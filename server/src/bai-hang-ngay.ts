@@ -18,7 +18,7 @@
 import type { Env } from './kieu'
 import type {
   CauTomTat, CheDoNgay, DemThaiDo, EmBaiHangNgay, KetLuanThaiDo, LopBaiHangNgay, NgayBaiEm, NgayHoatDong, NguonMuc, NhomGiay,
-  TinHieuThaiDo, TraLoiBaiHangNgay, TraLoiHoSoThaiDo,
+  TinHieuThaiDo, TraLoiBaiHangNgay, TraLoiHoSoThaiDo, TuSuaSai,
 } from './bai-hang-ngay-kieu'
 import { NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO as NG, TEN_NHAN_THAI_DO, TOI_DA_SO_NGAY_BAI_HANG_NGAY } from './bai-hang-ngay-kieu'
 import { CAU_TOI_THIEU } from './hanh-trinh-ngay'
@@ -33,6 +33,7 @@ import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { chonTuGiaTri, chuanMucDo, sqlLuotCaDaCongBo, tieuDeCau, type NguoiDocSo } from './lich-su-lam-cau'
 import { docCauKho, tenCuaDang } from './omni-d1'
 import { chuoiDuGanNhat, laLuoiTheoTiLe, tomTatNhip } from './nhip-hoc-luat'
+import { CACH_TINH_TIN_CAY, doTinCayTinHieu, tinCayKetLuan, type SoLieuThaiDo } from './thai-do-tin-cay'
 
 type Row = Record<string, unknown>
 type Tang = 1 | 2 | 3 | 4
@@ -527,7 +528,21 @@ export function tinhThaiDo(a: {
   // Chuỗi ngày đủ mức liền gần nhất (thầy 12/10: "6 ngày liền làm đủ mới thoát nhóm lười") — cùng phép thuần với Nhịp học (nhip-hoc-luat.ts).
   const homNay = a.ngay.find((n) => n.homNay)?.ngay ?? congNgayBhn(a.den, 1)
   const chuoiDu = chuoiDuGanNhat(a.ngay.map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam })), homNay)
-  return { tinHieu: t, ketLuan: ketLuanThaiDo(t, chuoi, chuoiDu) }
+  // CHỈ THÊM 12/10 đợt 16 — ĐỘ TIN CẬY (thai-do-tin-cay.ts): từ đúng các số đếm ở trên, không đọc thêm. Nhãn vẫn do `ketLuanThaiDo` quyết, KHÔNG đổi.
+  const soLieu: SoLieuThaiDo = {
+    ngay: { du, n: tinh.length },
+    nhanh: { nhanh: nhanh.length, coGiay: coGiay.length, dungNhanh: nhanh.filter((l) => l.dung === true).length, nhanhCoKq: coKq(nhanh).length },
+    don: { khuya, tong: a.luot.length },
+    goiY: { hoTro, soCau: a.cauDaLam.size },
+    lap: { trongChuoi: lap.trongChuoi, tong: lap.tong },
+    xuHuong: { ganDung: gan.filter((l) => l.dung).length, gan: gan.length, truocDung: truoc.filter((l) => l.dung).length, truoc: truoc.length },
+  }
+  for (const x of t) {
+    const d = doTinCayTinHieu(x.ma, x.muc, soLieu)
+    if (d !== undefined) x.doTinCay = d
+  }
+  const ketLuan = ketLuanThaiDo(t, chuoi, chuoiDu)
+  return { tinHieu: t, ketLuan: { ...ketLuan, ...tinCayKetLuan(ketLuan.nhan, t, soLieu, chuoi, chuoiDu) } }
 }
 
 /** Luật kết luận `LUAT_KET_LUAN` (kieu). Lý do luôn bằng số. */
@@ -717,6 +732,18 @@ export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: numb
     .then((m) => m.get(sbd) ?? tu)
     .catch(() => tu)
   const nhip = tomTatNhip(keHoach.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam })), homNay)
+  // 5c · CHỈ THÊM 12/10 đợt 16 — tự sửa câu sai, CHỈ ĐỂ XEM (không vào tín hiệu / kết luận): lượt trong khoảng (đã sắp cũ → mới), quy câu gốc;
+  // câu "đã sửa" = có lượt ĐÚNG sau lượt sai đầu tiên. Từ sổ đã đọc, không truy vấn thêm.
+  const tungSaiTrong = new Set<string>(), daSua = new Set<string>()
+  for (const d of lamTrong) {
+    if (d.ketQua === 0) tungSaiTrong.add(d.goc)
+    else if (d.ketQua === 1 && tungSaiTrong.has(d.goc)) daSua.add(d.goc)
+  }
+  const pSua = phanTram(daSua.size, tungSaiTrong.size)
+  const tuSuaSai: TuSuaSai = {
+    soCauSai: tungSaiTrong.size, soCauDaSua: daSua.size, phanTram: pSua,
+    chu: tungSaiTrong.size ? `Đã làm đúng lại ${daSua.size}/${tungSaiTrong.size} câu từng sai (${pSua}%)` : 'Chưa có câu nào làm sai trong khoảng này',
+  }
 
   // 6 · Câu đúng / Câu đã ôn (toàn bộ sổ đã đọc, quy câu gốc)
   const theoGoc = new Map<string, DongSo[]>()
@@ -752,6 +779,7 @@ export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: numb
     // Bản học sinh: bỏ ghi chú nội bộ của thầy (Gói 7 chưa đọc được, khoảng ngày bị nắn, sổ Hành trình…), chỉ giữ dòng "sổ bị cắt" nói với em.
     canhBao: nguoiDoc === 'hoc-sinh' ? (chuCat ? [chuCat] : []) : canhBao,
     nhomNhip: nhip.nhom, coDoiPho: ketLuan.nhan === 'doi-pho', chuoiDuGanNhat: nhip.chuoiDuGanNhat,
+    cachTinhTinCay: CACH_TINH_TIN_CAY, tuSuaSai,
   }
 }
 

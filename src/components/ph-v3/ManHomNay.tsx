@@ -6,6 +6,8 @@
 // Có `/ph/con-tong-quan` (ConTongQuan.tsx): khối chính lấy số câu đã làm / MỨC TỐI THIỂU của ngày từ đó + ba số câu đúng · câu sai · trung bình mỗi câu;
 // ngay sau cảnh báo là "Gợi ý nhắc con"; "Tuần này học đều" thay bằng "Lịch học tuần này" (đủ mức / chưa đủ / không làm + từng ngày từ mốc theo dõi, 01/10).
 // Máy chủ cũ chưa có lệnh ⇒ các khối mới vắng, màn y như trước.
+// ĐỢT 16 (thầy 12/10: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): sau khối chính · cảnh báo · Gợi ý nhắc con là thẻ "Nhịp học của con" (NhipHocCon.tsx —
+// CÙNG bảng Lười/Chăm của app học sinh, `/ph/nhip-hoc`; bấm ⇒ CÙNG tấm Hồ sơ làm bài). Chỉ hiện khi nơi dựng truyền `nhipCon` (AppPhuHuynh).
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { CaGanNhat, PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
@@ -18,6 +20,13 @@ import { BtChuY, BtChuong, BtKep, BtPhai, BtTich } from './BieuTuong'
 import { DangTai, The, TheLoi } from './dung-chung'
 import { BaSoHomNay, GoiYNhacCon, LichTuan, chuTinhTrangMuc, homNayCua, type TaiTongQuan } from './ConTongQuan'
 import { chuThay, lienKetCa, tuanNay } from './tien-ich'
+import NhipHocCon from './NhipHocCon'
+
+/** Số hôm nay của khối chính (tổng quan: đã làm / mức tối thiểu) cho thẻ Nhịp học — MỘT con số trên màn. Không có tổng quan ⇒ null (giữ số máy chủ). */
+const soHomNayTq = (tq: ConTongQuan | null): { muc: number; daLam: number } | null => {
+  const n = homNayCua(tq)
+  return n ? { muc: n.canLam, daLam: n.daLam } : null
+}
 
 /** Tối đa số tên dạng ghi ở dòng dạng (còn lại gộp "và N dạng khác") — dòng ngắn trên điện thoại; danh sách đủ ở Tiến bộ. */
 const DANG_TOI_DA = 3
@@ -28,10 +37,12 @@ const TEN_TANG = ['Nền', 'Hiểu', 'Vận dụng', 'Tổng hợp'] as const
 /** Chưa nối khối tổng quan (test cũ, màn dựng riêng) ⇒ coi như máy chủ cũ: các khối mới vắng. */
 const KHONG_TONG_QUAN: TaiTongQuan = { v: null, daTai: true, chuLoi: '', thuLai: () => {} }
 
-export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, onDaXem, tongQuan = KHONG_TONG_QUAN }: {
+export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, onDaXem, tongQuan = KHONG_TONG_QUAN, nhipCon }: {
   v: ViewPhMoi
   hoc2: Hoc2 | null
   tongQuan?: TaiTongQuan
+  /** Đợt 16: có ⇒ thẻ "Nhịp học của con" (Lười / Chăm, mở hồ sơ làm bài). Vắng (test cũ, màn dựng riêng) ⇒ không thẻ, không gọi `/ph/nhip-hoc`. */
+  nhipCon?: { sbd: string; tenCon: string; lop?: string }
   loiThay: { ds: NhanXetCa[] | null; chuLoi: string }
   thuLaiLoiThay: () => void
   canhBao: CanhBaoThay[]
@@ -51,6 +62,7 @@ export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, on
           <KhoiChinh pm={pm} hoc2={hoc2} tq={tongQuan.v} />
           {canhBao.map((cb) => <CanhBao key={cb.id} cb={cb} nay={pm.serverNow ?? Date.now()} onDaXem={onDaXem} />)}
           <GoiYNhacCon tai={tongQuan} />
+          {nhipCon && <NhipHocCon sbd={nhipCon.sbd} tenCon={nhipCon.tenCon} lop={nhipCon.lop} homNay={soHomNayTq(tongQuan.v)} />}
           <LoiThayMoi loiThay={loiThay} thuLai={thuLaiLoiThay} />
           {tongQuan.v ? <LichTuan tq={tongQuan.v} /> : <TuanNay pm={pm} />}
           <CanChuY pm={pm} hoc2={hoc2} hep={!!tongQuan.v} />

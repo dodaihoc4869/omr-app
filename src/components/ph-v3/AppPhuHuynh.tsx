@@ -1,5 +1,6 @@
 // TRUNG TU GIAO DIỆN THẦY DUYỆT 09/10 (bản vẽ PH-HomNay · PH-TienBo · PH-CaKiemTra): BA mục Hôm nay · Tiến bộ · Ca kiểm tra, ba biểu tượng khác nhau.
 // "Nhận xét của thầy" không còn là mục: thẻ lời mới nhất ở Hôm nay + màn con `#loi-thay` (có nút quay lại). "Đổi số báo danh" CHỈ ở menu Tài khoản và hỏi lại trước khi làm.
+// Đợt 16: Hôm nay có thẻ "Nhịp học của con" (Lười / Chăm như app học sinh) — ManHomNay nhận `nhipCon` (SBD · tên · lớp) để tự nạp `/ph/nhip-hoc`.
 // Đổi mục: mờ dần + trượt 8px (.tt-vao-muc), mỗi mục giữ chỗ cuộn riêng (kể cả khi quay lại từ chi tiết ca). Nguồn đọc và quyền công bố giữ nguyên.
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactElement } from 'react'
 import { AnhLogo } from '../LogoVai'
@@ -161,7 +162,7 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   else if (tuyen.muc === 'thong-tin') man = <ThongTin ten={ten} lop={lop} />
   else if (tuyen.muc === 'loi-thay') man = <ManLoiThay ds={loiThay.ds} loi={loiThay.chuLoi} thuLai={napLoiThay} />
   else if (tuyen.muc === 'tien-bo') man = <ManTienBo v={v} hoc2={hoc2} tq={tq.v} />
-  else man = <ManHomNay v={v} hoc2={hoc2} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} tongQuan={taiTq} />
+  else man = <ManHomNay v={v} hoc2={hoc2} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} tongQuan={taiTq} nhipCon={{ sbd, tenCon: ten, lop }} />
 
   const sang = mucSang(tuyen)
   const manCon = laManCon(tuyen)

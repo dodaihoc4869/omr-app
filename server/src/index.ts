@@ -3620,6 +3620,10 @@ const boXuLy = {
       if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
       // LÀN PHỤ HUYNH 12/10: tổng quan về con (đúng/sai, số giây từng câu, lịch học từ 12/10, gợi ý nhắc) — ĐỌC-CHỈ, cùng xác thực.
       if (p === '/ph/con-tong-quan') return ra(await phConTongQuan(env, b, Date.now(), envDoc, ctx))
+      // ĐỢT 16 (12/10): hồ sơ của con CÙNG hợp đồng ba lệnh học sinh (nhịp học Lười/Chăm, hồ sơ thái độ, lịch sử làm câu) — ĐỌC-CHỈ, cùng xác thực (ph-ho-so-con.ts).
+      if (p === '/ph/nhip-hoc') return ra(await import('./ph-ho-so-con').then((m) => m.phNhipHoc(env, b, Date.now(), envDoc, ctx)))
+      if (p === '/ph/ho-so-thai-do') return ra(await import('./ph-ho-so-con').then((m) => m.phHoSoThaiDo(env, b, Date.now(), envDoc, ctx)))
+      if (p === '/ph/lich-su-lam-cau') return ra(await import('./ph-ho-so-con').then((m) => m.phLichSuLamCau(env, b, envDoc, ctx)))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) {
         if (!congGame) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))

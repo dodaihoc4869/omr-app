@@ -233,7 +233,7 @@ describe('cùng phép tính với thầy: em không có lượt ẩn ⇒ mọi c
     const hsLs = (await hsLichSuLamCau(env, { token: tokenB })) as KetQuaLichSuLamCau
     expect(hsLs.tong).toEqual(thayLs.tong)
     expect(hsLs.lan.map(({ qid: _q, tieuDe: _t, chon: _c, ...l }) => l)).toEqual(thayLs.lan.map(({ qid: _q, tieuDe: _t, chon: _c, ...l }) => l))
-    expect(hsLs.cauSai.map(({ qid: _q, tieuDe: _t, ...c }) => c)).toEqual(thayLs.cauSai.map(({ qid: _q, tieuDe: _t, ...c }) => c))
+    expect(hsLs.cauSai.map(({ qid: _q, tieuDe: _t, moChua: _m, ...c }) => c)).toEqual(thayLs.cauSai.map(({ qid: _q, tieuDe: _t, ...c }) => c)) // moChua: khoá mở Tự chữa chỉ ở bản em (đợt 16)
     // qua Worker (đường thật) ra đúng như gọi hàm (Worker thêm `serverNow` vào mọi trả lời)
     const quaWorker = await goi<KetQuaLichSuLamCau & { serverNow?: number }>(env, '/hs/lich-su-lam-cau', { token: tokenB })
     delete quaWorker.serverNow
@@ -244,7 +244,10 @@ describe('cùng phép tính với thầy: em không có lượt ẩn ⇒ mọi c
 describe('lọc thuần (ho-so-em-hs-loc.ts)', () => {
   it('khoá câu: cùng mã ⇒ cùng khoá; khớp câu sai ↔ lượt giữ nguyên; tiêu đề rỗng ⇒ "Câu N" / "Câu chưa có tên dạng"', () => {
     const khoa = taoKhoaCau()
-    expect([khoa('X-I-1'), khoa('X-I-2'), khoa('X-I-1')]).toEqual(['c1', 'c2', 'c1'])
+    // Đợt 16: khoá cố định theo mã (băm) — cùng mã ⇒ cùng khoá ở mọi trả lời; mã khác ⇒ khoá khác; vẫn dạng "c<số>".
+    const [k1, k2, k3] = [khoa('X-I-1'), khoa('X-I-2'), khoa('X-I-1')]
+    expect(k1).toBe(k3); expect(k1).not.toBe(k2); expect([k1, k2].every((k) => /^c\d+$/.test(k))).toBe(true)
+    expect(taoKhoaCau()('X-I-1')).toBe(k1)
     expect(tieuDeCauHs('DH-12-C1-B2-III-17~ss2#3', '')).toBe('Câu 17')
     expect(tieuDeCauHs('nen:abc', ' ')).toBe('Câu chưa có tên dạng')
     expect(tieuDeCauHs('DH-12-I-4', 'Câu 4 · Chất béo')).toBe('Câu 4 · Chất béo')
@@ -257,8 +260,10 @@ describe('lọc thuần (ho-so-em-hs-loc.ts)', () => {
       ],
       cauSai: [{ qid: 'Q-I-9', tieuDe: '', mucDo: '', soLan: 2, soSai: 1, soDung: 1, lanCuoiDung: true, lanCuoi: '2026-10-02T01:00:00Z', giaySai: [30] }],
     })
-    expect(r.lan.map((l) => [l.qid, l.chon, l.tieuDe])).toEqual([['c1', null, 'Câu 9'], ['c1', null, 'Câu 9']])
-    expect(r.cauSai[0]).toMatchObject({ qid: 'c1', tieuDe: 'Câu 9', soSai: 1, giaySai: [30] })
+    const kQ = taoKhoaCau()('Q-I-9')
+    expect(r.lan.map((l) => [l.qid, l.chon, l.tieuDe])).toEqual([[kQ, null, 'Câu 9'], [kQ, null, 'Câu 9']])
+    expect(r.cauSai[0]).toMatchObject({ qid: kQ, tieuDe: 'Câu 9', soSai: 1, giaySai: [30] })
+    expect(r.cauSai[0]!.moChua).toMatch(/^g\d+$/) // đợt 16: khoá mở Tự chữa (băm mã gốc), không mã nội bộ
     expect(TRUONG_BO_BAN_HOC_SINH).toContain('lan[].chon')
   })
 })

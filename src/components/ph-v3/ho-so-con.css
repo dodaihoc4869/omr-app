@@ -1,0 +1,21 @@
+/* HỒ SƠ LÀM BÀI CỦA CON (app phụ huynh, đợt 16) — tấm `HoSoLamCauEm` chế độ phụ huynh, bọc trong `.ph-ho-so-con` (HoSoCuaConPh.tsx).
+ * MÀU (thầy 05/10: giữ nguyên mọi màu, thêm thì đồng bộ biến chuẩn): tấm đọc bảng --gvm-* — khai ở :root (tokens.css), sáng/tối theo máy như app phụ
+ * huynh (bảng --ph3-* cùng gốc màu với --gvm-*). Chỉ ÁNH XẠ biến tấm cần mà ngoài vỏ app thầy không có: --m3-man-che (nền che) ⇒ --phu (lớp phủ chuẩn,
+ * tokens.css, sáng + tối) — y như bản học sinh. CỠ CHỮ: thân 15 px cho phụ huynh (chuẩn C9), chú thích ≥ 12 px. */
+.ph-ho-so-con {
+  display: contents;
+  --m3-man-che: var(--phu);
+}
+.ph-ho-so-con .gvv2-hs {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.ph-ho-so-con :is(.gvv2-tdo-mo-ta, .gvv2-tdo-ly-do, .gvv2-tdo-thoat, .gvv2-tdo-th-chu, .gvv2-tdo-loi, .gvv2-hs-ls-dau p, .gvv2-hs-lan-chu b) {
+  font-size: 15px;
+}
+.ph-ho-so-con .gvv2-hs-dau-chu .gvv2-h2 {
+  line-height: 1.3;
+}
+.ph-ho-so-con .gvv2-hs-dau-chu p {
+  font-size: 13px;
+}

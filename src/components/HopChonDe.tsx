@@ -13,13 +13,37 @@
 //
 // OMNI 3 (05/10): `theoMucDich` ⇒ cây hai thư mục DẠY HỌC / TU LUYỆN (`src/lib/cay-muc-dich.ts`) — dùng ở Mở ca kiểm tra và Giao chiến dịch
 // (vẫn chọn được MỌI tờ). Thư mục TU LUYỆN mở sẵn để thầy thấy ngay các khối như trước. Vắng cờ ⇒ cây cũ y nguyên.
-import { useMemo, useState } from 'react'
+//
+// ĐỢT 16 (12/10, thầy: "chọn xong bấm lại nút chọn thì sẽ trở lại ban đầu"): hộp bị DỰNG LẠI mỗi lần mở (hộp Dạy học chỉ vẽ khi mở; Gọi lên
+// bảng đổi chế độ là bỏ hộp) ⇒ chữ tìm, chip khối mất và cây gập sạch — bài đã tích nằm khuất nên trông như chưa chọn gì. Màn truyền `nho`
+// (một `useRef`) ⇒ giữ chữ tìm + chip khối qua các lần dựng lại, và lần mở cây TỰ MỞ tới bài đang chọn (cuộn khung cây tới dòng ấy).
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CheckSquare, Square, MinusSquare, Search, ChevronRight, Circle, CircleDot } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
 import { bamTich, dungCay, khoiCuaDe, locCay, moiMaTrongCay, tongCau, tongDaChon, trangThaiTich, type Nut } from '../lib/cay-chon-de'
 import { dungCayTheoMucDich, KHOA_THU_MUC_TU_LUYEN } from '../lib/cay-muc-dich'
 
 export { khoiCuaDe }
+
+/** Trạng thái hộp giữ qua các lần dựng lại (đợt 16): chữ tìm + chip khối. Màn gọi giữ bằng `useRef<NhoHopChonDe | null>(null)`. */
+export interface NhoHopChonDe {
+  tim: string
+  khoi: string
+}
+
+/** Khoá các nhánh phải mở để thấy bài đang chọn: nhánh chọn MỘT PHẦN thì mở và đi tiếp xuống; nhánh chọn TRỌN thì để gập (ô tích đầy đã nói đủ). */
+function nhanhToiDaChon(cay: Nut[], daChon: Set<string>): string[] {
+  const ra: string[] = []
+  const di = (ds: Nut[]) => {
+    for (const n of ds) {
+      if (!n.con.length || trangThaiTich(n, daChon) !== 'nua') continue
+      ra.push(n.khoa)
+      di(n.con)
+    }
+  }
+  di(cay)
+  return ra
+}
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -86,6 +110,7 @@ function Hang({
           type="button"
           role={tichDuoc ? (chonNhieu ? 'checkbox' : 'radio') : undefined}
           aria-checked={tichDuoc ? tt !== 'trong' : undefined}
+          data-tich={tt}
           disabled={!tichDuoc}
           onClick={() => tichDuoc && onTich(n)}
           className="tap-target flex-1 min-w-0 text-left flex items-center"
@@ -137,11 +162,22 @@ export interface HopChonDeProps {
   onChonTatCa?: (ma: string[]) => void
   /** OMNI 3: xếp cây theo mục đích — thư mục DẠY HỌC và TU LUYỆN (mọi nhánh khác). Vắng ⇒ cây cũ. */
   theoMucDich?: boolean
+  /** Đợt 16: có ⇒ giữ chữ tìm + chip khối qua các lần dựng lại hộp, và lần mở cây tự mở tới bài đang chọn. Vắng ⇒ như cũ. */
+  nho?: { current: NhoHopChonDe | null }
 }
 
-export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308, chonNhieu, onChonTatCa, theoMucDich = false }: HopChonDeProps) {
-  const [tim, setTim] = useState('')
-  const [khoi, setKhoi] = useState('')
+export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308, chonNhieu, onChonTatCa, theoMucDich = false, nho }: HopChonDeProps) {
+  const [tim, setTim] = useState(() => nho?.current?.tim ?? '')
+  // Chip khối nhớ lại chỉ khi kho vẫn có khối ấy (kho đổi ⇒ về "Tất cả", không để cây rỗng).
+  const [khoi, setKhoi] = useState(() => {
+    const k = nho?.current?.khoi ?? ''
+    return k && ds.some((c) => khoiCuaDe(c) === k) ? k : ''
+  })
+  useEffect(() => {
+    if (nho) nho.current = { tim, khoi }
+  }, [nho, tim, khoi])
+  // Bài đang chọn LÚC MỞ hộp — đọc một lần: tích / bỏ trong lúc mở không làm cây tự gập / mở theo.
+  const [chonLucMo] = useState(() => (nho && daChon.size ? daChon : null))
   /** Nhánh thầy TỰ bấm mở/gập, gắn với chữ đang gõ. Đổi chữ tìm là quay về mặc định. */
   const [moTay, setMoTay] = useState<{ tim: string; set: Set<string> } | null>(null)
 
@@ -160,9 +196,11 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
   //   · đang gõ tìm   → mở đúng nhánh có kết quả
   //   · thầy tự bấm   → theo tay thầy, cho đến khi đổi chữ trong ô tìm
   //   · theo mục đích → thư mục TU LUYỆN mở sẵn (thấy ngay các khối như cây cũ), DẠY HỌC gập
+  //   · mở lại hộp (`nho`) → thêm các nhánh dẫn tới bài đang chọn
+  const moTheoChon = useMemo(() => (chonLucMo ? nhanhToiDaChon(cayGoc, chonLucMo) : []), [cayGoc, chonLucMo])
   const macDinh = useMemo(
-    () => new Set<string>(tim.trim() ? moKhoa : theoMucDich && cayGoc.some((n) => n.khoa === KHOA_THU_MUC_TU_LUYEN) ? [KHOA_THU_MUC_TU_LUYEN] : []),
-    [tim, moKhoa, cayGoc, theoMucDich],
+    () => new Set<string>(tim.trim() ? moKhoa : [...(theoMucDich && cayGoc.some((n) => n.khoa === KHOA_THU_MUC_TU_LUYEN) ? [KHOA_THU_MUC_TU_LUYEN] : []), ...moTheoChon]),
+    [tim, moKhoa, cayGoc, theoMucDich, moTheoChon],
   )
   const moRong = moTay && moTay.tim === tim ? moTay.set : macDinh
 
@@ -186,6 +224,18 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
     }
     onChonTatCa([...bamTich(n, daChon)])
   }
+
+  // Mở lại hộp: cuộn KHUNG CÂY (không kéo cả trang) tới dòng chọn trọn đầu tiên nếu nó đang khuất.
+  const khungCay = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const k = khungCay.current
+    const o = chonLucMo ? k?.querySelector<HTMLElement>('[data-tich="day"]') : null
+    if (!k || !o) return
+    const rk = k.getBoundingClientRect()
+    const ro = o.getBoundingClientRect()
+    if (ro.top < rk.top || ro.bottom > rk.bottom) k.scrollTop += ro.top - rk.top - 8
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const tong = useMemo(() => tongDaChon(cayGoc, daChon), [cayGoc, daChon])
   const tongTrongLoc = useMemo(() => moiMaTrongCay(cay).length, [cay])
@@ -223,7 +273,7 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
         <span style={{ ...NHAN_NHO, ...SO, flex: '0 0 auto' }}>{tongTrongLoc} đề</span>
       </div>
 
-      <div role="tree" aria-label="Cây chọn đề" style={{ maxHeight: cao, overflowY: 'auto', borderRadius: 'var(--bo-2)', border: '1px solid var(--vien)', background: 'var(--the)', overscrollBehavior: 'contain' }}>
+      <div ref={khungCay} role="tree" aria-label="Cây chọn đề" style={{ maxHeight: cao, overflowY: 'auto', borderRadius: 'var(--bo-2)', border: '1px solid var(--vien)', background: 'var(--the)', overscrollBehavior: 'contain' }}>
         {cay.length === 0 ? (
           // Ô tìm để trống mà cây vẫn rỗng = KHO ĐỀ TRỐNG (chưa nạp), không phải "không khớp": chữ cũ ra `khớp ""` — vô nghĩa.
           <div style={{ ...NHAN_NHO, padding: 'var(--k4)' }}>

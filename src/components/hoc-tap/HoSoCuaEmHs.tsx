@@ -24,9 +24,12 @@ export interface HoSoCuaEmHsProps {
   /** Tên lớp hiện ở đầu tấm khi máy chủ chưa trả (vd "12A1"). */
   lop?: string
   onDong(): void
+  /** Đợt 16: bấm một hộp "Chưa sửa được" ⇒ mở Tự chữa đúng câu ấy. `qid` = khoá câu của lệnh `/hs/lich-su-lam-cau` (bản học sinh: "c1", "c2"…
+   *  theo hợp đồng lọc server/src/ho-so-em-hs-loc.ts). Cổng học sinh (StudentPortalScreen) nối. Vắng ⇒ hộp không bấm được. */
+  onChuaCau?: (qid: string) => void
 }
 
-export default function HoSoCuaEmHs({ token, tenEm, lop, onDong }: HoSoCuaEmHsProps) {
+export default function HoSoCuaEmHs({ token, tenEm, lop, onDong, onChuaCau }: HoSoCuaEmHsProps) {
   useKhoaCuonTrang(true)
   const nguon = useMemo(() => taoNguonHoSoEm(token), [token])
   const em = useMemo(() => ({ sbd: '', ten: tenEm, khoi: null, ...(lop ? { lop } : {}) }), [tenEm, lop])
@@ -42,7 +45,7 @@ export default function HoSoCuaEmHs({ token, tenEm, lop, onDong }: HoSoCuaEmHsPr
   )
   return createPortal(
     <div className="hs-ho-so-em" data-che-do="hoc-sinh">
-      <HoSoLamCauEm em={em} nguon={nguon} cheDo="hoc-sinh" onDong={onDong} />
+      <HoSoLamCauEm em={em} nguon={nguon} cheDo="hoc-sinh" onDong={onDong} onChuaCau={onChuaCau} />
     </div>,
     document.body,
   )

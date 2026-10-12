@@ -1,58 +1,79 @@
-// TẤM "HỒ SƠ LÀM BÀI" CỦA MỘT EM — mở từ Hành trình › Nhịp học hoặc › Bài hằng ngày (bấm một em).
-// LỊCH SỬ: 09/10 khuya thầy: "bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử, câu làm sai số giây làm mỗi câu, mọi thứ về học sinh đó" ⇒ tấm
-// "Lịch sử làm câu". 12/10 THẦY: "Khi tôi bấm vào học sinh tôi muốn biết mọi thông tin làm bài của học sinh, câu sai, câu đúng, câu đã làm, câu đã ôn
-// tôi muốn biết rõ học sinh đó chăm chỉ hay lười biếng hay đối phó làm bài tập mọi thứ phải hiển thị khoa học trực quan đẹp mắt" ⇒ TRÙNG TU:
-//   · ĐẦU TẤM (điểm nhấn duy nhất): nhãn thái độ "Chăm chỉ" / "Chưa đều" / "Có dấu hiệu đối phó" / "Chưa đủ dữ liệu" + lý do BẰNG SỐ — lệnh CHỈ ĐỌC
-//     `/gv/ho-so-thai-do` (`src/lib/bai-hang-ngay-api.ts`, luật + ngưỡng một chỗ ở `server/src/bai-hang-ngay-kieu.ts`). Không tự phán thêm gì.
-//     12/10 (thầy chốt luật nhóm, "6 ngày liền làm đủ mới thoát nhóm lười"): máy chủ trả `nhomNhip` ⇒ NHÓM Nhịp học là nhãn chính (cùng hàm với Hôm
-//     nay), cờ đối phó là chip riêng, Lười kèm "đủ mức liền x/6 ngày để thoát"; thiếu trường (máy chủ cũ) ⇒ nhãn cũ.
-//   · "Hôm nay" (dòng Nhịp học khi mở từ Nhịp học; mở từ Bài hằng ngày thì lấy ngày hôm nay của lịch).
-//   · TỪ MỐC THEO DÕI (01/10 — thầy 12/10: "dữ liệu phần này tính từ 1/10"; khoảng do máy chủ trả `tu`…`den`): năm ô số (đã làm · đúng · sai · đã ôn · giây trung bình) · lịch làm bài theo ngày (ô màu như bảng Bài hằng ngày) · biểu đồ độ đúng
-//     theo ngày (cột CSS) · phân bố số giây (nhóm quá nhanh tô riêng) · sáu tín hiệu, mỗi tín hiệu có số + ngưỡng.
-//   · TOÀN BỘ SỔ (`/gv/lich-su-lam-cau`, giữ nguyên số và chữ cũ): bốn ô số + bốn thẻ con Câu sai · Câu đúng · Câu đã ôn · Toàn bộ lịch sử
-//     (Câu đúng / Câu đã ôn từ lệnh hồ sơ thái độ). Giây ƯỚC TÍNH ghi "≈", không đo được ghi "chưa đo giờ"; 100 dòng mỗi đợt + "Xem thêm".
-//   · Tấm bên phải trên máy tính (rộng ≤ 760 px, nền che), TOÀN MÀN trên điện thoại. Esc / Đóng / bấm nền che ⇒ đóng; Tab giữ trong tấm; đóng xong
-//     focus về đúng nút đã bấm (thẻ mở tấm lo). Lệnh hồ sơ thái độ lỗi / máy chủ cũ chưa có ⇒ một dòng nói thật + Thử lại, phần lịch sử vẫn đủ.
-//   · "Mở hồ sơ đầy đủ" ⇒ màn Học sinh mở hồ sơ em (ca kiểm tra, EXP, thần thú, phụ huynh…) — `moHoSoEm`.
-//   · 12/10F (thầy: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé"): CÙNG tấm này mở trong app học sinh
-//     (`src/components/hoc-tap/HoSoCuaEmHs.tsx`) — prop `nguon` (hai lệnh học sinh `/hs/ho-so-thai-do` · `/hs/lich-su-lam-cau`) + `cheDo='hoc-sinh'`:
-//     đủ mọi phần số liệu như thầy thấy; tiêu đề "Hồ sơ làm bài của em · từ 01/10" + dòng "Thầy cũng xem hồ sơ này."; ẩn mọi đường của thầy
-//     ("Mở hồ sơ đầy đủ", kho thiếu câu, kiến thức cần bổ sung). Vắng hai prop ⇒ hành vi thầy NGUYÊN như cũ.
-// Mảnh riêng nạp LƯỜI (ngoài precache, vite.config.ts). Biểu đồ bằng CSS, không thư viện. Màu chỉ biến --gvm-* (bai-hang-ngay.css).
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Check, ExternalLink, RotateCcw, TriangleAlert, X } from 'lucide-react'
+// TẤM "HỒ SƠ LÀM BÀI" CỦA MỘT EM — MỘT tấm cho cả ba app: thầy (Hành trình › Nhịp học / Bài hằng ngày / Điểm danh), học sinh (HoSoCuaEmHs), phụ huynh
+// (ph-v3/HoSoCuaConPh). LỊCH SỬ: 09/10 khuya thầy: "bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử, câu làm sai số giây làm mỗi câu" ⇒ "Lịch sử làm
+// câu". 12/10 trùng tu: nhãn thái độ + lý do bằng số (`/gv/ho-so-thai-do`, luật + ngưỡng một chỗ ở server/src/bai-hang-ngay-kieu.ts), nhóm Nhịp học là nhãn
+// chính (`nhomNhip`), cờ đối phó là chip riêng, Lười kèm "đủ mức liền x/6 ngày để thoát". 12/10F: cùng tấm mở trong app học sinh (`nguon` + `cheDo`).
+//
+// ĐỢT 16 (thầy 12/10: "Hồ sơ học sinh tối ưu lại giao diện cho thân thiện hơn nữa, đẹp và đầy đủ hơn nữa, hiện đại. Tối ưu cho cả dọc ngang máy tính.
+// Đồng bộ cho cả app hs gv và ph" · "đo kĩ hơn nữa thái độ … chính xác hơn 90%" · "số giây hiển thị cho cả việc làm câu dễ khó, chỗ các câu học sinh
+// chưa chữa được bấm vào phải nảy vào đúng chỗ tự sửa … cho vào box"):
+//   · ĐẦU TẤM (điểm nhấn duy nhất): nhãn nhóm + biểu tượng, chip đối phó, chip "Độ tin cậy N%" (khi máy chủ gửi `doTinCay`; dưới 90% ⇒ kết luận ghi "tạm —
+//     đang theo dõi" + câu `canThem`), mô tả, Lười: 6 ô thoát, lý do bằng số; bên phải (máy tính) / bên dưới (điện thoại): dải 14 ngày gần nhất.
+//   · Sáu tín hiệu thành thẻ gọn: số đo lớn, thước 0–100% có VẠCH NGƯỠNG đúng `NGUONG_THAI_DO` (chú ý · vượt ngưỡng), câu số liệu, ngưỡng bằng chữ, độ tin cậy.
+//   · SỐ GIÂY Ở MỌI LƯỢT (đúng, sai, bỏ trống — câu dễ lẫn câu khó): dòng lịch sử có cột số giây; thẻ câu sai ghi số giây TỪNG lần (cũ → mới); khối "Số
+//     giây theo mức độ câu" (Nhận biết → Vận dụng cao). Không đo được ⇒ "—" + chú thích (không bao giờ bịa); ước tính ⇒ "≈".
+//   · CÂU CHƯA SỬA ĐƯỢC: lưới hộp gọn (tên câu · mức · số lần sai · lần cuối · số giây). Chế độ học sinh + `onChuaCau` ⇒ mỗi hộp là MỘT nút mở Tự chữa
+//     đúng câu ấy (`onChuaCau(qid)` — khoá câu của bản học sinh, cổng học sinh nối). Thầy / phụ huynh: hộp KHÔNG là đường vào Tự chữa.
+//   · Khung: tấm phải trên máy tính, RỘNG tới 1200 px, lưới nhiều cột theo bề rộng CHÍNH TẤM (container query) — điện thoại dọc một cột, xoay ngang / máy
+//     tính bảng hai cột, máy tính 12 cột; xoay ngang thấp (≤ 500 px cao) ⇒ toàn màn + đầu tấm gọn. CSS: ho-so-lam-cau-em.css (chỉ biến --gvm-* sẵn có).
+//   · cheDo 'phu-huynh': chữ của phụ huynh (ngôi "con"), ẩn mọi đường của thầy như chế độ học sinh.
+// Esc / Đóng / bấm nền che ⇒ đóng; Tab giữ trong tấm; đóng xong focus về đúng nút đã bấm (nơi mở lo). Lệnh nào lỗi ⇒ một câu nói thật + nút tải lại,
+// phần còn lại vẫn đủ. Mảnh riêng nạp LƯỜI (ngoài precache, vite.config.ts). Biểu đồ bằng CSS, không thư viện.
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { Activity, Check, ChevronRight, ExternalLink, Hourglass, RotateCcw, ShieldCheck, TriangleAlert, X } from 'lucide-react'
 import { gioPhutVN, ngayThuChu, ngayVN } from '../../lib/em-toan-canh'
 import { lyDoDeHieu } from '../../lib/loi-de-hieu'
 import { layLichSuLamCau, TRAN_GIOI_HAN, type CauEmSai, type KetQuaLichSuLamCau, type LanLamCau, type NguonGiay } from '../../lib/lich-su-lam-cau-api'
-import { layHoSoThaiDo, NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO, type CauTomTat, type KetQuaHoSoThaiDo, type NgayHoatDong } from '../../lib/bai-hang-ngay-api'
+import {
+  layHoSoThaiDo,
+  NGAY_BAT_DAU_BAI_HANG_NGAY,
+  NGUONG_THAI_DO,
+  type CauTomTat,
+  type KetLuanThaiDoApp,
+  type KetQuaHoSoThaiDo,
+  type KetQuaHoSoThaiDoApp,
+  type MaTinHieu,
+  type NgayHoatDong,
+  type NhanThaiDo,
+  type TinHieuThaiDoApp,
+} from '../../lib/bai-hang-ngay-api'
 import type { KetQuaLenh } from '../../lib/goi-lenh-thay'
 import { useAppStore } from '../../store/appStore'
 import { chuCaiTen, chuHomNay, coMucNhip, nhomNhipCuaEm, TEN_NHOM_NHIP, tenKhoi, tenTang, type DongNhip, type LoaiNhomNhip } from './nhip-hanh-trinh'
-import { chuO, MO_TA_NHAN, MO_TA_NHOM, mucO, NHAN_THEO_NHOM, ngayNgan, TEN_MUC_TIN_HIEU, thuNgan } from './bai-hang-ngay-ui'
+import { chuO, MO_TA_NHAN, MO_TA_NHOM, mucO, NHAN_THEO_NHOM, ngayNgan, TEN_MUC_O, TEN_MUC_TIN_HIEU, thuNgan } from './bai-hang-ngay-ui'
+import { doiNgoiCon } from '../hoc-tap/BangNhipHoc'
+import { chuCanThem, chuDoTinCay, NGUONG_TIN_CAY } from '../../lib/nhip-hoc-em'
 import { LUAT_NHOM_NHIP } from '../../../server/src/nhip-hoc-kieu'
 import { TEN_NHOM_NHIP as TEN_NHOM_NHIP_HOC } from '../../../server/src/nhip-hoc-luat'
 import './bai-hang-ngay.css'
+import './ho-so-lam-cau-em.css'
 
 /** Em mở tấm: bắt buộc SBD · tên · khối; số Nhịp học (mức hôm nay, tầng…) có khi mở từ Nhịp học; `lop` khi mở từ Bài hằng ngày. */
 export type EmHoSo = Pick<DongNhip, 'sbd' | 'ten' | 'khoi'> & Partial<Omit<DongNhip, 'sbd' | 'ten' | 'khoi'>> & { lop?: string }
 
+export { chuDoTinCay, NGUONG_TIN_CAY }
 /** Số lần hiện mỗi đợt ở "Toàn bộ lịch sử" (danh sách dài — chuẩn B16). */
 export const MOI_DOT = 100
+/** Số lần gần nhất ghi số giây trong một hộp câu (phần còn lại: một chip "+ N lần khác"). */
+export const SO_LAN_GIAY_HOP = 8
 
-/** Nguồn dữ liệu của tấm (12/10F). Vắng ⇒ hai lệnh thầy theo `em.sbd`. App học sinh truyền hai lệnh `/hs/...` (token của em). Nơi truyền giữ
+/** Nguồn dữ liệu của tấm (12/10F). Vắng ⇒ hai lệnh thầy theo `em.sbd`. App học sinh / phụ huynh truyền hai lệnh của mình. Nơi truyền giữ
  *  MỘT đối tượng cho mỗi em (useMemo) — đổi đối tượng là tấm nạp lại. */
 export interface NguonHoSo {
   hoSoThaiDo(): Promise<KetQuaLenh<KetQuaHoSoThaiDo>>
   lichSu(gioiHan?: number): Promise<KetQuaLenh<KetQuaLichSuLamCau>>
 }
-/** Ai đang xem: 'thay' (mặc định — app thầy) · 'hoc-sinh' (em xem hồ sơ của chính mình trong app học sinh). */
-export type CheDoHoSo = 'thay' | 'hoc-sinh'
+/** Ai đang xem: 'thay' (mặc định — app thầy) · 'hoc-sinh' (em xem hồ sơ của chính mình) · 'phu-huynh' (phụ huynh xem hồ sơ của con). */
+export type CheDoHoSo = 'thay' | 'hoc-sinh' | 'phu-huynh'
+type Ngoi = 'em' | 'con'
 
-/** Chữ khác nhau theo người xem (chỗ còn lại dùng chung: "Em …" đúng ngôi với cả thầy đọc lẫn em đọc). */
-const CHU_CHE_DO: Record<CheDoHoSo, { matDau: string; dangTai: string; loi: string; nutTai: string }> = {
-  thay: { matDau: 'Thái độ làm bài', dangTai: 'Đang tải hồ sơ thái độ làm bài', loi: 'Chưa tải được hồ sơ thái độ làm bài của em.', nutTai: 'Tải lại hồ sơ thái độ' },
-  'hoc-sinh': { matDau: 'Nhịp học của em', dangTai: 'Đang tải nhịp học của em', loi: 'Chưa tải được nhịp học của em.', nutTai: 'Tải lại nhịp học' },
+/** Chữ khác nhau theo người xem. `ngoi`: thầy và em đọc "em", phụ huynh đọc "con". */
+const CHU_CHE_DO: Record<CheDoHoSo, { matDau: string; dangTai: string; loi: string; nutTai: string; ngoi: Ngoi }> = {
+  thay: { matDau: 'Thái độ làm bài', dangTai: 'Đang tải hồ sơ thái độ làm bài', loi: 'Chưa tải được hồ sơ thái độ làm bài của em.', nutTai: 'Tải lại hồ sơ thái độ', ngoi: 'em' },
+  'hoc-sinh': { matDau: 'Nhịp học của em', dangTai: 'Đang tải nhịp học của em', loi: 'Chưa tải được nhịp học của em.', nutTai: 'Tải lại nhịp học', ngoi: 'em' },
+  'phu-huynh': { matDau: 'Nhịp học của con', dangTai: 'Đang tải nhịp học của con', loi: 'Chưa tải được nhịp học của con.', nutTai: 'Tải lại nhịp học', ngoi: 'con' },
 }
+const hoa = (ngoi: Ngoi): string => (ngoi === 'con' ? 'Con' : 'Em')
+const theoNgoi = (chu: string, ngoi: Ngoi): string => (ngoi === 'con' ? doiNgoiCon(chu) : chu)
 
 // ------------------------------------------------------------------ PHÉP THUẦN (test gọi thẳng)
 
@@ -109,6 +130,59 @@ export function giayCacLanSai(c: Pick<CauEmSai, 'qid' | 'giaySai'>, lan: readonl
   return c.giaySai.map((g) => ({ giay: g, nguon: g === null ? null : 'khong-ro' }))
 }
 
+/** Một lần làm của một câu, kèm số giây (đợt 16 — MỌI lần: đúng, sai, bỏ trống). */
+export interface LanGiay {
+  dung: boolean | null
+  giay: number | null
+  nguon: NguonGiay | 'khong-ro'
+}
+/**
+ * Số giây TỪNG LẦN của một câu (cũ → mới): mọi lần của câu trong `lan` (đúng, sai, bỏ trống — số giây máy chủ đo, ước tính ghi "≈"). Lần sai CŨ HƠN
+ * nằm ngoài `lan` (sổ chỉ trả các lượt gần nhất) ⇒ lấy từ `giaySai` của máy chủ, đứng trước, nguồn 'khong-ro'. `truoc` = số lần còn lại của câu
+ * (theo `soLan`) không có trong hai nguồn ấy — hộp ghi "+ N lần khác", KHÔNG bịa số giây cho chúng. Thuần.
+ */
+export function giayCacLan(c: Pick<CauEmSai, 'qid' | 'giaySai' | 'soLan'>, lan: readonly LanLamCau[]): { ds: LanGiay[]; truoc: number } {
+  const cua = lan.filter((l) => l.qid === c.qid).sort((a, b) => a.luc.localeCompare(b.luc))
+  const saiTrong = cua.filter((l) => l.dung === false).length
+  const cu: LanGiay[] = saiTrong < c.giaySai.length ? c.giaySai.slice(0, c.giaySai.length - saiTrong).map((g): LanGiay => ({ dung: false, giay: g, nguon: g === null ? null : 'khong-ro' })) : []
+  const ds: LanGiay[] = [...cu, ...cua.map((l): LanGiay => ({ dung: l.dung, giay: l.giay, nguon: l.giay === null ? null : (l.nguonGiay ?? 'khong-ro') }))]
+  return { ds, truoc: Math.max(0, c.soLan - ds.length) }
+}
+
+/** Một hàng "Số giây theo mức độ câu" (Nhận biết → Vận dụng cao, rồi "Chưa ghi mức độ"). */
+export interface DongGiayMuc {
+  ten: string
+  soLuot: number
+  soCoGiay: number
+  giayTb: number | null
+  soDung: number
+  soSai: number
+  coUoc: boolean
+}
+const THU_TU_MUC = ['Nhận biết', 'Thông hiểu', 'Vận dụng', 'Vận dụng cao', 'Chưa ghi mức độ']
+/** Gom các lượt theo mức độ câu: trung bình số giây (chỉ lượt có số giây — đo thật hoặc ước tính), số lượt, đúng/sai. Mức không có lượt ⇒ bỏ. Thuần. */
+export function giayTheoMucDo(lan: readonly LanLamCau[]): DongGiayMuc[] {
+  const m = new Map<string, DongGiayMuc & { tong: number }>()
+  for (const l of lan) {
+    const ten = tenMucDo(l.mucDo) || 'Chưa ghi mức độ'
+    const d = m.get(ten) ?? { ten, soLuot: 0, soCoGiay: 0, giayTb: null, soDung: 0, soSai: 0, coUoc: false, tong: 0 }
+    d.soLuot++
+    if (l.dung === true) d.soDung++
+    else if (l.dung === false) d.soSai++
+    if (l.giay !== null) {
+      d.soCoGiay++
+      d.tong += l.giay
+      if (l.nguonGiay === 'uoc') d.coUoc = true
+    }
+    m.set(ten, d)
+  }
+  return THU_TU_MUC.filter((t) => m.has(t)).map((t) => {
+    const { tong, ...d } = m.get(t)!
+    return { ...d, giayTb: d.soCoGiay > 0 ? Math.round(tong / d.soCoGiay) : null }
+  })
+}
+
+
 const ngayGio = (iso: string) => {
   const ngay = ngayThuChu(ngayVN(iso))
   const gio = gioPhutVN(iso)
@@ -118,6 +192,23 @@ const ngayGio = (iso: string) => {
 // ------------------------------------------------------------------ GIAO DIỆN
 
 const CHON_FOCUS = 'button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+const GIAI_THICH_CHUA_DO = 'Lượt này chưa đo được số giây (lượt cũ, hoặc máy chưa ghi giờ) — không ước đoán.'
+const GIAI_THICH_UOC = 'Số giây ước tính: tính từ lúc trả lời câu liền trước (lượt cũ chưa đo giờ).'
+
+/** Số giây một lần: "45 giây" · "≈ 45 giây" · "—" (chưa đo được, có chú thích) — KHÔNG bao giờ bịa. */
+function GiayO({ giay, nguon }: { giay: number | null; nguon: NguonGiay | 'khong-ro' }) {
+  if (giay === null || nguon === null)
+    return (
+      <span className="hslc-giay" data-chua="" title={GIAI_THICH_CHUA_DO}>
+        —<span className="gvv2-an-chu"> chưa đo số giây</span>
+      </span>
+    )
+  return (
+    <span className="hslc-giay gvv2-so" data-uoc={nguon === 'uoc' ? '' : undefined} title={nguon === 'uoc' ? GIAI_THICH_UOC : undefined}>
+      {chuGiay(giay, nguon)}
+    </span>
+  )
+}
 
 function XuongTam() {
   return (
@@ -146,39 +237,111 @@ function OSo({ nhan, so, phu }: { nhan: string; so: string; phu: string }) {
   )
 }
 
-function DsCauSai({ cauSai, lan }: { cauSai: readonly CauEmSai[]; lan: readonly LanLamCau[] }) {
-  if (cauSai.length === 0) return <p className="gvv2-trong">Em chưa sai câu nào trong các lượt đã ghi.</p>
+/** Số giây từng lần của một câu (cũ → mới), tối đa `SO_LAN_GIAY_HOP` lần gần nhất. */
+function GiayTungLan({ ds, truoc }: { ds: readonly LanGiay[]; truoc: number }) {
+  if (ds.length === 0 && truoc === 0) return null
+  const bot = Math.max(0, ds.length - SO_LAN_GIAY_HOP)
+  const hien = ds.slice(bot)
+  const cuHon = bot + truoc
   return (
-    <ul className="gvv2-hs-cau-ds">
-      {cauSai.map((c) => {
-        const giay = giayCacLanSai(c, lan)
-        const muc = tenMucDo(c.mucDo)
-        const lanCuoi = ngayGio(c.lanCuoi)
-        return (
-          <li key={c.qid} className="gvv2-hs-cau" data-sua={c.lanCuoiDung ? 'true' : 'false'}>
-            <div className="gvv2-hs-cau-dau">
-              <b>{tieuDeCau(c)}</b>
-              <span className="gvv2-hs-nhan" data-sua={c.lanCuoiDung ? 'true' : 'false'}>
-                {c.lanCuoiDung ? <Check size={14} aria-hidden="true" /> : <RotateCcw size={14} aria-hidden="true" />}
-                {c.lanCuoiDung ? 'Đã sửa được' : 'Chưa sửa được'}
-              </span>
-            </div>
-            <p className="gvv2-hs-cau-phu gvv2-so">
-              {muc ? `${muc} · ` : ''}sai {c.soSai} lần · đúng {c.soDung} lần{lanCuoi ? ` · lần cuối ${lanCuoi}` : ''}
-            </p>
-            {giay.length > 0 && (
-              <p className="gvv2-hs-cau-giay gvv2-so">
-                <span>Số giây các lần sai:</span> {giay.map((g) => chuGiay(g.giay, g.nguon)).join(' · ')}
-              </p>
-            )}
-          </li>
-        )
-      })}
-    </ul>
+    <span className="gvv2-hs-cau-giay hslc-giay-hang">
+      <span className="hslc-giay-nhan">Số giây từng lần (cũ → mới):</span>
+      {cuHon > 0 && (
+        <span className="hslc-giay-lan" data-kq="cu" title="Các lần này không ghi số giây ở hộp — xem thẻ Toàn bộ lịch sử.">
+          + {cuHon} lần khác
+        </span>
+      )}
+      {hien.map((l, i) => (
+        <span key={i} className="hslc-giay-lan" data-kq={l.dung === true ? 'dung' : l.dung === false ? 'sai' : 'trong'}>
+          {chuKetQua(l.dung)} <GiayO giay={l.giay} nguon={l.nguon} />
+        </span>
+      ))}
+    </span>
   )
 }
 
-function LichSu({ kq, onTaiThem, dangTai }: { kq: KetQuaLichSuLamCau; onTaiThem: () => void; dangTai: boolean }) {
+/** Một hộp câu từng sai. Có `onChua` (chỉ chế độ học sinh) ⇒ cả hộp là MỘT nút mở Tự chữa đúng câu ấy. */
+function OCauSai({ c, lan, onChua }: { c: CauEmSai; lan: readonly LanLamCau[]; onChua?: (qid: string) => void }) {
+  const { ds, truoc } = giayCacLan(c, lan)
+  const muc = tenMucDo(c.mucDo)
+  const lanCuoi = ngayGio(c.lanCuoi)
+  const sua = c.lanCuoiDung
+  const than = (
+    <>
+      <span className="gvv2-hs-cau-dau">
+        <b className="hslc-o-ten">{tieuDeCau(c)}</b>
+        <span className="gvv2-hs-nhan" data-sua={sua ? 'true' : 'false'}>
+          {sua ? <Check size={14} aria-hidden="true" /> : <RotateCcw size={14} aria-hidden="true" />}
+          {sua ? 'Đã sửa được' : 'Chưa sửa được'}
+        </span>
+      </span>
+      <span className="gvv2-hs-cau-phu gvv2-so">
+        {muc ? `${muc} · ` : ''}sai {c.soSai} lần · đúng {c.soDung} lần{lanCuoi ? ` · lần cuối ${lanCuoi}` : ''}
+      </span>
+      <GiayTungLan ds={ds} truoc={truoc} />
+      {onChua && (
+        <span className="hslc-o-mo" aria-hidden="true">
+          Tự chữa câu này
+          <ChevronRight size={18} />
+        </span>
+      )}
+    </>
+  )
+  return (
+    <li className="gvv2-hs-cau hslc-o" data-sua={sua ? 'true' : 'false'}>
+      {onChua ? (
+        <button type="button" className="hslc-o-nut tt-nhan" onClick={() => onChua(c.moChua ?? c.qid)} aria-label={`Tự chữa câu này: ${tieuDeCau(c)}`}>
+          {than}
+        </button>
+      ) : (
+        <div className="hslc-o-than">{than}</div>
+      )}
+    </li>
+  )
+}
+
+/** Thẻ "Câu sai": hai nhóm hộp — CHƯA SỬA ĐƯỢC (đứng trước, nổi) · ĐÃ SỬA ĐƯỢC. Lưới hộp tự giãn theo bề rộng tấm. */
+function DsCauSai({ cauSai, lan, onChuaCau, ngoi }: { cauSai: readonly CauEmSai[]; lan: readonly LanLamCau[]; onChuaCau?: (qid: string) => void; ngoi: Ngoi }) {
+  const id = useId()
+  if (cauSai.length === 0) return <p className="gvv2-trong">{hoa(ngoi)} chưa sai câu nào trong các lượt đã ghi.</p>
+  const chua = cauSai.filter((c) => !c.lanCuoiDung)
+  const da = cauSai.filter((c) => c.lanCuoiDung)
+  return (
+    <div className="hslc-cs">
+      <section className="hslc-cs-nhom" data-loai="chua" aria-labelledby={`${id}-chua`}>
+        <h4 id={`${id}-chua`} className="hslc-cs-tieu">
+          <RotateCcw size={18} aria-hidden="true" />
+          Chưa sửa được <span className="gvv2-so">· {chua.length} câu</span>
+        </h4>
+        {onChuaCau && chua.length > 0 && <p className="hslc-cs-goi-y">Bấm một câu để mở Tự chữa đúng câu ấy.</p>}
+        {chua.length === 0 ? (
+          <p className="gvv2-trong">Mọi câu từng sai đều đã sửa được — lần làm gần nhất đều đúng.</p>
+        ) : (
+          <ul className="gvv2-hs-cau-ds hslc-o-luoi">
+            {chua.map((c) => (
+              <OCauSai key={c.qid} c={c} lan={lan} onChua={onChuaCau} />
+            ))}
+          </ul>
+        )}
+      </section>
+      {da.length > 0 && (
+        <section className="hslc-cs-nhom" data-loai="da" aria-labelledby={`${id}-da`}>
+          <h4 id={`${id}-da`} className="hslc-cs-tieu">
+            <Check size={18} aria-hidden="true" />
+            Đã sửa được <span className="gvv2-so">· {da.length} câu</span>
+          </h4>
+          <ul className="gvv2-hs-cau-ds hslc-o-luoi">
+            {da.map((c) => (
+              <OCauSai key={c.qid} c={c} lan={lan} />
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  )
+}
+
+function LichSu({ kq, onTaiThem, dangTai, ngoi }: { kq: KetQuaLichSuLamCau; onTaiThem: () => void; dangTai: boolean; ngoi: Ngoi }) {
   const [chiSai, setChiSai] = useState(false)
   const [soHien, setSoHien] = useState(MOI_DOT)
   const loc = useMemo(() => (chiSai ? kq.lan.filter((l) => l.dung === false) : kq.lan), [kq.lan, chiSai])
@@ -204,8 +367,9 @@ function LichSu({ kq, onTaiThem, dangTai }: { kq: KetQuaLichSuLamCau; onTaiThem:
           Chỉ lần sai
         </button>
       </div>
+      <p className="hslc-ls-ghi">Mỗi lượt: giờ · câu · nơi làm · mức độ · kết quả · số giây (≈ là ước tính, — là chưa đo được).</p>
       {loc.length === 0 ? (
-        <p className="gvv2-trong">{chiSai ? 'Em chưa có lần sai nào trong các lượt đã tải.' : 'Chưa có lượt nào.'}</p>
+        <p className="gvv2-trong">{chiSai ? `${hoa(ngoi)} chưa có lần sai nào trong các lượt đã tải.` : 'Chưa có lượt nào.'}</p>
       ) : (
         ngay.map((n) => (
           <section key={n.ngay} className="gvv2-hs-ngay" aria-label={ngayThuChu(n.ngay) || n.ngay}>
@@ -216,10 +380,10 @@ function LichSu({ kq, onTaiThem, dangTai }: { kq: KetQuaLichSuLamCau; onTaiThem:
             <ol className="gvv2-hs-lan-ds">
               {n.lan.map((l, i) => {
                 const muc = tenMucDo(l.mucDo)
-                const phu = [l.noi, muc, l.chon ? `Chọn ${l.chon}` : '', chuGiay(l.giay, l.nguonGiay), l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join(' · ')
+                const phu = [l.noi, muc, l.chon ? `Chọn ${l.chon}` : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join(' · ')
                 const k = l.dung === true ? 'dung' : l.dung === false ? 'sai' : 'trong'
                 return (
-                  <li key={`${l.luc}-${l.qid}-${i}`} className="gvv2-hs-lan" data-kq={k}>
+                  <li key={`${l.luc}-${l.qid}-${i}`} className="gvv2-hs-lan hslc-lan" data-kq={k}>
                     <time className="gvv2-so" dateTime={l.luc}>
                       {gioPhutVN(l.luc)}
                     </time>
@@ -227,8 +391,11 @@ function LichSu({ kq, onTaiThem, dangTai }: { kq: KetQuaLichSuLamCau; onTaiThem:
                       <b>{tieuDeCau(l)}</b>
                       <small className="gvv2-so">{phu}</small>
                     </span>
-                    <span className="gvv2-hs-kq" data-kq={k}>
-                      {chuKetQua(l.dung)}
+                    <span className="hslc-lan-phai">
+                      <span className="gvv2-hs-kq" data-kq={k}>
+                        {chuKetQua(l.dung)}
+                      </span>
+                      <GiayO giay={l.giay} nguon={l.nguonGiay} />
                     </span>
                   </li>
                 )
@@ -252,6 +419,43 @@ function LichSu({ kq, onTaiThem, dangTai }: { kq: KetQuaLichSuLamCau; onTaiThem:
   )
 }
 
+/** "Số giây theo mức độ câu" — câu dễ (Nhận biết) tới câu khó (Vận dụng cao): trung bình số giây, số lượt có số giây, đúng/sai. */
+function GiayMucDo({ lan }: { lan: readonly LanLamCau[] }) {
+  const id = useId()
+  const ds = useMemo(() => giayTheoMucDo(lan), [lan])
+  if (ds.length === 0) return null
+  const lon = Math.max(1, ...ds.map((d) => d.giayTb ?? 0))
+  const coUoc = ds.some((d) => d.coUoc)
+  return (
+    <section className="hslc-khoi-con" aria-labelledby={`${id}-t`}>
+      <h4 id={`${id}-t`} className="hslc-tieu-nho">
+        Số giây theo mức độ câu <small className="gvv2-so">· dễ → khó · {lan.length} lượt gần nhất đã tải</small>
+      </h4>
+      <ul className="hslc-muc">
+        {ds.map((d) => {
+          const coKq = d.soDung + d.soSai
+          return (
+            <li key={d.ten} className="hslc-muc-dong">
+              <span className="hslc-muc-ten">{d.ten}</span>
+              <span className="hslc-muc-thanh" aria-hidden="true">
+                {d.giayTb !== null && <i style={{ width: `${Math.max(4, (100 * d.giayTb) / lon)}%` }} />}
+              </span>
+              <span className="hslc-muc-so gvv2-so">
+                <b>{d.giayTb !== null ? doiGiay(d.giayTb) : '—'}</b>
+                <small>
+                  {d.giayTb !== null ? 'trung bình mỗi lượt' : 'chưa đo được số giây'} · {d.soCoGiay}/{d.soLuot} lượt có số giây
+                  {coKq > 0 ? ` · đúng ${d.soDung}/${coKq}` : ''}
+                </small>
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+      <p className="hslc-ghi">Trung bình tính trên lượt có số giây{coUoc ? ', gồm số giây ước tính (≈) ở lượt cũ' : ''}; lượt chưa đo được không tính.</p>
+    </section>
+  )
+}
+
 // ------------------------------------------------------------------ HỒ SƠ THÁI ĐỘ (từ mốc 01/10)
 
 const phan = (tu: number, mau: number): number | null => (mau > 0 ? Math.round((100 * tu) / mau) : null)
@@ -269,41 +473,129 @@ function XuongThaiDo({ chu }: { chu: string }) {
   )
 }
 
-/** Đầu tấm. 12/10: máy chủ có `nhomNhip` ⇒ NHÓM Nhịp học (Chăm / Chưa đều / Lười / Chưa đủ dữ liệu — cùng luật Hôm nay) là nhãn chính, cờ
- *  "Có dấu hiệu đối phó" là chip riêng, nhóm Lười kèm "đủ mức liền x/6 ngày để thoát". Máy chủ cũ (thiếu trường) ⇒ nhãn thái độ cũ. Lý do bằng số giữ nguyên. */
-function DauThaiDo({ td, matDau }: { td: KetQuaHoSoThaiDo; matDau: string }) {
-  const k = td.ketLuan
-  const nhom = td.nhomNhip
-  const canThoat = LUAT_NHOM_NHIP.ngayLienThoatLuoi
+const ICON_NHAN: Record<NhanThaiDo, typeof Check> = { 'cham-chi': Check, 'chua-deu': Activity, luoi: TriangleAlert, 'doi-pho': TriangleAlert, 'chua-du-du-lieu': Hourglass }
+
+/** Chip độ tin cậy (chỉ khi máy chủ gửi). Dưới `NGUONG_TIN_CAY` ⇒ tông hổ phách + "đang theo dõi". */
+function ChipTinCay({ n, nho = false }: { n: number; nho?: boolean }) {
+  const du = n >= NGUONG_TIN_CAY
   return (
-    <section className="gvv2-tdo-dau" data-nhan={nhom ? NHAN_THEO_NHOM[nhom] : k.nhan} aria-labelledby="gvv2-tdo-nhan">
-      <small className="gvv2-tdo-mat gvv2-so">
-        {matDau} · {chuKhoang(td.tu, td.den)}
-      </small>
-      <div className="gvv2-tdo-nhan-hang">
-        <h3 id="gvv2-tdo-nhan" className="gvv2-tdo-nhan">
-          {nhom ? TEN_NHOM_NHIP_HOC[nhom] : k.chu}
-        </h3>
-        {nhom && td.coDoiPho && (
-          <span className="gvv2-tdo-co-doi-pho">
-            <TriangleAlert size={15} aria-hidden="true" />
-            Có dấu hiệu đối phó
+    <span className={`hslc-tin${nho ? ' hslc-tin--nho' : ''}`} data-du={du ? 'true' : 'false'} title={`Kết luận chắc khi độ tin cậy từ ${NGUONG_TIN_CAY}%.`}>
+      {du ? <ShieldCheck size={nho ? 14 : 16} aria-hidden="true" /> : <Hourglass size={nho ? 14 : 16} aria-hidden="true" />}
+      {chuDoTinCay(n)}
+      {!du && ' · đang theo dõi'}
+    </span>
+  )
+}
+
+/** Dải 14 ngày gần nhất (Lười / Chăm trong nháy mắt): ô tô theo bốn mức của bảng Bài hằng ngày; hôm nay chưa đủ ⇒ ô viền "đang làm". */
+function DaiMuoiBon({ ngay, chuoi }: { ngay: readonly NgayHoatDong[]; chuoi?: number }) {
+  const gan = ngay.slice(-14)
+  if (gan.length === 0) return null
+  const qua = gan.filter((n) => !n.homNay)
+  const du = qua.filter((n) => n.datMuc).length
+  const tom = `${gan.length} ngày gần nhất: đủ mức ${du}/${qua.length} ngày đã qua. ${gan.map((n) => chuO(n)).join('; ')}`
+  return (
+    <div className="hslc-dai">
+      <p className="hslc-dai-tieu">
+        <b>{gan.length} ngày gần nhất</b>
+        <span className="gvv2-so"> · đủ mức {du}/{qua.length} ngày đã qua</span>
+      </p>
+      <ol className="hslc-dai-o" role="img" aria-label={tom} style={{ '--cot': gan.length } as CSSProperties}>
+        {gan.map((n) => (
+          <li key={n.ngay} data-muc={n.homNay && !n.datMuc ? 'cho' : mucO(n)} data-hom-nay={n.homNay ? 'true' : undefined} title={chuO(n)}>
+            <i />
+            <small className="gvv2-so">{n.homNay ? 'Nay' : n.ngay.slice(8, 10)}</small>
+          </li>
+        ))}
+      </ol>
+      <span className="hslc-dai-chu-thich" aria-hidden="true">
+        {(['du', 'thieu-it', 'thieu-nhieu', 'khong-lam'] as const).map((m) => (
+          <span key={m}>
+            <i data-muc={m} />
+            {TEN_MUC_O[m].replace(/ \(.*\)$/, '').replace('Không làm câu nào', 'Không làm')}
           </span>
-        )}
-      </div>
-      <p className="gvv2-tdo-mo-ta">{nhom ? MO_TA_NHOM[nhom] : MO_TA_NHAN[k.nhan]}</p>
-      {nhom === 'luoi' && (
-        <p className="gvv2-tdo-thoat gvv2-so">
-          Đủ mức liền {Math.min(td.chuoiDuGanNhat ?? 0, canThoat)}/{canThoat} ngày để thoát
+        ))}
+        <span>
+          <i data-muc="cho" />
+          Hôm nay
+        </span>
+      </span>
+      {chuoi !== undefined && (
+        <p className="hslc-dai-chuoi gvv2-so">
+          Chuỗi đủ mức liền gần nhất: <b>{chuoi} ngày</b>
         </p>
       )}
-      {k.lyDo.length > 0 && (
-        <ul className="gvv2-tdo-ly-do gvv2-so" aria-label="Lý do">
-          {k.lyDo.map((l) => (
-            <li key={l}>{l}</li>
-          ))}
-        </ul>
-      )}
+    </div>
+  )
+}
+
+/** Đầu tấm. Máy chủ có `nhomNhip` ⇒ NHÓM Nhịp học (Chăm / Chưa đều / Lười / Chưa đủ dữ liệu — cùng luật Hôm nay) là nhãn chính, cờ "Có dấu hiệu đối
+ *  phó" là chip riêng, nhóm Lười kèm "đủ mức liền x/6 ngày để thoát" + 6 ô. Máy chủ cũ (thiếu trường) ⇒ nhãn thái độ cũ. Lý do bằng số giữ nguyên.
+ *  Đợt 16: chip "Độ tin cậy N%" + kết luận tạm khi dưới 90%; dải 14 ngày gần nhất. */
+function DauThaiDo({ td, matDau, ngoi }: { td: KetQuaHoSoThaiDo; matDau: string; ngoi: Ngoi }) {
+  const k = td.ketLuan as KetLuanThaiDoApp
+  const nhom = td.nhomNhip
+  const nhan: NhanThaiDo = nhom ? NHAN_THEO_NHOM[nhom] : k.nhan
+  const Icon = ICON_NHAN[nhan]
+  const canThoat = LUAT_NHOM_NHIP.ngayLienThoatLuoi
+  const coThoat = Math.min(td.chuoiDuGanNhat ?? 0, canThoat)
+  const tin = k.doTinCay
+  const tam = tin !== undefined && tin < NGUONG_TIN_CAY
+  const cachTinh = (td as KetQuaHoSoThaiDoApp).cachTinhTinCay
+  return (
+    <section className="gvv2-tdo-dau hslc-hero" data-nhan={nhan} data-tam={tam ? 'true' : undefined} aria-labelledby="gvv2-tdo-nhan">
+      <div className="hslc-hero-chinh">
+        <small className="gvv2-tdo-mat gvv2-so">
+          {matDau} · {chuKhoang(td.tu, td.den)}
+        </small>
+        <div className="gvv2-tdo-nhan-hang">
+          <span className="hslc-hero-bt" aria-hidden="true">
+            <Icon size={22} strokeWidth={2.6} />
+          </span>
+          <h3 id="gvv2-tdo-nhan" className="gvv2-tdo-nhan">
+            {nhom ? TEN_NHOM_NHIP_HOC[nhom] : k.chu}
+          </h3>
+          {nhom && td.coDoiPho && (
+            <span className="gvv2-tdo-co-doi-pho">
+              <TriangleAlert size={15} aria-hidden="true" />
+              Có dấu hiệu đối phó
+            </span>
+          )}
+          {tin !== undefined && <ChipTinCay n={tin} />}
+        </div>
+        {tam && (
+          <p className="hslc-tam">
+            <b>Kết luận tạm — đang theo dõi.</b> {k.canThem ? chuCanThem(theoNgoi(k.canThem, ngoi)) : `Độ tin cậy dưới ${NGUONG_TIN_CAY}%: cần thêm ngày làm bài để chắc.`}
+          </p>
+        )}
+        <p className="gvv2-tdo-mo-ta">{theoNgoi(nhom ? MO_TA_NHOM[nhom] : MO_TA_NHAN[k.nhan], ngoi)}</p>
+        {nhom === 'luoi' && (
+          <div className="hslc-thoat">
+            <p className="gvv2-tdo-thoat gvv2-so">
+              Đủ mức liền {coThoat}/{canThoat} ngày để thoát
+            </p>
+            <span className="hslc-thoat-o" aria-hidden="true">
+              {Array.from({ length: canThoat }, (_, i) => (
+                <i key={i} data-xong={i < coThoat ? 'true' : undefined} />
+              ))}
+            </span>
+          </div>
+        )}
+        {k.lyDo.length > 0 && (
+          <ul className="gvv2-tdo-ly-do gvv2-so" aria-label="Lý do">
+            {k.lyDo.map((l) => (
+              <li key={l}>{l}</li>
+            ))}
+          </ul>
+        )}
+        {cachTinh && (
+          <details className="hslc-cach">
+            <summary className="tt-nhan">Cách tính độ tin cậy</summary>
+            <p>{theoNgoi(cachTinh, ngoi)}</p>
+          </details>
+        )}
+      </div>
+      <DaiMuoiBon ngay={td.ngay} chuoi={td.chuoiDuGanNhat} />
     </section>
   )
 }
@@ -414,33 +706,79 @@ function PhanBoGiay({ td }: { td: KetQuaHoSoThaiDo }) {
   )
 }
 
+const NG = NGUONG_THAI_DO
+/** Vạch ngưỡng trên thước 0–100% của từng tín hiệu (đúng `NGUONG_THAI_DO`; 'xu-huong' là chênh điểm % ⇒ không thước). `caoTot` = càng cao càng tốt. */
+const VACH: Partial<Record<MaTinHieu, { chuY: number; xau: number; caoTot: boolean }>> = {
+  'ngay-du-muc': { chuY: NG.ngayDuTot, xau: NG.ngayDuChuY, caoTot: true },
+  'qua-nhanh': { chuY: NG.nhanChuY, xau: NG.nhanXau, caoTot: false },
+  'don-bai': { chuY: NG.donChuY, xau: NG.donXau, caoTot: false },
+  'goi-y': { chuY: NG.goiYChuY, xau: NG.goiYXau, caoTot: false },
+  'chon-lap': { chuY: NG.lapChuY, xau: NG.lapXau, caoTot: false },
+}
+/** Số đo lớn của thẻ tín hiệu: "86%" · "−12 điểm %" (xu hướng) · "—" (chưa đo được). */
+export function soTinHieu(t: Pick<TinHieuThaiDoApp, 'ma' | 'giaTri'>): string {
+  if (t.giaTri === null) return '—'
+  if (t.ma === 'xu-huong') return `${t.giaTri > 0 ? '+' : t.giaTri < 0 ? '−' : ''}${Math.abs(t.giaTri)} điểm %`
+  return `${t.giaTri}%`
+}
+
 function TinHieu({ td }: { td: KetQuaHoSoThaiDo }) {
   return (
-    <ul className="gvv2-tdo-th">
-      {td.tinHieu.map((t) => (
-        <li key={t.ma} className="gvv2-tdo-th-o" data-muc={t.muc} data-ma={t.ma}>
-          <div className="gvv2-tdo-th-dau">
-            <b>{t.ten}</b>
-            <span className="gvv2-tdo-chip" data-muc={t.muc}>
-              {TEN_MUC_TIN_HIEU[t.muc]}
-            </span>
-          </div>
-          <p className="gvv2-tdo-th-chu gvv2-so">{t.chu}</p>
-          <small className="gvv2-tdo-th-nguong">Ngưỡng: {t.nguong}.</small>
-        </li>
-      ))}
+    <ul className="gvv2-tdo-th hslc-th-luoi">
+      {(td.tinHieu as TinHieuThaiDoApp[]).map((t) => {
+        const v = VACH[t.ma]
+        const coThuoc = !!v && t.giaTri !== null && t.muc !== 'chua-du'
+        return (
+          <li key={t.ma} className="gvv2-tdo-th-o hslc-th" data-muc={t.muc} data-ma={t.ma}>
+            <div className="gvv2-tdo-th-dau">
+              <b>{t.ten}</b>
+              <span className="gvv2-tdo-chip" data-muc={t.muc}>
+                {TEN_MUC_TIN_HIEU[t.muc]}
+              </span>
+            </div>
+            <p className="hslc-th-so gvv2-so">{soTinHieu(t)}</p>
+            {coThuoc && (
+              <span className="hslc-th-thuoc" data-muc={t.muc} aria-hidden="true">
+                <i style={{ width: `${Math.max(0, Math.min(100, t.giaTri!))}%` }} />
+                <b data-vach="chu-y" style={{ left: `${v.chuY}%` }} />
+                <b data-vach="xau" style={{ left: `${v.xau}%` }} />
+              </span>
+            )}
+            {coThuoc && (
+              <small className="hslc-th-vach gvv2-so" aria-hidden="true">
+                {v.caoTot ? `Vạch: dưới ${v.xau}% chưa đều · từ ${v.chuY}% tốt` : `Vạch: từ ${v.chuY}% cần để mắt · từ ${v.xau}% vượt ngưỡng`}
+              </small>
+            )}
+            <p className="gvv2-tdo-th-chu gvv2-so">{t.chu}</p>
+            <small className="gvv2-tdo-th-nguong">Ngưỡng: {t.nguong}.</small>
+            {t.doTinCay !== undefined && <ChipTinCay n={t.doTinCay} nho />}
+          </li>
+        )
+      })}
     </ul>
   )
 }
 
-function DsCauTomTat({ cau, loai }: { cau: readonly CauTomTat[]; loai: 'dung' | 'on' }) {
+/** Số giây từng lần của một câu trong Câu đúng / Câu đã ôn — ghép theo khoá câu của hai lệnh: app thầy là mã thật; bản học sinh / phụ huynh là khoá băm
+ *  CỐ ĐỊNH theo mã (đợt 16, server/src/ho-so-em-hs-loc.ts) nên hai lệnh cùng khoá — ba app đều thấy số giây từng lần. */
+function GiayCauTomTat({ c, lan }: { c: CauTomTat; lan: readonly LanLamCau[] }) {
+  const cua = lan.filter((l) => l.qid === c.qid).sort((a, b) => a.luc.localeCompare(b.luc))
+  if (cua.length === 0) return null
+  return <GiayTungLan ds={cua.map((l): LanGiay => ({ dung: l.dung, giay: l.giay, nguon: l.giay === null ? null : (l.nguonGiay ?? 'khong-ro') }))} truoc={Math.max(0, c.soLan - cua.length)} />
+}
+
+function DsCauTomTat({ cau, loai, lan, ngoi }: { cau: readonly CauTomTat[]; loai: 'dung' | 'on'; lan: readonly LanLamCau[] | null; ngoi: Ngoi }) {
   const [soHien, setSoHien] = useState(MOI_DOT)
   if (cau.length === 0)
-    return <p className="gvv2-trong">{loai === 'dung' ? 'Em chưa làm đúng câu nào trong các lượt đã ghi.' : 'Em chưa ôn câu nào (Ôn lại, hoặc làm lại câu từng sai).'}</p>
+    return (
+      <p className="gvv2-trong">
+        {loai === 'dung' ? `${hoa(ngoi)} chưa làm đúng câu nào trong các lượt đã ghi.` : `${hoa(ngoi)} chưa ôn câu nào (Ôn lại, hoặc làm lại câu từng sai).`}
+      </p>
+    )
   const con = cau.length - Math.min(soHien, cau.length)
   return (
     <>
-      <ul className="gvv2-hs-cau-ds">
+      <ul className="gvv2-hs-cau-ds hslc-o-luoi">
         {cau.slice(0, soHien).map((c) => {
           const muc = tenMucDo(c.mucDo)
           const lanCuoi = ngayGio(c.lanCuoi)
@@ -449,19 +787,22 @@ function DsCauTomTat({ cau, loai }: { cau: readonly CauTomTat[]; loai: 'dung' | 
               ? { k: c.dungLanDau ? 'dung-ngay' : 'dung-sau', chu: c.dungLanDau ? 'Đúng ngay lần đầu' : `Đúng sau ${c.soSai} lần sai` }
               : { k: c.lanCuoiDung ? 'dung-ngay' : 'chua', chu: c.lanCuoiDung ? 'Đã sửa được' : 'Chưa sửa được' }
           return (
-            <li key={c.qid} className="gvv2-hs-cau" data-sua={loai === 'on' && !c.lanCuoiDung ? 'false' : 'true'}>
-              <div className="gvv2-hs-cau-dau">
-                <b>{tieuDeCau(c)}</b>
-                <span className="gvv2-tdo-nhan-cau" data-loai={chip.k}>
-                  {chip.k === 'chua' ? <RotateCcw size={14} aria-hidden="true" /> : <Check size={14} aria-hidden="true" />}
-                  {chip.chu}
+            <li key={c.qid} className="gvv2-hs-cau hslc-o" data-sua={loai === 'on' && !c.lanCuoiDung ? 'false' : 'true'}>
+              <div className="hslc-o-than">
+                <span className="gvv2-hs-cau-dau">
+                  <b className="hslc-o-ten">{tieuDeCau(c)}</b>
+                  <span className="gvv2-tdo-nhan-cau" data-loai={chip.k}>
+                    {chip.k === 'chua' ? <RotateCcw size={14} aria-hidden="true" /> : <Check size={14} aria-hidden="true" />}
+                    {chip.chu}
+                  </span>
                 </span>
+                <span className="gvv2-hs-cau-phu gvv2-so">
+                  {muc ? `${muc} · ` : ''}
+                  {loai === 'on' ? `ôn ${c.soLanOn} lần · ` : ''}làm {c.soLan} lần · đúng {c.soDung} · sai {c.soSai}
+                  {lanCuoi ? ` · lần cuối ${lanCuoi}` : ''}
+                </span>
+                {lan && <GiayCauTomTat c={c} lan={lan} />}
               </div>
-              <p className="gvv2-hs-cau-phu gvv2-so">
-                {muc ? `${muc} · ` : ''}
-                {loai === 'on' ? `ôn ${c.soLanOn} lần · ` : ''}làm {c.soLan} lần · đúng {c.soDung} · sai {c.soSai}
-                {lanCuoi ? ` · lần cuối ${lanCuoi}` : ''}
-              </p>
             </li>
           )
         })}
@@ -483,17 +824,22 @@ export default function HoSoLamCauEm({
   onDong,
   nguon,
   cheDo = 'thay',
+  onChuaCau,
 }: {
   em: EmHoSo
   nhom?: LoaiNhomNhip
   onDong: () => void
-  /** 12/10F: nguồn dữ liệu riêng (app học sinh) — xem `NguonHoSo`. */
+  /** 12/10F: nguồn dữ liệu riêng (app học sinh / phụ huynh) — xem `NguonHoSo`. */
   nguon?: NguonHoSo
-  /** 12/10F: 'hoc-sinh' ⇒ chữ của em, ẩn đường của thầy (xem đầu tệp). */
+  /** 12/10F: 'hoc-sinh' / 'phu-huynh' ⇒ chữ của người xem, ẩn đường của thầy (xem đầu tệp). */
   cheDo?: CheDoHoSo
+  /** Đợt 16 — CHỈ chế độ học sinh: bấm hộp "Chưa sửa được" ⇒ mở Tự chữa đúng câu ấy (khoá câu của lệnh lịch sử). Chế độ khác bỏ qua. */
+  onChuaCau?: (qid: string) => void
 }) {
   const laThay = cheDo === 'thay'
   const chuCd = CHU_CHE_DO[cheDo]
+  const ngoi = chuCd.ngoi
+  const onChua = cheDo === 'hoc-sinh' ? onChuaCau : undefined
   const [kq, setKq] = useState<KetQuaLichSuLamCau | null>(null)
   const [loi, setLoi] = useState('')
   const [dangTai, setDangTai] = useState(true)
@@ -598,6 +944,7 @@ export default function HoSoLamCauEm({
   }, [em, nhom, td])
   const d = td?.dem
   const coKq = d ? d.soDung + d.soSai : 0
+  const tuSuaSai = (td as KetQuaHoSoThaiDoApp | null)?.tuSuaSai
   const the4: [TheCon, string, number | null][] = [
     ['cau-sai', 'Câu sai', kq ? kq.cauSai.length : null],
     ['cau-dung', 'Câu đúng', td ? td.cauDung.length : null],
@@ -608,8 +955,16 @@ export default function HoSoLamCauEm({
   return (
     <>
       <div className="gvv2-hs-che" aria-hidden="true" onClick={onDong} />
-      <section ref={tam} className="gvv2-hs gvv2-hs--rong" role="dialog" aria-modal="true" aria-labelledby="gvv2-hs-ten" aria-describedby="gvv2-hs-phu">
-        <header className="gvv2-hs-dau">
+      <section
+        ref={tam}
+        className="gvv2-hs gvv2-hs--rong hslc"
+        data-che-do={cheDo}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gvv2-hs-ten"
+        aria-describedby="gvv2-hs-phu"
+      >
+        <header className="gvv2-hs-dau hslc-dau">
           <span className="gvv2-avatar" aria-hidden="true">
             {chuCaiTen(ten)}
           </span>
@@ -630,7 +985,7 @@ export default function HoSoLamCauEm({
                 {tenLop ? ` · Lớp ${tenLop}` : ''}
               </small>
               <h2 id="gvv2-hs-ten" className="gvv2-h2 gvv2-so">
-                Hồ sơ làm bài của em · từ {ngayNgan(td?.tu ?? NGAY_BAT_DAU_BAI_HANG_NGAY)}
+                Hồ sơ làm bài của {ngoi} · từ {ngayNgan(td?.tu ?? NGAY_BAT_DAU_BAI_HANG_NGAY)}
               </h2>
               <p id="gvv2-hs-phu">Thầy cũng xem hồ sơ này.</p>
             </div>
@@ -641,169 +996,187 @@ export default function HoSoLamCauEm({
           </button>
         </header>
 
-        <div className="gvv2-hs-than">
-          {/* 1 · Thái độ làm bài — điểm nhấn của tấm */}
-          {td ? (
-            <DauThaiDo td={td} matDau={chuCd.matDau} />
-          ) : dangTaiTd ? (
-            <XuongThaiDo chu={chuCd.dangTai} />
-          ) : (
-            <div className="gvv2-tdo-loi" role="status">
-              <p>
-                {chuCd.loi} {loiTd}
-              </p>
-              <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void taiTd()} disabled={dangTaiTd}>
-                {chuCd.nutTai}
-              </button>
-            </div>
-          )}
-
-          {/* 2 · Hôm nay */}
-          {hn && (
-            <div className="gvv2-hs-hn" data-nhom={hn.nhom}>
-              <span className="gvv2-hs-hn-chu">
-                <small>Hôm nay</small>
-                <b className="gvv2-so">{hn.chu}</b>
-              </span>
-              <span className="gvv2-hs-hn-chu">
-                <small>Tầng hiện tại</small>
-                <b>{hn.tang}</b>
-              </span>
-              <span className="gvv2-hs-nhom" data-nhom={hn.nhom}>
-                {TEN_NHOM_NHIP[hn.nhom]}
-              </span>
-              {hn.nhom !== 'du' && hn.con > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Còn {hn.con} câu tới mức tối thiểu</small>}
-              {laThay && !!em.conThieu && em.conThieu > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Kho thiếu {em.conThieu} câu phù hợp cho em hôm nay</small>}
-            </div>
-          )}
-          {laThay && !!em.canBoSung?.length && (
-            <div className="gvv2-hs-bo-sung">
-              <b>Kiến thức cần bổ sung</b>
-              <ul>
-                {em.canBoSung.map((c, i) => (
-                  <li key={i}>
-                    {c.ten} · {c.lyDo === 'can_sua_nen' ? 'Cần câu củng cố nền' : 'Cần thêm câu đã duyệt'}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* 3 · Từ mốc 01/10 (khoảng máy chủ trả): số · lịch · biểu đồ · tín hiệu */}
-          {td && d && (
-            <>
-              <section className="gvv2-tdo-khoi" aria-labelledby="gvv2-tdo-so-tieu">
-                <h3 id="gvv2-tdo-so-tieu" className="gvv2-tdo-tieu">
-                  Làm bài {chuTuDen(td.tu, td.den)}
-                </h3>
-                <dl className="gvv2-tdo-so">
-                  <OSoTd nhan="Đã làm" so={`${d.soLuot} lượt`} phu={`${d.soCau} câu khác nhau`} />
-                  <OSoTd nhan="Đúng" so={`${d.soDung} lượt`} phu={phan(d.soDung, coKq) === null ? 'chưa có lượt có kết quả' : `${phan(d.soDung, coKq)}% lượt có kết quả`} />
-                  <OSoTd nhan="Sai" so={`${d.soSai} lượt`} phu={`${d.soBoTrong} lượt bỏ trống`} />
-                  <OSoTd nhan="Đã ôn" so={`${d.soCauOn} câu`} phu={`${d.soLuotOn} lượt ôn`} />
-                  <OSoTd
-                    nhan="Giây trung bình"
-                    so={d.giayTb !== null && d.giayTb > 0 ? doiGiay(d.giayTb) : 'Chưa đo'}
-                    phu={d.giayTrungVi !== null ? `trung vị ${doiGiay(d.giayTrungVi)} · ${d.soLuotCoGiay} lượt có số giây` : 'chưa có lượt có số giây'}
-                  />
-                </dl>
-              </section>
-              <section className="gvv2-tdo-khoi" aria-labelledby="gvv2-tdo-lich-tieu">
-                <h3 id="gvv2-tdo-lich-tieu" className="gvv2-tdo-tieu">
-                  Lịch làm bài theo ngày <small>· đã làm/mức tối thiểu</small>
-                </h3>
-                <LichNgay ngay={td.ngay} />
-              </section>
-              <section className="gvv2-tdo-khoi" aria-labelledby="gvv2-tdo-dung-tieu">
-                <h3 id="gvv2-tdo-dung-tieu" className="gvv2-tdo-tieu">
-                  Độ đúng theo ngày <small>· % lượt đúng trên lượt có kết quả</small>
-                </h3>
-                <CotDoDung ngay={td.ngay} />
-              </section>
-              <section className="gvv2-tdo-khoi" aria-labelledby="gvv2-tdo-giay-tieu">
-                <h3 id="gvv2-tdo-giay-tieu" className="gvv2-tdo-tieu">
-                  Số giây mỗi lượt
-                </h3>
-                <PhanBoGiay td={td} />
-              </section>
-              <section className="gvv2-tdo-khoi" aria-labelledby="gvv2-tdo-th-tieu">
-                <h3 id="gvv2-tdo-th-tieu" className="gvv2-tdo-tieu">
-                  Sáu tín hiệu và ngưỡng
-                </h3>
-                <TinHieu td={td} />
-              </section>
-              {td.canhBao.map((c) => (
-                <p key={c} className="gvv2-hs-ghi">
-                  {c}
+        <div className="gvv2-hs-than hslc-than">
+          <div className="hslc-luoi">
+            {/* 1 · Thái độ / Nhịp học — điểm nhấn của tấm (nhãn · lý do · độ tin cậy · dải 14 ngày) */}
+            {td ? (
+              <DauThaiDo td={td} matDau={chuCd.matDau} ngoi={ngoi} />
+            ) : dangTaiTd ? (
+              <XuongThaiDo chu={chuCd.dangTai} />
+            ) : (
+              <div className="gvv2-tdo-loi" role="status">
+                <p>
+                  {chuCd.loi} {loiTd}
                 </p>
-              ))}
-            </>
-          )}
+                <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void taiTd()} disabled={dangTaiTd}>
+                  {chuCd.nutTai}
+                </button>
+              </div>
+            )}
 
-          {/* 4 · Toàn bộ sổ: bốn ô số + bốn thẻ con */}
-          <h3 className="gvv2-tdo-tieu gvv2-tdo-tieu--so">Toàn bộ sổ của em</h3>
-          {kq === null && dangTai ? (
-            <XuongTam />
-          ) : kq === null ? (
-            <div className="gvv2-loi gvv2-cc-loi" role="alert">
-              <p>Chưa tải được lịch sử làm câu của em. {loi}</p>
-              <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTai}>
-                Thử lại
-              </button>
-            </div>
-          ) : (
-            <>
-              {loi && (
+            {/* 2 · Hôm nay */}
+            {hn && (
+              <div className="gvv2-hs-hn" data-nhom={hn.nhom}>
+                <span className="gvv2-hs-hn-chu">
+                  <small>Hôm nay</small>
+                  <b className="gvv2-so">{hn.chu}</b>
+                </span>
+                <span className="gvv2-hs-hn-chu">
+                  <small>Tầng hiện tại</small>
+                  <b>{hn.tang}</b>
+                </span>
+                <span className="gvv2-hs-nhom" data-nhom={hn.nhom}>
+                  {TEN_NHOM_NHIP[hn.nhom]}
+                </span>
+                {hn.nhom !== 'du' && hn.con > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Còn {hn.con} câu tới mức tối thiểu</small>}
+                {laThay && !!em.conThieu && em.conThieu > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Kho thiếu {em.conThieu} câu phù hợp cho em hôm nay</small>}
+              </div>
+            )}
+            {laThay && !!em.canBoSung?.length && (
+              <div className="gvv2-hs-bo-sung">
+                <b>Kiến thức cần bổ sung</b>
+                <ul>
+                  {em.canBoSung.map((c, i) => (
+                    <li key={i}>
+                      {c.ten} · {c.lyDo === 'can_sua_nen' ? 'Cần câu củng cố nền' : 'Cần thêm câu đã duyệt'}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* 3 · Từ mốc 01/10 (khoảng máy chủ trả): số · lịch · biểu đồ · tín hiệu */}
+            {td && d && (
+              <>
+                <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-so-tieu">
+                  <h3 id="gvv2-tdo-so-tieu" className="gvv2-tdo-tieu">
+                    Làm bài {chuTuDen(td.tu, td.den)}
+                  </h3>
+                  <dl className="gvv2-tdo-so">
+                    <OSoTd nhan="Đã làm" so={`${d.soLuot} lượt`} phu={`${d.soCau} câu khác nhau`} />
+                    <OSoTd nhan="Đúng" so={`${d.soDung} lượt`} phu={phan(d.soDung, coKq) === null ? 'chưa có lượt có kết quả' : `${phan(d.soDung, coKq)}% lượt có kết quả`} />
+                    <OSoTd nhan="Sai" so={`${d.soSai} lượt`} phu={`${d.soBoTrong} lượt bỏ trống`} />
+                    <OSoTd nhan="Đã ôn" so={`${d.soCauOn} câu`} phu={`${d.soLuotOn} lượt ôn`} />
+                    <OSoTd
+                      nhan="Giây trung bình"
+                      so={d.giayTb !== null && d.giayTb > 0 ? doiGiay(d.giayTb) : 'Chưa đo'}
+                      phu={d.giayTrungVi !== null ? `trung vị ${doiGiay(d.giayTrungVi)} · ${d.soLuotCoGiay} lượt có số giây` : 'chưa có lượt có số giây'}
+                    />
+                    {tuSuaSai && tuSuaSai.soCauSai > 0 && <OSoTd nhan="Tự sửa được" so={`${tuSuaSai.soCauDaSua}/${tuSuaSai.soCauSai} câu`} phu={tuSuaSai.chu} />}
+                  </dl>
+                </section>
+                <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-lich-tieu">
+                  <h3 id="gvv2-tdo-lich-tieu" className="gvv2-tdo-tieu">
+                    Lịch làm bài theo ngày <small>· đã làm/mức tối thiểu</small>
+                  </h3>
+                  <LichNgay ngay={td.ngay} />
+                </section>
+                <section className="gvv2-tdo-khoi hslc-khoi hslc-nua" aria-labelledby="gvv2-tdo-dung-tieu">
+                  <h3 id="gvv2-tdo-dung-tieu" className="gvv2-tdo-tieu">
+                    Độ đúng theo ngày <small>· % lượt đúng trên lượt có kết quả</small>
+                  </h3>
+                  <CotDoDung ngay={td.ngay} />
+                </section>
+                <section className="gvv2-tdo-khoi hslc-khoi hslc-nua" aria-labelledby="gvv2-tdo-giay-tieu">
+                  <h3 id="gvv2-tdo-giay-tieu" className="gvv2-tdo-tieu">
+                    Số giây mỗi lượt
+                  </h3>
+                  <PhanBoGiay td={td} />
+                </section>
+                <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-th-tieu">
+                  <h3 id="gvv2-tdo-th-tieu" className="gvv2-tdo-tieu">
+                    Sáu tín hiệu và ngưỡng <small>· số đo, vạch ngưỡng, mức</small>
+                  </h3>
+                  <TinHieu td={td} />
+                </section>
+                {td.canhBao.map((c) => (
+                  <p key={c} className="gvv2-hs-ghi">
+                    {c}
+                  </p>
+                ))}
+              </>
+            )}
+
+            {/* 4 · Toàn bộ sổ: bốn ô số + số giây theo mức độ + bốn thẻ con */}
+            <section className="hslc-so" aria-labelledby="hslc-so-tieu">
+              <h3 id="hslc-so-tieu" className="gvv2-tdo-tieu gvv2-tdo-tieu--so">
+                Toàn bộ sổ của {ngoi}
+              </h3>
+              {kq === null && dangTai ? (
+                <XuongTam />
+              ) : kq === null ? (
                 <div className="gvv2-loi gvv2-cc-loi" role="alert">
-                  <p>Chưa tải thêm được lượt cũ hơn. {loi}</p>
-                  <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai(TRAN_GIOI_HAN)} disabled={dangTai}>
+                  <p>
+                    Chưa tải được lịch sử làm câu của {ngoi}. {loi}
+                  </p>
+                  <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTai}>
                     Thử lại
                   </button>
                 </div>
-              )}
-              <dl className="gvv2-hs-so">
-                <OSo nhan="Số lượt làm câu" so={String(t!.soLuot)} phu={`${t!.soCau} câu khác nhau`} />
-                <OSo nhan="Tỉ lệ đúng" so={tiLe} phu={`${t!.soDung} đúng · ${t!.soSai} sai · ${t!.soBoTrong} bỏ trống`} />
-                <OSo nhan="Câu từng sai" so={String(t!.soCauSai)} phu={`${chuaSua} câu chưa sửa được`} />
-                <OSo nhan="Trung bình mỗi câu" so={t!.giayTb !== null && t!.giayTb > 0 ? doiGiay(t!.giayTb) : 'Chưa đo'} phu="lượt đo được, gồm ước tính" />
-              </dl>
-              {kq.catBot && <p className="gvv2-hs-ghi">Số liệu tính trên 5000 lượt gần nhất của em.</p>}
-
-              {t!.soLuot === 0 ? (
-                <p className="gvv2-trong">Sổ chưa ghi lượt làm câu nào của em. Khi em làm bài hằng ngày, ca kiểm tra hay Ôn lại, lượt sẽ hiện ở đây.</p>
               ) : (
                 <>
-                  <div className="gvv2-con" data-so="4" role="tablist" aria-label="Toàn bộ sổ của em">
-                    {the4.map(([k, nhan, so]) => (
-                      <button
-                        key={k}
-                        type="button"
-                        role="tab"
-                        id={`gvv2-hs-the-${k}`}
-                        aria-controls={`gvv2-hs-o-${k}`}
-                        aria-selected={the === k}
-                        className="gvv2-con-nut tt-nhan"
-                        onClick={() => setThe(k)}
-                      >
-                        {nhan} {so !== null && <span className="gvv2-so">· {so}</span>}
+                  {loi && (
+                    <div className="gvv2-loi gvv2-cc-loi" role="alert">
+                      <p>Chưa tải thêm được lượt cũ hơn. {loi}</p>
+                      <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai(TRAN_GIOI_HAN)} disabled={dangTai}>
+                        Thử lại
                       </button>
-                    ))}
-                  </div>
-                  <div role="tabpanel" id={`gvv2-hs-o-${the}`} aria-labelledby={`gvv2-hs-the-${the}`} className="gvv2-hs-o-the">
-                    {the === 'cau-sai' ? (
-                      <DsCauSai cauSai={kq.cauSai} lan={kq.lan} />
-                    ) : the === 'lich-su' ? (
-                      <LichSu kq={kq} dangTai={dangTai} onTaiThem={() => void tai(TRAN_GIOI_HAN)} />
-                    ) : td ? (
-                      <DsCauTomTat key={the} cau={the === 'cau-dung' ? td.cauDung : td.cauDaOn} loai={the === 'cau-dung' ? 'dung' : 'on'} />
-                    ) : (
-                      <p className="gvv2-trong">{dangTaiTd ? 'Đang tải danh sách…' : `Chưa tải được danh sách này. Bấm "${chuCd.nutTai}" ở đầu tấm.`}</p>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                  <dl className="gvv2-hs-so">
+                    <OSo nhan="Số lượt làm câu" so={String(t!.soLuot)} phu={`${t!.soCau} câu khác nhau`} />
+                    <OSo nhan="Tỉ lệ đúng" so={tiLe} phu={`${t!.soDung} đúng · ${t!.soSai} sai · ${t!.soBoTrong} bỏ trống`} />
+                    <OSo nhan="Câu từng sai" so={String(t!.soCauSai)} phu={`${chuaSua} câu chưa sửa được`} />
+                    <OSo nhan="Trung bình mỗi câu" so={t!.giayTb !== null && t!.giayTb > 0 ? doiGiay(t!.giayTb) : 'Chưa đo'} phu="lượt đo được, gồm ước tính" />
+                  </dl>
+                  {kq.catBot && <p className="gvv2-hs-ghi">Số liệu tính trên 5000 lượt gần nhất của {ngoi}.</p>}
+
+                  {t!.soLuot === 0 ? (
+                    <p className="gvv2-trong">
+                      Sổ chưa ghi lượt làm câu nào của {ngoi}. Khi {ngoi} làm bài hằng ngày, ca kiểm tra hay Ôn lại, lượt sẽ hiện ở đây.
+                    </p>
+                  ) : (
+                    <>
+                      <GiayMucDo lan={kq.lan} />
+                      <div className="gvv2-con hslc-the-con" data-so="4" role="tablist" aria-label={`Toàn bộ sổ của ${ngoi}`}>
+                        {the4.map(([k, nhan, so]) => (
+                          <button
+                            key={k}
+                            type="button"
+                            role="tab"
+                            id={`gvv2-hs-the-${k}`}
+                            aria-controls={`gvv2-hs-o-${k}`}
+                            aria-selected={the === k}
+                            className="gvv2-con-nut tt-nhan"
+                            onClick={() => setThe(k)}
+                          >
+                            {nhan} {so !== null && <span className="gvv2-so">· {so}</span>}
+                          </button>
+                        ))}
+                      </div>
+                      <div role="tabpanel" id={`gvv2-hs-o-${the}`} aria-labelledby={`gvv2-hs-the-${the}`} className="gvv2-hs-o-the">
+                        {the === 'cau-sai' ? (
+                          <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} ngoi={ngoi} />
+                        ) : the === 'lich-su' ? (
+                          <LichSu kq={kq} dangTai={dangTai} onTaiThem={() => void tai(TRAN_GIOI_HAN)} ngoi={ngoi} />
+                        ) : td ? (
+                          <DsCauTomTat
+                            key={the}
+                            cau={the === 'cau-dung' ? td.cauDung : td.cauDaOn}
+                            loai={the === 'cau-dung' ? 'dung' : 'on'}
+                            lan={kq.lan}
+                            ngoi={ngoi}
+                          />
+                        ) : (
+                          <p className="gvv2-trong">{dangTaiTd ? 'Đang tải danh sách…' : `Chưa tải được danh sách này. Bấm "${chuCd.nutTai}" ở đầu tấm.`}</p>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </>
               )}
-            </>
-          )}
+            </section>
+          </div>
         </div>
 
         {laThay && (

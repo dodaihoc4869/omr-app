@@ -25,3 +25,29 @@
   background: var(--m3-primary-container);
   color: var(--m3-on-primary-container);
 }
+
+/* LÀN B ĐỢT 16 (thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và thân thiện") — màn làm bài
+ * Luyện đề chuẩn cấu trúc (LuyenDeChuan, khung `.ldc-lam`). CHỈ bố cục, không màu mới. Máy tính + điện thoại xoay ngang: khung rộng ra và
+ * MỖI THẺ CÂU chia hai cột — đề (hình, bảng) bên trái, khối trả lời (A–D · ý a–d Đúng|Sai · ô số) bên phải; phần sau khối trả lời (hình cuối câu,
+ * lời giải khi xem lại) trải hết bề ngang. Trình duyệt chưa có `:has()` bỏ qua cả luật ⇒ giữ một cột như cũ. Điện thoại dọc: không đổi. */
+@media (min-width: 1100px) {
+  .ldc-lam .ldc-khung { max-width: 1200px; }
+}
+@media (min-width: 1100px), (orientation: landscape) and (min-width: 700px) {
+  /* thân thẻ (`.the-cau > div:last-child`, đệm + khe nội tuyến của TheCau) có khối trả lời ⇒ lưới hai cột; khe cột thắng `gap` nội tuyến */
+  .ldc-lam .the-cau > div:last-child:has(> div > div > .pa-hang, > div > div > .y-hang, > .osl) {
+    /* `display: grid` + `column-gap` phải thắng kiểu nội tuyến của TheCau ⇒ `!important` — đặt ở the-cau.css (tệp duy nhất được dùng, phạm vi `.m3 .the-cau`). */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+  .ldc-lam .the-cau > div:last-child:has(> div > div > .pa-hang, > div > div > .y-hang, > .osl) > * { grid-column: 1; min-width: 0; }
+  .ldc-lam .the-cau > div:last-child > :is(div:has(> div > .pa-hang), div:has(> div > .y-hang), .osl) { grid-column: 2; grid-row: 1 / span 3; }
+  .ldc-lam .the-cau > div:last-child > :is(div:has(> div > .pa-hang), div:has(> div > .y-hang), .osl) ~ * { grid-column: 1 / -1; }
+}
+/* Điện thoại xoay ngang (thấp ~390 px): đầu màn và thanh nộp gọn lại cho đề có chỗ; nút Nộp vẫn ≥ 48 px. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .ldc-lam .ldc-khung > .m3-dau-man { padding: var(--k2, 8px) var(--k4, 16px); }
+  .ldc-lam .ldc-khung > .m3-dau-man > div:first-child { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--k4, 16px); }
+  .ldc-lam [data-practice-toolbar] { padding-top: 0; }
+  .ldc-lam [data-practice-toolbar] .m3-thanh-duoi { padding: 6px 8px 6px 16px; }
+}

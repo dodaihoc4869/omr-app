@@ -2,7 +2,7 @@
 // (thẻ câu dùng chung cho màn thi, màn thầy, phiếu…); chỉ dùng lại các mảnh hiển thị đề/hình/công thức mà `TheCau` cũng dùng
 // (ChemText · tachDongTheoY · ExperimentDemo · BangSoLieu · CauHinh · HinhTaiViTri · KhoiLoiGiaiChuan) để chữ và hình ra y hệt.
 // Màu: chỉ biến của app học sinh (hoc-tap.css, khối `.ht2-lam*`). Đáp án chỉ có ở các khối PHẢN HỒI — nhận từ máy chủ SAU khi nộp.
-import { useRef, type KeyboardEvent as KE, type ReactNode } from 'react'
+import { useRef, useSyncExternalStore, type KeyboardEvent as KE, type ReactNode } from 'react'
 import { Check, Delete, X as XIcon } from 'lucide-react'
 import ExperimentDemo, { ExperimentOriginal } from '../ExperimentDemo'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
@@ -14,6 +14,42 @@ import type { HinhAnh } from '../../data/examContent'
 import type { Question } from '../../game/than-thu-v2/core'
 import { TOI_DA_KY_TU, chuDS, kyTuHien, phimCoTacDung, soSanhDungSai, type PhimSo } from './lam-bai'
 import '../m3/the-cau.css'
+
+// ── BỐ CỤC THEO KHỔ MÀN (làn B đợt 16, thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và
+// thân thiện"). CÙNG điểm ngắt với hoc-tap.css: 'rong' = màn ≥ 900 px và cao > 560 px (máy tính, máy tính bảng ngang) · 'thap' = điện
+// thoại xoay ngang (cao ≤ 560 px, rộng ≥ 640 px) · còn lại 'doc' (GIỮ NGUYÊN bản dọc). Không có matchMedia (jsdom, máy chủ) ⇒ 'doc'.
+// Chỉ quyết CHỖ ĐẶT phần trả lời (cột trái dưới đề hay cột phải cạnh nút Nộp) — không đổi đáp án, nháp, thời gian, lệnh máy chủ.
+export type BoCucLam = 'doc' | 'rong' | 'thap'
+export const MQ_LAM_THAP = '(max-height: 560px) and (min-width: 640px)'
+export const MQ_LAM_RONG = '(min-width: 900px)'
+/** Bố cục theo bề rộng × chiều cao khung nhìn (thuần — test được không cần trình duyệt). */
+export function chonBoCucLam(rong: number, cao: number): BoCucLam {
+  if (cao <= 560 && rong >= 640) return 'thap'
+  if (rong >= 900) return 'rong'
+  return 'doc'
+}
+const coMq = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+function docBoCucLam(): BoCucLam {
+  if (!coMq()) return 'doc'
+  if (window.matchMedia(MQ_LAM_THAP).matches) return 'thap'
+  if (window.matchMedia(MQ_LAM_RONG).matches) return 'rong'
+  return 'doc'
+}
+function ngheBoCucLam(bao: () => void): () => void {
+  if (!coMq()) return () => {}
+  const ds = [MQ_LAM_THAP, MQ_LAM_RONG].map((q) => window.matchMedia(q))
+  for (const m of ds) m.addEventListener?.('change', bao)
+  return () => { for (const m of ds) m.removeEventListener?.('change', bao) }
+}
+/** Bố cục hiện tại — đổi ngay khi xoay máy / kéo cửa sổ (đáp án, nháp nằm ở màn cha nên không mất gì). */
+export function useBoCucLam(): BoCucLam {
+  return useSyncExternalStore(ngheBoCucLam, docBoCucLam, () => 'doc')
+}
+/** Phần trả lời sang CỘT PHẢI (cạnh nút Nộp): máy tính — mọi loại câu; điện thoại xoay ngang — chỉ trắc nghiệm (4 phương án vừa một màn
+ *  thấp; đúng–sai và 4 ô + bàn phím số cao hơn màn nên giữ dưới đề như bản đã duyệt). */
+export function traLoiCotPhai(boCuc: BoCucLam, phan: string): boolean {
+  return boCuc === 'rong' || (boCuc === 'thap' && phan === 'I')
+}
 
 type Hinh = HinhAnh[]
 const hinh = (q: Question): Hinh => q.hinhAnh as Hinh

@@ -202,3 +202,11 @@
   background: var(--m3-primary);
   color: var(--m3-on-primary);
 }
+
+/* ĐỢT 16 làn B — Luyện đề chuẩn (`.m3.ldc-lam`, src/components/LuyenDeChuan.tsx) trên máy tính / điện thoại xoay ngang: thân thẻ có khối trả lời ⇒ lưới
+   hai cột (đề trái · trả lời phải; phần còn lại của luật ở luyen-khac-phuc.css). Hai khai báo dưới phải thắng `display` / `gap` nội tuyến của TheCau. */
+@media (min-width: 1100px), (orientation: landscape) and (min-width: 700px) {
+  .m3 .the-cau:where(.ldc-lam *) > div:last-child:has(> div > div > .pa-hang) { display: grid !important; column-gap: var(--k6, 24px) !important; }
+  .m3 .the-cau:where(.ldc-lam *) > div:last-child:has(> div > div > .y-hang) { display: grid !important; column-gap: var(--k6, 24px) !important; }
+  .m3 .the-cau:where(.ldc-lam *) > div:last-child:has(> .osl) { display: grid !important; column-gap: var(--k6, 24px) !important; }
+}

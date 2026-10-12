@@ -11,6 +11,7 @@
 // `nguoiDoc = 'hoc-sinh'`; không phép tính thứ hai. Khác thầy CHỈ ở các trường bảo mật liệt kê đầu `ho-so-em-hs-loc.ts` (lượt ca chưa công bố,
 // đáp án em chọn, mã câu thật, ghi chú nội bộ).
 // Lỗi: token hỏng ⇒ "Em đăng nhập lại…"; lõi báo lỗi / ném ⇒ MỘT câu nói thật cho em (không lộ lời máy chủ nội bộ).
+// PHỤ HUYNH (12/10 đợt 16): `/ph/ho-so-thai-do`, `/ph/lich-su-lam-cau` (ph-ho-so-con.ts) gọi ĐÚNG hai lõi bản học sinh dưới đây sau cổng phụ huynh.
 import type { Env } from './kieu'
 import type { TraLoiHoSoThaiDo } from './bai-hang-ngay-kieu'
 import type { TraLoiLichSuLamCau } from './lich-su-lam-cau-kieu'
@@ -39,24 +40,37 @@ async function sbdTuToken(env: Env, b: Row): Promise<string | null> {
 export async function hsHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promise<TraLoiHoSoThaiDo> {
   const sbd = await sbdTuToken(env, b)
   if (!sbd) return { ok: false, error: CAN_DANG_NHAP_HO_SO }
-  try {
-    const r = await hoSoThaiDoCuaEm(env, sbd, {}, nowMs, 'hoc-sinh')
-    return r.ok ? banHocSinhHoSoThaiDo(r) : { ok: false, error: LOI_HO_SO_EM }
-  } catch (e) {
-    console.error('[ho-so-em-hs] hồ sơ thái độ lỗi (báo em thử lại):', e instanceof Error ? e.message : e)
-    return { ok: false, error: LOI_HO_SO_EM }
-  }
+  return hoSoThaiDoBanHocSinh(env, sbd, nowMs, LOI_HO_SO_EM)
 }
 
 /** `POST /hs/lich-su-lam-cau {token, gioiHan?}` — xem đầu tệp. `gioiHan` như lệnh thầy (mặc định 1000, trần 2000). */
 export async function hsLichSuLamCau(env: Env, b: Row): Promise<TraLoiLichSuLamCau> {
   const sbd = await sbdTuToken(env, b)
   if (!sbd) return { ok: false, error: CAN_DANG_NHAP_HO_SO }
+  return lichSuLamCauBanHocSinh(env, sbd, b.gioiHan, LOI_LICH_SU_EM)
+}
+
+// ---- LÕI BẢN HỌC SINH cho một SBD ĐÃ XÁC THỰC (12/10 đợt 16: tách để `/ph/ho-so-thai-do`, `/ph/lich-su-lam-cau` — ph-ho-so-con.ts — trả ĐÚNG bản
+// em thấy, cùng mọi luật bảo mật của em; không phép tính thứ hai). `loi` = câu báo khi lõi hỏng (em / phụ huynh xưng hô khác nhau).
+
+/** Hồ sơ thái độ bản học sinh (khoảng mặc định từ 01/10, `nguoiDoc = 'hoc-sinh'`, lọc `banHocSinhHoSoThaiDo`). */
+export async function hoSoThaiDoBanHocSinh(env: Env, sbd: string, nowMs: number, loi: string = LOI_HO_SO_EM): Promise<TraLoiHoSoThaiDo> {
   try {
-    const r = await lichSuLamCauCuaEm(env, sbd, b.gioiHan, 'hoc-sinh')
-    return r.ok ? banHocSinhLichSu(r) : { ok: false, error: LOI_LICH_SU_EM }
+    const r = await hoSoThaiDoCuaEm(env, sbd, {}, nowMs, 'hoc-sinh')
+    return r.ok ? banHocSinhHoSoThaiDo(r) : { ok: false, error: loi }
   } catch (e) {
-    console.error('[ho-so-em-hs] lịch sử làm câu lỗi (báo em thử lại):', e instanceof Error ? e.message : e)
-    return { ok: false, error: LOI_LICH_SU_EM }
+    console.error('[ho-so-em-hs] hồ sơ thái độ lỗi (báo thử lại):', e instanceof Error ? e.message : e)
+    return { ok: false, error: loi }
+  }
+}
+
+/** Lịch sử làm câu bản học sinh (`nguoiDoc = 'hoc-sinh'`, lọc `banHocSinhLichSu`). `gioiHan` như lệnh thầy. */
+export async function lichSuLamCauBanHocSinh(env: Env, sbd: string, gioiHan: unknown, loi: string = LOI_LICH_SU_EM): Promise<TraLoiLichSuLamCau> {
+  try {
+    const r = await lichSuLamCauCuaEm(env, sbd, gioiHan, 'hoc-sinh')
+    return r.ok ? banHocSinhLichSu(r) : { ok: false, error: loi }
+  } catch (e) {
+    console.error('[ho-so-em-hs] lịch sử làm câu lỗi (báo thử lại):', e instanceof Error ? e.message : e)
+    return { ok: false, error: loi }
   }
 }

@@ -30,7 +30,7 @@ import { mergeKeepAnswers } from '../data/examContent'
 import { khuTrungNguon } from '../lib/khu-trung-cau'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
-import HopChonDe from '../components/HopChonDe'
+import HopChonDe, { type NhoHopChonDe } from '../components/HopChonDe'
 import { baiLamTuCa, boCauTrungNoiDung, boTrungTrongBanDe, cauTuBanDe, khoaNoiDungBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
 import { rutDeChua } from '../lib/rut-de-chua'
 import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
@@ -283,7 +283,13 @@ function GoiLenBangCu() {
   // thêm KHÔNG có bài làm nên không bao giờ bị xếp "giảng cả lớp"/"đọc đáp án";
   // nó vào thẳng danh sách chữa và xếp theo sao.
   const [deDaLuu, setDeDaLuu] = useState<TeacherExamSource[]>([])
-  const [maDeChon, setMaDeChon] = useState<Set<string>>(new Set())
+  // ĐỢT 16 (12/10, thầy: "chọn xong bấm lại nút chọn thì sẽ trở lại ban đầu"): bài thầy TỰ TÍCH ở hộp chọn (`maDeTich`) tách khỏi đề của BTVN
+  // đang chọn (`maDeBtvn`). Trước đây chung một tập ⇒ danh sách BTVN của ca về MUỘN (hoặc bấm một BTVN) xoá sạch bài thầy vừa tích.
+  // `maDeChon` (tập đang dùng để dựng câu chữa) = BTVN khi ở chế độ "Chữa BTVN", còn lại = bài thầy tích.
+  const [maDeTich, setMaDeTich] = useState<Set<string>>(new Set())
+  const [maDeBtvn, setMaDeBtvn] = useState<Set<string>>(new Set())
+  /** Hộp chọn đề bị bỏ khi đổi chế độ ⇒ giữ chữ tìm + chip khối ở đây, mở lại cây tự mở tới bài đã tích. */
+  const nhoHopChon = useRef<NhoHopChonDe | null>(null)
   // HAI CÁCH LẤY CÂU ĐỂ CHỮA (thầy chốt 05/09 tối):
   //   'san'   — dùng bộ câu máy đã rút sẵn khi mở ca ở chế độ Kiểm tra điểm yếu;
   //   'tu_chon' — thầy tự tích bài muốn chữa, máy dựa vào điểm yếu cộng dồn ở
@@ -291,6 +297,7 @@ function GoiLenBangCu() {
   // Mặc định TỰ CHỌN: chưa mở ca thì chưa biết ca có bộ rút sẵn hay không, mà
   // hộp tích đề phải hiện sẵn để thầy làm việc được ngay.
   const [cachLayCau, setCachLayCau] = useState<'san' | 'tu_chon' | 'theo_dang' | 'btvn_gan_nhat'>('tu_chon')
+  const maDeChon = cachLayCau === 'btvn_gan_nhat' ? maDeBtvn : maDeTich
   const [dsBtvnCa, setDsBtvnCa] = useState<DongTheoDoiBtvn[]>([])
   const [dangTaiBtvnCa, setDangTaiBtvnCa] = useState(false)
   const [btvnChon, setBtvnChon] = useState<string | null>(null)
@@ -568,6 +575,7 @@ function GoiLenBangCu() {
     if (!du?.maCa) {
       setDsBtvnCa([])
       setBtvnChon(null)
+      setMaDeBtvn(new Set())
       return
     }
     let huy = false
@@ -581,9 +589,8 @@ function GoiLenBangCu() {
           setDsBtvnCa(list)
           if (list.length > 0) {
             setBtvnChon(list[0].maBtvn)
-            if (list[0].maDe) {
-              setMaDeChon(new Set([list[0].maDe]))
-            }
+            // Chỉ đặt đề của chế độ "Chữa BTVN" — bài thầy đã tích ở hộp chọn giữ nguyên.
+            setMaDeBtvn(new Set(list[0].maDe ? [list[0].maDe] : []))
           }
         }
       } catch (err) {
@@ -1006,7 +1013,8 @@ function GoiLenBangCu() {
     if (!buoiDo || !tinhTrangDo) return
     const tt = tinhTrangDo
     setCachLayCau(buoiDo.nguon.cachLayCau)
-    setMaDeChon(new Set(buoiDo.nguon.maDeChon))
+    if (buoiDo.nguon.cachLayCau === 'btvn_gan_nhat') setMaDeBtvn(new Set(buoiDo.nguon.maDeChon))
+    else setMaDeTich(new Set(buoiDo.nguon.maDeChon))
     setSoCauChua(buoiDo.nguon.soCauChua)
     setLocSao(buoiDo.nguon.locSao as LocSao)
     setLocDang(buoiDo.nguon.locDang as LocDang)
@@ -1864,7 +1872,7 @@ function GoiLenBangCu() {
                       onClick={() => {
                         setBtvnChon(bt.maBtvn)
                         if (bt.maDe) {
-                          setMaDeChon(new Set([bt.maDe]))
+                          setMaDeBtvn(new Set([bt.maDe]))
                         }
                       }}
                       className={`p-3 rounded-xl border transition-colors cursor-pointer flex items-center justify-between gap-3 ${
@@ -1921,10 +1929,11 @@ function GoiLenBangCu() {
         ) : (
           <HopChonDe
             ds={deDaLuu}
-            daChon={maDeChon}
+            daChon={maDeTich}
             chonNhieu
+            nho={nhoHopChon}
             onChon={(ma) => {
-              setMaDeChon((cu) => {
+              setMaDeTich((cu) => {
                 const m = new Set(cu)
                 if (m.has(ma)) m.delete(ma)
                 else m.add(ma)
@@ -1932,7 +1941,7 @@ function GoiLenBangCu() {
               })
             }}
             onChonTatCa={(ma) => {
-              setMaDeChon(new Set(ma))
+              setMaDeTich(new Set(ma))
             }}
             cao={264}
           />

@@ -14,9 +14,12 @@
 // TỐC ĐỘ LÀM BÀI: số giây đã ghi trong sổ (`su_kien_hoc.giay` ⇒ `raw_json.ms`, như theo lô của `/gv/nhip-hoc`), quá nhanh = dưới 8 giây (câu tự tính
 //   Phần III dưới 15 giây), mức theo `NGUONG_THAI_DO` (tín hiệu (b) của hồ sơ thầy). BỎ lượt còn giấu (`embargoed`) VÀ lượt của ca kiểm tra chưa công
 //   bố / đã xoá (`SQL_LUOT_GOI7`) — % đúng của nhóm quá nhanh không được lộ kết quả ca chưa công bố. Chỉ trả SỐ ĐẾM: không mã câu, không đáp án.
+// PHỤ HUYNH (12/10 đợt 16, thầy: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): `/ph/nhip-hoc` (ph-ho-so-con.ts) gọi ĐÚNG lõi
+//   `nhipHocCuaEm` sau cổng phụ huynh ⇒ cùng hợp đồng, cùng luật bảo mật như bản em.
+// ĐỘ TIN CẬY (12/10 đợt 16): `doTinCay` / `canThem` của nhóm — phép thuần `tinCayNhanNgay` (thai-do-tin-cay.ts); nhóm KHÔNG đổi.
 import type { Env } from './kieu'
 import { NGUONG_THAI_DO as NG } from './bai-hang-ngay-kieu'
-import type { KetQuaNhipHocEm, TocDoNhipEm, TraLoiNhipHocEm } from './nhip-hoc-kieu'
+import type { KetQuaNhipHocEm, NhomNhip, TocDoNhipEm, TraLoiNhipHocEm } from './nhip-hoc-kieu'
 import { khoangNgay, ngayBaiCuaMotEm } from './bai-hang-ngay'
 import { docNgayVao } from './nhip-hoc'
 import { tomTatNhip, viecTiepNhip } from './nhip-hoc-luat'
@@ -24,6 +27,7 @@ import { gameIdentity } from './game-v2-auth'
 import { SQL_LUOT_GOI7 } from './goi-bai-7'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docCauKho } from './omni-d1'
+import { tinCayNhanNgay } from './thai-do-tin-cay'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -98,9 +102,20 @@ export async function hsNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<T
     return { ok: false, error: CAN_DANG_NHAP_NHIP }
   }
   if (!sbd || sbd.length > 40) return { ok: false, error: CAN_DANG_NHAP_NHIP }
+  return nhipHocCuaEm(env, sbd, nowMs, LOI_NHIP_EM)
+}
+
+/** Nhóm theo ngày ⇒ nhãn của luật kết luận (cùng ba nhóm, tên khác nhau ở hai hợp đồng). */
+const NHAN_CUA_NHOM: Readonly<Record<Exclude<NhomNhip, 'chua-du'>, 'cham-chi' | 'chua-deu' | 'luoi'>> = { cham: 'cham-chi', 'chua-deu': 'chua-deu', luoi: 'luoi' }
+
+/**
+ * LÕI bảng "Nhịp học" của MỘT em đã xác thực (12/10 đợt 16: tách để `/ph/nhip-hoc` — ph-ho-so-con.ts — trả ĐÚNG bản em thấy, không phép tính thứ hai).
+ * `sbd` đã kiểm ở nơi gọi (em ⇒ token học sinh; phụ huynh ⇒ `sbdCuaPhuHuynh`). `loi` = câu báo khi đọc hỏng (em / phụ huynh xưng hô khác nhau).
+ */
+export async function nhipHocCuaEm(env: Env, sbd: string, nowMs: number, loi: string = LOI_NHIP_EM): Promise<TraLoiNhipHocEm> {
   // Khoảng mặc định (01/10 → hôm nay); em KHÔNG chọn được khoảng khác (bỏ `tu` / `den` của thân lệnh).
   const kh = khoangNgay({}, nowMs)
-  if ('error' in kh) return { ok: false, error: LOI_NHIP_EM }
+  if ('error' in kh) return { ok: false, error: loi }
   const { tu, den, homNay } = kh
   try {
     const [ngay, vaoMap, tocDo] = await Promise.all([
@@ -108,7 +123,7 @@ export async function hsNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<T
       docNgayVao(env, [{ sbd, hoTen: sbd, lop: '', khoi: '', goi7Tu: null }], tu).catch(() => new Map<string, string>()),
       docTocDo(env, sbd, tu, den),
     ])
-    if (!ngay) return { ok: false, error: LOI_NHIP_EM }
+    if (!ngay) return { ok: false, error: loi }
     const vao = vaoMap.get(sbd) ?? tu
     const dai = ngay.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam }))
     const t = tomTatNhip(dai, homNay)
@@ -129,10 +144,14 @@ export async function hsNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<T
       chuoiBo: t.chuoiKhongLam,
       tocDo,
       viecTiep: viecTiepNhip(t),
+      // CHỈ THÊM 12/10 đợt 16: độ tin cậy của nhóm — cùng phép với hồ sơ thái độ (thai-do-tin-cay.ts); nhóm vẫn do `tomTatNhip` quyết.
+      ...(t.nhom === 'chua-du'
+        ? {}
+        : tinCayNhanNgay(NHAN_CUA_NHOM[t.nhom], { n: t.soNgayQua, du: t.soNgayDu, chuoiKhongLam: t.chuoiKhongLam?.dai ?? 0, chuoiDuGanNhat: t.chuoiDuGanNhat })),
     }
     return kq
   } catch (e) {
-    console.error('[nhip-hoc-em] lỗi (báo em thử lại):', e instanceof Error ? e.message : e)
-    return { ok: false, error: LOI_NHIP_EM }
+    console.error('[nhip-hoc-em] lỗi (báo thử lại):', e instanceof Error ? e.message : e)
+    return { ok: false, error: loi }
   }
 }

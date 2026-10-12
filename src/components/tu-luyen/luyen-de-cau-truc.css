@@ -453,3 +453,12 @@
 @media (prefers-reduced-motion: reduce) {
   .ldct-gioi-thieu[data-bo-cuc] { animation: none; }
 }
+/* LÀN B ĐỢT 16 (thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và thân thiện"): điện thoại dọc
+   (màn chạm) — ô nhảy câu ở thanh đầu đủ 44 px cho ngón tay (luật B3/C9; trước 36 px). Hàng vẫn cuộn ngang một dòng như cũ. */
+@media (pointer: coarse) and (orientation: portrait) {
+  .ldct-dh-o {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+}

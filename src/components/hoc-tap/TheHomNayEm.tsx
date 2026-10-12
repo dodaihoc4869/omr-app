@@ -1,22 +1,9 @@
-import { useEffect, useId, useState, type CSSProperties, type ReactNode } from 'react'
-import { Activity, ArrowRight, Check, ChevronRight, Clock, Eye, Hourglass, TriangleAlert } from 'lucide-react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Activity, ArrowRight, Check, Hourglass, TriangleAlert } from 'lucide-react'
 import { CAU_MOI_CHANG, soChangXong, type SoHomNay } from './lam-bai'
-import {
-  chuDaiOEm,
-  chuDuMucEm,
-  chuMotOEm,
-  chuRaKhoiLuoi,
-  chuTocDo,
-  chuViecTiep,
-  layNhipHocEm,
-  loaiONgay,
-  LUAT_NHOM_NHIP,
-  nhipTheoSanh,
-  TEN_LOAI_O_EM,
-  TEN_NHOM_NHIP,
-  type KetQuaNhipHocEm,
-  type NhomNhip,
-} from '../../lib/nhip-hoc-em'
+import { layNhipHocEm, nhipTheoSanh, TEN_NHOM_NHIP, type KetQuaNhipHocEm, type NhomNhip } from '../../lib/nhip-hoc-em'
+// Đợt 16: phần Nhịp học (dải ô ngày, Lười k/6, Việc tiếp, tốc độ) tách thành bảng DÙNG CHUNG với app phụ huynh — markup + chữ của em giữ nguyên.
+import BangNhipHoc from './BangNhipHoc'
 
 // THẺ "HÔM NAY CỦA EM" — đầu màn Hôm nay của app học sinh (thầy 12/10: "Bạn gộp 2 phần làm bài này vào làm một thôi nhé. Tập trung vào việc nhắc học
 // sinh làm bao nhiêu câu. Thiết kế đẹp, trực quan, khoa học thân thiện nhất với hs nhé"). Thay CẢ khối vòng tròn "Mục tiêu hôm nay" (`.ht2-chinh` cũ) lẫn
@@ -212,98 +199,6 @@ function PhanChinh(p: PropsTheHomNayEm & { chip: ReactNode }) {
   )
 }
 
-function DaiNgay({ k, idMo }: { k: KetQuaNhipHocEm; idMo: string }) {
-  const n = Math.min(Math.max(k.ngay.length, 1), 14)
-  const nRong = Math.min(Math.max(k.ngay.length, 1), 21)
-  return (
-    <>
-      {/* Số cột = số ngày, tối đa 14 (điện thoại) / 21 (máy tính) rồi xuống hàng; ít ngày thì ô không kéo giãn. */}
-      <span className="ht2-hn-dai" id={idMo} role="img" aria-label={chuDaiOEm(k)} style={{ '--cot': n, '--cot-rong': nRong } as CSSProperties}>
-        {k.ngay.map((x) => (
-          <i key={x.ngay} data-loai={loaiONgay(x, k.homNay)} data-hom-nay={x.ngay === k.homNay ? 'true' : undefined} title={chuMotOEm(x, k.homNay)} />
-        ))}
-      </span>
-      <span className="ht2-hn-chu-thich" aria-hidden="true">
-        {(Object.keys(TEN_LOAI_O_EM) as (keyof typeof TEN_LOAI_O_EM)[]).map((l) => (
-          <span key={l}>
-            <i data-loai={l} />
-            {TEN_LOAI_O_EM[l]}
-          </span>
-        ))}
-        <span>
-          <i data-loai="cho" />
-          Hôm nay
-        </span>
-      </span>
-    </>
-  )
-}
-
-function PhanNhip({ k, onMoHoSo }: { k: KetQuaNhipHocEm; onMoHoSo?: () => void }) {
-  const id = useId()
-  const can = LUAT_NHOM_NHIP.ngayLienThoatLuoi
-  const v = k.viecTiep
-  const co = Math.min(v.loai === 'thoat-luoi' ? v.coNgay : k.chuoiDuGanNhat, can)
-  const hom = k.homNayMuc
-  const homDu = !!hom && hom.lam >= hom.muc
-  // ô "đang làm" của thanh 6 ô = ngày hôm nay chưa đủ, tô theo số câu đã làm hôm nay (cùng số Sảnh).
-  const phanHom = hom && !homDu && hom.muc > 0 ? Math.round((100 * hom.lam) / hom.muc) : 0
-  // Điện thoại: "Xem hồ sơ ›" là hàng cuối của khối (sau dải + chú giải); máy tính: góc phải hàng đầu (hoc-tap.css).
-  const ruot = (
-    <>
-      <span className="ht2-hn-du-dong" id={`${id}-du`}>
-        {chuDuMucEm(k)}
-      </span>
-      <DaiNgay k={k} idMo={`${id}-dai`} />
-      {onMoHoSo && (
-        <span className="ht2-hn-xem" aria-hidden="true">
-          Xem hồ sơ
-          <ChevronRight size={18} />
-        </span>
-      )}
-    </>
-  )
-  return (
-    <div className="ht2-hn-nhip" role="group" aria-label="Nhịp học của em">
-      {onMoHoSo ? (
-        <button type="button" className="ht2-hn-nhip-bam" onClick={onMoHoSo} aria-label="Xem hồ sơ làm bài của em" aria-describedby={`${id}-du ${id}-dai`}>
-          {ruot}
-        </button>
-      ) : (
-        <div className="ht2-hn-nhip-bam">{ruot}</div>
-      )}
-      {k.nhom === 'luoi' ? (
-        <div className="ht2-hn-luoi">
-          <p>
-            <b>Ra khỏi nhóm Lười:</b>
-            {chuRaKhoiLuoi(k).replace(/^Ra khỏi nhóm Lười:/, '')}
-          </p>
-          <span className="ht2-hn-sau" role="img" aria-label={`${co} trên ${can} ngày liền đủ mức`}>
-            {Array.from({ length: can }, (_, i) => {
-              const tt = i < co ? 'xong' : i === co && hom && !homDu ? 'dang' : 'cho'
-              return <i key={i} data-tt={tt}>{tt === 'dang' && phanHom > 0 && <span style={{ transform: `scaleX(${phanHom / 100})` }} />}</i>
-            })}
-          </span>
-        </div>
-      ) : (
-        <p className="ht2-hn-tiep">
-          <b>Việc tiếp:</b> {chuViecTiep(k)}
-        </p>
-      )}
-      {k.tocDo && (k.tocDo.muc === 'xau' || k.tocDo.muc === 'chu-y') && (
-        <p className="ht2-hn-toc" data-muc={k.tocDo.muc}>
-          <Clock size={18} aria-hidden="true" />
-          <span>{chuTocDo(k.tocDo)}</span>
-        </p>
-      )}
-      <p className="ht2-hn-thay">
-        <Eye size={18} aria-hidden="true" />
-        Thầy cũng thấy bảng này.
-      </p>
-    </div>
-  )
-}
-
 export default function TheHomNayEm(p: PropsTheHomNayEm) {
   // Khoá cố định (không theo số câu đã làm): số hôm nay đã tính lại từ sảnh bên dưới ⇒ không gọi /hs/nhip-hoc sau mỗi câu (khẩn 12/10 21h).
   const nhipGoc = useNhipHocEm(p.token, null)
@@ -314,7 +209,7 @@ export default function TheHomNayEm(p: PropsTheHomNayEm) {
     <section className="ht2-hn" data-nhom={k?.nhom} data-mot={coNhip ? undefined : 'true'} aria-label="Hôm nay của em" aria-busy={(!p.so && p.dangTai) || nhip === 'tai'}>
       <PhanChinh {...p} chip={k ? <Chip nhom={k.nhom} /> : nhip === 'tai' ? <span className="ht2-hn-chip-xuong" aria-hidden="true" /> : null} />
       {k ? (
-        <PhanNhip k={k} onMoHoSo={p.onMoHoSo} />
+        <BangNhipHoc k={k} onMoHoSo={p.onMoHoSo} />
       ) : nhip === 'tai' ? (
         <div className="ht2-hn-nhip ht2-hn-xuong" aria-label="Đang tải nhịp học của em">
           <span style={{ width: '58%', height: 18 }} />
