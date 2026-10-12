@@ -3,6 +3,7 @@ import { ArrowRight, Atom, BookOpen, Check, ChevronRight, ClipboardCheck, FileCl
 import type { KetQuaSanh } from '../hoa2/api'
 import './hoc-tap.css'
 import TheGoi7 from './TheGoi7'
+import NhipHocEm from './NhipHocEm'
 
 // TRÙNG TU 11/10 (thầy duyệt bản vẽ https://claude.ai/artifact/5v8vXw5zBzw53FkpCvMknC — "buid và đẩy luôn nhé"):
 // 4 mục Hôm nay · Hành trình · Ôn & sửa · Kết quả; "Của em" là tấm mở từ ảnh đại diện; "Vào ca kiểm tra" luôn ở góc trên
@@ -17,6 +18,8 @@ interface Props {
   onTaiLai: () => void; onDangXuat: () => void; coCa: boolean
   /** Số bài tập về nhà thầy đang giao (dòng ở Hôm nay chỉ hiện khi > 0). */
   soBaiTap?: number
+  /** Token phiên của em — bảng "Nhịp học của em" (12/10) đọc `/hs/nhip-hoc`; không có ⇒ bảng không hiện. */
+  token?: string
 }
 /** Tên ngắn 4 tầng của Hành trình (thầy chốt bản vẽ 11/10). */
 export const TANG = ['Nền', 'Hiểu', 'Vận dụng', 'Tổng hợp']
@@ -88,6 +91,8 @@ export default function HocTapHomNay(p: Props) {
         {p.coCa && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
         {muc === 'hom-nay' && <>
+          {/* 12/10 (thầy duyệt bản vẽ HS-Cham / HS-Luoi): bảng Nhịp học của em ĐẦU màn, trên khối Hôm nay chính; lỗi ⇒ ẩn gọn. */}
+          <NhipHocEm token={p.token} onHoc={p.onHoc} tatHoc={khoaHoc} lamMoi={daLam} />
           <section className="ht2-chinh" aria-busy={p.dangTai && !sanh} aria-label="Mục tiêu hôm nay">
             <div className="ht2-vong" style={{ '--p': phanTram } as CSSProperties} aria-hidden="true"><span><b>{daLam ?? '—'}</b><small>trên {mucNgay ?? '—'} câu</small></span></div>
             <progress className="ht2-an" aria-label="Tiến độ nhiệm vụ hôm nay" value={daLam ?? 0} max={Math.max(1, mucNgay ?? 1)} />
