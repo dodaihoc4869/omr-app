@@ -6,6 +6,7 @@ import { lichSuGia } from './lich-su-lam-cau'
 import { baiHangNgayGia, hoSoThaiDoGia, tenEmBhn } from './bai-hang-ngay' // LÀN GIÁO VIÊN 12/10
 import { goi7Gia } from './goi-bai-7' // LÀN BÀI MỚI 7 NGÀY 12/10
 import { LA_TTC, LOP_TTC } from './thay-tu-chua' // LÀN THẦY TỰ CHỮA 12/10
+import { traLoiChuaBai } from './chua-bai' // LÀN CHỮA BÀI 12/10B
 
 const HT = [
   { k: '10', id: 'hanh-trinh-v3-khoi-10', soEm: 38 },
@@ -80,5 +81,9 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   // ---- LÀN THẦY TỰ CHỮA 12/10 (cảnh `&ttc=1`): danh sách lớp CÓ số báo danh ⇒ thẻ Thầy tự chữa có tỉ lệ sai lớp (gia/thay-tu-chua.ts).
   if (LA_TTC && duong === '/gv/lop') return { ok: true as const, du: { lop: LOP_TTC } }
   // ---- hết LÀN THẦY TỰ CHỮA 12/10
+  // ---- LÀN CHỮA BÀI 12/10B (cảnh `&ttc=1&cb=1`): em của lớp làm sai từng câu (theo lô) + buổi điểm danh đang mở (gia/chua-bai.ts).
+  const cb = traLoiChuaBai(duong, b)
+  if (cb) return cb
+  // ---- hết LÀN CHỮA BÀI 12/10B
   return traLoiThay(duong, b)
 }

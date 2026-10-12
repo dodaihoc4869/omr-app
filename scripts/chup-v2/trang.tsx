@@ -75,6 +75,9 @@ import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
 import { goi7Du } from './gia/goi-bai-7'
 // LÀN THẦY TỰ CHỮA 12/10: `gv-nhip&the=can-chua&ttc=1` = Cần thầy chữa › thẻ Thầy tự chữa (bài Dạy học giả có đủ ba tờ, lớp có SBD, số liệu lớp giả).
 import { LA_TTC, BAI_TTC, aiSaiTtc, soGopTtc } from './gia/thay-tu-chua'
+// ═════════ LÀN CHỮA BÀI 12/10B: `gv-nhip&the=can-chua&ttc=1&cb=1` = Hành trình › Chữa bài — (A) Học sinh cần chữa + (B) Chữa câu khó & tính toán MỞ SẴN
+// (bài + lớp + số liệu lớp giả của làn Thầy tự chữa; em làm sai theo lô + buổi điểm danh đang mở: gia/chua-bai.ts qua `goiLenh` giả). ═════════
+import { LA_CB } from './gia/chua-bai'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -341,6 +344,12 @@ if (LA_TTC) {
   }
 }
 // ═════════════════════════════════════════ hết LÀN THẦY TỰ CHỮA 12/10 ═════════════════════════════════════════
+// ═════════════════════════════════════════ LÀN CHỮA BÀI 12/10B ═════════════════════════════════════════
+// Thầy 12/10: "… thu gọn tối giản hết lại thành 2 mục …" · "chữa câu khó và tính toán cũng phải chiếu lên bảng theo chuẩn nhé". Cảnh `cb=1` đi cùng `ttc=1`
+// (kho có Bài 6 khối 12, lớp 12A1 có SBD, `/gv/thong-ke-lop-cau` giả); thiếu `ttc=1` thì nạp bài giả ở đây. Lệnh `/gv/ai-sai-nhieu-cau` + `/gv/buoi-hoc`
+// gan-day trả ở gia/chua-bai.ts.
+if (LA_CB && !KHO.some((s) => s.maDe === BAI_TTC.maDe)) KHO.push(BAI_TTC)
+// ═════════════════════════════════════════ hết LÀN CHỮA BÀI 12/10B ═════════════════════════════════════════
 const manHs12 = () =>
   man === 'hs12-tu-luyen' || man === 'hs12-tu-luyen-lam' ? h(ManTuLuyen, { token: 'tk', sbd: '12121212', onVe: noop })
   : man === 'hs12-tu-chua' ? h(ManTuChua, { token: 'tk', onVe: noop, onTuLuyen: noop })
