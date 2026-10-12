@@ -13,17 +13,17 @@ export interface GiaoTuCa {
   ten: string
 }
 
-/** Các thẻ của màn Hành trình: Dạy học · Bài mới trong 7 ngày · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa.
- *  10/10 thêm bài 7 ngày ngay sau Dạy học. `chien-dich` KHÔNG phải thẻ: là trang quản lý "Chiến dịch đã
+/** Các thẻ của màn Hành trình: Dạy học · Bài mới trong 7 ngày · Nhịp học · Bài hằng ngày · Kiểm tra đầu giờ · Cần thầy chữa.
+ *  10/10 thêm bài 7 ngày ngay sau Dạy học; 12/10 thêm Bài hằng ngày ngay sau Nhịp học. `chien-dich` KHÔNG phải thẻ: là trang quản lý "Chiến dịch đã
  *  giao" của cùng màn (lối vào chữ nhỏ ở Cài đặt, hoặc Tổng quan › "Giao" cho một ca). */
-export type TheHanhTrinh = 'day-hoc' | 'goi-7' | 'nhip' | 'dau-gio' | 'can-chua' | 'chien-dich'
+export type TheHanhTrinh = 'day-hoc' | 'goi-7' | 'nhip' | 'bai-hang-ngay' | 'dau-gio' | 'can-chua' | 'chien-dich'
 
 /** Màn Hôm nay bấm một việc ⇒ Hành trình mở sẵn đúng thẻ (đọc một lần rồi xoá — như `giaoTuCa`). */
 export interface MoHanhTrinh {
   the: TheHanhTrinh
   /** "Bổ sung bài": cuộn tới bước Bài hôm nay trong thẻ Dạy học. */
   boSungBai?: boolean
-  /** Thẻ Nhịp học: khối chọn sẵn ở thanh phân đoạn (Hôm nay bấm dòng "Khối 12" của thẻ Đủ mức tối thiểu). Vắng ⇒ Tất cả. */
+  /** Thẻ Nhịp học / Bài hằng ngày: khối chọn sẵn ở thanh phân đoạn (Hôm nay bấm dòng "Khối 12" của thẻ Đủ mức tối thiểu). Vắng ⇒ Tất cả. */
   khoi?: number
 }
 

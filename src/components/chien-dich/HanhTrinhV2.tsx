@@ -4,10 +4,14 @@
 // cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại" + "kiểm tra đầu giờ giữ lại nữa nhé". 09/10 KHUYA — THẦY: "hành trình
 // để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu nhé, bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử…".
 // 10/10: thêm lối vào Bài mới trong 7 ngày ngay trên màn Hành trình hiện hành, sau Dạy học.
+// 12/10 — THẦY: "tôi cần biết lịch sử học sinh làm bài tập hàng ngày, tính từ 12/10. Học sinh thiếu nhiều ngày nhất hiển thị lên đầu, làm thiếu nhiều
+// câu nhất trong từng ngày" ⇒ thẻ Bài hằng ngày ngay sau Nhịp học (`TheBaiHangNgay`: bảng nhiệt em × ngày, bấm em ⇒ hồ sơ làm bài).
 //   · Dạy học (mặc định) — `TheBaiDaDay` (điểm danh · chọn câu · bước Bài hôm nay). Nút chính "Bổ sung bài" thuộc thẻ này: chỉ hiện khi đứng ở
 //     thẻ Dạy học, bấm ⇒ cuộn tới bước Bài hôm nay (tick bài vừa dạy — máy chủ chưa có lệnh thêm bài thẳng vào hành trình theo khối).
 //   · Nhịp học — `TheNhipHoc` (từng em hôm nay của các Hành trình khối đang chạy; em chưa làm / chưa đủ mức đứng đầu; bấm một em ⇒ tấm Lịch sử
 //     làm câu). Hôm nay › "Xem danh sách" / dòng khối của thẻ Đủ mức tối thiểu mở thẳng thẻ này (khối chọn sẵn: `khoiDau`).
+//   · Bài hằng ngày — `TheBaiHangNgay` (từ 12/10, mỗi em mỗi ngày đã làm/mức; em thiếu nhiều ngày nhất đứng đầu; bấm đầu cột một ngày ⇒ em thiếu
+//     nhiều câu nhất ngày ấy lên đầu; bấm em ⇒ tấm Hồ sơ làm bài có nhãn thái độ). Hôm nay › "Bài hằng ngày từ 12/10" mở thẳng thẻ này.
 //   · Kiểm tra đầu giờ — `KiemTraDauGio` (cùng bước điểm danh, app gọi ≤ 6 em làm lại câu từng đúng).
 //   · Cần thầy chữa — `TheCanThayChua` (trung tu: MỘT danh sách câu/dạng cần chữa xếp theo số em, mỗi dòng một nút đúng việc; thanh phân đoạn
 //     Khối 10 · 11 · 12 chỉ hiện ở thẻ này vì chỉ thẻ này lọc theo khối). Số cạnh tên thẻ = số "Cần thầy chữa" màn Hôm nay đã đếm.
@@ -30,15 +34,17 @@ export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
 const TheBaiDaDay = lazy(() => import('./TheBaiDaDay'))
 const BangGoi7 = lazy(() => import('./BangGoi7'))
 const TheNhipHoc = lazy(() => import('./TheNhipHoc'))
+const TheBaiHangNgay = lazy(() => import('./TheBaiHangNgay'))
 const KiemTraDauGio = lazy(() => import('../day-hoc/KiemTraDauGio'))
 const TheCanThayChua = lazy(() => import('./TheCanThayChua'))
 
 type TheMan = Exclude<TheHanhTrinh, 'chien-dich'>
-/** Dạy → bài mới 7 ngày → nhịp học của từng em → kiểm tra đầu giờ → chữa. */
+/** Dạy → bài mới 7 ngày → nhịp học của từng em → bài hằng ngày từ 12/10 → kiểm tra đầu giờ → chữa. */
 export const THE_HANH_TRINH: readonly (readonly [TheMan, string])[] = [
   ['day-hoc', 'Dạy học'],
   ['goi-7', 'Bài mới trong 7 ngày'],
   ['nhip', 'Nhịp học'],
+  ['bai-hang-ngay', 'Bài hằng ngày'],
   ['dau-gio', 'Kiểm tra đầu giờ'],
   ['can-chua', 'Cần thầy chữa'],
 ]
@@ -119,6 +125,8 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, kho
             <BangGoi7 trangRieng />
           ) : the === 'nhip' ? (
             <TheNhipHoc khoiDau={khoiDau} />
+          ) : the === 'bai-hang-ngay' ? (
+            <TheBaiHangNgay khoiDau={khoiDau} />
           ) : the === 'dau-gio' ? (
             <div className="gvv2-nhung">
               <KiemTraDauGio />

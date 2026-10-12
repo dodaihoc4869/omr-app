@@ -29,7 +29,7 @@ export default function ChienDichScreen() {
       {daGiao ? (
         <TrangChienDichDaGiao tuCa={tuCa} onVe={() => setDaGiao(false)} />
       ) : (
-        <HanhTrinhV2 theDau={mo && mo.the !== 'chien-dich' ? mo.the : 'day-hoc'} boSungBai={mo?.boSungBai === true} khoiDau={mo?.the === 'nhip' ? (mo.khoi ?? null) : null} />
+        <HanhTrinhV2 theDau={mo && mo.the !== 'chien-dich' ? mo.the : 'day-hoc'} boSungBai={mo?.boSungBai === true} khoiDau={mo?.the === 'nhip' || mo?.the === 'bai-hang-ngay' ? (mo.khoi ?? null) : null} />
       )}
     </div>
   )

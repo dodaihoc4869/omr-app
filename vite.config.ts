@@ -254,6 +254,9 @@ export default defineConfig({
           // Hành trình › Nhịp học + tấm Lịch sử làm câu của một em (thầy 09/10 khuya): CHỈ màn thầy nạp lười (thẻ Nhịp học ⇒ bấm một em), lệnh
           // `/gv/lich-su-lam-cau` cần mạng ⇒ kho chạy-lúc, không cất sẵn.
           '**/{TheNhipHoc,HoSoLamCauEm,lich-su-lam-cau-api,nhip-hanh-trinh}-*.{js,css}',
+          // Hành trình › Bài hằng ngày + hồ sơ thái độ (thầy 12/10): CHỈ màn thầy nạp lười, lệnh `/gv/bai-hang-ngay` · `/gv/ho-so-thai-do` cần mạng
+          // ⇒ kho chạy-lúc, không cất sẵn.
+          '**/{TheBaiHangNgay,bai-hang-ngay-api,bai-hang-ngay-ui,bai-hang-ngay}-*.{js,css}',
           // Khung lời giải + thang tự gỡ: chỉ mở khi em bấm "Hỏi thầy" (vốn phải có mạng để gọi máy chủ) ⇒ kho chạy-lúc, không cất sẵn.
           '**/KhungLoiGiai-*.{js,css}',
           '**/loi-giai-*.{js,css}',
