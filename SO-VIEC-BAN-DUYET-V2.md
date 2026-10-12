@@ -125,4 +125,14 @@ Thầy nhắn (nguyên văn, kèm ảnh màn "Cùng gỡ câu này" trạng thá
 - [x] GV · bấm em ⇒ mọi thông tin: câu sai/đúng/đã làm/đã ôn; chăm chỉ · lười · đối phó (khoa học, trực quan) | bằng chứng: POST /gv/ho-so-thai-do — 6 tín hiệu có số + ngưỡng (NGUONG_THAI_DO), kết luận Chăm chỉ / Chưa đều / Có dấu hiệu đối phó / Chưa đủ dữ liệu.
 - [x] PH · trùng tu: số câu đúng/sai, thời gian từng câu, gợi ý nhắc con | bằng chứng: 39fbbf20 + 76094e82 — POST /ph/con-tong-quan (chỉ đọc, xác thực như /ph/hoc-2, bỏ embargoed + ca chưa công bố, không trả đáp án); b4ea4d61 đã làm/mức dùng chung phép tính bảng của thầy; ảnh 40-ph1210-*.
 - [x] PH · bỏ mục "Thầy cần chữa" | bằng chứng: 76094e82; test omni-3-ph-tien-do đòi vắng.
-- [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)
+- [x] Build + đẩy (kiểm ca mở trước) | bằng chứng: PR240 gộp `046b5584`, Actions `38192685162` SUCCESS (17 bước, Kiểm ca thi đạt; khoá Cloudflare của phiên vẫn lỗi 9109 nên dựa cổng CI). Lùi: `git revert -m 1 046b5584`.
+
+## Đợt 9 — Bài mới trong 7 ngày · Thầy tự chữa (chiếu đề) (12/10)
+Thầy nhắn (nguyên văn, kèm ảnh thẻ "Bài mới trong 7 ngày"):
+"phần này tôi muốn bạn trùng tu lại toàn bộ bạn quyết định sao cho khoa học đầy đủ và đẹp nhất trực quan"
+"mục cần chữa cho tôi một phần tự chữa, phần này cho tôi chọn đề trong Mục dạy học (trắc nghiệm khách quan trả lời ngắn) khi chọn đề nào thì đề đó hiển thị tất cả các câu chiếu lên máy chiếu, ưu tiên đẩy câu đúng sai và tính toán lên đầu tiên hiển thị, bảng hiển thị đầy đủ mọi thứ như mục chiếu lên bảng (đúng chuẩn)"
+- [ ] GV · trùng tu toàn bộ thẻ "Bài mới trong 7 ngày" (khoa học, đầy đủ, trực quan) | bằng chứng: (chưa có)
+- [ ] GV · Cần thầy chữa có phần "Thầy tự chữa": chọn đề trong Dạy học (TN / Đúng–sai / Trả lời ngắn) | bằng chứng: (chưa có)
+- [ ] GV · chọn đề ⇒ chiếu TẤT CẢ câu lên máy chiếu, câu đúng–sai + tính toán lên đầu | bằng chứng: (chưa có)
+- [ ] GV · tờ chiếu đầy đủ như Chiếu lên bảng (lời giải, thống kê lớp, ai sai + giây) | bằng chứng: (chưa có)
+- [ ] Build + đẩy đợt 9 (kiểm ca mở trước) | bằng chứng: (chưa có)
