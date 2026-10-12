@@ -59,8 +59,13 @@ export default function HocTapHomNay(p: Props) {
   // lực → kế hoạch cũ), cùng hàm màn làm bài dùng. "Đủ mức" khi đã làm ≥ M — đúng `datMuc` phía thầy / phụ huynh / Nhịp học; câu mới theo lịch còn lại
   // của gói KHÔNG chặn chữ đạt (máy chủ đã xếp chúng trong mức; phần chưa gặp dồn sang ngày sau).
   const so = soHomNay(p.ketQua, p.tienDoCu)
+  // `theLuc.con` = số việc kế hoạch XẾP ĐƯỢC lúc này. Gói 7 (khẩn 12/10 21h30): kho thiếu câu sẵn sàng (giữ cho ca kiểm tra, BTVN, chờ duyệt…) ⇒ con
+  // có thể nhỏ hơn M − đã làm. Em VẪN bấm học được phần đã xếp; CHỈ khoá khi hết hẳn việc xếp được (con = 0), lúc ấy chưa đủ mức thì nút nói rõ
+  // "Hôm nay còn N câu chờ thầy bổ sung" (N = M − đã làm). "Còn N câu" phía trên luôn theo M (`soHomNay`), không theo `theLuc`.
   const con = sanh?.theLuc.con ?? null
   const khoaHoc = p.dangLamMoi || p.dangTai && !sanh || con === 0
+  const conMuc = so ? Math.max(0, so.muc - so.daLam) : 0
+  const kho = goi7 ? { choBoSung: con === 0 ? conMuc : 0, sanSang: con ?? undefined } : undefined
   const baiXep = [...(ht?.bai ?? [])].sort((a, b) => b.tangMo - a.tangMo)
 
   // Tấm "Của em": Esc đóng, focus vào tấm khi mở và trả về ảnh đại diện khi đóng.
@@ -73,7 +78,7 @@ export default function HocTapHomNay(p: Props) {
   }, [moCuaEm])
   const dongTam = (fn: () => void) => () => { setMoCuaEm(false); fn() }
 
-  const nutHoc = (phu: boolean) => <button className={phu ? 'ht-nut-phu ht2-nut-lon' : 'ht-nut-chinh ht2-nut-lon'} onClick={p.onHoc} disabled={khoaHoc}>{chuNutHoc(so, con === 0)}<ArrowRight size={20} aria-hidden="true" /></button>
+  const nutHoc = (phu: boolean) => <button className={phu ? 'ht-nut-phu ht2-nut-lon' : 'ht-nut-chinh ht2-nut-lon'} onClick={p.onHoc} disabled={khoaHoc}>{chuNutHoc(so, con === 0, kho)}<ArrowRight size={20} aria-hidden="true" /></button>
 
   return <div className="ht-app ht2" data-nguon={p.nguon}>
     <header className="ht-thanh ht2-thanh">
@@ -99,7 +104,7 @@ export default function HocTapHomNay(p: Props) {
               và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
           <TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
             viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
-            onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
+            onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
           {goi7 && <TheGoi7 du={goi7} />}
           {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có; thầy có thể bổ sung kiến thức.</div>}
           {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu được giữ cho ca kiểm tra. Bài học sẽ cập nhật khi đủ điều kiện.</div>}

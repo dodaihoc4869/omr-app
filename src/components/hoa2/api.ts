@@ -212,6 +212,11 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
   if (o.canChonThu === true) return { cheDo2: true, canChonThu: true }
   const tl = o.theLuc as Record<string, unknown> | undefined
   if (!tl || typeof tl !== 'object' || !laSo(tl.con) || !laSo(tl.tong)) return null
+  // Khẩn 12/10 21h30 (thầy: "lúc chiều thì hiện 31 câu giờ lại hiện 2 chặng"): ở nhánh Gói 7, `theLuc` = { con: số việc kế hoạch XẾP ĐƯỢC, tong: đã làm
+  // + con } — `theLuc.tong` KHÔNG phải mức ngày M (kho thiếu câu ⇒ 8 thay vì 32). Máy chủ CÓ gửi `goi7` mà phần cốt lõi hỏng ⇒ coi cả Sảnh là LỖI
+  // (Hôm nay hiện "Thử lại"), KHÔNG bỏ `goi7` rồi để `soHomNay` rơi về `theLuc.tong` làm M.
+  const goi7 = docTomTatGoi7(o.goi7)
+  if (o.goi7 !== undefined && o.goi7 !== null && !goi7) return null
   const cdTho = o.chienDich as Record<string, unknown> | null | undefined
   let chienDich: ChienDichSanh | null = null
   if (cdTho && typeof cdTho === 'object') {
@@ -232,7 +237,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
   return {
     cheDo2: true,
     sanh: {
-      goi7: docTomTatGoi7(o.goi7),
+      goi7,
       ngay: laNgay(o.ngay) ? o.ngay : '',
       chienDich,
       sapBatDau: docSapBatDau(o.sapBatDau),
