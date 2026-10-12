@@ -151,7 +151,7 @@ Thầy nhắn (nguyên văn, kèm ảnh thẻ Bài mới trong 7 ngày: "Học s
 ## Đợt 11 — bỏ Tự kiểm kiến thức ở app học sinh (12/10)
 Thầy hỏi "Chỗ tự kiểm này là gì" (ảnh thẻ Bài học trong 7 ngày: Tự kiểm kiến thức · Tờ 1/2/3 · Kiến thức bài trước 0/164 kỹ năng), rồi nhắn: "Bỏ chỗ này đi."
 - [x] Bỏ khối Tự kiểm kiến thức (Tờ 1/2/3), dòng "Kiến thức bài trước … kỹ năng", đoạn giải thích tiến độ; gỡ màn ManKiemGoi7 (không còn lối vào). Máy chủ goi-bai-7-kiem.ts giữ nguyên (điểm cũ còn trong sổ) | bằng chứng: TheGoi7/HocTapHomNay/StudentPortalScreen; test goi-bai-7-giao-dien-1010 sửa có chủ đích (khẳng định vắng); tsc sạch; 14 đỏ liên quan trùng lần chạy đợt 10; check:mau, kiem:mau-giu 0, soi:giao-dien 0 LỖI, build:cf 13/13.
-- [ ] Build + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
+- [x] Build + đẩy (kiểm ca mở) | bằng chứng: PR247 gộp main `7ce754c478503844af67a58930174e8a3f6e9ede`, Actions `38223806315` SUCCESS 08:37 UTC (bước Kiểm ca thi đạt, Worker + Pages sống cùng commit). Lùi: `git revert -m 1 7ce754c4`.
 
 ## Đợt 12 — Điểm danh + bảng nhịp học trên bản chiếu · bảng Chăm/Lười ở app học sinh (12/10) — VẼ DUYỆT TRƯỚC
 Thầy nhắn (nguyên văn): "Tôi muốn bạn trùng tu lại phần điểm danh học sinh, tôi muốn mỗi buổi lên lớp học sinh sẽ làm điểm danh đầu tiên, khi học sinh điểm danh xong sẽ hiện luôn thống kê lười và chăm chỉ rõ ràng đầy đủ trong bản chiếu, trùng tu lại thật đẹp rõ ràng. Vẽ cho tôi duyệt trước khi tôi quyết định build."
