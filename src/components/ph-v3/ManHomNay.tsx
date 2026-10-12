@@ -106,11 +106,13 @@ export function dongHanhTrinh(ht: Hoc2['hanhTrinh'], tong: number | null): strin
 }
 
 /**
- * Khối chính "Con hôm nay". Có tổng quan (`/ph/con-tong-quan`) và không ở chế độ gói bài 7 ⇒ số câu đã làm / MỨC TỐI THIỂU của ngày (kế hoạch ngày đang chấm;
+ * Khối chính "Con hôm nay". Có tổng quan (`/ph/con-tong-quan`, cả ngày Gói bài 7 ngày từ 12/10) ⇒ số câu đã làm / MỨC TỐI THIỂU của ngày (kế hoạch ngày đang chấm;
  * mức ước tính ghi "≈") + ba số câu đúng · câu sai · trung bình mỗi câu. Không có ⇒ như trước (`soCauHomNay`). Số câu hôm nay vẫn MỘT nguồn, nói MỘT lần.
  */
 function KhoiChinh({ pm, hoc2, tq }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTongQuan | null }) {
-  const nayTq = hoc2?.goi7 ? null : homNayCua(tq)
+  // Thầy 12/10 ("một con số"): ngày Gói bài 7 ngày cũng ghi ĐÃ LÀM / MỨC HÔM NAY từ tổng quan (cùng số con thấy trên app và thầy thấy); câu mới theo
+  // lịch của gói là dòng phụ "nằm trong" mức. Chưa có tổng quan ⇒ như trước (câu mới đã gặp).
+  const nayTq = homNayCua(tq)
   const so = nayTq ? { daLam: nayTq.daLam, tong: nayTq.canLam, keHoach: true } : soCauHomNay(pm, hoc2)
   const xap = nayTq?.mucUocTinh ? '≈' : ''
   const ngay = thuNgayVn(nayTq && tq ? tq.serverNow : hoc2?.homNay && hoc2.serverNow ? hoc2.serverNow : pm.serverNow ?? Date.now())
@@ -123,7 +125,7 @@ function KhoiChinh({ pm, hoc2, tq }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTong
     <section className="ph3-ah ph3-o-du" aria-labelledby="ph3-hn" data-vung="anh-hung">
       {coSo ? (
         <>
-          <p id="ph3-hn" className="ph3-ah__nhan">{hoc2?.goi7?'Câu mới con đã gặp hôm nay':'Con đã làm hôm nay'} · {ngay}</p>
+          <p id="ph3-hn" className="ph3-ah__nhan">{hoc2?.goi7 && !nayTq ? 'Câu mới con đã gặp hôm nay' : 'Con đã làm hôm nay'} · {ngay}</p>
           <p className="ph3-ah__cau" data-vung="so-cau-hom-nay"><b>{so.daLam}</b><small>{so.tong !== null ? `/${xap}${so.tong} câu` : ' câu'}</small></p>
           {ti !== null && <span className="ph3-ah__thanh" aria-hidden="true"><span className="tt-thanh" style={{ width: `${ti * 100}%` }} /></span>}
         </>
@@ -133,7 +135,8 @@ function KhoiChinh({ pm, hoc2, tq }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTong
           <h2 id="ph3-hn">Hôm nay con chưa làm câu nào</h2>
         </>
       )}
-      {hoc2?.goi7 ? <div className="ph3-ah__ghi">{hoc2.goi7.map(g=><p key={g.ten}>{g.nguonDayDu===false?`${g.ten}: đang chờ đủ nguồn các tờ; chưa xác nhận hoàn thành toàn bộ bài.`:`${g.ten}: đã gặp ${g.daGap}/${g.tong} câu gốc · còn ${g.con} câu · hạn ${g.han.slice(8,10)}/${g.han.slice(5,7)}.`}</p>)}<p>Gặp câu với hỗ trợ chưa có nghĩa con đã tự làm được hoặc thành thạo.</p></div> : tinhTrang && <p className="ph3-ah__phu">{tinhTrang}</p>}
+      {(!hoc2?.goi7 || nayTq) && tinhTrang && <p className="ph3-ah__phu">{tinhTrang}</p>}
+      {hoc2?.goi7 && <div className="ph3-ah__ghi">{nayTq && hoc2.homNay && so.tong !== null && <p data-vung="cau-moi-goi7">Câu mới hôm nay: {hoc2.homNay.daLam}/{hoc2.homNay.tong} (nằm trong {so.tong} câu của ngày).</p>}{hoc2.goi7.map(g=><p key={g.ten}>{g.nguonDayDu===false?`${g.ten}: đang chờ đủ nguồn các tờ; chưa xác nhận hoàn thành toàn bộ bài.`:`${g.ten}: đã gặp ${g.daGap}/${g.tong} câu gốc · còn ${g.con} câu · hạn ${g.han.slice(8,10)}/${g.han.slice(5,7)}.`}</p>)}<p>Gặp câu với hỗ trợ chưa có nghĩa con đã tự làm được hoặc thành thạo.</p></div>}
       {tq && <BaSoHomNay d={tq.dem.homNay} />}
       {(gioQuen || hanhTrinh || xap) && (
         <div className="ph3-ah__ghi">
