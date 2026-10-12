@@ -69,6 +69,10 @@ import { lichSuGia } from './gia/lich-su-lam-cau'
 import { conTongQuanGia } from './gia/ph-con-tong-quan'
 // LÀN GIÁO VIÊN 12/10: `gv-nhip&the=bai-hang-ngay` = Hành trình › Bài hằng ngày (bảng nhiệt), bấm một em ⇒ tấm Hồ sơ làm bài (gia/bai-hang-ngay.ts).
 import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
+// ═════════ LÀN BÀI MỚI 7 NGÀY 12/10: `gv-nhip&the=goi-7` = Hành trình › Bài mới trong 7 ngày (trùng tu: thẻ chọn bài · 6 ô số · dải tiến độ ·
+// danh sách chữa lọc/xếp · Học sinh cần hỗ trợ · Tiến độ học sinh · tấm soạn phần chữa). `/gv/goi-bai-7` GIẢ: gia/goi-bai-7.ts (≈ 60 em × 40 câu);
+// `&g7=trong` chưa có bài · `&g7=loi` máy chủ lỗi · `&g7=thieu-nguon` cảnh báo thiếu nguồn. ═════════
+import { goi7Du } from './gia/goi-bai-7'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -193,6 +197,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.endsWith('/gv/bai-hang-ngay')) return tra(baiHangNgayGia())
   if (u.pathname.endsWith('/gv/ho-so-thai-do')) return tra(hoSoThaiDoGia(String(b.sbd ?? '')))
   // ---- hết LÀN GIÁO VIÊN 12/10
+  // ---- LÀN BÀI MỚI 7 NGÀY 12/10: app thầy gọi qua `goiLenh` giả (gia/goi-lenh-thay.ts); giữ thêm đường `fetch` cùng dữ liệu như các làn trên
+  if (u.pathname.endsWith('/gv/goi-bai-7')) return tra(goi7Du(b))
+  // ---- hết LÀN BÀI MỚI 7 NGÀY 12/10
   return tra({ ok: true })
 }
 
