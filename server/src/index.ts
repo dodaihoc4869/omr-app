@@ -32,6 +32,7 @@ import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-
 import {gvLichSuCauCuaEm} from './gv-lich-su-cau'
 import {gvBaoCaoCa,gvBaoCaoCaEm} from './bao-cao-ca'
 import { phBaoCaoCa, phHoc2, phLoiThay } from './ph-bao-cao-moi'
+import { phConTongQuan } from './ph-con-tong-quan'
 import {gvCongBoCa,gvDongCuaVao,gvNhanXetCaEm} from './ca-thi-them'
 import {gvBangTinSong} from './gv-bang-tin-song'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
@@ -3617,6 +3618,8 @@ const boXuLy = {
       if (p === '/ph/bao-cao-ca') return ra(await phBaoCaoCa(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/loi-thay') return ra(await phLoiThay(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
+      // LÀN PHỤ HUYNH 12/10: tổng quan về con (đúng/sai, số giây từng câu, lịch học từ 12/10, gợi ý nhắc) — ĐỌC-CHỈ, cùng xác thực.
+      if (p === '/ph/con-tong-quan') return ra(await phConTongQuan(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) {
         if (!congGame) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))
