@@ -18,6 +18,7 @@ import { bam } from './srs2-loi'
 import { PHIEN_BAN_HT6,quyenCau } from './hanh-trinh-v6-loi'
 import { docMoHinhV6,type ChonV6 } from './hanh-trinh-v6-d1'
 import { featuresV6,pDoKhoV6,giaTriV6 } from './hanh-trinh-v6-mo-hinh'
+import { dbGoc } from './cau-hinh-dem'
 type Row=Record<string,unknown>
 export interface CauDanhMuc { qid:string;q:QCau;tang:number;nhan:NhanHanhTrinh|null }
 const cache=new WeakMap<object,Map<string,{luc:number;ds:CauDanhMuc[]}>>()
@@ -25,10 +26,13 @@ const cache=new WeakMap<object,Map<string,{luc:number;ds:CauDanhMuc[]}>>()
 export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau?:HoSo2['cau']},now:number):Promise<CauDanhMuc[]>{
   const full=hs.chienDich?await env.DB.prepare('SELECT qid_json,ma_de_json FROM chien_dich WHERE id=?').bind(hs.chienDich.id).first<{qid_json:string;ma_de_json:string}>():null
   const ids=full?JSON.parse(full.qid_json) as string[]:(hs.cau??[]).map(c=>c.qid),mas=[...(hs.phamVi?.maDe??new Set(full?JSON.parse(full.ma_de_json) as string[]:hs.chienDich?.maDe??[]))].sort()
-  const key=`${hs.chienDich?.id}|${bam(ids.join('|'))}|${mas.join('|')}`,dem=cache.get(env.DB)??new Map();cache.set(env.DB,dem)
+  // Giờ cao điểm: khoá đệm theo D1 GỐC (`dbGoc`) — mỗi lượt gọi bọc D1 riêng (gameV2 › gopDocD1) nên khoá theo `env.DB` chỉ dùng lại TRONG một lượt
+  // (số đo 12/10: ~9.000 lần đọc/ngày dù "nhớ 1 phút"). Ngoài giờ giữ khoá cũ (y như trước).
+  const caoDiem=new Date(now+7*3_600_000).getUTCHours()>=20,khoaDb=caoDiem?dbGoc(env.DB as unknown as object):env.DB as unknown as object
+  const key=`${hs.chienDich?.id}|${bam(ids.join('|'))}|${mas.join('|')}`,dem=cache.get(khoaDb)??new Map();cache.set(khoaDb,dem)
   // Giờ cao điểm 20:00–23:59 VN (khẩn 12/10 22h30, số đo D1 thật: câu đọc danh mục này ~23.000 dòng/lần, ~49 ms, gần 9.000 lần/ngày — đứng thứ hai
   // về tổng thời gian D1): nhớ 10 phút thay vì 1 phút. Danh mục chỉ đổi khi thầy sửa kho ⇒ câu sửa lúc cao điểm vào danh mục chậm nhất 10 phút.
-  const nho=new Date(now+7*3_600_000).getUTCHours()>=20?600000:60000
+  const nho=caoDiem?600000:60000
   const cu=dem.get(key);if(cu&&Math.abs(now-cu.luc)<nho)return cu.ds
   const r=await env.DB.prepare(`SELECT g.qid,g.dang,g.content_group,json_extract(g.json,'$.phan') phan,json_extract(g.json,'$.mucDo') muc,json_extract(g.json,'$.sao') sao,json_extract(g.json,'$.chuyenDe') cd,json_extract(g.json,'$.reviewed') duyet,json_extract(g.json,'$.hanhTrinh') nhan,json_extract(g.json,'$.kienThuc') kn,(SELECT oq.vkn_json FROM omni_q oq WHERE oq.qid=g.qid AND oq.y=-1 AND oq.duyet_luc IS NOT NULL) q_kn FROM game_v2_question g WHERE g.qid IN(SELECT value FROM json_each(?)) AND g.ma_de IN(SELECT value FROM json_each(?)) AND json_valid(g.json) AND json_extract(g.json,'$.reviewed')=1 ORDER BY g.qid,g.ma_de`).bind(JSON.stringify(ids),JSON.stringify(mas)).all<Row>()
   const fullQ=await qCuaCau(env,[...new Set(r.results.map(x=>String(x.qid)))])

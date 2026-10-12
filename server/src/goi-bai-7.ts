@@ -9,7 +9,7 @@ import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import { publicQuestion, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { docCauTheoRef, loiCauDoi, protectedQuestions, docKhoiEm, dongBoCacTo } from './game-v2-bank'
 import { readGameScope } from './game-v2-reports'
-import { docHoSo2 } from './srs2-d1'
+import { docHoSo2, docMetaCau } from './srs2-d1'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 import { dongCoHanhTrinh } from './hanh-trinh-dong-co'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
@@ -243,6 +243,19 @@ export async function lapGoi7(env: Env, sbd: string, now: number) {
   const [hs, baoVe, btvn, control] = await Promise.all([docHoSo2(env,sbd,ngay,undefined,undefined,undefined,[...qids,...ungCu.results.map(r=>str(r.qid))]), protectedQuestions(env),docCauBtvnChuaNop(env,sbd),readGameScope(env,sbd)])
   const chan = new Set([...baoVe,...btvn,...control.blocked,...goi.flatMap(g=>g.cau.filter(c=>c.hopLe===false).map(c=>c.qid))])
   if (control.types.length) for (const c of hs.cau) if (!c.dang || !control.types.includes(c.dang)) chan.add(c.qid)
+  // CÙNG CỔNG VỚI LÚC PHÁT CÂU (khẩn 12/10 23h — thầy: "học sinh báo lỗi 2 câu cuối app không cho làm tiếp bảo tìm câu phù hợp"): câu gói em KHÔNG nhận
+  // được ở `startGoi7` — không còn trong chỉ mục, tự luận, sai dạng thầy giới hạn, khác khối / câu nghi (`chanKhacKhoiEm`, đúng tham số của startGoi7) —
+  // trước đây vẫn vào kế hoạch (vai tiếp cận, xếp CUỐI) ⇒ em làm hết phần còn lại thì sảnh "Còn 2 câu" mà mở chặng rỗng. Nay chặn ngay ở kế hoạch.
+  {
+    const daGap0 = new Set(goi.flatMap(g => [...g.daGap]))
+    const ungGoi = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid, c])).values()].filter(c => !daGap0.has(c.qid) && !chan.has(c.qid) && !chan.has(c.group))
+    const thieuMeta = ungGoi.filter(c => !hs.meta.has(c.qid)).map(c => c.qid)
+    const [khoiEm, metaThem] = await Promise.all([docKhoiEm(env, sbd), thieuMeta.length ? docMetaCau(env, thieuMeta, goi.flatMap(g => g.maDeNguon)) : Promise.resolve(new Map<string, never>())])
+    const metaCua = (qid: string) => hs.meta.get(qid) ?? metaThem.get(qid)
+    const coTheGiao = ungGoi.filter(c => { const m = metaCua(c.qid); return !!m && !m.tuLuan && !(control.types.length && (!m.dang || !control.types.includes(m.dang))) })
+    const quaCong = new Set((await chanKhacKhoiEm(env, 'goi7', { sbd, khoiEm }, coTheGiao, { cauCua: (c) => metaCua(c.qid) })).map(c => c.qid))
+    for (const c of ungGoi) if (!quaCong.has(c.qid)) chan.add(c.qid)
+  }
   const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan)
   const sanSang = new Set(hs.cau.filter(c => !engine.chan.has(c.qid) && !chan.has(c.qid) && !chan.has(hs.meta.get(c.qid)?.group??'') && !hs.meta.get(c.qid)?.tuLuan).map(c => c.qid))
   const daLamNgay = await docDaLamNgay7(env,sbd,ngay)
@@ -309,7 +322,10 @@ export async function startGoi7(env: Env, sbd: string, now: number): Promise<Rec
   const done = new Set(answered.results.map(r => r.qid))
   const viec = saved ? saved.questions.filter(r => !done.has(r.qid)).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = []
-  for (const v of (viec.length ? viec : lap.plan.viec.slice(0,6))) {
+  // Đợt cũ còn câu mà không câu nào phát được nữa ⇒ lấy theo kế hoạch hôm nay; kế hoạch đi tiếp qua câu không phát được cho đủ 6 câu (khẩn 12/10 23h).
+  const lanThu = viec.length ? [viec, lap.plan.viec] : [lap.plan.viec]
+  for (const ds of lanThu) { if (refs.length) break; for (const v of ds) {
+    if (refs.length >= 6) break
     const oldRef=saved?.questions.find(r=>r.qid===v.qid)
     const meta = oldRef ?? lap.hs.meta.get(v.qid) ?? lap.goi.flatMap(g=>g.cau).find(c=>c.qid===v.qid)
     if (!meta || lap.chan.has(v.qid) || lap.chan.has(meta.group)) continue
@@ -324,9 +340,9 @@ export async function startGoi7(env: Env, sbd: string, now: number): Promise<Rec
     const ref: RefGoi7 = {...oldRef,...lamLai,qid:q.qid,maDe:q.maDe,version:q.version,group:q.group,novel:lap.hs.tt.get(q.qid)?.laMoi ?? true,
       role:v.vai==='moi'?'cau_moi':v.vai==='sua'?'on_lai':'on_lai',vai:v.vai,huongDan:v.huongDan}
     refs.push(ref); questions.push({...publicQuestion(q),...(ref.goiY?{goiY:ref.goiY}:{}),vaiGoi7:v.vai,huongDan7:v.huongDan,coGoi7:lap.goi.some(g=>g.cau.some(c=>c.qid===q.qid&&c.version===q.version))})
-  }
+  } }
   if (!refs.length) return {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}
-  const id = viec.length && refs.length === viec.length ? str(old!.id) : crypto.randomUUID()
+  const id = viec.length && refs.length === viec.length && refs.every(r => viec.some(v => v.qid === r.qid)) ? str(old!.id) : crypto.randomUUID()
   if (id !== str(old?.id)) await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify({mode:'adventure',created:now,hoa2:1,hocTap:1,goi7:1,questions:refs}),new Date(now).toISOString()).run()
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
 }

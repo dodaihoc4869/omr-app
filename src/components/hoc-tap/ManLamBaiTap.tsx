@@ -13,7 +13,7 @@ import '../m3/m3.css'
 import './hoc-tap.css'
 
 type Cau = Question & { vaiGoi7?:string; huongDan7?:boolean; coGoi7?:boolean; goiY?: { gach?: string[]; cotLoi?: string } }
-type Ket = { choThay?:boolean; hocCoHoTro?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh'] }
+type Ket = { choThay?:boolean; hocCoHoTro?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh']; chamLanTruoc?: boolean }
 export function duTraLoi(phan: string, value: string): boolean { return phan === 'II' ? /^[DS]{4}$/.test(value) : phan === 'I' ? /^[ABCD]$/.test(value) : value.trim().length > 0 }
 /** Props `TheCau` cho câu học (bảng Gói 7 của thầy vẫn dùng — `src/components/chien-dich/BangGoi7.tsx`). Màn làm bài của em từ 12/10 dựng phần trả lời riêng (LamCau.tsx). */
 export function propsCauHoc(q: Cau, stt: number, value: string, onChange: (v: string) => void, ket?: Ket, khoa = false): TheCauProps {
@@ -69,7 +69,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       const g7 = docTomTatGoi7(r.goi7)
       setCau(ds); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7)
       if (g7) setDem({ daLam: g7.daLamHomNay, muc: g7.toiThieu })
-      if (!ds.length) setLoi('Hiện chưa có câu phù hợp để mở đợt mới. Em về Hôm nay để xem tiến độ và tình trạng nguồn câu.')
+      if (!ds.length) setLoi(typeof r.message === 'string' && r.message.trim() ? r.message : 'Hiện chưa có câu phù hợp để mở đợt mới. Em về Hôm nay để xem tiến độ và tình trạng nguồn câu.')
     }).catch(e => { if (!huy) setLoi(e instanceof Error ? e.message : 'Chưa tải được bài học.') }).finally(() => { if (!huy) setTai(false) })
     return () => { huy = true }
   }, [token, lan])
@@ -107,7 +107,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       const r = await goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted: !!q.goiY, msLam }, 40)
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam }))
-      setKet(v => ({ ...v, [q.qid]: r as unknown as Ket })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } capNhatSo()
+      // CHẤM THEO ĐÚNG ĐÁP ÁN MÁY CHỦ ĐÃ CHẤM (khẩn 12/10 23h — thầy: "hs làm đúng cả 4 ý nhưng app lại báo sai"): mỗi câu của một đợt chỉ chấm MỘT lần
+      // (khoá lượt|câu). Giờ cao điểm lần nộp đầu chậm / hết 40 giây ⇒ em sửa đáp án rồi nộp lại ⇒ máy chủ trả kết quả LẦN ĐẦU (`replayed`, kèm `traLoi`
+      // đã chấm) — trước đây màn so từng ý bằng đáp án đang chọn ⇒ "Đúng 4/4 ý · sai ý". Nay hiện đúng đáp án đã chấm và ghi rõ là lần nộp trước.
+      const daCham = typeof r.traLoi === 'string' && duTraLoi(q.phan, r.traLoi) ? r.traLoi : tra
+      if (daCham !== tra) { setTra(daCham); traRef.current = daCham }
+      setKet(v => ({ ...v, [q.qid]: { ...(r as unknown as Ket), ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) } })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } capNhatSo()
     } catch (e) { setLoi(e instanceof Error ? e.message : 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.') }
     finally { gui.current = false; setNop(false) }
   }
@@ -151,12 +156,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // ── chữ dải kết quả (giữ NGUYÊN câu trạng thái đặc biệt: nhờ thầy chữa, học có hỗ trợ, lượt chưa tính)
   const thoiGian = q && k && !k.choThay && !k.hocCoHoTro ? chuThoiGian(msCau[q.qid]) : ''
   const yDS = q?.phan === 'II' && k ? soSanhDungSai(tra, k.answer) : []
+  const lanTruoc = k?.chamLanTruoc ? 'chấm theo đáp án em nộp lần trước' : ''
   const ketDai = !q || !k ? null
     : k.choThay ? { tt: 'ho-tro', tieu: 'Chờ phần chữa của thầy', phu: 'Em đã gặp câu này và nhờ thầy chữa. Khi có phần chữa, em sẽ được học lại; hiện chưa tính đúng hoặc đã hiểu.' }
     : k.hocCoHoTro ? { tt: 'ho-tro', tieu: 'Đã học cách giải · có hỗ trợ', phu: 'Em đã học phần chữa. Câu này được ghi là đã gặp với hỗ trợ, chưa tính tự làm đúng.' }
     : k.omni?.luot ? { tt: 'cho', tieu: 'Lượt này chưa được tính đúng hay sai.', phu: thoiGian }
-    : k.correct ? { tt: q.goiY ? 'ho-tro' : 'dung', tieu: q.goiY ? 'Đúng · có gợi ý' : 'Đúng · tự làm', phu: [thoiGian, q.goiY ? 'câu có gợi ý tính là học có hỗ trợ' : ''].filter(Boolean).join(' · ') }
-    : { tt: 'sai', tieu: q.phan === 'II' ? `Đúng ${yDS.filter(y => y.dung).length}/4 ý · sai ý ${yDS.filter(y => !y.dung).map(y => y.chu).join(', ')}` : `Chưa đúng · đáp án ${k.answer}`, phu: [thoiGian, 'câu này vào lịch ôn 1 · 3 · 7 ngày'].filter(Boolean).join(' · ') }
+    : k.correct ? { tt: q.goiY ? 'ho-tro' : 'dung', tieu: q.goiY ? 'Đúng · có gợi ý' : 'Đúng · tự làm', phu: [lanTruoc, thoiGian, q.goiY ? 'câu có gợi ý tính là học có hỗ trợ' : ''].filter(Boolean).join(' · ') }
+    : { tt: 'sai', tieu: q.phan === 'II' ? `Đúng ${yDS.filter(y => y.dung).length}/4 ý · sai ý ${yDS.filter(y => !y.dung).map(y => y.chu).join(', ')}` : `Chưa đúng · đáp án ${k.answer}`, phu: [lanTruoc, thoiGian, 'câu này vào lịch ôn 1 · 3 · 7 ngày'].filter(Boolean).join(' · ') }
   const coTuChua = !!k && !k.correct && !k.omni?.luot && !k.hocCoHoTro && !k.choThay
   const traHien = k?.hocCoHoTro ? '' : tra // học cách giải: nháp chưa nộp KHÔNG phải câu trả lời của em
   const lg = q && k && !k.choThay ? loiGiaiChuanTuKho(k.solution, q.phan, k.answer) : undefined

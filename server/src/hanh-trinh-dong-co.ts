@@ -2,6 +2,7 @@
 import { boChonV5, type BoChonV5 } from './hanh-trinh-v5-d1'
 import { ghiDoV6 } from './hanh-trinh-v6-d1'
 import type { Env } from './kieu'
+import { dbGoc } from './cau-hinh-dem'
 import type { HoSo2 } from './srs2-d1'
 import { docMetaCau } from './srs2-d1'
 import { docSuKienOmni, qCuaCau, damBaoBangOmni } from './omni-d1'
@@ -41,6 +42,27 @@ export function phanBoCanThiep(rs:readonly Row[],qs:readonly QuanSatHanhTrinh[],
   }).filter(x=>x.d.dungLuc!==null)
 }
 
+const SQL_CANH_LOP=`SELECT tu,den,SUM(n_co) nCo,SUM(dung_co) dungCo,SUM(n_chua) nChua,SUM(dung_chua) dungChua,COUNT(DISTINCT sbd) soEm FROM hanh_trinh_v4_canh WHERE den IN (SELECT value FROM json_each(?)) AND cap_nhat_luc>=? AND n_co+n_chua>0 GROUP BY tu,den`
+/**
+ * CẠNH TIÊN QUYẾT CẢ LỚP. Giờ cao điểm 20:00–23:59 VN (khẩn 12/10 23h — số đo D1 thật: câu tổng hợp này ~9.700 lần/ngày × 26 ms, ~9.400 dòng/lần): số
+ * liệu cả lớp đổi chậm ⇒ nhớ 10 phút theo isolate (khoá D1 gốc), THEO TỪNG kỹ năng đích `den` — GROUP BY (tu, den) nên dòng của mỗi `den` độc lập; em sau
+ * chỉ đọc kỹ năng còn thiếu. Trả theo thứ tự (tu, den) như GROUP BY. Ngoài giờ cao điểm: đọc thẳng như cũ.
+ */
+const demCanh=new WeakMap<object,{luc:number;moc:number;theoDen:Map<string,CanhHoc[]>}>()
+async function docCanhLop(env:Env,targets:readonly string[],now:number):Promise<CanhHoc[]>{
+  if(new Date(now+7*3_600_000).getUTCHours()<20)return (await env.DB.prepare(SQL_CANH_LOP).bind(JSON.stringify(targets),now-7*86400000).all<CanhHoc>()).results??[]
+  const goc=dbGoc(env.DB as unknown as object)
+  let d=demCanh.get(goc)
+  if(!d||now-d.luc>=600_000||now<d.luc){d={luc:now,moc:now-7*86400000,theoDen:new Map()};demCanh.set(goc,d)}
+  const dem=d,ds=[...new Set(targets)],thieu=ds.filter(t=>!dem.theoDen.has(t)),moi=new Map<string,CanhHoc[]>(thieu.map(t=>[t,[]]))
+  if(thieu.length){
+    for(const x of (await env.DB.prepare(SQL_CANH_LOP).bind(JSON.stringify(thieu),dem.moc).all<CanhHoc>()).results??[])moi.get(String(x.den))?.push(x)
+    for(const [t,a] of moi)dem.theoDen.set(t,a)
+  }
+  const so=(a:string,b:string)=>a<b?-1:a>b?1:0
+  return ds.flatMap(t=>moi.get(t)??dem.theoDen.get(t)??[]).sort((a,b)=>so(String(a.tu),String(b.tu))||so(String(a.den),String(b.den)))
+}
+
 export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true):Promise<DongCoHanhTrinh> {
   await chayDdlMotLan(env,'hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH)
   const [so,allowed,xacNhan]=await Promise.all([docSuKienOmni(env,[sbd]),
@@ -58,13 +80,13 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const qs=quanSatDocLap(sbd,events,q,now), graph=dungDoThi(qs,now), memory=fitHalfLife(qs)
   const targets=[...new Set(hs.cau.flatMap(c=>vknCaCau(q.get(c.qid)!)))]
   const [edges,offers,stats,beta,rewards]=await Promise.all([
-    env.DB.prepare(`SELECT tu,den,SUM(n_co) nCo,SUM(dung_co) dungCo,SUM(n_chua) nChua,SUM(dung_chua) dungChua,COUNT(DISTINCT sbd) soEm FROM hanh_trinh_v4_canh WHERE den IN (SELECT value FROM json_each(?)) AND cap_nhat_luc>=? AND n_co+n_chua>0 GROUP BY tu,den`).bind(JSON.stringify(targets),now-7*86400000).all<CanhHoc>(),
+    docCanhLop(env,targets,now),
     env.DB.prepare('SELECT * FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND goi_luc>=? AND do_luc IS NULL ORDER BY goi_luc DESC,ngay DESC,moc DESC LIMIT 96').bind(sbd,now-15*86400000).all<Row>(),
     env.DB.prepare(`SELECT context,cach,SUM(CASE WHEN ket_qua=1 THEN 1 ELSE 0 END) dung,SUM(CASE WHEN ket_qua=0 THEN 1 ELSE 0 END) sai FROM hanh_trinh_v4_can_thiep WHERE do_luc>=? AND ket_qua IS NOT NULL GROUP BY context,cach`).bind(now-90*86400000).all<BangBandit>(),
     env.DB.prepare('SELECT qid,beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(hs.cau.map(c=>c.qid))).all<{qid:string;beta:number}>(),
     env.DB.prepare('SELECT do_receipt FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND do_receipt IS NOT NULL').bind(sbd).all<{do_receipt:string}>(),
   ])
-  const learned=canhDangHoc(edges.results??[]), b=new Map((beta.results??[]).map(r=>[r.qid,r.beta]))
+  const learned=canhDangHoc(edges), b=new Map((beta.results??[]).map(r=>[r.qid,r.beta]))
   const omni=phatLaiEm(sbd,{suKien:events,q,beta:b,homNay:new Date(now+7*3600000).toISOString().slice(0,10),xacNhan:xacNhan.results})
   const out:DongCoHanhTrinh={chan:new Set(chan),hen:new Map(),trongSo:{},soQuanSat:qs.length,soHalfLife:0,soCanhHoc:learned.length,p8:0}
   for(const c of hs.cau) {
