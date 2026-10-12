@@ -160,4 +160,6 @@ Thầy nhắn (nguyên văn): "Tôi muốn bạn trùng tu lại phần điểm 
 - [x] Vẽ: bản chiếu khi điểm danh xong — thống kê Chăm/Chưa đều/Lười của lớp đầy đủ | bằng chứng: khung ChieuNhipLop (ba cột, em vắng mờ, phím H ẩn tên nhóm Lười).
 - [x] Vẽ: màn thầy bước Điểm danh trùng tu | bằng chứng: khung GV-DiemDanh (mã + QR, có mặt theo nhóm, vắng đang Lười, Vừa điểm danh, nút Xong điểm danh · chiếu Nhịp học của lớp).
 - [x] Vẽ: app học sinh — bảng Chăm/Lười ngay đầu Hôm nay + câu "Thầy cũng thấy bảng này" | bằng chứng: khung HS-Cham + HS-Luoi. ĐỀ XUẤT ĐỔI LUẬT chờ duyệt: "3 ngày liền không làm" chỉ xét trong 7 ngày gần nhất (luật hiện hành xét cả khoảng ⇒ em không thể thoát nhóm Lười).
-- [ ] Chờ thầy duyệt — CHƯA BUILD | bằng chứng: (chưa có)
+- [x] Thầy nhắn thêm: "cho tôi bấm vào từng học sinh hiện hồ sơ làm bài như trong app luôn nhé, nối với phần đó" ⇒ bản vẽ thêm khung ChieuHoSoEm (bấm tên em ở bản chiếu/màn thầy ⇒ hồ sơ trượt ra) | bằng chứng: artifact PeaKFgTjj2wgxsTQRDQkt3 bản 7.
+- [x] Chờ thầy duyệt — CHƯA BUILD | bằng chứng: thầy 12/10 "duyệt bản vẽ buid luôn nhé". Giả định theo bản vẽ: Lười = ≤ 40% ngày đủ mức HOẶC 3 ngày liền bỏ TRONG 7 NGÀY GẦN NHẤT; bản chiếu mặc định hiện tên, phím H ẩn tên nhóm Lười.
+- [ ] Build + đẩy đợt 12 (kiểm ca mở) | bằng chứng: (chưa có)
