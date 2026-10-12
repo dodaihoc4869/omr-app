@@ -28,6 +28,7 @@ import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { CAU_TOI_THIEU, type TangHanhTrinh } from './hanh-trinh-ngay'
 import { idDaLam } from './hanh-trinh-nguon-cau'
+import { ngayBaiCuaMotEm } from './bai-hang-ngay'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -320,6 +321,21 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
       trangThai: soCau === 0 && daLam === 0 ? 'khong' : daLam >= canLam ? 'du' : 'thieu',
       homNay: n === homNay,
     })
+  }
+  // 3b · "đã làm / mức" mỗi ngày lấy ĐÚNG phép tính bảng "Bài hằng ngày" của thầy (Gói 7 đếm câu của gói, Hành trình đếm câu kế hoạch) để phụ huynh và
+  //      thầy thấy cùng một số. Không đọc đủ được ⇒ giữ cách tính riêng ở trên.
+  const chung = await ngayBaiCuaMotEm(env, sbd, tuNgay, homNay, homNay).catch(() => null)
+  if (chung) {
+    const theo = new Map(chung.map((x) => [x.ngay, x]))
+    for (const h of ngay) {
+      const g = theo.get(h.ngay)
+      if (!g) continue
+      h.muc = g.mucToiThieu
+      h.mucUocTinh = g.mucUocTinh
+      h.canLam = g.mucToiThieu
+      h.daLam = g.daLam
+      h.trangThai = h.soCau === 0 && g.daLam === 0 ? 'khong' : g.datMuc ? 'du' : 'thieu'
+    }
   }
 
   // 4 · các khoảng

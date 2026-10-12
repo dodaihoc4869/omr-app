@@ -56,9 +56,10 @@ export interface NgayHoc {
   mucUocTinh: boolean
   /** Số câu kế hoạch đã chốt của ngày (kể cả phần con tự lấy thêm); không có kế hoạch đã chốt ⇒ null. */
   daXep: number | null
-  /** Số câu cần làm để đủ mức: `muc`, hoặc ít hơn khi kế hoạch đã chốt xếp ít câu hơn mức (thiếu câu phù hợp). */
+  /** Số câu cần làm để đủ mức. Bình thường = `muc` (cùng phép tính bảng "Bài hằng ngày" của thầy); chỉ khi không đọc đủ được bảng ấy mới lùi về
+   *  cách tính riêng (ít hơn `muc` khi kế hoạch đã chốt xếp ít câu hơn mức). */
   canLam: number
-  /** Số câu tính vào mức: câu của kế hoạch đã chốt con đã làm trong ngày; không có kế hoạch ⇒ `soCau`. */
+  /** Số câu tính vào mức — cùng số với bảng "Bài hằng ngày" của thầy (Gói 7: câu của gói; Hành trình: câu kế hoạch đã làm). Lùi: kế hoạch ⇒ `idDaLam`, không có ⇒ `soCau`. */
   daLam: number
   /** du: daLam ≥ canLam · thieu: có làm nhưng chưa đủ · khong: không làm câu nào. Hôm nay chưa hết ngày ⇒ xem `homNay`. */
   trangThai: TrangThaiNgay

@@ -217,6 +217,22 @@ async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, den: str
   return ra
 }
 
+/**
+ * Dãy ngày (mức + đã làm) của MỘT em — ĐÚNG phép tính bảng "Bài hằng ngày" của thầy. App phụ huynh (`/ph/con-tong-quan`) dùng chung hàm này để
+ * phụ huynh và thầy luôn thấy cùng một số "đã làm / mức" mỗi ngày. Đọc thiếu bất kỳ bảng nào (có cảnh báo) hoặc lỗi ⇒ null (bên gọi giữ cách tính riêng).
+ */
+export async function ngayBaiCuaMotEm(env: Env, sbd: string, tu: string, den: string, homNay: string): Promise<NgayBaiEm[] | null> {
+  const goi7 = await docGoi7Em(env, sbd)
+  if (!goi7) return null
+  const canhBao: string[] = []
+  try {
+    const ra = await docNgayCacEm(env, [{ sbd, hoTen: sbd, lop: '', khoi: '', goi7Tu: goi7.get(sbd) ?? null }], tu, den, homNay, canhBao)
+    return canhBao.length ? null : (ra.get(sbd) ?? null)
+  } catch {
+    return null
+  }
+}
+
 // ------------------------------------------------------------------ DANH SÁCH EM
 const khoiTuChu = (v: unknown): string => /(1[012])/.exec(str(v))?.[1] ?? ''
 

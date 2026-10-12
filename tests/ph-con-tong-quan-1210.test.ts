@@ -129,7 +129,7 @@ describe('số đúng / sai / giây', () => {
 })
 
 describe('lịch từng ngày: mức đã lưu của kế hoạch ngày đang chấm; không lưu ⇒ quy tắc hiện hành + cờ ước tính', () => {
-  it('12/10 mức lưu 30 (tầng 2) · 13/10 không lưu ⇒ ≈30 theo tầng gần nhất, kế hoạch 3 câu ⇒ cần 3 · 14/10 hôm nay · ngày trống ⇒ không làm', async () => {
+  it('12/10 mức lưu 30 (tầng 2) · 13/10 không lưu ⇒ ≈30 theo tầng gần nhất, làm đủ 3 câu kế hoạch vẫn thiếu mức 30 (đúng bảng của thầy) · 14/10 hôm nay · ngày trống ⇒ không làm', async () => {
     const { d, env } = dung()
     for (const s of SQL_BANG_HANH_TRINH) d.sql.exec(s)
     d.sql.prepare('INSERT INTO hanh_trinh_v3_ngay (sbd, ngay, tang, toi_thieu) VALUES (?,?,?,?)').run('S1', '2026-10-12', 2, 30)
@@ -150,9 +150,11 @@ describe('lịch từng ngày: mức đã lưu của kế hoạch ngày đang ch
     const r = await chay(env, { sbd: 'S1' })
     expect(r.ngay.map((n) => n.ngay)).toEqual(Array.from({ length: 14 }, (_, i) => `2026-10-${String(i + 1).padStart(2, '0')}`))
     const theo = Object.fromEntries(r.ngay.map((n) => [n.ngay, n])) as Record<string, NgayHoc>
-    expect(theo['2026-10-12']).toEqual({ ngay: '2026-10-12', dung: 2, sai: 1, boTrong: 0, soCau: 2, muc: 30, mucUocTinh: false, daXep: null, canLam: 30, daLam: 2, trangThai: 'thieu', homNay: false })
-    expect(theo['2026-10-13']).toEqual({ ngay: '2026-10-13', dung: 3, sai: 1, boTrong: 0, soCau: 4, muc: 30, mucUocTinh: true, daXep: 3, canLam: 3, daLam: 3, trangThai: 'du', homNay: false })
-    expect(theo['2026-10-14']).toMatchObject({ soCau: 1, muc: 30, mucUocTinh: true, canLam: 30, daLam: 1, trangThai: 'thieu', homNay: true })
+    // "đã làm / mức" dùng CHUNG phép tính bảng "Bài hằng ngày" của thầy (`ngayBaiCuaMotEm`, sửa có chủ đích 12/10 để phụ huynh và thầy cùng một số):
+    // ngày Hành trình chỉ đếm câu CỦA KẾ HOẠCH đã làm (không mở kế hoạch ⇒ 0), đủ mức khi đã làm ≥ mức tối thiểu (giống app học sinh chấm).
+    expect(theo['2026-10-12']).toEqual({ ngay: '2026-10-12', dung: 2, sai: 1, boTrong: 0, soCau: 2, muc: 30, mucUocTinh: false, daXep: null, canLam: 30, daLam: 0, trangThai: 'thieu', homNay: false })
+    expect(theo['2026-10-13']).toEqual({ ngay: '2026-10-13', dung: 3, sai: 1, boTrong: 0, soCau: 4, muc: 30, mucUocTinh: true, daXep: 3, canLam: 30, daLam: 3, trangThai: 'thieu', homNay: false })
+    expect(theo['2026-10-14']).toMatchObject({ soCau: 1, muc: 30, mucUocTinh: true, canLam: 30, daLam: 0, trangThai: 'thieu', homNay: true })
     // trước mọi mức đã lưu ⇒ tầng gần nhất SAU (2) ⇒ 30; ngày trống ⇒ không làm
     expect(theo['2026-10-05']).toMatchObject({ soCau: 0, muc: 30, mucUocTinh: true, trangThai: 'khong' })
   })
