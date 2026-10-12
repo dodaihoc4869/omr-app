@@ -4,7 +4,7 @@
 // Nguồn đọc và quyền công bố giữ nguyên; khối vắng dữ liệu không dựng số minh hoạ; số câu hôm nay MỘT nguồn, nói MỘT lần.
 // LÀN PHỤ HUYNH 12/10 (thầy: "… số câu làm đúng, làm sai, thời gian làm từng câu gợi ý nhắc, bỏ mục thầy cần chữa …"): BỎ HẲN dòng "Cần thầy chữa".
 // Có `/ph/con-tong-quan` (ConTongQuan.tsx): khối chính lấy số câu đã làm / MỨC TỐI THIỂU của ngày từ đó + ba số câu đúng · câu sai · trung bình mỗi câu;
-// ngay sau cảnh báo là "Gợi ý nhắc con"; "Tuần này học đều" thay bằng "Lịch học tuần này" (đủ mức / chưa đủ / không làm + từng ngày từ 12/10).
+// ngay sau cảnh báo là "Gợi ý nhắc con"; "Tuần này học đều" thay bằng "Lịch học tuần này" (đủ mức / chưa đủ / không làm + từng ngày từ mốc theo dõi, 01/10).
 // Máy chủ cũ chưa có lệnh ⇒ các khối mới vắng, màn y như trước.
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { CaGanNhat, PhMoi } from '../../lib/ph-moi/du-lieu'

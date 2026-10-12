@@ -1,9 +1,12 @@
 // LÀN GIÁO VIÊN 12/10 — DỮ LIỆU GIẢ cho ảnh chụp Hành trình › Bài hằng ngày + tấm Hồ sơ làm bài (tên em là tên giả, số do hàm tất định sinh ra,
 // không một yêu cầu nào tới máy chủ thật). Hình dạng đúng hợp đồng `server/src/bai-hang-ngay-kieu.ts`; thứ tự em đúng luật máy chủ.
+// Thầy 12/10 dời mốc về 01/10 ⇒ khoảng giả 01/10 → 17/10 (17 cột, hôm nay 17/10): ngày trước 10/10 (chưa có Gói bài 7 ngày) đều là chế độ Hành trình.
 import type { EmBaiHangNgay, KetQuaBaiHangNgay, KetQuaHoSoThaiDo, NgayBaiEm, NhanThaiDo, TinHieuThaiDo } from '../../../server/src/bai-hang-ngay-kieu'
 import { TEN_NHAN_THAI_DO } from '../../../server/src/bai-hang-ngay-kieu'
 
-const NGAY = ['2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17']
+const NGAY = Array.from({ length: 17 }, (_, i) => `2026-10-${String(i + 1).padStart(2, '0')}`)
+/** Gói bài 7 ngày bật từ 10/10 — trước đó mọi ngày tính theo kế hoạch Hành trình (đúng luật máy chủ). */
+const GOI7_TU = '2026-10-10'
 const HOM_NAY = NGAY[NGAY.length - 1]!
 const HO = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Vũ', 'Đặng', 'Bùi', 'Đỗ', 'Ngô', 'Phan', 'Lý']
 const TEN = ['Minh Anh', 'Đức Huy', 'Phương Linh', 'Quang Minh', 'Thu Trang', 'Khánh Vy', 'Gia Bảo', 'Hải Yến', 'Quốc Việt', 'Mai Chi', 'Thanh Tâm', 'Ngọc Ánh', 'Tuấn Kiệt']
@@ -27,8 +30,9 @@ function ngayEm(i: number): NgayBaiEm[] {
     let daLam =
       kieu <= 1 ? (r < 0.85 ? muc + Math.floor(r * 6) : Math.floor(muc * 0.7)) : kieu === 2 ? (r < 0.5 ? muc : r < 0.75 ? Math.floor(muc * 0.6) : Math.floor(muc * 0.2)) : r < 0.35 ? Math.floor(muc * 0.4) : 0
     if (homNay) daLam = Math.floor(daLam * 0.55)
-    const daChot = j % 3 === 1
-    return { ngay, mucToiThieu: muc, daLam, thieu: Math.max(0, muc - daLam), datMuc: daLam >= muc, mucUocTinh: !daChot, nguonMuc: daChot ? 'da-chot' : 'tang-gan-nhat', tang, cheDo: daChot ? 'hanh-trinh' : 'goi7', homNay }
+    const daChot = j % 3 === 1 && ngay >= '2026-10-09' // mức chốt theo ngày có từ 09/10 (Hành trình v3)
+    const cheDo = ngay < GOI7_TU || daChot ? 'hanh-trinh' : 'goi7'
+    return { ngay, mucToiThieu: muc, daLam, thieu: Math.max(0, muc - daLam), datMuc: daLam >= muc, mucUocTinh: !daChot, nguonMuc: daChot ? 'da-chot' : 'tang-gan-nhat', tang, cheDo, homNay }
   })
 }
 
@@ -78,23 +82,31 @@ export function hoSoThaiDoGia(sbd: string): KetQuaHoSoThaiDo {
   const nhan: NhanThaiDo = doiPho ? 'doi-pho' : tinh.length < 3 ? 'chua-du-du-lieu' : pA >= 80 ? 'cham-chi' : 'chua-deu'
   const soLuot = e.tongDaLam
   const nhanh = doiPho ? Math.round(soLuot * 0.42) : Math.round(soLuot * 0.06)
+  const ngay = e.ngay.map((n, j) => {
+    const dung = Math.round(n.daLam * (doiPho ? 0.45 + 0.1 * gia(viTri, j) : 0.7 + 0.2 * gia(viTri, j)))
+    return { ...n, soLuot: n.daLam, soDung: dung, soSai: n.daLam - dung, tiLeDung: n.daLam ? Math.round((100 * dung) / n.daLam) : null }
+  })
+  // (f) 7 ngày gần nhất so với trước đó — đúng phép máy chủ trên chính các ngày giả
+  const mocGan = NGAY[NGAY.length - 7]!
+  const cong = (ds: typeof ngay) => ({ d: ds.reduce((t, n) => t + n.soDung, 0), m: ds.reduce((t, n) => t + n.soDung + n.soSai, 0) })
+  const gan = cong(ngay.filter((n) => n.ngay >= mocGan)), truoc = cong(ngay.filter((n) => n.ngay < mocGan))
+  const dGan = gan.m ? Math.round((100 * gan.d) / gan.m) : null, dTruoc = truoc.m ? Math.round((100 * truoc.d) / truoc.m) : null
+  const chenh = gan.m >= 20 && truoc.m >= 20 ? dGan! - dTruoc! : null
+  const mucF: TinHieuThaiDo['muc'] = chenh === null ? 'chua-du' : chenh <= -15 ? 'xau' : chenh <= -5 ? 'chu-y' : 'tot'
+  const pt = (x: number | null) => (x === null ? '—' : `${x}%`)
   const tin: TinHieuThaiDo[] = [
     { ma: 'ngay-du-muc', ten: 'Ngày đủ mức', muc: pA >= 80 ? 'tot' : pA >= 50 ? 'chu-y' : 'xau', giaTri: pA, tu: du, mau: tinh.length, chu: `Đủ mức ${du}/${tinh.length} ngày (${pA}%)`, nguong: 'Tốt từ 80% · chú ý 50–79% · dưới 50% là chưa đều; cần ít nhất 3 ngày' },
     { ma: 'qua-nhanh', ten: 'Trả lời quá nhanh', muc: doiPho ? 'xau' : 'tot', giaTri: Math.round((100 * nhanh) / soLuot), tu: nhanh, mau: soLuot, chu: `Quá nhanh ${nhanh}/${soLuot} lượt (${Math.round((100 * nhanh) / soLuot)}%) · nhóm quá nhanh đúng ${doiPho ? 28 : 71}% · lượt thường đúng 78%`, nguong: 'Quá nhanh: dưới 8 giây (trắc nghiệm), dưới 15 giây (tự tính). Đáng lo khi từ 30% lượt mà nhóm ấy đúng dưới 50% (đoán bừa) · chú ý từ 15%; cần ít nhất 20 lượt có số giây' },
     { ma: 'don-bai', ten: 'Dồn bài cuối ngày', muc: doiPho ? 'chu-y' : 'tot', giaTri: doiPho ? 31 : 8, tu: Math.round(soLuot * (doiPho ? 0.31 : 0.08)), mau: soLuot, chu: `${Math.round(soLuot * (doiPho ? 0.31 : 0.08))}/${soLuot} lượt làm trong 23:00–04:59 (${doiPho ? 31 : 8}%)`, nguong: 'Đáng lo từ 50% lượt làm 23:00–04:59 · chú ý từ 25%; cần ít nhất 20 lượt' },
     { ma: 'goi-y', ten: 'Dùng gợi ý, đọc lời giải', muc: 'tot', giaTri: 12, tu: 5, mau: 42, chu: '5/42 câu có dùng gợi ý hoặc đọc lời giải (12%)', nguong: 'Đáng lo từ 50% số câu · chú ý từ 25%; cần ít nhất 10 câu' },
     { ma: 'chon-lap', ten: 'Chọn lặp một phương án', muc: doiPho ? 'xau' : 'tot', giaTri: doiPho ? 14 : 0, tu: doiPho ? 9 : 0, mau: 64, chu: doiPho ? '9/64 lượt trắc nghiệm nằm trong chuỗi chọn lặp (14%) · chuỗi dài nhất 9 lượt chọn C' : '0/64 lượt trắc nghiệm nằm trong chuỗi chọn lặp (0%) · chuỗi dài nhất 3 lượt chọn A', nguong: 'Chuỗi lặp: từ 6 lượt liên tiếp cùng một chữ. Đáng lo khi từ 10% lượt nằm trong chuỗi · chú ý từ 5%; cần ít nhất 15 lượt' },
-    { ma: 'xu-huong', ten: 'Độ đúng theo thời gian', muc: 'chua-du', giaTri: null, tu: soLuot, mau: 0, chu: `7 ngày gần nhất đúng ${doiPho ? 54 : 76}% (${soLuot} lượt) · trước đó — (0 lượt)`, nguong: 'Đáng lo khi giảm từ 15 điểm % · chú ý khi giảm từ 5; mỗi bên cần ít nhất 20 lượt' },
+    { ma: 'xu-huong', ten: 'Độ đúng theo thời gian', muc: mucF, giaTri: chenh, tu: gan.m, mau: truoc.m, chu: `7 ngày gần nhất đúng ${pt(dGan)} (${gan.m} lượt) · trước đó ${pt(dTruoc)} (${truoc.m} lượt)${chenh !== null ? ` · ${chenh >= 0 ? 'tăng' : 'giảm'} ${Math.abs(chenh)} điểm %` : ''}`, nguong: 'Đáng lo khi giảm từ 15 điểm % · chú ý khi giảm từ 5; mỗi bên cần ít nhất 20 lượt' },
   ]
   const lyDo = doiPho
     ? [`Trả lời quá nhanh: ${tin[1]!.chu}.`, `Chọn lặp một phương án: ${tin[4]!.chu}.`, `Ngày đủ mức: ${tin[0]!.chu}.`]
     : nhan === 'cham-chi'
       ? [`Ngày đủ mức: ${tin[0]!.chu}.`, 'Không có dấu hiệu đối phó (trả lời quá nhanh, chọn lặp một phương án, dùng gợi ý, đọc lời giải trong ngưỡng).']
       : [`Ngày đủ mức: ${tin[0]!.chu}.`]
-  const ngay = e.ngay.map((n, j) => {
-    const dung = Math.round(n.daLam * (doiPho ? 0.45 + 0.1 * gia(viTri, j) : 0.7 + 0.2 * gia(viTri, j)))
-    return { ...n, soLuot: n.daLam, soDung: dung, soSai: n.daLam - dung, tiLeDung: n.daLam ? Math.round((100 * dung) / n.daLam) : null }
-  })
   const soDung = ngay.reduce((t, n) => t + n.soDung, 0)
   return {
     ok: true, em: { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi }, tu: NGAY[0]!, den: HOM_NAY, homNay: HOM_NAY,

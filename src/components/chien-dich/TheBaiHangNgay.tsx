@@ -1,19 +1,22 @@
 // HÀNH TRÌNH › BÀI HẰNG NGÀY (thầy 12/10, nguyên văn: "tôi cần biết lịch sử học sinh làm bài tập hàng ngày, tính từ 12/10. Học sinh thiếu nhiều
-// ngày nhất hiển thị lên đầu, làm thiếu nhiều câu nhất trong từng ngày").
+// ngày nhất hiển thị lên đầu, làm thiếu nhiều câu nhất trong từng ngày"; cùng ngày chỉnh mốc: "dữ liệu phần này tính từ 1/10 cho tôi nhé" ⇒ máy chủ
+// tính từ `NGAY_BAT_DAU_BAI_HANG_NGAY` = 01/10, chữ trên thẻ đọc đúng hằng ấy).
 //   · Số từ lệnh CHỈ ĐỌC `/gv/bai-hang-ngay` (`src/lib/bai-hang-ngay-api.ts`, hợp đồng `server/src/bai-hang-ngay-kieu.ts`) — không bịa số.
-//   · BẢNG NHIỆT: hàng = em (máy chủ đã xếp: số ngày thiếu ↓ → tổng câu thiếu ↓ → tên); cột = ngày từ 12/10; ô = "đã làm/mức" tô theo bốn mức
+//   · BẢNG NHIỆT: hàng = em (máy chủ đã xếp: số ngày thiếu ↓ → tổng câu thiếu ↓ → tên); cột = ngày từ 01/10; ô = "đã làm/mức" tô theo bốn mức
 //     (đủ · thiếu ít · thiếu nhiều · không làm — `mucO`), ô hôm nay viền riêng ("tính tới lúc tải"). Bấm đầu cột một ngày ⇒ xếp em thiếu nhiều câu
 //     NHẤT ngày ấy lên đầu ("làm thiếu nhiều câu nhất trong từng ngày"); "Xếp theo tổng" trả về thứ tự chung.
 //   · Cột tổng (chỉ các ngày ĐÃ QUA — hôm nay chưa hết ngày nên chưa cộng): số ngày thiếu · tổng câu thiếu · ngày thiếu nhiều nhất. Hoà ⇒ em còn
 //     thiếu nhiều câu hôm nay đứng trước. Lọc Khối (thanh phân đoạn) · Lớp (ô chọn) · tìm tên/SBD (không dấu vẫn khớp).
 //   · Bấm tên em (một nút, ≥ 48 px) ⇒ tấm hồ sơ làm bài (`HoSoLamCauEm`, nạp lười); đóng tấm ⇒ focus về đúng nút.
 //   · Mức nào máy chủ chưa lưu (ngày em không mở kế hoạch, Gói bài 7 ngày) là mức ƯỚC TÍNH theo quy tắc hiện hành — một dòng ghi chú nói rõ số ô.
+//   · Nhiều ngày (12–62 cột): máy tính cuộn ngang TRONG khung (cột tên dính trái) và mở sẵn ở ngày gần nhất + ba cột tổng, một dòng nói cuộn
+//     sang trái để xem ngày cũ; điện thoại mỗi em một thẻ, dải ô ngày xuống dòng (không tràn trang).
 //   · Danh sách dài: 50 em mỗi đợt + "Xem thêm" (chuẩn B16). Mảnh riêng, chỉ tải khi thầy mở thẻ (ngoài precache, vite.config.ts).
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowDownWideNarrow, ChevronRight, RefreshCw, Search } from 'lucide-react'
 import { lyDoDeHieu } from '../../lib/loi-de-hieu'
-import { layBaiHangNgay, MUC_THEO_TANG, type EmBaiHangNgay, type KetQuaBaiHangNgay } from '../../lib/bai-hang-ngay-api'
+import { layBaiHangNgay, MUC_THEO_TANG, NGAY_BAT_DAU_BAI_HANG_NGAY, type EmBaiHangNgay, type KetQuaBaiHangNgay } from '../../lib/bai-hang-ngay-api'
 import { chuCaiTen, khopTim } from './nhip-hanh-trinh'
 import { chuO, mucO, ngayNgan, TEN_MUC_O, thuDu, thuNgan, xepTheoNgay, type MucO } from './bai-hang-ngay-ui'
 import type { EmHoSo } from './HoSoLamCauEm'
@@ -155,6 +158,8 @@ export default function TheBaiHangNgay({ khoiDau = null }: { khoiDau?: number | 
   const [soHien, setSoHien] = useState(MOI_DOT_EM)
   const [mo, setMo] = useState<EmHoSo | null>(null)
   const nutVua = useRef<HTMLButtonElement | null>(null)
+  const khungCuon = useRef<HTMLDivElement | null>(null)
+  const [cuonNgang, setCuonNgang] = useState(false)
 
   const lan = useRef(0)
   const tai = useCallback(async () => {
@@ -193,6 +198,15 @@ export default function TheBaiHangNgay({ khoiDau = null }: { khoiDau?: number | 
   const emThieu = loc.filter((e) => e.soNgayThieu > 0).length
   const coHomNay = !!kq && kq.ngay.includes(kq.homNay)
   const chuaDuHomNay = loc.filter((e) => e.ngay.some((n) => n.homNay && !n.datMuc)).length
+  const coBang = !!kq && loc.length > 0
+  // Mỗi lần nạp số mới: khung bảng (máy tính, cuộn ngang) mở ở NGÀY GẦN NHẤT + ba cột tổng — các ngày cũ từ 01/10 cuộn sang trái mới thấy.
+  // Điện thoại khung không cuộn (mỗi em một thẻ) ⇒ không có gì để dời.
+  useLayoutEffect(() => {
+    const k = khungCuon.current
+    const tran = !!k && k.scrollWidth > k.clientWidth + 1
+    if (k && tran) k.scrollLeft = k.scrollWidth
+    setCuonNgang(tran)
+  }, [kq, coBang])
 
   const onMo = useCallback((e: EmBaiHangNgay, nut: HTMLButtonElement) => {
     nutVua.current = nut
@@ -224,7 +238,7 @@ export default function TheBaiHangNgay({ khoiDau = null }: { khoiDau?: number | 
               {' · '}từ {ngayNgan(kq.tu)} đến {ngayNgan(kq.den)} <span className="gvv2-so">({kq.ngay.length} ngày)</span>
             </>
           ) : (
-            'Bài hằng ngày từ 12/10: em thiếu nhiều ngày nhất đứng trước'
+            `Bài hằng ngày từ ${ngayNgan(NGAY_BAT_DAU_BAI_HANG_NGAY)}: em thiếu nhiều ngày nhất đứng trước`
           )}
         </p>
         <button type="button" className="gvv2-nut-chu tt-nhan" onClick={() => void tai()} disabled={dangTai} aria-busy={dangTai}>
@@ -299,41 +313,48 @@ export default function TheBaiHangNgay({ khoiDau = null }: { khoiDau?: number | 
           {loc.length === 0 ? (
             <p className="gvv2-trong">Không có em nào khớp bộ lọc{khoiChon ? ` ở Khối ${khoiChon}` : ''}{lopChon ? ` · lớp ${lopChon}` : ''}.</p>
           ) : (
-            <div className="gvv2-bhn-cuon" role="region" aria-label="Bảng bài hằng ngày, cuộn ngang khi nhiều ngày" tabIndex={0}>
-              <table className="gvv2-bhn-bang">
-                <caption className="gvv2-an-chu">Bài hằng ngày từng em: đã làm trên mức tối thiểu mỗi ngày, số ngày thiếu, câu thiếu, ngày thiếu nhiều nhất.</caption>
-                <thead>
-                  <tr>
-                    <th scope="col" className="gvv2-bhn-em-o">
-                      Học sinh <span className="gvv2-so">· {loc.length} em</span>
-                    </th>
-                    {du.kq.ngay.map((d) => (
-                      <th key={d} scope="col" className="gvv2-bhn-ngay" aria-sort={xep === d ? 'descending' : 'none'} data-hom-nay={d === du.kq.homNay ? 'true' : undefined}>
-                        <button
-                          type="button"
-                          className="gvv2-bhn-ngay-nut tt-nhan"
-                          aria-pressed={xep === d}
-                          aria-label={`${thuDu(d)}${d === du.kq.homNay ? ' (hôm nay)' : ''}: xếp em thiếu nhiều câu nhất ngày này lên đầu`}
-                          onClick={() => doiLoc(() => setXep((x) => (x === d ? null : d)))}
-                        >
-                          <b className="gvv2-so">{ngayNgan(d)}</b>
-                          <small>{d === du.kq.homNay ? 'Hôm nay' : thuNgan(d)}</small>
-                          {xep === d && <ArrowDownWideNarrow size={14} aria-hidden="true" />}
-                        </button>
+            <>
+              {cuonNgang && (
+                <p className="gvv2-bhn-ghi gvv2-so">
+                  Bảng mở sẵn ở ngày gần nhất và ba cột tổng · cuộn ngang để xem các ngày từ {ngayNgan(du.kq.tu)}.
+                </p>
+              )}
+              <div ref={khungCuon} className="gvv2-bhn-cuon" role="region" aria-label="Bảng bài hằng ngày, cuộn ngang khi nhiều ngày" tabIndex={0}>
+                <table className="gvv2-bhn-bang">
+                  <caption className="gvv2-an-chu">Bài hằng ngày từng em: đã làm trên mức tối thiểu mỗi ngày, số ngày thiếu, câu thiếu, ngày thiếu nhiều nhất.</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col" className="gvv2-bhn-em-o">
+                        Học sinh <span className="gvv2-so">· {loc.length} em</span>
                       </th>
+                      {du.kq.ngay.map((d) => (
+                        <th key={d} scope="col" className="gvv2-bhn-ngay" aria-sort={xep === d ? 'descending' : 'none'} data-hom-nay={d === du.kq.homNay ? 'true' : undefined}>
+                          <button
+                            type="button"
+                            className="gvv2-bhn-ngay-nut tt-nhan"
+                            aria-pressed={xep === d}
+                            aria-label={`${thuDu(d)}${d === du.kq.homNay ? ' (hôm nay)' : ''}: xếp em thiếu nhiều câu nhất ngày này lên đầu`}
+                            onClick={() => doiLoc(() => setXep((x) => (x === d ? null : d)))}
+                          >
+                            <b className="gvv2-so">{ngayNgan(d)}</b>
+                            <small>{d === du.kq.homNay ? 'Hôm nay' : thuNgan(d)}</small>
+                            {xep === d && <ArrowDownWideNarrow size={14} aria-hidden="true" />}
+                          </button>
+                        </th>
+                      ))}
+                      <th scope="col" className="gvv2-bhn-tong-dau">Số ngày thiếu</th>
+                      <th scope="col" className="gvv2-bhn-tong-dau">Câu thiếu</th>
+                      <th scope="col" className="gvv2-bhn-tong-dau">Ngày thiếu nhiều nhất</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hien.map((e) => (
+                      <DongEm key={e.sbd} e={e} ngay={du.kq.ngay} onMo={onMo} />
                     ))}
-                    <th scope="col" className="gvv2-bhn-tong-dau">Số ngày thiếu</th>
-                    <th scope="col" className="gvv2-bhn-tong-dau">Câu thiếu</th>
-                    <th scope="col" className="gvv2-bhn-tong-dau">Ngày thiếu nhiều nhất</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {hien.map((e) => (
-                    <DongEm key={e.sbd} e={e} ngay={du.kq.ngay} onMo={onMo} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
           {loc.length > hien.length && (
             <button type="button" className="gvv2-nut-vien tt-nhan gvv2-bhn-them" onClick={() => setSoHien((s) => s + MOI_DOT_EM)}>

@@ -79,7 +79,8 @@ describe('Hôm nay — bỏ "Cần thầy chữa"; khối chính có đúng/sai/
     expect(khoi).not.toContain('tuan-nay') // Lịch học tuần này thay "Tuần này học đều" — không hai lịch tuần
   })
 
-  it('Lịch học tuần này: trạng thái từng ngày bằng chữ (không chỉ màu) + từng ngày từ 12/10', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 12/10 — thầy: "dữ liệu phần này tính từ 1/10" ⇒ bộ giả có mốc 01/10, sổ đủ 01/10 → 16/10 (16 ngày).
+  it('Lịch học tuần này: trạng thái từng ngày bằng chữ (không chỉ màu) + từng ngày từ 01/10', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="lich-tuan"]')).toBeTruthy())
     const lich = container.querySelector('[data-vung="lich-tuan"]')!
@@ -87,7 +88,11 @@ describe('Hôm nay — bỏ "Cần thầy chữa"; khối chính có đúng/sai/
     expect(lich.textContent).toContain('Thứ Ba 13/10: Thiếu 10 câu, đã làm 20/30 câu')
     expect(lich.textContent).toContain('Thứ Tư 14/10: Không làm, đã làm 0/≈30 câu')
     expect(lich.textContent).toContain('Đủ mức 2/4')
-    expect([...lich.querySelectorAll('[data-vung="lich-tung-ngay"] li b')].map((b) => b.textContent)).toEqual(['Hôm nay 16/10', 'Thứ Năm 15/10', 'Thứ Tư 14/10', 'Thứ Ba 13/10', 'Thứ Hai 12/10'])
+    const tungNgay = [...lich.querySelectorAll('[data-vung="lich-tung-ngay"] li b')].map((b) => b.textContent)
+    expect(tungNgay.slice(0, 5)).toEqual(['Hôm nay 16/10', 'Thứ Năm 15/10', 'Thứ Tư 14/10', 'Thứ Ba 13/10', 'Thứ Hai 12/10'])
+    expect(tungNgay).toHaveLength(16)
+    expect(tungNgay.at(-1)).toBe('Thứ Năm 01/10')
+    expect(lich.textContent).toContain('Xem từng ngày từ 01/10 (16 ngày)')
     expect(lich.textContent).toContain('≈ là mức ước tính')
   })
 
@@ -122,7 +127,8 @@ describe('Tiến bộ — đúng/sai theo ngày, thời gian làm câu, câu sai
     await waitFor(() => expect(container.querySelector('[data-vung="dung-sai-ngay"]')).toBeTruthy())
     expect(container.querySelector('[data-vung="nhip-14"]')).toBeNull() // cùng trục ngày ⇒ không vẽ hai lần
     const ds = container.querySelector('[data-vung="dung-sai-ngay"]')!
-    expect([...ds.querySelectorAll('.ph3-so3 > div')].map((d) => d.textContent)).toEqual(['Hôm nay75% đúng9 đúng · 3 sai', '7 ngày qua73% đúng82 đúng · 31 sai', 'Từ 12/1071% đúng70 đúng · 28 sai'])
+    // SỬA CÓ CHỦ ĐÍCH 12/10 (mốc 01/10): ô thứ ba cộng mọi ngày từ 01/10
+    expect([...ds.querySelectorAll('.ph3-so3 > div')].map((d) => d.textContent)).toEqual(['Hôm nay75% đúng9 đúng · 3 sai', '7 ngày qua73% đúng82 đúng · 31 sai', 'Từ 01/1075% đúng219 đúng · 73 sai'])
     expect(ds.querySelectorAll('.ph3-cot-ds__cot > span')).toHaveLength(14)
     expect(ds.querySelector('.ph3-cot-ds__cot')!.getAttribute('aria-label')).toContain('15/10 26 đúng 10 sai')
     const tg = container.querySelector('[data-vung="thoi-gian-lam"]')!
@@ -147,7 +153,7 @@ describe('lớp đọc chặt + chữ', () => {
     expect(docConTongQuan(null)).toBeNull()
     const goc = conTongQuanGia()
     const r = docConTongQuan({ ...goc, ngay: [...goc.ngay, { ngay: 'x' }, 7], ganDay: [...goc.ganDay, { luc: 'khong-phai-ngay' }], goiY: [...goc.goiY, { ma: 'la', chu: 'x' }, { ma: 'nhanh-sai', chu: 'trùng' }] })!
-    expect(r.ngay).toHaveLength(14)
+    expect(r.ngay).toHaveLength(16) // 01/10 → 16/10 (mốc 01/10)
     expect(r.ganDay).toHaveLength(30)
     expect(r.goiY.map((g) => g.ma)).toEqual(['con-cau-hom-nay', 'sai-chua-sua', 'nhanh-sai', 'thieu-ngay', 'lam-khuya'])
     expect(docConTongQuan({ ...goc, dem: { ...goc.dem, homNay: { soLuot: 5, dung: 9, sai: 3, boTrong: 0, soCau: 1, giayTb: 4 } } })).toBeNull()

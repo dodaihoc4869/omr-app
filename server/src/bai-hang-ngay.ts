@@ -1,15 +1,17 @@
-// BÀI HẰNG NGÀY + HỒ SƠ THÁI ĐỘ LÀM BÀI (thầy 12/10). Hợp đồng ĐÃ CHỐT + luật mức / đã làm / ngưỡng: `bai-hang-ngay-kieu.ts` (đọc trước).
+// BÀI HẰNG NGÀY + HỒ SƠ THÁI ĐỘ LÀM BÀI (thầy 12/10; mốc tính từ 01/10 — `NGAY_BAT_DAU_BAI_HANG_NGAY`). Hợp đồng ĐÃ CHỐT + luật mức / đã làm / ngưỡng: `bai-hang-ngay-kieu.ts` (đọc trước).
 //
 // `POST /gv/bai-hang-ngay {tu?, den?, khoi?, lop?}` — LỆNH THẦY, CHỈ ĐỌC (sau cổng `laThay`, chạy trên `envDoc`). Không ghi, không DDL.
 //   · Em: mọi em của các Hành trình khối đang chạy (`chien_dich` id `hanh-trinh-v3-khoi-*`) ∪ em có Gói bài 7 ngày (khi cờ bật); bỏ tài khoản thử
 //     12121212 và em bị khoá. Không đọc được bảng Hành trình ⇒ lùi về danh sách lớp (cảnh báo nói thật).
 //   · Gom em theo LÔ 100 SBD (một tham số JSON, `json_each`) — mỗi lô ≤ 6 truy vấn, mọi truy vấn sổ lọc `sbd IN (…) AND ngay_vn BETWEEN …`
 //     ⇒ đi chỉ mục `idx_skh_em_ngay (sbd, ngay_vn)`; số đếm Gói 7 GOM SẴN trong SQL (COUNT DISTINCT theo em × ngày) ⇒ ~300 em × 14 ngày trả ≤ 4200 dòng.
+//     Mỗi lô chỉ đọc phần ngày cần cho từng chế độ: sổ Gói 7 từ ngày gói sớm nhất của lô, kế hoạch Hành trình tới trước ngày gói muộn nhất của lô
+//     (em chưa có gói ⇒ tới `den`) — khoảng từ 01/10 dài hơn nhưng không đọc thừa những ngày chế độ kia không dùng.
 //   · Mỗi ngày: `mucToiThieu` (thật `da-chot` / ước tính theo quy tắc hiện hành), `daLam`, `thieu`, `datMuc`. Hôm nay chưa hết ngày ⇒ không tính vào
 //     tổng. Xếp em: số ngày thiếu ↓ → tổng câu thiếu ↓ → (hoà) câu còn thiếu hôm nay ↓ → tên.
 // `POST /gv/ho-so-thai-do {sbd, tu?, den?}` — LỆNH THẦY, CHỈ ĐỌC. Lịch hoạt động + số đếm + 6 tín hiệu có số và ngưỡng + kết luận theo luật
 //   `LUAT_KET_LUAN` + danh sách Câu đúng / Câu đã ôn (Câu sai và Toàn bộ lịch sử vẫn ở `/gv/lich-su-lam-cau`).
-//   · Sổ một em (lọc `sbd`, tối đa 5000 lượt gần nhất), bỏ sự kiện còn giấu. "Lượt làm" = như kế hoạch đếm (`SQL_LA_LAN_LAM`: bỏ đọc lời giải, lướt,
+//   · Sổ một em (lọc `sbd`, tối đa `TOI_DA_LUOT_HO_SO` = 10 000 lượt gần nhất), bỏ sự kiện còn giấu. "Lượt làm" = như kế hoạch đếm (`SQL_LA_LAN_LAM`: bỏ đọc lời giải, lướt,
 //     chẩn đoán, gỡ bước); dòng "đọc lời giải" chỉ dùng cho tín hiệu (d).
 //   · Số giây (không bịa, như `/gv/lich-su-lam-cau`): cột `giay` ⇒ `raw_json.ms` ⇒ ca thi `chi_tiet_cau.giay` ⇒ game ước tính từ mốc trả lời ⇒ null.
 import type { Env } from './kieu'
@@ -35,8 +37,9 @@ const str = (x: unknown): string => (x === null || x === undefined ? '' : String
 
 /** Số SBD mỗi lô truy vấn. */
 export const LO_EM_BAI_HANG_NGAY = 100
-/** Số lượt gần nhất đọc cho hồ sơ một em (như `/gv/lich-su-lam-cau`). */
-export const TOI_DA_LUOT_HO_SO = 5000
+/** Số lượt gần nhất đọc cho hồ sơ một em. Thầy 12/10 dời mốc về 01/10 ⇒ khoảng xem dài dần (tới 62 ngày × ~50 lượt/ngày, em chăm hơn
+ *  gấp mấy lần) ⇒ nâng gấp đôi mức cũ 5000 để mọi lượt TRONG khoảng xem đều được đọc; vẫn cắt ⇒ `catBot` + cảnh báo nói rõ. */
+export const TOI_DA_LUOT_HO_SO = 10_000
 export const TOI_DA_CAU_DANH_SACH = 500
 
 async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | null> {
@@ -51,6 +54,8 @@ async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | n
 const NGAY_RE = /^\d{4}-\d{2}-\d{2}$/
 export const ngayVnCua = (ms: number): string => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
 export const congNgayBhn = (ngay: string, n: number): string => new Date(Date.parse(`${ngay}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10)
+/** "01/10" từ "2026-10-01" (đúng cách ghi ngày của app thầy). */
+const ngayNganBhn = (ngay: string): string => `${ngay.slice(8, 10)}/${ngay.slice(5, 7)}`
 const laNgayThat = (s: string): boolean => NGAY_RE.test(s) && Number.isFinite(Date.parse(`${s}T00:00:00Z`)) && congNgayBhn(s, 0) === s
 /** Các ngày `tu` … `den` (gồm hai đầu). */
 export function cacNgay(tu: string, den: string): string[] {
@@ -59,7 +64,7 @@ export function cacNgay(tu: string, den: string): string[] {
   return ra
 }
 
-/** Khoảng ngày của một lệnh: `tu` mặc định 12/10, `den` mặc định (và tối đa) hôm nay; quá `TOI_DA_SO_NGAY` ⇒ cắt bớt đầu, kèm cảnh báo. */
+/** Khoảng ngày của một lệnh: `tu` mặc định `NGAY_BAT_DAU_BAI_HANG_NGAY` (01/10), `den` mặc định (và tối đa) hôm nay; quá `TOI_DA_SO_NGAY` ⇒ cắt bớt đầu, kèm cảnh báo. */
 export function khoangNgay(b: Row, nowMs: number): { tu: string; den: string; homNay: string; canhBao: string[] } | { error: string } {
   const homNay = ngayVnCua(nowMs)
   const canhBao: string[] = []
@@ -167,6 +172,28 @@ export const SQL_LUOT_KE_HOACH = `SELECT sbd, ngay_vn AS ngay, qid, ${SQL_TC} AS
 const SQL_CHOT_TRONG = 'SELECT sbd, ngay, tang, toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
 const SQL_CHOT_TRUOC = 'SELECT sbd, MAX(ngay) AS ngay, tang, toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay < ?2 GROUP BY sbd'
 
+/**
+ * Khoảng ngày một lô cần đọc cho từng chế độ (ngày `d` của em là Gói 7 khi `goi7Tu ≤ d`, còn lại Hành trình):
+ *   · `tuGoi` = ngày gói sớm nhất của lô (không sớm hơn `tu`) — trước đó không em nào ở Gói 7;
+ *   · `denHt` = ngày cuối còn ở Hành trình muộn nhất của lô (em chưa có gói ⇒ `den`; có gói ⇒ trước ngày gói một ngày; không muộn hơn `den`).
+ * Lô không có em ở chế độ ấy ⇒ trả `den` / `tu` (bên gọi đã bỏ truy vấn). Chỉ thu hẹp phần đọc — số mỗi ngày không đổi.
+ */
+export function khoangDocTheoCheDo(lo: readonly Pick<EmGoc, 'goi7Tu'>[], tu: string, den: string): { tuGoi: string; denHt: string } {
+  let tuGoi = den
+  let denHt = tu
+  for (const e of lo) {
+    if (e.goi7Tu !== null && e.goi7Tu <= den) {
+      const t = e.goi7Tu > tu ? e.goi7Tu : tu
+      if (t < tuGoi) tuGoi = t
+    }
+    if (e.goi7Tu === null || e.goi7Tu > tu) {
+      const d = e.goi7Tu === null || e.goi7Tu > den ? den : congNgayBhn(e.goi7Tu, -1)
+      if (d > denHt) denHt = d
+    }
+  }
+  return { tuGoi, denHt }
+}
+
 /** Dãy ngày (mức + đã làm) của các em, đọc theo lô. Ném `LoiDocSo` khi không đọc được sổ chính. */
 async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, den: string, homNay: string, canhBao: string[]): Promise<Map<string, NgayBaiEm[]>> {
   const ngay = cacNgay(tu, den)
@@ -176,15 +203,16 @@ async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, den: str
     const lo = em.slice(i, i + LO_EM_BAI_HANG_NGAY)
     const goi = lo.filter((e) => e.goi7Tu !== null && e.goi7Tu <= den)
     const ht = lo.filter((e) => e.goi7Tu === null || e.goi7Tu > tu)
+    const { tuGoi, denHt } = khoangDocTheoCheDo(lo, tu, den)
     const j = (ds: readonly EmGoc[]) => JSON.stringify(ds.map((e) => e.sbd))
     const rong = Promise.resolve([] as Row[])
     const [rTrong, rTruoc, rGoi, rGap, rKh, rLuot] = await Promise.all([
       hoi(env, SQL_CHOT_TRONG, j(lo), tu, den),
       hoi(env, SQL_CHOT_TRUOC, j(lo), tu),
-      goi.length ? hoi(env, SQL_DEM_GOI7, j(goi), tu, den) : rong,
-      goi.length ? hoi(env, SQL_DEM_GAP, j(goi), tu, den) : rong,
-      ht.length ? hoi(env, SQL_KE_HOACH, j(ht), tu, den) : rong,
-      ht.length ? hoi(env, SQL_LUOT_KE_HOACH, j(ht), tu, den) : rong,
+      goi.length ? hoi(env, SQL_DEM_GOI7, j(goi), tuGoi, den) : rong,
+      goi.length ? hoi(env, SQL_DEM_GAP, j(goi), tuGoi, den) : rong,
+      ht.length ? hoi(env, SQL_KE_HOACH, j(ht), tu, denHt) : rong,
+      ht.length ? hoi(env, SQL_LUOT_KE_HOACH, j(ht), tu, denHt) : rong,
     ])
     // Sổ chính hỏng ⇒ cả lệnh báo lỗi (không trả số sai). Bảng kế hoạch không đọc được ⇒ lượt kế hoạch cũng không đọc được: chỉ cảnh báo.
     if (rGoi === null || (rLuot === null && rKh !== null)) throw new LoiDocSo('Không đọc được sổ học của các em.')
@@ -537,6 +565,8 @@ export async function gvHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promis
   }
   if (!rSo) return { ok: false, error: 'Không đọc được sổ học của em.' }
   const catBot = rSo.length > TOI_DA_LUOT_HO_SO
+  // Dòng đầu tiên bị bỏ (sổ xếp ngày giảm dần) còn trong khoảng xem ⇒ các số "từ … đến …" cũng thiếu lượt cũ nhất của khoảng.
+  const catTrongKhoang = catBot && str(rSo[TOI_DA_LUOT_HO_SO]?.ngay_vn) >= tu
   const dong: DongSo[] = rSo.slice(0, TOI_DA_LUOT_HO_SO).map((x) => {
     const raw = docRaw(x.raw_json)
     const qid = str(x.qid)
@@ -648,7 +678,9 @@ export async function gvHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promis
   const moiTruoc = (a: CauTomTat, c: CauTomTat) => c.lanCuoi.localeCompare(a.lanCuoi) || a.qid.localeCompare(c.qid)
   const cauDung = tomTat.filter((c) => c.soDung > 0).sort(moiTruoc).slice(0, TOI_DA_CAU_DANH_SACH)
   const cauDaOn = tomTat.filter((c) => c.soLanOn > 0).sort((a, c) => Number(a.lanCuoiDung) - Number(c.lanCuoiDung) || moiTruoc(a, c)).slice(0, TOI_DA_CAU_DANH_SACH)
-  if (catBot) canhBao.push(`Sổ của em vượt ${TOI_DA_LUOT_HO_SO} lượt — danh sách câu tính trên ${TOI_DA_LUOT_HO_SO} lượt gần nhất.`)
+  const soLuotChu = String(TOI_DA_LUOT_HO_SO).replace(/\B(?=(\d{3})+(?!\d))/g, '.') // "10.000" — không phụ thuộc Intl của Worker
+  if (catTrongKhoang) canhBao.push(`Riêng từ ${ngayNganBhn(tu)} đến ${ngayNganBhn(den)} em đã có hơn ${soLuotChu} lượt — các số của khoảng này chỉ tính ${soLuotChu} lượt gần nhất.`)
+  else if (catBot) canhBao.push(`Sổ của em vượt ${soLuotChu} lượt — danh sách câu tính trên ${soLuotChu} lượt gần nhất.`)
   return { ok: true, em, tu, den, homNay, ketLuan, tinHieu, dem, ngay, phanBoGiay: phanBoGiay(luot), cauDung, cauDaOn, catBot, canhBao }
 }
 

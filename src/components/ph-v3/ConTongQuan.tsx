@@ -1,7 +1,7 @@
 // LÀN PHỤ HUYNH 12/10 (thầy: "cho phụ huynh biết nhiều thông tin cần thiết nữa về con, số câu làm đúng, làm sai, thời gian làm từng câu gợi ý nhắc …
 // làm app phụ huynh siêu đẹp trực quan để phụ huynh theo dõi được con toàn diện"). Các khối đọc `/ph/con-tong-quan` (src/lib/ph-v3/con-tong-quan.ts):
-//   Hôm nay  — ba số trong khối chính (câu đúng · câu sai · trung bình mỗi câu) · Gợi ý nhắc con · Lịch học tuần này (+ từng ngày từ 12/10).
-//   Tiến bộ  — Đúng và sai theo ngày (cột chồng 14 ngày + ba ô Hôm nay / 7 ngày / Từ 12/10) · Thời gian làm câu (phân bố + câu gần đây) · Câu sai gần đây.
+//   Hôm nay  — ba số trong khối chính (câu đúng · câu sai · trung bình mỗi câu) · Gợi ý nhắc con · Lịch học tuần này (+ từng ngày từ mốc theo dõi `tq.moc`, 01/10).
+//   Tiến bộ  — Đúng và sai theo ngày (cột chồng 14 ngày + ba ô Hôm nay / 7 ngày / Từ <mốc>) · Thời gian làm câu (phân bố + câu gần đây) · Câu sai gần đây.
 // Biểu đồ vẽ bằng CSS (không thư viện). Màu CHỈ biến --ph3-* sẵn có; màu không là kênh duy nhất (luôn kèm chữ / số / biểu tượng).
 // Không mã câu, không đáp án; số nào cũng có nhãn; ước tính ghi "≈"; lượt không đo được ghi "chưa đo giờ".
 import type { ReactElement } from 'react'
@@ -100,7 +100,7 @@ export function GoiYNhacCon({ tai }: { tai: TaiTongQuan }) {
 }
 
 // ---------------------------------------------------------------- HÔM NAY · Lịch học tuần này ----------------------------------------------------------------
-/** Lịch tuần (Thứ Hai → Chủ nhật): mỗi ngày từ 12/10 một ô tròn có số câu đã làm và mức; ngày chưa tới nét đứt; trước mốc ghi "chưa theo dõi". */
+/** Lịch tuần (Thứ Hai → Chủ nhật): mỗi ngày từ mốc theo dõi (`tq.moc`) một ô tròn có số câu đã làm và mức; ngày chưa tới nét đứt; trước mốc ghi "chưa theo dõi". */
 export function LichTuan({ tq }: { tq: ConTongQuan }) {
   const { ngay: tuan, homNay } = tuanNay(tq.serverNow)
   if (tuan.length !== 7) return null
@@ -170,7 +170,7 @@ function OTiLe({ nhan, d }: { nhan: string; d: DemCau }) {
   )
 }
 
-/** Cột chồng 14 ngày gần nhất (đúng ở dưới, sai ở trên, khe 2 px); số trên cột = tổng câu đúng + sai; ba ô tỉ lệ Hôm nay · 7 ngày · Từ 12/10. */
+/** Cột chồng 14 ngày gần nhất (đúng ở dưới, sai ở trên, khe 2 px); số trên cột = tổng câu đúng + sai; ba ô tỉ lệ Hôm nay · 7 ngày · Từ <mốc>. */
 export function DungSaiTheoNgay({ tq }: { tq: ConTongQuan }) {
   const ngay = tq.ngay.slice(-14)
   if (ngay.length === 0) return null

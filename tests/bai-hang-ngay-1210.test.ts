@@ -4,6 +4,8 @@
 // `server/src/bai-hang-ngay-kieu.ts`. CHỈ ĐỌC — chạy trên D1 THẬT (SQLite, lược đồ repo + bảng Hành trình / Gói 7 tạo bằng chính DDL của máy chủ).
 // Kiểm: mức thật (đã chốt) / ước tính theo quy tắc hiện hành · đã làm đúng như kế hoạch đếm (Gói 7 + Hành trình) · thiếu · xếp thứ tự · thang ngày từ
 // 12/10 · lọc khối/lớp · chỉ mục · tín hiệu thái độ với ngưỡng · "Chưa đủ dữ liệu". Tên em là tên giả.
+// SỬA CÓ CHỦ ĐÍCH 12/10 — thầy: "dữ liệu phần này tính từ 1/10 cho tôi nhé" ⇒ mốc mặc định 01/10. Các ca kiểm LUẬT (mức / đã làm / xếp / lọc /
+// hồ sơ) vẫn chạy trên khoảng 12–14/10 nên truyền `tu` rõ ràng; mốc mặc định + ngày trước Gói 7 + khoảng đọc theo chế độ + cắt 10.000 lượt có khối riêng cuối tệp.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
@@ -12,8 +14,8 @@ import { SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
 import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
 import type { KetQuaBaiHangNgay, KetQuaHoSoThaiDo, NgayBaiEm } from '../server/src/bai-hang-ngay-kieu'
 import {
-  chuoiChonLap, gvBaiHangNgay, gvHoSoThaiDo, khoangNgay, mucCuaNgay, ngayVnCua, phanBoGiay, SQL_DEM_GOI7, SQL_LUOT_KE_HOACH, tinhThaiDo, tomTatNgay, xepEmBaiHangNgay,
-  type LuotThaiDo,
+  chuoiChonLap, gvBaiHangNgay, gvHoSoThaiDo, khoangDocTheoCheDo, khoangNgay, mucCuaNgay, ngayVnCua, phanBoGiay, SQL_DEM_GOI7, SQL_LUOT_KE_HOACH, tinhThaiDo,
+  TOI_DA_LUOT_HO_SO, tomTatNgay, xepEmBaiHangNgay, type LuotThaiDo,
 } from '../server/src/bai-hang-ngay'
 
 type D = ReturnType<typeof taoD1That>
@@ -97,25 +99,27 @@ function boDuLieu() {
   }
   return d
 }
-const goi = (d: D, b: Record<string, unknown> = {}) => gvBaiHangNgay(d.env as unknown as Env, b, NOW) as Promise<KetQuaBaiHangNgay & { error?: string }>
+/** Ca kiểm luật: khoảng 12–14/10 (truyền `tu` rõ — mặc định nay là 01/10, xem đầu tệp). */
+const goi = (d: D, b: Record<string, unknown> = {}) => gvBaiHangNgay(d.env as unknown as Env, { tu: '2026-10-12', ...b }, NOW) as Promise<KetQuaBaiHangNgay & { error?: string }>
 const theo = (r: KetQuaBaiHangNgay, sbd: string) => r.em.find((e) => e.sbd === sbd)!
 const o = (n: NgayBaiEm) => [n.ngay, n.mucToiThieu, n.daLam, n.thieu, n.datMuc, n.nguonMuc, n.cheDo]
 
-describe('máy chủ /gv/bai-hang-ngay — cổng, thang ngày từ 12/10', () => {
-  it('chỉ thầy; mặc định tu = 12/10, den = hôm nay (giờ VN); den tương lai bị chặn; tu sau den ⇒ lỗi; quá 62 ngày ⇒ cắt + cảnh báo', async () => {
+describe('máy chủ /gv/bai-hang-ngay — cổng, thang ngày từ 01/10', () => {
+  it('chỉ thầy; mặc định tu = 01/10, den = hôm nay (giờ VN); den tương lai bị chặn; tu sau den ⇒ lỗi; quá 62 ngày ⇒ cắt + cảnh báo', async () => {
     vi.useFakeTimers({ toFake: ['Date'] })
     vi.setSystemTime(NOW)
     const d = boDuLieu()
     const env = d.env as unknown as Env
     expect((await goiWorker(worker, env, '/gv/bai-hang-ngay', {})).ok).toBe(false)
     const r = (await goiWorker(worker, env, '/gv/bai-hang-ngay', {}, true)) as KetQuaBaiHangNgay
-    expect(r).toMatchObject({ ok: true, tu: '2026-10-12', den: '2026-10-14', homNay: '2026-10-14', ngay: ['2026-10-12', '2026-10-13', '2026-10-14'] })
+    expect(r).toMatchObject({ ok: true, tu: '2026-10-01', den: '2026-10-14', homNay: '2026-10-14' })
+    expect(r.ngay).toEqual(Array.from({ length: 14 }, (_, i) => `2026-10-${String(i + 1).padStart(2, '0')}`))
     expect(r.em.every((e) => e.ngay.map((n) => n.ngay).join() === r.ngay.join())).toBe(true)
     expect(r.em.flatMap((e) => e.ngay.filter((n) => n.homNay).map((n) => n.ngay))).toEqual(r.em.map(() => '2026-10-14'))
-    expect(khoangNgay({ den: '2026-12-01' }, NOW)).toMatchObject({ tu: '2026-10-12', den: '2026-10-14' })
+    expect(khoangNgay({ den: '2026-12-01' }, NOW)).toMatchObject({ tu: '2026-10-01', den: '2026-10-14' })
     expect(khoangNgay({ tu: '2026-10-20' }, NOW)).toEqual({ error: 'Ngày bắt đầu đang sau ngày kết thúc.' })
     expect(khoangNgay({ tu: '12/10/2026' }, NOW)).toEqual({ error: 'Ngày bắt đầu phải có dạng YYYY-MM-DD.' })
-    expect(khoangNgay({}, Date.parse('2026-10-11T05:00:00Z'))).toMatchObject({ tu: '2026-10-11', den: '2026-10-11' }) // trước 12/10: một ngày, không lỗi
+    expect(khoangNgay({}, Date.parse('2026-09-30T05:00:00Z'))).toMatchObject({ tu: '2026-09-30', den: '2026-09-30' }) // trước 01/10: một ngày, không lỗi
     const dai = khoangNgay({ tu: '2026-07-01' }, NOW)
     expect(dai).toMatchObject({ tu: '2026-08-14', den: '2026-10-14' })
     expect('canhBao' in dai && dai.canhBao[0]).toMatch(/tối đa 62 ngày/)
@@ -332,7 +336,7 @@ describe('máy chủ /gv/ho-so-thai-do — đọc D1', () => {
     sk(d, { sbd: 'B', qid: 'G10', luc: luc('2026-10-14', 8, 5), kq: 1, assistance: 'assisted', giay: 50 })
     d.sql.prepare('INSERT INTO loi_giai_hoi (sbd, qid, nguon, luc) VALUES (?,?,?,?)').run('B', 'G11', 'x', luc('2026-10-14', 9))
     const env = d.env as unknown as Env
-    const r = (await gvHoSoThaiDo(env, { sbd: 'B' }, NOW)) as KetQuaHoSoThaiDo
+    const r = (await gvHoSoThaiDo(env, { sbd: 'B', tu: '2026-10-12' }, NOW)) as KetQuaHoSoThaiDo
     expect(r).toMatchObject({ ok: true, em: { sbd: 'B', hoTen: 'Lê Bình', lop: '12 - Tinh Hoa', khoi: '12' }, tu: '2026-10-12', den: '2026-10-14' })
     const bang = theo(await goi(d), 'B')
     expect(r.ngay.map((n) => [n.ngay, n.mucToiThieu, n.datMuc])).toEqual(bang.ngay.map((n) => [n.ngay, n.mucToiThieu, n.datMuc]))
@@ -347,5 +351,75 @@ describe('máy chủ /gv/ho-so-thai-do — đọc D1', () => {
     expect(r.phanBoGiay[0]).toMatchObject({ nhan: 'Dưới 8 giây', soLuot: 1, soNhanh: 1 }) // raw ms 5000
     expect(r.ngay.find((n) => n.ngay === '2026-10-14')).toMatchObject({ soLuot: 2, soDung: 1, soSai: 1, tiLeDung: 50, homNay: true })
     expect(r.ketLuan.nhan).toBe('chua-du-du-lieu') // 12/10 + 13/10 đã hết, hôm nay chưa đủ ⇒ 2 ngày
+  })
+})
+
+// ------------------------------------------------------------------ MỐC 01/10 (thầy 12/10: "dữ liệu phần này tính từ 1/10 cho tôi nhé")
+describe('mốc 01/10 — mặc định, ngày trước Gói 7, khoảng đọc, cắt 10.000 lượt', () => {
+  it('mặc định tính từ 2026-10-01; ngày 05/10 (trước Gói 7) tính theo kế hoạch Hành trình, từ ngày gói 10/10 mới là Gói 7; hồ sơ cùng khoảng, cùng số', async () => {
+    const d = taoD1()
+    const env = d.env as unknown as Env
+    em(d, 'G', 'Ngô Giang', '12', '12 - Tinh Hoa')
+    hanhTrinh(d, '12', ['G'])
+    goi7(d, 'G', '2026-10-10')
+    // 05/10: mức chốt tầng 2 = 30; kế hoạch 3 câu — làm H1, H2 (sai vẫn là đã làm) + Z1 ngoài kế hoạch (Gói 7 sẽ đếm 3, Hành trình chỉ 2)
+    chot(d, 'G', '2026-10-05', 2, 30)
+    keHoach(d, 'G', '2026-10-05', ['H1', 'H2', 'H3'])
+    sk(d, { sbd: 'G', qid: 'H1', luc: luc('2026-10-05', 9) })
+    sk(d, { sbd: 'G', qid: 'H2', luc: luc('2026-10-05', 9, 5), kq: 0 })
+    sk(d, { sbd: 'G', qid: 'Z1', luc: luc('2026-10-05', 9, 10) })
+    // 06/10: không có kế hoạch, vẫn làm một câu ⇒ Hành trình đếm 0 (không bị tính nhầm kiểu Gói 7)
+    sk(d, { sbd: 'G', qid: 'Z2', luc: luc('2026-10-06', 9) })
+    // 10/10: ngày gói đầu ⇒ Gói 7 đếm mọi mã câu khác nhau có kết quả
+    for (const q of ['G1', 'G2']) sk(d, { sbd: 'G', qid: q, luc: luc('2026-10-10', 9) })
+    const r = (await gvBaiHangNgay(env, {}, NOW)) as KetQuaBaiHangNgay
+    expect(r).toMatchObject({ ok: true, tu: '2026-10-01', den: '2026-10-14', canhBao: [] })
+    expect(r.ngay).toHaveLength(14)
+    const g = theo(r, 'G')
+    const theoNgay = Object.fromEntries(g.ngay.map((n) => [n.ngay, o(n)]))
+    expect(theoNgay['2026-10-01']).toEqual(['2026-10-01', 30, 0, 30, false, 'tang-gan-nhat', 'hanh-trinh']) // chưa có tầng trước ⇒ tầng sau gần nhất
+    expect(theoNgay['2026-10-05']).toEqual(['2026-10-05', 30, 2, 28, false, 'da-chot', 'hanh-trinh'])
+    expect(theoNgay['2026-10-06']).toEqual(['2026-10-06', 30, 0, 30, false, 'tang-gan-nhat', 'hanh-trinh'])
+    expect(theoNgay['2026-10-10']).toEqual(['2026-10-10', 30, 2, 28, false, 'tang-gan-nhat', 'goi7'])
+    expect(g.ngay.filter((n) => n.cheDo === 'hanh-trinh').map((n) => n.ngay)).toEqual(r.ngay.filter((n) => n < '2026-10-10'))
+    expect(g).toMatchObject({ soNgayThieu: 13, soNgayKhongLam: 11, tongDaLam: 4 })
+    // hồ sơ thái độ mặc định: cùng khoảng 01/10 → 14/10, cùng "đã làm / chế độ" từng ngày với bảng
+    const h = (await gvHoSoThaiDo(env, { sbd: 'G' }, NOW)) as KetQuaHoSoThaiDo
+    expect(h).toMatchObject({ ok: true, tu: '2026-10-01', den: '2026-10-14', catBot: false })
+    expect(h.ngay.map((n) => [n.ngay, n.mucToiThieu, n.daLam, n.cheDo])).toEqual(g.ngay.map((n) => [n.ngay, n.mucToiThieu, n.daLam, n.cheDo]))
+    expect(h.ngay.find((n) => n.ngay === '2026-10-05')).toMatchObject({ soLuot: 3, soDung: 2, soSai: 1, cheDo: 'hanh-trinh' })
+    expect(h.dem.soLuot).toBe(6)
+    expect(h.tinHieu.find((t) => t.ma === 'ngay-du-muc')).toMatchObject({ tu: 0, mau: 13, muc: 'xau' })
+  })
+
+  it('khoảng đọc theo chế độ: sổ Gói 7 từ ngày gói sớm nhất của lô, kế hoạch Hành trình tới trước ngày gói muộn nhất (chưa có gói ⇒ tới den)', () => {
+    const [tu, den] = ['2026-10-01', '2026-10-14']
+    expect(khoangDocTheoCheDo([{ goi7Tu: '2026-10-10' }, { goi7Tu: '2026-10-12' }], tu, den)).toEqual({ tuGoi: '2026-10-10', denHt: '2026-10-11' })
+    expect(khoangDocTheoCheDo([{ goi7Tu: null }, { goi7Tu: '2026-10-10' }], tu, den)).toEqual({ tuGoi: '2026-10-10', denHt: den })
+    expect(khoangDocTheoCheDo([{ goi7Tu: '2026-10-20' }], tu, den)).toEqual({ tuGoi: den, denHt: den }) // gói sau khoảng ⇒ cả khoảng là Hành trình
+    expect(khoangDocTheoCheDo([{ goi7Tu: '2026-09-20' }], tu, den)).toEqual({ tuGoi: tu, denHt: tu }) // gói trước khoảng ⇒ cả khoảng là Gói 7
+  })
+
+  it(`sổ vượt ${TOI_DA_LUOT_HO_SO} lượt: cắt rơi vào khoảng xem ⇒ catBot + cảnh báo nói rõ khoảng; cắt ở lượt cũ trước khoảng ⇒ cảnh báo danh sách câu`, async () => {
+    const dung = (truocKhoang: number) => {
+      const d = taoD1()
+      em(d, 'H', 'Hồ Hải', '12', '12 - Tinh Hoa')
+      const them = d.sql.prepare('INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, luc, ngay_vn) VALUES (?,?,?,?,?,?,?,?,?)')
+      const ghi = (i: number, ngay: string) => {
+        const l = new Date(Date.parse(`${ngay}T08:00:00+07:00`) + i * 1000).toISOString()
+        them.run(`h${i}`, 'H', `Q${i % 400}`, 'game', 'P', 1, i % 3 ? 1 : 0, l, ngayVnCua(Date.parse(l)))
+      }
+      for (let i = 0; i < truocKhoang; i++) ghi(i, '2026-09-20')
+      for (let i = truocKhoang; i < TOI_DA_LUOT_HO_SO + 1; i++) ghi(i, `2026-10-${String(1 + (i % 14)).padStart(2, '0')}`)
+      return d.env as unknown as Env
+    }
+    const trong = (await gvHoSoThaiDo(dung(0), { sbd: 'H' }, NOW)) as KetQuaHoSoThaiDo
+    expect(trong).toMatchObject({ ok: true, catBot: true })
+    expect(trong.dem.soLuot).toBe(TOI_DA_LUOT_HO_SO)
+    expect(trong.canhBao).toContain('Riêng từ 01/10 đến 14/10 em đã có hơn 10.000 lượt — các số của khoảng này chỉ tính 10.000 lượt gần nhất.')
+    const ngoai = (await gvHoSoThaiDo(dung(1), { sbd: 'H' }, NOW)) as KetQuaHoSoThaiDo
+    expect(ngoai).toMatchObject({ ok: true, catBot: true })
+    expect(ngoai.dem.soLuot).toBe(TOI_DA_LUOT_HO_SO) // mọi lượt trong khoảng đều đọc đủ
+    expect(ngoai.canhBao).toContain('Sổ của em vượt 10.000 lượt — danh sách câu tính trên 10.000 lượt gần nhất.')
   })
 })
