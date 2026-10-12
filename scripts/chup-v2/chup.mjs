@@ -119,6 +119,20 @@ const DS = [
   ['47-gv-bai-hang-ngay-bang-dien-thoai-toi', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
   ['48-gv-ho-so-cau-dung-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cau-dung'],
   // ---------------------------------------------------------------- hết LÀN GIÁO VIÊN 12/10
+  // ═════════ LÀN BÀI MỚI 7 NGÀY 12/10: Hành trình › Bài mới trong 7 ngày (trùng tu). Máy 1440×900 + điện thoại 390×844, sáng + tối.
+  // `g7:<việc>`: dau = đầu thẻ · ds = danh sách chữa · ho-tro = mở Học sinh cần hỗ trợ của dòng đầu · loc = lọc Nhiều học sinh sai + xếp tỉ lệ sai ·
+  // tien-do = thẻ Tiến độ học sinh · soan = bấm "Mở câu và chữa" dòng đầu (tấm soạn phần chữa). Chạy riêng: tiền tố "5" (50-…57-).
+  ...['light', 'dark'].flatMap((nen) => {
+    const k = nen === 'dark' ? '-toi' : ''
+    return [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].flatMap(([w, hh, kho]) =>
+      [['50', 'dau'], ['51', 'ds'], ['52', 'ho-tro'], ['53', 'loc'], ['54', 'tien-do'], ['55', 'soan']].map(([so, v]) =>
+        [`${so}-gv-g7-${v}-${kho}${k}`, 'gv-nhip&the=goi-7', w, hh, nen, false, /Hành trình giỏi Hóa/, `g7:${v}`]))
+  }),
+  ['56-gv-g7-toan-trang-may-tinh', 'gv-nhip&the=goi-7', 1440, 900, 'light', true, /Hành trình giỏi Hóa/, 'g7:dau'],
+  ['57-gv-g7-chua-co-bai-dien-thoai', 'gv-nhip&the=goi-7&g7=trong', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'cho:Chưa có bài mới trong 7 ngày'],
+  ['57-gv-g7-loi-may-tinh', 'gv-nhip&the=goi-7&g7=loi', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'cho:Không nối được máy chủ'],
+  ['57-gv-g7-thieu-nguon-may-tinh-toi', 'gv-nhip&the=goi-7&g7=thieu-nguon', 1440, 900, 'dark', false, /Hành trình giỏi Hóa/, 'cho:Bộ bài chưa đủ nguồn'],
+  // ═════════ hết LÀN BÀI MỚI 7 NGÀY 12/10
   ['14-gv-chien-dich-da-giao', 'gv-nhip&the=chien-dich', 1440, 960, 'light', false, /Chiến dịch đã giao/],
   ['14-gv-chien-dich-da-giao-dien-thoai-toi', 'gv-nhip&the=chien-dich', 390, 844, 'dark', true, /Chiến dịch đã giao/],
   ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
@@ -247,6 +261,24 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
       await t.locator('.gvv2-bhn-ngay-nut', { hasText: viec.slice(8) }).first().click({ timeout: 20000 })
       await t.waitForTimeout(300)
+    } else if (viec?.startsWith('g7:')) {
+      // LÀN BÀI MỚI 7 NGÀY 12/10 — chờ hàng ô số rồi làm đúng một việc; cuộn trang (không cuộn khung) tới khối cần chụp.
+      const v = viec.slice(3)
+      const cuonToi = (chon) => t.evaluate((c) => { const el = document.querySelector(c); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - (innerWidth < 900 ? 72 : 16)) }, chon)
+      await t.getByText('Câu cần chữa').first().waitFor({ timeout: 20000 })
+      if (v === 'ds') await cuonToi('.g7-tab')
+      if (v === 'ho-tro') { await t.locator('.g7-nut-mo').first().click(); await cuonToi('.g7-hang') }
+      if (v === 'loc') {
+        await t.getByRole('radio', { name: /^Nhiều học sinh sai/ }).click()
+        await t.getByRole('radio', { name: 'Tỉ lệ sai cao trước' }).click()
+        await cuonToi('.g7-loc')
+      }
+      if (v === 'tien-do') { await t.getByRole('tab', { name: /Tiến độ học sinh/ }).click(); await cuonToi('.g7-tab') }
+      if (v === 'soan') {
+        await t.getByRole('button', { name: 'Mở câu và chữa', exact: true }).first().click()
+        await t.getByRole('dialog').getByText('Giải thích để học sinh học lại').waitFor({ timeout: 20000 })
+      }
+      await t.waitForTimeout(400)
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {
