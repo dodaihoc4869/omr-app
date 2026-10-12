@@ -131,8 +131,8 @@ Thầy nhắn (nguyên văn, kèm ảnh màn "Cùng gỡ câu này" trạng thá
 Thầy nhắn (nguyên văn, kèm ảnh thẻ "Bài mới trong 7 ngày"):
 "phần này tôi muốn bạn trùng tu lại toàn bộ bạn quyết định sao cho khoa học đầy đủ và đẹp nhất trực quan"
 "mục cần chữa cho tôi một phần tự chữa, phần này cho tôi chọn đề trong Mục dạy học (trắc nghiệm khách quan trả lời ngắn) khi chọn đề nào thì đề đó hiển thị tất cả các câu chiếu lên máy chiếu, ưu tiên đẩy câu đúng sai và tính toán lên đầu tiên hiển thị, bảng hiển thị đầy đủ mọi thứ như mục chiếu lên bảng (đúng chuẩn)"
-- [ ] GV · trùng tu toàn bộ thẻ "Bài mới trong 7 ngày" (khoa học, đầy đủ, trực quan) | bằng chứng: (chưa có)
-- [ ] GV · Cần thầy chữa có phần "Thầy tự chữa": chọn đề trong Dạy học (TN / Đúng–sai / Trả lời ngắn) | bằng chứng: (chưa có)
-- [ ] GV · chọn đề ⇒ chiếu TẤT CẢ câu lên máy chiếu, câu đúng–sai + tính toán lên đầu | bằng chứng: (chưa có)
-- [ ] GV · tờ chiếu đầy đủ như Chiếu lên bảng (lời giải, thống kê lớp, ai sai + giây) | bằng chứng: (chưa có)
+- [x] GV · trùng tu toàn bộ thẻ "Bài mới trong 7 ngày" (khoa học, đầy đủ, trực quan) | bằng chứng: 8c5b75a0 — thẻ chọn bài (hạn, còn N ngày), 6 ô số, dải tiến độ lớp, Danh sách chữa (thanh tỉ lệ sai, lọc tình trạng/loại câu, xếp ưu tiên/tỉ lệ sai, Học sinh cần hỗ trợ 3 nhóm), Tiến độ học sinh (thanh, tìm tên, 4 cách xếp), tấm soạn phần chữa; test goi-bai-7-trung-tu-1210 (16); ảnh 50–57-gv-g7-*.
+- [x] GV · Cần thầy chữa có phần "Thầy tự chữa": chọn đề trong Dạy học (TN / Đúng–sai / Trả lời ngắn) | bằng chứng: 55156900 — nguồn đúng cây Dạy học (`khoDayHoc` → `dsBaiCuaKhoi`), chip ba tờ có số câu; ảnh 50/51-ttc-*.
+- [x] GV · chọn đề ⇒ chiếu TẤT CẢ câu lên máy chiếu, câu đúng–sai + tính toán lên đầu | bằng chứng: 55156900 — xếp Đúng–sai có tính toán → Đúng–sai → tính toán → còn lại (giữ thứ tự đề); test thay-tu-chua-1210 (14).
+- [x] GV · tờ chiếu đầy đủ như Chiếu lên bảng (lời giải, thống kê lớp, ai sai + giây) | bằng chứng: dùng lại `to-chieu.ts` → `KhungXemPhieu` (G lời giải · T thống kê `/gv/thong-ke-lop-cau` · X ai sai `/gv/ai-sai-cau`); ảnh 52-ttc-to-chieu-*-1920. Thêm 487bde44: tên nơi làm mới trên tờ (bỏ Đảo/Đoàn/Bi-a). Nút Đóng 34 px của khung phiếu GIỮ NGUYÊN (test m3-c6-khung-xem-phieu-1909 khoá).
 - [ ] Build + đẩy đợt 9 (kiểm ca mở trước) | bằng chứng: (chưa có)

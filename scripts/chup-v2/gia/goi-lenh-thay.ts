@@ -4,6 +4,8 @@ export * from '../../../src/lib/goi-lenh-thay'
 import { traLoiThay } from '../../chup-omni-3/gia/may-thay'
 import { lichSuGia } from './lich-su-lam-cau'
 import { baiHangNgayGia, hoSoThaiDoGia, tenEmBhn } from './bai-hang-ngay' // LÀN GIÁO VIÊN 12/10
+import { goi7Gia } from './goi-bai-7' // LÀN BÀI MỚI 7 NGÀY 12/10
+import { LA_TTC, LOP_TTC } from './thay-tu-chua' // LÀN THẦY TỰ CHỮA 12/10
 
 const HT = [
   { k: '10', id: 'hanh-trinh-v3-khoi-10', soEm: 38 },
@@ -67,9 +69,16 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
     return { ok: true as const, du: lichSuGia(String(b.sbd), tenEmBhn(String(b.sbd))!) as unknown as Record<string, unknown> }
   }
   // ---------------------------------------------------------------- hết LÀN GIÁO VIÊN 12/10
+  // ---------------------------------------------------------------- LÀN BÀI MỚI 7 NGÀY 12/10 (gia/goi-bai-7.ts): Hành trình › Bài mới trong 7 ngày
+  // (3 bài ≈ 60 em × 40 câu; `chi_tiet` trả câu đủ đáp án + lời giải; `chua` trả đã lưu). `&g7=trong|loi|thieu-nguon` = ba trạng thái.
+  if (duong === '/gv/goi-bai-7') return goi7Gia(b)
+  // ---------------------------------------------------------------- hết LÀN BÀI MỚI 7 NGÀY 12/10
   // Hành trình › Nhịp học › tấm Lịch sử làm câu (thầy 09/10 khuya): lịch sử GIẢ của em đúng SBD trong bảng nhịp (tên giả).
   if (duong === '/gv/lich-su-lam-cau') {
     return { ok: true as const, du: lichSuGia(String(b.sbd), tenTheoSbd(String(b.sbd))) as unknown as Record<string, unknown> }
   }
+  // ---- LÀN THẦY TỰ CHỮA 12/10 (cảnh `&ttc=1`): danh sách lớp CÓ số báo danh ⇒ thẻ Thầy tự chữa có tỉ lệ sai lớp (gia/thay-tu-chua.ts).
+  if (LA_TTC && duong === '/gv/lop') return { ok: true as const, du: { lop: LOP_TTC } }
+  // ---- hết LÀN THẦY TỰ CHỮA 12/10
   return traLoiThay(duong, b)
 }

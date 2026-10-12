@@ -45,9 +45,27 @@ const DS_HS12 = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']
 })).concat([['41-hs12-chua-gap-lai-doc', 'hs12-chua-gap-lai', 390, 844, 'light', true, /Lần gặp lại 2 mở lúc/]])
 // ═══════════ hết LÀN HỌC SINH 12/10 ═══════════
 
+// ═══════════ LÀN THẦY TỰ CHỮA 12/10: Cần thầy chữa › thẻ "Thầy tự chữa" (gập · đã chọn đề) + tờ máy chiếu sau khi chọn đề ═══════════
+// Cảnh `?man=gv-nhip&the=can-chua&ttc=1` (trang.tsx, khối cùng tên). `ttc:<mã bài>` = mở thẻ, chọn bài, chờ tỉ lệ sai lớp; `ttc-chieu:<mã bài>[:phím]` = thêm
+// bấm "Chiếu lên máy chiếu", chờ tờ nối app rồi gõ phím trên tờ (t thống kê lớp · g lời giải · x ai làm sai). Chạy riêng: tiền tố "5" (50-, 51-, 52-).
+const DS_TTC = [
+  ['50-ttc-the-gap-may-tinh', 'gv-nhip&the=can-chua&ttc=1', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'cho:chỗ cần chữa'],
+  ['50-ttc-the-gap-dien-thoai-toi', 'gv-nhip&the=can-chua&ttc=1', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'cho:chỗ cần chữa'],
+  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+    [`51-ttc-chon-de-${kho}${nen === 'dark' ? '-toi' : ''}`, 'gv-nhip&the=can-chua&ttc=1', w, hh, nen, true, /Hành trình giỏi Hóa/, 'ttc:DH-12-C2-B6'])),
+  ['52-ttc-to-chieu-1920', 'gv-nhip&the=can-chua&ttc=1', 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'ttc-chieu:DH-12-C2-B6'],
+  ['52-ttc-to-chieu-thong-ke-1920', 'gv-nhip&the=can-chua&ttc=1', 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'ttc-chieu:DH-12-C2-B6:t'],
+  ['52-ttc-to-chieu-loi-giai-1920', 'gv-nhip&the=can-chua&ttc=1', 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'ttc-chieu:DH-12-C2-B6:g '],
+  ['52-ttc-to-chieu-ai-sai-1920', 'gv-nhip&the=can-chua&ttc=1', 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'ttc-chieu:DH-12-C2-B6:x'],
+  ['52-ttc-to-chieu-1440', 'gv-nhip&the=can-chua&ttc=1', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'ttc-chieu:DH-12-C2-B6:t'],
+  ['52-ttc-to-chieu-dot-5-1920', 'gv-nhip&the=can-chua&ttc=1', 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'ttc-chieu:DH-12-C2-B6:→→→→t'],
+]
+// ═══════════ hết LÀN THẦY TỰ CHỮA 12/10 ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
   ...DS_HS12, // LÀN HỌC SINH 12/10
+  ...DS_TTC, // LÀN THẦY TỰ CHỮA 12/10
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],
@@ -119,6 +137,20 @@ const DS = [
   ['47-gv-bai-hang-ngay-bang-dien-thoai-toi', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
   ['48-gv-ho-so-cau-dung-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cau-dung'],
   // ---------------------------------------------------------------- hết LÀN GIÁO VIÊN 12/10
+  // ═════════ LÀN BÀI MỚI 7 NGÀY 12/10: Hành trình › Bài mới trong 7 ngày (trùng tu). Máy 1440×900 + điện thoại 390×844, sáng + tối.
+  // `g7:<việc>`: dau = đầu thẻ · ds = danh sách chữa · ho-tro = mở Học sinh cần hỗ trợ của dòng đầu · loc = lọc Nhiều học sinh sai + xếp tỉ lệ sai ·
+  // tien-do = thẻ Tiến độ học sinh · soan = bấm "Mở câu và chữa" dòng đầu (tấm soạn phần chữa). Chạy riêng: tiền tố "5" (50-…57-).
+  ...['light', 'dark'].flatMap((nen) => {
+    const k = nen === 'dark' ? '-toi' : ''
+    return [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].flatMap(([w, hh, kho]) =>
+      [['50', 'dau'], ['51', 'ds'], ['52', 'ho-tro'], ['53', 'loc'], ['54', 'tien-do'], ['55', 'soan']].map(([so, v]) =>
+        [`${so}-gv-g7-${v}-${kho}${k}`, 'gv-nhip&the=goi-7', w, hh, nen, false, /Hành trình giỏi Hóa/, `g7:${v}`]))
+  }),
+  ['56-gv-g7-toan-trang-may-tinh', 'gv-nhip&the=goi-7', 1440, 900, 'light', true, /Hành trình giỏi Hóa/, 'g7:dau'],
+  ['57-gv-g7-chua-co-bai-dien-thoai', 'gv-nhip&the=goi-7&g7=trong', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'cho:Chưa có bài mới trong 7 ngày'],
+  ['57-gv-g7-loi-may-tinh', 'gv-nhip&the=goi-7&g7=loi', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'cho:Không nối được máy chủ'],
+  ['57-gv-g7-thieu-nguon-may-tinh-toi', 'gv-nhip&the=goi-7&g7=thieu-nguon', 1440, 900, 'dark', false, /Hành trình giỏi Hóa/, 'cho:Bộ bài chưa đủ nguồn'],
+  // ═════════ hết LÀN BÀI MỚI 7 NGÀY 12/10
   ['14-gv-chien-dich-da-giao', 'gv-nhip&the=chien-dich', 1440, 960, 'light', false, /Chiến dịch đã giao/],
   ['14-gv-chien-dich-da-giao-dien-thoai-toi', 'gv-nhip&the=chien-dich', 390, 844, 'dark', true, /Chiến dịch đã giao/],
   ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
@@ -247,6 +279,47 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
       await t.locator('.gvv2-bhn-ngay-nut', { hasText: viec.slice(8) }).first().click({ timeout: 20000 })
       await t.waitForTimeout(300)
+    } else if (viec?.startsWith('g7:')) {
+      // LÀN BÀI MỚI 7 NGÀY 12/10 — chờ hàng ô số rồi làm đúng một việc; cuộn trang (không cuộn khung) tới khối cần chụp.
+      const v = viec.slice(3)
+      const cuonToi = (chon) => t.evaluate((c) => { const el = document.querySelector(c); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - (innerWidth < 900 ? 72 : 16)) }, chon)
+      await t.getByText('Câu cần chữa').first().waitFor({ timeout: 20000 })
+      if (v === 'ds') await cuonToi('.g7-tab')
+      if (v === 'ho-tro') { await t.locator('.g7-nut-mo').first().click(); await cuonToi('.g7-hang') }
+      if (v === 'loc') {
+        await t.getByRole('radio', { name: /^Nhiều học sinh sai/ }).click()
+        await t.getByRole('radio', { name: 'Tỉ lệ sai cao trước' }).click()
+        await cuonToi('.g7-loc')
+      }
+      if (v === 'tien-do') { await t.getByRole('tab', { name: /Tiến độ học sinh/ }).click(); await cuonToi('.g7-tab') }
+      if (v === 'soan') {
+        await t.getByRole('button', { name: 'Mở câu và chữa', exact: true }).first().click()
+        await t.getByRole('dialog').getByText('Giải thích để học sinh học lại').waitFor({ timeout: 20000 })
+      }
+      await t.waitForTimeout(400)
+    } else if (viec?.startsWith('ttc:') || viec?.startsWith('ttc-chieu:')) {
+      // LÀN THẦY TỰ CHỮA 12/10: mở thẻ Thầy tự chữa → chọn bài → (chiếu → phím trên tờ).
+      const [loai, khoaBai, phim] = viec.split(':')
+      const the = t.getByRole('region', { name: 'Thầy tự chữa' })
+      await the.getByRole('button', { name: 'Chọn đề' }).click({ timeout: 20000 })
+      await the.getByRole('combobox', { name: 'Lớp' }).selectOption('lop:12A1', { timeout: 20000 })
+      await the.getByRole('combobox', { name: /Bài trong Dạy học/ }).selectOption(khoaBai)
+      await the.getByText(/lớp sai/).first().waitFor({ timeout: 20000 })
+      if (loai === 'ttc') {
+        await t.waitForTimeout(300)
+      } else {
+        await the.getByRole('button', { name: 'Chiếu lên máy chiếu' }).click()
+        const khung = t.frameLocator('.lop-xem-phieu iframe')
+        await khung.locator('body.mc-noi').waitFor({ timeout: 20000 })
+        await t.waitForTimeout(600)
+        // phím gõ thẳng vào tài liệu của tờ (tờ nghe keydown trên document — như máy thầy bấm khi tờ đang có focus)
+        for (const k of phim ?? '') {
+          const key = k === '→' ? 'ArrowRight' : k
+          await khung.locator('body').evaluate((b, key) => b.ownerDocument.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })), key)
+          await t.waitForTimeout(500)
+        }
+        if ((phim ?? '').includes('x')) await khung.locator('.mc-aisai.mc-mo .mc-sai-em').first().waitFor({ timeout: 20000 })
+      }
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {

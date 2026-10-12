@@ -7,9 +7,12 @@
 // HAI NÚT ĐẠT / CHƯA ĐẠT trên tờ: truyền `maPhien` ⇒ tờ dựng kèm `cauNoi` (đúng cầu nối `to-chieu-cau-noi.ts` của Gọi lên bảng);
 // chỉ ô CÓ em (không phải "Cả lớp") và câu tra được chuyên đề mới có nút — thiếu chuyên đề thì máy chủ không ghi được.
 // Trả kèm `o` (khoá `sbd|qid` ⇒ ô) để nơi nghe tin tra lại ô theo khoá, không tin nội dung tin đến.
+// THẦY TỰ CHỮA (12/10, Cần thầy chữa › Thầy tự chữa — `ThayTuChua.tsx`): CHỈ THÊM ba tuỳ chọn của `dungToChieu` (giữ tự luận khi thầy tự chọn đề · dải thống kê
+// lớp phím T theo mã câu · nút X "Ai sai" cho tờ cả lớp qua mốc khoá ẩn). Vắng ba tuỳ chọn ⇒ tờ y như trước.
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../../data/examContent'
 import type { CauLuyen } from '../../lib/bai-tap-pdf'
 import type { OBang } from '../../lib/html-may-chieu'
+import type { ThongKeLopCau } from '../../lib/thong-ke-lop-cau'
 import { qidMayChuCuaIdCau } from '../../lib/lich-su-cau-len-bang'
 import { phanTichKhoiCau } from '../../lib/khoi-cau'
 import { laCauTuLuan } from '../../lib/cau-tu-luan'
@@ -191,6 +194,32 @@ export async function hoiNoiDungChoToChieu(
 /** Tuỳ chọn dựng tờ. `khoiDich` = khối của lớp / chiến dịch: dòng có mã khác khối bị bỏ (phòng thủ thêm); rỗng / vắng ⇒ không chặn. */
 export interface TuyChonToChieu {
   khoiDich?: readonly number[]
+  /** THẦY TỰ CHỮA (12/10) — thầy TỰ CHỌN đề trong Dạy học: câu tự luận có trong đề vẫn hiện (luật CLAUDE.md "riêng Gọi lên bảng thầy chọn gì hiện
+   *  đúng thế", như bảng Dạy học). Vắng ⇒ bỏ tự luận như cũ (tờ chữa của chiến dịch không bao giờ có tự luận — thầy 06/10). */
+  giuTuLuan?: boolean
+  /** Dải thống kê lớp (phím T) của từng câu, theo mã câu máy chủ. Trả null / vắng ⇒ câu ấy không vẽ dải (luật cũ: không số thì không bịa). */
+  thongKe?: (qid: string, cau: CauLuyen) => ThongKeLopCau | null | undefined
+  /** Tờ CẢ LỚP (không gọi em — Thầy tự chữa 12/10): dòng không có em vẫn tra được "Ai sai" (nút X) — mỗi đợt mang MỐC KHOÁ ẨN `|<mã câu>`
+   *  (`chenMocAiSaiCaLop`), ô ấy vào `o` để app nghe tin. Không thêm nút Đạt / Chưa đạt / Thầy chữa (không có em để ghi). Cần `maPhien`. */
+  aiSaiCaLop?: boolean
+}
+
+/** Lớp của mốc khoá ẩn (Thầy tự chữa 12/10). Cùng lớp + thuộc tính với nút "Thầy chữa" (`.mc-thay-chua[data-khoa-tc]`) — đúng chỗ nút X của tờ đọc khoá
+ *  câu đang chiếu — nhưng ở trạng thái `xong`, KHÔNG có nút bên trong và ẩn hẳn: phím C không hiện, cầu nối không đổi gì ở mốc này. */
+export const LOP_MOC_CA_LOP = 'mc-moc-ca-lop'
+const thoatTt = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+/** Chèn mốc khoá ẩn vào từng đợt (thứ tự đợt = thứ tự ô). `khoaTheoDot[i]` null ⇒ đợt ấy không có mốc. Số vùng `.mc-giai-vung` không khớp số đợt
+ *  (tờ đổi khuôn) ⇒ trả NGUYÊN tờ: nút X khi ấy chỉ báo "không tra được", không gắn nhầm câu. */
+export function chenMocAiSaiCaLop(html: string, khoaTheoDot: readonly (string | null)[]): string {
+  const MO = '<div class="mc-giai-vung">'
+  const manh = html.split(MO)
+  if (manh.length - 1 !== khoaTheoDot.length || !khoaTheoDot.some(Boolean)) return html
+  return manh.reduce((ra, m, i) => {
+    if (i === 0) return m
+    const k = khoaTheoDot[i - 1]
+    return ra + MO + (k ? `<span class="mc-thay-chua ${LOP_MOC_CA_LOP}" data-khoa-tc="${thoatTt(k)}" data-trang="xong" hidden style="display:none"></span>` : '') + m
+  }, '')
 }
 
 /** Dựng HTML tờ máy chiếu. Trả số câu KHÁC NHAU không có nội dung đúng mã (`soThieu`) và số câu bị bỏ vì khác khối lớp (`soBoKhoi`) để nơi gọi báo thầy trước.
@@ -213,6 +242,8 @@ export async function dungToChieu(
   const boKhoi = new Set<string>()
   const boTuLuan = new Set<string>()
   const oGhi = new Map<string, OGhiToChieu>()
+  /** Mốc khoá ẩn của từng đợt (Thầy tự chữa) — cùng thứ tự với `dsO` (mỗi ô một đợt). */
+  const khoaTheoDot: (string | null)[] = []
   const khoiDich = tuyChon.khoiDich ?? []
   const dsGiu = ds.filter((o) => {
     if (!cauKhacKhoiLop(o.qid, khoiDich)) return true
@@ -245,7 +276,8 @@ export async function dungToChieu(
     }
 
     // THẦY 06/10: "câu tự luận tuyệt đối loại bỏ" — tờ chiếu chữa KHÔNG BAO GIỜ có câu tự luận. Câu Phần III không tra được nội dung thì không biết có phải tự luận không ⇒ cũng bỏ (đếm vào `thieu`).
-    if (cl && laCauTuLuan({ phan: cl.phan, text: cl.text, dapAn: cl.dapAn, ...(cl.phan === 'I' ? { choices: cl.luaChon ?? [] } : cl.phan === 'II' ? { ideas: cl.luaChon ?? [] } : {}) }, cl.phan)) { boTuLuan.add(o.qid); return [] }
+    // Riêng Thầy tự chữa (12/10, `giuTuLuan`): thầy tự chọn đề ⇒ giữ câu tự luận như bảng Dạy học.
+    if (cl && !tuyChon.giuTuLuan && laCauTuLuan({ phan: cl.phan, text: cl.text, dapAn: cl.dapAn, ...(cl.phan === 'I' ? { choices: cl.luaChon ?? [] } : cl.phan === 'II' ? { ideas: cl.luaChon ?? [] } : {}) }, cl.phan)) { boTuLuan.add(o.qid); return [] }
     if (!cl && o.phan === 'III') { thieu.add(o.qid); return [] }
     const cau: CauLuyen = cl ?? {
       id: o.qid,
@@ -265,10 +297,16 @@ export async function dungToChieu(
     }
     const coNut = !!maPhien && !!o.sbd && !!goc && !!cau.chuyenDe
     if (coNut) oGhi.set(khoaToChieu(o.sbd, o.qid), { sbd: o.sbd, hoTen: o.ten, qid: o.qid, chuyenDe: cau.chuyenDe })
+    // Tờ CẢ LỚP (Thầy tự chữa 12/10): dòng không em, có nội dung đúng mã ⇒ mốc khoá ẩn cho nút X "Ai sai" (không nút ghi nào).
+    const mocCaLop = !!tuyChon.aiSaiCaLop && !!maPhien && !o.sbd && !!goc
+    if (mocCaLop) oGhi.set(khoaToChieu('', o.qid), { sbd: '', hoTen: o.ten, qid: o.qid, chuyenDe: cau.chuyenDe })
+    khoaTheoDot.push(mocCaLop ? khoaToChieu('', o.qid) : null)
+    const tk = tuyChon.thongKe?.(o.qid, cau)
     return [{
       sbd: o.sbd,
       hoTen: o.ten,
       ...(coNut ? { qid: o.qid } : {}),
+      ...(tk ? { thongKe: tk } : {}),
       bacUoc: (goc ? uocLuongBacCauGoc(goc.phan, goc.q) : uocLuongBacCau(cau)).bac,
       soCau: o.stt,
       sao: cau.sao,
@@ -277,11 +315,12 @@ export async function dungToChieu(
       viSao: o.viSao,
     }]
   })
-  const html = taoHtmlMayChieu(dsO, {
+  const html0 = taoHtmlMayChieu(dsO, {
     tenBuoi,
     ngay: new Date(),
     nganSachPhut: CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT,
     ...(maPhien && oGhi.size > 0 ? { cauNoi: { maPhien } } : {}),
   })
+  const html = tuyChon.aiSaiCaLop ? chenMocAiSaiCaLop(html0, khoaTheoDot) : html0
   return { html, soThieu: thieu.size, soBoKhoi: boKhoi.size, o: oGhi }
 }

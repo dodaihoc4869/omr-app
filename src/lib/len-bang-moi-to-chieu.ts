@@ -382,6 +382,16 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function u() { return Math.min(window.innerWidth, window.innerHeight * 16 / 9) / 100; }
   function tao(tag, cls, cha) { var e = document.createElement(tag); if (cls) e.className = cls; if (cha) cha.appendChild(e); return e; }
   function thoat(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // Tên nơi làm HIỆN trên tờ (cả lớp nhìn thấy) — thầy 12/10: bỏ tên trò chơi Đảo/Đoàn/Bi-a, dùng đúng bộ tên của app học sinh
+  // (src/lib/nhan-nguon-lan.ts). Máy chủ vẫn gửi nhãn cũ; màu theo nhóm (MAU_NOI) vẫn tính trên nhãn gốc.
+  var TEN_NOI = [['Bát Linh Đảo', 'Học theo kế hoạch'], ['Đoàn Hộ Tống', 'Ôn theo kế hoạch'], ['Bi-a Phản Ứng', 'Luyện tập trước đây'], ['Đảo', 'Học theo kế hoạch'], ['Đoàn', 'Ôn theo kế hoạch'], ['Bi-a', 'Luyện tập trước đây']];
+  function tenNguon(s) {
+    var t = String(s == null ? '' : s);
+    if (t === 'Ca') return 'Ca kiểm tra';
+    if (t === 'Đầu giờ') return 'Kiểm tra đầu giờ';
+    for (var i = 0; i < TEN_NOI.length; i++) if (t === TEN_NOI[i][0] || t.indexOf(TEN_NOI[i][0] + ' ') === 0) return TEN_NOI[i][1] + t.slice(TEN_NOI[i][0].length);
+    return t;
+  }
   var bao = tao('div', 'mc-bao', body), hBao = 0;
   function baoNhanh(chu, ms) { bao.textContent = chu; bao.classList.toggle('mc-hien', !!chu); clearTimeout(hBao); if (ms !== 0) hBao = setTimeout(function () { bao.classList.remove('mc-hien'); }, ms || 1400); }
 
@@ -738,7 +748,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       else {
         var cuoi = c.lan[c.lan.length - 1], gc = gioVn(cuoi.luc);
         h += '<div class="mc-tong"><div class="mc-ct-lan">' + c.soLan + ' <small>lần làm</small></div><div class="mc-ds"><span class="mc-kq mc-dat">Đúng ' + c.soDung + '</span><span class="mc-kq mc-kd">Sai ' + c.soSai + '</span></div><div class="mc-gan">Gần nhất: <b>' + (cuoi.dung ? 'đúng' : 'sai') + '</b> lúc ' + gc.gio + ' ' + gc.ngay + '</div></div><div class="mc-dtg">' +
-          c.lan.map(function (x) { var g = gioVn(x.luc); return '<div class="mc-lanlam ' + (x.dung ? 'mc-dung' : 'mc-sai') + '"><div class="mc-gio">' + g.ngay + ' · ' + g.gio + '</div><div><span class="mc-kq2">' + (x.dung ? 'Đúng' : 'Sai') + '</span> · chọn <b>' + thoat(x.chon || '—') + '</b></div><div class="mc-ph">' + (x.coGoiY ? 'Có gợi ý' : 'Không gợi ý') + (x.giay != null ? ' · ' + x.giay + ' giây' : '') + '</div><span class="mc-ng">' + thoat(x.nguon) + '</span></div>'; }).join('') + '</div>';
+          c.lan.map(function (x) { var g = gioVn(x.luc); return '<div class="mc-lanlam ' + (x.dung ? 'mc-dung' : 'mc-sai') + '"><div class="mc-gio">' + g.ngay + ' · ' + g.gio + '</div><div><span class="mc-kq2">' + (x.dung ? 'Đúng' : 'Sai') + '</span> · chọn <b>' + thoat(x.chon || '—') + '</b></div><div class="mc-ph">' + (x.coGoiY ? 'Có gợi ý' : 'Không gợi ý') + (x.giay != null ? ' · ' + x.giay + ' giây' : '') + '</div><span class="mc-ng">' + thoat(tenNguon(x.nguon)) + '</span></div>'; }).join('') + '</div>';
       }
       h += '</section><div class="mc-ct-luoi">';
       var cd = hs.chienDich, NHIP = { vuot: ['Vượt nhịp', 'đã làm hơn mức cần'], dung: ['Đúng nhịp', 'làm đủ mức cần mỗi ngày'], tre12: ['Trễ 1–2 ngày', 'nên nhắc em làm bù'], tre3: ['Trễ từ 3 ngày', 'cần nhắc em ngay'] };
@@ -754,7 +764,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       } else h += '<section class="mc-the-ct"><h4>Đúng / sai 14 ngày</h4>' + RONG + '</section>';
       var CHU = { L1: 'Yếu', L2: 'Trung bình', L3: 'Khá', L4: 'Giỏi' };
       h += '<section class="mc-the-ct"><h4>Sức học theo dạng (30 ngày)</h4>' + (hs.dang && hs.dang.length ? '<div class="mc-nhiet">' + hs.dang.map(function (x) { var p = Math.round(x.tiLe * 100); return '<div class="mc-d"><span>' + thoat(x.ten) + '</span><span class="mc-th"><i class="mc-' + x.hang + '" style="width:' + p + '%"></i><span class="mc-moc" style="left:40%"></span><span class="mc-moc" style="left:65%"></span><span class="mc-moc" style="left:85%"></span></span><b>' + p + '%</b><span class="mc-hang mc-' + x.hang + '">' + x.hang + ' ' + CHU[x.hang] + '</span></div>'; }).join('') + '</div><div class="mc-chu-giai"><span><i class="mc-L1"></i>&lt;40%</span><span><i class="mc-L2"></i>40–65%</span><span><i class="mc-L3"></i>65–85%</span><span><i class="mc-L4"></i>&gt;85%</span></div>' : RONG) + '</section>';
-      h += '<section class="mc-the-ct"><h4>5 câu sai gần nhất</h4>' + (hs.saiGanNhat && hs.saiGanNhat.length ? '<div class="mc-ds-dong">' + hs.saiGanNhat.map(function (x) { return '<div class="mc-r"><b>' + thoat(tenCau(x.qid)) + '</b><span>' + thoat(x.dang || x.nguon) + '</span><span>' + gioVn(x.luc).ngan + '</span></div>'; }).join('') + '</div>' : RONG) + '</section>';
+      h += '<section class="mc-the-ct"><h4>5 câu sai gần nhất</h4>' + (hs.saiGanNhat && hs.saiGanNhat.length ? '<div class="mc-ds-dong">' + hs.saiGanNhat.map(function (x) { return '<div class="mc-r"><b>' + thoat(tenCau(x.qid)) + '</b><span>' + thoat(x.dang || tenNguon(x.nguon)) + '</span><span>' + gioVn(x.luc).ngan + '</span></div>'; }).join('') + '</div>' : RONG) + '</section>';
       h += '<section class="mc-the-ct"><h4>Lịch sử lên bảng</h4>' + (hs.lenBang && hs.lenBang.length ? '<div class="mc-ds-dong">' + hs.lenBang.map(function (x) { return '<div class="mc-r"><b>' + gioVn(x.luc).ngan + '</b><span>' + thoat(tenCau(x.qid)) + '</span><span class="mc-kq ' + (x.dat ? 'mc-dat' : 'mc-kd') + '">' + (x.dat ? 'Đạt' : 'Chưa đạt') + '</span></div>'; }).join('') + '</div>' : '<div class="mc-rong">Lần đầu lên bảng.</div>') + '</section>';
       var ca = hs.caGanNhat;
       h += '<section class="mc-the-ct"><h4>Ca kiểm tra gần nhất</h4>' + (ca ? '<div class="mc-diem">' + String(ca.diem).replace('.', ',') + '<small> /10</small></div><div><b>' + thoat(ca.tenCa) + '</b><br><span class="mc-rong">nộp ' + gioVn(ca.luc).ngan + (typeof ca.diemTruoc === 'number' ? ' · lần trước ' + String(ca.diemTruoc).replace('.', ',') : '') + '</span></div>' : RONG) + '</section></div>';
@@ -816,10 +826,10 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       + '<div class="mc-sai-o" style="--mc-sai-c:rgb(230,103,103)"><b>' + thuTu.length + '</b><span>em làm sai</span></div>'
       + '<div class="mc-sai-o" style="--mc-sai-c:rgb(255,210,122)"><b>' + ds.length + '</b><span>lượt làm sai' + (conNua ? ' (300 lượt gần nhất)' : '') + '</span></div>'
       + '<div class="mc-sai-o" style="--mc-sai-c:rgb(57,135,229)"><b>' + (tb == null ? '—' : (coUoc ? '≈ ' : '') + saiThoiLuong(tb)) + '</b><span>trung bình mỗi lượt</span></div>'
-      + '<div class="mc-sai-o" style="--mc-sai-c:' + mauNoi(noiXep[0]) + '"><b>' + thoat(noiXep[0] || '—') + '</b><span>sai nhiều nhất (' + (theoNoi[noiXep[0]] || 0) + ' lượt)</span></div>'
+      + '<div class="mc-sai-o" style="--mc-sai-c:' + mauNoi(noiXep[0]) + '"><b>' + thoat(tenNguon(noiXep[0]) || '—') + '</b><span>sai nhiều nhất (' + (theoNoi[noiXep[0]] || 0) + ' lượt)</span></div>'
       + '</div><div class="mc-sai-hai"><section class="mc-sai-the" aria-label="Lượt sai theo nơi làm"><h3>Lượt sai theo nơi làm</h3>';
     noiXep.forEach(function (g) {
-      h += '<div class="mc-sai-thanh" title="' + thoat(g) + ': ' + theoNoi[g] + ' lượt"><span>' + thoat(g) + '</span><i style="--mc-sai-c:' + mauNoi(g) + '" data-w="' + Math.max(4, Math.round(theoNoi[g] / maxNoi * 100)) + '"></i><em>' + theoNoi[g] + '</em></div>';
+      h += '<div class="mc-sai-thanh" title="' + thoat(tenNguon(g)) + ': ' + theoNoi[g] + ' lượt"><span>' + thoat(tenNguon(g)) + '</span><i style="--mc-sai-c:' + mauNoi(g) + '" data-w="' + Math.max(4, Math.round(theoNoi[g] / maxNoi * 100)) + '"></i><em>' + theoNoi[g] + '</em></div>';
     });
     h += '</section><section class="mc-sai-the" aria-label="Lượt sai theo ngày"><h3>Lượt sai theo ngày</h3>';
     var ngay = Object.keys(theoNgay).sort().slice(-10), maxNg = 1;
@@ -838,11 +848,11 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       var tbEm = nEm ? ' · trung bình ' + (uocEm ? '≈ ' : '') + saiThoiLuong(Math.round(tgEm / nEm)) : '';
       h += '<article class="mc-sai-em"><span class="mc-sai-anh" aria-hidden="true">' + thoat(chuCai(e.ten)) + '</span><span class="mc-sai-ten">' + thoat(e.ten) + '<small>' + e.ds.length + ' lần sai' + thoat(tbEm) + '</small></span><span class="mc-sai-chip">';
       e.ds.forEach(function (x) {
-        h += '<span style="--mc-sai-c:' + mauNoi(x.noi) + '">' + thoat(saiGio(x.luc)) + ' · ' + thoat(x.noi || '') + (x.giay != null && isFinite(x.giay) ? ' · <u>' + (x.uocTinh ? '≈ ' : '') + thoat(saiThoiLuong(x.giay)) + '</u>' : ' · chưa đo giờ') + '</span>';
+        h += '<span style="--mc-sai-c:' + mauNoi(x.noi) + '">' + thoat(saiGio(x.luc)) + ' · ' + thoat(tenNguon(x.noi || '')) + (x.giay != null && isFinite(x.giay) ? ' · <u>' + (x.uocTinh ? '≈ ' : '') + thoat(saiThoiLuong(x.giay)) + '</u>' : ' · chưa đo giờ') + '</span>';
       });
       h += '</span></article>';
     });
-    h += '</div></section>' + (coUoc ? '<p class="mc-sai-chu">≈ : lượt game cũ chưa đo giờ — thời gian ước tính từ lúc trả lời câu trước tới câu này.</p>' : '');
+    h += '</div></section>' + (coUoc ? '<p class="mc-sai-chu">≈ : lượt cũ chưa đo giờ — thời gian ước tính từ lúc trả lời câu trước tới câu này.</p>' : '');
     sai.insertAdjacentHTML('beforeend', h);
     // Thanh / cột mọc lên sau một nhịp (tắt khi giảm chuyển động — CSS lo).
     requestAnimationFrame(function () {
