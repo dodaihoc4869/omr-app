@@ -14,6 +14,7 @@
 //   · Sổ một em (lọc `sbd`, tối đa `TOI_DA_LUOT_HO_SO` = 10 000 lượt gần nhất), bỏ sự kiện còn giấu. "Lượt làm" = như kế hoạch đếm (`SQL_LA_LAN_LAM`: bỏ đọc lời giải, lướt,
 //     chẩn đoán, gỡ bước); dòng "đọc lời giải" chỉ dùng cho tín hiệu (d).
 //   · Số giây (không bịa, như `/gv/lich-su-lam-cau`): cột `giay` ⇒ `raw_json.ms` ⇒ ca thi `chi_tiet_cau.giay` ⇒ game ước tính từ mốc trả lời ⇒ null.
+//   · 12/10F: lõi `hoSoThaiDoCuaEm` dùng chung cho lệnh EM `/hs/ho-so-thai-do` (ho-so-em-hs.ts — SBD từ token, khoảng mặc định, thêm bỏ lượt ca chưa công bố).
 import type { Env } from './kieu'
 import type {
   CauTomTat, CheDoNgay, DemThaiDo, EmBaiHangNgay, KetLuanThaiDo, LopBaiHangNgay, NgayBaiEm, NgayHoatDong, NguonMuc, NhomGiay,
@@ -29,7 +30,7 @@ import { tachSongSinh } from './loi-hoc-luat'
 import { tenLopCuaEm } from './ten-lop'
 import { SBD_THU } from './gv-bang-tin'
 import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
-import { chonTuGiaTri, chuanMucDo, tieuDeCau } from './lich-su-lam-cau'
+import { chonTuGiaTri, chuanMucDo, sqlLuotCaDaCongBo, tieuDeCau, type NguoiDocSo } from './lich-su-lam-cau'
 import { docCauKho, tenCuaDang } from './omni-d1'
 import { chuoiDuGanNhat, laLuoiTheoTiLe, tomTatNhip } from './nhip-hoc-luat'
 
@@ -575,6 +576,13 @@ export async function gvHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promis
   const sbd = str(b.sbd)
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
   if (sbd.length > 40) return { ok: false, error: 'Số báo danh quá dài' }
+  return hoSoThaiDoCuaEm(env, sbd, b, nowMs, 'thay')
+}
+
+/** LÕI hồ sơ thái độ của MỘT em (12/10F: tách để lệnh EM `/hs/ho-so-thai-do` — ho-so-em-hs.ts — dùng CÙNG phép tính, không bản thứ hai).
+ *  `sbd` đã kiểm ở nơi gọi (thầy ⇒ thân lệnh; em ⇒ token). `nguoiDoc` 'hoc-sinh' (xem `NguoiDocSo`, lich-su-lam-cau.ts): sổ THÊM bỏ lượt ca kiểm tra
+ *  chưa công bố / đã xoá, không lùi câu lệnh không lọc; `canhBao` chỉ giữ dòng "sổ bị cắt" (các dòng khác là ghi chú nội bộ cho thầy). */
+export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: number, nguoiDoc: NguoiDocSo): Promise<TraLoiHoSoThaiDo> {
   const kh = khoangNgay(b, nowMs)
   if ('error' in kh) return { ok: false, error: kh.error }
   const { tu, den, homNay, canhBao } = kh
@@ -599,13 +607,15 @@ export async function gvHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promis
   // 2 · lịch kế hoạch (cùng phép tính với bảng Bài hằng ngày) + sổ một em (song song)
   const COT = 'qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, muc_do'
   const SAU = `ORDER BY ngay_vn DESC, luc DESC LIMIT ${TOI_DA_LUOT_HO_SO + 1}`
+  const locEm = nguoiDoc === 'hoc-sinh' ? ` AND ${sqlLuotCaDaCongBo('su_kien_hoc')}` : ''
   let keHoach: NgayBaiEm[]
   let rSo: Row[] | null
   try {
     ;[keHoach, rSo] = await Promise.all([
       docNgayCacEm(env, [{ ...em, goi7Tu: goi7?.get(sbd) ?? null }], tu, den, homNay, canhBao).then((m) => m.get(sbd) ?? []),
       hoi(env, `SELECT ${COT}, purpose, assistance, attempt_id, CASE WHEN json_valid(raw_json) THEN raw_json END AS raw_json FROM su_kien_hoc
-          WHERE sbd = ? AND COALESCE(visibility, '') <> 'embargoed' ${SAU}`, sbd).then((r) => r ?? hoi(env, `SELECT ${COT} FROM su_kien_hoc WHERE sbd = ? ${SAU}`, sbd)),
+          WHERE sbd = ? AND COALESCE(visibility, '') <> 'embargoed'${locEm} ${SAU}`, sbd)
+        .then((r) => r ?? (nguoiDoc === 'thay' ? hoi(env, `SELECT ${COT} FROM su_kien_hoc WHERE sbd = ? ${SAU}`, sbd) : null)),
     ])
   } catch (e) {
     return { ok: false, error: e instanceof LoiDocSo ? e.message : 'Không đọc được sổ học của em.' }
@@ -733,10 +743,14 @@ export async function gvHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promis
   const cauDung = tomTat.filter((c) => c.soDung > 0).sort(moiTruoc).slice(0, TOI_DA_CAU_DANH_SACH)
   const cauDaOn = tomTat.filter((c) => c.soLanOn > 0).sort((a, c) => Number(a.lanCuoiDung) - Number(c.lanCuoiDung) || moiTruoc(a, c)).slice(0, TOI_DA_CAU_DANH_SACH)
   const soLuotChu = String(TOI_DA_LUOT_HO_SO).replace(/\B(?=(\d{3})+(?!\d))/g, '.') // "10.000" — không phụ thuộc Intl của Worker
-  if (catTrongKhoang) canhBao.push(`Riêng từ ${ngayNganBhn(tu)} đến ${ngayNganBhn(den)} em đã có hơn ${soLuotChu} lượt — các số của khoảng này chỉ tính ${soLuotChu} lượt gần nhất.`)
-  else if (catBot) canhBao.push(`Sổ của em vượt ${soLuotChu} lượt — danh sách câu tính trên ${soLuotChu} lượt gần nhất.`)
+  const chuCat = catTrongKhoang
+    ? `Riêng từ ${ngayNganBhn(tu)} đến ${ngayNganBhn(den)} em đã có hơn ${soLuotChu} lượt — các số của khoảng này chỉ tính ${soLuotChu} lượt gần nhất.`
+    : catBot ? `Sổ của em vượt ${soLuotChu} lượt — danh sách câu tính trên ${soLuotChu} lượt gần nhất.` : ''
+  if (chuCat) canhBao.push(chuCat)
   return {
-    ok: true, em, tu, den, homNay, ketLuan, tinHieu, dem, ngay, phanBoGiay: phanBoGiay(luot), cauDung, cauDaOn, catBot, canhBao,
+    ok: true, em, tu, den, homNay, ketLuan, tinHieu, dem, ngay, phanBoGiay: phanBoGiay(luot), cauDung, cauDaOn, catBot,
+    // Bản học sinh: bỏ ghi chú nội bộ của thầy (Gói 7 chưa đọc được, khoảng ngày bị nắn, sổ Hành trình…), chỉ giữ dòng "sổ bị cắt" nói với em.
+    canhBao: nguoiDoc === 'hoc-sinh' ? (chuCat ? [chuCat] : []) : canhBao,
     nhomNhip: nhip.nhom, coDoiPho: ketLuan.nhan === 'doi-pho', chuoiDuGanNhat: nhip.chuoiDuGanNhat,
   }
 }

@@ -12,6 +12,8 @@
 //     tra kho `game_v2_question` (`docCauKho`, đệm 10 phút) hoặc mã dạng của sổ (`tenCuaDang`). Không tra được tên dạng ⇒ chuỗi rỗng (app ghi theo mã câu).
 //   · CÂU TỪNG SAI gom theo CÂU GỐC (song sinh / biến thể `~ss|~bt|~yd`, lượt lặp `#n`, câu thay thế `raw_json.tc` ⇒ câu gốc — như mọi nơi
 //     đọc sổ quy về câu gốc): "đúng lại" ở bản khác cũng là em đã sửa được.
+// 12/10F: lõi `lichSuLamCauCuaEm` dùng chung cho lệnh EM `/hs/lich-su-lam-cau` (ho-so-em-hs.ts: SBD từ token, thêm bỏ lượt ca chưa công bố, lọc bản
+// học sinh ở ho-so-em-hs-loc.ts) — một phép tính, không bản thứ hai.
 // Truy vấn: sổ (1) + em (2) + kho (1/800 câu, đệm) + tên dạng thiếu (≤ 1) + loại game (1) + lượt game (1) + ước tính (1 lô 2) + chi tiết ca (1). Khối phụ
 // nào lỗi thì để trống phần ấy (chon/giây/tiêu đề = null/rỗng), không làm hỏng cả lệnh.
 import type { Env } from './kieu'
@@ -21,6 +23,7 @@ import { loaiGameCua } from './dau-gio'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docCauKho, tenCuaDang } from './omni-d1'
 import { tenLopCuaEm } from './ten-lop'
+import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
 
 type Row = Record<string, unknown>
@@ -105,11 +108,26 @@ interface Dong {
   tenCa: string
 }
 
+/** AI ĐỌC SỔ (12/10F — học sinh xem hồ sơ của chính mình): 'thay' = lệnh thầy, như trước; 'hoc-sinh' = lệnh em (`/hs/lich-su-lam-cau`,
+ *  `/hs/ho-so-thai-do`) — THÊM bỏ lượt của ca kiểm tra chưa công bố / đã xoá (`sqlLuotCaDaCongBo`) và KHÔNG lùi về câu lệnh không lọc khi D1 thiếu cột
+ *  (lùi thì lộ lượt còn giấu) ⇒ báo lỗi. Ngoài hai điểm ấy là CÙNG một phép tính ⇒ em và thầy thấy cùng số (khi không có ca chưa công bố). */
+export type NguoiDocSo = 'thay' | 'hoc-sinh'
+
+/** Điều kiện SQL "lượt này em được xem kết quả": không phải lượt ca kiểm tra, hoặc ca còn (không `da_xoa`) và ĐÃ công bố — ĐÚNG luật `SQL_DA_CONG_BO`
+ *  (như `SQL_LUOT_GOI7`, `/ph/con-tong-quan`). `bang` = tên / bí danh bảng `su_kien_hoc` trong câu lệnh. Ca không có dòng trong `ca` ⇒ KHÔNG công bố. */
+export const sqlLuotCaDaCongBo = (bang: string): string =>
+  `(${bang}.nguon <> 'thi' OR EXISTS (SELECT 1 FROM ca cb WHERE cb.ma_ca = ${bang}.ma_nguon AND COALESCE(cb.trang_thai, '') <> 'da_xoa' AND ${SQL_DA_CONG_BO('cb')}))`
+
 export async function gvLichSuLamCau(env: Env, b: Row): Promise<TraLoiLichSuLamCau> {
   const sbd = str(b.sbd)
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
   if (sbd.length > 40) return { ok: false, error: 'Số báo danh quá dài' }
-  const gx = Math.floor(Number(b.gioiHan))
+  return lichSuLamCauCuaEm(env, sbd, b.gioiHan, 'thay')
+}
+
+/** LÕI lịch sử làm câu của MỘT em (`sbd` đã kiểm ở nơi gọi: thầy ⇒ thân lệnh; em ⇒ token). Xem đầu tệp; `nguoiDoc` xem `NguoiDocSo`. */
+export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unknown, nguoiDoc: NguoiDocSo): Promise<TraLoiLichSuLamCau> {
+  const gx = Math.floor(Number(gioiHanThan))
   const gioiHan = Number.isFinite(gx) && gx > 0 ? Math.min(TRAN_GIOI_HAN_LAN, gx) : GIOI_HAN_LAN_MAC_DINH
 
   // 1 · em: họ tên từ `danh_sach` (lùi `hoc_sinh`), lớp = tên lớp hiệu lực (`hoc_sinh.ten_lop`, chưa gán ⇒ mặc định theo khối).
@@ -130,10 +148,11 @@ export async function gvLichSuLamCau(env: Env, b: Row): Promise<TraLoiLichSuLamC
   const COT = 's.qid, s.nguon, s.ma_nguon, s.lan, s.ket_qua, s.giay, s.luc, s.ngay_vn, s.ma_dang, s.muc_do, c.ten_ca AS ten_ca'
   const TU = "FROM su_kien_hoc s LEFT JOIN ca c ON s.nguon = 'thi' AND c.ma_ca = s.ma_nguon WHERE s.sbd = ?"
   const SAU = `ORDER BY s.ngay_vn DESC, s.luc DESC LIMIT ${TOI_DA_LUOT_DOC_LICH_SU + 1}`
+  const locEm = nguoiDoc === 'hoc-sinh' ? ` AND ${sqlLuotCaDaCongBo('s')}` : ''
   const rSo =
     (await hoi(env, `SELECT ${COT}, s.attempt_id, s.assistance, CASE WHEN json_valid(s.raw_json) THEN s.raw_json END AS raw_json ${TU}
-        AND COALESCE(s.purpose, '') <> 'xem_loi_giai' AND COALESCE(s.visibility, '') <> 'embargoed' ${SAU}`, sbd)) ??
-    (await hoi(env, `SELECT ${COT} ${TU} ${SAU}`, sbd))
+        AND COALESCE(s.purpose, '') <> 'xem_loi_giai' AND COALESCE(s.visibility, '') <> 'embargoed'${locEm} ${SAU}`, sbd)) ??
+    (nguoiDoc === 'thay' ? await hoi(env, `SELECT ${COT} ${TU} ${SAU}`, sbd) : null)
   if (!rSo) return { ok: false, error: 'Không đọc được sổ học của em' }
   const catBot = rSo.length > TOI_DA_LUOT_DOC_LICH_SU
   const dong: Dong[] = rSo.slice(0, TOI_DA_LUOT_DOC_LICH_SU).map((x) => {

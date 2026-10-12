@@ -14,13 +14,18 @@
 //   · Tấm bên phải trên máy tính (rộng ≤ 760 px, nền che), TOÀN MÀN trên điện thoại. Esc / Đóng / bấm nền che ⇒ đóng; Tab giữ trong tấm; đóng xong
 //     focus về đúng nút đã bấm (thẻ mở tấm lo). Lệnh hồ sơ thái độ lỗi / máy chủ cũ chưa có ⇒ một dòng nói thật + Thử lại, phần lịch sử vẫn đủ.
 //   · "Mở hồ sơ đầy đủ" ⇒ màn Học sinh mở hồ sơ em (ca kiểm tra, EXP, thần thú, phụ huynh…) — `moHoSoEm`.
+//   · 12/10F (thầy: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé"): CÙNG tấm này mở trong app học sinh
+//     (`src/components/hoc-tap/HoSoCuaEmHs.tsx`) — prop `nguon` (hai lệnh học sinh `/hs/ho-so-thai-do` · `/hs/lich-su-lam-cau`) + `cheDo='hoc-sinh'`:
+//     đủ mọi phần số liệu như thầy thấy; tiêu đề "Hồ sơ làm bài của em · từ 01/10" + dòng "Thầy cũng xem hồ sơ này."; ẩn mọi đường của thầy
+//     ("Mở hồ sơ đầy đủ", kho thiếu câu, kiến thức cần bổ sung). Vắng hai prop ⇒ hành vi thầy NGUYÊN như cũ.
 // Mảnh riêng nạp LƯỜI (ngoài precache, vite.config.ts). Biểu đồ bằng CSS, không thư viện. Màu chỉ biến --gvm-* (bai-hang-ngay.css).
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Check, ExternalLink, RotateCcw, TriangleAlert, X } from 'lucide-react'
 import { gioPhutVN, ngayThuChu, ngayVN } from '../../lib/em-toan-canh'
 import { lyDoDeHieu } from '../../lib/loi-de-hieu'
 import { layLichSuLamCau, TRAN_GIOI_HAN, type CauEmSai, type KetQuaLichSuLamCau, type LanLamCau, type NguonGiay } from '../../lib/lich-su-lam-cau-api'
-import { layHoSoThaiDo, NGUONG_THAI_DO, type CauTomTat, type KetQuaHoSoThaiDo, type NgayHoatDong } from '../../lib/bai-hang-ngay-api'
+import { layHoSoThaiDo, NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO, type CauTomTat, type KetQuaHoSoThaiDo, type NgayHoatDong } from '../../lib/bai-hang-ngay-api'
+import type { KetQuaLenh } from '../../lib/goi-lenh-thay'
 import { useAppStore } from '../../store/appStore'
 import { chuCaiTen, chuHomNay, coMucNhip, nhomNhipCuaEm, TEN_NHOM_NHIP, tenKhoi, tenTang, type DongNhip, type LoaiNhomNhip } from './nhip-hanh-trinh'
 import { chuO, MO_TA_NHAN, MO_TA_NHOM, mucO, NHAN_THEO_NHOM, ngayNgan, TEN_MUC_TIN_HIEU, thuNgan } from './bai-hang-ngay-ui'
@@ -33,6 +38,21 @@ export type EmHoSo = Pick<DongNhip, 'sbd' | 'ten' | 'khoi'> & Partial<Omit<DongN
 
 /** Số lần hiện mỗi đợt ở "Toàn bộ lịch sử" (danh sách dài — chuẩn B16). */
 export const MOI_DOT = 100
+
+/** Nguồn dữ liệu của tấm (12/10F). Vắng ⇒ hai lệnh thầy theo `em.sbd`. App học sinh truyền hai lệnh `/hs/...` (token của em). Nơi truyền giữ
+ *  MỘT đối tượng cho mỗi em (useMemo) — đổi đối tượng là tấm nạp lại. */
+export interface NguonHoSo {
+  hoSoThaiDo(): Promise<KetQuaLenh<KetQuaHoSoThaiDo>>
+  lichSu(gioiHan?: number): Promise<KetQuaLenh<KetQuaLichSuLamCau>>
+}
+/** Ai đang xem: 'thay' (mặc định — app thầy) · 'hoc-sinh' (em xem hồ sơ của chính mình trong app học sinh). */
+export type CheDoHoSo = 'thay' | 'hoc-sinh'
+
+/** Chữ khác nhau theo người xem (chỗ còn lại dùng chung: "Em …" đúng ngôi với cả thầy đọc lẫn em đọc). */
+const CHU_CHE_DO: Record<CheDoHoSo, { matDau: string; dangTai: string; loi: string; nutTai: string }> = {
+  thay: { matDau: 'Thái độ làm bài', dangTai: 'Đang tải hồ sơ thái độ làm bài', loi: 'Chưa tải được hồ sơ thái độ làm bài của em.', nutTai: 'Tải lại hồ sơ thái độ' },
+  'hoc-sinh': { matDau: 'Nhịp học của em', dangTai: 'Đang tải nhịp học của em', loi: 'Chưa tải được nhịp học của em.', nutTai: 'Tải lại nhịp học' },
+}
 
 // ------------------------------------------------------------------ PHÉP THUẦN (test gọi thẳng)
 
@@ -240,9 +260,9 @@ export const chuKhoang = (tu: string, den: string): string => (tu === den ? ngay
 /** Khoảng xem trong câu: "từ 01/10 đến 12/10" (một ngày ⇒ "ngày 12/10"). */
 export const chuTuDen = (tu: string, den: string): string => (tu === den ? `ngày ${ngayNgan(tu)}` : `từ ${ngayNgan(tu)} đến ${ngayNgan(den)}`)
 
-function XuongThaiDo() {
+function XuongThaiDo({ chu }: { chu: string }) {
   return (
-    <div className="gvv2-tdo-xuong" role="status" aria-label="Đang tải hồ sơ thái độ làm bài">
+    <div className="gvv2-tdo-xuong" role="status" aria-label={chu}>
       <span className="gvv2-cc-xuong-khoi tt-xuong" style={{ width: '100%', height: 132, borderRadius: 20 }} />
       <span className="gvv2-cc-xuong-khoi tt-xuong" style={{ width: '100%', height: 84, borderRadius: 16 }} />
     </div>
@@ -251,13 +271,15 @@ function XuongThaiDo() {
 
 /** Đầu tấm. 12/10: máy chủ có `nhomNhip` ⇒ NHÓM Nhịp học (Chăm / Chưa đều / Lười / Chưa đủ dữ liệu — cùng luật Hôm nay) là nhãn chính, cờ
  *  "Có dấu hiệu đối phó" là chip riêng, nhóm Lười kèm "đủ mức liền x/6 ngày để thoát". Máy chủ cũ (thiếu trường) ⇒ nhãn thái độ cũ. Lý do bằng số giữ nguyên. */
-function DauThaiDo({ td }: { td: KetQuaHoSoThaiDo }) {
+function DauThaiDo({ td, matDau }: { td: KetQuaHoSoThaiDo; matDau: string }) {
   const k = td.ketLuan
   const nhom = td.nhomNhip
   const canThoat = LUAT_NHOM_NHIP.ngayLienThoatLuoi
   return (
     <section className="gvv2-tdo-dau" data-nhan={nhom ? NHAN_THEO_NHOM[nhom] : k.nhan} aria-labelledby="gvv2-tdo-nhan">
-      <small className="gvv2-tdo-mat gvv2-so">Thái độ làm bài · {chuKhoang(td.tu, td.den)}</small>
+      <small className="gvv2-tdo-mat gvv2-so">
+        {matDau} · {chuKhoang(td.tu, td.den)}
+      </small>
       <div className="gvv2-tdo-nhan-hang">
         <h3 id="gvv2-tdo-nhan" className="gvv2-tdo-nhan">
           {nhom ? TEN_NHOM_NHIP_HOC[nhom] : k.chu}
@@ -455,7 +477,23 @@ function DsCauTomTat({ cau, loai }: { cau: readonly CauTomTat[]; loai: 'dung' | 
 
 type TheCon = 'cau-sai' | 'cau-dung' | 'da-on' | 'lich-su'
 
-export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: LoaiNhomNhip; onDong: () => void }) {
+export default function HoSoLamCauEm({
+  em,
+  nhom,
+  onDong,
+  nguon,
+  cheDo = 'thay',
+}: {
+  em: EmHoSo
+  nhom?: LoaiNhomNhip
+  onDong: () => void
+  /** 12/10F: nguồn dữ liệu riêng (app học sinh) — xem `NguonHoSo`. */
+  nguon?: NguonHoSo
+  /** 12/10F: 'hoc-sinh' ⇒ chữ của em, ẩn đường của thầy (xem đầu tệp). */
+  cheDo?: CheDoHoSo
+}) {
+  const laThay = cheDo === 'thay'
+  const chuCd = CHU_CHE_DO[cheDo]
   const [kq, setKq] = useState<KetQuaLichSuLamCau | null>(null)
   const [loi, setLoi] = useState('')
   const [dangTai, setDangTai] = useState(true)
@@ -475,7 +513,7 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
       setLoi('')
       let r: Awaited<ReturnType<typeof layLichSuLamCau>>
       try {
-        r = await layLichSuLamCau(em.sbd, gioiHan)
+        r = await (nguon ? nguon.lichSu(gioiHan) : layLichSuLamCau(em.sbd, gioiHan))
       } catch (e) {
         r = { ok: false, loai: 'mang', chu: lyDoDeHieu(e) }
       }
@@ -484,7 +522,7 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
       else setLoi(r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu))
       setDangTai(false)
     },
-    [em.sbd],
+    [em.sbd, nguon],
   )
   const lanTd = useRef(0)
   const taiTd = useCallback(async () => {
@@ -493,7 +531,7 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
     setLoiTd('')
     let r: Awaited<ReturnType<typeof layHoSoThaiDo>>
     try {
-      r = await layHoSoThaiDo(em.sbd)
+      r = await (nguon ? nguon.hoSoThaiDo() : layHoSoThaiDo(em.sbd))
     } catch (e) {
       r = { ok: false, loai: 'mang', chu: lyDoDeHieu(e) }
     }
@@ -501,7 +539,7 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
     if (r.ok) setTd(r.du)
     else setLoiTd(r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu))
     setDangTaiTd(false)
-  }, [em.sbd])
+  }, [em.sbd, nguon])
   useEffect(() => {
     void tai()
     void taiTd()
@@ -575,15 +613,28 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
           <span className="gvv2-avatar" aria-hidden="true">
             {chuCaiTen(ten)}
           </span>
-          <div className="gvv2-hs-dau-chu">
-            <small className="gvv2-hs-mat">Hồ sơ làm bài</small>
-            <h2 id="gvv2-hs-ten" className="gvv2-h2">
-              {ten}
-            </h2>
-            <p id="gvv2-hs-phu" className="gvv2-so">
-              SBD {em.sbd} · {lop}
-            </p>
-          </div>
+          {laThay ? (
+            <div className="gvv2-hs-dau-chu">
+              <small className="gvv2-hs-mat">Hồ sơ làm bài</small>
+              <h2 id="gvv2-hs-ten" className="gvv2-h2">
+                {ten}
+              </h2>
+              <p id="gvv2-hs-phu" className="gvv2-so">
+                SBD {em.sbd} · {lop}
+              </p>
+            </div>
+          ) : (
+            <div className="gvv2-hs-dau-chu">
+              <small className="gvv2-hs-mat">
+                {ten}
+                {tenLop ? ` · Lớp ${tenLop}` : ''}
+              </small>
+              <h2 id="gvv2-hs-ten" className="gvv2-h2 gvv2-so">
+                Hồ sơ làm bài của em · từ {ngayNgan(td?.tu ?? NGAY_BAT_DAU_BAI_HANG_NGAY)}
+              </h2>
+              <p id="gvv2-hs-phu">Thầy cũng xem hồ sơ này.</p>
+            </div>
+          )}
           <button ref={nutDong} type="button" className="gvv2-nut-chu tt-nhan gvv2-hs-dong" onClick={onDong}>
             <X size={18} aria-hidden="true" />
             Đóng
@@ -593,14 +644,16 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
         <div className="gvv2-hs-than">
           {/* 1 · Thái độ làm bài — điểm nhấn của tấm */}
           {td ? (
-            <DauThaiDo td={td} />
+            <DauThaiDo td={td} matDau={chuCd.matDau} />
           ) : dangTaiTd ? (
-            <XuongThaiDo />
+            <XuongThaiDo chu={chuCd.dangTai} />
           ) : (
             <div className="gvv2-tdo-loi" role="status">
-              <p>Chưa tải được hồ sơ thái độ làm bài của em. {loiTd}</p>
+              <p>
+                {chuCd.loi} {loiTd}
+              </p>
               <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void taiTd()} disabled={dangTaiTd}>
-                Tải lại hồ sơ thái độ
+                {chuCd.nutTai}
               </button>
             </div>
           )}
@@ -620,10 +673,10 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
                 {TEN_NHOM_NHIP[hn.nhom]}
               </span>
               {hn.nhom !== 'du' && hn.con > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Còn {hn.con} câu tới mức tối thiểu</small>}
-              {!!em.conThieu && em.conThieu > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Kho thiếu {em.conThieu} câu phù hợp cho em hôm nay</small>}
+              {laThay && !!em.conThieu && em.conThieu > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Kho thiếu {em.conThieu} câu phù hợp cho em hôm nay</small>}
             </div>
           )}
-          {!!em.canBoSung?.length && (
+          {laThay && !!em.canBoSung?.length && (
             <div className="gvv2-hs-bo-sung">
               <b>Kiến thức cần bổ sung</b>
               <ul>
@@ -744,7 +797,7 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
                     ) : td ? (
                       <DsCauTomTat key={the} cau={the === 'cau-dung' ? td.cauDung : td.cauDaOn} loai={the === 'cau-dung' ? 'dung' : 'on'} />
                     ) : (
-                      <p className="gvv2-trong">{dangTaiTd ? 'Đang tải danh sách…' : 'Chưa tải được danh sách này. Bấm "Tải lại hồ sơ thái độ" ở đầu tấm.'}</p>
+                      <p className="gvv2-trong">{dangTaiTd ? 'Đang tải danh sách…' : `Chưa tải được danh sách này. Bấm "${chuCd.nutTai}" ở đầu tấm.`}</p>
                     )}
                   </div>
                 </>
@@ -753,13 +806,15 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
           )}
         </div>
 
-        <footer className="gvv2-hs-chan">
-          <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => moHoSoEm(em.sbd)}>
-            <ExternalLink size={18} aria-hidden="true" />
-            Mở hồ sơ đầy đủ
-          </button>
-          <small>Ca kiểm tra, EXP, phụ huynh của em</small>
-        </footer>
+        {laThay && (
+          <footer className="gvv2-hs-chan">
+            <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => moHoSoEm(em.sbd)}>
+              <ExternalLink size={18} aria-hidden="true" />
+              Mở hồ sơ đầy đủ
+            </button>
+            <small>Ca kiểm tra, EXP, phụ huynh của em</small>
+          </footer>
+        )}
       </section>
     </>
   )
