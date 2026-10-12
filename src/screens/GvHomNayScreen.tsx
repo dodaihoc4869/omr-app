@@ -1,25 +1,23 @@
-// HÔM NAY CỦA THẦY — màn đầu app thầy khi Game Hóa 2.0 bật (BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 · GV-HomNay.dc.html, BoGop: "Tổng quan: 2 nút chính
-// + nút Mở ca → Hôm nay: danh sách việc, mỗi việc 1 nút"). Trả lời MỘT câu: "Lớp tôi cần gì hôm nay?". Mã màn vẫn là `tongquan` (TongQuanScreen giữ mã).
-// TRUNG TU 09/10 (thầy duyệt bản vẽ GV-HomNay, "build luôn"):
-//   · đầu màn: tiêu đề 32 + dòng phụ; MỘT nút chính gọn ở góc phải = việc gấp nhất (có ca đang mở ⇒ "Theo dõi ca đang mở", không thì
-//     "Bổ sung bài hôm nay").
-//   · lưới 2fr / 1fr. Trái "Việc cần thầy · xếp theo độ gấp" (thứ tự DOM = thứ tự mắt = thứ tự Tab — bỏ column-reverse): ca đang mở → Theo dõi
-//     ca · Cần thầy chữa → Hành trình › Cần thầy chữa · em hỏi bài chờ chữa → Học sinh hỏi · lớp chờ bài mới (OMNI) → Hành trình › Dạy học ·
-//     em chưa làm câu nào → Hành trình › Nhịp học (một khối có em chưa làm ⇒ chọn sẵn khối đó) · phần chưa đọc được → Thử lại · không có chỗ
-//     cần chữa ⇒ một dòng ✓. MỖI việc MỘT nút viền.
-//   · phải: thẻ "Đủ mức tối thiểu hôm nay a/b em" + mỗi khối một dòng (thanh + a/b), bấm mở Hành trình › Nhịp học chọn sẵn khối đó;
-//     12/10 thêm nút chữ "Xem bài hằng ngày từ 01/10" ⇒ Hành trình › Bài hằng ngày (lịch sử từng ngày, em thiếu nhiều ngày nhất đứng đầu; mốc thầy
-//     chỉnh cùng ngày từ 12/10 về 1/10 — chữ phải khớp `NGAY_BAT_DAU_BAI_HANG_NGAY`, test giữ; không import hằng để màn này khỏi kéo mảnh nạp lười).
-//   (Thầy 09/10 tối bỏ thẻ Nhịp hôm nay ⇒ hai lối trên tạm mở màn Học sinh; 09/10 khuya thầy: "hành trình để lại chỗ nhịp học, học sinh chưa làm
-//   và chưa hoàn thành đủ ưu tiên hiện lên đầu" ⇒ hai lối trên mở thẻ Nhịp học — em chưa làm / chưa đủ mức đứng đầu, bấm em xem lịch sử làm câu.)
-//   · BỎ bốn ô số lặp lại danh sách việc (C4: một thông tin một chỗ). Chờ tải: khung xương đúng hình (`.tt-xuong`). Lỗi: câu dễ hiểu
-//     (`lyDoDeHieu`), không in lỗi kỹ thuật thô.
-//   Số "Đủ mức" / "chưa làm" cộng từ bảng hôm nay của các Hành trình — `danh-sach` lọc `hanhTrinh` rồi `bang` → `hanhTrinhNgay.em`, cùng phép
-//   đếm `chiSoNhip` của màn Hành trình. "Cần thầy chữa" = ba nhóm thẻ Cần thầy chữa của Bảng chiến dịch (`nhomCanThayChua`).
-// SỐ CHỈ TỪ API SẴN CÓ, không đổi máy chủ, không số giả: lệnh nào lỗi thì phần của nó KHÔNG vẽ, và một dòng nói thật phần nào chưa đọc được.
+// HÔM NAY CỦA THẦY — màn đầu app thầy khi Game Hóa 2.0 bật. Trả lời MỘT câu: "Lớp tôi cần gì hôm nay, em nào chăm, em nào lười?". Mã màn vẫn là
+// `tongquan` (TongQuanScreen giữ mã).
+// LỊCH SỬ: bản vẽ tối giản thầy chốt 09/10 (GV-HomNay: việc cần thầy xếp theo độ gấp, mỗi việc một nút + thẻ "Đủ mức tối thiểu hôm nay").
+// BẢN VẼ THẦY DUYỆT 12/10 (dot10-canvas Main.dc.html + HomNay-DienThoai.dc.html; thầy: "Mục hôm nay hiển thị rõ cho tôi vô cùng đẹp Nhịp học, phải
+// làm rất đẹp, tôi nhìn vào thấy ngay học sinh nào chăm học sinh nào lười" · "duyệt bản vẽ, buid và đẩy luôn nhé"):
+//   · đầu màn: tiêu đề + "Thứ Hai 12/10/2026 · N em đang học · cập nhật HH:MM"; MỘT nút chính góc phải = việc gấp nhất (ca đang mở ⇒ "Theo dõi ca
+//     đang mở", không thì "Bổ sung bài hôm nay").
+//   · "Việc cần thầy": GIỮ ĐỦ chức năng cũ (ca đang mở → Theo dõi ca · Cần thầy chữa → Hành trình › Chữa bài · Học sinh hỏi → màn câu hỏi · lớp
+//     chờ bài mới → Hành trình › Dạy học · phần chưa đọc được → Thử lại · không có chỗ cần chữa ⇒ thẻ ✓ không nút), trình bày thành HÀNG THẺ gọn
+//     (máy tính: thẻ có biểu tượng + chữ + chữ hành động viền; điện thoại: danh sách dòng có mũi tên). BỎ việc "N em chưa làm câu nào hôm nay" (Nhịp
+//     học đã nói). Nút "Cần thầy chữa" mở Hành trình › mục Chữa bài: thẻ mới do làn Hành trình đặt mã `chua-bai`; tạm gọi đúng cách mở thẻ Cần thầy
+//     chữa đang có (`{ the: 'can-chua' }`) — làn Hành trình ánh xạ khoá cũ `can-chua` sang `chua-bai`.
+//   · "Nhịp học" (từ 01/10) thay thẻ "Đủ mức tối thiểu hôm nay" và nút "Xem bài hằng ngày từ 01/10" (hai thẻ Nhịp học / Bài hằng ngày đã rời Hành
+//     trình): `src/components/hom-nay-thay/NhipHocThay.tsx`, MỘT lệnh CHỈ ĐỌC `/gv/nhip-hoc` (src/lib/nhip-hoc-thay.ts), tải SONG SONG với phần việc —
+//     phần nào lỗi thì phần ấy nói thật + Thử lại, phần kia vẫn hiện.
+//   · Chờ tải: khung xương đúng hình (`.tt-xuong`). Lỗi: câu dễ hiểu (`lyDoDeHieu`), không in lỗi kỹ thuật thô.
+// SỐ CHỈ TỪ API, không số giả: lệnh nào lỗi thì phần của nó KHÔNG vẽ. "Cần thầy chữa" = cùng nguồn và cùng cách gộp với danh sách Cần thầy chữa.
 // Ghi số cho thanh bên (`useSoDemGv`: ca đang mở, Cần thầy chữa). Phép tính thuần xuất ra để test (tests/gv-hom-nay-0910.test.tsx).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, Check, ChevronRight, Clock, MessageCircleQuestion, MonitorCheck, Presentation, RefreshCw, type LucideIcon } from 'lucide-react'
+import { BookOpen, Check, ChevronRight, CircleHelp, MonitorCheck, PenLine, RefreshCw, type LucideIcon } from 'lucide-react'
 import { danhSachCa, danhSachCauHoi, type CaTomTat } from '../lib/exam-api'
 import { gomTheoCa } from '../lib/hoi-bai'
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
@@ -30,32 +28,20 @@ import { useSoDemGv, type MoHanhTrinh } from '../lib/so-dem-gv'
 import { taiGioiHan } from '../lib/tai-gioi-han'
 import { layLopThay } from '../lib/ten-lop-thay'
 import { chuChoBaiMoi } from '../lib/bai-hom-nay'
+import { layNhipHoc } from '../lib/nhip-hoc-thay'
 import { danhSach, docBang, type BangChienDich, type CauCanDayLai, type ChienDichTom } from '../components/chien-dich/api'
 import { baiDaDayDanhSach, docBangOmniCua, docCoOmni } from '../components/chien-dich/api-omni'
 import { nhomCanThayChua } from '../components/chien-dich/omni-bang'
-import { chiSoNhip, khoiCuaHanhTrinh, type ChiSoNhip } from '../components/chien-dich/nhip-hanh-trinh'
 import { hienNgay, ngayVn } from '../components/chien-dich/ngay'
+import NhipHocThay, { type DuNhip } from '../components/hom-nay-thay/NhipHocThay'
 import type { CanThayChua } from '../../server/src/omni-kieu'
 import { caConEmDangLam } from './LichSuCaScreen'
 import './gv-hoa2.css'
 import '../components/chien-dich/gv-v2.css'
 import './gv-hom-nay.css'
+import '../components/hom-nay-thay/hom-nay-thay.css'
 
 // ------------------------------------------------------------------ PHÉP TÍNH THUẦN
-
-/** Nhịp hôm nay của một Hành trình (một khối). `cs` null = chưa đọc được bảng hôm nay ⇒ không vẽ hàng. */
-export interface NhipKhoi {
-  cd: ChienDichTom
-  khoi: string | null
-  cs: ChiSoNhip | null
-}
-
-/** Cộng nhịp các khối đã đọc được bảng. Không khối nào đọc được ⇒ null (không vẽ ô số). */
-export function tongNhip(ds: readonly NhipKhoi[]): { duMuc: number; coMuc: number; chuaLam: number; tong: number } | null {
-  const co = ds.filter((d) => d.cs)
-  if (co.length === 0) return null
-  return co.reduce((s, d) => ({ duMuc: s.duMuc + d.cs!.duMuc, coMuc: s.coMuc + d.cs!.coMuc, chuaLam: s.chuaLam + d.cs!.chuaLam, tong: s.tong + d.cs!.tong }), { duMuc: 0, coMuc: 0, chuaLam: 0, tong: 0 })
-}
 
 export interface DemCanThayChua {
   catTia: number
@@ -103,7 +89,6 @@ export interface DuLieuHomNay {
   /** null = chưa đọc được danh sách chiến dịch (lý do ở `loiCd`). */
   cd: ChienDichTom[] | null
   loiCd: string
-  nhip: NhipKhoi[]
   /** null = chưa biết (danh sách lỗi / mọi bảng lỗi). */
   canThayChua: DemCanThayChua | null
   /** Lớp chờ bài mới (OMNI): chỉ lớp đã chờ từ `NGAY_NHAC_CHO_BAI_MOI` ngày. */
@@ -222,13 +207,7 @@ export async function taiHomNay(): Promise<DuLieuHomNay> {
     canThayChua.tong = dong.length
   }
 
-  const nhip: NhipKhoi[] = chay
-    .map((c, i) => ({ c, b: bang[i] }))
-    .filter((x) => x.c.hanhTrinh)
-    .map(({ c, b }) => ({ cd: c, khoi: khoiCuaHanhTrinh(c), cs: b?.hanhTrinhNgay ? chiSoNhip(b.hanhTrinhNgay.em) : null }))
-    .sort((a, b) => String(a.khoi).localeCompare(String(b.khoi)))
-
-  return { ca, loiCa, cd, loiCd, nhip, canThayChua, choBaiMoi, hoi, loiHoi }
+  return { ca, loiCa, cd, loiCd, canThayChua, choBaiMoi, hoi, loiHoi }
 }
 
 // ------------------------------------------------------------------ MÀN
@@ -238,42 +217,38 @@ interface Viec {
   key: string
   mau: Mau
   icon: LucideIcon
+  /** Dòng đậm trên máy tính ("Cần thầy chữa · 8 chỗ"). */
   tieuDe: string
+  /** Điện thoại: tên việc đậm + số ngắn ("Cần thầy chữa" · "8 chỗ"). */
+  ten: string
+  soNgan?: string
   phu: string
-  /** Không có nút (dòng báo "không có chỗ cần chữa") ⇒ để trống. */
+  /** Không có nút (thẻ báo "không có chỗ cần chữa") ⇒ để trống. */
   nut?: string
   lam?: () => void
-  /** Dòng báo lệnh chưa đọc được — trình đọc màn hình đọc ngay. */
+  /** Thẻ báo lệnh chưa đọc được — trình đọc màn hình đọc ngay. */
   loi?: boolean
 }
 
-const tiLe = (a: number, b: number) => (b > 0 ? Math.round((100 * Math.min(a, b)) / b) : 0)
+/** "10:15" giờ Việt Nam. */
+const gioPhut = (ms: number): string => {
+  const d = new Date(ms + 7 * 3_600_000)
+  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`
+}
 
-/** Khung xương đúng hình màn Hôm nay (thẻ việc 3 dòng + thẻ đủ mức 3 khối) — thay chữ "Đang tải…". */
-function XuongHomNay() {
+/** Khung xương đúng hình hàng thẻ việc. */
+function XuongViec() {
   return (
-    <div className="gvhn-luoi" role="status" aria-label="Đang tải việc hôm nay">
-      <div className="gvv2-the gvhn-viec gvhn-xuong">
-        <span className="gv-xuong-khoi tt-xuong" style={{ width: 260, height: 18 }} />
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="gvhn-xuong-dong">
-            <span className="gv-xuong-khoi tt-xuong" style={{ width: 44, height: 44, borderRadius: 14 }} />
-            <span className="gvhn-xuong-chu">
-              <span className="gv-xuong-khoi tt-xuong" style={{ width: '70%', height: 14 }} />
-              <span className="gv-xuong-khoi tt-xuong" style={{ width: '45%', height: 12 }} />
-            </span>
-            <span className="gv-xuong-khoi tt-xuong" style={{ width: 112, height: 44, borderRadius: 12 }} />
+    <div className="gvhn-the-ds" role="status" aria-label="Đang tải việc hôm nay">
+      {[0, 1, 2].map((i) => (
+        <span key={i} className="gvhn-the-viec gvhn-xuong-the">
+          <span className="gv-xuong-khoi tt-xuong" style={{ width: 44, height: 44, borderRadius: 12 }} />
+          <span className="gvhn-xuong-chu">
+            <span className="gv-xuong-khoi tt-xuong" style={{ width: '70%', height: 14 }} />
+            <span className="gv-xuong-khoi tt-xuong" style={{ width: '45%', height: 12 }} />
           </span>
-        ))}
-      </div>
-      <div className="gvv2-the gvhn-du gvhn-xuong">
-        <span className="gv-xuong-khoi tt-xuong" style={{ width: 160, height: 14 }} />
-        <span className="gv-xuong-khoi tt-xuong" style={{ width: 140, height: 44 }} />
-        <span className="gv-xuong-khoi tt-xuong" style={{ width: '100%', height: 8 }} />
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="gv-xuong-khoi tt-xuong" style={{ width: '100%', height: 20 }} />
-        ))}
-      </div>
+        </span>
+      ))}
     </div>
   )
 }
@@ -285,6 +260,9 @@ export default function GvHomNayScreen() {
   const datMoHanhTrinh = useSoDemGv((s) => s.datMoHanhTrinh)
   const [du, setDu] = useState<DuLieuHomNay | null>(null)
   const [dangTai, setDangTai] = useState(false)
+  const [nhip, setNhip] = useState<DuNhip | null>(null)
+  const [dangTaiNhip, setDangTaiNhip] = useState(false)
+  const [capNhat, setCapNhat] = useState<number | null>(null)
 
   const lanTai = useRef(0)
   const tai = useCallback(async () => {
@@ -295,17 +273,34 @@ export default function GvHomNayScreen() {
     setDu(kq)
     setDangTai(false)
   }, [])
+  // Nhịp học: MỘT lệnh, song song với phần việc; lỗi chỉ ảnh hưởng khối Nhịp học (Thử lại riêng).
+  const lanNhip = useRef(0)
+  const taiNhip = useCallback(async () => {
+    const lan = ++lanNhip.current
+    setDangTaiNhip(true)
+    let kq: DuNhip
+    try {
+      const r = await layNhipHoc()
+      kq = r.ok ? { ok: true, kq: r.du } : { ok: false, chu: r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu) }
+    } catch (e) {
+      kq = { ok: false, chu: lyDoDeHieu(e) }
+    }
+    if (lan !== lanNhip.current) return
+    setNhip(kq)
+    if (kq.ok) setCapNhat(gioMayChu())
+    setDangTaiNhip(false)
+  }, [])
   useEffect(() => {
     void tai()
+    void taiNhip()
     return () => {
       lanTai.current++
+      lanNhip.current++
     }
-  }, [tai])
+  }, [tai, taiNhip])
 
   const now = gioMayChu()
   const caMo = useMemo(() => (du?.ca ?? []).filter((c) => c.loai !== 'baitap' && caConEmDangLam(c, now)), [du, now])
-  const tong = useMemo(() => (du ? tongNhip(du.nhip) : null), [du])
-  const khoiCo = useMemo(() => (du?.nhip ?? []).filter((n) => n.cs), [du])
 
   useEffect(() => {
     if (!du) return
@@ -316,38 +311,39 @@ export default function GvHomNayScreen() {
     datMoHanhTrinh(m)
     setScreen('chiendich')
   }
-  // Từng em hôm nay ở Hành trình › Nhịp học (em chưa làm / chưa đủ mức đứng đầu) — khối đọc được ⇒ chọn sẵn khối ấy, không ⇒ Tất cả.
-  const moNhip = (khoi: string | null | undefined) => {
-    const k = Number(khoi)
-    moHanhTrinh(k === 10 || k === 11 || k === 12 ? { the: 'nhip', khoi: k } : { the: 'nhip' })
-  }
 
-  // VIỆC CẦN THẦY — xếp theo độ gấp: ca đang mở (đang diễn ra) → Cần thầy chữa → em hỏi bài → lớp chờ bài mới → em chưa làm câu nào
-  // → phần chưa đọc được (Thử lại) → không có chỗ cần chữa (✓, không nút).
+  // VIỆC CẦN THẦY — xếp theo độ gấp: ca đang mở → Cần thầy chữa → em hỏi bài → lớp chờ bài mới → phần chưa đọc được (Thử lại)
+  // → không có chỗ cần chữa (✓, không nút). Việc "em chưa làm câu nào" đã bỏ: khối Nhịp học nói đủ và rõ hơn.
   const viec: Viec[] = []
   for (const c of caMo) {
+    const ten = c.tenCa || `Ca ${c.maCa}`
     viec.push({
       key: `ca-${c.maCa}`,
       mau: 'xd',
       icon: MonitorCheck,
-      tieuDe: `Ca đang mở: ${c.tenCa || `Ca ${c.maCa}`}${c.lop ? ` · ${c.lop}` : ''}`,
-      phu: `Đã vào ${c.daVao} em · đã nộp ${c.daNop} em`,
-      nut: 'Theo dõi ca',
+      tieuDe: 'Ca đang mở',
+      ten: 'Ca đang mở',
+      soNgan: `đã nộp ${c.daNop}/${c.daVao}`,
+      phu: `${ten}${c.lop && !ten.includes(c.lop) ? ` · ${c.lop}` : ''} · đã nộp ${c.daNop}/${c.daVao} em`,
+      nut: 'Theo dõi',
       lam: () => moChiTietCa(c.maCa),
     })
   }
   if (du?.canThayChua && du.canThayChua.tong > 0) {
-    viec.push({ key: 'can-chua', mau: 'hp', icon: Presentation, tieuDe: `Cần thầy chữa: ${du.canThayChua.tong} chỗ`, phu: chuCanThayChua(du.canThayChua), nut: 'Xếp buổi chữa', lam: () => moHanhTrinh({ the: 'can-chua' }) })
+    const n = du.canThayChua.tong
+    viec.push({ key: 'can-chua', mau: 'hp', icon: PenLine, tieuDe: `Cần thầy chữa · ${n} chỗ`, ten: 'Cần thầy chữa', soNgan: `${n} chỗ`, phu: chuCanThayChua(du.canThayChua), nut: 'Chữa bài', lam: () => moHanhTrinh({ the: 'can-chua' }) })
   }
   if (du?.hoi && du.hoi.chuaChua > 0) {
     const h = du.hoi
     viec.push({
       key: 'hoi',
       mau: 'tim',
-      icon: MessageCircleQuestion,
-      tieuDe: `Học sinh hỏi: ${h.chuaChua} lượt chờ thầy chữa`,
-      phu: h.soCa === 1 ? h.caMoi : `${h.soCa} ca · mới nhất: ${h.caMoi}`,
-      nut: 'Xem câu hỏi',
+      icon: CircleHelp,
+      tieuDe: `Học sinh hỏi · ${h.chuaChua} lượt`,
+      ten: 'Học sinh hỏi',
+      soNgan: `${h.chuaChua} lượt`,
+      phu: `chờ thầy chữa · ${h.soCa === 1 ? h.caMoi : `${h.soCa} ca, mới nhất: ${h.caMoi}`}`,
+      nut: 'Xem',
       lam: () => setScreen('cauhoi'),
     })
   }
@@ -358,25 +354,14 @@ export default function GvHomNayScreen() {
       mau: 'tim',
       icon: BookOpen,
       tieuDe: ds.length === 1 ? `${ds[0]!.lop}: ${ds[0]!.soNgay} ngày chưa có bài mới` : `${ds.length} lớp chưa có bài mới`,
+      ten: ds.length === 1 ? `${ds[0]!.lop}: chưa có bài mới` : 'Lớp chưa có bài mới',
+      soNgan: ds.length === 1 ? `${ds[0]!.soNgay} ngày` : `${ds.length} lớp`,
       phu: ds.length === 1 ? 'Hành trình đang ôn bài cũ · tick bài vừa dạy để mở câu mới' : `${ds.map((x) => `${x.lop}: ${x.soNgay} ngày`).join(' · ')} — tick bài vừa dạy để mở câu mới`,
       nut: 'Bổ sung bài',
       lam: () => moHanhTrinh({ the: 'day-hoc', boSungBai: true }),
     })
   }
-  if (tong && tong.chuaLam > 0) {
-    const coEm = khoiCo.filter((n) => n.cs!.chuaLam > 0)
-    viec.push({
-      key: 'chua-lam',
-      mau: 'ho',
-      icon: Clock,
-      tieuDe: `${tong.chuaLam} em chưa làm câu nào hôm nay`,
-      phu: coEm.map((n) => `Khối ${n.khoi ?? '—'}: ${n.cs!.chuaLam} em`).join(' · '),
-      nut: 'Xem danh sách',
-      // Một khối có em chưa làm ⇒ chọn sẵn khối ấy; nhiều khối ⇒ Tất cả (không giấu khối nào). Nhóm "Chưa làm câu nào" đứng đầu thẻ.
-      lam: () => moNhip(coEm.length === 1 ? coEm[0]!.khoi : null),
-    })
-  }
-  // Phần chưa đọc được: MỘT dòng, nói thật phần nào + lý do dễ hiểu + Thử lại (không in lỗi kỹ thuật thô).
+  // Phần chưa đọc được: MỘT thẻ, nói thật phần nào + lý do dễ hiểu + Thử lại (không in lỗi kỹ thuật thô).
   const hong = du
     ? ([
         du.loiCa && ['danh sách ca kiểm tra', du.loiCa],
@@ -386,12 +371,14 @@ export default function GvHomNayScreen() {
     : []
   if (hong.length > 0) {
     const lyDo = Array.from(new Set(hong.map(([, l]) => l))).join(' ')
-    const conLai = !!du && (!!tong || du.canThayChua !== null || du.ca !== null || du.hoi !== null)
+    const conLai = !!du && (du.canThayChua !== null || du.ca !== null || du.hoi !== null)
     viec.push({
       key: 'loi',
       mau: 'xam',
       icon: RefreshCw,
       tieuDe: `Chưa tải được ${hong.map(([ten]) => ten).join(' · ')}`,
+      ten: 'Chưa tải được',
+      soNgan: hong.map(([ten]) => ten).join(' · '),
       phu: `${lyDo}${conLai ? ' Số khác trên trang vẫn đúng.' : ''}`,
       nut: dangTai ? 'Đang tải lại…' : 'Thử lại',
       lam: () => void tai(),
@@ -399,25 +386,29 @@ export default function GvHomNayScreen() {
     })
   }
   if (du?.canThayChua && du.canThayChua.tong === 0) {
-    viec.push({ key: 'khong-chua', mau: 'xl', icon: Check, tieuDe: 'Không có chỗ cần thầy chữa hôm nay.', phu: '' })
+    viec.push({ key: 'khong-chua', mau: 'xl', icon: Check, tieuDe: 'Không có chỗ cần thầy chữa hôm nay.', ten: 'Không có chỗ cần thầy chữa hôm nay.', phu: '' })
   }
 
   // Nút chính góc phải = việc gấp nhất: có ca đang mở ⇒ theo dõi ca ấy; không thì bổ sung bài hôm nay.
   const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => moHanhTrinh({ the: 'day-hoc', boSungBai: true }) }
+  const soEm = nhip?.ok ? nhip.kq.em.length : null
 
   return (
-    <div className="gv2-trang gvhn">
+    <div className="gv2-trang gvhn gvhn-1210">
       <header className="gvhn-dau">
         <div className="gvhn-dau-chu">
           <h1 className="gvv2-h1">Hôm nay của thầy</h1>
-          <p className="gvv2-phu">
-            {hienNgay(ngayVn(now))}
-            {khoiCo.length > 0 && tong && (
+          {/* điện thoại (bản vẽ): "Thứ Hai 12/10 · 262 em · cập nhật 10:15" — bỏ năm và chữ "đang học" cho vừa một dòng */}
+          <p className="gvv2-phu gvv2-so">
+            <span className="nht-an-hep">{hienNgay(ngayVn(now))}</span>
+            <span className="nht-chi-hep">{hienNgay(ngayVn(now), false)}</span>
+            {soEm !== null && soEm > 0 && (
               <>
-                {' · '}
-                <span className="gvv2-so">{khoiCo.length}</span> khối · <span className="gvv2-so">{tong.tong}</span> em đang chạy Hành trình
+                {` · ${soEm} em`}
+                <span className="nht-an-hep"> đang học</span>
               </>
             )}
+            {capNhat !== null && ` · cập nhật ${gioPhut(capNhat)}`}
           </p>
         </div>
         <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
@@ -425,87 +416,52 @@ export default function GvHomNayScreen() {
         </button>
       </header>
 
-      {!du ? (
-        <XuongHomNay />
-      ) : (
-        <div className="gvhn-luoi">
-          <section className="gvv2-the gvhn-viec" aria-labelledby="gvhn-viec-tieu">
-            <h2 id="gvhn-viec-tieu" className="gvv2-h2">
-              Việc cần thầy · xếp theo độ gấp
-            </h2>
-            {viec.length === 0 ? (
-              <p className="gvv2-trong">Không có việc cần thầy lúc này. Màn tự đọc lại số mỗi lần thầy mở.</p>
-            ) : (
-              <ul className="gvhn-viec-ds">
-                {viec.map((v) => {
-                  const Icon = v.icon
-                  return (
-                    <li key={v.key} className="gvhn-viec-dong" role={v.loi ? 'alert' : undefined} data-viec={v.key}>
-                      <span className="gvhn-dau-o" data-mau={v.mau} aria-hidden="true">
-                        <Icon size={20} aria-hidden="true" />
-                      </span>
-                      <span className="gvhn-viec-chu">
-                        <b>{v.tieuDe}</b>
-                        {v.phu && <span>{v.phu}</span>}
-                      </span>
-                      {/* Một nút chính trên màn (luật C2) ở đầu màn; mỗi việc MỘT nút viền. */}
-                      {v.nut && v.lam && (
-                        <button type="button" className="gvv2-nut-vien tt-nhan" onClick={v.lam} disabled={v.loi && dangTai} aria-label={v.loi ? v.nut : `${v.nut}: ${v.tieuDe}`}>
-                          {v.nut}
-                        </button>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </section>
-
-          {tong && khoiCo.length > 0 && (
-            <aside className="gvv2-the gvhn-du" aria-labelledby="gvhn-du-tieu">
-              <span id="gvhn-du-tieu" className="gvhn-du-nhan">
-                Đủ mức tối thiểu hôm nay
-              </span>
-              <b className="gvhn-du-so gvv2-so">
-                {tong.duMuc}
-                <small>/{tong.coMuc} em</small>
-              </b>
-              <span className="gvv2-thanh gvhn-du-thanh" data-du="true" role="progressbar" aria-label="Em đủ mức tối thiểu hôm nay" aria-valuemin={0} aria-valuemax={100} aria-valuenow={tiLe(tong.duMuc, tong.coMuc)}>
-                <i className="tt-thanh" style={{ width: `${tiLe(tong.duMuc, tong.coMuc)}%` }} />
-              </span>
-              <div className="gvhn-khoi-ds">
-                {khoiCo.map((n) => {
-                  const ti = tiLe(n.cs!.duMuc, n.cs!.coMuc)
-                  return (
-                    <button
-                      key={n.cd.id}
-                      type="button"
-                      className="gvhn-khoi-dong tt-nhan"
-                      onClick={() => moNhip(n.khoi)}
-                      aria-label={`Khối ${n.khoi ?? '—'}: ${n.cs!.duMuc}/${n.cs!.coMuc} em đủ mức — xem từng em khối ${n.khoi ?? '—'} ở Hành trình › Nhịp học`}
-                    >
-                      <b>Khối {n.khoi ?? '—'}</b>
-                      <span className="gvv2-thanh" data-du="true" aria-hidden="true">
-                        <i className="tt-thanh" style={{ width: `${ti}%` }} />
-                      </span>
-                      <span className="gvv2-so gvhn-khoi-so">
-                        {n.cs!.duMuc}/{n.cs!.coMuc}
-                      </span>
-                      <ChevronRight size={16} aria-hidden="true" />
+      <section className="gvhn-viec-khoi" aria-label="Việc cần thầy">
+        {!du ? (
+          <XuongViec />
+        ) : viec.length === 0 ? (
+          <p className="gvv2-trong gvhn-viec-trong">Không có việc cần thầy lúc này. Màn tự đọc lại số mỗi lần thầy mở.</p>
+        ) : (
+          <ul className="gvhn-the-ds">
+            {viec.map((v) => {
+              const Icon = v.icon
+              const ruot = (
+                <>
+                  <span className="gvhn-dau-o" data-mau={v.mau} aria-hidden="true">
+                    <Icon size={20} aria-hidden="true" />
+                  </span>
+                  <span className="gvhn-the-chu">
+                    <b className="nht-an-hep">{v.tieuDe}</b>
+                    <span className="nht-chi-hep">
+                      <b>{v.ten}</b>
+                      {v.soNgan && <span className="gvv2-so"> · {v.soNgan}</span>}
+                    </span>
+                    {v.phu && <span className="gvhn-the-phu">{v.phu}</span>}
+                  </span>
+                </>
+              )
+              return (
+                <li key={v.key} className="gvhn-the-viec" role={v.loi ? 'alert' : undefined} data-viec={v.key}>
+                  {v.nut && v.lam ? (
+                    <button type="button" className="gvhn-the-nut tt-nhan" onClick={v.lam} disabled={v.loi && dangTai}>
+                      {ruot}
+                      {/* MỘT nút chính trên màn (luật C2) ở đầu màn; mỗi việc là MỘT nút (cả thẻ), chữ hành động viền như nút phụ. */}
+                      <span className="gvhn-the-hanh">{v.nut}</span>
+                      <ChevronRight className="gvhn-the-mui" size={18} aria-hidden="true" />
                     </button>
-                  )
-                })}
-              </div>
-              <span className="gvhn-du-ghi">Bấm một khối để xem từng em ở Hành trình › Nhịp học.</span>
-              {/* 12/10 thầy: "lịch sử học sinh làm bài tập hàng ngày" ⇒ lối vào thẻ Bài hằng ngày (nút chữ, không thêm nút chính); mốc "tính từ 1/10". */}
-              <button type="button" className="gvv2-nut-chu tt-nhan gvhn-bhn" onClick={() => moHanhTrinh({ the: 'bai-hang-ngay' })} aria-label="Xem bài hằng ngày từ 01/10 ở Hành trình › Bài hằng ngày">
-                Xem bài hằng ngày từ 01/10
-                <ChevronRight size={16} aria-hidden="true" />
-              </button>
-            </aside>
-          )}
-        </div>
-      )}
+                  ) : (
+                    <div className="gvhn-the-nut" data-tinh="true">
+                      {ruot}
+                    </div>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
+
+      <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} />
     </div>
   )
 }

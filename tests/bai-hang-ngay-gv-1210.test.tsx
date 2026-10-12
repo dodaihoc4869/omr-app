@@ -292,11 +292,14 @@ describe('mốc 01/10 — chữ ba app khớp một hằng', () => {
     expect(MOC_THEO_DOI).toBe(NGAY_BAT_DAU_BAI_HANG_NGAY)
     const moc = ngayNgan(NGAY_BAT_DAU_BAI_HANG_NGAY)
     expect(moc).toBe('01/10')
-    // Hôm nay của thầy: không import hằng (giữ mảnh nạp lười) ⇒ chữ viết tay phải khớp hằng
+    // SỬA CÓ CHỦ ĐÍCH 12/10 — thầy duyệt bản vẽ Hôm nay: nút "Xem bài hằng ngày từ 01/10" thay bằng khối Nhịp học (nút "Xem bảng từng ngày" mở bảng
+    // này ngay tại Hôm nay). Mốc trên khối đọc từ `tu` máy chủ trả (`/gv/nhip-hoc` dùng cùng hằng mốc) — không còn chữ ngày viết tay để lệch hằng.
     const homNay = readFileSync('src/screens/GvHomNayScreen.tsx', 'utf8')
-    expect(homNay).toContain(`Xem bài hằng ngày từ ${moc}`)
-    expect(homNay).toContain(`aria-label="Xem bài hằng ngày từ ${moc} ở Hành trình › Bài hằng ngày"`)
-    expect(homNay).not.toMatch(/bài hằng ngày từ 12\/10/)
+    const nhip = readFileSync('src/components/hom-nay-thay/NhipHocThay.tsx', 'utf8')
+    expect(homNay).not.toContain('aria-label="Xem bài hằng ngày từ')
+    expect(nhip).toContain('Từ {ngayNgan(kq.tu)}')
+    expect(nhip).toContain("{moBang ? 'Ẩn bảng từng ngày' : 'Xem bảng từng ngày'}")
+    expect(homNay + nhip).not.toMatch(/bài hằng ngày từ 12\/10/)
     expect(readFileSync('src/lib/ph-v3/con-tong-quan.ts', 'utf8')).toContain(`|| '${MOC_THEO_DOI}'`)
     // thẻ đang chờ máy chủ ⇒ câu chờ ghi đúng mốc
     m.goi.mockImplementation(() => new Promise(() => {}))
