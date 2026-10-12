@@ -70,6 +70,8 @@ import { boNap, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
+// Hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé") — nạp lười, ngoài precache.
+const HoSoCuaEmHs = lazy(() => import('../components/hoc-tap/HoSoCuaEmHs'))
 const ManTuChua = lazy(() => import('../components/hoc-tap/ManTuChua'))
 
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
@@ -274,6 +276,8 @@ export default function StudentPortalScreen() {
   const [tab, setTabThat] = useState<TabType | null>(null)
   const setTab = (t: TabType | null) => setTabThat(t === 'thanthu' || t === 'bia' ? 'hoctap' : t)
   const [qidChua, setQidChua] = useState<string | undefined>()
+  // Tấm Hồ sơ làm bài của em, mở từ thẻ "Hôm nay của em" (nút Xem hồ sơ làm bài của em).
+  const [moHoSoEm, setMoHoSoEm] = useState(false)
   // Lịch sử ca mở từ màn Câu đã làm (bản vẽ tối giản 09/10) ⇒ "Về" quay lại Câu đã làm; mở từ chỗ khác ⇒ về màn chính như cũ.
   const [veSauLichSuCa, setVeSauLichSuCa] = useState<TabType | null>(null)
   const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
@@ -968,8 +972,10 @@ export default function StudentPortalScreen() {
           onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam(); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
+          onMoHoSo={() => setMoHoSoEm(true)}
         /></div>
       )}
+      {moHoSoEm && auth.token && tab === null && !manThi && <Suspense fallback={null}><HoSoCuaEmHs token={auth.token} tenEm={auth.hoTen ?? ''} lop={auth.lop ?? undefined} onDong={() => setMoHoSoEm(false)} /></Suspense>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
       {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} onTuLuyen={() => setTab('tuluyen')} /></Suspense></div>}
 
