@@ -24,7 +24,10 @@
 .pc-bn-score span { display: block; font-size: 11px; color: var(--pc-muted); }
 .pc-bn-score strong { display: block; font-size: 22px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
 .pc-bn-scene { position: relative; height: 352px; border-radius: 16px; overflow: hidden; background: var(--pc-sky-bottom); }
-.pc-bn-scene canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+/* SỬA LỖI 12/10 (vuốt — Phòng chờ): `touch-action: none` nuốt MỌI cú vuốt trên bàn chơi (cao 352px) ⇒ máy ngang 844×390 / máy thấp bàn chơi phủ
+ * gần kín màn, em kẹt giữa phòng chờ (đo: cuộn 303/469 px rồi đứng, vuốt ngón cái +0). Game chỉ cần kéo NGANG để dời tàu (pointermove theo clientX)
+ * và chạm để bắn ⇒ `pan-y`: vuốt dọc cuộn phòng chờ, kéo ngang + chạm vẫn thuộc game. */
+.pc-bn-scene canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
 .pc-bn-scene canvas:active { cursor: grabbing; }
 .pc-bn-combo { position: absolute; left: 10px; top: 10px; font-size: 13px; font-weight: 700; padding: 5px 12px; border-radius: 30px; background: var(--pc-bn-pill); color: var(--pc-bn-pill-ink); border: 1px solid var(--pc-line); pointer-events: none; }
 .pc-room .pc-bn-pause { position: absolute; right: 8px; top: 8px; width: 44px; height: 44px; min-height: 44px; border-radius: 50%; border: 1px solid var(--pc-line); background: var(--pc-bn-pill); color: var(--pc-bn-pill-ink); display: grid; place-items: center; padding: 0; }
