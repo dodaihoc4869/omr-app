@@ -175,7 +175,8 @@ Thầy nhắn (nguyên văn, kèm ảnh màn "Câu 4 trong 5 câu" Đúng–sai 
 - [ ] Tìm nguyên nhân gốc lỗi "không vuốt lên được" ở app học sinh và sửa triệt để (tái hiện bằng máy: cảm ứng 390×844) | bằng chứng: (chưa có)
 - [ ] Build + đẩy bản sửa lỗi vuốt (kiểm ca mở) | bằng chứng: (chưa có)
 - [x] Vẽ màn làm bài học sinh trùng tu (dọc, thân thiện, khoa học, mịn mắt) — CHỜ THẦY DUYỆT, CHƯA BUILD | bằng chứng: artifact NqZ2D6F1APXMHyzvZy4FmU bản 8 — 7 khung 390 px: Đúng–sai đang làm, Trắc nghiệm, Trả lời ngắn (4 ô + bàn phím số), Câu mới tự làm/học cách giải, phản hồi sai, phản hồi đúng, Xong chặng.
-- [ ] Thầy duyệt bản vẽ màn làm bài ⇒ build | bằng chứng: (chưa có)
+- [x] Thầy duyệt bản vẽ màn làm bài ⇒ build | bằng chứng: thầy 12/10 "Chốt build đẩy lên luôn đi".
+- [ ] Build màn làm bài theo bản vẽ NqZ2D6F1APXMHyzvZy4FmU + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
 - [ ] Soát việc giao câu: 24 câu (vòng) vs 31 câu tự làm vs lịch tối thiểu 32 câu vs còn 22 câu — chỉ ra từng con số lấy từ đâu, thống nhất một nguồn | bằng chứng: (chưa có)
 - [ ] Soát số câu Lười/Chăm từng ngày (mức tối thiểu + đã làm mỗi ngày) khớp đúng con số học sinh thấy là mục tiêu hôm nay | bằng chứng: (chưa có)
 - [ ] Thầy nhắn thêm (ảnh app HS "0 trên 24 câu · 24 câu tự làm · 4 chặng" và Hồ sơ làm bài thầy "Hôm nay 0/36 câu", lịch ngày x/36, em Nguyễn Khánh Ngọc SBD 10030 Lớp 10): "trên app học sinh báo 24 câu nhưng đo theo ngày hôm nay lại hiện 0/36 câu" ⇒ mức hằng ngày em được giao và mức dùng để chấm Lười/Chăm phải là MỘT con số | bằng chứng: (chưa có)
