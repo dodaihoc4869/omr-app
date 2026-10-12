@@ -723,7 +723,7 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
             <ExternalLink size={18} aria-hidden="true" />
             Mở hồ sơ đầy đủ
           </button>
-          <small>Ca kiểm tra, EXP, thần thú, phụ huynh của em</small>
+          <small>Ca kiểm tra, EXP, phụ huynh của em</small>
         </footer>
       </section>
     </>
