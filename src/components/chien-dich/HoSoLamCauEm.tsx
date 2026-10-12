@@ -312,6 +312,12 @@ function LichNgay({ ngay }: { ngay: readonly NgayHoatDong[] }) {
           <small className="gvv2-so" aria-hidden="true">
             {n.datMuc ? 'đủ mức' : `thiếu ${n.thieu}`}
           </small>
+          {/* Thầy 12/10 ("hiển thị thật chính xác"): ô có mức ƯỚC TÍNH (ngày chưa chốt mức) ghi rõ ngay trên ô, không chỉ trong chú thích trỏ chuột. */}
+          {n.mucUocTinh && (
+            <small className="gvv2-so" aria-hidden="true">
+              mức ước tính
+            </small>
+          )}
           <span className="gvv2-an-chu">{chuO(n)}</span>
         </li>
       ))}

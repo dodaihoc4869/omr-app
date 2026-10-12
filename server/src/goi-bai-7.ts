@@ -1,7 +1,7 @@
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
-import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, diemConDungNguon7, type CauGoi7, type ViecGoi7 } from './goi-bai-7-loi'
+import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7 } from './goi-bai-7-loi'
 import { tachMaTo } from './srs2-gv'
 import { laMaToKhongGiao, damBaoBangBaiDaDay, phamViLop, lopCuaEm } from './bai-da-day'
 import { TEN_LOP_CHUA_XEP, TEN_LOP_THUONG_12 } from './ten-lop'
@@ -14,7 +14,7 @@ import { docCauBtvnChuaNop } from './game-v2-luot'
 import { dongCoHanhTrinh } from './hanh-trinh-dong-co'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
-import { CAU_TOI_THIEU, tangCuaEm } from './hanh-trinh-ngay'
+import { CAU_TOI_THIEU, tangCuaEm, type TangHanhTrinh } from './hanh-trinh-ngay'
 import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { apLamLaiKhac } from './cau-anh-em'
 import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
@@ -169,6 +169,31 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
   return out
 }
 
+/** Mức hôm nay đã chốt của em ngày Gói 7 (một dòng `goi_bai_7_muc_ngay`). */
+export interface MucNgay7 { tang: TangHanhTrinh; toiThieuTang: number; quota: number; muc: number; daChot: boolean }
+const tangHopLe7 = (v: unknown): TangHanhTrinh => { const t = Math.floor(Number(v)); return (t >= 1 && t <= 4 ? t : 1) as TangHanhTrinh }
+/**
+ * CHỐT MỨC HÔM NAY (thầy 12/10: "một con số"). Lần lập đầu tiên trong ngày ghi `muc = mucNgayGoi7(CAU_TOI_THIEU[tầng], Σ quota câu mới hôm nay)` bằng
+ * INSERT OR IGNORE; mọi lần sau trong ngày (và mọi màn thầy / phụ huynh / Nhịp học) ĐỌC LẠI số đã chốt — tầng lên giữa ngày hay lịch gói đổi cũng không
+ * làm mức nhảy. `chiDoc` ⇒ không ghi (tính ra số nhưng `daChot: false`). Hai máy cùng lập lần đầu ⇒ đọc lại dòng thắng sau khi ghi.
+ */
+export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: TangHanhTrinh, tongQuota: number, now: number, chiDoc = false): Promise<MucNgay7> {
+  const doc = async (): Promise<MucNgay7 | null> => {
+    const r = await env.DB.prepare('SELECT tang,toi_thieu_tang,quota,muc FROM goi_bai_7_muc_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>().catch(() => null)
+    return r && Number(r.muc) > 0 ? { tang: tangHopLe7(r.tang), toiThieuTang: Number(r.toi_thieu_tang) || 0, quota: Number(r.quota) || 0, muc: Number(r.muc), daChot: true } : null
+  }
+  const cu = await doc()
+  if (cu) return cu
+  const toiThieuTang = CAU_TOI_THIEU[tang], quota = Math.max(0, Math.floor(tongQuota) || 0)
+  const moi: MucNgay7 = { tang, toiThieuTang, quota, muc: mucNgayGoi7(toiThieuTang, quota), daChot: false }
+  if (chiDoc) return moi
+  await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES(?,?,?,?,?,?,?)')
+    .bind(sbd, ngay, moi.tang, moi.toiThieuTang, moi.quota, moi.muc, new Date(now).toISOString()).run()
+    // Không ghi được (D1 trục trặc) ⇒ em vẫn học với số vừa tính; thầy thấy ngày ấy là mức ước tính — không làm hỏng màn em.
+    .catch((e: unknown) => console.error('[goi7] chưa chốt được mức hôm nay:', e instanceof Error ? e.message : e))
+  return (await doc()) ?? moi
+}
+
 export async function lapGoi7(env: Env, sbd: string, now: number) {
   const goi = await docGoiCuaEm7(env,sbd,now)
   if (!goi.length) return null
@@ -207,9 +232,12 @@ export async function lapGoi7(env: Env, sbd: string, now: number) {
   const cau = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid,c])).values()]
   const quotaCon = goi.reduce((n,g) => n+Math.max(0,g.quota-g.gapNgay.size),0)
   const tang = tangCuaEm(hs.cau,hs.tt,new Map([...hs.meta].map(([qid,m])=>[qid,m.group])))
-  const toiThieu = CAU_TOI_THIEU[tang]
+  // MỘT CON SỐ (thầy 12/10): mức hôm nay M = max(mức theo tầng, Σ câu mới theo lịch các gói) — chốt lần lập đầu tiên trong ngày, các lần sau đọc lại.
+  // Kế hoạch đúng M − đã làm câu: câu mới theo lịch vẫn đứng đầu nhưng không vượt phần còn lại của M (`chiTrongMuc`).
+  const muc7 = await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now)
+  const toiThieu = muc7.muc
   const nhomPhu=[...goi].sort((a,b)=>a.han.localeCompare(b.han)).map(g=>({qids:g.cau.map(c=>c.qid),quota:Math.max(0,g.quota-g.gapNgay.size)}))
-  const plan = chonGoi7({ cau,daGap,daLamNgay,quotaCon,sanSang,chan,sua,on,chua,mucTieuNgay:Math.max(0,toiThieu-daLamNgay.size),trongSo:engine.trongSo,nhomPhu })
+  const plan = chonGoi7({ cau,daGap,daLamNgay,quotaCon,sanSang,chan,sua,on,chua,mucTieuNgay:Math.max(0,toiThieu-daLamNgay.size),trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true })
   const kiem=await env.DB.prepare('SELECT goi_id,ma_de,diem,nop_luc,json FROM goi_bai_7_kiem WHERE sbd=? AND nop_luc IS NOT NULL ORDER BY nop_luc DESC LIMIT 30').bind(sbd).all<Row>()
   const diemDaDo=kiem.results.filter(r=>diemConDungNguon7(json<Row>(r.json).cau,goi.find(g=>g.id===r.goi_id)?.cau.filter(c=>(c.maTo??c.maDe)===r.ma_de)??[])).map(r=>({goiId:str(r.goi_id),maDe:str(r.ma_de),diem:Number(r.diem),luc:str(r.nop_luc),cauMoi:Number(json<Row>(r.json).cauMoi??0),tong:Number(json<Row>(r.json).tong??0)}))
   const skills = new Map(old.results.map(r => [str(r.kn),r.trang_thai === 'dat']))
@@ -253,7 +281,7 @@ export async function startGoi7(env: Env, sbd: string, now: number): Promise<Rec
       role:v.vai==='moi'?'cau_moi':v.vai==='sua'?'on_lai':'on_lai',vai:v.vai,huongDan:v.huongDan}
     refs.push(ref); questions.push({...publicQuestion(q),...(ref.goiY?{goiY:ref.goiY}:{}),vaiGoi7:v.vai,huongDan7:v.huongDan,coGoi7:lap.goi.some(g=>g.cau.some(c=>c.qid===q.qid&&c.version===q.version))})
   }
-  if (!refs.length) return {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}
+  if (!refs.length) return {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}
   const id = viec.length && refs.length === viec.length ? str(old!.id) : crypto.randomUUID()
   if (id !== str(old?.id)) await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify({mode:'adventure',created:now,hoa2:1,hocTap:1,goi7:1,questions:refs}),new Date(now).toISOString()).run()
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}

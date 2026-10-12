@@ -47,10 +47,12 @@ const sk = (d: D, x: Sk) =>
     x.purpose ?? null, x.visibility ?? null, x.assistance ?? null, x.raw ? JSON.stringify(x.raw) : null,
   )
 const luc = (ngay: string, gioVn = 10, phut = 0) => new Date(Date.parse(`${ngay}T00:00:00+07:00`) + (gioVn * 60 + phut) * 60_000).toISOString()
+// SỬA CÓ CHỦ ĐÍCH 12/10 (lỗi tên lớp — goi-bai-7-ten-lop-1210): `goi_bai_7.lop` = `bai_da_day.lop` là TÊN LỚP của em ("12 - Tinh Hoa"), không phải khối "12".
+// Bảng thầy nay so lớp gói với tên lớp hiệu lực của em (`sqlTenLopHs`, đúng `docGoiCuaEm7`) — dữ liệu giả cũ ghi khối nên chỉ khớp nhờ lỗi so `h.lop`.
 const goi7 = (d: D, sbd: string, batDau: string) => {
   d.sql.prepare("INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('goi_bai_7_v1', ?, 'x')").run(JSON.stringify({ bat: true, batDau: '2026-10-10' }))
-  d.sql.prepare("INSERT INTO bai_da_day (id, lop, khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc) VALUES ('t1', '12', 'b6', 'Bài 6', 1, '[]', 'x')").run()
-  d.sql.prepare("INSERT INTO goi_bai_7 (id, tick_id, lop, khoa_bai, ten, bat_dau, han, tao_luc) VALUES ('g7:t1', 't1', '12', 'b6', 'Bài 6', ?, '2026-10-18', 'x')").run(batDau)
+  d.sql.prepare("INSERT INTO bai_da_day (id, lop, khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc) VALUES ('t1', '12 - Tinh Hoa', 'b6', 'Bài 6', 1, '[]', 'x')").run()
+  d.sql.prepare("INSERT INTO goi_bai_7 (id, tick_id, lop, khoa_bai, ten, bat_dau, han, tao_luc) VALUES ('g7:t1', 't1', '12 - Tinh Hoa', 'b6', 'Bài 6', ?, '2026-10-18', 'x')").run(batDau)
   d.sql.prepare("INSERT INTO goi_bai_7_em (goi_id, sbd, bat_dau, han) VALUES ('g7:t1', ?, ?, '2026-10-18')").run(sbd, batDau)
 }
 
@@ -140,26 +142,34 @@ describe('mức / đã làm / thiếu — đúng như kế hoạch đang chấm'
     expect(a).toMatchObject({ soNgayThieu: 2, tongCauThieu: 63, ngayThieuNhieuNhat: { ngay: '2026-10-13', thieu: 33 }, soNgayDu: 0, soNgayKhongLam: 1, tongDaLam: 3, thieuHomNay: 36 })
   })
 
-  it('Gói 7: mức không lưu ⇒ tầng 1 (24 câu, mặc định); đã làm = mã câu khác nhau có kết quả, bỏ đọc lời giải / còn giấu / ca chưa công bố, cộng câu có hướng dẫn', async () => {
+  // SỬA CÓ CHỦ ĐÍCH — thầy 12/10: một con số. Gói 7 chưa có dòng chốt `goi_bai_7_muc_ngay` ⇒ nguồn 'uoc-goi7' (max(24, lịch câu mới ngày ấy) — ở đây
+  // không có lịch ⇒ 24), không còn 'mac-dinh' của Hành trình. Phép đếm đã làm GIỮ NGUYÊN.
+  it('Gói 7: chưa chốt mức ⇒ ước tính tầng 1 (24 câu, uoc-goi7); đã làm = mã câu khác nhau có kết quả, bỏ đọc lời giải / còn giấu / ca chưa công bố, cộng câu có hướng dẫn', async () => {
     const r = await goi(boDuLieu())
     const b = theo(r, 'B')
     expect(b.ngay.map(o)).toEqual([
-      ['2026-10-12', 24, 24, 0, true, 'mac-dinh', 'goi7'],
-      ['2026-10-13', 24, 3, 21, false, 'mac-dinh', 'goi7'], // G1 (hai lượt + một hướng dẫn) · G6 (ca đã công bố) · G7 (hướng dẫn)
-      ['2026-10-14', 24, 0, 24, false, 'mac-dinh', 'goi7'],
+      ['2026-10-12', 24, 24, 0, true, 'uoc-goi7', 'goi7'],
+      ['2026-10-13', 24, 3, 21, false, 'uoc-goi7', 'goi7'], // G1 (hai lượt + một hướng dẫn) · G6 (ca đã công bố) · G7 (hướng dẫn)
+      ['2026-10-14', 24, 0, 24, false, 'uoc-goi7', 'goi7'],
     ])
     expect(b.ngay.every((n) => n.mucUocTinh && n.tang === 1)).toBe(true)
     expect(b).toMatchObject({ soNgayThieu: 1, tongCauThieu: 21, ngayThieuNhieuNhat: { ngay: '2026-10-13', thieu: 21 }, thieuHomNay: 24 })
   })
 
-  it('mucCuaNgay: Gói 7 KHÔNG lấy mức chốt của Hành trình làm số thật; tầng sau ngày ấy chỉ dùng khi không có tầng trước', () => {
+  // SỬA CÓ CHỦ ĐÍCH — thầy 12/10: một con số. Ngày Gói 7 KHÔNG còn lấy tầng Hành trình gần nhất (lỗi 0/36 trong khi em được giao 24): có dòng chốt
+  // Gói 7 ⇒ đúng số ấy; chưa có ⇒ ước tính max(24, lịch câu mới ngày ấy), tầng 1.
+  it('mucCuaNgay: Gói 7 KHÔNG lấy mức / tầng của Hành trình; tầng sau ngày ấy chỉ dùng khi không có tầng trước (Hành trình)', () => {
     const c = [{ ngay: '2026-10-13', tang: 2 as const, toiThieu: 30 }, { ngay: '2026-10-15', tang: 4 as const, toiThieu: 36 }]
-    expect(mucCuaNgay('2026-10-13', 'goi7', c)).toEqual({ muc: 30, tang: 2, nguon: 'tang-gan-nhat', uoc: true })
+    expect(mucCuaNgay('2026-10-13', 'goi7', c)).toEqual({ muc: 24, tang: 1, nguon: 'uoc-goi7', uoc: true })
+    expect(mucCuaNgay('2026-10-13', 'goi7', c, { chot: { tang: 3, muc: 36 }, quota: 40 })).toEqual({ muc: 36, tang: 3, nguon: 'da-chot', uoc: false })
+    expect(mucCuaNgay('2026-10-13', 'goi7', c, { chot: null, quota: 32 })).toEqual({ muc: 32, tang: 1, nguon: 'uoc-goi7', uoc: true })
+    expect(mucCuaNgay('2026-10-13', 'goi7', c, { quota: 3 })).toEqual({ muc: 24, tang: 1, nguon: 'uoc-goi7', uoc: true })
     expect(mucCuaNgay('2026-10-13', 'hanh-trinh', c)).toEqual({ muc: 30, tang: 2, nguon: 'da-chot', uoc: false })
     expect(mucCuaNgay('2026-10-12', 'hanh-trinh', c)).toEqual({ muc: 30, tang: 2, nguon: 'tang-gan-nhat', uoc: true })
     expect(mucCuaNgay('2026-10-14', 'hanh-trinh', c)).toEqual({ muc: 30, tang: 2, nguon: 'tang-gan-nhat', uoc: true })
-    expect(mucCuaNgay('2026-10-16', 'goi7', c)).toEqual({ muc: 36, tang: 4, nguon: 'tang-gan-nhat', uoc: true })
-    expect(mucCuaNgay('2026-10-16', 'goi7', [])).toEqual({ muc: 24, tang: 1, nguon: 'mac-dinh', uoc: true })
+    expect(mucCuaNgay('2026-10-16', 'hanh-trinh', c)).toEqual({ muc: 36, tang: 4, nguon: 'tang-gan-nhat', uoc: true })
+    expect(mucCuaNgay('2026-10-16', 'hanh-trinh', [])).toEqual({ muc: 24, tang: 1, nguon: 'mac-dinh', uoc: true })
+    expect(mucCuaNgay('2026-10-16', 'goi7', [])).toEqual({ muc: 24, tang: 1, nguon: 'uoc-goi7', uoc: true })
   })
 })
 
@@ -380,7 +390,8 @@ describe('mốc 01/10 — mặc định, ngày trước Gói 7, khoảng đọc,
     expect(theoNgay['2026-10-01']).toEqual(['2026-10-01', 30, 0, 30, false, 'tang-gan-nhat', 'hanh-trinh']) // chưa có tầng trước ⇒ tầng sau gần nhất
     expect(theoNgay['2026-10-05']).toEqual(['2026-10-05', 30, 2, 28, false, 'da-chot', 'hanh-trinh'])
     expect(theoNgay['2026-10-06']).toEqual(['2026-10-06', 30, 0, 30, false, 'tang-gan-nhat', 'hanh-trinh'])
-    expect(theoNgay['2026-10-10']).toEqual(['2026-10-10', 30, 2, 28, false, 'tang-gan-nhat', 'goi7'])
+    // SỬA CÓ CHỦ ĐÍCH — thầy 12/10: một con số. Ngày gói đầu chưa chốt mức ⇒ ước tính tầng 1 = 24 (không lấy tầng 2 của Hành trình ⇒ 30).
+    expect(theoNgay['2026-10-10']).toEqual(['2026-10-10', 24, 2, 22, false, 'uoc-goi7', 'goi7'])
     expect(g.ngay.filter((n) => n.cheDo === 'hanh-trinh').map((n) => n.ngay)).toEqual(r.ngay.filter((n) => n < '2026-10-10'))
     expect(g).toMatchObject({ soNgayThieu: 13, soNgayKhongLam: 11, tongDaLam: 4 })
     // hồ sơ thái độ mặc định: cùng khoảng 01/10 → 14/10, cùng "đã làm / chế độ" từng ngày với bảng
