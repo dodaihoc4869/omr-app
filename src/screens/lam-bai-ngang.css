@@ -269,7 +269,9 @@
 /* CÂU DÀI ⇒ CHIA ĐÔI: trái đề (cuộn cùng thân thẻ), phải phương án / ý / ô đáp số (dính đầu, cuộn riêng khi dài). */
 .lb-gon-de[data-chia] { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 8px; }
 .lb-gon-de[data-chia] > [data-gon-hien] { display: flex; flex: 1 1 auto; flex-direction: column; width: 100%; min-height: 0; }
-.lb-gon-de[data-chia] .the-cau { display: flex !important; flex: 1 1 auto; flex-direction: column; min-height: 0; overflow: hidden; }
+/* Làn B đợt 16: CHỈ thẻ câu đang hiện mới thành cột flex — đường không bọc khung (thẻ là con trực tiếp của .lb-gon-de) trước đây bị luật này
+   (độ ưu tiên cao hơn) lật ngược `display: none` của các thẻ khác ⇒ mọi thẻ cùng hiện, xẹp còn dải màu đầu thẻ. */
+.lb-gon-de[data-chia] > [data-gon-hien] .the-cau, .lb-gon-de[data-chia] > .the-cau[data-gon-hien] { display: flex !important; flex: 1 1 auto; flex-direction: column; min-height: 0; overflow: hidden; }
 .lb-gon-de[data-chia] .the-cau > * { flex: none; }
 .lb-gon-de[data-chia] .the-cau > div:last-child {
   display: grid !important; flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;

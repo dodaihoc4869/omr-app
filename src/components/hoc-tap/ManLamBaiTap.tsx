@@ -6,7 +6,7 @@ import { goiHoa2 } from '../hoa2/api'
 import type { HinhAnh } from '../../data/examContent'
 import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
-import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem } from './LamCau'
+import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
 import { chuDanhSachCau, chuThoiGian, coChuSo, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
@@ -109,6 +109,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const choChonCach = coHuongDan && !tuLam
   const dangTraLoi = !!q && !k && !choChonCach
   const tenBai = q?.vaiGoi7 === 'moi' ? goi7?.goi.find(g => g.to.includes(q.maDe))?.ten : undefined
+  // LÀN B ĐỢT 16: máy tính / điện thoại xoay ngang ⇒ đề bên trái, phần trả lời (hoặc phản hồi sau khi nộp) bên phải ngay trên nút Nộp — cùng
+  // các khối, cùng state; bản dọc giữ nguyên thứ tự cũ. Chỉ đổi CHỖ ĐẶT (xem `traLoiCotPhai` trong LamCau.tsx).
+  const boCuc = useBoCucLam()
+  const traLoiPhai = !tai && !xong && !!q && (dangTraLoi || (!!k && !k.choThay)) && traLoiCotPhai(boCuc, q.phan) // đang tải / xong chặng: bố cục cũ
 
   // Gõ số trên máy tính vẫn nhập được (Trả lời ngắn) — không có ô nhập nên bàn phím điện thoại không bật.
   const laTLN = dangTraLoi && q?.phan === 'III'
@@ -173,6 +177,27 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     : q.phan === 'III' ? <><BanPhimSo value={tra} khoa={nop} onPhim={(p: PhimSo) => doiTra(nhanPhim(tra, p))} /><div className="ht2-lam-hang-nop" data-goi-y={!!nutGoiY || undefined}>{nutGoiY}{nutNop}</div></>
     : <div className="ht2-lam-hang-nop" data-goi-y={!!nutGoiY || undefined}>{nutGoiY}{nutNop}</div>
 
+  // Dải kết quả sau khi nộp: máy tính ⇒ đầu cột phải, ngay trên các phương án đã tô (điện thoại xoay ngang: giữ trên đề cho cột phải vừa một màn).
+  const daiPhai = traLoiPhai && boCuc === 'rong'
+  const daiKet = ketDai && <section className="ht2-lam-ket" data-tt={ketDai.tt} role="status">
+    <span className="ht2-lam-ket-dau" aria-hidden="true">{ketDai.tt === 'dung' ? <Check size={22} strokeWidth={2.6} /> : ketDai.tt === 'sai' ? <XIcon size={22} strokeWidth={2.6} /> : ketDai.tt === 'cho' ? <Info size={22} /> : <BookOpen size={20} />}</span>
+    <span className="ht2-lam-ket-chu"><b>{ketDai.tieu}</b>{ketDai.phu && <small>{ketDai.phu}</small>}</span>
+  </section>
+  // Phần trả lời (đang làm) / phản hồi (sau khi nộp) + ghi chú cách chọn — đặt dưới đề (dọc) hoặc ở cột phải cạnh nút Nộp (`traLoiPhai`).
+  const khoiTraLoi = !q ? null : <>
+    {dangTraLoi && (q.phan === 'II' ? <ChonDungSai q={q} value={tra} khoa={nop} onChon={(i, v) => { const a = tra.padEnd(4, '-').split(''); a[i] = v; doiTra(a.join('')) }} />
+      : q.phan === 'I' ? <ChonTracNghiem q={q} value={tra} khoa={nop} onChon={doiTra} />
+      : <OTraLoiNgan value={tra} />)}
+    {k && !k.choThay && (q.phan === 'II' ? <PhanHoiDungSai q={q} tra={traHien} dapAn={k.answer} lyDo={(chu) => lg?.tungY?.[chu]?.viSao} />
+      : q.phan === 'I' ? <PhanHoiTracNghiem q={q} tra={traHien} dapAn={k.answer} />
+      : <PhanHoiTraLoiNgan tra={traHien} dapAn={k.answer} dung={k.correct} />)}
+  </>
+  const ghiTraLoi = !q ? null : <>
+    {dangTraLoi && q.goiY && <p className="ht2-lam-ghi"><Lightbulb size={14} aria-hidden="true" />Câu này có gợi ý; lượt dùng gợi ý tính là có hỗ trợ.</p>}
+    {dangTraLoi && q.phan === 'II' && <p className="ht2-lam-ghi"><Check size={14} aria-hidden="true" />Lựa chọn được lưu nháp — thoát ra vào lại vẫn còn.</p>}
+    {dangTraLoi && q.phan === 'I' && <p className="ht2-lam-ghi">Chạm cả ô để chọn · chọn lại được trước khi nộp.</p>}
+  </>
+
   const homNayO = homNay ? <span className="ht2-lam-hom-nay"><b aria-hidden="true">{homNay.daLam}/{homNay.muc}</b><small aria-hidden="true">câu hôm nay</small><span className="ht2-an">Hôm nay đã làm {homNay.daLam} trên {homNay.muc} câu</span></span> : <span />
 
   return <div ref={gocRef} className="ht-app ht2-lam" data-xong={xong || undefined}>
@@ -184,7 +209,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       </div>
       {homNayO}
     </header>
-    <div className="ht2-lam-khung">
+    <div className="ht2-lam-khung" data-tra-loi={traLoiPhai ? q.phan : undefined} data-ket={traLoiPhai && k ? '' : undefined}>
       <main className="ht2-lam-than">
         {tai ? <div className="ht2-lam-the ht2-lam-cho" role="status">Đang chuẩn bị những câu phù hợp với em…</div>
         : xong ? <>
@@ -202,10 +227,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           </section>}
         </>
         : q ? <>
-          {ketDai && <section className="ht2-lam-ket" data-tt={ketDai.tt} role="status">
-            <span className="ht2-lam-ket-dau" aria-hidden="true">{ketDai.tt === 'dung' ? <Check size={22} strokeWidth={2.6} /> : ketDai.tt === 'sai' ? <XIcon size={22} strokeWidth={2.6} /> : ketDai.tt === 'cho' ? <Info size={22} /> : <BookOpen size={20} />}</span>
-            <span className="ht2-lam-ket-chu"><b>{ketDai.tieu}</b>{ketDai.phu && <small>{ketDai.phu}</small>}</span>
-          </section>}
+          {!daiPhai && daiKet}
           {!k && <div className="ht2-lam-nhan">
             <span className="ht2-lam-chip">{loai}</span>
             {q.vaiGoi7 === 'moi' ? <span className="ht2-lam-chip" data-sac="vang">{tenBai ? `Câu mới · ${tenBai}` : 'Câu mới'}</span>
@@ -219,24 +241,18 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
             <div className="ht2-lam-chon-dong" data-sac="vang"><span aria-hidden="true"><BookOpen size={20} /></span><p><b>Học cách giải:</b> {q.vaiGoi7 === 'chua' ? 'thầy đã chữa câu này — xem phần chữa từng bước.' : 'xem lời giải từng bước.'} Ghi là câu học có hỗ trợ.</p></div>
             {homNay && <p className="ht2-lam-chon-ghi">Cách nào cũng được tính vào <b>{homNay.muc} câu hôm nay</b>. Thầy xem riêng số câu tự làm và số câu có hỗ trợ.</p>}
           </section>}
-          {dangTraLoi && (q.phan === 'II' ? <ChonDungSai q={q} value={tra} khoa={nop} onChon={(i, v) => { const a = tra.padEnd(4, '-').split(''); a[i] = v; doiTra(a.join('')) }} />
-            : q.phan === 'I' ? <ChonTracNghiem q={q} value={tra} khoa={nop} onChon={doiTra} />
-            : <OTraLoiNgan value={tra} />)}
-          {k && !k.choThay && (q.phan === 'II' ? <PhanHoiDungSai q={q} tra={traHien} dapAn={k.answer} lyDo={(chu) => lg?.tungY?.[chu]?.viSao} />
-            : q.phan === 'I' ? <PhanHoiTracNghiem q={q} tra={traHien} dapAn={k.answer} />
-            : <PhanHoiTraLoiNgan tra={traHien} dapAn={k.answer} dung={k.correct} />)}
+          {!traLoiPhai && khoiTraLoi}
           {(dangTraLoi || k) && <HinhCuoiCau q={q} stt={stt} />}
           {k && !k.choThay && (q.phan !== 'II' || moLoiGiai
             ? <LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />
             : <button type="button" className="ht2-lam-nut ht2-lam-nut-mo" aria-expanded={false} onClick={() => setMoLoiGiai(true)}><ChevronDown size={18} aria-hidden="true" />{coLyDoY ? 'Xem lời giải đầy đủ cả 4 ý' : 'Xem lời giải đầy đủ'}</button>)}
           {dangTraLoi && coHuongDan && <button type="button" className="ht2-lam-nut ht2-lam-nut-mo" onClick={() => void hocHuongDan()} disabled={nop}><BookOpen size={18} aria-hidden="true" />Chưa làm được? Học cách giải</button>}
-          {dangTraLoi && q.goiY && <p className="ht2-lam-ghi"><Lightbulb size={14} aria-hidden="true" />Câu này có gợi ý; lượt dùng gợi ý tính là có hỗ trợ.</p>}
-          {dangTraLoi && q.phan === 'II' && <p className="ht2-lam-ghi"><Check size={14} aria-hidden="true" />Lựa chọn được lưu nháp — thoát ra vào lại vẫn còn.</p>}
-          {dangTraLoi && q.phan === 'I' && <p className="ht2-lam-ghi">Chạm cả ô để chọn · chọn lại được trước khi nộp.</p>}
+          {!traLoiPhai && ghiTraLoi}
         </> : null}
         {loi && !q && <div className="ht2-lam-loi" role="alert"><span>{loi}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => setLan(n => n + 1)}><RefreshCw size={17} aria-hidden="true" />Thử lại</button></div>}
       </main>
-      {thanhDay && <div className="ht2-lam-day" role="region" aria-label="Thao tác câu">
+      {thanhDay && <div className="ht2-lam-day" role="region" aria-label="Thao tác câu" data-tra-loi={traLoiPhai ? q.phan : undefined}>
+        {traLoiPhai && <div className="ht2-lam-cot-tra-loi">{daiPhai && daiKet}{khoiTraLoi}{ghiTraLoi}</div>}
         {loi && q && <p className="ht2-lam-loi" role="alert">{loi}</p>}
         {thanhDay}
       </div>}

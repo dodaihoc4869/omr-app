@@ -665,3 +665,10 @@
   align-items: center;
   gap: 8px;
 }
+
+/* LÀN B ĐỢT 16 (thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và thân thiện"): điện thoại xoay
+   ngang thấp thu cả màn bằng `zoom` (≥ 0,75) ⇒ nút 44 px chỉ còn ~33 px dưới ngón tay. Bù đúng tỉ lệ thu để mọi nút / ô chọn vẫn ≥ 44 px THẬT
+   (luật B3/C9). Không đổi màu, không đổi bố cục 5/7. */
+.h2-cdl-ngang[data-thap='true'] :is(button, select) {
+  min-height: calc(44px / var(--h2-ti-le, 1));
+}
