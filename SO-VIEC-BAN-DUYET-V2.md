@@ -135,4 +135,4 @@ Thầy nhắn (nguyên văn, kèm ảnh thẻ "Bài mới trong 7 ngày"):
 - [x] GV · Cần thầy chữa có phần "Thầy tự chữa": chọn đề trong Dạy học (TN / Đúng–sai / Trả lời ngắn) | bằng chứng: 55156900 — nguồn đúng cây Dạy học (`khoDayHoc` → `dsBaiCuaKhoi`), chip ba tờ có số câu; ảnh 50/51-ttc-*.
 - [x] GV · chọn đề ⇒ chiếu TẤT CẢ câu lên máy chiếu, câu đúng–sai + tính toán lên đầu | bằng chứng: 55156900 — xếp Đúng–sai có tính toán → Đúng–sai → tính toán → còn lại (giữ thứ tự đề); test thay-tu-chua-1210 (14).
 - [x] GV · tờ chiếu đầy đủ như Chiếu lên bảng (lời giải, thống kê lớp, ai sai + giây) | bằng chứng: dùng lại `to-chieu.ts` → `KhungXemPhieu` (G lời giải · T thống kê `/gv/thong-ke-lop-cau` · X ai sai `/gv/ai-sai-cau`); ảnh 52-ttc-to-chieu-*-1920. Thêm 487bde44: tên nơi làm mới trên tờ (bỏ Đảo/Đoàn/Bi-a). Nút Đóng 34 px của khung phiếu GIỮ NGUYÊN (test m3-c6-khung-xem-phieu-1909 khoá).
-- [ ] Build + đẩy đợt 9 (kiểm ca mở trước) | bằng chứng: (chưa có)
+- [x] Build + đẩy đợt 9 (kiểm ca mở trước) | bằng chứng: PR242 gộp `4187009d`, Actions `38198445809` SUCCESS (17 bước, Kiểm ca thi đạt). Lùi: `git revert -m 1 4187009d`.
