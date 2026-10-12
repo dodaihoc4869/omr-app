@@ -1,0 +1,23 @@
+/* HỒ SƠ LÀM BÀI CỦA EM (app học sinh, 12/10F) — tấm thầy `HoSoLamCauEm` ở chế độ học sinh, bọc trong `.hs-ho-so-em` (HoSoCuaEmHs.tsx).
+ * MÀU (thầy 05/10: giữ nguyên mọi màu, thêm thì đồng bộ biến chuẩn): tấm đọc bảng --gvm-* của app thầy. Các biến này KHAI Ở :root (tokens.css), KHÔNG
+ * theo lớp, và đổi sáng/tối bằng ĐÚNG công tắc của app học sinh (prefers-color-scheme; [data-giao-dien] nếu máy ép) ⇒ trong app học sinh chúng
+ * đã có giá trị đúng ở cả hai nền, tương phản chữ đã soát ≥ 4,5:1 (tokens.css). Không màu mới, không đổi khai báo cũ. Chỉ ÁNH XẠ biến tấm cần
+ * mà ngoài vỏ `.m3` không có: --m3-man-che (nền che sau tấm) ⇒ --phu (lớp phủ chuẩn của app học sinh, tokens.css, sáng + tối).
+ * CỠ CHỮ: chữ thân của tấm 14 px (app thầy) ⇒ 15 px cho học sinh (chuẩn B4); chú thích giữ ≥ 12 px. */
+.hs-ho-so-em {
+  display: contents;
+  --m3-man-che: var(--phu);
+}
+.hs-ho-so-em .gvv2-hs {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.hs-ho-so-em :is(.gvv2-tdo-mo-ta, .gvv2-tdo-ly-do, .gvv2-tdo-thoat, .gvv2-tdo-th-chu, .gvv2-tdo-loi, .gvv2-hs-cau-phu, .gvv2-hs-cau-giay, .gvv2-hs-ls-dau p, .gvv2-hs-lan-chu b) {
+  font-size: 15px;
+}
+.hs-ho-so-em .gvv2-hs-dau-chu .gvv2-h2 {
+  line-height: 1.3;
+}
+.hs-ho-so-em .gvv2-hs-dau-chu p {
+  font-size: 13px;
+}
