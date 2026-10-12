@@ -2,13 +2,22 @@
 // CNH-1.0 P06/RV07 phụ — `coverage` (§7.2) đếm được task BTVN/Mom trong plan HÔM NAY:
 // việc `btvn_lo` mang `chiTiet.qid` = mã câu ĐÃ CHỐT của chặng (`btvn_em_cau`), việc `mom` mang `chiTiet.qid` = `mom_bai.qid_json`.
 // Nhờ vậy `docCoverageTheoPlan` thấy câu đã xong/đang giữ chỗ trong plan và quy về KỸ NĂNG thật (không còn bỏ sót BTVN/Mom).
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { docCoverageTheoPlan } from '../server/src/bo-chon-that'
 import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
 import { taoD1That } from './_d1-that'
 
-const NOW = Date.now()
+// NỢ TEST 13/10 — NGUYÊN NHÂN GỐC: `NOW` là đồng hồ THẬT, câu BTVN "đã có kết quả HÔM NAY" ghi lúc NOW − 1 giờ ⇒ chạy từ 00:00 tới 00:59 giờ VN thì lượt ấy
+// rơi sang HÔM QUA (ngày VN) nên kế hoạch / coverage hôm nay không thấy ⇒ đỏ. Sửa: ĐỒNG HỒ CỐ ĐỊNH 12:00 thứ Tư 14/10 giờ VN (chỉ giả `Date`) và lượt
+// "hôm nay" không lùi qua 00:00 giờ VN (đổi giờ cố định sang sát nửa đêm vẫn đúng).
+const NOW = Date.parse('2026-10-14T05:00:00Z')
+const DAU_HOM_NAY_VN = Date.parse(`${ngayVn(NOW)}T00:00:00+07:00`)
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(NOW)
+})
+afterEach(() => vi.useRealTimers())
 const iso = (ms: number) => new Date(ms).toISOString()
 const D = 24 * 3_600_000
 
@@ -34,7 +43,7 @@ async function dung() {
   d.sql.prepare("INSERT INTO mom_bai(sbd,id,title,created_at,question_count,bank_key,started_at,submitted_at,qid_json) VALUES('S1','M1','Bài Mẹ giao',?,2,'k',NULL,NULL,?)")
     .run(iso(NOW - D), JSON.stringify(['DE1-I-2', 'DE1-I-3']))
   // Câu trong chặng BTVN đã có kết quả HÔM NAY ⇒ `coverage` phải đếm được qua kỹ năng K1.
-  await ghiSuKien(d.env, [{ nguon: 'btvn' as const, maNguon: 'BT1', sbd: 'S1', qid: 'DE1-I-1', lan: 1, ketQua: 0 as const, luc: iso(NOW - 3_600_000) }])
+  await ghiSuKien(d.env, [{ nguon: 'btvn' as const, maNguon: 'BT1', sbd: 'S1', qid: 'DE1-I-1', lan: 1, ketQua: 0 as const, luc: iso(Math.max(NOW - 3_600_000, DAU_HOM_NAY_VN)) }])
   return d
 }
 
