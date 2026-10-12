@@ -3830,6 +3830,9 @@ const boXuLy = {
       // từng ngày từ 12/10 của mọi em; một em: lịch hoạt động, tín hiệu có ngưỡng, kết luận theo luật.
       if (p === '/gv/bai-hang-ngay') return ra(await import('./bai-hang-ngay').then((m) => m.gvBaiHangNgay(envDoc, b)))
       if (p === '/gv/ho-so-thai-do') return ra(await import('./bai-hang-ngay').then((m) => m.gvHoSoThaiDo(envDoc, b)))
+      // NHỊP HỌC trên Hôm nay của thầy (thầy 12/10 duyệt bản vẽ, server/src/nhip-hoc.ts; hợp đồng nhip-hoc-kieu.ts): CHỈ ĐỌC — mọi em: ngày vào,
+      // mức/đã làm từng ngày từ 01/10 (cùng phép tính Bài hằng ngày), cờ đối phó tính theo lô. MỘT lần gọi cho cả màn.
+      if (p === '/gv/nhip-hoc') return ra(await import('./nhip-hoc').then((m) => m.gvNhipHoc(envDoc, b)))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
       if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
       // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.
