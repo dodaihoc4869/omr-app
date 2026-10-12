@@ -4,6 +4,7 @@
 // → Sơ ý của con (mục tiêu dưới 7%, OMNI). Không thêm số mới; khối nào không có số thật ⇒ vắng; cả màn không có gì ⇒ một thẻ trống nói vì sao.
 // LÀN PHỤ HUYNH 12/10 (thầy: "số câu làm đúng, làm sai, thời gian làm từng câu … theo dõi được con toàn diện"): có `/ph/con-tong-quan` ⇒ thêm
 // "Câu sai gần đây" (đã sửa / chưa sửa) · "Đúng và sai theo ngày" (thay "Nhịp học 14 ngày" — cùng trục ngày, không nói một số hai lần) · "Thời gian làm câu".
+// ĐỢT 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn"): mới 1 ca ⇒ chỉ điểm + tên ca (bỏ câu "Từ ca thứ hai…"); bỏ dòng giải thích ba bậc; câu trống ngắn lại.
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { DiemTienBo, PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2 } from '../../lib/ph-v3/du-lieu'
@@ -78,7 +79,7 @@ export default function ManTienBo({ v, hoc2, tq = null }: { v: ViewPhMoi; hoc2: 
         {tq && <CauSaiGanDay tq={tq} />}
         <BacTheoDang pm={pm} />
         <SoY omni={omni} />
-        {!coGi && <TheTrong id="ph3-tb-trong" tieuDe="Chưa đủ dữ liệu" chu="Con học thêm vài ngày và có ca kiểm tra được công bố thì điểm, bậc từng dạng và nhịp học hiện ở đây." />}
+        {!coGi && <TheTrong id="ph3-tb-trong" tieuDe="Chưa đủ dữ liệu" chu="Con chưa có ngày học hay ca kiểm tra nào được công bố." />}
       </div>
     </div>
   )
@@ -102,14 +103,13 @@ function DiemCacCa({ pm, omni, du = false }: { pm: PhMoi; omni?: PhOmni; du?: bo
   )
 }
 
-/** Mới một ca được công bố: số điểm to + tên ca, ngày; câu nói rõ đường điểm hiện từ ca thứ hai (không vẽ biểu đồ một chấm). */
+/** Mới một ca được công bố: số điểm to + tên ca, ngày (không vẽ biểu đồ một chấm). */
 function MotCa({ d }: { d: DiemTienBo }) {
   return (
     <>
       <p id="ph3-diem-ca" className="ph3-ah__nhan">Điểm ca kiểm tra gần nhất</p>
       <p className="ph3-ah__cau" data-vung="diem-gan-nhat"><b>{soVn(d.diem)}</b><small>/10</small></p>
       <p className="ph3-ah__phu">{d.tenCa} · {ngayChuoiNgan(d.ngay)}</p>
-      <p className="ph3-ah__o-ghi">Con mới có 1 ca. Từ ca thứ hai, đường điểm sẽ hiện ở đây kèm mức tăng hay giảm.</p>
     </>
   )
 }
@@ -149,7 +149,7 @@ function BacTheoDang({ pm }: { pm: PhMoi }) {
   const conVap = new Set((pm.manhYeu?.conVap ?? []).map((x) => x.tenDang))
   const dem = demTheoBac(ds)
   return (
-    <The id="ph3-bac" className="ph3-o-hep" vung="bac-theo-dang" tieuDe="Các dạng con đã học" phu="Mỗi dạng có ba bậc: Biết · Hiểu · Vận dụng">
+    <The id="ph3-bac" className="ph3-o-hep" vung="bac-theo-dang" tieuDe="Các dạng con đã học">
       <div className="ph3-ba-khuc" role="img" aria-label={dem.map((d) => `${d.so} dạng ở bậc ${TEN_BAC_SO[d.bac]}`).join(', ')}>
         {dem.filter((d) => d.so > 0).map((d) => <span key={d.bac} data-bac={d.bac} style={{ flexGrow: d.so }} />)}
       </div>
@@ -217,7 +217,7 @@ function Nhip({ pm }: { pm: PhMoi }) {
         <span><i style={{ background: 'var(--ph3-tim)' }} />7 ngày gần nhất</span>
         <span><i style={{ background: 'var(--ph3-tim-nhat)' }} />7 ngày trước đó</span>
         <span><i style={{ background: 'var(--ph3-vien)', height: 4 }} />Ngày không học</span>
-        <span>Số trên cột = số câu con làm trong ngày</span>
+        <span>Số trên cột: số câu trong ngày</span>
       </div>
     </The>
   )

@@ -1,6 +1,8 @@
 // Mục "Hôm nay" — TRUNG TU THẦY DUYỆT 09/10 (bản vẽ PH-HomNay). Thứ tự: khối chính (a/b câu · thanh · câu tình trạng · giờ học quen)
 // → cảnh báo của thầy (nếu có) → Nhận xét của thầy (lời mới nhất + "Xem tất cả nhận xét của thầy ›") → Tuần này học đều (7 chấm)
-// → danh sách cần chú ý (dạng con đang luyện thêm / dạng cần vững · ca gần nhất dẫn sang Ca kiểm tra) → "Gia đình hỗ trợ" một đoạn chữ nhỏ cuối màn.
+// → danh sách cần chú ý (dạng con đang luyện thêm / dạng cần vững · ca gần nhất dẫn sang Ca kiểm tra).
+// ĐỢT 18 (thầy 13/10: "Tối ưu lại câu từ cho dễ hiểu … Bỏ hết các gợi ý hướng dẫn"): bỏ đoạn "Gia đình hỗ trợ", câu giải thích Gói 7 ngày / mức ước tính /
+// kế hoạch ít hơn mức; "Gợi ý nhắc con" thành "Cần nhắc con" (chỉ câu số liệu, xem ConTongQuan.tsx).
 // Nguồn đọc và quyền công bố giữ nguyên; khối vắng dữ liệu không dựng số minh hoạ; số câu hôm nay MỘT nguồn, nói MỘT lần.
 // LÀN PHỤ HUYNH 12/10 (thầy: "… số câu làm đúng, làm sai, thời gian làm từng câu gợi ý nhắc, bỏ mục thầy cần chữa …"): BỎ HẲN dòng "Cần thầy chữa".
 // Có `/ph/con-tong-quan` (ConTongQuan.tsx): khối chính lấy số câu đã làm / MỨC TỐI THIỂU của ngày từ đó + ba số câu đúng · câu sai · trung bình mỗi câu;
@@ -66,7 +68,6 @@ export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, on
           <LoiThayMoi loiThay={loiThay} thuLai={thuLaiLoiThay} />
           {tongQuan.v ? <LichTuan tq={tongQuan.v} /> : <TuanNay pm={pm} />}
           <CanChuY pm={pm} hoc2={hoc2} hep={!!tongQuan.v} />
-          <p className="ph3-gia-dinh ph3-o-hep" data-vung="gia-dinh"><b>Gia đình hỗ trợ:</b> dành cho con một khoảng yên tĩnh để học từng chặng ngắn; hỏi con điều đã hiểu và điều muốn thầy chữa.</p>
         </div>
       )}
     </div>
@@ -99,7 +100,8 @@ export function soCauHomNay(pm: PhMoi, hoc2: Hoc2 | null): { daLam: number; tong
 /** Một câu tình trạng dưới số câu (không nhắc lại số đã ghi to). */
 export function chuTinhTrang({ daLam, tong, keHoach }: { daLam: number; tong: number | null; keHoach: boolean }): string {
   const dich = keHoach ? 'xong kế hoạch hôm nay' : 'đủ mục tiêu của ngày'
-  if (tong === null) return daLam > 0 ? '' : 'Kết quả hiện ở đây ngay khi con bắt đầu học.'
+  // Đợt 18 (thầy 13/10 "bỏ hết các gợi ý hướng dẫn"): chưa có mục tiêu ⇒ không câu nào (tiêu đề "Hôm nay con chưa làm câu nào" đã đủ).
+  if (tong === null) return ''
   if (daLam >= tong) return keHoach ? 'Con đã xong kế hoạch hôm nay.' : 'Con đã đủ mục tiêu của ngày.'
   if (daLam === 0) return keHoach ? 'Con chưa bắt đầu kế hoạch hôm nay.' : 'Con chưa bắt đầu học hôm nay.'
   return `Con đang làm, còn ${tong - daLam} câu nữa là ${dich}.`
@@ -113,7 +115,7 @@ export function dongHanhTrinh(ht: Hoc2['hanhTrinh'], tong: number | null): strin
   if (!ht) return ''
   const tang = `Hành trình của con: tầng ${TEN_TANG[ht.tang - 1]}`
   if (tong === null || ht.toiThieu === tong) return `${tang}.`
-  if (tong < ht.toiThieu) return `${tang} · mức tối thiểu ${ht.toiThieu} câu. Kế hoạch hôm nay ít hơn vì chưa đủ câu phù hợp hoặc có câu đang để dành cho ca kiểm tra.`
+  // Đợt 18: bỏ câu giải thích vì sao kế hoạch ít hơn mức (chữ hướng dẫn) — chỉ giữ số có nhãn.
   return `${tang} · mức tối thiểu ${ht.toiThieu} câu.`
 }
 
@@ -148,13 +150,13 @@ function KhoiChinh({ pm, hoc2, tq }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTong
         </>
       )}
       {(!hoc2?.goi7 || nayTq) && tinhTrang && <p className="ph3-ah__phu">{tinhTrang}</p>}
-      {hoc2?.goi7 && <div className="ph3-ah__ghi">{nayTq && hoc2.homNay && so.tong !== null && <p data-vung="cau-moi-goi7">Câu mới hôm nay: {hoc2.homNay.daLam}/{hoc2.homNay.tong} (nằm trong {so.tong} câu của ngày).</p>}{hoc2.goi7.map(g=><p key={g.ten}>{g.nguonDayDu===false?`${g.ten}: đang chờ đủ nguồn các tờ; chưa xác nhận hoàn thành toàn bộ bài.`:`${g.ten}: đã gặp ${g.daGap}/${g.tong} câu gốc · còn ${g.con} câu · hạn ${g.han.slice(8,10)}/${g.han.slice(5,7)}.`}</p>)}<p>Gặp câu với hỗ trợ chưa có nghĩa con đã tự làm được hoặc thành thạo.</p></div>}
+      {hoc2?.goi7 && <div className="ph3-ah__ghi">{nayTq && hoc2.homNay && so.tong !== null && <p data-vung="cau-moi-goi7">Câu mới hôm nay: {hoc2.homNay.daLam}/{hoc2.homNay.tong} (nằm trong {so.tong} câu của ngày).</p>}{hoc2.goi7.map(g=><p key={g.ten}>{g.nguonDayDu===false?`${g.ten}: bài chưa đủ câu, chưa tính hoàn thành.`:`${g.ten}: đã gặp ${g.daGap}/${g.tong} câu · còn ${g.con} câu · hạn nộp ${g.han.slice(8,10)}/${g.han.slice(5,7)}.`}</p>)}</div>}
       {tq && <BaSoHomNay d={tq.dem.homNay} />}
       {(gioQuen || hanhTrinh || xap) && (
         <div className="ph3-ah__ghi">
           {gioQuen && <p>{gioQuen}</p>}
           {hanhTrinh && <p data-vung="hanh-trinh">{hanhTrinh}</p>}
-          {xap && <p>≈ là mức ước tính theo quy tắc hiện hành: hôm nay máy chưa lưu mức của con.</p>}
+          {xap && <p>≈ là mức ước tính.</p>}
         </div>
       )}
     </section>

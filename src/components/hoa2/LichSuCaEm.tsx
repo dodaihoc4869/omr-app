@@ -98,7 +98,7 @@ export default function LichSuCaEm({ sbd, scriptUrl = '', banDau = null, onVe }:
         )}
         {ls && ds.length === 0 && (
           <div className="h2-lsc-thong-bao" role="status">
-            <p>Em chưa nộp ca kiểm tra nào. Khi thầy mở ca, em vào thi từ nút Vào kiểm tra trên Hôm nay.</p>
+            <p>Em chưa nộp ca kiểm tra nào.</p>
           </div>
         )}
         {ds.length > 0 && (

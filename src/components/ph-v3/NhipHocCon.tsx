@@ -70,7 +70,7 @@ export default function NhipHocCon({ sbd, tenCon, lop, homNay }: { sbd: string; 
         bieuTuong={<BtLich co={22} />}
         mau={MAU_NHOM[k.nhom]}
         tieuDe="Nhịp học của con"
-        phu={`Lười hay chăm tính theo số ngày đủ mức, từ ${ngayNgan(k.tu)}`}
+        phu={`Từ ${ngayNgan(k.tu)}`}
         chip={
           <span className="ph3-chip ph3-nhip__nhom" data-mau={MAU_NHOM[k.nhom]}>
             <Icon size={16} strokeWidth={2.6} aria-hidden="true" />

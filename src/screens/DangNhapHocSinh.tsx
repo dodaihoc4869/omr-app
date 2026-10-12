@@ -60,7 +60,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
     if (e) e.preventDefault()
     const sbd = sbdInput.trim()
     if (!sbd) {
-      setLoiDangNhap('Vui lòng nhập số báo danh (SBD)')
+      setLoiDangNhap('Em nhập số báo danh (SBD).')
       return
     }
     setDangXuLyDangNhap(true)
@@ -130,7 +130,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
         setChuaCoMatKhau(false)
       } else {
         setChuaCoMatKhau(false)
-        setLoiDangNhap('Đặt mật khẩu thành công! Vui lòng đăng nhập.')
+        setLoiDangNhap('Đã đặt mật khẩu. Em đăng nhập lại.')
       }
     } catch (err) {
       setLoiDatMatKhau(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ')
@@ -140,7 +140,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
   }
 
   return (
-    <div className="bl-login"><section className="gd-cong-gioi-thieu"><h1>Hành trình giỏi Hóa</h1><p>Học từng chặng ngắn. Ôn đúng lúc. Từng bài mở thêm tầng khi em sẵn sàng.</p></section>
+    <div className="bl-login"><section className="gd-cong-gioi-thieu"><h1>Hành trình giỏi Hóa</h1></section>
       <div className="bl-login__card">
         <div className="bl-login__brand">{logo}</div>
         <LoiChao vai="hs" />
@@ -150,7 +150,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
             <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-amber-800 dark:text-amber-300 text-xs leading-relaxed flex items-start gap-2.5">
               <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
               <div>
-                <strong>Thiết lập mật khẩu lần đầu:</strong> SBD <strong>{sbdInput}</strong> chưa có mật khẩu. Em hãy tạo mật khẩu mới (tối thiểu 6 ký tự) để đăng nhập vào các lần sau.
+                SBD <strong>{sbdInput}</strong> chưa có mật khẩu. Em tạo mật khẩu mới, tối thiểu 6 ký tự.
               </div>
             </div>
 

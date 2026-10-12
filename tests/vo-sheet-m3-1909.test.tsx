@@ -49,11 +49,12 @@ const moMan = async (nhan: string) => {
 const tam = () => document.querySelector('.fixed.inset-0.z-50') as HTMLElement
 
 const TAB: [string, string][] = [
-  ['Xem điểm & lịch sử ca kiểm tra', 'Xem điểm & lịch sử ca kiểm tra'],
+  // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10 "tối ưu câu từ cho dễ hiểu"): tiêu đề tấm = ĐÚNG tên dòng đã bấm (một khái niệm một tên).
+  ['Xem điểm & lịch sử ca kiểm tra', 'Kết quả bài đã nộp'],
   ['Bài tập về nhà', 'Bài tập về nhà'],
   ['Bài gia đình giao', 'Bài gia đình giao'],
-  ['Khắc phục lỗi sai', 'Khắc phục lỗi sai & luyện đề'],
-  ['Bảng tin & bài luyện hôm nay', 'Bảng tin & bài luyện hôm nay'],
+  ['Khắc phục lỗi sai', 'Luyện lại từ bài kiểm tra'],
+  ['Bảng tin & bài luyện hôm nay', 'Thông tin từ gia đình'],
 ]
 
 describe('C1 · vỏ sheet toàn màn của cổng học sinh (/hs)', () => {
