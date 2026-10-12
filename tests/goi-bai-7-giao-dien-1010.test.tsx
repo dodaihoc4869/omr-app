@@ -20,8 +20,10 @@ it('màn Hôm nay ưu tiên gói thật thay kế hoạch cũ; phân biệt gặ
   expect(screen.getByRole('button',{name:'Vào ca kiểm tra'})).toBeTruthy()
 })
 it('dữ liệu sai hoặc thiếu không biến thành hoàn tất bài/đạt 80%',()=>{
-  expect(docTomTatGoi7({...goi,goi:[{...goi.goi[0],daGap:200}]})).toBeUndefined()
-  expect(docTomTatGoi7({...goi,kienThucCu:{tong:10,dat:20,tyLe:100}})).toBeUndefined()
+  // SỬA CÓ CHỦ ĐÍCH 12/10 21h30 (thầy: "lúc chiều thì hiện 31 câu giờ lại hiện 2 chặng"): trường PHỤ lệch không còn làm app bỏ cả gói (bỏ gói ⇒ Hôm nay
+  // rơi về số kế hoạch sai). daGap > tong ⇒ kẹp + "chưa chốt tổng số câu" (nguonDayDu:false) — vẫn KHÔNG thành hoàn tất bài; kienThucCu sai ⇒ mặc định.
+  expect(docTomTatGoi7({...goi,goi:[{...goi.goi[0],daGap:200}]})!.goi[0]).toMatchObject({daGap:127,con:0,nguonDayDu:false})
+  expect(docTomTatGoi7({...goi,kienThucCu:{tong:10,dat:20,tyLe:100}})!.kienThucCu).toEqual({tong:0,dat:0,tyLe:null})
   expect(docTomTatGoi7({bat:true})).toBeUndefined()
   expect(docTomTatGoi7(goi)).toEqual(goi)
 })
