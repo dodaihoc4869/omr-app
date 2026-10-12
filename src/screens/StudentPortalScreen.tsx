@@ -3,6 +3,7 @@ import { htmlKhoiLoiGiaiChuan } from '../lib/html-khoi-loi-giai-chuan'
 import HocTapHomNay from '../components/hoc-tap/HocTapHomNay'
 import { soHomNay } from '../components/hoc-tap/lam-bai' // màn làm bài 12/10D: thanh trên "đã làm/M câu hôm nay" cùng nguồn vòng tròn Hôm nay
 import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
+import { useKhoaCuonTrang } from '../lib/khoa-cuon-trang'
 import { canThanTuSanh, useSanhHoa2 } from '../components/hoa2/api'
 import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
 import { type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
@@ -816,6 +817,8 @@ export default function StudentPortalScreen() {
     goc.classList.add('sanh-bi-che')
     return () => goc.classList.remove('sanh-bi-che')
   }, [cheDo2, tab])
+  // SỬA LỖI 12/10 "không vuốt lên được": có màn con ⇒ khoá trang Hôm nay phía sau, cú vuốt luôn thuộc màn đang nhìn (src/lib/khoa-cuon-trang.ts).
+  useKhoaCuonTrang(dangMoManCon)
   // NẠP TRƯỚC MÀN LÀM BÀI (09/10): tải trước ExamTakeScreen lúc rảnh để khi học sinh bấm "Vào thi" thì màn mở ngay 0ms không phải chờ tải qua mạng.
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -967,8 +970,8 @@ export default function StudentPortalScreen() {
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
         /></div>
       )}
-      {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
-      {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} onTuLuyen={() => setTab('tuluyen')} /></Suspense></div>}
+      {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
+      {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} onTuLuyen={() => setTab('tuluyen')} /></Suspense></div>}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
       {/* CÂU ĐÃ LÀM (Game Hóa 2.0): màn riêng toàn màn hình, có nút "Về Hôm nay" của chính nó. */}
@@ -1023,7 +1026,7 @@ export default function StudentPortalScreen() {
 
       {tab !== null && tab !== 'hoctap' && tab !== 'tuchua' && tab !== 'caudalam' && tab !== 'lichsuca' && tab !== 'tuluyen' && (
         <div
-          className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade`}
+          className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto overscroll-contain flex flex-col animate-google-fade`}
         >
           {/* Header Toàn Màn Hình. Cổng học sinh (mọi màn cũ trừ game) dùng thanh trên M3 dùng chung; mọi đường khác giữ đúng cái cũ. */}
           {vaoM3 && (

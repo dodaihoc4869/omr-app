@@ -217,6 +217,15 @@ body {
   touch-action: pan-y;
   overscroll-behavior-y: contain;
 }
+/* KHOÁ TRANG PHÍA SAU MÀN CON của cổng học sinh (sửa lỗi "không vuốt lên được" 12/10 — StudentPortalScreen gắn `data-khoa-cuon` lên <html>
+ * khi có màn con): body `overflow: hidden` lan lên khung nhìn ⇒ trang Hôm nay ẩn phía sau không nhận cú vuốt nào (vuốt luôn thuộc màn đang
+ * nhìn); `overscroll-behavior: none` chặn kéo-làm-mới của trình duyệt khi màn con chưa tràn. Gỡ thuộc tính là trang cuộn lại đúng chỗ cũ. */
+html[data-khoa-cuon] {
+  overscroll-behavior: none;
+}
+html[data-khoa-cuon] body {
+  overflow: hidden;
+}
 /* Thanh trạng thái trong suốt (apple-mobile-web-app-status-bar-style =
  * black-translucent) — chừa vùng an toàn phía trên cho thanh dính của màn thi. */
 .man-lam-bai > .sticky {
