@@ -152,3 +152,12 @@ Thầy nhắn (nguyên văn, kèm ảnh thẻ Bài mới trong 7 ngày: "Học s
 Thầy hỏi "Chỗ tự kiểm này là gì" (ảnh thẻ Bài học trong 7 ngày: Tự kiểm kiến thức · Tờ 1/2/3 · Kiến thức bài trước 0/164 kỹ năng), rồi nhắn: "Bỏ chỗ này đi."
 - [x] Bỏ khối Tự kiểm kiến thức (Tờ 1/2/3), dòng "Kiến thức bài trước … kỹ năng", đoạn giải thích tiến độ; gỡ màn ManKiemGoi7 (không còn lối vào). Máy chủ goi-bai-7-kiem.ts giữ nguyên (điểm cũ còn trong sổ) | bằng chứng: TheGoi7/HocTapHomNay/StudentPortalScreen; test goi-bai-7-giao-dien-1010 sửa có chủ đích (khẳng định vắng); tsc sạch; 14 đỏ liên quan trùng lần chạy đợt 10; check:mau, kiem:mau-giu 0, soi:giao-dien 0 LỖI, build:cf 13/13.
 - [ ] Build + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
+
+## Đợt 12 — Điểm danh + bảng nhịp học trên bản chiếu · bảng Chăm/Lười ở app học sinh (12/10) — VẼ DUYỆT TRƯỚC
+Thầy nhắn (nguyên văn): "Tôi muốn bạn trùng tu lại phần điểm danh học sinh, tôi muốn mỗi buổi lên lớp học sinh sẽ làm điểm danh đầu tiên, khi học sinh điểm danh xong sẽ hiện luôn thống kê lười và chăm chỉ rõ ràng đầy đủ trong bản chiếu, trùng tu lại thật đẹp rõ ràng. Vẽ cho tôi duyệt trước khi tôi quyết định build."
+"Ở app học sinh hiện rõ một bảng ngay đầu thông tin lười hay chăm chỉ trên app đầy đủ siêu đẹp và chính xác, ghi thêm 1 câu trong bảng thầy cũng thấy điều này."
+- [ ] Vẽ: bản chiếu khi đang điểm danh (mã/QR + em đã điểm danh tô theo nhóm) | bằng chứng: (chưa có)
+- [ ] Vẽ: bản chiếu khi điểm danh xong — thống kê Chăm/Chưa đều/Lười của lớp đầy đủ | bằng chứng: (chưa có)
+- [ ] Vẽ: màn thầy bước Điểm danh trùng tu | bằng chứng: (chưa có)
+- [ ] Vẽ: app học sinh — bảng Chăm/Lười ngay đầu Hôm nay + câu "Thầy cũng thấy bảng này" | bằng chứng: (chưa có)
+- [ ] Chờ thầy duyệt — CHƯA BUILD | bằng chứng: (chưa có)
