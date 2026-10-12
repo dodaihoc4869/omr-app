@@ -108,8 +108,30 @@ const DS_HN = [
 ]
 // ═══════════ hết LÀN HÔM NAY 12/10B ═══════════
 
+// ═══════════ LÀN NHỊP EM 12/10C: app học sinh › Hôm nay — bảng "Nhịp học của em · từ 01/10" (bản vẽ HS-Cham / HS-Luoi thầy duyệt) ═══════════
+// Cảnh `?man=hs-nhip&nhe=…` (trang.tsx khối cùng tên; `/hs/nhip-hoc` GIẢ gia/nhip-hoc-em.ts). Chăm + Lười × 390×844 / 1440×900 × sáng / tối, CẢ
+// TRANG; thêm Lười đang thoát (3/6), Chưa đều, Chưa đủ dữ liệu (điện thoại sáng) và lỗi (bảng ẩn gọn). Chạy riêng: tiền tố "7" (70-…73-).
+const DS_NHE = [
+  ...['light', 'dark'].flatMap((nen) => [[390, 844, 'dien-thoai'], [1440, 900, 'may-tinh']].flatMap(([w, hh, kho]) => [
+    [`70-nhe-cham-${kho}${nen === 'dark' ? '-toi' : ''}`, 'hs-nhip&nhe=cham', w, hh, nen, true, /Thầy cũng thấy bảng này/],
+    [`71-nhe-luoi-${kho}${nen === 'dark' ? '-toi' : ''}`, 'hs-nhip&nhe=luoi', w, hh, nen, true, /Thầy cũng thấy bảng này/],
+  ])),
+  ['72-nhe-luoi-dang-thoat-dien-thoai', 'hs-nhip&nhe=luoi-thoat', 390, 844, 'light', true, /Thầy cũng thấy bảng này/],
+  ['72-nhe-chua-deu-dien-thoai', 'hs-nhip&nhe=chua-deu', 390, 844, 'light', true, /Thầy cũng thấy bảng này/],
+  ['72-nhe-chua-du-dien-thoai-toi', 'hs-nhip&nhe=chua-du', 390, 844, 'dark', true, /Thầy cũng thấy bảng này/],
+  ['72-nhe-30-ngay-dien-thoai', 'hs-nhip&nhe=cham-dai', 390, 844, 'light', true, /Thầy cũng thấy bảng này/],
+  ['72-nhe-30-ngay-may-tinh-toi', 'hs-nhip&nhe=cham-dai', 1440, 900, 'dark', true, /Thầy cũng thấy bảng này/],
+  ['73-nhe-loi-an-gon-dien-thoai', 'hs-nhip&nhe=loi', 390, 844, 'light', false, /Chào Minh Anh/],
+  // phía thầy: ô Lười ở Hôm nay nói đường thoát; tấm Hồ sơ làm bài lấy NHÓM làm nhãn chính + chip đối phó riêng (bộ giả gia/nhip-hoc.ts)
+  ['74-nhe-thay-hom-nay-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:cho'],
+  ['74-nhe-thay-ho-so-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:ho-so'],
+  ['74-nhe-thay-ho-so-dien-thoai-toi', 'gv-hom-nay&nh=1', 390, 844, 'dark', false, /Hôm nay của thầy/, 'hn:ho-so'],
+]
+// ═══════════ hết LÀN NHỊP EM 12/10C ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_NHE, // LÀN NHỊP EM 12/10C
   ...DS_HN, // LÀN HÔM NAY 12/10B
   ...DS_HS12, // LÀN HỌC SINH 12/10
   ...DS_TTC, // LÀN THẦY TỰ CHỮA 12/10
