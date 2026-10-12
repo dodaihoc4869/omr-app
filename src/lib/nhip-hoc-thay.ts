@@ -5,15 +5,19 @@
 // LUẬT NHÓM (thầy đã duyệt, `LUAT_NHOM_NHIP`) — tính trên các ngày ĐÃ QUA (không tính hôm nay vì ngày chưa hết), từ ngày vào của em (`ngayVao`, máy
 // chủ đã kẹp ≥ 01/10: em vào học muộn không bị tính những ngày trước khi có mặt) tới hôm qua:
 //   · Chưa đủ dữ liệu: em có dưới 3 ngày đã qua được tính.
-//   · Lười: số ngày đủ mức ≤ 40% số ngày đã qua, HOẶC có từ 3 ngày liền không làm câu nào.
-//   · Chăm: số ngày đủ mức ≥ 80% số ngày đã qua.
+//   · Lười: (số ngày đủ mức ≤ 40% số ngày đã qua, HOẶC có từ 3 ngày liền không làm câu nào) VÀ chuỗi ngày đủ mức liền gần nhất dưới 6 ngày.
+//   · Thoát Lười (thầy chốt 12/10: "6 ngày liền làm đủ mới thoát nhóm lười nhé"): chuỗi ngày đủ mức liền gần nhất từ 6 ngày (lùi từ hôm qua; hôm nay
+//     đã đủ thì cộng hôm nay) ⇒ ≥ 80% là Chăm, còn lại Chưa đều.
+//   · Chăm: số ngày đủ mức ≥ 80% số ngày đã qua (không Lười).
 //   · Chưa đều: còn lại.
-//   Chồng lấn (≥ 80% mà vẫn có 3 ngày liền không làm — chỉ xảy ra khi em đã qua từ 15 ngày) ⇒ LƯỜI: ba ngày liền bỏ là việc thầy cần nhắc ngay, không
-//   để em ấy nằm ở cột "đáng khen". So sánh bằng số nguyên (đủ × 100 so với tỉ lệ × số ngày) — không làm tròn ở biên 80% / 40%.
+//   Chồng lấn (≥ 80% mà vẫn có 3 ngày liền không làm — chỉ xảy ra khi em đã qua từ 15 ngày) ⇒ LƯỜI (trừ khi đã đủ 6 ngày liền): ba ngày liền bỏ là
+//   việc thầy cần nhắc ngay. So sánh bằng số nguyên (đủ × 100 so với tỉ lệ × số ngày) — không làm tròn ở biên 80% / 40%.
+//   PHÉP THUẦN MỘT CHỖ cho cả máy chủ và hai app: `server/src/nhip-hoc-luat.ts` (tệp này chỉ gọi lại, giữ nguyên chữ ký cũ).
 // "Có dấu hiệu đối phó" là cờ RIÊNG (máy chủ tính theo lô, đúng ngưỡng `NGUONG_THAI_DO`), độc lập với nhóm.
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
 import type { DoiPhoChonLap, DoiPhoEm, DoiPhoQuaNhanh, EmNhipHoc, KetQuaNhipHoc, NhomNhip } from '../../server/src/nhip-hoc-kieu'
 import { LUAT_NHOM_NHIP } from '../../server/src/nhip-hoc-kieu'
+import { nhomNhipTheoLuat, tomTatNhip } from '../../server/src/nhip-hoc-luat'
 import type { LopBaiHangNgay } from '../../server/src/bai-hang-ngay-kieu'
 
 export type { DoiPhoEm, EmNhipHoc, KetQuaNhipHoc, NhomNhip }
@@ -124,6 +128,8 @@ export interface DongNhipHoc {
   tongLam: number
   /** Chuỗi ngày liền không làm câu nào DÀI NHẤT (ngày đã qua; hoà ⇒ chuỗi gần đây hơn); không có ⇒ null. */
   chuoiKhongLam: { dai: number; tu: string; den: string } | null
+  /** Chuỗi ngày đủ mức liền GẦN NHẤT (lùi từ hôm qua; hôm nay đã đủ thì cộng hôm nay) — từ 6 ngày thì thoát nhóm Lười. */
+  chuoiDuGanNhat: number
   /** Hôm nay tới lúc tải (ngày chưa hết). Khoảng không gồm hôm nay ⇒ null. */
   homNay: { muc: number; lam: number } | null
   /** Mỗi ngày từ đầu khoảng tới hôm nay (dải ô). */
@@ -133,12 +139,10 @@ export interface DongNhipHoc {
 
 const loaiO = (muc: number, lam: number): Exclude<LoaiO, 'chua-vao'> => (lam >= muc ? 'du' : lam <= 0 ? 'khong-lam' : 2 * lam >= muc ? 'thieu-it' : 'thieu-nhieu')
 
-/** Chia nhóm theo luật đầu tệp. `n` = số ngày đã qua được tính, `du` = số ngày đủ mức, `chuoi` = số ngày liền không làm dài nhất. */
-export function nhomTheoLuat(n: number, du: number, chuoi: number): NhomNhip {
-  if (n < LUAT_NHOM_NHIP.soNgayToiThieu) return 'chua-du'
-  if (du * 100 <= LUAT_NHOM_NHIP.luoiDen * n || chuoi >= LUAT_NHOM_NHIP.ngayLienKhongLam) return 'luoi'
-  if (du * 100 >= LUAT_NHOM_NHIP.chamTu * n) return 'cham'
-  return 'chua-deu'
+/** Chia nhóm theo luật đầu tệp. `n` = số ngày đã qua được tính, `du` = số ngày đủ mức, `chuoi` = số ngày liền không làm dài nhất,
+ *  `chuoiDuGanNhat` (THÊM 12/10, tuỳ chọn — mặc định 0 = chưa xét đường thoát) = chuỗi ngày đủ mức liền gần nhất. */
+export function nhomTheoLuat(n: number, du: number, chuoi: number, chuoiDuGanNhat = 0): NhomNhip {
+  return nhomNhipTheoLuat(n, du, chuoi, chuoiDuGanNhat)
 }
 
 /** Một em ⇒ một dòng Nhịp học (nhóm, số ngày, dải ô). `ngay` = các ngày của trả lời (cùng thứ tự `muc` / `lam`). Thuần. */
@@ -151,35 +155,24 @@ export function phanNhomEm(e: EmNhipHoc, ngay: readonly string[], homNay: string
     const loai: LoaiO = d < e.ngayVao ? 'chua-vao' : laHomNay && lam > 0 && lam < muc ? 'thieu-it' : loaiO(muc, lam)
     return { ngay: d, muc, lam, loai, homNay: laHomNay }
   })
-  const tinh = o.filter((x) => !x.homNay && x.ngay < homNay && x.loai !== 'chua-vao')
-  let lon: { dai: number; tu: string; den: string } | null = null
-  for (let i = 0, dau = -1; i < tinh.length; i++) {
-    if (tinh[i]!.lam > 0) {
-      dau = -1
-      continue
-    }
-    if (dau < 0) dau = i
-    const dai = i - dau + 1
-    if (!lon || dai >= lon.dai) lon = { dai, tu: tinh[dau]!.ngay, den: tinh[i]!.ngay }
-  }
-  const du = tinh.filter((x) => x.lam >= x.muc).length
-  const h = o.find((x) => x.homNay)
-  const chuoi = lon?.dai ?? 0
+  // Các ngày được tính (từ ngày vào, gồm hôm nay) ⇒ MỘT phép thuần với máy chủ (`tomTatNhip`, server/src/nhip-hoc-luat.ts).
+  const t = tomTatNhip(o.filter((x) => x.loai !== 'chua-vao'), homNay)
   return {
     sbd: e.sbd,
     hoTen: e.hoTen,
     lop: e.lop,
     khoi: e.khoi,
     ngayVao: e.ngayVao,
-    nhom: nhomTheoLuat(tinh.length, du, chuoi),
-    soNgayQua: tinh.length,
-    soNgayDu: du,
-    soNgayThieu: tinh.length - du,
-    tongCauThieu: tinh.reduce((t, x) => t + Math.max(0, x.muc - x.lam), 0),
-    soNgayKhongLam: tinh.filter((x) => x.lam <= 0).length,
-    tongLam: tinh.reduce((t, x) => t + x.lam, 0),
-    chuoiKhongLam: lon,
-    homNay: h ? { muc: h.muc, lam: h.lam } : null,
+    nhom: t.nhom,
+    soNgayQua: t.soNgayQua,
+    soNgayDu: t.soNgayDu,
+    soNgayThieu: t.soNgayThieu,
+    tongCauThieu: t.tongCauThieu,
+    soNgayKhongLam: t.soNgayKhongLam,
+    tongLam: t.tongLam,
+    chuoiKhongLam: t.chuoiKhongLam,
+    chuoiDuGanNhat: t.chuoiDuGanNhat,
+    homNay: t.homNay,
     o,
     doiPho: e.doiPho,
   }
@@ -277,15 +270,18 @@ export const khoangNgan = (tu: string, den: string): string => (tu === den ? nga
 /** Số ngày tối thiểu để Chăm / tối đa để Lười trên `n` ngày (số nguyên, đúng phép so của `nhomTheoLuat`). */
 export const nguongNgay = (n: number) => ({ cham: Math.ceil((LUAT_NHOM_NHIP.chamTu * n) / 100), luoi: Math.floor((LUAT_NHOM_NHIP.luoiDen * n) / 100) })
 
+/** Đường thoát nhóm Lười (thầy 12/10: "6 ngày liền làm đủ mới thoát nhóm lười nhé"). */
+export const CHU_THOAT_LUOI = `thoát khi đủ mức ${LUAT_NHOM_NHIP.ngayLienThoatLuoi} ngày liền`
+
 /** Chữ điều kiện dưới mỗi ô nhóm (bản vẽ: "Đủ mức từ 9/11 ngày trở lên"). Chưa đủ 3 ngày ⇒ chữ theo phần trăm. */
 export function chuDieuKien(nhom: Exclude<NhomNhip, 'chua-du'>, n: number): string {
   const L = LUAT_NHOM_NHIP
   if (n < L.soNgayToiThieu) {
-    return nhom === 'cham' ? `Đủ mức từ ${L.chamTu}% số ngày trở lên` : nhom === 'luoi' ? `Đủ mức từ ${L.luoiDen}% số ngày trở xuống, hoặc ${L.ngayLienKhongLam} ngày liền không làm` : `Đủ mức trên ${L.luoiDen}% và dưới ${L.chamTu}% số ngày`
+    return nhom === 'cham' ? `Đủ mức từ ${L.chamTu}% số ngày trở lên` : nhom === 'luoi' ? `Đủ mức từ ${L.luoiDen}% số ngày trở xuống, hoặc ${L.ngayLienKhongLam} ngày liền không làm · ${CHU_THOAT_LUOI}` : `Đủ mức trên ${L.luoiDen}% và dưới ${L.chamTu}% số ngày`
   }
   const g = nguongNgay(n)
   if (nhom === 'cham') return `Đủ mức từ ${g.cham}/${n} ngày trở lên`
-  if (nhom === 'luoi') return `Đủ mức ${g.luoi}/${n} ngày trở xuống, hoặc ${L.ngayLienKhongLam} ngày liền không làm`
+  if (nhom === 'luoi') return `Đủ mức ${g.luoi}/${n} ngày trở xuống, hoặc ${L.ngayLienKhongLam} ngày liền không làm · ${CHU_THOAT_LUOI}`
   const a = g.luoi + 1
   const b = g.cham - 1
   return a >= b ? `Đủ mức ${a}/${n} ngày` : `Đủ mức ${a}–${b} ngày trong ${n}`

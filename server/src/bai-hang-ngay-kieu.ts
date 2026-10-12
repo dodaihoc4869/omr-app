@@ -110,9 +110,11 @@ export const NGUONG_THAI_DO = {
   ngayDuTot: 80,
   ngayDuChuY: 50,
   soNgayToiThieu: 3,
-  /** Nhãn "Lười" (thầy 12/10 duyệt, CÙNG luật nhóm Nhịp học ở Hôm nay): đủ mức ≤ 40% số ngày đã tính, HOẶC ≥ 3 ngày liền không làm câu nào. */
+  /** Nhãn "Lười" (thầy 12/10 duyệt, CÙNG luật nhóm Nhịp học ở Hôm nay): đủ mức ≤ 40% số ngày đã tính, HOẶC ≥ 3 ngày liền không làm câu nào … */
   ngayDuLuoi: 40,
   ngayLienKhongLam: 3,
+  /** … VÀ chuỗi ngày đủ mức liền gần nhất dưới 6 ngày (thầy 12/10: "6 ngày liền làm đủ mới thoát nhóm lười nhé" — `LUAT_NHOM_NHIP.ngayLienThoatLuoi`). */
+  ngayLienThoatLuoi: 6,
   /** (b) quá nhanh: xấu khi ≥ 30% lượt quá nhanh VÀ nhóm ấy đúng dưới 50% · chú ý khi ≥ 15%; cần ≥ 20 lượt có số giây. */
   nhanXau: 30,
   nhanChuY: 15,
@@ -172,13 +174,14 @@ export const TEN_NHAN_THAI_DO: Readonly<Record<NhanThaiDo, string>> = {
 /** LUẬT KẾT LUẬN (minh bạch, theo thứ tự) — nhóm Chăm / Chưa đều / Lười CÙNG luật Nhịp học ở Hôm nay (thầy 12/10 duyệt):
  *  1. "Có dấu hiệu đối phó" khi (b) quá nhanh ở mức xấu, HOẶC (e) chọn lặp ở mức xấu, HOẶC (d) gợi ý ở mức xấu VÀ (f) độ đúng đang giảm (chú ý/xấu).
  *  2. "Chưa đủ dữ liệu" khi (a) chưa đủ 3 ngày đã tính.
- *  3. "Lười" khi (a) đủ mức ≤ 40% số ngày, HOẶC ≥ 3 ngày liền không làm câu nào.
+ *  3. "Lười" khi ((a) đủ mức ≤ 40% số ngày, HOẶC ≥ 3 ngày liền không làm câu nào) VÀ chuỗi ngày đủ mức liền gần nhất dưới 6 ngày
+ *     (thầy 12/10: "6 ngày liền làm đủ mới thoát nhóm lười nhé"; chuỗi lùi từ hôm qua, hôm nay đã đủ thì cộng hôm nay).
  *  4. "Chưa đều" khi (a) dưới 80% số ngày đủ mức, HOẶC (c) dồn bài ở mức xấu.
  *  5. Còn lại: "Chăm chỉ" (≥ 80% ngày đủ mức, không dồn bài, không dấu hiệu đối phó). */
 export const LUAT_KET_LUAN: readonly string[] = [
   'Có dấu hiệu đối phó: quá nhanh mà đúng thấp, hoặc chọn lặp một phương án, hoặc dựa nhiều vào gợi ý/lời giải trong khi độ đúng đang giảm.',
   'Chưa đủ dữ liệu: chưa đủ 3 ngày để tính tỉ lệ ngày đủ mức.',
-  'Lười: đủ mức từ 40% số ngày trở xuống, hoặc 3 ngày liền không làm câu nào.',
+  'Lười: đủ mức từ 40% số ngày trở xuống, hoặc 3 ngày liền không làm câu nào; thoát khi đủ mức 6 ngày liền.',
   'Chưa đều: dưới 80% số ngày đủ mức, hoặc từ 50% lượt làm dồn vào 23:00–04:59.',
   'Chăm chỉ: từ 80% số ngày đủ mức, không dồn bài, không dấu hiệu đối phó.',
 ]
@@ -267,5 +270,12 @@ export interface KetQuaHoSoThaiDo {
   /** Sổ vượt `TOI_DA_LUOT_HO_SO` (10 000) lượt ⇒ chỉ tính 10 000 lượt gần nhất (cắt rơi vào khoảng xem ⇒ `canhBao` nói rõ). */
   catBot: boolean
   canhBao: string[]
+  // ---- CHỈ THÊM 12/10 (máy chủ cũ không có ⇒ app lùi về nhãn `ketLuan`) ----
+  /** Nhóm Nhịp học của em — CÙNG phép thuần với Hôm nay › Nhịp học (`tomTatNhip`, server/src/nhip-hoc-luat.ts), tính từ ngày em vào học như `/gv/nhip-hoc`. */
+  nhomNhip?: 'cham' | 'chua-deu' | 'luoi' | 'chua-du'
+  /** Cờ "Có dấu hiệu đối phó" (luật 1 của `LUAT_KET_LUAN`) — chip riêng, độc lập với nhóm. */
+  coDoiPho?: boolean
+  /** Chuỗi ngày đủ mức liền gần nhất (từ 6 ngày thì thoát nhóm Lười). */
+  chuoiDuGanNhat?: number
 }
 export type TraLoiHoSoThaiDo = KetQuaHoSoThaiDo | { ok: false; error: string }

@@ -1,5 +1,6 @@
 // BÀI HẰNG NGÀY — phép thuần dùng chung cho thẻ "Bài hằng ngày" (bảng nhiệt) và tấm hồ sơ một em (lịch hoạt động). Không IO.
 import type { EmBaiHangNgay, MucTinHieu, NgayBaiEm, NhanThaiDo } from '../../lib/bai-hang-ngay-api'
+import { LUAT_NHOM_NHIP, type NhomNhip } from '../../../server/src/nhip-hoc-kieu'
 
 /** Bốn mức tô của một ô ngày (màu KHÔNG là kênh duy nhất: ô luôn ghi "đã làm/mức"). */
 export type MucO = 'du' | 'thieu-it' | 'thieu-nhieu' | 'khong-lam'
@@ -49,7 +50,16 @@ export const TEN_MUC_TIN_HIEU: Record<MucTinHieu, string> = { tot: 'Trong ngư�
 export const MO_TA_NHAN: Record<NhanThaiDo, string> = {
   'cham-chi': 'Làm đủ mức gần như mọi ngày, nhịp đều, không thấy dấu hiệu làm cho xong.',
   'chua-deu': 'Đủ mức chưa tới 80% số ngày, hoặc làm dồn vào khuya.',
-  luoi: 'Đủ mức từ 40% số ngày trở xuống, hoặc 3 ngày liền không làm câu nào.',
+  luoi: 'Đủ mức từ 40% số ngày trở xuống, hoặc 3 ngày liền không làm câu nào; thoát khi đủ mức 6 ngày liền.',
   'doi-pho': 'Có dấu hiệu làm cho xong: xem các tín hiệu vượt ngưỡng bên dưới.',
   'chua-du-du-lieu': 'Cần thêm ngày làm bài để kết luận.',
+}
+
+/** 12/10: đầu tấm hiện NHÓM Nhịp học (cùng luật Hôm nay › Nhịp học) làm nhãn chính — màu tô theo nhãn thái độ tương ứng, mô tả theo luật nhóm. */
+export const NHAN_THEO_NHOM: Record<NhomNhip, NhanThaiDo> = { cham: 'cham-chi', 'chua-deu': 'chua-deu', luoi: 'luoi', 'chua-du': 'chua-du-du-lieu' }
+export const MO_TA_NHOM: Record<NhomNhip, string> = {
+  cham: `Đủ mức từ ${LUAT_NHOM_NHIP.chamTu}% số ngày đã qua, tính từ ngày em vào học.`,
+  'chua-deu': `Đủ mức chưa tới ${LUAT_NHOM_NHIP.chamTu}% số ngày đã qua, hoặc vừa ra khỏi nhóm Lười nhờ ${LUAT_NHOM_NHIP.ngayLienThoatLuoi} ngày liền đủ mức.`,
+  luoi: `Đủ mức từ ${LUAT_NHOM_NHIP.luoiDen}% số ngày trở xuống, hoặc ${LUAT_NHOM_NHIP.ngayLienKhongLam} ngày liền không làm câu nào; thoát khi đủ mức ${LUAT_NHOM_NHIP.ngayLienThoatLuoi} ngày liền.`,
+  'chua-du': `Chưa đủ ${LUAT_NHOM_NHIP.soNgayToiThieu} ngày đã qua để xếp nhóm.`,
 }

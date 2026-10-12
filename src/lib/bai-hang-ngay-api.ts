@@ -28,6 +28,8 @@ const laNgay = (x: unknown): x is string => typeof x === 'string' && /^\d{4}-\d{
 const dt = (x: unknown): O | null => (x && typeof x === 'object' && !Array.isArray(x) ? (x as O) : null)
 const mang = <T>(x: unknown, doc: (v: unknown) => T | null): T[] => (Array.isArray(x) ? x.map(doc).filter((v): v is T => v !== null) : [])
 const tang = (x: unknown): 1 | 2 | 3 | 4 => (x === 2 || x === 3 || x === 4 ? x : 1)
+/** Bốn nhóm Nhịp học (trường `nhomNhip` của hồ sơ thái độ, chỉ thêm 12/10). */
+const NHOM_NHIP = ['cham', 'chua-deu', 'luoi', 'chua-du'] as const
 
 function docNgayBai(x: unknown): NgayBaiEm | null {
   const o = dt(x)
@@ -165,6 +167,10 @@ export function docHoSoThaiDo(du: O): KetQuaHoSoThaiDo | null {
     cauDaOn: mang(du.cauDaOn, docCau),
     catBot: du.catBot === true,
     canhBao: mang(du.canhBao, (x) => (typeof x === 'string' && x ? x : null)),
+    // CHỈ THÊM 12/10: nhóm Nhịp học + cờ đối phó + chuỗi đủ mức liền gần nhất. Máy chủ cũ không có / sai kiểu ⇒ bỏ trường (tấm lùi về nhãn `ketLuan`).
+    ...(NHOM_NHIP.includes(du.nhomNhip as never) ? { nhomNhip: du.nhomNhip as NonNullable<KetQuaHoSoThaiDo['nhomNhip']> } : {}),
+    ...(typeof du.coDoiPho === 'boolean' ? { coDoiPho: du.coDoiPho } : {}),
+    ...(so(du.chuoiDuGanNhat) !== null ? { chuoiDuGanNhat: soKhongAm(du.chuoiDuGanNhat) } : {}),
   }
 }
 
