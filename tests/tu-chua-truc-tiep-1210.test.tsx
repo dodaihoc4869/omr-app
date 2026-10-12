@@ -1,13 +1,16 @@
 // CHỮA TRỰC TIẾP CÂU GỐC (12/10) — thầy: "mục chữa lỗi hiển thị cho thật chuẩn để học sinh chữa lỗi được" (kèm ảnh "Cùng gỡ câu này" ở
-// trạng thái "Cần thêm bài luyện đúng chỗ": em chỉ thấy một khung chữ). Khoá:
-//   · thieu_hoc_lieu ⇒ lối "Chữa trực tiếp câu gốc": (a) câu gốc bằng TheCau, (b) đáp án em đã chọn, (c) đáp án đúng + lời giải SAU khi em bấm,
-//     (d) em tự làm lại và kiểm tra lại — đúng / chưa đúng; nút rời màn "Sang câu khác";
-//   · máy chủ KHÔNG cho (câu thuộc ca chưa công bố ⇒ `khoa`) ⇒ không đáp án, không lời giải, không bước 2–3;
+// trạng thái "Cần thêm bài luyện đúng chỗ": em chỉ thấy một khung chữ). SỬA CÓ CHỦ Ý 12/10 (Boss): thứ tự là Xem lại câu gốc → TỰ LÀM LẠI →
+// Đáp án và lời giải (xem đáp án trước rồi làm lại là chép, không phải tự chữa). Khoá:
+//   · thieu_hoc_lieu ⇒ lối "Chữa trực tiếp câu gốc": bước 1 câu gốc bằng TheCau + đáp án em đã chọn, KHÔNG đáp án đúng / lời giải;
+//   · bước 2 tự làm lại: đúng ⇒ "Em đã tự sửa đúng" + mở bước 3; sai ⇒ báo sai (không lộ đáp án), thử thêm một lần, rồi mở bước 3;
+//     nút phụ "Em chưa làm được — xem lời giải" mở bước 3 ngay; câu trả lời ngắn / tự luận ⇒ giải ra giấy rồi đối chiếu;
+//   · máy chủ KHÔNG cho đáp án (câu thuộc ca chưa công bố ⇒ `khoa`) ⇒ vẫn làm lại được nhưng không chấm, "Câu này chưa được mở đáp án,
+//     thầy sẽ chữa", không bước 3, không đáp án / lời giải trên màn;
 //   · vòng chữa báo đang có ca kiểm tra mở ⇒ KHÔNG hỏi đề/đáp án câu gốc;
 //   · cho_gap_lai_2 ⇒ ghi rõ giờ + thứ + ngày hẹn, kèm nút sang câu khác;
 //   · hàm thuần: so lần tự làm lại, chữ đáp án có nhãn, thời gian còn lại.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 
 const api = vi.hoisted(() => ({
   apiMoDot: vi.fn(),
@@ -43,6 +46,14 @@ function mayChu(chiTiet: Record<string, unknown>) {
   }))
 }
 const DOT = { ok: true, dotId: 'D1', trangThai: 'thieu_hoc_lieu', coHocLieu: false, revision: 1, tienDo: { soBuocDaQua: 0, soBuocCanKiem: 0 }, tienDoChiTiet: [], cauGoc: null, item: null }
+const duongTuGo = () => screen.getByRole('list', { name: 'Các bước chữa trực tiếp' })
+const nutBuoc = (ten: RegExp) => within(duongTuGo()).getByRole('button', { name: ten }) as HTMLButtonElement
+/** Chưa có đáp án đúng / lời giải nào trên màn. */
+function chuaLoDapAn() {
+  expect(screen.queryByText('Đáp án đúng')).toBeNull()
+  expect(screen.queryByText(/0,1 × 82/)).toBeNull()
+  expect(screen.queryByText(/khối lượng muối CH₃COONa là 8,2 gam/)).toBeNull()
+}
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -57,59 +68,107 @@ afterEach(() => {
 })
 
 describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bước', () => {
-  it('không còn ngõ cụt: câu gốc + đáp án em chọn → đáp án đúng + lời giải → tự làm lại, kiểm tra lại', async () => {
+  it('không còn ngõ cụt: câu gốc + đáp án em chọn → tự làm lại (sai, thử thêm, vẫn sai) → đáp án + lời giải', async () => {
     mayChu({ ok: true, cau: [CT] })
     const veNgoai = vi.fn()
     render(<Man token="t" qid="Q" onVe={veNgoai} />)
-    // (a) câu gốc đầy đủ + (b) đáp án em đã chọn; đáp án đúng CHƯA hiện
+    // Bước 1: câu gốc đầy đủ + đáp án em đã chọn; đáp án đúng / lời giải CHƯA hiện
     expect(await screen.findByRole('heading', { name: 'Bài luyện từng bước đang được chuẩn bị' })).toBeTruthy()
     expect(screen.getByText('Chữa trực tiếp câu gốc')).toBeTruthy() // dòng phụ đầu màn: tên lối đang đi
     expect(await screen.findByText(/etyl axetat/)).toBeTruthy()
     expect(screen.getByText('Em đã chọn').nextSibling?.textContent).toBe('B')
-    expect(screen.queryByText('Đáp án đúng')).toBeNull()
-    expect(screen.queryByText(/0,1 × 82/)).toBeNull()
+    chuaLoDapAn()
     expect(screen.queryByText('Cần thêm bài luyện đúng chỗ')).toBeNull()
-    // Đường tự gỡ có 3 bước, bước 1 đang mở
-    const duong = screen.getByRole('list', { name: 'Các bước chữa trực tiếp' })
-    expect(within(duong).getAllByRole('button').map((b) => b.textContent)).toEqual(['1Xem lại câu gốc', '2Đáp án và lời giải', '3Tự làm lại'])
-    expect(within(duong).getByRole('button', { name: /Xem lại câu gốc/ }).getAttribute('aria-current')).toBe('step')
-    // một nút chính, kèm nút sang câu khác
+    // Đường tự gỡ: 1 Xem lại câu gốc → 2 Tự làm lại → 3 Đáp án và lời giải (bước 3 khoá tới khi em làm lại)
+    expect(within(duongTuGo()).getAllByRole('button').map((b) => b.textContent)).toEqual(['1Xem lại câu gốc', '2Tự làm lại', '3Đáp án và lời giải'])
+    expect(nutBuoc(/Xem lại câu gốc/).getAttribute('aria-current')).toBe('step')
+    expect(nutBuoc(/Đáp án và lời giải/).disabled).toBe(true)
+    // một nút chính (đổi theo bước), kèm nút sang câu khác
     expect(document.querySelectorAll('.ccs-day .ccs-nut-chinh')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Sang câu khác' })).toBeTruthy()
-    // (c) đáp án đúng + lời giải từng bước
-    fireEvent.click(screen.getByRole('button', { name: 'Xem đáp án và lời giải' }))
-    expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
-    expect(screen.getByText('Đáp án đúng').nextSibling?.textContent).toBe('A')
-    expect(screen.getByText(/0,1 × 82/)).toBeTruthy()
-    // (d) tự làm lại: chọn sai ⇒ "Chưa đúng" + đáp án đúng; làm lại, chọn đúng ⇒ "Em làm đúng rồi"
+    expect(screen.queryByRole('button', { name: 'Xem đáp án và lời giải' })).toBeNull()
+    // Bước 2: tự làm lại — sai lần đầu ⇒ báo sai, KHÔNG lộ đáp án, cho thử thêm
     fireEvent.click(screen.getByRole('button', { name: 'Tự làm lại câu này' }))
-    const kiem = screen.getByRole('button', { name: 'Kiểm tra lại' }) as HTMLButtonElement
-    expect(kiem.disabled).toBe(true)
+    expect(nutBuoc(/Tự làm lại/).getAttribute('aria-current')).toBe('step')
+    expect((screen.getByRole('button', { name: 'Kiểm tra lại' }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getByRole('button', { name: 'Em chưa làm được — xem lời giải' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /6,8/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra lại' }))
     expect(await screen.findByRole('heading', { name: 'Chưa đúng' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Làm lại lần nữa' }))
-    fireEvent.click(screen.getByRole('button', { name: /8,2/ }))
+    chuaLoDapAn()
+    expect(nutBuoc(/Đáp án và lời giải/).disabled).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: 'Thử thêm một lần' }))
+    fireEvent.click(screen.getByRole('button', { name: /9,6/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra lại' }))
-    expect(await screen.findByRole('heading', { name: 'Em làm đúng rồi' })).toBeTruthy()
-    expect(screen.getByText(/không tính điểm, không đổi lịch ôn/)).toBeTruthy()
+    // sai lần hai ⇒ mở bước 3
+    expect(await screen.findByRole('heading', { name: 'Vẫn chưa đúng' })).toBeTruthy()
+    chuaLoDapAn()
+    expect(nutBuoc(/Đáp án và lời giải/).disabled).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Xem đáp án và lời giải' }))
+    // Bước 3: đáp án đúng + lời giải từng bước + đối chiếu lần làm lại
+    expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
+    expect(screen.getByText('Đáp án đúng').nextSibling?.textContent).toBe('A')
+    expect(screen.getByText(/0,1 × 82/)).toBeTruthy()
+    expect(screen.getByText('Lần em tự làm lại').nextSibling?.textContent).toBe('C · chưa đúng')
     fireEvent.click(screen.getAllByRole('button', { name: 'Sang câu khác' })[0]!)
     expect(veNgoai).toHaveBeenCalled()
     // đề + đáp án lấy qua đường "Câu đã làm" (máy chủ xét quyền), đúng câu
     expect(cuoc.filter((c) => c.u === '/game-v2/hoa2-cau-chi-tiet').map((c) => c.body.qid)).toEqual(['Q'])
   })
 
-  it('máy chủ không cho đáp án (câu thuộc ca chưa công bố) ⇒ không đáp án, không lời giải, không bước 2–3', async () => {
-    mayChu({ ok: true, cau: [], khoa: ['Q'] })
+  it('tự làm lại đúng ⇒ "Em đã tự sửa đúng" rồi mới mở lời giải để đối chiếu', async () => {
+    mayChu({ ok: true, cau: [CT] })
     render(<Man token="t" qid="Q" onVe={() => {}} />)
-    expect(await screen.findByText(/ca kiểm tra chưa công bố kết quả/)).toBeTruthy()
-    expect(screen.queryByText('Đáp án đúng')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Xem đáp án và lời giải' })).toBeNull()
-    const duong = screen.getByRole('list', { name: 'Các bước chữa trực tiếp' })
-    expect((within(duong).getByRole('button', { name: /Đáp án và lời giải/ }) as HTMLButtonElement).disabled).toBe(true)
-    expect((within(duong).getByRole('button', { name: /Tự làm lại/ }) as HTMLButtonElement).disabled).toBe(true)
-    expect(document.body.textContent).not.toMatch(/8,2 gam/)
+    fireEvent.click(await screen.findByRole('button', { name: 'Tự làm lại câu này' }))
+    fireEvent.click(screen.getByRole('button', { name: /8,2/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra lại' }))
+    expect(await screen.findByRole('heading', { name: 'Em đã tự sửa đúng' })).toBeTruthy()
+    expect(screen.getByText(/không tính điểm, không đổi lịch ôn/)).toBeTruthy()
+    chuaLoDapAn()
+    fireEvent.click(screen.getByRole('button', { name: 'Đối chiếu lời giải' }))
+    expect(await screen.findByText(/0,1 × 82/)).toBeTruthy()
+    expect(screen.getByText('Lần em tự làm lại').nextSibling?.textContent).toBe('A · đúng')
+  })
+
+  it('"Em chưa làm được — xem lời giải" mở bước 3 ngay', async () => {
+    mayChu({ ok: true, cau: [CT] })
+    render(<Man token="t" qid="Q" onVe={() => {}} />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Tự làm lại câu này' }))
+    chuaLoDapAn()
+    fireEvent.click(screen.getByRole('button', { name: 'Em chưa làm được — xem lời giải' }))
+    expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
+    expect(screen.getByText(/0,1 × 82/)).toBeTruthy()
+    expect(nutBuoc(/Đáp án và lời giải/).getAttribute('aria-current')).toBe('step')
+  })
+
+  it('câu trả lời ngắn (điền số) ⇒ giải ra giấy rồi "Em đã giải xong — xem lời giải để đối chiếu"', async () => {
+    mayChu({ ok: true, cau: [{ ...CT, de: { ...CT.de, phan: 'III', choices: [] }, dapAn: '8,2', emTraLoi: '6,8' }] })
+    render(<Man token="t" qid="Q" onVe={() => {}} />)
+    expect(await screen.findByText('Em đã trả lời')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Tự làm lại câu này' }))
+    expect(screen.getByText(/em giải ra giấy/)).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Kiểm tra lại' })).toBeNull()
+    chuaLoDapAn()
+    fireEvent.click(screen.getByRole('button', { name: 'Em đã giải xong — xem lời giải để đối chiếu' }))
+    expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
+    expect(screen.getByText('Đáp án đúng').nextSibling?.textContent).toBe('8,2')
+  })
+
+  it('máy chủ không cho đáp án (câu thuộc ca chưa công bố) ⇒ làm lại được nhưng không chấm, không đáp án, không bước 3', async () => {
+    mayChu({ ok: true, cau: [], khoa: ['Q'] })
+    api.apiPhatItem.mockResolvedValue({ ...DOT, cauGoc: { phan: 'I', text: DE, choices: ['8,2 gam.', '6,8 gam.', '9,6 gam.', '4,1 gam.'] } })
+    render(<Man token="t" qid="Q" onVe={() => {}} />)
+    expect(await screen.findByText(/Câu này chưa được mở đáp án, thầy sẽ chữa/)).toBeTruthy()
+    chuaLoDapAn()
+    expect(nutBuoc(/Đáp án và lời giải/).disabled).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: 'Tự làm lại câu này' }))
+    expect(screen.getByText(/Câu này chưa được mở đáp án, thầy sẽ chữa\. Em cứ tự làm lại/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /6,8/ }))
+    expect(screen.queryByRole('button', { name: 'Kiểm tra lại' })).toBeNull()
+    expect(screen.queryByRole('button', { name: /xem lời giải/ })).toBeNull()
     expect(screen.getByRole('button', { name: 'Sang câu khác' })).toBeTruthy()
+    expect(nutBuoc(/Đáp án và lời giải/).disabled).toBe(true)
+    chuaLoDapAn()
   })
 
   it('em đang có ca kiểm tra mở (vòng chữa từ chối) ⇒ không hỏi đề / đáp án câu gốc', async () => {

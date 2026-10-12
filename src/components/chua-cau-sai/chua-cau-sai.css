@@ -476,6 +476,8 @@ body[data-hoc-tap=hs] .ccs-buoc-ten { margin: 0; color: var(--muc); font-size: c
 body[data-hoc-tap=hs] .ccs-buoc-ten:focus { outline: none; }
 body[data-hoc-tap=hs] .ccs-buoc-ten:focus-visible { outline: 3px solid var(--tim); outline-offset: 4px; border-radius: 6px; }
 body[data-hoc-tap=hs] .ccs-cau-goc-the { min-width: 0; }
+/* Câu tự luận / trả lời ngắn ở bước Tự làm lại: em giải ra giấy ⇒ chỉ hiện đề, ẩn ô nhập số (12/10, Boss). */
+body[data-hoc-tap=hs] .ccs-chi-de .osl { display: none; }
 body[data-hoc-tap=hs] .ccs-dang-tai-nho { padding: 24px 16px; border-radius: 18px; background: var(--the-2); color: var(--nhat); text-align: center; }
 body[data-hoc-tap=hs] .ccs-ghi-nho { margin: 0; color: var(--nhat); font-size: 14px; }
 body[data-hoc-tap=hs] .ccs-doi-chieu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 0; }

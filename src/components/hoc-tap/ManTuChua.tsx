@@ -102,7 +102,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
           )}
           <h1>Câu em cần chữa</h1>
         </div>
-        <p className="ht2-phu">Chọn một câu: em xem lại câu gốc, đọc đáp án và lời giải từng bước rồi tự làm lại.</p>
+        <p className="ht2-phu">Chọn một câu: em xem lại câu gốc, tự làm lại, rồi đối chiếu đáp án và lời giải từng bước.</p>
         {!kq ? (
           <div className="ht2-nhom" role="status" aria-label="Đang tải danh sách câu cần chữa">
             <div className="ht2-dong ht2-dong-xuong" /><div className="ht2-dong ht2-dong-xuong" /><div className="ht2-dong ht2-dong-xuong" />

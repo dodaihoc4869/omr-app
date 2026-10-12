@@ -1,8 +1,13 @@
 // CHỮA TRỰC TIẾP CÂU GỐC (12/10) — thầy gửi ảnh "Cùng gỡ câu này" ở trạng thái "Cần thêm bài luyện đúng chỗ": em chỉ thấy một khung chữ,
 // không làm được gì. Nay mọi đợt không có bước để làm đi theo "Đường tự gỡ" ba bước, mỗi màn MỘT nút chính (sát đáy trên điện thoại):
-//   1. Xem lại câu gốc — TheCau đầy đủ (công thức, bảng, hình) + đáp án em đã chọn;
-//   2. Đáp án và lời giải — đáp án đúng + lời giải của kho (TheCau xem lại) + nút Hỏi thầy mở lời giải từng bước; CHỈ khi máy chủ cho;
-//   3. Tự làm lại — em làm lại câu, bấm "Kiểm tra lại" ⇒ đúng / chưa đúng (lần tự kiểm: không ghi sổ, không tính điểm).
+//   1. Xem lại câu gốc — TheCau đầy đủ (công thức, bảng, hình) + đáp án em đã chọn (KHÔNG đáp án đúng, KHÔNG lời giải);
+//   2. Tự làm lại — Boss 12/10: em làm lại TRƯỚC khi thấy đáp án (xem đáp án trước rồi làm lại là chép, không phải tự chữa):
+//      · câu có lựa chọn: "Kiểm tra lại" ⇒ đúng: "Em đã tự sửa đúng" + mở bước 3; sai: cho thử thêm MỘT lần, rồi mở bước 3;
+//        nút phụ "Em chưa làm được — xem lời giải" mở bước 3 ngay; sai không lộ đáp án đúng;
+//      · câu tự luận / trả lời ngắn (điền số): em giải ra giấy rồi bấm "Em đã giải xong — xem lời giải để đối chiếu";
+//      · máy chủ chưa mở đáp án (khoá / không có): vẫn cho làm lại nhưng KHÔNG chấm, ghi rõ "Câu này chưa được mở đáp án, thầy sẽ chữa";
+//   3. Đáp án và lời giải — đáp án đúng + lời giải của kho (TheCau xem lại) + Hỏi thầy; CHỈ mở sau bước 2 và CHỈ khi máy chủ cho.
+// Lần tự làm lại so trên máy với đáp án máy chủ đã cho (em đã nộp câu này) — lần tự kiểm: không ghi sổ, không tính điểm.
 // Quyền xem đáp án + luật so: src/lib/chua-truc-tiep.ts (chú thích đầu tệp).
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import TheCau, { type TheCauProps } from '../TheCau'
@@ -76,7 +81,7 @@ function deTuCauGoc(c: NonNullable<KetQuaDot['cauGoc']>): DeHien | null {
   return { ...c, phan: c.phan, hinhAnh: c.hinhAnh as DeHien['hinhAnh'] }
 }
 
-const BUOC = ['Xem lại câu gốc', 'Đáp án và lời giải', 'Tự làm lại'] as const
+const BUOC = ['Xem lại câu gốc', 'Tự làm lại', 'Đáp án và lời giải'] as const
 const nhanTra = (phan: Phan) => (phan === 'I' ? 'Em đã chọn' : 'Em đã trả lời')
 
 function IconBuoc({ so, xong }: { so: number; xong: boolean }) {
@@ -108,7 +113,14 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
   const [lanTai, setLanTai] = useState(0)
   const [buoc, setBuoc] = useState<1 | 2 | 3>(1)
   const [tra, setTra] = useState('')
+  /** Kết quả lần bấm "Kiểm tra lại" gần nhất (null = chưa kiểm). */
   const [ket, setKet] = useState<boolean | null>(null)
+  /** Số lần em kiểm mà chưa đúng (tối đa 2: lần đầu + một lần thử thêm). */
+  const [lanSai, setLanSai] = useState(0)
+  /** Lần tự làm lại của em (để đối chiếu ở bước 3). */
+  const [traCuoi, setTraCuoi] = useState('')
+  /** Bước 3 đã mở (em làm đúng, sai đủ hai lần, giải xong ra giấy, hoặc bấm "Em chưa làm được — xem lời giải"). */
+  const [moLoiGiai, setMoLoiGiai] = useState(false)
   const tieuDeRef = useRef<HTMLHeadingElement>(null)
   const daDoiBuoc = useRef(false)
 
@@ -127,55 +139,78 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
     setBuoc(b)
     if (typeof window !== 'undefined') window.scrollTo?.({ top: 0 })
   }
-  const lamLai = () => { setTra(''); setKet(null); doiBuoc(3) }
+  const batDauLamLai = () => { setTra(''); setKet(null); setLanSai(0); doiBuoc(2) }
+  const xemLoiGiai = () => { setMoLoiGiai(true); doiBuoc(3) }
 
   const ct = cg?.trangThai === 'co' ? cg.ct : null
   const coDapAn = !!ct && !!ct.dapAn.trim()
-  const lamLaiDuoc = coDapAn && !ct?.tuLuan
   const de: DeHien | null = ct ? { ...ct.de, tenDang: ct.de.tenDang } : ph.cauGoc ? deTuCauGoc(ph.cauGoc) : null
   const phan: Phan = de?.phan ?? 'I'
+  // Cách làm lại ở bước 2: chấm (câu có lựa chọn, có đáp án) · giấy (tự luận / điền số: giải ra giấy rồi đối chiếu) · không chấm (máy chủ chưa mở đáp án).
+  const cachLam: 'cham' | 'giay' | 'khong_cham' | null = !de ? null : !coDapAn ? 'khong_cham' : ct?.tuLuan || phan === 'III' ? 'giay' : 'cham'
   const moDau = loiMoTrucTiep(ph.trangThai)
   const hen = ph.trangThai === 'cho_gap_lai_2' ? henGapLai(ph.denHan, Date.now()) : null
-  const duoc = (b: number) => b === 1 || (b === 2 ? coDapAn : lamLaiDuoc)
+  const duoc = (b: number) => b === 1 || (b === 2 ? !!cachLam : moLoiGiai && coDapAn)
   const emChon = ct ? chuDapAn(phan, ct.emTraLoi) : ''
   const dapAnChu = ct ? chuDapAn(phan, ct.dapAn) : ''
 
+  const kiemTra = () => {
+    if (!ct) return
+    const dung = soTuLam(phan, tra, ct.dapAn)
+    setTraCuoi(tra)
+    setKet(dung)
+    if (dung) setMoLoiGiai(true)
+    else {
+      const n = lanSai + 1
+      setLanSai(n)
+      if (n >= 2) setMoLoiGiai(true)
+    }
+  }
+  const thuThem = () => { setTra(''); setKet(null) }
+
   // ---- nút đáy của bước hiện tại: MỘT nút chính, tối đa một nút phụ
+  const nutVe = <button type="button" className="ccs-nut-phu" onClick={onVe} disabled={ban}>{nhanVe}</button>
+  const nutChuaLamDuoc = <button type="button" className="ccs-nut-phu" onClick={xemLoiGiai}>Em chưa làm được — xem lời giải</button>
   let nutChinh: ReactNode = null
-  let nutPhu: ReactNode = <button type="button" className="ccs-nut-phu" onClick={onVe} disabled={ban}>{nhanVe}</button>
+  let nutPhu: ReactNode = nutVe
   if (hen?.daToi) {
     nutChinh = <button type="button" className="ccs-nut-chinh" onClick={onLamGapLai} disabled={ban}>Làm lần gặp lại 2</button>
   } else if (!cg) {
     nutChinh = null
-  } else if (buoc === 1 && coDapAn) {
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={() => doiBuoc(2)}>Xem đáp án và lời giải</button>
-  } else if (buoc === 2 && lamLaiDuoc) {
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={lamLai}>Tự làm lại câu này</button>
-  } else if (buoc === 3 && lamLaiDuoc && ct) {
+  } else if (buoc === 1) {
+    nutChinh = de
+      ? <button type="button" className="ccs-nut-chinh" onClick={batDauLamLai}>Tự làm lại câu này</button>
+      : <button type="button" className="ccs-nut-chinh" onClick={onVe} disabled={ban}>{nhanVe}</button>
+    if (!de) nutPhu = null
+  } else if (buoc === 2 && cachLam === 'cham') {
     if (ket === null) {
-      nutChinh = (
-        <button type="button" className="ccs-nut-chinh" disabled={!daTraLoiDu(phan, tra)} onClick={() => setKet(soTuLam(phan, tra, ct.dapAn))}>
-          Kiểm tra lại
-        </button>
-      )
+      nutChinh = <button type="button" className="ccs-nut-chinh" disabled={!daTraLoiDu(phan, tra)} onClick={kiemTra}>Kiểm tra lại</button>
+      nutPhu = nutChuaLamDuoc
     } else if (ket) {
-      nutChinh = <button type="button" className="ccs-nut-chinh" onClick={onVe} disabled={ban}>{nhanVe}</button>
-      nutPhu = <button type="button" className="ccs-nut-phu" onClick={lamLai}>Làm lại lần nữa</button>
+      nutChinh = <button type="button" className="ccs-nut-chinh" onClick={() => doiBuoc(3)}>Đối chiếu lời giải</button>
+    } else if (lanSai < 2) {
+      nutChinh = <button type="button" className="ccs-nut-chinh" onClick={thuThem}>Thử thêm một lần</button>
+      nutPhu = nutChuaLamDuoc
     } else {
-      nutChinh = <button type="button" className="ccs-nut-chinh" onClick={() => doiBuoc(2)}>Xem lại lời giải</button>
-      nutPhu = <button type="button" className="ccs-nut-phu" onClick={lamLai}>Làm lại lần nữa</button>
+      nutChinh = <button type="button" className="ccs-nut-chinh" onClick={() => doiBuoc(3)}>Xem đáp án và lời giải</button>
     }
+  } else if (buoc === 2 && cachLam === 'giay') {
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={xemLoiGiai}>Em đã giải xong — xem lời giải để đối chiếu</button>
+  } else if (buoc === 3 && moLoiGiai && ct) {
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={onVe} disabled={ban}>{nhanVe}</button>
+    nutPhu = cachLam === 'cham' ? <button type="button" className="ccs-nut-phu" onClick={batDauLamLai}>Làm lại lần nữa</button> : null
   } else {
-    // Không có đáp án để đi tiếp (máy chủ giữ / chưa có câu): rời màn là việc chính.
+    // Máy chủ chưa mở đáp án (hoặc chưa có câu): rời màn là việc chính.
     nutChinh = <button type="button" className="ccs-nut-chinh" onClick={onVe} disabled={ban}>{nhanVe}</button>
     nutPhu = null
   }
 
-  const khungCau = (p: TheCauProps) => (
-    <div className="m3 ccs-cau-goc-the">
+  const khungCau = (p: TheCauProps, lop = '') => (
+    <div className={`m3 ccs-cau-goc-the${lop ? ` ${lop}` : ''}`}>
       <TheCau {...p} />
     </div>
   )
+  const TIEU_DE_BUOC = ['Câu em đã làm sai', 'Em tự làm lại câu này', 'Đáp án đúng và lời giải'] as const
 
   return (
     <div className="ccs-bo-cuc" data-tuyen="truc-tiep">
@@ -188,10 +223,10 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
           <ol className="ccs-lo-trinh" data-nut="true" aria-label="Các bước chữa trực tiếp">
             {BUOC.map((ten, i) => {
               const so = (i + 1) as 1 | 2 | 3
-              const xong = so < buoc || (so === 3 && ket === true)
+              const xong = so < buoc || (so === 2 && ket === true)
               return (
                 <li key={ten} data-da={xong} data-hien-tai={so === buoc}>
-                  <button type="button" aria-current={so === buoc ? 'step' : undefined} disabled={!duoc(so)} onClick={() => (so === 3 && buoc !== 3 ? lamLai() : doiBuoc(so))}>
+                  <button type="button" aria-current={so === buoc ? 'step' : undefined} disabled={!duoc(so)} onClick={() => (so === 2 && buoc === 1 ? batDauLamLai() : doiBuoc(so))}>
                     <IconBuoc so={so} xong={xong} />
                     <b>{ten}</b>
                   </button>
@@ -210,7 +245,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
             <p className="ccs-hen" role="status">
               {hen ? (
                 hen.daToi ? <>Đã tới lần gặp lại 2 (hẹn <b>{hen.luc}</b>). Em bấm "Làm lần gặp lại 2" để tự làm bản mới.</>
-                  : <>Lần gặp lại 2 mở lúc <b className="ccs-so">{hen.luc}</b> ({hen.conLai}). Trong lúc chờ, em chữa câu khác hoặc xem lại câu gốc ở dưới.</>
+                  : <>Lần gặp lại 2 mở lúc <b className="ccs-so">{hen.luc}</b> ({hen.conLai}). Trong lúc chờ, em chữa câu khác hoặc tự làm lại câu gốc ở dưới.</>
               ) : 'Lần gặp lại 2 mở sau ít nhất 24 giờ kể từ lúc em ghép xong bài. Trong lúc chờ, em chữa câu khác.'}
             </p>
           )}
@@ -218,9 +253,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
 
         <div className="ccs-buoc-truc-tiep">
           <p className="ccs-ghi">Bước {buoc} · {BUOC[buoc - 1]}</p>
-          <h3 className="ccs-buoc-ten" ref={tieuDeRef} tabIndex={-1}>
-            {buoc === 1 ? 'Câu em đã làm sai' : buoc === 2 ? 'Đáp án đúng và lời giải' : 'Em tự làm lại câu này'}
-          </h3>
+          <h3 className="ccs-buoc-ten" ref={tieuDeRef} tabIndex={-1}>{TIEU_DE_BUOC[buoc - 1]}</h3>
         </div>
 
         {!cg ? (
@@ -237,7 +270,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
               </dl>
             ) : null}
             {cg.trangThai === 'khoa' ? (
-              <p className="ccs-goi-y" role="status">Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Đáp án và lời giải mở sau khi thầy công bố — em quay lại sau nhé.</p>
+              <p className="ccs-goi-y" role="status">Câu này chưa được mở đáp án, thầy sẽ chữa. Câu đang nằm trong một ca kiểm tra chưa công bố kết quả — đáp án và lời giải mở sau khi thầy công bố.</p>
             ) : cg.trangThai === 'khong_co' ? (
               <div className="ccs-goi-y" role="status">
                 <p>{de ? 'Chưa mở được đáp án của câu này ở đây.' : 'Chưa tải được câu gốc ở đây.'} Em bấm Hỏi thầy để xem lời giải câu này (lời giải chỉ mở khi câu không còn nằm trong ca kiểm tra chưa công bố).</p>
@@ -248,11 +281,43 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
                 <p>{cg.loi}</p>
                 <button type="button" className="ccs-nut-phu" onClick={() => setLanTai((n) => n + 1)}>Thử lại</button>
               </div>
-            ) : ct?.tuLuan ? (
-              <p className="ccs-goi-y" role="status">Câu tự luận — không chấm tự động. Em đọc đáp án tham khảo và lời giải ở bước 2.</p>
-            ) : null}
+            ) : (
+              <p className="ccs-ghi-nho">Em tự làm lại câu này trước, rồi mới xem đáp án và lời giải để đối chiếu.</p>
+            )}
           </>
-        ) : buoc === 2 && ct ? (
+        ) : buoc === 2 && de ? (
+          cachLam === 'giay' ? (
+            <>
+              {khungCau(propsCauLam(de, ''), 'ccs-chi-de')}
+              <p className="ccs-goi-y" role="status">
+                {ct?.tuLuan ? 'Câu tự luận — không chấm tự động.' : 'Câu trả lời ngắn — em giải ra giấy.'} Em tự giải ra giấy đến kết quả cuối, xong bấm nút dưới để đối chiếu với lời giải.
+              </p>
+            </>
+          ) : (
+            <>
+              {khungCau(propsCauLam(de, tra, (v) => setTra(v), ket !== null))}
+              {cachLam === 'khong_cham' ? (
+                <div className="ccs-goi-y" role="status">
+                  <p>{cg.trangThai === 'khoa' ? 'Câu này chưa được mở đáp án, thầy sẽ chữa. Em cứ tự làm lại để nhớ cách giải — lần này không chấm.' : 'Chưa mở được đáp án ở đây nên lần làm lại này không chấm. Em bấm Hỏi thầy để xem lời giải.'}</p>
+                  {cg.trangThai !== 'khoa' && <NutHoiThay qid={qid} nguon="tu_chua" />}
+                </div>
+              ) : ket !== null ? (
+                <section className="ccs-phan-hoi" data-dung={ket} role="status" aria-live="polite">
+                  <h3>{ket ? 'Em đã tự sửa đúng' : lanSai < 2 ? 'Chưa đúng' : 'Vẫn chưa đúng'}</h3>
+                  <p>
+                    {ket
+                      ? 'Em xem lời giải để đối chiếu cách làm của mình. Lần tự làm lại này để em tự kiểm — không tính điểm, không đổi lịch ôn.'
+                      : lanSai < 2
+                        ? 'Em đọc lại đề, soát từng bước rồi thử thêm một lần.'
+                        : 'Không sao — em xem đáp án và lời giải, tìm chỗ mình làm khác.'}
+                  </p>
+                </section>
+              ) : lanSai > 0 ? (
+                <p className="ccs-ghi-nho">Lần thử thêm — em chọn lại đáp án.</p>
+              ) : null}
+            </>
+          )
+        ) : buoc === 3 && moLoiGiai && ct ? (
           <>
             <dl className="ccs-doi-chieu">
               <div data-kieu="dung">
@@ -260,33 +325,17 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
                 <dd>{dapAnChu}</dd>
               </div>
               <div data-kieu="em">
-                <dt>{nhanTra(phan)}</dt>
+                <dt>{nhanTra(phan)} lần trước</dt>
                 <dd>{emChon || 'chưa lưu'}</dd>
               </div>
+              {traCuoi && (
+                <div data-kieu={soTuLam(phan, traCuoi, ct.dapAn) ? 'dung' : 'em'}>
+                  <dt>Lần em tự làm lại</dt>
+                  <dd>{chuDapAn(phan, traCuoi)} · {soTuLam(phan, traCuoi, ct.dapAn) ? 'đúng' : 'chưa đúng'}</dd>
+                </div>
+              )}
             </dl>
             {khungCau({ ...propsTheCau(ct, 1), hoiThay: { qid, nguon: 'tu_chua' } })}
-          </>
-        ) : buoc === 3 && ct && de ? (
-          <>
-            {khungCau(propsCauLam(de, tra, (v) => { setTra(v); setKet(null) }, ket !== null))}
-            {ket !== null && (
-              <section className="ccs-phan-hoi" data-dung={ket} role="status" aria-live="polite">
-                <h3>{ket ? 'Em làm đúng rồi' : 'Chưa đúng'}</h3>
-                <dl className="ccs-doi-chieu ccs-doi-chieu-gon">
-                  <div data-kieu="em">
-                    <dt>{nhanTra(phan)}</dt>
-                    <dd>{chuDapAn(phan, tra)}</dd>
-                  </div>
-                  {!ket && (
-                    <div data-kieu="dung">
-                      <dt>Đáp án đúng</dt>
-                      <dd>{dapAnChu}</dd>
-                    </div>
-                  )}
-                </dl>
-                <p>{ket ? 'Lần tự làm lại này để em tự kiểm — không tính điểm, không đổi lịch ôn.' : 'Em đọc lại lời giải, tìm chỗ mình làm khác rồi làm lại nhé.'}</p>
-              </section>
-            )}
           </>
         ) : null}
 

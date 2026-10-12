@@ -1,7 +1,8 @@
 // CHỮA TRỰC TIẾP CÂU GỐC (12/10) — thầy: "mục chữa lỗi hiển thị cho thật chuẩn để học sinh chữa lỗi được".
 // Trước: đợt chữa ở trạng thái chờ (thieu_hoc_lieu, can_thay, tam_khoa, cau_thay_doi, cho_gap_lai_2) hoặc không có bước nào chỉ hiện MỘT khung
 // chữ ("Cần thêm bài luyện đúng chỗ") — em không làm được gì. Nay mọi trạng thái ấy dựng lối "Chữa trực tiếp câu gốc":
-//   (a) câu gốc đầy đủ bằng TheCau · (b) đáp án em đã chọn · (c) đáp án đúng + lời giải từng bước — CHỈ khi máy chủ cho · (d) em tự làm lại câu.
+//   1. câu gốc đầy đủ bằng TheCau + đáp án em đã chọn · 2. em TỰ LÀM LẠI (Boss 12/10: làm trước, xem đáp án sau — xem trước là chép) ·
+//   3. đáp án đúng + lời giải từng bước — CHỈ mở sau bước 2 và CHỈ khi máy chủ cho.
 // QUYỀN XEM ĐÁP ÁN đi đúng đường sẵn có của "Câu đã làm": `POST /game-v2/hoa2-cau-chi-tiet` (server/src/srs2-game.ts `cauChiTiet`) chỉ trả đề +
 // đáp án + lời giải cho câu em ĐÃ làm (sổ `su_kien_hoc`, không `embargoed`) và KHÔNG thuộc ca kiểm tra còn làm được / chưa công bố
 // (`protectedQuestions`, so cả nhóm nội dung) — câu ấy vào `khoa`, không có đề lẫn đáp án. Màn chỉ gọi lệnh này SAU khi vòng chữa mở được
@@ -26,19 +27,19 @@ export function canChuaTrucTiep(ph: KetQuaDot | null | undefined): boolean {
 export function loiMoTrucTiep(tt: TrangThaiChua | undefined): { tieuDe: string; chu: string } {
   switch (tt) {
     case 'thieu_hoc_lieu':
-      return { tieuDe: 'Bài luyện từng bước đang được chuẩn bị', chu: 'Trong lúc chờ, em chữa ngay trên câu gốc: xem lại câu, đọc đáp án và lời giải rồi tự làm lại. Những bước em đã làm được vẫn được giữ.' }
+      return { tieuDe: 'Bài luyện từng bước đang được chuẩn bị', chu: 'Trong lúc chờ, em chữa ngay trên câu gốc: xem lại câu, tự làm lại rồi đối chiếu đáp án và lời giải. Những bước em đã làm được vẫn được giữ.' }
     case 'cau_thay_doi':
-      return { tieuDe: 'Câu vừa được thầy cập nhật', chu: 'Bài luyện từng bước đang làm lại cho bản mới. Em chữa ngay trên câu gốc: xem lại câu, đọc lời giải rồi tự làm lại. Tiến độ cũ vẫn được giữ.' }
+      return { tieuDe: 'Câu vừa được thầy cập nhật', chu: 'Bài luyện từng bước đang làm lại cho bản mới. Em chữa ngay trên câu gốc: xem lại câu, tự làm lại rồi đối chiếu lời giải. Tiến độ cũ vẫn được giữ.' }
     case 'can_thay':
-      return { tieuDe: 'Chờ chữa trên lớp', chu: 'Bước còn mắc đã được xếp vào buổi chữa trên lớp, kèm các bước em đã hiểu — em không cần gửi riêng cho thầy. Trong lúc chờ, em xem lại câu gốc và lời giải.' }
+      return { tieuDe: 'Chờ chữa trên lớp', chu: 'Bước còn mắc đã được xếp vào buổi chữa trên lớp, kèm các bước em đã hiểu — em không cần gửi riêng cho thầy. Trong lúc chờ, em tự làm lại câu gốc rồi đối chiếu lời giải.' }
     case 'tam_khoa':
-      return { tieuDe: 'Bài luyện từng bước đang tạm khoá', chu: 'Tiến độ của em vẫn được giữ. Nếu câu đã được công bố, em xem lại câu gốc và lời giải ở dưới.' }
+      return { tieuDe: 'Bài luyện từng bước đang tạm khoá', chu: 'Tiến độ của em vẫn được giữ. Em vẫn xem lại và tự làm lại câu gốc ở dưới.' }
     case 'cho_gap_lai_2':
       return { tieuDe: 'Em đã ghép lại được cả bài', chu: 'Lần sau, em tự làm một bản mới của câu này để chắc là đã hiểu.' }
     case 'da_tu_sua':
       return { tieuDe: 'Em đã tự làm được bản mới', chu: 'Em vừa giải bản mới mà không cần gợi ý. Lịch ôn chung sẽ kiểm tiếp ở những ngày khác để xác nhận đã khắc phục bền vững. Em vẫn xem lại câu gốc được.' }
     default:
-      return { tieuDe: 'Câu này chưa có bước luyện', chu: 'Em chữa ngay trên câu gốc: xem lại câu, đọc lời giải rồi tự làm lại.' }
+      return { tieuDe: 'Câu này chưa có bước luyện', chu: 'Em chữa ngay trên câu gốc: xem lại câu, tự làm lại rồi đối chiếu lời giải.' }
   }
 }
 

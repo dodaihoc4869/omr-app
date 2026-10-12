@@ -36,7 +36,9 @@ const DS_HS12 = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']
     [`40-hs12-tu-luyen-${k}${t}`, 'hs12-tu-luyen', w, hgt, nen, true, /Sửa câu sai/],
     [`40-hs12-tu-luyen-sua-sai-${k}${t}`, 'hs12-tu-luyen', w, hgt, nen, false, /Sửa câu sai/, 'bam-radio:Sửa câu sai'],
     [`41-hs12-chua-truc-tiep-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, false, /Câu em đã làm sai/],
-    [`41-hs12-chua-truc-tiep-loi-giai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, true, /Câu em đã làm sai/, 'nut:Xem đáp án và lời giải'],
+    // Boss 12/10: thứ tự Xem lại câu gốc → Tự làm lại → Đáp án và lời giải (bước 3 mở sau khi em làm lại / bấm xem lời giải)
+    [`41-hs12-chua-truc-tiep-lam-lai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, false, /Câu em đã làm sai/, 'nut:Tự làm lại câu này'],
+    [`41-hs12-chua-truc-tiep-loi-giai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, true, /Câu em đã làm sai/, 'nut:Tự làm lại câu này » Em chưa làm được — xem lời giải'],
     [`42-hs12-tu-chua-${k}${t}`, 'hs12-tu-chua', w, hgt, nen, true, /Câu em cần chữa/],
     [`43-hs12-tu-luyen-lam-${k}${t}`, 'hs12-tu-luyen-lam', w, hgt, nen, false, /Thuỷ phân hoàn toàn/],
   ]
@@ -154,8 +156,11 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   }
   try {
     if (viec?.startsWith('nut:')) {
-      await t.getByRole('button', { name:viec.slice(4), exact:true }).first().click()
-      await t.waitForTimeout(400)
+      // 12/10 (làn học sinh): nhiều nút liền nhau ngăn bằng " » " — bấm lần lượt (một nút như cũ).
+      for (const ten of viec.slice(4).split(' » ')) {
+        await t.getByRole('button', { name:ten, exact:true }).first().click()
+        await t.waitForTimeout(400)
+      }
     } else if (viec?.startsWith('ht:')) {
       await t.getByRole('navigation', { name:'Điều hướng học sinh' }).getByRole('button', { name:viec.slice(3), exact:true }).click()
       await t.waitForTimeout(250)
