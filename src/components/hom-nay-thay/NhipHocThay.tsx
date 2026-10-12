@@ -305,7 +305,7 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
   const o = [
     { k: 'cham', icon: Check, ten: 'Chăm', so: dem.cham, pt: true, dai: chuDieuKien('cham', n), ngan: n >= LUAT_NHOM_NHIP.soNgayToiThieu ? `đủ mức ≥ ${Math.ceil((LUAT_NHOM_NHIP.chamTu * n) / 100)}/${n} ngày` : `đủ mức ≥ ${LUAT_NHOM_NHIP.chamTu}% số ngày` },
     { k: 'chua-deu', icon: Activity, ten: 'Chưa đều', so: dem.chuaDeu, pt: true, dai: chuDieuKien('chua-deu', n), ngan: chuDieuKien('chua-deu', n).replace(/^Đủ mức/, 'đủ mức').replace(/ trong \d+$/, '') },
-    { k: 'luoi', icon: TriangleAlert, ten: 'Lười', so: dem.luoi, pt: true, dai: chuDieuKien('luoi', n), ngan: n >= LUAT_NHOM_NHIP.soNgayToiThieu ? `đủ mức ≤ ${Math.floor((LUAT_NHOM_NHIP.luoiDen * n) / 100)}/${n} ngày` : `đủ mức ≤ ${LUAT_NHOM_NHIP.luoiDen}% số ngày` },
+    { k: 'luoi', icon: TriangleAlert, ten: 'Lười', so: dem.luoi, pt: true, dai: chuDieuKien('luoi', n), ngan: `${n >= LUAT_NHOM_NHIP.soNgayToiThieu ? `đủ mức ≤ ${Math.floor((LUAT_NHOM_NHIP.luoiDen * n) / 100)}/${n} ngày` : `đủ mức ≤ ${LUAT_NHOM_NHIP.luoiDen}% số ngày`} · thoát: ${LUAT_NHOM_NHIP.ngayLienThoatLuoi} ngày liền đủ` },
     { k: 'doi-pho', icon: Clock, ten: 'Có dấu hiệu đối phó', tenNgan: 'Đối phó', so: dem.doiPho, pt: false, dai: coChonLap ? 'Làm quá nhanh mà sai nhiều, chọn lặp một đáp án' : 'Làm quá nhanh mà sai nhiều (lần này chưa đọc được đáp án chọn)', ngan: coChonLap ? 'nhanh mà sai, chọn lặp' : 'nhanh mà sai' },
   ]
   const h = t.homNay

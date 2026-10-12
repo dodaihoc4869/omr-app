@@ -288,6 +288,39 @@ describe('bấm em ⇒ tấm Hồ sơ làm bài (trùng tu)', () => {
   })
 })
 
+// ------------------------------------------------------------------ 12/10C: NHÓM NHỊP HỌC LÀ NHÃN CHÍNH CỦA TẤM (thầy chốt "6 ngày liền làm đủ mới thoát
+// nhóm lười"; `/gv/ho-so-thai-do` CHỈ THÊM nhomNhip · coDoiPho · chuoiDuGanNhat — cùng hàm với Hôm nay › Nhịp học). Thiếu trường ⇒ nhãn cũ (test trên).
+describe('tấm Hồ sơ làm bài — nhóm Nhịp học + cờ đối phó (12/10C)', () => {
+  it('đọc trả lời: giữ ba trường mới đúng kiểu; giá trị lạ ⇒ bỏ trường (lùi về nhãn cũ)', () => {
+    expect(docHoSoThaiDo({ ...THAI_DO, nhomNhip: 'luoi', coDoiPho: true, chuoiDuGanNhat: 2 } as never)).toMatchObject({ nhomNhip: 'luoi', coDoiPho: true, chuoiDuGanNhat: 2 })
+    const la = docHoSoThaiDo({ ...THAI_DO, nhomNhip: 'gioi', coDoiPho: 'co', chuoiDuGanNhat: 'x' } as never)!
+    expect('nhomNhip' in la || 'coDoiPho' in la || 'chuoiDuGanNhat' in la).toBe(false)
+  })
+  it('Lười + có dấu hiệu đối phó ⇒ nhãn chính "Lười", chip đối phó riêng, "Đủ mức liền 2/6 ngày để thoát"; lý do bằng số giữ nguyên', async () => {
+    mayChu({ thaiDo: { ok: true, du: { ...THAI_DO, nhomNhip: 'luoi', coDoiPho: true, chuoiDuGanNhat: 2 } } })
+    render(<TheBaiHangNgay />)
+    fireEvent.click(await screen.findByRole('button', { name: /^Lê Bình, SBD 12/ }))
+    const tam = await screen.findByRole('dialog', { name: 'Lê Bình' })
+    const dau = await within(tam).findByRole('region', { name: 'Lười' })
+    expect(dau.getAttribute('data-nhan')).toBe('luoi')
+    expect(dau.querySelector('.gvv2-tdo-co-doi-pho')!.textContent).toBe('Có dấu hiệu đối phó')
+    expect(dau.querySelector('.gvv2-tdo-thoat')!.textContent).toBe('Đủ mức liền 2/6 ngày để thoát')
+    expect(dau.textContent).toContain('thoát khi đủ mức 6 ngày liền')
+    expect(dau.textContent).toContain('Quá nhanh 16/40 lượt (40%) · nhóm quá nhanh đúng 25%')
+  })
+  it('Chăm, không đối phó ⇒ nhãn "Chăm", không chip, không dòng thoát', async () => {
+    mayChu({ thaiDo: { ok: true, du: { ...THAI_DO, ketLuan: { nhan: 'cham-chi', chu: 'Chăm chỉ', lyDo: ['Ngày đủ mức: Đủ mức 9/11 ngày (82%).'] }, nhomNhip: 'cham', coDoiPho: false, chuoiDuGanNhat: 7 } } })
+    render(<TheBaiHangNgay />)
+    fireEvent.click(await screen.findByRole('button', { name: /^Lê Bình, SBD 12/ }))
+    const tam = await screen.findByRole('dialog', { name: 'Lê Bình' })
+    const dau = await within(tam).findByRole('region', { name: 'Chăm' })
+    expect(dau.getAttribute('data-nhan')).toBe('cham-chi')
+    expect(dau.querySelector('.gvv2-tdo-co-doi-pho')).toBeNull()
+    expect(dau.querySelector('.gvv2-tdo-thoat')).toBeNull()
+    expect(dau.textContent).toContain('Ngày đủ mức: Đủ mức 9/11 ngày (82%).')
+  })
+})
+
 // ------------------------------------------------------------------ MỐC 01/10 (thầy 12/10: "dữ liệu phần này tính từ 1/10 cho tôi nhé")
 describe('mốc 01/10 — chữ ba app khớp một hằng', () => {
   it('máy chủ thầy + phụ huynh cùng mốc 2026-10-01; lối vào Hôm nay, chữ chờ của thẻ, mốc dự phòng app phụ huynh đọc đúng mốc ấy', async () => {

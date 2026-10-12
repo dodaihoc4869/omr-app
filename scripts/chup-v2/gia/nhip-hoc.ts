@@ -7,6 +7,7 @@ import type { EmBaiHangNgay, KetQuaBaiHangNgay, KetQuaHoSoThaiDo, NgayBaiEm, Nga
 import { TEN_NHAN_THAI_DO } from '../../../server/src/bai-hang-ngay-kieu'
 import type { DoiPhoEm, EmNhipHoc, KetQuaNhipHoc } from '../../../server/src/nhip-hoc-kieu'
 import { hoSoThaiDoGia, tenEmBhn } from './bai-hang-ngay'
+import { tomTatNhip } from '../../../server/src/nhip-hoc-luat' // LÀN NHỊP EM 12/10C
 
 const NGAY = Array.from({ length: 12 }, (_, i) => `2026-10-${String(i + 1).padStart(2, '0')}`)
 const HOM_NAY = NGAY[NGAY.length - 1]!
@@ -148,5 +149,9 @@ export function hoSoTuNhip(sbd: string): KetQuaHoSoThaiDo {
     ...goc, em: { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi }, tu: NGAY[0]!, den: HOM_NAY, homNay: HOM_NAY, ngay, tinHieu,
     ketLuan: { nhan, chu: TEN_NHAN_THAI_DO[nhan], lyDo },
     dem: { ...goc.dem, soLuot, soCau: Math.round(soLuot * 0.85), soDung, soSai: soLuot - soDung, soLuotCoGiay: soLuot },
+    // LÀN NHỊP EM 12/10C: ba trường CHỈ THÊM của máy chủ — nhóm tính bằng ĐÚNG phép thuần Nhịp học (từ ngày vào), cờ đối phó riêng.
+    ...((t) => ({ nhomNhip: t.nhom, coDoiPho: !!e.doiPho, chuoiDuGanNhat: t.chuoiDuGanNhat }))(
+      tomTatNhip(ngay.filter((n) => n.ngay >= e.ngayVao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam })), HOM_NAY),
+    ),
   }
 }

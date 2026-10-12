@@ -4,6 +4,8 @@
 // tôi muốn biết rõ học sinh đó chăm chỉ hay lười biếng hay đối phó làm bài tập mọi thứ phải hiển thị khoa học trực quan đẹp mắt" ⇒ TRÙNG TU:
 //   · ĐẦU TẤM (điểm nhấn duy nhất): nhãn thái độ "Chăm chỉ" / "Chưa đều" / "Có dấu hiệu đối phó" / "Chưa đủ dữ liệu" + lý do BẰNG SỐ — lệnh CHỈ ĐỌC
 //     `/gv/ho-so-thai-do` (`src/lib/bai-hang-ngay-api.ts`, luật + ngưỡng một chỗ ở `server/src/bai-hang-ngay-kieu.ts`). Không tự phán thêm gì.
+//     12/10 (thầy chốt luật nhóm, "6 ngày liền làm đủ mới thoát nhóm lười"): máy chủ trả `nhomNhip` ⇒ NHÓM Nhịp học là nhãn chính (cùng hàm với Hôm
+//     nay), cờ đối phó là chip riêng, Lười kèm "đủ mức liền x/6 ngày để thoát"; thiếu trường (máy chủ cũ) ⇒ nhãn cũ.
 //   · "Hôm nay" (dòng Nhịp học khi mở từ Nhịp học; mở từ Bài hằng ngày thì lấy ngày hôm nay của lịch).
 //   · TỪ MỐC THEO DÕI (01/10 — thầy 12/10: "dữ liệu phần này tính từ 1/10"; khoảng do máy chủ trả `tu`…`den`): năm ô số (đã làm · đúng · sai · đã ôn · giây trung bình) · lịch làm bài theo ngày (ô màu như bảng Bài hằng ngày) · biểu đồ độ đúng
 //     theo ngày (cột CSS) · phân bố số giây (nhóm quá nhanh tô riêng) · sáu tín hiệu, mỗi tín hiệu có số + ngưỡng.
@@ -14,14 +16,16 @@
 //   · "Mở hồ sơ đầy đủ" ⇒ màn Học sinh mở hồ sơ em (ca kiểm tra, EXP, thần thú, phụ huynh…) — `moHoSoEm`.
 // Mảnh riêng nạp LƯỜI (ngoài precache, vite.config.ts). Biểu đồ bằng CSS, không thư viện. Màu chỉ biến --gvm-* (bai-hang-ngay.css).
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Check, ExternalLink, RotateCcw, X } from 'lucide-react'
+import { Check, ExternalLink, RotateCcw, TriangleAlert, X } from 'lucide-react'
 import { gioPhutVN, ngayThuChu, ngayVN } from '../../lib/em-toan-canh'
 import { lyDoDeHieu } from '../../lib/loi-de-hieu'
 import { layLichSuLamCau, TRAN_GIOI_HAN, type CauEmSai, type KetQuaLichSuLamCau, type LanLamCau, type NguonGiay } from '../../lib/lich-su-lam-cau-api'
 import { layHoSoThaiDo, NGUONG_THAI_DO, type CauTomTat, type KetQuaHoSoThaiDo, type NgayHoatDong } from '../../lib/bai-hang-ngay-api'
 import { useAppStore } from '../../store/appStore'
 import { chuCaiTen, chuHomNay, coMucNhip, nhomNhipCuaEm, TEN_NHOM_NHIP, tenKhoi, tenTang, type DongNhip, type LoaiNhomNhip } from './nhip-hanh-trinh'
-import { chuO, MO_TA_NHAN, mucO, ngayNgan, TEN_MUC_TIN_HIEU, thuNgan } from './bai-hang-ngay-ui'
+import { chuO, MO_TA_NHAN, MO_TA_NHOM, mucO, NHAN_THEO_NHOM, ngayNgan, TEN_MUC_TIN_HIEU, thuNgan } from './bai-hang-ngay-ui'
+import { LUAT_NHOM_NHIP } from '../../../server/src/nhip-hoc-kieu'
+import { TEN_NHOM_NHIP as TEN_NHOM_NHIP_HOC } from '../../../server/src/nhip-hoc-luat'
 import './bai-hang-ngay.css'
 
 /** Em mở tấm: bắt buộc SBD · tên · khối; số Nhịp học (mức hôm nay, tầng…) có khi mở từ Nhịp học; `lop` khi mở từ Bài hằng ngày. */
@@ -245,15 +249,32 @@ function XuongThaiDo() {
   )
 }
 
+/** Đầu tấm. 12/10: máy chủ có `nhomNhip` ⇒ NHÓM Nhịp học (Chăm / Chưa đều / Lười / Chưa đủ dữ liệu — cùng luật Hôm nay) là nhãn chính, cờ
+ *  "Có dấu hiệu đối phó" là chip riêng, nhóm Lười kèm "đủ mức liền x/6 ngày để thoát". Máy chủ cũ (thiếu trường) ⇒ nhãn thái độ cũ. Lý do bằng số giữ nguyên. */
 function DauThaiDo({ td }: { td: KetQuaHoSoThaiDo }) {
   const k = td.ketLuan
+  const nhom = td.nhomNhip
+  const canThoat = LUAT_NHOM_NHIP.ngayLienThoatLuoi
   return (
-    <section className="gvv2-tdo-dau" data-nhan={k.nhan} aria-labelledby="gvv2-tdo-nhan">
+    <section className="gvv2-tdo-dau" data-nhan={nhom ? NHAN_THEO_NHOM[nhom] : k.nhan} aria-labelledby="gvv2-tdo-nhan">
       <small className="gvv2-tdo-mat gvv2-so">Thái độ làm bài · {chuKhoang(td.tu, td.den)}</small>
-      <h3 id="gvv2-tdo-nhan" className="gvv2-tdo-nhan">
-        {k.chu}
-      </h3>
-      <p className="gvv2-tdo-mo-ta">{MO_TA_NHAN[k.nhan]}</p>
+      <div className="gvv2-tdo-nhan-hang">
+        <h3 id="gvv2-tdo-nhan" className="gvv2-tdo-nhan">
+          {nhom ? TEN_NHOM_NHIP_HOC[nhom] : k.chu}
+        </h3>
+        {nhom && td.coDoiPho && (
+          <span className="gvv2-tdo-co-doi-pho">
+            <TriangleAlert size={15} aria-hidden="true" />
+            Có dấu hiệu đối phó
+          </span>
+        )}
+      </div>
+      <p className="gvv2-tdo-mo-ta">{nhom ? MO_TA_NHOM[nhom] : MO_TA_NHAN[k.nhan]}</p>
+      {nhom === 'luoi' && (
+        <p className="gvv2-tdo-thoat gvv2-so">
+          Đủ mức liền {Math.min(td.chuoiDuGanNhat ?? 0, canThoat)}/{canThoat} ngày để thoát
+        </p>
+      )}
       {k.lyDo.length > 0 && (
         <ul className="gvv2-tdo-ly-do gvv2-so" aria-label="Lý do">
           {k.lyDo.map((l) => (

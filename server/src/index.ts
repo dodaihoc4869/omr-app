@@ -3660,6 +3660,8 @@ const boXuLy = {
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       // Ô "Thi đua hôm nay" (Điều 8, phương án 8A): ĐỌC-CHỈ, token của em (thi-dua-hom-nay.ts của Code 4).
       if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(envDoc, b))
+      // BẢNG "NHỊP HỌC CỦA EM" (thầy 12/10 duyệt bản vẽ, server/src/nhip-hoc-em.ts; hợp đồng nhip-hoc-kieu.ts): CHỈ ĐỌC, token của em, chỉ số của chính em.
+      if (p === '/hs/nhip-hoc') return ra(await import('./nhip-hoc-em').then((m) => m.hsNhipHoc(envDoc, b)))
       if (p === '/hs/ke-hoach-ngay') {
         // DỒN LƯỢT + ĐỆM 20 GIÂY theo em (dem-ke-hoach.ts; Boss 21/09): lượt đệm KHÔNG ghi gì; em có ghi thì đệm bị xoá ngay. `thanThu` luôn đọc tươi.
         let sbdKhoa = ''

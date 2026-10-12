@@ -61,8 +61,9 @@ const SQL_VAO_DAU_VET = [
 ] as const
 const SQL_VAO_TAO = 'SELECT sbd, tao_luc AS t FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?1))'
 
-/** sbd → ngày bắt đầu tính (≥ `tu`). Nguồn nào đọc hỏng thì bỏ nguồn ấy (không chặn cả lệnh). */
-async function docNgayVao(env: Env, em: readonly EmGoc[], tu: string): Promise<Map<string, string>> {
+/** sbd → ngày bắt đầu tính (≥ `tu`). Nguồn nào đọc hỏng thì bỏ nguồn ấy (không chặn cả lệnh). Xuất 12/10 cho `/gv/ho-so-thai-do` và `/hs/nhip-hoc`
+ *  (một em) — cùng ngày vào với Nhịp học của thầy. */
+export async function docNgayVao(env: Env, em: readonly EmGoc[], tu: string): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
   for (let i = 0; i < em.length; i += LO_EM_BAI_HANG_NGAY) {
     const lo = em.slice(i, i + LO_EM_BAI_HANG_NGAY)
