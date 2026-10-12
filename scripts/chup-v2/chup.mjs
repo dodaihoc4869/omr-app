@@ -147,8 +147,36 @@ const DS_NHE = [
 ]
 // ═══════════ hết LÀN NHỊP EM 12/10C ═══════════
 
+// ═══════════ LÀN MÀN LÀM BÀI 12/10D: màn làm bài học sinh theo bản vẽ dot13 thầy duyệt 12/10 (7 trạng thái) ═══════════
+// Cảnh `?man=lam13[&lam=g7]` (trang.tsx khối cùng tên; máy chủ giả gia/lam-bai-1210d.ts). Thao tác `lam13:<bước » bước…>` (khối xử lý cùng tên bên dưới):
+// tn:<regex> chạm ô trắc nghiệm · ds:a=Đúng,b=Sai chạm nút của ý · nut:<regex> bấm nút · phim:<kí tự> gõ phím máy tính · dau = cuộn khung về đầu.
+// Chặng 2 (bản vẽ): câu 1 đúng, 2 sai, 3 đúng ⇒ câu 4 Đúng–sai (9/24) · nộp sai ý d · câu 5 trắc nghiệm chọn B · đúng · câu 6 gõ 1,2 · xong chặng (12/24).
+// 390×844 sáng + tối cả 7 trạng thái; 390×1180 (đúng khung bản vẽ Đúng–sai) cho hai trạng thái cao; 1440×900 vài trạng thái. Chạy riêng: tiền tố "lam13".
+const L13_TOI_CAU4 = 'tn:^A » nut:^Nộp câu » nut:^Câu tiếp theo » tn:^A » nut:^Nộp câu » nut:^Câu tiếp theo » tn:^B » nut:^Nộp câu » nut:^Câu tiếp theo'
+const L13_NOP4 = `${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Nộp câu$`
+const L13_CAU5 = `${L13_NOP4} » nut:^Câu tiếp theo » tn:^B`
+const L13_CAU6 = `${L13_CAU5} » nut:^Nộp câu » nut:^Câu tiếp theo » phim:1,2`
+const L13_CANH = [
+  ['1-dung-sai', 'lam13', /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
+  ['2-trac-nghiem', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU5} » dau`],
+  ['3-tra-loi-ngan', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
+  ['4-hoc-huong-dan', 'lam13&lam=g7', /Câu này em chọn làm thế nào/, 'lam13:dau'],
+  ['5-phan-hoi-sai', 'lam13', /Câu 1\/6/, `lam13:${L13_NOP4}`],
+  ['6-phan-hoi-dung', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU5} » nut:^Nộp câu`],
+  ['7-xong-chang', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU6} » nut:^Nộp câu » nut:^Kết thúc chặng`],
+]
+const DS_LAM13 = [
+  ...['light', 'dark'].flatMap((nen) => L13_CANH.map(([t, m, cho, viec]) => [`lam13-${t}-doc${nen === 'dark' ? '-toi' : ''}`, m, 390, 844, nen, false, cho, viec])),
+  ...L13_CANH.filter(([t]) => /dung-sai|phan-hoi-sai/.test(t)).map(([t, m, cho, viec]) => [`lam13-${t}-doc-ca-khung`, m, 390, 1180, 'light', false, cho, viec]),
+  ...L13_CANH.filter(([t]) => /dung-sai|tra-loi-ngan|hoc-huong-dan|phan-hoi-sai|xong/.test(t)).map(([t, m, cho, viec]) => [`lam13-${t}-may-tinh`, m, 1440, 900, 'light', false, cho, viec]),
+  ['lam13-1-dung-sai-may-tinh-toi', 'lam13', 1440, 900, 'dark', false, /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
+  ['lam13-3-tra-loi-ngan-ngang', 'lam13', 844, 390, 'light', false, /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
+]
+// ═══════════ hết LÀN MÀN LÀM BÀI 12/10D ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D
   ...DS_NHE, // LÀN NHỊP EM 12/10C
   ...DS_HN, // LÀN HÔM NAY 12/10B
   ...DS_HS12, // LÀN HỌC SINH 12/10
@@ -468,6 +496,20 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         if (v === 'tab-doi-pho') await t.getByRole('tab', { name: /^Đối phó/ }).click()
       }
       await t.waitForTimeout(400)
+    } else if (viec?.startsWith('lam13:')) {
+      // LÀN MÀN LÀM BÀI 12/10D: các bước ngăn bằng " » " (xem khối DS_LAM13).
+      for (const buoc of viec.slice(6).split(' » ')) {
+        const [loai, ...con] = buoc.split(':'); const gt = con.join(':')
+        if (loai === 'tn') await t.getByRole('radio', { name: new RegExp(gt) }).first().click({ timeout: 20000 })
+        else if (loai === 'nut') await t.getByRole('button', { name: new RegExp(gt) }).first().click({ timeout: 20000 })
+        else if (loai === 'ds') for (const cap of gt.split(',')) { const [y, v] = cap.split('='); await t.getByRole('group', { name: `Chọn cho ý ${y}` }).getByRole('button', { name: v, exact: true }).click({ timeout: 20000 }) }
+        else if (loai === 'phim') for (const k of gt) await t.keyboard.press(k)
+        else if (loai === 'dau') await t.evaluate(() => { const k = document.querySelector('.ht2-lam')?.parentElement; if (k) k.scrollTop = 0 })
+        await t.waitForTimeout(250)
+      }
+      // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
+      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
+      if (tranTrong > 0) tran.push(`${ten}: trong khung ${tranTrong}px`)
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {
