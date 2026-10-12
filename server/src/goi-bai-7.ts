@@ -3,7 +3,8 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, diemConDungNguon7, type CauGoi7, type ViecGoi7 } from './goi-bai-7-loi'
 import { tachMaTo } from './srs2-gv'
-import { laMaToKhongGiao, damBaoBangBaiDaDay, phamViLop } from './bai-da-day'
+import { laMaToKhongGiao, damBaoBangBaiDaDay, phamViLop, lopCuaEm } from './bai-da-day'
+import { TEN_LOP_CHUA_XEP, TEN_LOP_THUONG_12 } from './ten-lop'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import { publicQuestion, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { docCauTheoRef, loiCauDoi, protectedQuestions, docKhoiEm, dongBoCacTo } from './game-v2-bank'
@@ -26,6 +27,15 @@ export function mang7(x: unknown): string[] { try { const a: unknown = typeof x 
 const json = <T>(x: unknown): T => JSON.parse(str(x)) as T
 const KHONG_CA = "NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')"
 export const SQL_LUOT_GOI7 = `${SQL_LA_LAN_LAM} AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`
+/**
+ * TÊN LỚP HIỆU LỰC của một dòng `hoc_sinh` (bí danh `h`) viết bằng SQL — ĐÚNG luật `tenLopCuaEm` (ten-lop.ts): `ten_lop` đã gán thì dùng, không thì
+ * mặc định theo KHỐI (`lop` là KHỐI: '12' ⇒ '12 - Lớp Thường'; rỗng ⇒ 'Chưa xếp lớp'; khối khác ⇒ chính nó).
+ * LỖI THẬT 12/10 (thầy chụp "Học sinh nhận bài 0 · Câu cần chữa 132" ở gói "12 - Lớp Thường · Bài 8 Amine"): `goi_bai_7.lop` = `bai_da_day.lop` là
+ * TÊN LỚP ("12 - Lớp Thường", "12 - Tinh Hoa"…) mà gói so với `hoc_sinh.lop` (KHỐI "12") ⇒ không em nào được gắn vào gói (máy em cũng không thấy
+ * gói). Mọi chỗ so lớp em với lớp gói đi qua biểu thức này. Chỉ đọc cột sẵn có — không đổi schema.
+ */
+export const sqlTenLopHs = (h: string): string =>
+  `COALESCE(NULLIF(TRIM(${h}.ten_lop),''),CASE TRIM(COALESCE(${h}.lop,'')) WHEN '12' THEN '${TEN_LOP_THUONG_12}' WHEN '' THEN '${TEN_LOP_CHUA_XEP}' ELSE TRIM(${h}.lop) END)`
 export interface CoGoi7 { bat: boolean; batDau: string; batLuc?: string }
 export async function coGoi7(env: Env): Promise<CoGoi7> {
   const r = await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='goi_bai_7_v1'").first<{ gia_tri: string }>()
@@ -65,7 +75,7 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     const rs = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) SELECT ?,?,?,?,?,?,?,? WHERE ${KHONG_CA}`).bind(id,b.id,b.lop,b.khoa_bai,b.ten_bai,batDau,han,luc),
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE EXISTS(SELECT 1 FROM goi_bai_7 WHERE id=?) AND ${KHONG_CA}`).bind(id,JSON.stringify(cau),id),
-      env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) SELECT ?,sbd,?,? FROM hoc_sinh WHERE lop=? AND COALESCE(trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM goi_bai_7 WHERE id=?) AND ${KHONG_CA}`).bind(id,batDau,han,b.lop,id),
+      env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) SELECT ?,h.sbd,?,? FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM goi_bai_7 WHERE id=?) AND ${KHONG_CA}`).bind(id,batDau,han,b.lop,id),
     ])
     soGoi += Number(rs[0]?.meta.changes ?? 0); soCau += Number(rs[1]?.meta.changes ?? 0); soEm += Number(rs[2]?.meta.changes ?? 0)
   }
@@ -83,7 +93,7 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
   }
   // Em mới chuyển/đăng ký lớp cũng nhận bài, không tạo lại tiến độ của em cũ.
   await env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han)
-    SELECT g.id,h.sbd,g.bat_dau,g.han FROM goi_bai_7 g JOIN hoc_sinh h ON h.lop=g.lop AND COALESCE(h.trang_thai,'')<>'khoa' JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${KHONG_CA}`).run()
+    SELECT g.id,h.sbd,g.bat_dau,g.han FROM goi_bai_7 g JOIN hoc_sinh h ON ${sqlTenLopHs('h')}=g.lop AND COALESCE(h.trang_thai,'')<>'khoa' JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${KHONG_CA}`).run()
   return { soGoi, soEm, soCau, hoan: false }
 }
 
@@ -130,7 +140,7 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
   if(!chiDoc)await damBaoGoi7(env)
   const ngay = ngayVn7(now)
   const gs = await env.DB.prepare(`SELECT g.id,g.ten,g.khoa_bai,e.bat_dau,e.han,b.ma_to_json FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id
-    JOIN hoc_sinh h ON h.sbd=e.sbd AND h.lop=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? ORDER BY e.bat_dau DESC,g.id`).bind(sbd).all<Row>()
+    JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? ORDER BY e.bat_dau DESC,g.id`).bind(sbd).all<Row>()
   if (!gs.results.length) return []
   const gids = JSON.stringify(gs.results.map(g => g.id))
   const [cs, gaps, events, quotas] = await Promise.all([
@@ -163,7 +173,8 @@ export async function lapGoi7(env: Env, sbd: string, now: number) {
   const goi = await docGoiCuaEm7(env,sbd,now)
   if (!goi.length) return null
   const qids = [...new Set(goi.flatMap(g => g.cau.map(c => c.qid)))], ngay = ngayVn7(now)
-  const lop = (await env.DB.prepare('SELECT lop FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{lop:string}>())?.lop ?? ''
+  // Phạm vi bài đã dạy theo TÊN LỚP của em (cùng nguồn màn Học sinh) — `hoc_sinh.lop` là khối, không khớp `bai_da_day.lop` (lỗi 12/10, xem sqlTenLopHs).
+  const lop = (await lopCuaEm(env, sbd)) ?? ''
   const phamVi = await phamViLop(env,lop)
   const maCu = [...(phamVi?.maDe ?? [])].filter(m => !goi.some(g => g.maDeNguon.includes(m)))
   // Ma trận cũ là toàn phạm vi; mẫu bổ sung chọn theo độ yếu, không chỉ câu đã làm.

@@ -78,12 +78,19 @@ const DS_CB = [
   ['61-cb-to-chieu-da-goi-loi-giai-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6:lg '],
 ]
 // ═══════════ hết LÀN CHỮA BÀI 12/10B ═══════════
+// ═══════════ LÀN HÀNH TRÌNH 12/10B: Hành trình còn 2 mục › Dạy học & đầu giờ = MỘT buổi dạy 4 bước (bản vẽ HanhTrinh-DayHoc đã duyệt) ═══════════
+// Cảnh `?man=gv-nhip&ht2=1` (máy giả riêng gia/hanh-trinh-2-muc.ts: lớp có 6 em vắng + một lượt 6 em gọi lên bảng; bảng Bài đang giao dùng bộ giả
+// gói 7 ngày). Chờ dòng cuối của bảng Bài đang giao ("58 em" — gói 12A2) rồi chụp CẢ TRANG. Chạy riêng: tiền tố "60-".
+const DS_HT2 = ['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+  [`60-ht2-day-hoc-${kho}${nen === 'dark' ? '-toi' : ''}`, 'gv-nhip&ht2=1', w, hh, nen, true, /Hành trình giỏi Hóa/, 'cho:58 em']))
+// ═══════════ hết LÀN HÀNH TRÌNH 12/10B ═══════════
 
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
   ...DS_HS12, // LÀN HỌC SINH 12/10
   ...DS_TTC, // LÀN THẦY TỰ CHỮA 12/10
   ...DS_CB, // LÀN CHỮA BÀI 12/10B
+  ...DS_HT2, // LÀN HÀNH TRÌNH 12/10B
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],

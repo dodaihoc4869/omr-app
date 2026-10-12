@@ -1,53 +1,37 @@
 // BẢN DUYỆT V2 · MÀN 14 — "HÀNH TRÌNH GIỎI HÓA" của thầy (chế độ Game Hóa 2.0).
 // LỊCH SỬ: 09/10 bản vẽ tối giản thầy chốt (bốn thẻ Nhịp hôm nay · Cần thầy chữa · Bài đã dạy · Chiến dịch đã giao + ba thẻ lớn chọn khối).
 // 09/10 TỐI — THẦY RA LỆNH: "phần này phải tối ưu lại, tôi chỉ cần giữ lại phần dạy học. Phần câu cần chữa trùng tu lại bỏ hết những thứ không
-// cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại" + "kiểm tra đầu giờ giữ lại nữa nhé". 09/10 KHUYA — THẦY: "hành trình
-// để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu nhé, bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử…".
-// 10/10: thêm lối vào Bài mới trong 7 ngày ngay trên màn Hành trình hiện hành, sau Dạy học.
-// 12/10 — THẦY: "tôi cần biết lịch sử học sinh làm bài tập hàng ngày, tính từ 12/10. Học sinh thiếu nhiều ngày nhất hiển thị lên đầu, làm thiếu nhiều
-// câu nhất trong từng ngày" ⇒ thẻ Bài hằng ngày ngay sau Nhịp học (`TheBaiHangNgay`: bảng nhiệt em × ngày, bấm em ⇒ hồ sơ làm bài).
-//   · Dạy học (mặc định) — `TheBaiDaDay` (điểm danh · chọn câu · bước Bài hôm nay). Nút chính "Bổ sung bài" thuộc thẻ này: chỉ hiện khi đứng ở
-//     thẻ Dạy học, bấm ⇒ cuộn tới bước Bài hôm nay (tick bài vừa dạy — máy chủ chưa có lệnh thêm bài thẳng vào hành trình theo khối).
-//   · Nhịp học — `TheNhipHoc` (từng em hôm nay của các Hành trình khối đang chạy; em chưa làm / chưa đủ mức đứng đầu; bấm một em ⇒ tấm Lịch sử
-//     làm câu). Hôm nay › "Xem danh sách" / dòng khối của thẻ Đủ mức tối thiểu mở thẳng thẻ này (khối chọn sẵn: `khoiDau`).
-//   · Bài hằng ngày — `TheBaiHangNgay` (từ 12/10, mỗi em mỗi ngày đã làm/mức; em thiếu nhiều ngày nhất đứng đầu; bấm đầu cột một ngày ⇒ em thiếu
-//     nhiều câu nhất ngày ấy lên đầu; bấm em ⇒ tấm Hồ sơ làm bài có nhãn thái độ). Hôm nay › "Bài hằng ngày từ 12/10" mở thẳng thẻ này.
-//   · Kiểm tra đầu giờ — `KiemTraDauGio` (cùng bước điểm danh, app gọi ≤ 6 em làm lại câu từng đúng).
-//   · Cần thầy chữa — `TheCanThayChua` (trung tu: MỘT danh sách câu/dạng cần chữa xếp theo số em, mỗi dòng một nút đúng việc; thanh phân đoạn
-//     Khối 10 · 11 · 12 chỉ hiện ở thẻ này vì chỉ thẻ này lọc theo khối). Số cạnh tên thẻ = số "Cần thầy chữa" màn Hôm nay đã đếm.
-// ĐÃ BỎ khỏi màn (thông tin/hành động ấy nằm ở chỗ khác — không mất chức năng nào):
-//   · bốn ô số + thẻ chương của thẻ Nhịp hôm nay cũ (bảng từng em đã trở lại ở thẻ Nhịp học) — chương/bài của khối ở cây Dạy học › Bài hôm nay
-//     và Kho đề.
-//   · thẻ Chiến dịch đã giao (giao mới · lọc · xem bảng · rải đều · sửa · kết thúc · huỷ) — trang riêng của cùng màn `chiendich`
-//     (`ChienDichScreen`), lối vào chữ nhỏ ở Cài đặt và Tổng quan › "Giao" cho một ca.
-//   · ba thẻ lớn chọn khối (cao 124 px).
+// cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại" + "kiểm tra đầu giờ giữ lại nữa nhé". 09/10 KHUYA thêm Nhịp học;
+// 10/10 thêm Bài mới trong 7 ngày; 12/10 sáng thêm Bài hằng ngày (sáu thẻ).
+// 12/10 — THẦY (bản vẽ HanhTrinh-DayHoc + HanhTrinh-ChuaBai đã duyệt): "Chỗ này rất khó hiểu, chốt lại trong phần này tôi chỉ cần mục dạy học, gọi lên
+// bảng đầu giờ và chữa câu khó tính toán và câu học sinh cần chữa. Bạn hãy thu gọn tối giản hết lại thành 2 mục và làm thật trực quan dễ hiểu khoa học
+// đẹp mắt" ⇒ màn còn ĐÚNG HAI MỤC dạng nút lớn:
+//   · "Dạy học & đầu giờ" (`day-hoc`, mặc định) — `TheBaiDaDay`: MỘT buổi dạy 4 bước (Điểm danh · Gọi lên bảng đầu giờ · Dạy và chiếu câu · Tick bài
+//     vừa dạy + bảng Bài đang giao). Nút chính "Tick bài hôm nay" / "Bổ sung bài" nằm ở bước 4 (không còn nút ở đầu màn).
+//   · "Chữa bài" (`chua-bai`) — `TheCanThayChua` (làn Chữa bài trùng tu bên trong). Số cạnh tên mục = số "Cần thầy chữa" (Hôm nay đếm; danh sách đọc
+//     xong thì dùng đúng số của danh sách — một con số ở mọi nơi, kể cả thanh bên).
+// ĐÃ BỎ khỏi màn (12/10): Bài mới trong 7 ngày (tiến độ gói nay là bảng Bài đang giao ở bước 4; câu nhiều em sai ở mục Chữa bài), Nhịp học và Bài hằng
+// ngày (chuyển sang màn Hôm nay), Kiểm tra đầu giờ (gộp vào mục 1 thành bước "Gọi lên bảng đầu giờ"). KHOÁ CŨ không gãy: `mucHanhTrinh` (so-dem-gv.ts)
+// ánh xạ `can-chua` ⇒ Chữa bài; `dau-gio` · `goi-7` · `nhip` · `bai-hang-ngay` ⇒ Dạy học & đầu giờ.
 import { lazy, Suspense, useCallback, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Monitor, PencilLine } from 'lucide-react'
 import type { BaiCay } from '../../lib/bai-hom-nay'
-import { useSoDemGv, type TheHanhTrinh } from '../../lib/so-dem-gv'
+import { mucHanhTrinh, useSoDemGv, type MucHanhTrinh, type TheHanhTrinh } from '../../lib/so-dem-gv'
 import './gv-v2.css'
 
 // Phép tính nhịp (khối, bốn chỉ số) ở `nhip-hanh-trinh.ts` (màn Hôm nay dùng) — xuất lại ở đây cho mọi lối nhập cũ.
 export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
 
-// Mỗi thẻ là mảnh riêng, chỉ tải khi thầy mở thẻ.
+// Mỗi mục là mảnh riêng, chỉ tải khi thầy mở mục.
 const TheBaiDaDay = lazy(() => import('./TheBaiDaDay'))
-const BangGoi7 = lazy(() => import('./BangGoi7'))
-const TheNhipHoc = lazy(() => import('./TheNhipHoc'))
-const TheBaiHangNgay = lazy(() => import('./TheBaiHangNgay'))
-const KiemTraDauGio = lazy(() => import('../day-hoc/KiemTraDauGio'))
 const TheCanThayChua = lazy(() => import('./TheCanThayChua'))
 
-type TheMan = Exclude<TheHanhTrinh, 'chien-dich'>
-/** Dạy → bài mới 7 ngày → nhịp học của từng em → bài hằng ngày từ 12/10 → kiểm tra đầu giờ → chữa. */
-export const THE_HANH_TRINH: readonly (readonly [TheMan, string])[] = [
-  ['day-hoc', 'Dạy học'],
-  ['goi-7', 'Bài mới trong 7 ngày'],
-  ['nhip', 'Nhịp học'],
-  ['bai-hang-ngay', 'Bài hằng ngày'],
-  ['dau-gio', 'Kiểm tra đầu giờ'],
-  ['can-chua', 'Cần thầy chữa'],
+/** Hai mục của màn (thầy 12/10). */
+export const THE_HANH_TRINH: readonly (readonly [MucHanhTrinh, string])[] = [
+  ['day-hoc', 'Dạy học & đầu giờ'],
+  ['chua-bai', 'Chữa bài'],
 ]
+const BIEU_TUONG: Record<MucHanhTrinh, typeof Monitor> = { 'day-hoc': Monitor, 'chua-bai': PencilLine }
 
 /** Chương của khối: số bài + số câu (cộng `soCau` các bài trong cây DẠY HỌC). Màn không còn vẽ thẻ chương — giữ hàm thuần cho lối nhập cũ. */
 export function chuongCuaKhoi(bai: readonly BaiCay[]): { chuong: string; soBai: number; soCau: number }[] {
@@ -61,10 +45,10 @@ export function chuongCuaKhoi(bai: readonly BaiCay[]): { chuong: string; soBai: 
   return [...ra.values()]
 }
 
-/** Chờ mảnh thẻ: khung xương đúng hình hai khối bước (thang chung `.tt-xuong`), không chữ "Đang mở…". */
+/** Chờ mảnh mục: khung xương đúng hình hai khối bước (thang chung `.tt-xuong`), không chữ "Đang mở…". */
 function XuongThe() {
   return (
-    <div className="gvv2-cc-xuong" role="status" aria-label="Đang mở thẻ">
+    <div className="gvv2-cc-xuong" role="status" aria-label="Đang mở mục">
       <span className="gvv2-cc-xuong-khoi tt-xuong" style={{ width: '100%', height: 96, borderRadius: 16 }} />
       <span className="gvv2-cc-xuong-khoi tt-xuong" style={{ width: '100%', height: 160, borderRadius: 16 }} />
     </div>
@@ -72,14 +56,15 @@ function XuongThe() {
 }
 
 /** Màn Hành trình.
- *  `theDau` = thẻ mở đầu (Hôm nay › một việc ⇒ đúng thẻ ấy). `boSungBai` = vào thẳng thẻ Dạy học và cuộn tới bước Bài hôm nay.
- *  `khoiDau` = khối chọn sẵn ở thẻ Nhịp học (Hôm nay › dòng "Khối 12"). */
-export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, khoiDau = null }: { theDau?: TheMan; boSungBai?: boolean; khoiDau?: number | null }) {
-  const [the, setThe] = useState<TheMan>(boSungBai ? 'day-hoc' : theDau)
-  // Mỗi lần bấm "Bổ sung bài" tăng một nhịp ⇒ thẻ Dạy học cuộn lại tới bước Bài hôm nay.
-  const [lanBoSung, setLanBoSung] = useState(boSungBai ? 1 : 0)
+ *  `theDau` = mục mở đầu — nhận cả khoá cũ (Hôm nay › một việc ⇒ đúng mục ấy; `mucHanhTrinh`). `boSungBai` = vào thẳng mục Dạy học & đầu giờ, mở
+ *  bước Bài hôm nay và cuộn tới bước Tick bài vừa dạy. `khoiDau` giữ cho lối gọi cũ (khối của thẻ Nhịp học — thẻ ấy nay ở màn Hôm nay). */
+export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, khoiDau = null }: { theDau?: TheHanhTrinh; boSungBai?: boolean; khoiDau?: number | null }) {
+  void khoiDau
+  const [the, setThe] = useState<MucHanhTrinh>(boSungBai ? 'day-hoc' : mucHanhTrinh(theDau))
+  // Mỗi lần có yêu cầu "Bổ sung bài" tăng một nhịp ⇒ mục Dạy học mở bước Bài hôm nay và cuộn tới.
+  const [lanBoSung] = useState(boSungBai ? 1 : 0)
   const canThayChua = useSoDemGv((s) => s.canThayChua)
-  // Số cạnh tên thẻ: số màn Hôm nay đếm; thẻ Cần thầy chữa đọc xong danh sách (gồm cả bước cuối, thẻ nút thắt) ⇒ dùng đúng số của danh sách.
+  // Số cạnh tên mục: số màn Hôm nay đếm; mục Chữa bài đọc xong danh sách (gồm cả bước cuối, thẻ nút thắt) ⇒ dùng đúng số của danh sách.
   const [demDanhSach, setDemDanhSach] = useState<number | null>(null)
   const datSo = useSoDemGv((s) => s.datSo)
   // Danh sách vừa đọc xong (kể cả sau khi chữa một chỗ) ⇒ số cạnh mục Hành trình ở thanh bên theo luôn — một con số ở mọi nơi.
@@ -91,50 +76,42 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, kho
     [datSo],
   )
   const soCanChua = demDanhSach ?? canThayChua
+  const moChuaBai = useCallback(() => {
+    setThe('chua-bai')
+    if (typeof window !== 'undefined') window.scrollTo?.({ top: 0 })
+  }, [])
 
   return (
     <div className="gvv2">
       <header className="gvv2-dau">
         <div className="gvv2-dau-chu">
           <h1 className="gvv2-h1">Hành trình giỏi Hóa</h1>
-          <p className="gvv2-phu">Thầy tick bài đã dạy — app tự lập kế hoạch riêng cho từng em mỗi ngày</p>
+          <p className="gvv2-phu">Thầy dạy và tick bài, app tự lập bài cho từng em mỗi ngày</p>
         </div>
-        {the === 'day-hoc' && (
-          <button type="button" className="gvv2-nut-chinh tt-nhan" onClick={() => setLanBoSung((n) => n + 1)} title="Tick bài vừa dạy ở bước Bài hôm nay — hành trình tự nhận bài mới">
-            <Plus size={18} aria-hidden="true" />
-            Bổ sung bài
-          </button>
-        )}
       </header>
 
-      <nav className="gvv2-tab" data-so={THE_HANH_TRINH.length} role="tablist" aria-label="Hành trình">
-        {THE_HANH_TRINH.map(([k, nhan]) => (
-          <button key={k} type="button" role="tab" id={`gvv2-the-${k}`} aria-controls={`gvv2-o-${k}`} aria-selected={the === k} className="gvv2-tab-nut" onClick={() => setThe(k)}>
-            {nhan}
-            {k === 'can-chua' && soCanChua ? <span className="gvv2-so"> · {soCanChua}</span> : null}
-          </button>
-        ))}
+      <nav className="gvv2-muc" data-so={THE_HANH_TRINH.length} role="tablist" aria-label="Hành trình">
+        {THE_HANH_TRINH.map(([k, nhan]) => {
+          const BieuTuong = BIEU_TUONG[k]
+          return (
+            <button key={k} type="button" role="tab" id={`gvv2-the-${k}`} aria-controls={`gvv2-o-${k}`} aria-selected={the === k} className="gvv2-muc-nut" onClick={() => setThe(k)}>
+              <BieuTuong size={20} aria-hidden="true" />
+              {nhan}
+              {k === 'chua-bai' && soCanChua ? (
+                <span className="gvv2-muc-dem gvv2-so">
+                  <span className="sr-only"> · </span>
+                  {soCanChua}
+                  <span className="sr-only"> chỗ cần chữa</span>
+                </span>
+              ) : null}
+            </button>
+          )
+        })}
       </nav>
 
-      {/* Đổi thẻ: mờ dần + trượt 8px 200ms (thang chung .tt-vao-muc); key theo thẻ để mỗi lần đổi chạy lại. */}
+      {/* Đổi mục: mờ dần + trượt 8px 200ms (thang chung .tt-vao-muc); key theo mục để mỗi lần đổi chạy lại. */}
       <div key={the} role="tabpanel" id={`gvv2-o-${the}`} aria-labelledby={`gvv2-the-${the}`} className="gvv2-o-the tt-vao-muc">
-        <Suspense fallback={<XuongThe />}>
-          {the === 'day-hoc' ? (
-            <TheBaiDaDay lanBoSung={lanBoSung} />
-          ) : the === 'goi-7' ? (
-            <BangGoi7 trangRieng />
-          ) : the === 'nhip' ? (
-            <TheNhipHoc khoiDau={khoiDau} />
-          ) : the === 'bai-hang-ngay' ? (
-            <TheBaiHangNgay khoiDau={khoiDau} />
-          ) : the === 'dau-gio' ? (
-            <div className="gvv2-nhung">
-              <KiemTraDauGio />
-            </div>
-          ) : (
-            <TheCanThayChua onDem={nhanDem} />
-          )}
-        </Suspense>
+        <Suspense fallback={<XuongThe />}>{the === 'day-hoc' ? <TheBaiDaDay lanBoSung={lanBoSung} onMoChuaBai={moChuaBai} /> : <TheCanThayChua onDem={nhanDem} />}</Suspense>
       </div>
     </div>
   )

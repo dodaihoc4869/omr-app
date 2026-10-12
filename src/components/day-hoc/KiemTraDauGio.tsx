@@ -6,6 +6,9 @@
 //      ("Sai 20/09 (Ca) · Đúng 22/09 (Đoàn)"), bấm thẻ tên ⇒ bảng chi tiết (các lần làm câu này). "Gọi thêm" = lượt mới (không trùng em đã gọi trong buổi).
 //  3 · CHẤM — mỗi câu Đạt / Chưa đạt (idempotent theo buổi + em + câu, ghi sổ nguon='dau_gio') + ô "Thầy đã chữa" (nhãn + mốc dạy lại).
 //      "Kết thúc": câu chưa chấm KHÔNG ghi gì vào sổ.
+// 12/10 — thầy: Hành trình còn 2 mục; mục "Dạy học & đầu giờ" là MỘT buổi dạy 4 bước. Mục ấy truyền `dd` (điểm danh dùng chung, `useDiemDanhBuoi`
+// gọi MỘT lần ở cha) ⇒ thẻ này KHÔNG tự tìm/mở buổi, KHÔNG vẽ bước Điểm danh, chỉ vẽ MỘT bước "Gọi lên bảng đầu giờ" (chiếu + thẻ từng em chấm
+// Đạt / Chưa đạt + Gọi thêm + Thầy đã chữa + Kết thúc) — luồng máy chủ `/gv/dau-gio` giữ nguyên. Vắng `dd` ⇒ y như cũ (màn Lên bảng dùng).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Eye, EyeOff, Flag, Lightbulb, MonitorPlay, UserPlus, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
@@ -17,7 +20,7 @@ import { chonLuotDauGio, ngayNganVn, TOI_DA_EM_MOI_LUOT } from '../../lib/dau-gi
 import { cauTheoQid, khoaNoiDungTheoKho, locUngVienTheoKho } from '../../lib/dau-gio-kho'
 import { chamCau, chotLuot, ghiDaChua, ketThucDauGio, layLichSuHoi, layUngVien, xemDauGio, type LichSuHoi, type LuotHoi } from '../../lib/dau-gio-api'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
-import { BuocDiemDanh, tenNgan, useDiemDanhBuoi } from './DiemDanhBuoi'
+import { BuocDiemDanh, tenNgan, useDiemDanhBuoi, type DiemDanhBuoi } from './DiemDanhBuoi'
 import TheCauHienThi from './TheCauHienThi'
 import './day-hoc.css'
 import './dau-gio.css'
@@ -25,9 +28,32 @@ import './dau-gio.css'
 const TEN_PHAN: Record<CauDayHoc['phan'], string> = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng–sai', III: 'Phần III · Trả lời ngắn' }
 const khoa = (x: { sbd: string; qid: string }) => khoaToChieu(x.sbd, x.qid)
 
-export default function KiemTraDauGio() {
-  const showToast = useAppStore((s) => s.showToast)
+/** Chữ cái đầu của hai tiếng cuối họ tên ("Lê Khánh Vy" ⇒ "KV") cho ô tròn đầu thẻ; vắng tên ⇒ hai số cuối SBD. */
+export function kyTuTen(hoTen: string, sbd: string): string {
+  const t = hoTen.split(/\s+/).filter(Boolean)
+  return t.length ? t.slice(-2).map((x) => x[0]!.toLocaleUpperCase('vi')).join('') : sbd.slice(-2)
+}
+
+export interface TuyChonKiemTraDauGio {
+  /** Điểm danh dùng chung do cha tạo (mục Hành trình "Dạy học & đầu giờ"): có ⇒ KHÔNG tạo buổi riêng, KHÔNG vẽ bước Điểm danh. */
+  dd?: DiemDanhBuoi
+  /** Số của bước trong buổi dạy (chỉ khi có `dd`; mặc định 2). */
+  soBuoc?: number
+  /** Báo cha bước đã xong (đã gọi và chấm hết, hoặc đã kết thúc) — thanh bước của buổi dạy. */
+  onXong?: (xong: boolean) => void
+}
+
+/** Vắng `dd` ⇒ tự tạo điểm danh như cũ (màn Lên bảng); có `dd` ⇒ một bước gọn trong buổi dạy. */
+export default function KiemTraDauGio({ dd, soBuoc, onXong }: TuyChonKiemTraDauGio = {}) {
+  return dd ? <KiemTraDauGioThan dd={dd} nhung soBuoc={soBuoc} onXong={onXong} /> : <KiemTraDauGioTuTao />
+}
+function KiemTraDauGioTuTao() {
   const dd = useDiemDanhBuoi()
+  return <KiemTraDauGioThan dd={dd} nhung={false} />
+}
+
+function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong }: { dd: DiemDanhBuoi; nhung: boolean; soBuoc?: number; onXong?: (xong: boolean) => void }) {
+  const showToast = useAppStore((s) => s.showToast)
   const { tt, idBuoi, coMat, lopCuaEm } = dd
   const buoiMo = !!tt?.buoi.dangMo
 
@@ -241,6 +267,194 @@ export default function KiemTraDauGio() {
     for (const x of luot) m.set(x.luot, [...(m.get(x.luot) ?? []), x])
     return [...m.entries()].sort((a, b) => b[0] - a[0])
   }, [luot])
+  // Bước xong (thanh bước của buổi dạy): đã gọi và chấm hết, hoặc thầy đã bấm Kết thúc.
+  const xong = daKetThuc || (luot.length > 0 && dem.cho === 0)
+  useEffect(() => {
+    onXong?.(xong)
+  }, [xong, onXong])
+
+  const khungChieu = html ? (
+    <KhungXemPhieu
+      html={html}
+      ten="Tờ máy chiếu — Kiểm tra đầu giờ"
+      dong={() => {
+        dongPhien()
+        setHtml('')
+      }}
+    />
+  ) : null
+  const doiLoiGiai = (x: LuotHoi) =>
+    setXemLoiGiai((cu) => {
+      const m = new Set(cu)
+      if (m.has(khoa(x))) m.delete(khoa(x))
+      else m.add(khoa(x))
+      return m
+    })
+
+  if (nhung) {
+    const idTieuDe = `bd-b${soBuoc}`
+    const coTheGoi = !!tt && buoiMo && !daKetThuc
+    const moTa = !tt
+      ? 'Điểm danh ở bước 1 trước — app chỉ gọi em có mặt.'
+      : daKetThuc
+        ? 'Đã kết thúc gọi lên bảng đầu giờ của buổi này. Kết quả đã chấm vẫn giữ.'
+        : !buoiMo
+          ? 'Buổi học đã kết thúc — mở buổi mới ở bước 1 để gọi lên bảng.'
+          : !coMat.length
+            ? 'Chưa có em nào có mặt — chờ em điểm danh ở bước 1.'
+            : `App chọn tối đa ${TOI_DA_EM_MOI_LUOT} em có mặt, mỗi em một câu em từng làm đúng — kiểm xem em còn nhớ không.`
+    return (
+      <section className="dh-buoc gvv2-bd-buoc" data-buoc={soBuoc} data-khoi="buoc-dau-gio" aria-labelledby={idTieuDe}>
+        <div className="dh-buoc-dau">
+          <span className="dh-so" aria-hidden="true">
+            {soBuoc}
+          </span>
+          <div className="dh-buoc-ten">
+            <h2 id={idTieuDe}>Gọi lên bảng đầu giờ</h2>
+            <p>{moTa}</p>
+          </div>
+          {coTheGoi && (
+            <div className="gvv2-bd-nut">
+              {luot.length > 0 && (
+                <button type="button" className="m3-nut-vien dh-nut" disabled={dangChieu || !coMat.length || daGoiHet} aria-busy={dangChieu} onClick={() => void goiLuot()}>
+                  <UserPlus size={18} aria-hidden="true" /> {daGoiHet ? 'Đã gọi hết em có mặt' : `Gọi thêm (tối đa ${TOI_DA_EM_MOI_LUOT} em)`}
+                </button>
+              )}
+              <button
+                type="button"
+                className="m3-nut-chinh dh-nut"
+                disabled={dangChieu || (!luot.length && (!coMat.length || daGoiHet))}
+                aria-busy={dangChieu}
+                onClick={() => void (luot.length ? moTo(luot.filter((x) => x.luot === luotCuoi)) : goiLuot())}
+              >
+                <MonitorPlay size={18} aria-hidden="true" /> {dangChieu ? 'Đang dựng tờ chiếu…' : 'Chiếu lên bảng'}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {!tt ? null : dangTaiLuot && !luot.length ? (
+          <p className="dh-phu" aria-busy="true">
+            Đang tải các em đã gọi…
+          </p>
+        ) : loiLuot ? (
+          <div className="dh-hang">
+            <p className="dh-loi" role="alert">
+              {loiLuot}
+            </p>
+            <button type="button" className="m3-nut-vien dh-nut" onClick={() => void napLuot()}>
+              Thử lại
+            </button>
+          </div>
+        ) : !luot.length ? (
+          coTheGoi && coMat.length > 0 ? <p className="dh-phu">Chưa gọi em nào. Bấm “Chiếu lên bảng”: app chọn em, dựng tờ chiếu; thầy chấm ngay trên tờ hoặc ở đây.</p> : null
+        ) : (
+          <>
+            <div className="gvv2-dg-tom">
+              <p className="dh-tong dg-tong">
+                <span>
+                  Đã gọi <b>{dem.goi}</b> em
+                </span>
+                <span>
+                  Đạt <b>{dem.dat}</b>
+                </span>
+                <span>
+                  Chưa đạt <b>{dem.chuaDat}</b>
+                </span>
+                <span>
+                  Chưa chấm <b>{dem.cho}</b>
+                </span>
+              </p>
+              {xemLoiGiai.size > 0 ? (
+                <button type="button" className="m3-nut-chu dh-nut-nho" onClick={() => setXemLoiGiai(new Set())}>
+                  <EyeOff size={15} aria-hidden="true" /> Ẩn lời giải
+                </button>
+              ) : (
+                <button type="button" className="m3-nut-chu dh-nut-nho" onClick={() => setXemLoiGiai(new Set(luot.map(khoa)))}>
+                  <Eye size={15} aria-hidden="true" /> Hiện lời giải tất cả
+                </button>
+              )}
+            </div>
+            {theoLuot.map(([so, ds]) => (
+              <div key={so} className="gvv2-dg-luot">
+                {theoLuot.length > 1 && <h3 className="dg-luot-ten">Lượt {so}</h3>}
+                <ul className="gvv2-dg-luoi" aria-label={`Lượt ${so} · ${ds.length} em`}>
+                  {ds.map((x) => {
+                    const c = khoSan ? kho.current?.get(x.qid) : undefined
+                    const t = trangThai(x)
+                    const ls = lichSu[khoa(x)]
+                    const mo = xemLoiGiai.has(khoa(x))
+                    const ten = x.hoTen || `SBD ${x.sbd}`
+                    return (
+                      <li key={khoa(x)} className="gvv2-dg-the" data-trang-thai={t}>
+                        <div className="gvv2-dg-dau">
+                          <span className="gvv2-avatar" aria-hidden="true">
+                            {kyTuTen(x.hoTen, x.sbd)}
+                          </span>
+                          <p className="gvv2-dg-ten">
+                            <b title={ten}>{ten}</b>
+                            <small>{c ? `${TEN_PHAN[c.phan]} · ${c.tenDang || x.chuyenDe || 'Câu đã làm đúng'}` : x.chuyenDe || 'Câu đã làm đúng'}</small>
+                          </p>
+                        </div>
+                        <p className="gvv2-dg-de">{c ? tomTatDe(c, 140) : 'Máy này chưa có câu này trong kho — đồng bộ Ngân hàng câu hỏi để xem đề.'}</p>
+                        {ls?.chu && <p className="gvv2-dg-ls">Lịch sử câu này: {ls.chu}</p>}
+                        {t === 'dat' || t === 'chua_dat' ? (
+                          <p className="gvv2-dg-kq" data-kq={t}>
+                            {t === 'dat' ? <Check size={16} aria-hidden="true" /> : <X size={16} aria-hidden="true" />} {t === 'dat' ? 'Đã ghi: Đạt' : 'Đã ghi: Chưa đạt'}
+                          </p>
+                        ) : t === 'bo' ? (
+                          <p className="gvv2-dg-kq" data-kq="bo">
+                            Không chấm (đã kết thúc)
+                          </p>
+                        ) : (
+                          <div className="gvv2-dg-cham">
+                            <button type="button" className="gvv2-dg-nut" data-loai="dat" onClick={() => void cham(x, true)} aria-label={`${tenNgan(x.hoTen, x.sbd)}: Đạt`}>
+                              <Check size={16} aria-hidden="true" /> Đạt
+                            </button>
+                            <button type="button" className="gvv2-dg-nut" data-loai="chua" onClick={() => void cham(x, false)} aria-label={`${tenNgan(x.hoTen, x.sbd)}: Chưa đạt`}>
+                              <X size={16} aria-hidden="true" /> Chưa đạt
+                            </button>
+                          </div>
+                        )}
+                        <div className="gvv2-dg-phu">
+                          <button type="button" className="m3-nut-chu dh-nut-nho" aria-expanded={mo} onClick={() => doiLoiGiai(x)}>
+                            <Lightbulb size={15} aria-hidden="true" /> {mo ? 'Ẩn lời giải' : 'Hiện lời giải'}
+                          </button>
+                          <label className={`dg-da-chua${x.daChuaLuc ? ' dg-da-chua--co' : ''}`}>
+                            <input
+                              type="checkbox"
+                              checked={!!x.daChuaLuc || dangChua.has(khoa(x))}
+                              disabled={!!x.daChuaLuc || dangChua.has(khoa(x)) || (daKetThuc && !x.daChuaLuc && t === 'bo')}
+                              onChange={() => void daChua(x)}
+                            />
+                            <span>Thầy đã chữa{x.daChuaLuc ? ` · ${ngayNganVn(x.daChuaLuc)}` : ''}</span>
+                          </label>
+                        </div>
+                        {mo &&
+                          (c ? (
+                            <TheCauHienThi c={c} />
+                          ) : (
+                            <p className="dh-cau-de">Chưa có câu này trong kho trên máy. Bấm Ngân hàng câu hỏi → Đồng bộ ngay.</p>
+                          ))}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
+            {coTheGoi && (
+              <div className="dh-hang">
+                <button type="button" className="m3-nut-chu dh-nut" onClick={() => void ketThuc()}>
+                  <Flag size={16} aria-hidden="true" /> Kết thúc kiểm tra
+                </button>
+              </div>
+            )}
+          </>
+        )}
+        {khungChieu}
+      </section>
+    )
+  }
 
   return (
     <div className="dh-trang" data-khoi="kiem-tra-dau-gio">
@@ -449,16 +663,7 @@ export default function KiemTraDauGio() {
         )}
       </section>
 
-      {html && (
-        <KhungXemPhieu
-          html={html}
-          ten="Tờ máy chiếu — Kiểm tra đầu giờ"
-          dong={() => {
-            dongPhien()
-            setHtml('')
-          }}
-        />
-      )}
+      {khungChieu}
     </div>
   )
 }

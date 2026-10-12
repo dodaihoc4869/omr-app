@@ -1,5 +1,5 @@
 import type { Env } from './kieu'
-import { coGoi7, damBaoGoi7, dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7 } from './goi-bai-7'
+import { coGoi7, damBaoGoi7, dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7, sqlTenLopHs } from './goi-bai-7'
 import { lyDoChua7, diemConDungNguon7, type CauGoi7 } from './goi-bai-7-loi'
 import { docCauTheoRef, loiCauDoi } from './game-v2-bank'
 type Row = Record<string,unknown>
@@ -38,7 +38,7 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
   if (!id || !goi.results.some(g=>g.id===id)) return {ok:true,bat:true,goi:goi.results,cau:[],em:[]}
   const [cauRows,emRows,gap,events,chua,pv,kiem]=await Promise.all([
     env.DB.prepare('SELECT * FROM goi_bai_7_cau WHERE goi_id=?').bind(id).all<Row>(),
-    env.DB.prepare(`SELECT e.sbd,h.ho_ten,e.bat_dau,e.han FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd JOIN goi_bai_7 g ON g.id=e.goi_id AND g.lop=h.lop WHERE e.goi_id=?`).bind(id).all<Row>(),
+    env.DB.prepare(`SELECT e.sbd,h.ho_ten,e.bat_dau,e.han FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd JOIN goi_bai_7 g ON g.id=e.goi_id AND g.lop=${sqlTenLopHs('h')} WHERE e.goi_id=?`).bind(id).all<Row>(),
     env.DB.prepare('SELECT sbd,qid,version,kieu FROM goi_bai_7_gap WHERE goi_id=?').bind(id).all<Row>(),
     env.DB.prepare(`SELECT sbd,qid,json_extract(raw_json,'$.ht_cau_version') cau_version,ket_qua,assistance,luc,received_at,EXISTS(SELECT 1 FROM loi_giai_hoi l WHERE l.sbd=su_kien_hoc.sbd AND l.qid=su_kien_hoc.qid AND julianday(l.luc)<julianday(su_kien_hoc.luc) AND julianday(l.luc)>=julianday(su_kien_hoc.luc)-0.5) da_xem FROM su_kien_hoc WHERE sbd IN (SELECT sbd FROM goi_bai_7_em WHERE goi_id=?)
       AND qid IN (SELECT qid FROM goi_bai_7_cau WHERE goi_id=?) AND ${SQL_LUOT_GOI7} ORDER BY received_at,khoa`).bind(id,id).all<Row>(),
