@@ -17,6 +17,7 @@ import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3,
 import { apiDanhSachTuChua, type KetQuaDanhSachChua, type MucChua } from '../../lib/chua-cau-sai-api'
 import { taiCauDaLam, NHAN_NGUON_LAN, type CauDaLamMuc } from '../hoa2/api'
 import { henGapLai } from '../../lib/chua-truc-tiep'
+import { khoaMoChua } from '../../../server/src/ho-so-em-hs-loc'
 import './hoc-tap.css'
 import './tu-chua.css'
 const ManChua = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
@@ -35,6 +36,8 @@ export const CHU_TRANG_THAI_CHUA: Record<string, string> = {
   da_tu_sua: 'Đã tự sửa',
 }
 const TEN_PHAN: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
+/** Khoá mở Tự chữa từ Hồ sơ ("g<số>" — `khoaMoChua`). */
+export const laKhoaHoSo = (q: string) => /^g\d+$/.test(q)
 /** Mã gốc của câu: bỏ đuôi bản đổi số (~n, #n) và tiền tố "tc:" — để khớp câu mở thẳng với đợt trong danh sách. */
 export const goc = (q: string) => q.replace(/(~\d+|#\d+)$/, '').replace(/^tc:/, '')
 const ngayNgan = (ymd: string) => (/^\d{4}-\d{2}-\d{2}$/.test(ymd) ? `${ymd.slice(8, 10)}/${ymd.slice(5, 7)}` : '')
@@ -71,6 +74,11 @@ export function dungDong(m: MucChua, i: number, cdl: ReadonlyMap<string, CauDaLa
 
 /** Đợt ứng với câu mở thẳng: cùng mã gốc; có cả đợt đã đóng lẫn đợt đang mở thì lấy đợt đang mở. */
 export function timMucChua(ds: readonly MucChua[], qid: string): MucChua | undefined {
+  // Từ Hồ sơ (đợt 16): khoá băm "g<số>" của mã gốc ⇒ băm từng câu trong danh sách bằng CÙNG hàm của máy chủ để khớp (không có mã nội bộ trong hồ sơ).
+  if (laKhoaHoSo(qid)) {
+    const cung = ds.filter((m) => khoaMoChua(m.qid) === qid)
+    return cung.find((m) => m.trangThai !== 'da_tu_sua') ?? cung[0]
+  }
   const g = goc(qid)
   const cung = ds.filter((m) => goc(m.qid) === g)
   return cung.find((m) => m.trangThai !== 'da_tu_sua') ?? cung[0]
@@ -139,7 +147,9 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     if (!doi || !kq) return
     if (kq.trangThai === 'bat') {
       const m = timMucChua(kq.ds, doi)
-      setChon(m ? { qid: m.qid } : { qid: doi, thu: true })
+      // Khoá từ Hồ sơ không có trong danh sách (đã sửa xong / chưa vào vòng chữa) ⇒ không "thử mở" bằng khoá băm: hiện danh sách kèm lời báo.
+      if (!m && laKhoaHoSo(doi)) setBao({ qid: doi, loi: 'Câu này hiện chưa có trong danh sách Tự chữa của em — có thể em đã sửa xong, hoặc câu chưa vào vòng chữa.' })
+      else setChon(m ? { qid: m.qid } : { qid: doi, thu: true })
       setDoi('')
     } else if (kq.trangThai === 'tat') setDoi('')
   }, [kq, doi])
@@ -203,9 +213,9 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
               <strong>Chưa mở được câu em chọn</strong>
               <small>{bao.loi ? `${cau(bao.loi)} ` : ''}{coCauChua ? 'Em chọn một câu trong danh sách để chữa.' : ''}</small>
             </span>
-            <button type="button" className="ht-nut-phu" onClick={() => { setBao(null); setChon({ qid: bao.qid, thu: true }) }}>
+            {!laKhoaHoSo(bao.qid) && <button type="button" className="ht-nut-phu" onClick={() => { setBao(null); setChon({ qid: bao.qid, thu: true }) }}>
               <RotateCcw size={16} aria-hidden="true" />Thử mở lại
-            </button>
+            </button>}
           </div>
         )}
         {dangMoThang || !kq ? (

@@ -290,7 +290,7 @@ function OCauSai({ c, lan, onChua }: { c: CauEmSai; lan: readonly LanLamCau[]; o
   return (
     <li className="gvv2-hs-cau hslc-o" data-sua={sua ? 'true' : 'false'}>
       {onChua ? (
-        <button type="button" className="hslc-o-nut tt-nhan" onClick={() => onChua(c.qid)} aria-label={`Tự chữa câu này: ${tieuDeCau(c)}`}>
+        <button type="button" className="hslc-o-nut tt-nhan" onClick={() => onChua(c.moChua ?? c.qid)} aria-label={`Tự chữa câu này: ${tieuDeCau(c)}`}>
           {than}
         </button>
       ) : (
@@ -759,8 +759,8 @@ function TinHieu({ td }: { td: KetQuaHoSoThaiDo }) {
   )
 }
 
-/** Số giây từng lần của một câu trong Câu đúng / Câu đã ôn — CHỈ khi khoá câu của hai lệnh khớp nhau (app thầy: mã thật). Bản học sinh / phụ huynh
- *  đổi khoá riêng từng lệnh ⇒ không ghép (không đoán) — số giây từng lượt xem ở Toàn bộ lịch sử. */
+/** Số giây từng lần của một câu trong Câu đúng / Câu đã ôn — ghép theo khoá câu của hai lệnh: app thầy là mã thật; bản học sinh / phụ huynh là khoá băm
+ *  CỐ ĐỊNH theo mã (đợt 16, server/src/ho-so-em-hs-loc.ts) nên hai lệnh cùng khoá — ba app đều thấy số giây từng lần. */
 function GiayCauTomTat({ c, lan }: { c: CauTomTat; lan: readonly LanLamCau[] }) {
   const cua = lan.filter((l) => l.qid === c.qid).sort((a, b) => a.luc.localeCompare(b.luc))
   if (cua.length === 0) return null
@@ -1062,7 +1062,7 @@ export default function HoSoLamCauEm({
                       so={d.giayTb !== null && d.giayTb > 0 ? doiGiay(d.giayTb) : 'Chưa đo'}
                       phu={d.giayTrungVi !== null ? `trung vị ${doiGiay(d.giayTrungVi)} · ${d.soLuotCoGiay} lượt có số giây` : 'chưa có lượt có số giây'}
                     />
-                    {tuSuaSai !== undefined && <OSoTd nhan="Tự sửa được" so={`${tuSuaSai} câu`} phu="câu từng sai, sau làm lại đúng" />}
+                    {tuSuaSai && tuSuaSai.soCauSai > 0 && <OSoTd nhan="Tự sửa được" so={`${tuSuaSai.soCauDaSua}/${tuSuaSai.soCauSai} câu`} phu={tuSuaSai.chu} />}
                   </dl>
                 </section>
                 <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-lich-tieu">
@@ -1164,7 +1164,7 @@ export default function HoSoLamCauEm({
                             key={the}
                             cau={the === 'cau-dung' ? td.cauDung : td.cauDaOn}
                             loai={the === 'cau-dung' ? 'dung' : 'on'}
-                            lan={laThay ? kq.lan : null}
+                            lan={kq.lan}
                             ngoi={ngoi}
                           />
                         ) : (

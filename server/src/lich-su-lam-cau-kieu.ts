@@ -35,6 +35,8 @@ export interface LanLamCau {
 /** Một câu em từng làm SAI (ít nhất một lần). */
 export interface CauEmSai {
   qid: string
+  /** Bản học sinh / phụ huynh (đợt 16): khoá "g<số>" mở màn Tự chữa đúng câu (`khoaMoChua` trong ho-so-em-hs-loc.ts). Bản thầy: vắng. */
+  moChua?: string
   tieuDe: string
   mucDo: string
   soLan: number

@@ -17,12 +17,21 @@ export { MUC_THEO_TANG, NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO, TEN_NHAN_THA
 
 // ĐỢT 16 (thầy 12/10: "đo kĩ hơn nữa thái độ của học sinh chính xác hơn 90%") — làn máy chủ D CHỈ THÊM ba trường TUỲ CHỌN; khai ở PHÍA APP (không sửa
 // tệp máy chủ). Máy chủ cũ không gửi ⇒ trường vắng, tấm hiện y như trước (không chip, không "đang theo dõi").
+/** Đọc `tuSuaSai` của máy chủ: hai số đếm nguyên ≥ 0, đã sửa ≤ câu sai, câu chữ khác rỗng; khác ⇒ null (bỏ trường, không bịa). */
+function docTuSuaSai(x: unknown): NonNullable<KetQuaHoSoThaiDo['tuSuaSai']> | null {
+  if (!x || typeof x !== 'object') return null
+  const o = x as Record<string, unknown>
+  const sai = Number(o.soCauSai), sua = Number(o.soCauDaSua)
+  if (!Number.isInteger(sai) || !Number.isInteger(sua) || sai < 0 || sua < 0 || sua > sai || typeof o.chu !== 'string' || !o.chu.trim()) return null
+  const pt = o.phanTram === null ? null : Number(o.phanTram)
+  return { soCauSai: sai, soCauDaSua: sua, phanTram: pt !== null && Number.isFinite(pt) ? Math.round(pt) : null, chu: o.chu.trim() }
+}
 /** Độ tin cậy (0–100) của MỘT tín hiệu. */
 export type TinHieuThaiDoApp = TinHieuThaiDo & { doTinCay?: number }
 /** Độ tin cậy (0–100; máy chủ kẹp ≤ 99) của kết luận + câu "cần thêm gì để chắc" khi chưa đủ tin cậy. */
 export type KetLuanThaiDoApp = KetLuanThaiDo & { doTinCay?: number; canThem?: string }
 /** Cả hồ sơ: cách tính độ tin cậy (chữ) + số câu từng sai nay đã làm lại đúng (chỉ để hiện). */
-export type KetQuaHoSoThaiDoApp = KetQuaHoSoThaiDo & { cachTinhTinCay?: string; tuSuaSai?: number }
+export type KetQuaHoSoThaiDoApp = KetQuaHoSoThaiDo
 /** Đọc độ tin cậy: số hữu hạn ⇒ làm tròn, kẹp 0–100; khác ⇒ null (bỏ trường, không bịa). */
 export const docDoTinCay = (x: unknown): number | null => {
   const n = so(x)
@@ -196,7 +205,8 @@ export function docHoSoThaiDo(du: O): KetQuaHoSoThaiDo | null {
     ...(so(du.chuoiDuGanNhat) !== null ? { chuoiDuGanNhat: soKhongAm(du.chuoiDuGanNhat) } : {}),
     // ĐỢT 16 — tuỳ chọn (xem `KetQuaHoSoThaiDoApp`)
     ...(typeof du.cachTinhTinCay === 'string' && du.cachTinhTinCay.trim() ? { cachTinhTinCay: du.cachTinhTinCay.trim() } : {}),
-    ...(so(du.tuSuaSai) !== null ? { tuSuaSai: Math.round(soKhongAm(du.tuSuaSai)) } : {}),
+    // Tự sửa câu sai (máy chủ đợt 16: { soCauSai, soCauDaSua, phanTram, chu }) — chỉ nhận khi số hợp lệ (0 ≤ đã sửa ≤ câu sai); sai kiểu ⇒ bỏ trường.
+    ...(docTuSuaSai(du.tuSuaSai) ? { tuSuaSai: docTuSuaSai(du.tuSuaSai)! } : {}),
   }
 }
 

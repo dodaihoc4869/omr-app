@@ -10,8 +10,11 @@
 //   ĐÃ BỎ Ở ĐÂY:
 //     · `lan[].chon` (đáp án em đã chọn) ⇒ null: ghép với cột Đúng/Sai là lộ ĐÁP ÁN ĐÚNG của câu; nguồn nào trả phản hồi muộn (bài tập về nhà, phiếu…)
 //       thì em chưa được xem — bỏ hẳn, không đoán nguồn nào an toàn;
-//     · `qid` thật (mã tờ đề, mã câu nội bộ) ⇒ khoá "c1", "c2"… theo lần gặp đầu trong MỘT trả lời (cùng mã ⇒ cùng khoá: phép khớp câu sai với lượt
-//       của tấm giữ nguyên); `tieuDe` rỗng ⇒ "Câu N" theo quy ước mã câu, không thì "Câu chưa có tên dạng" (tấm không bao giờ ghi khoá ra màn).
+//     · `qid` thật (mã tờ đề, mã câu nội bộ) ⇒ khoá "c" + số băm CỐ ĐỊNH của mã (đợt 16, 12/10: cùng mã ⇒ cùng khoá ở MỌI trả lời — hồ sơ thái độ và
+//       lịch sử ghép được số giây từng lần cho "Câu đúng" / "Câu đã ôn"); `tieuDe` rỗng ⇒ "Câu N" theo quy ước mã câu, không thì "Câu chưa có tên dạng"
+//       (tấm không bao giờ ghi khoá ra màn).
+//   THÊM Ở ĐÂY (đợt 16 — thầy: "chỗ các câu học sinh chưa chữa đc bấm vào phải nảy vào đúng chỗ tự sửa"): `cauSai[].moChua` = khoá "g<số>" băm từ MÃ
+//     GỐC của câu (`khoaMoChua`) — màn Tự chữa băm mã các câu trong danh sách của nó bằng CÙNG hàm để mở đúng câu; không có mã nội bộ nào xuống máy.
 //   KHÔNG có trong hai lệnh (nên không phải bỏ): đáp án đúng, lời giải, đề bài, đường mở app thầy, ghi chú của thầy.
 import type { CauTomTat, KetQuaHoSoThaiDo } from './bai-hang-ngay-kieu'
 import type { CauEmSai, KetQuaLichSuLamCau, LanLamCau } from './lich-su-lam-cau-kieu'
@@ -25,12 +28,27 @@ export const TRUONG_BO_BAN_HOC_SINH = [
   'qid thật (đổi khoá c1, c2…)',
 ] as const
 
-/** Khoá câu cho máy em: mã thật ⇒ "c1", "c2"… theo lần gặp đầu (một trả lời một bộ khoá). */
+/** Băm FNV-1a 32 bit (hạt giống khác nhau cho hai nửa). */
+function fnv32(s: string, hat: number): number {
+  let h = hat >>> 0
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0 }
+  return h >>> 0
+}
+/** Mã gốc để mở Tự chữa: bỏ tiền tố "tc:", đuôi lượt "#n", đuôi bản đổi số / song sinh "~n", "~ssn", "~btn", "~ydn". */
+export function maGocChua(qid: string): string {
+  return qid.replace(/^tc:/, '').replace(/#\d+$/, '').replace(/~(?:ss|bt|yd)?\d+$/, '')
+}
+/** Khoá mở Tự chữa: "g" + số băm 48 bit của MÃ GỐC (hàm thuần — app học sinh băm danh sách Tự chữa bằng chính hàm này để khớp). */
+export function khoaMoChua(qid: string): string {
+  const g = maGocChua(qid)
+  return `g${fnv32(g, 2166136261) * 65536 + (fnv32(g, 0x9e3779b9) & 0xffff)}`
+}
+/** Khoá câu cho máy em: mã thật ⇒ "c" + số băm 48 bit CỐ ĐỊNH (cùng mã ⇒ cùng khoá ở mọi trả lời; hai mã khác nhau trùng khoá ~ 1/2^48). */
 export function taoKhoaCau(): (qid: string) => string {
   const m = new Map<string, string>()
   return (qid) => {
     let k = m.get(qid)
-    if (!k) m.set(qid, (k = `c${m.size + 1}`))
+    if (!k) m.set(qid, (k = `c${fnv32(qid, 2166136261) * 65536 + (fnv32(qid, 0x9e3779b9) & 0xffff)}`))
     return k
   }
 }
@@ -49,7 +67,7 @@ export function tieuDeCauHs(qidThat: string, tieuDe: string): string {
 export function banHocSinhLichSu(kq: KetQuaLichSuLamCau): KetQuaLichSuLamCau {
   const khoa = taoKhoaCau()
   const lan: LanLamCau[] = kq.lan.map((l) => ({ ...l, qid: khoa(l.qid), tieuDe: tieuDeCauHs(l.qid, l.tieuDe), chon: null }))
-  const cauSai: CauEmSai[] = kq.cauSai.map((c) => ({ ...c, qid: khoa(c.qid), tieuDe: tieuDeCauHs(c.qid, c.tieuDe) }))
+  const cauSai: CauEmSai[] = kq.cauSai.map((c) => ({ ...c, qid: khoa(c.qid), tieuDe: tieuDeCauHs(c.qid, c.tieuDe), moChua: khoaMoChua(c.qid) }))
   return { ...kq, lan, cauSai }
 }
 

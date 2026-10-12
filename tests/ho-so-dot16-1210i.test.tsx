@@ -227,7 +227,7 @@ describe('độ tin cậy trên tấm (trường tuỳ chọn của máy chủ)'
       ketLuan: { ...TD.ketLuan, doTinCay: 86, canThem: 'ít nhất 3 ngày làm bài nữa.' },
       tinHieu: TD.tinHieu.map((t, i) => (i === 0 ? { ...t, doTinCay: 95 } : i === 1 ? { ...t, doTinCay: 60 } : t)),
       cachTinhTinCay: 'Tính từ số ngày và số lượt đã đo.',
-      tuSuaSai: 4,
+      tuSuaSai: { soCauSai: 6, soCauDaSua: 4, phanTram: 67, chu: 'Đã làm đúng lại 4/6 câu từng sai (67%)' }, // đúng hợp đồng máy chủ làn D
     }
     thayMo(td)
     const tam = await screen.findByRole('dialog')
@@ -245,7 +245,7 @@ describe('độ tin cậy trên tấm (trường tuỳ chọn của máy chủ)'
     expect(th[0]!.querySelector('.hslc-tin')!.textContent).toBe('Độ tin cậy 95%')
     expect(th[1]!.querySelector('.hslc-tin')!.textContent).toBe('Độ tin cậy 60% · đang theo dõi')
     expect(th[2]!.querySelector('.hslc-tin')).toBeNull()
-    expect([...tam.querySelectorAll('.gvv2-tdo-o')].map((o) => o.textContent)).toContain('Tự sửa được4 câucâu từng sai, sau làm lại đúng')
+    expect([...tam.querySelectorAll('.gvv2-tdo-o')].map((o) => o.textContent)).toContain('Tự sửa được4/6 câuĐã làm đúng lại 4/6 câu từng sai (67%)')
   })
 
   it('vắng ⇒ không chip, không "đang theo dõi" (máy chủ cũ y như trước); chữ độ tin không bao giờ 100%', async () => {
