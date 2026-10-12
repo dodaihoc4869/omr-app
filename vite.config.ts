@@ -263,6 +263,9 @@ export default defineConfig({
           // Hành trình › Bài hằng ngày + hồ sơ thái độ (thầy 12/10): CHỈ màn thầy nạp lười, lệnh `/gv/bai-hang-ngay` · `/gv/ho-so-thai-do` cần mạng
           // ⇒ kho chạy-lúc, không cất sẵn.
           '**/{TheBaiHangNgay,bai-hang-ngay-api,bai-hang-ngay-ui,bai-hang-ngay}-*.{js,css}',
+          // Hồ sơ làm bài CỦA EM (app học sinh, 12/10F): mảnh nạp LƯỜI khi em bấm bảng Nhịp học (bọc tấm `HoSoLamCauEm` + gv-v2 — đều ngoài precache),
+          // lệnh `/hs/ho-so-thai-do` · `/hs/lich-su-lam-cau` cần mạng ⇒ kho chạy-lúc, không làm nặng precache vỏ học sinh.
+          '**/{HoSoCuaEmHs,ho-so-em-hs-api}-*.{js,css}',
           // Khung lời giải + thang tự gỡ: chỉ mở khi em bấm "Hỏi thầy" (vốn phải có mạng để gọi máy chủ) ⇒ kho chạy-lúc, không cất sẵn.
           '**/KhungLoiGiai-*.{js,css}',
           '**/loi-giai-*.{js,css}',

@@ -52,6 +52,9 @@
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- 12/10: app có bản sáng + tối riêng (src/index.css `color-scheme: light dark`). Khai báo NGAY ở <head> để trình duyệt điện thoại (Chrome
+         "tự làm tối trang", Samsung Internet chế độ tối) không ép tối ĐÈ lên bản tối của app — ảnh thầy gửi: dải ô ngày, vòng tiến độ sẫm gần như đen. -->
+    <meta name="color-scheme" content="light dark" />
     <!-- Màu thanh trạng thái Android / iOS: đổi thành #ffffff (hoặc #0f172a chế độ tối) để full viền tràn màn hình, không bị dải đen -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />

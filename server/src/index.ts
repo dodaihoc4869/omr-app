@@ -3662,6 +3662,9 @@ const boXuLy = {
       if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(envDoc, b))
       // BẢNG "NHỊP HỌC CỦA EM" (thầy 12/10 duyệt bản vẽ, server/src/nhip-hoc-em.ts; hợp đồng nhip-hoc-kieu.ts): CHỈ ĐỌC, token của em, chỉ số của chính em.
       if (p === '/hs/nhip-hoc') return ra(await import('./nhip-hoc-em').then((m) => m.hsNhipHoc(envDoc, b)))
+      // HỒ SƠ LÀM BÀI CỦA EM (thầy 12/10 "cho hs bấm vào bảng lười chăm", server/src/ho-so-em-hs.ts): CHỈ ĐỌC, token của em, cùng lõi với hai lệnh thầy.
+      if (p === '/hs/ho-so-thai-do') return ra(await import('./ho-so-em-hs').then((m) => m.hsHoSoThaiDo(envDoc, b)))
+      if (p === '/hs/lich-su-lam-cau') return ra(await import('./ho-so-em-hs').then((m) => m.hsLichSuLamCau(envDoc, b)))
       if (p === '/hs/ke-hoach-ngay') {
         // DỒN LƯỢT + ĐỆM 20 GIÂY theo em (dem-ke-hoach.ts; Boss 21/09): lượt đệm KHÔNG ghi gì; em có ghi thì đệm bị xoá ngay. `thanThu` luôn đọc tươi.
         let sbdKhoa = ''

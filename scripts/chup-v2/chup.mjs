@@ -27,6 +27,9 @@ const goc = `http://127.0.0.1:${may.address().port}`
 const trangGoc = `${goc}/scripts/chup-v2/trang.html`
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
 const trinh = await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
+// LÀN THẺ HÔM NAY 12/10E: trình duyệt ÉP TỐI trang web (như "tối cho trang web" của Samsung Internet / Chrome trên điện thoại) — chỉ mở khi có cảnh 'ep-toi'.
+let epToi = null
+const trinhEpToi = async () => (epToi ??= await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--blink-settings=forceDarkModeEnabled=true'] }))
 
 // ═══════════ LÀN HỌC SINH 12/10: Tu luyện trùng tu · Chữa trực tiếp câu gốc (thiếu bài luyện từng bước) · danh sách Tự chữa lỗi ═══════════
 // 3 khổ (390×844, 844×390, 1440×900) × sáng/tối; cảnh `?man=hs12-*` ở trang.tsx (khối cùng tên). Chạy riêng: tiền tố "4" (40-, 41-, 42-).
@@ -147,6 +150,20 @@ const DS_NHE = [
 ]
 // ═══════════ hết LÀN NHỊP EM 12/10C ═══════════
 
+// ═══════════ LÀN THẺ HÔM NAY 12/10E: app học sinh › Hôm nay — MỘT thẻ "Hôm nay của em" (gộp vòng Mục tiêu hôm nay + bảng Nhịp học, thầy 12/10) ═══════════
+// Cảnh `?man=hs-the&the=luoi|cham|chua-deu|du|loi` (trang.tsx khối cùng tên). Lười (7/32 như ảnh thầy) · Chăm · Chưa đều · đủ mức · `/hs/nhip-hoc` lỗi ×
+// 390×844 / 1440×900 × sáng / tối, CẢ TRANG. Thêm nền 'ep-toi' = máy tối + trình duyệt ÉP TỐI trang web (Chromium `forceDarkModeEnabled`, như Samsung Internet
+// / Chrome "tối cho trang web" trên máy thầy) — thẻ khai `color-scheme` nên vẫn đúng màu tối đã đo. Chạy riêng: tiền tố "the1210e".
+const DS_THE1210E = [
+  ...['light', 'dark'].flatMap((nen) => [[390, 844, 'dien-thoai'], [1440, 900, 'may-tinh']].flatMap(([w, hh, kho]) =>
+    ['luoi', 'cham', 'chua-deu', 'du', 'loi'].map((the) =>
+      [`the1210e-${the}-${kho}${nen === 'dark' ? '-toi' : ''}`, `hs-the&the=${the}`, w, hh, nen, true, the === 'loi' ? /Còn 25 câu|Còn/ : /Thầy cũng thấy bảng này/]))),
+  ['the1210e-luoi-dien-thoai-ep-toi', 'hs-the&the=luoi', 390, 844, 'ep-toi', true, /Thầy cũng thấy bảng này/],
+  ['the1210e-du-dien-thoai-ep-toi', 'hs-the&the=du', 390, 844, 'ep-toi', true, /Thầy cũng thấy bảng này/],
+  ['the1210e-luoi-khong-ho-so-dien-thoai', 'hs-the&the=luoi&hs=0', 390, 844, 'light', false, /Thầy cũng thấy bảng này/],
+]
+// ═══════════ hết LÀN THẺ HÔM NAY 12/10E ═══════════
+
 // ═══════════ LÀN MÀN LÀM BÀI 12/10D: màn làm bài học sinh theo bản vẽ dot13 thầy duyệt 12/10 (7 trạng thái) ═══════════
 // Cảnh `?man=lam13[&lam=g7]` (trang.tsx khối cùng tên; máy chủ giả gia/lam-bai-1210d.ts). Thao tác `lam13:<bước » bước…>` (khối xử lý cùng tên bên dưới):
 // tn:<regex> chạm ô trắc nghiệm · ds:a=Đúng,b=Sai chạm nút của ý · nut:<regex> bấm nút · phim:<kí tự> gõ phím máy tính · dau = cuộn khung về đầu.
@@ -174,8 +191,26 @@ const DS_LAM13 = [
 ]
 // ═══════════ hết LÀN MÀN LÀM BÀI 12/10D ═══════════
 
+// ═══════════ LÀN HỒ SƠ EM 12/10F: app học sinh — bấm bảng "Nhịp học của em" ⇒ tấm "Hồ sơ làm bài của em" (tấm thầy, chế độ học sinh) ═══════════
+// Cảnh `?man=hs-ho-so&nhe=…` (trang.tsx khối cùng tên; ba lệnh `/hs/...` GIẢ gia/ho-so-em-hs.ts). 390×844 + 1440×900 × sáng / tối: đầu tấm (`hse:dau`)
+// và CUỘN TỚI ĐÁY bằng con lăn trên thân tấm (`hse:day` — kiểm trang phía sau đứng yên, thân tấm tới đáy); thêm thẻ Toàn bộ lịch sử (`hse:lich-su`).
+// Mỗi ảnh đo TƯƠNG PHẢN mọi chữ trong tấm (≥ 4,5:1; chữ lớn ≥ 3:1) — in ở cuối như "Tương phản < ngưỡng". Chạy riêng: tiền tố "hse" (hse-1-…hse-3-).
+const DS_HSE = [
+  ...['light', 'dark'].flatMap((nen) => [[390, 844, 'dien-thoai'], [1440, 900, 'may-tinh']].flatMap(([w, hh, kho]) => [
+    [`hse-1-luoi-dau-${kho}${nen === 'dark' ? '-toi' : ''}`, 'hs-ho-so&nhe=luoi', w, hh, nen, false, /Hồ sơ làm bài của em/, 'hse:dau'],
+    [`hse-2-luoi-day-${kho}${nen === 'dark' ? '-toi' : ''}`, 'hs-ho-so&nhe=luoi', w, hh, nen, false, /Hồ sơ làm bài của em/, 'hse:day'],
+  ])),
+  ['hse-3-cham-dau-dien-thoai', 'hs-ho-so&nhe=cham', 390, 844, 'light', false, /Hồ sơ làm bài của em/, 'hse:dau'],
+  ['hse-3-lich-su-dien-thoai-toi', 'hs-ho-so&nhe=luoi', 390, 844, 'dark', false, /Hồ sơ làm bài của em/, 'hse:lich-su'],
+  ['hse-3-lich-su-may-tinh', 'hs-ho-so&nhe=luoi', 1440, 900, 'light', false, /Hồ sơ làm bài của em/, 'hse:lich-su'],
+]
+const tuongPhanThap = []
+// ═══════════ hết LÀN HỒ SƠ EM 12/10F ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
+  ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D
   ...DS_NHE, // LÀN NHỊP EM 12/10C
   ...DS_HN, // LÀN HÔM NAY 12/10B
@@ -305,7 +340,8 @@ const tran = []
 const chamNho = []
 for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   if (CHON.length && !CHON.some((c) => ten.startsWith(c))) continue
-  const ctx = await trinh.newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, colorScheme: nen, hasTouch: w < 900, isMobile: w < 500 })
+  // LÀN THẺ HÔM NAY 12/10E: nền 'ep-toi' = máy tối + trình duyệt ép tối trang web (một trình duyệt riêng có cờ, mở khi cần)
+  const ctx = await (nen === 'ep-toi' ? await trinhEpToi() : trinh).newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, colorScheme: nen === 'ep-toi' ? 'dark' : nen, hasTouch: w < 900, isMobile: w < 500 })
   await ctx.route((u) => !u.href.startsWith(goc), (r) => r.abort())
   const t = await ctx.newPage()
   t.setDefaultTimeout(8000)
@@ -496,6 +532,78 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         if (v === 'tab-doi-pho') await t.getByRole('tab', { name: /^Đối phó/ }).click()
       }
       await t.waitForTimeout(400)
+    } else if (viec?.startsWith('hse:')) {
+      // LÀN HỒ SƠ EM 12/10F: tấm mở sẵn — chờ đủ hai lệnh rồi làm đúng một việc; sau đó đo tương phản mọi chữ trong tấm.
+      const v = viec.slice(4)
+      const tam = t.getByRole('dialog')
+      await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
+      await tam.locator('.gvv2-tdo-dau').waitFor({ timeout: 20000 })
+      if (v === 'lich-su') {
+        await tam.getByRole('tab', { name: /Toàn bộ lịch sử/ }).click()
+        await t.evaluate(() => {
+          const than = document.querySelector('.hs-ho-so-em .gvv2-hs-than')
+          const o = document.getElementById('gvv2-hs-the-lich-su')
+          if (than && o) than.scrollTop += o.getBoundingClientRect().top - than.getBoundingClientRect().top - 12
+        })
+      }
+      if (v === 'day') {
+        // vuốt bằng con lăn TRÊN thân tấm (không đặt scrollTop bằng mã) ⇒ chứng minh khung cuộn riêng tới đáy, trang phía sau đứng yên
+        const hop = await tam.locator('.gvv2-hs-than').boundingBox()
+        await t.mouse.move(hop.x + hop.width / 2, hop.y + hop.height / 2)
+        for (let i = 0; i < 40; i++) { await t.mouse.wheel(0, 1200); await t.waitForTimeout(25) }
+        await t.waitForTimeout(400)
+        const kq = await t.evaluate(() => {
+          const than = document.querySelector('.hs-ho-so-em .gvv2-hs-than')
+          return { day: than.scrollTop + than.clientHeight >= than.scrollHeight - 2, top: Math.round(than.scrollTop), cao: than.scrollHeight, trang: (document.scrollingElement || document.documentElement).scrollTop, khoa: document.documentElement.hasAttribute('data-khoa-cuon') }
+        })
+        if (!kq.day) loiTrang.push(`${ten}: thân tấm chưa tới đáy (${kq.top}/${kq.cao}px)`)
+        if (kq.trang !== 0) loiTrang.push(`${ten}: trang phía sau bị cuộn ${kq.trang}px`)
+        if (!kq.khoa) loiTrang.push(`${ten}: chưa khoá trang phía sau`)
+        console.log(`${ten}: thân tấm cuộn ${kq.top}px · tới đáy ${kq.day} · trang phía sau ${kq.trang}px · khoá ${kq.khoa}`)
+      }
+      await t.waitForTimeout(300)
+      const tp = await t.evaluate(() => {
+        const doc = (s) => {
+          let m = /^rgba?\(([^)]+)\)$/.exec(s)
+          if (m) { const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p[3] ?? 1] }
+          m = /^color\(srgb ([^)]+)\)$/.exec(s)
+          if (m) { const p = m[1].split(/[\s/]+/).filter(Boolean).map(Number); return [p[0] * 255, p[1] * 255, p[2] * 255, p[3] ?? 1] }
+          return null
+        }
+        const tron = (a, b) => [0, 1, 2].map((i) => a[i] * a[3] + b[i] * (1 - a[3])).concat(1)
+        const nen = (el) => {
+          const lop = []
+          for (let e = el; e; e = e.parentElement) { const c = doc(getComputedStyle(e).backgroundColor); if (c && c[3] > 0) { lop.push(c); if (c[3] >= 1) break } }
+          return lop.reverse().reduce((d, c) => tron(c, d), [255, 255, 255, 1])
+        }
+        const L = (c) => c.slice(0, 3).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4 }).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0)
+        const tyLe = (a, b) => { const x = L(a), y = L(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) }
+        const goc = document.querySelector('.hs-ho-so-em .gvv2-hs')
+        const ra = []
+        const daXet = new Set()
+        const w = document.createTreeWalker(goc, NodeFilter.SHOW_TEXT)
+        for (let n = w.nextNode(); n; n = w.nextNode()) {
+          const el = n.parentElement
+          if (!n.textContent.trim() || daXet.has(el) || el.closest('.gvv2-an-chu, button:disabled')) continue
+          daXet.add(el)
+          const s = getComputedStyle(el)
+          const r = el.getBoundingClientRect()
+          if (s.visibility === 'hidden' || r.width === 0 || r.height === 0) continue
+          const mau = doc(s.color)
+          if (!mau) { ra.push(`màu lạ ${s.color}`); continue }
+          const bg = nen(el)
+          let op = 1
+          for (let e = el; e && e !== goc.parentElement; e = e.parentElement) op *= Number(getComputedStyle(e).opacity)
+          const chu = tron([mau[0], mau[1], mau[2], mau[3] * op], bg)
+          const co = parseFloat(s.fontSize)
+          const nguong = co >= 24 || (co >= 18.66 && Number(s.fontWeight) >= 700) ? 3 : 4.5
+          const k = tyLe(chu, bg)
+          if (k < nguong) ra.push(`"${n.textContent.trim().slice(0, 28)}" ${k.toFixed(2)}`)
+        }
+        return { ra, so: daXet.size }
+      })
+      console.log(`${ten}: tương phản — ${tp.so} khối chữ, ${tp.ra.length} dưới ngưỡng`)
+      if (tp.ra.length) tuongPhanThap.push(`${ten}: ${tp.ra.join(' | ')}`)
     } else if (viec?.startsWith('lam13:')) {
       // LÀN MÀN LÀM BÀI 12/10D: các bước ngăn bằng " » " (xem khối DS_LAM13).
       for (const buoc of viec.slice(6).split(' » ')) {
@@ -555,6 +663,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   await ctx.close()
 }
 await trinh.close()
+await epToi?.close() // LÀN THẺ HÔM NAY 12/10E
 may.close()
 console.log(`\nLỗi trang: ${loiTrang.length}`)
 for (const l of loiTrang) console.log('  ' + l)
@@ -562,4 +671,9 @@ console.log(`Tràn ngang: ${tran.length}`)
 for (const l of tran) console.log('  ' + l)
 console.log(`Vùng chạm < 44px: ${chamNho.length}`)
 for (const l of chamNho) console.log('  ' + l)
+// LÀN HỒ SƠ EM 12/10F: chữ trong tấm dưới ngưỡng tương phản (4,5:1; chữ lớn 3:1) — chỉ cảnh `hse:`.
+if (DS.some(([ten, , , , , , , viec]) => viec?.startsWith('hse:') && (!CHON.length || CHON.some((c) => ten.startsWith(c))))) {
+  console.log(`Tương phản < ngưỡng (tấm hồ sơ em): ${tuongPhanThap.length}`)
+  for (const l of tuongPhanThap) console.log('  ' + l)
+}
 process.exit(loiTrang.length || tran.length ? 1 : 0)
