@@ -80,7 +80,7 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     chuaLoDapAn()
     expect(screen.queryByText('Cần thêm bài luyện đúng chỗ')).toBeNull()
     // Đường tự gỡ: 1 Xem lại câu gốc → 2 Tự làm lại → 3 Đáp án và lời giải (bước 3 khoá tới khi em làm lại)
-    expect(within(duongTuGo()).getAllByRole('button').map((b) => b.textContent)).toEqual(['1Xem lại câu gốc', '2Tự làm lại', '3Đáp án và lời giải'])
+    expect(within(duongTuGo()).getAllByRole('button').map((b) => b.textContent)).toEqual(['1Xem lại câu gốcĐề và lựa chọn cũ của em', '2Tự làm lạiTrước khi xem đáp án', '3Đáp án và lời giảiTìm chỗ em làm khác'])
     expect(nutBuoc(/Xem lại câu gốc/).getAttribute('aria-current')).toBe('step')
     expect(nutBuoc(/Đáp án và lời giải/).disabled).toBe(true)
     // một nút chính (đổi theo bước), kèm nút sang câu khác
