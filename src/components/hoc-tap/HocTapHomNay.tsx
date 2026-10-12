@@ -9,7 +9,6 @@ import TheGoi7 from './TheGoi7'
 // (ca đang mở ⇒ dải ca + nút chính là Vào ca kiểm tra, "Tiếp tục học" lùi thành nút viền). Một màn — một nút chính; mọi việc khác là dòng.
 type Muc = 'hom-nay' | 'hanh-trinh' | 'on-lai' | 'ket-qua'
 interface Props {
-  onKiem?: (goiId:string,maDe:string)=>void
   dangLamMoi?: boolean; nguon?: string; onKetQua?: () => void; onLuyenLai?: () => void; onBangTin?: () => void;
   thongBao?: ReactNode; canhBao?: ReactNode; tienDoCu?: { daLam: number; mucTieu: number };
   ten: string; lop: string; ketQua: KetQuaSanh | null; dangTai: boolean; loi: string
@@ -102,7 +101,7 @@ export default function HocTapHomNay(p: Props) {
               {xong && <p className="ht-chu-phu">Em có thể nghỉ. Câu đã làm và kiến thức đã vững được theo dõi riêng.</p>}
             </div>
           </section>
-          {goi7 && <TheGoi7 du={goi7} onKiem={p.onKiem} />}
+          {goi7 && <TheGoi7 du={goi7} />}
           {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có; thầy có thể bổ sung kiến thức.</div>}
           {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu được giữ cho ca kiểm tra. Bài học sẽ cập nhật khi đủ điều kiện.</div>}
           <section className="ht2-nhom" aria-label="Ôn và sửa đúng chỗ">
