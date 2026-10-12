@@ -168,3 +168,12 @@ Thầy nhắn (nguyên văn): "Tôi muốn bạn trùng tu lại phần điểm 
 - [x] Điểm danh bước 1 theo bản vẽ GV-DiemDanh (mã + QR, có mặt theo nhóm, vắng đang Lười, Vừa điểm danh bấm ⇒ hồ sơ, nút Xong điểm danh · chiếu Nhịp học của lớp; giữ thêm em tay, bớt em nhầm, kết thúc buổi) | bằng chứng: 614edf1b.
 - [x] Hai bản chiếu React toàn màn (đang điểm danh: ô tên tô nhóm + đủ mức x/y; Nhịp học của lớp: thanh nhóm, ba cột, em vắng mờ, H ẩn tên Lười, → sang Gọi lên bảng) + bấm tên ⇒ CHÍNH tấm HoSoLamCauEm đầy đủ | bằng chứng: 614edf1b; 12 ảnh scratchpad/lan-12b/anh 0 lỗi 0 tràn 0 chạm < 44.
 - [ ] Build + đẩy đợt 12 (kiểm ca mở) | bằng chứng: gộp 3a9f8db0; tsc 0 · server tsc 0 · check:mau sạch · kiem:mau-giu 0 · soi:giao-dien 0 LỖI · build:cf SW 13/13 152 tệp / 2882 KB; vitest toàn bộ 15219 test, 164 đỏ — so tên với gop-tukiem/gop-dot10: 0 đỏ mới; ảnh gộp (82/83/71) 0 lỗi 0 tràn 0 chạm < 44, hồ sơ trên bản chiếu hiện chữ luật mới.
+
+## Đợt 13 — sửa lỗi không vuốt được ở màn làm câu · trùng tu màn làm bài (VẼ DUYỆT TRƯỚC) · soát số câu giao / số câu Lười–Chăm (12/10)
+Thầy nhắn (nguyên văn, kèm ảnh màn "Câu 4 trong 5 câu" Đúng–sai và ảnh Hôm nay "2 trên 24 câu · 31 câu tự làm · lịch tối thiểu 32 câu"): "học sinh báo app học sinh không vuốt lên được, bạn check và khắc phục triệt để lỗi này nhé, Đồng thời trùng tu lại giao diện làm bài của học sinh cho thật khoa học phải rất thân thiện, tối ưu tối đa cho màn hình dọc và phải thật đẹp mịn mắt. Vẽ trước tôi xem trước khi build nhé."
+"Xem xét lại kĩ lưỡng việc giao câu của code, ví dụ trong ảnh học sinh làm 24 câu nhưng lại báo 31 câu làm, kiểm tra kĩ xem thống nhất chưa, sau đó check lại kĩ số câu lười chăm từng ngày xem đã hiển thị chính xác chưa phải rất cẩn thận chỗ này để học sinh thấy chính xác làm đủ làm thiếu từ đó đánh giá chính xác lười và chăm."
+- [ ] Tìm nguyên nhân gốc lỗi "không vuốt lên được" ở app học sinh và sửa triệt để (tái hiện bằng máy: cảm ứng 390×844) | bằng chứng: (chưa có)
+- [ ] Build + đẩy bản sửa lỗi vuốt (kiểm ca mở) | bằng chứng: (chưa có)
+- [ ] Vẽ màn làm bài học sinh trùng tu (dọc, thân thiện, khoa học, mịn mắt) — CHỜ THẦY DUYỆT, CHƯA BUILD | bằng chứng: (chưa có)
+- [ ] Soát việc giao câu: 24 câu (vòng) vs 31 câu tự làm vs lịch tối thiểu 32 câu vs còn 22 câu — chỉ ra từng con số lấy từ đâu, thống nhất một nguồn | bằng chứng: (chưa có)
+- [ ] Soát số câu Lười/Chăm từng ngày (mức tối thiểu + đã làm mỗi ngày) khớp đúng con số học sinh thấy là mục tiêu hôm nay | bằng chứng: (chưa có)
