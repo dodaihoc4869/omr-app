@@ -421,12 +421,37 @@ function ManLam13() {
   return h('div', { className: 'fixed inset-0 z-50 overflow-y-auto' }, h(ManLamBaiTap, { token: 'tk', sbd: '12121212', onVe: noop, onCapNhat: () => datHomNay(soHomNayLam13()), onChua: noop, homNay }))
 }
 // ═════════════════════════════════════════ hết LÀN MÀN LÀM BÀI 12/10D ═════════════════════════════════════════
+// ═════════════════════════════════════════ LÀN HỒ SƠ EM 12/10F ═════════════════════════════════════════
+// Thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé". Cảnh `?man=hs-ho-so[&nhe=luoi|cham]`: Hôm nay
+// của app học sinh (component THẬT HocTapHomNay, bảng Nhịp học phía sau) + tấm "Hồ sơ làm bài của em" (component THẬT HoSoCuaEmHs ⇒ HoSoLamCauEm chế độ
+// học sinh) MỞ SẴN như sau khi em bấm bảng. `/hs/nhip-hoc` · `/hs/ho-so-thai-do` · `/hs/lich-su-lam-cau` GIẢ (gia/ho-so-em-hs.ts — qua đúng hàm lọc bản
+// học sinh của máy chủ); bọc `fetch`, chỉ trả lời khi đang chụp cảnh này.
+import { Fragment as FragmentHse, useState as useStateHse } from 'react'
+import HoSoCuaEmHs from '../../src/components/hoc-tap/HoSoCuaEmHs'
+import { hoSoEmGia, lichSuEmGia } from './gia/ho-so-em-hs'
+if (man === 'hs-ho-so') {
+  const fetchChung = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const duong = new URL(url, location.href).pathname
+    const nhe = thamSo.get('nhe') ?? 'luoi'
+    const du = duong.endsWith('/hs/nhip-hoc') ? nhipEmGia(nhe) : duong.endsWith('/hs/ho-so-thai-do') ? hoSoEmGia(nhe) : duong.endsWith('/hs/lich-su-lam-cau') ? lichSuEmGia(nhe) : null
+    return du ? new Response(JSON.stringify(du), { status: 200, headers: { 'content-type': 'application/json' } }) : fetchChung(input, init)
+  }
+}
+function ManHoSoEm() {
+  const [mo, datMo] = useStateHse(true)
+  const nhe = thamSo.get('nhe') ?? 'luoi'
+  return h(FragmentHse, null, manNhipEm(), mo ? h(HoSoCuaEmHs, { token: 'tk', tenEm: nhe.startsWith('luoi') ? 'Ngọc Ánh' : 'Minh Anh', lop: '12A1', onDong: () => datMo(false) }) : null)
+}
+// ═════════════════════════════════════════ hết LÀN HỒ SƠ EM 12/10F ═════════════════════════════════════════
 
 const MAN_THAY: Record<string, string> ={ 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 const con =
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
   man === 'hs-nhip' ? manNhipEm() : // LÀN NHỊP EM 12/10C
   man === 'lam13' ? h(ManLam13) : // LÀN MÀN LÀM BÀI 12/10D
+  man === 'hs-ho-so' ? h(ManHoSoEm) : // LÀN HỒ SƠ EM 12/10F
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'de-thu' ? h('div', {className:'dao dao2'}, h(DeThu, {sbd:'GIA',call:callDao,onVe:noop}))
