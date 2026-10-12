@@ -69,6 +69,8 @@ import { lichSuGia } from './gia/lich-su-lam-cau'
 import { conTongQuanGia } from './gia/ph-con-tong-quan'
 // LÀN GIÁO VIÊN 12/10: `gv-nhip&the=bai-hang-ngay` = Hành trình › Bài hằng ngày (bảng nhiệt), bấm một em ⇒ tấm Hồ sơ làm bài (gia/bai-hang-ngay.ts).
 import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
+// LÀN NHỊP EM 12/10C: `?man=hs-nhip&nhe=…` = bảng "Nhịp học của em" (app học sinh), `/hs/nhip-hoc` GIẢ đúng số bản vẽ.
+import { nhipEmGia } from './gia/nhip-hoc-em'
 // ═════════ LÀN BÀI MỚI 7 NGÀY 12/10: `gv-nhip&the=goi-7` = Hành trình › Bài mới trong 7 ngày (trùng tu: thẻ chọn bài · 6 ô số · dải tiến độ ·
 // danh sách chữa lọc/xếp · Học sinh cần hỗ trợ · Tiến độ học sinh · tấm soạn phần chữa). `/gv/goi-bai-7` GIẢ: gia/goi-bai-7.ts (≈ 60 em × 40 câu);
 // `&g7=trong` chưa có bài · `&g7=loi` máy chủ lỗi · `&g7=thieu-nguon` cảnh báo thiếu nguồn. ═════════
@@ -83,6 +85,13 @@ import { LA_CB } from './gia/chua-bai'
 // gia/hanh-trinh-2-muc.ts nối ở gia/goi-lenh-thay.ts, chỉ trả lời khi `ht2=1` (ảnh cảnh khác không đổi). ═════════
 import { LA_HT2 } from './gia/hanh-trinh-2-muc'
 if (LA_HT2) document.documentElement.dataset.canhHt2 = '1' // LÀN HÀNH TRÌNH 12/10B — đánh dấu cảnh (đọc khi soát ảnh)
+// ═════════ LÀN ĐIỂM DANH 12/10C: `gv-nhip&ht2=1&dd12c=1` = Hành trình › Dạy học & đầu giờ, bước 1 Điểm danh theo bản vẽ GV-DiemDanh (ô mã + QR, có mặt
+// chia nhóm Chăm / Chưa đều / Lười / Mới, ô em vắng, Vừa điểm danh) + hai bản chiếu React (đang điểm danh · Nhịp học của lớp) + tấm Hồ sơ làm bài mở trên
+// bản chiếu. Màn THẬT; máy giả riêng gia/diem-danh-1210c.ts (lớp "12 Nhóm 10 điểm" của bộ Nhịp học giả, 30/38 em có mặt) nối ở gia/goi-lenh-thay.ts
+// TRƯỚC máy giả ht2, chỉ trả lời khi `dd12c=1`. ═════════
+import { LA_DD12C } from './gia/diem-danh-1210c'
+if (LA_DD12C) document.documentElement.dataset.canhDd12c = '1' // LÀN ĐIỂM DANH 12/10C — đánh dấu cảnh
+// ═════════ hết LÀN ĐIỂM DANH 12/10C ═════════
 // ═════════ LÀN HÔM NAY 12/10B: `gv-hom-nay&nh=1` = Hôm nay của thầy bản vẽ duyệt 12/10 (Việc cần thầy dạng thẻ + Nhịp học: 262 em × 12 ngày, hai cột
 // Lười nhất · Chăm nhất, Đối phó, Theo lớp, bảng từng ngày, tấm hồ sơ). `/gv/nhip-hoc` GIẢ: gia/nhip-hoc.ts; `&nh=loi` máy chủ lỗi · `&nh=trong` chưa có em. ═════════
 import { nhipHocGia } from './gia/nhip-hoc'
@@ -366,10 +375,34 @@ const manHs12 = () =>
   : man === 'hs12-tu-chua' ? h(ManTuChua, { token: 'tk', onVe: noop, onTuLuyen: noop })
   : h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B2-17', tenCau: 'Thuỷ phân ester', onVe: noop })
 // ═════════════════════════════════════════ hết LÀN HỌC SINH 12/10 ═════════════════════════════════════════
+// ═════════════════════════════════════════ LÀN NHỊP EM 12/10C ═════════════════════════════════════════
+// Thầy 12/10 duyệt bản vẽ HS-Cham / HS-Luoi: bảng "Nhịp học của em · từ 01/10" đầu màn Hôm nay của app học sinh. Cảnh `?man=hs-nhip&nhe=cham|luoi|
+// luoi-thoat|chua-deu|chua-du|loi` (component THẬT HocTapHomNay có token, `/hs/nhip-hoc` GIẢ đúng số bản vẽ: gia/nhip-hoc-em.ts — bọc `fetch`, chỉ trả
+// lời khi đang chụp cảnh hs-nhip; mọi cảnh khác đi tiếp bộ giả chung).
+if (man === 'hs-nhip') {
+  const fetchChung = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    if (new URL(url, location.href).pathname.endsWith('/hs/nhip-hoc')) {
+      const r = nhipEmGia(thamSo.get('nhe'))
+      return new Response(JSON.stringify(r), { status: r.ok ? 200 : 500, headers: { 'content-type': 'application/json' } })
+    }
+    return fetchChung(input, init)
+  }
+}
+// Khối Hôm nay chính dưới bảng dùng CÙNG số câu hôm nay với bảng (bộ giả) — ảnh không hiện hai con số lệch nhau.
+const homNhe = (() => { const k = nhipEmGia(thamSo.get('nhe')); return k.ok && k.homNayMuc ? k.homNayMuc : { muc: 30, lam: 12 } })()
+const SANH_NHE = { ...SANH_MOI, hanhTrinh: { ...SANH_MOI.hanhTrinh, toiThieu: homNhe.muc, daLam: homNhe.lam, daXep: homNhe.muc, changHienTai: Math.min(5, Math.floor(homNhe.lam / 6) + 1) },
+  theLuc: { con: Math.max(0, homNhe.muc - homNhe.lam), tong: homNhe.muc }, ruong: { ...SANH_MOI.ruong, daLam: homNhe.lam, tong: homNhe.muc } }
+const manNhipEm = () =>
+  h(HocTapHomNay, { ten: thamSo.get('nhe')?.startsWith('luoi') ? 'Ngọc Ánh' : 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_NHE } as never, dangTai: false, loi: '', coCa: false, token: 'tk',
+    onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })
+// ═════════════════════════════════════════ hết LÀN NHỊP EM 12/10C ═════════════════════════════════════════
 
-const MAN_THAY: Record<string, string> = { 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
+const MAN_THAY: Record<string, string> ={ 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 const con =
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
+  man === 'hs-nhip' ? manNhipEm() : // LÀN NHỊP EM 12/10C
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'de-thu' ? h('div', {className:'dao dao2'}, h(DeThu, {sbd:'GIA',call:callDao,onVe:noop}))

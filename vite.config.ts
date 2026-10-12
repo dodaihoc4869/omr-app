@@ -207,6 +207,9 @@ export default defineConfig({
           '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau,DieuKhienToChieuScreen,ModalDieuKhienTuXa,btvn-nang-do-thay}-*.{js,css}',
           // Bảng Dạy học (28/09): tấm Chiếu mã (vào thi + điểm danh) nay là mảnh dùng chung của 4 màn thầy (Mở ca, Theo dõi ca, phòng chờ, Lên bảng — đều ngoài precache) ⇒ kho chạy-lúc.
           '**/TamPhuChieuMa-*.{js,css}',
+          // Điểm danh 12/10C (bản vẽ GV-DiemDanh): bước Điểm danh dùng chung (`DiemDanhBuoi` — chỉ năm màn thầy nhập, đều ngoài precache) + hai bản chiếu
+          // React (`BanChieuDiemDanh`, nạp lười khi thầy bấm chiếu) ⇒ kho chạy-lúc; máy em / phụ huynh không bao giờ tải.
+          '**/{DiemDanhBuoi,BanChieuDiemDanh}-*.{js,css}',
           // Thầy tự chữa (12/10): tờ chiếu cả đề tách thành mảnh dùng chung CHỈ của màn thầy (Cần thầy chữa, Lên bảng chiến dịch, Gọi lên bảng) ⇒ kho chạy-lúc,
           // không cất sẵn trên máy học sinh / phụ huynh (giữ precache như trước đợt 9).
           '**/{to-chieu,tra-cau-chieu,thong-ke-lop-cau,thay-tu-chua-to}-*.{js,css}',

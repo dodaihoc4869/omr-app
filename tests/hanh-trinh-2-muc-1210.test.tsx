@@ -132,12 +132,16 @@ describe('mục Dạy học & đầu giờ: MỘT buổi dạy 4 bước', () =>
     await screen.findByRole('img', { name: 'Có mặt 2 trên 3 em' })
     // một điểm danh: Kiểm tra đầu giờ + Dạy học nhận `dd` ⇒ không tự hỏi buổi / không vẽ lại bước Điểm danh
     expect(lenh('/gv/buoi-hoc', 'dang-mo')).toHaveLength(1)
-    expect(screen.getAllByRole('heading', { level: 2, name: 'Điểm danh' })).toHaveLength(1)
+    // 12/10C — thầy 12/10 duyệt bản vẽ GV-DiemDanh: tiêu đề bước 1 đổi thành "Điểm danh — việc đầu tiên của buổi" (sửa có chủ đích)
+    expect(screen.getAllByRole('heading', { level: 2, name: 'Điểm danh — việc đầu tiên của buổi' })).toHaveLength(1)
     expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
-    expect([...container.querySelectorAll('[data-buoc] h2, .dh-buoc[data-buoc] h2')].map((h) => h.textContent)).toEqual(['Điểm danh', 'Gọi lên bảng đầu giờ', 'Dạy và chiếu câu', 'Tick bài vừa dạy'])
+    expect([...container.querySelectorAll('[data-buoc] h2, .dh-buoc[data-buoc] h2')].map((h) => h.textContent)).toEqual(['Điểm danh — việc đầu tiên của buổi', 'Gọi lên bảng đầu giờ', 'Dạy và chiếu câu', 'Tick bài vừa dạy'])
     // bước 1: thanh có mặt / sĩ số + tên em vắng (em lớp khác không tính vắng)
     expect(screen.getByRole('img', { name: 'Có mặt 2 trên 3 em' })).toBeTruthy()
-    expect(container.querySelector('[data-khoi="em-vang"]')?.textContent).toBe('Vắng 1 em: Bùi Quang Minh')
+    // 12/10C — thầy 12/10 duyệt bản vẽ: tên em vắng nằm trong ô đỏ "Vắng N em — k em đang Lười" (máy giả chưa có lệnh Nhịp học ⇒ chỉ "Vắng 1 em")
+    const oVang = container.querySelector<HTMLElement>('[data-khoi="em-vang"]')!
+    expect(within(oVang).getByText('Vắng 1 em')).toBeTruthy()
+    expect(within(oVang).getByText('Bùi Quang Minh')).toBeTruthy()
     // ô Buổi dạy + thanh bước: điểm danh xong, đầu giờ còn một em chưa chấm ⇒ đang
     expect((screen.getByRole('combobox', { name: /^Buổi dạy/ }) as HTMLSelectElement).value).toBe('BH-12')
     const buoc = within(screen.getByRole('list', { name: 'Bốn bước của buổi dạy' })).getAllByRole('button')

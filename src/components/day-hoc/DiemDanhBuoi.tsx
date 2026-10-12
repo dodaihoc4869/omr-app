@@ -4,7 +4,11 @@
 // 12/10 (thầy: Hành trình còn 2 mục, "Dạy học & đầu giờ" = MỘT buổi dạy 4 bước): mục ấy gọi `useDiemDanhBuoi()` MỘT lần rồi truyền `dd` xuống
 // Kiểm tra đầu giờ và Dạy học (một buổi, một danh sách có mặt, một nhịp làm mới). Thêm `dsBuoiMo` + `chonBuoi` cho ô "Buổi dạy" của thanh bước
 // (nhiều buổi cùng mở ⇒ thầy chọn buổi), và `thanh` = thanh "có mặt / sĩ số" của bản vẽ (chỉ mục Hành trình bật; màn khác giữ y như cũ).
-import { useCallback, useEffect, useMemo, useState } from 'react'
+// 12/10C (thầy duyệt bản vẽ GV-DiemDanh + hai bản chiếu): `thanh` ⇒ bước 1 vẽ theo bản vẽ mới (`Buoc1DiemDanh`: ô mã + QR, ô có mặt chia nhóm
+// Chăm / Chưa đều / Lười / Mới, ô em vắng, "Vừa điểm danh" bấm em ⇒ Hồ sơ làm bài, nút "Xong điểm danh · chiếu Nhịp học của lớp") và mã chiếu bằng
+// bản chiếu React mới (`BanChieuDiemDanh`). Mọi chức năng cũ giữ ở đây (mở buổi, thêm em tay, bớt em, kết thúc buổi) và truyền xuống làm khối con.
+// Màn khác (`thanh` tắt) giữ y như cũ, chiếu bằng `TamPhuChieuMa`.
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { MonitorPlay, Plus, UserCheck, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import TamPhuChieuMa, { type ChuTamPhu, type PhongChoChieu } from '../TamPhuChieuMa'
@@ -12,7 +16,11 @@ import { hoiXacNhan } from '../hop-thoai'
 import { NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../../lib/nhip-may-thay'
 import { layLopThay, type LopThay } from '../../lib/ten-lop-thay'
 import { botEmBuoi, buoiDangMo, dongBuoiHoc, linkDiemDanh, moBuoiHoc, themEmBuoi, xemBuoiHoc, locEmThem, type BuoiHoc, type TrangThaiBuoi } from '../../lib/buoi-hoc-api'
+import { emVangBuoi } from '../../lib/diem-danh-nhip'
+import Buoc1DiemDanh from './Buoc1DiemDanh'
 import './day-hoc.css'
+
+export { emVangBuoi }
 
 export const CHU_DIEM_DANH: ChuTamPhu = {
   tenMa: 'Mã điểm danh',
@@ -97,13 +105,28 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
       setTt((cu) => ({ ...x, lopEm: x.lopEm ?? cu?.lopEm ?? null })),
     [],
   )
+  /** Lần tự làm mới gần nhất lỗi (bản chiếu hiện chấm "mất kết nối", danh sách cũ giữ nguyên). */
+  const [loiLamMoi, setLoiLamMoi] = useState(false)
   const lamMoi = useCallback(async () => {
     if (!idBuoi) return true
     const r = await xemBuoiHoc(idBuoi)
-    if (!r.ok) return false
+    if (!r.ok) {
+      setLoiLamMoi(true)
+      return false
+    }
+    setLoiLamMoi(false)
     capNhat(r.du)
     return true
   }, [idBuoi, capNhat])
+  // Buổi vừa mở (moBuoiHoc) chưa kèm danh sách lớp ⇒ đọc lại MỘT lần có danh sách lớp (em vắng + nhóm cả lớp của bước 1 bản vẽ).
+  const daNapLop = useRef(new Set<string>())
+  const coLopEm = !!tt?.lopEm
+  const napLopEm = useCallback(async () => {
+    if (!idBuoi || coLopEm || daNapLop.current.has(idBuoi)) return
+    daNapLop.current.add(idBuoi)
+    const r = await xemBuoiHoc(idBuoi, true)
+    if (r.ok) setTt((cu) => (cu && cu.buoi.id === r.du.buoi.id ? r.du : cu))
+  }, [idBuoi, coLopEm])
   // TỰ LÀM MỚI 5 GIÂY qua nhịp chung của app thầy (không gọi chồng, tab ẩn không gọi, lỗi lùi dần) — chỉ khi buổi đang mở và KHÔNG đang chiếu mã
   // (tấm chiếu mã tự hỏi 5 giây của riêng nó).
   useNhipThay(lamMoi, NHIP_PHONG_CHO_THAY, !!tt?.buoi.dangMo && !chieuMa, TUY_CHON_NHIP_THAY.phongCho)
@@ -206,26 +229,30 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
     },
     [idBuoi, showToast],
   )
-  return { dsBuoiMo, chonBuoi, dangChonBuoi, dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, lopThem, setLopThem, dangThem, goc, idBuoi, capNhat, lamMoi, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, lopCuaEm, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong }
+  return { dsBuoiMo, chonBuoi, dangChonBuoi, dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, lopThem, setLopThem, dangThem, goc, idBuoi, capNhat, lamMoi, loiLamMoi, napLopEm, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, lopCuaEm, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong }
 }
 export type DiemDanhBuoi = ReturnType<typeof useDiemDanhBuoi>
 
-/** Số tên em vắng hiện thẳng trên dòng có mặt (còn lại ghi "và N em khác"). */
-const TOI_DA_TEN_VANG = 3
-
-/** Em VẮNG của buổi: em thuộc đúng lớp của buổi mà chưa có trong danh sách có mặt. Buổi "Mọi lớp" hoặc chưa có danh sách lớp ⇒ rỗng (không đoán). */
-export function emVangBuoi(tt: Pick<TrangThaiBuoi, 'buoi' | 'lopEm' | 'coMat'> | null): { sbd: string; hoTen: string }[] {
-  const lop = (tt?.buoi.lop ?? '').trim()
-  if (!tt || !lop || !tt.lopEm) return []
-  const co = new Set(tt.coMat.map((e) => e.sbd))
-  return tt.lopEm.filter((e) => e.tenLop === lop && !co.has(e.sbd)).map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))
-}
-
 /** Khung bước "Điểm danh" (số bước + tiêu đề) và tấm chiếu mã — y hệt thẻ Dạy học.
- *  `thanh` (mục Hành trình 12/10, bản vẽ): thêm thanh "có mặt / sĩ số" và dòng tên em vắng ngay dưới số có mặt. */
-export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = false, thanh = false }: { dd: DiemDanhBuoi; soBuoc?: number; idTieuDe?: string; khoaLop?: boolean; thanh?: boolean }) {
+ *  `thanh` (mục Hành trình — bản vẽ GV-DiemDanh thầy duyệt 12/10): bước 1 vẽ bằng `Buoc1DiemDanh` (ô mã + QR, ô có mặt chia nhóm, ô em vắng, Vừa điểm danh,
+ *  hai bản chiếu React); các khối chức năng cũ (mở buổi, danh sách bớt em, thêm em tay) dựng ở đây rồi truyền xuống — một chỗ, không chép hai bản.
+ *  `onSangDauGio` (chỉ mục Hành trình): phím → / nút trên bản chiếu Nhịp học ⇒ sang bước Gọi lên bảng đầu giờ. */
+export function BuocDiemDanh({
+  dd,
+  soBuoc = 1,
+  idTieuDe = 'dh-b1',
+  khoaLop = false,
+  thanh = false,
+  onSangDauGio,
+}: {
+  dd: DiemDanhBuoi
+  soBuoc?: number
+  idTieuDe?: string
+  khoaLop?: boolean
+  thanh?: boolean
+  onSangDauGio?: () => void
+}) {
   const { dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, setLopThem, dangThem, goc, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong } = dd
-  const vang = thanh ? emVangBuoi(tt) : []
   const dsCoMat = (
     <ul className="dh-chip-ds" aria-label="Học sinh có mặt">
       {coMat.map((e) => (
@@ -242,7 +269,123 @@ export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = fal
       ))}
     </ul>
   )
-  const phanCoMat = thanh && tt?.siSo ? Math.min(100, Math.round((100 * coMat.length) / tt.siSo)) : null
+  // Chưa có buổi / buổi đã kết thúc ⇒ chọn lớp + mở buổi mới.
+  const khoiMo: ReactNode =
+    !dangTaiBuoi && (!tt || buoiXong) ? (
+      <div className="dh-hang">
+        {loiBuoi && (
+          <p className="dh-loi" role="alert">
+            {loiBuoi}
+          </p>
+        )}
+        <label className="dh-chon-lop">
+          <span>Lớp học hôm nay</span>
+          <select value={lopChon} onChange={(e) => setLopChon(e.target.value)} disabled={khoaLop}>
+            <option value="">Mọi lớp (em lớp nào cũng điểm danh được)</option>
+            {lopChon && !dsLop.some((l) => l.tenLop === lopChon) && <option value={lopChon}>{lopChon}</option>}
+            {dsLop.map((l) => (
+              <option key={l.tenLop} value={l.tenLop}>
+                {l.tenLop} · {l.soEm} em
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="button" className="m3-nut-chinh dh-nut" onClick={() => void batDauDiemDanh()} disabled={dangMo}>
+          <UserCheck size={18} aria-hidden="true" /> {dangMo ? 'Đang mở buổi…' : 'Điểm danh'}
+        </button>
+      </div>
+    ) : null
+  // Thầy thêm em quên điện thoại / không quét được mã (ghi "thầy thêm").
+  const khoiThem: ReactNode =
+    themMo && !buoiXong && tt ? (
+      <div className="dh-them" role="group" aria-labelledby="dh-them-ten">
+        <div className="dh-them-dau">
+          <h3 id="dh-them-ten">Thêm em chưa điểm danh được</h3>
+          <button type="button" className="m3-nut-chu dh-nut" onClick={() => setThemMo(false)}>
+            Đóng
+          </button>
+        </div>
+        <p className="dh-phu">Em quên điện thoại hoặc không quét được mã: tích tên em rồi thêm vào danh sách có mặt (ghi là “thầy thêm”).</p>
+        <div className="dh-hang">
+          <label className="dh-chon-lop dh-chon-lop--hep">
+            <span>Lớp</span>
+            <select value={lopLoc} onChange={(e) => setLopThem(e.target.value)}>
+              <option value="">Mọi lớp</option>
+              {dsLopThem.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="dh-chon-lop">
+            <span>Tìm theo SBD hoặc tên</span>
+            <input className="dh-tim" type="search" value={timEm} onChange={(e) => setTimEm(e.target.value)} placeholder="vd: 1203 hoặc minh anh" autoComplete="off" />
+          </label>
+        </div>
+        {!tt.lopEm ? (
+          <p className="dh-phu" aria-busy="true">
+            Đang tải danh sách lớp…
+          </p>
+        ) : emLoc.length === 0 ? (
+          <p className="dh-phu">{timEm.trim() ? `Không có em nào khớp “${timEm.trim()}”${lopLoc ? ` trong lớp ${lopLoc} — thử chọn “Mọi lớp”` : ''}.` : 'Lớp này chưa có học sinh.'}</p>
+        ) : (
+          <>
+            <ul className="dh-them-ds" aria-label="Danh sách học sinh để thêm">
+              {emLoc.slice(0, TOI_DA_HIEN).map((e) => {
+                const co = coMatMap.get(e.sbd)
+                return (
+                  <li key={e.sbd} className="dh-them-dong">
+                    <label className={`dh-them-o${co ? ' dh-them-o--co' : ''}`}>
+                      <input
+                        type="checkbox"
+                        checked={!!co || emThem.has(e.sbd)}
+                        disabled={!!co}
+                        onChange={() =>
+                          setEmThem((cu) => {
+                            const m = new Set(cu)
+                            if (m.has(e.sbd)) m.delete(e.sbd)
+                            else m.add(e.sbd)
+                            return m
+                          })
+                        }
+                      />
+                      <span className="dh-them-chu">
+                        <span className="dh-them-ten">{e.hoTen || e.sbd}</span>
+                        <small>
+                          SBD {e.sbd}
+                          {e.tenLop ? ` · ${e.tenLop}` : ''}
+                        </small>
+                      </span>
+                    </label>
+                    {co && <span className={`dh-chip ${co.cach === 'thay' ? 'dh-chip--vang' : 'dh-chip--xanh'}`}>{co.cach === 'thay' ? 'thầy thêm' : 'đã điểm danh'}</span>}
+                    {co?.cach === 'thay' && (
+                      <button type="button" className="m3-nut-chu dh-nut-nho" onClick={() => void botEm(e.sbd)} aria-label={`Bỏ ${e.hoTen || e.sbd} khỏi danh sách có mặt`}>
+                        Bỏ
+                      </button>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+            {emLoc.length > TOI_DA_HIEN && <p className="dh-phu">Đang hiện {TOI_DA_HIEN} trong {emLoc.length} em — gõ tên hoặc SBD để lọc.</p>}
+          </>
+        )}
+        <div className="dh-hang">
+          <button type="button" className="m3-nut-chinh dh-nut" disabled={!emThem.size || dangThem} aria-busy={dangThem} onClick={() => void themEm()}>
+            Thêm {emThem.size} em vào danh sách có mặt
+          </button>
+          {emThem.size > 0 && (
+            <button type="button" className="m3-nut-chu dh-nut" onClick={() => setEmThem(new Set())}>
+              Bỏ chọn
+            </button>
+          )}
+        </div>
+      </div>
+    ) : null
+
+  if (thanh) return <Buoc1DiemDanh dd={dd} soBuoc={soBuoc} idTieuDe={idTieuDe} khoiMo={khoiMo} dsCoMat={dsCoMat} khoiThem={khoiThem} onSangDauGio={onSangDauGio} />
+
   return (
     <>
       <section className="dh-buoc" aria-labelledby={idTieuDe}>
@@ -261,30 +404,9 @@ export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = fal
           <p className="dh-phu" aria-busy="true">
             Đang tìm buổi học đang mở…
           </p>
-        ) : !tt || buoiXong ? (
-          <div className="dh-hang">
-            {loiBuoi && (
-              <p className="dh-loi" role="alert">
-                {loiBuoi}
-              </p>
-            )}
-            <label className="dh-chon-lop">
-              <span>Lớp học hôm nay</span>
-              <select value={lopChon} onChange={(e) => setLopChon(e.target.value)} disabled={khoaLop}>
-                <option value="">Mọi lớp (em lớp nào cũng điểm danh được)</option>
-                {lopChon && !dsLop.some((l) => l.tenLop === lopChon) && <option value={lopChon}>{lopChon}</option>}
-                {dsLop.map((l) => (
-                  <option key={l.tenLop} value={l.tenLop}>
-                    {l.tenLop} · {l.soEm} em
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button type="button" className="m3-nut-chinh dh-nut" onClick={() => void batDauDiemDanh()} disabled={dangMo}>
-              <UserCheck size={18} aria-hidden="true" /> {dangMo ? 'Đang mở buổi…' : 'Điểm danh'}
-            </button>
-          </div>
-        ) : null}
+        ) : (
+          khoiMo
+        )}
 
         {tt && (
           <>
@@ -294,11 +416,6 @@ export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = fal
                 {tt.siSo ? `/ ${tt.siSo} em` : 'em'} có mặt
                 {tt.buoi.lop ? ` · ${tt.buoi.lop}` : ''}
               </span>
-              {phanCoMat !== null && (
-                <span className="dh-dem-thanh" role="img" aria-label={`Có mặt ${coMat.length} trên ${tt.siSo} em`}>
-                  <i style={{ width: `${phanCoMat}%` }} />
-                </span>
-              )}
               {!buoiXong && (
                 <span className="dh-dem-nut">
                   <button type="button" className="m3-nut-tonal dh-nut" onClick={() => setChieuMa(true)}>
@@ -313,109 +430,8 @@ export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = fal
                 </span>
               )}
             </div>
-            {vang.length > 0 && (
-              <p className="dh-phu dh-vang" data-khoi="em-vang">
-                Vắng {vang.length} em: {vang.slice(0, TOI_DA_TEN_VANG).map((e) => e.hoTen || `SBD ${e.sbd}`).join(', ')}
-                {vang.length > TOI_DA_TEN_VANG ? ` và ${vang.length - TOI_DA_TEN_VANG} em khác` : ''}
-              </p>
-            )}
-            {coMat.length === 0 ? (
-              <p className="dh-phu">Chưa em nào điểm danh. Bấm “Chiếu mã điểm danh” để em quét QR hoặc nhập mã; danh sách tự cập nhật mỗi 5 giây.</p>
-            ) : thanh ? (
-              // Mục Hành trình (bản vẽ 12/10): số + thanh + tên em vắng là đủ nhìn; danh sách từng em (bớt em) gập sẵn, mở khi cần.
-              <details className="dh-co-mat-gap" data-khoi="ds-co-mat">
-                <summary>Xem danh sách em có mặt ({coMat.length} em) — bớt em điểm danh nhầm</summary>
-                {dsCoMat}
-              </details>
-            ) : (
-              dsCoMat
-            )}
-            {themMo && !buoiXong && (
-              <div className="dh-them" role="group" aria-labelledby="dh-them-ten">
-                <div className="dh-them-dau">
-                  <h3 id="dh-them-ten">Thêm em chưa điểm danh được</h3>
-                  <button type="button" className="m3-nut-chu dh-nut" onClick={() => setThemMo(false)}>
-                    Đóng
-                  </button>
-                </div>
-                <p className="dh-phu">Em quên điện thoại hoặc không quét được mã: tích tên em rồi thêm vào danh sách có mặt (ghi là “thầy thêm”).</p>
-                <div className="dh-hang">
-                  <label className="dh-chon-lop dh-chon-lop--hep">
-                    <span>Lớp</span>
-                    <select value={lopLoc} onChange={(e) => setLopThem(e.target.value)}>
-                      <option value="">Mọi lớp</option>
-                      {dsLopThem.map((l) => (
-                        <option key={l} value={l}>
-                          {l}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="dh-chon-lop">
-                    <span>Tìm theo SBD hoặc tên</span>
-                    <input className="dh-tim" type="search" value={timEm} onChange={(e) => setTimEm(e.target.value)} placeholder="vd: 1203 hoặc minh anh" autoComplete="off" />
-                  </label>
-                </div>
-                {!tt.lopEm ? (
-                  <p className="dh-phu" aria-busy="true">
-                    Đang tải danh sách lớp…
-                  </p>
-                ) : emLoc.length === 0 ? (
-                  <p className="dh-phu">{timEm.trim() ? `Không có em nào khớp “${timEm.trim()}”${lopLoc ? ` trong lớp ${lopLoc} — thử chọn “Mọi lớp”` : ''}.` : 'Lớp này chưa có học sinh.'}</p>
-                ) : (
-                  <>
-                    <ul className="dh-them-ds" aria-label="Danh sách học sinh để thêm">
-                      {emLoc.slice(0, TOI_DA_HIEN).map((e) => {
-                        const co = coMatMap.get(e.sbd)
-                        return (
-                          <li key={e.sbd} className="dh-them-dong">
-                            <label className={`dh-them-o${co ? ' dh-them-o--co' : ''}`}>
-                              <input
-                                type="checkbox"
-                                checked={!!co || emThem.has(e.sbd)}
-                                disabled={!!co}
-                                onChange={() =>
-                                  setEmThem((cu) => {
-                                    const m = new Set(cu)
-                                    if (m.has(e.sbd)) m.delete(e.sbd)
-                                    else m.add(e.sbd)
-                                    return m
-                                  })
-                                }
-                              />
-                              <span className="dh-them-chu">
-                                <span className="dh-them-ten">{e.hoTen || e.sbd}</span>
-                                <small>
-                                  SBD {e.sbd}
-                                  {e.tenLop ? ` · ${e.tenLop}` : ''}
-                                </small>
-                              </span>
-                            </label>
-                            {co && <span className={`dh-chip ${co.cach === 'thay' ? 'dh-chip--vang' : 'dh-chip--xanh'}`}>{co.cach === 'thay' ? 'thầy thêm' : 'đã điểm danh'}</span>}
-                            {co?.cach === 'thay' && (
-                              <button type="button" className="m3-nut-chu dh-nut-nho" onClick={() => void botEm(e.sbd)} aria-label={`Bỏ ${e.hoTen || e.sbd} khỏi danh sách có mặt`}>
-                                Bỏ
-                              </button>
-                            )}
-                          </li>
-                        )
-                      })}
-                    </ul>
-                    {emLoc.length > TOI_DA_HIEN && <p className="dh-phu">Đang hiện {TOI_DA_HIEN} trong {emLoc.length} em — gõ tên hoặc SBD để lọc.</p>}
-                  </>
-                )}
-                <div className="dh-hang">
-                  <button type="button" className="m3-nut-chinh dh-nut" disabled={!emThem.size || dangThem} aria-busy={dangThem} onClick={() => void themEm()}>
-                    Thêm {emThem.size} em vào danh sách có mặt
-                  </button>
-                  {emThem.size > 0 && (
-                    <button type="button" className="m3-nut-chu dh-nut" onClick={() => setEmThem(new Set())}>
-                      Bỏ chọn
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
+            {coMat.length === 0 ? <p className="dh-phu">Chưa em nào điểm danh. Bấm “Chiếu mã điểm danh” để em quét QR hoặc nhập mã; danh sách tự cập nhật mỗi 5 giây.</p> : dsCoMat}
+            {khoiThem}
           </>
         )}
       </section>

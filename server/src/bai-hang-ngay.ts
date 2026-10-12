@@ -30,6 +30,7 @@ import { SBD_THU } from './gv-bang-tin'
 import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { chonTuGiaTri, chuanMucDo, tieuDeCau } from './lich-su-lam-cau'
 import { docCauKho, tenCuaDang } from './omni-d1'
+import { chuoiDuGanNhat, laLuoiTheoTiLe, tomTatNhip } from './nhip-hoc-luat'
 
 type Row = Record<string, unknown>
 type Tang = 1 | 2 | 3 | 4
@@ -426,7 +427,7 @@ export function tinhThaiDo(a: {
     ma: 'ngay-du-muc', ten: 'Ngày đủ mức', tu: du, mau: tinh.length, giaTri: pA,
     muc: tinh.length < NG.soNgayToiThieu ? 'chua-du' : pA! >= NG.ngayDuTot ? 'tot' : pA! >= NG.ngayDuChuY ? 'chu-y' : 'xau',
     chu: tinh.length ? `Đủ mức ${du}/${tinh.length} ngày (${pA}%)` : 'Chưa có ngày nào đã hết để tính',
-    nguong: `Chăm từ ${NG.ngayDuTot}% · Lười từ ${NG.ngayDuLuoi}% trở xuống hoặc ${NG.ngayLienKhongLam} ngày liền không làm · ở giữa là chưa đều; cần ít nhất ${NG.soNgayToiThieu} ngày`,
+    nguong: `Chăm từ ${NG.ngayDuTot}% · Lười từ ${NG.ngayDuLuoi}% trở xuống hoặc ${NG.ngayLienKhongLam} ngày liền không làm, thoát Lười khi đủ mức ${NG.ngayLienThoatLuoi} ngày liền · ở giữa là chưa đều; cần ít nhất ${NG.soNgayToiThieu} ngày`,
   })
   // (b) quá nhanh
   const coGiay = a.luot.filter((l) => l.giay !== null)
@@ -497,12 +498,16 @@ export function tinhThaiDo(a: {
     dai = n.daLam > 0 ? 0 : dai + 1
     if (dai > chuoi) chuoi = dai
   }
-  return { tinHieu: t, ketLuan: ketLuanThaiDo(t, chuoi) }
+  // Chuỗi ngày đủ mức liền gần nhất (thầy 12/10: "6 ngày liền làm đủ mới thoát nhóm lười") — cùng phép thuần với Nhịp học (nhip-hoc-luat.ts).
+  const homNay = a.ngay.find((n) => n.homNay)?.ngay ?? congNgayBhn(a.den, 1)
+  const chuoiDu = chuoiDuGanNhat(a.ngay.map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam })), homNay)
+  return { tinHieu: t, ketLuan: ketLuanThaiDo(t, chuoi, chuoiDu) }
 }
 
 /** Luật kết luận `LUAT_KET_LUAN` (kieu). Lý do luôn bằng số. */
-/** `chuoiKhongLam` = số ngày liền không làm câu nào dài nhất (ngày đã hết) — nhánh "Lười" (cùng luật Nhịp học ở Hôm nay). */
-export function ketLuanThaiDo(t: readonly TinHieuThaiDo[], chuoiKhongLam = 0): KetLuanThaiDo {
+/** `chuoiKhongLam` = số ngày liền không làm câu nào dài nhất (ngày đã hết) — nhánh "Lười" (cùng luật Nhịp học ở Hôm nay).
+ *  `chuoiDuGanNhat` (THÊM 12/10, mặc định 0) = chuỗi ngày đủ mức liền gần nhất — từ `NG.ngayLienThoatLuoi` (6) ngày thì thoát nhánh "Lười". */
+export function ketLuanThaiDo(t: readonly TinHieuThaiDo[], chuoiKhongLam = 0, chuoiDuGanNhat = 0): KetLuanThaiDo {
   const m = (ma: TinHieuThaiDo['ma']) => t.find((x) => x.ma === ma)!
   const xau = (x: TinHieuThaiDo) => x.muc === 'xau'
   const khongTot = (x: TinHieuThaiDo) => x.muc === 'xau' || x.muc === 'chu-y'
@@ -512,13 +517,16 @@ export function ketLuanThaiDo(t: readonly TinHieuThaiDo[], chuoiKhongLam = 0): K
   const tra = (nhan: KetLuanThaiDo['nhan'], ds: readonly TinHieuThaiDo[], them: string[] = []): KetLuanThaiDo => ({ nhan, chu: TEN_NHAN_THAI_DO[nhan], lyDo: [...ds.map(lyDo), ...them] })
   if (doiPho.length) return tra('doi-pho', [...doiPho, ...(xau(d) && khongTot(f) ? [f] : [])], a.muc !== 'chua-du' ? [lyDo(a)] : [])
   if (a.muc === 'chua-du') return tra('chua-du-du-lieu', [a], [`Cần ít nhất ${NG.soNgayToiThieu} ngày đã hết để kết luận.`])
-  // Lười — so số nguyên như `nhomTheoLuat` (src/lib/nhip-hoc-thay.ts): du × 100 ≤ 40 × số ngày.
-  if (a.tu * 100 <= NG.ngayDuLuoi * a.mau || chuoiKhongLam >= NG.ngayLienKhongLam) {
+  // Lười — CÙNG phép thuần với Nhịp học (`laLuoiTheoTiLe`, nhip-hoc-luat.ts): du × 100 ≤ 40 × số ngày, hoặc 3 ngày liền không làm; đủ mức 6 ngày
+  // liền gần nhất ⇒ thoát (thầy 12/10).
+  const theoTiLe = laLuoiTheoTiLe(a.mau, a.tu, chuoiKhongLam)
+  if (theoTiLe && chuoiDuGanNhat < NG.ngayLienThoatLuoi) {
     return tra('luoi', [a], chuoiKhongLam >= NG.ngayLienKhongLam ? [`${chuoiKhongLam} ngày liền không làm câu nào.`] : [])
   }
-  if (a.muc !== 'tot' || xau(c)) return tra('chua-deu', [a, ...(xau(c) ? [c] : [])])
+  const thoat = theoTiLe ? [`Đủ mức ${chuoiDuGanNhat} ngày liền gần nhất — đã ra khỏi nhóm Lười (cần ${NG.ngayLienThoatLuoi} ngày liền).`] : []
+  if (a.muc !== 'tot' || xau(c)) return tra('chua-deu', [a, ...(xau(c) ? [c] : [])], thoat)
   const khongDau = [b, e, d].filter((x) => x.muc !== 'chua-du').map((x) => x.ten.toLocaleLowerCase('vi'))
-  return tra('cham-chi', [a], khongDau.length ? [`Không có dấu hiệu đối phó (${khongDau.join(', ')} trong ngưỡng).`] : [])
+  return tra('cham-chi', [a], [...thoat, ...(khongDau.length ? [`Không có dấu hiệu đối phó (${khongDau.join(', ')} trong ngưỡng).`] : [])])
 }
 
 // ------------------------------------------------------------------ HỒ SƠ THÁI ĐỘ (đọc D1)
@@ -667,6 +675,13 @@ export async function gvHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promis
     return { ...n, soLuot: o.length, soDung: dung, soSai: sai, tiLeDung: phanTram(dung, dung + sai) }
   })
   const { tinHieu, ketLuan } = tinhThaiDo({ ngay: keHoach, luot, cauDaLam, cauHoTro, den })
+  // 5b · CHỈ THÊM 12/10: nhóm Nhịp học — CÙNG phép thuần với Hôm nay › Nhịp học (`tomTatNhip`), tính từ ngày em vào học như `/gv/nhip-hoc`
+  // (`docNgayVao`, nạp động để không vòng nhập tĩnh với nhip-hoc.ts); đọc ngày vào hỏng ⇒ tính từ `tu` (đúng lối lùi của `/gv/nhip-hoc`).
+  const vao = await import('./nhip-hoc')
+    .then((m) => m.docNgayVao(env, [{ ...em, goi7Tu: null }], tu))
+    .then((m) => m.get(sbd) ?? tu)
+    .catch(() => tu)
+  const nhip = tomTatNhip(keHoach.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam })), homNay)
 
   // 6 · Câu đúng / Câu đã ôn (toàn bộ sổ đã đọc, quy câu gốc)
   const theoGoc = new Map<string, DongSo[]>()
@@ -695,6 +710,9 @@ export async function gvHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promis
   const soLuotChu = String(TOI_DA_LUOT_HO_SO).replace(/\B(?=(\d{3})+(?!\d))/g, '.') // "10.000" — không phụ thuộc Intl của Worker
   if (catTrongKhoang) canhBao.push(`Riêng từ ${ngayNganBhn(tu)} đến ${ngayNganBhn(den)} em đã có hơn ${soLuotChu} lượt — các số của khoảng này chỉ tính ${soLuotChu} lượt gần nhất.`)
   else if (catBot) canhBao.push(`Sổ của em vượt ${soLuotChu} lượt — danh sách câu tính trên ${soLuotChu} lượt gần nhất.`)
-  return { ok: true, em, tu, den, homNay, ketLuan, tinHieu, dem, ngay, phanBoGiay: phanBoGiay(luot), cauDung, cauDaOn, catBot, canhBao }
+  return {
+    ok: true, em, tu, den, homNay, ketLuan, tinHieu, dem, ngay, phanBoGiay: phanBoGiay(luot), cauDung, cauDaOn, catBot, canhBao,
+    nhomNhip: nhip.nhom, coDoiPho: ketLuan.nhan === 'doi-pho', chuoiDuGanNhat: nhip.chuoiDuGanNhat,
+  }
 }
 

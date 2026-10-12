@@ -84,6 +84,24 @@ const DS_CB = [
 const DS_HT2 = ['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
   [`60-ht2-day-hoc-${kho}${nen === 'dark' ? '-toi' : ''}`, 'gv-nhip&ht2=1', w, hh, nen, true, /Hành trình giỏi Hóa/, 'cho:58 em']))
 // ═══════════ hết LÀN HÀNH TRÌNH 12/10B ═══════════
+// ═══════════ LÀN ĐIỂM DANH 12/10C: bước 1 Điểm danh (bản vẽ GV-DiemDanh) + bản chiếu A đang điểm danh · B Nhịp học của lớp · hồ sơ một em trên bản chiếu ═══════════
+// Cảnh `?man=gv-nhip&ht2=1&dd12c=1` (trang.tsx + gia/diem-danh-1210c.ts). `dd12c:<việc>[:phím]`: buoc1 = chờ ô em vắng có nhóm · chieu = bấm "Chiếu điểm danh"
+// · nhip = bấm nút chính "Xong điểm danh · chiếu Nhịp học của lớp" (rồi gõ phím, vd `h` ẩn tên Lười) · ho-so = thêm bấm em đầu cột Chưa đều ⇒ tấm Hồ sơ làm bài.
+// Bước 1: máy 1440×900 + điện thoại 390×844 TOÀN TRANG, sáng + tối; bản chiếu 1920×1080 (thêm 1280×720 kiểm co giãn). Chạy riêng: tiền tố "8" (80-…84-).
+const DD12C = 'gv-nhip&ht2=1&dd12c=1'
+const DS_DD12C = [
+  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+    [`80-dd12c-buoc1-${kho}${nen === 'dark' ? '-toi' : ''}`, DD12C, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:buoc1'])),
+  ['81-dd12c-chieu-diem-danh-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:chieu'],
+  ['81-dd12c-chieu-diem-danh-1280', DD12C, 1280, 720, 'dark', false, /Hành trình giỏi Hóa/, 'dd12c:chieu'],
+  ['82-dd12c-chieu-nhip-lop-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:nhip'],
+  ['82-dd12c-chieu-nhip-lop-an-luoi-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:nhip:h'],
+  ['82-dd12c-chieu-nhip-lop-1280', DD12C, 1280, 720, 'dark', false, /Hành trình giỏi Hóa/, 'dd12c:nhip'],
+  ['83-dd12c-chieu-ho-so-em-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:ho-so'],
+  ['83-dd12c-chieu-ho-so-em-1920-toi', DD12C, 1920, 1080, 'dark', false, /Hành trình giỏi Hóa/, 'dd12c:ho-so'],
+  ['84-dd12c-buoc1-ho-so-em-may-tinh', DD12C, 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:vua'],
+]
+// ═══════════ hết LÀN ĐIỂM DANH 12/10C ═══════════
 // ═══════════ LÀN HÔM NAY 12/10B: Hôm nay của thầy theo bản vẽ thầy duyệt 12/10 — hàng thẻ Việc cần thầy + khối Nhịp học (262 em × 12 ngày, ═══════════
 // gia/nhip-hoc.ts). Máy 1440×900 + điện thoại 390×844 TOÀN TRANG, sáng + tối; thêm thao tác `hn:<việc>`: Xem đủ em lười · lọc Khối 12 · bấm em ⇒ tấm hồ
 // sơ · bảng từng ngày · thẻ Chăm / Đối phó (điện thoại) · lỗi (`nh=loi`) · chưa có em (`nh=trong`). Chạy riêng: tiền tố "6" (60-…67-).
@@ -108,13 +126,36 @@ const DS_HN = [
 ]
 // ═══════════ hết LÀN HÔM NAY 12/10B ═══════════
 
+// ═══════════ LÀN NHỊP EM 12/10C: app học sinh › Hôm nay — bảng "Nhịp học của em · từ 01/10" (bản vẽ HS-Cham / HS-Luoi thầy duyệt) ═══════════
+// Cảnh `?man=hs-nhip&nhe=…` (trang.tsx khối cùng tên; `/hs/nhip-hoc` GIẢ gia/nhip-hoc-em.ts). Chăm + Lười × 390×844 / 1440×900 × sáng / tối, CẢ
+// TRANG; thêm Lười đang thoát (3/6), Chưa đều, Chưa đủ dữ liệu (điện thoại sáng) và lỗi (bảng ẩn gọn). Chạy riêng: tiền tố "7" (70-…73-).
+const DS_NHE = [
+  ...['light', 'dark'].flatMap((nen) => [[390, 844, 'dien-thoai'], [1440, 900, 'may-tinh']].flatMap(([w, hh, kho]) => [
+    [`70-nhe-cham-${kho}${nen === 'dark' ? '-toi' : ''}`, 'hs-nhip&nhe=cham', w, hh, nen, true, /Thầy cũng thấy bảng này/],
+    [`71-nhe-luoi-${kho}${nen === 'dark' ? '-toi' : ''}`, 'hs-nhip&nhe=luoi', w, hh, nen, true, /Thầy cũng thấy bảng này/],
+  ])),
+  ['72-nhe-luoi-dang-thoat-dien-thoai', 'hs-nhip&nhe=luoi-thoat', 390, 844, 'light', true, /Thầy cũng thấy bảng này/],
+  ['72-nhe-chua-deu-dien-thoai', 'hs-nhip&nhe=chua-deu', 390, 844, 'light', true, /Thầy cũng thấy bảng này/],
+  ['72-nhe-chua-du-dien-thoai-toi', 'hs-nhip&nhe=chua-du', 390, 844, 'dark', true, /Thầy cũng thấy bảng này/],
+  ['72-nhe-30-ngay-dien-thoai', 'hs-nhip&nhe=cham-dai', 390, 844, 'light', true, /Thầy cũng thấy bảng này/],
+  ['72-nhe-30-ngay-may-tinh-toi', 'hs-nhip&nhe=cham-dai', 1440, 900, 'dark', true, /Thầy cũng thấy bảng này/],
+  ['73-nhe-loi-an-gon-dien-thoai', 'hs-nhip&nhe=loi', 390, 844, 'light', false, /Chào Minh Anh/],
+  // phía thầy: ô Lười ở Hôm nay nói đường thoát; tấm Hồ sơ làm bài lấy NHÓM làm nhãn chính + chip đối phó riêng (bộ giả gia/nhip-hoc.ts)
+  ['74-nhe-thay-hom-nay-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:cho'],
+  ['74-nhe-thay-ho-so-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:ho-so'],
+  ['74-nhe-thay-ho-so-dien-thoai-toi', 'gv-hom-nay&nh=1', 390, 844, 'dark', false, /Hôm nay của thầy/, 'hn:ho-so'],
+]
+// ═══════════ hết LÀN NHỊP EM 12/10C ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_NHE, // LÀN NHỊP EM 12/10C
   ...DS_HN, // LÀN HÔM NAY 12/10B
   ...DS_HS12, // LÀN HỌC SINH 12/10
   ...DS_TTC, // LÀN THẦY TỰ CHỮA 12/10
   ...DS_CB, // LÀN CHỮA BÀI 12/10B
   ...DS_HT2, // LÀN HÀNH TRÌNH 12/10B
+  ...DS_DD12C, // LÀN ĐIỂM DANH 12/10C
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],
@@ -376,6 +417,29 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
           await t.waitForTimeout(k === 'l' ? 2600 : 600)
         }
       }
+    } else if (viec?.startsWith('dd12c:')) {
+      // LÀN ĐIỂM DANH 12/10C: chờ ô em vắng có nhóm Lười (Nhịp học đã về) rồi làm đúng một việc.
+      const [, v, phim] = viec.split(':')
+      await t.getByText(/em đang Lười/).first().waitFor({ timeout: 20000 })
+      if (v === 'chieu') {
+        await t.getByRole('button', { name: 'Chiếu điểm danh', exact: true }).click()
+        await t.locator('.ddc .ddc-em').first().waitFor({ timeout: 20000 })
+      }
+      if (v === 'nhip' || v === 'ho-so') {
+        await t.getByRole('button', { name: 'Xong điểm danh · chiếu Nhịp học của lớp', exact: true }).click()
+        await t.locator('.ddc .ddc-dong-em').first().waitFor({ timeout: 20000 })
+      }
+      for (const k of phim ?? '') await t.keyboard.press(k)
+      if (v === 'ho-so') {
+        // em đầu cột Chưa đều (nhãn thái độ của hồ sơ GIẢ chỉ có Chăm chỉ / Chưa đều / Đối phó — chọn em cùng nhóm để ảnh không tự mâu thuẫn)
+        await t.locator('.ddc-cot[data-nhom="chua-deu"] .ddc-dong-em').first().click()
+        await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
+      }
+      if (v === 'vua') {
+        await t.locator('.dd1-vua-dong').first().click()
+        await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
+      }
+      await t.waitForTimeout(500)
     } else if (viec?.startsWith('hn:')) {
       // LÀN HÔM NAY 12/10B: chờ khối Nhịp học có em rồi làm đúng một việc (ảnh toàn trang không cần cuộn; ảnh khung nhìn cuộn trang tới khối cần chụp).
       const v = viec.slice(3)

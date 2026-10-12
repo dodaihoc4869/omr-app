@@ -137,6 +137,10 @@
 .gvv2-tdo-nhan { margin: 0; font-size: var(--t-khoi, 24px); font-weight: 800; line-height: 1.2; color: var(--m-dam); }
 .gvv2-tdo-mo-ta { margin: 0; font-size: 14px; color: var(--gvm-chu-2); }
 .gvv2-tdo-ly-do { display: grid; gap: 4px; margin: 4px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.45; color: var(--gvm-chu); }
+/* 12/10: nhãn chính = nhóm Nhịp học; cờ "Có dấu hiệu đối phó" là chip riêng cạnh nhãn (tông hồng sẵn có); nhóm Lười kèm dòng "đủ mức liền x/6". */
+.gvv2-tdo-nhan-hang { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
+.gvv2-tdo-co-doi-pho { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 12px; border-radius: var(--r-vien, 999px); background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.gvv2-tdo-thoat { margin: 0; font-size: 14px; font-weight: 700; color: var(--m-dam); }
 
 .gvv2-tdo-khoi { display: grid; gap: 10px; min-width: 0; }
 .gvv2-tdo-tieu { margin: 8px 0 0; font-size: var(--t-the, 17px); font-weight: 800; color: var(--gvm-chu); }

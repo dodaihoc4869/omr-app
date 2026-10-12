@@ -84,7 +84,9 @@ describe('luật nhóm (thầy đã duyệt) — tính trên các ngày ĐÃ QUA
   it('chữ điều kiện theo số ngày đã qua (bản vẽ: 9/11 · 5–8 · 4/11)', () => {
     expect(chuDieuKien('cham', 11)).toBe('Đủ mức từ 9/11 ngày trở lên')
     expect(chuDieuKien('chua-deu', 11)).toBe('Đủ mức 5–8 ngày trong 11')
-    expect(chuDieuKien('luoi', 11)).toBe('Đủ mức 4/11 ngày trở xuống, hoặc 3 ngày liền không làm')
+    // SỬA CÓ CHỦ ĐÍCH 12/10 — thầy chốt "6 ngày liền làm đủ mới thoát nhóm lười": chữ điều kiện ô Lười nói thêm đường thoát.
+    expect(chuDieuKien('luoi', 11)).toBe('Đủ mức 4/11 ngày trở xuống, hoặc 3 ngày liền không làm · thoát khi đủ mức 6 ngày liền')
+    expect(chuDieuKien('luoi', 2)).toBe('Đủ mức từ 40% số ngày trở xuống, hoặc 3 ngày liền không làm · thoát khi đủ mức 6 ngày liền')
     expect(chuDieuKien('chua-deu', 5)).toBe('Đủ mức 3/5 ngày')
     expect(chuDieuKien('cham', 2)).toBe('Đủ mức từ 80% số ngày trở lên')
   })
@@ -92,6 +94,35 @@ describe('luật nhóm (thầy đã duyệt) — tính trên các ngày ĐÃ QUA
     expect(chuLuoi(dong(em('A', 'k k k k k k k k k k k k')))).toEqual({ chinh: 'Thiếu 11/11 ngày', phu: '0 câu từ 01/10' })
     expect(chuLuoi(dong(em('B', 'k k n k k k n k k k k k')))).toEqual({ chinh: 'Thiếu 11/11 ngày', phu: '9 ngày không làm · làm 10 câu' })
     expect(chuLuoi(dong(em('C', 'n i n d i n i n i n d k')))).toEqual({ chinh: 'Thiếu 9/11 ngày', phu: 'thiếu 135 câu' })
+  })
+})
+
+// THẦY CHỐT 12/10: "6 ngày liền làm đủ mới thoát nhóm lười nhé" — Lười = (≤ 40% HOẶC ≥ 3 ngày liền bỏ) VÀ chuỗi đủ mức liền GẦN NHẤT < 6;
+// chuỗi lùi từ hôm qua, hôm nay đã đủ thì cộng hôm nay; thoát rồi: ≥ 80% Chăm, còn lại Chưa đều.
+describe('luật thoát nhóm Lười — 6 ngày liền đủ mức (thầy chốt 12/10)', () => {
+  it('nhomTheoLuat: tham số thứ tư tuỳ chọn (mặc định 0 = như cũ); chuỗi 6 ⇒ thoát, 5 ⇒ vẫn Lười; thoát mà ≥ 80% ⇒ Chăm', () => {
+    expect(nhomTheoLuat(11, 6, 5)).toBe('luoi')
+    expect(nhomTheoLuat(11, 6, 5, 5)).toBe('luoi')
+    expect(nhomTheoLuat(11, 6, 5, 6)).toBe('chua-deu')
+    expect(nhomTheoLuat(11, 2, 0, 6)).toBe('chua-deu') // 18% mà đủ 6 ngày liền gần nhất ⇒ ra khỏi Lười
+    expect(nhomTheoLuat(15, 12, 3, 6)).toBe('cham')
+    expect(nhomTheoLuat(15, 12, 3, 5)).toBe('luoi')
+    expect(nhomTheoLuat(2, 2, 0, 6)).toBe('chua-du')
+  })
+  it('một em Lười rồi đủ 6 ngày liền (tới hôm qua) ⇒ thoát, sang Chưa đều', () => {
+    const d = dong(em('T6', 'k k k k k d d d d d d k'))
+    expect(d).toMatchObject({ nhom: 'chua-deu', soNgayQua: 11, soNgayDu: 6, chuoiDuGanNhat: 6, chuoiKhongLam: { dai: 5 } })
+  })
+  it('mới 5 ngày liền đủ mức ⇒ vẫn Lười', () => {
+    const d = dong(em('T5', 'k k k k k k d d d d d k'))
+    expect(d).toMatchObject({ nhom: 'luoi', chuoiDuGanNhat: 5 })
+  })
+  it('hôm nay đã đủ mức được cộng vào chuỗi (5 ngày tới hôm qua + hôm nay = 6 ⇒ thoát); hôm nay chưa đủ thì không cắt chuỗi', () => {
+    expect(dong(em('H6', 'k k k k k k d d d d d d'))).toMatchObject({ nhom: 'chua-deu', chuoiDuGanNhat: 6 })
+    expect(dong(em('H5', 'k k k k k k d d d d d i'))).toMatchObject({ nhom: 'luoi', chuoiDuGanNhat: 5 })
+  })
+  it('chuỗi GẦN NHẤT mới tính: đủ 6 ngày liền trước đây rồi bỏ ngày ⇒ về lại Lười', () => {
+    expect(dong(em('Q', 'k k k d d d d d d k n k'))).toMatchObject({ nhom: 'luoi', chuoiDuGanNhat: 0, soNgayDu: 6 })
   })
 })
 
@@ -163,7 +194,7 @@ describe('giao diện khối Nhịp học (máy tính)', () => {
     const o = [...document.querySelectorAll('.nht-o-nhom')].map((x) => x.textContent)
     expect(o[0]).toContain('7 em · 44%')
     expect(o[0]).toContain('Đủ mức từ 9/11 ngày trở lên')
-    expect(o[2]).toContain('Đủ mức 4/11 ngày trở xuống, hoặc 3 ngày liền không làm')
+    expect(o[2]).toContain('Đủ mức 4/11 ngày trở xuống, hoặc 3 ngày liền không làm · thoát khi đủ mức 6 ngày liền')
     expect(o[3]).toContain('Có dấu hiệu đối phó')
     expect(o[3]).toContain('4 em')
     expect(screen.getByRole('img', { name: /Hôm nay: 3 em đủ mức, 2 em đang làm, 11 em chưa làm câu nào/ })).toBeTruthy()
