@@ -187,3 +187,4 @@ Thầy nhắn (nguyên văn, kèm ảnh app học sinh tối: khối "Cách ra k
 - [ ] Gộp hai thẻ thành một, trọng tâm là số câu em phải làm hôm nay; một nút học duy nhất | bằng chứng: (chưa có)
 - [ ] Sửa tương phản bản tối thấy trong ảnh (vòng tiến độ, vạch chặng, nút Tiếp tục học tối trên nền tối) | bằng chứng: (chưa có)
 - [ ] Build + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
+- [ ] Thầy nhắn thêm (ảnh bảng Nhịp học của em bản tối, em Lười 2/11): "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé" ⇒ bấm bảng ⇒ tấm Hồ sơ làm bài của CHÍNH em, đủ phần như tấm thầy xem ở Nhịp học (lệnh học sinh chỉ đọc, chỉ của mình, không lộ đáp án / ca chưa công bố) | bằng chứng: (chưa có)
