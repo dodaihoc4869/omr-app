@@ -80,7 +80,9 @@ export function soHomNay(kq: KetQuaSanh | null | undefined, tienDoCu?: { daLam: 
   const daLam = goi7?.daLamHomNay ?? ht?.daLam ?? (sanh ? Math.max(0, sanh.theLuc.tong - sanh.theLuc.con) : tienDoCu?.daLam ?? null)
   const muc = goi7?.toiThieu ?? ht?.toiThieu ?? sanh?.theLuc.tong ?? tienDoCu?.mucTieu ?? null
   if (daLam === null || muc === null || !Number.isFinite(daLam) || !Number.isFinite(muc) || muc <= 0) return null
-  const soChang = ht?.soChang ?? Math.ceil(muc / CAU_MOI_CHANG)
+  // Số chặng đi CÙNG nguồn với M: Gói 7 ⇒ ceil(M/6) (12/10E: Sảnh có cả Hành trình lẫn Gói 7 thì trước đây lấy số chặng của Hành trình — "1/5 chặng" khi
+  // M = 32 cần 6 chặng); Hành trình ⇒ số chặng máy chủ xếp.
+  const soChang = goi7 ? Math.ceil(muc / CAU_MOI_CHANG) : (ht?.soChang ?? Math.ceil(muc / CAU_MOI_CHANG))
   const chang = soChang <= 0 ? null : ht && !goi7 ? (ht.changHienTai >= 1 ? Math.min(ht.changHienTai, soChang) : null) : Math.min(soChang, Math.floor(daLam / CAU_MOI_CHANG) + 1)
   return { daLam, muc, chang, soChang }
 }

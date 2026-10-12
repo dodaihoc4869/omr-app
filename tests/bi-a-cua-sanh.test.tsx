@@ -97,4 +97,5 @@ describe('Cửa Bi-a trên Sảnh bản đồ', () => {
 
 
 // 10/10: cờ Bi-a cũ không được mở lại game ở giao diện học tập.
-it('máy chủ vẫn có cờ Bi-a nhưng app học sinh chỉ mở học tập',async()=>{tra['/game-v2/hoc-tap-sanh']=SANH;localStorage.setItem('omr_student_portal_auth',JSON.stringify({sbd:'test',hoTen:'Em thử',token:'test-token'}));render(<StudentPortalScreen/>);expect(await screen.findByRole('button',{name:'Tiếp tục học'})).toBeTruthy();expect(screen.queryByRole('button',{name:/Bi-a/})).toBeNull();expect(cuocGoi.some(x=>x.url.includes('/bia-sanh'))).toBe(false)})
+// SỬA CÓ CHỦ ĐÍCH 12/10 (thầy 12/10: "gộp hai phần làm một"): nút học duy nhất ghi số câu còn lại ("Học tiếp · N câu" / "Bắt đầu học · N câu").
+it('máy chủ vẫn có cờ Bi-a nhưng app học sinh chỉ mở học tập',async()=>{tra['/game-v2/hoc-tap-sanh']=SANH;localStorage.setItem('omr_student_portal_auth',JSON.stringify({sbd:'test',hoTen:'Em thử',token:'test-token'}));render(<StudentPortalScreen/>);expect(await screen.findByRole('button',{name:/^(Học tiếp|Bắt đầu học) · \d+ câu$/})).toBeTruthy();expect(screen.queryByRole('button',{name:/Bi-a/})).toBeNull();expect(cuocGoi.some(x=>x.url.includes('/bia-sanh'))).toBe(false)})

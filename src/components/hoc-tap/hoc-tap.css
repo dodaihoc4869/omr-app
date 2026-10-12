@@ -379,3 +379,84 @@ body[data-hoc-tap=hs] .h2-cdl{--h2c-xanh-chu:var(--the)}
   .ht2-lam-phim{gap:6px}.ht2-lam-phim button{height:44px}.ht2-lam-nut{min-height:48px}
   .ht2-lam-hang-nut{grid-template-columns:minmax(0,1fr);gap:8px}.ht2-lam-hang-nut>.ht2-lam-nut-chinh{order:-1}
 }
+/* ── THẺ "HÔM NAY CỦA EM" 12/10E (thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu"; TheHomNayEm.tsx) ──
+   Thay khối vòng tròn `.ht2-chinh` + bảng `.ht2-nhe` ở đầu màn Hôm nay; luật cũ của hai khối GIỮ NGUYÊN ở trên (cổng kiem:mau-giu cấm xoá khai báo màu).
+   MÀU: chỉ biến app học sinh (--the --the-2 --vien --muc --nhat --lg-nhan --xanh --do --cam) + color-mix. Đo từ giá trị biến thật (tokens.css), sáng | tối:
+   số "Còn N" + nút (--lg-nhan / chữ --the) 7,84 | 7,56 · chữ --nhat 6,85 | 8,93 · ô xong --lg-nhan 7,84 | 7,56 · viền ô chờ (--nhat 75%) 3,75 | 5,71 (trên nền ô Lười 3,29 | 4,87) ·
+   ô ngày Đủ mức (--xanh 75% + --muc) 3,80 | 8,64 · Thiếu ít (--cam 65%) 4,06 | 9,96 · Không làm / viền Thiếu nhiều (--do 85%) 4,69 | 6,09 — mọi ô, vạch,
+   nút ≥ 3:1 với nền thẻ, mọi chữ ≥ 4,5:1 (khoá ở tests/the-hom-nay-em-1210e.test.tsx).
+   `color-scheme: light dark` TRÊN THẺ: điện thoại bật "tối cho trang web" (Samsung Internet / Chrome) tô tối CHỒNG lên bản tối của app với trang không
+   khai color-scheme — gốc của ảnh thầy 12/10 (vạch chặng xanh than, nút xám, ô ngày đỏ / xanh sẫm). Phần tử có color-scheme dùng là tối thì trình duyệt
+   không tô lại (đã thử bằng Chromium `forceDarkModeEnabled`) ⇒ thẻ hiện đúng màu tối đã đo. */
+.ht2-hn{--nhe-xanh:color-mix(in srgb,var(--xanh) 50%,var(--muc));--nhe-do:color-mix(in srgb,var(--do) 68%,var(--muc));--nhe-cam:color-mix(in srgb,var(--cam) 38%,var(--muc));
+  --hn-o-cho:color-mix(in srgb,var(--nhat) 75%,var(--the));--hn-du:color-mix(in srgb,var(--xanh) 75%,var(--muc));--hn-thieu-it:color-mix(in srgb,var(--cam) 65%,var(--muc));
+  --hn-khong:color-mix(in srgb,var(--do) 85%,var(--muc));
+  color-scheme:light dark;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:20px 18px;border-radius:28px;background:var(--the);color:var(--muc);
+  border:1px solid var(--vien);box-shadow:0 16px 36px -28px color-mix(in srgb,var(--muc) 45%,transparent);min-width:0}
+.ht2-hn[data-nhom=luoi]{border-color:color-mix(in srgb,var(--do) 35%,var(--vien))}
+.ht2-hn p{margin:0}
+.ht2-hn-chinh{display:flex;flex-direction:column;gap:12px;min-width:0}
+.ht2-hn-dau{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;min-height:34px}
+.ht2-hn .ht2-hn-nhan{margin:0;font-size:15px;font-weight:700;letter-spacing:0;line-height:1.35;color:var(--nhat)}
+.ht2-hn-chip-xuong{display:block;width:84px;height:30px;border-radius:999px;background:var(--the-2)}
+.ht2-hn .ht2-hn-so{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;margin-top:2px;font-size:22px;font-weight:700;line-height:1;letter-spacing:-.01em;color:var(--muc)}
+.ht2-hn-so b{font-size:64px;font-weight:800;line-height:.95;letter-spacing:-.045em;color:var(--lg-nhan);font-variant-numeric:tabular-nums}
+.ht2-hn .ht2-hn-so[data-du]{align-items:center;font-size:30px;font-weight:800;line-height:1.15;color:var(--nhe-xanh)}
+.ht2-hn-dau-tick{flex:0 0 44px;width:44px;height:44px;display:grid;place-items:center;border-radius:999px;background:var(--hn-du);color:var(--the)}
+.ht2-hn .ht2-hn-da{font-size:16px;line-height:1.5;color:var(--nhat);font-variant-numeric:tabular-nums}.ht2-hn-da b{color:var(--muc);font-weight:800}
+.ht2-hn-vach,.ht2-hn-sau{display:flex;gap:6px;min-width:0}
+.ht2-hn-vach{margin-top:6px}
+.ht2-hn-vach i,.ht2-hn-sau i{position:relative;display:block;flex:1 1 0;min-width:8px;height:14px;border-radius:999px;overflow:hidden;background:var(--the);box-shadow:inset 0 0 0 1.5px var(--hn-o-cho)}
+.ht2-hn-sau i{height:12px}
+.ht2-hn-vach i[data-tt=xong],.ht2-hn-sau i[data-tt=xong]{background:var(--lg-nhan);box-shadow:none}
+.ht2-hn-vach i[data-tt=dang],.ht2-hn-sau i[data-tt=dang]{box-shadow:inset 0 0 0 2px var(--lg-nhan)}
+.ht2-hn-vach i>span,.ht2-hn-sau i>span{position:absolute;inset:0;background:var(--lg-nhan);transform-origin:left center;transition:transform var(--cd-thanh,250ms)}
+.ht2-hn .ht2-hn-chang{display:flex;justify-content:space-between;gap:2px 12px;flex-wrap:wrap;font-size:14px;line-height:1.4;color:var(--nhat);font-variant-numeric:tabular-nums}
+.ht2-hn-chang>span:first-child{font-weight:700;color:var(--muc)}
+.ht2-hn .ht2-hn-bai{font-size:15px;line-height:1.5;color:var(--nhat);overflow-wrap:anywhere}.ht2-hn-bai b{color:var(--muc);font-weight:700}
+.ht2-hn-nut{width:100%;min-height:56px;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;padding:12px 20px;border:0;border-radius:16px;
+  background:var(--lg-nhan);color:var(--the);font-size:17px;font-weight:700;line-height:1.3;text-align:center;transition:transform var(--cd-nhan,120ms)}
+.ht2-hn-nut[data-phu]{background:var(--the);color:var(--muc);border:1.5px solid var(--hn-o-cho)}
+.ht2-hn-nut:active:not(:disabled){transform:scale(.99)}
+/* phần Nhịp học */
+.ht2-hn-nhip{display:flex;flex-direction:column;gap:12px;min-width:0;padding-top:16px;border-top:1px solid var(--vien)}
+.ht2-hn-nhip-bam{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;width:100%;min-width:0;padding:0;border:0;background:transparent;color:var(--muc);text-align:left}
+button.ht2-hn-nhip-bam{min-height:44px;margin:0;padding:12px;border:1px solid var(--vien);border-radius:18px;background:var(--the);transition:border-color var(--cd-doi-muc,200ms)}
+button.ht2-hn-nhip-bam:hover{border-color:color-mix(in srgb,var(--lg-nhan) 45%,var(--vien))}
+.ht2-hn-du-dong{font-size:16px;font-weight:700;line-height:1.4;font-variant-numeric:tabular-nums;min-width:0}
+.ht2-hn-xem{display:inline-flex;align-items:center;justify-self:start;gap:2px;font-size:15px;font-weight:700;color:var(--lg-nhan);white-space:nowrap}
+.ht2-hn-dai{display:grid;grid-template-columns:repeat(var(--cot,12),minmax(0,1fr));gap:4px;width:100%;max-width:max(132px,calc(var(--cot,12) * 40px));padding:3px 0}
+.ht2-hn-dai i{display:block;height:20px;border-radius:5px}
+.ht2-hn i[data-loai=du]{background:var(--hn-du)}
+.ht2-hn i[data-loai=thieu-it]{background:var(--hn-thieu-it)}
+.ht2-hn i[data-loai=thieu-nhieu]{background:color-mix(in srgb,var(--do) 22%,var(--the));box-shadow:inset 0 0 0 2px var(--hn-khong)}
+.ht2-hn i[data-loai=khong-lam]{background:var(--hn-khong)}
+.ht2-hn i[data-loai=cho]{background:var(--the);box-shadow:inset 0 0 0 2px var(--lg-nhan)}
+.ht2-hn-dai i[data-hom-nay]:not([data-loai=cho]){outline:2px solid var(--lg-nhan);outline-offset:1px}
+.ht2-hn-chu-thich{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;font-weight:500;line-height:1.4;color:var(--nhat)}
+.ht2-hn-chu-thich>span{display:inline-flex;align-items:center;gap:6px}
+.ht2-hn-chu-thich i{display:block;flex:0 0 12px;width:12px;height:12px;border-radius:3px}
+.ht2-hn-luoi{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--lg-nhan) 8%,var(--the))}
+.ht2-hn .ht2-hn-luoi p{font-size:15px;line-height:1.5}
+.ht2-hn .ht2-hn-tiep{font-size:15px;line-height:1.5}
+.ht2-hn .ht2-hn-toc{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:14px;font-size:14px;line-height:1.45;background:color-mix(in srgb,var(--cam) 14%,var(--the));color:var(--nhe-cam)}
+.ht2-hn-toc svg{flex:0 0 18px;margin-top:1px}
+.ht2-hn .ht2-hn-thay{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--lg-nhan)}
+.ht2-hn-xuong{display:flex;flex-direction:column;gap:10px}.ht2-hn-xuong>span{display:block;border-radius:10px;background:var(--the-2)}
+@media(prefers-reduced-motion:no-preference){.ht2-hn-xuong>span,.ht2-hn-chip-xuong{animation:ht2-nhap 1.2s ease-in-out infinite alternate}}
+@media(prefers-reduced-motion:reduce){.ht2-hn-nut,.ht2-hn-vach i>span,.ht2-hn-sau i>span,button.ht2-hn-nhip-bam{transition:none}}
+@media(max-width:380px){.ht2-hn{padding:18px 14px}.ht2-hn-so b{font-size:56px}}
+/* máy tính: hai cột cân — phần chính (số + vạch + nút) | Nhịp học, ngăn bằng một đường dọc; không có Nhịp học ⇒ một cột vừa đọc. */
+@media(min-width:1000px){
+  .ht2-hn{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:0;padding:28px 32px;align-items:start}
+  .ht2-hn[data-mot]{grid-template-columns:minmax(0,640px)}
+  .ht2-hn-chinh{padding-right:32px}
+  .ht2-hn-nhip{align-self:stretch;padding:0 0 0 32px;border-top:0;border-left:1px solid var(--vien)}
+  .ht2-hn-nut{width:auto;min-width:300px;align-self:flex-start}
+  .ht2-hn-dai{grid-template-columns:repeat(var(--cot-rong,12),minmax(0,1fr));max-width:max(132px,calc(var(--cot-rong,12) * 44px))}
+  .ht2-hn-dai i{height:24px}
+  .ht2-hn-nhip-bam{grid-template-columns:minmax(0,1fr) auto;column-gap:12px}
+  .ht2-hn-nhip-bam>:not(.ht2-hn-xem){grid-column:1/-1}
+  .ht2-hn-nhip-bam>.ht2-hn-du-dong{grid-column:1;grid-row:1}
+  .ht2-hn-xem{grid-column:2;grid-row:1;justify-self:end;font-size:14px}
+}

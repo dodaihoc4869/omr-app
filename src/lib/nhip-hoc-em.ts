@@ -1,12 +1,14 @@
-// BẢNG "NHỊP HỌC CỦA EM" (app học sinh, đầu màn Hôm nay — thầy 12/10 duyệt bản vẽ HS-Cham / HS-Luoi). Lớp nối + PHÉP THUẦN (test gọi thẳng —
-// tests/nhip-hoc-em-1210c.test.tsx). Lệnh CHỈ ĐỌC `POST /hs/nhip-hoc {token}` (hợp đồng `KetQuaNhipHocEm`, server/src/nhip-hoc-kieu.ts; máy chủ
-// server/src/nhip-hoc-em.ts). Không ném lỗi: thiếu token / mất mạng / 404 / thân lạ ⇒ null ⇒ bảng ẩn gọn (không chặn màn).
-// Luật nhóm + mọi số do máy chủ tính bằng CÙNG phép thuần với Hôm nay của thầy (server/src/nhip-hoc-luat.ts) ⇒ em và thầy thấy cùng một số.
+// NHỊP HỌC CỦA EM (app học sinh, phần dưới của thẻ "Hôm nay của em" ở đầu màn Hôm nay — thầy 12/10 duyệt bản vẽ HS-Cham / HS-Luoi, rồi 12/10:
+// "gộp 2 phần làm bài này vào làm một"). Lớp nối + PHÉP THUẦN (test gọi thẳng — tests/nhip-hoc-em-1210c.test.tsx, tests/the-hom-nay-em-1210e.test.tsx).
+// Lệnh CHỈ ĐỌC `POST /hs/nhip-hoc {token}` (hợp đồng `KetQuaNhipHocEm`, server/src/nhip-hoc-kieu.ts; máy chủ server/src/nhip-hoc-em.ts). Không ném lỗi:
+// thiếu token / mất mạng / 404 / thân lạ ⇒ null ⇒ phần Nhịp học ẩn gọn (phần chính của thẻ vẫn đủ).
+// Luật nhóm + mọi số do máy chủ tính bằng CÙNG phép thuần với Hôm nay của thầy (server/src/nhip-hoc-luat.ts) ⇒ em và thầy thấy cùng một số. Riêng HÔM NAY:
+// `nhipTheoSanh` thay số hôm nay bằng số của Sảnh (cập nhật sau mỗi câu) rồi tính lại bằng đúng phép thuần ấy ⇒ thẻ chỉ có MỘT con số câu hôm nay.
 // Chữ: bảng từ chuẩn (docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md) — "đủ mức", "Chuỗi ngày", không mã nội bộ; lời thẳng, không khen sáo.
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { LUAT_NHOM_NHIP, type KetQuaNhipHocEm, type NgayNhipEm, type NhomNhip, type TocDoNhipEm, type ViecTiepNhip } from '../../server/src/nhip-hoc-kieu'
 import { NGUONG_THAI_DO } from '../../server/src/bai-hang-ngay-kieu'
-import { TEN_NHOM_NHIP } from '../../server/src/nhip-hoc-luat'
+import { TEN_NHOM_NHIP, tomTatNhip, viecTiepNhip } from '../../server/src/nhip-hoc-luat'
 
 export type { KetQuaNhipHocEm, NgayNhipEm, NhomNhip, TocDoNhipEm, ViecTiepNhip }
 export { LUAT_NHOM_NHIP, TEN_NHOM_NHIP }
@@ -98,30 +100,39 @@ export async function layNhipHocEm(token: string): Promise<KetQuaNhipHocEm | nul
 
 /** "01/10". */
 export const ngayNgan = (ngay: string): string => `${ngay.slice(8, 10)}/${ngay.slice(5, 7)}`
-/** "06–09/10" (cùng tháng) · "30/09–02/10". */
-export const khoangNgan = (tu: string, den: string): string => (tu === den ? ngayNgan(tu) : tu.slice(0, 7) === den.slice(0, 7) ? `${tu.slice(8, 10)}–${ngayNgan(den)}` : `${ngayNgan(tu)}–${ngayNgan(den)}`)
-/** 1234 ⇒ "1.234" (không phụ thuộc Intl). */
-export const soChu = (n: number): string => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
 const L = LUAT_NHOM_NHIP
 const conHomNay = (k: KetQuaNhipHocEm): number => (k.homNayMuc ? Math.max(0, k.homNayMuc.muc - k.homNayMuc.lam) : 0)
 const homNayDu = (k: KetQuaNhipHocEm): boolean => !!k.homNayMuc && k.homNayMuc.lam >= k.homNayMuc.muc
 
-/** Dòng điều kiện dưới số lớn (bản vẽ: "91% số ngày đã qua · nhóm Chăm cần từ 80%" · "18% số ngày đã qua · bỏ 4 ngày liền (06–09/10)"). */
-export function chuDieuKienEm(k: KetQuaNhipHocEm): string {
-  if (k.nhom === 'chua-du') {
-    const con = Math.max(0, L.soNgayToiThieu - k.soNgayQua)
-    return `Cần ít nhất ${L.soNgayToiThieu} ngày đã qua để xếp nhóm — còn ${con} ngày nữa.`
+/** Dòng đầu phần Nhịp học: "Đủ mức 2/11 ngày từ 01/10" (số ngày ĐÃ QUA, không gồm hôm nay — hôm nay là ô viền cuối dải). */
+export const chuDuMucEm = (k: KetQuaNhipHocEm): string =>
+  k.soNgayQua > 0 ? `Đủ mức ${k.soNgayDu}/${k.soNgayQua} ngày từ ${ngayNgan(k.tu)}` : `Bắt đầu đếm từ hôm nay ${ngayNgan(k.homNay)}`
+
+/**
+ * MỘT CON SỐ (thầy 12/10: gộp hai phần làm một): ô "hôm nay" của dải và mọi câu nói về hôm nay dùng CÙNG mức M và số đã làm của Sảnh (cập nhật sau
+ * mỗi câu), không dùng số cũ của `/hs/nhip-hoc` khi lệch. Thay ngày hôm nay trong dải (chưa có thì thêm cuối) rồi tính lại bằng ĐÚNG phép thuần máy
+ * chủ (`tomTatNhip` + `viecTiepNhip`) — các ngày đã qua (đủ mức a/b, chuỗi bỏ) không đổi; nhóm, chuỗi ngày và việc tiếp theo kịp số hôm nay.
+ * Thiếu số Sảnh (M ≤ 0) ⇒ giữ nguyên. Thuần.
+ */
+export function nhipTheoSanh(k: KetQuaNhipHocEm, so: { muc: number; daLam: number } | null | undefined): KetQuaNhipHocEm {
+  if (!so || !Number.isFinite(so.muc) || !Number.isFinite(so.daLam) || so.muc <= 0) return k
+  const hom: NgayNhipEm = { ngay: k.homNay, muc: Math.round(so.muc), lam: Math.max(0, Math.round(so.daLam)) }
+  const ngay = k.ngay.some((x) => x.ngay === k.homNay) ? k.ngay.map((x) => (x.ngay === k.homNay ? hom : x)) : [...k.ngay, hom]
+  const t = tomTatNhip(ngay, k.homNay)
+  return {
+    ...k,
+    ngay,
+    nhom: t.nhom,
+    chuoiDuGanNhat: t.chuoiDuGanNhat,
+    ngayDuGanNhat: t.ngayDuGanNhat,
+    tongDaLam: t.tongLam + hom.lam,
+    homNayMuc: t.homNay,
+    viecTiep: viecTiepNhip(t),
   }
-  const p = `${k.phanTram ?? 0}% số ngày đã qua`
-  if (k.nhom === 'luoi') {
-    const b = k.chuoiBo
-    return b && b.dai >= L.ngayLienKhongLam ? `${p} · bỏ ${b.dai} ngày liền (${khoangNgan(b.tu, b.den)})` : `${p} · từ ${L.luoiDen}% trở xuống là nhóm Lười`
-  }
-  return `${p} · nhóm Chăm cần từ ${L.chamTu}%`
 }
 
-/** "Việc tiếp:" cho Chăm / Chưa đều / Chưa đủ dữ liệu (Lười dùng `chuThoatLuoi`). */
+/** "Việc tiếp:" cho Chăm / Chưa đều / Chưa đủ dữ liệu (Lười dùng `chuRaKhoiLuoi`). */
 export function chuViecTiep(k: KetQuaNhipHocEm): string {
   const v = k.viecTiep
   const c = conHomNay(k)
@@ -135,22 +146,20 @@ export function chuViecTiep(k: KetQuaNhipHocEm): string {
     return `cần thêm ${v.ngayCanThem} ngày đủ mức (tính cả hôm nay) để lên nhóm Chăm — hôm nay còn ${c} câu.${giu}`
   }
   if (v.loai === 'chua-du') return v.homNayDu ? 'hôm nay em đã đủ mức. Mỗi ngày đủ mức là một ngày đủ trên dải ô.' : `làm đủ mức mỗi ngày — hôm nay còn ${c} câu.`
-  return chuThoatLuoi(k)
+  return chuRaKhoiLuoi(k)
 }
 
-/** Câu trong khối "Cách ra khỏi nhóm Lười" (bản vẽ: "Em đang có 0/6 ngày — bắt đầu từ hôm nay với 30 câu."). */
-export function chuThoatLuoi(k: KetQuaNhipHocEm): string {
+/** Dòng Lười (thầy 12/10: "6 ngày liền làm đủ mới thoát nhóm lười"): "Ra khỏi nhóm Lười: đủ mức 6 ngày liền — em đang có k/6 ngày" + hôm nay chưa đủ
+ *  thì "hôm nay còn N câu nữa là được k+1/6 ngày" (N, k theo số của Sảnh qua `nhipTheoSanh`). Không có nút thứ hai — nút học duy nhất ở phần chính. */
+export function chuRaKhoiLuoi(k: KetQuaNhipHocEm): string {
   const v = k.viecTiep
   const can = v.loai === 'thoat-luoi' ? v.canNgay : L.ngayLienThoatLuoi
   const co = Math.min(v.loai === 'thoat-luoi' ? v.coNgay : k.chuoiDuGanNhat, can)
-  const c = conHomNay(k)
-  if (homNayDu(k)) return `Em đang có ${co}/${can} ngày, đã tính hôm nay — mai làm đủ mức để lên ${Math.min(co + 1, can)}/${can}.`
-  if (co === 0) return (k.homNayMuc?.lam ?? 0) > 0 ? `Em đang có 0/${can} ngày — hôm nay còn ${c} câu nữa là được ngày đầu tiên.` : `Em đang có 0/${can} ngày — bắt đầu từ hôm nay với ${c} câu.`
-  return `Em đang có ${co}/${can} ngày — hôm nay làm đủ thêm ${c} câu để lên ${co + 1}/${can}.`
+  const dau = `Ra khỏi nhóm Lười: đủ mức ${can} ngày liền — em đang có ${co}/${can} ngày`
+  if (co >= can || !k.homNayMuc) return `${dau}.`
+  if (homNayDu(k)) return `${dau}, đã tính hôm nay. Mai làm đủ mức là được ${co + 1}/${can} ngày.`
+  return `${dau}, hôm nay còn ${conHomNay(k)} câu nữa là được ${co + 1}/${can} ngày.`
 }
-
-/** Nút trong khối Lười: chỉ khi hôm nay còn câu. */
-export const chuNutHocNgay = (k: KetQuaNhipHocEm): string | null => (homNayDu(k) || conHomNay(k) <= 0 ? null : `Học ngay · ${conHomNay(k)} câu hôm nay`)
 
 /** Dòng tốc độ làm bài (bản vẽ: "Tốc độ làm bài bình thường: 2/96 lượt dưới 8 giây." · "21/49 lượt em trả lời dưới 8 giây, nhóm này chỉ đúng 28%. Đọc hết đề rồi mới chọn."). */
 export function chuTocDo(t: TocDoNhipEm): string {
@@ -161,29 +170,6 @@ export function chuTocDo(t: TocDoNhipEm): string {
   const p = Math.round((100 * t.soNhanh) / Math.max(1, t.soCoGiay))
   if (t.muc === 'xau') return `${t.soNhanh}/${t.soCoGiay} lượt em trả lời ${nguong}, nhóm này chỉ đúng ${t.dungNhanh ?? 0}%. Đọc hết đề rồi mới chọn.`
   return `${t.soNhanh}/${t.soCoGiay} lượt em trả lời ${nguong} (${p}%)${t.dungNhanh !== null ? `, nhóm này đúng ${t.dungNhanh}%` : ''}. Đọc hết đề rồi mới chọn.`
-}
-
-/** Ba ô số (bản vẽ). Chăm / Chưa đều / Chưa đủ dữ liệu: ngày liền đủ mức · câu đã làm · câu hôm nay. Lười: câu còn thiếu · ngày đủ mức gần nhất · câu hôm nay. */
-export interface OSoEm {
-  so: string
-  nhan: string
-  /** 'nhom' = màu của nhóm · 'chinh' = màu nhấn chàm (câu hôm nay) · '' = màu chữ thường. */
-  sac: 'nhom' | 'chinh' | ''
-}
-export function oSoEm(k: KetQuaNhipHocEm): OSoEm[] {
-  const hom: OSoEm = { so: k.homNayMuc ? `${k.homNayMuc.lam}/${k.homNayMuc.muc}` : '—', nhan: 'câu hôm nay', sac: 'chinh' }
-  if (k.nhom === 'luoi') {
-    return [
-      { so: soChu(k.tongCauThieu), nhan: `câu còn thiếu từ ${ngayNgan(k.tu)}`, sac: 'nhom' },
-      { so: k.ngayDuGanNhat ? ngayNgan(k.ngayDuGanNhat) : 'Chưa có', nhan: 'ngày đủ mức gần nhất', sac: '' },
-      hom,
-    ]
-  }
-  return [
-    { so: String(k.chuoiDuGanNhat), nhan: 'ngày liền đủ mức', sac: 'nhom' },
-    { so: soChu(k.tongDaLam), nhan: `câu đã làm từ ${ngayNgan(k.tu)}`, sac: '' },
-    hom,
-  ]
 }
 
 /** Loại một ô ngày trên dải (đúng bốn mức của bảng Bài hằng ngày; hôm nay chưa làm ⇒ 'cho'). */

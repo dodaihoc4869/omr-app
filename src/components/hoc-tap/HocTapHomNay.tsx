@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowRight, Atom, BookOpen, Check, ChevronRight, ClipboardCheck, FileClock, History, Home, LineChart, LogOut, Mail, PenLine, RefreshCw, Route, Target, Users, X } from 'lucide-react'
 import type { KetQuaSanh } from '../hoa2/api'
 import type { TomTatGoi7 } from '../../lib/goi-bai-7'
 import './hoc-tap.css'
 import TheGoi7 from './TheGoi7'
-import NhipHocEm from './NhipHocEm'
+import TheHomNayEm, { chuNutHoc } from './TheHomNayEm'
+import { soHomNay } from './lam-bai'
 
 // TRÙNG TU 11/10 (thầy duyệt bản vẽ https://claude.ai/artifact/5v8vXw5zBzw53FkpCvMknC — "buid và đẩy luôn nhé"):
 // 4 mục Hôm nay · Hành trình · Ôn & sửa · Kết quả; "Của em" là tấm mở từ ảnh đại diện; "Vào ca kiểm tra" luôn ở góc trên
@@ -19,8 +20,10 @@ interface Props {
   onTaiLai: () => void; onDangXuat: () => void; coCa: boolean
   /** Số bài tập về nhà thầy đang giao (dòng ở Hôm nay chỉ hiện khi > 0). */
   soBaiTap?: number
-  /** Token phiên của em — bảng "Nhịp học của em" (12/10) đọc `/hs/nhip-hoc`; không có ⇒ bảng không hiện. */
+  /** Token phiên của em — phần Nhịp học của thẻ "Hôm nay của em" (12/10) đọc `/hs/nhip-hoc`; không có ⇒ phần ấy không hiện. */
   token?: string
+  /** Có ⇒ khối Nhịp học trong thẻ "Hôm nay của em" bấm được, mở hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm"). */
+  onMoHoSo?: () => void
 }
 /** Tên ngắn 4 tầng của Hành trình (thầy chốt bản vẽ 11/10). */
 export const TANG = ['Nền', 'Hiểu', 'Vận dụng', 'Tổng hợp']
@@ -52,18 +55,11 @@ export default function HocTapHomNay(p: Props) {
   const sanh = p.ketQua?.cheDo2 && 'sanh' in p.ketQua ? p.ketQua.sanh : null
   const ht = sanh?.hanhTrinh
   const goi7 = sanh?.goi7
-  const daLam = goi7?.daLamHomNay ?? ht?.daLam ?? (sanh ? Math.max(0, sanh.theLuc.tong - sanh.theLuc.con) : p.tienDoCu?.daLam ?? null)
-  const mucNgay = goi7?.toiThieu ?? ht?.toiThieu ?? sanh?.theLuc.tong ?? p.tienDoCu?.mucTieu ?? null
-  // MỘT CON SỐ (thầy 12/10: "học sinh làm 24 câu nhưng lại báo 31 câu"): Gói 7 hay Hành trình đều "đạt" khi đã làm ≥ mức hôm nay — đúng `datMuc` phía
-  // thầy / phụ huynh / Nhịp học. Câu mới theo lịch còn lại của gói KHÔNG chặn chữ đạt (máy chủ đã xếp chúng trong mức; phần chưa gặp dồn sang ngày sau).
-  const xong = daLam !== null && mucNgay !== null && mucNgay > 0 && daLam >= mucNgay
-  const soChang = ht?.soChang ?? (mucNgay ? Math.ceil(mucNgay / 6) : 0)
+  // MỘT CON SỐ (thầy 12/10: "học sinh làm 24 câu nhưng lại báo 31 câu"): M và đã làm của hôm nay lấy MỘT chỗ — `soHomNay` (Gói 7 → Hành trình → thể
+  // lực → kế hoạch cũ), cùng hàm màn làm bài dùng. "Đủ mức" khi đã làm ≥ M — đúng `datMuc` phía thầy / phụ huynh / Nhịp học; câu mới theo lịch còn lại
+  // của gói KHÔNG chặn chữ đạt (máy chủ đã xếp chúng trong mức; phần chưa gặp dồn sang ngày sau).
+  const so = soHomNay(p.ketQua, p.tienDoCu)
   const con = sanh?.theLuc.con ?? null
-  const phanTram = daLam !== null && mucNgay ? Math.min(100, Math.round((daLam / mucNgay) * 100)) : 0
-  const xongChang = (i: number) => daLam !== null && daLam >= Math.min((i + 1) * 6, mucNgay ?? Infinity)
-  const soChangXong = Array.from({ length: soChang }, (_, i) => xongChang(i)).filter(Boolean).length
-  const conCau = daLam !== null && mucNgay !== null ? Math.max(0, mucNgay - daLam) : null
-  const chuNut = con === 0 ? 'Đã làm hết câu được giao' : daLam ? 'Tiếp tục học' : 'Bắt đầu học'
   const khoaHoc = p.dangLamMoi || p.dangTai && !sanh || con === 0
   const baiXep = [...(ht?.bai ?? [])].sort((a, b) => b.tangMo - a.tangMo)
 
@@ -77,7 +73,7 @@ export default function HocTapHomNay(p: Props) {
   }, [moCuaEm])
   const dongTam = (fn: () => void) => () => { setMoCuaEm(false); fn() }
 
-  const nutHoc = (phu: boolean) => <button className={phu ? 'ht-nut-phu ht2-nut-lon' : 'ht-nut-chinh ht2-nut-lon'} onClick={p.onHoc} disabled={khoaHoc}>{chuNut}<ArrowRight size={20} aria-hidden="true" /></button>
+  const nutHoc = (phu: boolean) => <button className={phu ? 'ht-nut-phu ht2-nut-lon' : 'ht-nut-chinh ht2-nut-lon'} onClick={p.onHoc} disabled={khoaHoc}>{chuNutHoc(so, con === 0)}<ArrowRight size={20} aria-hidden="true" /></button>
 
   return <div className="ht-app ht2" data-nguon={p.nguon}>
     <header className="ht-thanh ht2-thanh">
@@ -99,21 +95,11 @@ export default function HocTapHomNay(p: Props) {
         {p.coCa && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
         {muc === 'hom-nay' && <>
-          {/* 12/10 (thầy duyệt bản vẽ HS-Cham / HS-Luoi): bảng Nhịp học của em ĐẦU màn, trên khối Hôm nay chính; lỗi ⇒ ẩn gọn. */}
-          <NhipHocEm token={p.token} onHoc={p.onHoc} tatHoc={khoaHoc} lamMoi={daLam} />
-          <section className="ht2-chinh" aria-busy={p.dangTai && !sanh} aria-label="Mục tiêu hôm nay">
-            <div className="ht2-vong" style={{ '--p': phanTram } as CSSProperties} aria-hidden="true"><span><b>{daLam ?? '—'}</b><small>trên {mucNgay ?? '—'} câu</small></span></div>
-            <progress className="ht2-an" aria-label="Tiến độ nhiệm vụ hôm nay" value={daLam ?? 0} max={Math.max(1, mucNgay ?? 1)} />
-            <div className="ht2-chinh-chu">
-              <p className="ht2-nhan">{xong ? 'Đã đạt mục tiêu hôm nay' : 'Mục tiêu hôm nay'}</p>
-              <h2>{p.dangTai && !sanh ? 'Đang tải bài học…' : xong ? 'Em đã hoàn thành phần được xếp hôm nay' : goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : 'Tiếp tục bài học của em'}</h2>
-              <p className="ht2-phu">{goi7?.goi[0]?.ten || sanh?.chienDich?.ten || 'Bài học được chọn theo kiến thức và lịch ôn của em.'}{conCau !== null && !xong ? ` · còn ${conCau} câu` : ''}</p>
-              {soChang > 0 && <div className="ht2-chang" aria-label={`Xong ${soChangXong} trong ${soChang} chặng`}>{Array.from({ length: soChang }, (_, i) => <i key={i} data-tt={xongChang(i) ? 'xong' : i === soChangXong ? 'dang' : 'cho'} />)}</div>}
-              {soChang > 0 && <p className="ht2-chang-chu"><span>Xong {soChangXong} chặng</span><span>{soChang} chặng · mỗi chặng tối đa 6 câu</span></p>}
-              {nutHoc(p.coCa)}
-              {xong && <p className="ht-chu-phu">Em có thể nghỉ. Câu đã làm và kiến thức đã vững được theo dõi riêng.</p>}
-            </div>
-          </section>
+          {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
+              và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
+          <TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
+            viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
+            onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
           {goi7 && <TheGoi7 du={goi7} />}
           {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có; thầy có thể bổ sung kiến thức.</div>}
           {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu được giữ cho ca kiểm tra. Bài học sẽ cập nhật khi đủ điều kiện.</div>}
