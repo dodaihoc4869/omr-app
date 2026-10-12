@@ -115,6 +115,14 @@ const DS = [
   ['24-gv-hoc-sinh-ep-toi', 'gv-hoc-sinh&giao=toi', 1440, 900, 'light', false, /Học sinh/],
   ['24-gv-mo-ca-ep-sang', 'gv-mo-ca&giao=sang', 1440, 900, 'dark', false, /Mở ca kiểm tra/],
   ['18-gv-ma-tran-de', 'gv-ma-tran', 1440, 700, 'light', false, /Ma trận đề/],
+  // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): app phụ huynh trùng tu — Hôm nay (khối chính có câu đúng/sai/giây · Gợi ý nhắc con · Lịch học tuần này)
+  // và Tiến bộ (Đúng và sai theo ngày · Thời gian làm câu · Câu sai gần đây). Điện thoại 390×844 + máy tính 1440×900, sáng + tối; thêm trạng thái lỗi.
+  ...['light', 'dark'].flatMap((nen) => [[390, 844, 'dien-thoai'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => [
+    [`40-ph1210-hom-nay-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph', w, h, nen, true, /Gợi ý nhắc con/],
+    [`40-ph1210-tien-bo-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph', w, h, nen, true, /Hôm nay/, 'ph:tien-bo:Thời gian làm câu'],
+  ])),
+  ['40-ph1210-hom-nay-loi', 'ph&tq=loi', 390, 844, 'light', true, /Máy chủ đang bận/],
+  // ---- hết khối LÀN PHỤ HUYNH 12/10
 ]
 
 const loiTrang = []
