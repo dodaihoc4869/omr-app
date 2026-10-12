@@ -98,6 +98,8 @@ if (LA_DD12C) document.documentElement.dataset.canhDd12c = '1' // LÀN ĐIỂM D
 // ═════════ LÀN HÔM NAY 12/10B: `gv-hom-nay&nh=1` = Hôm nay của thầy bản vẽ duyệt 12/10 (Việc cần thầy dạng thẻ + Nhịp học: 262 em × 12 ngày, hai cột
 // Lười nhất · Chăm nhất, Đối phó, Theo lớp, bảng từng ngày, tấm hồ sơ). `/gv/nhip-hoc` GIẢ: gia/nhip-hoc.ts; `&nh=loi` máy chủ lỗi · `&nh=trong` chưa có em. ═════════
 import { nhipHocGia } from './gia/nhip-hoc'
+// ═════════ LÀN THẺ HÔM NAY 12/10E: `?man=hs-the&the=…` = thẻ "Hôm nay của em" (gộp vòng Mục tiêu hôm nay + bảng Nhịp học) — bộ giả Nhịp học dùng lại. ═════════
+import { NHIP_EM_CHAM, NHIP_EM_CHUA_DEU, NHIP_EM_LUOI } from './gia/nhip-hoc-em'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -401,6 +403,42 @@ const manNhipEm = () =>
   h(HocTapHomNay, { ten: thamSo.get('nhe')?.startsWith('luoi') ? 'Ngọc Ánh' : 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_NHE } as never, dangTai: false, loi: '', coCa: false, token: 'tk',
     onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })
 // ═════════════════════════════════════════ hết LÀN NHỊP EM 12/10C ═════════════════════════════════════════
+// ═════════════════════════════════════════ LÀN THẺ HÔM NAY 12/10E ═════════════════════════════════════════
+// Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu". Cảnh `?man=hs-the&the=luoi|cham|chua-deu|du|loi`
+// (component THẬT HocTapHomNay, token 'tk'; `&hs=0` = không truyền onMoHoSo). Sảnh giả: Gói 7 "Bài 8. Amine" (Lười đúng ảnh thầy: 7/32 · 25 câu tự làm ·
+// 0 câu học có hỗ trợ · 6 chặng) hoặc Hành trình (Chăm). `/hs/nhip-hoc` GIẢ (bọc `fetch`, chỉ cảnh hs-the) cố ý giữ số hôm nay CŨ (vd Lười 0/30) để ảnh chứng
+// minh thẻ dùng số của Sảnh (MỘT con số); `loi` ⇒ máy chủ 500 ⇒ phần Nhịp học ẩn gọn.
+const THE_1210E = thamSo.get('the') ?? 'luoi'
+const goi7The = (muc: number, lam: number, tuLam: number, hoTro: number) => ({
+  bat: true, ngay: '2026-10-12', toiThieu: muc, daLamHomNay: lam, tuLamCon: tuLam, tiepCanCon: hoTro, thieuPhu: 0, thieuNgay: 0, canHoTro: false,
+  kienThucCu: { tong: 0, dat: 0, tyLe: null }, diemDaDo: [],
+  goi: [{ id: 'g7:amine', ten: 'Bài 8. Amine', batDau: '2026-10-11', han: '2026-10-16', tong: 164, daGap: 8 + lam, con: 156 - lam, quota: 32, gapHomNay: Math.min(lam, 8), quaHan: false, canBoSung: 0, to: ['DH-B8-TN'] }],
+})
+const NHIP_1210E = THE_1210E === 'loi' ? null
+  : THE_1210E === 'cham' || THE_1210E === 'du' ? NHIP_EM_CHAM
+  : THE_1210E === 'chua-deu' ? NHIP_EM_CHUA_DEU
+  : { ...NHIP_EM_LUOI, tocDo: { soNhanh: 28, soCoGiay: 50, dungNhanh: 43, coTuTinh: true, muc: 'xau' as const } }
+if (man === 'hs-the') {
+  const fetchChung = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    if (new URL(url, location.href).pathname.endsWith('/hs/nhip-hoc')) {
+      const r = NHIP_1210E ?? { ok: false, error: 'Chưa tải được nhịp học của em.' }
+      return new Response(JSON.stringify(r), { status: NHIP_1210E ? 200 : 500, headers: { 'content-type': 'application/json' } })
+    }
+    return fetchChung(input, init)
+  }
+}
+const SANH_1210E =
+  THE_1210E === 'cham' ? { ...SANH_MOI, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: 18, daXep: 30, soChang: 5, changHienTai: 4 }, theLuc: { con: 12, tong: 30 } }
+  : THE_1210E === 'du' ? { ...SANH_MOI, chienDich: null, goi7: goi7The(30, 31, 0, 0), theLuc: { con: 6, tong: 37 } }
+  : THE_1210E === 'chua-deu' ? { ...SANH_MOI, chienDich: null, goi7: goi7The(30, 5, 19, 6), theLuc: { con: 25, tong: 30 } }
+  : { ...SANH_MOI, chienDich: null, goi7: goi7The(32, 7, 25, 0), theLuc: { con: 25, tong: 32 } }
+const manTheHomNay = () =>
+  h(HocTapHomNay, { ten: 'Đỗ Đại Học', lop: '12 - Lớp Thường', ketQua: { cheDo2: true, sanh: SANH_1210E } as never, dangTai: false, loi: '', coCa: false, token: 'tk',
+    onMoHoSo: thamSo.get('hs') === '0' ? undefined : noop,
+    onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })
+// ═════════════════════════════════════════ hết LÀN THẺ HÔM NAY 12/10E ═════════════════════════════════════════
 // ═════════════════════════════════════════ LÀN MÀN LÀM BÀI 12/10D ═════════════════════════════════════════
 // Thầy 12/10 duyệt bản vẽ dot13 (màn làm bài học sinh: Đúng–sai · Trắc nghiệm · Trả lời ngắn 4 ô + bàn phím số · câu mới tự làm / học cách giải ·
 // phản hồi sai / đúng · xong chặng). Cảnh `?man=lam13[&lam=g7|ds-dau]`: component THẬT ManLamBaiTap trong ĐÚNG lớp bọc cuộn của cổng học sinh
@@ -426,6 +464,7 @@ const MAN_THAY: Record<string, string> ={ 'gv-hom-nay':'tongquan', 'gv-kho':'nga
 const con =
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
   man === 'hs-nhip' ? manNhipEm() : // LÀN NHỊP EM 12/10C
+  man === 'hs-the' ? manTheHomNay() : // LÀN THẺ HÔM NAY 12/10E
   man === 'lam13' ? h(ManLam13) : // LÀN MÀN LÀM BÀI 12/10D
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })

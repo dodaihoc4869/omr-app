@@ -27,6 +27,9 @@ const goc = `http://127.0.0.1:${may.address().port}`
 const trangGoc = `${goc}/scripts/chup-v2/trang.html`
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
 const trinh = await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
+// LÀN THẺ HÔM NAY 12/10E: trình duyệt ÉP TỐI trang web (như "tối cho trang web" của Samsung Internet / Chrome trên điện thoại) — chỉ mở khi có cảnh 'ep-toi'.
+let epToi = null
+const trinhEpToi = async () => (epToi ??= await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--blink-settings=forceDarkModeEnabled=true'] }))
 
 // ═══════════ LÀN HỌC SINH 12/10: Tu luyện trùng tu · Chữa trực tiếp câu gốc (thiếu bài luyện từng bước) · danh sách Tự chữa lỗi ═══════════
 // 3 khổ (390×844, 844×390, 1440×900) × sáng/tối; cảnh `?man=hs12-*` ở trang.tsx (khối cùng tên). Chạy riêng: tiền tố "4" (40-, 41-, 42-).
@@ -147,6 +150,20 @@ const DS_NHE = [
 ]
 // ═══════════ hết LÀN NHỊP EM 12/10C ═══════════
 
+// ═══════════ LÀN THẺ HÔM NAY 12/10E: app học sinh › Hôm nay — MỘT thẻ "Hôm nay của em" (gộp vòng Mục tiêu hôm nay + bảng Nhịp học, thầy 12/10) ═══════════
+// Cảnh `?man=hs-the&the=luoi|cham|chua-deu|du|loi` (trang.tsx khối cùng tên). Lười (7/32 như ảnh thầy) · Chăm · Chưa đều · đủ mức · `/hs/nhip-hoc` lỗi ×
+// 390×844 / 1440×900 × sáng / tối, CẢ TRANG. Thêm nền 'ep-toi' = máy tối + trình duyệt ÉP TỐI trang web (Chromium `forceDarkModeEnabled`, như Samsung Internet
+// / Chrome "tối cho trang web" trên máy thầy) — thẻ khai `color-scheme` nên vẫn đúng màu tối đã đo. Chạy riêng: tiền tố "the1210e".
+const DS_THE1210E = [
+  ...['light', 'dark'].flatMap((nen) => [[390, 844, 'dien-thoai'], [1440, 900, 'may-tinh']].flatMap(([w, hh, kho]) =>
+    ['luoi', 'cham', 'chua-deu', 'du', 'loi'].map((the) =>
+      [`the1210e-${the}-${kho}${nen === 'dark' ? '-toi' : ''}`, `hs-the&the=${the}`, w, hh, nen, true, the === 'loi' ? /Còn 25 câu|Còn/ : /Thầy cũng thấy bảng này/]))),
+  ['the1210e-luoi-dien-thoai-ep-toi', 'hs-the&the=luoi', 390, 844, 'ep-toi', true, /Thầy cũng thấy bảng này/],
+  ['the1210e-du-dien-thoai-ep-toi', 'hs-the&the=du', 390, 844, 'ep-toi', true, /Thầy cũng thấy bảng này/],
+  ['the1210e-luoi-khong-ho-so-dien-thoai', 'hs-the&the=luoi&hs=0', 390, 844, 'light', false, /Thầy cũng thấy bảng này/],
+]
+// ═══════════ hết LÀN THẺ HÔM NAY 12/10E ═══════════
+
 // ═══════════ LÀN MÀN LÀM BÀI 12/10D: màn làm bài học sinh theo bản vẽ dot13 thầy duyệt 12/10 (7 trạng thái) ═══════════
 // Cảnh `?man=lam13[&lam=g7]` (trang.tsx khối cùng tên; máy chủ giả gia/lam-bai-1210d.ts). Thao tác `lam13:<bước » bước…>` (khối xử lý cùng tên bên dưới):
 // tn:<regex> chạm ô trắc nghiệm · ds:a=Đúng,b=Sai chạm nút của ý · nut:<regex> bấm nút · phim:<kí tự> gõ phím máy tính · dau = cuộn khung về đầu.
@@ -176,6 +193,7 @@ const DS_LAM13 = [
 
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D
   ...DS_NHE, // LÀN NHỊP EM 12/10C
   ...DS_HN, // LÀN HÔM NAY 12/10B
@@ -305,7 +323,8 @@ const tran = []
 const chamNho = []
 for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   if (CHON.length && !CHON.some((c) => ten.startsWith(c))) continue
-  const ctx = await trinh.newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, colorScheme: nen, hasTouch: w < 900, isMobile: w < 500 })
+  // LÀN THẺ HÔM NAY 12/10E: nền 'ep-toi' = máy tối + trình duyệt ép tối trang web (một trình duyệt riêng có cờ, mở khi cần)
+  const ctx = await (nen === 'ep-toi' ? await trinhEpToi() : trinh).newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, colorScheme: nen === 'ep-toi' ? 'dark' : nen, hasTouch: w < 900, isMobile: w < 500 })
   await ctx.route((u) => !u.href.startsWith(goc), (r) => r.abort())
   const t = await ctx.newPage()
   t.setDefaultTimeout(8000)
@@ -555,6 +574,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   await ctx.close()
 }
 await trinh.close()
+await epToi?.close() // LÀN THẺ HÔM NAY 12/10E
 may.close()
 console.log(`\nLỗi trang: ${loiTrang.length}`)
 for (const l of loiTrang) console.log('  ' + l)

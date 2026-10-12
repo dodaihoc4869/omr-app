@@ -150,7 +150,7 @@ async function moCong() {
   p.on('pageerror', (e) => loi.push(e.message.slice(0, 160)))
   const cdp = await ctx.newCDPSession(p)
   await p.goto(goc + '/hs')
-  await p.waitForSelector('.ht2-nhe:not(.ht2-nhe-xuong)', { timeout: 60000 })
+  await p.waitForSelector('.ht2-hn-nhip:not(.ht2-hn-xuong)', { timeout: 60000 }) // 12/10E: Nhịp học nay là phần dưới của thẻ "Hôm nay của em"
   await p.waitForTimeout(800)
   return { ctx, p, cdp, loi }
 }
@@ -180,7 +180,8 @@ async function chup(p, ten) {
 
 // ── KỊCH BẢN: cách mở màn + bộ chọn phần tử cuối phải chạm được + khối nút ghim (nếu có) ─────────────────────────────────────
 const NUT_GHIM = '.ht2-lam .ht2-lam-day' // thanh đáy (màn làm bài 12/10D)
-const vaoLam = async (p) => { await cham(p, /Bắt đầu học|Tiếp tục học/); await p.waitForSelector('.ht2-lam .ht2-lam-than .ht2-lam-y, .ht2-lam .ht2-lam-than .ht2-lam-pa', { timeout: 20000 }); await p.waitForTimeout(600) }
+// 12/10E (thầy: "gộp hai phần làm một"): nút học duy nhất của thẻ Hôm nay ghi số câu — "Bắt đầu học · N câu" / "Học tiếp · N câu".
+const vaoLam = async (p) => { await cham(p, /Bắt đầu học|Học tiếp|Tiếp tục học/); await p.waitForSelector('.ht2-lam .ht2-lam-than .ht2-lam-y, .ht2-lam .ht2-lam-than .ht2-lam-pa', { timeout: 20000 }); await p.waitForTimeout(600) }
 const chonDs = async (p) => { for (const n of await p.locator('.ht2-lam .ht2-lam-y-nut button:first-child').all()) { await n.scrollIntoViewIfNeeded(); await n.tap() } }
 const nopCau = async (p) => { await chonDs(p); await cham(p, /^Nộp câu/); await p.waitForSelector('.ht2-lam-ket', { timeout: 10000 }); await p.waitForTimeout(400) }
 const tabDuoi = (i) => async (p) => { await cham(p, `.ht-menu button:nth-child(${i})`); await p.waitForTimeout(500) }
