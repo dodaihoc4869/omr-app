@@ -1,0 +1,30 @@
+name: Đọc độ phủ bài 7 ngày của một tài khoản (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/kiem-goi7-em-1210.yml', 'scripts/kiem-goi7-em-1210.ts']
+    branches-ignore: [main]
+permissions:
+  contents: read
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - run: npm ci --ignore-scripts
+      - name: Làm sạch cấu hình kết nối
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc số câu bằng hàm của app; chặn mọi câu lệnh ghi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          SBD_CAN_DOC: '12121212'
+        run: |
+          npx esbuild scripts/kiem-goi7-em-1210.ts --bundle --platform=node --format=esm --target=node24 --external:node:sqlite --outfile=/tmp/doc-goi7.mjs --log-level=warning
+          node /tmp/doc-goi7.mjs
