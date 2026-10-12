@@ -146,4 +146,4 @@ Thầy nhắn (nguyên văn, kèm ảnh thẻ Bài mới trong 7 ngày: "Học s
 - [x] Chờ thầy duyệt bản vẽ — CHƯA BUILD | bằng chứng: thầy 12/10: "duyệt bản vẽ, buid và đẩy luôn nhé" (duyệt cả ngưỡng Chăm ≥ 80% ngày đủ mức · Lười ≤ 40% hoặc 3 ngày liền không làm · Chưa đều ở giữa).
 - [ ] Build theo bản đã duyệt + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
 - [x] Thầy nhắn thêm: "chữa câu khó và tính toán cũng phải chiếu lên bảng theo chuẩn nhé" ⇒ bản vẽ: nút "Chiếu lên bảng", mỗi câu gợi ý em làm sai (có mặt) để gọi lên bảng, Đạt / Chưa đạt ghi sổ; khung ToChieu-ChuaCauKho (1920×1080, đã gọi em: cột 1/3 đen + thẻ tên) | bằng chứng: artifact 13511ZX2Q9tamm65z5JDRu bản 6. BUILD: chờ thầy duyệt.
-- [ ] Thầy nhắn thêm: "dữ liệu phần này tính từ 1/10 cho tôi nhé." (ảnh tấm Hồ sơ làm bài) ⇒ đổi mốc 12/10 → 1/10 cho Bài hằng ngày, Hồ sơ làm bài, app phụ huynh | bằng chứng: (đang làm)
+- [x] Thầy nhắn thêm: "dữ liệu phần này tính từ 1/10 cho tôi nhé." (ảnh tấm Hồ sơ làm bài) ⇒ đổi mốc 12/10 → 1/10 cho Bài hằng ngày, Hồ sơ làm bài, app phụ huynh | bằng chứng: 3ec927a9; PR244 gộp `0ddef340`, Actions `38210173304` SUCCESS (Kiểm ca thi đạt). Lùi: `git revert -m 1 0ddef340`.

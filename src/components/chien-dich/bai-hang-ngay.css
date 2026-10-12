@@ -130,6 +130,8 @@
 }
 .gvv2-tdo-dau[data-nhan='cham-chi'] { --m: var(--gvm-xl); --m-nen: var(--gvm-xl-nen); --m-dam: var(--gvm-xl-dam); }
 .gvv2-tdo-dau[data-nhan='chua-deu'] { --m: var(--gvm-hp); --m-nen: var(--gvm-hp-nen); --m-dam: var(--gvm-hp-dam); }
+/* 12/10B: nhãn "Lười" (cùng luật Nhịp học ở Hôm nay) — tông hồng của app thầy. */
+.gvv2-tdo-dau[data-nhan='luoi'] { --m: var(--gvm-ho); --m-nen: var(--gvm-ho-nen); --m-dam: var(--gvm-ho-dam); }
 .gvv2-tdo-dau[data-nhan='doi-pho'] { --m: var(--gvm-ho); --m-nen: var(--gvm-ho-nen); --m-dam: var(--gvm-ho-dam); }
 .gvv2-tdo-mat { font-size: 12px; font-weight: 700; color: var(--gvm-chu-2); }
 .gvv2-tdo-nhan { margin: 0; font-size: var(--t-khoi, 24px); font-weight: 800; line-height: 1.2; color: var(--m-dam); }

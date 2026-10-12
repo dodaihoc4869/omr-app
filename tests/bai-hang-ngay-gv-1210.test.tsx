@@ -135,14 +135,17 @@ describe('phép thuần + lớp nối', () => {
 })
 
 describe('thẻ Bài hằng ngày', () => {
-  it('đứng ngay sau Nhịp học; Hôm nay đặt { the: bai-hang-ngay } ⇒ mở đúng thẻ, gọi đúng lệnh', async () => {
+  // SỬA CÓ CHỦ ĐÍCH — thầy 12/10: Hành trình còn 2 mục (Dạy học & đầu giờ · Chữa bài); thẻ Bài hằng ngày chuyển sang màn Hôm nay (làn Hôm nay).
+  // `TheBaiHangNgay` giữ nguyên (các test dưới); khoá cũ `{ the: 'bai-hang-ngay' }` không gãy: mở mục Dạy học & đầu giờ, không gọi lệnh bảng nhiệt.
+  it('khoá cũ { the: bai-hang-ngay } ⇒ Hành trình mở mục Dạy học & đầu giờ (không còn thẻ Bài hằng ngày), xoá yêu cầu', async () => {
     mayChu()
     useSoDemGv.getState().datMoHanhTrinh({ the: 'bai-hang-ngay' })
     render(<ChienDichScreen />)
-    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học', 'Bài mới trong 7 ngày', 'Nhịp học', 'Bài hằng ngày', 'Kiểm tra đầu giờ', 'Cần thầy chữa'])
-    expect(screen.getByRole('tab', { name: 'Bài hằng ngày' }).getAttribute('aria-selected')).toBe('true')
-    expect(await screen.findByRole('region', { name: /^Bài hằng ngày/ })).toBeTruthy()
-    await waitFor(() => expect(m.goi.mock.calls.filter(([d]) => d === '/gv/bai-hang-ngay')).toHaveLength(1))
+    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học & đầu giờ', 'Chữa bài'])
+    expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
+    expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
+    await waitFor(() => expect(useSoDemGv.getState().moHanhTrinh).toBeNull())
+    expect(m.goi.mock.calls.filter(([d]) => d === '/gv/bai-hang-ngay')).toHaveLength(0)
   })
 
   it('bảng nhiệt: thứ tự máy chủ, ô "đã làm/mức" tô bốn mức, ô hôm nay, cột tổng, ghi chú mức ước tính', async () => {
@@ -292,11 +295,14 @@ describe('mốc 01/10 — chữ ba app khớp một hằng', () => {
     expect(MOC_THEO_DOI).toBe(NGAY_BAT_DAU_BAI_HANG_NGAY)
     const moc = ngayNgan(NGAY_BAT_DAU_BAI_HANG_NGAY)
     expect(moc).toBe('01/10')
-    // Hôm nay của thầy: không import hằng (giữ mảnh nạp lười) ⇒ chữ viết tay phải khớp hằng
+    // SỬA CÓ CHỦ ĐÍCH 12/10 — thầy duyệt bản vẽ Hôm nay: nút "Xem bài hằng ngày từ 01/10" thay bằng khối Nhịp học (nút "Xem bảng từng ngày" mở bảng
+    // này ngay tại Hôm nay). Mốc trên khối đọc từ `tu` máy chủ trả (`/gv/nhip-hoc` dùng cùng hằng mốc) — không còn chữ ngày viết tay để lệch hằng.
     const homNay = readFileSync('src/screens/GvHomNayScreen.tsx', 'utf8')
-    expect(homNay).toContain(`Xem bài hằng ngày từ ${moc}`)
-    expect(homNay).toContain(`aria-label="Xem bài hằng ngày từ ${moc} ở Hành trình › Bài hằng ngày"`)
-    expect(homNay).not.toMatch(/bài hằng ngày từ 12\/10/)
+    const nhip = readFileSync('src/components/hom-nay-thay/NhipHocThay.tsx', 'utf8')
+    expect(homNay).not.toContain('aria-label="Xem bài hằng ngày từ')
+    expect(nhip).toContain('Từ {ngayNgan(kq.tu)}')
+    expect(nhip).toContain("{moBang ? 'Ẩn bảng từng ngày' : 'Xem bảng từng ngày'}")
+    expect(homNay + nhip).not.toMatch(/bài hằng ngày từ 12\/10/)
     expect(readFileSync('src/lib/ph-v3/con-tong-quan.ts', 'utf8')).toContain(`|| '${MOC_THEO_DOI}'`)
     // thẻ đang chờ máy chủ ⇒ câu chờ ghi đúng mốc
     m.goi.mockImplementation(() => new Promise(() => {}))

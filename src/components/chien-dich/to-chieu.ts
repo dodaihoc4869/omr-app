@@ -9,6 +9,8 @@
 // Trả kèm `o` (khoá `sbd|qid` ⇒ ô) để nơi nghe tin tra lại ô theo khoá, không tin nội dung tin đến.
 // THẦY TỰ CHỮA (12/10, Cần thầy chữa › Thầy tự chữa — `ThayTuChua.tsx`): CHỈ THÊM ba tuỳ chọn của `dungToChieu` (giữ tự luận khi thầy tự chọn đề · dải thống kê
 // lớp phím T theo mã câu · nút X "Ai sai" cho tờ cả lớp qua mốc khoá ẩn). Vắng ba tuỳ chọn ⇒ tờ y như trước.
+// CHỮA CÂU KHÓ & TÍNH TOÁN (12/10B — tờ chuẩn Chiếu lên bảng, mỗi câu gọi một em làm sai): CHỈ THÊM ba trường tuỳ chọn của `OChieu` (`lichSu` in trong thẻ tên ·
+// `ungVien` danh sách em gọi thay ⇒ nút "Gọi em khác", `to-chieu-goi-em-khac.ts` · `chuLop` số liệu lớp ở thanh dưới). Vắng ba trường ⇒ tờ y như trước.
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../../data/examContent'
 import type { CauLuyen } from '../../lib/bai-tap-pdf'
 import type { OBang } from '../../lib/html-may-chieu'
@@ -18,6 +20,8 @@ import { phanTichKhoiCau } from '../../lib/khoi-cau'
 import { laCauTuLuan } from '../../lib/cau-tu-luan'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { noiDungTuCauGoc, type NoiDungCau } from '../../lib/thoi-gian-len-bang'
+import type { NhanLichSuCau } from '../../lib/lich-su-cau-len-bang'
+import type { DotGoiEm } from './to-chieu-goi-em-khac'
 import { saoTuMucDo } from './tinh'
 import type { NoiDungCauMayChu } from './api'
 import type { KetQuaLenh } from '../../lib/goi-lenh-thay'
@@ -119,6 +123,13 @@ export interface OChieu {
   viSao: string
   /** Nội dung ĐÚNG mã câu do máy chủ gửi (lệnh `noi-dung-cau`, đã qua cổng khối) — khuôn Ngân hàng đề của thầy. Vắng ⇒ tra Ngân hàng đề trên máy theo NGUYÊN mã. */
   cauGoc?: any
+  /** CHỮA CÂU KHÓ (12/10, chỉ thêm): dòng lịch sử của em ở câu này, in TRONG thẻ tên (`OBang.lichSuCau`) — chỉ thấy sau khi thầy gọi em. Vắng ⇒ như cũ. */
+  lichSu?: NhanLichSuCau
+  /** CHỮA CÂU KHÓ (12/10, chỉ thêm): MỌI em có thể gọi lên câu này, theo thứ tự gọi — người đầu chính là em của ô (`sbd`). Có ⇒ tờ có nút "Gọi em khác"
+   *  (`to-chieu-goi-em-khac.ts`) và mọi em trong danh sách đều là ô ghi được (cùng chuyên đề). Vắng ⇒ tờ y như cũ. */
+  ungVien?: readonly { sbd: string; ten: string; lichSu?: NhanLichSuCau }[]
+  /** CHỮA CÂU KHÓ (12/10, chỉ thêm): dòng số liệu lớp của câu ở thanh dưới tờ ("18/34 em lớp sai câu này") — đi cùng `ungVien`. */
+  chuLop?: string
 }
 
 /** Một ô em × câu có nút Đạt / Chưa đạt trên tờ — đủ để ghi kết quả (cùng lệnh `ghiLenBang` của Gọi lên bảng). */
@@ -244,6 +255,8 @@ export async function dungToChieu(
   const oGhi = new Map<string, OGhiToChieu>()
   /** Mốc khoá ẩn của từng đợt (Thầy tự chữa) — cùng thứ tự với `dsO` (mỗi ô một đợt). */
   const khoaTheoDot: (string | null)[] = []
+  /** Chữa câu khó (12/10): em gọi được + đợt có nút ghi không + dòng số liệu lớp của từng đợt (null = đợt không mang gì) — cùng thứ tự với `dsO`. */
+  const dotGoiEm: (DotGoiEm | null)[] = []
   const khoiDich = tuyChon.khoiDich ?? []
   const dsGiu = ds.filter((o) => {
     if (!cauKhacKhoiLop(o.qid, khoiDich)) return true
@@ -300,7 +313,13 @@ export async function dungToChieu(
     // Tờ CẢ LỚP (Thầy tự chữa 12/10): dòng không em, có nội dung đúng mã ⇒ mốc khoá ẩn cho nút X "Ai sai" (không nút ghi nào).
     const mocCaLop = !!tuyChon.aiSaiCaLop && !!maPhien && !o.sbd && !!goc
     if (mocCaLop) oGhi.set(khoaToChieu('', o.qid), { sbd: '', hoTen: o.ten, qid: o.qid, chuyenDe: cau.chuyenDe })
-    khoaTheoDot.push(mocCaLop ? khoaToChieu('', o.qid) : null)
+    // CHỮA CÂU KHÓ (12/10): ô có em + danh sách em gọi thay. Câu có chuyên đề ⇒ mọi em là ô ghi được (nút "Gọi em khác" đổi khoá ô chấm);
+    // câu THIẾU chuyên đề ⇒ không nút Đạt / Chưa đạt (luật cũ: máy chủ không ghi được), chỉ mốc khoá ẩn của em để X "Ai sai" vẫn tra được.
+    const uv = o.sbd && o.ungVien?.length ? o.ungVien : null
+    const mocEm = !!uv && !coNut && !!tuyChon.aiSaiCaLop && !!maPhien && !!goc
+    if (uv && (coNut || mocEm)) for (const e of uv) oGhi.set(khoaToChieu(e.sbd, o.qid), { sbd: e.sbd, hoTen: e.ten, qid: o.qid, chuyenDe: coNut ? cau.chuyenDe : '' })
+    dotGoiEm.push(uv || o.chuLop ? { em: (uv ?? []).map((e) => ({ sbd: e.sbd, ten: e.ten, khoa: coNut || mocEm ? khoaToChieu(e.sbd, o.qid) : '', nhan: e.lichSu?.chu ?? '' })), coGhi: coNut, chuLop: o.chuLop ?? '' } : null)
+    khoaTheoDot.push(mocCaLop ? khoaToChieu('', o.qid) : mocEm ? khoaToChieu(o.sbd, o.qid) : null)
     const tk = tuyChon.thongKe?.(o.qid, cau)
     return [{
       sbd: o.sbd,
@@ -313,6 +332,7 @@ export async function dungToChieu(
       mucDo: o.mucDo ?? undefined,
       cau,
       viSao: o.viSao,
+      ...(o.lichSu ? { lichSuCau: o.lichSu } : {}),
     }]
   })
   const html0 = taoHtmlMayChieu(dsO, {
@@ -321,6 +341,8 @@ export async function dungToChieu(
     nganSachPhut: CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT,
     ...(maPhien && oGhi.size > 0 ? { cauNoi: { maPhien } } : {}),
   })
-  const html = tuyChon.aiSaiCaLop ? chenMocAiSaiCaLop(html0, khoaTheoDot) : html0
+  const html1 = tuyChon.aiSaiCaLop ? chenMocAiSaiCaLop(html0, khoaTheoDot) : html0
+  // Chữa câu khó (12/10): có đợt mang danh sách em ⇒ chèn dữ liệu đợt + nút "Gọi em khác" (mảnh riêng, nạp động). Không có ⇒ tờ y như cũ.
+  const html = dotGoiEm.some(Boolean) ? (await import('./to-chieu-goi-em-khac')).chenGoiEmKhac(html1, dotGoiEm) : html1
   return { html, soThieu: thieu.size, soBoKhoi: boKhoi.size, o: oGhi }
 }

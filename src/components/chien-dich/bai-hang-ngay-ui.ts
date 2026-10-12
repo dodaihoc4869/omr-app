@@ -48,7 +48,8 @@ export const TEN_MUC_TIN_HIEU: Record<MucTinHieu, string> = { tot: 'Trong ngư�
 /** Mô tả ngắn từng nhãn (đứng dưới nhãn ở đầu tấm). */
 export const MO_TA_NHAN: Record<NhanThaiDo, string> = {
   'cham-chi': 'Làm đủ mức gần như mọi ngày, nhịp đều, không thấy dấu hiệu làm cho xong.',
-  'chua-deu': 'Có ngày không đủ mức hoặc làm dồn vào khuya.',
+  'chua-deu': 'Đủ mức chưa tới 80% số ngày, hoặc làm dồn vào khuya.',
+  luoi: 'Đủ mức từ 40% số ngày trở xuống, hoặc 3 ngày liền không làm câu nào.',
   'doi-pho': 'Có dấu hiệu làm cho xong: xem các tín hiệu vượt ngưỡng bên dưới.',
   'chua-du-du-lieu': 'Cần thêm ngày làm bài để kết luận.',
 }

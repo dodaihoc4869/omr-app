@@ -62,10 +62,59 @@ const DS_TTC = [
 ]
 // ═══════════ hết LÀN THẦY TỰ CHỮA 12/10 ═══════════
 
+// ═══════════ LÀN CHỮA BÀI 12/10B: Hành trình › Chữa bài = (A) Học sinh cần chữa + (B) Chữa câu khó & tính toán (mở sẵn) + tờ chiếu gọi em lên bảng ═══════════
+// Cảnh `?man=gv-nhip&the=can-chua&ttc=1&cb=1` (trang.tsx + gia/chua-bai.ts). `cb:<mã bài>` = chọn lớp 12A1 + bài, chờ dòng "Gọi lên bảng:";
+// `cb-chieu:<mã bài>[:phím]` = thêm bấm "Chiếu lên bảng", chờ tờ nối app rồi gõ phím trên tờ (l gọi em · e gọi em khác · g lời giải).
+// Chạy riêng: tiền tố "6" (60-, 61-).
+const CB = 'gv-nhip&the=can-chua&ttc=1&cb=1'
+const DS_CB = [
+  ['60-cb-chua-bai-may-tinh', CB, 1440, 900, 'light', true, /Hành trình giỏi Hóa/, 'cb:DH-12-C2-B6'],
+  ['60-cb-chua-bai-may-tinh-toi', CB, 1440, 900, 'dark', true, /Hành trình giỏi Hóa/, 'cb:DH-12-C2-B6'],
+  ['60-cb-chua-bai-dien-thoai', CB, 390, 844, 'light', true, /Hành trình giỏi Hóa/, 'cb:DH-12-C2-B6'],
+  ['60-cb-chua-bai-dien-thoai-toi', CB, 390, 844, 'dark', true, /Hành trình giỏi Hóa/, 'cb:DH-12-C2-B6'],
+  ['61-cb-to-chieu-cho-goi-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6'],
+  ['61-cb-to-chieu-da-goi-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6:l'],
+  ['61-cb-to-chieu-goi-em-khac-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6:le'],
+  ['61-cb-to-chieu-da-goi-loi-giai-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6:lg '],
+]
+// ═══════════ hết LÀN CHỮA BÀI 12/10B ═══════════
+// ═══════════ LÀN HÀNH TRÌNH 12/10B: Hành trình còn 2 mục › Dạy học & đầu giờ = MỘT buổi dạy 4 bước (bản vẽ HanhTrinh-DayHoc đã duyệt) ═══════════
+// Cảnh `?man=gv-nhip&ht2=1` (máy giả riêng gia/hanh-trinh-2-muc.ts: lớp có 6 em vắng + một lượt 6 em gọi lên bảng; bảng Bài đang giao dùng bộ giả
+// gói 7 ngày). Chờ dòng cuối của bảng Bài đang giao ("58 em" — gói 12A2) rồi chụp CẢ TRANG. Chạy riêng: tiền tố "60-".
+const DS_HT2 = ['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+  [`60-ht2-day-hoc-${kho}${nen === 'dark' ? '-toi' : ''}`, 'gv-nhip&ht2=1', w, hh, nen, true, /Hành trình giỏi Hóa/, 'cho:58 em']))
+// ═══════════ hết LÀN HÀNH TRÌNH 12/10B ═══════════
+// ═══════════ LÀN HÔM NAY 12/10B: Hôm nay của thầy theo bản vẽ thầy duyệt 12/10 — hàng thẻ Việc cần thầy + khối Nhịp học (262 em × 12 ngày, ═══════════
+// gia/nhip-hoc.ts). Máy 1440×900 + điện thoại 390×844 TOÀN TRANG, sáng + tối; thêm thao tác `hn:<việc>`: Xem đủ em lười · lọc Khối 12 · bấm em ⇒ tấm hồ
+// sơ · bảng từng ngày · thẻ Chăm / Đối phó (điện thoại) · lỗi (`nh=loi`) · chưa có em (`nh=trong`). Chạy riêng: tiền tố "6" (60-…67-).
+const DS_HN = [
+  ...['light', 'dark'].flatMap((nen) => {
+    const t = nen === 'dark' ? '-toi' : ''
+    return [
+      [`60-hn-may-tinh${t}`, 'gv-hom-nay&nh=1', 1440, 900, nen, true, /Hôm nay của thầy/, 'hn:cho'],
+      [`61-hn-dien-thoai${t}`, 'gv-hom-nay&nh=1', 390, 844, nen, true, /Hôm nay của thầy/, 'hn:cho'],
+    ]
+  }),
+  ['62-hn-xem-du-luoi-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:xem-du-luoi'],
+  ['63-hn-loc-khoi-12-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', true, /Hôm nay của thầy/, 'hn:khoi-12'],
+  ['63-hn-loc-khoi-12-may-tinh-toi', 'gv-hom-nay&nh=1', 1440, 900, 'dark', true, /Hôm nay của thầy/, 'hn:khoi-12'],
+  ['64-hn-ho-so-em-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:ho-so'],
+  ['64-hn-ho-so-em-dien-thoai-toi', 'gv-hom-nay&nh=1', 390, 844, 'dark', false, /Hôm nay của thầy/, 'hn:ho-so'],
+  ['65-hn-bang-tung-ngay-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:bang'],
+  ['66-hn-dien-thoai-tab-cham', 'gv-hom-nay&nh=1', 390, 844, 'light', true, /Hôm nay của thầy/, 'hn:tab-cham'],
+  ['66-hn-dien-thoai-tab-doi-pho-toi', 'gv-hom-nay&nh=1', 390, 844, 'dark', true, /Hôm nay của thầy/, 'hn:tab-doi-pho'],
+  ['67-hn-loi-dien-thoai', 'gv-hom-nay&nh=loi', 390, 844, 'light', false, /Hôm nay của thầy/, 'hn:loi'],
+  ['67-hn-chua-co-em-may-tinh-toi', 'gv-hom-nay&nh=trong', 1440, 900, 'dark', false, /Hôm nay của thầy/, 'hn:trong'],
+]
+// ═══════════ hết LÀN HÔM NAY 12/10B ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_HN, // LÀN HÔM NAY 12/10B
   ...DS_HS12, // LÀN HỌC SINH 12/10
   ...DS_TTC, // LÀN THẦY TỰ CHỮA 12/10
+  ...DS_CB, // LÀN CHỮA BÀI 12/10B
+  ...DS_HT2, // LÀN HÀNH TRÌNH 12/10B
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],
@@ -121,21 +170,8 @@ const DS = [
   // em thiếu nhiều ngày nhất đứng đầu) + tấm Hồ sơ làm bài trùng tu (nhãn thái độ + lý do bằng số, ô số, lịch, biểu đồ, sáu tín hiệu). Máy 1440×900,
   // điện thoại 390×844, sáng + tối. `bhn:<hàng>|cuoi[:cuon|:tin-hieu]` = bấm em ở hàng ấy (`doi-pho` = hàng em "Có dấu hiệu đối phó" của bộ giả), cuộn thân
   // tấm tới lịch + biểu đồ / sáu tín hiệu; `bhn-bang` = cuộn tới bảng (điện thoại).
-  ...['light', 'dark'].flatMap((nen) => {
-    const k = nen === 'dark' ? '-toi' : ''
-    return [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].flatMap(([w, hh, kho]) => [
-      [`40-gv-bai-hang-ngay-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'cho:em thiếu ít nhất một ngày'],
-      [`41-gv-ho-so-thai-do-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho'],
-      [`42-gv-ho-so-bieu-do-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cuon'],
-      [`43-gv-ho-so-tin-hieu-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:tin-hieu'],
-    ])
-  }),
-  ['44-gv-ho-so-cham-chi-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:cuoi'],
-  ['45-gv-bai-hang-ngay-xep-hom-nay', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn-xep:Hôm nay'],
-  ['46-gv-hom-nay-loi-vao-bhn', 'gv-hom-nay', 1440, 900, 'light', false, /Hôm nay của thầy/],
-  ['47-gv-bai-hang-ngay-bang-dien-thoai', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
-  ['47-gv-bai-hang-ngay-bang-dien-thoai-toi', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
-  ['48-gv-ho-so-cau-dung-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cau-dung'],
+  // ĐÃ GỠ 12/10B: các cảnh 40–48-gv mở thẻ Hành trình › Bài hằng ngày — thẻ ấy bỏ khỏi Hành trình (thầy duyệt bản vẽ "Hành trình còn 2 mục");
+  // bảng nhiệt + tấm Hồ sơ làm bài nay mở từ Hôm nay › Nhịp học: xem cảnh 62–67-hn (LÀN HÔM NAY 12/10B).
   // ---------------------------------------------------------------- hết LÀN GIÁO VIÊN 12/10
   // ═════════ LÀN BÀI MỚI 7 NGÀY 12/10: Hành trình › Bài mới trong 7 ngày (trùng tu). Máy 1440×900 + điện thoại 390×844, sáng + tối.
   // `g7:<việc>`: dau = đầu thẻ · ds = danh sách chữa · ho-tro = mở Học sinh cần hỗ trợ của dòng đầu · loc = lọc Nhiều học sinh sai + xếp tỉ lệ sai ·
@@ -300,15 +336,16 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     } else if (viec?.startsWith('ttc:') || viec?.startsWith('ttc-chieu:')) {
       // LÀN THẦY TỰ CHỮA 12/10: mở thẻ Thầy tự chữa → chọn bài → (chiếu → phím trên tờ).
       const [loai, khoaBai, phim] = viec.split(':')
-      const the = t.getByRole('region', { name: 'Thầy tự chữa' })
-      await the.getByRole('button', { name: 'Chọn đề' }).click({ timeout: 20000 })
+      // 12/10B (làn Chữa bài): khối đổi tên "Chữa câu khó & tính toán", MỞ SẴN (không còn nút "Chọn đề"), nút chiếu "Chiếu lên bảng".
+      const the = t.getByRole('region', { name: /Thầy tự chữa|Chữa câu khó/ })
+      if (await the.getByRole('button', { name: 'Chọn đề' }).count()) await the.getByRole('button', { name: 'Chọn đề' }).click({ timeout: 20000 })
       await the.getByRole('combobox', { name: 'Lớp' }).selectOption('lop:12A1', { timeout: 20000 })
       await the.getByRole('combobox', { name: /Bài trong Dạy học/ }).selectOption(khoaBai)
       await the.getByText(/lớp sai/).first().waitFor({ timeout: 20000 })
       if (loai === 'ttc') {
         await t.waitForTimeout(300)
       } else {
-        await the.getByRole('button', { name: 'Chiếu lên máy chiếu' }).click()
+        await the.getByRole('button', { name: /^Chiếu lên (máy chiếu|bảng)$/ }).click()
         const khung = t.frameLocator('.lop-xem-phieu iframe')
         await khung.locator('body.mc-noi').waitFor({ timeout: 20000 })
         await t.waitForTimeout(600)
@@ -320,6 +357,53 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         }
         if ((phim ?? '').includes('x')) await khung.locator('.mc-aisai.mc-mo .mc-sai-em').first().waitFor({ timeout: 20000 })
       }
+    } else if (viec?.startsWith('cb:') || viec?.startsWith('cb-chieu:')) {
+      // LÀN CHỮA BÀI 12/10B: khối (B) mở sẵn → chọn lớp 12A1 + bài → chờ dòng "Gọi lên bảng:" → (chiếu → phím trên tờ).
+      const [loai, khoaBai, phim] = viec.split(':')
+      const the = t.getByRole('region', { name: 'Chữa câu khó & tính toán' })
+      await the.getByRole('combobox', { name: 'Lớp' }).selectOption('lop:12A1', { timeout: 20000 })
+      await the.getByRole('combobox', { name: /Bài trong Dạy học/ }).selectOption(khoaBai)
+      await the.getByText(/^Gọi lên bảng:/).first().waitFor({ timeout: 20000 })
+      if (loai === 'cb') {
+        await t.waitForTimeout(300)
+      } else {
+        await the.getByRole('button', { name: 'Chiếu lên bảng', exact: true }).click()
+        const khung = t.frameLocator('.lop-xem-phieu iframe')
+        await khung.locator('body.mc-noi').waitFor({ timeout: 20000 })
+        await t.waitForTimeout(600)
+        for (const k of phim ?? '') {
+          await khung.locator('body').evaluate((b, key) => b.ownerDocument.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })), k)
+          await t.waitForTimeout(k === 'l' ? 2600 : 600)
+        }
+      }
+    } else if (viec?.startsWith('hn:')) {
+      // LÀN HÔM NAY 12/10B: chờ khối Nhịp học có em rồi làm đúng một việc (ảnh toàn trang không cần cuộn; ảnh khung nhìn cuộn trang tới khối cần chụp).
+      const v = viec.slice(3)
+      const cuonToi = (chon) => t.evaluate((c) => { const el = document.querySelector(c); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - (innerWidth < 900 ? 72 : 16)) }, chon)
+      if (v === 'loi') await t.getByText(/Chưa tải được Nhịp học/).first().waitFor({ timeout: 20000 })
+      else if (v === 'trong') await t.getByText(/Chưa có em nào nhận bài hằng ngày/).first().waitFor({ timeout: 20000 })
+      else {
+        await t.locator('.nht-em').first().waitFor({ timeout: 20000 })
+        if (v === 'xem-du-luoi') {
+          // mở rộng tại chỗ (đợt đầu 50 em) rồi cuộn tới ô tìm của cột — ảnh khung nhìn (toàn trang quá dài cho ảnh ≤ 150 KB)
+          await t.getByRole('button', { name: /^Xem đủ \d+ em lười/ }).click()
+          await t.getByRole('button', { name: 'Thu gọn' }).waitFor({ timeout: 20000 })
+          await cuonToi('.nht-cot[data-kieu="luoi"]')
+        }
+        if (v === 'khoi-12') await t.getByRole('radio', { name: /^Khối 12/ }).click()
+        if (v === 'ho-so') {
+          await t.locator('.nht-em').first().click()
+          await t.getByRole('dialog').getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
+        }
+        if (v === 'bang') {
+          await t.getByRole('button', { name: /Xem bảng từng ngày/ }).click()
+          await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
+          await cuonToi('#nht-bang')
+        }
+        if (v === 'tab-cham') await t.getByRole('tab', { name: /^Chăm/ }).click()
+        if (v === 'tab-doi-pho') await t.getByRole('tab', { name: /^Đối phó/ }).click()
+      }
+      await t.waitForTimeout(400)
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {

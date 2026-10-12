@@ -75,6 +75,17 @@ import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
 import { goi7Du } from './gia/goi-bai-7'
 // LÀN THẦY TỰ CHỮA 12/10: `gv-nhip&the=can-chua&ttc=1` = Cần thầy chữa › thẻ Thầy tự chữa (bài Dạy học giả có đủ ba tờ, lớp có SBD, số liệu lớp giả).
 import { LA_TTC, BAI_TTC, aiSaiTtc, soGopTtc } from './gia/thay-tu-chua'
+// ═════════ LÀN CHỮA BÀI 12/10B: `gv-nhip&the=can-chua&ttc=1&cb=1` = Hành trình › Chữa bài — (A) Học sinh cần chữa + (B) Chữa câu khó & tính toán MỞ SẴN
+// (bài + lớp + số liệu lớp giả của làn Thầy tự chữa; em làm sai theo lô + buổi điểm danh đang mở: gia/chua-bai.ts qua `goiLenh` giả). ═════════
+import { LA_CB } from './gia/chua-bai'
+// ═════════ LÀN HÀNH TRÌNH 12/10B: `gv-nhip&ht2=1` = Hành trình còn 2 mục › Dạy học & đầu giờ — MỘT buổi dạy 4 bước (điểm danh có 6 em vắng · gọi lên
+// bảng đầu giờ 6 em · dạy và chiếu câu · tick bài vừa dạy + bảng Bài đang giao). Màn THẬT (`ChienDichScreen` ⇒ `HanhTrinhV2`); máy giả riêng
+// gia/hanh-trinh-2-muc.ts nối ở gia/goi-lenh-thay.ts, chỉ trả lời khi `ht2=1` (ảnh cảnh khác không đổi). ═════════
+import { LA_HT2 } from './gia/hanh-trinh-2-muc'
+if (LA_HT2) document.documentElement.dataset.canhHt2 = '1' // LÀN HÀNH TRÌNH 12/10B — đánh dấu cảnh (đọc khi soát ảnh)
+// ═════════ LÀN HÔM NAY 12/10B: `gv-hom-nay&nh=1` = Hôm nay của thầy bản vẽ duyệt 12/10 (Việc cần thầy dạng thẻ + Nhịp học: 262 em × 12 ngày, hai cột
+// Lười nhất · Chăm nhất, Đối phó, Theo lớp, bảng từng ngày, tấm hồ sơ). `/gv/nhip-hoc` GIẢ: gia/nhip-hoc.ts; `&nh=loi` máy chủ lỗi · `&nh=trong` chưa có em. ═════════
+import { nhipHocGia } from './gia/nhip-hoc'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -195,6 +206,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // Tấm Lịch sử làm câu của một em (09/10 khuya) — app thầy gọi qua `goiLenh` (bản chụp đã thay bằng gia/goi-lenh-thay.ts, cùng dữ liệu này);
   // giữ thêm đường `fetch` để mọi lối gọi thẳng cũng nhận dữ liệu giả, không chạm máy chủ thật.
   if (u.pathname.endsWith('/gv/lich-su-lam-cau')) return tra(lichSuGia(String(b.sbd ?? ''), 'Trần Đức Huy'))
+  // ---- LÀN HÔM NAY 12/10B: Nhịp học (app thầy gọi qua `goiLenh` giả — gia/goi-lenh-thay.ts; giữ thêm đường `fetch` cùng dữ liệu)
+  if (u.pathname.endsWith('/gv/nhip-hoc')) { const r = nhipHocGia(); return r.ok ? tra(r.du) : new Response(JSON.stringify({ ok: false, error: r.chu }), { status: 500, headers: { 'content-type': 'application/json' } }) }
+  // ---- hết LÀN HÔM NAY 12/10B
   // ---- LÀN GIÁO VIÊN 12/10: Bài hằng ngày + hồ sơ thái độ (app thầy gọi qua `goiLenh` giả; giữ thêm đường `fetch` như trên)
   if (u.pathname.endsWith('/gv/bai-hang-ngay')) return tra(baiHangNgayGia())
   if (u.pathname.endsWith('/gv/ho-so-thai-do')) return tra(hoSoThaiDoGia(String(b.sbd ?? '')))
@@ -341,6 +355,12 @@ if (LA_TTC) {
   }
 }
 // ═════════════════════════════════════════ hết LÀN THẦY TỰ CHỮA 12/10 ═════════════════════════════════════════
+// ═════════════════════════════════════════ LÀN CHỮA BÀI 12/10B ═════════════════════════════════════════
+// Thầy 12/10: "… thu gọn tối giản hết lại thành 2 mục …" · "chữa câu khó và tính toán cũng phải chiếu lên bảng theo chuẩn nhé". Cảnh `cb=1` đi cùng `ttc=1`
+// (kho có Bài 6 khối 12, lớp 12A1 có SBD, `/gv/thong-ke-lop-cau` giả); thiếu `ttc=1` thì nạp bài giả ở đây. Lệnh `/gv/ai-sai-nhieu-cau` + `/gv/buoi-hoc`
+// gan-day trả ở gia/chua-bai.ts.
+if (LA_CB && !KHO.some((s) => s.maDe === BAI_TTC.maDe)) KHO.push(BAI_TTC)
+// ═════════════════════════════════════════ hết LÀN CHỮA BÀI 12/10B ═════════════════════════════════════════
 const manHs12 = () =>
   man === 'hs12-tu-luyen' || man === 'hs12-tu-luyen-lam' ? h(ManTuLuyen, { token: 'tk', sbd: '12121212', onVe: noop })
   : man === 'hs12-tu-chua' ? h(ManTuChua, { token: 'tk', onVe: noop, onTuLuyen: noop })

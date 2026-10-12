@@ -152,6 +152,23 @@ export function tiLeSaiLop(g: SoGopCauLop | null | undefined): { phanTram: numbe
   return { phanTram: Math.round((sai / g.bai) * 100), bai: g.bai }
 }
 
+/** Ngưỡng "lớp sai nhiều" (bản vẽ Chữa bài 12/10: ô "câu lớp sai từ 30%", số % tô màu cảnh báo). */
+export const NGUONG_LOP_SAI = 30
+
+/** Số liệu lớp của một câu cho xem trước (12/10B): ưu tiên danh sách em sai theo lô (`/gv/ai-sai-nhieu-cau` — lần làm MỚI NHẤT của mỗi em, có số em đã
+ *  làm), không có thì số gộp sổ học (`tiLeSaiLop`). Không có số ⇒ null (không bịa). */
+export function soLieuLopCau(
+  saiLo: { lam: number | null; sai: readonly unknown[] } | null | undefined,
+  gop: SoGopCauLop | null | undefined,
+): { sai: number; lam: number; phanTram: number } | null {
+  if (saiLo && saiLo.lam !== null && saiLo.lam > 0) {
+    const sai = Math.min(saiLo.sai.length, saiLo.lam)
+    return { sai, lam: saiLo.lam, phanTram: Math.round((sai / saiLo.lam) * 100) }
+  }
+  const t = tiLeSaiLop(gop)
+  return t && gop ? { sai: Math.max(0, gop.bai - Math.max(0, gop.dung)), lam: t.bai, phanTram: t.phanTram } : null
+}
+
 /** Dòng tóm tắt đề (một dòng, bỏ thẻ / mhchem thô) cho danh sách xem trước. */
 export function tomTatCau(q: Pick<CauGocTuChua, 'text'>, toiDa = 120): string {
   const t = String(q.text || '')

@@ -6,6 +6,9 @@ import { lichSuGia } from './lich-su-lam-cau'
 import { baiHangNgayGia, hoSoThaiDoGia, tenEmBhn } from './bai-hang-ngay' // LÀN GIÁO VIÊN 12/10
 import { goi7Gia } from './goi-bai-7' // LÀN BÀI MỚI 7 NGÀY 12/10
 import { LA_TTC, LOP_TTC } from './thay-tu-chua' // LÀN THẦY TỰ CHỮA 12/10
+import { traLoiChuaBai } from './chua-bai' // LÀN CHỮA BÀI 12/10B
+import { traLoiHt2 } from './hanh-trinh-2-muc' // LÀN HÀNH TRÌNH 12/10B
+import { baiHangNgayTuNhip, hoSoTuNhip, laCanhNhipHoc, nhipHocGia, tenEmNhip } from './nhip-hoc' // LÀN HÔM NAY 12/10B
 
 const HT = [
   { k: '10', id: 'hanh-trinh-v3-khoi-10', soEm: 38 },
@@ -47,6 +50,10 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   void _a
   void _b
   const b = (body ?? {}) as Record<string, unknown>
+  // ---- LÀN HÀNH TRÌNH 12/10B (cảnh `&ht2=1`): buổi dạy 4 bước — lớp có em vắng + lượt gọi lên bảng đầu giờ (gia/hanh-trinh-2-muc.ts).
+  const ht2 = await traLoiHt2(duong, b)
+  if (ht2) return ht2
+  // ---- hết LÀN HÀNH TRÌNH 12/10B
   // trung tu 09/10: ảnh app thầy chụp ở chế độ 2.0 — màn Cài đặt đọc lại cờ thì vẫn thấy BẬT (trước: "lệnh lạ" ⇒ cờ tắt ⇒ thanh bên cũ 9 mục)
   if (duong === '/gv/chien-dich' && b.action === 'co-doc') return { ok: true as const, du: { ok: true, co: { bat: true, lop: [], sbd: [] } } }
   if (duong === '/gv/chien-dich' && b.action === 'danh-sach') return { ok: true as const, du: { homNay, chienDich: HT.map(cd) } }
@@ -61,6 +68,16 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
       },
     }
   }
+  // ---------------------------------------------------------------- LÀN HÔM NAY 12/10B (gia/nhip-hoc.ts): Hôm nay › Nhịp học (262 em × 12 ngày)
+  // + bảng từng ngày + tấm hồ sơ CÙNG bộ em; ba lệnh sau chỉ đổi khi cảnh có `&nh=…` (cảnh của làn khác giữ dữ liệu của làn ấy).
+  if (duong === '/gv/nhip-hoc') return nhipHocGia()
+  if (laCanhNhipHoc()) {
+    if (duong === '/gv/bai-hang-ngay') return { ok: true as const, du: baiHangNgayTuNhip() as unknown as Record<string, unknown> }
+    if (duong === '/gv/ho-so-thai-do') return { ok: true as const, du: hoSoTuNhip(String(b.sbd)) as unknown as Record<string, unknown> }
+    const ten = tenEmNhip(String(b.sbd))
+    if (duong === '/gv/lich-su-lam-cau' && ten) return { ok: true as const, du: lichSuGia(String(b.sbd), ten) as unknown as Record<string, unknown> }
+  }
+  // ---------------------------------------------------------------- hết LÀN HÔM NAY 12/10B
   // ---------------------------------------------------------------- LÀN GIÁO VIÊN 12/10 (gia/bai-hang-ngay.ts): Hành trình › Bài hằng ngày +
   // tấm Hồ sơ làm bài (hồ sơ thái độ + lịch sử làm câu đúng tên em của bảng). Dữ liệu giả, tên giả.
   if (duong === '/gv/bai-hang-ngay') return { ok: true as const, du: baiHangNgayGia() as unknown as Record<string, unknown> }
@@ -80,5 +97,9 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   // ---- LÀN THẦY TỰ CHỮA 12/10 (cảnh `&ttc=1`): danh sách lớp CÓ số báo danh ⇒ thẻ Thầy tự chữa có tỉ lệ sai lớp (gia/thay-tu-chua.ts).
   if (LA_TTC && duong === '/gv/lop') return { ok: true as const, du: { lop: LOP_TTC } }
   // ---- hết LÀN THẦY TỰ CHỮA 12/10
+  // ---- LÀN CHỮA BÀI 12/10B (cảnh `&ttc=1&cb=1`): em của lớp làm sai từng câu (theo lô) + buổi điểm danh đang mở (gia/chua-bai.ts).
+  const cb = traLoiChuaBai(duong, b)
+  if (cb) return cb
+  // ---- hết LÀN CHỮA BÀI 12/10B
   return traLoiThay(duong, b)
 }

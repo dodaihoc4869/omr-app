@@ -110,6 +110,9 @@ export const NGUONG_THAI_DO = {
   ngayDuTot: 80,
   ngayDuChuY: 50,
   soNgayToiThieu: 3,
+  /** Nhãn "Lười" (thầy 12/10 duyệt, CÙNG luật nhóm Nhịp học ở Hôm nay): đủ mức ≤ 40% số ngày đã tính, HOẶC ≥ 3 ngày liền không làm câu nào. */
+  ngayDuLuoi: 40,
+  ngayLienKhongLam: 3,
   /** (b) quá nhanh: xấu khi ≥ 30% lượt quá nhanh VÀ nhóm ấy đúng dưới 50% · chú ý khi ≥ 15%; cần ≥ 20 lượt có số giây. */
   nhanXau: 30,
   nhanChuY: 15,
@@ -158,21 +161,24 @@ export interface TinHieuThaiDo {
   nguong: string
 }
 
-export type NhanThaiDo = 'cham-chi' | 'chua-deu' | 'doi-pho' | 'chua-du-du-lieu'
+export type NhanThaiDo = 'cham-chi' | 'chua-deu' | 'luoi' | 'doi-pho' | 'chua-du-du-lieu'
 export const TEN_NHAN_THAI_DO: Readonly<Record<NhanThaiDo, string>> = {
   'cham-chi': 'Chăm chỉ',
   'chua-deu': 'Chưa đều',
+  luoi: 'Lười',
   'doi-pho': 'Có dấu hiệu đối phó',
   'chua-du-du-lieu': 'Chưa đủ dữ liệu',
 }
-/** LUẬT KẾT LUẬN (minh bạch, theo thứ tự):
+/** LUẬT KẾT LUẬN (minh bạch, theo thứ tự) — nhóm Chăm / Chưa đều / Lười CÙNG luật Nhịp học ở Hôm nay (thầy 12/10 duyệt):
  *  1. "Có dấu hiệu đối phó" khi (b) quá nhanh ở mức xấu, HOẶC (e) chọn lặp ở mức xấu, HOẶC (d) gợi ý ở mức xấu VÀ (f) độ đúng đang giảm (chú ý/xấu).
  *  2. "Chưa đủ dữ liệu" khi (a) chưa đủ 3 ngày đã tính.
- *  3. "Chưa đều" khi (a) dưới 80% ngày đủ mức, HOẶC (c) dồn bài ở mức xấu.
- *  4. Còn lại: "Chăm chỉ" (≥ 80% ngày đủ mức, không dồn bài, không dấu hiệu đối phó). */
+ *  3. "Lười" khi (a) đủ mức ≤ 40% số ngày, HOẶC ≥ 3 ngày liền không làm câu nào.
+ *  4. "Chưa đều" khi (a) dưới 80% số ngày đủ mức, HOẶC (c) dồn bài ở mức xấu.
+ *  5. Còn lại: "Chăm chỉ" (≥ 80% ngày đủ mức, không dồn bài, không dấu hiệu đối phó). */
 export const LUAT_KET_LUAN: readonly string[] = [
   'Có dấu hiệu đối phó: quá nhanh mà đúng thấp, hoặc chọn lặp một phương án, hoặc dựa nhiều vào gợi ý/lời giải trong khi độ đúng đang giảm.',
   'Chưa đủ dữ liệu: chưa đủ 3 ngày để tính tỉ lệ ngày đủ mức.',
+  'Lười: đủ mức từ 40% số ngày trở xuống, hoặc 3 ngày liền không làm câu nào.',
   'Chưa đều: dưới 80% số ngày đủ mức, hoặc từ 50% lượt làm dồn vào 23:00–04:59.',
   'Chăm chỉ: từ 80% số ngày đủ mức, không dồn bài, không dấu hiệu đối phó.',
 ]

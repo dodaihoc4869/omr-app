@@ -1,29 +1,50 @@
-// HÀNH TRÌNH › CẦN THẦY CHỮA › "THẦY TỰ CHỮA" (thầy 12/10, nguyên văn: "mục cần chữa cho tôi một phần tự chữa, phần này cho tôi chọn đề trong Mục dạy
-// học (trắc nghiệm khách quan trả lời ngắn) khi chọn đề nào thì đề đó hiển thị tất cả các câu chiếu lên máy chiếu, ưu tiên đẩy câu đúng sai và tính toán
-// lên đầu tiên hiển thị, bảng hiển thị đầy đủ mọi thứ như mục chiếu lên bảng (đúng chuẩn)").
+// HÀNH TRÌNH › CHỮA BÀI › KHỐI (B) "CHỮA CÂU KHÓ & TÍNH TOÁN" (thầy 12/10, nguyên văn: "mục cần chữa cho tôi một phần tự chữa, phần này cho tôi chọn đề
+// trong Mục dạy học (trắc nghiệm khách quan trả lời ngắn) … ưu tiên đẩy câu đúng sai và tính toán lên đầu tiên hiển thị, bảng hiển thị đầy đủ mọi thứ như mục
+// chiếu lên bảng (đúng chuẩn)"; 12/10B: "thu gọn tối giản hết lại thành 2 mục …" · "chữa câu khó và tính toán cũng phải chiếu lên bảng theo chuẩn nhé" —
+// bản vẽ HanhTrinh-ChuaBai + ToChieu-ChuaCauKho thầy duyệt).
 //
-// MỘT THẺ GẬP ở đầu thẻ Cần thầy chữa (mặc định gập — danh sách cần chữa vẫn là thứ thầy thấy trước; bấm "Chọn đề" mới đọc kho):
-//   1. Lớp (ô chọn theo khối, `/gv/lop` — lệnh chỉ đọc sẵn có; lỗi ⇒ chọn theo khối, không có tỉ lệ sai lớp)
-//   2. Bài trong Dạy học (đúng cây DẠY HỌC của Hành trình › Dạy học › Bài hôm nay: `khoDayHoc` → `dsBaiCuaKhoi`, chương theo số chương, bài theo số bài)
-//   3. Đề: ba nút bật/tắt Trắc nghiệm · Đúng–sai · Trả lời ngắn (kèm số câu) — chọn bài thì bật đủ cả ba (cả đề của bài); bấm để giữ một tờ.
-//   4. Xem trước: mọi câu ĐÃ XẾP (Đúng–sai có tính toán → Đúng–sai → có tính toán → còn lại, cùng hạng theo thứ tự đề — `xepThuTuChua`), mỗi dòng
-//      số thứ tự chiếu · Câu N · loại · "Có tính toán" / "Tự luận" · tóm tắt đề · tỉ lệ sai của lớp (sổ học, `/gv/thong-ke-lop-cau`) khi có.
-//   5. Nút chính "Chiếu lên máy chiếu" ⇒ tờ của Chiếu lên bảng (`thay-tu-chua-to.ts` → `dungToChieu` → `KhungXemPhieu`): đề + phương án + hình,
-//      lời giải hiện dần, phím T thống kê lớp, phím X ai làm sai (kèm số giây), lật trang, chữ không thu nhỏ.
+// MỞ SẴN (không gập): đọc kho Dạy học trên máy + danh sách lớp ngay khi thẻ hiện.
+//   1. Lớp (ô chọn theo khối, `/gv/lop` — lệnh chỉ đọc sẵn có; lỗi ⇒ chọn theo khối, không có số liệu lớp, không gọi em)
+//   2. Bài trong Dạy học (đúng cây DẠY HỌC của Hành trình › Dạy học: `khoDayHoc` → `dsBaiCuaKhoi`)
+//   3. Đề: chip Trắc nghiệm · Đúng–sai · Trả lời ngắn (kèm số câu) — chọn bài thì bật đủ (cả đề của bài); bấm để giữ một tờ.
+//   4. BỐN Ô SỐ: câu sẽ chiếu · câu Đúng–sai · câu có tính toán · câu lớp sai từ 30%.
+//   5. Danh sách câu ĐÃ XẾP (Đúng–sai có tính toán → Đúng–sai → có tính toán → còn lại — `xepThuTuChua`): số thứ tự chiếu · Câu N · loại · "Có tính toán"
+//      · tóm tắt đề · "Gọi lên bảng: <em> (có mặt, làm sai câu này) · còn N em sai khác" · % lớp sai + "x/y em sai" + thanh.
+//   6. Nút chính "Chiếu lên bảng" ⇒ tờ CHUẨN Chiếu lên bảng (`thay-tu-chua-to.ts` → `dungToChieu` → `KhungXemPhieu`): mỗi câu một đợt, phím L / nút "Lên bảng"
+//      gọi em đầu danh sách, "Gọi em khác" gọi em kế, cột 1/3 đen + thẻ tên "Tên · Sai câu này N lần · gần nhất dd/mm · số giây", Đạt / Chưa đạt ghi sổ
+//      qua cầu nối (`useGhiToChieu`, lệnh `ghiLenBang` như Lên bảng chiến dịch; "Thầy chữa" ⇒ `/gv/thay-chua-cau`), G lời giải hiện dần, T thống kê lớp,
+//      X ai sai + số giây, Space lật trang.
+// ỨNG VIÊN (ung-vien-chua-cau.ts): em của lớp làm SAI câu (lần mới nhất) — `/gv/ai-sai-nhieu-cau` MỘT lệnh cho cả đề (máy chủ cũ ⇒ `/gv/ai-sai-cau` từng câu);
+// ưu tiên em CÓ MẶT ở buổi điểm danh đang mở hôm nay (`/gv/buoi-hoc` gan-day); không có buổi ⇒ vẫn liệt kê, nói rõ chưa biết ai có mặt.
 // Năm trạng thái: chờ = khung xương · trống (kho / khối chưa có bài) = câu nói vì sao + việc làm tiếp · có dữ liệu · lỗi = lý do + Thử lại · mất mạng
-// (danh sách lớp / số liệu lớp lỗi ⇒ dòng nói thật, phần còn lại vẫn dùng được). Không ghi gì lên máy chủ: chỉ đọc kho trên máy + hai lệnh chỉ đọc.
-// Màu: chỉ biến --gvm-* của app thầy (thay-tu-chua.css).
+// (danh sách lớp / số liệu lớp / em làm sai lỗi ⇒ dòng nói thật, phần còn lại vẫn dùng được). Chỉ GHI khi thầy bấm Đạt / Chưa đạt / Thầy chữa trên tờ.
+// Màu: chỉ biến --gvm-* của app thầy (thay-tu-chua.css). Đáp án / lời giải chỉ nằm trên tờ chiếu của máy thầy.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronDown, ChevronUp, MonitorPlay, Presentation, RefreshCw } from 'lucide-react'
+import { MonitorPlay, RefreshCw } from 'lucide-react'
 import type { TeacherExamSource } from '../../data/examContent'
 import type { BaiCay, ToBai } from '../../lib/bai-hom-nay'
 import type { LopThay } from '../../lib/ten-lop-thay'
 import type { SoGopCauLop } from '../../lib/thong-ke-lop-cau'
 import { layThongKeLopCau } from '../../lib/ho-so-em-thay'
 import { lyDoDeHieu } from '../../lib/loi-de-hieu'
-import { TEN_LOAI_CAU, cauCuaDe, demTuChua, laCauKhacKhoi, tenBuoiTuChua, tiLeSaiLop, tomTatCau, xepThuTuChua, type CauTuChua, type PhanCau } from '../../lib/thay-tu-chua'
+import {
+  NGUONG_LOP_SAI,
+  TEN_LOAI_CAU,
+  cauCuaDe,
+  demTuChua,
+  laCauKhacKhoi,
+  soLieuLopCau,
+  tenBuoiTuChua,
+  tomTatCau,
+  xepThuTuChua,
+  type CauTuChua,
+  type PhanCau,
+} from '../../lib/thay-tu-chua'
+import { docCoMatHomNay, dongGoiLenBang, laySaiNhieuCau, ngayVnCua, xepUngVien, type KetQuaSai, type UngVien } from '../../lib/ung-vien-chua-cau'
 import { useAppStore } from '../../store/appStore'
-import { useGhiToChieu } from './ghi-to-chieu'
+import { ghiMotO, thayChuaQuaMayChu, useGhiToChieu } from './ghi-to-chieu'
+import type { OGhiToChieu } from './to-chieu'
+import type { SoLopCau } from './thay-tu-chua-to'
 import './thay-tu-chua.css'
 
 const KhungXemPhieu = lazy(() => import('../KhungXemPhieu'))
@@ -37,7 +58,7 @@ const TRAN_EM_TK = 200
 const TRAN_CAU_TK = 120
 const KHOA_NHO = 'ddh.thayTuChua'
 
-/** Đối tượng chữa: một lớp (có danh sách SBD ⇒ có tỉ lệ sai) hoặc cả khối (khi chưa đọc được danh sách lớp). */
+/** Đối tượng chữa: một lớp (có danh sách SBD ⇒ có số liệu lớp + gọi em) hoặc cả khối (khi chưa đọc được danh sách lớp). */
 export type DoiTuong = { kieu: 'lop'; tenLop: string; khoi: KhoiSo; sbd: readonly string[]; soEm: number } | { kieu: 'khoi'; khoi: KhoiSo }
 const khoaDoiTuong = (d: DoiTuong) => (d.kieu === 'lop' ? `lop:${d.tenLop}` : `khoi:${d.khoi}`)
 const tenDoiTuong = (d: DoiTuong) => (d.kieu === 'lop' ? `lớp ${d.tenLop}` : `Khối ${d.khoi}`)
@@ -109,6 +130,7 @@ function ghiNho(n: NhoChon) {
 }
 
 type TrangThaiTk = { trang: 'khong-ap' | 'cho' | 'trong' | 'loi' } | { trang: 'co'; soGop: Record<string, SoGopCauLop> }
+type TrangThaiUv = { trang: 'khong-ap' | 'cho' } | { trang: 'loi'; chu: string } | { trang: 'co'; kq: Extract<KetQuaSai, { ok: true }> }
 
 function Xuong() {
   return (
@@ -120,18 +142,29 @@ function Xuong() {
   )
 }
 
-function DongCau({ c, stt, tk }: { c: CauTuChua; stt: number; tk: TrangThaiTk }) {
-  const sai = tk.trang === 'co' ? tiLeSaiLop(tk.soGop[c.qid]) : null
+interface DongXem {
+  c: CauTuChua
+  so: { sai: number; lam: number; phanTram: number } | null
+  /** Có số liệu lớp (đã đọc xong) mà câu chưa em nào làm. */
+  chuaAiLam: boolean
+  uv: readonly UngVien[] | null
+}
+
+function DongCau({ d, stt }: { d: DongXem; stt: number }) {
+  const { c, so, uv } = d
   const loai = c.tuLuan ? 'Tự luận' : TEN_LOAI_CAU[c.phan]
   const tom = c.thieuNoiDung ? '' : tomTatCau(c.q)
+  const cao = !!so && so.phanTram >= NGUONG_LOP_SAI
+  const goi = uv && uv.length ? dongGoiLenBang(uv) : ''
   return (
     <li className="gvv2-ttc-dong" data-phan={c.phan} data-qid={c.qid}>
       <span className="gvv2-ttc-stt gvv2-so">{stt}</span>
       <div className="gvv2-ttc-cau">
         <span className="gvv2-ttc-meta">
-          <b>
-            Câu {c.so} · {loai}
-          </b>
+          <b>Câu {c.so}</b>
+          <span className="gvv2-ttc-loai" data-phan={c.tuLuan ? 'tu-luan' : c.phan}>
+            {loai}
+          </span>
           {c.tinhToan && (
             <span className="gvv2-ttc-the" data-loai="tinh">
               Có tính toán
@@ -144,13 +177,30 @@ function DongCau({ c, stt, tk }: { c: CauTuChua; stt: number; tk: TrangThaiTk })
           )}
         </span>
         {tom ? <span className="gvv2-ttc-de">{tom}</span> : !c.thieuNoiDung && <span className="gvv2-ttc-de">(câu chỉ có hình)</span>}
+        {goi ? (
+          <span className="gvv2-ttc-goi" data-co-mat={uv?.[0]?.coMat === true ? 'true' : 'false'}>
+            {goi}
+          </span>
+        ) : uv && d.chuaAiLam === false && so && so.sai === 0 ? (
+          <span className="gvv2-ttc-goi" data-trong="true">
+            Chưa em nào của lớp làm sai câu này — thầy chữa cho cả lớp
+          </span>
+        ) : null}
       </div>
-      <span className="gvv2-ttc-sai" data-cao={sai && sai.phanTram >= 50 ? 'true' : 'false'}>
-        {sai ? (
+      <span className="gvv2-ttc-sai" data-cao={cao ? 'true' : 'false'}>
+        {so ? (
           <>
-            <b className="gvv2-so">{sai.phanTram}%</b> <small className="gvv2-so">lớp sai · {sai.bai} em làm</small>
+            <span className="gvv2-ttc-sai-so">
+              <b className="gvv2-so">{so.phanTram}% lớp sai</b>
+              <small className="gvv2-so">
+                {so.sai}/{so.lam} em sai
+              </small>
+            </span>
+            <span className="gvv2-ttc-thanh" aria-hidden="true">
+              <i style={{ width: `${Math.max(0, Math.min(100, so.phanTram))}%` }} />
+            </span>
           </>
-        ) : tk.trang === 'co' ? (
+        ) : d.chuaAiLam ? (
           <small>chưa em nào làm</small>
         ) : null}
       </span>
@@ -158,13 +208,12 @@ function DongCau({ c, stt, tk }: { c: CauTuChua; stt: number; tk: TrangThaiTk })
   )
 }
 
-/** Thẻ "Thầy tự chữa" (gập sẵn). */
+/** Khối (B) "Chữa câu khó & tính toán" — mở sẵn. */
 export default function ThayTuChua() {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
-  const [mo, setMo] = useState(false)
 
-  // ── kho + lớp (chỉ đọc khi mở) ──
+  // ── kho + lớp (đọc ngay khi thẻ hiện) ──
   const [kho, setKho] = useState<KhoTuChua | null>(null)
   const [loiKho, setLoiKho] = useState('')
   const [dangTaiKho, setDangTaiKho] = useState(false)
@@ -195,17 +244,24 @@ export default function ThayTuChua() {
     }
     setDangTaiKho(false)
   }, [])
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    void tai()
+    return () => {
       lanTai.current++
-    },
-    [],
-  )
-  /** Mở thẻ lần đầu ⇒ đọc kho + lớp (gập lại / mở lại không đọc lại; "Thử lại" đọc lại khi lỗi). */
-  const batTat = () => {
-    if (!mo && !kho && !dangTaiKho && !loiKho) void tai()
-    setMo((x) => !x)
-  }
+    }
+  }, [tai])
+
+  // ── em có mặt hôm nay (buổi điểm danh đang mở) — đọc một lần; undefined = đang đọc ──
+  const [coMat, setCoMat] = useState<ReadonlySet<string> | null | undefined>(undefined)
+  useEffect(() => {
+    let huy = false
+    void docCoMatHomNay().then((s) => {
+      if (!huy) setCoMat(s)
+    })
+    return () => {
+      huy = true
+    }
+  }, [])
 
   // ── lựa chọn (nhớ trên máy: lớp, bài, tờ của bài) ──
   const [nho] = useState(docNho)
@@ -251,35 +307,89 @@ export default function ThayTuChua() {
   const [xemDuBai, setXemDuBai] = useState<string | null>(null)
   const xemDu = !!bai && xemDuBai === bai.khoaBai
 
-  // ── số liệu lớp (tỉ lệ sai + dải T trên tờ): CHỈ ĐỌC `/gv/thong-ke-lop-cau`; kết quả gắn khoá (lớp · câu) — đổi lựa chọn ⇒ "đang đọc" ngay ──
+  // ── số liệu lớp (tỉ lệ sai + dải T) và EM LÀM SAI từng câu: CHỈ ĐỌC; kết quả gắn khoá (lớp · câu) — đổi lựa chọn ⇒ "đang đọc" ngay ──
   const qidKey = xep.map((c) => c.qid).join('|')
   const sbdLop = dt?.kieu === 'lop' ? dt.sbd : null
   const khoaTk = sbdLop?.length && qidKey && dt ? `${khoaDoiTuong(dt)}#${qidKey}` : ''
   const [tkKq, setTkKq] = useState<{ khoa: string; tk: TrangThaiTk } | null>(null)
   const tk: TrangThaiTk = !khoaTk ? { trang: 'khong-ap' } : tkKq?.khoa === khoaTk ? tkKq.tk : { trang: 'cho' }
+  const [uvKq, setUvKq] = useState<{ khoa: string; uv: TrangThaiUv } | null>(null)
+  const uvTrang: TrangThaiUv = !khoaTk ? { trang: 'khong-ap' } : uvKq?.khoa === khoaTk ? uvKq.uv : { trang: 'cho' }
+  /** Lượt đọc em làm sai đang chạy (nút Chiếu bấm sớm thì chờ đúng lượt này, không chiếu "cả lớp" nhầm). */
+  const uvHua = useRef<{ khoa: string; hua: Promise<TrangThaiUv> } | null>(null)
   useEffect(() => {
     if (!khoaTk || !sbdLop) return
     let huy = false
-    void layThongKeLopCau(sbdLop.slice(0, TRAN_EM_TK), [...new Set(qidKey.split('|'))].slice(0, TRAN_CAU_TK))
+    const qids = [...new Set(qidKey.split('|'))].slice(0, TRAN_CAU_TK)
+    void layThongKeLopCau(sbdLop.slice(0, TRAN_EM_TK), qids)
       .catch(() => null)
       .then((r) => {
         if (huy) return
         setTkKq({ khoa: khoaTk, tk: r === null ? { trang: 'loi' } : Object.keys(r).length ? { trang: 'co', soGop: r } : { trang: 'trong' } })
       })
+    const hua = laySaiNhieuCau(sbdLop.slice(0, TRAN_EM_TK), qids).then(
+      (r): TrangThaiUv => (r.ok ? { trang: 'co', kq: r } : { trang: 'loi', chu: r.chu }),
+      (e: unknown): TrangThaiUv => ({ trang: 'loi', chu: lyDoDeHieu(e) }),
+    )
+    uvHua.current = { khoa: khoaTk, hua }
+    void hua.then((uv) => {
+      if (!huy) setUvKq({ khoa: khoaTk, uv })
+    })
     return () => {
       huy = true
     }
   }, [khoaTk, sbdLop, qidKey])
 
-  // ── chiếu ──
+  /** Ứng viên đã xếp từng câu (có mặt trước, rải người đầu) — null khi chưa có danh sách em sai. */
+  const xepUv = useCallback(
+    (u: TrangThaiUv) => (u.trang === 'co' ? xepUngVien(xep.map((c) => c.qid), u.kq.cau, coMat ?? null) : null),
+    [xep, coMat],
+  )
+  const uvTheoCau = useMemo(() => xepUv(uvTrang), [xepUv, uvTrang])
+  const dongXem: DongXem[] = useMemo(
+    () =>
+      xep.map((c) => {
+        const lo = uvTrang.trang === 'co' ? uvTrang.kq.cau[c.qid] : undefined
+        const gop = tk.trang === 'co' ? tk.soGop[c.qid] : undefined
+        const so = soLieuLopCau(lo, gop)
+        const coSoLieu = tk.trang === 'co' || tk.trang === 'trong' || (uvTrang.trang === 'co' && !uvTrang.kq.tungCau)
+        return { c, so, chuaAiLam: !so && coSoLieu, uv: uvTheoCau ? (uvTheoCau.get(c.qid) ?? []) : null }
+      }),
+    [xep, uvTrang, tk, uvTheoCau],
+  )
+  const coSoLop = dongXem.some((d) => d.so)
+  const soSaiCao = dongXem.filter((d) => d.so && d.so.phanTram >= NGUONG_LOP_SAI).length
+  const soCoMatLop = coMat && sbdLop ? sbdLop.filter((s) => coMat.has(s)).length : 0
+
+  // ── chiếu (tờ chuẩn Chiếu lên bảng: gọi em, Đạt / Chưa đạt ghi sổ) ──
   const [html, setHtml] = useState('')
   const [dangChieu, setDangChieu] = useState(false)
-  const khongGhi = useCallback(async () => ({ ok: false as const, chu: 'Thầy tự chữa không gọi em lên bảng — không có kết quả để ghi.' }), [])
-  const { moPhien, ganO, dongPhien } = useGhiToChieu('thay-tu-chua', khongGhi, khongGhi)
+  // Khoá ghi theo NGÀY: chống ghi đôi cùng em × câu trong ngày (mở lại tờ ⇒ ô đã ghi khoá ngay); hôm sau chữa lại được.
+  const [maNguon] = useState(() => `chua-cau-kho-${ngayVnCua(Date.now())}`)
+  const ghiO = useCallback(
+    async (o: OGhiToChieu, dat: boolean, giay?: number) =>
+      !o.sbd
+        ? { ok: false as const, chu: 'Câu chữa cho cả lớp — không có em để ghi.' }
+        : !o.chuyenDe
+          ? { ok: false as const, chu: 'Câu này chưa có chuyên đề — chưa ghi Đạt / Chưa đạt vào sổ được.' }
+          : ghiMotO(o, dat, giay),
+    [],
+  )
+  const thayChuaO = useCallback(
+    async (o: OGhiToChieu) => (o.sbd ? thayChuaQuaMayChu(o, 'len_bang', maNguon) : { ok: false as const, chu: 'Câu chữa cho cả lớp — không có em để ghi.' }),
+    [maNguon],
+  )
+  const { moPhien, ganO, dongPhien } = useGhiToChieu(maNguon, ghiO, thayChuaO)
   const chieu = async () => {
     if (!xep.length || !bai) return
     setDangChieu(true)
     try {
+      // Danh sách em làm sai còn đang đọc ⇒ chờ đúng lượt ấy (không chiếu "cả lớp" nhầm khi lớp có em sai).
+      let uv = uvTrang
+      if (uv.trang === 'cho' && uvHua.current?.khoa === khoaTk) uv = await uvHua.current.hua
+      const theoCau = xepUv(uv)
+      const soLop = new Map<string, SoLopCau>()
+      for (const d of dongXem) if (d.so) soLop.set(d.c.qid, { sai: d.so.sai, lam: d.so.lam })
       const ma = moPhien()
       const [{ dungToThayTuChua }, { chuBoCauKhacKhoi, chuThieuNoiDung }] = await Promise.all([import('./thay-tu-chua-to'), import('../../lib/tra-cau-chieu')])
       const kq = await dungToThayTuChua(xep, nguonChon, {
@@ -287,6 +397,8 @@ export default function ThayTuChua() {
         khoi: dt?.khoi ?? null,
         maPhien: ma,
         soGop: tk.trang === 'co' ? tk.soGop : null,
+        ungVien: theoCau,
+        soLop,
       })
       const bo = chuBoCauKhacKhoi(kq.soBoKhoi)
       if (kq.soBoKhoi >= xep.length) {
@@ -296,6 +408,7 @@ export default function ThayTuChua() {
       if (bo) showToast(bo, 'warn')
       const thieu = chuThieuNoiDung(kq.soThieu)
       if (thieu) showToast(thieu, 'warn')
+      if (kq.soKhongGhi > 0) showToast(`${kq.soKhongGhi} câu chưa có chuyên đề — trên tờ các câu ấy không có nút Đạt / Chưa đạt (chưa ghi sổ được)`, 'warn')
       ganO(ma, kq.o)
       setHtml(kq.html)
     } catch (e) {
@@ -305,179 +418,183 @@ export default function ThayTuChua() {
     }
   }
 
-  const hien = xemDu ? xep : xep.slice(0, SO_CAU_XEM_TRUOC)
-  const nutMo = (
-    <button type="button" className="gvv2-nut-vien tt-nhan" aria-expanded={mo} aria-controls="gvv2-ttc-than" onClick={batTat}>
-      {mo ? 'Thu gọn' : 'Chọn đề'}
-      {mo ? <ChevronUp size={18} aria-hidden="true" /> : <ChevronDown size={18} aria-hidden="true" />}
-    </button>
-  )
+  const hien = xemDu ? dongXem : dongXem.slice(0, SO_CAU_XEM_TRUOC)
 
   return (
-    <section className="gvv2-the gvv2-ttc" aria-labelledby="gvv2-ttc-tieu" data-mo={mo ? 'true' : 'false'}>
+    <section className="gvv2-the gvv2-ttc" aria-labelledby="gvv2-ttc-tieu">
       <div className="gvv2-ttc-dau">
-        <span className="gvv2-cc-bieu" data-mau="xd" aria-hidden="true">
-          <Presentation size={20} />
-        </span>
-        <div className="gvv2-ttc-chu">
-          <h2 id="gvv2-ttc-tieu" className="gvv2-ttc-tieu">
-            Thầy tự chữa
-          </h2>
-          <p className="gvv2-ttc-phu">Chọn một đề trong Dạy học — chiếu đủ mọi câu cho cả lớp, câu Đúng–sai và câu có tính toán lên trước.</p>
-        </div>
-        {nutMo}
+        <h2 id="gvv2-ttc-tieu" className="gvv2-ttc-tieu">
+          Chữa câu khó &amp; tính toán
+        </h2>
+        <p className="gvv2-ttc-phu">
+          Thầy chọn đề trong Dạy học — app xếp câu Đúng–sai và câu tính toán lên trước, kèm tỉ lệ lớp sai, rồi chiếu theo đúng chuẩn Chiếu lên bảng: mỗi câu gọi em
+          làm sai lên bảng, chấm Đạt / Chưa đạt.
+        </p>
       </div>
 
-      {mo && (
-        <div id="gvv2-ttc-than" className="gvv2-ttc-than">
-          {loiKho ? (
-            <div className="gvv2-loi gvv2-ttc-loi" role="alert">
-              <p>Chưa đọc được kho đề trên máy này. {loiKho}</p>
-              <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTaiKho}>
-                Thử lại
-              </button>
-            </div>
-          ) : !kho ? (
-            <Xuong />
-          ) : !doiTuong.length ? (
-            <div className="gvv2-ttc-trong">
-              <p>Kho Dạy học trên máy này chưa có bài nào có tờ Trắc nghiệm, Đúng–sai hay Trả lời ngắn. Nhập đề vào thư mục DẠY HỌC ở Kho đề rồi mở lại.</p>
-              <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => setScreen('nganhangde')}>
-                Mở Kho đề
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="gvv2-ttc-chon">
-                <label className="gvv2-ttc-o">
-                  <span>Lớp</span>
-                  <select
-                    value={dt ? khoaDoiTuong(dt) : ''}
-                    onChange={(e) => setChonDt(e.target.value)}
-                  >
-                    {KHOI.map((k) => {
-                      const ds = doiTuong.filter((d) => d.khoi === k)
-                      if (!ds.length) return null
-                      return (
-                        <optgroup key={k} label={`Khối ${k}`}>
-                          {ds.map((d) => (
-                            <option key={khoaDoiTuong(d)} value={khoaDoiTuong(d)}>
-                              {d.kieu === 'lop' ? `${d.tenLop} · ${d.soEm} em` : `Khối ${d.khoi}`}
-                            </option>
-                          ))}
-                        </optgroup>
-                      )
-                    })}
-                  </select>
-                </label>
-                <label className="gvv2-ttc-o">
-                  <span>Bài trong Dạy học{dt ? ` · Khối ${dt.khoi}` : ''}</span>
-                  <select value={bai?.khoaBai ?? ''} onChange={(e) => setKhoaBai(e.target.value)}>
-                    {!bai && (
-                      <option value="" disabled>
-                        Chọn bài cần chữa
-                      </option>
-                    )}
-                    {[...new Set(dsBai.map((b) => b.chuong))].map((ch) => (
-                      <optgroup key={ch || '_'} label={ch || 'Chưa xếp chương'}>
-                        {dsBai
-                          .filter((b) => b.chuong === ch)
-                          .map((b) => (
-                            <option key={b.khoaBai} value={b.khoaBai}>
-                              {b.tenBai}
-                            </option>
-                          ))}
+      <div id="gvv2-ttc-than" className="gvv2-ttc-than">
+        {loiKho ? (
+          <div className="gvv2-loi gvv2-ttc-loi" role="alert">
+            <p>Chưa đọc được kho đề trên máy này. {loiKho}</p>
+            <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTaiKho}>
+              Thử lại
+            </button>
+          </div>
+        ) : !kho ? (
+          <Xuong />
+        ) : !doiTuong.length ? (
+          <div className="gvv2-ttc-trong">
+            <p>Kho Dạy học trên máy này chưa có bài nào có tờ Trắc nghiệm, Đúng–sai hay Trả lời ngắn. Nhập đề vào thư mục DẠY HỌC ở Kho đề rồi mở lại.</p>
+            <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => setScreen('nganhangde')}>
+              Mở Kho đề
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="gvv2-ttc-chon">
+              <label className="gvv2-ttc-o gvv2-ttc-o--lop">
+                <span>Lớp</span>
+                <select value={dt ? khoaDoiTuong(dt) : ''} onChange={(e) => setChonDt(e.target.value)}>
+                  {KHOI.map((k) => {
+                    const ds = doiTuong.filter((d) => d.khoi === k)
+                    if (!ds.length) return null
+                    return (
+                      <optgroup key={k} label={`Khối ${k}`}>
+                        {ds.map((d) => (
+                          <option key={khoaDoiTuong(d)} value={khoaDoiTuong(d)}>
+                            {d.kieu === 'lop' ? `${d.tenLop} · ${d.soEm} em` : `Khối ${d.khoi}`}
+                          </option>
+                        ))}
                       </optgroup>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              {loiLop && (
-                <p className="gvv2-ttc-ghi" role="status">
-                  Chưa tải được danh sách lớp ({loiLop}) — đang chọn theo khối; tỉ lệ sai của lớp sẽ không có.
-                </p>
-              )}
-
-              {!bai ? (
-                <p className="gvv2-ttc-trong-chu">Chọn một bài để xem các câu sẽ chiếu.</p>
-              ) : (
-                <>
-                  <div className="gvv2-ttc-to" role="group" aria-label={`Tờ đề của ${bai.tenBai}`}>
-                    <span className="gvv2-ttc-nhan">Đề</span>
+                    )
+                  })}
+                </select>
+              </label>
+              <label className="gvv2-ttc-o gvv2-ttc-o--bai">
+                <span>Bài trong Dạy học{dt ? ` · Khối ${dt.khoi}` : ''}</span>
+                <select value={bai?.khoaBai ?? ''} onChange={(e) => setKhoaBai(e.target.value)}>
+                  {!bai && (
+                    <option value="" disabled>
+                      Chọn bài cần chữa
+                    </option>
+                  )}
+                  {[...new Set(dsBai.map((b) => b.chuong))].map((ch) => (
+                    <optgroup key={ch || '_'} label={ch || 'Chưa xếp chương'}>
+                      {dsBai
+                        .filter((b) => b.chuong === ch)
+                        .map((b) => (
+                          <option key={b.khoaBai} value={b.khoaBai}>
+                            {b.tenBai}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </label>
+              {bai && (
+                <div className="gvv2-ttc-to" role="group" aria-label={`Tờ đề của ${bai.tenBai}`}>
+                  <span className="gvv2-ttc-nhan">Đề</span>
+                  <span className="gvv2-ttc-chip-hang">
                     {dsTo.map((t) => (
-                      <button
-                        key={t.maDe}
-                        type="button"
-                        className="gvv2-ttc-chip tt-nhan"
-                        aria-pressed={maChon.has(t.maDe)}
-                        onClick={() => batTo(t.maDe)}
-                      >
-                        <b>{TEN_LOAI_CAU[t.phan as PhanCau]}</b> <small className="gvv2-so">{t.soCau} câu</small>
+                      <button key={t.maDe} type="button" className="gvv2-ttc-chip tt-nhan" aria-pressed={maChon.has(t.maDe)} onClick={() => batTo(t.maDe)}>
+                        <b>{TEN_LOAI_CAU[t.phan as PhanCau]}</b> <small className="gvv2-so">· {t.soCau} câu</small>
                       </button>
                     ))}
-                  </div>
-
-                  {xep.length === 0 ? (
-                    <p className="gvv2-ttc-trong-chu">Bật ít nhất một tờ đề ở trên để chiếu.</p>
-                  ) : (
-                    <>
-                      <p className="gvv2-ttc-tom" aria-live="polite">
-                        <b className="gvv2-so">{dem.tong}</b> câu sẽ chiếu · <b className="gvv2-so">{dem.dungSai}</b> câu Đúng–sai ·{' '}
-                        <b className="gvv2-so">{dem.tinhToan}</b> câu có tính toán — Đúng–sai và câu có tính toán chiếu trước
-                      </p>
-                      {soKhacKhoi > 0 && (
-                        <p className="gvv2-ttc-bao" role="status">
-                          {soKhacKhoi} câu mang mã khối khác Khối {khoiDt} — không chiếu.
-                        </p>
-                      )}
-                      {dem.thieu > 0 && (
-                        <p className="gvv2-ttc-bao" role="status">
-                          {dem.thieu} câu chưa có nội dung trên máy này — tờ chiếu sẽ hiện dòng thay thế ở chỗ ấy.
-                        </p>
-                      )}
-                      <p className="gvv2-ttc-ghi">
-                        {tk.trang === 'co' || tk.trang === 'trong'
-                          ? `Tỉ lệ sai: lần làm mới nhất của mỗi em ${tenDoiTuong(dt!)} (sổ học)${tk.trang === 'trong' ? ' — chưa em nào làm các câu này, tờ không có dải thống kê.' : '.'}`
-                          : tk.trang === 'cho'
-                            ? `Đang đọc số liệu của ${tenDoiTuong(dt!)}…`
-                            : tk.trang === 'loi'
-                              ? 'Chưa tải được số liệu lớp — tờ vẫn chiếu, chỉ không có dải thống kê.'
-                              : dt?.kieu === 'lop'
-                                ? 'Lớp này chưa có danh sách số báo danh — tờ vẫn chiếu, không có tỉ lệ sai.'
-                                : 'Chọn một lớp để thấy tỉ lệ sai của lớp.'}
-                      </p>
-                      <ol className="gvv2-ttc-ds" aria-label="Thứ tự câu sẽ chiếu">
-                        {hien.map((c, i) => (
-                          <DongCau key={c.khoa} c={c} stt={i + 1} tk={tk} />
-                        ))}
-                      </ol>
-                      {xep.length > SO_CAU_XEM_TRUOC && (
-                        <button type="button" className="gvv2-nut-chu gvv2-ttc-xem-du" aria-expanded={xemDu} onClick={() => setXemDuBai(xemDu ? null : (bai?.khoaBai ?? null))}>
-                          {xemDu ? `Chỉ xem ${SO_CAU_XEM_TRUOC} câu đầu` : `Xem đủ ${xep.length} câu`}
-                        </button>
-                      )}
-                    </>
-                  )}
-
-                  <div className="gvv2-ttc-cuoi">
-                    <button type="button" className="gvv2-nut-chinh tt-nhan" disabled={!xep.length || dangChieu} aria-busy={dangChieu} onClick={() => void chieu()}>
-                      {dangChieu ? <RefreshCw size={18} aria-hidden="true" className="gvv2-quay" /> : <MonitorPlay size={18} aria-hidden="true" />}
-                      {dangChieu ? 'Đang dựng tờ chiếu…' : 'Chiếu lên máy chiếu'}
-                    </button>
-                    <span className="gvv2-ttc-goi-y">Trên tờ chiếu: G hiện lời giải · T thống kê lớp · X ai làm sai · Space lật trang · ? mọi phím</span>
-                  </div>
-                </>
+                  </span>
+                </div>
               )}
-            </>
-          )}
-        </div>
-      )}
+            </div>
+            {loiLop && (
+              <p className="gvv2-ttc-ghi" role="status">
+                Chưa tải được danh sách lớp ({loiLop}) — đang chọn theo khối; tỉ lệ sai của lớp và em gọi lên bảng sẽ không có.
+              </p>
+            )}
+
+            {!bai ? (
+              <p className="gvv2-ttc-trong-chu">Chọn một bài để xem các câu sẽ chiếu.</p>
+            ) : xep.length === 0 ? (
+              <p className="gvv2-ttc-trong-chu">Bật ít nhất một tờ đề ở trên để chiếu.</p>
+            ) : (
+              <>
+                <div className="gvv2-ttc-so4" aria-live="polite">
+                  <span className="gvv2-ttc-o-so" data-mau="xam">
+                    <b className="gvv2-so">{dem.tong}</b> câu sẽ chiếu
+                  </span>
+                  <span className="gvv2-ttc-o-so" data-mau="tim">
+                    <b className="gvv2-so">{dem.dungSai}</b> câu Đúng–sai
+                  </span>
+                  <span className="gvv2-ttc-o-so" data-mau="xd">
+                    <b className="gvv2-so">{dem.tinhToan}</b> câu có tính toán
+                  </span>
+                  {coSoLop && (
+                    <span className="gvv2-ttc-o-so" data-mau="ho">
+                      <b className="gvv2-so">{soSaiCao}</b> câu lớp sai từ {NGUONG_LOP_SAI}%
+                    </span>
+                  )}
+                </div>
+                {soKhacKhoi > 0 && (
+                  <p className="gvv2-ttc-bao" role="status">
+                    {soKhacKhoi} câu mang mã khối khác Khối {khoiDt} — không chiếu.
+                  </p>
+                )}
+                {dem.thieu > 0 && (
+                  <p className="gvv2-ttc-bao" role="status">
+                    {dem.thieu} câu chưa có nội dung trên máy này — tờ chiếu sẽ hiện dòng thay thế ở chỗ ấy.
+                  </p>
+                )}
+                <p className="gvv2-ttc-ghi">
+                  {tk.trang === 'cho' || uvTrang.trang === 'cho'
+                    ? `Đang đọc số liệu và em làm sai của ${tenDoiTuong(dt!)}…`
+                    : !khoaTk
+                      ? dt?.kieu === 'lop'
+                        ? 'Lớp này chưa có danh sách số báo danh — tờ vẫn chiếu, không có tỉ lệ sai và chưa gọi được em.'
+                        : 'Chọn một lớp để thấy tỉ lệ sai và em được gọi lên bảng.'
+                      : uvTrang.trang === 'loi'
+                        ? `Chưa tải được danh sách em làm sai (${uvTrang.chu}) — tờ vẫn chiếu, các câu chữa cho cả lớp.`
+                        : tk.trang === 'loi' && !coSoLop
+                          ? 'Chưa tải được số liệu lớp — tờ vẫn chiếu, chỉ không có dải thống kê.'
+                          : `Tỉ lệ sai: lần làm mới nhất của mỗi em ${tenDoiTuong(dt!)} (sổ học).${
+                              coMat === undefined
+                                ? ''
+                                : coMat
+                                  ? ` Gọi em có mặt trước — buổi điểm danh đang mở hôm nay có ${soCoMatLop} em của lớp.`
+                                  : ' Hôm nay chưa có buổi điểm danh đang mở — gọi theo số lần sai, chưa biết em nào có mặt.'
+                            }${uvTrang.trang === 'co' && uvTrang.kq.tungCau ? ' Máy chủ chưa có lệnh tra theo lô — em làm sai chỉ tra cho 30 câu đầu.' : ''}`}
+                </p>
+                <ol className="gvv2-ttc-ds" aria-label="Thứ tự câu sẽ chiếu">
+                  {hien.map((d, i) => (
+                    <DongCau key={d.c.khoa} d={d} stt={i + 1} />
+                  ))}
+                </ol>
+                {xep.length > SO_CAU_XEM_TRUOC && (
+                  <button type="button" className="gvv2-nut-chu gvv2-ttc-xem-du" aria-expanded={xemDu} onClick={() => setXemDuBai(xemDu ? null : (bai?.khoaBai ?? null))}>
+                    {xemDu ? `Chỉ xem ${SO_CAU_XEM_TRUOC} câu đầu` : `Xem đủ ${xep.length} câu ›`}
+                  </button>
+                )}
+              </>
+            )}
+
+            {bai && (
+              <div className="gvv2-ttc-cuoi">
+                <button type="button" className="gvv2-nut-chinh tt-nhan" disabled={!xep.length || dangChieu} aria-busy={dangChieu} onClick={() => void chieu()}>
+                  {dangChieu ? <RefreshCw size={20} aria-hidden="true" className="gvv2-quay" /> : <MonitorPlay size={20} aria-hidden="true" />}
+                  {dangChieu ? 'Đang dựng tờ chiếu…' : 'Chiếu lên bảng'}
+                </button>
+                <span className="gvv2-ttc-goi-y">
+                  Tờ chiếu chuẩn như Chiếu lên bảng: <b>L</b> gọi em lên bảng · <b>Đạt / Chưa đạt</b> ghi sổ · <b>G</b> lời giải hiện dần · <b>T</b> thống kê lớp ·{' '}
+                  <b>X</b> ai sai, mấy giây · <b>Space</b> lật trang
+                </span>
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
       {html && (
         <Suspense fallback={null}>
           <KhungXemPhieu
             html={html}
-            ten="Tờ máy chiếu — Thầy tự chữa"
+            ten="Tờ máy chiếu — Chữa câu khó & tính toán"
             dong={() => {
               dongPhien()
               setHtml('')
