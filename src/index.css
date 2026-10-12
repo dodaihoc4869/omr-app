@@ -421,16 +421,20 @@ body {
 }
 .nut-dong-phieu {
   position: absolute;
-  top: calc(10px + env(safe-area-inset-top));
-  right: 10px;
+  /* 12/10: vùng bấm 44 px (chuẩn chạm), vòng tròn nhìn thấy vẫn 34 px ở đúng chỗ cũ — đệm 5 px + nền chỉ tô phần ruột. */
+  top: calc(5px + env(safe-area-inset-top));
+  right: 5px;
   z-index: 61;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
+  padding: 5px;
+  box-sizing: border-box;
   display: grid;
   place-items: center;
   border: none;
   border-radius: 50%;
   background: var(--phu-dam-mo);
+  background-clip: content-box;
   color: var(--p-trang);
   cursor: pointer;
   -webkit-backdrop-filter: blur(6px);

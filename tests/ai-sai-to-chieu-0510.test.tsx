@@ -91,9 +91,9 @@ describe('tờ chạy thật — nút X', () => {
     })
     // 4 ô số: em · lượt · trung bình (có ước tính ⇒ "≈") · nơi sai nhiều nhất
     // (40 + 95) / 2 = 67,5 ⇒ 68 giây
-    expect([...panel.querySelectorAll('.mc-sai-o b')].map((b) => b.textContent)).toEqual(['2', '3', '≈ 1 phút 8 giây', 'Ca'])
+    expect([...panel.querySelectorAll('.mc-sai-o b')].map((b) => b.textContent)).toEqual(['2', '3', '≈ 1 phút 8 giây', 'Ca kiểm tra'] /* 12/10: nhóm "Ca" hiện đủ tên */)
     // thanh theo nơi: "Ca Kiểm tra tuần 3" gộp vào nhóm "Ca"; xếp nhiều trước
-    expect([...panel.querySelectorAll('.mc-sai-thanh')].map((x) => [x.querySelector('span')!.textContent, x.querySelector('em')!.textContent])).toEqual([['Ca', '2'], ['Lên bảng', '1']])
+    expect([...panel.querySelectorAll('.mc-sai-thanh')].map((x) => [x.querySelector('span')!.textContent, x.querySelector('em')!.textContent])).toEqual([['Ca kiểm tra', '2'], ['Lên bảng', '1']]) /* 12/10: tên nhóm hiện đủ */
     // cột theo ngày, tăng dần
     expect([...panel.querySelectorAll('.mc-sai-ngay span')].map((x) => x.textContent)).toEqual(['01/10', '03/10'])
     // thẻ từng em: em sai nhiều trước; dòng tên có trung bình giây của em (chỉ lượt có số giây; có ước tính ⇒ "≈") — thầy 09/10;
@@ -124,7 +124,7 @@ describe('tờ chạy thật — nút X', () => {
     // (18 + 64) / 2 = 41 — lượt "chưa đo giờ" không kéo trung bình
     expect(em.querySelector('.mc-sai-ten small')!.textContent).toBe('3 lần sai · trung bình 41 giây')
     expect([...em.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual([
-      '10:00 · 03/10 · Đảo · 18 giây', '10:00 · 02/10 · Lên bảng · chưa đo giờ', '09:05 · 01/10 · Ca Kiểm tra tuần 3 · 1 phút 4 giây',
+      '10:00 · 03/10 · Học theo kế hoạch · 18 giây' /* 12/10: tờ hiện tên nguồn mới (bỏ Đảo/Đoàn/Bi-a) */, '10:00 · 02/10 · Lên bảng · chưa đo giờ', '09:05 · 01/10 · Ca Kiểm tra tuần 3 · 1 phút 4 giây',
     ])
     // số đo nổi bật (thẻ <u>), "chưa đo giờ" là chữ thường của chip — không thêm màu
     expect([...em.querySelectorAll('.mc-sai-chip > span u')].map((x) => x.textContent)).toEqual(['18 giây', '1 phút 4 giây'])

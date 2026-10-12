@@ -207,6 +207,9 @@ export default defineConfig({
           '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau,DieuKhienToChieuScreen,ModalDieuKhienTuXa,btvn-nang-do-thay}-*.{js,css}',
           // Bảng Dạy học (28/09): tấm Chiếu mã (vào thi + điểm danh) nay là mảnh dùng chung của 4 màn thầy (Mở ca, Theo dõi ca, phòng chờ, Lên bảng — đều ngoài precache) ⇒ kho chạy-lúc.
           '**/TamPhuChieuMa-*.{js,css}',
+          // Thầy tự chữa (12/10): tờ chiếu cả đề tách thành mảnh dùng chung CHỈ của màn thầy (Cần thầy chữa, Lên bảng chiến dịch, Gọi lên bảng) ⇒ kho chạy-lúc,
+          // không cất sẵn trên máy học sinh / phụ huynh (giữ precache như trước đợt 9).
+          '**/{to-chieu,tra-cau-chieu,thong-ke-lop-cau,thay-tu-chua-to}-*.{js,css}',
           // Trung tu giao diện 09/10: ba mảnh CHỈ màn thầy nạp (đồng bộ mọi ca ở Cài đặt/Ca kiểm tra, tên lớp của thầy, mã QR chiếu) ra kho chạy-lúc —
           // ba làn trung tu thêm ~10 KB kiểu dáng cho vỏ học sinh/phụ huynh, giữ precache dưới trần 3000 KB mà không đụng mảnh nào máy em/phụ huynh cần.
           '**/{NutDongBoMoiCa,ten-lop-thay,ma-qr}-*.{js,css}',
