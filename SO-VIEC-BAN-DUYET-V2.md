@@ -136,3 +136,12 @@ Thầy nhắn (nguyên văn, kèm ảnh thẻ "Bài mới trong 7 ngày"):
 - [x] GV · chọn đề ⇒ chiếu TẤT CẢ câu lên máy chiếu, câu đúng–sai + tính toán lên đầu | bằng chứng: 55156900 — xếp Đúng–sai có tính toán → Đúng–sai → tính toán → còn lại (giữ thứ tự đề); test thay-tu-chua-1210 (14).
 - [x] GV · tờ chiếu đầy đủ như Chiếu lên bảng (lời giải, thống kê lớp, ai sai + giây) | bằng chứng: dùng lại `to-chieu.ts` → `KhungXemPhieu` (G lời giải · T thống kê `/gv/thong-ke-lop-cau` · X ai sai `/gv/ai-sai-cau`); ảnh 52-ttc-to-chieu-*-1920. Thêm 487bde44: tên nơi làm mới trên tờ (bỏ Đảo/Đoàn/Bi-a). Nút Đóng 34 px của khung phiếu GIỮ NGUYÊN (test m3-c6-khung-xem-phieu-1909 khoá).
 - [x] Build + đẩy đợt 9 (kiểm ca mở trước) | bằng chứng: PR242 gộp `4187009d`, Actions `38198445809` SUCCESS (17 bước, Kiểm ca thi đạt). Lùi: `git revert -m 1 4187009d`.
+
+## Đợt 10 — Hành trình còn 2 mục · Nhịp học lên Hôm nay (12/10) — VẼ DUYỆT TRƯỚC
+Thầy nhắn (nguyên văn, kèm ảnh thẻ Bài mới trong 7 ngày: "Học sinh nhận bài 0 · Câu cần chữa 132"):
+"Chỗ này rất khó hiểu, chốt lại trong phần này tôi chỉ cần mục dạy học, gọi lên bảng đầu giờ và chữa cấu khó tính toán và câu học sinh cần chữa. Bạn hãy thu gọn tối giản hết lại thành 2 mục và làm thật trực quan dễ hiểu khoa học đẹp mắt."
+"Mục hôm nay hiển thị rõ cho tôi vô cùng đẹp Nhịp học, phải làm rất đẹp, tôi nhìn vào thấy ngay học sinh nào chăm học sinh nào lười. Vẽ cho tôi duyệt trước khi buiild nhé"
+- [ ] Vẽ bản duyệt: Hành trình 2 mục (Dạy học & đầu giờ · Chữa bài) | bằng chứng: (chưa có)
+- [ ] Vẽ bản duyệt: Hôm nay của thầy có Nhịp học (thấy ngay em chăm / em lười) | bằng chứng: (chưa có)
+- [ ] Chờ thầy duyệt bản vẽ — CHƯA BUILD | bằng chứng: (chưa có)
+- [ ] Build theo bản đã duyệt + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
