@@ -109,3 +109,20 @@ Giả định (thầy chưa trả lời 3 câu): mục 4 = Kết quả, Của em
 - [x] Làm câu → Sau khi nộp → Xong chặng | bằng chứng: eed66e0b; ảnh 30-hs-moi-lam-* (điện thoại: khối nút ghim đáy).
 - [x] Màn con cùng bảng màu (Cùng gỡ câu này, Câu đã làm) — sửa chữ chìm | bằng chứng: eed66e0b; ảnh 26-hs-cung-go-* (nền giấy, chữ mực), Câu đã làm chip chữ màu thẻ. Tu luyện: Codex vừa làm lại (7d7c3c9f, d5b07318) — giữ nguyên.
 - [x] Build + đẩy (kiểm ca mở trước) | bằng chứng: PR238 gộp `0c31532`, Actions `38162406893` SUCCESS (bước "Kiểm ca thi" của CI đạt: 0 ca mở/0 lượt; khoá Cloudflare của phiên hết hạn nên phiên không tự đọc D1). Lùi: `git revert -m 1 0c31532`.
+
+## Đợt 8 — Tu luyện + chữa lỗi HS · lịch sử bài hằng ngày GV · hồ sơ em · app phụ huynh (12/10)
+Thầy nhắn (nguyên văn, kèm ảnh màn "Cùng gỡ câu này" trạng thái "Cần thêm bài luyện đúng chỗ"):
+"trùng tu lại giao diện mục tu luyện của app học sinh, bỏ phần nhưng câu cần gỡ, thay những từ đảo đoàn, bia bằng những từ phù hợp, mục chữa lỗi hiển thị cho thật chuẩn để học sinh chữa lỗi được."
+"Trùng tu giao diện giáo viên cho đẹp hơn khoa học hơn, tôi cần biết lịch sử học sinh làm bài tập hàng ngày, tính từ 12/10. Học sinh thiếu nhiều ngày nhất hiển thị lên đầu, làm thiếu nhiều câu nhất trong từng ngày."
+"Khi tôi bấm vào học sinh tôi muốn biết mọi thông tin làm bài của học sinh, câu sai, câu đúng, câu đã làm, câu đã ôn tôi muốn biết rõ học sinh đó chăm chỉ hay lười biếng hay đối phó làm bài tập mọi thứ phải hiển thị khoa học trực quan đẹp măt"
+"Trùng tu giao diện app phụ huynh, cho phụ huynh biết nhiều thông tin cần thiết nữa về con, số câu làm đúng, làm sai, thời gian làm từng câu gợi ý nhắc, bỏ mục thầy cần chữa, làm app phụ huynh siêu đẹp trực quan để phụhuynh theo dõi được con toàn diện."
+- [ ] HS · Tu luyện trùng tu giao diện | bằng chứng: (chưa có)
+- [ ] HS · Tu luyện bỏ phần "câu cần gỡ" | bằng chứng: (chưa có)
+- [ ] HS · thay chữ Đảo/Đoàn/Bi-a bằng tên nguồn phù hợp | bằng chứng: (chưa có)
+- [ ] HS · Chữa lỗi hiển thị chuẩn, học sinh chữa được (kể cả khi chưa có bài luyện bước) | bằng chứng: (chưa có)
+- [ ] GV · trùng tu giao diện đẹp, khoa học hơn | bằng chứng: (chưa có)
+- [ ] GV · lịch sử bài hằng ngày từ 12/10; thiếu nhiều ngày nhất lên đầu; ngày thiếu nhiều câu nhất | bằng chứng: (chưa có)
+- [ ] GV · bấm em ⇒ mọi thông tin: câu sai/đúng/đã làm/đã ôn; chăm chỉ · lười · đối phó (khoa học, trực quan) | bằng chứng: (chưa có)
+- [ ] PH · trùng tu: số câu đúng/sai, thời gian từng câu, gợi ý nhắc con | bằng chứng: (chưa có)
+- [ ] PH · bỏ mục "Thầy cần chữa" | bằng chứng: (chưa có)
+- [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)
