@@ -9,6 +9,7 @@ import { LA_TTC, LOP_TTC } from './thay-tu-chua' // LÀN THẦY TỰ CHỮA 12/1
 import { traLoiChuaBai } from './chua-bai' // LÀN CHỮA BÀI 12/10B
 import { traLoiHt2 } from './hanh-trinh-2-muc' // LÀN HÀNH TRÌNH 12/10B
 import { baiHangNgayTuNhip, hoSoTuNhip, laCanhNhipHoc, nhipHocGia, tenEmNhip } from './nhip-hoc' // LÀN HÔM NAY 12/10B
+import { traLoiDd12c } from './diem-danh-1210c' // LÀN ĐIỂM DANH 12/10C
 
 const HT = [
   { k: '10', id: 'hanh-trinh-v3-khoi-10', soEm: 38 },
@@ -50,6 +51,10 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   void _a
   void _b
   const b = (body ?? {}) as Record<string, unknown>
+  // ---- LÀN ĐIỂM DANH 12/10C (cảnh `&ht2=1&dd12c=1`): buổi điểm danh của lớp có số Nhịp học + hồ sơ đúng em (gia/diem-danh-1210c.ts) — trước ht2.
+  const dd12c = traLoiDd12c(duong, b)
+  if (dd12c) return dd12c
+  // ---- hết LÀN ĐIỂM DANH 12/10C
   // ---- LÀN HÀNH TRÌNH 12/10B (cảnh `&ht2=1`): buổi dạy 4 bước — lớp có em vắng + lượt gọi lên bảng đầu giờ (gia/hanh-trinh-2-muc.ts).
   const ht2 = await traLoiHt2(duong, b)
   if (ht2) return ht2

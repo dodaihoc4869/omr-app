@@ -84,6 +84,24 @@ const DS_CB = [
 const DS_HT2 = ['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
   [`60-ht2-day-hoc-${kho}${nen === 'dark' ? '-toi' : ''}`, 'gv-nhip&ht2=1', w, hh, nen, true, /Hành trình giỏi Hóa/, 'cho:58 em']))
 // ═══════════ hết LÀN HÀNH TRÌNH 12/10B ═══════════
+// ═══════════ LÀN ĐIỂM DANH 12/10C: bước 1 Điểm danh (bản vẽ GV-DiemDanh) + bản chiếu A đang điểm danh · B Nhịp học của lớp · hồ sơ một em trên bản chiếu ═══════════
+// Cảnh `?man=gv-nhip&ht2=1&dd12c=1` (trang.tsx + gia/diem-danh-1210c.ts). `dd12c:<việc>[:phím]`: buoc1 = chờ ô em vắng có nhóm · chieu = bấm "Chiếu điểm danh"
+// · nhip = bấm nút chính "Xong điểm danh · chiếu Nhịp học của lớp" (rồi gõ phím, vd `h` ẩn tên Lười) · ho-so = thêm bấm em đầu cột Chưa đều ⇒ tấm Hồ sơ làm bài.
+// Bước 1: máy 1440×900 + điện thoại 390×844 TOÀN TRANG, sáng + tối; bản chiếu 1920×1080 (thêm 1280×720 kiểm co giãn). Chạy riêng: tiền tố "8" (80-…84-).
+const DD12C = 'gv-nhip&ht2=1&dd12c=1'
+const DS_DD12C = [
+  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+    [`80-dd12c-buoc1-${kho}${nen === 'dark' ? '-toi' : ''}`, DD12C, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:buoc1'])),
+  ['81-dd12c-chieu-diem-danh-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:chieu'],
+  ['81-dd12c-chieu-diem-danh-1280', DD12C, 1280, 720, 'dark', false, /Hành trình giỏi Hóa/, 'dd12c:chieu'],
+  ['82-dd12c-chieu-nhip-lop-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:nhip'],
+  ['82-dd12c-chieu-nhip-lop-an-luoi-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:nhip:h'],
+  ['82-dd12c-chieu-nhip-lop-1280', DD12C, 1280, 720, 'dark', false, /Hành trình giỏi Hóa/, 'dd12c:nhip'],
+  ['83-dd12c-chieu-ho-so-em-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:ho-so'],
+  ['83-dd12c-chieu-ho-so-em-1920-toi', DD12C, 1920, 1080, 'dark', false, /Hành trình giỏi Hóa/, 'dd12c:ho-so'],
+  ['84-dd12c-buoc1-ho-so-em-may-tinh', DD12C, 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:vua'],
+]
+// ═══════════ hết LÀN ĐIỂM DANH 12/10C ═══════════
 // ═══════════ LÀN HÔM NAY 12/10B: Hôm nay của thầy theo bản vẽ thầy duyệt 12/10 — hàng thẻ Việc cần thầy + khối Nhịp học (262 em × 12 ngày, ═══════════
 // gia/nhip-hoc.ts). Máy 1440×900 + điện thoại 390×844 TOÀN TRANG, sáng + tối; thêm thao tác `hn:<việc>`: Xem đủ em lười · lọc Khối 12 · bấm em ⇒ tấm hồ
 // sơ · bảng từng ngày · thẻ Chăm / Đối phó (điện thoại) · lỗi (`nh=loi`) · chưa có em (`nh=trong`). Chạy riêng: tiền tố "6" (60-…67-).
@@ -115,6 +133,7 @@ const DS = [
   ...DS_TTC, // LÀN THẦY TỰ CHỮA 12/10
   ...DS_CB, // LÀN CHỮA BÀI 12/10B
   ...DS_HT2, // LÀN HÀNH TRÌNH 12/10B
+  ...DS_DD12C, // LÀN ĐIỂM DANH 12/10C
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],
@@ -376,6 +395,29 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
           await t.waitForTimeout(k === 'l' ? 2600 : 600)
         }
       }
+    } else if (viec?.startsWith('dd12c:')) {
+      // LÀN ĐIỂM DANH 12/10C: chờ ô em vắng có nhóm Lười (Nhịp học đã về) rồi làm đúng một việc.
+      const [, v, phim] = viec.split(':')
+      await t.getByText(/em đang Lười/).first().waitFor({ timeout: 20000 })
+      if (v === 'chieu') {
+        await t.getByRole('button', { name: 'Chiếu điểm danh', exact: true }).click()
+        await t.locator('.ddc .ddc-em').first().waitFor({ timeout: 20000 })
+      }
+      if (v === 'nhip' || v === 'ho-so') {
+        await t.getByRole('button', { name: 'Xong điểm danh · chiếu Nhịp học của lớp', exact: true }).click()
+        await t.locator('.ddc .ddc-dong-em').first().waitFor({ timeout: 20000 })
+      }
+      for (const k of phim ?? '') await t.keyboard.press(k)
+      if (v === 'ho-so') {
+        // em đầu cột Chưa đều (nhãn thái độ của hồ sơ GIẢ chỉ có Chăm chỉ / Chưa đều / Đối phó — chọn em cùng nhóm để ảnh không tự mâu thuẫn)
+        await t.locator('.ddc-cot[data-nhom="chua-deu"] .ddc-dong-em').first().click()
+        await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
+      }
+      if (v === 'vua') {
+        await t.locator('.dd1-vua-dong').first().click()
+        await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
+      }
+      await t.waitForTimeout(500)
     } else if (viec?.startsWith('hn:')) {
       // LÀN HÔM NAY 12/10B: chờ khối Nhịp học có em rồi làm đúng một việc (ảnh toàn trang không cần cuộn; ảnh khung nhìn cuộn trang tới khối cần chụp).
       const v = viec.slice(3)
