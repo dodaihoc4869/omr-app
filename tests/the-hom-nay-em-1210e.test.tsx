@@ -44,7 +44,7 @@ function ve(o: { g?: TomTatGoi7; con?: number; nhip?: KetQuaNhipHocEm | 'loi'; o
   )
 }
 const the = () => screen.getByRole('region', { name: 'Hôm nay của em' })
-const nutHoc = () => screen.getAllByRole('button').filter((b) => /^(Bắt đầu học|Học tiếp|Học thêm|Học ngay|Tiếp tục học|Đã làm hết câu được giao)/.test(b.textContent ?? ''))
+const nutHoc = () => screen.getAllByRole('button').filter((b) => /^(Bắt đầu học|Học tiếp|Học thêm|Học ngay|Tiếp tục học|Đã làm hết câu được giao|Hôm nay còn \d+ câu chờ thầy bổ sung)/.test(b.textContent ?? ''))
 
 describe('phần chính: MỘT con số câu hôm nay, khớp Sảnh', () => {
   it('ảnh thầy (Lười, 7/32): "Còn 25 câu" = 32 − 7 · "Đã làm 7/32 câu hôm nay" · 6 chặng (xong 1, chặng 2 đang làm) · dòng phụ tổng = 25 · MỘT nút học', async () => {
@@ -79,7 +79,8 @@ describe('phần chính: MỘT con số câu hôm nay, khớp Sảnh', () => {
     cleanup()
     ve({ g: goi({ daLamHomNay: 20, tuLamCon: 0, thieuNgay: 12 }), con: 0, nhip: 'loi' })
     const b = nutHoc()[0] as HTMLButtonElement
-    expect(b.textContent).toBe('Đã làm hết câu được giao')
+    // SỬA CÓ CHỦ ĐÍCH 12/10 21h30: Gói 7 hết việc xếp được mà CHƯA đủ mức ⇒ nút khoá nói rõ số câu chờ thầy bổ sung (đủ mức mới là "Đã làm hết câu được giao").
+    expect(b.textContent).toBe('Hôm nay còn 12 câu chờ thầy bổ sung')
     expect(b.disabled).toBe(true)
     expect(the().querySelector('.ht2-hn-bai')!.textContent).toBe('Bài 8. Amine · 0 câu tự làm · 0 câu học có hỗ trợ · 12 câu chờ thầy bổ sung')
     expect(chuNutHoc(null, false)).toBe('Bắt đầu học')

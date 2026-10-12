@@ -94,6 +94,10 @@ export interface PropsTheHomNayEm {
   khoaHoc: boolean
   /** Hết câu được giao (thể lực 0) ⇒ nút "Đã làm hết câu được giao", khoá. */
   hetCau: boolean
+  /** Gói 7, hết việc xếp được mà CHƯA đủ mức ⇒ số câu còn lại của mức đang chờ thầy bổ sung (nút khoá nói rõ số này). */
+  choBoSung?: number
+  /** Gói 7: số việc kế hoạch xếp được lúc này (`theLuc.con`) — ít hơn số còn lại của mức (kho thiếu) thì nút nói "x câu sẵn sàng". */
+  sanSang?: number
   /** Ca kiểm tra đang mở ⇒ nút học lùi thành nút viền (nút chính của màn là Vào ca kiểm tra). */
   nutPhu?: boolean
   /** Token phiên ⇒ phần Nhịp học (`/hs/nhip-hoc`); không có ⇒ không hiện. */
@@ -102,13 +106,17 @@ export interface PropsTheHomNayEm {
   onMoHoSo?: () => void
 }
 
-/** Chữ nút học — MỘT nút cho cả màn (Hôm nay và Hành trình dùng chung). */
-export function chuNutHoc(so: SoHomNay | null, hetCau: boolean): string {
-  if (hetCau) return 'Đã làm hết câu được giao'
+/** Chữ nút học — MỘT nút cho cả màn (Hôm nay và Hành trình dùng chung).
+ *  Gói 7 kho thiếu (khẩn 12/10 21h30): hết việc xếp được mà chưa đủ mức ⇒ "Hôm nay còn N câu chờ thầy bổ sung" (nút khoá); còn việc xếp được nhưng ít
+ *  hơn phần còn lại của mức ⇒ nút VẪN BẤM ĐƯỢC, nói đúng số câu sẵn sàng ("Học tiếp · 1 câu sẵn sàng") — số "Còn N câu" phía trên vẫn theo M. */
+export function chuNutHoc(so: SoHomNay | null, hetCau: boolean, kho?: { choBoSung?: number; sanSang?: number }): string {
+  if (hetCau) return kho?.choBoSung ? `Hôm nay còn ${kho.choBoSung} câu chờ thầy bổ sung` : 'Đã làm hết câu được giao'
   if (!so) return 'Bắt đầu học'
   const con = Math.max(0, so.muc - so.daLam)
   if (con === 0) return 'Học thêm'
-  return so.daLam > 0 ? `Học tiếp · ${con} câu` : `Bắt đầu học · ${con} câu`
+  const dau = so.daLam > 0 ? 'Học tiếp' : 'Bắt đầu học'
+  const sanSang = kho?.sanSang
+  return sanSang !== undefined && sanSang > 0 && sanSang < con ? `${dau} · ${sanSang} câu sẵn sàng` : `${dau} · ${con} câu`
 }
 
 function Chip({ nhom }: { nhom: NhomNhip }) {
@@ -127,7 +135,7 @@ function PhanChinh(p: PropsTheHomNayEm & { chip: ReactNode }) {
   const du = con === 0
   const chang = so ? chiaChang(so) : []
   const xong = so ? soChangXong(so) : 0
-  const nut = chuNutHoc(so, p.hetCau)
+  const nut = chuNutHoc(so, p.hetCau, { choBoSung: p.choBoSung, sanSang: p.sanSang })
   return (
     <div className="ht2-hn-chinh">
       <div className="ht2-hn-dau">

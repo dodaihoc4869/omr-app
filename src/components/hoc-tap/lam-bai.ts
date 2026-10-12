@@ -72,13 +72,19 @@ export const CAU_MOI_CHANG = 6
  * Cùng chuỗi nguồn với vòng tròn Hôm nay: Gói 7 ngày (`goi7.daLamHomNay`/`toiThieu`) → Hành trình (`hanhTrinh.daLam`/`toiThieu`) → thể lực của Sảnh
  * → tiến độ kế hoạch ngày cũ. Thiếu số (hoặc M ≤ 0) ⇒ null (màn ẩn ô ấy — không bịa). Chặng: Hành trình có `changHienTai` của máy chủ;
  * nguồn khác suy đúng như vạch chặng ở Hôm nay (xong chặng i khi đã làm ≥ 6·i câu).
+ * KHẨN 12/10 21h30 (thầy: "lúc chiều thì hiện 31 câu giờ lại hiện 2 chặng"):
+ *  · Ở nhánh Gói 7, `theLuc.tong` KHÔNG phải mức ngày — nó là đã làm + số việc kế hoạch XẾP ĐƯỢC (kho thiếu câu ⇒ 7 + 1 = 8 thay vì M = 32). Sảnh có
+ *    `goi7` thô mà cốt lõi hỏng thì `docSanh` đã trả LỖI, nên tới đây Sảnh nhánh gói luôn có `goi7` và M lấy từ `goi7.toiThieu`.
+ *  · `tienDoCu` (mức kế hoạch ngày cũ, kẹp 8–16 câu) CHỈ dùng khi Sảnh ĐÃ VỀ và không có số Sảnh (chế độ cũ). Sảnh chưa về / lỗi lần đầu ⇒ chưa biết
+ *    em học Gói 7 hay Hành trình ⇒ null (khung xương / "Thử lại"), không vẽ "7/8" của kế hoạch cũ thành số hôm nay.
  */
 export function soHomNay(kq: KetQuaSanh | null | undefined, tienDoCu?: { daLam: number; mucTieu: number }): SoHomNay | null {
   const sanh = kq && kq.cheDo2 && 'sanh' in kq ? kq.sanh : null
   const goi7 = sanh?.goi7
   const ht = sanh?.hanhTrinh
-  const daLam = goi7?.daLamHomNay ?? ht?.daLam ?? (sanh ? Math.max(0, sanh.theLuc.tong - sanh.theLuc.con) : tienDoCu?.daLam ?? null)
-  const muc = goi7?.toiThieu ?? ht?.toiThieu ?? sanh?.theLuc.tong ?? tienDoCu?.mucTieu ?? null
+  const cu = kq ? tienDoCu : undefined
+  const daLam = goi7?.daLamHomNay ?? ht?.daLam ?? (sanh ? Math.max(0, sanh.theLuc.tong - sanh.theLuc.con) : cu?.daLam ?? null)
+  const muc = goi7?.toiThieu ?? ht?.toiThieu ?? sanh?.theLuc.tong ?? cu?.mucTieu ?? null
   if (daLam === null || muc === null || !Number.isFinite(daLam) || !Number.isFinite(muc) || muc <= 0) return null
   // Số chặng đi CÙNG nguồn với M: Gói 7 ⇒ ceil(M/6) (12/10E: Sảnh có cả Hành trình lẫn Gói 7 thì trước đây lấy số chặng của Hành trình — "1/5 chặng" khi
   // M = 32 cần 6 chặng); Hành trình ⇒ số chặng máy chủ xếp.

@@ -245,12 +245,30 @@ export async function lapGoi7(env: Env, sbd: string, now: number) {
   return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:daLamNgay.size }
 }
 
+/** Số đếm hợp lệ (hữu hạn, ≥ 0); còn lại ⇒ 0 — không để NaN thành `null` trong JSON (app đọc chặt). */
+const dem7 = (v: unknown): number => typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : 0
+/** Một mục `diemDaDo` app nhận được: chuỗi id/mã/lúc, điểm 0–10, 0 ≤ câu mới ≤ tổng. */
+const laDiemDaDo7 = (d: { goiId: unknown; maDe: unknown; diem: unknown; luc: unknown; cauMoi: unknown; tong: unknown }): boolean =>
+  typeof d.goiId === 'string' && !!d.goiId && typeof d.maDe === 'string' && !!d.maDe && typeof d.luc === 'string' && !!d.luc &&
+  typeof d.diem === 'number' && Number.isFinite(d.diem) && d.diem >= 0 && d.diem <= 10 &&
+  typeof d.cauMoi === 'number' && typeof d.tong === 'number' && Number.isFinite(d.tong) && d.cauMoi >= 0 && d.cauMoi <= d.tong
+
+/**
+ * Tóm tắt Gói 7 gửi app. BẤT BIẾN (khẩn 12/10 21h30 — thầy: "lúc chiều hiện 31 câu giờ lại hiện 2 chặng"; app đọc chặt mà một trường phụ lệch là bỏ
+ * cả gói ⇒ rơi về số sai): mỗi gói `to` chỉ gồm chuỗi khác rỗng · `daGap` chỉ đếm câu THUỘC gói và ≤ `tong` · `con = tong − daGap ≥ 0` · số đếm hữu hạn
+ * ≥ 0 · `diemDaDo` chỉ gồm mục hợp lệ.
+ */
 export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>, now: number) {
-  return { bat: true, ngay: ngayVn7(now), goi: lap.goi.map(g => ({ id:g.id,ten:g.ten,batDau:g.batDau,han:g.han,tong:g.cau.length,daGap:g.daGap.size,
-    con:g.cau.length-g.daGap.size,nguonDayDu:g.nguonDayDu,to:[...new Set(g.cau.map(c=>c.maTo??c.maDe))],canBoSung:g.cau.filter(c=>c.hopLe===false).length,quota:g.quota,gapHomNay:g.gapNgay.size,quaHan:ngayVn7(now)>g.han && (!g.nguonDayDu||g.daGap.size<g.cau.length) })),
-    tuLamCon:lap.plan.tuLam,tiepCanCon:lap.plan.tiepCan,thieuPhu:lap.plan.thieuPhu,thieuNgay:Math.max(0,lap.toiThieu-lap.daLamNgay-lap.plan.viec.length),kienThucCu:lap.kienThucCu,
+  const homNay = ngayVn7(now)
+  return { bat: true, ngay: homNay, goi: lap.goi.map(g => {
+    const qids = new Set(g.cau.map(c => c.qid)), tong = qids.size, daGap = Math.min(tong, [...g.daGap].filter(q => qids.has(q)).length)
+    return { id:g.id,ten:g.ten,batDau:g.batDau,han:g.han,tong,daGap,con:tong-daGap,nguonDayDu:g.nguonDayDu,
+      to:[...new Set(g.cau.map(c=>c.maTo??c.maDe).filter((m): m is string => typeof m === 'string' && m.trim().length > 0))],
+      canBoSung:g.cau.filter(c=>c.hopLe===false).length,quota:dem7(g.quota),gapHomNay:[...g.gapNgay].filter(q => qids.has(q)).length,quaHan:homNay>g.han && (!g.nguonDayDu||daGap<tong) }
+  }),
+    tuLamCon:dem7(lap.plan.tuLam),tiepCanCon:dem7(lap.plan.tiepCan),thieuPhu:dem7(lap.plan.thieuPhu),thieuNgay:Math.max(0,lap.toiThieu-lap.daLamNgay-lap.plan.viec.length),kienThucCu:lap.kienThucCu,
     canHoTro:lap.plan.tuLam*2+lap.plan.tiepCan*3>60 || lap.plan.thieuPhu>0 || lap.daLamNgay+lap.plan.viec.length<lap.toiThieu,
-    mucTieuDiem:7,diemDaDo:lap.diemDaDo,toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay }
+    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay }
 }
 
 /** Một đợt tối đa 6 câu; giữ các câu/phiên bản và vai ở máy chủ, không phát đáp án. */
