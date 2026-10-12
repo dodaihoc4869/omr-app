@@ -10,4 +10,7 @@ export const SQL_GOI7: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS goi_bai_7_chua (goi_id TEXT NOT NULL,qid TEXT NOT NULL,version TEXT NOT NULL,loi_go TEXT NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(goi_id,qid,version))`,
   `CREATE TABLE IF NOT EXISTS goi_bai_7_kiem (id TEXT PRIMARY KEY,goi_id TEXT NOT NULL,sbd TEXT NOT NULL,ma_de TEXT NOT NULL,json TEXT NOT NULL,tao_luc TEXT NOT NULL,nop_luc TEXT,diem REAL)`,
   `CREATE INDEX IF NOT EXISTS goi_bai_7_kiem_em ON goi_bai_7_kiem(goi_id,sbd,nop_luc)`,
+  // CHỈ THÊM 12/10 (thầy: "học sinh làm 24 câu nhưng lại báo 31 câu … hiển thị thật chính xác"): MỨC HÔM NAY của em ngày Gói 7 — chốt ở lần lập đầu
+  // tiên trong ngày (`chotMucNgay7`, INSERT OR IGNORE), mọi màn em / thầy / phụ huynh đọc lại đúng số này. muc = max(toi_thieu_tang, quota).
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_muc_ngay (sbd TEXT NOT NULL,ngay TEXT NOT NULL,tang INTEGER NOT NULL,toi_thieu_tang INTEGER NOT NULL,quota INTEGER NOT NULL,muc INTEGER NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,ngay))`,
 ]

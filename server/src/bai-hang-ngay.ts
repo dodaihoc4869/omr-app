@@ -3,11 +3,11 @@
 // `POST /gv/bai-hang-ngay {tu?, den?, khoi?, lop?}` — LỆNH THẦY, CHỈ ĐỌC (sau cổng `laThay`, chạy trên `envDoc`). Không ghi, không DDL.
 //   · Em: mọi em của các Hành trình khối đang chạy (`chien_dich` id `hanh-trinh-v3-khoi-*`) ∪ em có Gói bài 7 ngày (khi cờ bật); bỏ tài khoản thử
 //     12121212 và em bị khoá. Không đọc được bảng Hành trình ⇒ lùi về danh sách lớp (cảnh báo nói thật).
-//   · Gom em theo LÔ 100 SBD (một tham số JSON, `json_each`) — mỗi lô ≤ 6 truy vấn, mọi truy vấn sổ lọc `sbd IN (…) AND ngay_vn BETWEEN …`
+//   · Gom em theo LÔ 100 SBD (một tham số JSON, `json_each`) — mỗi lô ≤ 8 truy vấn (12/10 thêm 2: mức chốt + lịch câu mới Gói 7), mọi truy vấn sổ lọc `sbd IN (…) AND ngay_vn BETWEEN …`
 //     ⇒ đi chỉ mục `idx_skh_em_ngay (sbd, ngay_vn)`; số đếm Gói 7 GOM SẴN trong SQL (COUNT DISTINCT theo em × ngày) ⇒ ~300 em × 14 ngày trả ≤ 4200 dòng.
 //     Mỗi lô chỉ đọc phần ngày cần cho từng chế độ: sổ Gói 7 từ ngày gói sớm nhất của lô, kế hoạch Hành trình tới trước ngày gói muộn nhất của lô
 //     (em chưa có gói ⇒ tới `den`) — khoảng từ 01/10 dài hơn nhưng không đọc thừa những ngày chế độ kia không dùng.
-//   · Mỗi ngày: `mucToiThieu` (thật `da-chot` / ước tính theo quy tắc hiện hành), `daLam`, `thieu`, `datMuc`. Hôm nay chưa hết ngày ⇒ không tính vào
+//   · Mỗi ngày: `mucToiThieu` (thật `da-chot` / ước tính theo quy tắc hiện hành — Gói 7: `goi_bai_7_muc_ngay` / `uoc-goi7`, xem `mucCuaNgay`), `daLam`, `thieu`, `datMuc`. Hôm nay chưa hết ngày ⇒ không tính vào
 //     tổng. Xếp em: số ngày thiếu ↓ → tổng câu thiếu ↓ → (hoà) câu còn thiếu hôm nay ↓ → tên.
 // `POST /gv/ho-so-thai-do {sbd, tu?, den?}` — LỆNH THẦY, CHỈ ĐỌC. Lịch hoạt động + số đếm + 6 tín hiệu có số và ngưỡng + kết luận theo luật
 //   `LUAT_KET_LUAN` + danh sách Câu đúng / Câu đã ôn (Câu sai và Toàn bộ lịch sử vẫn ở `/gv/lich-su-lam-cau`).
@@ -21,7 +21,8 @@ import type {
 } from './bai-hang-ngay-kieu'
 import { NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO as NG, TEN_NHAN_THAI_DO, TOI_DA_SO_NGAY_BAI_HANG_NGAY } from './bai-hang-ngay-kieu'
 import { CAU_TOI_THIEU } from './hanh-trinh-ngay'
-import { SQL_LUOT_GOI7 } from './goi-bai-7'
+import { SQL_LUOT_GOI7, sqlTenLopHs } from './goi-bai-7'
+import { mucNgayGoi7 } from './goi-bai-7-loi'
 import { SQL_TC } from './lam-lai-so'
 import { idDaLam } from './hanh-trinh-nguon-cau'
 import { tachSongSinh } from './loi-hoc-luat'
@@ -95,14 +96,27 @@ const tangHopLe = (v: unknown): Tang => {
 /** Dòng `hanh_trinh_v3_ngay` đã đọc của một em. */
 export interface ChotNgay { ngay: string; tang: Tang; toiThieu: number }
 
+/** Gói 7 của một em, một ngày: dòng chốt `goi_bai_7_muc_ngay` (nếu có) + Σ `goi_bai_7_ngay.quota` ngày ấy (để ước tính ngày chưa chốt). */
+export interface Goi7Ngay { chot?: { tang: Tang; muc: number } | null; quota?: number }
+
 /**
- * Mức tối thiểu của một ngày. Hành trình + có dòng chốt đúng ngày ⇒ số thật. Còn lại (ngày em không mở kế hoạch / Gói 7 không lưu mức) ⇒ QUY TẮC
- * HIỆN HÀNH `CAU_TOI_THIEU[tầng]` với tầng gần nhất đã ghi (ngày gần nhất ≤ ngày ấy, không có thì ngày sớm nhất sau), chưa ghi ⇒ tầng 1.
+ * MỨC CỦA MỘT NGÀY — HÀM DUY NHẤT mọi màn thầy / phụ huynh / Nhịp học đọc (`docNgayCacEm` ⇒ `/gv/bai-hang-ngay`, `/gv/ho-so-thai-do`, `/gv/nhip-hoc`,
+ * `/hs/nhip-hoc`, `/ph/con-tong-quan`). App học sinh đọc cùng số chốt qua `chotMucNgay7` (goi-bai-7.ts) / `hanh_trinh_v3_ngay` (Hành trình).
+ *   · Hành trình + có dòng chốt đúng ngày ⇒ số thật. Ngày em không mở kế hoạch ⇒ QUY TẮC HIỆN HÀNH `CAU_TOI_THIEU[tầng]` với tầng gần nhất đã ghi
+ *     (ngày gần nhất ≤ ngày ấy, không có thì ngày sớm nhất sau), chưa ghi ⇒ tầng 1.
+ *   · Gói 7 (thầy 12/10 "một con số"): có dòng chốt `goi_bai_7_muc_ngay` ⇒ đúng M em thấy (`da-chot`). Chưa có (ngày trước khi có bảng / em chưa mở
+ *     bài ngày ấy) ⇒ ƯỚC TÍNH M = `mucNgayGoi7(CAU_TOI_THIEU[1], Σ quota ngày ấy)`, tầng 1, `uoc-goi7` — tầng tính trên phạm vi câu của bài mới nên
+ *     những ngày đầu bài gần như chắc là tầng 1; KHÔNG dùng tầng Hành trình (lỗi cũ: 36 câu trong khi em được giao 24).
  * `chot` đã sắp theo ngày tăng dần.
  */
-export function mucCuaNgay(ngay: string, cheDo: CheDoNgay, chot: readonly ChotNgay[]): { muc: number; tang: Tang; nguon: NguonMuc; uoc: boolean } {
+export function mucCuaNgay(ngay: string, cheDo: CheDoNgay, chot: readonly ChotNgay[], goi7?: Goi7Ngay): { muc: number; tang: Tang; nguon: NguonMuc; uoc: boolean } {
+  if (cheDo === 'goi7') {
+    const c = goi7?.chot
+    if (c && c.muc > 0) return { muc: c.muc, tang: c.tang, nguon: 'da-chot', uoc: false }
+    return { muc: mucNgayGoi7(CAU_TOI_THIEU[1], goi7?.quota ?? 0), tang: 1, nguon: 'uoc-goi7', uoc: true }
+  }
   const dung = chot.find((c) => c.ngay === ngay)
-  if (cheDo === 'hanh-trinh' && dung && dung.toiThieu > 0) return { muc: dung.toiThieu, tang: dung.tang, nguon: 'da-chot', uoc: false }
+  if (dung && dung.toiThieu > 0) return { muc: dung.toiThieu, tang: dung.tang, nguon: 'da-chot', uoc: false }
   let gan: ChotNgay | undefined
   for (const c of chot) if (c.ngay <= ngay) gan = c
   gan ??= chot.find((c) => c.ngay > ngay)
@@ -166,6 +180,10 @@ const SQL_DEM_GAP = `SELECT g.sbd AS sbd, date(g.luc, '+7 hours') AS ngay, COUNT
     AND NOT EXISTS (SELECT 1 FROM su_kien_hoc WHERE su_kien_hoc.sbd = g.sbd AND su_kien_hoc.ngay_vn = date(g.luc, '+7 hours') AND su_kien_hoc.qid = g.qid
       AND su_kien_hoc.ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7})
   GROUP BY g.sbd, date(g.luc, '+7 hours')`
+/** Mức hôm nay đã chốt của ngày Gói 7 (`chotMucNgay7`) — đúng số em thấy trên app. */
+const SQL_MUC_GOI7 = 'SELECT sbd, ngay, tang, muc FROM goi_bai_7_muc_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
+/** Σ lịch câu mới các gói của em mỗi ngày — chỉ dùng ƯỚC TÍNH ngày Gói 7 chưa có dòng chốt. */
+const SQL_QUOTA_GOI7 = 'SELECT sbd, ngay, SUM(quota) AS q FROM goi_bai_7_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3 GROUP BY sbd, ngay'
 const SQL_KE_HOACH = 'SELECT sbd, ngay, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
 export const SQL_LUOT_KE_HOACH = `SELECT sbd, ngay_vn AS ngay, qid, ${SQL_TC} AS tc FROM su_kien_hoc
   WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}
@@ -208,19 +226,22 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
     const { tuGoi, denHt } = khoangDocTheoCheDo(lo, tu, den)
     const j = (ds: readonly EmGoc[]) => JSON.stringify(ds.map((e) => e.sbd))
     const rong = Promise.resolve([] as Row[])
-    const [rTrong, rTruoc, rGoi, rGap, rKh, rLuot] = await Promise.all([
+    const [rTrong, rTruoc, rGoi, rGap, rKh, rLuot, rMuc7, rQuota7] = await Promise.all([
       hoi(env, SQL_CHOT_TRONG, j(lo), tu, den),
       hoi(env, SQL_CHOT_TRUOC, j(lo), tu),
       goi.length ? hoi(env, SQL_DEM_GOI7, j(goi), tuGoi, den) : rong,
       goi.length ? hoi(env, SQL_DEM_GAP, j(goi), tuGoi, den) : rong,
       ht.length ? hoi(env, SQL_KE_HOACH, j(ht), tu, denHt) : rong,
       ht.length ? hoi(env, SQL_LUOT_KE_HOACH, j(ht), tu, denHt) : rong,
+      goi.length ? hoi(env, SQL_MUC_GOI7, j(goi), tuGoi, den) : rong,
+      goi.length ? hoi(env, SQL_QUOTA_GOI7, j(goi), tuGoi, den) : rong,
     ])
     // Sổ chính hỏng ⇒ cả lệnh báo lỗi (không trả số sai). Bảng kế hoạch không đọc được ⇒ lượt kế hoạch cũng không đọc được: chỉ cảnh báo.
     if (rGoi === null || (rLuot === null && rKh !== null)) throw new LoiDocSo('Không đọc được sổ học của các em.')
     if (rTrong === null || rTruoc === null) baoMot('Chưa đọc được mức đã chốt theo ngày — mọi ô dùng mức ước tính theo quy tắc hiện hành.')
     if (rGap === null) baoMot('Chưa đọc được câu học có hướng dẫn của Gói bài 7 ngày — số đã làm chỉ tính câu trong sổ.')
     if (rKh === null) baoMot('Chưa đọc được kế hoạch Hành trình theo ngày — ngày Hành trình tính là chưa làm câu nào của kế hoạch.')
+    if (rMuc7 === null || rQuota7 === null) baoMot('Chưa đọc được mức đã chốt của Gói bài 7 ngày — ô Gói 7 dùng mức ước tính (24 câu hoặc lịch câu mới của ngày nếu nhiều hơn).')
     const chot = new Map<string, ChotNgay[]>()
     for (const x of [...(rTruoc ?? []), ...(rTrong ?? [])]) {
       const s = str(x.sbd)
@@ -232,13 +253,15 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
     const demGoi = new Map((rGoi ?? []).map((x) => [k(x.sbd, x.ngay), Number(x.n) || 0]))
     const demGap = new Map((rGap ?? []).map((x) => [k(x.sbd, x.ngay), Number(x.n) || 0]))
     const keHoach = new Map((rKh ?? []).map((x) => [k(x.sbd, x.ngay), { dao: mangChuoi(x.dao_json), doan: mangChuoi(x.doan_json) }]))
+    const muc7 = new Map((rMuc7 ?? []).map((x) => [k(x.sbd, x.ngay), { tang: tangHopLe(x.tang), muc: Math.max(0, Math.floor(Number(x.muc) || 0)) }]))
+    const quota7 = new Map((rQuota7 ?? []).map((x) => [k(x.sbd, x.ngay), Math.max(0, Math.floor(Number(x.q) || 0))]))
     const luot = new Map<string, { qid: unknown; tc: unknown }[]>()
     for (const x of rLuot ?? []) (luot.get(k(x.sbd, x.ngay)) ?? luot.set(k(x.sbd, x.ngay), []).get(k(x.sbd, x.ngay))!).push({ qid: x.qid, tc: x.tc })
     for (const e of lo) {
       const c = chot.get(e.sbd) ?? []
       ra.set(e.sbd, ngay.map((d) => {
         const cheDo: CheDoNgay = e.goi7Tu !== null && e.goi7Tu <= d ? 'goi7' : 'hanh-trinh'
-        const m = mucCuaNgay(d, cheDo, c)
+        const m = mucCuaNgay(d, cheDo, c, cheDo === 'goi7' ? { chot: muc7.get(k(e.sbd, d)) ?? null, quota: quota7.get(k(e.sbd, d)) ?? 0 } : undefined)
         const daLam = cheDo === 'goi7' ? (demGoi.get(k(e.sbd, d)) ?? 0) + (demGap.get(k(e.sbd, d)) ?? 0) : daLamKeHoach(keHoach.get(k(e.sbd, d)), luot.get(k(e.sbd, d)) ?? [])
         return { ngay: d, mucToiThieu: m.muc, daLam, thieu: Math.max(0, m.muc - daLam), datMuc: daLam >= m.muc, mucUocTinh: m.uoc, nguonMuc: m.nguon, tang: m.tang, cheDo, homNay: d === homNay }
       }))
@@ -274,8 +297,10 @@ async function docCoGoi7(env: Env): Promise<boolean> {
     return false
   }
 }
+// Đúng điều kiện `docGoiCuaEm7`: so lớp gói (TÊN LỚP) với TÊN LỚP hiệu lực của em (`sqlTenLopHs`) — trước 12/10 so `h.lop` (KHỐI) nên em khối 12 lớp
+// "12 - Lớp Thường" bị tính theo Hành trình phía thầy trong khi máy em đang ở Gói 7.
 const SQL_GOI7_EM = `SELECT e.sbd AS sbd, MIN(e.bat_dau) AS bat_dau FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id = e.goi_id
-  JOIN hoc_sinh h ON h.sbd = e.sbd AND h.lop = g.lop JOIN bai_da_day b ON b.id = g.tick_id AND b.bo_tick_luc IS NULL`
+  JOIN hoc_sinh h ON h.sbd = e.sbd AND ${sqlTenLopHs('h')} = g.lop JOIN bai_da_day b ON b.id = g.tick_id AND b.bo_tick_luc IS NULL`
 /** sbd → ngày bắt đầu Gói 7 sớm nhất (đúng điều kiện `docGoiCuaEm7`). Cờ tắt ⇒ rỗng. Lỗi đọc ⇒ null. */
 async function docGoi7Em(env: Env, sbd?: string): Promise<Map<string, string> | null> {
   if (!(await docCoGoi7(env))) return new Map()
