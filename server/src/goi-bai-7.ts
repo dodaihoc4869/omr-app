@@ -328,10 +328,16 @@ export async function startGoi7(env: Env, sbd: string, now: number): Promise<Rec
     const answered = old ? await env.DB.prepare('SELECT qid FROM game_v2_attempt WHERE session=? AND sbd=? UNION SELECT qid FROM goi_bai_7_gap WHERE receipt LIKE ? AND sbd=?').bind(old.id,sbd,`${str(old.id)}|%`,sbd).all<{qid:string}>() : {results:[] as {qid:string}[]}
     return { old, answered }
   }))
+  // CÂU VỪA TRẢ LỜI (lỗi 13/10 — thầy: "làm xong chặng 2 bấm làm tiếp chặng 3 câu bị lặp, còn nếu thoát ra bấm làm tiếp thì ko bị"): lệnh nộp câu ghi
+  // `game_v2_attempt` NGAY trong lô chấm, còn dòng sổ học (`su_kien_hoc` — nguồn "đã gặp / đã làm hôm nay" của kế hoạch) ghi SAU khi đã trả lời máy em
+  // (`ctx.waitUntil`). Bấm "Học tiếp" ngay ⇒ kế hoạch lập khi sổ chưa kịp có câu cuối ⇒ xếp lại câu vừa làm. Nay câu em vừa trả lời trong 15 phút
+  // (đọc từ bảng ghi ngay) không vào chặng mới; sau đó sổ đã có, kế hoạch tự loại như cũ.
+  const vuaLamSom = som(env.DB.prepare('SELECT DISTINCT qid FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,new Date(now-15*60_000).toISOString()).all<{qid:string}>()
+    .then(r => new Set(r.results.map(x => x.qid))).catch(() => new Set<string>()))
   const lap = await lapGoi7(env,sbd,now)
   if (!lap) return null
   if (!lap.control.enabled) throw new Error('Thầy đang tạm dừng bài học cho em.')
-  const [khoi, { old, answered }] = await Promise.all([khoiSom, cuSom])
+  const [khoi, { old, answered }, vuaLam] = await Promise.all([khoiSom, cuSom, vuaLamSom])
   const saved = old ? json<{questions:RefGoi7[]}>(old.json) : null
   const done = new Set(answered.results.map(r => r.qid))
   const viec = saved ? saved.questions.filter(r => !done.has(r.qid)).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
@@ -344,7 +350,7 @@ export async function startGoi7(env: Env, sbd: string, now: number): Promise<Rec
   // duyệt ĐÚNG thứ tự kế hoạch, ĐÚNG mọi điều kiện cũ ⇒ cùng bộ câu như trước.
   for (const ds of lanThu) { if (refs.length) break
     const ung = ds.map(v => { const oldRef = saved?.questions.find(r=>r.qid===v.qid); return { v, oldRef, meta: oldRef ?? lap.hs.meta.get(v.qid) ?? cauGoi.get(v.qid) } })
-      .filter(x => x.meta && !lap.chan.has(x.v.qid) && !lap.chan.has(x.meta.group))
+      .filter(x => x.meta && !lap.chan.has(x.v.qid) && !lap.chan.has(x.meta.group) && (ds === viec || !vuaLam.has(x.v.qid)))
     for (let i = 0; i < ung.length && refs.length < 6;) {
     const lo = ung.slice(i, i + 6 - refs.length + 2); i += lo.length
     const daDoc = (await Promise.all(lo.map(x => currentQuestion(env, x.meta!).then(q => ({ ...x, q }), () => null)))).filter((x): x is NonNullable<typeof x> => !!x)

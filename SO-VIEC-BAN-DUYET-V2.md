@@ -269,3 +269,7 @@ Thầy nhắn thêm (2 ảnh màn "Câu đã làm" của học sinh: khối tả
 "Ảnh 2 chỉ giữ lại bài đã chọn là bài 8, các phần dưới xóa bỏ nhé"
 - [ ] Câu đã làm: khối tải PDF / tải đề làm lại gọn, tinh tế | bằng chứng: (chưa có)
 - [ ] Câu đã làm: hộp chọn chỉ giữ bài (Bài 8 · Amine), bỏ chiến dịch mã "#cd…" và "Hành trình giỏi hoá" | bằng chứng: (chưa có)
+Thầy nhắn thêm: "Nếu đã làm xong chặng 2 bấm làm tiếp chặng 3 câu bị lặp, còn nếu thoát ra bấm làm tiếp thì ko bị bạn check chỗ này và sửa lỗi"
+- [ ] Xong chặng ⇒ bấm "Học tiếp chặng sau" ngay ở màn làm bài thì câu bị lặp (thoát ra vào lại thì không) — tìm nguyên nhân gốc, sửa | bằng chứng: (chưa có)
+Thầy nhắn thêm (ảnh app thầy, màn Học sinh: bấm ô tìm "Thành nam" ⇒ khung xanh đậm lồng bên trong khung ô tìm): "Bấm vào ô sớt thì bị chèn khung màu xanh nhìn xấu, bạn xử lý tất cả các chỗ này trên mọi chỗ mọi app nhé"
+- [ ] Bỏ khung xanh chèn khi bấm vào ô tìm / ô nhập ở mọi chỗ, cả 3 app (giữ dấu hiệu đang chọn nhẹ nhàng cho bàn phím) | bằng chứng: (chưa có)
