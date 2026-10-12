@@ -186,7 +186,8 @@ async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, den: str
       ht.length ? hoi(env, SQL_KE_HOACH, j(ht), tu, den) : rong,
       ht.length ? hoi(env, SQL_LUOT_KE_HOACH, j(ht), tu, den) : rong,
     ])
-    if (rGoi === null || rLuot === null) throw new LoiDocSo('Không đọc được sổ học của các em.')
+    // Sổ chính hỏng ⇒ cả lệnh báo lỗi (không trả số sai). Bảng kế hoạch không đọc được ⇒ lượt kế hoạch cũng không đọc được: chỉ cảnh báo.
+    if (rGoi === null || (rLuot === null && rKh !== null)) throw new LoiDocSo('Không đọc được sổ học của các em.')
     if (rTrong === null || rTruoc === null) baoMot('Chưa đọc được mức đã chốt theo ngày — mọi ô dùng mức ước tính theo quy tắc hiện hành.')
     if (rGap === null) baoMot('Chưa đọc được câu học có hướng dẫn của Gói bài 7 ngày — số đã làm chỉ tính câu trong sổ.')
     if (rKh === null) baoMot('Chưa đọc được kế hoạch Hành trình theo ngày — ngày Hành trình tính là chưa làm câu nào của kế hoạch.')

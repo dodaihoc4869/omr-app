@@ -203,6 +203,20 @@ describe('xếp em + lọc', () => {
     expect(r).toMatchObject({ ok: true, em: [], soO: 0 })
   })
 
+  it('bảng phụ chưa có (D1 cũ: chưa dựng Gói 7 / mức chốt) ⇒ vẫn trả số, cảnh báo nói thật, mức ước tính', async () => {
+    const d = taoD1That() // KHÔNG dựng bảng Hành trình v3 / Gói 7
+    em(d, 'A', 'Trần An')
+    hanhTrinh(d, '12', ['A'])
+    d.sql.prepare("INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('goi_bai_7_v1', '{\"bat\":true}', 'x')").run()
+    const r = await goi(d)
+    expect(r.ok).toBe(true)
+    expect(theo(r, 'A').ngay.map((n) => [n.mucToiThieu, n.nguonMuc, n.cheDo])).toEqual([[24, 'mac-dinh', 'hanh-trinh'], [24, 'mac-dinh', 'hanh-trinh'], [24, 'mac-dinh', 'hanh-trinh']])
+    expect(r.canhBao).toEqual([
+      'Chưa đọc được Gói bài 7 ngày — các em tính theo kế hoạch Hành trình.',
+      'Chưa đọc được mức đã chốt theo ngày — mọi ô dùng mức ước tính theo quy tắc hiện hành.',
+    ])
+  })
+
   it('truy vấn sổ đi chỉ mục (sbd, ngay_vn)', () => {
     const d = taoD1()
     for (const q of [SQL_DEM_GOI7, SQL_LUOT_KE_HOACH]) {

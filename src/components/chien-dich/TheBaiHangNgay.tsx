@@ -300,7 +300,7 @@ export default function TheBaiHangNgay({ khoiDau = null }: { khoiDau?: number | 
             <p className="gvv2-trong">Không có em nào khớp bộ lọc{khoiChon ? ` ở Khối ${khoiChon}` : ''}{lopChon ? ` · lớp ${lopChon}` : ''}.</p>
           ) : (
             <div className="gvv2-bhn-cuon" role="region" aria-label="Bảng bài hằng ngày, cuộn ngang khi nhiều ngày" tabIndex={0}>
-              <table className="gvv2-bhn-bang" style={{ ['--so-ngay' as string]: du.kq.ngay.length }}>
+              <table className="gvv2-bhn-bang">
                 <caption className="gvv2-an-chu">Bài hằng ngày từng em: đã làm trên mức tối thiểu mỗi ngày, số ngày thiếu, câu thiếu, ngày thiếu nhiều nhất.</caption>
                 <thead>
                   <tr>
