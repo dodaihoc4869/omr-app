@@ -6,6 +6,8 @@
 // Khoá: (1) vắng `omni` / omni không có số thật ⇒ không dòng OMNI nào, không số 0 giả; (2) có omni ⇒ đúng chữ, đúng chỗ; (3) độ tin không bao giờ 100%;
 // (4) không chữ game, không chữ A.I trên màn phụ huynh; (5) lớp đọc chặt từng trường.
 // Tệp .ts (không JSX) để lọt mẫu cổng `tests/omni-3-*.test.ts` của đặc tả mục 8.
+// SỬA CÓ CHỦ Ý — LÀN PHỤ HUYNH 12/10 (thầy 12/10: "… bỏ mục thầy cần chữa …"): dòng "Cần thầy chữa: N chỗ" ĐÃ BỎ khỏi app phụ huynh.
+// Khoá đổi chiều: máy chủ vẫn gửi `omni.canThayChua` (lớp đọc giữ nguyên) nhưng KHÔNG màn phụ huynh nào hiện chữ "Cần thầy chữa".
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, render, waitFor } from '@testing-library/react'
 import { createElement } from 'react'
@@ -85,14 +87,16 @@ describe('OMNI 3 · app phụ huynh theo bản vẽ tối giản 09/10', () => {
     expect(c.querySelector('[data-vung="diem-omni"], [data-vung="so-y"]')).toBeNull()
   })
 
-  it('CÓ omni ⇒ Hôm nay: giờ học con chọn, dạng cần vững, Cần thầy chữa; Tiến bộ: khoảng cách tới 8 + chứng chỉ dưới đường điểm, Sơ ý; không chữ game / A.I / 100%', async () => {
+  it('CÓ omni ⇒ Hôm nay: giờ học con chọn, dạng cần vững, KHÔNG "Cần thầy chữa" (bỏ 12/10); Tiến bộ: khoảng cách tới 8 + chứng chỉ dưới đường điểm, Sơ ý; không chữ game / A.I / 100%', async () => {
     hoc2 = { ...HOC2, omni: OMNI }
     const c = await moHomNay()
     expect(c.querySelector('[data-vung="anh-hung"]')!.textContent).toContain('Giờ học con chọn: 20:30.')
     const dang = c.querySelector('[data-vung="dang-luyen-them"]')!
     expect(dang.querySelector('h2')!.textContent).toBe('Dạng cần vững')
     expect(dang.textContent).toContain('Hiệu suất ester hoá · Hỗn hợp ester')
-    expect(c.querySelector('[data-vung="can-thay-chua"]')!.textContent).toBe('Cần thầy chữa: 1 chỗ')
+    // LÀN PHỤ HUYNH 12/10: thầy lệnh bỏ mục "Cần thầy chữa" ⇒ omni.canThayChua = 1 nhưng không dòng nào
+    expect(c.querySelector('[data-vung="can-thay-chua"]')).toBeNull()
+    expect(c.textContent).not.toContain('Cần thầy chữa')
     expect(c.textContent).not.toMatch(/Sẵn sàng 8\+|tới 8|Sơ ý/) // các số ấy chỉ ở Tiến bộ
     expect(c.textContent).not.toMatch(CAM)
     await sangTienBo(c)
@@ -103,7 +107,7 @@ describe('OMNI 3 · app phụ huynh theo bản vẽ tối giản 09/10', () => {
     const soY = c.querySelector('[data-vung="so-y"]')!
     expect(soY.querySelector('h2')!.textContent).toBe('Sơ ý của con')
     expect(soY.textContent).toContain('6% (mục tiêu dưới 7%)')
-    expect(c.textContent).not.toContain('Cần thầy chữa') // mỗi số một chỗ: Cần thầy chữa chỉ ở Hôm nay
+    expect(c.textContent).not.toContain('Cần thầy chữa') // bỏ hẳn khỏi app phụ huynh (12/10)
     expect(c.textContent).not.toMatch(CAM)
   })
 

@@ -23,7 +23,18 @@ export const BtBang = (p: P) => <Net {...p}><path d="M8 3h8v4H8z" /><path d="M16
 export const BtKep = (p: P) => <Net {...p}><path d="M8 3h8v4H8z" /><path d="M16 5h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2" /></Net>
 /** Tam giác chú ý (dòng dạng con đang luyện thêm / dạng cần vững). */
 export const BtChuY = (p: P) => <Net {...p}><path d="M12 9v4M12 17h.01" /><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /></Net>
-/** Bút (dòng "Cần thầy chữa"). */
+/** Bút (gợi ý nhắc "câu sai chưa sửa"; trước 12/10 là dòng "Cần thầy chữa" — mục đó đã bỏ khỏi app phụ huynh). */
 export const BtBut = (p: P) => <Net {...p}><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" /><path d="m13.5 6.5 4 4" /></Net>
 export const BtChuong = (p: P) => <Net {...p}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0" /></Net>
 export const BtKhoa = (p: P) => <Net {...p}><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></Net>
+// LÀN PHỤ HUYNH 12/10 — biểu tượng của gợi ý nhắc con, thời gian làm câu, lịch học.
+/** Đồng hồ (thời gian làm câu · làm quá nhanh). */
+export const BtDongHo = (p: P) => <Net {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Net>
+/** Lịch (lịch học từng ngày · ngày thiếu). */
+export const BtLich = (p: P) => <Net {...p}><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" /><path d="M3.5 10h17M8 3v4M16 3v4" /></Net>
+/** Trăng (làm bài khuya). */
+export const BtTrang = (p: P) => <Net {...p}><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" /></Net>
+/** Bóng đèn (dùng gợi ý · khối Gợi ý nhắc con). */
+export const BtBongDen = (p: P) => <Net {...p}><path d="M9 18h6M10 21h4" /><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z" /></Net>
+/** Dấu nhân (lượt sai). */
+export const BtNhan = (p: P) => <Net {...p}><path d="M7 7l10 10M17 7 7 17" /></Net>
