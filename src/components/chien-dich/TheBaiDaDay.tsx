@@ -4,7 +4,9 @@
 // cần chữa. Bạn hãy thu gọn tối giản hết lại thành 2 mục và làm thật trực quan dễ hiểu khoa học đẹp mắt" (bản vẽ HanhTrinh-DayHoc đã duyệt) ⇒ mục này
 // là MỘT BUỔI DẠY 4 BƯỚC trên một trang:
 //   · Thanh trên: ô "Buổi dạy" (buổi đang mở; nhiều buổi ⇒ chọn) + 4 bước có trạng thái xong / đang / chờ (bấm ⇒ cuộn tới bước).
-//   · 1 Điểm danh — `BuocDiemDanh` (mở buổi, mã/QR, thêm em tay, Kết thúc buổi) + thanh có mặt / sĩ số + tên em vắng.
+//   · 1 Điểm danh — `BuocDiemDanh` (mở buổi, mã/QR, thêm em tay, Kết thúc buổi) + thanh có mặt / sĩ số + tên em vắng. 12/10C (bản vẽ GV-DiemDanh):
+//     bước 1 chia nhóm Chăm / Lười, hai bản chiếu React (đang điểm danh · Nhịp học của lớp); phím → trên bản chiếu Nhịp học ⇒ `sangDauGio` (cuộn tới
+//     bước 2 và bấm nút chính "Chiếu lên bảng" của bước ấy — như thầy tự bấm).
 //   · 2 Gọi lên bảng đầu giờ — `KiemTraDauGio` nhận `dd` (chiếu + Đạt / Chưa đạt + Gọi thêm + Thầy đã chữa + Kết thúc; máy chủ `/gv/dau-gio`).
 //   · 3 Dạy và chiếu câu + 4 Tick bài vừa dạy — `DayHocLenBang` nhận `dd` (chọn câu kho Dạy học + chiếu; Bài hôm nay gập sẵn + bảng
 //     `BangBaiDangGiao` + lối sang mục Chữa bài).
@@ -89,6 +91,16 @@ export default function TheBaiDaDay({ lanBoSung = 0, onMoChuaBai }: { lanBoSung?
   const denBuoc = useCallback((so: number) => {
     khung.current?.querySelector<HTMLElement>(`[data-buoc="${so}"]`)?.scrollIntoView?.({ block: 'start', behavior: giamChuyenDong() ? 'auto' : 'smooth' })
   }, [])
+  /** Từ bản chiếu Nhịp học (phím → / nút): sang bước 2 Gọi lên bảng đầu giờ — cuộn tới bước, bấm nút chính nếu đang bấm được (không thì chỉ đưa focus tới). */
+  const sangDauGio = useCallback(() => {
+    const buoc = khung.current?.querySelector<HTMLElement>('[data-buoc="2"]')
+    if (!buoc) return
+    buoc.scrollIntoView?.({ block: 'start', behavior: giamChuyenDong() ? 'auto' : 'smooth' })
+    const nut = buoc.querySelector<HTMLButtonElement>('.m3-nut-chinh')
+    if (!nut) return
+    nut.focus()
+    if (!nut.disabled) nut.click()
+  }, [])
 
   useEffect(() => {
     if (lanBoSung <= 0) return
@@ -117,7 +129,7 @@ export default function TheBaiDaDay({ lanBoSung = 0, onMoChuaBai }: { lanBoSung?
     <div ref={khung} className="gvv2-nhung gvv2-bd" data-khoi="buoi-day" data-b1={trangThai[0]} data-b2={trangThai[1]} data-b3={trangThai[2]} data-b4={trangThai[3]}>
       <ThanhBuoi dd={dd} trangThai={trangThai} onDen={denBuoc} />
       <div className="gvv2-bd-b1" data-buoc="1">
-        <BuocDiemDanh dd={dd} soBuoc={1} idTieuDe="bd-b1" thanh />
+        <BuocDiemDanh dd={dd} soBuoc={1} idTieuDe="bd-b1" thanh onSangDauGio={sangDauGio} />
       </div>
       <Suspense fallback={<XuongBuoc nhan="Đang mở bước Gọi lên bảng đầu giờ" />}>
         <KiemTraDauGio dd={dd} soBuoc={2} onXong={setXongDauGio} />
