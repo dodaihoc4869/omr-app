@@ -9,10 +9,16 @@
 // MỨC TỐI THIỂU MỖI NGÀY (`mucToiThieu`) — đúng luật đang chấm "đủ mức":
 //   · Kế hoạch Hành trình: mức của ngày là `hanh_trinh_v3_ngay.toi_thieu` CHỐT đầu ngày khi em mở kế hoạch (`lapChotHanhTrinh`) ⇒ `nguonMuc 'da-chot'`,
 //     số THẬT. Ngày em không mở kế hoạch thì máy chủ không có dòng ấy.
-//   · Gói bài 7 ngày (đang bật từ 10/10): mức = `CAU_TOI_THIEU[tầng]` tính LẠI mỗi lần em mở (`lapGoi7`), KHÔNG lưu theo ngày.
-//   ⇒ Ngày không có mức đã lưu: dùng ĐÚNG quy tắc hiện hành `CAU_TOI_THIEU` (tầng 1 → 24 · 2 → 30 · 3 → 36 · 4 → 36 câu) với tầng gần nhất đã ghi
-//     của em (`hanh_trinh_v3_ngay.tang` ngày gần nhất, ưu tiên ngày trước) ⇒ `nguonMuc 'tang-gan-nhat'`; chưa ghi tầng nào ⇒ tầng 1 (24 câu, đúng
-//     mức máy chủ khởi tạo cho ngày mới) ⇒ `nguonMuc 'mac-dinh'`. Hai trường hợp này `mucUocTinh = true`. Không bịa số khác.
+//   · Gói bài 7 ngày (đang bật từ 10/10) — MỘT CON SỐ (thầy 12/10: "học sinh làm 24 câu nhưng lại báo 31 câu … trên app học sinh báo 24 câu nhưng
+//     đo theo ngày hôm nay lại hiện 0/36"): mức M = max(`CAU_TOI_THIEU[tầng]` tính như `lapGoi7`, Σ câu mới theo lịch các gói hôm nay) (`mucNgayGoi7`),
+//     CHỐT ở lần lập đầu tiên trong ngày vào `goi_bai_7_muc_ngay` ⇒ `nguonMuc 'da-chot'`, đúng số vòng tròn / "còn x câu" / số chặng / "Đã đạt mục
+//     tiêu" em thấy. Ngày Gói 7 chưa có dòng chốt (trước khi có bảng, hoặc em chưa mở bài ngày ấy) ⇒ ƯỚC TÍNH M = max(`CAU_TOI_THIEU[1]` = 24,
+//     Σ `goi_bai_7_ngay.quota` ngày ấy) ⇒ `nguonMuc 'uoc-goi7'`, `tang 1`: tầng tính trên phạm vi câu của BÀI MỚI nên những ngày đầu bài gần như chắc
+//     là tầng 1 — KHÔNG lấy tầng Hành trình (trước 12/10 lấy tầng Hành trình gần nhất ⇒ 36 câu, lệch 24 câu em được giao, chấm Lười sai).
+//   ⇒ Ngày Hành trình không có mức đã lưu: dùng ĐÚNG quy tắc hiện hành `CAU_TOI_THIEU` (tầng 1 → 24 · 2 → 30 · 3 → 36 · 4 → 36 câu) với tầng gần nhất
+//     đã ghi của em (`hanh_trinh_v3_ngay.tang` ngày gần nhất, ưu tiên ngày trước) ⇒ `nguonMuc 'tang-gan-nhat'`; chưa ghi tầng nào ⇒ tầng 1 (24 câu,
+//     đúng mức máy chủ khởi tạo cho ngày mới) ⇒ `nguonMuc 'mac-dinh'`. Ba trường hợp ước tính (`tang-gan-nhat` · `mac-dinh` · `uoc-goi7`) có
+//     `mucUocTinh = true`. Không bịa số khác.
 // SỐ CÂU ĐÃ LÀM (`daLam`) — cùng nguồn sự kiện, cùng cách loại "đọc lời giải" với kế hoạch đang chấm em ngày ấy:
 //   · Gói 7 (`cheDo 'goi7'`, đúng `lapGoi7`): số mã câu KHÁC NHAU trong sổ `su_kien_hoc` ngày ấy có kết quả, là lượt làm (`SQL_LA_LAN_LAM`: bỏ đọc lời
 //     giải / lướt / chẩn đoán / gỡ bước), không còn giấu, ca kiểm tra chỉ tính khi đã công bố và chưa xoá (`SQL_LUOT_GOI7`) + câu học có hướng dẫn
@@ -30,8 +36,9 @@ export const TOI_DA_SO_NGAY_BAI_HANG_NGAY = 62
 export const MUC_THEO_TANG: Readonly<Record<1 | 2 | 3 | 4, number>> = { 1: 24, 2: 30, 3: 36, 4: 36 }
 
 export type CheDoNgay = 'goi7' | 'hanh-trinh'
-/** 'da-chot' = mức thật đã chốt của đúng ngày · 'tang-gan-nhat' = ước tính theo tầng gần nhất đã ghi · 'mac-dinh' = ước tính tầng 1. */
-export type NguonMuc = 'da-chot' | 'tang-gan-nhat' | 'mac-dinh'
+/** 'da-chot' = mức thật đã chốt của đúng ngày (Hành trình: `hanh_trinh_v3_ngay` · Gói 7: `goi_bai_7_muc_ngay`) · 'tang-gan-nhat' = Hành trình,
+ *  ước tính theo tầng gần nhất đã ghi · 'mac-dinh' = Hành trình, ước tính tầng 1 · 'uoc-goi7' = Gói 7 chưa chốt, ước tính max(24, Σ lịch câu mới). */
+export type NguonMuc = 'da-chot' | 'tang-gan-nhat' | 'mac-dinh' | 'uoc-goi7'
 
 /** Một ngày của một em. `thieu = max(0, mucToiThieu − daLam)`, `datMuc = daLam ≥ mucToiThieu`. */
 export interface NgayBaiEm {

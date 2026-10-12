@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowRight, Atom, BookOpen, Check, ChevronRight, ClipboardCheck, FileClock, History, Home, LineChart, LogOut, Mail, PenLine, RefreshCw, Route, Target, Users, X } from 'lucide-react'
 import type { KetQuaSanh } from '../hoa2/api'
+import type { TomTatGoi7 } from '../../lib/goi-bai-7'
 import './hoc-tap.css'
 import TheGoi7 from './TheGoi7'
 import NhipHocEm from './NhipHocEm'
@@ -28,6 +29,11 @@ const THU = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm',
 const homNayChu = () => { const d = new Date(); return `${THU[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}` }
 const chuCaiDau = (ten: string) => { const p = ten.trim().split(/\s+/).filter(Boolean); return ((p.length > 1 ? p[p.length - 2]![0] : '') + (p[p.length - 1]?.[0] ?? 'E')).toUpperCase() }
 
+/** Tiêu đề việc còn lại của ngày Gói 7: tự làm + có hỗ trợ (+ câu chờ bổ sung khi kho thiếu) = mức − đã làm, không số nào mâu thuẫn vòng tròn. */
+export function chuViecGoi7(g: Pick<TomTatGoi7, 'tuLamCon' | 'tiepCanCon' | 'thieuNgay'>): string {
+  return `${g.tuLamCon} câu tự làm · ${g.tiepCanCon} câu học có hỗ trợ${g.thieuNgay > 0 ? ` · ${g.thieuNgay} câu chờ thầy bổ sung` : ''}`
+}
+
 /** Dòng việc: biểu tượng · tên · lý do · số (nếu có) · mũi tên. */
 function Dong({ ten, chu, icon: Icon, sac, so, donVi, onClick }: { ten: string; chu: string; icon: typeof Home; sac: 'cham' | 'vang' | 'muc'; so?: number; donVi?: string; onClick: () => void }) {
   return <button className="ht2-dong" onClick={onClick}>
@@ -48,7 +54,9 @@ export default function HocTapHomNay(p: Props) {
   const goi7 = sanh?.goi7
   const daLam = goi7?.daLamHomNay ?? ht?.daLam ?? (sanh ? Math.max(0, sanh.theLuc.tong - sanh.theLuc.con) : p.tienDoCu?.daLam ?? null)
   const mucNgay = goi7?.toiThieu ?? ht?.toiThieu ?? sanh?.theLuc.tong ?? p.tienDoCu?.mucTieu ?? null
-  const xong = goi7 ? goi7.tuLamCon+goi7.tiepCanCon+goi7.thieuPhu===0 && goi7.goi.every(g=>g.gapHomNay>=g.quota) : daLam !== null && mucNgay !== null && mucNgay > 0 && daLam >= mucNgay
+  // MỘT CON SỐ (thầy 12/10: "học sinh làm 24 câu nhưng lại báo 31 câu"): Gói 7 hay Hành trình đều "đạt" khi đã làm ≥ mức hôm nay — đúng `datMuc` phía
+  // thầy / phụ huynh / Nhịp học. Câu mới theo lịch còn lại của gói KHÔNG chặn chữ đạt (máy chủ đã xếp chúng trong mức; phần chưa gặp dồn sang ngày sau).
+  const xong = daLam !== null && mucNgay !== null && mucNgay > 0 && daLam >= mucNgay
   const soChang = ht?.soChang ?? (mucNgay ? Math.ceil(mucNgay / 6) : 0)
   const con = sanh?.theLuc.con ?? null
   const phanTram = daLam !== null && mucNgay ? Math.min(100, Math.round((daLam / mucNgay) * 100)) : 0
@@ -98,7 +106,7 @@ export default function HocTapHomNay(p: Props) {
             <progress className="ht2-an" aria-label="Tiến độ nhiệm vụ hôm nay" value={daLam ?? 0} max={Math.max(1, mucNgay ?? 1)} />
             <div className="ht2-chinh-chu">
               <p className="ht2-nhan">{xong ? 'Đã đạt mục tiêu hôm nay' : 'Mục tiêu hôm nay'}</p>
-              <h2>{p.dangTai && !sanh ? 'Đang tải bài học…' : xong ? 'Em đã hoàn thành phần được xếp hôm nay' : goi7 ? `${goi7.tuLamCon} câu tự làm · ${goi7.tiepCanCon} câu học có hỗ trợ` : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : 'Tiếp tục bài học của em'}</h2>
+              <h2>{p.dangTai && !sanh ? 'Đang tải bài học…' : xong ? 'Em đã hoàn thành phần được xếp hôm nay' : goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : 'Tiếp tục bài học của em'}</h2>
               <p className="ht2-phu">{goi7?.goi[0]?.ten || sanh?.chienDich?.ten || 'Bài học được chọn theo kiến thức và lịch ôn của em.'}{conCau !== null && !xong ? ` · còn ${conCau} câu` : ''}</p>
               {soChang > 0 && <div className="ht2-chang" aria-label={`Xong ${soChangXong} trong ${soChang} chặng`}>{Array.from({ length: soChang }, (_, i) => <i key={i} data-tt={xongChang(i) ? 'xong' : i === soChangXong ? 'dang' : 'cho'} />)}</div>}
               {soChang > 0 && <p className="ht2-chang-chu"><span>Xong {soChangXong} chặng</span><span>{soChang} chặng · mỗi chặng tối đa 6 câu</span></p>}

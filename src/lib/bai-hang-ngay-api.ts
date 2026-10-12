@@ -45,7 +45,7 @@ function docNgayBai(x: unknown): NgayBaiEm | null {
     thieu: Math.max(0, muc - daLam),
     datMuc: daLam >= muc,
     mucUocTinh: o.mucUocTinh === true,
-    nguonMuc: (['da-chot', 'tang-gan-nhat', 'mac-dinh'] as NguonMuc[]).includes(o.nguonMuc as NguonMuc) ? (o.nguonMuc as NguonMuc) : 'mac-dinh',
+    nguonMuc: (['da-chot', 'tang-gan-nhat', 'mac-dinh', 'uoc-goi7'] as NguonMuc[]).includes(o.nguonMuc as NguonMuc) ? (o.nguonMuc as NguonMuc) : 'mac-dinh',
     tang: tang(o.tang),
     cheDo: (o.cheDo === 'goi7' ? 'goi7' : 'hanh-trinh') as CheDoNgay,
     homNay: o.homNay === true,

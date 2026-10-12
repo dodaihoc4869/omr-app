@@ -69,10 +69,11 @@ function ChuGiai({ kq }: { kq: KetQuaBaiHangNgay }) {
           {kq.soOUocTinh > 0 && <span className="gvv2-so"> ({kq.soOUocTinh}/{kq.soO} ô dùng mức ước tính)</span>}
         </summary>
         <p className="gvv2-bhn-ghi gvv2-so">
-          Mức tối thiểu theo tầng của em: Nền {MUC_THEO_TANG[1]} câu · Hiểu {MUC_THEO_TANG[2]} · Vận dụng, Tổng hợp {MUC_THEO_TANG[3]}. Ngày em mở kế hoạch Hành
-          trình, mức là số đã chốt đầu ngày. Ngày không có mức đã lưu (em không mở kế hoạch, hoặc Gói bài 7 ngày — gói không lưu mức theo ngày) dùng mức
-          ước tính theo tầng gần nhất đã ghi của em; chưa ghi tầng nào thì tính tầng Nền. Đã làm = số câu khác nhau em làm có kết quả trong ngày, không
-          tính lượt chỉ đọc lời giải. Hôm nay chưa hết ngày nên chưa cộng vào số ngày thiếu và câu thiếu.
+          Mức tối thiểu theo tầng của em: Nền {MUC_THEO_TANG[1]} câu · Hiểu {MUC_THEO_TANG[2]} · Vận dụng, Tổng hợp {MUC_THEO_TANG[3]}. Ngày Hành trình: mức
+          là số đã chốt đầu ngày khi em mở kế hoạch; ngày em không mở dùng mức ước tính theo tầng gần nhất đã ghi (chưa ghi tầng nào thì tính tầng Nền).
+          Ngày Gói bài 7 ngày: mức là số chốt lần đầu em mở bài trong ngày, bằng số lớn hơn giữa mức theo tầng và số câu mới theo lịch của gói hôm nay —
+          đúng số em thấy trên app; ngày gói chưa chốt mức dùng mức ước tính: số lớn hơn giữa {MUC_THEO_TANG[1]} câu và số câu mới theo lịch ngày ấy. Đã làm =
+          số câu khác nhau em làm có kết quả trong ngày, không tính lượt chỉ đọc lời giải. Hôm nay chưa hết ngày nên chưa cộng vào số ngày thiếu và câu thiếu.
         </p>
       </details>
     </div>
