@@ -161,5 +161,12 @@ export interface KetQuaNhipHocEm {
   /** Không đọc được số giây ⇒ null (dòng tốc độ ẩn). */
   tocDo: TocDoNhipEm | null
   viecTiep: ViecTiepNhip
+  // ---- CHỈ THÊM 12/10 đợt 16 (máy chủ cũ không có ⇒ app ẩn) ----
+  /** Độ tin cậy 0–99 của `nhom`: xác suất luật nhóm vẫn ra đúng nhóm này nếu biết tỉ lệ ngày đủ mức THẬT (cỡ mẫu = số ngày đã qua; sự việc 3 ngày
+   *  liền không làm / đủ mức 6 ngày liền là chắc chắn) — CÙNG phép `tinCayNhanNgay` (server/src/thai-do-tin-cay.ts) với hồ sơ thái độ. 'chua-du' ⇒ vắng.
+   *  KHÔNG đổi `nhom`. */
+  doTinCay?: number
+  /** Khi `doTinCay` dưới 90: một câu nói thật cần thêm bao nhiêu ngày có số liệu. */
+  canThem?: string
 }
 export type TraLoiNhipHocEm = KetQuaNhipHocEm | { ok: false; error: string }

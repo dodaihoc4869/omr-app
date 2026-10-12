@@ -168,6 +168,9 @@ export interface TinHieuThaiDo {
   chu: string
   /** Ngưỡng bằng chữ ("Tốt từ 80% · chú ý 50–79% · dưới 50% là chưa đều"). */
   nguong: string
+  /** CHỈ THÊM 12/10 (đợt 16): độ tin cậy 0–99 — xác suất tỉ lệ THẬT của em nằm cùng vùng (tốt / chú ý / xấu) với tỉ lệ đã đo, theo cỡ mẫu
+   *  (hậu nghiệm Jeffreys Beta(k + ½, n − k + ½); cách tính `CACH_TINH_TIN_CAY`, server/src/thai-do-tin-cay.ts). 'chua-du' ⇒ vắng. KHÔNG ảnh hưởng `muc`. */
+  doTinCay?: number
 }
 
 export type NhanThaiDo = 'cham-chi' | 'chua-deu' | 'luoi' | 'doi-pho' | 'chua-du-du-lieu'
@@ -199,6 +202,11 @@ export interface KetLuanThaiDo {
   chu: string
   /** Lý do bằng số, câu ngắn, theo thứ tự quan trọng. */
   lyDo: string[]
+  /** CHỈ THÊM 12/10 (đợt 16): độ tin cậy 0–99 của nhãn — xác suất luật kết luận vẫn ra ĐÚNG nhãn này nếu biết tỉ lệ thật, tính trên tín hiệu quyết
+   *  định (server/src/thai-do-tin-cay.ts `tinCayKetLuan`). 'chua-du-du-lieu' ⇒ vắng. KHÔNG đổi `nhan`. */
+  doTinCay?: number
+  /** Khi `doTinCay` dưới 90: một câu nói thật cần thêm bao nhiêu số liệu để đạt 90% ("Cần thêm khoảng 3 ngày có số liệu …"). */
+  canThem?: string
 }
 
 /** Một ngày trên lịch hoạt động: số kế hoạch (mức/đã làm) + mọi lượt làm câu trong sổ ngày ấy. */
@@ -284,5 +292,22 @@ export interface KetQuaHoSoThaiDo {
   coDoiPho?: boolean
   /** Chuỗi ngày đủ mức liền gần nhất (từ 6 ngày thì thoát nhóm Lười). */
   chuoiDuGanNhat?: number
+  // ---- CHỈ THÊM 12/10 đợt 16 (độ tin cậy; máy chủ cũ không có ⇒ app ẩn) ----
+  /** Câu "Cách tính" độ tin cậy (in nguyên văn) — `CACH_TINH_TIN_CAY`. */
+  cachTinhTinCay?: string
+  /** CHỈ ĐỂ XEM (không vào kết luận): câu từng sai trong khoảng mà sau đó em làm lại ĐÚNG — tính từ sổ đã đọc, không truy vấn thêm. */
+  tuSuaSai?: TuSuaSai
+}
+
+/** Tự sửa câu sai (chỉ để xem, KHÔNG ảnh hưởng nhãn). Đếm theo câu gốc, lượt trong khoảng xem. */
+export interface TuSuaSai {
+  /** Số câu (gốc) có ít nhất một lượt sai trong khoảng. */
+  soCauSai: number
+  /** Trong đó: số câu có lượt ĐÚNG sau lượt sai đầu tiên. */
+  soCauDaSua: number
+  /** % câu đã sửa (làm tròn); chưa có câu sai ⇒ null. */
+  phanTram: number | null
+  /** Câu số liệu ("Đã làm đúng lại 5/8 câu từng sai (63%)"). */
+  chu: string
 }
 export type TraLoiHoSoThaiDo = KetQuaHoSoThaiDo | { ok: false; error: string }
