@@ -177,7 +177,7 @@ function KhoiKhacPhuc({ tong, da, tuan }: { tong: number; da: number; tuan: Tuan
     <section className="tlu-khoi tlu-o-kp" aria-labelledby="tlu-h-kp">
       <h2 id="tlu-h-kp" className="tlu-muc">Khắc phục câu sai từ 29/09</h2>
       <div className="tlu-dem-kp tlu-dem-kp-lon">
-        <span className="tlu-dem-kp-chu">Đã khắc phục <b className="baloo tlu-tab">{da}/{tong}</b> câu sai</span>
+        <span className="tlu-dem-kp-chu">Đã khắc phục <b className="tlu-tab">{da}/{tong}</b> câu sai</span>
         <span className="tlu-thanh" role="progressbar" aria-label="Số câu sai đã khắc phục" aria-valuemin={0} aria-valuemax={tong} aria-valuenow={da}>
           <span style={{ transform: `scaleX(${tong ? Math.min(1, da / tong) : 0})` }} />
         </span>
@@ -248,7 +248,7 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, on
   const oHero = (
       <section className="tlu-hero" aria-label="Tổng quan">
         <div className="tlu-hero-so">
-          <b className="baloo tlu-tab">{pt(t.tiLe)}</b>
+          <b className="tlu-tab">{pt(t.tiLe)}</b>
           <span>câu đúng · {t.soDung}/{t.soCau} câu</span>
         </div>
         <dl className="tlu-kpi">

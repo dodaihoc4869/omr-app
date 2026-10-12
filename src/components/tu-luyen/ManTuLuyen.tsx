@@ -7,14 +7,16 @@
 // "Chấm từng câu" (nhớ theo máy) ⇒ mỗi câu bấm Kiểm tra, máy chủ chấm + khoá câu, hiện đúng/sai + lời giải + nút Câu tiếp.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 const ManChuaCauSai = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
-import ChoChuaCuaEm from '../chua-cau-sai/ChoChuaCuaEm'
 import { apiCoChua } from '../../lib/chua-cau-sai-api'
 import TheCau from '../TheCau'
 import { hoiXacNhan } from '../hop-thoai'
 import '../m3'
-import '../hoa2/phong-baloo'
 import './tu-luyen.css'
 import './tu-luyen-rong.css'
+// TRÙNG TU 12/10 (thầy: "trùng tu lại giao diện mục tu luyện của app học sinh"): ngôn ngữ giao diện Hôm nay (.ht2) — nền giấy, chữ mực,
+// nhấn chàm, thẻ bo 24px, một nút chính màu mực; bỏ phông Baloo và nút vàng nổi kiểu game. Chỉ THÊM luật, phạm vi body[data-hoc-tap=hs].
+import './tu-luyen-hs.css'
+import { doiTenNguonCu } from '../../lib/nhan-nguon-lan'
 import ChonNguonSai from './ChonNguonSai'
 import { chonMacDinh, demChon, docNhoNguon, ghiNhoNguon, type MaNguonSai } from './nguon-cau-sai'
 import type { HinhAnh } from '../../data/examContent'
@@ -39,7 +41,7 @@ import TongHopTuLuyen from './TongHopTuLuyen'
 import { taiDieuKienLuyenDe, type DieuKienLuyenDe } from '../luyen-de/dung-luyen-de'
 import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import { taoGoiSom } from '../hoa2/nap-truoc-man'
-import { BanDoKetQua, KhungLamRong, cuonToiCau, useBoCuc, type BoCuc, type LocXem, type NhomBang } from './bo-cuc'
+import { BanDoKetQua, KhungLamRong, cuonMuot, cuonToiCau, useBoCuc, type BoCuc, type LocXem, type NhomBang } from './bo-cuc'
 
 // Thẻ "Luyện đề cấu trúc" (30/09): mảnh NẠP LƯỜI khi em mở thẻ (ngoài precache — vite.config.ts globIgnores). Cổng + lý do khoá lấy từ
 // máy chủ `/luyen-de/dieu-kien` ngay khi mở Tu luyện (thẻ hiện ổ khoá, không ẩn).
@@ -131,7 +133,7 @@ function NhanLuyen({ c }: { c: CauCongKhai }) {
     <>
       {c.nhanLuyen && <span className="tlu-nhan" data-kieu="luyen">{c.nhanLuyen}</span>}
       {c.conMotLan && <span className="tlu-nhan" data-kieu="con-mot">{c.conMotLan}</span>}
-      {c.saiGoc && <span className="tlu-sai-goc">{c.saiGoc}</span>}
+      {c.saiGoc && <span className="tlu-sai-goc">{doiTenNguonCu(c.saiGoc)}</span>}
     </>
   )
 }
@@ -248,6 +250,12 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   }, [token, lamMoiTongHop])
   const [chamTungCau, setChamTungCau] = useState(docChamTungCau)
   const [dangCham, setDangCham] = useState('')
+  // 12/10: điện thoại dọc — chạm một cách luyện ⇒ đưa bảng cài đặt (số câu + nút Bắt đầu) lên tầm mắt (trước: nằm dưới cả sáu thẻ, em phải tự cuộn tìm).
+  const cauHinhRef = useRef<HTMLElement>(null)
+  const [cuonCauHinh, setCuonCauHinh] = useState(0)
+  useEffect(() => {
+    if (cuonCauHinh && !rong) cauHinhRef.current?.scrollIntoView?.({ block: 'start', behavior: cuonMuot() })
+  }, [cuonCauHinh]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // tham số từng chế độ
   const [soCau1, setSoCau1] = useState(SO_CAU_MAC_DINH)
@@ -545,8 +553,8 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   /** Dòng phụ trên thẻ: nguồn đang dùng (chế độ 2, 4) / trạng thái kho (chế độ 1). */
   const phuThe = (m: CheDoTuLuyen): string => {
     if (m === 1 && nguon && n1Kho === 0) return tongKp > 0 ? `Em đã khắc phục hết ${tongKp} câu sai từ 29/09` : 'Em chưa sai câu nào từ 29/09'
-    if (m === 2 && nguon?.dangCauSai?.nhan) return nguon.dangCauSai.nhan
-    if (m === 4 && nguon?.tuDo?.nhan) return nguon.tuDo.nhan
+    if (m === 2 && nguon?.dangCauSai?.nhan) return doiTenNguonCu(nguon.dangCauSai.nhan)
+    if (m === 4 && nguon?.tuDo?.nhan) return doiTenNguonCu(nguon.tuDo.nhan)
     return MO_TA[m].phu
   }
 
@@ -570,7 +578,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   }
   const oNguon = nguonXt?.nhan ? (
     <div className="tlu-nguon" role="status">
-      <span className="tlu-nhan" data-kieu={nguonXt.kieu === 'cau_sai' ? 'luyen' : 'du-phong'}>{nguonXt.nhan}</span>
+      <span className="tlu-nhan" data-kieu={nguonXt.kieu === 'cau_sai' ? 'luyen' : 'du-phong'}>{doiTenNguonCu(nguonXt.nhan)}</span>
       {GIAI_NGUON[nguonXt.kieu] && <span className="tlu-ghi">{GIAI_NGUON[nguonXt.kieu]}</span>}
     </div>
   ) : null
@@ -586,12 +594,12 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
 
   // Hai cột khi màn rộng: TRÁI = chọn nguồn (ca / lớp–bài–dạng / loại câu), PHẢI = số câu + nút bắt đầu. Màn dọc: hai khối `display: contents` ⇒ y như cũ.
   const bangCheDo = cheDo && (
-    <section className="tlu-cau-hinh" aria-label={`Cài đặt ${TEN_CHE_DO[cheDo]}`}>
+    <section className="tlu-cau-hinh" aria-label={`Cài đặt ${TEN_CHE_DO[cheDo]}`} ref={cauHinhRef}>
       <div className="tlu-ch-trai">
         {rong && <p className="tlu-ch-ten"><span className="tlu-ch-icon" data-che-do={cheDo}><IconCheDo cheDo={cheDo} /></span>{TEN_CHE_DO[cheDo]}</p>}
         {cheDo === 1 && n1Kho === 0 && nguon && (
           <div className="tlu-chuc-mung" role="status">
-            <b className="baloo">{tongKp > 0 ? `Em đã khắc phục hết ${tongKp} câu sai!` : 'Em chưa sai câu nào từ 29/09!'}</b>
+            <b>{tongKp > 0 ? `Em đã khắc phục hết ${tongKp} câu sai!` : 'Em chưa sai câu nào từ 29/09!'}</b>
             <p>{tongKp > 0 ? 'Kho câu sai của em đang trống. Câu nào em làm sai sau này sẽ tự vào đây để luyện lại.' : 'Làm tốt lắm. Câu nào em làm sai ở ca kiểm tra, chiến dịch, Luyện đề hay Tu luyện sẽ tự vào đây để luyện lại.'}</p>
             <DemKhacPhuc da={daKp} tong={tongKp} />
             {oNenLuyen ? (
@@ -608,7 +616,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
           <>
             <h2 className="tlu-muc">Kho câu sai của em</h2>
             <div className="tlu-kho-sai" role="status" aria-live="polite">
-              <b className="baloo tlu-tab">{n1}</b>
+              <b className="tlu-tab">{n1}</b>
               <span className="tlu-kho-sai-chu">
                 <span>{theoNguon1 ? 'câu sai trong nguồn em chọn' : 'câu sai còn phải sửa'}</span>
                 {theoNguon1 && <span className="tlu-tab tlu-kho-sai-them">Kho câu sai của em: {n1Kho} câu</span>}
@@ -765,7 +773,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
         {([1, 2, 3, 4] as CheDoTuLuyen[]).map((m) => {
           const lyDoKhoa = khoaCheDo(m)
           return (
-            <button key={m} type="button" role="radio" aria-checked={cheDo === m} className="tlu-the-che-do tlu-the-lon" data-che-do={m} disabled={!!lyDoKhoa} onClick={() => { setCheDo(m); setLoi('') }}>
+            <button key={m} type="button" role="radio" aria-checked={cheDo === m} className="tlu-the-che-do tlu-the-lon" data-che-do={m} disabled={!!lyDoKhoa} onClick={() => { setCheDo(m); setLoi(''); setCuonCauHinh((n) => n + 1) }}>
               <span className="tlu-the-hinh" aria-hidden="true"><IconCheDo cheDo={m} /></span>
               <span className="tlu-the-dau">
                 <span className="tlu-the-che-do-icon"><IconCheDo cheDo={m} /></span>
@@ -832,7 +840,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
         <div className="tlu-hang">
           <button type="button" className="tlu-ve" aria-label="Về Hôm nay" onClick={onVe}><IconVe /></button>
           <div className="tlu-tieu-khoi">
-            <h1 className="tlu-tieu baloo">Tu luyện</h1>
+            <h1 className="tlu-tieu">Tu luyện</h1>
             <p className="tlu-phu">Luyện tự do · luyện theo nhu cầu</p>
           </div>
         </div>
@@ -882,7 +890,8 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
         </main>
       ) : (
         <main className="tlu-than" key="luyen">
-          <ChoChuaCuaEm token={token} />
+          {/* 12/10 thầy: "bỏ phần những câu cần gỡ" — khối "Câu cần gỡ tiếp" đã gỡ khỏi Tu luyện; chữa lỗi có lối riêng
+              (Hôm nay › Tự chữa lỗi, Ôn & sửa). Nút "Sửa từng bước" dưới câu sai ở màn kết quả giữ nguyên. */}
           {khoa && <p className="tlu-bao" data-kieu="khoa" role="status">Em đang có ca kiểm tra mở nên Tu luyện tạm khoá. Làm xong ca kiểm tra rồi luyện tiếp nhé.</p>}
           {dangTaiNguon && !nguon ? (
             <div className="tlu-luoi-che-do" aria-busy="true" role="status" aria-label="Đang tải">
@@ -1027,7 +1036,7 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
         <circle cx="56" cy="56" r="44" className="tlu-vong-nen" strokeWidth="10" fill="none" />
         <circle cx="56" cy="56" r="44" className="tlu-vong-dat" strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={`${((chuVi * tiLe) / 100).toFixed(1)} ${chuVi.toFixed(1)}`} transform="rotate(-90 56 56)" />
       </svg>
-      <span className="tlu-vong-chu"><b className="baloo tlu-tab">{kq.soDung}/{kq.soCau}</b><span>câu đúng</span></span>
+      <span className="tlu-vong-chu"><b className="tlu-tab">{kq.soDung}/{kq.soCau}</b><span>câu đúng</span></span>
     </span>
   )
   const diem = (

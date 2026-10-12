@@ -970,7 +970,7 @@ export default function StudentPortalScreen() {
       )}
       {tab === 'kiemgoi7' && kiemGoi7 && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManKiemGoi7 token={auth.token} sbd={auth.sbd} {...kiemGoi7} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} /></Suspense></div>}
-      {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} /></Suspense></div>}
+      {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} onTuLuyen={() => setTab('tuluyen')} /></Suspense></div>}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
       {/* CÂU ĐÃ LÀM (Game Hóa 2.0): màn riêng toàn màn hình, có nút "Về Hôm nay" của chính nó. */}

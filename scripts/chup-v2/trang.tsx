@@ -34,6 +34,8 @@ import CauDaLam from '../../src/components/hoa2/CauDaLam'
 import HocTapHomNay from '../../src/components/hoc-tap/HocTapHomNay'
 import ManLamBaiTap from '../../src/components/hoc-tap/ManLamBaiTap'
 import ManChuaCauSai from '../../src/components/chua-cau-sai/ManChuaCauSai'
+import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen' // LÀN HỌC SINH 12/10
+import ManTuChua from '../../src/components/hoc-tap/ManTuChua' // LÀN HỌC SINH 12/10
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 // Bản màu app thầy (App.tsx nạp ba tệp này, phạm vi `.vo-thay`) — màn thầy bọc đúng khung `.m3.m3-thay.vo-thay` như app thật.
 import '../../src/styles/vo-thay.css'
@@ -236,8 +238,84 @@ const OMNI_D = { bat: true, baiDangLuyen: [], dangVung: { a: 0, b: 0 }, conDangD
 const callDoan = async (lenh: string): Promise<unknown> =>
   lenh === 'hoa2-sanh' ? { ok: true, cheDo2: true, doan: { con: 4 }, dao: { con: 16 }, omni: OMNI_D } : lenh === 'doan-xem' ? { ok: true, doan: xemD() } : { ok: true }
 
+// ═════════════════════════════════════════ LÀN HỌC SINH 12/10 ═════════════════════════════════════════
+// Thầy 12/10: "trùng tu lại giao diện mục tu luyện của app học sinh, bỏ phần những câu cần gỡ, thay những từ đảo đoàn, bia bằng những từ
+// phù hợp, mục chữa lỗi hiển thị cho thật chuẩn để học sinh chữa lỗi được". Cảnh `?man=hs12-*` (component THẬT, máy chủ GIẢ riêng — bọc
+// `fetch` ở trên, chỉ trả lời khi đang chụp cảnh hs12; mọi cảnh khác đi tiếp bộ giả chung):
+//   hs12-tu-luyen        Tu luyện (màn chọn cách luyện, kho câu sai theo nguồn)
+//   hs12-chua-truc-tiep  Cùng gỡ câu này ở trạng thái thiếu bài luyện từng bước ⇒ Chữa trực tiếp câu gốc
+//   hs12-chua-gap-lai    Chờ lần gặp lại 2 (giờ · thứ · ngày hẹn)
+//   hs12-tu-chua         Danh sách Tự chữa lỗi (tên câu + trạng thái bằng chữ)
+const HS12_KHO = { tong: 14, tuCa: 6, tuChienDich: 8, tuLuyenDe: 0, tuTuLuyen: 0, loi: '', tongTuMoc: 20, daKhacPhuc: 6, toiHan: 2, choHen: 3,
+  theoNguon: { ca: 6, dao: 5, doan: 4, bia: 2, tu_luyen: 0, luyen_de: 0 }, theoMat: { 1: 5, 3: 1, 2: 3, 4: 3, 6: 1, 8: 1 } }
+const HS12_DANH_MUC = [{ lop: '12', bais: [
+  { tenBai: 'Bài 1 · Ester – Lipid', dangs: [{ ma: 'DB-ES-1', ten: 'Khái niệm, danh pháp ester', soCau: 40 }, { ma: 'DB-ES-2', ten: 'Thuỷ phân ester', soCau: 36 }, { ma: 'DB-ES-3', ten: 'Chất béo', soCau: 28 }] },
+  { tenBai: 'Bài 2 · Carbohydrate', dangs: [{ ma: 'DB-CH-1', ten: 'Glucose và fructose', soCau: 30 }, { ma: 'DB-CH-2', ten: 'Saccharose, tinh bột', soCau: 26 }] },
+] }]
+const HS12_CT = {
+  de: { qid: 'DH-12-C1-B2-17', maDe: 'DH-12-C1-B2', version: '1', group: 'g', phan: 'I', text: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate (CH₃COOC₂H₅) bằng dung dịch NaOH vừa đủ. Khối lượng muối thu được là',
+    choices: ['8,2 gam.', '6,8 gam.', '9,6 gam.', '4,1 gam.'], ideas: [], hinhAnh: [], tenDang: 'Thuỷ phân ester', mucDo: 'hieu', sao: 1 },
+  dapAn: 'A',
+  loiGiai: {
+    chot: 'Số mol ester bằng 0,1 mol nên muối CH₃COONa thu được là 0,1 mol, nặng 8,2 gam.',
+    buoc: ['Tính số mol ethyl acetate: n = 8,8 : 88 = 0,1 mol.', 'Viết phương trình: CH₃COOC₂H₅ + NaOH → CH₃COONa + C₂H₅OH, tỉ lệ 1 : 1.', 'Khối lượng muối: m = 0,1 × 82 = 8,2 gam.'],
+    tung_pa: { A: { dung: true, vi_sao: 'Muối là CH₃COONa (M = 82): 0,1 × 82 = 8,2 gam.' }, B: { dung: false, vi_sao: '6,8 gam là khối lượng HCOONa — nhầm gốc acid.' }, C: { dung: false, vi_sao: '9,6 gam là muối C₂H₅COONa — nhầm gốc acid.' }, D: { dung: false, vi_sao: '4,1 gam ứng với 0,05 mol — tính sai số mol ester.' } },
+  },
+  emTraLoi: 'B',
+}
+const HS12_CDL = { ok: true, chienDich: [{ id: 'cd1', ten: 'Hành trình giỏi hoá · Khối 12', hanNop: '9999-12-31', tong: 120 }], cau: [
+  { qid: 'H12-1', chienDichId: 'cd1', stt: 12, phan: 'I', mucDo: 'hieu', tenDang: 'Thuỷ phân ester', trangThai: 'dang_on', lanCuoiDung: false, henOn: null, lichSu: [{ ngay: '2026-10-10', dung: false, coGoiY: false, nguon: 'dao' }] },
+  { qid: 'H12-2', chienDichId: 'cd1', stt: 18, phan: 'III', mucDo: 'VD', tenDang: 'Bài toán đốt cháy chất béo', trangThai: 'dang_on', lanCuoiDung: false, henOn: null, lichSu: [{ ngay: '2026-10-11', dung: false, coGoiY: false, nguon: 'thi' }] },
+  { qid: 'H12-3', chienDichId: 'cd1', stt: 21, phan: 'II', mucDo: 'hieu', tenDang: 'Glucose và fructose', trangThai: 'dang_on', lanCuoiDung: false, henOn: null, lichSu: [{ ngay: '2026-10-09', dung: false, coGoiY: true, nguon: 'doan' }] },
+  { qid: 'H12-4', chienDichId: 'cd1', stt: 25, phan: 'I', mucDo: 'biet', tenDang: 'Saccharose, tinh bột', trangThai: 'dang_on', lanCuoiDung: false, henOn: null, lichSu: [{ ngay: '2026-10-08', dung: false, coGoiY: false, nguon: 'bia' }] },
+  { qid: 'H12-5', chienDichId: 'cd1', stt: 30, phan: 'I', mucDo: 'hieu', tenDang: 'Khái niệm, danh pháp ester', trangThai: 'thanh_thao', lanCuoiDung: true, henOn: null, lichSu: [{ ngay: '2026-10-05', dung: false, coGoiY: false, nguon: 'dao' }, { ngay: '2026-10-07', dung: true, coGoiY: false, nguon: 'dao' }] },
+] }
+const HS12_DS_CHUA = [
+  { dotId: 'd1', qid: 'H12-1', trangThai: 'thieu_hoc_lieu' },
+  { dotId: 'd2', qid: 'H12-2', trangThai: 'dang_chua_buoc' },
+  { dotId: 'd3', qid: 'H12-3', trangThai: 'can_thay' },
+  { dotId: 'd4', qid: 'H12-4', trangThai: 'cho_gap_lai_2', denHan: new Date(now + 20 * 3600_000).toISOString() },
+  { dotId: 'd5', qid: 'H12-5', trangThai: 'da_tu_sua' },
+]
+// hs12-tu-luyen-lam: bài Tu luyện đang làm dở (máy em giữ trong localStorage — chỉ câu công khai, không đáp án) ⇒ màn làm bài mở thẳng.
+if (man === 'hs12-tu-luyen-lam') {
+  const cau = [
+    { qid: 'L1', phan: 'I', text: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate bằng dung dịch NaOH vừa đủ. Khối lượng muối thu được là', luaChon: ['8,2 gam.', '6,8 gam.', '9,6 gam.', '4,1 gam.'], tenDang: 'Thuỷ phân ester', sao: 1, loai: 'bai_tap', nhanLuyen: 'Luyện lại lần 2', saiGoc: 'Sai gốc: Chiến dịch Ôn ester · Đoàn Hộ Tống · 10/10', conMotLan: 'Còn 1 lần đúng nữa là khắc phục' },
+    { qid: 'L2', phan: 'II', text: 'Cho các phát biểu về chất béo:', luaChon: ['Chất béo là triester của glycerol với acid béo.', 'Tristearin ở thể lỏng ở nhiệt độ thường.', 'Chất béo không tan trong nước.', 'Thuỷ phân chất béo trong môi trường kiềm gọi là phản ứng xà phòng hoá.'], tenDang: 'Chất béo', sao: 0, loai: 'ly_thuyet', nhanLuyen: 'Luyện lần đầu', saiGoc: 'Sai gốc: Bi-a · 09/10' },
+    { qid: 'L3', phan: 'III', text: 'Lên men 45 gam glucose với hiệu suất 80%. Thể tích khí CO₂ (đkc, lít) thu được là bao nhiêu?', luaChon: null, tenDang: 'Glucose và fructose', sao: 2, loai: 'bai_tap', nhanLuyen: 'Luyện lần đầu', saiGoc: 'Sai gốc: Ca kiểm tra Carbohydrate · 11/10' },
+  ]
+  try { localStorage.setItem('ddh.tuluyen.dang.12121212', JSON.stringify({ luotId: 'tl_hs12', cheDo: 1, tieuDe: 'Sửa câu sai · 3 câu', taoLuc: now, cau, traLoi: { L1: 'B' }, giay: 95, giayCau: {}, coGoiY: [] })) } catch { /* bỏ qua */ }
+}
+if (man.startsWith('hs12-')) {
+  const fetchChung = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const p = new URL(url, location.href).pathname
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (p.endsWith('/hs/tu-luyen/nguon')) return tra({ ok: true, cacCa: [], soCauSai: 14, danhMuc: HS12_DANH_MUC, dangThi: false, khoCauSai: HS12_KHO,
+      dangCauSai: { kieu: 'cau_sai', nhan: 'Theo câu sai của em' }, tuDo: { kieu: 'cau_sai', nhan: 'Theo câu sai của em' }, dangNenLuyen: null })
+    if (p.endsWith('/hs/tu-luyen/tong-hop')) return tra({ ok: true, luot: [], cau: [], luyenDe: [], khacPhuc: null })
+    if (p.endsWith('/hs/tu-luyen/xem-truoc')) return tra({ ok: true, tongToiDa: 40, loi: '', thongKe: [{ tenDang: 'Thuỷ phân ester', soCauSai: 4, soUngVien: 36 }], nguonDang: { kieu: 'cau_sai', nhan: 'Theo câu sai của em', loi: '' } })
+    if (p.endsWith('/luyen-de/dieu-kien')) return tra({ ok: true, trangThai: 'mo', lyDo: '', items: [] })
+    if (p.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
+    if (p.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: HS12_DS_CHUA })
+    if (p.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd1', trangThai: 'thieu_hoc_lieu', coHocLieu: false })
+    if (p.endsWith('/hs/chua-cau-sai/phat-item')) return tra({ ok: true, dotId: 'd1', revision: 1, tienDo: { soBuocDaQua: 0, soBuocCanKiem: 0 }, tienDoChiTiet: [], cauGoc: null, item: null,
+      ...(man === 'hs12-chua-gap-lai' ? { trangThai: 'cho_gap_lai_2', denHan: new Date(now + 20 * 3600_000).toISOString() } : { trangThai: 'thieu_hoc_lieu' }) })
+    if (p.endsWith('/hoa2-cau-chi-tiet')) return tra({ ok: true, cau: [HS12_CT] })
+    if (p.endsWith('/hoa2-cau-da-lam')) return tra(HS12_CDL)
+    return fetchChung(input, init)
+  }
+}
+const manHs12 = () =>
+  man === 'hs12-tu-luyen' || man === 'hs12-tu-luyen-lam' ? h(ManTuLuyen, { token: 'tk', sbd: '12121212', onVe: noop })
+  : man === 'hs12-tu-chua' ? h(ManTuChua, { token: 'tk', onVe: noop, onTuLuyen: noop })
+  : h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B2-17', tenCau: 'Thuỷ phân ester', onVe: noop })
+// ═════════════════════════════════════════ hết LÀN HỌC SINH 12/10 ═════════════════════════════════════════
+
 const MAN_THAY: Record<string, string> = { 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 const con =
+  man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'de-thu' ? h('div', {className:'dao dao2'}, h(DeThu, {sbd:'GIA',call:callDao,onVe:noop}))

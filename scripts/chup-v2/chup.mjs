@@ -28,8 +28,26 @@ const trangGoc = `${goc}/scripts/chup-v2/trang.html`
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
 const trinh = await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
 
+// ═══════════ LÀN HỌC SINH 12/10: Tu luyện trùng tu · Chữa trực tiếp câu gốc (thiếu bài luyện từng bước) · danh sách Tự chữa lỗi ═══════════
+// 3 khổ (390×844, 844×390, 1440×900) × sáng/tối; cảnh `?man=hs12-*` ở trang.tsx (khối cùng tên). Chạy riêng: tiền tố "4" (40-, 41-, 42-).
+const DS_HS12 = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hgt, k]) => ['light', 'dark'].flatMap((nen) => {
+  const t = nen === 'dark' ? '-toi' : ''
+  return [
+    [`40-hs12-tu-luyen-${k}${t}`, 'hs12-tu-luyen', w, hgt, nen, true, /Sửa câu sai/],
+    [`40-hs12-tu-luyen-sua-sai-${k}${t}`, 'hs12-tu-luyen', w, hgt, nen, false, /Sửa câu sai/, 'bam-radio:Sửa câu sai'],
+    [`41-hs12-chua-truc-tiep-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, false, /Câu em đã làm sai/],
+    // Boss 12/10: thứ tự Xem lại câu gốc → Tự làm lại → Đáp án và lời giải (bước 3 mở sau khi em làm lại / bấm xem lời giải)
+    [`41-hs12-chua-truc-tiep-lam-lai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, false, /Câu em đã làm sai/, 'nut:Tự làm lại câu này'],
+    [`41-hs12-chua-truc-tiep-loi-giai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, true, /Câu em đã làm sai/, 'nut:Tự làm lại câu này » Em chưa làm được — xem lời giải'],
+    [`42-hs12-tu-chua-${k}${t}`, 'hs12-tu-chua', w, hgt, nen, true, /Câu em cần chữa/],
+    [`43-hs12-tu-luyen-lam-${k}${t}`, 'hs12-tu-luyen-lam', w, hgt, nen, false, /Thuỷ phân hoàn toàn/],
+  ]
+})).concat([['41-hs12-chua-gap-lai-doc', 'hs12-chua-gap-lai', 390, 844, 'light', true, /Lần gặp lại 2 mở lúc/]])
+// ═══════════ hết LÀN HỌC SINH 12/10 ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_HS12, // LÀN HỌC SINH 12/10
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],
@@ -93,8 +111,8 @@ const DS = [
     [`25-hs-cau-da-lam-${k}`, 'cau-da-lam', w,h,'light',false,/Câu đã làm/],
     [`25-hs-cau-da-lam-${k}-toi`, 'cau-da-lam', w,h,'dark',false,/Câu đã làm/],
     // Cùng gỡ câu này (10/10): thầy gửi ảnh chữ chìm — chụp sáng + tối mọi khổ
-    [`26-hs-cung-go-${k}`, 'chua-cau-sai', w,h,'light',false,/Cần thêm bài luyện/],
-    [`26-hs-cung-go-${k}-toi`, 'chua-cau-sai', w,h,'dark',false,/Cần thêm bài luyện/],
+    [`26-hs-cung-go-${k}`, 'chua-cau-sai', w,h,'light',false,/Chữa trực tiếp câu gốc/], // 12/10: trạng thái chờ học liệu nay mở lối Chữa trực tiếp câu gốc
+    [`26-hs-cung-go-${k}-toi`, 'chua-cau-sai', w,h,'dark',false,/Chữa trực tiếp câu gốc/],
     [`26-hs-cung-go-buoc-${k}`, 'chua-cau-sai&go=buoc', w,h,'light',false,/Số mol NaOH/],
     [`26-hs-cung-go-buoc-${k}-toi`, 'chua-cau-sai&go=buoc', w,h,'dark',false,/Số mol NaOH/],
     // App học sinh tập trung học (PR231): 4 mục + màn làm bài, sáng/tối
@@ -146,8 +164,11 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   }
   try {
     if (viec?.startsWith('nut:')) {
-      await t.getByRole('button', { name:viec.slice(4), exact:true }).first().click()
-      await t.waitForTimeout(400)
+      // 12/10 (làn học sinh): nhiều nút liền nhau ngăn bằng " » " — bấm lần lượt (một nút như cũ).
+      for (const ten of viec.slice(4).split(' » ')) {
+        await t.getByRole('button', { name:ten, exact:true }).first().click()
+        await t.waitForTimeout(400)
+      }
     } else if (viec?.startsWith('ht:')) {
       await t.getByRole('navigation', { name:'Điều hướng học sinh' }).getByRole('button', { name:viec.slice(3), exact:true }).click()
       await t.waitForTimeout(250)

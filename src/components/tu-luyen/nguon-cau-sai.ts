@@ -4,12 +4,16 @@
 //   · theoMat   — số câu theo MẶT NẠ nguồn (bit i = DS_NGUON[i]) ⇒ máy em tính NGAY tổng câu DUY NHẤT khi tick, không hỏi lại máy chủ.
 // Thứ tự DS_NGUON PHẢI trùng `DS_NGUON_SAI` của máy chủ (test khoá).
 
+// Thầy 12/10 ("thay những từ đảo, đoàn, bia bằng những từ phù hợp"): tên hiện ra lấy ĐÚNG bộ tên nguồn của Câu đã làm
+// (`lib/nhan-nguon-lan.ts` · NHAN_NGUON_LAN) — một khái niệm một từ; mã nội bộ (`dao`, `doan`, `bia`) và thứ tự giữ nguyên.
+import { NHAN_NGUON_LAN } from '../../lib/nhan-nguon-lan'
+
 export type MaNguonSai = 'ca' | 'dao' | 'doan' | 'bia' | 'tu_luyen' | 'luyen_de'
 export const DS_NGUON: readonly { ma: MaNguonSai; ten: string }[] = [
-  { ma: 'ca', ten: 'Ca kiểm tra' },
-  { ma: 'dao', ten: 'Bát Linh Đảo' },
-  { ma: 'doan', ten: 'Đoàn Hộ Tống' },
-  { ma: 'bia', ten: 'Bi-a' },
+  { ma: 'ca', ten: NHAN_NGUON_LAN.thi },
+  { ma: 'dao', ten: NHAN_NGUON_LAN.dao },
+  { ma: 'doan', ten: NHAN_NGUON_LAN.doan },
+  { ma: 'bia', ten: NHAN_NGUON_LAN.bia },
   { ma: 'tu_luyen', ten: 'Tu luyện' },
   { ma: 'luyen_de', ten: 'Luyện đề cấu trúc' },
 ]
