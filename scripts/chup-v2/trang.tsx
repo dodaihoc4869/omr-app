@@ -75,6 +75,9 @@ import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
 import { goi7Du } from './gia/goi-bai-7'
 // LÀN THẦY TỰ CHỮA 12/10: `gv-nhip&the=can-chua&ttc=1` = Cần thầy chữa › thẻ Thầy tự chữa (bài Dạy học giả có đủ ba tờ, lớp có SBD, số liệu lớp giả).
 import { LA_TTC, BAI_TTC, aiSaiTtc, soGopTtc } from './gia/thay-tu-chua'
+// ═════════ LÀN HÔM NAY 12/10B: `gv-hom-nay&nh=1` = Hôm nay của thầy bản vẽ duyệt 12/10 (Việc cần thầy dạng thẻ + Nhịp học: 262 em × 12 ngày, hai cột
+// Lười nhất · Chăm nhất, Đối phó, Theo lớp, bảng từng ngày, tấm hồ sơ). `/gv/nhip-hoc` GIẢ: gia/nhip-hoc.ts; `&nh=loi` máy chủ lỗi · `&nh=trong` chưa có em. ═════════
+import { nhipHocGia } from './gia/nhip-hoc'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -195,6 +198,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // Tấm Lịch sử làm câu của một em (09/10 khuya) — app thầy gọi qua `goiLenh` (bản chụp đã thay bằng gia/goi-lenh-thay.ts, cùng dữ liệu này);
   // giữ thêm đường `fetch` để mọi lối gọi thẳng cũng nhận dữ liệu giả, không chạm máy chủ thật.
   if (u.pathname.endsWith('/gv/lich-su-lam-cau')) return tra(lichSuGia(String(b.sbd ?? ''), 'Trần Đức Huy'))
+  // ---- LÀN HÔM NAY 12/10B: Nhịp học (app thầy gọi qua `goiLenh` giả — gia/goi-lenh-thay.ts; giữ thêm đường `fetch` cùng dữ liệu)
+  if (u.pathname.endsWith('/gv/nhip-hoc')) { const r = nhipHocGia(); return r.ok ? tra(r.du) : new Response(JSON.stringify({ ok: false, error: r.chu }), { status: 500, headers: { 'content-type': 'application/json' } }) }
+  // ---- hết LÀN HÔM NAY 12/10B
   // ---- LÀN GIÁO VIÊN 12/10: Bài hằng ngày + hồ sơ thái độ (app thầy gọi qua `goiLenh` giả; giữ thêm đường `fetch` như trên)
   if (u.pathname.endsWith('/gv/bai-hang-ngay')) return tra(baiHangNgayGia())
   if (u.pathname.endsWith('/gv/ho-so-thai-do')) return tra(hoSoThaiDoGia(String(b.sbd ?? '')))
