@@ -141,7 +141,8 @@ Thầy nhắn (nguyên văn, kèm ảnh thẻ "Bài mới trong 7 ngày"):
 Thầy nhắn (nguyên văn, kèm ảnh thẻ Bài mới trong 7 ngày: "Học sinh nhận bài 0 · Câu cần chữa 132"):
 "Chỗ này rất khó hiểu, chốt lại trong phần này tôi chỉ cần mục dạy học, gọi lên bảng đầu giờ và chữa cấu khó tính toán và câu học sinh cần chữa. Bạn hãy thu gọn tối giản hết lại thành 2 mục và làm thật trực quan dễ hiểu khoa học đẹp mắt."
 "Mục hôm nay hiển thị rõ cho tôi vô cùng đẹp Nhịp học, phải làm rất đẹp, tôi nhìn vào thấy ngay học sinh nào chăm học sinh nào lười. Vẽ cho tôi duyệt trước khi buiild nhé"
-- [ ] Vẽ bản duyệt: Hành trình 2 mục (Dạy học & đầu giờ · Chữa bài) | bằng chứng: (chưa có)
-- [ ] Vẽ bản duyệt: Hôm nay của thầy có Nhịp học (thấy ngay em chăm / em lười) | bằng chứng: (chưa có)
+- [x] Vẽ bản duyệt: Hành trình 2 mục (Dạy học & đầu giờ · Chữa bài) | bằng chứng: artifact 13511ZX2Q9tamm65z5JDRu — khung HanhTrinh-DayHoc (4 bước: điểm danh · gọi lên bảng đầu giờ · dạy và chiếu câu · tick bài + bài đang giao) và HanhTrinh-ChuaBai (Học sinh cần chữa · Chữa câu khó & tính toán).
+- [x] Vẽ bản duyệt: Hôm nay của thầy có Nhịp học (thấy ngay em chăm / em lười) | bằng chứng: artifact 13511ZX2Q9tamm65z5JDRu — khung Main (máy tính) + HomNay-DienThoai: thanh 262 em Chăm/Chưa đều/Lười, ô Đối phó, Lười nhất · Chăm nhất có dải 12 ngày, Theo lớp.
 - [ ] Chờ thầy duyệt bản vẽ — CHƯA BUILD | bằng chứng: (chưa có)
 - [ ] Build theo bản đã duyệt + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
+- [ ] Thầy nhắn thêm: "dữ liệu phần này tính từ 1/10 cho tôi nhé." (ảnh tấm Hồ sơ làm bài) ⇒ đổi mốc 12/10 → 1/10 cho Bài hằng ngày, Hồ sơ làm bài, app phụ huynh | bằng chứng: (đang làm)
