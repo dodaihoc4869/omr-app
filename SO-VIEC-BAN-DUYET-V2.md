@@ -212,3 +212,24 @@ Thầy nhắn thêm 23h (2 ảnh: "Đang chuẩn bị những câu phù hợp v�
 - [ ] "Tối ưu sâu máy chủ … load ngay tức thì mọi chức năng" | bằng chứng: (chưa có)
 - [ ] "2 câu cuối app không cho làm tiếp bảo tìm câu phù hợp" | bằng chứng: (chưa có) — giả thuyết: câu gói em không nhận được (khác khối / câu nghi / sai dạng giới hạn) vẫn vào kế hoạch (vai tiếp cận, xếp CUỐI) nhưng `startGoi7` chặn ⇒ "Còn 2 câu" mà mở chặng rỗng
 - [ ] "hs làm đúng cả 4 ý nhưng app lại báo sai" | bằng chứng: (chưa có) — máy chủ chấm `grade` = so khớp đúng chuỗi trả về `answer`; app so ý bằng `tra` HIỆN TẠI. Lệch chỉ xảy ra khi phản hồi là lượt nộp LẦN TRƯỚC (`replayed`, khoá lượt|câu): nộp chậm/hết 40 giây ⇒ em sửa đáp án rồi nộp lại ⇒ máy trả kết quả lần đầu
+
+## Đợt 16 — trùng tu Tự sửa lỗi, màn làm bài 3 cỡ, Hồ sơ đồng bộ 3 app (12/10 ~23h30)
+Thầy nhắn (nguyên văn):
+"Trùng tu toàn diện giao diện tự sửa lỗi, mời gọi hs sửa lỗi, phải siêu đẹp, siêu thân thiện, rất khoa học. Tối ưu cho cả màn hình dọc, ngang máy tính."
+"Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đeph và thân thiện."
+"App ph cũng phải hiển thị lười chăm đầy đủ như app hs"
+"Phần chọn bài bảng khi chọn xong bấm lại nút chọn thì sẽ trở lại ban đầu, tick chọn bài cũng vậy."
+"Hồ sơ của hs tôi muốn hiện thị rõ hơn nữa, đo kĩ hơn nữa thái độ của học sinh chính xác hơn 90%"
+"Tôi muốn số giây hiển thị cho cả việc làm câu dễ khó, chỗ các câu học sinh chưa chữa đc bấm vào phải nảy vào đúng chỗ tự sửa chỗ thiết kế đẹp lúc nãy. Chỗ các câu chưa sửa thiết kế lại cho vào box nếu cần để cho gọn đẹp mắt trực quan rõ ràng."
+"Hồ sơ học sinh tối ưu lại giao diện cho thân thiện hơn nữa, đẹp và dầy đủ hơn nữa, hiện đại. Tối ưu cho cả dọc ngang máy tính. Đôngg bộ cho cả app hs gv và ph nhé"
+"Xong đẩy luôn lên nhé."
+- [ ] Trùng tu toàn diện giao diện Tự sửa lỗi (mời gọi em sửa lỗi; đẹp, thân thiện, khoa học) — dọc · ngang · máy tính | bằng chứng: (chưa có)
+- [ ] Mọi màn làm bài của học sinh tối ưu dọc · ngang · máy tính | bằng chứng: (chưa có)
+- [ ] App phụ huynh hiện Lười/Chăm đầy đủ như app học sinh | bằng chứng: (chưa có)
+- [ ] Sửa lỗi chọn bài (bảng): chọn xong bấm lại nút chọn ⇒ mất hết về ban đầu; tick chọn bài cũng vậy | bằng chứng: (chưa có)
+- [ ] Hồ sơ học sinh hiển thị rõ hơn; đo thái độ kĩ hơn, chính xác > 90% | bằng chứng: (chưa có)
+- [ ] Số giây làm câu hiện cho cả câu dễ lẫn câu khó | bằng chứng: (chưa có)
+- [ ] Bấm câu chưa chữa ⇒ nhảy đúng vào câu ấy ở màn Tự sửa | bằng chứng: (chưa có)
+- [ ] Khu câu chưa sửa thiết kế lại thành ô/hộp gọn, trực quan | bằng chứng: (chưa có)
+- [ ] Hồ sơ học sinh: giao diện thân thiện, đẹp, đầy đủ, hiện đại; dọc · ngang · máy tính; đồng bộ app HS · GV · PH | bằng chứng: (chưa có)
+- [ ] Build + đẩy + phát hành (kiểm ca mở) | bằng chứng: (chưa có)
