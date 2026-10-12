@@ -156,8 +156,8 @@ Thầy hỏi "Chỗ tự kiểm này là gì" (ảnh thẻ Bài học trong 7 ng
 ## Đợt 12 — Điểm danh + bảng nhịp học trên bản chiếu · bảng Chăm/Lười ở app học sinh (12/10) — VẼ DUYỆT TRƯỚC
 Thầy nhắn (nguyên văn): "Tôi muốn bạn trùng tu lại phần điểm danh học sinh, tôi muốn mỗi buổi lên lớp học sinh sẽ làm điểm danh đầu tiên, khi học sinh điểm danh xong sẽ hiện luôn thống kê lười và chăm chỉ rõ ràng đầy đủ trong bản chiếu, trùng tu lại thật đẹp rõ ràng. Vẽ cho tôi duyệt trước khi tôi quyết định build."
 "Ở app học sinh hiện rõ một bảng ngay đầu thông tin lười hay chăm chỉ trên app đầy đủ siêu đẹp và chính xác, ghi thêm 1 câu trong bảng thầy cũng thấy điều này."
-- [ ] Vẽ: bản chiếu khi đang điểm danh (mã/QR + em đã điểm danh tô theo nhóm) | bằng chứng: (chưa có)
-- [ ] Vẽ: bản chiếu khi điểm danh xong — thống kê Chăm/Chưa đều/Lười của lớp đầy đủ | bằng chứng: (chưa có)
-- [ ] Vẽ: màn thầy bước Điểm danh trùng tu | bằng chứng: (chưa có)
-- [ ] Vẽ: app học sinh — bảng Chăm/Lười ngay đầu Hôm nay + câu "Thầy cũng thấy bảng này" | bằng chứng: (chưa có)
+- [x] Vẽ: bản chiếu khi đang điểm danh (mã/QR + em đã điểm danh tô theo nhóm) | bằng chứng: artifact PeaKFgTjj2wgxsTQRDQkt3 khung Main (1920×1080).
+- [x] Vẽ: bản chiếu khi điểm danh xong — thống kê Chăm/Chưa đều/Lười của lớp đầy đủ | bằng chứng: khung ChieuNhipLop (ba cột, em vắng mờ, phím H ẩn tên nhóm Lười).
+- [x] Vẽ: màn thầy bước Điểm danh trùng tu | bằng chứng: khung GV-DiemDanh (mã + QR, có mặt theo nhóm, vắng đang Lười, Vừa điểm danh, nút Xong điểm danh · chiếu Nhịp học của lớp).
+- [x] Vẽ: app học sinh — bảng Chăm/Lười ngay đầu Hôm nay + câu "Thầy cũng thấy bảng này" | bằng chứng: khung HS-Cham + HS-Luoi. ĐỀ XUẤT ĐỔI LUẬT chờ duyệt: "3 ngày liền không làm" chỉ xét trong 7 ngày gần nhất (luật hiện hành xét cả khoảng ⇒ em không thể thoát nhóm Lười).
 - [ ] Chờ thầy duyệt — CHƯA BUILD | bằng chứng: (chưa có)
