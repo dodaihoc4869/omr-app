@@ -17,6 +17,7 @@ import { dungDoThi, canhDangHoc, type CanhHoc } from './do-thi-tien-quyet'
 import { chonBandit, type BangBandit, type CachCuu } from './bandit'
 import type { QCau } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
+import { bam } from './srs2-loi'
 
 type Row=Record<string,unknown>
 export { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
@@ -131,13 +132,19 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const firstSeen=new Map<string,number>()
   for(const e of events) {const g=e.contentGroup||q.get(e.qid)?.contentGroup||e.qid;firstSeen.set(g,Math.min(firstSeen.get(g)??Infinity,e.receivedAt))}
   const updates=phanBoCanThiep(offers.results??[],qs,firstSeen,new Set(rewards.results.map(r=>r.do_receipt)))
-  const snapshot={halfLife:memory,canh:graph.canh,soQuanSat:qs.length,soHalfLife:out.soHalfLife,soCanhHoc:learned.length,duBao:forecast,phamVi:'ung_vien_ngay',soCau:scope.length}
   const rows=graph.canh.map(c=>({...c,sbd}))
-  const old=await env.DB.prepare('SELECT cap_nhat_luc FROM hanh_trinh_v4_em WHERE sbd=?').bind(sbd).first<{cap_nhat_luc:number}>()
+  // CHỈ GHI CẠNH KHI ĐỔI (đợt 17 — thầy: "bắt buộc tối ưu máy chủ chuyên sâu"; số đo D1 thật 12/10: mỗi lần lập kế hoạch ghi lại TOÀN BỘ bảng cạnh của em
+  // ~124 dòng ⇒ ~2,5 triệu dòng ghi/ngày, kể cả khi em chưa làm câu nào mới). Cạnh là số dẫn xuất từ sổ học: bản băm giống lần ghi trước VÀ lần ghi ấy
+  // chưa quá 20 giờ ⇒ giữ nguyên các dòng cạnh (bảng y hệt). Vẫn làm mới tối thiểu mỗi 20 giờ để cạnh của em còn trong cửa sổ 7 ngày của số liệu lớp.
+  const chuoiCanh=JSON.stringify(graph.canh.map(c=>[c.tu,c.den,c.nCo,c.dungCo,c.nChua,c.dungChua])),bamCanh=`${bam(chuoiCanh)}:${bam(chuoiCanh.split('').reverse().join(''))}:${chuoiCanh.length}`
+  const old=await env.DB.prepare(`SELECT cap_nhat_luc,json_extract(mo_hinh_json,'$.bamCanh') AS bam_canh,json_extract(mo_hinh_json,'$.canhLuc') AS canh_luc FROM hanh_trinh_v4_em WHERE sbd=?`).bind(sbd).first<{cap_nhat_luc:number;bam_canh:string|null;canh_luc:number|null}>()
+  const canhLucCu=Number(old?.canh_luc)
+  const giuCanh=!!old&&old.bam_canh===bamCanh&&Number.isFinite(canhLucCu)&&now>=canhLucCu&&now-canhLucCu<20*3_600_000
+  const snapshot={halfLife:memory,canh:graph.canh,soQuanSat:qs.length,soHalfLife:out.soHalfLife,soCanhHoc:learned.length,duBao:forecast,phamVi:'ung_vien_ngay',soCau:scope.length,bamCanh,canhLuc:giuCanh?canhLucCu:now}
   const commands=[
-    env.DB.prepare(`UPDATE hanh_trinh_v4_canh SET n_co=0,dung_co=0,n_chua=0,dung_chua=0,cap_nhat_luc=? WHERE sbd=? AND cap_nhat_luc<=? AND ${KHONG_CA}`).bind(now,sbd,Math.min(old?.cap_nhat_luc??now,now)),
+    ...(giuCanh?[]:[env.DB.prepare(`UPDATE hanh_trinh_v4_canh SET n_co=0,dung_co=0,n_chua=0,dung_chua=0,cap_nhat_luc=? WHERE sbd=? AND cap_nhat_luc<=? AND ${KHONG_CA}`).bind(now,sbd,Math.min(old?.cap_nhat_luc??now,now))]),
     env.DB.prepare(`INSERT INTO hanh_trinh_v4_em SELECT ?,?,?,?,? WHERE ${KHONG_CA} ON CONFLICT(sbd) DO UPDATE SET cursor=excluded.cursor,phien_ban=excluded.phien_ban,mo_hinh_json=excluded.mo_hinh_json,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_em.cap_nhat_luc`).bind(sbd,cursor,'ht4-0910-v1',JSON.stringify(snapshot),now),
-    env.DB.prepare(`INSERT INTO hanh_trinh_v4_canh SELECT ?,json_extract(value,'$.tu'),json_extract(value,'$.den'),json_extract(value,'$.nCo'),json_extract(value,'$.dungCo'),json_extract(value,'$.nChua'),json_extract(value,'$.dungChua'),? FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(sbd,tu,den) DO UPDATE SET n_co=excluded.n_co,dung_co=excluded.dung_co,n_chua=excluded.n_chua,dung_chua=excluded.dung_chua,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_canh.cap_nhat_luc`).bind(sbd,now,JSON.stringify(rows)),
+    ...(giuCanh?[]:[env.DB.prepare(`INSERT INTO hanh_trinh_v4_canh SELECT ?,json_extract(value,'$.tu'),json_extract(value,'$.den'),json_extract(value,'$.nCo'),json_extract(value,'$.dungCo'),json_extract(value,'$.nChua'),json_extract(value,'$.dungChua'),? FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(sbd,tu,den) DO UPDATE SET n_co=excluded.n_co,dung_co=excluded.dung_co,n_chua=excluded.n_chua,dung_chua=excluded.dung_chua,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_canh.cap_nhat_luc`).bind(sbd,now,JSON.stringify(rows))]),
   ]
   // Tối đa một receipt cho mỗi chặng cũ; không tăng mẫu khi đọc lại hoặc hai thiết bị.
   commands.push(env.DB.prepare(`UPDATE hanh_trinh_v4_can_thiep SET do_receipt=(SELECT json_extract(value,'$.d.receipt') FROM json_each(?1) WHERE json_extract(value,'$.r.ngay')=hanh_trinh_v4_can_thiep.ngay AND json_extract(value,'$.r.moc')=hanh_trinh_v4_can_thiep.moc),dung_luc=(SELECT json_extract(value,'$.d.dungLuc') FROM json_each(?1) WHERE json_extract(value,'$.r.ngay')=hanh_trinh_v4_can_thiep.ngay AND json_extract(value,'$.r.moc')=hanh_trinh_v4_can_thiep.moc),do_luc=(SELECT json_extract(value,'$.d.doLuc') FROM json_each(?1) WHERE json_extract(value,'$.r.ngay')=hanh_trinh_v4_can_thiep.ngay AND json_extract(value,'$.r.moc')=hanh_trinh_v4_can_thiep.moc),ket_qua=(SELECT json_extract(value,'$.d.ketQua') FROM json_each(?1) WHERE json_extract(value,'$.r.ngay')=hanh_trinh_v4_can_thiep.ngay AND json_extract(value,'$.r.moc')=hanh_trinh_v4_can_thiep.moc) WHERE sbd=?2 AND do_luc IS NULL AND EXISTS(SELECT 1 FROM json_each(?1) WHERE json_extract(value,'$.r.ngay')=hanh_trinh_v4_can_thiep.ngay AND json_extract(value,'$.r.moc')=hanh_trinh_v4_can_thiep.moc) AND NOT EXISTS(SELECT 1 FROM hanh_trinh_v4_can_thiep claimed JOIN json_each(?1) u ON json_extract(u.value,'$.r.ngay')=hanh_trinh_v4_can_thiep.ngay AND json_extract(u.value,'$.r.moc')=hanh_trinh_v4_can_thiep.moc AND json_extract(u.value,'$.d.receipt')=claimed.do_receipt WHERE claimed.sbd=hanh_trinh_v4_can_thiep.sbd AND (claimed.ngay<>hanh_trinh_v4_can_thiep.ngay OR claimed.moc<>hanh_trinh_v4_can_thiep.moc)) AND ${KHONG_CA}`).bind(JSON.stringify(updates),sbd))

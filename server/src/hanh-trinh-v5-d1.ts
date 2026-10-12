@@ -26,9 +26,9 @@ const cache=new WeakMap<object,Map<string,{luc:number;ds:CauDanhMuc[]}>>()
 export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau?:HoSo2['cau']},now:number):Promise<CauDanhMuc[]>{
   const full=hs.chienDich?await env.DB.prepare('SELECT qid_json,ma_de_json FROM chien_dich WHERE id=?').bind(hs.chienDich.id).first<{qid_json:string;ma_de_json:string}>():null
   const ids=full?JSON.parse(full.qid_json) as string[]:(hs.cau??[]).map(c=>c.qid),mas=[...(hs.phamVi?.maDe??new Set(full?JSON.parse(full.ma_de_json) as string[]:hs.chienDich?.maDe??[]))].sort()
-  // Giờ cao điểm: khoá đệm theo D1 GỐC (`dbGoc`) — mỗi lượt gọi bọc D1 riêng (gameV2 › gopDocD1) nên khoá theo `env.DB` chỉ dùng lại TRONG một lượt
-  // (số đo 12/10: ~9.000 lần đọc/ngày dù "nhớ 1 phút"). Ngoài giờ giữ khoá cũ (y như trước).
-  const caoDiem=new Date(now+7*3_600_000).getUTCHours()>=20,khoaDb=caoDiem?dbGoc(env.DB as unknown as object):env.DB as unknown as object
+  // Khoá đệm theo D1 GỐC (`dbGoc`) — mỗi lượt gọi bọc D1 riêng (gameV2 › gopDocD1) nên khoá theo `env.DB` chỉ dùng lại TRONG một lượt (số đo 12/10:
+  // ~9.000 lần đọc/ngày dù "nhớ 1 phút"). Đợt 17: cả ngày (đúng ý định nhớ 1 phút ban đầu); giờ cao điểm nhớ 10 phút.
+  const caoDiem=new Date(now+7*3_600_000).getUTCHours()>=20,khoaDb=dbGoc(env.DB as unknown as object)
   const key=`${hs.chienDich?.id}|${bam(ids.join('|'))}|${mas.join('|')}`,dem=cache.get(khoaDb)??new Map();cache.set(khoaDb,dem)
   // Giờ cao điểm 20:00–23:59 VN (khẩn 12/10 22h30, số đo D1 thật: câu đọc danh mục này ~23.000 dòng/lần, ~49 ms, gần 9.000 lần/ngày — đứng thứ hai
   // về tổng thời gian D1): nhớ 10 phút thay vì 1 phút. Danh mục chỉ đổi khi thầy sửa kho ⇒ câu sửa lúc cao điểm vào danh mục chậm nhất 10 phút.
