@@ -170,21 +170,8 @@ const DS = [
   // em thiếu nhiều ngày nhất đứng đầu) + tấm Hồ sơ làm bài trùng tu (nhãn thái độ + lý do bằng số, ô số, lịch, biểu đồ, sáu tín hiệu). Máy 1440×900,
   // điện thoại 390×844, sáng + tối. `bhn:<hàng>|cuoi[:cuon|:tin-hieu]` = bấm em ở hàng ấy (`doi-pho` = hàng em "Có dấu hiệu đối phó" của bộ giả), cuộn thân
   // tấm tới lịch + biểu đồ / sáu tín hiệu; `bhn-bang` = cuộn tới bảng (điện thoại).
-  ...['light', 'dark'].flatMap((nen) => {
-    const k = nen === 'dark' ? '-toi' : ''
-    return [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].flatMap(([w, hh, kho]) => [
-      [`40-gv-bai-hang-ngay-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'cho:em thiếu ít nhất một ngày'],
-      [`41-gv-ho-so-thai-do-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho'],
-      [`42-gv-ho-so-bieu-do-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cuon'],
-      [`43-gv-ho-so-tin-hieu-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:tin-hieu'],
-    ])
-  }),
-  ['44-gv-ho-so-cham-chi-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:cuoi'],
-  ['45-gv-bai-hang-ngay-xep-hom-nay', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn-xep:Hôm nay'],
-  ['46-gv-hom-nay-loi-vao-bhn', 'gv-hom-nay', 1440, 900, 'light', false, /Hôm nay của thầy/],
-  ['47-gv-bai-hang-ngay-bang-dien-thoai', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
-  ['47-gv-bai-hang-ngay-bang-dien-thoai-toi', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
-  ['48-gv-ho-so-cau-dung-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cau-dung'],
+  // ĐÃ GỠ 12/10B: các cảnh 40–48-gv mở thẻ Hành trình › Bài hằng ngày — thẻ ấy bỏ khỏi Hành trình (thầy duyệt bản vẽ "Hành trình còn 2 mục");
+  // bảng nhiệt + tấm Hồ sơ làm bài nay mở từ Hôm nay › Nhịp học: xem cảnh 62–67-hn (LÀN HÔM NAY 12/10B).
   // ---------------------------------------------------------------- hết LÀN GIÁO VIÊN 12/10
   // ═════════ LÀN BÀI MỚI 7 NGÀY 12/10: Hành trình › Bài mới trong 7 ngày (trùng tu). Máy 1440×900 + điện thoại 390×844, sáng + tối.
   // `g7:<việc>`: dau = đầu thẻ · ds = danh sách chữa · ho-tro = mở Học sinh cần hỗ trợ của dòng đầu · loc = lọc Nhiều học sinh sai + xếp tỉ lệ sai ·
