@@ -233,3 +233,5 @@ Thầy nhắn (nguyên văn):
 - [ ] Khu câu chưa sửa thiết kế lại thành ô/hộp gọn, trực quan | bằng chứng: (chưa có)
 - [ ] Hồ sơ học sinh: giao diện thân thiện, đẹp, đầy đủ, hiện đại; dọc · ngang · máy tính; đồng bộ app HS · GV · PH | bằng chứng: (chưa có)
 - [ ] Build + đẩy + phát hành (kiểm ca mở) | bằng chứng: (chưa có)
+Thầy nhắn thêm: "Sau khi làm hết tất cả thì bắt buôck tối ưu máy chủ chuyên sâu để mọi thứ phải load tức thì"
+- [ ] SAU khi xong đợt 16: tối ưu máy chủ chuyên sâu để mọi thứ load tức thì (đo trước/sau bằng số thật: thời gian lệnh, D1 insights) | bằng chứng: (chưa có)
