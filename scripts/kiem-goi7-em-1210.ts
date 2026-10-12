@@ -45,6 +45,18 @@ async function main(){
     SUM(CASE WHEN NOT EXISTS(SELECT 1 FROM su_kien_hoc WHERE sbd=? AND qid=q.qid AND ket_qua IS NOT NULL AND received_at<=? AND ${SQL_LUOT_GOI7}) THEN 1 ELSE 0 END) chuaCoLuotGapGoc,
     SUM(CASE WHEN NOT EXISTS(SELECT 1 FROM su_kien_hoc WHERE sbd=? AND qid=q.qid AND ket_qua IS NOT NULL AND received_at<=? AND json_extract(raw_json,'$.ht_cau_version')=q.version AND ${SQL_LUOT_GOI7}) THEN 1 ELSE 0 END) chuaGapDungPhienBan
     FROM q GROUP BY id ORDER BY han_nop`).bind(sbd,sbd,now,sbd,now).all<Record<string,unknown>>()
+  const goiLuu=await db.prepare(`WITH cs AS (
+    SELECT g.id,g.bat_dau,e.han,CASE WHEN g.lop=h.lop THEN 1 ELSE 0 END lopConKhop,
+      CASE WHEN b.bo_tick_luc IS NULL THEN 1 ELSE 0 END baiConDuocChon,c.qid,c.version,json_extract(c.meta_json,'$.phan') phan,
+      CASE WHEN EXISTS(SELECT 1 FROM su_kien_hoc WHERE sbd=e.sbd AND qid=c.qid AND received_at<=? AND ket_qua IS NOT NULL AND json_extract(raw_json,'$.ht_cau_version')=c.version AND ${SQL_LUOT_GOI7})
+        OR EXISTS(SELECT 1 FROM goi_bai_7_gap x WHERE x.sbd=e.sbd AND x.goi_id=e.goi_id AND x.qid=c.qid AND x.version=c.version) THEN 1 ELSE 0 END daGap
+    FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd
+      JOIN bai_da_day b ON b.id=g.tick_id JOIN goi_bai_7_cau c ON c.goi_id=e.goi_id WHERE e.sbd=?
+  ) SELECT bat_dau batDau,han,lopConKhop,baiConDuocChon,COUNT(*) tong,SUM(daGap) daGap,SUM(1-daGap) con,
+    SUM(CASE WHEN phan='I' AND daGap=0 THEN 1 ELSE 0 END) tracNghiemCon,
+    SUM(CASE WHEN phan='II' AND daGap=0 THEN 1 ELSE 0 END) dungSaiCon,
+    SUM(CASE WHEN phan='III' AND daGap=0 THEN 1 ELSE 0 END) traLoiNganCon
+    FROM cs GROUP BY id ORDER BY bat_dau DESC`).bind(now,sbd).all<Record<string,unknown>>()
   const moi=[...new Set(goi.flatMap(g=>g.cau.filter(c=>!g.daGap.has(c.qid)).map(c=>c.qid)))],gap=[...new Set(goi.flatMap(g=>[...g.daGap]))]
   const ds=goi.map((g,i)=>{
     const con=g.cau.filter(c=>!g.daGap.has(c.qid))
@@ -54,6 +66,6 @@ async function main(){
       quaHan:ngay>g.han,quotaSauHanNeuConNguyen:quotaGoi7(con.length,'9999-12-31',g.han),
       cauConChuaHopLe:con.filter(c=>c.hopLe===false).length}
   })
-  console.log(JSON.stringify({docGoi7:true,docLuc:new Date(now).toISOString(),ngayVn:ngay,coHocSinh:!!em,taiKhoanKhoa:em?.trang_thai==='khoa',bat:co.bat,soGoi:ds.length,cauMoiChuaGapKhongTrung:moi.length,cauDaGapKhongTrung:gap.length,goi:ds,noiGoi,hanhTrinh:hanhTrinh.results,soLenhDoc:soDoc}))
+  console.log(JSON.stringify({docGoi7:true,docLuc:new Date(now).toISOString(),ngayVn:ngay,coHocSinh:!!em,taiKhoanKhoa:em?.trang_thai==='khoa',bat:co.bat,soGoi:ds.length,cauMoiChuaGapKhongTrung:moi.length,cauDaGapKhongTrung:gap.length,goi:ds,noiGoi,goiDaLuu:goiLuu.results,hanhTrinh:hanhTrinh.results,soLenhDoc:soDoc}))
 }
 main().catch(e=>{console.error(e instanceof Error?e.message:'Không hoàn tất đọc.');process.exitCode=1})
