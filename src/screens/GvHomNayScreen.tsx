@@ -7,7 +7,8 @@
 //     ca · Cần thầy chữa → Hành trình › Cần thầy chữa · em hỏi bài chờ chữa → Học sinh hỏi · lớp chờ bài mới (OMNI) → Hành trình › Dạy học ·
 //     em chưa làm câu nào → Hành trình › Nhịp học (một khối có em chưa làm ⇒ chọn sẵn khối đó) · phần chưa đọc được → Thử lại · không có chỗ
 //     cần chữa ⇒ một dòng ✓. MỖI việc MỘT nút viền.
-//   · phải: thẻ "Đủ mức tối thiểu hôm nay a/b em" + mỗi khối một dòng (thanh + a/b), bấm mở Hành trình › Nhịp học chọn sẵn khối đó.
+//   · phải: thẻ "Đủ mức tối thiểu hôm nay a/b em" + mỗi khối một dòng (thanh + a/b), bấm mở Hành trình › Nhịp học chọn sẵn khối đó;
+//     12/10 thêm nút chữ "Xem bài hằng ngày từ 12/10" ⇒ Hành trình › Bài hằng ngày (lịch sử từng ngày, em thiếu nhiều ngày nhất đứng đầu).
 //   (Thầy 09/10 tối bỏ thẻ Nhịp hôm nay ⇒ hai lối trên tạm mở màn Học sinh; 09/10 khuya thầy: "hành trình để lại chỗ nhịp học, học sinh chưa làm
 //   và chưa hoàn thành đủ ưu tiên hiện lên đầu" ⇒ hai lối trên mở thẻ Nhịp học — em chưa làm / chưa đủ mức đứng đầu, bấm em xem lịch sử làm câu.)
 //   · BỎ bốn ô số lặp lại danh sách việc (C4: một thông tin một chỗ). Chờ tải: khung xương đúng hình (`.tt-xuong`). Lỗi: câu dễ hiểu
@@ -495,6 +496,11 @@ export default function GvHomNayScreen() {
                 })}
               </div>
               <span className="gvhn-du-ghi">Bấm một khối để xem từng em ở Hành trình › Nhịp học.</span>
+              {/* 12/10 thầy: "lịch sử học sinh làm bài tập hàng ngày, tính từ 12/10" ⇒ lối vào thẻ Bài hằng ngày (nút chữ, không thêm nút chính). */}
+              <button type="button" className="gvv2-nut-chu tt-nhan gvhn-bhn" onClick={() => moHanhTrinh({ the: 'bai-hang-ngay' })} aria-label="Xem bài hằng ngày từ 12/10 ở Hành trình › Bài hằng ngày">
+                Xem bài hằng ngày từ 12/10
+                <ChevronRight size={16} aria-hidden="true" />
+              </button>
             </aside>
           )}
         </div>

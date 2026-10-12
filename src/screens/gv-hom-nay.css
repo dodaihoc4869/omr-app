@@ -88,3 +88,5 @@
   .gvhn-viec-dong { flex-wrap: wrap; }
   .gvhn-viec-dong > button { flex: 1 0 100%; }
 }
+/* 12/10: lối vào Hành trình › Bài hằng ngày (nút chữ cuối thẻ Đủ mức) */
+.gvhn-du .gvhn-bhn { align-self: flex-start; margin: -8px 0 -8px -12px; }

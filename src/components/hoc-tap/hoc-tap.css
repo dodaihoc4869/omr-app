@@ -133,3 +133,17 @@ body[data-hoc-tap=hs] .h2-cdl{--h2c-xanh-chu:var(--the)}
   .ht2-lam .ht2-nhac{display:none}
 }
 .ht2-tam:focus-visible{outline:3px solid var(--tim);outline-offset:-3px}
+/* TỰ CHỮA LỖI (12/10): danh sách câu cần chữa — tên câu + trạng thái bằng chữ, nhóm Cần chữa / Đang chờ / Đã tự sửa; rỗng có việc tiếp. */
+.ht2-tu-chua>.ht-noi-dung{margin:0 auto;max-width:820px;width:100%}
+.ht2-tu-chua .ht2-phu{margin:-8px 0 0!important}
+.ht2-tu-chua .ht2-nhom>h2 .ht2-so,.ht2-tu-chua .ht2-so{font-variant-numeric:tabular-nums;color:var(--nhat);font-weight:700}
+.ht2-dong-chua{min-height:76px}
+.ht2-dong-chu small.ht2-dong-trang-thai{font-weight:700;color:var(--lg-nhan)}
+.ht2-dong-chu small.ht2-dong-trang-thai[data-nhom=cho]{color:var(--vang-diu)}
+.ht2-dong-chu small.ht2-dong-trang-thai[data-nhom=xong]{color:var(--nhat)}
+.ht2-dong-xuong{min-height:76px;background:var(--the-2);border-color:transparent}
+@media(prefers-reduced-motion:no-preference){.ht2-dong-xuong{animation:ht2-nhap 1.2s ease-in-out infinite alternate}}
+@keyframes ht2-nhap{from{opacity:1}to{opacity:.55}}
+.ht2-trong-chua{align-items:flex-start}.ht2-trong-chua h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-.01em}.ht2-trong-chua .ht2-phu{margin:0!important}
+.ht2-hang-nut{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+@media(max-width:700px){.ht2-tu-chua .ht-thanh{padding:10px 16px;min-height:64px}.ht2-tu-chua>.ht-noi-dung{padding:20px 16px 40px}.ht2-hang-nut{flex-direction:column;align-items:stretch}.ht2-hang-nut>*{width:100%}}

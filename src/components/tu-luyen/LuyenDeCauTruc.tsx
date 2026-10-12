@@ -202,7 +202,7 @@ export default function LuyenDeCauTruc({ token, sbd, dieuKien, dangTaiDieuKien, 
           {CAU_TRUC_DE.map((p) => (
             <li key={p.phan} data-phan={p.phan}>
               <span className="ldct-ct-nhan">Phần {p.phan} · {p.ten}</span>
-              <b className="baloo tlu-tab">{p.soCau} câu</b>
+              <b className="tlu-tab">{p.soCau} câu</b>
               <span className="ldct-ct-diem tlu-tab">tối đa {so(p.diemToiDa)} điểm</span>
               <span className="ldct-ct-cach">{p.cach}</span>
             </li>
@@ -468,7 +468,7 @@ function ManKetQua({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
           <circle cx="56" cy="56" r="44" className="tlu-vong-nen" strokeWidth="10" fill="none" />
           <circle cx="56" cy="56" r="44" className="tlu-vong-dat" strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={`${((chuVi * Math.min(10, diem)) / 10).toFixed(1)} ${chuVi.toFixed(1)}`} transform="rotate(-90 56 56)" />
         </svg>
-        <span className="tlu-vong-chu"><b className="baloo tlu-tab">{so(diem)}</b><span>/ 10 điểm</span></span>
+        <span className="tlu-vong-chu"><b className="tlu-tab">{so(diem)}</b><span>/ 10 điểm</span></span>
       </span>
       <dl className="tlu-diem-so ldct-diem-dau">
         <div><dt>Điểm lượt này</dt><dd className="tlu-tab">{so(diem)} / 10</dd></div>

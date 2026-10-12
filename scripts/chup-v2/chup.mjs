@@ -28,8 +28,26 @@ const trangGoc = `${goc}/scripts/chup-v2/trang.html`
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
 const trinh = await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
 
+// ═══════════ LÀN HỌC SINH 12/10: Tu luyện trùng tu · Chữa trực tiếp câu gốc (thiếu bài luyện từng bước) · danh sách Tự chữa lỗi ═══════════
+// 3 khổ (390×844, 844×390, 1440×900) × sáng/tối; cảnh `?man=hs12-*` ở trang.tsx (khối cùng tên). Chạy riêng: tiền tố "4" (40-, 41-, 42-).
+const DS_HS12 = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hgt, k]) => ['light', 'dark'].flatMap((nen) => {
+  const t = nen === 'dark' ? '-toi' : ''
+  return [
+    [`40-hs12-tu-luyen-${k}${t}`, 'hs12-tu-luyen', w, hgt, nen, true, /Sửa câu sai/],
+    [`40-hs12-tu-luyen-sua-sai-${k}${t}`, 'hs12-tu-luyen', w, hgt, nen, false, /Sửa câu sai/, 'bam-radio:Sửa câu sai'],
+    [`41-hs12-chua-truc-tiep-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, false, /Câu em đã làm sai/],
+    // Boss 12/10: thứ tự Xem lại câu gốc → Tự làm lại → Đáp án và lời giải (bước 3 mở sau khi em làm lại / bấm xem lời giải)
+    [`41-hs12-chua-truc-tiep-lam-lai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, false, /Câu em đã làm sai/, 'nut:Tự làm lại câu này'],
+    [`41-hs12-chua-truc-tiep-loi-giai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, true, /Câu em đã làm sai/, 'nut:Tự làm lại câu này » Em chưa làm được — xem lời giải'],
+    [`42-hs12-tu-chua-${k}${t}`, 'hs12-tu-chua', w, hgt, nen, true, /Câu em cần chữa/],
+    [`43-hs12-tu-luyen-lam-${k}${t}`, 'hs12-tu-luyen-lam', w, hgt, nen, false, /Thuỷ phân hoàn toàn/],
+  ]
+})).concat([['41-hs12-chua-gap-lai-doc', 'hs12-chua-gap-lai', 390, 844, 'light', true, /Lần gặp lại 2 mở lúc/]])
+// ═══════════ hết LÀN HỌC SINH 12/10 ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_HS12, // LÀN HỌC SINH 12/10
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],
@@ -81,6 +99,26 @@ const DS = [
   ['14-gv-ho-so-em-dien-thoai', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'ho-so:Trần Đức Huy'],
   ['14-gv-ho-so-em-dien-thoai-toi', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'ho-so:Trần Đức Huy'],
   ['14-gv-ho-so-em-lich-su-dien-thoai', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'ho-so-ls:Trần Đức Huy'],
+  // ---------------------------------------------------------------- LÀN GIÁO VIÊN 12/10: Hành trình › Bài hằng ngày (bảng nhiệt em × ngày,
+  // em thiếu nhiều ngày nhất đứng đầu) + tấm Hồ sơ làm bài trùng tu (nhãn thái độ + lý do bằng số, ô số, lịch, biểu đồ, sáu tín hiệu). Máy 1440×900,
+  // điện thoại 390×844, sáng + tối. `bhn:<hàng>|cuoi[:cuon|:tin-hieu]` = bấm em ở hàng ấy (`doi-pho` = hàng em "Có dấu hiệu đối phó" của bộ giả), cuộn thân
+  // tấm tới lịch + biểu đồ / sáu tín hiệu; `bhn-bang` = cuộn tới bảng (điện thoại).
+  ...['light', 'dark'].flatMap((nen) => {
+    const k = nen === 'dark' ? '-toi' : ''
+    return [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].flatMap(([w, hh, kho]) => [
+      [`40-gv-bai-hang-ngay-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'cho:em thiếu ít nhất một ngày'],
+      [`41-gv-ho-so-thai-do-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho'],
+      [`42-gv-ho-so-bieu-do-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cuon'],
+      [`43-gv-ho-so-tin-hieu-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:tin-hieu'],
+    ])
+  }),
+  ['44-gv-ho-so-cham-chi-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:cuoi'],
+  ['45-gv-bai-hang-ngay-xep-hom-nay', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn-xep:Hôm nay'],
+  ['46-gv-hom-nay-loi-vao-bhn', 'gv-hom-nay', 1440, 900, 'light', false, /Hôm nay của thầy/],
+  ['47-gv-bai-hang-ngay-bang-dien-thoai', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
+  ['47-gv-bai-hang-ngay-bang-dien-thoai-toi', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
+  ['48-gv-ho-so-cau-dung-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cau-dung'],
+  // ---------------------------------------------------------------- hết LÀN GIÁO VIÊN 12/10
   ['14-gv-chien-dich-da-giao', 'gv-nhip&the=chien-dich', 1440, 960, 'light', false, /Chiến dịch đã giao/],
   ['14-gv-chien-dich-da-giao-dien-thoai-toi', 'gv-nhip&the=chien-dich', 390, 844, 'dark', true, /Chiến dịch đã giao/],
   ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
@@ -93,8 +131,8 @@ const DS = [
     [`25-hs-cau-da-lam-${k}`, 'cau-da-lam', w,h,'light',false,/Câu đã làm/],
     [`25-hs-cau-da-lam-${k}-toi`, 'cau-da-lam', w,h,'dark',false,/Câu đã làm/],
     // Cùng gỡ câu này (10/10): thầy gửi ảnh chữ chìm — chụp sáng + tối mọi khổ
-    [`26-hs-cung-go-${k}`, 'chua-cau-sai', w,h,'light',false,/Cần thêm bài luyện/],
-    [`26-hs-cung-go-${k}-toi`, 'chua-cau-sai', w,h,'dark',false,/Cần thêm bài luyện/],
+    [`26-hs-cung-go-${k}`, 'chua-cau-sai', w,h,'light',false,/Chữa trực tiếp câu gốc/], // 12/10: trạng thái chờ học liệu nay mở lối Chữa trực tiếp câu gốc
+    [`26-hs-cung-go-${k}-toi`, 'chua-cau-sai', w,h,'dark',false,/Chữa trực tiếp câu gốc/],
     [`26-hs-cung-go-buoc-${k}`, 'chua-cau-sai&go=buoc', w,h,'light',false,/Số mol NaOH/],
     [`26-hs-cung-go-buoc-${k}-toi`, 'chua-cau-sai&go=buoc', w,h,'dark',false,/Số mol NaOH/],
     // App học sinh tập trung học (PR231): 4 mục + màn làm bài, sáng/tối
@@ -115,6 +153,14 @@ const DS = [
   ['24-gv-hoc-sinh-ep-toi', 'gv-hoc-sinh&giao=toi', 1440, 900, 'light', false, /Học sinh/],
   ['24-gv-mo-ca-ep-sang', 'gv-mo-ca&giao=sang', 1440, 900, 'dark', false, /Mở ca kiểm tra/],
   ['18-gv-ma-tran-de', 'gv-ma-tran', 1440, 700, 'light', false, /Ma trận đề/],
+  // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): app phụ huynh trùng tu — Hôm nay (khối chính có câu đúng/sai/giây · Gợi ý nhắc con · Lịch học tuần này)
+  // và Tiến bộ (Đúng và sai theo ngày · Thời gian làm câu · Câu sai gần đây). Điện thoại 390×844 + máy tính 1440×900, sáng + tối; thêm trạng thái lỗi.
+  ...['light', 'dark'].flatMap((nen) => [[390, 844, 'dien-thoai'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => [
+    [`40-ph1210-hom-nay-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph', w, h, nen, true, /Gợi ý nhắc con/],
+    [`40-ph1210-tien-bo-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph', w, h, nen, true, /Hôm nay/, 'ph:tien-bo:Thời gian làm câu'],
+  ])),
+  ['40-ph1210-hom-nay-loi', 'ph&tq=loi', 390, 844, 'light', true, /Máy chủ đang bận/],
+  // ---- hết khối LÀN PHỤ HUYNH 12/10
 ]
 
 const loiTrang = []
@@ -138,8 +184,11 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   }
   try {
     if (viec?.startsWith('nut:')) {
-      await t.getByRole('button', { name:viec.slice(4), exact:true }).first().click()
-      await t.waitForTimeout(400)
+      // 12/10 (làn học sinh): nhiều nút liền nhau ngăn bằng " » " — bấm lần lượt (một nút như cũ).
+      for (const ten of viec.slice(4).split(' » ')) {
+        await t.getByRole('button', { name:ten, exact:true }).first().click()
+        await t.waitForTimeout(400)
+      }
     } else if (viec?.startsWith('ht:')) {
       await t.getByRole('navigation', { name:'Điều hướng học sinh' }).getByRole('button', { name:viec.slice(3), exact:true }).click()
       await t.waitForTimeout(250)
@@ -175,6 +224,29 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
       if (viec.startsWith('ho-so-ls:')) await tam.getByRole('tab', { name: /Toàn bộ lịch sử/ }).click()
       await t.waitForTimeout(400)
+    } else if (viec?.startsWith('bhn:')) {
+      // LÀN GIÁO VIÊN 12/10: Bài hằng ngày › bấm nút em đầu / cuối bảng ⇒ tấm Hồ sơ làm bài; `:cuon` / `:tin-hieu` cuộn thân tấm tới khối ấy.
+      const [, viTri, cuon] = viec.split(':')
+      await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
+      const hang = viTri === 'doi-pho' ? await t.evaluate(() => globalThis.__HANG_DOI_PHO ?? 1) : Number(viTri)
+      const nut = viTri === 'cuoi' ? t.locator('.gvv2-bhn-em').last() : t.locator('.gvv2-bhn-em').nth(Math.max(0, hang - 1))
+      await nut.click({ timeout: 20000 })
+      const tam = t.getByRole('dialog')
+      await tam.locator('.gvv2-tdo-dau').waitFor({ timeout: 20000 })
+      await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
+      if (cuon === 'cau-dung') await tam.getByRole('tab', { name: /Câu đúng/ }).click()
+      // cuộn THÂN TẤM (không cuộn trang phía sau) tới khối cần chụp
+      const dich = { cuon: 'gvv2-tdo-lich-tieu', 'tin-hieu': 'gvv2-tdo-th-tieu', 'cau-dung': 'gvv2-hs-the-cau-dung' }[cuon ?? '']
+      if (dich) await t.evaluate((id) => { const el = document.getElementById(id); const than = el?.closest('.gvv2-hs-than'); if (el && than) than.scrollTop += el.getBoundingClientRect().top - than.getBoundingClientRect().top - 12 }, dich)
+      await t.waitForTimeout(400)
+    } else if (viec === 'bhn-bang') {
+      await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
+      await t.evaluate(() => { const el = document.querySelector('.gvv2-bhn-cuon'); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 72) })
+      await t.waitForTimeout(300)
+    } else if (viec?.startsWith('bhn-xep:')) {
+      await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
+      await t.locator('.gvv2-bhn-ngay-nut', { hasText: viec.slice(8) }).first().click({ timeout: 20000 })
+      await t.waitForTimeout(300)
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {

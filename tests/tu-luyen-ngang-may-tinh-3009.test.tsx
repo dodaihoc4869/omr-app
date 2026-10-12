@@ -70,7 +70,10 @@ describe('Màn dọc giữ nguyên', () => {
     expect(document.querySelector('.tlu-thanh-nop')).not.toBeNull()
     expect(screen.queryByRole('navigation', { name: 'Lưới câu theo phần' })).toBeNull()
     expect(screen.getByText('Luyện lại lần 2')).toBeTruthy()
-    expect(screen.getByText('Sai gốc: Chiến dịch Ôn ester · Đoàn Hộ Tống · 30/09')).toBeTruthy()
+    // SỬA CÓ CHỦ Ý 12/10 (thầy: thay chữ đảo/đoàn/bia): máy chủ vẫn gửi "… · Đoàn Hộ Tống · …", màn Tu luyện hiện theo bộ tên nguồn
+    // chuẩn (lib/nhan-nguon-lan.ts · doiTenNguonCu) ⇒ "Ôn theo kế hoạch".
+    expect(screen.getByText('Sai gốc: Chiến dịch Ôn ester · Ôn theo kế hoạch · 30/09')).toBeTruthy()
+    expect(screen.queryByText(/Đoàn Hộ Tống/)).toBeNull()
   })
 })
 

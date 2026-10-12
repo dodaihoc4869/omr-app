@@ -1,8 +1,9 @@
-// Gọi ba lệnh chỉ-đọc mới của app phụ huynh (server/src/ph-bao-cao-moi.ts). Danh tính như src/lib/ph-moi/api.ts: mã liên kết riêng (`docPass()`) nếu có, không thì SBD trần.
+// Gọi các lệnh chỉ-đọc mới của app phụ huynh (server/src/ph-bao-cao-moi.ts + ph-con-tong-quan.ts). Danh tính như src/lib/ph-moi/api.ts: mã liên kết riêng (`docPass()`) nếu có, không thì SBD trần.
 // KHÔNG ném lỗi: mất mạng / máy chủ cũ chưa có lệnh (404) / lỗi ⇒ `{ kieu: 'loi', chu }` kèm câu cho người đọc; màn hiện "Thử lại".
 import { layDiaChiMayChu } from '../dia-chi-may-chu'
 import { docPass } from '../ph-token'
 import { docBaoCaoCa, docHoc2, docLoiThay, type BaoCaoCa, type Hoc2, type NhanXetCa } from './du-lieu'
+import { docConTongQuan, type ConTongQuan } from './con-tong-quan'
 
 const HAN_MS = 20_000
 export const CHU_MANG = 'Chưa kết nối được máy chủ. Anh/chị kiểm tra mạng rồi thử lại.'
@@ -45,3 +46,15 @@ export const taiLoiThay = (sbd: string): Promise<KetQua<NhanXetCa[]>> =>
   tai('/ph/loi-thay', {}, sbd, docLoiThay, 'Chưa xem được nhận xét của thầy. Anh/chị thử lại sau ít phút.')
 export const taiHoc2 = (sbd: string): Promise<KetQua<Hoc2>> =>
   tai('/ph/hoc-2', {}, sbd, docHoc2, 'Chưa xem được tiến độ chiến dịch của con. Anh/chị thử lại sau ít phút.')
+// LÀN PHỤ HUYNH 12/10: tổng quan về con (đúng/sai, số giây từng câu, lịch học từ 12/10, gợi ý nhắc) — server/src/ph-con-tong-quan.ts.
+// Máy chủ CŨ chưa có lệnh (404) hoặc trả `ok` mà không có khối ⇒ `{ kieu: 'ok', v: null }`: các khối mới VẮNG, màn giữ nguyên như trước (không báo lỗi giả).
+// Mất mạng / lỗi thật của máy chủ ⇒ `{ kieu: 'loi', chu }` để màn hiện "Thử lại".
+export async function taiConTongQuan(sbd: string): Promise<KetQua<ConTongQuan | null>> {
+  const r = await goi('/ph/con-tong-quan', {}, sbd)
+  if (!r) return { kieu: 'loi', chu: CHU_MANG }
+  const v = docConTongQuan(r.j)
+  if (v) return { kieu: 'ok', v }
+  const ok = r.j !== null && typeof r.j === 'object' && (r.j as { ok?: unknown }).ok === true
+  if (r.status === 404 || ok) return { kieu: 'ok', v: null }
+  return { kieu: 'loi', chu: loiTuMayChu(r.j) || 'Chưa xem được số câu đúng, sai và thời gian làm của con. Anh/chị thử lại sau ít phút.' }
+}

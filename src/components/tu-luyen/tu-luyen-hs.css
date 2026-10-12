@@ -1,0 +1,585 @@
+/* TRÙNG TU TU LUYỆN 12/10 — thầy: "trùng tu lại giao diện mục tu luyện của app học sinh".
+ * Đi CHUNG ngôn ngữ giao diện Hôm nay (`hoc-tap/hoc-tap.css`, lớp `.ht2-*`): nền giấy, chữ mực, nhấn chàm; thẻ bo 24px; dòng có ô biểu tượng;
+ * mỗi màn MỘT nút chính màu mực. Bỏ phông Baloo và nút vàng nổi kiểu game.
+ * LUẬT MÀU (thầy 05/10): chỉ THÊM luật, phạm vi `body[data-hoc-tap=hs]` (vỏ app học sinh) — không xoá / đổi khai báo màu đang có của
+ * tu-luyen.css, tu-luyen-rong.css, chon-nguon-sai.css, luyen-de-cau-truc.css. Màu chỉ lấy biến tokens.css (--nen --the --the-2 --vien --muc
+ * --nhat --lg-nhan --vang-diu --xanh --do --cam); nền nhạt dựng bằng color-mix từ chính các biến ấy ⇒ sáng/tối tự đổi cùng bảng. */
+
+/* ---------------------------------------------------------------- bảng màu: biến --tlu-* trỏ về token giấy/mực */
+body[data-hoc-tap=hs] .tlu {
+  --tlu-nen: var(--nen);
+  --tlu-nen-2: var(--the);
+  --tlu-nen-3: var(--the-2);
+  --tlu-vien: var(--vien);
+  --tlu-chu: var(--muc);
+  --tlu-chu-phu: var(--nhat);
+  --tlu-nhan: var(--lg-nhan);
+  --tlu-nhan-chu: var(--the);
+  --tlu-vang: var(--vang-diu);
+  --tlu-vang-dam: var(--vang-diu);
+  --tlu-nau: var(--muc);
+  --tlu-ngoc: var(--xanh);
+  --tlu-do: var(--do);
+  --tlu-cd-1: var(--lg-nhan);
+  --tlu-cd-2: var(--lg-nhan);
+  --tlu-cd-3: var(--lg-nhan);
+  --tlu-cd-4: var(--lg-nhan);
+  --tlu-cd-5: var(--vang-diu);
+  --tlu-cd-6: var(--cam);
+  /* chữ đỏ / xanh đủ tương phản trên nền giấy lẫn nền tối (đỏ, xanh thuần chỉ dùng cho viền, chấm) */
+  --tlu-do-chu: color-mix(in srgb, var(--do) 68%, var(--muc));
+  --tlu-xanh-chu: color-mix(in srgb, var(--xanh) 52%, var(--muc));
+  background: var(--nen);
+  color: var(--muc);
+  color-scheme: light dark;
+  font-family: var(--sans);
+  line-height: 1.55;
+}
+body[data-hoc-tap=hs] .tlu :is(.baloo, .tlu-tieu, .tlu-the-che-do-ten, .tlu-nut-chinh, .tlu-so-cau, .tlu-ch-ten, .ldct-the-ten) {
+  font-family: var(--sans);
+}
+body[data-hoc-tap=hs] .tlu :is(button, select, input, [tabindex='0']):focus-visible {
+  outline: 3px solid var(--tim);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- đầu màn */
+body[data-hoc-tap=hs] .tlu-dau-lam {
+  background: color-mix(in srgb, var(--the) 94%, transparent);
+  border-bottom: 1px solid var(--vien);
+}
+body[data-hoc-tap=hs] .tlu-ve {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--vien);
+  background: var(--the);
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-tieu {
+  color: var(--muc);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+body[data-hoc-tap=hs] .tlu-tieu.tlu-tieu-nho {
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+body[data-hoc-tap=hs] .tlu-phu {
+  font-size: 14px;
+  color: var(--nhat);
+}
+/* Ba thẻ con Luyện · Tổng hợp · Luyện đề cấu trúc: thanh chia đoạn kiểu Hôm nay (nền chìm, ô đang chọn nổi màu thẻ). */
+body[data-hoc-tap=hs] .tlu-the-phu {
+  border: 0;
+  border-radius: 16px;
+  padding: 4px;
+  background: var(--the-2);
+}
+body[data-hoc-tap=hs] .tlu-the-phu-nut {
+  border-radius: 12px;
+  color: var(--nhat);
+  font-weight: 700;
+}
+body[data-hoc-tap=hs] .tlu-the-phu-nut[aria-selected='true'] {
+  background: var(--the);
+  color: var(--muc);
+  box-shadow: inset 0 0 0 1px var(--vien), 0 1px 2px color-mix(in srgb, var(--muc) 12%, transparent);
+}
+body[data-hoc-tap=hs] .tlu-rong .tlu-the-phu-nut:not([aria-selected='true']):hover {
+  background: color-mix(in srgb, var(--the) 55%, transparent);
+  color: var(--muc);
+}
+
+/* ---------------------------------------------------------------- chữ mục, ghi chú, báo */
+body[data-hoc-tap=hs] .tlu-muc {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-ghi {
+  font-size: 14px;
+  color: var(--nhat);
+}
+body[data-hoc-tap=hs] .tlu-ghi[data-kieu='loi'],
+body[data-hoc-tap=hs] .tlu-loi-nho {
+  color: var(--tlu-do-chu);
+}
+body[data-hoc-tap=hs] .tlu-ghi[data-kieu='lap'] {
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-bao {
+  border-radius: 20px;
+  border-color: var(--vien);
+  background: var(--the);
+}
+body[data-hoc-tap=hs] .tlu-bao[data-kieu='khoa'] {
+  border-color: var(--vang-diu);
+  background: color-mix(in srgb, var(--vang-diu) 10%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-bao[data-kieu='loi'] {
+  border-color: var(--do);
+  background: color-mix(in srgb, var(--do) 7%, var(--the));
+}
+
+/* ---------------------------------------------------------------- thẻ chọn cách luyện (6 thẻ) */
+body[data-hoc-tap=hs] .tlu-the-lon.tlu-the-che-do {
+  min-height: 0;
+  padding: 20px;
+  gap: 0;
+  border-radius: 24px;
+  border: 1px solid var(--vien);
+  background: var(--the);
+  color: var(--muc);
+  box-shadow: 0 16px 36px -28px color-mix(in srgb, var(--muc) 45%, transparent);
+  transition: transform var(--cd-nhan, 120ms), border-color var(--cd-doi-muc, 200ms);
+}
+body[data-hoc-tap=hs] .tlu-the-lon.tlu-the-che-do:not(:disabled):hover {
+  transform: none;
+  border-color: color-mix(in srgb, var(--lg-nhan) 40%, var(--vien));
+  box-shadow: 0 16px 36px -28px color-mix(in srgb, var(--muc) 45%, transparent);
+}
+body[data-hoc-tap=hs] .tlu-the-lon.tlu-the-che-do:not(:disabled):active {
+  transform: scale(0.99);
+}
+body[data-hoc-tap=hs] .tlu-the-lon.tlu-the-che-do[aria-checked='true'] {
+  border-color: var(--lg-nhan);
+  background: color-mix(in srgb, var(--lg-nhan) 7%, var(--the));
+  box-shadow: inset 0 0 0 1px var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-the-lon.tlu-the-che-do:disabled {
+  opacity: 0.6;
+}
+/* hình chìm lớn ở góc thẻ là trang trí kiểu game ⇒ bỏ (biểu tượng nhỏ đầu thẻ đã đủ nghĩa) */
+body[data-hoc-tap=hs] .tlu-the-hinh {
+  display: none;
+}
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-the-che-do-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--lg-nhan) 13%, var(--the));
+  color: var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-the-lon[data-che-do='th'] .tlu-the-che-do-icon {
+  background: color-mix(in srgb, var(--vang-diu) 16%, var(--the));
+  color: var(--vang-diu);
+}
+body[data-hoc-tap=hs] .tlu-the-lon[data-che-do='ld'] .tlu-the-che-do-icon {
+  background: var(--the-2);
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-the-che-do-icon svg {
+  width: 24px;
+  height: 24px;
+}
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-the-che-do-ten {
+  margin-top: 14px;
+  margin-bottom: 4px;
+  color: var(--muc);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-the-che-do-phu {
+  margin-bottom: 12px;
+  color: var(--nhat);
+  font-size: 14px;
+  line-height: 1.5;
+}
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-dem-kp {
+  border: 0;
+  border-radius: 14px;
+  background: var(--nen);
+}
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-dem-kp-chu,
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-dem-kp-chu b,
+body[data-hoc-tap=hs] .tlu-dem-kp b {
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-dem-kp .tlu-thanh,
+body[data-hoc-tap=hs] .tlu-thanh {
+  background: var(--the-2);
+}
+body[data-hoc-tap=hs] .tlu-the-lon .tlu-dem-kp .tlu-thanh > span,
+body[data-hoc-tap=hs] .tlu-dem-kp .tlu-thanh > span,
+body[data-hoc-tap=hs] .tlu-thanh span {
+  background: var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-the-khoa {
+  background: color-mix(in srgb, var(--do) 12%, var(--the));
+  color: var(--tlu-do-chu);
+}
+body[data-hoc-tap=hs] .tlu-the-mo {
+  background: color-mix(in srgb, var(--xanh) 14%, var(--the));
+  color: var(--tlu-xanh-chu);
+}
+body[data-hoc-tap=hs] .tlu-the-so-o {
+  border: 0;
+  background: var(--nen);
+  color: var(--nhat);
+  font-size: 13px;
+}
+body[data-hoc-tap=hs] .tlu-the-so-o b,
+body[data-hoc-tap=hs] .tlu-the-lon[data-che-do='th'] .tlu-the-so-o b {
+  color: var(--muc);
+  font-weight: 800;
+}
+
+/* Điện thoại dọc: sáu thẻ cao 285px ⇒ sáu DÒNG gọn kiểu Hôm nay (ô biểu tượng trái, tên + một dòng phụ, số liệu nhỏ dưới). */
+@media (max-width: 639px) {
+  body[data-hoc-tap=hs] .tlu-luoi-the {
+    gap: 10px;
+  }
+  body[data-hoc-tap=hs] .tlu-the-lon.tlu-the-che-do {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    column-gap: 14px;
+    row-gap: 8px;
+    align-items: start;
+    padding: 14px 16px;
+    border-radius: 20px;
+  }
+  body[data-hoc-tap=hs] .tlu-the-lon .tlu-the-dau {
+    display: contents;
+  }
+  body[data-hoc-tap=hs] .tlu-the-lon .tlu-the-che-do-icon {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+  }
+  body[data-hoc-tap=hs] .tlu-the-lon :is(.tlu-the-khoa, .tlu-the-mo) {
+    grid-column: 2;
+    justify-self: start;
+    order: 3;
+    min-height: 26px;
+  }
+  body[data-hoc-tap=hs] .tlu-the-lon :is(.tlu-the-che-do-chu, .tlu-dem-kp, .tlu-the-so) {
+    grid-column: 2;
+  }
+  body[data-hoc-tap=hs] .tlu-the-lon .tlu-the-che-do-ten {
+    margin: 0 0 2px;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  body[data-hoc-tap=hs] .tlu-the-lon .tlu-the-che-do-phu {
+    margin: 0;
+    font-size: 13px;
+  }
+  body[data-hoc-tap=hs] .tlu-the-lon .tlu-dem-kp {
+    margin: 0;
+  }
+  body[data-hoc-tap=hs] .tlu-the-so {
+    gap: 6px;
+  }
+  body[data-hoc-tap=hs] .tlu-the-so-o {
+    min-height: 28px;
+    padding: 3px 10px;
+    font-size: 12px;
+  }
+  body[data-hoc-tap=hs] .tlu-the-so-o b {
+    font-size: 14px;
+  }
+}
+
+/* ---------------------------------------------------------------- bảng cài đặt của cách luyện đã chọn */
+body[data-hoc-tap=hs] .tlu-cau-hinh {
+  border-radius: 24px;
+  border: 1px solid var(--vien);
+  background: var(--the);
+  box-shadow: 0 16px 36px -28px color-mix(in srgb, var(--muc) 45%, transparent);
+  scroll-margin-top: 16px;
+}
+body[data-hoc-tap=hs] .tlu-rong .tlu-ch-phai {
+  border: 0;
+  border-radius: 20px;
+  background: var(--nen);
+}
+body[data-hoc-tap=hs] .tlu-ch-ten {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+body[data-hoc-tap=hs] .tlu-ch-icon {
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--lg-nhan) 13%, var(--the));
+  color: var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-kho-sai b {
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-chuc-mung {
+  border-radius: 20px;
+  border-color: var(--vien);
+  background: var(--nen);
+}
+body[data-hoc-tap=hs] .tlu-chuc-mung > b {
+  color: var(--muc);
+  font-weight: 800;
+}
+body[data-hoc-tap=hs] .tlu-o-chon {
+  border: 1px solid var(--vien);
+  background: var(--the);
+}
+body[data-hoc-tap=hs] .tlu-o-chon input,
+body[data-hoc-tap=hs] .tlu-thanh-chon input[type='range'] {
+  accent-color: var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-rong .tlu-o-chon:hover {
+  background: color-mix(in srgb, var(--lg-nhan) 6%, var(--the));
+}
+body[data-hoc-tap=hs] .tlu-chip {
+  border-color: var(--vien);
+  background: var(--the);
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-chip:is([aria-checked='true'], [aria-pressed='true']) {
+  border-color: var(--lg-nhan);
+  background: color-mix(in srgb, var(--lg-nhan) 12%, var(--the));
+  color: var(--lg-nhan);
+  box-shadow: inset 0 0 0 1px var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-chon-bai select {
+  border-color: var(--vien);
+  background: var(--the);
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-thanh-chon-dau b {
+  color: var(--muc);
+  font-weight: 800;
+}
+body[data-hoc-tap=hs] .tlu-cong-tac {
+  border-color: var(--vien);
+  background: var(--nen);
+}
+body[data-hoc-tap=hs] .tlu-cong-tac input {
+  background: var(--the-2);
+  border-color: var(--nhat);
+}
+body[data-hoc-tap=hs] .tlu-cong-tac input:checked {
+  background: var(--lg-nhan);
+  border-color: var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-cong-tac input:checked::after {
+  background: var(--the);
+}
+body[data-hoc-tap=hs] .tlu-nhan[data-kieu='du-phong'] {
+  background: color-mix(in srgb, var(--vang-diu) 16%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-nhan[data-kieu='luyen'] {
+  background: color-mix(in srgb, var(--lg-nhan) 13%, var(--the));
+  color: var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-nhan[data-kieu='con-mot'] {
+  background: color-mix(in srgb, var(--xanh) 16%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-nguon-sai {
+  --tlu-ng-hong: var(--cam);
+}
+body[data-hoc-tap=hs] .tlu-the-nguon {
+  --ng: var(--lg-nhan);
+  border-color: var(--vien);
+  background: var(--the);
+}
+body[data-hoc-tap=hs] .tlu-the-nguon[data-chon='1'] {
+  border-color: var(--lg-nhan);
+  background: color-mix(in srgb, var(--lg-nhan) 8%, var(--the));
+}
+body[data-hoc-tap=hs] .tlu-the-nguon:has(input:focus-visible) {
+  outline-color: var(--tim);
+}
+
+/* ---------------------------------------------------------------- nút: MỘT nút chính màu mực (như .ht-nut-chinh), nút phụ viền mảnh */
+body[data-hoc-tap=hs] .tlu-nut-chinh {
+  min-height: 56px;
+  padding: 12px 24px;
+  border-radius: 16px;
+  border: 1px solid var(--muc);
+  background: var(--muc);
+  color: var(--the);
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: none;
+  transition: transform var(--cd-nhan, 120ms);
+}
+body[data-hoc-tap=hs] .tlu-nut-chinh:not(:disabled):active {
+  transform: scale(0.99);
+}
+body[data-hoc-tap=hs] .tlu-nut-chinh:disabled {
+  filter: none;
+  opacity: 0.5;
+}
+body[data-hoc-tap=hs] .tlu-lam-luoi[data-bo-cuc='ngang'] .tlu-ben-cuoi .tlu-nut-chinh {
+  box-shadow: none;
+}
+body[data-hoc-tap=hs] .tlu-nut-phu {
+  border-radius: 14px;
+  border-color: var(--vien);
+  background: var(--the);
+  color: var(--muc);
+  font-weight: 650;
+}
+body[data-hoc-tap=hs] .tlu-rong .tlu-nut-phu:not(:disabled):hover {
+  background: var(--the-2);
+}
+body[data-hoc-tap=hs] .tlu-nut-chu {
+  color: var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-nut-kiem:not(:disabled) {
+  border-color: var(--muc);
+  background: var(--muc);
+  color: var(--the);
+}
+body[data-hoc-tap=hs] .tlu-nut-chua {
+  min-height: 44px;
+  border-color: var(--lg-nhan);
+  color: var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-nut-chua:hover {
+  background: color-mix(in srgb, var(--lg-nhan) 8%, var(--the));
+  color: var(--lg-nhan);
+}
+
+/* ---------------------------------------------------------------- làm bài + kết quả + tổng hợp: cùng bảng giấy */
+body[data-hoc-tap=hs] .tlu-tien-do span {
+  background: var(--tim);
+}
+body[data-hoc-tap=hs] .tlu-the-cau {
+  border-radius: 24px;
+  border: 1px solid var(--vien);
+  background: var(--the);
+  box-shadow: 0 16px 36px -28px color-mix(in srgb, var(--muc) 45%, transparent);
+}
+body[data-hoc-tap=hs] .tlu-the-cau[data-dung='true'] {
+  border-color: var(--xanh);
+  box-shadow: inset 0 0 0 1px var(--xanh);
+}
+body[data-hoc-tap=hs] .tlu-the-cau[data-dung='false'] {
+  border-color: var(--do);
+  box-shadow: inset 0 0 0 1px var(--do);
+}
+body[data-hoc-tap=hs] .tlu-lam-de .tlu-the-cau[data-hien-tai='true'] {
+  box-shadow: inset 0 0 0 2px var(--lg-nhan);
+}
+body[data-hoc-tap=hs] .tlu-thanh-nop-trong {
+  border-color: var(--vien);
+  background: var(--the);
+  box-shadow: 0 -10px 24px -18px color-mix(in srgb, var(--muc) 50%, transparent);
+}
+body[data-hoc-tap=hs] .tlu-lam-luoi[data-bo-cuc] .tlu-lam-ben {
+  box-shadow: 0 16px 36px -28px color-mix(in srgb, var(--muc) 45%, transparent);
+}
+body[data-hoc-tap=hs] .tlu-bc-hang[aria-current='true'] {
+  background: color-mix(in srgb, var(--lg-nhan) 10%, var(--the));
+}
+body[data-hoc-tap=hs] .tlu-bc-y[data-gia-tri='D'] {
+  background: color-mix(in srgb, var(--xanh) 20%, var(--the));
+}
+body[data-hoc-tap=hs] .tlu-bc-y[data-gia-tri='S'] {
+  background: color-mix(in srgb, var(--do) 16%, var(--the));
+}
+body[data-hoc-tap=hs] .tlu-diem,
+body[data-hoc-tap=hs] .tlu-hero {
+  border-radius: 24px;
+  border-color: var(--vien);
+  background: var(--the);
+}
+body[data-hoc-tap=hs] .tlu-vong-dat {
+  stroke: var(--tim);
+}
+body[data-hoc-tap=hs] .tlu-vong-nen {
+  stroke: var(--the-2);
+}
+body[data-hoc-tap=hs] .tlu-hero-so b {
+  color: var(--muc);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+body[data-hoc-tap=hs] .tlu-kpi div {
+  background: var(--nen);
+}
+body[data-hoc-tap=hs] .tlu-khoi {
+  border-radius: 24px;
+  border-color: var(--vien);
+  background: var(--the);
+}
+body[data-hoc-tap=hs] .tlu-kq-loc {
+  border-color: var(--vien);
+  background: color-mix(in srgb, var(--the) 94%, transparent);
+  box-shadow: 0 10px 24px -20px color-mix(in srgb, var(--muc) 50%, transparent);
+}
+body[data-hoc-tap=hs] .tlu-bd-kq-chu [data-kieu='dung']::before {
+  color: var(--the);
+}
+body[data-hoc-tap=hs] .tlu-bd-kq-chu [data-kieu='mot_phan']::before {
+  background: color-mix(in srgb, var(--vang-diu) 18%, var(--the));
+}
+body[data-hoc-tap=hs] .tlu-bd-kq-chu [data-kieu='sai']::before {
+  background: color-mix(in srgb, var(--do) 14%, var(--the));
+}
+body[data-hoc-tap=hs] .tlu-bd-luoi {
+  stroke: var(--vien);
+}
+body[data-hoc-tap=hs] .tlu-bd-day {
+  stroke: var(--nhat);
+}
+body[data-hoc-tap=hs] .tlu-bd-trong {
+  fill: var(--the-2);
+}
+body[data-hoc-tap=hs] .tlu-khac-phuc {
+  background: color-mix(in srgb, var(--do) 9%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-khac-phuc[data-dung='true'] {
+  background: color-mix(in srgb, var(--xanh) 12%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-sai-goc {
+  color: var(--nhat);
+}
+/* Luyện đề cấu trúc (thẻ con): cùng bảng giấy */
+body[data-hoc-tap=hs] .ldct-trang-thai[data-kieu='mo'] {
+  background: color-mix(in srgb, var(--xanh) 16%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .ldct-trang-thai[data-kieu='can_xac_nhan'] {
+  background: color-mix(in srgb, var(--vang-diu) 16%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .ldct-trang-thai[data-kieu='khoa'] {
+  background: color-mix(in srgb, var(--do) 12%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .ldct-ly-do {
+  border-color: color-mix(in srgb, var(--do) 45%, var(--vien));
+  background: var(--the);
+}
+body[data-hoc-tap=hs] .ldct-dong-ho[data-gap='true'] {
+  background: color-mix(in srgb, var(--do) 14%, var(--the));
+  color: var(--muc);
+}
+body[data-hoc-tap=hs] .tlu-xuong {
+  background: linear-gradient(90deg, var(--the), var(--the-2), var(--the));
+  background-size: 200% 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-hoc-tap=hs] .tlu-the-lon.tlu-the-che-do,
+  body[data-hoc-tap=hs] .tlu-nut-chinh {
+    transition: none;
+  }
+}
+/* Bảng câu (làm bài ngang / máy tính): ô số câu đủ 44px để chạm; câu đang xem viền chàm thay viền vàng. */
+body[data-hoc-tap=hs] .tlu-bc-so {
+  min-width: 44px;
+}
+body[data-hoc-tap=hs] .tlu-bc-so[aria-current='true'],
+body[data-hoc-tap=hs] .tlu-bc-hang[aria-current='true'] > .tlu-bc-so {
+  border-color: var(--lg-nhan);
+  box-shadow: 0 0 0 2px var(--lg-nhan);
+}

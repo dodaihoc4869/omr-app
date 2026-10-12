@@ -1,6 +1,9 @@
 // TU LUYỆN — CHỌN NGUỒN CÂU SAI · GIAO DIỆN (30/09). Khoá: khối "Nguồn câu sai" có 6 ô tick kèm số câu; nguồn 0 câu bị tắt;
 // mặc định tick mọi nguồn có câu; tick/bỏ tick cập nhật NGAY tổng câu duy nhất (không gọi lại máy chủ); nhớ lựa chọn theo máy;
 // không tick nguồn nào ⇒ nút tắt + nhắc; "Chọn tất cả"; lệnh rút gửi đúng `nguon`; máy chủ bản cũ ⇒ không hiện khối.
+// SỬA CÓ CHỦ Ý 12/10 (thầy: "thay những từ đảo, đoàn, bia bằng những từ phù hợp"): tên ô tick đổi theo bộ tên nguồn của Câu đã làm
+// (NHAN_NGUON_LAN) — Bát Linh Đảo ⇒ "Học theo kế hoạch", Đoàn Hộ Tống ⇒ "Ôn theo kế hoạch", Bi-a ⇒ "Luyện tập trước đây". Mã nguồn
+// gửi máy chủ (`dao`, `doan`, `bia`) và mọi luật đếm/tick giữ nguyên.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ManTuLuyen from '../src/components/tu-luyen/ManTuLuyen'
@@ -56,17 +59,17 @@ describe('Khối Nguồn câu sai', () => {
     await moCheDo1()
     expect(screen.getAllByRole('checkbox').filter((x) => x.closest('.tlu-nguon-sai')).length).toBe(6)
     expect(o(/Ca kiểm tra/).checked).toBe(true)
-    expect(o(/Bát Linh Đảo/).checked).toBe(true)
-    expect(o(/Bi-a/).checked).toBe(true)
-    expect(o(/Đoàn Hộ Tống/).disabled).toBe(true)
-    expect(o(/Đoàn Hộ Tống/).closest('label')!.textContent).toContain('0 câu')
+    expect(o(/Học theo kế hoạch/).checked).toBe(true)
+    expect(o(/Luyện tập trước đây/).checked).toBe(true)
+    expect(o(/Ôn theo kế hoạch/).disabled).toBe(true)
+    expect(o(/Ôn theo kế hoạch/).closest('label')!.textContent).toContain('0 câu')
     expect(o(/Ca kiểm tra/).closest('label')!.textContent).toContain('3 câu')
     expect(soKho()).toBe('5')
     expect(screen.getByText('Kho câu sai của em: 5 câu')).toBeTruthy()
     const truoc = cuoc.length
     fireEvent.click(o(/Ca kiểm tra/))
     expect(soKho()).toBe('3') // Đảo (2 câu, 1 câu trùng ca) + Bi-a 1
-    fireEvent.click(o(/Bát Linh Đảo/))
+    fireEvent.click(o(/Học theo kế hoạch/))
     expect(soKho()).toBe('1')
     expect((screen.getByLabelText('Số câu') as HTMLInputElement).max).toBe('2')
     expect(cuoc.length).toBe(truoc)
@@ -76,7 +79,7 @@ describe('Khối Nguồn câu sai', () => {
   it('không tick nguồn nào ⇒ nút tắt + nhắc; "Chọn tất cả" bật lại; rút gửi đúng nguồn', async () => {
     const cuoc = giaLap()
     await moCheDo1()
-    for (const t of [/Ca kiểm tra/, /Bát Linh Đảo/, /Bi-a/]) fireEvent.click(o(t))
+    for (const t of [/Ca kiểm tra/, /Học theo kế hoạch/, /Luyện tập trước đây/]) fireEvent.click(o(t))
     expect(soKho()).toBe('0')
     expect(screen.getByText('Em chọn ít nhất 1 nguồn câu sai để bắt đầu.')).toBeTruthy()
     const nut = screen.getByRole('button', { name: 'Chọn nguồn để luyện' }) as HTMLButtonElement
@@ -96,7 +99,7 @@ describe('Khối Nguồn câu sai', () => {
     ghiNhoNguon('S1', new Set(['dao', 'bia']), KHO.theoNguon)
     await moCheDo1()
     expect(o(/Ca kiểm tra/).checked).toBe(false)
-    expect(o(/Bát Linh Đảo/).checked).toBe(true)
+    expect(o(/Học theo kế hoạch/).checked).toBe(true)
     expect(soKho()).toBe('3')
     // hàm thuần: bỏ hết nguồn đang có ⇒ về mặc định tick tất cả; nguồn mới (Tu luyện) tự được tick
     expect([...chonMacDinh({ ca: 1, dao: 1 }, ['ca', 'dao'])]).toEqual(['ca', 'dao'])
