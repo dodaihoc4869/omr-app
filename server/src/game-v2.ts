@@ -382,10 +382,10 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const g7=await import('./goi-bai-7')
     const cfg7=await g7.coGoi7(env)
     if(cfg7.bat){
-      // Đồng bộ theo TÊN LỚP của em (`lopCuaEm`, cùng nguồn `lapGoi7`) — `hoc_sinh.lop` là KHỐI ("12") nên không khớp `bai_da_day.lop`
-      // ("12 - Lớp Thường"): trước 12/10 lượt đồng bộ từ máy em khối 12 không thấy bài mới, phải chờ cron.
-      if(action==='hoc-tap-sanh'||action==='hoc-tap-start'){const lop7=await import('./bai-da-day').then(m=>m.lopCuaEm(env,sbd))
-      await g7.dongBoGoi7(env,Date.now(),10,lop7??'')}
+      // KHÔNG đồng bộ gói từ máy em (khẩn 12/10 21h — giờ cao điểm app treo "Đang chuẩn bị những câu…"): `dongBoGoi7` mỗi 20 giây/isolate nạp lại
+      // MỌI gói đang mở của lớp (đọc R2 từng tờ, upsert ~164 dòng/gói) ⇒ dồn tải ghi D1 vào đúng lệnh sảnh / bắt đầu chặng. Trước 18:53 lượt này lọc
+      // theo KHỐI nên với em khối 12 là no-op; sửa theo tên lớp làm nó chạy thật ⇒ quá tải. Bài mới vẫn vào gói: cron mỗi phút của Worker (index.ts)
+      // + trang thầy Bài mới 7 ngày (`gvGoi7`) + bước phát hành `ap-goi7-song`. Em mới mở app chậm nhất ~1 phút sau khi thầy tick là thấy bài.
       if(action==='hoc-tap-gap')return g7.gapHuongDan7(env,sbd,b,Date.now())
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now());if(r7)return r7}
       if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now());if(lap7){const con7=lap7.plan.viec.length;return {ok:true,cheDo2:true,ngay:g7.tomTatGoi7(lap7,Date.now()).ngay,goi7:g7.tomTatGoi7(lap7,Date.now()),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}

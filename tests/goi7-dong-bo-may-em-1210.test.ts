@@ -1,7 +1,8 @@
 // @vitest-environment node
 // LỖI 12/10 (soát "việc giao câu của code" theo yêu cầu thầy): khi em mở app (`hoc-tap-sanh` / `hoc-tap-start`), máy chủ đồng bộ Gói bài 7 ngày theo
 // `hoc_sinh.lop` — cột ấy là KHỐI ("12") trong khi bài thầy tick (`bai_da_day.lop`) mang TÊN LỚP ("12 - Lớp Thường") ⇒ lượt đồng bộ từ máy em khối
-// 12 không thấy bài mới nào, phải chờ cron. Sửa: đồng bộ theo `lopCuaEm` (tên lớp hiệu lực, cùng nguồn `lapGoi7`).
+// 12 không thấy bài mới nào, phải chờ cron. Khẩn 12/10 21h: bỏ hẳn lượt đồng bộ từ máy em (quá tải giờ cao điểm) — cron + trang thầy đồng bộ, theo
+// tên lớp (`sqlTenLopHs` trong `dongBoThat7`).
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
@@ -53,10 +54,12 @@ it('đồng bộ theo tên lớp của em (lopCuaEm) tạo gói và gắn đủ 
   expect(em.map((e) => e.sbd)).toEqual(['S1', 'S2', 'S3'])
 })
 
-it('lệnh hoc-tap-sanh / hoc-tap-start của máy em đồng bộ theo lopCuaEm, không theo cột khối hoc_sinh.lop', () => {
+it('khẩn 12/10 21h: lệnh hoc-tap-sanh / hoc-tap-start của máy em KHÔNG đồng bộ gói (nạp lại mọi gói của lớp mỗi 20 giây ⇒ quá tải giờ cao điểm)', () => {
   const src = readFileSync(new URL('../server/src/game-v2.ts', import.meta.url), 'utf8')
-  const khoi = src.slice(src.indexOf("if(action==='hoc-tap-sanh'||action==='hoc-tap-start')"), src.indexOf("if(action==='hoc-tap-gap')"))
-  expect(khoi).toMatch(/lopCuaEm\(env,sbd\)/)
-  expect(khoi).toMatch(/dongBoGoi7\(env,Date\.now\(\),10,lop7\?\?''\)/)
+  const khoi = src.slice(src.indexOf("if(action.startsWith('hoc-tap-'))"), src.indexOf("if(action==='hoc-tap-gap')"))
+  expect(khoi).not.toMatch(/dongBoGoi7\(/)
   expect(khoi).not.toMatch(/SELECT lop FROM hoc_sinh/)
+  // Bài mới vẫn vào gói qua cron mỗi phút của Worker.
+  const idx = readFileSync(new URL('../server/src/index.ts', import.meta.url), 'utf8')
+  expect(idx).toMatch(/m\.dongBoGoi7\(env,Date\.now\(\)\)/)
 })

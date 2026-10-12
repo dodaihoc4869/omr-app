@@ -35,7 +35,8 @@ const ICON_NHOM: Record<NhomNhip, typeof Check> = { cham: Check, 'chua-deu': Act
 /** Bản nhớ trong phiên (mỗi token một bản, 60 giây, gắn với `lamMoi`): em chuyển qua lại các mục rồi về Hôm nay thì vẽ ngay, không gọi lại máy
  *  chủ (bớt lượt D1); số câu hôm nay đổi ⇒ khoá khác ⇒ nạp lại. */
 const NHO = new Map<string, { kq: KetQuaNhipHocEm; luc: number; khoa: number | null | undefined }>()
-const NHO_MS = 60_000
+// Khẩn 12/10 21h (giờ cao điểm): lịch sử ngày không đổi trong ngày — số HÔM NAY lấy từ sảnh ⇒ nhớ 10 phút, KHÔNG nạp lại sau mỗi câu.
+const NHO_MS = 600_000
 /** Chỉ cho test: xoá bản nhớ. */
 export const xoaNhoNhipHocEm = (): void => NHO.clear()
 
@@ -296,7 +297,8 @@ function PhanNhip({ k, onMoHoSo }: { k: KetQuaNhipHocEm; onMoHoSo?: () => void }
 }
 
 export default function TheHomNayEm(p: PropsTheHomNayEm) {
-  const nhipGoc = useNhipHocEm(p.token, p.so?.daLam ?? null)
+  // Khoá cố định (không theo số câu đã làm): số hôm nay đã tính lại từ sảnh bên dưới ⇒ không gọi /hs/nhip-hoc sau mỗi câu (khẩn 12/10 21h).
+  const nhipGoc = useNhipHocEm(p.token, null)
   const nhip = typeof nhipGoc === 'string' ? nhipGoc : nhipTheoSanh(nhipGoc, p.so ? { muc: p.so.muc, daLam: p.so.daLam } : null)
   const coNhip = nhip !== 'an'
   const k = typeof nhip === 'string' ? null : nhip

@@ -197,7 +197,7 @@ describe('phần Nhịp học trong thẻ (số hôm nay = số Sảnh)', () => 
     expect(readFileSync('src/components/hoc-tap/hoc-tap.css', 'utf8')).toMatch(/button\.ht2-hn-nhip-bam\{min-height:44px;/)
   })
 
-  it('bản nhớ 60 giây: về lại Hôm nay vẽ ngay, không gọi lại máy chủ; số câu hôm nay đổi ⇒ nạp lại', async () => {
+  it('bản nhớ 10 phút: về lại Hôm nay vẽ ngay, không gọi lại máy chủ; số câu hôm nay đổi KHÔNG nạp lại (khẩn 12/10 21h — số hôm nay lấy từ Sảnh)', async () => {
     const f = vi.fn(async () => traLoi(NHIP_EM_CHAM))
     vi.stubGlobal('fetch', f)
     const p = { dangTai: false, ngayChu: 'Thứ Hai 12/10', onHoc: vi.fn(), khoaHoc: false, hetCau: false, token: 'tk-nho' }
@@ -208,7 +208,9 @@ describe('phần Nhịp học trong thẻ (số hôm nay = số Sảnh)', () => 
     expect(screen.getByText('Thầy cũng thấy bảng này.')).toBeTruthy()
     expect(f).toHaveBeenCalledTimes(1)
     r2.rerender(<TheHomNayEm {...p} so={{ daLam: 19, muc: 30, chang: 4, soChang: 5 }} />)
-    await waitFor(() => expect(f).toHaveBeenCalledTimes(2))
+    await new Promise((r) => setTimeout(r, 30))
+    expect(f).toHaveBeenCalledTimes(1) // giờ cao điểm: không gọi /hs/nhip-hoc sau mỗi câu
+    expect(screen.getByText('Thầy cũng thấy bảng này.')).toBeTruthy()
   })
 })
 
