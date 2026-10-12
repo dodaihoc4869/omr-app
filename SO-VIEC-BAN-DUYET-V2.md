@@ -188,3 +188,13 @@ Thầy nhắn (nguyên văn, kèm ảnh app học sinh tối: khối "Cách ra k
 - [x] Sửa tương phản bản tối thấy trong ảnh (vòng tiến độ, vạch chặng, nút Tiếp tục học tối trên nền tối) | bằng chứng: chữ ≥ 4,5:1, vạch/ô/nút ≥ 3:1 (số/nút 7,56; ô chờ 5,71; ô ngày 6,09–9,96) khoá trong test; nguyên nhân ảnh thầy: trình duyệt điện thoại ép tối đè bản tối của app ⇒ thẻ khai color-scheme + `<meta name="color-scheme" content="light dark">` ở index.html (eb580266).
 - [ ] Build + đẩy (kiểm ca mở) | bằng chứng: gộp eb580266: tsc 0 · check:mau · kiem:mau-giu 0 · soi 0 LỖI · build:cf 13/13 154 tệp/2924 KB · vitest 15276 test 0 đỏ mới.
 - [x] Thầy nhắn thêm (ảnh bảng Nhịp học của em bản tối, em Lười 2/11): "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé" ⇒ bấm bảng ⇒ tấm Hồ sơ làm bài của CHÍNH em, đủ phần như tấm thầy xem ở Nhịp học (lệnh học sinh chỉ đọc, chỉ của mình, không lộ đáp án / ca chưa công bố) | bằng chứng: 66d16f16/5bac16c6 — `POST /hs/ho-so-thai-do`, `POST /hs/lich-su-lam-cau` (gameIdentity, SBD từ token; lõi chung với lệnh thầy; bỏ embargoed + ca chưa công bố/đã xoá, `lan[].chon`, qid thật, canhBao nội bộ); HoSoLamCauEm chế độ học sinh; HoSoCuaEmHs nạp lười; nối eb580266; test máy chủ 8 + giao diện 5 + nối 2; 11 ảnh 0 lỗi.
+
+## Đợt 15 — KHẨN giờ cao điểm 21h (12/10)
+Thầy nhắn (nguyên văn, kèm 5 ảnh 21:14: "Máy chủ phản hồi chậm hoặc mạng gián đoạn" ở Hôm nay, Chặng học, Hành trình; em Nguyễn Anh Thư "Đủ mức hôm nay · Đã làm 36/36 · Đã làm hết câu được giao"; bảng Nhịp học cũ ô hôm nay vàng):
+"nhiều học sinh chưa làm câu nào nhưng app đã báo làm đủ"
+"App học sinh bị lag, tối ưu triệt để giờ cao điểm luôn bây giờ để mượt mà ổn định nhất"
+"Học sinh làm xong hôm nay thanh màu vẫn báo vàng."
+- [ ] Tìm nguyên nhân gốc "chưa làm câu nào mà báo làm đủ" và sửa | bằng chứng: (chưa có)
+- [ ] Tìm nguyên nhân gốc lag / "Máy chủ phản hồi chậm" giờ cao điểm và tối ưu triệt để | bằng chứng: (chưa có)
+- [ ] Ô hôm nay làm xong vẫn vàng ⇒ phải xanh khi đủ mức | bằng chứng: (chưa có)
+- [ ] Build + đẩy (kiểm ca mở; phát hành không làm D1 ngừng phục vụ giờ cao điểm) | bằng chứng: (chưa có)

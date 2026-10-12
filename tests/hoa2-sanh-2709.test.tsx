@@ -236,11 +236,21 @@ describe('StudentPortalScreen thật: giao diện học tập tập trung', () =
     expect(container.querySelector('.bnv')).toBeNull()
   })
   it('có đệm phiên trước hiện kế hoạch ngay; mạng lỗi vẫn giữ kế hoạch', async () => {
-    ghiNhoKetQuaSanh('test',docSanh(SANH)!)
+    // Khẩn 12/10 21h: đệm chỉ dùng khi là số của HÔM NAY (giờ Việt Nam) — dựng đệm đúng ngày hôm nay.
+    const homNayVn = new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10)
+    ghiNhoKetQuaSanh('test',docSanh({ ...SANH, ngay: homNayVn })!)
     tra['/game-v2/hoc-tap-sanh']={nem:true}
     render(<StudentPortalScreen />)
     expect(screen.getByRole('button',{name:/^Học tiếp · \d+ câu$/})).toBeTruthy() // 12/10: "gộp hai phần làm một" — nút ghi số câu còn lại
     expect(docNhoKetQuaSanh('test')).toBeTruthy()
+  })
+  it('khẩn 12/10 21h: đệm của NGÀY KHÁC không bao giờ vẽ thành số hôm nay (mạng lỗi ⇒ không có "Học tiếp · N câu" từ số cũ)', async () => {
+    // Đệm hôm qua: lỗi mạng giờ cao điểm từng làm em chưa làm câu nào thấy "Đủ mức hôm nay 36/36" (số hôm qua).
+    ghiNhoKetQuaSanh('test',docSanh({ ...SANH, ngay: '2026-09-30' })!)
+    expect(docNhoKetQuaSanh('test')).toBeNull()
+    tra['/game-v2/hoc-tap-sanh']={nem:true}
+    render(<StudentPortalScreen />)
+    expect(screen.queryByRole('button',{name:/^Học tiếp · \d+ câu$/})).toBeNull()
   })
 })
 

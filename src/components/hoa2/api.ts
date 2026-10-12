@@ -528,7 +528,14 @@ export function docNhoKetQuaSanh(sbd: string | undefined): KetQuaSanh | null {
     const raw = localStorage.getItem(khoaNhoKetQuaSanh(sbd))
     if (!raw) return null
     const parsed = JSON.parse(raw) as unknown
-    if (parsed && typeof parsed === 'object') return parsed as KetQuaSanh
+    if (!parsed || typeof parsed !== 'object') return null
+    // Khẩn 12/10 21h (thầy: "nhiều học sinh chưa làm câu nào nhưng app đã báo làm đủ"): đệm là số của NGÀY nó được ghi. Giờ cao điểm lệnh sảnh lỗi /
+    // chậm ⇒ Sảnh đang vẽ bằng đệm — đệm của hôm qua (đã đủ mức hôm qua) hiện thành "Đủ mức hôm nay 36/36". Đệm khác ngày hôm nay (giờ Việt Nam)
+    // ⇒ BỎ, Sảnh chờ số thật (khung xương / lỗi + Thử lại), không bao giờ vẽ số ngày khác làm số hôm nay.
+    const kq = parsed as KetQuaSanh
+    const ngayDem = kq.cheDo2 && 'sanh' in kq ? kq.sanh?.ngay : undefined
+    if (kq.cheDo2 && ngayDem !== new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10)) return null
+    return kq
   } catch {
     /* ignore */
   }
