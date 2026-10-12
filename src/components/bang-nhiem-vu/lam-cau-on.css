@@ -147,3 +147,24 @@
 
 /* OMNI 3 · CẨN THẬN (b) (06/10): ô "Soát lại đơn vị và số liệu" dưới ô đáp số (câu Phần III) — dùng lại hàng chọn `.lco-lua` (màu M3 sẵn có); CHỈ bố cục. */
 .lco-soat { min-height: 48px; }
+
+/* LÀN B ĐỢT 16 (thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và thân thiện"). CHỈ bố cục,
+ * màu giữ nguyên biến --m3-* ở trên. Máy tính + điện thoại xoay ngang: khung rộng ra, MỖI THẺ CÂU chia hai cột — đề bên trái, phần trả lời
+ * (A–D · Đúng|Sai · ô số) bên phải; đầu thẻ và lời giải trải hết bề ngang. Đoạn giới thiệu giữ ≤ 720 px cho dòng chữ vừa mắt.
+ * Điện thoại dọc / máy tính bảng dọc: không đổi. */
+@media (min-width: 900px), (orientation: landscape) and (min-width: 640px) {
+  .lco { max-width: 1080px; }
+  .lco-dau { max-width: 720px; }
+  .lco-the { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--k6, 24px); row-gap: var(--k3, 12px); align-items: start; }
+  .lco-the > * { grid-column: 1 / -1; min-width: 0; }
+  .lco-the > .lco-de { grid-column: 1; }
+  .lco-the > .lco-nhom { grid-column: 2; grid-row: 2; }
+  .lco-day-hang, .lco-loi-nop, .lco-cho-may-chu { max-width: 1080px; }
+}
+/* Điện thoại xoay ngang (thấp): khung nhìn chỉ ~390 px ⇒ đầu màn và thanh nộp gọn lại để thẻ câu có chỗ; nút vẫn ≥ 48 px. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .lco { padding-top: 0; }
+  .lco-dau { gap: var(--k1, 4px); margin-bottom: var(--k3, 12px); }
+  .lco-tieu-de { font-size: var(--bnv-cx-4); }
+  .lco-day { padding: var(--k2, 8px) var(--k3, 12px); margin-top: var(--k3, 12px); }
+}

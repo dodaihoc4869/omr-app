@@ -379,6 +379,34 @@ body[data-hoc-tap=hs] .h2-cdl{--h2c-xanh-chu:var(--the)}
   .ht2-lam-phim{gap:6px}.ht2-lam-phim button{height:44px}.ht2-lam-nut{min-height:48px}
   .ht2-lam-hang-nut{grid-template-columns:minmax(0,1fr);gap:8px}.ht2-lam-hang-nut>.ht2-lam-nut-chinh{order:-1}
 }
+/* ── LÀN B ĐỢT 16 (thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và thân thiện") ──────────
+   Máy tính / điện thoại xoay ngang: ĐỀ bên trái — PHẦN TRẢ LỜI bên phải ngay trên nút chính. ManLamBaiTap đặt `data-tra-loi="I|II|III"` lên
+   khung + cột phải khi chuyển khối trả lời sang (`traLoiCotPhai`, LamCau.tsx): máy tính mọi loại câu, điện thoại xoay ngang chỉ trắc nghiệm.
+   Trắc nghiệm / đúng–sai: cột phải thôi là thẻ (các phương án, các ý vốn là thẻ — khỏi thẻ lồng thẻ), hai cột rộng bằng nhau để đề đọc vừa mắt
+   (~60 chữ/dòng). Trả lời ngắn: cột phải giữ thẻ, 4 ô nằm ngay trên bàn phím số. Bản dọc không đổi. Màu: chỉ biến sẵn có của khối `.ht2-lam`. */
+.ht2-lam-cot-tra-loi{display:flex;flex-direction:column;gap:12px;min-width:0}
+@media(min-width:900px){
+  .ht2-lam-khung[data-tra-loi]{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
+  .ht2-lam-khung[data-tra-loi=III]{grid-template-columns:minmax(0,1fr) 400px}
+  .ht2-lam-day:is([data-tra-loi=I],[data-tra-loi=II]){gap:14px;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
+  .ht2-lam-day[data-tra-loi=III] .ht2-lam-cot-tra-loi{padding:4px 0 6px;border-bottom:1px solid var(--vien)}
+  .ht2-lam-day[data-tra-loi] .ht2-lam-ket{border-radius:18px}
+  /* đang làm: cột phải bắt đầu NGANG thẻ đề (dưới hàng nhãn "Trắc nghiệm · tên dạng" cao 28 px + khe 14 px) */
+  .ht2-lam-khung[data-tra-loi] .ht2-lam-nhan{height:28px}
+  .ht2-lam-khung[data-tra-loi]:not([data-ket])>.ht2-lam-day{margin-top:42px}
+  /* đúng–sai: các ý đã hiện ngay trên ⇒ bỏ dải tóm tắt a·Đ b c d (trùng thông tin — luật C4); nút gợi ý (nếu có) vẫn giữ */
+  .ht2-lam-day[data-tra-loi=II] .ht2-lam-ban-do{display:none}
+  .ht2-lam-day[data-tra-loi=II] .ht2-lam-hang-ban-do:not(:has(button)){display:none}
+}
+@media(max-height:560px) and (min-width:640px){
+  .ht2-lam-khung[data-tra-loi]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .ht2-lam-khung[data-tra-loi]:not([data-ket])>.ht2-lam-day{margin-top:0}.ht2-lam-khung[data-tra-loi] .ht2-lam-nhan{height:auto}
+  .ht2-lam-day[data-tra-loi]{gap:10px;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
+  .ht2-lam-cot-tra-loi{gap:8px}
+  .ht2-lam-cot-tra-loi .ht2-lam-tn,.ht2-lam-cot-tra-loi .ht2-lam-pa-khoi{gap:6px}
+  .ht2-lam-cot-tra-loi .ht2-lam-pa{min-height:48px;padding:6px 12px;border-radius:16px;font-size:16px;gap:12px}
+  .ht2-lam-cot-tra-loi .ht2-lam-pa-ma{flex-basis:30px;width:30px;height:30px;font-size:14px}
+}
 /* ── THẺ "HÔM NAY CỦA EM" 12/10E (thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu"; TheHomNayEm.tsx) ──
    Thay khối vòng tròn `.ht2-chinh` + bảng `.ht2-nhe` ở đầu màn Hôm nay; luật cũ của hai khối GIỮ NGUYÊN ở trên (cổng kiem:mau-giu cấm xoá khai báo màu).
    MÀU: chỉ biến app học sinh (--the --the-2 --vien --muc --nhat --lg-nhan --xanh --do --cam) + color-mix. Đo từ giá trị biến thật (tokens.css), sáng | tối:

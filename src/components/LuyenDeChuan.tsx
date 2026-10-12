@@ -164,9 +164,10 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
   const soCauDaLam = demDaLam(answers)
 
   return createPortal(
-    <div className="m3 m3-man-lam fixed inset-0 z-50 overflow-y-auto overscroll-contain">
+    // `ldc-lam` / `ldc-khung` (làn B đợt 16): móc bố cục máy tính + xoay ngang ở m3/luyen-khac-phuc.css — mỗi thẻ câu đề trái, trả lời phải.
+    <div className="m3 m3-man-lam ldc-lam fixed inset-0 z-50 overflow-y-auto overscroll-contain">
       <div
-        className="min-h-full max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-6"
+        className="ldc-khung min-h-full max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-6"
         style={{
           paddingTop: 'max(16px, env(safe-area-inset-top))',
           paddingBottom: done ? 'max(32px, env(safe-area-inset-bottom))' : '110px',
