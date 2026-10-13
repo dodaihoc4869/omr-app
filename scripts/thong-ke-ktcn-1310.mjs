@@ -32,3 +32,7 @@ in1('scope12', await doc(`SELECT COUNT(*) em,SUM(json_array_length(COALESCE(json
 // Câu khối 12 có kỹ năng giá trị trung bình đang bị nghi đáp án: vì sao (số lượt làm/sai hay máy giải lại lệch). Không in đề/đáp án.
 in1('nghi12', await doc(`SELECT n.qid,n.so_lan,n.so_sai,n.ty_le_sai,n.trang_thai,substr(COALESCE(n.ghi_chu,''),1,160) ghi_chu,n.luc FROM cau_nghi_dap_an n WHERE n.qid IN(SELECT o.qid FROM omni_q o JOIN game_v2_question q ON q.qid=o.qid WHERE o.vkn_json LIKE '%gia_tri_trung_binh%' AND q.ma_de LIKE 'DH-12-%')`))
 in1('phamViLop12', await doc(`SELECT lop,COUNT(*) bai,SUM(ma_de_json LIKE '%DH-12-C1-B1%') co_b1 FROM pham_vi_lop WHERE lop LIKE '12%' GROUP BY 1`))
+// Hỏi thêm Thầy (Gemini, PR268) báo "đang gặp lỗi" (thầy gửi ảnh 13/10 18:2x): lỗi máy chủ ghi ở cột `loi` — chỉ in giờ, model, ms, lỗi (không sbd, không câu hỏi).
+in1('hoiThemLoi', await doc(`SELECT luc,model,ms,substr(loi,1,260) loi FROM hoi_tro_ly WHERE loi IS NOT NULL ORDER BY id DESC LIMIT 8`))
+in1('hoiThemDem', await doc(`SELECT ngay_vn,COUNT(*) n,SUM(loi IS NULL) ok,SUM(loi IS NOT NULL) loi FROM hoi_tro_ly GROUP BY 1 ORDER BY 1 DESC LIMIT 3`))
+in1('hoiThemCauHinh', await doc(`SELECT gia_tri,cap_nhat_luc FROM cau_hinh WHERE khoa LIKE '%hoi_them%' OR khoa LIKE '%hoi_tro_ly%'`))
