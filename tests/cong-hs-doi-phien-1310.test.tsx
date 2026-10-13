@@ -74,6 +74,19 @@ it('mở Mom trên máy mới lấy câu trả lời đã lưu trên máy chủ 
   await moMom()
   expect(screen.getByTestId('mom-tra').textContent).toBe('{"q1":"B"}')
 })
+it('nháp local cũ không đè đáp án đã lưu trên máy khác; chỉ bù câu máy chủ còn trống', async () => {
+  const bai = { ...baiMom, soCau: 2, dsCau: [...baiMom.dsCau, { ...baiMom.dsCau[0], id: 'q2' }] }
+  localStorage.setItem('omr_mom_draft_S1_mom1', JSON.stringify({ q1: 'A', q2: 'C', ngoai: 'D' }))
+  api.mom.mockImplementation(async (action: string) => action === 'list' ? { ok: true, items: [bai] } : { ok: true, item: { ...bai, dapAnDaNop: { q1: 'B', q2: '' } } })
+  await moMom()
+  expect(JSON.parse(screen.getByTestId('mom-tra').textContent!)).toEqual({ q1: 'B', q2: 'C' })
+})
+it('nháp offline còn nguyên khi máy chủ chưa có câu trả lời', async () => {
+  localStorage.setItem('omr_mom_draft_S1_mom1', JSON.stringify({ q1: 'B' }))
+  api.mom.mockImplementation(async (action: string) => action === 'list' ? { ok: true, items: [baiMom] } : { ok: true, item: { ...baiMom, dapAnDaNop: { q1: '' } } })
+  await moMom()
+  expect(screen.getByTestId('mom-tra').textContent).toBe('{"q1":"B"}')
+})
 it('kết quả Mom dùng đáp án sau nộp từ máy chủ, không lưu phiếu tự đoán đáp án A', async () => {
   const daNop = { ...baiMom, trangThai: 'da_nop', nopLuc: new Date().toISOString(), diem: 10, soCauDung: 1, dapAnDaNop: { q1: 'B' } }
   api.mom.mockImplementation(async (action: string) => action === 'list' ? { ok: true, items: [baiMom] } : action === 'submit' ? { ok: true, item: daNop } : action === 'review' ? { ok: true, item: { ...daNop, dsCau: [{ ...baiMom.dsCau[0], dapAn: 'B', loiGiai: 'Phần chữa thật' }] } } : { ok: true, item: baiMom })

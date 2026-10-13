@@ -443,7 +443,9 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
         const raw = localStorage.getItem(`omr_mom_draft_${auth.sbd}_${bai.id}`) || localStorage.getItem(`omr_mom_draft_${bai.id}_${auth.sbd}`)
         if (raw) {
           const parsed = JSON.parse(raw)
-          answers = { ...answers, ...(parsed.cauTraLoi || parsed) }
+          // API không có mốc sửa từng câu: nháp máy chỉ bù câu trống, không đè đáp án đã lưu trên máy khác.
+          const daLuu = Object.fromEntries(Object.entries(answers).filter(([, v]) => typeof v === 'string' && v.trim()))
+          answers = { ...(parsed.cauTraLoi || parsed), ...daLuu }
         }
       } catch {}
       const ids = new Set(capNhat.dsCau.map(c => c.id))
