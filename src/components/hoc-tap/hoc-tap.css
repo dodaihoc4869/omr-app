@@ -505,3 +505,6 @@ button.ht2-hn-nhip-bam:hover{border-color:color-mix(in srgb,var(--lg-nhan) 45%,v
 .ht2-moi-sua-nut:active{transform:scale(.99)}
 @media(min-width:700px){.ht2-moi-sua{grid-template-columns:auto minmax(0,1fr) auto;gap:16px;padding:18px 22px}.ht2-moi-sua-nut{grid-column:auto;min-width:220px}}
 @media(prefers-reduced-motion:reduce){.ht2-moi-sua-nut{transition:none}}
+/* ĐỢT 19: ô hình Tự sửa lỗi (hình vẽ riêng nạp lười — BieuTuongTuSua.tsx + bieu-tuong.css; ô giữ chỗ đúng cỡ) · chỗ chờ khi mở tab Hành trình / Ôn & sửa. */
+.ht2-moi-sua .ht2-moi-sua-bt{width:60px;height:60px;flex-basis:60px;background:none}
+.ht2-cho-tab{min-height:320px;border-radius:24px;background:var(--the-2)}
