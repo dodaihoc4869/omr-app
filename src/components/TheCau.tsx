@@ -65,8 +65,9 @@ interface BaseProps {
    * `layCauGoc` là hàm có hành vi không phụ thuộc lần vẽ (nhớ bằng ref ở nơi gọi) nên `bangPropsBoQuaHam` coi mọi hàm là bằng nhau. */
   daDungO?: { nhan: string; gocQid?: string; layCauGoc?: LayCauGoc }
   onZoom?: (src: string) => void
-  /** Nút "Hỏi thầy" (thầy lệnh 30/09: CHỈ hiện khi lời giải đang hiện). Vẽ BÊN TRONG khối lời giải ⇒ chế độ `thi`
-   * (chưa có lời giải) hoặc câu không có lời giải thì không có nút. KHÔNG truyền trong màn thi. */
+  /** Nút "Hỏi thầy". THẦY 13/10 ("nút hỏi bài ở tất cả các câu… dễ nhìn thấy… hỏi bài thầy mọi lúc"): ngay DƯỚI phần trả lời, mọi chế độ;
+   * chế độ `thi` (em chưa trả lời) ⇒ chỉ Hỏi thầy, Thầy gợi hướng không đáp án. "Lời giải từng bước" chỉ ở chế độ xem lại khi câu có lời giải
+   * (lệnh 30/09). KHÔNG truyền trong màn thi, Gọi lên bảng, lúc làm bài kiểm tra cá nhân. */
   hoiThay?: { qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean }
 }
 
@@ -205,10 +206,15 @@ function DaiDaDung({ nhan }: { nhan: string }) {
   )
 }
 
+/** Câu có lời giải để hiện (chốt, giải thích, bước, lý do từng phương án/ý). */
+const coLoiGiai = (props: TheCauProps) => {
+  const lg = props.loiGiai
+  return !!lg?.chot || !!props.explanation?.trim() || !!(lg?.buoc && lg.buoc.length > 0) || !!lg?.tungPa || !!lg?.tungY
+}
+
 function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai }) {
   const lg = props.loiGiai
   const text = props.explanation
-  const coGi = !!lg?.chot || !!text?.trim() || !!(lg?.buoc && lg.buoc.length > 0) || !!lg?.tungPa || !!lg?.tungY
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
       {nhan === 'nghi_dap_an_sai' && (
@@ -229,7 +235,6 @@ function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai 
         choicePerm={props.phan === 'I' ? props.choicePerm : undefined}
         yPerm={props.phan === 'II' ? props.yPerm : undefined}
       />
-      {coGi && props.hoiThay && <NutHoiThay qid={props.hoiThay.qid} nguon={props.hoiThay.nguon} onHoi={props.hoiThay.onHoi} gon={props.hoiThay.gon} />}
     </div>
   )
 }
@@ -466,6 +471,12 @@ export default function TheCau(props: TheCauProps) {
         <HinhTaiViTri hinhAnh={hinhAnh} viTri="sau_de" onZoom={onZoom} nhan={nhan} /></ExperimentOriginal>
         {body}
         <HinhTaiViTri hinhAnh={hinhAnh} viTri="cuoi_cau" onZoom={onZoom} nhan={nhan} />
+        {/* THẦY 13/10 "nút hỏi bài ở tất cả các câu… vị trí học sinh dễ nhìn thấy… hỏi bài thầy mọi lúc": ngay dưới phần trả lời, mọi chế độ.
+            Đang làm (`thi`) ⇒ chỉ Hỏi thầy, Thầy gợi hướng không đáp án; xem lại + có lời giải ⇒ thêm Lời giải từng bước (lệnh 30/09). */}
+        {props.hoiThay && (
+          <NutHoiThay gon qid={props.hoiThay.qid} nguon={props.hoiThay.nguon} onHoi={props.hoiThay.onHoi}
+            dangLam={!xemLai} chi={xemLai && coLoiGiai(props) ? undefined : 'hoi'} />
+        )}
         {xemLai && <LoiGiai props={props} nhan={props.nhanLoiGiai} />}
       </div>
     </TheNoiDung>

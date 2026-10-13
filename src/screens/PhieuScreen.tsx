@@ -14,7 +14,7 @@
 // Hoạt ảnh chỉ động vào `transform`, `opacity`, `stroke-dashoffset` và chiều cao
 // bằng grid — không thứ nào bắt trình duyệt tính lại bố cục, nên mượt trên máy
 // yếu. Máy bật "giảm chuyển động" thì hiện thẳng trạng thái cuối.
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
 import { chanSoCau, docLinkPhieu } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
@@ -257,6 +257,9 @@ export function laLoiCho(loi: string): boolean {
   return s.includes('không trả lời sau') || s.includes('Failed to fetch') || s.includes('NetworkError') || s.includes('HTTP 5')
 }
 
+// Nghe nút Hỏi thầy của phiếu bài tập (13/10) — tách mảnh, chỉ tải khi mở phiếu bài tập.
+const NgheHoiThayPhieu = lazy(() => import('../components/loi-giai/NgheHoiThayPhieu'))
+
 export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duCoSan?: PhieuDayDu; laCuaEm?: boolean; xinLink?: () => Promise<string> } = {}) {
   const [du, setDu] = useState<PhieuDayDu | null | undefined>(duCoSan ?? undefined)
   // Link phiếu bài tập: trang này chỉ việc hiện trọn tài liệu HTML đã dựng.
@@ -332,9 +335,16 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
   }, [du])
 
   const [oDau, raDau] = useHienKhiToi<HTMLDivElement>(tat)
+  const khungBt = useRef<HTMLIFrameElement>(null)
 
   if (phieuBt) {
-    return <iframe title="Phiếu bài tập" srcDoc={themCssMayYeu(phieuBt)} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
+    // 13/10: nút Hỏi thầy trên phiếu nhắn lên đây (trước đây không ai nghe ⇒ nút chết).
+    return (
+      <>
+        <iframe ref={khungBt} title="Phiếu bài tập" srcDoc={themCssMayYeu(phieuBt)} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
+        <Suspense fallback={null}><NgheHoiThayPhieu khung={khungBt} /></Suspense>
+      </>
+    )
   }
 
   // VỎ LỖI mặc M3 ở cổng học sinh / phụ huynh (dungM3()): nền surface, chữ theo bảng màu M3 (sáng/tối), nút Thử lại đủ

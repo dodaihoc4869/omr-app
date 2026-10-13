@@ -1,0 +1,32 @@
+# HỎI THÊM THẦY (13/10): đọc LỖI gọi Gemini trong sổ `hoi_tro_ly` (CHỈ ĐỌC). Repo công khai ⇒ chỉ in giờ, model, thời gian, chữ lỗi —
+# KHÔNG in sbd, câu hỏi hay câu trả lời của em. Bấm tay hoặc tự chạy khi đẩy nhánh KHÁC main có sửa tệp này.
+name: Hỏi thêm Thầy — đọc lỗi Gemini (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/doc-loi-hoi-them-thay-1310.yml']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: doc-loi-hoi-them-thay-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc 10 lỗi gần nhất + số lượt (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx -y wrangler@4 d1 execute omr --remote --command "SELECT COUNT(*) AS tong, SUM(CASE WHEN loi IS NULL THEN 1 ELSE 0 END) AS tra_loi_duoc, SUM(CASE WHEN loi IS NOT NULL THEN 1 ELSE 0 END) AS loi FROM hoi_tro_ly" 2>&1 | tail -n 20
+          npx -y wrangler@4 d1 execute omr --remote --command "SELECT luc, model, ms, loi FROM hoi_tro_ly WHERE loi IS NOT NULL ORDER BY id DESC LIMIT 10" 2>&1 | tail -n 40

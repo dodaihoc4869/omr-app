@@ -7,7 +7,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { baoDocLoiGiai, guiCauKiem, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu, type SuKienKhung } from '../../lib/loi-giai-api'
 import ThanhThangGo from './ThanhThangGo'
-import HoiThemThay from './HoiThemThay'
 import KhoiLoiGiaiChuan, { chuanSangCauTruc } from './KhoiLoiGiaiChuan'
 import './loi-giai.css'
 
@@ -42,7 +41,7 @@ function LoiGiaiChuView({ cau, lg }: { cau: CauChoKhung; lg: LoiGiaiChu }) {
 
 const KIEU_SU_KIEN = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot', 'mo_buoc', 'kiem'])
 
-export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', trongTrang = false, hoiThem = false, onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; trongTrang?: boolean; hoiThem?: boolean; onDong: () => void }) {
+export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', trongTrang = false, onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; trongTrang?: boolean; onDong: () => void }) {
   const khung = useRef<HTMLIFrameElement>(null)
   // GĐ1 v2: gom thao tác em làm trong khung (khung chỉ postMessage, không gọi mạng) — đóng hộp thì gửi một lần. Màn thầy không gửi.
   const suKien = useRef<SuKienKhung[]>([])
@@ -110,7 +109,6 @@ export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false
         <div className="lg-cuon"><LoiGiaiChuView cau={cau} lg={loiGiaiChu} /></div>
       ) : null}
       {coThang && kiem && <ThanhThangGo qid={cau.qid} kiem={kiem} lanTai={lanTai} layDang={layDang} />}
-      {hoiThem && !thay && <HoiThemThay qid={cau.qid} nguon={nguon} />}
     </div>
   )
 }

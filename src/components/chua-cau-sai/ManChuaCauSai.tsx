@@ -450,7 +450,8 @@ export default function ManChuaCauSai({
                     <span aria-hidden="true">＋</span>
                   </summary>
                   <div className="ccs-cau-goc-noi m3">
-                    <TheCau {...cauGocDe} />
+                    {/* Thầy 13/10: Hỏi thầy ở mọi câu — đề gốc của câu đang chữa (Thầy gợi hướng). */}
+                    <TheCau {...cauGocDe} hoiThay={{ qid, nguon: 'tu_chua' }} />
                   </div>
                 </details>
               )}

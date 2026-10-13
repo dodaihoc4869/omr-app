@@ -29,15 +29,18 @@
 // `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
 // thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
 // là phiếu co theo ngay.
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { ThanhTren, dungM3 } from './m3'
 import { themCssMayYeu } from '../lib/may-yeu'
 import './m3/khung-xem-phieu.css'
 import type { TinNopChang } from '../lib/btvn-nop-chang-em'
-import { hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu } from '../lib/loi-giai-api'
-import KhungLoiGiai from './loi-giai/KhungLoiGiai'
+import { CHU_LAM_XONG, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu } from '../lib/loi-giai-api'
+
+// Luật tốc độ (thầy 13/10): khung xem phiếu nằm trong mảnh tải lúc mở app ⇒ hộp hỏi Thầy / khung lời giải tách mảnh, tải khi em bấm Hỏi thầy.
+const KhungLoiGiai = lazy(() => import('./loi-giai/KhungLoiGiai'))
+const HopHoiThay = lazy(() => import('./loi-giai/HopHoiThay'))
 
 export interface KhungXemPhieuProps {
   /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
@@ -56,7 +59,7 @@ export interface KhungXemPhieuProps {
 }
 
 export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: KhungXemPhieuProps) {
-  const [hoi, setHoi] = useState<{ cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; hoiThem?: boolean } | null>(null)
+  const [hoi, setHoi] = useState<{ cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; hoiThem?: boolean; dangLam?: boolean } | null>(null)
   const [loiHoi, setLoiHoi] = useState('')
   const hoiMoRef = useRef(false)
   hoiMoRef.current = hoi !== null
@@ -136,9 +139,12 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
       if (e.data?.type === 'ddh-hoi-thay' && e.data.qid) {
         // NÚT HỎI THẦY trên phiếu học sinh (29/09): chỉ nhận từ chính iframe của khung này; máy chủ tự chặn câu đang thi.
         if (e.source !== iframeRef.current?.contentWindow) return
-        void hoiThay(String(e.data.qid), 'phieu').then((r) => {
-          if (r.ok) setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined, hoiThem: r.hoiThem === true })
-          else setLoiHoi(r.loi)
+        // 13/10: phiếu báo `dangLam` (em chưa nộp / phiếu không kèm lời giải) ⇒ máy chủ chỉ trả đề, Thầy gợi hướng, không đáp án.
+        const dangLam = e.data.dangLam === true
+        void hoiThay(String(e.data.qid), 'phieu', dangLam).then((r) => {
+          if (!r.ok) setLoiHoi(r.loi)
+          else if (dangLam && !r.hoiThem) setLoiHoi(CHU_LAM_XONG)
+          else setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined, hoiThem: r.hoiThem === true, dangLam })
         })
         return
       }
@@ -245,7 +251,10 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
           ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo.
           (Dưới M3 nút Đóng nằm trong thanh trên ở trên.) */}
       {phu}
-      {hoi && <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" hoiThem={hoi.hoiThem} onDong={() => setHoi(null)} />}
+      {/* Thầy 13/10: phần hỏi Thầy đang mở ⇒ Hỏi thầy mở thẳng HỘP HỎI THẦY, không mở lời giải từng bước. */}
+      {hoi && <Suspense fallback={null}>{hoi.hoiThem
+        ? <HopHoiThay cau={hoi.cau} nguon="phieu" dangLam={hoi.dangLam} onDong={() => setHoi(null)} onMoLoiGiai={hoi.dangLam ? undefined : () => setHoi({ ...hoi, hoiThem: false })} />
+        : <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" onDong={() => setHoi(null)} />}</Suspense>}
       {loiHoi && (
         <div className="lg-bao-loi m3" role="alert">
           <span>{loiHoi}</span>
