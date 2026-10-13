@@ -4038,6 +4038,7 @@ export function laGioCaoDiemVn(nowMs: number): boolean {
 
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
 export { BanBiA } from './ban-bi-a-dong'
+export { TramGemini } from './tram-gemini'
 export default {
   ...boXuLy,
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
