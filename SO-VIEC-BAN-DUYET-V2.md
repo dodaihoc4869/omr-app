@@ -383,3 +383,5 @@ Thầy nhắn thêm (13/10, giữa lúc dựng đợt 20): "khi mọi thứ xong
 - [x] Toàn bộ vitest so tên với main (đã gộp PR262): 2 tên mới đỏ đều chập chờn, không thuộc phần đổi — ph-v3-app-2809 đỏ cả trên main (1/4 lượt), escort-context-menu xanh 4/4 khi chạy lại
 - [!] Test chập chờn có sẵn: tests/ph-v3-app-2809 "BA mục điều hướng…" (đỏ ngẫu nhiên ~1/4 cả trên main) — sửa gốc trong đợt tối ưu sau
 - [x] Phát hành đợt 20 | bằng chứng: PR264 → main da132cbd, Actions 38360819715 SUCCESS 14:17 VN. Lùi: git revert da132cbd && git push origin main
+- [x] Đợt 21 tối ưu máy chủ chuyên sâu — dựng + phát hành | bằng chứng: PR265 → main 3e9433bb, Actions 38363992966 SUCCESS 14:47 VN; tests/toi-uu-may-chu-dot21-1310 2/2 (cron không đổi ≤ 4 lệnh nhẹ, 0 lệnh ghi; Nhịp học đọc sổ 1 lần / 5 phút); toàn bộ vitest 15685 test so tên với đợt 20: 0 đỏ mới, hết 2 đỏ chập chờn. Lùi: git revert 3e9433bb && git push origin main
+- [ ] Đo trước/sau đợt 21 bằng số thật (do-may-chu-gio-qua-1310, 3 giờ sau phát hành) so mốc 3 giờ trước 13:58 VN: Worker p50 0,054 s · p90 0,84 s · p99 3,26 s; CPU p90 237 ms · p99 953 ms; D1 tổng 870 s | bằng chứng: (chưa có)
