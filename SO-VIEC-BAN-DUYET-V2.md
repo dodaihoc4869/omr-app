@@ -397,3 +397,10 @@ Thầy (13/10): "Bạn tự làm hết nhé" (khối 12 thiếu nguồn giá tr�
 - [x] Khối 12 có đề Hóa 2026 | bằng chứng: Claude giải lại câu DH-12-C1-B1-P2 II-15 (đáp án kho đúng) → gỡ nghi; run 38380453141: 126/126 em lập lại, 0 lỗi; khối 12: Lớp Thường 68 em/204 lịch, Nhóm 10 điểm 15/45, Tinh Hoa 43/129 (3 bài/em)
 - [x] Kiểm D1 sau khi bật cờ (không lặp sự cố quá tải) | bằng chứng: run 38382091507 (09:15–10:15 UTC): Worker 1752 yêu cầu 0 lỗi, p50 0,032 s · p90 0,34 s · p99 0,97 s (mốc 0,054/0,84/3,26); D1 147 s/giờ (mốc ~290); truy vấn kiểm tra riêng không vào top 30
 - [ ] Đợt 22 tối ưu: danhMuc (hanh-trinh-v5-d1) quét ~38.000 dòng 229 lần/giờ TB 74 ms; cauCuaToChiTiet (srs2-gv, đọc json cả tờ) 327 lần/giờ TB 75 ms — gộp vào lượt đo 17:50 | bằng chứng: (chưa có)
+- [x] Đo trước/sau đợt 21 (run 38386293740, 3 giờ sau phát hành) | bằng chứng: Worker p50 0,054→0,033 s · p90 0,84→0,32 s · p99 3,26→0,93 s · CPU p99 953→840 ms · 0 lỗi; D1 top-30 870→327 s (~100 s là lượt chuyển đề một lần)
+Thầy (13/10): "Bản mới vẫn bị lỗi" (ảnh Hỏi Thầy báo lỗi)
+- [x] Tìm gốc lỗi Hỏi thêm Thầy | bằng chứng: hoi_tro_ly.loi = HTTP 404 "models/gemini-2.5-flash is no longer available to new users"; PR271 (Heisenberg) đổi sang gemini-3.5-flash-lite chạy được 18:19 (1,4–1,7 s); cấu hình gemini-3.8-flash Claude đặt 18:21 đã gỡ 18:27 (chậm 7,6–13 s)
+Thầy (13/10): "Tôi muốn giao diện đề chuẩn theo hiển thị của đề bài. Phần hướng dẫn lời giải phải hiển thị khoa học hơn, ngắt câu tô đậm … hs đọc cái hiểu ngay"
+- [x] Bản vẽ + đặc tả 7 mục (bước 2 quy trình) | bằng chứng: docs/ban-ve-hoi-thay-1310 (8 ảnh Chromium, soát 0 lỗi/0 tràn/0 đích <44 px), đã gửi thầy
+- [ ] Thầy duyệt bản vẽ Hỏi Thầy ⇒ dựng (làn Heisenberg, ghi DIEU-PHOI trước) | bằng chứng: (chưa có)
+- [x] Đợt 22 tối ưu máy chủ: dấu kho câu | bằng chứng: tests/toi-uu-may-chu-dot22-1310 2/2; liên quan 32/32 (gồm trần lệnh hoa2-sanh); toàn bộ 15736 test so tên: 1 đỏ mới là ph-v3-app-2809 chập chờn (chạy lại 13/13); kiem:toc-do 0 đỏ
