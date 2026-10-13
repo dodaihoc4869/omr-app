@@ -6,7 +6,9 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 const GOC = 'https://omr.ttadodaihoc.workers.dev'
 const SANH = { ok: true, cheDo2: true, ngay: '2026-10-06', theLuc: { con: 28, tong: 40 } }
 const thanTk = (token: string) => JSON.stringify({ token })
-const DUONG_SANH = '/game-v2/hoa2-sanh'
+// SỬA CÓ CHỦ ĐÍCH 13/10: lệnh Sảnh của cổng học sinh = `hoc-tap-sanh` (Hôm nay dùng đúng lệnh này); đăng nhập xin `kemSanh: 'hoc-tap'` (bản cũ
+// `kemSanh: true` ⇒ máy chủ vẫn trả hoa2-sanh). Trước: hỏi sớm / kèm đăng nhập `hoa2-sanh` mà màn không nhận ⇒ máy chủ chạy thừa một Sảnh đầy đủ.
+const DUONG_SANH = '/game-v2/hoc-tap-sanh'
 
 const mocks = vi.hoisted(() => ({ dangNhap: vi.fn(), cong: { thay: null as null | (() => unknown) } }))
 vi.mock('../src/lib/exam-db', async (goc) => ({ ...(await goc<Record<string, unknown>>()), loadScriptUrlHoacMacDinh: async () => '/test' }))
@@ -28,7 +30,7 @@ vi.mock('../src/screens/StudentPortalScreen', async () => {
   return {
     default: function CongGia() {
       const tk = JSON.parse(localStorage.getItem('omr_student_portal_auth') ?? '{}').token as string
-      const x = xemHoiSomDaVe('/game-v2/hoa2-sanh', JSON.stringify({ token: tk }))
+      const x = xemHoiSomDaVe(DUONG_SANH, JSON.stringify({ token: tk }))
       const o = x ? (JSON.parse(x.text) as { ok?: boolean; theLuc?: unknown }) : null
       const hopLe = !!o && o.ok === true && !!o.theLuc // như `docSanh`: phải đủ phần bắt buộc mới dùng được cho lượt vẽ đầu
       mocks.cong.thay = () => (hopLe ? o : null)

@@ -34,8 +34,10 @@ export interface BangNapTruoc {
   hsVo?: string[]
   /** Phông Sảnh (chỉ nạp khi trang đã do service worker phục vụ). */
   phongHs?: string[]
-  /** Mảnh KaTeX (`katex-goi` + CSS): máy CHƯA đăng nhập nạp trước cùng mảnh cổng (ưu tiên thấp) — xem `taoMaNapTruoc`. */
+  /** Mảnh KaTeX (`katex-goi` + CSS). 13/10: KHÔNG nạp trước ở cổng học sinh nữa (main.tsx tải lúc rảnh sau khi trang tải xong — máy yếu). */
   katex?: string[]
+  /** Ảnh thần thú của màn đăng nhập học sinh (phần tử lớn nhất màn đầu — `LoiChao`, `anhThu(1, 50)`): máy CHƯA đăng nhập nạp trước ngay. */
+  anhDangNhapHs?: string
 }
 
 /** Khoá localStorage của phiên đăng nhập cổng học sinh (= `KHOA_LUU_AUTH` StudentPortalScreen; phien-hoc-sinh.ts xuất lại). Tệp này không
@@ -48,7 +50,7 @@ export const KHOA_DIA_CHI_HS = 'ddh.mayChuHs'
 /** Lệnh Sảnh hỏi sớm: đường + thân (theo `token` hay `sbd` của phiên) — y hệt lệnh các màn gửi lúc dựng Sảnh
  *  (hoa2/api.ts goiHoa2, bang-nhiem-vu/may-chu.ts goiPost, buoi-hoc-api.ts goiHs, exam-api.ts hsLichSuCaApi). */
 export const LENH_HOI_SOM: [string, 'token' | 'sbd'][] = [
-  ['/game-v2/hoa2-sanh', 'token'],
+  ['/game-v2/hoc-tap-sanh', 'token'], // 13/10: đúng lệnh Hôm nay dùng (trước: hoa2-sanh — hỏi thừa, màn không nhận)
   ['/hs/ke-hoach-ngay', 'token'],
   ['/hs/ca-dang-mo', 'token'],
   ['/hs/buoi-hoc', 'token'],
@@ -123,6 +125,7 @@ export function taoMaNapTruoc(bang: BangNapTruoc): string {
     `if(c==='hs'&&b.hsVo){var p=null;try{p=JSON.parse(localStorage.getItem(${JSON.stringify(KHOA_PHIEN_HS)})||'null')}catch(e){}nap(b.hsVo);` +
     `if(p){nap(b.hs);var g='';try{g=localStorage.getItem(${JSON.stringify(KHOA_DIA_CHI_HS)})||''}catch(e){}` +
     `if(/^https:\\/\\/[^\\/]+$/.test(g)&&typeof fetch==='function'){try{(${hoiSomSanh.toString()})(window,g,p,${JSON.stringify(LENH_HOI_SOM)},true)}catch(e){}}` +
-    `if(navigator.serviceWorker&&navigator.serviceWorker.controller)nap(b.phongHs)}else document.addEventListener('DOMContentLoaded',function(){nap(b.hs,1);nap(b.katex,1)});return}` +
+    `if(navigator.serviceWorker&&navigator.serviceWorker.controller)nap(b.phongHs)}else{if(b.anhDangNhapHs){var a=document.createElement('link');a.rel='preload';a.as='image';a.href=b.anhDangNhapHs;document.head.appendChild(a)}` +
+    `document.addEventListener('DOMContentLoaded',function(){nap(b.hs,1)})}return}` +
     `if(b.app&&c!=='hs')nap(b.app);nap(c&&b[c])}catch(e){}})()`
 }

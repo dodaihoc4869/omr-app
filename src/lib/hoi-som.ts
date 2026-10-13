@@ -94,7 +94,9 @@ function nhanSanhKemDangNhap(goc: string, token: string, kem: KemDangNhap): void
   )
   k[DUONG_SANH] = muc
 }
-const DUONG_SANH = '/game-v2/hoa2-sanh'
+// 13/10: cổng học sinh dựng Hôm nay bằng `hoc-tap-sanh` (hoa2/api.ts `useSanhHoa2(…, tapTrung = true)`) — hỏi sớm ĐÚNG lệnh ấy. Trước: hỏi sớm
+// `hoa2-sanh` mà màn không bao giờ nhận ⇒ mỗi lần mở app máy chủ chạy thừa một Sảnh đầy đủ.
+export const DUONG_SANH = '/game-v2/hoc-tap-sanh'
 
 /** Gửi sớm các lệnh Sảnh cho phiên vừa đăng nhập (cùng hàm đoạn mã nội tuyến dùng). `kem` (máy chủ đính kèm đăng nhập: `sanh` có sẵn / `sanhHua` đang về) thay cho lệnh `hoa2-sanh`. */
 export function batDauHoiSom(goc: string, phien: { token?: string; sbd?: string }, kem?: KemDangNhap): void {

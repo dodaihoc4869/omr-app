@@ -303,3 +303,7 @@ Thầy nhắn thêm (13/10): "Tôi muốn bạn tính toán tối ưu sắp xế
 - [ ] Không chậm hơn: không thêm truy vấn D1, cổng kiem:toc-do xanh | bằng chứng: (chưa có)
 Thầy nhắn thêm: "Hiện bậc trên màn chiếu luôn nhé."
 - [ ] Hiện bậc 1–12 (màu riêng) trên màn chiếu điểm danh cả lớp | bằng chứng: (chưa có)
+Thầy nhắn thêm: "Xong thì đẩy lên luôn nhé, đảm bảo máy chủ luôn nhann, load app ổn định tức thì, tối ưu cả cho máy yếu"
+- [ ] Đo app trên máy yếu (Chromium thật, CPU chậm 6×, mạng 4G chậm): byte tải, số yêu cầu, thời điểm hiện nội dung, tổng thời gian chặn luồng — 3 app, bản đang chạy vs bản mới | bằng chứng: (chưa có)
+- [ ] Xử lý các chỗ tốn nhất tìm được (ảnh nặng, mã chặn luồng…) — phải đo lại thấy nhanh hơn | bằng chứng: (chưa có)
+- [ ] Đẩy lên + phát hành khi xong (kiểm ca mở) | bằng chứng: (chưa có)
