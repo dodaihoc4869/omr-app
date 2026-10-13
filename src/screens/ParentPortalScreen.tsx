@@ -43,11 +43,12 @@ export default function ParentPortalScreen() {
         datPassPhuHuynh('')
         setThongBaoLoi(kq.error)
       }
-      const sbdLuu = localStorage.getItem(SBD_STORAGE_KEY)
+      let sbdLuu: string | null = null
+      try { sbdLuu = localStorage.getItem(SBD_STORAGE_KEY) } catch { /* máy chặn lưu: nhập SBD cho phiên này */ }
       if (sbdLuu && sbdLuu.trim()) {
         void dangNhapPhuHuynh(sbdLuu.trim(), u)
       }
-    })
+    }).catch(() => setThongBaoLoi('Chưa kết nối được máy chủ. Vui lòng thử lại.'))
   }, [])
 
   useEffect(() => {
@@ -88,7 +89,7 @@ export default function ParentPortalScreen() {
       setSbdHienTai(sbdSach)
       setHoTenCon(ten || `Học sinh SBD ${sbdSach}`)
       setLopCon(lop)
-      localStorage.setItem(SBD_STORAGE_KEY, sbdSach)
+      try { localStorage.setItem(SBD_STORAGE_KEY, sbdSach) } catch { /* vẫn xem báo cáo trong phiên này */ }
     } catch (e) {
       setThongBaoLoi(e instanceof Error ? e.message : 'Không đăng nhập được')
     } finally {
@@ -97,7 +98,7 @@ export default function ParentPortalScreen() {
   }
 
   const dangXuat = () => {
-    localStorage.removeItem(SBD_STORAGE_KEY)
+    try { localStorage.removeItem(SBD_STORAGE_KEY) } catch { /* vẫn thoát và xóa liên kết trong phiên này */ }
     xoaPass()
     datPassPhuHuynh('')
     setSbdHienTai(null)
