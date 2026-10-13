@@ -26,6 +26,8 @@ import type { Mau } from './dung-chung'
 import { chuThay } from './tien-ich'
 import './trang-con.css'
 
+const TheKiemTraCon = lazy(() => import('./TheKiemTraCon'))
+
 // ---------------------------------------------------------------- các phần trên trang ----------------------------------------------------------------
 export type IdPhan = 'hom-nay' | 'nhip' | 'thai-do' | 'cau-sai' | 'thoi-gian' | 'kiem-tra' | 'btvn' | 'buoi-hoc' | 'lich-su'
 type Bt = (p: { co?: number; day?: number }) => ReactElement
@@ -283,7 +285,12 @@ export default function TrangVeCon(p: TrangVeConProps) {
       ) : (
         <div className="tvc-luoi">
           <div className="tvc-nhom-trai">
-            <HomNay pm={pm} hoc2={hoc2} tq={tq} k={nhip.k} nowMs={nowMs} />
+            {/* Kiểm tra cá nhân (Codex PR258, docs/hop-dong-kiem-tra-ca-nhan-1310.md — giữ đúng luồng của ManHomNay cũ): ngày con có bài kiểm tra ⇒ thẻ
+                kiểm tra thay khối Hôm nay (ngày ấy không phát bài thường); ngày khác ⇒ thẻ lịch kiểm tra sắp tới ngay dưới khối Hôm nay. */}
+            {hoc2?.kiemTraCaNhan?.homNay
+              ? <Suspense fallback={<section className="tvc-the tvc-cho tt-xuong" role="status" aria-label="Đang mở bài kiểm tra của con" />}><TheKiemTraCon kt={hoc2.kiemTraCaNhan} /></Suspense>
+              : <HomNay pm={pm} hoc2={hoc2} tq={tq} k={nhip.k} nowMs={nowMs} />}
+            {hoc2?.kiemTraCaNhan && !hoc2.kiemTraCaNhan.homNay && hoc2.kiemTraCaNhan.trangThai !== 'cho_nguon' && <Suspense fallback={null}><TheKiemTraCon kt={hoc2.kiemTraCaNhan} /></Suspense>}
             <NhipHoc pm={pm} tq={tq} nhip={nhip} />
           </div>
           <div className="tvc-nhom-phai">
