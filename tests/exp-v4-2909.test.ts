@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "vang-xem … vang-doi" (lệnh cửa hàng `vang-*` đã gỡ) và cờ `shop_phu_kien` thừa.
 // LUẬT EXP v4 (thầy chốt 29/09/2026 "chốt theo đề xuất, build luôn" — docs/DE-XUAT-EXP-2909.md). Bảng nghiệm thu:
 //   (1) đường cấp công thức đóng; (2) mô phỏng em chăm nhất: ngày 20 cấp 9, ngày 21 cấp 10, khiên đầu ngày 21; (3) trần KIẾM (câu 3× mục tiêu, khắc phục ≤ 3, lên bậc ≤ 10);
 //   (4) vàng 1 / 5 EXP; (5) khoá mốc 21 ngày đạt (EXP chờ, không mất); (6) chuyển dữ liệu cũ v3 → v4 không tụt cấp, gọi lại không nạp đôi; (7) khiên bằng vàng, không cần cấp 10;
@@ -176,7 +177,6 @@ describe('(8) D1: đúc vàng lười, rèn khiên bằng vàng, vang-doi đã b
     const d = taoD1That()
     d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em','12','mk','x')").run()
     d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run('S1', JSON.stringify({ pet: 'lua_phuong', choice: false, legacy: null, cap: 5, exp: 40, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2026-09-01T00:00:00.000Z', luatCap: 4, mocVang: 0, ...p }), 'x')
-    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('shop_phu_kien',?,'x')").run(JSON.stringify({ bat: true }))
     return d
   }
   const vangSo = (d: D1That): number => (d.sql.prepare("SELECT COALESCE(SUM(so_vang),0) v FROM vang_so WHERE sbd='S1'").get() as { v: number }).v
@@ -189,13 +189,6 @@ describe('(8) D1: đúc vàng lười, rèn khiên bằng vàng, vang-doi đã b
     expect(vangSo(d)).toBe(300 + 300)
     const dong = d.sql.prepare("SELECT so_vang, exp_tru FROM vang_so WHERE sbd='S1' AND khoa_yeu_cau LIKE 'duc|%' ORDER BY id").all() as { so_vang: number; exp_tru: number }[]
     expect(dong).toEqual([{ so_vang: 200, exp_tru: 0 }, { so_vang: 100, exp_tru: 0 }])
-  })
-  it('vang-xem: đúc rồi trả số dư; không còn ống nghiệm/đổi tay; vang-doi ⇒ da_bo, không ghi gì', async () => {
-    const d = dung({ earned: 2000 })
-    const tk = await gameToken(d.env, 'S1')
-    expect(await gameV2(d.env, 'vang-xem', { token: tk })).toMatchObject({ ok: true, bat: true, vang: 400, ongNghiem: 0, doiToiDa: 0, expMoiVang: 5 })
-    expect(await gameV2(d.env, 'vang-doi', { token: tk, soExp: 10, khoaYeuCau: 'khoa-abcdefgh' })).toMatchObject({ ok: false, ma: 'da_bo' })
-    expect(vangSo(d)).toBe(400)
   })
   it('SỬA CÓ CHỦ Ý 29/09 v5 — rèn khiên: trừ đúng 2 600 vàng MỘT lần (gửi lại cùng số đã rèn không trừ nữa); thiếu vàng ⇒ lỗi, không trừ', async () => {
     const d = dung({ earned: 13_500, cap: 3, expMoi: { daCong: 0, manhDaTinh: 36, ngayDat: 36 }, khienRen: { manh: 36, daRen: 0 } })

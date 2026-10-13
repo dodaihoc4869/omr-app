@@ -1,7 +1,7 @@
 // Hợp đồng chữa lỗi: quyền từ token, ảnh chụp bất biến, CAS và sổ học trong cùng batch.
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
-import { coCaDangMo } from './bi-a'
+import { coCaDangMo } from './ca-dang-mo'
 import { cauCongKhai, layCauChoEm } from './cau-theo-qid'
 import { chuanCauHinh, docCauHinh, tinhNangBat } from './chua-cau-sai-cau-hinh'
 import { docHocLieu } from './chua-cau-sai-hoc-lieu'

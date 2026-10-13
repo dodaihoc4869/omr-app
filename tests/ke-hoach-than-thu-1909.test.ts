@@ -1,6 +1,7 @@
 // @vitest-environment node
 // Sửa lỗi: trang chủ học sinh hiện sai thần thú ("Hoả Long cấp 1" luôn) vì client đọc bảng V1 `than_thu` mà lấy trường V2.
 // Thần thú thật nằm ở `game_v2_profile`; `/hs/ke-hoach-ngay` trả thêm `thanThu` đọc TƯƠI mỗi lần gọi.
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ `shopBat` khỏi khối thanThu và `doanMo` khỏi danh sách khoá phản hồi.
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'
 import { docThanThu, lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
@@ -18,7 +19,7 @@ describe('/hs/ke-hoach-ngay trả thêm thanThu (thần thú THẬT từ game_v2
     hoSo(d, 'S1', { pet: 'hoa_long', choice: false, cap: 7, nickname: 'Bé Lửa', exp: 3 })
     const r = await goi(d, 'S1')
     expect(r.ok).toBe(true)
-    expect(r.thanThu).toEqual({ pet: 'hoa_long', cap: 7, nickname: 'Bé Lửa', shopBat: false }) // SỬA CÓ CHỦ Ý 21/09: khối thanThu mang thêm shopBat (cờ cửa hàng, mặc định false) cho nút Cửa hàng của máy em
+    expect(r.thanThu).toEqual({ pet: 'hoa_long', cap: 7, nickname: 'Bé Lửa' }) // 14/10: cửa hàng đã gỡ ⇒ không còn shopBat
   })
 
   it('em CHƯA chọn thần thú (choice=true, pet chỉ là dat_quy điền tạm) → null, không bịa', async () => {
@@ -60,9 +61,9 @@ describe('/hs/ke-hoach-ngay trả thêm thanThu (thần thú THẬT từ game_v2
     themHs(d, 'B3'); hoSo(d, 'B3', { pet: 'hoa_long', choice: false, cap: 2, nickname: ' Tí ' })
     themHs(d, 'B4'); hoSo(d, 'B4', { pet: { x: 1 }, choice: false, cap: 2 })
     themHs(d, 'B5'); hoSo(d, 'B5', { pet: '', choice: false, cap: 2 })
-    expect((await goi(d, 'B1')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: null, shopBat: false })
-    expect((await goi(d, 'B2')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: null, shopBat: false })
-    expect((await goi(d, 'B3')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: 'Tí', shopBat: false })
+    expect((await goi(d, 'B1')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: null })
+    expect((await goi(d, 'B2')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: null })
+    expect((await goi(d, 'B3')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: 'Tí' })
     expect((await goi(d, 'B4')).thanThu).toBeNull()
     expect((await goi(d, 'B5')).thanThu).toBeNull()
   })
@@ -84,13 +85,13 @@ describe('/hs/ke-hoach-ngay trả thêm thanThu (thần thú THẬT từ game_v2
     const r = await goi(d, 'S1')
     const { thanThu: _t, ...con } = r
     const goc = (await lapVaLuuKeHoach(d.env, ['S1'], Date.now(), { luu: false })).get('S1')!
-    // `serverNow` do route `/hs/*` thêm sẵn từ trước; `doanMo` do route thêm từ cb80f0d (cờ mở game Đoàn, không thuộc kế hoạch); `no` + `veDich` do route thêm từ W3b (Dồn về đích: đọc-chỉ `docVeDichCuaEm`,
-    // chỉ-thêm, KHÔNG lưu vào ke_hoach_ngay — sửa CÓ CHỦ Ý 21/09); đều không phải của lệnh này.
-    expect(Object.keys(con).sort()).toEqual(['doanMo', 'no', 'ok', 'serverNow', 'veDich', ...Object.keys(goc)].sort())
+    // `serverNow` do route `/hs/*` thêm sẵn từ trước; `no` + `veDich` do route thêm từ W3b (Dồn về đích: đọc-chỉ `docVeDichCuaEm`,
+    // chỉ-thêm, KHÔNG lưu vào ke_hoach_ngay — sửa CÓ CHỦ Ý 21/09); đều không phải của lệnh này. (`doanMo` đã gỡ 14/10 cùng Đoàn.)
+    expect(Object.keys(con).sort()).toEqual(['no', 'ok', 'serverNow', 'veDich', ...Object.keys(goc)].sort())
     expect(d.chup('ke_hoach_ngay')).not.toMatch(/thanThu|hoa_long|Bé Lửa/)
     // Đổi thần thú rồi gọi lại → thấy ngay (đọc tươi, không cache trong kế hoạch).
     d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json, '$.pet', 'thuy_long', '$.cap', 9) WHERE sbd = 'S1'").run()
-    expect((await goi(d, 'S1')).thanThu).toEqual({ pet: 'thuy_long', cap: 9, nickname: 'Bé Lửa', shopBat: false })
+    expect((await goi(d, 'S1')).thanThu).toEqual({ pet: 'thuy_long', cap: 9, nickname: 'Bé Lửa' })
   })
 
   it('thêm đúng MỘT truy vấn', async () => {

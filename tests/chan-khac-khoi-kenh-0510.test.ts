@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "Đoàn kho lớp" (doan-mo đã gỡ); ca nợ mọi nguồn dựng lại bằng startDao2(…, true) thay startDoan2.
 // CHẶN CÂU KHÁC KHỐI — TỪNG KÊNH RÚT CÂU (luật A) + TỪNG DANH SÁCH CHỮA BÀI / CHIẾU LÊN BẢNG (luật B) trên D1 THẬT (điều phối 05/10/2026).
 // Lệnh thầy 05/10 (nguyên văn):
 //   1) "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé"
@@ -13,8 +14,7 @@ import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { layKeHoachHomNay } from '../server/src/srs2-d1'
-import { startDoan2 } from '../server/src/srs2-game'
-import { biaAction } from '../server/src/bi-a'
+import { startDao2 } from '../server/src/srs2-game'
 import { loiDenHan } from '../server/src/rut-de-v2'
 import { demChanKhoi, xoaDemChanKhoi } from '../server/src/chan-khac-khoi'
 import { daHocDang } from './_pham-vi-ca-nhan'
@@ -70,7 +70,7 @@ describe('LUẬT C — nơi thầy TỰ CHỌN giữ đúng thầy chọn', () =
   })
 })
 
-describe('LUẬT A — Hoá 2.0 (kế hoạch ngày Đảo / Đoàn / Bi-a và mọi nguồn: chiến dịch, ca đã công bố, Lên bảng, đầu giờ, nguồn thứ 4)', () => {
+describe('LUẬT A — Hoá 2.0 (kế hoạch ngày Đảo / Đoàn và mọi nguồn: chiến dịch, ca đã công bố, Lên bảng, đầu giờ, nguồn thứ 4)', () => {
   it('kế hoạch ngày + Đảo: chiến dịch có tờ khác khối ⇒ kế hoạch và chuyến Đảo CHỈ câu khối 11', async () => {
     const d = await dungKho()
     batHoa2(d)
@@ -81,27 +81,15 @@ describe('LUẬT A — Hoá 2.0 (kế hoạch ngày Đảo / Đoàn / Bi-a và m
     const r = await goiGame(d, 'start', { mode: 'adventure' })
     chiKhoi11(((r.questions ?? []) as { qid: string }[]).map((x) => x.qid), 'Đảo (Hoá 2.0)')
   })
-  it('Đoàn: nợ từ câu sai MỌI nguồn (ca, Lên bảng, đầu giờ, game nguồn thứ 4, BTVN, Luyện đề) ⇒ chặng Đoàn CHỈ câu khối 11', async () => {
+  it('nợ từ câu sai MỌI nguồn (ca, Lên bảng, đầu giờ, game nguồn thứ 4, BTVN, Luyện đề) ⇒ chuyến Đảo tập trung (nhận câu ôn của chặng Đoàn cũ) CHỈ câu khối 11', async () => {
     const d = await dungKho()
     batHoa2(d)
     hoSoGame(d, 'S1')
     await ghiSai(d, 'S1', [...mauMoiTo(6), ...mauMoiToPhan('III', 3)], T0 - 3 * MOT_NGAY)
     const { kh } = await layKeHoachHomNay(d.env, 'S1', T0)
     chiKhoi11([...kh.dao, ...kh.doan], 'kế hoạch ngày (nợ)')
-    const r = await startDoan2(d.env, 'S1', T0)
-    chiKhoi11(((r.questions ?? []) as { qid: string }[]).map((x) => x.qid), 'Đoàn (Hoá 2.0)')
-  })
-  it('Bi-a: bàn A.I xếp từ kế hoạch (nợ câu sai mọi tờ) ⇒ mọi bi + câu chốt CHỈ câu khối 11', async () => {
-    const d = await dungKho()
-    batHoa2(d)
-    hoSoGame(d, 'S1')
-    d.sql.exec(`INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bi_a','{"bat":true}','x')`)
-    xoaDemCauHinh(d.env)
-    await ghiSai(d, 'S1', [...mauMoiTo(3), ...mauMoiToPhan('II', 2), ...mauMoiToPhan('III', 2)], T0 - 3 * MOT_NGAY)
-    const r = await biaAction(d.env, 'S1', 'bia-xep-ban', { loai: 'ai', cheDo: 'don', soBi: 7 }, T0) as Record<string, any>
-    expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
-    const qids = [...((r.cau ?? []) as { qid: string }[]).map((c) => c.qid), ...(r.chot ? [String(r.chot.qid)] : [])]
-    chiKhoi11(qids, 'Bi-a')
+    const r = await startDao2(d.env, 'S1', T0, true)
+    chiKhoi11(((r.questions ?? []) as { qid: string }[]).map((x) => x.qid), 'Đảo tập trung (Hoá 2.0)')
   })
   it('lỗi đến hạn cho ca (`/ca/loi-den-han`, máy thầy rút đề riêng) ⇒ CHỈ lỗi câu khối 11', async () => {
     const d = await dungKho()
@@ -138,7 +126,7 @@ describe('LUẬT B — danh sách chữa bài / chiếu lên bảng của lớp 
   })
 })
 
-describe('LUẬT A — Game Thần thú đường không Hoá 2.0 (Đảo, gợi ý, Đoàn kho lớp, câu chung trùm Đoàn)', () => {
+describe('LUẬT A — Game Thần thú đường không Hoá 2.0 (Đảo, gợi ý)', () => {
   async function dungGame() {
     const d = await dungKho()
     hoSoGame(d, 'S1')
@@ -156,16 +144,6 @@ describe('LUẬT A — Game Thần thú đường không Hoá 2.0 (Đảo, gợi
     const r = await goiGame(d, 'recommendations', {})
     const nguon = ((r.suggestions ?? []) as { source: string }[]).map((x) => `${x.source}-I-1`)
     chiKhoi11(nguon, 'gợi ý')
-  })
-  it('Đoàn kho lớp: câu cá nhân của em CHỈ khối 11; câu chung (trùm) của đội cùng khối 11 CHỈ khối 11', async () => {
-    const d = await dungGame()
-    const mo = await goiGame(d, 'doan-mo')
-    expect(mo.ok, JSON.stringify(mo).slice(0, 300)).toBe(true)
-    const chang = JSON.parse((d.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(mo.doan.ma) as { json: string }).json)
-    const cua = (chang.nguoi as { sbd: string; cau: { qid: string }[] }[]).find((x) => x.sbd === 'S1')!
-    chiKhoi11(cua.cau.map((c) => c.qid), 'Đoàn — câu cá nhân')
-    const trum = Object.values((chang.trum ?? {}) as Record<string, { qid: string } | null>).filter(Boolean).map((x) => x!.qid)
-    expect(trum.filter((q) => !laCauDung11(q)), 'Đoàn — câu trùm').toEqual([])
   })
 })
 

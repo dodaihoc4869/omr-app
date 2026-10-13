@@ -1709,7 +1709,6 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
     ok: true,
     cheDo2: true,
     ngay: kh.ngay,
-    _san: { kh, hs },
     // Chiến dịch chưa tới ngày bắt đầu (thầy 28/09): chỉ báo tên + ngày, KHÔNG lộ câu.
     sapBatDau: hs.sapBatDau ? { id: hs.sapBatDau.id, ten: hs.sapBatDau.ten, batDau: hs.sapBatDau.batDau, hanNop: hs.sapBatDau.hanNop } : null,
     chienDich: cd ? { id: cd.id, ten: cd.ten, hanNop: cd.hanNop, D: soNgayConLai(kh.ngay, cd.hanNop), tong: tl.tong, coXat: tl.coXat, thanhThao: tl.thanhThao, canDayLai: tl.canDayLai, thanhThaoTangTu: tl.thanhThao ? null : ngayThanhThaoSomNhat(hs.ttChienDich) } : null,

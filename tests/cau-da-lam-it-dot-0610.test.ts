@@ -8,7 +8,6 @@ import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { demVongD1 } from './_dem-vong-d1'
 import { gvChienDich } from '../server/src/srs2-gv'
-import { biaAction } from '../server/src/bi-a'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import type { Env } from '../server/src/kieu'
@@ -26,9 +25,9 @@ async function dung() {
   const st = d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
   for (let i = 1; i <= 20; i++) st.run('DE1', `Q${i}`, 'v1', `g-Q${i}`, 'D1', cau(`Q${i}`))
   for (let i = 1; i <= 5; i++) st.run('DE9', `X${i}`, 'v1', `g-X${i}`, 'D1', cau(`X${i}`, 'DE9'))
-  d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true}','x'),('bi_a','{"bat":true}','x')`)
-  // 06/10 (gộp làn A'): Bi-a nay cũng qua THANG làm lại câu sai — câu sai trong ca (X1..X5) là câu LỖI nên có thể ra bản xáo (chữ cái em chọn đổi so với câu gốc). Test này khoá SỐ ĐỢT D1
-  // và kết quả đọc lại của "Câu đã làm", không phải thang ⇒ tắt khoá `lam_lai_khac` (đường BẬT: tests/lam-lai-cau-sai-0610-bi-a.test.ts).
+  d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true}','x')`)
+  // Câu sai trong ca (X1..X5) là câu LỖI nên có thể ra bản xáo (chữ cái em chọn đổi so với câu gốc). Test này khoá SỐ ĐỢT D1
+  // và kết quả đọc lại của "Câu đã làm", không phải thang ⇒ tắt khoá `lam_lai_khac` .
   d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('lam_lai_khac','{"bat":false}','x')`)
   // ca kiểm tra đã công bố hôm qua: em sai X1..X5 (đề DE9, không thuộc chiến dịch nào) ⇒ nhóm "Câu sai trong ca kiểm tra"
   d.sql.exec("INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,lop,cong_bo,thoi_gian_phut,cap_nhat_luc) VALUES('C1','KT','dong','thi','12A1','ngay',45,'x')")
@@ -38,8 +37,9 @@ async function dung() {
   expect((await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: '2026-12-30', raiDeu: false }, Date.now() - 3 * NGAY)).ok).toBe(true)
   const token = await gameToken(env, 'S1')
   await gameV2(env, 'choose', { token, pet: 'dat_quy' })
-  const ban = await biaAction(env, 'S1', 'bia-xep-ban', { loai: 'ai', cheDo: 'don', soBi: 7 }, Date.now())
-  return { d, env, token, ban, qs: (ban.bi as { qid: string }[]).map((x) => x.qid) }
+  // 14/10 (gỡ Bi-a): câu em làm lấy từ chặng học tập (Hoá 2.0) thay cho bàn Bi-a.
+  const r = await gameV2(env, 'hoc-tap-start', { token })
+  return { d, env, token, ban: { session: r.id }, qs: (r.questions as { qid: string }[]).map((x) => x.qid).filter((q) => q.startsWith('Q')) } // chỉ câu chiến dịch (chưa làm lần nào)
 }
 
 describe('hoa2-cau-da-lam / hoa2-cau-chi-tiet — ít đợt D1, kết quả như cũ', () => {
@@ -50,14 +50,14 @@ describe('hoa2-cau-da-lam / hoa2-cau-chi-tiet — ít đợt D1, kết quả nh�
     const r = await gameV2(e2, 'hoa2-cau-da-lam', { token })
     expect(r.ok).toBe(true)
     const ds = r.cau as Muc[]
-    // câu em đã làm = các câu trả lời trong Bi-a + 5 câu sai trong ca kiểm tra đã công bố (nhóm riêng, nguồn "thi")
+    // câu em đã làm = các câu trả lời trong chặng + 5 câu sai trong ca kiểm tra đã công bố (nhóm riêng, nguồn "thi")
     const mong = new Set([...qs, 'X1', 'X2', 'X3', 'X4', 'X5'])
     expect(ds.map((c) => c.qid).sort()).toEqual([...mong].sort())
-    const chiBia = ds.filter((c) => qs.includes(c.qid))
-    expect(chiBia.length).toBe(qs.length)
+    const chiChang = ds.filter((c) => qs.includes(c.qid))
+    expect(chiChang.length).toBe(qs.length)
     expect((r.chienDich as { id: string }[]).length).toBeGreaterThanOrEqual(1)
     for (const c of ds) expect(c.lichSu.length).toBeGreaterThanOrEqual(1)
-    expect(chiBia.every((c) => c.lichSu.at(-1)!.nguon === 'bia')).toBe(true) // lần làm cuối của câu trả lời trong Bi-a ghi nguồn "Bi-a"
+    expect(chiChang.every((c) => c.lichSu.at(-1)!.nguon === 'dao')).toBe(true) // lần làm cuối của câu trong chặng ghi nguồn game (Đảo)
     expect(ds.filter((c) => c.qid.startsWith('X') && !qs.includes(c.qid)).every((c) => c.lichSu[0]!.nguon === 'thi')).toBe(true)
     // eslint-disable-next-line no-console
     console.log(`DO|cau-da-lam|${d.vong}|${d.dot}`)
@@ -73,7 +73,7 @@ describe('hoa2-cau-da-lam / hoa2-cau-chi-tiet — ít đợt D1, kết quả nh�
     await gameV2(env, 'answer', { token, session: ban.session, qid: qs[1], answer: 'A' })
     const sau = (await gameV2(env, 'hoa2-cau-da-lam', { token })).cau as Muc[]
     expect(sau.length).toBe(truoc.length + (truoc.some((c) => c.qid === qs[1]) ? 0 : 1))
-    expect(sau.find((c) => c.qid === qs[1])!.lichSu.at(-1)).toMatchObject({ dung: false, nguon: 'bia' }) // lần vừa làm hiện NGAY, không số cũ
+    expect(sau.find((c) => c.qid === qs[1])!.lichSu.at(-1)).toMatchObject({ dung: false, nguon: 'dao' }) // lần vừa làm hiện NGAY, không số cũ
   })
 
   it('chi tiết câu: đề + đáp án + lời giải của câu em ĐÃ làm, câu chưa làm không trả đáp án — không đổi; ≤ 5 đợt D1', async () => {

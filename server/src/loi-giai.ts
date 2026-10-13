@@ -18,7 +18,7 @@
 import type { Env } from './kieu'
 import { gameIdentity, gameIdentityHaiBuoc } from './game-v2-auth'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
-import { coCaDangMo } from './bi-a'
+import { coCaDangMo } from './ca-dang-mo'
 import { protectedQuestions } from './game-v2-bank'
 import { qidGoc } from './srs2-d1'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'

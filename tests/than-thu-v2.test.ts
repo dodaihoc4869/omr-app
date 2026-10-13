@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca phòng 6 người, phòng hai người chốt vòng, Linh Tâm phòng 4 người, PvP 1 đấu 1; ca Linh Tâm tải lại ⇒ khoá lời "đã đóng".
 import {describe,it,expect,vi} from 'vitest'
 import {DatabaseSync} from 'node:sqlite'
 import {readFileSync} from 'node:fs'
@@ -11,7 +12,6 @@ import {TEN_GOI_Y} from '../src/game/than-thu-v2/dao/ChonBanDongHanh'
 import {xoaMoiDem} from '../server/src/dem-chung'
 import {gameToken,gameIdentity,parentPass,parentIdentity} from '../server/src/game-v2-auth'
 import {normalizeBank,readScope,syncIndex,protectedQuestions,xoaDemCaBaoVe} from '../server/src/game-v2-bank'
-import {roomAction} from '../server/src/game-v2-room'
 import {thanhExp} from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import {adminGame,parentGame} from '../server/src/game-v2-reports'
 const question=(i=0):PrivateQuestion=>({qid:`D-I-${i}`,maDe:'D',version:'v1',group:`g${i}`,phan:'I',text:`Đề ${i}`,choices:['A','B','C','D'],ideas:[],hinhAnh:[],dang:'AA.BB.CC',tenDang:'Dạng đã học',mucDo:'biet',sao:1,kienThuc:['K1'],correct:'B',solution:{chot:'Giải từ kho'},reviewed:true})
@@ -60,11 +60,9 @@ describe('D1 thực: tách dữ liệu, phân quyền, giao dịch',()=>{
  // test sửa bảng `ca` bằng SQL thô, không qua lệnh thật ⇒ tự gọi xoaDemCaBaoVe() sau mỗi lần sửa (production có móc bất hoạt ở mọi lệnh sửa ca thật).
  it('ca vẫn mang cờ mở nhưng đã hết hạn và công bố được phép ôn',async()=>{const f=fixture();f.seed();f.sql.exec("UPDATE ca SET trang_thai='mo',het_han_vao='2026-01-01T00:00:00Z',thoi_gian_phut=30,loai='thi',bank_r2='de/CA'");xoaDemCaBaoVe();f.objects.set('de/CA',f.bank('D'));expect((await protectedQuestions(f.env)).has('D-I-0')).toBe(false);f.sql.exec("UPDATE ca SET cong_bo='khong'");xoaDemCaBaoVe();expect((await protectedQuestions(f.env)).has('D-I-0')).toBe(true)})
  it('phụ huynh chỉ nhắc dạng có bằng chứng, giáo viên khoá game riêng em',async()=>{const f=fixture();const pass=await parentPass(f.env,'1');await expect(parentGame(f.env,{pass,action:'task',dang:'AA.BB.CC'})).rejects.toThrow();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');await adminGame(f.env,{action:'scope',sbd:'1',enabled:false});await expect(gameV2(f.env,'start',{token})).rejects.toThrow('tạm dừng')})
- it('phòng tối đa sáu người, không lộ SBD; người ngoài không sửa được',async()=>{const f=fixture();const create=await roomAction(f.env,'1','dat_quy','room-create',{});const room=create.room as {id:string};for(let i=2;i<=6;i++)await roomAction(f.env,String(i),'khi_lang','room-join',{room:room.id});await expect(roomAction(f.env,'7','khi_lang','room-join',{room:room.id})).rejects.toThrow();await expect(roomAction(f.env,'7','khi_lang','room-action',{room:room.id})).rejects.toThrow();const view=await roomAction(f.env,'1','dat_quy','room-view',{room:room.id});expect(JSON.stringify(view)).not.toContain('sbd')})
  it('ống đầy và cấp 120 giữ phần EXP còn dư',async()=>{const f=fixture();/* Đợt 1 thần thú (21/09): hồ sơ ĐÃ ở luật cấp mới (luatCap 2), hôm nay em đạt nhiệm vụ ngày ⇒ trần 200; nạp qua cổng hấp thụ. Sửa CÓ CHỦ Ý. */const homNay=new Date(Date.now()+7*3600000).toISOString().slice(0,10);f.sql.prepare('INSERT INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,0,?,?)').run('1',JSON.stringify({pet:'dat_quy',choice:false,legacy:null,cap:119,exp:thanhExp(119)-5,wallet:50000,earned:0,tower:1,mastery:[],arena:null,cutover:'2026-09-21T00:00:00Z',luatCap:3}),'x');f.sql.exec('CREATE TABLE IF NOT EXISTS exp_so(khoa TEXT PRIMARY KEY,sbd TEXT,ngay_vn TEXT,loai TEXT,qid TEXT,ma_nguon TEXT,exp INTEGER,luc TEXT,ghi_chu TEXT)');f.sql.prepare("INSERT INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu) VALUES(?,?,?,'dat_ngay',NULL,NULL,80,?,'x')").run(`1|dat|${homNay}`,'1',homNay,new Date().toISOString());const token=await gameToken(f.env,'1');const r=await gameV2(f.env,'invest',{token});const p=(await loadProfile(f.env,'1')).profile;/* Luật v4 (29/09): mở hồ sơ v3 ⇒ chuyển MỘT lần, ống nghiệm nạp hết vào thú (không trần); quá cấp 120 thì EXP chỉ ghi sổ; lệnh invest không còn gì để nạp. Sửa CÓ CHỦ Ý. */expect(p.cap).toBe(120);expect(p.wallet).toBe(0);expect(p.luatCap).toBe(5);/* SỬA CÓ CHỦ Ý 29/09 v5: chuỗi v3 → v4 → v5 */expect((p.truocSiet4 as {wallet:number}).wallet).toBe(50000);expect(r.daNap).toBe(0)})
  it('hoàn thành tầng gọi lại không nhảy thêm tầng',async()=>{const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');const r=await gameV2(f.env,'start',{token,mode:'tower'});await gameV2(f.env,'answer',{token,session:r.id,qid:'D-I-0',answer:'B'});await gameV2(f.env,'complete',{token,session:r.id});await gameV2(f.env,'complete',{token,session:r.id});expect((await loadProfile(f.env,'1')).profile.tower).toBe(2)})
  it('bỏ trống và nộp thiếu ý không được dùng để lấy lượt học',async()=>{const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');const r=await gameV2(f.env,'start',{token});await expect(gameV2(f.env,'answer',{token,session:r.id,qid:'D-I-0',answer:''})).rejects.toThrow('điền đủ');expect(f.sql.prepare('SELECT COUNT(*) n FROM game_v2_attempt').get()?.n).toBe(0)})
- it('hai người chốt thì xử đúng một vòng, không nhận trạng thái vàng tự khai',async()=>{const f=fixture();const created=await roomAction(f.env,'1','dat_quy','room-create',{});const id=(created.room as {id:string}).id;await roomAction(f.env,'2','khi_lang','room-join',{room:id});let rev=1;const act=async(sbd:string,action:string,extra:Record<string,unknown>={})=>{const r=await roomAction(f.env,sbd,'dat_quy',action,{room:id,revision:rev,...extra});rev=(r.room as {revision:number}).revision;return r.room as {round:number;board:{units:{id:string}[];gold:number}}};await act('1','room-start');const one=await act('1','room-action',{action:{type:'buy',slot:0},gold:999});expect(one.board.gold).toBe(6);await act('1','room-action',{action:{type:'place',id:one.board.units[0]!.id,pos:0}});const two=await act('2','room-action',{action:{type:'buy',slot:0}});await act('2','room-action',{action:{type:'place',id:two.board.units[0]!.id,pos:0}});expect((await act('1','room-action',{action:{type:'fight'}})).round).toBe(1);expect((await act('2','room-action',{action:{type:'fight'}})).round).toBe(2);await expect(act('1','room-action',{action:{type:'fight'}})).rejects.toThrow('câu Hoá')})
  it('giữ nguyên ảnh đúng vị trí trong nguồn thô',async()=>{const raw={ma_de:'D',cau:[{phan:'I',so:1,de:'Câu có ảnh',pa:{A:'a',B:'b',C:'c',D:'d'},dap_an:'A',hinh:[{tep:'i.png',vi_tri:'sau_pa_B',du_lieu:'data:image/png;base64,YQ=='}]}]};const qs=await normalizeBank(raw,'D');expect(qs[0]?.hinhAnh[0]?.viTri).toBe('sau_pa_B')})
 })
 
@@ -156,20 +154,6 @@ it('Mom: không nhận điểm tự khai, chỉ chấm đáp án thuộc bài đ
  expect((await gameV2(env,'academic-sync',{token,mom:[{id:'m1',at,answers:{'D-I-0':'B'}}]})).gain).toBe(2)
  expect((await gameV2(env,'academic-sync',{token,mom:[{id:'m2',at,answers:{'D-I-0':'B'}}]})).gain).toBe(0)
 })
-it('Linh Tâm: phòng 4 người, xác thực lượt học, không dùng lại câu vòng trước, không lộ SBD',async()=>{
- const {env,sql}=fixture();const {escortAction}=await import('../server/src/game-v2-escort')
- let v:any=await escortAction(env,'1','dat_quy',1,'escort-create',{});const id=v.escort.id
- for(const sbd of ['2','3','4'])v=await escortAction(env,sbd,'lua_phuong',100,'escort-join',{room:id})
- await expect(escortAction(env,'5','dat_quy',1,'escort-join',{room:id})).rejects.toThrow('đủ bốn')
- v=await escortAction(env,'1','dat_quy',1,'escort-start',{room:id,revision:v.escort.revision})
- expect(v.escort.players.map((p:any)=>p.id)).toEqual(['p0','p1','p2','p3'])
- await expect(escortAction(env,'1','dat_quy',1,'escort-act',{room:id,revision:v.escort.revision,command:{type:'guard'}})).rejects.toThrow('câu Hoá')
- for(const sbd of ['1','2','3','4']){sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('s'+sbd,sbd,JSON.stringify({mode:'arena',guardian:id,guardianRound:1}),new Date().toISOString());sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)').run('a'+sbd,sbd,'s'+sbd,'q','g',JSON.stringify({attempt:{correct:sbd!=='2',assisted:false}}),new Date().toISOString());v=await escortAction(env,sbd,'dat_quy',1,'escort-act',{room:id,revision:v.escort.revision,command:{type:'guard'}})}
- expect(v.escort.round).toBe(2)
- await expect(escortAction(env,'1','dat_quy',1,'escort-act',{room:id,revision:v.escort.revision,command:{type:'guard'}})).rejects.toThrow('câu Hoá')
- await expect(escortAction(env,'7','dat_quy',1,'escort-view',{room:id})).rejects.toThrow('chưa ở')
-})
-
 describe('adaptive variety',()=>{
  it('cycles through 60 fresh groups before reusing answered questions',()=>{
   const pool=Array.from({length:60},(_,i)=>question(i)),history:Attempt[]=[];const seen=new Set<string>()
@@ -235,17 +219,14 @@ describe('Đổi tên thần thú (luật tên + 3 lần/ngày)',()=>{
  })
 })
 
-it('Linh Tâm tải lại đúng câu cùng lượt và từ chối câu của lượt cũ',async()=>{
+it('Võ đài Linh Tâm đã đóng: start kèm guardian và phiên guardian cũ đều bị từ chối, không ghi lượt',async()=>{
  const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');await gameV2(f.env,'choose',{token,pet:'nuoc_long'})
- const created=await gameV2(f.env,'escort-create',{token,mode:'solo'});const room=(created as any).escort
- const a=await gameV2(f.env,'start',{token,mode:'arena',guardian:room.id,guardianRound:1})
- const b=await gameV2(f.env,'start',{token,mode:'arena',guardian:room.id,guardianRound:1});expect(a.id).toBe(b.id)
- expect(f.sql.prepare('SELECT COUNT(*) n FROM game_v2_session').get()?.n).toBe(1)
- await gameV2(f.env,'rename',{token,name:'Rồng Lam'})
- const view=await gameV2(f.env,'escort-view',{token,room:room.id});expect((view as any).escort.players[0].alias).toBe('Rồng Lam')
- const raw=JSON.parse(String(f.sql.prepare('SELECT json FROM game_v2_room WHERE id=?').get(room.id)?.json));raw.round=2
- f.sql.prepare('UPDATE game_v2_room SET json=? WHERE id=?').run(JSON.stringify(raw),room.id)
- await expect(gameV2(f.env,'answer',{token,session:a.id,qid:'D-I-0',answer:'B'})).rejects.toThrow('Lượt vừa kết thúc')
+ await expect(gameV2(f.env,'start',{token,mode:'arena',guardian:'R1',guardianRound:1})).rejects.toThrow('Võ đài Linh Tâm đã đóng')
+ expect(f.sql.prepare('SELECT COUNT(*) n FROM game_v2_session').get()?.n).toBe(0)
+ const a:any=await gameV2(f.env,'start',{token,mode:'arena'})
+ const raw=JSON.parse(String(f.sql.prepare('SELECT json FROM game_v2_session WHERE id=?').get(a.id)?.json));raw.guardian='R1';raw.guardianRound=1
+ f.sql.prepare('UPDATE game_v2_session SET json=? WHERE id=?').run(JSON.stringify(raw),a.id)
+ await expect(gameV2(f.env,'answer',{token,session:a.id,qid:a.questions[0].qid,answer:'B'})).rejects.toThrow('Võ đài Linh Tâm đã đóng')
  expect(f.sql.prepare('SELECT COUNT(*) n FROM game_v2_attempt').get()?.n).toBe(0)
 })
 
@@ -270,15 +251,3 @@ it('nhiệm vụ cá nhân không lộ đáp án, giới hạn 36 câu ĐẢO th
  const other=await gameToken(f.env,'2');expect((await gameV2(f.env,'recommendations',{token:other})).remaining).toBe(36)
 })
 
-it('PvP 1 đấu 1: đủ hai người mới bắt đầu, chặn người thứ ba, không tạo Boss',async()=>{
- const {env}=fixture();const {escortAction}=await import('../server/src/game-v2-escort')
- let v:any=await escortAction(env,'1','dat_quy',1,'escort-create',{mode:'duel'});const id=v.escort.id
- expect(v.escort.mode).toBe('duel');expect(v.escort.players).toHaveLength(1)
- await expect(escortAction(env,'1','dat_quy',1,'escort-start',{room:id,revision:v.escort.revision})).rejects.toThrow('đủ 2')
- v=await escortAction(env,'2','nuoc_long',1,'escort-join',{room:id})
- await expect(escortAction(env,'3','dat_quy',1,'escort-join',{room:id})).rejects.toThrow('đủ hai')
- await expect(escortAction(env,'2','nuoc_long',1,'escort-start',{room:id,revision:v.escort.revision})).rejects.toThrow('chủ phòng')
- v=await escortAction(env,'1','dat_quy',1,'escort-start',{room:id,revision:v.escort.revision})
- expect(v.escort.started).toBe(true);expect(v.escort.players.map((p:any)=>p.team)).toEqual([0,1]);expect(v.escort.players).toHaveLength(2)
- v=await escortAction(env,'2','nuoc_long',1,'escort-leave',{room:id,revision:v.escort.revision});expect(v.escort.finished).toBe(true);expect(v.escort.winner).toBe(0)
-})

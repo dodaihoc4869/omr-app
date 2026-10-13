@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "chuyển sang học tập nhả câu bị bàn Bi-a cũ giữ" (máy chủ không còn phiên Bi-a để nhả).
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { taoKhoOmni, themChienDich, lam, T_SANG } from './omni-3-ke-hoach-chung'
 import { gameV2 } from '../server/src/game-v2'
@@ -58,15 +59,6 @@ it('token sai không mở được kế hoạch hay phiên của em khác', asyn
   expect(k.d.sql.prepare('SELECT COUNT(*) AS n FROM game_v2_session').get()).toMatchObject({ n: 0 })
 })
 
-it('chuyển sang học tập nhả câu bị bàn Bi-a cũ giữ, không xoá lịch sử', async () => {
-  const k = await kho()
-  const { kh } = await layKeHoachHomNay(k.env, 'S1', T_SANG)
-  k.d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('ban-cu','S1', JSON.stringify({ bia:1, questions: kh.conDao.map(qid=>({qid})) }), new Date(T_SANG).toISOString())
-  const r = await gameV2(k.env, 'hoc-tap-start', { token:k.token })
-  expect((r.questions as unknown[]).length).toBeGreaterThan(0)
-  const row = k.d.sql.prepare("SELECT json FROM game_v2_session WHERE id='ban-cu'").get() as {json:string}
-  expect(JSON.parse(row.json).dong).toBe(1)
-})
 it('câu thuộc ca mở bị chặn cả khi đã tạo đợt học chờ', async () => {
   const k = await kho()
   const first = await gameV2(k.env, 'hoc-tap-start', {token:k.token})

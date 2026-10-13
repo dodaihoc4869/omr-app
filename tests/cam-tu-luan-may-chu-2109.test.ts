@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ khối "B · Đoàn Hộ Tống" (3 ca: câu cá nhân, câu chung trùm, phòng cũ ghim tự luận).
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // CẤM RÚT CÂU TỰ LUẬN — MÁY CHỦ (Code 3, 21/09/2026). Đề bài: prompt-cam-rut-tu-luan.md.
 // Thầy: "Tuyệt đối không rút câu tự luận, chỉ được rút câu trắc nghiệm, đúng sai, trả lời ngắn — ở mọi chỗ rút đề, TRỪ màn Gọi lên bảng".
@@ -9,7 +10,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
-import { DEM_NGUOC_MS, NGHI_GIUA_HIEP_MS } from '../server/src/game-v2-doan'
 import { readScope } from '../server/src/game-v2-bank'
 import { cauCongKhai, docDoPhuPhucVu, hsCauTheoQid, layCauChoEm, qidPhucVuDuoc } from '../server/src/cau-theo-qid'
 import { cauKhacPhucGoi, deTheoDangBai, ghiPhieuKhacPhuc, hsCauSai, layPhieu, luuPhieu } from '../server/src/goi-cu'
@@ -25,9 +25,7 @@ import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import { BAY_GIO, HAN, cauThay, dung as dungBtvn, giao, gio, maBtvn, mo, toKho } from './_btvn-nang-do-mau'
 
 const T0 = Date.parse('2026-09-21T12:00:00+07:00')
-let bayGio = T0
-const troi = (ms: number) => { bayGio += ms; vi.setSystemTime(bayGio) }
-beforeEach(() => { bayGio = T0; vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) })
+beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) })
 afterEach(() => vi.useRealTimers())
 
 // ───────────────────────────── KHO MẪU ─────────────────────────────
@@ -161,88 +159,6 @@ describe('A · game Đảo thần thú (game-v2.ts): chọn phiên, sổ tay, l�
     const { evidence } = await readScope(d.env, 'S1')
     expect(evidence.map((e) => e.qid)).toEqual(expect.arrayContaining([SACCHAROSE_QID]))
     expect(d.dem('nam_kt_cau', `qid='${SACCHAROSE_QID}'`)).toBe(1) // hồ sơ KHÔNG mất câu tự luận
-  })
-})
-
-// ───────────────────────────── B · ĐOÀN HỘ TỐNG ─────────────────────────────
-describe('B · Đoàn Hộ Tống (game-v2-doan.ts): câu cá nhân và câu chung của trùm', () => {
-  const KHO_D = [
-    ...Array.from({ length: 9 }, (_, i) => ({ ...cauRieng(thoI(i + 1), 'DE1'), qid: `X${i + 1}`, group: `g-X${i + 1}`, correct: 'B' })),
-    // 3 câu phần I TỰ LUẬN cùng dạng (2 phương án): nếu lọt vào suất cá nhân, em sẽ thấy ở ô câu hỏi
-    ...Array.from({ length: 3 }, (_, i) => ({ ...cauRieng(thoI(20 + i, { pa: { A: 'a', B: 'b' } }), 'DE1'), qid: `XTL${i + 1}`, group: `g-XTL${i + 1}`, correct: 'B' })),
-  ]
-  // Kiểm cấm tự luận: câu đối chứng phải vừa sức ở bậc Biết của fixture.
-  const trum = (qid: string, o: Tho = {}) => ({ ...cauRieng(thoII(1), 'DE1'), qid, group: `g-${qid}`, correct: 'DSDS', mucDo: 'biet', ...o })
-  function dungDoan(cauTrum: ReturnType<typeof trum>[]): D1That {
-    const d = taoD1That()
-    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('doan_ho_tong',?,'x')").run(JSON.stringify({ toanBo: true }))
-    d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',?,?,0,'v1')").run(KHO_D.length + cauTrum.length, 'kho/DE1.json')
-    d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
-    for (const q of [...KHO_D, ...cauTrum]) d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', q.qid, 'v1', q.group, q.dang, JSON.stringify(q))
-    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Nguyễn Thu Hà','12A','mk','x')").run()
-    d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run('S1', JSON.stringify({ pet: 'lua_phuong', choice: false, legacy: null, cap: 1, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z' }), 'x')
-    return d
-  }
-  const goi = async (d: D1That, lenh: string, b: Record<string, unknown> = {}) => gameV2(d.env, `doan-${lenh}`, { token: await gameToken(d.env, 'S1'), ...b }) as Promise<{ doan: any }>
-  /** Đi tới hết chặng, ghi lại mọi qid câu cá nhân và câu chung của trùm em nhìn thấy. */
-  async function diHetChang(d: D1That) {
-    await saiBtvn(d, ['X1'])
-    const ma = (await goi(d, 'mo')).doan.ma as string
-    troi(DEM_NGUOC_MS)
-    const caNhan: string[] = [], chung: any[] = [], tatCa: string[] = []
-    let xem = await goi(d, 'xem', { ma })
-    for (let vong = 0; !xem.doan.tran.ketThuc && vong < 30; vong++) {
-      if (xem.doan.tran.laTrum) {
-        const t = xem.doan.trum
-        chung.push(t)
-        if (t?.coCau === false) troi(65_000) // không có câu chung ⇒ không ai chốt được ý nào: hiệp trùm chạy hết giờ
-        else for (const y of (t.yCuaEm ?? []) as number[]) xem = await goi(d, 'nop-y', { ma, hiep: xem.doan.tran.hiep, y, answer: 'D' })
-      } else if (xem.doan.cau) {
-        caNhan.push(xem.doan.cau.qid)
-        xem = await goi(d, 'nop', { ma, hiep: xem.doan.tran.hiep, answer: 'B', hanhDong: 'danh' })
-      }
-      troi(NGHI_GIUA_HIEP_MS + 1000); xem = await goi(d, 'xem', { ma }); tatCa.push(JSON.stringify(xem.doan))
-    }
-    return { caNhan, chung, tatCa: tatCa.join('\n') }
-  }
-
-  it('6 câu cá nhân: KHÔNG có câu tự luận (đối chứng: vẫn đủ 6 câu rút được)', async () => {
-    const d = dungDoan([trum('TX1')])
-    const { caNhan } = await diHetChang(d)
-    expect(new Set(caNhan).size).toBe(6)
-    expect(caNhan.filter((q) => q.startsWith('XTL'))).toEqual([])
-  })
-  it('câu chung của trùm: ứng viên phần II tự luận (đủ 4 ý, đủ DSDS, nhưng gắn nhãn tự luận) KHÔNG được chọn; đối chứng: bỏ nhãn thì được chọn', async () => {
-    const dTL = dungDoan([trum('TXTL', { loai: 'tu_luan' })])
-    await saiBtvn(dTL, ['X1'])
-    const ma0 = (await goi(dTL, 'mo')).doan.ma as string
-    expect(JSON.stringify((JSON.parse((dTL.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(ma0) as { json: string }).json) as { trum: unknown }).trum)).not.toContain('TXTL') // chonCauTrum không chọn câu tự luận
-    const r1 = await diHetChang(dungDoan([trum('TXTL', { loai: 'tu_luan' })]))
-    expect(r1.caNhan.length).toBeGreaterThan(0) // đã chơi thật, không phải chạy rỗng
-    expect(r1.chung.filter((t) => t?.qid === 'TXTL')).toEqual([]) // không có ứng viên rút được ⇒ KHÔNG phát câu tự luận làm câu chung
-    expect(r1.tatCa).not.toContain('TXTL')
-
-    const dDoiChung = dungDoan([trum('TXTL')]) // cùng câu, không nhãn ⇒ rút được ⇒ phải được chọn
-    await saiBtvn(dDoiChung, ['X1'])
-    const ma1 = (await goi(dDoiChung, 'mo')).doan.ma as string
-    expect(JSON.stringify((JSON.parse((dDoiChung.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(ma1) as { json: string }).json) as { trum: unknown }).trum)).toContain('TXTL')
-    const r2 = await diHetChang(dungDoan([trum('TXTL')]))
-    expect(r2.chung.some((t) => t?.qid === 'TXTL')).toBe(true)
-  })
-  it('phòng cũ đã GHIM câu tự luận làm câu chung: xem lại thì báo câu đã rút khỏi kho (đường rut sẵn có), không phát đề', async () => {
-    const d = dungDoan([trum('TX1'), trum('TXTL', { loai: 'tu_luan' })])
-    await saiBtvn(d, ['X1'])
-    const ma = (await goi(d, 'mo')).doan.ma as string
-    // giả lập phòng soạn TRƯỚC lệnh cấm: ghim câu tự luận vào cả câu cá nhân hiệp 1
-    const phong = d.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(ma) as { json: string } | undefined
-    expect(phong).toBeTruthy()
-    const p = JSON.parse(phong!.json)
-    p.nguoi[0].cau[0] = { ...p.nguoi[0].cau[0], qid: 'XTL1', nhom: 'g-XTL1' }
-    d.sql.prepare('UPDATE doan_chang SET json = ? WHERE ma = ?').run(JSON.stringify(p), ma)
-    troi(DEM_NGUOC_MS)
-    const xem = await goi(d, 'xem', { ma })
-    expect(xem.doan.cau.de).toBeUndefined()
-    expect(xem.doan.cau.rut).toBe(true)
   })
 })
 

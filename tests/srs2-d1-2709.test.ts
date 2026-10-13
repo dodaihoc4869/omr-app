@@ -1,12 +1,13 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — 2 ca dùng startDoan2 dựng lại bằng chặng học (startDao2 tapTrung); bỏ ý "Đoàn không tách chặng vụn".
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // Game Hóa 2.0 — tích hợp trên D1 thật (node:sqlite, lược đồ đủ migration): giao chiến dịch → Sảnh → khoá Đảo →
-// Đoàn có gợi ý M3 → cắt tỉa → Chữa xong → Rương Bát Linh; kế hoạch ngày chốt, dựng lại từ sổ khớp 100% (N3).
+// chặng học có gợi ý M3 → cắt tỉa → Chữa xong → Rương Bát Linh; kế hoạch ngày chốt, dựng lại từ sổ khớp 100% (N3).
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { cheDo2, layKeHoachHomNay, sanh2, docHoSo2, LOI_KHOA_DAO } from '../server/src/srs2-d1'
-import { startDao2, startDoan2, hoa2Action, docCotLoi, VANG_RUONG } from '../server/src/srs2-game'
+import { startDao2, hoa2Action, docCotLoi, VANG_RUONG } from '../server/src/srs2-game'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
 import { damBaoBangBoTro } from '../server/src/cau-bo-tro'
@@ -61,8 +62,10 @@ describe('Game Hóa 2.0 trên D1 thật', () => {
     d.sql.prepare('INSERT INTO srs2_ke_hoach(sbd,ngay,chien_dich_id,dao_json,doan_json,huyet_chien,tong,tao_luc) VALUES(?,?,?,?,?,0,2,?)')
       .run('S1', '2026-09-30', cd, '["Q2"]', '["Q1"]', new Date(T0).toISOString())
     expect(await sanh2(env, 'S1', T0)).toMatchObject({ doan: { con: 1 }, khoaDao: true })
-    const luot = await startDoan2(env, 'S1', T0)
-    expect(luot.questions).toMatchObject([{ qid: 'Q1~ss0' }])
+    // Chặng học (hoc-tap-start = startDao2 tapTrung) phát câu ôn còn lại bằng bản song sinh.
+    const luot = await startDao2(env, 'S1', T0, true)
+    expect((luot.questions as { qid: string }[]).map((q) => q.qid)).toContain('Q1~ss0')
+    expect((luot.questions as { qid: string }[]).map((q) => q.qid)).not.toContain('Q1')
     await ghiSuKien(env, [suKien('S1', 'Q1~ss0', T0 + 60_000, true)])
     expect(await sanh2(env, 'S1', T0 + 60_001)).toMatchObject({ doan: { con: 0 }, khoaDao: false, ruong: { daLam: 1, tong: 2 } })
     expect((await startDao2(env, 'S1', T0 + 60_002)).questions).toMatchObject([{ qid: 'Q2' }])
@@ -91,22 +94,23 @@ describe('Game Hóa 2.0 trên D1 thật', () => {
     expect(JSON.stringify(dao)).not.toContain('Cốt lõi của') // chưa đủ điều kiện gợi ý ⇒ không lộ lời giải
   })
 
-  it('còn câu ôn hôm nay ⇒ Đảo khoá đúng lời thầy; Đoàn phát câu ôn; sai 2 lần ⇒ gạch 2 phương án, không lộ đáp án', async () => {
+  it('còn câu ôn hôm nay ⇒ Đảo khoá đúng lời thầy; chặng học phát câu ôn; sai 2 lần ⇒ gạch 2 phương án, không lộ đáp án', async () => {
     const { env } = fixture()
     await giao(env, '2026-10-04', T0 - 3 * NGAY)
     await ghiSuKien(env, [suKien('S1', 'Q1', T0 - 2 * NGAY, false), suKien('S1', 'Q1', T0 - NGAY, false), suKien('S1', 'Q2', T0 - NGAY, false)])
     const dao = await startDao2(env, 'S1', T0)
     expect(dao).toMatchObject({ lyDo: 'khoa_cho_doan', message: LOI_KHOA_DAO })
-    const doan = await startDoan2(env, 'S1', T0)
-    const qs = doan.questions as { qid: string; goiY?: { gach?: string[] } }[]
-    // ĐAN XEN (Boss 29/09): Q1 (sai 2 lần) và Q2 (Vận dụng) đều khó, không còn câu dễ để xen ⇒ KHÔNG tách chặng vụn, một chặng.
-    expect(qs.map((q) => q.qid).sort()).toEqual(['Q1', 'Q2'])
+    // Câu ôn hôm nay = Q1 (sai 2 lần) + Q2; chặng học (startDao2 tapTrung) phát câu ôn trước, chuyến tối đa 6 ải.
+    expect([...(await layKeHoachHomNay(env, 'S1', T0)).kh.conDoan].sort()).toEqual(['Q1', 'Q2'])
+    const hoc = await startDao2(env, 'S1', T0, true)
+    const qs = hoc.questions as { qid: string; goiY?: { gach?: string[] }; nhanNo?: string }[]
+    expect(qs.map((q) => q.qid)).toContain('Q1')
     const q1 = qs.find((q) => q.qid === 'Q1')!
     expect(q1.goiY?.gach).toHaveLength(2)
     expect(q1.goiY?.gach).not.toContain('B')
-    expect(JSON.stringify(doan)).not.toContain('"correct"')
+    expect(JSON.stringify(hoc)).not.toContain('"correct"')
     // Nhãn nợ trên câu (Sổ nợ 29/09): "Sai 2 lần · Đảo 28/09 · Đảo 29/09" (phiên game không có trong bảng phiên ⇒ Đảo).
-    expect((qs[0] as { nhanNo?: string }).nhanNo).toMatch(/^Sai 2 lần · /)
+    expect(q1.nhanNo).toMatch(/^Sai 2 lần · /)
   })
 
   it('kế hoạch CHỐT trong ngày; xoá bảng đệm dựng lại từ sổ khớp 100% (N3)', async () => {

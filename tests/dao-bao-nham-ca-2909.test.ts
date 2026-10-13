@@ -1,19 +1,17 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — không bỏ ca nào; bỏ import thừa (startDoan2, gameV2, gameToken) và cờ cấu hình `bi_a` trong kho giả.
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // LỖI THẦY CHỤP 21:36 29/09: Bát Linh Đảo "Rương 42/46", còn 4 câu, khung báo "Các câu hôm nay đang dùng cho ca kiểm tra…" trong khi KHÔNG có ca nào mở.
 // Mỗi nguyên nhân khả dĩ làm `napLuot` rỗng một test (D1 thật = node:sqlite, lược đồ đủ migration):
-//   (b) phiên Bi-a "Trả lời câu hỏi" (chiCau) / bàn Bi-a bỏ dở GIỮ câu 2 giờ ⇒ Đảo rỗng  ← NGUYÊN NHÂN GỐC ra đúng ảnh
+//   (b) phiên Bi-a giữ câu — đã gỡ cùng Bi-a 14/10
 //   (a) ca đóng mà chưa công bố khoá câu còn lại của kế hoạch ⇒ Đảo rỗng + rương kẹt
 //   (c) câu còn lại đã rút khỏi kho ⇒ Đảo rỗng + rương kẹt
-// Sau khi sửa: lý do báo ĐÚNG, Bi-a không ăn câu của Đảo/Đoàn, rương/thể lực không kẹt vì câu bị khoá.
+// Sau khi sửa: lý do báo ĐÚNG, rương/thể lực không kẹt vì câu bị khoá.
 import { beforeEach, describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { layKeHoachHomNay, qidGoc, sanh2 } from '../server/src/srs2-d1'
-import { hoa2Action, startDao2, startDoan2 } from '../server/src/srs2-game'
-import { biaAction } from '../server/src/bi-a'
-import { gameV2 } from '../server/src/game-v2'
-import { gameToken } from '../server/src/game-v2-auth'
+import { hoa2Action, startDao2 } from '../server/src/srs2-game'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
@@ -41,7 +39,6 @@ function fixture(soCau = 30) {
     st.run('DE1', `Q${i}`, 'v1', `g-Q${i}`, `D${i % 3}`, cauJson(`Q${i}`, phan, ['NB', 'TH', 'VD'][i % 3]!, `D${i % 3}`, dapAn(i)))
   }
   d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true,"lop":["12A1"]}','x')`)
-  d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bi_a','{"bat":true,"lop":["12A1"]}','x')`)
   return { d, env }
 }
 async function giao(env: Env) {
@@ -73,62 +70,6 @@ function caChuaCongBo(d: ReturnType<typeof fixture>['d'], qids: string[], o: { t
 const qidsCua = (r: Record<string, unknown>) => ((r.questions as { qid: string }[]) ?? []).map((q) => q.qid)
 
 beforeEach(() => xoaDemCaBaoVe())
-
-describe('Đảo báo nhầm "ca kiểm tra" — nguyên nhân (b): Bi-a giữ câu', () => {
-  it('ẢNH THẦY: em mở "Trả lời câu hỏi", làm vài câu rồi đóng máy (không gọi dong) ⇒ 4 câu cuối vẫn phải ra Đảo, KHÔNG báo ca', async () => {
-    const { d, env } = fixture()
-    await giao(env)
-    const nay = Date.now()
-    const tl = await biaAction(env, 'S1', 'bia-tra-loi', {}, nay)
-    const h = (tl.cau as { qid: string }[]).map((c) => c.qid)
-    expect(h.length).toBeGreaterThanOrEqual(4)
-    const token = await gameToken(env, 'S1')
-    for (const q of h.slice(4)) await gameV2(env, 'answer', { token, session: String(tl.session), qid: q, answer: dapAn(Number(q.slice(1))), assisted: false })
-    const bon = h.slice(0, 4) // 4 câu còn nằm trong phiên chỉ-trả-lời, em tắt máy
-    await conLai(env, () => bon, nay)
-    const s = await sanh2(env, 'S1', nay)
-    expect(s.theLuc).toMatchObject({ con: 4 })
-    const dao = await startDao2(env, 'S1', nay + 60_000)
-    expect(String(dao.message ?? '')).not.toContain(LOI_CA)
-    expect(qidsCua(dao).sort()).toEqual([...bon].sort())
-    // phiên chỉ-trả-lời cũ đã đóng ⇒ câu không còn bị Bi-a giữ
-    expect(d.dem('game_v2_session', `id='${tl.session}' AND json_extract(json,'$.dong')=1`)).toBe(1)
-  })
-
-  it('bàn Bi-a bỏ dở quá 30 phút ⇒ nhả câu cho Đảo; bàn đang chơi (< 30 phút) ⇒ lý do riêng "đang ở bàn Bi-a", không nói ca', async () => {
-    const { env } = fixture()
-    await giao(env)
-    const nay = Date.now()
-    const ban = await biaAction(env, 'S1', 'bia-xep-ban', { loai: 'ai', cheDo: 'don', soBi: 7 }, nay - 5 * 60_000)
-    const tren = [...(ban.bi as { qid: string }[]), ban.chot as { qid: string }].map((q) => q.qid)
-    const giu = tren.slice(0, 4)
-    await conLai(env, () => giu, nay)
-    const dangChoi = await startDao2(env, 'S1', nay)
-    expect(dangChoi.lyDo).toBe('cau_dang_o_bia')
-    expect(String(dangChoi.message)).not.toContain(LOI_CA)
-    expect(String(dangChoi.message)).toContain('Bi-a')
-    // 40 phút sau (em bỏ bàn) ⇒ câu về Đảo
-    const sau = await startDao2(env, 'S1', nay + 40 * 60_000)
-    expect(qidsCua(sau).sort()).toEqual([...giu].sort())
-  })
-
-  it('Đoàn: phiên chỉ-trả-lời bỏ dở không ăn mất câu ôn', async () => {
-    const { env } = fixture()
-    await giao(env)
-    const nay = Date.now()
-    // câu ôn: sai hôm qua
-    await ghiSuKien(env, ['Q1', 'Q2', 'Q3', 'Q6', 'Q7'].map((q) => suKien(q, nay - NGAY, false)))
-    const { kh } = await layKeHoachHomNay(env, 'S1', nay)
-    const on = kh.conDoan.map(qidGoc)
-    expect(on.length).toBeGreaterThan(0)
-    const tl = await biaAction(env, 'S1', 'bia-tra-loi', {}, nay)
-    const h = (tl.cau as { qid: string }[]).map((c) => c.qid)
-    expect(on.some((q) => h.includes(q))).toBe(true)
-    const doan = await startDoan2(env, 'S1', nay + 60_000)
-    expect(String(doan.message ?? '')).not.toContain(LOI_CA)
-    expect(qidsCua(doan).length).toBeGreaterThan(0)
-  })
-})
 
 describe('Đảo báo nhầm "ca kiểm tra" — nguyên nhân (a): ca đóng chưa công bố', () => {
   it('câu còn lại nằm trong ca đóng chưa công bố ⇒ không lộ câu, không kẹt rương: thể lực trừ câu tạm hoãn, rương mở, lời báo nói đúng ca', async () => {
