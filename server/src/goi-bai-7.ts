@@ -20,7 +20,8 @@ import { apLamLaiKhac } from './cau-anh-em'
 import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
 import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
-import { docCauHinhDem } from './cau-hinh-dem'
+import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
+import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -247,7 +248,11 @@ const VUA_LAM_MS = 15 * 60_000
  * LỖI 13/10 20:11 (em báo "còn một câu mà nó báo hoàn thành", sảnh 23/24): lệnh nộp câu ghi `game_v2_attempt` NGAY trong lô chấm, còn dòng sổ học ghi SAU
  * khi đã trả lời máy em (`ctx.waitUntil`). Mở chặng / đếm ngay sau câu cuối ⇒ sổ chưa có câu ấy ⇒ bộ đếm 23/24 và kế hoạch xếp LẠI đúng câu vừa làm,
  * còn `startGoi7` (luật 13/10 không phát lại câu vừa trả lời) bỏ nó ⇒ chặng rỗng ⇒ "Em đã hoàn thành…". Nay kế hoạch + bộ đếm cùng thấy câu vừa làm
- * ngay. Mã câu quy về câu gốc (bản ảo `~ss|bt|ydN`, lần `#n` — `tachSongSinh`) như sổ. Cùng đợt đọc (không thêm vòng chờ D1); chỉ mục `game_v2_attempt(sbd, created_at)`.
+ * ngay. Cùng đợt đọc (không thêm vòng chờ D1); chỉ mục `game_v2_attempt(sbd, created_at)`.
+ * MỘT SỐ VỚI LỊCH NGÀY (lỗi 13/10 22h, thầy: "app báo đủ mức rồi mà hôm nay lại báo thiếu" — Hôm nay 24/24, lịch ngày 19/24): (1) tập ĐÃ LÀM thêm ĐÚNG mã
+ * sổ ghi (mã đã phát, kể cả bản ảo `~ss|bt|ydN` / lần `#n`) — trước cộng mã GỐC ⇒ câu ảo vừa làm đếm hai lần (mã sổ + mã gốc) suốt 15 phút, kế hoạch
+ * tưởng đủ mức, ngừng phát câu; (2) chỉ thêm lượt CHƯA có dòng sổ — lượt đã ghi sổ thì sổ quyết định như lịch ngày (lướt / chẩn đoán không tính).
+ * `vuaLam` (chặn phát lại) giữ cả mã đã phát lẫn mã gốc (`tachSongSinh`).
  * `now` vắng ⇒ như cũ (chỉ sổ). Lỗi đọc bảng lượt ⇒ bỏ phần thêm, như cũ.
  */
 export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now?: number): Promise<{ daLam: Set<string>; vuaLam: Set<string> }> {
@@ -255,12 +260,13 @@ export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now
   const [done, guidedToday, vua] = await Promise.all([
     env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>(),
     env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
-    tu ? env.DB.prepare('SELECT DISTINCT qid FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,tu).all<{qid:string}>().catch(() => ({ results: [] as {qid:string}[] })) : Promise.resolve({ results: [] as {qid:string}[] }),
+    // `co_so`: lượt đã có dòng sổ (chỉ mục su_kien_hoc(sbd, qid, ngay_vn)) ⇒ sổ quyết định (lướt / chẩn đoán không tính); chưa có ⇒ đang chờ ghi, tính ngay.
+    tu ? env.DB.prepare('SELECT a.qid,EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=a.sbd AND s.qid=a.qid AND s.ngay_vn=? AND s.attempt_id=a.id) co_so FROM game_v2_attempt a WHERE a.sbd=? AND a.created_at>=?').bind(ngay,sbd,tu).all<{qid:string;co_so:number}>().catch(() => ({ results: [] as {qid:string;co_so:number}[] })) : Promise.resolve({ results: [] as {qid:string;co_so:number}[] }),
   ])
   const daLamNgay = new Set(done.results.map(r=>r.qid))
   for(const r of guidedToday.results)daLamNgay.add(r.qid)
   const vuaLam = new Set<string>()
-  for(const r of vua.results){const q=str(r.qid);if(!q)continue;vuaLam.add(q);const goc=tachSongSinh(q.replace(/#\d+$/,'')).goc;vuaLam.add(goc);daLamNgay.add(goc)}
+  for(const r of vua.results){const q=str(r.qid);if(!q)continue;vuaLam.add(q);vuaLam.add(tachSongSinh(q).goc);if(!Number(r.co_so))daLamNgay.add(q)}
   return { daLam: daLamNgay, vuaLam }
 }
 /**
@@ -300,14 +306,7 @@ function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: reado
     const phamVi = await phamViLop(env,lop)
     const maCu = [...(phamVi?.maDe ?? [])].filter(m => !goi.some(g => g.maDeNguon.includes(m)))
     // Ma trận cũ là toàn phạm vi; mẫu bổ sung chọn theo độ yếu, không chỉ câu đã làm.
-    return Promise.all([
-      env.DB.prepare(`SELECT DISTINCT j.value AS kn,p.trang_thai FROM game_v2_question q LEFT JOIN omni_q o ON q.qid=o.qid,
-      json_each(CASE WHEN json_array_length(COALESCE(o.vkn_json,'[]'))>0 THEN o.vkn_json ELSE json_array(CASE WHEN COALESCE(q.dang,'')<>'' THEN 'dang:'||q.dang ELSE 'cau:'||q.qid END) END) j LEFT JOIN omni_p_vkn p ON p.vkn_id=j.value AND p.sbd=? WHERE q.ma_de IN (SELECT value FROM json_each(?))`).bind(sbd,JSON.stringify(maCu)).all<Row>(),
-      env.DB.prepare(`SELECT q.qid,MIN(COALESCE(p.p,0.3)) yeu FROM game_v2_question q LEFT JOIN omni_q o ON o.qid=q.qid,
-      json_each(CASE WHEN json_array_length(COALESCE(o.vkn_json,'[]'))>0 THEN o.vkn_json ELSE json_array(CASE WHEN COALESCE(q.dang,'')<>'' THEN 'dang:'||q.dang ELSE 'cau:'||q.qid END) END) j LEFT JOIN omni_p_vkn p ON p.vkn_id=j.value AND p.sbd=?
-      WHERE q.ma_de IN(SELECT value FROM json_each(?)) AND json_extract(q.json,'$.reviewed')=1
-      GROUP BY q.qid ORDER BY yeu,q.qid LIMIT 96`).bind(sbd,JSON.stringify(maCu)).all<Row>(),
-    ])
+    return docMaTranCu7(env, sbd, maCu, now)
   })())
   const ungMoRong = som(Promise.all([qidsGoi, oldUngSom]).then(([qids, [, ungCu]]) => [...qids, ...ungCu.results.map(r => str(r.qid))]))
   const hsSom = som(docHoSo2(env, sbd, ngay, undefined, undefined, undefined, ungMoRong))
@@ -316,6 +315,69 @@ function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: reado
   const dongCo = docTruocDongCoNeuSanBang(env, sbd, now)
   const mucSom = som(docMucNgay7(env, sbd, ngay))
   return { phuSom, khoiSom, daLamSom, xemChuaSom, kiemSom, oldUngSom, hsSom, dongCo, mucSom }
+}
+/** Phần CHỈ PHỤ THUỘC KHO của hai câu SQL cũ (ma trận nhãn + 96 câu yếu; bản gốc giữ trong tests/goi7-ma-tran-cu-1310.test.ts làm phép thử): mỗi (câu, tờ, nhãn kỹ năng) — [qid, đã duyệt 0/1, nhãn]. Cùng CASE nhãn dự phòng (dạng / câu). */
+const SQL_KN_TINH = `SELECT q.qid,CASE WHEN json_extract(q.json,'$.reviewed')=1 THEN 1 ELSE 0 END duyet,j.value AS kn FROM game_v2_question q LEFT JOIN omni_q o ON o.qid=q.qid,
+      json_each(CASE WHEN json_array_length(COALESCE(o.vkn_json,'[]'))>0 THEN o.vkn_json ELSE json_array(CASE WHEN COALESCE(q.dang,'')<>'' THEN 'dang:'||q.dang ELSE 'cau:'||q.qid END) END) j WHERE q.ma_de IN (SELECT value FROM json_each(?))`
+/** Bản đồ GỌN (bộ nhớ isolate — đo 13/10 21:20–22:05: 111 lỗi `exceededMemory`): mã câu / nhãn mỗi chuỗi giữ MỘT lần, bộ ba (chỉ số câu, đã duyệt, chỉ số nhãn) trong Uint32Array. */
+type KnTinh7 = { q: string[]; k: string[]; ba: Uint32Array }
+/** Trần TỔNG số bộ ba của mọi phạm vi đang đệm trong một isolate (~12 byte/bộ ba); vượt ⇒ bỏ phạm vi cũ nhất. */
+const TRAN_BA_KN_TINH = 120_000
+function gonKnTinh(rows: readonly Row[]): KnTinh7 {
+  const q: string[] = [], k: string[] = [], iq = new Map<string, number>(), ik = new Map<string, number>(), ba = new Uint32Array(rows.length * 3)
+  rows.forEach((x, i) => {
+    const a = str(x.qid), b = str(x.kn)
+    let u = iq.get(a); if (u === undefined) { u = q.length; q.push(a); iq.set(a, u) }
+    let v = ik.get(b); if (v === undefined) { v = k.length; k.push(b); ik.set(b, v) }
+    ba[3 * i] = u; ba[3 * i + 1] = Number(x.duyet) === 1 ? 1 : 0; ba[3 * i + 2] = v
+  })
+  return { q, k, ba }
+}
+/** Hạn tối đa của bản đồ câu → nhãn kỹ năng (tính từ lúc DỰNG): nhãn mới duyệt vào chậm nhất 10 phút — như danh mục Hành trình (HAN_TOI_DA_DANH_MUC). */
+const HAN_KN_TINH_MS = 600_000
+/** Sau bao lâu thì hỏi lại dấu kho (một dòng) trước khi dùng tiếp bản đồ — câu sửa/duyệt vào chậm nhất chừng này, như danh mục ngoài cao điểm. */
+const KIEM_KN_TINH_MS = 60_000
+const demKnTinh = new WeakMap<object, Map<string, { luc: number; kiem: number; dau: string; tinh: KnTinh7 }>>()
+/**
+ * MA TRẬN CŨ + ỨNG VIÊN YẾU của Gói 7 (13/10 tối — thầy: "tất cả mọi chỗ rút câu rất là lag, bạn tối ưu máy chủ chuyên sâu"). Số đo D1 thật 24 giờ:
+ * hai câu SQL cũ (ma trận nhãn + 96 câu yếu, bản gốc ở test) chạy ~24.000 lần/ngày, mỗi lần quét ~6.500–8.900 dòng câu kèm tách JSON (~300 + 80 giây D1/ngày) — trong khi phần quét
+ * kho (câu → nhãn kỹ năng, đã duyệt) giống hệt cho mọi em cùng phạm vi; chỉ điểm kỹ năng `omni_p_vkn` (khoá chính (sbd, vkn_id) ⇒ ≤ 1 dòng/nhãn) là của em.
+ * Nay: bản đồ tĩnh (SQL_KN_TINH, MỘT lần quét thay hai) đệm theo isolate (khoá D1 gốc + phạm vi), dùng lại tới 10 phút từ lúc dựng, quá 60 giây thì hỏi
+ * dấu kho (một dòng) CÙNG đợt với lượt đọc điểm của em. Điểm của em LUÔN đọc mới, rồi tính
+ * ĐÚNG phép SQL cũ: DISTINCT (nhãn, trạng thái) và MIN(COALESCE(p, 0,3)) theo câu đã duyệt, xếp (độ yếu, mã câu), lấy 96. Số đợt D1 không tăng.
+ */
+export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[], now: number): Promise<[{ results: Row[] }, { results: Row[] }]> {
+  const thamSo = JSON.stringify(maCu), khoa = [...maCu].sort().join('|'), goc = dbGoc(env.DB as unknown as object)
+  const pSom = env.DB.prepare('SELECT vkn_id,p,trang_thai FROM omni_p_vkn WHERE sbd=?').bind(sbd).all<Row>()
+  pSom.catch(() => {})
+  let bang = demKnTinh.get(goc)
+  if (!bang) { bang = new Map(); demKnTinh.set(goc, bang) }
+  let e = bang.get(khoa)
+  if (e && !(now - e.luc >= 0 && now - e.luc < HAN_KN_TINH_MS)) e = undefined
+  if (e && !(now - e.kiem >= 0 && now - e.kiem < KIEM_KN_TINH_MS)) {
+    const d = await dauKhoCau(env)
+    if (d && (e.dau ? d === e.dau : dauTruocLucDoc(d, e.luc))) { e.dau = d; e.kiem = now } else e = undefined
+  }
+  if (!e) {
+    // Cùng nhịp với lượt đọc điểm (không `await` nào trước) ⇒ lớp gom lệnh gửi chung một lô như hai câu cũ.
+    const r = await env.DB.prepare(SQL_KN_TINH).bind(thamSo).all<Row>()
+    e = { luc: now, kiem: now, dau: '', tinh: gonKnTinh(r.results ?? []) }
+    bang.delete(khoa); bang.set(khoa, e)
+    let tong = 0; for (const v of bang.values()) tong += v.tinh.ba.length / 3
+    for (const [k2, v] of bang) { if (tong <= TRAN_BA_KN_TINH || k2 === khoa) break; tong -= v.tinh.ba.length / 3; bang.delete(k2) }
+  }
+  const { q: qs, k: ks, ba } = e.tinh, n = ba.length / 3
+  const p = new Map(((await pSom).results ?? []).map((x) => [str(x.vkn_id), x]))
+  const da = new Set<string>(), kn: Row[] = []
+  for (let i = 0; i < n; i++) { const k = ks[ba[3 * i + 2]!]!, t = p.get(k)?.trang_thai ?? null, d = `${k}\u0000${t}`; if (da.has(d)) continue; da.add(d); kn.push({ kn: k, trang_thai: t }) }
+  const yeu = new Map<string, number>()
+  for (let i = 0; i < n; i++) {
+    if (!ba[3 * i + 1]) continue
+    const qid = qs[ba[3 * i]!]!, v = p.get(ks[ba[3 * i + 2]!]!)?.p, y = v == null ? 0.3 : Number(v), cu = yeu.get(qid)
+    if (cu === undefined || y < cu) yeu.set(qid, y)
+  }
+  const ung = [...yeu].sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).slice(0, 96).map(([qid, y]) => ({ qid, yeu: y }))
+  return [{ results: kn }, { results: ung }]
 }
 /** `gsSom`: danh sách gói đã đọc đoán cùng đợt cờ Gói 7 (`docDanhSachGoiSom7`); vắng ⇒ đọc như cũ. */
 export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>) {

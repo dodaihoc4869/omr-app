@@ -416,3 +416,32 @@ Thầy (13/10 20:11, ảnh em Nguyễn Tiến Nam: "Chặng học của em 23/24
 - [x] Tối ưu tức thì máy chủ (tiếp hoa2-cau-chi-tiet bỏ docHoSo2) | bằng chứng: đo 1 giờ cao điểm (workflow 38402898461): 9375 yc, 0 lỗi, p99 1,49 s, CPU p99 0,76 s; cauChiTiet tra docMetaCau thay docHoSo2: 4→2 lượt D1, 3→2 đợt; chờ phát hành
 - [x] Phát hành PR280 (gộp 4af31ff1) | bằng chứng: Actions 38408765210 SUCCESS (npm test 5 phút, kiểm ca thi, Worker + Pages cùng commit), sống từ 21:03:41 VN; lùi: git revert -m 1 4af31ff1 && git push origin main
 - [ ] Đo lại máy chủ 1 giờ sau phát hành (so CPU p99 0,76 s, p99 1,49 s trước sửa) — lịch 22:35 VN | bằng chứng: (chưa có)
+Thầy (13/10 tối, ảnh "Lên men — tính khối lượng · Sửa từng bước · Đang mở câu..."): "chỗ này mở câu quá lâu"
+- [ ] Tìm nguyên nhân + làm "Đang mở câu..." (Sửa từng bước) mở tức thì | bằng chứng: (chưa có)
+- [ ] (dở) Tối ưu "Sửa từng bước · Đang mở câu…": mo-dot gộp phat (38 → 17 đợt D1, 2 → 1 lượt mạng) — chưa chạy xong test giao diện, CHƯA đẩy | bằng chứng: (chưa có)
+Thầy (13/10 tối): "phần tick bài hiện tại load khá lâu, có lúc không load được, mục lưu hạn từng lớp bấm lưu bị nhảy sang màn khác, tôi muốn bấm lưu xong hiện đã lưu không nhảy, thêm một nút sửa hạn hàng loạt nhé. Tối ưu chỗ này cho phản hồi tức thì đi. Cho tôi thêm phần thêm em và bớt em trong phần đó luôn, xóa bỏ hết phần thêm em của bản cũ chiến dịch nhé, khi thêm em vào thuật toán phân câu giữ nguyên nhé."
+- [ ] Tick bài load lâu / có lúc không load được ⇒ tìm nguyên nhân + tải tức thì | bằng chứng: (chưa có)
+- [ ] Lưu hạn từng lớp: bấm lưu hiện "Đã lưu", KHÔNG nhảy màn | bằng chứng: (chưa có)
+- [ ] Nút sửa hạn hàng loạt | bằng chứng: (chưa có)
+- [ ] Thêm em / bớt em trong phần đó (thuật toán phân câu giữ nguyên) | bằng chứng: (chưa có)
+- [ ] Xoá phần thêm em của bản cũ chiến dịch | bằng chứng: (chưa có)
+Thầy (13/10 21:26, ảnh HS kẹt "Đang chuẩn bị những câu phù hợp với em…" 14/24): "tại sao hs kêu lag không load được câu hỏi"
+- [x] Tìm nguyên nhân HS lag 21:26 | bằng chứng: workflow 38414976153 (20:52–21:37): 19.234 yc/45 phút (≈2,7× giờ 19:11–20:11), 0 lỗi, p50 0,20 s · p90 1,25 s · p99 3,75 s (trước 0,05/0,46/1,49), CPU p99 0,74 s; 3 lượt phát hành giữa cao điểm (20:52 PR269, 21:03 PR280, ~21:15 PR282) xoá đệm Worker ⇒ docMetaCau 3.111 lần × 33 ms (~1.270 dòng/lần); tem kho KHÔNG đổi (workflow 38415223402: 0 tờ lập chỉ mục/1 giờ, 0 tờ lệch)
+- [x] Tối 13/10 giờ cao điểm: đo số thật (routine) | bằng chứng: do-d1-cao-diem 38415277120 (24 giờ): docMetaCau 26.950→21.982 lần (37,6→30,7 ms); danhMuc 8.903→4.708 lần (vẫn đọc 123 triệu dòng/ngày — lớn nhất); upsert goi_bai_7_cau 1,04 triệu dòng→hết khỏi top; hanh_trinh_v4_canh ghi ~2,5 triệu→~0,98 triệu dòng
+- [ ] LUẬT: không phát hành 19:00–23:59 trừ sửa khẩn; việc dở tối nay phát hành sau 24:00
+Thầy (13/10 ~21:45): "tất cả mọi chỗ rút câu rất là lag, bạn tối ưu máy chủ chuyên sâu cho app hoạt động mượt mà và tức thì ngay và luôn nhé"
+- [~] Tối ưu chuyên sâu mọi đường rút câu | bằng chứng: ma trận kỹ năng Gói 7 đệm isolate (bỏ hai SQL ~380 giây D1/ngày), sảnh lần đầu 30 đợt/37 lệnh = mốc; lớp đệm colo BỎ (workers.dev không có tác dụng) — commit d357c183 + a0d77d01. CHƯA PHÁT HÀNH (chờ 00:00). Còn: đo số D1 thật sau phát hành
+Thầy (13/10 tối, 2 ảnh: "Đủ mức hôm nay · Đã làm 24/24" và ô lịch "Hôm nay 13/10 · 19/24 · thiếu 5"): "app báo đủ mức rồi mà hôm nay lại báo thiếu, sửa triệt để đi nhé"
+- [x] Sửa triệt để: hai chỗ đếm "đã làm hôm nay" lệch nhau (24/24 vs 19/24) | bằng chứng: nguyên nhân gốc = phần "vừa làm" cộng mã GỐC của câu bản ảo (~ss/~bt/#n) trong khi sổ ghi mã ảo ⇒ đếm hai lần 15 phút; test tái hiện đúng 24 vs 19 rồi xanh (tests/goi7-vua-lam-dem-1310 5/5); số thật 13/10: 137 lượt mã ảo, 14 em ≥3 lượt ảo/10 phút; commit 4f4f1fdd (+ chỉ cộng lượt chưa có dòng sổ). CHƯA PHÁT HÀNH (chờ 00:00)
+Thầy (13/10 22:2x): "sau 00h bạn phải tối ưu chuyên sâu tốc độ ở mọi chỗ, xóa tất cả các code không liên quan, đảo đoàn, bia , chiến dịch cũ các thứ. Phải rút gọn và tối ưu code ở cấp độ siêu chuyên nghiệp giống google facebook, tối ưu code siêu thông minh ngắn gọn đẳng cấp, để app hoạt động siêu mượt mà đỉnh cao. Cái này phải làm bằng được"
+Thầy (tiếp): "bạn làm việc này với thằng codex nữa nhé để tạo ra những dòng code đỉnh cao nhất thế giới về trải nghiệm app"
+- [ ] Sau 00h: kiểm kê code Đảo thần thú / Đoàn Hộ Tống / Bia / chiến dịch cũ (tệp, bảng D1, chỗ dùng chung với kho câu) | bằng chứng: (chưa có)
+- [ ] Sau 00h: xoá code các phần đó (KHÔNG xoá bảng/dữ liệu D1 — chỉ gỡ code), tsc + vitest + build xanh | bằng chứng: (chưa có)
+- [ ] Sau 00h: tối ưu tốc độ mọi chỗ (byte tải từng app + đợt chờ D1), mốc docs/moc-toc-do.json hạ | bằng chứng: (chưa có)
+- [ ] Chia việc với Codex: ghi mục [ ] vào docs/viec-giao-codex.md, đẩy main, theo dõi PR | bằng chứng: (chưa có)
+- [x] Kiểm kê code Đảo/Đoàn/Bi-a/chiến dịch cũ | bằng chứng: docs/kiem-ke-don-game-1410.md (commit fbb1ee3e)
+- [x] Giao Codex C1–C3 (phía app + Tick bài) | bằng chứng: docs/viec-giao-codex.md (commit de937717, 3a8b6710) — lên main cùng PR 00:00
+- [~] Gỡ máy chủ Bi-a (679e3646) + Đoàn/cửa hàng/võ đài/phòng (90f612af, test đang sửa) trong worktree wt-don — chưa đẩy
+- [ ] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts, /gv/chien-dich/sua) — SAU khi C3 Codex gộp
+- [x] Đo lại máy chủ 1 giờ sau phát hành PR280 | bằng chứng: workflow 38428596656, khung CỐ ĐỊNH 21:20–22:20 VN (sau PR280 16 phút, trước PR283) so 19:11–20:11 (38402898461). Yêu cầu 9.375 → 15.814 (×1,69). D1 top-30 402 → 398 s ⇒ mỗi yêu cầu 42,9 → 25,2 ms (−41%). Danh mục cả kho (24.017 dòng) 764 → 250 lần (mỗi 1.000 yc 81,5 → 15,8); docMetaCau 1.945 → 1.903 lần (mỗi 1.000 yc 207 → 120), 22 → 23,7 ms; game_v2_question theo tờ 265×74 ms → 372×51,5 ms. Worker p50 0,05 → 0,06 s · p90 0,46 → 0,53 s · p99 1,49 → 3,75 s (XẤU HƠN) · CPU p99 761 → 720 ms. LỖI 0 → 111 = 100% `exceededMemory` (Worker vượt 128 MB, bị giết), dồn 21:20–22:05 (5–20 lỗi/5 phút, p99 4 s), từ 22:05 về 0 lỗi, p99 1–3 s.
+- [ ] KHẨN: giảm bộ nhớ Worker giờ cao điểm (exceededMemory 111 lần/giờ ⇒ em "không load được câu") — tìm đệm/truy vấn ngốn bộ nhớ (danh mục 24.017 dòng, JSON đầy đủ câu, đệm isolate), đặt trần trọng lượng; test đo bộ nhớ | bằng chứng: (chưa có)

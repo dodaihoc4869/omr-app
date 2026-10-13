@@ -1,5 +1,5 @@
 // Hợp đồng chữa lỗi: quyền từ token, ảnh chụp bất biến, CAS và sổ học trong cùng batch.
-import type { Env } from './kieu'
+import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { coCaDangMo } from './bi-a'
 import { cauCongKhai, layCauChoEm } from './cau-theo-qid'
@@ -31,22 +31,25 @@ const loi = (ma: string, mo: string, status = 400) =>
 async function quyen(env: Env, b: Obj): Promise<string | Response> {
   const sbd = await gameIdentity(env, b).catch(() => '')
   if (!sbd) return loi('CAN_DANG_NHAP', 'Em đăng nhập lại để tiếp tục.', 401)
-  if (!(await tinhNangBat(env, { sbd })))
+  // 13/10 (thầy: "chỗ này mở câu quá lâu"): hai lượt ĐỌC độc lập (cờ tính năng, ca đang mở) chạy CÙNG đợt — trước: nối tiếp. Thứ tự xét + lời giữ nguyên.
+  const [bat, ca] = await Promise.all([
+    tinhNangBat(env, { sbd }),
+    coCaDangMo(env, sbd, Date.now(), true).then((v) => ({ v }), () => null),
+  ])
+  if (!bat)
     return loi('FEATURE_TAT', 'Vòng chữa chưa mở cho tài khoản này.', 403)
-  try {
-    if (await coCaDangMo(env, sbd, Date.now(), true))
-      return loi(
-        'DANG_KIEM_TRA',
-        'Em hoàn thành ca kiểm tra trước khi chữa câu.',
-        403,
-      )
-  } catch {
+  if (!ca)
     return loi(
       'CHO_KIEM_QUYEN',
       'Chưa kiểm tra được lịch thi. Tiến độ được giữ; em thử lại sau.',
       503,
     )
-  }
+  if (ca.v)
+    return loi(
+      'DANG_KIEM_TRA',
+      'Em hoàn thành ca kiểm tra trước khi chữa câu.',
+      403,
+    )
   return sbd
 }
 async function bam(v: unknown): Promise<string> {
@@ -68,6 +71,16 @@ const docPhien = (env: Env, sbd: string, dot: string) =>
   )
     .bind(dot, sbd)
     .first<Obj>()
+const sqlDot = (env: Env, sbd: string, id: string) => env.DB.prepare('SELECT * FROM chua_loi_dot WHERE id=? AND sbd=?').bind(id, sbd)
+const sqlPhien = (env: Env, sbd: string, dot: string) =>
+  env.DB.prepare('SELECT * FROM chua_loi_phien WHERE dot_id=? AND sbd=? ORDER BY lan_gap_lai DESC,so_luot DESC LIMIT 1').bind(dot, sbd)
+const dongDau = (r: { results?: unknown[] } | undefined): Obj | null => ((r?.results ?? [])[0] as Obj | undefined) ?? null
+/** GHI rồi ĐỌC LẠI đợt + phiên trong CÙNG một lô (13/10, thầy: "chỗ này mở câu quá lâu" — trước: lô ghi xong mới đọc lại, thêm một đợt D1). Lô chạy
+ *  trong một giao dịch như D1 ⇒ phần đọc thấy đúng trạng thái ngay sau các câu ghi (như đọc lại ngay sau `await batch` cũ). Đợt chắc có, như `docDot(...)!` cũ. */
+async function ghiRoiDocDotPhien(env: Env, sbd: string, id: string, ghi: D1PreparedStatement[]): Promise<[Obj, Obj | null]> {
+  const r = await env.DB.batch([...ghi, sqlDot(env, sbd, id), sqlPhien(env, sbd, id)])
+  return [dongDau(r[r.length - 2])!, dongDau(r[r.length - 1])]
+}
 function docAnh(ph: Obj): AnhPhien | null {
   try {
     const a = JSON.parse(str(ph.snapshot_json))
@@ -216,7 +229,13 @@ async function traPhien(
 export async function moDot(env: Env, b: Obj): Promise<Response> {
   const sbd = await quyen(env, b)
   if (sbd instanceof Response) return sbd
-  return giaoDotCuaEm(env, sbd, str(b.qid))
+  const r = await giaoDotCuaEm(env, sbd, str(b.qid))
+  // 13/10 (thầy: "chỗ này mở câu quá lâu"): máy em mở câu = mo-dot RỒI phat-item (hai lượt đi-về mạng, hai lần kiểm quyền). `phat: true` ⇒ phát luôn
+  // bước đầu trong CÙNG lượt, kết quả phát (kể cả lỗi) nằm trong khoá `phat` — máy em xử lý y như khi tự gọi phat-item. Máy em bản cũ không gửi cờ ⇒ như cũ.
+  if (b.phat !== true || !r.ok) return r
+  const j = (await r.json()) as Obj
+  const ph = await phatItemCuaEm(env, sbd, { dotId: j.dotId })
+  return Response.json({ ...j, phat: await ph.json() })
 }
 export async function giaoDotCuaEm(
   env: Env,
@@ -226,12 +245,15 @@ export async function giaoDotCuaEm(
   const qid = qidChuan(qidVao)
   if (!qid || qid.length > 120)
     return loi('THIEU_THAM_SO', 'Thiếu câu cần chữa.')
-  const dau = await docTrangThaiLoiDau(env, sbd, qid, ngayVn(Date.now()))
+  // 13/10: trạng thái lỗi, cấu hình, học liệu, câu là bốn lượt ĐỌC độc lập ⇒ chạy CÙNG lúc (trước: bốn chặng nối tiếp ≈ 8 đợt D1). Chưa có lỗi đã công
+  // bố ⇒ trả lỗi như cũ, phần đọc thêm bỏ đi (chỉ đọc, không ghi, không trả gì cho em).
+  const dauSom = docTrangThaiLoiDau(env, sbd, qid, ngayVn(Date.now()))
+  const cfgSom = docCauHinh(env), hSom = docHocLieu(env, qid), qSom = cauDuoc(env, sbd, qid)
+  for (const p of [cfgSom, hSom, qSom]) p.catch(() => {})
+  const dau = await dauSom
   if (!dau || ['dong', 'khong_loi'].includes(dau.loiHoc.trangThai))
     return loi('CHUA_CO_LOI', 'Câu này chưa có lỗi đang mở đã công bố.', 404)
-  const cfg = await docCauHinh(env),
-    h = await docHocLieu(env, qid),
-    q = await cauDuoc(env, sbd, qid),
+  const [cfg, h, q] = await Promise.all([cfgSom, hSom, qSom]),
     now = Date.now()
   const cu = await env.DB.prepare(
     `SELECT * FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL ORDER BY giao_luc ASC,id ASC LIMIT 1`,
@@ -251,7 +273,7 @@ export async function giaoDotCuaEm(
         ? 'cau_thay_doi'
         : 'can_chan_doan'
   // Giao và chốt cửa sổ đo một lần; không kéo dài cửa sổ khi em quay lại hay sai tiếp.
-  await env.DB.prepare(
+  const [, dongDotMoi] = await env.DB.batch([env.DB.prepare(
     `INSERT OR IGNORE INTO chua_loi_dot(id,sbd,qid_chuan,content_group,cohort_id,nguon_sai,phien_ban_cau,mo_luc,sai_cuoi_luc,trang_thai_day,ly_do_thieu,policy_snapshot,giao_luc,chot_do_luc,tao_luc,cap_nhat_luc)
     SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL)`,
   )
@@ -275,9 +297,8 @@ export async function giaoDotCuaEm(
       sbd,
       qid,
       q?.group ?? '',
-    )
-    .run()
-  let dot = await docDot(env, sbd, id)
+    ), sqlDot(env, sbd, id)]) // 13/10: đọc lại đợt CÙNG lô ghi (bớt một đợt D1)
+  let dot = dongDau(dongDotMoi)
   if (!dot) {
     const winner = await env.DB.prepare(
       `SELECT qid_chuan FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL ORDER BY giao_luc ASC,id ASC LIMIT 1`,
@@ -295,12 +316,11 @@ export async function giaoDotCuaEm(
     q &&
     h.hocLieu?.contentVersion === q.version
   ) {
-    await env.DB.prepare(
+    const [, dongMoLai] = await env.DB.batch([env.DB.prepare(
       `UPDATE chua_loi_dot SET trang_thai_day='can_chan_doan',content_group=?,phien_ban_cau=?,ly_do_thieu='',revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=? AND NOT EXISTS(SELECT 1 FROM chua_loi_phien WHERE dot_id=?)`,
     )
-      .bind(q.group, q.version, now, id, num(dot.revision), id)
-      .run()
-    dot = (await docDot(env, sbd, id))!
+      .bind(q.group, q.version, now, id, num(dot.revision), id), sqlDot(env, sbd, id)])
+    dot = dongDau(dongMoLai)!
   }
   return Response.json({
     ok: true,
@@ -314,10 +334,13 @@ export async function giaoDotCuaEm(
 export async function phatItem(env: Env, b: Obj): Promise<Response> {
   const sbd = await quyen(env, b)
   if (sbd instanceof Response) return sbd
-  let dot = await docDot(env, sbd, str(b.dotId))
+  return phatItemCuaEm(env, sbd, b)
+}
+/** Phần phát của `phatItem` khi đã qua `quyen` (dùng lại trong `moDot` với `phat: true`). Đợt + phiên đọc CÙNG lúc (13/10 — trước: nối tiếp). */
+async function phatItemCuaEm(env: Env, sbd: string, b: Obj): Promise<Response> {
+  let [dot, ph] = await Promise.all([docDot(env, sbd, str(b.dotId)), docPhien(env, sbd, str(b.dotId))])
   if (!dot) return loi('KHONG_TIM_THAY', 'Không tìm thấy đợt chữa.', 404)
-  let ph = await docPhien(env, sbd, str(dot.id)),
-    a = ph ? docAnh(ph) : null
+  let a = ph ? docAnh(ph) : null
   if (a) {
     const cam = await kiemAnh(env, sbd, dot, a)
     if (cam) return cam
@@ -353,7 +376,7 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
         : h.hocLieu.buoc.length
       if (moi.buoc >= 0 && chonProbe(moi)) {
         const now = Date.now()
-        await env.DB.batch([
+        ;[dot, ph] = await ghiRoiDocDotPhien(env, sbd, str(dot.id), [
           env.DB.prepare(
             "UPDATE chua_loi_dot SET trang_thai_day=?,ly_do_thieu='',revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=? AND trang_thai_day='thieu_hoc_lieu'",
           ).bind(
@@ -370,8 +393,6 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
             'UPDATE chua_loi_phien SET snapshot_json=?,revision=revision+1,cap_nhat_luc=? WHERE id=? AND changes()=1',
           ).bind(JSON.stringify(moi), now, ph.id),
         ])
-        dot = (await docDot(env, sbd, str(dot.id)))!
-        ph = await docPhien(env, sbd, str(dot.id))
         a = ph ? docAnh(ph) : null
       }
     }
@@ -403,7 +424,7 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
     moi.phanHoi = null
     moi.batDauDoan = now
     moi.soChanDoan = 0
-    await env.DB.batch([
+    ;[dot, ph] = await ghiRoiDocDotPhien(env, sbd, str(dot.id), [
       env.DB.prepare(
         `UPDATE chua_loi_dot SET trang_thai_day='dang_kiem_chung',lan_gap_lai=?,revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=? AND trang_thai_day='cho_gap_lai_2'`,
       ).bind(lanMoi, now, dot.id, num(dot.revision)),
@@ -423,13 +444,12 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
         now,
       ),
     ])
-    dot = (await docDot(env, sbd, str(dot.id)))!
-    ph = await docPhien(env, sbd, str(dot.id))
     a = ph ? docAnh(ph) : null
   }
   if (!ph) {
-    const q = await cauDuoc(env, sbd, str(dot.qid_chuan)),
-      h = await docHocLieu(env, str(dot.qid_chuan))
+    const luatSom = docLuatChua(env, sbd)
+    luatSom.catch(() => {})
+    const [q, h] = await Promise.all([cauDuoc(env, sbd, str(dot.qid_chuan)), docHocLieu(env, str(dot.qid_chuan))])
     if (!q)
       return loi('CAU_BI_BAO_VE', 'Câu này hiện chưa được phép luyện.', 403)
     if (!h.hocLieu || h.hocLieu.contentVersion !== q.version)
@@ -447,10 +467,10 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
       cfg,
       now,
     )
-    a.gioDocLoiGiai = (await docLuatChua(env, sbd)).gioDocLoiGiai
+    a.gioDocLoiGiai = (await luatSom).gioDocLoiGiai
     const ck = cauCongKhai(q)
     a.cauGoc = ck
-    await env.DB.batch([
+    ;[dot, ph] = await ghiRoiDocDotPhien(env, sbd, str(dot.id), [
       env.DB.prepare(
         `UPDATE chua_loi_dot SET lan_gap_lai=1,revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=? AND NOT EXISTS(SELECT 1 FROM chua_loi_phien WHERE dot_id=?)`,
       ).bind(now, dot.id, num(dot.revision), dot.id),
@@ -469,8 +489,6 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
         now,
       ),
     ])
-    dot = (await docDot(env, sbd, str(dot.id)))!
-    ph = await docPhien(env, sbd, str(dot.id))
     a = ph ? docAnh(ph) : null
   }
   if (!ph || !a)
@@ -504,12 +522,11 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
   }
   const p = chonProbe(a)
   if (!p) {
-    await env.DB.prepare(
+    const [, dongHet] = await env.DB.batch([env.DB.prepare(
       "UPDATE chua_loi_dot SET trang_thai_day='thieu_hoc_lieu',ly_do_thieu='het_cau_moi_trong_phien',revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=?",
     )
-      .bind(now, dot.id, num(dot.revision))
-      .run()
-    dot = (await docDot(env, sbd, str(dot.id)))!
+      .bind(now, dot.id, num(dot.revision)), sqlDot(env, sbd, str(dot.id))])
+    dot = dongDau(dongHet)!
     return traPhien(env, dot, ph, a)
   }
   const id = crypto.randomUUID(),
@@ -518,7 +535,7 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
   a.soItem++
   a.daDung.push(dauNoiDung(p))
   a.phanHoi = null
-  await env.DB.batch([
+  ;[dot, ph] = await ghiRoiDocDotPhien(env, sbd, str(dot.id), [
     env.DB.prepare(
       'UPDATE chua_loi_dot SET revision=revision+1,cap_nhat_luc=? WHERE id=? AND sbd=? AND revision=?',
     ).bind(now, dot.id, sbd, num(dot.revision)),
@@ -544,8 +561,6 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
       `UPDATE chua_loi_phien SET snapshot_json=?,tien_do_json=?,item_hien_tai=?,revision=revision+1,cap_nhat_luc=? WHERE id=? AND EXISTS(SELECT 1 FROM chua_loi_item WHERE id=?)`,
     ).bind(JSON.stringify(a), JSON.stringify(a.tienDo), id, now, ph.id, id),
   ])
-  dot = (await docDot(env, sbd, str(dot.id)))!
-  ph = await docPhien(env, sbd, str(dot.id))
   a = ph ? docAnh(ph) : null
   const it = await env.DB.prepare(
     'SELECT * FROM chua_loi_item WHERE id=? AND sbd=?',

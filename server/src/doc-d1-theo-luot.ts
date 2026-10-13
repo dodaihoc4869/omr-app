@@ -8,7 +8,10 @@ const DA_GOP = Symbol('omr.docD1TheoLuot')
 // OMNI / danh sách GIỐNG HỆT em khác ⇒ D1 quá tải giờ cao điểm. SELECT mà MỌI bảng nhắc tới đều thuộc BANG_DUNG_CHUNG được nhớ 60 giây theo (SQL, tham số);
 // lệnh ghi qua bản gộp đụng các bảng này ⇒ xoá ngay (isolate khác cũ tối đa 60 giây). KHÔNG đưa `hoc_sinh` vào (có token/mật khẩu). Trả bản sao từng dòng.
 export const BANG_DUNG_CHUNG: readonly string[] = ['game_v2_question', 'omni_q', 'danh_sach']
-const demChung = new DemTTL<D1Result>(60_000, 300, 16_000_000)
+// Trần bộ nhớ (đo 13/10 21:20–22:05: 111 lỗi `exceededMemory`): trọng lượng = số ký tự JSON; chữ Việt ⇒ 2 byte/ký tự và đối tượng dòng còn tốn gấp vài lần
+// ⇒ trước 16 triệu ký tự (một mục tới 4 triệu) có thể chiếm hàng chục MB của 128 MB isolate. Nay 6 triệu tổng, 1,5 triệu mỗi mục (mục lớn hơn đọc thẳng D1).
+const demChung = new DemTTL<D1Result>(60_000, 300, 6_000_000)
+const TRAN_MOT_MUC_DEM_CHUNG = 1_500_000
 const RE_BANG_SQL = /\b(?:FROM|JOIN)\s+([A-Za-z_][A-Za-z0-9_]*)/gi
 function khoaDemChung(sql: string, tham: readonly unknown[]): string | null {
   if (!/^\s*SELECT\b/i.test(sql) || /\bFROM\s+[A-Za-z_][A-Za-z0-9_]*\s*,/i.test(sql) || /'now'|\brandom\s*\(/i.test(sql)) return null
@@ -214,7 +217,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     return p.then((r) => {
       if (r && Array.isArray(r.results)) {
         const co = Math.max(1, JSON.stringify(r.results).length)
-        if (co <= 4_000_000) demChung.ghi(khoa, Date.now(), banSao(r), co)
+        if (co <= TRAN_MOT_MUC_DEM_CHUNG) demChung.ghi(khoa, Date.now(), banSao(r), co)
       }
       return r
     })
