@@ -80,7 +80,8 @@ describe('khung lời giải', () => {
   const lg = { dapAn: 'A', chot: 'n = 0,1 mol', tung: [], buoc: [], ketQua: '' }
   it('hoiThem ⇒ có ô hỏi Thầy; không bật hoặc màn thầy ⇒ không có', async () => {
     const { unmount } = render(<KhungLoiGiai cau={cau} loiGiaiChu={lg} hoiThem onDong={() => {}} />)
-    expect(screen.getByRole('button', { name: 'Em còn chỗ chưa hiểu? Nhắn hỏi Thầy' })).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (Claude, đợt 22 — luật tốc độ): khung hỏi thêm Thầy tải lười (không vào lượt mở app) ⇒ nút hiện sau một nhịp, chờ bằng findByRole.
+    expect(await screen.findByRole('button', { name: 'Em còn chỗ chưa hiểu? Nhắn hỏi Thầy' })).toBeTruthy()
     unmount()
     const r2 = render(<KhungLoiGiai cau={cau} loiGiaiChu={lg} onDong={() => {}} />)
     expect(screen.queryByRole('button', { name: 'Em còn chỗ chưa hiểu? Nhắn hỏi Thầy' })).toBeNull()

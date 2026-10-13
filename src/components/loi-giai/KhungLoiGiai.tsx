@@ -4,10 +4,11 @@
 // Câu CHƯA có hồ sơ từng bước (nút Hỏi thầy): hộp hiện lời giải chữ đang có của kho, vẽ bằng React (chữ kho là chữ thường, React tự thoát).
 // Vòng học v2 GĐ2: câu có học liệu `kiem` ⇒ khung thêm "Đọc từng bước"; câu kiểm khung gửi lên ('khung-cau-kiem') được chuyển tới máy chủ
 // (`/hs/cau-kiem`, chấm ở máy chủ) rồi trả kết quả vào khung ('cau-kiem-kq'); dưới hộp có thanh thang tự gỡ (ThanhThangGo). Màn thầy không có.
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useId, useRef, useState } from 'react'
 import { baoDocLoiGiai, guiCauKiem, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu, type SuKienKhung } from '../../lib/loi-giai-api'
 import ThanhThangGo from './ThanhThangGo'
-import HoiThemThay from './HoiThemThay'
+// Đợt 22 (luật tốc độ 13/10): khung hỏi thêm Thầy chỉ tải khi hiện (nút Hỏi thầy có ở mọi app — không kéo khung này vào lượt mở app).
+const HoiThemThay = lazy(() => import('./HoiThemThay'))
 import KhoiLoiGiaiChuan, { chuanSangCauTruc } from './KhoiLoiGiaiChuan'
 import './loi-giai.css'
 
@@ -110,7 +111,7 @@ export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false
         <div className="lg-cuon"><LoiGiaiChuView cau={cau} lg={loiGiaiChu} /></div>
       ) : null}
       {coThang && kiem && <ThanhThangGo qid={cau.qid} kiem={kiem} lanTai={lanTai} layDang={layDang} />}
-      {hoiThem && !thay && <HoiThemThay qid={cau.qid} nguon={nguon} />}
+      {hoiThem && !thay && <Suspense fallback={null}><HoiThemThay qid={cau.qid} nguon={nguon} /></Suspense>}
     </div>
   )
 }

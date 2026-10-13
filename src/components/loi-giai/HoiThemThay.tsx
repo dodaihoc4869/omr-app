@@ -4,7 +4,7 @@
 import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { ChemText } from '../../lib/chem-format'
 import { chiSoRo } from '../../lib/chi-so-ro'
-import { hoiThemThay } from '../../lib/loi-giai-api'
+import { hoiThemThay } from '../../lib/hoi-them-api'
 
 type Tin = { vai: 'em' | 'thay'; chu: string }
 export const TOI_DA_KY_TU = 500
