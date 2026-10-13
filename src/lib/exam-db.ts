@@ -581,11 +581,15 @@ export async function xoaQidRaPhieu(sbd: string): Promise<void> {
  * đáp án một câu trong ngân hàng — xem NganHangDeScreen). */
 export async function loadAllSessionTeacherBanks(): Promise<{ maCa: string; sources: TeacherExamSource[] }[]> {
   const db = await getDb()
-  const keys = (await db.getAllKeys(STORE_SESSION_BANK_TEACHER)) as string[]
+  // Cùng một giao dịch chỉ-đọc: khoá và bank luôn thuộc cùng bản chụp, kể cả
+  // khi tab khác đang sửa/xoá ca. Không mở N giao dịch rồi chờ từng bank.
+  const tx = db.transaction(STORE_SESSION_BANK_TEACHER)
+  const store = tx.objectStore(STORE_SESSION_BANK_TEACHER)
+  const [keys, banks] = await Promise.all([store.getAllKeys(), store.getAll(), tx.done])
   const out: { maCa: string; sources: TeacherExamSource[] }[] = []
-  for (const k of keys) {
-    const sources = (await db.get(STORE_SESSION_BANK_TEACHER, k)) as TeacherExamSource[] | undefined
-    if (sources) out.push({ maCa: String(k), sources })
+  for (let i = 0; i < keys.length; i++) {
+    const sources = banks[i] as TeacherExamSource[] | undefined
+    if (sources) out.push({ maCa: String(keys[i]), sources })
   }
   return out
 }

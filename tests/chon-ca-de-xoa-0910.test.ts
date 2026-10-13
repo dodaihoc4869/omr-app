@@ -26,6 +26,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { caConEmDangLam, trangThaiCa } from '../src/screens/LichSuCaScreen'
 
+const LUAT_CA = fs.readFileSync(path.join(process.cwd(), 'src/lib/ca-dang-chay.ts'), 'utf8')
 const MAN = fs.readFileSync(path.join(process.cwd(), 'src/screens/LichSuCaScreen.tsx'), 'utf8')
 const GS = fs.readFileSync(path.join(process.cwd(), 'docs/apps-script-kiem-tra.gs'), 'utf8')
 
@@ -85,8 +86,8 @@ describe('D2 — NHẬN DIỆN CA ĐANG CHẠY', () => {
   })
 
   it('DÙNG LẠI `trangThaiCa`, không viết luật đếm giờ thứ hai', () => {
-    const dau = MAN.indexOf('export function caConEmDangLam(')
-    const than = MAN.slice(dau, MAN.indexOf('\n}', dau))
+    const dau = LUAT_CA.indexOf('export function caConEmDangLam(')
+    const than = LUAT_CA.slice(dau, LUAT_CA.indexOf('\n}', dau))
     expect(than).toContain('trangThaiCa(ca, nowMs).ten')
     // Không được tự parse ngày lần nữa trong hàm này.
     expect(than).not.toContain('new Date(')
