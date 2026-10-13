@@ -86,7 +86,7 @@ export default function NhipHocCon({ sbd, tenCon, lop, homNay }: { sbd: string; 
             <span className="bcc-hang">
               {chipNhom}
               <Suspense fallback={null}>
-                <ChipBacNhipLuoi k={k} />
+                <ChipBacNhipLuoi k={k} xung="con" />
               </Suspense>
             </span>
           ) : (
