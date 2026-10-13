@@ -416,3 +416,12 @@ Thầy (13/10 20:11, ảnh em Nguyễn Tiến Nam: "Chặng học của em 23/24
 - [x] Tối ưu tức thì máy chủ (tiếp hoa2-cau-chi-tiet bỏ docHoSo2) | bằng chứng: đo 1 giờ cao điểm (workflow 38402898461): 9375 yc, 0 lỗi, p99 1,49 s, CPU p99 0,76 s; cauChiTiet tra docMetaCau thay docHoSo2: 4→2 lượt D1, 3→2 đợt; chờ phát hành
 - [x] Phát hành PR280 (gộp 4af31ff1) | bằng chứng: Actions 38408765210 SUCCESS (npm test 5 phút, kiểm ca thi, Worker + Pages cùng commit), sống từ 21:03:41 VN; lùi: git revert -m 1 4af31ff1 && git push origin main
 - [ ] Đo lại máy chủ 1 giờ sau phát hành (so CPU p99 0,76 s, p99 1,49 s trước sửa) — lịch 22:35 VN | bằng chứng: (chưa có)
+Thầy (13/10 tối, ảnh "Lên men — tính khối lượng · Sửa từng bước · Đang mở câu..."): "chỗ này mở câu quá lâu"
+- [ ] Tìm nguyên nhân + làm "Đang mở câu..." (Sửa từng bước) mở tức thì | bằng chứng: (chưa có)
+- [ ] (dở) Tối ưu "Sửa từng bước · Đang mở câu…": mo-dot gộp phat (38 → 17 đợt D1, 2 → 1 lượt mạng) — chưa chạy xong test giao diện, CHƯA đẩy | bằng chứng: (chưa có)
+Thầy (13/10 tối): "phần tick bài hiện tại load khá lâu, có lúc không load được, mục lưu hạn từng lớp bấm lưu bị nhảy sang màn khác, tôi muốn bấm lưu xong hiện đã lưu không nhảy, thêm một nút sửa hạn hàng loạt nhé. Tối ưu chỗ này cho phản hồi tức thì đi. Cho tôi thêm phần thêm em và bớt em trong phần đó luôn, xóa bỏ hết phần thêm em của bản cũ chiến dịch nhé, khi thêm em vào thuật toán phân câu giữ nguyên nhé."
+- [ ] Tick bài load lâu / có lúc không load được ⇒ tìm nguyên nhân + tải tức thì | bằng chứng: (chưa có)
+- [ ] Lưu hạn từng lớp: bấm lưu hiện "Đã lưu", KHÔNG nhảy màn | bằng chứng: (chưa có)
+- [ ] Nút sửa hạn hàng loạt | bằng chứng: (chưa có)
+- [ ] Thêm em / bớt em trong phần đó (thuật toán phân câu giữ nguyên) | bằng chứng: (chưa có)
+- [ ] Xoá phần thêm em của bản cũ chiến dịch | bằng chứng: (chưa có)

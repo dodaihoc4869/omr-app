@@ -171,6 +171,13 @@ function docNop(id: string): LanNop | null {
     return null
   }
 }
+/** Kết quả phát kèm trong `mo-dot` (`phat: true`, 13/10) ⇒ đúng dạng `apiPhatItem` (kể cả lỗi, cùng lời như `loiCua` của API); vắng ⇒ null (gọi phat-item). */
+function docPhatKem(v: unknown): KetQuaDot | null {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Record<string, unknown>
+  if (o.ok) return o as unknown as KetQuaDot
+  return { ok: false, loi: String(o.mo ?? o.error ?? 'Máy chủ chưa trả lời được. Em thử lại.'), ma: String(o.ma ?? '') }
+}
 export default function ManChuaCauSai({
   token,
   qid,
@@ -226,7 +233,9 @@ export default function ManChuaCauSai({
     let huy = false
     const n = ++goiRef.current
     ;(async () => {
-      const r = await apiMoDot(token, qid)
+      // 13/10 (thầy: "chỗ này mở câu quá lâu"): mở đợt + phát bước đầu MỘT lượt đi-về; máy chủ cũ không trả `phat` ⇒ gọi phat-item như trước.
+      const r = await apiMoDot(token, qid, undefined, true)
+      const phat = docPhatKem(r.phat)
       if (huy || n !== goiRef.current) return
       if (!r.ok || !r.dotId) {
         if (khongMoRef.current) {
@@ -237,7 +246,7 @@ export default function ManChuaCauSai({
         setTai(false)
         return
       }
-      const sau = await apiPhatItem(token, r.dotId)
+      const sau = phat ?? (await apiPhatItem(token, r.dotId))
       if (huy || n !== goiRef.current) return
       if (sau.ok) ap(sau)
       else setLoi(sau.loi ?? 'Chưa tải được câu chữa.')
