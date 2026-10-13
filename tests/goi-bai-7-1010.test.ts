@@ -312,6 +312,17 @@ it('164 câu với ngày kiểm tra ở ngày cuối vẫn chia hết trong bả
  for(let i=0;i<7;i++){const d=`2026-10-${10+i}`,n=quotaHocKt(con,d,'2026-10-16',lich);if(lich.has(d))expect(n).toBeLessThanOrEqual(12);con-=n}
  expect(con).toBe(0)
 })
+it('hạn sửa rất xa vẫn tính nhẹ; chia quota khớp phép chia sức chứa từng ngày ở cả lịch cũ/mới và nợ quá hạn',async()=>{
+ const {quotaHocKt}=await import('../server/src/kiem-tra-ca-nhan-loi'),lich=new Map([['2026-10-11',1],['2026-10-13',2],['2026-10-15',1]]),cu=new Set(lich.keys())
+ // Đối chứng độc lập bằng mô phỏng sức học từng ngày, không dùng hàm lập lịch để sinh đáp án.
+ for(const ds of [lich,cu])for(const u of [0,12,80,127,164,300])for(let n=10;n<=18;n++){
+  const ngay=`2026-10-${n}`,weight=(d:string)=>ds instanceof Map?(ds.get(d)===1?12:ds.has(d)?0:24):ds.has(d)?0:24
+  let tong=0,t=0,k=0;for(let i=n;i<=16;i++){const d=`2026-10-${i}`,v=weight(d);tong+=v;if(ds instanceof Map&&ds.has(d))k+=v;else if(v)t++}
+  const w=weight(ngay),phan=w?ds instanceof Map&&u>tong&&t&&!ds.has(ngay)?Math.ceil((u-k)/t):Math.ceil(u*w/Math.max(w,tong)):0
+  expect(quotaHocKt(u,ngay,'2026-10-16',ds)).toBe(ds instanceof Map&&ds.get(ngay)===1?Math.min(12,phan):phan)
+ }
+ const t=performance.now();expect(quotaHocKt(127,'2026-10-10','9999-12-31',lich)).toBe(1);expect(performance.now()-t).toBeLessThan(50)
+})
 
 it('sửa hạn từng bài/lớp: tính lại theo tiến độ từng em, giữ sổ/điểm/phiên; cron và em mới kế thừa hạn mới',async()=>{
  const k=await kho(127),qid=k.qids('DH-B1')[0]!

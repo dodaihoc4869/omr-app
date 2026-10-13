@@ -68,7 +68,9 @@ export function henKt(a: { sbd: string; homNay: string; lanTruoc?: string; bangC
 export function quotaHocKt(u: number, ngay: string, han: string, lich: ReadonlySet<string>|ReadonlyMap<string,number>, sanNgay=24): number {
  const trong=(d:string)=>lich instanceof Map?(lich.get(d)===1?12:(lich.get(d)??0)>=2?0:sanNgay):(lich.has(d)?0:sanNgay)
  const homNay=trong(ngay);if(!homNay)return 0
- let suc=0,thuong=0,sucKiem=0;for(let n=ngay;n<=han;n=congNgayKt(n,1)){const v=trong(n);suc+=v;if(lich instanceof Map&&lich.has(n))sucKiem+=v;else if(v)thuong++}
+ // Hạn thầy sửa có thể rất xa: tính số ngày trực tiếp, chỉ duyệt các ngày kiểm tra, không lặp từng ngày tới năm9999.
+ let thuong=Math.max(0,1+Math.floor((Date.parse(han)-Date.parse(ngay))/86400000)),suc=thuong*sanNgay,sucKiem=0
+ for(const d of lich.keys())if(d>=ngay&&d<=han){const v=trong(d);suc+=v-sanNgay;thuong--;sucKiem+=v}
  // Quá sức chứa chuẩn: giữ ngày kiểm tra ở 12, chia phần dư cho ngày thường từ trước (không dồn sang ngày kiểm tra cuối).
  const quota=lich instanceof Map&&u>suc&&thuong&&!lich.has(ngay)?Math.ceil(Math.max(0,u-sucKiem)/thuong):Math.ceil(Math.max(0,u)*homNay/Math.max(homNay,suc))
  return lich instanceof Map&&lich.get(ngay)===1?Math.min(12,quota):quota
