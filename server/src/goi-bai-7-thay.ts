@@ -14,7 +14,7 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
   await damBaoGoi7(env)
   if(b.action==='sua_han')return suaHan(env,b,Date.now())
   if(b.action==='sua_han_hang_loat')return suaHanHangLoat(env,b,Date.now())
-  if(b.action==='tong_hop')return tongHopGoi7(env,s(b.lop))
+  if(b.action==='tong_hop')return tongHopGoi7(env,s(b.lop),b.caCu===true)
   if(!b.action)await dongBoGoi7(env,Date.now(),100,s(b.lop))
   if (b.action==='dong_bo') return {ok:true,...await dongBoGoi7(env,Date.now(),100)}
   if(b.action==='chi_tiet') {

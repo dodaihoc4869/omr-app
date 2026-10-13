@@ -5,7 +5,7 @@ import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
 import { damBaoGoi7, docGoiCuaEm7 } from '../server/src/goi-bai-7'
 import { gvGoi7 } from '../server/src/goi-bai-7-thay'
 import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
-import { dongBaiDangGiao } from '../src/components/chien-dich/buoi-day-ui'
+import { dongBaiDangGiao, goiDangGiao, TOI_DA_DONG_GIAO } from '../src/components/chien-dich/buoi-day-ui'
 import type { DuGoi7, GoiDu } from '../src/components/chien-dich/goi7-ui'
 
 const NOW = Date.parse('2026-10-13T13:00:00Z')
@@ -71,17 +71,33 @@ it('lọc lớp/bỏ tick, không đếm lần xem, embargoed hoặc ca chưa c�
   expect((await gvGoi7(k.env, { action: 'tong_hop' })).thongKe).toEqual({ g1: { soEm: 0, pGap: null, pTuLam: null } })
 })
 
-it('5 gói chỉ một truy vấn đọc số tổng hợp; không đọc JSON đề, sổ em, OMNI hay lời chữa', async () => {
+it('5 gói chỉ hai truy vấn metadata/số tổng hợp; không trả JSON đề, sổ em, OMNI hay lời chữa', async () => {
   const k = await kho(5)
   await gvGoi7(k.env, { action: 'tong_hop' }) // Cờ/DDL đã ấm như isolate đang chạy.
   const before = k.d.soLenh.prepare
   const r = await gvGoi7(k.env, { action: 'tong_hop' })
-  expect(k.d.soLenh.prepare - before).toBe(1)
+  expect(k.d.soLenh.prepare - before).toBe(2)
   expect(r.goi).toHaveLength(5)
   const start = k.d.soLenh.prepare
   for (const g of r.goi as GoiDu[]) await gvGoi7(k.env, { action: 'danh_sach', goiId: g.id })
   expect(k.d.soLenh.prepare - start).toBe(45)
   expect(JSON.stringify(r).length).toBeLessThan(2500)
+})
+
+it('thống kê chỉ 12 dòng nhìn thấy theo đúng thứ tự UI; bài quá hạn ẩn không bị đọc sổ', async () => {
+  const k = await kho(20)
+  k.d.sql.exec("UPDATE goi_bai_7 SET han='2026-10-12' WHERE CAST(SUBSTR(id,2) AS INT)>=5")
+  const r = await gvGoi7(k.env, { action: 'tong_hop' }), goi = r.goi as GoiDu[]
+  expect(goi).toHaveLength(20)
+  expect(Object.keys(r.thongKe as object).sort()).toEqual(['g1', 'g2', 'g3', 'g4'])
+  const x = await gvGoi7(k.env, { action: 'tong_hop', caCu: true })
+  const visible = [...goiDangGiao(goi, '2026-10-13'), ...goi.filter(g => g.han < '2026-10-13').sort((a, b) => b.han.localeCompare(a.han))].slice(0, TOI_DA_DONG_GIAO)
+  expect(Object.keys(x.thongKe as object).sort()).toEqual(visible.map(g => g.id).sort())
+  expect(Object.keys(x.thongKe as object)).toHaveLength(TOI_DA_DONG_GIAO)
+  k.d.sql.exec("UPDATE goi_bai_7 SET han='2026-10-12'")
+  const truoc = k.d.soLenh.prepare
+  expect((await gvGoi7(k.env, { action: 'tong_hop' })).thongKe).toEqual({})
+  expect(k.d.soLenh.prepare - truoc).toBe(1)
 })
 
 const doi = (goi: { goiId: string; hanCu: string }[], han = '2026-10-19') => ({ action: 'sua_han_hang_loat', goi, han })
