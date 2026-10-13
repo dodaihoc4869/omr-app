@@ -22,8 +22,12 @@ const chuoi = (v: unknown): v is string => typeof v === 'string'
  *  không phải điện tích ⇒ đánh dấu chỉ số tường minh, giữ gạch thường. Ion ("HCO3-", "SO42-", "NH4+") không khớp nên đi đường cũ.
  *  Chỉ áp trong hộp Hỏi Thầy (mảnh tải lười): byte mở app không đổi. */
 const RE_GOC = /([A-Za-z0-9()_{}]+)-(?=$|[\s,.;:!?)\]…])/g
+/** ĐIỆN TÍCH TRONG NGOẶC (thầy báo 13/10, ảnh "HCO3⁻ + OH⁻ → CO3(2-) + H2O"): Gemini hay viết "CO3(2-)", "Fe(3+)", "NH4(+)" — ChemText
+ *  chỉ hiểu điện tích liền sau công thức ⇒ đổi thành mũ tường minh `^{2-}`. Chỉ khi phía trước là công thức (có chữ in hoa): "Fe(III)",
+ *  "(1)", "x(2-)" giữ nguyên. Dấu trừ Unicode "−" coi như "-". Không dùng lookbehind (máy iOS cũ). */
+const RE_DIEN_TICH_NGOAC = /([A-Za-z0-9)\]]+)\((\d{0,2})([+\-−])\)/g
 export function chuHoa(s: string): string {
-  return chiSoRo(s).replace(RE_GOC, (m, tok: string) =>
+  return chiSoRo(s).replace(RE_DIEN_TICH_NGOAC, (m, truoc: string, so: string, dau: string) => (/[A-Z]/.test(truoc) ? `${truoc}^{${so}${dau === '+' ? '+' : '-'}}` : m)).replace(RE_GOC, (m, tok: string) =>
     /^(?:[A-Z][a-z]?|[()]|\d+|_\{\d+\})+$/.test(tok) && /C(?![a-z])/.test(tok) && /H\d+$/.test(tok) ? `${tok.replace(/([A-Za-z)])(\d+)/g, '$1_{$2}')}-` : m)
 }
 
