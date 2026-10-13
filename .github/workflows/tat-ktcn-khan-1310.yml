@@ -1,0 +1,48 @@
+# KHẨN 13/10 (giờ VN ~12:40): D1 báo "D1 DB is overloaded" (mã 7429) ngay sau khi bật kiểm tra riêng.
+# Số đo `wrangler d1 insights` (run 38353048410): truy vấn số liệu lịch riêng (COT_META_KT) trung bình 902,8 ms MỖI dòng
+# — chạy ở mỗi lần em mở app (hoc-tap-sanh), phụ huynh, và bảng của thầy (mọi em một lượt) ⇒ D1 xếp hàng quá lâu.
+# Đường lùi chính thức của docs/hop-dong-kiem-tra-ca-nhan-1310.md: "Tắt cờ để lùi luồng, giữ bảng/bài nộp/sổ".
+# Tệp này CHỈ đổi cờ cau_hinh.kiem_tra_ca_nhan_v1 sang {"bat":false}; không xoá/sửa lịch, bài nộp hay điểm.
+# Bật lại sau khi bản vá số liệu gọn (bảng meta tính sẵn) đã lên.
+name: Khẩn — tạm tắt cờ kiểm tra riêng (D1 quá tải)
+on:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/tat-ktcn-khan-1310.yml']
+permissions:
+  contents: read
+concurrency:
+  group: tat-ktcn-khan-1310
+  cancel-in-progress: false
+jobs:
+  tat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Tắt cờ (thử lại khi D1 còn quá tải)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          LUC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          SQL="UPDATE cau_hinh SET gia_tri='{\"bat\":false,\"tatKhan\":\"$LUC\",\"lyDo\":\"D1 qua tai 13/10\"}',cap_nhat_luc='$LUC' WHERE khoa='kiem_tra_ca_nhan_v1'"
+          for n in 1 2 3 4 5 6; do
+            if npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL" > /tmp/kq.json 2>&1; then echo "Đã tắt ở lượt $n"; break; fi
+            echo "Lượt $n chưa được: $(grep -o '"text": "[^"]*"' /tmp/kq.json | tail -n 1)"; sleep $((n*10))
+            [ "$n" = 6 ] && exit 1
+          done
+      - name: Đọc lại cờ + đếm lịch (chỉ đọc)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa,gia_tri,cap_nhat_luc FROM cau_hinh WHERE khoa='kiem_tra_ca_nhan_v1'" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.stringify(JSON.parse(s)[0].results))}catch{console.log(s.slice(0,800))}})'
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT trang_thai,COUNT(*) n,MIN(ngay) som,MAX(ngay) muon,SUM(CASE WHEN ngay=date('now','+7 hours') THEN 1 ELSE 0 END) homNay FROM kiem_tra_ca_nhan GROUP BY trang_thai" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.stringify(JSON.parse(s)[0].results))}catch{console.log(s.slice(0,800))}})'

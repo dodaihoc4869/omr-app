@@ -11,5 +11,6 @@ const env={DB:db} as unknown as Env
 // Mỗi vòng đều kiểm ca đang mở; hồ sơ lỗi có cooldown nên không giữ cả hàng đợi.
 // Chuẩn bị tối đa một lô; phần còn lại do cron chậm xử lý, tránh quét cả lớp trong bước phát hành.
 const r=await dongBoKtCn(env,now,2);if(r.hoan)throw new Error('Ca vừa mở: dừng áp lịch riêng.');console.log(JSON.stringify({chuanBiKtCnTheoLo:true,soEm:r.soEm,soMoi:r.soMoi}));
-const stats=(await query(`SELECT COUNT(*) soLich,COUNT(DISTINCT sbd) soEm,SUM(CASE WHEN trang_thai='cho_nguon' THEN 1 ELSE 0 END) choNguon,MIN(ngay) ngaySomNhat,MAX(ngay) ngayMuonNhat,MIN(json_array_length(json_extract(json,'$.cau'))) cauItNhat,MAX(json_array_length(json_extract(json,'$.cau'))) cauNhieuNhat FROM kiem_tra_ca_nhan`))[0]
+// 13/10: số câu lấy từ số tính sẵn (kiem_tra_ca_nhan_meta) — không bóc JSON đề của mọi lịch trên D1 (từng làm D1 quá tải).
+const stats=(await query(`SELECT COUNT(*) soLich,COUNT(DISTINCT k.sbd) soEm,SUM(CASE WHEN k.trang_thai='cho_nguon' THEN 1 ELSE 0 END) choNguon,MIN(k.ngay) ngaySomNhat,MAX(k.ngay) ngayMuonNhat,MIN(json_extract(km.meta_json,'$.tong')) cauItNhat,MAX(json_extract(km.meta_json,'$.tong')) cauNhieuNhat,SUM(CASE WHEN km.id IS NULL THEN 1 ELSE 0 END) chuaCoSoTinhSan FROM kiem_tra_ca_nhan k LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id`))[0]
 console.log(JSON.stringify({apKtCn:true,...stats,giuKetQuaDaNop:true,cronTiepTuc:true}))

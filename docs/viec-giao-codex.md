@@ -34,3 +34,16 @@ Thầy đã chuyển bốn việc này cho Codex trên máy thầy ngày 13/10. 
 - [x] **Cổng trước khi gộp.** PR262 — frontend/serverTS, build/tốc độ0đỏ, SW13/13, màu0; đã gộp main e4f69136, không có deploy đang chạy trước mở PR. Xem docs/ket-qua-hop-dong-claude-1310.md; chờ Claude soát, chưa phát hành.
   - Chạy đủ các cổng ở `AGENTS.md` mục 3.
   - Mở PR vào `main`, thân PR liệt kê kết quả từng cổng.
+
+## 13/10 — Claude đã sửa làn kiểm tra cá nhân vì sự cố D1 quá tải (Codex đọc để gộp đúng)
+- Sự cố: D1 báo "overloaded" (mã 7429) sau khi bật cờ lúc 12:34. Số đo `wrangler d1 insights`: `COT_META_KT` trung bình 902,8 ms mỗi lần. Nguyên nhân là bóc JSON đề lớn ngay trong SQL (`json_each` lồng nhau, NOT IN tương quan), chạy ở mỗi lần em mở app (`hoc-tap-sanh`), ở phụ huynh và ở bảng của thầy.
+- Claude đã tạm tắt cờ lúc 12:49 rồi vá. Thay đổi trong mã:
+  - Bảng chỉ-thêm `kiem_tra_ca_nhan_meta(id, meta_json)` nằm trong `SQL_KT_CN`.
+  - `metaKt(d)` ghi số tĩnh cùng giao dịch với `lapKtCn`.
+  - `COT_META_KT` đọc số tính sẵn. "Đã trả lời" vẫn đếm bằng SQL nhưng chỉ trên JSON nhỏ (bảng phần × `tra_json`). Không trả đề hay câu trả lời ra Worker.
+  - `buMetaKt` (cron, mỗi phút ≤ 10 dòng) bù cho lịch cũ.
+  - `scripts/bat-lai-ktcn-1310.ts` bù hết rồi mới bật cờ.
+- **Luật từ nay:**
+  - Đổi cấu trúc `DeKt` hoặc thêm số vào lịch thì sửa `metaKt` và kiểm `tests/kiem-tra-ca-nhan-1310.test.ts` (test "khẩn 13/10").
+  - Truy vấn đọc lịch không gọi `json_each` / `json_extract` trên `k.json` cho nhiều dòng.
+- [ ] Codex gộp `main` mới vào nhánh đang làm, giữ bản vá này (đặc biệt `COT_META_KT`, `lapKtCn` batch, `dongBoKtCn` gọi `buMetaKt`).

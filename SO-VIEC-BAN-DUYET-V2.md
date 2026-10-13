@@ -363,3 +363,13 @@ Kết đợt 19 (13/10 12:34 VN) — PR259 gộp main `dc4512ec`, Actions `38351
 - [x] Dựng app phụ huynh theo bản vẽ (+ điểm danh buổi học, hạng chăm) | bằng chứng: dc4512ec (làn R), tests/ph-trung-tu-1310r.test.tsx, tests/ph-kiem-tra-dot19-1310.test.tsx
 - [x] 3 khổ + không chậm hơn + phát hành | bằng chứng: kiem:toc-do xanh trước gộp (HS 342960, PH 275800 byte nén), SW 13/13 (168 tệp / 2913 KB), Actions 38351141603 SUCCESS. Lùi: git revert dc4512ec && git push origin main
 - [!] Dặn Codex qua @codex GitHub | KẸT: bot chatgpt-codex-connector trả "create an environment" (issue #260, 13/10 05:30 UTC) dù thầy đã tạo môi trường; thầy xoá môi trường trùng 13/10 ~12:35 VN, đã thử lại 1 lần
+Thầy nhắn (13/10, ảnh thẻ "Lịch dành riêng cho em · Kiểm tra ôn tập · Thầy đang bổ sung nguồn…" trên app học sinh):
+"bạn thiết kế chỗ này cho đẹp mịn, thân thiện, xem cả màn làm bài kiểm tra của phần này của học sinh thiết kế lại đỉnh đẹp tối ưu thân thiện. Vẽ cho tôi xem trước khi duyệt buid nhé"
+- [ ] Thẻ Kiểm tra ôn tập (HS, mọi trạng thái): BẢN VẼ đẹp, mịn, thân thiện (dọc · ngang · máy tính) | bằng chứng: (chưa có)
+- [ ] Màn làm bài kiểm tra ôn tập (HS): BẢN VẼ thiết kế lại, tối ưu, thân thiện | bằng chứng: (chưa có)
+- [ ] Dựng theo bản vẽ sau khi thầy duyệt (làn Codex ⇒ ghi Nhật ký "định sửa" + test khoá luồng) | bằng chứng: (chờ duyệt)
+Thầy gửi ảnh (13/10 ~12:45): "D1_ERROR: D1 DB is overloaded. Requests queued for too long." + nút Thử lại
+- [x] Tìm nguyên nhân gốc | bằng chứng: wrangler d1 insights (run 38353048410): COT_META_KT (kiểm tra cá nhân, bật 12:34) 583 lần × TB 902,8 ms; PR261 deploy bước 11 hỏng 7429 lúc 12:40
+- [x] Chặn ngay: tạm tắt cờ kiem_tra_ca_nhan_v1 | bằng chứng: run 38353377657 — đọc lại {"bat":false} 12:49; 261 lịch (172 chờ nguồn, 89 hẹn), sớm nhất 17/10, hôm nay 0
+- [ ] Bản vá số liệu tính sẵn + phát hành + bật lại cờ | bằng chứng: SQLite đề 148 KB: cũ 8,57 → mới 0,09 ms/dòng, cùng số; test KTCN 22/22
+- [x] Thẻ Kiểm tra ôn tập (5 trạng thái) + màn làm bài: BẢN VẼ | bằng chứng: f0d7c041 docs/ban-ve-dot20/ (15 ảnh Chromium ≤ 150 KB, soát 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ), đã gửi thầy 12 ảnh — chờ duyệt
