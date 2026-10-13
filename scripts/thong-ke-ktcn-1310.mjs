@@ -29,3 +29,6 @@ in1('cau12GTTB', await doc(`SELECT q.qid,q.ma_de,json_extract(q.json,'$.phan') p
   FROM omni_q o JOIN game_v2_question q ON q.qid=o.qid WHERE o.vkn_json LIKE '%gia_tri_trung_binh%' AND q.ma_de LIKE 'DH-12-%'`))
 in1('phamVi12', await doc(`SELECT b.lop,COUNT(*) bai,SUM(b.ma_to_json LIKE '%DH-12-C1-B1%') co_b1 FROM bai_da_day b WHERE b.bo_tick_luc IS NULL AND b.lop LIKE '12%' GROUP BY 1`))
 in1('scope12', await doc(`SELECT COUNT(*) em,SUM(json_array_length(COALESCE(json_extract(s.json,'$.types'),'[]'))>0) gioi_han_dang,SUM(json_array_length(COALESCE(json_extract(s.json,'$.blocked'),'[]'))>0) co_chan FROM game_v2_scope s JOIN hoc_sinh h ON h.sbd=s.sbd WHERE h.lop LIKE '12%' OR h.ten_lop LIKE '12%'`))
+// Câu khối 12 có kỹ năng giá trị trung bình đang bị nghi đáp án: vì sao (số lượt làm/sai hay máy giải lại lệch). Không in đề/đáp án.
+in1('nghi12', await doc(`SELECT n.qid,n.so_lan,n.so_sai,n.ty_le_sai,n.trang_thai,substr(COALESCE(n.ghi_chu,''),1,160) ghi_chu,n.luc FROM cau_nghi_dap_an n WHERE n.qid IN(SELECT o.qid FROM omni_q o JOIN game_v2_question q ON q.qid=o.qid WHERE o.vkn_json LIKE '%gia_tri_trung_binh%' AND q.ma_de LIKE 'DH-12-%')`))
+in1('phamViLop12', await doc(`SELECT lop,COUNT(*) bai,SUM(ma_de_json LIKE '%DH-12-C1-B1%') co_b1 FROM pham_vi_lop WHERE lop LIKE '12%' GROUP BY 1`))
