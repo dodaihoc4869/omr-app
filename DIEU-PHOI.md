@@ -818,3 +818,5 @@ Phân vùng dự kiến theo hai bản thiết kế:
 
 
 - Codex 13/10: định sửa game-v2.ts, goi-bai-7.ts, bai-hang-ngay.ts, HocTapHomNay.tsx và TrangVeCon.tsx theo chỉ đạo mới của thầy: tối đa 3 kiểm tra/7 ngày, giãn ngày; ngày có 1 kiểm tra vẫn có tối thiểu 12 câu riêng, giữ câu mới 7 ngày và sổ sai. Thêm test khóa luồng và giữ metadata D1 của Claude.
+
+- Codex 13/10: định sửa index.ts (cron và đường kế hoạch cũ) để chuẩn bị đề khi cờ tắt, không chấm bài chưa công bố trong thời gian tắt; đường ngày một kiểm tra trả đúng mục tiêu 12. Giữ ca, receipt, màu và mọi lệnh khác.

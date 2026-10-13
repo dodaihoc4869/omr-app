@@ -150,7 +150,7 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
   if(cu&&Number(cu.mo_luc)>now)hen.ngay=s(cu.ngay)
   const bai=[...new Map([...pv.baiTheoMaDe.values()].map(b=>[b.khoaBai,{khoa:b.khoaBai,ten:b.tenBai}])).values()]
   if(dungKhung2026){
-    if(cu&&de(cu).phienBan===3&&de(cu).chuKyNgay&&dauNgayKt(de(cu).chuKyNgay!)<=now)return {id:s(cu.id),ngay:s(cu.ngay),tong:de(cu).cau.length,thieu:de(cu).thieu.length,phut:50}
+    if(cu&&s(cu.trang_thai)!=='cho_nguon'&&de(cu).phienBan===3&&de(cu).chuKyNgay&&dauNgayKt(de(cu).chuKyNgay!)<=now)return {id:s(cu.id),ngay:s(cu.ngay),tong:de(cu).cau.length,thieu:de(cu).thieu.length,phut:50}
     const nk=nhomKienThucKt([...muc.values()],ung.map((u,i)=>({...u,phan:ds[i]!.q.phan,mucDo:bacQ(ds[i]!.q)>=3?'van_dung' as const:bacQ(ds[i]!.q)===2?'hieu' as const:'biet' as const})),bc)
     let mt=chonChuKyKt2026(nk.muc,nk.cau,nk.hs,sbd+hen.ngay),nguon=[...ds]
     if(!mt.du){
@@ -163,7 +163,7 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
     const phuChuKy=new Set(mt.de.flatMap(d=>d.qids).flatMap(id=>nk.cau.find(q=>q.qid===id)?.muc??[]))
     const dong=mt.de.map((d,i)=>dongGoiDe2026({ngay:hen.ngay,qids:d.qids,nguon,muc:nk.muc,viKyNang:[...muc.values()].filter(m=>m.loai!=='bai'),anhXa:nk.anhXa,bai,thieu:[...thieuKy],soDe:mt.de.length,lan:i+1,chuKyPhu:nk.muc.filter(m=>m.loai!=='bai'&&phuChuKy.has(m.id)).length,seed:sbd+hen.ngay,lyDo:hen.lyDo}))
     if(chiDoc)return {id:`ktcn:${sbd}:${hen.ngay}`,ngay:hen.ngay,tong:28,phut:50,thieu:thieuKy.size,soKienThuc:nk.muc.filter(m=>m.loai!=='bai').length,soViKyNang:[...muc.values()].filter(m=>m.loai!=='bai').length,maTran2026:{soDe:mt.de.length,soCau:mt.de.map(d=>d.qids.length),phut:mt.de.map(d=>d.phut),du:mt.du&&thieu.size===0,phu:mt.phu,tong:mt.tongMuc,thieuMaTran:mt.thieuMaTran,chuaPhu:mt.chuaPhu,thieuNguon:mt.thieuNguon.length}}
-    const sql=`INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) SELECT ?1,?2,?3,?4,?5,?6,?7,?8,?9 WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo') AND NOT EXISTS(SELECT 1 FROM json_each('[0,1,2,3,4,5,6]') o WHERE (SELECT COUNT(*) FROM kiem_tra_ca_nhan k WHERE k.sbd=?2 AND k.lop=?3 AND k.id<>?1 AND k.trang_thai<>'cho_nguon' AND k.ngay BETWEEN date(?4,'-'||(6-o.value)||' days') AND date(?4,'+'||o.value||' days'))>=3) ON CONFLICT(sbd,ngay) DO UPDATE SET lop=excluded.lop,json=excluded.json,trang_thai=excluded.trang_thai,cap_nhat_luc=excluded.cap_nhat_luc WHERE kiem_tra_ca_nhan.mo_luc>?10 AND kiem_tra_ca_nhan.nop_luc IS NULL AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id)`
+    const sql=`INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) SELECT ?1,?2,?3,?4,?5,?6,?7,?8,?9 WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo') AND NOT EXISTS(SELECT 1 FROM json_each('[0,1,2,3,4,5,6]') o WHERE (SELECT COUNT(*) FROM kiem_tra_ca_nhan k WHERE k.sbd=?2 AND k.id<>?1 AND k.trang_thai<>'cho_nguon' AND k.ngay BETWEEN date(?4,'-'||(6-o.value)||' days') AND date(?4,'+'||o.value||' days'))>=3) ON CONFLICT(sbd,ngay) DO UPDATE SET lop=excluded.lop,json=excluded.json,trang_thai=excluded.trang_thai,cap_nhat_luc=excluded.cap_nhat_luc WHERE kiem_tra_ca_nhan.mo_luc>?10 AND kiem_tra_ca_nhan.nop_luc IS NULL AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id)`
     await env.DB.batch(dong.flatMap(d=>{const id=`ktcn:${sbd}:${d.ngay}`;return [env.DB.prepare(sql).bind(id,sbd,lop,d.ngay,dauNgayKt(d.ngay),dauNgayKt(congNgayKt(d.ngay,1)),thieuKy.size?'cho_nguon':'hen',JSON.stringify(d.de),now,now),env.DB.prepare(SQL_GHI_META_KT).bind(id,JSON.stringify(metaKt(d.de)),now)]}))
     return {id:`ktcn:${sbd}:${hen.ngay}`,ngay:hen.ngay,tong:28,phut:50,thieu:thieuKy.size}
   }
@@ -292,17 +292,19 @@ async function ketQuaKt(env: Env, r: Row, now: number) {
   return {bai,daGhiSo:Number(r.da_ghi)===1,cau:d.cau.map(c=>({de:publicQuestion(c.q),tra:t[c.q.qid]??'',dung:dungKt(c.q,t[c.q.qid]??''),dapAn:c.q.correct,loiGiai:c.q.solution})),chu:'Kết quả lần này; khả năng nhớ lâu được kiểm chứng tiếp trong lịch học.'}
 }
 
-export async function dongBoKtCn(env: Env, now: number, tran=2,dungKhung2026=true) {
-  if (!await coKtCn(env)) return {soEm:0,soMoi:0}
+export async function dongBoKtCn(env: Env, now: number, tran=2,dungKhung2026=true,chuanBiKhiTat=false) {
+  const bat=await coKtCn(env)
+  if (!bat&&!chuanBiKhiTat) return {soEm:0,soMoi:0}
   await damBaoKtCn(env)
   if (await env.DB.prepare("SELECT 1 FROM ca WHERE trang_thai='mo' LIMIT 1").first()) return {soEm:0,soMoi:0,hoan:true}
   await buMetaKt(env,10)
-  const het=await env.DB.prepare(`SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=?) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?`).bind(now,tran).all<Row>()
+  const cfg=JSON.parse((await docCauHinhDem(env,'kiem_tra_ca_nhan_v1'))??'{}'),batLuc=Date.parse(s(cfg.batLuc))||0
+  const het=bat?await env.DB.prepare(`SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=? AND han_luc>?) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?`).bind(now,batLuc,tran).all<Row>():{results:[] as Row[]}
   for (const r of het.results) await chotKtCn(env,r,now,true)
   // Làm mới phạm vi/đề trước ngày kiểm tra; ngày đã mở tuyệt đối không đổi N/nguồn.
   const moi=await env.DB.prepare(`SELECT k.sbd FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} WHERE COALESCE(h.trang_thai,'')<>'khoa' AND k.mo_luc>? AND k.nop_luc IS NULL AND (json_extract(k.json,'$.phienBan')<>? OR (k.ngay=? AND k.cap_nhat_luc<? AND COALESCE(json_extract(k.json,'$.chuKyNgay'),k.ngay)>?)) GROUP BY k.sbd ORDER BY MIN(k.ngay) LIMIT ?`).bind(now,dungKhung2026?3:2,congNgayKt(ngayKt(now),1),dauNgayKt(ngayKt(now)),ngayKt(now),tran).all<Row>()
   for(const r of moi.results)await lapKtCn(env,s(r.sbd),now,true,false,dungKhung2026)
-  const em=await env.DB.prepare(`SELECT h.sbd,${sqlTenLopHs('h')} lop FROM hoc_sinh h WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM bai_da_day b WHERE b.lop=${sqlTenLopHs('h')} AND b.bo_tick_luc IS NULL) AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan k WHERE k.sbd=h.sbd AND k.lop=${sqlTenLopHs('h')} AND k.ngay>=? AND k.trang_thai<>'cho_nguon') AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_dieu_phoi n WHERE n.sbd=h.sbd AND n.lop=${sqlTenLopHs('h')} AND n.thu_luc>?) ORDER BY h.sbd LIMIT ?`).bind(ngayKt(now),now-6*3600000,tran).all<Row>()
+  const em=bat?await env.DB.prepare(`SELECT h.sbd,${sqlTenLopHs('h')} lop FROM hoc_sinh h WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM bai_da_day b WHERE b.lop=${sqlTenLopHs('h')} AND b.bo_tick_luc IS NULL) AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan k WHERE k.sbd=h.sbd AND k.lop=${sqlTenLopHs('h')} AND k.ngay>=? AND k.trang_thai<>'cho_nguon') AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_dieu_phoi n WHERE n.sbd=h.sbd AND n.lop=${sqlTenLopHs('h')} AND n.thu_luc>?) ORDER BY h.sbd LIMIT ?`).bind(ngayKt(now),now-6*3600000,tran).all<Row>():{results:[] as Row[]}
   // Ghi lượt thử trước khi lập: một em tạm dừng/nguồn lỗi không chiếm mãi hai vị trí đầu hàng đợi.
   for (const r of em.results) {
     await env.DB.prepare(`INSERT INTO kiem_tra_ca_nhan_dieu_phoi(sbd,lop,thu_luc) VALUES(?,?,?) ON CONFLICT(sbd) DO UPDATE SET lop=excluded.lop,thu_luc=excluded.thu_luc,loi=''`).bind(r.sbd,r.lop,now).run()

@@ -291,6 +291,8 @@ it('ngày một kiểm tra: API vẫn mở chặng Gói7, đúng 12 câu riêng;
  const qid=k.qids('DH-B1')[100]!;await lam(k.env,'S1',qid,NOW,true,{maNguon:'ktcn:S1:2026-10-10',purpose:'de_thu',cauVersion:'v1'})
  const gs=await docGoiCuaEm7(k.env,'S1',NOW);expect(gs[0]!.daGap.has(qid)).toBe(true)
  const dem=await gameV2(k.env,'hoc-tap-dem',{token:k.token});expect(dem).toMatchObject({toiThieu:12,daLamHomNay:0})
+ const worker=(await import('../server/src/index')).default,req=new Request('https://omr.test/hs/ke-hoach-ngay',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:k.token})}),res=await worker.fetch(req,k.env),du=await res.json() as Record<string,unknown>
+ expect(du).toMatchObject({cheDoNgay:'goi7',nganSach:{toiThieuCau:12},tienBo:{daLamCau:0,toiThieuCau:12}})
  const report=await docNgayCacEm(k.env,[{sbd:'S1',hoTen:'Em',lop:'12A1',khoi:'12',goi7Tu:'2026-10-10'}],'2026-10-10','2026-10-10','2026-10-10',[])
  expect(report.get('S1')![0]).toMatchObject({mucToiThieu:12,daLam:0,cheDo:'goi7'})
 })

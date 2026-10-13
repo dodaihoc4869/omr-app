@@ -3392,7 +3392,7 @@ const boXuLy = {
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
     // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
     if(event.cron==='* * * * *') {
-      await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now())).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
+      await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now(),2,true,new Date(Date.now()+7*3600000).getUTCHours()<19)).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
       await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
@@ -3682,6 +3682,7 @@ const boXuLy = {
         const kt=await import('./kiem-tra-ca-nhan'), baiKt=await kt.docKtCn(env,sbdKhoa,Date.now(),true)
         if(kt.laNgayKt(baiKt,Date.now())){
           const tt=kt.tomTatKt(baiKt!,Date.now())
+          if(kt.coHocNgayKt(baiKt)){const g=await import('./goi-bai-7'),dem=await g.demHomNay7(env,sbdKhoa,Date.now()),lam=Number(dem.daLamHomNay);return themMocReset(env,ra({ok:true,cheDoNgay:'goi7',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:12,toiThieuCau:12},tienBo:{daLamCau:lam,toiThieuCau:12,conThieu:Math.max(0,12-lam),dat:lam>=12}}))}
           return themMocReset(env,ra({ok:true,cheDoNgay:'kiem-tra',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:tt.tong,toiThieuCau:tt.tong},tienBo:{daLamCau:tt.daTra,toiThieuCau:tt.tong,conThieu:tt.con,dat:tt.nopLuc!==null&&tt.con===0}}))
         }
         // Tối ưu 05/10: cờ cửa hàng (đệm 30 giây, không phụ thuộc kế hoạch) đọc CÙNG đợt đầu — trước: một đợt riêng ở cuối. Dùng đúng chỗ cũ.
