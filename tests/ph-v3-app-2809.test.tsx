@@ -84,26 +84,27 @@ const vaoApp = async () => {
 }
 
 describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)', () => {
-  it('Hôm nay (bản vẽ tối giản 09/10): số câu MỘT nguồn (kế hoạch 32/40), tuần này, dạng luyện thêm + ca gần nhất, lời thầy; KHÔNG chiến dịch/BTVN/nút giao bài; chỉ gọi lệnh ĐỌC', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 · làn R — thầy duyệt bản vẽ app phụ huynh "mọi thứ đo được về con, không dấu diếm"): Hôm nay là MỘT trang đủ phần —
+  // thêm Bài tập về nhà, Buổi học, Lịch sử, hạng chăm, các lần học hôm nay (có phút); dạng luyện thêm + ca gần nhất ở phần "Kiểm tra và tiến bộ";
+  // giờ học quen ở "Thời gian làm bài"; thẻ Tuần này thay bằng Nhịp học 14 ngày. Vẫn CHỈ XEM: không nút giao bài, không chiến dịch, chỉ lệnh ĐỌC.
+  it('Hôm nay (bản vẽ đợt 19): số câu MỘT nguồn (kế hoạch 32/40), dạng luyện thêm + ca gần nhất ở Kiểm tra, lời thầy, giờ học quen; KHÔNG chiến dịch / nút giao bài; chỉ gọi lệnh ĐỌC', async () => {
     const { container } = await vaoApp()
     await waitFor(() => expect(container.querySelector('[data-vung="loi-thay-moi"]')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('[data-vung="kiem-tra"]')).toBeTruthy())
     const ah = container.querySelector('[data-vung="anh-hung"]')!.textContent!
-    expect(ah).toContain('Con đã làm hôm nay · Thứ Hai 21/09')
+    expect(ah).toContain('Hôm nay · Thứ Hai 21/09')
     expect(container.querySelector('[data-vung="so-cau-hom-nay"]')!.textContent).toBe('32/40 câu')
-    expect(ah).toContain('Con đang làm, còn 8 câu nữa là xong kế hoạch hôm nay.')
-    expect(ah).toContain('Giờ học quen của con: 19:30–21:00.')
-    // 01/10 có: 52 phút, 38 câu (nguồn thứ hai), 79% đúng, +5 câu, Thứ 9/42, chuỗi 6 ngày — bản vẽ 09/10 bỏ.
-    for (const bo of ['38', 'phút', '79%', '+5 câu', 'Thứ 9/42', 'Chuỗi 6 ngày']) expect(ah, bo).not.toContain(bo)
-    expect(container.querySelector('[data-vung="tuan-nay"]')!.textContent).toContain('1/7 ngày') // 21/09/2026 là Thứ Hai
-    const dang = container.querySelector('[data-vung="dang-luyen-them"]')!.textContent!
-    expect(dang).toContain('Dạng con đang luyện thêm')
-    expect(dang).toContain('Xà phòng hoá chất béo · Bài toán hỗn hợp ester')
-    expect(dang).toContain('Ca kiểm tra gần nhất · 19/09')
-    expect(container.querySelector('[data-vung="ca-gan-nhat"] b')!.textContent).toBe('7,5/10 điểm')
-    expect((container.querySelector('[data-vung="ca-gan-nhat"]') as HTMLAnchorElement).getAttribute('href')).toBe('#ca/CA-2')
+    expect(ah).toContain('Còn 8 câu nữa là xong kế hoạch hôm nay.')
+    expect(ah).not.toContain('38') // nguồn thứ hai không hiện
+    expect(container.querySelector('[data-vung="thoi-gian"]')!.textContent).toContain('Giờ học quen19:30–21:00')
+    const kt = container.querySelector('[data-vung="kiem-tra"]')!
+    expect(kt.textContent).toContain('Dạng con đang luyện thêm')
+    expect(kt.textContent).toContain('Xà phòng hoá chất béo')
+    expect(kt.querySelector('.tvc-ca-so b')!.textContent).toBe('7,5/10')
+    expect(kt.querySelector('a[href="#ca/CA-2"]')!.textContent).toBe('Xem báo cáo ca này')
     expect(container.querySelector('[data-vung="loi-thay-moi"]')!.textContent).toContain('Con mất điểm ở bài đốt cháy ester.')
-    expect(container.querySelector('[data-vung="chien-dich"], [data-vung="nhip-14"], [data-vung="khac-phuc"]')).toBeNull()
-    for (const bo of ['Chiến dịch của con', 'Bài tập về nhà', 'Gia đình giao', 'câu cần thầy dạy lại', 'Con học lúc nào', 'Điều đáng mừng', 'đã lo cho con']) expect(container.textContent, bo).not.toContain(bo)
+    expect(container.querySelector('[data-vung="chien-dich"], [data-vung="khac-phuc"]')).toBeNull()
+    for (const bo of ['Chiến dịch của con', 'Gia đình giao', 'câu cần thầy dạy lại', 'Con học lúc nào', 'Điều đáng mừng', 'đã lo cho con']) expect(container.textContent, bo).not.toContain(bo)
     expect(container.querySelector('[data-vung="ten-con"]')!.textContent).toBe('Nguyễn Minh Khôi · Lớp 12A1')
     // Không một nút / liên kết nào để giao bài.
     expect(container.textContent).not.toContain('Giao thêm bài cho con')
@@ -113,23 +114,32 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     const duong = new Set(goi.map((g) => g.duong))
     // SỬA CÓ CHỦ Ý — LÀN PHỤ HUYNH 12/10: thêm lệnh CHỈ ĐỌC `/ph/con-tong-quan` (đúng/sai, số giây, gợi ý nhắc) — cùng thân {sbd}, không ghi gì.
     // SỬA CÓ CHỦ Ý — đợt 16: thêm lệnh CHỈ ĐỌC `/ph/nhip-hoc` (thẻ "Nhịp học của con" — Lười / Chăm như app học sinh), cùng thân danh tính.
-    for (const d of duong) expect(['/ph/tat-ca-ve-con', '/ph/hoc-2', '/ph/loi-thay', '/ph/con-tong-quan', '/ph/nhip-hoc']).toContain(d)
+    // SỬA CÓ CHỦ ĐÍCH 13/10 — đợt 19: phần dưới trang nạp hai lệnh CHỈ ĐỌC `/ph/ho-so-thai-do`, `/ph/lich-su-lam-cau` (+ `gioiHan` số lượt) khi sắp cuộn tới.
+    for (const d of duong) expect(['/ph/tat-ca-ve-con', '/ph/hoc-2', '/ph/loi-thay', '/ph/con-tong-quan', '/ph/nhip-hoc', '/ph/ho-so-thai-do', '/ph/lich-su-lam-cau']).toContain(d)
     expect(duong.has('/ph/giao-them')).toBe(false)
     expect(duong.has('/hoa2/ph-ngung')).toBe(false)
-    for (const g of goi) expect(g.than).toEqual({ sbd: '12121212' })
+    for (const g of goi) {
+      const { gioiHan, ...than } = g.than
+      expect(than).toEqual({ sbd: '12121212' })
+      if (gioiHan !== undefined) expect(g.duong).toBe('/ph/lich-su-lam-cau')
+    }
   })
 
   it('BA mục điều hướng là liên kết (#hom-nay · #tien-bo · #ca-kiem-tra), mục đang xem có aria-current; Ca kiểm tra: ca gần nhất + lời thầy của ca + "Các ca trước"', async () => {
     tatCa = { ...PH_OK, tienBo: { diem: [{ ngay: '2026-09-05', diem: 6.25, maCa: 'CA-1', tenCa: 'Kiểm tra 15 phút' }, { ngay: '2026-09-12', diem: 6.75, maCa: 'CA-15', tenCa: 'Kiểm tra chương 4' }], dangTienBoNhat: [] } }
     const { container } = await vaoApp()
-    const lk = [...container.querySelectorAll('nav[aria-label="Các mục chính"] a')] as HTMLAnchorElement[]
-    expect(lk.map((a) => [a.getAttribute('href'), a.textContent])).toEqual([['#hom-nay', 'Hôm nay'], ['#tien-bo', 'Tiến bộ'], ['#ca-kiem-tra', 'Ca kiểm tra']])
-    expect(lk[0]!.getAttribute('aria-current')).toBe('page')
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19): thanh bên là các PHẦN của trang (liên kết `#phan-…`, bấm ⇒ cuộn tới phần); Ca kiểm tra mở từ phần "Kiểm tra và tiến bộ".
+    const lk = [...container.querySelectorAll('nav[aria-label="Các phần về con"] a')] as HTMLAnchorElement[]
+    expect(lk[0]!.getAttribute('href')).toBe('#phan-hom-nay')
+    expect(lk[0]!.getAttribute('aria-current')).toBe('true')
+    await waitFor(() => expect(container.querySelector('[data-vung="kiem-tra"] a[href="#ca-kiem-tra"]')).toBeTruthy())
+    expect(container.querySelector('[data-vung="kiem-tra"] a[href="#ca-kiem-tra"]')!.textContent).toBe('Xem tất cả 3 ca kiểm tra')
     await diToi('#ca-kiem-tra')
     await waitFor(() => expect(container.querySelector('[data-vung="man-ca-kiem-tra"]')).toBeTruthy())
-    expect(lk[2]!.getAttribute('aria-current')).toBe('page')
+    expect(lk.some((a) => a.hasAttribute('aria-current'))).toBe(false) // màn con: không phần nào sáng
+    expect(container.querySelector('main a.ph3-lui')!.getAttribute('href')).toBe('#hom-nay')
     expect(container.querySelector('h1')!.textContent).toBe('Ca kiểm tra')
-    expect(container.textContent).not.toMatch(/Điểm số|Lịch sử/)
+    expect(container.querySelector('main')!.textContent).not.toMatch(/Điểm số|Lịch sử/)
     const ca = container.querySelector('[data-vung="ca-gan-nhat"]')!
     for (const x of ['Kiểm tra 45 phút · Ester – Lipid', 'Thứ Bảy 19/09/2026 · 28 câu', '7,5', 'Trắc nghiệm', '15/18 câu']) expect(ca.textContent).toContain(x)
     await waitFor(() => expect(ca.querySelector('[data-vung="loi-thay-ca"] p')!.textContent).toBe('Con mất điểm ở bài đốt cháy ester.'))
@@ -146,7 +156,6 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     await waitFor(() => expect(container.querySelector('[data-vung="man-ca-kiem-tra"]')).toBeTruthy())
     await diToi('#loi-thay')
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Nhận xét của thầy', level: 1 })).toBeTruthy())
-    expect(lk[0]!.getAttribute('aria-current')).toBe('page')
     const lui = container.querySelector('a.ph3-lui') as HTMLAnchorElement
     expect([lui.getAttribute('href'), lui.textContent]).toEqual(['#hom-nay', 'Hôm nay'])
     expect(container.querySelector('[data-vung="man-nhan-xet"]')!.textContent).toContain('Con mất điểm ở bài đốt cháy ester.')
@@ -224,9 +233,11 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     expect(container.textContent).not.toMatch(/A\.I|Bộ não/)
     const lt = container.querySelector('[data-vung="loi-thay-moi"]')!
     expect(lt.querySelector('h2')!.textContent).toBe('Nhận xét của thầy')
-    expect(lt.textContent).toContain('Sau Kiểm tra 45 phút · Ester – Lipid')
-    expect([...lt.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Xem tất cả nhận xét của thầy', '#loi-thay']])
-    expect([...container.querySelector('.ph3-luoi')!.children].slice(0, 2).map((x) => x.getAttribute('data-vung'))).toEqual(['anh-hung', 'canh-bao-thay'])
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19): dòng phụ ghi tác giả + ca + ngày; liên kết ghi số nhận xét; cảnh báo đứng đầu cột phải (điện thoại: ngay sau Hôm nay).
+    expect(lt.textContent).toContain('Thầy Đỗ Đại Học · sau Kiểm tra 45 phút · Ester – Lipid')
+    expect([...lt.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Xem tất cả 1 nhận xét của thầy', '#loi-thay']])
+    expect(container.querySelector('.tvc-nhom-trai')!.firstElementChild!.getAttribute('data-vung')).toBe('anh-hung')
+    expect(container.querySelector('.tvc-nhom-phai')!.firstElementChild!.getAttribute('data-vung')).toBe('canh-bao-thay')
     fireEvent.click(screen.getByRole('button', { name: 'Đã xem cảnh báo' }))
     expect(daXem).toHaveBeenCalledWith('cb-1')
     expect(container.querySelector('[data-vung="canh-bao-thay"]')).toBeNull()
