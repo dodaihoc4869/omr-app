@@ -117,21 +117,33 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   // Hộp chọn bài dựng lại mỗi lần mở ⇒ giữ chữ tìm + chip khối ở đây (đợt 16).
   const nhoHop = useRef<NhoHopChonDe | null>(null)
 
-  const napKho = useCallback(async () => {
-    if (kho) return kho
-    try {
-      const [{ loadExamSources }, { khuTrungNguon }, { tachNhieuTheoPhan }] = await Promise.all([
-        import('../../lib/exam-db'),
-        import('../../lib/khu-trung-cau'),
-        import('../../lib/tach-phan-de'),
-      ])
-      const ds = khoDayHoc(await loadExamSources(), khuTrungNguon, tachNhieuTheoPhan)
-      setKho(ds)
-      return ds
-    } catch {
-      setKho([])
-      return []
+  const [loiKho, setLoiKho] = useState('')
+  const dangNapKho = useRef<Promise<TeacherExamSource[]> | null>(null)
+  const napKho = useCallback((): Promise<TeacherExamSource[]> => {
+    if (kho) return Promise.resolve(kho)
+    if (dangNapKho.current) return dangNapKho.current
+    setLoiKho('')
+    const doc = async () => {
+      try {
+        const [{ loadExamSources }, { khuTrungNguon }, { tachNhieuTheoPhan }] = await Promise.all([
+          import('../../lib/exam-db'),
+          import('../../lib/khu-trung-cau'),
+          import('../../lib/tach-phan-de'),
+        ])
+        const ds = khoDayHoc(await loadExamSources(), khuTrungNguon, tachNhieuTheoPhan)
+        setKho(ds)
+        return ds
+      } catch {
+        // Lỗi kho khác kho rỗng: giữ null để lần Thử lại còn thực sự đọc kho.
+        setLoiKho('Chưa đọc được kho đề trên máy này. Thầy thử tải lại.')
+        return []
+      } finally {
+        dangNapKho.current = null
+      }
     }
+    const cho = doc()
+    dangNapKho.current = cho
+    return cho
   }, [kho])
   useEffect(() => {
     if (maChon.size && !kho) void napKho()
@@ -577,10 +589,12 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
             )}
           </div>
           <DongChoBaiMoi bhn={bhn} />
+          {!bhn.co && bhn.dangTaiCo && <p className="dh-phu" role="status">Đang đọc cấu hình giao bài…</p>}
+          {bhn.loiCo && <div className="dh-hang"><p className="dh-loi" role="alert">Chưa tải được phần Tick bài: {bhn.loiCo}</p><button type="button" className="m3-nut-vien dh-nut-nho" disabled={bhn.dangTaiCo} onClick={() => void bhn.taiCo()}>Thử tải Tick bài lại</button></div>}
           {bhn.co && !bhn.bat && <p className="dh-phu">Tick bài vừa dạy cần bật OMNI cho lớp ở Cài đặt › OMNI (theo lớp).</p>}
           {bhn.bat && moTick && (
             <div id={idKhungTick} ref={khungTick} className="gvv2-bd-tick">
-              <BuocBaiHomNay bhn={bhn} kho={kho} soBuoc={so4} />
+              <BuocBaiHomNay bhn={bhn} kho={kho} loiKho={loiKho} thuKho={() => void napKho()} soBuoc={so4} />
             </div>
           )}
           {sauBaiHomNay}
@@ -633,7 +647,7 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
       </section>
 
       {/* ───── BƯỚC 4 (OMNI 3) ───── */}
-      <BuocBaiHomNay bhn={bhn} kho={kho} />
+      <BuocBaiHomNay bhn={bhn} kho={kho} loiKho={loiKho} thuKho={() => void napKho()} />
 
       {hopChon}
 

@@ -1,0 +1,43 @@
+{
+  "timezone": "Asia/Saigon",
+  "not_before": "2026-10-14T00:00:00+07:00",
+  "continuation_at": "2026-10-14T00:05:00+07:00",
+  "phase": "audit_prepared_optimizations_not_applied",
+  "base": "97300016",
+  "teacher_priority_pr": 285,
+  "lanes": [
+    {
+      "lane": "frontend_obsolete",
+      "worktree": "/workspace/soat-ma-cu-1310",
+      "manifest": "docs/soat-app-1310/kiem-ke-ma-cu.json",
+      "goal": "Ngắt Game initializer rồi loại file/tài nguyên không có caller; giữ lõi học và dữ liệu"
+    },
+    {
+      "lane": "parent",
+      "worktree": "/workspace/soat-ph-1310",
+      "goal": "API phụ mount 2 lượt do moc null→mốc đầu: đo9→5 requests, giữ refresh thật sau đổi mốc"
+    },
+    {
+      "lane": "student",
+      "worktree": "/workspace/soat-hs-1310",
+      "goal": "Lịch sử+BTVN song song; đồng hồ KTCN không render toàn đề mỗi giây; tải Exam sau auth, giữ nháp/replay"
+    },
+    {
+      "lane": "worker",
+      "worktree": "/workspace/soat-worker-1310",
+      "goal": "/ph/cap-ma không SELECT password từng em sau đọc bảng; kho/cron/cache và sức khoẻ tránh O(n²)"
+    },
+    {
+      "lane": "integration",
+      "worktree": "/workspace/tick-nhanh-1310",
+      "goal": "Giữ main mới/Claude, tốc độ/mốc chỉ hạ, test so theo tên, không deploy chồng, ca mở thì không phát hành"
+    }
+  ],
+  "limits": [
+    "Không xoá/ghi đè dữ liệu D1/R2 thật",
+    "Không thay luật chấm/đáp án trước nộp/ca kiểm tra",
+    "Đo cục bộ không phải số D1/mạng production",
+    "Mọi danh sách retire phải kiểm lại tham chiếu trên main mới trước xoá",
+    "Không coi Claude im lặng là đã review"
+  ]
+}

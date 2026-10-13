@@ -8,11 +8,11 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import type { TeacherExamSource } from '../src/data/examContent'
 
 // Kho giả nằm trong khối `vi.hoisted` (gán sau khi dựng `KHO`) ⇒ nhà máy `vi.mock` không đọc biến trước khi khai báo (luật no-use-before-define).
-const { goi, khoGia } = vi.hoisted(() => ({ goi: vi.fn(), khoGia: { ds: [] as unknown[] } }))
+const { goi, khoGia } = vi.hoisted(() => ({ goi: vi.fn(), khoGia: { ds: [] as unknown[], loiLan: 0, docLan: 0 } }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
 vi.mock('../src/lib/exam-db', async (goc) => ({
   ...(await goc<typeof import('../src/lib/exam-db')>()),
-  loadExamSources: async () => khoGia.ds,
+  loadExamSources: async () => { ++khoGia.docLan; if (khoGia.loiLan-- > 0) throw new Error('IndexedDB đang bận'); return khoGia.ds },
   loadScriptUrl: async () => 'https://may-chu',
   loadTeacherSecret: async () => 'mat',
 }))
@@ -112,6 +112,7 @@ const lenh = (action: string) => goi.mock.calls.filter(([d, b]) => d === '/gv/ba
 
 beforeEach(() => {
   goi.mockReset()
+  khoGia.loiLan = 0; khoGia.docLan = 0
   co = { bat: true, lop: ['12A1'], sbd: [] }
   xem = XEM
   dsEm = null
@@ -654,4 +655,43 @@ describe('"Giao theo bài" ở mục Chiến dịch luyện — lối vào thứ
 
 beforeEach(() => {
   chuanMockGoc = goi.getMockImplementation()
+})
+
+// Khóa lỗi 13/10: co-doc thất bại không được ẩn Tick mãi; kho đọc lỗi phải khác kho rỗng.
+describe('Tick bài tải lỗi và thử lại tại màn đang mở', () => {
+  const ddGia = () => ({ idBuoi: BUOI.id, dsLop: [{ tenLop: '12A1', khoi: '12', soEm: 44, sbd: [] }], tt: { buoi: BUOI, coMat: [], siSo: 44, lopEm: [] }, coMat: [], lopCuaEm: new Map() }) as unknown as import('../src/components/day-hoc/DiemDanhBuoi').DiemDanhBuoi
+  it('lỗi đọc công tắc hiện lý do + Thử lại, phục hồi Tick trong cùng màn', async () => {
+    const goc = goi.getMockImplementation()!
+    let loi = true
+    goi.mockImplementation(async (d, b) => d === '/gv/omni' && b.action === 'co-doc' && loi ? { ok: false, chu: 'Không nối được máy chủ.' } : goc(d, b))
+    render(<DayHocLenBang dd={ddGia()} />)
+    expect((await screen.findByRole('alert')).textContent).toContain('Chưa tải được phần Tick bài')
+    expect(screen.queryByRole('button', { name: 'Tick bài hôm nay' })).toBeNull()
+    loi = false
+    fireEvent.click(screen.getByRole('button', { name: 'Thử tải Tick bài lại' }))
+    expect(await screen.findByRole('button', { name: 'Tick bài hôm nay' })).toBeTruthy()
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(goi.mock.calls.filter(([d, b]) => d === '/gv/omni' && b.action === 'co-doc')).toHaveLength(2)
+  })
+  it('lỗi IndexedDB không biến thành kho trống vĩnh viễn; Thử lại thật sự đọc và giữ cùng màn/bài', async () => {
+    khoGia.loiLan = 1
+    const { container } = render(<DayHocLenBang dd={ddGia()} />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Tick bài hôm nay' }))
+    expect((await screen.findByRole('alert')).textContent).toContain('Chưa đọc được kho đề')
+    expect(screen.queryByText(/Kho chưa có bài Dạy học/)).toBeNull()
+    const buoc = container.querySelector('[data-khoi="buoc-tick-bai"]')
+    fireEvent.click(screen.getByRole('button', { name: 'Thử tải kho lại' }))
+    expect(await screen.findByText('Bài 3. Xà phòng và chất giặt rửa')).toBeTruthy()
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(container.querySelector('[data-khoi="buoc-tick-bai"]')).toBe(buoc)
+    expect(khoGia.docLan).toBe(2)
+  })
+  it('mở Tick và hộp chiếu cùng lúc chỉ đọc/dựng một lượt kho đang chờ', async () => {
+    render(<DayHocLenBang dd={ddGia()} />)
+    const tick = await screen.findByRole('button', { name: 'Tick bài hôm nay' })
+    fireEvent.click(tick)
+    fireEvent.click(screen.getByRole('button', { name: 'Chọn câu để chiếu' }))
+    expect(await screen.findByText('Bài 3. Xà phòng và chất giặt rửa')).toBeTruthy()
+    expect(khoGia.docLan).toBe(1)
+  })
 })

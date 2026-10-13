@@ -43,33 +43,34 @@ async function goiLenhCon(duong: string, sbd: string, them: Record<string, unkno
   if (!url) return thoat('mang', 'Chưa kết nối được máy chủ. Anh/chị kiểm tra mạng rồi thử lại.')
   const dk = new AbortController()
   const hen = setTimeout(() => dk.abort(), HAN_GIAY * 1000)
-  let res: Response
   try {
-    res = await fetch(`${String(url).replace(/\/+$/, '')}${duong}`, {
+    const res = await fetch(`${String(url).replace(/\/+$/, '')}${duong}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ ...danhTinh, ...them }),
       signal: dk.signal,
     })
+    if (res.status === 404) return thoat('chua_co_lenh', CHU_CHUA_CO_LENH_CON)
+    let j: Record<string, unknown> | null
+    try {
+      j = (await res.json()) as Record<string, unknown> | null
+    } catch (e) {
+      // Thời hạn bao gồm cả thân phản hồi: headers về chưa có nghĩa JSON đã tải xong.
+      if (dk.signal.aborted) throw e
+      return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
+    }
+    if (!j || typeof j !== 'object') return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
+    if (!res.ok || j.ok !== true) {
+      const e = typeof j.error === 'string' ? j.error.replace(/\s+/g, ' ').trim() : ''
+      return thoat('tu_choi', e && e.length <= 240 ? e : 'Máy chủ chưa trả số liệu — anh/chị thử lại sau ít phút.')
+    }
+    return { ok: true, du: j }
   } catch (e) {
     if ((e as { name?: string })?.name === 'AbortError') return thoat('cham', 'Máy chủ trả lời chậm — anh/chị thử lại sau ít phút.')
     return thoat('mang', 'Chưa kết nối được máy chủ. Anh/chị kiểm tra mạng rồi thử lại.')
   } finally {
     clearTimeout(hen)
   }
-  if (res.status === 404) return thoat('chua_co_lenh', CHU_CHUA_CO_LENH_CON)
-  let j: Record<string, unknown> | null
-  try {
-    j = (await res.json()) as Record<string, unknown> | null
-  } catch {
-    return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
-  }
-  if (!j || typeof j !== 'object') return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
-  if (!res.ok || j.ok !== true) {
-    const e = typeof j.error === 'string' ? j.error.replace(/\s+/g, ' ').trim() : ''
-    return thoat('tu_choi', e && e.length <= 240 ? e : 'Máy chủ chưa trả số liệu — anh/chị thử lại sau ít phút.')
-  }
-  return { ok: true, du: j }
 }
 
 /** Nhịp học của con (nhóm Chăm / Chưa đều / Lười / Chưa đủ dữ liệu, dải ô ngày từ 01/10, việc tiếp) — CÙNG hợp đồng bảng của em. */

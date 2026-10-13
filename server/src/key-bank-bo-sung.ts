@@ -18,6 +18,7 @@
 import type { Env } from './kieu'
 import { khopPhanIII } from '../../src/lib/cham-so'
 import { hopNhatKeyBank, laKeyBankHopLe } from './key-bank-hop-nhat'
+import { ghiKeyBank } from './dem-ca-thi'
 
 type Obj = Record<string, unknown>
 const laObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v)
@@ -159,6 +160,6 @@ export async function phucHoiKeyCa(env: Env, maCa: string, tuyChon: { ghi: boole
   const hop = hopNhatKeyBank(doc.cu, doc.moi.giaTri)
   if (!hop) return { ok: false, lyDo: 'dap_an_hong', error: 'Không hợp nhất được tờ đáp án — không ghi', ...baoCao }
   await env.DE!.put(khoaSaoLuu, JSON.stringify(doc.cu))
-  await env.DE!.put(`key/${maCa}.json`, JSON.stringify(hop))
+  await ghiKeyBank(env, maCa, JSON.stringify(hop))
   return { ok: true, xemTruoc: false, daGhi: true, saoLuu: khoaSaoLuu, ...baoCao }
 }

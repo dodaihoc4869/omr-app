@@ -1,0 +1,62 @@
+[
+  {
+    "ten": "doc",
+    "mau": "sang",
+    "tran": false,
+    "nho": [],
+    "loi": [],
+    "giuMan": true,
+    "lechCuon": 0,
+    "anhKB": 69
+  },
+  {
+    "ten": "doc",
+    "mau": "toi",
+    "tran": false,
+    "nho": [],
+    "loi": [],
+    "giuMan": true,
+    "lechCuon": 0,
+    "anhKB": 63
+  },
+  {
+    "ten": "ngang",
+    "mau": "sang",
+    "tran": false,
+    "nho": [],
+    "loi": [],
+    "giuMan": true,
+    "lechCuon": 0,
+    "anhKB": 65
+  },
+  {
+    "ten": "ngang",
+    "mau": "toi",
+    "tran": false,
+    "nho": [],
+    "loi": [],
+    "giuMan": true,
+    "lechCuon": 0,
+    "anhKB": 60
+  },
+  {
+    "ten": "may-tinh",
+    "mau": "sang",
+    "tran": false,
+    "nho": [],
+    "loi": [],
+    "giuMan": true,
+    "lechCuon": 0,
+    "anhKB": 78
+  },
+  {
+    "ten": "may-tinh",
+    "mau": "toi",
+    "tran": false,
+    "nho": [],
+    "loi": [],
+    "giuMan": true,
+    "lechCuon": 0,
+    "anhKB": 72
+  }
+]

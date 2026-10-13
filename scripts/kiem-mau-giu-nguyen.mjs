@@ -14,6 +14,8 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { createHash } from 'node:crypto'
+import ts from 'typescript'
 
 const MOC = process.argv[2] || 'origin/main'
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
@@ -40,6 +42,29 @@ function khaiBaoMau(van) {
   }
   return ra
 }
+
+// Ngoại lệ đóng 13/10: bỏ đúng mẫu HTML tự chấm Mom bằng đáp án đoán A.
+// Kết quả nay dùng momReviewHtml(review) đã có, sau ACK máy chủ. CSS/palette của app giữ nguyên.
+// Chỉ bỏ khai báo trong initializer đã xoá TOÀN BỘ; sửa mẫu hoặc màu khác cùng tệp vẫn bị kiểm.
+function htmlMomTuCham(van) {
+  const tep = ts.createSourceFile('StudentPortalScreen.tsx', van, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+  const ds = []
+  const docKhoi = n => {
+    if (ts.isFunctionLike(n)) return // Không lấy template của hàm/arrow con đang dùng.
+    if (ts.isVariableDeclaration(n) && n.name.getText(tep) === 'htmlKetQua' && n.initializer && (ts.isTemplateExpression(n.initializer) || ts.isNoSubstitutionTemplateLiteral(n.initializer))) ds.push(n.initializer.getText(tep))
+    ts.forEachChild(n, docKhoi)
+  }
+  const quet = n => {
+    if (n.name?.getText(tep) === 'nopBaiCuaMom') {
+      const fn = ts.isVariableDeclaration(n) ? n.initializer : ts.isFunctionDeclaration(n) ? n : null
+      if (fn && ts.isFunctionLike(fn) && fn.body && ts.isBlock(fn.body)) docKhoi(fn.body)
+    }
+    ts.forEachChild(n, quet)
+  }
+  quet(tep)
+  return ds.length === 1 ? ds[0] : ''
+}
+const HASH_HTML_MOM_CU = 'aa2e70cfa2703cdecc5fa07e0105e650e781b0ed097b751b3586349f81352f8e'
 
 const LA_TEP = (f) => (/^src\/.*\.(css|tsx?|html)$/.test(f) || f === 'index.html') && !f.includes('graphify-out')
 const doi = git('diff', '--name-status', MOC, '--', 'src', 'index.html').trim().split('\n').filter(Boolean)
@@ -100,6 +125,10 @@ for (const [trangThai, f, f2] of doi) {
   try { moi = trangThai.startsWith('D') ? '' : readFileSync(ten, 'utf8') } catch { moi = '' }
   const dem = (ds) => ds.reduce((m, k) => m.set(k, (m.get(k) ?? 0) + 1), new Map())
   const a = dem(khaiBaoMau(cu)), b = dem(khaiBaoMau(moi))
+  const htmlCu = trangThai === 'M' && ten === 'src/screens/StudentPortalScreen.tsx' ? htmlMomTuCham(cu) : ''
+  if (htmlCu && createHash('sha256').update(htmlCu).digest('hex') === HASH_HTML_MOM_CU && !htmlMomTuCham(moi)) {
+    for (const [k, n] of dem(khaiBaoMau(htmlCu))) a.set(k, Math.max(0, (a.get(k) ?? 0) - n))
+  }
   for (const [k, n] of a) if ((b.get(k) ?? 0) < n) loi.push(`ĐỔI/XOÁ màu đang có · ${ten} · ${k}`)
   for (const [k, n] of b) {
     if ((a.get(k) ?? 0) >= n) continue

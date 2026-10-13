@@ -3,7 +3,7 @@ import { LoiChao } from '../components/bat-linh/DongHanh'
 // bản vẽ đã chốt https://claude.ai/artifact/2HShm51xEiuVKcTAUpfeFT). Lệnh mới này THAY quyết định 27/09 "bỏ hẳn app phụ huynh" (màn "đã ngừng" theo công tắc Game Hoá 2.0 đã gỡ):
 // app phụ huynh chạy lại, CHỈ XEM — không nút giao bài, không lệnh ghi nào của phụ huynh.
 // Tệp này chỉ còn ĐĂNG NHẬP (liên kết riêng ?ph=<pass> hoặc số báo danh của con, như cũ) rồi giao cho `components/ph-v3/AppPhuHuynh` (Hôm nay · Tiến bộ · Ca kiểm tra — bản vẽ tối giản thầy chốt 09/10).
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { datPassPhuHuynh } from '../lib/mom-api'
 import { docPass, nhanPassTuDiaChi, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
 import { LogoDoc } from '../components/LogoVai'
@@ -25,29 +25,35 @@ export default function ParentPortalScreen() {
   const [scriptUrl, setScriptUrl] = useState('')
   const [dangTai, setDangTai] = useState(false)
   const [thongBaoLoi, setThongBaoLoi] = useState('')
+  const luotDangNhap = useRef(0)
 
   useEffect(() => {
+    const luot = ++luotDangNhap.current
     loadScriptUrl().then(async (u) => {
+      if (luot !== luotDangNhap.current) return
       setScriptUrl(u)
       // LIÊN KẾT RIÊNG CỦA CON (?ph=<pass>, giai đoạn mềm): nhận + xoá khỏi địa chỉ, xác định con bằng token; lỗi thì hiện câu của máy chủ
       // và cho nhập SBD như cũ. Không có liên kết mà máy đã nhớ pass thì dùng lại pass đó.
       const pass = nhanPassTuDiaChi() || docPass()
       if (pass) {
         const kq = await xacDinhPhuHuynh(pass)
+        if (luot !== luotDangNhap.current) return
         if (kq.ok) {
           datPassPhuHuynh(pass)
-          void dangNhapPhuHuynh(kq.sbd, u, { hoTen: kq.hoTen, lop: kq.lop })
+          void dangNhapPhuHuynh(kq.sbd, u, { hoTen: kq.hoTen, lop: kq.lop }, luot)
           return
         }
         xoaPass()
         datPassPhuHuynh('')
         setThongBaoLoi(kq.error)
       }
-      const sbdLuu = localStorage.getItem(SBD_STORAGE_KEY)
+      let sbdLuu: string | null = null
+      try { sbdLuu = localStorage.getItem(SBD_STORAGE_KEY) } catch { /* máy chặn lưu: nhập SBD cho phiên này */ }
       if (sbdLuu && sbdLuu.trim()) {
-        void dangNhapPhuHuynh(sbdLuu.trim(), u)
+        void dangNhapPhuHuynh(sbdLuu.trim(), u, undefined, luot)
       }
-    })
+    }).catch(() => { if (luot === luotDangNhap.current) setThongBaoLoi('Chưa kết nối được máy chủ. Vui lòng thử lại.') })
+    return () => { ++luotDangNhap.current }
   }, [])
 
   useEffect(() => {
@@ -62,11 +68,17 @@ export default function ParentPortalScreen() {
     }
   }, [])
 
-  async function dangNhapPhuHuynh(sbd: string, urlParam?: string, conBiet?: { hoTen: string; lop: string }) {
+  async function dangNhapPhuHuynh(sbd: string, urlParam?: string, conBiet?: { hoTen: string; lop: string }, luotSan?: number) {
     const sbdSach = sbd.trim()
     if (!sbdSach) {
       setThongBaoLoi('Nhập số báo danh của con.')
       return
+    }
+    const luot = luotSan ?? ++luotDangNhap.current
+    if (luot !== luotDangNhap.current) return
+    if (luotSan === undefined) {
+      // Chọn SBD khác phải bỏ liên kết của con cũ trước khi đọc báo cáo.
+      xoaPass(); datPassPhuHuynh('')
     }
     setDangTai(true)
     setThongBaoLoi('')
@@ -85,19 +97,22 @@ export default function ParentPortalScreen() {
           // mạng chậm: bỏ qua tra tên, màn chính lấy tên từ máy chủ sau
         }
       }
+      if (luot !== luotDangNhap.current) return
       setSbdHienTai(sbdSach)
       setHoTenCon(ten || `Học sinh SBD ${sbdSach}`)
       setLopCon(lop)
-      localStorage.setItem(SBD_STORAGE_KEY, sbdSach)
+      try { localStorage.setItem(SBD_STORAGE_KEY, sbdSach) } catch { /* vẫn xem báo cáo trong phiên này */ }
     } catch (e) {
-      setThongBaoLoi(e instanceof Error ? e.message : 'Không đăng nhập được')
+      if (luot === luotDangNhap.current) setThongBaoLoi(e instanceof Error ? e.message : 'Không đăng nhập được')
     } finally {
-      setDangTai(false)
+      if (luot === luotDangNhap.current) setDangTai(false)
     }
   }
 
   const dangXuat = () => {
-    localStorage.removeItem(SBD_STORAGE_KEY)
+    ++luotDangNhap.current
+    setDangTai(false)
+    try { localStorage.removeItem(SBD_STORAGE_KEY) } catch { /* vẫn thoát và xóa liên kết trong phiên này */ }
     xoaPass()
     datPassPhuHuynh('')
     setSbdHienTai(null)

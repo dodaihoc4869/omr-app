@@ -31,7 +31,8 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
       return
     }
     let huy = false
-    const chay = async (): Promise<boolean> => {
+    let dangChay: Promise<boolean> | null = null
+    const doc = async (): Promise<boolean> => {
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return true
       setS((x) => ({ ...x, dangLamMoi: true }))
       const r = await apiRef.current(sbd)
@@ -40,6 +41,8 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
       else setS((x) => (x.pm ? { ...x, chuLoi: r.chu, dangLamMoi: false } : { trangThai: 'loi', pm: null, chuLoi: r.chu, dangLamMoi: false }))
       return r.kieu === 'ok'
     }
+    // Tải lại tay và nhịp nền dùng chung lượt đang đọc; không để bản về muộn ghi đè bản mới.
+    const chay = (): Promise<boolean> => dangChay ??= doc().finally(() => { dangChay = null })
     nap.current = () => void chay() // nút "làm mới" của phụ huynh: gọi NGAY, không qua nhịp
     const nhip = batNhipBenVung(chay, { coSoMs: NHIP_PH_MOI_MS })
     const khiHien = () => {

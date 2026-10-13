@@ -66,6 +66,7 @@ beforeEach(() => {
 })
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
   localStorage.clear()
   vi.unstubAllGlobals()
   window.history.replaceState(null, '', '/')
@@ -126,17 +127,44 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
   })
 
   it('BA mục điều hướng là liên kết (#hom-nay · #tien-bo · #ca-kiem-tra), mục đang xem có aria-current; Ca kiểm tra: ca gần nhất + lời thầy của ca + "Các ca trước"', async () => {
+    // JSDOM không bố trí: mọi top mặc định bằng 0, khiến bộ theo dõi cuộn chọn phần cuối.
+    // Mô phỏng vị trí một trang đang cuộn; khung hình chỉ chạy khi test chủ động gọi.
+    let doCuon = 0, maKhung = 0
+    const viTri: Record<string, number> = { 'hom-nay': 0, nhip: 600, 'thai-do': 1200, 'cau-sai': 1800, 'thoi-gian': 2400, 'kiem-tra': 3000, btvn: 3600, 'buoi-hoc': 4200, 'lich-su': 4800 }
+    const rectGoc = HTMLElement.prototype.getBoundingClientRect
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      const phan = this.dataset.phan
+      return phan ? new DOMRect(0, (viTri[phan] ?? 6000) - doCuon, 390, 480) : rectGoc.call(this)
+    })
+    vi.spyOn(document.documentElement, 'scrollHeight', 'get').mockReturnValue(10_000)
+    const khungHinh = new Map<number, FrameRequestCallback>()
+    vi.stubGlobal('requestAnimationFrame', (f: FrameRequestCallback) => { khungHinh.set(++maKhung, f); return maKhung })
+    vi.stubGlobal('cancelAnimationFrame', (id: number) => { khungHinh.delete(id) })
     tatCa = { ...PH_OK, tienBo: { diem: [{ ngay: '2026-09-05', diem: 6.25, maCa: 'CA-1', tenCa: 'Kiểm tra 15 phút' }, { ngay: '2026-09-12', diem: 6.75, maCa: 'CA-15', tenCa: 'Kiểm tra chương 4' }], dangTienBoNhat: [] } }
     const { container } = await vaoApp()
     // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19): thanh bên là các PHẦN của trang (liên kết `#phan-…`, bấm ⇒ cuộn tới phần); Ca kiểm tra mở từ phần "Kiểm tra và tiến bộ".
     const lk = [...container.querySelectorAll('nav[aria-label="Các phần về con"] a')] as HTMLAnchorElement[]
     expect(lk[0]!.getAttribute('href')).toBe('#phan-hom-nay')
-    expect(lk[0]!.getAttribute('aria-current')).toBe('true')
+    await waitFor(() => expect(lk[0]!.getAttribute('aria-current')).toBe('true'))
+    expect(lk.filter(a => a.getAttribute('aria-current') === 'true')).toHaveLength(1)
+    await act(async () => {
+      doCuon = 600
+      vi.stubGlobal('scrollY', doCuon)
+      window.dispatchEvent(new Event('scroll'))
+      window.dispatchEvent(new Event('scroll'))
+      expect(khungHinh.size).toBe(1) // Nhiều sự kiện cuộn vẫn chỉ tính một lần mỗi khung hình.
+      const cho = [...khungHinh.values()]
+      khungHinh.clear()
+      for (const f of cho) f(0)
+    })
+    await waitFor(() => expect(container.querySelector('nav a[href="#phan-nhip"]')!.getAttribute('aria-current')).toBe('true'))
+    expect(lk.filter(a => a.getAttribute('aria-current') === 'true')).toHaveLength(1)
     await waitFor(() => expect(container.querySelector('[data-vung="kiem-tra"] a[href="#ca-kiem-tra"]')).toBeTruthy())
     expect(container.querySelector('[data-vung="kiem-tra"] a[href="#ca-kiem-tra"]')!.textContent).toBe('Xem tất cả 3 ca kiểm tra')
     await diToi('#ca-kiem-tra')
     await waitFor(() => expect(container.querySelector('[data-vung="man-ca-kiem-tra"]')).toBeTruthy())
     expect(lk.some((a) => a.hasAttribute('aria-current'))).toBe(false) // màn con: không phần nào sáng
+    expect(container.querySelectorAll('nav[aria-label="Các phần về con"] a[aria-current]')).toHaveLength(0)
     expect(container.querySelector('main a.ph3-lui')!.getAttribute('href')).toBe('#hom-nay')
     expect(container.querySelector('h1')!.textContent).toBe('Ca kiểm tra')
     expect(container.querySelector('main')!.textContent).not.toMatch(/Điểm số|Lịch sử/)
