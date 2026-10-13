@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, CalendarDays, Check, CloudCheck, Lock, RefreshCw, Route, Timer } from 'lucide-react'
 import { goiHoa2 } from '../hoa2/api'
 import { docKiemTra, type TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
@@ -9,6 +9,7 @@ import TheKiemTraCaNhan from './TheKiemTraCaNhan'
 import BieuTuongKiemTra from './BieuTuongKiemTra'
 import { conLai, diemChu, dongHo, gioHan, gioVn, thuNgay } from './kiem-tra-chu'
 import { hoiXacNhan } from '../hop-thoai'
+import { taoKhoGio, useGiayConLai, type KhoGio } from '../../lib/dong-ho-thi'
 import './hoc-tap.css'
 import './kiem-tra-ca-nhan.css'
 // ĐỢT 20 · MÀN KIỂM TRA ÔN TẬP theo bản vẽ docs/ban-ve-dot20 (thầy duyệt 13/10). Logic lưu/đồng hồ/chốt/khôi phục nháp GIỮ NGUYÊN (hợp đồng Codex
@@ -25,8 +26,27 @@ function VongDem({phan,nhan,lop,an=false,children}:{phan:number;nhan?:string;lop
   <span>{children}</span>
  </div>
 }
+/** Chỉ các nút lá nghe từng giây; cây câu hỏi và công thức không dựng lại theo nhịp giờ. */
+function DongHoChang({kho,giay,vong=false}:{kho:KhoGio|null;giay:number;vong?:boolean}){
+ const sec=Math.max(0,Math.ceil(useGiayConLai(kho)??0)),gap=sec<=60
+ if(vong)return <VongDem phan={giay?sec/giay:0} lop={gap?'ktcn-vong-gap':undefined} an><b>{dongHo(sec)}</b><small>còn lại</small></VongDem>
+ return <span className="ktcn-dh" data-gap={gap||undefined}><svg viewBox="0 0 36 36" aria-hidden="true"><circle className="ktcn-dh-nen" cx="18" cy="18" r="14"/><circle className="ktcn-dh-cung" cx="18" cy="18" r="14" strokeDasharray={`${giay?Math.min(1,sec/giay)*88:88} 88`}/></svg><time aria-label="Thời gian chặng còn lại">{dongHo(sec)}</time></span>
+}
+function GioConLai({kho,bai=false}:{kho:KhoGio|null;bai?:boolean}){
+ const giay=useGiayConLai(kho)??0
+ return <>{bai?conLai(giay*1000):dongHo(Math.max(0,Math.ceil(giay)))}</>
+}
+const khongDangKy=()=>()=>{}
+function useHetGio(kho:KhoGio|null){
+ const lay=()=>!!kho&&kho.conLai()<=0
+ return useSyncExternalStore(kho?.dangKy??khongDangKy,lay,lay)
+}
 export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:string;sbd:string;id:string;onVe:()=>void;onCapNhat:()=>void}) {
- const [tt,setTt]=useState<TomTatKiemTra>(),[chang,setChang]=useState<Chang[]>([]),[cs,setCs]=useState<Question[]>([]),[stt,setStt]=useState<number|null>(null),[viTri,setViTri]=useState(0),[tra,setTra]=useState<Record<string,string>>({}),[han,setHan]=useState(0),[offset,setOffset]=useState(0),[now,setNow]=useState(Date.now()),[busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[luu,setLuu]=useState(''),[ket,setKet]=useState<Ket>()
+ const [tt,setTt]=useState<TomTatKiemTra>(),[chang,setChang]=useState<Chang[]>([]),[cs,setCs]=useState<Question[]>([]),[stt,setStt]=useState<number|null>(null),[viTri,setViTri]=useState(0),[tra,setTra]=useState<Record<string,string>>({}),[han,setHan]=useState(0),[offset,setOffset]=useState(0),[busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[luu,setLuu]=useState(''),[ket,setKet]=useState<Ket>()
+ const hanChay=stt!==null?han:!ket&&tt?.homNay&&tt.nopLuc===null?chang.find(c=>!c.daChot&&c.han!==null)?.han:undefined
+ const khoChang=useMemo(()=>hanChay?taoKhoGio(hanChay,()=>Date.now()+offset):null,[hanChay,offset])
+ const khoBai=useMemo(()=>tt?taoKhoGio(tt.hanLuc,()=>Date.now()+offset):null,[tt?.hanLuc,offset])
+ const hetGio=useHetGio(khoChang)
  const traRef=useRef(tra),revision=useRef(0),day=useRef<Promise<unknown>>(Promise.resolve()),tuNop=useRef(false),timer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),mounted=useRef(true)
  const key=`ktcn:nhap:${sbd}:${id}:${stt}`
  const [nhapCuu,setNhapCuu]=useState<Record<string,string>>()
@@ -35,8 +55,6 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
  const tai=async()=>{setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id});const t=nhan(r);setChang(r.chang as Chang[]);if(t.nopLuc!==null||t.trangThai==='het_han'){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id});nhan(k);setKet(k.ketQua as Ket)}}catch(e){setLoi(e instanceof Error?e.message:'Chưa tải được bài kiểm tra.')}finally{setBusy(false)}}
  useEffect(()=>{mounted.current=true;void tai();return()=>{mounted.current=false;if(timer.current)clearTimeout(timer.current)}},[token,id])
- // Đồng hồ cục bộ 1 giây: chỉ vẽ giờ; hết hạn chốt một lần qua tuNop, không hỏi máy chủ định kỳ.
- useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(t)},[])
  const save=(submit=false)=>{
   if(stt===null)return Promise.resolve()
   if(timer.current)clearTimeout(timer.current)
@@ -55,19 +73,19 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
   // Nộp tay khi còn câu trống ⇒ hỏi lại bằng hộp app (đợt 20). Hết giờ tự chốt thì không hỏi; hộp đang mở mà hết giờ ⇒ lượt tự chốt đi trước.
   if(!auto){const trong=cs.flatMap((c,i)=>traRef.current[c.qid]?[]:[i+1]);if(trong.length&&!await hoiXacNhan({tieuDe:`Nộp chặng ${stt+1}?`,noiDung:`Chặng này còn ${trong.length} câu chưa trả lời (câu ${trong.join(', ')}). Nộp chặng sẽ chốt các câu đã lưu, không sửa lại được.`,nhanDongY:`Nộp chặng ${stt+1}`,nhanKhong:'Làm tiếp',vo:'m3'}))return;if(tuNop.current)return}
   tuNop.current=true;setBusy(true);setLoi('');try{await save(true);setCs([]);setStt(null);await tai();onCapNhat()}catch(e){tuNop.current=false;setLoi(e instanceof Error?e.message:'Chưa chốt được chặng.');if(auto)setLuu('Hết giờ; đang giữ bản nháp trên máy để đối chiếu.')}finally{setBusy(false)}}
- useEffect(()=>{if(stt!==null&&han&&now+offset>=han&&!busy)void chot(true)},[now,han,offset,stt,busy])
+ // Gốc màn chỉ nghe mốc giờ; hết hạn vẫn chốt một lần, đợi đúng hàng lưu/revision hiện hành.
+ useEffect(()=>{if(stt!==null&&han&&hetGio&&!busy)void chot(true)},[hetGio,han,offset,stt,busy])
  const doi=(qid:string,a:string)=>{const v={...traRef.current,[qid]:a};traRef.current=v;setTra(v);setLuu('Đang lưu…');setNhapCuu(undefined);try{localStorage.setItem(key,JSON.stringify({han,tra:v}))}catch{/* bản nháp máy chủ vẫn là nguồn chính */}if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{void save().catch(e=>{setLoi(e instanceof Error?e.message:'Chưa lưu được bài.');setLuu('Chưa đồng bộ; bản nháp đang ở trên máy')})},400)}
- const phucHoi=()=>{if(!nhapCuu||sec===0)return;traRef.current={...traRef.current,...nhapCuu};setTra(traRef.current);setNhapCuu(undefined);void save().catch(e=>setLoi(e instanceof Error?e.message:'Chưa đồng bộ được bản nháp.'))}
+ const phucHoi=()=>{if(!nhapCuu||!khoChang||khoChang.conLaiNgay()<=0)return;traRef.current={...traRef.current,...nhapCuu};setTra(traRef.current);setNhapCuu(undefined);void save().catch(e=>setLoi(e instanceof Error?e.message:'Chưa đồng bộ được bản nháp.'))}
  const ve=async()=>{if(stt!==null){setBusy(true);try{await save();onVe();onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa lưu được bài.')}finally{setBusy(false)}}else{onVe();onCapNhat()}}
  const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa nộp được bài.')}finally{setBusy(false)}}
  const [loc,setLoc]=useState<Loc>('tat-ca')
- const sec=Math.max(0,Math.ceil((han-now-offset)/1000)),q=cs[viTri]
- const nowMay=now+offset,changNay=stt!==null?chang.find(c=>c.stt===stt):undefined,giayChang=changNay?.giay||0
+ const q=cs[viTri]
+ const nowMay=Date.now()+offset,changNay=stt!==null?chang.find(c=>c.stt===stt):undefined,giayChang=changNay?.giay||0
  const dangChay=chang.find(c=>!c.daChot&&c.han!==null&&c.han>nowMay)
  const soChot=chang.filter(c=>c.daChot).length,xongHet=chang.length>0&&soChot===chang.length
  const dau=chang.find(c=>!c.daChot)
  const daTraChang=cs.filter(c=>!!tra[c.qid]).length
- const gap=stt!==null&&sec<=60
  const dsCau=(nho:boolean)=><div className={nho?'ktcn-nav ktcn-nav-dt':'ktcn-nav'} role="group" aria-label="Các câu trong chặng">{cs.map((c,i)=><button type="button" key={c.qid} aria-current={viTri===i||undefined} data-co={tra[c.qid]?'':undefined} aria-label={`Câu ${i+1}${tra[c.qid]?' · đã trả lời':''}`} onClick={()=>setViTri(i)}>{i+1}</button>)}</div>
  const tieuDe=stt!==null?<><b>Chặng {stt+1}/{chang.length||stt+1}</b><small>Câu {viTri+1}/{cs.length}</small></>:<><b>Kiểm tra ôn tập</b>{tt&&<small>{thuNgay(tt.ngay)}</small>}</>
  const kq=ket?{dung:ket.cau.filter(c=>c.dung).length,trong:ket.cau.filter(c=>!c.tra).length,on:ket.cau.filter(c=>c.tra&&!c.dung).length}:null
@@ -76,7 +94,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
   <header className="ktcn-thanh">
    <button type="button" className="ktcn-ve" onClick={()=>void ve()} disabled={busy&&stt!==null}><ArrowLeft size={20} aria-hidden="true"/>{stt!==null?'Lưu và về':'Hôm nay'}</button>
    <p className="ktcn-thanh-giua">{tieuDe}</p>
-   {stt!==null?<span className="ktcn-dh" data-gap={gap||undefined}><svg viewBox="0 0 36 36" aria-hidden="true"><circle className="ktcn-dh-nen" cx="18" cy="18" r="14"/><circle className="ktcn-dh-cung" cx="18" cy="18" r="14" strokeDasharray={`${giayChang?Math.min(1,sec/giayChang)*88:88} 88`}/></svg><time aria-label="Thời gian chặng còn lại">{dongHo(sec)}</time></span>:<span className="ktcn-thanh-trong" aria-hidden="true"/>}
+   {stt!==null?<DongHoChang kho={khoChang} giay={giayChang}/>:<span className="ktcn-thanh-trong" aria-hidden="true"/>}
   </header>
   {loi&&<div className="ktcn-bao" role="alert"><span>{loi}</span><button type="button" className="ktcn-nut-phu" onClick={()=>void(stt!==null?mo(stt):tai())} disabled={busy}><RefreshCw size={16} aria-hidden="true"/>Tải lại</button></div>}
 
@@ -90,7 +108,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
      <ul className="ktcn-dong-so"><li><Route size={20} aria-hidden="true"/><span><b>{soChot}/{chang.length||tt.soChang} chặng</b> đã chốt</span></li><li><Check size={20} aria-hidden="true"/><span>Từ <b>{tt.soBai} bài</b> em đã học</span></li></ul>
     </div>
     <div className="ktcn-hai-gio">
-     <div><CalendarDays size={22} aria-hidden="true"/><b>Hạn nộp {gioHan(tt.hanLuc,tt.ngay)}</b><small>Cả bài · còn {conLai(tt.hanLuc-nowMay)}</small></div>
+     <div><CalendarDays size={22} aria-hidden="true"/><b>Hạn nộp {gioHan(tt.hanLuc,tt.ngay)}</b><small>Cả bài · còn <GioConLai kho={khoBai} bai/></small></div>
      <div><Timer size={22} aria-hidden="true"/><b>Giờ riêng từng chặng</b><small>Chỉ chạy khi em bấm Làm chặng</small></div>
     </div>
    </section>
@@ -99,7 +117,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
     return <li key={c.stt} data-xong={c.daChot||undefined} data-dang={chay||undefined}>
      <span className="ktcn-ch-dau" aria-hidden="true">{c.daChot?<Check size={20}/>:c.stt+1}</span>
      <div className="ktcn-ch-o">
-      <div className="ktcn-ch-h"><b>Chặng {c.stt+1}</b>{c.daChot?<span className="ktcn-chip" data-sac="xanh">Đã chốt</span>:chay?<span className="ktcn-chip">Còn {dongHo(Math.max(0,Math.ceil((c.han!-nowMay)/1000)))}</span>:khoa?<span className="ktcn-chip" data-sac="xam"><Lock size={13} aria-hidden="true"/>Chờ chặng {dangChay!.stt+1}</span>:null}</div>
+      <div className="ktcn-ch-h"><b>Chặng {c.stt+1}</b>{c.daChot?<span className="ktcn-chip" data-sac="xanh">Đã chốt</span>:chay?<span className="ktcn-chip">Còn <GioConLai kho={khoChang}/></span>:khoa?<span className="ktcn-chip" data-sac="xam"><Lock size={13} aria-hidden="true"/>Chờ chặng {dangChay!.stt+1}</span>:null}</div>
       <small>{c.soCau} câu · {Math.ceil(c.giay/60)} phút{typeof c.daTra==='number'?` · đã trả lời ${c.daTra}/${c.soCau}`:''}</small>
       {!c.daChot&&<button type="button" className={chinh?'ktcn-nut-chinh':'ktcn-nut-phu'} onClick={()=>void mo(c.stt)} disabled={busy||khoa}>{chay?`Làm tiếp chặng ${c.stt+1}`:`Làm chặng ${c.stt+1}`}<ArrowRight size={18} aria-hidden="true"/></button>}
       {khoa&&<p className="ktcn-ch-ghi">Nộp chặng {dangChay!.stt+1} rồi mới mở chặng này.</p>}
@@ -114,16 +132,16 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
 
   {q&&stt!==null&&<div className="ktcn-lam">
    <aside className="ktcn-ben" aria-label={`Chặng ${stt+1}`}>
-    <VongDem phan={giayChang?sec/giayChang:0} lop={gap?'ktcn-vong-gap':undefined} an><b>{dongHo(sec)}</b><small>còn lại</small></VongDem>
+    <DongHoChang kho={khoChang} giay={giayChang} vong/>
     <h3>Câu trong chặng {stt+1} · đã trả lời {daTraChang}/{cs.length}</h3>
     {dsCau(false)}
     <p className="ktcn-ch-ghi">Hết giờ, chặng tự chốt với các câu đã lưu.</p>
    </aside>
    <main className="ktcn-noi">
     {dsCau(true)}
-    {nhapCuu&&<div className="ktcn-bao" role="status"><span>Có bản nháp trên máy chưa đồng bộ. Đồng hồ vẫn theo giờ đã mở.</span><button type="button" className="ktcn-nut-phu" onClick={phucHoi} disabled={busy||sec===0}>Khôi phục bản nháp trên máy</button></div>}
+    {nhapCuu&&<div className="ktcn-bao" role="status"><span>Có bản nháp trên máy chưa đồng bộ. Đồng hồ vẫn theo giờ đã mở.</span><button type="button" className="ktcn-nut-phu" onClick={phucHoi} disabled={busy||hetGio}>Khôi phục bản nháp trên máy</button></div>}
     <div className="ktcn-luu-dong"><p className="ktcn-luu" role="status">{luu==='Đã lưu trên máy chủ'?<><CloudCheck size={18} aria-hidden="true"/>Đã lưu</>:luu}</p><span>Đã trả lời {daTraChang}/{cs.length}</span></div>
-    <TheCau {...propsCauHoc(q,viTri+1,tra[q.qid]??'',v=>doi(q.qid,v),undefined,busy||sec===0)}/>
+    <TheCau {...propsCauHoc(q,viTri+1,tra[q.qid]??'',v=>doi(q.qid,v),undefined,busy||hetGio)}/>
     <div className="ktcn-day">
      <button className="ktcn-nut-phu" type="button" onClick={()=>setViTri(Math.max(0,viTri-1))} disabled={viTri===0||busy}>Câu trước</button>
      {viTri<cs.length-1?<button className="ktcn-nut-chinh" type="button" onClick={()=>setViTri(viTri+1)}>Câu tiếp theo<ArrowRight size={20} aria-hidden="true"/></button>:<button className="ktcn-nut-chinh" type="button" onClick={()=>void chot()} disabled={busy}>Nộp chặng {stt+1}</button>}

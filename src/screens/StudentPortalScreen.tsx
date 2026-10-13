@@ -64,7 +64,7 @@ import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './DangNhapHocSinh'
 import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
-import { boNap, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
+import { boNap, nenNapTruoc, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
@@ -85,7 +85,6 @@ const ManTuLuyenNhanh = veNgayKhiCo(ManTuLuyen, napManTuLuyen)
 const LichSuCaEm = lazy(() => import('../components/hoa2/LichSuCaEm'))
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
 
-/** = KHOA_MAN_DAU của Game.tsx (test khoá khớp). KHÔNG import hằng ấy từ Game.tsx: sẽ kéo cả game vào gói chính, mất nạp lười. */
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import { chuTheCaGanNhat, dungLichSuCa } from '../lib/lich-su-ca-hs'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
@@ -196,8 +195,7 @@ function mauDiem(diem: number | null): string {
 
 type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua' | 'kiemtra'
 
-/** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
- * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
+/** Giữ khung bài học trong lúc mảnh mã đang về, tránh giật trang và khoảng trắng. */
 function ChoNapGame() {
   return (
     <div
@@ -642,28 +640,24 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   useEffect(() => {
     if (!auth) return
     let huy = false
+    setDangTaiLichSu(true)
+    setDangTaiBtvn(true)
     void (async () => {
       try {
         const url = await loadScriptUrlHoacMacDinh().catch(() => '')
         if (huy) return
-        setDangTaiLichSu(true)
-        const resLs = await hsLichSuCaApi(url, auth.sbd)
-        if (!huy) {
-          setDangTaiLichSu(false)
-          if (resLs.ok && resLs.items) {
+        // Hai nguồn độc lập: nguồn về trước hiện trước; một nguồn mất mạng không chặn nguồn kia.
+        await Promise.all([
+          hsLichSuCaApi(url, auth.sbd).then(resLs => {
+            if (huy || !resLs.ok || !resLs.items) return
             setDsLichSu(resLs.items)
             setDsChuaCongBo(resLs.chuaCongBo ?? [])
-          }
-        }
-
-        setDangTaiBtvn(true)
-        const resBt = await hsBtvnApi(url, auth.sbd)
-        if (!huy) {
-          setDangTaiBtvn(false)
-          if (resBt.ok && resBt.items) {
+          }, () => {}).finally(() => { if (!huy) setDangTaiLichSu(false) }),
+          hsBtvnApi(url, auth.sbd).then(resBt => {
+            if (huy || !resBt.ok || !resBt.items) return
             setDsBtvn(resBt.items)
-          }
-        }
+          }, () => {}).finally(() => { if (!huy) setDangTaiBtvn(false) }),
+        ])
       } finally {
         if (!huy) setDaNapLanDau(true)
       }
@@ -676,14 +670,20 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
 
   // Đăng nhập (+ đặt mật khẩu lần đầu): màn DangNhapHocSinh (05/10, tách để vỏ app học sinh dựng trước cổng). Cất phiên rồi vào cổng như cũ.
   const daDangNhap = (thongTin: ThongTinHs) => {
-    localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin))
+    try { localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin)) } catch {
+      // Bộ nhớ máy bị chặn/đầy: phiên mới vẫn dùng được, cố bỏ bản cũ để không mở nhầm em.
+      try { localStorage.removeItem(KHOA_LUU_AUTH) } catch {}
+    }
     setAuth(thongTin)
   }
 
   const dangXuat = async () => {
-    try{const r=await navigator.serviceWorker?.getRegistration();const sub=await r?.pushManager?.getSubscription();if(sub&&auth?.token){await noticeApi(auth.token,'unsubscribe',{endpoint:sub.endpoint});await sub.unsubscribe()}}catch{/* Generic push contains no personal data. */}
-    localStorage.removeItem(KHOA_LUU_AUTH)
+    try { localStorage.removeItem(KHOA_LUU_AUTH) } catch {
+      try { localStorage.setItem(KHOA_LUU_AUTH, '') } catch { /* Vẫn đăng xuất phiên trong bộ nhớ. */ }
+    }
+    // Đóng cổng của em ngay; bỏ đăng ký thông báo tiếp tục độc lập ở nền.
     setAuth(null)
+    try{const r=await navigator.serviceWorker?.getRegistration();const sub=await r?.pushManager?.getSubscription();if(sub&&auth?.token){await noticeApi(auth.token,'unsubscribe',{endpoint:sub.endpoint});await sub.unsubscribe()}}catch{/* Generic push contains no personal data. */}
   }
 
   const tongSoCauSaiDaChon = useMemo(() => {
@@ -718,21 +718,23 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   }, [cheDo2, tab])
   // SỬA LỖI 12/10 "không vuốt lên được": có màn con ⇒ khoá trang Hôm nay phía sau, cú vuốt luôn thuộc màn đang nhìn (src/lib/khoa-cuon-trang.ts).
   useKhoaCuonTrang(dangMoManCon)
-  // NẠP TRƯỚC MÀN LÀM BÀI (09/10): tải trước ExamTakeScreen lúc rảnh để khi học sinh bấm "Vào thi" thì màn mở ngay 0ms không phải chờ tải qua mạng.
+  // Chỉ nạp trước màn thi sau xác thực, ở Hôm nay và lúc máy rảnh; bấm Vào thi vẫn tải ngay.
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    const cb = () => { void boNapExam() }
+    if (typeof window === 'undefined' || !auth?.token || dangMoManCon || !nenNapTruoc()) return
+    let huy = false
+    const cb = () => { if (!huy) void boNapExam().catch(() => {}) }
     const hen = ('requestIdleCallback' in window
       ? (window as Window & { requestIdleCallback: (fn: () => void) => number }).requestIdleCallback
       : (fn: () => void) => setTimeout(fn, 1200))(cb)
     return () => {
+      huy = true
       if ('cancelIdleCallback' in window) {
         (window as Window & { cancelIdleCallback: (n: number) => void }).cancelIdleCallback(hen)
       } else {
         clearTimeout(hen)
       }
     }
-  }, [])
+  }, [auth?.token, dangMoManCon])
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
   const caDangMo = useCaDangMo({ token: auth?.token, sbd: auth?.sbd }, !!auth)
@@ -864,7 +866,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
           coCa={!!caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} coBaiTap={dsBtvn.length > 0} token={auth.token} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
-          onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam(); setTab('vaothi') }}
+          onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam().catch(() => {}); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
           onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')}
