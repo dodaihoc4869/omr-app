@@ -27,11 +27,8 @@ const NOI: { ten: string; html: string; css: string; goc: string }[] = [
 
 let browser: Browser | null = null
 beforeAll(async () => {
-  try {
-    browser = await chromium.launch({ headless: true })
-  } catch {
-    browser = null
-  }
+  // Dùng Chromium hệ thống khi môi trường không cài bản tải riêng của Playwright; mở thất bại phải báo đỏ, không bỏ qua khẳng định.
+  browser = await chromium.launch({ headless: true, ...(fs.existsSync('/usr/bin/chromium') ? { executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] } : {}) })
 })
 afterAll(async () => {
   await browser?.close()
@@ -41,7 +38,7 @@ for (const noi of NOI)
   for (const [w, h] of [[320, 640], [360, 740], [390, 844]] as const)
     for (const mau of ['light', 'dark'] as const)
       it(`${noi.ten} · ${w}×${h} · ${mau}: hai nút ≥ 36 px nằm TRONG ô (mép phải, giữa theo chiều dọc), ô ≥ 100 px, 0 tràn ngang`, async () => {
-        if (!browser) return
+        if (!browser) throw new Error('Chưa mở được Chromium để kiểm ô trả lời.')
         const ctx = await browser.newContext({ viewport: { width: w, height: h }, colorScheme: mau })
         const page = await ctx.newPage()
         await page.setContent(`<!doctype html><html lang="vi"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0}${noi.css}</style></head><body>${noi.html}</body></html>`)
