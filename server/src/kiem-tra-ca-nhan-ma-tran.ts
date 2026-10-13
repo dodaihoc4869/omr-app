@@ -1,10 +1,25 @@
 // Khung Hóa 2026 trong app: 18 TN · 4 ĐS · 6 TLN, 50 phút.
 // Mức độ do app phân tích 4 đề 2026; không gọi là ma trận chính thức của Bộ.
 import { bamKt, type BangChungKt, type MucKt, type UngKt } from './kiem-tra-ca-nhan-loi'
+import { CO_CHE, VIEC } from '../../src/lib/tu-vung-dang'
 export const KHUNG_KT_2026 = { I: { biet: 11, hieu: 4, van_dung: 3 }, II: { biet: 0, hieu: 3, van_dung: 1 }, III: { biet: 1, hieu: 2, van_dung: 3 } } as const
 export interface CauMaTranKt extends UngKt { phan: 'I'|'II'|'III'; mucDo: 'biet'|'hieu'|'van_dung' }
 const oCau = (q: CauMaTranKt) => `${q.phan}:${q.mucDo}`
 const khung = Object.entries(KHUNG_KT_2026).flatMap(([phan, muc]) => Object.entries(muc).filter(([,n])=>n>0).map(([m,n])=>({o:`${phan}:${m}`,n})))
+
+/** Cây thật trong kho: chương → cơ chế kiến thức → thao tác. Sổ vi kỹ năng giữ riêng toàn bộ lá. */
+export function nhomKienThucKt(muc:readonly MucKt[],cau:readonly CauMaTranKt[],hs:ReadonlyMap<string,BangChungKt>){
+  const anhXa=new Map<string,string>(),ms=new Map<string,MucKt>(),bc=new Map<string,BangChungKt>()
+  for(const m of muc){
+    const ma=m.kyNang.replace(/^dang:/,'').split('#')[0]!,[chuong,coChe,viec]=ma.split('.')
+    const nhom=m.loai!=='bai'&&chuong&&coChe&&viec&&CO_CHE[chuong]?.[coChe]&&VIEC[viec]?`${chuong}.${coChe}`:null
+    const id=nhom?`kien_thuc:${nhom}`:m.id,cu=ms.get(id),bais=[...new Set([...(cu?.baiLienQuan??[]),...(m.baiLienQuan??[m.bai])])]
+    anhXa.set(m.id,id);ms.set(id,{...m,id,kyNang:nhom??m.kyNang,baiLienQuan:bais})
+    const b=hs.get(m.id),tr=bc.get(id)
+    if(b)bc.set(id,tr?{p:Math.min(tr.p,b.p),vung:tr.vung&&b.vung,n:Math.min(tr.n,b.n),ngayCuoi:[tr.ngayCuoi,b.ngayCuoi].filter((s):s is string=>!!s).sort()[0]??null}:b)
+  }
+  return {muc:[...ms.values()],cau:cau.map(q=>({...q,muc:[...new Set(q.muc.map(id=>anhXa.get(id)??id))]})),hs:bc,anhXa}
+}
 
 /** Phủ có ràng buộc ma trận: tuyệt đối không tăng số câu để chạy theo mẫu số kiến thức. */
 export function chonChuKyKt2026(muc: readonly MucKt[], cau: readonly CauMaTranKt[], hs: ReadonlyMap<string,BangChungKt>, seed: string) {

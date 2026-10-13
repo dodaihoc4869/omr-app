@@ -17,7 +17,7 @@ import { ketQuaTungY } from './omni-game'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { sqlTenLopHs } from './goi-bai-7'
 import { henHalfLife, type MoHinhHalfLife } from './half-life'
-import { chonChuKyKt2026 } from './kiem-tra-ca-nhan-ma-tran'
+import { chonChuKyKt2026,nhomKienThucKt } from './kiem-tra-ca-nhan-ma-tran'
 import { chuanMucDo } from './lich-su-lam-cau'
 
 type Row = Record<string, unknown>
@@ -133,7 +133,7 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
   const bai=[...new Map([...pv.baiTheoMaDe.values()].map(b=>[b.khoaBai,{khoa:b.khoaBai,ten:b.tenBai}])).values()]
   const d: DeKt = { phienBan: 2, lyDo: hen.lyDo, bai, muc: [...muc.values()], cau, soPhu: chon.soPhu, phut: Math.ceil(chang.reduce((n,c)=>n+c.giay,0)/60), thieu: [...thieu], chang }
   const id = `ktcn:${sbd}:${hen.ngay}`
-  if(chiDoc){const mt=chonChuKyKt2026([...muc.values()],ung.map((u,i)=>({...u,phan:ds[i]!.q.phan,mucDo:bacQ(ds[i]!.q)>=3?'van_dung' as const:bacQ(ds[i]!.q)===2?'hieu' as const:'biet' as const})),bc,sbd+ngayKt(now));return {maTran2026:{soDe:mt.de.length,soCau:mt.de.map(d=>d.qids.length),phut:mt.de.map(d=>d.phut),du:mt.du,phu:mt.phu,tong:mt.tongMuc,thieuMaTran:mt.thieuMaTran,chuaPhu:mt.chuaPhu.map(id=>muc.get(id)?.kyNang??id),thieuNguon:mt.thieuNguon.length},id,ngay:hen.ngay,tong:cau.length,thieu:thieu.size,phut:d.phut,soPhu:chon.soPhu,soThem:chon.soThem,soKienThuc:[...muc.values()].filter(m=>m.loai!=='bai').length,thieuChiTiet:[...thieu].map(id=>{const m=muc.get(id);return {kyNang:m?.kyNang??'',bai:m?.tenBai??id,loai:m?.loai??'nguon'}})}}
+  if(chiDoc){const nk=nhomKienThucKt([...muc.values()],ung.map((u,i)=>({...u,phan:ds[i]!.q.phan,mucDo:bacQ(ds[i]!.q)>=3?'van_dung' as const:bacQ(ds[i]!.q)===2?'hieu' as const:'biet' as const})),bc);const mt=chonChuKyKt2026(nk.muc,nk.cau,nk.hs,sbd+ngayKt(now));return {maTran2026:{soDe:mt.de.length,soCau:mt.de.map(d=>d.qids.length),phut:mt.de.map(d=>d.phut),du:mt.du,phu:mt.phu,tong:mt.tongMuc,thieuMaTran:mt.thieuMaTran,chuaPhu:mt.chuaPhu.map(id=>muc.get(id)?.kyNang??id),thieuNguon:mt.thieuNguon.length},id,ngay:hen.ngay,tong:cau.length,thieu:thieu.size,phut:d.phut,soPhu:chon.soPhu,soThem:chon.soThem,soKienThuc:[...muc.values()].filter(m=>m.loai!=='bai').length,thieuChiTiet:[...thieu].map(id=>{const m=muc.get(id);return {kyNang:m?.kyNang??'',bai:m?.tenBai??id,loai:m?.loai??'nguon'}})}}
   await env.DB.prepare(`INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) SELECT ?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo') AND (?=1 OR NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan WHERE sbd=? AND lop=? AND ngay>=? AND trang_thai<>'cho_nguon')) ON CONFLICT(sbd,ngay) DO UPDATE SET lop=excluded.lop,json=excluded.json,trang_thai=excluded.trang_thai,cap_nhat_luc=excluded.cap_nhat_luc WHERE (?=1 OR kiem_tra_ca_nhan.trang_thai='cho_nguon' OR kiem_tra_ca_nhan.lop<>excluded.lop) AND kiem_tra_ca_nhan.mo_luc>? AND kiem_tra_ca_nhan.nop_luc IS NULL AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id)`).bind(id,sbd,lop,hen.ngay,dauNgayKt(hen.ngay),dauNgayKt(congNgayKt(hen.ngay,1)),thieu.size || !muc.size ? 'cho_nguon' : 'hen',JSON.stringify(d),now,lamMoi?1:0,sbd,lop,ngayKt(now),lamMoi?1:0,now).run()
   return { id, ngay: hen.ngay, tong: cau.length, thieu: thieu.size, phut: d.phut }
 }

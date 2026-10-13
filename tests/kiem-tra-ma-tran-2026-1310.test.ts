@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { expect,it } from 'vitest'
 import { MA_TRAN_HOA_2026 } from '../src/lib/ma-tran-hoa-2026'
-import { KHUNG_KT_2026,chonChuKyKt2026,type CauMaTranKt } from '../server/src/kiem-tra-ca-nhan-ma-tran'
+import { KHUNG_KT_2026,chonChuKyKt2026,nhomKienThucKt,type CauMaTranKt } from '../server/src/kiem-tra-ca-nhan-ma-tran'
 import type { MucKt } from '../server/src/kiem-tra-ca-nhan-loi'
 const bai:MucKt[]=Array.from({length:6},(_,i)=>({id:`bai:${i}`,bai:String(i),tenBai:`Bài ${i}`,kyNang:'',mucDo:'',loai:'bai'}))
 const kn=(n:number):MucKt[]=>Array.from({length:n},(_,i)=>({id:`kn:${i}`,bai:'0',tenBai:'Bài 0',kyNang:String(i),mucDo:'',loai:'ky_nang'}))
@@ -33,4 +33,11 @@ it('hàng trăm kỹ năng không thể phủ trong 2 đề thì báo phần cò
 it('thiếu câu ở ô đúng/sai Vận dụng không lấy câu khác mức/phần bù, vẫn giữ mẫu số kiến thức',()=>{
  const qs=pool(1).filter(q=>!(q.phan==='II'&&q.mucDo==='van_dung')),r=chonChuKyKt2026([...bai,...kn(1)],qs,new Map(),'S4')
  expect(r.du).toBe(false);expect(r.thieuMaTran).toEqual([{o:'II:van_dung',can:1,co:0}]);expect(r.tongMuc).toBe(7)
+})
+
+it('phủ kiến thức dùng nhánh cơ chế trong từ vựng thật; nền tính một lần; lá thao tác vẫn có ánh xạ đầy đủ',()=>{
+ const a:MucKt={id:'a',bai:'B1',tenBai:'Ester',kyNang:'dang:ESTER.THUY_PHAN_BASE.TINH_KHOI_LUONG',mucDo:'VD'},b:MucKt={...a,id:'b',bai:'B2',kyNang:'dang:ESTER.THUY_PHAN_BASE.TINH_THE_TICH'},nen:MucKt={...a,id:'n',kyNang:'nen:mol'},la:MucKt={...a,id:'l',kyNang:'dang:TU_NGHI.CO_CHE.VIEC'}
+ const r=nhomKienThucKt([a,b,nen,la],[],new Map())
+ expect(r.muc.map(m=>m.id)).toEqual(['kien_thuc:ESTER.THUY_PHAN_BASE','n','l'])
+ expect(r.anhXa.size).toBe(4);expect(r.muc[0]!.baiLienQuan).toEqual(['B1','B2'])
 })
