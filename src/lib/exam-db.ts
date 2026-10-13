@@ -153,10 +153,21 @@ async function thaoTacKho<T, M extends 'readonly' | 'readwrite'>(db: IDBPDatabas
 
 async function getDb(): Promise<IDBPDatabase> {
   let hetCho = false
+  // Hết hạn phải rollback cả migration đã bắt đầu nhưng chưa commit.
+  let nangCap: IDBPTransaction<unknown, string[], 'versionchange'> | undefined
+  const huyNangCap = () => {
+    const tx = nangCap
+    nangCap = undefined
+    try { tx?.abort() } catch { /* Giao dịch đã kết thúc. */ }
+  }
+  const dungCho = () => { hetCho = true; huyNangCap() }
   const nap = openDB(DB_NAME, DB_VERSION, {
     upgrade(db, oldVersion, _moi, tx) {
+      nangCap = tx
+      const xong = () => { if (nangCap === tx) nangCap = undefined }
+      void tx.done.then(xong, xong)
       // open bị chặn rồi về muộn: hủy TRƯỚC mọi thao tác migration cũ, không tự chuyển/xóa nháp.
-      if (hetCho) { tx.abort(); return }
+      if (hetCho) { huyNangCap(); return }
       if (oldVersion < 1) {
         if (!db.objectStoreNames.contains(STORE_SETTINGS)) db.createObjectStore(STORE_SETTINGS)
       }
@@ -171,9 +182,9 @@ async function getDb(): Promise<IDBPDatabase> {
     },
   })
   try {
-    return await voiHanCho(nap, HAN_KHO_THI_MS, 'Kho bài chưa mở được.', () => { hetCho = true })
+    return await voiHanCho(nap, HAN_KHO_THI_MS, 'Kho bài chưa mở được.', dungCho)
   } catch {
-    hetCho = true
+    dungCho()
     void nap.then(db => db.close(), () => {})
     throw new LoiKhoThi('mo')
   }

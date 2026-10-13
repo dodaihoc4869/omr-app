@@ -31,7 +31,9 @@ it('upgrade/connection về muộn sau hạn phải abort trước mutation và 
   const p = loadAttempt('ca1', 'S1').catch(e => e)
   await vi.advanceTimersByTimeAsync(6000)
   expect(await p).toMatchObject({ name: 'LoiKhoThi' })
-  const tx = { abort: vi.fn() }, db = { close: vi.fn(), deleteObjectStore: vi.fn(), createObjectStore: vi.fn(), objectStoreNames: { contains: () => true } }
+  let baoLoi!: (e: Error) => void
+  const tx = { done: new Promise<void>((_resolve, reject) => { baoLoi = reject }), abort: vi.fn(() => baoLoi(new Error('Giao dịch đã hủy.'))) }
+  const db = { close: vi.fn(), deleteObjectStore: vi.fn(), createObjectStore: vi.fn(), objectStoreNames: { contains: () => true } }
   m.mo.mock.calls[0][2].upgrade(db, 1, 2, tx)
   tra(db)
   await Promise.resolve(); await Promise.resolve()
@@ -39,6 +41,62 @@ it('upgrade/connection về muộn sau hạn phải abort trước mutation và 
   expect(db.deleteObjectStore).not.toHaveBeenCalled()
   expect(db.createObjectStore).not.toHaveBeenCalled()
   expect(db.close).toHaveBeenCalledOnce()
+})
+function nangCapDangCho() {
+  const data = new Map<string, unknown>([['ca1:S1', nhap]])
+  const stores = new Set(['settings', 'attempts', 'examContents'])
+  let daHuy = false, xoaNhap = false
+  let traDone!: () => void, baoLoiDone!: (e: Error) => void, traMo!: (db: unknown) => void, baoLoiMo!: (e: Error) => void
+  const tx = {
+    done: new Promise<void>((resolve, reject) => { traDone = resolve; baoLoiDone = reject }),
+    abort: vi.fn(() => { daHuy = true; baoLoiDone(new Error('Giao dịch đã hủy.')) }),
+  }
+  const db = {
+    close: vi.fn(), objectStoreNames: { contains: (s: string) => stores.has(s) },
+    deleteObjectStore: vi.fn((s: string) => { stores.delete(s); if (s === 'attempts') xoaNhap = true }),
+    createObjectStore: vi.fn((s: string) => { stores.add(s) }),
+    transaction: () => ({ store: { get: (key: string) => Promise.resolve(data.get(key)) }, done: Promise.resolve(), abort: vi.fn() }),
+  }
+  m.mo.mockImplementation((_ten, _v, opt) => {
+    opt.upgrade(db, 1, 2, tx)
+    return new Promise((resolve, reject) => { traMo = resolve; baoLoiMo = reject })
+  })
+  return {
+    data, tx, db,
+    commitMuon: () => { if (!daHuy) { if (xoaNhap) data.clear(); traDone() } traMo(db) },
+    moLoi: () => baoLoiMo(new Error('Không mở được kho.')),
+    done: () => traDone(),
+    thuLai: () => m.mo.mockResolvedValue(db),
+  }
+}
+it('upgrade bắt đầu trước hạn nhưng chưa commit: timeout rollback thao tác đã xếp hàng, đóng connection muộn và thử lại giữ nháp', async () => {
+  const k = nangCapDangCho()
+  const p = loadAttempt('ca1', 'S1').catch(e => e)
+  expect(k.db.deleteObjectStore).toHaveBeenCalledWith('attempts')
+  expect(k.tx.abort).not.toHaveBeenCalled()
+  await vi.advanceTimersByTimeAsync(3000)
+  expect(await p).toMatchObject({ name: 'LoiKhoThi' })
+  expect(k.tx.abort).toHaveBeenCalledOnce()
+  k.commitMuon()
+  await Promise.resolve(); await Promise.resolve()
+  expect(k.db.close).toHaveBeenCalledOnce()
+  expect(k.data.get('ca1:S1')).toEqual(nhap)
+  k.thuLai()
+  expect(await loadAttempt('ca1', 'S1')).toEqual(nhap)
+})
+it('open báo lỗi cũng hủy upgrade đang chờ, nhưng transaction đã done không bị hủy lại', async () => {
+  const k = nangCapDangCho()
+  const p = loadAttempt('ca1', 'S1').catch(e => e)
+  k.moLoi()
+  expect(await p).toMatchObject({ name: 'LoiKhoThi' })
+  expect(k.tx.abort).toHaveBeenCalledOnce()
+  const xong = nangCapDangCho()
+  const p2 = loadAttempt('ca1', 'S1').catch(e => e)
+  xong.done()
+  await Promise.resolve()
+  xong.moLoi()
+  expect(await p2).toMatchObject({ name: 'LoiKhoThi' })
+  expect(xong.tx.abort).not.toHaveBeenCalled()
 })
 function kho() {
   const data = new Map<string, unknown>([['ca1:S1', nhap]])
