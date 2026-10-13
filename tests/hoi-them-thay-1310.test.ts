@@ -58,9 +58,9 @@ afterEach(() => { vi.restoreAllMocks() })
 
 describe('hàm thuần', () => {
   it('cấu hình: mặc định bật, chặn biên, JSON hỏng ⇒ mặc định', () => {
-    expect(giaiCauHinhHoiThem(null)).toMatchObject({ bat: true, tranNgay: 20, tranCau: 6, model: 'gemini-3.5-flash-lite' }) // thầy 13/10: "đổi sang gemini 3.5 flash lite"
+    expect(giaiCauHinhHoiThem(null)).toMatchObject({ bat: true, tranNgay: 20, tranCau: 6, model: 'gemini-3.1-flash-lite' }) // thầy tối 13/10: "chuyển xuống mô hình 3.1 flash lite"
     expect(giaiCauHinhHoiThem('{"bat":false,"tranNgay":999,"lop":["12A1"," "],"model":"gemini-2.5-pro"}')).toMatchObject({ bat: false, tranNgay: 200, lop: ['12A1'], model: 'gemini-2.5-pro' })
-    expect(giaiCauHinhHoiThem('{"model":"../x"}').model).toBe('gemini-3.5-flash-lite')
+    expect(giaiCauHinhHoiThem('{"model":"../x"}').model).toBe('gemini-3.1-flash-lite')
     expect(giaiCauHinhHoiThem('không phải json')).toMatchObject({ bat: true })
   })
   it('đáp án Phần II viết theo từng ý; phần khác giữ nguyên', () => {
@@ -136,7 +136,7 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     expect(r).toMatchObject({ ok: true, traLoi: 'Ý b sai vì em nhầm chất, xem lại bước 2.', conLai: 19, ngoaiPhamVi: false })
     expect(goi).toHaveLength(1)
     const g = goi[0]!
-    expect(g.url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent')
+    expect(g.url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent')
     expect(g.url).not.toContain('khoa-thu-gemini')
     expect(g.headers['x-goog-api-key']).toBe('khoa-thu-gemini')
     expect(g.body.generationConfig).toMatchObject({ responseMimeType: 'application/json' })
@@ -225,11 +225,23 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     const { d, token } = await chuanBi()
     const goi = giaGemini(() => traLoiJson({ lienQuan: true, traLoi: 'Em tính lại số mol trước.' }))
     await em(d, '/hs/hoi-thay', { token, qid: QA.ds })
-    vi.mocked(globalThis.fetch).mockImplementationOnce(async () => new Response(JSON.stringify({ error: { code: 404, message: 'models/gemini-3.5-flash-lite is not found' } }), { status: 404, headers: { 'content-type': 'application/json' } }))
+    vi.mocked(globalThis.fetch).mockImplementationOnce(async () => new Response(JSON.stringify({ error: { code: 404, message: 'models/gemini-3.1-flash-lite is not found' } }), { status: 404, headers: { 'content-type': 'application/json' } }))
     const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Vì sao ạ?' })
     expect(r).toMatchObject({ ok: true, traLoi: 'Em tính lại số mol trước.', conLai: 19 })
+    expect(goi.map((g) => g.url.split('/models/')[1])).toEqual(['gemini-3.5-flash-lite:generateContent'])
+    expect(DS_MODEL_DU_PHONG[0]).toBe('gemini-3.5-flash-lite')
+    expect(d.dem('hoi_tro_ly', "model='gemini-3.5-flash-lite' AND loi IS NULL")).toBe(1)
+  })
+
+  it('model đã bị gỡ (410) rồi bản dự phòng đầu cũng 404 ⇒ thử tiếp tên chung, em vẫn được trả lời', async () => {
+    const { d, token } = await chuanBi()
+    const goi = giaGemini(() => traLoiJson({ lienQuan: true, traLoi: 'Bước 1 em tính số mol.' }))
+    await em(d, '/hs/hoi-thay', { token, qid: QA.ds })
+    const het = (ma: number) => async () => new Response(JSON.stringify({ error: { code: ma, message: 'model gone' } }), { status: ma, headers: { 'content-type': 'application/json' } })
+    vi.mocked(globalThis.fetch).mockImplementationOnce(het(410)).mockImplementationOnce(het(404))
+    const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Vì sao ạ?' })
+    expect(r).toMatchObject({ ok: true, traLoi: 'Bước 1 em tính số mol.' })
     expect(goi.map((g) => g.url.split('/models/')[1])).toEqual(['gemini-flash-lite-latest:generateContent'])
-    expect(DS_MODEL_DU_PHONG[0]).toBe('gemini-flash-lite-latest')
     expect(d.dem('hoi_tro_ly', "model='gemini-flash-lite-latest' AND loi IS NULL")).toBe(1)
   })
 

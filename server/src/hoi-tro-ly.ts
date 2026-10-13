@@ -25,10 +25,12 @@ export interface CauHinhHoiThem {
   nhietDo: number
 }
 // 13/10: Google báo 404 "gemini-2.5-flash is no longer available to new users … use models/gemini-3.8-flash" (sổ hoi_tro_ly, lượt đầu tiên thật);
-// thầy chọn Gemini 3.5 Flash Lite.
-export const MAC_DINH_HOI_THEM: CauHinhHoiThem = { bat: true, lop: [], sbd: [], model: 'gemini-3.5-flash-lite', tranNgay: 20, tranCau: 6, thinkingBudget: 1024, nhietDo: 0.3 }
-/** Model báo 404 (sai tên, hoặc Google ngừng cấp cho tài khoản mới) ⇒ thử lần lượt các tên chung luôn trỏ bản mới nhất. */
-export const DS_MODEL_DU_PHONG: readonly string[] = ['gemini-flash-lite-latest', 'gemini-flash-latest']
+// thầy chọn Gemini 3.5 Flash Lite; tối 13/10 thầy: "chuyển xuống mô hình 3.1 flash lite" ⇒ mặc định gemini-3.1-flash-lite (tên ổn định trong tài liệu Gemini API).
+export const MAC_DINH_HOI_THEM: CauHinhHoiThem = { bat: true, lop: [], sbd: [], model: 'gemini-3.1-flash-lite', tranNgay: 20, tranCau: 6, thinkingBudget: 1024, nhietDo: 0.3 }
+/** Model báo 404 / 410 (sai tên, Google ngừng cấp cho khoá mới, hoặc đã gỡ model) ⇒ thử lần lượt: 3.5 Flash-Lite (đã chạy thật 13/10:
+ *  1,4–1,7 s/lượt), rồi các tên chung luôn trỏ bản mới nhất. */
+export const DS_MODEL_DU_PHONG: readonly string[] = ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-flash-latest']
+const MA_KHONG_CO_MODEL = new Set([404, 410])
 
 /** `cau_hinh.hoi_tro_ly` (JSON, mọi khoá tuỳ chọn) ⇒ cấu hình đã chặn biên. Hỏng / vắng ⇒ mặc định. */
 export function giaiCauHinhHoiThem(tho: unknown): CauHinhHoiThem {
@@ -225,8 +227,8 @@ export const goiGemini: GoiAi = async (key, cfg, noiDung) => {
   let kq: KetQuaAi = { ok: false, ma: 'loi_ai', chiTiet: 'chưa gọi' }
   for (const model of ds) {
     kq = await goiMotModel(key, cfg, model, noiDung)
-    if (kq.ok || kq.http !== 404) return kq
-    console.error('[hoi-tro-ly] model', model, 'báo 404 — thử tên kế')
+    if (kq.ok || !MA_KHONG_CO_MODEL.has(kq.http ?? 0)) return kq
+    console.error('[hoi-tro-ly] model', model, `báo ${kq.http} — thử tên kế`)
     vet.push(`${model}: ${kq.chiTiet}`)
   }
   return kq.ok ? kq : { ...kq, chiTiet: vet.join(' | ').slice(0, 280) }
