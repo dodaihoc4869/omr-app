@@ -681,3 +681,31 @@ export async function hsDocLoiGiai(env: Env, b: Obj) {
     .bind(sbd, qid, str(b.nguon).slice(0, 40) || 'luyen', new Date(nay).toISOString(), ngayVn(nay), giay, ds.length, JSON.stringify(tomTatDoc(ds)), JSON.stringify(ds)).run()
   return { ok: true }
 }
+
+// ---------------------------------------------------------------- HỎI THÊM THẦY (AI, thầy 13/10 — server/src/hoi-tro-ly.ts)
+
+/** Ngữ cảnh một câu cho phần hỏi thêm: ĐÚNG cổng chặn của nút Hỏi thầy, thêm điều kiện em đã bấm Hỏi thầy câu này trong 24 giờ qua
+ *  (dòng `loi_giai_hoi` ⇒ lần xem đã tính "có trợ giúp" như hiện nay). Trả câu kho, hồ sơ xem được (nếu có), lời giải chữ, lời thầy gỡ. */
+export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, nowMs = Date.now()) {
+  await damBaoBangLoiGiai(env)
+  const qid = qidGoc(str(qidVao))
+  if (!qid) return { ok: false as const, error: 'Thiếu câu cần hỏi.' }
+  if (await coCaDangMo(env, sbd, nowMs)) return { ok: false as const, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở nên phần hỏi Thầy tạm khoá. Làm xong ca kiểm tra rồi hỏi nhé.' }
+  if (await cauDangBaoVe(env, qid)) return { ok: false as const, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
+  const ht = await cauHienTai(env, qid).catch(() => null)
+  if (!ht) return { ok: false as const, error: 'Không tìm thấy câu này trong kho đề.' }
+  if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false as const, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
+  const daHoi = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_hoi WHERE sbd = ? AND qid = ? AND luc >= ? LIMIT 1')
+    .bind(sbd, qid, new Date(nowMs - 24 * 3_600_000).toISOString()).first<Obj>()
+  if (!daHoi) return { ok: false as const, khoa: 'chua_mo', error: 'Em bấm Hỏi thầy ở câu này trước rồi nhắn hỏi nhé.' }
+  const dong = await env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>().catch(() => null)
+  const hoSo = dong ? await docHoSo(env, ht.bam).catch(() => null) : null
+  const kiem = hoSo ? await kiemChoKhung(env, ht.bam).catch(() => undefined) : undefined
+  // ĐỦ lời giải cho máy chủ (không xuống máy em): học liệu bổ trợ (bước + câu kiểm KÈM đáp án) và học liệu chữa câu sai đã đạt kiểm.
+  const boTro = (await docBoTro(env, [ht.bam]).catch(() => new Map())).get(ht.bam) ?? null
+  const hl = await env.DB.prepare("SELECT hoc_lieu_json FROM chua_loi_hoc_lieu WHERE qid_chuan = ? AND trang_thai = 'du_dung' ORDER BY cap_nhat_luc DESC LIMIT 1")
+    .bind(qid).first<Obj>().catch(() => null)
+  let hocLieu: unknown = null
+  try { hocLieu = hl ? JSON.parse(str(hl.hoc_lieu_json)) : null } catch { hocLieu = null }
+  return { ok: true as const, qid, cau: ht.c, hoSo, loiGiaiChu: loiGiaiChu(ht.c), kiem, boTro, hocLieu }
+}
