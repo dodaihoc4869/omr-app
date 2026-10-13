@@ -307,3 +307,6 @@ Thầy nhắn thêm: "Xong thì đẩy lên luôn nhé, đảm bảo máy chủ 
 - [ ] Đo app trên máy yếu (Chromium thật, CPU chậm 6×, mạng 4G chậm): byte tải, số yêu cầu, thời điểm hiện nội dung, tổng thời gian chặn luồng — 3 app, bản đang chạy vs bản mới | bằng chứng: (chưa có)
 - [ ] Xử lý các chỗ tốn nhất tìm được (ảnh nặng, mã chặn luồng…) — phải đo lại thấy nhanh hơn | bằng chứng: (chưa có)
 - [ ] Đẩy lên + phát hành khi xong (kiểm ca mở) | bằng chứng: (chưa có)
+- [x] Đo app trên máy yếu (Chromium thật, CPU chậm 6×, mạng 1,6 Mbps / RTT 150 ms) | bằng chứng: bản đang chạy /hs lần đầu LCP 4,5 s (ảnh thần thú màn đăng nhập), mở lại 1,9 s; /ph lần đầu 2,7–3,5 s; /gv 2,5 s
+- [x] Xử lý chỗ tốn nhất | bằng chứng: 6edd8ad0 — KaTeX cổng học sinh tải lúc rảnh + nạp trước ảnh màn đăng nhập ⇒ /hs LCP lần đầu 1,6–1,9 s, mở lại 0,8 s (đo 2 lượt mỗi bản); máy chủ bỏ một hoa2-sanh chạy thừa mỗi lần mở app + mỗi lần đăng nhập (tests/may-yeu-mo-app-1310, dang-nhap-kem-sanh-may-chu-0610)
+- [ ] (đợt sau) App phụ huynh dùng chung khung App.tsx của thầy (~272 KB nén tải đầu) — tách vỏ riêng nhẹ như AppHocSinh để màn đầu phụ huynh < 1,5 s trên máy yếu | bằng chứng: (chưa làm)
