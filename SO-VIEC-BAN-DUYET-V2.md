@@ -448,3 +448,5 @@ Thầy (tiếp): "bạn làm việc này với thằng codex nữa nhé để t�
 - [ ] Đo lại giờ cao điểm 14/10 (hẹn tự kiểm 21:35): exceededMemory sau PR #288 | bằng chứng: (chưa có)
 - [ ] Phía app (Codex C1–C3) — chờ thầy nhắn Codex; Claude soát PR | bằng chứng: (chưa có)
 - [ ] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts) SAU khi C3 gộp | bằng chứng: (chưa có)
+Thầy (14/10 ~06:00, ảnh thẻ Kiểm tra ôn tập 17/10): "Bỏ nút xem lịch kiểm tra, khi nào tới lịch kiểm tra thì hiển bảng đó lên đầu và mở nút bắt đầu kiểm tra nhé"
+- [x] Bỏ nút Xem lịch kiểm tra; ngày kiểm tra thẻ lên đầu + nút Làm bài kiểm tra | bằng chứng: tests/ktcn-len-dau-1410 (3/4 đỏ mã cũ → 4/4), vitest so main 0 đỏ mới, PR #294 main 2f91f0e4, Actions 38485946948 SUCCESS
