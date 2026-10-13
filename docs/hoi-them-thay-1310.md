@@ -34,3 +34,7 @@ Thầy: "chỉnh lại ô này cho thật đẹp, tinh tế, câu slogan ở dư
 - Máy chủ `/hs/hoi-thay`: các lượt đọc độc lập chạy cùng một đợt, việc ghi sổ chạy sau phản hồi. Đo bằng `tests/toc-do-mo-hoi-thay-1310.test.ts`: có lời giải 12 → 5 đợt D1 (lần sau 6 → 2), đang làm 8 → 4 (3 → 2).
 - Ô nhắn: một khung bo tròn (ô gõ tự giãn, cỡ chữ 16 để iPhone không phóng to; chip "Còn N câu hỏi hôm nay", số ký tự, nút gửi trong khung). Khẩu hiệu căn giữa, chữ đậm màu nhấn, một dòng trên điện thoại. CSS ở `hop-hoi-thay.css` (mảnh lười).
 - Lệnh của thầy (duyệt lời giải) tách sang `src/lib/loi-giai-gv-api.ts`: máy học sinh/phụ huynh không tải phần ấy lúc mở app.
+- Lỗi "Thầy trả lời chưa kịp" (ảnh thầy gửi 13/10): sổ `hoi_tro_ly` 15 lượt gần nhất Gemini chỉ 1,4–3,9 s, lượt lỗi không có dòng nào ⇒ máy em hết 45 s chờ, máy chủ bị cắt trước khi ghi sổ. Phần chậm là máy chủ: `/hs/hoi-tro-ly` 13 / 12 đợt D1 nối tiếp ⇒ nay 3 / 3 (đọc song song trong `traLoiHoiThem` + `nguCanhHoiTroLy`, ba lượt ghi cùng đợt).
+- Gọi kép Gemini (`taoGoiGemini`, `CHO_GOI_KEP_MS` = 8 s): lượt đầu quá 8 s chưa về ⇒ bắn thêm một lượt y hệt, lấy lượt về trước, huỷ lượt kia. Trần 25 s / 20 s ⇒ máy chủ luôn trả lời hoặc ghi lỗi `cham` vào sổ trước khi máy em hết 45 s.
+- Hộp mở sớm (đề chưa về): em gõ trước được, nút Gửi mở khi đề đã về.
+- Xem thời gian từng lượt: workflow "Hỏi thêm Thầy — đọc lỗi Gemini (chỉ đọc)" in 15 lượt gần nhất (giờ, model, ms, token; không SBD, không câu hỏi).

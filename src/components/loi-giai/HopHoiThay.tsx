@@ -98,7 +98,7 @@ export default function HopHoiThay({ cau, qid = '', nguon, onDong, onTraLoi, onM
             <span>Xem lời giải từng bước</span>
           </button>
         )}
-        <HoiThemThay qid={cau?.qid ?? qid} nguon={nguon} hop dangLam={dangLam} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
+        <HoiThemThay qid={cau?.qid ?? qid} nguon={nguon} hop dangLam={dangLam} choDe={!cau} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
       </div>
     </div>,
     document.body,

@@ -2,8 +2,9 @@
 // TỐC ĐỘ MỞ HỘP HỎI THẦY (thầy 13/10: "Tốc độ bấm vào hỏi thầy hơi chậm tối ưu lại tốc độ nhanh nhất"): đếm số ĐỢT CHỜ D1 NỐI TIẾP
 // của `/hs/hoi-thay` (mỗi đợt = một lượt đi-về D1; các lệnh chạy song song trong cùng đợt tính một) — cùng cách đếm với
 // tests/toc-do-may-chu-lenh-nong-1310.test.ts. "Lần đầu": máy chủ vừa thức (bảng DDL, cấu hình chưa đệm); "lần sau": như học sinh bấm
-// câu kế tiếp (đệm 30–60 s đã có). Bản trước khi sửa (main 4f1c5f89, đo 13/10): có hồ sơ 12 / 6 đợt, đang làm (chiHoi) 8 / 3 đợt. MỐC CHỈ HẠ.
-import { expect, it } from 'vitest'
+// câu kế tiếp (đệm 30–60 s đã có). Bản trước khi sửa (main 4f1c5f89, đo 13/10): mở hộp có hồ sơ 12 / 6 đợt, đang làm (chiHoi) 8 / 3 đợt;
+// gửi câu hỏi (/hs/hoi-tro-ly) 13 / 12 đợt. MỐC CHỈ HẠ.
+import { afterEach, expect, it, vi } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import worker from '../server/src/index'
@@ -11,7 +12,8 @@ import { gameToken } from '../server/src/game-v2-auth'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 
-const MOC = { coHoSo: [5, 2], chiHoi: [4, 2] }
+const MOC = { coHoSo: [5, 2], chiHoi: [4, 2], hoi: [3, 3] }
+afterEach(() => { vi.restoreAllMocks() })
 
 type Lenh = { first?: unknown; all?: unknown; run?: unknown; bind?: unknown }
 /** Bọc D1 đếm đợt: mỗi lần chạy (first/all/run/batch) xếp hàng; `chay` thả cả hàng khi mã đã rảnh (một đợt). */
@@ -104,4 +106,36 @@ it('mở hộp Hỏi thầy lúc em ĐANG LÀM (chiHoi) — số đợt chờ D1
   for (const r of [dau, sau]) expect(r.kq).toMatchObject({ ok: true, chiHoi: true, hoiThem: true })
   console.info(`mở Hỏi thầy (đang làm): lần đầu ${dau.dot} đợt, lần sau ${sau.dot} đợt (mốc ${MOC.chiHoi.join(' / ')})`)
   expect([dau.dot, sau.dot]).toEqual([Math.min(dau.dot, MOC.chiHoi[0]!), Math.min(sau.dot, MOC.chiHoi[1]!)])
+})
+
+/** Gửi câu hỏi (`/hs/hoi-tro-ly`) sau khi đã mở hộp: Gemini giả trả ngay ⇒ chỉ đếm đợt D1 của máy chủ (trước và sau lượt gọi Gemini). */
+async function doHoi(than: Record<string, unknown>) {
+  const { d, token } = await chuanBi()
+  const that = globalThis.fetch
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input instanceof Request ? input.url : input)
+    if (!url.startsWith('https://generativelanguage.googleapis.com/')) return that(input, init)
+    const chu = JSON.stringify({ lienQuan: true, yChinh: 'Em viết phương trình thuỷ phân trước.', buoc: [], hoiTiep: [] })
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: chu }] }, finishReason: 'STOP' }], usageMetadata: { promptTokenCount: 900, candidatesTokenCount: 60 } }), { status: 200, headers: { 'content-type': 'application/json' } })
+  })
+  const bo = boDemDot(d.env.DB)
+  const env = { ...d.env, DB: bo.db } as Env
+  const goi = (duong: string, b: Record<string, unknown>) => {
+    const viecPhu: Promise<unknown>[] = []
+    const ctx = { waitUntil: (p: Promise<unknown>) => { viecPhu.push(p) }, passThroughOnException() {} }
+    return bo.chay(async () => {
+      const res = await worker.fetch(new Request(`https://test${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...b, token }) }), env, ctx as never)
+      return (await res.json()) as Record<string, unknown>
+    }, viecPhu)
+  }
+  await import('../server/src/hoi-tro-ly')
+  await goi('/hs/hoi-thay', { qid: Q_DS, nguon: 'luyen', ...(than.dangLam ? { chiHoi: true } : {}) })
+  return [await goi('/hs/hoi-tro-ly', { qid: Q_DS, nguon: 'luyen', cauHoi: 'Câu này bắt đầu từ đâu ạ?', ...than }), await goi('/hs/hoi-tro-ly', { qid: Q_DS, nguon: 'luyen', cauHoi: 'Bước 2 là gì ạ?', ...than })] as const
+}
+
+it('gửi câu hỏi Thầy (/hs/hoi-tro-ly) — số đợt chờ D1 không vượt mốc', async () => {
+  const [dau, sau] = await doHoi({})
+  for (const r of [dau, sau]) expect(r.kq).toMatchObject({ ok: true })
+  console.info(`gửi câu hỏi: lần đầu ${dau.dot} đợt, lần sau ${sau.dot} đợt (mốc ${MOC.hoi.join(' / ')})`)
+  expect([dau.dot, sau.dot]).toEqual([Math.min(dau.dot, MOC.hoi[0]!), Math.min(sau.dot, MOC.hoi[1]!)])
 })

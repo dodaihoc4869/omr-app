@@ -13,8 +13,9 @@ export const TOI_DA_KY_TU = 500
 const MA_DUNG_HAN = new Set(['het_luot', 'het_luot_cau', 'chua_bat', 'dang_kiem_tra', 'ca_chua_cong_bo', 'chua_mo'])
 
 /** `onTraLoi`: gọi một lần khi Thầy trả lời được câu đầu (game tính câu này là "có trợ giúp", như khi mở lời giải).
- *  `dangLam`: em đang làm câu, chưa nộp ⇒ máy chủ chỉ cho Thầy gợi hướng, không nêu đáp án. */
-export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dangLam = false, onTraLoi }: { qid: string; nguon: string; gon?: boolean; hop?: boolean; dangLam?: boolean; onTraLoi?: () => void }) {
+ *  `dangLam`: em đang làm câu, chưa nộp ⇒ máy chủ chỉ cho Thầy gợi hướng, không nêu đáp án.
+ *  `choDe`: hộp vừa mở, đề câu chưa về (máy chủ chưa ghi "em đã mở câu") ⇒ gõ trước được, CHƯA gửi. */
+export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dangLam = false, choDe = false, onTraLoi }: { qid: string; nguon: string; gon?: boolean; hop?: boolean; dangLam?: boolean; choDe?: boolean; onTraLoi?: () => void }) {
   const id = useId()
   const [mo, setMo] = useState(gon || hop)
   const [tin, setTin] = useState<Tin[]>([])
@@ -46,7 +47,7 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
   const gui = async (e?: FormEvent, cauSan?: string) => {
     e?.preventDefault()
     const cau = (cauSan ?? chu).trim()
-    if (cau.length < 2 || dangGui || dung) return
+    if (cau.length < 2 || dangGui || dung || choDe) return
     setDangGui(true)
     setLoi('')
     setTin((t) => [...t, { vai: 'em', chu: cau }])
@@ -105,7 +106,7 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
           <div className="lg-nh-chan">
             <span className="lg-nh-con">{conLai === null ? '' : `Còn ${conLai} câu hỏi hôm nay`}</span>
             <span className="lg-nh-dem" data-gan={chu.length > TOI_DA_KY_TU - 50 || undefined}>{chu.length}/{TOI_DA_KY_TU}</span>
-            <button type="submit" className="lg-nh-gui" aria-label="Gửi" disabled={dangGui || dung || chu.trim().length < 2}>
+            <button type="submit" className="lg-nh-gui" aria-label="Gửi" disabled={dangGui || dung || choDe || chu.trim().length < 2}>
               <SendHorizontal aria-hidden="true" size={19} strokeWidth={2.3} />
             </button>
           </div>

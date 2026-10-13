@@ -112,9 +112,14 @@ describe('nút Hỏi thầy + Lời giải từng bước', () => {
     const hop = await screen.findByRole('dialog', { name: 'Hỏi Thầy' })
     expect(hop.textContent).toContain('Đang mở đề câu')
     expect(hop.textContent).not.toContain('Đun nóng 8,8 gam ester X')
-    expect(screen.getByLabelText('Chỗ em thắc mắc về câu này')).toBeTruthy() // gõ trước được
+    fireEvent.change(o(), { target: { value: 'Câu này bắt đầu từ đâu ạ?' } }) // gõ trước được
+    expect((screen.getByRole('button', { name: 'Gửi' }) as HTMLButtonElement).disabled).toBe(true) // đề chưa về ⇒ chưa gửi
+    fireEvent.keyDown(o(), { key: 'Enter' })
+    expect(goi.filter((g) => g.url.endsWith('/hs/hoi-tro-ly'))).toHaveLength(0)
     xong()
     await waitFor(() => expect(screen.getByRole('dialog', { name: 'Hỏi Thầy' }).textContent).toContain('Đun nóng 8,8 gam ester X'))
+    expect((screen.getByRole('button', { name: 'Gửi' }) as HTMLButtonElement).disabled).toBe(false)
+    expect(o().value).toBe('Câu này bắt đầu từ đâu ạ?') // chữ gõ trước vẫn còn
     expect(screen.getByRole('dialog', { name: 'Hỏi Thầy' }).textContent).toContain('Câu 1 · Ester')
     // lần hai: mỗi lần bấm máy chủ đều được hỏi (kiểm chặn lại)
     fireEvent.click(screen.getByRole('button', { name: 'Đóng' }))
