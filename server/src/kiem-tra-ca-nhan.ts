@@ -26,6 +26,21 @@ interface CauDe { q: PrivateQuestion; muc: string[]; y: Record<string, string[]>
 interface DeKt { phienBan: 1; lyDo: string; bai: {khoa:string;ten:string}[]; muc: MucKt[]; cau: CauDe[]; soPhu: number; phut: number; thieu: string[]; chang: { qids: string[]; giay: number }[] }
 const de = (r: Row): DeKt => JSON.parse(s(r.json)) as DeKt
 const tra = (r: Row): Record<string, string> => JSON.parse(s(r.tra_json)) as Record<string, string>
+/** Số tĩnh của một đề (không đổi sau khi lập) + phần của từng câu để đếm "đã trả lời" từ tra_json. Cùng phép tính với nhánh đọc đề của tomTatKt. */
+export interface MetaKt { tong: number; soChang: number; phut: number; soBai: number; tongKienThuc: number; phuDe: number; lyDo: string; thieuNguon: number; phan: Record<string, string> }
+export function metaKt(d: DeKt): MetaKt {
+  const thieu = new Set(d.thieu)
+  return { tong: d.cau.length, soChang: d.chang.length, phut: d.phut, soBai: d.bai?.length ?? new Set(d.muc.map(m => m.bai)).size, tongKienThuc: d.muc.length,
+    phuDe: d.muc.filter(m => !thieu.has(m.id)).length, lyDo: d.lyDo, thieuNguon: d.thieu.length, phan: Object.fromEntries(d.cau.map(c => [c.q.qid, c.q.phan])) }
+}
+const SQL_GHI_META_KT = `INSERT INTO kiem_tra_ca_nhan_meta(id,meta_json) SELECT ?1,?2 WHERE EXISTS(SELECT 1 FROM kiem_tra_ca_nhan WHERE id=?1 AND cap_nhat_luc=?3) ON CONFLICT(id) DO UPDATE SET meta_json=excluded.meta_json`
+/** Bù số tính sẵn cho lịch lập trước bản vá 13/10 (mỗi lượt ≤ tran dòng). Chỉ ghi khi đề chưa đổi kể từ lúc đọc (cap_nhat_luc khớp). */
+export async function buMetaKt(env: Env, tran = 10): Promise<number> {
+  const r = await env.DB.prepare(`SELECT k.id,k.json,k.cap_nhat_luc FROM kiem_tra_ca_nhan k WHERE NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_meta km WHERE km.id=k.id) LIMIT ?`).bind(tran).all<Row>()
+  if (!r.results.length) return 0
+  await env.DB.batch(r.results.map(x => env.DB.prepare(SQL_GHI_META_KT).bind(s(x.id), JSON.stringify(metaKt(de(x))), Number(x.cap_nhat_luc))))
+  return r.results.length
+}
 export async function coKtCn(env: Env): Promise<boolean> {
   const v = await docCauHinhDem(env, 'kiem_tra_ca_nhan_v1')
   if (!v) return false
@@ -34,8 +49,13 @@ export async function coKtCn(env: Env): Promise<boolean> {
 export const duTraKt = (phan: string, a: string) => phan === 'I' ? /^[ABCD]$/.test(a) : phan === 'II' ? /^[DS]{4}$/.test(a) : a.trim().length > 0 && a.length <= 100
 const dungKt = (q: PrivateQuestion, a: string) => q.phan === 'III' ? khopPhanIII(a, q.correct) : grade(q, a)
 // Lịch/báo cáo chỉ lấy số ở D1, không tải hàng trăm bản đề riêng chứa nội dung/đáp án lên Worker.
+// Lịch/báo cáo chỉ lấy SỐ, không tải đề riêng chứa nội dung/đáp án lên Worker. KHẨN 13/10 (D1 quá tải, mã 7429): bản cũ bóc JSON đề
+// lớn ngay trong SQL (json_each lồng nhau + NOT IN tương quan) ≈ 0,9 s MỖI dòng ⇒ mỗi lần em mở app, phụ huynh xem, thầy mở bảng là D1 xếp hàng.
+// Nay: số tĩnh tính SẴN lúc lập đề vào `kiem_tra_ca_nhan_meta` (metaKt); "đã trả lời" đếm trên hai JSON NHỎ (bảng phần từng câu × tra_json),
+// cùng phép đếm chặt cũ. Không trả đề / câu trả lời ra Worker. Dòng chưa có số tính sẵn (lập trước bản vá, chờ bù) mới rơi về phép tính cũ.
 export const COT_META_KT = `k.id,k.sbd,k.lop,k.ngay,k.mo_luc,k.han_luc,k.trang_thai,k.nop_luc,k.diem,k.da_ghi,k.cap_nhat_luc,
- json_object('tong',json_array_length(k.json,'$.cau'),'soChang',json_array_length(k.json,'$.chang'),'phut',json_extract(k.json,'$.phut'),'soBai',json_array_length(k.json,'$.bai'),'tongKienThuc',json_array_length(k.json,'$.muc'),'phuDe',(SELECT COUNT(*) FROM json_each(k.json,'$.muc') m WHERE json_extract(m.value,'$.id') NOT IN(SELECT value FROM json_each(k.json,'$.thieu'))),'lyDo',json_extract(k.json,'$.lyDo'),'thieuNguon',json_array_length(k.json,'$.thieu'),'daTra',(SELECT COUNT(*) FROM json_each(k.json,'$.cau') c JOIN json_each(k.tra_json) a ON a.key=json_extract(c.value,'$.q.qid') WHERE a.type='text' AND CASE json_extract(c.value,'$.q.phan') WHEN 'I' THEN a.value IN('A','B','C','D') WHEN 'II' THEN length(a.value)=4 AND replace(replace(a.value,'D',''),'S','')='' ELSE length(trim(a.value,char(9,10,11,12,13,32,160,5760,8192,8193,8194,8195,8196,8197,8198,8199,8200,8201,8202,8232,8233,8239,8287,12288,65279)))>0 AND length(a.value)<=100 END)) meta_json`
+ COALESCE((SELECT json_remove(json_set(km.meta_json,'$.daTra',(SELECT COUNT(*) FROM json_each(km.meta_json,'$.phan') p JOIN json_each(k.tra_json) a ON a.key=p.key WHERE a.type='text' AND CASE p.value WHEN 'I' THEN a.value IN('A','B','C','D') WHEN 'II' THEN length(a.value)=4 AND replace(replace(a.value,'D',''),'S','')='' ELSE length(trim(a.value,char(9,10,11,12,13,32,160,5760,8192,8193,8194,8195,8196,8197,8198,8199,8200,8201,8202,8232,8233,8239,8287,12288,65279)))>0 AND length(a.value)<=100 END)),'$.phan') FROM kiem_tra_ca_nhan_meta km WHERE km.id=k.id),
+ json_object('tong',json_array_length(k.json,'$.cau'),'soChang',json_array_length(k.json,'$.chang'),'phut',json_extract(k.json,'$.phut'),'soBai',json_array_length(k.json,'$.bai'),'tongKienThuc',json_array_length(k.json,'$.muc'),'phuDe',(SELECT COUNT(*) FROM json_each(k.json,'$.muc') m WHERE json_extract(m.value,'$.id') NOT IN(SELECT value FROM json_each(k.json,'$.thieu'))),'lyDo',json_extract(k.json,'$.lyDo'),'thieuNguon',json_array_length(k.json,'$.thieu'),'daTra',(SELECT COUNT(*) FROM json_each(k.json,'$.cau') c JOIN json_each(k.tra_json) a ON a.key=json_extract(c.value,'$.q.qid') WHERE a.type='text' AND CASE json_extract(c.value,'$.q.phan') WHEN 'I' THEN a.value IN('A','B','C','D') WHEN 'II' THEN length(a.value)=4 AND replace(replace(a.value,'D',''),'S','')='' ELSE length(trim(a.value,char(9,10,11,12,13,32,160,5760,8192,8193,8194,8195,8196,8197,8198,8199,8200,8201,8202,8232,8233,8239,8287,12288,65279)))>0 AND length(a.value)<=100 END))) meta_json`
 
 /** Chỉ đọc; bảng chỉ được tạo ở cron/migration, không ở trang của thầy/PH. */
 export async function docKtCn(env: Env, sbd: string, now: number, chiMeta=false): Promise<Row | null> {
@@ -125,7 +145,8 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false) 
   const bai=[...new Map([...pv.baiTheoMaDe.values()].map(b=>[b.khoaBai,{khoa:b.khoaBai,ten:b.tenBai}])).values()]
   const d: DeKt = { phienBan: 1, lyDo: hen.lyDo, bai, muc: [...muc.values()], cau, soPhu: chon.soPhu, phut: Math.ceil(chang.reduce((n,c)=>n+c.giay,0)/60), thieu: [...thieu], chang }
   const id = `ktcn:${sbd}:${hen.ngay}`
-  await env.DB.prepare(`INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) SELECT ?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo') AND (?=1 OR NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan WHERE sbd=? AND lop=? AND ngay>=? AND trang_thai<>'cho_nguon')) ON CONFLICT(sbd,ngay) DO UPDATE SET lop=excluded.lop,json=excluded.json,trang_thai=excluded.trang_thai,cap_nhat_luc=excluded.cap_nhat_luc WHERE (?=1 OR kiem_tra_ca_nhan.trang_thai='cho_nguon' OR kiem_tra_ca_nhan.lop<>excluded.lop) AND kiem_tra_ca_nhan.mo_luc>? AND kiem_tra_ca_nhan.nop_luc IS NULL AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id)`).bind(id,sbd,lop,hen.ngay,dauNgayKt(hen.ngay),dauNgayKt(congNgayKt(hen.ngay,1)),thieu.size || !muc.size ? 'cho_nguon' : 'hen',JSON.stringify(d),now,lamMoi?1:0,sbd,lop,ngayKt(now),lamMoi?1:0,now).run()
+  // Cùng giao dịch: số tính sẵn chỉ ghi khi đề vừa ghi thật (cap_nhat_luc = now) ⇒ không lệch đề đang lưu.
+  await env.DB.batch([env.DB.prepare(`INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) SELECT ?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo') AND (?=1 OR NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan WHERE sbd=? AND lop=? AND ngay>=? AND trang_thai<>'cho_nguon')) ON CONFLICT(sbd,ngay) DO UPDATE SET lop=excluded.lop,json=excluded.json,trang_thai=excluded.trang_thai,cap_nhat_luc=excluded.cap_nhat_luc WHERE (?=1 OR kiem_tra_ca_nhan.trang_thai='cho_nguon' OR kiem_tra_ca_nhan.lop<>excluded.lop) AND kiem_tra_ca_nhan.mo_luc>? AND kiem_tra_ca_nhan.nop_luc IS NULL AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id)`).bind(id,sbd,lop,hen.ngay,dauNgayKt(hen.ngay),dauNgayKt(congNgayKt(hen.ngay,1)),thieu.size || !muc.size ? 'cho_nguon' : 'hen',JSON.stringify(d),now,lamMoi?1:0,sbd,lop,ngayKt(now),lamMoi?1:0,now),env.DB.prepare(SQL_GHI_META_KT).bind(id,JSON.stringify(metaKt(d)),now)])
   return { id, ngay: hen.ngay, tong: cau.length, thieu: thieu.size, phut: d.phut }
 }
 
@@ -244,6 +265,8 @@ export async function dongBoKtCn(env: Env, now: number, tran=2) {
   if (!await coKtCn(env)) return {soEm:0}
   await damBaoKtCn(env)
   if (await env.DB.prepare("SELECT 1 FROM ca WHERE trang_thai='mo' LIMIT 1").first()) return {soEm:0,hoan:true}
+  // Lịch lập trước bản vá 13/10 chưa có số tính sẵn: bù dần, mỗi phút ≤ 10 dòng (hết dòng thiếu ⇒ một lượt đọc chỉ mục rỗng).
+  await buMetaKt(env, 10)
   const het=await env.DB.prepare(`SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=?) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?`).bind(now,tran).all<Row>()
   for (const r of het.results) await chotKtCn(env,r,now,true)
   // Làm mới phạm vi/đề trước ngày kiểm tra; ngày đã mở tuyệt đối không đổi N/nguồn.
