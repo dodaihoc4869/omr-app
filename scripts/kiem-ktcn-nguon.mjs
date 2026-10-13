@@ -18,4 +18,8 @@ if((await query("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND nam
  const audit=(await query(`SELECT COUNT(*) daThu,SUM(CASE WHEN loi<>'' THEN 1 ELSE 0 END) loiLap FROM kiem_tra_ca_nhan_dieu_phoi`))[0]
  const cfg=(await query("SELECT gia_tri FROM cau_hinh WHERE khoa='kiem_tra_ca_nhan_v1'"))[0]
  console.log(JSON.stringify({kiemKichHoatKtCn:true,chiDoc:true,bat:cfg?JSON.parse(cfg.gia_tri).bat===true:false,...audit}))
+ const muc=(await query(`SELECT COUNT(DISTINCT json_extract(m.value,'$.id')) donVi,COUNT(DISTINCT json_extract(m.value,'$.kyNang')) kyNang,COUNT(DISTINCT CASE WHEN json_extract(m.value,'$.kyNang') LIKE 'nen:%' THEN json_extract(m.value,'$.id') END) donViNen,COUNT(DISTINCT CASE WHEN json_extract(m.value,'$.kyNang') LIKE 'nen:%' THEN json_extract(m.value,'$.kyNang') END) kyNangNen,COUNT(DISTINCT json_extract(m.value,'$.bai')) bai FROM kiem_tra_ca_nhan k,json_each(k.json,'$.muc') m`))[0]
+ console.log(JSON.stringify({kiemDonViKtCn:true,chiDoc:true,...muc}))
+ const thieu=await query(`SELECT COALESCE(json_extract(m.value,'$.tenBai'),CASE WHEN t.value LIKE 'nguon:%' THEN 'Thiếu tờ' WHEN t.value LIKE 'ma_tran:%' THEN 'Thiếu ma trận' ELSE 'Khác' END) bai,COALESCE(json_extract(m.value,'$.mucDo'),'') muc,COUNT(*) n FROM kiem_tra_ca_nhan k,json_each(k.json,'$.thieu') t LEFT JOIN json_each(k.json,'$.muc') m ON json_extract(m.value,'$.id')=t.value GROUP BY bai,muc ORDER BY n DESC LIMIT 12`)
+ console.log(JSON.stringify({kiemThieuKtCn:true,chiDoc:true,nhom:thieu}))
 }
