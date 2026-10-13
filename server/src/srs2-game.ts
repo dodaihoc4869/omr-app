@@ -196,34 +196,36 @@ const loiTamHoan = (n: number): string => (n > 0 ? ` Còn ${n} câu đang dùng 
  * - Lượt đang chờ (chưa trả lời câu nào) ⇒ trả lại chính lượt ấy.
  * - Thứ tự trong chuyến: ĐAN XEN (thầy 29/09, `napLuot`) — mở/kết bằng câu dễ, không 2 câu khó/2 câu nợ liền nhau; em khá/giỏi Trùm là câu khó nhất.
  */
-export async function startDao2(env: Env, sbd: string, nowMs: number, tapTrung = false): Promise<Record<string, unknown>> {
+export async function startDao2(env: Env, sbd: string, nowMs: number, tapTrung = false,chanMoi?:ReadonlySet<string>): Promise<Record<string, unknown>> {
   // 29/09 (cao điểm): chuyến đang chờ (chưa làm câu nào) đọc SONG SONG với kế hoạch — không phụ thuộc nhau (trước: một đợt nối tiếp).
   const dangChoSom = env.DB.prepare(`SELECT id, json FROM game_v2_session s WHERE sbd = ? AND created_at >= ? AND json_extract(json,'$.hoa2') = 1 AND COALESCE(json_extract(json,'$.doan'),0) = 0 AND COALESCE(json_extract(json,'$.bia'),0) = 0 AND COALESCE(json_extract(json,'$.hocTap'),0) = ?
       AND NOT EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id) ORDER BY created_at DESC LIMIT 1`).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString(), Number(tapTrung)).first<Row>().catch(() => null)
   const hdSom = hoSoDangSom(env, sbd)
-  const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
+  const quyenSom=chanMoi?Promise.resolve(chanMoi):import('./goi-bai-7-chan-moi').then(m=>m.docChanCauMoiNeuBat7(env,sbd))
+  const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs,undefined,undefined,undefined,quyenSom)
+  const quyen=await quyenSom
   const khoaCau = tapTrung ? [...kh.conDoan, ...kh.conDao] : kh.conDao
   const tamHoan = kh.tamHoan?.ca ?? 0
   const tomTat = { theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong }, dao: { con: kh.conDao.length }, doan: { con: kh.conDoan.length }, ...(tamHoan ? { tamHoan } : {}) }
   if (!tapTrung && kh.conDoan.length) return { ok: true, questions: [], lyDo: 'khoa_cho_doan', khoaDao: true, message: LOI_KHOA_DAO, ...tomTat }
   // OMNI 3: ngày chưa có câu nào mà em đang ở chế độ chờ bài mới (`hs.omni` chỉ có khi OMNI bật cho em) ⇒ lời báo "chờ thầy giao bài mới".
-  if (!khoaCau.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong || kh.tamHoan?.nghi ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Em có thể nghỉ và quay lại học vào ngày mai.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : (tapTrung ? 'Hôm nay chưa có câu nào cho em. Bài học sẽ xuất hiện khi thầy bổ sung nội dung phù hợp.' : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.'), ...tomTat }
   const dangCho = await dangChoSom
   if (dangCho) {
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
     // 05/10: câu anh em (`tc`) đứng thay câu gốc của kế hoạch; lượt có câu anh em / bản xáo nạp lại theo ref phiên (cau-anh-em.ts), còn lại như cũ.
-    if (cu.questions.every((r) => khoaCau.some((k) => qidGoc(k) === r.qid || qidGoc(k) === (r.tc ?? r.qid)))) {
+    if (cu.questions.every((r) => khoaCau.some((k) => qidGoc(k) === r.qid || qidGoc(k) === (r.tc ?? r.qid)) || quyen.has(r.tc??r.qid))) {
       const day = await napLaiLuotCho(env, hs, cu.questions, SO_CAU_CHUYEN, () => napCau(env, hs, cu.questions.map((r) => r.qid), SO_CAU_CHUYEN, new Set()))
       // 06/10: lượt chờ lưu từ trước cũng QUA CỔNG KHỐI — câu khác khối em ⇒ bỏ cả lượt, rút lượt mới (đã lọc).
       const hopKhoi = day.length === cu.questions.length && (await chanKhacKhoiEm(env, 'dao2_luot_cho', { sbd, meta: hs.meta }, day, { cauCua: (x) => x.q })).length === day.length
       if (hopKhoi) return { ok: true, id: str(dangCho.id), questions: day.map(({ q }, i) => ({ ...publicQuestion(q), vai: cu.questions[i]!.role, ...(cu.questions[i]!.goiY ? { goiY: cu.questions[i]!.goiY } : {}), ...(cu.questions[i]!.nhanNo ? { nhanNo: cu.questions[i]!.nhanNo } : {}) })), ...tomTat }
     }
   }
+  if (!khoaCau.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong || kh.tamHoan?.nghi ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Em có thể nghỉ và quay lại học vào ngày mai.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : (tapTrung ? 'Hôm nay chưa có câu nào cho em. Bài học sẽ xuất hiện khi thầy bổ sung nội dung phù hợp.' : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.'), ...tomTat }
   // 29/09 (cao điểm): câu bảo vệ ca thi (đệm 5 s, thường đã có từ bước kế hoạch) và sức em là hai việc độc lập ⇒ SONG SONG (trước: nối tiếp).
   // ĐAN XEN (thầy 29/09): chuyến mở/kết bằng câu dễ, không 2 câu khó / 2 câu nợ liền nhau, mật độ theo sức em.
   // Em khá/giỏi, chuyến đủ 6 ải: ải 6 (Trùm) vẫn là câu khó nhất (thầy 28/09); em yếu/TB kết chuyến bằng câu dễ.
   const [chanCa, suc] = await Promise.all([protectedQuestions(env), sucEmHomNay(env, sbd, hs, hdSom)])
-  const chan = new Set(chanCa)
+  const chan = new Set([...chanCa,...quyen])
   const boQua = boQuaMoi()
   const nhanSom = batDauNhanNo(env, sbd, hs)
   // 06/10 (1): bật chẩn đoán bước sai cho chuyến Đảo (không chèn vào ải Trùm — câu cuối khi chuyến đủ SO_CAU_CHUYEN ải).

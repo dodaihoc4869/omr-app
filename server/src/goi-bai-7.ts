@@ -1,6 +1,8 @@
 import type { Env } from './kieu'
 import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
+import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
+import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7 } from './goi-bai-7-quyen'
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7 } from './goi-bai-7-loi'
 import { tachMaTo } from './srs2-gv'
 import { laMaToKhongGiao, damBaoBangBaiDaDay, phamViLop, lopCuaEm } from './bai-da-day'
@@ -81,7 +83,7 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     const rs = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) SELECT ?,?,?,?,?,?,?,? WHERE ${KHONG_CA}`).bind(id,b.id,b.lop,b.khoa_bai,b.ten_bai,batDau,han,luc),
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE EXISTS(SELECT 1 FROM goi_bai_7 WHERE id=?) AND ${KHONG_CA}`).bind(id,JSON.stringify(cau),id),
-      env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) SELECT ?,h.sbd,?,? FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM goi_bai_7 WHERE id=?) AND ${KHONG_CA}`).bind(id,batDau,han,b.lop,id),
+      env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) SELECT ?,h.sbd,?,? FROM hoc_sinh h JOIN goi_bai_7 g ON g.id=? WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa' AND ${sqlQuyetDinhNhan7('g','h.sbd')} AND ${KHONG_CA}`).bind(id,batDau,han,id,b.lop),
     ])
     soGoi += Number(rs[0]?.meta.changes ?? 0); soCau += Number(rs[1]?.meta.changes ?? 0); soEm += Number(rs[2]?.meta.changes ?? 0)
   }
@@ -102,7 +104,7 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
   }
   // Em mới chuyển/đăng ký lớp cũng nhận bài, không tạo lại tiến độ của em cũ.
   await env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han)
-    SELECT g.id,h.sbd,g.bat_dau,g.han FROM goi_bai_7 g JOIN hoc_sinh h ON ${sqlTenLopHs('h')}=g.lop AND COALESCE(h.trang_thai,'')<>'khoa' JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${KHONG_CA}`).run()
+    SELECT g.id,h.sbd,g.bat_dau,g.han FROM goi_bai_7 g JOIN hoc_sinh h ON ${sqlTenLopHs('h')}=g.lop AND COALESCE(h.trang_thai,'')<>'khoa' JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${sqlQuyetDinhNhan7('g','h.sbd')} AND ${KHONG_CA}`).run()
   return { soGoi, soEm, soCau, hoan: false }
 }
 
@@ -150,7 +152,7 @@ export interface GoiNhe7 { id: string; maDeNguon: string[] }
 const goiNheTuDong7 = (g: Row): GoiNhe7 => ({ id: str(g.id), maDeNguon: [...new Set(mang7(g.ma_to_json).map(m => tachMaTo(m).goc))] })
 /** Danh sách gói em đang nhận (một câu đọc) — đầu vào của `docGoiCuaEm7`. */
 const docDanhSachGoi7 = (env: Env, sbd: string) => env.DB.prepare(`SELECT g.id,g.ten,g.khoa_bai,e.bat_dau,e.han,b.ma_to_json FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id
-    JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? ORDER BY e.bat_dau DESC,g.id`).bind(sbd).all<Row>()
+    JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? AND ${sqlEmDangNhan7('e','g','h')} ORDER BY e.bat_dau DESC,g.id`).bind(sbd).all<Row>()
 /**
  * ĐỌC ĐOÁN danh sách gói của em (đợt 18): Sảnh / Mở chặng gọi CÙNG lúc đọc cờ Gói 7 (`coGoi7`) — trước: đọc cờ xong mới đọc gói, hai đợt D1 nối tiếp.
  * CHỈ khi bảng gói đã tạo xong trong isolate (không gửi lệnh tạo bảng trước khi biết cờ bật). Cờ tắt ⇒ kết quả bỏ không dùng (một lượt đọc thừa có chỉ mục,
@@ -203,7 +205,7 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
     const chia=quotaCacGoiHocKt(out.map(g=>({id:g.id,han:g.han,chuaGap:g.cau.length-g.daGap.size+g.gapNgay.size})),ngay,ngayKiem)
     for(const g of out)g.quota=ngayKiem.has(ngay)?chia.get(g.id)??0:Math.max(g.quota,chia.get(g.id)??0)
   }
-  for(const g of out)if(!chiDoc&&!quotas.results.some(q=>q.goi_id===g.id))await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) VALUES(?,?,?,?)').bind(g.id,sbd,ngay,g.quota).run()
+  for(const g of out)if(!chiDoc&&!quotas.results.some(q=>q.goi_id===g.id))await env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) SELECT ?,?,?,? WHERE ${sqlCacGoiConNhan7('?','?',sqlTenLopHs('h'))}`).bind(g.id,sbd,ngay,g.quota,JSON.stringify([g.id]),sbd).run()
   return out
 }
 
@@ -221,7 +223,7 @@ export async function docMucNgay7(env: Env, sbd: string, ngay: string): Promise<
   return r && Number(r.muc) > 0 ? { tang: tangHopLe7(r.tang), toiThieuTang: Number(r.toi_thieu_tang) || 0, quota: Number(r.quota) || 0, muc: Number(r.muc), daChot: true } : null
 }
 /** `cuSom` = lượt `docMucNgay7(env,sbd,ngay)` nơi gọi đã bắt đầu sớm (bảng chỉ hàm này ghi ⇒ đọc sớm cùng kết quả); vắng ⇒ đọc như cũ. Lần đọc lại sau ghi luôn đọc mới. */
-export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: TangHanhTrinh, tongQuota: number, now: number, chiDoc = false, cuSom?: Promise<MucNgay7 | null>, giuCho=0,kiemNhe=false): Promise<MucNgay7> {
+export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: TangHanhTrinh, tongQuota: number, now: number, chiDoc = false, cuSom?: Promise<MucNgay7 | null>, giuCho=0,kiemNhe=false,goiId:readonly string[]=[]): Promise<MucNgay7> {
   const doc = (): Promise<MucNgay7 | null> => docMucNgay7(env, sbd, ngay)
   const cu = await (cuSom ?? doc())
   if (cu&&!kiemNhe) return cu
@@ -229,8 +231,8 @@ export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: Ta
   const toiThieuTang = kiemNhe?12:CAU_TOI_THIEU[tang], quota = Math.max(0, Math.floor(tongQuota) || 0)
   const moi: MucNgay7 = { tang, toiThieuTang, quota, muc: kiemNhe?12:mucNgayGoi7(toiThieuTang, quota+Math.max(0,giuCho)), daChot: false }
   if (chiDoc) return moi
-  await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES(?,?,?,?,?,?,?) ON CONFLICT(sbd,ngay) DO UPDATE SET toi_thieu_tang=12,quota=excluded.quota,muc=12 WHERE ?=1')
-    .bind(sbd, ngay, moi.tang, moi.toiThieuTang, moi.quota, moi.muc, new Date(now).toISOString(),kiemNhe?1:0).run()
+  await env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) SELECT ?,?,?,?,?,?,? WHERE ${sqlCacGoiConNhan7('?','?',sqlTenLopHs('h'))} ON CONFLICT(sbd,ngay) DO UPDATE SET toi_thieu_tang=12,quota=excluded.quota,muc=12 WHERE ?=1`)
+    .bind(sbd, ngay, moi.tang, moi.toiThieuTang, moi.quota, moi.muc, new Date(now).toISOString(),JSON.stringify(goiId),sbd,kiemNhe?1:0).run()
     // Không ghi được (D1 trục trặc) ⇒ em vẫn học với số vừa tính; thầy thấy ngày ấy là mức ước tính — không làm hỏng màn em.
     .catch((e: unknown) => console.error('[goi7] chưa chốt được mức hôm nay:', e instanceof Error ? e.message : e))
   return (await doc()) ?? moi
@@ -292,7 +294,7 @@ export async function demHomNay7(env: Env, sbd: string, now: number): Promise<Re
  * danh sách ứng viên (câu gói + ma trận cũ) ở đúng chỗ dùng. Lỗi: `som` giữ, nổi lên đúng chỗ `await` cũ.
  */
 function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: readonly GoiNhe7[], qidsGoi: Promise<readonly string[]>, lopSom: Promise<string | null>) {
-  const phuSom = som(Promise.all([protectedQuestions(env), docCauBtvnChuaNop(env, sbd), readGameScope(env, sbd)]))
+  const phuSom = som(Promise.all([protectedQuestions(env), docCauBtvnChuaNop(env, sbd), readGameScope(env, sbd),docChanCauMoiGoi7(env,sbd)]))
   const khoiSom = som(docKhoiEm(env, sbd))
   const daLamSom = som(docDaLamVaVuaLam7(env, sbd, ngay, now))
   const xemChuaSom = som(Promise.all([
@@ -397,7 +399,9 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const som7 = giu.s ?? batDauSom7(env,sbd,now,ngay,goi,qidsGoi,lopSom)
   const { phuSom, khoiSom, daLamSom, xemChuaSom, kiemSom } = som7
   const [old] = await som7.oldUngSom
-  const [hs, [baoVe, btvn, control]] = await Promise.all([som7.hsSom, phuSom])
+  const [hs, [baoVe, btvn, control,chanMoi]] = await Promise.all([som7.hsSom, phuSom])
+  // Chỉ lọc ứng viên phát MỚI; metadata/ref của phiên đã cấp và câu đã gặp vẫn giữ cho resume/ôn/sửa.
+  hs.cau=hs.cau.filter(c=>!chanMoi.has(c.qid))
   // β câu + dòng chiến dịch đầy đủ của động cơ (theo hồ sơ) đi CÙNG đợt với bước cổng khối dưới (đợt 18).
   const dongCo = som7.dongCo ?? docTruocDongCo(env, sbd, now)
   docTruocDongCoTheoHoSo(env, dongCo, hs)
@@ -436,7 +440,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const suaCan=batKt?sua.filter(id=>eligible(id)&&!chua.includes(id)).slice(0,4):[]
   const onCan=batKt?on.filter(id=>eligible(id)&&!suaCan.includes(id)&&!chua.includes(id)):[]
   const giuOn=batKt?Math.min(6,onCan.length):0
-  const muc7 = await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,giuOn+suaCan.length,goi.some(g=>g.kiemNhe))
+  const muc7 = await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,giuOn+suaCan.length,goi.some(g=>g.kiemNhe),goi.map(g=>g.id))
   const toiThieu = muc7.muc
   const kiemNhe=goi.some(g=>g.kiemNhe)
   // 12 chỗ của ngày kiểm tra giữ tiến độ bài đang trong hạn; nợ cũ vẫn ở hàng đợi.
@@ -502,7 +506,19 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   // (đọc từ bảng ghi ngay) không vào chặng mới; sau đó sổ đã có, kế hoạch tự loại như cũ. 13/10 tối: tập này nay đọc CÙNG lượt "đã làm hôm nay" của
   // `lapGoi7` (`docDaLamVaVuaLam7`) — kế hoạch + bộ đếm đã tính câu vừa làm; ở đây giữ làm chốt chặn cho đợt cũ còn câu.
   const lap = await lapGoi7(env,sbd,now,gsSom)
-  if (!lap) return null
+  if (!lap) {
+    // Bớt em chỉ ngừng cấp câu mới. Phiên đã cấp vẫn tiếp tục đúng payload/thứ tự, qua các cổng nguồn/khối/ca hiện hành.
+    const [khoi,{old,answered},baoVe,btvn,control]=await Promise.all([khoiSom,cuSom,protectedQuestions(env),docCauBtvnChuaNop(env,sbd),readGameScope(env,sbd)])
+    if (!old || !control.enabled) return null
+    const saved=json<{goi7?:number;questions:RefGoi7[]}>(old.json)
+    if (saved.goi7!==1) return null
+    const done=new Set(answered.results.map(r=>r.qid)),refs=saved.questions.filter(r=>!done.has(r.qid))
+    const qs=(await Promise.all(refs.map(r=>currentQuestion(env,r).then(q=>({r,q}),()=>null)))).filter((v):v is NonNullable<typeof v>=>!!v)
+    const quaKhoi=new Set(await chanKhacKhoiEm(env,'goi7',{sbd,khoiEm:khoi},qs.map(v=>v.q)))
+    const questions=qs.filter(({q})=>quaKhoi.has(q)&&q.reviewed&&!laCauTuLuan(q)&&!baoVe.has(q.qid)&&!baoVe.has(q.group)&&!btvn.has(q.qid)&&!control.blocked.includes(q.qid)&&(!control.types.length||!!q.dang&&control.types.includes(q.dang)))
+      .map(({r,q})=>({...publicQuestion(apXaoTheoRef(q,r)),...(r.goiY?{goiY:r.goiY}:{}),vaiGoi7:r.vai,huongDan7:r.huongDan,coGoi7:true}))
+    return questions.length?{ok:true,id:str(old.id),questions}:null
+  }
   if (!lap.control.enabled) throw new Error('Thầy đang tạm dừng bài học cho em.')
   const [khoi, { old, answered }] = await Promise.all([khoiSom, cuSom])
   const vuaLam = lap.vuaLam
@@ -540,7 +556,11 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   } } }
   if (!refs.length) return {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}
   const id = viec.length && refs.length === viec.length && refs.every(r => viec.some(v => v.qid === r.qid)) ? str(old!.id) : crypto.randomUUID()
-  if (id !== str(old?.id)) await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify({mode:'adventure',created:now,hoa2:1,hocTap:1,goi7:1,questions:refs}),new Date(now).toISOString()).run()
+  if (id !== str(old?.id)) {
+    const rs=await env.DB.prepare(`INSERT INTO game_v2_session(id,sbd,json,created_at) SELECT ?,?,?,? WHERE ${sqlCacGoiConNhan7('?','?',sqlTenLopHs('h'))}`)
+      .bind(id,sbd,JSON.stringify({mode:'adventure',created:now,hoa2:1,hocTap:1,goi7:1,questions:refs}),new Date(now).toISOString(),JSON.stringify(lap.goi.map(g=>g.id)),sbd).run()
+    if(!Number(rs.meta.changes))throw new Error('Danh sách bài vừa thay đổi. Em cập nhật lại trước khi học tiếp; bài đang làm vẫn được giữ.')
+  }
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
 }
 interface RefGoi7 extends LamLaiRef { qid:string; maDe:string; version:string; group:string; novel:boolean; role:string; vai:ViecGoi7['vai']; huongDan:boolean; goiY?:unknown }
@@ -554,7 +574,12 @@ export async function gapHuongDan7(env: Env,sbd: string,b: Row,now: number) {
   if (!s.goi7 || !ref || now-s.created>2*3600000) throw new Error('Đợt học đã hết hạn. Em mở đợt mới.')
   const [q,blocked,btvn,control,goi] = await Promise.all([currentQuestion(env,ref),protectedQuestions(env),docCauBtvnChuaNop(env,sbd),readGameScope(env,sbd),docGoiCuaEm7(env,sbd,now)])
   if (!control.enabled || blocked.has(q.qid) || blocked.has(q.group) || btvn.has(q.qid) || control.blocked.includes(q.qid) || control.types.length && (!q.dang || !control.types.includes(q.dang))) throw new Error('Câu này hiện chưa mở phần chữa. Em chuyển sang câu khác.')
-  const gs = goi.filter(g=>g.cau.some(c=>c.qid===q.qid && c.version===q.version))
+  let gs: {id:string}[] = goi.filter(g=>g.cau.some(c=>c.qid===q.qid && c.version===q.version))
+  if(!gs.length) {
+    // Chỉ phần chữa của ref thuộc phiên gốc đã xác thực ở trên; không cho bớt em biến thành mất bài đang học.
+    gs=(await env.DB.prepare(`SELECT g.id FROM goi_bai_7 g JOIN goi_bai_7_em e ON e.goi_id=g.id AND e.sbd=?
+      JOIN goi_bai_7_cau c ON c.goi_id=g.id AND c.qid=? AND c.version=?`).bind(sbd,q.qid,q.version).all<{id:string}>()).results
+  }
   if (!gs.length || !q.reviewed || laCauTuLuan(q) || !(await chanKhacKhoiEm(env,'goi7-chua',sbd,[q])).length) throw new Error('Câu không thuộc bài được giao cho em.')
   const chua = await env.DB.prepare('SELECT loi_go FROM goi_bai_7_chua WHERE qid=? AND version=? AND goi_id IN (SELECT value FROM json_each(?)) LIMIT 1').bind(q.qid,q.version,JSON.stringify(gs.map(g=>g.id))).first<{loi_go:string}>()
   const solution = chua?.loi_go && chua.loi_go!=='@loi-giai-goc' ? chua.loi_go : q.solution

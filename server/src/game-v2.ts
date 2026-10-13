@@ -343,7 +343,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       if(action==='hoc-tap-start')return gameV2(env,'start',{...b,mode:'adventure'},ctx)
       return {ok:true,cheDo2:false}
     }
-    if(action==='hoc-tap-start')return startDao2(env,sbd,Date.now(),true)
+    if(action==='hoc-tap-start'){const chanMoi=cfg7.bat?await import('./goi-bai-7-chan-moi').then(m=>m.docChanCauMoiGoi7(env,sbd)):new Set<string>();return startDao2(env,sbd,Date.now(),true,chanMoi)}
     const alias:Record<string,string>={'hoc-tap-sanh':'hoa2-sanh','hoc-tap-cau-da-lam':'hoa2-cau-da-lam','hoc-tap-cau-chi-tiet':'hoa2-cau-chi-tiet'}
     if(!alias[action])throw new Error('Chức năng học này chưa có.')
     const r=await hoa2Action(env,sbd,alias[action]!,b)

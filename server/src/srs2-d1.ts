@@ -1211,12 +1211,13 @@ export async function docKeHoachDaChot(env: Env, sbd: string, nowMs: number): Pr
  * (`tamHoanCauKhoa`): đang bảo vệ cho ca kiểm tra, hoặc đã rút khỏi kho. Nhờ vậy em không bị kẹt (Đảo rỗng, Đảo khoá chờ Đoàn, rương 42/46);
  * câu bảo vệ vẫn KHÔNG ra máy em. Ca công bố xong ⇒ câu tự quay lại kế hoạch hôm nay (không ghi gì vào `srs2_ke_hoach`).
  */
-export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanTruoc?: Promise<Set<string>>, omniTruoc?: Promise<boolean>): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
+export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanTruoc?: Promise<Set<string>>, omniTruoc?: Promise<boolean>,quyenTruoc?:Promise<ReadonlySet<string>>): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
   // 29/09 (cao điểm 20h–24h): tập câu bảo vệ ca thi (dùng chung mọi em, đệm 5 s trong isolate) đọc SONG SONG với kế hoạch — trước: một đợt D1 nối tiếp sau kế hoạch.
   // `chanTruoc` (chỉ-thêm 30/09): nơi gọi đã bắt đầu đọc tập ấy (Sảnh cần lại cho Thử sức thêm) ⇒ dùng chung, không đọc hai lần.
-  const chanSom = chanTruoc ?? protectedQuestions(env).catch(() => new Set<string>())
+  const quyenSom=quyenTruoc??import('./goi-bai-7-chan-moi').then(m=>m.docChanCauMoiNeuBat7(env,sbd))
+  const chanSom=Promise.all([chanTruoc??protectedQuestions(env).catch(()=>new Set<string>()),quyenSom]).then(([ca,quyen])=>new Set([...ca,...quyen]))
   const nghiSom = docCauNghiDem(env, nowMs) // 06/10: câu nghi đáp án — cùng đợt với kế hoạch (đệm 60 s trong isolate; không bao giờ ném)
-  const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom, omniTruoc)
+  const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom, omniTruoc,quyenSom)
   const kh = await tamHoanCauKhoa(env, r.kh, r.hs, chanSom, nghiSom, sbd)
   if (kh.hanhTrinh) kh.hanhTrinh = { ...tienDoHanhTrinh(kh.hanhTrinh.tang, kh.hanhTrinh.toiThieu, kh.tong, kh.tong - kh.conDao.length - kh.conDoan.length), ...(kh.hanhTrinh.bai ? { bai: kh.hanhTrinh.bai } : {}) }
   return { kh, hs: r.hs }
@@ -1575,7 +1576,7 @@ function batDauDocLap(env: Env, sbd: string, nowMs: number): DocLapSom {
   nk.catch(() => {}); hd.catch(() => {})
   return { nk, hd }
 }
-async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanSom?: Promise<Set<string>>, omniTruoc?: Promise<boolean>): Promise<{ kh: KeHoachDaChot; hs: HoSo2; tcHanhTrinh?: TuyChonKeHoach }> {
+async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanSom?: Promise<Set<string>>, omniTruoc?: Promise<boolean>,quyenSom:Promise<ReadonlySet<string>>=Promise.resolve(new Set())): Promise<{ kh: KeHoachDaChot; hs: HoSo2; tcHanhTrinh?: TuyChonKeHoach }> {
   const ngay = ngayVnCua(nowMs)
   // OMNI 3: hỏi cờ MỘT lần (dùng chung với docHoSo2); bật ⇒ đọc thêm bảng phụ kế hoạch OMNI CÙNG ĐỢT. Tắt ⇒ không thêm lượt đọc nào.
   // `omniTruoc` (chỉ-thêm, tối ưu 05/10): nơi gọi (Sảnh) đã hỏi đúng câu ấy ⇒ dùng chung lời hỏi.
@@ -1590,12 +1591,13 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
   const hsOmniSom = Promise.all([cuP, omniSom]).then(([cu, bat]) => (!cu && bat ? lanOmniD1().then((m) => m.hoSoOmniEm(env, sbd, nowMs)) : null)).catch(() => null)
   // CẨN THẬN (a): cùng lượt đọc hồ sơ trên cho biết `canThan` (S_em > 0,07) ⇒ `docHoSo2` nhân mốc duy trì × 0,7 — chỉ LÚC LẬP kế hoạch (hôm nay chưa chốt), không thêm lượt D1 nào.
   const canThanSom = hsOmniSom.then((h) => canThanTu(true, h))
-  const [hoSo, dem, cu, luuOmni] = await Promise.all([
+  const [hoSo, dem, cu, luuOmni,quyen] = await Promise.all([
     hs ?? docHoSo2(env, sbd, ngay, omniSom, canThanSom),
     docDemHomNay(env, sbd, ngay),
     cuP,
-    omniSom.then((bat) => (bat ? docKeHoachOmni(env, sbd, ngay) : null)),
+    omniSom.then((bat) => (bat ? docKeHoachOmni(env, sbd, ngay) : null)),quyenSom,
   ])
+  if(quyen.size)hoSo.cau=hoSo.cau.filter(c=>!quyen.has(c.qid))
   if (hoSo.chienDich && laHanhTrinh(hoSo.chienDich.id)) {
     const [chan, nghi] = await Promise.all([
       chanSom ?? protectedQuestions(env), docCauNghiDem(env, nowMs),
