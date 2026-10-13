@@ -1,0 +1,62 @@
+[
+  {
+    "name": "approved_card_removed_live_same",
+    "status": 0,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 0 vi phạm"
+  },
+  {
+    "name": "card_partial_color",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 1 vi phạm\n  ĐỔI/XOÁ màu đang có · src/screens/CaiDatScreen.tsx · color: var(--nhat)"
+  },
+  {
+    "name": "card_retitled_partial_color",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 1 vi phạm\n  ĐỔI/XOÁ màu đang có · src/screens/CaiDatScreen.tsx · color: var(--nhat)"
+  },
+  {
+    "name": "card_retitled_hides_live_color",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 1 vi phạm\n  ĐỔI/XOÁ màu đang có · src/screens/CaiDatScreen.tsx · color: var(--nhat)"
+  },
+  {
+    "name": "card_callback_renamed_hides_live_color",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 1 vi phạm\n  ĐỔI/XOÁ màu đang có · src/screens/CaiDatScreen.tsx · color: var(--nhat)"
+  },
+  {
+    "name": "card_retained_raw_added",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 2 vi phạm\n  ĐỔI/XOÁ màu đang có · src/screens/CaiDatScreen.tsx · color: var(--nhat)\n  MÀU THÔ mới (phải dùng biến chuẩn) · src/screens/CaiDatScreen.tsx · color: rgb(1,2,3)"
+  },
+  {
+    "name": "nested_card_removed",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 1 vi phạm\n  ĐỔI/XOÁ màu đang có · src/screens/CaiDatScreen.tsx · color: var(--nhat)"
+  },
+  {
+    "name": "retired_exact_delete",
+    "status": 0,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 0 tệp src/ đổi · 0 vi phạm · 1 tệp mã chết đã xoá nguyên tệp (ngoại lệ đóng, không tính)"
+  },
+  {
+    "name": "retired_wrong_hash_delete",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 9 vi phạm\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · background: radial-gradient(ellipse,rgba(var(--spirit-tint),.3),rgba(var(--spirit-tint),.08) 48%,transparent 70%)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · border: 1px solid rgba(var(--spirit-tint),.28)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · box-shadow: 0 0 18px rgba(var(--spirit-tint),.12)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · border: 1px solid rgba(var(--spirit-tint),.5)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · background: radial-gradient(ellipse,rgba(var(--spirit-tint),.22),transparent 70%)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · box-shadow: 0 0 16px rgba(var(--spirit-tint),.18)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · color: rgb(var(--spirit-tint))\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · text-shadow: 0 0 9px currentColor\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · color: red"
+  },
+  {
+    "name": "retired_same_path_partial",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 9 vi phạm\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · background: radial-gradient(ellipse,rgba(var(--spirit-tint),.3),rgba(var(--spirit-tint),.08) 48%,transparent 70%)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · border: 1px solid rgba(var(--spirit-tint),.28)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · box-shadow: 0 0 18px rgba(var(--spirit-tint),.12)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · border: 1px solid rgba(var(--spirit-tint),.5)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · background: radial-gradient(ellipse,rgba(var(--spirit-tint),.22),transparent 70%)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · box-shadow: 0 0 16px rgba(var(--spirit-tint),.18)\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · color: rgb(var(--spirit-tint))\n  ĐỔI/XOÁ màu đang có · src/game/than-thu-v2/spirit-2d.css · text-shadow: 0 0 9px currentColor\n  MÀU THÔ mới (phải dùng biến chuẩn) · src/game/than-thu-v2/spirit-2d.css · color: red"
+  },
+  {
+    "name": "retired_rename_changed_raw",
+    "status": 1,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 1 tệp src/ đổi · 1 vi phạm\n  MÀU THÔ mới (phải dùng biến chuẩn) · src/game/than-thu-v2/spirit-moi.css · color: rgb(1,2,3)"
+  },
+  {
+    "name": "historical_path_arbitrary_delete",
+    "status": 0,
+    "out": "kiem-mau-giu-nguyen · mốc HEAD · 0 tệp src/ đổi · 0 vi phạm · 1 tệp mã chết đã xoá nguyên tệp (ngoại lệ đóng, không tính)"
+  }
+]
