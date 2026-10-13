@@ -24,6 +24,12 @@ import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
 type Row=Record<string,unknown>
 export interface CauDanhMuc { qid:string;q:QCau;tang:number;nhan:NhanHanhTrinh|null }
 const cache=new WeakMap<object,Map<string,{luc:number;kiem:number;dau:string;ds:CauDanhMuc[]}>>()
+/** BỘ NHỚ ISOLATE (đo 13/10 21:20–22:05: 111 lỗi `exceededMemory` — Worker vượt 128 MB): danh mục có thể ~24.000 câu (mỗi câu một QCau + nhãn).
+ *  Trần TỔNG số câu của mọi danh mục đang đệm trong một isolate (trước: tối đa 8 danh mục, không trần cỡ); vượt ⇒ bỏ danh mục cũ nhất. */
+export const TRAN_CAU_DEM_DANH_MUC=40_000
+/** MỘT LƯỢT DỰNG cho mỗi khoá trong isolate: các yêu cầu đến cùng lúc (giờ cao điểm) dùng chung lượt đang dựng thay vì mỗi yêu cầu tự đọc ~24.000 dòng
+ *  và dựng một bản riêng (gấp N lần bộ nhớ + D1). Cùng câu SQL, cùng kết quả; lỗi tới mọi bên chờ như khi tự đọc. */
+const dangDung=new WeakMap<object,Map<string,Promise<CauDanhMuc[]>>>()
 /** Đợt 22: tuổi tối đa của một danh mục trong đệm dù dấu kho không đổi (bằng mức nhớ giờ cao điểm đã chốt 12/10). */
 export const HAN_TOI_DA_DANH_MUC=600_000
 type DongChienDichDay={qid_json:string;ma_de_json:string}
@@ -48,6 +54,18 @@ export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau
   // Câu sửa/duyệt (lập lại chỉ mục) vào danh mục sau ≤ 1 phút như cũ; nhãn kỹ năng đã duyệt (omni_q) vào chậm nhất HAN_TOI_DA_DANH_MUC (= mức giờ cao điểm).
   // Lần đọc đầu KHÔNG hỏi dấu (không thêm lệnh); lần kiểm đầu tiên: mốc lập chỉ mục mới nhất có trước lúc đọc ⇒ dữ liệu đang giữ là bản mới nhất.
   if(cu&&Math.abs(now-cu.luc)<HAN_TOI_DA_DANH_MUC){const d=await dauKhoCau(env);if(d&&(cu.dau?d===cu.dau:dauTruocLucDoc(d,cu.luc))){cu.dau=d;cu.kiem=now;return cu.ds}}
+  const bay=dangDung.get(khoaDb)??new Map<string,Promise<CauDanhMuc[]>>();dangDung.set(khoaDb,bay)
+  const dangCo=bay.get(key);if(dangCo)return dangCo
+  const p=dungDanhMuc(env,ids,mas).then(ds=>{
+    dem.delete(key);dem.set(key,{luc:now,kiem:now,dau:'',ds})
+    let tong=0;for(const v of dem.values())tong+=v.ds.length
+    for(const k of dem.keys()){if(tong<=TRAN_CAU_DEM_DANH_MUC||k===key)break;tong-=dem.get(k)!.ds.length;dem.delete(k)}
+    return ds
+  }).finally(()=>{if(bay.get(key)===p)bay.delete(key)})
+  bay.set(key,p)
+  return p
+}
+async function dungDanhMuc(env:Env,ids:readonly string[],mas:readonly string[]):Promise<CauDanhMuc[]>{
   const r=await env.DB.prepare(`SELECT g.qid,g.dang,g.content_group,json_extract(g.json,'$.phan') phan,json_extract(g.json,'$.mucDo') muc,json_extract(g.json,'$.sao') sao,json_extract(g.json,'$.chuyenDe') cd,json_extract(g.json,'$.reviewed') duyet,json_extract(g.json,'$.hanhTrinh') nhan,json_extract(g.json,'$.kienThuc') kn,(SELECT oq.vkn_json FROM omni_q oq WHERE oq.qid=g.qid AND oq.y=-1 AND oq.duyet_luc IS NOT NULL) q_kn FROM game_v2_question g WHERE g.qid IN(SELECT value FROM json_each(?)) AND g.ma_de IN(SELECT value FROM json_each(?)) AND json_valid(g.json) AND json_extract(g.json,'$.reviewed')=1 ORDER BY g.qid,g.ma_de`).bind(JSON.stringify(ids),JSON.stringify(mas)).all<Row>()
   const fullQ=await qCuaCau(env,[...new Set(r.results.map(x=>String(x.qid)))])
   const ds:CauDanhMuc[]=[],da=new Set<string>()
@@ -58,7 +76,7 @@ export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau
     let raw:unknown=null;try{raw=JSON.parse(String(x.nhan))}catch{/* nhãn vắng/lỗi giữ luật mặc định */}
     ds.push({qid,q,tang:t,nhan:docNhanHanhTrinh(raw,q,true)})
   }
-  if(dem.size>=8)dem.delete(dem.keys().next().value!);dem.set(key,{luc:now,kiem:now,dau:'',ds});return ds
+  return ds
 }
 export interface BoChonV5 { tang:Map<string,1|2|3|4>;chan:Set<string>;chanDoan:Set<string>;chon:Record<string,ChonV6>;ungNgoai:{qid:string;nhom:string;moi:boolean;hoc:boolean}[];uuTienThamDo?:string;vai:Record<string,VaiTroCau>;trongSo:Record<string,number>;phut:Record<string,number>;phamVi:string;nhom:NhomThu;tienDo:ReturnType<typeof tienDoMuc>;soL4:number;soChanDoan:number }
 /**
