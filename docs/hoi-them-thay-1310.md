@@ -8,9 +8,9 @@ Mọi câu em làm ngoài giờ kiểm tra và ngoài Gọi lên bảng có hai 
 3. Có khoá là bật cho mọi em. Chưa có khoá ⇒ ô hỏi tự ẩn.
 
 ## Tuỳ chỉnh (không cần phát hành lại) — `cau_hinh.khoa = 'hoi_tro_ly'`, giá trị JSON, mọi khoá tuỳ chọn
-`{"bat": true, "lop": ["12A1"], "sbd": [], "model": "gemini-3.5-flash-lite", "tranNgay": 20, "tranCau": 6, "thinkingBudget": 1024, "nhietDo": 0.3}`
+`{"bat": true, "lop": ["12A1"], "sbd": [], "model": "gemini-3.1-flash-lite", "tranNgay": 20, "tranCau": 6, "thinkingBudget": 1024, "nhietDo": 0.3}`
 - `bat:false` tắt hẳn · `lop`/`sbd` chỉ mở cho lớp/em đó (chạy thử) · `tranNgay` câu hỏi/em/ngày · `tranCau` lần hỏi/câu/ngày.
-- Mặc định `gemini-3.5-flash-lite` (thầy chọn 13/10). Google báo 404 (model ngừng cấp cho khoá mới) ⇒ máy chủ tự thử `gemini-flash-lite-latest` rồi `gemini-flash-latest`; sổ ghi đúng model đã trả lời. `thinkingBudget` chỉ gửi cho model 2.5 (`null` = không gửi).
+- Mặc định `gemini-3.1-flash-lite` (thầy tối 13/10: "chuyển xuống mô hình 3.1 flash lite"; trước đó 3.5 Flash-Lite). Google báo 404/410 (model ngừng cấp cho khoá mới / đã gỡ) ⇒ máy chủ tự thử `gemini-3.5-flash-lite`, rồi `gemini-flash-lite-latest`, `gemini-flash-latest`; sổ ghi đúng model đã trả lời. `thinkingBudget` chỉ gửi cho model 2.5 (`null` = không gửi).
 
 ## Luật máy chủ (không tin máy em)
 - Cùng cổng chặn nút Hỏi thầy: em có ca kiểm tra mở ⇒ khoá; câu thuộc ca chưa công bố (kể cả bản chép ở tờ khác) ⇒ khoá.
