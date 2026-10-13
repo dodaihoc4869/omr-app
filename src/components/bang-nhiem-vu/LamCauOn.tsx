@@ -225,11 +225,6 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
         <h2 id="lco-tieu-de" className="lco-tieu-de">
           {tieuDe || 'Ôn câu hôm nay'}
         </h2>
-        {pha === 'lam' && (
-          <p className="lco-phu">
-            Chọn đáp án cho từng câu rồi bấm <b>Nộp</b>. Câu chưa trả lời <b>chưa được tính</b> và không bị coi là sai — em làm nốt sau cũng được.
-          </p>
-        )}
         {pha === 'lam' && cau.length > 0 && (
           <div className="lco-hang-chip">
             <span className="m3-chip" data-vai-tro="primary">
@@ -291,7 +286,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
           )}
           {soChuaTraLoi > 0 && (
             <p className="lco-nhac">
-              Còn {soChuaTraLoi} câu chưa trả lời — <b>chưa được tính</b>. Em làm nốt rồi nộp tiếp.
+              Còn {soChuaTraLoi} câu chưa trả lời, <b>chưa được tính</b>.
             </p>
           )}
         </section>
@@ -325,7 +320,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
           {khongCo.map((q, i) => (
             <li key={q} className="lco-the lco-the--khong-co" data-vai-tro="secondary">
               <p className="lco-the-ten">Câu {cau.length + i + 1}</p>
-              <p className="lco-phu">Chưa mở được câu này. Em bỏ qua nó, các câu khác vẫn làm bình thường.</p>
+              <p className="lco-phu">Chưa mở được câu này.</p>
             </li>
           ))}
         </ol>
