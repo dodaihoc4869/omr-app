@@ -273,3 +273,9 @@ Thầy nhắn thêm: "Nếu đã làm xong chặng 2 bấm làm tiếp chặng 3
 - [ ] Xong chặng ⇒ bấm "Học tiếp chặng sau" ngay ở màn làm bài thì câu bị lặp (thoát ra vào lại thì không) — tìm nguyên nhân gốc, sửa | bằng chứng: (chưa có)
 Thầy nhắn thêm (ảnh app thầy, màn Học sinh: bấm ô tìm "Thành nam" ⇒ khung xanh đậm lồng bên trong khung ô tìm): "Bấm vào ô sớt thì bị chèn khung màu xanh nhìn xấu, bạn xử lý tất cả các chỗ này trên mọi chỗ mọi app nhé"
 - [ ] Bỏ khung xanh chèn khi bấm vào ô tìm / ô nhập ở mọi chỗ, cả 3 app (giữ dấu hiệu đang chọn nhẹ nhàng cho bàn phím) | bằng chứng: (chưa có)
+Thầy nhắn thêm (luật thường trực): "Khi bạn sửa bất kì cái gì thì luôn phải đảm bảo sau khi sửa xong tốc độ load app và tốc độ máy chủ phải nhanh hơn ap load mượt mà ổn định nhất"
+- [ ] Ghi luật vào CLAUDE.md (mọi phiên phải theo) | bằng chứng: (chưa có)
+- [ ] Cổng đo tốc độ tải app: kích thước gói tải đầu (JS/CSS mở trang) so mốc — lớn hơn mốc là đỏ | bằng chứng: (chưa có)
+- [ ] Cổng đo tốc độ máy chủ: số vòng chờ D1 của lệnh nóng (sảnh, mở chặng, nộp câu, đếm) so mốc — chậm hơn là đỏ | bằng chứng: (chưa có)
+Thầy nhắn thêm (ảnh tab Kết quả app học sinh: Ca kiểm tra · Kết quả bài đã nộp · Bài tập về nhà): "Bỏ phần btvn ở đây"
+- [ ] Bỏ thẻ "Bài tập về nhà" ở tab Kết quả (app học sinh) | bằng chứng: (chưa có)
