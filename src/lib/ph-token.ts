@@ -6,6 +6,19 @@ import { layDiaChiMayChu } from './dia-chi-may-chu'
 export const KHOA_PH_PASS = 'omr_ph_pass'
 // Máy chặn ghi/xóa thì dùng giá trị riêng cho phiên này, kể cả '' sau đăng xuất.
 let passPhien: string | undefined
+const nguoiTheoDoi = new Set<() => void>()
+const baoDoiPass = () => { for (const bao of nguoiTheoDoi) bao() }
+
+/** Theo dõi liên kết trong tab này và thao tác đăng nhập ở tab khác. Không phát mã ra DOM/sự kiện. */
+export function theoDoiPass(bao: () => void): () => void {
+  nguoiTheoDoi.add(bao)
+  const khiLuu = (e: StorageEvent) => { if (e.key === KHOA_PH_PASS || e.key === null) bao() }
+  if (typeof window !== 'undefined') window.addEventListener('storage', khiLuu)
+  return () => {
+    nguoiTheoDoi.delete(bao)
+    if (typeof window !== 'undefined') window.removeEventListener('storage', khiLuu)
+  }
+}
 
 /** Tách `ph=` khỏi chuỗi truy vấn: trả pass (đã giải mã, đã cắt khoảng trắng; rỗng nếu không có) và chuỗi truy vấn còn lại. Thuần. */
 export function tachPass(search: string): { pass: string; con: string } {
@@ -37,6 +50,7 @@ export function luuPass(pass: string): void {
   } catch {
     /* chế độ riêng tư: dùng cho phiên này thôi */
   }
+  baoDoiPass()
 }
 export function docPass(): string {
   if (passPhien !== undefined) return passPhien.trim()
@@ -54,6 +68,7 @@ export function xoaPass(): void {
   } catch {
     /* bỏ qua */
   }
+  baoDoiPass()
 }
 
 export type KetQuaXacDinh = { ok: true; sbd: string; hoTen: string; lop: string } | { ok: false; error: string }

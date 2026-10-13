@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { taiTatCaVeCon, type PhanHoiTatCa } from './api'
 import type { PhMoi } from './du-lieu'
 import { batNhipBenVung } from '../nhip-ben-vung'
+import { docPass } from '../ph-token'
+import { usePassPhuHuynh } from './use-pass'
 
 export const NHIP_PH_MOI_MS = 180_000 // sự cố D1 21/09: 60 s × mọi máy phụ huynh ⇒ 180 s ± 30 s (lỗi ⇒ lùi 30→60→120→300 s, quay lại tab dội ≥ 20 s)
 export type TrangThaiPhMoi = 'tai' | 'ok' | 'loi'
@@ -19,13 +21,14 @@ export interface ViewPhMoi {
 }
 
 export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<PhanHoiTatCa> = taiTatCaVeCon): ViewPhMoi {
+  const pass = usePassPhuHuynh()
   const [s, setS] = useState<Omit<ViewPhMoi, 'thuLai'>>({ trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false })
-  const chuDuLieu = useRef(sbd)
+  const chuDuLieu = useRef({ sbd, pass })
   const apiRef = useRef(api)
   apiRef.current = api
   const nap = useRef<() => void>(() => {})
   useEffect(() => {
-    chuDuLieu.current = sbd
+    chuDuLieu.current = { sbd, pass }
     setS({ trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false })
     if (!sbd) {
       setS({ trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false })
@@ -36,6 +39,7 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
     let dangChay: Promise<boolean> | null = null
     let lanDoc = 0
     const doc = async (): Promise<boolean> => {
+      if (huy || docPass() !== pass) return true
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return true
       const lanLamMoi = lanDoc++
       setS((x) => ({ ...x, dangLamMoi: true, lanLamMoi }))
@@ -43,11 +47,11 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
       try {
         r = await apiRef.current(sbd)
       } catch {
-        if (huy) return true
+        if (huy || docPass() !== pass) return true
         setS((x) => ({ ...x, trangThai: x.pm ? 'ok' : 'loi', chuLoi: 'Chưa tải được báo cáo của con. Anh/chị thử lại sau ít phút.', dangLamMoi: false }))
         return false
       }
-      if (huy) return true
+      if (huy || docPass() !== pass) return true
       if (r.kieu === 'ok') setS({ trangThai: 'ok', pm: r.pm, chuLoi: '', dangLamMoi: false, lanLamMoi })
       else setS((x) => (x.pm ? { ...x, chuLoi: r.chu, dangLamMoi: false } : { trangThai: 'loi', pm: null, chuLoi: r.chu, dangLamMoi: false, lanLamMoi }))
       return r.kieu === 'ok'
@@ -65,11 +69,11 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
       nhip.dung()
       document.removeEventListener('visibilitychange', khiHien)
     }
-  }, [sbd])
+  }, [sbd, pass])
   const thuLai = useCallback(() => {
     setS((x) => (x.pm ? x : { ...x, trangThai: 'tai', chuLoi: '' }))
     nap.current()
   }, [])
   // Không vẽ báo cáo của em trước trong lượt render đầu tiên sau đổi SBD.
-  return chuDuLieu.current === sbd ? { ...s, thuLai } : { trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false, thuLai }
+  return chuDuLieu.current.sbd === sbd && chuDuLieu.current.pass === pass ? { ...s, thuLai } : { trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false, thuLai }
 }

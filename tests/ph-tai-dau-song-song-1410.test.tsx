@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import AppPhuHuynh from '../src/components/ph-v3/AppPhuHuynh'
 import { NHIP_PH_MOI_MS } from '../src/lib/ph-moi/use-tat-ca-ve-con'
+import { luuPass, xoaPass } from '../src/lib/ph-token'
 import { hoc2Gia, loiThayGia, nhipGia, tatCaGia, tongQuanGia } from '../scripts/chup-ph-dot19/gia'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => diaChi }))
@@ -42,7 +43,7 @@ beforeEach(() => {
     return giu.has(duong) ? new Promise((ok) => cho.push({ duong, xong: () => ok(res) })) : Promise.resolve(res)
   }))
 })
-afterEach(() => { cleanup(); localStorage.clear(); vi.unstubAllGlobals(); vi.useRealTimers(); vi.restoreAllMocks() })
+afterEach(() => { cleanup(); xoaPass(); localStorage.clear(); vi.unstubAllGlobals(); vi.useRealTimers(); vi.restoreAllMocks() })
 
 describe('tải báo cáo phụ huynh trong React thật', () => {
   it('bốn lệnh phụ khởi động trước khi bản chính về; bản đầu không tạo lượt đọc kép', async () => {
@@ -72,8 +73,7 @@ describe('tải báo cáo phụ huynh trong React thật', () => {
     duLieu['/ph/loi-thay'] = { ...nx, nhanXet: [{ ...nx.nhanXet[0], noiDung: 'Nhận xét mới của thầy.' }] }
     duLieu['/ph/nhip-hoc'] = { ...nhipGia(), doTinCay: 95, canThem: 'Cần thêm số liệu mới.' }
     diaChi = 'https://may-moi.test'
-    localStorage.setItem('omr_ph_pass', 'PASS-B')
-    await lamMoi()
+    await act(async () => luuPass('PASS-B'))
     expect(goi).toHaveLength(10)
     for (const d of [TAT_CA, ...PHU]) expect(goi.filter((x) => x.duong === d)).toHaveLength(2)
     expect(goi.slice(5).every((x) => x.url.startsWith(diaChi) && JSON.stringify(x.than) === '{"pass":"PASS-B"}')).toBe(true)
@@ -82,6 +82,8 @@ describe('tải báo cáo phụ huynh trong React thật', () => {
     expect(r.container.querySelector('[data-vung="loi-thay-moi"]')?.textContent).toContain('Nhận xét mới của thầy.')
     expect(r.container.querySelector('[data-vung="nhip-hoc-con"]')?.textContent).toContain('95%')
     expect(r.container.querySelector('[data-vung="anh-hung"]')?.textContent).toContain('Hành trình của con: tầng Tổng hợp')
+    await lamMoi()
+    expect(goi).toHaveLength(15)
   })
 
   it('tab ẩn không đọc; quay lại tab làm mới đủ năm lệnh một lượt', async () => {

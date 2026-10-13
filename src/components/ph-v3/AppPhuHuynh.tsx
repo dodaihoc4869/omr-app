@@ -12,6 +12,7 @@ import { AnhLogo } from '../LogoVai'
 import HopXacNhan from '../HopXacNhan'
 import { chuBanApp } from '../../lib/cap-nhat-app'
 import { useTatCaVeCon } from '../../lib/ph-moi/use-tat-ca-ve-con'
+import { usePassPhuHuynh } from '../../lib/ph-moi/use-pass'
 import { chuCaiTen } from '../../lib/ph-moi/dinh-dang'
 import { taiConTongQuan, taiHoc2, taiLoiThay } from '../../lib/ph-v3/api'
 import type { ConTongQuan } from '../../lib/ph-v3/con-tong-quan'
@@ -101,8 +102,9 @@ function TaiKhoan({ ten, onDoiSbd }: { ten: string; onDoiSbd: () => void }) {
 type ThongTinPhuHuynh = { sbd: string; hoTen: string; lop: string; onDoiSbd: () => void }
 
 export default function AppPhuHuynh(p: ThongTinPhuHuynh) {
-  // Đổi con tạo phiên đọc mới: không giữ báo cáo, cảnh báo hoặc phản hồi muộn của em trước.
-  return <PhienBaoCao key={p.sbd} {...p} />
+  const pass = usePassPhuHuynh()
+  // Đổi con/liên kết tạo phiên đọc mới cho cả năm khối. Key chỉ thuộc React, không đưa liên kết ra DOM.
+  return <PhienBaoCao key={JSON.stringify([p.sbd, pass])} {...p} />
 }
 
 function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
