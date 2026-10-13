@@ -4,7 +4,7 @@ Thầy yêu cầu tải ổn định, lưu hạn từng lớp tại chỗ và s�
 
 ## Hợp đồng chỉ-thêm
 
-- `POST /gv/goi-bai-7`, `action: 'tong_hop'`: `{ ok, bat, goi, thongKe }`; `thongKe[goiId] = { soEm, pGap, pTuLam }`. Đếm gốc phân biệt đã gặp/tự làm, đúng phiên bản gói; không trả đề/câu trả lời/JSON câu hỏi. Tổng hợp tất cả gói trong cùng lượt, không 1+N gọi theo lớp.
+- `POST /gv/goi-bai-7`, `action: 'tong_hop'`: `{ ok, bat, goi, thongKe }`; `thongKe[goiId] = { soEm, pGap, pTuLam }`. Đếm gốc phân biệt đã gặp/tự làm, đúng phiên bản gói; không trả đề/câu trả lời/JSON câu hỏi. Một API tổng hợp: metadata nhẹ rồi chỉ thống kê tối đa 12 dòng đang hiển thị, không 1+N gọi theo lớp hoặc quét các bài cũ đang ẩn. `caCu:true` đọc thống kê bài quá hạn khi thầy mở bộ lọc. `serverNow` là số mili-giây máy chủ, dùng cùng ngày Việt Nam để chọn dòng, hiển thị hạn và giới hạn ngày nhập.
 - `action: 'sua_han'` giữ `{ goiId, han, hanCu }`; trả xác nhận `goiId/han`.
 - `action: 'sua_han_hang_loat'`, `{ goi: [{ goiId, hanCu }], han }`: máy chủ kiểm mọi dòng, cập nhật nguyên tử và trả `ketQua: [{ goiId, han, ok: true }]`. Một dòng đã đổi, không còn tick hoặc có ca thi mở: từ chối toàn lượt, không ghi một phần.
 - Hạn là hết ngày Việt Nam. Đổi hạn tính lại quota các gói theo phần còn thiếu và lịch kiểm tra; không xoá tiến độ, lượt làm, bài đang làm hay đề kiểm tra đã phát hành.

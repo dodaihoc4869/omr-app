@@ -853,3 +853,11 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - 13/10 22:32 (VN) · Codex · ĐỊNH SỬA thêm DayHocLenBang.tsx chỉ nạp kho/retry bước Tick: lỗi đọc kho không được lưu [] vĩnh viễn; coOmni lỗi không được treo. goi-lenh-thay.ts giữ timeout đến hết body JSON (trước đây hủy ở headers), thêm test body treo/hồi phục/null/lời từ chối. PH bổ sung ManChiTietCa thử lại sau mất mạng; đã báo PR269.
 
 - 13/10 22:35 (VN) · Codex · ĐỊNH SỬA StudentPortalScreen.tsx chỉ reset/guard response khi đổi phiên (repro dữ liệu bài/nhiệm vụ em cũ); game-v2-auth.ts parentPass chỉ fail-closed khi SELECT mật khẩu bị lỗi, không đổi luật tài khoản không mật khẩu/tokenlegacy. Mỗi lỗi có commit/test riêng, không đổi quyền hay chống gian lận.
+
+- 13/10 22:36 (VN) · Codex · ĐỊNH SỬA StudentPortalScreen luồng Mom: start giữ dapAnDaNop từ máy chủ, bỏ đáp ánA/chấmHTML đoán trước nộp, xem kết quả dùng review máy chủ (2regression). ParentPortalScreen guard Storage khi đăng xuất/nạpSBD, ph-token.ts fallback trong phiên khi Storage từ chối và timeout body; các luồng cũ giữ nguyên. Đã báo Claude tại PR285, trước sửa, mỗi lỗi test thực thi riêng.
+
+- 13/10 22:38 (VN) · Codex · ĐỊNH SỬA dem-ca-thi.ts chống keyR2cũ hồi sinh sau cập nhật nguồn; wrapper ghiKeyBank ở đúng5nơi putkey trong index.ts/goi-cu.ts/key-bank-bo-sung.ts. Không thayJSON/chấm điểm/điểmđãghi, không thêmI/O, khôngxoáD1; córegression bay/ghi/saughi/khácca. Tệp dùng chung chỉ hook này, rootnhờClaude soát PR285.
+
+- 13/10 22:43 (VN) · Codex · ĐỊNH SỬA đúngtuChuaLanhPhieu(index.ts): repairphieulỗi khôngtrảbody đãtiêuthụ; giữbảnHTMLgốc để GETkhông500. Học sinh thêmmediaLamCau sauchấm: giữảnhphươngán đểđốichiếucấutạo/đồthị; khôngđổiCSS. Tổnghợp5lớp65gói135720events đoSQLite2query~49msvsold45query~160ms; unbounded1query~598msbịloại, khônggán sốđóchoD1sống.
+
+- 13/10 22:55 (VN) · Codex · Đã tích hợp các commit correctness từ6agent vào PR285; soátchéo bắt thêm CASretry/stalephiên/bootstrapPH/nhápMomchưaACK và đãsửa. UIDeadline dùngserverNow đểkhônglệch12dòng do giờmáy; giữsave khôngđổimàn/scroll, bulkatomic. Kiểmkêmãcũ vàmốcSQLite nằm docs/soat-app-1310; bảnkiểm kê CHƯAxoátrước00. Chuẩnbịfullso tênvới nềnmain97300016, gộpnhậtkýmainfbbff57f, chưaphát hành.

@@ -1,0 +1,2032 @@
+{
+  "commit": "97300016",
+  "phase": "inventory_before_00h_VN_2026-10-14",
+  "graph": {
+    "file": "/tmp/soat-ma-cu-1310-graph.json",
+    "resolvedLocalImportMissing": 0,
+    "orphanInitializer": "src/components/hoa2/man-sanh-luoi.ts:23",
+    "liveEntryGameCaller": "StudentPortalScreen imports only napManCauDaLam/napManTuLuyen"
+  },
+  "sourceCandidatesAfterInitializerRemoval": [
+    "src/game/bi-a/mat-than-luon.tsx",
+    "src/game/bi-a/dieu-khien-mang.ts",
+    "src/game/bi-a/du-doan.ts",
+    "src/game/bi-a/ManChoi.tsx",
+    "src/game/bi-a/ve-bi.ts",
+    "src/game/bi-a/ket-noi.ts",
+    "src/game/bi-a/ai.ts",
+    "src/game/bi-a/bi-a.css",
+    "src/game/bi-a/api.ts",
+    "src/game/bi-a/XemLaiCauSai.tsx",
+    "src/game/bi-a/DieuKhienBia.tsx",
+    "src/game/bi-a/dieu-khien-cham.ts",
+    "src/game/bi-a/dieu-khien.ts",
+    "src/game/bi-a/TraLoiCau.tsx",
+    "src/game/bi-a/TamCauBia.tsx",
+    "src/game/bi-a/bo-cuc.ts",
+    "src/game/bi-a/cai-dat-bia.ts",
+    "src/game/bi-a/gay.ts",
+    "src/game/bi-a/BanOnline.tsx",
+    "src/game/bi-a/PhongCho.tsx",
+    "src/game/bi-a/am-thanh.ts",
+    "src/game/bi-a/ve-ban.ts",
+    "src/game/bi-a/BiaGame.tsx",
+    "src/game/bi-a/xem-thu.html",
+    "src/game/bi-a/xem-thu.tsx",
+    "src/game/than-thu-v2/SpiritArt.tsx",
+    "src/game/than-thu-v2/battle-audio.ts",
+    "src/game/than-thu-v2/DoanCau.tsx",
+    "src/game/than-thu-v2/thu-quai.css",
+    "src/game/than-thu-v2/EscortQuestion.tsx",
+    "src/game/than-thu-v2/escort.css",
+    "src/game/than-thu-v2/DoanKetChang.tsx",
+    "src/game/than-thu-v2/QuaiSonThuy.tsx",
+    "src/game/than-thu-v2/EscortRoom.tsx",
+    "src/game/than-thu-v2/DoanTungChuong.tsx",
+    "src/game/than-thu-v2/doan-kieu.ts",
+    "src/game/than-thu-v2/XeLinhTam.tsx",
+    "src/game/than-thu-v2/doan-khoan-exp.ts",
+    "src/game/than-thu-v2/EscortGuide.tsx",
+    "src/game/than-thu-v2/DoanSanh.tsx",
+    "src/game/than-thu-v2/game.css",
+    "src/game/than-thu-v2/anh-san-sang.ts",
+    "src/game/than-thu-v2/Game.tsx",
+    "src/game/than-thu-v2/LearningBattle.tsx",
+    "src/game/than-thu-v2/DoanTran.tsx",
+    "src/game/than-thu-v2/Spirit2D.tsx",
+    "src/game/than-thu-v2/spirit-2d.css",
+    "src/game/than-thu-v2/learning-battle.css",
+    "src/game/than-thu-v2/progress-chart.css",
+    "src/game/than-thu-v2/DoanTiepSuc.tsx",
+    "src/game/than-thu-v2/doan-xem-thu.tsx",
+    "src/game/than-thu-v2/chu-het-luot.ts",
+    "src/game/than-thu-v2/dau-trang-cao.ts",
+    "src/game/than-thu-v2/ProgressChart.tsx",
+    "src/game/than-thu-v2/DoanHinh.tsx",
+    "src/game/than-thu-v2/NutTuTin.tsx",
+    "src/game/than-thu-v2/LinhTam.tsx",
+    "src/game/than-thu-v2/ImmortalShield.tsx",
+    "src/game/than-thu-v2/doan-xem-thu.html",
+    "src/game/than-thu-v2/DoanHoTong.tsx",
+    "src/game/than-thu-v2/doan.css",
+    "src/game/than-thu-v2/dao/TuiDo.tsx",
+    "src/game/than-thu-v2/dao/ThanThuV2.tsx",
+    "src/game/than-thu-v2/dao/ManShopThat.tsx",
+    "src/game/than-thu-v2/dao/dao.css",
+    "src/game/than-thu-v2/dao/dao-ngang.css",
+    "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+    "src/game/than-thu-v2/dao/than-thu-v2.css",
+    "src/game/than-thu-v2/dao/SoTay.tsx",
+    "src/game/than-thu-v2/dao/dao-core.ts",
+    "src/game/than-thu-v2/dao/ChonBanDongHanh.tsx",
+    "src/game/than-thu-v2/dao/DaoCuaEm.tsx",
+    "src/game/than-thu-v2/dao/ThamHiem.tsx",
+    "src/game/than-thu-v2/dao/kieu.ts",
+    "src/game/than-thu-v2/dao/xem-thu.html",
+    "src/game/than-thu-v2/dao/xem-thu.tsx",
+    "src/game/than-thu-v2/shop/ThuDo.tsx",
+    "src/game/than-thu-v2/shop/XacNhanMua.tsx",
+    "src/game/than-thu-v2/shop/chu-shop.ts",
+    "src/game/than-thu-v2/shop/may-chu-that.ts",
+    "src/game/than-thu-v2/shop/bieu-tuong.tsx",
+    "src/game/than-thu-v2/shop/TuDo.tsx",
+    "src/game/than-thu-v2/shop/shop.css",
+    "src/game/than-thu-v2/shop/shop-v2.css",
+    "src/game/than-thu-v2/shop/TamChao.tsx",
+    "src/game/than-thu-v2/shop/CuaHang.tsx",
+    "src/game/than-thu-v2/shop/shop-ngang.css",
+    "src/game/than-thu-v2/shop/san-khau.tsx",
+    "src/game/than-thu-v2/shop/chu-cua-vao.ts",
+    "src/game/than-thu-v2/shop/ManShop.tsx",
+    "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+    "src/game/than-thu-v2/shop/chung.tsx",
+    "src/game/than-thu-v2/shop/logic-shop.ts",
+    "src/game/than-thu-v2/shop/kieu.ts",
+    "src/game/than-thu-v2/shop/xem-thu.html",
+    "src/game/than-thu-v2/shop/shop-trang-suc.css",
+    "src/game/than-thu-v2/shop/xem-thu.tsx",
+    "src/game/than-thu-v2/doan2/doan2.css",
+    "src/game/than-thu-v2/doan2/Canh2.tsx",
+    "src/game/than-thu-v2/doan2/xem-thu-2.html",
+    "src/game/than-thu-v2/doan2/doan2-ngang.css",
+    "src/game/than-thu-v2/doan2/kieu2.ts",
+    "src/game/than-thu-v2/doan2/KetChang2.tsx",
+    "src/game/than-thu-v2/doan2/XemLaiChuan.tsx",
+    "src/game/than-thu-v2/doan2/TheTram2.tsx",
+    "src/game/than-thu-v2/doan2/BuaTroGiang.tsx",
+    "src/game/than-thu-v2/doan2/xem-thu-2.tsx",
+    "src/game/than-thu-v2/doan2/TheBuocSai2.tsx",
+    "src/game/than-thu-v2/phu-kien/phu-kien-mon.ts",
+    "src/game/than-thu-v2/phu-kien/TrangSuc.tsx",
+    "src/game/than-thu-v2/phu-kien/phu-kien-neo.ts",
+    "src/game/than-thu-v2/phu-kien/nap-hinh.ts",
+    "src/game/than-thu-v2/phu-kien/HinhVatPham.tsx",
+    "src/game/than-thu-v2/phu-kien/phu-kien.css",
+    "src/game/than-thu-v2/phu-kien/ThuMacDo.tsx",
+    "src/game/than-thu-v2/dao2/tran-v2.css",
+    "src/game/than-thu-v2/dao2/CanhDao3D.tsx",
+    "src/game/than-thu-v2/dao2/de-thu-da-thiet-bi.css",
+    "src/game/than-thu-v2/dao2/xem-thu-chuong.html",
+    "src/game/than-thu-v2/dao2/xem-thu-chuong.tsx",
+    "src/game/than-thu-v2/dao2/KhoaDao.tsx",
+    "src/game/than-thu-v2/dao2/TrongAi.tsx",
+    "src/game/than-thu-v2/dao2/XongChuyen.tsx",
+    "src/game/than-thu-v2/dao2/DeThu.tsx",
+    "src/game/than-thu-v2/dao2/Dao2.tsx",
+    "src/game/than-thu-v2/dao2/ChuongTranDau.tsx",
+    "src/game/than-thu-v2/dao2/dao2-core.ts",
+    "src/game/than-thu-v2/dao2/ngang.ts",
+    "src/game/than-thu-v2/dao2/TramHoiPhuc.tsx",
+    "src/game/than-thu-v2/dao2/dao2.css",
+    "src/game/than-thu-v2/dao2/chuong.css",
+    "src/game/than-thu-v2/dao2/xem-thu.html",
+    "src/game/than-thu-v2/dao2/TheBuocSai.tsx",
+    "src/game/than-thu-v2/dao2/xem-thu.tsx",
+    "src/game/than-thu-v2/dao2/BanDo.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-vd-05.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-da-02.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-hq-01.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-hq-07.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-cl-05.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-da-08.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-da-03.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-hq-05.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-vd-01.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-da-05.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-da-06.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-da-01.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-hq-06.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-vd-06.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-cl-03.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-cl-02.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-vd-07.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-cl-04.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-da-07.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-vd-03.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-cl-06.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-hq-04.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-cl-01.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-vd-04.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-vd-08.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-da-04.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-cl-07.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-cl-08.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-hq-02.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-hq-03.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-hq-08.tsx",
+    "src/game/than-thu-v2/phu-kien/hinh/pk-vd-02.tsx"
+  ],
+  "sourceCandidateBytes": 1346973,
+  "keepCurrentLearningOrWorkerDependencies": [
+    "src/game/than-thu-hoa-hoc/kinh-nghiem.ts",
+    "src/game/than-thu-hoa-hoc/hinh-thai.ts",
+    "src/game/bi-a/nguyen-to.ts",
+    "src/game/bi-a/tran.ts",
+    "src/game/bi-a/luat.ts",
+    "src/game/bi-a/vat-ly.ts",
+    "src/game/than-thu-v2/academic-sync.ts",
+    "src/game/than-thu-v2/ly-do-thuong.ts",
+    "src/game/than-thu-v2/evolution.ts",
+    "src/game/than-thu-v2/anh-webp.ts",
+    "src/game/than-thu-v2/bieu-cam-thu.css",
+    "src/game/than-thu-v2/doan-core.ts",
+    "src/game/than-thu-v2/learning-battle.ts",
+    "src/game/than-thu-v2/pet-name.ts",
+    "src/game/than-thu-v2/escort-core.ts",
+    "src/game/than-thu-v2/Reports.tsx",
+    "src/game/than-thu-v2/shields.ts",
+    "src/game/than-thu-v2/loi-het-tran.ts",
+    "src/game/than-thu-v2/core.ts",
+    "src/game/than-thu-v2/BieuCamThu.tsx",
+    "src/game/than-thu-v2/dao/anh.ts"
+  ],
+  "keepBytes": 178392,
+  "testsScriptsRequiringReview": {
+    "tests/chu-het-luot-2109.test.ts": [
+      "src/game/than-thu-v2/chu-het-luot.ts"
+    ],
+    "tests/bi-a-am-thanh.test.ts": [
+      "src/game/bi-a/am-thanh.ts",
+      "src/game/bi-a/dieu-khien.ts",
+      "src/game/than-thu-v2/battle-audio.ts"
+    ],
+    "tests/dao-cua-em.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoCuaEm.tsx",
+      "src/game/than-thu-v2/dao/TuiDo.tsx",
+      "src/game/than-thu-v2/dao/dao-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/phu-kien-mac-do-2109.test.tsx": [
+      "src/game/than-thu-v2/phu-kien/ThuMacDo.tsx",
+      "src/game/than-thu-v2/phu-kien/phu-kien-mon.ts",
+      "src/game/than-thu-v2/phu-kien/phu-kien-neo.ts",
+      "src/game/than-thu-v2/phu-kien/nap-hinh.ts"
+    ],
+    "tests/omni-can-than-dao-hs-0610.test.tsx": [
+      "src/game/than-thu-v2/dao2/Dao2.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/bi-a-ket-noi.test.ts": [
+      "src/game/bi-a/ket-noi.ts"
+    ],
+    "tests/bi-a-mat-than-tra-loi.test.tsx": [
+      "src/game/bi-a/BiaGame.tsx",
+      "src/game/bi-a/api.ts",
+      "src/game/bi-a/dieu-khien.ts",
+      "src/game/bi-a/mat-than-luon.tsx"
+    ],
+    "tests/doan-cua-vao.test.tsx": [
+      "src/game/than-thu-v2/EscortRoom.tsx",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "src/game/than-thu-v2/ProgressChart.tsx",
+      "src/game/than-thu-v2/LearningBattle.tsx",
+      "src/game/than-thu-v2/Spirit2D.tsx",
+      "src/game/than-thu-v2/SpiritArt.tsx",
+      "src/game/than-thu-v2/ImmortalShield.tsx",
+      "src/game/than-thu-v2/Game.tsx"
+    ],
+    "tests/phu-kien-dat-do-trinh-duyet-2109.test.ts": [
+      "src/game/than-thu-v2/phu-kien/phu-kien-mon.ts",
+      "src/game/than-thu-v2/phu-kien/phu-kien-neo.ts"
+    ],
+    "tests/omni-3-dao-hs.test.tsx": [
+      "src/game/than-thu-v2/dao2/Dao2.tsx",
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/TramHoiPhuc.tsx",
+      "src/game/than-thu-v2/dao2/DeThu.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/ph-khong-game-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx",
+      "src/game/than-thu-v2/SpiritArt.tsx"
+    ],
+    "tests/bang-nhiem-vu-may-chu-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/bi-a-luat.test.ts": [
+      "src/game/bi-a/ai.ts"
+    ],
+    "tests/bi-a-ve-vung-ban-3009.test.ts": [
+      "src/game/bi-a/ve-ban.ts",
+      "src/game/bi-a/dieu-khien.ts",
+      "src/game/bi-a/bo-cuc.ts"
+    ],
+    "tests/ph-token-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/than-thu-v2.test.ts": [
+      "src/game/than-thu-v2/dao/ChonBanDongHanh.tsx"
+    ],
+    "tests/dang-lam-moi-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/phu-kien-mac-do-trinh-duyet-2109.test.ts": [
+      "src/game/than-thu-v2/phu-kien/phu-kien-mon.ts",
+      "src/game/than-thu-v2/phu-kien/nap-hinh.ts"
+    ],
+    "tests/bi-a-sanh-it-cau-3009.test.tsx": [
+      "src/game/bi-a/BiaGame.tsx",
+      "src/game/bi-a/api.ts"
+    ],
+    "tests/dao-chon-ban-dong-hanh.test.tsx": [
+      "src/game/than-thu-v2/dao/ChonBanDongHanh.tsx"
+    ],
+    "tests/dao2-khoa-2709.test.tsx": [
+      "src/game/than-thu-v2/dao2/KhoaDao.tsx",
+      "src/game/than-thu-v2/dao2/Dao2.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/doan-cuon-mobile-1010.test.tsx": [
+      "src/game/than-thu-v2/dao2/tran-v2.css",
+      "src/game/than-thu-v2/doan.css"
+    ],
+    "tests/hieu-ung-exp-cau-2909.test.tsx": [
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts",
+      "src/game/than-thu-v2/DoanCau.tsx"
+    ],
+    "tests/toan-man-hinh-game-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx",
+      "src/game/than-thu-v2/Game.tsx"
+    ],
+    "tests/giao-them-cho-con-man-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/dao-luot-ngay-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoCuaEm.tsx",
+      "src/game/than-thu-v2/dao/dao-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/lich-su-ca-m3-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/tu-ngu-cum6-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx",
+      "src/game/than-thu-v2/SpiritArt.tsx",
+      "src/game/than-thu-v2/EscortGuide.tsx",
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/EscortQuestion.tsx",
+      "src/game/than-thu-v2/EscortRoom.tsx",
+      "src/game/than-thu-v2/ImmortalShield.tsx"
+    ],
+    "tests/dao2-cot-loi-2709.test.tsx": [
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao2/dao2.css"
+    ],
+    "tests/bi-a-ban-online.test.tsx": [
+      "src/game/bi-a/BiaGame.tsx",
+      "src/game/bi-a/PhongCho.tsx",
+      "src/game/bi-a/api.ts",
+      "src/game/bi-a/dieu-khien.ts"
+    ],
+    "tests/escort-context-menu.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx",
+      "src/game/than-thu-v2/SpiritArt.tsx",
+      "src/game/than-thu-v2/EscortGuide.tsx",
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/EscortQuestion.tsx",
+      "src/game/than-thu-v2/EscortRoom.tsx"
+    ],
+    "tests/bi-a-van-mang.test.ts": [
+      "src/game/bi-a/dieu-khien-mang.ts",
+      "src/game/bi-a/dieu-khien.ts",
+      "src/game/bi-a/ai.ts"
+    ],
+    "tests/bi-a-man-choi.test.tsx": [
+      "src/game/bi-a/BiaGame.tsx",
+      "src/game/bi-a/ManChoi.tsx",
+      "src/game/bi-a/api.ts",
+      "src/game/bi-a/dieu-khien.ts",
+      "src/game/bi-a/cai-dat-bia.ts"
+    ],
+    "tests/ngang-so-tay-tui-shop-2809.test.tsx": [
+      "src/game/than-thu-v2/dao/SoTay.tsx",
+      "src/game/than-thu-v2/dao/TuiDo.tsx",
+      "src/game/than-thu-v2/shop/ManShop.tsx",
+      "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+      "src/game/than-thu-v2/dao2/ngang.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/doan-tran-cap-rieng-2109.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/the-ca-gan-nhat-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/doan2-loi-giai-chuan.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan2/XemLaiChuan.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/omni-can-than-doan-hs-0610.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts",
+      "src/game/than-thu-v2/doan2/kieu2.ts"
+    ],
+    "tests/doan-sanh-hep-2109.test.tsx": [
+      "src/game/than-thu-v2/DoanSanh.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/shop-bo-cuc-2109.test.tsx": [
+      "src/game/than-thu-v2/shop/CuaHang.tsx",
+      "src/game/than-thu-v2/shop/ThuDo.tsx",
+      "src/game/than-thu-v2/shop/TuDo.tsx",
+      "src/game/than-thu-v2/shop/TamChao.tsx",
+      "src/game/than-thu-v2/shop/XacNhanMua.tsx",
+      "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+      "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+      "src/game/than-thu-v2/shop/kieu.ts",
+      "src/game/than-thu-v2/shop/logic-shop.ts"
+    ],
+    "tests/dao-than-thu-vo.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/chuyen-man-nhanh-0510.test.tsx": [
+      "src/game/than-thu-v2/EscortRoom.tsx",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/ProgressChart.tsx",
+      "src/game/than-thu-v2/LearningBattle.tsx",
+      "src/game/than-thu-v2/Game.tsx"
+    ],
+    "tests/thi-dua-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/may-yeu-toan-dien-2909.test.tsx": [
+      "src/game/than-thu-v2/shop/chung.tsx"
+    ],
+    "tests/bang-song-sinh-hien-thi-0210.test.tsx": [
+      "src/game/than-thu-v2/DoanCau.tsx"
+    ],
+    "tests/dao2-gach-2709.test.tsx": [
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao2/dao2-core.ts"
+    ],
+    "tests/vao-thi-form-m3-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/dao2-man-dau-tui-do-2709.test.tsx": [
+      "src/game/than-thu-v2/EscortRoom.tsx",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/ProgressChart.tsx",
+      "src/game/than-thu-v2/LearningBattle.tsx",
+      "src/game/than-thu-v2/Game.tsx",
+      "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/bi-a-ngang.test.tsx": [
+      "src/game/bi-a/bo-cuc.ts",
+      "src/game/bi-a/gay.ts",
+      "src/game/bi-a/ManChoi.tsx",
+      "src/game/bi-a/api.ts",
+      "src/game/bi-a/dieu-khien.ts"
+    ],
+    "tests/doan-giao-dien.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/DoanTungChuong.tsx",
+      "src/game/than-thu-v2/Game.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/ve-dich-the-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/dao-tham-hiem.test.tsx": [
+      "src/game/than-thu-v2/dao/ThamHiem.tsx",
+      "src/game/than-thu-v2/dao/ThamHiem.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/mom-m3-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/cau-tu-luan-may-hs-2109.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/EscortRoom.tsx",
+      "src/game/than-thu-v2/ProgressChart.tsx",
+      "src/game/than-thu-v2/LearningBattle.tsx",
+      "src/game/than-thu-v2/Spirit2D.tsx",
+      "src/game/than-thu-v2/SpiritArt.tsx",
+      "src/game/than-thu-v2/ImmortalShield.tsx",
+      "src/game/than-thu-v2/Game.tsx"
+    ],
+    "tests/hoa2-doi-ten-thu-2809.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/bi-a-lan-that-3009.test.ts": [
+      "src/game/bi-a/ve-ban.ts",
+      "src/game/bi-a/dieu-khien.ts",
+      "src/game/bi-a/bo-cuc.ts",
+      "src/game/bi-a/ve-bi.ts",
+      "src/game/bi-a/du-doan.ts"
+    ],
+    "tests/game-bo-nut-toan-man-hinh-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/omni-3-doan-hs.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/dao-tham-hiem-het-tran-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/btvn-m3-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/bao-hiem-ban-moi-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/vo-sheet-m3-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx",
+      "src/game/than-thu-v2/Game.tsx"
+    ],
+    "tests/doan2-co-tat.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/bi-a-muot.test.ts": [
+      "src/game/bi-a/bo-cuc.ts",
+      "src/game/bi-a/dieu-khien.ts"
+    ],
+    "tests/man-thi-m3-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/dao2-chuong-2809.test.tsx": [
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao2/ChuongTranDau.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/doan2-thang-cau-ha.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/DoanSanh.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/doan2-gach-phuong-an.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/bi-a-tran.test.ts": [
+      "src/game/bi-a/ai.ts"
+    ],
+    "tests/dang-nhap-hs-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/bi-a-shader-0110.test.ts": [
+      "src/game/bi-a/ve-bi.ts"
+    ],
+    "tests/omni-3-nut-tu-tin-0610.test.tsx": [
+      "src/game/than-thu-v2/NutTuTin.tsx"
+    ],
+    "tests/bi-a-dieu-khien-3009.test.tsx": [
+      "src/game/bi-a/ManChoi.tsx",
+      "src/game/bi-a/api.ts",
+      "src/game/bi-a/dieu-khien.ts",
+      "src/game/bi-a/dieu-khien-mang.ts",
+      "src/game/bi-a/dieu-khien-cham.ts",
+      "src/game/bi-a/cai-dat-bia.ts",
+      "src/game/bi-a/ve-bi.ts"
+    ],
+    "tests/dao2-ban-do-3d-2809.test.tsx": [
+      "src/game/than-thu-v2/dao2/BanDo.tsx",
+      "src/game/than-thu-v2/dao2/CanhDao3D.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/escort-question.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/EscortQuestion.tsx"
+    ],
+    "tests/dao-so-tay.test.tsx": [
+      "src/game/than-thu-v2/dao/SoTay.tsx",
+      "src/game/than-thu-v2/dao/dao-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/kinh-te-ui-2309.test.tsx": [
+      "src/game/than-thu-v2/dao/TuiDo.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/doan2-bua-tro-giang.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/doan2-danh-tiep-2809.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/hap-thu-man-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoCuaEm.tsx",
+      "src/game/than-thu-v2/dao/dao-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/cho-an-du-tru-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoCuaEm.tsx",
+      "src/game/than-thu-v2/dao/dao-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts",
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/o-nhap-dap-so-cac-noi-2109.test.tsx": [
+      "src/game/than-thu-v2/DoanCau.tsx"
+    ],
+    "tests/dao2-tran-dung-san-0510.test.tsx": [
+      "src/game/than-thu-v2/dao2/Dao2.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/omni-3-doan-tram-0610.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts",
+      "src/game/than-thu-v2/doan2/doan2.css",
+      "src/game/than-thu-v2/doan.css"
+    ],
+    "tests/shop-cua-vao-bo-cuc-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts",
+      "src/game/than-thu-v2/shop/chu-shop.ts",
+      "src/game/than-thu-v2/dao/ManShopThat.tsx"
+    ],
+    "tests/doan-anh-san-sang-2109.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/anh-san-sang.ts",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/omni-3-chi-so-ro-0510.test.tsx": [
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/doan2/XemLaiChuan.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts"
+    ],
+    "tests/doan-tran-khong-nhay-2109.test.tsx": [
+      "src/game/than-thu-v2/DoanTran.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/dao2-luong-2709.test.tsx": [
+      "src/game/than-thu-v2/dao2/Dao2.tsx",
+      "src/game/than-thu-v2/Game.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/bang-nhiem-vu-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/shop-man-2109.test.tsx": [
+      "src/game/than-thu-v2/shop/ManShop.tsx",
+      "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+      "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+      "src/game/than-thu-v2/shop/kieu.ts",
+      "src/game/than-thu-v2/shop/kieu.ts"
+    ],
+    "tests/hoa2-sanh-2709.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/bi-a-phong.test.ts": [
+      "src/game/bi-a/ai.ts"
+    ],
+    "tests/m3-c9-phu-huynh-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/doan-cua-bang-nhiem-vu-1909.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx",
+      "src/game/than-thu-v2/Game.tsx"
+    ],
+    "tests/may-yeu-2909.test.tsx": [
+      "src/game/than-thu-v2/dao2/ChuongTranDau.tsx"
+    ],
+    "tests/dao2-loi-giai-2709.test.tsx": [
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/bi-a-cua-sanh.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/ban-duyet-v2-0910.test.tsx": [
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao/ThanThuV2.tsx"
+    ],
+    "tests/shop-logic-2109.test.tsx": [
+      "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+      "src/game/than-thu-v2/shop/kieu.ts",
+      "src/game/than-thu-v2/shop/kieu.ts",
+      "src/game/than-thu-v2/shop/logic-shop.ts"
+    ],
+    "tests/doan-sanh-nut-khoa-2109.test.tsx": [
+      "src/game/than-thu-v2/DoanSanh.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/phu-kien-danh-muc-2109.test.ts": [
+      "src/game/than-thu-v2/phu-kien/phu-kien-mon.ts"
+    ],
+    "tests/shop-khoa-nguon-2109.test.tsx": [
+      "src/game/than-thu-v2/shop/chu-shop.ts",
+      "src/game/than-thu-v2/shop/chu-shop.ts"
+    ],
+    "tests/mo-bai-tu-bang-tin.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/bi-a-thoat-giua-van-3009.test.tsx": [
+      "src/game/bi-a/BiaGame.tsx",
+      "src/game/bi-a/ManChoi.tsx",
+      "src/game/bi-a/TraLoiCau.tsx",
+      "src/game/bi-a/api.ts",
+      "src/game/bi-a/dieu-khien.ts"
+    ],
+    "tests/doan-tran-chon-dap-an-2109.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/doan-khoan-exp-2109.test.tsx": [
+      "src/game/than-thu-v2/DoanKetChang.tsx",
+      "src/game/than-thu-v2/doan-khoan-exp.ts"
+    ],
+    "tests/canh-bao-thay-the-2109.test.tsx": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/doan2-bo-cuc-ngang-2809.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/bi-a-gay.test.ts": [
+      "src/game/bi-a/gay.ts",
+      "src/game/bi-a/dieu-khien-cham.ts"
+    ],
+    "tests/dao2-ngang-2809.test.tsx": [
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "src/game/than-thu-v2/dao2/BanDo.tsx",
+      "src/game/than-thu-v2/dao2/XongChuyen.tsx",
+      "src/game/than-thu-v2/dao2/ngang.ts",
+      "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/ghim-khung-tran-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/ThamHiem.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ],
+    "tests/shop-cua-vao-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts",
+      "src/game/than-thu-v2/shop/may-chu-that.ts",
+      "src/game/than-thu-v2/shop/kieu.ts",
+      "src/game/than-thu-v2/shop/chu-shop.ts",
+      "src/game/than-thu-v2/dao/ManShopThat.tsx",
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/cau-tu-luan-doan-2109.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "tests/evolution-v2.test.ts": [
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/tu-ngu-cum1-2109.test.tsx": [
+      "src/game/than-thu-v2/dao/ThamHiem.tsx",
+      "src/game/than-thu-v2/dao/ThamHiem.tsx",
+      "src/game/than-thu-v2/dao/kieu.ts",
+      "src/game/than-thu-v2/Spirit2D.tsx"
+    ],
+    "tests/doan2-phu-2809.test.tsx": [
+      "src/game/than-thu-v2/battle-audio.ts",
+      "src/game/than-thu-v2/DoanTungChuong.tsx",
+      "src/game/than-thu-v2/DoanTiepSuc.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts"
+    ],
+    "scripts/preview-bat-linh/bieu-cam.tsx": [
+      "src/game/than-thu-v2/DoanHinh.tsx",
+      "src/game/than-thu-v2/XeLinhTam.tsx",
+      "src/game/than-thu-v2/doan.css"
+    ],
+    "scripts/preview-bat-linh/chuong.tsx": [
+      "src/game/than-thu-v2/DoanTungChuong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts",
+      "src/game/than-thu-v2/doan.css",
+      "src/game/than-thu-v2/doan2/doan2.css"
+    ],
+    "scripts/preview-bat-linh/games.tsx": [
+      "src/game/than-thu-v2/dao/xem-thu.tsx",
+      "src/game/than-thu-v2/shop/xem-thu.tsx",
+      "src/game/than-thu-v2/doan2/xem-thu-2.tsx",
+      "src/game/bi-a/xem-thu.tsx",
+      "src/game/than-thu-v2/dao2/xem-thu.tsx"
+    ],
+    "scripts/chup-v2/trang.tsx": [
+      "src/game/than-thu-v2/game.css",
+      "src/game/than-thu-v2/dao/dao.css",
+      "src/game/than-thu-v2/dao/ThanThuV2.tsx",
+      "src/game/than-thu-v2/shop/ManShop.tsx",
+      "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+      "src/game/than-thu-v2/phu-kien/ThuMacDo.tsx",
+      "src/game/than-thu-v2/phu-kien/HinhVatPham.tsx",
+      "src/game/than-thu-v2/dao2/Dao2.tsx",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts",
+      "src/game/than-thu-v2/dao/kieu.ts",
+      "src/game/than-thu-v2/dao2/DeThu.tsx"
+    ],
+    "scripts/do-app-hs/may-chu-gia.ts": [
+      "src/game/than-thu-v2/shop/du-lieu-mau.ts"
+    ],
+    "scripts/do-bia/may-chu.do.test.ts": [
+      "src/game/bi-a/ai.ts"
+    ],
+    "scripts/chup-omni-3/trang.tsx": [
+      "src/game/than-thu-v2/dao2/Dao2.tsx",
+      "src/game/than-thu-v2/DoanHoTong.tsx",
+      "src/game/than-thu-v2/doan-kieu.ts",
+      "src/game/than-thu-v2/game.css",
+      "src/game/than-thu-v2/dao/dao.css",
+      "src/game/than-thu-v2/dao/kieu.ts"
+    ]
+  },
+  "publicFiles": [
+    {
+      "file": "public/logo-hs-180-v3.png",
+      "bytes": 14010
+    },
+    {
+      "file": "public/hs.mobileconfig",
+      "bytes": 21695
+    },
+    {
+      "file": "public/logo-gv-180-v3.png",
+      "bytes": 16296
+    },
+    {
+      "file": "public/404.html",
+      "bytes": 2903
+    },
+    {
+      "file": "public/logo-ph-180-v3.png",
+      "bytes": 13167
+    },
+    {
+      "file": "public/logo-hs-v3.svg",
+      "bytes": 33075
+    },
+    {
+      "file": "public/logo-hs-192-v3.png",
+      "bytes": 15488
+    },
+    {
+      "file": "public/icons.svg",
+      "bytes": 5031
+    },
+    {
+      "file": "public/logo-ph-512-maskable-v3.png",
+      "bytes": 62135
+    },
+    {
+      "file": "public/logo-gv-64-v3.png",
+      "bytes": 4529
+    },
+    {
+      "file": "public/logo-gv-192-v3.png",
+      "bytes": 17877
+    },
+    {
+      "file": "public/logo-ph-192-v3.png",
+      "bytes": 14534
+    },
+    {
+      "file": "public/cai-kiem-toc-do.html",
+      "bytes": 7226
+    },
+    {
+      "file": "public/logo-ph-nho-v3.svg",
+      "bytes": 1607
+    },
+    {
+      "file": "public/robots.txt",
+      "bytes": 169
+    },
+    {
+      "file": "public/manifest-hs.json",
+      "bytes": 881
+    },
+    {
+      "file": "public/icon-512.png",
+      "bytes": 96425
+    },
+    {
+      "file": "public/logo-gv-512-v3.png",
+      "bytes": 96425
+    },
+    {
+      "file": "public/logo-gv-nho-v3.svg",
+      "bytes": 21979
+    },
+    {
+      "file": "public/favicon.svg",
+      "bytes": 21979
+    },
+    {
+      "file": "public/logo-ph-64-v3.png",
+      "bytes": 4054
+    },
+    {
+      "file": "public/cai-dat.html",
+      "bytes": 22915
+    },
+    {
+      "file": "public/ph.mobileconfig",
+      "bytes": 20489
+    },
+    {
+      "file": "public/manifest-ph.json",
+      "bytes": 876
+    },
+    {
+      "file": "public/logo-gv-512-maskable-v3.png",
+      "bytes": 81740
+    },
+    {
+      "file": "public/sw-version.json",
+      "bytes": 22
+    },
+    {
+      "file": "public/_redirects",
+      "bytes": 1790
+    },
+    {
+      "file": "public/icon-192.png",
+      "bytes": 17877
+    },
+    {
+      "file": "public/logo-hs-512-v3.png",
+      "bytes": 80711
+    },
+    {
+      "file": "public/cai-app.html",
+      "bytes": 22915
+    },
+    {
+      "file": "public/logo-hs-64-v3.png",
+      "bytes": 4288
+    },
+    {
+      "file": "public/icon-512-maskable.png",
+      "bytes": 81740
+    },
+    {
+      "file": "public/logo-ph-512-v3.png",
+      "bytes": 73852
+    },
+    {
+      "file": "public/apple-touch-icon.png",
+      "bytes": 16296
+    },
+    {
+      "file": "public/logo-hs-512-maskable-v3.png",
+      "bytes": 68672
+    },
+    {
+      "file": "public/cau-hinh.json",
+      "bytes": 492
+    },
+    {
+      "file": "public/_headers",
+      "bytes": 857
+    },
+    {
+      "file": "public/logo-gv-v3.svg",
+      "bytes": 32661
+    },
+    {
+      "file": "public/logo-huy-hieu-96-v3.png",
+      "bytes": 1434
+    },
+    {
+      "file": "public/manifest.json",
+      "bytes": 865
+    },
+    {
+      "file": "public/logo-ph-v3.svg",
+      "bytes": 1922
+    },
+    {
+      "file": "public/logo-hs-nho-v3.svg",
+      "bytes": 22179
+    },
+    {
+      "file": "public/cai-app/index.html",
+      "bytes": 22915
+    },
+    {
+      "file": "public/loi-giai/khung.html",
+      "bytes": 408447
+    },
+    {
+      "file": "public/than-thu-v2/evolution-elements-cutout.webp",
+      "bytes": 622574
+    },
+    {
+      "file": "public/than-thu-v2/evolution-elements-cutout.png",
+      "bytes": 3145396
+    },
+    {
+      "file": "public/than-thu-v2/evolution-virtues-cutout.png",
+      "bytes": 2928093
+    },
+    {
+      "file": "public/than-thu-v2/evolution-virtues-cutout.webp",
+      "bytes": 582876
+    },
+    {
+      "file": "public/bat-linh/canh-ho-tong-nho.webp",
+      "bytes": 141906
+    },
+    {
+      "file": "public/bat-linh/bieu-cam-1.webp",
+      "bytes": 602630
+    },
+    {
+      "file": "public/bat-linh/quai-son-thuy.webp",
+      "bytes": 661860
+    },
+    {
+      "file": "public/bat-linh/bieu-cam-2.webp",
+      "bytes": 704718
+    },
+    {
+      "file": "public/bat-linh/canh-dao.webp",
+      "bytes": 273142
+    },
+    {
+      "file": "public/bat-linh/canh-dao-nho.webp",
+      "bytes": 106152
+    },
+    {
+      "file": "public/bat-linh/xe-linh-tam.webp",
+      "bytes": 230220
+    },
+    {
+      "file": "public/bat-linh/ban-do-dao-nho.webp",
+      "bytes": 261336
+    },
+    {
+      "file": "public/bat-linh/ban-do-dao.webp",
+      "bytes": 557252
+    },
+    {
+      "file": "public/bat-linh/canh-ho-tong.webp",
+      "bytes": 356220
+    },
+    {
+      "file": "public/than-thu-v2/spells/water.webp",
+      "bytes": 705464
+    },
+    {
+      "file": "public/than-thu-v2/spells/faith.webp",
+      "bytes": 650890
+    },
+    {
+      "file": "public/than-thu-v2/spells/fire.webp",
+      "bytes": 384318
+    },
+    {
+      "file": "public/than-thu-v2/spells/wind.png",
+      "bytes": 2548489
+    },
+    {
+      "file": "public/than-thu-v2/spells/love.png",
+      "bytes": 2436310
+    },
+    {
+      "file": "public/than-thu-v2/spells/gratitude.png",
+      "bytes": 2567839
+    },
+    {
+      "file": "public/than-thu-v2/spells/wind.webp",
+      "bytes": 522266
+    },
+    {
+      "file": "public/than-thu-v2/spells/earth.png",
+      "bytes": 2475709
+    },
+    {
+      "file": "public/than-thu-v2/spells/love.webp",
+      "bytes": 520450
+    },
+    {
+      "file": "public/than-thu-v2/spells/water.png",
+      "bytes": 2818390
+    },
+    {
+      "file": "public/than-thu-v2/spells/gratitude.webp",
+      "bytes": 551736
+    },
+    {
+      "file": "public/than-thu-v2/spells/awareness.webp",
+      "bytes": 547352
+    },
+    {
+      "file": "public/than-thu-v2/spells/fire.png",
+      "bytes": 2232840
+    },
+    {
+      "file": "public/than-thu-v2/spells/earth.webp",
+      "bytes": 495928
+    },
+    {
+      "file": "public/than-thu-v2/spells/faith.png",
+      "bytes": 2775472
+    },
+    {
+      "file": "public/than-thu-v2/spells/awareness.png",
+      "bytes": 2412131
+    },
+    {
+      "file": "public/than-thu-v2/combat/7.png",
+      "bytes": 2496909
+    },
+    {
+      "file": "public/than-thu-v2/combat/5.png",
+      "bytes": 2230481
+    },
+    {
+      "file": "public/than-thu-v2/combat/0.png",
+      "bytes": 2658617
+    },
+    {
+      "file": "public/than-thu-v2/combat/1.png",
+      "bytes": 2399890
+    },
+    {
+      "file": "public/than-thu-v2/combat/3.png",
+      "bytes": 2290755
+    },
+    {
+      "file": "public/than-thu-v2/combat/2.png",
+      "bytes": 2330849
+    },
+    {
+      "file": "public/than-thu-v2/combat/4.png",
+      "bytes": 2597942
+    },
+    {
+      "file": "public/than-thu-v2/combat/6.png",
+      "bytes": 2425708
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-1.webp",
+      "bytes": 20162
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-6-binh-thuong.webp",
+      "bytes": 54112
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-5.webp",
+      "bytes": 36234
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-5.webp",
+      "bytes": 55446
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-5.webp",
+      "bytes": 61154
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-4.webp",
+      "bytes": 48508
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-3-be.webp",
+      "bytes": 6176
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-3-cuong-no.webp",
+      "bytes": 54138
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-7-binh-thuong.webp",
+      "bytes": 49868
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-2-be.webp",
+      "bytes": 5444
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-0.webp",
+      "bytes": 14858
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-1-be.webp",
+      "bytes": 5202
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-1.webp",
+      "bytes": 22316
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-4-binh-thuong.webp",
+      "bytes": 56978
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-0-cuong-no.webp",
+      "bytes": 88806
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-3-be.webp",
+      "bytes": 6094
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-4-be.webp",
+      "bytes": 8920
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-3.webp",
+      "bytes": 32046
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-1-be.webp",
+      "bytes": 4138
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-5-be.webp",
+      "bytes": 8268
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-5-cuong-no.webp",
+      "bytes": 58354
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-3-be.webp",
+      "bytes": 6750
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-1-be.webp",
+      "bytes": 4100
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-2.webp",
+      "bytes": 31748
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-3-be.webp",
+      "bytes": 5554
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-7-cuong-no.webp",
+      "bytes": 62458
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-0-be.webp",
+      "bytes": 3132
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-2.webp",
+      "bytes": 35926
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-1.webp",
+      "bytes": 18230
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-5.webp",
+      "bytes": 50030
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-5.webp",
+      "bytes": 52090
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-4.webp",
+      "bytes": 30816
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-3.webp",
+      "bytes": 27972
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-3.webp",
+      "bytes": 48232
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-2.webp",
+      "bytes": 27178
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-3.webp",
+      "bytes": 39666
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-4-be.webp",
+      "bytes": 8096
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-4.webp",
+      "bytes": 52210
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-5-be.webp",
+      "bytes": 7210
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-4.webp",
+      "bytes": 47798
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-3.webp",
+      "bytes": 37850
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-5.webp",
+      "bytes": 46596
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-5.webp",
+      "bytes": 55876
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-1-be.webp",
+      "bytes": 4302
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-3.webp",
+      "bytes": 34998
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-0.webp",
+      "bytes": 13566
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-1-be.webp",
+      "bytes": 4564
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-2-cuong-no.webp",
+      "bytes": 70956
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-0.webp",
+      "bytes": 15666
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-5-be.webp",
+      "bytes": 8652
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-3-be.webp",
+      "bytes": 8520
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-4.webp",
+      "bytes": 46230
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-2-be.webp",
+      "bytes": 6024
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-1-be.webp",
+      "bytes": 3780
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-0-be.webp",
+      "bytes": 3380
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-5-binh-thuong.webp",
+      "bytes": 45138
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-0.webp",
+      "bytes": 13882
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-5-be.webp",
+      "bytes": 11226
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-1.webp",
+      "bytes": 20426
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-0-be.webp",
+      "bytes": 3196
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-0-binh-thuong.webp",
+      "bytes": 70512
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-3-be.webp",
+      "bytes": 6908
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-2-be.webp",
+      "bytes": 6762
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-4-cuong-no.webp",
+      "bytes": 77050
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-0.webp",
+      "bytes": 15714
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-0-be.webp",
+      "bytes": 3900
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-4.webp",
+      "bytes": 40728
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-3-be.webp",
+      "bytes": 7206
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-2-be.webp",
+      "bytes": 7902
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-1.webp",
+      "bytes": 23206
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-4-be.webp",
+      "bytes": 8174
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-3-binh-thuong.webp",
+      "bytes": 40562
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-0.webp",
+      "bytes": 16110
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-1-cuong-no.webp",
+      "bytes": 79154
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-2.webp",
+      "bytes": 28760
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-3-be.webp",
+      "bytes": 7074
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-4.webp",
+      "bytes": 60962
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-2-be.webp",
+      "bytes": 5246
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-4-be.webp",
+      "bytes": 6100
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-0-be.webp",
+      "bytes": 3382
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-5-be.webp",
+      "bytes": 9452
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-5-be.webp",
+      "bytes": 9072
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-5-be.webp",
+      "bytes": 9368
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-1.webp",
+      "bytes": 20708
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-3.webp",
+      "bytes": 33008
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-3-1-be.webp",
+      "bytes": 4550
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-0.webp",
+      "bytes": 14568
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-5.webp",
+      "bytes": 57652
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-5-be.webp",
+      "bytes": 9632
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-1.webp",
+      "bytes": 26956
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-2.webp",
+      "bytes": 28830
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-1-be.webp",
+      "bytes": 4266
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-2.webp",
+      "bytes": 22076
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-5-2-be.webp",
+      "bytes": 4548
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-2.webp",
+      "bytes": 31754
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-0-be.webp",
+      "bytes": 3406
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-2-be.webp",
+      "bytes": 6426
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-4-be.webp",
+      "bytes": 10274
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-1-binh-thuong.webp",
+      "bytes": 51608
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-7-0-be.webp",
+      "bytes": 3170
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-4-be.webp",
+      "bytes": 7706
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-4-2-be.webp",
+      "bytes": 5708
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-6-3.webp",
+      "bytes": 37460
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-4-be.webp",
+      "bytes": 9130
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-6-cuong-no.webp",
+      "bytes": 65870
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-4.webp",
+      "bytes": 48490
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-1.webp",
+      "bytes": 21076
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-0-0-be.webp",
+      "bytes": 3436
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-0.webp",
+      "bytes": 18226
+    },
+    {
+      "file": "public/than-thu-v2/nho/the-2-binh-thuong.webp",
+      "bytes": 51020
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-2-4-be.webp",
+      "bytes": 8544
+    },
+    {
+      "file": "public/than-thu-v2/nho/thu-1-2.webp",
+      "bytes": 43060
+    }
+  ],
+  "sourceGroups": {
+    "src/game/bi-a/": {
+      "files": 25,
+      "bytes": 341071
+    },
+    "src/game/than-thu-v2/dao/": {
+      "files": 15,
+      "bytes": 164857
+    },
+    "src/game/than-thu-v2/dao2/": {
+      "files": 20,
+      "bytes": 200782
+    },
+    "src/game/than-thu-v2/doan2/": {
+      "files": 11,
+      "bytes": 98280
+    },
+    "src/game/than-thu-v2/phu-kien/": {
+      "files": 39,
+      "bytes": 84228
+    },
+    "src/game/than-thu-v2/shop/": {
+      "files": 21,
+      "bytes": 149592
+    }
+  },
+  "assetGroups": {
+    "combat_unused_runtime_now": {
+      "files": 8,
+      "bytes": 19431151,
+      "paths": [
+        "public/than-thu-v2/combat/7.png",
+        "public/than-thu-v2/combat/5.png",
+        "public/than-thu-v2/combat/0.png",
+        "public/than-thu-v2/combat/1.png",
+        "public/than-thu-v2/combat/3.png",
+        "public/than-thu-v2/combat/2.png",
+        "public/than-thu-v2/combat/4.png",
+        "public/than-thu-v2/combat/6.png"
+      ]
+    },
+    "spells_only_deleted_game_visuals": {
+      "files": 16,
+      "bytes": 24645584,
+      "paths": [
+        "public/than-thu-v2/spells/water.webp",
+        "public/than-thu-v2/spells/faith.webp",
+        "public/than-thu-v2/spells/fire.webp",
+        "public/than-thu-v2/spells/wind.png",
+        "public/than-thu-v2/spells/love.png",
+        "public/than-thu-v2/spells/gratitude.png",
+        "public/than-thu-v2/spells/wind.webp",
+        "public/than-thu-v2/spells/earth.png",
+        "public/than-thu-v2/spells/love.webp",
+        "public/than-thu-v2/spells/water.png",
+        "public/than-thu-v2/spells/gratitude.webp",
+        "public/than-thu-v2/spells/awareness.webp",
+        "public/than-thu-v2/spells/fire.png",
+        "public/than-thu-v2/spells/earth.webp",
+        "public/than-thu-v2/spells/faith.png",
+        "public/than-thu-v2/spells/awareness.png"
+      ]
+    },
+    "cards_only_deleted_game_visuals": {
+      "files": 16,
+      "bytes": 976584,
+      "paths": [
+        "public/than-thu-v2/nho/the-6-binh-thuong.webp",
+        "public/than-thu-v2/nho/the-3-cuong-no.webp",
+        "public/than-thu-v2/nho/the-7-binh-thuong.webp",
+        "public/than-thu-v2/nho/the-4-binh-thuong.webp",
+        "public/than-thu-v2/nho/the-0-cuong-no.webp",
+        "public/than-thu-v2/nho/the-5-cuong-no.webp",
+        "public/than-thu-v2/nho/the-7-cuong-no.webp",
+        "public/than-thu-v2/nho/the-2-cuong-no.webp",
+        "public/than-thu-v2/nho/the-5-binh-thuong.webp",
+        "public/than-thu-v2/nho/the-0-binh-thuong.webp",
+        "public/than-thu-v2/nho/the-4-cuong-no.webp",
+        "public/than-thu-v2/nho/the-3-binh-thuong.webp",
+        "public/than-thu-v2/nho/the-1-cuong-no.webp",
+        "public/than-thu-v2/nho/the-1-binh-thuong.webp",
+        "public/than-thu-v2/nho/the-6-cuong-no.webp",
+        "public/than-thu-v2/nho/the-2-binh-thuong.webp"
+      ]
+    },
+    "island_path_only_unreachable_or_deleted": {
+      "files": 4,
+      "bytes": 1710668,
+      "paths": [
+        "public/bat-linh/ban-do-dao.webp",
+        "public/bat-linh/ban-do-dao-nho.webp",
+        "public/bat-linh/xe-linh-tam.webp",
+        "public/bat-linh/quai-son-thuy.webp"
+      ]
+    },
+    "keep_current_login_parent_projection_pet_images": {
+      "files": 96,
+      "bytes": 1931124,
+      "paths": [
+        "public/than-thu-v2/nho/thu-5-1.webp",
+        "public/than-thu-v2/nho/thu-5-5.webp",
+        "public/than-thu-v2/nho/thu-7-5.webp",
+        "public/than-thu-v2/nho/thu-6-5.webp",
+        "public/than-thu-v2/nho/thu-3-4.webp",
+        "public/than-thu-v2/nho/thu-4-3-be.webp",
+        "public/than-thu-v2/nho/thu-3-2-be.webp",
+        "public/than-thu-v2/nho/thu-3-0.webp",
+        "public/than-thu-v2/nho/thu-1-1-be.webp",
+        "public/than-thu-v2/nho/thu-3-1.webp",
+        "public/than-thu-v2/nho/thu-7-3-be.webp",
+        "public/than-thu-v2/nho/thu-3-4-be.webp",
+        "public/than-thu-v2/nho/thu-4-3.webp",
+        "public/than-thu-v2/nho/thu-4-1-be.webp",
+        "public/than-thu-v2/nho/thu-0-5-be.webp",
+        "public/than-thu-v2/nho/thu-3-3-be.webp",
+        "public/than-thu-v2/nho/thu-0-1-be.webp",
+        "public/than-thu-v2/nho/thu-0-2.webp",
+        "public/than-thu-v2/nho/thu-5-3-be.webp",
+        "public/than-thu-v2/nho/thu-5-0-be.webp",
+        "public/than-thu-v2/nho/thu-2-2.webp",
+        "public/than-thu-v2/nho/thu-7-1.webp",
+        "public/than-thu-v2/nho/thu-2-5.webp",
+        "public/than-thu-v2/nho/thu-3-5.webp",
+        "public/than-thu-v2/nho/thu-5-4.webp",
+        "public/than-thu-v2/nho/thu-5-3.webp",
+        "public/than-thu-v2/nho/thu-1-3.webp",
+        "public/than-thu-v2/nho/thu-7-2.webp",
+        "public/than-thu-v2/nho/thu-2-3.webp",
+        "public/than-thu-v2/nho/thu-4-4-be.webp",
+        "public/than-thu-v2/nho/thu-1-4.webp",
+        "public/than-thu-v2/nho/thu-5-5-be.webp",
+        "public/than-thu-v2/nho/thu-7-4.webp",
+        "public/than-thu-v2/nho/thu-0-3.webp",
+        "public/than-thu-v2/nho/thu-0-5.webp",
+        "public/than-thu-v2/nho/thu-1-5.webp",
+        "public/than-thu-v2/nho/thu-6-1-be.webp",
+        "public/than-thu-v2/nho/thu-3-3.webp",
+        "public/than-thu-v2/nho/thu-7-0.webp",
+        "public/than-thu-v2/nho/thu-2-1-be.webp",
+        "public/than-thu-v2/nho/thu-6-0.webp",
+        "public/than-thu-v2/nho/thu-2-5-be.webp",
+        "public/than-thu-v2/nho/thu-1-3-be.webp",
+        "public/than-thu-v2/nho/thu-4-4.webp",
+        "public/than-thu-v2/nho/thu-0-2-be.webp",
+        "public/than-thu-v2/nho/thu-7-1-be.webp",
+        "public/than-thu-v2/nho/thu-3-0-be.webp",
+        "public/than-thu-v2/nho/thu-5-0.webp",
+        "public/than-thu-v2/nho/thu-6-5-be.webp",
+        "public/than-thu-v2/nho/thu-4-1.webp",
+        "public/than-thu-v2/nho/thu-4-0-be.webp",
+        "public/than-thu-v2/nho/thu-0-3-be.webp",
+        "public/than-thu-v2/nho/thu-2-2-be.webp",
+        "public/than-thu-v2/nho/thu-1-0.webp",
+        "public/than-thu-v2/nho/thu-2-0-be.webp",
+        "public/than-thu-v2/nho/thu-0-4.webp",
+        "public/than-thu-v2/nho/thu-2-3-be.webp",
+        "public/than-thu-v2/nho/thu-1-2-be.webp",
+        "public/than-thu-v2/nho/thu-2-1.webp",
+        "public/than-thu-v2/nho/thu-7-4-be.webp",
+        "public/than-thu-v2/nho/thu-0-0.webp",
+        "public/than-thu-v2/nho/thu-3-2.webp",
+        "public/than-thu-v2/nho/thu-6-3-be.webp",
+        "public/than-thu-v2/nho/thu-6-4.webp",
+        "public/than-thu-v2/nho/thu-7-2-be.webp",
+        "public/than-thu-v2/nho/thu-5-4-be.webp",
+        "public/than-thu-v2/nho/thu-1-0-be.webp",
+        "public/than-thu-v2/nho/thu-1-5-be.webp",
+        "public/than-thu-v2/nho/thu-3-5-be.webp",
+        "public/than-thu-v2/nho/thu-7-5-be.webp",
+        "public/than-thu-v2/nho/thu-6-1.webp",
+        "public/than-thu-v2/nho/thu-7-3.webp",
+        "public/than-thu-v2/nho/thu-3-1-be.webp",
+        "public/than-thu-v2/nho/thu-4-0.webp",
+        "public/than-thu-v2/nho/thu-4-5.webp",
+        "public/than-thu-v2/nho/thu-4-5-be.webp",
+        "public/than-thu-v2/nho/thu-1-1.webp",
+        "public/than-thu-v2/nho/thu-4-2.webp",
+        "public/than-thu-v2/nho/thu-5-1-be.webp",
+        "public/than-thu-v2/nho/thu-5-2.webp",
+        "public/than-thu-v2/nho/thu-5-2-be.webp",
+        "public/than-thu-v2/nho/thu-6-2.webp",
+        "public/than-thu-v2/nho/thu-6-0-be.webp",
+        "public/than-thu-v2/nho/thu-6-2-be.webp",
+        "public/than-thu-v2/nho/thu-6-4-be.webp",
+        "public/than-thu-v2/nho/thu-7-0-be.webp",
+        "public/than-thu-v2/nho/thu-0-4-be.webp",
+        "public/than-thu-v2/nho/thu-4-2-be.webp",
+        "public/than-thu-v2/nho/thu-6-3.webp",
+        "public/than-thu-v2/nho/thu-1-4-be.webp",
+        "public/than-thu-v2/nho/thu-2-4.webp",
+        "public/than-thu-v2/nho/thu-0-1.webp",
+        "public/than-thu-v2/nho/thu-0-0-be.webp",
+        "public/than-thu-v2/nho/thu-2-0.webp",
+        "public/than-thu-v2/nho/thu-2-4-be.webp",
+        "public/than-thu-v2/nho/thu-1-2.webp"
+      ]
+    },
+    "keep_current_projection_atlas_and_fallbacks": {
+      "files": 4,
+      "bytes": 7278939,
+      "paths": [
+        "public/than-thu-v2/evolution-elements-cutout.webp",
+        "public/than-thu-v2/evolution-elements-cutout.png",
+        "public/than-thu-v2/evolution-virtues-cutout.png",
+        "public/than-thu-v2/evolution-virtues-cutout.webp"
+      ]
+    },
+    "keep_current_parent_expression_images": {
+      "files": 2,
+      "bytes": 1307348,
+      "paths": [
+        "public/bat-linh/bieu-cam-1.webp",
+        "public/bat-linh/bieu-cam-2.webp"
+      ]
+    },
+    "keep_global_shell_backgrounds_until_main_css_removed": {
+      "files": 4,
+      "bytes": 877420,
+      "paths": [
+        "public/bat-linh/canh-dao.webp",
+        "public/bat-linh/canh-dao-nho.webp",
+        "public/bat-linh/canh-ho-tong.webp",
+        "public/bat-linh/canh-ho-tong-nho.webp"
+      ]
+    }
+  },
+  "obsoleteBuiltChunkPrefixes": [
+    {
+      "file": "dist/assets/DoanHoTong-CM5AkOg1.js",
+      "bytes": 87171,
+      "gzip": 26518
+    },
+    {
+      "file": "dist/assets/Dao2-CDZZ0kHB.css",
+      "bytes": 55499,
+      "gzip": 11906
+    },
+    {
+      "file": "dist/assets/Game-BoRsrS7Y.css",
+      "bytes": 53885,
+      "gzip": 12038
+    },
+    {
+      "file": "dist/assets/DoanHoTong-CMfhpLcq.css",
+      "bytes": 80500,
+      "gzip": 15431
+    },
+    {
+      "file": "dist/assets/Game-CkkeuKya.js",
+      "bytes": 59673,
+      "gzip": 20539
+    },
+    {
+      "file": "dist/assets/DaoThanThu-DSBKnvzD.js",
+      "bytes": 61770,
+      "gzip": 20208
+    },
+    {
+      "file": "dist/assets/Dao2-BtFvB5gp.js",
+      "bytes": 63727,
+      "gzip": 20917
+    },
+    {
+      "file": "dist/assets/DaoThanThu-DER82lht.css",
+      "bytes": 45646,
+      "gzip": 9496
+    },
+    {
+      "file": "dist/assets/DoanHinh-maH_fLmX.js",
+      "bytes": 2785,
+      "gzip": 1167
+    }
+  ],
+  "baseline": {
+    "appGzipBytes": {
+      "gv": 275640,
+      "hs": 338694,
+      "ph": 272831
+    },
+    "swFiles": 169,
+    "swKiB": 2726.78
+  },
+  "removeNotes": [
+    "Only after 00:00 VN on 2026-10-14",
+    "First remove unused Game module initializer in man-sanh-luoi.ts or split school preload module",
+    "Do not delete current learning/auth/EXP/shared game-v2 modules nor database rows/schema",
+    "Game visual tests removed with products; mock-only game imports in real learning tests must be removed/replaced while retaining actual assertions",
+    "DurableObject BanBiA export/binding stays unless coordinated Worker compatibility shell retains configured class",
+    "three is still used by teacher class map and cannot be uninstalled"
+  ],
+  "danglingNonEntrySrcCallersToRemoveOrAdaptWithOwners": [
+    "src/components/bang-nhiem-vu/BangNhiemVu.tsx",
+    "src/components/bang-nhiem-vu/DauTrang.tsx",
+    "src/components/bang-nhiem-vu/TheVinhDanh.tsx",
+    "src/components/hoa2/man-sanh-luoi.ts",
+    "src/components/xem-thu/phu-kien.tsx"
+  ],
+  "mockOnlyRetiredVisualReferencesInCurrentLearningTests": [
+    "tests/ph-khong-game-2109.test.tsx",
+    "tests/bang-nhiem-vu-may-chu-1909.test.tsx",
+    "tests/ph-token-1909.test.tsx",
+    "tests/dang-lam-moi-1909.test.tsx",
+    "tests/giao-them-cho-con-man-2109.test.tsx",
+    "tests/lich-su-ca-m3-1909.test.tsx",
+    "tests/the-ca-gan-nhat-2109.test.tsx",
+    "tests/thi-dua-2109.test.tsx",
+    "tests/vao-thi-form-m3-1909.test.tsx",
+    "tests/ve-dich-the-2109.test.tsx",
+    "tests/mom-m3-1909.test.tsx",
+    "tests/hoa2-doi-ten-thu-2809.test.tsx",
+    "tests/btvn-m3-1909.test.tsx",
+    "tests/bao-hiem-ban-moi-2109.test.tsx",
+    "tests/man-thi-m3-1909.test.tsx",
+    "tests/dang-nhap-hs-1909.test.tsx",
+    "tests/bang-nhiem-vu-1909.test.tsx",
+    "tests/hoa2-sanh-2709.test.tsx",
+    "tests/m3-c9-phu-huynh-1909.test.tsx",
+    "tests/bi-a-cua-sanh.test.tsx",
+    "tests/mo-bai-tu-bang-tin.test.tsx",
+    "tests/canh-bao-thay-the-2109.test.tsx",
+    "tests/evolution-v2.test.ts"
+  ],
+  "testsWithActualRetiredGameTargetsRequiringCaseReview": [
+    "tests/chu-het-luot-2109.test.ts",
+    "tests/bi-a-am-thanh.test.ts",
+    "tests/dao-cua-em.test.tsx",
+    "tests/phu-kien-mac-do-2109.test.tsx",
+    "tests/omni-can-than-dao-hs-0610.test.tsx",
+    "tests/bi-a-ket-noi.test.ts",
+    "tests/bi-a-mat-than-tra-loi.test.tsx",
+    "tests/doan-cua-vao.test.tsx",
+    "tests/phu-kien-dat-do-trinh-duyet-2109.test.ts",
+    "tests/omni-3-dao-hs.test.tsx",
+    "tests/bi-a-luat.test.ts",
+    "tests/bi-a-ve-vung-ban-3009.test.ts",
+    "tests/than-thu-v2.test.ts",
+    "tests/phu-kien-mac-do-trinh-duyet-2109.test.ts",
+    "tests/bi-a-sanh-it-cau-3009.test.tsx",
+    "tests/dao-chon-ban-dong-hanh.test.tsx",
+    "tests/dao2-khoa-2709.test.tsx",
+    "tests/doan-cuon-mobile-1010.test.tsx",
+    "tests/hieu-ung-exp-cau-2909.test.tsx",
+    "tests/toan-man-hinh-game-2109.test.tsx",
+    "tests/dao-luot-ngay-2109.test.tsx",
+    "tests/tu-ngu-cum6-2109.test.tsx",
+    "tests/dao2-cot-loi-2709.test.tsx",
+    "tests/bi-a-ban-online.test.tsx",
+    "tests/escort-context-menu.test.tsx",
+    "tests/bi-a-van-mang.test.ts",
+    "tests/bi-a-man-choi.test.tsx",
+    "tests/ngang-so-tay-tui-shop-2809.test.tsx",
+    "tests/doan-tran-cap-rieng-2109.test.tsx",
+    "tests/doan2-loi-giai-chuan.test.tsx",
+    "tests/omni-can-than-doan-hs-0610.test.tsx",
+    "tests/doan-sanh-hep-2109.test.tsx",
+    "tests/shop-bo-cuc-2109.test.tsx",
+    "tests/dao-than-thu-vo.test.tsx",
+    "tests/chuyen-man-nhanh-0510.test.tsx",
+    "tests/may-yeu-toan-dien-2909.test.tsx",
+    "tests/bang-song-sinh-hien-thi-0210.test.tsx",
+    "tests/dao2-gach-2709.test.tsx",
+    "tests/dao2-man-dau-tui-do-2709.test.tsx",
+    "tests/bi-a-ngang.test.tsx",
+    "tests/doan-giao-dien.test.tsx",
+    "tests/dao-tham-hiem.test.tsx",
+    "tests/cau-tu-luan-may-hs-2109.test.tsx",
+    "tests/bi-a-lan-that-3009.test.ts",
+    "tests/game-bo-nut-toan-man-hinh-2109.test.tsx",
+    "tests/omni-3-doan-hs.test.tsx",
+    "tests/dao-tham-hiem-het-tran-2109.test.tsx",
+    "tests/vo-sheet-m3-1909.test.tsx",
+    "tests/doan2-co-tat.test.tsx",
+    "tests/bi-a-muot.test.ts",
+    "tests/dao2-chuong-2809.test.tsx",
+    "tests/doan2-thang-cau-ha.test.tsx",
+    "tests/doan2-gach-phuong-an.test.tsx",
+    "tests/bi-a-tran.test.ts",
+    "tests/bi-a-shader-0110.test.ts",
+    "tests/omni-3-nut-tu-tin-0610.test.tsx",
+    "tests/bi-a-dieu-khien-3009.test.tsx",
+    "tests/dao2-ban-do-3d-2809.test.tsx",
+    "tests/escort-question.test.tsx",
+    "tests/dao-so-tay.test.tsx",
+    "tests/kinh-te-ui-2309.test.tsx",
+    "tests/doan2-bua-tro-giang.test.tsx",
+    "tests/doan2-danh-tiep-2809.test.tsx",
+    "tests/hap-thu-man-2109.test.tsx",
+    "tests/cho-an-du-tru-2109.test.tsx",
+    "tests/o-nhap-dap-so-cac-noi-2109.test.tsx",
+    "tests/dao2-tran-dung-san-0510.test.tsx",
+    "tests/omni-3-doan-tram-0610.test.tsx",
+    "tests/shop-cua-vao-bo-cuc-2109.test.tsx",
+    "tests/doan-anh-san-sang-2109.test.tsx",
+    "tests/omni-3-chi-so-ro-0510.test.tsx",
+    "tests/doan-tran-khong-nhay-2109.test.tsx",
+    "tests/dao2-luong-2709.test.tsx",
+    "tests/shop-man-2109.test.tsx",
+    "tests/bi-a-phong.test.ts",
+    "tests/doan-cua-bang-nhiem-vu-1909.test.tsx",
+    "tests/may-yeu-2909.test.tsx",
+    "tests/dao2-loi-giai-2709.test.tsx",
+    "tests/ban-duyet-v2-0910.test.tsx",
+    "tests/shop-logic-2109.test.tsx",
+    "tests/doan-sanh-nut-khoa-2109.test.tsx",
+    "tests/phu-kien-danh-muc-2109.test.ts",
+    "tests/shop-khoa-nguon-2109.test.tsx",
+    "tests/bi-a-thoat-giua-van-3009.test.tsx",
+    "tests/doan-tran-chon-dap-an-2109.test.tsx",
+    "tests/doan-khoan-exp-2109.test.tsx",
+    "tests/doan2-bo-cuc-ngang-2809.test.tsx",
+    "tests/bi-a-gay.test.ts",
+    "tests/dao2-ngang-2809.test.tsx",
+    "tests/ghim-khung-tran-2109.test.tsx",
+    "tests/shop-cua-vao-2109.test.tsx",
+    "tests/cau-tu-luan-doan-2109.test.tsx",
+    "tests/tu-ngu-cum1-2109.test.tsx",
+    "tests/doan2-phu-2809.test.tsx"
+  ],
+  "testScriptReferenceCounts": {
+    "totalFiles": 124,
+    "tests": 117,
+    "scripts": 7
+  }
+}
