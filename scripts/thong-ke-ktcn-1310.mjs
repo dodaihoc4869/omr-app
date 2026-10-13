@@ -16,3 +16,6 @@ in1('soDoKtcn', await doc(`SELECT COUNT(*) n,COUNT(DISTINCT sbd) em FROM su_kien
 // Khối 12 thiếu nguồn đã duyệt cho kỹ năng nền "dùng giá trị trung bình" (mô phỏng của Codex 52/53): tờ nào có câu gắn kỹ năng này, đã duyệt chưa.
 in1('giaTriTrungBinh', await doc(`SELECT q.ma_de,COALESCE(json_extract(q.json,'$.reviewed'),0) duyet,COUNT(*) n FROM omni_q o JOIN game_v2_question q ON q.qid=o.qid
   WHERE o.vkn_json LIKE '%gia_tri_trung_binh%' GROUP BY 1,2 ORDER BY 1,2`))
+// Lý do lịch đề Hóa 2026 còn "chuẩn bị": gom mã phần thiếu (tên kỹ năng/ô ma trận, không có danh tính) theo lớp. Chỉ lịch bản 3, một lần đọc.
+in1('thieuV3', await doc(`SELECT k.lop,t.value ma,COUNT(DISTINCT k.sbd) em FROM kiem_tra_ca_nhan k JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id,json_each(k.json,'$.thieu') t
+  WHERE k.trang_thai='cho_nguon' AND json_extract(km.meta_json,'$.phienBan')=3 AND k.han_luc>${now} GROUP BY 1,2 ORDER BY 1,3 DESC LIMIT 60`))
