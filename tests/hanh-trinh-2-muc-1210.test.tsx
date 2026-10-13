@@ -52,9 +52,11 @@ const emGoi = (tong: number, daGap: number, tuLam: number, sbd: string) => ({ sb
 const CT_TINH_HOA = { bat: true, goiId: 'g7:tinh-hoa', soEm: 2, soCau: 10, canChua: 0, goi: GOI, cau: [], em: [emGoi(10, 6, 3, 'A'), emGoi(10, 4, 1, 'B')] }
 const CT_THUONG = { bat: true, goiId: 'g7:thuong', soEm: 0, soCau: 132, canChua: 132, goi: GOI, cau: [], em: [] }
 
+const TONG_HOP = { bat: true, goi: GOI, thongKe: { 'g7:tinh-hoa': { soEm: 2, pGap: 50, pTuLam: 20 }, 'g7:thuong': { soEm: 0, pGap: null, pTuLam: null }, 'g7:cu': { soEm: 3, pGap: 40, pTuLam: 20 } } }
+
 let co: Record<string, unknown> = { bat: true, lop: ['12A1'], sbd: [] }
 let tickLuc = '2026-10-05T03:00:00Z'
-let goi7: (b: Record<string, unknown>) => unknown = (b) => ({ ok: true, du: b.goiId === 'g7:thuong' ? CT_THUONG : CT_TINH_HOA })
+let goi7: (b: Record<string, unknown>) => unknown = (b) => ({ ok: true, du: b.action === 'tong_hop' ? TONG_HOP : b.goiId === 'g7:thuong' ? CT_THUONG : CT_TINH_HOA })
 
 function mayChu() {
   goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
@@ -81,7 +83,7 @@ beforeEach(() => {
   goi.mockReset()
   co = { bat: true, lop: ['12A1'], sbd: [] }
   tickLuc = '2026-10-05T03:00:00Z'
-  goi7 = (b) => ({ ok: true, du: b.goiId === 'g7:thuong' ? CT_THUONG : CT_TINH_HOA })
+  goi7 = (b) => ({ ok: true, du: b.action === 'tong_hop' ? TONG_HOP : b.goiId === 'g7:thuong' ? CT_THUONG : CT_TINH_HOA })
   useSoDemGv.setState({ canThayChua: null, moHanhTrinh: null, giaoTuCa: null })
   mayChu()
 })
@@ -218,7 +220,7 @@ describe('bảng Bài đang giao', () => {
     const o=screen.getByLabelText('Hạn mới của Bài 8. Amine · 12 - Tinh Hoa') as HTMLInputElement
     expect(o.min).toBe('2026-10-12');fireEvent.change(o,{target:{value:'2026-10-20'}})
     let thatBai=true
-    goi7=b=>b.action==='sua_han'?(thatBai?{ok:false,chu:'Đang có ca kiểm tra mở.'}:{ok:true,du:{ok:true,goiId:b.goiId,han:b.han}}):{ok:true,du:b.goiId==='g7:thuong'?CT_THUONG:CT_TINH_HOA}
+    goi7=b=>b.action==='sua_han'?(thatBai?{ok:false,chu:'Đang có ca kiểm tra mở.'}:{ok:true,du:{ok:true,goiId:b.goiId,han:b.han}}):{ok:true,du:b.action==='tong_hop'?TONG_HOP:b.goiId==='g7:thuong'?CT_THUONG:CT_TINH_HOA}
     fireEvent.click(screen.getByRole('button',{name:'Lưu hạn'}))
     expect((await screen.findByRole('alert')).textContent).toContain('ca kiểm tra mở')
     expect(o.value).toBe('2026-10-20');thatBai=false
@@ -256,8 +258,8 @@ describe('bảng Bài đang giao', () => {
     expect(dong[1]!.textContent).toContain('2 em')
     expect(dong[1]!.textContent).toContain('T7 17/10')
     expect(dong[1]!.textContent).toContain('còn 6 ngày')
-    // lệnh: một lệnh đầu (danh sách + chi tiết gói đầu) + một lệnh cho gói còn lại; KHÔNG đọc gói đã hết hạn
-    expect(lenh('/gv/goi-bai-7').map(([, b]) => b)).toEqual([{ lop: '' }, { lop: '', goiId: 'g7:thuong' }])
+    // SỬA CÓ CHỦ ĐÍCH 13/10: chỉ một lệnh gọn cho cả bảng, không đọc từng đề/học sinh.
+    expect(lenh('/gv/goi-bai-7').map(([, b]) => b)).toEqual([{ action: 'tong_hop' }])
     fireEvent.click(within(vung).getByRole('button', { name: 'Câu nhiều em sai của các bài này nằm ở mục Chữa bài ›' }))
     expect(sang).toHaveBeenCalledTimes(1)
   })
@@ -266,7 +268,7 @@ describe('bảng Bài đang giao', () => {
     goi7 = () => ({ ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' })
     const r1 = render(<BangBaiDangGiao />)
     expect((await screen.findByRole('alert')).textContent).toBe('Chưa tải được bài đang giao: Không nối được máy chủ.')
-    goi7 = (b) => ({ ok: true, du: b.goiId === 'g7:thuong' ? CT_THUONG : CT_TINH_HOA })
+    goi7 = (b) => ({ ok: true, du: b.action === 'tong_hop' ? TONG_HOP : b.goiId === 'g7:thuong' ? CT_THUONG : CT_TINH_HOA })
     fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
     await waitFor(() => expect(r1.container.querySelectorAll('[data-khoi="dong-giao"]')).toHaveLength(2))
     expect(screen.queryByRole('alert')).toBeNull()
@@ -277,7 +279,7 @@ describe('bảng Bài đang giao', () => {
     expect(await screen.findByText(/Máy chủ chưa bật giao bài 7 ngày/)).toBeTruthy()
     r2.unmount()
 
-    goi7 = () => ({ ok: true, du: { bat: true, goi: [GOI[2]], cau: [], em: [] } })
+    goi7 = () => ({ ok: true, du: { bat: true, goi: [GOI[2]], thongKe: {} } })
     render(<BangBaiDangGiao />)
     expect(await screen.findByText(/Chưa lớp nào đang có bài giao\. Tick bài vừa dạy ở trên/)).toBeTruthy()
   })
