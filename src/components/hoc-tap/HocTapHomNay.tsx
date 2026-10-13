@@ -88,7 +88,7 @@ export default function HocTapHomNay(p: Props) {
   const sanh = p.ketQua?.cheDo2 && 'sanh' in p.ketQua ? p.ketQua.sanh : null
   const ht = sanh?.hanhTrinh
   const goi7 = sanh?.goi7
-  const kiem=sanh?.kiemTraCaNhan, ngayKiem=kiem?.homNay===true&&!kiem.baiNgayToiThieu
+  const kiem=sanh?.kiemTraCaNhan, ngayKiem=kiem?.homNay===true&&!kiem.baiNgayToiThieu, kiemHomNay=kiem?.homNay===true
   // MỘT CON SỐ (thầy 12/10: "học sinh làm 24 câu nhưng lại báo 31 câu"): M và đã làm của hôm nay lấy MỘT chỗ — `soHomNay` (Gói 7 → Hành trình → thể
   // lực → kế hoạch cũ), cùng hàm màn làm bài dùng. "Đủ mức" khi đã làm ≥ M — đúng `datMuc` phía thầy / phụ huynh / Nhịp học; câu mới theo lịch còn lại
   // của gói KHÔNG chặn chữ đạt (máy chủ đã xếp chúng trong mức; phần chưa gặp dồn sang ngày sau).
@@ -145,12 +145,14 @@ export default function HocTapHomNay(p: Props) {
         {muc === 'hom-nay' && <>
           {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
               và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
-          {/* Đợt 20 (bản vẽ docs/ban-ve-dot20): ngày kiểm tra ⇒ thẻ kiểm tra là khối CHÍNH; ngày khác (sắp đến / đang chuẩn bị) ⇒ thẻ phụ NẰM SAU khối học. */}
-          {kiem&&ngayKiem&&<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
+          {/* Đợt 20 (bản vẽ docs/ban-ve-dot20): ngày kiểm tra ⇒ thẻ kiểm tra là khối CHÍNH; ngày khác (sắp đến / đang chuẩn bị) ⇒ thẻ phụ NẰM SAU khối học.
+              Thầy 14/10 ("khi nào tới lịch kiểm tra thì hiển bảng đó lên đầu và mở nút bắt đầu kiểm tra"): ngày kiểm tra có kèm kế hoạch học nhẹ cũng đưa thẻ
+              kiểm tra (nút Làm bài kiểm tra) lên ĐẦU, khối học nhẹ nằm sau. */}
+          {kiem&&kiemHomNay&&<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
           {!ngayKiem&&<><TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
             viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
             onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
-          {kiem&&<Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
+          {kiem&&!kiemHomNay&&<Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
           <TheMoiTuSua so={soSua} onChua={p.onChua} />
           {goi7 && <TheGoi7 du={goi7} />}
           {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>}

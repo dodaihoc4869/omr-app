@@ -441,7 +441,10 @@ Thầy (tiếp): "bạn làm việc này với thằng codex nữa nhé để t�
 - [ ] Chia việc với Codex: ghi mục [ ] vào docs/viec-giao-codex.md, đẩy main, theo dõi PR | bằng chứng: (chưa có)
 - [x] Kiểm kê code Đảo/Đoàn/Bi-a/chiến dịch cũ | bằng chứng: docs/kiem-ke-don-game-1410.md (commit fbb1ee3e)
 - [x] Giao Codex C1–C3 (phía app + Tick bài) | bằng chứng: docs/viec-giao-codex.md (commit de937717, 3a8b6710) — lên main cùng PR 00:00
-- [~] Gỡ máy chủ Bi-a + Đoàn + cửa hàng + võ đài + phòng: commit 34d922f6 trên nhánh (−9.000 dòng, tsc sạch), đang chạy toàn bộ vitest rồi phát hành
+- [x] Gỡ máy chủ Bi-a + Đoàn + cửa hàng + võ đài + phòng | bằng chứng: PR #289 main 888c34d4, Actions 38438330679 SUCCESS 00:32 14/10; vitest 15.515 test 0 đỏ mới; −9.000 dòng
 - [ ] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts, /gv/chien-dich/sua) — SAU khi C3 Codex gộp
 - [x] Đo lại máy chủ 1 giờ sau phát hành PR280 | bằng chứng: workflow 38428596656, khung CỐ ĐỊNH 21:20–22:20 VN (sau PR280 16 phút, trước PR283) so 19:11–20:11 (38402898461). Yêu cầu 9.375 → 15.814 (×1,69). D1 top-30 402 → 398 s ⇒ mỗi yêu cầu 42,9 → 25,2 ms (−41%). Danh mục cả kho (24.017 dòng) 764 → 250 lần (mỗi 1.000 yc 81,5 → 15,8); docMetaCau 1.945 → 1.903 lần (mỗi 1.000 yc 207 → 120), 22 → 23,7 ms; game_v2_question theo tờ 265×74 ms → 372×51,5 ms. Worker p50 0,05 → 0,06 s · p90 0,46 → 0,53 s · p99 1,49 → 3,75 s (XẤU HƠN) · CPU p99 761 → 720 ms. LỖI 0 → 111 = 100% `exceededMemory` (Worker vượt 128 MB, bị giết), dồn 21:20–22:05 (5–20 lỗi/5 phút, p99 4 s), từ 22:05 về 0 lỗi, p99 1–3 s.
 - [~] KHẨN: giảm bộ nhớ Worker giờ cao điểm (PR #288 00:08 14/10: danh mục một lượt dựng + trần, ma trận Gói 7 gọn, đệm D1 chung 16→6 triệu; còn đo lại exceededMemory giờ cao điểm 14/10) (exceededMemory 111 lần/giờ ⇒ em "không load được câu") — tìm đệm/truy vấn ngốn bộ nhớ (danh mục 24.017 dòng, JSON đầy đủ câu, đệm isolate), đặt trần trọng lượng; test đo bộ nhớ | bằng chứng: (chưa có)
+- [ ] Đo lại giờ cao điểm 14/10 (hẹn tự kiểm 21:35): exceededMemory sau PR #288 | bằng chứng: (chưa có)
+- [ ] Phía app (Codex C1–C3) — chờ thầy nhắn Codex; Claude soát PR | bằng chứng: (chưa có)
+- [ ] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts) SAU khi C3 gộp | bằng chứng: (chưa có)
