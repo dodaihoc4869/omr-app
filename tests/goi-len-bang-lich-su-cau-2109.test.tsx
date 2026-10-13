@@ -6,7 +6,7 @@ import type { CaTomTat } from '../src/lib/exam-api'
 import type { TeacherExamSource } from '../src/data/examContent'
 import { khoaEmCau, type LichSuCauEm } from '../src/lib/lich-su-cau-len-bang'
 
-const m = vi.hoisted(() => ({ ghi: vi.fn(), hoSo: vi.fn(), mau: [] as unknown[], lichSu: vi.fn() }))
+const m = vi.hoisted(() => ({ ghi: vi.fn(), hoSo: vi.fn(), mau: [] as unknown[], lichSu: vi.fn(), ungVien: vi.fn() }))
 
 const ca = (maCa: string): CaTomTat =>
   ({ maCa, tenCa: `Ca ${maCa}`, lop: '12', daVao: 10, daNop: 10, lenBang: false, trangThai: 'dong', batDau: '2026-09-09T00:00:00.000Z', hetHanVao: '2026-09-09T01:00:00.000Z' }) as unknown as CaTomTat
@@ -53,13 +53,17 @@ vi.mock('../src/lib/exam-db', () => ({
   docKhoChuaCa: async () => [DE],
   docKhoDoKho: async () => undefined,
   luuKhoDoKho: async () => {},
+  docBuoiChua: async () => undefined,
+  luuBuoiChua: async () => {},
   docMauGiayThuc: async () => m.mau,
   themMauGiayThuc: async (x: unknown) => (m.mau.push(x), m.mau),
 }))
 vi.mock('../src/lib/may-chu-moi', async (goc) => ({ ...(await goc<Record<string, unknown>>()), layCauHinhMayChu: async () => ({ BAT: true, URL: 'https://x' }) }))
 vi.mock('../src/lib/lich-su-cau-len-bang-lenh', () => ({ layLichSuCau: (...a: unknown[]) => m.lichSu(...a) }))
 const toast = vi.fn()
-vi.mock('../src/store/appStore', () => ({ useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ setScreen: vi.fn(), showToast: toast }) }))
+// Mock giữ cả API đọc ngoài React của Zustand; không bỏ cổng cảnh báo thật.
+vi.mock('../src/store/appStore', () => ({ useAppStore: Object.assign((sel: (s: Record<string, unknown>) => unknown) => sel({ setScreen: vi.fn(), showToast: toast }), { getState: () => ({ showToast: toast }) }) }))
+vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (...a: unknown[]) => m.ungVien(...a) }))
 
 const { default: GoiLenBangScreen } = await import('../src/screens/GoiLenBangScreen')
 
@@ -90,6 +94,8 @@ beforeEach(() => {
   m.mau.length = 0
   m.lichSu.mockReset()
   m.lichSu.mockImplementation(async (cap: { sbd: string; qid: string }[]) => traLichSu(cap))
+  m.ungVien.mockReset()
+  m.ungVien.mockImplementation(async (_: string, b: { qids: string[]; sbd: string[] }) => ({ ok: true, du: { cau: Object.fromEntries(b.qids.map((qid, i) => [qid, [{ sbd: b.sbd[i % b.sbd.length], ten: `Em ${i % b.sbd.length + 1}`, loai: i % 2 ? 'du_bao' : 'da_dung', p: i % 2 ? 0.8 : null, luc: null }]])) } }))
   toast.mockReset()
 })
 
@@ -118,24 +124,27 @@ describe('bảng buổi chữa + tờ chiếu: "em đã làm câu này chưa"', 
     expect(chu.some((c) => c.includes('Đã làm · lần gần nhất sai') && c.includes('3 lần: 1 đúng, 2 sai · gần nhất 19/09') && c.includes('Đã lên bảng câu này 1 lần · đạt'))).toBe(true)
   }, 60000)
 
-  it('bấm "Chiếu lên bảng ngay": tờ có nhãn TRONG thẻ tên (`.mc-em .mc-ls`), cùng nội dung với bảng; lệnh được gọi lại một lần cho mọi cặp trên tờ', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 13/10: tờ chiếu đổi người theo bằng chứng độc lập/dự đoán, bảng đồng bộ người ấy; nhãn trước khi chiếu vẫn là lịch sử.
+  it('bấm "Chiếu lên bảng ngay": tờ có nhãn bằng chứng/dự đoán TRONG thẻ tên và người trên bảng đồng bộ; đọc lịch sử mọi cặp một lần', async () => {
     const r = await moBuoiChua()
     await waitFor(() => expect(nhanTrenBang(r).length).toBeGreaterThan(0), CHO)
     const truoc = m.lichSu.mock.calls.length
     fireEvent.click([...r.container.querySelectorAll('button')].find((b) => (b.textContent ?? '').includes('Chiếu lên bảng ngay')) as HTMLButtonElement)
     await waitFor(() => expect(document.querySelector('.lop-xem-phieu iframe')).toBeTruthy(), CHO)
     const html = (document.querySelector('.lop-xem-phieu iframe') as HTMLIFrameElement).getAttribute('srcdoc') ?? ''
-    expect(m.lichSu.mock.calls.length).toBe(truoc + 1)
+    await waitFor(() => expect(m.lichSu.mock.calls.length).toBe(truoc + 1), CHO) // chỉ bảng đã đổi người, không hỏi lịch sử người cũ thừa
+    expect(m.ungVien).toHaveBeenCalledTimes(1)
     const doc = new DOMParser().parseFromString(html, 'text/html')
     const ls = [...doc.querySelectorAll('.mc-em .mc-ls')]
     expect(ls.length).toBeGreaterThan(0)
-    expect(ls.some((e) => (e.textContent ?? '').includes('Chưa làm câu này'))).toBe(true)
-    expect(ls.some((e) => (e.textContent ?? '').includes('Đã làm · lần gần nhất sai'))).toBe(true)
+    expect(ls.some((e) => (e.textContent ?? '').includes('Đã tự làm đúng câu này'))).toBe(true)
+    expect(ls.some((e) => (e.textContent ?? '').includes('Dự kiến làm được câu này'))).toBe(true)
     expect(doc.querySelectorAll('.mc-ls').length).toBe(ls.length) // không nhãn nào nằm ngoài thẻ tên
   }, 60000)
 
   it('lệnh không gọi được (null: máy chủ cũ / mất mạng / chậm) ⇒ KHÔNG nhãn ở bảng lẫn ở tờ, tờ vẫn mở bình thường', async () => {
     m.lichSu.mockImplementation(async () => null)
+    m.ungVien.mockResolvedValue({ ok: false, chu: 'Mất mạng' })
     const r = await moBuoiChua()
     await waitFor(() => expect(m.lichSu).toHaveBeenCalled(), CHO)
     expect(nhanTrenBang(r)).toEqual([])
