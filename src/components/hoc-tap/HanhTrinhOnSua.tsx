@@ -155,7 +155,7 @@ export default function HanhTrinhOnSua(p: PropsHanhTrinhOnSua) {
     </section>
     <section className="htn-bai-nhom" aria-labelledby="htn-bai-tieu">
       <h2 id="htn-bai-tieu">Bài đang luyện{bai.length > 0 && <span> · {bai.length} bài</span>}</h2>
-      {bai.length > 0 ? bai.map((b) => <TheBai key={b.khoa} b={b} />) : p.dangTai && !p.sanh ? <div className="htn-cho" aria-busy="true" aria-label="Đang tải bài" /> : <p className="htn-trong">Chưa có bài đang luyện.</p>}
+      {bai.length > 0 ? bai.map((b) => <TheBai key={b.khoa} b={b} />) : p.dangTai && !p.sanh ? <div className="htn-cho" role="status" aria-busy="true" aria-label="Đang tải bài" /> : <p className="htn-trong">Chưa có bài đang luyện.</p>}
     </section>
   </div>
 }

@@ -159,7 +159,7 @@ export default function HocTapHomNay(p: Props) {
           </section>
         </>}
 
-        {(muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" aria-busy="true" aria-label="Đang mở" />}>
+        {(muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" role="status" aria-busy="true" aria-label="Đang mở" />}>
           <HanhTrinhOnSua muc={muc} sanh={sanh} dangTai={p.dangTai} soSua={soSua}
             nut={<button type="button" className="htn-nut" data-phu={p.coCa || undefined} onClick={p.onHoc} disabled={khoaHoc}>{chuNutHoc(so, con === 0, kho)}<ArrowRight size={20} aria-hidden="true" /></button>}
             onChua={p.onChua} onXemLai={p.onXemLai} onTuLuyen={p.onTuLuyen} onLuyenLai={p.onLuyenLai} />
