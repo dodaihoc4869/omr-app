@@ -6,6 +6,3 @@ const kep=(n:number,max:number)=>Math.max(0,Math.min(max,Math.trunc(Number.isFin
 export const anhThuTheoDang=(thu:number,dang:number,be=false)=>`${GOC}/thu-${kep(thu,7)}-${kep(dang,5)}${be?'-be':''}.webp`
 /** Thú ở đúng dạng của CẤP thật. */
 export const anhThu=(thu:number,cap:number,be=false)=>anhThuTheoDang(thu,evolutionStage(cap),be)
-export type TrangThaiThe='binh-thuong'|'cuong-no'
-/** Thẻ tranh 512 px: Bình thường | Cuồng nộ. */
-export const anhThe=(thu:number,trangThai:TrangThaiThe)=>`${GOC}/the-${kep(thu,7)}-${trangThai}.webp`
