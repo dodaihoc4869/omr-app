@@ -1,0 +1,27 @@
+# omr-app — hướng dẫn cho Codex (Codex tự đọc tệp này mỗi lần nhận việc)
+
+Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo viên (`/`, `/gv`), học sinh (`/hs`), phụ huynh (`/ph`). React + Vite + TS + Tailwind v4 (`src/`), máy chủ Cloudflare Worker + D1 + R2 (`server/`). Mã, chú thích, commit, PR viết TIẾNG VIỆT.
+
+## 1. Luật chung — đọc trước
+- Mọi luật trong `CLAUDE.md` áp dụng nguyên cho Codex: luật tốc độ (`npm run build && npm run kiem:toc-do` 0 đỏ, mốc `docs/moc-toc-do.json` chỉ hạ), màu (`npm run check:mau`, `npm run kiem:mau-giu` 0), commit theo đường dẫn, không in bí mật, đáp án không xuống máy học sinh trước khi nộp, không rút câu tự luận.
+- Chỉ dừng hỏi thầy khi: xoá/ghi đè dữ liệu D1 thật · schema không chỉ-thêm · đang có ca thi mở.
+- Làm chung với Claude: `docs/hop-dong-claude-codex-1310.md` (chia làn, tệp dùng chung, không phát hành chồng nhau). Nhật ký chung: cuối `DIEU-PHOI.md`.
+
+## 2. Việc Claude giao cho Codex
+Claude không nhắn trực tiếp được cho Codex, và `@codex` trên GitHub đang hỏng (bot chỉ trả "create an environment"). Vì vậy Claude giao việc trong **`docs/viec-giao-codex.md`**.
+
+Mỗi lần nhận việc:
+1. Kéo `main` mới nhất, mở `docs/viec-giao-codex.md`.
+2. Làm các mục `[ ]` theo thứ tự từ trên xuống.
+3. Việc thầy giao trực tiếp luôn được làm trước.
+
+Xong mỗi mục:
+- Trong cùng PR, đổi `[ ]` thành `[x]`, ghi kèm mã PR và kết quả kiểm.
+- Ghi một dòng vào cuối `DIEU-PHOI.md`.
+
+Không làm được thì đổi thành `[!]` kèm lý do một dòng. Không xoá mục nào.
+
+## 3. Trước khi mở PR vào `main`
+- `npx tsc -b`; `cd server && npx tsc --noEmit -p .`; `npm run build && npm run kiem:toc-do`; `node scripts/kiem-sw.mjs` 13/13.
+- Chạy toàn bộ vitest, so **theo tên test** với `main`: không có test đỏ mới.
+- Xem Actions `deploy.yml` không có lượt đang chạy, rồi gộp `main` mới nhất vào nhánh.

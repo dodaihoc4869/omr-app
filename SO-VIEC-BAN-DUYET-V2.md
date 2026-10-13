@@ -353,3 +353,13 @@ Thầy nhắn thêm (13/10): "bạn dặn luôn nó đi" · "từ giờ tôi nh�
 - [ ] Luật thường trực: thầy nhắn ở phiên này; việc Codex làm tốt hơn ⇒ giao thẳng Codex qua @codex, theo dõi tới xong, báo thầy | bằng chứng: (chưa có)
 - [x] Sửa lỗi: trang phụ huynh mới mất thẻ kiểm tra cá nhân của PR258 | bằng chứng: fd37f2fc + tests/ph-kiem-tra-dot19-1310 (3 xanh)
 - [x] Thoả thuận làm việc chung Claude ↔ Codex | bằng chứng: 34bd1c70 docs/hop-dong-claude-codex-1310.md + dòng đầu DIEU-PHOI
+Kết đợt 19 (13/10 12:34 VN) — PR259 gộp main `dc4512ec`, Actions `38351141603` SUCCESS:
+- [x] Tấm đủ 12 bậc khi bấm chip + huy hiệu 12 bậc vẽ riêng | bằng chứng: dc4512ec (làn M), tests/huy-hieu-bac-1310m.test.tsx, ảnh docs/anh-dot19/
+- [x] Biểu tượng Tự sửa lỗi vẽ lại | bằng chứng: dc4512ec (làn N)
+- [x] Hành trình thiết kế lại + sửa "Chưa có danh sách bài" (gốc: hoc-tap-sanh dạng Gói 7 không có hanhTrinh) | bằng chứng: dc4512ec (làn N)
+- [x] Ôn & sửa thiết kế lại | bằng chứng: dc4512ec (làn N)
+- [x] Nhịp học thầy: bấm bậc ⇒ danh sách em theo bậc | bằng chứng: dc4512ec (làn M), nạp khi bấm, ngoài precache
+- [x] Dựng màn chiếu theo bản vẽ (xếp theo bậc) | bằng chứng: dc4512ec (làn Q), tests/man-chieu-dot19-1310q.test.tsx 16 test
+- [x] Dựng app phụ huynh theo bản vẽ (+ điểm danh buổi học, hạng chăm) | bằng chứng: dc4512ec (làn R), tests/ph-trung-tu-1310r.test.tsx, tests/ph-kiem-tra-dot19-1310.test.tsx
+- [x] 3 khổ + không chậm hơn + phát hành | bằng chứng: kiem:toc-do xanh trước gộp (HS 342960, PH 275800 byte nén), SW 13/13 (168 tệp / 2913 KB), Actions 38351141603 SUCCESS. Lùi: git revert dc4512ec && git push origin main
+- [!] Dặn Codex qua @codex GitHub | KẸT: bot chatgpt-codex-connector trả "create an environment" (issue #260, 13/10 05:30 UTC) dù thầy đã tạo môi trường; thầy xoá môi trường trùng 13/10 ~12:35 VN, đã thử lại 1 lần
