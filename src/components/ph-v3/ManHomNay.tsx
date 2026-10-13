@@ -139,7 +139,7 @@ function KhoiChinh({ pm, hoc2, tq }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTong
   const coSo = so.tong !== null || so.daLam > 0
   const ti = so.tong ? Math.max(0, Math.min(1, so.daLam / so.tong)) : null
   const kt=hoc2?.kiemTraCaNhan
-  if(kt?.homNay)return <Suspense fallback={<section className="ph3-ah ph3-o-du" role="status">Đang mở bài kiểm tra của con…</section>}><TheKiemTraCon kt={kt}/></Suspense>
+  if(kt?.homNay&&!kt.baiNgayToiThieu)return <Suspense fallback={<section className="ph3-ah ph3-o-du" role="status">Đang mở bài kiểm tra của con…</section>}><TheKiemTraCon kt={kt}/></Suspense>
   return (
     <section className="ph3-ah ph3-o-du" aria-labelledby="ph3-hn" data-vung="anh-hung">
       {coSo ? (

@@ -175,13 +175,13 @@ export interface EmGoc { sbd: string; hoTen: string; lop: string; khoi: string; 
 export class LoiDocSo extends Error {}
 
 export const SQL_DEM_GOI7 = `SELECT sbd, ngay_vn AS ngay, COUNT(DISTINCT qid) AS n FROM su_kien_hoc
-  WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}
+  WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LUOT_GOI7}
   GROUP BY sbd, ngay_vn`
 // Câu học có hướng dẫn (Gói 7) ngày ấy mà sổ chưa có ⇒ cộng thêm (lapGoi7 gộp hai tập mã câu).
 const SQL_DEM_GAP = `SELECT g.sbd AS sbd, date(g.luc, '+7 hours') AS ngay, COUNT(DISTINCT g.qid) AS n FROM goi_bai_7_gap g
   WHERE g.sbd IN (SELECT value FROM json_each(?1)) AND date(g.luc, '+7 hours') BETWEEN ?2 AND ?3
     AND NOT EXISTS (SELECT 1 FROM su_kien_hoc WHERE su_kien_hoc.sbd = g.sbd AND su_kien_hoc.ngay_vn = date(g.luc, '+7 hours') AND su_kien_hoc.qid = g.qid
-      AND su_kien_hoc.ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7})
+      AND su_kien_hoc.ket_qua IS NOT NULL AND su_kien_hoc.ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LUOT_GOI7})
   GROUP BY g.sbd, date(g.luc, '+7 hours')`
 /** Mức hôm nay đã chốt của ngày Gói 7 (`chotMucNgay7`) — đúng số em thấy trên app. */
 const SQL_MUC_GOI7 = 'SELECT sbd, ngay, tang, muc FROM goi_bai_7_muc_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
@@ -189,7 +189,7 @@ const SQL_MUC_GOI7 = 'SELECT sbd, ngay, tang, muc FROM goi_bai_7_muc_ngay WHERE 
 const SQL_QUOTA_GOI7 = 'SELECT sbd, ngay, SUM(quota) AS q FROM goi_bai_7_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3 GROUP BY sbd, ngay'
 const SQL_KE_HOACH = 'SELECT sbd, ngay, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
 export const SQL_LUOT_KE_HOACH = `SELECT sbd, ngay_vn AS ngay, qid, ${SQL_TC} AS tc FROM su_kien_hoc
-  WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}
+  WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LUOT_GOI7}
     AND EXISTS (SELECT 1 FROM srs2_ke_hoach k WHERE k.sbd = su_kien_hoc.sbd AND k.ngay = su_kien_hoc.ngay_vn)
   GROUP BY sbd, ngay_vn, qid, tc`
 const SQL_CHOT_TRONG = 'SELECT sbd, ngay, tang, toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
@@ -268,11 +268,11 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
       const c = chot.get(e.sbd) ?? []
       ra.set(e.sbd, ngay.map((d) => {
         const test=ktNgay.get(k(e.sbd,d))
-        if(test)return {ngay:d,mucToiThieu:test.tong,daLam:test.daTra,thieu:Math.max(0,test.tong-test.daTra),datMuc:test.nopLuc!==null&&test.daTra>=test.tong,mucUocTinh:false,nguonMuc:'da-chot' as const,tang:1 as const,cheDo:'kiem-tra' as const,homNay:d===homNay}
+        if(test&&!test.baiNgayToiThieu)return {ngay:d,mucToiThieu:test.tong,daLam:test.daTra,thieu:Math.max(0,test.tong-test.daTra),datMuc:test.nopLuc!==null&&test.daTra>=test.tong,mucUocTinh:false,nguonMuc:'da-chot' as const,tang:1 as const,cheDo:'kiem-tra' as const,homNay:d===homNay}
         const cheDo: CheDoNgay = e.goi7Tu !== null && e.goi7Tu <= d ? 'goi7' : 'hanh-trinh'
-        const m = mucCuaNgay(d, cheDo, c, cheDo === 'goi7' ? { chot: muc7.get(k(e.sbd, d)) ?? null, quota: quota7.get(k(e.sbd, d)) ?? 0 } : undefined)
+        const m = test?.baiNgayToiThieu?{muc:12,tang:1 as const,nguon:'da-chot' as const,uoc:false}:mucCuaNgay(d, cheDo, c, cheDo === 'goi7' ? { chot: muc7.get(k(e.sbd, d)) ?? null, quota: quota7.get(k(e.sbd, d)) ?? 0 } : undefined)
         const daLam = cheDo === 'goi7' ? (demGoi.get(k(e.sbd, d)) ?? 0) + (demGap.get(k(e.sbd, d)) ?? 0) : daLamKeHoach(keHoach.get(k(e.sbd, d)), luot.get(k(e.sbd, d)) ?? [])
-        return { ngay: d, mucToiThieu: m.muc, daLam, thieu: Math.max(0, m.muc - daLam), datMuc: daLam >= m.muc, mucUocTinh: m.uoc, nguonMuc: m.nguon, tang: m.tang, cheDo, homNay: d === homNay }
+        return { ...(test?.baiNgayToiThieu?{kiemTra:test}:{}),ngay: d, mucToiThieu: m.muc, daLam, thieu: Math.max(0, m.muc - daLam), datMuc: daLam >= m.muc, mucUocTinh: m.uoc, nguonMuc: m.nguon, tang: m.tang, cheDo, homNay: d === homNay }
       }))
     }
   }

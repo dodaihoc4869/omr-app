@@ -88,7 +88,7 @@ export default function HocTapHomNay(p: Props) {
   const sanh = p.ketQua?.cheDo2 && 'sanh' in p.ketQua ? p.ketQua.sanh : null
   const ht = sanh?.hanhTrinh
   const goi7 = sanh?.goi7
-  const kiem=sanh?.kiemTraCaNhan, ngayKiem=kiem?.homNay===true
+  const kiem=sanh?.kiemTraCaNhan, ngayKiem=kiem?.homNay===true&&!kiem.baiNgayToiThieu
   // MỘT CON SỐ (thầy 12/10: "học sinh làm 24 câu nhưng lại báo 31 câu"): M và đã làm của hôm nay lấy MỘT chỗ — `soHomNay` (Gói 7 → Hành trình → thể
   // lực → kế hoạch cũ), cùng hàm màn làm bài dùng. "Đủ mức" khi đã làm ≥ M — đúng `datMuc` phía thầy / phụ huynh / Nhịp học; câu mới theo lịch còn lại
   // của gói KHÔNG chặn chữ đạt (máy chủ đã xếp chúng trong mức; phần chưa gặp dồn sang ngày sau).

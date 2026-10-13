@@ -1,7 +1,7 @@
 # KHẨN 13/10 — BẬT LẠI kiểm tra riêng sau bản vá D1 quá tải (số liệu lịch tính sẵn, bảng kiem_tra_ca_nhan_meta).
 # Chỉ bấm SAU KHI lượt "Phát hành lên Cloudflare Pages" của bản vá đã thành công (Worker sống đã có bản vá).
 # Kịch bản scripts/bat-lai-ktcn-1310.ts: kiểm ca mở → tạo bảng chỉ-thêm → bù số tính sẵn cho mọi lịch cũ → còn thiếu thì DỪNG → bật cờ.
-# Không xoá/sửa lịch, bài nộp, điểm.
+# 13/10 (gộp đề Hóa 2026): trước khi bật, chuyển mọi lịch tương lai chưa mở về 28 câu/50 phút. Không đụng bài đã mở/làm/nộp, điểm.
 name: Khẩn — bật lại kiểm tra riêng (sau bản vá số liệu tính sẵn)
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ concurrency:
 jobs:
   bat:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -11,7 +11,7 @@ export default function TheKiemTraCon({ kt }: { kt: TomTatKiemTra }) {
       </header>
       <p className="tvc-hn-so"><b>{kt.homNay ? kt.daTra : kt.tong}</b><span>{kt.homNay ? `/${kt.tong} câu đã trả lời` : ' câu kiểm tra'}</span></p>
       <p className="tvc-phu">{kt.phut} phút làm bài · {kt.soBai} bài đã học</p>
-      <p className="tvc-hop">{kt.homNay ? `Hạn nộp ${gioVn(kt.hanLuc)} ${ngayNganVn(kt.hanLuc)}. Hôm nay không giao thêm bài tập ngày.` : `Mở ${gioVn(kt.moLuc)} ${ngayNganVn(kt.moLuc)} · hoàn thành trong 24 giờ.`}</p>
+      <p className="tvc-hop">{kt.homNay ? `Hạn nộp ${gioVn(kt.hanLuc)} ${ngayNganVn(kt.hanLuc)}. ${kt.baiNgayToiThieu?'Có thêm kế hoạch học nhẹ: tối thiểu 12 câu, giữ tiến độ bài mới.':'Hôm nay không giao thêm bài tập ngày.'}` : `Mở ${gioVn(kt.moLuc)} ${ngayNganVn(kt.moLuc)} · hoàn thành trong 24 giờ.`}</p>
       {kt.diem !== null && <p className="tvc-phu">Điểm lần này: {kt.diem}/10. Kết quả nhớ lâu được kiểm chứng tiếp.</p>}
     </section>
   )

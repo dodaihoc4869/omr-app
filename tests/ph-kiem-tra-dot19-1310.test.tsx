@@ -65,3 +65,10 @@ it('chờ nguồn: không hiện thẻ kiểm tra', async () => {
   await waitFor(() => expect(c.querySelector('[data-vung="anh-hung"]')).toBeTruthy())
   expect(c.querySelector('#ph3-kiemtra')).toBeNull()
 })
+
+it('lịch mới: ngày có một kiểm tra vẫn hiện kế hoạch học nhẹ và thẻ kiểm tra riêng',async()=>{
+ hoc2={...hoc2,kiemTraCaNhan:kt({baiNgayToiThieu:12})}
+ const c=mo();await waitFor(()=>expect(c.querySelector('[data-vung="anh-hung"]')).toBeTruthy())
+ const the=await waitFor(()=>{const x=c.querySelector('#ph3-kiemtra');expect(x).toBeTruthy();return x!.closest('section')!})
+ expect(the.textContent).toContain('tối thiểu 12 câu');expect(the.textContent).not.toContain('không giao thêm')
+})
