@@ -29,7 +29,6 @@ import '../../src/styles/the-loc.css'
 import '../../src/components/hoc-tap/hoc-tap.css'
 import '../../src/components/m3'
 import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
-import SanhHomNay from '../../src/components/ban-duyet-v2/SanhHomNay'
 import CauDaLam from '../../src/components/hoa2/CauDaLam'
 import HocTapHomNay from '../../src/components/hoc-tap/HocTapHomNay'
 import ManLamBaiTap from '../../src/components/hoc-tap/ManLamBaiTap'
@@ -41,21 +40,9 @@ import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import '../../src/styles/vo-thay.css'
 import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
-import '../../src/game/than-thu-v2/game.css'
-import '../../src/game/than-thu-v2/dao/dao.css'
-import ThanThuV2 from '../../src/game/than-thu-v2/dao/ThanThuV2'
-import ManShop from '../../src/game/than-thu-v2/shop/ManShop'
-import { ShopApiGia } from '../../src/game/than-thu-v2/shop/du-lieu-mau'
-import { ThuMacDo } from '../../src/game/than-thu-v2/phu-kien/ThuMacDo'
-import { HinhVatPham } from '../../src/game/than-thu-v2/phu-kien/HinhVatPham'
-import Dao2 from '../../src/game/than-thu-v2/dao2/Dao2'
-import DoanHoTong from '../../src/game/than-thu-v2/DoanHoTong'
-import type { DoanXem } from '../../src/game/than-thu-v2/doan-kieu'
-import type { DaoKetQua, DaoProfile } from '../../src/game/than-thu-v2/dao/kieu'
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import AppPhuHuynh from '../../src/components/ph-v3/AppPhuHuynh'
-import DeThu from '../../src/game/than-thu-v2/dao2/DeThu'
 import { PH_OK } from '../../tests/_ph-moi/du-lieu-mau'
 import BangMaTranDe from '../../src/components/ma-tran-de/BangMaTranDe'
 import { useCoHoa2 } from '../../src/components/chien-dich/co-hoa2'
@@ -234,52 +221,12 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 }
 
 function manSanh(du: Record<string, unknown> | null, them: Record<string, unknown> = {}) {
-  return h(SanhHomNay, {
-    tenEm: 'Nguyễn Minh Anh', lop: '12A1',
-    ketQua: du ? (docSanh(du) as KetQuaSanh) : null, loi: '', dangTai: !du, thu: { index: 5, cap: 7, ten: 'Linh Hồ' }, exp: { homNay: 22, conThieu: 160 },
-    chuoiNgay: 12, caDangMo: false, now, token: 'tk', shopBat: true, onVaoThi: noop, onPhaPhucKich: noop, onKhamPhaDao: noop, onCauDaLam: noop,
-    onTuiDo: noop, onCuaHang: noop, onMoThanThu: noop, onChonThu: noop, onDangXuat: noop, onTaiLai: noop, onTuLuyen: noop, onChoiBia: noop,
-    caGanNhat: { chu: 'Ca kiểm tra gần nhất: 8,00 điểm · 03/10', coDiem: true }, onLichSuCa: noop,
-    ...them,
-  } as never)
+  return h(HocTapHomNay, {
+    ten: 'Minh Anh', lop: '12A1', ketQua: du ? (docSanh(du) as KetQuaSanh) : null, loi: '', dangTai: !du,
+    coCa: them.caDangMo === true, onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop,
+    onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onDangXuat: noop, onTaiLai: noop,
+  })
 }
-
-// ---------------------------------------------------------------- thần thú + cửa hàng (component THẬT)
-const hoSo = { nickname: 'Linh Hồ', pet: 'tinhyeu_ho', choice: false, cap: 7, exp: 120, wallet: 0, mastery: [] } as unknown as DaoProfile
-const veThuThat = (o: { pet: number; cap: number; size?: number; dangMac?: unknown; ten?: string; nhan?: string; tinh?: boolean }) => h(ThuMacDo as never, o as never)
-
-// ---------------------------------------------------------------- Đảo 2.0 (component THẬT `Dao2`, máy chủ giả qua prop `call`) — câu công khai không đáp án
-const cauDao = (i: number) => [
-  { text: 'Chất nào sau đây là ester?', choices: ['CH₃COOH', 'C₂H₅OH', 'CH₃COOCH₃', 'CH₃CH₂CH₂OH'] },
-  { text: 'Thuỷ phân ethyl acetate trong dung dịch NaOH thu được muối nào?', choices: ['HCOONa', 'CH₃COONa', 'C₂H₅ONa', 'CH₃ONa'] },
-  { text: 'Công thức chung của ester no, đơn chức, mạch hở là', choices: ['CₙH₂ₙO₂ (n ≥ 2)', 'CₙH₂ₙ₊₂O₂', 'CₙH₂ₙ₋₂O₂', 'CₙH₂ₙO (n ≥ 1)'] },
-  { text: 'Chất nào có nhiệt độ sôi thấp nhất?', choices: ['CH₃COOH', 'CH₃COOCH₃', 'C₂H₅OH', 'CH₃CH₂CH₂OH'] },
-].map((c, k) => ({ qid: `HS${k + 1}`, maDe: 'DH-12-C1-B1-TN', version: '1', group: `g${k + 1}`, phan: 'I', text: c.text, choices: c.choices, ideas: [], hinhAnh: [], dang: 'ES', tenDang: 'Khái niệm ester', mucDo: 'biet', sao: 0, kienThuc: [], vai: 'moi' }))[i]!
-const SANH_DAO = { ...SANH_HT, khoaDao: false, loiKhoaDao: '' }
-const callDao = async (action: string): Promise<DaoKetQua> => {
-  await new Promise((r) => setTimeout(r, 60))
-  const kq: Record<string, unknown> =
-    action === 'hoa2-sanh' ? SANH_DAO
-    : action === 'resume' ? { questions: [] }
-    : action === 'sync' ? { remaining: 0 }
-    : action === 'hoa2-omni-de-thu' ? { id: 'DT1', cau: Array.from({length:14},(_,i)=>({...cauDao(i%4),qid:`DT${i+1}`})), phut: 25, hetLuc: new Date(Date.now()+25*60_000).toISOString() }
-    : action === 'start' ? { id: 'P1', questions: [0, 1, 2, 3].map(cauDao), theLuc: { con: 18, tong: 30 }, dao: { con: 16 }, doan: { con: 0 } }
-    : {}
-  return { ok: true, ...kq } as DaoKetQua
-}
-
-// ---------------------------------------------------------------- Đoàn Hộ Tống (component THẬT `DoanHoTong`, phòng Hóa 2.0 một người thật)
-const gheD: DoanXem['ghe'] = [
-  { ghe: 0, ten: 'Minh Anh', pet: 5, cap: 7, laMay: false, roi: false, laEm: true, trangThai: 'dang_lam', tinHieu: null },
-  { ghe: 1, ten: 'Thu Hà', pet: 1, cap: 6, laMay: false, roi: false, laEm: false, trangThai: 'da_chot', tinHieu: null },
-]
-const tranD = { tenChang: 'Ổ phục kích Sương Mù', hiep: 1, soHiep: 8, laTrum: false, ketThuc: false, thang: null, linhTam: { hp: 100, toiDa: 100 }, quai: [{ ma: 5, loai: 'bun_acid', hp: 24 }], trumVoGiap: [],
-  nangLuong: 2, daNhanTiepSuc: 0, giay: 40, moSauMs: 0, conMs: 26000, tenQuai: ['Bùn Acid', 'Khói Oxi Hoá'], loaiQuai: ['bun_acid', 'khoi_oxi_hoa'], tenTrum: ['Chúa tể Kết Tủa', 'Bá chủ Ăn Mòn'], loaiTrum: ['chua_te_ket_tua', 'ba_chu_an_mon'] } as DoanXem['tran']
-const deD = { qid: 'Q1', maDe: 'DH-12-C1-B1-TN', version: 'v', group: 'g', phan: 'I' as const, text: 'Dựa vào bảng sau, chất nào là ester?', table: [['Chất', 'Công thức'], ['Ethanol', 'C₂H₅OH'], ['Acetic acid', 'CH₃COOH'], ['Methyl acetate', 'CH₃COOCH₃']], choices: ['Ethanol', 'Acetic acid', 'Methyl acetate', 'Cả ba chất'], ideas: [], hinhAnh: [], dang: 'ES', tenDang: 'Khái niệm ester', mucDo: 'biet', sao: 0, kienThuc: [] }
-const xemD = (): DoanXem => ({ ma: 'DH2', revision: 5, laChu: true, batDau: true, ghe: gheD, gioMayChu: 0, tran: tranD, cau: { qid: deD.qid, nhan: 'toi_han_on', de: deD } as DoanXem['cau'] })
-const OMNI_D = { bat: true, baiDangLuyen: [], dangVung: { a: 0, b: 0 }, conDangDe8: null, sEm: null, sMucTieu: 0.07, chungChi: [], ve: { con: 2, tong: 2 }, choBaiMoi: false, onBaiCu: 0, metGio: null, nhatKy: null, deThu: { duoc: false, soCau: 14, phut: 25 } }
-const callDoan = async (lenh: string): Promise<unknown> =>
-  lenh === 'hoa2-sanh' ? { ok: true, cheDo2: true, doan: { con: 4 }, dao: { con: 16 }, omni: OMNI_D } : lenh === 'doan-xem' ? { ok: true, doan: xemD() } : { ok: true }
 
 // ═════════════════════════════════════════ LÀN HỌC SINH 12/10 ═════════════════════════════════════════
 // Thầy 12/10: "trùng tu lại giao diện mục tu luyện của app học sinh, bỏ phần những câu cần gỡ, thay những từ đảo đoàn, bia bằng những từ
@@ -484,6 +431,8 @@ function ManHoSoEm() {
 }
 // ═════════════════════════════════════════ hết LÀN HỒ SƠ EM 12/10F ═════════════════════════════════════════
 
+if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
+
 const MAN_THAY: Record<string, string> ={ 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 const con =
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
@@ -493,11 +442,6 @@ const con =
   man === 'hs-ho-so' ? h(ManHoSoEm) : // LÀN HỒ SƠ EM 12/10F
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
-  : man === 'de-thu' ? h('div', {className:'dao dao2'}, h(DeThu, {sbd:'GIA',call:callDao,onVe:noop}))
-  : man === 'than-thu' ? h('div', { className: 'dao dao-vo dao-v2', 'data-thu': 5 }, h(ThanThuV2, { profile: hoSo, token: 'tk', onCuaHang: noop, onTuiDo: noop, onDongHanh: noop }))
-  : man === 'cua-hang' ? h('div', { className: 'dao dao-vo dao-v2', 'data-thu': 5 }, h(ManShop as never, { api: new ShopApiGia(), pet: 5, cap: 7, tenThu: 'Linh Hồ', onDong: noop, veThu: veThuThat, veHinhMon: (m: { ma: string }) => h(HinhVatPham as never, { ma: m.ma }) } as never))
-  : man === 'dao' ? h(Dao2, { sbd: 'GIA', profile: hoSo, call: callDao, doanMo: false, sanhDau: SANH_DAO, onMoDoan: noop, onMoSoTay: noop, onDong: noop } as never)
-  : man === 'doan' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 5, cap: 7, onDong: noop, onVeBangNhiemVu: noop } as never))
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
   : man === 'hs-moi' ? h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_MOI } as never, dangTai: false, loi: '', coCa: thamSo.get('ca') === '1',
