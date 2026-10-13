@@ -387,3 +387,13 @@ Thầy nhắn thêm (13/10, giữa lúc dựng đợt 20): "khi mọi thứ xong
 - [ ] Đo trước/sau đợt 21 bằng số thật (do-may-chu-gio-qua-1310, 3 giờ sau phát hành) so mốc 3 giờ trước 13:58 VN: Worker p50 0,054 s · p90 0,84 s · p99 3,26 s; CPU p90 237 ms · p99 953 ms; D1 tổng 870 s | bằng chứng: (chưa có)
 Thầy (13/10): "đồng ý quy ước phối hợp"
 - [x] Ghi quy trình 4 bước vào CLAUDE.md + AGENTS.md (chi tiết docs/quy-trinh-4-buoc-1310.md) | bằng chứng: commit dưới, gộp main qua PR
+Thầy (13/10): "bạn làm đỡ được codex phần nào để tăng tốc không"
+- [x] Nhận soát + gộp + phát hành nhánh đề Hóa 2026 của Codex | bằng chứng: PR267 → main e8c3e2ab, Actions 38370392224 SUCCESS; liên quan 88/88 + 66/66; toàn bộ 15706 test so tên: 5 đỏ mới chạy lại riêng 35/35 xanh; tsc/build/kiem:toc-do/SW 13/13/màu 0. Lùi: git revert e8c3e2ab && git push origin main
+- [x] Soát D1 nhánh Codex: cron chọn đề cũ đọc số tính sẵn thay vì bóc JSON đề mỗi phút | bằng chứng: db4a8e1f + test mới kiem-tra-chu-ky-2026-1310
+- [x] Bật lại kiểm tra riêng (khung 28 câu/50 phút) | bằng chứng: bat-lai-ktcn-1310 run 38376337214 SUCCESS, cờ {"bat":true} 16:32; thống kê 38377606537: 526 lịch bản 3, khối 10+11 135 em có lịch, khối 12 126 em chờ nguồn
+- [ ] Khối 12 thiếu nguồn đã duyệt cùng khối cho kỹ năng "dùng giá trị trung bình" — chờ thầy chọn cách (thêm câu khối 12 hay cho dùng câu nền khối 10/11) | bằng chứng: (chưa có)
+- [ ] Kiểm D1 sau khi bật cờ (không lặp sự cố quá tải) | bằng chứng: (chưa có)
+Thầy (13/10): "Bạn tự làm hết nhé" (khối 12 thiếu nguồn giá trị trung bình)
+- [x] Khối 12 có đề Hóa 2026 | bằng chứng: Claude giải lại câu DH-12-C1-B1-P2 II-15 (đáp án kho đúng) → gỡ nghi; run 38380453141: 126/126 em lập lại, 0 lỗi; khối 12: Lớp Thường 68 em/204 lịch, Nhóm 10 điểm 15/45, Tinh Hoa 43/129 (3 bài/em)
+- [x] Kiểm D1 sau khi bật cờ (không lặp sự cố quá tải) | bằng chứng: run 38382091507 (09:15–10:15 UTC): Worker 1752 yêu cầu 0 lỗi, p50 0,032 s · p90 0,34 s · p99 0,97 s (mốc 0,054/0,84/3,26); D1 147 s/giờ (mốc ~290); truy vấn kiểm tra riêng không vào top 30
+- [ ] Đợt 22 tối ưu: danhMuc (hanh-trinh-v5-d1) quét ~38.000 dòng 229 lần/giờ TB 74 ms; cauCuaToChiTiet (srs2-gv, đọc json cả tờ) 327 lần/giờ TB 75 ms — gộp vào lượt đo 17:50 | bằng chứng: (chưa có)

@@ -1,0 +1,25 @@
+# CHỈ ĐỌC — đọc một câu trong kho dưới dạng MÃ HOÁ (đề/đáp án không lộ ra log) để Claude tự kiểm đáp án câu đang bị nghi (13/10).
+name: Đọc một câu (mã hoá, chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['scripts/doc-cau-ma-hoa-1310.mjs', '.github/workflows/doc-cau-ma-hoa-1310.yml']
+permissions:
+  contents: read
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc + mã hoá
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/doc-cau-ma-hoa-1310.mjs

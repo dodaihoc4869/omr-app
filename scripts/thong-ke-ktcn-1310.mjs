@@ -16,3 +16,19 @@ in1('soDoKtcn', await doc(`SELECT COUNT(*) n,COUNT(DISTINCT sbd) em FROM su_kien
 // Khối 12 thiếu nguồn đã duyệt cho kỹ năng nền "dùng giá trị trung bình" (mô phỏng của Codex 52/53): tờ nào có câu gắn kỹ năng này, đã duyệt chưa.
 in1('giaTriTrungBinh', await doc(`SELECT q.ma_de,COALESCE(json_extract(q.json,'$.reviewed'),0) duyet,COUNT(*) n FROM omni_q o JOIN game_v2_question q ON q.qid=o.qid
   WHERE o.vkn_json LIKE '%gia_tri_trung_binh%' GROUP BY 1,2 ORDER BY 1,2`))
+// Lý do lịch đề Hóa 2026 còn "chuẩn bị": gom mã phần thiếu (tên kỹ năng/ô ma trận, không có danh tính) theo lớp. Chỉ lịch bản 3, một lần đọc.
+in1('thieuV3', await doc(`SELECT k.lop,t.value ma,COUNT(DISTINCT k.sbd) em FROM kiem_tra_ca_nhan k JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id,json_each(k.json,'$.thieu') t
+  WHERE k.trang_thai='cho_nguon' AND json_extract(km.meta_json,'$.phienBan')=3 AND k.han_luc>${now} GROUP BY 1,2 ORDER BY 1,3 DESC LIMIT 60`))
+// Vì sao câu khối 12 có kỹ năng "dùng giá trị trung bình" (tờ DH-12-…) không vào được đề: phần, mức, duyệt, chỉ mục đúng bản, đã dạy ở lớp 12 nào,
+// đang nghi sai đáp án, loại câu. Chỉ in thuộc tính câu (không có học sinh).
+in1('cau12GTTB', await doc(`SELECT q.qid,q.ma_de,json_extract(q.json,'$.phan') phan,json_extract(q.json,'$.mucDo') muc_do,COALESCE(json_extract(q.json,'$.reviewed'),0) duyet,
+  q.dang,o.y,o.nguon,o.duyet_luc IS NOT NULL omni_duyet,length(q.json) dai,
+  EXISTS(SELECT 1 FROM de_kho d JOIN game_v2_index i ON i.ma_de=d.ma_de AND i.source_version=d.cap_nhat_luc WHERE d.ma_de=q.ma_de AND COALESCE(d.da_xoa,0)=0) chi_muc_dung,
+  (SELECT group_concat(DISTINCT b.lop) FROM bai_da_day b WHERE b.bo_tick_luc IS NULL AND b.ma_to_json LIKE '%'||q.ma_de||'%') day_o_lop,
+  EXISTS(SELECT 1 FROM cau_nghi_dap_an n WHERE n.qid=q.qid AND n.trang_thai='nghi') nghi_dap_an
+  FROM omni_q o JOIN game_v2_question q ON q.qid=o.qid WHERE o.vkn_json LIKE '%gia_tri_trung_binh%' AND q.ma_de LIKE 'DH-12-%'`))
+in1('phamVi12', await doc(`SELECT b.lop,COUNT(*) bai,SUM(b.ma_to_json LIKE '%DH-12-C1-B1%') co_b1 FROM bai_da_day b WHERE b.bo_tick_luc IS NULL AND b.lop LIKE '12%' GROUP BY 1`))
+in1('scope12', await doc(`SELECT COUNT(*) em,SUM(json_array_length(COALESCE(json_extract(s.json,'$.types'),'[]'))>0) gioi_han_dang,SUM(json_array_length(COALESCE(json_extract(s.json,'$.blocked'),'[]'))>0) co_chan FROM game_v2_scope s JOIN hoc_sinh h ON h.sbd=s.sbd WHERE h.lop LIKE '12%' OR h.ten_lop LIKE '12%'`))
+// Câu khối 12 có kỹ năng giá trị trung bình đang bị nghi đáp án: vì sao (số lượt làm/sai hay máy giải lại lệch). Không in đề/đáp án.
+in1('nghi12', await doc(`SELECT n.qid,n.so_lan,n.so_sai,n.ty_le_sai,n.trang_thai,substr(COALESCE(n.ghi_chu,''),1,160) ghi_chu,n.luc FROM cau_nghi_dap_an n WHERE n.qid IN(SELECT o.qid FROM omni_q o JOIN game_v2_question q ON q.qid=o.qid WHERE o.vkn_json LIKE '%gia_tri_trung_binh%' AND q.ma_de LIKE 'DH-12-%')`))
+in1('phamViLop12', await doc(`SELECT lop,COUNT(*) bai,SUM(ma_de_json LIKE '%DH-12-C1-B1%') co_b1 FROM pham_vi_lop WHERE lop LIKE '12%' GROUP BY 1`))

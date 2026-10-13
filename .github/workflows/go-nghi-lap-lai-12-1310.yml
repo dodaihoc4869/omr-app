@@ -1,0 +1,36 @@
+# Claude 13/10 — gỡ cờ nghi đáp án câu DH-12-C1-B1-P2 Phần II câu 15 (Claude đã giải lại: đáp án kho đúng) rồi lập lại đề Hóa 2026 cho khối 12.
+# Chỉ sửa một dòng cau_nghi_dap_an + lịch kiểm tra CHƯA MỞ của khối 12. Không đụng bài đã làm/nộp, điểm.
+name: Gỡ nghi câu khối 12 + lập lại đề khối 12
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['scripts/go-nghi-lap-lai-12-1310.ts', '.github/workflows/go-nghi-lap-lai-12-1310.yml']
+permissions:
+  contents: read
+concurrency:
+  group: go-nghi-lap-lai-12
+  cancel-in-progress: false
+jobs:
+  lam:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Gỡ nghi + lập lại
+        run: |
+          npx esbuild scripts/go-nghi-lap-lai-12-1310.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/go-nghi.mjs --log-level=warning
+          node /tmp/go-nghi.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}

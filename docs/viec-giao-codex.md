@@ -73,3 +73,8 @@ Codex KHÔNG đẩy thêm vào `codex/de-kiem-tra-2026-1310`. Claude đã gộp 
   - Số thật lúc 15:22: 261 lịch đều ngày 17–19/10, chưa em nào mở; khối 11 có 89 lịch đề cũ ("hen"), khối 10/12 có 172 lịch "cho_nguon".
   - Đã thêm bước chuyển từng em về 28 câu/50 phút TRƯỚC khi bật, vì cờ tắt thì cron chưa chuyển.
 - [ ] Khối 12 còn thiếu nguồn đã duyệt cho `nen:gia_tri_trung_binh` (52/53) ⇒ lịch khối 12 vẫn "Đang chuẩn bị". Cần thầy duyệt câu đang chờ; Codex/Claude không tự duyệt.
+- [x] (Claude 13/10 17:20) Bật lại cờ xong 16:32. Khối 12 hết thiếu nguồn:
+  - Câu DH-12-C1-B1-P2 II-15 bị nghi đáp án; Claude giải lại thấy đáp án kho đúng nên gỡ nghi.
+  - Đã lập lại 126 em; mỗi em có 3 bài.
+  - Còn 122 dòng `cho_nguon` cũ ở ngày giữa chu kỳ. Dòng này ẩn ở mọi màn nên để nguyên.
+  - Codex sửa luật nguồn tương đương thì nhớ: `chanKhacKhoiEm` loại câu `cau_nghi_dap_an`='nghi'. Câu khó, tỉ lệ sai cao vẫn bị xếp nghi; nên có nút gỡ trên app thầy (`/gv/cau-nghi/xu-ly` đã có ở máy chủ, chưa có giao diện).
