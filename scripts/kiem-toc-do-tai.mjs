@@ -20,7 +20,8 @@ const APP = { 'giao-vien': ['App'], 'hoc-sinh': ['AppHocSinh', 'StudentPortalScr
 
 if (!existsSync(resolve(DIST, 'index.html'))) { console.error('Chưa có dist/index.html. Chạy trước: npm run build'); process.exit(2) }
 const tep = readdirSync(ASSETS)
-const coBam = (ten) => tep.filter((t) => t.replace(/-[A-Za-z0-9_]{6,}\.(js|css)$/, '') === ten)
+// Mã băm của Vite: đúng 8 ký tự [A-Za-z0-9_-] (CÓ THỂ chứa dấu '-', vd `bieu-tuong-B2sLNj-c.js`).
+const coBam = (ten) => tep.filter((t) => t.replace(/-[A-Za-z0-9_-]{8}\.(js|css)$/, '') === ten)
 const nen = new Map()
 const kichCo = (t) => { if (!nen.has(t)) { const b = readFileSync(resolve(ASSETS, t)); nen.set(t, gzipSync(b, { level: 9 }).length) } return nen.get(t) }
 /** Đóng tĩnh: tệp + mọi tệp nó `import` tĩnh (không tính `import()` động — nạp khi bấm). */
