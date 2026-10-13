@@ -28,27 +28,30 @@ export async function goiLenh(duong: string, body: unknown, chuKhongCoLenh: stri
   if (!url) return thoat('mang', 'Chưa kết nối được máy chủ.')
   const dk = new AbortController()
   const hen = setTimeout(() => dk.abort(), HAN_GIAY * 1000)
-  let res: Response
   try {
-    res = await fetch(`${url}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': mat || '' }, body: JSON.stringify(body ?? {}), signal: dk.signal })
+    const res = await fetch(`${url}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': mat || '' }, body: JSON.stringify(body ?? {}), signal: dk.signal })
+    if (res.status === 404) return thoat('chua_co_lenh', chuKhongCoLenh)
+    let j: Record<string, unknown>
+    try {
+      const du: unknown = await res.json()
+      if (dk.signal.aborted) return thoat('cham', chuCham)
+      if (!du || typeof du !== 'object' || Array.isArray(du)) return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
+      j = du as Record<string, unknown>
+    } catch {
+      return dk.signal.aborted ? thoat('cham', chuCham) : thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
+    }
+    if (!res.ok || j.ok !== true) {
+      const chu = String(j.error || j.loi || 'Máy chủ không đồng ý lệnh này.')
+      return thoat('tu_choi', res.status === 403 && /mã bí mật/i.test(chu) ? `${chu} — ${CHU_HUONG_DAN_MA}` : chu)
+    }
+    return { ok: true, du: j }
   } catch (e) {
-    if ((e as { name?: string })?.name === 'AbortError') return thoat('cham', chuCham)
+    if (dk.signal.aborted || (e as { name?: string })?.name === 'AbortError') return thoat('cham', chuCham)
     return thoat('mang', 'Không nối được máy chủ.')
   } finally {
+    // Thời hạn gồm cả body: nhận headers chưa có nghĩa là đã đọc xong dữ liệu.
     clearTimeout(hen)
   }
-  if (res.status === 404) return thoat('chua_co_lenh', chuKhongCoLenh)
-  let j: Record<string, unknown>
-  try {
-    j = (await res.json()) as Record<string, unknown>
-  } catch {
-    return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
-  }
-  if (!res.ok || j.ok !== true) {
-    const chu = String(j.error || j.loi || 'Máy chủ không đồng ý lệnh này.')
-    return thoat('tu_choi', res.status === 403 && /mã bí mật/i.test(chu) ? `${chu} — ${CHU_HUONG_DAN_MA}` : chu)
-  }
-  return { ok: true, du: j }
 }
 
 /** Đuôi hướng dẫn khi máy chủ từ chối mã bí mật (07/10: thầy đổi mã ở Cloudflare, app chỉ báo "Sai mã bí mật" trơ trọi nên không biết làm gì). */
