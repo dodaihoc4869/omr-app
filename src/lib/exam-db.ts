@@ -3,7 +3,7 @@
 // để mất mạng/refresh giữa chừng vẫn khôi phục đúng, và nộp bài lên server
 // luôn ở dạng chấm được ngay (chấm lại chỉ cần chạy lại đúng thuật toán chọn
 // câu từ (mãCa, sbd), không cần lưu thêm bộ câu đã gán cho từng em).
-import { openDB, type IDBPDatabase } from 'idb'
+import { openDB, type IDBPDatabase, type IDBPTransaction } from 'idb'
 import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import type { BanGhiKhoa } from './khoa-app'
 import { chuanHoaMayChu, diaChiMayChuHopLe, type CauHinhMayChu } from './cau-hinh-may-chu'
@@ -127,10 +127,36 @@ const STORE_SOURCES = 'examSources'
 const STORE_ATTEMPTS = 'attempts'
 const STORE_SESSION_CACHE = 'sessionCache'
 const STORE_SESSION_BANK_TEACHER = 'sessionBankTeacher'
+const HAN_KHO_THI_MS = 3000
+
+/** Chưa đọc được kho khác với kho không có bài: không được thay nháp bằng một lượt rỗng. */
+export class LoiKhoThi extends Error {
+  constructor(viec: 'mo' | 'doc' | 'ghi') {
+    super(viec === 'ghi' ? 'Chưa lưu được bài trên máy. Em giữ màn này rồi thử lại.' : 'Chưa đọc được kho bài trên máy. Bản nháp vẫn được giữ nguyên; em đóng tab app cũ rồi thử lại.')
+    this.name = 'LoiKhoThi'
+  }
+}
+
+async function thaoTacKho<T, M extends 'readonly' | 'readwrite'>(db: IDBPDatabase, ten: string, cheDo: M, viec: (tx: IDBPTransaction<unknown, [string], M>) => Promise<T>): Promise<T> {
+  const tx = db.transaction(ten, cheDo)
+  // Đăng ký cả done trước khi chạy request; abort không sinh lời hứa lỗi không ai nhận.
+  const done = tx.done
+  void done.catch(() => {})
+  const huy = () => { try { tx.abort() } catch { /* Giao dịch đã kết thúc. */ } }
+  try {
+    return (await voiHanCho(Promise.all([viec(tx), done]), HAN_KHO_THI_MS, 'Kho bài chưa phản hồi.', huy))[0]
+  } catch {
+    huy()
+    throw new LoiKhoThi(cheDo === 'readonly' ? 'doc' : 'ghi')
+  }
+}
 
 async function getDb(): Promise<IDBPDatabase> {
-  return openDB(DB_NAME, DB_VERSION, {
-    upgrade(db, oldVersion) {
+  let hetCho = false
+  const nap = openDB(DB_NAME, DB_VERSION, {
+    upgrade(db, oldVersion, _moi, tx) {
+      // open bị chặn rồi về muộn: hủy TRƯỚC mọi thao tác migration cũ, không tự chuyển/xóa nháp.
+      if (hetCho) { tx.abort(); return }
       if (oldVersion < 1) {
         if (!db.objectStoreNames.contains(STORE_SETTINGS)) db.createObjectStore(STORE_SETTINGS)
       }
@@ -144,6 +170,13 @@ async function getDb(): Promise<IDBPDatabase> {
       if (!db.objectStoreNames.contains(STORE_SESSION_BANK_TEACHER)) db.createObjectStore(STORE_SESSION_BANK_TEACHER)
     },
   })
+  try {
+    return await voiHanCho(nap, HAN_KHO_THI_MS, 'Kho bài chưa mở được.', () => { hetCho = true })
+  } catch {
+    hetCho = true
+    void nap.then(db => db.close(), () => {})
+    throw new LoiKhoThi('mo')
+  }
 }
 
 export interface CachedSession {
@@ -156,12 +189,12 @@ export interface CachedSession {
 /** Cache đề đã tải về máy học sinh — để mất mạng giữa chừng vẫn mở lại làm tiếp được. */
 export async function cacheSession(session: CachedSession): Promise<void> {
   const db = await getDb()
-  await db.put(STORE_SESSION_CACHE, session, session.maCa)
+  await thaoTacKho(db, STORE_SESSION_CACHE, 'readwrite', tx => tx.store.put(session, session.maCa))
 }
 
 export async function loadCachedSession(maCa: string): Promise<CachedSession | undefined> {
   const db = await getDb()
-  return db.get(STORE_SESSION_CACHE, maCa)
+  return thaoTacKho(db, STORE_SESSION_CACHE, 'readonly', tx => tx.store.get(maCa))
 }
 
 /** Lưu lại (trên máy thầy) ngân hàng ĐẦY ĐỦ ĐÁP ÁN đã dùng để mở 1 ca — để màn Theo dõi
@@ -324,7 +357,7 @@ export async function saveScriptUrl(url: string): Promise<void> {
 export async function loadCauHinhMayChu(): Promise<CauHinhMayChu> {
   try {
     const db = await getDb()
-    return chuanHoaMayChu((await db.get(STORE_SETTINGS, 'mayChuMoi')) as Partial<CauHinhMayChu> | undefined)
+    return chuanHoaMayChu((await thaoTacKho(db, STORE_SETTINGS, 'readonly', tx => tx.store.get('mayChuMoi'))) as Partial<CauHinhMayChu> | undefined)
   } catch {
     return chuanHoaMayChu(null)
   }
@@ -350,11 +383,11 @@ export async function saveCauHinhMayChu(c: Partial<CauHinhMayChu>): Promise<CauH
 export async function loadScriptUrl(): Promise<string> {
   // Khoá `scriptUrl` cũ có thể trỏ Google/localhost từ máy đã dùng lâu.
   // Mọi màn đọc cùng địa chỉ Worker đã kiểm tra của máy hiện tại.
-  const ch = await loadCauHinhMayChu()
-  if (ch.URL) return ch.URL
   try {
     const db = await getDb()
-    const daChon = diaChiMayChuHopLe(await db.get(STORE_SETTINGS, 'scriptUrl'))
+    const ch = chuanHoaMayChu(await thaoTacKho(db, STORE_SETTINGS, 'readonly', tx => tx.store.get('mayChuMoi')))
+    if (ch.URL) return ch.URL
+    const daChon = diaChiMayChuHopLe(await thaoTacKho(db, STORE_SETTINGS, 'readonly', tx => tx.store.get('scriptUrl')))
     if (daChon) return daChon
   } catch {
     // Máy sạch/IndexedDB hỏng vẫn có cấu hình công khai.
@@ -627,12 +660,12 @@ export function attemptKey(maCa: string, sbd: string): string {
 
 export async function saveAttempt(attempt: ExamAttempt): Promise<void> {
   const db = await getDb()
-  await db.put(STORE_ATTEMPTS, attempt)
+  await thaoTacKho(db, STORE_ATTEMPTS, 'readwrite', tx => tx.store.put(attempt))
 }
 
 export async function loadAttempt(maCa: string, sbd: string): Promise<ExamAttempt | undefined> {
   const db = await getDb()
-  return db.get(STORE_ATTEMPTS, attemptKey(maCa, sbd))
+  return thaoTacKho(db, STORE_ATTEMPTS, 'readonly', tx => tx.store.get(attemptKey(maCa, sbd)))
 }
 
 // ---------------------------------------------------------------------------
@@ -672,7 +705,7 @@ export async function docLichSuDiem(sbd: string): Promise<DiemDaLuu[]> {
 
 export async function listPendingAttempts(): Promise<ExamAttempt[]> {
   const db = await getDb()
-  const all: ExamAttempt[] = await db.getAll(STORE_ATTEMPTS)
+  const all: ExamAttempt[] = await thaoTacKho(db, STORE_ATTEMPTS, 'readonly', tx => tx.store.getAll())
   return all.filter((a) => a.pendingSubmit)
 }
 
