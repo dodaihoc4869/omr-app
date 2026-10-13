@@ -9,6 +9,7 @@ import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { LUAT_NHOM_NHIP, type KetQuaNhipHocEm, type NgayNhipEm, type NhomNhip, type TocDoNhipEm, type ViecTiepNhip } from '../../server/src/nhip-hoc-kieu'
 import { NGUONG_THAI_DO } from '../../server/src/bai-hang-ngay-kieu'
 import { TEN_NHOM_NHIP, tomTatNhip, viecTiepNhip } from '../../server/src/nhip-hoc-luat'
+import { docBacCham } from './bac-cham-chi'
 
 export type { KetQuaNhipHocEm, NgayNhipEm, NhomNhip, TocDoNhipEm, ViecTiepNhip }
 /** ĐỢT 16 — làn máy chủ D CHỈ THÊM hai trường TUỲ CHỌN (khai phía app): độ tin cậy của nhóm (0–100, máy chủ kẹp ≤ 99) + câu "cần thêm" khi chưa chắc.
@@ -65,6 +66,8 @@ export function docNhipHocEm(v: unknown): KetQuaNhipHocEm | null {
   const h = dt(du.homNayMuc)
   const b = dt(du.chuoiBo)
   const t = dt(du.tocDo)
+  // 13/10 — bậc 1–12 (tuỳ chọn, CHỈ THÊM): đọc chặt + phải khớp nhóm; sai / vắng ⇒ bỏ trường (phần bậc ẩn).
+  const bacCham = docBacCham(du.bacCham, nhom)
   return {
     ok: true,
     tu: du.tu,
@@ -88,6 +91,7 @@ export function docNhipHocEm(v: unknown): KetQuaNhipHocEm | null {
     // ĐỢT 16 — tuỳ chọn (xem `KetQuaNhipHocApp`)
     ...(so(du.doTinCay) !== null ? { doTinCay: Math.max(0, Math.min(100, Math.round(so(du.doTinCay)!))) } : {}),
     ...(typeof du.canThem === 'string' && du.canThem.trim() ? { canThem: du.canThem.trim() } : {}),
+    ...(bacCham ? { bacCham } : {}),
   }
 }
 

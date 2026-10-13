@@ -5,8 +5,11 @@
 //     em không có trong trả lời ⇒ "chưa có số" (ô tên vẫn hiện, không màu nhóm — không bịa nhóm);
 //   · em vắng = em đúng lớp của buổi chưa có trong danh sách có mặt (`emVangBuoi`; buổi "Mọi lớp" ⇒ không tính vắng);
 //   · ba cột của bản chiếu Nhịp học: Chăm xếp số ngày đủ mức GIẢM dần, Chưa đều giảm dần, Lười TĂNG dần (cùng số ⇒ bỏ liền dài hơn trước).
+//   · 13/10 (thầy: "Hiện bậc trên màn chiếu luôn nhé"): mỗi em mang `bacCham` (bậc 1–12, CHỈ THÊM) — đúng số `phanNhomEm` đã đọc chặt + kiểm khớp nhóm;
+//     em chưa đủ dữ liệu / máy chủ cũ ⇒ vắng (không chip). Đếm số em mỗi bậc: `demTheoBac` (nhip-hoc-thay.ts).
 import type { TrangThaiBuoi } from './buoi-hoc-api'
 import { LUAT_NHOM_NHIP, phanNhomEm, type DongNhipHoc, type KetQuaNhipHoc } from './nhip-hoc-thay'
+import type { KetQuaBac } from './bac-cham-chi'
 
 /** Hai bản chiếu: đang điểm danh · Nhịp học của lớp. */
 export type CheDoChieu = 'diem-danh' | 'nhip-lop'
@@ -46,6 +49,8 @@ export interface EmBuoi {
   cach: 'ma' | 'thay' | null
   /** null = máy chủ không có số nhịp học của em này. */
   nhip: DongNhipHoc | null
+  /** 13/10 — bậc 1–12 của em (từ `nhip.bacCham`); vắng ⇒ không chip bậc. */
+  bacCham?: KetQuaBac
 }
 
 /** Nhóm hiển thị: bốn nhóm của luật + "chưa có số" (không có trong trả lời Nhịp học). "Mới" = chưa đủ 3 ngày để xếp nhóm. */
@@ -67,7 +72,7 @@ export function emCuaBuoi(tt: Pick<TrangThaiBuoi, 'buoi' | 'lopEm' | 'coMat'> | 
     da.add(sbd)
     const c = coMat.get(sbd)
     const n = nhip.get(sbd) ?? null
-    ra.push({ sbd, hoTen: (hoTen || c?.hoTen || n?.hoTen || '').trim(), lop: tenLop || n?.lop || '', coMat: !!c, luc: c?.luc ?? null, cach: c?.cach ?? null, nhip: n })
+    ra.push({ sbd, hoTen: (hoTen || c?.hoTen || n?.hoTen || '').trim(), lop: tenLop || n?.lop || '', coMat: !!c, luc: c?.luc ?? null, cach: c?.cach ?? null, nhip: n, ...(n?.bacCham ? { bacCham: n.bacCham } : {}) })
   }
   if (lop) for (const e of tt.lopEm ?? []) if (e.tenLop === lop) them(e.sbd, e.hoTen, e.tenLop)
   for (const e of tt.coMat) them(e.sbd, e.hoTen, tt.lopEm?.find((x) => x.sbd === e.sbd)?.tenLop ?? lop)
@@ -226,10 +231,10 @@ export function chuChip(e: Pick<EmBuoi, 'nhip'>): string {
   if (k === 'moi' || k === 'chua-co' || !e.nhip) return TEN_NHOM[k]
   return `${TEN_NHOM[k]} · ${e.nhip.soNgayDu}/${e.nhip.soNgayQua}`
 }
-/** Câu đọc màn hình của một nút tên em. */
-export function chuNutEm(e: EmBuoi): string {
+/** Câu đọc màn hình của một nút tên em. `bac` (13/10, tuỳ chọn) = chữ bậc đã dựng ("Bậc 3/12 · Vua Ngủ Nướng") ⇒ chèn sau nhóm. */
+export function chuNutEm(e: EmBuoi, bac?: string): string {
   const k = khoaNhom(e)
   const nhom = !e.nhip ? 'chưa có số nhịp học' : k === 'moi' ? 'mới vào lớp, chưa đủ 3 ngày để xếp nhóm' : `${TEN_NHOM[k]}, đủ mức ${e.nhip.soNgayDu}/${e.nhip.soNgayQua} ngày`
-  return `${e.hoTen || `SBD ${e.sbd}`}${e.coMat ? '' : ', vắng'}, ${nhom} — mở hồ sơ làm bài`
+  return `${e.hoTen || `SBD ${e.sbd}`}${e.coMat ? '' : ', vắng'}, ${nhom}${bac ? `, ${bac}` : ''} — mở hồ sơ làm bài`
 }
 

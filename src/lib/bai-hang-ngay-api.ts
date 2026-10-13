@@ -8,6 +8,7 @@ import type {
   NgayHoatDong, NguonMuc, NhanThaiDo, NhomGiay, TinHieuThaiDo,
 } from '../../server/src/bai-hang-ngay-kieu'
 import { MUC_THEO_TANG, NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO, TEN_NHAN_THAI_DO } from '../../server/src/bai-hang-ngay-kieu'
+import { docBacCham } from './bac-cham-chi'
 
 export type {
   CauTomTat, EmBaiHangNgay, KetLuanThaiDo, KetQuaBaiHangNgay, KetQuaHoSoThaiDo, LopBaiHangNgay, MaTinHieu, MucTinHieu, NgayBaiEm, NgayHoatDong,
@@ -157,6 +158,8 @@ export function docHoSoThaiDo(du: O): KetQuaHoSoThaiDo | null {
   const em = dt(du.em), kl = dt(du.ketLuan), dem = dt(du.dem)
   if (!em || !kl || !dem || !Array.isArray(du.tinHieu) || !Array.isArray(du.ngay) || !laNgay(du.tu) || !laNgay(du.den)) return null
   const nhan: NhanThaiDo = (Object.keys(TEN_NHAN_THAI_DO) as NhanThaiDo[]).includes(kl.nhan as NhanThaiDo) ? (kl.nhan as NhanThaiDo) : 'chua-du-du-lieu'
+  // 13/10: bậc 1–12 của nhóm Nhịp học — chỉ nhận khi có nhóm hợp lệ và bậc nằm trong khoảng của nhóm ấy (chip đặt cạnh tên nhóm). Sai / vắng ⇒ bỏ.
+  const bacCham = docBacCham(du.bacCham, NHOM_NHIP.includes(du.nhomNhip as never) ? (du.nhomNhip as NonNullable<KetQuaHoSoThaiDo['nhomNhip']>) : null)
   return {
     ok: true,
     em: { sbd: chu(em.sbd), hoTen: chu(em.hoTen), lop: chu(em.lop), khoi: chu(em.khoi) },
@@ -211,6 +214,7 @@ export function docHoSoThaiDo(du: O): KetQuaHoSoThaiDo | null {
     ...(du.tinCayNhom && typeof du.tinCayNhom === 'object' && docDoTinCay((du.tinCayNhom as Record<string, unknown>).doTinCay) !== null
       ? { tinCayNhom: { doTinCay: docDoTinCay((du.tinCayNhom as Record<string, unknown>).doTinCay)!, ...(typeof (du.tinCayNhom as Record<string, unknown>).canThem === 'string' && String((du.tinCayNhom as Record<string, unknown>).canThem).trim() ? { canThem: String((du.tinCayNhom as Record<string, unknown>).canThem).trim() } : {}) } }
       : {}),
+    ...(bacCham ? { bacCham } : {}),
   }
 }
 
