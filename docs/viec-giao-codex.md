@@ -80,4 +80,4 @@ Codex KHÔNG đẩy thêm vào `codex/de-kiem-tra-2026-1310`. Claude đã gộp 
   - Codex sửa luật nguồn tương đương thì nhớ: `chanKhacKhoiEm` loại câu `cau_nghi_dap_an`='nghi'. Câu khó, tỉ lệ sai cao vẫn bị xếp nghi; nên có nút gỡ trên app thầy (`/gv/cau-nghi/xu-ly` đã có ở máy chủ, chưa có giao diện).
 
 ## 13/10 — Thầy nhắc phần sửa hạn chưa xuất hiện
-- [ ] PR269: cập nhật main mới, giữ Hỏi Thầy hiện tại; kiểm cổng và nhờ Claude soát/phát hành nút Sửa hạn tại từng dòng Bài đang giao. Code/ảnh đã có; chưa gộp nên bản sống chưa có nút.
+- [x] PR269: cập nhật main mới, giữ Hỏi Thầy hiện tại; đã kiểm cổng và gửi Claude soát. Nút Sửa hạn tại từng dòng Bài đang giao;7tệp99/99,tốc độ/màu/SWđạt, so full không có lỗi mới còn tái hiện. Thầy nhắc ảnh chưa có nút nên ưu tiên phát hành; không sửa hạn D1 thay thầy.

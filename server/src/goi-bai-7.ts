@@ -19,7 +19,7 @@ import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { apLamLaiKhac } from './cau-anh-em'
 import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
-import { quotaHocKt } from './kiem-tra-ca-nhan-loi'
+import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
 import { docCauHinhDem } from './cau-hinh-dem'
 
 type Row = Record<string, unknown>
@@ -196,13 +196,13 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
     const cu = quotas.results.find(q => q.goi_id === g.id)
     const duKiem=(ngayKiem.get(ngay)??0)>=2
     const quota = duKiem?0:ngayKiem.get(ngay)===1?quotaHocKt(cau.length-daGap.size+gapNgay.size,ngay,str(g.han),ngayKiem):Math.max(cu ? Number(cu.quota) : 0,ngayKiem.size?quotaHocKt(cau.length-daGap.size+gapNgay.size,ngay,str(g.han),ngayKiem):quotaGoi7(cau.length - daGap.size + gapNgay.size, ngay, str(g.han)))
-    if (!cu && !chiDoc) await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) VALUES(?,?,?,?)').bind(g.id,sbd,ngay,quota).run()
     out.push({ id: str(g.id), ten: str(g.ten), khoaBai: str(g.khoa_bai), batDau: str(g.bat_dau), han: str(g.han),maDeNguon:[...new Set(mang7(g.ma_to_json).map(m=>tachMaTo(m).goc))], cau, daGap, gapNgay, tuLamNgay, choThay, nguonDayDu, quota,kiemNhe:ngayKiem.get(ngay)===1 })
   }
-  if(ngayKiem.get(ngay)===1){
-    let con=12
-    for(const g of [...out].sort((a,b)=>Number(a.han<ngay)-Number(b.han<ngay)||a.han.localeCompare(b.han))){g.quota=Math.min(g.quota,con);con-=g.quota}
+  if(ngayKiem.size){
+    const chia=quotaCacGoiHocKt(out.map(g=>({id:g.id,han:g.han,chuaGap:g.cau.length-g.daGap.size+g.gapNgay.size})),ngay,ngayKiem)
+    for(const g of out)g.quota=ngayKiem.has(ngay)?chia.get(g.id)??0:Math.max(g.quota,chia.get(g.id)??0)
   }
+  for(const g of out)if(!chiDoc&&!quotas.results.some(q=>q.goi_id===g.id))await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) VALUES(?,?,?,?)').bind(g.id,sbd,ngay,g.quota).run()
   return out
 }
 

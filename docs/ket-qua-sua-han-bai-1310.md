@@ -18,3 +18,18 @@ Nguồn thật: mô phỏng chỉSELECT/WITH Actions38360174317 trên mộtđạ
 D1: bản sửa hạn chưa áp dụng vào dữ liệu thật. Claude phụ trách bật cờ qua workflowbat-lai-ktcn-1310 theo main267; không bật SQLtay. Không thay luật chấm điểm/ca chính thức. PR bổ sung chờ Claude soát rồi phát hành theo điều phối.
 
 Gộp tiếp main268/124208fb (Hỏi thêm Thầy), không bỏ cập nhật bên kia:202/202kiểm liên quan đạt. Cập nhật này làm cổng tải đỏ cả3app, đã tách mã khung lời giải và Hỏi thêm sang nạp khi dùng, giữ CSS/API/backend nguyên.110/110kiểm luồng sau tối ưu đạt; mộtkiểmHỏi thêm đợi tải bằngfindByRole thaygetByRole, ghi SỬA CÓ CHỦ ĐÍCH, khôngskip. Build/TS/serverTS/tốc độ/SW/màu0đỏ. TảiGV268,6KB/HS330,7KB/PH266,1KB, giảm3,9/2,6/3,3KBso mốc; hạ mốc đúng số đo275064/338686/272461byte, không nâng. SW170/13-13.
+
+
+## Cập nhật 13/10 20:27 — thầy nhắc nút chưa xuất hiện
+
+PR269 chưa được gộp nên bảng sống không có nút. Gộp main ec23546a (main tiếp theo5db64591 chỉ nhật ký). Giữ Hỏi Thầy mới: hộp thoại, trả lời có cấu trúc, mô hình3.1 và trần12/6. API Hỏi thêm giữ nguyên5tham số/dangLam/cauTruc, nạp cùng khung khi bấm; cầu nối tương thích bắt lỗi mất mảnh để không kẹt gửi.
+
+Soát độc lập phát hiện hai gói cùng hạn cùng dự trù12chỗ ở ngày kiểm tra cuối; đã sửa dự trù chỗ chung theo hạn trên mọi ngày kiểm tra tương lai. Hai gói164câu: đủ328trong7ngày, ngày kiểm tra cuối tổng≤12. Nợ quá hạn không chiếm dự trù tương lai. Kiểm API/sổ thật trong kho thử và nhiều hạn/ngày2kiểm tra: goi7 31/31.
+
+- Liên quan cuối:7tệp99/99. FrontendTS qua build, serverTS sạch.
+- Full đối chiếu main ec23546a: nền15587đạt/138đỏ, nhánh15596/138;2tên chỉ đỏ ở nhánh và2chỉ đỏ ở nền. Chạy lại4tệp khác biệt cả hai: nhánh36/36, nền34/34; không còn lỗi mới tái hiện. Các sửa sau so full được kiểm lại trong7tệp99/99. Không tuyên bố toàn bộ đều xanh.
+- Build/SW13/13:169mảnh,2727KiB. Màu0; tốc độ0đỏ, mốc lấy số nhỏ hơn từng mục, không nâng. Byte mở GV275987/HS338822/PH273115; nhẹ hơn main hiện tại276137/338986/273281.
+- Ảnh6khổ trongban-ve-sua-han-1310 vẫn đúng bố cục sửa hạn (không đổi giao diện sau ảnh).
+- Đo D1 chỉ đọc lúc19:53:10 cũ761/mới18;11 cũ528/mới99;ba lớp12 cũ899/mới164. Workflow38400669996. Tỷ lệ dự báo là sức chứa, không phải tiến bộ đã đo.
+
+Không tự sửa hạn D1 của thầy; phát hành chỉ bổ sung nút và lệnh để thầy chọn hạn.

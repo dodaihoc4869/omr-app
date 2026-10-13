@@ -76,6 +76,35 @@ export function quotaHocKt(u: number, ngay: string, han: string, lich: ReadonlyS
  return lich instanceof Map&&lich.get(ngay)===1?Math.min(12,quota):quota
 }
 
+/** 12 chỗ ngày kiểm tra là của em, không phải 12 chỗ cho MỖI gói.
+ * Dự trù chỗ chung trên toàn lịch đã công bố trước khi chia phần còn lại sang ngày thường.
+ * Chỉ duyệt ngày kiểm tra; hạn rất xa không tạo vòng lặp theo từng ngày. */
+export function quotaCacGoiHocKt(goi:readonly {id:string;chuaGap:number;han:string}[],ngay:string,lich:ReadonlyMap<string,number>,sanNgay=24):Map<string,number>{
+ const ds=[...goi].sort((a,b)=>Number(a.han<ngay)-Number(b.han<ngay)||a.han.localeCompare(b.han)||a.id.localeCompare(b.id))
+ const ngayKiem=[...lich.keys()].filter(d=>d>=ngay&&(lich.get(d)??0)>0).sort()
+ const du=new Map(ds.map(g=>[g.id,Math.max(0,g.chuaGap)])),cho=new Map<string,Map<string,number>>()
+ for(const d of ngayKiem){
+  let con=lich.get(d)===1?12:0
+  for(const g of ds){
+   if(!con)break
+   // Nợ quá hạn chỉ nhận chỗ hôm nay còn dư sau các gói đang hạn, không chiếm dự trù tương lai.
+   if(g.han<d&&!(g.han<ngay&&d===ngay))continue
+   const n=Math.min(con,du.get(g.id)??0)
+   if(!n)continue
+   const m=cho.get(g.id)??new Map<string,number>();m.set(d,n);cho.set(g.id,m)
+   du.set(g.id,(du.get(g.id)??0)-n);con-=n
+  }
+ }
+ return new Map(ds.map(g=>{
+  const han=g.han<ngay?ngay:g.han,kiem=ngayKiem.filter(d=>d<=han)
+  const thuong=Math.max(0,1+Math.floor((Date.parse(han)-Date.parse(ngay))/NGAY_KT)-kiem.length)
+  const m=cho.get(g.id),sucKiem=kiem.reduce((n,d)=>n+(m?.get(d)??0),0),suc=thuong*sanNgay+sucKiem
+  const w=lich.has(ngay)?m?.get(ngay)??0:sanNgay,u=Math.max(0,g.chuaGap)
+  const quota=!w?0:!lich.has(ngay)&&u>suc&&thuong?Math.ceil((u-sucKiem)/thuong):Math.ceil(u*w/Math.max(w,suc))
+  return [g.id,lich.has(ngay)?Math.min(w,quota):quota]
+ }))
+}
+
 export function phutCauKt(phan: string, ms: readonly number[]): number {
   const nen = phan === 'III' ? 150 : phan === 'II' ? 120 : 60
   const mau = ms.filter(t => Number.isFinite(t) && t >= 5000 && t <= 600000).sort((a, b) => a - b)
