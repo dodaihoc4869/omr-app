@@ -4,12 +4,14 @@
 //   · Đặt lại lượt hỏi hôm nay của MỘT em: gõ SBD ⇒ "Xem lượt" (em đã hỏi bao nhiêu câu hôm nay) ⇒ "Đặt lại lượt hỏi hôm nay".
 //     Máy chủ không xoá sổ, chỉ thôi đếm các lượt hôm nay (`/gv/hoi-tro-ly/dat-lai`). Đổi lại được bất cứ lúc nào ⇒ không hỏi lại (luật C8).
 //   · SBD thử không giới hạn lượt hỏi: cho máy thầy thử; học sinh thật vẫn theo trần (`/gv/hoi-tro-ly/sbd-thu`).
+//   · Sổ hỏi Thầy (13/10 khuya, SoHoiThay.tsx): bao nhiêu lượt, em nào hỏi, hỏi câu gì (`/gv/hoi-tro-ly/so`).
 // Máy chủ từ chối / chưa có lệnh ⇒ hiện ĐÚNG lời máy chủ ngay cạnh ô vừa dùng; các thẻ khác của Cài đặt không đổi.
 import { useEffect, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
 import { datLaiLuotHoiThay, docLuotHoiThay, doiSbdThuHoiThay, type LuotHoiThay } from '../../lib/hoi-thay-gv-api'
 import { useAppStore } from '../../store/appStore'
 import { TheNoiDung } from '../DesignSystem'
+import SoHoiThay from './SoHoiThay'
 import './chien-dich.css'
 
 const SBD_HOP_LE = /^[0-9A-Za-z_-]{3,32}$/
@@ -71,6 +73,9 @@ export default function CongTacHoiThay() {
       <p data-tran-hoi-thay style={{ margin: 0, fontSize: 'var(--cx-1)', lineHeight: 1.5, color: 'var(--nhat)' }}>
         {luot ? `Mỗi em hỏi tối đa ${luot.tranNgay} câu/ngày, mỗi câu bài tập tối đa ${luot.tranCau} lần/ngày. Sang ngày mới lượt tự về 0.` : 'Đang đọc trần lượt…'}
       </p>
+
+      <div style={VACH} />
+      <SoHoiThay />
 
       <div style={VACH} />
       <h3 style={TIEU_DE_PHU}>Đặt lại lượt hỏi hôm nay của một em</h3>

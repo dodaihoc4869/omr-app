@@ -81,6 +81,18 @@ describe('TraLoiThay', () => {
     expect(chuHoa('gốc C₂H5- và (CH3)2CH2-')).toBe('gốc C_{2}H_{5}- và (CH_{3})_{2}CH_{2}-')
   })
 
+  it('điện tích trong ngoặc (thầy báo 13/10, ảnh "HCO3⁻ + OH⁻ → CO3(2-) + H2O"): CO3(2-) ⇒ CO₃²⁻, Fe(3+) ⇒ Fe³⁺, NH4(+) ⇒ NH₄⁺', () => {
+    const { container } = render(<TraLoiThay ct={docCauTruc({ yChinh: 'Ion Fe(3+) tạo kết tủa.', buoc: [{ ten: 'Viết phương trình', chu: 'HCO3- + OH- → CO3(2-) + H2O.' }] })!} />)
+    const p = container.querySelector('.lg-tl-buoc p')!
+    expect([...p.querySelectorAll('sup')].map((x) => x.textContent)).toEqual(['-', '-', '2-'])
+    expect([...p.querySelectorAll('sub')].map((x) => x.textContent)).toEqual(['3', '3', '2'])
+    expect(p.textContent).not.toContain('(2-)')
+    expect(container.querySelector('.lg-tl-chinh sup')!.textContent).toBe('3+')
+    expect(chuHoa('NH4(+) và SO4(2−)')).toBe('NH4^{+} và SO4^{2-}')
+    // Không đụng: số oxi hoá La Mã, số thứ tự phương trình, chữ thường, công thức có ngoặc nhóm.
+    for (const giu of ['Fe(III)', 'phương trình (1)', 'x(2-)', 'Fe2(SO4)3', 'Ca(HCO3)2']) expect(chuHoa(giu)).toBe(giu)
+  })
+
   it('docCauTruc: sai khuôn / rỗng ⇒ null; thiếu phần nào hiện phần có được', () => {
     expect(docCauTruc(undefined)).toBeNull()
     expect(docCauTruc('chữ')).toBeNull()
