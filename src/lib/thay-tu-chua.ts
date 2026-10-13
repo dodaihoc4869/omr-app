@@ -22,6 +22,7 @@ import { laCauTuLuan } from './cau-tu-luan'
 import { qidMayChuCuaIdCau } from './lich-su-cau-len-bang'
 import { phanTichKhoiCau } from './khoi-cau'
 import type { SoGopCauLop } from './thong-ke-lop-cau'
+import { sinhMaNgauNhien } from './thiet-bi'
 
 export type PhanCau = 'I' | 'II' | 'III'
 export type CauGocTuChua = TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion
@@ -129,7 +130,7 @@ export function hangCau(c: Pick<CauTuChua, 'phan' | 'tinhToan'>): 0 | 1 | 2 | 3 
 }
 
 /** Trộn chung nhóm ưu tiên, ổn định theo buổi; giữ nguyên mảng vào, câu còn lại theo đề. */
-export function xepThuTuChua<T extends Pick<CauTuChua, 'phan' | 'tinhToan' | 'thuTuDe'>>(ds: readonly T[], soLop?:ReadonlyMap<string,{sai:number;lam:number}>|null,seed=crypto.randomUUID()): T[] {
+export function xepThuTuChua<T extends Pick<CauTuChua, 'phan' | 'tinhToan' | 'thuTuDe'>>(ds: readonly T[], soLop?:ReadonlyMap<string,{sai:number;lam:number}>|null,seed=sinhMaNgauNhien()): T[] {
   const hash=(s:string)=>{let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
   const key=(c:T)=>String((c as T&{qid?:string}).qid??c.thuTuDe)
   const uu=(c:T)=>{const q=(c as T&{q?:{sao?:number;mucDo?:string}}).q,g=soLop?.get(key(c));return c.tinhToan||Number(q?.sao)>=2||['VDC','van_dung_cao'].includes(q?.mucDo??'')||!!g&&g.lam>=5&&g.sai/g.lam>=0.3}

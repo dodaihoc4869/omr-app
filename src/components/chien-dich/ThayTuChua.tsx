@@ -42,6 +42,7 @@ import {
 } from '../../lib/thay-tu-chua'
 import { docCoMatHomNay, laySaiNhieuCau, ngayVnCua, xepUngVien, type KetQuaSai } from '../../lib/ung-vien-chua-cau'
 import { layEmChieu,nhanEmChieu,type EmChieu } from '../../lib/ung-vien-chieu'
+import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { useAppStore } from '../../store/appStore'
 import { ghiMotO, thayChuaQuaMayChu, useGhiToChieu } from './ghi-to-chieu'
 import type { OGhiToChieu } from './to-chieu'
@@ -299,7 +300,7 @@ export default function ThayTuChua() {
     return toDangChon.map((t) => theoMa.get(t.maDe)).filter((s): s is TeacherExamSource => !!s)
   }, [kho, toDangChon])
   const tatCa = useMemo(() => cauCuaDe(nguonChon), [nguonChon])
-  const [seedChieu]=useState(()=>crypto.randomUUID())
+  const [seedChieu]=useState(sinhMaNgauNhien)
   // Câu mang mã khối khác lớp đang chọn: bỏ ngay ở xem trước (cùng luật tờ chiếu chặn thêm một lần) và nói số câu.
   const khoiDt = dt?.khoi ?? null
   const soKhacKhoi = useMemo(() => tatCa.filter((c) => laCauKhacKhoi(c.qid, khoiDt)).length, [tatCa, khoiDt])
