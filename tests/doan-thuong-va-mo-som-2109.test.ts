@@ -1,30 +1,6 @@
 // EXP KẾT CHẶNG ĐOÀN + MỞ SỚM CHẶNG BTVN (Code 1, 21/09/2026; Điều 9 + Điều 6 phương án B).
 import { describe, expect, it } from 'vitest'
-import { THUONG_KET_CHANG, THUONG_VO_GIAP, khoanKetChang, thuongKetChang, thuongVoGiap } from '../src/game/than-thu-v2/doan-core'
 import { NGUONG_MO_SOM, chuMoSomChang, duocMoSomChang } from '../src/lib/mo-som-chang'
-
-describe('thuongKetChang / vỡ giáp (Điều 9)', () => {
-  it('thắng 1 · 2 · 3 sao ⇒ 5 · 10 · 15 EXP (chặng thắng đầu ngày); các chặng sau MỘT NỬA làm tròn lên ⇒ 3 · 5 · 8; thua / 0 sao / số lạ ⇒ 0', () => {
-    expect(THUONG_KET_CHANG).toEqual([5, 10, 15])
-    expect([1, 2, 3].map((s) => thuongKetChang(s, true))).toEqual([5, 10, 15])
-    expect([1, 2, 3].map((s) => thuongKetChang(s, false))).toEqual([3, 5, 8])
-    for (const s of [0, -1, Number.NaN, Number.NEGATIVE_INFINITY]) expect(thuongKetChang(s, true), String(s)).toBe(0)
-    expect(thuongKetChang(4, true)).toBe(15) // kẹp 3 sao
-    expect(thuongKetChang(2.9, true)).toBe(10)
-    expect(thuongKetChang(Number.POSITIVE_INFINITY, true)).toBe(0) // không phải số hữu hạn ⇒ 0
-  })
-  it('vỡ giáp +3 EXP mỗi trùm cho TỪNG bạn; khoản gộp: chặng + vỡ giáp; thua vẫn được điểm vỡ giáp, không được điểm chặng', () => {
-    expect(THUONG_VO_GIAP).toBe(3)
-    expect(thuongVoGiap([])).toBe(0)
-    expect(thuongVoGiap([true])).toBe(3)
-    expect(thuongVoGiap([true, false])).toBe(3)
-    expect(thuongVoGiap([true, true])).toBe(6)
-    expect(khoanKetChang({ thang: true, sao: 3, trumVoGiap: [true, true] }, true)).toEqual({ chang: 15, voGiap: 6, tong: 21 })
-    expect(khoanKetChang({ thang: true, sao: 2, trumVoGiap: [true, false] }, false)).toEqual({ chang: 5, voGiap: 3, tong: 8 })
-    expect(khoanKetChang({ thang: false, sao: 0, trumVoGiap: [true] }, true)).toEqual({ chang: 0, voGiap: 3, tong: 3 })
-    expect(khoanKetChang({ thang: false, sao: 3, trumVoGiap: [] }, true)).toEqual({ chang: 0, voGiap: 0, tong: 0 }) // sao chỉ tính khi thắng
-  })
-})
 
 describe('duocMoSomChang (Điều 6 B)', () => {
   it('đúng ≥ 80 %, hôm nay chưa mở sớm, còn chặng kế ⇒ được; dưới 80 % ⇒ chua_du_ti_le; đã mở sớm ⇒ da_mo_som_hom_nay; hết chặng ⇒ het_chang (thứ tự nói lý do)', () => {

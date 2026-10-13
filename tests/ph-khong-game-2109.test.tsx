@@ -178,9 +178,6 @@ describe('CHỐT CHẶN — chữ hiển thị của MÀN PHỤ HUYNH không cò
 })
 
 describe('khoá nguồn — các chốt `laPh` nằm đúng chỗ (đột biến bắt được)', () => {
-
-  it('BangNhiemVu: gỡ dữ liệu một cửa + vùng EXP, "Vừa nhận EXP", chọn thú đều có `!laPh`', () => {
-  })
   it('DauTrang: phụ huynh không vẽ khối thần thú; TheVinhDanh có `hienThu`; BangTinPhuHuynh chỉ vẽ ô Thần thú khi có studentToken', () => {
     expect(doc('src/components/BangTinPhuHuynh.tsx')).toMatch(/\{studentToken && !tapTrungHoc && \(\s*<button[^>]*\n\s*type="button"\s*\n\s*onClick=\{\(\) => onSelectTab\?\.\('thanthu'\)\}/)
   })

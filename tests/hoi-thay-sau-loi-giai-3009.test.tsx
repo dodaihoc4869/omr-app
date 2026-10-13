@@ -91,8 +91,9 @@ describe('mọi màn em làm câu có Hỏi thầy; màn thi, Gọi lên bảng,
   it('màn thi, Gọi lên bảng, lúc làm kiểm tra cá nhân, đề thử có giờ: không nút', () => {
     expect(doc('src/screens/ExamTakeScreen.tsx')).not.toMatch(/NutHoiThay|hoiThay/)
     expect(doc('src/screens/GoiLenBangScreen.tsx')).not.toMatch(/NutHoiThay|hoiThay/)
+    // SỬA CÓ CHỦ ĐÍCH 14/10: hết giờ đọc từ kho đồng hồ lá, vẫn khoá câu đang làm và chỉ cho Hỏi Thầy sau nộp.
     const kt = doc('src/components/hoc-tap/ManKiemTraCaNhan.tsx')
-    expect(kt).toContain('<TheCau {...propsCauHoc(q,viTri+1,tra[q.qid]??\'\',v=>doi(q.qid,v),undefined,busy||sec===0)}/>')
+    expect(kt).toContain('<TheCau {...propsCauHoc(q,viTri+1,tra[q.qid]??\'\',v=>doi(q.qid,v),undefined,busy||hetGio)}/>')
     expect(kt.split('hoiThay').length).toBe(2) // chỉ ở phần KẾT QUẢ sau nộp
   })
 })

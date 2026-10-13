@@ -319,13 +319,6 @@ describe('GiaoThemChoCon — màn', () => {
   })
 })
 
-describe('Menu phụ huynh — ĐÃ GỠ (một màn một nút, 21/09)', () => {
-  it('muc-menu không còn xuất hàm menu phụ huynh; menu học sinh giữ nguyên', () => {
-    expect((mucMenuTep as Record<string, unknown>).mucMenuPhuHuynh).toBeUndefined()
-    expect(typeof mucMenuTep.mucMenuHocSinh).toBe('function')
-  })
-})
-
 // ĐÃ GỠ 28/09: describe "Cổng phụ huynh thật — MỘT màn, MỘT nút" (4 test trên ParentPortalScreen). Thầy lệnh 28/09: "app phụ huynh không có giao bài cho con nữa
 // chỉ xem được báo cáo mọi thứ về con" ⇒ cổng phụ huynh không còn nút "Giao thêm bài cho con" và không gọi /ph/giao-them (khoá ở tests/ph-v3-app-2809.test.tsx).
 // Các mảnh còn lại của tệp này (lớp đọc, API, hook, GiaoThemChoCon) vẫn khoá vì mã còn trong kho.

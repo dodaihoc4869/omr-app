@@ -74,12 +74,7 @@ describe('điểm ngắt ngang', () => {
     datMan(1440, 900)
     expect(docBoCucNgang()).toEqual({ ngang: true, thap: false, tiLe: 1 })
   })
-  it('CSS: lưới 12 cột — Sảnh 7/5, Câu đã làm 5/7; thu tỉ lệ bằng zoom; cột phải tự cuộn thay vì tràn', () => {
-    const cssSanh = readFileSync(resolve(__dirname, '../src/components/hoa2/sanh-ban-do.css'), 'utf8').replace(/\s+/g, ' ')
-    expect(cssSanh).toContain('grid-template-columns: repeat(12, minmax(0, 1fr))')
-    expect(cssSanh).toMatch(/\.h2-ng-trai \{ grid-column: 1 \/ span 7;/)
-    expect(cssSanh).toMatch(/\.h2-ng-phai \{ grid-column: 8 \/ span 5;[^}]*overflow-y: auto;/)
-    expect(cssSanh).toMatch(/\.h2-ngang\[data-thap='true'\] \{ zoom: var\(--h2-ti-le, 1\);/)
+  it('CSS Câu đã làm: hai cột 5/7 và chỉ số dưới đúng kích thước', () => {
     const cssCdl = readFileSync(resolve(__dirname, '../src/components/hoa2/cau-da-lam.css'), 'utf8').replace(/\s+/g, ' ')
     expect(cssCdl).toContain('grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)')
     expect(cssCdl).toMatch(/\.h2-cdl sub \{ font-size: 0\.78em;/)

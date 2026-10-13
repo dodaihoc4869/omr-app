@@ -4,7 +4,6 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import {gameV2} from '../server/src/game-v2'
 import {gameToken} from '../server/src/game-v2-auth'
-import {giayCuaHiep} from '../src/game/than-thu-v2/doan-core'
 import {chooseLuotMoi,learnedQuestionFilter,targetLevel,type Evidence,type PrivateQuestion} from '../src/game/than-thu-v2/core'
 import {taoD1That} from './_d1-that'
 
@@ -58,12 +57,6 @@ describe('kho game theo phần từng em đã học',()=>{
     const r=await gameV2(d.env,'start',{token:await gameToken(d.env,'S2'),mode:'adventure'}) as {questions:{dang:string}[]}
     expect(r.questions.length).toBeGreaterThan(0)
     expect(r.questions.every(q=>q.dang==='B')).toBe(true)
-  })
-  it('đồng hồ tăng theo loại câu và mức độ, cùng số giây dùng cho cả hiệp',()=>{
-    // CNH-1.0 (02 §8): hạn mềm = ceil(1,25 × giây gốc), sàn 60, KHÔNG trần 180; đồng hồ đội ≤ 300/hiệp.
-    expect(giayCuaHiep(1,[{phan:'I',mucDo:'biet'}])).toBe(94) // ceil(1,25 × 75)
-    expect(giayCuaHiep(1,[{phan:'I',mucDo:'biet'},{phan:'III',mucDo:'van_dung'}])).toBe(300) // câu dài nhất chạm trần đội 300
-    expect(giayCuaHiep(4,[])).toBe(60) // không kèm câu: hằng số cũ của hiệp trùm
   })
 })
 

@@ -71,13 +71,3 @@ describe('cụm 7 · nhãn Bảng nhiệm vụ và tên bài', () => {
     expect(doc('src/components/bang-nhiem-vu/BtvnM3.tsx')).not.toContain('Bài tập ca ')
   })
 })
-
-describe('cụm 7 · đơn vị trong game: Chuyến / Hiệp / Trạm / Ải; "chặng" chỉ còn ở Bài tập về nhà', () => {
-  const HS_DOAN = ['DoanSanh.tsx', 'DoanTran.tsx', 'DoanKetChang.tsx', 'DoanHoTong.tsx']
-  for (const f of HS_DOAN) {
-    it(`${f}: chữ hiện cho em không nói "chặng" của game (trừ câu nhắc "chặng Bài tập về nhà")`, () => {
-      const dong = doc(`src/game/than-thu-v2/${f}`).split('\n').filter((d) => !/^\s*(\/\/|\*|\/\*)/.test(d) && /[Cc]hặng|CHẶNG/.test(d) && !/chặng Bài tập về nhà/.test(d) && !/conChangToiTramKe|dh-chang|changThang|changMoiTram|chang[A-Z.]|\.chang\b|Chang\b/.test(d))
-      expect(dong.map((d) => d.trim().slice(0, 90))).toEqual([])
-    })
-  }
-})

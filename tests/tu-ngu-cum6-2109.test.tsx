@@ -4,7 +4,6 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { it, expect, vi, afterEach, describe } from 'vitest'
 import { render, screen, fireEvent, cleanup, within, configure } from '@testing-library/react'
-import { newEscort, player } from '../src/game/than-thu-v2/escort-core'
 import { JS_PHIEU } from '../src/lib/html-phieu'
 
 // Chạy chung cả bộ 8000 test máy rất nặng: nới hạn chờ của findBy để không đỏ oan vì chậm (không đo thời gian ở đây).
