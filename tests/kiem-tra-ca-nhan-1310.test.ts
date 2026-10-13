@@ -2,7 +2,7 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
-import { lapKtCn, docKtCn, tomTatKt, ktCnAction, dongBoKtCn, chotKtCn } from '../server/src/kiem-tra-ca-nhan'
+import { lapKtCn as lapKtCnThat, docKtCn, tomTatKt, ktCnAction, dongBoKtCn as dongBoKtCnThat, chotKtCn } from '../server/src/kiem-tra-ca-nhan'
 import { chonDeKt, henKt, quotaHocKt, phutCauKt, dauNgayKt, type MucKt } from '../server/src/kiem-tra-ca-nhan-loi'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
@@ -14,6 +14,9 @@ import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
 import { ungVienChieu } from '../server/src/ung-vien-chieu'
 import { gvKtCn } from '../server/src/kiem-tra-ca-nhan-thay'
 
+// Dữ liệu toy/receipt trước chuyển đổi: giữ phép phủ cũ; bộ 2026 mặc định kiểm riêng bằng nguồn đủ ma trận.
+const lapKtCn=(env:Parameters<typeof lapKtCnThat>[0],sbd:string,now:number,moi=false,doc=false)=>lapKtCnThat(env,sbd,now,moi,doc,false)
+const dongBoKtCn=(env:Parameters<typeof dongBoKtCnThat>[0],now:number)=>dongBoKtCnThat(env,now,2,false)
 const NOW=Date.parse('2026-10-13T02:00:00Z')
 afterEach(()=>{vi.useRealTimers();xoaDemPhamVi()})
 async function kho(){
