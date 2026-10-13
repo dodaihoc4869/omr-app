@@ -43,7 +43,7 @@ export interface R2Bucket {
 /** Durable Object (Bi-a Phản Ứng GĐ2 — phòng đấu `BanBiA`): chỉ khai đúng phần dùng tới. */
 export interface DurableObjectId { toString(): string }
 export interface DurableObjectStub { fetch(req: Request): Promise<Response> }
-export interface DurableObjectNamespace { idFromName(ten: string): DurableObjectId; get(id: DurableObjectId): DurableObjectStub }
+export interface DurableObjectNamespace { idFromName(ten: string): DurableObjectId; get(id: DurableObjectId, tuy?: { locationHint?: string }): DurableObjectStub }
 /** WebSocket phía máy chủ (Hibernation API): gắn dữ liệu nhỏ vào kết nối, sống qua lúc phòng ngủ. */
 export interface WsMayChu {
   send(chu: string): void
@@ -74,6 +74,8 @@ export interface Env {
   DE: R2Bucket
   /** Phòng đấu Bi-a online (GĐ2). Vắng ⇒ Worker chưa có Durable Object ⇒ Sảnh Bi-a ghi "Sắp mở" cho chơi với bạn. */
   BAN_BIA?: DurableObjectNamespace
+  /** Trạm gọi Gemini ghim châu Đại Dương (server/src/tram-gemini.ts) — chỉ dùng khi Google chặn vị trí trạm đang chạy. Vắng ⇒ gọi thẳng. */
+  TRAM_GEMINI?: DurableObjectNamespace
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */
   MA_BI_MAT: string
   /** Khoá Gemini (Google AI Studio) cho phần hỏi thêm Thầy (server/src/hoi-tro-ly.ts) — Worker secret, KHÔNG vào git. Vắng ⇒ phần này tắt. */
