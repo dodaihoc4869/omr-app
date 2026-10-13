@@ -41,6 +41,14 @@ jobs:
           npx -y wrangler@4 d1 execute omr --remote --json --command "$A, e AS (SELECT sbd, SUM(co IS NULL) ks, SUM(p IN ('luot','chan_doan')) lc FROM x GROUP BY sbd) SELECT COUNT(*) so_em, SUM(ks>0) em_khong_so, MAX(ks) max_khong_so, SUM(lc>0) em_luot_cd, MAX(lc) max_luot_cd FROM e" | jq -c ".[0].results"
           echo "== lượt KHÔNG có dòng sổ theo giờ VN"
           npx -y wrangler@4 d1 execute omr --remote --json --command "$A SELECT substr(datetime(created_at,'+7 hours'),12,2) gio, COUNT(*) tong, SUM(co IS NULL) khong_so FROM x GROUP BY gio ORDER BY gio" | jq -c ".[0].results[]"
+      - name: Lượt trả lời hôm nay có mã câu ảo (song sinh / biến thể / lần) — mã gốc khác mã trong sổ (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          echo "== lượt hôm nay của em Gói 7: tổng · mã có '~' · mã có '#' · số em có ≥ 3 lượt mã ảo trong 15 phút liền"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "WITH em AS (SELECT DISTINCT sbd FROM goi_bai_7_em), a AS (SELECT a.sbd, a.qid, a.created_at FROM em JOIN game_v2_attempt a ON a.sbd=em.sbd AND a.created_at>='$TU_UTC'), w AS (SELECT sbd, substr(created_at,1,15) k, SUM(instr(qid,'~')>0 OR instr(qid,'#')>0) n FROM a GROUP BY sbd, k) SELECT (SELECT COUNT(*) FROM a) tong, (SELECT SUM(instr(qid,'~')>0) FROM a) co_nga, (SELECT SUM(instr(qid,'#')>0) FROM a) co_thang, (SELECT COUNT(DISTINCT sbd) FROM w WHERE n>=3) em_3_ao_10phut" | jq -c ".[0].results"
       - name: Chế độ ngày phía thầy (Gói 7 / Hành trình) so với máy em (chỉ SELECT)
         working-directory: server
         env:
