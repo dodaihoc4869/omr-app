@@ -1013,9 +1013,10 @@ async function dayPhieu(env: Env, b: Record<string, unknown>): Promise<Response>
   return ra({ ok: true })
 }
 
-async function tuChuaLanhPhieu(env: Env, o: { body: ReadableStream }, khoa: string): Promise<string | ReadableStream> {
+async function tuChuaLanhPhieu(env: Env, o: { body: ReadableStream }, khoa: string): Promise<string> {
+  const tho = await new Response(o.body).text()
   try {
-    const doc = (await new Response(o.body).json()) as Record<string, unknown>
+    const doc = JSON.parse(tho) as Record<string, unknown>
     // TỰ ĐỘNG CHỮA LÀNH PHIẾU NẾU LỆCH VỚI BẢNG CHI_TIET_CAU CHÍNH THỨC
     if (doc && doc.phieu && typeof doc.phieu === 'object' && doc.maCa && doc.sbd && String(doc.loai) !== 'baitap') {
       const p = doc.phieu as Record<string, unknown>
@@ -1059,13 +1060,15 @@ async function tuChuaLanhPhieu(env: Env, o: { body: ReadableStream }, khoa: stri
               dapAnDung: String(r.dap_an_dung ?? cu?.dapAnDung ?? ''),
             }
           })
-          await env.DE.put(`phieu/${khoa}.json`, JSON.stringify(doc))
+          const moi = JSON.stringify(doc)
+          await env.DE.put(`phieu/${khoa}.json`, moi)
+          return moi
         }
       }
     }
-    return JSON.stringify(doc)
+    return tho
   } catch {
-    return o.body
+    return tho // Thân R2 đã đọc hết; lỗi tự sửa không được làm mất phiếu đã có.
   }
 }
 
