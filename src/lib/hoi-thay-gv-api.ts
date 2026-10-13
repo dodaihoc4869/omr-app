@@ -38,3 +38,21 @@ export async function datLaiLuotHoiThay(sbd: string): Promise<KqThay<{ daDatLai:
 export async function doiSbdThuHoiThay(sbd: string, them: boolean): Promise<KqThay<{ sbdThu: string[] }>> {
   return kqThay(await goiThay('/gv/hoi-tro-ly/sbd-thu', { sbd, them }), (j) => ({ sbdThu: Array.isArray(j.sbdThu) ? j.sbdThu.map(String) : [] }))
 }
+
+/** SỔ HỎI THẦY (13/10 khuya): tổng số lượt, từng em, các lượt gần nhất (máy chủ `gvSoHoiThay`, chỉ đọc). `sbd` ⇒ chỉ một em. */
+export interface TongSoHoiThay { luot: number; traLoi: number; ngoaiPhamVi: number; loi: number; soEm: number; soCau: number; dau: string }
+export interface EmSoHoiThay { sbd: string; ten: string; lop: string; soLuot: number; soCau: number; ganNhat: string }
+export interface LuotSoHoiThay { luc: string; sbd: string; ten: string; qid: string; nguon: string; cauHoi: string; traLoi: string; ngoaiPhamVi: boolean; model: string; ms: number; loi: string }
+export interface SoHoiThay { tong: TongSoHoiThay; theoEm: EmSoHoiThay[]; luot: LuotSoHoiThay[] }
+const mang = <T,>(v: unknown, f: (x: Record<string, unknown>) => T): T[] => (Array.isArray(v) ? v.filter((x) => x && typeof x === 'object').map((x) => f(x as Record<string, unknown>)) : [])
+const chu = (v: unknown) => (typeof v === 'string' ? v : '')
+export async function docSoHoiThay(sbd = '', gioiHan = 100): Promise<KqThay<SoHoiThay>> {
+  return kqThay(await goiThay('/gv/hoi-tro-ly/so', sbd ? { sbd, gioiHan } : { gioiHan }), (j) => {
+    const t = (j.tong && typeof j.tong === 'object' ? j.tong : {}) as Record<string, unknown>
+    return {
+      tong: { luot: Number(t.luot) || 0, traLoi: Number(t.traLoi) || 0, ngoaiPhamVi: Number(t.ngoaiPhamVi) || 0, loi: Number(t.loi) || 0, soEm: Number(t.soEm) || 0, soCau: Number(t.soCau) || 0, dau: chu(t.dau) },
+      theoEm: mang(j.theoEm, (x) => ({ sbd: chu(x.sbd), ten: chu(x.ten), lop: chu(x.lop), soLuot: Number(x.soLuot) || 0, soCau: Number(x.soCau) || 0, ganNhat: chu(x.ganNhat) })),
+      luot: mang(j.luot, (x) => ({ luc: chu(x.luc), sbd: chu(x.sbd), ten: chu(x.ten), qid: chu(x.qid), nguon: chu(x.nguon), cauHoi: chu(x.cauHoi), traLoi: chu(x.traLoi), ngoaiPhamVi: x.ngoaiPhamVi === true, model: chu(x.model), ms: Number(x.ms) || 0, loi: chu(x.loi) })),
+    }
+  })
+}

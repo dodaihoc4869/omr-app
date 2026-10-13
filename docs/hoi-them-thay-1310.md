@@ -39,3 +39,4 @@ Thầy: "chỉnh lại ô này cho thật đẹp, tinh tế, câu slogan ở dư
 - Hộp mở sớm (đề chưa về): em gõ trước được, nút Gửi mở khi đề đã về.
 - Xem thời gian từng lượt: workflow "Hỏi thêm Thầy — đọc lỗi Gemini (chỉ đọc)" in 15 lượt gần nhất (giờ, model, ms, token; không SBD, không câu hỏi).
 - Điện tích ion (ảnh thầy 13/10 "CO3(2-)"): Gemini hay viết điện tích trong ngoặc ⇒ `chuHoa` (TraLoiThay.tsx) đổi `CO3(2-)`, `Fe(3+)`, `NH4(+)` thành mũ `^{…}` (đọc được cả câu trả lời cũ trong sổ); chỉ dẫn gửi Gemini dặn viết `CO3^2-`, `Fe^3+`. Giữ nguyên `Fe(III)`, `(1)`, `Fe2(SO4)3`.
+- Sổ hỏi Thầy (thầy 13/10 khuya: "bao nhiêu lượt hỏi, từ những số báo danh nào, hỏi câu gì"): app thầy · Cài đặt · Hỏi Thầy (AI) · "Xem sổ hỏi Thầy" — tổng số lượt, từng em (SBD, tên, lớp, số lượt, số câu), 100 lượt gần nhất (câu hỏi + trả lời rút gọn). Máy chủ `/gv/hoi-tro-ly/so` (chỉ đọc, sau cổng mã bí mật, một đợt D1). Repo công khai nên workflow chỉ in số đếm.
