@@ -23,6 +23,7 @@ import { NGUONG_THAI_DO as NG } from './bai-hang-ngay-kieu'
 import type { KetQuaNhipHocEm, TocDoNhipEm, TraLoiNhipHocEm } from './nhip-hoc-kieu'
 import { khoangNgay, ngayBaiCuaMotEm } from './bai-hang-ngay'
 import { docNgayVao, ngayDuocTinh, tinCayNhomNhip } from './nhip-hoc'
+import { bacChamChi } from './bac-cham-chi'
 import { tomTatNhip, viecTiepNhip } from './nhip-hoc-luat'
 import { gameIdentity } from './game-v2-auth'
 import { SQL_LUOT_GOI7 } from './goi-bai-7'
@@ -124,6 +125,7 @@ export async function nhipHocCuaEm(env: Env, sbd: string, nowMs: number, loi: st
     const vao = vaoMap.get(sbd) ?? tu
     const dai = ngayDuocTinh(ngay, vao)
     const t = tomTatNhip(dai, homNay)
+    const bac = bacChamChi(dai, homNay, t)
     const kq: KetQuaNhipHocEm = {
       ok: true,
       tu: vao > den ? den : vao,
@@ -143,6 +145,8 @@ export async function nhipHocCuaEm(env: Env, sbd: string, nowMs: number, loi: st
       viecTiep: viecTiepNhip(t),
       // CHỈ THÊM 12/10 đợt 16: độ tin cậy của nhóm — cùng phép với hồ sơ thái độ (thai-do-tin-cay.ts); nhóm vẫn do `tomTatNhip` quyết.
       ...tinCayNhomNhip(t),
+      // CHỈ THÊM 13/10: bậc 1–12 + điểm chăm — cùng phép với dòng em ở `/gv/nhip-hoc`.
+      ...(bac ? { bacCham: bac } : {}),
     }
     return kq
   } catch (e) {

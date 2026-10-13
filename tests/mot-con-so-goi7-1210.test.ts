@@ -336,6 +336,10 @@ describe('ngày Gói 7 cũ chưa chốt ⇒ ước tính uoc-goi7; luật Lườ
     expect(h.tinCayNhom?.doTinCay).toBe(em.doTinCay)
     expect(h.tinCayNhom?.canThem).toBe(em.canThem)
     expect((eL as { doTinCay?: number }).doTinCay).toBe(em.doTinCay)
+    // 13/10: bậc 1–12 + điểm chăm — CÙNG một số ở hồ sơ (thầy), bảng em (học sinh / phụ huynh) và dòng em của Nhịp học cả lớp; Chăm ⇒ bậc 8–12.
+    expect(em.bacCham?.bac).toBeGreaterThanOrEqual(8)
+    expect(h.bacCham).toEqual(em.bacCham)
+    expect(eL.bacCham).toEqual(em.bacCham)
   })
 
   it('lịch câu mới ngày cũ lớn hơn 24 ⇒ ước tính theo lịch (32); có dòng chốt ⇒ đúng số chốt (da-chot), không ước tính', async () => {

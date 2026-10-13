@@ -22,6 +22,7 @@ import { tachSongSinh } from './loi-hoc-luat'
 import { docCauKho } from './omni-d1'
 import { tomTatNhip } from './nhip-hoc-luat'
 import { tinCayNhomNhip } from './thai-do-tin-cay'
+import { bacChamChi } from './bac-cham-chi'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -277,8 +278,10 @@ export async function gvNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<T
       const ngay = ngayEm.get(e.sbd) ?? []
       const ngayVao = vao.get(e.sbd) ?? tu
       // CHỈ THÊM 13/10 đợt 18: độ tin cậy của nhóm — đúng phép bảng của em, trên chính dãy số trả về (không đọc thêm D1).
-      const tin = tinCayNhomNhip(tomTatNhip(ngayDuocTinh(ngay, ngayVao), homNay))
-      return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi, ngayVao, muc: ngay.map((n) => n.mucToiThieu), lam: ngay.map((n) => n.daLam), doiPho: dp.theoEm.get(e.sbd) ?? null, ...tin }
+      const dai = ngayDuocTinh(ngay, ngayVao)
+      const tt = tomTatNhip(dai, homNay)
+      const bac = bacChamChi(dai, homNay, tt)
+      return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi, ngayVao, muc: ngay.map((n) => n.mucToiThieu), lam: ngay.map((n) => n.daLam), doiPho: dp.theoEm.get(e.sbd) ?? null, ...tinCayNhomNhip(tt), ...(bac ? { bacCham: bac } : {}) }
     })
     .sort((a, c) => c.khoi.localeCompare(a.khoi) || a.hoTen.localeCompare(c.hoTen, 'vi') || a.sbd.localeCompare(c.sbd))
   return { ok: true, tu, den, homNay, ngay: cacNgay(tu, den), em, lop: demLop(tatCa), doiPhoDaTinh: dp.daTinh, canhBao }

@@ -294,3 +294,10 @@ Thầy nhắn thêm (ảnh tab Kết quả app học sinh: Ca kiểm tra · Kế
 - [x] Cổng tốc độ tải app | bằng chứng: scripts/kiem-toc-do-tai.mjs (23c76e3a): GV +0,0 KB · HS −0,4 KB · PH −0,7 KB so bản đang chạy
 - [x] Cổng tốc độ máy chủ | bằng chứng: tests/toc-do-may-chu-lenh-nong-1310 (1df0a566), mốc đo trên 81f13983: sảnh lần sau 20 đợt, mở chặng 25, nộp câu 9, đếm 2
 - [x] Bỏ thẻ "Bài tập về nhà" ở tab Kết quả | bằng chứng: 3ddcc179 + tests/ket-qua-bo-btvn-1310 (Hôm nay vẫn có khi thầy đang giao)
+Thầy nhắn thêm (13/10): "Tôi muốn bạn tính toán tối ưu sắp xếp mức độ lười biếng theo cấu trúc sau và hiển thị luôn nhé. 12 BẬC TỪ LƯỜI BIẾNG ĐẾN CHĂM CHỈ 1. 🦥 Lười Vô Cực 2. 🛌 Thánh Bất Động 3. 💤 Vua Ngủ Nướng 4. 🐌 Chúa Tể Trì Hoãn 5. 🐢 Cao Thủ Né Việc 6. 🐼 Lười Có Tính Toán 7. ⚖️ Đại Sư Cân Bằng 8. 🚶 Tân Binh Siêng Năng 9. 📚 Chiến Binh Cần Cù 10. 🔥 Cao Thủ Chăm Chỉ 11. ⚡ Chiến Thần Năng Suất 12. 👑 Thần Chăm Chỉ Tối Thượng" · "Mỗi cấp độ hiển thị màu khác nhau nhé"
+- [ ] Phép tính 12 bậc (một hàm thuần ở máy chủ, khớp nhóm Chăm/Chưa đều/Lười đã duyệt — không bao giờ mâu thuẫn nhóm) | bằng chứng: (chưa có)
+- [ ] Hiển thị bậc ở app học sinh (Hôm nay · Nhịp học, hồ sơ) | bằng chứng: (chưa có)
+- [ ] Hiển thị bậc ở app phụ huynh (Nhịp học của con) | bằng chứng: (chưa có)
+- [ ] Hiển thị + sắp xếp theo bậc ở app thầy (Nhịp học cả lớp, hồ sơ em) | bằng chứng: (chưa có)
+- [ ] Mỗi bậc một màu riêng (12 màu, dẫn từ biến màu chuẩn, sáng + tối) | bằng chứng: (chưa có)
+- [ ] Không chậm hơn: không thêm truy vấn D1, cổng kiem:toc-do xanh | bằng chứng: (chưa có)

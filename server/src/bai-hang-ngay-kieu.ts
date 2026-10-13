@@ -29,6 +29,7 @@
 
 /** Ngày bắt đầu theo dõi bài hằng ngày. Thầy 12/10 lúc đầu: "tính từ 12/10"; cùng ngày chỉnh lại: "dữ liệu phần này tính từ 1/10 cho tôi nhé"
  *  ⇒ 01/10. Ngày trước khi em vào Gói bài 7 ngày (gói bật từ 10/10) vẫn tính theo kế hoạch Hành trình (xem luật `cheDo` ở trên). */
+import type { KetQuaBac } from './bac-cham-chi'
 export const NGAY_BAT_DAU_BAI_HANG_NGAY = '2026-10-01'
 /** Số ngày tối đa một lần hỏi (≈ 2 tháng) — giữ lệnh trong sức một Worker với ~300 em. */
 export const TOI_DA_SO_NGAY_BAI_HANG_NGAY = 62
@@ -300,6 +301,8 @@ export interface KetQuaHoSoThaiDo {
   /** CHỈ THÊM 13/10: độ tin cậy CỦA NHÓM `nhomNhip` (cùng `tinCayNhomNhip` với bảng Nhịp học của thầy). Chip cạnh tên nhóm dùng số này, không dùng
    *  `ketLuan.doTinCay` (số ấy của nhãn thái độ — có thể khác nhóm). 'chua-du' ⇒ {}. */
   tinCayNhom?: { doTinCay?: number; canThem?: string }
+  /** CHỈ THÊM 13/10: bậc 1–12 + điểm chăm của nhóm `nhomNhip` (`bacChamChi`, bac-cham-chi.ts — cùng phép `/gv/nhip-hoc`, `/hs|/ph/nhip-hoc`). */
+  bacCham?: KetQuaBac
 }
 
 /** Tự sửa câu sai (chỉ để xem, KHÔNG ảnh hưởng nhãn). Đếm theo câu gốc, lượt trong khoảng xem. */
