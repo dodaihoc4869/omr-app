@@ -53,7 +53,7 @@ export function noiChoPh(nguon: string): string {
     game: 'Bài luyện trên app',
     on_lai: 'Ôn lại',
     tu_luyen: 'Tu luyện',
-    chua_loi: 'Tự chữa lỗi',
+    chua_loi: 'Tự sửa lỗi',
     len_bang: 'Lên bảng',
     dau_gio: 'Kiểm tra đầu giờ',
     btvn: 'Bài tập về nhà',
@@ -187,7 +187,7 @@ export function sinhGoiYNhac(v: DauVaoGoiY): GoiYNhac[] {
     if (h.daLam === 0 && h.soCau === 0) ra.push({ ma: 'chua-lam-hom-nay', chu: `Hôm nay con chưa làm câu nào. Mức của ngày là ${xap}${h.canLam} câu.` })
     else ra.push({ ma: 'con-cau-hom-nay', chu: `Hôm nay con còn ${xap}${h.canLam - h.daLam} câu chưa làm (đã làm ${h.daLam}/${xap}${h.canLam} câu).` })
   }
-  if (v.chuaSua > 0) ra.push({ ma: 'sai-chua-sua', chu: `Có ${v.chuaSua} câu con làm sai chưa sửa được. Nhắc con vào mục Tự chữa lỗi để làm lại.` })
+  if (v.chuaSua > 0) ra.push({ ma: 'sai-chua-sua', chu: `Có ${v.chuaSua} câu con làm sai chưa sửa được. Nhắc con vào mục Tự sửa lỗi để làm lại.` })
   if (v.nhanh.so >= LUAT_GOI_Y.nhanhToiThieu && v.nhanh.sai >= v.nhanh.so * LUAT_GOI_Y.nhanhTiLeSai)
     ra.push({ ma: 'nhanh-sai', chu: `7 ngày qua có ${v.nhanh.so} câu con làm dưới ${GIAY_NHANH} giây và sai ${v.nhanh.sai} câu. Nhắc con đọc kỹ đề trước khi chọn.` })
   const khong = v.ngayTruoc.filter((n) => n.trangThai === 'khong').length

@@ -297,6 +297,9 @@ export interface KetQuaHoSoThaiDo {
   cachTinhTinCay?: string
   /** CHỈ ĐỂ XEM (không vào kết luận): câu từng sai trong khoảng mà sau đó em làm lại ĐÚNG — tính từ sổ đã đọc, không truy vấn thêm. */
   tuSuaSai?: TuSuaSai
+  /** CHỈ THÊM 13/10: độ tin cậy CỦA NHÓM `nhomNhip` (cùng `tinCayNhomNhip` với bảng Nhịp học của thầy). Chip cạnh tên nhóm dùng số này, không dùng
+   *  `ketLuan.doTinCay` (số ấy của nhãn thái độ — có thể khác nhóm). 'chua-du' ⇒ {}. */
+  tinCayNhom?: { doTinCay?: number; canThem?: string }
 }
 
 /** Tự sửa câu sai (chỉ để xem, KHÔNG ảnh hưởng nhãn). Đếm theo câu gốc, lượt trong khoảng xem. */

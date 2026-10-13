@@ -93,7 +93,7 @@ describe('màn làm bài', () => {
     expect(screen.getByText(/B đứng trước C nên tính acid/)).toBeTruthy() // giải thích ý sai mở sẵn (công thức tách thẻ sub)
     fireEvent.click(screen.getByRole('button', { name: 'Xem lời giải đầy đủ cả 4 ý' }))
     expect(screen.getByText('Tính phi kim tăng dần trong chu kì.')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Tự chữa câu này' })).toBeTruthy(); expect(onCapNhat).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: 'Sửa câu này' })).toBeTruthy(); expect(onCapNhat).toHaveBeenCalledOnce()
   })
   it('Trả lời ngắn: 4 ô + bàn phím số riêng, KHÔNG có ô nhập (không bật bàn phím điện thoại); phím máy tính vẫn nhập; gửi "-1,5"', async () => {
     moMan([TLN])
@@ -129,7 +129,7 @@ describe('màn làm bài', () => {
     await screen.findByText('Đúng · tự làm')
     expect(screen.getByText('Em chọn · đáp án')).toBeTruthy()
     expect(screen.getByText('N liên kết với 2 gốc hydrocarbon.')).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Tự chữa câu này' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Sửa câu này' })).toBeNull()
     expect(screen.getByRole('button', { name: /Kết thúc chặng/ })).toBeTruthy()
   })
   it('câu Gói 7 có hướng dẫn: chip "Câu mới · <tên bài>", thẻ chọn cách, hai nút; "Tự làm câu này" mở khu trả lời', async () => {

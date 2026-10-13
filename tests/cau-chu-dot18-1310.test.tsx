@@ -42,7 +42,7 @@ afterEach(() => {
 
 describe('Cần nhắc con — chỉ câu số liệu', () => {
   it('chuSoLieuNhac giữ câu đầu, bỏ vế khuyên; dòng trùng khối chính bị bỏ', () => {
-    expect(chuSoLieuNhac('Có 3 câu con làm sai chưa sửa được. Nhắc con vào mục Tự chữa lỗi để làm lại.')).toBe('Có 3 câu con làm sai chưa sửa được.')
+    expect(chuSoLieuNhac('Có 3 câu con làm sai chưa sửa được. Nhắc con vào mục Tự sửa lỗi để làm lại.')).toBe('Có 3 câu con làm sai chưa sửa được.')
     expect(chuSoLieuNhac('Tỉ lệ đúng 7 ngày qua là 60%, thấp hơn 7 ngày trước đó (72%). Hỏi con phần nào đang khó để báo Thầy.')).toBe('Tỉ lệ đúng 7 ngày qua là 60%, thấp hơn 7 ngày trước đó (72%).')
     expect(chuSoLieuNhac('Một câu không dấu chấm')).toBe('Một câu không dấu chấm')
     const ds = dongCanNhac([

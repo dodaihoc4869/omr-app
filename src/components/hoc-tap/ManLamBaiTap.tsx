@@ -194,7 +194,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       </div>
     : !q ? null
     : k ? <div className="ht2-lam-hang-nut" data-mot={!coTuChua || undefined}>
-        {coTuChua && <button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => onChua(q.qid)}>Tự chữa câu này</button>}
+        {coTuChua && <button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => onChua(q.qid)}>Sửa câu này</button>}
         <button ref={nutTiepRef} type="button" className="ht2-lam-nut ht2-lam-nut-chinh" onClick={tiep}>{viTri + 1 === cau.length ? 'Kết thúc chặng' : 'Câu tiếp theo'}<ArrowRight size={18} aria-hidden="true" /></button>
       </div>
     : choChonCach ? <div className="ht2-lam-hang-nut">

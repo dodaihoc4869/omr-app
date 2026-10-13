@@ -33,7 +33,7 @@ import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { chonTuGiaTri, chuanMucDo, sqlLuotCaDaCongBo, tieuDeCau, type NguoiDocSo } from './lich-su-lam-cau'
 import { docCauKho, tenCuaDang } from './omni-d1'
 import { chuoiDuGanNhat, laLuoiTheoTiLe, tomTatNhip } from './nhip-hoc-luat'
-import { CACH_TINH_TIN_CAY, doTinCayTinHieu, tinCayKetLuan, type SoLieuThaiDo } from './thai-do-tin-cay'
+import { CACH_TINH_TIN_CAY, doTinCayTinHieu, tinCayKetLuan, tinCayNhomNhip, type SoLieuThaiDo } from './thai-do-tin-cay'
 
 type Row = Record<string, unknown>
 type Tang = 1 | 2 | 3 | 4
@@ -779,7 +779,7 @@ export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: numb
     // Bản học sinh: bỏ ghi chú nội bộ của thầy (Gói 7 chưa đọc được, khoảng ngày bị nắn, sổ Hành trình…), chỉ giữ dòng "sổ bị cắt" nói với em.
     canhBao: nguoiDoc === 'hoc-sinh' ? (chuCat ? [chuCat] : []) : canhBao,
     nhomNhip: nhip.nhom, coDoiPho: ketLuan.nhan === 'doi-pho', chuoiDuGanNhat: nhip.chuoiDuGanNhat,
-    cachTinhTinCay: CACH_TINH_TIN_CAY, tuSuaSai,
+    cachTinhTinCay: CACH_TINH_TIN_CAY, tuSuaSai, tinCayNhom: tinCayNhomNhip(nhip),
   }
 }
 

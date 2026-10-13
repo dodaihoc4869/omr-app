@@ -574,7 +574,10 @@ function DauThaiDo({ td, matDau, ngoi, laThay }: { td: KetQuaHoSoThaiDo; matDau:
   const Icon = ICON_NHAN[nhan]
   const canThoat = LUAT_NHOM_NHIP.ngayLienThoatLuoi
   const coThoat = Math.min(td.chuoiDuGanNhat ?? 0, canThoat)
-  const tin = k.doTinCay
+  // Chip cạnh tên NHÓM ⇒ độ tin cậy của nhóm (cùng số bảng Nhịp học của thầy); không có nhóm ⇒ của nhãn thái độ như cũ.
+  const tinNguon = nhom ? td.tinCayNhom : k
+  const tin = tinNguon?.doTinCay
+  const canThem = tinNguon?.canThem
   const tam = tin !== undefined && tin < NGUONG_TIN_CAY
   const cachTinh = (td as KetQuaHoSoThaiDoApp).cachTinhTinCay
   return (
@@ -600,7 +603,7 @@ function DauThaiDo({ td, matDau, ngoi, laThay }: { td: KetQuaHoSoThaiDo; matDau:
         </div>
         {tam && (
           <p className="hslc-tam">
-            <b>Kết luận tạm, đang theo dõi.</b> {k.canThem ? chuCanThem(theoNgoi(k.canThem, ngoi)) : `Độ tin cậy dưới ${NGUONG_TIN_CAY}%: cần thêm ngày làm bài để chắc.`}
+            <b>Kết luận tạm, đang theo dõi.</b> {canThem ? chuCanThem(theoNgoi(canThem, ngoi)) : `Độ tin cậy dưới ${NGUONG_TIN_CAY}%: cần thêm ngày làm bài để chắc.`}
           </p>
         )}
         <p className="gvv2-tdo-mo-ta">{theoNgoi(nhom ? MO_TA_NHOM[nhom] : MO_TA_NHAN[k.nhan], ngoi)}</p>

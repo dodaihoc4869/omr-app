@@ -207,6 +207,10 @@ export function docHoSoThaiDo(du: O): KetQuaHoSoThaiDo | null {
     ...(typeof du.cachTinhTinCay === 'string' && du.cachTinhTinCay.trim() ? { cachTinhTinCay: du.cachTinhTinCay.trim() } : {}),
     // Tự sửa câu sai (máy chủ đợt 16: { soCauSai, soCauDaSua, phanTram, chu }) — chỉ nhận khi số hợp lệ (0 ≤ đã sửa ≤ câu sai); sai kiểu ⇒ bỏ trường.
     ...(docTuSuaSai(du.tuSuaSai) ? { tuSuaSai: docTuSuaSai(du.tuSuaSai)! } : {}),
+    // 13/10: độ tin cậy CỦA NHÓM Nhịp học (chip cạnh tên nhóm). Vắng / sai kiểu ⇒ bỏ trường (chip ẩn, không mượn số của nhãn thái độ).
+    ...(du.tinCayNhom && typeof du.tinCayNhom === 'object' && docDoTinCay((du.tinCayNhom as Record<string, unknown>).doTinCay) !== null
+      ? { tinCayNhom: { doTinCay: docDoTinCay((du.tinCayNhom as Record<string, unknown>).doTinCay)!, ...(typeof (du.tinCayNhom as Record<string, unknown>).canThem === 'string' && String((du.tinCayNhom as Record<string, unknown>).canThem).trim() ? { canThem: String((du.tinCayNhom as Record<string, unknown>).canThem).trim() } : {}) } }
+      : {}),
   }
 }
 

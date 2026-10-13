@@ -23,6 +23,8 @@
 //  5. `canThem`: giữ nguyên các tỉ lệ đã đo, tăng dần số ngày (nhãn theo ngày) hoặc số lượt (đối phó) tới khi độ tin cậy đạt 90%; trong 90 ngày /
 //     gấp 10 lần số lượt mà vẫn chưa đạt (tỉ lệ sát ngưỡng) ⇒ câu nói thật là thêm số liệu như cũ chưa làm rõ được.
 import { NGUONG_THAI_DO as NG, type MaTinHieu, type MucTinHieu, type NhanThaiDo, type TinHieuThaiDo } from './bai-hang-ngay-kieu'
+import type { NhomNhip } from './nhip-hoc-kieu'
+import type { TomTatNhip } from './nhip-hoc-luat'
 
 /** Độ tin cậy từ mức này trở lên mới coi là chắc (thầy: "chính xác hơn 90%"). */
 export const NGUONG_CHAC = 90
@@ -311,4 +313,15 @@ export function tinCayKetLuan(
     chuoiDuGanNhat,
     donXau: coDon ? (h) => xacSuatVung('don-bai', s, h).xau : undefined,
   })
+}
+
+/** Nhóm theo ngày ⇒ nhãn của luật kết luận (cùng ba nhóm, tên khác nhau ở hai hợp đồng). */
+export const NHAN_CUA_NHOM: Readonly<Record<Exclude<NhomNhip, 'chua-du'>, 'cham-chi' | 'chua-deu' | 'luoi'>> = { cham: 'cham-chi', 'chua-deu': 'chua-deu', luoi: 'luoi' }
+
+/** Độ tin cậy + câu "cần thêm" của NHÓM Nhịp học một em — `tinCayNhanNgay` (tiên nghiệm Jeffreys) trên đúng số đếm của `tomTatNhip`. Dùng cho
+ *  `/gv/nhip-hoc` (mỗi dòng em), `nhipHocCuaEm` (`/hs/nhip-hoc`, `/ph/nhip-hoc`) VÀ hồ sơ một em (chip cạnh tên nhóm). Nhóm do `tomTatNhip` quyết —
+ *  KHÔNG đổi. 'chua-du' ⇒ {} (luật chưa xếp nhóm thì không có độ tin cậy). */
+export function tinCayNhomNhip(t: TomTatNhip): { doTinCay?: number; canThem?: string } {
+  if (t.nhom === 'chua-du') return {}
+  return tinCayNhanNgay(NHAN_CUA_NHOM[t.nhom], { n: t.soNgayQua, du: t.soNgayDu, chuoiKhongLam: t.chuoiKhongLam?.dai ?? 0, chuoiDuGanNhat: t.chuoiDuGanNhat })
 }

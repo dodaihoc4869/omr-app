@@ -15,13 +15,13 @@
 import type { Env } from './kieu'
 import type { LopBaiHangNgay, NgayBaiEm } from './bai-hang-ngay-kieu'
 import { NGUONG_THAI_DO as NG } from './bai-hang-ngay-kieu'
-import type { DoiPhoChonLap, DoiPhoEm, DoiPhoQuaNhanh, EmNhipHoc, NgayNhipEm, NhomNhip, TraLoiNhipHoc } from './nhip-hoc-kieu'
+import type { DoiPhoChonLap, DoiPhoEm, DoiPhoQuaNhanh, EmNhipHoc, NgayNhipEm, TraLoiNhipHoc } from './nhip-hoc-kieu'
 import { cacNgay, docDanhSachEm, docNgayCacEm, khoangNgay, LO_EM_BAI_HANG_NGAY, LoiDocSo, ngayVnCua, type EmGoc } from './bai-hang-ngay'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docCauKho } from './omni-d1'
-import { tomTatNhip, type TomTatNhip } from './nhip-hoc-luat'
-import { tinCayNhanNgay } from './thai-do-tin-cay'
+import { tomTatNhip } from './nhip-hoc-luat'
+import { tinCayNhomNhip } from './thai-do-tin-cay'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -86,20 +86,13 @@ export async function docNgayVao(env: Env, em: readonly EmGoc[], tu: string): Pr
 
 // ------------------------------------------------------------------ ĐỘ TIN CẬY CỦA NHÓM (phép thuần — một chỗ cho thầy, em, phụ huynh)
 
-/** Nhóm theo ngày ⇒ nhãn của luật kết luận (cùng ba nhóm, tên khác nhau ở hai hợp đồng). */
-export const NHAN_CUA_NHOM: Readonly<Record<Exclude<NhomNhip, 'chua-du'>, 'cham-chi' | 'chua-deu' | 'luoi'>> = { cham: 'cham-chi', 'chua-deu': 'chua-deu', luoi: 'luoi' }
+// `NHAN_CUA_NHOM` + `tinCayNhomNhip` nằm ở thai-do-tin-cay.ts (13/10) để hồ sơ một em (bai-hang-ngay.ts) dùng CÙNG hàm mà không vòng nhập.
+export { NHAN_CUA_NHOM, tinCayNhomNhip } from './thai-do-tin-cay'
 
 /** Dãy ngày ĐƯỢC TÍNH của một em: từ ngày vào (gồm hôm nay), đúng `mucToiThieu` / `daLam` — cách dựng dải ô của bảng em và của dòng thầy. */
 export const ngayDuocTinh = (ngay: readonly NgayBaiEm[], vao: string): NgayNhipEm[] =>
   ngay.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam }))
 
-/** Độ tin cậy + câu "cần thêm" của NHÓM Nhịp học một em — `tinCayNhanNgay` (thai-do-tin-cay.ts, tiên nghiệm Jeffreys) trên đúng số đếm của
- *  `tomTatNhip`. Dùng cho `/gv/nhip-hoc` (mỗi dòng em) VÀ `nhipHocCuaEm` (`/hs/nhip-hoc`, `/ph/nhip-hoc`). Nhóm do `tomTatNhip` quyết — KHÔNG đổi.
- *  'chua-du' ⇒ {} (luật chưa xếp nhóm thì không có độ tin cậy). */
-export function tinCayNhomNhip(t: TomTatNhip): { doTinCay?: number; canThem?: string } {
-  if (t.nhom === 'chua-du') return {}
-  return tinCayNhanNgay(NHAN_CUA_NHOM[t.nhom], { n: t.soNgayQua, du: t.soNgayDu, chuoiKhongLam: t.chuoiKhongLam?.dai ?? 0, chuoiDuGanNhat: t.chuoiDuGanNhat })
-}
 
 // ------------------------------------------------------------------ CỜ ĐỐI PHÓ (phép thuần — test gọi thẳng)
 

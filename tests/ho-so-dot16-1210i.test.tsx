@@ -264,6 +264,21 @@ describe('độ tin cậy trên tấm (trường tuỳ chọn của máy chủ)'
     expect([...tam.querySelectorAll('.gvv2-tdo-o')].map((o) => o.textContent)).toContain('Tự sửa được4/6 câuĐã làm đúng lại 4/6 câu từng sai (67%)')
   })
 
+  it('13/10: có nhóm Nhịp học ⇒ chip cạnh tên nhóm lấy độ tin cậy CỦA NHÓM (`tinCayNhom`), không mượn số của nhãn thái độ; nhóm không kèm số ⇒ không chip', async () => {
+    const td = { ...TD, nhomNhip: 'luoi', chuoiDuGanNhat: 1, ketLuan: { ...TD.ketLuan, doTinCay: 61, canThem: 'ít nhất 5 ngày làm bài nữa.' }, tinCayNhom: { doTinCay: 93 } }
+    thayMo(td)
+    const tam = await screen.findByRole('dialog')
+    const dau = await waitFor(() => { const x = tam.querySelector('.hslc-hero'); expect(x).toBeTruthy(); return x as HTMLElement })
+    expect(dau.querySelector('.hslc-tin')!.textContent).toBe('Độ tin cậy 93%')
+    expect(dau.querySelector('.hslc-tam')).toBeNull()
+    cleanup()
+    thayMo({ ...td, tinCayNhom: undefined })
+    const tam2 = await screen.findByRole('dialog')
+    const dau2 = await waitFor(() => { const x = tam2.querySelector('.hslc-hero'); expect(x).toBeTruthy(); return x as HTMLElement })
+    expect(dau2.querySelector('.hslc-tin')).toBeNull()
+    expect(dau2.textContent).not.toContain('61%')
+  })
+
   it('vắng ⇒ không chip, không "đang theo dõi" (máy chủ cũ y như trước); chữ độ tin không bao giờ 100%', async () => {
     thayMo()
     const tam = await screen.findByRole('dialog')
