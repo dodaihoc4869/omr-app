@@ -9,7 +9,7 @@ import path from 'node:path'
 import KhoiLoiGiaiChuan, { KhoiLoiGiaiTuCT, loiGiaiChuanTuKho } from '../src/components/loi-giai/KhoiLoiGiaiChuan'
 import { LoiGiaiCauSai } from '../src/components/KhoiCauSai'
 import TheCauChiTiet from '../src/components/TheCauChiTiet'
-import { htmlKhoiLoiGiaiChuan } from '../src/lib/html-khoi-loi-giai-chuan'
+import { momReviewHtml } from '../src/lib/mom-api'
 import type { CauSaiChiTiet } from '../src/lib/phieu-du-lieu'
 
 afterEach(cleanup)
@@ -78,14 +78,22 @@ describe('Mỗi nơi đã chuyển đều có nhãn LỜI GIẢI + Kiến thức
     const c: CauSaiChiTiet = { phan: 'I', soCau: 1, qid: 'q1', chuyenDe: 'Este', mucDo: 'hieu', giay: 30, de: 'Đề', luaChon: ['a', 'b', 'c', 'd'], dapAnDung: 'B', dapAnChon: 'A', chot: 'Cu(OH)2 màu xanh', lyDo: [{ khoa: 'A', dung: false, ly: 'Sai A' }, { khoa: 'B', dung: true, ly: 'Đúng B' }], buoc: null, ketQua: '', coHinh: false }
     kiem(renderToStaticMarkup(<TheCauChiTiet c={c} stt={1} moSanBanDau />))
   })
-  it('HTML trang kết quả (StudentPortalScreen) cùng thứ tự, thoát ký tự HTML, không còn bản sao rgb kem/hổ phách', () => {
-    const h = htmlKhoiLoiGiaiChuan({ chot: 'a < b', lyDo: [{ khoa: 'A', dung: false, ly: 'Sai A' }, { khoa: 'B', dung: true, ly: 'Đúng B' }], phan: 'I' })
-    expect(tangDan(viTri(h, 'LỜI GIẢI', 'Kiến thức cốt lõi', 'Sai A', 'Đúng B'))).toBe(true)
-    expect(h).toContain('a &lt; b')
-    const man = doc('src/screens/StudentPortalScreen.tsx')
-    expect(man).toContain('htmlKhoiLoiGiaiChuan(c)')
-    expect(man).not.toContain('ĐÚNG CHUẨN ẢNH 4')
-    expect(man).not.toContain('rgb(255, 253, 245)')
+  // SỬA CÓ CHỦ ĐÍCH 13/10: bỏ tự chấm Mom bằng đáp án đoán. Phiếu chỉ dựng từ review máy chủ sau nộp.
+  it('phiếu kết quả Mom sau nộp dùng khuôn chuẩn, đúng thứ tự và thoát ký tự HTML', async () => {
+    const h = await momReviewHtml({ id: 'M-CANON', sbd: 'S1', tieuDe: 'Bài đã nộp', trangThai: 'da_nop', nopLuc: '2026-10-13T10:00:00Z', diem: 10, soCau: 1, soCauDung: 1, dapAnDaNop: { q1: 'B' },
+      dsCau: [{ id: 'q1', phan: 'I', text: 'Đề câu từ máy chủ', choices: ['Phương án A', 'Phương án B', 'Phương án C', 'Phương án D'], dapAn: 'B',
+        loiGiai: { chot: 'a < b', tung_pa: { A: { dung: true, vi_sao: 'Sai A' }, B: { dung: false, vi_sao: 'Đúng B' }, C: { dung: false, vi_sao: 'Sai C' }, D: { dung: false, vi_sao: 'Sai D' } } } }],
+    })
+    const phieu = new DOMParser().parseFromString(h, 'text/html')
+    const lg = phieu.querySelector('.sol-box')!
+    expect(lg).not.toBeNull()
+    expect(tangDan(viTri(lg.innerHTML, 'LỜI GIẢI', 'Kiến thức cốt lõi', 'Sai A', 'Đúng B', 'Sai C', 'Sai D'))).toBe(true)
+    expect(lg.querySelector('.sol-cot-loi')!.innerHTML).toContain('a &lt; b')
+    expect(lg.querySelector('.sol-cot-loi')!.textContent).toBe('a < b')
+    expect([...lg.querySelectorAll('.sol-pa strong')].map(x => x.textContent)).toEqual(['A.', 'B.', 'C.', 'D.'])
+    // Cờ lý do cố tình lệch; dấu đúng phải theo đáp án B của máy chủ đã chấm.
+    expect([...lg.querySelectorAll('.sol-dau')].map(x => x.textContent)).toEqual(['✗', '✓', '✗', '✗'])
+    expect(lg.querySelector('.sol-dap')!.textContent).toBe('Đáp án: B')
   })
   // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): bỏ `xem-diem-gv/BaoCaoMotEm.tsx` khỏi danh sách (tệp bị xoá — báo cáo thầy nay là `ca-thi/BaoCaoChiTiet.tsx`).
   it('màn tổ chiếu + khung dự phòng dùng khối chuẩn (không còn nhãn cũ)', () => {
