@@ -251,9 +251,6 @@ function DemGioMom({ mom, children }: { mom: { batDauLuc?: string; trangThai?: s
 }
 
 export default function StudentPortalScreen() {
-  const nowHocTap = useGioHocTap()
-  // Hộp thoại riêng thay `confirm`/`alert` của trình duyệt (bảng từ ngữ H38): nói việc sẽ làm bằng động từ, không "OK / Hủy".
-  const { hoi, bao, hop } = useHopThoai()
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
     try {
       const luu = localStorage.getItem(KHOA_LUU_AUTH)
@@ -263,6 +260,14 @@ export default function StudentPortalScreen() {
       return null
     }
   })
+  // Máy dùng chung: đổi phiên dựng cổng mới, dừng nhịp cũ và không nhận phản hồi đang tải của em trước.
+  return <CongHocSinh key={auth?.token ?? 'chua-dang-nhap'} auth={auth} setAuth={setAuth} />
+}
+
+function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: ThongTinHs | null) => void }) {
+  const nowHocTap = useGioHocTap()
+  // Hộp thoại riêng thay `confirm`/`alert` của trình duyệt (bảng từ ngữ H38): nói việc sẽ làm bằng động từ, không "OK / Hủy".
+  const { hoi, bao, hop } = useHopThoai()
 
   useEffect(()=>{
     if(!auth?.sbd||!auth.token)return
