@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
-import { ArrowRight, Atom, BookOpen, Check, ChevronRight, ClipboardCheck, FileClock, History, Home, LineChart, LogOut, Mail, PenLine, RefreshCw, Route, Target, Users, X } from 'lucide-react'
+import { ArrowRight, Atom, BookOpen, ChevronRight, ClipboardCheck, History, Home, LineChart, LogOut, Mail, RefreshCw, Route, Users, X } from 'lucide-react'
 import type { KetQuaSanh } from '../hoa2/api'
 import type { TomTatGoi7 } from '../../lib/goi-bai-7'
 import './hoc-tap.css'
@@ -8,6 +8,13 @@ const TheKiemTraCaNhan=lazy(()=>import('./TheKiemTraCaNhan'))
 import TheHomNayEm, { chuNutHoc } from './TheHomNayEm'
 import { soHomNay } from './lam-bai'
 import { useSoCauCanSua } from '../../lib/tu-sua-loi'
+
+// ĐỢT 19 (13/10 — làn N): hai tab Hành trình · Ôn & sửa thiết kế lại và biểu tượng Tự sửa lỗi vẽ riêng (BieuTuongTuSua.tsx — MỘT hình ở thẻ mời, dòng Hôm
+// nay và Ôn & sửa) đều ở khối NẠP LƯỜI (luật tốc độ: không thêm byte tải mở app); nạp trước lúc rảnh sau khi Hôm nay có số ⇒ bấm tab / thẻ mời hiện là có.
+const napHanhTrinhOnSua = () => import('./HanhTrinhOnSua')
+const HanhTrinhOnSua = lazy(napHanhTrinhOnSua)
+const HinhTuSua = lazy(() => import('./BieuTuongTuSua').then((m) => ({ default: m.BieuTuongTuSua })))
+const hinhTuSua = (hien?: boolean) => <Suspense fallback={null}><HinhTuSua hien={hien} /></Suspense>
 
 // TRÙNG TU 11/10 (thầy duyệt bản vẽ https://claude.ai/artifact/5v8vXw5zBzw53FkpCvMknC — "buid và đẩy luôn nhé"):
 // 4 mục Hôm nay · Hành trình · Ôn & sửa · Kết quả; "Của em" là tấm mở từ ảnh đại diện; "Vào ca kiểm tra" luôn ở góc trên
@@ -48,9 +55,9 @@ export function chuViecGoi7(g: Pick<TomTatGoi7, 'tuLamCon' | 'tiepCanCon' | 'thi
 }
 
 /** Dòng việc: biểu tượng · tên · chữ phụ ngắn (nếu có) · số (nếu có) · mũi tên. */
-function Dong({ ten, chu, icon: Icon, sac, so, donVi, onClick }: { ten: string; chu?: string; icon: typeof Home; sac: 'cham' | 'vang' | 'muc'; so?: number; donVi?: string; onClick: () => void }) {
+function Dong({ ten, chu, icon: Icon, hinh, sac, so, donVi, onClick }: { ten: string; chu?: string; icon?: typeof Home; hinh?: ReactNode; sac?: 'cham' | 'vang' | 'muc'; so?: number; donVi?: string; onClick: () => void }) {
   return <button className="ht2-dong" onClick={onClick}>
-    <span className="ht2-dong-bt" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>
+    <span className="ht2-dong-bt" data-sac={sac} aria-hidden="true">{hinh ?? (Icon && <Icon size={20} />)}</span>
     <span className="ht2-dong-chu"><strong>{ten}</strong>{chu && <small>{chu}</small>}</span>
     {so !== undefined && <b className="ht2-dong-so">{so}<small> {donVi}</small></b>}
     <ChevronRight size={20} aria-hidden="true" className="ht2-dong-mui" />
@@ -64,7 +71,7 @@ export const TEN_TU_SUA = 'Tự sửa lỗi'
 export function TheMoiTuSua({ so, onChua }: { so: number | null; onChua: () => void }) {
   if (!so || so <= 0) return null
   return <section className="ht2-moi-sua" aria-labelledby="ht2-moi-sua-tieu">
-    <span className="ht2-moi-sua-bt" aria-hidden="true"><PenLine size={24} /></span>
+    <span className="ht2-moi-sua-bt" aria-hidden="true">{hinhTuSua(true)}</span>
     <div className="ht2-moi-sua-chu">
       <span className="ht2-moi-sua-nhan">{TEN_TU_SUA}</span>
       <h2 id="ht2-moi-sua-tieu"><b>{so}</b> câu đang chờ em sửa</h2>
@@ -93,7 +100,6 @@ export default function HocTapHomNay(p: Props) {
   const khoaHoc = p.dangLamMoi || p.dangTai && !sanh || con === 0
   const conMuc = so ? Math.max(0, so.muc - so.daLam) : 0
   const kho = goi7 ? { choBoSung: con === 0 ? conMuc : 0, sanSang: con ?? undefined } : undefined
-  const baiXep = [...(ht?.bai ?? [])].sort((a, b) => b.tangMo - a.tangMo)
   // Thẻ mời Tự sửa lỗi: tải lười khi Hôm nay đã có số (không tranh lượt với Sảnh); em làm thêm câu ⇒ xem lại bản nhớ (hết hạn mới hỏi máy chủ).
   const soSua = useSoCauCanSua(p.token, !!sanh || !p.dangTai, so?.daLam)
   const coMoiSua = !!soSua && soSua > 0
@@ -107,8 +113,15 @@ export default function HocTapHomNay(p: Props) {
     return () => { window.removeEventListener('keydown', f); nutCuaEm.current?.focus() }
   }, [moCuaEm])
   const dongTam = (fn: () => void) => () => { setMoCuaEm(false); fn() }
-
-  const nutHoc = (phu: boolean) => <button className={phu ? 'ht-nut-phu ht2-nut-lon' : 'ht-nut-chinh ht2-nut-lon'} onClick={p.onHoc} disabled={khoaHoc}>{chuNutHoc(so, con === 0, kho)}<ArrowRight size={20} aria-hidden="true" /></button>
+  // Nạp trước khối Hành trình / Ôn & sửa lúc trình duyệt rảnh, sau khi Hôm nay đã có số (không tranh lượt tải đầu).
+  const coSanh = !!sanh
+  useEffect(() => {
+    if (!coSanh) return
+    const w = window as Window & { requestIdleCallback?: (f: () => void) => number; cancelIdleCallback?: (id: number) => void }
+    const nap = () => { void napHanhTrinhOnSua().catch(() => {}) }
+    if (w.requestIdleCallback) { const id = w.requestIdleCallback(nap); return () => w.cancelIdleCallback?.(id) }
+    const id = window.setTimeout(nap, 1500); return () => window.clearTimeout(id)
+  }, [coSanh])
 
   return <div className="ht-app ht2" data-nguon={p.nguon}>
     <header className="ht-thanh ht2-thanh">
@@ -142,7 +155,7 @@ export default function HocTapHomNay(p: Props) {
           {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>}
           <section className="ht2-nhom" aria-label="Ôn và sửa">
             <h2>Ôn và sửa</h2>
-            {!coMoiSua && <Dong ten={TEN_TU_SUA} chu={soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} icon={PenLine} sac="cham" onClick={p.onChua} />}
+            {!coMoiSua && <Dong ten={TEN_TU_SUA} chu={soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} hinh={hinhTuSua()} onClick={p.onChua} />}
             <Dong ten="Câu đã làm" chu="Lời giải và lịch ôn từng câu" icon={History} sac="vang" onClick={p.onXemLai} />
             {/* Lối DUY NHẤT vào Bài tập về nhà (thầy 13/10 bỏ ở Kết quả): còn bài chưa nộp ⇒ "Thầy đang giao" + số bài; chỉ còn bài đã nộp ⇒ vẫn hiện để em
                 xem điểm / làm lại lượt còn. */}
@@ -151,30 +164,14 @@ export default function HocTapHomNay(p: Props) {
           </>}
         </>}
 
-        {muc === 'hanh-trinh' && <>
-          <section className="ht2-the">
-            <p className="ht2-nhan">Thang 4 tầng của mỗi bài</p>
-            <ol className="ht2-thang" aria-label={ht ? `Tầng đang luyện: ${TANG[ht.tang - 1] ?? ''}` : 'Thang 4 tầng'}>
-              {TANG.map((t, i) => { const tt = !ht ? 'cho' : i + 1 < ht.tang ? 'vung' : i + 1 === ht.tang ? 'dang' : 'cho'; return <li key={t} data-tt={tt}><span>{tt === 'vung' ? <Check size={16} aria-label="Đã vững" /> : i + 1}</span>{t}</li> })}
-            </ol>
-          </section>
-          <section className="ht2-nhom" aria-label="Các bài trong Hành trình">
-            <h2>{baiXep.length ? `${baiXep.length} bài trong Hành trình` : sanh?.chienDich?.ten || 'Bài học được giao'}</h2>
-            {baiXep.length ? baiXep.map(b => <div className="ht2-bai" key={b.khoa}>
-              <div className="ht2-bai-dau"><strong>{b.ten}</strong><span className="ht2-chip" data-sac="cham">{TANG[b.tangMo - 1]}</span></div>
-              <div className="ht2-bai-nac" aria-label={`Đang luyện tầng ${TANG[b.tangMo - 1]}`}>{TANG.map((t, i) => <i key={t} data-tt={i + 1 < b.tangMo ? 'vung' : i + 1 === b.tangMo ? 'dang' : 'cho'} />)}</div>
-            </div>) : <p className="ht-trong">Chưa có danh sách bài.</p>}
-            <p className="ht-chu-phu">Vàng trầm: đã vững · chàm: đang luyện · xám: còn khoá.</p>
-          </section>
-          {ngayKiem&&kiem?<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>:nutHoc(p.coCa)}
-        </>}
-
-        {muc === 'on-lai' && <section className="ht2-nhom" aria-label="Ôn và sửa">
-          <Dong ten={TEN_TU_SUA} chu={soSua === 0 ? 'Không còn câu cần sửa' : coMoiSua ? 'Câu đang chờ em sửa' : 'Câu em làm sai'} icon={PenLine} sac="cham" so={coMoiSua ? soSua : undefined} donVi="câu" onClick={p.onChua} />
-          <Dong ten="Câu đã làm" chu="Lời giải và lịch ôn từng câu" icon={History} sac="vang" onClick={p.onXemLai} />
-          <Dong ten="Tu luyện" chu="Luyện thêm theo chương, dạng, mức" icon={Target} sac="muc" onClick={p.onTuLuyen} />
-          {p.onLuyenLai && <Dong ten="Luyện lại từ bài kiểm tra" chu="Câu sai trong các bài kiểm tra" icon={FileClock} sac="muc" onClick={p.onLuyenLai} />}
-        </section>}
+        {(muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" role="status" aria-busy="true" aria-label="Đang mở" />}>
+          <HanhTrinhOnSua muc={muc} sanh={sanh} dangTai={p.dangTai} soSua={soSua}
+            // Ngày có lịch kiểm tra cá nhân (PR258): thẻ kiểm tra thay nút Học tiếp — như bản trước khi trùng tu Hành trình.
+            nut={ngayKiem && kiem
+              ? <Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
+              : <button type="button" className="htn-nut" data-phu={p.coCa || undefined} onClick={p.onHoc} disabled={khoaHoc}>{chuNutHoc(so, con === 0, kho)}<ArrowRight size={20} aria-hidden="true" /></button>}
+            onChua={p.onChua} onXemLai={p.onXemLai} onTuLuyen={p.onTuLuyen} onLuyenLai={p.onLuyenLai} />
+        </Suspense>}
 
         {muc === 'ket-qua' && <section className="ht2-nhom" aria-label="Kết quả">
           <h2>Điểm thầy đã công bố</h2>

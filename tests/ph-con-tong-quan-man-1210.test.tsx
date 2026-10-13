@@ -54,15 +54,16 @@ describe('Hôm nay — bỏ "Cần thầy chữa"; khối chính có đúng/sai/
   it('không còn "Cần thầy chữa" dù máy chủ gửi số; ba số câu đúng · câu sai · trung bình; số câu đã làm / mức một lần', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="goi-y-nhac"]')).toBeTruthy())
-    await waitFor(() => expect(container.querySelector('[data-vung="dang-luyen-them"]')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('[data-vung="kiem-tra"]')).toBeTruthy()) // SỬA CÓ CHỦ ĐÍCH 13/10: dạng + ca gần nhất ở phần Kiểm tra (đợt 19)
     expect(container.textContent).not.toMatch(/[Cc]ần thầy chữa|[Tt]hầy cần chữa/)
     expect(container.querySelector('[data-vung="can-thay-chua"]')).toBeNull()
     expect(container.querySelector('[data-vung="so-cau-hom-nay"]')!.textContent).toBe('12/30 câu')
     expect(container.querySelectorAll('[data-vung="so-cau-hom-nay"]')).toHaveLength(1)
     const ba = container.querySelector('[data-vung="dung-sai-hom-nay"]')!
-    const o = [...ba.querySelectorAll('dl > div')].map((d) => [d.querySelector('dt')!.textContent, d.querySelector('dd')!.textContent])
+    const o = [...ba.querySelectorAll(':scope > div')].map((d) => [d.querySelector('dt')!.textContent, d.querySelector('dd')!.textContent])
     expect(o).toEqual([['Câu đúng', '9'], ['Câu sai', '3'], ['Trung bình', '41 giây/câu']])
-    expect(container.querySelector('[data-vung="anh-hung"]')!.textContent).toContain('Còn 18 câu nữa là đủ mức tối thiểu của ngày.')
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19, chữ bản vẽ): "Còn N câu nữa là đủ mức hôm nay."
+    expect(container.querySelector('[data-vung="anh-hung"]')!.textContent).toContain('Còn 18 câu nữa là đủ mức hôm nay.')
   })
 
   it('"Gợi ý nhắc con": hiện đúng các câu máy chủ sinh theo luật, mỗi câu một biểu tượng; ngay sau khối chính', async () => {
@@ -71,41 +72,44 @@ describe('Hôm nay — bỏ "Cần thầy chữa"; khối chính có đúng/sai/
     const ds = [...container.querySelectorAll('[data-vung="goi-y-nhac"] li')]
     // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn"): khối thành "Cần nhắc con"; bỏ dòng nói lại số câu hôm nay của khối chính;
     // mỗi dòng chỉ còn câu số liệu (bỏ vế khuyên "Nhắc con…", "Hỏi con…").
-    expect(container.querySelector('#ph3-goi-y')!.textContent).toBe('Cần nhắc con')
-    expect(ds.map((li) => li.getAttribute('data-ma'))).toEqual(['sai-chua-sua', 'nhanh-sai', 'thieu-ngay', 'lam-khuya'])
-    expect(ds[1]!.textContent).toBe('7 ngày qua có 14 câu con làm dưới 8 giây và sai 9 câu.')
+    expect(container.querySelector('#tvc-nhac')!.textContent).toBe('Cần nhắc con')
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19, bản vẽ): xếp theo mức cần để ý (trả lời quá nhanh → ngày thiếu → câu sai chưa sửa → làm khuya); con số tô đậm.
+    expect(ds.map((li) => li.getAttribute('data-ma'))).toEqual(['nhanh-sai', 'thieu-ngay', 'sai-chua-sua', 'lam-khuya'])
+    expect(ds[0]!.textContent).toBe('7 ngày qua có 14 câu con làm dưới 8 giây và sai 9 câu.')
     expect(container.querySelector('[data-vung="goi-y-nhac"]')!.textContent).not.toMatch(/Nhắc con|Hỏi con|Tự chữa lỗi|Tự sửa lỗi/)
     for (const li of ds) expect(li.querySelector('.ph3-o-bt svg')).toBeTruthy()
-    const khoi = [...container.querySelector('[data-vung="man-chinh-ph"] .ph3-luoi')!.children].map((x) => x.getAttribute('data-vung'))
-    expect(khoi.slice(0, 2)).toEqual(['anh-hung', 'goi-y-nhac'])
-    expect(khoi).toContain('lich-tuan')
-    expect(khoi).not.toContain('tuan-nay') // Lịch học tuần này thay "Tuần này học đều" — không hai lịch tuần
+    // điện thoại: Cần nhắc con đứng ngay sau khối Hôm nay (thứ tự `order` theo bản vẽ); máy tính: cột phải
+    expect(container.querySelector('[data-vung="goi-y-nhac"]')!.getAttribute('data-thu')).toBe('2')
+    expect(container.querySelector('[data-vung="tuan-nay"], [data-vung="lich-tuan"]')).toBeNull() // Nhịp học 14 ngày + Lịch sử thay hai lịch tuần cũ
   })
 
-  // SỬA CÓ CHỦ ĐÍCH 12/10 — thầy: "dữ liệu phần này tính từ 1/10" ⇒ bộ giả có mốc 01/10, sổ đủ 01/10 → 16/10 (16 ngày).
-  it('Lịch học tuần này: trạng thái từng ngày bằng chữ (không chỉ màu) + từng ngày từ 01/10', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19): thẻ "Lịch học tuần này" thay bằng phần "Lịch sử từng ngày" (bảng mọi ngày từ 01/10, mới trước; trạng thái bằng chữ).
+  it('Lịch sử từng ngày: mọi ngày từ 01/10 (mới trước, 14 ngày hiện sẵn, còn lại mở thêm); "Không làm" bằng chữ; mức ước tính có "≈"', async () => {
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="lich-tuan"]')).toBeTruthy())
-    const lich = container.querySelector('[data-vung="lich-tuan"]')!
-    expect([...lich.querySelectorAll('.ph3-lich > li')].map((li) => li.getAttribute('data-tt'))).toEqual(['du', 'thieu', 'khong', 'du', 'nay', 'chua-toi', 'chua-toi'])
-    expect(lich.textContent).toContain('Thứ Ba 13/10: Thiếu 10 câu, đã làm 20/30 câu')
-    expect(lich.textContent).toContain('Thứ Tư 14/10: Không làm, đã làm 0/≈30 câu')
-    expect(lich.textContent).toContain('Đủ mức 2/4')
-    const tungNgay = [...lich.querySelectorAll('[data-vung="lich-tung-ngay"] li b')].map((b) => b.textContent)
-    expect(tungNgay.slice(0, 5)).toEqual(['Hôm nay 16/10', 'Thứ Năm 15/10', 'Thứ Tư 14/10', 'Thứ Ba 13/10', 'Thứ Hai 12/10'])
-    expect(tungNgay).toHaveLength(16)
-    expect(tungNgay.at(-1)).toBe('Thứ Năm 01/10')
-    expect(lich.textContent).toContain('Xem từng ngày từ 01/10 (16 ngày)')
-    expect(lich.textContent).toContain('≈ là mức ước tính')
+    await waitFor(() => expect(container.querySelector('[data-vung="lich-su"]')).toBeTruthy())
+    const ls = container.querySelector('[data-vung="lich-su"]')!
+    const hien = [...ls.querySelectorAll('.tvc-bang:not(details .tvc-bang) tbody tr')]
+    expect(hien).toHaveLength(14)
+    expect(hien[0]!.textContent).toContain('16/10 · hôm nay')
+    expect([...ls.querySelectorAll('tbody tr')]).toHaveLength(16)
+    expect(ls.querySelector('details summary')!.textContent).toBe('Xem thêm 2 ngày trước đó')
+    const ngay14 = [...ls.querySelectorAll('tbody tr')].find((tr) => tr.textContent!.includes('14/10'))!
+    expect(ngay14.getAttribute('data-t')).toBe('khong')
+    expect(ngay14.textContent).toContain('Không làm')
+    expect(ls.textContent).toContain('/≈')
   })
 
   it('máy chủ cũ chưa có lệnh (404) ⇒ khối mới vắng, màn như trước (Tuần này học đều); lỗi thật ⇒ lý do + Thử lại gọi lại', async () => {
     tq = { ok: false, error: 'Không có đường' }
     tqTrangThai = 404
     const a = render(<ParentPortalScreen />)
-    await waitFor(() => expect(a.container.querySelector('[data-vung="loi-thay-moi"], [data-vung="tuan-nay"], [data-vung="dang-luyen-them"]')).toBeTruthy())
+    await waitFor(() => expect(a.container.querySelector('[data-vung="loi-thay-moi"]')).toBeTruthy())
     await waitFor(() => expect(goi).toContain('/ph/con-tong-quan'))
-    await waitFor(() => expect(a.container.querySelector('[data-vung="goi-y-nhac"], [data-vung="goi-y-dang-tai"]')).toBeNull())
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19): máy chủ cũ ⇒ không dòng gợi ý nào của `/ph/con-tong-quan`, không Lịch sử; Cần nhắc con chỉ còn khi `/ph/tat-ca-ve-con`
+    // có lịch ôn hôm nay / bài tập đang chạy (bộ giả: bài hạn 25/09 đang chạy ⇒ đúng MỘT dòng bài tập về nhà).
+    await waitFor(() => expect(a.container.querySelector('[data-vung="goi-y-dang-tai"]')).toBeNull())
+    expect([...a.container.querySelectorAll('[data-vung="goi-y-nhac"] li')].map((li) => li.getAttribute('data-ma'))).toEqual(['btvn-B1'])
+    expect(a.container.querySelector('[data-phan="lich-su"]')).toBeNull()
     expect(a.container.querySelector('[data-vung="dung-sai-hom-nay"]')).toBeNull()
     expect(a.container.textContent).not.toMatch(/[Cc]ần thầy chữa/)
     cleanup()

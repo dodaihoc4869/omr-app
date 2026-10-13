@@ -406,7 +406,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
       if(action==='hoc-tap-dem')return g7.demHomNay7(env,sbd,Date.now())
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
-      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){const con7=lap7.plan.viec.length;return {ok:true,cheDo2:true,ngay:g7.tomTatGoi7(lap7,Date.now()).ngay,goi7:g7.tomTatGoi7(lap7,Date.now()),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now());return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 

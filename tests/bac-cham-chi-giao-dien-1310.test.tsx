@@ -9,6 +9,9 @@
 //   · tờ chiếu điểm danh: ô em `.ddc-em` (bản A) / dòng em (bản B) có chip đúng bậc, dải chú giải đếm đúng số;
 //   · bộ đọc 3 lệnh bỏ dữ liệu sai kiểu / lệch nhóm; khoảng bậc phía app khớp `NGUONG_BAC` máy chủ;
 //   · bảng em/phụ huynh: số Sảnh đổi nhóm ⇒ bậc tính lại vẫn nằm trong khoảng của nhóm mới (MỘT con số).
+// SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn M — thầy: "thiết kế lại biểu tượng từng bậc … để học sinh phải wow"): emoji ⇒ huy hiệu SVG vẽ riêng (HuyHieuBac,
+// aria-hidden, không có chữ) ⇒ các chuỗi khoá chữ bỏ phần emoji, kiểm huy hiệu đúng `data-bac` thay vào; chip ở app phụ huynh nay là NÚT mở tấm 12 bậc
+// (chữ nút thêm phần chỉ trình đọc màn hình nghe ", xem đủ 12 bậc"). Bộ test mới: tests/huy-hieu-bac-1310m.test.tsx.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
@@ -87,17 +90,19 @@ describe('fixture khớp luật: bậc luôn trong khoảng nhóm', () => {
 })
 
 describe('ChipBac', () => {
-  it('bản thường: biểu tượng + "Bậc N/12 · Tên"; biểu tượng ẩn khỏi trình đọc màn hình', () => {
+  it('bản thường: huy hiệu + "Bậc N/12 · Tên"; huy hiệu ẩn khỏi trình đọc màn hình', () => {
     const { container } = render(<ChipBac bac={6} />)
     const chip = container.querySelector('.bcc-chip')!
     expect(chip.getAttribute('data-bac')).toBe('6')
-    expect(chip.textContent).toBe('🐼Bậc 6/12 · Lười Có Tính Toán')
+    expect(chip.textContent).toBe('Bậc 6/12 · Lười Có Tính Toán')
+    expect(chip.querySelector('svg.bcc-bt.bcc-hh')!.getAttribute('data-bac')).toBe('6')
     expect(chip.querySelector('.bcc-bt')!.getAttribute('aria-hidden')).toBe('true')
   })
-  it('bản nhỏ: chỉ biểu tượng + số bậc; tên đầy đủ ở title + aria-label', () => {
+  it('bản nhỏ: chỉ huy hiệu + số bậc; tên đầy đủ ở title + aria-label', () => {
     render(<ChipBac bac={12} nho />)
     const chip = screen.getByRole('img', { name: 'Bậc 12/12 · Thần Chăm Chỉ Tối Thượng' })
-    expect(chip.textContent).toBe('👑12')
+    expect(chip.textContent).toBe('12')
+    expect(chip.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe('12')
     expect(chip.getAttribute('title')).toBe('Bậc 12/12 · Thần Chăm Chỉ Tối Thượng')
     expect(chip.hasAttribute('data-nho')).toBe(true)
   })
@@ -108,7 +113,7 @@ describe('ChipBac', () => {
 })
 
 describe('ThangBac', () => {
-  it('12 ô, 12 data-bac khác nhau theo thứ tự 1 → 12, đúng một ô hiện tại có biểu tượng; "Còn N điểm lên <biểu tượng> <tên bậc kế>"', () => {
+  it('12 ô, 12 data-bac khác nhau theo thứ tự 1 → 12, đúng một ô hiện tại có huy hiệu; "Còn N điểm lên <huy hiệu> <tên bậc kế>"', () => {
     const { container } = render(<ThangBac kq={{ bac: 6, diem: 49, diemLenBac: 6 }} />)
     const o = [...container.querySelectorAll('.bcc-o')]
     expect(o).toHaveLength(12)
@@ -116,10 +121,11 @@ describe('ThangBac', () => {
     const hien = o.filter((x) => x.getAttribute('data-hien') === 'true')
     expect(hien).toHaveLength(1)
     expect(hien[0]!.getAttribute('data-bac')).toBe('6')
-    expect(hien[0]!.textContent).toBe('🐼')
-    expect(o.filter((x) => x.textContent).length).toBe(1)
+    expect(hien[0]!.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe('6')
+    expect(o.filter((x) => x.querySelector('svg')).length).toBe(1)
     expect(screen.getByRole('img', { name: 'Thang 12 bậc từ Lười đến Chăm: đang ở Bậc 6/12 · Lười Có Tính Toán, điểm chăm 49/100' })).toBeTruthy()
-    expect(container.querySelector('.bcc-len')!.textContent).toBe('Còn 6 điểm lên ⚖️ Đại Sư Cân Bằng')
+    expect(container.querySelector('.bcc-len')!.textContent).toBe('Còn 6 điểm lên Đại Sư Cân Bằng')
+    expect(container.querySelector('.bcc-len svg.bcc-hh')!.getAttribute('data-bac')).toBe('7')
   })
   it('diemLenBac = null (bậc kế thuộc nhóm khác / bậc 12) ⇒ không thêm chữ', () => {
     const { container, rerender } = render(<ThangBac kq={{ bac: 5, diem: 40, diemLenBac: null }} />)
@@ -226,7 +232,9 @@ describe('bảng em / phụ huynh', () => {
       return c
     })
     expect(chip.getAttribute('data-bac')).toBe(String(b.bac))
-    expect(chip.textContent).toBe(`${BAC_CHAM_CHI[b.bac - 1]!.bieuTuong}Bậc ${b.bac}/12 · ${BAC_CHAM_CHI[b.bac - 1]!.ten}`)
+    expect(chip.tagName).toBe('BUTTON')
+    expect(chip.textContent).toBe(`Bậc ${b.bac}/12 · ${BAC_CHAM_CHI[b.bac - 1]!.ten}, xem đủ 12 bậc`)
+    expect(chip.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe(String(b.bac))
     expect(chip.parentElement!.querySelector('.ph3-nhip__nhom')!.textContent).toBe('Lười')
     expect(container.querySelector('.ph3-nhip')!.classList.contains('ph3-nhip--bac')).toBe(true)
     await screen.findByRole('img', { name: /^Thang 12 bậc/ })
@@ -300,22 +308,24 @@ describe('tờ chiếu điểm danh (thầy 13/10: "Hiện bậc trên màn chi�
       <BanChieuDiemDanh cheDo={cheDo} tt={TT} tk={thongKeBuoi(TT, nhipTheoSbd(kq))} nhip={{ kq, dangTai: false, loi: '' }} goc="https://app.test" matKetNoi={false} hoSoMo={false}
         onDoiCheDo={() => {}} onDong={() => {}} onMoEm={() => {}} onThuLaiNhip={() => {}} />,
     )
-  it('bản A: mỗi ô em có chip đúng bậc (em mới vào không chip); dải chú giải đếm đúng số em có mặt mỗi bậc', () => {
+  // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q — bản A thành lưới THẺ em theo bậc, bản vẽ thầy duyệt): chip nhỏ trong ô ⇒ huy hiệu lớn + số bậc của thẻ;
+  // dải chú giải 12 ô ⇒ thang 12 bậc dạng bậc thềm (`.ddc-thang`); câu đọc màn hình thêm điểm chăm sau bậc. Test đầy đủ: tests/man-chieu-dot19-1310q.
+  it('bản A: mỗi thẻ em có huy hiệu đúng bậc (em mới vào không huy hiệu bậc); thang 12 bậc đếm đúng số em có mặt mỗi bậc', () => {
     ve('diem-danh')
     const o = [...document.querySelectorAll<HTMLButtonElement>('.ddc-em')]
     expect(o).toHaveLength(4)
     for (const nut of o) {
       const e = DS_EM.find((x) => nut.textContent!.includes(x.hoTen))!
-      const chip = nut.querySelector('.bcc-chip[data-nho]')
+      const hh = nut.querySelector('svg.bcc-hh')
       if (e.bacCham) {
-        expect(chip!.getAttribute('data-bac')).toBe(String(e.bacCham.bac))
-        expect(chip!.textContent).toBe(`${BAC_CHAM_CHI[e.bacCham.bac - 1]!.bieuTuong}${e.bacCham.bac}`)
-        expect(nut.getAttribute('aria-label')).toContain(`, Bậc ${e.bacCham.bac}/12 · ${BAC_CHAM_CHI[e.bacCham.bac - 1]!.ten} — mở hồ sơ làm bài`)
-      } else expect(chip).toBeNull()
+        expect(hh!.getAttribute('data-bac')).toBe(String(e.bacCham.bac))
+        expect(nut.querySelector('.ddc-the-so')!.textContent).toBe(`${e.bacCham.bac}`)
+        expect(nut.getAttribute('aria-label')).toContain(`, Bậc ${e.bacCham.bac}/12 · ${BAC_CHAM_CHI[e.bacCham.bac - 1]!.ten}, điểm chăm ${e.bacCham.diem} — mở hồ sơ làm bài`)
+      } else expect(hh).toBeNull()
     }
-    const dai = screen.getByRole('group', { name: '12 bậc từ Lười đến Chăm' })
+    const dai = screen.getByRole('group', { name: 'Số em có mặt ở mỗi bậc, từ Lười đến Chăm' })
     const dem = demTheoBac(DS_EM.filter((e) => CO_MAT.some((c) => c.sbd === e.sbd)).map((e) => ({ bacCham: e.bacCham })))
-    expect([...dai.querySelectorAll('.bcc-dem-o b')].map((b) => Number(b.textContent!.replace(/\D/g, '')))).toEqual(dem)
+    expect([...dai.querySelectorAll('.ddc-bac-cot.bcc .ddc-bac-chu b')].map((b) => Number(b.textContent!.replace(/\D/g, '')))).toEqual(dem)
     expect(dem.reduce((a, b) => a + b, 0)).toBe(3)
   })
   it('bản B: dòng em có chip, dải chú giải cả lớp kèm tên bậc', () => {
@@ -329,7 +339,7 @@ describe('tờ chiếu điểm danh (thầy 13/10: "Hiện bậc trên màn chi�
   it('máy chủ cũ ⇒ không chip, không dải; câu đọc màn hình y như trước', () => {
     const cu = { ...KQ, em: DS_EM.map(boBac) }
     ve('diem-danh', cu)
-    expect(document.querySelector('.bcc-chip, .ddc-bac')).toBeNull()
+    expect(document.querySelector('.bcc-chip, .ddc-bac, .ddc-thang, .ddc-vinh, svg.bcc-hh')).toBeNull()
     const tk = thongKeBuoi(TT, nhipTheoSbd(cu))
     const nut = [...document.querySelectorAll('.ddc-em')][0]!
     expect(nut.getAttribute('aria-label')).toBe(chuNutEm(tk.coMat.find((e) => nut.textContent!.includes(e.hoTen))!))

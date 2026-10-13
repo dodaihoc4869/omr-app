@@ -310,3 +310,46 @@ Thầy nhắn thêm: "Xong thì đẩy lên luôn nhé, đảm bảo máy chủ 
 - [x] Đo app trên máy yếu (Chromium thật, CPU chậm 6×, mạng 1,6 Mbps / RTT 150 ms) | bằng chứng: bản đang chạy /hs lần đầu LCP 4,5 s (ảnh thần thú màn đăng nhập), mở lại 1,9 s; /ph lần đầu 2,7–3,5 s; /gv 2,5 s
 - [x] Xử lý chỗ tốn nhất | bằng chứng: 6edd8ad0 — KaTeX cổng học sinh tải lúc rảnh + nạp trước ảnh màn đăng nhập ⇒ /hs LCP lần đầu 1,6–1,9 s, mở lại 0,8 s (đo 2 lượt mỗi bản); máy chủ bỏ một hoa2-sanh chạy thừa mỗi lần mở app + mỗi lần đăng nhập (tests/may-yeu-mo-app-1310, dang-nhap-kem-sanh-may-chu-0610)
 - [ ] (đợt sau) App phụ huynh dùng chung khung App.tsx của thầy (~272 KB nén tải đầu) — tách vỏ riêng nhẹ như AppHocSinh để màn đầu phụ huynh < 1,5 s trên máy yếu | bằng chứng: (chưa làm)
+- [x] Phép tính 12 bậc (máy chủ, khớp nhóm) | bằng chứng: 4196d6d4 server/src/bac-cham-chi.ts + tests/bac-cham-chi-1310 (3.000 dãy: không mâu thuẫn nhóm, trải đủ 12 bậc; đơn điệu; ba app cùng bậc — mot-con-so-goi7-1210)
+- [x] Hiển thị bậc HS (Hôm nay, hồ sơ) · PH · thầy (chip + đếm + xếp theo bậc) · 12 màu từ biến chuẩn | bằng chứng: làn L c8041ab5, tests/bac-cham-chi-giao-dien-1310 (22), ảnh docs/anh-dot18/lan-l-*.jpg
+- [x] Hiện bậc trên màn chiếu điểm danh | bằng chứng: làn L c8041ab5, ảnh lan-l-man-chieu.jpg
+- [x] Không chậm hơn | bằng chứng: kiem:toc-do xanh (HS +0,3 KB trong dung sai; máy chủ không thêm đợt/lệnh)
+- [x] Đẩy lên + phát hành (kiểm ca mở) | bằng chứng: PR257 → e4fc3f9a, Actions 38335605600 SUCCESS (bước "Kiểm ca thi" đạt, bước 16 Worker + Pages cùng commit). Lùi: git revert e4fc3f9a
+
+## Đợt 19 — bảng 12 bậc khi bấm chip, biểu tượng bậc thiết kế lại, biểu tượng Tự sửa lỗi (13/10 sáng)
+Thầy nhắn (2 ảnh: chip "💤 Bậc 3/12 · Vua Ngủ Nướng"; thẻ "Tự sửa lỗi · 100 câu đang chờ em sửa · Sửa lỗi ngay"):
+"chỗ bấm vào bậc này cho hiện đủ 12 bậc để học sinh biết rõ bao nhiêu bậc, nhớ hiển thị đẹp, bạn thiết kế lại biểu tượng từng bậc cho phù hợp nổi bật siêu đẹp ,mịn để học sinh phải wow"
+"mục tự sửa lỗi thiết kế lại biểu tưởng làm cho hiển thị đẹp mắt hơn nữa nhé."
+- [ ] Bấm chip bậc ⇒ hiện bảng đủ 12 bậc (bậc em đang ở nổi bật, còn bao nhiêu điểm lên bậc kế), đẹp ở dọc · ngang · máy tính, sáng · tối | bằng chứng: (chưa có)
+- [ ] Thiết kế lại biểu tượng 12 bậc: vẽ riêng (SVG, mịn mọi cỡ, không phụ thuộc emoji của máy), phù hợp tên bậc, nổi bật, bậc cao có trang trí hơn | bằng chứng: (chưa có)
+- [ ] Thiết kế lại biểu tượng thẻ Tự sửa lỗi cho đẹp mắt hơn | bằng chứng: (chưa có)
+- [ ] Không chậm hơn (kiem:toc-do xanh; bảng 12 bậc nạp khi bấm) + phát hành | bằng chứng: (chưa có)
+Thầy nhắn thêm (ảnh tab Hành trình: "Thang 4 tầng của mỗi bài" 1 Nền · 2 Hiểu · 3 Vận dụng · 4 Tổng hợp, "Bài học được giao — Chưa có danh sách bài.", chú giải màu, nút đen "Học tiếp · 9 câu"; ảnh tab Ôn & sửa: Tự sửa lỗi 100 câu · Câu đã làm · Tu luyện · Luyện lại từ bài kiểm tra):
+"hành trình cũng thiết kế lại giao diện cực đẹp, khoa học, thân thiện trực quan các nút bấm gọn gàng đẹp mắt"
+"phần này cũng thiết kế lại rõ từng phần vô cùng đẹp mắt trực quan khoa học thân thiện"
+- [ ] Hành trình: thiết kế lại cực đẹp, khoa học, trực quan, nút gọn đẹp (dọc · ngang · máy tính, sáng · tối) | bằng chứng: (chưa có)
+- [ ] Hành trình: sửa lỗi "Chưa có danh sách bài" khi em đang có bài (Hôm nay hiện Bài 8. Amine) — tìm nguyên nhân gốc | bằng chứng: (chưa có)
+- [ ] Ôn & sửa: thiết kế lại rõ từng phần, đẹp, trực quan, khoa học, thân thiện | bằng chứng: (chưa có)
+Thầy nhắn thêm (ảnh thẻ "12 bậc từ Lười đến Chăm · Số em mỗi bậc · 260 em đã xếp bậc" ở Nhịp học của thầy):
+"phần này cho tôi bấm vào từng bậc sẽ hiện ra danh sách siêu đẹp của từng học sinh đó"
+"Tất cả cái sửa giao diện thì đều phải tối ưu cho dọc, ngang và máy tính nhé. Tăng tốc máy chủ tốc độ load app tức thì nhé."
+"Làm cho giao diện điểm danh của học sinh chiếu lên bảng phải làm đẹp hơn nữa, chi tiết hơn nữa hiển thị được cấp bậc rõ ràng của từng học sinh, phải khiến cho học sinh wow, vẽ cho tôi xem trước khi buid chỗ này."
+"App phụ huynh trùng tu lại cho chi tiết hơn, phụ huynh để xem đủ hết mọi thông tin của con từ thái độ, tính cách mọi thứ đo được về con, hiển thị không được phép dấu diếm, toàn bộ chi tiết thực chất cho phụ huynh, giao diện phải ấm áp để phụ huynh thấy bình an, thân thiện, vẽ tôi xem trước khi build nhé."
+- [ ] Nhịp học thầy: bấm từng bậc ở dải 12 bậc ⇒ danh sách học sinh bậc ấy (đẹp, dọc · ngang · máy tính) | bằng chứng: (chưa có)
+- [ ] Mọi giao diện sửa trong đợt: đúng 3 khổ dọc · ngang · máy tính; kiem:toc-do xanh, không thêm vòng chờ máy chủ | bằng chứng: (chưa có)
+- [ ] Màn chiếu điểm danh: BẢN VẼ xem trước (thầy duyệt) — đẹp hơn, chi tiết hơn, bậc rõ từng em | bằng chứng: (chưa có)
+- [ ] Màn chiếu điểm danh: dựng theo bản vẽ đã duyệt | bằng chứng: (chờ thầy duyệt bản vẽ)
+- [ ] App phụ huynh: BẢN VẼ xem trước (thầy duyệt) — đủ mọi số đo được về con, không giấu, ấm áp | bằng chứng: (chưa có)
+- [ ] App phụ huynh: dựng theo bản vẽ đã duyệt | bằng chứng: (chờ thầy duyệt bản vẽ)
+Giả định: "tính cách" — app KHÔNG đo tính cách; chỉ hiện đúng những gì đo được (thái độ làm bài: nhịp học, bậc, quá nhanh, chọn lặp, đúng/sai theo thời gian, tự sửa, số giây…), không gán nhãn tính cách không có số liệu.
+Thầy chốt: "không hiện tính cách cũng được" ⇒ app phụ huynh không có mục tính cách; chỉ hiện số đo được.
+Thầy duyệt (13/10): "duyệt cả hai giữ xếp theo bậc phụ huynh xem được hạng"
+- [x] Màn chiếu điểm danh: BẢN VẼ | bằng chứng: docs/ban-ve-dot19/anh/chieu-*.jpg — thầy duyệt, giữ xếp theo bậc
+- [x] App phụ huynh: BẢN VẼ | bằng chứng: docs/ban-ve-dot19/anh/ph-*.jpg — thầy duyệt, phụ huynh xem được hạng trong lớp
+- [ ] Dựng màn chiếu theo bản vẽ (xếp theo bậc) | bằng chứng: (chưa có)
+- [ ] Dựng app phụ huynh theo bản vẽ + mở các mục "cần mở cho phụ huynh" (điểm danh buổi học, các lần học hôm nay, lịch ôn lại, hạng chăm trong lớp) | bằng chứng: (chưa có)
+Thầy nhắn thêm (13/10): "bạn dặn luôn nó đi" · "từ giờ tôi nhắn ở đây, việc gì thằng codex làm tốt hơn bạn giao luôn cho nó tự làm nhé"
+- [ ] Dặn Codex trực tiếp (@codex trên GitHub) đọc thoả thuận chung + xác nhận | bằng chứng: (chưa có)
+- [ ] Luật thường trực: thầy nhắn ở phiên này; việc Codex làm tốt hơn ⇒ giao thẳng Codex qua @codex, theo dõi tới xong, báo thầy | bằng chứng: (chưa có)
+- [x] Sửa lỗi: trang phụ huynh mới mất thẻ kiểm tra cá nhân của PR258 | bằng chứng: fd37f2fc + tests/ph-kiem-tra-dot19-1310 (3 xanh)
+- [x] Thoả thuận làm việc chung Claude ↔ Codex | bằng chứng: 34bd1c70 docs/hop-dong-claude-codex-1310.md + dòng đầu DIEU-PHOI

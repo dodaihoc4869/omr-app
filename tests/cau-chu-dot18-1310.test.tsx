@@ -57,11 +57,12 @@ describe('app phụ huynh — bỏ chữ hướng dẫn, giữ nhãn', () => {
   it('Hôm nay: không "Gia đình hỗ trợ", không chữ nhỏ cách tính; còn Câu đúng · Câu sai · Trung bình · Cần nhắc con · Lịch học tuần này', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="goi-y-nhac"]')).toBeTruthy())
-    await waitFor(() => expect(container.querySelector('[data-vung="lich-tuan"]')).toBeTruthy())
+    // SỬA CÓ CHỦ ĐÍCH 13/10 — đợt 19: "Lịch học tuần này" thay bằng "Nhịp học" + "Lịch sử từng ngày" (bản vẽ thầy duyệt).
+    await waitFor(() => expect(container.querySelector('[data-vung="lich-su"]')).toBeTruthy())
     const chu = container.textContent!
     for (const bo of ['Gia đình hỗ trợ', 'Gợi ý nhắc con', 'Theo số liệu đến', 'Đúng, sai tính theo từng lần', 'theo quy tắc hiện hành', 'Nhắc con đọc kỹ đề', 'Gặp câu với hỗ trợ'])
       expect(chu).not.toContain(bo)
-    for (const giu of ['Câu đúng', 'Câu sai', 'Trung bình', 'Cần nhắc con', 'Lịch học tuần này']) expect(chu).toContain(giu)
+    for (const giu of ['Câu đúng', 'Câu sai', 'Trung bình', 'Cần nhắc con', 'Lịch sử từng ngày']) expect(chu).toContain(giu)
   })
 
   it('Tiến bộ: không câu giải thích dưới tiêu đề khối; ba khối số liệu vẫn có tên', async () => {

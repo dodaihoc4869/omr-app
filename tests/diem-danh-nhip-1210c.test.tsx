@@ -29,7 +29,8 @@ vi.mock('../src/components/chien-dich/HoSoLamCauEm', () => ({
 import { BuocDiemDanh, useDiemDanhBuoi } from '../src/components/day-hoc/DiemDanhBuoi'
 import { cotNhipLop, demNhom, homQuaHomNay, khoaNhom, luoiDiemDanh, nhipTheoSbd, soNgayBo, thongKeBuoi, type EmBuoi } from '../src/lib/diem-danh-nhip'
 import { gioDd } from '../src/lib/diem-danh-nhip'
-import { dongMotCot, soCotLuoi } from '../src/components/day-hoc/BanChieuDiemDanh'
+import { dongMotCot } from '../src/components/day-hoc/BanChieuDiemDanh'
+import { coLuoiThe } from '../src/components/day-hoc/chieu-bac'
 import type { TrangThaiBuoi } from '../src/lib/buoi-hoc-api'
 import type { KetQuaNhipHoc } from '../src/lib/nhip-hoc-thay'
 
@@ -105,7 +106,8 @@ describe('phép thuần: nhóm em có mặt / vắng', () => {
     expect(ten(c.khac)).toEqual(['S8', 'S10', 'S9'])
   })
   it('co giãn theo khổ: lưới tên A thêm cột khi đông em; cột B tách đôi khi quá số dòng cao ≥ 44 px vừa khung; giờ điểm danh theo giờ Việt Nam', () => {
-    expect([30, 40, 41, 54, 60].map(soCotLuoi)).toEqual([5, 5, 6, 6, 7])
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q — lưới THẺ em theo bậc): ≤ 30 em 5 cột thẻ đủ · 31–48 em 6 cột thẻ gọn · nhiều hơn 7 cột
+    expect([30, 31, 48, 49, 60].map((n) => coLuoiThe(n).cot)).toEqual([5, 6, 6, 7, 7])
     expect([dongMotCot(1920, 1080), dongMotCot(1280, 720), dongMotCot(3840, 2160)]).toEqual([12, 8, 12])
     expect(gioDd('2026-10-12T10:58:00Z')).toBe('17:58')
     expect(gioDd('hỏng')).toBe('')
@@ -234,15 +236,19 @@ describe('bản chiếu A — đang điểm danh', () => {
     expect(within(chieu).getByRole('status', { name: 'Có mặt 6 trên 9 em' })).toBeTruthy()
     expect(within(chieu).getByRole('img', { name: 'Mã QR điểm danh' })).toBeTruthy()
     const o = within(within(chieu).getByRole('list', { name: 'Bấm tên em để mở hồ sơ làm bài' })).getAllByRole('button')
-    expect(o.map((b) => [b.querySelector('b')?.textContent, b.getAttribute('data-nhom'), b.querySelector('.ddc-em-chu span')?.textContent])).toEqual([
-      ['Nguyễn Minh Anh', 'cham', 'đủ mức 11/11 ngày'],
-      ['Trần Gia Bảo', 'cham', 'đủ mức 10/11 ngày'],
-      ['Đỗ Mai Phương', 'chua-deu', 'đủ mức 6/11 ngày'],
-      ['Hoàng Đức Huy', 'luoi', 'đủ mức 0/11 ngày'],
-      ['Quách Gia Linh', 'moi', 'mới vào lớp'],
-      ['Phạm Hà', 'chua-co', `điểm danh ${gioDd(luc(56))}`],
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q — ô tên ⇒ THẺ em: dòng nhóm + "Đủ mức x/y ngày" riêng; máy chủ này chưa gửi bậc nên thẻ tô theo nhóm
+    // như cũ; nhãn "Vừa vào" + viền vàng cho BA em vào muộn nhất theo bản vẽ thầy duyệt, không còn một em)
+    expect(
+      o.map((b) => [b.querySelector('b')?.textContent, b.getAttribute('data-nhom'), b.querySelector('.ddc-em-chu span')?.textContent, b.querySelector('.ddc-the-dong')?.textContent ?? null]),
+    ).toEqual([
+      ['Nguyễn Minh Anh', 'cham', 'Nhóm Chăm', 'Đủ mức 11/11 ngày'],
+      ['Trần Gia Bảo', 'cham', 'Nhóm Chăm', 'Đủ mức 10/11 ngày'],
+      ['Đỗ Mai Phương', 'chua-deu', 'Nhóm Chưa đều', 'Đủ mức 6/11 ngày'],
+      ['Hoàng Đức Huy', 'luoi', 'Nhóm Lười', 'Đủ mức 0/11 ngày'],
+      ['Quách Gia Linh', 'moi', 'Mới vào lớp', 'Đã có số 1/3 ngày'],
+      ['Phạm Hà', 'chua-co', `Điểm danh ${gioDd(luc(56))}`, 'Chưa có số nhịp học'],
     ])
-    expect(o.filter((b) => b.hasAttribute('data-moi')).map((b) => b.querySelector('b')?.textContent)).toEqual(['Hoàng Đức Huy'])
+    expect(o.filter((b) => b.hasAttribute('data-moi')).map((b) => b.querySelector('b')?.textContent)).toEqual(['Hoàng Đức Huy', 'Quách Gia Linh', 'Phạm Hà'])
     expect([...chieu.querySelectorAll('.ddc-chip')].map((x) => x.textContent)).toEqual(['Chăm 2', 'Chưa đều 1', 'Lười 1', 'Mới 1', 'Chưa có số 1'])
     expect(chieu.querySelector('.ddc-chan')?.textContent).toContain('thoát khi đủ mức 6 ngày liền')
     fireEvent.click(o[3]!)

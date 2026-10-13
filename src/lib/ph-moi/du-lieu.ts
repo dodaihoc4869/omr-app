@@ -11,7 +11,8 @@ const NGUON: readonly string[] = ['on_lai', 'btvn', 'thu_thach_rieng', 'luyen_da
 const BAC: readonly string[] = ['biet', 'hieu', 'van_dung']
 
 export interface CongBo { congBo: 'khong' | 'ngay' | 'ca_lop_xong'; daCongBo: boolean; soEmDaNop: number; soEmDaVao: number }
-export interface PhanDiem { ma: 'I' | 'II' | 'III'; dung: number; tong: number; diem: number | null }
+/** `toiDa` (CHỈ THÊM, đợt 19): điểm tối đa của phần (4,5 · 4 · 1,5) khi máy chủ gửi; vắng ⇒ null (thanh phần tính theo số câu đúng). */
+export interface PhanDiem { ma: 'I' | 'II' | 'III'; dung: number; tong: number; diem: number | null; toiDa?: number | null }
 export interface CaGanNhat {
   maCa: string
   tenCa: string
@@ -90,7 +91,11 @@ export interface PhMoi {
   phuHuynhLamGi: string[]
   giaoThemConLai: number | null
   doCham: { hang: number; siSo: number } | null
+  /** ĐỢT 19 (CHỈ THÊM): điểm danh buổi học trên lớp, mới trước, ≤ 8 buổi. Máy chủ cũ / chưa có buổi nào ⇒ null (phần Buổi học ẩn). */
+  buoiHoc: BuoiHocPh[] | null
 }
+/** Một buổi học: `luc` (giờ vào) + `cach` ('ma' tự điểm danh bằng mã · 'thay' thầy điểm danh) CHỈ khi có mặt; `dangMo` = buổi chưa kết thúc. */
+export interface BuoiHocPh { ten: string; moLuc: string; coMat: boolean; luc: string; cach: 'ma' | 'thay' | null; dangMo: boolean }
 
 const laDoiTuong = (x: unknown): x is Record<string, unknown> => x !== null && typeof x === 'object' && !Array.isArray(x)
 const so = (x: unknown): number | null => (typeof x === 'number' && Number.isFinite(x) ? x : null)
@@ -136,7 +141,8 @@ function docCaGanNhat(x: unknown): CaGanNhat | null {
     const dung = nguyenKhongAm(p.dung)
     const t = nguyenKhongAm(p.tong)
     if (dung === null || t === null || t <= 0 || dung > t) continue
-    phan.push({ ma: p.ma, dung, tong: t, diem: soKhongAm(p.diem) })
+    const toiDa = soKhongAm(p.toiDa)
+    phan.push({ ma: p.ma, dung, tong: t, diem: soKhongAm(p.diem), ...(toiDa !== null && toiDa > 0 ? { toiDa } : {}) })
     if (phan.length >= 3) break
   }
   return {
@@ -323,6 +329,14 @@ const lapDanh = <T,>(x: unknown, doc: (e: unknown) => T | null, toiDa: number): 
   return ra
 }
 
+function docBuoiHoc(x: unknown): BuoiHocPh | null {
+  if (!laDoiTuong(x)) return null
+  const moLuc = iso(x.moLuc)
+  if (!moLuc) return null
+  const luc = x.coMat === true ? iso(x.luc) : ''
+  return { ten: chuoi(x.ten, 80) || 'Buổi học', moLuc, coMat: !!luc, luc, cach: luc && (x.cach === 'ma' || x.cach === 'thay') ? x.cach : null, dangMo: x.dangMo === true }
+}
+
 /** Thân `/ph/tat-ca-ve-con` ⇒ `PhMoi`; không phải thân của lệnh này (ok≠true, thiếu tên con) ⇒ null. */
 export function docTatCaVeCon(raw: unknown): PhMoi | null {
   if (!laDoiTuong(raw) || raw.ok !== true) return null
@@ -447,6 +461,11 @@ export function docTatCaVeCon(raw: unknown): PhMoi | null {
     no: docNo(raw.no),
     phuHuynhLamGi: lapDanh(raw.phuHuynhLamGi, (e) => (typeof e === 'string' && e.trim() ? chuoi(e, 240) : null), 2),
     giaoThemConLai: gt ? nguyenKhongAm(gt.conLaiHomNay) : null,
+    buoiHoc: (() => {
+      const bh = laDoiTuong(raw.buoiHoc) ? raw.buoiHoc : null
+      const d = bh ? lapDanh(bh.ds, docBuoiHoc, 8) : []
+      return d.length > 0 ? d : null
+    })(),
     doCham: dc && nguyenKhongAm(dc.hang) !== null && nguyenKhongAm(dc.siSo) !== null && (dc.hang as number) >= 1 && (dc.siSo as number) >= (dc.hang as number) ? { hang: dc.hang as number, siSo: dc.siSo as number } : null,
   }
 }

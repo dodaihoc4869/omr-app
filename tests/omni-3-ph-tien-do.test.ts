@@ -90,14 +90,17 @@ describe('OMNI 3 · app phụ huynh theo bản vẽ tối giản 09/10', () => {
   it('CÓ omni ⇒ Hôm nay: giờ học con chọn, dạng cần vững, KHÔNG "Cần thầy chữa" (bỏ 12/10); Tiến bộ: khoảng cách tới 8 + chứng chỉ dưới đường điểm, Sơ ý; không chữ game / A.I / 100%', async () => {
     hoc2 = { ...HOC2, omni: OMNI }
     const c = await moHomNay()
-    expect(c.querySelector('[data-vung="anh-hung"]')!.textContent).toContain('Giờ học con chọn: 20:30.')
-    const dang = c.querySelector('[data-vung="dang-luyen-them"]')!
-    expect(dang.querySelector('h2')!.textContent).toBe('Dạng cần vững')
-    expect(dang.textContent).toContain('Hiệu suất ester hoá · Hỗn hợp ester')
+    // SỬA CÓ CHỦ ĐÍCH 13/10 — đợt 19 (bản vẽ thầy duyệt: mọi số đo được trên MỘT trang): giờ con chọn ở "Thời gian làm bài"; dạng cần vững, sơ ý,
+    // khoảng cách tới 8, chứng chỉ ở "Kiểm tra và tiến bộ" (khoảng cách chỉ khi đã hiệu chuẩn — bộ giả: đã hiệu chuẩn ⇒ có số).
+    await waitFor(() => expect(c.querySelector('[data-vung="thoi-gian"]')).toBeTruthy())
+    expect(c.querySelector('[data-vung="thoi-gian"]')!.textContent).toContain('Giờ học con chọn20:30')
+    const kt = c.querySelector('[data-vung="kiem-tra"]')!
+    expect(kt.querySelector('[data-vung="dang-can-vung"]')!.textContent).toBe('Dạng cần vững: Hiệu suất ester hoá · Hỗn hợp ester')
+    expect(kt.querySelector('[data-vung="omni-ph"]')!.textContent).toContain('Khoảng cách tới 8Con còn 1,1 điểm tới 8')
+    expect(kt.textContent).toContain('Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91% · điểm ca chốt 8,5')
     // LÀN PHỤ HUYNH 12/10: thầy lệnh bỏ mục "Cần thầy chữa" ⇒ omni.canThayChua = 1 nhưng không dòng nào
     expect(c.querySelector('[data-vung="can-thay-chua"]')).toBeNull()
     expect(c.textContent).not.toContain('Cần thầy chữa')
-    expect(c.textContent).not.toMatch(/Sẵn sàng 8\+|tới 8|Sơ ý/) // các số ấy chỉ ở Tiến bộ
     expect(c.textContent).not.toMatch(CAM)
     await sangTienBo(c)
     const o = c.querySelector('[data-vung="diem-omni"]') as HTMLElement
@@ -115,10 +118,14 @@ describe('OMNI 3 · app phụ huynh theo bản vẽ tối giản 09/10', () => {
     tatCa = PH_OK
     hoc2 = { ...HOC2, omni: { ...OMNI, hieuChuan: { soCaChot: 2, du: false }, canThayChua: 0 } }
     const c = await moHomNay()
-    expect(c.querySelector('[data-vung="anh-hung"]')!.textContent).toContain('Giờ học quen của con: 19:30–21:00.')
-    expect(c.textContent).not.toContain('Giờ học con chọn')
-    expect(c.querySelector('[data-vung="dang-luyen-them"] h2')!.textContent).toBe('Dạng con đang luyện thêm')
-    expect(c.textContent).not.toMatch(/Dạng cần vững|Cần thầy chữa/)
+    // SỬA CÓ CHỦ ĐÍCH 13/10 — đợt 19: giờ học quen (đo từ sổ) ở "Thời gian làm bài", giờ con chọn ghi riêng một dòng (hai số khác nhau, không trộn);
+    // dạng luyện thêm của máy chủ ở "Kiểm tra và tiến bộ"; chưa hiệu chuẩn ⇒ "Chưa tính", không số khoảng cách.
+    await waitFor(() => expect(c.querySelector('[data-vung="thoi-gian"]')).toBeTruthy())
+    expect(c.querySelector('[data-vung="thoi-gian"]')!.textContent).toContain('Giờ học quen19:30–21:00')
+    expect(c.querySelector('[data-vung="thoi-gian"]')!.textContent).toContain('Giờ học con chọn: 20:30.')
+    expect(c.querySelector('[data-vung="dang-ph"]')!.textContent).toContain('Dạng con đang luyện thêm')
+    expect(c.querySelector('[data-vung="omni-ph"]')!.textContent).toContain('Chưa tính (cần 3 ca chốt, đã có 2)')
+    expect(c.textContent).not.toMatch(/Cần thầy chữa/)
     await sangTienBo(c)
     expect([...c.querySelector('[data-vung="diem-omni"]')!.children].map((x) => x.textContent)).toEqual(['Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91% · điểm ca chốt 8,5'])
     expect(c.textContent).not.toMatch(/tới 8|mốc 8/)

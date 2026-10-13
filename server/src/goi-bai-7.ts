@@ -14,7 +14,7 @@ import { docCauBtvnChuaNop } from './game-v2-luot'
 import { dongCoHanhTrinh, docTruocDongCo, docTruocDongCoNeuSanBang, docTruocDongCoTheoHoSo } from './hanh-trinh-dong-co'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
-import { CAU_TOI_THIEU, tangCuaEm, type TangHanhTrinh } from './hanh-trinh-ngay'
+import { CAU_TOI_THIEU, tangCuaCau, tangCuaEm, type TangHanhTrinh } from './hanh-trinh-ngay'
 import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { apLamLaiKhac } from './cau-anh-em'
 import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
@@ -340,7 +340,8 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const chua=goi.flatMap(g=>g.cau.filter(c=>g.choThay.has(c.qid)&&teacherCorrections.results.some(r=>r.goi_id===g.id&&r.qid===c.qid&&r.version===c.version)).map(c=>c.qid))
   const cau = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid,c])).values()]
   const quotaCon = goi.reduce((n,g) => n+Math.max(0,g.quota-g.gapNgay.size),0)
-  const tang = tangCuaEm(hs.cau,hs.tt,new Map([...hs.meta].map(([qid,m])=>[qid,m.group])))
+  const nhom7 = new Map([...hs.meta].map(([qid,m])=>[qid,m.group]))
+  const tang = tangCuaEm(hs.cau,hs.tt,nhom7)
   // MỘT CON SỐ (thầy 12/10): mức hôm nay M = max(mức theo tầng, Σ câu mới theo lịch các gói) — chốt lần lập đầu tiên trong ngày, các lần sau đọc lại.
   // Kế hoạch đúng M − đã làm câu: câu mới theo lịch vẫn đứng đầu nhưng không vượt phần còn lại của M (`chiTrongMuc`).
   const batKt=await import('./kiem-tra-ca-nhan').then(m=>m.coKtCn(env))
@@ -356,7 +357,15 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const diemDaDo=kiem.results.filter(r=>diemConDungNguon7(json<Row>(r.json).cau,goi.find(g=>g.id===r.goi_id)?.cau.filter(c=>(c.maTo??c.maDe)===r.ma_de)??[])).map(r=>({goiId:str(r.goi_id),maDe:str(r.ma_de),diem:Number(r.diem),luc:str(r.nop_luc),cauMoi:Number(json<Row>(r.json).cauMoi??0),tong:Number(json<Row>(r.json).tong??0)}))
   const skills = new Map(old.results.map(r => [str(r.kn),r.trang_thai === 'vung']))
   const kienThucCu = { tong: skills.size, dat: [...skills.values()].filter(Boolean).length, tyLe: skills.size ? Math.round(1000*[...skills.values()].filter(Boolean).length/skills.size)/10 : null }
-  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:daLamNgay.size }
+  // ĐỢT 19 (CHỈ-THÊM, không đọc thêm D1 — lỗi 13/10 "tab Hành trình: Chưa có danh sách bài" khi Gói 7 bật): tầng đang luyện của TỪNG bài trong gói, cùng
+  // cổng mở tầng của động cơ (`tangCuaEm`) trên các câu của gói có trong hồ sơ vừa đọc. Gói không có câu nào mang mức độ trong hồ sơ ⇒ KHÔNG có tầng
+  // (app không vẽ, không bịa).
+  const tangGoi = new Map<string, TangHanhTrinh>()
+  for (const g of goi) {
+    const q = new Set(g.cau.map(c => c.qid)), ds = hs.cau.filter(c => q.has(c.qid))
+    if (ds.some(c => tangCuaCau(c) !== null)) tangGoi.set(g.id, tangCuaEm(ds, hs.tt, nhom7))
+  }
+  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:daLamNgay.size, tang, tangGoi }
 }
 
 /** Số đếm hợp lệ (hữu hạn, ≥ 0); còn lại ⇒ 0 — không để NaN thành `null` trong JSON (app đọc chặt). */
@@ -374,9 +383,13 @@ const laDiemDaDo7 = (d: { goiId: unknown; maDe: unknown; diem: unknown; luc: unk
  */
 export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>, now: number) {
   const homNay = ngayVn7(now)
-  return { bat: true, ngay: homNay, goi: lap.goi.map(g => {
+  // ĐỢT 19 (CHỈ-THÊM): `tang` = tầng chung của em (đúng số `lapGoi7` dùng chốt mức hôm nay) · `goi[].tang` = tầng đang luyện của bài ấy. Vắng (tóm tắt
+  // dựng tay, gói không có bằng chứng) ⇒ không gửi trường — app hiện thang 4 tầng trung tính.
+  const tangGoi = lap.tangGoi as ReadonlyMap<string, TangHanhTrinh> | undefined
+  return { bat: true, ngay: homNay, ...(lap.tang ? { tang: lap.tang } : {}), goi: lap.goi.map(g => {
     const qids = new Set(g.cau.map(c => c.qid)), tong = qids.size, daGap = Math.min(tong, [...g.daGap].filter(q => qids.has(q)).length)
-    return { id:g.id,ten:g.ten,batDau:g.batDau,han:g.han,tong,daGap,con:tong-daGap,nguonDayDu:g.nguonDayDu,
+    const tangBai = tangGoi?.get(g.id)
+    return { id:g.id,ten:g.ten,batDau:g.batDau,han:g.han,tong,daGap,con:tong-daGap,nguonDayDu:g.nguonDayDu,...(tangBai ? { tang: tangBai } : {}),
       to:[...new Set(g.cau.map(c=>c.maTo??c.maDe).filter((m): m is string => typeof m === 'string' && m.trim().length > 0))],
       canBoSung:g.cau.filter(c=>c.hopLe===false).length,quota:dem7(g.quota),gapHomNay:[...g.gapNgay].filter(q => qids.has(q)).length,quaHan:homNay>g.han && (!g.nguonDayDu||daGap<tong) }
   }),

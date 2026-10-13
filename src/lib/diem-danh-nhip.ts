@@ -139,9 +139,18 @@ export function thongKeBuoi(tt: Pick<TrangThaiBuoi, 'buoi' | 'lopEm' | 'coMat'> 
   return { ds, coMat, vang, demCoMat: demNhom(coMat), demLop: demNhom(ds), vangLuoi: vang.filter((e) => khoaNhom(e) === 'luoi').length }
 }
 
-/** Lưới tên của bản chiếu đang điểm danh: theo nhóm (Chăm → Chưa đều → Lười → Mới → chưa có số), trong nhóm theo giờ điểm danh (đến trước đứng trước). */
+/** Lưới thẻ của bản chiếu đang điểm danh. Đợt 19 (thầy duyệt 13/10 "giữ xếp theo bậc"): XẾP THEO BẬC từ cao xuống (cùng bậc ⇒ điểm chăm cao trước),
+ *  em chưa xếp bậc đứng sau; rồi theo nhóm (Chăm → Chưa đều → Lười → Mới → chưa có số), rồi giờ điểm danh (đến trước đứng trước). Máy chủ cũ không
+ *  gửi bậc ⇒ đúng cách xếp cũ (nhóm → giờ). */
 export function luoiDiemDanh(coMat: readonly EmBuoi[]): EmBuoi[] {
-  return [...coMat].sort((a, b) => THU_TU_NHOM.indexOf(khoaNhom(a)) - THU_TU_NHOM.indexOf(khoaNhom(b)) || (a.luc ?? '').localeCompare(b.luc ?? '') || ten(a, b))
+  return [...coMat].sort(
+    (a, b) =>
+      (b.bacCham?.bac ?? 0) - (a.bacCham?.bac ?? 0) ||
+      (b.bacCham?.diem ?? 0) - (a.bacCham?.diem ?? 0) ||
+      THU_TU_NHOM.indexOf(khoaNhom(a)) - THU_TU_NHOM.indexOf(khoaNhom(b)) ||
+      (a.luc ?? '').localeCompare(b.luc ?? '') ||
+      ten(a, b),
+  )
 }
 
 export interface CotNhip {

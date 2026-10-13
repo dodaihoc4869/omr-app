@@ -215,6 +215,17 @@ export default defineConfig({
           // Điểm danh 12/10C (bản vẽ GV-DiemDanh): bước Điểm danh dùng chung (`DiemDanhBuoi` — chỉ năm màn thầy nhập, đều ngoài precache) + hai bản chiếu
           // React (`BanChieuDiemDanh`, nạp lười khi thầy bấm chiếu) ⇒ kho chạy-lúc; máy em / phụ huynh không bao giờ tải.
           '**/{DiemDanhBuoi,BanChieuDiemDanh}-*.{js,css}',
+          // App phụ huynh đợt 19 (làn R): phần dưới trang "Hôm nay của con" + khối bậc + màn con Tiến bộ / Ca kiểm tra đều NẠP KHI CẦN và chỉ có nghĩa khi
+          // có mạng (số của máy chủ) ⇒ kho chạy-lúc, không làm precache vỏ nặng thêm.
+          '**/{TrangVeConDuoi,BacCon,ManTienBo,ManDiemSo}-*.{js,css}',
+          // Đợt 19 (13/10, giữ trần precache 170 tệp / 3000 KB sau 4 làn giao diện): (1) danh sách em theo bậc CHỈ của Nhịp học thầy (máy thầy, có mạng);
+          // (2) 9 phông KaTeX mà đề Hoá không dùng — Caligraphic (\mathcal), Fraktur (\mathfrak), Script (\mathscr), SansSerif (\mathsf), Typewriter
+          // (\mathtt) — ~94 KB. Công thức hoá (\ce) và toán thường dùng Main / Math / AMS / Size1–4 (vẫn cất sẵn). Lỡ gặp khi mất mạng ⇒ phông hệ thống.
+          '**/DsTheoBac-*.{js,css}',
+          // PR258 (kiểm tra cá nhân) gộp cùng đợt 19: bảng kiểm tra cá nhân của màn Chiến dịch (HanhTrinhV2 ← ChienDichScreen) và bộ chọn câu ưu tiên
+          // trên màn chiếu chữa (ThayTuChua, Gọi lên bảng, Cần thầy chữa…) — CHỈ máy thầy, các màn nhập đều đã ngoài precache ⇒ kho chạy-lúc.
+          '**/{BangKiemTraCaNhan,ung-vien-chieu}-*.{js,css}',
+          '**/KaTeX_{Caligraphic,Fraktur,Script,SansSerif,Typewriter}-*',
           // Thầy tự chữa (12/10): tờ chiếu cả đề tách thành mảnh dùng chung CHỈ của màn thầy (Cần thầy chữa, Lên bảng chiến dịch, Gọi lên bảng) ⇒ kho chạy-lúc,
           // không cất sẵn trên máy học sinh / phụ huynh (giữ precache như trước đợt 9).
           '**/{to-chieu,tra-cau-chieu,thong-ke-lop-cau,thay-tu-chua-to}-*.{js,css}',
