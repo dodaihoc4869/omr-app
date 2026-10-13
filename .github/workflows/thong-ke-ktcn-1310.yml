@@ -1,0 +1,25 @@
+# CHỈ ĐỌC — đếm lịch kiểm tra riêng (phiên bản/trạng thái/thời điểm) để lên đường bật lại cờ sau khi gộp đề Hóa 2026 (Claude 13/10).
+name: Thống kê lịch kiểm tra riêng (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['scripts/thong-ke-ktcn-1310.mjs', '.github/workflows/thong-ke-ktcn-1310.yml']
+permissions:
+  contents: read
+jobs:
+  dem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ đọc)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/thong-ke-ktcn-1310.mjs
