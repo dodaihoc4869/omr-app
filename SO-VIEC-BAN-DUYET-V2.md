@@ -330,3 +330,15 @@ Thầy nhắn thêm (ảnh tab Hành trình: "Thang 4 tầng của mỗi bài" 1
 - [ ] Hành trình: thiết kế lại cực đẹp, khoa học, trực quan, nút gọn đẹp (dọc · ngang · máy tính, sáng · tối) | bằng chứng: (chưa có)
 - [ ] Hành trình: sửa lỗi "Chưa có danh sách bài" khi em đang có bài (Hôm nay hiện Bài 8. Amine) — tìm nguyên nhân gốc | bằng chứng: (chưa có)
 - [ ] Ôn & sửa: thiết kế lại rõ từng phần, đẹp, trực quan, khoa học, thân thiện | bằng chứng: (chưa có)
+Thầy nhắn thêm (ảnh thẻ "12 bậc từ Lười đến Chăm · Số em mỗi bậc · 260 em đã xếp bậc" ở Nhịp học của thầy):
+"phần này cho tôi bấm vào từng bậc sẽ hiện ra danh sách siêu đẹp của từng học sinh đó"
+"Tất cả cái sửa giao diện thì đều phải tối ưu cho dọc, ngang và máy tính nhé. Tăng tốc máy chủ tốc độ load app tức thì nhé."
+"Làm cho giao diện điểm danh của học sinh chiếu lên bảng phải làm đẹp hơn nữa, chi tiết hơn nữa hiển thị được cấp bậc rõ ràng của từng học sinh, phải khiến cho học sinh wow, vẽ cho tôi xem trước khi buid chỗ này."
+"App phụ huynh trùng tu lại cho chi tiết hơn, phụ huynh để xem đủ hết mọi thông tin của con từ thái độ, tính cách mọi thứ đo được về con, hiển thị không được phép dấu diếm, toàn bộ chi tiết thực chất cho phụ huynh, giao diện phải ấm áp để phụ huynh thấy bình an, thân thiện, vẽ tôi xem trước khi build nhé."
+- [ ] Nhịp học thầy: bấm từng bậc ở dải 12 bậc ⇒ danh sách học sinh bậc ấy (đẹp, dọc · ngang · máy tính) | bằng chứng: (chưa có)
+- [ ] Mọi giao diện sửa trong đợt: đúng 3 khổ dọc · ngang · máy tính; kiem:toc-do xanh, không thêm vòng chờ máy chủ | bằng chứng: (chưa có)
+- [ ] Màn chiếu điểm danh: BẢN VẼ xem trước (thầy duyệt) — đẹp hơn, chi tiết hơn, bậc rõ từng em | bằng chứng: (chưa có)
+- [ ] Màn chiếu điểm danh: dựng theo bản vẽ đã duyệt | bằng chứng: (chờ thầy duyệt bản vẽ)
+- [ ] App phụ huynh: BẢN VẼ xem trước (thầy duyệt) — đủ mọi số đo được về con, không giấu, ấm áp | bằng chứng: (chưa có)
+- [ ] App phụ huynh: dựng theo bản vẽ đã duyệt | bằng chứng: (chờ thầy duyệt bản vẽ)
+Giả định: "tính cách" — app KHÔNG đo tính cách; chỉ hiện đúng những gì đo được (thái độ làm bài: nhịp học, bậc, quá nhanh, chọn lặp, đúng/sai theo thời gian, tự sửa, số giây…), không gán nhãn tính cách không có số liệu.
