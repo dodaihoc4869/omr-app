@@ -315,3 +315,18 @@ Thầy nhắn thêm: "Xong thì đẩy lên luôn nhé, đảm bảo máy chủ 
 - [x] Hiện bậc trên màn chiếu điểm danh | bằng chứng: làn L c8041ab5, ảnh lan-l-man-chieu.jpg
 - [x] Không chậm hơn | bằng chứng: kiem:toc-do xanh (HS +0,3 KB trong dung sai; máy chủ không thêm đợt/lệnh)
 - [x] Đẩy lên + phát hành (kiểm ca mở) | bằng chứng: PR257 → e4fc3f9a, Actions 38335605600 SUCCESS (bước "Kiểm ca thi" đạt, bước 16 Worker + Pages cùng commit). Lùi: git revert e4fc3f9a
+
+## Đợt 19 — bảng 12 bậc khi bấm chip, biểu tượng bậc thiết kế lại, biểu tượng Tự sửa lỗi (13/10 sáng)
+Thầy nhắn (2 ảnh: chip "💤 Bậc 3/12 · Vua Ngủ Nướng"; thẻ "Tự sửa lỗi · 100 câu đang chờ em sửa · Sửa lỗi ngay"):
+"chỗ bấm vào bậc này cho hiện đủ 12 bậc để học sinh biết rõ bao nhiêu bậc, nhớ hiển thị đẹp, bạn thiết kế lại biểu tượng từng bậc cho phù hợp nổi bật siêu đẹp ,mịn để học sinh phải wow"
+"mục tự sửa lỗi thiết kế lại biểu tưởng làm cho hiển thị đẹp mắt hơn nữa nhé."
+- [ ] Bấm chip bậc ⇒ hiện bảng đủ 12 bậc (bậc em đang ở nổi bật, còn bao nhiêu điểm lên bậc kế), đẹp ở dọc · ngang · máy tính, sáng · tối | bằng chứng: (chưa có)
+- [ ] Thiết kế lại biểu tượng 12 bậc: vẽ riêng (SVG, mịn mọi cỡ, không phụ thuộc emoji của máy), phù hợp tên bậc, nổi bật, bậc cao có trang trí hơn | bằng chứng: (chưa có)
+- [ ] Thiết kế lại biểu tượng thẻ Tự sửa lỗi cho đẹp mắt hơn | bằng chứng: (chưa có)
+- [ ] Không chậm hơn (kiem:toc-do xanh; bảng 12 bậc nạp khi bấm) + phát hành | bằng chứng: (chưa có)
+Thầy nhắn thêm (ảnh tab Hành trình: "Thang 4 tầng của mỗi bài" 1 Nền · 2 Hiểu · 3 Vận dụng · 4 Tổng hợp, "Bài học được giao — Chưa có danh sách bài.", chú giải màu, nút đen "Học tiếp · 9 câu"; ảnh tab Ôn & sửa: Tự sửa lỗi 100 câu · Câu đã làm · Tu luyện · Luyện lại từ bài kiểm tra):
+"hành trình cũng thiết kế lại giao diện cực đẹp, khoa học, thân thiện trực quan các nút bấm gọn gàng đẹp mắt"
+"phần này cũng thiết kế lại rõ từng phần vô cùng đẹp mắt trực quan khoa học thân thiện"
+- [ ] Hành trình: thiết kế lại cực đẹp, khoa học, trực quan, nút gọn đẹp (dọc · ngang · máy tính, sáng · tối) | bằng chứng: (chưa có)
+- [ ] Hành trình: sửa lỗi "Chưa có danh sách bài" khi em đang có bài (Hôm nay hiện Bài 8. Amine) — tìm nguyên nhân gốc | bằng chứng: (chưa có)
+- [ ] Ôn & sửa: thiết kế lại rõ từng phần, đẹp, trực quan, khoa học, thân thiện | bằng chứng: (chưa có)
