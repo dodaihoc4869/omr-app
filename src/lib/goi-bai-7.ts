@@ -1,10 +1,16 @@
 export interface TomTatGoi7 {
   bat:true; ngay:string; toiThieu:number; daLamHomNay:number; tuLamCon:number; tiepCanCon:number; thieuPhu:number; thieuNgay:number; canHoTro:boolean
+  /** Đợt 19 (CHỈ-THÊM): tầng chung của em 1–4 (máy chủ mới). Vắng ⇒ Hành trình không đánh dấu tầng. */
+  tang?:Tang7
   kienThucCu:{tong:number;dat:number;tyLe:number|null}
-  goi:{id:string;ten:string;batDau:string;han:string;tong:number;daGap:number;con:number;quota:number;gapHomNay:number;quaHan:boolean;canBoSung:number;nguonDayDu?:boolean;to:string[]}[]
+  /** `tang` (đợt 19, CHỈ-THÊM) = tầng đang luyện của bài; vắng ⇒ thẻ bài không ghi tầng. */
+  goi:{id:string;ten:string;batDau:string;han:string;tong:number;daGap:number;con:number;quota:number;gapHomNay:number;quaHan:boolean;canBoSung:number;nguonDayDu?:boolean;to:string[];tang?:Tang7}[]
   diemDaDo:{goiId:string;maDe:string;diem:number;luc:string;cauMoi:number;tong:number}[]
 }
 type Tho = Record<string, unknown>
+export type Tang7 = 1|2|3|4
+/** Tầng hợp lệ 1–4; khác ⇒ undefined (không đoán). */
+const docTang = (v:unknown):Tang7|undefined => v===1||v===2||v===3||v===4 ? v : undefined
 const laSo = (v:unknown):v is number => typeof v==='number'&&Number.isFinite(v)&&v>=0
 const so0 = (v:unknown):number => laSo(v)?v:0
 const laNgay = (v:unknown):v is string => typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)
@@ -21,7 +27,8 @@ function docGoi(x:unknown):TomTatGoi7['goi'][number]|null {
   const daGap = Math.min(daGapTho, tong)
   const nguonDayDu = lech ? false : typeof x.nguonDayDu==='boolean' ? x.nguonDayDu : undefined
   return { id:x.id, ten:x.ten, batDau:laNgay(x.batDau)?x.batDau:'', han:laNgay(x.han)?x.han:'', tong, daGap, con:tong-daGap, quota:so0(x.quota), gapHomNay:so0(x.gapHomNay),
-    quaHan:x.quaHan===true, canBoSung:so0(x.canBoSung), ...(nguonDayDu===undefined?{}:{nguonDayDu}), to:Array.isArray(x.to)?[...new Set(x.to.filter(laChu))]:[] }
+    quaHan:x.quaHan===true, canBoSung:so0(x.canBoSung), ...(nguonDayDu===undefined?{}:{nguonDayDu}), to:Array.isArray(x.to)?[...new Set(x.to.filter(laChu))]:[],
+    ...(docTang(x.tang)?{tang:docTang(x.tang)}:{}) }
 }
 function docKienThuc(x:unknown):TomTatGoi7['kienThucCu'] {
   if(!doiTuong(x)||!laSo(x.tong)||!laSo(x.dat)||x.dat>x.tong||x.tyLe!==null&&!laSo(x.tyLe))return KIEN_THUC_TRONG
@@ -41,6 +48,7 @@ export function docTomTatGoi7(x:unknown):TomTatGoi7|undefined {
   if(x.bat!==true||!laNgay(x.ngay)||!laSo(x.toiThieu)||x.toiThieu<=0||!laSo(x.daLamHomNay)||!Array.isArray(x.goi))return
   const goi = x.goi.map(docGoi).filter((g):g is NonNullable<typeof g> => g!==null)
   if(!goi.length)return
+  const tang = docTang(x.tang)
   return { bat:true, ngay:x.ngay, toiThieu:x.toiThieu, daLamHomNay:x.daLamHomNay, tuLamCon:so0(x.tuLamCon), tiepCanCon:so0(x.tiepCanCon), thieuPhu:so0(x.thieuPhu),
-    thieuNgay:so0(x.thieuNgay), canHoTro:x.canHoTro===true, kienThucCu:docKienThuc(x.kienThucCu), goi, diemDaDo:Array.isArray(x.diemDaDo)?x.diemDaDo.filter(laDiem):[] }
+    thieuNgay:so0(x.thieuNgay), canHoTro:x.canHoTro===true, ...(tang?{tang}:{}), kienThucCu:docKienThuc(x.kienThucCu), goi, diemDaDo:Array.isArray(x.diemDaDo)?x.diemDaDo.filter(laDiem):[] }
 }
