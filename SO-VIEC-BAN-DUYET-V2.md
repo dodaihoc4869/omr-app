@@ -373,3 +373,9 @@ Thầy gửi ảnh (13/10 ~12:45): "D1_ERROR: D1 DB is overloaded. Requests queu
 - [x] Chặn ngay: tạm tắt cờ kiem_tra_ca_nhan_v1 | bằng chứng: run 38353377657 — đọc lại {"bat":false} 12:49; 261 lịch (172 chờ nguồn, 89 hẹn), sớm nhất 17/10, hôm nay 0
 - [ ] Bản vá số liệu tính sẵn + phát hành + bật lại cờ | bằng chứng: SQLite đề 148 KB: cũ 8,57 → mới 0,09 ms/dòng, cùng số; test KTCN 22/22
 - [x] Thẻ Kiểm tra ôn tập (5 trạng thái) + màn làm bài: BẢN VẼ | bằng chứng: f0d7c041 docs/ban-ve-dot20/ (15 ảnh Chromium ≤ 150 KB, soát 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ), đã gửi thầy 12 ảnh — chờ duyệt
+Thầy (13/10): "Chốt bản vẽ làm đi nhé" ⇒ duyệt docs/ban-ve-dot20 (Kiểm tra ôn tập)
+- [ ] Dựng thẻ Kiểm tra ôn tập 5 trạng thái theo bản vẽ (dọc · ngang · máy tính, sáng · tối) | bằng chứng: (chưa có)
+- [ ] Dựng màn làm bài: trang bài theo chặng + làm chặng + hộp nộp + kết quả theo bản vẽ | bằng chứng: (chưa có)
+- [ ] Không chậm hơn (kiem:toc-do 0 đỏ, precache ≤ 170, không thêm lượt D1) + phát hành | bằng chứng: (chưa có)
+Thầy nhắn thêm (13/10, giữa lúc dựng đợt 20): "khi mọi thứ xong hết bạn phải tối ưu máy chủ chuyên sâu hơn nữa, đảm bảo 100% app load tức thì và máy chủ phàn hồi tức thì nhé."
+- [ ] SAU khi xong đợt 20: tối ưu máy chủ chuyên sâu theo số đo D1 thật (wrangler d1 insights: truy vấn tốn nhất 24 giờ) + tải mở app — mỗi bước có số trước/sau | bằng chứng: (chưa có)

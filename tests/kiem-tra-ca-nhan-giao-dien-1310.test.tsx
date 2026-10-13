@@ -50,7 +50,8 @@ it('mở lại chặng cho khôi phục nháp chưa đồng bộ, chỉ gửi kh
  localStorage.setItem('ktcn:nhap:S1:kt-S1:0',JSON.stringify({han:deadline,tra:{q1:'B',ngoai:'A'}}))
  api.mockImplementation(async(action:string)=>action==='hoc-tap-ktcn-trang-thai'?{ok:true,kiemTra:kt,chang:[{stt:0,soCau:1,giay:60,han:deadline,daChot:false}]}:action==='hoc-tap-ktcn-start'?{ok:true,kiemTra:kt,revision:0,hanChang:deadline,daChot:false,questions:[{qid:'q1',maDe:'d',version:'v1',group:'g1',phan:'I',text:'Câu kiểm chứng',choices:['Một','Hai','Ba','Bốn'],ideas:[],hinhAnh:[],dang:null,tenDang:'',mucDo:'NB',sao:0,kienThuc:[]}],tra:{q1:''}}:{ok:true,kiemTra:kt,revision:1,daLuu:true})
  render(<ManKiemTra token="token" sbd="S1" id="kt-S1" onVe={noop} onCapNhat={noop}/>)
- fireEvent.click(await screen.findByRole('button',{name:/Làm chặng 1/}))
+ // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 20, bản vẽ thầy duyệt): chặng đã mở còn giờ ghi "Làm tiếp chặng 1".
+ fireEvent.click(await screen.findByRole('button',{name:/Làm tiếp chặng 1/}))
  const button=await screen.findByRole('button',{name:'Khôi phục bản nháp trên máy'})
  expect(api.mock.calls.map(c=>c[0])).not.toContain('hoc-tap-ktcn-luu')
  fireEvent.click(button)
