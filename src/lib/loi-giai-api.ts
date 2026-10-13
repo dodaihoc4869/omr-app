@@ -71,8 +71,8 @@ export interface KiemKhung {
   loiGo: { buoc: number; noiDung: string }[]
 }
 export type KetQuaHoiThay =
-  | { ok: true; cau: CauChoKhung; hoSo: HoSoLoiGiai; loiGiaiChu?: undefined; kiem?: KiemKhung }
-  | { ok: true; cau: CauChoKhung; hoSo?: undefined; loiGiaiChu: LoiGiaiChu }
+  | { ok: true; cau: CauChoKhung; hoSo: HoSoLoiGiai; loiGiaiChu?: undefined; kiem?: KiemKhung; hoiThem?: boolean }
+  | { ok: true; cau: CauChoKhung; hoSo?: undefined; loiGiaiChu: LoiGiaiChu; hoiThem?: boolean }
   | { ok: false; loi: string; khoa?: 'dang_kiem_tra' | 'ca_chua_cong_bo' }
 
 /** `nguon`: nơi em bấm (on_lai, luyen_de, khac_phuc, btvn, gia_dinh, game, dao, doan, vo_dai, bi_a…) — chỉ để thầy xem thống kê. */
@@ -82,8 +82,36 @@ export async function hoiThay(qid: string, nguon: string): Promise<KetQuaHoiThay
   const j = await goiHs('/hs/hoi-thay', { token, qid, nguon })
   if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
   if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được lời giải.'), khoa: j.khoa as 'dang_kiem_tra' | 'ca_chua_cong_bo' | undefined }
-  if (j.coLoiGiai === true) return { ok: true, cau: j.cau as CauChoKhung, hoSo: j.hoSo as HoSoLoiGiai, ...(j.kiem ? { kiem: j.kiem as KiemKhung } : {}) }
-  return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu }
+  const hoiThem = j.hoiThem === true
+  if (j.coLoiGiai === true) return { ok: true, cau: j.cau as CauChoKhung, hoSo: j.hoSo as HoSoLoiGiai, ...(j.kiem ? { kiem: j.kiem as KiemKhung } : {}), hoiThem }
+  return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu, hoiThem }
+}
+
+// ---------------------------------------------------------------- hỏi thêm Thầy (AI theo lời giải của Thầy, server/src/hoi-tro-ly.ts)
+
+export type KetQuaHoiThem =
+  | { ok: true; traLoi: string; conLai: number; ngoaiPhamVi: boolean }
+  | { ok: false; loi: string; ma: string; conLai?: number }
+
+/** Em nhắn một câu hỏi về câu đang mở lời giải. Chờ tối đa 45 giây (Thầy suy nghĩ rồi mới trả lời). */
+export async function hoiThemThay(qid: string, nguon: string, cauHoi: string, dapAnEm = ''): Promise<KetQuaHoiThem> {
+  const token = docTokenHs()
+  if (!token) return { ok: false, ma: 'dang_nhap', loi: 'Em đăng nhập lại để hỏi Thầy.' }
+  const dk = new AbortController()
+  const t = setTimeout(() => dk.abort(), 45_000)
+  try {
+    const url = await layDiaChiMayChu()
+    if (!url) return { ok: false, ma: 'mang', loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
+    const r = await fetch(`${url}/hs/hoi-tro-ly`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token, qid, nguon, cauHoi, dapAnEm }), signal: dk.signal })
+    const j = (await r.json()) as Record<string, unknown>
+    const conLai = typeof j.conLai === 'number' ? j.conLai : undefined
+    if (j.ok === true) return { ok: true, traLoi: String(j.traLoi ?? ''), conLai: conLai ?? 0, ngoaiPhamVi: j.ngoaiPhamVi === true }
+    return { ok: false, ma: String(j.ma ?? 'loi'), loi: String(j.error ?? 'Thầy chưa trả lời được. Em thử lại sau.'), ...(conLai !== undefined ? { conLai } : {}) }
+  } catch {
+    return { ok: false, ma: dk.signal.aborted ? 'cham' : 'mang', loi: dk.signal.aborted ? 'Thầy trả lời chưa kịp. Em gửi lại câu hỏi nhé.' : 'Chưa nối được máy chủ. Em thử lại sau.' }
+  } finally {
+    clearTimeout(t)
+  }
 }
 
 /** Một thao tác em làm trong khung lời giải (GĐ1 v2): chọn Đ/S một ý, xin gợi ý, gắn chìa khoá, câu tương tự, trả lời số, chốt. */

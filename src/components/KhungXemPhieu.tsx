@@ -56,7 +56,7 @@ export interface KhungXemPhieuProps {
 }
 
 export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: KhungXemPhieuProps) {
-  const [hoi, setHoi] = useState<{ cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung } | null>(null)
+  const [hoi, setHoi] = useState<{ cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; hoiThem?: boolean } | null>(null)
   const [loiHoi, setLoiHoi] = useState('')
   const hoiMoRef = useRef(false)
   hoiMoRef.current = hoi !== null
@@ -137,7 +137,7 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
         // NÚT HỎI THẦY trên phiếu học sinh (29/09): chỉ nhận từ chính iframe của khung này; máy chủ tự chặn câu đang thi.
         if (e.source !== iframeRef.current?.contentWindow) return
         void hoiThay(String(e.data.qid), 'phieu').then((r) => {
-          if (r.ok) setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined })
+          if (r.ok) setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined, hoiThem: r.hoiThem === true })
           else setLoiHoi(r.loi)
         })
         return
@@ -245,7 +245,7 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
           ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo.
           (Dưới M3 nút Đóng nằm trong thanh trên ở trên.) */}
       {phu}
-      {hoi && <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" onDong={() => setHoi(null)} />}
+      {hoi && <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" hoiThem={hoi.hoiThem} onDong={() => setHoi(null)} />}
       {loiHoi && (
         <div className="lg-bao-loi m3" role="alert">
           <span>{loiHoi}</span>

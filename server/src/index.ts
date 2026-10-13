@@ -3706,7 +3706,13 @@ const boXuLy = {
       // LỜI GIẢI TỪNG BƯỚC (phương án A, 29/09): cổng công bố + hồ sơ đã duyệt + băm khớp đề hiện tại — xem server/src/loi-giai.ts
       if (p === '/hs/loi-giai') return ra(await hsLoiGiai(env, b))
       if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
-      if (p === '/hs/hoi-thay') return ra(await hsHoiThay(env, b))
+      if (p === '/hs/hoi-thay') {
+        // HỎI THÊM THẦY (13/10, hoi-tro-ly.ts): phản hồi mở được lời giải ⇒ kèm `hoiThem` = máy em hiện ô nhắn hỏi Thầy (AI) dưới lời giải.
+        const r = await hsHoiThay(env, b) as Record<string, unknown>
+        if (r.ok === true) r.hoiThem = await import('./hoi-tro-ly').then(async (m) => m.hoiThemBatCho(env, await gameIdentity(env, b))).catch(() => false)
+        return ra(r)
+      }
+      if (p === '/hs/hoi-tro-ly') return ra(await import('./hoi-tro-ly').then((m) => m.hsHoiTroLy(env, b)))
       if (p === '/hs/doc-loi-giai') return ra(await hsDocLoiGiai(env, b))
       // THANG TỰ GỠ (Vòng học v2 GĐ2, server/src/thang-tu-go.ts): câu kiểm từng bước chấm ở máy chủ, cổng nỗ lực, luyện nền, gửi thầy.
       if (p === '/hs/cau-kiem') return ra(await hsCauKiem(env, b))

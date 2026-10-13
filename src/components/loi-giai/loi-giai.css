@@ -102,3 +102,43 @@ button.lg-nut.lg-nut--hoi:disabled { opacity: 0.6; cursor: progress; }
 .lg-kq--dung { background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
 .lg-kq--sai { background: var(--m3-error-container); color: var(--m3-on-error-container); }
 .lg-nen-xong { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+
+/* HỎI THÊM THẦY (13/10, HoiThemThay.tsx) — dưới lời giải trong khung Hỏi thầy. Chỉ biến M3 có sẵn (Bát Linh tự ánh xạ trên màn học sinh). */
+.lg-ht { display: flex; flex-direction: column; gap: 8px; padding: 10px 16px 12px; border-top: 1px solid var(--m3-outline-variant, transparent); background: var(--m3-surface-container); max-height: 48vh; }
+.lg-ht--dong { max-height: none; padding: 8px 16px; }
+.lg-ht--gon { max-height: none; border: 1px solid var(--m3-outline-variant, transparent); border-radius: 16px; margin-top: 8px; }
+.lg-ht-mo {
+  min-height: 44px; width: 100%; border-radius: 999px; border: 1.5px solid var(--m3-primary); background: var(--m3-surface);
+  color: var(--m3-primary); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.lg-ht-mo:focus-visible, .lg-ht-gui:focus-visible, .lg-ht-o:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+.lg-ht-dau { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.lg-ht-tieu-de { margin: 0; font-size: 16px; font-weight: 700; color: var(--m3-on-surface); }
+.lg-ht-log { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
+.lg-ht--gon .lg-ht-log { max-height: 420px; }
+.lg-ht-goi-y { margin: 0; font-size: 14px; line-height: 1.5; color: var(--m3-on-surface-variant); }
+.lg-ht-em {
+  align-self: flex-end; max-width: 82%; margin: 0; padding: 10px 14px; border-radius: 18px 18px 4px 18px; white-space: pre-wrap;
+  background: var(--m3-primary-container); color: var(--m3-on-primary-container); font-size: 15px; line-height: 1.5;
+}
+.lg-ht-thay {
+  align-self: flex-start; max-width: 92%; display: flex; flex-direction: column; gap: 6px; padding: 10px 14px; border-radius: 18px 18px 18px 4px;
+  background: var(--m3-surface); color: var(--m3-on-surface); border: 1px solid var(--m3-outline-variant, transparent); font-size: 15px; line-height: 1.55;
+}
+.lg-ht-thay p { margin: 0; }
+.lg-ht-nhan { font-size: 12px; font-weight: 700; color: var(--m3-primary); }
+.lg-ht-cho { margin: 0; font-size: 14px; color: var(--m3-on-surface-variant); }
+.lg-ht-loi { margin: 0; padding: 8px 12px; border-radius: 12px; background: var(--m3-error-container); color: var(--m3-on-error-container); font-size: 14px; }
+.lg-ht-nhap { display: flex; flex-direction: column; gap: 6px; }
+.lg-ht-dem { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--m3-on-surface-variant); font-variant-numeric: tabular-nums; }
+.lg-ht-hang { display: flex; gap: 8px; align-items: flex-end; }
+.lg-ht-o {
+  flex: 1; min-width: 0; min-height: 44px; max-height: 120px; resize: vertical; box-sizing: border-box; padding: 10px 14px; border-radius: 18px;
+  border: 1px solid var(--m3-outline); background: var(--m3-surface); color: var(--m3-on-surface); font: inherit; font-size: 15px; line-height: 1.4;
+}
+.lg-ht-gui {
+  flex: none; min-width: 64px; min-height: 44px; border-radius: 999px; border: 0; padding: 0 16px;
+  background: var(--m3-primary); color: var(--m3-on-primary); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.lg-ht-gui:disabled { opacity: .5; cursor: default; }
+.lg-ht-phu { margin: 0; font-size: 12px; line-height: 1.4; color: var(--m3-on-surface-variant); }

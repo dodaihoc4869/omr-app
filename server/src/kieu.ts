@@ -76,6 +76,8 @@ export interface Env {
   BAN_BIA?: DurableObjectNamespace
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */
   MA_BI_MAT: string
+  /** Khoá Gemini (Google AI Studio) cho phần hỏi thêm Thầy (server/src/hoi-tro-ly.ts) — Worker secret, KHÔNG vào git. Vắng ⇒ phần này tắt. */
+  GEMINI_API_KEY?: string
 }
 
 /**
