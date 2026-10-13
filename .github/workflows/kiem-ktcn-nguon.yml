@@ -1,0 +1,19 @@
+name: Kiểm nguồn kiểm tra cá nhân (chỉ đọc)
+on:
+  push:
+    branches: [codex/kiem-tra-ca-nhan-1310]
+    paths: [scripts/kiem-ktcn-nguon.mjs, .github/workflows/kiem-ktcn-nguon.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - run: node scripts/kiem-ktcn-nguon.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
