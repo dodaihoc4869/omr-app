@@ -9,12 +9,13 @@ const TOI_DA_DONG = 12
 
 /** Đọc metadata nhỏ, sau đó chỉ gộp 12 dòng thực sự được hiển thị; không quét sổ của các bài cũ đang ẩn. */
 export async function tongHopGoi7(env: Env, lop: string, caCu = false): Promise<Row> {
+  const serverNow = Date.now()
   const goi = (await env.DB.prepare(`SELECT g.*,b.ma_to_json FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE (?='' OR g.lop=?) ORDER BY g.bat_dau DESC,g.ten`).bind(lop, lop).all<Row>()).results
-  const ngay = ngayVn7(Date.now()), chu = (v: unknown) => String(v ?? '')
+  const ngay = ngayVn7(serverNow), chu = (v: unknown) => String(v ?? '')
   const hien = [...goi.filter(g => /^\d{4}-\d{2}-\d{2}$/.test(chu(g.han)) && chu(g.han) >= ngay)
     .sort((a, b) => chu(a.han).localeCompare(chu(b.han)) || chu(a.lop).localeCompare(chu(b.lop), 'vi') || chu(a.ten).localeCompare(chu(b.ten), 'vi')),
     ...(caCu ? goi.filter(g => chu(g.han) < ngay).sort((a, b) => chu(b.han).localeCompare(chu(a.han))) : [])].slice(0, TOI_DA_DONG)
-  if (!hien.length) return { ok: true, bat: true, goi, thongKe: {} }
+  if (!hien.length) return { ok: true, bat: true, goi, thongKe: {}, serverNow }
   const r = await env.DB.prepare(`WITH
     goi AS (SELECT g.id,g.lop FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE g.id IN(SELECT value FROM json_each(?))),
     cau AS (SELECT c.goi_id,c.qid,c.version FROM goi_bai_7_cau c JOIN goi g ON g.id=c.goi_id),
@@ -42,5 +43,5 @@ export async function tongHopGoi7(env: Env, lop: string, caCu = false): Promise<
     const soEm = Number(so_em), tong = Number(so_cau) * soEm
     thongKe[String(id)] = { soEm, pGap: tong ? Math.round(100 * Number(da_gap) / tong) : null, pTuLam: tong ? Math.round(100 * Number(tu_lam) / tong) : null }
   }
-  return { ok: true, bat: true, goi, thongKe }
+  return { ok: true, bat: true, goi, thongKe, serverNow }
 }

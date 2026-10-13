@@ -10,7 +10,7 @@ const s = (x: unknown) => String(x ?? '')
 export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
   const co = await coGoi7(env)
   if(!co.bat&&['sua_han','sua_han_hang_loat'].includes(s(b.action)))throw new Error('Giao bài đang tạm dừng. Thầy cập nhật rồi sửa hạn sau.')
-  if (!co.bat) return {ok:true,bat:false,goi:[],thongKe:{}}
+  if (!co.bat) return {ok:true,bat:false,goi:[],thongKe:{},...(b.action==='tong_hop'?{serverNow:Date.now()}:{})}
   await damBaoGoi7(env)
   if(b.action==='sua_han')return suaHan(env,b,Date.now())
   if(b.action==='sua_han_hang_loat')return suaHanHangLoat(env,b,Date.now())

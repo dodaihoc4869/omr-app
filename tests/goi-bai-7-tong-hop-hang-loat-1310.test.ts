@@ -47,6 +47,7 @@ it('tổng hợp khớp chi tiết: đếm câu gốc/bản hiện tại, gặp 
   gap.run('3', 'g1', 'S2', b!, 'v0', 'co_ho_tro', 'x')
   gap.run('4', 'g2', 'S2', c!, 'v1', 'co_ho_tro', 'x')
   const r = await gvGoi7(k.env, { action: 'tong_hop' })
+  expect(r.serverNow).toBe(NOW)
   expect(r).not.toHaveProperty('cau'); expect(r).not.toHaveProperty('em')
   expect(r.thongKe).toMatchObject({ g1: { soEm: 2, pGap: 67, pTuLam: 17 }, g2: { soEm: 1, pGap: 33, pTuLam: 33 } })
   for (const g of r.goi as GoiDu[]) {
@@ -172,5 +173,18 @@ it('lưu hạn không đổi không ghi lại hoặc xoá cache; cờ tắt ch�
   xoaDemCauHinh(k.env)
   await expect(gvGoi7(k.env, doi(goi))).rejects.toThrow('tạm dừng')
   await expect(gvGoi7(k.env, { action: 'sua_han', goiId: 'g1', hanCu: '2026-10-16', han: '2026-10-19' })).rejects.toThrow('tạm dừng')
-  expect(await gvGoi7(k.env, { action: 'tong_hop' })).toEqual({ ok: true, bat: false, goi: [], thongKe: {} })
+  expect(await gvGoi7(k.env, { action: 'tong_hop' })).toEqual({ ok: true, bat: false, goi: [], thongKe: {}, serverNow: NOW })
+})
+
+it('trả mốc máy chủ đúng ngày Việt Nam qua nửa đêm, kể cả bảng rỗng; không lệch phạm vi 12 dòng', async () => {
+  const k = await kho()
+  k.d.sql.exec("UPDATE goi_bai_7 SET han='2026-10-13'")
+  const truoc = Date.parse('2026-10-13T16:59:59Z')
+  vi.setSystemTime(truoc)
+  expect(await gvGoi7(k.env, { action: 'tong_hop' })).toMatchObject({ serverNow: truoc, thongKe: { g1: { soEm: 2 }, g2: { soEm: 1 } } })
+  const sau = Date.parse('2026-10-13T17:00:00Z')
+  vi.setSystemTime(sau)
+  const r = await gvGoi7(k.env, { action: 'tong_hop' })
+  expect(r.serverNow).toBe(sau); expect(r.thongKe).toEqual({})
+  expect(Object.keys((await gvGoi7(k.env, { action: 'tong_hop', caCu: true })).thongKe as object).sort()).toEqual(['g1', 'g2'])
 })
