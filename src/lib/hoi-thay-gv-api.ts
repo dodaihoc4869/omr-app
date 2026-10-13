@@ -7,7 +7,11 @@ async function goiThay(duong: string, body: Record<string, unknown>): Promise<Re
   try {
     const [ch, secret] = await Promise.all([layCauHinhMayChu(), loadTeacherSecret()])
     if (!ch.URL) return { ok: false, error: 'Chưa cài địa chỉ máy chủ.' }
-    const r = await fetch(`${ch.URL}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret || '' }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) })
+    // AbortController + setTimeout (KHÔNG AbortSignal.timeout: iPhone cũ iOS 14–15 không có — tests/khong-cu-phap-may-cu-2109).
+    const dk = new AbortController()
+    const t = setTimeout(() => dk.abort(), 20000)
+    const r = await fetch(`${ch.URL}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret || '' }, body: JSON.stringify(body), signal: dk.signal })
+    clearTimeout(t)
     return (await r.json()) as Record<string, unknown>
   } catch {
     return { ok: false, error: 'Chưa nối được máy chủ.' }
