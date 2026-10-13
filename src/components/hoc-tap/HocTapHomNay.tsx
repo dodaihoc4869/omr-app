@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowRight, Atom, BookOpen, Check, ChevronRight, ClipboardCheck, FileClock, History, Home, LineChart, LogOut, Mail, PenLine, RefreshCw, Route, Target, Users, X } from 'lucide-react'
 import type { KetQuaSanh } from '../hoa2/api'
 import type { TomTatGoi7 } from '../../lib/goi-bai-7'
 import './hoc-tap.css'
 import TheGoi7 from './TheGoi7'
+const TheKiemTraCaNhan=lazy(()=>import('./TheKiemTraCaNhan'))
 import TheHomNayEm, { chuNutHoc } from './TheHomNayEm'
 import { soHomNay } from './lam-bai'
 import { useSoCauCanSua } from '../../lib/tu-sua-loi'
@@ -32,6 +33,7 @@ interface Props {
   token?: string
   /** Có ⇒ khối Nhịp học trong thẻ "Hôm nay của em" bấm được, mở hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm"). */
   onMoHoSo?: () => void
+  onKiemTra?: () => void
 }
 /** Tên ngắn 4 tầng của Hành trình (thầy chốt bản vẽ 11/10). */
 export const TANG = ['Nền', 'Hiểu', 'Vận dụng', 'Tổng hợp']
@@ -79,6 +81,7 @@ export default function HocTapHomNay(p: Props) {
   const sanh = p.ketQua?.cheDo2 && 'sanh' in p.ketQua ? p.ketQua.sanh : null
   const ht = sanh?.hanhTrinh
   const goi7 = sanh?.goi7
+  const kiem=sanh?.kiemTraCaNhan, ngayKiem=kiem?.homNay===true
   // MỘT CON SỐ (thầy 12/10: "học sinh làm 24 câu nhưng lại báo 31 câu"): M và đã làm của hôm nay lấy MỘT chỗ — `soHomNay` (Gói 7 → Hành trình → thể
   // lực → kế hoạch cũ), cùng hàm màn làm bài dùng. "Đủ mức" khi đã làm ≥ M — đúng `datMuc` phía thầy / phụ huynh / Nhịp học; câu mới theo lịch còn lại
   // của gói KHÔNG chặn chữ đạt (máy chủ đã xếp chúng trong mức; phần chưa gặp dồn sang ngày sau).
@@ -129,7 +132,8 @@ export default function HocTapHomNay(p: Props) {
         {muc === 'hom-nay' && <>
           {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
               và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
-          <TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
+          {kiem&&<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
+          {!ngayKiem&&<><TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
             viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
             onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
           <TheMoiTuSua so={soSua} onChua={p.onChua} />
@@ -144,6 +148,7 @@ export default function HocTapHomNay(p: Props) {
                 xem điểm / làm lại lượt còn. */}
             {(!!p.soBaiTap || !!p.coBaiTap) && <Dong ten="Bài tập về nhà" chu={p.soBaiTap ? 'Thầy đang giao' : 'Xem lại bài đã nộp'} icon={BookOpen} sac="muc" so={p.soBaiTap || undefined} donVi="bài" onClick={p.onBaiTap} />}
           </section>
+          </>}
         </>}
 
         {muc === 'hanh-trinh' && <>
@@ -161,7 +166,7 @@ export default function HocTapHomNay(p: Props) {
             </div>) : <p className="ht-trong">Chưa có danh sách bài.</p>}
             <p className="ht-chu-phu">Vàng trầm: đã vững · chàm: đang luyện · xám: còn khoá.</p>
           </section>
-          {nutHoc(p.coCa)}
+          {ngayKiem&&kiem?<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>:nutHoc(p.coCa)}
         </>}
 
         {muc === 'on-lai' && <section className="ht2-nhom" aria-label="Ôn và sửa">

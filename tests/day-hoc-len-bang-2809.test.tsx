@@ -53,6 +53,7 @@ const BUOI = { id: 'BH-1', ten: 'Buổi học 28/09 · 12A1', lop: '12A1', moLuc
 let coMat: { sbd: string; hoTen: string; luc: string; cach: string }[] = []
 function chuanMock() {
   goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
+    if(duong==='/gv/ung-vien-chieu')return {ok:true,du:{ok:true,cau:Object.fromEntries((b.qids as string[]).map(qid=>[qid,[{sbd:'S1',ten:'Nguyễn An',loai:'du_bao',p:0.9,luc:null}]]))}}
     if (duong === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '12A1', khoi: '12', soEm: 3, sbd: ['S1', 'S2', 'S3'] }] } }
     if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return { ok: true, du: { ok: true, buoi: [] } }
     if (duong === '/gv/buoi-hoc')

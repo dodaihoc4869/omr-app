@@ -147,6 +147,9 @@ export default function CauCanChuaTrenLop({ gon = false, chonDau }: { gon?: bool
         throw new Error('Chọn bước cần gỡ ở câu tổng hợp trước khi chiếu.')
       const ma = moPhien(),
         o = phien.current.map((p, i) => oChuaCuoi(p.nhom, i + 1))
+      const {layEmChieu,nhanEmChieu}=await import('../../lib/ung-vien-chieu')
+      const uv=await layEmChieu(phien.current.map(p=>p.nhom.qid),dd.coMat.map(e=>e.sbd),coMat)
+      for(let i=0;i<o.length;i++){const e=uv.get(phien.current[i]!.nhom.qid)?.[0];o[i]!.sbd=e?.sbd??'';o[i]!.hoTen=e?.ten??'Cả lớp';o[i]!.lichSuCau=e?nhanEmChieu(e):undefined}
       const { taoHtmlMayChieu } = await import('../../lib/html-may-chieu')
       const h = taoHtmlMayChieu(o, {
         tenBuoi: 'Câu cần chữa · Cùng gỡ bước cuối',

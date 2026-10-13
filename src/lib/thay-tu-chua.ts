@@ -6,8 +6,8 @@
 // khử trùng, tách theo phần) → `dsBaiCuaKhoi(dungCay(locDeDayHoc(kho)), khối)`. Mỗi bài có các tờ Trắc nghiệm (-TN) · Đúng–sai (-DS) · Trả lời ngắn
 // (-TLN) — chỉ các tờ `tuDong` (không Ví dụ minh hoạ, không Các dạng toán trọng tâm), đúng ba loại thầy nói.
 //
-// LUẬT XẾP (`xepThuTuChua`, sắp ỔN ĐỊNH theo thứ tự đề Phần I → II → III):
-//   hạng 0 · câu Đúng–sai CÓ tính toán · hạng 1 · câu Đúng–sai · hạng 2 · câu có tính toán (Trắc nghiệm / Trả lời ngắn) · hạng 3 · phần còn lại.
+// LUẬT XẾP thầy chốt 13/10: gộp câu tính toán, câu khó và câu lớp sai nhiều vào MỘT nhóm ưu tiên, trộn ngẫu nhiên trong nhóm.
+// Giữ hạt ngẫu nhiên trong cùng buổi; phần còn lại theo đề, không bỏ câu và không lặp câu thuộc nhiều nhóm.
 // NHẬN DIỆN "CÓ TÍNH TOÁN" (`laCauTinhToan`): gói bài 7 ngày ghi lý do "Có tính toán" bằng một biểu thức viết liền trong máy chủ (`server/src/goi-bai-7.ts`,
 // không có hàm xuất) — `Phần III ∨ /tính|khối lượng|số mol|…|số kèm đơn vị/`. Biểu thức ấy bắt cả "tính chất", "tính base" (câu lý thuyết) nên KHÔNG dùng
 // một mình: trước hết dùng luật lý thuyết / bài tập MỘT NGUỒN của app (`dangCua`, src/lib/dang-cau.ts — nhãn `kieu` của kho trước, Phần III luôn là
@@ -71,7 +71,6 @@ export interface CauTuChua {
   thieuNoiDung: boolean
 }
 
-const THU_TU_PHAN: Record<PhanCau, number> = { I: 0, II: 1, III: 2 }
 
 function coNoiDung(q: CauGocTuChua): boolean {
   const o = q as { text?: string; thanCauImg?: string; imageDataUrl?: string; hinhAnh?: unknown[] }
@@ -123,15 +122,22 @@ export function laCauKhacKhoi(qid: string, khoi: number | null): boolean {
   return p.khoi !== khoi
 }
 
-/** Hạng ưu tiên chiếu: 0 Đúng–sai có tính toán · 1 Đúng–sai · 2 có tính toán · 3 còn lại. */
+/** Hạng cũ giữ cho bên gọi cũ; không dùng trong thứ tự chữa hiện tại. */
 export function hangCau(c: Pick<CauTuChua, 'phan' | 'tinhToan'>): 0 | 1 | 2 | 3 {
   if (c.phan === 'II') return c.tinhToan ? 0 : 1
   return c.tinhToan ? 2 : 3
 }
 
-/** Thứ tự chiếu: hạng tăng dần, cùng hạng giữ thứ tự đề (Phần I → II → III, số câu tăng dần). Không đổi mảng vào. */
-export function xepThuTuChua<T extends Pick<CauTuChua, 'phan' | 'tinhToan' | 'thuTuDe'>>(ds: readonly T[]): T[] {
-  return [...ds].sort((a, b) => hangCau(a) - hangCau(b) || THU_TU_PHAN[a.phan] - THU_TU_PHAN[b.phan] || a.thuTuDe - b.thuTuDe)
+/** Trộn chung nhóm ưu tiên, ổn định theo buổi; giữ nguyên mảng vào, câu còn lại theo đề. */
+export function xepThuTuChua<T extends Pick<CauTuChua, 'phan' | 'tinhToan' | 'thuTuDe'>>(ds: readonly T[], soLop?:ReadonlyMap<string,{sai:number;lam:number}>|null,seed=crypto.randomUUID()): T[] {
+  const hash=(s:string)=>{let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
+  const key=(c:T)=>String((c as T&{qid?:string}).qid??c.thuTuDe)
+  const uu=(c:T)=>{const q=(c as T&{q?:{sao?:number;mucDo?:string}}).q,g=soLop?.get(key(c));return c.tinhToan||Number(q?.sao)>=2||['VDC','van_dung_cao'].includes(q?.mucDo??'')||!!g&&g.lam>=5&&g.sai/g.lam>=0.3}
+  const unique=[...new Map(ds.map(c=>[key(c),c])).values()].sort((a,b)=>a.thuTuDe-b.thuTuDe)
+  let state=hash(seed)||1
+  const a=unique.filter(uu)
+  for(let i=a.length-1;i>0;i--){state^=state<<13;state^=state>>>17;state^=state<<5;const j=(state>>>0)%(i+1);[a[i],a[j]]=[a[j]!,a[i]!]}
+  return [...a,...unique.filter(c=>!uu(c))]
 }
 
 /** Đếm cho dòng tóm tắt. */

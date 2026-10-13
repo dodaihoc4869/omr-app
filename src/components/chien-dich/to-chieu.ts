@@ -204,6 +204,8 @@ export async function hoiNoiDungChoToChieu(
 
 /** Tuỳ chọn dựng tờ. `khoiDich` = khối của lớp / chiến dịch: dòng có mã khác khối bị bỏ (phòng thủ thêm); rỗng / vắng ⇒ không chặn. */
 export interface TuyChonToChieu {
+  sbdLop?: readonly string[]
+  lop?: string
   khoiDich?: readonly number[]
   /** THẦY TỰ CHỮA (12/10) — thầy TỰ CHỌN đề trong Dạy học: câu tự luận có trong đề vẫn hiện (luật CLAUDE.md "riêng Gọi lên bảng thầy chọn gì hiện
    *  đúng thế", như bảng Dạy học). Vắng ⇒ bỏ tự luận như cũ (tờ chữa của chiến dịch không bao giờ có tự luận — thầy 06/10). */
@@ -242,6 +244,11 @@ export async function dungToChieu(
   maPhien?: string,
   tuyChon: TuyChonToChieu = {},
 ): Promise<{ html: string; soThieu: number; soBoKhoi: number; o: Map<string, OGhiToChieu> }> {
+  if(tuyChon.sbdLop?.length||tuyChon.lop){
+    const {layEmChieu,nhanEmChieu}=await import('../../lib/ung-vien-chieu')
+    const uv=await layEmChieu(ds.map(o=>o.qid),tuyChon.sbdLop??[],null,tuyChon.lop)
+    ds=ds.map(o=>{const list=uv.get(o.qid)??[],e=list[0];return {...o,sbd:e?.sbd??'',ten:e?.ten??'Cả lớp',lichSu:e?nhanEmChieu(e):undefined,ungVien:list.map(e=>({sbd:e.sbd,ten:e.ten,lichSu:nhanEmChieu(e)}))}})
+  }
   const bang = tra ?? (await napBangTra())
   const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu }, { uocLuongBacCau, uocLuongBacCauGoc }, { CAU_HINH_LEN_BANG_MAC_DINH }] = await Promise.all([
     import('../../lib/bai-tap-pdf'),

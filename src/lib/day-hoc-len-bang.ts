@@ -162,7 +162,13 @@ export async function dungToChieuDayHoc(
   maPhien?: string,
   /** Nút X "Ai sai" (thầy 05/10): Kiểm tra đầu giờ CÓ, Dạy học KHÔNG (truyền false). */
   nutAiSai = true,
-): Promise<{ html: string; o: Map<string, OGhiDayHoc> }> {
+  sbdCuaLop:readonly string[] = [],
+  boQua?:ReadonlyMap<string,ReadonlySet<string>>,
+): Promise<{ html: string; o: Map<string, OGhiDayHoc>; emGoi:Map<string,import('./ung-vien-chieu').EmChieu> }> {
+  const nhanGoi=new Map<string,import('./lich-su-cau-len-bang').NhanLichSuCau>()
+  const emGoi=new Map<string,import('./ung-vien-chieu').EmChieu>()
+  // Kiểm tra đầu giờ dùng nutAiSai=true: giữ nguyên người và thuật toán kiểm tra đầu giờ.
+  if(!nutAiSai&&sbdCuaLop.length){const {layEmChieu,nhanEmChieu}=await import('./ung-vien-chieu');const uv=await layEmChieu(dsCau.map(c=>c.qid),sbdCuaLop,undefined,undefined,boQua);const m=new Map<string,EmLenCau>();for(const c of dsCau){const e=uv.get(c.qid)?.[0];if(e){m.set(c.khoa,{sbd:e.sbd,hoTen:e.ten});nhanGoi.set(c.khoa,nhanEmChieu(e));emGoi.set(c.khoa,e)}}giao=m}
   const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu }, { uocLuongBacCauGoc }, { CAU_HINH_LEN_BANG_MAC_DINH }, { khoaToChieu }] = await Promise.all([
     import('./bai-tap-pdf'),
     import('./html-may-chieu'),
@@ -189,7 +195,7 @@ export async function dungToChieuDayHoc(
       ...(coNut ? { qid: c.qid } : {}),
       ...(em?.lop ? { lop: em.lop } : {}),
       ...(em?.lanLenBang ? { lanLenBang: em.lanLenBang } : {}),
-      ...(em?.lichSu ? { lichSuCau: { kieu: 'dung' as const, chu: em.lichSu } } : {}),
+      ...(nhanGoi.has(c.khoa)?{lichSuCau:nhanGoi.get(c.khoa)}:em?.lichSu ? { lichSuCau: { kieu: 'dung' as const, chu: em.lichSu } } : {}),
       bacUoc: uocLuongBacCauGoc(c.phan, c.q).bac,
       soCau: i + 1,
       sao: cau.sao,
@@ -204,5 +210,5 @@ export async function dungToChieuDayHoc(
     ...(maPhien && o.size > 0 ? { cauNoi: { maPhien } } : {}),
     nutAiSai,
   })
-  return { html, o }
+  return { html, o, emGoi }
 }
