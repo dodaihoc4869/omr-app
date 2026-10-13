@@ -8,7 +8,7 @@ vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (...a: unknown[]) => goi(.
 vi.mock('../src/lib/exam-db', () => ({ loadTeacherSecret: async () => mat.value }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 import SuaEmNhanBai from '../src/components/chien-dich/SuaEmNhanBai'
-import BangBaiDangGiao, { ChanLoiDanhSach } from '../src/components/chien-dich/BangBaiDangGiao'
+import BangBaiDangGiao, { ChanLoiDanhSach, ChoTamEm, napGiaoDienEm } from '../src/components/chien-dich/BangBaiDangGiao'
 import { batLoiThieuManh } from '../src/lib/nap-manh'
 import { docAckEmNhanBai, docEmNhanBai } from '../src/components/chien-dich/api-goi7-em'
 const EM = [
@@ -212,4 +212,52 @@ it('StrictMode đọc lại khi mount đôi, phản hồi lượt cũ không đ�
   await themBao(); expect(screen.getByText('Đã chọn 2/2 em')).toBeTruthy()
   await act(async () => cu.tra({ ok: true, du: { ...DU, nhan: [] } }))
   expect(screen.getByText('Đã chọn 2/2 em')).toBeTruthy()
+})
+
+it('vỏ chờ hiện tấm/xương ngay, khóa cuộn và Tab/Esc, trả focus sau hủy trước khi mã tải xong', () => {
+  const nutMo = document.createElement('button'); document.body.append(nutMo); nutMo.focus()
+  const dong = vi.fn(), cuon = document.body.style.overflow
+  const a = render(<ChoTamEm ten={DU.ten} lop={DU.lop} onDong={dong} />)
+  expect(screen.getByRole('dialog', { name: `Em nhận ${DU.ten}` })).toBeTruthy()
+  expect(document.querySelectorAll('[data-khoi="cho-tam-em"] .tt-xuong')).toHaveLength(3)
+  expect(document.body.style.overflow).toBe('hidden')
+  const huy = screen.getByRole('button', { name: 'Hủy mở danh sách' })
+  expect(document.activeElement).toBe(huy); fireEvent.keyDown(huy, { key: 'Tab' }); expect(document.activeElement).toBe(huy)
+  fireEvent.keyDown(document, { key: 'Escape' }); expect(dong).toHaveBeenCalledTimes(1)
+  a.unmount(); expect(document.body.style.overflow).toBe(cuon); expect(document.activeElement).toBe(nutMo)
+  nutMo.remove()
+})
+
+it('lỗi mảnh muộn vẫn xử lý cục bộ tới khi promise kết thúc, sau đó bỏ listener', async () => {
+  const cho = doi<{ default: typeof SuaEmNhanBai }>()
+  const p = napGiaoDienEm(() => cho.cho)
+  const e = new Event('vite:preloadError', { cancelable: true }) as Event & { payload: Error }
+  e.payload = new Error('Failed to fetch dynamically imported module: /assets/SuaEmNhanBai-old.js')
+  window.dispatchEvent(e); expect(e.defaultPrevented).toBe(true)
+  const ket = expect(p).rejects.toThrow(/dynamically imported/)
+  cho.tra({ default: SuaEmNhanBai }); await ket
+  const sau = new Event('vite:preloadError', { cancelable: true }) as Event & { payload: Error }; sau.payload = e.payload
+  window.dispatchEvent(sau); expect(sau.defaultPrevented).toBe(false)
+})
+
+it('CSS hỏng dù import JS trả thành công vẫn báo lỗi, retry không render tấm thiếu CSS', async () => {
+  const cho = doi<{ default: typeof SuaEmNhanBai }>(), p = napGiaoDienEm(() => cho.cho)
+  const e = new Event('vite:preloadError', { cancelable: true }) as Event & { payload: Error }
+  e.payload = new Error('Unable to preload CSS for /assets/SuaEmNhanBai-old.css')
+  window.dispatchEvent(e); expect(e.defaultPrevented).toBe(true)
+  const ket = expect(p).rejects.toThrow(/preload CSS/); cho.tra({ default: SuaEmNhanBai }); await ket
+  await expect(napGiaoDienEm(async () => ({ default: SuaEmNhanBai }))).rejects.toThrow(/preload CSS/)
+  // Một stylesheet đã nạp thật (hoặc sau cập nhật thủ công) mới gỡ trạng thái CSS lỗi.
+  const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = '/assets/SuaEmNhanBai-old.css'
+  Object.defineProperty(link, 'sheet', { value: {} }); document.head.append(link)
+  try { await expect(napGiaoDienEm(async () => ({ default: SuaEmNhanBai }))).resolves.toMatchObject({ default: SuaEmNhanBai }) }
+  finally { link.remove() }
+})
+
+it('capture của tấm chỉ nhận đúng mảnh mình, không chặn cứu lỗi mảnh khác', async () => {
+  const cho = doi<{ default: typeof SuaEmNhanBai }>(), p = napGiaoDienEm(() => cho.cho)
+  const e = new Event('vite:preloadError', { cancelable: true }) as Event & { payload: Error }
+  e.payload = new Error('Failed to fetch dynamically imported module: /assets/KhoDe-old.js')
+  window.dispatchEvent(e); expect(e.defaultPrevented).toBe(false)
+  cho.tra({ default: SuaEmNhanBai }); await expect(p).resolves.toMatchObject({ default: SuaEmNhanBai })
 })

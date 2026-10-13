@@ -1,6 +1,7 @@
 // Bài đang giao: một lệnh tổng hợp, giữ nguyên bảng khi cập nhật hoặc lưu hạn.
 // Chỉ báo Đã lưu sau khi máy chủ xác nhận đúng từng bài/ngày; không tải lại bảng sau lưu.
 import { Component, type ReactNode, lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { RefreshCw } from 'lucide-react'
 import { goiLenh } from '../../lib/goi-lenh-thay'
 import { theoDoiBaiDangGiao, type BaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
@@ -9,11 +10,53 @@ import { chuDemGiao, chuHanDong, goiDangGiao, TOI_DA_DONG_GIAO } from './buoi-da
 import './sua-han-bai.css'
 import type { AckEmNhanBai } from './api-goi7-em'
 
-const giuLoiNapEm = (e: Event) => {
-  const loi = (e as Event & { payload?: unknown }).payload
-  if (/SuaEmNhanBai|sua-em-nhan-bai/.test(loi instanceof Error ? loi.message : String(loi))) e.preventDefault()
+let cssChuaNap: { duong: string; loi: Error } | null = null
+/** Giữ lỗi nạp của đúng tấm tới khi promise kết thúc, kể cả thầy đã đóng tấm chờ. */
+export async function napGiaoDienEm(nap = () => import('./SuaEmNhanBai')) {
+  let loi: Error | null = null
+  const giu = (e: Event) => {
+    const p = (e as Event & { payload?: unknown }).payload
+    const chu = p instanceof Error ? p.message : String(p)
+    if (!/SuaEmNhanBai|sua-em-nhan-bai/.test(chu)) return
+    e.preventDefault(); loi = p instanceof Error ? p : new Error(chu)
+    if (/\.css\b/.test(chu)) cssChuaNap = { duong: chu.match(/(?:https?:\/\/|\/)[^\s'"]+\.css(?:\?[^\s'"]*)?/)?.[0] ?? '', loi }
+  }
+  window.addEventListener('vite:preloadError', giu, true)
+  try {
+    const du = await nap()
+    if (loi) throw loi
+    if (cssChuaNap) {
+      const href = cssChuaNap.duong ? new URL(cssChuaNap.duong, document.baseURI).href : ''
+      if (![...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].some(x => x.href === href && x.sheet)) throw cssChuaNap.loi
+      cssChuaNap = null
+    }
+    return du
+  } finally { window.removeEventListener('vite:preloadError', giu, true) }
 }
-const napSuaEm = () => lazy(() => import('./SuaEmNhanBai'))
+const napSuaEm = () => lazy(() => napGiaoDienEm())
+
+/** Vỏ chờ nhẹ hiện ngay; chưa tải bộ chọn/API và không lấy số 0 thay cho dữ liệu chưa đọc. */
+export function ChoTamEm({ ten, lop, onDong }: { ten: string; lop: string; onDong: () => void }) {
+  const nut = useRef<HTMLButtonElement>(null), dong = useRef(onDong)
+  dong.current = onDong
+  useEffect(() => {
+    const cu = document.activeElement as HTMLElement | null, cuon = document.body.style.overflow
+    document.body.style.overflow = 'hidden'; nut.current?.focus()
+    const phim = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') { e.preventDefault(); nut.current?.focus() }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); dong.current() }
+    }
+    document.addEventListener('keydown', phim)
+    return () => { document.removeEventListener('keydown', phim); document.body.style.overflow = cuon; if (cu?.isConnected) cu.focus() }
+  }, [])
+  return createPortal(<div className="m3 gvv2" style={{ position: 'fixed', inset: 0, zIndex: 200, padding: 8, display: 'grid', placeItems: 'center', background: 'var(--phu)' }}>
+    <section role="dialog" aria-modal="true" aria-label={`Em nhận ${ten}`} data-khoi="cho-tam-em" style={{ boxSizing: 'border-box', width: 'min(880px, 100%)', maxHeight: 'calc(100dvh - 16px)', overflowY: 'auto', padding: 24, borderRadius: 24, background: 'var(--gvm-mat)', color: 'var(--gvm-chu)' }}>
+      <p className="gvv2-phu">{lop}</p><h2 className="gvv2-h2" style={{ overflowWrap: 'anywhere' }}>Em nhận {ten}</h2><p role="status">Đang mở danh sách nhận bài…</p>
+      {[0, 1, 2].map(n => <span key={n} className="tt-xuong" style={{ display: 'block', height: 48, borderRadius: 12, marginBottom: 12 }} />)}
+      <button ref={nut} type="button" className="gvv2-nut-vien" style={{ minHeight: 48 }} onClick={onDong}>Hủy mở danh sách</button>
+    </section>
+  </div>, document.body)
+}
 
 /** Thiếu mảnh danh sách chỉ báo tại bảng, giữ màn và những gì thầy đang sửa. */
 export class ChanLoiDanhSach extends Component<{ children: ReactNode; onThu: () => void; onDong: () => void }, { loi: boolean }> {
@@ -74,9 +117,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
   const [thuTam, setThuTam] = useState(0)
   const ackEm = useRef(new Map<string, { soEm: number; serverNow: number }>())
   const [emSua, setEmSua] = useState<GoiBang | null>(null)
-  const batEm = (goi: GoiBang) => { window.addEventListener('vite:preloadError', giuLoiNapEm, true); setEmSua(goi) }
-  useEffect(() => { if (!emSua) window.removeEventListener('vite:preloadError', giuLoiNapEm, true) }, [emSua])
-  useEffect(() => () => window.removeEventListener('vite:preloadError', giuLoiNapEm, true), [])
+  const batEm = (goi: GoiBang) => setEmSua(goi)
   const docSauEm = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [du, setDu] = useState<DuBang | null>(null)
   const [dangTai, setDangTai] = useState(true)
@@ -368,7 +409,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
           Thử lại
         </button>
       )}
-      {emSua && <ChanLoiDanhSach key={thuTam} onThu={() => { setTamEm(napSuaEm); setThuTam(n => n + 1) }} onDong={() => setEmSua(null)}><Suspense fallback={<p role="status">Đang mở danh sách nhận bài…</p>}><TamEm key={emSua.id} goiId={emSua.id} lop={emSua.lop} ten={emSua.ten} onDong={() => setEmSua(null)} onDaLuu={daLuuEm} /></Suspense></ChanLoiDanhSach>}
+      {emSua && <ChanLoiDanhSach key={thuTam} onThu={() => { setTamEm(napSuaEm); setThuTam(n => n + 1) }} onDong={() => setEmSua(null)}><Suspense fallback={<ChoTamEm ten={emSua.ten} lop={emSua.lop} onDong={() => setEmSua(null)} />}><TamEm key={emSua.id} goiId={emSua.id} lop={emSua.lop} ten={emSua.ten} onDong={() => setEmSua(null)} onDaLuu={daLuuEm} /></Suspense></ChanLoiDanhSach>}
     </div>
   )
 }
