@@ -3,10 +3,11 @@
 // Cổng chặn = cổng nút Hỏi thầy (`nguCanhHoiTroLy`, loi-giai.ts) + em đã bấm Hỏi thầy câu ấy trong 24 giờ. Khoá GEMINI_API_KEY chỉ ở Worker secret.
 // Không gửi tên/SBD sang Google. Mọi lượt ghi bảng `hoi_tro_ly` để thầy xem lại.
 import type { Env } from './kieu'
-import { gameIdentity } from './game-v2-auth'
+import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { DemTTL } from './dem-chung'
 import { nguCanhHoiTroLy } from './loi-giai'
+import { qidGoc } from './srs2-d1'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 import { SCHEMA_TRA_LOI, chuPhang, lamSachCauTruc, tachCauTruc, type CauTrucTraLoi } from './hoi-tro-ly-cau-truc'
 
@@ -237,20 +238,50 @@ export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: st
 export type KetQuaAi = { ok: true; chu: string; vao: number; ra: number; model?: string } | { ok: false; ma: 'qua_tai' | 'cham' | 'rong' | 'loi_ai' | 'mang'; chiTiet: string; http?: number }
 export type GoiAi = (key: string, cfg: CauHinhHoiThem, noiDung: NoiDungGemini) => Promise<KetQuaAi>
 
-export const goiGemini: GoiAi = async (key, cfg, noiDung) => {
-  const ds = [cfg.model, ...DS_MODEL_DU_PHONG.filter((m) => m !== cfg.model)]
-  const vet: string[] = []
-  let kq: KetQuaAi = { ok: false, ma: 'loi_ai', chiTiet: 'chưa gọi' }
-  for (const model of ds) {
-    kq = await goiMotModel(key, cfg, model, noiDung)
-    if (kq.ok || !MA_KHONG_CO_MODEL.has(kq.http ?? 0)) return kq
-    console.error('[hoi-tro-ly] model', model, `báo ${kq.http} — thử tên kế`)
-    vet.push(`${model}: ${kq.chiTiet}`)
+/** GỌI KÉP (tốc độ, thầy 13/10 gửi ảnh "Thầy trả lời chưa kịp"): sổ hoi_tro_ly cho thấy 3.1 Flash-Lite thường trả 1,4–3,9 s, nhưng mô hình
+ *  này thỉnh thoảng treo lâu bất thường. Lượt đầu quá `choKep` ms chưa về ⇒ bắn thêm MỘT lượt y hệt; lượt nào trả được trước thì lấy, huỷ lượt
+ *  kia. Trần: lượt đầu 25 s, lượt kép 20 s ⇒ máy chủ trả lời (hoặc ghi lỗi `cham` vào sổ) trước khi máy em hết 45 s chờ. */
+export const CHO_GOI_KEP_MS = 8_000
+export function taoGoiGemini(choKep = CHO_GOI_KEP_MS): GoiAi {
+  return async (key, cfg, noiDung) => {
+    const ds = [cfg.model, ...DS_MODEL_DU_PHONG.filter((m) => m !== cfg.model)]
+    const vet: string[] = []
+    let kq: KetQuaAi = { ok: false, ma: 'loi_ai', chiTiet: 'chưa gọi' }
+    for (const model of ds) {
+      kq = await goiKep(key, cfg, model, noiDung, choKep)
+      if (kq.ok || !MA_KHONG_CO_MODEL.has(kq.http ?? 0)) return kq
+      console.error('[hoi-tro-ly] model', model, `báo ${kq.http} — thử tên kế`)
+      vet.push(`${model}: ${kq.chiTiet}`)
+    }
+    return kq.ok ? kq : { ...kq, chiTiet: vet.join(' | ').slice(0, 280) }
   }
-  return kq.ok ? kq : { ...kq, chiTiet: vet.join(' | ').slice(0, 280) }
+}
+export const goiGemini: GoiAi = taoGoiGemini()
+
+async function goiKep(key: string, cfg: CauHinhHoiThem, model: string, noiDung: NoiDungGemini, choKep: number): Promise<KetQuaAi> {
+  const dk = [new AbortController(), new AbortController()] as const
+  const p1 = goiMotModel(key, cfg, model, noiDung, dk[0].signal, 25_000)
+  let hen: ReturnType<typeof setTimeout> | undefined
+  const quaHan = new Promise<'qua_han'>((ok) => { hen = setTimeout(() => ok('qua_han'), choKep) })
+  const dau = await Promise.race([p1, quaHan])
+  if (dau !== 'qua_han') { clearTimeout(hen); return dau }
+  console.warn('[hoi-tro-ly] model', model, `quá ${choKep} ms chưa trả — gọi kép`)
+  const p2 = goiMotModel(key, cfg, model, noiDung, dk[1].signal, 20_000)
+  return new Promise<KetQuaAi>((ok) => {
+    let con = 2
+    let loiDau: KetQuaAi | null = null
+    const nhan = (i: 0 | 1) => (r: KetQuaAi) => {
+      if (r.ok) { dk[i === 0 ? 1 : 0].abort(); ok(r); return }
+      loiDau ??= r
+      if (--con === 0) ok(loiDau)
+    }
+    void p1.then(nhan(0))
+    void p2.then(nhan(1))
+  })
 }
 
-async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiDung: NoiDungGemini): Promise<KetQuaAi> {
+/** `huy`: lượt kép kia đã trả ⇒ thôi chờ lượt này. `hanMs`: trần chờ riêng của lượt này. */
+async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiDung: NoiDungGemini, huy?: AbortSignal, hanMs = 30_000): Promise<KetQuaAi> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`
   const gen: Obj = {
     temperature: cfg.nhietDo, maxOutputTokens: 2048 + (cfg.thinkingBudget ?? 0),
@@ -261,7 +292,9 @@ async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiD
   }
   if (cfg.thinkingBudget !== null && /2\.5/.test(model)) gen.thinkingConfig = { thinkingBudget: cfg.thinkingBudget }
   const ac = new AbortController()
-  const hen = setTimeout(() => ac.abort(), 30_000)
+  const hen = setTimeout(() => ac.abort(), hanMs)
+  const thoi = () => ac.abort()
+  huy?.addEventListener('abort', thoi)
   try {
     const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify({ ...noiDung, generationConfig: gen }), signal: ac.signal })
     const j = (await r.json().catch(() => null)) as Obj | null
@@ -276,6 +309,7 @@ async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiD
     return { ok: false, ma: ac.signal.aborted ? 'cham' : 'mang', chiTiet: e instanceof Error ? e.message.slice(0, 200) : 'lỗi' }
   } finally {
     clearTimeout(hen)
+    huy?.removeEventListener('abort', thoi)
   }
 }
 
@@ -316,7 +350,7 @@ const LOI_CHO_EM: Record<string, string> = {
 
 // ---------------------------------------------------------------- lệnh /hs/hoi-tro-ly
 
-export interface PhuThuocHoiThem { nguCanh?: (env: Env, sbd: string, qid: string, nowMs: number, dangLam: boolean) => Promise<{ ok: false; khoa?: string; error: string } | ({ ok: true } & NguCanhCau)>; goiAi?: GoiAi; nowMs?: number }
+export interface PhuThuocHoiThem { nguCanh?: (env: Env, sbd: string, qid: string, nowMs: number, dangLam: boolean) => Promise<{ ok: false; khoa?: string; error: string } | ({ ok: true } & NguCanhCau)>; goiAi?: GoiAi; nowMs?: number; xong?: Promise<unknown> }
 
 /** Em ĐANG LÀM (chưa nộp): bỏ mọi câu (dòng / câu văn) lộ đáp án — phương án đúng, chữ của phương án đúng, đúng/sai từng ý, đáp số
  *  phần III. Bỏ hết ⇒ câu cố định nhắc em làm xong rồi xem lời giải. Chỉ dẫn đã dặn mô hình không nêu; đây là chốt chặn thứ hai. */
@@ -393,37 +427,51 @@ export async function gvSbdThuHoiThay(env: Env, b: Obj, nowMs = Date.now()): Pro
 }
 
 export async function hsHoiTroLy(env: Env, b: Obj): Promise<Obj> {
-  const sbd = await gameIdentity(env, b)
-  return traLoiHoiThem(env, sbd, b)
+  // Bước 1 (không chạm D1) ⇒ có sbd ngay; mật khẩu còn khớp (`xong`) kiểm SONG SONG với các lượt đọc đầu (traLoiHoiThem chờ nó trước khi trả gì).
+  const { sbd, xong } = await gameIdentityHaiBuoc(env, b)
+  return traLoiHoiThem(env, sbd, b, { xong })
 }
 
 export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuocHoiThem = {}): Promise<Obj> {
   const nowMs = phu.nowMs ?? Date.now()
   const key = str(env.GEMINI_API_KEY).trim()
-  const cfg = await docCauHinhHoiThem(env)
-  if (!key || !(await emDuocDung(env, sbd, cfg))) return { ok: false, ma: 'chua_bat', error: 'Phần hỏi thêm Thầy chưa mở cho em.' }
   const cauHoi = str(b.cauHoi).replace(/\s+/g, ' ').trim().slice(0, 500)
-  if (cauHoi.length < 2) return { ok: false, ma: 'trong', error: 'Em nhắn chỗ em thắc mắc trước nhé.' }
-  await chayDdlMotLan(env, 'hoi_tro_ly_v1', SQL_BANG)
   // Em đang làm câu (chưa nộp, máy em gửi `dangLam`) ⇒ Thầy chỉ gợi hướng; máy chủ lọc thêm câu lộ đáp án (chanLoDapAn).
   const dangLam = b.dangLam === true
-  const nc = await (phu.nguCanh ?? (nguCanhHoiTroLy as NonNullable<PhuThuocHoiThem['nguCanh']>))(env, sbd, str(b.qid), nowMs, dangLam)
-  if (!nc.ok) return { ok: false, ma: nc.khoa ?? 'khong_mo', error: nc.error }
   const ngay = ngayVn(nowMs)
-  const dem = await env.DB.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN qid = ? THEN 1 ELSE 0 END), 0) AS c FROM hoi_tro_ly WHERE sbd = ? AND ngay_vn = ? AND loi IS NULL')
-    .bind(nc.qid, sbd, ngay).first<Obj>()
+  // TỐC ĐỘ (thầy 13/10, ảnh "Thầy trả lời chưa kịp" — sổ cho thấy Gemini chỉ 1,4–3,9 s, phần chậm là ~12 lượt D1 NỐI TIẾP của máy chủ):
+  // mọi lượt ĐỌC (cấu hình, ngữ cảnh câu, số câu đã hỏi hôm nay, ba lượt hỏi–đáp gần nhất, kết quả làm gần nhất) bắt đầu CÙNG lúc;
+  // thứ tự CHẶN và lời báo giữ như cũ, chưa qua chặn thì không trả gì. Các lượt đọc theo câu dùng `qidGoc(b.qid)` = `nc.qid` của nguCanhHoiTroLy.
+  const qidDoan = qidGoc(str(b.qid))
+  const ddl = chayDdlMotLan(env, 'hoi_tro_ly_v1', SQL_BANG)
+  const cfgP = docCauHinhHoiThem(env)
+  const duocP = cfgP.then((cfg) => emDuocDung(env, sbd, cfg))
+  const ncP = (phu.nguCanh ?? (nguCanhHoiTroLy as NonNullable<PhuThuocHoiThem['nguCanh']>))(env, sbd, str(b.qid), nowMs, dangLam)
+  const docDem = (q: string) => ddl.then(() => env.DB.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN qid = ? THEN 1 ELSE 0 END), 0) AS c FROM hoi_tro_ly WHERE sbd = ? AND ngay_vn = ? AND loi IS NULL')
+    .bind(q, sbd, ngay).first<Obj>())
+  // Ba lượt hỏi–đáp gần nhất của chính em ở câu này (24 giờ) — đọc từ sổ máy chủ, không tin lịch sử máy em gửi.
+  const docLs = (q: string) => ddl.then(() => env.DB.prepare('SELECT cau_hoi, tra_loi FROM hoi_tro_ly WHERE sbd = ? AND qid = ? AND luc >= ? AND loi IS NULL AND COALESCE(lien_quan, 1) = 1 ORDER BY id DESC LIMIT 3')
+    .bind(sbd, q, new Date(nowMs - 24 * 3_600_000).toISOString()).all<Obj>()).catch(() => ({ results: [] as Obj[] }))
+  const docKq0 = (q: string) => env.DB.prepare('SELECT ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid = ? AND COALESCE(purpose, \'\') <> ? ORDER BY luc DESC LIMIT 1')
+    .bind(sbd, q, MUC_DICH_XEM_LOI_GIAI).first<Obj>()
+    .catch(() => env.DB.prepare('SELECT ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid = ? ORDER BY luc DESC LIMIT 1').bind(sbd, q).first<Obj>().catch(() => null))
+  const demP = docDem(qidDoan), lsP = docLs(qidDoan), kq0P = docKq0(qidDoan)
+  for (const p of [duocP, ncP, demP, ddl]) p.catch(() => {})
+  const [, cfg] = await Promise.all([phu.xong, cfgP])
+  if (!key || !(await duocP)) return { ok: false, ma: 'chua_bat', error: 'Phần hỏi thêm Thầy chưa mở cho em.' }
+  if (cauHoi.length < 2) return { ok: false, ma: 'trong', error: 'Em nhắn chỗ em thắc mắc trước nhé.' }
+  await ddl
+  const nc = await ncP
+  if (!nc.ok) return { ok: false, ma: nc.khoa ?? 'khong_mo', error: nc.error }
+  // Ngữ cảnh trả qid khác qid đoán (chỉ khi thay bộ dựng ngữ cảnh) ⇒ đọc lại theo đúng qid của ngữ cảnh.
+  const cungQid = nc.qid === qidDoan
+  const [dem, ls, kq0] = await Promise.all(cungQid ? [demP, lsP, kq0P] : [docDem(nc.qid), docLs(nc.qid), docKq0(nc.qid)])
   const n = Number(dem?.n) || 0, daHoiCau = Number(dem?.c) || 0
   // SBD thử của thầy ⇒ không chặn trần (vẫn ghi sổ như mọi lượt); số "còn lại" luôn hiện đủ trần.
   const khongTran = cfg.sbdKhongTran.includes(sbd)
   if (!khongTran && n >= cfg.tranNgay) return { ok: false, ma: 'het_luot', conLai: 0, error: `Hôm nay em đã hỏi đủ ${cfg.tranNgay} câu. Mai em hỏi tiếp nhé.` }
   if (!khongTran && daHoiCau >= cfg.tranCau) return { ok: false, ma: 'het_luot_cau', conLai: cfg.tranNgay - n, error: `Câu này em đã hỏi ${cfg.tranCau} lần hôm nay. Em làm lại câu theo lời giải, chỗ nào còn vướng mang lên lớp hỏi Thầy.` }
-  // Ba lượt hỏi–đáp gần nhất của chính em ở câu này (24 giờ) — đọc từ sổ máy chủ, không tin lịch sử máy em gửi.
-  const ls = await env.DB.prepare('SELECT cau_hoi, tra_loi FROM hoi_tro_ly WHERE sbd = ? AND qid = ? AND luc >= ? AND loi IS NULL AND COALESCE(lien_quan, 1) = 1 ORDER BY id DESC LIMIT 3')
-    .bind(sbd, nc.qid, new Date(nowMs - 24 * 3_600_000).toISOString()).all<Obj>().catch(() => ({ results: [] as Obj[] }))
-  const lichSu = (ls.results ?? []).reverse().map((x) => ({ cauHoi: str(x.cau_hoi), traLoi: str(x.tra_loi) })).filter((x) => x.cauHoi && x.traLoi)
-  const kq0 = await env.DB.prepare('SELECT ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid = ? AND COALESCE(purpose, \'\') <> ? ORDER BY luc DESC LIMIT 1')
-    .bind(sbd, nc.qid, MUC_DICH_XEM_LOI_GIAI).first<Obj>()
-    .catch(() => env.DB.prepare('SELECT ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid = ? ORDER BY luc DESC LIMIT 1').bind(sbd, nc.qid).first<Obj>().catch(() => null))
+  const lichSu = ((ls as { results?: Obj[] }).results ?? []).reverse().map((x) => ({ cauHoi: str(x.cau_hoi), traLoi: str(x.tra_loi) })).filter((x) => x.cauHoi && x.traLoi)
   const ketQuaGanNhat = kq0 && kq0.ket_qua !== null && kq0.ket_qua !== undefined ? (Number(kq0.ket_qua) === 1 ? 'dung' : 'sai') : 'chua_lam'
   const dapAnEm = str(b.dapAnEm).replace(/\s+/g, ' ').trim().slice(0, 40)
   const noiDung = dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm, dangLam })
@@ -453,17 +501,20 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   // Ngoài phạm vi (cờ của mô hình) hoặc trả lời rỗng ⇒ câu cố định do MÁY CHỦ viết; lượt vẫn tính vào trần ngày.
   const ngoai = !lienQuan || !traLoiAi
   const traLoi = ngoai ? CAU_NGOAI_PHAM_VI : traLoiAi
-  await env.DB.prepare('INSERT INTO hoi_tro_ly (sbd, qid, ngay_vn, luc, nguon, cau_hoi, tra_loi, lien_quan, model, token_vao, token_ra, ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
-    .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, traLoi, ngoai ? 0 : 1, kq.model ?? cfg.model, kq.vao, kq.ra, ms).run()
-  // ÔN LẠI, em đang làm mà Thầy đã gợi hướng ⇒ như bấm Hỏi thầy trước khi nộp (loi-giai.ts hsHoiThay): lần làm hôm nay là "có trợ giúp",
-  // không EXP, câu quay lại lịch ôn. Đã nộp rồi thì khoá trùng ⇒ không đổi gì.
-  if (dangLam && !ngoai && nguon === 'on_lai') {
-    await ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngay}`, sbd, qid: nc.qid, lan: 1, ketQua: 0, luc, assistance: 'assisted', purpose: MUC_DICH_XEM_LOI_GIAI }]).catch(() => null)
-  }
-  // Thầy đã gợi hướng câu em đang làm ⇒ ghi `loi_giai_hoi` như một lần được chữa: kiểm tra cá nhân (kiem-tra-ca-nhan.ts) vẫn chặn vào chặng
-  // có câu này trong 12 giờ ("kiểm chứng độc lập"), sổ chất lượng sửa lỗi biết câu có trợ giúp. Chỉ thêm dòng, không đổi điểm.
-  if (dangLam && !ngoai) {
-    await env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,0)').bind(sbd, nc.qid, `${nguon}:goi_y`.slice(0, 40), luc).run().catch(() => null)
-  }
+  // Ba lượt ghi chạy CÙNG một đợt (tốc độ 13/10): sổ hỏi–đáp (lỗi ⇒ báo lỗi như cũ), sự kiện ôn lại, dấu đã được chữa.
+  await Promise.all([
+    env.DB.prepare('INSERT INTO hoi_tro_ly (sbd, qid, ngay_vn, luc, nguon, cau_hoi, tra_loi, lien_quan, model, token_vao, token_ra, ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
+      .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, traLoi, ngoai ? 0 : 1, kq.model ?? cfg.model, kq.vao, kq.ra, ms).run(),
+    // ÔN LẠI, em đang làm mà Thầy đã gợi hướng ⇒ như bấm Hỏi thầy trước khi nộp (loi-giai.ts hsHoiThay): lần làm hôm nay là "có trợ giúp",
+    // không EXP, câu quay lại lịch ôn. Đã nộp rồi thì khoá trùng ⇒ không đổi gì.
+    dangLam && !ngoai && nguon === 'on_lai'
+      ? ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngay}`, sbd, qid: nc.qid, lan: 1, ketQua: 0, luc, assistance: 'assisted', purpose: MUC_DICH_XEM_LOI_GIAI }]).catch(() => null)
+      : null,
+    // Thầy đã gợi hướng câu em đang làm ⇒ ghi `loi_giai_hoi` như một lần được chữa: kiểm tra cá nhân (kiem-tra-ca-nhan.ts) vẫn chặn vào chặng
+    // có câu này trong 12 giờ ("kiểm chứng độc lập"), sổ chất lượng sửa lỗi biết câu có trợ giúp. Chỉ thêm dòng, không đổi điểm.
+    dangLam && !ngoai
+      ? env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,0)').bind(sbd, nc.qid, `${nguon}:goi_y`.slice(0, 40), luc).run().catch(() => null)
+      : null,
+  ])
   return { ok: true, traLoi, ...(cauTruc && !ngoai ? { cauTruc } : {}), ngoaiPhamVi: ngoai, conLai: khongTran ? cfg.tranNgay : Math.max(0, cfg.tranNgay - n - 1) }
 }

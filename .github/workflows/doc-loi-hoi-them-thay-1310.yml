@@ -32,3 +32,5 @@ jobs:
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT luc, model, ms, loi FROM hoi_tro_ly WHERE loi IS NOT NULL ORDER BY id DESC LIMIT 10" | jq -c ".[0].results"
           # 13/10 tối: mô hình nào THẬT SỰ trả lời trong 24 giờ (thầy chọn gemini-3.1-flash-lite; dự phòng 404/410 ⇒ 3.5-flash-lite…) — chỉ đếm, không sbd/câu hỏi.
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT model, COUNT(*) AS so_luot, CAST(AVG(ms) AS INTEGER) AS ms_tb, MAX(luc) AS gan_nhat FROM hoi_tro_ly WHERE loi IS NULL AND luc >= strftime('%Y-%m-%dT%H:%M:%S', 'now', '-1 day') GROUP BY model ORDER BY gan_nhat DESC" | jq -c ".[0].results"
+          # 13/10 tối (thầy gửi ảnh "Thầy trả lời chưa kịp"): 15 lượt gần nhất — CHỈ giờ, model, ms, số token, cờ phạm vi, có lỗi không.
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT luc, model, ms, token_vao, token_ra, lien_quan, (loi IS NOT NULL) AS co_loi FROM hoi_tro_ly ORDER BY id DESC LIMIT 15" | jq -c ".[0].results[]"
