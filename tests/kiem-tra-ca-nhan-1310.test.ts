@@ -248,6 +248,9 @@ it('cùng nền qua 20 bài và bốn độ khó không thành 80 kiến thức;
 it('làm mới đề cũ chỉ trước ngày mở, giữ ngày đã hẹn và không đổi bài đã nộp',async()=>{
  const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!
  const old=JSON.parse(String(r.json));old.phienBan=1;k.d.sql.prepare('UPDATE kiem_tra_ca_nhan SET json=? WHERE id=?').run(JSON.stringify(old),String(r.id))
+ // SỬA CÓ CHỦ ĐÍCH 13/10 (Claude): đề và số tính sẵn luôn ghi CÙNG lô ⇒ đề cũ thật có số tính sẵn phiên bản cũ; cron đọc phiên bản ở số
+ // tính sẵn (không bóc JSON đề lớn mỗi phút) nên bản giả phải đổi cả hai cho khớp thực tế.
+ k.d.sql.prepare("UPDATE kiem_tra_ca_nhan_meta SET meta_json=json_set(meta_json,'$.phienBan',1) WHERE id=?").run(String(r.id))
  await dongBoKtCn(k.env,NOW+60000)
  const moi=(await docKtCn(k.env,'S1',NOW))!;expect(moi.ngay).toBe(r.ngay);expect(JSON.parse(String(moi.json)).phienBan).toBe(2)
  const now=Number(moi.mo_luc)+1000;await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id:moi.id},now)

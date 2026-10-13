@@ -95,3 +95,20 @@ it('ba đề giãn ngày, và cổng ghi không cho quá ba bài trong bất k�
  const so=k.d.sql.prepare("SELECT COUNT(*) n FROM kiem_tra_ca_nhan WHERE ngay BETWEEN ? AND ?").get(String(rows[0]!.ngay),congNgayKt(String(rows[0]!.ngay),6))!
  expect(Number(so.n)).toBeLessThanOrEqual(3)
 })
+// Claude 13/10 (soát nhánh đề 2026): cron chuyển đề cũ đọc phiên bản ở số tính sẵn (JSON nhỏ), KHÔNG bóc JSON đề lớn của mọi lịch tương lai
+// mỗi phút (bài học D1 quá tải 13/10). Số tính sẵn lập trước khi có trường phienBan ⇒ coi là đề cũ và vẫn được chuyển về 28 câu/50 phút.
+it('cron chuyển đề cũ chưa mở về 28 câu nhờ số tính sẵn, không bóc JSON đề trong lệnh chọn lịch',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,d=JSON.parse(String(r.json))
+ k.d.sql.prepare('UPDATE kiem_tra_ca_nhan SET json=? WHERE id=?').run(JSON.stringify({...d,phienBan:1,cau:Array.from({length:333},()=>d.cau[0]),phut:475}),String(r.id))
+ k.d.sql.prepare("UPDATE kiem_tra_ca_nhan_meta SET meta_json=json_remove(meta_json,'$.phienBan','$.baiNgayToiThieu') WHERE id=?").run(String(r.id))
+ const sqls:string[]=[],prepare=k.env.DB.prepare.bind(k.env.DB)
+ ;(k.env.DB as {prepare:typeof prepare}).prepare=(sql:string)=>{sqls.push(sql);return prepare(sql)}
+ expect((await dongBoKtCn(k.env,NOW+1000)).soMoi).toBe(1)
+ const chon=sqls.find(q=>/SELECT k\.sbd FROM kiem_tra_ca_nhan k/.test(q))!
+ expect(chon).toMatch(/km\.meta_json,'\$\.phienBan'/);expect(chon).not.toMatch(/json_extract\(k\.json,'\$\.phienBan'\)/)
+ const moi=(await docKtCn(k.env,'S1',NOW,true))!
+ expect(moi.ngay).toBe(r.ngay);expect(tomTatKt(moi,NOW)).toMatchObject({tong:28,phut:50})
+ expect(JSON.parse(String(k.d.sql.prepare('SELECT meta_json FROM kiem_tra_ca_nhan_meta WHERE id=?').get(String(r.id))!.meta_json))).toMatchObject({phienBan:3,tong:28,phut:50})
+ // Lượt sau: mọi lịch đã là bản 3 ⇒ không chọn lại em nào.
+ expect((await dongBoKtCn(k.env,NOW+2000)).soMoi).toBe(0)
+})
