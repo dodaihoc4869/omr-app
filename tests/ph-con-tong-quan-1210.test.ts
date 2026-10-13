@@ -185,7 +185,7 @@ describe('gợi ý nhắc con: đúng luật, tối đa 5, không độn, giọn
     expect(g.map((x) => x.ma)).toEqual(['con-cau-hom-nay', 'sai-chua-sua', 'nhanh-sai', 'thieu-ngay', 'ti-le-giam'])
     expect(g.map((x) => x.chu)).toEqual([
       'Hôm nay con còn 12 câu chưa làm (đã làm 12/24 câu).',
-      'Có 3 câu con làm sai chưa sửa được. Nhắc con vào mục Tự chữa lỗi để làm lại.',
+      'Có 3 câu con làm sai chưa sửa được. Nhắc con vào mục Tự sửa lỗi để làm lại.',
       '7 ngày qua có 8 câu con làm dưới 8 giây và sai 6 câu. Nhắc con đọc kỹ đề trước khi chọn.',
       'Từ 12/10 con có 1 ngày không làm bài và 1 ngày làm chưa đủ mức. Hỏi con lý do và chốt một giờ học cố định mỗi ngày.',
       'Tỉ lệ đúng 7 ngày qua là 40%, thấp hơn 7 ngày trước đó (70%). Hỏi con phần nào đang khó để báo Thầy.',

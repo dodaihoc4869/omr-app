@@ -81,6 +81,25 @@ describe('/hs/dang-nhap — xin kèm Sảnh (kemSanh): trả theo luồng', () =
     expect(boGio(sau.sanh)).toEqual(boGio(rieng))
   })
 
+  it("13/10: bản app mới xin kemSanh: 'hoc-tap' ⇒ dòng 2 = ĐÚNG lệnh hoc-tap-sanh (lệnh Hôm nay dùng), KHÔNG chạy hoa2-sanh; bản cũ kemSanh: true vẫn hoa2-sanh", async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(T0 + 1000)
+    const { env } = await dung()
+    CT.__SANH_HONG = true // hoa2-sanh mà chạy là ném lỗi ⇒ dòng 2 sẽ null
+    try {
+      const dn = await goiLuong(env, { sbd: 'S1', matKhau: 'mk-s1', kemSanh: 'hoc-tap' })
+      expect(dn.kieu).toBe(KIEU_LUONG_DANG_NHAP)
+      const [dau, sau] = dn.dong as [Obj, { sanh: Obj }]
+      expect(sau.sanh).toMatchObject({ ok: true })
+      const rieng = await goi(env, '/game-v2/hoc-tap-sanh', { token: dau.token })
+      expect(boGio(sau.sanh)).toEqual(boGio(rieng))
+      const cu = await goiLuong(env, { sbd: 'S1', matKhau: 'mk-s1', kemSanh: true })
+      expect((cu.dong[1] as { sanh: unknown }).sanh).toBeNull() // bản cũ vẫn đi hoa2-sanh (đang bị làm hỏng giả)
+    } finally {
+      CT.__SANH_HONG = false
+    }
+  })
+
   it('DÒNG 1 ĐI TRƯỚC khi Sảnh xong: Sảnh bị giữ lại mà đăng nhập vẫn đọc được ngay (các lệnh còn lại của máy em không bị chậm lại)', async () => {
     vi.useFakeTimers({ toFake: ['Date'] })
     vi.setSystemTime(T0 + 1000)

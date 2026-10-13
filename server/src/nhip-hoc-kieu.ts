@@ -22,6 +22,7 @@
 //   Theo lô chỉ đọc số giây và đáp án ĐÃ GHI TRONG SỔ (`su_kien_hoc.giay`, `raw_json.ms`, `raw_json.chon|traLoi`) — lượt ca kiểm tra chỉ có số giây ở bảng
 //   chi tiết ca, lượt game cũ không ghi số giây thì không vào mẫu (hồ sơ một em đọc thêm các nguồn ấy nên số có thể nhỉnh hơn). Không đọc được
 //   phần chọn lặp ⇒ chỉ dùng quá nhanh, `doiPhoDaTinh.chonLap = false` + một câu cảnh báo.
+import type { KetQuaBac } from './bac-cham-chi'
 import type { LopBaiHangNgay } from './bai-hang-ngay-kieu'
 
 /** LUẬT NHÓM (thầy 12/10 duyệt cùng bản vẽ) — tính trên các ngày ĐÃ QUA (không tính hôm nay), từ `ngayVao` của em tới hôm qua. Mọi tỉ lệ là %.
@@ -80,6 +81,15 @@ export interface EmNhipHoc {
   lam: number[]
   /** null = không có dấu hiệu đối phó (hoặc chưa đủ lượt để đo). */
   doiPho: DoiPhoEm | null
+  // ---- CHỈ THÊM 13/10 đợt 18 (máy chủ cũ không có ⇒ app ẩn chip) ----
+  /** Độ tin cậy 0–99 của NHÓM em (nhóm app tính bằng `tomTatNhip` trên đúng `muc` / `lam` / `ngayVao` / `homNay` của trả lời này) — ĐÚNG phép
+   *  `tinCayNhomNhip` (nhip-hoc.ts) mà `/hs/nhip-hoc`, `/ph/nhip-hoc` dùng ⇒ cùng số với bảng của em. 'chua-du' ⇒ vắng. KHÔNG đổi nhóm. */
+  doTinCay?: number
+  /** Khi `doTinCay` dưới 90: câu nói thật cần thêm bao nhiêu ngày có số liệu. */
+  canThem?: string
+  /** CHỈ THÊM 13/10: bậc 1–12 từ Lười đến Chăm + điểm chăm 0–100 (`bacChamChi`, bac-cham-chi.ts — một phép cho thầy, em, phụ huynh). Bậc luôn nằm
+   *  trong khoảng của nhóm (Lười 1–5 · Chưa đều 6–7 · Chăm 8–12). 'chua-du' ⇒ vắng. */
+  bacCham?: KetQuaBac
 }
 
 export interface KetQuaNhipHoc {
@@ -168,5 +178,8 @@ export interface KetQuaNhipHocEm {
   doTinCay?: number
   /** Khi `doTinCay` dưới 90: một câu nói thật cần thêm bao nhiêu ngày có số liệu. */
   canThem?: string
+  /** CHỈ THÊM 13/10: bậc 1–12 từ Lười đến Chăm + điểm chăm 0–100 (`bacChamChi`, bac-cham-chi.ts — một phép cho thầy, em, phụ huynh). Bậc luôn nằm
+   *  trong khoảng của nhóm (Lười 1–5 · Chưa đều 6–7 · Chăm 8–12). 'chua-du' ⇒ vắng. */
+  bacCham?: KetQuaBac
 }
 export type TraLoiNhipHocEm = KetQuaNhipHocEm | { ok: false; error: string }

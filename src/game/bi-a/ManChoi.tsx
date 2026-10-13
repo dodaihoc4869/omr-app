@@ -3,7 +3,7 @@
 // XOAY NGANG (29/09): bàn toàn màn, nút/thanh lực là lớp phủ mảnh hai mép, câu hỏi là tấm phủ giữa màn; âm thanh mô phỏng, tấm câu chấm ở máy chủ, sai là sang lượt ngay, Xem lại câu sai lúc chờ lượt.
 // BÀN BI-A MỚI (thầy chốt bản vẽ 30/09): bỏ bảng "Bi của em" + bảng bi đối thủ ⇒ hàng chấm nhỏ trên cùng; bi vẽ theo góc nhìn (em lam đặc,
 // đối thủ sọc đỏ cam); giải trước = chạm bi của em trên bàn trong lượt người khác; kéo bàn xoay gậy + bánh xe + thanh lực dọc có Huỷ (DieuKhienBia.tsx).
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import type { KeyboardEvent as KE, PointerEvent as PE } from 'react'
 import { AmThanhBia } from './am-thanh'
 import { doiCauBia, doiCauBiaMang, giuBanBia, ketVanBia, NHIP_GIU_BAN_MS } from './api'
@@ -235,7 +235,9 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   // Dựng sẵn âm thanh ngay sau khi bàn hiện (không trong lần chạm đầu — đo máy yếu 30/09: long task 150–350 ms lúc chạm bàn đầu tiên).
   useEffect(() => { const h = setTimeout(() => am.chuanBi(), 700); return () => clearTimeout(h) }, [am])
   // Đang ở màn chơi (kể cả bảng kết quả) ⇒ app KHÔNG tự tải lại vì bản mới (nguyên nhân gốc "đang chơi thoát luôn" 30/09); rời màn ⇒ bản mới vào.
-  useEffect(() => giuTrangKhongTaiLai(), [])
+  // useLAYOUTEffect (13/10): giữ trang NGAY trong lượt dựng — `useEffect` chạy SAU khi bàn đã vẽ ⇒ có một khe (bàn đã hiện, trang chưa giữ) mà bản mới
+  // chiếm quyền đúng lúc ấy vẫn tải lại trang giữa ván (tests/bi-a-thoat-giua-van-3009 bắt được khe này khi máy chậm).
+  useLayoutEffect(() => giuTrangKhongTaiLai(), [])
   // Giữ bàn ở máy chủ (30/09): ván A.I có phiên câu ⇒ báo "còn chơi" mỗi 3 phút khi màn đang hiện, để máy chủ chỉ nhả câu của bàn THẬT SỰ bỏ dở
   // (không hoạt động quá HAN_GIU_BAN_BIA_MS), không nhả bàn đang chơi. Ván online: phòng đấu giữ. Nối tiếp (không chồng lượt), lỗi thì bỏ qua.
   useEffect(() => {

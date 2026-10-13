@@ -331,6 +331,15 @@ describe('ngày Gói 7 cũ chưa chốt ⇒ ước tính uoc-goi7; luật Lườ
     const eL = nhip.em.find((e) => e.sbd === 'L')!
     expect(eL.muc).toEqual([36, 24, 24, 24, 24, 24, 24, 24])
     expect(eL.lam).toEqual([0, 24, 24, 24, 24, 24, 24, 0])
+    // 13/10: chip cạnh tên nhóm trên hồ sơ = CÙNG độ tin cậy của nhóm ở bảng em và dòng thầy (không mượn số của nhãn thái độ).
+    expect(em.doTinCay).toBeGreaterThan(0)
+    expect(h.tinCayNhom?.doTinCay).toBe(em.doTinCay)
+    expect(h.tinCayNhom?.canThem).toBe(em.canThem)
+    expect((eL as { doTinCay?: number }).doTinCay).toBe(em.doTinCay)
+    // 13/10: bậc 1–12 + điểm chăm — CÙNG một số ở hồ sơ (thầy), bảng em (học sinh / phụ huynh) và dòng em của Nhịp học cả lớp; Chăm ⇒ bậc 8–12.
+    expect(em.bacCham?.bac).toBeGreaterThanOrEqual(8)
+    expect(h.bacCham).toEqual(em.bacCham)
+    expect(eL.bacCham).toEqual(em.bacCham)
   })
 
   it('lịch câu mới ngày cũ lớn hơn 24 ⇒ ước tính theo lịch (32); có dòng chốt ⇒ đúng số chốt (da-chot), không ước tính', async () => {

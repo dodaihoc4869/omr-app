@@ -1,9 +1,10 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { Suspense, useEffect, useState, type ReactNode } from 'react'
 import { Activity, ArrowRight, Check, Hourglass, TriangleAlert } from 'lucide-react'
 import { CAU_MOI_CHANG, soChangXong, type SoHomNay } from './lam-bai'
 import { layNhipHocEm, nhipTheoSanh, TEN_NHOM_NHIP, type KetQuaNhipHocEm, type NhomNhip } from '../../lib/nhip-hoc-em'
 // Đợt 16: phần Nhịp học (dải ô ngày, Lười k/6, Việc tiếp, tốc độ) tách thành bảng DÙNG CHUNG với app phụ huynh — markup + chữ của em giữ nguyên.
 import BangNhipHoc from './BangNhipHoc'
+import { ChipBacNhipLuoi, napBacNhip } from '../bac-cham-chi/nap'
 
 // THẺ "HÔM NAY CỦA EM" — đầu màn Hôm nay của app học sinh (thầy 12/10: "Bạn gộp 2 phần làm bài này vào làm một thôi nhé. Tập trung vào việc nhắc học
 // sinh làm bao nhiêu câu. Thiết kế đẹp, trực quan, khoa học thân thiện nhất với hs nhé"). Thay CẢ khối vòng tròn "Mục tiêu hôm nay" (`.ht2-chinh` cũ) lẫn
@@ -39,6 +40,8 @@ export function useNhipHocEm(token: string | undefined, lamMoi: number | null | 
       return
     }
     let huy = false
+    // 13/10: nạp sẵn khối 12 bậc song song lệnh nhịp học (không thêm lệnh máy chủ) — số về là chip + thang vẽ ngay
+    void napBacNhip()
     void layNhipHocEm(token).then((r) => {
       if (huy) return
       if (r) {
@@ -112,6 +115,19 @@ function Chip({ nhom }: { nhom: NhomNhip }) {
     <span className="ht2-nhe-nhom" data-nhom={nhom}>
       <Icon size={16} strokeWidth={2.6} aria-hidden="true" />
       {TEN_NHOM_NHIP[nhom]}
+    </span>
+  )
+}
+
+/** Chip nhóm; máy chủ có bậc (13/10) ⇒ thêm chip "Bậc N/12 · Tên" ngay cạnh (khối nạp khi cần), hai chip xuống hàng khi chật. */
+function ChipNhom({ k }: { k: KetQuaNhipHocEm }) {
+  if (!k.bacCham) return <Chip nhom={k.nhom} />
+  return (
+    <span className="bcc-hang">
+      <Chip nhom={k.nhom} />
+      <Suspense fallback={null}>
+        <ChipBacNhipLuoi k={k} />
+      </Suspense>
     </span>
   )
 }
@@ -207,7 +223,7 @@ export default function TheHomNayEm(p: PropsTheHomNayEm) {
   const k = typeof nhip === 'string' ? null : nhip
   return (
     <section className="ht2-hn" data-nhom={k?.nhom} data-mot={coNhip ? undefined : 'true'} aria-label="Hôm nay của em" aria-busy={(!p.so && p.dangTai) || nhip === 'tai'}>
-      <PhanChinh {...p} chip={k ? <Chip nhom={k.nhom} /> : nhip === 'tai' ? <span className="ht2-hn-chip-xuong" aria-hidden="true" /> : null} />
+      <PhanChinh {...p} chip={k ? <ChipNhom k={k} /> : nhip === 'tai' ? <span className="ht2-hn-chip-xuong" aria-hidden="true" /> : null} />
       {k ? (
         <BangNhipHoc k={k} onMoHoSo={p.onMoHoSo} />
       ) : nhip === 'tai' ? (

@@ -3575,11 +3575,15 @@ const boXuLy = {
           try { result.token = await gameToken(env, String(result.sbd), 'matKhau' in daDoc ? daDoc.matKhau : undefined) } catch { /* Game must not block academic login. */ }
           // Tối ưu vòng 2 (06/10, dang-nhap-kem-sanh.ts): máy em xin `kemSanh` ⇒ trả lời THEO LUỒNG: dòng 1 = đăng nhập (đi ngay), dòng 2 = Sảnh của em khi xong (bớt một vòng
           // mạng, KHÔNG làm chậm các lệnh còn lại của máy em). Lỗi / quá hạn ⇒ dòng 2 là null. Công tắc khẩn: env.TAT_KEM_SANH.
-          if (b.kemSanh === true && typeof result.token === 'string' && result.token && !kemSanhBiTat(env)) {
+          // 13/10: cổng học sinh dựng Hôm nay bằng `hoc-tap-sanh` (KHÔNG dùng `hoa2-sanh`) ⇒ bản app mới xin `kemSanh: 'hoc-tap'` và nhận đúng lệnh ấy;
+          // bản app cũ còn gửi `kemSanh: true` ⇒ vẫn `hoa2-sanh` như trước (không vỡ máy chưa cập nhật). Trước: mỗi lần đăng nhập máy chủ chạy một
+          // `hoa2-sanh` đầy đủ mà màn không dùng.
+          if ((b.kemSanh === true || b.kemSanh === 'hoc-tap') && typeof result.token === 'string' && result.token && !kemSanhBiTat(env)) {
             const token = result.token
+            const lenhSanh = b.kemSanh === 'hoc-tap' ? 'hoc-tap-sanh' : 'hoa2-sanh'
             return luongDangNhapKemSanh(
               { ...result, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() },
-              () => sanhKemDangNhap(() => gameV2(env, 'hoa2-sanh', { token }, ctx), (r) => ({ ...r, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() })),
+              () => sanhKemDangNhap(() => gameV2(env, lenhSanh, { token }, ctx), (r) => ({ ...r, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() })),
               JSON_HEADERS,
               ctx,
             )

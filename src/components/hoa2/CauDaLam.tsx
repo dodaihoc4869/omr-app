@@ -3,7 +3,7 @@
 // một dòng đề · "Em chọn: Sai · Đáp án: Đúng" · lịch ôn + "Xem lời giải". Chi tiết lấy qua `hoa2-cau-chi-tiet` cho các câu đang lọc
 // (máy chủ chỉ trả câu em ĐÃ làm). Bấm thẻ ⇒ thẻ trắng: đề + lựa chọn + LỜI GIẢI bằng ĐÚNG thành phần chuẩn `TheCau` chế độ `xem_lai`
 // (lời giải thô đọc qua `chuanHoaLoiGiaiCau`) — KHÔNG vẽ khối lời giải thứ hai — rồi lịch sử làm câu.
-// Nút chính "Tải PDF · N câu đang lọc" (thầy chốt 28/09): lấy chi tiết (≤ 60 câu/lượt) → `dungPdf` (pdf-cau-da-lam.ts, nạp lười) dựng
+// Nút "Tải PDF · N câu" (thầy chốt 28/09; đợt 18 thầy 12/10: hàng tải gọn — hai nút vừa, bỏ dòng chữ nhỏ giải thích): lấy chi tiết (≤ 60 câu/lượt) → `dungPdf` (pdf-cau-da-lam.ts, nạp lười) dựng
 // TỆP .pdf thật đúng bản vẽ HS-PDF → tải về `cau-da-lam-<bộ-lọc>-<ngày>.pdf`. Máy yếu không dựng được thì còn nút "Mở bản in" (đường cũ).
 // Bản NGANG (docs/ban-ve-ngang-2809/Ngang-CauDaLam): cột trái bộ lọc + danh sách gọn, cột phải chi tiết câu đang chọn (cùng khối
 // TheCau xem_lai), Tải PDF lên hàng trên. Điểm ngắt: bo-cuc-ngang.ts. Điện thoại dọc giữ nguyên.
@@ -13,7 +13,7 @@ import TheCau from '../TheCau'
 import KhungXemPhieu from '../KhungXemPhieu'
 import { ChemText } from '../../lib/chem-format'
 import '../m3'
-import { taiCauDaLam, taiChiTiet, type CauDaLamMuc, type ChiTietCau, type KetQuaCauDaLam } from './api'
+import { taiCauDaLam, taiChiTiet, type CauDaLamMuc, type ChienDichCau, type ChiTietCau, type KetQuaCauDaLam } from './api'
 import { NHAN_TRANG_THAI, NHAN_TU_LUAN, cauLuyenTuChiTiet, chiSoDuoiRo, chuLanLam, chuLanLamTuLuan, dauCau, ngayGanNhat, propsTheCau, tomTatThe } from './cau-chuyen'
 import { gioThuNgay, thuNgayThang } from './thoi-gian'
 import { useBoCucNgang } from './bo-cuc-ngang'
@@ -29,6 +29,21 @@ export const BO_LOC: { id: BoLoc; nhan: string; hop: (c: CauDaLamMuc) => boolean
   { id: 'thanh_thao', nhan: 'Thành thạo', hop: (c) => !c.tuLuan && c.trangThai === 'thanh_thao' },
   { id: 'can_day_lai', nhan: 'Cần thầy dạy lại', hop: (c) => !c.tuLuan && c.trangThai === 'can_day_lai' },
 ]
+
+/** ĐỢT 18 (thầy 12/10, ô chọn "Chiến dịch" của Câu đã làm: "chỉ giữ lại bài đã chọn là bài 8, các phần dưới xóa bỏ nhé"): Hành trình
+ *  (mã `hanh-trinh-…` như `laHanhTrinh` của máy chủ, tên "Hành trình…", hay hạn giả 9999) KHÔNG vào ô chọn. */
+export function laHanhTrinhCd(c: Pick<ChienDichCau, 'id' | 'ten' | 'hanNop'>): boolean {
+  return /^hanh-trinh/i.test(c.id) || /^hành trình/i.test(c.ten.trim()) || (c.hanNop || '') >= '9999'
+}
+/** Tên thật để hiện cho em: không rỗng, không phải tên mặc định "Chiến dịch" của bộ đọc, không phải mã nội bộ ("#cd12009c1c2", chính mã id). */
+export function coTenThat(c: Pick<ChienDichCau, 'id' | 'ten'>): boolean {
+  const t = c.ten.trim()
+  return !!t && t !== 'Chiến dịch' && t !== c.id && !t.startsWith('#') && !/^[a-z]{0,4}[-_]?[0-9a-f]{8,}$/i.test(t)
+}
+/** Các mục được hiện trong ô chọn (giữ thứ tự máy chủ). */
+export function chienDichHienChon<T extends Pick<ChienDichCau, 'id' | 'ten' | 'hanNop'>>(ds: readonly T[]): T[] {
+  return ds.filter((c) => !laHanhTrinhCd(c) && coTenThat(c))
+}
 
 /** Xếp theo lần làm gần nhất (mới trước), cùng ngày thì theo số câu. */
 export function xepCau(ds: CauDaLamMuc[]): CauDaLamMuc[] {
@@ -134,7 +149,10 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
   }, [token, luot])
   useEffect(() => xoaCauDaLamSom, []) // rời màn ⇒ bỏ lệnh sớm chưa ai nhận
 
-  const dsChienDich = du && du.cheDo2 ? du.chienDich : []
+  const dsChienDichGoc = useMemo(() => (du && du.cheDo2 ? du.chienDich : []), [du])
+  // Ô chọn chỉ có bài thật (bỏ Hành trình, bỏ mục mang mã nội bộ). Không còn bài nào ⇒ màn vẫn dùng danh sách gốc để em thấy câu, chỉ ẩn ô chọn.
+  const dsBai = useMemo(() => chienDichHienChon(dsChienDichGoc), [dsChienDichGoc])
+  const dsChienDich = dsBai.length > 0 ? dsBai : dsChienDichGoc
   const tatCaCau = du && du.cheDo2 ? du.cau : []
   // Mặc định: chiến dịch mới nhất có câu em đã làm (máy chủ xếp mới trước).
   const cdHienTai = useMemo(() => {
@@ -142,6 +160,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
     return (dsChienDich.find((c) => tatCaCau.some((q) => q.chienDichId === c.id)) ?? dsChienDich[0])?.id ?? ''
   }, [cdChon, dsChienDich, tatCaCau])
   const cd = dsChienDich.find((c) => c.id === cdHienTai) ?? null
+  /** Tên in lên tệp PDF / bản in — mã nội bộ không bao giờ ra tới em. */
+  const tenCdHien = cd && coTenThat(cd) ? cd.ten : ''
   const cauCd = useMemo(() => xepCau(tatCaCau.filter((c) => c.chienDichId === cdHienTai)), [tatCaCau, cdHienTai])
   const dem = useMemo(() => Object.fromEntries(BO_LOC.map((b) => [b.id, cauCd.filter(b.hop).length])) as Record<BoLoc, number>, [cauCd])
   const boLoc = BO_LOC.find((b) => b.id === loc)!
@@ -211,7 +231,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
   const taiPdf = async (chiDe = false) => {
     if (pdf.dang || dsLoc.length === 0) return
     const ds = dsLoc
-    const tenCd = cd?.ten ?? ''
+    const tenCd = tenCdHien
     setPdf({ ...PDF_TRONG, dang: true, chu: `Đang lấy ${ds.length} câu…` })
     let buoc: 'lay' | 'dung' = 'lay'
     try {
@@ -255,7 +275,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
       })
       if (cauIn.length === 0) throw new Error('Máy chủ chưa trả được câu nào để in. Em thử lại sau ít phút.')
       const { dungPhieu } = await import('../../lib/html-phieu')
-      const tenCd = cd?.ten ?? 'Câu đã làm'
+      const tenCd = tenCdHien || 'Câu đã làm'
       const html = dungPhieu(
         {
           hoTen,
@@ -287,7 +307,12 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
   const chonNgang = ngang ? (mo && dsLoc.some((c) => c.qid === mo) ? mo : (dsLoc[0]?.qid ?? null)) : null
 
   // ── các mảnh dùng chung bản dọc và bản ngang ──
-  const chonCd = dsChienDich.length > 0 && (
+  // Một bài ⇒ tiêu đề trơn (không hộp chọn); không bài nào ⇒ không có gì; từ hai bài ⇒ hộp chọn như cũ.
+  const chonCd = dsBai.length === 0 ? null : dsBai.length === 1 ? (
+    <p className="h2-cdl-bai">
+      <b>{dsBai[0]!.ten}</b> · {dsBai[0]!.tong} câu
+    </p>
+  ) : (
     <div className="h2-cdl-chon">
       <span className="h2-cdl-chon-hien" aria-hidden="true">
         <span className="h2-cdl-chon-chu">
@@ -306,7 +331,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
           setMo(null)
         }}
       >
-        {dsChienDich.map((c) => (
+        {dsBai.map((c) => (
           <option key={c.id} value={c.id}>
             {c.ten} · {c.tong} câu
           </option>
@@ -360,7 +385,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
       )}
       {trangThaiDs === 'tat' && (
         <div className="h2-cdl-thong-bao">
-          <p>Mục Câu đã làm chưa mở cho em. Khi thầy bật chiến dịch, câu em làm sẽ hiện ở đây.</p>
+          <p>Mục Câu đã làm chưa mở cho em.</p>
         </div>
       )}
       {trangThaiDs === 'trong' && (
@@ -403,7 +428,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
           <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
         </svg>
-        {pdf.dang ? pdf.chu : `Tải PDF · ${dsLoc.length} câu đang lọc`}
+        {pdf.dang ? pdf.chu : `Tải PDF · ${dsLoc.length} câu`}
       </button>
       {/* Chế độ CHỈ ĐỀ (thầy 28/09): tờ sạch để em in ra làm lại — không đáp án, không lời giải. */}
       {!pdf.dang && (
@@ -411,7 +436,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
             <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h5" />
           </svg>
-          Tải chỉ đề · để làm lại
+          Tải đề làm lại
         </button>
       )}
     </div>
@@ -586,7 +611,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
                 {thanMo(cauChon, tinChon)}
               </>
             ) : (
-              <p className="h2-cdl-ng-trong">{trangThaiDs === 'co' ? 'Em chọn một câu ở danh sách bên trái để xem đề, đáp án và lời giải.' : ''}</p>
+              <p className="h2-cdl-ng-trong" />
             )}
           </section>
         </div>
@@ -644,7 +669,6 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
           {tinPdf}
           {nutPdf}
           {nutDuPhong}
-          <span className="h2-cdl-nhac">Tệp PDF tải thẳng về máy: đề đầy đủ, đáp án, lời giải và lịch sử từng câu. Chạy trên điện thoại và máy tính.</span>
         </footer>
       )}
 

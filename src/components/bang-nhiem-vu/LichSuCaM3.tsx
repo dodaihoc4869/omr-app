@@ -49,8 +49,7 @@ export default function LichSuCaM3({
   return (
     <div className="lsc">
       <div className="lsc-tieu">
-        <h2 className="lsc-h">Lịch sử ca kiểm tra & Báo cáo kết quả</h2>
-        <p className="lsc-phu">Xem điểm chi tiết và báo cáo học tập của tất cả các ca kiểm tra em đã tham gia</p>
+        <h2 className="lsc-h">Lịch sử ca kiểm tra</h2>
       </div>
 
       {dangTai ? (
@@ -63,7 +62,6 @@ export default function LichSuCaM3({
         <div className="lsc-trong">
           <Award size={40} aria-hidden="true" />
           <h3 className="lsc-trong-ten">Chưa có ca kiểm tra nào</h3>
-          <p className="lsc-phu">Em chưa tham gia ca kiểm tra nào trên hệ thống hoặc ca kiểm tra chưa được đồng bộ.</p>
         </div>
       ) : (
         <div role="region" aria-label="Lịch sử ca kiểm tra và báo cáo" className="lsc-ds">

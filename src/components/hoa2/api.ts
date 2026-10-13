@@ -590,10 +590,11 @@ function baoSanhDaVe(): void {
  * Phản hồi `hoa2-sanh` đã HỎI SỚM và ĐÃ VỀ trước khi Sảnh dựng (src/lib/hoi-som.ts) ⇒ đọc đồng bộ để lượt vẽ ĐẦU có số ngay, không qua
  * trạng thái "đang tải". Chỉ nhận phản hồi `ok:true` đọc chặt đủ phần (`docSanh`); còn lại ⇒ null, đi đường thường (gửi/nhận như cũ).
  */
-function sanhHoiSom(token: string | undefined): { than: string; kq: KetQuaSanh } | null {
+const duongSanh = (tapTrung: boolean) => (tapTrung ? '/game-v2/hoc-tap-sanh' : '/game-v2/hoa2-sanh')
+function sanhHoiSom(token: string | undefined, tapTrung: boolean): { than: string; kq: KetQuaSanh } | null {
   if (!token) return null
   const than = JSON.stringify({ token })
-  const x = xemHoiSomDaVe('/game-v2/hoa2-sanh', than)
+  const x = xemHoiSomDaVe(duongSanh(tapTrung), than)
   if (!x || !x.ok) return null
   try {
     const o = JSON.parse(x.text) as unknown
@@ -612,7 +613,8 @@ function sanhHoiSom(token: string | undefined): { than: string; kq: KetQuaSanh }
  */
 export function useSanhHoa2(token: string | undefined, sbd: string | undefined, lamMoi: number, tapTrung = false): TrangThaiSanh & { taiLai: () => void } {
   const som = useRef<{ than: string; kq: KetQuaSanh } | null | undefined>(undefined)
-  if (som.current === undefined) som.current = sbd && !tapTrung ? sanhHoiSom(token) : null
+  // 13/10: Hôm nay (`tapTrung`) cũng nhận phản hồi hỏi sớm — đoạn mã nội tuyến / đăng nhập nay hỏi sớm đúng `hoc-tap-sanh`.
+  if (som.current === undefined) som.current = sbd ? sanhHoiSom(token, tapTrung) : null
   const kqDem = useRef<KetQuaSanh | null | undefined>(undefined)
   if (kqDem.current === undefined) kqDem.current = docNhoKetQuaSanh(sbd)
 
@@ -658,7 +660,7 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
     if (daCo) {
       // Lượt hỏi lúc dựng = lượt đã hỏi sớm: nhận nó (lượt sau gửi thật), ghi nhớ chế độ như khi gửi thường.
       som.current = null
-      danhDauDaNhan('/game-v2/hoa2-sanh', daCo.than)
+      danhDauDaNhan(duongSanh(tapTrung), daCo.than)
       ghiNhoCheDo2(sbd, daCo.kq.cheDo2)
       ghiNhoKetQuaSanh(sbd, daCo.kq)
       return

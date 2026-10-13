@@ -58,7 +58,6 @@ export default function DaiCauChuaLamM3({
         <>
           <div className="thi-dai-chua-lam-dau">
             <span className="thi-dai-chua-lam-so">Còn {chuaLam.length} câu chưa làm</span>
-            <span className="thi-dai-chua-lam-goi-y">chạm số để tới câu</span>
           </div>
           <HangSo ds={chuaLam} danhDau={dd} onToiCau={onToiCau} onMoLuoi={onMoLuoi} kieu="chua-lam" />
         </>

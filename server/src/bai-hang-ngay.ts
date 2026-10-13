@@ -33,7 +33,8 @@ import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { chonTuGiaTri, chuanMucDo, sqlLuotCaDaCongBo, tieuDeCau, type NguoiDocSo } from './lich-su-lam-cau'
 import { docCauKho, tenCuaDang } from './omni-d1'
 import { chuoiDuGanNhat, laLuoiTheoTiLe, tomTatNhip } from './nhip-hoc-luat'
-import { CACH_TINH_TIN_CAY, doTinCayTinHieu, tinCayKetLuan, type SoLieuThaiDo } from './thai-do-tin-cay'
+import { CACH_TINH_TIN_CAY, doTinCayTinHieu, tinCayKetLuan, tinCayNhomNhip, type SoLieuThaiDo } from './thai-do-tin-cay'
+import { bacChamChi } from './bac-cham-chi'
 
 type Row = Record<string, unknown>
 type Tang = 1 | 2 | 3 | 4
@@ -731,7 +732,9 @@ export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: numb
     .then((m) => m.docNgayVao(env, [{ ...em, goi7Tu: null }], tu))
     .then((m) => m.get(sbd) ?? tu)
     .catch(() => tu)
-  const nhip = tomTatNhip(keHoach.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam })), homNay)
+  const ngayNhip = keHoach.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam }))
+  const nhip = tomTatNhip(ngayNhip, homNay)
+  const bacCham = bacChamChi(ngayNhip, homNay, nhip)
   // 5c · CHỈ THÊM 12/10 đợt 16 — tự sửa câu sai, CHỈ ĐỂ XEM (không vào tín hiệu / kết luận): lượt trong khoảng (đã sắp cũ → mới), quy câu gốc;
   // câu "đã sửa" = có lượt ĐÚNG sau lượt sai đầu tiên. Từ sổ đã đọc, không truy vấn thêm.
   const tungSaiTrong = new Set<string>(), daSua = new Set<string>()
@@ -779,7 +782,7 @@ export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: numb
     // Bản học sinh: bỏ ghi chú nội bộ của thầy (Gói 7 chưa đọc được, khoảng ngày bị nắn, sổ Hành trình…), chỉ giữ dòng "sổ bị cắt" nói với em.
     canhBao: nguoiDoc === 'hoc-sinh' ? (chuCat ? [chuCat] : []) : canhBao,
     nhomNhip: nhip.nhom, coDoiPho: ketLuan.nhan === 'doi-pho', chuoiDuGanNhat: nhip.chuoiDuGanNhat,
-    cachTinhTinCay: CACH_TINH_TIN_CAY, tuSuaSai,
+    cachTinhTinCay: CACH_TINH_TIN_CAY, tuSuaSai, tinCayNhom: tinCayNhomNhip(nhip), ...(bacCham ? { bacCham } : {}),
   }
 }
 

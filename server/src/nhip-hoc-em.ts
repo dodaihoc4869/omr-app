@@ -16,18 +16,19 @@
 //   bố / đã xoá (`SQL_LUOT_GOI7`) — % đúng của nhóm quá nhanh không được lộ kết quả ca chưa công bố. Chỉ trả SỐ ĐẾM: không mã câu, không đáp án.
 // PHỤ HUYNH (12/10 đợt 16, thầy: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): `/ph/nhip-hoc` (ph-ho-so-con.ts) gọi ĐÚNG lõi
 //   `nhipHocCuaEm` sau cổng phụ huynh ⇒ cùng hợp đồng, cùng luật bảo mật như bản em.
-// ĐỘ TIN CẬY (12/10 đợt 16): `doTinCay` / `canThem` của nhóm — phép thuần `tinCayNhanNgay` (thai-do-tin-cay.ts); nhóm KHÔNG đổi.
+// ĐỘ TIN CẬY (12/10 đợt 16): `doTinCay` / `canThem` của nhóm — phép thuần `tinCayNhanNgay` (thai-do-tin-cay.ts); nhóm KHÔNG đổi. Từ 13/10 đợt 18 gọi qua
+//   `tinCayNhomNhip` (nhip-hoc.ts) — MỘT hàm với từng dòng em của `/gv/nhip-hoc` ⇒ thầy và em cùng một số.
 import type { Env } from './kieu'
 import { NGUONG_THAI_DO as NG } from './bai-hang-ngay-kieu'
-import type { KetQuaNhipHocEm, NhomNhip, TocDoNhipEm, TraLoiNhipHocEm } from './nhip-hoc-kieu'
+import type { KetQuaNhipHocEm, TocDoNhipEm, TraLoiNhipHocEm } from './nhip-hoc-kieu'
 import { khoangNgay, ngayBaiCuaMotEm } from './bai-hang-ngay'
-import { docNgayVao } from './nhip-hoc'
+import { docNgayVao, ngayDuocTinh, tinCayNhomNhip } from './nhip-hoc'
+import { bacChamChi } from './bac-cham-chi'
 import { tomTatNhip, viecTiepNhip } from './nhip-hoc-luat'
 import { gameIdentity } from './game-v2-auth'
 import { SQL_LUOT_GOI7 } from './goi-bai-7'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docCauKho } from './omni-d1'
-import { tinCayNhanNgay } from './thai-do-tin-cay'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -105,9 +106,6 @@ export async function hsNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<T
   return nhipHocCuaEm(env, sbd, nowMs, LOI_NHIP_EM)
 }
 
-/** Nhóm theo ngày ⇒ nhãn của luật kết luận (cùng ba nhóm, tên khác nhau ở hai hợp đồng). */
-const NHAN_CUA_NHOM: Readonly<Record<Exclude<NhomNhip, 'chua-du'>, 'cham-chi' | 'chua-deu' | 'luoi'>> = { cham: 'cham-chi', 'chua-deu': 'chua-deu', luoi: 'luoi' }
-
 /**
  * LÕI bảng "Nhịp học" của MỘT em đã xác thực (12/10 đợt 16: tách để `/ph/nhip-hoc` — ph-ho-so-con.ts — trả ĐÚNG bản em thấy, không phép tính thứ hai).
  * `sbd` đã kiểm ở nơi gọi (em ⇒ token học sinh; phụ huynh ⇒ `sbdCuaPhuHuynh`). `loi` = câu báo khi đọc hỏng (em / phụ huynh xưng hô khác nhau).
@@ -125,8 +123,9 @@ export async function nhipHocCuaEm(env: Env, sbd: string, nowMs: number, loi: st
     ])
     if (!ngay) return { ok: false, error: loi }
     const vao = vaoMap.get(sbd) ?? tu
-    const dai = ngay.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam }))
+    const dai = ngayDuocTinh(ngay, vao)
     const t = tomTatNhip(dai, homNay)
+    const bac = bacChamChi(dai, homNay, t)
     const kq: KetQuaNhipHocEm = {
       ok: true,
       tu: vao > den ? den : vao,
@@ -145,9 +144,9 @@ export async function nhipHocCuaEm(env: Env, sbd: string, nowMs: number, loi: st
       tocDo,
       viecTiep: viecTiepNhip(t),
       // CHỈ THÊM 12/10 đợt 16: độ tin cậy của nhóm — cùng phép với hồ sơ thái độ (thai-do-tin-cay.ts); nhóm vẫn do `tomTatNhip` quyết.
-      ...(t.nhom === 'chua-du'
-        ? {}
-        : tinCayNhanNgay(NHAN_CUA_NHOM[t.nhom], { n: t.soNgayQua, du: t.soNgayDu, chuoiKhongLam: t.chuoiKhongLam?.dai ?? 0, chuoiDuGanNhat: t.chuoiDuGanNhat })),
+      ...tinCayNhomNhip(t),
+      // CHỈ THÊM 13/10: bậc 1–12 + điểm chăm — cùng phép với dòng em ở `/gv/nhip-hoc`.
+      ...(bac ? { bacCham: bac } : {}),
     }
     return kq
   } catch (e) {

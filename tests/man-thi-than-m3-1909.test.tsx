@@ -16,13 +16,13 @@ describe('DaiCauChuaLamM3', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('"Còn N câu chưa làm" + gợi ý; tối đa 6 số, rồi ô "+K" mở lưới; số đầu = câu kế tiếp; tên từng nút cho trình đọc màn hình', () => {
+  it('"Còn N câu chưa làm" (đợt 18: bỏ dòng gợi ý "chạm số để tới câu"); tối đa 6 số, rồi ô "+K" mở lưới; số đầu = câu kế tiếp; tên từng nút cho trình đọc màn hình', () => {
     expect(SO_CAU_TOI_DA_TREN_DAI).toBe(6)
     const cho = Array.from({ length: 12 }, (_, i) => i + 1)
     const { container } = render(<DaiCauChuaLamM3 chuaLam={cho} onToiCau={() => {}} onMoLuoi={() => {}} />)
     expect(screen.getByRole('region', { name: 'Còn 12 câu chưa làm' })).toBeTruthy()
     expect(container.querySelector('.thi-dai-chua-lam-so')!.textContent).toBe('Còn 12 câu chưa làm')
-    expect(container.querySelector('.thi-dai-chua-lam-goi-y')!.textContent).toBe('chạm số để tới câu')
+    expect(container.querySelector('.thi-dai-chua-lam-goi-y')).toBeNull()
     const nut = [...container.querySelectorAll('button')]
     expect(nut.map((b) => b.textContent)).toEqual(['1', '2', '3', '4', '5', '6', '+6'])
     expect(nut.filter((b) => b.getAttribute('data-ke-tiep')).map((b) => b.textContent)).toEqual(['1'])

@@ -1,4 +1,4 @@
-import { useId, type CSSProperties } from 'react'
+import { Suspense, useId, type CSSProperties } from 'react'
 import { ChevronRight, Clock, Eye } from 'lucide-react'
 import {
   chuDaiOEm,
@@ -16,6 +16,7 @@ import {
   type KetQuaNhipHocApp,
   type KetQuaNhipHocEm,
 } from '../../lib/nhip-hoc-em'
+import { ThangBacNhipLuoi } from '../bac-cham-chi/nap'
 import './bang-nhip-hoc.css'
 
 // BẢNG "NHỊP HỌC" (Lười / Chăm) DÙNG CHUNG — tách nguyên văn từ phần dưới thẻ "Hôm nay của em" (TheHomNayEm.tsx, 12/10E) để app PHỤ HUYNH vẽ CÙNG bảng
@@ -26,6 +27,8 @@ import './bang-nhip-hoc.css'
 //     bảng này.". Không mã nội bộ, không số bịa.
 //   · Có `onMoHoSo` ⇒ khối dải ngày là MỘT nút "Xem hồ sơ làm bài của em/của con" (mở tấm `HoSoLamCauEm`).
 //   · Máy chủ gửi `doTinCay` (đợt 16, tuỳ chọn) ⇒ một dòng "Độ tin cậy N%"; dưới 90% ⇒ "kết luận tạm, đang theo dõi" + câu `canThem`. Vắng ⇒ không dòng.
+//   · 13/10 — máy chủ gửi `bacCham` ⇒ đầu bảng là THANG 12 BẬC (từ Lười đến Chăm, mỗi bậc một màu) + "Còn N điểm lên …" (khối nạp khi cần
+//     src/components/bac-cham-chi/). Vắng ⇒ không có gì, bảng y như trước. Chip bậc nằm cạnh tên nhóm ở đầu thẻ (TheHomNayEm / NhipHocCon).
 // Màu: lớp `ht2-hn-*` — app học sinh tô ở hoc-tap.css; app phụ huynh tô ở ph-v3/nhip-hoc-con.css (biến --ph3-* sẵn có).
 
 export type NgoiNhip = 'em' | 'con'
@@ -95,6 +98,12 @@ export default function BangNhipHoc({ k, onMoHoSo, ngoi = 'em' }: { k: KetQuaNhi
   )
   return (
     <div className="ht2-hn-nhip" role="group" aria-label={laCon ? 'Nhịp học của con' : 'Nhịp học của em'}>
+      {k.bacCham && (
+        // giữ chỗ đúng chiều cao thang khi khối bậc chưa nạp xong (không xô lệch)
+        <Suspense fallback={<span aria-hidden="true" style={{ display: 'block', minHeight: 30 }} />}>
+          <ThangBacNhipLuoi k={k} />
+        </Suspense>
+      )}
       {onMoHoSo ? (
         <button
           type="button"

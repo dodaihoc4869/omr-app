@@ -89,7 +89,7 @@ async function dangNhapGoi(scriptUrl: string, sbd: string, matKhau: string | und
     const res = await fetchCoHan(`${base}/hs/dang-nhap`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ sbd: sbd.trim(), matKhau: (matKhau ?? '').trim(), ...(kemSanh ? { kemSanh: true } : {}) }),
+      body: JSON.stringify({ sbd: sbd.trim(), matKhau: (matKhau ?? '').trim(), ...(kemSanh ? { kemSanh: 'hoc-tap' } : {}) }),
     }, HAN_GIAY)
     // Máy chủ mới trả THEO LUỒNG khi đăng nhập thành công + xin kèm Sảnh (kiểu NDJSON); mọi trường hợp khác (sai mật khẩu, máy chủ cũ) vẫn là MỘT khối JSON như cũ.
     if (kemSanh && /ndjson/i.test(res.headers.get('content-type') ?? '') && res.body) return await docLuongDangNhap(res)

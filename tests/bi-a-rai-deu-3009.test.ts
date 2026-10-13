@@ -7,7 +7,7 @@
 //       Câu chốt chỉ khi còn ≥ 2 câu; (3) "Trả lời câu hỏi" cùng luật; (4) Sảnh đếm đúng luật mới.
 // Kèm bản CHẠY VỚI RẢI ĐỀU BẬT (mặc định) của hai test cũ tests/bi-a-cau-da-lam.test.ts và tests/bi-a-giu-cau-3009.test.ts (bản cũ đặt raiDeu:false).
 // D1 thật (node:sqlite, lược đồ đủ migration).
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { layKeHoachHomNay, qidGoc } from '../server/src/srs2-d1'
@@ -15,7 +15,7 @@ import { biaAction, biaChoSanh, laCauMoiKeHoach, LOI_BIA, tinhTranBia } from '..
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
-import { ghiSuKien } from '../server/src/su-kien-hoc'
+import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
 
 const NGAY = 86_400_000
@@ -45,7 +45,7 @@ function fixture(soCau = 45) {
 /** Giao chiến dịch với RẢI ĐỀU mặc định (không truyền raiDeu). Hạn còn `ngayHan` ngày ⇒ quota câu mới = ceil(số câu / (ngayHan + 1 − 3)). */
 async function giao(env: Env, ngayHan = 5) {
   const nay = Date.now()
-  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: new Date(nay + ngayHan * NGAY).toISOString().slice(0, 10) }, nay - 3 * NGAY)
+  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: ngayVn(nay + ngayHan * NGAY) }, nay - 3 * NGAY)
   expect(r.ok).toBe(true)
 }
 /** Câu ôn (nợ) hôm nay: em sai từ hôm qua. */
@@ -79,7 +79,16 @@ async function lamHetBangTraLoi(env: Env, nay: number): Promise<{ qids: string[]
   throw new Error('Trả lời câu hỏi không dừng')
 }
 
-beforeEach(() => xoaDemCaBaoVe())
+// NỢ TEST 13/10 — NGUYÊN NHÂN GỐC: test đọc đồng hồ THẬT và ghi hạn nộp bằng ngày UTC (`toISOString().slice(0, 10)`), còn máy chủ đếm ngày theo lịch
+// Việt Nam (+07:00) ⇒ chạy từ 00:00 tới 06:59 giờ VN thì hạn hụt MỘT ngày (quota rải đều lớn hơn, trần Bi-a ≥ 8, kế hoạch khác) ⇒ đỏ. Sửa: hạn nộp tính
+// theo ngày VN (`ngayVn`) + ĐỒNG HỒ CỐ ĐỊNH (12:00 thứ Tư 14/10 giờ VN; chỉ giả `Date`, hẹn giờ thật) ⇒ kết quả không đổi theo giờ chạy.
+const GIO_CO_DINH = Date.parse('2026-10-14T05:00:00Z')
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(GIO_CO_DINH)
+  xoaDemCaBaoVe()
+})
+afterEach(() => vi.useRealTimers())
 
 describe('Thầy 30/09: Bi-a rải câu ôn lại đúng tỉ lệ trần 40% trên TOÀN BỘ kế hoạch (rải đều bật)', () => {
   it('kế hoạch có cả câu mới (quota rải đều) lẫn nợ: Sảnh = floor(40% cả kế hoạch), chia mới : ôn theo tỉ lệ kế hoạch; hoa2-sanh cùng số', async () => {
@@ -251,7 +260,7 @@ describe('[rải đều bật] Câu đã làm có câu em trả lời trong Bi-a
       d.sql.exec("INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,lop,cong_bo,thoi_gian_phut,cap_nhat_luc) VALUES('C1','KT','dong','thi','12A1','ngay',45,'x')")
       const hqua = new Date(Date.now() - NGAY).toISOString()
       const sk = d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES (?,?,?,'thi','C1',1,0,30,?,?)")
-      for (let i = 1; i <= 5; i++) sk.run(`thi|C1|S1|X${i}`, 'S1', `X${i}`, hqua, hqua.slice(0, 10))
+      for (let i = 1; i <= 5; i++) sk.run(`thi|C1|S1|X${i}`, 'S1', `X${i}`, hqua, ngayVn(hqua))
     }
     // Rải đều BẬT (mặc định): hạn còn 4 ngày ⇒ quota ceil(20 / 2) = 10 câu mới/ngày ⇒ trần Bi-a ≥ 4 (Câu chốt + 3 bi).
     await giao(env, 4)

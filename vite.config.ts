@@ -90,6 +90,8 @@ function napTruocManEm(): Plugin {
           .map((f) => goc + f)
         const bang = {
           katex: dsCua('/src/lib/katex-goi.ts'),
+          // Ảnh lớn nhất của màn đăng nhập học sinh (LoiChao: `anhThu(1, 50)`) — nạp trước khi máy chưa đăng nhập (tests/may-yeu-mo-app-1310 khoá đúng đường).
+          anhDangNhapHs: '/than-thu-v2/nho/thu-1-3.webp',
           thi: ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
           hs: ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo),
           ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), app),

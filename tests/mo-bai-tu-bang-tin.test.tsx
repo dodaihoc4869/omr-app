@@ -48,7 +48,7 @@ it.each(['chua_lam','dang_lam'])('nút đỏ trong danh sách Mom hoạt động
 it.each(['moi','xem','lamlai'])('BTVN mở đúng lượt và đúng chế độ: %s',async(mode)=>{
  const bt={maBtvn:'BT1',maCa:'CA1',soCau:1,tenBtvn:'Bài test',hanNop:new Date(Date.now()+86400000).toISOString(),daNop:mode!=='moi',soLanLamLaiConLai:3}
  mocks.items=[bt]
- render(<StudentPortalScreen/>);/* Trùng tu 11/10: Bài tập về nhà ở mục Kết quả */fireEvent.click(await screen.findByRole('button',{name:'Kết quả'}));fireEvent.click(await screen.findByRole('button',{name:/^Bài tập về nhà/}))
+ render(<StudentPortalScreen/>);/* SỬA CÓ CHỦ ĐÍCH 13/10 (thầy: "Bỏ phần btvn ở đây" — tab Kết quả không còn Bài tập về nhà; lối vào duy nhất ở Hôm nay › Ôn và sửa) */fireEvent.click(await screen.findByRole('button',{name:/^Bài tập về nhà/}))
  const name=mode==='moi'?'Vào làm bài':mode==='xem'?/Xem lại/:/Làm lại/
  fireEvent.click(await screen.findByRole('button',{name}))
  if(mode==='lamlai')fireEvent.click(await screen.findByRole('button',{name:'Làm lại bài'}))

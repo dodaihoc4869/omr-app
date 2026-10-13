@@ -3,7 +3,7 @@
 // Thẻ câu chuẩn (`TheCauAi` = TheCau chế độ 'thi'), chấm ở MÁY CHỦ qua `answer` chung (đáp án chỉ về SAU khi chốt), lời giải `KhoiLoiGiai`,
 // "+N EXP" bay vào thần thú theo số máy chủ (`expCau`, luật v5). Hỏi thầy trước khi chốt ⇒ câu tính "có trợ giúp" (không EXP).
 // Hết lượt câu ⇒ xin lượt sau; hết câu ⇒ báo đúng chữ của Bi-a (het_tran…). Câu đã trả lời ở đây không hỏi lại trong ván bi-a hôm đó.
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { KhoiLoiGiai, TheCauAi } from '../than-thu-v2/dao2/TrongAi'
 import { docGoiY, docVai } from '../than-thu-v2/dao2/dao2-core'
 import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
@@ -20,7 +20,7 @@ interface Luot { session: string; cau: CauBia[]; tran: { con: number; tong: numb
 const TEN_PHAN: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
 
 export default function TraLoiCau({ token, onVe }: TraLoiCauProps) {
-  useEffect(() => giuTrangKhongTaiLai(), []) // đang trả lời câu ⇒ app không tự tải lại vì bản mới (30/09)
+  useLayoutEffect(() => giuTrangKhongTaiLai(), []) // đang trả lời câu ⇒ app không tự tải lại vì bản mới (30/09); giữ ngay trong lượt dựng (13/10)
   const [luot, setLuot] = useState<Luot | null>(null)
   const [viTri, setViTri] = useState(0)
   const [het, setHet] = useState('')

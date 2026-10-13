@@ -1,7 +1,7 @@
 // BI-A PHẢN ỨNG GĐ2 · BÀN ONLINE: giữ kết nối phòng đấu cho cả phòng chờ lẫn ván; chuyển từng gói phòng tới đúng chỗ.
 //   'phong' ⇒ Phòng chờ · 'bat_dau' ⇒ xếp câu cho đúng bi ghế em (`bia-xep-ban`) rồi 'san_sang' · 'tt' ⇒ màn chơi (`VanMang`) · 'nhan' · 'loi'.
 // Câu đã xếp cất ở sessionStorage theo mã ván: tải lại trang giữa ván vẫn trả lời được câu của mình.
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { diaChiPhong, xepBanOnline, type VeVaoBan, type XepOnline } from './api'
 import { KetNoiBan, type GoiPhong, type TrangThaiNoi } from './ket-noi'
 import ManChoi from './ManChoi'
@@ -29,7 +29,7 @@ export default function BanOnline({ token, hoTen, vao, conTran, onVe }: BanOnlin
   const choRef = useRef<GoiPhong[]>([])
   const daXep = useRef(false)
   const dauRef = useRef<GoiTT | null>(null)
-  useEffect(() => giuTrangKhongTaiLai(), []) // phòng chờ + ván online: app không tự tải lại vì bản mới (30/09)
+  useLayoutEffect(() => giuTrangKhongTaiLai(), []) // phòng chờ + ván online: app không tự tải lại vì bản mới (30/09); giữ ngay trong lượt dựng (13/10)
   // Mất mạng lâu (trạng thái 'mat') ⇒ có mạng lại / quay lại app thì TỰ nối lại đúng bàn bằng vé cũ (trước chỉ có nút "Nối lại").
   useEffect(() => {
     const thu = () => { const kn = knRef.current; if (kn && kn.trangThai === 'mat' && (typeof document === 'undefined' || document.visibilityState !== 'hidden')) kn.noiLai() }

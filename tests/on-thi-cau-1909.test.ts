@@ -2,13 +2,13 @@
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // VIỆC `on_thi` MANG DANH SÁCH CÂU (server/src/ke-hoach-ngay.ts + ke-hoach-ngay-d1.ts): câu lấy từ hồ sơ của em, lệnh lấy đề PHỤC VỤ ĐƯỢC, và cùng luồng
 // `/hs/cau-theo-qid` + `/hs/on-lai/nop` với on_lai (nên LamCauOn dùng chung). SQLite thật, lược đồ thật + mọi migration.
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
 import { layCauChoEm } from '../server/src/cau-theo-qid'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
-import { ghiSuKien } from '../server/src/su-kien-hoc'
+import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({
@@ -21,6 +21,15 @@ vi.mock('../server/src/game-v2-auth', async (orig) => ({
 
 const H = 3_600_000
 const D = 24 * H
+// NỢ TEST 13/10 — NGUYÊN NHÂN GỐC: test đọc đồng hồ THẬT; câu "sai HÔM NAY" ghi lúc now − 0,02 ngày (≈ 29 phút) ⇒ chạy từ 00:00 tới 00:28 giờ VN thì các lượt
+// ấy rơi sang HÔM QUA (ngày VN), thành câu ôn tới hạn / lệch hồ sơ ⇒ đỏ. Sửa: ĐỒNG HỒ CỐ ĐỊNH 12:00 thứ Tư 14/10 giờ VN (chỉ giả `Date`, hẹn giờ thật) và
+// lượt "hôm nay" (dưới 1 ngày trước) không lùi qua 00:00 giờ VN (`luc` dưới) — đổi giờ cố định sang sát nửa đêm vẫn đúng.
+const GIO_CO_DINH = Date.parse('2026-10-14T05:00:00Z')
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(GIO_CO_DINH)
+})
+afterEach(() => vi.useRealTimers())
 const cauKho = (qid: string) => ({
   qid, maDe: 'x', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'biet', sao: 1,
   kienThuc: ['K1'], correct: 'B', solution: 'Giải', reviewed: true,
@@ -38,7 +47,10 @@ function themCa(d: D1That, maCa: string, gio: number, qid: string[]) {
   xoaDemCaBaoVe() // test tự ghi bảng `ca` bằng SQL thô, không qua lệnh thật ⇒ tự xoá đệm (production có móc bất hoạt ở mọi lệnh sửa ca thật)
 }
 const themHs = (d: D1That) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','x','12','mk','x')").run()
-const luc = (soNgayTruoc: number) => new Date(Date.now() - soNgayTruoc * D).toISOString()
+const luc = (soNgayTruoc: number) => {
+  const t = Date.now() - soNgayTruoc * D
+  return new Date(soNgayTruoc < 1 ? Math.max(t, Date.parse(`${ngayVn(Date.now())}T00:00:00+07:00`)) : t).toISOString()
+}
 async function sai(d: D1That, qids: string[], soNgayTruoc: number) {
   const r = await ghiSuKien(d.env, qids.map((q, i) => ({ nguon: 'btvn' as const, maNguon: 'B', sbd: 'S1', qid: q, lan: i + 1, ketQua: 0 as const, luc: luc(soNgayTruoc) })))
   expect(r.ok).toBe(true)

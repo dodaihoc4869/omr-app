@@ -16,7 +16,7 @@ export default function ManLoiThay({ ds, loi, thuLai }: { ds: NhanXetCa[] | null
       ) : (
         <div className="ph3-luoi">
           {loi && <TheLoi chu={loi} thuLai={thuLai} />}
-          {ds?.length === 0 && <TheTrong id="ph3-nx-trong" tieuDe="Chưa có nhận xét của thầy" chu="Nhận xét của thầy hiện ở đây sau khi thầy công bố kết quả ca kiểm tra của con." />}
+          {ds?.length === 0 && <TheTrong id="ph3-nx-trong" tieuDe="Chưa có nhận xét của thầy" chu="Thầy chưa công bố nhận xét nào cho con." />}
           {ds?.map((x) => {
             const ngay = x.nopLuc || x.capNhatLuc || ''
             return (

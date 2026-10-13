@@ -6,10 +6,16 @@ import './hoc-tap.css'
 import TheGoi7 from './TheGoi7'
 import TheHomNayEm, { chuNutHoc } from './TheHomNayEm'
 import { soHomNay } from './lam-bai'
+import { useSoCauCanSua } from '../../lib/tu-sua-loi'
 
 // TRÙNG TU 11/10 (thầy duyệt bản vẽ https://claude.ai/artifact/5v8vXw5zBzw53FkpCvMknC — "buid và đẩy luôn nhé"):
 // 4 mục Hôm nay · Hành trình · Ôn & sửa · Kết quả; "Của em" là tấm mở từ ảnh đại diện; "Vào ca kiểm tra" luôn ở góc trên
 // (ca đang mở ⇒ dải ca + nút chính là Vào ca kiểm tra, "Tiếp tục học" lùi thành nút viền). Một màn — một nút chính; mọi việc khác là dòng.
+// ĐỢT 18 (13/10 — thầy: "Mời gọi học sinh tự sửa lỗi … Làm nổi bật phần tự sửa lỗi lên và mời gọi thân thiện" · "Tối ưu lại câu từ cho dễ hiểu ở mọi
+// [màn]. Bỏ hết các gợi ý hướng dẫn"): thẻ mời "Tự sửa lỗi" ngay dưới thẻ Hôm nay khi còn câu cần sửa (số có nhãn + MỘT nút viền "Sửa lỗi ngay" — nút
+// chính của màn vẫn là nút học); hết câu ⇒ thẻ ẩn, dòng "Tự sửa lỗi" thường hiện lại. Số từ `useSoCauCanSua` (src/lib/tu-sua-loi.ts — tải lười SAU khi
+// Hôm nay có số, nhớ trong phiên, lỗi ⇒ ẩn, không bao giờ chặn thẻ Hôm nay). Dòng việc: chữ phụ ngắn (không lời dặn); bỏ câu giải thích ở Hành trình
+// và tấm "Của em".
 type Muc = 'hom-nay' | 'hanh-trinh' | 'on-lai' | 'ket-qua'
 interface Props {
   dangLamMoi?: boolean; nguon?: string; onKetQua?: () => void; onLuyenLai?: () => void; onBangTin?: () => void;
@@ -20,6 +26,8 @@ interface Props {
   onTaiLai: () => void; onDangXuat: () => void; coCa: boolean
   /** Số bài tập về nhà thầy đang giao (dòng ở Hôm nay chỉ hiện khi > 0). */
   soBaiTap?: number
+  /** Có bài tập về nhà nào (kể cả đã nộp) ⇒ Hôm nay giữ lối vào để xem lại / làm lại. */
+  coBaiTap?: boolean
   /** Token phiên của em — phần Nhịp học của thẻ "Hôm nay của em" (12/10) đọc `/hs/nhip-hoc`; không có ⇒ phần ấy không hiện. */
   token?: string
   /** Có ⇒ khối Nhịp học trong thẻ "Hôm nay của em" bấm được, mở hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm"). */
@@ -37,14 +45,30 @@ export function chuViecGoi7(g: Pick<TomTatGoi7, 'tuLamCon' | 'tiepCanCon' | 'thi
   return `${g.tuLamCon} câu tự làm · ${g.tiepCanCon} câu học có hỗ trợ${g.thieuNgay > 0 ? ` · ${g.thieuNgay} câu chờ thầy bổ sung` : ''}`
 }
 
-/** Dòng việc: biểu tượng · tên · lý do · số (nếu có) · mũi tên. */
-function Dong({ ten, chu, icon: Icon, sac, so, donVi, onClick }: { ten: string; chu: string; icon: typeof Home; sac: 'cham' | 'vang' | 'muc'; so?: number; donVi?: string; onClick: () => void }) {
+/** Dòng việc: biểu tượng · tên · chữ phụ ngắn (nếu có) · số (nếu có) · mũi tên. */
+function Dong({ ten, chu, icon: Icon, sac, so, donVi, onClick }: { ten: string; chu?: string; icon: typeof Home; sac: 'cham' | 'vang' | 'muc'; so?: number; donVi?: string; onClick: () => void }) {
   return <button className="ht2-dong" onClick={onClick}>
     <span className="ht2-dong-bt" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>
-    <span className="ht2-dong-chu"><strong>{ten}</strong><small>{chu}</small></span>
+    <span className="ht2-dong-chu"><strong>{ten}</strong>{chu && <small>{chu}</small>}</span>
     {so !== undefined && <b className="ht2-dong-so">{so}<small> {donVi}</small></b>}
     <ChevronRight size={20} aria-hidden="true" className="ht2-dong-mui" />
   </button>
+}
+
+/** Tên mục Tự sửa lỗi (chữ của thầy 13/10) — MỘT tên ở Hôm nay, Ôn & sửa và đầu màn Tự sửa lỗi. */
+export const TEN_TU_SUA = 'Tự sửa lỗi'
+
+/** Thẻ mời Tự sửa lỗi ở Hôm nay: chỉ hiện khi biết chắc còn câu cần sửa (`so` > 0); 0 / chưa có số ⇒ không vẽ gì. */
+export function TheMoiTuSua({ so, onChua }: { so: number | null; onChua: () => void }) {
+  if (!so || so <= 0) return null
+  return <section className="ht2-moi-sua" aria-labelledby="ht2-moi-sua-tieu">
+    <span className="ht2-moi-sua-bt" aria-hidden="true"><PenLine size={24} /></span>
+    <div className="ht2-moi-sua-chu">
+      <span className="ht2-moi-sua-nhan">{TEN_TU_SUA}</span>
+      <h2 id="ht2-moi-sua-tieu"><b>{so}</b> câu đang chờ em sửa</h2>
+    </div>
+    <button type="button" className="ht2-moi-sua-nut" onClick={onChua}>Sửa lỗi ngay<ArrowRight size={20} aria-hidden="true" /></button>
+  </section>
 }
 
 export default function HocTapHomNay(p: Props) {
@@ -67,6 +91,9 @@ export default function HocTapHomNay(p: Props) {
   const conMuc = so ? Math.max(0, so.muc - so.daLam) : 0
   const kho = goi7 ? { choBoSung: con === 0 ? conMuc : 0, sanSang: con ?? undefined } : undefined
   const baiXep = [...(ht?.bai ?? [])].sort((a, b) => b.tangMo - a.tangMo)
+  // Thẻ mời Tự sửa lỗi: tải lười khi Hôm nay đã có số (không tranh lượt với Sảnh); em làm thêm câu ⇒ xem lại bản nhớ (hết hạn mới hỏi máy chủ).
+  const soSua = useSoCauCanSua(p.token, !!sanh || !p.dangTai, so?.daLam)
+  const coMoiSua = !!soSua && soSua > 0
 
   // Tấm "Của em": Esc đóng, focus vào tấm khi mở và trả về ảnh đại diện khi đóng.
   useEffect(() => {
@@ -105,14 +132,17 @@ export default function HocTapHomNay(p: Props) {
           <TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
             viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
             onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
+          <TheMoiTuSua so={soSua} onChua={p.onChua} />
           {goi7 && <TheGoi7 du={goi7} />}
-          {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có; thầy có thể bổ sung kiến thức.</div>}
-          {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu được giữ cho ca kiểm tra. Bài học sẽ cập nhật khi đủ điều kiện.</div>}
-          <section className="ht2-nhom" aria-label="Ôn và sửa đúng chỗ">
-            <h2>Ôn và sửa đúng chỗ</h2>
-            <Dong ten="Tự chữa lỗi" chu="Hiểu lại bước đang vướng, rồi tự làm bản mới." icon={PenLine} sac="cham" onClick={p.onChua} />
-            <Dong ten="Câu đã làm" chu="Lời giải, lịch ôn 1 · 3 · 7 ngày và trạng thái từng câu." icon={History} sac="vang" onClick={p.onXemLai} />
-            {!!p.soBaiTap && <Dong ten="Bài tập về nhà" chu="Thầy đang giao — làm theo chặng." icon={BookOpen} sac="muc" so={p.soBaiTap} donVi="bài" onClick={p.onBaiTap} />}
+          {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>}
+          {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>}
+          <section className="ht2-nhom" aria-label="Ôn và sửa">
+            <h2>Ôn và sửa</h2>
+            {!coMoiSua && <Dong ten={TEN_TU_SUA} chu={soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} icon={PenLine} sac="cham" onClick={p.onChua} />}
+            <Dong ten="Câu đã làm" chu="Lời giải và lịch ôn từng câu" icon={History} sac="vang" onClick={p.onXemLai} />
+            {/* Lối DUY NHẤT vào Bài tập về nhà (thầy 13/10 bỏ ở Kết quả): còn bài chưa nộp ⇒ "Thầy đang giao" + số bài; chỉ còn bài đã nộp ⇒ vẫn hiện để em
+                xem điểm / làm lại lượt còn. */}
+            {(!!p.soBaiTap || !!p.coBaiTap) && <Dong ten="Bài tập về nhà" chu={p.soBaiTap ? 'Thầy đang giao' : 'Xem lại bài đã nộp'} icon={BookOpen} sac="muc" so={p.soBaiTap || undefined} donVi="bài" onClick={p.onBaiTap} />}
           </section>
         </>}
 
@@ -122,32 +152,29 @@ export default function HocTapHomNay(p: Props) {
             <ol className="ht2-thang" aria-label={ht ? `Tầng đang luyện: ${TANG[ht.tang - 1] ?? ''}` : 'Thang 4 tầng'}>
               {TANG.map((t, i) => { const tt = !ht ? 'cho' : i + 1 < ht.tang ? 'vung' : i + 1 === ht.tang ? 'dang' : 'cho'; return <li key={t} data-tt={tt}><span>{tt === 'vung' ? <Check size={16} aria-label="Đã vững" /> : i + 1}</span>{t}</li> })}
             </ol>
-            <p className="ht-chu-phu">Tầng của từng bài do kết quả em tự làm quyết định. Câu có gợi ý vẫn được ghi, nhưng tính là có hỗ trợ.</p>
           </section>
           <section className="ht2-nhom" aria-label="Các bài trong Hành trình">
             <h2>{baiXep.length ? `${baiXep.length} bài trong Hành trình` : sanh?.chienDich?.ten || 'Bài học được giao'}</h2>
             {baiXep.length ? baiXep.map(b => <div className="ht2-bai" key={b.khoa}>
               <div className="ht2-bai-dau"><strong>{b.ten}</strong><span className="ht2-chip" data-sac="cham">{TANG[b.tangMo - 1]}</span></div>
               <div className="ht2-bai-nac" aria-label={`Đang luyện tầng ${TANG[b.tangMo - 1]}`}>{TANG.map((t, i) => <i key={t} data-tt={i + 1 < b.tangMo ? 'vung' : i + 1 === b.tangMo ? 'dang' : 'cho'} />)}</div>
-            </div>) : <p className="ht-trong">Chưa có danh sách bài để hiển thị. Kế hoạch hôm nay vẫn được cập nhật theo nguồn phù hợp.</p>}
+            </div>) : <p className="ht-trong">Chưa có danh sách bài.</p>}
             <p className="ht-chu-phu">Vàng trầm: đã vững · chàm: đang luyện · xám: còn khoá.</p>
           </section>
           {nutHoc(p.coCa)}
         </>}
 
         {muc === 'on-lai' && <section className="ht2-nhom" aria-label="Ôn và sửa">
-          <h2>Hổng chỗ nào, sửa chỗ ấy</h2>
-          <Dong ten="Tự chữa lỗi" chu="Giữ bước đã hiểu, tập trung vào bước còn vướng." icon={PenLine} sac="cham" onClick={p.onChua} />
-          <Dong ten="Câu đã làm" chu="Lời giải và lịch ôn lại của từng câu." icon={History} sac="vang" onClick={p.onXemLai} />
-          <Dong ten="Tu luyện" chu="Tự chọn chương, dạng và mức để luyện thêm." icon={Target} sac="muc" onClick={p.onTuLuyen} />
-          {p.onLuyenLai && <Dong ten="Luyện lại từ bài kiểm tra" chu="Chọn lỗi cần củng cố từ các bài đã làm." icon={FileClock} sac="muc" onClick={p.onLuyenLai} />}
+          <Dong ten={TEN_TU_SUA} chu={soSua === 0 ? 'Không còn câu cần sửa' : coMoiSua ? 'Câu đang chờ em sửa' : 'Câu em làm sai'} icon={PenLine} sac="cham" so={coMoiSua ? soSua : undefined} donVi="câu" onClick={p.onChua} />
+          <Dong ten="Câu đã làm" chu="Lời giải và lịch ôn từng câu" icon={History} sac="vang" onClick={p.onXemLai} />
+          <Dong ten="Tu luyện" chu="Luyện thêm theo chương, dạng, mức" icon={Target} sac="muc" onClick={p.onTuLuyen} />
+          {p.onLuyenLai && <Dong ten="Luyện lại từ bài kiểm tra" chu="Câu sai trong các bài kiểm tra" icon={FileClock} sac="muc" onClick={p.onLuyenLai} />}
         </section>}
 
         {muc === 'ket-qua' && <section className="ht2-nhom" aria-label="Kết quả">
           <h2>Điểm thầy đã công bố</h2>
-          <Dong ten="Ca kiểm tra" chu="Điểm, đường tiến bộ và lời giải các ca đã công bố." icon={LineChart} sac="cham" onClick={p.onLichSu} />
-          {p.onKetQua && <Dong ten="Kết quả bài đã nộp" chu="Điểm và báo cáo theo quyền công bố." icon={ClipboardCheck} sac="vang" onClick={p.onKetQua} />}
-          <Dong ten="Bài tập về nhà" chu="Bài thầy giao và các chặng đã nộp." icon={BookOpen} sac="muc" so={p.soBaiTap || undefined} donVi="bài" onClick={p.onBaiTap} />
+          <Dong ten="Ca kiểm tra" chu="Điểm và lời giải ca đã công bố" icon={LineChart} sac="cham" onClick={p.onLichSu} />
+          {p.onKetQua && <Dong ten="Kết quả bài đã nộp" chu="Điểm và báo cáo đã công bố" icon={ClipboardCheck} sac="vang" onClick={p.onKetQua} />}
         </section>}
       </main>
     </div>
@@ -160,10 +187,9 @@ export default function HocTapHomNay(p: Props) {
           <button className="ht-nut-bieu-tuong" onClick={() => setMoCuaEm(false)} aria-label="Đóng"><X size={18} aria-hidden="true" /></button>
         </div>
         <div className="ht2-nhom ht2-nhom-tam">
-          <Dong ten="Bài gia đình giao" chu="Bài bổ sung gia đình đã giao cho em." icon={Mail} sac="muc" onClick={dongTam(p.onGiaDinh)} />
-          {p.onBangTin && <Dong ten="Thông tin từ gia đình" chu="Lời nhắn và thông báo của gia đình." icon={Users} sac="muc" onClick={dongTam(p.onBangTin)} />}
+          <Dong ten="Bài gia đình giao" icon={Mail} sac="muc" onClick={dongTam(p.onGiaDinh)} />
+          {p.onBangTin && <Dong ten="Thông tin từ gia đình" chu="Lời nhắn và thông báo" icon={Users} sac="muc" onClick={dongTam(p.onBangTin)} />}
         </div>
-        <p className="ht2-tam-ghi"><strong>Em đang học theo kế hoạch của thầy.</strong> Mỗi ngày làm đủ số câu tối thiểu, ôn đúng lịch, chữa câu sai đến khi tự làm được bản mới.</p>
         <button className="ht-nut-phu ht2-dang-xuat" onClick={dongTam(p.onDangXuat)}><LogOut size={18} aria-hidden="true" />Đăng xuất</button>
       </div>
     </div>}

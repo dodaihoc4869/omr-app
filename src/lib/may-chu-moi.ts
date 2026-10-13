@@ -11,7 +11,7 @@
 //      vào được mà không có đề là hỏng nặng hơn chậm.
 //   3. Cấm nhớ cấu hình quá lâu: thầy tắt cờ giữa ca thì lượt gọi tiếp theo
 //      phải đi đường cũ ngay.
-import { chuanHoaMayChu, gianVaoThi, type CauHinhMayChu } from './cau-hinh-may-chu'
+import { chuanHoaMayChu, type CauHinhMayChu } from './cau-hinh-may-chu'
 import { loadCauHinhMayChu, loadDiaChiMayChuMoiChoEm, saveCauHinhMayChu } from './exam-db'
 import { voiHanCho } from './han-cho'
 
@@ -270,7 +270,9 @@ export async function vaoThiMoi(
   danhTinh: { hoTen?: string; namSinh?: string; xacNhanTen?: boolean; matKhau?: string } = {},
 ): Promise<KetQuaVaoThiMoi | null> {
   if (!ch.BAT) return null
-  await gianVaoThi(ch)
+  // KHÔNG giãn ở đây nữa (13/10, luật thầy "sửa xong phải nhanh hơn"): màn thi đã giãn 0–3 giây ĐÚNG MỘT LẦN trước lượt vào đầu (T5, ExamTakeScreen
+  // `daGianVaoThiRef`), phòng chờ đã giãn 0–8 giây (`gianVaoSauBatDau`). Giãn thêm ở đây làm lượt đầu chờ tới 6 giây (phòng chờ tới 14) và lượt bấm
+  // lại sau khi hỏng vẫn phải chờ — trái luật "bấm lại thì vào thẳng".
   return goiWorker<KetQuaVaoThiMoi>(
     ch,
     '/vao-thi',

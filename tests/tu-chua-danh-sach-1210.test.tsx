@@ -42,6 +42,8 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+// SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18 — thầy: "tự sửa lỗi", "Tối ưu lại câu từ cho dễ hiểu"): chữ "chữa" của em ⇒ "sửa" (thầy CHỮA trên lớp, em SỬA):
+// "Sửa trên câu gốc", "Đang sửa từng bước", nhóm "Cần sửa", "Em không còn câu nào cần sửa". Hành vi không đổi.
 describe('Danh sách câu cần chữa', () => {
   it('tên câu + phần + lần sai gần nhất (tên nguồn chuẩn) + trạng thái bằng chữ; nhóm theo việc', async () => {
     const den = new Date(Date.now() + 26 * 3600000).toISOString()
@@ -54,13 +56,13 @@ describe('Danh sách câu cần chữa', () => {
     render(<ManTuChua token="t" onVe={() => {}} />)
     const dong1 = await screen.findByRole('button', { name: /Thuỷ phân ester/ })
     expect(dong1.textContent).toContain('Trắc nghiệm · sai lần gần nhất 10/10 · Ôn theo kế hoạch')
-    expect(dong1.textContent).toContain('Chữa trực tiếp câu gốc')
+    expect(dong1.textContent).toContain('Sửa trên câu gốc')
     const dong2 = screen.getByRole('button', { name: /Chất béo/ })
     expect(dong2.textContent).toContain('Trả lời ngắn · sai lần gần nhất 09/10 · Luyện tập trước đây')
     expect(dong2.textContent).toMatch(/Lần gặp lại 2 mở lúc \d{2}:\d{2} · (Thứ (Hai|Ba|Tư|Năm|Sáu|Bảy)|Chủ nhật) \d{2}\/\d{2}\/\d{4}/)
-    expect(screen.getByRole('button', { name: /Câu sai số 3/ }).textContent).toContain('Đang gỡ từng bước')
+    expect(screen.getByRole('button', { name: /Câu sai số 3/ }).textContent).toContain('Đang sửa từng bước')
     expect(screen.getByRole('button', { name: /Câu sai số 4/ }).textContent).toContain('Đã tự sửa')
-    expect(screen.getByRole('region', { name: 'Cần chữa: 2 câu' })).toBeTruthy()
+    expect(screen.getByRole('region', { name: 'Cần sửa: 2 câu' })).toBeTruthy()
     expect(screen.getByRole('region', { name: 'Đang chờ lần gặp lại: 1 câu' })).toBeTruthy()
     expect(screen.getByRole('region', { name: 'Đã tự sửa: 1 câu' })).toBeTruthy()
     // không mã nội bộ, không tên game, không chữ mơ hồ cũ
@@ -89,7 +91,7 @@ describe('Danh sách câu cần chữa', () => {
     api.apiDanhSachTuChua.mockResolvedValue({ trangThai: 'bat', ds: [] })
     const veHomNay = vi.fn(), tuLuyen = vi.fn()
     render(<ManTuChua token="t" onVe={veHomNay} onTuLuyen={tuLuyen} />)
-    expect(await screen.findByRole('heading', { name: 'Em không còn câu nào cần chữa' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Em không còn câu nào cần sửa' })).toBeTruthy()
     expect(screen.getByText(/Câu em làm sai sẽ tự vào đây/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Luyện thêm ở Tu luyện' }))
     expect(tuLuyen).toHaveBeenCalled()

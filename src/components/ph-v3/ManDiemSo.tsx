@@ -111,12 +111,12 @@ export default function ManDiemSo({ v, loiThay }: { v: ViewPhMoi; loiThay: NhanX
                 ))}
               </ul>
             ) : (
-              <p className="ph3-o-bao">Chưa có ca nào khác trước ca này. Mỗi ca thầy công bố sau sẽ thêm một dòng ở đây.</p>
+              <p className="ph3-o-bao">Chưa có ca nào trước ca này.</p>
             )}
           </section>
         )}
         {!ca && truoc.length === 0 && (
-          <TheTrong id="ph3-ds-trong" tieuDe="Chưa có ca kiểm tra" chu="Con chưa có ca kiểm tra nào được công bố điểm. Khi thầy công bố, điểm và từng câu của con hiện ở đây." />
+          <TheTrong id="ph3-ds-trong" tieuDe="Chưa có ca kiểm tra" chu="Con chưa có ca kiểm tra nào được công bố điểm." />
         )}
       </div>
     </div>

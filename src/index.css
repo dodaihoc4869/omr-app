@@ -1067,3 +1067,15 @@ input:is([type="date"], [type="datetime-local"], [type="time"])::-webkit-calenda
 .mt-tran .mt-than {
   min-width: 20px;
 }
+
+/* Ô NHẬP CHỮ KHÔNG CHÈN KHUNG (thầy 13/10: "Bấm vào ô sớt thì bị chèn khung màu xanh nhìn xấu, bạn xử lý tất cả các chỗ này trên mọi chỗ mọi app").
+ * Nguyên nhân: luật khung ngoài dày của từng app (`.m3 input:focus-visible`, `.m3.vo-thay :is(…input,select,textarea):focus-visible`, …) và vòng
+ * `focus:ring-*` của Tailwind — trên điện thoại ô nhập chữ LUÔN khớp :focus-visible khi bấm vào ⇒ một khung xanh lồng trong khung ô (ô tìm có khung bọc
+ * đã tự sáng theo :focus-within). Ô nhập chữ / ô chọn / ô soạn: bỏ khung ngoài và vòng; dấu hiệu đang nhập = con trỏ chữ + viền ô sang màu chính sẵn có.
+ * Nút, liên kết, ô tick, thanh trượt GIỮ khung khi dùng bàn phím (không đụng). */
+:is(input:not([type='checkbox'], [type='radio'], [type='range'], [type='button'], [type='submit'], [type='reset'], [type='color'], [type='file'], [type='image']), textarea, select):focus {
+  outline: none !important;
+  --tw-ring-shadow: 0 0 transparent !important;
+  --tw-ring-offset-shadow: 0 0 transparent !important;
+  border-color: var(--m3-primary, currentColor);
+}

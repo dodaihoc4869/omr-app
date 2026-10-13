@@ -380,6 +380,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // Cùng bộ kế hoạch, phiên, quyền và answer hiện có; chỉ bỏ ràng buộc cửa Đảo/Đoàn ở giao diện.
   if(action.startsWith('hoc-tap-')){
     const g7=await import('./goi-bai-7')
+    // Đợt 18: Sảnh / Mở chặng đọc ĐOÁN danh sách gói CÙNG đợt với cờ Gói 7 (xem `docDanhSachGoiSom7`) — chỉ dùng khi cờ bật, đúng lượt đọc sẽ chạy.
+    const gsSom7=action==='hoc-tap-sanh'||action==='hoc-tap-start'?g7.docDanhSachGoiSom7(env,sbd):undefined
     const cfg7=await g7.coGoi7(env)
     if(cfg7.bat){
       // KHÔNG đồng bộ gói từ máy em (khẩn 12/10 21h — giờ cao điểm app treo "Đang chuẩn bị những câu…"): `dongBoGoi7` mỗi 20 giây/isolate nạp lại
@@ -389,8 +391,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       if(action==='hoc-tap-gap')return g7.gapHuongDan7(env,sbd,b,Date.now())
       // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
       if(action==='hoc-tap-dem')return g7.demHomNay7(env,sbd,Date.now())
-      if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now());if(r7)return r7}
-      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now());if(lap7){const con7=lap7.plan.viec.length;return {ok:true,cheDo2:true,ngay:g7.tomTatGoi7(lap7,Date.now()).ngay,goi7:g7.tomTatGoi7(lap7,Date.now()),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+      if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
+      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){const con7=lap7.plan.viec.length;return {ok:true,cheDo2:true,ngay:g7.tomTatGoi7(lap7,Date.now()).ngay,goi7:g7.tomTatGoi7(lap7,Date.now()),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 

@@ -69,9 +69,12 @@ describe('Hôm nay — bỏ "Cần thầy chữa"; khối chính có đúng/sai/
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="goi-y-nhac"]')).toBeTruthy())
     const ds = [...container.querySelectorAll('[data-vung="goi-y-nhac"] li')]
-    expect(ds.map((li) => li.getAttribute('data-ma'))).toEqual(['con-cau-hom-nay', 'sai-chua-sua', 'nhanh-sai', 'thieu-ngay', 'lam-khuya'])
-    expect(ds[2]!.textContent).toBe('7 ngày qua có 14 câu con làm dưới 8 giây và sai 9 câu. Nhắc con đọc kỹ đề trước khi chọn.')
-    expect(ds[1]!.textContent).toContain('Tự chữa lỗi')
+    // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn"): khối thành "Cần nhắc con"; bỏ dòng nói lại số câu hôm nay của khối chính;
+    // mỗi dòng chỉ còn câu số liệu (bỏ vế khuyên "Nhắc con…", "Hỏi con…").
+    expect(container.querySelector('#ph3-goi-y')!.textContent).toBe('Cần nhắc con')
+    expect(ds.map((li) => li.getAttribute('data-ma'))).toEqual(['sai-chua-sua', 'nhanh-sai', 'thieu-ngay', 'lam-khuya'])
+    expect(ds[1]!.textContent).toBe('7 ngày qua có 14 câu con làm dưới 8 giây và sai 9 câu.')
+    expect(container.querySelector('[data-vung="goi-y-nhac"]')!.textContent).not.toMatch(/Nhắc con|Hỏi con|Tự chữa lỗi|Tự sửa lỗi/)
     for (const li of ds) expect(li.querySelector('.ph3-o-bt svg')).toBeTruthy()
     const khoi = [...container.querySelector('[data-vung="man-chinh-ph"] .ph3-luoi')!.children].map((x) => x.getAttribute('data-vung'))
     expect(khoi.slice(0, 2)).toEqual(['anh-hung', 'goi-y-nhac'])

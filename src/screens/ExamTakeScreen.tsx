@@ -1,5 +1,5 @@
 import { Component, lazy, memo, startTransition, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, laLoiDongNguoi } from '../lib/nhip-gui-lai'
+import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { qidDaGap, type SoCauMoiPhan } from '../lib/bo-cau-tu-bai-lam'
@@ -1399,7 +1399,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
       let kq: KetQuaVaoThi | null = null
       if (url) {
-        daGianVaoThiRef.current = true
+        // XẾP HÀNG 0–3 GIÂY TRƯỚC LƯỢT VÀO ĐẦU TIÊN (T5). Chỉ giãn LẦN ĐẦU — em bấm lại sau khi hỏng thì vào thẳng.
+        // (Khôi phục 13/10: 6f9b8c67 lỡ bỏ cổng này, cờ chỉ còn được gán mà không ai đọc ⇒ tests/gian-va-thu-lai-t5-1009.test.ts đỏ.)
+        if (!daGianVaoThiRef.current) {
+          daGianVaoThiRef.current = true
+          const cho = gianVaoThi()
+          if (cho > 0) await new Promise((nghi) => setTimeout(nghi, cho))
+        }
         try {
           kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam, xacNhanTen: xacNhan !== null, matKhau: matKhauCa.trim() })
         } catch {
@@ -2596,6 +2602,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         setLoiCho(lan === 0 ? 'Thầy đã bắt đầu — đang xếp hàng vào phòng thi…' : 'Máy chủ đang đông — máy tự thử lại, em không phải bấm gì.')
         await new Promise((r) => setTimeout(r, lan === 0 ? gianVaoSauBatDau() : choBaoLau(lan - 1)))
         loiVaoThiRef.current = ''
+        daGianVaoThiRef.current = true // vừa giãn 0–8 giây ở trên ⇒ không giãn thêm 0–3 giây trong handleJoin (13/10)
         try {
           await handleJoin()
         } catch {
@@ -3697,8 +3704,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       <button
         type="button"
         onClick={() => thuVaoToanManHinh()}
-        className="fixed flex items-center"
-        style={{ left: 12, bottom: 'calc(12px + env(safe-area-inset-bottom))', zIndex: 45, gap: 6, height: 36, padding: '0 12px', borderRadius: 18, border: '1px solid var(--vien-dam)', background: 'var(--the)', color: 'var(--nhat)', fontFamily: 'var(--sans)', fontSize: 12.5, fontWeight: 600, boxShadow: 'var(--bong-1)', opacity: 0.92 }}
+        className="fixed flex items-center thi-nut-vao-lai"
+        style={{ left: 12, bottom: 'calc(12px + env(safe-area-inset-bottom))', zIndex: 45, gap: 6, height: 44, padding: '0 14px', borderRadius: 22, border: '1px solid var(--vien-dam)', background: 'var(--the)', color: 'var(--nhat)', fontFamily: 'var(--sans)', fontSize: 12.5, fontWeight: 600, boxShadow: 'var(--bong-1)', opacity: 0.92 }}
       >
         <Maximize size={14} aria-hidden="true" />
         Vào lại toàn màn hình

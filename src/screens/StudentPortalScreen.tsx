@@ -944,13 +944,13 @@ export default function StudentPortalScreen() {
     })
   }
   const tieuSheet =
-    tab === 'diem' ? 'Xem điểm & lịch sử ca kiểm tra'
+    tab === 'diem' ? 'Kết quả bài đã nộp'
     : tab === 'btvn' ? 'Bài tập về nhà'
     : tab === 'mom' ? 'Bài gia đình giao'
-    : tab === 'khacphuc' ? 'Khắc phục lỗi sai & luyện đề'
+    : tab === 'khacphuc' ? 'Luyện lại từ bài kiểm tra'
     : tab === 'vaothi' ? 'Vào ca kiểm tra trực tuyến'
     : tab === 'cauon' ? 'Ôn câu hôm nay'
-    : 'Bảng tin & bài luyện hôm nay'
+    : 'Thông tin từ gia đình'
 
   const moManCu = (man: TabType) => {
     setTab(man)
@@ -968,7 +968,7 @@ export default function StudentPortalScreen() {
         <div inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
-          coCa={!!caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} token={auth.token} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
+          coCa={!!caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} coBaiTap={dsBtvn.length > 0} token={auth.token} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
           onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam(); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}

@@ -6,12 +6,15 @@
 // đã có số (giữ bản đã tải + dòng báo + nút) · máy chủ chưa có lệnh (404 ⇒ cùng câu lỗi nói thật). Không bao giờ làm hỏng màn Hôm nay.
 // MỘT CON SỐ (như thẻ của em, `nhipTheoSanh`): có số hôm nay của khối chính (`/ph/con-tong-quan`: đã làm / mức tối thiểu) ⇒ ô hôm nay, nhóm, chuỗi và
 // "Việc tiếp" tính lại từ CÙNG số ấy — phụ huynh không thấy hai số câu hôm nay khác nhau trên một màn.
-// MÀU: nhip-hoc-con.css (chỉ biến --ph3-* sẵn có).
+// 13/10 — máy chủ gửi `bacCham` ⇒ chip "Bậc N/12 · Tên" cạnh chip nhóm (đầu thẻ xuống hàng khi chật) + thang 12 bậc đầu bảng (BangNhipHoc); khối nạp
+// khi cần (src/components/bac-cham-chi/), nạp sẵn song song lệnh nhịp học. Vắng ⇒ thẻ y như trước.
+// MÀU: nhip-hoc-con.css (chỉ biến --ph3-* sẵn có); màu 12 bậc: bac-cham-chi.css (biến chuẩn tokens.css).
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import { Activity, Check, Hourglass, TriangleAlert } from 'lucide-react'
 import BangNhipHoc from '../hoc-tap/BangNhipHoc'
 import { layNhipHocCon } from '../../lib/ho-so-con-ph-api'
 import { ngayNgan, nhipTheoSanh, TEN_NHOM_NHIP, type KetQuaNhipHocEm, type NhomNhip } from '../../lib/nhip-hoc-em'
+import { ChipBacNhipLuoi, napBacNhip } from '../bac-cham-chi/nap'
 import { BtLich } from './BieuTuong'
 import { The, type Mau } from './dung-chung'
 import './nhip-hoc-con.css'
@@ -30,6 +33,7 @@ export default function NhipHocCon({ sbd, tenCon, lop, homNay }: { sbd: string; 
   useEffect(() => {
     let huy = false
     setTt((x) => ({ ...x, dangTai: true, loi: '' }))
+    void napBacNhip()
     void layNhipHocCon(sbd).then((r) => {
       if (huy) return
       setTt((x) => (r.ok ? { k: r.du, dangTai: false, loi: '' } : { k: x.k, dangTai: false, loi: r.chu }))
@@ -61,21 +65,33 @@ export default function NhipHocCon({ sbd, tenCon, lop, homNay }: { sbd: string; 
       </section>
     )
   const Icon = ICON_NHOM[k.nhom]
+  const chipNhom = (
+    <span className="ph3-chip ph3-nhip__nhom" data-mau={MAU_NHOM[k.nhom]}>
+      <Icon size={16} strokeWidth={2.6} aria-hidden="true" />
+      {TEN_NHOM_NHIP[k.nhom]}
+    </span>
+  )
   return (
     <>
       <The
         id="ph3-nhip-con"
-        className="ph3-o-du ph3-nhip"
+        className={`ph3-o-du ph3-nhip${k.bacCham ? ' ph3-nhip--bac' : ''}`}
         vung="nhip-hoc-con"
         bieuTuong={<BtLich co={22} />}
         mau={MAU_NHOM[k.nhom]}
         tieuDe="Nhịp học của con"
-        phu={`Lười hay chăm tính theo số ngày đủ mức, từ ${ngayNgan(k.tu)}`}
+        phu={`Từ ${ngayNgan(k.tu)}`}
         chip={
-          <span className="ph3-chip ph3-nhip__nhom" data-mau={MAU_NHOM[k.nhom]}>
-            <Icon size={16} strokeWidth={2.6} aria-hidden="true" />
-            {TEN_NHOM_NHIP[k.nhom]}
-          </span>
+          k.bacCham ? (
+            <span className="bcc-hang">
+              {chipNhom}
+              <Suspense fallback={null}>
+                <ChipBacNhipLuoi k={k} />
+              </Suspense>
+            </span>
+          ) : (
+            chipNhom
+          )
         }
       >
         {tt.loi && (

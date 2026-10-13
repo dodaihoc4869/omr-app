@@ -114,20 +114,36 @@ describe('số giây ở MỌI lượt — câu dễ lẫn câu khó, đúng l�
 })
 
 describe('hộp "Chưa sửa được"', () => {
+  // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18 — thầy: "những câu chưa sửa lỗi mà có trong tự sửa lỗi mới hiện sửa câu này, nếu chưa có thì chưa hiện"):
+  // hộp chưa sửa chỉ là nút "Sửa câu này" khi câu đang ở danh sách Tự sửa lỗi (máy chủ giả trả mọi câu chưa sửa TRỪ câu cuối ⇒ câu cuối là hộp thường);
+  // bỏ chữ gợi ý "Bấm một câu…", thay bằng dòng mời có số câu.
   it('học sinh: lưới hộp, mỗi hộp chưa sửa là MỘT nút gọi onChuaCau(khoá câu của lệnh lịch sử); hộp đã sửa không là nút', async () => {
-    traFetch = (d) => ({ status: 200, du: d === '/hs/ho-so-thai-do' ? banHocSinhHoSoThaiDo(TD) : banHocSinhLichSu(LS) })
+    const chuaThat = LS.cauSai.filter((c) => !c.lanCuoiDung)
+    expect(chuaThat.length).toBeGreaterThan(1)
+    const ds = chuaThat.slice(0, -1).map((c) => ({ qid: c.qid, trangThai: 'can_chan_doan' }))
+    traFetch = (d) =>
+      d.endsWith('/chua-cau-sai/co')
+        ? { status: 200, du: { ok: true } }
+        : d.endsWith('/chua-cau-sai/danh-sach')
+          ? { status: 200, du: { ok: true, ds } }
+          : { status: 200, du: d === '/hs/ho-so-thai-do' ? banHocSinhHoSoThaiDo(TD) : banHocSinhLichSu(LS) }
     const onChuaCau = vi.fn()
     render(<HoSoCuaEmHs token="tk-em" tenEm="Nguyễn Minh Anh" lop="12A1" onDong={() => {}} onChuaCau={onChuaCau} />)
     const tam = await screen.findByRole('dialog')
     await within(tam).findByText('Số lượt làm câu')
     const banEm = banHocSinhLichSu(LS)
     const chua = banEm.cauSai.filter((c) => !c.lanCuoiDung)
-    const nut = within(tam).getAllByRole('button', { name: /^Tự chữa câu này: / })
-    expect(nut).toHaveLength(chua.length)
-    expect(nut[0]!.getAttribute('aria-label')).toBe(`Tự chữa câu này: ${chua[0]!.tieuDe}`)
-    expect(within(tam).getByText('Bấm một câu để mở Tự chữa đúng câu ấy.')).toBeTruthy()
+    const nut = await within(tam).findAllByRole('button', { name: /^Sửa câu này: / })
+    expect(nut).toHaveLength(chua.length - 1)
+    expect(nut[0]!.getAttribute('aria-label')).toBe(`Sửa câu này: ${chua[0]!.tieuDe}`)
+    expect(tam.querySelector('.hslc-cs-moi')!.textContent).toBe(`${chua.length - 1} câu đang chờ em tự sửa`)
+    expect(tam.textContent).not.toMatch(/Bấm một câu/)
+    const hopCuoi = [...tam.querySelectorAll('.hslc-cs-nhom[data-loai="chua"] .hslc-o')].at(-1)!
+    expect(hopCuoi.querySelector('button')).toBeNull()
     fireEvent.click(nut[0]!)
-    expect(onChuaCau).toHaveBeenCalledWith(chua[0]!.qid)
+    // khoá MỞ Tự sửa lỗi "g<số>" (hàm đọc lịch sử nay giữ `moChua`; trước đây bỏ ⇒ gửi khoá "c<số>" không khớp được câu nào)
+    expect(chua[0]!.moChua).toMatch(/^g\d+$/)
+    expect(onChuaCau).toHaveBeenCalledWith(chua[0]!.moChua)
     // hộp đã sửa: không nút
     const da = tam.querySelectorAll('.hslc-cs-nhom[data-loai="da"] .hslc-o')
     for (const h of da) expect(h.querySelector('button')).toBeNull()
@@ -144,7 +160,7 @@ describe('hộp "Chưa sửa được"', () => {
     const hop = tam.querySelector('.hslc-cs-nhom[data-loai="chua"] .hslc-o')!
     expect(hop.querySelector('button')).toBeNull()
     expect(hop.querySelector('.hslc-o-than')).toBeTruthy()
-    expect(within(tam).queryByRole('button', { name: /^Tự chữa câu này/ })).toBeNull()
+    expect(within(tam).queryByRole('button', { name: /^(Tự chữa|Sửa) câu này/ })).toBeNull()
   })
 })
 
@@ -239,13 +255,28 @@ describe('độ tin cậy trên tấm (trường tuỳ chọn của máy chủ)'
     })
     expect(dau.querySelector('.hslc-tin')!.textContent).toBe('Độ tin cậy 86% · đang theo dõi')
     expect(dau.querySelector('.hslc-tin')!.getAttribute('data-du')).toBe('false')
-    expect(dau.querySelector('.hslc-tam')!.textContent).toBe('Kết luận tạm — đang theo dõi. Cần thêm: ít nhất 3 ngày làm bài nữa.')
+    expect(dau.querySelector('.hslc-tam')!.textContent).toBe('Kết luận tạm, đang theo dõi. Cần thêm: ít nhất 3 ngày làm bài nữa.') // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18): bỏ dấu gạch dài, cùng chữ bảng Nhịp học
     expect(within(dau).getByText('Cách tính độ tin cậy')).toBeTruthy()
     const th = [...tam.querySelectorAll('.gvv2-tdo-th-o')]
     expect(th[0]!.querySelector('.hslc-tin')!.textContent).toBe('Độ tin cậy 95%')
     expect(th[1]!.querySelector('.hslc-tin')!.textContent).toBe('Độ tin cậy 60% · đang theo dõi')
     expect(th[2]!.querySelector('.hslc-tin')).toBeNull()
     expect([...tam.querySelectorAll('.gvv2-tdo-o')].map((o) => o.textContent)).toContain('Tự sửa được4/6 câuĐã làm đúng lại 4/6 câu từng sai (67%)')
+  })
+
+  it('13/10: có nhóm Nhịp học ⇒ chip cạnh tên nhóm lấy độ tin cậy CỦA NHÓM (`tinCayNhom`), không mượn số của nhãn thái độ; nhóm không kèm số ⇒ không chip', async () => {
+    const td = { ...TD, nhomNhip: 'luoi', chuoiDuGanNhat: 1, ketLuan: { ...TD.ketLuan, doTinCay: 61, canThem: 'ít nhất 5 ngày làm bài nữa.' }, tinCayNhom: { doTinCay: 93 } }
+    thayMo(td)
+    const tam = await screen.findByRole('dialog')
+    const dau = await waitFor(() => { const x = tam.querySelector('.hslc-hero'); expect(x).toBeTruthy(); return x as HTMLElement })
+    expect(dau.querySelector('.hslc-tin')!.textContent).toBe('Độ tin cậy 93%')
+    expect(dau.querySelector('.hslc-tam')).toBeNull()
+    cleanup()
+    thayMo({ ...td, tinCayNhom: undefined })
+    const tam2 = await screen.findByRole('dialog')
+    const dau2 = await waitFor(() => { const x = tam2.querySelector('.hslc-hero'); expect(x).toBeTruthy(); return x as HTMLElement })
+    expect(dau2.querySelector('.hslc-tin')).toBeNull()
+    expect(dau2.textContent).not.toContain('61%')
   })
 
   it('vắng ⇒ không chip, không "đang theo dõi" (máy chủ cũ y như trước); chữ độ tin không bao giờ 100%', async () => {

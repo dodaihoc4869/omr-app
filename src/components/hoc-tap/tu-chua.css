@@ -171,3 +171,6 @@
 @media (prefers-reduced-motion: reduce) {
   .tcl-man .tcl-the { transition: none; }
 }
+
+/* ── ĐỢT 18 (13/10): thẻ tổng gọn — số câu cần sửa đứng cạnh lời mời (tiêu đề); bỏ câu "vì sao" và khối "Cách tự chữa". Không màu mới. ── */
+.tcl-tong-chu { display: flex; flex-direction: column; gap: 6px; min-width: 0; }

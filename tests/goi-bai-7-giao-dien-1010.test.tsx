@@ -39,7 +39,7 @@ it('học có hỗ trợ là hành động riêng, không hiện sai hoặc làm
   expect(screen.getByText('Câu này em chọn làm thế nào?')).toBeTruthy();expect(screen.getByRole('button',{name:'Tự làm câu này'})).toBeTruthy()
   fireEvent.click(screen.getByRole('button',{name:'Học cách giải'}))
   await screen.findByText(/đã gặp với hỗ trợ, chưa tính tự làm đúng/)
-  expect(screen.queryByText('Em đã trả lời đúng.')).toBeNull();expect(screen.queryByRole('button',{name:'Tự chữa câu này'})).toBeNull()
+  expect(screen.queryByText('Em đã trả lời đúng.')).toBeNull();expect(screen.queryByRole('button',{name:'Sửa câu này'})).toBeNull()
   expect(goiHoa2).toHaveBeenLastCalledWith('hoc-tap-gap','t',{session:'p',qid:'q1',chuaTuLam:true},40)
 })
 // Đã gỡ 12/10: test màn tự kiểm (ManKiemGoi7) — thầy bỏ phần Tự kiểm kiến thức khỏi app học sinh, màn ấy không còn lối vào nên đã xoá.
@@ -48,7 +48,7 @@ it('nhờ thầy chữa không lộ đáp án, không hiện làm sai và vẫn 
   render(<ManLamBaiTap token="t" sbd="s" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()}/>)
   /* thầy 12/10 duyệt bản vẽ màn làm bài: nút "Học cách giải" */await screen.findByText(q.text);fireEvent.click(screen.getByRole('button',{name:'Học cách giải'}))
   await screen.findByText(/nhờ thầy chữa/)
-  expect(screen.queryByRole('button',{name:'Tự chữa câu này'})).toBeNull()
+  expect(screen.queryByRole('button',{name:'Sửa câu này'})).toBeNull()
   expect(screen.queryByText('Em đã trả lời đúng.')).toBeNull()
   /* Trùng tu 11/10: "đợt" → "chặng" (bảng từ chuẩn A2) */fireEvent.click(screen.getByRole('button',{name:'Kết thúc chặng'}));/* thầy 12/10 duyệt bản vẽ màn làm bài: "Đã lưu chặng N" (không có số chặng ⇒ "chặng học") */expect(screen.getByText('Đã lưu chặng học')).toBeTruthy()
 })

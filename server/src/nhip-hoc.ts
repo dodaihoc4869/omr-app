@@ -10,14 +10,19 @@
 //          `docCauKho`, thiếu kho ⇒ đuôi mã câu "-III-n" như hồ sơ một em);
 //       2) chọn lặp: hàm cửa sổ ROW_NUMBER (khoảng liền cùng chữ, cùng ngày, xếp theo giờ) ⇒ chỉ trả các chuỗi ≥ 6 lượt + tổng lượt A–D mỗi em.
 //     Không gọi `/gv/ho-so-thai-do` từng em. Truy vấn chọn lặp hỏng (D1 cũ thiếu cột) ⇒ chỉ dùng tín hiệu quá nhanh + cảnh báo nói thật.
+//   · ĐỘ TIN CẬY CỦA NHÓM mỗi em (13/10 đợt 18, CHỈ THÊM `doTinCay` / `canThem`): phép thuần `tinCayNhomNhip` (dưới) trên đúng dãy ngày đã đọc —
+//     cùng phép `/hs/nhip-hoc` · `/ph/nhip-hoc` (nhip-hoc-em.ts) ⇒ thầy và em thấy cùng một số. KHÔNG truy vấn D1 nào thêm; nhóm vẫn do app tính.
 import type { Env } from './kieu'
 import type { LopBaiHangNgay, NgayBaiEm } from './bai-hang-ngay-kieu'
 import { NGUONG_THAI_DO as NG } from './bai-hang-ngay-kieu'
-import type { DoiPhoChonLap, DoiPhoEm, DoiPhoQuaNhanh, EmNhipHoc, TraLoiNhipHoc } from './nhip-hoc-kieu'
+import type { DoiPhoChonLap, DoiPhoEm, DoiPhoQuaNhanh, EmNhipHoc, NgayNhipEm, TraLoiNhipHoc } from './nhip-hoc-kieu'
 import { cacNgay, docDanhSachEm, docNgayCacEm, khoangNgay, LO_EM_BAI_HANG_NGAY, LoiDocSo, ngayVnCua, type EmGoc } from './bai-hang-ngay'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docCauKho } from './omni-d1'
+import { tomTatNhip } from './nhip-hoc-luat'
+import { tinCayNhomNhip } from './thai-do-tin-cay'
+import { bacChamChi } from './bac-cham-chi'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -79,6 +84,16 @@ export async function docNgayVao(env: Env, em: readonly EmGoc[], tu: string): Pr
   }
   return ra
 }
+
+// ------------------------------------------------------------------ ĐỘ TIN CẬY CỦA NHÓM (phép thuần — một chỗ cho thầy, em, phụ huynh)
+
+// `NHAN_CUA_NHOM` + `tinCayNhomNhip` nằm ở thai-do-tin-cay.ts (13/10) để hồ sơ một em (bai-hang-ngay.ts) dùng CÙNG hàm mà không vòng nhập.
+export { NHAN_CUA_NHOM, tinCayNhomNhip } from './thai-do-tin-cay'
+
+/** Dãy ngày ĐƯỢC TÍNH của một em: từ ngày vào (gồm hôm nay), đúng `mucToiThieu` / `daLam` — cách dựng dải ô của bảng em và của dòng thầy. */
+export const ngayDuocTinh = (ngay: readonly NgayBaiEm[], vao: string): NgayNhipEm[] =>
+  ngay.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam }))
+
 
 // ------------------------------------------------------------------ CỜ ĐỐI PHÓ (phép thuần — test gọi thẳng)
 
@@ -261,7 +276,12 @@ export async function gvNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<T
   const em: EmNhipHoc[] = tatCa
     .map((e) => {
       const ngay = ngayEm.get(e.sbd) ?? []
-      return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi, ngayVao: vao.get(e.sbd) ?? tu, muc: ngay.map((n) => n.mucToiThieu), lam: ngay.map((n) => n.daLam), doiPho: dp.theoEm.get(e.sbd) ?? null }
+      const ngayVao = vao.get(e.sbd) ?? tu
+      // CHỈ THÊM 13/10 đợt 18: độ tin cậy của nhóm — đúng phép bảng của em, trên chính dãy số trả về (không đọc thêm D1).
+      const dai = ngayDuocTinh(ngay, ngayVao)
+      const tt = tomTatNhip(dai, homNay)
+      const bac = bacChamChi(dai, homNay, tt)
+      return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi, ngayVao, muc: ngay.map((n) => n.mucToiThieu), lam: ngay.map((n) => n.daLam), doiPho: dp.theoEm.get(e.sbd) ?? null, ...tinCayNhomNhip(tt), ...(bac ? { bacCham: bac } : {}) }
     })
     .sort((a, c) => c.khoi.localeCompare(a.khoi) || a.hoTen.localeCompare(c.hoTen, 'vi') || a.sbd.localeCompare(c.sbd))
   return { ok: true, tu, den, homNay, ngay: cacNgay(tu, den), em, lop: demLop(tatCa), doiPhoDaTinh: dp.daTinh, canhBao }

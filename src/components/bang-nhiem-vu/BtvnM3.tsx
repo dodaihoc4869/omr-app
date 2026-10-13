@@ -60,9 +60,7 @@ export default function BtvnM3({
         <div className="btm-tieu-chu">
           <div className="btm-hang">
             <h2 className="btm-h">Bài tập về nhà</h2>
-            <span className="m3-chip btm-chip-tertiary">Chia chặng theo ngày/giờ</span>
           </div>
-          <p className="btm-phu">Mỗi bài chia thành các chặng mở dần theo ngày/giờ · làm chặng đang mở rồi nộp trước Hạn nộp</p>
         </div>
         <button type="button" onClick={onTaiLai} disabled={dangTai} className="m3-nut-vien btm-lam-moi">
           <RefreshCw size={18} className={dangTai ? 'btm-quay' : undefined} aria-hidden="true" />
@@ -70,27 +68,8 @@ export default function BtvnM3({
         </button>
       </div>
 
-      {/* Cách làm BTVN theo lô (thay 3 Vòng Phân Tầng cũ) */}
-      <section className="btm-cach" aria-label="Cách làm bài tập về nhà">
-        <div className="btm-cach-dau">
-          <h3 className="btm-cach-ten">Cách làm bài tập về nhà: chia chặng theo ngày/giờ</h3>
-          <span className="m3-chip btm-chip-tertiary">Xong chặng đang mở, chặng sau mở đúng nhịp</span>
-        </div>
-        <div className="btm-cach-luoi">
-          <div className="btm-cach-o" data-vai="tertiary">
-            <b>CHẶNG ĐANG MỞ</b>
-            <span>Em làm chặng tới nhịp hôm nay. Xong sớm thì chặng sau vẫn mở đúng nhịp, không mở sớm hơn.</span>
-          </div>
-          <div className="btm-cach-o" data-vai="secondary">
-            <b>CHẶNG SAU</b>
-            <span>Mở dần theo ngày/giờ tính từ Hạn nộp, để không dồn bài vào phút chót.</span>
-          </div>
-          <div className="btm-cach-o" data-vai="error">
-            <b>NỘP BÀI</b>
-            <span>Xong các chặng thì nộp trước Hạn nộp chung. Quá Hạn nộp là máy chủ chặn nộp — cần Thầy gia hạn.</span>
-          </div>
-        </div>
-      </section>
+      {/* Đợt 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn để học sinh phụ huynh không bị phân tâm"): gỡ khối "Cách làm bài tập về nhà" (ba ô chặng
+          đang mở / chặng sau / nộp bài) và dòng giải thích dưới tiêu đề. Hạn nộp vẫn ghi trên từng bài. */}
 
       {dangTai ? (
         <div className="btm-ds" aria-busy="true" aria-live="polite">
@@ -102,7 +81,6 @@ export default function BtvnM3({
         <div className="btm-trong">
           <BookOpen size={40} aria-hidden="true" />
           <h3 className="btm-trong-ten">Chưa có bài tập về nhà nào</h3>
-          <p className="btm-phu">Hiện tại Thầy chưa giao bài tập mới hoặc các bài tập trước đó đã hoàn tất.</p>
           <button type="button" onClick={onTaiLai} disabled={dangTai} className="m3-nut-tonal">
             <RefreshCw size={18} aria-hidden="true" />
             <span>Tải lại danh sách</span>

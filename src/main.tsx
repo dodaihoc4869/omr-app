@@ -134,9 +134,8 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
   // phiếu có công thức ngay ⇒ vẫn tải liền như cũ.
   const noiSauManEm = (!!dv.maCa && dv.vai !== 'diem') || dv.vai === 'hocsinh'
   const huaMan = noiSauManEm ? huaManEmSom() : null
-  if (huaMan) void huaMan.then(napKatex, napKatex).catch(() => {})
-  else if (canCongThucNgay) void napKatex().catch(() => {})
-  else {
+  /** Tải KaTeX lúc RẢNH sau khi trang tải xong (không giành đường truyền / CPU với màn đầu). */
+  const napKhiRanh = () => {
     const khiRanh = () => {
       const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void }
       if (w.requestIdleCallback) w.requestIdleCallback(() => void napKatex().catch(() => {}), { timeout: 4000 })
@@ -145,6 +144,13 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
     if (document.readyState === 'complete') khiRanh()
     else window.addEventListener('load', khiRanh, { once: true })
   }
+  // MÁY YẾU (13/10, đo Chromium CPU chậm 6× + mạng 1,6 Mbps): cổng học sinh — màn đầu (đăng nhập / Hôm nay) không có công thức; KaTeX (~83 KB nén,
+  // ~270 KB mã phải dịch) tải ngay sau mảnh màn giành đường truyền với ảnh + phông của màn đầu và chặn luồng chính trên máy yếu. Nay: chờ mảnh màn
+  // VÀ trang tải xong + lúc rảnh (chậm nhất ~4 giây). Câu có công thức mở trước khi KaTeX về ⇒ hiện chữ một nhịp rồi tự vẽ lại (như cũ).
+  if (huaMan && dv.vai === 'hocsinh') void huaMan.then(napKhiRanh, napKhiRanh).catch(() => {})
+  else if (huaMan) void huaMan.then(napKatex, napKatex).catch(() => {})
+  else if (canCongThucNgay) void napKatex().catch(() => {})
+  else napKhiRanh()
 }
 
 // beforeinstallprompt chỉ bắn MỘT LẦN và bắn trước khi React kịp mount — phải

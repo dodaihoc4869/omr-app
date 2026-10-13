@@ -245,3 +245,68 @@ Thầy nhắn thêm: "Sau khi làm hết tất cả thì bắt buôck tối ưu 
 - [x] Kiểm toàn bộ đợt 16 | bằng chứng: full vitest 15.396 test; đỏ mới duy nhất do đợt 16 (m3-d-the-cau) đã sửa; các đỏ khác (bi-a-rai-deu, cau-hong-giua-ngay, cnh-1-0-coverage-plan-p06, on-thi-cau) đỏ y hệt trên origin/main cùng lúc 00:1x 13/10 (test phụ thuộc ngày); 6 tệp node:sqlite đỏ sẵn; tsc 0; check:mau; kiem:mau-giu 0; soi 0 LỖI; build:cf 160 tệp/2959 KB (trần 170/3000)
 - [x] Build + đẩy + phát hành đợt 16 (kiểm ca mở) | bằng chứng: PR255 squash main `ebcc0759`, Actions 38285823177 SUCCESS 17:41→17:49 UTC (Kiểm ca thi đạt, ba hành trình + áp gói chạy đủ, Worker + Pages cùng commit); /ph/nhip-hoc, /ph/ho-so-thai-do, /ph/lich-su-lam-cau sống. Lùi: `git revert ebcc0759`.
 - [~] SAU đợt 16: tối ưu máy chủ chuyên sâu (đợt 17, commit f0c123a4) | bằng chứng: đo D1 giả 40 ms/lượt qua gameV2 thật: mở chặng 1,41 → 0,88 s; sảnh 1,13 → 0,96 s (lần 2 0,96 → 0,79 s); nộp câu 0,21 s (5 vòng — chậm giờ cao điểm là do D1 dồn tải); ghi cạnh hành trình chỉ khi đổi (trước ~2,5 triệu dòng/ngày); đệm siêu dữ liệu câu + danh mục cả ngày; tests/may-chu-chuyen-sau-dot17-1310 (2/2, đỏ trên mã cũ); 710 test liên quan 0 đỏ mới. Chờ full vitest → PR256 → phát hành.
+- [x] SAU đợt 16: tối ưu máy chủ chuyên sâu (đợt 17) — phát hành | bằng chứng: PR256 squash main `81f13983`, Actions 38288914721 SUCCESS 18:08→18:16 UTC (Kiểm ca thi đạt, Worker + Pages cùng commit). Đo D1 giả 40 ms/lượt qua gameV2 thật: mở chặng 1,41 → 0,88 s (−38%); sảnh 1,13 → 0,96 s; sảnh lần 2 0,96 → 0,79 s; nộp câu 0,21 s. Bản sống 01:20 (không tải): lệnh sảnh không danh tính 0,66–1,28 s đo từ máy ảo (gồm mạng). Số thật giờ cao điểm: chạy lại `do-d1-cao-diem-1210.yml` tối 13/10. Lùi: `git revert 81f13983`.
+- [ ] Nợ test có sẵn (không do đợt 15–17): sau 00:00 13/10 các test phụ thuộc ngày đỏ y hệt trên main (bi-a-rai-deu-3009, cau-hong-giua-ngay-3009, cnh-1-0-coverage-plan-p06, on-thi-cau-1909); 6 tệp `node:sqlite` không nạp được; gian-va-thu-lai-t5-1009 "CHỈ giãn LƯỢT ĐẦU" đỏ từ 09/10 | bằng chứng: đối chứng worktree origin/main cùng thời điểm
+
+## Đợt 18 — câu chữ dễ hiểu, bỏ chữ hướng dẫn, mời gọi Tự sửa lỗi, làm nốt việc sót (13/10 ~01h30)
+Thầy nhắn (nguyên văn):
+"Làm hết đi rồi đẩy lên luôn"
+"Tối ưu lại câu từ cho dễ hiểu ở mọi. Bỏ hết các gợi ý hướng dẫn để học sinh phụ huynh không bị phân tâm."
+"Mời gọi học sinh tự sửa lỗi, trong hồ sơ của học sinh những câu chưa sửa lỗi mà có trong tự sửa lỗi mới hiện sửa câu này, nếu chưa có thì chưa hiện. Làm nổi bật phần tự sửa lỗi lên và mời gọi thân thiện"
+Giả định: "gợi ý hướng dẫn" = chữ hướng dẫn cách dùng / chú thích phụ trên màn (không bỏ nút "Gợi ý" giải câu — đó là tính năng học, có ghi "có hỗ trợ"); phạm vi câu chữ: app học sinh + phụ huynh.
+- [ ] Ôn câu xoay ngang: phần giới thiệu chiếm ~1/3 màn đầu | bằng chứng: (chưa có)
+- [ ] Màn nhịp học cả lớp (app thầy) có độ tin cậy như hồ sơ từng em | bằng chứng: (chưa có)
+- [ ] Trùng tu nốt màn thi, Tự luyện, Câu đã làm (dọc · ngang · máy tính) | bằng chứng: (chưa có)
+- [ ] Dọn nợ test: test phụ thuộc ngày, 6 tệp node:sqlite, test "chỉ giãn lượt đầu" màn thi | bằng chứng: (chưa có)
+- [ ] Câu chữ dễ hiểu ở mọi màn học sinh + phụ huynh | bằng chứng: (chưa có)
+- [ ] Bỏ hết chữ hướng dẫn / chú thích phụ gây phân tâm (học sinh, phụ huynh) | bằng chứng: (chưa có)
+- [ ] Hồ sơ học sinh: nút "Sửa câu này" CHỈ hiện ở câu chưa sửa CÓ trong danh sách Tự sửa lỗi; chưa có thì không hiện | bằng chứng: (chưa có)
+- [ ] Làm nổi bật Tự sửa lỗi, mời gọi thân thiện | bằng chứng: (chưa có)
+- [ ] Đẩy + phát hành (kiểm ca mở) | bằng chứng: (chưa có)
+- [ ] Tối 13/10 giờ cao điểm: đo số thật (D1 insights + độ trễ) so với tối 12/10 | bằng chứng: (chưa có)
+Thầy nhắn thêm (2 ảnh màn "Câu đã làm" của học sinh: khối tải PDF to cuối danh sách; hộp chọn chiến dịch có "Bài 8 · Amine · 164 câu", "#cd12009c1c2 · 112 câu", "Hành trình giỏi hoá · Khối 12 · 9269 câu"):
+"Chỗ tải đề làm lại cho đẹp tinh tế và gọn gàng."
+"Ảnh 2 chỉ giữ lại bài đã chọn là bài 8, các phần dưới xóa bỏ nhé"
+- [ ] Câu đã làm: khối tải PDF / tải đề làm lại gọn, tinh tế | bằng chứng: (chưa có)
+- [ ] Câu đã làm: hộp chọn chỉ giữ bài (Bài 8 · Amine), bỏ chiến dịch mã "#cd…" và "Hành trình giỏi hoá" | bằng chứng: (chưa có)
+Thầy nhắn thêm: "Nếu đã làm xong chặng 2 bấm làm tiếp chặng 3 câu bị lặp, còn nếu thoát ra bấm làm tiếp thì ko bị bạn check chỗ này và sửa lỗi"
+- [ ] Xong chặng ⇒ bấm "Học tiếp chặng sau" ngay ở màn làm bài thì câu bị lặp (thoát ra vào lại thì không) — tìm nguyên nhân gốc, sửa | bằng chứng: (chưa có)
+Thầy nhắn thêm (ảnh app thầy, màn Học sinh: bấm ô tìm "Thành nam" ⇒ khung xanh đậm lồng bên trong khung ô tìm): "Bấm vào ô sớt thì bị chèn khung màu xanh nhìn xấu, bạn xử lý tất cả các chỗ này trên mọi chỗ mọi app nhé"
+- [ ] Bỏ khung xanh chèn khi bấm vào ô tìm / ô nhập ở mọi chỗ, cả 3 app (giữ dấu hiệu đang chọn nhẹ nhàng cho bàn phím) | bằng chứng: (chưa có)
+Thầy nhắn thêm (luật thường trực): "Khi bạn sửa bất kì cái gì thì luôn phải đảm bảo sau khi sửa xong tốc độ load app và tốc độ máy chủ phải nhanh hơn ap load mượt mà ổn định nhất"
+- [ ] Ghi luật vào CLAUDE.md (mọi phiên phải theo) | bằng chứng: (chưa có)
+- [ ] Cổng đo tốc độ tải app: kích thước gói tải đầu (JS/CSS mở trang) so mốc — lớn hơn mốc là đỏ | bằng chứng: (chưa có)
+- [ ] Cổng đo tốc độ máy chủ: số vòng chờ D1 của lệnh nóng (sảnh, mở chặng, nộp câu, đếm) so mốc — chậm hơn là đỏ | bằng chứng: (chưa có)
+Thầy nhắn thêm (ảnh tab Kết quả app học sinh: Ca kiểm tra · Kết quả bài đã nộp · Bài tập về nhà): "Bỏ phần btvn ở đây"
+- [ ] Bỏ thẻ "Bài tập về nhà" ở tab Kết quả (app học sinh) | bằng chứng: (chưa có)
+Đợt 18 — bằng chứng (13/10, sau gộp làn G/H/I/J; chỉ ghi thêm):
+- [x] Ôn câu xoay ngang gọn đầu màn | bằng chứng: làn H 36a04164 (844×390: tiêu đề + chip một hàng, câu 1 hiện không cuộn), ảnh docs/anh-dot18/lan-h-on-cau-ngang-truoc-sau.jpg
+- [x] Nhịp học cả lớp có độ tin cậy | bằng chứng: làn J 11cb47c8 (`tinCayNhomNhip` một hàm cho /gv/nhip-hoc + /hs + /ph, 15 truy vấn như cũ, nhóm khớp ảnh 720 em); 3975839b chip hồ sơ cạnh tên nhóm lấy đúng số nhóm (tests/mot-con-so-goi7-1210 + ho-so-dot16-1210i xanh)
+- [x] Trùng tu màn thi / Tự luyện / Câu đã làm | bằng chứng: làn H 2bc64011 69ba472a 87e6ef23 + tests/lam-bai-dot18-1310 (13 test), ảnh lan-h-*.jpg 3 khổ
+- [x] Dọn nợ test | bằng chứng: làn J 3c4fa6a8 (4 tệp phụ thuộc giờ — xanh ở 00:10/06:30/12:00 VN), 77c02b71 (5 tệp thiếu môi trường node), 0683ed0c ("CHỈ giãn LƯỢT ĐẦU"); 3ddcc179 bỏ giãn trùng (vào thi chỉ một lớp giãn)
+- [x] Câu chữ dễ hiểu + bỏ chữ hướng dẫn (HS + PH) | bằng chứng: làn I d774469b, làn G 935244a4, làn H 2bc64011; 3975839b đồng bộ tên "Tự sửa lỗi"/"Sửa câu này"
+- [x] Hồ sơ: "Sửa câu này" chỉ ở câu có trong Tự sửa lỗi | bằng chứng: làn G 935244a4 + tests/tu-sua-moi-goi-dot18-1310 (17 test); sửa luôn bộ đọc lịch sử làm rơi `moChua`
+- [x] Tự sửa lỗi nổi bật, mời gọi | bằng chứng: thẻ "N câu đang chờ em sửa · Sửa lỗi ngay" ở Hôm nay (ảnh lan-g-hom-nay-doc.jpg); gọi máy chủ ≤ 1 lần/10 phút, sau khi Hôm nay đã hiện
+- [x] Câu đã làm: hàng tải gọn + hộp chọn chỉ còn bài thật | bằng chứng: làn H 87e6ef23 (hai nút 44 px "Tải PDF · N câu" / "Tải đề làm lại"; bỏ Hành trình và "#cd…"; một bài ⇒ tên trơn, không bài ⇒ ẩn)
+- [x] Câu lặp khi bấm Học tiếp chặng sau | bằng chứng: 7ff7a1df — nguyên nhân gốc: sổ ghi sau phản hồi (waitUntil) nên lệnh mở chặng ngay sau đó chưa thấy câu vừa làm; nay loại câu có lượt trong 15 phút (một đọc chỉ mục, chạy song song). tests/hoc-tiep-khong-lap-1310: bản cũ lặp 6 câu, bản mới 0
+- [x] Bỏ khung xanh khi bấm ô nhập, 3 app | bằng chứng: 45bb16ce luật chung src/index.css + tests/o-nhap-khong-khung-1310; Chromium thật: ô SBD đang chọn outline none, vòng sáng trong suốt, ô đánh dấu vẫn giữ viền bàn phím
+- [x] Luật tốc độ vào CLAUDE.md | bằng chứng: 4a0f98b3
+- [x] Cổng tốc độ tải app | bằng chứng: scripts/kiem-toc-do-tai.mjs (23c76e3a): GV +0,0 KB · HS −0,4 KB · PH −0,7 KB so bản đang chạy
+- [x] Cổng tốc độ máy chủ | bằng chứng: tests/toc-do-may-chu-lenh-nong-1310 (1df0a566), mốc đo trên 81f13983: sảnh lần sau 20 đợt, mở chặng 25, nộp câu 9, đếm 2
+- [x] Bỏ thẻ "Bài tập về nhà" ở tab Kết quả | bằng chứng: 3ddcc179 + tests/ket-qua-bo-btvn-1310 (Hôm nay vẫn có khi thầy đang giao)
+Thầy nhắn thêm (13/10): "Tôi muốn bạn tính toán tối ưu sắp xếp mức độ lười biếng theo cấu trúc sau và hiển thị luôn nhé. 12 BẬC TỪ LƯỜI BIẾNG ĐẾN CHĂM CHỈ 1. 🦥 Lười Vô Cực 2. 🛌 Thánh Bất Động 3. 💤 Vua Ngủ Nướng 4. 🐌 Chúa Tể Trì Hoãn 5. 🐢 Cao Thủ Né Việc 6. 🐼 Lười Có Tính Toán 7. ⚖️ Đại Sư Cân Bằng 8. 🚶 Tân Binh Siêng Năng 9. 📚 Chiến Binh Cần Cù 10. 🔥 Cao Thủ Chăm Chỉ 11. ⚡ Chiến Thần Năng Suất 12. 👑 Thần Chăm Chỉ Tối Thượng" · "Mỗi cấp độ hiển thị màu khác nhau nhé"
+- [ ] Phép tính 12 bậc (một hàm thuần ở máy chủ, khớp nhóm Chăm/Chưa đều/Lười đã duyệt — không bao giờ mâu thuẫn nhóm) | bằng chứng: (chưa có)
+- [ ] Hiển thị bậc ở app học sinh (Hôm nay · Nhịp học, hồ sơ) | bằng chứng: (chưa có)
+- [ ] Hiển thị bậc ở app phụ huynh (Nhịp học của con) | bằng chứng: (chưa có)
+- [ ] Hiển thị + sắp xếp theo bậc ở app thầy (Nhịp học cả lớp, hồ sơ em) | bằng chứng: (chưa có)
+- [ ] Mỗi bậc một màu riêng (12 màu, dẫn từ biến màu chuẩn, sáng + tối) | bằng chứng: (chưa có)
+- [ ] Không chậm hơn: không thêm truy vấn D1, cổng kiem:toc-do xanh | bằng chứng: (chưa có)
+Thầy nhắn thêm: "Hiện bậc trên màn chiếu luôn nhé."
+- [ ] Hiện bậc 1–12 (màu riêng) trên màn chiếu điểm danh cả lớp | bằng chứng: (chưa có)
+Thầy nhắn thêm: "Xong thì đẩy lên luôn nhé, đảm bảo máy chủ luôn nhann, load app ổn định tức thì, tối ưu cả cho máy yếu"
+- [ ] Đo app trên máy yếu (Chromium thật, CPU chậm 6×, mạng 4G chậm): byte tải, số yêu cầu, thời điểm hiện nội dung, tổng thời gian chặn luồng — 3 app, bản đang chạy vs bản mới | bằng chứng: (chưa có)
+- [ ] Xử lý các chỗ tốn nhất tìm được (ảnh nặng, mã chặn luồng…) — phải đo lại thấy nhanh hơn | bằng chứng: (chưa có)
+- [ ] Đẩy lên + phát hành khi xong (kiểm ca mở) | bằng chứng: (chưa có)
+- [x] Đo app trên máy yếu (Chromium thật, CPU chậm 6×, mạng 1,6 Mbps / RTT 150 ms) | bằng chứng: bản đang chạy /hs lần đầu LCP 4,5 s (ảnh thần thú màn đăng nhập), mở lại 1,9 s; /ph lần đầu 2,7–3,5 s; /gv 2,5 s
+- [x] Xử lý chỗ tốn nhất | bằng chứng: 6edd8ad0 — KaTeX cổng học sinh tải lúc rảnh + nạp trước ảnh màn đăng nhập ⇒ /hs LCP lần đầu 1,6–1,9 s, mở lại 0,8 s (đo 2 lượt mỗi bản); máy chủ bỏ một hoa2-sanh chạy thừa mỗi lần mở app + mỗi lần đăng nhập (tests/may-yeu-mo-app-1310, dang-nhap-kem-sanh-may-chu-0610)
+- [ ] (đợt sau) App phụ huynh dùng chung khung App.tsx của thầy (~272 KB nén tải đầu) — tách vỏ riêng nhẹ như AppHocSinh để màn đầu phụ huynh < 1,5 s trên máy yếu | bằng chứng: (chưa làm)

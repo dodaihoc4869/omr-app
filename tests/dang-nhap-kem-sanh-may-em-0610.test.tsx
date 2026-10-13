@@ -13,7 +13,9 @@ vi.mock('../src/lib/exam-db', async (goc) => ({ ...(await goc<Record<string, unk
 const GOC = 'https://omr.ttadodaihoc.workers.dev'
 const SANH = { ok: true, cheDo2: true, ngay: '2026-10-06', theLuc: { con: 28, tong: 40 }, serverNow: 1_700_000_000_000, nhipDeNghi: 1 }
 const thanTk = (token: string) => JSON.stringify({ token })
-const DUONG_SANH = '/game-v2/hoa2-sanh'
+// SỬA CÓ CHỦ ĐÍCH 13/10: lệnh Sảnh của cổng học sinh = `hoc-tap-sanh` (Hôm nay dùng đúng lệnh này); đăng nhập xin `kemSanh: 'hoc-tap'` (bản cũ
+// `kemSanh: true` ⇒ máy chủ vẫn trả hoa2-sanh). Trước: hỏi sớm / kèm đăng nhập `hoa2-sanh` mà màn không nhận ⇒ máy chủ chạy thừa một Sảnh đầy đủ.
+const DUONG_SANH = '/game-v2/hoc-tap-sanh'
 
 describe('hoi-som — phản hồi Sảnh đi kèm lệnh đăng nhập', () => {
   let goiThat: ReturnType<typeof vi.fn>
@@ -152,7 +154,7 @@ describe('hsDangNhapKemSanhApi — chỉ xin kèm Sảnh khi nơi gọi chọn �
     expect(thanDaGui()).toEqual({ sbd: '99001', matKhau: 'mk' })
     await hsDangNhapKemSanhApi('', ' 99001 ', ' mk ')
     expect(String(fetchGia.mock.calls[1]![0])).toBe('https://may-chu.test/hs/dang-nhap')
-    expect(thanDaGui()).toEqual({ sbd: '99001', matKhau: 'mk', kemSanh: true })
+    expect(thanDaGui()).toEqual({ sbd: '99001', matKhau: 'mk', kemSanh: 'hoc-tap' })
   })
 
   it('luồng: đăng nhập trả NGAY ở dòng 1 (Sảnh chưa về), sanhHua thành phản hồi khi dòng 2 về — kể cả khi dòng bị cắt giữa chừng giữa hai nhịp', async () => {

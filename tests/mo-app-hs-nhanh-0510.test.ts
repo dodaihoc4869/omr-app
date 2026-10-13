@@ -12,6 +12,7 @@ const BANG: BangNapTruoc = {
   hsVo: ['/assets/AppHocSinh-f.js'],
   phongHs: ['/assets/be-vietnam-pro-latin-400-normal-g.woff2'],
   katex: ['/assets/katex-goi-h.js', '/assets/katex-goi-h.css'],
+  anhDangNhapHs: '/than-thu-v2/nho/thu-1-3.webp',
 }
 const GOC = 'https://omr.ttadodaihoc.workers.dev'
 
@@ -41,17 +42,20 @@ function chay(duong: string, q: string, o: { phien?: object | null; diaChi?: str
   return { them, goi, window, truocKhiXong }
 }
 
+// SỬA CÓ CHỦ ĐÍCH 13/10: lệnh Sảnh hỏi sớm = `hoc-tap-sanh` (đúng lệnh Hôm nay dùng; trước hỏi `hoa2-sanh` mà màn không nhận ⇒ máy chủ chạy thừa).
 describe('đoạn mã nội tuyến — cổng học sinh', () => {
-  it('máy CHƯA đăng nhập: vỏ + màn đăng nhập nạp ngay; mảnh cổng + KaTeX nạp SAU DOMContentLoaded, ưu tiên THẤP; không gọi máy chủ', () => {
+  // SỬA CÓ CHỦ ĐÍCH 13/10 (thầy: "tối ưu cả cho máy yếu" — đo Chromium CPU chậm 6× + mạng 1,6 Mbps): màn đăng nhập không có công thức ⇒ KHÔNG nạp
+  // trước KaTeX (83 KB nén giành đường truyền với ảnh lớn nhất của màn); thay bằng nạp trước CHÍNH ảnh ấy (phần tử lớn nhất màn đầu).
+  it('máy CHƯA đăng nhập: vỏ + màn đăng nhập + ảnh thần thú nạp ngay; mảnh cổng nạp SAU DOMContentLoaded, ưu tiên THẤP; KHÔNG KaTeX; không gọi máy chủ', () => {
     const { them, goi, truocKhiXong } = chay('/hs', '')
-    expect(truocKhiXong).toBe(1)
+    expect(truocKhiXong).toBe(2)
     expect(them.map((t) => [t.href, t.fetchPriority ?? ''])).toEqual([
       ['/assets/AppHocSinh-f.js', ''],
+      ['/than-thu-v2/nho/thu-1-3.webp', ''],
       ['/assets/StudentPortalScreen-c.js', 'low'],
       ['/assets/StudentPortalScreen-c.css', 'low'],
-      ['/assets/katex-goi-h.js', 'low'],
-      ['/assets/katex-goi-h.css', 'low'],
     ])
+    expect(them[1]).toMatchObject({ rel: 'preload', as: 'image' })
     expect(goi).toEqual([])
   })
 
@@ -60,7 +64,7 @@ describe('đoạn mã nội tuyến — cổng học sinh', () => {
     expect(them.map((t) => t.href)).toEqual(['/assets/AppHocSinh-f.js', '/assets/StudentPortalScreen-c.js', '/assets/StudentPortalScreen-c.css'])
     expect(them.every((t) => !t.fetchPriority)).toBe(true)
     expect(goi).toEqual([
-      { url: GOC + '/game-v2/hoa2-sanh', than: '{"token":"tk1"}' },
+      { url: GOC + '/game-v2/hoc-tap-sanh', than: '{"token":"tk1"}' },
       { url: GOC + '/hs/ke-hoach-ngay', than: '{"token":"tk1"}' },
       { url: GOC + '/hs/ca-dang-mo', than: '{"token":"tk1"}' },
       { url: GOC + '/hs/buoi-hoc', than: '{"token":"tk1"}' },
@@ -117,16 +121,16 @@ describe('hoi-som — nhận phản hồi hỏi sớm', () => {
   it('đúng địa chỉ + thân ⇒ nhận MỘT lần (không gửi lại); lần sau trả null để màn gửi lệnh thật', async () => {
     batDauHoiSom(GOC, { token: 'tk1', sbd: '9' })
     expect(goiThat).toHaveBeenCalledTimes(5)
-    const r = await layHoiSom(GOC + '/game-v2/hoa2-sanh', thanTk('tk1'))
-    expect(r && (await r.json())).toEqual({ ok: true, url: GOC + '/game-v2/hoa2-sanh' })
-    expect(layHoiSom(GOC + '/game-v2/hoa2-sanh', thanTk('tk1'))).toBeNull()
+    const r = await layHoiSom(GOC + '/game-v2/hoc-tap-sanh', thanTk('tk1'))
+    expect(r && (await r.json())).toEqual({ ok: true, url: GOC + '/game-v2/hoc-tap-sanh' })
+    expect(layHoiSom(GOC + '/game-v2/hoc-tap-sanh', thanTk('tk1'))).toBeNull()
     expect(goiThat).toHaveBeenCalledTimes(5)
   })
 
   it('khác thân (em khác) hoặc khác máy chủ ⇒ không nhận', () => {
     batDauHoiSom(GOC, { token: 'tk1', sbd: '9' })
-    expect(layHoiSom(GOC + '/game-v2/hoa2-sanh', thanTk('tk2'))).toBeNull()
-    expect(layHoiSom('https://khac.workers.dev/game-v2/hoa2-sanh', thanTk('tk1'))).toBeNull()
+    expect(layHoiSom(GOC + '/game-v2/hoc-tap-sanh', thanTk('tk2'))).toBeNull()
+    expect(layHoiSom('https://khac.workers.dev/game-v2/hoc-tap-sanh', thanTk('tk1'))).toBeNull()
     expect(layHoiSom(GOC + '/hs/lich-su', JSON.stringify({ sbd: '9' }))).not.toBeNull()
   })
 
@@ -153,10 +157,10 @@ describe('hoi-som — nhận phản hồi hỏi sớm', () => {
     await layHoiSom('https://chua-nhan.dev/x', than) // không nhận gì, chỉ chờ lượt fetch giả xong
     await new Promise((r) => setTimeout(r, 0))
     ghiDiaChiDaDung('https://khac.workers.dev')
-    expect(xemHoiSomDaVe('/game-v2/hoa2-sanh', than)).toBeNull()
+    expect(xemHoiSomDaVe('/game-v2/hoc-tap-sanh', than)).toBeNull()
     ghiDiaChiDaDung(GOC)
-    expect(xemHoiSomDaVe('/game-v2/hoa2-sanh', than)).toMatchObject({ ok: true, status: 200 })
-    danhDauDaNhan('/game-v2/hoa2-sanh', than)
-    expect(xemHoiSomDaVe('/game-v2/hoa2-sanh', than)).toBeNull()
+    expect(xemHoiSomDaVe('/game-v2/hoc-tap-sanh', than)).toMatchObject({ ok: true, status: 200 })
+    danhDauDaNhan('/game-v2/hoc-tap-sanh', than)
+    expect(xemHoiSomDaVe('/game-v2/hoc-tap-sanh', than)).toBeNull()
   })
 })

@@ -92,7 +92,21 @@ export function taoD1That() {
 
   const dbThat = {
     prepare,
-    async batch(ds: D1PreparedStatement[]) {
+    batch(ds: D1PreparedStatement[]) {
+      // NHƯ D1 THẬT: mỗi lô chạy NGUYÊN KHỐI, lô sau chờ lô trước (13/10 — mã máy chủ chạy song song nhiều đọc/ghi; bản giả trước đây để hai lô chồng
+      // nhau ⇒ "cannot start a transaction within a transaction", lỗi D1 thật không có).
+      const chay = hangLo.then(() => chayLo(ds))
+      hangLo = chay.catch(() => undefined)
+      return chay
+    },
+    // Sessions API (Boss 22/09, lượt 2): D1 giả KHÔNG có replica để mô phỏng thật — trả nguyên bản sqlite trong bộ nhớ này,
+    // cùng đối tượng `prepare/batch`, để route dùng withSession chạy Y HỆT route không dùng (không đổi kết quả/số lệnh test đo).
+    withSession(_constraintOrBookmark?: string) {
+      return dbThat
+    },
+  }
+  let hangLo: Promise<unknown> = Promise.resolve()
+  async function chayLo(ds: D1PreparedStatement[]) {
       soLenh.batch++
       sql.exec('BEGIN')
       try {
@@ -105,12 +119,6 @@ export function taoD1That() {
         sql.exec('ROLLBACK')
         throw e
       }
-    },
-    // Sessions API (Boss 22/09, lượt 2): D1 giả KHÔNG có replica để mô phỏng thật — trả nguyên bản sqlite trong bộ nhớ này,
-    // cùng đối tượng `prepare/batch`, để route dùng withSession chạy Y HỆT route không dùng (không đổi kết quả/số lệnh test đo).
-    withSession(_constraintOrBookmark?: string) {
-      return dbThat
-    },
   }
   const env = {
     MA_BI_MAT: 'bi-mat-thu',

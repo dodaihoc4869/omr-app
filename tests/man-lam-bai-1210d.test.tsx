@@ -93,7 +93,7 @@ describe('màn làm bài', () => {
     expect(screen.getByText(/B đứng trước C nên tính acid/)).toBeTruthy() // giải thích ý sai mở sẵn (công thức tách thẻ sub)
     fireEvent.click(screen.getByRole('button', { name: 'Xem lời giải đầy đủ cả 4 ý' }))
     expect(screen.getByText('Tính phi kim tăng dần trong chu kì.')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Tự chữa câu này' })).toBeTruthy(); expect(onCapNhat).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: 'Sửa câu này' })).toBeTruthy(); expect(onCapNhat).toHaveBeenCalledOnce()
   })
   it('Trả lời ngắn: 4 ô + bàn phím số riêng, KHÔNG có ô nhập (không bật bàn phím điện thoại); phím máy tính vẫn nhập; gửi "-1,5"', async () => {
     moMan([TLN])
@@ -129,7 +129,7 @@ describe('màn làm bài', () => {
     await screen.findByText('Đúng · tự làm')
     expect(screen.getByText('Em chọn · đáp án')).toBeTruthy()
     expect(screen.getByText('N liên kết với 2 gốc hydrocarbon.')).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Tự chữa câu này' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Sửa câu này' })).toBeNull()
     expect(screen.getByRole('button', { name: /Kết thúc chặng/ })).toBeTruthy()
   })
   it('câu Gói 7 có hướng dẫn: chip "Câu mới · <tên bài>", thẻ chọn cách, hai nút; "Tự làm câu này" mở khu trả lời', async () => {
@@ -138,7 +138,9 @@ describe('màn làm bài', () => {
     await screen.findByText(TLN.text)
     expect(screen.getByText('Câu mới · Bài 8. Amine')).toBeTruthy()
     expect(screen.getByText('Câu này em chọn làm thế nào?')).toBeTruthy()
-    expect(screen.getByText(/Cách nào cũng được tính vào/).textContent).toContain('24 câu hôm nay')
+    // Đợt 18 (làn H): bỏ dòng giải thích "Cách nào cũng được tính vào … Thầy xem riêng …"; mỗi cách còn MỘT dòng ngắn nói cách tính.
+    expect(screen.queryByText(/Cách nào cũng được tính vào/)).toBeNull()
+    expect(screen.getByText(/tính là câu tự làm/)).toBeTruthy(); expect(screen.getByText(/tính là có hỗ trợ/)).toBeTruthy()
     expect(screen.queryByRole('group', { name: 'Bàn phím số' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Học cách giải' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Tự làm câu này' }))
@@ -151,10 +153,10 @@ describe('màn làm bài', () => {
     expect(screen.getByText('Câu này em chọn làm thế nào?')).toBeTruthy()
     expect(screen.queryByText(/Cách nào cũng được tính vào/)).toBeNull()
   })
-  it('gợi ý: nút bóng đèn mở khối gợi ý; giữ câu "lượt dùng gợi ý tính là có hỗ trợ"; gửi assisted', async () => {
+  it('gợi ý: nút bóng đèn mở khối gợi ý; giữ dòng ngắn "Câu có gợi ý: tính là có hỗ trợ."; gửi assisted', async () => {
     moMan([{ ...TN, goiY: { cotLoi: 'Bậc amine = số gốc hydrocarbon gắn vào N.' } }])
     await screen.findByText(TN.text)
-    expect(screen.getByText(/lượt dùng gợi ý tính là có hỗ trợ/)).toBeTruthy()
+    expect(screen.getByText('Câu có gợi ý: tính là có hỗ trợ.')).toBeTruthy()
     expect(screen.queryByText('Bậc amine = số gốc hydrocarbon gắn vào N.')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Xem gợi ý' }))
     expect(screen.getByText('Bậc amine = số gốc hydrocarbon gắn vào N.')).toBeTruthy()
