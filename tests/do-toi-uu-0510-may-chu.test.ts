@@ -3,6 +3,7 @@
 // ms CPU (độ trễ giả 0) và KB phản hồi của ĐÚNG các lệnh app học sinh / phụ huynh / thầy gọi — trên dữ liệu GẦN THẬT
 // (1 lớp 40 em, kho 8 đề × 30 câu Phần I/II/III, 3 chiến dịch tick qua /gv/bai-da-day, em S01 làm ~200 câu qua 11 ngày bằng đường
 // thật resume/sync/start/answer/complete, có trận Đoàn), khi OMNI TẮT và khi BẬT.
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ đo trận Đoàn (doan-sanh/mo/xem/nop) và vang-xem / shop-danh-sach.
 //
 // CHẠY ĐƯỢC TRÊN CẢ BẢN TRƯỚC LẪN BẢN SAU: chỉ đi đường `worker.fetch` (không import hàm nội bộ nào ngoài `taoD1That`).
 //  - In mỗi lệnh một dòng `DO|kịch bản|tên|vòng|đợt|ms|KB` (đợt tính theo ĐƯỜNG GĂNG: lệnh D1 bắt đầu sau khi lệnh khác xong ⇒ đợt sau).
@@ -232,7 +233,7 @@ async function dungThe(omni: boolean): Promise<The> {
       const h = (await goiTho(env, '/hs/hoi-thay', { token: the.token.get('S03'), qid: '', nguon: 'dao' })).j
       expect(h.ok).toBe(false)
     }
-    // S02 chơi Đảo bốn tối đầu rồi bận một tuần (05/10 quay lại: kế hoạch dồn câu ôn nợ sang Đoàn ⇒ có trận Đoàn để đo).
+    // S02 chơi Đảo bốn tối đầu rồi bận một tuần (05/10 quay lại: đo Sảnh của em có câu ôn nợ dồn).
     if (ngay <= '2026-09-27') await choiNgay(the, 'S02', 4, omni)
     for (const sbd of EM.slice(2, 6)) await choiNgay(the, sbd, 1, omni)
   }
@@ -335,27 +336,9 @@ async function kichBanDo(the: The, omni: boolean, tre: number, ghi: (ten: string
   const daLam = await em('hoa2-cau-da-lam', '/game-v2/hoa2-cau-da-lam')
   const qids = ((daLam.cau ?? []) as Obj[]).slice(0, 12).map((x) => String(x.qid))
   await em('hoa2-cau-chi-tiet', '/game-v2/hoa2-cau-chi-tiet', qids.length ? { qids } : { qid: cau[0]!.qid })
-  // Đoàn: S02 (nghỉ một tuần, câu ôn nợ dồn sang Đoàn) đăng nhập → Sảnh → Sảnh Đoàn → Lên đường → xem → nộp hai hiệp.
+  // S02 (nghỉ một tuần) đăng nhập → Sảnh. (Trận Đoàn đã gỡ 14/10.)
   const dn2 = await goi('dang-nhap-S02', '/hs/dang-nhap', { sbd: 'S02', matKhau: 'mk-S02' })
-  const em2 = (ten: string, duong: string, than: Obj = {}) => goi(ten, duong, { token: String(dn2.token), ...than })
-  const sanhS02 = await em2('hoa2-sanh-S02', '/game-v2/hoa2-sanh')
-  expect(sanhS02.doan?.con, JSON.stringify(sanhS02).slice(0, 300)).toBeGreaterThan(0)
-  await em2('doan-sanh', '/game-v2/doan-sanh')
-  const mo = await em2('doan-mo', '/game-v2/doan-mo')
-  const ma = mo.doan?.ma
-  expect(ma, JSON.stringify(mo).slice(0, 300)).toBeTruthy()
-  for (let h = 1; h <= 2; h++) {
-    let xem = await em2(`doan-xem-${h}`, '/game-v2/doan-xem', { ma })
-    if ((xem.doan?.tran?.moSauMs ?? 0) > 0) { troi(Number(xem.doan.tran.moSauMs) + 500); xem = await em2(`doan-xem-${h}b`, '/game-v2/doan-xem', { ma }) }
-    const t2 = xem.doan?.tran, c2 = xem.doan?.cau
-    expect(c2?.de, JSON.stringify(xem).slice(0, 400)).toBeTruthy()
-    troi(20_000)
-    const nop = await em2(`doan-nop-${h}`, '/game-v2/doan-nop', { ma, hiep: t2.hiep, answer: traLoiCho(the, String(c2.qid), c2.de?.phan, h), hanhDong: 'danh', ...(omni ? { msLam: 20_000, tuTin: 'chac' } : {}) })
-    expect(nop.ok, JSON.stringify(nop).slice(0, 300)).toBe(true)
-    troi(15_000)
-  }
-  await em('vang-xem', '/game-v2/vang-xem')
-  await em('shop-danh-sach', '/game-v2/shop-danh-sach')
+  await goi('hoa2-sanh-S02', '/game-v2/hoa2-sanh', { token: String(dn2.token) })
   await em('luyen-nen', '/hs/luyen-nen', { nhan: 'hieu_suat' })
   // Phụ huynh (SBD trần như app /ph khi chưa có mã liên kết).
   await goi('ph-tat-ca-ve-con', '/ph/tat-ca-ve-con', { sbd: S1 })
@@ -375,7 +358,7 @@ const TRE = 25
 const tatCa: { omni: boolean; dong: DongDo[]; msDong: DongDo[] }[] = []
 const mau: Record<string, unknown> = {}
 const CHUOI_MO = ['dang-nhap', 'hoa2-sanh-1', 'ke-hoach-ngay', 'academic-sync']
-const CHUOI_CHOI = ['start', 'answer-1', 'answer-2', 'answer-3', 'answer-4', 'complete', 'doan-nop-1', 'doan-nop-2']
+const CHUOI_CHOI = ['start', 'answer-1', 'answer-2', 'answer-3', 'answer-4', 'complete']
 
 async function chay(omni: boolean) {
   // Lượt 1: độ trễ giả TRE ms/vòng ⇒ đếm vòng + đợt (đường găng).

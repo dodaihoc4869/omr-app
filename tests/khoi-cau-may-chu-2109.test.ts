@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ 4 ca ĐOÀN HỘ TỐNG (câu cá nhân `startDoanKhoLop`, câu trùm Phần II) và cờ `doan_ho_tong` thừa.
 // BẤT BIẾN KHỐI — MÁY CHỦ (Code 1, 21/09/2026; P0 thầy báo 20:28: học sinh khối 11 nhận câu khối 12 ở Đảo, "quét hết mọi chỗ rút sửa triệt để"; luật Boss: chỉ khối EM ĐANG HỌC hoặc THẤP hơn).
 // Hàm dùng chung: src/lib/khoi-cau.ts (`cauHopKhoi`). Kho ở đây có CÙNG mã dạng "A.1" ở ba tờ khối 10 / 11 / 12 (đúng cái bẫy ngoài đời: tên dạng dùng chung nhiều khối) và tờ khối 12 LỚN NHẤT
 // để nếu bộ lọc hở thì lượt rút gần như chắc chắn dính câu khối 12. SQLite thật (tests/_d1-that.ts), token thật.
@@ -20,7 +21,7 @@ const gio = (s: string) => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSyste
 const NGAY = '2026-09-22'
 const TO: Record<Khoi, string> = { 10: 'DH-10-C1-B1-TN', 11: 'DH-11-C1-B1-TN', 12: 'DH-12-C1-B1-TN' }
 const SO_CAU: Record<Khoi, number> = { 10: 8, 11: 8, 12: 60 } // Phần I; khối 12 lớn nhất: bộ lọc hở ⇒ lượt rút dính khối 12
-const SO_II: Record<Khoi, number> = { 10: 4, 11: 4, 12: 30 } // Phần II (câu chung của trùm Đoàn)
+const SO_II: Record<Khoi, number> = { 10: 4, 11: 4, 12: 30 } // Phần II (giữ trong kho để lượt rút có cả câu Phần II)
 /** Mã câu THẬT: `<mã tờ>-<phần>-<số>` (vd `DH-12-C1-B1-TN-I-5`) — đúng cách kho đặt qid; khối đọc được từ chính mã. */
 const qidI = (k: Khoi, i: number) => `${TO[k]}-I-${i}`
 const qidII = (k: Khoi, i: number) => `${TO[k]}-II-${i}`
@@ -36,7 +37,6 @@ function dung(khoiEm: Khoi, o: { tenLop?: string; soII?: Record<Khoi, number> } 
     for (let i = 0; i < SO_CAU[k]; i++) them.run(TO[k], qidI(k, i), 'v1', `g-${qidI(k, i)}`, 'A.1', JSON.stringify(cauJson(qidI(k, i), TO[k], 'A.1')))
     for (let i = 0; i < (o.soII ?? SO_II)[k]; i++) them.run(TO[k], qidII(k, i), 'v1', `g-${qidII(k, i)}`, 'A.1', JSON.stringify(cauJson(qidII(k, i), TO[k], 'A.1', 'II')))
   }
-  d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('doan_ho_tong',?,'x')").run(JSON.stringify({ toanBo: true }))
   for (const [sbd, ten] of [['S1', 'Em Một'], ['S2', 'Em Hai']] as const) {
     d.sql.prepare('INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,lop,cap_nhat_luc) VALUES(?,?,?,?,?)').run(sbd, ten, 'mk', String(khoiEm), 'x')
     if (o.tenLop) d.sql.prepare('UPDATE hoc_sinh SET ten_lop = ? WHERE sbd = ?').run(o.tenLop, sbd)
@@ -109,41 +109,6 @@ describe('ĐẢO — start đường CŨ (cờ lùi game_luot_moi = tat), Linh T
     const qs = ((r?.questions ?? []) as { qid: string }[]).map((x) => x.qid)
     expect(qs.length, 'đường cũ phải có câu để kiểm').toBeGreaterThan(0)
     expect(khoiToi(qs), `đường cũ trả: ${qs.join(',')}`).toBeLessThanOrEqual(11)
-  })
-})
-
-describe('ĐOÀN HỘ TỐNG — câu cá nhân (`startDoanKhoLop`) cùng luật khối', () => {
-  for (const khoiEm of [11, 10] as Khoi[]) {
-    it(`em khối ${khoiEm} mở đoàn: 6 câu cá nhân đều thuộc tờ khối ≤ ${khoiEm}`, async () => {
-      gio(`${NGAY}T10:00:00`)
-      const d = dung(khoiEm)
-      const mo = await goi(d, 'doan-mo')
-      expect(mo.ok).toBe(true)
-      const chang = d.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(mo.doan.ma) as { json: string }
-      const nguoi = (JSON.parse(chang.json).nguoi as { sbd: string; cau: { qid: string }[] }[]).find((x) => x.sbd === 'S1')!
-      const qs = nguoi.cau.map((c) => c.qid)
-      expect(qs.length).toBeGreaterThan(0)
-      expect(qs.filter((q) => khoiQid(q) > khoiEm), `câu khối cao: ${qs.join(',')}`).toEqual([])
-    })
-  }
-})
-
-describe('ĐOÀN HỘ TỐNG — câu CHUNG của trùm (Phần II, hiệp 4 và 8) cùng luật khối', () => {
-  it('kho Phần II CHỈ có tờ khối 12 (tờ khối 10/11 không có): em khối 11 mở đoàn ⇒ trùm KHÔNG được lấy câu khối 12 (thà không có câu chung còn hơn câu khối cao)', async () => {
-    gio(`${NGAY}T10:00:00`)
-    const d = dung(11, { soII: { 10: 0, 11: 0, 12: 30 } })
-    const mo = await goi(d, 'doan-mo')
-    expect(mo.ok).toBe(true)
-    const chang = JSON.parse((d.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(mo.doan.ma) as { json: string }).json)
-    const qs = Object.values((chang.trum ?? {}) as Record<string, { qid: string } | null>).filter(Boolean).map((x) => x!.qid)
-    expect(qs.filter((q) => khoiQid(q) > 11), `câu trùm khối cao: ${qs.join(',')}`).toEqual([])
-  })
-  it('đối chứng: em khối 12 cùng kho ⇒ có câu trùm (bộ lọc không chặn nhầm)', async () => {
-    gio(`${NGAY}T10:00:00`)
-    const d = dung(12, { soII: { 10: 0, 11: 0, 12: 30 } })
-    const mo = await goi(d, 'doan-mo')
-    const chang = JSON.parse((d.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(mo.doan.ma) as { json: string }).json)
-    expect(Object.values((chang.trum ?? {}) as Record<string, unknown>).filter(Boolean).length).toBeGreaterThan(0)
   })
 })
 

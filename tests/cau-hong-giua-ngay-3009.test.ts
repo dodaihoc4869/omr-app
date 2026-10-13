@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — K3 bỏ khẳng định startDoan2 (đã gỡ), giữ khẳng định Đảo / Sảnh.
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // PHẢN BIỆN #108 (vòng 1, 30/09) — khoá các lỗ hổng của bản sửa "Chưa tải được câu hôm nay" / rương kẹt 48/49 + rải đều câu mới:
 // (K1/SOÁT) câu không phục vụ được giữa ngày ⇒ CHỈ thay đúng câu ấy (mới thay mới, ôn thay ôn), KHÔNG lập lại cả ngày theo cờ rải đều hiện tại —
@@ -10,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { docMetaCau, layKeHoachHomNay, qidGoc, sanh2, tuLuanTuMeta, xoaDemChienDich } from '../server/src/srs2-d1'
-import { boQuaMoi, logChuaNap, lyDoLuotRong, startDao2, startDoan2 } from '../server/src/srs2-game'
+import { boQuaMoi, logChuaNap, lyDoLuotRong, startDao2 } from '../server/src/srs2-game'
 import { laCauTuLuan } from '../server/src/cam-tu-luan'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { ghiSuKien, ngayVn, type SuKien } from '../server/src/su-kien-hoc'
@@ -214,8 +215,6 @@ describe('K2 / K2b / K3 — kế hoạch và game cùng MỘT phép kiểm tự 
     const dao = await startDao2(env, 'S1', nay)
     expect(dao.lyDo).not.toBe('khoa_cho_doan')
     expect(qidsCua(dao).length).toBeGreaterThan(0)
-    const doan = await startDoan2(env, 'S1', nay)
-    expect(doan.lyDo).toBe('xong_on_hom_nay')
     const s = await sanh2(env, 'S1', nay)
     expect(s.khoaDao).toBe(false)
   })
@@ -227,11 +226,11 @@ describe('vang — câu vắng khi nạp mà meta còn', () => {
     const hs = { meta: new Map([['Q1', m]]) }
     const vang = boQuaMoi()
     vang.vang.add('Q1')
-    expect(lyDoLuotRong(['Q1'], hs, new Set(), new Set(), vang)).toBe('chua_nap_duoc')
+    expect(lyDoLuotRong(['Q1'], hs, new Set(), vang)).toBe('chua_nap_duoc')
     const tl = boQuaMoi()
     tl.tuLuan.add('Q1')
-    expect(lyDoLuotRong(['Q1'], hs, new Set(), new Set(), tl)).toBe('xong')
-    expect(lyDoLuotRong(['Q9'], hs, new Set(), new Set(), boQuaMoi())).toBe('xong') // mất meta = đã rút khỏi kho
+    expect(lyDoLuotRong(['Q1'], hs, new Set(), tl)).toBe('xong')
+    expect(lyDoLuotRong(['Q9'], hs, new Set(), boQuaMoi())).toBe('xong') // mất meta = đã rút khỏi kho
   })
 })
 

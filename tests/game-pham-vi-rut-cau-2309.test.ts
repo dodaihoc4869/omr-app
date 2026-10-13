@@ -1,9 +1,9 @@
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca trùm Đoàn (doan-mo) + phần doan-mo của ca đồng hồ; 3 ca kho riêng nay rút qua `start` của Đảo (bỏ danhDau).
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import {gameV2} from '../server/src/game-v2'
 import {gameToken} from '../server/src/game-v2-auth'
-import {danhDau} from '../server/src/game-v2-doan'
 import {giayCuaHiep} from '../src/game/than-thu-v2/doan-core'
 import {chooseLuotMoi,learnedQuestionFilter,targetLevel,type Evidence,type PrivateQuestion} from '../src/game/than-thu-v2/core'
 import {taoD1That} from './_d1-that'
@@ -14,7 +14,6 @@ afterEach(()=>vi.useRealTimers())
 
 function dung(){
   const d=taoD1That()
-  d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('doan_ho_tong',?,'x')").run(JSON.stringify({toanBo:true}))
   d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE','DE','12',60,'kho/DE.json',0,'v1')").run()
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE','v1','x')").run()
   const them=d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
@@ -40,7 +39,7 @@ describe('kho game theo phần từng em đã học',()=>{
   it('không lấy dạng bạn cùng lớp đã học và không lặp QID/nhóm nội dung trong lượt',async()=>{
     const d=dung()
     for(const [sbd,dang] of [['S1','A'],['S2','B']] as const){
-      const r=await gameV2(d.env,'start',danhDau({token:await gameToken(d.env,sbd),mode:'adventure'})) as {questions:{qid:string;group:string;dang:string}[]}
+      const r=await gameV2(d.env,'start',{token:await gameToken(d.env,sbd),mode:'adventure'}) as {questions:{qid:string;group:string;dang:string}[]}
       expect(r.questions).toHaveLength(6)
       expect(r.questions.every(q=>q.dang===dang)).toBe(true)
       expect(new Set(r.questions.map(q=>q.qid)).size).toBe(r.questions.length)
@@ -49,29 +48,22 @@ describe('kho game theo phần từng em đã học',()=>{
   })
   it('chưa có bằng chứng riêng thì trả kho trống, không tự lấy bài của lớp',async()=>{
     const d=dung()
-    const r=await gameV2(d.env,'start',danhDau({token:await gameToken(d.env,'S3'),mode:'adventure'})) as {questions:unknown[];lyDo:string}
+    const r=await gameV2(d.env,'start',{token:await gameToken(d.env,'S3'),mode:'adventure'}) as {questions:unknown[];lyDo:string}
     expect(r.questions).toEqual([])
     expect(r.lyDo).toBe('kho_trong')
   })
   it('sổ học riêng vẫn mở đúng dạng khi bảng hồ sơ dựng lại chưa có dòng',async()=>{
     const d=dung()
     d.sql.prepare("DELETE FROM nam_kt_cau WHERE sbd='S2'").run()
-    const r=await gameV2(d.env,'start',danhDau({token:await gameToken(d.env,'S2'),mode:'adventure'})) as {questions:{dang:string}[]}
+    const r=await gameV2(d.env,'start',{token:await gameToken(d.env,'S2'),mode:'adventure'}) as {questions:{dang:string}[]}
     expect(r.questions.length).toBeGreaterThan(0)
     expect(r.questions.every(q=>q.dang==='B')).toBe(true)
   })
-  it('đồng hồ tăng theo loại câu và mức độ, cùng số giây dùng cho cả hiệp',async()=>{
+  it('đồng hồ tăng theo loại câu và mức độ, cùng số giây dùng cho cả hiệp',()=>{
     // CNH-1.0 (02 §8): hạn mềm = ceil(1,25 × giây gốc), sàn 60, KHÔNG trần 180; đồng hồ đội ≤ 300/hiệp.
     expect(giayCuaHiep(1,[{phan:'I',mucDo:'biet'}])).toBe(94) // ceil(1,25 × 75)
     expect(giayCuaHiep(1,[{phan:'I',mucDo:'biet'},{phan:'III',mucDo:'van_dung'}])).toBe(300) // câu dài nhất chạm trần đội 300
     expect(giayCuaHiep(4,[])).toBe(60) // không kèm câu: hằng số cũ của hiệp trùm
-    const d=dung()
-    const r=await gameV2(d.env,'doan-mo',{token:await gameToken(d.env,'S1')}) as {doan:{tran:{giay:number;conMs:number}}}
-    // MỤC 6 (23/09): hạn hiệp còn cộng THỜI GIAN ĐỌC theo độ dài đề ⇒ không còn hằng số 90 s;
-    // máy chủ vẫn là nguồn hạn cuối và đồng hồ đếm đúng hạn ấy.
-    expect(r.doan.tran.giay).toBeGreaterThanOrEqual(60) // §8: sàn 60 giây
-    expect(r.doan.tran.giay).toBeLessThanOrEqual(300) // §8: trần ĐỒNG HỒ ĐỘI 300 giây/hiệp
-    expect(r.doan.tran.conMs).toBe(r.doan.tran.giay*1000)
   })
 })
 
@@ -85,21 +77,6 @@ describe('ôn có khoảng cách và chi phí chọn',()=>{
     const attempts=Array.from({length:5},(_,i)=>({id:`a${i}`,session:i<3?'luot1':'luot2',group:`g${i}`,qid:`q${i}`,dang:'A',mucDo:'biet',correct:i!==2,assisted:false,at:T+i,novel:true}))
     expect(targetLevel('A',evidence,attempts)).toBe(1)
     expect(targetLevel('A',evidence,attempts.map(a=>({...a,assisted:true})))).toBe(0)
-  })
-  it('trùm chỉ lấy câu vừa sức; kho chỉ có trùm quá khó thì không ép học sinh làm',async()=>{
-    for(const coCauDe of [true,false]){
-      const d=dung()
-      for(const [qid,mucDo] of [['TRUM-KHO','van_dung'],...(coCauDe?[['TRUM-DE','biet']]:[])]){
-        const q={...cau(qid!),phan:'II',ideas:['a','b','c','d'],correct:'DSDS',mucDo}
-        d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE',qid,'v1',q.group,'A',JSON.stringify({...q,maDe:'DE', lop: '12',version:'v1'}))
-      }
-      const r=await gameV2(d.env,'doan-mo',{token:await gameToken(d.env,'S1')}) as any
-      const row=d.sql.prepare('SELECT json FROM doan_chang WHERE ma=?').get(r.doan.ma) as {json:string}
-      const ids=Object.values(JSON.parse(row.json).trum).map((q:any)=>q?.qid??null)
-      expect(ids).not.toContain('TRUM-KHO')
-      if(coCauDe)expect(ids).toContain('TRUM-DE')
-      else expect(ids).toEqual([null,null])
-    }
   })
   it('ưu tiên câu tới hạn, hoãn câu vừa đúng và câu sai trong ngày',()=>{
     const ngay=(n:number)=>new Date(T-n*86_400_000).toISOString()

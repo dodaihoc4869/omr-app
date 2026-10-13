@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "Đoàn: ref câu của chặng mang btv" (lệnh doan-mo/doan-xem đã gỡ).
 // (2c) GHIM PHIÊN BẢN THAM CHIẾU `~bt` (06/10, lệnh thầy "Làm chuẩn đoán bước sai, còn nhỏ") — D1 thật (node:sqlite, đủ migration), đường Worker thật.
 // Tham chiếu `<Q>~bt<k>` không lưu nội dung: chấm / resume / Đoàn SINH LẠI. Nay ref phiên mang phiên bản bộ sinh (`btv`, BT_PHIEN_BAN = 1); bảng đăng ký
 // `BANG_PHIEN_BAN_BT`; tham chiếu CŨ (không `btv`) ⇒ phiên bản 1; số lạ ⇒ LÙI VỀ CÂU GỐC (không ném lỗi, không chấm theo câu sinh lệch).
@@ -14,7 +15,6 @@ import { xoaDemChienDich } from '../server/src/srs2-d1'
 import { xoaDemCauNghi, xoaDemChanKhoi } from '../server/src/chan-khac-khoi'
 import { BANG_PHIEN_BAN_BT, BT_PHIEN_BAN, PHIEN_BAN_BIEN_THE, apBienThe, apBienTheTheoPhienBan, cacDangCoBoSinh, cacHoDe, phienBanBt, sinhBienThe } from '../server/src/bien-the-sinh'
 import { bienTheTheoQid, luiVeCauGoc, phuQidAoMoi } from '../server/src/ban-khac-ao'
-import { DEM_NGUOC_MS } from '../server/src/game-v2-doan'
 import type { PrivateQuestion } from '../src/game/than-thu-v2/core'
 import type { Env } from '../server/src/kieu'
 
@@ -129,25 +129,5 @@ describe('(2c) tham chiếu `~bt` trong chuyến: phát mang btv; cũ vẫn ch�
     expect(t.correct).toBe(true)
     expect(t.answer).toBe('4,5')
     expect(bt0.correct).not.toBe('4,5')
-  })
-  it('Đoàn: ref câu của chặng mang btv = 1; phiên bản lạ ⇒ chặng hiện câu gốc (không rút câu, không lỗi)', async () => {
-    const { d, env } = dung()
-    d.sql.exec('DELETE FROM game_v2_session') // không có nhịp Đảo ⇒ câu ôn vào Đoàn
-    vi.setSystemTime(luc('2026-10-06'))
-    const mo = await em(env, '/game-v2/doan-mo', {})
-    expect(mo.ok, JSON.stringify(mo).slice(0, 400)).toBe(true)
-    const ma = String(mo.doan.ma)
-    const row = d.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(ma) as { json: string }
-    const phong = JSON.parse(row.json) as { nguoi: { cau: Record<string, unknown>[] }[] }
-    expect(phong.nguoi[0]!.cau[0]).toMatchObject({ qid: 'Q3~bt0', btv: 1 })
-    vi.setSystemTime(Date.now() + DEM_NGUOC_MS + 500)
-    const bt0 = apBienThe(gocQ3(d), 'Q3~bt0', 11)!
-    expect((await em(env, '/game-v2/doan-xem', { ma })).doan.cau.de.text).toBe(bt0.text)
-    phong.nguoi[0]!.cau[0]!.btv = 99
-    d.sql.prepare('UPDATE doan_chang SET json = ? WHERE ma = ?').run(JSON.stringify(phong), ma)
-    const xem = await em(env, '/game-v2/doan-xem', { ma })
-    expect(xem.ok).toBe(true)
-    expect(xem.doan.cau).toMatchObject({ qid: 'Q3~bt0', de: { text: 'Đề câu Q3' } })
-    expect(xem.doan.cau.rut).toBeUndefined()
   })
 })

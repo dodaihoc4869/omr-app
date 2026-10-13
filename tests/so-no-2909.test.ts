@@ -1,6 +1,7 @@
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // SỔ NỢ + ĐAN XEN (thầy chốt 29/09, docs/DAC-TA-KIEM-TRA-DAU-GIO-SO-NO-2909.md mục A, B4, E1–E2; hợp đồng docs/so-no-2909/HOP-DONG.md).
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ startDoan2; nhãn nợ nay kiểm qua chuyến học tập trung startDao2(…, true) (rút cả phần doan + dao của kế hoạch).
 import { describe, expect, it } from 'vitest'
 import {
   chiaLuot, danXenLuot, danXenNgay, henOnSau, lapKeHoachNgay, laNo, nhanNo, phanLoaiDanXen, phatLaiCau, soNgayTraNo, soSanhNo,
@@ -9,7 +10,7 @@ import {
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { docHoSo2, docLichSuCoNguon, ghiMocDayLai, layKeHoachHomNay } from '../server/src/srs2-d1'
-import { startDoan2 } from '../server/src/srs2-game'
+import { startDao2 } from '../server/src/srs2-game'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
 
@@ -297,11 +298,11 @@ describe('Sổ nợ trên D1 thật', () => {
     expect(hs.theLucNoCu).toBe(12)
     expect(kh.tong).toBe(11)
     expect(kh.doan).toContain('P30')
-    // Nhãn nợ ở chặng Đoàn: câu lên bảng mang "Lên bảng 30/09".
+    // Nhãn nợ ở chuyến học (tập trung = rút cả phần doan của kế hoạch; Đoàn đã gỡ 14/10): câu lên bảng mang "Lên bảng 30/09".
     const ls = await docLichSuCoNguon(env, 'S1', ['P30', 'Q1'])
     expect(ls!.get('P30')!.map((x) => x.nguon)).toEqual(['len_bang'])
-    const doan = await startDoan2(env, 'S1', T0 + NGAY)
-    const qs = doan.questions as { qid: string; nhanNo?: string }[]
+    const chuyen = await startDao2(env, 'S1', T0 + NGAY, true)
+    const qs = chuyen.questions as { qid: string; nhanNo?: string }[]
     expect(qs.length).toBeGreaterThan(0)
     for (const q of qs) expect(q.nhanNo).toMatch(/^Sai 1 lần · (Đảo|Lên bảng) \d\d\/\d\d · Chiến dịch 'CD DE1' · 28\/09$|^Sai 1 lần · Lên bảng 30\/09$/)
   })

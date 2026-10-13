@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ khẳng định thẻ Đoàn (MO_TA_THE) và tệp game-v2-doan-the.ts khỏi danh sách quét.
 // Thầy 28/09: "Bỏ A.I Đỗ Đại Học thay bằng Thầy Đỗ Đại Học" — "gộp luôn, đổi cả bên học sinh".
 // Khoá: (1) bộ lọc chuThay; (2) thông báo CŨ đã lưu trong student_notice (ghi trước 28/09, không ghi đè dữ liệu thật) hiện ra chữ "Thầy";
 // (3) mọi tệp màn HỌC SINH + game + tin máy chủ gửi học sinh không còn "A.I Đỗ Đại Học"/"Bộ não A.I" ngoài chú thích.
@@ -10,7 +11,6 @@ vi.mock('../server/src/game-v2-auth', () => ({ gameIdentity: async () => 'S1' })
 
 import { chuThay } from '../src/lib/chu-thay'
 import { notifications } from '../server/src/notifications'
-import { MO_TA_THE } from '../server/src/game-v2-doan-the'
 import { TIEU_DE_KHIEN, loiDaMat } from '../server/src/khien-mat'
 import { TIEU_DE_LUAT_CAP } from '../server/src/game-v2-hap-thu'
 import { taoD1That } from './_d1-that'
@@ -28,11 +28,10 @@ describe('chuThay — bộ lọc chung app + máy chủ', () => {
 })
 
 describe('tin máy chủ gửi học sinh', () => {
-  it('tin MỚI: tiêu đề/lời khiên, thần thú, thẻ Đoàn đều là "Thầy Đỗ Đại Học"', () => {
+  it('tin MỚI: tiêu đề/lời khiên, thần thú đều là "Thầy Đỗ Đại Học"', () => {
     expect(TIEU_DE_KHIEN).toBe('Thầy Đỗ Đại Học · Khiên của em')
     expect(loiDaMat()).toContain('Thầy Đỗ Đại Học đã trừ 1 khiên của em')
     expect(TIEU_DE_LUAT_CAP).toBe('Thầy Đỗ Đại Học · Thần thú của em')
-    expect(MO_TA_THE.loai_phuong_an.moTa).toBe('Thầy Đỗ Đại Học gạch một đáp án sai')
   })
 
   it('tin CŨ đã lưu (chữ A.I) ⇒ danh sách thông báo của em trả chữ "Thầy"; bảng student_notice KHÔNG bị ghi đè', async () => {
@@ -52,7 +51,7 @@ describe('khoá nguồn màn học sinh', () => {
     'src/screens/StudentPortalScreen.tsx', 'src/screens/ExamTakeScreen.tsx', 'src/screens/PhieuScreen.tsx',
     'src/components/KhoiBaiLuyen.tsx', 'src/components/xem-diem/KetQuaSauNop.tsx', // 06/10 gọn mã lần 2: bỏ KhungLoiGiaiGame.tsx (game Thần thú v1, đã xoá)
     'src/components/InfographicHuongDan.tsx', // TheBoNao + TheThuThachRieng đã XOÁ cùng Bộ não A.I (28/09)
-    'server/src/khien-mat.ts', 'server/src/game-v2-hap-thu.ts', 'server/src/game-v2-doan-the.ts', 'server/src/ph-giao-them.ts',
+    'server/src/khien-mat.ts', 'server/src/game-v2-hap-thu.ts', 'server/src/ph-giao-them.ts',
   ]
   const game = (thu: string): string[] => readdirSync(thu, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? game(`${thu}/${e.name}`) : /\.tsx?$/.test(e.name) ? [`${thu}/${e.name}`] : [])
   it('không còn "A.I Đỗ Đại Học"/"Bộ não A.I" ngoài chú thích', () => {
