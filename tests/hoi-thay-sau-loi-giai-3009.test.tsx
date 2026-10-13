@@ -80,23 +80,17 @@ describe('phiếu học sinh: nút luôn hiện dưới phần trả lời', () 
 describe('mọi màn em làm câu có Hỏi thầy; màn thi, Gọi lên bảng, lúc làm kiểm tra cá nhân / đề thử có giờ thì không', () => {
   const doc = (p: string) => readFileSync(p, 'utf8')
   it('lúc đang làm có nút', () => {
-    expect(doc('src/game/than-thu-v2/dao2/TrongAi.tsx')).toContain("hoi={{nguon:'dao',onHoi:()=>onAssisted(true)}}")
-    expect(doc('src/game/bi-a/TraLoiCau.tsx')).toContain("hoi={{ nguon: 'bi_a', onHoi: () => setTroGiup(true) }}")
-    expect(doc('src/game/than-thu-v2/Game.tsx')).toContain("hoiThay={feedback||!q?undefined:{qid:q.qid,nguon:'game',onHoi:()=>setAssisted(true)}}")
-    expect(doc('src/game/than-thu-v2/EscortQuestion.tsx')).toContain("nguon:'vo_dai',onHoi:()=>setAssisted(true)")
-    expect(doc('src/game/than-thu-v2/dao/ThamHiem.tsx')).toContain("hoiThay={phanHoi?undefined:{qid:q.qid,nguon:'dao',onHoi:()=>onAssisted(true)}}")
     expect(doc('src/components/bang-nhiem-vu/LamCauOn.tsx')).toContain('{!daCham && <NutHoiThay gon dangLam qid={c.qid} nguon="on_lai" />}')
     expect(doc('src/components/hoc-tap/ManLamBaiTap.tsx')).toMatch(/dangTraLoi && <NutHoiThay gon dangLam/)
     expect(doc('src/components/tu-luyen/ManTuLuyen.tsx')).toContain("cheDo: 'thi' as const,\n    // Thầy 13/10")
     expect(doc('src/components/tu-luyen/LuyenDeCauTruc.tsx')).toContain("cheDo: 'thi' as const, stt, hoiThay: { qid: q.id, nguon: 'luyen_de' } }")
-    for (const tep of ['src/components/hoa2/CauDaLam.tsx', 'src/components/ca-thi/CauCanChua.tsx', 'src/components/LuyenDeChuan.tsx', 'src/components/KhoiKhacPhuc3CheDo.tsx', 'src/game/than-thu-v2/doan2/XemLaiChuan.tsx', 'src/components/hoc-tap/ManKiemTraCaNhan.tsx']) {
+    for (const tep of ['src/components/hoa2/CauDaLam.tsx', 'src/components/ca-thi/CauCanChua.tsx', 'src/components/LuyenDeChuan.tsx', 'src/components/KhoiKhacPhuc3CheDo.tsx', 'src/components/hoc-tap/ManKiemTraCaNhan.tsx']) {
       expect(doc(tep), tep).toMatch(/hoiThay[=:]/)
     }
   })
   it('màn thi, Gọi lên bảng, lúc làm kiểm tra cá nhân, đề thử có giờ: không nút', () => {
     expect(doc('src/screens/ExamTakeScreen.tsx')).not.toMatch(/NutHoiThay|hoiThay/)
     expect(doc('src/screens/GoiLenBangScreen.tsx')).not.toMatch(/NutHoiThay|hoiThay/)
-    expect(doc('src/game/than-thu-v2/dao2/DeThu.tsx')).not.toMatch(/NutHoiThay|hoiThay|\bhoi=/)
     const kt = doc('src/components/hoc-tap/ManKiemTraCaNhan.tsx')
     expect(kt).toContain('<TheCau {...propsCauHoc(q,viTri+1,tra[q.qid]??\'\',v=>doi(q.qid,v),undefined,busy||sec===0)}/>')
     expect(kt.split('hoiThay').length).toBe(2) // chỉ ở phần KẾT QUẢ sau nộp

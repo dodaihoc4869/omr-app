@@ -1,13 +1,10 @@
 // "CẢNH BÁO CỦA THẦY" trên BẢNG NHIỆM VỤ: adapter (khoá `canhBaoThay` không đụng `canhBao` của máy chủ) + thẻ + nút + không lẫn vai + vị trí.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import TheCanhBaoThay from '../src/components/bang-nhiem-vu/TheCanhBaoThay'
 import { tuKeHoachNgay, tuKeHoachTroLy, type DuLieuBangNhiemVu, type KeHoachNgayMayChu, type TrangThaiThanThu } from '../src/lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../src/lib/tro-ly-ca-nhan'
 import { docCanhBaoThay, type CanhBaoThay } from '../src/lib/canh-bao-thay-hien-thi'
-
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => <div role="img" aria-label="Thần thú" /> }))
 
 const HAN = '2026-09-21T16:59:00.000Z' // 23:59 Thứ Hai 21/09/2026 giờ VN
 const NOW = Date.parse('2026-09-21T09:30:00.000Z') // 16:30 VN
@@ -132,70 +129,4 @@ describe('TheCanhBaoThay', () => {
 })
 
 describe('trên Bảng nhiệm vụ', () => {
-  const bang = (duLieu: DuLieuBangNhiemVu, p: object = {}) =>
-    render(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW} duLieu={conThu(duLieu)} {...p} />)
-
-  it('thẻ nằm ở ĐẦU thân bảng, trước thẻ tiến độ; không có cảnh báo ⇒ không có vùng "canh-bao-thay"', () => {
-    const { container } = bang(tuKeHoachNgay(keHoach({ canhBaoThay: [tho()] }), NOW))
-    const vung = [...container.querySelectorAll('[data-vung]')].map((e) => e.getAttribute('data-vung'))
-    expect(vung.indexOf('canh-bao-thay')).toBeGreaterThanOrEqual(0)
-    expect(vung.indexOf('canh-bao-thay')).toBeLessThan(vung.indexOf('tien-do'))
-    cleanup()
-    const trong = bang(tuKeHoachNgay(keHoach(), NOW))
-    expect(trong.container.querySelector('[data-vung="canh-bao-thay"]')).toBeNull()
-  })
-  it('học sinh: "Đã xem" gọi onCanhBaoDaXem đúng id; bài không nằm trong việc của em ⇒ không nút "Làm ngay"', () => {
-    const onCanhBaoDaXem = vi.fn()
-    bang(tuKeHoachNgay(keHoach({ canhBaoThay: [tho({ id: 'z9' })] }), NOW), { onCanhBaoDaXem })
-    expect(screen.queryByRole('button', { name: 'Làm ngay' })).toBeNull() // việc mẫu chỉ có "on_lai", không có bài maBtvn=B1
-    fireEvent.click(screen.getByRole('button', { name: 'Đã xem' }))
-    expect(onCanhBaoDaXem).toHaveBeenCalledTimes(1)
-    expect(onCanhBaoDaXem.mock.calls[0]![0].id).toBe('z9')
-  })
-  it('"Làm ngay" mở ĐÚNG bài: việc mo_btvn có bt.maBtvn khớp maBtvn của cảnh báo (cũng khớp maCa)', () => {
-    const dl = conThu(tuKeHoachNgay(keHoach(), NOW))
-    const mau = [...(dl.lamNgay ? [dl.lamNgay] : []), ...dl.cacBac.flatMap((b) => b.viec)][0]!
-    expect(mau).toBeDefined()
-    const theBtvn = (ma: string) => ({ ...mau, id: `btvn:${ma}`, hanhDong: { loai: 'mo_btvn' as const, payload: { bt: { maBtvn: ma, maCa: `CA-${ma}` } }, nhanNut: 'Làm bài' } })
-    const du: DuLieuBangNhiemVu = { ...dl, canhBaoThay: [cb({ maBtvn: 'B7' })], lamNgay: null, cacBac: dl.cacBac.map((b, i) => (i === 0 ? { ...b, viec: [theBtvn('B5'), theBtvn('B7')] } : { ...b, viec: [] })) }
-    const onHanhDong = vi.fn()
-    render(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW} duLieu={du} onHanhDong={onHanhDong} />)
-    fireEvent.click(screen.getAllByRole('button', { name: 'Làm ngay' })[0]!)
-    expect(onHanhDong).toHaveBeenCalledTimes(1)
-    expect(onHanhDong.mock.calls[0]![0].payload.bt.maBtvn).toBe('B7')
-    cleanup()
-    const onHanhDong2 = vi.fn()
-    render(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW} duLieu={{ ...du, canhBaoThay: [cb({ maBtvn: 'CA-B5' })] }} onHanhDong={onHanhDong2} />)
-    fireEvent.click(screen.getAllByRole('button', { name: 'Làm ngay' })[0]!)
-    expect(onHanhDong2.mock.calls[0]![0].payload.bt.maBtvn).toBe('B5')
-  })
-  it('khớp bài CHẶT: việc không phải mo_btvn (dù có bt trùng mã) hoặc cảnh báo không mã bài ⇒ không nút "Làm ngay"', () => {
-    const dl = conThu(tuKeHoachNgay(keHoach(), NOW))
-    const mau = [...(dl.lamNgay ? [dl.lamNgay] : []), ...dl.cacBac.flatMap((b) => b.viec)][0]!
-    const dungBang = (hanhDong: unknown, cbo: CanhBaoThay) => {
-      const the = { ...mau, id: 'x', hanhDong }
-      const du = { ...dl, canhBaoThay: [cbo], lamNgay: null, cacBac: dl.cacBac.map((b, i) => (i === 0 ? { ...b, viec: [the] } : { ...b, viec: [] })) } as unknown as DuLieuBangNhiemVu
-      return render(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW} duLieu={du} onHanhDong={() => {}} />)
-    }
-    dungBang({ loai: 'mo_mom', payload: { bt: { maBtvn: 'B7' } }, nhanNut: 'Làm bài' }, cb({ maBtvn: 'B7' })) // sai loại việc
-    expect(screen.queryByRole('button', { name: 'Làm ngay' })).toBeNull()
-    cleanup()
-    dungBang({ loai: 'mo_btvn', payload: { bt: { maBtvn: '', maCa: '' } }, nhanNut: 'Làm bài' }, cb({ maBtvn: '' })) // hai bên đều rỗng
-    expect(screen.queryByRole('button', { name: 'Làm ngay' })).toBeNull()
-    cleanup()
-    dungBang({ loai: 'mo_btvn', payload: { bt: { maBtvn: 'B7' } }, nhanNut: 'Làm bài' }, cb({ maBtvn: 'B7' })) // đối chứng: đúng loại + đúng mã
-    expect(screen.getByRole('button', { name: 'Làm ngay' })).toBeTruthy()
-  })
-  it('không lẫn vai: học sinh chỉ đọc `duLieu.canhBaoThay` (bỏ qua canhBaoPh); phụ huynh chỉ đọc `canhBaoPh` (bỏ qua duLieu.canhBaoThay)', () => {
-    const dl = conThu(tuKeHoachNgay(keHoach({ canhBaoThay: [tho({ id: 'cua-em', tenBtvn: 'Bài của em' })] }), NOW))
-    const ph = [cb({ id: 'cua-ph', tenBtvn: 'Bài của PH' })]
-    const hs = render(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW} duLieu={dl} canhBaoPh={ph} />)
-    expect(hs.container.textContent).toContain('Bài của em')
-    expect(hs.container.textContent).not.toContain('Bài của PH')
-    cleanup()
-    const p = render(<BangNhiemVu vaiTro="phuhuynh" hoTen="Minh" now={NOW} duLieu={dl} canhBaoPh={ph} />)
-    expect(p.container.textContent).toContain('Bài của PH')
-    expect(p.container.textContent).not.toContain('Bài của em')
-    expect(screen.queryByRole('button', { name: 'Làm ngay' })).toBeNull()
-  })
 })

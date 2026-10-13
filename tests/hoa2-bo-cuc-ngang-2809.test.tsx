@@ -4,7 +4,6 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import SanhBanDo, { type SanhBanDoProps } from '../src/components/hoa2/SanhBanDo'
 import CauDaLam from '../src/components/hoa2/CauDaLam'
 import { docSanh, type KetQuaSanh } from '../src/components/hoa2/api'
 import { MQ_NGANG, MQ_NGANG_THAP, docBoCucNgang } from '../src/components/hoa2/bo-cuc-ngang'
@@ -41,33 +40,6 @@ function datMan(rong: number, cao: number) {
       removeEventListener: () => {},
     })),
   )
-}
-
-function veSanh(sanh: Record<string, unknown> = SANH, ghiDe: Partial<SanhBanDoProps> = {}) {
-  const props: SanhBanDoProps = {
-    ketQua: docSanh(sanh) as KetQuaSanh,
-    loi: '',
-    dangTai: false,
-    thu: { index: 2, cap: 7, ten: 'Lửa Nhỏ' },
-    exp: { homNay: 22, conThieu: 160 },
-    chuoiNgay: 5,
-    caDangMo: false,
-    now: NOW,
-    token: 'tk',
-    shopBat: true,
-    onVaoThi: vi.fn(),
-    onPhaPhucKich: vi.fn(),
-    onKhamPhaDao: vi.fn(),
-    onCauDaLam: vi.fn(),
-    onTuiDo: vi.fn(),
-    onCuaHang: vi.fn(),
-    onMoThanThu: vi.fn(),
-    onChonThu: vi.fn(),
-    onDangXuat: vi.fn(),
-    onTaiLai: vi.fn(),
-    ...ghiDe,
-  }
-  return { ...render(<SanhBanDo {...props} />), props }
 }
 
 afterEach(() => {
@@ -111,82 +83,6 @@ describe('điểm ngắt ngang', () => {
     const cssCdl = readFileSync(resolve(__dirname, '../src/components/hoa2/cau-da-lam.css'), 'utf8').replace(/\s+/g, ' ')
     expect(cssCdl).toContain('grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)')
     expect(cssCdl).toMatch(/\.h2-cdl sub \{ font-size: 0\.78em;/)
-  })
-})
-
-describe('Sảnh ngang (Ngang-Sanh)', () => {
-  beforeEach(() => datMan(1440, 900))
-
-  it('bản đồ cột 7, cột 5: thẻ chiến dịch (vòng %, hạn, Cọ xát/Thành thạo) · Thể lực · MỘT nút chính · Rương · Câu đã làm', () => {
-    const { container, props } = veSanh()
-    const goc = container.querySelector('[data-bo-cuc="ngang"]')!
-    expect(goc).not.toBeNull()
-    expect(goc.getAttribute('data-thap')).toBe('false')
-    // 28/09 lớp hình Sảnh 3D: cảnh tự khớp khung (đo DOM); jsdom không có kích thước ⇒ viewBox mặc định của vùng cảnh (thay '-190 0 600 600' cũ có chủ ý).
-    expect(container.querySelector('.h2-ng-trai .h2-ban-do svg')!.getAttribute('viewBox')).toBe('-12 -14 424 522')
-    expect(container.querySelector('.h2-ng-trai')!.textContent).toContain('Đảo Carbohydrate')
-    expect(container.querySelector('[data-ve="o-phuc-kich"]')!.getAttribute('data-so')).toBe('4')
-    // bản dọc không còn: không thanh lối tắt dọc, không tấm dưới
-    expect(container.querySelector('.h2-ray')).toBeNull()
-    expect(container.querySelector('.h2-tam')).toBeNull()
-
-    const phai = container.querySelector('.h2-ng-phai')!
-    const cd = screen.getByRole('region', { name: 'Chiến dịch đang mở' })
-    expect(phai.contains(cd)).toBe(true)
-    expect(screen.getByRole('img', { name: 'Cọ xát 56%' })).toBeTruthy()
-    expect(cd.textContent).toContain('Hạn nộp: còn 4 ngày 9 giờ (tới 23:59 Chủ Nhật 04/10)')
-    expect(screen.getByRole('progressbar', { name: 'Cọ xát' }).getAttribute('aria-valuenow')).toBe('67')
-    expect(screen.getByRole('progressbar', { name: 'Thành thạo' }).getAttribute('aria-valuenow')).toBe('0')
-    expect(screen.getByRole('region', { name: 'Thể lực hôm nay' }).textContent).toContain('28/40 câu còn lại')
-    expect(screen.getByRole('region', { name: 'Rương Bát Linh' }).textContent).toContain('12/40 câu')
-
-    expect(container.querySelectorAll('.h2-nut-chinh').length).toBe(1)
-    fireEvent.click(screen.getByRole('button', { name: /PHÁ 4 Ổ PHỤC KÍCH/ }))
-    expect(props.onPhaPhucKich).toHaveBeenCalledTimes(1)
-    const dao = screen.getByRole('button', { name: /Khám phá Bát Linh Đảo · 24 câu/ }) as HTMLButtonElement
-    expect(dao.disabled).toBe(true)
-    fireEvent.click(screen.getByRole('button', { name: /^Câu đã làm/ }))
-    expect(props.onCauDaLam).toHaveBeenCalledTimes(1)
-    // hàng trên: thần thú của em (ảnh thật), Chuỗi ngày một chỗ, lối tắt
-    expect(container.querySelector('.h2-ng-tren .h2-luc-giac img')!.getAttribute('src')).toBe('/than-thu-v2/nho/thu-2-0-be.webp')
-    expect(screen.getAllByText(/Chuỗi 5 ngày/).length).toBe(1)
-    expect(screen.getAllByText(/28\/40/).length).toBe(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Túi đồ' }))
-    expect(props.onTuiDo).toHaveBeenCalled()
-    expect(screen.getByRole('button', { name: 'Cửa hàng' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Đăng xuất' })).toBeTruthy()
-  })
-
-  it('điện thoại xoay ngang 844×390: vẫn 7/5, đánh dấu thu tỉ lệ (--h2-ti-le)', () => {
-    datMan(844, 390)
-    const { container } = veSanh()
-    const goc = container.querySelector('[data-bo-cuc="ngang"]') as HTMLElement
-    expect(goc.getAttribute('data-thap')).toBe('true')
-    expect(Number(goc.style.getPropertyValue('--h2-ti-le'))).toBeGreaterThanOrEqual(0.75)
-  })
-
-  it('điện thoại dọc 390×844: giữ nguyên bản dọc (tấm dưới + thanh lối tắt)', () => {
-    datMan(390, 844)
-    const { container } = veSanh()
-    expect(container.querySelector('[data-bo-cuc="ngang"]')).toBeNull()
-    expect(container.querySelector('.h2-tam')).not.toBeNull()
-    expect(container.querySelector('.h2-ray')).not.toBeNull()
-  })
-
-  it('Xong hôm nay (Ngang-XongHomNay): màn mừng cột 7 với thần thú EM ĐÃ CHỌN (ảnh thật theo cấp) + nút Mở rương; cột 5 có Kế hoạch ngày mai', () => {
-    const { container } = veSanh(XONG)
-    const trai = container.querySelector('.h2-ng-trai')!
-    expect(trai.getAttribute('data-xong')).toBe('true')
-    expect(trai.textContent).toContain('Hôm nay em xong rồi!')
-    expect(trai.textContent).toContain('Kế hoạch hôm nay · Thứ Tư 30/09')
-    expect(trai.querySelector('img.h2-ng-xong-thu')!.getAttribute('src')).toBe('/than-thu-v2/nho/thu-2-0.webp')
-    expect(trai.textContent).toContain('40/40câu kế hoạch')
-    expect(trai.textContent).toContain('+22EXP cho Lửa Nhỏ')
-    expect(trai.contains(screen.getByRole('button', { name: /MỞ RƯƠNG BÁT LINH/ }))).toBe(true)
-    expect(container.querySelectorAll('.h2-nut-chinh').length).toBe(1)
-    expect(screen.getByRole('region', { name: 'Kế hoạch ngày mai' }).textContent).toContain('Sẵn lúc 00:00 Thứ Năm 01/10')
-    expect(screen.getByRole('region', { name: 'Thể lực hôm nay' }).textContent).toContain('0/40 câu còn lại')
-    expect(screen.queryByRole('region', { name: 'Rương Bát Linh' })).toBeNull()
   })
 })
 

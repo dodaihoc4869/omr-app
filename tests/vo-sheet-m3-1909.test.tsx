@@ -8,8 +8,6 @@ import path from 'node:path'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 
 const mocks = vi.hoisted(() => ({ items: [] as any[], momItems: [] as any[] }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
-vi.mock('../src/game/than-thu-v2/Game', () => ({ default: () => <div data-testid="game-than-thu" /> }))
 vi.mock('../src/components/BangVinhDanh', () => ({ default: () => null }))
 vi.mock('../src/components/BangTinPhuHuynh', () => ({ default: () => <div>Bảng tin thử</div> }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))

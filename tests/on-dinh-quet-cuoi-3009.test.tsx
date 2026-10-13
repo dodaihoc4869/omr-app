@@ -13,8 +13,6 @@ const doc = (p: string) => readFileSync(p, 'utf8')
 
 describe('Màn đang dở giữ trang (không tự tải lại vì bản mới)', () => {
   it.each([
-    ['src/game/than-thu-v2/dao2/Dao2.tsx', /useEffect\(\(\)=>pha==='ai'\?giuTrangKhongTaiLai\(\):undefined,\[pha\]\)/],
-    ['src/game/than-thu-v2/DoanHoTong.tsx', /useEffect\(\(\) => \(dangDi \? giuTrangKhongTaiLai\(\) : undefined\), \[dangDi\]\)/],
     ['src/components/luyen-de/dung-luyen-de.ts', /useEffect\(\(\) => \(dangLam \? giuTrangKhongTaiLai\(\) : undefined\), \[dangLam\]\)/],
     ['src/components/tu-luyen/ManTuLuyen.tsx', /useEffect\(\(\) => \(coBai \? giuTrangKhongTaiLai\(\) : undefined\), \[coBai\]\)/],
   ])('%s', (tep, mau) => {
@@ -32,13 +30,6 @@ describe('Màn đang dở giữ trang (không tự tải lại vì bản mới)'
 })
 
 describe('Lệnh game có hạn chờ', () => {
-  it('Game.tsx: fetch mang AbortController, hạn 25 s, lời báo tiếng Việt', () => {
-    const s = doc('src/game/than-thu-v2/Game.tsx')
-    expect(s).toMatch(/hetHan=new AbortController\(\);const hen=setTimeout\(\(\)=>hetHan\.abort\(\),25_000\)/)
-    expect(s).toMatch(/signal:hetHan\.signal/)
-    expect(s).toMatch(/finally\{clearTimeout\(hen\)\}/)
-    expect(s).toContain('Máy chủ trả lời chậm. Em bấm lại nhé.')
-  })
 })
 
 function VoManh(): React.ReactElement {

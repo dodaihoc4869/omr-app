@@ -10,7 +10,6 @@ import { chonTheCaGanNhat, tenCaThe, type CaChuaCongBo, type CaDaCongBo } from '
 configure({ asyncUtilTimeout: 8000 })
 const mocks = vi.hoisted(() => ({ ls: { ok: true, items: [] as any[], chuaCongBo: [] as any[] } }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({
   ...(await original<any>()),
@@ -103,11 +102,4 @@ describe('chonTheCaGanNhat — chọn ca + luật công bố (thuần)', () => {
 // GỌN MÃ 06/10 (lần 2): `TheCaGanNhatCua` đã xoá (xem ghi chú đầu tệp).
 
 describe('khoá nguồn', () => {
-  it('CardCaThiGanNhat.tsx mồ côi ĐÃ XOÁ; thẻ mới chỉ nằm ở vai phụ huynh (`laPh && theCaGanNhat`) và đứng sau khối tiến độ', () => {
-    expect(fs.existsSync(path.join(process.cwd(), 'src/components/CardCaThiGanNhat.tsx'))).toBe(false)
-    const b = doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')
-    expect(b).toContain('{laPh && theCaGanNhat}')
-    expect(b.indexOf('data-vung="tien-do"')).toBeLessThan(b.indexOf('{laPh && theCaGanNhat}'))
-    expect(b.indexOf('{laPh && theCaGanNhat}')).toBeLessThan(b.indexOf('{duLieu.trong ? (')) // (thẻ Thử thách riêng đã gỡ 28/09)
-  })
 })

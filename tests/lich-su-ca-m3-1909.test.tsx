@@ -9,7 +9,6 @@ import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 import LichSuCaM3, { mucDiem } from '../src/components/bang-nhiem-vu/LichSuCaM3'
 
 const mocks = vi.hoisted(() => ({ lichSu: [] as any[], chuaXong: false, deVaLoiGiai: vi.fn(), baoCao: vi.fn() }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/components/BangVinhDanh', () => ({ default: () => null }))
 vi.mock('../src/components/BangTinPhuHuynh', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))

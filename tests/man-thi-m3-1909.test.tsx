@@ -8,7 +8,6 @@ import path from 'node:path'
 import ExamTakeScreen from '../src/screens/ExamTakeScreen'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/components/LogoHocSinh', () => ({ default: () => null }))
 vi.mock('../src/components/LogoVai', () => ({ LogoDoc: () => null }))
 

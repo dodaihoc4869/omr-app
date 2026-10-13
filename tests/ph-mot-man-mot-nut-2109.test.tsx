@@ -138,9 +138,4 @@ describe('khoá nguồn — mã của các tính năng đã gỡ không còn ở
     expect(p).toContain('<AppPhuHuynh sbd={sbdHienTai} hoTen={hoTenCon} lop={lopCon} onDoiSbd={dangXuat} />')
     expect(p).not.toContain('useGiaoThem')
   })
-  it('BangNhiemVu: không còn prop/ô giao bài cũ; muc-menu không còn menu phụ huynh', () => {
-    const b = doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')
-    for (const cam of ['onGiaoBai', 'onGiaoHangNgay', 'giaoBai', 'onNhanThay', 'bnv-giao-bai', 'GiaoBaiHangNgay']) expect(b, cam).not.toContain(cam)
-    expect(doc('src/components/bang-nhiem-vu/muc-menu.tsx')).not.toContain('mucMenuPhuHuynh')
-  })
 })

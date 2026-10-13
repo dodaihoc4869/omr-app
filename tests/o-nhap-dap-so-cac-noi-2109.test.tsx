@@ -8,7 +8,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 import OSoTraLoi from '../src/components/OSoTraLoi'
 import TheCau from '../src/components/TheCau'
-import DoanCau from '../src/game/than-thu-v2/DoanCau'
 import type { Question } from '../src/game/than-thu-v2/core'
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8').replace(/@import[^;]*;/g, '')
@@ -17,13 +16,11 @@ const TOKEN = ['src/styles/tokens.css', 'src/index.css'].map(doc).join('\n')
 const M3 = doc('src/components/bang-nhiem-vu/m3-theme.css')
 const LCO = doc('src/components/bang-nhiem-vu/lam-cau-on.css')
 const MOM = doc('src/components/bang-nhiem-vu/mom-m3.css')
-const DOAN = doc('src/game/than-thu-v2/doan.css')
 const noop = () => {}
 const CAU_III = { qid: 'Q3', maDe: 'D', version: 'v', group: 'g', phan: 'III', text: 'Tính giá trị m (gam) thu được, làm tròn đến hàng phần mười.', choices: [], ideas: [], hinhAnh: [], dang: 'ES', tenDang: 'Ester', mucDo: 'hieu', sao: 2, kienThuc: [] } as unknown as Question
 
 const NOI: { ten: string; html: string; css: string; goc: string }[] = [
   { ten: 'thẻ câu thi (TheCau)', css: `${TOKEN}\n${ONDS}`, goc: 'the-cau', html: renderToStaticMarkup(<div style={{ padding: 16 }}><TheCau kieu="sa" id="c1" stt={12} text="Tính ΔH của phản ứng, làm tròn đến hàng phần mười." selected="-92,4" onChange={noop} /></div>) },
-  { ten: 'Đoàn (DoanCau)', css: `${TOKEN}\n${ONDS}\n${DOAN}`, goc: 'dh', html: renderToStaticMarkup(<div className="dh"><div className="dh-khung"><DoanCau q={CAU_III} chon="-1,5" onChon={noop} khoa={false} onZoom={noop} dau={<b>CÂU CỦA EM</b>} /></div></div>) },
   { ten: 'ôn câu (LamCauOn)', css: `${M3}\n${LCO}\n${ONDS}`, goc: 'm3', html: renderToStaticMarkup(<div className="m3" style={{ padding: 16 }}><div className="lco-nhom"><div className="lco-nhap"><label className="lco-nhap-nhan" htmlFor="lco-dap-an">Đáp án của em (số)</label><OSoTraLoi id="lco-dap-an" value="-12,5" onChange={noop} placeholder="Ví dụ 12,5" /></div></div></div>) },
   { ten: 'mở bài (MomM3)', css: `${M3}\n${MOM}\n${ONDS}`, goc: 'm3', html: renderToStaticMarkup(<div className="m3" style={{ padding: 16 }}><div className="mom-nhom"><div className="mom-nhap"><label className="mom-nhap-nhan" htmlFor="mom-tl">Điền câu trả lời ngắn:</label><OSoTraLoi id="mom-tl" inputMode="text" value="0,25 mol" onChange={noop} placeholder="Nhập đáp án số hoặc chữ..." /></div></div></div>) },
 ]

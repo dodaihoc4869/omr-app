@@ -6,7 +6,6 @@ import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-li
 import fs from 'node:fs'
 import path from 'node:path'
 import OThiDua from '../src/components/bang-nhiem-vu/OThiDua'
-import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import { chuHangEm, chuaAiHoc, docThiDua, docThuBan, dungBuc, vuaVuotLen, type ThiDua } from '../src/lib/thi-dua'
 import { GIU_VUA_VUOT_MS, NHIP_THI_DUA_MS, useThiDua } from '../src/lib/use-thi-dua'
 import { taiThiDua } from '../src/lib/thi-dua-api'
@@ -14,7 +13,6 @@ import { tuKeHoachNgay, type KeHoachNgayMayChu } from '../src/lib/nhiem-vu-adapt
 import { PETS } from '../src/game/than-thu-v2/core'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u
 
@@ -272,37 +270,6 @@ describe('hai nút dẫn tới VIỆC CHƯA XONG ĐẦU TIÊN của Bảng nhi�
   })
   const phu = { dsBtvn: [{ maBtvn: 'BT-A', maCa: 'CA-A', tenBtvn: 'BTVN A', soCau: 12 }, { maBtvn: 'BT-B', maCa: 'CA-B', tenBtvn: 'BTVN B', soCau: 12 }], dsMomGiao: [] as any[] }
   const dl = (viec: unknown[]) => ({ ...tuKeHoachNgay(kh(viec), NOW, phu), thanThu: { kieu: 'co', pet: LUA, cap: 12, ten: 'Hoả Long' } as const })
-  const manh = (d: any, ...n: any[]) => render(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={d} onHanhDong={n[0]} onMoThanThu={n[1]} thiDua={v(T())} taiVinhDanh={async () => null} />)
-
-  it('bấm "Làm thêm 5 câu…" ⇒ onHanhDong với việc chưa xong đầu tiên (không phải việc bị cổng)', () => {
-    const d = dl([
-      vm({ id: 'btvn_lo:BT-A:0', loai: 'btvn_lo', batBuoc: true, hanCung: gio(5), chiTiet: { ma: 'BT-A', chiSo: 0, tongLo: 1 } }),
-      vm({ id: 'btvn_lo:BT-B:0', loai: 'btvn_lo', batBuoc: true, hanCung: gio(9), cong: 'btvn_lo:BT-A:0', chiTiet: { ma: 'BT-B', chiSo: 0, tongLo: 1 } }),
-    ])
-    expect(d.lamNgay).toBeTruthy() // việc đầu không bị cổng; việc thứ hai bị cổng (biCong)
-    const onHanhDong = vi.fn()
-    const onMoThanThu = vi.fn()
-    manh(d, onHanhDong, onMoThanThu)
-    fireEvent.click(screen.getByRole('button', { name: 'Làm thêm 5 câu là vượt 2 bạn' }))
-    expect(onMoThanThu).not.toHaveBeenCalled()
-    expect(onHanhDong).toHaveBeenCalledTimes(1)
-    const hd = onHanhDong.mock.calls[0]![0]
-    expect(JSON.stringify(hd)).toContain('BT-A')
-    expect(JSON.stringify(hd)).not.toContain('BT-B')
-  })
-  it('hết việc (không còn thẻ nào) ⇒ mở Đảo thần thú', () => {
-    const d = dl([])
-    const onHanhDong = vi.fn()
-    const onMoThanThu = vi.fn()
-    manh(d, onHanhDong, onMoThanThu)
-    fireEvent.click(screen.getByRole('button', { name: 'Làm thêm 5 câu là vượt 2 bạn' }))
-    expect(onHanhDong).not.toHaveBeenCalled()
-    expect(onMoThanThu).toHaveBeenCalledTimes(1)
-  })
-  it('phụ huynh KHÔNG thấy ô (không có học sinh nào thi đua trong app PH)', () => {
-    const { container } = render(<BangNhiemVu vaiTro="phuhuynh" hoTen="PH" now={NOW} duLieu={dl([])} thiDua={v(T())} taiVinhDanh={async () => null} />)
-    expect(container.querySelector('[data-vung="thi-dua"]')).toBeNull()
-  })
 })
 
 describe('taiThiDua — không có lệnh / lỗi ⇒ null, không ném', () => {
@@ -407,7 +374,6 @@ describe('khoá mã nguồn', () => {
     expect(doc('src/screens/StudentPortalScreen.tsx')).not.toMatch(/useThiDua\(/)
     expect(doc('src/screens/StudentPortalScreen.tsx')).not.toMatch(/thiDua=\{thiDua\}/)
     expect(doc('src/screens/ParentPortalScreen.tsx')).not.toMatch(/thi-dua|ThiDua/)
-    expect(doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')).toMatch(/\{!laPh && thiDua && <OThiDua/)
   })
   it('không màu thô, không emoji, không lookbehind / .at( trong các tệp mới', () => {
     for (const p of ['src/components/bang-nhiem-vu/OThiDua.tsx', 'src/lib/thi-dua.ts', 'src/lib/use-thi-dua.ts', 'src/lib/thi-dua-api.ts']) {

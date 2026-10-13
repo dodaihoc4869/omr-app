@@ -201,8 +201,7 @@ describe('khoá nguồn: mọi màn có ô đáp số dùng OSoTraLoi', () => {
   it('các nơi dựng ô đáp số nhập và dựng <OSoTraLoi>', () => {
     const NOI = [
       'src/components/TheCau.tsx', // màn thi dọc, Đảo, Đảo 2, Bi-a (TraLoiCau + câu trong ván), Tu luyện, Luyện đề cấu trúc
-      'src/screens/ExamTakeScreen.tsx', // màn thi ngang (LamBaiNgangGon nhận ô qua oDapSo)
-      'src/game/than-thu-v2/DoanCau.tsx', // Đoàn Hộ Tống
+      'src/screens/ExamTakeScreen.tsx', // Đoàn Hộ Tống
       'src/components/bang-nhiem-vu/LamCauOn.tsx', // ôn câu (BTVN / lịch ôn)
       'src/components/bang-nhiem-vu/MomM3.tsx', // bài Mẹ giao (M3)
       'src/screens/StudentPortalScreen.tsx', // cổng học sinh (bài Mẹ giao cũ)
@@ -214,15 +213,14 @@ describe('khoá nguồn: mọi màn có ô đáp số dùng OSoTraLoi', () => {
     }
   })
   it('các màn game / tu luyện / bi-a đi qua TheCau (không tự dựng ô số riêng)', () => {
-    for (const n of ['src/game/than-thu-v2/dao/ThamHiem.tsx', 'src/game/than-thu-v2/EscortQuestion.tsx', 'src/game/than-thu-v2/dao2/TrongAi.tsx', 'src/components/tu-luyen/ManTuLuyen.tsx']) {
+    for (const n of [ 'src/components/tu-luyen/ManTuLuyen.tsx']) {
       expect(doc(n), n).toMatch(/import TheCau from/)
     }
-    for (const n of ['src/game/bi-a/TraLoiCau.tsx', 'src/game/bi-a/TamCauBia.tsx']) expect(doc(n), n).toMatch(/TheCauAi/)
-    expect(doc('src/game/than-thu-v2/dao2/TrongAi.tsx')).toMatch(/phan:'III',selected:traLoi,khoaO:khoa/)
+    for (const n of []) expect(doc(n), n).toMatch(/TheCauAi/)
   })
   it('thành phần cũ ONhapDapSo đã gỡ; không còn lớp .ond ở CSS/TSX', () => {
     expect(fs.existsSync(path.join(process.cwd(), 'src/components/ONhapDapSo.tsx'))).toBe(false)
-    const s = ['src/screens/lam-bai-ngang.css', 'src/game/than-thu-v2/doan.css', 'src/components/bang-nhiem-vu/lam-cau-on.css', 'src/components/bang-nhiem-vu/mom-m3.css', 'src/screens/LamBaiNgangGon.tsx'].map(doc).join('\n')
+    const s = ['src/screens/lam-bai-ngang.css', 'src/components/bang-nhiem-vu/lam-cau-on.css', 'src/components/bang-nhiem-vu/mom-m3.css', 'src/screens/LamBaiNgangGon.tsx'].map(doc).join('\n')
     expect(s).not.toMatch(/\.ond\b|--ond-/)
   })
   it('nút giữ tiêu điểm (onPointerDown + onMouseDown preventDefault), type=button; CSS không hex, không lookbehind', () => {

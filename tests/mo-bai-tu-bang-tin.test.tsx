@@ -2,7 +2,6 @@ import {beforeEach,afterEach,it,expect,vi} from 'vitest'
 import {render,screen,fireEvent,cleanup,waitFor} from '@testing-library/react'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 const mocks=vi.hoisted(()=>({start:vi.fn(),homework:vi.fn(),sheet:vi.fn(),items:[] as any[],momItems:[] as any[]}))
-vi.mock('../src/game/than-thu-v2/Spirit2D',()=>({default:()=>null}))
 vi.mock('../src/components/BangVinhDanh',()=>({default:()=>null}))
 vi.mock('../src/components/BangTinPhuHuynh',()=>({default:({onSelectTab}:any)=><button onClick={()=>onSelectTab('btvn')}>Danh sách BTVN</button>}))
 vi.mock('../src/components/ThongBaoHocSinh',()=>({default:()=>null,noticeApi:vi.fn()}))
