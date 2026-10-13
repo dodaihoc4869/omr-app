@@ -11,6 +11,7 @@ import { chanCauTuLuan, choPhepCauChoEm } from '../../lib/cau-tu-luan-may-hs'
 import { docSanhOmni } from '../../lib/omni-hs'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import type { SanhOmni } from '../../../server/src/omni-kieu'
+import { docKiemTra, type TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 
 export interface ChienDichSanh {
   id: string
@@ -39,6 +40,7 @@ export interface BaiHanhTrinh {
 }
 
 export interface SanhHoa2 {
+  kiemTraCaNhan?: TomTatKiemTra
   goi7?: TomTatGoi7
   hanhTrinh?: {
     tang: number; toiThieu: number; daLam: number; daXep: number; conThieu: number; soChang: number; changHienTai: number; cauTrongChang: number
@@ -216,6 +218,8 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
   // + con } — `theLuc.tong` KHÔNG phải mức ngày M (kho thiếu câu ⇒ 8 thay vì 32). Máy chủ CÓ gửi `goi7` mà phần cốt lõi hỏng ⇒ coi cả Sảnh là LỖI
   // (Hôm nay hiện "Thử lại"), KHÔNG bỏ `goi7` rồi để `soHomNay` rơi về `theLuc.tong` làm M.
   const goi7 = docTomTatGoi7(o.goi7)
+  const kiemTraCaNhan=docKiemTra(o.kiemTraCaNhan)
+  if(o.kiemTraCaNhan!==undefined&&!kiemTraCaNhan)return null
   if (o.goi7 !== undefined && o.goi7 !== null && !goi7) return null
   const cdTho = o.chienDich as Record<string, unknown> | null | undefined
   let chienDich: ChienDichSanh | null = null
@@ -238,6 +242,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
     cheDo2: true,
     sanh: {
       goi7,
+      kiemTraCaNhan,
       ngay: laNgay(o.ngay) ? o.ngay : '',
       chienDich,
       sapBatDau: docSapBatDau(o.sapBatDau),

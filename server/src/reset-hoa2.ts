@@ -53,6 +53,7 @@ export const BANG_XOA_HOA2: readonly string[] = [
 
 /** GIỮ — không bao giờ vào SQL xoá. `cau_hinh` và `game_v2_settings` chỉ bị GHI đúng vài dòng ở bước chốt (mùa game, `exp_moi`, xoá khoá P08). */
 export const BANG_GIU_HOA2: readonly string[] = [
+  'kiem_tra_ca_nhan', 'kiem_tra_ca_nhan_chang', 'kiem_tra_ca_nhan_dieu_phoi',
   // Tài khoản, lớp, phụ huynh (tài khoản giữ để khôi phục được dù bỏ app PH), kho đề, chỉ mục game, cấu hình, cài đặt em, đăng ký đẩy, thống kê dùng app, mã đã dùng.
   'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
   'study_preferences', 'student_push', 'app_presence', 'ma_da_dung', 'khien_truoc_reset_2109', 'ph_truy_cap',

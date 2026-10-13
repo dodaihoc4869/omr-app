@@ -67,7 +67,7 @@ const BAI1_12: TeacherExamSource = {
   phanIII: [],
 } as unknown as TeacherExamSource
 /** Thứ tự chiếu mong đợi (I-4 khác khối không có mặt). */
-const THU_TU = ['DH-11-C2-B6-II-2', 'DH-11-C2-B6-II-1', 'DH-11-C2-B6-I-2', 'DH-11-C2-B6-III-1', 'DH-11-C2-B6-I-1', 'DH-11-C2-B6-I-3', 'DH-11-C2-B6-III-2']
+const THU_TU = ['DH-11-C2-B6-I-2', 'DH-11-C2-B6-II-2', 'DH-11-C2-B6-III-1', 'DH-11-C2-B6-I-1', 'DH-11-C2-B6-I-3', 'DH-11-C2-B6-II-1', 'DH-11-C2-B6-III-2']
 /** Một đoạn chữ riêng của từng câu để dò thứ tự trên tờ. */
 const CHU: Record<string, string> = {
   'DH-11-C2-B6-I-1': 'đặc trưng của ammonia',
@@ -84,6 +84,7 @@ const SO_GOP = {
 }
 
 beforeEach(() => {
+  vi.spyOn(crypto, 'randomUUID').mockReturnValue('00000000-0000-4000-8000-000000001310')
   g.goi.mockReset()
   g.kho.mockReset()
   g.tk.mockReset()
@@ -91,6 +92,7 @@ beforeEach(() => {
   g.kho.mockResolvedValue([BAI6, BAI1_12])
   g.tk.mockResolvedValue(SO_GOP)
   g.goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
+    if (duong === '/gv/ung-vien-chieu') return { ok:true, du:{cau:{}} }
     if (duong === '/gv/lop') return { ok: true, du: { lop: [{ tenLop: '12A1', khoi: '12', soEm: 2, sbd: ['S1', 'S2'] }, { tenLop: '11B', khoi: '11', soEm: 3, sbd: ['T1', 'T2', 'T3'] }] } }
     if (duong === '/gv/chien-dich' && b.action === 'danh-sach') return { ok: true, du: { homNay: '2026-10-12', chienDich: [] } }
     return { ok: false, loai: 'chua_co_lenh', chu: 'lệnh lạ' }
@@ -113,7 +115,7 @@ describe('luật xếp: Đúng–sai và câu tính toán lên trước', () => 
     expect(hangCau({ phan: 'III', tinhToan: true })).toBe(2)
     expect(hangCau({ phan: 'I', tinhToan: false })).toBe(3)
   })
-  it('sắp ỔN ĐỊNH: cùng hạng giữ thứ tự đề (Phần I → II → III, số câu tăng dần); không đổi mảng vào', () => {
+  it('trộn nhóm ưu tiên theo mã buổi; giữ đủ câu và không đổi mảng vào', () => {
     const ds = [
       { id: 'a', phan: 'I' as const, tinhToan: false, thuTuDe: 0 },
       { id: 'b', phan: 'I' as const, tinhToan: true, thuTuDe: 1 },
@@ -124,7 +126,9 @@ describe('luật xếp: Đúng–sai và câu tính toán lên trước', () => 
       { id: 'g', phan: 'II' as const, tinhToan: true, thuTuDe: 6 },
     ]
     const truoc = ds.map((x) => x.id)
-    expect(xepThuTuChua(ds).map((x) => x.id)).toEqual(['d', 'g', 'c', 'b', 'e', 'a', 'f'])
+    expect(xepThuTuChua(ds).slice(0,4).map(x=>x.id).sort()).toEqual(['b','d','e','g'])
+    expect(xepThuTuChua(ds,null,'buoi').map(x=>x.id)).toEqual(xepThuTuChua(ds,null,'buoi').map(x=>x.id))
+    expect(new Set(Array.from({length:12},(_,i)=>xepThuTuChua(ds,null,String(i)).map(x=>x.id).join(','))).size).toBeGreaterThan(1)
     expect(ds.map((x) => x.id)).toEqual(truoc)
   })
   it('đề mẫu: thứ tự đề Phần I → II → III, số câu đọc từ mã; sau khi xếp đúng thứ tự chiếu', () => {
@@ -190,13 +194,13 @@ describe('chọn đề ⇒ tờ chiếu đủ mọi câu, đúng mã, câu khác
     expect(doc.querySelectorAll('.mc-dot')).toHaveLength(7)
     // số câu trên tờ = số trên đề + phần đúng loại
     expect([...doc.querySelectorAll('.mc-dot .mc-de-dau')].map((d) => d.textContent)).toEqual([
-      'Câu 2Phần II · Đúng / Sai', 'Câu 1Phần II · Đúng / Sai', 'Câu 2Phần I · Trắc nghiệm', 'Câu 1Phần III · Trả lời ngắn',
-      'Câu 1Phần I · Trắc nghiệm', 'Câu 3Phần I · Trắc nghiệm', 'Câu 2Phần III · Tự luận',
+      'Câu 2Phần I · Trắc nghiệm', 'Câu 2Phần II · Đúng / Sai', 'Câu 1Phần III · Trả lời ngắn',
+      'Câu 1Phần I · Trắc nghiệm', 'Câu 3Phần I · Trắc nghiệm', 'Câu 1Phần II · Đúng / Sai', 'Câu 2Phần III · Tự luận',
     ])
     // dải T: câu có số gộp (I-2, III-1) ⇒ có dải; câu không có số ⇒ không dải
     const dai = [...doc.querySelectorAll('.mc-dot')].map((d) => !!d.querySelector('.mc-tk'))
-    expect(dai).toEqual([false, false, true, true, false, false, false])
-    expect(doc.querySelectorAll('.mc-dot')[2]!.querySelector('.mc-tk')!.textContent).toContain('3 bài nộp')
+    expect(dai).toEqual([true, false, true, false, false, false, false])
+    expect(doc.querySelectorAll('.mc-dot')[0]!.querySelector('.mc-tk')!.textContent).toContain('3 bài nộp')
     // cả lớp: không Đạt / Chưa đạt, không nút Thầy chữa bấm được; mỗi đợt một mốc khoá ẩn `|<mã câu>` cho X
     expect(doc.querySelectorAll('.mc-cham')).toHaveLength(0)
     expect(doc.querySelectorAll('.mc-thay-chua-nut')).toHaveLength(0)
@@ -301,17 +305,17 @@ describe('giao diện: khối "Chữa câu khó & tính toán" trong mục Chữ
     const dong = () => [...ds.querySelectorAll<HTMLElement>('li[data-qid]')]
     expect(dong().map((l) => l.dataset.qid)).toEqual(THU_TU)
     expect(dong().map((l) => `${l.querySelector('.gvv2-ttc-meta b')!.textContent} · ${l.querySelector('.gvv2-ttc-loai')!.textContent}`)).toEqual([
-      'Câu 2 · Đúng–sai', 'Câu 1 · Đúng–sai', 'Câu 2 · Trắc nghiệm', 'Câu 1 · Trả lời ngắn', 'Câu 1 · Trắc nghiệm', 'Câu 3 · Trắc nghiệm', 'Câu 2 · Tự luận',
+      'Câu 2 · Trắc nghiệm', 'Câu 2 · Đúng–sai', 'Câu 1 · Trả lời ngắn', 'Câu 1 · Trắc nghiệm', 'Câu 3 · Trắc nghiệm', 'Câu 1 · Đúng–sai', 'Câu 2 · Tự luận',
     ])
-    expect(dong().filter((l) => l.textContent!.includes('Có tính toán')).map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-II-2', 'DH-11-C2-B6-I-2', 'DH-11-C2-B6-III-1'])
+    expect(dong().filter((l) => l.textContent!.includes('Có tính toán')).map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-I-2', 'DH-11-C2-B6-II-2', 'DH-11-C2-B6-III-1'])
     expect(screen.getByText(/1 câu mang mã khối khác Khối 11/)).toBeTruthy()
     // bốn ô số (ô "lớp sai từ 30%" có khi đã có số liệu lớp)
     await waitFor(() => expect([...document.querySelectorAll('.gvv2-ttc-o-so')].map((o) => o.textContent)).toEqual(['7 câu sẽ chiếu', '2 câu Đúng–sai', '3 câu có tính toán', '1 câu lớp sai từ 30%']))
     // tỉ lệ sai lớp: số gộp của đúng các em lớp 11B, đúng mã câu (máy chủ cũ chưa có lệnh theo lô ⇒ lùi về số gộp)
-    await waitFor(() => expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai2/3 em sai'))
-    expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.getAttribute('data-cao')).toBe('true')
-    expect(dong()[3]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('0% lớp sai0/2 em sai')
-    expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('chưa em nào làm')
+    await waitFor(() => expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai2/3 em sai'))
+    expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.getAttribute('data-cao')).toBe('true')
+    expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('0% lớp sai0/2 em sai')
+    expect(dong()[1]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('chưa em nào làm')
     const [sbd, qid] = g.tk.mock.calls.at(-1)!
     expect(sbd).toEqual(['T1', 'T2', 'T3'])
     expect([...qid].sort()).toEqual([...THU_TU].sort())
@@ -319,9 +323,9 @@ describe('giao diện: khối "Chữa câu khó & tính toán" trong mục Chữ
     // tắt tờ Trắc nghiệm ⇒ chỉ còn Đúng–sai + Trả lời ngắn
     fireEvent.click(chip[0]!)
     expect(chip[0]!.getAttribute('aria-pressed')).toBe('false')
-    expect(dong().map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-II-2', 'DH-11-C2-B6-II-1', 'DH-11-C2-B6-III-1', 'DH-11-C2-B6-III-2'])
+    expect(dong().map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-III-1', 'DH-11-C2-B6-II-2', 'DH-11-C2-B6-II-1', 'DH-11-C2-B6-III-2'])
     fireEvent.click(chip[0]!)
-    await waitFor(() => expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai2/3 em sai'))
+    await waitFor(() => expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai2/3 em sai'))
 
     // dòng phím trên tờ (bản vẽ): L · Đạt / Chưa đạt · G · T · X · Space
     expect(document.querySelector('.gvv2-ttc-goi-y')!.textContent).toBe(

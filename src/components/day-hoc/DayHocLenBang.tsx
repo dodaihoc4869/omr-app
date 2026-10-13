@@ -39,7 +39,7 @@ export { CHU_DIEM_DANH } from './DiemDanhBuoi'
 interface NhoBuoi {
   maChon: string[]
   boCau: string[]
-  giao: Record<string, { sbd: string; hoTen: string; xacSuat: number; uocLuong: boolean; lyDo: string; boQua: string[] }>
+  giao: Record<string, { sbd: string; hoTen: string; xacSuat: number; uocLuong: boolean; lyDo: string; boQua: string[]; daDung?:boolean }>
   lopNhan: string[] | null
   baiChon: BaiChonNho | null
 }
@@ -207,7 +207,9 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
           const lan = cauChieu.slice(0, cauChieu.indexOf(c) + 1).filter((x) => giaoMoi[x.khoa]?.sbd === g.sbd).length
           m.set(c.khoa, { sbd: g.sbd, hoTen: g.hoTen, lop: lopCuaEm.get(g.sbd) || tt?.buoi.lop || undefined, lanLenBang: lan })
         }
-      const { html: h, o } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined, false)
+      const boQua=new Map(cauChieu.map(c=>[c.qid,new Set(giaoMoi[c.khoa]?.boQua??[])]))
+      const { html: h, o, emGoi } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined, false,coMat.map(e=>e.sbd),boQua)
+      if(coEm){const moi:NhoBuoi['giao']={};for(const [k,e] of emGoi)moi[k]={sbd:e.sbd,hoTen:e.ten,xacSuat:e.p??0.3,uocLuong:e.loai==='du_bao',daDung:e.loai==='da_dung',lyDo:e.loai==='da_dung'?'Đã tự làm đúng câu này':'Dự kiến làm được câu này',boQua:giaoMoi[k]?.boQua??[]};setGiao(moi)}
       ganO(ma, o)
       setHtml(h)
       setDaChieu(true)
@@ -393,7 +395,7 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
                       <span className="dh-giao-em">
                         <UserCheck size={16} aria-hidden="true" /> <b>{g.hoTen || g.sbd}</b>
                         <span className="dh-giao-p" title={g.lyDo}>
-                          khả năng đúng ≈ {pt(g.xacSuat)}
+                          {g.daDung?'Đã tự làm đúng câu này':`khả năng đúng ≈ ${pt(g.xacSuat)}`}
                         </span>
                         {g.uocLuong && <span className="dh-chip dh-chip--vang">Ước lượng</span>}
                       </span>

@@ -40,7 +40,9 @@ import {
   type CauTuChua,
   type PhanCau,
 } from '../../lib/thay-tu-chua'
-import { docCoMatHomNay, dongGoiLenBang, laySaiNhieuCau, ngayVnCua, xepUngVien, type KetQuaSai, type UngVien } from '../../lib/ung-vien-chua-cau'
+import { docCoMatHomNay, laySaiNhieuCau, ngayVnCua, xepUngVien, type KetQuaSai } from '../../lib/ung-vien-chua-cau'
+import { layEmChieu,nhanEmChieu,type EmChieu } from '../../lib/ung-vien-chieu'
+import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { useAppStore } from '../../store/appStore'
 import { ghiMotO, thayChuaQuaMayChu, useGhiToChieu } from './ghi-to-chieu'
 import type { OGhiToChieu } from './to-chieu'
@@ -147,7 +149,7 @@ interface DongXem {
   so: { sai: number; lam: number; phanTram: number } | null
   /** Có số liệu lớp (đã đọc xong) mà câu chưa em nào làm. */
   chuaAiLam: boolean
-  uv: readonly UngVien[] | null
+  uv: readonly EmChieu[] | null
 }
 
 function DongCau({ d, stt }: { d: DongXem; stt: number }) {
@@ -155,7 +157,7 @@ function DongCau({ d, stt }: { d: DongXem; stt: number }) {
   const loai = c.tuLuan ? 'Tự luận' : TEN_LOAI_CAU[c.phan]
   const tom = c.thieuNoiDung ? '' : tomTatCau(c.q)
   const cao = !!so && so.phanTram >= NGUONG_LOP_SAI
-  const goi = uv && uv.length ? dongGoiLenBang(uv) : ''
+  const goi = uv && uv.length ? `Gọi lên bảng: ${uv[0]!.ten} · ${nhanEmChieu(uv[0]!).chu}${uv.length>1?` · còn ${uv.length-1} em phù hợp`:''}` : ''
   return (
     <li className="gvv2-ttc-dong" data-phan={c.phan} data-qid={c.qid}>
       <span className="gvv2-ttc-stt gvv2-so">{stt}</span>
@@ -178,12 +180,12 @@ function DongCau({ d, stt }: { d: DongXem; stt: number }) {
         </span>
         {tom ? <span className="gvv2-ttc-de">{tom}</span> : !c.thieuNoiDung && <span className="gvv2-ttc-de">(câu chỉ có hình)</span>}
         {goi ? (
-          <span className="gvv2-ttc-goi" data-co-mat={uv?.[0]?.coMat === true ? 'true' : 'false'}>
+          <span className="gvv2-ttc-goi">
             {goi}
           </span>
         ) : uv && d.chuaAiLam === false && so && so.sai === 0 ? (
           <span className="gvv2-ttc-goi" data-trong="true">
-            Chưa em nào của lớp làm sai câu này — thầy chữa cho cả lớp
+            Chưa đủ dữ liệu chọn em — thầy chữa cho cả lớp
           </span>
         ) : null}
       </div>
@@ -298,36 +300,39 @@ export default function ThayTuChua() {
     return toDangChon.map((t) => theoMa.get(t.maDe)).filter((s): s is TeacherExamSource => !!s)
   }, [kho, toDangChon])
   const tatCa = useMemo(() => cauCuaDe(nguonChon), [nguonChon])
+  const [seedChieu]=useState(sinhMaNgauNhien)
   // Câu mang mã khối khác lớp đang chọn: bỏ ngay ở xem trước (cùng luật tờ chiếu chặn thêm một lần) và nói số câu.
   const khoiDt = dt?.khoi ?? null
   const soKhacKhoi = useMemo(() => tatCa.filter((c) => laCauKhacKhoi(c.qid, khoiDt)).length, [tatCa, khoiDt])
-  const xep = useMemo(() => xepThuTuChua(tatCa.filter((c) => !laCauKhacKhoi(c.qid, khoiDt))), [tatCa, khoiDt])
-  const dem = demTuChua(xep)
   // "Xem đủ N câu" theo bài: đổi bài ⇒ tự về xem 8 câu đầu.
   const [xemDuBai, setXemDuBai] = useState<string | null>(null)
   const xemDu = !!bai && xemDuBai === bai.khoaBai
 
   // ── số liệu lớp (tỉ lệ sai + dải T) và EM LÀM SAI từng câu: CHỈ ĐỌC; kết quả gắn khoá (lớp · câu) — đổi lựa chọn ⇒ "đang đọc" ngay ──
-  const qidKey = xep.map((c) => c.qid).join('|')
+  const qidKey = tatCa.filter(c=>!laCauKhacKhoi(c.qid,khoiDt)).map(c=>c.qid).sort().join('|')
   const sbdLop = dt?.kieu === 'lop' ? dt.sbd : null
   const khoaTk = sbdLop?.length && qidKey && dt ? `${khoaDoiTuong(dt)}#${qidKey}` : ''
   const [tkKq, setTkKq] = useState<{ khoa: string; tk: TrangThaiTk } | null>(null)
   const tk: TrangThaiTk = !khoaTk ? { trang: 'khong-ap' } : tkKq?.khoa === khoaTk ? tkKq.tk : { trang: 'cho' }
   const [uvKq, setUvKq] = useState<{ khoa: string; uv: TrangThaiUv } | null>(null)
   const uvTrang: TrangThaiUv = !khoaTk ? { trang: 'khong-ap' } : uvKq?.khoa === khoaTk ? uvKq.uv : { trang: 'cho' }
+  const xep=useMemo(()=>{const so=new Map<string,{sai:number;lam:number}>();for(const c of tatCa){const v=soLieuLopCau(uvTrang.trang==='co'?uvTrang.kq.cau[c.qid]:undefined,tk.trang==='co'?tk.soGop[c.qid]:undefined);if(v)so.set(c.qid,v)}return xepThuTuChua(tatCa.filter(c=>!laCauKhacKhoi(c.qid,khoiDt)),so,seedChieu)},[tatCa,khoiDt,uvTrang,tk,seedChieu])
+  const dem=demTuChua(xep)
   /** Lượt đọc em làm sai đang chạy (nút Chiếu bấm sớm thì chờ đúng lượt này, không chiếu "cả lớp" nhầm). */
   const uvHua = useRef<{ khoa: string; hua: Promise<TrangThaiUv> } | null>(null)
+  const tkHua=useRef<{khoa:string;hua:Promise<TrangThaiTk>}|null>(null)
   useEffect(() => {
     if (!khoaTk || !sbdLop) return
     let huy = false
-    const qids = [...new Set(qidKey.split('|'))].slice(0, TRAN_CAU_TK)
-    void layThongKeLopCau(sbdLop.slice(0, TRAN_EM_TK), qids)
-      .catch(() => null)
-      .then((r) => {
+    const qids = [...new Set(qidKey.split('|'))]
+    const lo:string[][]=[];for(let i=0;i<qids.length;i+=TRAN_CAU_TK)lo.push(qids.slice(i,i+TRAN_CAU_TK))
+    const tkh=Promise.all(lo.map(q=>layThongKeLopCau(sbdLop.slice(0,TRAN_EM_TK),q))).then(rows=>{if(rows.some(r=>r===null))return {trang:'loi'} as TrangThaiTk;const soGop=Object.assign({},...rows);return Object.keys(soGop).length?{trang:'co',soGop} as TrangThaiTk:{trang:'trong'} as TrangThaiTk}).catch(()=>({trang:'loi'} as TrangThaiTk))
+    tkHua.current={khoa:khoaTk,hua:tkh}
+    void tkh.then((r) => {
         if (huy) return
-        setTkKq({ khoa: khoaTk, tk: r === null ? { trang: 'loi' } : Object.keys(r).length ? { trang: 'co', soGop: r } : { trang: 'trong' } })
+        setTkKq({ khoa: khoaTk, tk:r })
       })
-    const hua = laySaiNhieuCau(sbdLop.slice(0, TRAN_EM_TK), qids).then(
+    const hua = Promise.all(lo.map(q=>laySaiNhieuCau(sbdLop.slice(0,TRAN_EM_TK),q))).then(rows=>{const loi=rows.find(r=>!r.ok);if(loi&&!loi.ok)return loi;const ok=rows.filter((r):r is Extract<KetQuaSai,{ok:true}>=>r.ok);return {ok:true as const,cau:Object.assign({},...ok.map(r=>r.cau)),tungCau:ok.some(r=>r.tungCau)}}).then(
       (r): TrangThaiUv => (r.ok ? { trang: 'co', kq: r } : { trang: 'loi', chu: r.chu }),
       (e: unknown): TrangThaiUv => ({ trang: 'loi', chu: lyDoDeHieu(e) }),
     )
@@ -345,7 +350,8 @@ export default function ThayTuChua() {
     (u: TrangThaiUv) => (u.trang === 'co' ? xepUngVien(xep.map((c) => c.qid), u.kq.cau, coMat ?? null) : null),
     [xep, coMat],
   )
-  const uvTheoCau = useMemo(() => xepUv(uvTrang), [xepUv, uvTrang])
+  const [duGoi,setDuGoi]=useState<{khoa:string;map:Map<string,EmChieu[]>}|null>(null)
+  useEffect(()=>{let huy=false;if(khoaTk&&sbdLop)void layEmChieu(qidKey.split('|'),sbdLop,coMat).then(map=>{if(!huy)setDuGoi({khoa:khoaTk,map})}).catch(()=>{if(!huy)setDuGoi({khoa:khoaTk,map:new Map()})});return()=>{huy=true}},[khoaTk,sbdLop,qidKey,coMat])
   const dongXem: DongXem[] = useMemo(
     () =>
       xep.map((c) => {
@@ -353,9 +359,9 @@ export default function ThayTuChua() {
         const gop = tk.trang === 'co' ? tk.soGop[c.qid] : undefined
         const so = soLieuLopCau(lo, gop)
         const coSoLieu = tk.trang === 'co' || tk.trang === 'trong' || (uvTrang.trang === 'co' && !uvTrang.kq.tungCau)
-        return { c, so, chuaAiLam: !so && coSoLieu, uv: uvTheoCau ? (uvTheoCau.get(c.qid) ?? []) : null }
+        return { c, so, chuaAiLam: !so && coSoLieu, uv: duGoi?.khoa===khoaTk?(duGoi.map.get(c.qid)??[]):null }
       }),
-    [xep, uvTrang, tk, uvTheoCau],
+    [xep, uvTrang, tk, duGoi,khoaTk],
   )
   const coSoLop = dongXem.some((d) => d.so)
   const soSaiCao = dongXem.filter((d) => d.so && d.so.phanTram >= NGUONG_LOP_SAI).length
@@ -387,18 +393,21 @@ export default function ThayTuChua() {
       // Danh sách em làm sai còn đang đọc ⇒ chờ đúng lượt ấy (không chiếu "cả lớp" nhầm khi lớp có em sai).
       let uv = uvTrang
       if (uv.trang === 'cho' && uvHua.current?.khoa === khoaTk) uv = await uvHua.current.hua
+      const thongKe=tkHua.current?.khoa===khoaTk?await tkHua.current.hua:tk
       const theoCau = xepUv(uv)
       const soLop = new Map<string, SoLopCau>()
-      for (const d of dongXem) if (d.so) soLop.set(d.c.qid, { sai: d.so.sai, lam: d.so.lam })
+      for(const c of xep){const v=soLieuLopCau(uv.trang==='co'?uv.kq.cau[c.qid]:undefined,thongKe.trang==='co'?thongKe.soGop[c.qid]:undefined);if(v)soLop.set(c.qid,{sai:v.sai,lam:v.lam})}
+      const thuTuChieu=xepThuTuChua(xep,soLop,seedChieu)
       const ma = moPhien()
       const [{ dungToThayTuChua }, { chuBoCauKhacKhoi, chuThieuNoiDung }] = await Promise.all([import('./thay-tu-chua-to'), import('../../lib/tra-cau-chieu')])
-      const kq = await dungToThayTuChua(xep, nguonChon, {
+      const kq = await dungToThayTuChua(thuTuChieu, nguonChon, {
         tenBuoi: tenBuoiTuChua(bai.tenBai, toDangChon.map((t) => t.phan as PhanCau)),
         khoi: dt?.khoi ?? null,
         maPhien: ma,
-        soGop: tk.trang === 'co' ? tk.soGop : null,
+        soGop: thongKe.trang === 'co' ? thongKe.soGop : null,
         ungVien: theoCau,
         soLop,
+        sbdLop:sbdLop??[],coMat,
       })
       const bo = chuBoCauKhacKhoi(kq.soBoKhoi)
       if (kq.soBoKhoi >= xep.length) {
@@ -427,8 +436,7 @@ export default function ThayTuChua() {
           Chữa câu khó &amp; tính toán
         </h2>
         <p className="gvv2-ttc-phu">
-          Thầy chọn đề trong Dạy học — app xếp câu Đúng–sai và câu tính toán lên trước, kèm tỉ lệ lớp sai, rồi chiếu theo đúng chuẩn Chiếu lên bảng: mỗi câu gọi em
-          làm sai lên bảng, chấm Đạt / Chưa đạt.
+          Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Gọi em đã tự làm đúng; nếu chưa có, chọn em dự kiến làm được.
         </p>
       </div>
 

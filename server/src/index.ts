@@ -3392,6 +3392,7 @@ const boXuLy = {
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
     // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
     if(event.cron==='* * * * *') {
+      await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now())).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
       await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
@@ -3678,6 +3679,11 @@ const boXuLy = {
         let sbdKhoa = ''
         try { sbdKhoa = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
         if (!sbdKhoa || sbdKhoa.length > 40) return themMocReset(env, ra(await dungKeHoachEm(env, b)))
+        const kt=await import('./kiem-tra-ca-nhan'), baiKt=await kt.docKtCn(env,sbdKhoa,Date.now(),true)
+        if(kt.laNgayKt(baiKt,Date.now())){
+          const tt=kt.tomTatKt(baiKt!,Date.now())
+          return themMocReset(env,ra({ok:true,cheDoNgay:'kiem-tra',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:tt.tong,toiThieuCau:tt.tong},tienBo:{daLamCau:tt.daTra,toiThieuCau:tt.tong,conThieu:tt.con,dat:tt.nopLuc!==null&&tt.con===0}}))
+        }
         // Tối ưu 05/10: cờ cửa hàng (đệm 30 giây, không phụ thuộc kế hoạch) đọc CÙNG đợt đầu — trước: một đợt riêng ở cuối. Dùng đúng chỗ cũ.
         const shopSom = shopBatCho(env, sbdKhoa)
         shopSom.catch(() => {})
@@ -3819,6 +3825,8 @@ const boXuLy = {
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
       // GAME HÓA 2.0 (srs2-gv.ts): chiến dịch luyện — giao, đồng hồ sức chứa, bảng chiến dịch, buổi chữa, chữa xong, công tắc.
       if (p === '/gv/goi-bai-7') return ra(await import('./goi-bai-7-thay').then(m=>m.gvGoi7(env,b)))
+      if (p === '/gv/kiem-tra-ca-nhan') return ra(await import('./kiem-tra-ca-nhan-thay').then(m=>m.gvKtCn(env,b,Date.now())))
+      if (p === '/gv/ung-vien-chieu') return ra(await import('./ung-vien-chieu').then(m=>m.ungVienChieu(env,b)))
       if (p === '/gv/chien-dich') return ra(await gvChienDich(env, b))
       // OMNI 3 (05/10): tick bài đã dạy ⇒ tự giao chiến dịch theo bài (bai-da-day.ts) · Bảng bài, xác nhận dạng, ma trận Q, ca chốt 50/50 (omni-gv.ts). Có ghi ⇒ `env`.
       if (p === '/gv/bai-da-day') {

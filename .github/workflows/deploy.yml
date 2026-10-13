@@ -74,6 +74,7 @@ jobs:
           KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx tests/khoi-phuc-chien-dich-0810.test.ts tests/srs2-loi-2709.test.ts tests/srs2-ke-hoach-doi-cd-2809.test.ts tests/srs2-rai-deu-d1-3009.test.ts tests/d1-qua-tai-khong-nhan-truy-van-0810.test.ts tests/cao-diem-ho-so-0110.test.ts)
           KIEM+=(tests/ph-bao-cao-moi-2809.test.ts tests/hanh-trinh-bai-thu-suc-0910.test.ts tests/hanh-trinh-nguon-cau-0910.test.ts tests/hanh-trinh-ngay-0910.test.ts tests/hanh-trinh-d1-0910.test.ts tests/hanh-trinh-giao-dien-0910.test.tsx tests/hanh-trinh-dong-co-0910.test.ts tests/hanh-trinh-v5-0910.test.ts tests/hanh-trinh-v6-0910.test.ts tests/omni-3-sanh-hs.test.tsx tests/omni-3-tra-loi.test.ts tests/omni-3-tra-loi-ve-de-thu.test.ts)
           KIEM+=(tests/hoc-tap-tap-trung-1010.test.ts tests/hoc-tap-giao-dien-1010.test.tsx tests/vao-thi-form-m3-1909.test.tsx tests/dang-nhap-hs-1909.test.tsx tests/hoa2-sanh-2709.test.tsx tests/hs-lich-su-ca-2809.test.tsx tests/m3-c8-bang-tin-1909.test.tsx tests/ph-khong-game-2109.test.tsx)
+          KIEM+=(tests/kiem-tra-ca-nhan-1310.test.ts tests/kiem-tra-ca-nhan-giao-dien-1310.test.tsx tests/ung-vien-chieu-1310.test.ts tests/uu-tien-chieu-1310.test.ts tests/thay-tu-chua-1210.test.tsx)
           KIEM+=(tests/goi-bai-7-1010.test.ts tests/goi-bai-7-giao-dien-1010.test.tsx tests/goi-bai-7-loi-vao-thay-1010.test.tsx tests/hanh-trinh-nhip-ho-so-0910.test.tsx tests/gv-hom-nay-0910.test.tsx)
           if [[ "$TOAN_BO" == false ]]; then
             git diff --name-only --diff-filter=AM "$MOC_TRUOC" HEAD -- tests > /tmp/chua-test-doi.txt
@@ -108,6 +109,8 @@ jobs:
           node scripts/ap-migration-hanh-trinh-0910.mjs
           npx esbuild scripts/ap-migration-goi7.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/goi7-schema.mjs --log-level=warning
           node /tmp/goi7-schema.mjs
+          npx esbuild scripts/ap-migration-ktcn.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/ktcn-schema.mjs --log-level=warning
+          node /tmp/ktcn-schema.mjs
           node scripts/kiem-phat-hanh-chua.mjs --schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
@@ -159,6 +162,14 @@ jobs:
           if [ "$(TZ=Asia/Ho_Chi_Minh date +%H)" -ge 19 ]; then echo "Giờ cao điểm: hoãn áp gói hàng loạt — cron Worker vẫn đồng bộ mỗi phút."; exit 0; fi
           npx esbuild scripts/ap-goi7-song.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/goi7-song.mjs --log-level=warning
           node /tmp/goi7-song.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+
+      - name: Bật và chuẩn bị lịch kiểm tra riêng sau khi xác nhận bản sống
+        run: |
+          npx esbuild scripts/ap-ktcn-song.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/ktcn-song.mjs --log-level=warning
+          node /tmp/ktcn-song.mjs
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}

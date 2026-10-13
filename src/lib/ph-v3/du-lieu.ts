@@ -6,6 +6,7 @@
 // OMNI 3 (05/10): `/ph/hoc-2` có thể kèm `omni` (docs/hop-dong-omni-3.md mục C, kiểu `PhOmni` ở server/src/omni-kieu.ts — chỉ import KIỂU).
 import type { CongBo } from '../ph-moi/du-lieu'
 import type { PhOmni } from '../../../server/src/omni-kieu'
+import { docKiemTra, type TomTatKiemTra } from '../kiem-tra-ca-nhan'
 
 const laDoiTuong = (x: unknown): x is Record<string, unknown> => x !== null && typeof x === 'object' && !Array.isArray(x)
 const so = (x: unknown): number | null => (typeof x === 'number' && Number.isFinite(x) ? x : null)
@@ -121,6 +122,7 @@ export function docLoiThay(raw: unknown): NhanXetCa[] | null {
 
 // ---------------------------------------------------------------- Game Hoá 2.0 của con ----------------------------------------------------------------
 export interface Hoc2 {
+  kiemTraCaNhan?: TomTatKiemTra
   goi7?: {ten:string;han:string;tong:number;daGap:number;con:number;nguonDayDu?:boolean}[]
   serverNow?: number
   hanhTrinh?: { tang: 1 | 2 | 3 | 4; toiThieu: number }
@@ -210,5 +212,6 @@ export function docHoc2(raw: unknown): Hoc2 | null {
     if (tang !== null && tang >= 1 && tang <= 4 && toiThieu !== null && toiThieu > 0 && toiThieu <= 1000) hanhTrinh = { tang: tang as 1 | 2 | 3 | 4, toiThieu }
   }
   const goi7=Array.isArray(raw.goi7)?raw.goi7.filter((x):x is NonNullable<Hoc2['goi7']>[number]=>laDoiTuong(x)&&typeof x.ten==='string'&&typeof x.han==='string'&&nguyenKhongAm(x.tong)!==null&&nguyenKhongAm(x.daGap)!==null&&nguyenKhongAm(x.con)!==null&&Number(x.daGap)<=Number(x.tong)&&Number(x.con)===Number(x.tong)-Number(x.daGap)):[]
-  return { ...(serverNow !== null && serverNow <= 8640000000000000 ? { serverNow } : {}), ...(hanhTrinh ? { hanhTrinh } : {}), ...(goi7.length?{goi7}:{}), chienDich, homNay, cauTungSai, ...(omni ? { omni } : {}) }
+  const kiemTraCaNhan=docKiemTra(raw.kiemTraCaNhan)
+  return { ...(serverNow !== null && serverNow <= 8640000000000000 ? { serverNow } : {}), ...(hanhTrinh ? { hanhTrinh } : {}), ...(kiemTraCaNhan?{kiemTraCaNhan}:{}), ...(goi7.length?{goi7}:{}), chienDich, homNay, cauTungSai, ...(omni ? { omni } : {}) }
 }

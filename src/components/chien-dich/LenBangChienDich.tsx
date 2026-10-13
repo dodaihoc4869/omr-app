@@ -279,7 +279,7 @@ export default function LenBangChienDich({ chienDichId, chiChua = false }: { chi
         return false
       }
       if (!np.ds.length) return hetCau(np.soBoKhoi)
-      const { html: h, soThieu, soBoKhoi, o } = await dungToChieu(np.ds, tenBuoi, bangTra, ma, { khoiDich })
+      const { html: h, soThieu, soBoKhoi, o } = await dungToChieu(np.ds, tenBuoi, bangTra, ma, { khoiDich,sbdLop:bang?.em.map(e=>e.sbd),lop:bang?.chienDich.lop??buoi?.chienDich.lop??undefined })
       if (np.ds.length === soBoKhoi) return hetCau(np.soBoKhoi + soBoKhoi)
       const baoBo = chuBoCauKhacKhoi(np.soBoKhoi + soBoKhoi)
       if (baoBo) showToast(baoBo, 'warn')

@@ -16,7 +16,6 @@ import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
-import LuyenDeChuan from '../components/LuyenDeChuan'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
@@ -32,6 +31,7 @@ import '../components/bang-nhiem-vu/sheet-m3.css'
 // Tạm dừng hoạt ảnh Sảnh khi bị màn toàn màn hình che (lớp `sanh-bi-che`, xem hiệu ứng ngay dưới `cheDo2`).
 import '../styles/sanh-bi-che.css'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef, type CSSProperties, type ReactNode } from 'react'
+const LuyenDeChuan=lazy(()=>import('../components/LuyenDeChuan'))
 import { taoKhoGio, useGiayConLai } from '../lib/dong-ho-thi'
 import {
   Award,
@@ -70,6 +70,7 @@ import { boNap, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
+const ManKiemTraCaNhan = lazy(() => import('../components/hoc-tap/ManKiemTraCaNhan'))
 // Hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé") — nạp lười, ngoài precache.
 const HoSoCuaEmHs = lazy(() => import('../components/hoc-tap/HoSoCuaEmHs'))
 const ManTuChua = lazy(() => import('../components/hoc-tap/ManTuChua'))
@@ -196,7 +197,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua'
+type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua' | 'kiemtra'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -972,11 +973,12 @@ export default function StudentPortalScreen() {
           onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam(); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
-          onMoHoSo={() => setMoHoSoEm(true)}
+          onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')}
         /></div>
       )}
       {moHoSoEm && auth.token && tab === null && !manThi && <Suspense fallback={null}><HoSoCuaEmHs token={auth.token} tenEm={auth.hoTen ?? ''} lop={auth.lop ?? undefined} onDong={() => setMoHoSoEm(false)} onChuaCau={(qid) => { setMoHoSoEm(false); setQidChua(qid); setTab('tuchua') }} /></Suspense>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
+      {tab === 'kiemtra' && auth.token && !manThi && hoa2.ketQua?.cheDo2 && 'sanh' in hoa2.ketQua && hoa2.ketQua.sanh.kiemTraCaNhan && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManKiemTraCaNhan token={auth.token} sbd={auth.sbd} id={hoa2.ketQua.sanh.kiemTraCaNhan.id} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}
       {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} onTuLuyen={() => setTab('tuluyen')} /></Suspense></div>}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
@@ -1030,7 +1032,7 @@ export default function StudentPortalScreen() {
         </div>
       )}
 
-      {tab !== null && tab !== 'hoctap' && tab !== 'tuchua' && tab !== 'caudalam' && tab !== 'lichsuca' && tab !== 'tuluyen' && (
+      {tab !== null && tab !== 'kiemtra' && tab !== 'hoctap' && tab !== 'tuchua' && tab !== 'caudalam' && tab !== 'lichsuca' && tab !== 'tuluyen' && (
         <div
           className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto overscroll-contain flex flex-col animate-google-fade`}
         >
@@ -1797,7 +1799,7 @@ export default function StudentPortalScreen() {
         {tab === 'khacphuc' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start animate-google-fade">
             <div>
-              <LuyenDeChuan sbd={auth.sbd} token={auth.token} />
+              <Suspense fallback={<ChoNapGame/>}><LuyenDeChuan sbd={auth.sbd} token={auth.token} /></Suspense>
             </div>
             <div>
               <KhoiKhacPhuc3CheDo

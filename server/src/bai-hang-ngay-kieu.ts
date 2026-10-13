@@ -36,7 +36,7 @@ export const TOI_DA_SO_NGAY_BAI_HANG_NGAY = 62
 /** Quy tắc mức tối thiểu hiện hành theo tầng (bản sao chỉ để app ghi chú — máy chủ dùng `CAU_TOI_THIEU` của `hanh-trinh-ngay.ts`). */
 export const MUC_THEO_TANG: Readonly<Record<1 | 2 | 3 | 4, number>> = { 1: 24, 2: 30, 3: 36, 4: 36 }
 
-export type CheDoNgay = 'goi7' | 'hanh-trinh'
+export type CheDoNgay = 'goi7' | 'hanh-trinh' | 'kiem-tra'
 /** 'da-chot' = mức thật đã chốt của đúng ngày (Hành trình: `hanh_trinh_v3_ngay` · Gói 7: `goi_bai_7_muc_ngay`) · 'tang-gan-nhat' = Hành trình,
  *  ước tính theo tầng gần nhất đã ghi · 'mac-dinh' = Hành trình, ước tính tầng 1 · 'uoc-goi7' = Gói 7 chưa chốt, ước tính max(24, Σ lịch câu mới). */
 export type NguonMuc = 'da-chot' | 'tang-gan-nhat' | 'mac-dinh' | 'uoc-goi7'

@@ -1,0 +1,5 @@
+import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
+import { gioVn, ngayNganVn } from '../../lib/ph-moi/dinh-dang'
+export default function TheKiemTraCon({kt}:{kt:TomTatKiemTra}){
+ return <section className="ph3-ah ph3-o-du" aria-labelledby="ph3-kiemtra"><p className="ph3-ah__nhan">Lịch riêng của con · Kiểm tra ôn tập</p><h2 id="ph3-kiemtra">{kt.nopLuc!==null?'Con đã nộp bài kiểm tra':kt.homNay?'Hôm nay con làm bài kiểm tra':'Lịch kiểm tra sắp tới của con'}</h2><p className="ph3-ah__cau"><b>{kt.homNay?kt.daTra:kt.tong}</b><small>{kt.homNay?`/${kt.tong} câu đã trả lời`:' câu kiểm tra'}</small></p><p className="ph3-ah__phu">{kt.phut} phút làm bài · {kt.soBai} bài đã học</p><p className="ph3-ah__ghi">{kt.homNay?`Hạn nộp ${gioVn(kt.hanLuc)} ${ngayNganVn(kt.hanLuc)}. Hôm nay không giao thêm bài tập ngày.`:`Mở ${gioVn(kt.moLuc)} ${ngayNganVn(kt.moLuc)} · hoàn thành trong 24 giờ.`}</p>{kt.diem!==null&&<p className="ph3-ah__phu">Điểm lần này: {kt.diem}/10. Kết quả nhớ lâu được kiểm chứng tiếp.</p>}</section>
+}
