@@ -26,6 +26,8 @@ interface Props {
   onTaiLai: () => void; onDangXuat: () => void; coCa: boolean
   /** Số bài tập về nhà thầy đang giao (dòng ở Hôm nay chỉ hiện khi > 0). */
   soBaiTap?: number
+  /** Có bài tập về nhà nào (kể cả đã nộp) ⇒ Hôm nay giữ lối vào để xem lại / làm lại. */
+  coBaiTap?: boolean
   /** Token phiên của em — phần Nhịp học của thẻ "Hôm nay của em" (12/10) đọc `/hs/nhip-hoc`; không có ⇒ phần ấy không hiện. */
   token?: string
   /** Có ⇒ khối Nhịp học trong thẻ "Hôm nay của em" bấm được, mở hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm"). */
@@ -138,7 +140,9 @@ export default function HocTapHomNay(p: Props) {
             <h2>Ôn và sửa</h2>
             {!coMoiSua && <Dong ten={TEN_TU_SUA} chu={soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} icon={PenLine} sac="cham" onClick={p.onChua} />}
             <Dong ten="Câu đã làm" chu="Lời giải và lịch ôn từng câu" icon={History} sac="vang" onClick={p.onXemLai} />
-            {!!p.soBaiTap && <Dong ten="Bài tập về nhà" chu="Thầy đang giao" icon={BookOpen} sac="muc" so={p.soBaiTap} donVi="bài" onClick={p.onBaiTap} />}
+            {/* Lối DUY NHẤT vào Bài tập về nhà (thầy 13/10 bỏ ở Kết quả): còn bài chưa nộp ⇒ "Thầy đang giao" + số bài; chỉ còn bài đã nộp ⇒ vẫn hiện để em
+                xem điểm / làm lại lượt còn. */}
+            {(!!p.soBaiTap || !!p.coBaiTap) && <Dong ten="Bài tập về nhà" chu={p.soBaiTap ? 'Thầy đang giao' : 'Xem lại bài đã nộp'} icon={BookOpen} sac="muc" so={p.soBaiTap || undefined} donVi="bài" onClick={p.onBaiTap} />}
           </section>
         </>}
 

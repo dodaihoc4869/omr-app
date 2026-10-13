@@ -49,8 +49,8 @@ afterEach(async () => {
   datDuong('/')
 })
 // Trùng tu 11/10 (bản vẽ thầy duyệt): Bài tập về nhà + Kết quả bài đã nộp ở mục "Kết quả"; "Của em" là tấm mở từ ảnh đại diện (gia đình, đăng xuất).
+// SỬA CÓ CHỦ ĐÍCH 13/10 (thầy: "Bỏ phần btvn ở đây" — tab Kết quả không còn Bài tập về nhà; lối vào duy nhất ở Hôm nay › Ôn và sửa).
 const moTab = async () => {
-  fireEvent.click(await screen.findByRole('button', { name: 'Kết quả' }))
   fireEvent.click(await screen.findByRole('button', { name: /^Bài tập về nhà/ }))
 }
 const the = (i: number) => document.querySelectorAll<HTMLElement>('.btm-the')[i]

@@ -196,7 +196,7 @@ describe('tab BTVN của học sinh nói đúng hệ CHẶNG (không còn "3 Vò
     tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
     const { container } = render(<StudentPortalScreen />)
     // Trùng tu 11/10 (bản vẽ thầy duyệt): Bài tập về nhà + Kết quả bài đã nộp ở mục "Kết quả"; "Của em" là tấm mở từ ảnh đại diện (gia đình, đăng xuất).
-    fireEvent.click(await screen.findByRole('button', { name: 'Kết quả' }))
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (thầy: "Bỏ phần btvn ở đây" — tab Kết quả không còn Bài tập về nhà; lối vào duy nhất ở Hôm nay › Ôn và sửa).
     fireEvent.click(await screen.findByRole('button', { name: /^Bài tập về nhà/ }))
     expect(await screen.findByText('Cách làm bài tập về nhà: chia chặng theo ngày/giờ')).toBeTruthy()
     const chu = container.textContent!

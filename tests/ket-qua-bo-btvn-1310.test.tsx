@@ -21,3 +21,15 @@ it('tab Kết quả không còn Bài tập về nhà; Hôm nay vẫn có khi th�
   expect(within(kq).queryByText('Bài tập về nhà')).toBeNull()
   expect(screen.queryByText('Bài tập về nhà')).toBeNull()
 })
+
+it('chỉ còn bài đã nộp ⇒ Hôm nay vẫn có lối "Xem lại bài đã nộp" (để xem điểm / làm lại lượt còn); không có bài nào ⇒ không có lối', () => {
+  const sanh = docSanh({ cheDo2: true, theLuc: { con: 18, tong: 24 }, hanhTrinh: { tang: 1, toiThieu: 24, daLam: 6, daXep: 24, conThieu: 0, soChang: 4, changHienTai: 2, cauTrongChang: 6 } })
+  const p = { ten: 'An', lop: '12A1', ketQua: sanh, dangTai: false, loi: '', coCa: false, onHoc: vi.fn(), onXemLai: vi.fn(), onChua: vi.fn(), onThi: vi.fn(), onTuLuyen: vi.fn(), onLichSu: vi.fn(), onBaiTap: vi.fn(), onGiaDinh: vi.fn(), onTaiLai: vi.fn(), onDangXuat: vi.fn() }
+  const { unmount } = render(<HocTapHomNay {...p} soBaiTap={0} coBaiTap />)
+  const onSua = screen.getByRole('region', { name: 'Ôn và sửa' })
+  expect(within(onSua).getByText('Bài tập về nhà')).toBeTruthy()
+  expect(within(onSua).getByText('Xem lại bài đã nộp')).toBeTruthy()
+  unmount()
+  render(<HocTapHomNay {...p} soBaiTap={0} coBaiTap={false} />)
+  expect(screen.queryByText('Bài tập về nhà')).toBeNull()
+})

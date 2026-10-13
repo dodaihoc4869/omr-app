@@ -43,10 +43,13 @@ afterEach(() => {
 const moMan = async (nhan: string) => {
   const ten:Record<string,string>={'Bài tập về nhà':'Bài tập về nhà','Bài gia đình giao':'Bài gia đình giao','Xem điểm & lịch sử ca kiểm tra':'Kết quả bài đã nộp','Khắc phục lỗi sai':'Luyện lại từ bài kiểm tra','Bảng tin & bài luyện hôm nay':'Thông tin từ gia đình'}
   // Trùng tu 11/10 (bản vẽ thầy duyệt): Bài tập về nhà + Kết quả bài đã nộp ở mục "Kết quả"; "Của em" là tấm mở từ ảnh đại diện (gia đình, đăng xuất).
-  fireEvent.click(await screen.findByRole('button',{name:nhan==='Khắc phục lỗi sai'?'Ôn & sửa':nhan==='Bài tập về nhà'||nhan==='Xem điểm & lịch sử ca kiểm tra'?'Kết quả':'Của em'}))
+  // SỬA CÓ CHỦ ĐÍCH 13/10 (thầy: "Bỏ phần btvn ở đây" — tab Kết quả không còn Bài tập về nhà; lối vào duy nhất ở Hôm nay › Ôn và sửa).
+  if(nhan!=='Bài tập về nhà')fireEvent.click(await screen.findByRole('button',{name:nhan==='Khắc phục lỗi sai'?'Ôn & sửa':nhan==='Xem điểm & lịch sử ca kiểm tra'?'Kết quả':'Của em'}))
   fireEvent.click(await screen.findByRole('button',{name:new RegExp('^'+ten[nhan])}))
 }
 const tam = () => document.querySelector('.fixed.inset-0.z-50') as HTMLElement
+// SỬA CÓ CHỦ ĐÍCH 13/10: lối vào Bài tập về nhà nay chỉ ở Hôm nay và chỉ hiện khi em CÓ bài ⇒ các ca mở tấm Bài tập về nhà cho em một bài mẫu.
+const coBaiMau = () => { mocks.items = [{ maBtvn: 'BT1', maCa: 'CA1', tenBtvn: 'Bài mẫu', soCau: 8, hanNop: new Date(Date.now() + 48 * 3_600_000).toISOString(), daNop: false }] }
 
 const TAB: [string, string][] = [
   // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10 "tối ưu câu từ cho dễ hiểu"): tiêu đề tấm = ĐÚNG tên dòng đã bấm (một khái niệm một tên).
@@ -60,6 +63,7 @@ const TAB: [string, string][] = [
 describe('C1 · vỏ sheet toàn màn của cổng học sinh (/hs)', () => {
   it.each(TAB)('tab "%s": gốc `m3 m3-sheet`, thanh trên M3 nằm THẲNG dưới vùng cuộn, tiêu đề đúng, không còn header cũ', async (nhan, tieu) => {
     datDuong('/hs')
+    if (nhan === 'Bài tập về nhà') coBaiMau()
     render(<StudentPortalScreen />)
     await moMan(nhan)
     const goc = tam()
@@ -74,6 +78,7 @@ describe('C1 · vỏ sheet toàn màn của cổng học sinh (/hs)', () => {
 
   it('nút Quay lại (tên "Quay lại Bảng tin", tròn 48) và nút Đóng (title "Đóng toàn màn hình") đều đóng sheet về bảng nhiệm vụ', async () => {
     datDuong('/hs')
+    coBaiMau()
     render(<StudentPortalScreen />)
     await moMan('Bài tập về nhà')
     const quayLai = screen.getByRole('button', { name: 'Về Hôm nay' })
@@ -90,6 +95,7 @@ describe('C1 · vỏ sheet toàn màn của cổng học sinh (/hs)', () => {
 
   it('đường KHÔNG phải cổng học sinh (jsdom mặc định `/`): giữ NGUYÊN header cũ, không có lớp m3 nào', async () => {
     datDuong('/')
+    coBaiMau()
     render(<StudentPortalScreen />)
     await moMan('Bài tập về nhà')
     const goc = tam()
