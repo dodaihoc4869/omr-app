@@ -6,6 +6,7 @@ import NutChuaTungBuoc from '../chua-cau-sai/NutChuaTungBuoc'
 import { useState } from 'react'
 import { docTokenHs, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung } from '../../lib/loi-giai-api'
 import KhungLoiGiai from './KhungLoiGiai'
+import HoiThemThay from './HoiThemThay'
 import './loi-giai.css'
 
 export const CHU_DANG_SOAN = 'Thầy đang soạn lời giải từng bước cho câu này. Em chờ một chút rồi bấm lại nhé.'
@@ -13,7 +14,9 @@ export const CHU_DANG_SOAN = 'Thầy đang soạn lời giải từng bước ch
 export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean }) {
   const [dangTai, setDangTai] = useState(false)
   const [loi, setLoi] = useState('')
-  const [mo, setMo] = useState<{ cau: CauChoKhung; hoSo: HoSoLoiGiai; kiem?: KiemKhung } | null>(null)
+  const [mo, setMo] = useState<{ cau: CauChoKhung; hoSo: HoSoLoiGiai; kiem?: KiemKhung; hoiThem: boolean } | null>(null)
+  // Câu chưa có lời giải từng bước nhưng phần hỏi thêm Thầy (AI, 13/10) đang mở cho em ⇒ ô nhắn hiện ngay dưới dòng "Thầy đang soạn".
+  const [hoiThemSoan, setHoiThemSoan] = useState(false)
   if (!qid || !docTokenHs()) return null
   const bam = async () => {
     setDangTai(true)
@@ -22,8 +25,8 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: s
     setDangTai(false)
     if (!r.ok) { setLoi(r.loi); return }
     // Thầy chốt 29/09: câu CHƯA có lời giải từng bước ⇒ KHÔNG hiện lời giải ngắn của kho, chỉ báo đang soạn (không tính "có trợ giúp").
-    if (!r.hoSo) { setLoi(CHU_DANG_SOAN); return }
-    setMo({ cau: r.cau, hoSo: r.hoSo, kiem: r.kiem })
+    if (!r.hoSo) { setLoi(CHU_DANG_SOAN); setHoiThemSoan(r.hoiThem === true); return }
+    setMo({ cau: r.cau, hoSo: r.hoSo, kiem: r.kiem, hoiThem: r.hoiThem === true })
     onHoi?.()
   }
   return (
@@ -33,7 +36,8 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: s
       </button>
       <NutChuaTungBuoc qid={qid} />
       {loi && <span className="lg-loi" role="status">{loi}</span>}
-      {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
+      {loi === CHU_DANG_SOAN && hoiThemSoan && <HoiThemThay qid={qid} nguon={nguon} gon onTraLoi={onHoi} />}
+      {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} hoiThem={mo.hoiThem} onDong={() => setMo(null)} />}
     </div>
   )
 }
