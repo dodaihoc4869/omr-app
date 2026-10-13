@@ -1,0 +1,1714 @@
+{
+  "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+  "runtimeHash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+  "distTag": "439a6f2 · 2026-10-13 23:50",
+  "swBuiltAt": 1791935441,
+  "results": [
+    {
+      "role": "gv",
+      "width": 360,
+      "height": 800,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hôm nay của thầy\n\nThứ Tư 14/10 · 262 em · cập nhật 21:05\n\nTheo dõi ca đang mở\nCa đang mở · đã nộp 8/10\nKhông có chỗ cần thầy chữa hôm nay.\nNhịp học\n\nTừ 01/10 · 11 ngày đã qua\n\nTất cả 262\nK10 · 46\nK11 · 89\nK12 · 127\nLớp\nMọi lớp\n12 Lớp Thường · 52 em\n12 Nhóm 10 điểm · 38 em\n12 Tinh Hoa · 37 em\n11A1 · ",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "gv-360x800-light.jpg"
+    },
+    {
+      "role": "gv",
+      "width": 360,
+      "height": 800,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hôm nay của thầy\n\nThứ Tư 14/10 · 262 em · cập nhật 21:05\n\nTheo dõi ca đang mở\nCa đang mở · đã nộp 8/10\nKhông có chỗ cần thầy chữa hôm nay.\nNhịp học\n\nTừ 01/10 · 11 ngày đã qua\n\nTất cả 262\nK10 · 46\nK11 · 89\nK12 · 127\nLớp\nMọi lớp\n12 Lớp Thường · 52 em\n12 Nhóm 10 điểm · 38 em\n12 Tinh Hoa · 37 em\n11A1 · ",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "gv-360x800-dark.jpg"
+    },
+    {
+      "role": "gv",
+      "width": 800,
+      "height": 390,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hôm nay của thầy\n\nThứ Tư 14/10/2026 · 262 em đang học · cập nhật 21:05\n\nTheo dõi ca đang mở\nCa đang mở\nKiểm tra ôn tập · dữ liệu giả · 12A1 · đã nộp 8/10 em\nTheo dõi\nKhông có chỗ cần thầy chữa hôm nay.\nNhịp học\n\nTừ 01/10 tới hôm nay · 11 ngày đã qua · tính theo mức tối thiểu mỗi ngày của từng em\n\nTấ",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "gv-800x390-light.jpg"
+    },
+    {
+      "role": "gv",
+      "width": 800,
+      "height": 390,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hôm nay của thầy\n\nThứ Tư 14/10/2026 · 262 em đang học · cập nhật 21:05\n\nTheo dõi ca đang mở\nCa đang mở\nKiểm tra ôn tập · dữ liệu giả · 12A1 · đã nộp 8/10 em\nTheo dõi\nKhông có chỗ cần thầy chữa hôm nay.\nNhịp học\n\nTừ 01/10 tới hôm nay · 11 ngày đã qua · tính theo mức tối thiểu mỗi ngày của từng em\n\nTấ",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "gv-800x390-dark.jpg"
+    },
+    {
+      "role": "gv",
+      "width": 1280,
+      "height": 800,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hôm nay\nHành trình\nCa kiểm tra\n1 mở\nHọc sinh\nKho đề\nCài đặt\nHôm nay của thầy\n\nThứ Tư 14/10/2026 · 262 em đang học · cập nhật 21:05\n\nTheo dõi ca đang mở\nCa đang mở\nKiểm tra ôn tập · dữ liệu giả · 12A1 · đã nộp 8/10 em\nTheo dõi\nKhông có chỗ cần thầy chữa hôm nay.\nNhịp học\n\nTừ 01/10 tới hôm nay · 11 ng",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "gv-1280x800-light.jpg"
+    },
+    {
+      "role": "gv",
+      "width": 1280,
+      "height": 800,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hôm nay\nHành trình\nCa kiểm tra\n1 mở\nHọc sinh\nKho đề\nCài đặt\nHôm nay của thầy\n\nThứ Tư 14/10/2026 · 262 em đang học · cập nhật 21:05\n\nTheo dõi ca đang mở\nCa đang mở\nKiểm tra ôn tập · dữ liệu giả · 12A1 · đã nộp 8/10 em\nTheo dõi\nKhông có chỗ cần thầy chữa hôm nay.\nNhịp học\n\nTừ 01/10 tới hôm nay · 11 ng",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "gv-1280x800-dark.jpg"
+    },
+    {
+      "role": "hs",
+      "width": 360,
+      "height": 800,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Vào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câu tự làm · 0 câu học có hỗ t",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "hs-360x800-light.jpg"
+    },
+    {
+      "role": "hs",
+      "width": 360,
+      "height": 800,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Vào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câu tự làm · 0 câu học có hỗ t",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "hs-360x800-dark.jpg"
+    },
+    {
+      "role": "hs",
+      "width": 800,
+      "height": 390,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Đỗ Đại Học\nHọc Hoá mỗi ngày\nVào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câ",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "hs-800x390-light.jpg"
+    },
+    {
+      "role": "hs",
+      "width": 800,
+      "height": 390,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Đỗ Đại Học\nHọc Hoá mỗi ngày\nVào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câ",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "hs-800x390-dark.jpg"
+    },
+    {
+      "role": "hs",
+      "width": 1280,
+      "height": 800,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Đỗ Đại Học\nHọc Hoá mỗi ngày\nVào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câ",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "hs-1280x800-light.jpg"
+    },
+    {
+      "role": "hs",
+      "width": 1280,
+      "height": 800,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Đỗ Đại Học\nHọc Hoá mỗi ngày\nVào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câ",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "hs-1280x800-dark.jpg"
+    },
+    {
+      "role": "ph",
+      "width": 360,
+      "height": 800,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Phụ huynh em\nNguyễn Minh Khôi · Lớp 12A1\nK\nChào anh/chị,\nHôm nay của Khôi\n\nCập nhật 21:05 · Thứ Tư 14/10/2026 · mọi số đo từ 01/10\n\nHôm nay\nNhịp học\nThái độ\nCâu sai\nThời gian\nKiểm tra\nBài tập về nhà\nBuổi học\nLịch sử\nHôm nay · Thứ Tư 14/10\nCó mặt buổi học · 17:52\n\n18\n/30 câu\n\nCon đã làm / mức tối thi",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/ph/xac-dinh",
+          "action": ""
+        },
+        {
+          "path": "/ph/ke-hoach",
+          "action": ""
+        },
+        {
+          "path": "/ph/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ph/tat-ca-ve-con",
+          "action": ""
+        },
+        {
+          "path": "/ph/hoc-2",
+          "action": ""
+        },
+        {
+          "path": "/ph/con-tong-quan",
+          "action": ""
+        },
+        {
+          "path": "/ph/loi-thay",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "ph-360x800-light.jpg"
+    },
+    {
+      "role": "ph",
+      "width": 360,
+      "height": 800,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Phụ huynh em\nNguyễn Minh Khôi · Lớp 12A1\nK\nChào anh/chị,\nHôm nay của Khôi\n\nCập nhật 21:05 · Thứ Tư 14/10/2026 · mọi số đo từ 01/10\n\nHôm nay\nNhịp học\nThái độ\nCâu sai\nThời gian\nKiểm tra\nBài tập về nhà\nBuổi học\nLịch sử\nHôm nay · Thứ Tư 14/10\nCó mặt buổi học · 17:52\n\n18\n/30 câu\n\nCon đã làm / mức tối thi",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/ph/xac-dinh",
+          "action": ""
+        },
+        {
+          "path": "/ph/ke-hoach",
+          "action": ""
+        },
+        {
+          "path": "/ph/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ph/tat-ca-ve-con",
+          "action": ""
+        },
+        {
+          "path": "/ph/hoc-2",
+          "action": ""
+        },
+        {
+          "path": "/ph/con-tong-quan",
+          "action": ""
+        },
+        {
+          "path": "/ph/loi-thay",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "ph-360x800-dark.jpg"
+    },
+    {
+      "role": "ph",
+      "width": 800,
+      "height": 390,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hôm nay\nNhịp học\nThái độ\nCâu sai\nThời gian\nKiểm tra\nBài tập về nhà\nBuổi học\nLịch sử\nNguyễn Minh Khôi · Lớp 12A1\nK\nHôm nay · Thứ Tư 14/10\nCó mặt buổi học · 17:52\n\n18\n/30 câu\n\nCon đã làm / mức tối thiểu của ngày\n\nCòn 12 câu nữa là đủ mức hôm nay.\n\n19:31–19:39\n11 câu\n8 phút\n20:38–20:42\n7 câu\n4 phút\nHôm",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/ph/xac-dinh",
+          "action": ""
+        },
+        {
+          "path": "/ph/ke-hoach",
+          "action": ""
+        },
+        {
+          "path": "/ph/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ph/tat-ca-ve-con",
+          "action": ""
+        },
+        {
+          "path": "/ph/hoc-2",
+          "action": ""
+        },
+        {
+          "path": "/ph/con-tong-quan",
+          "action": ""
+        },
+        {
+          "path": "/ph/loi-thay",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "ph-800x390-light.jpg"
+    },
+    {
+      "role": "ph",
+      "width": 800,
+      "height": 390,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hôm nay\nNhịp học\nThái độ\nCâu sai\nThời gian\nKiểm tra\nBài tập về nhà\nBuổi học\nLịch sử\nNguyễn Minh Khôi · Lớp 12A1\nK\nHôm nay · Thứ Tư 14/10\nCó mặt buổi học · 17:52\n\n18\n/30 câu\n\nCon đã làm / mức tối thiểu của ngày\n\nCòn 12 câu nữa là đủ mức hôm nay.\n\n19:31–19:39\n11 câu\n8 phút\n20:38–20:42\n7 câu\n4 phút\nHôm",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/ph/xac-dinh",
+          "action": ""
+        },
+        {
+          "path": "/ph/ke-hoach",
+          "action": ""
+        },
+        {
+          "path": "/ph/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ph/tat-ca-ve-con",
+          "action": ""
+        },
+        {
+          "path": "/ph/hoc-2",
+          "action": ""
+        },
+        {
+          "path": "/ph/con-tong-quan",
+          "action": ""
+        },
+        {
+          "path": "/ph/loi-thay",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "ph-800x390-dark.jpg"
+    },
+    {
+      "role": "ph",
+      "width": 1280,
+      "height": 800,
+      "scheme": "light",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Phụ huynh em\nNguyễn Minh Khôi\nLớp 12A1\nHôm nay\nNhịp học\nThái độ\nCâu sai\nThời gian\nKiểm tra\nBài tập về nhà\nBuổi học\nLịch sử\n\nCập nhật 21:05 · Thứ Tư 14/10/2026\nSố liệu từ 01/10\n\nK\nChào anh/chị,\nHôm nay của Khôi\n\nCập nhật 21:05 · Thứ Tư 14/10/2026 · mọi số đo từ 01/10\n\nHôm nay · Thứ Tư 14/10\nCó mặt bu",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/ph/xac-dinh",
+          "action": ""
+        },
+        {
+          "path": "/ph/ke-hoach",
+          "action": ""
+        },
+        {
+          "path": "/ph/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ph/tat-ca-ve-con",
+          "action": ""
+        },
+        {
+          "path": "/ph/hoc-2",
+          "action": ""
+        },
+        {
+          "path": "/ph/con-tong-quan",
+          "action": ""
+        },
+        {
+          "path": "/ph/loi-thay",
+          "action": ""
+        },
+        {
+          "path": "/ph/ho-so-thai-do",
+          "action": ""
+        },
+        {
+          "path": "/ph/lich-su-lam-cau",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "ph-1280x800-light.jpg"
+    },
+    {
+      "role": "ph",
+      "width": 1280,
+      "height": 800,
+      "scheme": "dark",
+      "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Phụ huynh em\nNguyễn Minh Khôi\nLớp 12A1\nHôm nay\nNhịp học\nThái độ\nCâu sai\nThời gian\nKiểm tra\nBài tập về nhà\nBuổi học\nLịch sử\n\nCập nhật 21:05 · Thứ Tư 14/10/2026\nSố liệu từ 01/10\n\nK\nChào anh/chị,\nHôm nay của Khôi\n\nCập nhật 21:05 · Thứ Tư 14/10/2026 · mọi số đo từ 01/10\n\nHôm nay · Thứ Tư 14/10\nCó mặt bu",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/ph/xac-dinh",
+          "action": ""
+        },
+        {
+          "path": "/ph/ke-hoach",
+          "action": ""
+        },
+        {
+          "path": "/ph/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ph/tat-ca-ve-con",
+          "action": ""
+        },
+        {
+          "path": "/ph/hoc-2",
+          "action": ""
+        },
+        {
+          "path": "/ph/con-tong-quan",
+          "action": ""
+        },
+        {
+          "path": "/ph/loi-thay",
+          "action": ""
+        },
+        {
+          "path": "/ph/ho-so-thai-do",
+          "action": ""
+        },
+        {
+          "path": "/ph/lich-su-lam-cau",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ],
+      "screenshot": "ph-1280x800-dark.jpg"
+    }
+  ],
+  "servedMissing": [],
+  "additional": [
+    {
+      "name": "legacy-link-?tab=thanthu",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Vào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câu tự làm · 0 câu học có hỗ t",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    },
+    {
+      "name": "legacy-link-?tab=bia",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Vào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câu tự làm · 0 câu học có hỗ t",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    },
+    {
+      "name": "legacy-link-#thanthu",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Vào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câu tự làm · 0 câu học có hỗ t",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    },
+    {
+      "name": "legacy-link-#bia",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Vào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câu tự làm · 0 câu học có hỗ t",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    },
+    {
+      "name": "open-learning-public-question",
+      "leaked": false,
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Vào ca kiểm tra\nMK\nHôm nay\nHành trình\nÔn & sửa\nKết quả\n\nThứ Tư 14/10 · 12A1\n\nChào Nguyễn Minh Khôi\nHôm nay · Thứ Tư 14/10\nChưa đều\nBậc 7/12 · Đại Sư Cân Bằng\n, xem đủ 12 bậc\n\nCòn\n12\ncâu\n\nĐã làm 12/24 câu hôm nay\n\nXong 2/4 chặng\nmỗi chặng tối đa 6 câu\n\nBài 8. Amine · 12 câu tự làm · 0 câu học có hỗ t",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/game-v2/hoc-tap-sanh",
+          "action": ""
+        },
+        {
+          "path": "/hs/ke-hoach-ngay",
+          "action": ""
+        },
+        {
+          "path": "/hs/ca-dang-mo",
+          "action": ""
+        },
+        {
+          "path": "/hs/buoi-hoc",
+          "action": ""
+        },
+        {
+          "path": "/hs/lich-su",
+          "action": ""
+        },
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/notifications/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/academic-sync",
+          "action": ""
+        },
+        {
+          "path": "/mom/list",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/co",
+          "action": ""
+        },
+        {
+          "path": "/hs/chua-cau-sai/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/hs/btvn",
+          "action": ""
+        },
+        {
+          "path": "/game-v2/hoc-tap-start",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [
+        {
+          "questions": 6
+        }
+      ],
+      "kiemTraCards": 1,
+      "kiemTraText": [
+        "TH 717Tháng 10Lịch dành riêng cho emKiểm tra ôn tậpThứ Bảy 17/10 · còn 3 ngàyMở 21:05 · hoàn thành trong 24 giờ28câu50phút3bài đã họcĐề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu 12 câu."
+      ],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    },
+    {
+      "name": "sw-precache-probe",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "unknown": [],
+      "writes": [],
+      "publicLeaks": [],
+      "controller": "http://127.0.0.1:43661/sw.js",
+      "entries": [
+        {
+          "key": "workbox-precache-v2-http://127.0.0.1:43661/",
+          "size": 169,
+          "app": [
+            "http://127.0.0.1:43661/assets/App-BwBZ0Cix.js"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sw-offline-fetch-app-probe",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "unknown": [],
+      "writes": [],
+      "publicLeaks": [],
+      "appProbe": [
+        {
+          "url": "http://127.0.0.1:43661/assets/App-BwBZ0Cix.js",
+          "status": 200,
+          "length": 56680
+        }
+      ]
+    },
+    {
+      "name": "offline-shell-hs",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Hành trình giỏi Hóa\nĐỖ ĐẠI HỌC\nHỌC SINH\n6,022 · 10²³\nHỌC HOÁ MỖI NGÀY\nHành trình lớn lên cùng tri thức\nSố báo danh (SBD)\nMật khẩu\n(Lần đầu chưa có để trống để đặt)\nĐăng nhập\n\nQuên mật khẩu: nhắn thầy để đặt lại.",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    },
+    {
+      "name": "offline-shell-ph",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "Cùng con nhìn thấy tiến bộ\nĐỖ ĐẠI HỌC\nPHỤ HUYNH\n6,022 · 10²³\nHỌC HOÁ MỖI NGÀY\nCùng con, từng bước tiến bộ\nSố báo danh của con\nVào xem kết quả của con",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    },
+    {
+      "name": "offline-shell-gv",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "App của Thầy\nMáy này chưa được cấp quyền. Nhập mã bí mật để mở trên máy này.\nMở app",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    },
+    {
+      "name": "local-sw-update-reload-preserves-idb",
+      "marker": "preserve-after-update",
+      "js": [],
+      "external": [],
+      "overflow": 0,
+      "text": "App của Thầy\nMáy này chưa được cấp quyền. Nhập mã bí mật để mở trên máy này.\nMở app",
+      "unknown": [],
+      "writes": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        }
+      ],
+      "publicLeaks": [],
+      "publicChecks": [],
+      "kiemTraCards": 0,
+      "kiemTraText": [],
+      "fonts": [
+        "\"Be Vietnam Pro\", \"Noto Sans\", -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      ]
+    }
+  ]
+}
