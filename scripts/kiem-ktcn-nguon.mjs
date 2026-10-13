@@ -15,4 +15,7 @@ console.log(JSON.stringify({kiemNguonKtCn:true,chiDoc:true,...ca,...em,soNguon:r
 if((await query("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='kiem_tra_ca_nhan'"))[0]?.n){
  const kt=(await query(`SELECT COUNT(*) soLich,COUNT(DISTINCT sbd) soEmCoLich,SUM(CASE WHEN trang_thai<>'cho_nguon' THEN 1 ELSE 0 END) lichSanSang,SUM(CASE WHEN trang_thai='cho_nguon' THEN 1 ELSE 0 END) choNguon,MIN(ngay) ngaySomNhat,MAX(ngay) ngayMuonNhat,MIN(json_array_length(json_extract(json,'$.cau'))) cauItNhat,MAX(json_array_length(json_extract(json,'$.cau'))) cauNhieuNhat FROM kiem_tra_ca_nhan WHERE ngay>=date('now','+7 hours')`))[0]
  console.log(JSON.stringify({kiemLichKtCn:true,chiDoc:true,...kt}))
+ const audit=(await query(`SELECT COUNT(*) daThu,SUM(CASE WHEN loi<>'' THEN 1 ELSE 0 END) loiLap FROM kiem_tra_ca_nhan_dieu_phoi`))[0]
+ const cfg=(await query("SELECT gia_tri FROM cau_hinh WHERE khoa='kiem_tra_ca_nhan_v1'"))[0]
+ console.log(JSON.stringify({kiemKichHoatKtCn:true,chiDoc:true,bat:cfg?JSON.parse(cfg.gia_tri).bat===true:false,...audit}))
 }
