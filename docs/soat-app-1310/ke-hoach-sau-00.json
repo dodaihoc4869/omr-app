@@ -61,5 +61,6 @@
     "actions": 38444623860,
     "status": "success"
   },
-  "report": "docs/ket-qua-toi-uu-toan-app-1410.md"
+  "report": "docs/ket-qua-toi-uu-toan-app-1410.md",
+  "integration_pr": 290
 }
