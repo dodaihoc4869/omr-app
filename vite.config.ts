@@ -222,6 +222,9 @@ export default defineConfig({
           // (2) 9 phông KaTeX mà đề Hoá không dùng — Caligraphic (\mathcal), Fraktur (\mathfrak), Script (\mathscr), SansSerif (\mathsf), Typewriter
           // (\mathtt) — ~94 KB. Công thức hoá (\ce) và toán thường dùng Main / Math / AMS / Size1–4 (vẫn cất sẵn). Lỡ gặp khi mất mạng ⇒ phông hệ thống.
           '**/DsTheoBac-*.{js,css}',
+          // PR258 (kiểm tra cá nhân) gộp cùng đợt 19: bảng kiểm tra cá nhân của màn Chiến dịch (HanhTrinhV2 ← ChienDichScreen) và bộ chọn câu ưu tiên
+          // trên màn chiếu chữa (ThayTuChua, Gọi lên bảng, Cần thầy chữa…) — CHỈ máy thầy, các màn nhập đều đã ngoài precache ⇒ kho chạy-lúc.
+          '**/{BangKiemTraCaNhan,ung-vien-chieu}-*.{js,css}',
           '**/KaTeX_{Caligraphic,Fraktur,Script,SansSerif,Typewriter}-*',
           // Thầy tự chữa (12/10): tờ chiếu cả đề tách thành mảnh dùng chung CHỈ của màn thầy (Cần thầy chữa, Lên bảng chiến dịch, Gọi lên bảng) ⇒ kho chạy-lúc,
           // không cất sẵn trên máy học sinh / phụ huynh (giữ precache như trước đợt 9).
