@@ -68,8 +68,9 @@ export function henKt(a: { sbd: string; homNay: string; lanTruoc?: string; bangC
 export function quotaHocKt(u: number, ngay: string, han: string, lich: ReadonlySet<string>|ReadonlyMap<string,number>, sanNgay=24): number {
  const trong=(d:string)=>lich instanceof Map?(lich.get(d)===1?12:(lich.get(d)??0)>=2?0:sanNgay):(lich.has(d)?0:sanNgay)
  const homNay=trong(ngay);if(!homNay)return 0
- let suc=0;for(let n=ngay;n<=han;n=congNgayKt(n,1))suc+=trong(n)
- const quota=Math.ceil(Math.max(0,u)*homNay/Math.max(homNay,suc))
+ let suc=0,thuong=0,sucKiem=0;for(let n=ngay;n<=han;n=congNgayKt(n,1)){const v=trong(n);suc+=v;if(lich instanceof Map&&lich.has(n))sucKiem+=v;else if(v)thuong++}
+ // Quá sức chứa chuẩn: giữ ngày kiểm tra ở 12, chia phần dư cho ngày thường từ trước (không dồn sang ngày kiểm tra cuối).
+ const quota=lich instanceof Map&&u>suc&&thuong&&!lich.has(ngay)?Math.ceil(Math.max(0,u-sucKiem)/thuong):Math.ceil(Math.max(0,u)*homNay/Math.max(homNay,suc))
  return lich instanceof Map&&lich.get(ngay)===1?Math.min(12,quota):quota
 }
 

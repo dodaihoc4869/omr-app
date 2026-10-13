@@ -10,7 +10,8 @@ export function docKiemTra(x:unknown):TomTatKiemTra|undefined {
  if(Number(o.daTra)>Number(o.tong)||Number(o.con)!==Number(o.tong)-Number(o.daTra)||Number(o.hanLuc)-Number(o.moLuc)!==86400000)return
  if(typeof o.homNay!=='boolean'||typeof o.nguonDayDu!=='boolean'||typeof o.lyDo!=='string')return
  if(o.diem!==null&&(typeof o.diem!=='number'||o.diem<0||o.diem>10)||o.nopLuc!==null&&typeof o.nopLuc!=='number')return
- if(o.baiNgayToiThieu!==undefined&&o.baiNgayToiThieu!==12)return
+ const muc=o.baiNgayToiThieu
+ if(muc!==undefined&&muc!==12)return
  return o as unknown as TomTatKiemTra
 }
 export const gioKiemTra=(ms:number)=>new Intl.DateTimeFormat('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',hour12:false}).format(new Date(ms))

@@ -1,6 +1,6 @@
 import type { Env } from './kieu'
 import { coGoi7, damBaoGoi7, dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7, sqlTenLopHs } from './goi-bai-7'
-import { lyDoChua7, diemConDungNguon7, type CauGoi7 } from './goi-bai-7-loi'
+import { lyDoChua7, diemConDungNguon7, ngayVn7, type CauGoi7 } from './goi-bai-7-loi'
 import { docCauTheoRef, loiCauDoi } from './game-v2-bank'
 type Row = Record<string,unknown>
 const s = (x: unknown) => String(x ?? '')
@@ -10,6 +10,7 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
   const co = await coGoi7(env)
   if (!co.bat) return {ok:true,bat:false,goi:[]}
   await damBaoGoi7(env)
+  if(b.action==='sua_han')return suaHan(env,b,Date.now())
   if(!b.action)await dongBoGoi7(env,Date.now(),100,s(b.lop))
   if (b.action==='dong_bo') return {ok:true,...await dongBoGoi7(env,Date.now(),100)}
   if(b.action==='chi_tiet') {
@@ -76,4 +77,29 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
   }).sort((a,b)=>Number(b.choChua.length>0&&!b.daChua)-Number(a.choChua.length>0&&!a.daChua)||Number(b.lyDo.length>0)-Number(a.lyDo.length>0)||Number(a.daChua)-Number(b.daChua)||b.sai-a.sai||a.qid.localeCompare(b.qid))
   return {ok:true,bat:true,nguonDayDu,goi:goi.results,goiId:id,cau,em,canChua:cau.filter(c=>(c.lyDo.length||c.choChua.length)&&!c.daChua).length,
     canGap:em.filter(e=>e.con>0).length,soCau:ds.length,soEm:em.length}
+}
+
+/** Chỉ thay hạn/kế hoạch, không sửa sổ gặp, điểm, phiên làm dở hay lịch kiểm tra đã công bố. */
+async function suaHan(env:Env,b:Row,now:number):Promise<Row>{
+  const id=s(b.goiId),han=s(b.han),cu=s(b.hanCu),ngay=ngayVn7(now)
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(han)||!Number.isFinite(Date.parse(han))||new Date(han).toISOString().slice(0,10)!==han)throw new Error('Hạn nộp phải là ngày hợp lệ.')
+  if(han<ngay)throw new Error('Thầy chọn hạn từ hôm nay trở đi.')
+  const g=await env.DB.prepare('SELECT g.han,g.bat_dau FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE g.id=?').bind(id).first<Row>()
+  if(!g)throw new Error('Bài không còn được tick. Thầy cập nhật lại danh sách.')
+  if(cu!==s(g.han))throw new Error('Hạn đã được sửa ở máy khác. Thầy cập nhật lại danh sách.')
+  if(han<s(g.bat_dau))throw new Error('Hạn nộp phải từ ngày bắt đầu bài trở đi.')
+  if((await env.DB.prepare("SELECT 1 n FROM ca WHERE trang_thai='mo' LIMIT 1").first<Row>())?.n)throw new Error('Đang có ca kiểm tra mở. Thầy sửa hạn sau khi ca kết thúc.')
+  if(han===cu)return {ok:true,goiId:id,han,daDoi:false}
+  const receipt=crypto.randomUUID(),luc=new Date(now).toISOString(),hopLe="EXISTS(SELECT 1 FROM goi_bai_7_sua_han WHERE id=?)"
+  // D1 batch nguyên tử: bản cũ vẫn đúng và không có ca mở mới giành được receipt; các lệnh sau chỉ chạy khi giành được.
+  const rs=await env.DB.batch([
+    env.DB.prepare(`INSERT INTO goi_bai_7_sua_han(id,goi_id,han_cu,han_moi,luc) SELECT ?,g.id,g.han,?,? FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE g.id=? AND g.han=? AND NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')`).bind(receipt,han,luc,id,cu),
+    env.DB.prepare(`UPDATE goi_bai_7 SET han=? WHERE id=? AND ${hopLe}`).bind(han,id,receipt),
+    env.DB.prepare(`UPDATE goi_bai_7_em SET han=? WHERE goi_id=? AND ${hopLe}`).bind(han,id,receipt),
+    // Đây là số kế hoạch tính sẵn, không phải bài đã làm. Lượt đọc tiếp theo tính lại theo từng em và lịch kiểm tra thực tế.
+    env.DB.prepare(`DELETE FROM goi_bai_7_ngay WHERE goi_id=? AND ngay>=? AND ${hopLe}`).bind(id,ngay,receipt),
+    env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay>=? AND sbd IN(SELECT sbd FROM goi_bai_7_em WHERE goi_id=?) AND ${hopLe}`).bind(ngay,id,receipt),
+  ])
+  if(!Number(rs[0]?.meta.changes))throw new Error('Hạn vừa thay đổi hoặc có ca kiểm tra mở. Thầy cập nhật rồi thử lại.')
+  return {ok:true,goiId:id,han,daDoi:true,tuDongTinhLai:true}
 }

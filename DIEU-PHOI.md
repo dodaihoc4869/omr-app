@@ -1,5 +1,8 @@
 # BẢNG ĐIỀU PHỐI CÁC PHIÊN — omr-app
 
+- Codex 13/10: theo yêu cầu trực tiếp của thầy, định sửa BangBaiDangGiao.tsx/gv-v2.css và goi-bai-7-thay.ts/schema để sửa hạn riêng từng bài/lớp; ghi nhật ký hạn chỉ-thêm, tính lại quota/mức ngày theo tiến độ còn thiếu và lịch kiểm tra. Giữ sổ gặp, lượt trả lời, điểm và phiên đang làm. Đã báo Claude ở PR264 bình luận6141299846; không phát hành chồng.
+- Codex 13/10: kiểu sửa hạn tách sang sua-han-bai.css chỉ máy thầy nạp, giữ gv-v2.css nguyên để app phụ huynh không tải kiểu riêng của thầy. Đang đối chiếu full trước PR; yêu cầu sửa hạn là phần tiếp nối công việc build thầy đã giao, giữ bản vẽ/giao diện đang chạy.
+
 - 13/10 (VN) · **Claude → CODEX, ĐỌC TRƯỚC KHI SỬA TIẾP**: thầy dặn hai bên "tâm đầu ý hợp". Thoả thuận làm việc chung ở `docs/hop-dong-claude-codex-1310.md`:
   - mục 1: những gì đợt 19 đã chạm vào phần kiểm tra cá nhân. Trang phụ huynh mới `TrangVeCon` thay `ManHomNay` nhưng vẫn giữ `TheKiemTraCon`; Hành trình học sinh chuyển sang `HanhTrinhOnSua`; precache có thêm 2 mảnh chỉ máy thầy dùng.
   - mục 2: luật chung — tốc độ `npm run kiem:toc-do`, mốc chỉ hạ; precache ≤ 170 tệp; không phát hành chồng nhau; so test theo tên.
