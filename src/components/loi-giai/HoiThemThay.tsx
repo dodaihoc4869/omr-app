@@ -6,8 +6,10 @@ import { SendHorizontal } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import { chiSoRo } from '../../lib/chi-so-ro'
 import { hoiThemThay } from '../../lib/loi-giai-api'
+import TraLoiThay, { docCauTruc, type CauTrucTraLoi } from './TraLoiThay'
 
-type Tin = { vai: 'em' | 'thay'; chu: string }
+/** `ct`: câu trả lời có cấu trúc (bản vẽ docs/ban-ve-hoi-thay-1310) — vắng ⇒ vẽ chữ phẳng như cũ. */
+type Tin = { vai: 'em' | 'thay'; chu: string; ct?: CauTrucTraLoi | null }
 export const TOI_DA_KY_TU = 500
 const MA_DUNG_HAN = new Set(['het_luot', 'het_luot_cau', 'chua_bat', 'dang_kiem_tra', 'ca_chua_cong_bo', 'chua_mo'])
 
@@ -34,26 +36,27 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
     )
   }
 
-  const gui = async (e?: FormEvent) => {
+  // `cauSan`: câu bấm từ nút "hỏi tiếp" dưới câu trả lời của Thầy ⇒ gửi ngay, không đụng chữ em đang gõ dở.
+  const gui = async (e?: FormEvent, cauSan?: string) => {
     e?.preventDefault()
-    const cau = chu.trim()
+    const cau = (cauSan ?? chu).trim()
     if (cau.length < 2 || dangGui || dung) return
     setDangGui(true)
     setLoi('')
     setTin((t) => [...t, { vai: 'em', chu: cau }])
-    setChu('')
+    if (cauSan === undefined) setChu('')
     const r = await hoiThemThay(qid, nguon, cau, '', dangLam)
     setDangGui(false)
     if (r.ok) {
       if (!r.ngoaiPhamVi && !tin.some((m) => m.vai === 'thay')) onTraLoi?.()
-      setTin((t) => [...t, { vai: 'thay', chu: r.traLoi }])
+      setTin((t) => [...t, { vai: 'thay', chu: r.traLoi, ct: r.ngoaiPhamVi ? null : docCauTruc(r.cauTruc) }])
       setConLai(r.conLai)
       if (r.conLai <= 0) setDung(true)
       return
     }
     // Chưa gửi được ⇒ bỏ tin vừa nhắn khỏi khung, trả chữ lại ô nhập để em gửi lại.
     setTin((t) => t.slice(0, -1))
-    setChu(cau)
+    if (cauSan === undefined) setChu(cau)
     setLoi(r.loi)
     if (r.conLai !== undefined) setConLai(r.conLai)
     if (MA_DUNG_HAN.has(r.ma)) setDung(true)
@@ -72,7 +75,9 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
       )}
       <div className="lg-ht-log" role="log" aria-live="polite" aria-busy={dangGui}>
         {tin.map((m, i) => (m.vai === 'em' ? (
-          <p key={i} className="lg-ht-em">{m.chu}</p>
+          <p key={i} className="lg-ht-em"><ChemText text={chiSoRo(m.chu)} /></p>
+        ) : m.ct ? (
+          <TraLoiThay key={i} ct={m.ct} dangLam={dangLam} khoa={dangGui} onHoi={i === tin.length - 1 && !dung ? (q) => void gui(undefined, q) : undefined} />
         ) : (
           <div key={i} className="lg-ht-thay">
             <span className="lg-ht-nhan">Thầy Đỗ Đại Học</span>

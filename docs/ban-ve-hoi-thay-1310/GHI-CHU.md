@@ -94,3 +94,11 @@ Học sinh hỏi Thầy về một câu và đọc là hiểu ngay. Thứ tự �
 
 ## Làn làm việc
 Hộp Hỏi Thầy (`HopHoiThay`, `HoiThemThay`, `hoi-tro-ly.ts`) do phiên Heisenberg đang làm (PR271/272). Thầy duyệt xong thì dựng trên `main` mới nhất, ghi một dòng vào DIEU-PHOI trước khi sửa để hai phiên không giẫm tệp.
+
+## Đã dựng (13/10, thầy chốt "Chốt làm rồi đẩy luôn nhé")
+- Máy chủ: `server/src/hoi-tro-ly-cau-truc.ts` (lược đồ, làm sạch, chữ phẳng) + `hoi-tro-ly.ts` (lời dặn TRÌNH BÀY, `responseSchema`). Khuôn cũ `{lienQuan, traLoi}` vẫn đọc được.
+- Máy em: `TraLoiThay.tsx` + `tra-loi-thay.css` (câu trả lời), `HopHoiThay.tsx` + `hop-hoi-thay.css` (đề chuẩn, tự gập), `HoiThemThay.tsx` (nút hỏi tiếp).
+- Ảnh bản thật: `anh-that/01…08`, chụp linh kiện thật qua `node scripts/chup-hoi-thay-that-1310.mjs` (trang thử `that/`). Soát: 0 lỗi trang, 0 tràn, 0 đích chạm < 44 px.
+- Khác đặc tả, có chủ đích:
+  - KHÔNG thêm cột `cau_truc_json`: sổ `hoi_tro_ly.tra_loi` ghi bản chữ phẳng (đủ để thầy đọc lại), không đổi schema, không thêm byte ghi.
+  - Độ dài: lời dặn đòi câu ngắn (≤ 30 chữ/câu); máy chủ chỉ CẮT khi vượt trần an toàn (ý chính 220, tên bước 48, nội dung bước 320, ghi nhớ 200, hỏi tiếp 80 ký tự) để không cắt giữa câu.
