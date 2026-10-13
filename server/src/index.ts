@@ -3392,7 +3392,7 @@ const boXuLy = {
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
     // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
     if(event.cron==='* * * * *') {
-      await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now())).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
+      await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now(),2,true,new Date(Date.now()+7*3600000).getUTCHours()<19)).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
       await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
@@ -3682,6 +3682,7 @@ const boXuLy = {
         const kt=await import('./kiem-tra-ca-nhan'), baiKt=await kt.docKtCn(env,sbdKhoa,Date.now(),true)
         if(kt.laNgayKt(baiKt,Date.now())){
           const tt=kt.tomTatKt(baiKt!,Date.now())
+          if(kt.coHocNgayKt(baiKt)){const g=await import('./goi-bai-7'),dem=await g.demHomNay7(env,sbdKhoa,Date.now()),lam=Number(dem.daLamHomNay);return themMocReset(env,ra({ok:true,cheDoNgay:'goi7',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:12,toiThieuCau:12},tienBo:{daLamCau:lam,toiThieuCau:12,conThieu:Math.max(0,12-lam),dat:lam>=12}}))}
           return themMocReset(env,ra({ok:true,cheDoNgay:'kiem-tra',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:tt.tong,toiThieuCau:tt.tong},tienBo:{daLamCau:tt.daTra,toiThieuCau:tt.tong,conThieu:tt.con,dat:tt.nopLuc!==null&&tt.con===0}}))
         }
         // Tối ưu 05/10: cờ cửa hàng (đệm 30 giây, không phụ thuộc kế hoạch) đọc CÙNG đợt đầu — trước: một đợt riêng ở cuối. Dùng đúng chỗ cũ.
@@ -3989,6 +3990,10 @@ const boXuLy = {
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
       // HỌC LIỆU MÁY SOẠN 05/10 (hoc-lieu-may-soan.ts): nộp bản khác + ý Đ–S đã qua hai lượt, xem hàng câu em đã sai — cùng cổng mã bí mật ở trên.
       if (p.startsWith('/kho/may-soan/')) return ra(await duongMaySoan(env, p, b))
+      // HỎI THÊM THẦY · lệnh thầy (13/10): xem lượt hôm nay của một em, đặt lại lượt hôm nay, thêm/bớt SBD thử không giới hạn lượt.
+      if (p === '/gv/hoi-tro-ly/luot') return ra(await import('./hoi-tro-ly').then((m) => m.gvLuotHoiThay(env, b)))
+      if (p === '/gv/hoi-tro-ly/dat-lai') return ra(await import('./hoi-tro-ly').then((m) => m.gvDatLaiLuotHoiThay(env, b)))
+      if (p === '/gv/hoi-tro-ly/sbd-thu') return ra(await import('./hoi-tro-ly').then((m) => m.gvSbdThuHoiThay(env, b)))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
       // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
       if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))

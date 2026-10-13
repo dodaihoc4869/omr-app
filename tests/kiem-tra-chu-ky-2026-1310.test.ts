@@ -6,6 +6,7 @@ import {damBaoKtCn} from '../server/src/kiem-tra-ca-nhan-schema'
 import {lapKtCn,docKtCn,tomTatKt,ktCnAction,dongBoKtCn} from '../server/src/kiem-tra-ca-nhan'
 import {KHUNG_KT_2026} from '../server/src/kiem-tra-ca-nhan-ma-tran'
 import {xoaMoiDem} from '../server/src/dem-chung'
+import {xoaDemCauHinh} from '../server/src/cau-hinh-dem'
 import {congNgayKt} from '../server/src/kiem-tra-ca-nhan-loi'
 import {docLanLam} from '../server/src/srs2-d1'
 import {nguonTuongDuongKt} from '../server/src/kiem-tra-ca-nhan-nguon'
@@ -95,8 +96,39 @@ it('ba đề giãn ngày, và cổng ghi không cho quá ba bài trong bất k�
  const so=k.d.sql.prepare("SELECT COUNT(*) n FROM kiem_tra_ca_nhan WHERE ngay BETWEEN ? AND ?").get(String(rows[0]!.ngay),congNgayKt(String(rows[0]!.ngay),6))!
  expect(Number(so.n)).toBeLessThanOrEqual(3)
 })
-// Claude 13/10 (soát nhánh đề 2026): cron chuyển đề cũ đọc phiên bản ở số tính sẵn (JSON nhỏ), KHÔNG bóc JSON đề lớn của mọi lịch tương lai
-// mỗi phút (bài học D1 quá tải 13/10). Số tính sẵn lập trước khi có trường phienBan ⇒ coi là đề cũ và vẫn được chuyển về 28 câu/50 phút.
+it('chuyển lớp không làm trần riêng của em thành sáu đề mỗi tuần',async()=>{
+ const k=await kho(150,3);await lapKtCn(k.env,'S1',NOW)
+ const rows=k.d.sql.prepare('SELECT * FROM kiem_tra_ca_nhan ORDER BY ngay').all();expect(rows).toHaveLength(3)
+ k.d.sql.prepare("UPDATE kiem_tra_ca_nhan SET lop='Lớp cũ' WHERE id=?").run(String(rows[0]!.id))
+ await lapKtCn(k.env,'S1',NOW+1000,true)
+ expect(k.d.sql.prepare('SELECT COUNT(*) n FROM kiem_tra_ca_nhan WHERE sbd=? AND ngay BETWEEN ? AND ?').get('S1',String(rows[0]!.ngay),congNgayKt(String(rows[0]!.ngay),6))).toMatchObject({n:3})
+})
+it('cờ tắt vẫn chuyển được lịch 333 câu tương lai; không tự bật cờ, chấm lịch bị ẩn hoặc làm mất điểm cũ',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,d=JSON.parse(String(r.json))
+ k.d.sql.prepare('UPDATE kiem_tra_ca_nhan SET json=? WHERE id=?').run(JSON.stringify({...d,phienBan:1,cau:Array.from({length:333},()=>d.cau[0]),phut:475}),String(r.id))
+ // Đề cũ thật có metadata phiên bản cũ; cron chỉ đọc phiên bản ở metadata nhỏ theo bản vá Claude.
+ k.d.sql.prepare("UPDATE kiem_tra_ca_nhan_meta SET meta_json=json_set(meta_json,'$.phienBan',1) WHERE id=?").run(String(r.id))
+ k.d.sql.prepare("INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) VALUES('ktcn-bi-an','S1','12A1','2026-10-12',?,?,'hen',?,?)").run(NOW-86400000,NOW-1,JSON.stringify(d),NOW)
+ k.d.sql.exec("UPDATE cau_hinh SET gia_tri='{}' WHERE khoa='kiem_tra_ca_nhan_v1'");xoaMoiDem();xoaDemCauHinh(k.env)
+ expect(await dongBoKtCn(k.env,NOW+1000,2,true,true)).toMatchObject({soEm:0,soMoi:1})
+ expect(await docKtCn(k.env,'S1',NOW)).toBeNull()
+ const moi=k.d.sql.prepare('SELECT * FROM kiem_tra_ca_nhan WHERE id=?').get(String(r.id))!
+ expect(tomTatKt(moi,NOW)).toMatchObject({tong:28,phut:50});expect(moi.ngay).toBe(r.ngay)
+ expect(k.d.sql.prepare("SELECT nop_luc,diem FROM kiem_tra_ca_nhan WHERE id='ktcn-bi-an'").get()).toMatchObject({nop_luc:null,diem:null})
+ // Bật sau ngày bị ẩn: mốc bật ngăn cron biến lịch chưa công bố thành điểm 0.
+ k.d.sql.prepare("UPDATE cau_hinh SET gia_tri=? WHERE khoa='kiem_tra_ca_nhan_v1'").run(JSON.stringify({bat:true,batLuc:new Date(NOW).toISOString()}));xoaMoiDem();xoaDemCauHinh(k.env)
+ await dongBoKtCn(k.env,NOW+2000)
+ expect(k.d.sql.prepare("SELECT nop_luc FROM kiem_tra_ca_nhan WHERE id='ktcn-bi-an'").get()).toMatchObject({nop_luc:null})
+})
+it('nguồn đã đủ sau ngày chờ vẫn lập được lịch mới, không coi chờ nguồn là đã mở bài',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,d=JSON.parse(String(r.json))
+ k.d.sql.prepare("UPDATE kiem_tra_ca_nhan SET id='cho-nguon',ngay='2026-10-13',mo_luc=?,han_luc=?,trang_thai='cho_nguon',json=? WHERE id=?").run(NOW-1000,NOW+86400000,JSON.stringify({...d,chuKyNgay:'2026-10-13',thieu:['kn:nen:mol']}),String(r.id))
+ await lapKtCn(k.env,'S1',NOW+1000,true)
+ const moi=(await docKtCn(k.env,'S1',NOW))!;expect(moi.trang_thai).toBe('hen');expect(Number(moi.mo_luc)).toBeGreaterThan(NOW)
+ expect(k.d.sql.prepare("SELECT nop_luc FROM kiem_tra_ca_nhan WHERE id='cho-nguon'").get()).toMatchObject({nop_luc:null})
+})
+
+
 it('cron chuyển đề cũ chưa mở về 28 câu nhờ số tính sẵn, không bóc JSON đề trong lệnh chọn lịch',async()=>{
  const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,d=JSON.parse(String(r.json))
  k.d.sql.prepare('UPDATE kiem_tra_ca_nhan SET json=? WHERE id=?').run(JSON.stringify({...d,phienBan:1,cau:Array.from({length:333},()=>d.cau[0]),phut:475}),String(r.id))

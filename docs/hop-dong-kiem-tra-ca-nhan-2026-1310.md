@@ -14,7 +14,7 @@ Thầy chốt ngày 13/10: đề theo cấu trúc thi thật 2026, phủ kiến 
 
 Nền `nen:` toàn cục tính một lần; bài có bằng chứng đo riêng. Dạng được quy về cơ chế theo cây từ vựng thật chương → cơ chế → thao tác. Toàn bộ vi kỹ năng lá vẫn lưu trong `viKyNang` và sổ OMNI, không bỏ lá khó để tuyên bố đạt. `phuKienThuc` là số cơ chế/nền xuất hiện trong đề; `phuChuKy` là số trong cả chu kỳ; không đồng nghĩa đã tự làm, đã đúng hay vững lâu.
 
-Nguồn tương đương phải đã duyệt, chỉ mục đúng phiên bản, đúng khối, toàn bộ kiến thức đã dạy, không tự luận/ca/BTVN/công tắc chặn. ĐS phải có ma trận nguyên câu hoặc đầy đủ bốn ý. Thiếu nguồn/ô ma trận → `cho_nguon`, giữ mẫu số và nhiệm vụ bài ngày, không giả 100%. Mô phỏng nguồn thật trước bản cuối: khối10 35/35, khối11 44/44; khối12 còn thiếu nguồn đã duyệt cho `nen:gia_tri_trung_binh` (52/53), chưa thể xác nhận phủ toàn bộ. Không tự duyệt bốn câu đang chờ duyệt.
+Nguồn tương đương phải đã duyệt, chỉ mục đúng phiên bản, đúng khối, toàn bộ kiến thức đã dạy, không tự luận/ca/BTVN/công tắc chặn. ĐS phải có ma trận nguyên câu hoặc đầy đủ bốn ý. Thiếu nguồn/ô ma trận → `cho_nguon`, giữ mẫu số và nhiệm vụ bài ngày, không giả 100%. Mô phỏng nguồn thật trước bản cuối: khối10 35/35, khối11 44/44; khối12 còn thiếu câu đủ điều kiện nguồn/phạm vi/ma trận để phủ `nen:gia_tri_trung_binh` (52/53), chưa thể xác nhận phủ toàn bộ. Kho có câu mang nhãn này không đồng nghĩa câu ấy vượt đủ cổng; không tự duyệt câu đang chờ duyệt.
 
 ## Bài mới và kế hoạch ngày
 
@@ -28,6 +28,14 @@ Lịch version1/2 giữ hợp đồng cũ cho phiên đang làm. Version3 thay c
 
 Nộp kiểm tra ghi một receipt ổn định/câu đã trả lời đủ vào `su_kien_hoc`, nguồn game, purpose de_thu, assistance none. SRS/OMNI đọc lần làm thật đó; sai không bị xóa bởi việc nộp xong/xem chữa, phần đúng/sai giữ từng ý. Không tăng số câu đề đang làm sau một lỗi. Lỗi giữ trong vòng ôn/sửa và chỉ được đóng qua bằng chứng kiểm chứng của động cơ hiện có. Bỏ trống không tạo bằng chứng thành thạo.
 
-Giữ bản vá Claude: `kiem_tra_ca_nhan_meta`, snapshot+meta cùng batch nguyên tử, `COT_META_KT` đường nóng chỉ bóc JSON nhỏ, `buMetaKt` cron. Đọc lịch Gói7 song song câu/sổ/quota. Chuẩn bị lúc phát hành chỉ một lô nhỏ; không 500 vòng quét toàn học sinh. Script bật lại cờ chặn lịch tương lai chưa chuyển về 28/50.
+Giữ bản vá Claude: `kiem_tra_ca_nhan_meta`, snapshot+meta cùng batch nguyên tử, `COT_META_KT` đường nóng chỉ bóc JSON nhỏ, `buMetaKt` cron. Đọc lịch Gói7 song song câu/sổ/quota. Khi cờ tắt, cron ngoài cao điểm (trước19h VN) chỉ chuyển các lịch tương lai sẵn có; không giao chu kỳ tiếp hay chấm bài bị ẩn. Script bật ghi batLuc; cron không chấm lịch hết hạn trước mốc bật đó. Đường /hs/ke-hoach-ngay cũ cũng đọc mức 12 và số bài ngày riêng, không dựng thêm kế hoạch cũ. Chuẩn bị lúc phát hành chỉ một lô nhỏ; không 500 vòng quét toàn học sinh. Script bật lại cờ chặn lịch tương lai chưa chuyển về 28/50.
 
-Cờ kiểm tra đang tạm tắt sau sự cố D1. PR này chưa bật cờ/chưa phân lại D1 thật; mô phỏng chỉ SELECT. Gộp sau Claude soát, không phát hành chồng với main đang chạy; chưa thể bật toàn bộ nếu nguồn đã duyệt còn thiếu. Tắt cờ là cách lùi, giữ lịch/bài nộp/điểm/sổ.
+Claude đã bật lại cờ qua workflow38376337214 (main124208fb), kết quả success. Bản sửa hạn này chưa áp hạn/D1 thật; mô phỏng nguồn trước đó chỉ SELECT. Lịch thiếu nguồn đủ cổng vẫn ở cho_nguon, không giả độ phủ. Gộp phần bổ sung sau Claude soát, không phát hành chồng. Tắt cờ là cách lùi, giữ lịch/bài nộp/điểm/sổ.
+
+## Sửa hạn bài đã tick
+
+Trong Bài đang giao, mỗi dòng bài/lớp có Sửa hạn, ô ngày, Lưu hạn và Hủy. Hạn kết thúc 23:59 giờ Việt Nam. Có lựa chọn hiện cả bài quá hạn để gia hạn. Chỉ nhận ngày thật, từ hôm nay và từ ngày bắt đầu bài; từ chối bài bỏ tick, bản hạn đã đổi ở máy khác, hoặc ca chính thức đang mở.
+
+`/gv/goi-bai-7` sau cổng mã thầy nhận `{action:'sua_han',goiId,han,hanCu}`. Một batch nguyên tử giành receipt trong bảng chỉ-thêm `goi_bai_7_sua_han`, sửa hạn gói và các em đã nhận, làm mất hiệu lực số kế hoạch tính sẵn từ hôm nay. Không xóa lượt học, sổ gặp, nháp, điểm, lời chữa hay bài kiểm tra. Không thay ngày kiểm tra đã công bố: phép chia câu mới tự cân đối với lịch thực tế. Lần mở sảnh/chặng kế tiếp tính lại từng em; lệnh đếm nhẹ trong chặng đang làm giữ mục tiêu lúc mở, không lập nặng sau mỗi câu. Không quét nặng/lập lại tất cả học sinh trong lệnh lưu của thầy. Em mới chuyển vào lớp kế thừa hạn mới; cron không ghi đè hạn của thầy.
+
+Gia hạn giãn số câu còn thiếu; rút ngắn tăng phần cần gặp theo số ngày còn lại. Ví dụ 127 câu, một em đã gặp20 câu và một em chưa gặp: hạn tới19/10, tính từ10/10 ⇒ 11 và13 câu mới/ngày; đổi tới11/10 ⇒ 54 và64. Đây là số cần để phủ đúng hạn, không chứng minh đã hiểu/đúng. Ngày có một kiểm tra vẫn tối đa12 câu ngày và ưu tiên bài mới còn hạn trước nợ quá hạn; khi hạn quá ngắn hoặc em không học đủ, giữ nợ thật, không tuyên bố hoàn thành giả. Câu khó được tiếp cận có hỗ trợ theo động cơ, câu sai vẫn quay lại ôn/sửa.

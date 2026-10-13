@@ -13,4 +13,6 @@ export const SQL_GOI7: readonly string[] = [
   // CHỈ THÊM 12/10 (thầy: "học sinh làm 24 câu nhưng lại báo 31 câu … hiển thị thật chính xác"): MỨC HÔM NAY của em ngày Gói 7 — chốt ở lần lập đầu
   // tiên trong ngày (`chotMucNgay7`, INSERT OR IGNORE), mọi màn em / thầy / phụ huynh đọc lại đúng số này. muc = max(toi_thieu_tang, quota).
   `CREATE TABLE IF NOT EXISTS goi_bai_7_muc_ngay (sbd TEXT NOT NULL,ngay TEXT NOT NULL,tang INTEGER NOT NULL,toi_thieu_tang INTEGER NOT NULL,quota INTEGER NOT NULL,muc INTEGER NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,ngay))`,
+  // Hạn thầy sửa: nhật ký chỉ-thêm, đồng thời là biên nhận cho giao dịch đổi hạn/tính lại kế hoạch.
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_sua_han (id TEXT PRIMARY KEY,goi_id TEXT NOT NULL,han_cu TEXT NOT NULL,han_moi TEXT NOT NULL,luc TEXT NOT NULL)`,
 ]

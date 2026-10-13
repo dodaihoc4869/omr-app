@@ -1,0 +1,44 @@
+[
+  {
+    "ten": "doc",
+    "mau": "sang",
+    "tran": false,
+    "nho": [],
+    "loi": []
+  },
+  {
+    "ten": "doc",
+    "mau": "toi",
+    "tran": false,
+    "nho": [],
+    "loi": []
+  },
+  {
+    "ten": "ngang",
+    "mau": "sang",
+    "tran": false,
+    "nho": [],
+    "loi": []
+  },
+  {
+    "ten": "ngang",
+    "mau": "toi",
+    "tran": false,
+    "nho": [],
+    "loi": []
+  },
+  {
+    "ten": "may-tinh",
+    "mau": "sang",
+    "tran": false,
+    "nho": [],
+    "loi": []
+  },
+  {
+    "ten": "may-tinh",
+    "mau": "toi",
+    "tran": false,
+    "nho": [],
+    "loi": []
+  }
+]

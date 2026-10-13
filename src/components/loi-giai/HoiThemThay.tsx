@@ -4,7 +4,7 @@
 import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { SendHorizontal } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
-import { hoiThemThay } from '../../lib/loi-giai-api'
+import { hoiThemThay } from '../../lib/hoi-them-thay-api'
 import TraLoiThay, { chuHoa, docCauTruc, type CauTrucTraLoi } from './TraLoiThay'
 
 /** `ct`: câu trả lời có cấu trúc (bản vẽ docs/ban-ve-hoi-thay-1310) — vắng ⇒ vẽ chữ phẳng như cũ. */
