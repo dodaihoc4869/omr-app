@@ -52,11 +52,17 @@ describe('② PENDING SUBMIT — tắt app giữa chừng không mất bài', ()
   it('bài được đánh dấu pendingSubmit TRƯỚC khi gửi mạng qua trySend', () => {
     // Thứ tự bắt buộc: lưu local (saveAttempt) trước, sau đó mới trySend gọi mạng.
     const khoiSubmit = MAN.slice(MAN.indexOf('const doSubmit = async'), MAN.indexOf('const apDungKeyBank'))
-    const viTriLuu = khoiSubmit.indexOf('saveAttempt(updated)')
-    const viTriNop = khoiSubmit.indexOf('trySend(updated)')
+    const viTriPending = khoiSubmit.indexOf('pendingSubmit: true')
+    const viTriHelper = khoiSubmit.indexOf('await luuVaNop(updated, tuDongNop)')
+    expect(viTriPending).toBeGreaterThan(-1)
+    expect(viTriHelper).toBeGreaterThan(viTriPending)
+    const helper = MAN.slice(MAN.indexOf('const luuVaNop = async'), MAN.indexOf('const doSubmit = async'))
+    const viTriLuu = helper.indexOf('await saveAttempt(snapshot)')
+    const viTriNop = helper.indexOf('trySend(snapshot)')
     expect(viTriLuu).toBeGreaterThan(-1)
     expect(viTriNop).toBeGreaterThan(-1)
     expect(viTriLuu).toBeLessThan(viTriNop)
+    expect(helper).toMatch(/catch \(e\) \{[\s\S]*setPhase\('loi-luu-nop'\)[\s\S]*return/)
   })
 
   it('khi load lại trang, nếu còn pendingSubmit thì tự trySend', () => {

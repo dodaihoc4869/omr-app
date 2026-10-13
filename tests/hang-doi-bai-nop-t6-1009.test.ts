@@ -21,10 +21,17 @@ describe('NỬA MỘT — ghi xuống máy TRƯỚC khi gọi mạng', () => {
     const i = MAN.indexOf('submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }')
     expect(i).toBeGreaterThan(0)
     const sau = MAN.slice(i, i + 1400)
-    const iLuu = sau.indexOf('await saveAttempt(updated)')
-    const iGui = sau.indexOf('trySend(updated)')
+    // doSubmit chốt pending snapshot rồi gọi helper; helper phải lưu xong
+    // trước cả nhánh gửi ngay lẫn nhánh giãn cú nộp tự động.
+    expect(sau).toContain('nhapNopRef.current = updated')
+    expect(sau).toContain('await luuVaNop(updated, tuDongNop)')
+    expect(sau).not.toContain('trySend(updated)')
+    const helper = MAN.slice(MAN.indexOf('const luuVaNop = async'), MAN.indexOf('const doSubmit = async'))
+    const iLuu = helper.indexOf('await saveAttempt(snapshot)')
+    const iGui = helper.indexOf('trySend(snapshot)')
     expect(iLuu).toBeGreaterThan(0)
     expect(iGui).toBeGreaterThan(iLuu)
+    expect(helper).toMatch(/catch \(e\) \{[\s\S]*setPhase\('loi-luu-nop'\)[\s\S]*return/)
   })
 
   it('hàng đợi đọc được — có hàm lọc `pendingSubmit`', () => {
