@@ -125,3 +125,15 @@
 .m3 .thi-bao-nhe { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container); }
 .m3 .thi-bao-nhe svg { flex-shrink: 0; }
 .m3 .thi-bao-nhe-chu { min-width: 0; font-size: var(--bnv-cx-2); font-weight: 700; line-height: 1.4; }
+
+/* ── ĐỢT 18 · LÀN H (thầy 12/10: màn làm bài "siêu đẹp và thân thiện" ở cả dọc/ngang/máy tính). CHỈ bố cục, màu dùng biến sẵn có.
+ * Điện thoại dọc (< 440 px): thanh trên không đủ chỗ cho cả tên ca lẫn "Đã làm" — trước đây hai dòng cùng bị cắt ("Ca k…" / "Đã là…").
+ * Giữ MỘT dòng "Đã làm x/y" đọc trọn, đậm; tên ca em đã thấy ở phòng chờ và vẫn có ở bản máy tính. ── */
+@media (max-width: 439px) {
+  .m3 .thi-tren-hang { gap: 6px; padding-left: var(--k3, 12px); }
+  .m3 .thi-vien-thuoc { gap: 4px; padding: 0 10px; }
+  .m3 .thi-tren-ten { display: none; }
+  .m3 .thi-tren-da-lam { overflow: hidden; font-size: 14px; font-weight: 700; color: var(--m3-on-surface); text-overflow: ellipsis; white-space: nowrap; }
+}
+/* Máy rất hẹp (360 px): viên đồng hồ chỉ còn con số (màu đỏ khi sắp hết giờ vẫn giữ) để "Đã làm 28/28" đọc trọn. */
+@media (max-width: 379px) { .m3 .thi-vien-thuoc svg { display: none; } }

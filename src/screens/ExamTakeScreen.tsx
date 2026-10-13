@@ -3697,8 +3697,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       <button
         type="button"
         onClick={() => thuVaoToanManHinh()}
-        className="fixed flex items-center"
-        style={{ left: 12, bottom: 'calc(12px + env(safe-area-inset-bottom))', zIndex: 45, gap: 6, height: 36, padding: '0 12px', borderRadius: 18, border: '1px solid var(--vien-dam)', background: 'var(--the)', color: 'var(--nhat)', fontFamily: 'var(--sans)', fontSize: 12.5, fontWeight: 600, boxShadow: 'var(--bong-1)', opacity: 0.92 }}
+        className="fixed flex items-center thi-nut-vao-lai"
+        style={{ left: 12, bottom: 'calc(12px + env(safe-area-inset-bottom))', zIndex: 45, gap: 6, height: 44, padding: '0 14px', borderRadius: 22, border: '1px solid var(--vien-dam)', background: 'var(--the)', color: 'var(--nhat)', fontFamily: 'var(--sans)', fontSize: 12.5, fontWeight: 600, boxShadow: 'var(--bong-1)', opacity: 0.92 }}
       >
         <Maximize size={14} aria-hidden="true" />
         Vào lại toàn màn hình
