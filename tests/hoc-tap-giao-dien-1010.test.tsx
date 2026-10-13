@@ -8,7 +8,7 @@ import { docSanh } from '../src/components/hoa2/api'
 vi.mock('../src/components/hoa2/api', async importOriginal => ({ ...await importOriginal<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 afterEach(() => { cleanup(); vi.clearAllMocks(); localStorage.clear() })
 const q = { qid: 'gia-1', maDe: 'gia', version: 'v1', group: 'g1', phan: 'I' as const, text: 'Chất nào là muối?', choices: ['NaCl', 'HCl', 'NaOH', 'H2O'], ideas: [], hinhAnh: [], dang: null, tenDang: '', mucDo: 'NB', sao: 0, kienThuc: [] }
-it('màn chính dùng dữ liệu kế hoạch, không có cửa game hoặc đòi chọn thú', () => {
+it('màn chính dùng dữ liệu kế hoạch, không có cửa game hoặc đòi chọn thú', async () => {
   const hoc = vi.fn()
   const sanh = docSanh({ cheDo2: true, theLuc: { con: 18, tong: 24 }, hanhTrinh: { tang: 1, toiThieu: 24, daLam: 6, daXep: 24, conThieu: 0, soChang: 4, changHienTai: 2, cauTrongChang: 6 } })
   render(<HocTapHomNay ten="An" lop="12A1" ketQua={sanh} dangTai={false} loi="" coCa={false} onHoc={hoc} onXemLai={vi.fn()} onChua={vi.fn()} onThi={vi.fn()} onTuLuyen={vi.fn()} onLichSu={vi.fn()} onBaiTap={vi.fn()} onGiaDinh={vi.fn()} onTaiLai={vi.fn()} onDangXuat={vi.fn()} />)
@@ -17,7 +17,8 @@ it('màn chính dùng dữ liệu kế hoạch, không có cửa game hoặc đ�
   expect(screen.queryByText(/Bát Linh|Bi-a|Thần thú|Cửa hàng|Hộ Tống/i)).toBeNull()
   // SỬA CÓ CHỦ ĐÍCH 12/10 (thầy 12/10: "gộp hai phần làm một"): nút học duy nhất của thẻ "Hôm nay của em" ghi số câu còn lại ("Học tiếp · 18 câu").
   fireEvent.click(screen.getByRole('button', { name: 'Học tiếp · 18 câu' })); expect(hoc).toHaveBeenCalledOnce()
-  fireEvent.click(screen.getByRole('button', { name: 'Ôn & sửa' })); expect(screen.getByRole('button', { name: /Tự sửa lỗi/ })).toBeTruthy() // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18): tên mục theo chữ thầy
+  // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18): tên mục theo chữ thầy. SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19, luật tốc độ): tab Ôn & sửa nạp khi mở ⇒ chờ thẻ hiện (findBy).
+  fireEvent.click(screen.getByRole('button', { name: 'Ôn & sửa' })); expect(await screen.findByRole('button', { name: /Tự sửa lỗi/ })).toBeTruthy()
 })
 it('trước nộp không có đáp án, sau nộp dùng phản hồi máy chủ; nháp không mất khi lỗi', async () => {
   vi.mocked(goiHoa2).mockResolvedValueOnce({ ok: true, id: 'p1', questions: [q] }).mockRejectedValueOnce(new Error('Mạng gián đoạn')).mockResolvedValueOnce({ ok: true, correct: true, answer: 'A', solution: 'NaCl là muối.' })

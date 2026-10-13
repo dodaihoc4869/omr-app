@@ -1,0 +1,19 @@
+/* ── ĐỢT 19 · BIỂU TƯỢNG VẼ RIÊNG (BieuTuongTuSua.tsx, HanhTrinhOnSua.tsx — phong cách chung với huy hiệu 12 bậc của làn M; nạp lười cùng hình) ─────────────────────────────────────────────
+   viewBox 64 · ô gradient dịu: trên = màu nhấn pha --giay (luôn sáng hơn), dưới = màu nhấn (tối: pha --the cho có chiều sâu) · vệt bóng nửa trên: --giay mờ dần · vật trên ô màu --giay (giấy
+   trắng cả hai nền) · nét chi tiết = màu nhấn pha --muc (sáng) / --the (tối) ⇒ luôn ĐẬM hơn trên giấy trắng · dấu đúng/sai trên giấy: --xanh / --do (tối:
+   pha --the để đủ đậm trên giấy). Chỉ biến chuẩn sẵn có; không hex. Chuyển động khi hiện ≤ 260 ms, tắt khi giảm chuyển động hoặc html.may-yeu. */
+.bt64{display:block;width:100%;height:100%;--bt-c:var(--tim);--bt-d:var(--bt-c);--bt-dam:color-mix(in srgb,var(--bt-c) 62%,var(--muc));--bt-xanh:var(--xanh);--bt-do:var(--do)}
+.bt64[data-sac=sua]{--bt-c:var(--cam);--bt-d:color-mix(in srgb,var(--cam) 55%,var(--vang-diu))}
+.bt64-s{stop-color:color-mix(in srgb,var(--bt-c) 58%,var(--giay))}.bt64-d{stop-color:var(--bt-d)}
+.bt64-b{stop-color:var(--giay);stop-opacity:.42}.bt64-b0{stop-opacity:0}
+.bt-v{fill:var(--giay)}.bt-mo{opacity:.4}
+.bt-n{fill:none;stroke:var(--bt-dam);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.bt-sai{stroke:var(--bt-do);stroke-width:3}.bt-dung{stroke:var(--bt-xanh);stroke-width:3.6}
+.bt-go{fill:color-mix(in srgb,var(--cam) 28%,var(--giay))}.bt-ruot{fill:var(--bt-dam)}.bt-than{fill:var(--tim)}.bt-dai{fill:color-mix(in srgb,var(--tim) 35%,var(--giay))}.bt-tay{fill:color-mix(in srgb,var(--do) 45%,var(--giay))}
+@media(prefers-color-scheme:dark){.bt64{--bt-d:color-mix(in srgb,var(--bt-c) 78%,var(--the));--bt-dam:color-mix(in srgb,var(--bt-c) 58%,var(--the));--bt-xanh:color-mix(in srgb,var(--xanh) 70%,var(--the));--bt-do:color-mix(in srgb,var(--do) 78%,var(--the))}.bt64[data-sac=sua]{--bt-d:color-mix(in srgb,var(--cam) 70%,var(--vang-diu))}}
+@media(prefers-reduced-motion:no-preference){html:not(.may-yeu) .bt-hien .bt-dung{stroke-dasharray:20;animation:bt-ve .26s .15s ease-out backwards}html:not(.may-yeu) .bt-hien .bt-but{animation:bt-but .26s .15s ease-out backwards}html:not(.may-yeu) .bt-hien .bt-lap{transform-box:fill-box;transform-origin:center;animation:bt-lap .24s .4s ease-out backwards}}
+@keyframes bt-ve{from{stroke-dashoffset:20}}@keyframes bt-but{from{transform:translate(-12.4px,6.3px)}35%{transform:translate(-7.8px,10.3px)}}@keyframes bt-lap{from{transform:scale(0);opacity:0}}
+/* Màu nhấn từng hình (biến chuẩn của app học sinh). */
+.bt64[data-sac=xanh]{--bt-c:var(--xanh)}.bt64[data-sac=cam]{--bt-c:var(--cam)}.bt64[data-sac=tim]{--bt-c:var(--tim)}
+.bt64[data-sac=cham]{--bt-c:var(--lg-nhan)}.bt64[data-sac=do]{--bt-c:var(--do)}
+.bt-sang{stroke:var(--giay)}.bt-dam{fill:var(--bt-dam)}.bt-long{fill:color-mix(in srgb,var(--bt-c) 50%,var(--giay))}

@@ -216,9 +216,9 @@ describe('Hôm nay: thẻ mời Tự sửa lỗi', () => {
     expect(within(screen.getByRole('region', { name: 'Ôn và sửa' })).queryByRole('button', { name: /Tự sửa lỗi/ })).toBeNull()
     fireEvent.click(within(the).getByRole('button', { name: 'Sửa lỗi ngay' }))
     expect(onChua).toHaveBeenCalledOnce()
-    // Ôn & sửa: dòng Tự sửa lỗi mang số câu có nhãn
+    // Ôn & sửa: dòng Tự sửa lỗi mang số câu có nhãn. SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19, luật tốc độ): tab nạp khi mở ⇒ chờ thẻ hiện (findBy).
     fireEvent.click(screen.getByRole('button', { name: 'Ôn & sửa' }))
-    expect(screen.getByRole('button', { name: /Tự sửa lỗi/ }).textContent).toContain('3 câu')
+    expect((await screen.findByRole('button', { name: /Tự sửa lỗi/ })).textContent).toContain('3 câu')
   })
 
   it('không còn câu cần sửa ⇒ không thẻ mời, dòng "Tự sửa lỗi" nói thật', async () => {
