@@ -27,4 +27,3 @@ export function caConEmDangLam(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetH
   const t = trangThaiCa(ca, nowMs).ten
   return t === 'Đang mở' || t === 'Còn em đang làm'
 }
-

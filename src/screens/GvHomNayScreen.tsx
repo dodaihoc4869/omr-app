@@ -1,5 +1,5 @@
 // HÔM NAY CỦA THẦY — màn đầu app thầy khi Game Hóa 2.0 bật. Trả lời MỘT câu: "Lớp tôi cần gì hôm nay, em nào chăm, em nào lười?". Mã màn vẫn là
-// `tongquan` (TongQuanScreen giữ mã).
+// `tongquan` để giữ lối điều hướng cũ.
 // LỊCH SỬ: bản vẽ tối giản thầy chốt 09/10 (GV-HomNay: việc cần thầy xếp theo độ gấp, mỗi việc một nút + thẻ "Đủ mức tối thiểu hôm nay").
 // BẢN VẼ THẦY DUYỆT 12/10 (dot10-canvas Main.dc.html + HomNay-DienThoai.dc.html; thầy: "Mục hôm nay hiển thị rõ cho tôi vô cùng đẹp Nhịp học, phải
 // làm rất đẹp, tôi nhìn vào thấy ngay học sinh nào chăm học sinh nào lười" · "duyệt bản vẽ, buid và đẩy luôn nhé"):

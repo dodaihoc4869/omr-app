@@ -66,6 +66,24 @@ function htmlMomTuCham(van) {
 }
 const HASH_HTML_MOM_CU = 'aa2e70cfa2703cdecc5fa07e0105e650e781b0ed097b751b3586349f81352f8e'
 
+// Thầy giao gỡ quản lý chiến dịch cũ (14/10). Chỉ miễn màu của đúng thẻ đã
+// ngừng dùng khi bỏ NGUYÊN khối; màu các thẻ Cài đặt còn lại vẫn được so đủ.
+function theChienDichCu(van) {
+  const tep = ts.createSourceFile('CaiDatScreen.tsx', van, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+  const ds = []
+  const doc = n => {
+    if (ts.isFunctionLike(n)) return
+    if (ts.isJsxElement(n) && n.openingElement.tagName.getText(tep) === 'TheNoiDung') {
+      const s = n.getText(tep)
+      if (s.includes('Chiến dịch đã giao') && s.includes('onClick={moChienDichDaGiao}')) ds.push(s)
+    }
+    ts.forEachChild(n, doc)
+  }
+  for (const n of tep.statements) if (ts.isFunctionDeclaration(n) && n.name?.text === 'CaiDatScreen' && n.body) doc(n.body)
+  return ds.length === 1 ? ds[0] : ''
+}
+const HASH_THE_CHIEN_DICH_CU = '7977f3eefcb87b9f79c99be702d1830deac0e35e78edc2bd563d4ceb2290689b'
+
 const LA_TEP = (f) => (/^src\/.*\.(css|tsx?|html)$/.test(f) || f === 'index.html') && !f.includes('graphify-out')
 const doi = git('diff', '--name-status', MOC, '--', 'src', 'index.html').trim().split('\n').filter(Boolean)
   .map((d) => d.split('\t')).filter(([, f, f2]) => LA_TEP(f2 ?? f))
@@ -104,6 +122,10 @@ const DA_XOA_MA_CHET = new Set([
   'src/components/xem-diem-gv/BaoCaoCaLop.tsx', 'src/components/xem-diem-gv/BaoCaoMotEm.tsx', 'src/components/xem-diem-gv/xem-diem-gv.css', 'src/components/xem-diem/TheCaGanNhat.tsx',
 ])
 
+// 14/10: các đường dẫn chính xác có đồ thị trước/sau, giữ lõi học. Hash buộc
+// bản bị gỡ đúng snapshot đã soát; không miễn tệp sửa một phần hoặc mã mới cùng tên.
+const GAME_DA_GO = new Map(JSON.parse(readFileSync(new URL('../docs/don-game-1410/mau-tep-da-go.json', import.meta.url), 'utf8')).files.map(x => [x.path, x.sha256]))
+
 // MÀU THẦY RA LỆNH THÊM — ngoại lệ ĐÓNG (09/10/2026, thầy: "Quét bảng màu từ Bảng G (ngà voi #FFFEF6, xanh ngọc #10B981, xanh navy #0F3D3A,
 // vàng #F7A800) cập nhật vào tailwind…", rồi "Build rồi đẩy luôn"). Đúng BA khai báo gốc ở tokens.css (xanh ngọc trùng --xanh có sẵn nên không cần);
 // mọi sắc dẫn xuất phải pha color-mix từ ba biến này. Liệt kê đủ tệp · khai báo, KHÔNG glob; thêm dòng mới phải có lệnh thầy kèm theo.
@@ -119,6 +141,10 @@ let soMaChet = 0
 for (const [trangThai, f, f2] of doi) {
   const ten = f2 ?? f
   if (trangThai.startsWith('D') && DA_XOA_MA_CHET.has(f)) { soMaChet++; continue }
+  if (trangThai === 'D' && GAME_DA_GO.has(f)) {
+    const cu = git('show', `${MOC}:${f}`)
+    if (createHash('sha256').update(cu).digest('hex') === GAME_DA_GO.get(f)) { soMaChet++; continue }
+  }
   soTep++
   const cu = trangThai.startsWith('A') ? '' : (() => { try { return git('show', `${MOC}:${f}`) } catch { return '' } })()
   let moi = ''
@@ -128,6 +154,10 @@ for (const [trangThai, f, f2] of doi) {
   const htmlCu = trangThai === 'M' && ten === 'src/screens/StudentPortalScreen.tsx' ? htmlMomTuCham(cu) : ''
   if (htmlCu && createHash('sha256').update(htmlCu).digest('hex') === HASH_HTML_MOM_CU && !htmlMomTuCham(moi)) {
     for (const [k, n] of dem(khaiBaoMau(htmlCu))) a.set(k, Math.max(0, (a.get(k) ?? 0) - n))
+  }
+  const theCu = trangThai === 'M' && ten === 'src/screens/CaiDatScreen.tsx' ? theChienDichCu(cu) : ''
+  if (theCu && createHash('sha256').update(theCu).digest('hex') === HASH_THE_CHIEN_DICH_CU && !theChienDichCu(moi)) {
+    for (const [k, n] of dem(khaiBaoMau(theCu))) a.set(k, Math.max(0, (a.get(k) ?? 0) - n))
   }
   for (const [k, n] of a) if ((b.get(k) ?? 0) < n) loi.push(`ĐỔI/XOÁ màu đang có · ${ten} · ${k}`)
   for (const [k, n] of b) {
