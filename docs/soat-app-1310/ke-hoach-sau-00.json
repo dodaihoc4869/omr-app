@@ -2,35 +2,49 @@
   "timezone": "Asia/Saigon",
   "not_before": "2026-10-14T00:00:00+07:00",
   "continuation_at": "2026-10-14T00:05:00+07:00",
-  "phase": "audit_prepared_optimizations_not_applied",
-  "base": "97300016",
+  "phase": "applied_on_isolated_branch_final_gate_in_progress",
+  "base": "58d34a69",
   "teacher_priority_pr": 285,
   "lanes": [
     {
-      "lane": "frontend_obsolete",
-      "worktree": "/workspace/soat-ma-cu-1310",
-      "manifest": "docs/soat-app-1310/kiem-ke-ma-cu.json",
-      "goal": "Ngắt Game initializer rồi loại file/tài nguyên không có caller; giữ lõi học và dữ liệu"
-    },
-    {
-      "lane": "parent",
-      "worktree": "/workspace/soat-ph-1310",
-      "goal": "API phụ mount 2 lượt do moc null→mốc đầu: đo9→5 requests, giữ refresh thật sau đổi mốc"
+      "lane": "teacher",
+      "worktree": "/workspace/toi-uu-tai-1410",
+      "result": "IDB121→1; hai caller6→3lệnh; import Hômnay gọn"
     },
     {
       "lane": "student",
-      "worktree": "/workspace/soat-hs-1310",
-      "goal": "Lịch sử+BTVN song song; đồng hồ KTCN không render toàn đề mỗi giây; tải Exam sau auth, giữ nháp/replay"
+      "worktree": "/workspace/toi-uu-hs-1410",
+      "result": "lịch sử/BTVN song song; đồng hồ tách riêng; nạp màn thi lúc rảnh; lỗi tự chốt lùi nhịp"
     },
     {
-      "lane": "worker",
-      "worktree": "/workspace/soat-worker-1310",
-      "goal": "/ph/cap-ma không SELECT password từng em sau đọc bảng; kho/cron/cache và sức khoẻ tránh O(n²)"
+      "lane": "parent",
+      "worktree": "/workspace/toi-uu-ph-1410",
+      "result": "9→5request; backoff/partialerror; guard đổi phiên"
     },
     {
-      "lane": "integration",
-      "worktree": "/workspace/tick-nhanh-1310",
-      "goal": "Giữ main mới/Claude, tốc độ/mốc chỉ hạ, test so theo tên, không deploy chồng, ca mở thì không phát hành"
+      "lane": "frontend_obsolete",
+      "worktree": "/workspace/don-game-app-1410",
+      "result": "203 tệp nguồn/46 ảnh game gỡ có đồ thị; giữ lõi học"
+    },
+    {
+      "lane": "legacy_campaign",
+      "worktree": "/workspace/toi-uu-worker-1410",
+      "result": "5 UI cũ gỡ; giữ Sửa em chờ C3; sửa tràn chip"
+    },
+    {
+      "lane": "tick",
+      "worktree": "/workspace/toi-uu-tick-1410",
+      "result": "PR285 đã sống; retry nhẹ sau tick; đặc tả/bản vẽ C3 chưa build"
+    },
+    {
+      "lane": "server",
+      "owner": "Claude",
+      "result": "PR288/289 đã sống trước nhánh này; giữ BAN_BIA/D1/chấm thi"
+    },
+    {
+      "lane": "integration_pwa",
+      "worktree": "/workspace/don-ma-sau-00-1410",
+      "result": "offline/staticclosure13/13;18 Chromiumtổ hợp; full cuối đang chạy"
     }
   ],
   "limits": [
@@ -39,5 +53,13 @@
     "Đo cục bộ không phải số D1/mạng production",
     "Mọi danh sách retire phải kiểm lại tham chiếu trên main mới trước xoá",
     "Không coi Claude im lặng là đã review"
-  ]
+  ],
+  "integration_branch": "codex/don-ma-sau-00-1410",
+  "teacher_priority_release": {
+    "pr": 285,
+    "commit": "58d34a699ca95511a367136bfeba4869f28ee6d3",
+    "actions": 38444623860,
+    "status": "success"
+  },
+  "report": "docs/ket-qua-toi-uu-toan-app-1410.md"
 }

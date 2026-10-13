@@ -1,0 +1,1 @@
+{"fixture":{"banks":120,"questionsPerBank":28,"charsJSON":3100251,"utf8Bytes":4108851},"runsPerVariant":15,"cpuThrottle":6,"before":{"p50Ms":1167.5,"p90Ms":1909.5,"minMs":299.7,"maxMs":2311.7,"transactions":[121]},"after":{"p50Ms":189.5,"p90Ms":315.4,"minMs":92.9,"maxMs":356.1,"transactions":[1]}}
