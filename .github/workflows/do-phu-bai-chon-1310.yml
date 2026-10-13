@@ -1,0 +1,27 @@
+name: Đo câu của bài đang chọn và tỷ lệ ôn (chỉ đọc)
+on:
+  push:
+    branches: [codex/do-phu-bai-chon-1310]
+    paths: [scripts/do-phu-bai-chon-1310.ts, .github/workflows/do-phu-bai-chon-1310.yml]
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chỉ đọc phạm vi và đếm câu, không đổi app hoặc dữ liệu
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx -y esbuild@0.25.5 scripts/do-phu-bai-chon-1310.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/do-phu-bai-chon.mjs --log-level=warning
+          node /tmp/do-phu-bai-chon.mjs
