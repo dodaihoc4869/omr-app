@@ -47,3 +47,17 @@
   .lg-hh-nen, .lg-hh, .lg-ht-cham i { animation: none; }
   .lg-hh-de > summary::after { transition: none; }
 }
+
+/* ĐỀ CHUẨN trong hộp (bản vẽ docs/ban-ve-hoi-thay-1310, thầy chốt 13/10): như màn làm bài — "Câu n." đậm màu nhấn, cỡ 17, giãn dòng 1,62,
+   phương án A–D / ý a–d xếp như phiếu; sau câu trả lời đầu đề gập một dòng (tóm tắt + loại câu). Chỉ biến M3 có sẵn. */
+.lg-hh-de > summary { gap: 8px; }
+.lg-de-tom { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400; color: var(--m3-on-surface-variant); }
+.lg-de-loai { margin-left: auto; margin-right: 6px; flex: none; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
+.lg-de-chuan { gap: 10px; }
+.lg-de-chu { margin: 0; font-size: 17px; line-height: 1.62; white-space: pre-line; overflow-wrap: anywhere; color: var(--m3-on-surface); }
+.lg-de-chu > b:first-child { color: var(--m3-primary); }
+.lg-de-pa { list-style: none; margin: 2px 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+@media (min-width: 480px) { .lg-de-pa[data-ngan] { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lg-de-pa > li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 14px; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; background: var(--m3-surface); border: 1px solid var(--m3-surface-container-high); }
+.lg-de-chu-cai { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--m3-surface-container-high); color: var(--m3-on-surface); }
+.lg-de-pa[data-ds] .lg-de-chu-cai { border-radius: 8px; }

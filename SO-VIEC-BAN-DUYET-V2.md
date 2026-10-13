@@ -404,3 +404,6 @@ Thầy (13/10): "Tôi muốn giao diện đề chuẩn theo hiển thị của �
 - [x] Bản vẽ + đặc tả 7 mục (bước 2 quy trình) | bằng chứng: docs/ban-ve-hoi-thay-1310 (8 ảnh Chromium, soát 0 lỗi/0 tràn/0 đích <44 px), đã gửi thầy
 - [ ] Thầy duyệt bản vẽ Hỏi Thầy ⇒ dựng (làn Heisenberg, ghi DIEU-PHOI trước) | bằng chứng: (chưa có)
 - [x] Đợt 22 tối ưu máy chủ: dấu kho câu | bằng chứng: tests/toi-uu-may-chu-dot22-1310 2/2; liên quan 32/32 (gồm trần lệnh hoa2-sanh); toàn bộ 15736 test so tên: 1 đỏ mới là ph-v3-app-2809 chập chờn (chạy lại 13/13); kiem:toc-do 0 đỏ
+Thầy (13/10): "Chốt làm rồi đẩy luôn nhé" (bản vẽ Hỏi Thầy)
+- [x] Dựng Hỏi Thầy theo bản vẽ: đề chuẩn + trả lời có cấu trúc + gợi hướng + hỏi tiếp | bằng chứng: PR276 (e820f45b + f12286b5); tests/hoi-thay-cau-truc-1310 8/8, tests/hoi-thay-tra-loi-giao-dien-1310 8/8; ảnh linh kiện thật docs/ban-ve-hoi-thay-1310/anh-that 01–08 soát 0 lỗi/0 tràn/0 đích <44 px
+- [ ] Kiểm (test máy chủ + giao diện, tsc, toàn bộ vitest, kiem:toc-do, kiem:mau-giu, ảnh Chromium) + phát hành | bằng chứng: kiểm XONG — tsc sạch; toàn bộ 15752 test so tên 0 đỏ mới; 7 tệp Hỏi Thầy 55/55 sau gộp PR275; kiem:toc-do 0 đỏ (byte mở bằng mốc); kiem:mau-giu 0. Phát hành: chờ
