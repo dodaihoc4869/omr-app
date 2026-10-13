@@ -5,10 +5,10 @@
 // (= "Fast 3G" cũ của DevTools: 562,5 ms RTT, 1,44 Mb/s xuống), màn 360×740 (dọc) và 740×360 (ngang). DỮ LIỆU GIẢ: máy
 // chủ app được trả lời giả ngay trong script (mayChuGia) — không một byte nào tới máy chủ thật, không tài khoản thật.
 //
-//   node scripts/do-app-hs.mjs --dist=dist [--kich=mo-dau,mo-lai,man,dao,doan,heap] [--khung=doc|ngang] [--ra=kq.json]
+//   node scripts/do-app-hs.mjs --dist=dist [--kich=mo-dau,mo-lai,man,heap] [--khung=doc|ngang] [--ra=kq.json]
 //   node scripts/do-app-hs.mjs --kham=1   (in mọi lượt gọi máy chủ + chụp màn — dò đường khi viết kịch bản)
 //   node scripts/do-app-hs.mjs --dist=<dist> --kich=anh --anh=<thư mục> [--omni=1] [--gio=ISO] [--cpu=1]
-//        (ẢNH GIAO DIỆN 9 màn học sinh, trạng thái tất định — so điểm ảnh hai bản: node scripts/do-app-hs/so-anh.mjs <trước> <sau>)
+//        (ẢNH GIAO DIỆN màn học tập hiện tại, trạng thái tất định — so điểm ảnh hai bản: node scripts/do-app-hs/so-anh.mjs <trước> <sau>)
 //
 // Chromium: PW_CHROMIUM hoặc /opt/pw-browsers/chromium-*/chrome-linux/chrome (KHÔNG `playwright install`).
 // Kết quả + cách đọc: docs/do-toi-uu-app-hs-3009.md.
@@ -30,7 +30,6 @@ const KHAM = arg('kham', '') === '1'
 const CHUP = arg('chup', '')
 const THU_MUC_ANH = arg('anh', '')
 const OMNI_GIA = arg('omni', '') === '1'
-const THEM_CHAC = arg('them', '') === 'chac' // chụp THÊM hai ảnh nút Chắc / Chưa chắc của màn Đoàn (không nằm trong 9 ảnh của cổng điểm ảnh)
 const GIO = arg('gio', '2026-09-30T03:00:00Z')
 const LAN = Number(arg('lan', '1'))
 const PHUT_HEAP = Number(arg('phut-heap', '5'))
@@ -39,6 +38,7 @@ const MAN = KHUNG === 'ngang' ? { width: 740, height: 360 } : { width: 360, heig
 
 function timChromium() {
   if (process.env.PW_CHROMIUM) return process.env.PW_CHROMIUM
+  if (existsSync('/usr/bin/chromium')) return '/usr/bin/chromium'
   const goc = '/opt/pw-browsers'
   if (!existsSync(goc)) return undefined
   for (const d of readdirSync(goc).filter((x) => /^chromium-\d+$/.test(x)).sort().reverse()) {
@@ -268,7 +268,8 @@ async function dangNhap(p) {
 }
 
 // ── thao tác + đo trong trang ──────────────────────────────────────────────────────────────────────
-const SANH = '.h2-sanh[data-trang-thai="co"]'
+// Giữ tên mốc SANH trong JSON để công cụ so sánh số đo cũ đọc được; màn thật nay là Học tập.
+const SANH = '.ht-app .ht2-hn[aria-busy="false"]'
 /** Tìm phần tử trong trang: `text=…` (nút/nhãn chứa chữ, ưu tiên khớp đúng) hoặc bộ chọn CSS. Chạy TRONG trang (rẻ, không dò cây trợ năng). */
 const TIM = (chon) => {
   const hien = (e) => !!e && (e.offsetWidth || e.offsetHeight || e.getClientRects().length) && getComputedStyle(e).visibility !== 'hidden'
@@ -489,51 +490,18 @@ async function cacMan() {
       const b = (ten, ...a) => vet(ten, () => buocAn(p, ...a))
       await veSanh(p)
       m.sanhYen = await k('sanhYen', 5000)
-      // Đảo: bản đồ → lên đường → chọn đáp án → tung chiêu.
-      m.vaoDao = await b('vaoDao', 'text=Khám phá Bát Linh Đảo', '.dao2-bd', 2500)
-      m.daoYen = await k('daoYen', 5000)
-      m.daoLenDuong = await b('daoLenDuong', 'text=LÊN ĐƯỜNG', '.dao2-canh', 2500)
-      m.daoTranYen = await k('daoTranYen', 5000)
-      m.daoChon = await b('daoChon', 'text=A.', null, 800)
-      m.daoTungChieu = await b('daoTungChieu', 'text=tung chiêu', null, 3000)
-      m.daoTranSauChieu = await k('daoTranSauChieu', 4000)
-      // Đoàn Hộ Tống: phòng chờ rồi trong trận.
-      await veSanh(p)
-      m.vaoDoan = await b('vaoDoan', 'text=PHÁ 4 Ổ PHỤC KÍCH', '.dh-chang', 2500)
-      m.doanSanhYen = await k('doanSanhYen', 5000)
-      GIA.kichBan.doanTran = true
-      await veSanh(p)
-      m.vaoTranDoan = await b('vaoTranDoan', 'text=PHÁ 4 Ổ PHỤC KÍCH', '.dh-hiep', 2500)
-      m.doanTranYen = await k('doanTranYen', 6000)
-      m.doanChon = await b('doanChon', 'text=phương án hai', null, 800)
-      m.doanChot = await b('doanChot', '.dh-nut-lam', null, 2500)
-      m.doanTranSauChot = await k('doanTranSauChot', 4000)
-      GIA.kichBan.doanTran = false
       // Câu đã làm: mở (tải chi tiết + công thức), lọc, cuộn.
       await veSanh(p)
       m.vaoCauDaLam = await b('vaoCauDaLam', 'text=Câu đã làm', '.h2-cdl-loc', 4000)
       m.cdlLoc = await b('cdlLoc', 'text=Sai lần gần nhất', null, 2000)
       m.cdlLocTatCa = await b('cdlLocTatCa', 'text=Tất cả', null, 2000)
       m.cdlCuon = await kc('cdlCuon', 4000)
-      m.veSanhTuCdl = await b('veSanhTuCdl', 'text=Về Sảnh', SANH, 1500)
+      m.veSanhTuCdl = await b('veSanhTuCdl', '[aria-label="Về Hôm nay"]', SANH, 1500)
       // Tu luyện: mở, từng thẻ chế độ, thẻ Tổng hợp.
+      await cham(p, 'text=Ôn & sửa')
       m.vaoTuLuyen = await b('vaoTuLuyen', 'text=Tu luyện', 'text=Sửa câu sai', 2500)
       for (const [k, t] of [['tlSuaCauSai', 'Sửa câu sai'], ['tlDangCauSai', 'Dạng câu sai'], ['tlDangBai', 'Dạng bài'], ['tlTuDo', 'Tự do'], ['tlTongHop', 'Tổng hợp'], ['tlLuyenDe', 'Luyện đề cấu trúc'], ['tlLuyen', 'Luyện']]) m[k] = await b(k, 'text=' + t, null, 1500)
-      m.veSanhTuTl = await b('veSanhTuTl', 'text=Về Sảnh', SANH, 1500)
-      // Túi đồ + Cửa hàng (mở từ Sảnh, trong vỏ game).
-      m.vaoTuiDo = await b('vaoTuiDo', 'text=Túi đồ', '.dao-tui', 2500)
-      m.tuiDoYen = await k('tuiDoYen', 3000)
-      await veSanh(p)
-      m.vaoCuaHang = await b('vaoCuaHang', 'text=Cửa hàng', '.ps-man', 3000)
-      m.shopThuMon = await b('shopThuMon', '[aria-label^="Thử "]', null, 1500)
-      m.shopYen = await k('shopYen', 3000)
-      // Rương: kế hoạch xong ⇒ bản đồ Đảo có nút "Mở rương".
-      GIA.kichBan.ruongMoDuoc = true
-      await veSanh(p)
-      m.vaoDaoRuong = await b('vaoDaoRuong', 'text=Khám phá Bát Linh Đảo', '.dao2-nut-ruong', 2000)
-      m.moRuong = await b('moRuong', '.dao2-nut-ruong', null, 1500)
-      m.ruongHoatAnh = await k('ruongHoatAnh', 3000)
-      GIA.kichBan.ruongMoDuoc = false
+      m.veSanhTuTl = await b('veSanhTuTl', '[aria-label="Về Hôm nay"]', SANH, 1500)
       kq.lan.push(m)
     }
     kq.heapMB = await heapMb(cdp)
@@ -545,7 +513,7 @@ async function cacMan() {
   return kq
 }
 
-/** Kịch bản NGẮN (máy đang tải nặng): mở đầu + mở lại, rồi khung/tác vụ dài khi đứng yên ở Sảnh, Đảo (bản đồ + trận), Đoàn (trận),
+/** Kịch bản NGẮN (máy đang tải nặng): mở đầu + mở lại, rồi khung/tác vụ dài khi đứng yên ở Học tập,
  *  Câu đã làm (vuốt cuộn) — đúng những chỗ có hoạt ảnh chạy liên tục. Ghi từng phần vào `ra` ngay khi có (chạy dở vẫn còn số). */
 async function nhanh(ghiDo) {
   const kq = await moDauVaMoLai()
@@ -564,18 +532,6 @@ async function nhanh(ghiDo) {
     GIA.datLai()
     await veSanh(p)
     await lam('sanhYen', () => khung(p, 5000))
-    await lam('vaoDao', () => buoc(p, 'text=Khám phá Bát Linh Đảo', '.dao2-bd', 3000))
-    await lam('daoYen', () => khung(p, 5000))
-    await lam('daoLenDuong', () => buoc(p, 'text=LÊN ĐƯỜNG', '.dao2-canh', 3000))
-    await lam('daoTranYen', () => khung(p, 5000))
-    await lam('daoChon', () => buoc(p, 'text=A.', null, 1000))
-    GIA.kichBan.doanTran = true
-    await veSanh(p)
-    await lam('vaoTranDoan', () => buoc(p, 'text=PHÁ 4 Ổ PHỤC KÍCH', '.dh-nut-lam', 3000))
-    await lam('doanTranYen', () => khung(p, 6000))
-    await lam('doanChon', () => buoc(p, 'text=phương án hai', null, 1000))
-    GIA.kichBan.doanTran = false
-    await veSanh(p)
     await lam('vaoCauDaLam', () => buoc(p, 'text=Câu đã làm', '.h2-cdl-loc', 4000))
     await lam('cdlCuon', () => khungCuon(p, 4000, cdp))
     await lam('cdlLocTatCa', () => buoc(p, 'text=Tất cả', null, 2500))
@@ -589,7 +545,7 @@ async function nhanh(ghiDo) {
   return kq
 }
 
-/** Dùng liên tục `phut` phút KHÔNG tải lại trang (Sảnh → Đảo trận → Sảnh → Đoàn trận 8 s → Sảnh → Câu đã làm → Sảnh → Tu luyện → Sảnh): heap + nút DOM theo thời gian. */
+/** Dùng liên tục `phut` phút KHÔNG tải lại trang (Học tập → Câu đã làm → Học tập → Tu luyện → Học tập): heap + nút DOM theo thời gian. */
 async function heapDai(phut) {
   const { ctx, p, cdp, loi } = await moMay(trinh, goc, { sw: true })
   const kq = { mau: [] }
@@ -603,27 +559,16 @@ async function heapDai(phut) {
     let vong = 0
     const ghi = async () => kq.mau.push({ vong, giay: Math.round((Date.now() - dau) / 1000), heapMB: await heapMb(cdp), ...(await domCounters(cdp)) })
     const ve = async () => {
-      // Nút quay về của từng màn (game: "Về app học sinh" / nút lùi bản đồ; màn khác: "Về Sảnh").
-      for (const c of ['text=Về Sảnh', 'text=Về app học sinh', '.dao2-bd-dau button', '[aria-label^="Rời chuyến"]']) {
-        if (await p.evaluate(() => !!document.querySelector('.h2-sanh[data-trang-thai="co"]') && !document.querySelector('.fixed.inset-0.z-50'))) return
-        await cham(p, c, 1500).catch(() => {})
-        await p.waitForTimeout(700)
-      }
+      await cham(p, '[aria-label="Về Hôm nay"]')
+      await choThay(p, SANH)
     }
     await ghi()
     while (Date.now() - dau < phut * 60000) {
       vong++
       GIA.datLai()
-      await cham(p, 'text=Khám phá Bát Linh Đảo'); await choThay(p, '.dao2-bd'); await p.waitForTimeout(1500)
-      await cham(p, 'text=LÊN ĐƯỜNG').catch(() => {}); await choThay(p, '.dao2-canh', 20000).catch(() => {}); await p.waitForTimeout(2000)
-      await ve(); await choThay(p, SANH, 20000).catch(() => {}); await p.waitForTimeout(800)
-      GIA.kichBan.doanTran = true
-      await cham(p, 'text=PHÁ 4 Ổ PHỤC KÍCH'); await choThay(p, '.dh-hiep', 20000).catch(() => {}); await p.waitForTimeout(8000)
-      await ve(); await choThay(p, SANH, 20000).catch(() => {}); await p.waitForTimeout(800)
-      GIA.kichBan.doanTran = false
       await cham(p, 'text=Câu đã làm'); await choThay(p, '.h2-cdl-loc', 20000).catch(() => {}); await p.waitForTimeout(2500)
       await ve(); await choThay(p, SANH, 20000).catch(() => {}); await p.waitForTimeout(800)
-      await cham(p, 'text=Tu luyện'); await choThay(p, 'text=Sửa câu sai', 20000).catch(() => {}); await p.waitForTimeout(1500)
+      await cham(p, 'text=Ôn & sửa'); await cham(p, 'text=Tu luyện'); await choThay(p, 'text=Sửa câu sai', 20000).catch(() => {}); await p.waitForTimeout(1500)
       await ve(); await choThay(p, SANH, 20000).catch(() => {}); await p.waitForTimeout(800)
       if (vong % 2 === 0) await ghi()
     }
@@ -665,14 +610,12 @@ async function chupMan(p, ten) {
   await choCuonDung(p)
   await p.screenshot({ path: join(THU_MUC_ANH, `${ten}.png`), animations: 'disabled', caret: 'hide' })
 }
-/** 9 màn học sinh ở trạng thái TẤT ĐỊNH: giờ đóng băng (`--gio`, page.clock.setFixedTime), không giả mạng, mỗi kịch bản một phiên mới
+/** màn học tập hiện tại ở trạng thái TẤT ĐỊNH: giờ đóng băng (`--gio`, page.clock.setFixedTime), không giả mạng, mỗi kịch bản một phiên mới
  *  (đăng nhập lại). `--omni=1`: máy chủ giả trả thêm `omni` cho Sảnh như khi lớp bật OMNI. */
 const KICH_ANH = [
-  ['Sảnh + Đảo', true, ['ngu:2000', 'anh:1-sanh', 'Khám phá Bát Linh Đảo', 'chờ:.dao2-bd', 'ngu:2500', 'anh:2-dao-ban-do', 'LÊN ĐƯỜNG', 'chờ:.dao2-canh', 'ngu:3000',
-    'anh:3-dao-tran', 'A.', 'ngu:600', 'anh:4-dao-chon', 'CHỐT ĐÁP ÁN', 'ngu:4500', 'cuon:.lg-nut--hoi', 'ngu:800', 'anh:5-dao-loi-giai-hoi-thay']],
+  ['Học tập', true, ['ngu:2000', 'anh:1-hoc-tap']],
   ['Câu đã làm', false, ['ngu:1500', 'Câu đã làm', 'chờ:.h2-cdl-loc', 'ngu:3000', 'anh:6-cau-da-lam']],
-  ['Đoàn', false, ['kb:{"doanTran":true}', 'ngu:1000', 'PHÁ 4 Ổ PHỤC KÍCH', 'chờ:.dh-nut-lam', 'ngu:3000', 'anh:7-doan-tran', ...(THEM_CHAC ? ['css:[data-vung="chua-chac"]', 'ngu:400', 'anh:7b-doan-chua-chac', 'css:[data-vung="chac"]', 'ngu:400', 'anh:7c-doan-chac'] : [])]],
-  ['Tu luyện', false, ['ngu:1500', 'Tu luyện', 'chờ:text=Sửa câu sai', 'ngu:2500', 'anh:8-tu-luyen']],
+  ['Tu luyện', false, ['ngu:1500', 'Ôn & sửa', 'Tu luyện', 'chờ:text=Sửa câu sai', 'ngu:2500', 'anh:8-tu-luyen']],
 ]
 async function chupAnhGiaoDien() {
   mkdirSync(THU_MUC_ANH, { recursive: true })
@@ -681,7 +624,7 @@ async function chupAnhGiaoDien() {
   for (const [ten, anhDangNhap, buoc] of KICH_ANH) {
     GIA.datLai()
     GIA.kichBan.omni = OMNI_GIA
-    GIA.kichBan.gio = Date.parse(GIO) // máy chủ giả cùng giờ đóng băng với trang ⇒ đồng hồ hiệp Đoàn tất định
+    GIA.kichBan.gio = Date.parse(GIO) // dữ liệu mẫu cùng giờ đóng băng với trang
     const { ctx, p, loi } = await moMay(trinh, goc, { mang: false })
     try {
       await p.clock.setFixedTime(new Date(GIO))
@@ -716,13 +659,13 @@ try {
   if (!KHAM && muon('heap')) ket.man.heap = await heapDai(PHUT_HEAP)
   if (!KHAM && KICH === 'anh') ket.man.anh = await chupAnhGiaoDien()
   if (KHAM) {
-    // --buoc="Khám phá Bát Linh Đảo|chờ:.dao2|…": bấm lần lượt theo chữ (hoặc `css:` bộ chọn), `chờ:` đợi bộ chọn, `ngu:ms`.
+    // --buoc="Ôn & sửa|Tu luyện|…": bấm lần lượt theo chữ (hoặc `css:` bộ chọn), `chờ:` đợi bộ chọn, `ngu:ms`.
     TRE_API = false
     const { ctx, p, loi } = await moMay(trinh, goc, { mang: false })
     if (process.argv.some((a) => a.startsWith('--gio='))) await p.clock.setFixedTime(new Date(GIO))
     await p.goto(goc + '/hs')
     await dangNhap(p)
-    await p.waitForSelector('.h2-sanh[data-trang-thai="co"]', { timeout: 60000 })
+    await p.waitForSelector(SANH, { timeout: 60000 })
     for (const b of arg('buoc', '').split('|').filter(Boolean)) {
       await chayBuoc(p, b)
       await p.waitForTimeout(1500)

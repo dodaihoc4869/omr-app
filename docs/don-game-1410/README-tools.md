@@ -1,6 +1,6 @@
 # Soát công cụ còn nhắc mã Game đã gỡ · 14/10
 
-Soát ban đầu chỉ đọc trên `/workspace/don-ma-sau-00-1410`, commit `1048c7b5`. Cập nhật 14/10: đã xóa riêng bốn CLI độc lập ở bảng đầu trên làn C1, sau khi quét lại caller; tám tệp gallery và các công cụ hỗn hợp bên dưới vẫn giữ. Không sửa `src/`, luật chấm, caller Three.js, ảnh hoặc bản build của root.
+Soát ban đầu chỉ đọc trên `/workspace/don-ma-sau-00-1410`, commit `1048c7b5`. Cập nhật 14/10: đã xóa bốn CLI độc lập và tám tệp gallery Game trên làn C1, sau khi cắt dây và quét lại caller; các công cụ hỗn hợp học tập còn lại vẫn giữ. Không sửa `src/`, luật chấm, caller Three.js, ảnh hoặc bản build của root.
 
 ## Có thể bỏ độc lập
 
@@ -15,9 +15,9 @@ Trạng thái: **D · 4 tệp, 11.887 byte** (đo nội dung Git trước khi x�
 | `scripts/kiem-learning-battle.mjs` | chỉ mở Game, tìm `.learning-battle`, thanh máu, chiêu thức và chốt trận | 0 / 0 / 0 |
 | `scripts/kiem-evolution-v2.mjs` | dòng 16–30 mở `Mở game`, `Khám phá đảo`, `.spirit-hero`, `.battle-painted-spell`; xác thực là phiên Game cũ | 0 / 0 / 0 |
 
-## Cụm gallery Game cần cắt dây ở công cụ hỗn hợp trước
+## Gallery Game đã cắt dây và xóa
 
-Tám tệp này chỉ dựng/kiểm gallery Game. Không caller workflow/test học tập/package. Tuy nhiên `games.html` vẫn nằm trong danh sách đầu vào và kịch bản của các công cụ hỗn hợp; không xóa cả thư mục `preview-bat-linh`.
+Tám tệp này chỉ dựng/kiểm gallery Game. Đã cắt đầu vào Vite, mục lục, điều hướng và kịch bản Game; quét mã/cấu hình còn lại cho cả tám đường dẫn cho **0 caller**. Trạng thái **D · 8 tệp, 25.448 byte**. Giữ thư mục preview với học tập hiện tại, PH, Tu luyện, Câu đã làm và thầy; `BieuCamThu` cùng atlas đăng nhập/PH giữ nguyên.
 
 | Tệp | Tham chiếu / dây giữ |
 | --- | --- |
@@ -30,9 +30,9 @@ Tám tệp này chỉ dựng/kiểm gallery Game. Không caller workflow/test h�
 | `scripts/preview-bat-linh/check-shop-luxury.mjs` | toàn bộ kịch bản Cửa hàng, gọi `games.html?game=shop` |
 | `scripts/preview-bat-linh/chot-anh.mjs` | chỉ chụp Game Đảo/thần thú qua `games.html` |
 
-Tổng kiểm kê ban đầu 12 ứng viên: **37.335 byte**; đã xóa bốn CLI **11.887 byte**, còn giữ tám tệp gallery **25.448 byte** chờ cắt dây hỗn hợp. Những tên chỉ có trong `docs/soat-app-1310/kiem-ke-ma-cu.json` là kiểm kê cũ, không phải caller thực thi.
+Tổng kiểm kê ban đầu 12 ứng viên: **37.335 byte**; đã xóa bốn CLI **11.887 byte**, đã cắt dây và xóa tám tệp gallery **25.448 byte**. Những tên chỉ có trong `docs/soat-app-1310/kiem-ke-ma-cu.json` là kiểm kê cũ, không phải caller thực thi.
 
-Các dây cần thích nghi khi root bỏ gallery: `preview-bat-linh/{vite.config.mjs,muc-luc.html,trang.tsx,check.mjs,check-theme.mjs,check-bieu-cam.mjs}`. `check-bieu-cam.mjs` có kiểm **Câu đã làm** ở dòng 24, nên chỉ gỡ gallery/xe/trận và giữ phần học tập đó. `check.mjs`/`check-theme.mjs` còn PH, Tu luyện, đăng nhập; `teacher.html`/`teacher.tsx`/`check-teacher-modern.mjs` còn app thầy.
+Các dây đã thích nghi khi bỏ gallery: `preview-bat-linh/{vite.config.mjs,muc-luc.html,trang.tsx,check.mjs,check-theme.mjs,check-bieu-cam.mjs}`. `check-bieu-cam.mjs` có kiểm **Câu đã làm** ở dòng 24, nên chỉ gỡ gallery/xe/trận và giữ phần học tập đó. `check.mjs`/`check-theme.mjs` còn PH, Tu luyện, đăng nhập; `teacher.html`/`teacher.tsx`/`check-teacher-modern.mjs` còn app thầy.
 
 ## Công cụ hỗn hợp đang gãy import · giữ phần học tập
 
@@ -55,3 +55,11 @@ Root đang sở hữu `vite.config.ts`. Có thể cắt tên thuần phần đã
 Chạy Chromium hệ thống trên dist của `1048c7b5`, dữ liệu giả cục bộ, mạng ngoài bị chặn; mở GV/HS/PH 360×800 sáng, rồi mở lại màn đăng nhập ba vai. Kết quả `/tmp/c1-runtime-assets/matrix.json`: **0 lỗi JS, 0 tệp tĩnh 404, 15 yêu cầu ảnh (8 đường duy nhất), 0 đường thuộc 46 ảnh đã gỡ**. Ảnh thú/nền đã thấy: `/than-thu-v2/nho/thu-1-3.webp`, `/bat-linh/canh-dao-nho.webp`, đều giữ.
 
 Đây là cổng ảnh/mở app ở một khổ sáng. Fixture tạm còn thiếu 4 lệnh chỉ đọc `/hs/buoi-hoc`, `/hs/nhip-hoc`, `/hs/chua-cau-sai/co`, `/ph/ke-hoach`; không dùng lượt này để kết luận dữ liệu báo cáo đầy đủ hoặc tốc độ Worker. Cổng đầy đủ 18 tổ hợp/SW do làn teacher chạy. 96 tên thumb còn dùng đều đã được test kiểm tồn tại và dung lượng; không cắt hay ghi lại ảnh trong lượt sửa này.
+
+## Cổng công cụ sau cắt dây
+
+Biên dịch riêng hai entry preview học tập/thầy bằng Vite, `publicDir:false`, đầu ra `/tmp/c1-preview-1410-compile`: đạt (6 giây); không ghi `dist` hoặc ảnh nguồn. Chromium hệ thống, chặn mạng ngoài origin: tám màn HS/PH và màn thầy đều mở được, **0 lỗi JS, 0 yêu cầu tĩnh bị thiếu**; thực thi Ôn & sửa → Tu luyện. Báo cáo `/tmp/c1-preview-smoke.json`. Bộ kiểm viewport giữ 30 trường hợp sáng/tối/điện thoại/ngang/máy tính, đều 0 JS/ảnh hỏng/tràn; lượt kiểm luồng riêng `/tmp/c1-preview-flows.mjs` đạt cả hai luồng Tu luyện (rút/nộp/lời giải/tổng hợp) và PH (các phần hiện tại/nhận xét/báo cáo ca công bố). Cấu hình preview cho phép đọc đúng thư mục dependency thực khi worktree dùng symlink `node_modules`.
+
+Fixture `do-app-hs` đã bỏ dependency Shop và các nhánh Đảo/Đoàn/Cửa hàng/Rương trong kịch bản đo; giữ phần đo mở đầu/mở lại, CPU/mạng/khung/heap, Câu đã làm, Tu luyện. Đã kiểm nhập Vite SSR, 11 lệnh học tập, câu rút không có đáp án, câu đã làm có lời giải, đăng nhập NDJSON và lệnh Shop bị từ chối. Chưa chạy benchmark Slow 4G/heap dài trong lượt sửa này.
+
+Quét TypeScript AST tất cả import/export/dynamic import literal tương đối trong `scripts` sau sửa: còn **26 import chưa giải quyết ở sáu tệp**; đường dẫn và dòng nằm trong `C1-tools-imports-con-lai.json`. Đây là danh sách việc còn lại, không xóa công cụ hỗn hợp hoặc fixture học tập để che lỗi. Ngoài bốn nhóm chụp/đo đã biết, có một CSS Game ở `chup-dot16-lan-b/trang.tsx` và bộ kiểm `kiem-tran-giao-dien-2309.mjs` còn nhập Bảng nhiệm vụ cũ.

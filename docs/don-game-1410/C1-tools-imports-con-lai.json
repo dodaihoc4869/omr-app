@@ -1,0 +1,137 @@
+{
+  "base": "803f28eedd9085adcb20ff2abb908cfacd169314",
+  "phamVi": "import/export/dynamic import literal tương đối trong scripts, đã đối chiếu đường dẫn và phần mở rộng",
+  "tong": 26,
+  "imports": [
+    {
+      "file": "scripts/chup-dot16-lan-b/trang.tsx",
+      "line": 37,
+      "spec": "./../../src/components/bat-linh/game-toan-bo.css"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 32,
+      "spec": "../../src/components/ban-duyet-v2/SanhHomNay"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 44,
+      "spec": "../../src/game/than-thu-v2/game.css"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 45,
+      "spec": "../../src/game/than-thu-v2/dao/dao.css"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 46,
+      "spec": "../../src/game/than-thu-v2/dao/ThanThuV2"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 47,
+      "spec": "../../src/game/than-thu-v2/shop/ManShop"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 48,
+      "spec": "../../src/game/than-thu-v2/shop/du-lieu-mau"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 49,
+      "spec": "../../src/game/than-thu-v2/phu-kien/ThuMacDo"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 50,
+      "spec": "../../src/game/than-thu-v2/phu-kien/HinhVatPham"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 51,
+      "spec": "../../src/game/than-thu-v2/dao2/Dao2"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 52,
+      "spec": "../../src/game/than-thu-v2/DoanHoTong"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 53,
+      "spec": "../../src/game/than-thu-v2/doan-kieu"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 54,
+      "spec": "../../src/game/than-thu-v2/dao/kieu"
+    },
+    {
+      "file": "scripts/chup-v2/trang.tsx",
+      "line": 58,
+      "spec": "../../src/game/than-thu-v2/dao2/DeThu"
+    },
+    {
+      "file": "scripts/kiem-tran-giao-dien-2309.mjs",
+      "line": 25,
+      "spec": "/src/components/bang-nhiem-vu/BangNhiemVu.tsx"
+    },
+    {
+      "file": "scripts/chup-tu-luyen/trang.tsx",
+      "line": 20,
+      "spec": "../../src/components/hoa2/SanhBanDo"
+    },
+    {
+      "file": "scripts/chup-omni-3/trang.tsx",
+      "line": 26,
+      "spec": "../../src/components/hoa2/SanhBanDo"
+    },
+    {
+      "file": "scripts/chup-omni-3/trang.tsx",
+      "line": 29,
+      "spec": "../../src/game/than-thu-v2/dao2/Dao2"
+    },
+    {
+      "file": "scripts/chup-omni-3/trang.tsx",
+      "line": 30,
+      "spec": "../../src/game/than-thu-v2/DoanHoTong"
+    },
+    {
+      "file": "scripts/chup-omni-3/trang.tsx",
+      "line": 31,
+      "spec": "../../src/game/than-thu-v2/doan-kieu"
+    },
+    {
+      "file": "scripts/chup-omni-3/trang.tsx",
+      "line": 37,
+      "spec": "../../src/screens/TongQuanScreen"
+    },
+    {
+      "file": "scripts/chup-omni-3/trang.tsx",
+      "line": 43,
+      "spec": "../../src/game/than-thu-v2/game.css"
+    },
+    {
+      "file": "scripts/chup-omni-3/trang.tsx",
+      "line": 45,
+      "spec": "../../src/game/than-thu-v2/dao/dao.css"
+    },
+    {
+      "file": "scripts/chup-omni-3/trang.tsx",
+      "line": 47,
+      "spec": "../../src/game/than-thu-v2/dao/kieu"
+    },
+    {
+      "file": "scripts/do-may-yeu/trang-do.tsx",
+      "line": 20,
+      "spec": "../../src/components/hoa2/SanhBanDo"
+    },
+    {
+      "file": "scripts/do-may-yeu/trang-do.tsx",
+      "line": 22,
+      "spec": "../../src/components/bang-nhiem-vu/BangNhiemVu"
+    }
+  ]
+}
