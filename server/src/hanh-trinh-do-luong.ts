@@ -9,9 +9,10 @@ export const THU_NGHIEM_HT5='ht6-hoc-va-chon-cau-0910'
 export type NhomThu='A'|'B'
 export interface PhanNhom { nhom:NhomThu;bat_dau:number;pham_vi:string;diem_dau:number|null;ma_tran_dau?:string|null }
 export async function docNhom(env:Env,sbd:string):Promise<PhanNhom|null>{return env.DB.prepare('SELECT nhom,bat_dau,pham_vi,diem_dau,ma_tran_dau FROM hanh_trinh_v5_phan_nhom WHERE thu_nghiem=? AND sbd=?').bind(THU_NGHIEM_HT5,sbd).first<PhanNhom>()}
-export async function phanNhom(env:Env,sbd:string,now:number,phamVi:string,ghi=true):Promise<PhanNhom|null>{
+/** `cuSom` = lượt `docNhom(env,sbd)` nơi gọi đã bắt đầu sớm SAU lệnh tạo bảng v5 (đợt 18 — động cơ đọc trước cùng đợt); vắng ⇒ đọc như cũ. */
+export async function phanNhom(env:Env,sbd:string,now:number,phamVi:string,ghi=true,cuSom?:Promise<PhanNhom|null>):Promise<PhanNhom|null>{
   await chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)
-  const cu=await docNhom(env,sbd);if(cu||!ghi)return cu
+  const cu=await (cuSom??docNhom(env,sbd));if(cu||!ghi)return cu
   // Đầu vào đo: đề đã nộp trước phân nhóm, có ít nhất 14 câu. Không suy điểm từ ket_qua.
   const r=await env.DB.prepare(`SELECT h.ten_lop,h.lop,(SELECT d.diem FROM omni_de_thu d WHERE d.sbd=h.sbd AND d.nop_luc IS NOT NULL AND d.diem IS NOT NULL AND json_array_length(d.qid_json)>=14 AND d.nop_luc<? ORDER BY d.nop_luc DESC LIMIT 1) diem FROM hoc_sinh h WHERE h.sbd=?`).bind(new Date(now).toISOString(),sbd).first<{ten_lop:string;lop:string;diem:number|null}>()
   if(!r)return null

@@ -172,22 +172,28 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
       const rieng = BANG_VANG.size ? lo.filter((x) => nhacBangVang(x.sql)) : []
       const chung = rieng.length ? lo.filter((x) => !rieng.includes(x)) : lo
       const chayRieng = rieng.map(motMinh)
-      try {
-        if (chung.length) {
-          const rs = await db.batch(chung.map(x => x.st))
-          for (let i = 0; i < chung.length; i++) chung[i].xong(rs[i])
-        }
-      } catch (e) {
-        nhanLoi(e)
-        // CHỈ tách lô khi bảng/cột phụ thiếu. Quá tải/mất kết nối/lỗi khác:
-        // không nhân một lô lỗi thành hàng chục truy vấn gửi lại vào D1.
-        if (/no such (?:table|column):/i.test(e instanceof Error ? e.message : String(e)) && !loiQuaTai) {
-          ghiBangVang(e)
-          await Promise.all(chung.map(motMinh))
-        } else {
-          for (const x of chung) x.loi(e)
+      // Gửi một lô; lỗi "bảng chưa có: X" ⇒ câu nhắc X đi RIÊNG, phần còn lại thử lại MỘT lô (lặp cho bảng thiếu kế tiếp) — đợt 18: trước tách HẾT thành
+      // từng câu (lô N câu ⇒ N lệnh D1 ở lượt đầu của isolate; lô càng gộp nhiều câu càng tốn). Mỗi câu vẫn ra ĐÚNG kết quả/lỗi của chính nó như chạy riêng.
+      // Không nhận ra bảng nào (vd. "no such column") ⇒ tách từng câu như cũ.
+      const guiLo = async (cau: Cho[]): Promise<void> => {
+        try {
+          const rs = await db.batch(cau.map(x => x.st))
+          for (let i = 0; i < cau.length; i++) cau[i].xong(rs[i])
+        } catch (e) {
+          nhanLoi(e)
+          // CHỈ tách lô khi bảng/cột phụ thiếu. Quá tải/mất kết nối/lỗi khác:
+          // không nhân một lô lỗi thành hàng chục truy vấn gửi lại vào D1.
+          if (/no such (?:table|column):/i.test(e instanceof Error ? e.message : String(e)) && !loiQuaTai) {
+            ghiBangVang(e)
+            const vang = cau.filter((x) => nhacBangVang(x.sql))
+            if (vang.length && vang.length < cau.length) await Promise.all([...vang.map(motMinh), guiLo(cau.filter((x) => !vang.includes(x)))])
+            else await Promise.all(cau.map(motMinh))
+          } else {
+            for (const x of cau) x.loi(e)
+          }
         }
       }
+      if (chung.length) await guiLo(chung)
       await Promise.all(chayRieng)
     })
     truoc = Promise.all([truoc, p]).then(() => undefined)
