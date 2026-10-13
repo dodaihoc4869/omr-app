@@ -56,6 +56,11 @@ jobs:
               sum{requests errors subrequests} quantiles{cpuTimeP50 cpuTimeP90 cpuTimeP99 durationP50 durationP90 durationP99}}}}}`, v)
           console.log('=== Worker omr ===')
           for (const x of w?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(JSON.stringify(x))
+          // Lỗi theo loại kết quả (exception / exceededCpu / exceededResources / …) — lỗi thật hay quá tải.
+          const wo = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:20,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den}){dimensions{status} sum{requests errors}}}}}`, v)
+          console.log('=== Worker omr theo trạng thái ===')
+          for (const x of wo?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(JSON.stringify(x))
           // Theo từng 5 phút: lag có trùng lúc phát hành (bộ đệm trong máy Worker nguội) hay rải đều?
           const w5 = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
             workersInvocationsAdaptive(limit:30,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
