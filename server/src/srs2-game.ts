@@ -15,7 +15,7 @@ import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
 import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type HoSoDangTho, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
-import { coGoiY, docChienDichThoCuaEm, docHangEm, docHoSo2, docHoSoDangCaLop, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidCanNhanNo, qidGoc, sanh2, thuSucThem, type HoSo2, type LanLamCoNguon, type MetaCau } from './srs2-d1'
+import { coGoiY, docChienDichThoCuaEm, docHangEm, docHoSo2, docHoSoDangCaLop, docMetaCau, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidCanNhanNo, qidGoc, sanh2, thuSucThem, type HoSo2, type LanLamCoNguon, type MetaCau } from './srs2-d1'
 import { ghiLoiMay } from './nhat-ky-may'
 import { omniBat } from './omni-d1'
 import { hoa2OmniAction, LENH_OMNI_HOA2, startVe } from './omni-game'
@@ -552,14 +552,18 @@ export async function phanLoaiTuLuanDaLam(env: Env, sbd: string, ds: readonly { 
 async function cauChiTiet(env: Env, sbd: string, b: Row): Promise<Record<string, unknown>> {
   const qids = (Array.isArray(b.qids) ? b.qids : [b.qid]).map(str).filter(Boolean).slice(0, 60)
   if (!qids.length) return { ok: false, error: 'Thiếu câu cần xem.' }
-  // Tối ưu 05/10: ba lượt ĐỌC độc lập (câu em đã làm, hồ sơ 2.0, câu đang bảo vệ) bắt đầu CÙNG lúc — trước: nối tiếp. Dùng đúng thứ tự cũ.
-  const hsSom = docHoSo2(env, sbd, ngayVnCua(Date.now()))
-  hsSom.catch(() => {})
+  // Tối ưu 05/10: ba lượt ĐỌC độc lập (câu em đã làm, siêu dữ liệu câu, câu đang bảo vệ) bắt đầu CÙNG lúc — trước: nối tiếp. Dùng đúng thứ tự cũ.
+  // 13/10 (thầy báo màn Đường tự gỡ "Máy chủ phản hồi chậm", lệnh này quá 30 s giờ cao điểm): trước dựng CẢ hồ sơ 2.0 (`docHoSo2`: mọi chiến dịch,
+  // nợ, ôn bài cũ, ứng viên hành trình — có lượt quét cả kho 24 nghìn dòng khi isolate nguội) chỉ để tra mã tờ + phiên bản của vài câu ⇒ nay tra
+  // THẲNG siêu dữ liệu đúng các câu xin (`docMetaCau`, đệm theo isolate, tem kho). Quyền giữ nguyên: chỉ câu em ĐÃ làm (sổ, không embargoed) +
+  // không thuộc ca đang bảo vệ. Câu em đã làm mà nằm ngoài hồ sơ (vd. ca thi cũ ngoài chiến dịch) nay cũng xem lại được thay vì trả rỗng.
+  const metaSom = docMetaCau(env, qids)
+  metaSom.catch(() => {})
   const baoVeSom = protectedQuestions(env).catch(() => null)
   const daLam = await env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND COALESCE(visibility,'released') <> 'embargoed'`).bind(sbd, JSON.stringify(qids)).all<Row>()
     .catch(() => env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))').bind(sbd, JSON.stringify(qids)).all<Row>())
   const duoc = new Set((daLam.results ?? []).map((x) => str(x.qid)))
-  const hs = await hsSom
+  const meta = await metaSom
   // Câu đang bảo vệ cho ca chưa công bố / còn làm được (theo qid HOẶC nhóm nội dung — bản chép ở tờ khác) ⇒ KHÔNG trả đáp án, lời giải.
   // Lỗi đọc phạm vi ⇒ giấu hết (thà giấu nhầm một lúc còn hơn lộ). Trả `khoa` để app báo "đang khoá tới khi Thầy công bố".
   const tapBaoVe = await baoVeSom
@@ -569,7 +573,7 @@ async function cauChiTiet(env: Env, sbd: string, b: Row): Promise<Record<string,
   // đọc CÙNG đợt (gộp một lô), rồi xét đúng thứ tự cũ: câu đang bảo vệ vẫn vào `khoa`, không trả đáp án/lời giải/đáp án em chọn.
   const viec = qids.map((qid) => {
     if (!duoc.has(qid)) return null
-    const m = hs.meta.get(qid)
+    const m = meta.get(qid)
     if (!m) return null
     const q = doDayDu(env, [{ qid, maDe: m.maDe, version: m.version, nhe: true } as unknown as CauPool]).then(([x]) => x)
     q.catch(() => {})
