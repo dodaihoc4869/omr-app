@@ -9,6 +9,9 @@ const DA_GOP = Symbol('omr.docD1TheoLuot')
 // lệnh ghi qua bản gộp đụng các bảng này ⇒ xoá ngay (isolate khác cũ tối đa 60 giây). KHÔNG đưa `hoc_sinh` vào (có token/mật khẩu). Trả bản sao từng dòng.
 export const BANG_DUNG_CHUNG: readonly string[] = ['game_v2_question', 'omni_q', 'danh_sach']
 const demChung = new DemTTL<D1Result>(60_000, 300, 16_000_000)
+// Lượt đọc cũ đang bay không được hồi sinh đệm sau khi lượt khác sửa kho.
+let doiDemChung = 0
+dangKyXoaDem(() => { doiDemChung++ })
 const RE_BANG_SQL = /\b(?:FROM|JOIN)\s+([A-Za-z_][A-Za-z0-9_]*)/gi
 function khoaDemChung(sql: string, tham: readonly unknown[]): string | null {
   if (!/^\s*SELECT\b/i.test(sql) || /\bFROM\s+[A-Za-z_][A-Za-z0-9_]*\s*,/i.test(sql) || /'now'|\brandom\s*\(/i.test(sql)) return null
@@ -23,7 +26,7 @@ function khoaDemChung(sql: string, tham: readonly unknown[]): string | null {
 }
 const banSao = (r: D1Result): D1Result => ({ ...r, results: (r.results ?? []).map((d) => ({ ...(d as object) })) }) as D1Result
 function xoaDemChungSauGhi(sql: string): void {
-  if (!sql || BANG_DUNG_CHUNG.some((b) => nhacBang(sql, b))) demChung.xoa()
+  if (!sql || BANG_DUNG_CHUNG.some((b) => nhacBang(sql, b))) { doiDemChung++; demChung.xoa() }
 }
 /** Sổ nhớ ĐỌC của MỘT lượt (tối ưu 05/10): khoá → Promise kết quả (+ các BẢNG mà lượt đọc ấy đọc). Chỉ bản gộp đọc (`gopDocD1(db, true)`) có.
  *  Lệnh GHI của lượt xoá: mục KHÔNG khai bảng ⇒ mọi lệnh ghi xoá (như trước); mục có khai bảng ⇒ chỉ lệnh ghi mà câu SQL CÓ NHẮC tới một trong các bảng ấy mới xoá
@@ -155,8 +158,9 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
   let loiQuaTai: unknown = null
   const laQuaTai = (e: unknown) => /overloaded|requests queued for too long|too many requests|SQLITE_BUSY/i.test(e instanceof Error ? e.message : String(e))
   const nhanLoi = (e: unknown) => { if (laQuaTai(e)) loiQuaTai = e }
-  function gui<T>(chay: () => Promise<T>): Promise<T> {
+  function gui<T>(chay: () => Promise<T>, sql: string): Promise<T> {
     const p = truoc.then(() => { if (loiQuaTai) throw loiQuaTai; return chay() }).catch(e => { nhanLoi(e); throw e })
+      .finally(() => xoaDemChungSauGhi(sql)) // đọc chen trong lúc ghi cũng không được sống qua lần ghi này
     ghi = p.then(() => undefined, () => undefined)
     truoc = ghi
     return p
@@ -201,6 +205,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
   function doc(st: D1PreparedStatement, sql = '', tham: readonly unknown[] = []): Promise<D1Result> {
     if (loiQuaTai) return Promise.reject(loiQuaTai)
     const khoa = khoaDemChung(sql, tham)
+    const doi = doiDemChung
     if (khoa) {
       const c = demChung.doc(khoa, Date.now())
       if (c) return Promise.resolve(banSao(c))
@@ -212,7 +217,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     })
     if (!khoa) return p
     return p.then((r) => {
-      if (r && Array.isArray(r.results)) {
+      if (doi === doiDemChung && r && Array.isArray(r.results)) {
         const co = Math.max(1, JSON.stringify(r.results).length)
         if (co <= 4_000_000) demChung.ghi(khoa, Date.now(), banSao(r), co)
       }
@@ -223,13 +228,13 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
   function boc(st: D1PreparedStatement, laDoc: boolean, sql: string, tham: readonly unknown[] = []): D1PreparedStatement {
     const p: D1PreparedStatement = {
       bind: (...t) => boc(st.bind(...t), laDoc, sql, t),
-      all: <T>() => { if (!laDoc) { ghiSql(sql); return gui(() => st.all<T>()) }; return doc(st, sql, tham) as Promise<D1Result<T>> },
+      all: <T>() => { if (!laDoc) { ghiSql(sql); return gui(() => st.all<T>(), sql) }; return doc(st, sql, tham) as Promise<D1Result<T>> },
       first: async <T>(cot?: string) => {
-        if (!laDoc) { ghiSql(sql); return gui(() => st.first<T>(cot)) }
+        if (!laDoc) { ghiSql(sql); return gui(() => st.first<T>(cot), sql) }
         const r = await doc(st, sql, tham), dong = r.results[0]
         return (cot ? (dong as Record<string, unknown> | undefined)?.[cot] ?? null : dong ?? null) as T | null
       },
-      run: <T>() => { ghiSql(sql); return gui(() => st.run<T>()) },
+      run: <T>() => { ghiSql(sql); return gui(() => st.run<T>(), sql) },
     }
     goc.set(p, { st, doc: laDoc, sql, tham })
     return p
@@ -243,7 +248,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
       if (that.some(x => !x.sql)) { nho.clear(); demChung.xoa() }
       else { const gop = that.map(x => x.sql).join(' ;; '); xoaNhoSauGhi(nho, gop); xoaDemChungSauGhi(gop) }
       xa()
-      return gui(() => db.batch<T>(that.map(x => x.st)))
+      return gui(() => db.batch<T>(that.map(x => x.st)), that.some(x => !x.sql) ? '' : that.map(x => x.sql).join(' ;; '))
     },
   }, db)
   Object.defineProperty(wrapped, DA_GOP, { value: true })
