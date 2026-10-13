@@ -1,0 +1,116 @@
+/* HAI TẤM BẬC (13/10 đợt 19) — tấm "12 bậc từ Lười đến Chăm" (TamMuoiHaiBac) và tấm "Bậc N · K em" của thầy (DsTheoBac); khung chung KhungTam.tsx.
+ * CHỈ nạp khi bấm. Màu CHỈ biến chuẩn (--the, --the-2, --muc, --nhat, --mo, --vien, --vien-dam, --phu, --tim, --bong-2) + --bac của `.bcc[data-bac]`;
+ * nằm dưới lớp bọc `m3` / `m3 m3-thay vo-thay` của nơi mở thì các biến ấy tự đổi theo bảng màu app (giống chip đã bấm).
+ * Điện thoại dọc: tấm trượt từ dưới (bo hai góc trên, vạch kéo, cuộn trong tấm) · ngang ≥ 640 px hoặc rộng ≥ 900 px: hộp thoại giữa màn, 2 cột;
+ * thấp ≤ 500 px (điện thoại xoay ngang): đầu tấm gọn. Chuyển động ≤ 240 ms, chỉ transform/opacity, tắt khi giảm chuyển động / máy yếu. */
+.bcc-tam-khung { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; overscroll-behavior: contain; }
+.bcc-tam-khung[data-tang='duoi'] { z-index: 58; }
+.bcc-tam-che { position: absolute; inset: 0; background: var(--phu); animation: bcc-tam-nen 200ms ease-out both; }
+.bcc-tam {
+  position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100%; max-height: 92dvh; overflow: hidden;
+  background: var(--the); color: var(--muc); border-radius: 24px 24px 0 0; box-shadow: var(--bong-2);
+  font-family: var(--sans); text-align: left; animation: bcc-tam-len 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.bcc-tam-keo { flex: none; display: block; width: 36px; height: 4px; margin: 8px auto 0; border-radius: 999px; background: var(--vien-dam); }
+.bcc-tam-dau { flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 12px 10px 20px; border-bottom: 1px solid var(--vien); }
+.bcc-tam-dau-chu { flex: 1; min-width: 0; }
+.bcc-tam-dau h2 { margin: 0; font-size: 18px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.bcc-tam-dau p { margin: 2px 0 0; font-size: 14px; color: var(--nhat); }
+.bcc-tam-dong {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; min-width: 44px; min-height: 44px; padding: 0 14px; box-sizing: border-box;
+  border: 0; border-radius: 999px; background: var(--the-2); color: var(--muc); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+  touch-action: manipulation;
+}
+.bcc-tam-dong:hover { background: var(--vien); }
+.bcc-tam-dong:focus-visible { outline: 3px solid var(--tim); outline-offset: 2px; }
+.bcc-tam-than {
+  display: flex; flex-direction: column; gap: 16px; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: 16px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+/* đầu tấm: huy hiệu lớn + bậc + điểm chăm */
+.bcc.bcc-tam-hien {
+  display: flex; align-items: center; gap: 16px; padding: 14px 16px; border-radius: 20px;
+  background: color-mix(in oklab, var(--bac) 13%, var(--the)); border: 1px solid color-mix(in oklab, var(--bac) 32%, transparent);
+}
+.bcc-tam-hien > .bcc-hh { width: 80px; height: 80px; }
+.bcc-tam-hien-chu { min-width: 0; }
+.bcc-tam-hien-ten { margin: 0; font-size: 20px; font-weight: 800; line-height: 1.25; overflow-wrap: anywhere; color: color-mix(in oklab, var(--bac) 42%, var(--muc)); }
+.bcc-tam-hien-diem { margin: 4px 0 0; font-size: 15px; line-height: 1.45; font-variant-numeric: tabular-nums; }
+.bcc-tam-hien-diem b { font-size: 18px; font-weight: 800; }
+.bcc-len.bcc-tam-len { margin-top: 6px; font-size: 15px; }
+
+/* đủ 12 bậc, ba nhóm */
+.bcc-tam-cot { display: grid; gap: 16px; }
+.bcc-tam-cot > div { display: grid; gap: 16px; align-content: start; min-width: 0; }
+.bcc-tam-nhan { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px 4px; font-size: 15px; font-weight: 800; line-height: 1.3; color: var(--muc); }
+.bcc-tam-nhan small { font-size: 13px; font-weight: 600; color: var(--mo); font-variant-numeric: tabular-nums; }
+.bcc-tam-ds { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.bcc.bcc-tam-bac {
+  display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 60px; padding: 6px 12px 6px 6px;
+  border-radius: 16px; background: color-mix(in oklab, var(--bac) 6%, var(--the));
+}
+.bcc-tam-bac > .bcc-hh { justify-self: center; }
+.bcc-tam-bac-chu { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.bcc-tam-bac-chu small { font-size: 12px; font-weight: 700; color: var(--mo); font-variant-numeric: tabular-nums; }
+.bcc-tam-bac-chu b { font-size: 15px; font-weight: 800; overflow-wrap: anywhere; color: color-mix(in oklab, var(--bac) 40%, var(--muc)); }
+.bcc-tam-bac-chu span { font-size: 14px; color: var(--nhat); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+/* bậc đã vượt: huy hiệu mờ, chữ trầm (vẫn ≥ 4,5:1) · bậc hiện tại: nền màu bậc + viền + nhãn "đang ở đây" */
+.bcc-tam-bac[data-trang='qua'] { background: transparent; }
+.bcc-tam-bac[data-trang='qua'] > .bcc-hh { opacity: 0.45; }
+.bcc-tam-bac[data-trang='qua'] .bcc-tam-bac-chu b { color: var(--nhat); }
+.bcc.bcc-tam-bac[data-trang='hien'] {
+  min-height: 68px; background: color-mix(in oklab, var(--bac) 18%, var(--the));
+  box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--bac) 62%, var(--the));
+}
+.bcc-tam-day {
+  padding: 5px 10px; border-radius: 999px; font-size: 13px; font-weight: 800; line-height: 1.2; white-space: nowrap;
+  background: color-mix(in oklab, var(--bac) 30%, var(--the)); color: color-mix(in oklab, var(--bac) 40%, var(--muc));
+}
+.bcc-tam-cach { margin: 0; padding: 0 4px; font-size: 14px; line-height: 1.5; color: var(--nhat); }
+
+/* tấm thầy: danh sách em theo bậc — lưới thẻ (1 cột dọc · 2–3 cột ngang / máy tính) */
+.bcc-ds { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.bcc.bcc-ds-o { min-width: 0; content-visibility: auto; contain-intrinsic-size: auto 96px; }
+.bcc-ds-em {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: 'av ten diem' 'av vach vach' 'av so so';
+  align-items: center; column-gap: 12px; row-gap: 6px; box-sizing: border-box; width: 100%; height: 100%; min-height: 44px; padding: 12px 14px;
+  border: 1px solid color-mix(in oklab, var(--bac) 28%, var(--vien)); border-radius: 18px; background: var(--the); color: var(--muc);
+  font: inherit; text-align: left; cursor: pointer; touch-action: manipulation;
+}
+.bcc-ds-em:hover { background: color-mix(in oklab, var(--bac) 8%, var(--the)); }
+.bcc-ds-em:focus-visible { outline: 3px solid var(--tim); outline-offset: 2px; }
+.bcc-ds-av {
+  grid-area: av; align-self: start; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: color-mix(in oklab, var(--bac) 22%, var(--the)); color: color-mix(in oklab, var(--bac) 42%, var(--muc)); font-size: 15px; font-weight: 800;
+}
+.bcc-ds-ten { grid-area: ten; display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.bcc-ds-ten b { font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+.bcc-ds-ten small { font-size: 13px; color: var(--nhat); overflow-wrap: anywhere; }
+.bcc-ds-diem { grid-area: diem; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.bcc-ds-diem b { font-size: 22px; font-weight: 800; color: color-mix(in oklab, var(--bac) 42%, var(--muc)); }
+.bcc-ds-diem small { font-size: 12px; font-weight: 600; color: var(--mo); }
+.bcc-ds-vach { grid-area: vach; display: block; height: 6px; border-radius: 999px; background: var(--the-2); overflow: hidden; }
+.bcc-ds-vach i { display: block; height: 100%; border-radius: inherit; background: var(--bac); }
+.bcc-ds-so { grid-area: so; font-size: 13px; line-height: 1.4; color: var(--nhat); font-variant-numeric: tabular-nums; }
+
+@media (min-width: 640px) and (orientation: landscape), (min-width: 900px) {
+  .bcc-tam-khung { align-items: center; padding: 16px; }
+  .bcc-tam { width: min(880px, 100%); max-height: calc(100dvh - 32px); border-radius: 28px; animation-name: bcc-tam-noi; }
+  .bcc-tam[data-kieu='ds-bac'] { width: min(1080px, 100%); }
+  .bcc-tam-keo { display: none; }
+  .bcc-tam-dau { padding: 14px 16px 12px 24px; }
+  .bcc-tam-than { padding: 20px 24px 24px; }
+  .bcc-tam-cot { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
+}
+@media (max-height: 500px) {
+  .bcc.bcc-tam-hien { padding: 10px 12px; gap: 12px; }
+  .bcc-tam-hien > .bcc-hh { width: 56px; height: 56px; }
+  .bcc-tam-hien-ten { font-size: 18px; }
+  .bcc-tam-than { padding-top: 12px; gap: 12px; }
+}
+@keyframes bcc-tam-nen { from { opacity: 0; } }
+@keyframes bcc-tam-len { from { opacity: 0.4; transform: translateY(32px); } }
+@keyframes bcc-tam-noi { from { opacity: 0; transform: scale(0.96); } }
+@media (prefers-reduced-motion: reduce) { .bcc-tam-che, .bcc-tam { animation: none; } }
+html.may-yeu .bcc-tam-che, html.may-yeu .bcc-tam { animation: none; }

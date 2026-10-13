@@ -6,7 +6,7 @@ import type { KetQuaNhipHocEm } from '../../lib/nhip-hoc-em'
 
 type KhoiBac = typeof import('./BacNhipEm')
 let hua: Promise<KhoiBac | null> | null = null
-const KhongGi = (_: { k: KetQuaNhipHocEm }) => null
+const KhongGi = (_: { k: KetQuaNhipHocEm; xung?: 'em' | 'con' }) => null
 
 /** Nạp sẵn khối bậc (một lần mỗi phiên; lỗi ⇒ lần sau thử lại). */
 export function napBacNhip(): Promise<KhoiBac | null> {

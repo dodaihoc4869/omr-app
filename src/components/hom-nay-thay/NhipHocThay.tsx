@@ -14,6 +14,8 @@
 //     thẻ "12 bậc từ Lười đến Chăm" có dải đếm số em mỗi bậc (12 ô màu) + cách xếp "Theo nhóm" (hai cột cũ) | "Theo bậc" (MỘT danh sách bậc 1 → 12,
 //     em lười nhất trước; điện thoại: thẻ phân đoạn Theo bậc · Đối phó). Máy chủ cũ (không có bậc) ⇒ không thẻ, không chip, màn y như trước.
 //     Tờ chiếu điểm danh cũng hiện bậc (thầy 13/10: "Hiện bậc trên màn chiếu luôn nhé") — BanChieuDiemDanh.tsx.
+//   · 13/10 đợt 19 (thầy: "bấm vào từng bậc sẽ hiện ra danh sách siêu đẹp của từng học sinh đó"): ô CÓ em của dải đếm là nút ⇒ tấm "Bậc N · Tên · K em"
+//     (`DsTheoBac`, nạp khi bấm): thẻ từng em (điểm chăm thấp → cao), bấm em ⇒ Hồ sơ làm bài chồng lên; đóng Hồ sơ ⇒ về đúng thẻ em; đóng tấm ⇒ về ô.
 // Số CHỈ từ lệnh CHỈ ĐỌC `/gv/nhip-hoc` (src/lib/nhip-hoc-thay.ts: luật nhóm + phép thuần có test). Màu chỉ biến --gvm-* (hom-nay-thay.css); ô ngày
 // dùng ĐÚNG bộ màu bảng nhiệt `bai-hang-ngay.css` (lớp `gvv2-bhn-mau-o`).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
@@ -33,6 +35,7 @@ import './hom-nay-thay.css'
 
 const HoSoLamCauEm = lazy(() => import('../chien-dich/HoSoLamCauEm'))
 const TheBaiHangNgay = lazy(() => import('../chien-dich/TheBaiHangNgay'))
+const DsTheoBac = lazy(() => import('../bac-cham-chi/DsTheoBac'))
 
 /** Số em mỗi cột khi chưa mở rộng (bản vẽ: 6) · đối phó 3 · mỗi đợt khi mở rộng (chuẩn B16: danh sách dài chia đợt). */
 export const SO_EM_COT = 6
@@ -274,6 +277,8 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
   const [moBang, setMoBang] = useState(false)
   const nutVua = useRef<HTMLButtonElement | null>(null)
   const nutBang = useRef<HTMLButtonElement | null>(null)
+  // tấm danh sách em theo bậc (bấm ô dải đếm): bậc đang mở + ô đã bấm (trả tiêu điểm khi đóng)
+  const [moBac, setMoBac] = useState<{ bac: number; nut: HTMLButtonElement } | null>(null)
 
   const kq = du?.ok ? du.kq : null
   const tatCa = useMemo(() => kq?.em ?? [], [kq])
@@ -298,6 +303,21 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
     setMo(null)
     nutVua.current?.focus()
   }, [])
+  // Hồ sơ mở từ tấm theo bậc: lúc Hồ sơ đóng tấm còn `inert` ⇒ trả tiêu điểm SAU khi vẽ lại (tấm đã dùng được).
+  const choTraVe = useRef(false)
+  const onMoTuBac = useCallback(
+    (d: DongNhipHoc, nut: HTMLButtonElement) => {
+      choTraVe.current = true
+      onMo(d, nut)
+    },
+    [onMo],
+  )
+  useEffect(() => {
+    if (mo || !choTraVe.current) return
+    choTraVe.current = false
+    if (nutVua.current?.isConnected) nutVua.current.focus()
+  }, [mo])
+  const dsBac = useMemo(() => (moBac ? theoBac.filter((d) => d.bacCham?.bac === moBac.bac) : []), [moBac, theoBac])
 
   if (du === null) return <XuongNhip />
   if (!du.ok)
@@ -439,7 +459,7 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
           </button>
         </div>
       </div>
-      <DaiDemBac dem={demBac} />
+      <DaiDemBac dem={demBac} onChon={(bac, nut) => setMoBac({ bac, nut })} />
     </section>
   )
   const tabHien: Kieu = xepBac ? (tab === 'doi-pho' ? 'doi-pho' : 'bac') : tab === 'bac' ? 'luoi' : tab
@@ -666,6 +686,11 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
         </div>
       )}
 
+      {moBac && (
+        <Suspense fallback={null}>
+          <DsTheoBac bac={moBac.bac} ds={dsBac} traVe={moBac.nut} phu={!!mo} onMoEm={onMoTuBac} onDong={() => setMoBac(null)} />
+        </Suspense>
+      )}
       {mo &&
         createPortal(
           <div className="m3 m3-thay vo-thay" data-hoa2="" data-vo-cong="ho-so-lam-cau" style={{ display: 'contents' }}>
