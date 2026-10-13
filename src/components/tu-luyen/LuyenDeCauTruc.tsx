@@ -214,7 +214,7 @@ export default function LuyenDeCauTruc({ token, sbd, dieuKien, dangTaiDieuKien, 
           <div><dt>Thang điểm</dt><dd className="tlu-tab">10 điểm</dd></div>
           <div><dt>Nguồn câu</dt><dd>Bộ đề lớp 12</dd></div>
         </dl>
-        <p className="tlu-ghi">Hết 50 phút bài tự nộp. Đáp án và lời giải hiện sau khi em nộp.</p>
+        <p className="tlu-ghi">Hết 50 phút bài tự nộp.</p>
       </section>
 
       <LuotGanDay history={history} busy={busy} onMo={(id) => void open(id)} khoa={khoa} />
@@ -223,14 +223,14 @@ export default function LuyenDeCauTruc({ token, sbd, dieuKien, dangTaiDieuKien, 
   )
 }
 
-function LuotGanDay({ history, busy, onMo, khoa }: { history: LuotLuyenDe[]; busy: boolean; onMo: (id: string) => void; khoa: boolean }) {
+function LuotGanDay({ history, busy, onMo }: { history: LuotLuyenDe[]; busy: boolean; onMo: (id: string) => void; khoa?: boolean }) {
   const [het, setHet] = useState(false)
   const ds = het ? history : history.slice(0, 5)
   return (
     <section className="tlu-khoi ldct-o-luot" aria-labelledby="ldct-h-luot">
       <h2 id="ldct-h-luot" className="tlu-muc">Lượt luyện đề gần đây</h2>
       {history.length === 0 ? (
-        <p className="tlu-ghi">{khoa ? 'Chưa có lượt luyện đề nào.' : 'Chưa có lượt luyện đề nào. Làm đề đầu tiên — nộp xong điểm hiện ở đây và ở thẻ Tổng hợp.'}</p>
+        <p className="tlu-ghi">Chưa có lượt luyện đề nào.</p>
       ) : (
         <ul className="tlu-ds-luot">
           {ds.map((h) => (
@@ -486,9 +486,8 @@ function ManKetQua({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
           ))}
         </dl>
       ) : (
-        <p className="tlu-ghi">Bài này chấm trước khi có bảng điểm theo phần — chỉ còn tổng điểm.</p>
+        <p className="tlu-ghi">Bài này chỉ có tổng điểm.</p>
       )}
-      <p className="tlu-ghi">Câu nào chưa hiểu, em bấm Hỏi thầy ngay dưới câu đó.</p>
     </section>
   )
   const chip = coDetail && (
@@ -512,8 +511,8 @@ function ManKetQua({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
           </section>
         )
       })}
-      {loc === 'sai' && soSai === 0 && <p className="tlu-ghi tlu-ghi-giua">Không có câu nào sai. Em làm tốt lắm!</p>}
-      {loc === 'dung' && soDung === 0 && <p className="tlu-ghi tlu-ghi-giua">Chưa có câu đúng nào — xem lời giải từng câu rồi làm đề mới nhé.</p>}
+      {loc === 'sai' && soSai === 0 && <p className="tlu-ghi tlu-ghi-giua">Không có câu nào sai.</p>}
+      {loc === 'dung' && soDung === 0 && <p className="tlu-ghi tlu-ghi-giua">Chưa có câu đúng nào.</p>}
     </div>
   )
   const nut = (
@@ -552,7 +551,7 @@ function ManKetQua({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
             {tomTat}
             {coDetail && (
               <section className="tlu-khoi" aria-labelledby="ldct-h-ban-do">
-                <h2 id="ldct-h-ban-do" className="tlu-muc">Bản đồ câu <span className="tlu-muc-phu">bấm một ô để xem lại câu đó</span></h2>
+                <h2 id="ldct-h-ban-do" className="tlu-muc">Bản đồ câu</h2>
                 <BanDoKetQua nhom={nhom} onNhay={nhay} />
               </section>
             )}

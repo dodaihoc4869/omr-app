@@ -317,3 +317,29 @@
 .lb-bang-phim { width: 100%; border-collapse: collapse; font-size: 14px; }
 .lb-bang-phim td { padding: 8px 4px; border-bottom: 1px solid var(--lb-mat-2); vertical-align: top; }
 .lb-bang-phim td:first-child { width: 42%; white-space: nowrap; }
+
+/* ---------------------------------------------------------------- ĐỢT 18 · LÀN H (thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn
+ * làm bài của học sinh phải siêu đẹp và thân thiện" · "Bỏ hết các gợi ý hướng dẫn"). CHỈ bố cục — mọi màu giữ nguyên biến ở trên.
+ * Đích chạm ≥ 44 px ở cả máy tính bảng ngang (dùng chung bố cục 'ngang' với máy tính) và điện thoại xoay ngang. */
+/* Phiếu: ô tô TRÒN (luật chung `.m3 button { min-height: 48px }` từng kéo ô 40 px thành bầu dục 40×48). Máy tính dùng chuột giữ ô 40 px
+ * (phiếu 2 cột gọn như bản thầy duyệt 28/09); máy CẢM ỨNG (máy tính bảng ngang dùng chung bố cục này) ô 44 px. */
+.lb-phieu .lb-bong { height: 40px; min-height: 0; }
+@media (pointer: coarse) {
+  .lb-phieu .lb-bong { width: 44px; height: 44px; }
+  .lb-pI { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  /* Phần II: nút Đ / S ≥ 44 px — cột phiếu dưới 660 px xếp 2 ý một hàng (trước đây máy 1180 px còn 4 ý một hàng, nút chỉ ~25 px). */
+  .lb-phieu .lb-y button { min-width: 44px; height: 44px; min-height: 0; }
+}
+@container lb-phai (max-width: 660px) { @media (pointer: coarse) { .lb-y-luoi { grid-template-columns: repeat(2, minmax(0, 1fr)); } } }
+/* Phần III: hai nút "±" "," trong ô đáp số rộng 44 px (trước 38 px). */
+.lb-o3 .osl { --osl-nut-rong: 44px; }
+/* Dải chú thích phím tắt đã bỏ: còn MỘT nút "Phím tắt" nằm gọn bên phải, không khung. */
+.lb-goi-y[data-chi-nut] { justify-content: flex-end; padding: 0; background: transparent; box-shadow: none; }
+.lb-goi-y .lb-nut-phim { height: 44px; min-height: 0; border-radius: 22px; }
+/* Điện thoại xoay ngang: thanh trên VẪN mỏng 32 px (thầy chốt 29/09) — chỉ nới vùng chạm vô hình lên 44 px và nút rộng 44 px. */
+.lb-gon .lb-gon-nut, .lb-gon .lb-gon-co button, .lb-gon .lb-gon-thanh .nut-diu-mat { width: 44px; }
+.lb-gon .lb-gon-nut::after, .lb-gon .lb-gon-co button::after, .lb-gon .lb-gon-thanh .nut-diu-mat::after { inset: -6px 0; }
+.lb-gon .lb-gon-so::after, .lb-gon .lb-nop::after { inset: -9px 0; }
+@media (max-width: 619px) { .lb-gon .lb-gon-nut, .lb-gon .lb-gon-co button, .lb-gon .lb-gon-thanh .nut-diu-mat { width: 40px; } }
+/* Nút nhỏ "Vào lại toàn màn hình" (chỉ hiện khi em đã thoát toàn màn hình) nổi ở góc dưới trái: chừa đáy khung đề để kéo phương án cuối lên khỏi nút. */
+.lb-gon:has(~ .thi-nut-vao-lai) .lb-gon-de { padding-bottom: 64px; }

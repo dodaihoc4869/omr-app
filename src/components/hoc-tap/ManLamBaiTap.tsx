@@ -63,13 +63,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     setTai(true); setLoi(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); soLuotDem.current++
     void goiHoa2('hoc-tap-start', token, {}, 40).then(r => {
       if (huy) return
-      if (!r.ok) throw new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được đợt học.')
+      if (!r.ok) throw new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được chặng học.')
       const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []
       if (ds.some(c => !c.qid || !['I', 'II', 'III'].includes(c.phan) || typeof c.text !== 'string' || !Array.isArray(c.hinhAnh) || c.phan === 'I' && c.choices?.length !== 4 || c.phan === 'II' && c.ideas?.length !== 4)) throw new Error('Nội dung câu chưa đầy đủ. Em cập nhật lại bài học nhé.')
       const g7 = docTomTatGoi7(r.goi7)
       setCau(ds); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7)
       if (g7) setDem({ daLam: g7.daLamHomNay, muc: g7.toiThieu })
-      if (!ds.length) setLoi(typeof r.message === 'string' && r.message.trim() ? r.message : 'Hiện chưa có câu phù hợp để mở đợt mới. Em về Hôm nay để xem tiến độ và tình trạng nguồn câu.')
+      if (!ds.length) setLoi(typeof r.message === 'string' && r.message.trim() ? r.message : 'Chưa có câu mới cho chặng này. Em về Hôm nay xem tiến độ.')
     }).catch(e => { if (!huy) setLoi(e instanceof Error ? e.message : 'Chưa tải được bài học.') }).finally(() => { if (!huy) setTai(false) })
     return () => { huy = true }
   }, [token, lan])
@@ -221,9 +221,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       : <PhanHoiTraLoiNgan tra={traHien} dapAn={k.answer} dung={k.correct} />)}
   </>
   const ghiTraLoi = !q ? null : <>
-    {dangTraLoi && q.goiY && <p className="ht2-lam-ghi"><Lightbulb size={14} aria-hidden="true" />Câu này có gợi ý; lượt dùng gợi ý tính là có hỗ trợ.</p>}
-    {dangTraLoi && q.phan === 'II' && <p className="ht2-lam-ghi"><Check size={14} aria-hidden="true" />Lựa chọn được lưu nháp — thoát ra vào lại vẫn còn.</p>}
-    {dangTraLoi && q.phan === 'I' && <p className="ht2-lam-ghi">Chạm cả ô để chọn · chọn lại được trước khi nộp.</p>}
+    {dangTraLoi && q.goiY && <p className="ht2-lam-ghi"><Lightbulb size={14} aria-hidden="true" />Câu có gợi ý: tính là có hỗ trợ.</p>}
   </>
 
   const homNayO = homNayHien ? <span className="ht2-lam-hom-nay"><b aria-hidden="true">{homNayHien.daLam}/{homNayHien.muc}</b><small aria-hidden="true">câu hôm nay</small><span className="ht2-an">Hôm nay đã làm {homNayHien.daLam} trên {homNayHien.muc} câu</span></span> : <span />
@@ -251,7 +249,6 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {homNayHien && <section className="ht2-lam-the ht2-lam-hom-nay-the" aria-label="Hôm nay">
             <div className="ht2-lam-hom-nay-dau"><b>Hôm nay {homNayHien.daLam}/{homNayHien.muc} câu</b><span>{homNayHien.daLam >= homNayHien.muc ? 'đã đủ mức hôm nay' : `còn ${homNayHien.muc - homNayHien.daLam} câu · ${homNayHien.soChang - soChangXong(homNayHien)} chặng`}</span></div>
             {homNayHien.soChang > 0 && <div className="ht2-lam-chang" role="img" aria-label={`Xong ${soChangXong(homNayHien)} trên ${homNayHien.soChang} chặng`} style={{ gridTemplateColumns: `repeat(${homNayHien.soChang}, minmax(0, 1fr))` }}>{Array.from({ length: homNayHien.soChang }, (_, i) => <i key={i} data-xong={i < soChangXong(homNayHien) || undefined} />)}</div>}
-            <p className="ht2-lam-phu">Làm đủ {homNayHien.muc} câu là đủ mức hôm nay — đúng con số thầy thấy trong hồ sơ của em.</p>
           </section>}
         </>
         : q ? <>
@@ -265,9 +262,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {q.goiY && goiY && dangTraLoi && <section id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           {choChonCach && <section className="ht2-lam-the ht2-lam-chon-cach" aria-label="Chọn cách làm">
             <h2 className="ht2-lam-chon-tieu">Câu này em chọn làm thế nào?</h2>
-            <div className="ht2-lam-chon-dong"><span aria-hidden="true"><PenLine size={20} /></span><p><b>Tự làm:</b> làm được thì nộp. Ghi là câu tự làm.</p></div>
-            <div className="ht2-lam-chon-dong" data-sac="vang"><span aria-hidden="true"><BookOpen size={20} /></span><p><b>Học cách giải:</b> {q.vaiGoi7 === 'chua' ? 'thầy đã chữa câu này — xem phần chữa từng bước.' : 'xem lời giải từng bước.'} Ghi là câu học có hỗ trợ.</p></div>
-            {homNayHien && <p className="ht2-lam-chon-ghi">Cách nào cũng được tính vào <b>{homNayHien.muc} câu hôm nay</b>. Thầy xem riêng số câu tự làm và số câu có hỗ trợ.</p>}
+            <div className="ht2-lam-chon-dong"><span aria-hidden="true"><PenLine size={20} /></span><p><b>Tự làm:</b> tính là câu tự làm.</p></div>
+            <div className="ht2-lam-chon-dong" data-sac="vang"><span aria-hidden="true"><BookOpen size={20} /></span><p><b>Học cách giải:</b> {q.vaiGoi7 === 'chua' ? 'xem phần thầy chữa' : 'xem lời giải từng bước'}, tính là có hỗ trợ.</p></div>
           </section>}
           {!traLoiPhai && khoiTraLoi}
           {(dangTraLoi || k) && <HinhCuoiCau q={q} stt={stt} />}

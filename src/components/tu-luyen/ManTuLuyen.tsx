@@ -395,7 +395,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     const daKiemHet = !!bai.chamTungCau && bai.cau.every((c) => bai.daCham?.[c.qid])
     const dongY = await hoiXacNhan({
       tieuDe: daKiemHet ? 'Xem tổng kết lượt này?' : 'Nộp bài tu luyện?',
-      noiDung: daKiemHet ? 'Em đã kiểm tra hết các câu. Nộp để lưu lượt này và xem tổng kết. Lượt tự luyện được theo dõi riêng.' : conTrong > 0 ? `Em còn ${conTrong} câu chưa làm — câu bỏ trống tính là sai. Nộp xong em xem ngay đáp án và lời giải. Lượt tự luyện được theo dõi riêng.` : 'Nộp xong em xem ngay đáp án và lời giải từng câu. Lượt tự luyện được theo dõi riêng.',
+      noiDung: daKiemHet ? 'Em đã kiểm tra hết các câu. Nộp để lưu lượt này và xem tổng kết.' : conTrong > 0 ? `Em còn ${conTrong} câu chưa làm — câu bỏ trống tính là sai. Nộp xong em xem ngay đáp án và lời giải.` : 'Nộp xong em xem ngay đáp án và lời giải từng câu.',
       nhanDongY: 'Nộp bài',
       nhanKhong: 'Làm tiếp',
       vo: 'm3',
@@ -415,7 +415,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   }
 
   const boBai = async () => {
-    const dongY = await hoiXacNhan({ tieuDe: 'Bỏ bài đang làm?', noiDung: 'Các câu em đã chọn sẽ mất, lượt này không được chấm. Em có thể rút bài mới bất cứ lúc nào.', nhanDongY: 'Bỏ bài', nhanKhong: 'Làm tiếp', nguyHiem: true, vo: 'm3' })
+    const dongY = await hoiXacNhan({ tieuDe: 'Bỏ bài đang làm?', noiDung: 'Các câu em đã chọn sẽ mất, lượt này không được chấm.', nhanDongY: 'Bỏ bài', nhanKhong: 'Làm tiếp', nguyHiem: true, vo: 'm3' })
     if (!dongY) return
     ghiNho(sbd, null)
     setBai(null)
@@ -570,11 +570,11 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const nhanXt = tongXt?.dang ? <p className="tlu-ghi" role="status">Đang đếm câu trong kho…</p> : tongXt?.loi ? <p className="tlu-ghi" data-kieu="loi">{tongXt.loi}</p> : null
   const nguonXt = (tongXt?.nguonDang?.nhan ? tongXt.nguonDang : null) ?? (cheDo === 2 ? nguon?.dangCauSai : cheDo === 4 ? nguon?.tuDo : null) ?? null
   const GIAI_NGUON: Record<string, string> = {
-    cau_sai: 'Lấy từ kho câu sai của em từ 29/09 (ca kiểm tra, chiến dịch, Luyện đề, Tu luyện).',
-    yeu: 'Em chưa có câu sai từ 29/09 — lấy các dạng em làm đúng ít nhất (mỗi dạng đã làm ít nhất 3 lần).',
-    chuong: 'Em chưa có câu sai và chưa đủ số liệu — lấy các dạng của chương em đang học trong chiến dịch.',
-    pho_bien: 'Em chưa có câu sai và chưa có chiến dịch — lấy các dạng có nhiều câu nhất của lớp em.',
-    toan_kho: 'Em chưa có câu sai từ 29/09 — rút từ toàn kho lớp em.',
+    // Đợt 18 (thầy 12/10 "bỏ hết các gợi ý hướng dẫn"): nguồn chính (câu sai) chỉ còn chip tên nguồn; nguồn dự phòng giữ MỘT vế lý do ngắn.
+    yeu: 'Chưa có câu sai: lấy các dạng em làm đúng ít nhất.',
+    chuong: 'Chưa có câu sai: lấy các dạng của chương em đang học.',
+    pho_bien: 'Chưa có câu sai: lấy các dạng có nhiều câu nhất của lớp em.',
+    toan_kho: 'Chưa có câu sai: rút từ toàn kho lớp em.',
   }
   const oNguon = nguonXt?.nhan ? (
     <div className="tlu-nguon" role="status">
@@ -587,7 +587,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
       <input type="checkbox" role="switch" checked={chamTungCau} aria-checked={chamTungCau} onChange={(e) => { setChamTungCau(e.target.checked); ghiChamTungCau(e.target.checked) }} />
       <span className="tlu-cong-tac-chu">
         <b>Chấm từng câu</b>
-        <span>{chamTungCau ? 'Bấm Kiểm tra sau mỗi câu — biết đúng sai và xem lời giải ngay.' : 'Tắt: làm hết rồi nộp cả lượt.'}</span>
+        <span>{chamTungCau ? 'Biết đúng sai ngay sau mỗi câu.' : 'Làm hết rồi nộp cả lượt.'}</span>
       </span>
     </label>
   )
@@ -600,7 +600,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
         {cheDo === 1 && n1Kho === 0 && nguon && (
           <div className="tlu-chuc-mung" role="status">
             <b>{tongKp > 0 ? `Em đã khắc phục hết ${tongKp} câu sai!` : 'Em chưa sai câu nào từ 29/09!'}</b>
-            <p>{tongKp > 0 ? 'Kho câu sai của em đang trống. Câu nào em làm sai sau này sẽ tự vào đây để luyện lại.' : 'Làm tốt lắm. Câu nào em làm sai ở ca kiểm tra, chiến dịch, Luyện đề hay Tu luyện sẽ tự vào đây để luyện lại.'}</p>
+            <p>Kho câu sai của em đang trống.</p>
             <DemKhacPhuc da={daKp} tong={tongKp} />
             {oNenLuyen ? (
               <button type="button" className="tlu-nut-chinh" onClick={() => {
@@ -632,7 +632,6 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
             )}
             <DemKhacPhuc da={daKp} tong={tongKp} />
             {!!khoSai?.toiHan && <p className="tlu-ghi" data-kieu="lap">{khoSai.toiHan} câu đã tới hẹn ôn lại — được lấy trước.</p>}
-            <p className="tlu-ghi">Làm đúng một câu ⇒ hẹn gặp lại sau 1 ngày; đúng lần nữa vào ngày khác ⇒ câu đó được khắc phục và rời kho. Câu chưa luyện lấy trước, câu khó và dễ xếp xen kẽ. Bỏ câu tự luận.</p>
           </>
         )}
         {cheDo === 2 && (
@@ -671,7 +670,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
                 {lopHT?.bais.map((b) => <option key={b.tenBai} value={b.tenBai}>{b.tenBai}</option>)}
               </select>
             </div>
-            <h2 className="tlu-muc">Dạng bài <span className="tlu-muc-phu">chọn được nhiều dạng</span></h2>
+            <h2 className="tlu-muc">Dạng bài</h2>
             <div className="tlu-ds-chon">
               {baiHT?.dangs.map((d) => (
                 <label key={d.ma} className="tlu-o-chon">
@@ -711,16 +710,13 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
               <p className="tlu-ghi" data-kieu="loi" role="status">Em chọn ít nhất 1 nguồn câu sai để bắt đầu.</p>
             ) : soCauChon > n1 ? (
               <p className="tlu-ghi" data-kieu="lap" role="status">Em chọn nhiều hơn {n1} câu trong nguồn đã chọn: sẽ có {soCauChon - n1} câu lặp lại trong lượt này.</p>
-            ) : (
-              <p className="tlu-ghi">Kéo quá {n1} câu nếu em muốn luyện lặp (mỗi câu tối đa 2 lần trong một lượt).</p>
-            )}
+            ) : null}
           </>
         )}
         {cheDo === 2 && (
           <>
             {nhanXt}
             {thanhChon(soCau2, setSoCau2, 1, tongXt?.tong ?? 0)}
-            <p className="tlu-ghi">Số câu mỗi dạng chia theo tỉ lệ câu em sai ở dạng đó.</p>
           </>
         )}
         {cheDo === 3 && nguon && (
@@ -733,7 +729,6 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
           <>
             {nhanXt}
             {thanhChon(soCau4, setSoCau4, 1, Math.min(50, tongXt?.tong ?? 0))}
-            <p className="tlu-ghi">{nguonXt?.kieu === 'toan_kho' ? 'Rút ngẫu nhiên từ toàn kho lớp em.' : 'Rút từ kho câu cùng chuyên đề với các câu em từng sai.'}</p>
           </>
         )}
         {!(cheDo === 1 && n1Kho === 0) && (
@@ -906,7 +901,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
             <>
               <h2 className="tlu-muc tlu-muc-dau">Chọn cách luyện</h2>
               {luoiRong}
-              {cheDo ? bangCheDo : <p className="tlu-ghi tlu-ghi-giua">Chọn một cách luyện để bắt đầu. Làm xong em xem ngay đáp án, lời giải và tiến độ của mình ở thẻ Tổng hợp.</p>}
+              {cheDo ? bangCheDo : null}
             </>
           )}
         </main>
@@ -1047,7 +1042,6 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
         <div><dt>Tỉ lệ đúng</dt><dd className="tlu-tab">{tiLe}%</dd></div>
         <div><dt>Thời gian làm</dt><dd className="tlu-tab">{chuThoiGian(kq.giay)}</dd></div>
       </dl>
-      <p className="tlu-ghi">Luyện tự do giúp em củng cố kiến thức; kế hoạch được giao vẫn được theo dõi riêng.</p>
     </section>
   )
   const soSai = kq.soCau - kq.soDung
@@ -1060,7 +1054,7 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
   )
   const danhSach = (
     <div className="tlu-ds-cau">
-      {ds.length === 0 && <p className="tlu-ghi tlu-ghi-giua">{loc === 'sai' ? 'Không có câu sai nào. Em làm tốt lắm!' : 'Chưa có câu đúng nào trong lượt này — xem lời giải ở thẻ Câu sai rồi luyện lượt mới nhé.'}</p>}
+      {ds.length === 0 && <p className="tlu-ghi tlu-ghi-giua">{loc === 'sai' ? 'Không có câu sai nào.' : 'Chưa có câu đúng nào trong lượt này.'}</p>}
       {ds.map(({ c, i, k }) => (
         <article key={c.qid} id={domId(c.qid)} className="tlu-the-cau m3" data-dung={k?.dung ? 'true' : 'false'}>
           <div className="tlu-the-cau-dau">
@@ -1131,7 +1125,7 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
           <aside className="tlu-kq-trai" aria-label="Tóm tắt kết quả">
             {diem}
             <section className="tlu-khoi" aria-labelledby="tlu-h-ban-do">
-              <h2 id="tlu-h-ban-do" className="tlu-muc">Bản đồ câu <span className="tlu-muc-phu">bấm một ô để xem lại câu đó</span></h2>
+              <h2 id="tlu-h-ban-do" className="tlu-muc">Bản đồ câu</h2>
               <BanDoKetQua nhom={nhom} onNhay={nhay} />
             </section>
             <section className="tlu-khoi" aria-labelledby="tlu-h-kq-phan">

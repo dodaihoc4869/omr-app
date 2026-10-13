@@ -672,3 +672,20 @@
 .h2-cdl-ngang[data-thap='true'] :is(button, select) {
   min-height: calc(44px / var(--h2-ti-le, 1));
 }
+
+/* ĐỢT 18 · LÀN H (thầy 12/10: "Chỗ tải đề làm lại cho đẹp tinh tế và gọn gàng"; màn làm bài "siêu đẹp và thân thiện" ở dọc/ngang/máy tính).
+   CHỈ bố cục — màu giữ nguyên các khai báo ở trên. Hàng tải: HAI nút vừa (44 px) cùng một hàng, bỏ dòng chữ nhỏ giải thích; chân dọc mỏng lại. */
+.h2-cdl-hang-pdf { flex-wrap: nowrap; gap: 8px; }
+.h2-cdl-hang-pdf .h2-cdl-nut-chinh,
+.h2-cdl-hang-pdf .h2-cdl-chi-de { min-height: 44px; padding: 0 16px; border-radius: 22px; font-size: 15px; font-weight: 700; }
+.h2-cdl-chan { gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom)); }
+.h2-cdl-chan .h2-cdl-hang-pdf > button { flex: 1 1 0; min-width: 0; justify-content: center; }
+.h2-cdl-ngang .h2-cdl-hang-pdf { flex-shrink: 0; }
+.h2-cdl-ngang .h2-cdl-hang-pdf .h2-cdl-nut-chinh,
+.h2-cdl-ngang .h2-cdl-hang-pdf .h2-cdl-chi-de { min-height: calc(44px / var(--h2-ti-le, 1)); padding: 0 18px; border-radius: 22px; font-size: 15px; white-space: nowrap; }
+/* Một bài duy nhất: tiêu đề trơn thay cho hộp chọn. */
+.h2-cdl-bai { margin: 0; min-width: 0; overflow: hidden; font-size: 15px; line-height: 1.4; color: var(--h2c-chu); text-overflow: ellipsis; white-space: nowrap; }
+.h2-cdl-bai b { font-weight: 800; }
+.h2-cdl-ngang .h2-cdl-bai { flex: 0 1 340px; }
+/* Thẻ lọc ≥ 44 px cả trên máy tính (trước chỉ màn cảm ứng). */
+.h2-cdl-loc .tl-the { height: auto; min-height: 44px; }

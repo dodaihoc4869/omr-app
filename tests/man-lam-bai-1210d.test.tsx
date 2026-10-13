@@ -138,7 +138,9 @@ describe('màn làm bài', () => {
     await screen.findByText(TLN.text)
     expect(screen.getByText('Câu mới · Bài 8. Amine')).toBeTruthy()
     expect(screen.getByText('Câu này em chọn làm thế nào?')).toBeTruthy()
-    expect(screen.getByText(/Cách nào cũng được tính vào/).textContent).toContain('24 câu hôm nay')
+    // Đợt 18 (làn H): bỏ dòng giải thích "Cách nào cũng được tính vào … Thầy xem riêng …"; mỗi cách còn MỘT dòng ngắn nói cách tính.
+    expect(screen.queryByText(/Cách nào cũng được tính vào/)).toBeNull()
+    expect(screen.getByText(/tính là câu tự làm/)).toBeTruthy(); expect(screen.getByText(/tính là có hỗ trợ/)).toBeTruthy()
     expect(screen.queryByRole('group', { name: 'Bàn phím số' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Học cách giải' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Tự làm câu này' }))
@@ -151,10 +153,10 @@ describe('màn làm bài', () => {
     expect(screen.getByText('Câu này em chọn làm thế nào?')).toBeTruthy()
     expect(screen.queryByText(/Cách nào cũng được tính vào/)).toBeNull()
   })
-  it('gợi ý: nút bóng đèn mở khối gợi ý; giữ câu "lượt dùng gợi ý tính là có hỗ trợ"; gửi assisted', async () => {
+  it('gợi ý: nút bóng đèn mở khối gợi ý; giữ dòng ngắn "Câu có gợi ý: tính là có hỗ trợ."; gửi assisted', async () => {
     moMan([{ ...TN, goiY: { cotLoi: 'Bậc amine = số gốc hydrocarbon gắn vào N.' } }])
     await screen.findByText(TN.text)
-    expect(screen.getByText(/lượt dùng gợi ý tính là có hỗ trợ/)).toBeTruthy()
+    expect(screen.getByText('Câu có gợi ý: tính là có hỗ trợ.')).toBeTruthy()
     expect(screen.queryByText('Bậc amine = số gốc hydrocarbon gắn vào N.')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Xem gợi ý' }))
     expect(screen.getByText('Bậc amine = số gốc hydrocarbon gắn vào N.')).toBeTruthy()

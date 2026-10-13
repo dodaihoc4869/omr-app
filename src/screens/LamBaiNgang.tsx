@@ -402,9 +402,7 @@ function LamBaiNgangDu(p: LamBaiNgangProps) {
           <div className="lb-de-dau-hang">
             <div className="lb-ten-ca">
               <b>{p.tenCa.trim() || 'Bài làm'}</b>
-              <span>
-                {p.tong} câu · Phím tắt: bấm <kbd>?</kbd>
-              </span>
+              <span>{p.tong} câu</span>
             </div>
             {p.congCu}
             <div className="lb-co-chu" role="group" aria-label="Cỡ chữ đề">
@@ -600,24 +598,8 @@ function LamBaiNgangDu(p: LamBaiNgangProps) {
             )
           })}
         </div>
-        <div className="lb-goi-y">
-          <div className="lb-goi-y-ds" aria-hidden="true">
-            <span>
-              <kbd>1</kbd>–<kbd>4</kbd> chọn
-            </span>
-            <span>
-              <kbd>N</kbd> câu sau
-            </span>
-            <span>
-              <kbd>P</kbd> câu trước
-            </span>
-            <span>
-              <kbd>M</kbd> đánh dấu
-            </span>
-            <span>
-              Giữ <kbd>phím cách</kbd> để đọc
-            </span>
-          </div>
+        {/* Đợt 18 (thầy 12/10 "bỏ hết các gợi ý hướng dẫn"): bỏ dải chú thích phím tắt luôn hiện; bảng đầy đủ vẫn ở nút "Phím tắt". */}
+        <div className="lb-goi-y" data-chi-nut="">
           <button type="button" className="lb-nut-phim" onClick={() => setMoPhim(true)}>
             <Keyboard size={16} />
             Phím tắt

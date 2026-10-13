@@ -161,10 +161,12 @@
   .lco-the > .lco-nhom { grid-column: 2; grid-row: 2; }
   .lco-day-hang, .lco-loi-nop, .lco-cho-may-chu { max-width: 1080px; }
 }
-/* Điện thoại xoay ngang (thấp): khung nhìn chỉ ~390 px ⇒ đầu màn và thanh nộp gọn lại để thẻ câu có chỗ; nút vẫn ≥ 48 px. */
+/* Điện thoại xoay ngang (thấp): khung nhìn chỉ ~390 px ⇒ đầu màn và thanh nộp gọn lại để thẻ câu có chỗ; nút vẫn ≥ 48 px.
+ * ĐỢT 18 (làn H): đầu màn thành MỘT hàng (tiêu đề + chip số câu, cao ~36 px) ⇒ câu 1 hiện ngay màn đầu, không phải cuộn. */
 @media (orientation: landscape) and (max-height: 500px) {
   .lco { padding-top: 0; }
-  .lco-dau { gap: var(--k1, 4px); margin-bottom: var(--k3, 12px); }
-  .lco-tieu-de { font-size: var(--bnv-cx-4); }
+  .lco-dau { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: var(--k3, 12px); row-gap: var(--k1, 4px); margin-bottom: var(--k2, 8px); }
+  .lco-tieu-de { font-size: var(--bnv-cx-3); }
+  .lco-the { padding: var(--k3, 12px) var(--k4, 16px); }
   .lco-day { padding: var(--k2, 8px) var(--k3, 12px); margin-top: var(--k3, 12px); }
 }
