@@ -1,10 +1,12 @@
 // BA LỖI CA THẬT ĐẦU TIÊN TRÊN MÁY CHỦ MỚI — ca 195422 "2010 - Lớp 2 - L1", 12/09.
 //
 // Cả ba đều là dây thừa còn sót từ thời hai máy chủ, không phải hỏng dữ liệu.
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { khoaDuocViCuaSoNoi, khoaDuocViThuNhoMan, xetCoMan, TI_LE_CO_MAN_CHOT } from '../src/lib/man-thi-sach'
+import { capNhatKeyBank } from '../server/src/goi-cu'
+import type { Env } from '../server/src/kieu'
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const API = doc('src/lib/exam-api.ts')
@@ -81,13 +83,39 @@ describe('LỖI 1 — link xem điểm báo "Máy chủ chưa gửi đề của 
     })
   })
 
-  it('ca CŨ tự lành: màn chấm đẩy keyBank lên bằng lệnh chỉ ghi một đối tượng R2', () => {
+  it('ca CŨ tự lành: màn chấm đẩy keyBank lên bằng lệnh chỉ ghi một đối tượng R2', async () => {
     expect(THEODOI).toContain('void capNhatKeyBank(scriptUrl, secret, chiTiet.ca.maCa, keyBank).catch(() => {})')
-    const SRV = doc('server/src/goi-cu.ts')
-    const i = SRV.indexOf("await env.DE.put(`key/${maCa}.json`")
-    expect(i).toBeGreaterThan(0)
+    // SỬA CÓ CHỦ ĐÍCH 13/10: ghi đi qua hàng rào đệm R2; kiểm hành vi thật,
+    // không đòi `.put` nằm trực tiếp trong thân hàm (luật một R2 và không ghi D1 giữ nguyên).
+    const sql: string[] = []
+    const run = vi.fn(async () => ({ success: true, results: [], meta: { changes: 1 } }))
+    const batch = vi.fn(async () => [])
+    const get = vi.fn(async () => null)
+    const put = vi.fn(async () => undefined)
+    const env = {
+      DB: {
+        prepare: (q: string) => {
+          sql.push(q)
+          const st = {
+            bind: () => st,
+            first: async () => /FROM ca WHERE/.test(q) ? { cong_bo: 'ca_lop_xong' } : null,
+            run,
+          }
+          return st
+        },
+        batch,
+      },
+      DE: { get, put },
+    } as unknown as Env
+    const keyBank = { phanI: [{ id: 'Q1', choices: ['a', 'b', 'c', 'd'], correct: 'A' }], phanII: [], phanIII: [] }
+    expect(await capNhatKeyBank(env, { maCa: '195422', keyBank })).toEqual({ ok: true, congBo: 'ca_lop_xong' })
+    expect(get).toHaveBeenCalledExactlyOnceWith('key/195422.json')
+    expect(put).toHaveBeenCalledExactlyOnceWith('key/195422.json', JSON.stringify(keyBank))
     // Lệnh ấy KHÔNG được đụng bảng ca — ghi đè dòng ca bằng rỗng đã hỏng ca 704066.
-    expect(SRV.slice(Math.max(0, i - 500), i + 200)).not.toContain('INSERT INTO ca')
+    expect(sql.length).toBeGreaterThan(0)
+    expect(sql.every(q => /^\s*SELECT\b/i.test(q))).toBe(true)
+    expect(run).not.toHaveBeenCalled()
+    expect(batch).not.toHaveBeenCalled()
   })
 })
 
