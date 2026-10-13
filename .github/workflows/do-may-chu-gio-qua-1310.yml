@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     env:
-      # 13/10 21:30 (VN): HS báo kẹt "Đang chuẩn bị những câu phù hợp với em…" (hoc-tap-start) ⇒ đo 45 phút qua (PR280 lên 21:03, PR282 ~21:15).
-      GIO: '0.75'
+      # 13/10 (VN): thầy hỏi "giờ app hs load bình thường chưa" ⇒ đo 20 phút gần nhất (sau lượt phát hành cuối ~21:15).
+      GIO: '0.34'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
