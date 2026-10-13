@@ -169,12 +169,13 @@ describe('màn Lên bảng — thẻ Dạy học', () => {
     await waitFor(() => expect(within(tam).getByText('Nguyễn An')).toBeTruthy(), { timeout: 7000 })
   }, 10000)
 
-  it('có em + có câu ⇒ Chiếu lên bảng gọi em CÓ MẶT (câu Vận dụng ⇒ em bậc Vận dụng), mở tờ; "Em làm đúng" ghi bằng ghiLenBang', async () => {
+  it('màn chiếu chọn em có mặt đã tự đúng dù dự đoán thấp hơn; bảng gọi tên và nút ghi ngoài tờ theo đúng em ấy', async () => {
     coMat = [
       { sbd: 'S1', hoTen: 'Nguyễn An', luc: '2026-09-28T11:01:00Z', cach: 'ma' },
       { sbd: 'S2', hoTen: 'Trần Bảo', luc: '2026-09-28T11:02:00Z', cach: 'thay' },
     ]
     goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
+      if(duong==='/gv/ung-vien-chieu')return {ok:true,du:{cau:Object.fromEntries((b.qids as string[]).map(qid=>[qid,[{sbd:'S2',ten:'Trần Bảo',loai:'da_dung',p:0.2,luc:'2026-09-28'}]]))}}
       if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return { ok: true, du: { ok: true, buoi: [BUOI] } }
       return (chuanMockGoc as (d: string, b: Record<string, unknown>) => unknown)(duong, b)
     })
@@ -185,12 +186,12 @@ describe('màn Lên bảng — thẻ Dạy học', () => {
     await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
     fireEvent.click(nut)
     await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/buoi-hoc/suc-hoc', expect.objectContaining({ sbd: ['S1', 'S2'] })))
-    // câu 1 (Vận dụng, dạng thuỷ phân) ⇒ An (bậc Vận dụng)
-    const dong = (await screen.findAllByText(/khả năng đúng ≈/))[0]!.closest('li')!
-    expect(within(dong).getByText('Nguyễn An')).toBeTruthy()
     await waitFor(() => expect(document.querySelector('.lop-xem-phieu iframe')).toBeTruthy())
+    const dong = document.querySelector('.dh-giao')!.closest('li')!
+    expect(within(dong).getByText('Trần Bảo')).toBeTruthy()
+    expect(within(dong).queryByText('Nguyễn An')).toBeNull()
     fireEvent.click(within(dong).getByRole('button', { name: /Em làm đúng/ }))
-    await waitFor(() => expect(ghiLenBang).toHaveBeenCalledWith('https://may-chu', 'mat', expect.objectContaining({ sbd: 'S1', dat: true })))
+    await waitFor(() => expect(ghiLenBang).toHaveBeenCalledWith('https://may-chu', 'mat', expect.objectContaining({ sbd: 'S2', dat: true })))
     expect(await within(dong).findByText('Đã ghi: làm đúng')).toBeTruthy()
   })
 })
