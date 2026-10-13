@@ -18,8 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     env:
-      # 13/10 20:15 (VN): thầy báo màn Đường tự gỡ "Máy chủ phản hồi chậm" (hoa2-cau-chi-tiet quá 30 s) ⇒ đo 1 giờ cao điểm qua (có 3 lượt phát hành 19:48–20:05).
+      # 13/10 (VN): đo 1 giờ SAU PR280 (sống 21:03:41 VN) — khung cố định 21:20–22:20 VN (14:20–15:20 UTC): sau phát hành 16 phút, TRƯỚC lượt phát hành PR283 (22:25 VN).
+      # So với 1 giờ cao điểm TRƯỚC sửa (12:11–13:11 UTC, workflow 38402898461). DEN rỗng ⇒ tới hiện tại.
       GIO: '1'
+      DEN: '2026-10-13T15:20:00Z'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
@@ -34,8 +36,8 @@ jobs:
           ACC: ${{ env.CF_ACC_SACH }}
         run: |
           node - <<'JS'
-          const { TOKEN, ACC, GIO, DB_ID } = process.env
-          const den = new Date(), tu = new Date(den.getTime() - Number(GIO) * 3600_000)
+          const { TOKEN, ACC, GIO, DB_ID, DEN } = process.env
+          const den = DEN ? new Date(DEN) : new Date(), tu = new Date(den.getTime() - Number(GIO) * 3600_000)
           const hoi = async (query, variables) => {
             const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ query, variables }) })
             const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
@@ -54,6 +56,11 @@ jobs:
               sum{requests errors subrequests} quantiles{cpuTimeP50 cpuTimeP90 cpuTimeP99 durationP50 durationP90 durationP99}}}}}`, v)
           console.log('=== Worker omr ===')
           for (const x of w?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(JSON.stringify(x))
+          // Lỗi theo loại kết quả (exception / exceededCpu / exceededResources / …) — lỗi thật hay quá tải.
+          const wo = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:20,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den}){dimensions{status} sum{requests errors}}}}}`, v)
+          console.log('=== Worker omr theo trạng thái ===')
+          for (const x of wo?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(JSON.stringify(x))
           // Theo từng 5 phút: lag có trùng lúc phát hành (bộ đệm trong máy Worker nguội) hay rải đều?
           const w5 = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
             workersInvocationsAdaptive(limit:30,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
@@ -61,3 +68,17 @@ jobs:
           console.log('=== Worker omr theo 5 phút (UTC) ===')
           for (const x of w5?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log([x.dimensions.datetimeFiveMinutes.slice(11, 16), `yc=${x.sum.requests}`, `loi=${x.sum.errors}`, `p50=${Math.round(x.quantiles.durationP50)}`, `p90=${Math.round(x.quantiles.durationP90)}`, `p99=${Math.round(x.quantiles.durationP99)}`, `cpu99=${Math.round(x.quantiles.cpuTimeP99)}`].join(' '))
           JS
+      - name: Tem kho câu đổi bao nhiêu lần (chỉ SELECT — bộ đệm siêu dữ liệu câu xoá mỗi khi tem đổi)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          TU=$(date -u -d "-${GIO%.*} hour" +%Y-%m-%dT%H:%M:%S 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%S)
+          TU1=$(date -u -d '-1 hour' +%Y-%m-%dT%H:%M:%S)
+          echo "== tem kho: tổng tờ, số tờ lập chỉ mục trong 1 giờ qua, mốc mới nhất"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS so_to, SUM(CASE WHEN indexed_at >= '$TU1' THEN 1 ELSE 0 END) AS lap_1h, MAX(indexed_at) AS moi_nhat FROM game_v2_index" | jq -c ".[0].results"
+          echo "== 15 tờ lập chỉ mục gần nhất"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT ma_de, indexed_at FROM game_v2_index ORDER BY indexed_at DESC LIMIT 15" | jq -c ".[0].results[]"
+          echo "== tờ đang LỆCH chỉ mục (de_kho.cap_nhat_luc khác game_v2_index.source_version)"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS lech FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc)" | jq -c ".[0].results"

@@ -3999,6 +3999,8 @@ const boXuLy = {
       if (p === '/gv/hoi-tro-ly/luot') return ra(await import('./hoi-tro-ly').then((m) => m.gvLuotHoiThay(env, b)))
       if (p === '/gv/hoi-tro-ly/dat-lai') return ra(await import('./hoi-tro-ly').then((m) => m.gvDatLaiLuotHoiThay(env, b)))
       if (p === '/gv/hoi-tro-ly/sbd-thu') return ra(await import('./hoi-tro-ly').then((m) => m.gvSbdThuHoiThay(env, b)))
+      // Sổ hỏi Thầy (13/10 khuya): số lượt, từng em, các lượt gần nhất — chỉ đọc, sau cổng mã bí mật ở trên.
+      if (p === '/gv/hoi-tro-ly/so') return ra(await import('./hoi-tro-ly').then((m) => m.gvSoHoiThay(env, b)))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
       // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
       if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))

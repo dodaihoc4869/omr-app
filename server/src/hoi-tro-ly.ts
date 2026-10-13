@@ -117,6 +117,7 @@ CÁCH THẦY TRẢ LỜI
 - Em còn sai hoặc còn vướng thì bước cuối là một việc cụ thể em làm ngay.
 - Viết NGẮN: mỗi câu tối đa 30 chữ, cả trả lời tối đa 180 chữ.
 - Công thức hoá học viết liền (CH3COOC2H5, Fe2(SO4)3), số thập phân dùng dấu phẩy (8,2 gam), mũi tên phản ứng "→".
+- Ion: điện tích viết sau dấu ^ ngay sau công thức (HCO3^-, CO3^2-, Fe^3+, NH4^+), KHÔNG viết điện tích trong ngoặc như CO3(2-).
 - Không emoji, không LaTeX, không gạch ngang dài, không markdown nào ngoài hai dấu sau: **…** tô đậm cụm then chốt (tối đa 4 cụm cả trả lời); ==…== làm nổi đáp số hay kết luận chính (tối đa 1, chỉ trong yChinh).
 
 TRÌNH BÀY (máy em vẽ từng phần thành thẻ để em đọc là hiểu ngay — mỗi phần một việc)
@@ -424,6 +425,40 @@ export async function gvSbdThuHoiThay(env: Env, b: Obj, nowMs = Date.now()): Pro
     .bind(JSON.stringify(o), new Date(nowMs).toISOString()).run()
   demCauHinh.xoa()
   return { ok: true, sbdThu: [...ds] }
+}
+
+/** SỔ HỎI THẦY cho máy thầy (13/10 khuya, thầy: "truy vấn xem đã có bao nhiêu lượt hỏi rồi, từ những số báo danh nào, hỏi câu gì").
+ *  CHỈ ĐỌC, một đợt D1 (batch ba lệnh): tổng số lượt · từng em (SBD, tên, lớp, số lượt Thầy trả lời, số câu, lúc gần nhất) · `gioiHan`
+ *  lượt gần nhất (giờ, em, câu, câu hỏi, trả lời rút gọn 400 ký tự, ngoài phạm vi, model, ms, lỗi). `sbd` (tuỳ chọn) ⇒ chỉ một em.
+ *  Lượt thầy đã "đặt lại" vẫn hiện (sổ không xoá). Chỉ sau cổng mã bí mật của thầy (index.ts) — dữ liệu em không đi ra nơi khác. */
+export async function gvSoHoiThay(env: Env, b: Obj): Promise<Obj> {
+  const sbd = sbdVao(b.sbd)
+  if (sbd && !SBD_HOP_LE.test(sbd)) return { ok: false, error: 'Số báo danh không hợp lệ.' }
+  const gioiHan = Math.max(1, Math.min(300, Math.floor(Number(b.gioiHan)) || 100))
+  await chayDdlMotLan(env, 'hoi_tro_ly_v1', SQL_BANG)
+  const loc = sbd ? 'WHERE t.sbd = ?' : ''
+  const tham = sbd ? [sbd] : []
+  const TEN = "COALESCE(NULLIF(h.ho_ten, ''), (SELECT d.ho_ten FROM danh_sach d WHERE d.sbd = t.sbd LIMIT 1), '')"
+  const LOP = "COALESCE(NULLIF(h.lop, ''), (SELECT d.lop FROM danh_sach d WHERE d.sbd = t.sbd LIMIT 1), '')"
+  const [tong, theoEm, luot] = await env.DB.batch<Obj>([
+    env.DB.prepare(`SELECT COUNT(*) AS luot, SUM(CASE WHEN t.loi IS NULL THEN 1 ELSE 0 END) AS tra_loi, SUM(CASE WHEN t.loi IS NULL AND t.lien_quan = 0 THEN 1 ELSE 0 END) AS ngoai,
+      SUM(CASE WHEN t.loi IS NOT NULL THEN 1 ELSE 0 END) AS loi, COUNT(DISTINCT t.sbd) AS so_em, COUNT(DISTINCT t.qid) AS so_cau, MIN(t.luc) AS dau FROM hoi_tro_ly t ${loc}`).bind(...tham),
+    env.DB.prepare(`SELECT t.sbd, ${TEN} AS ten, ${LOP} AS lop, SUM(CASE WHEN t.loi IS NULL THEN 1 ELSE 0 END) AS so_luot, COUNT(DISTINCT t.qid) AS so_cau, MAX(t.luc) AS gan_nhat
+      FROM hoi_tro_ly t LEFT JOIN hoc_sinh h ON h.sbd = t.sbd ${loc} GROUP BY t.sbd ORDER BY gan_nhat DESC LIMIT 300`).bind(...tham),
+    env.DB.prepare(`SELECT t.luc, t.sbd, ${TEN} AS ten, t.qid, t.nguon, t.cau_hoi, substr(COALESCE(t.tra_loi, ''), 1, 400) AS tra_loi, t.lien_quan, t.model, t.ms, t.loi
+      FROM hoi_tro_ly t LEFT JOIN hoc_sinh h ON h.sbd = t.sbd ${loc} ORDER BY t.id DESC LIMIT ?`).bind(...tham, gioiHan),
+  ])
+  const t0 = (tong.results ?? [])[0] ?? {}
+  return {
+    ok: true,
+    ...(sbd ? { sbd } : {}),
+    tong: { luot: Number(t0.luot) || 0, traLoi: Number(t0.tra_loi) || 0, ngoaiPhamVi: Number(t0.ngoai) || 0, loi: Number(t0.loi) || 0, soEm: Number(t0.so_em) || 0, soCau: Number(t0.so_cau) || 0, dau: str(t0.dau) },
+    theoEm: (theoEm.results ?? []).map((x) => ({ sbd: str(x.sbd), ten: str(x.ten), lop: str(x.lop), soLuot: Number(x.so_luot) || 0, soCau: Number(x.so_cau) || 0, ganNhat: str(x.gan_nhat) })),
+    luot: (luot.results ?? []).map((x) => ({
+      luc: str(x.luc), sbd: str(x.sbd), ten: str(x.ten), qid: str(x.qid), nguon: str(x.nguon), cauHoi: str(x.cau_hoi), traLoi: str(x.tra_loi),
+      ngoaiPhamVi: x.lien_quan === 0 || x.lien_quan === '0', model: str(x.model), ms: Number(x.ms) || 0, loi: str(x.loi).slice(0, 160),
+    })),
+  }
 }
 
 export async function hsHoiTroLy(env: Env, b: Obj): Promise<Obj> {

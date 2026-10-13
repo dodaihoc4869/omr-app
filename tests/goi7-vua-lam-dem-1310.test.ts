@@ -70,3 +70,40 @@ it('lượt trả lời cũ hơn 15 phút hoặc của hôm qua không cộng v�
   expect((await lapGoi7(k.env, 'S1', NOW))!.daLamNgay).toBe(0)
   expect((await demHomNay7(k.env, 'S1', NOW)).daLamHomNay).toBe(0)
 })
+
+// LỖI 13/10 22h (thầy, 2 ảnh cùng một em: Hôm nay "Đủ mức hôm nay · Đã làm 24/24 · Đã làm hết câu được giao", lịch ngày "Hôm nay 13/10 · 19/24 · thiếu 5":
+// "app báo đủ mức rồi mà hôm nay lại báo thiếu, sửa triệt để đi nhé"). Nguyên nhân gốc: phần "vừa làm" (bản vá 20:11) cộng MÃ GỐC của câu bản ảo
+// (song sinh ~ssN, biến thể ~btN, lần #n) vào tập đã làm, trong khi sổ ghi ĐÚNG mã đã phát (mã ảo) ⇒ 15 phút sau mỗi câu ảo, một câu đếm HAI lần
+// (mã sổ + mã gốc); kế hoạch tưởng đủ mức, ngừng phát câu. Lịch ngày (thầy / hồ sơ em / phụ huynh) đếm theo sổ ⇒ 19. Nay tập đã làm thêm ĐÚNG mã sổ.
+import { ghiSuKien } from '../server/src/su-kien-hoc'
+import { ngayBaiCuaMotEm } from '../server/src/bai-hang-ngay'
+
+it('câu bản ảo vừa làm (sổ đã ghi) không bị đếm hai lần — sảnh, ô đếm sau mỗi câu và lịch ngày cùng MỘT số', async () => {
+  const k = await kho()
+  const ke = (await lapGoi7(k.env, 'S1', NOW))!.plan.viec.map((v) => v.qid)
+  const lam = ke.slice(0, 19).map((q, i) => (i < 3 ? `${q}~ss${i + 1}` : i < 5 ? `${q}~bt1#${i}` : q)) // 5 câu bản ảo
+  const luc = NOW - 60_000
+  ghiLuotNgay(k, lam, luc)
+  await ghiSuKien(k.env, lam.map((q) => ({ nguon: 'game', maNguon: 'phien-cuoi', sbd: 'S1', qid: q, lan: 1, ketQua: 1, luc: new Date(luc).toISOString(), maDang: '', chuyenDe: '', mucDo: '', attemptId: `phien-cuoi|${q}`, assistance: 'none', purpose: 'maintenance', receivedAt: luc })) as never)
+  const lap = (await lapGoi7(k.env, 'S1', NOW))!
+  expect(lap.daLamNgay).toBe(19) // trước: 24 ⇒ "Đủ mức 24/24" mà thật mới 19
+  expect((await demHomNay7(k.env, 'S1', NOW)).daLamHomNay).toBe(19)
+  const ngay = await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-13', '2026-10-13', '2026-10-13')
+  expect(ngay?.map((n) => n.daLam)).toEqual([19])
+  expect(lap.plan.viec.length).toBeGreaterThan(0) // còn thiếu ⇒ vẫn phát câu
+  expect(lap.plan.viec.filter((v) => ke.slice(0, 19).includes(v.qid))).toEqual([]) // câu vừa làm (cả gốc của bản ảo) không quay lại
+})
+
+it('lượt lướt / chẩn đoán đã vào sổ (không tính) không được phần "vừa làm" cộng lại — sảnh và lịch ngày vẫn cùng số', async () => {
+  const k = await kho()
+  const ke = (await lapGoi7(k.env, 'S1', NOW))!.plan.viec.map((v) => v.qid)
+  const luc = NOW - 60_000
+  const lam = ke.slice(0, 6)
+  ghiLuotNgay(k, lam, luc)
+  const dong = (q: string, i: number) => ({ nguon: 'game', maNguon: 'phien-cuoi', sbd: 'S1', qid: q, lan: 1, ketQua: i === 0 ? null : 1, luc: new Date(luc).toISOString(), maDang: '', chuyenDe: '', mucDo: '', attemptId: `phien-cuoi|${q}`, assistance: 'none', purpose: i === 0 ? 'luot' : i === 1 ? 'chan_doan' : 'maintenance', receivedAt: luc })
+  await ghiSuKien(k.env, lam.map(dong) as never)
+  const lap = (await lapGoi7(k.env, 'S1', NOW))!
+  expect(lap.daLamNgay).toBe(4)
+  expect((await demHomNay7(k.env, 'S1', NOW)).daLamHomNay).toBe(4)
+  expect((await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-13', '2026-10-13', '2026-10-13'))?.map((n) => n.daLam)).toEqual([4])
+})

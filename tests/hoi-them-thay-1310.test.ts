@@ -245,6 +245,25 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     expect(d.dem('hoi_tro_ly', "model='gemini-flash-lite-latest' AND loi IS NULL")).toBe(1)
   })
 
+  it('sổ hỏi Thầy (thầy 13/10 khuya: "bao nhiêu lượt hỏi, từ những số báo danh nào, hỏi câu gì"): chỉ máy thầy đọc được', async () => {
+    const { d, token } = await chuanBi()
+    giaGemini(() => traLoiJson({ lienQuan: true, yChinh: 'Em viết phương trình trước.' }))
+    await em(d, '/hs/hoi-thay', { token, qid: QA.ds })
+    await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Câu này bắt đầu từ đâu ạ?' })
+    await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Ý b sai chỗ nào ạ?' })
+    const so = await thay(d, '/gv/hoi-tro-ly/so', {})
+    expect(so).toMatchObject({ ok: true, tong: { luot: 2, traLoi: 2, ngoaiPhamVi: 0, loi: 0, soEm: 1, soCau: 1 } })
+    expect(so.theoEm).toEqual([expect.objectContaining({ sbd: SBD, ten: 'Nguyễn Văn Thử', lop: '12', soLuot: 2, soCau: 1 })])
+    expect(so.luot.map((x: { cauHoi: string }) => x.cauHoi)).toEqual(['Ý b sai chỗ nào ạ?', 'Câu này bắt đầu từ đâu ạ?']) // mới nhất trước
+    expect(so.luot[0]).toMatchObject({ sbd: SBD, ten: 'Nguyễn Văn Thử', qid: QA.ds, ngoaiPhamVi: false, loi: '' })
+    expect(so.luot[0].traLoi).toContain('Em viết phương trình trước.')
+    expect(await thay(d, '/gv/hoi-tro-ly/so', { sbd: 'SBD-KHAC-1' })).toMatchObject({ ok: true, sbd: 'SBD-KHAC-1', tong: { luot: 0 }, theoEm: [], luot: [] })
+    expect(await thay(d, '/gv/hoi-tro-ly/so', { sbd: 'x y' })).toMatchObject({ ok: false })
+    const lo = await em(d, '/gv/hoi-tro-ly/so', { token })
+    expect(lo.ok).toBe(false) // học sinh (không mã bí mật) không đọc được sổ
+    expect(JSON.stringify(lo)).not.toContain('bắt đầu từ đâu')
+  })
+
   it('lệnh thầy (13/10): xem lượt hôm nay, đặt lại (KHÔNG xoá sổ), SBD thử không giới hạn lượt; em không gọi được', async () => {
     const { d, token } = await chuanBi()
     d.sql.prepare("INSERT INTO cau_hinh(khoa, gia_tri, cap_nhat_luc) VALUES('hoi_tro_ly', '{\"tranNgay\":1}', 'x')").run()

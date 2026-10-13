@@ -81,3 +81,27 @@ Codex KHÔNG đẩy thêm vào `codex/de-kiem-tra-2026-1310`. Claude đã gộp 
 
 ## 13/10 — Thầy nhắc phần sửa hạn chưa xuất hiện
 - [x] PR269: cập nhật main mới, giữ Hỏi Thầy hiện tại; đã kiểm cổng và gửi Claude soát. Nút Sửa hạn tại từng dòng Bài đang giao;7tệp99/99,tốc độ/màu/SWđạt, so full không có lỗi mới còn tái hiện. Thầy nhắc ảnh chưa có nút nên ưu tiên phát hành; không sửa hạn D1 thay thầy.
+
+## 14/10 00:00 — DỌN CODE GAME + CHIẾN DỊCH CŨ, TỐI ƯU TỐC ĐỘ (thầy 13/10 22:2x)
+Thầy: "sau 00h bạn phải tối ưu chuyên sâu tốc độ ở mọi chỗ, xóa tất cả các code không liên quan, đảo đoàn, bia, chiến dịch cũ các thứ. Phải rút gọn và tối ưu code ở cấp độ siêu chuyên nghiệp … Cái này phải làm bằng được" · "bạn làm việc này với thằng codex nữa nhé".
+
+Chia làn (không giẫm tệp): **Codex = phía máy em/thầy (`src/`, `public/`, test giao diện)** · **Claude = máy chủ (`server/`, test máy chủ)**. Bảng kiểm kê đầy đủ (tệp, dòng, chỗ gắn, phần DÙNG CHUNG không được xoá): `docs/kiem-ke-don-game-1410.md`.
+
+Luật chung cho mọi mục dưới:
+- CHỈ xoá CODE và ẢNH. Không xoá bảng / dòng D1, không đổi schema. Durable Object `BAN_BIA` giữ nguyên ràng buộc (Claude thay bằng lớp rỗng phía máy chủ).
+- Không đổi luồng đang dùng: Hôm nay / Gói 7 / Hành trình / Sửa từng bước / Kiểm tra cá nhân / Gọi lên bảng / Bài hằng ngày / phụ huynh. Giữ nguyên tệp DÙNG CHUNG ghi ở mục B của bảng kiểm kê (vd `src/game/than-thu-v2/core.ts`, `evolution.ts`, `anh-webp.ts`, `dao/anh.ts`, `academic-sync.ts`, `Reports.tsx`, `src/components/chien-dich/{api.ts,ChonEmGiao,BangChienDich,BuoiChua,HanhTrinhV2,HoSoLamCauEm,BangGoi7}`, `hoa2/api.ts`, ảnh `nho/thu-*`, `evolution-*-cutout.*`, `bat-linh/canh-dao*`).
+- Test: xoá test CHỈ khoá phần đã xoá (danh sách mục C); test chạm cả hai thì sửa bản giả, không `skip`. So toàn bộ vitest theo tên với `main`: 0 test đỏ mới.
+- Cổng `AGENTS.md` mục 4; `npm run build && npm run kiem:toc-do` 0 đỏ và **HẠ mốc** `docs/moc-toc-do.json` theo số mới (chỉ hạ); `node scripts/kiem-sw.mjs` 13/13; `npm run kiem:mau-giu` 0.
+- Không phát hành 19:00–23:59 (giờ cao điểm em làm bài), trừ sửa khẩn.
+
+- [ ] **C1. Gỡ Đảo thần thú + Đoàn Hộ Tống + Bi-a phía app** (`src/game/than-thu-v2/` phần Đảo/Đoàn/cửa hàng/phụ kiện, `dao/**` trừ `dao/anh.ts`, `dao2/**`, `doan2/**`, `shop/**`, `phu-kien/**`, `src/game/bi-a/**`, sảnh đảo `hoa2/{SanhBanDo,CanhSanh3D,…}`, `ban-duyet-v2/*`, `bat-linh/{BanDoHanhTrinh,DongHanh,…}`, `chien-dich/CongTacBia.tsx`; chỗ gắn: `man-sanh-luoi.ts:23,45-88`, `StudentPortalScreen.tsx:200,278`, `BangTinPhuHuynh.tsx:589-616`, `ParentPortalScreen.tsx:1` → `bat-linh/LoiChao`, `main.tsx:45` `game-toan-bo.css`, `CaiDatScreen.tsx:17,101`).
+  - THỨ TỰ: máy chủ đang import `src/game/than-thu-v2/{doan-core,escort-core}.ts` và `src/game/bi-a/{luat,nguyen-to,tran}.ts` ⇒ năm tệp này Codex xoá SAU khi PR máy chủ của Claude (gỡ Đoàn/Bi-a/Đảo phía `server/`) gộp — Claude ghi Nhật ký khi gộp. Phần còn lại của C1 làm song song được.
+  - Ảnh chỉ của phần đã gỡ (~47 MB): `public/than-thu-v2/{spells,combat}`, `public/bat-linh/{ban-do-dao*,canh-ho-tong*,quai-son-thuy,xe-linh-tam,bieu-cam-1,bieu-cam-2}.webp`, `public/than-thu-v2/nho/the-*.webp`. Soát `vite.config.ts` (`globIgnores`, ảnh đăng nhập) trước khi xoá.
+  - Nghiệm thu: `npx tsc -b` sạch; không còn import tới thư mục đã xoá (`rg "bi-a/|doan2/|dao2/|shop/|phu-kien/" src` rỗng trừ tệp dùng chung); byte tải mở app học sinh / phụ huynh / thầy GIẢM so mốc; Chromium thật mở 3 app (360×800, 1280×800, sáng/tối): 0 lỗi JS, tab cũ `thanthu`/`bia` vẫn về Hôm nay.
+- [ ] **C2. Gỡ giao diện chiến dịch cũ** (`chien-dich/{GiaoChienDich,DsChienDichDaGiao,SuaChienDich,HopChon,DongHoSucChua,sua-chien-dich.css,NutGiaoTheoBai}`, `lib/tom-tat-sua-chien-dich.ts`, `screens/TongQuanScreen.tsx`; chỗ gắn `ChienDichScreen.tsx:11-12,20,29-30,37-79`, `CaiDatScreen.tsx:39-41,~105-118`, `ExamMonitorScreen.tsx:12,1346,1844,1942-1950`). **Giữ** mục Hành trình (`ThanhBenTrai.tsx:62` `chiendich`). Hàm cũ chỉ phần đã xoá dùng trong `chien-dich/api.ts` (`taoChienDich`, `tinhSucChua`, `huyChienDich`, `doiRaiDeu`, `danhSachThongKe`, `*Sua*`) xoá theo.
+  - Nghiệm thu: như C1; màn Hành trình / Ca kiểm tra / Cài đặt mở đủ, 0 lỗi JS.
+- [ ] **C3. Tick bài (làn Codex — tiếp PR269 Sửa hạn).** Thầy 13/10 nguyên văn: "phần tick bài hiện tại load khá lâu, có lúc không load được, mục lưu hạn từng lớp bấm lưu bị nhảy sang màn khác, tôi muốn bấm lưu xong hiện đã lưu không nhảy, thêm một nút sửa hạn hàng loạt nhé. Tối ưu chỗ này cho phản hồi tức thì đi. Cho tôi thêm phần thêm em và bớt em trong phần đó luôn, xóa bỏ hết phần thêm em của bản cũ chiến dịch nhé, khi thêm em vào thuật toán phân câu giữ nguyên nhé."
+  - Sửa lỗi làm thẳng: tải chậm / không tải được (đo số đợt D1 + byte, tải song song, khung xương ngay); bấm Lưu hạn ở lại màn, hiện "Đã lưu" tại chỗ.
+  - Tính năng mới (nút Sửa hạn hàng loạt; Thêm em / Bớt em trong Tick bài) theo QUY TRÌNH 4 BƯỚC: đặc tả 7 mục + bản vẽ Chromium thật 3 khổ sáng/tối → thầy duyệt → build. Thêm em: em mới nhận đúng gói như em cũ cùng lớp; thuật toán phân câu Gói 7 (`goi-bai-7.ts` `chonGoi7`/quota) KHÔNG đổi — tệp dùng chung, báo trước trong Nhật ký nếu phải chạm.
+  - Xoá nút "Sửa em" chiến dịch cũ ở `day-hoc/BaiHomNay.tsx:87,438-444,564,601,731-743` (cùng PR với Thêm/Bớt em mới để thầy không mất chức năng giữa chừng).
+  - Nghiệm thu: test giao diện cho Lưu không nhảy màn + "Đã lưu"; test máy chủ thêm em ⇒ em có gói, bớt em ⇒ em không còn nhận câu gói, phân câu em cũ không đổi (so kế hoạch trước/sau).
