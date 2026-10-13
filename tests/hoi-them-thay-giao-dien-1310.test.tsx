@@ -40,6 +40,7 @@ describe('ô hỏi thêm Thầy', () => {
     expect(onTraLoi).toHaveBeenCalledTimes(1)
     expect(o().value).toBe('')
     expect(container.textContent!.toLowerCase()).not.toContain('trợ lý')
+    expect(screen.getByText('KIÊN TRÌ là vũ khí tối thượng để chiến thắng mọi thứ')).toBeTruthy() // thầy 13/10: thay dòng "Trả lời tự động…"
   })
 
   it('Enter gửi, Shift+Enter xuống dòng', async () => {

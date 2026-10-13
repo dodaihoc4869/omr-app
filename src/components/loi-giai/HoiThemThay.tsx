@@ -92,7 +92,7 @@ export default function HoiThemThay({ qid, nguon, gon = false, onTraLoi }: { qid
           />
           <button type="submit" className="lg-ht-gui" disabled={dangGui || dung || chu.trim().length < 2}>Gửi</button>
         </div>
-        <p className="lg-ht-phu">Trả lời tự động theo lời giải của Thầy. Chỗ nào chưa chắc em hỏi Thầy trên lớp.</p>
+        <p className="lg-ht-phu">KIÊN TRÌ là vũ khí tối thượng để chiến thắng mọi thứ</p>
       </form>
     </section>
   )
