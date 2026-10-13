@@ -250,7 +250,11 @@ const VUA_LAM_MS = 15 * 60_000
  * LỖI 13/10 20:11 (em báo "còn một câu mà nó báo hoàn thành", sảnh 23/24): lệnh nộp câu ghi `game_v2_attempt` NGAY trong lô chấm, còn dòng sổ học ghi SAU
  * khi đã trả lời máy em (`ctx.waitUntil`). Mở chặng / đếm ngay sau câu cuối ⇒ sổ chưa có câu ấy ⇒ bộ đếm 23/24 và kế hoạch xếp LẠI đúng câu vừa làm,
  * còn `startGoi7` (luật 13/10 không phát lại câu vừa trả lời) bỏ nó ⇒ chặng rỗng ⇒ "Em đã hoàn thành…". Nay kế hoạch + bộ đếm cùng thấy câu vừa làm
- * ngay. Mã câu quy về câu gốc (bản ảo `~ss|bt|ydN`, lần `#n` — `tachSongSinh`) như sổ. Cùng đợt đọc (không thêm vòng chờ D1); chỉ mục `game_v2_attempt(sbd, created_at)`.
+ * ngay. Cùng đợt đọc (không thêm vòng chờ D1); chỉ mục `game_v2_attempt(sbd, created_at)`.
+ * MỘT SỐ VỚI LỊCH NGÀY (lỗi 13/10 22h, thầy: "app báo đủ mức rồi mà hôm nay lại báo thiếu" — Hôm nay 24/24, lịch ngày 19/24): (1) tập ĐÃ LÀM thêm ĐÚNG mã
+ * sổ ghi (mã đã phát, kể cả bản ảo `~ss|bt|ydN` / lần `#n`) — trước cộng mã GỐC ⇒ câu ảo vừa làm đếm hai lần (mã sổ + mã gốc) suốt 15 phút, kế hoạch
+ * tưởng đủ mức, ngừng phát câu; (2) chỉ thêm lượt CHƯA có dòng sổ — lượt đã ghi sổ thì sổ quyết định như lịch ngày (lướt / chẩn đoán không tính).
+ * `vuaLam` (chặn phát lại) giữ cả mã đã phát lẫn mã gốc (`tachSongSinh`).
  * `now` vắng ⇒ như cũ (chỉ sổ). Lỗi đọc bảng lượt ⇒ bỏ phần thêm, như cũ.
  */
 export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now?: number): Promise<{ daLam: Set<string>; vuaLam: Set<string> }> {
@@ -258,12 +262,13 @@ export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now
   const [done, guidedToday, vua] = await Promise.all([
     env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>(),
     env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
-    tu ? env.DB.prepare('SELECT DISTINCT qid FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,tu).all<{qid:string}>().catch(() => ({ results: [] as {qid:string}[] })) : Promise.resolve({ results: [] as {qid:string}[] }),
+    // `co_so`: lượt đã có dòng sổ (chỉ mục su_kien_hoc(sbd, qid, ngay_vn)) ⇒ sổ quyết định (lướt / chẩn đoán không tính); chưa có ⇒ đang chờ ghi, tính ngay.
+    tu ? env.DB.prepare('SELECT a.qid,EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=a.sbd AND s.qid=a.qid AND s.ngay_vn=? AND s.attempt_id=a.id) co_so FROM game_v2_attempt a WHERE a.sbd=? AND a.created_at>=?').bind(ngay,sbd,tu).all<{qid:string;co_so:number}>().catch(() => ({ results: [] as {qid:string;co_so:number}[] })) : Promise.resolve({ results: [] as {qid:string;co_so:number}[] }),
   ])
   const daLamNgay = new Set(done.results.map(r=>r.qid))
   for(const r of guidedToday.results)daLamNgay.add(r.qid)
   const vuaLam = new Set<string>()
-  for(const r of vua.results){const q=str(r.qid);if(!q)continue;vuaLam.add(q);const goc=tachSongSinh(q.replace(/#\d+$/,'')).goc;vuaLam.add(goc);daLamNgay.add(goc)}
+  for(const r of vua.results){const q=str(r.qid);if(!q)continue;vuaLam.add(q);vuaLam.add(tachSongSinh(q).goc);if(!Number(r.co_so))daLamNgay.add(q)}
   return { daLam: daLamNgay, vuaLam }
 }
 /**
