@@ -3,6 +3,7 @@
 // `onMoLoiGiai`: nơi chỉ có MỘT nút Hỏi thầy (phiếu bài làm) ⇒ thêm lối sang lời giải từng bước ngay trong hộp.
 // `dangLam`: em đang làm câu, chưa nộp ⇒ một dòng báo Thầy chỉ gợi hướng; không có lối sang lời giải.
 // Vẽ qua portal vào <body>: thẻ câu trong game/màn cuộn có transform ⇒ `position: fixed` lệch khỏi màn nếu nằm trong thẻ.
+// `cau = null` (tốc độ, thầy 13/10): hộp mở NGAY lúc em bấm, đề câu đang tới ⇒ ba vạch chờ; ô nhắn dùng `qid` của nút (gõ trước được).
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { BookOpenText, MessageCircleQuestion, X } from 'lucide-react'
@@ -37,7 +38,7 @@ function tachDe(html: string): { chu: string; con: string } | null {
 }
 const LOAI_CAU = { tn: 'Trắc nghiệm', ds: 'Đúng / Sai', tln: 'Trả lời ngắn' } as const
 
-export default function HopHoiThay({ cau, nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false }: { cau: CauChoKhung; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean }) {
+export default function HopHoiThay({ cau, qid = '', nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false }: { cau: CauChoKhung | null; qid?: string; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean }) {
   const id = useId()
   const dongRef = useRef(onDong)
   dongRef.current = onDong
@@ -47,10 +48,10 @@ export default function HopHoiThay({ cau, nguon, onDong, onTraLoi, onMoLoiGiai, 
     window.addEventListener('keydown', phim)
     return () => { window.removeEventListener('keydown', phim); truoc?.focus?.() }
   }, [])
-  const y = Object.entries(cau.y)
-  const de = useMemo(() => tachDe(cau.de), [cau.de])
+  const y = cau ? Object.entries(cau.y) : []
+  const de = useMemo(() => (cau ? tachDe(cau.de) : null), [cau?.de]) // eslint-disable-line react-hooks/exhaustive-deps
   const loai = !y.length ? 'tln' : /^[A-D]$/.test(y[0]![0]) ? 'tn' : 'ds'
-  const yChu = useMemo(() => y.map(([k, t]) => [k, chuCuaHtml(t)] as const), [cau.y]) // eslint-disable-line react-hooks/exhaustive-deps
+  const yChu = useMemo(() => y.map(([k, t]) => [k, chuCuaHtml(t)] as const), [cau?.y]) // eslint-disable-line react-hooks/exhaustive-deps
   const ngan = loai === 'tn' && yChu.every(([, t]) => t.length <= 24)
   // Đề mở sẵn lúc em chưa hỏi; Thầy trả lời câu đầu ⇒ gập thành một dòng nhường chỗ cho lời giải (chạm để mở lại).
   const [deMo, setDeMo] = useState(true)
@@ -61,7 +62,7 @@ export default function HopHoiThay({ cau, nguon, onDong, onTraLoi, onMoLoiGiai, 
           <span className="lg-hh-hinh" aria-hidden="true"><MessageCircleQuestion size={22} strokeWidth={2.2} /></span>
           <div className="lg-hh-ten">
             <h2 id={`${id}-t`} className="lg-hh-tieu-de">Hỏi Thầy</h2>
-            <p className="lg-hh-phu">{cau.so}{cau.chuong ? ` · ${cau.chuong}` : ''}</p>
+            <p className="lg-hh-phu">{cau ? `${cau.so}${cau.chuong ? ` · ${cau.chuong}` : ''}` : 'Đang mở đề câu…'}</p>
           </div>
           <button type="button" className="lg-hh-dong" onClick={onDong} aria-label="Đóng"><X size={20} strokeWidth={2.2} aria-hidden="true" /></button>
         </header>
@@ -69,11 +70,13 @@ export default function HopHoiThay({ cau, nguon, onDong, onTraLoi, onMoLoiGiai, 
           <summary>
             Đề câu
             {!deMo && de && <span className="lg-de-tom">{de.chu.replace(/\s+/g, ' ')}</span>}
-            <span className="lg-de-loai">{LOAI_CAU[loai]}</span>
+            {cau && <span className="lg-de-loai">{LOAI_CAU[loai]}</span>}
           </summary>
           <div className="lg-hh-de-than lg-de-chuan">
             {/* `cau.de`, chữ từng ý: máy chủ dựng từ chữ kho đã thoát HTML (như khung lời giải) — KHÔNG có đáp án */}
-            {de ? (
+            {!cau ? (
+              <div className="lg-hh-cho-de" role="status"><span className="sr-only">Đang mở đề câu</span><i /><i /><i /></div>
+            ) : de ? (
               <>
                 <p className="lg-de-chu"><b>{cau.so}.</b> <ChemText text={chuHoa(de.chu)} /></p>
                 {de.con && <div className="lg-chu-de" dangerouslySetInnerHTML={{ __html: de.con }} />}
@@ -95,7 +98,7 @@ export default function HopHoiThay({ cau, nguon, onDong, onTraLoi, onMoLoiGiai, 
             <span>Xem lời giải từng bước</span>
           </button>
         )}
-        <HoiThemThay qid={cau.qid} nguon={nguon} hop dangLam={dangLam} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
+        <HoiThemThay qid={cau?.qid ?? qid} nguon={nguon} hop dangLam={dangLam} choDe={!cau} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
       </div>
     </div>,
     document.body,

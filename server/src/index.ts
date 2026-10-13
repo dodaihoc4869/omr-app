@@ -3709,9 +3709,11 @@ const boXuLy = {
       if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
       if (p === '/hs/hoi-thay') {
         // HỎI THÊM THẦY (13/10, hoi-tro-ly.ts): phản hồi mở được lời giải ⇒ kèm `hoiThem` = máy em hiện ô nhắn hỏi Thầy (AI) dưới lời giải.
-        const r = await hsHoiThay(env, b) as Record<string, unknown>
-        if (r.ok === true) r.hoiThem = await import('./hoi-tro-ly').then(async (m) => m.hoiThemBatCho(env, await gameIdentity(env, b))).catch(() => false)
-        return ra(r)
+        // Tốc độ (thầy 13/10): cờ đọc SONG SONG với các lượt kiểm của hsHoiThay; việc ghi sổ chạy sau phản hồi (ctx.waitUntil).
+        return ra(await hsHoiThay(env, b, {
+          hoiThem: (sbd) => import('./hoi-tro-ly').then((m) => m.hoiThemBatCho(env, sbd)),
+          sau: ctx ? (viec) => ctx.waitUntil(viec) : undefined,
+        }))
       }
       if (p === '/hs/hoi-tro-ly') return ra(await import('./hoi-tro-ly').then((m) => m.hsHoiTroLy(env, b)))
       if (p === '/hs/doc-loi-giai') return ra(await hsDocLoiGiai(env, b))

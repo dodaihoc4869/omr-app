@@ -7,7 +7,7 @@
 // `chi`: 'hoi' | 'giai' — chỉ vẽ một nút (màn đã có nút kia ở chỗ khác).
 // Phần hỏi Thầy chưa bật cho em ⇒ "Hỏi thầy" mở lời giải như cũ (không có nút chết). Câu chưa có hồ sơ từng bước ⇒ báo "thầy đang soạn".
 // `onHoi`: gọi khi em nhận được trợ giúp (mở lời giải, hoặc Thầy trả lời câu hỏi đầu tiên) — game tính câu này là "có trợ giúp", không nhận thưởng.
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { BookOpenText, MessageCircleQuestion } from 'lucide-react'
 import { CHU_LAM_XONG, docTokenHs, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung } from '../../lib/loi-giai-api'
 import './loi-giai.css'
@@ -20,6 +20,19 @@ const HopHoiThay = lazy(napHop)
 const KhungLoiGiai = lazy(napKhung)
 const NutChuaTungBuoc = lazy(() => import('../chua-cau-sai/NutChuaTungBuoc'))
 
+// TỐC ĐỘ (thầy 13/10: "Tốc độ bấm vào hỏi thầy hơi chậm tối ưu lại tốc độ nhanh nhất"):
+//  · mảnh hộp Hỏi Thầy tải sẵn lúc máy RẢNH (một lần cho cả app, sau khi màn đã vẽ xong — không cộng vào lượt mở app);
+//  · bấm là hộp nảy lên NGAY, đề câu tới sau (máy chủ nay 5 đợt D1 thay 12, lần sau 2 thay 6) — máy chủ từ chối thì hộp đóng, báo đúng lý do như cũ.
+let daNapSan = false
+function napSanHop() {
+  if (daNapSan) return
+  daNapSan = true
+  const chay = () => { void napHop().catch(() => { daNapSan = false }) }
+  const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
+  if (w.requestIdleCallback) w.requestIdleCallback(chay, { timeout: 4000 })
+  else setTimeout(chay, 1500)
+}
+
 export const CHU_DANG_SOAN = 'Thầy đang soạn lời giải từng bước cho câu này. Em chờ một chút rồi bấm lại nhé.'
 export { CHU_LAM_XONG }
 
@@ -29,17 +42,24 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
   const [dangTai, setDangTai] = useState<'' | 'hoi' | 'giai'>('')
   const [loi, setLoi] = useState('')
   const [mo, setMo] = useState<{ cau: CauChoKhung; hoSo: HoSoLoiGiai; kiem?: KiemKhung } | null>(null)
-  const [hop, setHop] = useState<{ cau: CauChoKhung; dangLam: boolean } | null>(null)
-  if (!qid || !docTokenHs()) return null
+  const [hop, setHop] = useState<{ cau: CauChoKhung | null; dangLam: boolean } | null>(null)
+  const luot = useRef(0) // lượt bấm hiện tại: em đóng hộp trong lúc chờ ⇒ phản hồi đến muộn không mở lại hộp
+  const coPhien = !!qid && !!docTokenHs()
+  useEffect(() => { if (coPhien && chi !== 'giai') napSanHop() }, [coPhien, chi])
+  if (!qid || !coPhien) return null
   const coHoi = chi !== 'giai'
   const coGiai = chi !== 'hoi' && !dangLam
   const bam = async (kieu: 'hoi' | 'giai') => {
+    const so = ++luot.current
     setDangTai(kieu)
     setLoi('')
+    if (kieu === 'hoi') setHop({ cau: null, dangLam })
     const [r] = await Promise.all([hoiThay(qid, nguon, dangLam), (kieu === 'hoi' ? napHop() : napKhung()).catch(() => null)])
+    if (so !== luot.current) return
     setDangTai('')
-    if (!r.ok) { setLoi(r.loi); return }
+    if (!r.ok) { setHop(null); setLoi(r.loi); return }
     if (kieu === 'hoi' && r.hoiThem) { setHop({ cau: r.cau, dangLam }); return }
+    setHop(null)
     if (dangLam || 'chiHoi' in r) { setLoi(CHU_LAM_XONG); return }
     // Thầy chốt 29/09: câu CHƯA có lời giải từng bước ⇒ KHÔNG hiện lời giải ngắn của kho, chỉ báo đang soạn (không tính "có trợ giúp").
     if (!r.hoSo) { setLoi(CHU_DANG_SOAN); return }
@@ -64,7 +84,7 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
       {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={qid} /></Suspense>}
       {loi && <span className="lg-loi" role="status">{loi}</span>}
       <Suspense fallback={null}>
-        {hop && <HopHoiThay cau={hop.cau} nguon={nguon} dangLam={hop.dangLam} onTraLoi={onHoi} onDong={() => setHop(null)} />}
+        {hop && <HopHoiThay cau={hop.cau} qid={qid} nguon={nguon} dangLam={hop.dangLam} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
         {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
       </Suspense>
     </div>

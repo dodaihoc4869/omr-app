@@ -16,7 +16,7 @@
 //   · hàng phát CÂU EM ĐÃ SAI chưa có bản khác trước (nâng `loi_giai_viec` + việc "chỉ học liệu" ở `may_soan_viec`), rồi thứ tự cũ;
 //   · cờ đáp án: máy TỰ XỬ (giải lại độc lập) — còn lệch ⇒ câu vào `cau_nghi_dap_an`, danh sách sửa kho tách riêng `nghiTuXu` (không báo thầy).
 import type { Env } from './kieu'
-import { gameIdentity } from './game-v2-auth'
+import { gameIdentity, gameIdentityHaiBuoc } from './game-v2-auth'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { coCaDangMo } from './bi-a'
 import { protectedQuestions } from './game-v2-bank'
@@ -557,49 +557,88 @@ function loiGiaiChu(c: CauKho) {
  *   - câu nằm trong một ca kiểm tra CHƯA công bố kết quả (của bất kì em nào) ⇒ khoá câu ấy, kẻo em làm xong chuyền lời giải cho bạn chưa làm.
  * Có hồ sơ xem được ⇒ trả hồ sơ + câu cho khung. Chưa có ⇒ trả lời giải chữ của kho và đẩy câu lên đầu hàng soạn.
  * Mỗi lần bấm ghi một dòng `loi_giai_hoi` (em đã xem lời giải câu này).
+ *
+ * TỐC ĐỘ (thầy 13/10: "Tốc độ bấm vào hỏi thầy hơi chậm tối ưu lại tốc độ nhanh nhất"): các lượt ĐỌC không phụ thuộc nhau chạy CÙNG một
+ * đợt (Promise.all) — mật khẩu còn khớp, ca mở, tập câu bảo vệ, mã đề + gói R2 (đoán từ qid), cờ hỏi Thầy; rồi một đợt theo băm (bản chép
+ * đang bảo vệ, hồ sơ xem được, hồ sơ R2, học liệu bổ trợ). Thứ tự CHẶN và lời báo giữ như cũ: chưa qua chặn thì không trả gì của câu.
+ * Việc GHI (sổ đã hỏi, hàng soạn, sự kiện ôn lại) chạy SAU phản hồi (`sau` = ctx.waitUntil) — không tiếp tục chặn lượt chờ của em.
+ * `hoiThem(sbd)`: cờ máy em hiện ô hỏi Thầy (index.ts) — đọc song song từ đầu, chỉ gắn vào phản hồi mở được.
  */
-export async function hsHoiThay(env: Env, b: Obj) {
-  await damBaoBangLoiGiai(env)
-  const sbd = await gameIdentity(env, b)
+export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: string) => Promise<boolean>; sau?: (viec: Promise<unknown>) => void } = {}) {
+  const bang = damBaoBangLoiGiai(env)
+  const { sbd, xong } = await gameIdentityHaiBuoc(env, b) // bước 1 không chạm D1: token hỏng ⇒ ném ngay như cũ
   const qid = qidGoc(str(b.qid)) // câu game có hậu tố "#n" cho lượt lặp
   const nguon = str(b.nguon).slice(0, 40) || 'luyen'
-  if (!qid) return { ok: false, error: 'Thiếu câu cần hỏi.' }
+  if (!qid) { await Promise.all([bang, xong]); return { ok: false, error: 'Thiếu câu cần hỏi.' } }
   const nay = Date.now()
-  if (await coCaDangMo(env, sbd, nay)) return { ok: false, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở nên nút Hỏi thầy tạm khoá. Làm xong ca kiểm tra rồi hỏi nhé.' }
-  if (await cauDangBaoVe(env, qid)) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
-  const ht = await cauHienTai(env, qid).catch(() => null)
-  if (!ht) return { ok: false, error: 'Không tìm thấy câu này trong kho đề.' }
-  // Bản chép cùng nội dung ở tờ khác đang bảo vệ ⇒ khoá như chính câu ấy (dùng chung hồ sơ lời giải và đáp án).
-  if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
-  // THẦY 13/10 "nút hỏi bài ở tất cả các câu… hỏi bài thầy mọi lúc": em ĐANG LÀM câu (chưa trả lời/nộp) bấm Hỏi thầy ⇒ `chiHoi`: chỉ đề
-  // để hiện trong hộp hỏi Thầy, KHÔNG đáp án, KHÔNG lời giải, KHÔNG ghi `loi_giai_hoi` (em chưa xem lời giải). Thầy (AI) chỉ gợi hướng.
-  if (b.chiHoi === true) return { ok: true, chiHoi: true, cau: cauChoKhung(ht.c) }
-  const dong = await env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>()
-  const hoSo = dong ? await docHoSo(env, ht.bam) : null
-  const luc = new Date(nay).toISOString()
-  const ghi = [env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,?)').bind(sbd, qid, nguon, luc, hoSo ? 1 : 0)]
-  if (!hoSo) {
-    // Câu học sinh hỏi mà chưa có hồ sơ ⇒ lên đầu hàng soạn (mục 5.6: câu học sinh cần). Chưa vào hàng thì xếp cả đề ngay.
-    const coViec = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_viec WHERE bam = ?').bind(ht.bam).first<Obj>()
-    if (!coViec) await ghiCauVaoHang(env, ht.c.maDe, await docGoi(env, ht.c.maDe)).catch(() => null)
-    ghi.push(env.DB.prepare("UPDATE loi_giai_viec SET uu_tien = uu_tien + 3000 WHERE bam = ? AND trang_thai = 'cho' AND uu_tien < 3000").bind(ht.bam))
-  }
-  await env.DB.batch(ghi).catch(() => null)
-  // ÔN LẠI: hỏi thầy khi CHƯA nộp câu hôm nay ⇒ ghi trước lần làm đầu tiên của câu là "có trợ giúp" (assisted, chưa đúng).
-  // Ôn lại lấy kết quả LẦN ĐẦU trong ngày (nộp lại không đổi) ⇒ em không nhận EXP cho câu vừa xem lời giải, câu quay lại lịch ôn để tự làm.
-  // Đã nộp rồi mới hỏi thì khoá trùng ⇒ không đổi gì. Chỉ các nguồn có luật "lần đầu" này mới ghi (game tự gửi `assisted` khi trả lời).
-  if (nguon === 'on_lai') {
-    // 02/10 (Vòng học khép kín v2, GĐ1): dòng này chỉ KHOÁ lần làm hôm nay (không EXP, câu quay lại lịch ôn) — nó là sự kiện ĐỌC LỜI GIẢI,
-    // không phải một lần làm sai. `purpose = xem_loi_giai` ⇒ ôn tập / hồ sơ năm / năng lực bỏ qua dòng này khi đếm đúng–sai.
-    await ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngayVn(nay)}`, sbd, qid, lan: 1, ketQua: 0, luc, assistance: 'assisted', purpose: MUC_DICH_XEM_LOI_GIAI }]).catch(() => null)
-  }
-  const cau = cauChoKhung(ht.c)
-  if (hoSo) {
-    // Vòng học v2 GĐ2: câu có học liệu bổ trợ ⇒ kèm "Đọc từng bước" (chữ bước + câu kiểm KHÔNG đáp án + lời thầy gỡ). Không có ⇒ khung chạy như cũ.
-    const kiem = await kiemChoKhung(env, ht.bam).catch(() => undefined)
-    return { ok: true, coLoiGiai: true, hoSo, cau, ...(kiem ? { kiem } : {}) }
-  }
-  return { ok: true, coLoiGiai: false, cau, loiGiaiChu: loiGiaiChu(ht.c) }
+  const hoiThemP = tuyChon.hoiThem ? tuyChon.hoiThem(sbd).catch(() => false) : undefined
+  const [, , caMo, baoVe, ht] = await Promise.all([
+    bang, xong, coCaDangMo(env, sbd, nay), cauDangBaoVe(env, qid), cauHienTaiSongSong(env, qid, bang).catch(() => null),
+  ])
+  const kq = await (async (): Promise<Obj> => {
+    if (caMo) return { ok: false, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở nên nút Hỏi thầy tạm khoá. Làm xong ca kiểm tra rồi hỏi nhé.' }
+    if (baoVe) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
+    if (!ht) return { ok: false, error: 'Không tìm thấy câu này trong kho đề.' }
+    // THẦY 13/10 "nút hỏi bài ở tất cả các câu… hỏi bài thầy mọi lúc": em ĐANG LÀM câu (chưa trả lời/nộp) bấm Hỏi thầy ⇒ `chiHoi`: chỉ đề
+    // để hiện trong hộp hỏi Thầy, KHÔNG đáp án, KHÔNG lời giải, KHÔNG ghi `loi_giai_hoi` (em chưa xem lời giải). Thầy (AI) chỉ gợi hướng.
+    const chiHoi = b.chiHoi === true
+    // Đọc theo băm SONG SONG với lượt kiểm bản chép: hồ sơ R2 + học liệu chỉ dùng khi qua chặn và hồ sơ xem được (lỗi đọc như cũ: chỉ khi cần).
+    const dongP = chiHoi ? null : env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>()
+    const hoSoP = chiHoi ? null : docHoSo(env, ht.bam)
+    const kiemP = chiHoi ? null : kiemChoKhung(env, ht.bam).catch(() => undefined)
+    dongP?.catch(() => {}); hoSoP?.catch(() => {})
+    // Bản chép cùng nội dung ở tờ khác đang bảo vệ ⇒ khoá như chính câu ấy (dùng chung hồ sơ lời giải và đáp án).
+    if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
+    if (chiHoi || !dongP || !hoSoP || !kiemP) return { ok: true, chiHoi: true, cau: cauChoKhung(ht.c) }
+    const hoSo = (await dongP) ? await hoSoP : null
+    const luc = new Date(nay).toISOString()
+    const ghiHet = (async () => {
+      const ghi = [env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,?)').bind(sbd, qid, nguon, luc, hoSo ? 1 : 0)]
+      if (!hoSo) {
+        // Câu học sinh hỏi mà chưa có hồ sơ ⇒ lên đầu hàng soạn (mục 5.6: câu học sinh cần). Chưa vào hàng thì xếp cả đề ngay.
+        const coViec = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_viec WHERE bam = ?').bind(ht.bam).first<Obj>()
+        if (!coViec) await ghiCauVaoHang(env, ht.c.maDe, await docGoi(env, ht.c.maDe)).catch(() => null)
+        ghi.push(env.DB.prepare("UPDATE loi_giai_viec SET uu_tien = uu_tien + 3000 WHERE bam = ? AND trang_thai = 'cho' AND uu_tien < 3000").bind(ht.bam))
+      }
+      await Promise.all([
+        env.DB.batch(ghi).catch(() => null),
+        // ÔN LẠI: hỏi thầy khi CHƯA nộp câu hôm nay ⇒ ghi trước lần làm đầu tiên của câu là "có trợ giúp" (assisted, chưa đúng).
+        // Ôn lại lấy kết quả LẦN ĐẦU trong ngày (nộp lại không đổi) ⇒ em không nhận EXP cho câu vừa xem lời giải, câu quay lại lịch ôn để tự làm.
+        // Đã nộp rồi mới hỏi thì khoá trùng ⇒ không đổi gì. Chỉ các nguồn có luật "lần đầu" này mới ghi (game tự gửi `assisted` khi trả lời).
+        // 02/10 (Vòng học khép kín v2, GĐ1): dòng này chỉ KHOÁ lần làm hôm nay (không EXP, câu quay lại lịch ôn) — nó là sự kiện ĐỌC LỜI GIẢI,
+        // không phải một lần làm sai. `purpose = xem_loi_giai` ⇒ ôn tập / hồ sơ năm / năng lực bỏ qua dòng này khi đếm đúng–sai.
+        nguon === 'on_lai'
+          ? ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngayVn(nay)}`, sbd, qid, lan: 1, ketQua: 0, luc, assistance: 'assisted', purpose: MUC_DICH_XEM_LOI_GIAI }]).catch(() => null)
+          : null,
+      ])
+    })()
+    ghiHet.catch(() => {})
+    if (tuyChon.sau) tuyChon.sau(ghiHet)
+    else await ghiHet
+    const cau = cauChoKhung(ht.c)
+    if (hoSo) {
+      // Vòng học v2 GĐ2: câu có học liệu bổ trợ ⇒ kèm "Đọc từng bước" (chữ bước + câu kiểm KHÔNG đáp án + lời thầy gỡ). Không có ⇒ khung chạy như cũ.
+      const kiem = await kiemP
+      return { ok: true, coLoiGiai: true, hoSo, cau, ...(kiem ? { kiem } : {}) }
+    }
+    return { ok: true, coLoiGiai: false, cau, loiGiaiChu: loiGiaiChu(ht.c) }
+  })()
+  if (kq.ok === true && hoiThemP) kq.hoiThem = await hoiThemP
+  return kq
+}
+
+/** `cauHienTai` cho nút Hỏi thầy: đọc gói R2 của mã đề ĐOÁN từ qid SONG SONG với lượt D1 tra mã đề (gần như luôn trùng) ⇒ bớt một lượt chờ R2.
+ *  Kết quả y như `cauHienTai(env, qid)`; `cho`: bảng loi_giai_cau đã có (DDL) rồi mới tra. */
+async function cauHienTaiSongSong(env: Env, qid: string, cho: Promise<void>): Promise<{ c: CauKho; bam: string } | null> {
+  const doan = /^(.+)-(?:III|II|I)-\d+$/.exec(qid)?.[1] ?? ''
+  const goiDoan = doan ? docGoi(env, doan) : null
+  goiDoan?.catch(() => {})
+  await cho
+  const maDe = str((await env.DB.prepare('SELECT ma_de FROM loi_giai_cau WHERE qid = ?').bind(qid).first<Obj>())?.ma_de) || doan
+  if (!maDe) return null
+  const goi = maDe === doan && goiDoan ? await goiDoan : await docGoi(env, maDe)
+  const c = cauTrongGoi(maDe, goi).find((x) => x.qid === qid)
+  return c ? { c, bam: await bamCau(c) } : null
 }
 
 /** Câu kiểm gửi xuống máy em: CHỈ đề + lựa chọn — đáp án (`dap_an`, `dung`, `sai_so`) ở lại máy chủ, chấm qua `/hs/cau-kiem`. */
@@ -611,6 +650,9 @@ export interface KiemKhung { buoc: string[]; cauKiem: CauKiemKhung[]; loiGo: { b
  * (một câu mỗi bước, bỏ đáp án), lời thầy gỡ gắn vào bước (bảng `loi_go`). Bước đánh số từ 0 như `cau_kiem.buoc`. Câu chưa có học liệu ⇒ undefined.
  */
 export async function kiemChoKhung(env: Env, bam: string): Promise<KiemKhung | undefined> {
+  // Tốc độ (13/10): lời thầy gỡ đọc SONG SONG với học liệu (trước: nối tiếp hai–ba đợt); không có học liệu thì bỏ kết quả ấy.
+  const goP = damBaoBangNutThat(env).then(() => env.DB.prepare('SELECT buoc, kieu, noi_dung FROM loi_go WHERE bam = ? ORDER BY luc').bind(bam).all<Obj>())
+    .catch(() => ({ results: [] as Obj[] }))
   const bt = (await docBoTro(env, [bam])).get(bam)
   if (!bt || !bt.buoc.length) return undefined
   const n = bt.buoc.length
@@ -621,8 +663,7 @@ export async function kiemChoKhung(env: Env, bam: string): Promise<KiemKhung | u
     daCo.add(k.buoc)
     cauKiem.push(k.kieu === 'chon' ? { buoc: k.buoc, kieu: 'chon', hoi: k.hoi, lua_chon: (k.lua_chon ?? []).map(String) } : { buoc: k.buoc, kieu: 'so', hoi: k.hoi })
   }
-  await damBaoBangNutThat(env)
-  const r = await env.DB.prepare('SELECT buoc, kieu, noi_dung FROM loi_go WHERE bam = ? ORDER BY luc').bind(bam).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  const r = await goP
   const loiGo: KiemKhung['loiGo'] = []
   for (const x of r.results ?? []) {
     const buoc = Number(x.buoc)
@@ -690,25 +731,33 @@ export async function hsDocLoiGiai(env: Env, b: Obj) {
 /** Ngữ cảnh một câu cho phần hỏi thêm: ĐÚNG cổng chặn của nút Hỏi thầy, thêm điều kiện em đã bấm Hỏi thầy câu này trong 24 giờ qua
  *  (dòng `loi_giai_hoi` ⇒ lần xem đã tính "có trợ giúp" như hiện nay). Trả câu kho, hồ sơ xem được (nếu có), lời giải chữ, lời thầy gỡ. */
 export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, nowMs = Date.now(), dangLam = false) {
-  await damBaoBangLoiGiai(env)
+  // TỐC ĐỘ (thầy 13/10, ảnh "Thầy trả lời chưa kịp"): trước đây ~9 lượt D1/R2 NỐI TIẾP trước khi gọi Gemini. Nay: đợt 1 = ca mở, tập câu
+  // bảo vệ, mã đề + gói R2, đã bấm Hỏi thầy chưa, học liệu chữa câu sai; đợt 2 (theo băm) = bản chép bảo vệ, hồ sơ, học liệu bổ trợ, lời gỡ.
+  // Thứ tự CHẶN và lời báo giữ như cũ; lượt đọc thừa (bị chặn) chỉ bỏ kết quả.
+  const bang = damBaoBangLoiGiai(env)
   const qid = qidGoc(str(qidVao))
-  if (!qid) return { ok: false as const, error: 'Thiếu câu cần hỏi.' }
-  if (await coCaDangMo(env, sbd, nowMs)) return { ok: false as const, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở nên phần hỏi Thầy tạm khoá. Làm xong ca kiểm tra rồi hỏi nhé.' }
-  if (await cauDangBaoVe(env, qid)) return { ok: false as const, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
-  const ht = await cauHienTai(env, qid).catch(() => null)
-  if (!ht) return { ok: false as const, error: 'Không tìm thấy câu này trong kho đề.' }
-  if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false as const, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
-  const daHoi = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_hoi WHERE sbd = ? AND qid = ? AND luc >= ? LIMIT 1')
-    .bind(sbd, qid, new Date(nowMs - 24 * 3_600_000).toISOString()).first<Obj>()
+  if (!qid) { await bang; return { ok: false as const, error: 'Thiếu câu cần hỏi.' } }
   // Em đang làm (chưa nộp) ⇒ không cần đã mở lời giải: Thầy chỉ gợi hướng, không nêu đáp án (hoi-tro-ly.ts, `dangLam`).
-  if (!daHoi && !dangLam) return { ok: false as const, khoa: 'chua_mo', error: 'Em bấm Hỏi thầy ở câu này trước rồi nhắn hỏi nhé.' }
-  const dong = await env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>().catch(() => null)
-  const hoSo = dong ? await docHoSo(env, ht.bam).catch(() => null) : null
-  const kiem = hoSo ? await kiemChoKhung(env, ht.bam).catch(() => undefined) : undefined
-  // ĐỦ lời giải cho máy chủ (không xuống máy em): học liệu bổ trợ (bước + câu kiểm KÈM đáp án) và học liệu chữa câu sai đã đạt kiểm.
-  const boTro = (await docBoTro(env, [ht.bam]).catch(() => new Map())).get(ht.bam) ?? null
-  const hl = await env.DB.prepare("SELECT hoc_lieu_json FROM chua_loi_hoc_lieu WHERE qid_chuan = ? AND trang_thai = 'du_dung' ORDER BY cap_nhat_luc DESC LIMIT 1")
+  const daHoiP = dangLam ? null : bang.then(() => env.DB.prepare('SELECT 1 AS co FROM loi_giai_hoi WHERE sbd = ? AND qid = ? AND luc >= ? LIMIT 1')
+    .bind(sbd, qid, new Date(nowMs - 24 * 3_600_000).toISOString()).first<Obj>())
+  daHoiP?.catch(() => {})
+  const hlP = env.DB.prepare("SELECT hoc_lieu_json FROM chua_loi_hoc_lieu WHERE qid_chuan = ? AND trang_thai = 'du_dung' ORDER BY cap_nhat_luc DESC LIMIT 1")
     .bind(qid).first<Obj>().catch(() => null)
+  const [, caMo, baoVe, ht] = await Promise.all([bang, coCaDangMo(env, sbd, nowMs), cauDangBaoVe(env, qid), cauHienTaiSongSong(env, qid, bang).catch(() => null)])
+  if (caMo) return { ok: false as const, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở nên phần hỏi Thầy tạm khoá. Làm xong ca kiểm tra rồi hỏi nhé.' }
+  if (baoVe) return { ok: false as const, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
+  if (!ht) return { ok: false as const, error: 'Không tìm thấy câu này trong kho đề.' }
+  const dongP = env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>().catch(() => null)
+  const hoSoP = docHoSo(env, ht.bam).catch(() => null)
+  const kiemP = kiemChoKhung(env, ht.bam).catch(() => undefined)
+  // ĐỦ lời giải cho máy chủ (không xuống máy em): học liệu bổ trợ (bước + câu kiểm KÈM đáp án) và học liệu chữa câu sai đã đạt kiểm.
+  const boTroP = docBoTro(env, [ht.bam]).catch(() => new Map<string, never>())
+  if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false as const, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
+  if (!dangLam && !(await daHoiP)) return { ok: false as const, khoa: 'chua_mo', error: 'Em bấm Hỏi thầy ở câu này trước rồi nhắn hỏi nhé.' }
+  const [dong, hoSoTho, kiemTho, boTroMap, hl] = await Promise.all([dongP, hoSoP, kiemP, boTroP, hlP])
+  const hoSo = dong ? hoSoTho : null
+  const kiem = hoSo ? kiemTho : undefined
+  const boTro = boTroMap.get(ht.bam) ?? null
   let hocLieu: unknown = null
   try { hocLieu = hl ? JSON.parse(str(hl.hoc_lieu_json)) : null } catch { hocLieu = null }
   return { ok: true as const, qid, cau: ht.c, hoSo, loiGiaiChu: loiGiaiChu(ht.c), kiem, boTro, hocLieu }
