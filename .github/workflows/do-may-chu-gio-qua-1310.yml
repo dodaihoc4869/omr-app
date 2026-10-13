@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     env:
-      # 13/10 20:15 (VN): thầy báo màn Đường tự gỡ "Máy chủ phản hồi chậm" (hoa2-cau-chi-tiet quá 30 s) ⇒ đo 1 giờ cao điểm qua (có 3 lượt phát hành 19:48–20:05).
-      GIO: '1'
+      # 13/10 21:30 (VN): HS báo kẹt "Đang chuẩn bị những câu phù hợp với em…" (hoc-tap-start) ⇒ đo 45 phút qua (PR280 lên 21:03, PR282 ~21:15).
+      GIO: '0.75'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
