@@ -5,6 +5,7 @@
 //   C. SUBSTRATE QUYẾT TOÁN trên D1 THẬT (node:sqlite + đủ schema/migration): retry cùng request ⇒ receipt CŨ,
 //      key mâu thuẫn ⇒ IDEMPOTENCY_CONFLICT, cạnh tranh/ nhiều thiết bị ⇒ không cộng hai lần, qua ngày VN ⇒ NOT_FOUND.
 // Chỉ ĐỌC/GHI trên D1 GIẢ trong bộ nhớ với dữ liệu TỔNG HỢP. Không deploy, không chạm dữ liệu thật.
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ dòng đối chiếu + khẳng định dòng sổ `/game-v2/doan-nop` (Đoàn đã gỡ khỏi SO_TICH_HOP).
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { taoD1That, serialiseD1, type D1That } from './_d1-that'
@@ -22,7 +23,6 @@ const DOI_CHIEU: readonly (readonly [string, string, string])[] = [
   ['/game-v2/complete', 'server/src/game-v2.ts', "action==='complete'"],
   ['/game-v2/invest', 'server/src/game-v2.ts', "action==='invest'"],
   ['/game-v2/khien-ren', 'server/src/game-v2.ts', "action==='khien-ren'"],
-  ['/game-v2/doan-nop', 'server/src/game-v2-doan.ts', "action === 'doan-nop'"],
   ['/btvn/nop', 'server/src/index.ts', "p === '/btvn/nop'"],
   ['/btvn/xong-lo', 'server/src/index.ts', "p === '/btvn/xong-lo'"],
   ['/hs/on-lai/nop', 'server/src/index.ts', "p === '/hs/on-lai/nop'"],
@@ -68,9 +68,6 @@ describe('SỔ KIỂM route → P07: đủ dòng, không trùng, và KHỚP mã 
     const patch = deXuatPatch()
     expect(patch.length).toBe(12)
     for (const p of patch) expect(p.viec.length, p.duong).toBeGreaterThan(20)
-    // Đoàn KHÔNG nằm trong đề xuất patch (thuộc Aider) — đây là ràng buộc không sửa chồng.
-    expect(patch.map((p) => p.duong)).not.toContain('/game-v2/doan-nop')
-    expect(timDong('/game-v2/doan-nop')!.trangThai).toBe('ngoai_lat_nay')
   })
 })
 
@@ -92,11 +89,11 @@ describe('CỬA KÍCH HOẠT: fail-closed đúng mã, và strict metadata KHÔNG
     expect(kiemCuaKichHoat({ ...CUA_OK, duongCuConBat: true, viMoiLaChu: false, anhChupDaNoi: false }).ma).toBe('THIEU_ANH_CHUP')
     expect(kiemCuaKichHoat({ ...CUA_OK, duongCuConBat: true, viMoiLaChu: false }).choPhep).toBe(true)
   })
-  it('route lạ và route thuộc Aider đều bị từ chối (không tự nối, không sửa chồng)', () => {
+  it('route lạ và route Đoàn đã gỡ đều bị từ chối (không tự nối)', () => {
     expect(kiemTichHopRoute('/khong-co-that', CUA_OK)).toMatchObject({ choPhep: false, ma: 'CUA_KHONG_HOP_LE' })
-    const doan = kiemTichHopRoute('/game-v2/doan-nop', CUA_OK)
-    expect(doan).toMatchObject({ choPhep: false, ma: 'CUA_KHONG_HOP_LE' })
-    expect(doan.dong?.trangThai).toBe('ngoai_lat_nay')
+    // Đoàn đã gỡ (14/10) ⇒ không còn dòng sổ, cửa coi như route lạ.
+    expect(kiemTichHopRoute('/game-v2/doan-nop', CUA_OK)).toMatchObject({ choPhep: false, ma: 'CUA_KHONG_HOP_LE' })
+    expect(timDong('/game-v2/doan-nop')).toBeNull()
     const onLai = kiemTichHopRoute('/hs/on-lai/nop', CUA_OK)
     expect(onLai.choPhep).toBe(true)
     expect(onLai.dong?.duong).toBe('/hs/on-lai/nop')

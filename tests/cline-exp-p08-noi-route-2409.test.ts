@@ -1,11 +1,11 @@
 // @vitest-environment node
 // CNH-1.0 P08 — BẰNG CHỨNG NỐI ROUTE: nhánh `vang-doi` (shop) + `shield-use` (game) đi cửa P08.
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ 3 ca khối SHOP `vang-doi` (game-v2-shop.ts đã xoá).
 //
 // Chạy trên `node:sqlite` + lược đồ THẬT. Dữ liệu TỔNG HỢP. Chứng minh: cửa ĐÓNG (mặc định) ⇒ KHÔNG
 // chạm substrate P08; cửa MỞ ⇒ đi đúng lệnh P08 (ghi sổ tiêu P08 + `vang_so`, chuyển unused→used).
 import { describe, expect, it } from 'vitest'
 import { taoD1That, type D1That } from './_d1-that'
-import { shopAction } from '../server/src/game-v2-shop'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import type { Profile } from '../server/src/game-v2'
@@ -27,9 +27,6 @@ const gieoHoSo = (d1: D1That, sbd: string, wallet = 1000) =>
   d1.sql.prepare('INSERT INTO game_v2_profile (sbd, revision, json, created_at) VALUES (?, 0, ?, ?)').run(sbd, JSON.stringify(hoSo(wallet)), 'x')
 const dem = (d1: D1That, bang: string, dk = '1=1') =>
   Number((d1.sql.prepare(`SELECT COUNT(*) AS n FROM ${bang} WHERE ${dk}`).get() as { n: number }).n)
-const tongVang = (d1: D1That, sbd = 'S1') =>
-  Number((d1.sql.prepare('SELECT COALESCE(SUM(so_vang),0) AS t FROM vang_so WHERE sbd = ?').get(sbd) as { t: number }).t)
-const docLai = (p: Profile) => async () => ({ profile: p, revision: 0 })
 
 /** Ví P07 + trạng thái P08 (điều kiện để lệnh P08 chạy được). */
 function gieoP07(d1: D1That, sbd: string, o: { wallet?: number; unused?: number; used?: number; gold?: number } = {}): void {
@@ -38,40 +35,6 @@ function gieoP07(d1: D1That, sbd: string, o: { wallet?: number; unused?: number;
     .prepare("INSERT INTO cnh_exp_p08_state (student_id, absorbed_day, invested_exp, level, unused_shields, used_shields, gold) VALUES (?, ?, 0, 1, ?, ?, ?)")
     .run(sbd, NGAY, o.unused ?? 0, o.used ?? 0, o.gold ?? 0)
 }
-
-describe('P08 nối route · SHOP `vang-doi` (§8)', () => {
-  it('cửa ĐÓNG (mặc định) ⇒ KHÔNG chạm substrate P08', async () => {
-    const d1 = taoD1That()
-    gieoHoSo(d1, 'S1')
-    gieoP07(d1, 'S1', { wallet: 700 })
-    await shopAction(d1.env, 'S1', hoSo(700), 0, 'vang-doi', { khoaYeuCau: 'khoa-du-16-ky-tu', soExp: 300 }, docLai(hoSo(700)))
-    expect(dem(d1, 'cnh_exp_spend_ledger')).toBe(0) // nhánh P08 KHÔNG chạy
-    expect(tongVang(d1)).toBe(0)
-  })
-
-  // LUẬT v4 (thầy chốt 29/09, docs/DE-XUAT-EXP-2909.md): BỎ đổi tay EXP → vàng ⇒ `vang-doi` KHÔNG BAO GIỜ đi P08: cửa hàng đóng ⇒ `tam_dong`, mở ⇒ `da_bo`; không ghi vàng.
-  // (Trước: cửa MỞ đi `doiVangCore`, chưa chuyển đổi ném NOT_FOUND, xuyên dự trữ 400 ném KHONG_DU_DIEU_KIEN — sửa CÓ CHỦ Ý theo luật mới.)
-  it('luật v4: cửa P08 MỞ (cờ cửa hàng tắt) ⇒ `vang-doi` trả tam_dong, KHÔNG ghi sổ tiêu P08, không đổi vàng/ví', async () => {
-    const d1 = taoD1That()
-    gieoHoSo(d1, 'S1')
-    gieoP07(d1, 'S1', { wallet: 700, gold: 0 })
-    datCua(d1, CUA_MO)
-    const kq = await shopAction(d1.env, 'S1', hoSo(700), 0, 'vang-doi', { khoaYeuCau: 'khoa-du-16-ky-tu', soExp: 300 }, docLai(hoSo(700)))
-    expect(kq).toMatchObject({ ok: false, ma: 'tam_dong' })
-    expect(dem(d1, 'cnh_exp_spend_ledger')).toBe(0)
-    expect(tongVang(d1)).toBe(0)
-    expect(Number((d1.sql.prepare("SELECT wallet_exp AS w FROM cnh_exp_account WHERE student_id = 'S1'").get() as { w: number }).w)).toBe(700)
-  })
-
-  it('luật v4: cửa P08 MỞ mà em chưa chuyển P08 ⇒ không ném, không ghi gì', async () => {
-    const d1 = taoD1That()
-    gieoHoSo(d1, 'S1')
-    datCua(d1, CUA_MO)
-    expect(await shopAction(d1.env, 'S1', hoSo(700), 0, 'vang-doi', { khoaYeuCau: 'khoa-du-16-ky-tu', soExp: 301 }, docLai(hoSo(700)))).toMatchObject({ ok: false, ma: 'tam_dong' })
-    expect(tongVang(d1)).toBe(0)
-    expect(dem(d1, 'cnh_exp_spend_ledger')).toBe(0)
-  })
-})
 
 describe('P08 nối route · `shield-use` (§7.2)', () => {
   // ⚠️ TỪ 25/09: nhánh P08 đòi CẢ `khoaYeuCau` (không chỉ cửa mở) — nút "dùng khiên" hiện có đã gửi `useId`,

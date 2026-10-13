@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "(1) Đoàn: chặng cũng thay lượt làm lại…" (lệnh doan-mo/doan-xem/doan-nop đã gỡ).
 // (1) CHẨN ĐOÁN BƯỚC SAI TRƯỚC KHI LÀM LẠI (06/10, lệnh thầy "Làm chuẩn đoán bước sai") — D1 THẬT (node:sqlite, đủ migration), OMNI BẬT như bản sống,
 // mọi lệnh của em đi qua đúng đường Worker thật (`server/src/index.ts`). Thiết kế: server/src/chan-doan-buoc-sai.ts + docs/chan-doan-buoc-sai-0610.md.
 // Lượt làm lại ĐẦU TIÊN của câu lỗi Q (lỗi mở, chưa chẩn đoán) trong chuyến Đảo / chặng Đoàn ⇒ THAY bằng MỘT câu chẩn đoán (câu nền của bước yếu nhất — bước em
@@ -14,7 +15,6 @@ import { xoaDemPhamVi } from '../server/src/bai-da-day'
 import { docHoSo2, docKeHoachDaChot, docLanLam, xoaDemChienDich } from '../server/src/srs2-d1'
 import { hoSoOmniEm, xoaDemOmni } from '../server/src/omni-d1'
 import { chanMetaKhacKhoi, xoaDemCauNghi, xoaDemChanKhoi } from '../server/src/chan-khac-khoi'
-import { DEM_NGUOC_MS } from '../server/src/game-v2-doan'
 import { LENH_TAO_BANG_CAN_THAN } from '../server/src/omni-can-than'
 import { damBaoBangYDs } from '../server/src/cau-y-ds'
 import { damBaoBangLoiGiai } from '../server/src/loi-giai'
@@ -378,35 +378,6 @@ describe('(1) Đảo: lượt làm lại đầu tiên của câu lỗi ⇒ câu 
     const t = await em(env, '/game-v2/answer', { session: r.id, qid: ref.qid, answer: cau.correct })
     expect(t.correct).toBe(true)
     expect(soCua(d, String(ref.qid))[0]).toMatchObject({ purpose: 'chan_doan', ma_dang: 'DL' })
-  })
-})
-
-// ───────────────────────── Đoàn ─────────────────────────
-describe('(1) Đoàn: chặng cũng thay lượt làm lại đầu tiên bằng câu chẩn đoán', () => {
-  it('chặng hiện câu nền thay Q1 (không lộ đáp án); nộp ⇒ sổ purpose chan_doan + tc; Q1 vẫn lỗi mở', async () => {
-    const { d, env } = dung([Q1], ['Q1'], { nhipDao: false })
-    ghi(d, 'Q1', 0, luc('2026-10-05', '10:00'))
-    vi.setSystemTime(luc('2026-10-06'))
-    const mo = await em(env, '/game-v2/doan-mo', {})
-    expect(mo.ok, JSON.stringify(mo).slice(0, 400)).toBe(true)
-    const ma = String(mo.doan.ma)
-    vi.setSystemTime(Date.now() + DEM_NGUOC_MS + 500)
-    const xem = await em(env, '/game-v2/doan-xem', { ma })
-    expect(xem.ok, JSON.stringify(xem).slice(0, 400)).toBe(true)
-    const cau = xem.doan.cau as { qid: string; de: { text: string; phan: string } }
-    expect(cau.qid).toMatch(/^nen:sinh\./)
-    khongLoDapAn(xem)
-    const phong = JSON.parse((d.sql.prepare('SELECT json FROM doan_chang WHERE ma = ?').get(ma) as { json: string }).json) as { nguoi: { phien: string; cau: Record<string, unknown>[] }[] }
-    const refPhien = phien(d, phong.nguoi[0]!.phien).questions[0]!
-    expect(refPhien).toMatchObject({ qid: cau.qid, tc: 'Q1', cd: 1 })
-    const q = await dapAnCua(env, refPhien)
-    expect(cau.de.text).toBe(q.text)
-    const nop = await em(env, '/game-v2/doan-nop', { ma, hiep: xem.doan.tran.hiep, answer: q.correct, hanhDong: 'danh' })
-    expect(nop.ok, JSON.stringify(nop).slice(0, 300)).toBe(true)
-    expect(nop.ketQuaCau.correct).toBe(true)
-    expect(soCua(d, cau.qid)[0]).toMatchObject({ ket_qua: 1, purpose: 'chan_doan' })
-    expect(JSON.parse(soCua(d, cau.qid)[0]!.raw_json!)).toMatchObject({ tc: 'Q1', cd: 1 })
-    expect((await docHoSo2(env, 'S1', '2026-10-06')).loiV2?.get('Q1')).toMatchObject({ trangThai: 'mo' })
   })
 })
 

@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "doan: chỉ khi cờ doan_ho_tong bật…" và nhánh thiếu bảng doan_luot; khối `doan` nay luôn null (khoá ở ca "sau reset").
 // LỆNH ĐỌC-CHỈ CHO MÀN "HÔM NAY" CỦA APP GIÁO VIÊN (server/src/hom-nay-thay.ts; hợp đồng docs/hop-dong-gv-hom-nay-2109.md). SQLite thật, lược đồ thật + mọi migration.
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'
@@ -21,8 +22,6 @@ const btvnLo = (ma: string, chiSo: number, tongLo: number, treNhip: boolean, han
 const su = (sbd: string, qid: string, ketQua: 0 | 1, luc: string, lan = 1) => ({ nguon: 'btvn' as const, maNguon: 'B', sbd, qid, lan, ketQua, luc })
 const dangHs = (d: D1That, sbd: string, ma: string, soGap: number, soSai: number, khacPhuc: number) =>
   d.sql.prepare('INSERT INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES(?,?,?,?,?,?,0,0,0,?)').run(`${sbd}|${ma}`, sbd, ma, soGap, soSai, khacPhuc, 'x')
-const doanLuot = (d: D1That, ma: string, sbd: string, ngay: string, lop: string, thang: number | null) =>
-  d.sql.prepare('INSERT INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,thang,vao_luc) VALUES(?,?,?,?,1,?,?)').run(ma, sbd, ngay, lop, thang, 'x')
 
 /** Kịch bản đủ mọi khối. Lớp 12A: A1..A5 (+ K1 bị khoá); lớp 11B: B1..B3; N1 không lớp. */
 async function dung() {
@@ -71,13 +70,6 @@ async function dung() {
   d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,cap_nhat_luc) VALUES('CA3','Ca đóng','dong','thi','x')").run()
   d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,cap_nhat_luc) VALUES('CA4','Bài tập','mo','baitap','x')").run()
   d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc) VALUES('BT1','CA1','DE1',8,'x','2026-09-24T16:59:00.000Z',0,'x')").run()
-
-  // Đoàn Hộ Tống: cờ mở cho A1 (lớp 12A); mùa 21/09; 3 chặng thắng hôm nay của 12A.
-  d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('doan_ho_tong','{\"dsSbd\":[\"A1\"],\"toanBo\":false}','x')").run()
-  d.sql.prepare("INSERT INTO game_v2_settings(key,json) VALUES('season',?)").run(JSON.stringify({ id: '2026-09-21-mua-1', startedAt: '2026-09-21T00:00:00.000Z' }))
-  for (const s of ['A1', 'A2', 'A3']) doanLuot(d, `C-${s}`, s, NGAY, '12A', 1)
-  doanLuot(d, 'C-cu1', 'A1', '2026-09-20', '12A', 1); doanLuot(d, 'C-cu2', 'A4', '2026-09-20', '12A', 1)
-  doanLuot(d, 'C-lop-khac', 'B1', NGAY, '11B', 1); doanLuot(d, 'C-thua', 'A4', NGAY, '12A', 0)
   return d
 }
 const goi = (d: D1That, b: Record<string, unknown> = {}) => homNayThay(d.env, { ngay: NGAY, ...b }, NOW)
@@ -150,16 +142,6 @@ describe('lệnh /ke-hoach/hom-nay-thay: mọi khối từ dữ liệu thật', 
     const s = JSON.stringify(r)
     for (const cam of ['SECRET-LOI-GIAI', 'correct', 'solution', 'json']) expect(s, cam).not.toContain(cam)
   })
-  it('doan: chỉ khi cờ doan_ho_tong bật; lớp đã mở, trạm theo chặng thắng trong mùa, số bạn góp sức hôm nay, sĩ số', async () => {
-    const d = await dung()
-    expect((await goi(d)).doan).toEqual({ lop: '12A', tram: 1, tongTram: 30, gopSucHomNay: 3, siSo: 5 })
-    d.sql.prepare("UPDATE cau_hinh SET gia_tri = '{\"dsSbd\":[],\"toanBo\":false}' WHERE khoa = 'doan_ho_tong'").run()
-    const tat = await goi(d)
-    expect(tat.doan).toBeNull()
-    expect('doan' in (tat.lyDoThieu as object)).toBe(false) // cờ tắt KHÔNG phải lỗi
-    d.sql.prepare("UPDATE cau_hinh SET gia_tri = '{\"toanBo\":true}' WHERE khoa = 'doan_ho_tong'").run()
-    expect(((await goi(d)).doan as any).lop).toBe('12A') // toàn trường: lớp đông nhất
-  })
 })
 
 describe('dangYeu: chỉ các lớp đông nhất', () => {
@@ -197,7 +179,7 @@ describe('chỉ đọc, giới hạn truy vấn, xác thực', () => {
 })
 
 describe('khối nào không tính được thì null + lyDoThieu, các khối còn lại vẫn ra (không bịa số)', () => {
-  it('sau reset (chưa có kế hoạch ngày): nhiemVu/btvn/canYTuong null có lý do; soEm, caDangMo, dangYeu vẫn có; doan theo cờ', async () => {
+  it('sau reset (chưa có kế hoạch ngày): nhiemVu/btvn/canYTuong null có lý do; soEm, caDangMo, dangYeu vẫn có; doan luôn null (Đoàn đã gỡ)', async () => {
     const d = await dung()
     d.sql.exec('DELETE FROM ke_hoach_ngay')
     const r = await goi(d)
@@ -205,7 +187,8 @@ describe('khối nào không tính được thì null + lyDoThieu, các khối c
     for (const k of ['nhiemVu', 'btvn', 'canYTuong']) expect(String((r.lyDoThieu as any)[k]), k).toMatch(/kế hoạch ngày/)
     expect(r).toMatchObject({ soEm: 9, soLop: 2, caDangMo: 1 })
     expect((r.dangYeu as any[]).length).toBe(2)
-    expect(r.doan).not.toBeNull()
+    expect(r.doan).toBeNull()
+    expect('doan' in (r.lyDoThieu as object)).toBe(false) // Đoàn đã gỡ: null KHÔNG phải lỗi thiếu dữ liệu
   })
   it('hôm qua có kế hoạch nhưng chưa chốt ket_qua ⇒ tongHomQua/datHomQua null (không đếm 0 giả)', async () => {
     const d = await dung()
@@ -228,9 +211,6 @@ describe('khối nào không tính được thì null + lyDoThieu, các khối c
     const c = await thieu('ca')
     expect(c.caDangMo).toBeNull(); expect(String((c.lyDoThieu as any).caDangMo)).toMatch(/ca/)
     expect(c.nhiemVu).not.toBeNull()
-    const e = await thieu('doan_luot')
-    expect(e.doan).toBeNull(); expect(String((e.lyDoThieu as any).doan)).toMatch(/Đoàn/)
-    expect(e.dangYeu).not.toBeNull()
     const f = await thieu('su_kien_hoc')
     expect(f.nhiemVu).toBeNull(); expect(f.canYTuong).toBeNull()
     expect(f.btvn).not.toBeNull() // tiến độ lô đọc từ kế hoạch, không cần sổ

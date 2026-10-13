@@ -2,7 +2,6 @@ import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { khoiPhucChienDich0810 } from './khoi-phuc-chien-dich-0810'
 import { nhipCa } from './nhip-ca'
 import { anhCo, anhDay, layAnh } from './kho-anh'
-import { denPhongBiA } from './bi-a-phong'
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
@@ -19,7 +18,6 @@ import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,dangLamMoiTuDem,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {cronResetHoa2,lenhGhiResetHoa2,xuLyLenhResetHoa2} from './reset-hoa2'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
-import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsCauGoc} from './cau-goc'
 import {hsOnLaiNop, trangThaiNop} from './on-lai-nop'
@@ -74,7 +72,6 @@ import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2, laLenhCongSongSong } from './game-v2'
 import { kemSanhBiTat, luongDangNhapKemSanh, sanhKemDangNhap } from './dang-nhap-kem-sanh'
 import { RAO_GHI } from './doc-d1-theo-luot'
-import { shopBatCho } from './game-v2-shop'
 import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
 import { gameToken, gameIdentity } from './game-v2-auth'
 import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
@@ -149,11 +146,11 @@ const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS
 const DA_GO_BO_NAO = 'Chức năng đã gỡ'
 
 async function dungKeHoachEm(env: Env, b: Record<string, unknown>, sbdBiet = ''): Promise<Record<string, unknown>> {
-  // TỐI ƯU 05/10: `sbdBiet` (SBD nơi gọi đã xác định từ token/sbd — đúng SBD kế hoạch sẽ dùng) ⇒ hai khối phụ KHÔNG phụ thuộc kế hoạch (cờ Đoàn, cảnh báo
+  // TỐI ƯU 05/10: `sbdBiet` (SBD nơi gọi đã xác định từ token/sbd — đúng SBD kế hoạch sẽ dùng) ⇒ khối phụ KHÔNG phụ thuộc kế hoạch (cảnh báo
   // của thầy — chỉ đọc bảng kế hoạch/EXP không ghi) bắt đầu CÙNG đợt đầu của kế hoạch; "về đích" đọc hồ sơ nắm kiến thức mà kế hoạch vừa dựng lại ⇒ bắt đầu
   // NGAY SAU khi kế hoạch ghi xong, song song phần EXP (EXP không ghi bảng nào "về đích" đọc). Trước: cả ba chờ hết kế hoạch + EXP. Phản hồi y hệt.
-  const som = sbdBiet ? { doanMo: doanMoCho(env, sbdBiet), canhBao: canhBaoChoEm(env, sbdBiet) } : null
-  som?.doanMo.catch(() => {}); som?.canhBao.catch(() => {})
+  const som = sbdBiet ? { canhBao: canhBaoChoEm(env, sbdBiet) } : null
+  som?.canhBao.catch(() => {})
   // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` + `veDich`. Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
   const docVeDich = (sbd: string) => docVeDichCuaEm(env, sbd).then((v) => v, (e) => { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e); return null })
   let veDichSom: { sbd: string; p: ReturnType<typeof docVeDich> } | null = null
@@ -162,14 +159,11 @@ async function dungKeHoachEm(env: Env, b: Record<string, unknown>, sbdBiet = '')
     const sbd = kh.sbd
     const vdSom = veDichSom as { sbd: string; p: ReturnType<typeof docVeDich> } | null
     // HẠ TẢI D1 (Boss 21/09): bốn khối phụ ĐỘC LẬP chạy SONG SONG (trước đây tuần tự); khoá gán đúng thứ tự cũ để phản hồi y hệt.
-    const [doanMo, vd, canhBao] = await Promise.all([
-      // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
-      som && sbd === sbdBiet ? som.doanMo : doanMoCho(env, sbd),
+    const [vd, canhBao] = await Promise.all([
       vdSom && vdSom.sbd === sbd ? vdSom.p : docVeDich(sbd),
       // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay`.
       som && sbd === sbdBiet ? som.canhBao : canhBaoChoEm(env, sbd),
     ])
-    kh.doanMo = doanMo
     if (vd) { kh.no = vd.no; kh.veDich = vd.veDich }
     if (canhBao.length > 0) kh.canhBaoThay = canhBao
   }
@@ -3685,9 +3679,6 @@ const boXuLy = {
           if(kt.coHocNgayKt(baiKt)){const g=await import('./goi-bai-7'),dem=await g.demHomNay7(env,sbdKhoa,Date.now()),lam=Number(dem.daLamHomNay);return themMocReset(env,ra({ok:true,cheDoNgay:'goi7',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:12,toiThieuCau:12},tienBo:{daLamCau:lam,toiThieuCau:12,conThieu:Math.max(0,12-lam),dat:lam>=12}}))}
           return themMocReset(env,ra({ok:true,cheDoNgay:'kiem-tra',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:tt.tong,toiThieuCau:tt.tong},tienBo:{daLamCau:tt.daTra,toiThieuCau:tt.tong,conThieu:tt.con,dat:tt.nopLuc!==null&&tt.con===0}}))
         }
-        // Tối ưu 05/10: cờ cửa hàng (đệm 30 giây, không phụ thuộc kế hoạch) đọc CÙNG đợt đầu — trước: một đợt riêng ở cuối. Dùng đúng chỗ cũ.
-        const shopSom = shopBatCho(env, sbdKhoa)
-        shopSom.catch(() => {})
         let laLuotThat = false
         const kh = await keHoachCoDem(sbdKhoa, () => { laLuotThat = true; return dungKeHoachEm(env, b, sbdKhoa) })
         if (!laLuotThat && kh.ok === true) {
@@ -3696,8 +3687,6 @@ const boXuLy = {
           if ('expNhan' in kh) kh.expNhan = []
           if ('manhNhan' in kh) kh.manhNhan = []
         }
-        // `shopBat` trong khối `thanThu` (boolean): máy em hiện nút "Cửa hàng" hay không, không tốn lượt gọi nào (cờ đọc từ đệm 30 giây). Tạo khối MỚI: không ghi bẩn bản trong đệm kế hoạch.
-        if (kh.ok === true && kh.thanThu && typeof kh.thanThu === 'object') kh.thanThu = { ...(kh.thanThu as object), shopBat: await shopSom }
         return themMocReset(env, ra(kh))
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
@@ -4045,12 +4034,10 @@ export function laGioCaoDiemVn(nowMs: number): boolean {
 }
 
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
-export { BanBiA } from './bi-a-phong'
+export { BanBiA } from './ban-bi-a-dong'
 export default {
   ...boXuLy,
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
-    // Phòng đấu Bi-a (WebSocket, GĐ2): đi thẳng tới Durable Object, KHÔNG qua lớp bọc dưới (dựng lại Response làm hỏng bắt tay 101).
-    if (new URL(req.url).pathname.startsWith('/bi-a/phong/')) return denPhongBiA(req, env)
     const t0 = Date.now()
     let res: Response
     // ỔN ĐỊNH (28/09): ~40 nhánh định tuyến `return handler(...)` KHÔNG await ⇒ Promise bị từ chối thoát khỏi try/catch của định tuyến (và các nhánh GET

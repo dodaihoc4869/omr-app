@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — không bỏ ca nào; ca "Đoàn — câu ôn duy nhất là tự luận" (đỏ nền, giữ tên) gọi chặng học startDao2 tapTrung thay startDoan2.
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // LỖI THẦY BÁO 30/09 (em 11084, chiến dịch cd32010c1c2): kế hoạch hôm nay 49 câu, em làm 48; Đảo báo "Chưa tải được câu hôm nay (kho câu đang
 // cập nhật)" (`chua_nap_duoc`), Rương kẹt 48/49, Sảnh Bi-a "còn 1/19".
@@ -11,8 +12,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { layKeHoachHomNay, qidGoc, sanh2 } from '../server/src/srs2-d1'
-import { hoa2Action, startDao2, startDoan2 } from '../server/src/srs2-game'
-import { biaAction } from '../server/src/bi-a'
+import { hoa2Action, startDao2 } from '../server/src/srs2-game'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
@@ -40,7 +40,6 @@ function fixture(soCau = 30) {
     st.run('DE1', `Q${i}`, 'v1', `g-Q${i}`, `D${i % 3}`, cauJson(`Q${i}`, phan, ['NB', 'TH', 'VD'][i % 3]!, `D${i % 3}`, dapAn(i)))
   }
   d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true,"lop":["12A1"]}','x')`)
-  d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bi_a','{"bat":true,"lop":["12A1"]}','x')`)
   return { d, env }
 }
 type D = ReturnType<typeof fixture>['d']
@@ -88,8 +87,6 @@ async function kyVongDuocThay(env: Env, nay: number, tongCu: number, cauHong: st
   expect(ruong(s2)).toMatchObject({ daLam: tongCu, tong: tongCu, moDuoc: true })
   const mo = await hoa2Action(env, 'S1', 'hoa2-ruong-mo', {}, nay)
   expect(mo.ok).toBe(true)
-  const bia = await biaAction(env, 'S1', 'bia-sanh', {}, nay)
-  expect((bia.tran as { con: number }).con).toBe(0)
 }
 /** Kỳ vọng SAU KHI SỬA khi KHÔNG còn câu mới hợp lệ để thay: câu hỏng lặng lẽ bỏ, tổng = số phục vụ được, rương mở ngay (48/48), Đảo báo xong. */
 async function kyVongBoLang(env: Env, nay: number, tongCu: number) {
@@ -102,8 +99,6 @@ async function kyVongBoLang(env: Env, nay: number, tongCu: number) {
   expect(ruong(s)).toMatchObject({ daLam: tongCu - 1, tong: tongCu - 1, moDuoc: true })
   const mo = await hoa2Action(env, 'S1', 'hoa2-ruong-mo', {}, nay)
   expect(mo.ok).toBe(true)
-  const bia = await biaAction(env, 'S1', 'bia-sanh', {}, nay)
-  expect((bia.tran as { con: number }).con).toBe(0)
 }
 
 beforeEach(() => xoaDemCaBaoVe())
@@ -188,29 +183,12 @@ describe('(1) NGUYÊN NHÂN GỐC: câu cuối kế hoạch bị luật tự lu�
     const { kh } = await layKeHoachHomNay(env, 'S1', nay)
     expect(kh.conDoan.map(qidGoc)).toEqual(['Q1'])
     gatCoTuLuan(d, 'Q1')
-    const doan = await startDoan2(env, 'S1', nay)
+    const doan = await startDao2(env, 'S1', nay, true) // chặng học (hoc-tap-start) phát câu ôn thay Đoàn đã gỡ
     expect(doan.lyDo).not.toBe('chua_nap_duoc')
     expect(String(doan.message ?? '')).not.toContain(LOI_CHUA_NAP)
     const dao = await startDao2(env, 'S1', nay)
     expect(dao.lyDo).not.toBe('khoa_cho_doan')
     expect(qidsCua(dao).length).toBeGreaterThan(0)
-  })
-})
-
-describe('(2) LOẠI TRỪ: câu cuối đang ở bàn Bi-a ⇒ lý do phải là cau_dang_o_bia (đã đúng)', () => {
-  it('bàn Bi-a đang chơi (< 15 phút) giữ câu cuối ⇒ Đảo báo "đang ở bàn Bi-a", không phải "chưa tải được"', async () => {
-    const { env } = fixture()
-    await giao(env)
-    const nay = Date.now()
-    const ban = await biaAction(env, 'S1', 'bia-xep-ban', { loai: 'ai', cheDo: 'don', soBi: 7 }, nay - 5 * 60_000)
-    const tren = [...(ban.bi as { qid: string }[]), ban.chot as { qid: string }].map((q) => q.qid)
-    const { kh } = await layKeHoachHomNay(env, 'S1', nay)
-    const ds = kh.conDao.map(qidGoc)
-    const giu = tren[0]!
-    await lamXong(env, ds.filter((q) => q !== giu), nay)
-    const dao = await startDao2(env, 'S1', nay)
-    expect(dao.lyDo).toBe('cau_dang_o_bia')
-    expect(String(dao.message)).not.toContain(LOI_CHUA_NAP)
   })
 })
 

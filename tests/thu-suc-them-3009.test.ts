@@ -9,7 +9,6 @@ import { gvChienDich } from '../server/src/srs2-gv'
 import { layKeHoachHomNay, qidGoc, sanh2, thuSucThem, tranKeHoachHomNay, xoaDemChienDich, type ChienDich } from '../server/src/srs2-d1'
 import { coLoThuSucThem, quotaCauMoi } from '../server/src/srs2-loi'
 import { hoa2Action, startDao2 } from '../server/src/srs2-game'
-import { biaAction } from '../server/src/bi-a'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
@@ -239,25 +238,6 @@ describe('rương không khoá lại', () => {
     expect(await moRuong(env, T0)).toMatchObject({ ok: true, lapLai: true })
     expect(d.dem('ruong_bat_linh')).toBe(1)
     expect(d.dem('vang_so', "khoa_yeu_cau = 'ruong-2026-09-29'")).toBe(1)
-  })
-})
-
-describe('Bi-a: trần 40% theo tong mới', () => {
-  it('(10) sau lô: trần Bi-a = floor(40% × 49) = 19, không vượt số câu còn lại của kế hoạch', async () => {
-    const { d, env } = dung()
-    d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bi_a','{"bat":true,"lop":["12A1"]}','x')`)
-    await tao(env)
-    await xongVaMoRuong(env)
-    const truoc = await biaAction(env, 'S1', 'bia-sanh', {}, T0)
-    expect(truoc.lyDoKhoa).toBe('xong_ke_hoach')
-    await thuSucThem(env, 'S1', T0)
-    const s = await biaAction(env, 'S1', 'bia-sanh', {}, T0)
-    expect(s).not.toHaveProperty('lyDoKhoa')
-    const tran = s.tran as { con: number; tong: number; tranMoi: number; tranOn: number }
-    expect(tran.tong).toBe(19)
-    expect(tran.tranMoi + tran.tranOn).toBe(19)
-    expect(tran.con).toBeLessThanOrEqual((s.theLuc as { con: number }).con)
-    expect(s.theLuc).toEqual({ con: 19, tong: 49 })
   })
 })
 

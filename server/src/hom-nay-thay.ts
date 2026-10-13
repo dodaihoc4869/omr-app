@@ -8,7 +8,6 @@ import { quyetDinhVaoThi } from './luat-vao-thi'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { TIEN_BO_NGAY, phanTichNgayNghi } from './ke-hoach-ngay-d1'
 import { laDatNgay } from '../../src/lib/dat-nhiem-vu-ngay'
-import { muaHienTai, tramCuaLop, SO_TRAM } from './game-v2-doan-mua'
 
 const MOT_NGAY_MS = 86_400_000
 const TOI_DA_BTVN = 6
@@ -67,19 +66,16 @@ export async function homNayThay(env: Env, b: Record<string, unknown>, nowMs: nu
   const Q = khoiDo(env)
   const lyDoThieu: Record<string, string> = {}
 
-  // Truy vấn 1: học sinh + cấu hình cần đọc + mùa game (một lệnh, ba nguồn).
+  // Truy vấn 1: học sinh + cấu hình cần đọc (một lệnh, hai nguồn).
   const r1 = await Q.hoi<Dong>(
     `SELECT 'em' AS k, sbd AS a, ho_ten AS b, lop AS c FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'
-     UNION ALL SELECT 'cfg', khoa, gia_tri, NULL FROM cau_hinh WHERE khoa IN ('ngay_nghi', 'doan_ho_tong')
-     UNION ALL SELECT 'mua', key, json, NULL FROM game_v2_settings WHERE key = 'season'`,
+     UNION ALL SELECT 'cfg', khoa, gia_tri, NULL FROM cau_hinh WHERE khoa = 'ngay_nghi'`,
   )
   const em = new Map<string, { hoTen: string; lop: string }>()
   const cfg = new Map<string, string>()
-  let muaJson = ''
   for (const x of r1?.rows ?? []) {
     if (x.k === 'em') em.set(chuoi(x.a), { hoTen: chuoi(x.b), lop: chuoi(x.c) })
     else if (x.k === 'cfg') cfg.set(chuoi(x.a), chuoi(x.b))
-    else if (x.k === 'mua') muaJson = chuoi(x.b)
   }
   const coHs = r1 !== null
   const nghi = phanTichNgayNghi(cfg.get('ngay_nghi') ?? '')
@@ -294,37 +290,7 @@ export async function homNayThay(env: Env, b: Record<string, unknown>, nowMs: nu
   else if (!r6) lyDoThieu.dangYeu = 'Không đọc được hồ sơ dạng'
   else dangYeuLop = dangTheoLop.map((l) => ({ lop: l.lop, siSo: l.siSo, dang: l.ds.map((d) => ({ ma: d.ma, ten: tenDang(d.ma), soEmYeu: d.soEmYeu })) }))
 
-  // --- Khối doan: CHỈ khi cờ `doan_ho_tong` bật (tắt không phải lỗi) -----------------------------------------
-  let doan: Record<string, unknown> | null = null
-  try {
-    const co = chuoi(cfg.get('doan_ho_tong'))
-    const o = co ? doc<{ dsSbd?: unknown; toanBo?: unknown }>(co, {}) : {}
-    const dsMo = Array.isArray(o.dsSbd) ? o.dsSbd.map((x) => chuoi(x)) : []
-    if (o.toanBo !== true && dsMo.length === 0) {
-      // cờ tắt: doan = null, không ghi lyDoThieu (không phải lỗi)
-    } else if (!coHs) lyDoThieu.doan = 'Không đọc được danh sách học sinh'
-    else {
-      const lopMo = new Set(o.toanBo === true ? [...lopDong.keys()] : dsMo.map(lopCua).filter(Boolean))
-      const lop = [...lopMo].sort((a, c) => (lopDong.get(c)?.length ?? 0) - (lopDong.get(a)?.length ?? 0) || (a < c ? -1 : 1))[0]
-      if (!lop) lyDoThieu.doan = 'Không có lớp nào đã mở Đoàn Hộ Tống'
-      else {
-        const seasonId = doc<{ id?: string }>(muaJson || '{}', {}).id ?? ''
-        const mua = muaHienTai(String(seasonId), ngay)
-        const r8 = await Q.hoi<Dong>(
-          'SELECT COUNT(*) AS thang, COUNT(DISTINCT CASE WHEN ngay_vn = ? THEN sbd END) AS hom_nay FROM doan_luot WHERE lop = ? AND thang = 1 AND ngay_vn BETWEEN ? AND ?',
-          ngay, lop, mua.tuNgay, mua.denNgay,
-        )
-        if (!r8 || r8.rows.length === 0) lyDoThieu.doan = 'Không đọc được sổ chặng Đoàn Hộ Tống'
-        else {
-          const siSo = Math.max(1, lopDong.get(lop)!.length)
-          doan = { lop, tram: tramCuaLop(so(r8.rows[0]!.thang), siSo), tongTram: SO_TRAM, gopSucHomNay: so(r8.rows[0]!.hom_nay), siSo }
-        }
-      }
-    }
-  } catch {
-    doan = null
-    lyDoThieu.doan = 'Không tính được Đoàn Hộ Tống'
-  }
-
+  // Đoàn Hộ Tống đã gỡ (14/10) ⇒ `doan` luôn null (máy thầy ẩn thẻ).
+  const doan = null
   return { ok: true, serverNow: nowMs, ngay, soEm, soLop, caDangMo, nhiemVu, btvn, canYTuong, dangYeu: dangYeuLop, doan, lyDoThieu, soTruyVan: Q.dem() }
 }

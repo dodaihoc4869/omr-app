@@ -7,13 +7,11 @@ import {tramP08LenHienThi} from './cnh-exp-p08-hien-thi'
 import {congExpVaoHoSo} from './exp-ho-so-game'
 import {renKhienVang} from './vang-duc'
 import {normalizePetName} from '../../src/game/than-thu-v2/pet-name'
-import {escortAction,escortContext} from './game-v2-escort'
 import {readGameScope} from './game-v2-reports'
-import {roomAction} from './game-v2-room'
 import type {D1Result,Env,ExecutionContext} from './kieu'
 import {viecPhu} from './viec-phu'
 import {gameIdentity,parentPass} from './game-v2-auth'
-import {hash,readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,docCauTheoRef,loiCauDoi,type CauPool} from './game-v2-bank'
+import {readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,docCauTheoRef,loiCauDoi,type CauPool} from './game-v2-bank'
 import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
 import {chanKhacKhoiEm} from './chan-khac-khoi'
 import {qidThuHoiTrongLuot} from './thu-hoi-chien-dich'
@@ -36,19 +34,15 @@ import {ghiSuKien} from './su-kien-hoc'
 import {apXaoTheoRef,chonVeGoc,laQidChanDoan,rawLamLai,rawSo,type LamLaiRef} from './lam-lai-so' // 05/10: làm lại câu sai bằng bản khác (bản xáo chấm theo ref phiên; sổ ghi tc/xt/nv) — phần thuần, không vòng nạp
 import {chamCauChanDoan,ghiBuocSaiChanDoan,vknCauChanDoan} from './chan-doan-buoc-sai' // 06/10: câu chẩn đoán bước sai (chấm câu nền, ghi bước sai khi em làm sai)
 import {MUC_DICH_CHAN_DOAN} from './omni-kieu'
-import {doanAction,laGoiNoiBoDoan,doanMoCho,docDongChang,maChangCuaLenh} from './game-v2-doan'
-import {buCauLauNhat,docCauDaLamMoiNguon,docCauLamHomNay,tachMoiCu} from './game-v2-cau-moi'
-import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
+import {docCauLamHomNay} from './game-v2-cau-moi'
 import {LUAT_CAP_MOI,dangChoNgayV5,ngayConThieuLenCap,type TranV5,type TruocSiet4,type TruocV5} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
 import {cheDo2,docCoHoa2} from './srs2-d1'
-import {startDao2,startDao2CoVe,startDoan2,hoa2Action,LENH_HOA2} from './srs2-game'
+import {startDao2,startDao2CoVe,hoa2Action,LENH_HOA2} from './srs2-game'
 import {omniBat} from './omni-d1'
 import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
-import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
-import {ghiKhoanExpGame,docCauHinhExp,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
-import {LENH_SHOP,docCoCuaHangTuoi,shopAction,shopBatCho} from './game-v2-shop'
-import {LENH_BIA,biaAction,batDauBiaChoSanh,docCoBia} from './bi-a'
+import {TRAN_CAU_DAO_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
+import {ghiKhoanExpGame,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
 import {expMotCau,expMotCauGame} from './exp-hoc-tap'
 export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number;ngayNghi?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string;/** Luật v4: EXP chờ mốc cấp 10 (chưa đủ 21 ngày đạt). */choMoc?:number;/** Luật v4: `earned` lúc chuyển sang v4 — vàng chỉ đúc trên EXP kiếm sau mốc. */mocVang?:number;/** Dấu vết trước khi sang v4 (để lùi). */truocSiet4?:TruocSiet4;/** Luật v5: EXP tràn hôm nay + luỹ kế. */tranV5?:TranV5;/** Dấu vết trước khi sang v5 (để lùi). */truocV5?:TruocV5}
 type Row={revision:number;json:string}
@@ -212,78 +206,19 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const day=await doDayDu(env,chon.map(x=>x.q as CauPool)) // pool là bản NHẸ: chỉ các câu ĐƯỢC CHỌN mới nạp đầy đủ để đưa cho em
   return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(giuMat.length?{giuChoThua:giuMat}:{}),...(giuDangMo?{giuChoDangMo:giuDangMo}:{}),...(lyDoLuot?{chonLyDo:lyDoLuot}:{}),...(hoanLuot?{hoanLuot}:{}),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
 }
-/** Đoàn Hộ Tống: sáu câu cá nhân thuộc phần chính em đã làm và kiến thức nền đã biết.
- * Câu trùng nội dung hôm nay, bài chưa nộp, câu bảo vệ và câu vượt sức đều bị chặn. */
-async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<string,unknown>>{
-  const tNow=Date.now(),ngay=academicDay(now())
-  // Tối ưu 08/10: readGameScope, readScope, demCauTrongNgay độc lập → SONG SONG.
-  const dayStart=new Date(ngay+'T00:00:00+07:00').toISOString()
-  const [control,scope,soLamDoan]=await Promise.all([readGameScope(env,sbd),readScope(env,sbd),demCauTrongNgay(env,sbd,dayStart,'doan')])
-  if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
-  const remaining=Math.max(0,TRAN_CAU_DOAN_NGAY-soLamDoan) // trần ĐOÀN riêng (60), không tính lượt của Đảo
-  if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_DOAN_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
-  // Tối ưu 08/10: history, mastery, protectedQuestions, qidChanHomNay, docCauBtvnChuaNop, docCauLamHomNay, docCauDaLamMoiNguon, docKhoiEm, qidToiHanOn độc lập → SONG SONG.
-  const [history,mastery,blocked,chanHomNay,chanBtvn,homNay,daLam,khoiEm,dueQids]=await Promise.all([
-    attempts(env,sbd),masteryTheoHoSo(env,sbd,p.mastery),protectedQuestions(env),
-    qidChanHomNay(env,sbd,tNow), // câu làm HÔM NAY ở nguồn khác (+ gói gia đình chưa nộp): loại ở `eligible` nhưng tách riêng để báo THẬT "hết câu mới hôm nay"
-    docCauBtvnChuaNop(env,sbd),docCauLamHomNay(env,sbd,dayStart,ngay),docCauDaLamMoiNguon(env,sbd),
-    docKhoiEm(env,sbd),qidToiHanOn(env,sbd,ngay),
-  ])
-  for(const key of control.blocked)blocked.add(key)
-  for(const x of chanBtvn)blocked.add(x)
-  const daHoc=learnedQuestionFilter(scope.evidence,blocked)
-  const poolHopLe=scope.pool.filter(q=>q.phan!=='II'&&q.reviewed&&!laTuLuanPool(q)&&!!q.dang&&!!q.mucDo&&daHoc(q)&&(control.types.length===0||control.types.includes(q.dang)))
-  const eligible=poolHopLe.filter(q=>!chanHomNay.has(q.qid)&&!chanHomNay.has(q.group))
-  for(const qid of chanHomNay)blocked.add(qid)
-  // RÚT CÂU KHÔNG LẶP (thầy lệnh 21/09 ~19:35, game-v2-cau-moi.ts): CÙNG luật cá nhân hoá với Đảo Đợt 2 (chooseLuotMoi 'kham_pha'); KHÔNG lặp câu em đã làm HÔM NAY (mọi nguồn); ưu tiên câu CHƯA TỪNG làm ở đâu (mọi nguồn, mọi ngày);
-  // hết câu mới ⇒ câu LÂU NHẤT chưa gặp + báo thật `hetCauMoi`; không còn gì ⇒ báo thật.
-  const groupByQid=new Map(scope.pool.map(q=>[q.qid,q.group]))
-  for(const qid of [...homNay]){const group=groupByQid.get(qid);if(group)homNay.add(group)}
-  const lucGame=new Map<string,number>();for(const a of history)lucGame.set(a.group,Math.max(lucGame.get(a.group)??-1,a.at))
-  for(const [qid,luc] of daLam){const group=groupByQid.get(qid);if(group)lucGame.set(group,Math.max(lucGame.get(group)??-1,luc))}
-  const {moi,cu}=tachMoiCu(eligible,homNay,daLam,new Set(lucGame.keys()))
-  const soCau=Math.min(SO_HIEP-2,remaining),opt={loai:'kham_pha' as const,cap:p.cap,now:tNow,blocked,soCau,khoiEm,gentle:true,dueQids,seenGroups:lucGame}
-  const canOn=eligible.filter(q=>opt.dueQids.has(q.qid))
-  const uuTienOn=canOn.length?chooseLuotMoi(canOn,scope.evidence,history,mastery,{...opt,soCau:1}):[]
-  const nhomDaChon=new Set(uuTienOn.map(x=>x.q.group))
-  let chon=[...uuTienOn,...chooseLuotMoi(moi.filter(q=>!nhomDaChon.has(q.group)),scope.evidence,history,mastery,{...opt,soCau:Math.max(1,soCau-uuTienOn.length)}).slice(0,soCau-uuTienOn.length)],hetCauMoi=false
-  if(chon.length<soCau){
-    // Bù bằng câu LÂU NHẤT chưa gặp (buCauLauNhat: nới `k` theo luật bậc/đổi câu của chooseLuotMoi, TỐI ĐA TOI_DA_VONG_BU vòng — không lặp theo cỡ kho lớp).
-    // `boQuaDung30:true` (thầy lệnh 25/09, "Đoàn 1 câu rồi lặp"): vòng bù ĐƯỢC lấy câu "vừa đúng chưa tới 30 ngày" (chưa tới hạn FSRS) — chọn LÂU NHẤT chưa gặp — để Đoàn luôn đủ suất; chặn `sai3` vẫn giữ.
-    const daChon=new Set(chon.map(x=>x.q.group)),thieu=soCau-chon.length,cuCon=cu.filter(q=>!daChon.has(q.group)&&!opt.dueQids.has(q.qid))
-    const {bu}=buCauLauNhat(cuCon,daLam,lucGame,thieu,ds=>chooseLuotMoi(ds,scope.evidence,history,mastery,{...opt,soCau:thieu,boQuaDung30:true}))
-    if(bu.length){hetCauMoi=true;chon=[...chon,...bu]}
-  }
-  chon=await chanKhacKhoiEm(env,'doan_kho_lop',{sbd,khoiEm:opt.khoiEm},chon,{cauCua:x=>x.q}) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
-  if(!chon.length){
-    const lyDo=!poolHopLe.length?'kho_trong':(!moi.length&&!cu.length)?'het_cau_moi_hom_nay':'chi_con_cau_qua_bac'
-    const message=lyDo==='het_cau_moi_hom_nay'?'Hôm nay em đã làm hết câu mới hợp sức em trong kho. Mai em quay lại nhé.':lyDo==='chi_con_cau_qua_bac'?'Các câu còn lại cao hơn mức em đang làm ở dạng đó. Em làm thêm bài Thầy giao rồi quay lại nhé.':'Chưa có câu thuộc phần em đã học. Em hoàn thành bài Thầy giao rồi quay lại nhé.'
-    return {ok:true,questions:[],lyDo,missing:scope.missing,message}
-  }
-  const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
-  const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group)}))}
-  const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
-  if(!inserted.meta.changes)return startDoanKhoLop(env,sbd,p)
-  const day=await doDayDu(env,chon.map(x=>x.q as CauPool))
-  return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),role:x.role})),soCauThieu:Math.max(0,soCau-chon.length),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(hetCauMoi?{hetCauMoi:true}:{})}
-}
 /** Promise bắt đầu sớm: đánh dấu "đã bắt" để lỗi không thành lỗi treo — nơi dùng vẫn `await` và nhận đúng lỗi. */
 const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
-/** Bọc `gameV2Tho`: phản hồi `recommendations` (Đảo mở là gọi) mang thêm `shopBat` (boolean; cờ cửa hàng bật VÀ em thuộc chiSbd nếu có) để máy em biết có hiện nút "Cửa hàng" hay không mà KHÔNG thêm lượt gọi nào. Cờ đọc từ đệm 30 giây. */
 /** Lệnh game được chạy lượt đọc "cổng đóng băng" (reset) SONG SONG khi đệm cổng vừa hết hạn (index.ts, tối ưu 05/10): chỉ các lệnh CHỈ chạm D1 qua `env.DB`
- *  (rào ghi chặn được mọi lệnh ghi). KHÔNG gồm Bi-a (phòng đấu Durable Object), võ đài/phòng cũ — các lệnh ấy vẫn chờ cổng trước như cũ. */
-export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-dem','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)||LENH_SHOP.has(action)||action.startsWith('doan-')
+ *  (rào ghi chặn được mọi lệnh ghi). */
+export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-dem','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Rào ghi (index.ts, tối ưu 05/10): đệm cổng đóng băng vừa hết hạn ⇒ lượt đọc cổng chạy song song, mọi lệnh GHI của lệnh này chờ cổng. Lệnh nội bộ
   // (Đoàn gọi `answer`) dùng lại đúng bản gộp đọc của lượt ngoài (đã có rào) ⇒ không bọc lần nữa.
   const rao=(env as unknown as Record<symbol,unknown>)[RAO_GHI] as Promise<unknown>|undefined
-  env = { ...env, DB: gopDocD1(rao&&!laBanGop(env.DB)?raoGhiD1(env.DB,rao):env.DB, !LENH_BIA.has(action) && action !== 'hoa2-sanh') }
+  env = { ...env, DB: gopDocD1(rao&&!laBanGop(env.DB)?raoGhiD1(env.DB,rao):env.DB, action !== 'hoa2-sanh') }
   // CHỐT ĐÁP ÁN (29/09): cờ cửa P08 cho phần trám bên dưới đọc CÙNG đợt đầu (đệm 15 s dùng chung lượt đọc đang bay) — không thêm một đợt D1 ở cuối.
   if(action==='answer')void docCauHinhKichHoat(env,true).catch(()=>null)
-  // Cờ cửa hàng (đệm 30 s) đọc SONG SONG với phần chính (trước: một đợt nối tiếp ở cuối). Lỗi vẫn báo như cũ khi phần chính xong.
-  const shopSom=action==='recommendations'?som(gameIdentity(env,b).then(s=>shopBatCho(env,s))):null
   const r=await gameV2Tho(env,action,b,ctx)
-  if(action==='recommendations'&&r&&r.ok===true)r.shopBat=await shopSom
   // CNH-1.0 P08 (Cline 25/09): TRÁM số ví/trạng thái P08 lên MỌI bản hiển thị có `profile` — MỘT chỗ phủ hết
   // các nhánh trả `visible(p)` bên dưới. CHỈ sửa bản hiển thị (không đụng hồ sơ đã lưu). Cửa ĐÓNG (mặc định)
   // hoặc em chưa chuyển đổi ⇒ `tram` = null ⇒ giữ nguyên bản cũ. Phản hồi của lệnh P08 đã có `p08` ⇒ bỏ qua
@@ -345,31 +280,23 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   // Nhớ theo lượt: lệnh `answer` NỘI BỘ của Đoàn (cùng request, chưa ghi gì từ lúc này) dùng lại đúng lượt đọc này thay vì đọc hồ sơ lần nữa.
   const hoSoSom=som(nhoTheoLuot(env.DB,`hoso|${sbd}`,()=>env.DB.batch<Row>(lenhDocHoSo(env,sbd)),BANG_HO_SO))
   gieoNho(env.DB,'mua',hoSoSom.then(r=>r[0]?.results[0]??null),BANG_MUA)
-  // Đoàn Hộ Tống: cờ mở Đoàn + dòng chặng (theo `b.ma`) là hai lượt ĐỌC đầu của `doanAction` ⇒ đọc CÙNG lô hồ sơ (nhớ theo lượt; trước: hai đợt nối tiếp sau hồ sơ).
-  if(action.startsWith('doan-')){void doanMoCho(env,sbd).catch(()=>null);const maChang=maChangCuaLenh(action,b);if(maChang)void docDongChang(env,maChang).catch(()=>null)}
   // CHỐT ĐÁP ÁN (thầy 29/09 "bấm chốt đáp án nó chấm 1 lúc mới được"): lượt, câu bảo vệ ca thi, phạm vi thầy đặt, bản chấm cũ KHÔNG phụ thuộc hồ sơ ⇒
   // bắt đầu CÙNG đợt với loadProfile (trước: 5 đợt nối tiếp). Nhánh `answer` vẫn await đúng thứ tự cũ ⇒ lỗi nào báo trước vẫn như cũ.
   const truocAnswer=action==='answer'?docTruocAnswer(env,sbd,b):null
   const truocComplete=action==='complete'?docTruocComplete(env,sbd,b):null
   // OMNI 3 (tối ưu 05/10): máy em gửi `msLam` (chỉ khi OMNI áp cho em) ⇒ các lượt ĐỌC OMNI của lần trả lời bắt đầu CÙNG đợt hồ sơ (nhớ theo lượt, omni-game.ts).
-  if(action==='answer'||action==='doan-nop')docSomOmniTraLoi(env,sbd,action,b)
-  // Cửa hàng (tối ưu 05/10): cờ cửa hàng ĐỌC TƯƠI của lượt (nhớ theo lượt, `moCua` dùng lại) vào CÙNG lô đọc với hồ sơ — trước: một đợt riêng.
-  if(LENH_SHOP.has(action))void docCoCuaHangTuoi(env).catch(()=>null)
-  // Đoàn + OMNI: cờ EXP (nhớ theo lượt) đọc ngay đợt đầu ⇒ lệnh `answer` nội bộ đọc được tổng sổ EXP cùng đợt với phiên/câu (xem `docTruocAnswer`).
-  if(action==='doan-nop'&&b.msLam!==undefined&&b.msLam!==null)void docCauHinhExp(env).catch(()=>null)
-  // CAO ĐIỂM 20h–24h (29/09): cờ Game Hóa 2.0 / Bi-a (đệm 15 s dùng chung, lượt đọc đang bay được chia sẻ) đọc CÙNG đợt với hồ sơ thay vì một đợt riêng sau đó.
-  if(LENH_HOA2.has(action)||action==='start'||action==='recommendations'){void docCoHoa2(env).catch(()=>null);if(action!=='start')void docCoBia(env).catch(()=>null)}
+  if(action==='answer')docSomOmniTraLoi(env,sbd,action,b)
+  // CAO ĐIỂM 20h–24h (29/09): cờ Game Hóa 2.0 (đệm 15 s dùng chung, lượt đọc đang bay được chia sẻ) đọc CÙNG đợt với hồ sơ thay vì một đợt riêng sau đó.
+  if(LENH_HOA2.has(action)||action==='start'||action==='recommendations')void docCoHoa2(env).catch(()=>null)
   // Tối ưu 05/10: "em có ở Hoá 2.0" (cờ đệm + lớp của em, nhớ theo lượt) hỏi CÙNG đợt với hồ sơ — trước: một đợt nối tiếp sau hồ sơ. Chỉ ĐỌC.
   // Lớp của em (cờ Hoá 2.0 theo lớp) vào CÙNG lô đọc với hồ sơ — kể cả khi cờ còn đang được đọc (một dòng theo khoá chính, không thêm lượt D1).
   // `start`/`recommendations` Đảo cũng hỏi "em có ở Hoá 2.0" ngay sau hồ sơ ⇒ đọc sẵn lớp cùng lô (nhớ theo lượt, `cheDo2` dùng lại).
   if(LENH_HOA2.has(action)||action==='start'||action==='recommendations')void docDongLop(env.DB,sbd).catch(()=>null)
   const cheDo2Som=LENH_HOA2.has(action)?som(cheDo2(env,sbd)):null
-  // Sảnh: phần ĐỌC của ô Bi-a (cờ + ca đang mở) chạy song song với Sảnh; phần sau (bàn Bi-a) vẫn chạy SAU kế hoạch như cũ.
-  const biaSom=action==='hoa2-sanh'?batDauBiaChoSanh(env,sbd,Date.now()):null
   // "Câu đã làm" + chi tiết câu (tối ưu vòng 2, 06/10): hai lệnh CHỈ ĐỌC ⇒ chạy luôn CÙNG đợt với hồ sơ thần thú (trước: chờ hồ sơ xong mới bắt đầu — một đợt D1 nối tiếp thừa). Em chưa chọn thần thú / chưa ở
   // Hoá 2.0 ⇒ kết quả bỏ không dùng (đường kiểm bên dưới giữ nguyên thứ tự và lời cũ); lỗi của nó chỉ tới đúng chỗ `await` như cũ.
   const cauDaLamSom=action==='hoa2-cau-da-lam'||action==='hoa2-cau-chi-tiet'?som(hoa2Action(env,sbd,action,b)):null
-  return {sbd,hoSoSom,truocAnswer,truocComplete,cheDo2Som,biaSom,cauDaLamSom}
+  return {sbd,hoSoSom,truocAnswer,truocComplete,cheDo2Som,cauDaLamSom}
 }
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
@@ -388,7 +315,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const tt=kt.tomTatKt(kiem!,Date.now())
     if(action==='hoc-tap-sanh'||action==='hoa2-sanh')return {ok:true,cheDo2:true,ngay:tt.ngay,kiemTraCaNhan:tt,theLuc:{tong:tt.tong,con:tt.con},chienDich:null,doan:{con:0},dao:{con:0}}
     if(action==='hoc-tap-dem')return {ok:true,daLamHomNay:tt.daTra,toiThieu:tt.tong,kiemTraCaNhan:tt}
-    if(['hoc-tap-start','hoc-tap-gap','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete','hoa2-dao-start','hoa2-doan-start','hoa2-thu-suc','hoa2-thu-suc-them','hoa2-de-thu-start','hoa2-de-thu-nop'].includes(action)||action.startsWith('doan-'))throw new Error('Hôm nay em chỉ làm bài kiểm tra theo lịch riêng. Bài tập tiếp tục vào ngày học kế tiếp.')
+    if(['hoc-tap-start','hoc-tap-gap','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete','hoa2-dao-start','hoa2-thu-suc','hoa2-thu-suc-them','hoa2-de-thu-start','hoa2-de-thu-nop'].includes(action))throw new Error('Hôm nay em chỉ làm bài kiểm tra theo lịch riêng. Bài tập tiếp tục vào ngày học kế tiếp.')
   }
   // App học sinh tập trung làm bài (10/10): không bắt chọn thần thú, không mở phòng/game.
   // Cùng bộ kế hoạch, phiên, quyền và answer hiện có; chỉ bỏ ràng buộc cửa Đảo/Đoàn ở giao diện.
@@ -421,34 +348,19 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(!alias[action])throw new Error('Chức năng học này chưa có.')
     const r=await hoa2Action(env,sbd,alias[action]!,b)
     if(kiem)r.kiemTraCaNhan=kt.tomTatKt(kiem,Date.now())
-    delete r._san
     if(cfg7.bat && action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now());if(lap7)r.goi7=g7.tomTatGoi7(lap7,Date.now())}
     return r
   }
   if(action==='sync')return {ok:true,...await syncIndex(env)}
   const ds=giu.ds&&giu.ds.sbd===sbd?giu.ds:batDauDocSom(env,action,b,sbd)
-  const {truocAnswer,truocComplete,cheDo2Som,biaSom,cauDaLamSom}=ds
+  const {truocAnswer,truocComplete,cheDo2Som,cauDaLamSom}=ds
   const {profile:p,revision}=await loadProfile(env,sbd,await ds.hoSoSom)
-  if(action.startsWith('escort-')){if(p.choice)throw new Error('Em chọn thần thú trước khi vào võ đài.');return escortAction(env,sbd,p.pet,p.cap,action,b)}
-  if(action.startsWith('room-'))return roomAction(env,sbd,p.pet,action,b)
-  if(action.startsWith('doan-')){if(p.choice)throw new Error('Em chọn thần thú trước khi lên đường cùng Đoàn Hộ Tống.');return doanAction(env,sbd,p,action,b,gameV2)}
   // GAME HÓA 2.0 (srs2-game.ts): Sảnh bản đồ, Câu đã làm, Rương Bát Linh. Chỉ khi cờ `cau_hinh.game_hoa_2` bật cho em.
   if(LENH_HOA2.has(action)){
     if(!await cheDo2Som)return {ok:true,cheDo2:false};
     if(p.choice&&action!=='hoa2-cau-da-lam'&&action!=='hoa2-cau-chi-tiet')return {ok:true,cheDo2:true,canChonThu:true};
-    const h=await(cauDaLamSom??hoa2Action(env,sbd,action,b));
-    if(action==='hoa2-sanh'&&h.ok===true&&biaSom){
-      const san=h._san as { kh: any; hs: any } | undefined;
-      delete h._san;
-      h.bia=await biaSom(san);
-    } else {
-      delete h._san;
-    }
-    return h;
+    return cauDaLamSom??hoa2Action(env,sbd,action,b);
   }
-  // BI-A PHẢN ỨNG (bi-a.ts; cờ `cau_hinh.bi_a`, mặc định TẮT): cửa thứ ba trên Sảnh Bát Linh. Câu trả lời đi qua `answer` chung bên dưới.
-  if(LENH_BIA.has(action))return biaAction(env,sbd,action,b)
-  if(LENH_SHOP.has(action)){if(p.choice)throw new Error('Em chọn thần thú trước khi vào Cửa hàng.');return shopAction(env,sbd,p,revision,action,b,()=>loadProfile(env,sbd))} // Cửa hàng phụ kiện (game-v2-shop.ts; cờ cau_hinh.shop_phu_kien mặc định TẮT)
   if(action==='academic-sync'){const result=await syncAcademic(env,sbd,p,b.mom);return {ok:true,...result,profile:visible(p),revision:await save(env,sbd,p,revision)}}
   if(action==='progress-history'){
     const rows=await env.DB.prepare(`SELECT date(created_at,'+7 hours') AS day, COUNT(*) AS total,
@@ -472,12 +384,12 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     p.nickname=ten;p.doiTen={ngay,lan:da+1};return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision),doiTenConLai:DOI_TEN_MOI_NGAY-da-1}}
   if(action==='share')return {ok:true,pass:await parentPass(env,sbd)}
   if(action==='profile'){
-    // Tối ưu 05/10: bốn phần ĐỌC độc lập (nhiệm vụ, trần hấp thụ, đầu vào lượt, cờ Đoàn) chạy CÙNG đợt — trước: nối tiếp. `datHomNay` của đầu vào lượt
+    // Tối ưu 05/10: ba phần ĐỌC độc lập (nhiệm vụ, trần hấp thụ, đầu vào lượt) chạy CÙNG đợt — trước: nối tiếp. `datHomNay` của đầu vào lượt
     // chỉ được chép lại (không dùng để đọc) ⇒ gắn sau khi có trần hấp thụ. Lỗi vẫn tới đúng chỗ `await` cũ.
     const pTasks=som(env.DB.prepare('SELECT id,dang FROM game_v2_task WHERE sbd=? AND completed_at IS NULL ORDER BY created_at LIMIT 20').bind(sbd).all<{id:string;dang:string}>())
-    const pTran=som(docTranHapThu(env,sbd,academicDay(now()))),pLuot=som(docDauVaoLuot(env,sbd,academicDay(now()),Date.now(),false)),pDoan=som(doanMoCho(env,sbd))
+    const pTran=som(docTranHapThu(env,sbd,academicDay(now()))),pLuot=som(docDauVaoLuot(env,sbd,academicDay(now()),Date.now(),false))
     const tasks=await pTasks;const tranHapThu=await pTran;const dauVaoLuot={...await pLuot,datHomNay:tranHapThu.dat}
-    return {ok:true,profile:visible(p,{tran:tranHapThu.tran,soCauHomNay:tranHapThu.soCauHomNay,canCau:tranHapThu.canCau}),revision,luot:tomTatLuot(luotHomNay(dauVaoLuot),dauVaoLuot.soLuotDaLam),tasks:tasks.results,doanMo:await pDoan}
+    return {ok:true,profile:visible(p,{tran:tranHapThu.tran,soCauHomNay:tranHapThu.soCauHomNay,canCau:tranHapThu.canCau}),revision,luot:tomTatLuot(luotHomNay(dauVaoLuot),dauVaoLuot.soLuotDaLam),tasks:tasks.results}
   }
   if(action==='khien-ren'){
     if(p.choice)throw new Error('Em chọn thần thú trước khi rèn khiên.')
@@ -542,14 +454,10 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   }
   if(action==='start'||action==='recommendations'){
     const mode:Mode=['adventure','repair','tower','arena'].includes(String(b.mode))?b.mode as Mode:'adventure'
-    let guardian:string|undefined,guardianRound:number|undefined
-    if(b.guardian){guardian=String(b.guardian).trim().toUpperCase();const {r}=await escortContext(env,guardian,sbd);if(!r.started||r.finished||mode!=='arena'||Date.now()>=Math.min(r.deadline,r.roundAt+60000)||b.guardianRound!==undefined&&Number(b.guardianRound)!==r.round)throw new Error('Lượt Linh Tâm đã đổi. Em chờ câu của lượt mới.');guardianRound=r.round}
-    // Đoàn Hộ Tống gọi `start` NỘI BỘ (laGoiNoiBoDoan) để lấy câu bằng đường cũ; Linh Tâm (guardian) và võ đài cũng giữ đường cũ — chỉ lượt Đảo của em mới theo bộ chọn lượt mới.
-    // GAME HÓA 2.0: nguồn câu = kế hoạch ngày đã chốt (Đảo: câu mới + ôn Đúng–sai; Đoàn: câu ôn). Cờ tắt ⇒ đường cũ bên dưới.
-    if(!guardian&&mode==='adventure'&&await cheDo2(env,sbd)){if(!laGoiNoiBoDoan(b))return action==='start'?startDao2CoVe(env,sbd,b,Date.now()):hoa2Action(env,sbd,'hoa2-sanh',b);if(action==='start')return startDoan2(env,sbd,Date.now())}
-    if(!guardian&&mode==='adventure'&&!laGoiNoiBoDoan(b)&&await luotMoiBat(env))return startLuotMoi(env,sbd,p,b,action)
-    // ĐOÀN nội bộ (`start` gọi từ `taoNguoi`): kho LỚP như lượt Đảo mới (cùng cờ lùi `game_luot_moi`); Linh Tâm / võ đài / repair / tower vẫn đường cũ.
-    if(!guardian&&mode==='adventure'&&action==='start'&&laGoiNoiBoDoan(b)&&await luotMoiBat(env))return startDoanKhoLop(env,sbd,p)
+    if(b.guardian)throw new Error('Võ đài Linh Tâm đã đóng.')
+    // GAME HÓA 2.0: nguồn câu = kế hoạch ngày đã chốt. Cờ tắt ⇒ đường cũ bên dưới.
+    if(mode==='adventure'&&await cheDo2(env,sbd))return action==='start'?startDao2CoVe(env,sbd,b,Date.now()):hoa2Action(env,sbd,'hoa2-sanh',b)
+    if(mode==='adventure'&&await luotMoiBat(env))return startLuotMoi(env,sbd,p,b,action)
     // Tối ưu 08/10: readScope, protectedQuestions, readGameScope độc lập → SONG SONG; sau đó qidChanHomNay, docCauBtvnChuaNop, attempts cũng SONG SONG.
     const tNow=Date.now()
     const [scope,blocked,control]=await Promise.all([readScope(env,sbd),protectedQuestions(env),readGameScope(env,sbd)])
@@ -562,12 +470,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     for(const x of chanBtvn)blocked.add(x)
     const daHoc=learnedQuestionFilter(scope.evidence,blocked)
     const eligible=scope.pool.filter(q=>!laTuLuanPool(q)&&daHoc(q)&&(control.types.length===0||q.dang!==null&&control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
-    if(guardian){
-      const saved=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND json_extract(json,'$.guardian')=? AND json_extract(json,'$.guardianRound')=? ORDER BY created_at DESC LIMIT 1").bind(sbd,guardian,guardianRound).first<{id:string;json:string}>()
-      if(saved){const old=JSON.parse(saved.json) as Session;const qs=old.questions.map(ref=>eligible.find(q=>q.qid===ref.qid&&q.version===ref.version));if(qs.every(Boolean)){const answered=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=?').bind(saved.id,sbd).all<{json:string}>();const qsDay=await doDayDu(env,qs as CauPool[]);return {ok:true,id:saved.id,questions:qsDay.map(q=>publicQuestion(q)),answered:answered.results.map(x=>JSON.parse(x.json))}}throw new Error('Câu của lượt này đã thay đổi phạm vi. Em chờ lượt mới.')}
-    }
     const dayStart=new Date(academicDay(now())+'T00:00:00+07:00')
-    const loaiTran:LoaiTran=laGoiNoiBoDoan(b)?'doan':'dao' // Đoàn gọi `start` nội bộ ⇒ trần Đoàn; Linh Tâm/võ đài/đường cũ ⇒ trần Đảo (36)
+    const loaiTran:LoaiTran='dao' // Linh Tâm/võ đài/đường cũ ⇒ trần Đảo (36)
     const count={n:await demCauTrongNgay(env,sbd,dayStart.toISOString(),loaiTran)}
     const remaining=Math.max(0,tranCuaLoai(loaiTran)-count.n)
     const masteryLuot=await masteryTheoHoSo(env,sbd,p.mastery)
@@ -594,10 +498,10 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const selected=chon.map(x=>x.q),vai=new Map(chon.map(x=>[x.q.qid,x.role]))
     if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:tranCuaLoai(loaiTran),suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
     if(!remaining)throw hetTran(tranCuaLoai(loaiTran))
-    const qs=mode==='arena'?selected.slice(0,b.guardian?1:2):selected
+    const qs=mode==='arena'?selected.slice(0,2):selected
     if(!qs.length)return {ok:true,questions:[],missing:scope.missing,message:'Chưa có câu đã chấm, đã công bố và phù hợp trong kho. Em hoàn thành bài Thầy giao rồi quay lại.'}
-    const id=guardian?await hash(`${guardian}|${guardianRound}|${sbd}`):crypto.randomUUID();const groups=new Set(scope.evidence.map(e=>e.group))
-    const session:Session={guardian,guardianRound,mode,created:Date.now(),questions:qs.map(q=>({qid:q.qid,maDe:q.maDe,version:q.version,group:q.group,novel:!groups.has(q.group)}))}
+    const id=crypto.randomUUID();const groups=new Set(scope.evidence.map(e=>e.group))
+    const session:Session={mode,created:Date.now(),questions:qs.map(q=>({qid:q.qid,maDe:q.maDe,version:q.version,group:q.group,novel:!groups.has(q.group)}))}
     const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
     if(!inserted.meta.changes)return gameV2(env,'start',b)
     const qsDay=await doDayDu(env,qs as CauPool[])
@@ -622,7 +526,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const row=await truoc.session
     if(!row)throw new Error('Không tìm thấy lượt học của em.')
     const session=JSON.parse(row.json) as Session
-    if(session.doan&&!laGoiNoiBoDoan(b))throw new Error('Câu này thuộc chặng Đoàn Hộ Tống. Em trả lời ngay trong trận nhé.')
+    if(session.doan)throw new Error('Chặng Đoàn Hộ Tống đã đóng. Em mở chặng học mới nhé.')
     if(Date.now()-session.created>2*3600000)throw new Error('Lượt học đã hết hạn. Em mở lượt mới.')
     const ref=session.questions.find(q=>q.qid===qid);if(!ref)throw new Error('Câu không thuộc lượt học.')
     // THU HỒI KHI HUỶ (thầy 06/10, thu-hoi-chien-dich.ts): lượt có cờ `thuHoiLuc` mà câu này thuộc chiến dịch ĐÃ HUỶ ⇒ đóng như câu rút khỏi kho (`cau_doi`: máy em tự sang câu kế, không tính sai). Lượt không cờ: không thêm truy vấn.
@@ -635,9 +539,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     // Tối ưu 05/10: dòng câu đọc sẵn cùng đợt với phiên (`truoc.cau`, cùng điều kiện tra) — bản xáo áp lên đúng câu gốc ấy như cũ.
     const qGoc=await currentQuestion(env,ref,truoc.cau),q=apXaoTheoRef(qGoc,ref)
     // Đọc OMNI (thời gian kỳ vọng, số lượt lướt hôm nay, hồ sơ, ma trận Q, lượt của chuyến) bắt đầu ngay khi biết câu — song song phần kiểm phạm vi / bản chấm cũ.
-    // 06/10: Đoàn MỘT NGƯỜI THẬT (lệnh `answer` NỘI BỘ của game-v2-doan.ts `doan-nop` báo `motMinh`) được mở Trạm hồi phục; chỉ tin cờ khi đúng là lệnh nội bộ của Đoàn.
-    const doanMotMinh=!!session.doan&&laGoiNoiBoDoan(b)&&(b as {motMinh?:unknown}).motMinh===true
-    const omniDoc=omniSom?som(omniSom.then(bat=>bat?docTruocOmni(env,sbd,id,session,q,Date.now(),doanMotMinh):null)):null
+    const omniDoc=omniSom?som(omniSom.then(bat=>bat?docTruocOmni(env,sbd,id,session,q,Date.now()):null)):null
     const blocked=await truoc.blocked
     const control=await truoc.control;if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
     for(const key of control.blocked)blocked.add(key)
@@ -696,7 +598,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     }
     const previous=await truoc.previous
     if(previous){const cu=JSON.parse(previous.json);await ghiKetQuaHoc(cu.attempt,typeof cu.traLoi==='string'?cu.traLoi:undefined,undefined,truoc.exp,soOmniTuKetQuaCu(ref.xt?{...cu,traLoi:chonVeGoc(ref,q.phan,String(cu.traLoi??'')),answer:qGoc.correct}:cu,b,qGoc,session));const [moi,ec]=await Promise.all([loadProfile(env,sbd),expCauCuaCau(Number(cu.reward)||0)]);return {ok:true,...cu,...ec,profile:visible(moi.profile),revision:moi.revision,replayed:true}} // 05/10: lượt BẢN XÁO ⇒ phần OMNI từng ý dựng lại theo khung gốc (như lần chấm đầu: qGoc + đáp án quy về gốc)
-    if(session.guardian){const {r}=await escortContext(env,session.guardian,sbd);if(r.finished||r.round!==session.guardianRound||Date.now()>=Math.min(r.deadline,r.roundAt+60000))throw new Error('Lượt vừa kết thúc. Em làm câu của lượt mới.')}
+    if(session.guardian)throw new Error('Võ đài Linh Tâm đã đóng.')
     // TRẦN CÂU/NGÀY chỉ chặn ở lúc PHÁT câu (`start` / rút: `Math.min(soCau, remaining)`), KHÔNG chặn ở đây (Boss 21/09, P0 "không nộp được bài"): câu ĐÃ PHÁT trong một lượt đang mở thì luôn được trả lời, em không kẹt giữa ải
     // vì trần đổi / đếm lại. Mỗi câu của một lượt chỉ trả lời MỘT lần (`receipt` = lượt|câu là khoá chính; nộp lại ⇒ `replayed`), nên tổng số lượt trong ngày ≤ trần + phần dư của lượt cuối đã phát.
     const submitted=String(b.answer??'').trim()
@@ -705,7 +607,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const attempt:Attempt={id:receipt,session:id,qid,group:q.group,dang:q.dang,mucDo:q.mucDo,correct:laCD?chamCauChanDoan(q,String(b.answer??'')):(session as {hocTap?:number}).hocTap===1&&q.phan==='III'?khopPhanIII(String(b.answer??''),q.correct):grade(q,String(b.answer??'')),assisted:b.assisted===true||!!(ref as {goiY?:unknown}).goiY,at:Date.now(),novel:ref.novel}
     // OMNI 3: xét lướt / chắc-mà-sai / P dạng / Trạm hồi phục (omni-game.ts). Lỗi đọc ⇒ null ⇒ lượt chấm như cờ tắt.
     const docOmni=omniDoc?await omniDoc:null
-    const omni=docOmni?await xetOmniTraLoi(env,{sbd,phien:session,qidPhien:qid,cau:qGoc,chon:chonVeGoc(ref,q.phan,submitted),dung:attempt.correct,hoTro:attempt.assisted,b,nowMs:attempt.at,doc:docOmni,...(doanMotMinh?{doanMotMinh:true}:{})}):null
+    const omni=docOmni?await xetOmniTraLoi(env,{sbd,phien:session,qidPhien:qid,cau:qGoc,chon:chonVeGoc(ref,q.phan,submitted),dung:attempt.correct,hoTro:attempt.assisted,b,nowMs:attempt.at,doc:docOmni}):null
     // Lướt (sai quá nhanh, ≤ 3 lượt/ngày): KHÔNG đổi mastery của hồ sơ game (bỏ `advance`), không thưởng nấc.
     // 06/10: câu CHẨN ĐOÁN cũng không đổi mastery theo dạng (câu nền không thuộc dạng nào của kho — không sinh khoá dạng lạ trong báo cáo tiến bộ game).
     const masteryCu=p.mastery.find(m=>m.key===(q.dang??q.group))

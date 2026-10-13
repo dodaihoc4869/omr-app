@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "Đoàn: chặng Phần III ~bt0" (Đảo đã khoá cùng ý); 4 ca A3 dựng lại qua Đảo (em chỉ chơi Đảo).
 // LÀM LẠI CÂU SAI — ĐỢT 2 (06/10, làn A): thang MỚI = song sinh → BIẾN THỂ BẰNG MÃ (`~bt`, Phần I/III có bộ sinh) | Ý ĐÚNG–SAI MỚI (`~yd`, Phần II) →
 // câu anh em (DẠY HỌC rồi TU LUYỆN) → bản xáo → nguyên văn; và câu NGHI sai đáp án bị loại ở cổng cuối của em. Nghiệm thu trên D1 THẬT (node:sqlite, đủ migration),
 // mọi lệnh của em đi qua đúng đường Worker thật (`server/src/index.ts`). Đặc tả: DE-XUAT-LAM-LAI-CAU-SAI-0510.md; tệp đợt 1: lam-lai-cau-sai-0510-d1.test.ts.
@@ -11,7 +12,6 @@ import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
 import { xoaDemPhamVi } from '../server/src/bai-da-day'
 import { docHoSo2, docLanLam, xoaDemChienDich } from '../server/src/srs2-d1'
-import { DEM_NGUOC_MS } from '../server/src/game-v2-doan'
 import { damBaoBangYDs, docYDsTheoQid } from '../server/src/cau-y-ds'
 import { damBaoBangTuHoanThien, dsCauNghi } from '../server/src/tu-hoan-thien'
 import { chanKhacKhoiDong, chanKhacKhoiEm, chanKhacKhoiLop, chanKhacKhoiTheoEm, congKhoi, demChanKhoi, docCauNghiDem, xoaDemCauNghi, xoaDemChanKhoi } from '../server/src/chan-khac-khoi'
@@ -39,12 +39,12 @@ const ngayVnCua = (ms: number) => new Date(ms + 7 * 3_600_000).toISOString().sli
 const luc = (ngay: string, gio = '08:00') => Date.parse(`${ngay}T${gio}:00+07:00`)
 
 interface TuyChonKho { ngoaiPhamVi?: string[]; loTo?: Record<string, string | null> }
-/** Em S1 lớp 11A1 (khối 11), Game Hóa 2.0 + Đoàn bật, phạm vi đã dạy = mọi tờ của kho TRỪ `ngoaiPhamVi`, chiến dịch CD1 chứa các câu `cd`. */
+/** Em S1 lớp 11A1 (khối 11), Game Hóa 2.0 bật, phạm vi đã dạy = mọi tờ của kho TRỪ `ngoaiPhamVi`, chiến dịch CD1 chứa các câu `cd`. */
 function dung(kho: CauThu[], cd: string[], tuyChon: TuyChonKho = {}): { d: D1That; env: Env } {
   const d = taoD1That()
   const env = d.env as unknown as Env
   d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Nguyễn An','11A1','mk1','x')")
-  d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true,"lop":["11A1"]}','x'),('doan_ho_tong','{"toanBo":true}','x')`)
+  d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true,"lop":["11A1"]}','x')`)
   d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run('S1', JSON.stringify({ pet: 'lua_phuong', choice: false, legacy: null, cap: 5, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z' }), 'x')
   const lopTo = { ...LOP_TO, ...(tuyChon.loTo ?? {}) }
   const to = [...new Set(kho.map((c) => c.maDe))]
@@ -174,29 +174,6 @@ describe('A1 · khối 11 sai câu Phần III có bộ sinh, không song sinh �
     const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'Q3I~bt0', answer: bt.correct })
     expect(t.correct).toBe(true)
     expect(JSON.parse(soCua(d, 'Q3I~bt0')[0]!.raw_json!)).toEqual({ ht_cau_version:'v1', chon: bt.correct, tc: 'Q3I' })
-  })
-
-  it('Đoàn: chặng cho Phần III là ~bt0 (đề riêng, không lộ đáp án); nộp đúng ⇒ sổ ghi dưới ~bt0 + tc, Q3 tiến luật đóng lỗi', async () => {
-    const { d, env } = dung([Q3], ['Q3'])
-    ghi(d, 'Q3', 0, luc('2026-10-05', '10:00'))
-    vi.setSystemTime(luc('2026-10-06'))
-    const mo = await em(env, '/game-v2/doan-mo', {})
-    expect(mo.ok, JSON.stringify(mo).slice(0, 400)).toBe(true)
-    const ma = String(mo.doan.ma)
-    vi.setSystemTime(Date.now() + DEM_NGUOC_MS + 500)
-    const xem = await em(env, '/game-v2/doan-xem', { ma })
-    expect(xem.ok, JSON.stringify(xem).slice(0, 400)).toBe(true)
-    const cau = xem.doan.cau as { qid: string; de: { text: string } }
-    expect(cau.qid).toBe('Q3~bt0')
-    expect(cau.de.text).not.toBe('Đề câu Q3')
-    khongLoDapAn(xem)
-    const bt = apBienThe(gocCua(d, 'Q3'), 'Q3~bt0', 11)!
-    expect(cau.de.text).toBe(bt.text)
-    const nop = await em(env, '/game-v2/doan-nop', { ma, hiep: xem.doan.tran.hiep, answer: bt.correct, hanhDong: 'danh' })
-    expect(nop.ok, JSON.stringify(nop).slice(0, 300)).toBe(true)
-    expect(nop.ketQuaCau.correct).toBe(true)
-    expect(soCua(d, 'Q3~bt0').map((x) => ({ kq: x.ket_qua, tc: JSON.parse(x.raw_json ?? '{}').tc }))).toEqual([{ kq: 1, tc: 'Q3' }])
-    expect((await docHoSo2(env, 'S1', '2026-10-06')).loiV2?.get('Q3')).toMatchObject({ trangThai: 'cho_kiem', daDungSongSinh: true })
   })
 
   it('tắt khoá lam_lai_khac ⇒ y hệt hôm nay: Q3 nguyên văn, phiên và sổ không có khoá làm lại nào', async () => {
@@ -460,74 +437,79 @@ const TL_KHAC_KHOI: CauThu[] = [
 
 describe('A3 · câu anh em: DẠY HỌC thiếu ⇒ kho TU LUYỆN cùng dạng, cùng mức, ĐÚNG KHỐI, em chưa gặp', () => {
   const NGOAI = [TL11, TL10, TL11X] // kho luyện tập không nằm trong phạm vi đã dạy
-  async function moDoan(env: Env) {
-    const mo = await em(env, '/game-v2/doan-mo', {})
-    expect(mo.ok, JSON.stringify(mo).slice(0, 400)).toBe(true)
-    const ma = String(mo.doan.ma)
-    vi.setSystemTime(Date.now() + DEM_NGUOC_MS + 500)
-    const xem = await em(env, '/game-v2/doan-xem', { ma })
-    expect(xem.ok, JSON.stringify(xem).slice(0, 400)).toBe(true)
-    return { ma, xem, cau: xem.doan.cau as { qid: string; de: { qid: string; choices: string[] } } }
+  /** Nhịp kênh "chỉ chơi Đảo" (7 ngày qua có chuyến Đảo) ⇒ câu ôn Phần I vào Đảo; mở chuyến, lấy câu duy nhất của ngày. */
+  function chiChoiDao(d: D1That) {
+    d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('CU1', 'S1', JSON.stringify({ mode: 'adventure', created: luc('2026-10-04'), hoa2: 1, questions: [] }), new Date(luc('2026-10-04')).toISOString())
   }
-  it('Đoàn: không còn câu anh em DẠY HỌC ⇒ câu TU LUYỆN khối 11 chưa gặp (TLA), không lộ đáp án; sổ ghi dưới TLA + tc = Q1; không bao giờ lấy câu tờ khối 10 / tờ mâu thuẫn khối', async () => {
+  async function moDao(env: Env) {
+    const r = await dao(env)
+    expect(r.ok, JSON.stringify(r).slice(0, 400)).toBe(true)
+    expect(r.questions?.length, JSON.stringify(r).slice(0, 400)).toBe(1)
+    return { r, cau: r.questions[0] as { qid: string; choices: string[] } }
+  }
+  it('không còn câu anh em DẠY HỌC ⇒ câu TU LUYỆN khối 11 chưa gặp (TLA), không lộ đáp án; sổ ghi dưới TLA + tc = Q1; không bao giờ lấy câu tờ khối 10 / tờ mâu thuẫn khối', async () => {
     const { d, env } = dung([Q1, TL_A, ...TL_KHAC_KHOI], ['Q1'], { ngoaiPhamVi: NGOAI })
+    chiChoiDao(d)
     ghi(d, 'Q1', 0, luc('2026-10-05', '10:00'))
     vi.setSystemTime(luc('2026-10-06'))
-    expect((await dao(env)).lyDo).toBe('khoa_cho_doan')
-    const { ma, xem, cau } = await moDoan(env)
+    const { r, cau } = await moDao(env)
     expect(cau.qid).toBe('TLA')
-    expect(cau.de.choices).toEqual(['A', 'B', 'C', 'D'].map((k) => PA('TLA', k)))
-    khongLoDapAn(xem)
-    expect(JSON.stringify(xem)).not.toContain('Q1')
-    const nop = await em(env, '/game-v2/doan-nop', { ma, hiep: xem.doan.tran.hiep, answer: 'C', hanhDong: 'danh' })
-    expect(nop.ketQuaCau.correct).toBe(true)
+    expect(cau.choices).toEqual(['A', 'B', 'C', 'D'].map((k) => PA('TLA', k)))
+    khongLoDapAn(r)
+    expect(JSON.stringify(r)).not.toContain('Q1')
+    const nop = await em(env, '/game-v2/answer', { session: r.id, qid: cau.qid, answer: 'C' })
+    expect(nop.correct).toBe(true)
     expect(soCua(d, 'TLA').map((x) => ({ kq: x.ket_qua, tc: JSON.parse(x.raw_json ?? '{}').tc }))).toEqual([{ kq: 1, tc: 'Q1' }])
     expect((await docHoSo2(env, 'S1', '2026-10-06')).loiV2?.get('Q1')).toMatchObject({ trangThai: 'cho_kiem', daDungSongSinh: true })
   })
 
   it('LUẬT KHỐI: chỉ còn ứng viên TU LUYỆN khối 10 / tờ mâu thuẫn ⇒ KHÔNG lấy (rơi xuống bản xáo của chính Q1); thêm TLA khối 11 ⇒ chính nó thành câu anh em', async () => {
     const { d, env } = dung([Q1, ...TL_KHAC_KHOI], ['Q1'], { ngoaiPhamVi: NGOAI })
+    chiChoiDao(d)
     ghi(d, 'Q1', 0, luc('2026-10-05', '10:00'))
     vi.setSystemTime(luc('2026-10-06'))
-    const { xem, cau } = await moDoan(env)
+    const { r, cau } = await moDao(env)
     expect(cau.qid).toBe('Q1') // bản xáo (bậc 3)
-    for (const sai of ['TL10', 'TLMT']) expect(JSON.stringify(xem)).not.toContain(sai)
+    for (const sai of ['TL10', 'TLMT']) expect(JSON.stringify(r)).not.toContain(sai)
     // Đối chứng: thêm TLA (tờ khối 11 đúng) vào kho ⇒ có ứng viên.
     d.sql.prepare('INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,da_xoa,cap_nhat_luc) VALUES(?,?,?,?,0,?)').run(TL11, 'Tờ TL', '11', 1, 'v1')
     d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,'v1','x')").run(TL11)
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run(TL11, 'TLA', 'v1', 'g-TLA', 'D1', JSON.stringify(cauJson(TL_A)))
-    d.sql.exec('DELETE FROM game_v2_session; DELETE FROM doan_chang; DELETE FROM doan_luot')
+    d.sql.exec("DELETE FROM game_v2_session WHERE id <> 'CU1'")
     vi.setSystemTime(luc('2026-10-07'))
-    const sau = await moDoan(env)
+    const sau = await moDao(env)
     expect(sau.cau.qid).toBe('TLA')
   })
 
   it('DẠY HỌC còn câu anh em ⇒ ưu tiên DẠY HỌC (TU LUYỆN chỉ khi thiếu); TU LUYỆN em ĐÃ gặp ⇒ không lấy', async () => {
     const DH: CauThu = { qid: 'DH1', maDe: TO11, phan: 'I', dang: 'D1', mucDo: 'TH', correct: 'C' }
     const a = dung([Q1, DH, TL_A], ['Q1'], { ngoaiPhamVi: NGOAI })
+    chiChoiDao(a.d)
     ghi(a.d, 'Q1', 0, luc('2026-10-05', '10:00'))
     vi.setSystemTime(luc('2026-10-06'))
-    expect((await moDoan(a.env)).cau.qid).toBe('DH1')
+    expect((await moDao(a.env)).cau.qid).toBe('DH1')
     const b = dung([Q1, TL_A], ['Q1'], { ngoaiPhamVi: NGOAI })
+    chiChoiDao(b.d)
     ghi(b.d, 'Q1', 0, luc('2026-10-05', '10:00'))
     ghi(b.d, 'TLA', 1, luc('2026-10-04', '10:00')) // đã gặp 2 ngày trước
     vi.setSystemTime(luc('2026-10-06'))
-    expect((await moDoan(b.env)).cau.qid).toBe('Q1') // TU LUYỆN đã gặp ⇒ không phải "chưa gặp" ⇒ rơi xuống bản xáo
+    expect((await moDao(b.env)).cau.qid).toBe('Q1') // TU LUYỆN đã gặp ⇒ không phải "chưa gặp" ⇒ rơi xuống bản xáo
   })
 
   it('câu TU LUYỆN đang NGHI sai đáp án không thành câu anh em (chọn câu kế)', async () => {
     const TL_B: CauThu = { qid: 'TLB', maDe: TL11, phan: 'I', dang: 'D1', mucDo: 'TH', correct: 'D' }
     const { d, env } = dung([Q1, TL_A, TL_B], ['Q1'], { ngoaiPhamVi: NGOAI })
     await damBaoBangTuHoanThien(env)
+    chiChoiDao(d)
     d.sql.exec("INSERT INTO cau_nghi_dap_an(qid,so_lan,so_sai,ty_le_sai,trang_thai,luc) VALUES('TLA',9,9,1,'nghi','x'),('TLB',9,9,1,'nghi','x')")
     ghi(d, 'Q1', 0, luc('2026-10-05', '10:00'))
     vi.setSystemTime(luc('2026-10-06'))
-    expect((await moDoan(env)).cau.qid).toBe('Q1') // cả hai ứng viên đều nghi ⇒ bản xáo
+    expect((await moDao(env)).cau.qid).toBe('Q1') // cả hai ứng viên đều nghi ⇒ bản xáo
     d.sql.exec("UPDATE cau_nghi_dap_an SET trang_thai = 'dung_dap_an' WHERE qid = 'TLA'")
     xoaDemCauNghi()
-    d.sql.exec('DELETE FROM game_v2_session; DELETE FROM doan_chang; DELETE FROM doan_luot')
+    d.sql.exec("DELETE FROM game_v2_session WHERE id <> 'CU1'")
     vi.setSystemTime(luc('2026-10-07'))
-    expect((await moDoan(env)).cau.qid).toBe('TLA')
+    expect((await moDao(env)).cau.qid).toBe('TLA')
   })
 })
 
@@ -557,12 +539,12 @@ describe('A4 · cổng cuối của em loại câu NGHI sai đáp án (lý do `n
     log.mockRestore()
   })
 
-  it('MỌI kênh của em đi qua cùng cổng: Đảo · Đoàn · Tu luyện · Bi-a · ôn lại · khắc phục · lượt cũ ⇒ câu nghi bị loại ở từng kênh; rút đề ca thi (dsCauNghi) vẫn đọc đúng danh sách', async () => {
+  it('MỌI kênh của em đi qua cùng cổng: Đảo · Tu luyện · ôn lại · khắc phục · lượt cũ ⇒ câu nghi bị loại ở từng kênh; rút đề ca thi (dsCauNghi) vẫn đọc đúng danh sách', async () => {
     const d = taoD1That()
     const env = d.env as unknown as Env
     await damBaoBangTuHoanThien(env)
     nghi(d, 'DH-11-B1-I-2')
-    for (const kenh of ['dao2', 'doan2', 'tu_luyen', 'tu_luyen_kho_sai', 'bia', 'on_lai', 'khac_phuc', 'game_cu', 'ph_giao_them']) {
+    for (const kenh of ['dao2', 'tu_luyen', 'tu_luyen_kho_sai', 'on_lai', 'khac_phuc', 'game_cu', 'ph_giao_them']) {
       const ra = await chanKhacKhoiEm(env, kenh, { khoiEm: 11 }, [{ qid: 'DH-11-B1-I-1', maDe: TO11 }, { qid: 'DH-11-B1-I-2', maDe: TO11 }], { cauCua: (x) => x })
       expect(ra.map((x) => x.qid), kenh).toEqual(['DH-11-B1-I-1'])
       expect(demChanKhoi()[`em:${kenh}`], kenh).toMatchObject({ giu: 1, nghi_dap_an: 1 })

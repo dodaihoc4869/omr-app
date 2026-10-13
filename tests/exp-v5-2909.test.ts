@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ dòng soát `game-v2-doan-exp.ts` (tệp đã gỡ) trong ca (3); các tệp còn giữ vẫn soát như cũ.
 // LUẬT EXP v5 (THẦY ĐÃ CHỐT 29/09/2026 "build và đẩy luôn" — docs/DE-XUAT-EXP-V5-2909.md). BẢNG NGHIỆM THU chạy bằng HÀM THẬT:
 //   (1) bảng D/T khoá theo công thức đóng; (2) mô phỏng 1 300 ngày: cày vô hạn cấp 10 ≥ ngày 21, chăm = 21; cấp 120 chăm = 1 200 ± 5; khiên 1 chăm = 36, cày ≥ 36;
 //       chăm cấp 2 ≤ ngày 1, cấp 3 ≤ ngày 2; (3) không trần ngày nào còn chặn EXP; (4) EXP tràn quy đổi đúng công thức; (5) ngày nghỉ chung; (6) khoá shop bậc 4/5;
@@ -102,7 +103,6 @@ describe('(3) KHÔNG trần ngày nào còn chặn EXP', () => {
   it('máy chủ không còn dùng Huyết Chiến / trần game để cắt EXP (chỉ còn cho vật phẩm)', () => {
     const doc = (t: string) => readFileSync(new URL(`../server/src/${t}`, import.meta.url), 'utf8')
     expect(doc('game-v2.ts')).not.toMatch(/khongThuong|duocThuongCauThu|TRAN_EXP_GAME_NGAY/)
-    expect(doc('game-v2-doan-exp.ts')).not.toMatch(/duocThuongCauThu/)
     expect(doc('exp-d1.ts')).not.toMatch(/TIEP_SUC_TOI_DA_NGAY/)
     expect(doc('exp-hoc-tap.ts')).not.toMatch(/TRAN_MEM|TRAN_CUNG|TOI_DA_NGAY/)
   })

@@ -4,7 +4,7 @@ import { docCauHinh } from './chua-cau-sai-cau-hinh'
 import { docHocLieu } from './chua-cau-sai-hoc-lieu'
 import { chonProbe, type AnhPhien } from './chua-cau-sai-phien'
 import type { NhomChuaTrenLop } from './chua-cau-sai-chieu-kieu'
-import { coCaDangMo } from './bi-a'
+import { coCaDangMo } from './ca-dang-mo'
 type Obj = Record<string, any>
 const str = (x: unknown) => (typeof x === 'string' ? x.trim() : '')
 const loi = (mo: string, status = 409) =>

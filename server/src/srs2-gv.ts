@@ -1,5 +1,5 @@
 // THUẬT TOÁN 2.0 — LỆNH CỦA THẦY `/gv/chien-dich` (nằm SAU cổng `laThay`).
-//   action: co-doc | co-luu | bia-co-doc | bia-co-luu | danh-sach | suc-chua | tao | dong | huy | bang | buoi-chua | noi-dung-cau | chua-xong
+//   action: co-doc | co-luu | danh-sach | suc-chua | tao | dong | huy | bang | buoi-chua | noi-dung-cau | chua-xong
 // Vòng khép kín: Kết thúc ca kiểm tra → Giao chiến dịch (có đồng hồ sức chứa) → Bảng chiến dịch khi đang chạy →
 // Buổi chữa khi hết hạn nộp → "Chữa xong" (câu cần dạy lại quay về Đoàn Hộ Tống hôm sau).
 import type { Env } from './kieu'
@@ -12,7 +12,6 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { khoaCau } from '../../src/lib/khu-trung-cau'
 import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, HANG_MUC_DO, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
-import { KHOA_CO_BIA } from './bi-a'
 import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 import { cacQidSongSinh } from './loi-hoc-luat'
 import { chayDdlMotLan } from './ddl-mot-lan'
@@ -29,8 +28,6 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
   try {
     if (action === 'co-doc') return coDoc(env)
     if (action === 'co-luu') return coLuu(env, b, nowMs)
-    if (action === 'bia-co-doc') return coDoc(env, KHOA_CO_BIA)
-    if (action === 'bia-co-luu') return coLuu(env, b, nowMs, KHOA_CO_BIA)
     if (action === 'danh-sach') return danhSach(env, nowMs, b.thongKe === true)
     if (action === 'suc-chua') return tinhSucChua(env, b, nowMs)
     if (action === 'ds-em') return dsEm(env)
@@ -49,7 +46,6 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
 }
 
 // ---------------------------------------------------------------- công tắc
-// Công tắc Bi-a Phản Ứng (khoá riêng `bi_a`, cùng hình `{bat, lop, sbd}`): cùng hai hàm, khác khoá.
 async function coDoc(env: Env, khoa = KHOA_CO_HOA2) {
   const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(khoa).first<{ gia_tri: string }>().catch(() => null)
   return { ok: true, co: docCoHoa2Tu(r?.gia_tri) }
