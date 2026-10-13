@@ -279,3 +279,18 @@ Thầy nhắn thêm (luật thường trực): "Khi bạn sửa bất kì cái g
 - [ ] Cổng đo tốc độ máy chủ: số vòng chờ D1 của lệnh nóng (sảnh, mở chặng, nộp câu, đếm) so mốc — chậm hơn là đỏ | bằng chứng: (chưa có)
 Thầy nhắn thêm (ảnh tab Kết quả app học sinh: Ca kiểm tra · Kết quả bài đã nộp · Bài tập về nhà): "Bỏ phần btvn ở đây"
 - [ ] Bỏ thẻ "Bài tập về nhà" ở tab Kết quả (app học sinh) | bằng chứng: (chưa có)
+Đợt 18 — bằng chứng (13/10, sau gộp làn G/H/I/J; chỉ ghi thêm):
+- [x] Ôn câu xoay ngang gọn đầu màn | bằng chứng: làn H 36a04164 (844×390: tiêu đề + chip một hàng, câu 1 hiện không cuộn), ảnh docs/anh-dot18/lan-h-on-cau-ngang-truoc-sau.jpg
+- [x] Nhịp học cả lớp có độ tin cậy | bằng chứng: làn J 11cb47c8 (`tinCayNhomNhip` một hàm cho /gv/nhip-hoc + /hs + /ph, 15 truy vấn như cũ, nhóm khớp ảnh 720 em); 3975839b chip hồ sơ cạnh tên nhóm lấy đúng số nhóm (tests/mot-con-so-goi7-1210 + ho-so-dot16-1210i xanh)
+- [x] Trùng tu màn thi / Tự luyện / Câu đã làm | bằng chứng: làn H 2bc64011 69ba472a 87e6ef23 + tests/lam-bai-dot18-1310 (13 test), ảnh lan-h-*.jpg 3 khổ
+- [x] Dọn nợ test | bằng chứng: làn J 3c4fa6a8 (4 tệp phụ thuộc giờ — xanh ở 00:10/06:30/12:00 VN), 77c02b71 (5 tệp thiếu môi trường node), 0683ed0c ("CHỈ giãn LƯỢT ĐẦU"); 3ddcc179 bỏ giãn trùng (vào thi chỉ một lớp giãn)
+- [x] Câu chữ dễ hiểu + bỏ chữ hướng dẫn (HS + PH) | bằng chứng: làn I d774469b, làn G 935244a4, làn H 2bc64011; 3975839b đồng bộ tên "Tự sửa lỗi"/"Sửa câu này"
+- [x] Hồ sơ: "Sửa câu này" chỉ ở câu có trong Tự sửa lỗi | bằng chứng: làn G 935244a4 + tests/tu-sua-moi-goi-dot18-1310 (17 test); sửa luôn bộ đọc lịch sử làm rơi `moChua`
+- [x] Tự sửa lỗi nổi bật, mời gọi | bằng chứng: thẻ "N câu đang chờ em sửa · Sửa lỗi ngay" ở Hôm nay (ảnh lan-g-hom-nay-doc.jpg); gọi máy chủ ≤ 1 lần/10 phút, sau khi Hôm nay đã hiện
+- [x] Câu đã làm: hàng tải gọn + hộp chọn chỉ còn bài thật | bằng chứng: làn H 87e6ef23 (hai nút 44 px "Tải PDF · N câu" / "Tải đề làm lại"; bỏ Hành trình và "#cd…"; một bài ⇒ tên trơn, không bài ⇒ ẩn)
+- [x] Câu lặp khi bấm Học tiếp chặng sau | bằng chứng: 7ff7a1df — nguyên nhân gốc: sổ ghi sau phản hồi (waitUntil) nên lệnh mở chặng ngay sau đó chưa thấy câu vừa làm; nay loại câu có lượt trong 15 phút (một đọc chỉ mục, chạy song song). tests/hoc-tiep-khong-lap-1310: bản cũ lặp 6 câu, bản mới 0
+- [x] Bỏ khung xanh khi bấm ô nhập, 3 app | bằng chứng: 45bb16ce luật chung src/index.css + tests/o-nhap-khong-khung-1310; Chromium thật: ô SBD đang chọn outline none, vòng sáng trong suốt, ô đánh dấu vẫn giữ viền bàn phím
+- [x] Luật tốc độ vào CLAUDE.md | bằng chứng: 4a0f98b3
+- [x] Cổng tốc độ tải app | bằng chứng: scripts/kiem-toc-do-tai.mjs (23c76e3a): GV +0,0 KB · HS −0,4 KB · PH −0,7 KB so bản đang chạy
+- [x] Cổng tốc độ máy chủ | bằng chứng: tests/toc-do-may-chu-lenh-nong-1310 (1df0a566), mốc đo trên 81f13983: sảnh lần sau 20 đợt, mở chặng 25, nộp câu 9, đếm 2
+- [x] Bỏ thẻ "Bài tập về nhà" ở tab Kết quả | bằng chứng: 3ddcc179 + tests/ket-qua-bo-btvn-1310 (Hôm nay vẫn có khi thầy đang giao)
