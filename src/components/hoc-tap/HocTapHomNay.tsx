@@ -171,7 +171,6 @@ export default function HocTapHomNay(p: Props) {
           <h2>Điểm thầy đã công bố</h2>
           <Dong ten="Ca kiểm tra" chu="Điểm và lời giải ca đã công bố" icon={LineChart} sac="cham" onClick={p.onLichSu} />
           {p.onKetQua && <Dong ten="Kết quả bài đã nộp" chu="Điểm và báo cáo đã công bố" icon={ClipboardCheck} sac="vang" onClick={p.onKetQua} />}
-          <Dong ten="Bài tập về nhà" chu="Bài thầy giao, chặng đã nộp" icon={BookOpen} sac="muc" so={p.soBaiTap || undefined} donVi="bài" onClick={p.onBaiTap} />
         </section>}
       </main>
     </div>

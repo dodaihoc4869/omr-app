@@ -2602,6 +2602,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         setLoiCho(lan === 0 ? 'Thầy đã bắt đầu — đang xếp hàng vào phòng thi…' : 'Máy chủ đang đông — máy tự thử lại, em không phải bấm gì.')
         await new Promise((r) => setTimeout(r, lan === 0 ? gianVaoSauBatDau() : choBaoLau(lan - 1)))
         loiVaoThiRef.current = ''
+        daGianVaoThiRef.current = true // vừa giãn 0–8 giây ở trên ⇒ không giãn thêm 0–3 giây trong handleJoin (13/10)
         try {
           await handleJoin()
         } catch {
