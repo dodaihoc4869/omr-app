@@ -21,4 +21,3 @@ export async function hoiThemThay(qid: string, nguon: string, cauHoi: string, da
     clearTimeout(t)
   }
 }
-
