@@ -74,13 +74,15 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     render(<Man token="t" qid="Q" onVe={veNgoai} />)
     // Bước 1: câu gốc đầy đủ + đáp án em đã chọn; đáp án đúng / lời giải CHƯA hiện
     expect(await screen.findByRole('heading', { name: 'Bài luyện từng bước đang được chuẩn bị' })).toBeTruthy()
-    expect(screen.getByText('Chữa trực tiếp câu gốc')).toBeTruthy() // dòng phụ đầu màn: tên lối đang đi
+    expect(screen.getByText('Sửa trên câu gốc')).toBeTruthy() // dòng phụ đầu màn: tên lối đang đi
     expect(await screen.findByText(/etyl axetat/)).toBeTruthy()
     expect(screen.getByText('Em đã chọn').nextSibling?.textContent).toBe('B')
     chuaLoDapAn()
     expect(screen.queryByText('Cần thêm bài luyện đúng chỗ')).toBeNull()
     // Đường tự gỡ: 1 Xem lại câu gốc → 2 Tự làm lại → 3 Đáp án và lời giải (bước 3 khoá tới khi em làm lại)
-    expect(within(duongTuGo()).getAllByRole('button').map((b) => b.textContent)).toEqual(['1Xem lại câu gốcĐề và lựa chọn cũ của em', '2Tự làm lạiTrước khi xem đáp án', '3Đáp án và lời giảiTìm chỗ em làm khác'])
+    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18 — thầy: "Bỏ hết các gợi ý hướng dẫn"): bỏ dòng nhỏ dưới tên bước; nút không còn dấu gạch dài; khối khoá đáp án
+    // nói gọn "Lần làm lại này không chấm"; dòng phụ đầu màn "Sửa trên câu gốc".
+    expect(within(duongTuGo()).getAllByRole('button').map((b) => b.textContent)).toEqual(['1Xem lại câu gốc', '2Tự làm lại', '3Đáp án và lời giải'])
     expect(nutBuoc(/Xem lại câu gốc/).getAttribute('aria-current')).toBe('step')
     expect(nutBuoc(/Đáp án và lời giải/).disabled).toBe(true)
     // một nút chính (đổi theo bước), kèm nút sang câu khác
@@ -91,7 +93,7 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     fireEvent.click(screen.getByRole('button', { name: 'Tự làm lại câu này' }))
     expect(nutBuoc(/Tự làm lại/).getAttribute('aria-current')).toBe('step')
     expect((screen.getByRole('button', { name: 'Kiểm tra lại' }) as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getByRole('button', { name: 'Em chưa làm được — xem lời giải' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Em chưa làm được · xem lời giải' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /6,8/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra lại' }))
     expect(await screen.findByRole('heading', { name: 'Chưa đúng' })).toBeTruthy()
@@ -135,7 +137,7 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     render(<Man token="t" qid="Q" onVe={() => {}} />)
     fireEvent.click(await screen.findByRole('button', { name: 'Tự làm lại câu này' }))
     chuaLoDapAn()
-    fireEvent.click(screen.getByRole('button', { name: 'Em chưa làm được — xem lời giải' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Em chưa làm được · xem lời giải' }))
     expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
     expect(screen.getByText(/0,1 × 82/)).toBeTruthy()
     expect(nutBuoc(/Đáp án và lời giải/).getAttribute('aria-current')).toBe('step')
@@ -149,7 +151,7 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     expect(screen.getByText(/em giải ra giấy/)).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Kiểm tra lại' })).toBeNull()
     chuaLoDapAn()
-    fireEvent.click(screen.getByRole('button', { name: 'Em đã giải xong — xem lời giải để đối chiếu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Em đã giải xong · xem lời giải' }))
     expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
     expect(screen.getByText('Đáp án đúng').nextSibling?.textContent).toBe('8,2')
   })
@@ -162,7 +164,7 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     chuaLoDapAn()
     expect(nutBuoc(/Đáp án và lời giải/).disabled).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: 'Tự làm lại câu này' }))
-    expect(screen.getByText(/Câu này chưa được mở đáp án, thầy sẽ chữa\. Em cứ tự làm lại/)).toBeTruthy()
+    expect(screen.getByText(/Câu này chưa được mở đáp án, thầy sẽ chữa\. Lần làm lại này không chấm/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /6,8/ }))
     expect(screen.queryByRole('button', { name: 'Kiểm tra lại' })).toBeNull()
     expect(screen.queryByRole('button', { name: /xem lời giải/ })).toBeNull()

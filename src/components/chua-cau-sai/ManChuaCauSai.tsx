@@ -2,6 +2,8 @@
 // 12/10 (thầy: "mục chữa lỗi hiển thị cho thật chuẩn để học sinh chữa lỗi được"): không còn trạng thái nào chỉ báo chữ rồi bỏ đó —
 // đợt không có bước để làm (chờ học liệu, chờ chữa trên lớp, tạm khoá, câu vừa cập nhật, chờ lần gặp lại 2, đã tự sửa) ⇒ "Chữa trực tiếp
 // câu gốc" (ChuaTrucTiep.tsx). Giao diện theo ngôn ngữ Hôm nay (.ht2): dải "Đường tự gỡ" có từng bước, khung làm bước, nút chính sát đáy.
+// ĐỢT 18 (13/10 — thầy: "Tối ưu lại câu từ cho dễ hiểu … Bỏ hết các gợi ý hướng dẫn"): dòng phụ đầu màn là TÊN lối đang đi ("Sửa từng bước" /
+// "Sửa trên câu gốc", chữ "sửa" như mục Tự sửa lỗi); bỏ lời dặn khi nghỉ; nút "Tiếp tục" gọn. Giữ nguyên "Cần gợi ý" (công cụ học, không phải hướng dẫn).
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   apiMoDot,
@@ -348,9 +350,9 @@ export default function ManChuaCauSai({
           <span className="ccs-ve-chu" aria-hidden="true">Quay lại</span>
         </button>
         <div className="ccs-dau-giua">
-          <h1 className="ccs-tieu">{tenCau ?? 'Cùng gỡ câu này'}</h1>
+          <h1 className="ccs-tieu">{tenCau ?? 'Sửa câu này'}</h1>
           <span className="ccs-nhan-trang-thai">
-            {trucTiep ? 'Chữa trực tiếp câu gốc' : 'Hiểu chỗ vướng · Tự sửa · Thử bản mới'}
+            {trucTiep ? 'Sửa trên câu gốc' : 'Sửa từng bước'}
           </span>
         </div>
         {soBuoc > 0 && !trucTiep && (
@@ -367,7 +369,7 @@ export default function ManChuaCauSai({
         {tai ? (
           <div className="ccs-dang-tai" role="status">
             <span className="ccs-dang-tai-vong" aria-hidden="true" />
-            <strong>Đang tìm đúng chỗ em cần gỡ</strong>
+            <strong>Đang mở câu…</strong>
           </div>
         ) : trucTiep && ph ? (
           <ChuaTrucTiep
@@ -437,7 +439,7 @@ export default function ManChuaCauSai({
                   </ol>
                 ) : (
                   <p className="ccs-the-tien-do-trong">
-                    Các bước hiện ra khi em làm xong bước tìm chỗ vướng.
+                    Bước sẽ hiện sau khi tìm ra chỗ vướng.
                   </p>
                 )}
               </section>
@@ -460,17 +462,14 @@ export default function ManChuaCauSai({
                   <h2 ref={buocRef} tabIndex={-1}>
                     Mình nghỉ một chút nhé
                   </h2>
-                  <p>
-                    Những bước em đã hiểu đã được lưu. Em chọn tiếp một đoạn
-                    ngắn hoặc quay lại sau.
-                  </p>
+                  <p>Những bước em đã hiểu đã được lưu.</p>
                   <div className="ccs-hang-nut ccs-day">
                     <button
                       className="ccs-nut-chinh"
                       onClick={() => void tiep(true)}
                       disabled={ban}
                     >
-                      Em muốn tiếp thêm một đoạn
+                      Làm tiếp một đoạn
                     </button>
                   </div>
                 </section>
@@ -554,7 +553,7 @@ export default function ManChuaCauSai({
                           disabled={ban}
                           onClick={() => void tiep()}
                         >
-                          Em sẵn sàng · Tiếp tục
+                          Tiếp tục
                         </button>
                       ) : (
                         <>

@@ -17,7 +17,7 @@ it('màn chính dùng dữ liệu kế hoạch, không có cửa game hoặc đ�
   expect(screen.queryByText(/Bát Linh|Bi-a|Thần thú|Cửa hàng|Hộ Tống/i)).toBeNull()
   // SỬA CÓ CHỦ ĐÍCH 12/10 (thầy 12/10: "gộp hai phần làm một"): nút học duy nhất của thẻ "Hôm nay của em" ghi số câu còn lại ("Học tiếp · 18 câu").
   fireEvent.click(screen.getByRole('button', { name: 'Học tiếp · 18 câu' })); expect(hoc).toHaveBeenCalledOnce()
-  fireEvent.click(screen.getByRole('button', { name: 'Ôn & sửa' })); expect(screen.getByRole('button', { name: /Tự chữa lỗi/ })).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: 'Ôn & sửa' })); expect(screen.getByRole('button', { name: /Tự sửa lỗi/ })).toBeTruthy() // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18): tên mục theo chữ thầy
 })
 it('trước nộp không có đáp án, sau nộp dùng phản hồi máy chủ; nháp không mất khi lỗi', async () => {
   vi.mocked(goiHoa2).mockResolvedValueOnce({ ok: true, id: 'p1', questions: [q] }).mockRejectedValueOnce(new Error('Mạng gián đoạn')).mockResolvedValueOnce({ ok: true, correct: true, answer: 'A', solution: 'NaCl là muối.' })

@@ -12,9 +12,14 @@
 //     + "Thử mở lại"; danh sách lỗi ⇒ báo lỗi + Thử lại (không màn trắng, không kẹt). Mở câu ⇒ cuộn về đầu màn chữa; quay ra ⇒ về đúng chỗ
 //     trong danh sách (đã tải lại trạng thái);
 //   · dọc: một cột; ngang và máy tính: hai cột (thẻ tổng bên trái, danh sách bên phải). Chỉ biến màu sẵn có — kiểu ở tu-chua.css.
+// ĐỢT 18 (13/10 — thầy: "Mời gọi học sinh tự sửa lỗi … Làm nổi bật phần tự sửa lỗi lên và mời gọi thân thiện" · "Tối ưu lại câu từ cho dễ hiểu ở mọi
+// [màn]. Bỏ hết các gợi ý hướng dẫn để học sinh phụ huynh không bị phân tâm"): tên màn theo chữ của thầy "Tự sửa lỗi" (em SỬA, thầy CHỮA trên lớp);
+// bỏ khối "Cách tự chữa một câu", câu "vì sao nên chữa", dòng giải thích nhóm chờ và lời dặn "chọn một câu trong danh sách"; nhóm của từng câu theo
+// MỘT luật `nhomMucChua` (src/lib/tu-sua-loi.ts — thẻ mời ở Hôm nay và hồ sơ đếm cùng luật); danh sách tải MỚI qua `taiTuSuaLoi` để Hôm nay cập nhật số.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3, Lock, PencilLine, RotateCcw } from 'lucide-react'
-import { apiDanhSachTuChua, type KetQuaDanhSachChua, type MucChua } from '../../lib/chua-cau-sai-api'
+import type { KetQuaDanhSachChua, MucChua } from '../../lib/chua-cau-sai-api'
+import { nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
 import { taiCauDaLam, NHAN_NGUON_LAN, type CauDaLamMuc } from '../hoa2/api'
 import { henGapLai } from '../../lib/chua-truc-tiep'
 import { khoaMoChua } from '../../../server/src/ho-so-em-hs-loc'
@@ -24,14 +29,14 @@ const ManChua = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 
 /** Trạng thái đợt chữa ⇒ chữ em đọc được (bảng từ chuẩn: không mã nội bộ). */
 export const CHU_TRANG_THAI_CHUA: Record<string, string> = {
-  can_chan_doan: 'Chưa bắt đầu · tìm chỗ vướng',
-  dang_chua_buoc: 'Đang gỡ từng bước',
+  can_chan_doan: 'Chưa bắt đầu',
+  dang_chua_buoc: 'Đang sửa từng bước',
   dang_ghep_bai: 'Đang ghép lại cả bài',
   dang_kiem_chung: 'Lần gặp lại 2 · tự làm bản mới',
   cho_gap_lai_2: 'Chờ lần gặp lại 2',
-  can_thay: 'Chờ chữa trên lớp · chữa trực tiếp được',
-  thieu_hoc_lieu: 'Chữa trực tiếp câu gốc',
-  cau_thay_doi: 'Câu vừa cập nhật · chữa trực tiếp được',
+  can_thay: 'Chờ chữa trên lớp · em sửa trước được',
+  thieu_hoc_lieu: 'Sửa trên câu gốc',
+  cau_thay_doi: 'Câu vừa cập nhật · sửa trên câu gốc',
   tam_khoa: 'Tạm khoá · tiến độ được giữ',
   da_tu_sua: 'Đã tự sửa',
 }
@@ -44,14 +49,14 @@ const ngayNgan = (ymd: string) => (/^\d{4}-\d{2}-\d{2}$/.test(ymd) ? `${ymd.slic
 const cau = (s: string) => (/[.!?…]$/.test(s.trim()) ? s.trim() : `${s.trim()}.`)
 const DANG_LAM = new Set(['dang_chua_buoc', 'dang_ghep_bai', 'dang_kiem_chung'])
 
-type Nhom = 'can' | 'cho' | 'xong'
+type Nhom = NhomMucChua
 interface DongChua {
   m: MucChua
   ten: string
   phu: string
   trangThai: string
   nhom: Nhom
-  /** Động từ trên thẻ: Chữa · Chữa tiếp · Xem · Xem lại. */
+  /** Động từ trên thẻ: Sửa · Sửa tiếp · Xem · Xem lại. */
   lam: string
 }
 
@@ -64,11 +69,11 @@ export function dungDong(m: MucChua, i: number, cdl: ReadonlyMap<string, CauDaLa
     saiCuoi ? `sai lần gần nhất ${ngayNgan(saiCuoi.ngay)}${saiCuoi.nguon ? ` · ${NHAN_NGUON_LAN[saiCuoi.nguon]}` : ''}` : '',
   ].filter(Boolean).join(' · ')
   const hen = m.trangThai === 'cho_gap_lai_2' ? henGapLai(m.denHan, nayMs) : null
-  const nhom: Nhom = m.trangThai === 'da_tu_sua' ? 'xong' : m.trangThai === 'cho_gap_lai_2' && !hen?.daToi ? 'cho' : 'can'
+  const nhom: Nhom = nhomMucChua(m, nayMs)
   const trangThai = m.trangThai === 'cho_gap_lai_2'
     ? hen?.daToi ? 'Đã tới lần gặp lại 2 · tự làm bản mới' : hen ? `Lần gặp lại 2 mở lúc ${hen.luc}` : CHU_TRANG_THAI_CHUA.cho_gap_lai_2
-    : CHU_TRANG_THAI_CHUA[m.trangThai] ?? 'Tiếp tục tự chữa'
-  const lam = nhom === 'xong' ? 'Xem lại' : nhom === 'cho' ? 'Xem' : DANG_LAM.has(m.trangThai) ? 'Chữa tiếp' : 'Chữa'
+    : CHU_TRANG_THAI_CHUA[m.trangThai] ?? 'Đang tự sửa'
+  const lam = nhom === 'xong' ? 'Xem lại' : nhom === 'cho' ? 'Xem' : DANG_LAM.has(m.trangThai) ? 'Sửa tiếp' : 'Sửa'
   return { m, ten: c?.tenDang || `Câu sai số ${i + 1}`, phu, trangThai, nhom, lam }
 }
 
@@ -99,11 +104,7 @@ function BieuTuong({ d }: { d: DongChua }) {
   return <span className="ht2-dong-bt" data-sac={sac}><Icon size={20} aria-hidden="true" /></span>
 }
 
-const TEN_NHOM: Record<Nhom, string> = { can: 'Cần chữa', cho: 'Đang chờ lần gặp lại', xong: 'Đã tự sửa' }
-/** Một dòng giải thích dưới tiêu đề nhóm (chỉ điều app đang làm thật — ChuaTrucTiep: chờ lần gặp lại vẫn tự làm lại được câu gốc). */
-const PHU_NHOM: Partial<Record<Nhom, string>> = {
-  cho: 'Lần gặp lại 2 là bản mới của câu, mở theo giờ hẹn ghi trên thẻ. Trong lúc chờ, em vẫn tự làm lại được câu gốc.',
-}
+const TEN_NHOM: Record<Nhom, string> = { can: 'Cần sửa', cho: 'Đang chờ lần gặp lại', xong: 'Đã tự sửa' }
 
 type Chon = { qid: string; /** câu mở thẳng KHÔNG có trong danh sách: mở không được thì về danh sách kèm lời báo */ thu?: boolean }
 
@@ -133,7 +134,8 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     let huy = false
     if (!lang.current) setKq(null)
     lang.current = false
-    void apiDanhSachTuChua(token).then((r) => { if (!huy) setKq(r) })
+    // Luôn tải MỚI (em vừa sửa xong một câu thì số đổi) — bản nhớ chung được ghi đè ⇒ thẻ mời ở Hôm nay cập nhật theo.
+    void taiTuSuaLoi(token, { moi: true }).then((r) => { if (!huy) setKq(r) })
     // Tên câu: lấy từ "Câu đã làm" (cùng tên dạng em đã thấy ở đó); hỏng thì giữ tên dự phòng — không chặn danh sách.
     void taiCauDaLam(token).then((r) => {
       if (!huy && r.cheDo2) setCdl(new Map(r.cau.map((c) => [goc(c.qid), c])))
@@ -148,7 +150,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     if (kq.trangThai === 'bat') {
       const m = timMucChua(kq.ds, doi)
       // Khoá từ Hồ sơ không có trong danh sách (đã sửa xong / chưa vào vòng chữa) ⇒ không "thử mở" bằng khoá băm: hiện danh sách kèm lời báo.
-      if (!m && laKhoaHoSo(doi)) setBao({ qid: doi, loi: 'Câu này hiện chưa có trong danh sách Tự chữa của em — có thể em đã sửa xong, hoặc câu chưa vào vòng chữa.' })
+      if (!m && laKhoaHoSo(doi)) setBao({ qid: doi, loi: 'Câu này chưa có trong Tự sửa lỗi của em.' })
       else setChon(m ? { qid: m.qid } : { qid: doi, thu: true })
       setDoi('')
     } else if (kq.trangThai === 'tat') setDoi('')
@@ -181,7 +183,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     const ten = d?.ten ?? (cdl.get(goc(chon.qid))?.tenDang || undefined)
     return (
       <div ref={gocRef}>
-        <Suspense fallback={<div className="ht-app ht2 tcl-man"><p className="ht-noi-dung tcl-cho-mo" role="status">Đang mở câu chữa…</p></div>}>
+        <Suspense fallback={<div className="ht-app ht2 tcl-man"><p className="ht-noi-dung tcl-cho-mo" role="status">Đang mở câu…</p></div>}>
           <ManChua
             token={token}
             qid={chon.qid}
@@ -198,12 +200,11 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const soCho = dong.filter((d) => d.nhom === 'cho').length
   const soXong = dong.filter((d) => d.nhom === 'xong').length
   const dangMoThang = !!doi && (!kq || kq.trangThai === 'bat')
-  const coCauChua = can.length + soCho > 0
   return (
     <div ref={gocRef} className="ht-app ht2 tcl-man">
       <header className="ht-thanh tcl-dau-trang">
         <button type="button" className="ht-nut-phu" onClick={onVe}><ArrowLeft size={18} aria-hidden="true" />Hôm nay</button>
-        <strong className="tcl-dau-trang-ten">Tự chữa lỗi</strong>
+        <strong className="tcl-dau-trang-ten">Tự sửa lỗi</strong>
       </header>
       <main className="ht-noi-dung ht2-noi-dung tcl-noi-dung">
         {bao && (
@@ -211,7 +212,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
             <AlertCircle size={22} aria-hidden="true" />
             <span className="tcl-bao-chu">
               <strong>Chưa mở được câu em chọn</strong>
-              <small>{bao.loi ? `${cau(bao.loi)} ` : ''}{coCauChua ? 'Em chọn một câu trong danh sách để chữa.' : ''}</small>
+              {bao.loi && <small>{cau(bao.loi)}</small>}
             </span>
             {!laKhoaHoSo(bao.qid) && <button type="button" className="ht-nut-phu" onClick={() => { setBao(null); setChon({ qid: bao.qid, thu: true }) }}>
               <RotateCcw size={16} aria-hidden="true" />Thử mở lại
@@ -221,7 +222,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
         {dangMoThang || !kq ? (
           <div className="tcl-bo-cuc" aria-busy="true">
             <div className="tcl-tong tcl-xuong" role="status">
-              <p className="tcl-cho-mo">{dangMoThang ? 'Đang mở câu em chọn…' : 'Đang tải câu cần chữa…'}</p>
+              <p className="tcl-cho-mo">{dangMoThang ? 'Đang mở câu em chọn…' : 'Đang tải câu cần sửa…'}</p>
             </div>
             <div className="tcl-ds" aria-hidden="true">
               <div className="tcl-nhom"><div className="tcl-the tcl-xuong" /><div className="tcl-the tcl-xuong" /><div className="tcl-the tcl-xuong" /></div>
@@ -230,17 +231,17 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
         ) : kq.trangThai === 'loi' ? (
           <section className="tcl-trong" aria-labelledby="tcl-loi-tieu">
             <span className="tcl-trong-bt" data-sac="do"><AlertCircle size={26} aria-hidden="true" /></span>
-            <h1 id="tcl-loi-tieu">Chưa tải được câu cần chữa</h1>
+            <h1 id="tcl-loi-tieu">Chưa tải được câu cần sửa</h1>
             <div className="ht-thong-bao ht2-loi tcl-loi" role="alert">
-              <span>{doi ? 'Chưa mở được câu em chọn vì chưa tải được danh sách câu cần chữa. ' : ''}{kq.loi}</span>
+              <span>{doi ? 'Chưa mở được câu em chọn vì chưa tải được danh sách câu cần sửa. ' : ''}{kq.loi}</span>
               <button type="button" className="ht-nut-chinh" onClick={() => setLan((n) => n + 1)}>Thử lại</button>
             </div>
           </section>
         ) : kq.trangThai === 'tat' ? (
           <section className="tcl-trong" aria-labelledby="tcl-tat-tieu">
             <span className="tcl-trong-bt" data-sac="cham"><Lock size={26} aria-hidden="true" /></span>
-            <h1 id="tcl-tat-tieu">Tự chữa lỗi chưa mở cho em</h1>
-            <p className="ht2-phu">Em vẫn xem được đáp án và lời giải của câu đã làm ở Ôn &amp; sửa › Câu đã làm, và hỏi thầy ở từng câu.</p>
+            <h1 id="tcl-tat-tieu">Tự sửa lỗi chưa mở cho em</h1>
+            <p className="ht2-phu">Lời giải câu đã làm có ở Ôn &amp; sửa › Câu đã làm.</p>
             <div className="ht2-hang-nut">
               <button type="button" className="ht-nut-chinh ht2-nut-lon" onClick={onVe}>Về Hôm nay</button>
             </div>
@@ -249,9 +250,9 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
           <div className={soXong ? 'tcl-bo-cuc' : undefined}>
             <section className="tcl-trong" aria-labelledby="tcl-xong-tieu">
               <span className="tcl-trong-bt" data-sac="xanh"><CheckCircle2 size={28} aria-hidden="true" /></span>
-              <h1 id="tcl-xong-tieu">Em không còn câu nào cần chữa</h1>
+              <h1 id="tcl-xong-tieu">Em không còn câu nào cần sửa</h1>
               {soXong > 0 && <p className="tcl-trong-so">Đã tự sửa: <b>{soXong} câu</b></p>}
-              <p className="ht2-phu">Câu em làm sai sẽ tự vào đây. Việc tiếp theo: làm kế hoạch hôm nay{onTuLuyen ? ', hoặc luyện thêm ở Tu luyện' : ''}.</p>
+              <p className="ht2-phu">Câu em làm sai sẽ tự vào đây.</p>
               <div className="ht2-hang-nut">
                 <button type="button" className="ht-nut-chinh ht2-nut-lon" onClick={onVe}>Về Hôm nay</button>
                 {onTuLuyen && <button type="button" className="ht-nut-phu" onClick={onTuLuyen}>Luyện thêm ở Tu luyện</button>}
@@ -275,7 +276,10 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   )
 }
 
-/** Thẻ tổng: điểm nhấn của màn (số câu cần chữa) + tiến độ + vì sao + MỘT nút chính + cách tự chữa. */
+/** Tiêu đề thẻ tổng — lời mời ngắn, động từ đứng đầu (thầy 13/10: "mời gọi thân thiện"). */
+export const TIEU_DE_TONG = 'Sửa lại câu em làm sai'
+
+/** Thẻ tổng: điểm nhấn của màn (số câu cần sửa) + tiến độ + MỘT nút chính. Đợt 18: bỏ câu "vì sao" và khối "Cách tự chữa" (thầy: bỏ gợi ý hướng dẫn). */
 function TheTong({ can, soCho, soXong, tong, onChon, onVe }: {
   can: DongChua[]
   soCho: number
@@ -288,14 +292,12 @@ function TheTong({ can, soCho, soXong, tong, onChon, onVe }: {
   const phan = (n: number) => `${Math.round((n / Math.max(1, tong)) * 1000) / 10}%`
   return (
     <section className="tcl-tong" aria-labelledby="tcl-tong-tieu">
-      <h1 id="tcl-tong-tieu">Câu em cần chữa</h1>
       <div className="tcl-tong-dau">
-        <p className="tcl-so"><b>{can.length}</b><small>câu cần chữa</small></p>
-        <p className="tcl-vi-sao">
-          {dau
-            ? 'Câu sai sẽ quay lại theo lịch ôn 1 · 3 · 7 ngày. Tự chữa ngay để lần gặp lại em tự làm được.'
-            : 'Lúc này chưa có câu cần chữa ngay. Câu đang chờ lần gặp lại mở theo giờ hẹn ghi trên thẻ.'}
-        </p>
+        <p className="tcl-so"><b>{can.length}</b><small>câu cần sửa</small></p>
+        <div className="tcl-tong-chu">
+          <h1 id="tcl-tong-tieu">{TIEU_DE_TONG}</h1>
+          {!dau && <p className="tcl-vi-sao">Lúc này chưa có câu cần sửa ngay.</p>}
+        </div>
       </div>
       <div className="tcl-tien-do">
         <p className="tcl-tien-do-chu"><span>Đã tự sửa</span><b>{soXong}/{tong} câu</b></p>
@@ -308,7 +310,7 @@ function TheTong({ can, soCho, soXong, tong, onChon, onVe }: {
       {dau ? (
         <div className="tcl-bat-dau">
           <button type="button" className="ht-nut-chinh ht2-nut-lon tcl-nut-chinh" aria-describedby="tcl-cau-dau" onClick={() => onChon(dau)}>
-            <span>{DANG_LAM.has(dau.m.trangThai) ? 'Chữa tiếp' : 'Bắt đầu chữa'}</span><ArrowRight size={20} aria-hidden="true" />
+            <span>{DANG_LAM.has(dau.m.trangThai) ? 'Sửa tiếp' : 'Bắt đầu sửa'}</span><ArrowRight size={20} aria-hidden="true" />
           </button>
           <p className="tcl-cau-dau" id="tcl-cau-dau">Câu đầu tiên: <b>{dau.ten}</b></p>
         </div>
@@ -317,14 +319,6 @@ function TheTong({ can, soCho, soXong, tong, onChon, onVe }: {
           <span>Về Hôm nay</span><ArrowRight size={20} aria-hidden="true" />
         </button>
       )}
-      <div className="tcl-cach">
-        <p className="tcl-cach-tieu">Cách tự chữa một câu</p>
-        <ol>
-          <li><span aria-hidden="true">1</span><p><b>Xem lại câu gốc</b> · tìm chỗ em sai</p></li>
-          <li><span aria-hidden="true">2</span><p><b>Tự làm lại</b> · trước khi xem đáp án</p></li>
-          <li><span aria-hidden="true">3</span><p><b>Đáp án và lời giải</b> · đối chiếu cách làm</p></li>
-        </ol>
-      </div>
     </section>
   )
 }
@@ -338,7 +332,6 @@ function DanhSach({ nhom, ds, onChon }: { nhom: Nhom; ds: DongChua[]; onChon: (d
         <h2>{ten}</h2>
         <span className="tcl-dem">{cua.length} câu</span>
       </div>
-      {PHU_NHOM[nhom] && <p className="tcl-nhom-phu">{PHU_NHOM[nhom]}</p>}
       {cua.map((d) => (
         <button type="button" className="tcl-the" key={d.m.dotId ?? d.m.qid} data-khoa={d.m.dotId ?? d.m.qid} data-nhom={d.nhom} onClick={() => onChon(d)}>
           <BieuTuong d={d} />
