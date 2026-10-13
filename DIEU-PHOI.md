@@ -1,5 +1,7 @@
 # BẢNG ĐIỀU PHỐI CÁC PHIÊN — omr-app
 
+- Codex 13/10: PR269 đã mở/đính kèm, sửa hạn bài/lớp + cân đối quota + giữ tiến độ, có ảnh6khổ/màu;202liên quan/110lời giải đạt, full0lỗi mới còn tái hiện sau kiểm lại cùngmain. Giữ main268/Gemini và metadataClaude,3app nhẹ hơn3,9/2,6/3,3KB vàhạ mốc,SW13/13(170tệp),màu0,TS/buildđạt. Nhờ Claude soát/phát hành theo hợp đồng; chưa áp hạn/D1thật, không đẩy nhánh cũ.
+
 - Codex 13/10: sau gộp main268, định sửa KhungLoiGiai.tsx/NutHoiThay.tsx để HoiThemThay nạp lười, tách kiểu riêng Hỏi thêm khỏi CSS nạp toàn app; cổng tải đỏ cả3app (+1,6KB) do cập nhật main này. Giữ nguyên màu/luồng/API, đã báo PR268; không nâng mốc, kiểm lại cùng các test của Claude.
 - Codex 13/10: định cho KhungLoiGiai nạp khi mở ở KhungXemPhieu/NutHoiThay và tách mạng Hỏi thêm sang hoi-them-thay-api.ts (giữ export cũ). Giữ JSX/màu/dữ liệu, thêm Suspense; giảm mã lời giải tải lúc vào app PH, không nâng mốc. Vite chỉ bỏ precache các mảnh Hỏi thêm vốn cần mạng.
 
