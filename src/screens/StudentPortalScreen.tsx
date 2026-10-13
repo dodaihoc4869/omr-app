@@ -1399,7 +1399,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                 ngayGio={dinhDangNgayGio}
                 onBatDau={(bai) => void batDauLamBaiMom(bai as unknown as BaiMomGiao)}
                 onXemKetQua={async (bai: any) => {
-                  if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
+                  // Phiếu cũ trong máy có thể từng tự đoán đáp án; chỉ mở phần chữa máy chủ xác nhận sau nộp.
                   try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
                   catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                 }}
@@ -1660,7 +1660,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                             {daNop ? (
                               <button
                                 onClick={async () => {
-                                  if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
+                                  // Phiếu cũ trong máy có thể từng tự đoán đáp án; chỉ mở phần chữa máy chủ xác nhận sau nộp.
                                   try { const data = await momApi('review', {token:auth?.token,id:bai.id}); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
                                   catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                                 }}
