@@ -41,3 +41,17 @@ jobs:
           npx -y wrangler@4 d1 execute omr --remote --json --command "$A, e AS (SELECT sbd, SUM(co IS NULL) ks, SUM(p IN ('luot','chan_doan')) lc FROM x GROUP BY sbd) SELECT COUNT(*) so_em, SUM(ks>0) em_khong_so, MAX(ks) max_khong_so, SUM(lc>0) em_luot_cd, MAX(lc) max_luot_cd FROM e" | jq -c ".[0].results"
           echo "== lượt KHÔNG có dòng sổ theo giờ VN"
           npx -y wrangler@4 d1 execute omr --remote --json --command "$A SELECT substr(datetime(created_at,'+7 hours'),12,2) gio, COUNT(*) tong, SUM(co IS NULL) khong_so FROM x GROUP BY gio ORDER BY gio" | jq -c ".[0].results[]"
+      - name: Chế độ ngày phía thầy (Gói 7 / Hành trình) so với máy em (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          L="COALESCE(NULLIF(TRIM(h.ten_lop),''),CASE TRIM(COALESCE(h.lop,'')) WHEN '12' THEN '12 - Lớp Thường' WHEN '' THEN 'Chưa xếp lớp' ELSE TRIM(h.lop) END)"
+          T="WITH t AS (SELECT e.sbd, MIN(e.bat_dau) bd FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND $L=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL GROUP BY e.sbd)"
+          echo "== em máy đã chốt mức Gói 7 hôm nay · phía thầy KHÔNG thấy Gói 7 · phía thầy thấy Gói 7 bắt đầu sau hôm nay"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$T SELECT COUNT(*) em_chot_goi7, SUM(t.sbd IS NULL) thay_khong_goi7, SUM(t.bd>'$NGAY') thay_bd_sau FROM goi_bai_7_muc_ngay m LEFT JOIN t ON t.sbd=m.sbd WHERE m.ngay='$NGAY'" | jq -c ".[0].results"
+          echo "== phía thầy coi là Gói 7 hôm nay · không có dòng chốt Gói 7 · có kế hoạch Hành trình hôm nay"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$T SELECT COUNT(*) thay_goi7, SUM(NOT EXISTS(SELECT 1 FROM goi_bai_7_muc_ngay m WHERE m.sbd=t.sbd AND m.ngay='$NGAY')) khong_chot, SUM(EXISTS(SELECT 1 FROM srs2_ke_hoach k WHERE k.sbd=t.sbd AND k.ngay='$NGAY')) co_ke_hoach_ht FROM t WHERE t.bd<='$NGAY'" | jq -c ".[0].results"
+          echo "== em đã chốt mức Gói 7 hôm nay: số đếm phía thầy (sổ ∪ có hướng dẫn) so với mức — đủ / thiếu"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "WITH m AS (SELECT sbd, muc FROM goi_bai_7_muc_ngay WHERE ngay='$NGAY'), s AS (SELECT DISTINCT s.sbd, s.qid FROM m JOIN su_kien_hoc s ON s.sbd=m.sbd AND s.ngay_vn='$NGAY' AND s.ket_qua IS NOT NULL AND s.ma_nguon NOT LIKE 'ktcn:%' AND COALESCE(s.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc') AND COALESCE(s.visibility,'')<>'embargoed' UNION SELECT g.sbd, g.qid FROM m JOIN goi_bai_7_gap g ON g.sbd=m.sbd AND date(g.luc,'+7 hours')='$NGAY'), d AS (SELECT m.sbd, m.muc, COUNT(s.qid) n FROM m LEFT JOIN s ON s.sbd=m.sbd GROUP BY m.sbd) SELECT COUNT(*) so_em, SUM(n>=muc) du, SUM(n<muc AND n>0) thieu_co_lam, SUM(n=0) chua_lam FROM d" | jq -c ".[0].results"
