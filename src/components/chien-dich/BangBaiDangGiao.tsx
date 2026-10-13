@@ -4,7 +4,7 @@ import { Component, type ReactNode, lazy, Suspense, useCallback, useEffect, useI
 import { createPortal } from 'react-dom'
 import { RefreshCw } from 'lucide-react'
 import { goiLenh } from '../../lib/goi-lenh-thay'
-import { theoDoiBaiDangGiao, type BaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
+import { baoMetadataBaiDangGiao, theoDoiBaiDangGiao, type BaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
 import { ngayVn, type GoiDu } from './goi7-ui'
 import { chuDemGiao, chuHanDong, goiDangGiao, TOI_DA_DONG_GIAO } from './buoi-day-ui'
 import './sua-han-bai.css'
@@ -115,7 +115,6 @@ function Thanh({ p, nhan, loai }: { p: number | null; nhan: string; loai: 'gap' 
 export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => void }) {
   const [TamEm, setTamEm] = useState(napSuaEm)
   const [thuTam, setThuTam] = useState(0)
-  const ackEm = useRef(new Map<string, { soEm: number; serverNow: number }>())
   const [emSua, setEmSua] = useState<GoiBang | null>(null)
   const batEm = (goi: GoiBang) => setEmSua(goi)
   const docSauEm = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -148,11 +147,6 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
       const moi = r.ok ? docBang(r.du) : null
       if (!moi) { setLoiTai(r.ok ? 'Máy chủ trả lời chưa đủ số liệu. Thầy thử lại.' : r.chu); return null }
       const theoId = new Map(moi.goi.map(g => [g.id, g]))
-      for (const [id, ack] of ackEm.current) {
-        const t = moi.thongKe[id]
-        if (t?.soEm === ack.soEm && moi.serverNow !== undefined && moi.serverNow >= ack.serverNow) ackEm.current.delete(id)
-        else if (theoId.has(id)) moi.thongKe[id] = { soEm: ack.soEm, pGap: null, pTuLam: null }
-      }
       setDu(moi)
       // Cập nhật sau lỗi 2 máy: giữ ngày thầy đang nhập, lấy hạn hiện tại để so khi lưu lại.
       setSua(cu => cu && theoId.has(cu.id) ? { ...cu, hanCu: theoId.get(cu.id)!.han } : null)
@@ -257,6 +251,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
       setDaLuu(cu => ({ ...cu, ...Object.fromEntries(goi.map(g => [g.id, han])) }))
       setSua(cu => cu ? { ...cu, hanCu: han } : cu)
       setNhieu(cu => cu ? { ...cu, goi: cu.goi.map(g => daDoi.has(g.id) ? { ...g, han } : g) } : cu)
+      baoMetadataBaiDangGiao((du?.goi ?? []).filter(g => daDoi.has(g.id) && g.khoa_bai).map(g => ({ lop: g.lop, khoaBai: g.khoa_bai!, goiId: g.id, han, ...(typeof r.du.serverNow === 'number' ? { serverNow: r.du.serverNow } : {}) })))
     } catch {
       if (song.current) setLoiHan('Không nối được máy chủ. Ngày thầy đã chọn vẫn được giữ để thử lại.')
     } finally {
@@ -266,8 +261,9 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
   }
   const daLuuEm = (ack: AckEmNhanBai) => {
     ++thayDoi.current
-    ackEm.current.set(ack.goiId, { soEm: ack.nhan.length, serverNow: ack.serverNow })
     setDu(cu => cu ? { ...cu, thongKe: { ...cu.thongKe, [ack.goiId]: { soEm: ack.nhan.length, pGap: null, pTuLam: null } } } : cu)
+    const g = du?.goi.find(g => g.id === ack.goiId)
+    if (g?.khoa_bai) baoMetadataBaiDangGiao([{ lop: g.lop, khoaBai: g.khoa_bai, goiId: g.id, soEm: ack.nhan.length, serverNow: ack.serverNow }])
     if (docSauEm.current !== null) clearTimeout(docSauEm.current)
     const docMoi = () => {
       if (!song.current) return

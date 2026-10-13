@@ -17,7 +17,7 @@
 // buổi (`lopTay`, `chonNho`, `datNho`) ⇒ mở lại màn vẫn còn.
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
-import { baoBaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
+import { baoBaiDangGiaoThayDoi, theoDoiMetadataBaiDangGiao, type MetadataBaiDangGiao } from '../../lib/bai-dang-giao-thay-doi'
 import type { TeacherExamSource } from '../../data/examContent'
 import { THAM_SO_OMNI, type CoOmni } from '../../../server/src/omni-kieu'
 import { TI_LE_ON_BAI_CU_TOI_DA, xemOnBaiCu } from '../../../server/src/omni-on-bai-cu'
@@ -116,6 +116,20 @@ const giongTap = (a: ReadonlySet<string>, b: readonly string[]) => a.size === b.
 /** Chữ chip gọn cho nhãn nhỏ theo lớp: bỏ đuôi "· chứng chỉ a/b". */
 const chuNgan = (chu: string) => chu.split(' · chứng chỉ')[0]!
 
+/** ACK ở bảng nhẹ cập nhật đúng bài/lớp, giữ chứng chỉ và các bài khác. */
+function capNhatMetadata(ds: DanhSachBaiDaDay, m: MetadataBaiDangGiao): DanhSachBaiDaDay {
+  const homNay = typeof m.serverNow === 'number' && Number.isFinite(new Date(m.serverNow).getTime()) ? ngayVn(m.serverNow) : null
+  const bai = ds.bai.map(b => {
+    if (b.khoaBai !== m.khoaBai || b.goi7 && b.goi7.goiId !== m.goiId) return b
+    const han = m.han ?? b.goi7?.han ?? b.hanNop
+    const soEm = m.soEm ?? b.goi7?.soEm
+    const trangThai = m.han && homNay ? m.han >= homNay ? 'dang_luyen' as const : 'da_day' as const : b.trangThai
+    const conNgay = m.han && homNay ? trangThai === 'dang_luyen' ? Math.max(1, Math.round((Date.parse(m.han) - Date.parse(homNay)) / 86400000) + 1) : null : b.conNgay
+    return { ...b, ...(m.han ? { hanNop: m.han, trangThai, conNgay } : {}), ...(soEm !== undefined && han ? { goi7: { goiId: m.goiId, soEm, han } } : {}) }
+  })
+  return { ...ds, bai, ...(bai.some(b => b.trangThai === 'dang_luyen') ? { choBaiMoi: null } : {}) }
+}
+
 /** Bài thầy đang chọn ở cây (đợt 16): khoá bài + khối của cây lúc chọn + tên (để báo khi phải bỏ). Bảng Dạy học nhớ theo buổi. */
 export interface BaiChonNho {
   khoaBai: string
@@ -183,6 +197,18 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
   const [loiDsTheoLop, setLoiDsTheoLop] = useState<Record<string, string>>({})
   const [dangTaiDs, setDangTaiDs] = useState(false)
   const luotDs = useRef(0)
+  const luotMetadata = useRef(0), metadata = useRef(new Map<string, { lan: number; du: MetadataBaiDangGiao }>())
+  useEffect(() => theoDoiMetadataBaiDangGiao(bai => {
+    const lan = ++luotDs.current
+    luotMetadata.current = lan
+    for (const m of bai) metadata.current.set(JSON.stringify([m.lop, m.khoaBai]), { lan, du: m })
+    setDsTheoLop(cu => {
+      const moi = { ...cu }
+      for (const m of bai) if (moi[m.lop]) moi[m.lop] = capNhatMetadata(moi[m.lop]!, m)
+      return moi
+    })
+    setDangTaiDs(false)
+  }), [])
   const taiDs = useCallback(async () => {
     const l = ++luotDs.current
     if (!bat || !lopChon.length) {
@@ -194,16 +220,22 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     setDangTaiDs(true)
     setLoiDsTheoLop({})
     const kq = await Promise.all(lopChon.map(async (x) => [x, await baiDaDayDanhSach(x)] as const))
-    if (l !== luotDs.current) return
+    // Đổi lớp hoặc có lượt đọc mới thì bỏ phản hồi cũ. Chỉ ACK metadata tới giữa lượt đọc:
+    // giữ phần các lớp/bài chưa tải xong, áp ACK lên đúng dòng trước khi đưa vào cây.
+    if (l !== luotDs.current && luotMetadata.current !== luotDs.current) return
     setDangTaiDs(false)
     const ds: Record<string, DanhSachBaiDaDay> = {}
     const loi: Record<string, string> = {}
     for (const [x, r] of kq) {
-      if (r.ok) ds[x] = r.du
+      if (r.ok) {
+        ds[x] = r.du
+        for (const m of metadata.current.values()) if (m.lan > l && m.du.lop === x) ds[x] = capNhatMetadata(ds[x]!, m.du)
+      }
       else loi[x] = r.chu
     }
     setDsTheoLop(cu => ({ ...cu, ...ds }))
     setLoiDsTheoLop(loi)
+    for (const [k, m] of metadata.current) if (m.lan <= l) metadata.current.delete(k)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bat, khoaLop])
   useEffect(() => {
@@ -547,7 +579,7 @@ function HangBai({ bhn, b }: { bhn: BaiHomNay; b: BaiCay }) {
   const daHet = ticks.length > 0 && ticks.every((x) => !!x.tick)
   const tick1 = nhieu ? undefined : ticks[0]?.tick
   const so = soBaiCuaTen(b.tenBai)
-  const soEm1 = tick1 ? (tick1.soEm ?? tick1.chungChi?.tong) : null
+  const soEm1 = tick1 ? (tick1.goi7?.soEm ?? tick1.soEm ?? tick1.chungChi?.tong) : null
   const [moChiTiet, setMoChiTiet] = useState(false)
   return (
     <li className={`bhn-bai${dangChon ? ' bhn-bai--chon' : ''}${daHet ? ' bhn-bai--xong' : ''}`} data-bai={b.khoaBai} data-trang-thai={tt.kieu}>
@@ -562,7 +594,7 @@ function HangBai({ bhn, b }: { bhn: BaiHomNay; b: BaiCay }) {
           </span>
           <small>
             {b.soCau} câu
-            {soEm1 ? ` · Đã giao ${soEm1} em` : ''}
+            {soEm1 !== null && soEm1 !== undefined && (tick1?.goi7 || soEm1 > 0) ? ` · Đã giao ${soEm1} em` : ''}
           </small>
         </span>
       </label>

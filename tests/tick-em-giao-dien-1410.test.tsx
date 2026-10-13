@@ -10,6 +10,7 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 import SuaEmNhanBai from '../src/components/chien-dich/SuaEmNhanBai'
 import BangBaiDangGiao, { ChanLoiDanhSach, ChoTamEm, napGiaoDienEm } from '../src/components/chien-dich/BangBaiDangGiao'
 import { batLoiThieuManh } from '../src/lib/nap-manh'
+import { theoDoiMetadataBaiDangGiao } from '../src/lib/bai-dang-giao-thay-doi'
 import { docAckEmNhanBai, docEmNhanBai } from '../src/components/chien-dich/api-goi7-em'
 const EM = [
   { sbd: 'S1', hoTen: 'Nguyễn An', khoi: '12', tenLop: '12 - Tinh Hoa', duocThem: true },
@@ -260,4 +261,40 @@ it('capture của tấm chỉ nhận đúng mảnh mình, không chặn cứu l�
   e.payload = new Error('Failed to fetch dynamically imported module: /assets/KhoDe-old.js')
   window.dispatchEvent(e); expect(e.defaultPrevented).toBe(false)
   cho.tra({ default: SuaEmNhanBai }); await expect(p).resolves.toMatchObject({ default: SuaEmNhanBai })
+})
+
+it('sau ACK count2, Cập nhật nhận count3 mới của máy khác và phát metadata riêng, không giữ count cũ vĩnh viễn', async () => {
+  let soEm = 1
+  const metadata = vi.fn(), bo = theoDoiMetadataBaiDangGiao(metadata)
+  goi.mockImplementation(async (_: string, b: Record<string, unknown>) => {
+    if (b.action === 'tong_hop') return { ok: true, du: { bat: true, serverNow: DU.serverNow + 1, goi: [{ id: 'g1', khoa_bai: 'b1', ten: DU.ten, lop: DU.lop, han: '2026-10-20' }], thongKe: { g1: { soEm, pGap: 30, pTuLam: 20 } } } }
+    if (b.action === 'doc_em') return { ok: true, du: DU }
+    soEm = 2; return { ok: true, du: ack(b) }
+  })
+  try {
+    render(<BangBaiDangGiao />)
+    fireEvent.click(await screen.findByRole('button', { name: `Thêm / Bớt em ${DU.ten} · ${DU.lop}` }))
+    await themBao(); fireEvent.click(screen.getByRole('button', { name: 'Lưu danh sách' })); await screen.findByText('Đã lưu danh sách')
+    await waitFor(() => expect(document.querySelector('[data-khoi="dong-giao"]')?.getAttribute('data-so-em')).toBe('2'))
+    expect(metadata).toHaveBeenCalledExactlyOnceWith([{ lop: DU.lop, khoaBai: 'b1', goiId: 'g1', soEm: 2, serverNow: DU.serverNow }])
+    fireEvent.click(screen.getByRole('button', { name: 'Đóng' })); await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    soEm = 3; fireEvent.click(screen.getByRole('button', { name: 'Cập nhật' }))
+    await waitFor(() => expect(document.querySelector('[data-khoi="dong-giao"]')?.getAttribute('data-so-em')).toBe('3'))
+  } finally { bo() }
+})
+
+it('ACK sửa hạn chỉ phát metadata sau xác nhận đúng; không tạo lượt Tick/Bỏ tick', async () => {
+  const metadata = vi.fn(), bo = theoDoiMetadataBaiDangGiao(metadata)
+  goi.mockImplementation(async (_: string, b: Record<string, unknown>) => b.action === 'tong_hop'
+    ? { ok: true, du: { bat: true, serverNow: DU.serverNow, goi: [{ id: 'g1', khoa_bai: 'b1', ten: DU.ten, lop: DU.lop, han: '2026-10-20' }], thongKe: { g1: { soEm: 1, pGap: 30, pTuLam: 20 } } } }
+    : { ok: true, du: { goiId: b.goiId, han: b.han, serverNow: DU.serverNow } })
+  try {
+    render(<BangBaiDangGiao />)
+    fireEvent.click(await screen.findByRole('button', { name: `Sửa hạn ${DU.ten} · ${DU.lop}` }))
+    fireEvent.change(screen.getByLabelText(`Hạn mới của ${DU.ten} · ${DU.lop}`), { target: { value: '2026-10-22' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu hạn' }))
+    await screen.findByText('Đã lưu hạn mới')
+    expect(metadata).toHaveBeenCalledExactlyOnceWith([{ lop: DU.lop, khoaBai: 'b1', goiId: 'g1', han: '2026-10-22', serverNow: DU.serverNow }])
+    expect(lan('tick')).toHaveLength(0); expect(lan('bo-tick')).toHaveLength(0)
+  } finally { bo() }
 })
