@@ -5,7 +5,7 @@ import { diemChu, gioHan, gioVn, soNgayToi, thuNgan, thuNgay } from './kiem-tra-
 import './kiem-tra-ca-nhan.css'
 
 // ĐỢT 20 · THẺ KIỂM TRA ÔN TẬP (bản vẽ docs/ban-ve-dot20 thầy duyệt 13/10: "Chốt bản vẽ làm đi nhé"). Năm trạng thái thật của máy chủ:
-//   cho_nguon → thẻ MỎNG vàng dịu (em vẫn học như thường) · sap_den → tờ lịch + 3 ô số, không đếm ngược từng giây ·
+//   cho_nguon → thẻ MỎNG vàng dịu (em vẫn học như thường) · sap_den → tờ lịch + 3 ô số, không đếm ngược từng giây, KHÔNG nút (thầy 14/10: "Bỏ nút xem lịch kiểm tra") ·
 //   can_lam → thẻ CHÍNH thay khối Hôm nay: vòng "đã trả lời", 3 dòng số, MỘT nút · da_nop / het_han → điểm lớn + Xem kết quả.
 // Chỉ số có trong TomTatKiemTra (không bịa "câu đúng" khi máy chủ chưa gửi). Máy tính: thẻ chính 2 cột theo vùng lưới (CSS).
 
@@ -44,7 +44,6 @@ export default function TheKiemTraCaNhan({ du, onMo, disabled = false }: { du: T
       </div></div>
       <div className="ktcn-o-so"><div><b>{du.tong}</b><small>câu</small></div><div><b>{du.phut}</b><small>phút</small></div><div><b>{du.soBai}</b><small>bài đã học</small></div></div>
       <p className="ktcn-loi">{du.baiNgayToiThieu ? `Đề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu ${du.baiNgayToiThieu} câu.` : 'Đề chọn riêng cho em từ các bài đã học. Ngày đó không có bài tập thường.'}</p>
-      {onMo && <button type="button" className="ktcn-nut-phu" disabled={disabled} onClick={onMo}>Xem lịch kiểm tra<ArrowRight size={18} aria-hidden="true" /></button>}
     </section>
   }
 
