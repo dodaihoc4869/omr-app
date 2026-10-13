@@ -44,6 +44,8 @@ it('ngày kiểm tra: thẻ kiểm tra thay khối Hôm nay (đúng số câu đ
   hoc2 = { ...hoc2, kiemTraCaNhan: kt({}) }
   const c = mo()
   const the = await waitFor(() => { const x = c.querySelector('#ph3-kiemtra'); expect(x).toBeTruthy(); return x!.closest('section')! })
+  expect(the.classList.contains('tvc-the')).toBe(true)
+  expect(the.classList.contains('ph3-ah')).toBe(false)
   expect(the.textContent).toContain('Hôm nay con làm bài kiểm tra')
   expect(the.textContent).toContain('5/18 câu đã trả lời')
   expect(c.querySelector('[data-vung="anh-hung"]')).toBeNull()
