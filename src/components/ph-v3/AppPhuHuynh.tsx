@@ -2,6 +2,11 @@
 // "Nhận xét của thầy" không còn là mục: thẻ lời mới nhất ở Hôm nay + màn con `#loi-thay` (có nút quay lại). "Đổi số báo danh" CHỈ ở menu Tài khoản và hỏi lại trước khi làm.
 // Đợt 16: Hôm nay có thẻ "Nhịp học của con" (Lười / Chăm như app học sinh) — ManHomNay nhận `nhipCon` (SBD · tên · lớp) để tự nạp `/ph/nhip-hoc`.
 // Đổi mục: mờ dần + trượt 8px (.tt-vao-muc), mỗi mục giữ chỗ cuộn riêng (kể cả khi quay lại từ chi tiết ca). Nguồn đọc và quyền công bố giữ nguyên.
+// ĐỢT 19 · LÀN R (thầy duyệt bản vẽ docs/ban-ve-dot19/app-phu-huynh.html 13/10): mục Hôm nay thành MỘT trang cuộn "Hôm nay của con" (TrangVeCon.tsx) có
+// đủ mọi phần; thanh điều hướng thành danh sách PHẦN của trang (điện thoại: thanh mục dính trên đầu trang · xoay ngang: thanh trái 88 px · máy tính: thanh
+// bên 264 px) — bấm mục ⇒ cuộn tới phần, không đổi tuyến. Màn con Tiến bộ (`#tien-bo`) · Ca kiểm tra (`#ca-kiem-tra`) · chi tiết ca · nhận xét · thông tin
+// vẫn mở từ liên kết trong trang (có nút quay lại), nạp khi mở. App giữ số của hai lệnh nạp khi cuộn tới (`/ph/ho-so-thai-do`, `/ph/lich-su-lam-cau` —
+// gọi SONG SONG một lần) và của `/ph/nhip-hoc` (nạp lúc mở, cùng nhịp với "mọi thứ về con").
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactElement } from 'react'
 import { AnhLogo } from '../LogoVai'
 import HopXacNhan from '../HopXacNhan'
@@ -15,25 +20,30 @@ import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
 import { taiThongTinPhuHuynh } from '../../lib/tai-thong-tin-ph'
 import { baoDaXemPhuHuynh } from '../../lib/canh-bao-thay-may-chu'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
-import { BtBang, BtHomNay, BtTienBo, BtTrai } from './BieuTuong'
-import ManHomNay from './ManHomNay'
-import ManDiemSo from './ManDiemSo'
-import ManTienBo from './ManTienBo'
-import { docTuyen, khoaCuon, laManCon, mucSang, type Muc, type Tuyen } from './tien-ich'
+import { BtTrai } from './BieuTuong'
+import { docTuyen, khoaCuon, laManCon, type Tuyen } from './tien-ich'
 import { DangTai } from './dung-chung'
+import TrangVeCon, { HO_SO_TRONG, PHAN, docPhanTuHash, idPhan, phanCo, type IdPhan, type TaiHoSo } from './TrangVeCon'
+import { layHoSoThaiDoCon, layLichSuLamCauCon, layNhipHocCon } from '../../lib/ho-so-con-ph-api'
+import type { KetQuaNhipHocApp } from '../../lib/nhip-hoc-em'
+import { gioVn, ngayChuoiNgan, ngayDayDuVn } from '../../lib/ph-moi/dinh-dang'
 import './ph-v3.css'
 import './giao-dien-day-du.css'
 import './con-tong-quan.css'
 import ManLoiThay from './ManLoiThay'
 
-const MUC: { muc: Muc; ten: string; bt: () => ReactElement }[] = [
-  { muc: 'hom-nay', ten: 'Hôm nay', bt: () => <BtHomNay /> },
-  { muc: 'tien-bo', ten: 'Tiến bộ', bt: () => <BtTienBo /> },
-  { muc: 'ca-kiem-tra', ten: 'Ca kiểm tra', bt: () => <BtBang /> },
-]
-
-// Màn chi tiết ca kéo ChemText (công thức, lời giải): GÓI TẢI LƯỜI riêng — lần mở app đầu tiên không phải tải.
+// Màn chi tiết ca kéo ChemText (công thức, lời giải): GÓI TẢI LƯỜI riêng — lần mở app đầu tiên không phải tải. Đợt 19: Tiến bộ · Ca kiểm tra là màn con
+// mở từ trang ⇒ cũng nạp khi mở (tải đầu app nhẹ hơn).
 const ManChiTietCa = lazy(() => import('./ManChiTietCa'))
+const ManTienBo = lazy(() => import('./ManTienBo'))
+const ManDiemSo = lazy(() => import('./ManDiemSo'))
+/** Số lượt làm câu tối đa tải cho phần "Số giây theo mức độ câu" (câu sai và tổng thì máy chủ tính trên mọi lượt). */
+const GIOI_HAN_LUOT = 600
+
+/** Màn con (mở từ trang, có nút quay lại, luôn mở từ đầu): chi tiết ca · nhận xét · thông tin · Tiến bộ · Ca kiểm tra (đợt 19). */
+const laCon = (t: Tuyen): boolean => laManCon(t) || t.muc === 'tien-bo' || t.muc === 'ca-kiem-tra'
+/** Nút quay lại trang "Hôm nay của con" trên màn con Tiến bộ / Ca kiểm tra. */
+const NutVe = () => <a className="ph3-lui tt-nhan" href="#hom-nay"><BtTrai co={24} day={2.5} />Hôm nay</a>
 
 /** Tuyến theo `#…` + giữ chỗ cuộn: rời một mục ⇒ nhớ chỗ đang cuộn; về lại mục ⇒ trả đúng chỗ; màn con luôn mở từ đầu. */
 function useTuyen(): Tuyen {
@@ -44,7 +54,7 @@ function useTuyen(): Tuyen {
   useEffect(() => {
     const doi = () => {
       const cu = dangXem.current
-      if (!laManCon(cu)) cuon.current.set(khoaCuon(cu), window.scrollY || 0)
+      if (!laCon(cu)) cuon.current.set(khoaCuon(cu), window.scrollY || 0)
       const moi = docTuyen(location.hash)
       dangXem.current = moi
       setT(moi)
@@ -54,7 +64,7 @@ function useTuyen(): Tuyen {
   }, [])
   useLayoutEffect(() => {
     if (lanDau.current) { lanDau.current = false; return }
-    window.scrollTo?.(0, laManCon(t) ? 0 : cuon.current.get(khoaCuon(t)) ?? 0)
+    window.scrollTo?.(0, laCon(t) ? 0 : cuon.current.get(khoaCuon(t)) ?? 0)
   }, [t])
   return t
 }
@@ -156,35 +166,97 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
     void baoDaXemPhuHuynh(id)
   }, [])
 
+  // Nhịp học của con (`/ph/nhip-hoc`): nạp lúc mở, cùng nhịp với "mọi thứ về con"; lỗi ⇒ giữ bản đã tải + lý do + Tải lại.
+  const [nhip, setNhip] = useState<{ k: KetQuaNhipHocApp | null; dangTai: boolean; loi: string }>({ k: null, dangTai: true, loi: '' })
+  const [nhapNhip, setNhapNhip] = useState(0)
+  useEffect(() => {
+    let huy = false
+    setNhip((x) => ({ ...x, dangTai: true }))
+    void layNhipHocCon(sbd).then((r) => {
+      if (huy) return
+      setNhip((x) => (r.ok ? { k: r.du, dangTai: false, loi: '' } : { k: x.k, dangTai: false, loi: r.chu }))
+    })
+    return () => { huy = true }
+  }, [sbd, moc, nhapNhip])
+  const thuLaiNhip = useCallback(() => setNhapNhip((x) => x + 1), [])
+
+  // Hai lệnh của phần dưới trang (Thái độ · Câu sai · Thời gian): gọi khi phần ấy SẮP cuộn tới, SONG SONG, mỗi lệnh cập nhật ngay khi về.
+  const [hoSo, setHoSo] = useState<TaiHoSo>(HO_SO_TRONG)
+  const luotHoSo = useRef(0)
+  useEffect(() => () => { luotHoSo.current += 1 }, [])
+  const napHoSo = useCallback(() => {
+    const luot = ++luotHoSo.current
+    setHoSo((x) => ({ ...x, daGoi: true, dangTaiTd: true, dangTaiLs: true, loiTd: '', loiLs: '' }))
+    void layHoSoThaiDoCon(sbd).then((r) => {
+      if (luot === luotHoSo.current) setHoSo((x) => ({ ...x, dangTaiTd: false, ...(r.ok ? { td: r.du, loiTd: '' } : { loiTd: r.chu }) }))
+    })
+    void layLichSuLamCauCon(sbd, GIOI_HAN_LUOT).then((r) => {
+      if (luot === luotHoSo.current) setHoSo((x) => ({ ...x, dangTaiLs: false, ...(r.ok ? { ls: r.du, loiLs: '' } : { loiLs: r.chu }) }))
+    })
+  }, [sbd])
+
+  // Phần đang đọc (thanh mục sáng) + phần cần cuộn tới (bấm mục ở thanh bên khi đang ở màn con, hoặc mở thẳng `#phan-…`).
+  const [phanHien, setPhanHien] = useState<IdPhan>('hom-nay')
+  const [denPhan, setDenPhan] = useState<{ id: IdPhan; lan: number } | null>(() => {
+    const id = docPhanTuHash(typeof location === 'undefined' ? '' : location.hash)
+    return id ? { id, lan: 0 } : null
+  })
+  const daDenPhan = useCallback(() => setDenPhan(null), [])
+  const manChinh = tuyen.muc === 'hom-nay' && !tuyen.maCa
+  const diToiPhan = (id: IdPhan) => {
+    setPhanHien(id)
+    if (manChinh) setDenPhan({ id, lan: Date.now() })
+    else {
+      setDenPhan({ id, lan: Date.now() })
+      location.hash = 'hom-nay'
+    }
+  }
+
   let man: ReactElement
+  const choMan = <DangTai chu="Đang mở…" hinh="tien-bo" />
   if (tuyen.maCa) man = <Suspense fallback={<DangTai chu="Đang mở báo cáo ca kiểm tra…" hinh="chi-tiet" />}><ManChiTietCa key={tuyen.maCa} sbd={sbd} maCa={tuyen.maCa} /></Suspense>
-  else if (tuyen.muc === 'ca-kiem-tra') man = <ManDiemSo v={v} loiThay={loiThay.ds} />
+  else if (tuyen.muc === 'ca-kiem-tra') man = <><NutVe /><Suspense fallback={choMan}><ManDiemSo v={v} loiThay={loiThay.ds} /></Suspense></>
   else if (tuyen.muc === 'thong-tin') man = <ThongTin ten={ten} lop={lop} />
   else if (tuyen.muc === 'loi-thay') man = <ManLoiThay ds={loiThay.ds} loi={loiThay.chuLoi} thuLai={napLoiThay} />
-  else if (tuyen.muc === 'tien-bo') man = <ManTienBo v={v} hoc2={hoc2} tq={tq.v} />
-  else man = <ManHomNay v={v} hoc2={hoc2} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} tongQuan={taiTq} nhipCon={{ sbd, tenCon: ten, lop }} />
+  else if (tuyen.muc === 'tien-bo') man = <><NutVe /><Suspense fallback={choMan}><ManTienBo v={v} hoc2={hoc2} tq={tq.v} /></Suspense></>
+  else
+    man = (
+      <TrangVeCon
+        v={v} hoc2={hoc2} tongQuan={taiTq} nhip={{ ...nhip, thuLai: thuLaiNhip }} loiThay={loiThay} thuLaiLoiThay={napLoiThay}
+        canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} hoSo={hoSo} napHoSo={napHoSo} sbd={sbd} tenCon={ten} lop={lop}
+        denPhan={denPhan} daDenPhan={daDenPhan} phanHien={phanHien} onPhanHien={setPhanHien}
+      />
+    )
 
-  const sang = mucSang(tuyen)
-  const manCon = laManCon(tuyen)
+  const manCon = laCon(tuyen)
+  const coPhan = phanCo(v.pm, tq.v)
+  const nay = v.pm?.serverNow ?? null
+  const mocSo = tq.v?.moc ?? nhip.k?.tu ?? null
   return (
-    <div className="ph3" data-app="ph3">
+    <div className="ph3 tvc-app" data-app="ph3">
       <div className="ph3-khung">
-        <nav className="ph3-dieu-huong" aria-label="Các mục chính">
-          <span className="ph3-dieu-huong__logo" aria-hidden="true"><AnhLogo vai="ph" size={36} /></span>
-          <div className="ph3-dieu-huong__con">
-            <AnhLogo vai="ph" size={44} alt="Logo Đỗ Đại Học" />
-            <div>
+        <nav className="tvc-ben" aria-label="Các phần về con">
+          <div className="tvc-ben-logo">
+            <AnhLogo vai="ph" size={40} alt="Logo Đỗ Đại Học" />
+            <div className="tvc-ben-con">
               <span>Phụ huynh em</span>
               <b>{ten}</b>
-              {lop && <span>Lớp {lop}</span>}
+              {lop && <small>Lớp {lop}</small>}
             </div>
           </div>
-          {MUC.map((m) => (
-            <a key={m.muc} href={`#${m.muc}`} className="ph3-muc tt-nhan" aria-current={sang === m.muc ? 'page' : undefined}>
-              <span className="ph3-muc__bt">{m.bt()}</span>
-              {m.ten}
+          {PHAN.filter((x) => coPhan.includes(x.id)).map((x) => (
+            <a
+              key={x.id}
+              href={`#${idPhan(x.id)}`}
+              className="tvc-ben-muc tt-nhan"
+              aria-current={manChinh && phanHien === x.id ? 'true' : undefined}
+              onClick={(e) => { e.preventDefault(); diToiPhan(x.id) }}
+            >
+              <x.bt co={20} />
+              <span>{x.ten}</span>
             </a>
           ))}
+          {nay !== null && <p className="tvc-ben-cap">Cập nhật {gioVn(nay)} · {ngayDayDuVn(nay)}{mocSo ? <><br />Số liệu từ {ngayChuoiNgan(mocSo)}</> : null}</p>}
         </nav>
         <main className="ph3-chinh">
           {!manCon && (

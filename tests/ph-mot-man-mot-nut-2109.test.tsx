@@ -61,17 +61,20 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
   // Hôm nay · Tiến bộ · Ca kiểm tra (bỏ "Lịch sử"/"Lời thầy").
   it('MỌI nút bấm được khớp danh sách hữu hạn: nút tròn tài khoản · "Đã xem cảnh báo" · "Đổi số báo danh" (CHỈ trong menu Tài khoản); menu mở ⇒ hai mục', async () => {
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="ca-gan-nhat"]')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('[data-vung="kiem-tra"]')).toBeTruthy())
     const ten = () => [...container.querySelectorAll('button')].map((b) => (b.getAttribute('aria-label') || b.textContent || '').replace(/\s+/g, ' ').trim())
     // SỬA CÓ CHỦ Ý — đợt 16: thẻ "Nhịp học của con" chỉ có nút XEM (mở hồ sơ làm bài của con) / TẢI LẠI khi lỗi — không nút giao bài nào.
-    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Đã xem cảnh báo|Đổi số báo danh|Xem hồ sơ làm bài của con|Tải lại nhịp học)$/
+    // SỬA CÓ CHỦ ĐÍCH 13/10 — đợt 19 (trang "Hôm nay của con"): thêm các nút CHỈ XEM / TẢI LẠI của trang — khối bậc (mở tấm 12 bậc), "Xem đủ … câu"
+    // và "Xem tất cả … lượt" (mở hồ sơ làm bài), tải lại phần thái độ / câu sai khi lỗi. Không nút giao bài nào.
+    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Đã xem cảnh báo|Đổi số báo danh|Xem hồ sơ làm bài của con|Tải lại nhịp học|Tải lại thái độ làm bài|Tải lại câu sai|Bậc \d+\/12 · .+, xem đủ 12 bậc|Xem đủ \d+ câu chưa sửa và \d+ câu đã sửa|Xem tất cả \d+ lượt)$/
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
     expect(ten()).not.toContain('Đổi số báo danh') // menu chưa mở ⇒ không có ở đâu khác
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
     expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(2)
-    // SỬA CÓ CHỦ Ý — bản vẽ tối giản thầy chốt 09/10 (thay thứ tự 01/10): BA mục điều hướng là LIÊN KẾT (không phải nút)
-    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Ca kiểm tra'])
+    // SỬA CÓ CHỦ ĐÍCH 13/10 — đợt 19: thanh điều hướng là các PHẦN của trang — vẫn là LIÊN KẾT (không phải nút)
+    expect([...container.querySelectorAll('nav.tvc-ben a')].map((a) => a.textContent).slice(0, 2)).toEqual(['Hôm nay', 'Nhịp học'])
+    expect(container.querySelectorAll('nav button')).toHaveLength(0)
   })
 
   it('cảnh báo của thầy hiện ở Hôm nay (thụ động: chỉ "Đã xem cảnh báo", không "Làm ngay")', async () => {

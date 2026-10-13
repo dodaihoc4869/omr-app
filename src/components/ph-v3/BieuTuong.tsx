@@ -38,3 +38,20 @@ export const BtTrang = (p: P) => <Net {...p}><path d="M20 14.5A8 8 0 1 1 9.5 4a6
 export const BtBongDen = (p: P) => <Net {...p}><path d="M9 18h6M10 21h4" /><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z" /></Net>
 /** Dấu nhân (lượt sai). */
 export const BtNhan = (p: P) => <Net {...p}><path d="M7 7l10 10M17 7 7 17" /></Net>
+// ĐỢT 19 (làn R — trang "Hôm nay của con" theo bản vẽ docs/ban-ve-dot19/app-phu-huynh.html): biểu tượng các phần trên trang.
+/** Nhịp tim (Thái độ làm bài). */
+export const BtNhipTim = (p: P) => <Net {...p}><path d="M3 12h4l2-5 4 10 2-5h6" /></Net>
+/** Sách (Bài tập về nhà). */
+export const BtSach = (p: P) => <Net {...p}><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 19V5M8 7h7" /></Net>
+/** Người (Buổi học trên lớp). */
+export const BtLop = (p: P) => <Net {...p}><circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" /><circle cx="17" cy="9" r="2.5" /><path d="M17 14c2.5 0 4 1.8 4 4.5" /></Net>
+/** Đồng hồ quay ngược (Lịch sử). */
+export const BtLichSu = (p: P) => <Net {...p}><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5M12 7v5l3 2" /></Net>
+/** Tia sét (trả lời quá nhanh). */
+export const BtTia = (p: P) => <Net {...p}><path d="M13 2L4 14h7l-1 8 9-12h-7z" /></Net>
+/** Đường đi xuống (độ đúng giảm). */
+export const BtDiXuong = (p: P) => <Net {...p}><path d="M3 7l6 6 4-4 8 8" /><path d="M15 17h6v-6" /></Net>
+/** Đường đi lên (điểm tăng · vừa lên bậc). */
+export const BtDiLen = (p: P) => <Net {...p}><path d="M3 17l6-6 4 4 8-8" /><path d="M15 7h6v6" /></Net>
+/** Bong bóng lời (Nhận xét của thầy). */
+export const BtTinNhan = (p: P) => <Net {...p}><path d="M4 5h16v11H9l-5 4z" /></Net>

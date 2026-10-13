@@ -11,7 +11,8 @@ const NGUON: readonly string[] = ['on_lai', 'btvn', 'thu_thach_rieng', 'luyen_da
 const BAC: readonly string[] = ['biet', 'hieu', 'van_dung']
 
 export interface CongBo { congBo: 'khong' | 'ngay' | 'ca_lop_xong'; daCongBo: boolean; soEmDaNop: number; soEmDaVao: number }
-export interface PhanDiem { ma: 'I' | 'II' | 'III'; dung: number; tong: number; diem: number | null }
+/** `toiDa` (CHỈ THÊM, đợt 19): điểm tối đa của phần (4,5 · 4 · 1,5) khi máy chủ gửi; vắng ⇒ null (thanh phần tính theo số câu đúng). */
+export interface PhanDiem { ma: 'I' | 'II' | 'III'; dung: number; tong: number; diem: number | null; toiDa?: number | null }
 export interface CaGanNhat {
   maCa: string
   tenCa: string
@@ -140,7 +141,8 @@ function docCaGanNhat(x: unknown): CaGanNhat | null {
     const dung = nguyenKhongAm(p.dung)
     const t = nguyenKhongAm(p.tong)
     if (dung === null || t === null || t <= 0 || dung > t) continue
-    phan.push({ ma: p.ma, dung, tong: t, diem: soKhongAm(p.diem) })
+    const toiDa = soKhongAm(p.toiDa)
+    phan.push({ ma: p.ma, dung, tong: t, diem: soKhongAm(p.diem), ...(toiDa !== null && toiDa > 0 ? { toiDa } : {}) })
     if (phan.length >= 3) break
   }
   return {
