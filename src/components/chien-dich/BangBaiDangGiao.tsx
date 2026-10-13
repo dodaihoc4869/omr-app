@@ -1,12 +1,28 @@
 // Bài đang giao: một lệnh tổng hợp, giữ nguyên bảng khi cập nhật hoặc lưu hạn.
 // Chỉ báo Đã lưu sau khi máy chủ xác nhận đúng từng bài/ngày; không tải lại bảng sau lưu.
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { Component, type ReactNode, lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from 'react'
 import { RefreshCw } from 'lucide-react'
 import { goiLenh } from '../../lib/goi-lenh-thay'
 import { theoDoiBaiDangGiao, type BaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
 import { ngayVn, type GoiDu } from './goi7-ui'
 import { chuDemGiao, chuHanDong, goiDangGiao, TOI_DA_DONG_GIAO } from './buoi-day-ui'
 import './sua-han-bai.css'
+import type { AckEmNhanBai } from './api-goi7-em'
+
+const giuLoiNapEm = (e: Event) => {
+  const loi = (e as Event & { payload?: unknown }).payload
+  if (/SuaEmNhanBai|sua-em-nhan-bai/.test(loi instanceof Error ? loi.message : String(loi))) e.preventDefault()
+}
+const napSuaEm = () => lazy(() => import('./SuaEmNhanBai'))
+
+/** Thiếu mảnh danh sách chỉ báo tại bảng, giữ màn và những gì thầy đang sửa. */
+export class ChanLoiDanhSach extends Component<{ children: ReactNode; onThu: () => void; onDong: () => void }, { loi: boolean }> {
+  state = { loi: false }
+  static getDerivedStateFromError() { return { loi: true } }
+  render() {
+    return this.state.loi ? <div role="alert"><p>Chưa mở được danh sách nhận bài. Thầy kiểm tra mạng rồi thử lại.</p><button type="button" className="gvv2-nut-chu" onClick={this.props.onThu}>Thử mở danh sách lại</button><button type="button" className="gvv2-nut-chu" onClick={() => window.location.reload()}>Tải lại app</button><button type="button" className="gvv2-nut-chu" onClick={this.props.onDong}>Đóng thông báo</button></div> : this.props.children
+  }
+}
 
 const CHU_CHUA_CO_LENH = 'Máy chủ chưa có bảng bài 7 ngày.'
 type ThongKe = { soEm: number; pGap: number | null; pTuLam: number | null }
@@ -54,6 +70,14 @@ function Thanh({ p, nhan, loai }: { p: number | null; nhan: string; loai: 'gap' 
 }
 
 export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => void }) {
+  const [TamEm, setTamEm] = useState(napSuaEm)
+  const [thuTam, setThuTam] = useState(0)
+  const ackEm = useRef(new Map<string, { soEm: number; serverNow: number }>())
+  const [emSua, setEmSua] = useState<GoiBang | null>(null)
+  const batEm = (goi: GoiBang) => { window.addEventListener('vite:preloadError', giuLoiNapEm, true); setEmSua(goi) }
+  useEffect(() => { if (!emSua) window.removeEventListener('vite:preloadError', giuLoiNapEm, true) }, [emSua])
+  useEffect(() => () => window.removeEventListener('vite:preloadError', giuLoiNapEm, true), [])
+  const docSauEm = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [du, setDu] = useState<DuBang | null>(null)
   const [dangTai, setDangTai] = useState(true)
   const [loiTai, setLoiTai] = useState('')
@@ -83,6 +107,11 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
       const moi = r.ok ? docBang(r.du) : null
       if (!moi) { setLoiTai(r.ok ? 'Máy chủ trả lời chưa đủ số liệu. Thầy thử lại.' : r.chu); return null }
       const theoId = new Map(moi.goi.map(g => [g.id, g]))
+      for (const [id, ack] of ackEm.current) {
+        const t = moi.thongKe[id]
+        if (t?.soEm === ack.soEm && moi.serverNow !== undefined && moi.serverNow >= ack.serverNow) ackEm.current.delete(id)
+        else if (theoId.has(id)) moi.thongKe[id] = { soEm: ack.soEm, pGap: null, pTuLam: null }
+      }
       setDu(moi)
       // Cập nhật sau lỗi 2 máy: giữ ngày thầy đang nhập, lấy hạn hiện tại để so khi lưu lại.
       setSua(cu => cu && theoId.has(cu.id) ? { ...cu, hanCu: theoId.get(cu.id)!.han } : null)
@@ -147,6 +176,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
     return () => {
       song.current = false; boNghe(); choBai.current = null
       if (henDoc.current !== null) clearTimeout(henDoc.current)
+      if (docSauEm.current !== null) clearTimeout(docSauEm.current)
     }
   }, [tai, docBaiVuaDoi])
 
@@ -192,6 +222,19 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
       dangLuu.current = false
       if (song.current) setLuu(false)
     }
+  }
+  const daLuuEm = (ack: AckEmNhanBai) => {
+    ++thayDoi.current
+    ackEm.current.set(ack.goiId, { soEm: ack.nhan.length, serverNow: ack.serverNow })
+    setDu(cu => cu ? { ...cu, thongKe: { ...cu.thongKe, [ack.goiId]: { soEm: ack.nhan.length, pGap: null, pTuLam: null } } } : cu)
+    if (docSauEm.current !== null) clearTimeout(docSauEm.current)
+    const docMoi = () => {
+      if (!song.current) return
+      if (dangDoc.current || dangLuu.current) { docSauEm.current = setTimeout(docMoi, 200); return }
+      docSauEm.current = null
+      void tai(caCuHien.current)
+    }
+    docMoi()
   }
   const batSua = (g: GoiDu) => {
     setSua({ id: g.id, han: g.han < homNay ? homNay : g.han, hanCu: g.han })
@@ -273,6 +316,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
                         <span className="gvv2-bdg-bai">{g.ten}</span>
                       </td>
                       <td data-nhan="Hạn nộp">
+                        <div className="gvv2-bdg-tuy-chinh">
                         {sua?.id === g.id ? <div className="gvv2-bdg-sua-han" role="group" aria-label={`Sửa hạn ${g.ten} · ${g.lop}`}>
                           <label>Hạn mới · 23:59 giờ Việt Nam<input autoFocus type="date" required min={homNay > String(g.bat_dau ?? '') ? homNay : g.bat_dau} value={sua.han} disabled={luu} aria-label={`Hạn mới của ${g.ten} · ${g.lop}`} onKeyDown={enterLuu} onChange={e => setSua({ ...sua, han: e.target.value })} /></label>
                           <span><button type="button" className="gvv2-nut-chu" disabled={luu || daLuu[g.id] === sua.han} onClick={bamLuu}>{luu ? 'Đang lưu…' : 'Lưu hạn'}</button><button type="button" className="gvv2-nut-chu" disabled={luu} onClick={huySua}>{daLuu[g.id] === sua.han ? 'Đóng' : 'Hủy'}</button></span>
@@ -284,6 +328,8 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
                           <span className="gvv2-bdg-da-luu" role="status" title="Kế hoạch từng em tự tính lại theo tiến độ còn thiếu và lịch kiểm tra.">{daLuu[g.id] === g.han ? 'Đã lưu hạn mới' : ''}</span>
                         </div>}
 
+                        <button type="button" className="gvv2-nut-chu" aria-label={`Thêm / Bớt em ${g.ten} · ${g.lop}`} disabled={luu || !!nhieu} onClick={() => batEm(g)}>Thêm / Bớt em</button>
+                        </div>
                       </td>
                       {!ct ? (
                         <td colSpan={2} data-nhan="Tiến độ" className="gvv2-bdg-canh">
@@ -322,6 +368,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
           Thử lại
         </button>
       )}
+      {emSua && <ChanLoiDanhSach key={thuTam} onThu={() => { setTamEm(napSuaEm); setThuTam(n => n + 1) }} onDong={() => setEmSua(null)}><Suspense fallback={<p role="status">Đang mở danh sách nhận bài…</p>}><TamEm key={emSua.id} goiId={emSua.id} lop={emSua.lop} ten={emSua.ten} onDong={() => setEmSua(null)} onDaLuu={daLuuEm} /></Suspense></ChanLoiDanhSach>}
     </div>
   )
 }

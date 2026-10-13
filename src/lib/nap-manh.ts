@@ -101,6 +101,7 @@ export async function napDong<T>(nap: () => Promise<T>): Promise<T> {
  * hỏng, kể cả ở chỗ chưa kịp bọc `napDong`. Gọi một lần lúc khởi động. */
 export function batLoiThieuManh(cua: Window = window): void {
   cua.addEventListener('vite:preloadError', (e) => {
+    if (e.defaultPrevented) return // Một tấm có đường thử lại riêng đã nhận lỗi này.
     if (taiLaiMotLan()) {
       // Chặn Vite ném tiếp ra ngoài — mình xử lý bằng cách tải lại.
       e.preventDefault()

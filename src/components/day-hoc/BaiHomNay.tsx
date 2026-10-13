@@ -6,16 +6,16 @@
 // → nút chính "Giao Bài <số> cho <lớp | N lớp>" ⇒ `tick` LẦN LƯỢT từng lớp chưa có bài (máy chủ giữ nguyên, mỗi lớp một chiến dịch)
 // (TỰ GIAO đúng ba phần Trắc nghiệm / Đúng sai / Trả lời ngắn của bài — thầy 05/10, KHÔNG ô tích, bỏ hẳn Ví dụ minh hoạ và Các dạng toán trọng tâm;
 // phạm vi = mọi bài đứng TRƯỚC trong cây cùng khối kèm tờ tự giao của chúng).
-// Bài đã tick: "Bỏ tick" / "Sửa em" theo từng lớp (hỏi lại, nói thật hậu quả). Lớp chờ bài mới từ 3 ngày ⇒ một dòng nhỏ ở đầu bảng (`DongChoBaiMoi`).
+// Bài đã tick: "Bỏ tick" theo từng lớp; danh sách nhận bài chỉnh tại Bài đang giao (hỏi lại, nói thật hậu quả). Lớp chờ bài mới từ 3 ngày ⇒ một dòng nhỏ ở đầu bảng (`DongChoBaiMoi`).
 // CHỌN EM NHẬN BÀI (thầy nhắn 05/10: "cho thêm chỗ chọn giao cho hs nhé (bạn bê luôn cái chọn hs ở chiến dịch cũ, cho chọn hs theo điểm danh nữa)"):
 // trong thẻ xác nhận, BÊ NGUYÊN khối "Chọn em nhận chiến dịch" của màn Giao (`ChonEmGiao` + `useDsEmGiao`, mặc định cả các lớp đã chọn) + hàng chip
 // "Theo điểm danh:" (buổi đang mở + tối đa 3 buổi gần nhất của từng lớp, `buoiGanDay`) + chip "Cả lớp". Gửi `sbd` (chia về đúng lớp của em) trong CẢ `xem-truoc` lẫn
-// `tick`; chưa có danh sách em ⇒ giữ hành vi cũ (giao cả lớp, không gửi `sbd`). Bài đã tick: "Đã giao N em" + "Sửa em" (hộp sửa chiến dịch sẵn có).
+// `tick`; chưa có danh sách em ⇒ giữ hành vi cũ (giao cả lớp, không gửi `sbd`). Bài đã tick: "Đã giao N em"; Thêm / Bớt em nằm tại bảng Bài đang giao.
 // Chữ: bảng A2 (app thầy dùng "lượt/ngày", không "thể lực"); chủ ngữ chữ MỚI là "A.I Đỗ Đại Học" (omni-chu.ts). Kiểu dáng: `bai-hom-nay.css` (chỉ biến màu --bts-*).
 // ĐỢT 16 (12/10, thầy: "tick chọn bài cũng vậy" — mở lại là mất bài đang chọn): bài đang chọn giữ theo KHOÁ BÀI + khối (`chonNho`), bài hiện ra suy từ cây
 // đang có ⇒ kho / danh sách lớp về muộn không xoá; chỉ bỏ khi thầy đổi sang lớp KHÁC KHỐI thật, và báo. Lớp tự chọn + bài đang chọn được bảng Dạy học nhớ theo
 // buổi (`lopTay`, `chonNho`, `datNho`) ⇒ mở lại màn vẫn còn.
-import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { baoBaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
 import type { TeacherExamSource } from '../../data/examContent'
@@ -84,8 +84,6 @@ const LOP_CHIP: Record<KieuTrangThaiBai, string> = { da_day: 'dh-chip dh-chip--x
 const LOP_CHAM: Record<KieuTrangThaiBai, string> = { da_day: 'bhn-cham bhn-cham--xanh', dang_luyen: 'bhn-cham bhn-cham--vang', hom_nay: 'bhn-cham bhn-cham--duong', chua_day: 'bhn-cham bhn-cham--xam' }
 /** Số buổi gần đây (ngoài buổi đang mở) hiện trong hàng chip "Theo điểm danh". */
 const SO_BUOI_GAN_DAY = 3
-/** Hộp sửa chiến dịch sẵn có (thêm/bớt em) — nạp lười, chỉ khi thầy bấm "Sửa em". */
-const SuaChienDich = lazy(() => import('../chien-dich/SuaChienDich'))
 
 /** Cách chọn em nhận bài (thầy 06/10: "chỗ chọn lớp cho thêm mục chọn theo em (giao theo em), giao theo điểm danh"): cả lớp · từng em · theo điểm danh. */
 export type CheDoGiao = 'lop' | 'em' | 'diem_danh'
@@ -411,7 +409,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     const ten = tenNganBai(chon.tenBai)
     if (ok.length === 1 && dauVaoLop.length === 1) {
       const k = ok[0]!
-      showToast(k.daCo ? `${ten} đã giao cho ${k.lop} từ trước — giữ chiến dịch có sẵn (đổi em nhận bài: bấm Sửa em)` : `Đã giao ${ten} cho ${k.lop}${k.hanNop ? ` · hạn nộp ${hienHanNop(k.hanNop)}` : ''}`, 'success')
+      showToast(k.daCo ? `${ten} đã giao cho ${k.lop} từ trước — giữ chiến dịch có sẵn (đổi em nhận bài: bấm Thêm / Bớt em tại Bài đang giao)` : `Đã giao ${ten} cho ${k.lop}${k.hanNop ? ` · hạn nộp ${hienHanNop(k.hanNop)}` : ''}`, 'success')
     } else if (ok.length) {
       const moi = ok.filter((k) => !k.daCo).map((k) => k.lop)
       const cu = ok.filter((k) => k.daCo).map((k) => k.lop)
@@ -456,14 +454,6 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     void taiDs()
   }
 
-  // "Sửa em" của bài đã tick: hộp sửa chiến dịch sẵn có; không có mã chiến dịch ⇒ sang mục Chiến dịch luyện.
-  const setScreen = useAppStore((s) => s.setScreen)
-  const [suaCd, setSuaCd] = useState<{ id: string; ten: string } | null>(null)
-  const suaEm = (b: Pick<BaiDaTick, 'chienDichId' | 'tenBai'>) => {
-    if (b.chienDichId) setSuaCd({ id: b.chienDichId, ten: b.tenBai })
-    else setScreen('chiendich')
-  }
-
   const chuCho = bat ? lopChon.map((l) => chuChoBaiMoi(l, dsTheoLop[l]?.choBaiMoi)).filter((c): c is string => !!c) : []
   return {
     setDsEm,
@@ -480,9 +470,6 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     cheDoGiao,
     doiCheDoGiao,
     nguonCuaBai,
-    suaCd,
-    setSuaCd,
-    suaEm,
     bat,
     co,
     dangTaiCo,
@@ -549,7 +536,7 @@ export function DongChoBaiMoi({ bhn }: { bhn: Pick<BaiHomNay, 'chuCho'> }) {
   )
 }
 
-/** Một dòng bài của cây: số bài, tên + số câu, chip trạng thái (gộp qua các lớp đã chọn), Sửa em / Bỏ tick (một lớp: ngay trên dòng; nhiều lớp: mở "Theo lớp"). */
+/** Một dòng bài của cây: số bài, tên + số câu, chip trạng thái (gộp qua các lớp đã chọn), Bỏ tick (một lớp: ngay trên dòng; nhiều lớp: mở "Theo lớp"). */
 function HangBai({ bhn, b }: { bhn: BaiHomNay; b: BaiCay }) {
   const { lopChon, chon, chonBai, tickTheoLop } = bhn
   const nhieu = lopChon.length > 1
@@ -584,11 +571,6 @@ function HangBai({ bhn, b }: { bhn: BaiHomNay; b: BaiCay }) {
           {tt.chu}
         </span>
         {tick1 && (
-          <button type="button" className="m3-nut-chu dh-nut-nho" onClick={() => bhn.suaEm(tick1)} title={tick1.chienDichId ? 'Thêm / bớt em của chiến dịch bài này' : 'Mở mục Chiến dịch luyện'}>
-            Sửa em
-          </button>
-        )}
-        {tick1 && (
           <button type="button" className="m3-nut-chu dh-nut-nho" disabled={bhn.dangBo === `${lopChon[0]}|${b.khoaBai}`} onClick={() => void bhn.boTick(b, lopChon[0])}>
             {bhn.dangBo === `${lopChon[0]}|${b.khoaBai}` ? 'Đang bỏ…' : 'Bỏ tick'}
           </button>
@@ -608,7 +590,7 @@ function HangBai({ bhn, b }: { bhn: BaiHomNay; b: BaiCay }) {
             {ticks.some((x) => x.tick) && (
               <li className="bhn-cham-nut">
                 <button type="button" className="bhn-nut-link" aria-expanded={moChiTiet} onClick={() => setMoChiTiet(!moChiTiet)}>
-                  Sửa em / Bỏ tick theo lớp
+                  Bỏ tick theo lớp
                 </button>
               </li>
             )}
@@ -621,9 +603,6 @@ function HangBai({ bhn, b }: { bhn: BaiHomNay; b: BaiCay }) {
                   <li key={x.lop} className="bhn-chi-tiet-hang" data-lop={x.lop}>
                     <span className="bhn-chi-tiet-ten">{x.lop}</span>
                     <span className="bhn-chi-tiet-nut">
-                      <button type="button" className="m3-nut-chu dh-nut-nho" aria-label={`Sửa em · ${x.lop}`} onClick={() => bhn.suaEm(x.tick!)}>
-                        Sửa em
-                      </button>
                       <button type="button" className="m3-nut-chu dh-nut-nho" aria-label={`Bỏ tick · ${x.lop}`} disabled={bhn.dangBo === `${x.lop}|${b.khoaBai}`} onClick={() => void bhn.boTick(b, x.lop)}>
                         {bhn.dangBo === `${x.lop}|${b.khoaBai}` ? 'Đang bỏ…' : 'Bỏ tick'}
                       </button>
@@ -749,20 +728,6 @@ export function BuocBaiHomNay({ bhn, kho, loiKho = '', thuKho, soBuoc = 4 }: { b
           </aside>
         </div>
       </div>
-      {bhn.suaCd && (
-        <Suspense fallback={null}>
-          <SuaChienDich
-            id={bhn.suaCd.id}
-            ten={bhn.suaCd.ten}
-            onDong={() => bhn.setSuaCd(null)}
-            onDaLuu={(kq) => {
-              bhn.setSuaCd(null)
-              useAppStore.getState().showToast(`Đã lưu chiến dịch: ${kq.tomTat}`, 'success')
-              void taiDs()
-            }}
-          />
-        </Suspense>
-      )}
     </section>
   )
 }

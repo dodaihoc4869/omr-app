@@ -562,16 +562,13 @@ describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của c
     expect(screen.queryByRole('heading', { name: 'Giao cho' })).toBeNull()
   })
 
-  it('bài ĐÃ tick: "Đã giao N em" + "Sửa em" mở hộp sửa chiến dịch sẵn có; không có mã chiến dịch ⇒ sang mục Chiến dịch luyện', async () => {
+  it('bài đã tick giữ số em và Bỏ tick; danh sách nhận bài chỉnh tại bảng Gói7, không mở chiến dịch cũ', async () => {
     cd1 = null
-    const { useAppStore } = await import('../src/store/appStore')
     const buoc = await moBuoc()
     expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 44 em')
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Sửa em' }))
-    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/chien-dich/sua', { action: 'doc', id: 'cd-2' }))
-    expect(await screen.findByText(/Chỉnh sửa: Bài 2\. Lipid/)).toBeTruthy()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B1')).getByRole('button', { name: 'Sửa em' }))
-    expect(useAppStore.getState().screen).toBe('chiendich')
+    expect(within(dong(buoc, 'DH-12-C1-B2')).queryByRole('button', { name: 'Sửa em' })).toBeNull()
+    expect(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Bỏ tick' })).toBeTruthy()
+    expect(goi.mock.calls.some(([duong]) => duong === '/gv/chien-dich/sua')).toBe(false)
   })
 })
 

@@ -17,3 +17,6 @@
   .gvv2-bdg-sua-han { font-size: 15px; }
   .gvv2-bdg-han-o { text-align: right; }
 }
+
+.gvv2-bdg-tuy-chinh { display: grid; gap: 2px; min-width: 0; }
+.gvv2-bdg-tuy-chinh > button { white-space: normal; }
