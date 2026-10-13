@@ -1,5 +1,5 @@
 // `POST /ph/tat-ca-ve-con {pass}` — thẻ "Ca kiểm tra gần nhất của con" + trang "Tất cả về con" của phụ huynh (hợp đồng docs/hop-dong-xem-diem-v2-2109.md mục 6 + bổ sung `homNay`, `manhYeu` của điều phối 21/09).
-// ĐỌC-CHỈ, không AI, ≤ 14 truy vấn D1 cho phần dữ liệu + 3 cho `doCham` (hangChamCuaEm dùng chung với lệnh thi đua) + 5 cho `no` của con (`docVeDichCuaEm`, W3b Dồn về đích) = ≤ 20 tổng (kể cả xác thực; đo trong test). KHÔNG trường nào của game (không thần thú, EXP, khiên, chuỗi game, đoàn, đảo, võ đài), không xếp hạng, không so với bạn.
+// ĐỌC-CHỈ, không AI, ≤ 15 truy vấn D1 cho phần dữ liệu (đợt 19: +1 `buoiHoc` chạy cùng đợt đầu, không thêm đợt chờ) + 3 cho `doCham` (hangChamCuaEm dùng chung với lệnh thi đua) + 5 cho `no` của con (`docVeDichCuaEm`, W3b Dồn về đích) = ≤ 20 tổng (kể cả xác thực; đo trong test). KHÔNG trường nào của game (không thần thú, EXP, khiên, chuỗi game, đoàn, đảo, võ đài), không xếp hạng, không so với bạn.
 // Khối nào không có số thật thì VẮNG (không số 0 giả, không mảng bịa).
 //
 // TRƯỜNG MỚI CHO BẢNG KIỂU APPLE (thầy chốt 21/09 16:16): xem docs/ph-tat-ca-ve-con-truong-apple-2109.md (mucTieu, viecXong/viecTong, soLanHoc, dieuDangMung, aiDaLam/aiDaChuanBi, cau[].lan/lamLau, chang[], nopTreGio, lichOn.bayNgayToi…).
@@ -31,6 +31,7 @@ import { quotaPhan } from '../../src/engine/score'
 import { hangChamCuaEm } from './thi-dua-hom-nay'
 import { docVeDichCuaEm } from './ve-dich-d1'
 import { docCauBtvnChuaNop } from './game-v2-luot'
+import { TEN_LOP_CHUA_XEP, TEN_LOP_THUONG_12 } from './ten-lop'
 
 type Row = Record<string, unknown>
 
@@ -53,11 +54,14 @@ export const SO_NGAY_VUA_LEN_BAC = 3
 export const PHIEN_CACH_TOI_DA_PHUT = 10
 export const TOI_DA_CAU_HOM_NAY = 120
 export const DE_RUT_GON_TOI_DA = 160
-export const TOI_DA_TRUY_VAN = 14 // 12 + 1 truy vấn gộp thử thách riêng + lần nhắc hạn (bảng kiểu Apple, 21/09) + 1 câu của bài chưa nộp (che theo bài, 21/09)
+export const TOI_DA_TRUY_VAN = 15 // 12 + 1 truy vấn gộp thử thách riêng + lần nhắc hạn (bảng kiểu Apple, 21/09) + 1 câu của bài chưa nộp (che theo bài, 21/09) + 1 điểm danh buổi học (đợt 19, cùng đợt đầu)
 /** Câu làm từ chừng này giây trở lên là "làm lâu" (bộ lọc "Làm lâu" ở bảng phụ huynh; máy khách không phải chép ngưỡng). */
 export const NGUONG_LAM_LAU_GIAY = 120
 export const SO_NGAY_LICH_ON_TOI = 7
 export const CHU_THU = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'] as const
+/** ĐỢT 19 (làn R, thầy duyệt bản vẽ app phụ huynh 13/10) — khối `buoiHoc`: điểm danh buổi học trên lớp của con, tối đa 8 buổi gần nhất trong 60 ngày. */
+export const TOI_DA_BUOI_HOC = 8
+export const SO_NGAY_BUOI_HOC = 60
 /** Ngân sách câu/ngày mặc định của kế hoạch ngày (docs/ke-hoach-ngay-api-1909.md: mucTieuCau 8) — chỉ để tính TRẦN ôn khi con chưa có kế hoạch hôm nay. */
 export const MUC_TIEU_CAU_MAC_DINH = 8
 const MOI_GIAY_MAC_DINH = 90
@@ -282,6 +286,43 @@ async function docBtvnVaMom(hoi: ReturnType<typeof boHoi>['hoi'], sbd: string, d
   return null
 }
 
+// ------------------------------------------------------------------ BUỔI HỌC (đợt 19) ------------------------------------------------------------------
+/**
+ * Điểm danh buổi học của con — MỘT truy vấn (bảng `buoi_hoc` + `buoi_hoc_diem_danh`, buoi-hoc.ts), chạy CÙNG ĐỢT ĐẦU với sổ học / lượt nộp ⇒ không thêm
+ * đợt chờ D1 nối tiếp. Buổi được tính: buổi GẮN ĐÚNG LỚP của con (có mặt hay vắng đều tính) + buổi "mọi lớp" / lớp khác CHỈ khi con có mặt.
+ * Tên lớp hiệu lực của con tính ngay trong câu SQL theo ĐÚNG luật `tenLopCuaEm` (ten-lop.ts: đã gán thì dùng, không thì mặc định theo khối) — không
+ * thêm lượt đọc `hoc_sinh`. Dòng "bớt em" (`trang_thai = 'bo'`) là vắng. Không mã buổi, không bí mật, không tên/sbd bạn nào. Thiếu bảng ⇒ `null`.
+ */
+const SQL_BUOI_HOC = `SELECT b.ten AS ten, b.mo_luc AS mo_luc, b.het_han AS het_han, b.dong_luc AS dong_luc, d.luc AS luc, d.cach AS cach, d.trang_thai AS tt
+  FROM buoi_hoc b LEFT JOIN buoi_hoc_diem_danh d ON d.buoi_id = b.id AND d.sbd = ?
+ WHERE b.mo_luc >= ? AND b.mo_luc <= ?
+   AND (d.trang_thai = 'co_mat' OR b.lop = (SELECT CASE WHEN TRIM(COALESCE(h.ten_lop, '')) <> '' THEN TRIM(h.ten_lop)
+                                                      WHEN TRIM(COALESCE(h.lop, '')) = '12' THEN ?
+                                                      WHEN TRIM(COALESCE(h.lop, '')) <> '' THEN TRIM(h.lop) ELSE ? END
+                                                FROM hoc_sinh h WHERE h.sbd = ?))
+ ORDER BY b.mo_luc DESC LIMIT ${TOI_DA_BUOI_HOC}`
+
+export interface BuoiHocCuaCon { ten: string; moLuc: string; coMat: boolean; luc?: string; cach?: 'ma' | 'thay'; dangMo?: true }
+
+async function docBuoiHocCuaCon(hoi: ReturnType<typeof boHoi>['hoi'], sbd: string, nowMs: number): Promise<BuoiHocCuaCon[] | null> {
+  const tu = new Date(nowMs - SO_NGAY_BUOI_HOC * 86_400_000).toISOString()
+  const r = await hoi(SQL_BUOI_HOC, sbd, tu, new Date(nowMs).toISOString(), TEN_LOP_THUONG_12, TEN_LOP_CHUA_XEP, sbd).catch(() => null)
+  if (!r) return null
+  return r.filter((x) => chuoi(x.mo_luc)).map((x): BuoiHocCuaCon => {
+    const coMat = chuoi(x.tt) === 'co_mat' && !!chuoi(x.luc)
+    const cach = chuoi(x.cach)
+    const dangMo = !chuoi(x.dong_luc) && Date.parse(chuoi(x.het_han)) > nowMs
+    return {
+      ten: chuoi(x.ten).slice(0, 80) || 'Buổi học',
+      moLuc: chuoi(x.mo_luc),
+      coMat,
+      ...(coMat ? { luc: chuoi(x.luc) } : {}),
+      ...(coMat && (cach === 'ma' || cach === 'thay') ? { cach } : {}),
+      ...(dangMo ? { dangMo: true as const } : {}),
+    }
+  })
+}
+
 // ------------------------------------------------------------------ LỆNH ------------------------------------------------------------------
 // `envDoc` (Boss 22/09 lượt 2, mặc định = `envGoc`): tệp này KHÔNG ghi gì ngoài đếm truy cập của `sbdCuaPhuHuynh` (đã tách sang `envGoc` primary qua `envGhi`)
 // — nên mọi lượt đọc còn lại (biến `env` từ đây xuống, che tham số `envGoc`) chạy trên bản sao gần nhất khi Worker có.
@@ -308,6 +349,8 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
     sbd,
   ))
   const pVeDich = chan(docVeDichCuaEm(env, sbd, nowMs))
+  // Đợt 19: điểm danh buổi học — cùng đợt đầu (chỉ phụ thuộc em), đọc kết quả ở cuối ⇒ không thêm đợt chờ nối tiếp.
+  const pBuoiHoc = chan(docBuoiHocCuaCon(hoi, sbd, nowMs))
 
   // 1 · truy vấn gộp: tên em, số lượt giao thêm hôm nay, kế hoạch hôm nay, (qid → dạng) của hồ sơ
   let hoTen = ''
@@ -766,6 +809,10 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   // Chỉ hai con số hạng + sĩ số — không tên bạn nào, không thần thú. Con chưa học hôm nay / chưa xác định được lớp / đọc lỗi ⇒ VẮNG (không hạng bịa).
   const doCham = await pDoCham
   if (doCham) ra.doCham = { hang: doCham.hang, siSo: doCham.siSo }
+
+  // ── buổi học trên lớp (đợt 19): mới trước, ≤ 8 buổi; không buổi nào ⇒ VẮNG khoá (không mảng rỗng giả).
+  const buoiHoc = await pBuoiHoc
+  if (buoiHoc && buoiHoc.length > 0) ra.buoiHoc = { ds: buoiHoc }
 
   // ── điều đáng mừng · A.I đã làm / đã chuẩn bị (CHỈ sự thật ĐO ĐƯỢC từ mốc; không có gì ⇒ mảng rỗng / vắng, KHÔNG bịa) ────────────────────────────────
   const dieuDangMung: Row[] = []
