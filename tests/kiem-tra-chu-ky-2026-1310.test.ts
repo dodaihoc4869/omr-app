@@ -106,6 +106,8 @@ it('chuyển lớp không làm trần riêng của em thành sáu đề mỗi tu
 it('cờ tắt vẫn chuyển được lịch 333 câu tương lai; không tự bật cờ, chấm lịch bị ẩn hoặc làm mất điểm cũ',async()=>{
  const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,d=JSON.parse(String(r.json))
  k.d.sql.prepare('UPDATE kiem_tra_ca_nhan SET json=? WHERE id=?').run(JSON.stringify({...d,phienBan:1,cau:Array.from({length:333},()=>d.cau[0]),phut:475}),String(r.id))
+ // Đề cũ thật có metadata phiên bản cũ; cron chỉ đọc phiên bản ở metadata nhỏ theo bản vá Claude.
+ k.d.sql.prepare("UPDATE kiem_tra_ca_nhan_meta SET meta_json=json_set(meta_json,'$.phienBan',1) WHERE id=?").run(String(r.id))
  k.d.sql.prepare("INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) VALUES('ktcn-bi-an','S1','12A1','2026-10-12',?,?,'hen',?,?)").run(NOW-86400000,NOW-1,JSON.stringify(d),NOW)
  k.d.sql.exec("UPDATE cau_hinh SET gia_tri='{}' WHERE khoa='kiem_tra_ca_nhan_v1'");xoaMoiDem();xoaDemCauHinh(k.env)
  expect(await dongBoKtCn(k.env,NOW+1000,2,true,true)).toMatchObject({soEm:0,soMoi:1})

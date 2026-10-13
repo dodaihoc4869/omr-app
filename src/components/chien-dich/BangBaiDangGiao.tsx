@@ -91,6 +91,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
     try{
       const r=await goiLenh('/gv/goi-bai-7',{action:'sua_han',goiId:sua.id,han:sua.han,hanCu:sua.hanCu},CHU_CHUA_CO_LENH)
       if(!r.ok){setLoiHan(r.chu);return}
+      if(r.du.goiId!==sua.id||r.du.han!==sua.han){setLoiHan('Chưa nhận được xác nhận lưu hạn. Thầy cập nhật rồi thử lại.');return}
       setSua(null);setBao('Đã lưu hạn mới. Kế hoạch từng em tự tính lại theo tiến độ còn thiếu và lịch kiểm tra.');setLan(n=>n+1)
     }finally{setLuu(false)}
   }

@@ -8,6 +8,7 @@ const s = (x: unknown) => String(x ?? '')
 /** Được gọi SAU cổng mật khẩu giáo viên ở index; không dùng lại SBD từ khách làm danh tính. */
 export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
   const co = await coGoi7(env)
+  if(!co.bat&&b.action==='sua_han')throw new Error('Giao bài đang tạm dừng. Thầy cập nhật rồi sửa hạn sau.')
   if (!co.bat) return {ok:true,bat:false,goi:[]}
   await damBaoGoi7(env)
   if(b.action==='sua_han')return suaHan(env,b,Date.now())
