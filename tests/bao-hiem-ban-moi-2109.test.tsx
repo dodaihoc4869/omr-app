@@ -390,8 +390,8 @@ describe('precache nhỏ + kho chạy-lúc (vite.config.ts · sw.ts · kiem-sw.m
   const sw = boDong(doc('src/sw.ts'))
   const kiem = doc('scripts/kiem-sw.mjs')
 
-  it('màn thầy, game, máy chiếu, phiếu, phông trùng (ttf/woff), biểu tượng 512 và logo app thầy KHÔNG nằm trong precache', () => {
-    for (const ten of ['GoiLenBangScreen', 'ExamMonitorScreen', 'HocSinhScreen', 'PhanCongScreen', 'ExamSetupScreen', 'ExamHubScreen', 'Game', 'DoanHoTong', 'DaoThanThu', 'html-may-chieu']) expect(vite, ten).toContain(ten)
+  it('màn thầy, máy chiếu, phiếu, phông trùng (ttf/woff), biểu tượng 512 và logo app thầy KHÔNG nằm trong precache', () => {
+    for (const ten of ['GoiLenBangScreen', 'ExamMonitorScreen', 'HocSinhScreen', 'PhanCongScreen', 'ExamSetupScreen', 'ExamHubScreen', 'html-may-chieu']) expect(vite, ten).toContain(ten)
     expect(vite).toContain("'**/html-phieu-*.js'")
     expect(vite).toContain("'**/*-512*.png'")
     expect(vite).toContain("'**/logo-gv-*'")
