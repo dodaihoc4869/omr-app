@@ -34,7 +34,7 @@ export default function TheKiemTraCaNhan({ du, onMo, disabled = false }: { du: T
     </section>
   }
 
-  if (!xong && !du.homNay) {
+  if (!xong && !du.homNay && du.trangThai !== 'het_han') {
     const con = soNgayToi(du.ngay, du.serverNow)
     return <section className="ktcn-the" aria-label="Kiểm tra theo lịch riêng" data-trang-thai={du.trangThai}>
       <div className="ktcn-dau"><div className="ktcn-to-lich" aria-hidden="true"><i>{thuNgan(du.ngay)}</i><b>{Number(du.ngay.slice(8))}</b><small>Tháng {Number(du.ngay.slice(5, 7))}</small></div><div className="ktcn-chu">
@@ -55,7 +55,7 @@ export default function TheKiemTraCaNhan({ du, onMo, disabled = false }: { du: T
         <p className="ktcn-nhan" data-sac={het ? 'xam' : undefined}>{nhan}</p>
         <h2>Kiểm tra ôn tập <span className="ktcn-chip" data-sac={het ? 'xam' : 'xanh'}>{het ? 'Đã hết hạn' : 'Đã nộp'}</span></h2>
         <p className="ktcn-ly-do">{het
-          ? <>Hạn nộp {gioHan(du.hanLuc, du.ngay)} · {thuNgay(du.ngay)} đã qua. App đã tự chốt các câu em đã lưu.</>
+          ? <>Hạn nộp {gioHan(du.hanLuc, du.ngay)} · {thuNgay(du.ngay)} đã qua. {xong ? 'App đã tự chốt các câu em đã lưu.' : 'App đang chốt các câu em đã lưu.'}</>
           : <>Nộp lúc {gioVn(du.nopLuc!)} · {thuNgay(du.ngay)}</>}</p>
       </div></div>
       <div className="ktcn-than ktcn-than-diem">
