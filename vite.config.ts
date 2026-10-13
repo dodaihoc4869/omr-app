@@ -199,6 +199,9 @@ export default defineConfig({
           '**/than-thu-v2/**',
           // Lời giải từng bước (29/09): khung tĩnh ~280 KB chỉ tải khi em bấm "Xem lời giải từng bước" — không cất sẵn.
           '**/loi-giai/**',
+          // Hỏi thầy ở mọi câu (13/10): hộp hỏi Thầy, khung lời giải, nút chữa từng bước, nghe nút phiếu — mảnh nạp khi em bấm (NutHoiThay
+          // lazy) + ba mảnh nhỏ chỉ các mảnh ấy / game / màn chữa (đều ngoài precache) nạp tĩnh ⇒ kho chạy-lúc, precache không phình.
+          '**/{HopHoiThay,KhungLoiGiai,NutChuaTungBuoc,NgheHoiThayPhieu,ThanhThangGo,chi-so-ro,trong-man-chua}-*.{js,css}',
           '**/Spirit3D-*.js',
           // Bảng tin sàn của thầy: bản đồ lớp 3D nạp LƯỜI (import động) — three (≈ 536 KB) chỉ máy thầy tải khi mở màn Hôm nay; máy học sinh / phụ huynh KHÔNG được cất vào bộ nhớ đệm.
           '**/ban-do-3d-three-*.js',
