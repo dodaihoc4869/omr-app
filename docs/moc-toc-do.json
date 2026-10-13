@@ -1,15 +1,39 @@
 {
  "ghiChu": "Mốc tốc độ (luật thầy 13/10: sửa xong phải nhanh bằng/hơn). Đo trên bản đang chạy thật 81f13983. mayChu: số đợt chờ D1 nối tiếp + số lệnh D1 trên đường trả lời (tests/toc-do-may-chu-lenh-nong-1310.test.ts). taiApp: byte nén phải tải để mở từng app (scripts/kiem-toc-do-tai.mjs). Mốc CHỈ HẠ, không nâng.",
  "mayChu": {
-  "sanh-lan-dau": { "dot": 30, "lenh": 38 },
-  "sanh-lan-sau": { "dot": 6, "lenh": 11 },
-  "mo-chang": { "dot": 10, "lenh": 18 },
-  "nop-cau": { "dot": 9, "lenh": 12 },
-  "dem-hom-nay": { "dot": 2, "lenh": 2 }
+  "sanh-lan-dau": {
+   "dot": 30,
+   "lenh": 38
+  },
+  "sanh-lan-sau": {
+   "dot": 6,
+   "lenh": 11
+  },
+  "mo-chang": {
+   "dot": 10,
+   "lenh": 18
+  },
+  "nop-cau": {
+   "dot": 9,
+   "lenh": 12
+  },
+  "dem-hom-nay": {
+   "dot": 2,
+   "lenh": 2
+  }
  },
  "taiApp": {
-  "giao-vien": { "tep": 18, "gzip": 279084 },
-  "hoc-sinh": { "tep": 47, "gzip": 342674 },
-  "phu-huynh": { "tep": 27, "gzip": 279529 }
+  "giao-vien": {
+   "tep": 18,
+   "gzip": 279084
+  },
+  "hoc-sinh": {
+   "tep": 47,
+   "gzip": 342674
+  },
+  "phu-huynh": {
+   "tep": 26,
+   "gzip": 275800
+  }
  }
 }
