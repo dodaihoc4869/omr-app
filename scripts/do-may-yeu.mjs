@@ -11,7 +11,7 @@
 // số component vẽ lại mỗi thao tác, dung lượng JS nạp cho màn.
 //
 //   node scripts/do-may-yeu.mjs --dist=dist [--mang=fast3g|slow3g] [--cpu=6] [--chi=thi,hs] [--ra=kq.json]
-//   node scripts/do-may-yeu.mjs --game=<thư mục build trang xem thử game> (xem scripts/do-may-yeu/)
+//   node scripts/do-may-yeu.mjs --preview=<thư mục build màn học tập/PH> (xem scripts/do-may-yeu/)
 //
 // Chromium: PW_CHROMIUM hoặc /opt/pw-browsers/chromium-*/chrome-linux/chrome (KHÔNG `playwright install`).
 import { execSync } from 'node:child_process'
@@ -28,7 +28,9 @@ const MANG = arg('mang', 'fast3g')
 const CPU = Number(arg('cpu', '6'))
 const CHI = arg('chi', '')
 const RA = arg('ra', '')
-const GAME = arg('game', '')
+// --game cũ là alias thư mục preview; các kịch bản Game đã ngừng.
+const GAME = arg('preview', arg('game', ''))
+if (CHI.split(',').some(x => ['dao', 'dao2', 'doan2', 'bia'].includes(x))) throw Error('Kịch bản Game đã ngừng; chọn màn học tập hoặc PH')
 const LAN = Number(arg('lan', '1'))
 // --cao=740: chiều cao khổ màn (mặc định 800) — tối ưu ca 30/09 đo khổ 360×740.
 const CAO = Number(arg('cao', '800'))
@@ -667,19 +669,9 @@ if (MAY_CHIEU) {
       }
     }, cssMayYeu)
   }
-  const cham = (sel) => async (p) => {
-    for (let i = 0; i < 4; i++) {
-      await p.locator(sel).first().click({ timeout: 1500 }).catch(() => {})
-      await p.waitForTimeout(900)
-    }
-  }
   const cuon = async (p) => p.evaluate(() => new Promise((ok) => { let n = 0; const f = () => { window.scrollBy(0, 12); document.querySelectorAll('*').length; if (++n < 250) requestAnimationFrame(f); else ok() }; requestAnimationFrame(f) }))
   const g = (duong, cho, thao) => doGame(trinh, goc, duong, cho, thao, ganMayYeu)
-  if (muon('dao')) ket.man.dao = await lap(() => g('/src/game/than-thu-v2/dao/xem-thu.html?man=vo', 'button', cuon))
-  if (muon('dao2')) ket.man.dao2 = await lap(() => g('/src/game/than-thu-v2/dao2/xem-thu.html', 'button', cham('button')))
-  if (muon('doan2')) ket.man.doan2 = await lap(() => g('/src/game/than-thu-v2/doan2/xem-thu-2.html', 'button', cham('button')))
-  if (muon('bia')) ket.man.bia = await lap(() => g('/src/game/bi-a/xem-thu.html', 'button', cham('button:has-text("Đấu đơn với A.I")')))
-  for (const m of ['sanh', 'hs', 'ph', 'phbang']) if (muon(m)) ket.man[m] = await lap(() => g(`/scripts/do-may-yeu/trang-do.html?man=${m}`, '#xong', cuon))
+  for (const m of ['sanh', 'hs', 'ph', 'phbang']) if (muon(m) || m === 'sanh' && muon('hoc-tap')) ket.man[m] = await lap(() => g(`/scripts/do-may-yeu/trang-do.html?man=${m}`, '#xong', cuon))
   s.close()
 } else {
   const { s, goc } = GOC ? { s: { close() {} }, goc: GOC } : await mayChuTinh(DIST)
