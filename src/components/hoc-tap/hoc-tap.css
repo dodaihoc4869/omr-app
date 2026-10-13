@@ -34,6 +34,7 @@ body[data-hoc-tap=hs]{--v2-nen:var(--nen)}
 .ht2-anh-lon{width:56px;height:56px;flex-basis:56px;font-size:19px}
 .ht2 .ht-menu button[aria-current=page]{background:color-mix(in srgb,var(--lg-nhan) 12%,var(--the));color:var(--lg-nhan)}
 .ht2-noi-dung{display:flex;flex-direction:column;gap:20px;max-width:1080px}
+.ht2-mo-dau{min-width:0}.ht2-mo-dau p,.ht2-mo-dau h1{overflow-wrap:anywhere}
 .ht2-mo-dau p{margin:0;font-size:14px;color:var(--nhat)}.ht2-mo-dau h1{margin:4px 0 0;font-size:clamp(24px,3vw,32px);font-weight:800;letter-spacing:-.03em;line-height:1.15}
 .ht2 .ht-thong-bao{margin:0}.ht2-loi{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.ht2-loi .ht-nut-phu{margin:0}
 .ht2-nhan{margin:0;font-size:14px;font-weight:700;color:var(--lg-nhan)}
