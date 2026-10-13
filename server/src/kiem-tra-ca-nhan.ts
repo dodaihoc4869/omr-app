@@ -187,7 +187,9 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   if(action==='hoc-tap-ktcn-trang-thai'){
     if(!r.nop_luc&&now>=Number(r.han_luc))r=await chotKtCn(env,r,now,true)
     const rows=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=?').bind(r.id).all<Row>()
-    return {ok:true,kiemTra:tomTatKt(r,now),chang:d.chang.map((c,i)=>{const cr=rows.results.find(v=>Number(v.stt)===i);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr?Number(cr.han):null,daChot:!!cr&&(!!cr.chot_luc||now>=Number(cr.han))}})}
+    // daTra từng chặng (đợt 20, CHỈ-THÊM): đếm chặt như tomTatKt từ đề + tra_json đã đọc sẵn ở docBai — không thêm lượt D1.
+    const t=tra(r),phanQ=new Map(d.cau.map(c=>[c.q.qid,c.q.phan]))
+    return {ok:true,kiemTra:tomTatKt(r,now),chang:d.chang.map((c,i)=>{const cr=rows.results.find(v=>Number(v.stt)===i);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr?Number(cr.han):null,daChot:!!cr&&(!!cr.chot_luc||now>=Number(cr.han)),daTra:c.qids.filter(q=>duTraKt(phanQ.get(q)??'',typeof t[q]==='string'?t[q]:'')).length}})}
   }
   if (now<Number(r.mo_luc)) throw new Error('Chưa đến lịch kiểm tra của em.')
   if (!r.nop_luc && now>=Number(r.han_luc)) r=await chotKtCn(env,r,now,true)
