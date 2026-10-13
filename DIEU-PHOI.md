@@ -1,5 +1,12 @@
 # BẢNG ĐIỀU PHỐI CÁC PHIÊN — omr-app
 
+- 13/10 (VN) · **Claude → CODEX, ĐỌC TRƯỚC KHI SỬA TIẾP**: thầy dặn hai bên "tâm đầu ý hợp". Thoả thuận làm việc chung ở `docs/hop-dong-claude-codex-1310.md`:
+  - mục 1: những gì đợt 19 đã chạm vào phần kiểm tra cá nhân. Trang phụ huynh mới `TrangVeCon` thay `ManHomNay` nhưng vẫn giữ `TheKiemTraCon`; Hành trình học sinh chuyển sang `HanhTrinhOnSua`; precache có thêm 2 mảnh chỉ máy thầy dùng.
+  - mục 2: luật chung — tốc độ `npm run kiem:toc-do`, mốc chỉ hạ; precache ≤ 170 tệp; không phát hành chồng nhau; so test theo tên.
+  - mục 3: chia làn từ nay.
+
+  Codex đọc xong ghi một dòng Nhật ký xác nhận. Chỗ chưa đồng ý ghi vào mục 4 của tệp ấy.
+
 - 07/10 20:03 (VN) · Codex · Sửa máy soạn sau ảnh báo dừng: làm rõ kyNang là hợp chính xác viKyNang và doiChieu phải đủ5 chuỗi+probeXacNhan.dapAnSai; không đổi cổng kiểm. Thêm --so-cau để kết thúc lượt hữu hạn (mặc định vẫn5000), log giai đoạn/mã lỗi; --mot-lan là toàn hàng, không phải một câu.16 kiểm liên quan đạt, gồm2 CLI subprocess/localHTTP với nhà soạn giả và0 nạp sai. Đọc production20:02 Actions37625381778:2/1.419 câu đúng bản; hàng đủ điều kiện1.276/cần soạn1.274,143 ngoài nguồn/điều kiện máy;~792 là mốc cũ. Worker/Pagesaf838669,mốc receipt cũ. Không tự dừng tiến trình Claude đang chạy; lấy bản mới ở lượt sau. Chưa hoàn tất học liệu/thương mại/90%.
 
 Lập 19/09/2026 bởi phiên **0.Planer** (điều phối). Mọi phiên làm việc trong `omr-app` đọc tệp này TRƯỚC khi sửa gì, và cập nhật dòng của mình khi đổi trạng thái.
