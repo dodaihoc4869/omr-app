@@ -1204,9 +1204,6 @@ function GoiLenBangCu() {
             [...new Set(dsO.flatMap((o) => (o.qid && qidMayChuCuaIdCau(o.qid) ? [qidMayChuCuaIdCau(o.qid)!] : [])))],
           ).catch(() => null)
 
-      // "EM ĐÃ LÀM CÂU NÀY CHƯA": quét HẾT lịch sử của từng cặp (em, câu) MỘT lần, chạy song song với thần thú. Không gọi được ⇒ tờ không có nhãn (không bịa).
-      const lichSuTheoCap = layLichSuCau(dsO.flatMap((o) => (o.qid && qidMayChuCuaIdCau(o.qid) ? [{ sbd: o.sbd, qid: qidMayChuCuaIdCau(o.qid)! }] : []))).catch(() => null)
-
       // THẦN THÚ CỦA TỪNG EM (có timeout an toàn)
       try {
         const { thanThuV2ChoToChieu } = await import('../lib/anh-than-thu-v2')
@@ -1230,14 +1227,8 @@ function GoiLenBangCu() {
         }
       }
 
-      const mapLichSu = await lichSuTheoCap
-      if (mapLichSu) {
-        for (const o of dsO) {
-          const qid = o.qid ? qidMayChuCuaIdCau(o.qid) : null
-          const nhan = qid ? nhanLichSuCau(mapLichSu.get(khoaEmCau(o.sbd, qid))) : null
-          if (nhan) o.lichSuCau = nhan
-        }
-      }
+      // Nhãn trên tờ lấy từ người được chọn bằng chứng/dự đoán bên dưới.
+      // Không đọc lại lịch sử người cũ rồi ghi đè; bảng vẫn tự đọc khi người gọi đổi.
 
       // CÂU CHỈ ĐỌC ĐÁP ÁN đi thành trang đáp án nối sau các đợt
       const dsDapAn: CauLuyen[] = []

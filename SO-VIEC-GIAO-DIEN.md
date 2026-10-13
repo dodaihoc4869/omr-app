@@ -515,3 +515,5 @@ Luật: vòng nền của app HS/PH ≥ 180 giây ± 30 giây lệch ngẫu nhi�
 
 - 28/09 · Tối ưu màn thi (nhánh `toi-uu-man-thi`) · xếp loại vòng `setInterval` mới `src/lib/dong-ho-thi.ts` (1 s, KHÔNG gọi máy chủ — kho giờ đếm ngược cho màn thi / luyện đề chuẩn / bài gia đình giao; chỉ chạy khi có nút lá đồng hồ nghe) vào `KHONG_GOI_MAY_CHU`. `StudentPortalScreen` vẫn 1 vòng (soi hết giờ để tự nộp); số giờ hiển thị chuyển sang kho. Chi tiết: `docs/toi-uu-2809/MAN-THI.md`.
 - 05/10 · OMNI 3 (phiên cloud `claude/gracious-heisenberg-hoe97n`, làn app học sinh) · xếp loại vòng `setInterval` mới vào bảng `KHONG_GOI_MAY_CHU` (`tests/nhip-bang-2109.test.ts`), KHÔNG gọi máy chủ: `src/game/than-thu-v2/dao2/DeThu.tsx` 1 s — vẽ lại đồng hồ đếm ngược đề thử theo `hetLuc` máy chủ; hết giờ tự nộp MỘT lần (không vòng hỏi).
+
+- 13/10 · Codex · Bảng nhịp kiểm tra cá nhân: ManKiemTraCaNhan.tsx có 1 setInterval 1000 ms chỉ cập nhật giờ cục bộ. Không gọi D1 định kỳ; hết hạn gọi chot(true) một lần, khoá tuNop và dọn đồng hồ khi rời màn. Đã xếp vào KHONG_GOI_MAY_CHU ở tests/nhip-bang-2109.test.ts.

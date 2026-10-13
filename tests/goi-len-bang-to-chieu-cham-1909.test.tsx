@@ -11,7 +11,7 @@ import { JSDOM, VirtualConsole } from 'jsdom'
 import type { CaTomTat } from '../src/lib/exam-api'
 import type { TeacherExamSource } from '../src/data/examContent'
 
-const m = vi.hoisted(() => ({ ghi: vi.fn(), hoSo: vi.fn(), mau: [] as unknown[] }))
+const m = vi.hoisted(() => ({ ghi: vi.fn(), hoSo: vi.fn(), nguoiDaGhi: null as null | {sbd:string;qid:string}, mau: [] as unknown[] }))
 
 const ca = (maCa: string): CaTomTat =>
   ({ maCa, tenCa: `Ca ${maCa}`, lop: '12', daVao: 10, daNop: 10, lenBang: false, trangThai: 'dong', batDau: '2026-09-09T00:00:00.000Z', hetHanVao: '2026-09-09T01:00:00.000Z' }) as unknown as CaTomTat
@@ -58,13 +58,17 @@ vi.mock('../src/lib/exam-db', () => ({
   docKhoChuaCa: async () => [DE],
   docKhoDoKho: async () => undefined,
   luuKhoDoKho: async () => {},
+  docBuoiChua: async () => undefined,
+  luuBuoiChua: async () => {},
   // "IndexedDB" giả cho mẫu giây thật (M6)
   docMauGiayThuc: async () => m.mau,
   themMauGiayThuc: async (x: unknown) => (m.mau.push(x), m.mau),
 }))
 vi.mock('../src/lib/may-chu-moi', async (goc) => ({ ...(await goc<Record<string, unknown>>()), layCauHinhMayChu: async () => ({ BAT: true, URL: 'https://x' }) }))
 const toast = vi.fn()
-vi.mock('../src/store/appStore', () => ({ useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ setScreen: vi.fn(), showToast: toast }) }))
+// Mock giữ cả API đọc ngoài React của Zustand; không bỏ cổng cảnh báo thật.
+vi.mock('../src/store/appStore', () => ({ useAppStore: Object.assign((sel: (s: Record<string, unknown>) => unknown) => sel({ setScreen: vi.fn(), showToast: toast }), { getState: () => ({ showToast: toast }) }) }))
+vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: async (_: string, b: { qids: string[]; sbd: string[] }) => ({ ok: true, du: { cau: Object.fromEntries(b.qids.map((qid, i) => [qid, [{ sbd: m.nguoiDaGhi?.qid===qid?m.nguoiDaGhi.sbd:b.sbd[i % b.sbd.length], ten: `Em ${i % b.sbd.length + 1}`, loai: 'da_dung', p: null, luc: '2026-10-13T00:00:00Z' }]])) } }) }))
 
 const { default: GoiLenBangScreen } = await import('../src/screens/GoiLenBangScreen')
 const { TIN_TO_CHIEU } = await import('../src/lib/to-chieu-cau-noi')
@@ -79,6 +83,7 @@ beforeEach(() => {
   m.hoSo.mockReset()
   m.hoSo.mockImplementation(async () => ({ em: Object.fromEntries(LUOT.map((l) => [l.sbd, emRong])) }))
   m.mau.length = 0
+  m.nguoiDaGhi = null
   toast.mockReset()
 })
 
@@ -261,6 +266,7 @@ describe('tờ chiếu ↔ màn giáo viên: bắt tay và ghi kết quả (giao
     const r = await moBuoiChua()
     const dong0 = dongBuoi(r)[0]
     const khoa0 = dong0.getAttribute('data-dong-buoi')!
+    const [sbd,qid]=khoa0.split('|');m.nguoiDaGhi={sbd,qid}
     fireEvent.click(nutBang(dong0, 'Đạt')!)
     await waitFor(() => expect(dong0.textContent).toContain('Đã ghi: Đạt'), CHO)
 
