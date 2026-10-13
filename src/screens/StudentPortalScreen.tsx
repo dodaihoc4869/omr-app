@@ -358,6 +358,20 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
 
   const answersMomRef = useRef(cauTraLoiMom)
   answersMomRef.current = cauTraLoiMom
+  // Chỉ thao tác mới chưa ACK được ưu tiên hơn bản máy chủ; nháp cũ đã đồng bộ không đè đáp án máy khác.
+  const choDongBoMom = useRef<Record<string, string>>({})
+  const luuChoMom = (id: string) => {
+    if (!auth) return
+    try { localStorage.setItem(`omr_mom_draft_cho_dong_bo_${auth.sbd}_${id}`, JSON.stringify(choDongBoMom.current)) } catch { /* vẫn giữ nháp trong phiên */ }
+  }
+  const doiTraLoiMom = (qid: string, value: string) => {
+    if (!dangLamMom) return
+    choDongBoMom.current = { ...choDongBoMom.current, [qid]: value }
+    luuChoMom(dangLamMom.id)
+    const next = { ...answersMomRef.current, [qid]: value }
+    answersMomRef.current = next
+    setCauTraLoiMom(next)
+  }
   const submittingMom = useRef(false)
   const retryMomAt = useRef(0)
   const [loiMom, setLoiMom] = useState('')
@@ -388,11 +402,16 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   }, [napDsMom])
   useEffect(() => {
     if (!dangLamMom || !auth) return
+    let huy = false
     try { localStorage.setItem(`omr_mom_draft_${auth.sbd}_${dangLamMom.id}`, JSON.stringify(cauTraLoiMom)) } catch {}
     const timer = setTimeout(() => {
-      void momApi('save', {token:auth.token,id:dangLamMom.id,answers:cauTraLoiMom}).catch(e => setLoiMom(`Chưa lưu được đáp án lên máy chủ: ${e.message}`))
+      void momApi('save', {token:auth.token,id:dangLamMom.id,answers:cauTraLoiMom}).then(() => {
+        if (huy) return
+        choDongBoMom.current = Object.fromEntries(Object.entries(choDongBoMom.current).filter(([qid, value]) => cauTraLoiMom[qid] !== value))
+        luuChoMom(dangLamMom.id)
+      }).catch(e => { if (!huy) setLoiMom(`Chưa lưu được đáp án lên máy chủ: ${e.message}`) })
     }, 600)
-    return () => clearTimeout(timer)
+    return () => { huy = true; clearTimeout(timer) }
   }, [cauTraLoiMom, dangLamMom, auth])
 
   useEffect(() => {
@@ -450,6 +469,14 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       } catch {}
       const ids = new Set(capNhat.dsCau.map(c => c.id))
       answers = Object.fromEntries(Object.entries(answers).filter(([qid, v]) => ids.has(qid) && typeof v === 'string' && v.length <= 1000))
+      let pending: Record<string, string> = {}
+      try {
+        const raw = JSON.parse(localStorage.getItem(`omr_mom_draft_cho_dong_bo_${auth.sbd}_${bai.id}`) || '{}')
+        if (raw && typeof raw === 'object' && !Array.isArray(raw)) pending = Object.fromEntries(Object.entries(raw).filter(([qid, v]) => ids.has(qid) && typeof v === 'string' && v.length <= 1000 && capNhat.dapAnDaNop?.[qid] !== v)) as Record<string, string>
+      } catch { /* Metadata nháp hỏng: vẫn dùng bản chính máy chủ. */ }
+      choDongBoMom.current = pending
+      luuChoMom(bai.id)
+      answers = { ...answers, ...pending }
       setCauTraLoiMom(answers)
       if (capNhat.trangThai === 'da_nop') {
         await napDsMom()
@@ -476,6 +503,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     if (saved.item?.id !== dangLamMom.id || saved.item.trangThai !== 'da_nop' || !Number.isFinite(saved.item.diem)) throw new Error('Máy chủ chưa xác nhận kết quả. Em thử nộp lại nhé.')
     // Câu công khai không có đáp án. Chỉ dùng điểm đã chấm; phần chữa lấy qua review sau nộp.
     const confirmed = chuanHoaBaiMom({ ...dangLamMom, ...saved.item, htmlKetQua: '', htmlBaoCao: '' })
+    choDongBoMom.current = {}; luuChoMom(dangLamMom.id)
     const danhSachMoi = dsMomGiao.map((b) => (b.id === dangLamMom.id ? confirmed : b))
     try { localStorage.setItem(`omr_mom_btvn_${auth.sbd}`, JSON.stringify(danhSachMoi)) } catch {}
     setDsMomGiao(danhSachMoi)
@@ -1343,7 +1371,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                 soDaLam={Object.keys(cauTraLoiMom).length}
                 dsCau={dangLamMom.dsCau || dangLamMom.cau || []}
                 traLoi={cauTraLoiMom}
-                datTraLoi={(idCau, giaTri) => setCauTraLoiMom((prev) => ({ ...prev, [idCau]: giaTri }))}
+                datTraLoi={doiTraLoiMom}
                 loi={loiMom}
                 onQuayLai={hoiRoiBaiMom}
                 onTamDung={() => {
@@ -1467,7 +1495,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                           <MomQuestionStem q={cau} />
                         </div>
 
-                        {cau.phan === 'II' ? <div className="space-y-3">{(cau.ideas || cau.luaChon || cau.choices || []).map((idea:string,i:number)=><div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3"><MomOption q={cau} index={i} text={`${String.fromCharCode(97+i)}) ${idea}`} tf /><div className="mt-2 flex gap-2">{['D','S'].map(v=><button key={v} onClick={()=>setCauTraLoiMom(prev=>{const a=(prev[cau.id]||'----').split('');a[i]=v;return {...prev,[cau.id]:a.join('')}})} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${daChon?.[i]===v?'bg-rose-600 text-white shadow-xs':'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700'}`}>{v==='D'?'Đúng':'Sai'}</button>)}</div></div>)}</div> : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
+                        {cau.phan === 'II' ? <div className="space-y-3">{(cau.ideas || cau.luaChon || cau.choices || []).map((idea:string,i:number)=><div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3"><MomOption q={cau} index={i} text={`${String.fromCharCode(97+i)}) ${idea}`} tf /><div className="mt-2 flex gap-2">{['D','S'].map(v=><button key={v} onClick={()=>{const a=(answersMomRef.current[cau.id]||'----').split('');a[i]=v;doiTraLoiMom(cau.id,a.join(''))}} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${daChon?.[i]===v?'bg-rose-600 text-white shadow-xs':'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700'}`}>{v==='D'?'Đúng':'Sai'}</button>)}</div></div>)}</div> : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                             {cau.choices.map((choice: string, cIdx: number) => {
                               const kyTu = String.fromCharCode(65 + cIdx)
@@ -1477,7 +1505,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                                   key={cIdx}
                                   type="button"
                                   onClick={() =>
-                                    setCauTraLoiMom((prev) => ({ ...prev, [cau.id]: kyTu }))
+                                    doiTraLoiMom(cau.id, kyTu)
                                   }
                                   className={`p-3 rounded-2xl border text-left text-xs transition flex items-start gap-2.5 cursor-pointer ${
                                     duocChon
@@ -1509,7 +1537,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                               inputMode="text"
                               className="sm:w-80"
                               value={daChon || ''}
-                              onChange={(v) => setCauTraLoiMom((prev) => ({ ...prev, [cau.id]: v }))}
+                              onChange={(v) => doiTraLoiMom(cau.id, v)}
                               placeholder="Nhập đáp án số hoặc chữ…"
                             />
                           </div>

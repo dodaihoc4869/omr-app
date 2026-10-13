@@ -14,7 +14,7 @@ vi.mock('../src/components/m3', async (goc) => ({ ...await goc<typeof import('..
 vi.mock('../src/components/diem-danh/TheDiemDanhHs', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))
 vi.mock('../src/components/bang-nhiem-vu/BtvnM3', () => ({ default: () => <div>Bảng bài thử</div> }))
-vi.mock('../src/components/bang-nhiem-vu/MomM3', () => ({ MomDanhSachM3: ({ ds, onBatDau, onXemKetQua }: { ds: { tieuDe: string; trangThai: string }[]; onBatDau: (b: unknown) => void; onXemKetQua: (b: unknown) => void }) => <div data-testid="mom-list">{ds.map(b => <button key={b.tieuDe} type="button" onClick={() => b.trangThai === 'da_nop' ? onXemKetQua(b) : onBatDau(b)}>{b.tieuDe}</button>)}</div>, MomLamBaiM3: ({ traLoi, datTraLoi, onNop }: { traLoi: Record<string, string>; datTraLoi: (qid: string, v: string) => void; onNop: () => void }) => <div><output data-testid="mom-tra">{JSON.stringify(traLoi)}</output><button type="button" onClick={() => datTraLoi('q1', 'B')}>Chọn B thử</button><button type="button" onClick={onNop}>Nộp Mom thử</button></div> }))
+vi.mock('../src/components/bang-nhiem-vu/MomM3', () => ({ MomDanhSachM3: ({ ds, onBatDau, onXemKetQua }: { ds: { tieuDe: string; trangThai: string }[]; onBatDau: (b: unknown) => void; onXemKetQua: (b: unknown) => void }) => <div data-testid="mom-list">{ds.map(b => <button key={b.tieuDe} type="button" onClick={() => b.trangThai === 'da_nop' ? onXemKetQua(b) : onBatDau(b)}>{b.tieuDe}</button>)}</div>, MomLamBaiM3: ({ traLoi, datTraLoi, onNop }: { traLoi: Record<string, string>; datTraLoi: (qid: string, v: string) => void; onNop: () => void }) => <div><output data-testid="mom-tra">{JSON.stringify(traLoi)}</output><button type="button" onClick={() => datTraLoi('q1', 'B')}>Chọn B thử</button><button type="button" onClick={() => datTraLoi('q1', 'C')}>Chọn C thử</button><button type="button" onClick={onNop}>Nộp Mom thử</button></div> }))
 vi.mock('../src/components/KhungXemPhieu', () => ({ default: ({ html }: { html: string }) => <div data-testid="phieu">{html}</div> }))
 vi.mock('../src/components/hoa2/api', () => ({ canThanTuSanh: () => false, useSanhHoa2: () => ({ cheDo2: false, ketQua: null, dangTai: false, loi: '', taiLai: vi.fn() }) }))
 vi.mock('../src/components/bang-nhiem-vu/may-chu', () => ({ useBanNho: () => null, useCaDangMo: () => null, useLamMoiKhiDong: () => 0, useKeHoachNgay: () => ({ keHoach: null, cu: true, daXong: true, dangLamMoi: false }) }))
@@ -86,6 +86,36 @@ it('nháp offline còn nguyên khi máy chủ chưa có câu trả lời', async
   api.mom.mockImplementation(async (action: string) => action === 'list' ? { ok: true, items: [baiMom] } : { ok: true, item: { ...baiMom, dapAnDaNop: { q1: '' } } })
   await moMom()
   expect(screen.getByTestId('mom-tra').textContent).toBe('{"q1":"B"}')
+})
+it('nháp mới chưa ACK vẫn còn khi đổi đáp án rồi rời trước 600 ms và mở lại', async () => {
+  api.mom.mockImplementation(async (action: string) => action === 'list' ? { ok: true, items: [baiMom] } : { ok: true, item: { ...baiMom, dapAnDaNop: { q1: 'A' } } })
+  await moMom()
+  fireEvent.click(screen.getByRole('button', { name: 'Chọn B thử' }))
+  cleanup()
+  await moMom()
+  expect(screen.getByTestId('mom-tra').textContent).toBe('{"q1":"B"}')
+})
+it('ACK của đáp án cũ đang gửi không xóa nháp mới hơn của cùng câu', async () => {
+  let traAck!: (v: unknown) => void
+  api.mom.mockImplementation(async (action: string) => action === 'list' ? { ok: true, items: [baiMom] } : action === 'save' ? new Promise(resolve => { traAck = resolve }) : { ok: true, item: { ...baiMom, dapAnDaNop: { q1: 'A' } } })
+  await moMom()
+  fireEvent.click(screen.getByRole('button', { name: 'Chọn B thử' }))
+  await waitFor(() => expect(api.mom).toHaveBeenCalledWith('save', expect.objectContaining({ answers: { q1: 'B' } })))
+  fireEvent.click(screen.getByRole('button', { name: 'Chọn C thử' }))
+  await act(async () => { traAck({ ok: true }) })
+  cleanup()
+  await moMom()
+  expect(screen.getByTestId('mom-tra').textContent).toBe('{"q1":"C"}')
+})
+it('nháp đã ACK không đè câu trả lời mới được lưu trên máy khác', async () => {
+  let daLuu = 'A'
+  api.mom.mockImplementation(async (action: string) => action === 'list' ? { ok: true, items: [baiMom] } : action === 'save' ? { ok: true } : { ok: true, item: { ...baiMom, dapAnDaNop: { q1: daLuu } } })
+  await moMom()
+  fireEvent.click(screen.getByRole('button', { name: 'Chọn B thử' }))
+  await waitFor(() => expect(api.mom).toHaveBeenCalledWith('save', expect.objectContaining({ answers: { q1: 'B' } })))
+  cleanup(); daLuu = 'C'
+  await moMom()
+  expect(screen.getByTestId('mom-tra').textContent).toBe('{"q1":"C"}')
 })
 it('kết quả Mom dùng đáp án sau nộp từ máy chủ, không lưu phiếu tự đoán đáp án A', async () => {
   const daNop = { ...baiMom, trangThai: 'da_nop', nopLuc: new Date().toISOString(), diem: 10, soCauDung: 1, dapAnDaNop: { q1: 'B' } }
