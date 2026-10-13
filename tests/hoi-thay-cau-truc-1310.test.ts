@@ -121,7 +121,7 @@ describe('đầu-cuối /hs/hoi-tro-ly', () => {
     const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, nguon: 'luyen_de', cauHoi: 'Em dùng kiến thức gì ạ?' })
     expect(goi[0]!.generationConfig.responseSchema).toEqual(JSON.parse(JSON.stringify(SCHEMA_TRA_LOI)))
     expect(String(goi[0]!.systemInstruction.parts[0].text)).toContain('TRÌNH BÀY')
-    expect(r).toMatchObject({ ok: true, ngoaiPhamVi: false, conLai: 19 })
+    expect(r).toMatchObject({ ok: true, ngoaiPhamVi: false, conLai: 11 }) // trần 12 câu/ngày (PR #275)
     expect((r.cauTruc as { bang: { sauBuoc: number } }).bang.sauBuoc).toBe(2)
     expect(r.traLoi).toBe(chuPhang(lamSachCauTruc(MAU_AMINE, false)!))
     const so = d.sql.prepare('SELECT tra_loi FROM hoi_tro_ly WHERE sbd=?').get(SBD) as { tra_loi: string }
