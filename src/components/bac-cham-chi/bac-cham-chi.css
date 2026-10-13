@@ -1,0 +1,62 @@
+/* 12 BẬC TỪ LƯỜI ĐẾN CHĂM — màu dùng chung 3 app (thầy 13/10: "Mỗi cấp độ hiển thị màu khác nhau").
+ * MÀU: KHÔNG màu thô, KHÔNG sửa màu đang có — 12 màu dựng CHỈ từ biến chuẩn của tokens.css (có bản sáng + tối): --do, --cam, --xanh, --tim,
+ * --vang-diu, nền --the, chữ --muc. Đi từ đỏ (Lười Vô Cực) qua cam, xanh lá, chàm, tới vàng kim (Thần Chăm Chỉ Tối Thượng); trộn trong oklch.
+ * Đo (sáng / tối): mọi cặp bậc khác nhau ΔE(oklab) ≥ 0,048; chữ chip = 50% màu bậc + 50% --muc trên nền 16% màu bậc ⇒ tương phản ≥ 5,0 (sáng)
+ * và ≥ 6,5 (tối) ở cả 12 bậc (bản 60% chỉ đạt 4,1 ở bậc 6 nền sáng — không đủ 4,5).
+ * Bộ chọn `.bcc[data-bac]` (không dùng `[data-bac]` trơn — bảng nhiệm vụ / app phụ huynh đã có `data-bac` nghĩa khác).
+ * Nền / chữ trộn qua `--bcc-nen` / `--bcc-chu` / `--bcc-mo` (mặc định --the / --muc / --mo): tờ chiếu điểm danh (nền tối cố định --km-*) đặt lại ba biến
+ * này ở ban-chieu-diem-danh.css — không sửa màu nào ở đây. */
+.bcc[data-bac='1'] { --bac: var(--do); }
+.bcc[data-bac='2'] { --bac: color-mix(in oklch, var(--do) 75%, var(--cam)); }
+.bcc[data-bac='3'] { --bac: color-mix(in oklch, var(--do) 50%, var(--cam)); }
+.bcc[data-bac='4'] { --bac: color-mix(in oklch, var(--do) 25%, var(--cam)); }
+.bcc[data-bac='5'] { --bac: var(--cam); }
+.bcc[data-bac='6'] { --bac: color-mix(in oklch, var(--cam) 65%, var(--xanh)); }
+.bcc[data-bac='7'] { --bac: color-mix(in oklch, var(--cam) 35%, var(--xanh)); }
+.bcc[data-bac='8'] { --bac: var(--xanh); }
+.bcc[data-bac='9'] { --bac: color-mix(in oklch, var(--xanh) 60%, var(--tim)); }
+.bcc[data-bac='10'] { --bac: color-mix(in oklch, var(--xanh) 25%, var(--tim)); }
+.bcc[data-bac='11'] { --bac: var(--tim); }
+.bcc[data-bac='12'] { --bac: var(--vang-diu); }
+
+.bcc-bt { flex: none; font-size: 1.05em; line-height: 1; font-style: normal; }
+
+/* chip (độ cụ thể cao hơn các luật `… span` của khung thẻ từng app) */
+.bcc.bcc-chip[data-bac] {
+  display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; box-sizing: border-box;
+  padding: 5px 11px; border: 1px solid color-mix(in oklch, var(--bac) 45%, transparent); border-radius: 999px;
+  background: color-mix(in oklch, var(--bac) 16%, var(--bcc-nen, var(--the))); color: color-mix(in oklch, var(--bac) 50%, var(--bcc-chu, var(--muc)));
+  font-size: 14px; font-weight: 700; line-height: 1.25; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; white-space: normal;
+}
+.bcc.bcc-chip[data-nho] { gap: 3px; padding: 1px 7px; font-size: 12px; white-space: nowrap; vertical-align: 1px; }
+
+/* hàng chip cạnh tên nhóm (thẻ Hôm nay của em, thẻ Nhịp học của con): chip nhóm + chip bậc, xuống hàng khi chật */
+.bcc-hang { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-width: 0; max-width: 100%; }
+
+/* thang 12 ô: ô thường là vạch mảnh (màu bậc nhạt bớt), ô hiện tại cao + đậm + viền + biểu tượng */
+.bcc-thang { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.bcc-thang-o { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: center; gap: 3px; min-height: 30px; }
+.bcc.bcc-o { display: grid; place-items: center; height: 10px; min-width: 0; border-radius: 999px; background: color-mix(in oklch, var(--bac) 60%, var(--bcc-nen, var(--the))); }
+.bcc.bcc-o[data-hien] {
+  height: 30px; border-radius: 9px; background: var(--bac);
+  box-shadow: 0 0 0 2px var(--bcc-nen, var(--the)), 0 0 0 4px color-mix(in oklch, var(--bac) 50%, var(--bcc-chu, var(--muc)));
+}
+.bcc-o .bcc-bt { font-size: 16px; }
+.bcc-len { margin: 0; font-size: 14px; line-height: 1.45; color: inherit; overflow-wrap: anywhere; }
+.bcc-len b { font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* dải đếm số em mỗi bậc (Nhịp học của thầy) */
+.bcc-dem { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.bcc.bcc-dem-o {
+  display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; padding: 9px 2px 7px; border-radius: 12px;
+  background: color-mix(in oklch, var(--bac) 16%, var(--bcc-nen, var(--the))); box-shadow: inset 0 4px 0 var(--bac);
+  color: color-mix(in oklch, var(--bac) 50%, var(--bcc-chu, var(--muc))); font-variant-numeric: tabular-nums;
+}
+.bcc-dem-o b { font-size: 18px; font-weight: 800; line-height: 1.15; white-space: nowrap; }
+.bcc-dem-o b small { font-size: 0.72em; font-weight: 700; }
+.bcc-dem-ten { max-width: 100%; font-size: 12px; font-weight: 700; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
+.bcc.bcc-dem-o[data-khong] { background: var(--bcc-nen, var(--the)); color: var(--bcc-mo, var(--mo)); }
+@media (max-width: 600px) {
+  .bcc-dem { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+  .bcc-dem-o b { font-size: 16px; }
+}

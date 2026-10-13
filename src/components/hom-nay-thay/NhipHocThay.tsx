@@ -10,16 +10,23 @@
 //   · Bấm một em ⇒ tấm Hồ sơ làm bài sẵn có (`HoSoLamCauEm`, nạp lười); đóng tấm ⇒ focus về đúng nút.
 //   · 13/10 đợt 18: mỗi dòng em có chip "Độ tin cậy N%" của nhóm (máy chủ gửi, cùng số bảng của em); dưới 90% ⇒ "· đang theo dõi" tông hổ phách,
 //     câu "cần thêm" hiện khi trỏ chuột (title) và hiện thành dòng chữ khi mở rộng cột ("Xem đủ"). Ở cột Đối phó chip kèm tên nhóm của em.
+//   · 13/10 — 12 BẬC TỪ LƯỜI ĐẾN CHĂM (máy chủ gửi `bacCham` mỗi em): chip bậc nhỏ (biểu tượng + số, tên trong title) mỗi dòng em · đầu danh sách là
+//     thẻ "12 bậc từ Lười đến Chăm" có dải đếm số em mỗi bậc (12 ô màu) + cách xếp "Theo nhóm" (hai cột cũ) | "Theo bậc" (MỘT danh sách bậc 1 → 12,
+//     em lười nhất trước; điện thoại: thẻ phân đoạn Theo bậc · Đối phó). Máy chủ cũ (không có bậc) ⇒ không thẻ, không chip, màn y như trước.
+//     Tờ chiếu điểm danh cũng hiện bậc (thầy 13/10: "Hiện bậc trên màn chiếu luôn nhé") — BanChieuDiemDanh.tsx.
 // Số CHỈ từ lệnh CHỈ ĐỌC `/gv/nhip-hoc` (src/lib/nhip-hoc-thay.ts: luật nhóm + phép thuần có test). Màu chỉ biến --gvm-* (hom-nay-thay.css); ô ngày
 // dùng ĐÚNG bộ màu bảng nhiệt `bai-hang-ngay.css` (lớp `gvv2-bhn-mau-o`).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Activity, Check, ChevronRight, Clock, RefreshCw, Search, TriangleAlert } from 'lucide-react'
 import {
-  chipTinCay, chuCham, chuDieuKien, chuLuoi, chuMotO, LUAT_NHOM_NHIP, ngayNgan, TEN_LOAI_O, TEN_NHOM_NHIP, tinhNhipHoc, xepCham, xepDoiPho, xepLuoi,
-  type DongNhipHoc, type KetQuaNhipHoc, type ONgay,
+  chipTinCay, chuCham, chuDieuKien, chuLuoi, chuMotO, demTheoBac, LUAT_NHOM_NHIP, ngayNgan, TEN_LOAI_O, TEN_NHOM_NHIP, tinhNhipHoc, xepCham, xepDoiPho, xepLuoi,
+  xepTheoBac, type DongNhipHoc, type KetQuaNhipHoc, type ONgay,
 } from '../../lib/nhip-hoc-thay'
 import { chuCaiTen, khopTim } from '../chien-dich/nhip-hanh-trinh'
+import ChipBac from '../bac-cham-chi/ChipBac'
+import DaiDemBac from '../bac-cham-chi/DaiDemBac'
+import { chuBacSo } from '../bac-cham-chi/bac'
 import type { EmHoSo } from '../chien-dich/HoSoLamCauEm'
 import '../chien-dich/bai-hang-ngay.css'
 import './hom-nay-thay.css'
@@ -33,7 +40,8 @@ export const SO_EM_DOI_PHO = 3
 export const MOI_DOT_MO_RONG = 50
 
 export type DuNhip = { ok: true; kq: KetQuaNhipHoc } | { ok: false; chu: string }
-type Kieu = 'luoi' | 'cham' | 'doi-pho'
+type Kieu = 'luoi' | 'cham' | 'doi-pho' | 'bac'
+type CachXep = 'nhom' | 'bac'
 const KHOI = ['10', '11', '12'] as const
 
 /** Khớp media query; môi trường không có matchMedia (test) ⇒ máy tính. */
@@ -102,8 +110,8 @@ function DaiO({ o }: { o: readonly ONgay[] }) {
 }
 
 function chuDong(d: DongNhipHoc, kieu: Kieu): { chinh: string; phu: string } {
-  if (kieu === 'luoi') return chuLuoi(d)
-  if (kieu === 'cham') return chuCham(d)
+  if (kieu === 'luoi' || (kieu === 'bac' && d.nhom === 'luoi')) return chuLuoi(d)
+  if (kieu === 'cham' || kieu === 'bac') return chuCham(d)
   return { chinh: '', phu: d.doiPho?.lyDo.join(' · ') ?? '' }
 }
 
@@ -112,6 +120,7 @@ function DongEm({ d, kieu, moRong = false, onMo }: { d: DongNhipHoc; kieu: Kieu;
   const tin = chipTinCay(d)
   // cột Đối phó không phải một nhóm ⇒ chip kèm tên nhóm của em; cột Lười / Chăm đã có tên nhóm ở tiêu đề cột
   const chuTin = tin ? `${kieu === 'doi-pho' ? `${TEN_NHOM_NHIP[d.nhom]} · ` : ''}${tin.chu}` : ''
+  const bac = d.bacCham ? chuBacSo(d.bacCham.bac) : undefined
   return (
     <li>
       <button
@@ -120,7 +129,7 @@ function DongEm({ d, kieu, moRong = false, onMo }: { d: DongNhipHoc; kieu: Kieu;
         data-kieu={kieu}
         data-sbd={d.sbd}
         onClick={(ev) => onMo(d, ev.currentTarget)}
-        aria-label={`${d.hoTen}${d.lop ? `, ${d.lop}` : ''}: ${kieu === 'doi-pho' ? c.phu : `${c.chinh}${c.phu ? `, ${c.phu}` : ''}`}${tin ? `; ${chuTin}${tin.tam ? `. ${tin.giaiThich}` : ''}` : ''} — xem hồ sơ làm bài`}
+        aria-label={`${d.hoTen}${d.lop ? `, ${d.lop}` : ''}: ${kieu === 'doi-pho' ? c.phu : `${c.chinh}${c.phu ? `, ${c.phu}` : ''}`}${bac ? `; ${bac}` : ''}${tin ? `; ${chuTin}${tin.tam ? `. ${tin.giaiThich}` : ''}` : ''} — xem hồ sơ làm bài`}
       >
         <span className="nht-av" aria-hidden="true">
           {chuCaiTen(d.hoTen)}
@@ -128,6 +137,12 @@ function DongEm({ d, kieu, moRong = false, onMo }: { d: DongNhipHoc; kieu: Kieu;
         <span className="nht-ten">
           <b>{d.hoTen}</b>
           {d.lop && <small> · {d.lop}</small>}
+          {d.bacCham && (
+            <>
+              {' '}
+              <ChipBac bac={d.bacCham.bac} nho />
+            </>
+          )}
           {tin && (
             <span className="nht-tin gvv2-so" data-du={tin.tam ? 'false' : 'true'} title={tin.giaiThich} aria-hidden="true">
               {chuTin}
@@ -254,6 +269,7 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
   const [khoi, setKhoi] = useState<string | null>(null)
   const [lop, setLop] = useState('')
   const [tab, setTab] = useState<Kieu>('luoi')
+  const [xep, setXep] = useState<CachXep>('nhom')
   const [mo, setMo] = useState<EmHoSo | null>(null)
   const [moBang, setMoBang] = useState(false)
   const nutVua = useRef<HTMLButtonElement | null>(null)
@@ -269,6 +285,10 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
   const luoi = useMemo(() => (t ? t.dong.filter((d) => d.nhom === 'luoi').sort(xepLuoi) : []), [t])
   const cham = useMemo(() => (t ? t.dong.filter((d) => d.nhom === 'cham').sort(xepCham) : []), [t])
   const doiPho = useMemo(() => (t ? t.dong.filter((d) => d.doiPho).sort(xepDoiPho) : []), [t])
+  // 13/10 — bậc: chỉ khi máy chủ gửi (ít nhất một em có bậc trong phần đang lọc)
+  const coBac = useMemo(() => !!t && t.dong.some((d) => d.bacCham), [t])
+  const theoBac = useMemo(() => (t ? t.dong.filter((d) => d.bacCham).sort(xepTheoBac) : []), [t])
+  const demBac = useMemo(() => (t ? demTheoBac(t.dong) : []), [t])
 
   const onMo = useCallback((d: DongNhipHoc, nut: HTMLButtonElement) => {
     nutVua.current = nut
@@ -374,6 +394,68 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
       oTab={oTab}
     />
   )
+  const xepBac = coBac && xep === 'bac'
+  const chuaXepBac = t.dong.length - theoBac.length
+  const cotBac = (oTab = false) => (
+    <CotEm
+      key={`bac-${khoiChon}-${lopChon}`}
+      kieu="bac"
+      ds={theoBac}
+      tieuDe="Theo bậc · lười nhất trước"
+      phu="bậc 1 → 12, cùng bậc thì điểm chăm thấp trước"
+      soDau={2 * SO_EM_COT}
+      chuXemDu={`Xem đủ ${theoBac.length} em`}
+      chuTrong={`Chưa em nào được xếp bậc${tenLoc}.`}
+      ghi={
+        chuaXepBac > 0 ? (
+          <p className="nht-ghi-nho">
+            {chuaXepBac} em chưa đủ dữ liệu (dưới {LUAT_NHOM_NHIP.soNgayToiThieu} ngày đã qua để tính) nên chưa xếp bậc.
+          </p>
+        ) : undefined
+      }
+      onMo={onMo}
+      oTab={oTab}
+    />
+  )
+  const doiCachXep = (c: CachXep) => {
+    setXep(c)
+    setTab((x) => (c === 'bac' ? (x === 'doi-pho' ? x : 'bac') : x === 'bac' ? 'luoi' : x))
+  }
+  const theBac = coBac && (
+    <section className="gvv2-the nht-cot nht-bac" aria-labelledby="nht-bac-tieu">
+      <div className="nht-cot-dau nht-bac-dau">
+        <div className="nht-bac-chu">
+          <h3 id="nht-bac-tieu">12 bậc từ Lười đến Chăm</h3>
+          <span className="gvv2-so">
+            Số em mỗi bậc · {theoBac.length} em đã xếp bậc{chuaXepBac > 0 ? ` · ${chuaXepBac} em chưa đủ dữ liệu` : ''}
+          </span>
+        </div>
+        <div className="nht-khoi nht-bac-xep" role="radiogroup" aria-label="Cách xếp em">
+          <button type="button" role="radio" aria-checked={!xepBac} className="nht-khoi-nut tt-nhan" onClick={() => doiCachXep('nhom')}>
+            Theo nhóm
+          </button>
+          <button type="button" role="radio" aria-checked={xepBac} className="nht-khoi-nut tt-nhan" onClick={() => doiCachXep('bac')}>
+            Theo bậc
+          </button>
+        </div>
+      </div>
+      <DaiDemBac dem={demBac} />
+    </section>
+  )
+  const tabHien: Kieu = xepBac ? (tab === 'doi-pho' ? 'doi-pho' : 'bac') : tab === 'bac' ? 'luoi' : tab
+  const dsTab = (
+    xepBac
+      ? [
+          ['bac', 'Theo bậc', theoBac.length],
+          ['doi-pho', 'Đối phó', doiPho.length],
+        ]
+      : [
+          ['luoi', 'Lười', luoi.length],
+          ['cham', 'Chăm', cham.length],
+          ['doi-pho', 'Đối phó', doiPho.length],
+        ]
+  ) as readonly (readonly [Kieu, string, number])[]
+
   const theoLop = (
     <section className="gvv2-the nht-cot nht-lop" aria-labelledby="nht-lop-tieu">
       <div className="nht-cot-dau">
@@ -548,31 +630,38 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
 
       {hep ? (
         <div className="nht-cot-ds nht-cot-ds--hep">
+          {theBac}
           <div className="gvv2-the nht-tab-khung">
-            <div className="nht-tab" role="tablist" aria-label="Nhóm em">
-              {(
-                [
-                  ['luoi', 'Lười', luoi.length],
-                  ['cham', 'Chăm', cham.length],
-                  ['doi-pho', 'Đối phó', doiPho.length],
-                ] as const
-              ).map(([k, ten, so]) => (
-                <button key={k} type="button" role="tab" id={`nht-tab-${k}`} aria-selected={tab === k} aria-controls={`nht-cot-${k}`} data-kieu={k} className="nht-tab-nut tt-nhan" onClick={() => setTab(k)}>
+            <div className="nht-tab" role="tablist" aria-label="Nhóm em" data-so={dsTab.length}>
+              {dsTab.map(([k, ten, so]) => (
+                <button key={k} type="button" role="tab" id={`nht-tab-${k}`} aria-selected={tabHien === k} aria-controls={`nht-cot-${k}`} data-kieu={k} className="nht-tab-nut tt-nhan" onClick={() => setTab(k)}>
                   {ten} <span className="gvv2-so">{so}</span>
                 </button>
               ))}
             </div>
-            {tab === 'luoi' ? cotLuoi(true) : tab === 'cham' ? cotCham(true) : cotDoiPho(true)}
+            {tabHien === 'bac' ? cotBac(true) : tabHien === 'luoi' ? cotLuoi(true) : tabHien === 'cham' ? cotCham(true) : cotDoiPho(true)}
           </div>
-          {tab !== 'doi-pho' && <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />}
+          {tabHien !== 'doi-pho' && <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />}
           {theoLop}
         </div>
       ) : (
         <div className="nht-cot-ds">
-          {cotLuoi()}
-          {cotCham()}
-          <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />
-          {cotDoiPho()}
+          {theBac}
+          {xepBac ? (
+            // một danh sách theo bậc cạnh cột Đối phó; chú giải ô ngày ngay dưới
+            <>
+              {cotBac()}
+              {cotDoiPho()}
+              <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />
+            </>
+          ) : (
+            <>
+              {cotLuoi()}
+              {cotCham()}
+              <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />
+              {cotDoiPho()}
+            </>
+          )}
           {theoLop}
         </div>
       )}

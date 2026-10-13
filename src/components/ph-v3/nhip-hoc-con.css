@@ -50,3 +50,6 @@
 @media (prefers-reduced-motion: reduce) {
   .ph3-nhip button.ht2-hn-nhip-bam { transition: none; }
 }
+/* 13/10 — có bậc (chip "Bậc N/12 · Tên" cạnh chip nhóm): đầu thẻ được xuống hàng, hàng chip đứng dưới tên thẻ khi chật (không tràn ngang). */
+.ph3-nhip--bac .ph3-the__dau { flex-wrap: wrap; row-gap: var(--k2); }
+.ph3-nhip--bac .ph3-the__dau > div { flex: 1 1 160px; }

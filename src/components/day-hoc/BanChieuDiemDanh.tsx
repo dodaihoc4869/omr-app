@@ -4,6 +4,8 @@
 //       chú giải luật ở chân. Danh sách tự làm mới 5 giây — nhịp của `useDiemDanhBuoi` (bản chiếu đọc thẳng `tt`).
 //   B · NHỊP HỌC CỦA LỚP: thanh Chăm / Chưa đều / Lười / Mới của cả lớp; ba cột tên (Chăm số ngày đủ giảm dần · Lười tăng dần kèm "bỏ N ngày liền");
 //       em vắng làm mờ + chữ "vắng"; chân: hôm qua cả lớp đủ mức x/y · hôm nay đã có z em đủ mức.
+// 13/10 (thầy: "Hiện bậc trên màn chiếu luôn nhé"): máy chủ có bậc ⇒ mỗi ô em (A) / dòng em (B) có chip bậc nhỏ (biểu tượng + số bậc, màu riêng
+//   từng bậc) + một dải chú giải 12 bậc (12 ô màu, biểu tượng, số em mỗi bậc; B kèm tên bậc). Em chưa có bậc ⇒ không chip; không em nào có ⇒ không dải.
 // Phím: Esc đóng · → (A ⇒ B, B ⇒ sang Gọi lên bảng đầu giờ) · ← (B ⇒ A) · H (B: ẩn / hiện tên nhóm Lười, mặc định HIỆN). Tấm hồ sơ đang mở ⇒ bản chiếu
 // không nghe phím (Esc của tấm chỉ đóng tấm). Cỡ theo khổ: mọi số đo tính bằng --u = 1/1920 chiều ngang (hoặc 1/1080 chiều cao) của khung
 // `.ca-chieu.cm.km` sẵn có (chieu-ma-kiem-tra.css) — cùng bộ màu tờ chiếu mã: nền --km-*, nhóm pha từ biến sẵn có (ban-chieu-diem-danh.css).
@@ -35,6 +37,10 @@ import {
   type TrangThaiNhip,
 } from '../../lib/diem-danh-nhip'
 import { chuBuoi } from '../chien-dich/buoi-day-ui'
+import { demTheoBac } from '../../lib/nhip-hoc-thay'
+import ChipBac from '../bac-cham-chi/ChipBac'
+import DaiDemBac from '../bac-cham-chi/DaiDemBac'
+import { chuBacSo } from '../bac-cham-chi/bac'
 import '../chieu-ma.css'
 import '../chieu-ma-kiem-tra.css'
 import './ban-chieu-diem-danh.css'
@@ -131,6 +137,19 @@ export default function BanChieuDiemDanh(p: PropsBanChieu) {
     </div>,
     document.body,
   )
+}
+
+/** Câu đọc màn hình của nút em, kèm bậc khi có. */
+const nhanEm = (e: EmBuoi): string => chuNutEm(e, e.bacCham ? chuBacSo(e.bacCham.bac) : undefined)
+
+/** Dải chú giải 12 bậc (số em mỗi bậc của `ds`); không em nào có bậc ⇒ không vẽ. */
+function DaiBacChieu({ ds, coTen = false }: { ds: readonly EmBuoi[]; coTen?: boolean }) {
+  const dem = useMemo(() => demTheoBac(ds), [ds])
+  return dem.some((n) => n > 0) ? (
+    <div className="ddc-bac" role="group" aria-label="12 bậc từ Lười đến Chăm">
+      <DaiDemBac dem={dem} coTen={coTen} />
+    </div>
+  ) : null
 }
 
 function MatKetNoi({ mat }: { mat: boolean }) {
@@ -248,6 +267,7 @@ function ChieuDiemDanh({ tt, tk, nhip, goc, matKetNoi, onMoEm, onDoiCheDo, onThu
               </div>
             )}
           </div>
+          {coNhip && <DaiBacChieu ds={tk.coMat} />}
           {soCoMat === 0 ? (
             <p className="ddc-rong">Chưa em nào điểm danh. Màn tự cập nhật mỗi 5 giây.</p>
           ) : (
@@ -256,8 +276,9 @@ function ChieuDiemDanh({ tt, tk, nhip, goc, matKetNoi, onMoEm, onDoiCheDo, onThu
                 const k = khoaNhom(e)
                 return (
                   <li key={e.sbd} className="ddc-luoi-o">
-                    <button type="button" className="ddc-em" data-nhom={k} data-moi={vua.has(e.sbd) ? '' : undefined} onClick={(ev) => onMoEm(e, ev.currentTarget)} aria-label={chuNutEm(e)}>
-                      <span className="ddc-cham" aria-hidden="true" />
+                    <button type="button" className="ddc-em" data-nhom={k} data-moi={vua.has(e.sbd) ? '' : undefined} onClick={(ev) => onMoEm(e, ev.currentTarget)} aria-label={nhanEm(e)}>
+                      {/* có bậc ⇒ chip bậc (biểu tượng trên, số bậc dưới) đứng ĐÚNG chỗ chấm nhóm — nền ô vẫn tô theo nhóm; tên giữ gần đủ bề ngang */}
+                      {e.bacCham ? <ChipBac bac={e.bacCham.bac} nho /> : <span className="ddc-cham" aria-hidden="true" />}
                       <span className="ddc-em-chu">
                         <b>{e.hoTen || `SBD ${e.sbd}`}</b>
                         <span>{!e.nhip ? `điểm danh ${gioDd(e.luc)}` : k === 'moi' ? 'mới vào lớp' : `đủ mức ${e.nhip.soNgayDu}/${e.nhip.soNgayQua} ngày`}</span>
@@ -366,7 +387,8 @@ function ChieuNhipLop({ tt, tk, nhip, matKetNoi, onMoEm, onDoiCheDo, onSangDauGi
               const so = `${e.nhip?.soNgayDu ?? 0}/${e.nhip?.soNgayQua ?? 0}`
               return (
                 <li key={e.sbd}>
-                  <button type="button" className="ddc-dong-em" data-vang={e.coMat ? undefined : ''} onClick={(ev) => onMoEm(e, ev.currentTarget)} aria-label={chuNutEm(e) + (bo ? `, bỏ ${bo} ngày liền` : '')}>
+                  <button type="button" className="ddc-dong-em" data-vang={e.coMat ? undefined : ''} onClick={(ev) => onMoEm(e, ev.currentTarget)} aria-label={nhanEm(e) + (bo ? `, bỏ ${bo} ngày liền` : '')}>
+                    {e.bacCham && <ChipBac bac={e.bacCham.bac} nho />}
                     <span className="ddc-dong-ten">{e.hoTen || `SBD ${e.sbd}`}</span>
                     {!e.coMat && <small className="ddc-vang-chu">vắng</small>}
                     <b className="ddc-dong-so">
@@ -436,6 +458,7 @@ function ChieuNhipLop({ tt, tk, nhip, matKetNoi, onMoEm, onDoiCheDo, onSangDauGi
               ) : null,
             )}
           </div>
+          <DaiBacChieu ds={tk.ds} coTen />
           <div className="ddc-ba-cot">
             {cotJsx('cham', cot.cham)}
             {cotJsx('chua-deu', cot.chuaDeu)}

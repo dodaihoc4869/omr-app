@@ -17,6 +17,8 @@ import { layNhipHoc } from '../../lib/nhip-hoc-thay'
 import { chuChip, chuNutEm, gioDd, khoaNhom, khoiEm, ngayNganDd, nhipTheoSbd, soNhom, TEN_NHOM, thongKeBuoi, THU_TU_NHOM, type CheDoChieu, type EmBuoi, type TrangThaiNhip } from '../../lib/diem-danh-nhip'
 import type { EmHoSo } from '../chien-dich/HoSoLamCauEm'
 import type { DiemDanhBuoi } from './DiemDanhBuoi'
+import ChipBac from '../bac-cham-chi/ChipBac'
+import { chuBacSo } from '../bac-cham-chi/bac'
 import './diem-danh-buoc1.css'
 
 const HoSoLamCauEm = lazy(() => import('../chien-dich/HoSoLamCauEm'))
@@ -291,14 +293,25 @@ export default function Buoc1DiemDanh({
                   <ul className="dd1-vua-ds" aria-label="Em vừa điểm danh — bấm để mở hồ sơ làm bài">
                     {vua.map((e) => {
                       const k = khoaNhom(e)
+                      const chipNhom = (
+                        <span className="dd1-chip" data-nhom={k}>
+                          {chuChip(e)}
+                        </span>
+                      )
                       return (
                         <li key={e.sbd}>
-                          <button type="button" className="dd1-vua-dong" onClick={(ev) => moEm(e, ev.currentTarget)} aria-label={`${chuNutEm(e)} (điểm danh ${gioDd(e.luc)}${e.cach === 'thay' ? ', thầy thêm' : ''})`}>
+                          <button type="button" className="dd1-vua-dong" onClick={(ev) => moEm(e, ev.currentTarget)} aria-label={`${chuNutEm(e, e.bacCham ? chuBacSo(e.bacCham.bac) : undefined)} (điểm danh ${gioDd(e.luc)}${e.cach === 'thay' ? ', thầy thêm' : ''})`}>
                             <span className="dd1-vua-gio">{gioDd(e.luc)}</span>
                             <b className="dd1-vua-ten">{e.hoTen || `SBD ${e.sbd}`}</b>
-                            <span className="dd1-chip" data-nhom={k}>
-                              {chuChip(e)}
-                            </span>
+                            {e.bacCham ? (
+                              // 13/10: có bậc ⇒ chip bậc nhỏ (biểu tượng + số bậc, tên đầy đủ trong title) ngay cạnh chip nhóm
+                              <span className="bcc-hang">
+                                {chipNhom}
+                                <ChipBac bac={e.bacCham.bac} nho />
+                              </span>
+                            ) : (
+                              chipNhom
+                            )}
                           </button>
                         </li>
                       )

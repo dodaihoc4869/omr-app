@@ -240,3 +240,17 @@ button.gvhn-the-nut:hover:not(:disabled) { border-color: color-mix(in srgb, var(
   .nht-lop-dong { grid-template-columns: minmax(80px, 116px) minmax(0, 1fr) 44px; gap: 10px; }
 }
 
+
+/* ----- 13/10 · 12 BẬC TỪ LƯỜI ĐẾN CHĂM: thẻ đầu danh sách (dải đếm số em mỗi bậc + cách xếp) · cột "Theo bậc". Màu bậc ở
+ * src/components/bac-cham-chi/bac-cham-chi.css; ở đây chỉ bố cục + biến --gvm-* sẵn có. ----- */
+.gvv2-the.nht-bac { grid-column: 1 / -1; gap: 12px; }
+.nht-bac-dau { align-items: center; margin-bottom: 0; }
+.nht-bac-chu { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.nht-bac-xep { flex: none; }
+.nht-cot[data-kieu='bac'] { --nht-tieu: var(--gvm-chu); --nht-av-nen: var(--gvm-mat-2); --nht-av-chu: var(--gvm-chu-2); --nht-so-chu: var(--gvm-chu); }
+.nht-ten .bcc-chip { margin-left: 2px; }
+@media (max-width: 600px) {
+  .gvv2-the.nht-bac { gap: 10px; }
+  .nht-bac-xep { width: 100%; }
+  .nht-tab[data-so='2'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

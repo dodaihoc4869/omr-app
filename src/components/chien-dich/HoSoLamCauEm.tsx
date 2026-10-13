@@ -51,6 +51,7 @@ import { doiNgoiCon } from '../hoc-tap/BangNhipHoc'
 import { chuCanThem, chuDoTinCay, NGUONG_TIN_CAY } from '../../lib/nhip-hoc-em'
 import { LUAT_NHOM_NHIP } from '../../../server/src/nhip-hoc-kieu'
 import { TEN_NHOM_NHIP as TEN_NHOM_NHIP_HOC } from '../../../server/src/nhip-hoc-luat'
+import ChipBac from '../bac-cham-chi/ChipBac'
 import './bai-hang-ngay.css'
 import './ho-so-lam-cau-em.css'
 
@@ -566,7 +567,8 @@ function DaiMuoiBon({ ngay, chuoi }: { ngay: readonly NgayHoatDong[]; chuoi?: nu
 
 /** Đầu tấm. Máy chủ có `nhomNhip` ⇒ NHÓM Nhịp học (Chăm / Chưa đều / Lười / Chưa đủ dữ liệu — cùng luật Hôm nay) là nhãn chính, cờ "Có dấu hiệu đối
  *  phó" là chip riêng, nhóm Lười kèm "đủ mức liền x/6 ngày để thoát" + 6 ô. Máy chủ cũ (thiếu trường) ⇒ nhãn thái độ cũ. Lý do bằng số giữ nguyên.
- *  Đợt 16: chip "Độ tin cậy N%" + kết luận tạm khi dưới 90%; dải 14 ngày gần nhất. */
+ *  Đợt 16: chip "Độ tin cậy N%" + kết luận tạm khi dưới 90%; dải 14 ngày gần nhất.
+ *  13/10: máy chủ có `bacCham` (đã kiểm khớp nhóm) ⇒ chip "Bậc N/12 · Tên" ngay cạnh tên nhóm (cùng chip 3 app). Vắng ⇒ y như trước. */
 function DauThaiDo({ td, matDau, ngoi, laThay }: { td: KetQuaHoSoThaiDo; matDau: string; ngoi: Ngoi; laThay: boolean }) {
   const k = td.ketLuan as KetLuanThaiDoApp
   const nhom = td.nhomNhip
@@ -593,6 +595,7 @@ function DauThaiDo({ td, matDau, ngoi, laThay }: { td: KetQuaHoSoThaiDo; matDau:
           <h3 id="gvv2-tdo-nhan" className="gvv2-tdo-nhan">
             {nhom ? TEN_NHOM_NHIP_HOC[nhom] : k.chu}
           </h3>
+          {nhom && td.bacCham && <ChipBac bac={td.bacCham.bac} />}
           {nhom && td.coDoiPho && (
             <span className="gvv2-tdo-co-doi-pho">
               <TriangleAlert size={15} aria-hidden="true" />

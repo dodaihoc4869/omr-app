@@ -178,6 +178,20 @@
 .ddc-an { margin: 0; font-size: var(--f22); color: var(--km-chu-phu); line-height: 1.5; }
 .ddc-than-cho { flex: 1 1 auto; display: grid; place-items: center; min-height: 0; padding: calc(24 * var(--u)); border-radius: calc(26 * var(--u)); background: var(--km-khung); }
 
+/* ── 13/10 · 12 bậc trên bản chiếu (thầy: "Hiện bậc trên màn chiếu luôn nhé"). Màu bậc: src/components/bac-cham-chi/bac-cham-chi.css (12 màu dựng từ
+ * biến chuẩn); ở đây chỉ đặt nền / chữ trộn theo nền tối cố định của tờ chiếu (--km-*) + cỡ đọc được từ cuối lớp (theo --u). Không đổi màu --ddc-*. ── */
+.ddc { --bcc-nen: var(--km-khung); --bcc-chu: var(--km-chu); --bcc-mo: var(--km-chu-phu); }
+.ddc .bcc.bcc-chip[data-nho] { flex: none; gap: calc(6 * var(--u)); padding: calc(4 * var(--u)) calc(12 * var(--u)); font-size: var(--f22); font-weight: 800; vertical-align: middle; }
+.ddc .bcc-chip .bcc-bt { font-size: max(calc(26 * var(--u)), 16px); }
+.ddc-em .bcc.bcc-chip[data-nho] { flex-direction: column; justify-content: center; gap: calc(2 * var(--u)); min-width: max(calc(46 * var(--u)), 30px); padding: calc(6 * var(--u)) calc(6 * var(--u)); border-radius: calc(14 * var(--u)); font-size: var(--f20); line-height: 1; }
+.ddc-cot-ds[data-hai-cot] .bcc.bcc-chip[data-nho] { padding: calc(2 * var(--u)) calc(8 * var(--u)); font-size: var(--f19); }
+.ddc-bac { flex: none; min-width: 0; }
+.ddc .bcc-dem { gap: calc(8 * var(--u)); }
+.ddc .bcc.bcc-dem-o { gap: calc(4 * var(--u)); padding: calc(12 * var(--u)) calc(4 * var(--u)) calc(8 * var(--u)); border-radius: calc(14 * var(--u)); box-shadow: inset 0 calc(6 * var(--u)) 0 var(--bac); }
+.ddc .bcc-dem-o .bcc-bt { font-size: max(calc(30 * var(--u)), 18px); }
+.ddc .bcc-dem-o b { font-size: var(--f26); }
+.ddc .bcc-dem-ten { font-size: var(--f17); }
+
 /* Tấm Hồ sơ làm bài mở TRÊN bản chiếu (CHÍNH tấm của app, không bản rút gọn): phóng to theo khổ máy chiếu để đọc được từ cuối lớp —
  * 760 px × 1,4 ≈ 1064 px trên khung 1920 (bản vẽ ChieuHoSoEm: tấm ≈ 1080 px); 4K phóng thêm. Màn hẹp giữ nguyên cỡ của app. */
 @media (min-width: 1600px) and (min-height: 860px) {
