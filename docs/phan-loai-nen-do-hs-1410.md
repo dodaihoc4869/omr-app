@@ -14,9 +14,9 @@ Nguồn: `/tmp/tick-1410-moi-full.json`, 15.606 test, 125 assertion đỏ. Soát
    - Sửa trong `bf926076`: tính nháp mới từ `attemptRef`, đổi state và gọi lưu đúng một lần. Hai click liền trên hai câu sinh 2 lượt lưu; nháp cuối giữ cả hai câu. Khi đã chốt nộp không sửa snapshot; retry dùng cùng đáp án/mốc nộp/khoá lượt. ACK cũ không xóa lỗi nháp mới, pending không báo “đã lưu”.
    - Kiểm: 4/4 test màn thi thật; log `/tmp/man-thi-kho-final.log`. ACK từ máy chủ vẫn là đã nộp thật nếu ghi ACK local ở nền lỗi; pending local cũ được giữ để replay idempotent.
 
-3. **P2 cần xử lý tiếp — tải gói đề không có hạn cho fetch và thân JSON.** [exam-api.ts](../src/lib/exam-api.ts), `vaoThiQuaMayChuMoi`: lượt `/vao-thi` có hạn, nhưng đoạn tải `deUrl` gọi `fetch` rồi `res.json()` trực tiếp.
+3. **P2 đã khóa bằng kiểm thử — tải gói đề không có hạn cho fetch và thân JSON.** [exam-api.ts](../src/lib/exam-api.ts), `vaoThiQuaMayChuMoi`: lượt `/vao-thi` có hạn, nhưng đoạn tải `deUrl` trước sửa gọi `fetch` rồi `res.json()` trực tiếp.
    - Tái hiện hàm `vaoThi` thật với metadata/deUrl hợp lệ; giả mạng trả header rồi `json()` không kết thúc. Sau 30 giây hàm vẫn pending, chỉ 1 fetch. Log: `/tmp/triage-goi-de-1410.log`.
-   - Không có bằng chứng sự cố production trong lượt soát này. Chưa sửa nguồn `exam-api.ts` vì nhánh phát hành đang khóa; đã báo root trước mutation. Cần đặt hạn bao gồm cả header/body và abort, giữ nguyên đề/khoá lượt/cách chấm.
+   - Không có bằng chứng sự cố production trong lượt soát này. Root cho sửa sau khi nhận tái hiện: `3de5bfaf` đặt hạn 25 giây từ lúc fetch tới hết JSON; abort/cancel body, không đưa JSON về muộn vào đề/tải ảnh. [vao-thi-goi-de-co-han-1410.test.ts](../tests/vao-thi-goi-de-co-han-1410.test.ts) 6/6: header/body treo, mạng lỗi, JSON lỗi, thành công và rejoin cùng lượt/mốc giờ/khoá/qid. Cùng 4 test màn thi: 10/10; frontend TypeScript sạch. Không đổi cách chấm.
 
 ## Các nhóm đỏ cần tách khỏi lỗi runtime
 
