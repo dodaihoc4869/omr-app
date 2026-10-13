@@ -21,9 +21,7 @@ import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
 import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
-import { cacheChung, docChung, ghiChung } from './dem-chung-colo'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
-import { bam } from './srs2-loi'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -332,7 +330,7 @@ const demKnTinh = new WeakMap<object, Map<string, { luc: number; kiem: number; d
  * hai câu SQL cũ (ma trận nhãn + 96 câu yếu, bản gốc ở test) chạy ~24.000 lần/ngày, mỗi lần quét ~6.500–8.900 dòng câu kèm tách JSON (~300 + 80 giây D1/ngày) — trong khi phần quét
  * kho (câu → nhãn kỹ năng, đã duyệt) giống hệt cho mọi em cùng phạm vi; chỉ điểm kỹ năng `omni_p_vkn` (khoá chính (sbd, vkn_id) ⇒ ≤ 1 dòng/nhãn) là của em.
  * Nay: bản đồ tĩnh (SQL_KN_TINH, MỘT lần quét thay hai) đệm theo isolate (khoá D1 gốc + phạm vi), dùng lại tới 10 phút từ lúc dựng, quá 60 giây thì hỏi
- * dấu kho (một dòng) CÙNG đợt với lượt đọc điểm của em; có đệm chung colo (tên miền riêng) thì isolate mới lấy từ đó. Điểm của em LUÔN đọc mới, rồi tính
+ * dấu kho (một dòng) CÙNG đợt với lượt đọc điểm của em. Điểm của em LUÔN đọc mới, rồi tính
  * ĐÚNG phép SQL cũ: DISTINCT (nhãn, trạng thái) và MIN(COALESCE(p, 0,3)) theo câu đã duyệt, xếp (độ yếu, mã câu), lấy 96. Số đợt D1 không tăng.
  */
 export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[], now: number): Promise<[{ results: Row[] }, { results: Row[] }]> {
@@ -348,15 +346,9 @@ export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[
     if (d && (e.dau ? d === e.dau : dauTruocLucDoc(d, e.luc))) { e.dau = d; e.kiem = now } else e = undefined
   }
   if (!e) {
-    const chung = await cacheChung()
-    const dau = chung ? await dauKhoCau(env) : ''
-    const m = dau ? await docChung<{ luc: number; r: KnTinh7 }>(`omni-kn/${dau}/${bam(khoa)}`) : null
-    if (m && Array.isArray(m.r) && Number.isFinite(m.luc) && now - m.luc >= 0 && now - m.luc < HAN_KN_TINH_MS) e = { luc: m.luc, kiem: now, dau, tinh: m.r }
-    else {
-      const r = await env.DB.prepare(SQL_KN_TINH).bind(thamSo).all<Row>()
-      e = { luc: now, kiem: now, dau, tinh: (r.results ?? []).map((x) => [str(x.qid), Number(x.duyet) === 1 ? 1 : 0, str(x.kn)] as [string, number, string]) }
-      if (dau) await ghiChung(`omni-kn/${dau}/${bam(khoa)}`, { luc: now, r: e.tinh }, HAN_KN_TINH_MS / 1000)
-    }
+    // Cùng nhịp với lượt đọc điểm (không `await` nào trước) ⇒ lớp gom lệnh gửi chung một lô như hai câu cũ.
+    const r = await env.DB.prepare(SQL_KN_TINH).bind(thamSo).all<Row>()
+    e = { luc: now, kiem: now, dau: '', tinh: (r.results ?? []).map((x) => [str(x.qid), Number(x.duyet) === 1 ? 1 : 0, str(x.kn)] as [string, number, string]) }
     if (bang.size >= 16) bang.delete(bang.keys().next().value!)
     bang.set(khoa, e)
   }

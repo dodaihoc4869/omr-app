@@ -7,7 +7,6 @@ import { SQL_HANH_TRINH_V5 } from './hanh-trinh-v5-schema'
 import { docNhom, type PhanNhom } from './hanh-trinh-do-luong'
 import type { Env, D1Result, D1PreparedStatement } from './kieu'
 import { dbGoc } from './cau-hinh-dem'
-import { cacheChung, docChung, ghiChung } from './dem-chung-colo'
 import type { HoSo2 } from './srs2-d1'
 import { docMetaCau } from './srs2-d1'
 import { docSuKienOmni, qCuaCau, damBaoBangOmni } from './omni-d1'
@@ -57,25 +56,15 @@ const SQL_CANH_LOP=`SELECT tu,den,SUM(n_co) nCo,SUM(dung_co) dungCo,SUM(n_chua) 
  * 3 phút (số liệu 7 ngày cả lớp, lệch tối đa 3 phút không đổi thứ tự ưu tiên bài), cao điểm 10 phút như cũ.
  */
 const demCanh=new WeakMap<object,{luc:number;moc:number;theoDen:Map<string,CanhHoc[]>}>()
-export async function docCanhLop(env:Env,targets:readonly string[],now:number):Promise<CanhHoc[]>{
+async function docCanhLop(env:Env,targets:readonly string[],now:number):Promise<CanhHoc[]>{
   const han=new Date(now+7*3_600_000).getUTCHours()>=20?600_000:180_000
   const goc=dbGoc(env.DB as unknown as object)
   let d=demCanh.get(goc)
   if(!d||now-d.luc>=han||now<d.luc){d={luc:now,moc:now-7*86400000,theoDen:new Map()};demCanh.set(goc,d)}
-  const dem=d,ds=[...new Set(targets)],moi=new Map<string,CanhHoc[]>()
-  let thieu=ds.filter(t=>!dem.theoDen.has(t))
-  // 13/10 tối (thầy: "mọi chỗ rút câu rất là lag … tối ưu chuyên sâu"): ĐỆM CHUNG giữa các isolate (dem-chung-colo.ts) theo KHUNG thời gian cố định
-  // dài đúng `han` — mọi isolate trong cùng khung dùng chung một bản (số liệu gộp cả lớp, không dữ liệu riêng em nào); lệch tối đa `han` như đệm isolate.
-  const khung=thieu.length&&(await cacheChung())?Math.floor(now/han):-1
-  if(khung>=0){
-    for(const [t,v] of await Promise.all(thieu.map(t=>docChung<CanhHoc[]>(`canh/${han}/${khung}/${t}`).then(v=>[t,v] as const))))if(Array.isArray(v)){moi.set(t,v);dem.theoDen.set(t,v)}
-    thieu=thieu.filter(t=>!moi.has(t))
-  }
+  const dem=d,ds=[...new Set(targets)],thieu=ds.filter(t=>!dem.theoDen.has(t)),moi=new Map<string,CanhHoc[]>(thieu.map(t=>[t,[]]))
   if(thieu.length){
-    const docD1=new Map<string,CanhHoc[]>(thieu.map(t=>[t,[]]))
-    for(const x of (await env.DB.prepare(SQL_CANH_LOP).bind(JSON.stringify(thieu),dem.moc).all<CanhHoc>()).results??[])docD1.get(String(x.den))?.push(x)
-    for(const [t,a] of docD1){moi.set(t,a);dem.theoDen.set(t,a)}
-    if(khung>=0){const conLai=Math.max(1,((khung+1)*han-now)/1000);await Promise.all([...docD1].map(([t,a])=>ghiChung(`canh/${han}/${khung}/${t}`,a,conLai)))}
+    for(const x of (await env.DB.prepare(SQL_CANH_LOP).bind(JSON.stringify(thieu),dem.moc).all<CanhHoc>()).results??[])moi.get(String(x.den))?.push(x)
+    for(const [t,a] of moi)dem.theoDen.set(t,a)
   }
   const so=(a:string,b:string)=>a<b?-1:a>b?1:0
   return ds.flatMap(t=>moi.get(t)??dem.theoDen.get(t)??[]).sort((a,b)=>so(String(a.tu),String(b.tu))||so(String(a.den),String(b.den)))

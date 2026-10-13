@@ -1,8 +1,8 @@
 // @vitest-environment node
-// MA TRẬN CŨ + ỨNG VIÊN YẾU Gói 7 qua ĐỆM (13/10 tối — thầy: "tất cả mọi chỗ rút câu rất là lag … tối ưu máy chủ chuyên sâu"). Hai câu SQL cũ quét
-// ~6.500–8.900 dòng câu kèm JSON ~24.000 lần/ngày dù phần quét kho giống hệt cho mọi em. Đường mới (khi có Cache API): bản đồ câu → nhãn kỹ năng lấy
-// từ đệm, điểm của em đọc riêng, tính lại ĐÚNG phép SQL. Khoá ở đây: kết quả TRÙNG KHÍT hai câu SQL cũ (cùng dữ liệu, nhiều em, câu chưa duyệt, nhãn
-// theo ý, nhãn rỗng, câu không nhãn); isolate thứ hai không quét kho; điểm của em KHÔNG lẫn giữa các em.
+// MA TRẬN CŨ + ỨNG VIÊN YẾU Gói 7 qua ĐỆM THEO ISOLATE (13/10 tối — thầy: "tất cả mọi chỗ rút câu rất là lag … tối ưu máy chủ chuyên sâu"). Hai câu SQL cũ
+// quét ~6.500–8.900 dòng câu kèm JSON ~24.000 lần/ngày dù phần quét kho giống hệt cho mọi em. Đường mới: bản đồ câu → nhãn kỹ năng quét MỘT lần mỗi
+// isolate (10 phút, hỏi dấu kho sau 60 giây), điểm của em đọc riêng, tính lại ĐÚNG phép SQL. Khoá: kết quả TRÙNG KHÍT hai câu SQL cũ (nhiều em, câu chưa
+// duyệt, nhãn theo ý, nhãn rỗng, câu không nhãn); em thứ hai cùng isolate không quét kho; điểm KHÔNG lẫn giữa các em; kho đổi ⇒ quét lại.
 import { afterEach, expect, it } from 'vitest'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import { docMaTranCu7 } from '../server/src/goi-bai-7'
@@ -10,9 +10,7 @@ import { xoaMoiDem } from '../server/src/dem-chung'
 import type { Env } from '../server/src/kieu'
 
 const NOW = Date.parse('2026-10-13T14:00:00Z')
-class CacheGia { kho = new Map<string, string>(); async match(u: string) { const v = this.kho.get(u); return v === undefined ? undefined : new Response(v) } async put(u: string, r: Response) { this.kho.set(u, await r.text()) } }
-const batCache = (c: CacheGia | null) => { if (c) (globalThis as { caches?: unknown }).caches = { default: c }; else delete (globalThis as { caches?: unknown }).caches }
-afterEach(() => { batCache(null); xoaMoiDem() })
+afterEach(() => { xoaMoiDem() })
 
 function kho() {
   const k = taoKhoOmni({ 'DH-B8': 24, 'DH-B7': 12 }, 2)
@@ -32,7 +30,7 @@ function kho() {
   let quet = 0
   const goc = k.env.DB
   const env = { ...k.env, DB: { prepare: (q: string) => { if (q.includes('FROM game_v2_question q LEFT JOIN omni_q o')) quet++; return goc.prepare(q) }, batch: goc.batch.bind(goc) } } as unknown as Env
-  return { ...k, env, quet: () => quet }
+  return { ...k, env, envGoc: k.env, quet: () => quet }
 }
 // Hai câu SQL CŨ của lapGoi7 (trước 13/10) — phép thử: đường mới phải ra TRÙNG KHÍT.
 const SQL_KN_CU = `SELECT DISTINCT j.value AS kn,p.trang_thai FROM game_v2_question q LEFT JOIN omni_q o ON q.qid=o.qid,
@@ -48,10 +46,9 @@ const docCu = async (env: Env, sbd: string, ma: readonly string[]) => {
 const xep = (rs: Record<string, unknown>[]) => rs.map((r) => `${String(r.kn)}|${r.trang_thai ?? 'null'}`).sort()
 const MA = ['DH-B8', 'DH-B7']
 
-it('kết quả qua đệm TRÙNG KHÍT hai câu SQL cũ — nhiều em, câu chưa duyệt, nhãn theo ý / rỗng / không có', async () => {
+it('kết quả TRÙNG KHÍT hai câu SQL cũ — nhiều em, câu chưa duyệt, nhãn theo ý / rỗng / không có', async () => {
   for (const sbd of ['S1', 'S2', 'S3']) {
     const k = kho()
-    batCache(new CacheGia())
     const [knCu, yeuCu] = await docCu(k.env, sbd, MA)
     const [knMoi, yeuMoi] = await docMaTranCu7(k.env, sbd, MA, NOW)
     expect(xep(knMoi.results)).toEqual(xep(knCu.results))
@@ -61,18 +58,20 @@ it('kết quả qua đệm TRÙNG KHÍT hai câu SQL cũ — nhiều em, câu ch
   }
 })
 
-it('isolate thứ hai (D1 khác, cùng kho) không quét kho; điểm kỹ năng của em KHÔNG lẫn giữa các em', async () => {
-  const c = new CacheGia()
-  batCache(c)
-  const k1 = kho(), k2 = kho()
-  const [, y1] = await docMaTranCu7(k1.env, 'S1', MA, NOW)
-  expect(k1.quet()).toBe(1)
-  xoaMoiDem() // isolate mới: đệm isolate trống, đệm chung còn
-  const [, y2] = await docMaTranCu7(k2.env, 'S2', MA, NOW + 1000)
-  expect(k2.quet()).toBe(0)
-  batCache(null)
-  const [, y2Cu] = await docMaTranCu7(k2.env, 'S2', MA, NOW + 1000)
+it('em thứ hai cùng isolate KHÔNG quét kho; điểm kỹ năng KHÔNG lẫn giữa các em; kho đổi ⇒ quét lại', async () => {
+  const k = kho()
+  const [, y1] = await docMaTranCu7(k.env, 'S1', MA, NOW)
+  expect(k.quet()).toBe(1)
+  const [kn2, y2] = await docMaTranCu7(k.env, 'S2', MA, NOW + 1000)
+  expect(k.quet()).toBe(1)
+  const [kn2Cu, y2Cu] = await docCu(k.envGoc, 'S2', MA)
+  expect(xep(kn2.results)).toEqual(xep(kn2Cu.results))
   expect(y2.results.map((r) => r.qid)).toEqual(y2Cu.results.map((r) => r.qid))
   expect(y2.results.map((r) => r.qid)).not.toEqual(y1.results.map((r) => r.qid))
-  k1.d.sql.close(); k2.d.sql.close()
+  await docMaTranCu7(k.env, 'S1', MA, NOW + 90_000) // quá 60 giây, dấu kho chưa đổi ⇒ dùng tiếp
+  expect(k.quet()).toBe(1)
+  k.d.sql.exec(`UPDATE game_v2_index SET indexed_at='2026-10-13T14:01:00Z' WHERE ma_de='DH-B8'`)
+  await docMaTranCu7(k.env, 'S1', MA, NOW + 180_000) // kho vừa lập chỉ mục lại ⇒ quét lại
+  expect(k.quet()).toBe(2)
+  k.d.sql.close()
 })
