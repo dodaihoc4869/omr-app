@@ -36,13 +36,14 @@ for (const [w, hgt, nhan] of [[390, 844, '390'], [1280, 900, '1280']]) {
   const ctx = await trinh.newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, colorScheme: 'light', locale: 'vi-VN' })
   const trang = await ctx.newPage()
   trang.on('pageerror', (e) => console.error('LỖI TRANG', e.message))
-  // 1. Sảnh có cửa Tu luyện
-  await trang.goto(`${goc}?man=sanh`)
+  // 1. Ôn & sửa của màn học tập có cửa Tu luyện
+  await trang.goto(`${goc}?man=hoc-tap`)
+  await trang.getByRole('button', { name: 'Ôn & sửa', exact: true }).click()
   await trang.waitForSelector('text=Tu luyện', { timeout: 20000 })
   await trang.waitForTimeout(2500)
-  await trang.locator('.h2-nut-tu-luyen, .h2-ng-tu-luyen').first().scrollIntoViewIfNeeded().catch(() => {})
+  await trang.getByRole('button', { name: /Tu luyện/ }).first().scrollIntoViewIfNeeded().catch(() => {})
   await trang.waitForTimeout(300)
-  await chup(trang, `1-sanh-cua-tu-luyen-${nhan}`)
+  await chup(trang, `1-hoc-tap-cua-tu-luyen-${nhan}`)
   // 2. Màn 4 chế độ (chọn Dạng bài)
   await trang.goto(`${goc}?man=tl`)
   await trang.waitForSelector('.tlu-the-che-do')

@@ -118,8 +118,9 @@ describe('máy khách — lệnh', () => {
 
 describe('màn của em', () => {
   it('có pha chờ riêng, không mượn pha loading', () => {
-    expect(MAN_EM).toContain("useState<'join' | 'loading' | 'cho' | 'exam' | 'submitted' | 'error'>('join')")
+    expect(MAN_EM).toContain("useState<'join' | 'loading' | 'cho' | 'exam' | 'submitted' | 'error' | 'loi-luu-nop'>('join')")
     expect(MAN_EM).toContain("if (phase === 'cho') {")
+    expect(MAN_EM).toContain("if (phase === 'loi-luu-nop' && attempt) {")
   })
 
   it('màn chờ nói đúng việc đang chờ ai và KHÔNG có nút nào để bấm', () => {

@@ -22,9 +22,8 @@ await p.evaluate(async () => {
     const { default: TheCau } = await import('/src/components/TheCau.tsx');
     const { default: Hop } = await import('/src/components/HopXacNhan.tsx');
     const { default: PH } = await import('/src/components/ph-moi/ManChinh.tsx');
-    const { default: HS } = await import('/src/components/bang-nhiem-vu/BangNhiemVu.tsx');
-    const { dungBangNhiemVu } = await import('/src/lib/nhiem-vu-adapter.ts');
-    const { tongHopKeHoachTroLy } = await import('/src/lib/tro-ly-ca-nhan.ts');
+    const { default: HS } = await import('/src/components/hoc-tap/HocTapHomNay.tsx');
+    const { docSanh } = await import('/src/components/hoa2/api.ts');
     await import('/node_modules/katex/dist/katex.min.css');
     const { default: Setup } = await import('/src/screens/ExamSetupScreen.tsx');
     const { default: BangPH } = await import('/src/components/ph-moi/BangMoiThu.tsx');
@@ -51,13 +50,14 @@ await p.evaluate(async () => {
         if (kind === 'ph')
             child = h(PH, { v: { trangThai: 'ok', pm: { serverNow: now, tongQuan: { soCau: 1234, soDung: 1200, phutHoc: 240, datNhiemVu: true, viecTong: 5, viecXong: 5 }, caGanNhat: null, nhipHoc: null }, thuLai: noop }, tenCon: long, lop: long, now, canhBao: [], onCanhBaoDaXem: noop, giaoThem: { trangThai: 'san_sang', conLai: 3, onGiao: noop }, onMoBang: noop, onDoiSbd: noop });
         if (kind === 'hs')
-            child = h(HS, { vaiTro: 'hocsinh', hoTen: long, now, duLieu: dungBangNhiemVu({ keHoachTroLy: tongHopKeHoachTroLy({ sbd: 'TEST', hoTen: long, dsBtvn: [{ maBtvn: 'BTEST', tenBtvn: long, soCau: 12, giaoLuc: new Date(now - 1000).toISOString(), hanNop: new Date(now + 3600000).toISOString() }], dsMomGiao: [], dsLichSu: [], tongCauSai: 0, now }), now }), onHanhDong: noop, onVaoThi: noop, onMoThanThu: noop });
+            child = h(HS, { ten: long, lop: long, ketQua: docSanh({ cheDo2: true, theLuc: { con: 12, tong: 20 }, hanhTrinh: { tang: 1, toiThieu: 20, daLam: 8, daXep: 20, conThieu: 0, soChang: 3, changHienTai: 2, cauTrongChang: 4 } }), loi: '', dangTai: false, coCa: false, soBaiTap: 1,
+                onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop });
         root.render(child);
     };
 });
 // Bỏ chốt che toàn app trong phép đo: phát hiện cả nội dung bị cắt mà
 // document.scrollWidth thường không thấy. Nền trang trí giữ vùng cắt riêng.
-await p.addStyleTag({ content: 'body,.khung-noi-dung,.vo-thay .khung-noi-dung,.phm-ap,.bnv{overflow-x:visible!important}' });
+await p.addStyleTag({ content: 'body,.khung-noi-dung,.vo-thay .khung-noi-dung,.phm-ap,.ht-app{overflow-x:visible!important}' });
 let checks = 0;
 try {
     for (const theme of ['light', 'dark'])

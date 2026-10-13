@@ -5,11 +5,8 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import TheVeDich from '../src/components/bang-nhiem-vu/TheVeDich'
-import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import { conLaiToiHan, chuHanNop, docMonNo, docVeDich, khoaMonNo, laSauGioCuoi, nhanCoHan, nhomNoTheoNgay, ngayVuaTraXong, tenMonNo, thuCuaNgay, thuNgayNgan, type VeDichView } from '../src/lib/ve-dich-hien-thi'
 import { dongGoiBanNho, tuKeHoachNgay, type KeHoachNgayMayChu } from '../src/lib/nhiem-vu-adapter'
-
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 afterEach(cleanup)
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const nhan = <T,>(o: T): T => JSON.parse(JSON.stringify(o))
@@ -250,41 +247,12 @@ describe('Bảng nhiệm vụ — nối thẻ', () => {
     }) as KeHoachNgayMayChu
   const phu = { dsBtvn: [{ maBtvn: 'B1', maCa: 'CA-1', tenBtvn: 'Ester – Lipid', soCau: 12 }], dsMomGiao: [] as any[] }
   const dl = (them: object = {}) => ({ ...tuKeHoachNgay(keHoach(them), NOW_B, phu), thanThu: { kieu: 'chua_biet' } as const })
-  const bang = (d: any, vaiTro: 'hocsinh' | 'phuhuynh' = 'hocsinh', extra: Record<string, unknown> = {}) => render(<BangNhiemVu vaiTro={vaiTro} hoTen="Minh" now={NOW_B} duLieu={d} onHanhDong={() => {}} taiVinhDanh={async () => null} {...(extra as object)} />)
 
   it('adapter: veDich đọc chặt vào duLieu.veDich; máy chủ chưa trả ⇒ null; bản nhớ KHÔNG lưu veDich', () => {
     expect(dl(KH()).veDich!.bai[0]!.maBtvn).toBe('B1')
     expect(dl().veDich).toBeNull()
     expect(dl({ veDich: 'x' }).veDich).toBeNull()
     expect(dongGoiBanNho(dl(KH()), NOW_B)!.duLieu.veDich).toBeNull()
-  })
-  it('học sinh: thẻ nằm NGAY DƯỚI lời chào, TRÊN tiến độ; nút ⇒ onHanhDong với việc chưa xong đầu tiên; thiếu veDich ⇒ không thẻ; phụ huynh không thấy', () => {
-    const onHanhDong = vi.fn()
-    const { container } = bang(dl(KH()), 'hocsinh', { onHanhDong })
-    const the = container.querySelector('[data-vung="ve-dich"]') as HTMLElement
-    const tienDo = container.querySelector('[data-vung="tien-do"]') as HTMLElement
-    expect(the).toBeTruthy()
-    expect(the.compareDocumentPosition(tienDo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: /Làm chặng 2 ngay/ }))
-    expect(onHanhDong).toHaveBeenCalledTimes(1)
-    cleanup()
-    expect(bang(dl()).container.querySelector('[data-vung="ve-dich"]')).toBeNull()
-    cleanup()
-    expect(bang(dl(KH()), 'phuhuynh').container.querySelector('[data-vung="ve-dich"]')).toBeNull()
-  })
-  it('hai lần nạp liên tiếp: nợ của Thứ Hai biến mất ⇒ dòng mừng "Em vừa trả xong phần của Thứ Hai." (rồi tự tắt sau 8 giây)', () => {
-    vi.useFakeTimers()
-    try {
-      const a = dl(KH())
-      const { container, rerender } = bang(a)
-      expect(container.querySelector('[data-vung="vua-tra"]')).toBeNull()
-      rerender(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW_B} duLieu={dl(KH({ no: { theoNgay: [] } })) as any} onHanhDong={() => {}} taiVinhDanh={async () => null} />)
-      expect(container.querySelector('[data-vung="vua-tra"]')!.textContent).toContain('Em vừa trả xong phần của Thứ Hai.')
-      vi.advanceTimersByTime(8500)
-      rerender(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW_B} duLieu={dl(KH({ no: { theoNgay: [] } })) as any} onHanhDong={() => {}} taiVinhDanh={async () => null} />)
-    } finally {
-      vi.useRealTimers()
-    }
   })
 })
 
@@ -296,7 +264,6 @@ describe('khoá nguồn', () => {
       expect(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(s), p).toBe(false)
       expect(s, p).not.toMatch(/thần thú|khiên|Võ đài|lười/i)
     }
-    expect(doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')).toMatch(/\{!laPh && duLieu\.veDich && !dangTai && \(/)
   })
 })
 
@@ -317,20 +284,6 @@ describe('NỘP TRỄ ở máy em (Điều 4 = B): thẻ "Đã qua Hạn nộp" 
     }) as KeHoachNgayMayChu
   const phu = { dsBtvn: [{ maBtvn: 'B1', maCa: 'CA-1', tenBtvn: 'Ester – Lipid', soCau: 12 }], dsMomGiao: [] as any[] }
   const baiTre = (chang_: string[], quaHan = true) => ({ ...nhan(BAI_MOT_NO), quaHan, chang: chang(chang_, ['2026-09-20', '2026-09-22', '2026-09-23'].slice(0, chang_.length)), toiNay: null })
-
-  it('máy chủ có veDich báo quaHan ⇒ "Bài đã qua Hạn nộp · em vẫn cần làm nốt 2 chặng · sẽ ghi nộp trễ", BẤM ĐƯỢC (mo_btvn "Làm nốt bài"), không "nhờ Thầy gia hạn"', () => {
-    const d = tuKeHoachNgay(keHoachTre([baiTre(['xong', 'hom_nay', 'sap_toi'])]), NOW_T, phu)
-    expect(d.quaHan[0]).toMatchObject({ loai: 'btvn', chu: 'Bài đã qua Hạn nộp · em vẫn cần làm nốt 2 chặng · sẽ ghi nộp trễ' })
-    expect(d.quaHan[0]!.hanhDong).toMatchObject({ loai: 'mo_btvn', nhanNut: 'Làm nốt bài' })
-    expect(JSON.stringify(d.quaHan[0])).not.toMatch(/nhờ Thầy gia hạn/)
-    const onHanhDong = vi.fn()
-    render(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW_T} duLieu={{ ...d, thanThu: { kieu: 'chua_biet' } } as any} onHanhDong={onHanhDong} taiVinhDanh={async () => null} />)
-    const nut = screen.getAllByRole('button').find((b) => /Đã qua Hạn nộp|qua Hạn nộp/.test(b.getAttribute('aria-label') || ''))!
-    expect(nut.getAttribute('aria-label')).toContain('sẽ ghi nộp trễ')
-    fireEvent.click(nut)
-    expect(onHanhDong).toHaveBeenCalledTimes(1)
-    expect(onHanhDong.mock.calls[0]![0]).toMatchObject({ loai: 'mo_btvn' })
-  })
   it('chặng còn lại 0 ⇒ câu "em vẫn làm và nộp được"; máy chủ CŨ (không veDich) hoặc bài KHÔNG quaHan hoặc mã khác ⇒ GIỮ chữ cũ "nhờ Thầy gia hạn" và không nút', () => {
     expect(tuKeHoachNgay(keHoachTre([baiTre(['xong', 'xong'])]), NOW_T, phu).quaHan[0]!.chu).toBe('Bài đã qua Hạn nộp · em vẫn làm và nộp được · sẽ ghi nộp trễ')
     for (const kh of [keHoachTre(undefined), keHoachTre([baiTre(['xong', 'hom_nay'], false)]), keHoachTre([{ ...baiTre(['xong', 'hom_nay']), maBtvn: 'B9' }])]) {

@@ -40,20 +40,6 @@ async function chup(trang, ten, fullPage = false) {
   }
 }
 
-async function lenDuong(t) {
-  const nut = t.getByRole('button', { name: /LÊN ĐƯỜNG/ }).first()
-  await nut.waitFor({ timeout: 30000 })
-  for (let i = 0; i < 40 && (await nut.isDisabled()); i++) await t.waitForTimeout(250)
-  await nut.click()
-  await t.getByText(/^ẢI 1\//).first().waitFor({ timeout: 20000 })
-  await t.waitForTimeout(800)
-}
-async function chotDapAn(t, chu) {
-  await t.getByRole('button', { name: chu }).first().click()
-  await t.waitForTimeout(250)
-  await t.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }).first().click()
-  await t.waitForTimeout(400)
-}
 
 /** Mỗi màn: [tên, khổ, hàm chạy]. Hàm nhận trang đã mở `?man=<tên>`. */
 /** Chụp RIÊNG một phần tử (cắt đúng khung phần tử, tự cuộn tới) — dùng khi cần ảnh gọn, chữ đọc được. JPG ≤ 150 KB như `chup`. */
@@ -87,129 +73,27 @@ async function chupVung(trang, chon, ten, cao = 760) {
 }
 const MAN = [
   ['sanh', [390, 844], async (t) => {
-    await t.waitForSelector('text=Tu luyện', { timeout: 20000 })
+    await t.waitForSelector('.ht-app', { timeout: 20000 })
     await t.waitForTimeout(1500)
-    await chup(t, 'hs-sanh-390')
-    await chup(t, 'hs-sanh-ca-trang-390', true)
+    await chup(t, 'hs-hoc-tap-390')
+    await chup(t, 'hs-hoc-tap-ca-trang-390', true)
   }],
   ['sanh-cho', [390, 844], async (t) => {
-    await t.waitForSelector('text=Tu luyện', { timeout: 20000 })
+    await t.waitForSelector('.ht-app', { timeout: 20000 })
     await t.waitForTimeout(1500)
-    await chup(t, 'hs-sanh-cho-bai-moi-ca-trang-390', true)
+    await chup(t, 'hs-hoc-tap-cho-bai-moi-ca-trang-390', true)
   }],
   // ── Đảo 2.0 thật (Dao2 + máy chủ giả qua prop call) ──
-  ['dao-chip', [390, 844], async (t) => {
-    await lenDuong(t)
-    await chup(t, 'hs-dao-cau-co-chip-chua-chac-390')
-    // Thầy 06/10 ("Nút chưa chắc … đổi màu dễ nhìn hơn, bấm chưa phản hồi"): BẬT ⇒ hổ phách + dòng trạng thái.
-    await t.getByRole('switch', { name: 'Chưa chắc' }).click()
-    await t.waitForTimeout(500)
-    await chup(t, 'hs-dao-chua-chac-bat-390')
-  }],
+
   // ĐOÀN MỘT MÌNH · Trạm hồi phục (06/10): chốt đáp án sai ⇒ thẻ Trạm dưới kết quả câu (quãng nghỉ) ⇒ "Làm 3 câu nền" ⇒ hộp câu nền phải NỔI TRÊN lớp phủ Đoàn.
-  ['doan-tram', [360, 740], async (t) => {
-    await t.locator('.dh2').first().waitFor({ timeout: 30000 })
-    await t.waitForTimeout(900)
-    await t.getByRole('button', { name: /9,6 gam/ }).first().click()
-    await t.waitForTimeout(250)
-    await t.getByRole('button', { name: /CHỐT ĐÒN ĐÁNH/ }).first().click()
-    await t.getByText('Trạm hồi phục', { exact: false }).first().waitFor({ timeout: 20000 })
-    await t.waitForTimeout(800)
-    await t.getByText('Trạm hồi phục', { exact: false }).first().scrollIntoViewIfNeeded()
-    await t.waitForTimeout(300)
-    await chup(t, 'hs-doan-tram-360')
-    await chupPhan(t, '[data-khoi="tram-hoi-phuc"]', 'hs-doan-tram-the-360')
-    await t.getByRole('button', { name: 'Làm 3 câu nền' }).first().click()
-    await t.getByRole('dialog', { name: /Luyện kiến thức nền/ }).waitFor({ timeout: 20000 })
-    await t.waitForTimeout(900)
-    await chup(t, 'hs-doan-tram-cau-nen-360')
-  }],
-  ['dao-cham', [390, 844], async (t) => {
-    await lenDuong(t)
-    await chotDapAn(t, /^B\./)
-    await t.getByRole('button', { name: /ĐÃ ĐỌC LỜI GIẢI/ }).first().waitFor({ timeout: 20000 })
-    await t.waitForTimeout(600)
-    await chup(t, 'hs-dao-dung-nhung-cham-390')
-    await t.locator('.loi-giai').first().scrollIntoViewIfNeeded()
-    await t.waitForTimeout(500)
-    await chup(t, 'hs-dao-loi-giai-trac-nghiem-390')
-  }],
-  ['dao-chac-sai', [390, 844], async (t) => {
-    await lenDuong(t)
-    await chotDapAn(t, /^C\./)
-    await t.getByRole('button', { name: /ĐÃ ĐỌC LỜI GIẢI/ }).first().waitFor({ timeout: 20000 })
-    await t.waitForTimeout(900)
-    await chup(t, 'hs-dao-chac-ma-sai-mo-loi-giai-390')
-  }],
-  ['dao-tln', [390, 844], async (t) => {
-    await lenDuong(t)
-    await t.locator('.dao2-giay input').first().fill('9,9')
-    await t.waitForTimeout(250)
-    await t.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }).first().click()
-    await t.getByRole('button', { name: /ĐÃ ĐỌC LỜI GIẢI/ }).first().waitFor({ timeout: 20000 })
-    await t.locator('.loi-giai').first().scrollIntoViewIfNeeded()
-    await t.waitForTimeout(600)
-    await chup(t, 'hs-dao-loi-giai-tra-loi-ngan-390')
-  }],
-  ['dao-tram', [390, 844], async (t) => {
-    await lenDuong(t)
-    for (let i = 1; i <= 3; i++) {
-      await chotDapAn(t, /^A\./)
-      if (i < 3) {
-        const nut = t.getByRole('button', { name: new RegExp(`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${i + 1}`) })
-        await nut.waitFor({ timeout: 20000 })
-        await nut.click()
-        await t.waitForTimeout(500)
-      }
-    }
-    await t.getByText('Trạm hồi phục', { exact: false }).first().waitFor({ timeout: 20000 })
-    await t.waitForTimeout(700)
-    await t.getByText('Trạm hồi phục', { exact: false }).first().scrollIntoViewIfNeeded()
-    await chup(t, 'hs-tram-hoi-phuc-390')
-    const lam = t.getByRole('button', { name: 'Làm 3 câu nền' })
-    if (await lam.count()) {
-      await lam.first().click()
-      await t.waitForTimeout(1200)
-      await chup(t, 'hs-tram-cau-nen-390')
-      await t.locator('.lg-nen-cau input').first().fill('0,1')
-      await t.getByRole('button', { name: 'Nộp câu này' }).first().click()
-      await t.locator('.lg-kq').first().waitFor({ timeout: 20000 })
-      await t.waitForTimeout(500)
-      await chup(t, 'hs-tram-cau-nen-loi-giai-390')
-    }
-  }],
+
+
+
+
+
   // ── CẨN THẬN (06/10): chỉ cho em `canThan` — ô "Soát lại đơn vị và số liệu" (câu Phần III) + thẻ "Em biết câu này. Sai vì bước nào?" (sau lượt chắc-mà-sai) ──
-  ...[['dt', [390, 844], '390'], ['pc', [1440, 900], '1440']].flatMap(([hau, kho, ten]) => [
-    [`dao-can-than-soat-${hau}`, kho, async (t) => {
-      await lenDuong(t)
-      await t.locator('.dao2-giay input').first().fill('9,9')
-      await t.waitForTimeout(300)
-      await t.getByRole('switch', { name: 'Soát lại đơn vị và số liệu' }).first().waitFor({ timeout: 20000 })
-      await chup(t, `hs-can-than-soat-lai-${ten}`)
-      await t.getByRole('switch', { name: 'Soát lại đơn vị và số liệu' }).first().click()
-      await t.waitForTimeout(400)
-      await chup(t, `hs-can-than-soat-lai-da-chon-${ten}`)
-    }],
-    [`dao-can-than-the-${hau}`, kho, async (t) => {
-      await lenDuong(t)
-      await chotDapAn(t, /^C\./)
-      await t.getByRole('button', { name: /ĐÃ ĐỌC LỜI GIẢI/ }).first().waitFor({ timeout: 20000 })
-      await t.getByRole('group', { name: 'Em biết câu này. Sai vì bước nào?' }).first().waitFor({ timeout: 20000 })
-      await t.waitForTimeout(900)
-      await t.getByRole('group', { name: 'Em biết câu này. Sai vì bước nào?' }).first().scrollIntoViewIfNeeded()
-      await t.waitForTimeout(300)
-      await chup(t, `hs-can-than-the-buoc-sai-${ten}`)
-      await t.getByRole('button', { name: 'Tính hiệu suất phản ứng' }).first().click()
-      await t.getByText('Đã ghi lại lựa chọn của em').first().waitFor({ timeout: 20000 })
-      await t.waitForTimeout(300)
-      await chup(t, `hs-can-than-the-buoc-sai-da-ghi-${ten}`)
-    }],
-  ]),
-  ['de-thu', [390, 844], async (t) => {
-    await t.getByRole('button', { name: 'Nộp đề thử' }).first().waitFor({ timeout: 20000 }).catch(() => {})
-    await t.waitForTimeout(1200)
-    await chup(t, 'hs-de-thu-390')
-  }],
+
+
   // ── App thầy: bảng Dạy học → bước "Bài hôm nay" (tick bài, chọn em theo điểm danh) ──
   ['gv-bai', [1440, 900], async (t) => {
     await t.getByRole('heading', { name: 'Bài hôm nay' }).first().waitFor({ timeout: 30000 })
@@ -438,6 +322,13 @@ const MAN = [
     await chup(t, 'ph-hom-nay-ca-trang-390', true)
   }],
 ]
+
+const khongCon = CHON.filter(c => !MAN.some(([ten]) => ten === c))
+if (khongCon.length) {
+  await trinh.close()
+  may.close()
+  throw Error('Không còn cảnh chụp: ' + khongCon.join(', '))
+}
 
 for (const [ten, [w, hgt], chay] of MAN) {
   if (CHON.length && !CHON.includes(ten)) continue

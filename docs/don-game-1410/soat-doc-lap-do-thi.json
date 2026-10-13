@@ -1,0 +1,16 @@
+{
+  "commit": "1048c7b5f655a836b7db557a7a4df417b4dde5e7",
+  "files": 1109,
+  "entries": [
+    "src/main.tsx",
+    "src/sw.ts",
+    "server/src/index.ts",
+    "functions/api/ca/[[path]].ts",
+    "index.html"
+  ],
+  "reachable": 1009,
+  "retired": 208,
+  "references": [],
+  "activeDeleted": [],
+  "unresolvedDynamic": []
+}

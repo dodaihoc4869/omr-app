@@ -24,6 +24,7 @@ function taoDbGia() {
       count: async () => m.size,
       clear: async () => void m.clear(),
       getAllKeys: async () => [...m.keys()],
+      getAll: async () => [...m.values()],
       delete: async (k: string) => {
         if (nen.hong) throw new Error('IDB hỏng giữa giao dịch')
         m.delete(k)
@@ -35,7 +36,8 @@ function taoDbGia() {
     }
   }
   return {
-    transaction: (ds: string[]) => {
+    transaction: (ten: string | string[]) => {
+      const ds = typeof ten === 'string' ? [ten] : ten
       // sao chép khi mở, chỉ GHI ĐÈ khi `done` — không ai `await tx.done` (do ném lỗi trước) thì coi như bị huỷ
       const lam: Kho = new Map(ds.map((t) => [t, new Map(nen.kho.get(t))]))
       return {

@@ -6,15 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, configure, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import BangTinPhuHuynh from '../src/components/BangTinPhuHuynh'
 import { boGameChoPhuHuynh, CHU_GAME_PH, khongChuGame, TEN_VIEC_LUYEN_DANG_PH, type DuLieuBangNhiemVu, type TheNhiemVu } from '../src/lib/nhiem-vu-adapter'
 
 configure({ asyncUtilTimeout: 8000 })
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-// Ảnh thú: nếu còn ai vẽ thì test thấy ngay (data-testid).
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => <div data-testid="anh-thu" /> }))
-vi.mock('../src/game/than-thu-v2/SpiritArt', () => ({ default: () => <div data-testid="anh-thu" /> }))
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const NOW = Date.parse('2026-09-21T19:00:00+07:00')
@@ -97,22 +93,6 @@ const VINH_DANH = async () => ({
   ],
 })
 
-function veBangPh(tuy: Record<string, unknown> = {}) {
-  return render(
-    <BangNhiemVu
-      vaiTro="phuhuynh"
-      hoTen="Đỗ Minh"
-      now={NOW}
-      duLieu={duLieuDayGame()}
-      taiVinhDanh={VINH_DANH}
-      onLenDuongDoan={() => {}}
-      onMoThanThu={() => {}}
-      onDoiSbd={() => {}}
-      {...(tuy as object)}
-    />,
-  )
-}
-
 beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, items: [], winners: [] }), text: async () => '{}' })))
 })
@@ -177,59 +157,6 @@ describe('boGameChoPhuHuynh — gỡ game ở DỮ LIỆU (thuần)', () => {
 })
 
 describe('CHỐT CHẶN — chữ hiển thị của MÀN PHỤ HUYNH không còn game', () => {
-  it('Bảng nhiệm vụ phụ huynh với dữ liệu ĐẦY game: 0 chuỗi cấm trong nội dung + aria-label + title + alt; 0 ảnh thú; 0 khối EXP/Đoàn/chọn thú', async () => {
-    const { container } = veBangPh()
-    await screen.findByText('Bài tập về nhà · Chặng 2')
-    // (Vinh danh KHÔNG còn ở app phụ huynh — một màn một nút, 21/09.)
-    expect(chuHienThi(container)).not.toMatch(CAM)
-    expect(screen.queryByTestId('anh-thu')).toBeNull()
-    for (const vung of ['exp', 'exp-moi', 'doan-ho-tong', 'chon-than-thu']) expect(container.querySelector(`[data-vung="${vung}"]`), vung).toBeNull()
-    expect(container.querySelector('.bnv-thu, .bnv-thu-vong, .bnv-thu-danh, .bnv-exp, .bnv-doan, .bnv-vd-thu')).toBeNull()
-  })
-
-  it('app phụ huynh một màn một nút (21/09): KHÔNG menu ba chấm; chân màn có "Đổi số báo danh", KHÔNG dòng số bản app (thầy lệnh 21/09 "Bỏ bản app"), không chữ game', async () => {
-    const { container } = veBangPh()
-    await screen.findByText('Bài tập về nhà · Chặng 2')
-    expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
-    expect(container.querySelector('.bnv-menu')).toBeNull()
-    const chan = container.querySelector('[data-vung="chan-ph"]') as HTMLElement
-    expect(chan).toBeTruthy()
-    expect(chuHienThi(chan)).not.toMatch(CAM)
-    expect(chan.querySelector('.bnv-chan-ph-ban')).toBeNull()
-    expect(chan.textContent).not.toMatch(/Bản app|Bản chạy thử/)
-    expect(chan.textContent).toContain('Đổi số báo danh')
-  })
-
-  it('việc `than_thu` hiện là "Luyện dạng con còn vấp" kèm số câu; việc bài tập về nhà và hạn nộp GIỮ nguyên', async () => {
-    const { container } = veBangPh()
-    await screen.findByText('Bài tập về nhà · Chặng 2')
-    expect(screen.getByText('Luyện dạng con còn vấp')).toBeTruthy()
-    expect(container.textContent).toMatch(/6\s*câu/)
-    expect(container.textContent).toContain('Chuỗi 5 ngày') // chuỗi ngày HỌC giữ (không phải chuỗi của game)
-    expect(container.textContent).toContain('hạn nộp 12:00 trưa mai') // cảnh báo học tập giữ, cảnh báo có chữ game bị bỏ
-    expect(container.textContent).not.toContain('sắp lên cấp')
-  })
-
-  it('"Vinh danh hôm nay" KHÔNG còn ở app phụ huynh (một màn một nút, 21/09) — học sinh vẫn có', async () => {
-    const { container } = veBangPh()
-    await screen.findByText('Bài tập về nhà · Chặng 2')
-    await new Promise((r) => setTimeout(r, 200))
-    expect(container.textContent).not.toMatch(/Vinh danh|Nguyễn M\.|9,5 điểm/)
-    expect(container.querySelector('.bnv-vd, [data-vung="vinh-danh"]')).toBeNull()
-  })
-
-  it('CẢ khi màn cha quên gỡ dữ liệu: BangNhiemVu vai phụ huynh tự gỡ (một cửa duy nhất) — cùng dữ liệu, học sinh VẪN thấy game', async () => {
-    const { container: ph } = veBangPh()
-    await screen.findByText('Bài tập về nhà · Chặng 2')
-    expect(chuHienThi(ph)).not.toMatch(CAM)
-    cleanup()
-    const hs = render(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={duLieuDayGame()} taiVinhDanh={VINH_DANH} onLenDuongDoan={() => {}} onMoThanThu={() => {}} />)
-    await screen.findByText('Bài tập về nhà · Chặng 2')
-    expect(chuHienThi(hs.container)).toMatch(/EXP/)
-    expect(chuHienThi(hs.container)).toMatch(/thần thú/i)
-    expect(hs.container.querySelector('[data-vung="exp"]')).toBeTruthy()
-    expect(hs.container.querySelector('[data-vung="doan-ho-tong"]')).toBeTruthy()
-  })
 
   it('sheet "Bảng tin của con" (BangTinPhuHuynh, phụ huynh): không ô "Thần thú của con"; học sinh (studentToken) vẫn có', async () => {
     const REPORT = {
@@ -251,18 +178,7 @@ describe('CHỐT CHẶN — chữ hiển thị của MÀN PHỤ HUYNH không cò
 })
 
 describe('khoá nguồn — các chốt `laPh` nằm đúng chỗ (đột biến bắt được)', () => {
-  const bang = doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')
-  it('BangNhiemVu: gỡ dữ liệu một cửa + vùng EXP, "Vừa nhận EXP", chọn thú đều có `!laPh`', () => {
-    expect(bang).toContain('const duLieu = useMemo(() => (laPh ? boGameChoPhuHuynh(duLieuGoc) : duLieuGoc), [laPh, duLieuGoc])')
-    expect(bang).not.toContain('boNaoPh') // thẻ lời Bộ não A.I đã gỡ 28/09
-    expect(bang).toContain("const coBaoNhan = !dangTai && !laPh && khoaNhan !== '#'")
-    expect(bang).toContain("const chuaChonThu = !dangTai && !laPh && duLieu.thanThu.kieu === 'chua_chon'")
-    expect(bang).toContain('{duLieu.exp && !laPh && (')
-    expect(bang).toContain('{!dangTai && !laPh && <TheVinhDanh') // Vinh danh chỉ ở học sinh (app PH một màn một nút, 21/09) — trước đây `hienThu={!laPh}`
-  })
   it('DauTrang: phụ huynh không vẽ khối thần thú; TheVinhDanh có `hienThu`; BangTinPhuHuynh chỉ vẽ ô Thần thú khi có studentToken', () => {
-    expect(doc('src/components/bang-nhiem-vu/DauTrang.tsx')).toContain('{laPh ? null : onMoThanThu && (co || chuaChon) ? (')
-    expect(doc('src/components/bang-nhiem-vu/TheVinhDanh.tsx')).toContain('const pet = hienThu ? PETS.findIndex((p) => p.id === w.pet) : -1')
     expect(doc('src/components/BangTinPhuHuynh.tsx')).toMatch(/\{studentToken && !tapTrungHoc && \(\s*<button[^>]*\n\s*type="button"\s*\n\s*onClick=\{\(\) => onSelectTab\?\.\('thanthu'\)\}/)
   })
   it('màn phụ huynh (ParentPortalScreen) không nhắc game trong mã hiển thị của chính nó', () => {

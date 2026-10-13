@@ -29,7 +29,8 @@ describe('mọi ô trả lời ngắn đều đi qua OSoTraLoi (30/09, trước 
     expect(src).toMatch(/<div class="lam-nhap-khoi">.*inputmode="decimal".*<\/div>/)
   })
   it('các nơi đã chuyển đang thật sự nhập và dùng OSoTraLoi', () => {
-    const NOI = ['components/TheCau.tsx', 'screens/ExamTakeScreen.tsx', 'components/bang-nhiem-vu/LamCauOn.tsx', 'components/bang-nhiem-vu/MomM3.tsx', 'screens/StudentPortalScreen.tsx', 'game/than-thu-v2/DoanCau.tsx']
+    // SỬA CÓ CHỦ ĐÍCH 14/10: bỏ duy nhất DoanCau đã gỡ; giữ quét toàn src và mọi caller học tập còn dùng.
+    const NOI = ['components/TheCau.tsx', 'screens/ExamTakeScreen.tsx', 'components/bang-nhiem-vu/LamCauOn.tsx', 'components/bang-nhiem-vu/MomM3.tsx', 'screens/StudentPortalScreen.tsx']
     for (const n of NOI) {
       const s = doc(path.join(GOC, n))
       expect(s, n).toMatch(/import OSoTraLoi from/)

@@ -1,0 +1,102 @@
+{
+  "timezone": "Asia/Saigon",
+  "not_before": "2026-10-14T00:00:00+07:00",
+  "continuation_at": "2026-10-14T00:05:00+07:00",
+  "phase": "released_verified",
+  "base": "58d34a69",
+  "teacher_priority_pr": 285,
+  "lanes": [
+    {
+      "lane": "teacher",
+      "worktree": "/workspace/toi-uu-tai-1410",
+      "result": "IDB121→1; hai caller6→3lệnh; import Hômnay gọn"
+    },
+    {
+      "lane": "student",
+      "worktree": "/workspace/toi-uu-hs-1410",
+      "result": "lịch sử/BTVN song song; đồng hồ tách riêng; nạp màn thi lúc rảnh; lỗi tự chốt lùi nhịp"
+    },
+    {
+      "lane": "parent",
+      "worktree": "/workspace/toi-uu-ph-1410",
+      "result": "9→5request; backoff/partialerror; guard đổi phiên"
+    },
+    {
+      "lane": "frontend_obsolete",
+      "worktree": "/workspace/don-game-app-1410",
+      "result": "203 tệp nguồn/46 ảnh game gỡ có đồ thị; giữ lõi học"
+    },
+    {
+      "lane": "legacy_campaign",
+      "worktree": "/workspace/toi-uu-worker-1410",
+      "result": "5 UI cũ gỡ; giữ Sửa em chờ C3; sửa tràn chip"
+    },
+    {
+      "lane": "tick",
+      "worktree": "/workspace/toi-uu-tick-1410",
+      "result": "PR285 đã sống; retry nhẹ sau tick; đặc tả/bản vẽ C3 chưa build"
+    },
+    {
+      "lane": "server",
+      "owner": "Claude",
+      "result": "PR288/289 đã sống trước nhánh này; giữ BAN_BIA/D1/chấm thi"
+    },
+    {
+      "lane": "integration_pwa",
+      "worktree": "/workspace/don-ma-sau-00-1410",
+      "result": "đã phát hành/đọc thật; SW13/13,18Chromium,full0lỗi mới"
+    }
+  ],
+  "limits": [
+    "Không xoá/ghi đè dữ liệu D1/R2 thật",
+    "Không thay luật chấm/đáp án trước nộp/ca kiểm tra",
+    "Đo cục bộ không phải số D1/mạng production",
+    "Mọi danh sách retire phải kiểm lại tham chiếu trên main mới trước xoá",
+    "Không coi Claude im lặng là đã review"
+  ],
+  "integration_branch": "codex/don-ma-sau-00-1410",
+  "teacher_priority_release": {
+    "pr": 285,
+    "commit": "58d34a699ca95511a367136bfeba4869f28ee6d3",
+    "actions": 38444623860,
+    "status": "success"
+  },
+  "report": "docs/ket-qua-toi-uu-toan-app-1410.md",
+  "integration_pr": 290,
+  "runtime_commit": "3148468b",
+  "full": {
+    "passed": 14284,
+    "failed_baseline_only": 120,
+    "pending_inherited": 27,
+    "new_failures": 0,
+    "new_failed_files": 0
+  },
+  "release": {
+    "pr": 290,
+    "commit": "1b597a082315314e6d05a5745376224a5738cf8c",
+    "actions": 38457735178,
+    "status": "success",
+    "worker_pages_same_commit": true,
+    "official_exam_counts": [
+      0,
+      0
+    ],
+    "goi7": {
+      "goi": 5,
+      "hoc_sinh": 263,
+      "cau": 609,
+      "thieu_quota": 0,
+      "thieu_nguon": 0,
+      "giu_ket_qua_da_nop": true
+    },
+    "ktcn": {
+      "lich": 772,
+      "hoc_sinh": 262,
+      "cau_min_max": [
+        28,
+        28
+      ],
+      "cho_nguon_cu_con_giu": 122
+    }
+  }
+}

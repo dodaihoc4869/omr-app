@@ -10,7 +10,6 @@ import NhanHanBaiTap from '../src/components/NhanHanBaiTap'
 import BtvnM3, { nhanHan, sapXepBtvn, type MucBtvn } from '../src/components/bang-nhiem-vu/BtvnM3'
 
 const mocks = vi.hoisted(() => ({ items: [] as any[], homework: vi.fn(), sheet: vi.fn() }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/components/BangVinhDanh', () => ({ default: () => null }))
 vi.mock('../src/components/BangTinPhuHuynh', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))

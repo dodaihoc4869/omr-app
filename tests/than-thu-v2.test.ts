@@ -8,7 +8,6 @@ import type {PrivateQuestion,Attempt,Evidence} from '../src/game/than-thu-v2/cor
 import type {Env,D1PreparedStatement} from '../server/src/kieu'
 import {gameV2,loadProfile} from '../server/src/game-v2'
 import {normalizePetName,laTenTuc,LOI_TEN_TUC} from '../src/game/than-thu-v2/pet-name'
-import {TEN_GOI_Y} from '../src/game/than-thu-v2/dao/ChonBanDongHanh'
 import {xoaMoiDem} from '../server/src/dem-chung'
 import {gameToken,gameIdentity,parentPass,parentIdentity} from '../server/src/game-v2-auth'
 import {normalizeBank,readScope,syncIndex,protectedQuestions,xoaDemCaBaoVe} from '../server/src/game-v2-bank'
@@ -199,7 +198,6 @@ describe('Đổi tên thần thú (luật tên + 3 lần/ngày)',()=>{
  it('lọc từ tục / xúc phạm không phân biệt dấu, hoa thường; không bắt nhầm tên hiền',()=>{
   for(const x of ['Địt','DIT','Lồn Con','Đéo Sợ','Óc Chó','oc cho','Đ M','VCL','Dit Me','Thằng Ngu','Buồi','Cứt'])expect(()=>normalizePetName(x),x).toThrow(LOI_TEN_TUC)
   for(const x of ['Lợn Con','Long','Bưởi','Đeo Nơ','Ngũ Hành','Con Cá Chép','Cầu Vồng','Đi Tới','Sóng Nhỏ','Lộc Non'])expect(normalizePetName(x),x).toBe(x)
-  for(const nhom of TEN_GOI_Y)for(const x of nhom)expect(laTenTuc(x),x).toBe(false)
  })
  it('máy chủ: báo lỗi thân thiện, tối đa 3 lần/ngày, chỉ đổi thần thú của chính em',async()=>{
   const f=fixture(),token=await gameToken(f.env,'1'),token2=await gameToken(f.env,'2');await gameV2(f.env,'choose',{token,pet:'nuoc_long'});await gameV2(f.env,'choose',{token:token2,pet:'nuoc_long'})

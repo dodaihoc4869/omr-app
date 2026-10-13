@@ -25,15 +25,15 @@
  "taiApp": {
   "giao-vien": {
    "tep": 17,
-   "gzip": 275064
+   "gzip": 270358
   },
   "hoc-sinh": {
    "tep": 47,
-   "gzip": 338686
+   "gzip": 329897
   },
   "phu-huynh": {
-   "tep": 27,
-   "gzip": 272461
+   "tep": 24,
+   "gzip": 265273
   }
  }
 }

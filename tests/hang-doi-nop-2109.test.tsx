@@ -293,11 +293,7 @@ describe('khoá nguồn', () => {
     expect(sp).not.toMatch(/hangNop\.them\([^)]*token/)
     expect(doc('src/lib/hang-doi-nop.ts')).toMatch(/Không chứa token/)
   })
-  it('Bảng nhiệm vụ: dải chờ nộp dùng CÙNG chữ chuDangCho, role=status, chỉ khi có việc; không màu thô', () => {
-    const b = doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')
-    expect(b).toMatch(/dangChoNop > 0 && \(/)
-    expect(b).toMatch(/data-vung="dang-cho-nop"/)
-    expect(b).toMatch(/chuDangCho\(dangChoNop\)/)
+  it('kho chờ nộp giữ nguyên khoá lưu qua lần nâng cấp giao diện', () => {
     expect(KHOA_LUU_HANG).toBe('omr_hang_doi_nop_v1')
   })
 })

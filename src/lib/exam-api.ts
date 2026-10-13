@@ -878,18 +878,23 @@ async function vaoThiQuaMayChuMoi(
   let bank: PublicExamBank | undefined
   if (canBank) {
     if (!r.deUrl) throw new Error('Ca này chưa được phát đề — báo Thầy bấm lại "Bắt đầu thi".')
-    let res: Response
-    try {
-      res = await fetch(`${ch.URL}${r.deUrl}`)
-    } catch {
-      throw new Error('Không tải được đề — kiểm tra mạng rồi bấm Vào thi lại.')
+    const bo = new AbortController()
+    let res: Response | undefined
+    const huy = () => {
+      if (bo.signal.aborted) return
+      bo.abort()
+      try { void res?.body?.cancel().catch(() => {}) } catch { /* Reader đang khóa: signal đã hủy fetch/body. */ }
     }
-    if (!res.ok) throw new Error(`Không tải được đề (máy chủ trả ${res.status}) — bấm Vào thi lại, vẫn lỗi thì báo Thầy.`)
     try {
-      bank = (await res.json()) as PublicExamBank
-    } catch {
-      throw new Error('Gói đề tải về bị hỏng — báo Thầy đẩy lại đề cho ca này.')
-    }
+      // Header đã về chưa phải tải xong: giữ hạn cho tới hết JSON, kể cả khi browser bỏ qua abort.
+      bank = await voiHanCho((async () => {
+        try { res = await fetch(`${ch.URL}${r.deUrl}`, { signal: bo.signal }) }
+        catch { throw new Error('Không tải được đề — kiểm tra mạng rồi bấm Vào thi lại.') }
+        if (!res.ok) throw new Error(`Không tải được đề (máy chủ trả ${res.status}) — bấm Vào thi lại, vẫn lỗi thì báo Thầy.`)
+        try { return (await res.json()) as PublicExamBank }
+        catch { throw new Error('Gói đề tải về bị hỏng — báo Thầy đẩy lại đề cho ca này.') }
+      })(), HAN_GIAY * 1000, 'Tải đề quá lâu — kiểm tra mạng rồi bấm Vào thi lại, vẫn lỗi thì báo Thầy.', huy)
+    } catch (e) { huy(); throw e }
     if (!bank) throw new Error('Gói đề rỗng — báo Thầy đẩy lại đề cho ca này.')
     // Ảnh đề nằm ở kho ảnh máy chủ (01/10, mở ca nhanh): tải sẵn ngay, mất mạng giữa bài vẫn thấy ảnh.
     taiSanAnhDe(bank)

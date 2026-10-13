@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 const db = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn() }))
-vi.mock('idb', () => ({ openDB: async () => db }))
+vi.mock('idb', () => ({ openDB: async () => ({ ...db, transaction: (table: string) => ({ store: { get: (key: string) => db.get(table, key) }, done: Promise.resolve(), abort() {} }) }) }))
 
 const URL_CHUNG = 'https://omr.ttadodaihoc.workers.dev'
 const treo = () => new Promise<never>(() => {})

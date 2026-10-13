@@ -1,46 +1,12 @@
 // Giao chiến dịch (thầy 28/09; bản vẽ docs/ban-ve-gv-2809 GV-GiaoChienDich): ô chọn em nhiều tầng Khối › Lớp › Em, cây Kho đề, số câu đồng bộ, cột tóm tắt.
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 
-const { goi } = vi.hoisted(() => ({ goi: vi.fn() }))
-vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
-const cauI = (ma: string, n: number) => Array.from({ length: n }, (_, i) => ({ id: `${ma}-I-${i + 1}`, text: `Câu ${ma} ${i + 1}`, choices: ['a', 'b', 'c', 'd'] }))
-vi.mock('../src/lib/exam-db', () => ({
-  loadExamSources: async () => [
-    // DE-A có 2 phần ⇒ tách thành DE-A-TN, DE-A-DS như màn Mở ca. DE-B TRÙNG HẾT câu phần I của DE-A ⇒ trước đây bị khử trùng mất khỏi cây.
-    { maDe: 'DE-A', nhom: 'C2', phanI: cauI('A', 3), phanII: [{ id: 'A-II-1', text: 'Đúng sai A', ideas: ['a', 'b', 'c', 'd'] }], phanIII: [] },
-    { maDe: 'DE-B', nhom: 'C2', phanI: cauI('A', 3), phanII: [], phanIII: [] },
-  ],
-}))
+// SỬA CÓ CHỦ ĐÍCH 14/10: kiểm chooser dùng chung trực tiếp sau khi gỡ màn giao chiến dịch cũ.
+import { useState } from 'react'
+import ChonEmGiao, { khoiCuaLop, nhomDaChon } from '../src/components/chien-dich/ChonEmGiao'
 
-import GiaoChienDich from '../src/components/chien-dich/GiaoChienDich'
-import { khoiCuaLop, nhomDaChon } from '../src/components/chien-dich/ChonEmGiao'
-import { useAppStore } from '../src/store/appStore'
-
-const NOW = Date.UTC(2026, 8, 27, 3, 0, 0)
-const lenh = (action: string) => goi.mock.calls.filter(([, b]) => b.action === action).map(([, b]) => b as Record<string, unknown>)
-const EM = [
-  { sbd: '1101', hoTen: 'An', lop: '11A1', sdt: '', namSinh: '' },
-  { sbd: '1102', hoTen: 'Bình', lop: '11A1', sdt: '', namSinh: '' },
-  { sbd: '1103', hoTen: 'Chi', lop: '11A2', sdt: '', namSinh: '' },
-  { sbd: '1201', hoTen: 'Dũng', lop: '12A1', sdt: '', namSinh: '' },
-]
-
-beforeEach(() => {
-  goi.mockReset()
-  goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
-    if (b.action === 'suc-chua') {
-      const sbd = (b.sbd as string[] | undefined) ?? []
-      return { ok: true, du: { ok: true, soCau: 170, soCauTheoTo: { 'DE-A-TN': 120, 'DE-A-DS': 50 }, soEm: sbd.length || 91, D: 8, sucChua: 320, khoiLuongTrungVi: 340, tachGiua: { cauMoi: 170, luotOn: 0 }, tiLe: 1.0625, muc: 'do', soEmQuaTai: sbd.length || 91, goiY: null } }
-    }
-    return { ok: false, loai: 'tu_choi', chu: 'lệnh lạ' }
-  })
-  useAppStore.setState({ classList: EM } as never)
-})
-afterEach(() => {
-  cleanup()
-  useAppStore.setState({ classList: [] } as never)
-})
+afterEach(cleanup)
 
 const EM_MAY_CHU = [
   { sbd: '1101', hoTen: 'An', khoi: '11', tenLop: '11' },
@@ -49,11 +15,12 @@ const EM_MAY_CHU = [
   { sbd: '1202', hoTen: 'Hà', khoi: '12', tenLop: '12 - Tinh Hoa' },
   { sbd: '1203', hoTen: 'Giang', khoi: '12', tenLop: '12 - Lớp Thường' },
 ]
-const coMayChu = () => {
-  const cu = goi.getMockImplementation()!
-  goi.mockImplementation(async (d: string, b: Record<string, unknown>) => (b.action === 'ds-em' ? { ok: true, du: { ok: true, em: EM_MAY_CHU } } : cu(d, b)))
+let chonCu: string[] = []
+function BoChon() {
+  const [chon, setChon] = useState<Set<string>>(new Set())
+  return <ChonEmGiao ds={EM_MAY_CHU} chon={chon} onDoi={(s) => { chonCu = [...s].sort(); setChon(s) }} />
 }
-const cuoi = () => lenh('suc-chua').at(-1) as Record<string, unknown>
+const cuoi = () => ({ sbd: chonCu })
 const moChon = async () => fireEvent.click(await screen.findByRole('button', { name: 'Chọn em' }))
 
 describe('ô chọn em nhiều tầng Khối › Lớp › Em (bản vẽ 28/09) — danh sách từ máy chủ, có lớp đã phân', () => {
@@ -71,29 +38,25 @@ describe('ô chọn em nhiều tầng Khối › Lớp › Em (bản vẽ 28/09)
       ['l:12 - Tinh Hoa', 2, 2],
     ])
   })
-  it('tích "Khối 12" trong tấm ⇒ chọn cả 3 em, thẻ "Khối 12 · 3 em"; bỏ tích ⇒ 0 em, nút giao tắt', async () => {
-    useAppStore.setState({ classList: [] } as never)
-    coMayChu()
-    render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
+  it('tích "Khối 12" trong tấm ⇒ chọn cả 3 em, thẻ "Khối 12 · 3 em"; bỏ tích ⇒ 0 em', async () => {
+    render(<BoChon />)
     await moChon()
     expect(screen.getByRole('button', { name: 'Đóng' }).getAttribute('aria-expanded')).toBe('true')
     fireEvent.click(screen.getByRole('checkbox', { name: 'Khối 12 · 0/3 em' }))
-    await waitFor(() => expect(cuoi()).toMatchObject({ lop: 'Khối 12', sbd: ['1201', '1202', '1203'] }))
+    await waitFor(() => expect(cuoi()).toMatchObject({ sbd: ['1201', '1202', '1203'] }))
     expect(screen.getByText(/Đã chọn 3\/5 em/)).toBeTruthy()
     expect(document.querySelector('[data-nhom="k:12"]')?.textContent).toContain('Khối 12 · 3 em')
     fireEvent.click(screen.getByRole('checkbox', { name: 'Khối 12 · 3/3 em' }))
     expect(screen.getByText('Chưa chọn em nào')).toBeTruthy()
-    await waitFor(() => expect((screen.getByRole('button', { name: /Giao chiến dịch cho/ }) as HTMLButtonElement).disabled).toBe(true))
+    expect(cuoi()).toEqual({ sbd: [] })
   })
   it('mở nhánh Khối 12, tích lớp "12 - Tinh Hoa" ⇒ đúng 2 em; ô Khối 12 thành "một phần" 2/3; thẻ × bỏ cả lớp', async () => {
-    useAppStore.setState({ classList: [] } as never)
-    coMayChu()
-    render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
+    render(<BoChon />)
     await moChon()
     expect(screen.queryByRole('checkbox', { name: /12 - Tinh Hoa/ })).toBeNull() // nhánh gập sẵn
     fireEvent.click(screen.getByRole('button', { name: 'Mở Khối 12' }))
     fireEvent.click(screen.getByRole('checkbox', { name: '12 - Tinh Hoa · 0/2 em' }))
-    await waitFor(() => expect(cuoi()).toMatchObject({ lop: '12 - Tinh Hoa', sbd: ['1201', '1202'] }))
+    await waitFor(() => expect(cuoi()).toMatchObject({ sbd: ['1201', '1202'] }))
     const khoi12 = screen.getByRole('checkbox', { name: 'Khối 12 · 2/3 em' }) as HTMLInputElement
     expect(khoi12.checked).toBe(false)
     expect(khoi12.indeterminate).toBe(true)
@@ -102,9 +65,7 @@ describe('ô chọn em nhiều tầng Khối › Lớp › Em (bản vẽ 28/09)
     expect(screen.getByText('Chưa chọn em nào')).toBeTruthy()
   })
   it('từng em: mở tới lớp để tích một em; ô tìm không dấu ("binh"); "Chọn hết" / "Bỏ chọn hết" chỉ áp cho em đang khớp', async () => {
-    useAppStore.setState({ classList: [] } as never)
-    coMayChu()
-    render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
+    render(<BoChon />)
     await moChon()
     fireEvent.click(screen.getByRole('button', { name: 'Mở Khối 12' }))
     fireEvent.click(screen.getByRole('button', { name: 'Mở 12 - Lớp Thường' }))
@@ -121,9 +82,7 @@ describe('ô chọn em nhiều tầng Khối › Lớp › Em (bản vẽ 28/09)
     await waitFor(() => expect(cuoi()).toMatchObject({ sbd: ['1203'] }))
   })
   it('Esc và "Xong" đóng tấm, tiêu điểm về nút mở', async () => {
-    useAppStore.setState({ classList: [] } as never)
-    coMayChu()
-    render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
+    render(<BoChon />)
     await moChon()
     expect(screen.getByRole('dialog', { name: 'Chọn em nhận chiến dịch' })).toBeTruthy()
     fireEvent.keyDown(document, { key: 'Escape' })
@@ -132,55 +91,5 @@ describe('ô chọn em nhiều tầng Khối › Lớp › Em (bản vẽ 28/09)
     await moChon()
     fireEvent.click(screen.getByRole('button', { name: 'Xong' }))
     expect(screen.queryByRole('dialog', { name: 'Chọn em nhận chiến dịch' })).toBeNull()
-  })
-  it('ca vừa kiểm tra lớp "12" ⇒ tích sẵn cả khối 12 (thẻ "Khối 12 · 3 em")', async () => {
-    useAppStore.setState({ classList: [] } as never)
-    coMayChu()
-    render(<GiaoChienDich maDeCa={['DE-A-TN']} lop="12" nowMs={NOW} />)
-    await waitFor(() => expect(document.querySelector('[data-nhom="k:12"]')?.textContent).toContain('Khối 12 · 3 em'))
-    await waitFor(() => expect(cuoi()).toMatchObject({ lop: 'Khối 12', sbd: ['1201', '1202', '1203'] }))
-  })
-  it('máy chủ không trả danh sách ⇒ dùng danh sách trên máy (lớp của classList)', async () => {
-    render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
-    await moChon()
-    fireEvent.click(screen.getByRole('button', { name: 'Mở Khối 11' }))
-    fireEvent.click(screen.getByRole('checkbox', { name: '11A1 · 0/2 em' }))
-    await waitFor(() => expect(cuoi()).toMatchObject({ lop: '11A1', sbd: ['1101', '1102'] }))
-  })
-})
-
-describe('giao chiến dịch — kho đề đủ và số câu đồng bộ', () => {
-  it('cây Kho đề (hiện ngay khi giao mới) có ĐỦ tờ, kể cả tờ trùng hết câu với tờ khác, tách theo phần như màn Mở ca; không có "Rút còn"', async () => {
-    render(<GiaoChienDich nowMs={NOW} />)
-    const cay = await screen.findByRole('tree', { name: 'Cây chọn đề' })
-    // Mở hết các nhánh của cây (cây gập sẵn) rồi mới đọc.
-    await waitFor(() => expect(within(cay).queryAllByRole('button', { name: /^Mở / }).length).toBeGreaterThan(0))
-    for (let i = 0; i < 10; i++) {
-      const nut = within(cay).queryAllByRole('button', { name: /^Mở / })
-      if (!nut.length) break
-      nut.forEach((b) => fireEvent.click(b))
-    }
-    expect(cay.textContent).toContain('DE-B')
-    expect(cay.textContent).toMatch(/DE-A-TN|Trắc nghiệm/)
-    expect(cay.textContent).toMatch(/DE-A-DS|Đúng sai/)
-    expect(screen.queryByText(/chưa có Kho đề/)).toBeNull()
-    expect(screen.queryByText(/Rút còn/)).toBeNull()
-  })
-  it('số câu cạnh từng tờ lấy từ máy chủ (cộng = tổng); khối lượng ghi rõ câu mới × 2 lượt, lượt/ngày, x/y em quá tải; tóm tắt đủ dòng', async () => {
-    useAppStore.setState({ classList: [] } as never)
-    render(<GiaoChienDich maDeCa={['DE-A-TN', 'DE-A-DS']} lop="11" nowMs={NOW} />)
-    await screen.findByText('106%')
-    expect(screen.getByRole('checkbox', { name: /DE-A-TN · 120 câu/ })).toBeTruthy()
-    expect(screen.getByRole('checkbox', { name: /DE-A-DS · 50 câu/ })).toBeTruthy()
-    expect(screen.getByText(/Tổng 170 câu/)).toBeTruthy()
-    const dh = document.querySelector('[data-khoi="dong-ho-suc-chua"]')!
-    expect(dh.textContent).toContain('Khối lượng so với thời gian còn lại')
-    expect(dh.textContent).toContain('Em ở giữa lớp cần khoảng 340 lượt (170 câu mới × 2 lượt) · có 8 ngày × 40 lượt/ngày = 320 lượt.')
-    expect(dh.textContent).toContain('91/91 em quá tải.')
-    expect(lenh('suc-chua').at(-1)).toMatchObject({ lop: '11' })
-    expect(lenh('suc-chua').at(-1)!.sbd).toBeUndefined()
-    const tt = document.querySelector('[data-khoi="tom-tat-giao"]') as HTMLElement
-    for (const chu of ['Tờ đề', 'Số câu170 câu', 'Giao cho', 'Hạn nộp', 'Lượt câu mỗi ngày', 'Khối lượng106% · quá tải', 'Dự kiến', 'Em dự kiến quá tải91 / 91 em'])
-      expect(tt.textContent).toContain(chu)
   })
 })

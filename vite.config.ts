@@ -193,7 +193,8 @@ export default defineConfig({
           // Khung mở sau khi lấy lời giải từ máy chủ; mảnh này dùng kho chạy-lúc hiện có.
           '**/{KhungLoiGiai,ThanhThangGo}-*.js',
           // Kiểm tra riêng cần máy chủ để mở chặng/lưu giờ: chỉ tải khi đến lịch, cất ở kho chạy-lúc.
-          '**/{ManKiemTraCaNhan,TheKiemTraCaNhan,TheKiemTraCon,kiem-tra-ca-nhan}-*.{js,css}',
+          '**/{ManKiemTraCaNhan,TheKiemTraCaNhan,TheKiemTraCon}-*.{js,css}',
+          '**/kiem-tra-ca-nhan-*.css',
           '**/LuyenDeChuan-*.{js,css}',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
         '**/{ChuyenBay,BanNguyenTo}-*.{js,css}',
@@ -206,17 +207,14 @@ export default defineConfig({
           // Hỏi thầy ở mọi câu (13/10): hộp hỏi Thầy, khung lời giải, nút chữa từng bước, nghe nút phiếu — mảnh nạp khi em bấm (NutHoiThay
           // lazy) + ba mảnh nhỏ chỉ các mảnh ấy / game / màn chữa (đều ngoài precache) nạp tĩnh ⇒ kho chạy-lúc, precache không phình.
           '**/{HopHoiThay,KhungLoiGiai,NutChuaTungBuoc,NgheHoiThayPhieu,ThanhThangGo,chi-so-ro,trong-man-chua}-*.{js,css}',
-          '**/Spirit3D-*.js',
           // Bảng tin sàn của thầy: bản đồ lớp 3D nạp LƯỜI (import động) — three (≈ 536 KB) chỉ máy thầy tải khi mở màn Hôm nay; máy học sinh / phụ huynh KHÔNG được cất vào bộ nhớ đệm.
           '**/ban-do-3d-three-*.js',
-          '**/{BanGoNutThatScreen,CaiDatScreen,TongQuanScreen,ChienDichScreen,DuyetLoiGiaiScreen,gv-hoa2,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu,Dao2,DoanHinh,chien-dich,ca-chot-chien-dich,CauDaLam,em-toan-canh,ho-so-em-thay}-*.{js,css}',
+          '**/{BanGoNutThatScreen,CaiDatScreen,ChienDichScreen,DuyetLoiGiaiScreen,gv-hoa2,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,html-may-chieu,chien-dich,ca-chot-chien-dich,CauDaLam,em-toan-canh,ho-so-em-thay}-*.{js,css}',
           // Lịch sử ca + báo cáo chi tiết bản mới của em (28/09): mảnh nạp LƯỜI khi em bấm thẻ "Ca kiểm tra gần nhất" / "Xem báo cáo" (đang có mạng) — kho chạy-lúc.
           '**/{LichSuCaEm,BaoCaoCaCuaEm,BaoCaoChiTiet,CauCanChua,ca-thi,cau-da-lam,cau-chuyen}-*.{js,css}',
-          // Game Hóa 2.0 (27/09): hình vẽ 32 phụ kiện thần thú (nạp lười trong game) — chỉ máy mở game mới tải, cất ở kho chạy-lúc.
-          '**/pk-{cl,da,hq,vd}-*.js',
           // Gộp ngang + app thầy 2.0 (28/09): các mảnh nạp LƯỜI chỉ của app thầy (giao/chiếu chiến dịch, bố cục tờ chiếu) và của game
           // (cửa hàng phụ kiện, lọc câu theo khối) ra kho chạy-lúc — giữ precache vỏ ≤ 2850 KB (chừa ≥ 150 KB dưới trần 3000 KB).
-          '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau,DieuKhienToChieuScreen,ModalDieuKhienTuXa,btvn-nang-do-thay}-*.{js,css}',
+          '**/{LenBangChienDich,bo-cuc-to-chieu,DieuKhienToChieuScreen,ModalDieuKhienTuXa,btvn-nang-do-thay}-*.{js,css}',
           // Bảng Dạy học (28/09): tấm Chiếu mã (vào thi + điểm danh) nay là mảnh dùng chung của 4 màn thầy (Mở ca, Theo dõi ca, phòng chờ, Lên bảng — đều ngoài precache) ⇒ kho chạy-lúc.
           '**/TamPhuChieuMa-*.{js,css}',
           // Điểm danh 12/10C (bản vẽ GV-DiemDanh): bước Điểm danh dùng chung (`DiemDanhBuoi` — chỉ năm màn thầy nhập, đều ngoài precache) + hai bản chiếu
@@ -244,13 +242,17 @@ export default defineConfig({
           // (tải nguồn, rút, chấm), mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc. Không ép vào precache vỏ (trần 3000 KB).
           '**/{ManTuLuyen,LuyenDeCauTruc}-*.{js,css}',
           // Vòng chữa chỉ phát/chấm câu qua máy chủ: tải khung khi em mở, rồi giữ bằng kho chạy-lúc.
-          // Bộ rút phiếu chữa cũng chỉ dùng khi mở phiếu/bảng/PDF; không làm nặng lượt cài 3 cổng.
-          '**/{ManChuaCauSai,chua-cau-sai,chua-cau-sai-thay-api,rut-de-chua,ThanhSoCauChua}-*.{js,css}',
+          // rut-de-chua được App nhập tĩnh: phải cất sẵn để GV/PH khởi động khi mất mạng.
+          '**/{ManChuaCauSai,chua-cau-sai-thay-api,ThanhSoCauChua}-*.{js,css}',
+          // Chỉ CSS/mảnh đúng tên, tránh loại cả chua-cau-sai-api mà cổng học sinh nhập tĩnh.
+          '**/chua-cau-sai-????????.{js,css}',
+          // Hai bộ xử lý chỉ của các màn thầy nạp lười; không thuộc đóng khởi động ba cổng.
+          '**/{ca-dang-chay,bai-dang-giao-thay-doi}-*.js',
           // Màn làm bài NGANG: từ 01/10 VÀO precache (≈ 47 KB) — ngoài precache thì máy còn bản cũ sau một lượt phát hành, hay mạng yếu lúc xoay,
           // nạp mảnh hỏng và em kẹt bố cục dọc (thầy báo "xoay ngang không hoạt động").
           // Bù chỗ cho mảnh ngang (giữ trần 3000 KB): ba mảnh CHỈ màn thầy nhập (Tổng quan/Chiến dịch, Cài đặt/Học sinh, Giao/Sửa chiến dịch —
           // các màn đó đã ngoài precache) ra kho chạy-lúc.
-          '**/{DsChienDichDaGiao,NutDongBoDanhSach,nguon-giao}-*.{js,css}',
+          '**/{NutDongBoDanhSach,nguon-giao}-*.{js,css}',
           // 01/10 (bài bổ sung + ảnh trong ô phương án làm vỏ nhích ~2 KB qua trần): màn Chi tiết ca của app phụ huynh nạp LƯỜI
           // (`lazy` trong AppPhuHuynh) và luôn cần mạng để tải ca ⇒ kho chạy-lúc (≈ 8 KB).
           '**/ManChiTietCa-*.{js,css}',
@@ -282,10 +284,11 @@ export default defineConfig({
           '**/{GvHomNayScreen,TheCanThayChua,TheBaiDaDay,DayHocLenBang,KiemTraDauGio,CauCanChuaTrenLop,TheCauHienThi,gv-v2,HopChonDe,cay-chon-de}-*.{js,css}',
           // Hành trình › Nhịp học + tấm Lịch sử làm câu của một em (thầy 09/10 khuya): CHỈ màn thầy nạp lười (thẻ Nhịp học ⇒ bấm một em), lệnh
           // `/gv/lich-su-lam-cau` cần mạng ⇒ kho chạy-lúc, không cất sẵn.
-          '**/{TheNhipHoc,HoSoLamCauEm,lich-su-lam-cau-api,nhip-hanh-trinh}-*.{js,css}',
+          '**/{TheNhipHoc,HoSoLamCauEm,nhip-hanh-trinh}-*.{js,css}',
           // Hành trình › Bài hằng ngày + hồ sơ thái độ (thầy 12/10): CHỈ màn thầy nạp lười, lệnh `/gv/bai-hang-ngay` · `/gv/ho-so-thai-do` cần mạng
           // ⇒ kho chạy-lúc, không cất sẵn.
-          '**/{TheBaiHangNgay,bai-hang-ngay-api,bai-hang-ngay-ui,bai-hang-ngay}-*.{js,css}',
+          '**/{TheBaiHangNgay,bai-hang-ngay-ui}-*.{js,css}',
+          '**/bai-hang-ngay-????????.{js,css}',
           // Hồ sơ làm bài CỦA EM (app học sinh, 12/10F): mảnh nạp LƯỜI khi em bấm bảng Nhịp học (bọc tấm `HoSoLamCauEm` + gv-v2 — đều ngoài precache),
           // lệnh `/hs/ho-so-thai-do` · `/hs/lich-su-lam-cau` cần mạng ⇒ kho chạy-lúc, không làm nặng precache vỏ học sinh.
           '**/{HoSoCuaEmHs,ho-so-em-hs-api}-*.{js,css}',

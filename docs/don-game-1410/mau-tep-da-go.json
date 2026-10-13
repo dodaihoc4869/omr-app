@@ -1,0 +1,841 @@
+{
+  "base": "888c34d4",
+  "evidence": [
+    "C1-kiem-ke.json",
+    "C2-do-thi.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/NutToanManHinh.tsx",
+      "sha256": "384060e67caa2113d25e83d0c20f16cab4afab55ed5aa407143cadddca299090"
+    },
+    {
+      "path": "src/components/ban-duyet-v2/SanhHomNay.tsx",
+      "sha256": "aacad363cb42eda8fc47eaeed2357b9d05e34e1ffdbefe1666b01946795a35b7"
+    },
+    {
+      "path": "src/components/ban-duyet-v2/SanhV2.tsx",
+      "sha256": "c3af47bb67426be0aa75b24279b1903c20e9deec191b53cecceecabfe51ea99f"
+    },
+    {
+      "path": "src/components/ban-duyet-v2/sanh-v2.css",
+      "sha256": "ed61c2c751f7ffcba1cd9bf6b0565e734045efd60b4d35e3590d0455bd6d5184"
+    },
+    {
+      "path": "src/components/bang-nhiem-vu/BangNhiemVu.tsx",
+      "sha256": "4bbc54ca57b689cd79a370fec856fb4ec938f21c8192c59ae6d67831396e23b1"
+    },
+    {
+      "path": "src/components/bang-nhiem-vu/DauTrang.tsx",
+      "sha256": "27e0f8e242dcbcd4bc5e48d46241e7cd81ec38ed9a8db4f58cb7e0e2fffaa568"
+    },
+    {
+      "path": "src/components/bang-nhiem-vu/NenDong.css",
+      "sha256": "f34a839a07924554e7dd4db058748a2c9375813878c1904c4a50b175681caa33"
+    },
+    {
+      "path": "src/components/bang-nhiem-vu/TheVinhDanh.tsx",
+      "sha256": "415d3decf42d88718af6947934cb5ff05b4d478f25d79f25e5004838e5bb1d0a"
+    },
+    {
+      "path": "src/components/bang-nhiem-vu/bang-nhiem-vu.css",
+      "sha256": "a635091c3e57a616927b6ba8169a1a4403e3eb6a12252bae4497aa54ab0671d7"
+    },
+    {
+      "path": "src/components/bang-nhiem-vu/muc-menu.tsx",
+      "sha256": "2a61acef807b05d5946e5f6ef13023d5164623090ce11417334777e9386003ea"
+    },
+    {
+      "path": "src/components/bat-linh/BanDoHanhTrinh.tsx",
+      "sha256": "3e2cf3819dca641cb315a63aee3b6e69f93b6512ef0e5375c63886015bfcab91"
+    },
+    {
+      "path": "src/components/bat-linh/DongHanh.tsx",
+      "sha256": "976abb0ccd1260948a6b39fbaf9666dacc09892ecdfc990e0ca98f3f62d55962"
+    },
+    {
+      "path": "src/components/bat-linh/ban-do-hanh-trinh.css",
+      "sha256": "4b34f1e954a40f6436e9ca579fd984450e9fe392d9a6fdfe092ffcd5191e03b6"
+    },
+    {
+      "path": "src/components/bat-linh/game-toan-bo.css",
+      "sha256": "5a2750f569d691f4fbec74a51cee11f485b5ebaf44a0ccdea9cdcad76600c917"
+    },
+    {
+      "path": "src/components/chien-dich/CongTacBia.tsx",
+      "sha256": "c1ef65d8afde411ac571c05852b14e6da176fcb671eb3b44feab09579f2dd77b"
+    },
+    {
+      "path": "src/components/chien-dich/DongHoSucChua.tsx",
+      "sha256": "458d6a3e7196134cdd9a37bdd96a3b3222547caf3e8a9f7c661d5ccce2443203"
+    },
+    {
+      "path": "src/components/chien-dich/DsChienDichDaGiao.tsx",
+      "sha256": "2c67896048fbfdc68f383fa1e661805ccfbb39383a6524fd0cafcba4a742ad3c"
+    },
+    {
+      "path": "src/components/chien-dich/GiaoChienDich.tsx",
+      "sha256": "06556f286302d18ddb5cc885de293189f369eb555c6e87e825796c28c584d31f"
+    },
+    {
+      "path": "src/components/chien-dich/NutGiaoTheoBai.tsx",
+      "sha256": "531d4a665a169284dc25a3011fb67c47befc383c438e08f027f3868819d53020"
+    },
+    {
+      "path": "src/components/hoa2/CanhSanh3D.tsx",
+      "sha256": "410aa546c637fc8d6e60041c6506c44d6f545336894c0bc7fe40c13180b7b3b2"
+    },
+    {
+      "path": "src/components/hoa2/HopDoiTen.tsx",
+      "sha256": "0f066cb12ab7c1cdf3779df60ad329ccffb416086dd6daad00435846c523a9f7"
+    },
+    {
+      "path": "src/components/hoa2/SanhBanDo.tsx",
+      "sha256": "93df85d83bd60d75b987871979daae042c422b645614664a66dae88e5125d473"
+    },
+    {
+      "path": "src/components/hoa2/hieu-ung-sanh.ts",
+      "sha256": "bc77243be28fadc7d0200e41e0cd862a1720a857e9e680d2165f8a4d9721fb01"
+    },
+    {
+      "path": "src/components/hoa2/phong-baloo.ts",
+      "sha256": "b53e67a8a630403867ede239a9fef29e0fe453f26c4895c7bd036470a57f2795"
+    },
+    {
+      "path": "src/components/hoa2/sanh-ban-do.css",
+      "sha256": "f66ff91bd9dd356d20c683a6fd45e7eff8ef31344d91ff299f20aaf9bc34fb38"
+    },
+    {
+      "path": "src/components/nut-toan-man-hinh.css",
+      "sha256": "4d6881e1baae689f6820312f40e05655f2bd67b2f58d29b04cbb9033339bc4a2"
+    },
+    {
+      "path": "src/components/useToanManHinhGame.ts",
+      "sha256": "aef1351071b8fee0d4f1793da512c7aa755842474dda66f98fc3cc5104cf1962"
+    },
+    {
+      "path": "src/components/xem-thu/phu-kien.html",
+      "sha256": "f19cc456dc7412056d1aaab59a94c1c52cd09cccc161dd45769973646d41b95a"
+    },
+    {
+      "path": "src/components/xem-thu/phu-kien.tsx",
+      "sha256": "0a68e75a412b3864f1950f4242f50489392ec01e2a05a416123dd09d68e8732d"
+    },
+    {
+      "path": "src/game/bi-a/BanOnline.tsx",
+      "sha256": "95ba46db472be45e1b5edb99f80bd8456b78439fbd24acd6e729793d9fc9cd8b"
+    },
+    {
+      "path": "src/game/bi-a/BiaGame.tsx",
+      "sha256": "7997e72c42cbbb35cb34f6c5a5cb84108643dda0e0de7ce1ba448751942f8cc5"
+    },
+    {
+      "path": "src/game/bi-a/DieuKhienBia.tsx",
+      "sha256": "8bcfb7e37431347ad7ad3f2ecc578373899163db73b18d0f785701adb1c10f21"
+    },
+    {
+      "path": "src/game/bi-a/ManChoi.tsx",
+      "sha256": "2ba37ba33c78a3abe8570d2e8a7604045e85d96edb69fc04e3157714dec9af44"
+    },
+    {
+      "path": "src/game/bi-a/PhongCho.tsx",
+      "sha256": "fcb65cdd06fc25b8a54414e6c98ce2b3efe26285c62a7782c80f7f370f2ab183"
+    },
+    {
+      "path": "src/game/bi-a/TamCauBia.tsx",
+      "sha256": "1cdd3028e8c76e1be105437f688a91bc0ea127325fe46677dad94fe9032f13c8"
+    },
+    {
+      "path": "src/game/bi-a/TraLoiCau.tsx",
+      "sha256": "a1d45b27e025ad38cdc5ecdc580a72d393b710d19fc924eec1d7071654b732b1"
+    },
+    {
+      "path": "src/game/bi-a/XemLaiCauSai.tsx",
+      "sha256": "684555b6e9cadcd4e80468d7369ae7ed2bf72ece32b5748c5665391bfea4cba0"
+    },
+    {
+      "path": "src/game/bi-a/ai.ts",
+      "sha256": "3f98b2cbb5de7220ddb8ba929554dca56068118895895d6d4f4cf4c4c601ab4b"
+    },
+    {
+      "path": "src/game/bi-a/am-thanh.ts",
+      "sha256": "3e0e01162ee083dde265e725916f9d5ed598924b737475423a83a8ff1fb759c4"
+    },
+    {
+      "path": "src/game/bi-a/api.ts",
+      "sha256": "44bd4b7ee4dc17db11e9a27a12bff839c96cb945f2c4989bbde754f7f0a7c84b"
+    },
+    {
+      "path": "src/game/bi-a/bi-a.css",
+      "sha256": "cf7ff4052f5fbb2b4595e67ce476843e4db9f89faf4954e903a9672efbfa79ce"
+    },
+    {
+      "path": "src/game/bi-a/bo-cuc.ts",
+      "sha256": "8edc54b7df2237923c2db59aa8648ba5fa635ab582a3a0a38f1fd5d33312d9b7"
+    },
+    {
+      "path": "src/game/bi-a/cai-dat-bia.ts",
+      "sha256": "2def4286988fd06fa6475b08bead49a620c295ff61d587d35b15cb81547e398f"
+    },
+    {
+      "path": "src/game/bi-a/dieu-khien-cham.ts",
+      "sha256": "f982d2d4ea055d426d2450beff26095eeed7bce04174785451b08431e1916a84"
+    },
+    {
+      "path": "src/game/bi-a/dieu-khien-mang.ts",
+      "sha256": "b0b44072916894805274674ae8aec4c4f09c98ab24c9887f3064ae9cf5422131"
+    },
+    {
+      "path": "src/game/bi-a/dieu-khien.ts",
+      "sha256": "f56e9e5f1994eed13699c61aa311568fdf931597b8357fff79a970800c069737"
+    },
+    {
+      "path": "src/game/bi-a/du-doan.ts",
+      "sha256": "85555ef1803336b19cd271f13cbc989fb89ae3db7ad57ba58724f8debe457c84"
+    },
+    {
+      "path": "src/game/bi-a/gay.ts",
+      "sha256": "e50edbc812e01c21a5ed661c91133772d3da30b8ae4acd9b0f86752d8788f2af"
+    },
+    {
+      "path": "src/game/bi-a/ket-noi.ts",
+      "sha256": "a72f21165479e3d46d87ad440b6d67e8697d3b9b0b70c37e27b493b2eaef5339"
+    },
+    {
+      "path": "src/game/bi-a/luat.ts",
+      "sha256": "81d1798f183dcf1b0d6812fd241d0f1eb86f009e55a325e782b7cac89181215d"
+    },
+    {
+      "path": "src/game/bi-a/mat-than-luon.tsx",
+      "sha256": "2f54e5fccf82c499e376da08ba0fc15fecd670ad0cf598ade5d6d273d5f9983e"
+    },
+    {
+      "path": "src/game/bi-a/nguyen-to.ts",
+      "sha256": "1d11bcbaf605e14015077f4f89dbfd209947b3af461b78b6226724ccdcb35043"
+    },
+    {
+      "path": "src/game/bi-a/tran.ts",
+      "sha256": "ca7e95c82a846b8d92b4173c8fd04a151b84ccb02fd968ee7f046cda1d61a1f1"
+    },
+    {
+      "path": "src/game/bi-a/vat-ly.ts",
+      "sha256": "46ef406c2e9804e61828673cfc55be968d21b243c7f904c969596a3c76009c0c"
+    },
+    {
+      "path": "src/game/bi-a/ve-ban.ts",
+      "sha256": "7d14fa23c48b48c380c95df674c0ddb80be4e455ce117948eb9a3d4334728247"
+    },
+    {
+      "path": "src/game/bi-a/ve-bi.ts",
+      "sha256": "5f1e74521a804d36eacd8337bfbfc5628de7c606301b76beb4df7dc5ebec63a4"
+    },
+    {
+      "path": "src/game/bi-a/xem-thu.html",
+      "sha256": "d42bb9506e22f940a61dd9e4a6e9a95b1c74c83115ea75e0e3c5e9604adcddb5"
+    },
+    {
+      "path": "src/game/bi-a/xem-thu.tsx",
+      "sha256": "1ac1f633e598795c64adc075f14eef1a73ccba04c6b276f81c90d5ebeaee3852"
+    },
+    {
+      "path": "src/game/than-thu-v2/DoanCau.tsx",
+      "sha256": "1e5fc8dce3aecba5496f1c7d69d9549f59250536035da8ac50963a0a58b45750"
+    },
+    {
+      "path": "src/game/than-thu-v2/DoanHinh.tsx",
+      "sha256": "eed7d6671ca5aa104c7a11563929fdb311057c2f1681f976b54cd6d54a12e67d"
+    },
+    {
+      "path": "src/game/than-thu-v2/DoanHoTong.tsx",
+      "sha256": "04b69a6d6ccec7f2071df0a68b001d6b80d304c10bdee74896806386baf94673"
+    },
+    {
+      "path": "src/game/than-thu-v2/DoanKetChang.tsx",
+      "sha256": "751513c8c35c17a5b14cf1cf070a327e44c49500015cfdc42a8c510205b004f6"
+    },
+    {
+      "path": "src/game/than-thu-v2/DoanSanh.tsx",
+      "sha256": "38d5af40ec05c427ff9df5b6b8462af85cd862e49a35ec25b355255de1bdb0a1"
+    },
+    {
+      "path": "src/game/than-thu-v2/DoanTiepSuc.tsx",
+      "sha256": "7a57bd133d88b5e8849e780e016dbe14cb9cd9d375b060b18167310d9228597b"
+    },
+    {
+      "path": "src/game/than-thu-v2/DoanTran.tsx",
+      "sha256": "c80f462da0a364ed181396e8ae10dce5998beeba63fe7d8e682d3f86dfa59c04"
+    },
+    {
+      "path": "src/game/than-thu-v2/DoanTungChuong.tsx",
+      "sha256": "c2e6ede81945434314690b61cee50eb75c2da91fced4f0cda7662209fba65bee"
+    },
+    {
+      "path": "src/game/than-thu-v2/EscortGuide.tsx",
+      "sha256": "133b4975e9887bf8990fa01d25d3bc4568d0b32583caf36067aeb99abff7ca86"
+    },
+    {
+      "path": "src/game/than-thu-v2/EscortQuestion.tsx",
+      "sha256": "0469f7355bb5a830000cfa247fba5a4040f1e4977ecb0180523ea6bd10ce66c4"
+    },
+    {
+      "path": "src/game/than-thu-v2/EscortRoom.tsx",
+      "sha256": "350ec19a267f0d6e7a64172ac6f21df9ae054501f318d1a00544fdc4055a142f"
+    },
+    {
+      "path": "src/game/than-thu-v2/Game.tsx",
+      "sha256": "c5cd6f154e29a0aae066a2518f77675ce322ec97326a9388c8ea81167afb546a"
+    },
+    {
+      "path": "src/game/than-thu-v2/ImmortalShield.tsx",
+      "sha256": "1466c3a225508c37cb3f10a8094195959d6afa71d375f29c91d5cb170d02aa52"
+    },
+    {
+      "path": "src/game/than-thu-v2/LearningBattle.tsx",
+      "sha256": "3bf5a705b7b4233a8dad47bc56f705813526da9d7e3a4e348bde07f64fbc421a"
+    },
+    {
+      "path": "src/game/than-thu-v2/LinhTam.tsx",
+      "sha256": "54fb26824caacb94d0c973431e062bd17c635e7f95798c66b312f3cbce40686b"
+    },
+    {
+      "path": "src/game/than-thu-v2/NutTuTin.tsx",
+      "sha256": "b4f66e070df9c5ffec49d1fb88d0f57c8942c4641a24794974937be58ccb21fb"
+    },
+    {
+      "path": "src/game/than-thu-v2/ProgressChart.tsx",
+      "sha256": "9d004f193bbc5a485d08d863a211828ab4a2c5b27f21b0dfd2f2d9661264959c"
+    },
+    {
+      "path": "src/game/than-thu-v2/QuaiSonThuy.tsx",
+      "sha256": "3207340cb2fe8aebabd9c675bfc6949a70c42a3ec2c785157a5273a7e28c77fc"
+    },
+    {
+      "path": "src/game/than-thu-v2/Spirit2D.tsx",
+      "sha256": "0e053e84885df30089c862dc7c15a1d4b29ae62eb4d9a8324a0ef746dbf7397c"
+    },
+    {
+      "path": "src/game/than-thu-v2/SpiritArt.tsx",
+      "sha256": "a1e3c5ce716c735745f65f267ab01a31005be3a9cb89b1e0a75f2442bf82c9ac"
+    },
+    {
+      "path": "src/game/than-thu-v2/XeLinhTam.tsx",
+      "sha256": "df71febce072691aa592cb2ee048cb55fd195e6ee6031eca80356736ef29f386"
+    },
+    {
+      "path": "src/game/than-thu-v2/anh-san-sang.ts",
+      "sha256": "c851f6a710096319f4605c51dda80466218143ce7b9fbba1eec4cbc7aac17ec9"
+    },
+    {
+      "path": "src/game/than-thu-v2/battle-audio.ts",
+      "sha256": "01ec6b302b90dc4eb1b5b7487264429fa5d9435fc5b61998d42d69ecbe1240c0"
+    },
+    {
+      "path": "src/game/than-thu-v2/chu-het-luot.ts",
+      "sha256": "0f0036833d088cd151ae9f939bef51c76474214d9e6a9b2d84321e56614aa161"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/ChonBanDongHanh.tsx",
+      "sha256": "66ad8c90069688d8086a8a9826a58ec8c6cf1c505761936bb3f498abf761b6fe"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/DaoCuaEm.tsx",
+      "sha256": "c00391870c598b19e1952d1e8b9e10caaf6f5e4f3a7d07c5e73a934209c7543b"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/DaoThanThu.tsx",
+      "sha256": "64907908d9ae2f4ca247b9025d83399a664fa3423b38c2970117a9942202d96f"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/ManShopThat.tsx",
+      "sha256": "a577b7cbc3845f95f3d0e8c7ab9e6d23d053ca4725e179dab754942b885d8b13"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/SoTay.tsx",
+      "sha256": "d31bc6e7eab6abf2c50c716deb3f6725f1c72a4da70efc0d402ec2e80102af1e"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/ThamHiem.tsx",
+      "sha256": "267e8f3f5c08c4587e443bcd3a6df43a50bd810a488d9f4381b175834044f4a9"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/ThanThuV2.tsx",
+      "sha256": "76b6e4a7c5cc4798d4d21113d470f133eee3692a959880e4a51ece9b60a7c040"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/TuiDo.tsx",
+      "sha256": "50aef1c8647d7d54d6d8b9d9bfb396655f69e77b013df02d2fa02ae3a4c5fff6"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/dao-core.ts",
+      "sha256": "970761b9596e2419170536b4fbeacb802d5e6bb62b7b3869e58b51577bd528a8"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/dao-ngang.css",
+      "sha256": "f0ca96b7945abcb89292bb1ba3a7a2afcc813be277b2423cd2f6b73839678e0c"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/dao.css",
+      "sha256": "d64693c818ceeda0da89065bf5412a1b09b01a00f749e914a92747f51d45e888"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/kieu.ts",
+      "sha256": "ba4df1a1a4bfe47df3de19d548c804c95bc1244d6a6fd1db08c89b4cd58caf0d"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/than-thu-v2.css",
+      "sha256": "a739b11dadb4ea7cad69ace027a49b8cfd10cd5af21e6bd63c7c59f61837ed88"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/xem-thu.html",
+      "sha256": "aca0decb015c3b4b02b8e179acd72e278752567c9c4b26bed6cdf5f514d42348"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao/xem-thu.tsx",
+      "sha256": "27d29b95132c9c10048b1128425915b983dad1796a32715a89e390ef109c6103"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/BanDo.tsx",
+      "sha256": "bd23d83739e01b37aaf046e77a58ccfd0bae2bca4cafe6be26d5767634c1665a"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/CanhDao3D.tsx",
+      "sha256": "8f9d4cef18f66763fe87b18e3329313d1238a250ff553666f4906854b2c89ea2"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/ChuongTranDau.tsx",
+      "sha256": "35fd76dde3925517831b85d4279f9819de705823dfdc99d368fe30c0efca1d31"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/Dao2.tsx",
+      "sha256": "855df7221c5ad5778f17bc3786df0e32da7fb3d06c9c4f5d822b7d9a1887a8ca"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/DeThu.tsx",
+      "sha256": "da70a4121d2ef9afd079957dd55140b31b3b7ce1df2d625340cd27d1b9878de3"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/KhoaDao.tsx",
+      "sha256": "267ba697d9149359a71e2a04ede5dcd2beaa5e71644adeb08deb5290af0e7807"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/TheBuocSai.tsx",
+      "sha256": "632d40bf13b23eaf9e7b2811c8c83ffc89a333f81f2316ae3a6e1a9af57bc629"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/TramHoiPhuc.tsx",
+      "sha256": "ac78500208686ff20dbbf782599979513ca109cd54cf69d8c26bca23f5bd4319"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/TrongAi.tsx",
+      "sha256": "e8118d048f8c49334bd52abc3c7a0e93256937c15d7038bdd7239119e47056b1"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/XongChuyen.tsx",
+      "sha256": "daddf04f035f3eee0b2ff0ca64e902a15bafa050050c985592b07e97900567f6"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/chuong.css",
+      "sha256": "915ba9a79cbad8ceffca421b5b583288888f31bddc0bd51a2866675fd297066d"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/dao2-core.ts",
+      "sha256": "b8828f947807bd79316bf6cd34df2b483c37c193b1372f6f90474cbbfae0d07d"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/dao2.css",
+      "sha256": "39c53dbeb456eeae8f19e72ea5b0a55a3d5079c487f8a35517d76352821d92c0"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/de-thu-da-thiet-bi.css",
+      "sha256": "483059eb41f2df443d80e2615815d9e21f8f9af7386721aeab057ec37220747e"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/ngang.ts",
+      "sha256": "f56f196af07efdbafd4bbb0f67ea01af106c390cd9088e58f0596536faa35d3d"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/tran-v2.css",
+      "sha256": "f2f2eb22c96cc40ef9778019dd95c344032f0c83e227f09c51576783cb0a1821"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/xem-thu-chuong.html",
+      "sha256": "4c8cb58dd22667bb43176c4bcfeef3c03f4820015aea53dd59ddffed21a9063a"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/xem-thu-chuong.tsx",
+      "sha256": "abdb982420e63d006d983ee633b80e8d369728ef79a156caee34dbeaaf341c1f"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/xem-thu.html",
+      "sha256": "18f74afaea3131cbf91e24e1f3d226491089395854fb9bc1617e881af872cda8"
+    },
+    {
+      "path": "src/game/than-thu-v2/dao2/xem-thu.tsx",
+      "sha256": "e61405eddf73741f3d3976e6fec8a6e8fab5970f1aa36a7c3f28de8f25dc9398"
+    },
+    {
+      "path": "src/game/than-thu-v2/dau-trang-cao.ts",
+      "sha256": "0f543b5f9fa6ea722cceb9751612fad34ee5ee34d5e60a4aa54022e8cdb3d84c"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan-core.ts",
+      "sha256": "c7e34760bf43731e72c6a3b229d2a219d2ee763fefa5c128959e366fe5ebebb0"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan-khoan-exp.ts",
+      "sha256": "11f3e1af912f33529dd0170da70e5c2a70353422c5d483e67c8c2b128c8dfd05"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan-kieu.ts",
+      "sha256": "4fa6851231fc38358a293a375fdb2d31ae8d7340cb619696340d57c1e5ae8a08"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan-xem-thu.html",
+      "sha256": "e91e21f37a5df784241ca4bb6591878b7816c44c4fba0d65c4673bdb8af1d5cf"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan-xem-thu.tsx",
+      "sha256": "588d8713e05a9eb3952bc33ec51c24627ad20815e541579f6f73677d55dabfb0"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan.css",
+      "sha256": "95fa80edead3e1a214f87b8ed07f1df32728503525e5e0b0fd35f45f01500291"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/BuaTroGiang.tsx",
+      "sha256": "01c917cdd3289ed6516264d5d6486d7297cd4d349ebfe089db3dad86d64ed9d4"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/Canh2.tsx",
+      "sha256": "6a06c1db6a38c243c6cddc77bb19a274abce45822be2b573911dd0e81e3ae902"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/KetChang2.tsx",
+      "sha256": "d7c5d1acf454bacf33641c0e2f37edd69a965709820e2bb227c6b1a4424538cf"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/TheBuocSai2.tsx",
+      "sha256": "26bfc50eb247b171a56ffb2a1d181ed871c6c57c653bade19914717bba43722c"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/TheTram2.tsx",
+      "sha256": "1e1aed76e90388abac1aab9018a31cafa884eace3fb23f9858eb235712b2ee7a"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/XemLaiChuan.tsx",
+      "sha256": "156833ecd56134548bf12bff9759f744c2cdc5017b6ee6d041413138b8ab9297"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/doan2-ngang.css",
+      "sha256": "dfb8b2413f7b4b31ae1031f786292663632c044122eab0796dff8440242171dc"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/doan2.css",
+      "sha256": "8cad092bebaf6049d913907e393f3f349ff86e612cc3e6b8c3b4e0932e33c929"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/kieu2.ts",
+      "sha256": "85ee850658809ee4446c4cb6f2cea5de3ebf72081fb055e90db042b863978f4f"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/xem-thu-2.html",
+      "sha256": "12a02f7b8c8b4bc8f39aa2e6d3487d6c72c6783c36dbd238fa2e5f751967217d"
+    },
+    {
+      "path": "src/game/than-thu-v2/doan2/xem-thu-2.tsx",
+      "sha256": "d2f86f4fd7bc56389e3ad7f2ff4651a7390fffd42d267cbab0accfdb453a501f"
+    },
+    {
+      "path": "src/game/than-thu-v2/escort-core.ts",
+      "sha256": "801d206d8556d89cd4c16c3ccacb7281f4109fcd896283b2cb2b2acdf701c7c9"
+    },
+    {
+      "path": "src/game/than-thu-v2/escort.css",
+      "sha256": "85dab7c636c4b82e547192901465c3d1f59f525b44ae8c4c88c562c5803ea19f"
+    },
+    {
+      "path": "src/game/than-thu-v2/game.css",
+      "sha256": "dc6cddeaf5d5f0c54da62708a713cd2217a6ad517d8b8fb470fcd4d11bcf7f31"
+    },
+    {
+      "path": "src/game/than-thu-v2/learning-battle.css",
+      "sha256": "61ab6931526b2a04cdeba0f6fe3a2759d504739d8a00f18d5a2dd26a5130f209"
+    },
+    {
+      "path": "src/game/than-thu-v2/learning-battle.ts",
+      "sha256": "0ee5ba2f88b51b05608751671fac11bc95310eede7072e39363f0200a279bace"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/HinhVatPham.tsx",
+      "sha256": "659de2b7edfdbf9e9edec08bae3dcdd91f89eb1558b4a5f1815dbcaa5ac5cdb5"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/ThuMacDo.tsx",
+      "sha256": "a065215c409bbd9f18ee98c3d4c13d4adb5c24897e18775840c7a3b98be88f05"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/TrangSuc.tsx",
+      "sha256": "9f7c4b649bc68e44fc04f61f466c1bca99857b4a41a98376208ec9081e499832"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-cl-01.tsx",
+      "sha256": "5e78cc0979289b90341d184334e58522d61bfac450773756d97fb78b7bae14de"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-cl-02.tsx",
+      "sha256": "b27ef70395be68e06e7c1730c4ec1d85b4578fe2e0036ffd43369a112071b29d"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-cl-03.tsx",
+      "sha256": "2f63d9e6c880b15997ada7d789b8ec661fb52b296f6eee5c330d1ed0e4512a0c"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-cl-04.tsx",
+      "sha256": "dc921f9b81d4a3e6f0de9636c14ec396fb22e5620b8d9aecc29b87dbda98141c"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-cl-05.tsx",
+      "sha256": "851506dadf0ac83b4e7538813c06e45f12e3d8fd16772b9e0bf1e9146251f2ff"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-cl-06.tsx",
+      "sha256": "c896aa0b096cb73ce8bb9725e2d81dad573f6ab3765b3ae46295afed9037fa4b"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-cl-07.tsx",
+      "sha256": "f7212faa9b3185c64b6ec63aa26b95218306e0e2caa11e6c6278830873b08c01"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-cl-08.tsx",
+      "sha256": "1aa16ea024e56fa186ff7920ed3fbfb538c554de563900f7e7c53633a9e19519"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-da-01.tsx",
+      "sha256": "b820dffda4410452a24dfb844977238fe71d03faf2dfbb25c2e104b4faa21ef1"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-da-02.tsx",
+      "sha256": "bac6614c7e56c4383e505951b98c933057438818b35af3a36d686435ced4dcbd"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-da-03.tsx",
+      "sha256": "75ed919edaeede23cfc7a191ed3a13faf6fcede92ba1112dfcb6e6c8814ed90b"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-da-04.tsx",
+      "sha256": "53b336d5753d7f87e80555238f8cec90405c1e153f6c5e4aeb1e6f5541b74bc6"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-da-05.tsx",
+      "sha256": "091e118cb21cc6100982e94d742315e5630e8db2300846a6621025c3d0672a39"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-da-06.tsx",
+      "sha256": "f4aca35111a646e5561ac74559be72a4d0b07d7d12ececbd637e723a520de097"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-da-07.tsx",
+      "sha256": "709c5d8d675a35622d6170b8e7de99a2c4530b5d1832f9027af061de43797e03"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-da-08.tsx",
+      "sha256": "eb173d3e77d15854c0b7212d0c798a559f9873978be33a7d1f80beeef7c5703f"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-hq-01.tsx",
+      "sha256": "0283a7bb1317c8ffb120d02f9e9fc3467d739f0dc393b18a70c0e1ea7296a0e4"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-hq-02.tsx",
+      "sha256": "be0813128540161a17d0d4e513a40a0aad174f659ccad8d34dc63eb51c52cc33"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-hq-03.tsx",
+      "sha256": "0cfb6b9a5fa54ae798b0de8650e65b1fbe9a107e7516dbe4f3617df6ccb84bb7"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-hq-04.tsx",
+      "sha256": "08fe724bdc8acaa652a831f969aca78a8de03a2737899afe1981a4741d74eb70"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-hq-05.tsx",
+      "sha256": "c3f0443d9b0f557ec5c0e8449a1a53e5d234aac0db566c411150ab8616e3a0e5"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-hq-06.tsx",
+      "sha256": "b437e6540edde67fb936bfe45c60cc6f2e3e579ead730aa5de5d02bb5a9a5dc4"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-hq-07.tsx",
+      "sha256": "f90b3a0d30fb8fcf28cfbb607c4d6c8d6a6f648a359200e7cb259256e4893506"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-hq-08.tsx",
+      "sha256": "39d650da8fd00693a67c3e8d348d6a7ca3fd084debf20b18fc31af4128840bb5"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-vd-01.tsx",
+      "sha256": "c4f991fbd844c3659a676a075be0521e65bdf48a9915e46d8f0fad73965e78b7"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-vd-02.tsx",
+      "sha256": "2a407e8e38476a7a39899e81ac89157b51628896453c8ac7ee8ab68f280982a0"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-vd-03.tsx",
+      "sha256": "1560af2a30226e524d5d195a4ed890c41256d52692e671a544acb22e60e0665e"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-vd-04.tsx",
+      "sha256": "4ff9c387c0d827f7eb971b723c7af3edd10195c92c7fd22cf322f24d0d8a017f"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-vd-05.tsx",
+      "sha256": "6b640c23478c9c6a7d9f87c0855d3c3acd276dbd9a6a353751a3947f7b31faec"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-vd-06.tsx",
+      "sha256": "44651d710a72d5538d0654a92be51ef408db79d4ea1dc835f4664313c0087529"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-vd-07.tsx",
+      "sha256": "fbd7f491dc126a97133dcde60efe5357bf7bba55bf9c72fecafd306d637ba2bd"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/hinh/pk-vd-08.tsx",
+      "sha256": "3cf5f86232bb1757f294c03ac802025c7d42d23fe8d2749455fab7e3bfe2c2e3"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/nap-hinh.ts",
+      "sha256": "7d13db573cacce0ffcde060dab8ad56ddc975240cef0cc71c437f8b7d700022c"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/phu-kien-mon.ts",
+      "sha256": "6c25270fc46886beb74dc4ec546541e24e3436c15d795d8ebc120810829d8e80"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/phu-kien-neo.ts",
+      "sha256": "1b7720febfdd8e307740133458b55700b5be7e7e38cad623140b159058c99fc3"
+    },
+    {
+      "path": "src/game/than-thu-v2/phu-kien/phu-kien.css",
+      "sha256": "2d5ebe2d4035b672cb392b15e2fb0908e77c9fe67418f61ec9fb95fa471b15b5"
+    },
+    {
+      "path": "src/game/than-thu-v2/progress-chart.css",
+      "sha256": "858031e1429ac300a6afb9a273d3487e5f641b596321f2f6be9a6c241254b827"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/CuaHang.tsx",
+      "sha256": "03218f2a45708b390ae7e2a19c5dca5b4e4058ce4fcd66c3495333fe78e32765"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/ManShop.tsx",
+      "sha256": "46782eac2a989611b6bdb27d4e2e9b5f847adebab747bea4a2d2cafe89911a24"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/TamChao.tsx",
+      "sha256": "28f670d1dd011347853c8bdb2ece6bbe99fae136fe41aec57eeba78649c51caa"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/ThuDo.tsx",
+      "sha256": "2e0ff1ef2ef4d419be980a201b694d6d3b4f629109891ad37f7a94822d2131a6"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/TuDo.tsx",
+      "sha256": "21d67b54174136dc604c9f03a66621f1805dd65f6b8f91fcbb33826b1d94a557"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/XacNhanMua.tsx",
+      "sha256": "b4216d0a642f7c600b31cb69a316300daf74a21cac5b2d9fc414cd7d3316cad8"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/bieu-tuong.tsx",
+      "sha256": "941f8a506b7a168613224c9c4adb127a5266f8a1c75ecefce2e41f2132ec564f"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/chu-cua-vao.ts",
+      "sha256": "33ce607ee08b11c8b0a4a6d301b508a2f9d85ab57e60e0f398ff458a8d2e053d"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/chu-shop.ts",
+      "sha256": "e8e4b23194d06cbd66ab7b5addaf45ba711491cdd3b9173408a75b7d95999c67"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/chung.tsx",
+      "sha256": "0a166b0a3c98e9cb2609c4e6f733a0905030d0e5969e453b5de68a9e5a74a4a1"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/du-lieu-mau.ts",
+      "sha256": "2dcc14e208afd1e164d0007cd482d8cf7ef22c2b70190468fa1020d2d97a6f19"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/kieu.ts",
+      "sha256": "4a0a64024fb1bb166472362a34b1320ee22392b90a5382ca86cbc89aaa35558b"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/logic-shop.ts",
+      "sha256": "8a98f220d2b25a83d128b96bece7c35a2fa62cfe43f6844b30ff2aed3924aa00"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/may-chu-that.ts",
+      "sha256": "5e0834c77493b495f9c46599b5e1195d4adf68875df0f38861483a909429f7fa"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/san-khau.tsx",
+      "sha256": "8dc4320954af793e17f35da101cebb9a54996a6b086a203f59af0a14d5494c38"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/shop-ngang.css",
+      "sha256": "588b9d9a96c59c797e9d41db134d8d6fc3c6f9a29f194dc1e2a5051fb18019a3"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/shop-trang-suc.css",
+      "sha256": "44b2603c79b3c05abd42e9c052b7f5efa94c4ecb8ca89f31fa8707a6e8ca4d82"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/shop-v2.css",
+      "sha256": "c2270026d4c66526ee9c8e06b6227a3e8266ea1a3015305f1631bb78c2814ecb"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/shop.css",
+      "sha256": "f61aa1beaabd1b36be2a60a37065b120fc228fa2206d71b19b39c23fb2fc0425"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/xem-thu.html",
+      "sha256": "f74b478b62cfc2000dff21c11180b20931ea9af31f4222ac7cdf30b868862663"
+    },
+    {
+      "path": "src/game/than-thu-v2/shop/xem-thu.tsx",
+      "sha256": "5019b8fae569a2b30b6fe857b6275364a7a62320e38e6b52b68b3d4d69ce4854"
+    },
+    {
+      "path": "src/game/than-thu-v2/spirit-2d.css",
+      "sha256": "2db843ed0767185a87ab9c5ab55031b203941ca9e696964b5ed807b947b0a172"
+    },
+    {
+      "path": "src/game/than-thu-v2/thu-quai.css",
+      "sha256": "af6ee9a4e43eefcbfc30c6068988ee7790ab1dc6f468e4989c5a935b984c3c6f"
+    },
+    {
+      "path": "src/lib/giay-co-so.ts",
+      "sha256": "dd43a7c3b877b1d814fa943b4333f88fdfdc1287e811c5a61053ed1317912a29"
+    },
+    {
+      "path": "src/lib/phu-kien-danh-muc.ts",
+      "sha256": "d633c598c8926be1a6d242b95b7712a433ce7b48d5155013f8f11c57501fd2be"
+    },
+    {
+      "path": "src/lib/toan-man-hinh-game.ts",
+      "sha256": "71ea1a425a7bef9ec84bd17216564aa78591335119ef8ac7984005b62197611a"
+    },
+    {
+      "path": "src/screens/TongQuanScreen.tsx",
+      "sha256": "b1e94d0184dc88603845bf61af4e47df4363798111d3412a2e2ee1daf202b7f9"
+    },
+    {
+      "path": "src/styles/ban-duyet-v2.css",
+      "sha256": "aa9adcc4c9f3f2ac78df259ee7a43a7b48ec260c64a6250a8ac5dd0dcd5b3b13"
+    }
+  ]
+}

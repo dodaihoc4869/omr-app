@@ -1,0 +1,68 @@
+/* Chỉ bố cục bản vẽ; tất cả màu từ token app thầy hiện tại. */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--gvm-nen); color: var(--gvm-chu); font: 15px/1.5 'Be Vietnam Pro', sans-serif; }
+button, input { font: inherit; }
+button, input, label { touch-action: manipulation; }
+button { cursor: pointer; background: transparent; border: 0; color: inherit; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--gvm-xd); outline-offset: 3px; }
+.ve-nen { margin: 0 auto; padding: 32px; max-width: 1160px; }
+.ve-bang { margin-top: 24px; padding: 24px; }
+.ve-dong { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin-top: 20px; }
+.ve-dong span { display: grid; flex: 1; min-width: 160px; }
+.ve-dong small { color: var(--gvm-chu-2); }
+.ve-phu { position: fixed; inset: 0; background: var(--phu); display: grid; place-items: center; padding: 20px; }
+.ve-tam { width: min(880px, 100%); height: min(700px, calc(100dvh - 40px)); background: var(--gvm-mat); border: 1px solid var(--gvm-vien); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--gvm-bong); }
+.ve-tam header { display: flex; align-items: center; gap: 12px; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--gvm-vien); }
+.ve-tam h2 { margin: 4px 0 0; font-size: 22px; line-height: 1.3; }
+.ve-nhan { margin: 0; color: var(--gvm-chu-2); font-size: 13px; }
+.ve-dong-tam { width: 48px; height: 48px; flex: none; border: 0; border-radius: 12px; color: var(--gvm-chu); background: var(--gvm-nen); font-size: 28px; }
+.ve-than { flex: 1; min-height: 0; display: grid; grid-template-columns: 224px 1fr; gap: 24px; padding: 20px 24px; }
+.ve-than > * { min-width: 0; }
+.ve-so { display: grid; gap: 8px; margin-top: 12px; }
+.ve-so span { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ve-so b { color: var(--gvm-xd-dam); }
+.ve-thay-doi { border-top: 1px solid var(--gvm-vien); margin-top: 20px; padding-top: 12px; }
+.ve-thay-doi p { margin: 0 0 12px; display: grid; gap: 4px; }
+.ve-thay-doi b { font-size: 13px; color: var(--gvm-chu-2); }
+.ve-chu { margin-top: 20px; color: var(--gvm-chu-2); font-size: 13px; }
+.ve-bo-chon { display: grid; align-content: start; gap: 8px; }
+.ve-bo-chon .cd-the-xoa { min-height: 48px; min-width: 48px; }
+.ve-bo-chon .cd-cay-gap { min-height: 48px; min-width: 48px; }
+.ve-bo-chon .cd-cay-nhan, .ve-bo-chon .cd-tam-nut label { min-height: 48px; }
+.ve-bo-chon .cd-tam-chon { max-height: 420px; }
+.ve-bo-chon .cd-tim-em { background: var(--bts-mat); color: var(--bts-chu); }
+.ve-bo-chon .cd-tim-em::placeholder { color: var(--gvm-chu-2); opacity: 1; }
+.ve-tam footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--gvm-vien); }
+.ve-tam footer p { margin: 0; color: var(--gvm-chu-2); font-size: 13px; }
+.ve-tam footer > div { display: flex; gap: 8px; }
+.ve-tam footer button { min-height: 48px; }
+@media (max-width: 650px) and (min-height: 501px) {
+  .ve-phu { padding: 8px; }
+  .ve-tam { height: calc(100dvh - 16px); border-radius: 20px; }
+  .ve-tam header { padding: 16px; }
+  .ve-tam h2 { font-size: 19px; }
+  .ve-than { padding: 16px; gap: 16px; display: flex; flex-direction: column; overflow-y: auto; }
+  .ve-so { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .ve-so span { display: grid; gap: 0; }
+  .ve-thay-doi { display: flex; gap: 16px; padding-top: 8px; margin-top: 12px; }
+  .ve-thay-doi p { margin: 0; font-size: 13px; }
+  .ve-chu { margin: 12px 0 0; }
+  .ve-bo-chon .cd-tam-chon { max-height: min(300px, calc(100dvh - 480px)); }
+  .ve-tam footer { padding: 12px 16px; }
+  .ve-tam footer button { padding: 0 12px; }
+}
+@media (max-height: 500px) {
+  .ve-phu { padding: 8px; }
+  .ve-tam { width: min(920px, 100%); height: calc(100dvh - 16px); border-radius: 16px; }
+  .ve-tam header { padding: 8px 16px; }
+  .ve-tam h2 { font-size: 19px; }
+  .ve-than { grid-template-columns: 216px 1fr; gap: 16px; padding: 8px 16px; }
+  .ve-thay-doi { margin-top: 8px; padding-top: 4px; }
+  .ve-thay-doi p { display: flex; gap: 8px; margin-bottom: 4px; font-size: 13px; }
+  .ve-so { margin-top: 4px; gap: 2px; }
+  .ve-chu { margin-top: 8px; }
+  .ve-bo-chon > .ve-nhan { display: none; }
+  .ve-bo-chon .cd-tam-chon { max-height: 164px; gap: 4px; padding: 8px; }
+  .ve-bo-chon .cd-tam-chan { padding-top: 4px; }
+  .ve-tam footer { padding: 8px 16px; }
+}

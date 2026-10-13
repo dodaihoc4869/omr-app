@@ -10,7 +10,6 @@ import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 import { MomDanhSachM3, MomLamBaiM3 } from '../src/components/bang-nhiem-vu/MomM3'
 
 const mocks = vi.hoisted(() => ({ momApi: vi.fn(), items: [] as any[], batDau: null as any }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/components/BangVinhDanh', () => ({ default: () => null }))
 vi.mock('../src/components/BangTinPhuHuynh', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))

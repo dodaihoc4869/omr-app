@@ -14,7 +14,6 @@ import {
   themMediaGiay,
   trungVi,
 } from '../src/lib/uoc-luong-thoi-gian'
-import { DUNG_DONG_HO_MEM_THEO_8, GIAY_DONG_HOI_TOI_DA, GIAY_MEM_TOI_THIEU, giayCuaHiep, giayDongHoiMoCua, giayHiepTheoCo, giayMemMotTask, hetGioHiep } from '../src/game/than-thu-v2/doan-core'
 
 describe('§5.1 · thời gian NỀN (nguyên văn bảng)', () => {
   it('baseSeconds(I,d)=[75,105,150] · (II,d)=[150,210,300] · (III,d)=[120,180,240]', () => {
@@ -99,54 +98,5 @@ describe('§5.1 · solveSeconds / feedbackSeconds / taskSeconds', () => {
     expect(feedbackSeconds(200)).toBe(50)
     expect(taskSeconds(200)).toBe(250)
     expect(taskSeconds(75)).toBe(105)
-  })
-})
-
-describe('§8 · hạn MỀM cá nhân + ĐỒNG HỒ ĐỘI (mặc định TẮT, không đổi nhịp game đang sống)', () => {
-  it('CỜ mặc định TẮT ⇒ `giayCuaHiep` cũ vẫn là đường đang chạy', () => {
-    expect(DUNG_DONG_HO_MEM_THEO_8).toBe(false)
-  })
-
-  it('hạn mềm = max(60, ceil(1,25 × solveSeconds)) — KHÔNG kẹp ở 180', () => {
-    expect(GIAY_MEM_TOI_THIEU).toBe(60)
-    expect(giayMemMotTask(0)).toBe(60)
-    expect(giayMemMotTask(48)).toBe(60) // ceil(60) = 60
-    expect(giayMemMotTask(100)).toBe(125)
-    expect(giayMemMotTask(144)).toBe(180)
-    expect(giayMemMotTask(400)).toBe(500) // §8: "không chặn cứng ở 180 giây"
-  })
-
-  it('đồng hồ đội = min(300, max(hạn mềm các task ĐANG MỞ)); rỗng ⇒ 0', () => {
-    expect(GIAY_DONG_HOI_TOI_DA).toBe(300)
-    expect(giayDongHoiMoCua([])).toBe(0)
-    expect(giayDongHoiMoCua([125, 200])).toBe(200)
-    expect(giayDongHoiMoCua([125, 500])).toBe(300) // trần/hiệp
-  })
-
-  it('solveSeconds lạ ⇒ NÉM', () => {
-    expect(() => giayMemMotTask(-1)).toThrow(/>= 0/)
-    expect(() => giayMemMotTask(Number.NaN)).toThrow(/>= 0/)
-  })
-
-  it('`giayHiepTheoCo`: cờ TẮT ⇒ NGUYÊN nhịp cũ; cờ BẬT + có task mở ⇒ §8 (max hạn mềm, trần 300)', () => {
-    const cau = [{ phan: 'I', mucDo: 'biet' as const, soTu: 100, coHinh: false }]
-    // Cờ đang TẮT ⇒ phải bằng ĐÚNG `giayCuaHiep` cũ (bảo chứng "chưa đổi nhịp game đang sống").
-    expect(giayHiepTheoCo(1, cau, [125, 400])).toBe(giayCuaHiep(1, cau))
-    // Cờ BẬT mà CHƯA có task mở ⇒ QUAY VỀ nhịp CŨ (KHÔNG trả 0 — trả 0 là hết giờ tức thì).
-    expect(giayHiepTheoCo(1, cau, [])).toBe(giayCuaHiep(1, cau))
-    // Cờ BẬT + CÓ task mở ⇒ §8: max hạn mềm (trần 300). (Tham số cờ để TEST được đường BẬT.)
-    expect(giayHiepTheoCo(1, cau, [125, 400], true)).toBe(300)
-    expect(giayHiepTheoCo(1, cau, [125, 200], true)).toBe(200)
-    expect(giayHiepTheoCo(1, cau, [125, 400], false)).toBe(giayCuaHiep(1, cau)) // cờ TẮT ⇒ bỏ qua danh sách
-    // Hàm §8 khi có task mở: trần 300.
-    expect(giayDongHoiMoCua([125, 400])).toBe(300)
-    expect(giayDongHoiMoCua([])).toBe(0) // hàm THUẦN vẫn trả 0; việc "0 ⇒ quay về nhịp cũ" là ở `giayHiepTheoCo`
-  })
-
-  it('`hetGioHiep` giữ NGUYÊN hành vi cũ khi không truyền gì (tương thích ngược)', () => {
-    // 3 tham số như mọi chỗ gọi cũ ⇒ y hệt `giayCuaHiep(hiep)` không kèm câu.
-    const han = giayCuaHiep(1) * 1000
-    expect(hetGioHiep(0, han - 1, 1)).toBe(false)
-    expect(hetGioHiep(0, han, 1)).toBe(true)
   })
 })

@@ -91,8 +91,8 @@ const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
 const CaiDatScreen = lazy(() => import('./screens/CaiDatScreen'))
 const GiaoDeTheoTuanScreen = lazy(() => import('./screens/GiaoDeTheoTuanScreen'))
 // GAME HÓA 2.0 — chỉ vào được khi cờ bật. BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10: mã màn `tongquan` dựng màn "Hôm nay" (`GvHomNayScreen`, việc cần
-// thầy theo độ gấp), mã màn `chiendich` là "Hành trình" (ChienDichScreen). `TongQuanScreen` (trang đầu 28/09) GIỮ MÃ trong repo nhưng App không
-// còn dựng — mọi `setScreen('tongquan')` cũ nay mở Hôm nay.
+// thầy theo độ gấp), mã màn `chiendich` là "Hành trình" (ChienDichScreen). Trang Tổng quan cũ đã gỡ 14/10;
+// mọi `setScreen('tongquan')` cũ nay mở Hôm nay.
 const GvHomNayScreen = lazy(() => import('./screens/GvHomNayScreen'))
 const ChienDichScreen = lazy(() => import('./screens/ChienDichScreen'))
 const DuyetLoiGiaiScreen = lazy(() => import('./screens/DuyetLoiGiaiScreen'))

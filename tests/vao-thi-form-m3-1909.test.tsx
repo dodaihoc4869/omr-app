@@ -10,7 +10,6 @@ import VaoThiForm from '../src/components/bang-nhiem-vu/VaoThiForm'
 
 const mocks = vi.hoisted(() => ({ tuCong: vi.fn() }))
 vi.mock('../src/screens/ExamTakeScreen', () => ({ default: (p: any) => { mocks.tuCong(p.tuCong); return <div data-testid="man-thi">Màn thi thử</div> } }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/components/BangVinhDanh', () => ({ default: () => null }))
 vi.mock('../src/components/BangTinPhuHuynh', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))

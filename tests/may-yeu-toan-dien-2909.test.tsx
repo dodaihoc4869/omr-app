@@ -7,7 +7,6 @@ import { bangGiaTriProp, bangPropsBoQuaHam } from '../src/lib/so-sanh-props'
 import { CSS_MAY_YEU_TRANG_NHUNG, LOP_MAY_YEU, dprToiDa, themCssMayYeu } from '../src/lib/may-yeu'
 import { gioPhutNay } from '../src/components/VanTay'
 import ExperimentDemo from '../src/components/ExperimentDemo'
-import { giamChuyenDong as giamShop } from '../src/game/than-thu-v2/shop/chung'
 import { giamChuyenDong as giamBangTin } from '../src/components/bang-tin/hooks'
 
 const dem = vi.hoisted(() => ({ tach: 0 }))
@@ -156,26 +155,16 @@ describe('trang nhúng (phiếu HTML) + độ phân giải canvas ở chế đ�
 })
 
 describe('hoạt ảnh số / cuộn mượt nghe chế độ máy yếu', () => {
-  it('cửa hàng phụ kiện + số đếm bảng tin: máy yếu ⇒ nhảy thẳng số cuối', () => {
+  it('số đếm bảng tin: máy yếu ⇒ nhảy thẳng số cuối', () => {
     const mm = window.matchMedia
     window.matchMedia = ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia
     try {
-      expect(giamShop()).toBe(false)
       expect(giamBangTin()).toBe(false)
       document.documentElement.classList.add(LOP_MAY_YEU)
-      expect(giamShop()).toBe(true)
       expect(giamBangTin()).toBe(true)
     } finally {
       window.matchMedia = mm
     }
-  })
-})
-
-describe('Đoàn Hộ Tống: đồng hồ trận chỉ vẽ lại khi số giây đổi', () => {
-  it('nhịp 250 ms so chuỗi giây hiện trên màn trước khi setNhip', () => {
-    const m = doc('src/game/than-thu-v2/DoanHoTong.tsx')
-    expect(m).toMatch(/if \(hienSo === cu\) return\s+cu = hienSo\s+setNhip\(n => n \+ 1\)/)
-    expect(m).not.toContain('setInterval(() => setNhip(n => n + 1), 250)')
   })
 })
 

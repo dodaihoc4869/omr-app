@@ -2,18 +2,25 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen, within } from '@testing-library/react'
 import BangChienDich from '../src/components/chien-dich/BangChienDich'
 import type { BangChienDich as DuBang } from '../src/components/chien-dich/api'
-import DsChienDichDaGiao from '../src/components/chien-dich/DsChienDichDaGiao'
+import LenBangChienDich from '../src/components/chien-dich/LenBangChienDich'
 
-vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: async () => ({ok:true,du:{ok:true,homNay:'2026-10-09',chienDich:[10,11,12].map(k => ({
-  id:`hanh-trinh-v3-khoi-${k}`,ten:`Hành trình giỏi hoá · Khối ${k}`,lop:`Khối ${k}`,maDe:[],hanNop:'9999-12-31',theLucNgay:36,huyetChien:false,maCa:null,taoLuc:'2026-10-09',trangThai:'dang_chay',soCau:100,soEm:1,hetHan:false,hanhTrinh:true,
-}))}}) }))
+const HANH_TRINH = [10, 11, 12].map(k => ({
+  id: `hanh-trinh-v3-khoi-${k}`, ten: `Hành trình giỏi hoá · Khối ${k}`, lop: `Khối ${k}`, maDe: [], hanNop: '9999-12-31', theLucNgay: 36, huyetChien: false, maCa: null, taoLuc: '2026-10-09', trangThai: 'dang_chay', soCau: 100, soEm: 1, hetHan: false, hanhTrinh: true,
+}))
+vi.mock('../src/lib/exam-db', () => ({ loadExamSources: async () => [] }))
+vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: async (_d: string, b: Record<string, unknown>) => {
+  if (b.action === 'danh-sach') return { ok: true, du: { homNay: '2026-10-09', chienDich: HANH_TRINH } }
+  if (b.action === 'bang') return { ok: true, du: { homNay: '2026-10-09', chienDich: HANH_TRINH.find(c => c.id === b.id), hetHan: false, lop: { coXat: 0, thanhThao: 0, huyetChien: 0, canDayLaiCau: 0, canDayLaiLuot: 0 }, dang: [], em: [], canDayLai: [], noCu: [], hanhTrinhNgay: { em: [] } } }
+  return { ok: false, loai: 'tu_choi', chu: 'Không áp dụng' }
+} }))
 
 afterEach(cleanup)
 describe('Bảng ba hành trình', () => {
-  it('chỉ quản lý ba hành trình, không còn nút giao/chỉnh chỉ tiêu/huỷ thủ công', async () => {
-    render(<DsChienDichDaGiao onGiaoMoi={vi.fn()} />)
-    await screen.findByText('Hành trình giỏi hoá · Khối 12')
-    expect(screen.getAllByRole('button',{name:'Xem bảng'})).toHaveLength(3)
+  it('luồng Lên bảng giữ đủ ba hành trình, không còn nút giao/chỉnh chỉ tiêu/huỷ thủ công', async () => {
+    render(<LenBangChienDich />)
+    const chon = await screen.findByRole('combobox', { name: 'Chiến dịch' })
+    expect(within(chon).getAllByRole('option')).toHaveLength(3)
+    for (const k of [10, 11, 12]) expect(within(chon).getByRole('option', { name: new RegExp(`Khối ${k}`) })).toBeTruthy()
     expect(screen.queryByRole('button',{name:'+ Giao chiến dịch mới'})).toBeNull()
     expect(screen.queryByRole('button',{name:'Chỉnh sửa'})).toBeNull()
     expect(screen.queryByRole('button',{name:'Huỷ'})).toBeNull()

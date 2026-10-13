@@ -1,9 +1,8 @@
+// SỬA CÓ CHỦ ĐÍCH 14/10: chỉ gỡ hợp đồng CSS của bảng cũ đã xóa; giữ kiểm hình học, sự kiện và gỡ màn.
 // NÚT NỔI "VÀO THI" NHƯỜNG NÚT CHÍNH (Boss báo 21/09: ở 390 nút nổi che nút "Làm …" của thẻ LÀM NGAY).
 // Luật: nút nổi mờ đi + không bấm trúng khi đè lên `.bnv-nut-chinh`; hết đè (cuộn/đổi cỡ) thì hiện lại; bàn phím vẫn tới được.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render } from '@testing-library/react'
-import fs from 'node:fs'
-import path from 'node:path'
 import NutVaoThi, { haiOChongNhau } from '../src/components/bang-nhiem-vu/NutVaoThi'
 
 const o = (l: number, t: number, r: number, b: number) => ({ left: l, top: t, right: r, bottom: b, width: r - l, height: b - t, x: l, y: t, toJSON: () => ({}) }) as DOMRect
@@ -101,15 +100,5 @@ describe('NutVaoThi · nhường nút chính', () => {
     ngat.mockRestore()
     expect(bo.mock.calls.filter((c) => c[0] === 'scroll' || c[0] === 'resize').length).toBe(2)
     them.mockRestore(); bo.mockRestore()
-  })
-})
-
-describe('CSS nhường — hợp đồng', () => {
-  const css = fs.readFileSync(path.join(process.cwd(), 'src/components/bang-nhiem-vu/bang-nhiem-vu.css'), 'utf8')
-  it("nhường ⇒ mờ + không bấm trúng; focus bàn phím ⇒ hiện lại; giảm chuyển động ⇒ không hiệu ứng", () => {
-    expect(css).toMatch(/\.bnv-fab\[data-nhuong='true'\]\s*\{[^}]*opacity:\s*0;[^}]*pointer-events:\s*none;/)
-    expect(css).toMatch(/\.bnv-fab\[data-nhuong='true'\]:focus-visible\s*\{[^}]*opacity:\s*1;/)
-    expect(css).toMatch(/prefers-reduced-motion: reduce\) \{\s*\.bnv-fab \{\s*transition: none;/)
-    expect(css).toMatch(/\.bnv-fab \{\s*transition: opacity 0\.2s/)
   })
 })

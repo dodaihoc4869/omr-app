@@ -2,7 +2,7 @@
 // xếp buổi chữa (≤ 90 phút, mỗi em có mặt ≥ 1 lượt), tờ đề của một ca, xếp tên em.
 import { maDeGocMayChu } from '../../lib/btvn-nang-do-thay'
 import { CAU_HINH_LEN_BANG_MAC_DINH } from '../../lib/len-bang-cau-hinh'
-import type { CauBuoiChua, EmGiaiMau, EmTen, HangEm, MucSucChua } from './api'
+import type { CauBuoiChua, EmGiaiMau, EmTen, HangEm } from './api'
 
 // ---------------------------------------------------------------- hạng theo dạng (heatmap em × dạng)
 /** Hạng theo % — ĐÚNG ngưỡng thuật toán bốc câu (máy chủ `hangTuTiLe`, srs2-loi.ts):
@@ -25,12 +25,6 @@ export function mucO(tiLe: number | null | undefined, daLam?: number | null): Mu
   if (daLam === 0) return 'chua-lam'
   return hangTuTiLe(tiLe)
 }
-
-/** Mức đồng hồ sức chứa: xanh ≤ 70% · vàng 70–90% · đỏ > 90% (cùng luật `sucChua` của máy chủ). */
-export function mucSucChua(tiLe: number): MucSucChua {
-  return tiLe <= 0.7 ? 'xanh' : tiLe <= 0.9 ? 'vang' : 'do'
-}
-export const CHU_MUC: Record<MucSucChua, string> = { xanh: 'vừa sức', vang: 'sát', do: 'quá tải' }
 
 // ---------------------------------------------------------------- tờ đề của ca
 /** Mã tờ kho (máy chủ) của các câu trong bộ đề một ca: id câu `X-I-3` / `X-TN-I-3` ⇒ `X`. Giữ thứ tự gặp đầu. */

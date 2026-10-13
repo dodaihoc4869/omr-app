@@ -5,17 +5,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import TheChoAn, { viewChoAn } from '../src/components/bang-nhiem-vu/TheChoAn'
 import TheCuoiChang from '../src/components/bang-nhiem-vu/TheCuoiChang'
-import DaoCuaEm from '../src/game/than-thu-v2/dao/DaoCuaEm'
-import { duTruNgayAn, lyDoTranExpGame } from '../src/game/than-thu-v2/dao/dao-core'
-import type { DaoProfile } from '../src/game/than-thu-v2/dao/kieu'
 import { docThieuDat, dongGoiBanNho, phucHoiBanNho, tuKeHoachNgay, type KeHoachNgayMayChu } from '../src/lib/nhiem-vu-adapter'
 import { docKetQuaChang, theChangView } from '../src/lib/btvn-ca-nhan-kieu'
 import { PETS } from '../src/game/than-thu-v2/core'
-
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 afterEach(cleanup)
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const NOW = Date.parse('2026-09-23T10:00:00+07:00')
@@ -120,38 +114,6 @@ describe('viewChoAn — khi nào thú "đói"', () => {
 })
 
 describe('TheChoAn + Bảng nhiệm vụ', () => {
-  const ve = (d: any, extra: Record<string, unknown> = {}, vaiTro: 'hocsinh' | 'phuhuynh' = 'hocsinh') =>
-    render(<BangNhiemVu vaiTro={vaiTro} hoTen="Đỗ Minh" now={NOW} duLieu={d} onHanhDong={() => {}} taiVinhDanh={async () => null} {...extra} />)
-  it('thẻ đúng chữ; MỘT đích chạm ≥ 48 px (button); bấm ⇒ vào Đảo', () => {
-    const onMoThanThu = vi.fn()
-    const { container } = ve(dl(), { onMoThanThu })
-    const the = container.querySelector('[data-vung="cho-an"]') as HTMLElement
-    expect(the.tagName).toBe('BUTTON')
-    expect(the.textContent).toContain('Hoả Long đang đói')
-    expect(the.textContent).toContain('Ống nghiệm có 480 EXP · dự trữ đủ 2 ngày ăn')
-    expect(the.textContent).toContain('Cho ăn')
-    expect(the.getAttribute('aria-label')).toBe('Hoả Long đang đói. Ống nghiệm có 480 EXP. Chạm để cho Hoả Long ăn')
-    expect(container.querySelectorAll('[data-vung="cho-an"]')).toHaveLength(1)
-    fireEvent.click(the)
-    expect(onMoThanThu).toHaveBeenCalledTimes(1)
-  })
-  it('ống nghiệm < 200 ⇒ có thẻ nhưng KHÔNG câu "dự trữ"; không số "0 ngày" bao giờ', () => {
-    const { container } = ve(dl(EXP({ ...EXP3, ongNghiem: 120 })), { onMoThanThu: () => {} })
-    const t = container.querySelector('[data-vung="cho-an"]')!.textContent!
-    expect(t).toContain('Ống nghiệm có 120 EXP')
-    expect(t).not.toMatch(/dự trữ|0 ngày/)
-  })
-  it('ẨN: thiếu số máy chủ / không đói / thiếu onMoThanThu / phụ huynh (không một chữ về thú)', () => {
-    expect(ve(dl(EXP({ ongNghiem: 480 })), { onMoThanThu: () => {} }).container.querySelector('[data-vung="cho-an"]')).toBeNull()
-    cleanup()
-    expect(ve(dl(EXP({ ...EXP3, hapThuConLaiHomNay: 0 })), { onMoThanThu: () => {} }).container.querySelector('[data-vung="cho-an"]')).toBeNull()
-    cleanup()
-    expect(ve(dl(), {}).container.querySelector('[data-vung="cho-an"]')).toBeNull()
-    cleanup()
-    const ph = ve(dl(), { onMoThanThu: () => {} }, 'phuhuynh').container
-    expect(ph.querySelector('[data-vung="cho-an"]')).toBeNull()
-    expect(ph.textContent).not.toMatch(/đang đói|ống nghiệm|Cho ăn/)
-  })
   it('TheChoAn dựng thẳng: tên dài không vỡ, số ≥ 1000 có dấu chấm', () => {
     render(<TheChoAn v={{ ten: 'Một Cái Tên Rất Dài Của Thần Thú', ongNghiem: 1200, duTruNgay: 6 }} onMo={() => {}} />)
     expect(screen.getByRole('button').textContent).toContain('1.200 EXP · dự trữ đủ 6 ngày ăn')
@@ -190,45 +152,10 @@ describe('thẻ cuối chặng — EXP đã vào ống nghiệm', () => {
   })
 })
 
-describe('Đảo — "Dự trữ đủ N ngày ăn" + câu trần EXP game', () => {
-  const hoSo = (them: Partial<DaoProfile> = {}): DaoProfile => ({ nickname: 'Lửa Nhỏ', pet: 'lua_phuong', choice: false, cap: 34, exp: 640, wallet: 0, mastery: [], ...them })
-  const ve = (them: Partial<DaoProfile>) => render(<DaoCuaEm profile={hoSo(them)} onLenDuong={() => {}} onNap={() => {}} />).container
-  it('duTruNgayAn: ⌊ví ÷ 200⌋, 0/âm/hỏng ⇒ null', () => {
-    expect(duTruNgayAn(200)).toBe(1)
-    expect(duTruNgayAn(399)).toBe(1)
-    expect(duTruNgayAn(400)).toBe(2)
-    for (const x of [0, 199, -50, NaN, Infinity * 0]) expect(duTruNgayAn(x), String(x)).toBeNull()
-  })
-  it('có hapThuHomNay + ví ≥ 200 ⇒ dòng "Dự trữ đủ 2 ngày ăn · ống nghiệm có 480 EXP" trong khối hấp thụ', () => {
-    const c = ve({ hapThuHomNay: { da: 100, tran: 200 }, wallet: 480 })
-    const d = c.querySelector('[data-vung="hap-thu"] [data-vung="du-tru"]')!
-    expect(d.textContent).toBe('Dự trữ đủ 2 ngày ăn · ống nghiệm có 480 EXP')
-  })
-  it('ví < 200 ⇒ ẩn; máy chủ cũ (không hapThuHomNay) ⇒ ẩn dù ví lớn', () => {
-    expect(ve({ hapThuHomNay: { da: 100, tran: 200 }, wallet: 150 }).querySelector('[data-vung="du-tru"]')).toBeNull()
-    cleanup()
-    expect(ve({ wallet: 900 }).querySelector('[data-vung="du-tru"]')).toBeNull()
-  })
-  it('lyDoTranExpGame: bị cắt (thưởng < thưởng gốc) ⇒ câu đủ 120 EXP; không cắt / thiếu ⇒ null (giữ câu máy chủ)', () => {
-    expect(lyDoTranExpGame(0, 20, 'Lửa Nhỏ')).toEqual({ moc: 0, exp: 0, chu: '+0 EXP · hôm nay em đã đủ 120 EXP từ game. Muốn Lửa Nhỏ lớn thêm thì làm bài tập về nhà hoặc phần ôn lại.' })
-    expect(lyDoTranExpGame(5, 20, 'Bông')!.chu).toBe('+5 EXP · hôm nay em đã đủ 120 EXP từ game. Muốn Bông lớn thêm thì làm bài tập về nhà hoặc phần ôn lại.')
-    for (const [r, g] of [[20, 20], [20, undefined], [0, 0], [0, undefined], [30, 20], [undefined, undefined]] as const) expect(lyDoTranExpGame(r, g, 'X'), `${r}/${g}`).toBeNull()
-  })
-})
-
 describe('khoá nguồn', () => {
-  it('Đảo dùng lyDoTranExpGame trước câu của máy chủ; kiểu kết quả có thuongGoc; trần lấy từ Code 1 (không viết cứng 120/200 mới)', () => {
-    expect(doc('src/game/than-thu-v2/dao/DaoThanThu.tsx')).toMatch(/lyDoTranExpGame\(reward,r\.thuongGoc,tenThu\(profile\)\)\?\?r\.lyDoThuong/)
-    expect(doc('src/game/than-thu-v2/dao/kieu.ts')).toContain('thuongGoc?:number')
-    const core = doc('src/game/than-thu-v2/dao/dao-core.ts')
-    expect(core).toContain("from '../../../lib/hap-thu-ngay'")
-    expect(core).toContain('HAP_THU_TOI_DA_NGAY=HAP_THU_DAT')
-    expect(core).toContain('${TRAN_EXP_GAME_NGAY} EXP từ game')
-  })
   it('không màu thô / emoji / lookbehind / .at( trong tệp mới; thẻ Cho ăn chỉ nhận prop, không gọi mạng', () => {
     const s = doc('src/components/bang-nhiem-vu/TheChoAn.tsx')
     expect(s).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\(\?<[=!]|\.at\(|fetch\(|randomUUID/)
     expect(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(s)).toBe(false)
-    expect(doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')).toMatch(/\{!laPh && onMoThanThu && viewChoAnHs && <TheChoAn/)
   })
 })

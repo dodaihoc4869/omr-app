@@ -71,23 +71,3 @@ describe('cụm 7 · nhãn Bảng nhiệm vụ và tên bài', () => {
     expect(doc('src/components/bang-nhiem-vu/BtvnM3.tsx')).not.toContain('Bài tập ca ')
   })
 })
-
-describe('cụm 7 · đơn vị trong game: Chuyến / Hiệp / Trạm / Ải; "chặng" chỉ còn ở Bài tập về nhà', () => {
-  const HS_DOAN = ['DoanSanh.tsx', 'DoanTran.tsx', 'DoanKetChang.tsx', 'DoanHoTong.tsx']
-  for (const f of HS_DOAN) {
-    it(`${f}: chữ hiện cho em không nói "chặng" của game (trừ câu nhắc "chặng Bài tập về nhà")`, () => {
-      const dong = doc(`src/game/than-thu-v2/${f}`).split('\n').filter((d) => !/^\s*(\/\/|\*|\/\*)/.test(d) && /[Cc]hặng|CHẶNG/.test(d) && !/chặng Bài tập về nhà/.test(d) && !/conChangToiTramKe|dh-chang|changThang|changMoiTram|chang[A-Z.]|\.chang\b|Chang\b/.test(d))
-      expect(dong.map((d) => d.trim().slice(0, 90))).toEqual([])
-    })
-  }
-  it('Khiên trong trận Đoàn là GIÁP ("+30 giáp cho Linh Tâm"), không "khiên 30"; máu có nhãn', () => {
-    const tran = doc('src/game/than-thu-v2/DoanTran.tsx'); const tung = doc('src/game/than-thu-v2/DoanTungChuong.tsx')
-    expect(tran).toContain('+{CHAN} giáp cho Linh Tâm'); expect(tran).not.toMatch(/khiên \{CHAN\}/)
-    expect(tung).toContain('mất ${kq.linhTamMat} máu'); expect(tung).not.toMatch(/khiên \{toi\.chan/)
-  })
-  it('ghế máy tên "Bạn máy"; ôn lại nói "đến lịch ôn lại"; mức độ của em là "Biết · Hiểu · Vận dụng"', () => {
-    expect(doc('src/game/than-thu-v2/doan-core.ts')).toContain("ten: 'Bạn máy'")
-    expect(doc('src/game/than-thu-v2/doan-kieu.ts')).toContain("toi_han_on: 'đến lịch ôn lại'")
-    expect(doc('src/game/than-thu-v2/dao/ThamHiem.tsx')).toContain("{biet:'Biết',hieu:'Hiểu',van_dung:'Vận dụng'}")
-  })
-})

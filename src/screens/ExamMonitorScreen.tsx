@@ -9,8 +9,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { BANG_NHIP_THAY, NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
 import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
-import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
-import { maDeTuBoCau } from '../components/chien-dich/tinh'
 import { Check, Trash2, ChevronRight, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import KhungBaiBoSung from '../components/KhungBaiBoSung'
@@ -336,11 +334,8 @@ export default function ExamMonitorScreen() {
   const xongSbdBaoCaoCa = useAppStore((s) => s.xongSbdBaoCaoCa)
   const moToanCanh = useAppStore((s) => s.moToanCanh)
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
-  // GAME HÓA 2.0: ca đã kết thúc ⇒ thẻ "BƯỚC TIẾP THEO · Giao chiến dịch luyện" (chỉ khi cờ bật; tắt thì màn như cũ).
-  // Thầy 29/09: "phần này có một nút bật lên thì mới giao chiến dịch, còn mặc định là tắt để theo dõi ca thi bình thường" ⇒ MẶC ĐỊNH TẮT (ẩn cả khối),
-  // một công tắc ở thanh đầu màn bật khối lên; KHÔNG nhớ giữa các lần mở ca (đổi ca ⇒ tắt lại).
+  // Cờ Hóa 2.0 giữ cách hiển thị Ca kiểm tra và các việc theo dõi đang dùng.
   const hoa2 = useHoa2Bat()
-  const [moGiao, setMoGiao] = useState(false)
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [secret, setSecret] = useState('')
@@ -850,7 +845,6 @@ export default function ExamMonitorScreen() {
   useEffect(() => {
     // Đổi ca ⇒ quên tiến độ sống của ca cũ.
     nhipRef.current = { maCa: maCaTheoDoiNen ?? '', moc: '', dauVet: null, taiDayLuc: Date.now() }
-    setMoGiao(false) // công tắc Giao chiến dịch: mỗi lần mở ca đều TẮT (thầy 29/09)
     setTienDoSong({})
     setSongOn(false)
   }, [maCaTheoDoiNen])
@@ -1343,7 +1337,6 @@ export default function ExamMonitorScreen() {
       }
     : null
   const tt = chiTiet && tk ? trangThaiCa({ ...chiTiet.ca, ...tk }, now) : null
-  const coGiaoChienDich = !!(hoa2 && chiTiet && tt && chiTiet.ca.loai !== 'baitap' && (chiTiet.ca.trangThai === 'dong' || tt.ten === 'Xong' || tt.ten === 'Hết giờ vào'))
 
   // ---------------------------------------------------------- KHOÁ / MỞ CA
   // Hai con số này đi thẳng vào hộp xác nhận. Nói "một số em" thì thầy không
@@ -1841,14 +1834,6 @@ export default function ExamMonitorScreen() {
               {chiTiet && <Pencil size={16} className="shrink-0" style={{ color: 'var(--nhat)' }} />}
             </button>
             <span className="flex items-center flex-wrap justify-end min-w-0" style={{ gap: 'var(--k2)' }}>
-            {coGiaoChienDich && (
-              <button type="button" role="switch" aria-checked={moGiao} className="ca-nut-chieu ca-cong-tac" data-bat={moGiao ? 'bat' : 'tat'} onClick={() => setMoGiao((v) => !v)}>
-                <span className="ca-cong-tac-ray" aria-hidden="true">
-                  <i />
-                </span>
-                Giao chiến dịch luyện từ ca này
-              </button>
-            )}
             {chiTiet && (
               <button type="button" className="ca-nut-chieu" onClick={() => setChieuMa(true)}>
                 Chiếu mã vào thi
@@ -1939,19 +1924,6 @@ export default function ExamMonitorScreen() {
 
       {chiTiet && tk && tt && (
         <>
-          {coGiaoChienDich && (() => {
-            const maDeCa = maDeTuBoCau((teacherBank ?? []).flatMap((b) => [...(b.phanI ?? []), ...(b.phanII ?? []), ...(b.phanIII ?? [])].map((q) => q.id)))
-            return !moGiao ? null : (
-              <GiaoChienDich
-                key={`${chiTiet.ca.maCa}|${maDeCa.join(',')}`}
-                maCa={chiTiet.ca.maCa}
-                lop={chiTiet.ca.lop}
-                maDeCa={maDeCa}
-                tenGoiY={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
-                onDeSau={() => setMoGiao(false)}
-              />
-            )
-          })()}
           {chiTiet.ca.trangThai === 'mo' ? (
             <>
             {vePhongCho()}

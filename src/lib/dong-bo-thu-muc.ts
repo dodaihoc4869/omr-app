@@ -31,9 +31,22 @@ async function napKhoMacDinh(): Promise<TeacherExamSource[]> {
 
 export type KetQuaDongBoThuMuc = 'da_gui' | 'hom_nay_roi' | 'kho_trong' | 'may_chu_tu_choi' | 'loi_tam'
 
+let dangDongBo: { ngay: string; nap: () => Promise<TeacherExamSource[]>; hua: Promise<KetQuaDongBoThuMuc> } | null = null
+
 /** Gửi thư mục mục đích của kho lên máy chủ nếu hôm nay chưa gửi. `nap` cho test thay nguồn kho. */
-export async function dongBoThuMucKho(nowMs: number = Date.now(), nap: () => Promise<TeacherExamSource[]> = napKhoMacDinh): Promise<KetQuaDongBoThuMuc> {
+export function dongBoThuMucKho(nowMs: number = Date.now(), nap: () => Promise<TeacherExamSource[]> = napKhoMacDinh): Promise<KetQuaDongBoThuMuc> {
   const homNay = ngayVn(nowMs)
+  // Hai nơi cùng mở app (kể cả StrictMode) chỉ đọc kho và gửi một lượt. Chỉ
+  // gộp khi đang chạy; mất mạng hoặc kho đổi thì lượt sau vẫn được thử lại.
+  if (dangDongBo?.ngay === homNay && dangDongBo.nap === nap) return dangDongBo.hua
+  const hua = dongBoThuMucThat(homNay, nap).finally(() => {
+    if (dangDongBo?.hua === hua) dangDongBo = null
+  })
+  dangDongBo = { ngay: homNay, nap, hua }
+  return hua
+}
+
+async function dongBoThuMucThat(homNay: string, nap: () => Promise<TeacherExamSource[]>): Promise<KetQuaDongBoThuMuc> {
   if (docNgay() === homNay) return 'hom_nay_roi'
   let ds: TeacherExamSource[]
   try {

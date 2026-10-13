@@ -226,17 +226,17 @@ const DS = [
   ['01c-hom-nay-may-tinh-toi', 'sanh', 1440, 960, 'dark', false, /Hôm nay/],
   ['01c-hom-nay-may-tinh', 'sanh', 1440, 960, 'light', false, /Hôm nay/],
   ['01d-hom-nay-xong', 'sanh-xong', 390, 844, 'light', true, /Hôm nay/],
-  ['01e-hom-nay-ca-dang-mo', 'sanh-ca-mo', 390, 844, 'light', false, /Vào thi/],
+  ['01e-hom-nay-ca-dang-mo', 'sanh-ca-mo', 390, 844, 'light', false, /Ca kiểm tra đang mở/],
   ['01f-hom-nay-dang-tai', 'sanh-dang-tai', 390, 844, 'light', false, /Hành trình/],
-  ['06-than-thu-doc', 'than-thu', 390, 844, 'light', true, /Thần thú của em/],
-  ['06-than-thu-may-tinh', 'than-thu', 1440, 900, 'light', false, /Thần thú của em/],
-  ['07-cua-hang-doc', 'cua-hang', 390, 844, 'light', true, /Cửa hàng/],
-  ['07-cua-hang-may-tinh', 'cua-hang', 1440, 900, 'light', false, /Cửa hàng/],
-  ['08-bat-linh-dao-ngang', 'dao', 1280, 720, 'light', false, /LÊN ĐƯỜNG|Lên đường/, 'dao'],
-  ['08-bat-linh-dao-dien-thoai-ngang', 'dao', 844, 390, 'light', false, /LÊN ĐƯỜNG|Lên đường/, 'dao'],
-  ['08-bat-linh-dao-doc', 'dao', 390, 844, 'light', false, /LÊN ĐƯỜNG|Lên đường/, 'dao'],
-  ['09-doan-ho-tong-ngang', 'doan', 1280, 720, 'light', false, /CHỐT ĐÁP ÁN|CHỌN ĐÁP ÁN/, 'doan'],
-  ['09-doan-ho-tong-dien-thoai-ngang', 'doan', 844, 390, 'light', false, /CHỐT ĐÁP ÁN|CHỌN ĐÁP ÁN/, 'doan'],
+
+
+
+
+
+
+
+
+
   // Hành trình (thầy 09/10 tối: "chỉ cần giữ lại phần dạy học" + "kiểm tra đầu giờ giữ lại"): ba thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa;
   // Cần thầy chữa = MỘT danh sách (chờ chữ "chỗ cần chữa"), bấm một dòng ⇒ chỗ làm việc; Chiến dịch đã giao = trang riêng (mở từ Cài đặt).
   ['14-gv-day-hoc', 'gv-nhip', 1440, 960, 'light', false, /Hành trình giỏi Hóa/, 'tieu-de:Điểm danh'],
@@ -295,7 +295,7 @@ const DS = [
   ['14-gv-chien-dich-da-giao-dien-thoai-toi', 'gv-nhip&the=chien-dich', 390, 844, 'dark', true, /Chiến dịch đã giao/],
   ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
     [`20-ph-${k}-${nen}`, 'ph', w,h,nen,true,/Hôm nay/],
-    [`21-de-thu-${k}-${nen}`, 'de-thu',w,h,nen,true,/Đề thử 14 câu/,'de-thu'],
+
   ])),
   ...[[390,844,'doc'],[844,390,'ngang'],[1440,960,'may-tinh']].flatMap(([w,h,k]) => [
     ...[['hanh-trinh','Hành trình'],['on-lai','Ôn lại'],['cua-em','Của em']].map(([m,chu]) => [`22-hs-${m}-${k}`, 'sanh', w,h,'light',true,/Hôm nay/,`hs:${chu}`]),
@@ -338,6 +338,13 @@ const DS = [
 const loiTrang = []
 const tran = []
 const chamNho = []
+const khongCon = CHON.filter(c => !DS.some(([ten]) => ten.startsWith(c)))
+if (khongCon.length) {
+  await trinh.close()
+  may.close()
+  throw Error('Không còn cảnh chụp: ' + khongCon.join(', '))
+}
+
 for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   if (CHON.length && !CHON.some((c) => ten.startsWith(c))) continue
   // LÀN THẺ HÔM NAY 12/10E: nền 'ep-toi' = máy tối + trình duyệt ép tối trang web (một trình duyệt riêng có cờ, mở khi cần)
@@ -372,19 +379,6 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       const [,hash,chu] = viec.split(':')
       await t.evaluate(h => {location.hash=h}, hash)
       await t.getByRole('heading', {name:chu,exact:true}).waitFor()
-    } else if (viec === 'de-thu') {
-      await t.locator('.dao2-de-thu-cau').first().locator('.pa-hang').nth(2).click()
-      const chon = t.locator('.dao2-de-thu-ban-do button').first()
-      if (await chon.getAttribute('data-da-lam') !== 'true') throw new Error('Bản đồ không cập nhật câu đã làm')
-      const rong = {width:w,height:hgt}
-      await t.setViewportSize({width:hgt,height:w})
-      await t.waitForTimeout(200)
-      if (await chon.getAttribute('data-da-lam') !== 'true') throw new Error('Xoay làm mất đáp án')
-      await t.setViewportSize(rong)
-      await t.getByRole('button',{name:'Câu 14: chưa làm',exact:true}).click()
-      if (await t.evaluate(()=>document.activeElement?.id) !== 'de-thu-cau-14') throw new Error('Không đưa focus đến câu 14')
-      await t.getByRole('button',{name:'Câu 1: đã làm',exact:true}).click()
-      await t.evaluate(()=>window.scrollTo(0,0))
     } else if (viec?.startsWith('tieu-de:')) {
       await t.getByRole('heading', { name: new RegExp(viec.slice(8)) }).first().waitFor({ timeout: 20000 })
     } else if (viec?.startsWith('cho:')) {
@@ -625,15 +619,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.getByRole('button', { name: 'Danh sách cần chữa' }).waitFor()
       await t.waitForTimeout(600)
       await t.evaluate(() => window.scrollTo(0, 0))
-    } else if (viec === 'dao') {
-      await t.getByRole('button', { name: /LÊN ĐƯỜNG|Lên đường/ }).first().click()
-      await t.getByText(/^(ẢI|Câu) 1\//).first().waitFor({ timeout: 20000 })
-      await t.waitForTimeout(600)
-      await t.getByRole('button', { name: /CH₃COOCH₃|CH3COOCH3/ }).first().click()
-    } else if (viec === 'doan') {
-      await t.waitForTimeout(600)
-      await t.getByRole('button', { name: /Methyl acetate/ }).first().click()
-    }
+    } else {}
   } catch (e) {
     const chu = `${ten}: thao tác ${viec} hỏng — ${String(e).slice(0, 300)}`
     loiTrang.push(chu)

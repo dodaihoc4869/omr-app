@@ -1,7 +1,19 @@
 /* Chỉ màn thầy sửa hạn mới nạp; không làm nặng lần mở app học sinh/phụ huynh. */
 .gvv2-bdg-cu { display: flex; align-items: center; gap: 8px; min-height: 48px; color: var(--gvm-chu-3); font-size: 13px; }
-.gvv2-bdg-sua-han { display: grid; gap: 4px; min-width: 0; font-size: 12px; }
+.gvv2-bdg-sua-han { display: grid; gap: 4px; min-width: 0; font-size: 13px; }
 .gvv2-bdg-sua-han label { display: grid; gap: 4px; }
 .gvv2-bdg-sua-han input { box-sizing: border-box; width: 100%; min-width: 0; min-height: 48px; padding: 4px; border: 1px solid var(--gvm-vien); border-radius: 8px; background: var(--gvm-mat); color: var(--gvm-chu); font: inherit; }
-.gvv2-bdg-sua-han > span { display: flex; flex-wrap: wrap; }
+.gvv2-bdg-sua-han > span { display: flex; flex-wrap: wrap; gap: 8px; }
 .gvv2-bdg-sua-han p { margin: 0; color: var(--gvm-chu); overflow-wrap: anywhere; }
+.gvv2-bdg-cong-cu { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.gvv2-bdg-hang-loat { display: grid; gap: 8px; min-width: 0; padding: 16px; border: 1px solid var(--gvm-vien); border-radius: 12px; background: var(--gvm-mat); }
+.gvv2-bdg-hang-loat h4 { margin: 0; color: var(--gvm-chu); font-size: 15px; }
+.gvv2-bdg-chon-nhieu { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 4px 16px; }
+.gvv2-bdg-hang-loat .gvv2-bdg-sua-han { max-width: 360px; }
+.gvv2-bdg-han-o { display: grid; gap: 2px; min-width: 0; }
+.gvv2-bdg-da-luu { display: block; min-height: 18px; color: var(--gvm-xl); font-size: 12px; overflow-wrap: anywhere; }
+.gvv2-bdg .gvv2-nut-chu { min-height: 48px; touch-action: manipulation; }
+@media (max-width: 720px) {
+  .gvv2-bdg-sua-han { font-size: 15px; }
+  .gvv2-bdg-han-o { text-align: right; }
+}

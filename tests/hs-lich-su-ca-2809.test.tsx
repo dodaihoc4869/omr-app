@@ -1,4 +1,4 @@
-// LỊCH SỬ CA + BÁO CÁO CHI TIẾT BẢN MỚI phía HỌC SINH (thầy 28/09): thẻ nhỏ trên Sảnh → màn Lịch sử ca → BaoCaoChiTiet chế độ em.
+// LỊCH SỬ CA + BÁO CÁO CHI TIẾT phía HỌC SINH: Kết quả của HocTapHomNay → Lịch sử ca → BaoCaoChiTiet chế độ em.
 // Khoá: chỉ ca ĐÃ CÔNG BỐ có điểm; mới nhất trên cùng; bấm mở đúng ca; chế độ em không hạng/không so lớp/không mã ca;
 // lời giải đi qua TheCau (khuôn Câu đã làm); mức độ nhận thức số thật hoặc ẩn; máy chủ không trả ca/câu của em khác.
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -7,6 +7,7 @@ import { dungLichSuCa, chuTheCaGanNhat, ngayThangVn } from '../src/lib/lich-su-c
 import { demMucDoNhanThuc } from '../src/lib/muc-do-nhan-thuc'
 import { baoCaoCuaEm } from '../src/lib/bao-cao-cua-em'
 import BaoCaoChiTiet from '../src/components/ca-thi/BaoCaoChiTiet'
+import HocTapHomNay from '../src/components/hoc-tap/HocTapHomNay'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -71,10 +72,16 @@ describe('thẻ nhỏ trên Sảnh', () => {
     expect(ngayThangVn('2026-09-25T23:30:00Z')).toBe('26/09')
     expect(ngayThangVn('hỏng')).toBe('')
   })
-  it('Sảnh nối thẻ vào màn Lịch sử ca', () => {
-    const sanh = readFileSync(resolve(__dirname, '../src/components/hoa2/SanhBanDo.tsx'), 'utf8')
+  it('Kết quả của màn học tập nối Ca kiểm tra vào Lịch sử ca', () => {
+    // SỬA CÓ CHỦ ĐÍCH 14/10: Sảnh đã ngừng; kiểm lối vào học tập hiện tại và giữ dây nạp lười của cổng.
+    const onLichSu = vi.fn(), noop = () => {}
+    render(<HocTapHomNay ten="An" lop="12A1" ketQua={null} dangTai={false} loi="" coCa={false}
+      onHoc={noop} onXemLai={noop} onChua={noop} onThi={noop} onTuLuyen={noop} onLichSu={onLichSu}
+      onBaiTap={noop} onGiaDinh={noop} onTaiLai={noop} onDangXuat={noop} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Kết quả' }))
+    fireEvent.click(screen.getByRole('button', { name: /^Ca kiểm tra/ }))
+    expect(onLichSu).toHaveBeenCalledTimes(1)
     const cong = readFileSync(resolve(__dirname, '../src/screens/StudentPortalScreen.tsx'), 'utf8')
-    expect((sanh.match(/<TheCaGanNhatSanh p=\{p\} \/>/g) ?? []).length).toBe(2)
     expect(cong).toContain("onLichSu={() => setTab('lichsuca')}")
     expect(cong).toContain("import('../components/hoa2/LichSuCaEm')")
   })

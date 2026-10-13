@@ -56,7 +56,8 @@ export async function gameIdentityHaiBuoc(env:Env,b:Record<string,unknown>):Prom
  * Token cũ (cấp trước 21/09, không có `pk`) vẫn dùng được tới khi hết hạn 30 ngày; không thu hồi được.
  */
 export async function parentPass(env:Env,sbd:string,ngayHan=30):Promise<string>{
-  const row=await env.DB.prepare('SELECT mat_khau FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{mat_khau:string|null}>().catch(()=>null)
+  // Đọc lỗi thì không cấp mã: chưa đọc được mật khẩu không có nghĩa em chưa có mật khẩu.
+  const row=await env.DB.prepare('SELECT mat_khau FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{mat_khau:string|null}>()
   const o:Record<string,unknown>={sbd,exp:Date.now()+Math.max(1,Math.min(365,Math.round(ngayHan)||30))*86400000,purpose:'game-parent'}
   if(row?.mat_khau)o.pk=await hash(row.mat_khau) // KHÔNG đặt tên `pwd`: `gameIdentity` kiểm `pwd` — token PH mà đọc được như token học sinh là PH thành em
   const payload=btoa(JSON.stringify(o));return `${payload}.${await signature(env,payload)}`

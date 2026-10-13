@@ -30,13 +30,13 @@ export const xoaNhoNhipHocEm = (): void => NHO.clear()
 
 /** Nạp `/hs/nhip-hoc`: 'tai' (đang tải) · 'an' (không token / lỗi lần đầu ⇒ ẩn gọn) · số. Lỗi khi đã có số ⇒ giữ số cũ. */
 export function useNhipHocEm(token: string | undefined, lamMoi: number | null | undefined): KetQuaNhipHocEm | 'tai' | 'an' {
-  const [kq, setKq] = useState<KetQuaNhipHocEm | null>(() => (token ? (NHO.get(token)?.kq ?? null) : null))
-  const [hong, setHong] = useState(false)
+  // Bản hiện gắn với phiên: đổi em trên máy dùng chung không được giữ nhóm/nhịp của em trước.
+  const [ban, setBan] = useState(() => ({ token, kq: token ? NHO.get(token)?.kq ?? null : null, hong: false }))
   useEffect(() => {
     if (!token) return
     const c = NHO.get(token)
     if (c && c.khoa === lamMoi && Date.now() - c.luc < NHO_MS) {
-      setKq(c.kq)
+      setBan({ token, kq: c.kq, hong: false })
       return
     }
     let huy = false
@@ -46,16 +46,15 @@ export function useNhipHocEm(token: string | undefined, lamMoi: number | null | 
       if (huy) return
       if (r) {
         NHO.set(token, { kq: r, luc: Date.now(), khoa: lamMoi })
-        setKq(r)
-        setHong(false)
-      } else setHong(true)
+        setBan({ token, kq: r, hong: false })
+      } else setBan(v => ({ token, kq: v.token === token ? v.kq : null, hong: true }))
     })
     return () => {
       huy = true
     }
   }, [token, lamMoi])
   if (!token) return 'an'
-  return kq ?? (hong ? 'an' : 'tai')
+  return ban.token === token ? ban.kq ?? (ban.hong ? 'an' : 'tai') : NHO.get(token)?.kq ?? 'tai'
 }
 
 /** Các chặng của hôm nay: chặng i gồm câu (6·i, min(6·(i+1), M)] — đúng luật vạch chặng / `soChangXong`; chặng cuối lấy hết phần còn lại tới M. */

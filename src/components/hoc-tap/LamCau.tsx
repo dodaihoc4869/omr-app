@@ -258,13 +258,16 @@ export function PhanHoiTracNghiem({ q, tra, dapAn }: { q: Question; tra: string;
         const laDapAn = dapAn === chu, emChon = tra === chu
         const ket = laDapAn ? 'dung' : emChon ? 'sai' : 'mo'
         const nhan = emChon && laDapAn ? 'Em chọn · đáp án' : laDapAn ? 'Đáp án' : emChon ? 'Em chọn' : ''
+        const anhSau = q.hinhAnh.filter((h) => h.viTri === `sau_pa_${chu}`)
+        const gopAnh = !q.choiceImgs?.[i] && anhSau.length > 0 && laChuGiuCho(q.choices[i] ?? '')
         return (
           <div key={chu} className="ht2-lam-pa-khoi">
             <div className="ht2-lam-pa" data-ket={ket}>
               <b className="ht2-lam-pa-ma">{chu}</b>
-              <span className="ht2-lam-pa-chu">{ket !== 'mo' && <span className="ht2-an">Phương án {chu}: </span>}<NoiDung chu={q.choices[i] ?? ''} anh={q.choiceImgs?.[i]} alt={`Phương án ${chu}`} /></span>
+              <span className="ht2-lam-pa-chu">{ket !== 'mo' && <span className="ht2-an">Phương án {chu}: </span>}{gopAnh ? anhSau.map((h, k) => <img key={k} src={h.src} alt={h.alt ?? `Phương án ${chu}`} loading="lazy" decoding="async" className="ht2-lam-anh-nho" />) : <NoiDung chu={q.choices[i] ?? ''} anh={q.choiceImgs?.[i]} alt={`Phương án ${chu}`} />}</span>
               {nhan && <small className="ht2-lam-pa-nhan">{nhan}</small>}
             </div>
+            {!gopAnh && <HinhTaiViTri hinhAnh={hinh(q)} viTri={`sau_pa_${chu}`} nhan={`phương án ${chu}`} />}
           </div>
         )
       })}

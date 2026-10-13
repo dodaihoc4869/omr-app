@@ -55,10 +55,8 @@ import BottomNav from '../src/components/BottomNav'
 import { useCoHoa2 } from '../src/components/chien-dich/co-hoa2'
 import { useSoDemGv } from '../src/lib/so-dem-gv'
 import { useAppStore } from '../src/store/appStore'
-import { chuHan } from '../src/components/chien-dich/DsChienDichDaGiao'
 import { coHanNop, conLai, hienHanNop, laHanGia } from '../src/components/chien-dich/ngay'
 const { default: GvHomNayScreen, chuCanThayChua, demCanThayChua } = await import('../src/screens/GvHomNayScreen')
-const { default: TongQuanScreen } = await import('../src/screens/TongQuanScreen')
 const { default: ChienDichScreen } = await import('../src/screens/ChienDichScreen')
 const { default: HanhTrinhV2 } = await import('../src/components/chien-dich/HanhTrinhV2')
 const { default: TheBaiDaDay } = await import('../src/components/chien-dich/TheBaiDaDay')
@@ -413,7 +411,7 @@ describe('Hành trình: hai mục Dạy học & đầu giờ · Chữa bài', ()
     }
   })
 
-  it('ChienDichScreen: Hôm nay đặt khoá cũ can-chua ⇒ mở Chữa bài rồi xoá yêu cầu; không yêu cầu ⇒ Dạy học & đầu giờ; Chiến dịch đã giao là trang riêng có nút quay lại', async () => {
+  it('ChienDichScreen: Hôm nay đặt khoá cũ can-chua ⇒ mở Chữa bài rồi xoá yêu cầu; không yêu cầu ⇒ Dạy học & đầu giờ; khoá chiến dịch cũ về Dạy học & đầu giờ', async () => {
     mayChu()
     useSoDemGv.getState().datMoHanhTrinh({ the: 'can-chua' })
     const { unmount } = render(<ChienDichScreen />)
@@ -425,22 +423,16 @@ describe('Hành trình: hai mục Dạy học & đầu giờ · Chữa bài', ()
     expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
     lan2.unmount()
 
-    // lối vào từ Cài đặt › "Mở danh sách chiến dịch"
+    // SỬA CÓ CHỦ ĐÍCH 14/10: đã gỡ trang quản lý cũ; khoá điều hướng tồn đọng vẫn mở Hành trình.
     useSoDemGv.getState().datMoHanhTrinh({ the: 'chien-dich' })
+    useSoDemGv.getState().datGiaoTuCa({ maCa: 'ca-cu', lop: '12A1', ten: 'Ca cũ' })
     render(<ChienDichScreen />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Chiến dịch đã giao' })).toBeTruthy()
-    expect(screen.queryByRole('tablist', { name: 'Hành trình' })).toBeNull()
-    expect(screen.getByRole('button', { name: 'Giao chiến dịch mới' })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Giao theo bài' })).toBeNull()
-    expect(await screen.findByText(HT12.ten)).toBeTruthy()
-    await waitFor(() => expect(useSoDemGv.getState().moHanhTrinh).toBeNull())
-    fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
     expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.queryByRole('heading', { name: 'Chiến dịch đã giao' })).toBeNull()
+    await waitFor(() => expect(useSoDemGv.getState()).toMatchObject({ moHanhTrinh: null, giaoTuCa: null }))
 
-    // Cài đặt (2.0) có lối vào gọn tới trang này
     const caiDat = readFileSync(resolve(__dirname, '../src/screens/CaiDatScreen.tsx'), 'utf8')
-    expect(caiDat).toContain("datMoHanhTrinh({ the: 'chien-dich' })")
-    expect(caiDat).toContain('Mở danh sách chiến dịch')
+    expect(caiDat).not.toContain('Mở danh sách chiến dịch')
   })
 })
 
@@ -591,29 +583,10 @@ describe('lỗi hạn nộp Hành trình (hạn giả 9999-12-31 bị in "còn ~
   it('hàm ngày: hạn giả ⇒ không chữ hạn, không "còn … ngày"', () => {
     expect(laHanGia('9999-12-31')).toBe(true)
     expect(laHanGia('2026-10-20')).toBe(false)
-    expect(chuHan('9999-12-31', '2026-10-09')).toBe('')
-    expect(chuHan('2026-10-12', '2026-10-09')).toBe('còn 3 ngày')
     expect(conLai('9999-12-31', Date.parse('2026-10-09T03:00:00Z'))).toBe('')
     expect(hienHanNop('9999-12-31')).toBe('Học mỗi ngày')
     expect(coHanNop({ hanNop: '9999-12-31' })).toBe(false)
     expect(coHanNop({ hanNop: '2026-10-20', hanhTrinh: true })).toBe(false)
     expect(coHanNop({ hanNop: '2026-10-20' })).toBe(true)
-  })
-
-  it('Tổng quan: dòng Hành trình KHÔNG ghi hạn nộp; chiến dịch thường vẫn ghi', async () => {
-    m.danhSachCa.mockResolvedValue([])
-    m.goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
-      if (b.action === 'danh-sach') return { ok: true, du: { homNay: '2026-10-09', chienDich: [HT12, CDA] } }
-      if (b.action === 'bang') return { ok: true, du: BANG[String(b.id)] }
-      return { ok: false, loai: 'tu_choi', chu: 'lạ' }
-    })
-    render(<TongQuanScreen />)
-    const dongHt = (await screen.findByRole('button', { name: HT12.ten })).closest('li') as HTMLElement
-    expect(dongHt.textContent).not.toContain('Hạn nộp')
-    expect(dongHt.textContent).not.toMatch(/còn \d{4,} ngày|triệu|31\/12/)
-    const dongCd = screen.getByRole('button', { name: CDA.ten }).closest('li') as HTMLElement
-    expect(dongCd.textContent).toContain('Hạn nộp')
-    expect(dongCd.textContent).toContain('còn 11 ngày')
-    expect(dongCd.textContent).toContain('23:59 · 20/10')
   })
 })

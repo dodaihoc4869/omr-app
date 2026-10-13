@@ -26,7 +26,6 @@ import { useSoDemGv } from '../src/lib/so-dem-gv'
 import { useAppStore } from '../src/store/appStore'
 import { baiNopTheoNgay, dongChienDich, mucCanHomNay, thongKeThang } from '../src/lib/tong-quan-gv'
 import type { BangChienDich, ChienDichTom } from '../src/components/chien-dich/api'
-const { default: TongQuanScreen } = await import('../src/screens/TongQuanScreen')
 const { default: LichSuCaScreen, CHU_CA_TRONG_HOA2 } = await import('../src/screens/LichSuCaScreen')
 
 const ca = (maCa: string, o: Partial<CaTomTat> = {}): CaTomTat =>
@@ -109,56 +108,6 @@ describe('thanh bên 2.0 · số đếm cạnh mục', () => {
     expect(screen.getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: 'Ca kiểm tra' }).getAttribute('title')).toBe('Ca kiểm tra · 1 ca đang mở')
     expect(screen.getByRole('button', { name: 'Hành trình' }).getAttribute('title')).toBe('Hành trình · Cần thầy chữa: 7 chỗ')
-  })
-})
-
-describe('Tổng quan', () => {
-  it('thẻ số có nhãn + đơn vị; ca đang mở; chiến dịch đang chạy; việc cần làm; ghi số cho thanh bên', async () => {
-    const c1 = cd('A')
-    m.danhSachCa.mockResolvedValue([ca('DH-12-C2-B6'), ca('DH-12-C1-A1', { trangThai: 'dong', batDau: '2026-09-26T12:00:00Z', moLuc: '2026-09-26T12:00:00Z', daNop: 30, daVao: 30 })])
-    m.goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
-      if (b.action === 'danh-sach') return { ok: true, du: { homNay: '2026-09-28', chienDich: [c1, cd('B', { trangThai: 'da_dong' })] } }
-      if (b.action === 'bang') return { ok: true, du: bang(c1, 0.2) }
-      return { ok: false, loai: 'tu_choi', chu: 'lạ' }
-    })
-    render(<TongQuanScreen />)
-    expect(await screen.findByRole('heading', { name: 'Chiến dịch luyện đang chạy' })).toBeTruthy()
-    const kpi = screen.getByRole('region', { name: 'Số liệu chính' })
-    expect(kpi.textContent).toContain('Em được giao chiến dịch')
-    expect(kpi.textContent).toContain('Thành thạo trung bình20 % câu')
-    expect(kpi.textContent).toMatch(/mức cần hôm nay \d+%/)
-    expect(kpi.textContent).toContain('Em trễ nhịp từ 2 ngày1 em')
-    expect(kpi.textContent).toContain('Câu cần thầy dạy lại4 câu')
-    // chỉ chiến dịch đang chạy (B đã kết thúc)
-    expect(screen.getByRole('button', { name: 'Chiến dịch A' })).toBeTruthy()
-    expect(screen.queryByText('Chiến dịch B')).toBeNull()
-    expect(document.querySelector('.gv2-chip')?.textContent).toBe('Chậm nhịp')
-    // ca đang mở + nút Theo dõi ca
-    const theCa = screen.getByRole('region', { name: 'Ca đang mở' })
-    expect(within(theCa).getByText('Kiểm tra DH-12-C2-B6')).toBeTruthy()
-    expect(theCa.textContent).toContain('Rời màn2 lần')
-    expect(within(theCa).getByRole('button', { name: 'Theo dõi ca' })).toBeTruthy()
-    // việc cần làm: câu dạy lại, em trễ nhịp, ca chưa có chiến dịch
-    const viec = screen.getByRole('region', { name: 'Việc cần làm' })
-    expect(viec.textContent).toContain('4 câu cần thầy dạy lại')
-    expect(viec.textContent).toContain('1 em trễ nhịp từ 2 ngày')
-    expect(viec.textContent).toContain('Ca 26/09 chưa có chiến dịch')
-    await waitFor(() => expect(useSoDemGv.getState()).toMatchObject({ caMo: 1, chienDichChay: 1, canDayLai: 4 }))
-    // "Giao" ở ca chưa có chiến dịch ⇒ màn Chiến dịch luyện, khung giao mở sẵn cho ca ấy
-    fireEvent.click(within(viec).getByRole('button', { name: /^Giao: Ca 26\/09/ }))
-    expect(useAppStore.getState().screen).toBe('chiendich')
-    expect(useSoDemGv.getState().giaoTuCa?.maCa).toBe('DH-12-C1-A1')
-  })
-
-  it('không có ca mở, không có chiến dịch ⇒ mỗi khối một dòng chữ, không số giả', async () => {
-    m.danhSachCa.mockResolvedValue([])
-    m.goi.mockResolvedValue({ ok: true, du: { homNay: '2026-09-28', chienDich: [] } })
-    render(<TongQuanScreen />)
-    expect(await screen.findByText('Không có ca nào đang mở.')).toBeTruthy()
-    expect(screen.getByText('Chưa có chiến dịch nào đang chạy. Giao chiến dịch ở mục Chiến dịch luyện.')).toBeTruthy()
-    expect(screen.getByText('Không có việc cần làm ngay.')).toBeTruthy()
-    expect(screen.getByText('Chưa có bài nộp nào trong 14 ngày qua.')).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Theo dõi ca' })).toBeNull()
   })
 })
 

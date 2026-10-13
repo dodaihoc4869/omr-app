@@ -152,12 +152,17 @@ describe('MÃ MÀN THI — ba chốt không được mất', () => {
 
   it('BÀI LƯU LÊN MÁY TRƯỚC khi gọi mạng — giãn cú nộp không được làm mất bài', () => {
     const khoi = MAN.slice(MAN.indexOf('const doSubmit = async'), MAN.indexOf('const apDungKeyBank'))
-    const viTriLuu = khoi.indexOf('await saveAttempt(updated)')
-    const viTriGian = khoi.indexOf('gianNopTuDong()')
+    const viTriPending = khoi.indexOf('pendingSubmit: true')
+    expect(viTriPending).toBeGreaterThan(-1)
+    expect(khoi.indexOf('await luuVaNop(updated, tuDongNop)')).toBeGreaterThan(viTriPending)
+    const helper = MAN.slice(MAN.indexOf('const luuVaNop = async'), MAN.indexOf('const doSubmit = async'))
+    const viTriLuu = helper.indexOf('await saveAttempt(snapshot)')
+    const viTriGian = helper.indexOf('gianNopTuDong()')
     expect(viTriLuu).toBeGreaterThan(-1)
     expect(viTriGian).toBeGreaterThan(viTriLuu)
+    expect(helper.indexOf('trySend(snapshot)')).toBeGreaterThan(viTriGian)
     // Và chỉ giãn khi TỰ ĐỘNG nộp lúc hết giờ, không giãn khi em tự bấm.
-    expect(khoi).toContain('const giam = tuDongNop ? gianNopTuDong() : 0')
+    expect(helper).toContain('const giam = tuDongNop ? gianNopTuDong() : 0')
   })
 })
 

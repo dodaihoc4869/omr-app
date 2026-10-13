@@ -1,0 +1,71 @@
+{
+  "duLieu": "Giả; chỉ bản vẽ, không gọi API thật",
+  "ketQua": [
+    {
+      "ten": "doc-sang",
+      "width": 360,
+      "height": 800,
+      "bytes": 33481,
+      "loi": [],
+      "tranNgang": 0,
+      "nho": [],
+      "tuongPhanThap": [],
+      "nutLuuBiChe": false
+    },
+    {
+      "ten": "doc-toi",
+      "width": 360,
+      "height": 800,
+      "bytes": 30083,
+      "loi": [],
+      "tranNgang": 0,
+      "nho": [],
+      "tuongPhanThap": [],
+      "nutLuuBiChe": false
+    },
+    {
+      "ten": "ngang-sang",
+      "width": 800,
+      "height": 390,
+      "bytes": 35787,
+      "loi": [],
+      "tranNgang": 0,
+      "nho": [],
+      "tuongPhanThap": [],
+      "nutLuuBiChe": false
+    },
+    {
+      "ten": "ngang-toi",
+      "width": 800,
+      "height": 390,
+      "bytes": 32233,
+      "loi": [],
+      "tranNgang": 0,
+      "nho": [],
+      "tuongPhanThap": [],
+      "nutLuuBiChe": false
+    },
+    {
+      "ten": "may-tinh-sang",
+      "width": 1280,
+      "height": 800,
+      "bytes": 55563,
+      "loi": [],
+      "tranNgang": 0,
+      "nho": [],
+      "tuongPhanThap": [],
+      "nutLuuBiChe": false
+    },
+    {
+      "ten": "may-tinh-toi",
+      "width": 1280,
+      "height": 800,
+      "bytes": 50903,
+      "loi": [],
+      "tranNgang": 0,
+      "nho": [],
+      "tuongPhanThap": [],
+      "nutLuuBiChe": false
+    }
+  ]
+}

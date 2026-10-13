@@ -12,7 +12,7 @@ const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 
 /** Đồng hồ / hiệu ứng KHÔNG gọi máy chủ (chỉ vẽ lại, đếm giờ cục bộ) — đúng số vòng. */
 const KHONG_GOI_MAY_CHU: Record<string, number> = {
-  'src/components/hoc-tap/ManKiemTraCaNhan.tsx': 1, // 1 s vẽ giờ máy chủ; hết giờ chốt một lần qua tuNop, không vòng hỏi D1.
+  'src/components/hoc-tap/ManKiemTraCaNhan.tsx': 0, // 1 s vẽ giờ máy chủ; hết giờ chốt một lần qua tuNop, không vòng hỏi D1.
   'src/components/KhoiKhacPhuc3CheDo.tsx': 1,
   'src/components/KhoiThoiGianCa.tsx': 1,
   'src/components/ca-thi/TheoDoiCa.tsx': 1, // 1 s đồng hồ vòng "phút còn lại" theo gioMayChu() (29/09) — vòng HỎI là /ca/nhip ở màn cha qua useNhipThay
@@ -20,16 +20,11 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/NutNopBtvn.tsx': 1,
   'src/components/PhongChoGame.tsx': 0, // 01/10: Chuyến bay dùng RAF, bỏ đồng hồ cao độ 100 ms
   'src/components/bang-nhiem-vu/DanhSachNhiemVu.tsx': 1,
-  'src/components/bang-tin-san/hooks.ts': 1,
-  'src/game/than-thu-v2/DoanHoTong.tsx': 1, // 250 ms vẽ lại đồng hồ trận (vòng HỎI trận đã chuyển sang batVongTrucTiep)
-  'src/game/than-thu-v2/dao2/DeThu.tsx': 1, // OMNI 3 đề thử (05/10): 1 s vẽ lại đồng hồ đếm ngược theo `hetLuc` máy chủ; hết giờ tự nộp MỘT lần (không vòng hỏi)
-  'src/game/than-thu-v2/ImmortalShield.tsx': 1,
-  'src/game/bi-a/TamCauBia.tsx': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
-  'src/components/tu-luyen/ManTuLuyen.tsx': 2, // Tu luyện (29/09): 1 s đếm giờ làm trong ref + 1 s ô đồng hồ nhỏ tự vẽ lại; chấm qua /hs/tu-luyen/nop một lần, không vòng hỏi
-  'src/game/bi-a/ManChoi.tsx': 0, // 30/09 thầy duyệt "Bàn Bi-a mới": bỏ hai nút ◀ ▶ (vòng 45 ms khi GIỮ nút) — thay bằng bánh xe kéo, không hẹn giờ
+  'src/components/bang-tin-san/hooks.ts': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
+  'src/components/tu-luyen/ManTuLuyen.tsx': 2, // 30/09 thầy duyệt "Bàn Bi-a mới": bỏ hai nút ◀ ▶ (vòng 45 ms khi GIỮ nút) — thay bằng bánh xe kéo, không hẹn giờ
   'src/hooks/useGioHocTap.ts': 1,
   'src/lib/html-may-chieu.ts': 0,
-  'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe
+  'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao/kiểm tra cá nhân (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe
   'src/lib/html-phieu.ts': 1,
   'src/lib/thu-tin-hieu.ts': 1,
   'src/lib/to-chieu-cau-noi.ts': 1,
@@ -40,7 +35,6 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
 const CHI_TEP_TINH = ['src/lib/bao-hiem-ban-moi.ts', 'src/lib/cap-nhat-app.ts']
 /** Ngoài lệnh KHẨN: EscortRoom chỉ còn đồng hồ 1 s; luồng thi thật cần Boss soát. (06/10 gọn mã lần 2, docs/gon-ma-0610-lan-2.md: hai dòng "MÃ CHẾT" DauTruongChanLy.tsx / ThanThuHoaHocGame.tsx đã bỏ cùng hai tệp.) */
 const NGOAI_LENH: Record<string, string> = {
-  'src/game/than-thu-v2/EscortRoom.tsx': 'đồng hồ 1 s (vòng hỏi phòng đã chuyển sang batVongTrucTiep)',
   'src/screens/ExamTakeScreen.tsx': 'LUỒNG THI THẬT — cần Boss soát, đã lệch pha chuKyLechPhaMs',
 }
 /** Làn của app thầy (Code 4) — có thể đổi; chỉ cho phép tồn tại. */
@@ -78,8 +72,6 @@ describe('khoá bảng: mọi tệp còn setInterval đều đã được xếp 
     for (const [f, n] of Object.entries(KHONG_GOI_MAY_CHU)) expect(co[f] ?? 0, f).toBe(n)
   })
   it('vòng đã chuyển đi rồi thì KHÔNG quay lại dạng setInterval trần: hỏi trận Đoàn / phòng Escort / đồng bộ EXP / danh sách Mầm', () => {
-    expect(doc('src/game/than-thu-v2/DoanHoTong.tsx')).not.toMatch(/setInterval\(\(\) => void hoi\(\)/)
-    expect(doc('src/game/than-thu-v2/EscortRoom.tsx')).not.toMatch(/setInterval\(\(\)=>void tick\(\)/)
     const sp = doc('src/screens/StudentPortalScreen.tsx')
     expect(sp).not.toMatch(/setInterval\([^)]*syncStudentExp/)
     expect(sp).not.toMatch(/setInterval\([^)]*napDsMom/)
@@ -92,13 +84,10 @@ describe('mọi vòng GỌI MÁY CHỦ của app HS/PH/game đi qua nhip-ben-vun
     'src/components/ThongBaoHocSinh.tsx',
     'src/components/BangTinPhuHuynh.tsx',
     'src/components/BangVinhDanh.tsx',
-    'src/components/bang-nhiem-vu/TheVinhDanh.tsx',
     'src/components/bang-nhiem-vu/may-chu.ts',
     'src/lib/app-presence.ts',
     'src/lib/use-thi-dua.ts',
     'src/lib/ph-moi/use-tat-ca-ve-con.ts',
-    'src/game/than-thu-v2/Game.tsx',
-    'src/game/than-thu-v2/ProgressChart.tsx',
   ]
   for (const f of NEN)
     it(`${f}: dùng batNhipBenVung, không còn setInterval`, () => {
@@ -106,7 +95,7 @@ describe('mọi vòng GỌI MÁY CHỦ của app HS/PH/game đi qua nhip-ben-vun
       expect(s).toMatch(/batNhipBenVung/)
       expect(dem(s), 'còn setInterval trần').toBe(f === 'src/screens/StudentPortalScreen.tsx' ? 1 : 0) // 1 = đồng hồ 1 s
     })
-  for (const f of ['src/game/than-thu-v2/DoanHoTong.tsx', 'src/game/than-thu-v2/EscortRoom.tsx'])
+  for (const f of [])
     it(`${f}: vòng hỏi trực tiếp dùng batVongTrucTiep (nối tiếp, thưa dần khi lỗi)`, () => {
       expect(doc(f)).toMatch(/batVongTrucTiep\(/)
     })

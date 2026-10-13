@@ -7,12 +7,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
-import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import { tuKeHoachNgay } from '../src/lib/nhiem-vu-adapter'
 import { laDangLamMoi, taiKeHoachNgay, taiKeHoachNgayChiTiet, useKeHoachNgay } from '../src/components/bang-nhiem-vu/may-chu'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/components/BangVinhDanh', () => ({ default: () => null }))
 vi.mock('../src/components/BangTinPhuHuynh', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))
@@ -139,43 +137,6 @@ describe('hook useKeHoachNgay: cờ dangLamMoi', () => {
   })
 })
 
-describe('dải "đang làm mới" trên Bảng nhiệm vụ', () => {
-  const duLieu = () => tuKeHoachNgay(KE_HOACH as any, Date.now(), {})
-  it('học sinh: đúng chữ 0.Planer chốt, role=status, có mặt trước phần việc; phụ huynh: "Con"; đang tải skeleton hoặc không có cờ thì KHÔNG hiện', () => {
-    const { rerender, container } = render(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={duLieu()} dangLamMoi />)
-    const dai = DAI()!
-    expect(dai.getAttribute('role')).toBe('status')
-    expect(dai.textContent).toContain('Hệ thống đang làm mới, khoảng 1–5 phút.')
-    expect(dai.textContent).toContain('Em cứ để app mở, app tự vào lại.')
-    // "1–5 phút" không bị ngắt dòng giữa dấu gạch (ảnh 360 px từng tách "1–" / "5 phút")
-    expect(dai.querySelector('.bnv-dang-lam-moi-so')!.textContent).toBe('1–5 phút')
-    expect(dai.querySelector('svg')!.getAttribute('aria-hidden')).toBe('true')
-    // đứng trước phần việc (dòng tiến độ) — bắt buộc có phần tử này, không để khẳng định lặng lẽ bị bỏ qua
-    const tienDo = container.querySelector('[data-vung="tien-do"]')
-    expect(tienDo).toBeTruthy()
-    expect(dai.compareDocumentPosition(tienDo!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    rerender(<BangNhiemVu vaiTro="phuhuynh" hoTen="Đỗ Minh" now={NOW} duLieu={duLieu()} dangLamMoi />)
-    expect(DAI()!.textContent).toContain('Con cứ để app mở, app tự vào lại.')
-    expect(DAI()!.textContent).not.toContain('Em cứ')
-    rerender(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={duLieu()} dangLamMoi dangTai />)
-    expect(DAI()).toBeNull()
-    rerender(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={duLieu()} />)
-    expect(DAI()).toBeNull()
-    rerender(<BangNhiemVu vaiTro="hocsinh" hoTen="Đỗ Minh" now={NOW} duLieu={duLieu()} dangLamMoi={false} />)
-    expect(DAI()).toBeNull()
-  })
-
-  it('CSS: chỉ đọc biến --m3-*, không mã màu cứng, không position:fixed; mọi phần tử trong dải có mặt trong tệp', () => {
-    const css = fs.readFileSync(path.join(process.cwd(), 'src/components/bang-nhiem-vu/bang-nhiem-vu.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
-    const luat = css.match(/\.bnv-dang-lam-moi[^{}]*\{[^}]*\}/g) || []
-    expect(luat.length).toBeGreaterThanOrEqual(5)
-    expect(luat.join('\n')).toMatch(/\.bnv-dang-lam-moi-so\s*\{[^}]*white-space:\s*nowrap/)
-    for (const l of luat) {
-      expect(l, l).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|position:\s*fixed/)
-    }
-    expect(luat.join('\n')).toMatch(/background:\s*var\(--m3-secondary-container\)/)
-  })
-})
 
 describe('StudentPortalScreen thật khi máy chủ đang làm mới', () => {
   beforeEach(() => {

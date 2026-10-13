@@ -135,7 +135,7 @@ function DongCau({ sbd, c }: { sbd: string; c: CauXemLai }) {
   const bam = () => {
     const moi = !mo
     setMo(moi)
-    if (moi && ct === null) {
+    if (moi && (ct === null || ct.kieu === 'loi')) {
       setCt({ kieu: 'tai' })
       void taiChiTietCau(sbd, c.qid).then((r) => setCt(r.kieu === 'ok' && r.ct.kieu === 'ok' ? { kieu: 'ok', ct: r.ct } : { kieu: 'loi' }))
     }

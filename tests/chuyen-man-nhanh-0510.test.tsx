@@ -5,13 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, configure, render, screen, waitFor } from '@testing-library/react'
 import { Suspense } from 'react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'http://may-chu.thu' }))
-vi.mock('../src/game/than-thu-v2/EscortRoom', () => ({ default: () => null }))
-vi.mock('../src/game/than-thu-v2/DoanHoTong', () => ({ default: () => <div data-testid="doan-ho-tong" /> }))
-vi.mock('../src/game/than-thu-v2/ProgressChart', () => ({ default: () => null }))
-vi.mock('../src/game/than-thu-v2/LearningBattle', () => ({ default: () => null, SpellPreview: () => null }))
 import { boNap, lazyNapTruoc, napTruocLanLuot, nenNapTruoc, taoGoiSom } from '../src/components/hoa2/nap-truoc-man'
-import { boCuaNhanh, dungNapTruocManSanh, napManCauDaLam, napTruocManSanh } from '../src/components/hoa2/man-sanh-luoi'
-import Game, { goiSomGame } from '../src/game/than-thu-v2/Game'
+import { boCuaNhanh, napManCauDaLam } from '../src/components/hoa2/man-sanh-luoi'
 import CauDaLam from '../src/components/hoa2/CauDaLam'
 
 configure({ asyncUtilTimeout: 8000 })
@@ -115,70 +110,6 @@ describe('bộ dụng cụ nạp trước / gọi sớm (nap-truoc-man.ts)', () 
     )
     expect(screen.getByText('lần hai')).toBeTruthy()
     expect(screen.queryByText('đang chờ')).toBeNull()
-  })
-
-  it('napTruocManSanh: em đã chạm một cửa (dungNapTruocManSanh) ⇒ không nạp trước nữa trong lượt mở trang này', async () => {
-    dungNapTruocManSanh()
-    const goc = (globalThis as { requestIdleCallback?: unknown }).requestIdleCallback
-    const hen = vi.fn()
-    ;(globalThis as { requestIdleCallback?: unknown }).requestIdleCallback = hen
-    try {
-      await napTruocManSanh(false)
-      expect(hen).not.toHaveBeenCalled()
-    } finally {
-      ;(globalThis as { requestIdleCallback?: unknown }).requestIdleCallback = goc
-    }
-  })
-})
-
-const hoSo = { nickname: 'Lửa Nhỏ', pet: 'lua_phuong', choice: false, cap: 5, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null }
-/** Máy chủ giả của game: lệnh nào cũng TREO tới khi `traHet()` (để xem lệnh nào đã đi trước khi lệnh khác về); `tuDong()` ⇒ từ đó trả ngay. */
-function mayChuGame() {
-  const goi: string[] = []
-  const cho: (() => void)[] = []
-  let ngay = false
-  vi.stubGlobal(
-    'fetch',
-    vi.fn((url: string) => {
-      const lenh = String(url).split('/').pop() ?? ''
-      goi.push(lenh)
-      const them = lenh === 'hoa2-sanh' ? { cheDo2: false } : { profile: hoSo, revision: 1, tasks: [], suggestions: [], doanMo: true }
-      const tra = { json: async () => ({ ok: true, ...them }) }
-      return ngay ? Promise.resolve(tra) : new Promise((ok) => cho.push(() => ok(tra)))
-    }),
-  )
-  return {
-    goi,
-    dem: (lenh: string) => goi.filter((g) => g === lenh).length,
-    tuDong: () => {
-      ngay = true
-      while (cho.length) cho.shift()!()
-    },
-  }
-}
-const daMoDao = () => document.querySelector('.dao-nav button[aria-current="page"]')?.textContent === 'Đảo'
-
-describe('Game: profile + hoa2-sanh song song; lệnh bắn sớm lúc chạm cửa được nhận lại — số lệnh không đổi', () => {
-  it('không gọi sớm: hoa2-sanh đi CÙNG LÚC với profile (không chờ hồ sơ về); mỗi lệnh đúng một lần', async () => {
-    const may = mayChuGame()
-    render(<Game sbd="S1" token="t" onDong={() => {}} />)
-    await waitFor(() => expect(may.dem('profile')).toBe(1))
-    expect(may.dem('hoa2-sanh')).toBe(1) // chưa lệnh nào về mà hoa2-sanh đã đi
-    may.tuDong()
-    await waitFor(() => expect(daMoDao()).toBe(true))
-    expect(may.dem('profile')).toBe(1)
-    expect(may.dem('hoa2-sanh')).toBe(1)
-  })
-
-  it('goiSomGame lúc chạm cửa rồi Game mở ⇒ Game nhận lại hai lệnh ấy, không gọi thêm: profile 1 lần, hoa2-sanh 1 lần', async () => {
-    const may = mayChuGame()
-    goiSomGame('S1', 't', '')
-    await waitFor(() => expect(may.goi).toEqual(['profile', 'hoa2-sanh']))
-    render(<Game sbd="S1" token="t" onDong={() => {}} />)
-    may.tuDong()
-    await waitFor(() => expect(daMoDao()).toBe(true))
-    expect(may.dem('profile')).toBe(1)
-    expect(may.dem('hoa2-sanh')).toBe(1)
   })
 })
 

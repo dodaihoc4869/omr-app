@@ -25,7 +25,6 @@ describe('app giáo viên · hộp cuộn thống nhất', () => {
   for (const tep of [
     'src/components/chien-dich/BangChienDich.tsx',
     'src/components/chien-dich/BuoiChua.tsx',
-    'src/components/chien-dich/DsChienDichDaGiao.tsx',
   ]) {
     it(`${tep} giới hạn bảng dài trong box cuộn`, () => {
       expect(doc(tep)).toContain('cd-cuon-doc')

@@ -1,5 +1,5 @@
 // TRANG CHỤP ẢNH TU LUYỆN (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
-// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|tl`.
+// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=hoc-tap|tl`.
 import { createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource/be-vietnam-pro/vietnamese-400.css'
@@ -17,7 +17,7 @@ import '../../src/index.css'
 import '../../src/styles/the-loc.css'
 import '../../src/components/m3'
 import '../../src/components/bang-nhiem-vu/sheet-m3.css'
-import SanhBanDo from '../../src/components/hoa2/SanhBanDo'
+import HocTapHomNay from '../../src/components/hoc-tap/HocTapHomNay'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen'
 import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
@@ -190,12 +190,15 @@ const SANH = {
   chienDich: { id: 'cd1', ten: 'Ester – Lipid', hanNop: '2026-10-04', D: 5, tong: 120, coXat: 67, thanhThao: 0, canDayLai: 0, thanhThaoTangTu: '2026-10-02' },
   theLuc: { con: 32, tong: 40 }, huyetChien: false, doan: { con: 4 }, dao: { con: 28 }, khoaDao: false, loiKhoaDao: '',
   ruong: { daLam: 8, tong: 40, moDuoc: false, daMo: false },
+  hanhTrinh: { tang: 2, toiThieu: 40, daLam: 8, daXep: 40, conThieu: 0, soChang: 5, changHienTai: 2, cauTrongChang: 8 },
 }
-const con = man === 'sanh'
-  ? h(SanhBanDo, {
-      ketQua: docSanh(SANH) as KetQuaSanh, loi: '', dangTai: false, thu: { index: 2, cap: 7, ten: 'Lửa Nhỏ' }, exp: { homNay: 22, conThieu: 160 },
-      chuoiNgay: 5, caDangMo: false, now, token: 'tk', shopBat: true, onVaoThi: noop, onPhaPhucKich: noop, onKhamPhaDao: noop, onCauDaLam: noop,
-      onTuiDo: noop, onCuaHang: noop, onMoThanThu: noop, onChonThu: noop, onDangXuat: noop, onTaiLai: noop, onTuLuyen: noop,
+const veHocTap = () => location.assign('?man=hoc-tap')
+const con = man === 'hoc-tap' || man === 'sanh'
+  ? h(HocTapHomNay, {
+      ten: 'Minh Khôi', lop: '12A1', ketQua: docSanh(SANH) as KetQuaSanh, loi: '', dangTai: false, coCa: false,
+      onHoc: () => location.assign('?man=tl'), onXemLai: noop, onChua: noop, onThi: noop,
+      onTuLuyen: () => location.assign('?man=tl'), onLichSu: noop, onBaiTap: noop, onGiaDinh: noop,
+      onDangXuat: noop, onTaiLai: noop,
     })
-  : h(ManTuLuyen, { token: 'tk-gia', sbd: 'GIA', onVe: noop })
+  : h(ManTuLuyen, { token: 'tk-gia', sbd: 'GIA', onVe: veHocTap })
 createRoot(document.getElementById('root')!).render(h(BatLinhShell, { vai: 'hs' }, con))

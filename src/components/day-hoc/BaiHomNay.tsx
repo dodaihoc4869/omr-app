@@ -17,6 +17,7 @@
 // buổi (`lopTay`, `chonNho`, `datNho`) ⇒ mở lại màn vẫn còn.
 import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
+import { baoBaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
 import type { TeacherExamSource } from '../../data/examContent'
 import { THAM_SO_OMNI, type CoOmni } from '../../../server/src/omni-kieu'
 import { TI_LE_ON_BAI_CU_TOI_DA, xemOnBaiCu } from '../../../server/src/omni-on-bai-cu'
@@ -128,15 +129,30 @@ export interface BaiChonNho {
 export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: TeacherExamSource[] | null, napKho: () => Promise<TeacherExamSource[]>) {
   const showToast = useAppStore((s) => s.showToast)
   const [co, setCo] = useState<CoOmni | null>(null)
-  useEffect(() => {
-    let song = true
-    void docCoOmni().then((r) => {
-      if (song && r.ok) setCo(r.du)
-    })
-    return () => {
-      song = false
+  const [dangTaiCo, setDangTaiCo] = useState(true)
+  const [loiCo, setLoiCo] = useState('')
+  const coSong = useRef(true), coDangDoc = useRef(false)
+  const taiCo = useCallback(async () => {
+    if (coDangDoc.current) return
+    coDangDoc.current = true
+    setDangTaiCo(true); setLoiCo('')
+    try {
+      const r = await docCoOmni()
+      if (!coSong.current) return
+      if (r.ok) setCo(r.du)
+      else setLoiCo(r.chu)
+    } catch {
+      if (coSong.current) setLoiCo('Không nối được máy chủ.')
+    } finally {
+      coDangDoc.current = false
+      if (coSong.current) setDangTaiCo(false)
     }
   }, [])
+  useEffect(() => {
+    coSong.current = true
+    void taiCo()
+    return () => { coSong.current = false }
+  }, [taiCo])
   const bat = co?.bat === true
 
   // LỚP: bật theo lớp ⇒ đúng các lớp đã bật; bật cả trung tâm / chạy thử theo em ⇒ mọi lớp. Mặc định = lớp của buổi đang mở (nếu OMNI áp cho lớp ấy).
@@ -188,7 +204,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
       if (r.ok) ds[x] = r.du
       else loi[x] = r.chu
     }
-    setDsTheoLop(ds)
+    setDsTheoLop(cu => ({ ...cu, ...ds }))
     setLoiDsTheoLop(loi)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bat, khoaLop])
@@ -402,7 +418,10 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
       showToast([moi.length ? `Đã giao ${ten} cho ${moi.length} lớp: ${moi.join(', ')}` : '', cu.length ? `${cu.join(', ')} đã có ${ten} từ trước — giữ chiến dịch có sẵn` : ''].filter(Boolean).join(' · '), 'success')
     }
     if (loi.length) setLoiGiao(loi.length === 1 && dauVaoLop.length === 1 ? loi[0]!.chu : loi.map((x) => `${x.lop}: ${x.chu}`).join(' · '))
-    if (ok.length) void taiDs()
+    if (ok.length) {
+      baoBaiDangGiaoThayDoi(ok.map(k => ({ lop: k.lop, khoaBai: chon.khoaBai, loai: 'tick' })))
+      void taiDs()
+    }
     if (!loi.length) setChonNho(null)
   }
 
@@ -433,6 +452,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
           : `Đã bỏ tick ${ten}`,
       'success',
     )
+    baoBaiDangGiaoThayDoi([{ lop: lopBo, khoaBai: b.khoaBai, loai: 'bo-tick' }])
     void taiDs()
   }
 
@@ -465,6 +485,9 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     suaEm,
     bat,
     co,
+    dangTaiCo,
+    loiCo,
+    taiCo,
     dsLop,
     lopChonDuoc,
     lop,
@@ -642,7 +665,7 @@ function ChuongBai({ bhn, g }: { bhn: BaiHomNay; g: { chuong: string; bai: BaiCa
 }
 
 /** Thẻ bước "Bài hôm nay" — cùng kiểu thẻ bước của bảng Dạy học. OMNI tắt ⇒ không vẽ gì. */
-export function BuocBaiHomNay({ bhn, kho, soBuoc = 4 }: { bhn: BaiHomNay; kho: TeacherExamSource[] | null; soBuoc?: number }) {
+export function BuocBaiHomNay({ bhn, kho, loiKho = '', thuKho, soBuoc = 4 }: { bhn: BaiHomNay; kho: TeacherExamSource[] | null; loiKho?: string; thuKho?: () => void; soBuoc?: number }) {
   if (!bhn.bat) return null
   const { lop, lopChon, lopChonDuoc, khoi, dsTheoLop, loiDsTheoLop, dangTaiDs, taiDs, dsBai, chon } = bhn
   // Nhóm bài theo chương, giữ thứ tự đã sắp.
@@ -687,9 +710,7 @@ export function BuocBaiHomNay({ bhn, kho, soBuoc = 4 }: { bhn: BaiHomNay; kho: T
             ) : !khoi ? (
               <p className="bhn-trong">Chưa nhận ra khối của lớp {lop} (tên lớp cần bắt đầu bằng 10, 11 hoặc 12).</p>
             ) : !kho ? (
-              <p className="bhn-trong" aria-busy="true">
-                Đang đọc kho đề…
-              </p>
+              loiKho ? <div className="dh-hang"><p className="dh-loi" role="alert">{loiKho}</p><button type="button" className="m3-nut-vien dh-nut-nho" onClick={thuKho}>Thử tải kho lại</button></div> : <p className="bhn-trong" aria-busy="true">Đang đọc kho đề…</p>
             ) : dsBai.length === 0 ? (
               <p className="bhn-trong">Kho chưa có bài Dạy học của khối {khoi}. Vào Ngân hàng câu hỏi → Đồng bộ ngay để nạp đề.</p>
             ) : (

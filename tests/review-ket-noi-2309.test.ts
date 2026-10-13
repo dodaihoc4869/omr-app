@@ -4,6 +4,7 @@ const store = vi.hoisted(() => new Map<string, unknown>())
 vi.mock('idb', () => ({ openDB: async () => ({
   get: async (_table: string, key: string) => store.get(key),
   put: async (_table: string, value: unknown, key: string) => { store.set(key, value) },
+  transaction: () => ({ store: { get: async (key: string) => store.get(key) }, done: Promise.resolve(), abort() {} }),
 }) }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://fallback.test' }))
 

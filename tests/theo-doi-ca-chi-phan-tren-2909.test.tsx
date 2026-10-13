@@ -115,17 +115,9 @@ describe('ca đang mở: chỉ còn khu trên', () => {
   })
 })
 
-// Thầy 29/09: "phần này [BƯỚC TIẾP THEO · Giao chiến dịch luyện] có một nút bật lên thì mới giao chiến dịch, còn mặc định là tắt".
-describe('công tắc Giao chiến dịch luyện', () => {
+// SỬA CÓ CHỦ ĐÍCH 14/10: gỡ lối giao chiến dịch cũ, giữ các việc theo dõi ca ở trên.
+it('màn theo dõi ca không còn nạp giao diện giao chiến dịch cũ', () => {
   const src = fs.readFileSync('src/screens/ExamMonitorScreen.tsx', 'utf8')
-  it('mặc định TẮT, đổi ca thì tắt lại; tắt ⇒ không vẽ khối GiaoChienDich', () => {
-    expect(src).toContain('const [moGiao, setMoGiao] = useState(false)')
-    expect(src).toContain('setMoGiao(false) // công tắc Giao chiến dịch: mỗi lần mở ca đều TẮT')
-    expect(src).toContain('return !moGiao ? null : (')
-    expect(src).not.toContain('thuGonGiao')
-  })
-  it('là MỘT công tắc (role switch, aria-checked) ở thanh đầu màn, chỉ khi ca đủ điều kiện giao', () => {
-    expect(src).toMatch(/\{coGiaoChienDich && \(\s*<button type="button" role="switch" aria-checked=\{moGiao\}/)
-    expect(src.match(/Giao chiến dịch luyện từ ca này/g)).toHaveLength(1)
-  })
+  expect(src).not.toContain("import GiaoChienDich")
+  expect(src).not.toContain('Giao chiến dịch luyện từ ca này')
 })

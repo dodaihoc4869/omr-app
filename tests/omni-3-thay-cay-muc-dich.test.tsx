@@ -100,6 +100,41 @@ describe('đồng bộ thư mục lên máy chủ (/kho/thu-muc)', () => {
   const NOW = Date.UTC(2026, 9, 5, 3, 0, 0) // 10:00 giờ Việt Nam 05/10
   const kho900 = Array.from({ length: 901 }, (_, i) => de(i % 3 ? `12-X-${i}` : `DH-12-X-${i}`, '12 · C1'))
 
+  it('hai nơi mở cùng lúc chỉ đọc kho và gửi một bộ lô; hỏng mạng vẫn thử lại được', async () => {
+    let traKho!: (ds: TeacherExamSource[]) => void
+    const nap = vi.fn(() => new Promise<TeacherExamSource[]>((r) => { traKho = r }))
+    goi.mockResolvedValue({ ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' })
+    const mot = dongBoThuMucKho(NOW, nap)
+    const hai = dongBoThuMucKho(NOW, nap)
+    traKho(kho900)
+    expect(await Promise.all([mot, hai])).toEqual(['loi_tam', 'loi_tam'])
+    expect(nap).toHaveBeenCalledTimes(1)
+    expect(goi).toHaveBeenCalledTimes(1)
+    expect(localStorage.getItem(KHOA_NGAY_THU_MUC)).toBeNull()
+
+    goi.mockReset().mockImplementation(async (_d: string, b: { ds: unknown[] }) => ({ ok: true, du: { ok: true, daGhi: b.ds.length } }))
+    nap.mockResolvedValue(kho900)
+    expect(await Promise.all([dongBoThuMucKho(NOW, nap), dongBoThuMucKho(NOW, nap)])).toEqual(['da_gui', 'da_gui'])
+    expect(nap).toHaveBeenCalledTimes(2)
+    expect(goi).toHaveBeenCalledTimes(3)
+    expect(localStorage.getItem(KHOA_NGAY_THU_MUC)).toBe('2026-10-05')
+  })
+
+  it('đọc kho lỗi không giữ lời hứa hỏng; bộ nhớ ngày bị chặn cũng không gửi kép', async () => {
+    const goc = Storage.prototype.getItem
+    Storage.prototype.getItem = () => { throw new Error('Bộ nhớ bị chặn') }
+    try {
+      const nap = vi.fn<() => Promise<TeacherExamSource[]>>().mockRejectedValueOnce(new Error('Kho chưa sẵn sàng')).mockResolvedValue(kho900)
+      expect(await dongBoThuMucKho(NOW, nap)).toBe('loi_tam')
+      goi.mockImplementation(async (_d: string, b: { ds: unknown[] }) => ({ ok: true, du: { ok: true, daGhi: b.ds.length } }))
+      expect(await Promise.all([dongBoThuMucKho(NOW, nap), dongBoThuMucKho(NOW, nap)])).toEqual(['da_gui', 'da_gui'])
+      expect(nap).toHaveBeenCalledTimes(2)
+      expect(goi).toHaveBeenCalledTimes(3)
+    } finally {
+      Storage.prototype.getItem = goc
+    }
+  })
+
   it('gửi theo lô ≤ 400 mã {maDe, thuMuc}; xong ghi ngày ⇒ cùng ngày không gửi lại; sang ngày mới gửi lại', async () => {
     goi.mockImplementation(async (_d: string, b: { ds: unknown[] }) => ({ ok: true, du: { ok: true, daGhi: b.ds.length } }))
     expect(await dongBoThuMucKho(NOW, async () => kho900)).toBe('da_gui')

@@ -1,4 +1,3 @@
-import { htmlKhoiLoiGiaiChuan } from '../lib/html-khoi-loi-giai-chuan'
 // App học sinh tập trung làm bài; giữ máy chủ giao câu, chấm và tiến độ hiện hành.
 import HocTapHomNay from '../components/hoc-tap/HocTapHomNay'
 import { soHomNay } from '../components/hoc-tap/lam-bai' // màn làm bài 12/10D: thanh trên "đã làm/M câu hôm nay" cùng nguồn vòng tròn Hôm nay
@@ -18,7 +17,6 @@ import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
-import { tachDongTheoY } from '../lib/tach-dong-cau'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
@@ -66,7 +64,7 @@ import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './DangNhapHocSinh'
 import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
-import { boNap, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
+import { boNap, nenNapTruoc, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
@@ -87,7 +85,6 @@ const ManTuLuyenNhanh = veNgayKhiCo(ManTuLuyen, napManTuLuyen)
 const LichSuCaEm = lazy(() => import('../components/hoa2/LichSuCaEm'))
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
 
-/** = KHOA_MAN_DAU của Game.tsx (test khoá khớp). KHÔNG import hằng ấy từ Game.tsx: sẽ kéo cả game vào gói chính, mất nạp lười. */
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import { chuTheCaGanNhat, dungLichSuCa } from '../lib/lich-su-ca-hs'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
@@ -103,7 +100,6 @@ const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang
 const napKhoiPhu = () => import('../components/cong-hs-nap-luoi')
 const BangTinPhuHuynh = lazy(() => napKhoiPhu().then((m) => ({ default: m.BangTinPhuHuynh })))
 const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.ModalKhacPhucCauSai })))
-import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import OSoTraLoi from '../components/OSoTraLoi'
@@ -144,8 +140,8 @@ export function chuanHoaBaiMom(b: any): BaiMomGiao {
     choices: Array.isArray(c?.choices)
       ? c.choices.map(String)
       : (Array.isArray(c?.luaChon) ? c.luaChon.map(String) : (Array.isArray(c?.ideas) ? c.ideas.map(String) : [])),
-    dapAn: String(c?.dapAn || c?.dapAnDung || 'A'),
-    dapAnDung: String(c?.dapAnDung || c?.dapAn || 'A'),
+    dapAn: String(c?.dapAn || c?.dapAnDung || ''),
+    dapAnDung: String(c?.dapAnDung || c?.dapAn || ''),
     loiGiai: c?.loiGiai != null && String(c.loiGiai) !== '[object Object]' ? c.loiGiai : '',
     chuyenDe: String(c?.chuyenDe || 'Hoá học'),
   }))
@@ -199,8 +195,7 @@ function mauDiem(diem: number | null): string {
 
 type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua' | 'kiemtra'
 
-/** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
- * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
+/** Giữ khung bài học trong lúc mảnh mã đang về, tránh giật trang và khoảng trắng. */
 function ChoNapGame() {
   return (
     <div
@@ -251,9 +246,6 @@ function DemGioMom({ mom, children }: { mom: { batDauLuc?: string; trangThai?: s
 }
 
 export default function StudentPortalScreen() {
-  const nowHocTap = useGioHocTap()
-  // Hộp thoại riêng thay `confirm`/`alert` của trình duyệt (bảng từ ngữ H38): nói việc sẽ làm bằng động từ, không "OK / Hủy".
-  const { hoi, bao, hop } = useHopThoai()
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
     try {
       const luu = localStorage.getItem(KHOA_LUU_AUTH)
@@ -263,6 +255,14 @@ export default function StudentPortalScreen() {
       return null
     }
   })
+  // Máy dùng chung: đổi phiên dựng cổng mới, dừng nhịp cũ và không nhận phản hồi đang tải của em trước.
+  return <CongHocSinh key={auth?.token ?? 'chua-dang-nhap'} auth={auth} setAuth={setAuth} />
+}
+
+function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: ThongTinHs | null) => void }) {
+  const nowHocTap = useGioHocTap()
+  // Hộp thoại riêng thay `confirm`/`alert` của trình duyệt (bảng từ ngữ H38): nói việc sẽ làm bằng động từ, không "OK / Hủy".
+  const { hoi, bao, hop } = useHopThoai()
 
   useEffect(()=>{
     if(!auth?.sbd||!auth.token)return
@@ -356,6 +356,20 @@ export default function StudentPortalScreen() {
 
   const answersMomRef = useRef(cauTraLoiMom)
   answersMomRef.current = cauTraLoiMom
+  // Chỉ thao tác mới chưa ACK được ưu tiên hơn bản máy chủ; nháp cũ đã đồng bộ không đè đáp án máy khác.
+  const choDongBoMom = useRef<Record<string, string>>({})
+  const luuChoMom = (id: string) => {
+    if (!auth) return
+    try { localStorage.setItem(`omr_mom_draft_cho_dong_bo_${auth.sbd}_${id}`, JSON.stringify(choDongBoMom.current)) } catch { /* vẫn giữ nháp trong phiên */ }
+  }
+  const doiTraLoiMom = (qid: string, value: string) => {
+    if (!dangLamMom) return
+    choDongBoMom.current = { ...choDongBoMom.current, [qid]: value }
+    luuChoMom(dangLamMom.id)
+    const next = { ...answersMomRef.current, [qid]: value }
+    answersMomRef.current = next
+    setCauTraLoiMom(next)
+  }
   const submittingMom = useRef(false)
   const retryMomAt = useRef(0)
   const [loiMom, setLoiMom] = useState('')
@@ -386,11 +400,16 @@ export default function StudentPortalScreen() {
   }, [napDsMom])
   useEffect(() => {
     if (!dangLamMom || !auth) return
+    let huy = false
     try { localStorage.setItem(`omr_mom_draft_${auth.sbd}_${dangLamMom.id}`, JSON.stringify(cauTraLoiMom)) } catch {}
     const timer = setTimeout(() => {
-      void momApi('save', {token:auth.token,id:dangLamMom.id,answers:cauTraLoiMom}).catch(e => setLoiMom(`Chưa lưu được đáp án lên máy chủ: ${e.message}`))
+      void momApi('save', {token:auth.token,id:dangLamMom.id,answers:cauTraLoiMom}).then(() => {
+        if (huy) return
+        choDongBoMom.current = Object.fromEntries(Object.entries(choDongBoMom.current).filter(([qid, value]) => cauTraLoiMom[qid] !== value))
+        luuChoMom(dangLamMom.id)
+      }).catch(e => { if (!huy) setLoiMom(`Chưa lưu được đáp án lên máy chủ: ${e.message}`) })
     }, 600)
-    return () => clearTimeout(timer)
+    return () => { huy = true; clearTimeout(timer) }
   }, [cauTraLoiMom, dangLamMom, auth])
 
   useEffect(() => {
@@ -436,14 +455,26 @@ export default function StudentPortalScreen() {
     try {
       const data = await momApi('start', {token:auth.token,id:bai.id})
       const capNhat = chuanHoaBaiMom(data.item)
-      let answers: Record<string, string> = {}
+      let answers: Record<string, string> = capNhat.dapAnDaNop && typeof capNhat.dapAnDaNop === 'object' ? { ...capNhat.dapAnDaNop } : {}
       try {
         const raw = localStorage.getItem(`omr_mom_draft_${auth.sbd}_${bai.id}`) || localStorage.getItem(`omr_mom_draft_${bai.id}_${auth.sbd}`)
         if (raw) {
           const parsed = JSON.parse(raw)
-          answers = { ...answers, ...(parsed.cauTraLoi || parsed) }
+          // API không có mốc sửa từng câu: nháp máy chỉ bù câu trống, không đè đáp án đã lưu trên máy khác.
+          const daLuu = Object.fromEntries(Object.entries(answers).filter(([, v]) => typeof v === 'string' && v.trim()))
+          answers = { ...(parsed.cauTraLoi || parsed), ...daLuu }
         }
       } catch {}
+      const ids = new Set(capNhat.dsCau.map(c => c.id))
+      answers = Object.fromEntries(Object.entries(answers).filter(([qid, v]) => ids.has(qid) && typeof v === 'string' && v.length <= 1000))
+      let pending: Record<string, string> = {}
+      try {
+        const raw = JSON.parse(localStorage.getItem(`omr_mom_draft_cho_dong_bo_${auth.sbd}_${bai.id}`) || '{}')
+        if (raw && typeof raw === 'object' && !Array.isArray(raw)) pending = Object.fromEntries(Object.entries(raw).filter(([qid, v]) => ids.has(qid) && typeof v === 'string' && v.length <= 1000 && capNhat.dapAnDaNop?.[qid] !== v)) as Record<string, string>
+      } catch { /* Metadata nháp hỏng: vẫn dùng bản chính máy chủ. */ }
+      choDongBoMom.current = pending
+      luuChoMom(bai.id)
+      answers = { ...answers, ...pending }
       setCauTraLoiMom(answers)
       if (capNhat.trangThai === 'da_nop') {
         await napDsMom()
@@ -466,150 +497,11 @@ export default function StudentPortalScreen() {
     retryMomAt.current = Date.now() + 15000
     const cauTraLoiMom = answersMomRef.current
     try {
-    const dsCau = Array.isArray(dangLamMom.dsCau) && dangLamMom.dsCau.length > 0
-      ? dangLamMom.dsCau
-      : (Array.isArray(dangLamMom.cau) ? dangLamMom.cau : [])
-    let soDung = 0
-    const tongSo = dsCau.length || 1
-    const chiTietKq: any[] = []
-
-    for (let i = 0; i < dsCau.length; i++) {
-      const cau = dsCau[i]
-      const dapAnEm = (cauTraLoiMom[cau.id] || '').trim().toUpperCase()
-      const dapAnDung = (cau.dapAn || cau.dapAnDung || 'A').trim().toUpperCase()
-      const laDung = dapAnEm === dapAnDung
-      if (laDung) soDung++
-
-      const rawChoices = cau.choices && cau.choices.length > 0
-        ? cau.choices
-        : (cau.ideas && cau.ideas.length > 0 ? cau.ideas : [])
-      const luaChon = rawChoices.map((x: unknown) => String(x ?? ''))
-
-      const lgChuan = chuanHoaLoiGiaiCau(cau.loiGiai, cau.phan || 'I', dapAnDung)
-
-      chiTietKq.push({
-        stt: i + 1,
-        text: cau.text,
-        choices: luaChon,
-        dapAnEm,
-        dapAnDung,
-        dungSai: laDung,
-        chot: lgChuan.chot,
-        lyDo: lgChuan.lyDo,
-        buoc: lgChuan.buoc,
-        ketQua: lgChuan.ketQua,
-        phan: String(cau.phan || 'I'),
-        chuyenDe: cau.chuyenDe || 'Chuyên đề ôn tập',
-      })
-    }
-
-    const diem = Number(((soDung / tongSo) * 10).toFixed(2))
-
-    const htmlKetQua = `<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Báo Cáo Bài Gia Đình Giao</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: rgb(248, 250, 252);
-      padding: 16px;
-      color: rgb(30, 41, 59);
-    }
-  </style>
-</head>
-<body>
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Google Sans', 'Segoe UI', Roboto, sans-serif; max-width: 820px; margin: 0 auto; padding: 28px; color: var(--muc, rgb(30, 41, 59)); background: var(--the, rgb(255, 255, 255)); border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-        <div style="height: 6px; width: 100%; border-radius: 9999px; overflow: hidden; display: flex; margin-bottom: 24px;">
-          <div style="flex: 1; background: rgb(26, 115, 232);"></div>
-          <div style="flex: 1; background: rgb(234, 67, 53);"></div>
-          <div style="flex: 1; background: rgb(251, 188, 4);"></div>
-          <div style="flex: 1; background: rgb(52, 168, 83);"></div>
-        </div>
-
-        <div style="text-align: center; border-bottom: 2px solid var(--vien, rgb(226, 232, 240)); padding-bottom: 24px; margin-bottom: 28px;">
-          <div style="font-size: 24px; font-weight: 900; color: rgb(234, 67, 53); margin-bottom: 6px; letter-spacing: -0.01em;">KẾT QUẢ BÀI GIA ĐÌNH GIAO</div>
-          <div style="font-size: 14.5px; color: var(--nhat, rgb(100, 116, 139));">Học sinh: <strong>${auth.hoTen}</strong> (SBD: <strong>${auth.sbd}</strong>) ${auth.lop ? `· Lớp: ${auth.lop}` : ''}</div>
-          <div style="font-size: 13px; color: var(--chim, rgb(148, 163, 184)); margin-top: 4px;">Thời gian nộp: ${new Date().toLocaleString('vi-VN', { hour12: false })}</div>
-          <div style="display: inline-block; margin-top: 18px; padding: 12px 32px; background: rgba(234, 67, 53, 0.08); border: 2px solid rgba(234, 67, 53, 0.25); border-radius: 9999px;">
-            <span style="font-size: 16px; font-weight: 700; color: rgb(197, 34, 31);">Điểm số: </span>
-            <span style="font-size: 32px; font-weight: 900; color: rgb(234, 67, 53);">${diem}</span>
-            <span style="font-size: 15px; font-weight: 600; color: rgb(197, 34, 31);"> / 10 (${soDung}/${tongSo} câu đúng)</span>
-          </div>
-        </div>
-
-        <div style="font-size: 16px; font-weight: 800; margin-bottom: 18px; color: var(--muc, rgb(15, 23, 42)); letter-spacing: 0.02em;">LỜI GIẢI CHI TIẾT TỪNG CÂU THEO CHUẨN HOÁ HỌC:</div>
-        ${chiTietKq
-          .map(
-            (c) => `
-          <div style="margin-bottom: 24px; padding: 20px; border-radius: 20px; border: 1px solid ${c.dungSai ? 'rgba(52, 168, 83, 0.35)' : 'rgba(234, 67, 53, 0.35)'}; background: ${c.dungSai ? 'rgba(52, 168, 83, 0.04)' : 'rgba(234, 67, 53, 0.04)'}; box-shadow: 0 1px 3px rgba(60,64,67,0.06);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <span style="font-weight: 800; font-size: 15px; color: var(--muc, rgb(30, 41, 59));">Câu ${c.stt}: ${c.chuyenDe}</span>
-              <span style="font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 9999px; background: ${c.dungSai ? 'rgb(52, 168, 83)' : 'rgb(234, 67, 53)'}; color: rgb(255, 255, 255);">
-                ${c.dungSai ? '✓ ĐÚNG' : '✗ SAI'}
-              </span>
-            </div>
-            <div style="font-size: 15px; line-height: 1.65; margin-bottom: 14px; color: var(--muc, rgb(51, 65, 85)); font-weight: 500; white-space: pre-line;">${tachDongTheoY(c.text)}</div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 14.5px; margin-bottom: 16px;">
-              ${c.choices
-                .map(
-                  (ch: string, idx: number) => {
-                    const kyTu = String.fromCharCode(65 + idx)
-                    const laDung = kyTu === c.dapAnDung
-                    const laChon = kyTu === c.dapAnEm
-                    let bg = 'rgb(255, 255, 255)'
-                    let border = 'rgb(226, 232, 240)'
-                    let color = 'rgb(51, 65, 85)'
-                    let badgeBg = 'rgb(241, 245, 249)'
-                    let badgeColor = 'rgb(71, 85, 105)'
-                    let fw = '500'
-                    if (laDung) {
-                      bg = 'rgb(240, 253, 244)'
-                      border = 'rgb(167, 243, 208)'
-                      color = 'rgb(22, 101, 52)'
-                      badgeBg = 'rgb(220, 252, 231)'
-                      badgeColor = 'rgb(22, 101, 52)'
-                      fw = '700'
-                    } else if (laChon) {
-                      bg = 'rgb(254, 242, 242)'
-                      border = 'rgb(254, 202, 202)'
-                      color = 'rgb(153, 27, 27)'
-                      badgeBg = 'rgb(254, 226, 226)'
-                      badgeColor = 'rgb(153, 27, 27)'
-                      fw = '700'
-                    }
-                    return `<div style="padding: 10px 16px; border-radius: 16px; border: 1.5px solid ${border}; background: ${bg}; color: ${color}; font-weight: ${fw}; display: flex; align-items: center; gap: 12px;"><span style="width: 28px; height: 28px; border-radius: 50%; background: ${badgeBg}; color: ${badgeColor}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0;">${kyTu}</span><span style="flex: 1; min-width: 0;">${ch}</span></div>`
-                  }
-                )
-                .join('')}
-            </div>
-
-            <!-- KHỐI LỜI GIẢI CHUẨN (src/lib/html-khoi-loi-giai-chuan.ts): LỜI GIẢI → Kiến thức cốt lõi → từng phương án ✓ ✗ → bước → kết quả -->
-            ${htmlKhoiLoiGiaiChuan(c)}
-          </div>
-        `
-          )
-          .join('')}
-      </div>
-</body>
-</html>
-    `
-
-    const baiDaNop: BaiMomGiao = {
-      ...dangLamMom,
-      trangThai: 'da_nop',
-      nopLuc: new Date().toISOString(),
-      diem,
-      soCauDung: soDung,
-      dapAnDaNop: {...cauTraLoiMom},
-      htmlKetQua,
-    }
-
     const saved = await momApi('submit', {token:auth.token,id:dangLamMom.id,answers:cauTraLoiMom})
-    const confirmed = {...baiDaNop, ...saved.item, htmlKetQua}
+    if (saved.item?.id !== dangLamMom.id || saved.item.trangThai !== 'da_nop' || !Number.isFinite(saved.item.diem)) throw new Error('Máy chủ chưa xác nhận kết quả. Em thử nộp lại nhé.')
+    // Câu công khai không có đáp án. Chỉ dùng điểm đã chấm; phần chữa lấy qua review sau nộp.
+    const confirmed = chuanHoaBaiMom({ ...dangLamMom, ...saved.item, htmlKetQua: '', htmlBaoCao: '' })
+    choDongBoMom.current = {}; luuChoMom(dangLamMom.id)
     const danhSachMoi = dsMomGiao.map((b) => (b.id === dangLamMom.id ? confirmed : b))
     try { localStorage.setItem(`omr_mom_btvn_${auth.sbd}`, JSON.stringify(danhSachMoi)) } catch {}
     setDsMomGiao(danhSachMoi)
@@ -748,28 +640,24 @@ export default function StudentPortalScreen() {
   useEffect(() => {
     if (!auth) return
     let huy = false
+    setDangTaiLichSu(true)
+    setDangTaiBtvn(true)
     void (async () => {
       try {
         const url = await loadScriptUrlHoacMacDinh().catch(() => '')
         if (huy) return
-        setDangTaiLichSu(true)
-        const resLs = await hsLichSuCaApi(url, auth.sbd)
-        if (!huy) {
-          setDangTaiLichSu(false)
-          if (resLs.ok && resLs.items) {
+        // Hai nguồn độc lập: nguồn về trước hiện trước; một nguồn mất mạng không chặn nguồn kia.
+        await Promise.all([
+          hsLichSuCaApi(url, auth.sbd).then(resLs => {
+            if (huy || !resLs.ok || !resLs.items) return
             setDsLichSu(resLs.items)
             setDsChuaCongBo(resLs.chuaCongBo ?? [])
-          }
-        }
-
-        setDangTaiBtvn(true)
-        const resBt = await hsBtvnApi(url, auth.sbd)
-        if (!huy) {
-          setDangTaiBtvn(false)
-          if (resBt.ok && resBt.items) {
+          }, () => {}).finally(() => { if (!huy) setDangTaiLichSu(false) }),
+          hsBtvnApi(url, auth.sbd).then(resBt => {
+            if (huy || !resBt.ok || !resBt.items) return
             setDsBtvn(resBt.items)
-          }
-        }
+          }, () => {}).finally(() => { if (!huy) setDangTaiBtvn(false) }),
+        ])
       } finally {
         if (!huy) setDaNapLanDau(true)
       }
@@ -782,14 +670,20 @@ export default function StudentPortalScreen() {
 
   // Đăng nhập (+ đặt mật khẩu lần đầu): màn DangNhapHocSinh (05/10, tách để vỏ app học sinh dựng trước cổng). Cất phiên rồi vào cổng như cũ.
   const daDangNhap = (thongTin: ThongTinHs) => {
-    localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin))
+    try { localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin)) } catch {
+      // Bộ nhớ máy bị chặn/đầy: phiên mới vẫn dùng được, cố bỏ bản cũ để không mở nhầm em.
+      try { localStorage.removeItem(KHOA_LUU_AUTH) } catch {}
+    }
     setAuth(thongTin)
   }
 
   const dangXuat = async () => {
-    try{const r=await navigator.serviceWorker?.getRegistration();const sub=await r?.pushManager?.getSubscription();if(sub&&auth?.token){await noticeApi(auth.token,'unsubscribe',{endpoint:sub.endpoint});await sub.unsubscribe()}}catch{/* Generic push contains no personal data. */}
-    localStorage.removeItem(KHOA_LUU_AUTH)
+    try { localStorage.removeItem(KHOA_LUU_AUTH) } catch {
+      try { localStorage.setItem(KHOA_LUU_AUTH, '') } catch { /* Vẫn đăng xuất phiên trong bộ nhớ. */ }
+    }
+    // Đóng cổng của em ngay; bỏ đăng ký thông báo tiếp tục độc lập ở nền.
     setAuth(null)
+    try{const r=await navigator.serviceWorker?.getRegistration();const sub=await r?.pushManager?.getSubscription();if(sub&&auth?.token){await noticeApi(auth.token,'unsubscribe',{endpoint:sub.endpoint});await sub.unsubscribe()}}catch{/* Generic push contains no personal data. */}
   }
 
   const tongSoCauSaiDaChon = useMemo(() => {
@@ -824,21 +718,23 @@ export default function StudentPortalScreen() {
   }, [cheDo2, tab])
   // SỬA LỖI 12/10 "không vuốt lên được": có màn con ⇒ khoá trang Hôm nay phía sau, cú vuốt luôn thuộc màn đang nhìn (src/lib/khoa-cuon-trang.ts).
   useKhoaCuonTrang(dangMoManCon)
-  // NẠP TRƯỚC MÀN LÀM BÀI (09/10): tải trước ExamTakeScreen lúc rảnh để khi học sinh bấm "Vào thi" thì màn mở ngay 0ms không phải chờ tải qua mạng.
+  // Chỉ nạp trước màn thi sau xác thực, ở Hôm nay và lúc máy rảnh; bấm Vào thi vẫn tải ngay.
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    const cb = () => { void boNapExam() }
+    if (typeof window === 'undefined' || !auth?.token || dangMoManCon || !nenNapTruoc()) return
+    let huy = false
+    const cb = () => { if (!huy) void boNapExam().catch(() => {}) }
     const hen = ('requestIdleCallback' in window
       ? (window as Window & { requestIdleCallback: (fn: () => void) => number }).requestIdleCallback
       : (fn: () => void) => setTimeout(fn, 1200))(cb)
     return () => {
+      huy = true
       if ('cancelIdleCallback' in window) {
         (window as Window & { cancelIdleCallback: (n: number) => void }).cancelIdleCallback(hen)
       } else {
         clearTimeout(hen)
       }
     }
-  }, [])
+  }, [auth?.token, dangMoManCon])
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
   const caDangMo = useCaDangMo({ token: auth?.token, sbd: auth?.sbd }, !!auth)
@@ -970,7 +866,7 @@ export default function StudentPortalScreen() {
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
           coCa={!!caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} coBaiTap={dsBtvn.length > 0} token={auth.token} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
-          onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam(); setTab('vaothi') }}
+          onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam().catch(() => {}); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
           onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')}
@@ -1477,7 +1373,7 @@ export default function StudentPortalScreen() {
                 soDaLam={Object.keys(cauTraLoiMom).length}
                 dsCau={dangLamMom.dsCau || dangLamMom.cau || []}
                 traLoi={cauTraLoiMom}
-                datTraLoi={(idCau, giaTri) => setCauTraLoiMom((prev) => ({ ...prev, [idCau]: giaTri }))}
+                datTraLoi={doiTraLoiMom}
                 loi={loiMom}
                 onQuayLai={hoiRoiBaiMom}
                 onTamDung={() => {
@@ -1505,7 +1401,7 @@ export default function StudentPortalScreen() {
                 ngayGio={dinhDangNgayGio}
                 onBatDau={(bai) => void batDauLamBaiMom(bai as unknown as BaiMomGiao)}
                 onXemKetQua={async (bai: any) => {
-                  if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
+                  // Phiếu cũ trong máy có thể từng tự đoán đáp án; chỉ mở phần chữa máy chủ xác nhận sau nộp.
                   try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
                   catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                 }}
@@ -1601,7 +1497,7 @@ export default function StudentPortalScreen() {
                           <MomQuestionStem q={cau} />
                         </div>
 
-                        {cau.phan === 'II' ? <div className="space-y-3">{(cau.ideas || cau.luaChon || cau.choices || []).map((idea:string,i:number)=><div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3"><MomOption q={cau} index={i} text={`${String.fromCharCode(97+i)}) ${idea}`} tf /><div className="mt-2 flex gap-2">{['D','S'].map(v=><button key={v} onClick={()=>setCauTraLoiMom(prev=>{const a=(prev[cau.id]||'----').split('');a[i]=v;return {...prev,[cau.id]:a.join('')}})} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${daChon?.[i]===v?'bg-rose-600 text-white shadow-xs':'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700'}`}>{v==='D'?'Đúng':'Sai'}</button>)}</div></div>)}</div> : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
+                        {cau.phan === 'II' ? <div className="space-y-3">{(cau.ideas || cau.luaChon || cau.choices || []).map((idea:string,i:number)=><div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3"><MomOption q={cau} index={i} text={`${String.fromCharCode(97+i)}) ${idea}`} tf /><div className="mt-2 flex gap-2">{['D','S'].map(v=><button key={v} onClick={()=>{const a=(answersMomRef.current[cau.id]||'----').split('');a[i]=v;doiTraLoiMom(cau.id,a.join(''))}} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${daChon?.[i]===v?'bg-rose-600 text-white shadow-xs':'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700'}`}>{v==='D'?'Đúng':'Sai'}</button>)}</div></div>)}</div> : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                             {cau.choices.map((choice: string, cIdx: number) => {
                               const kyTu = String.fromCharCode(65 + cIdx)
@@ -1611,7 +1507,7 @@ export default function StudentPortalScreen() {
                                   key={cIdx}
                                   type="button"
                                   onClick={() =>
-                                    setCauTraLoiMom((prev) => ({ ...prev, [cau.id]: kyTu }))
+                                    doiTraLoiMom(cau.id, kyTu)
                                   }
                                   className={`p-3 rounded-2xl border text-left text-xs transition flex items-start gap-2.5 cursor-pointer ${
                                     duocChon
@@ -1643,7 +1539,7 @@ export default function StudentPortalScreen() {
                               inputMode="text"
                               className="sm:w-80"
                               value={daChon || ''}
-                              onChange={(v) => setCauTraLoiMom((prev) => ({ ...prev, [cau.id]: v }))}
+                              onChange={(v) => doiTraLoiMom(cau.id, v)}
                               placeholder="Nhập đáp án số hoặc chữ…"
                             />
                           </div>
@@ -1766,7 +1662,7 @@ export default function StudentPortalScreen() {
                             {daNop ? (
                               <button
                                 onClick={async () => {
-                                  if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
+                                  // Phiếu cũ trong máy có thể từng tự đoán đáp án; chỉ mở phần chữa máy chủ xác nhận sau nộp.
                                   try { const data = await momApi('review', {token:auth?.token,id:bai.id}); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
                                   catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                                 }}
