@@ -425,3 +425,7 @@ Thầy (13/10 tối): "phần tick bài hiện tại load khá lâu, có lúc kh
 - [ ] Nút sửa hạn hàng loạt | bằng chứng: (chưa có)
 - [ ] Thêm em / bớt em trong phần đó (thuật toán phân câu giữ nguyên) | bằng chứng: (chưa có)
 - [ ] Xoá phần thêm em của bản cũ chiến dịch | bằng chứng: (chưa có)
+Thầy (13/10 21:26, ảnh HS kẹt "Đang chuẩn bị những câu phù hợp với em…" 14/24): "tại sao hs kêu lag không load được câu hỏi"
+- [x] Tìm nguyên nhân HS lag 21:26 | bằng chứng: workflow 38414976153 (20:52–21:37): 19.234 yc/45 phút (≈2,7× giờ 19:11–20:11), 0 lỗi, p50 0,20 s · p90 1,25 s · p99 3,75 s (trước 0,05/0,46/1,49), CPU p99 0,74 s; 3 lượt phát hành giữa cao điểm (20:52 PR269, 21:03 PR280, ~21:15 PR282) xoá đệm Worker ⇒ docMetaCau 3.111 lần × 33 ms (~1.270 dòng/lần); tem kho KHÔNG đổi (workflow 38415223402: 0 tờ lập chỉ mục/1 giờ, 0 tờ lệch)
+- [x] Tối 13/10 giờ cao điểm: đo số thật (routine) | bằng chứng: do-d1-cao-diem 38415277120 (24 giờ): docMetaCau 26.950→21.982 lần (37,6→30,7 ms); danhMuc 8.903→4.708 lần (vẫn đọc 123 triệu dòng/ngày — lớn nhất); upsert goi_bai_7_cau 1,04 triệu dòng→hết khỏi top; hanh_trinh_v4_canh ghi ~2,5 triệu→~0,98 triệu dòng
+- [ ] LUẬT: không phát hành 19:00–23:59 trừ sửa khẩn; việc dở tối nay phát hành sau 24:00
