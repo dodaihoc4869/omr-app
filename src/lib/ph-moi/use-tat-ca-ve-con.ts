@@ -39,7 +39,14 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return true
       const lanLamMoi = lanDoc++
       setS((x) => ({ ...x, dangLamMoi: true, lanLamMoi }))
-      const r = await apiRef.current(sbd)
+      let r: PhanHoiTatCa
+      try {
+        r = await apiRef.current(sbd)
+      } catch {
+        if (huy) return true
+        setS((x) => ({ ...x, trangThai: x.pm ? 'ok' : 'loi', chuLoi: 'Chưa tải được báo cáo của con. Anh/chị thử lại sau ít phút.', dangLamMoi: false }))
+        return false
+      }
       if (huy) return true
       if (r.kieu === 'ok') setS({ trangThai: 'ok', pm: r.pm, chuLoi: '', dangLamMoi: false, lanLamMoi })
       else setS((x) => (x.pm ? { ...x, chuLoi: r.chu, dangLamMoi: false } : { trangThai: 'loi', pm: null, chuLoi: r.chu, dangLamMoi: false, lanLamMoi }))
