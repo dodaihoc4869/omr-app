@@ -37,6 +37,8 @@ it('mở tấm tức thì có xương; chỉ đọc đúng gói một lần', as
   const d = doi<unknown>(); goi.mockReturnValue(d.cho); mo()
   expect(screen.getByRole('dialog', { name: 'Em nhận Bài 8. Amine' })).toBeTruthy()
   expect(screen.getByLabelText('Đang đọc danh sách nhận bài')).toBeTruthy()
+  expect(document.querySelector('.sen-so')?.textContent).not.toContain('0 em')
+  expect(document.querySelector('.sen-so')?.textContent).toContain('Sẽ nhận Đang đọc')
   expect((screen.getByRole('button', { name: 'Lưu danh sách' }) as HTMLButtonElement).disabled).toBe(true)
   await waitFor(() => expect(lan('doc_em')).toEqual([{ action: 'doc_em', goiId: 'g1' }]))
   await act(async () => d.tra({ ok: true, du: DU }))
@@ -128,8 +130,11 @@ it('Tab nhốt trong tấm; Enter ô tìm không nộp cha; danh sách rỗng v�
 it('API cũ không giả danh sách; không đủ ứng viên cho biết kiểm danh sách lớp', async () => {
   goi.mockResolvedValueOnce({ ok: true, du: { bat: true, goi: [] } }); const a = mo()
   expect(await screen.findByRole('button', { name: 'Thử đọc lại' })).toBeTruthy(); expect(screen.queryByRole('button', { name: 'Chọn em' })).toBeNull()
+  expect(document.querySelector('.sen-so')?.textContent).not.toContain('0 em')
+  expect(document.querySelector('.sen-so')?.textContent).toContain('Sẽ nhận Chưa có số')
   a.unmount(); goi.mockResolvedValueOnce({ ok: true, du: { ...DU, em: [], nhan: [] } }); mo()
   expect(await screen.findByText(/Không có em hợp lệ trong lớp/)).toBeTruthy()
+  expect(document.querySelector('.sen-so')?.textContent).toContain('Sẽ nhận 0 em')
 })
 it('đổi mã bí mật lúc chờ ACK giữ nháp; không báo thành công phiên cũ', async () => {
   const daLuu = vi.fn(), cho = doi<unknown>(); mo({ onDaLuu: daLuu }); await themBao(); goi.mockReturnValueOnce(cho.cho)

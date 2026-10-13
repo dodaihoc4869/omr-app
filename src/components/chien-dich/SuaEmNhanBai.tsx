@@ -122,7 +122,7 @@ export default function SuaEmNhanBai({ goiId, lop, ten, onDong, onDaLuu }: Props
       <section className="sen-tam" ref={tam} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={id} data-khoi="sua-em-nhan-bai" onKeyDown={e => { if (e.key === 'Enter' && e.target instanceof HTMLInputElement) { e.preventDefault(); e.stopPropagation() } }}>
         <header><span><p className="sen-nhan">{lop}{goc ? ` · đang nhận ${goc.nhan.length} em` : ''}</p><h2 id={id}>Em nhận {ten}</h2></span><button ref={nutDong} type="button" className="sen-dong" aria-label="Đóng tấm Em nhận bài" disabled={luu || hoiDong} onClick={dong}>×</button></header>
         <div className="sen-than">
-          <aside><p className="sen-nhan">Danh sách sẽ thay đổi</p><div className="sen-so"><span>Thêm <b>{them.length} em</b></span><span>Bớt <b>{bot.length} em</b></span><span>Sẽ nhận <b>{chon.size} em</b></span></div>
+          <aside><p className="sen-nhan">Danh sách sẽ thay đổi</p><div className="sen-so"><span>Thêm <b>{goc ? `${them.length} em` : doc ? 'Đang đọc' : 'Chưa có số'}</b></span><span>Bớt <b>{goc ? `${bot.length} em` : doc ? 'Đang đọc' : 'Chưa có số'}</b></span><span>Sẽ nhận <b>{goc ? `${chon.size} em` : doc ? 'Đang đọc' : 'Chưa có số'}</b></span></div>
             <div className="sen-thay-doi">{them.map(e => <p key={e.sbd}><b>Thêm</b><span>{e.hoTen || e.sbd}</span></p>)}{bot.map(e => <p key={e.sbd}><b>Bớt</b><span>{e.hoTen || e.sbd}</span></p>)}</div>
             <p className="sen-chu">Em được thêm nhận cùng bài và hạn của lớp. Kết quả đã làm được giữ.</p>
           </aside>
@@ -144,7 +144,7 @@ export default function SuaEmNhanBai({ goiId, lop, ten, onDong, onDaLuu }: Props
           </div>
         </div>
         {hoiDong && <div className="sen-hoi" role="alertdialog" aria-label="Bỏ thay đổi chưa lưu?"><p>{choAck ? 'Lượt lưu chưa được xác nhận. Khi mở lại, app sẽ đọc danh sách máy chủ.' : 'Danh sách đang có thay đổi chưa lưu.'}</p><button ref={nutGiu} type="button" className="gvv2-nut-vien" onClick={() => { setHoiDong(false); nutDong.current?.focus() }}>Giữ nháp, tiếp tục sửa</button><button type="button" className="gvv2-nut-chu" onClick={onDong}>Bỏ nháp và đóng</button></div>}
-        <footer><p role="status">{daLuu ? 'Đã lưu danh sách' : luu ? 'Đang lưu danh sách…' : doc ? 'Đang đọc danh sách…' : `${them.length + bot.length} em thay đổi`}</p><div><button type="button" className="gvv2-nut-vien" disabled={luu || hoiDong} onClick={dong}>{daLuu ? 'Đóng' : 'Hủy'}</button><button type="button" className="gvv2-nut-chinh" disabled={!luuDuoc || hoiDong} onClick={() => void luuDanhSach()}>{luu ? 'Đang lưu…' : choAck && !xungDot ? 'Thử lưu lại' : 'Lưu danh sách'}</button></div></footer>
+        <footer><p role="status">{daLuu ? 'Đã lưu danh sách' : luu ? 'Đang lưu danh sách…' : doc ? 'Đang đọc danh sách…' : !goc ? 'Chưa đọc được danh sách' : `${them.length + bot.length} em thay đổi`}</p><div><button type="button" className="gvv2-nut-vien" disabled={luu || hoiDong} onClick={dong}>{daLuu ? 'Đóng' : 'Hủy'}</button><button type="button" className="gvv2-nut-chinh" disabled={!luuDuoc || hoiDong} onClick={() => void luuDanhSach()}>{luu ? 'Đang lưu…' : choAck && !xungDot ? 'Thử lưu lại' : 'Lưu danh sách'}</button></div></footer>
       </section>
     </div>
   </div>, document.body)
