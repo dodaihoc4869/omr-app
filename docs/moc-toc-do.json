@@ -2,8 +2,8 @@
  "ghiChu": "Mốc tốc độ (luật thầy 13/10: sửa xong phải nhanh bằng/hơn). Đo trên bản đang chạy thật 81f13983. mayChu: số đợt chờ D1 nối tiếp + số lệnh D1 trên đường trả lời (tests/toc-do-may-chu-lenh-nong-1310.test.ts). taiApp: byte nén phải tải để mở từng app (scripts/kiem-toc-do-tai.mjs). Mốc CHỈ HẠ, không nâng. HẠ taiApp 13/10 (Hỏi thầy ở mọi câu: hộp thoại, khung lời giải, nút chữa từng bước tách mảnh nạp khi bấm).",
  "mayChu": {
   "sanh-lan-dau": {
-   "dot": 30,
-   "lenh": 37
+   "dot": 29,
+   "lenh": 36
   },
   "sanh-lan-sau": {
    "dot": 6,
@@ -11,7 +11,7 @@
   },
   "mo-chang": {
    "dot": 10,
-   "lenh": 17
+   "lenh": 16
   },
   "nop-cau": {
    "dot": 9,
