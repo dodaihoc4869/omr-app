@@ -310,3 +310,8 @@ Thầy nhắn thêm: "Xong thì đẩy lên luôn nhé, đảm bảo máy chủ 
 - [x] Đo app trên máy yếu (Chromium thật, CPU chậm 6×, mạng 1,6 Mbps / RTT 150 ms) | bằng chứng: bản đang chạy /hs lần đầu LCP 4,5 s (ảnh thần thú màn đăng nhập), mở lại 1,9 s; /ph lần đầu 2,7–3,5 s; /gv 2,5 s
 - [x] Xử lý chỗ tốn nhất | bằng chứng: 6edd8ad0 — KaTeX cổng học sinh tải lúc rảnh + nạp trước ảnh màn đăng nhập ⇒ /hs LCP lần đầu 1,6–1,9 s, mở lại 0,8 s (đo 2 lượt mỗi bản); máy chủ bỏ một hoa2-sanh chạy thừa mỗi lần mở app + mỗi lần đăng nhập (tests/may-yeu-mo-app-1310, dang-nhap-kem-sanh-may-chu-0610)
 - [ ] (đợt sau) App phụ huynh dùng chung khung App.tsx của thầy (~272 KB nén tải đầu) — tách vỏ riêng nhẹ như AppHocSinh để màn đầu phụ huynh < 1,5 s trên máy yếu | bằng chứng: (chưa làm)
+- [x] Phép tính 12 bậc (máy chủ, khớp nhóm) | bằng chứng: 4196d6d4 server/src/bac-cham-chi.ts + tests/bac-cham-chi-1310 (3.000 dãy: không mâu thuẫn nhóm, trải đủ 12 bậc; đơn điệu; ba app cùng bậc — mot-con-so-goi7-1210)
+- [x] Hiển thị bậc HS (Hôm nay, hồ sơ) · PH · thầy (chip + đếm + xếp theo bậc) · 12 màu từ biến chuẩn | bằng chứng: làn L c8041ab5, tests/bac-cham-chi-giao-dien-1310 (22), ảnh docs/anh-dot18/lan-l-*.jpg
+- [x] Hiện bậc trên màn chiếu điểm danh | bằng chứng: làn L c8041ab5, ảnh lan-l-man-chieu.jpg
+- [x] Không chậm hơn | bằng chứng: kiem:toc-do xanh (HS +0,3 KB trong dung sai; máy chủ không thêm đợt/lệnh)
+- [x] Đẩy lên + phát hành (kiểm ca mở) | bằng chứng: PR257 → e4fc3f9a, Actions 38335605600 SUCCESS (bước "Kiểm ca thi" đạt, bước 16 Worker + Pages cùng commit). Lùi: git revert e4fc3f9a
