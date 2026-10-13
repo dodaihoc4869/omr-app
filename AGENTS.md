@@ -21,7 +21,17 @@ Xong mỗi mục:
 
 Không làm được thì đổi thành `[!]` kèm lý do một dòng. Không xoá mục nào.
 
-## 3. Trước khi mở PR vào `main`
+## 3. Quy trình 4 bước (thầy đồng ý 13/10)
+Áp dụng cho tính năng mới, màn mới, đổi giao diện rõ rệt. Đọc `docs/quy-trinh-4-buoc-1310.md`.
+
+- Việc giao kèm đặc tả 7 mục và bản vẽ thầy đã duyệt: build đúng như vậy.
+- Thầy giao thẳng một tính năng mới mà chưa có bản vẽ duyệt:
+  - làm bước 2 trước (đặc tả 7 mục + ảnh Chromium thật, 3 khổ, sáng/tối) trong PR nháp;
+  - thầy duyệt rồi mới build.
+- Sửa lỗi, sửa chữ, tối ưu không đổi giao diện: làm thẳng.
+- Soát chéo với Claude trên PR GitHub, không soát code dán vào chat.
+
+## 4. Trước khi mở PR vào `main`
 - `npx tsc -b`; `cd server && npx tsc --noEmit -p .`; `npm run build && npm run kiem:toc-do`; `node scripts/kiem-sw.mjs` 13/13.
 - Chạy toàn bộ vitest, so **theo tên test** với `main`: không có test đỏ mới.
 - Xem Actions `deploy.yml` không có lượt đang chạy, rồi gộp `main` mới nhất vào nhánh.

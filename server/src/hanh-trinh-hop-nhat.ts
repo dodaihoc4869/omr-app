@@ -6,7 +6,7 @@ import { laCauTuLuan } from './cam-tu-luan'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { bam } from './srs2-loi'
 import { tangCuaCau } from './hanh-trinh-ngay'
-import { docCauHinhDem } from './cau-hinh-dem'
+import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_TC } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
@@ -15,6 +15,18 @@ type Row = Record<string, unknown>
 export const KHOA_HANH_TRINH = 'hanh_trinh_3_0910_v1'
 export const idHanhTrinh = (k: Khoi) => `hanh-trinh-v3-khoi-${k}`
 export const laHanhTrinh = (id: string) => /^hanh-trinh-v3-khoi-(10|11|12)$/.test(id)
+/** Dấu vân tay của lần gộp gần nhất (đợt 21) — xem dongBoBaHanhTrinh. */
+const KHOA_VAN_TAY = 'hanh_trinh_v3_van_tay'
+/** Lần kiểm vân tay gần nhất theo D1 gốc của isolate: tối đa một lần mỗi chu kỳ. */
+const kiemVanTay = new WeakMap<object, number>()
+/** Trạng thái chiến dịch trong vân tay (tính bằng SQL để lô ghi lưu được trạng thái SAU khi gộp mà không đọc lại). */
+const SQL_CD_VT = `COALESCE((SELECT group_concat(id||'~'||trang_thai||'~'||COALESCE(tao_luc,'')||'~'||COALESCE(han_nop,'')||'~'||COALESCE(the_luc_ngay,'')||'~'||COALESCE(huyet_chien,''),'|')
+    FROM (SELECT id,trang_thai,tao_luc,han_nop,the_luc_ngay,huyet_chien FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY id)),'')`
+/** MỘT lệnh: mốc kho câu (chỉ đổi qua lapChiMucTo) + mốc cau_hoi + trạng thái chiến dịch + vân tay đã lưu. */
+const SQL_VAN_TAY = `SELECT (SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index) kho,(SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hoi) ch,
+  ${SQL_CD_VT} cd,(SELECT gia_tri FROM cau_hinh WHERE khoa=?) vt`
+/** Vân tay = băm(mốc kho, mốc câu, danh sách em) + '#' + trạng thái chiến dịch. */
+const dauVanTay = (r: Row | null, hs: readonly Row[]) => String(bam(JSON.stringify([r?.kho, r?.ch, hs])))
 const mang = (v: unknown): string[] => { try { const a: unknown = JSON.parse(String(v ?? '[]')); return Array.isArray(a) ? a.filter((x): x is string => typeof x === 'string') : [] } catch { return [] } }
 export const SQL_BANG_HANH_TRINH = [
   `CREATE TABLE IF NOT EXISTS hanh_trinh_v3_nguon (id TEXT PRIMARY KEY, noi_dung_json TEXT NOT NULL, hop_nhat_luc TEXT NOT NULL)`,
@@ -71,17 +83,31 @@ async function docKhoHanhTrinh(env: Env) {
 /** Cron tự nhận học sinh/câu mới. Lần đầu đóng các chiến dịch nguồn trong cùng giao dịch có kiểm tra ca mở và CAS.
  * Ca đang mở ⇒ chờ cron kế tiếp; không thay đổi dữ liệu. */
 export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ trangThai: string; soChienDich?: number }> {
+  // Đợt 21: isolate vừa kiểm trong chu kỳ này ⇒ không hỏi D1 gì (cron mỗi phút).
+  const goc = dbGoc(env.DB as unknown as object), chuKyPhut = new Date(nowMs + 7 * 3_600_000).getUTCHours() >= 20 ? 20 : 5
+  if (nowMs - (kiemVanTay.get(goc) ?? -Infinity) < chuKyPhut * 60_000) return { trangThai: 'da_cap_nhat' }
   if (await env.DB.prepare("SELECT 1 FROM ca WHERE trang_thai='mo' LIMIT 1").first()) return { trangThai: 'cho_het_ca' }
   const truoc = await env.DB.prepare('SELECT gia_tri,cap_nhat_luc FROM cau_hinh WHERE khoa=?').bind(KHOA_HANH_TRINH).first<Row>()
   // Giờ cao điểm 20:00–23:59 VN (khẩn 12/10 22h30, số đo D1 thật): mỗi lượt quét CẢ kho (~16 trang × 1.000 câu kèm JSON, ~0,9 giây D1) rồi ghi lại ba
   // dòng chiến dịch lớn ⇒ 20 phút/lượt thay vì 5. Em mới / câu mới vào hành trình chậm nhất 20 phút; ngoài giờ cao điểm như cũ.
   const chuKy = new Date(nowMs + 7 * 3_600_000).getUTCHours() >= 20 ? 20 : 5
   if (truoc && nowMs - Date.parse(String(truoc.cap_nhat_luc)) < chuKy * 60_000) return { trangThai: 'da_cap_nhat' }
+  // ĐỢT 21 (thầy 13/10 "tối ưu máy chủ chuyên sâu"; số đo D1 3 giờ: lượt quét CẢ kho ~16 trang × 1.000 câu kèm JSON + ghi lại ba dòng chiến dịch
+  // lớn chạy mỗi 5 phút DÙ không có gì đổi). DẤU VÂN TAY RẺ: kho câu chỉ đổi qua lapChiMucTo (game_v2_index) và nhập cau_hoi (cap_nhat_luc); danh
+  // sách em qua hoc_sinh; chiến dịch qua trạng thái/mốc + các trường lượt gộp tự ghi. Vân tay trùng lần gộp trước ⇒ kết quả quét giống hệt ⇒ bỏ qua
+  // (không đọc kho, không ghi). Mỗi isolate kiểm tối đa một lần mỗi chu kỳ (không thêm truy vấn mỗi phút).
+  kiemVanTay.set(goc, nowMs)
+  // MỘT lệnh cho mốc kho + mốc câu + chiến dịch + vân tay cũ (giữ ngân sách lệnh D1 của lượt gộp đầy đủ); danh sách em đọc riêng (lượt gộp dùng lại).
+  const [vtMoi, hs] = await Promise.all([
+    env.DB.prepare(SQL_VAN_TAY).bind(KHOA_VAN_TAY).first<Row>(),
+    env.DB.prepare('SELECT sbd,lop,ten_lop,trang_thai FROM hoc_sinh ORDER BY sbd').all<Row>(),
+  ])
+  const dau = dauVanTay(vtMoi, hs.results ?? [])
+  if (truoc && vtMoi?.vt === `${dau}#${String(vtMoi?.cd ?? '')}`) return { trangThai: 'khong_doi' }
   await chayDdlMotLan(env, 'hanh_trinh_v3', SQL_BANG_HANH_TRINH)
-  const [marker, cd, hs, kho] = await Promise.all([
+  const [marker, cd, kho] = await Promise.all([
     env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa=?').bind(KHOA_HANH_TRINH).first<Row>(),
     env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy'").all<Row>(),
-    env.DB.prepare('SELECT sbd,lop,ten_lop,trang_thai FROM hoc_sinh').all<Row>(),
     docKhoHanhTrinh(env),
   ])
   const nguon = (cd.results ?? []).filter(r => !laHanhTrinh(String(r.id)))
@@ -139,6 +165,10 @@ export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ tran
         JSON.stringify({ bat: true, phienBan: 1, ...(key === KHOA_HANH_TRINH ? { thamChieuCuKhongCoTaiKhoan: thieuTaiKhoan } : {}) }), luc))
   }
   else lenh.push(env.DB.prepare('UPDATE cau_hinh SET cap_nhat_luc=? WHERE khoa=?').bind(luc, KHOA_HANH_TRINH))
+  // Vân tay CUỐI lô (nguyên tử): phần chiến dịch tính bằng SQL SAU các lệnh ghi trên (lượt gộp tự tạo/cập nhật ba hành trình, đóng nguồn) ⇒ lượt sau
+  // không đổi gì thì trùng khớp. Có người ghi chen giữa ⇒ lượt sau thấy khác ⇒ gộp lại (an toàn, chỉ tốn một lượt).
+  lenh.push(env.DB.prepare(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) SELECT ?1,?2||'#'||${SQL_CD_VT},?3 WHERE 1
+    ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri,cap_nhat_luc=excluded.cap_nhat_luc`).bind(KHOA_VAN_TAY, dau, luc))
   await env.DB.batch(lenh)
   // Import sau để tránh vòng phụ thuộc srs2-d1 → hành trình → srs2-d1.
   const [{ xoaDemChienDich }, { xoaDemCauHinh }] = await Promise.all([import('./srs2-d1'), import('./cau-hinh-dem')])
