@@ -9,6 +9,13 @@ Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo vi
 - Phải DỪNG và báo Boss CHỈ khi: **XOÁ/GHI ĐÈ DỮ LIỆU THẬT** (reset, xoá bảng, sửa điểm thật hàng loạt), **schema KHÔNG phải chỉ-thêm**, hoặc phát hiện **đang có ca thi mở**. Ngoài ba việc đó thì tự quyết và tự phát hành.
 - Không nhập/đoán mật khẩu, không in token/mã bí mật. Đáp án không xuống máy học sinh trước khi nộp.
 - **CODEX (thầy 13/10):** "từ giờ tôi nhắn ở đây, việc gì thằng codex làm tốt hơn bạn giao luôn cho nó tự làm nhé". Codex là công cụ khác, không nhắn bằng SendMessage được. Giao việc bằng cách GHI THÊM mục `[ ]` vào `docs/viec-giao-codex.md` rồi đẩy lên `main` (Codex tự đọc `AGENTS.md` ⇒ mở tệp đó mỗi lần nhận việc). Không dùng `@codex` trên GitHub: bot chỉ trả "create an environment" (thử 13/10, issue 260). Đề bài phải tự đủ nghĩa: việc, tệp, luật chung, nghiệm thu. Theo dõi PR tới khi xong rồi báo thầy. Giao Codex khi việc nằm trong làn Codex (kiểm tra cá nhân, chiếu chữa / người gọi, máy soạn câu song sinh) hoặc là tiếp nối PR của chính Codex. Việc độc lập, chạy song song được, không giẫm tệp đang sửa cũng có thể giao. Luật chung và chia làn: `docs/hop-dong-claude-codex-1310.md`.
+- **QUY TRÌNH 4 BƯỚC (thầy đồng ý 13/10)** — áp dụng cho tính năng mới, màn mới, đổi giao diện rõ rệt:
+  1) Thầy gửi ý tưởng. Có đặc tả ChatGPT thì dán một lần.
+  2) Claude viết đặc tả 7 mục + bản vẽ (ảnh Chromium thật, 3 khổ, sáng/tối).
+  3) Thầy duyệt ảnh. Chưa duyệt thì không build.
+  4) Claude hoặc Codex (theo làn) build → cổng → phát hành; bên còn lại soát trên PR.
+
+  Mẫu đặc tả và luật: `docs/quy-trinh-4-buoc-1310.md`. Sửa lỗi hoặc tối ưu không đổi giao diện thì làm thẳng.
 - **LUẬT TỐC ĐỘ (thầy 13/10):** "Khi bạn sửa bất kì cái gì thì luôn phải đảm bảo sau khi sửa xong tốc độ load app và tốc độ máy chủ phải nhanh hơn". Trước khi đẩy: `npm run build && npm run kiem:toc-do` phải 0 đỏ — đo byte tải mở từng app (`scripts/kiem-toc-do-tai.mjs`) và số đợt chờ D1 nối tiếp của 4 lệnh nóng (`tests/toc-do-may-chu-lenh-nong-1310.test.ts`), so mốc `docs/moc-toc-do.json`. Mốc CHỈ HẠ, không nâng; đỏ ⇒ làm nhẹ/bớt vòng chờ rồi mới đẩy. Thêm lệnh máy chủ mới: đọc song song (`som`/`Promise.all`/`batch`), không thêm vòng chờ nối tiếp.
 
 ## TIẾT KIỆM NGỮ CẢNH (thầy yêu cầu 21/09)
