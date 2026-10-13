@@ -9,7 +9,7 @@ import './sua-han-bai.css'
 
 const CHU_CHUA_CO_LENH = 'Máy chủ chưa có bảng bài 7 ngày.'
 type ThongKe = { soEm: number; pGap: number | null; pTuLam: number | null }
-type DuBang = { bat: boolean; goi: GoiDu[]; thongKe: Record<string, ThongKe> }
+type DuBang = { bat: boolean; goi: GoiDu[]; thongKe: Record<string, ThongKe>; serverNow?: number }
 type SuaHan = { id: string; han: string; hanCu: string }
 type SuaNhieu = { goi: GoiDu[]; chon: Set<string>; han: string }
 const laHo = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x)
@@ -19,7 +19,8 @@ const laPhanTram = (p: unknown): p is number | null => p === null || typeof p ==
 /** Số thiếu/sai dạng không biến thành 0% hoặc dữ liệu lớp khác. */
 function docBang(d: Record<string, unknown>): DuBang | null {
   if (typeof d.bat !== 'boolean') return null
-  if (!d.bat) return { bat: false, goi: [], thongKe: {} }
+  const serverNow = typeof d.serverNow === 'number' && Number.isFinite(d.serverNow) && Number.isFinite(new Date(d.serverNow + 7 * 3600000).getTime()) ? d.serverNow : undefined
+  if (!d.bat) return { bat: false, goi: [], thongKe: {}, serverNow }
   if (!Array.isArray(d.goi) || !laHo(d.thongKe)) return null
   const goi: GoiDu[] = [], thongKe: Record<string, ThongKe> = {}
   for (const g of d.goi) {
@@ -31,8 +32,8 @@ function docBang(d: Record<string, unknown>): DuBang | null {
       thongKe[g.id] = { soEm: t.soEm, pGap: t.soEm ? t.pGap : null, pTuLam: t.soEm ? t.pTuLam : null }
     }
   }
-  const homNay = ngayVn()
-  return { bat: true, goi: [...goiDangGiao(goi, homNay), ...goi.filter(g => g.han < homNay).sort((a, b) => b.han.localeCompare(a.han))], thongKe }
+  const homNay = ngayVn(serverNow)
+  return { bat: true, serverNow, goi: [...goiDangGiao(goi, homNay), ...goi.filter(g => g.han < homNay).sort((a, b) => b.han.localeCompare(a.han))], thongKe }
 }
 
 function Thanh({ p, nhan, loai }: { p: number | null; nhan: string; loai: 'gap' | 'tu-lam' }) {
@@ -59,7 +60,8 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
   const [loiHan, setLoiHan] = useState('')
   const docLan = useRef(0), thayDoi = useRef(0), song = useRef(true), dangDoc = useRef(false), dangLuu = useRef(false)
   const idTieuDe = useId(), idNhieu = useId()
-  const homNay = ngayVn()
+  // Ngày cùng lượt máy chủ chọn 12 gói: đồng hồ máy thầy lệch không làm lệch bảng/sàn hạn.
+  const homNay = ngayVn(du?.serverNow)
 
   const tai = useCallback(async (caCu = false) => {
     if (dangDoc.current || dangLuu.current) return

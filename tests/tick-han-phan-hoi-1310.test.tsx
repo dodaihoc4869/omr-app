@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // Khóa phản ánh thật 13/10: chờ nhiều lệnh, lưu làm co bảng/nhảy màn, cần sửa hạn nhiều lớp.
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { StrictMode } from 'react'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 const { goi } = vi.hoisted(() => ({ goi: vi.fn() }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (...a: unknown[]) => goi(...a) }))
@@ -192,4 +193,35 @@ it.each([false, true])('bài đã bỏ tick trên máy khác không được lư
     expect((await screen.findByRole('alert')).textContent).toContain('chọn ít nhất một lớp')
   } else expect(screen.queryByRole('button', { name: 'Lưu hạn' })).toBeNull()
   expect(goi.mock.calls.filter(([, b]) => b.action !== 'tong_hop')).toHaveLength(0)
+})
+
+it.each(['2026-10-12T10:00:00Z', '2026-10-15T10:00:00Z'])('máy thầy lệch ngày %s: đúng 12 gói/số liệu và sàn hạn theo ngày VN máy chủ', async localNow => {
+  vi.setSystemTime(Date.parse(localNow))
+  const serverNow = Date.parse('2026-10-13T17:00:01Z') // Đã sang 14/10 VN; máy thầy còn 12 hoặc 15.
+  const g = Array.from({ length: 13 }, (_, i) => ({ id: `bound-${i}`, ten: `Bài ${i}`, lop: `12 - Nhóm ${i}`, han: i === 0 ? '2026-10-13' : '2026-10-16', bat_dau: '2026-10-10' }))
+  goi.mockResolvedValueOnce({ ok: true, du: { bat: true, serverNow, goi: g, thongKe: Object.fromEntries(g.slice(1).map(x => [x.id, { soEm: 1, pGap: 40, pTuLam: 30 }])) } })
+  const { container } = render(<BangBaiDangGiao />)
+  await screen.findByRole('button', { name: 'Sửa hạn Bài 12 · 12 - Nhóm 12' })
+  expect(container.querySelectorAll('[data-khoi="dong-giao"]')).toHaveLength(12)
+  expect(screen.queryByText('Bài 0')).toBeNull()
+  expect(screen.getAllByRole('img', { name: 'Đã gặp câu gốc 40%' })).toHaveLength(12)
+  expect(screen.queryByText(/Chưa tải được số liệu/)).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Sửa hạn Bài 12 · 12 - Nhóm 12' }))
+  const o = screen.getByLabelText('Hạn mới của Bài 12 · 12 - Nhóm 12') as HTMLInputElement
+  expect(o.min).toBe('2026-10-14')
+  fireEvent.change(o, { target: { value: '2026-10-13' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu hạn' }))
+  expect((await screen.findByRole('alert')).textContent).toContain('từ hôm nay')
+  expect(goi.mock.calls.filter(([, b]) => b.action === 'sua_han')).toHaveLength(0)
+})
+it('StrictMode chạy lại effect vẫn nhận lượt đọc đang chờ, chỉ một yêu cầu và phục hồi đủ bảng', async () => {
+  const cho = doi<unknown>()
+  goi.mockImplementationOnce(() => cho.cho)
+  render(<StrictMode><BangBaiDangGiao /></StrictMode>)
+  expect(screen.getByLabelText('Đang tải bài đang giao')).toBeTruthy()
+  expect(goi).toHaveBeenCalledTimes(1)
+  await act(async () => { cho.tra(bang()) })
+  expect(await screen.findByRole('button', { name: 'Sửa hạn Bài 8. Amine · 12 - Tinh Hoa' })).toBeTruthy()
+  expect(screen.queryByLabelText('Đang tải bài đang giao')).toBeNull()
+  expect(goi).toHaveBeenCalledTimes(1)
 })
