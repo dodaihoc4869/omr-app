@@ -3,23 +3,23 @@
  "mayChu": {
   "sanh-lan-dau": {
    "dot": 30,
-   "lenh": 38
+   "lenh": 37
   },
   "sanh-lan-sau": {
    "dot": 6,
-   "lenh": 11
+   "lenh": 10
   },
   "mo-chang": {
    "dot": 10,
-   "lenh": 18
+   "lenh": 17
   },
   "nop-cau": {
    "dot": 9,
    "lenh": 12
   },
   "dem-hom-nay": {
-   "dot": 2,
-   "lenh": 2
+   "dot": 1,
+   "lenh": 1
   }
  },
  "taiApp": {
@@ -29,7 +29,7 @@
   },
   "hoc-sinh": {
    "tep": 47,
-   "gzip": 342674
+   "gzip": 341567
   },
   "phu-huynh": {
    "tep": 26,

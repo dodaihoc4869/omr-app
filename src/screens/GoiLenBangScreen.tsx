@@ -1258,6 +1258,14 @@ function GoiLenBangCu() {
 
       // CẦU NỐI GHI KẾT QUẢ NGAY TRÊN TỜ CHIẾU: mã phiên ngẫu nhiên mỗi lần mở, chỉ nằm trong HTML của tờ này.
       const maPhien = taoMaPhienChieu()
+      const {layEmChieu,nhanEmChieu}=await import('../lib/ung-vien-chieu')
+      const uvDung=await layEmChieu(dsO.map(o=>qidMayChuCuaIdCau(o.qid??'')??o.qid??''),dsEmCa.filter(e=>e.coMat).map(e=>e.sbd))
+      const cauTheoId=new Map([...oTrenTo.values()].map(o=>[o.cau.id,o.cau]))
+      oTrenTo.clear()
+      for(const o of dsO){const qid=qidMayChuCuaIdCau(o.qid??'')??o.qid??'',e=uvDung.get(qid)?.[0],c=cauTheoId.get(o.qid??'');o.sbd=e?.sbd??'';o.hoTen=e?.ten??'Cả lớp';o.lichSuCau=e?nhanEmChieu(e):undefined;o.lanLenBang=undefined;if(e&&c)oTrenTo.set(khoaToChieu(e.sbd,c.id),{sbd:e.sbd,hoTen:e.ten,cau:c})}
+      const emTheoCau=new Map(dsO.map(o=>[o.qid,{sbd:o.sbd,hoTen:o.hoTen}]))
+      setKq(cu=>cu?{...cu,phanCong:cu.phanCong.map(p=>({...p,...emTheoCau.get(p.cau.id)}))}:cu)
+      setKqBuoi(cu=>cu?{...cu,dong:cu.dong.map(d=>d.em&&emTheoCau.has(d.cau.id)?{...d,em:{...d.em,...emTheoCau.get(d.cau.id)}}:d)}:cu)
       const html = taoHtmlMayChieu(dsO, {
         dayHoc,
         tenBuoi: dayHoc ? 'Dạy học · Gọi lên bảng' : du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
@@ -1335,6 +1343,7 @@ function GoiLenBangCu() {
    * nhật lịch sử tại chỗ. Trả `true` chỉ khi máy chủ đã nhận: ghi hỏng thì bên gọi GIỮ dòng lại —
    * mất dòng mà máy chủ chưa có gì là thầy tưởng đã ghi rồi. */
   const ghiKetQua = async (p: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean, giayThuc?: { giay: number; duTinh: number }): Promise<boolean> => {
+    if(!p.sbd){showToast('Câu đang chữa chung, chưa có học sinh được gọi để ghi kết quả.','warn');return false}
     if (!cauHinh) {
       showToast('Chưa cấu hình máy chủ', 'error')
       return false

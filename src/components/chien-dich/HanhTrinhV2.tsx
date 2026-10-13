@@ -25,6 +25,7 @@ export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
 // Mỗi mục là mảnh riêng, chỉ tải khi thầy mở mục.
 const TheBaiDaDay = lazy(() => import('./TheBaiDaDay'))
 const TheCanThayChua = lazy(() => import('./TheCanThayChua'))
+const BangKiemTraCaNhan = lazy(() => import('./BangKiemTraCaNhan'))
 
 /** Hai mục của màn (thầy 12/10). */
 export const THE_HANH_TRINH: readonly (readonly [MucHanhTrinh, string])[] = [
@@ -111,7 +112,7 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, kho
 
       {/* Đổi mục: mờ dần + trượt 8px 200ms (thang chung .tt-vao-muc); key theo mục để mỗi lần đổi chạy lại. */}
       <div key={the} role="tabpanel" id={`gvv2-o-${the}`} aria-labelledby={`gvv2-the-${the}`} className="gvv2-o-the tt-vao-muc">
-        <Suspense fallback={<XuongThe />}>{the === 'day-hoc' ? <TheBaiDaDay lanBoSung={lanBoSung} onMoChuaBai={moChuaBai} /> : <TheCanThayChua onDem={nhanDem} />}</Suspense>
+        <Suspense fallback={<XuongThe />}>{the === 'day-hoc' ? <><TheBaiDaDay lanBoSung={lanBoSung} onMoChuaBai={moChuaBai} /><BangKiemTraCaNhan/></> : <TheCanThayChua onDem={nhanDem} />}</Suspense>
       </div>
     </div>
   )

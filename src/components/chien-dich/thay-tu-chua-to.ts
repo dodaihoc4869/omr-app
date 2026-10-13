@@ -53,6 +53,8 @@ export function toCoNoiDung(dsTo: readonly TeacherExamSource[], thieu: ReadonlyS
 }
 
 export interface TuyChonToTuChua {
+  sbdLop?:readonly string[]
+  coMat?:ReadonlySet<string>|null
   tenBuoi: string
   /** Khối của lớp đang chọn (10 / 11 / 12); null ⇒ không chặn khối. */
   khoi: number | null
@@ -75,6 +77,7 @@ export async function dungToThayTuChua(
   const tra = dungBangTra(toCoNoiDung(dsTo, new Set(ds.filter((c) => c.thieuNoiDung).map((c) => c.khoa))))
   const soGop = tuy.soGop ?? null
   const dong = oChieuTuChua(ds, tuy.ungVien, tuy.soLop)
+  if(tuy.sbdLop){const {layEmChieu,nhanEmChieu}=await import('../../lib/ung-vien-chieu');const uv=await layEmChieu(ds.map(c=>c.qid),tuy.sbdLop,tuy.coMat);for(const o of dong){const list=uv.get(o.qid)??[],e=list[0];o.sbd=e?.sbd??'';o.ten=e?.ten??'Cả lớp';o.lichSu=e?nhanEmChieu(e):undefined;o.ungVien=list.map(e=>({sbd:e.sbd,ten:e.ten,lichSu:nhanEmChieu(e)}))}}
   const kq = await dungToChieu(dong, tuy.tenBuoi, tra, tuy.maPhien, {
     khoiDich: tuy.khoi ? [tuy.khoi] : [],
     giuTuLuan: true,

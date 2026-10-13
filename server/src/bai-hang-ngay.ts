@@ -222,6 +222,7 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
   const ngay = cacNgay(tu, den)
   const ra = new Map<string, NgayBaiEm[]>()
   const baoMot = (chu: string) => { if (!canhBao.includes(chu)) canhBao.push(chu) }
+  const kt=await import('./kiem-tra-ca-nhan'), batKt=await kt.coKtCn(env)
   for (let i = 0; i < em.length; i += LO_EM_BAI_HANG_NGAY) {
     const lo = em.slice(i, i + LO_EM_BAI_HANG_NGAY)
     const goi = lo.filter((e) => e.goi7Tu !== null && e.goi7Tu <= den)
@@ -229,6 +230,9 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
     const { tuGoi, denHt } = khoangDocTheoCheDo(lo, tu, den)
     const j = (ds: readonly EmGoc[]) => JSON.stringify(ds.map((e) => e.sbd))
     const rong = Promise.resolve([] as Row[])
+    const kRows=await hoi(env,`SELECT ${kt.COT_META_KT} FROM kiem_tra_ca_nhan k WHERE sbd IN(SELECT value FROM json_each(?)) AND ngay BETWEEN ? AND ? AND trang_thai<>'cho_nguon' AND (?=1 OR nop_luc IS NOT NULL OR ngay<?)`,j(lo),tu,den,batKt?1:0,homNay)
+    if(kRows===null&&batKt)throw new LoiDocSo('Không đọc được lịch kiểm tra riêng của các em.')
+    const ktNgay=new Map((kRows??[]).map(r=>[`${r.sbd}|${r.ngay}`,kt.tomTatKt(r,Date.parse(homNay+'T12:00:00+07:00'))]))
     const [rTrong, rTruoc, rGoi, rGap, rKh, rLuot, rMuc7, rQuota7] = await Promise.all([
       hoi(env, SQL_CHOT_TRONG, j(lo), tu, den),
       hoi(env, SQL_CHOT_TRUOC, j(lo), tu),
@@ -263,6 +267,8 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
     for (const e of lo) {
       const c = chot.get(e.sbd) ?? []
       ra.set(e.sbd, ngay.map((d) => {
+        const test=ktNgay.get(k(e.sbd,d))
+        if(test)return {ngay:d,mucToiThieu:test.tong,daLam:test.daTra,thieu:Math.max(0,test.tong-test.daTra),datMuc:test.nopLuc!==null&&test.daTra>=test.tong,mucUocTinh:false,nguonMuc:'da-chot' as const,tang:1 as const,cheDo:'kiem-tra' as const,homNay:d===homNay}
         const cheDo: CheDoNgay = e.goi7Tu !== null && e.goi7Tu <= d ? 'goi7' : 'hanh-trinh'
         const m = mucCuaNgay(d, cheDo, c, cheDo === 'goi7' ? { chot: muc7.get(k(e.sbd, d)) ?? null, quota: quota7.get(k(e.sbd, d)) ?? 0 } : undefined)
         const daLam = cheDo === 'goi7' ? (demGoi.get(k(e.sbd, d)) ?? 0) + (demGap.get(k(e.sbd, d)) ?? 0) : daLamKeHoach(keHoach.get(k(e.sbd, d)), luot.get(k(e.sbd, d)) ?? [])

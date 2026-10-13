@@ -31,6 +31,8 @@ export function chonGoi7(a: {
   /** true ⇒ tổng việc KHÔNG vượt `mucTieuNgay` (thầy 12/10: một con số): câu mới theo lịch vẫn đứng đầu nhưng chỉ lấy trong phần còn lại của mức;
    *  phần lịch chưa gặp dồn sang ngày sau. Không truyền ⇒ hành vi cũ (câu mới theo lịch xếp đủ, có thể vượt mức). */
   chiTrongMuc?: boolean
+  /** Khi bật kiểm tra riêng: giữ chỗ thực cho ôn đến lịch, không để chữa/sửa ăn hết. */
+  giuOn?: number
 }): { viec: ViecGoi7[]; thieuPhu: number; tuLam: number; tiepCan: number } {
   const viec: ViecGoi7[] = [], used = new Set<string>()
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
@@ -47,7 +49,8 @@ export function chonGoi7(a: {
     viec.push({ qid: q.qid, vai: huongDan ? 'tiep_can' : 'moi', huongDan }); used.add(q.qid)
   }
   // Phần chữa mới của câu em đã nhờ thầy: quay lại học, không tính thêm câu gốc mới.
-  for(const qid of a.chua??[]){if(viec.length>=muc)break;if(used.has(qid)||a.daLamNgay.has(qid)||a.chan.has(qid))continue;used.add(qid);viec.push({qid,vai:'chua',huongDan:true})}
+  const giuOn=Math.min(Math.max(0,a.giuOn??0),Math.max(0,muc-viec.length))
+  for(const qid of a.chua??[]){if(viec.length>=muc-giuOn)break;if(used.has(qid)||a.daLamNgay.has(qid)||a.chan.has(qid))continue;used.add(qid);viec.push({qid,vai:'chua',huongDan:true})}
   const them = (ids: readonly string[], vai: VaiGoi7, tran: number) => {
     let n = 0
     for (const qid of ids) {
@@ -57,7 +60,7 @@ export function chonGoi7(a: {
   }
   // Giữ chỗ cho cả lỗi và kiến thức cũ; không sinh nhiệm vụ giả để đủ số.
   const con = Math.max(0,muc-viec.length)
-  them(a.sua, 'sua', Math.min(con,Math.max(4,Math.ceil(muc/3))))
+  them(a.sua, 'sua', Math.min(Math.max(0,con-giuOn),Math.max(4,Math.ceil(muc/3))))
   them(a.on, 'on', Math.max(0,muc-viec.length))
   them(moi.map(q=>q.qid), 'moi', Math.max(0,muc-viec.length))
   for(const q of moi){if(viec.length>=muc)break;if(used.has(q.qid))continue;const huongDan=!a.sanSang.has(q.qid);viec.push({qid:q.qid,vai:huongDan?'tiep_can':'moi',huongDan});used.add(q.qid)}

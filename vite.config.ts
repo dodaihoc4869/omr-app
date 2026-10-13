@@ -188,6 +188,9 @@ export default defineConfig({
         // vẫn tải được, tải một lần rồi cất ở kho chạy-lúc (`omr-manh-chay-lan`, xem src/sw.ts). `scripts/kiem-sw.mjs` chặn precache phình to lại.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
         globIgnores: [
+          // Kiểm tra riêng cần máy chủ để mở chặng/lưu giờ: chỉ tải khi đến lịch, cất ở kho chạy-lúc.
+          '**/{ManKiemTraCaNhan,TheKiemTraCaNhan,TheKiemTraCon,kiem-tra-ca-nhan}-*.{js,css}',
+          '**/LuyenDeChuan-*.{js,css}',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
         '**/{ChuyenBay,BanNguyenTo}-*.{js,css}',
           '**/404.html',

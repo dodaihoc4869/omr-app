@@ -19,6 +19,8 @@ import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { apLamLaiKhac } from './cau-anh-em'
 import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
+import { quotaHocKt } from './kiem-tra-ca-nhan-loi'
+import { docCauHinhDem } from './cau-hinh-dem'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -37,10 +39,11 @@ export const SQL_LUOT_GOI7 = `${SQL_LA_LAN_LAM} AND COALESCE(visibility,'')<>'em
 export const sqlTenLopHs = (h: string): string =>
   `COALESCE(NULLIF(TRIM(${h}.ten_lop),''),CASE TRIM(COALESCE(${h}.lop,'')) WHEN '12' THEN '${TEN_LOP_THUONG_12}' WHEN '' THEN '${TEN_LOP_CHUA_XEP}' ELSE TRIM(${h}.lop) END)`
 export interface CoGoi7 { bat: boolean; batDau: string; batLuc?: string }
-export async function coGoi7(env: Env): Promise<CoGoi7> {
-  const r = await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='goi_bai_7_v1'").first<{ gia_tri: string }>()
-  if (!r) return { bat: false, batDau: '' }
-  let c: Row; try { c = json<Row>(r.gia_tri) } catch { return {bat:false,batDau:''} }
+export async function coGoi7(env: Env, tuoi=false): Promise<CoGoi7> {
+  // Đọc kèm cờ kiểm tra riêng/OMNI trong cùng lô cấu hình, tuổi đệm tối đa 15 giây.
+  const v=tuoi?(await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='goi_bai_7_v1'").first<{gia_tri:string}>())?.gia_tri:await docCauHinhDem(env,'goi_bai_7_v1')
+  if (!v) return { bat: false, batDau: '' }
+  let c: Row; try { c = json<Row>(v) } catch { return {bat:false,batDau:''} }
   return { bat: c.bat === true, batDau: /^\d{4}-\d{2}-\d{2}$/.test(str(c.batDau)) ? str(c.batDau) : '', batLuc:Number.isFinite(Date.parse(str(c.batLuc)))?str(c.batLuc):undefined }
 }
 export const damBaoGoi7 = (env: Env) => chayDdlMotLan(env, 'goi_bai_7_v1', SQL_GOI7)
@@ -59,7 +62,7 @@ export async function dongBoGoi7(env: Env, now: number, tran = 2, lop = '', batB
   try{return await p}catch(e){m.delete(k);throw e}
 }
 async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Promise<{ soGoi: number; soEm: number; soCau: number; hoan: boolean }> {
-  const cfg = await coGoi7(env)
+  const cfg = await coGoi7(env,true)
   if (!cfg.bat || !cfg.batDau) return { soGoi: 0, soEm: 0, soCau: 0, hoan: false }
   const ca = await env.DB.prepare("SELECT COUNT(*) AS n FROM ca WHERE trang_thai='mo'").first<{ n: number }>()
   if (ca?.n) return { soGoi: 0, soEm: 0, soCau: 0, hoan: true }
@@ -175,6 +178,8 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
     env.DB.prepare('SELECT * FROM goi_bai_7_ngay WHERE sbd=? AND ngay=?').bind(sbd,ngay).all<Row>(),
   ])
   const out: GoiCuaEm7[] = []
+  const kt=await import('./kiem-tra-ca-nhan')
+  const ngayKiem=await kt.coKtCn(env)?new Set((await env.DB.prepare("SELECT ngay FROM kiem_tra_ca_nhan WHERE sbd=? AND trang_thai<>'cho_nguon' AND ngay>=?").bind(sbd,ngay).all<{ngay:string}>()).results.map(r=>r.ngay)):new Set<string>()
   for (const [i, g] of gs.results.entries()) {
     const cau = cs.results.filter(c => c.goi_id === g.id).map(c => json<CauGoi7>(c.meta_json)), versions = new Map(cau.map(c => [c.qid,c.version]))
     const nguonDayDu=cau.length>0&&await nguonSom[i]!
@@ -187,7 +192,7 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
     for (const e of gaps.results) if (e.goi_id === g.id && str(e.version) === versions.get(str(e.qid))) {gap(str(e.qid),ngayVn7(Date.parse(str(e.luc))));if(e.kieu==='cho_thay')choThay.add(str(e.qid));else choThay.delete(str(e.qid))}
     for (const [qid,d] of first) if (d===ngay) gapNgay.add(qid)
     const cu = quotas.results.find(q => q.goi_id === g.id)
-    const quota = Math.max(cu ? Number(cu.quota) : 0,quotaGoi7(cau.length - daGap.size + gapNgay.size, ngay, str(g.han)))
+    const quota = ngayKiem.has(ngay)?0:Math.max(cu ? Number(cu.quota) : 0,ngayKiem.size?quotaHocKt(cau.length-daGap.size+gapNgay.size,ngay,str(g.han),ngayKiem):quotaGoi7(cau.length - daGap.size + gapNgay.size, ngay, str(g.han)))
     if (!cu && !chiDoc) await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) VALUES(?,?,?,?)').bind(g.id,sbd,ngay,quota).run()
     out.push({ id: str(g.id), ten: str(g.ten), khoaBai: str(g.khoa_bai), batDau: str(g.bat_dau), han: str(g.han),maDeNguon:[...new Set(mang7(g.ma_to_json).map(m=>tachMaTo(m).goc))], cau, daGap, gapNgay, tuLamNgay, choThay, nguonDayDu, quota })
   }
@@ -208,12 +213,12 @@ export async function docMucNgay7(env: Env, sbd: string, ngay: string): Promise<
   return r && Number(r.muc) > 0 ? { tang: tangHopLe7(r.tang), toiThieuTang: Number(r.toi_thieu_tang) || 0, quota: Number(r.quota) || 0, muc: Number(r.muc), daChot: true } : null
 }
 /** `cuSom` = lượt `docMucNgay7(env,sbd,ngay)` nơi gọi đã bắt đầu sớm (bảng chỉ hàm này ghi ⇒ đọc sớm cùng kết quả); vắng ⇒ đọc như cũ. Lần đọc lại sau ghi luôn đọc mới. */
-export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: TangHanhTrinh, tongQuota: number, now: number, chiDoc = false, cuSom?: Promise<MucNgay7 | null>): Promise<MucNgay7> {
+export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: TangHanhTrinh, tongQuota: number, now: number, chiDoc = false, cuSom?: Promise<MucNgay7 | null>, giuCho=0): Promise<MucNgay7> {
   const doc = (): Promise<MucNgay7 | null> => docMucNgay7(env, sbd, ngay)
   const cu = await (cuSom ?? doc())
   if (cu) return cu
   const toiThieuTang = CAU_TOI_THIEU[tang], quota = Math.max(0, Math.floor(tongQuota) || 0)
-  const moi: MucNgay7 = { tang, toiThieuTang, quota, muc: mucNgayGoi7(toiThieuTang, quota), daChot: false }
+  const moi: MucNgay7 = { tang, toiThieuTang, quota, muc: mucNgayGoi7(toiThieuTang, quota+Math.max(0,giuCho)), daChot: false }
   if (chiDoc) return moi
   await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES(?,?,?,?,?,?,?)')
     .bind(sbd, ngay, moi.tang, moi.toiThieuTang, moi.quota, moi.muc, new Date(now).toISOString()).run()
@@ -339,13 +344,18 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const tang = tangCuaEm(hs.cau,hs.tt,nhom7)
   // MỘT CON SỐ (thầy 12/10): mức hôm nay M = max(mức theo tầng, Σ câu mới theo lịch các gói) — chốt lần lập đầu tiên trong ngày, các lần sau đọc lại.
   // Kế hoạch đúng M − đã làm câu: câu mới theo lịch vẫn đứng đầu nhưng không vượt phần còn lại của M (`chiTrongMuc`).
-  const muc7 = await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom)
+  const batKt=await import('./kiem-tra-ca-nhan').then(m=>m.coKtCn(env))
+  const eligible=(id:string)=>sanSang.has(id)&&!daLamNgay.has(id)&&!chan.has(id)
+  const suaCan=batKt?sua.filter(id=>eligible(id)&&!chua.includes(id)).slice(0,4):[]
+  const onCan=batKt?on.filter(id=>eligible(id)&&!suaCan.includes(id)&&!chua.includes(id)):[]
+  const giuOn=batKt?Math.min(6,onCan.length):0
+  const muc7 = await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,giuOn+suaCan.length)
   const toiThieu = muc7.muc
   const nhomPhu=[...goi].sort((a,b)=>a.han.localeCompare(b.han)).map(g=>({qids:g.cau.map(c=>c.qid),quota:Math.max(0,g.quota-g.gapNgay.size)}))
-  const plan = chonGoi7({ cau,daGap,daLamNgay,quotaCon,sanSang,chan,sua,on,chua,mucTieuNgay:Math.max(0,toiThieu-daLamNgay.size),trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true })
+  const plan = chonGoi7({ cau,daGap,daLamNgay,quotaCon,sanSang,chan,sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,mucTieuNgay:Math.max(0,toiThieu-daLamNgay.size),trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn })
   const kiem=await kiemSom
   const diemDaDo=kiem.results.filter(r=>diemConDungNguon7(json<Row>(r.json).cau,goi.find(g=>g.id===r.goi_id)?.cau.filter(c=>(c.maTo??c.maDe)===r.ma_de)??[])).map(r=>({goiId:str(r.goi_id),maDe:str(r.ma_de),diem:Number(r.diem),luc:str(r.nop_luc),cauMoi:Number(json<Row>(r.json).cauMoi??0),tong:Number(json<Row>(r.json).tong??0)}))
-  const skills = new Map(old.results.map(r => [str(r.kn),r.trang_thai === 'dat']))
+  const skills = new Map(old.results.map(r => [str(r.kn),r.trang_thai === 'vung']))
   const kienThucCu = { tong: skills.size, dat: [...skills.values()].filter(Boolean).length, tyLe: skills.size ? Math.round(1000*[...skills.values()].filter(Boolean).length/skills.size)/10 : null }
   // ĐỢT 19 (CHỈ-THÊM, không đọc thêm D1 — lỗi 13/10 "tab Hành trình: Chưa có danh sách bài" khi Gói 7 bật): tầng đang luyện của TỪNG bài trong gói, cùng
   // cổng mở tầng của động cơ (`tangCuaEm`) trên các câu của gói có trong hồ sơ vừa đọc. Gói không có câu nào mang mức độ trong hồ sơ ⇒ KHÔNG có tầng

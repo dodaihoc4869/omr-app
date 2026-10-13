@@ -13,6 +13,8 @@
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { CaGanNhat, PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
+import { lazy, Suspense } from 'react'
+const TheKiemTraCon=lazy(()=>import('./TheKiemTraCon'))
 import type { ConTongQuan } from '../../lib/ph-v3/con-tong-quan'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import { chuHanNop, chuGuiLuc, tieuDeCanhBao } from '../../lib/canh-bao-thay-hien-thi'
@@ -62,6 +64,7 @@ export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, on
       ) : (
         <div className="ph3-luoi">
           <KhoiChinh pm={pm} hoc2={hoc2} tq={tongQuan.v} />
+          {hoc2?.kiemTraCaNhan&&!hoc2.kiemTraCaNhan.homNay&&hoc2.kiemTraCaNhan.trangThai!=='cho_nguon'&&<Suspense fallback={null}><TheKiemTraCon kt={hoc2.kiemTraCaNhan}/></Suspense>}
           {canhBao.map((cb) => <CanhBao key={cb.id} cb={cb} nay={pm.serverNow ?? Date.now()} onDaXem={onDaXem} />)}
           <GoiYNhacCon tai={tongQuan} />
           {nhipCon && <NhipHocCon sbd={nhipCon.sbd} tenCon={nhipCon.tenCon} lop={nhipCon.lop} homNay={soHomNayTq(tongQuan.v)} />}
@@ -135,6 +138,8 @@ function KhoiChinh({ pm, hoc2, tq }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTong
   const hanhTrinh = dongHanhTrinh(hoc2?.hanhTrinh, so.tong)
   const coSo = so.tong !== null || so.daLam > 0
   const ti = so.tong ? Math.max(0, Math.min(1, so.daLam / so.tong)) : null
+  const kt=hoc2?.kiemTraCaNhan
+  if(kt?.homNay)return <Suspense fallback={<section className="ph3-ah ph3-o-du" role="status">Đang mở bài kiểm tra của con…</section>}><TheKiemTraCon kt={kt}/></Suspense>
   return (
     <section className="ph3-ah ph3-o-du" aria-labelledby="ph3-hn" data-vung="anh-hung">
       {coSo ? (

@@ -60,7 +60,7 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
   for(const e of gap.results)if(s(e.version)===ver.get(s(e.qid)))add(nhan,s(e.sbd),s(e.qid))
   const kyNang=[...new Set(ds.flatMap(q=>q.kyNang))],states=new Map(pv.results.map(r=>[`${s(r.sbd)}|${s(r.vkn_id)}`,r.trang_thai]))
   const em=emRows.results.map(e=>{
-    const sbd=s(e.sbd),daGap=nhan.get(sbd)?.size??0,dat=kyNang.filter(k=>states.get(`${sbd}|${k}`)==='dat').length
+    const sbd=s(e.sbd),daGap=nhan.get(sbd)?.size??0,dat=kyNang.filter(k=>states.get(`${sbd}|${k}`)==='vung').length
     const diem=new Map<string,Row>();for(const k of kiem.results)if(nguonDayDu&&k.sbd===sbd&&diemConDungNguon7((JSON.parse(s(k.json)) as Row).cau,ds.filter(c=>(c.maTo??c.maDe)===k.ma_de)))diem.set(s(k.ma_de),k)
     return {sbd,ten:s(e.ho_ten),han:s(e.han),tong:ds.length,daGap,tuLam:tuLam.get(sbd)?.size??0,con:ds.length-daGap,
       kyNang:{tong:kyNang.length,dat,tyLe:kyNang.length?Math.round(1000*dat/kyNang.length)/10:null},

@@ -376,12 +376,26 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // token giả bị chặn trước mọi lượt D1 như cũ). Không ghi gì, không trả gì trước khi xác thực xong. `gameIdentity` bị thay (test) ⇒ đọc sau xác thực như cũ.
   const giu:{ds:ReturnType<typeof batDauDocSom>|null}={ds:null}
   const sbd=await gameIdentity(env,b,s=>{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s)})
+  // Kiểm tra theo lịch RIÊNG từng em sở hữu cả ngày, kể cả khi em đã nộp sớm.
+  // Cổng ở trước lập Gói 7/Hành trình: API cũ và phiên cũ không phát bài thường song song.
+  const kt=await import('./kiem-tra-ca-nhan')
+  if(action.startsWith('hoc-tap-ktcn-'))return kt.ktCnAction(env,sbd,action,b,Date.now())
+  // Hai lượt chỉ đọc độc lập chạy cùng đợt; lịch kiểm tra vẫn chặn trước mọi lệnh lập/ghi bài thường.
+  const g7Som=action==='hoc-tap-sanh'||action==='hoc-tap-start'?await import('./goi-bai-7'):undefined
+  const dsGoiSom=g7Som?.docDanhSachGoiSom7(env,sbd)
+  const kiem=await kt.docKtCn(env,sbd,Date.now(),true)
+  if(kt.laNgayKt(kiem,Date.now())){
+    const tt=kt.tomTatKt(kiem!,Date.now())
+    if(action==='hoc-tap-sanh'||action==='hoa2-sanh')return {ok:true,cheDo2:true,ngay:tt.ngay,kiemTraCaNhan:tt,theLuc:{tong:tt.tong,con:tt.con},chienDich:null,doan:{con:0},dao:{con:0}}
+    if(action==='hoc-tap-dem')return {ok:true,daLamHomNay:tt.daTra,toiThieu:tt.tong,kiemTraCaNhan:tt}
+    if(['hoc-tap-start','hoc-tap-gap','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete','hoa2-dao-start','hoa2-doan-start','hoa2-thu-suc','hoa2-thu-suc-them','hoa2-de-thu-start','hoa2-de-thu-nop'].includes(action)||action.startsWith('doan-'))throw new Error('Hôm nay em chỉ làm bài kiểm tra theo lịch riêng. Bài tập tiếp tục vào ngày học kế tiếp.')
+  }
   // App học sinh tập trung làm bài (10/10): không bắt chọn thần thú, không mở phòng/game.
   // Cùng bộ kế hoạch, phiên, quyền và answer hiện có; chỉ bỏ ràng buộc cửa Đảo/Đoàn ở giao diện.
   if(action.startsWith('hoc-tap-')){
     const g7=await import('./goi-bai-7')
     // Đợt 18: Sảnh / Mở chặng đọc ĐOÁN danh sách gói CÙNG đợt với cờ Gói 7 (xem `docDanhSachGoiSom7`) — chỉ dùng khi cờ bật, đúng lượt đọc sẽ chạy.
-    const gsSom7=action==='hoc-tap-sanh'||action==='hoc-tap-start'?g7.docDanhSachGoiSom7(env,sbd):undefined
+    const gsSom7=dsGoiSom
     const cfg7=await g7.coGoi7(env)
     if(cfg7.bat){
       // KHÔNG đồng bộ gói từ máy em (khẩn 12/10 21h — giờ cao điểm app treo "Đang chuẩn bị những câu…"): `dongBoGoi7` mỗi 20 giây/isolate nạp lại
@@ -392,7 +406,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
       if(action==='hoc-tap-dem')return g7.demHomNay7(env,sbd,Date.now())
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
-      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now());return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now());return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 
@@ -406,6 +420,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const alias:Record<string,string>={'hoc-tap-sanh':'hoa2-sanh','hoc-tap-cau-da-lam':'hoa2-cau-da-lam','hoc-tap-cau-chi-tiet':'hoa2-cau-chi-tiet'}
     if(!alias[action])throw new Error('Chức năng học này chưa có.')
     const r=await hoa2Action(env,sbd,alias[action]!,b)
+    if(kiem)r.kiemTraCaNhan=kt.tomTatKt(kiem,Date.now())
     delete r._san
     if(cfg7.bat && action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now());if(lap7)r.goi7=g7.tomTatGoi7(lap7,Date.now())}
     return r

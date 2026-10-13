@@ -28,7 +28,7 @@ it('Hành trình không còn thẻ "Bài mới trong 7 ngày"; mở màn không 
   expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học & đầu giờ', 'Chữa bài'])
   expect(screen.queryByRole('tab', { name: 'Bài mới trong 7 ngày' })).toBeNull()
   expect(screen.queryByRole('region', { name: 'Bài mới trong 7 ngày' })).toBeNull()
-  expect(goiLenh).not.toHaveBeenCalled()
+  expect(goiLenh.mock.calls.every(([duong]) => duong === '/gv/kiem-tra-ca-nhan')).toBe(true)
 })
 
 it('khoá cũ { the: goi-7 } từ màn khác ⇒ mục Dạy học & đầu giờ (nơi có bảng Bài đang giao), yêu cầu được tiêu thụ một lần', async () => {

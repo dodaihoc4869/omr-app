@@ -70,6 +70,8 @@ export async function phLoiThay(envGoc: Env, b: Row, _nowMs: number = Date.now()
 // ---------------------------------------------------------------- /ph/hoc-2 ----------------------------------------------------------------
 export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), envDoc: Env = envGoc, ctx?: ExecutionContext): Promise<Row> {
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-hoc-2', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
+  const kt=await import('./kiem-tra-ca-nhan'), kiem=await kt.docKtCn(envDoc,sbd,nowMs,true)
+  if(kt.laNgayKt(kiem,nowMs)){const tt=kt.tomTatKt(kiem!,nowMs);return {ok:true,cheDo2:true,serverNow:nowMs,ngay:tt.ngay,kiemTraCaNhan:tt,homNay:{tong:tt.tong,daLam:tt.daTra}}}
   const goiPh7=(await coGoi7(envDoc)).bat?await docGoiCuaEm7(envDoc,sbd,nowMs,true):[]
   if (!(await cheDo2(envDoc, sbd))) return goiPh7.length?{ok:true,cheDo2:true,serverNow:nowMs,goi7:goiPh7.map(g=>({ten:g.ten,han:g.han,tong:g.cau.length,daGap:g.daGap.size,con:g.cau.length-g.daGap.size,nguonDayDu:g.nguonDayDu})),homNay:homNayGoi7(goiPh7)}:{ ok: true, cheDo2: false }
   const ngay = ngayVnCua(nowMs)
@@ -93,6 +95,7 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
   }
   const kh = khTho ? await tamHoanCauKhoa(envDoc, khTho, hsKeHoach, undefined, undefined, sbd) : null
   const ra: Row = { ok: true, cheDo2: true, ngay, serverNow: nowMs }
+  if(kiem)ra.kiemTraCaNhan=kt.tomTatKt(kiem,nowMs)
   const cd = hs.chienDich
   if (cd) {
     const tl = tiLeChienDich(hs.ttChienDich)
