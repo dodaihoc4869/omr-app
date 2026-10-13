@@ -21,6 +21,8 @@ export interface CauHinhHoiThem {
   model: string
   tranNgay: number
   tranCau: number
+  /** SBD thử của thầy (thầy 13/10): hỏi không giới hạn lượt; học sinh thật vẫn theo trần. Thầy thêm/bớt ở Cài đặt (`/gv/hoi-tro-ly/sbd-thu`). */
+  sbdKhongTran: string[]
   /** Ngân sách suy nghĩ (Gemini 2.5). `null` ⇒ không gửi trường này. */
   thinkingBudget: number | null
   nhietDo: number
@@ -28,7 +30,7 @@ export interface CauHinhHoiThem {
 // 13/10: Google báo 404 "gemini-2.5-flash is no longer available to new users … use models/gemini-3.8-flash" (sổ hoi_tro_ly, lượt đầu tiên thật);
 // thầy chọn Gemini 3.5 Flash Lite; tối 13/10 thầy: "chuyển xuống mô hình 3.1 flash lite" ⇒ mặc định gemini-3.1-flash-lite (tên ổn định trong tài liệu Gemini API).
 // Trần lượt (thầy tối 13/10): "chỉnh lại 12 câu/ngày và tối đa mỗi câu bài tập 6 lần/ngày".
-export const MAC_DINH_HOI_THEM: CauHinhHoiThem = { bat: true, lop: [], sbd: [], model: 'gemini-3.1-flash-lite', tranNgay: 12, tranCau: 6, thinkingBudget: 1024, nhietDo: 0.3 }
+export const MAC_DINH_HOI_THEM: CauHinhHoiThem = { bat: true, lop: [], sbd: [], model: 'gemini-3.1-flash-lite', tranNgay: 12, tranCau: 6, sbdKhongTran: [], thinkingBudget: 1024, nhietDo: 0.3 }
 /** Model báo 404 / 410 (sai tên, Google ngừng cấp cho khoá mới, hoặc đã gỡ model) ⇒ thử lần lượt: 3.5 Flash-Lite (đã chạy thật 13/10:
  *  1,4–1,7 s/lượt), rồi các tên chung luôn trỏ bản mới nhất. */
 export const DS_MODEL_DU_PHONG: readonly string[] = ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-flash-latest']
@@ -50,11 +52,13 @@ export function giaiCauHinhHoiThem(tho: unknown): CauHinhHoiThem {
     model: /^[a-z0-9][a-z0-9.\-]{2,60}$/i.test(str(o.model)) ? str(o.model) : md.model,
     tranNgay: so(o.tranNgay, md.tranNgay, 0, 200),
     tranCau: so(o.tranCau, md.tranCau, 0, 50),
+    sbdKhongTran: ds(o.sbdKhongTran).slice(0, TOI_DA_SBD_THU),
     thinkingBudget: o.thinkingBudget === null ? null : so(o.thinkingBudget, md.thinkingBudget ?? 0, 0, 8192),
     nhietDo: o.nhietDo !== undefined && Number.isFinite(nd) ? Math.min(1, Math.max(0, nd)) : md.nhietDo,
   }
 }
 
+const TOI_DA_SBD_THU = 20
 const demCauHinh = new DemTTL<CauHinhHoiThem>(30_000, 2)
 export async function docCauHinhHoiThem(env: Env): Promise<CauHinhHoiThem> {
   const c = demCauHinh.doc('c', Date.now())
@@ -342,6 +346,52 @@ export function chanLoDapAn(traLoi: string, phan: string, dapAn: string, pa: Rec
   return giu.length ? giu.join('\n') : CAU_CHUA_NOP
 }
 
+// ---------------------------------------------------------------- lệnh THẦY (sau cổng mã bí mật, index.ts)
+// Thầy 13/10: "Có nên tạo 1 nút reset lượt hỏi thầy để tôi chủ động reset được không?" ⇒ "chốt build". Ba lệnh cho khối Hỏi Thầy ở Cài đặt.
+const SBD_HOP_LE = /^[0-9A-Za-z_-]{3,32}$/
+const sbdVao = (v: unknown) => str(v).trim()
+
+/** Trần lượt + danh sách SBD thử; có `sbd` ⇒ thêm số câu em đã hỏi hôm nay. */
+export async function gvLuotHoiThay(env: Env, b: Obj, nowMs = Date.now()): Promise<Obj> {
+  const cfg = await docCauHinhHoiThem(env)
+  const chung = { ok: true, tranNgay: cfg.tranNgay, tranCau: cfg.tranCau, sbdThu: cfg.sbdKhongTran }
+  const sbd = sbdVao(b.sbd)
+  if (!sbd) return chung
+  if (!SBD_HOP_LE.test(sbd)) return { ok: false, error: 'Số báo danh không hợp lệ.' }
+  await chayDdlMotLan(env, 'hoi_tro_ly_v1', SQL_BANG)
+  const r = await env.DB.prepare('SELECT COUNT(*) AS n FROM hoi_tro_ly WHERE sbd = ? AND ngay_vn = ? AND loi IS NULL').bind(sbd, ngayVn(nowMs)).first<Obj>()
+  return { ...chung, sbd, homNay: Number(r?.n) || 0, laSbdThu: cfg.sbdKhongTran.includes(sbd) }
+}
+
+/** Đặt lại lượt HÔM NAY của một em. KHÔNG xoá: đổi `ngay_vn` các lượt hôm nay thành `<ngày>~dat-lai@<lúc>` ⇒ không còn bị đếm,
+ *  câu hỏi / trả lời vẫn nằm trong sổ (biết lúc nào thầy đặt lại). */
+export async function gvDatLaiLuotHoiThay(env: Env, b: Obj, nowMs = Date.now()): Promise<Obj> {
+  const sbd = sbdVao(b.sbd)
+  if (!SBD_HOP_LE.test(sbd)) return { ok: false, error: 'Số báo danh không hợp lệ.' }
+  await chayDdlMotLan(env, 'hoi_tro_ly_v1', SQL_BANG)
+  const ngay = ngayVn(nowMs)
+  const r = await env.DB.prepare('UPDATE hoi_tro_ly SET ngay_vn = ? WHERE sbd = ? AND ngay_vn = ?').bind(`${ngay}~dat-lai@${new Date(nowMs).toISOString()}`, sbd, ngay).run()
+  return { ok: true, sbd, daDatLai: Number(r.meta?.changes) || 0, homNay: 0 }
+}
+
+/** Thêm / bớt một SBD thử (không giới hạn lượt). Ghi GỘP vào dòng `cau_hinh.hoi_tro_ly` (giữ mọi khoá khác), tối đa 20 SBD. */
+export async function gvSbdThuHoiThay(env: Env, b: Obj, nowMs = Date.now()): Promise<Obj> {
+  const sbd = sbdVao(b.sbd)
+  if (!SBD_HOP_LE.test(sbd)) return { ok: false, error: 'Số báo danh không hợp lệ.' }
+  const r = await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'hoi_tro_ly'").first<Obj>().catch(() => null)
+  let o: Obj = {}
+  try { const x = JSON.parse(str(r?.gia_tri) || '{}'); if (x && typeof x === 'object' && !Array.isArray(x)) o = x as Obj } catch { o = {} }
+  const ds = new Set(giaiCauHinhHoiThem(JSON.stringify(o)).sbdKhongTran)
+  if (b.them === false) ds.delete(sbd)
+  else if (ds.size >= TOI_DA_SBD_THU && !ds.has(sbd)) return { ok: false, error: `Tối đa ${TOI_DA_SBD_THU} SBD thử.` }
+  else ds.add(sbd)
+  o.sbdKhongTran = [...ds]
+  await env.DB.prepare("INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('hoi_tro_ly', ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc")
+    .bind(JSON.stringify(o), new Date(nowMs).toISOString()).run()
+  demCauHinh.xoa()
+  return { ok: true, sbdThu: [...ds] }
+}
+
 export async function hsHoiTroLy(env: Env, b: Obj): Promise<Obj> {
   const sbd = await gameIdentity(env, b)
   return traLoiHoiThem(env, sbd, b)
@@ -363,8 +413,10 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const dem = await env.DB.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN qid = ? THEN 1 ELSE 0 END), 0) AS c FROM hoi_tro_ly WHERE sbd = ? AND ngay_vn = ? AND loi IS NULL')
     .bind(nc.qid, sbd, ngay).first<Obj>()
   const n = Number(dem?.n) || 0, daHoiCau = Number(dem?.c) || 0
-  if (n >= cfg.tranNgay) return { ok: false, ma: 'het_luot', conLai: 0, error: `Hôm nay em đã hỏi đủ ${cfg.tranNgay} câu. Mai em hỏi tiếp nhé.` }
-  if (daHoiCau >= cfg.tranCau) return { ok: false, ma: 'het_luot_cau', conLai: cfg.tranNgay - n, error: `Câu này em đã hỏi ${cfg.tranCau} lần hôm nay. Em làm lại câu theo lời giải, chỗ nào còn vướng mang lên lớp hỏi Thầy.` }
+  // SBD thử của thầy ⇒ không chặn trần (vẫn ghi sổ như mọi lượt); số "còn lại" luôn hiện đủ trần.
+  const khongTran = cfg.sbdKhongTran.includes(sbd)
+  if (!khongTran && n >= cfg.tranNgay) return { ok: false, ma: 'het_luot', conLai: 0, error: `Hôm nay em đã hỏi đủ ${cfg.tranNgay} câu. Mai em hỏi tiếp nhé.` }
+  if (!khongTran && daHoiCau >= cfg.tranCau) return { ok: false, ma: 'het_luot_cau', conLai: cfg.tranNgay - n, error: `Câu này em đã hỏi ${cfg.tranCau} lần hôm nay. Em làm lại câu theo lời giải, chỗ nào còn vướng mang lên lớp hỏi Thầy.` }
   // Ba lượt hỏi–đáp gần nhất của chính em ở câu này (24 giờ) — đọc từ sổ máy chủ, không tin lịch sử máy em gửi.
   const ls = await env.DB.prepare('SELECT cau_hoi, tra_loi FROM hoi_tro_ly WHERE sbd = ? AND qid = ? AND luc >= ? AND loi IS NULL AND COALESCE(lien_quan, 1) = 1 ORDER BY id DESC LIMIT 3')
     .bind(sbd, nc.qid, new Date(nowMs - 24 * 3_600_000).toISOString()).all<Obj>().catch(() => ({ results: [] as Obj[] }))
@@ -383,7 +435,7 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
     console.error('[hoi-tro-ly]', kq.ma, kq.chiTiet)
     await env.DB.prepare('INSERT INTO hoi_tro_ly (sbd, qid, ngay_vn, luc, nguon, cau_hoi, model, ms, loi) VALUES (?,?,?,?,?,?,?,?,?)')
       .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, cfg.model, ms, `${kq.ma}: ${kq.chiTiet}`.slice(0, 300)).run().catch(() => null)
-    return { ok: false, ma: kq.ma, conLai: cfg.tranNgay - n, error: LOI_CHO_EM[kq.ma] ?? LOI_CHO_EM.loi_ai }
+    return { ok: false, ma: kq.ma, conLai: khongTran ? cfg.tranNgay : cfg.tranNgay - n, error: LOI_CHO_EM[kq.ma] ?? LOI_CHO_EM.loi_ai }
   }
   // Khuôn mới có cấu trúc (ý chính · bước · bảng · ghi nhớ · hỏi tiếp) ⇒ làm sạch từng phần + bản chữ phẳng; mô hình lỡ khuôn cũ {lienQuan, traLoi} vẫn đọc.
   // Em đang làm ⇒ từng phần qua chốt chặn lộ đáp án (chanLoDapAn); mất hết ⇒ câu cố định nhắc em làm xong rồi xem lời giải.
@@ -413,5 +465,5 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   if (dangLam && !ngoai) {
     await env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,0)').bind(sbd, nc.qid, `${nguon}:goi_y`.slice(0, 40), luc).run().catch(() => null)
   }
-  return { ok: true, traLoi, ...(cauTruc && !ngoai ? { cauTruc } : {}), ngoaiPhamVi: ngoai, conLai: Math.max(0, cfg.tranNgay - n - 1) }
+  return { ok: true, traLoi, ...(cauTruc && !ngoai ? { cauTruc } : {}), ngoaiPhamVi: ngoai, conLai: khongTran ? cfg.tranNgay : Math.max(0, cfg.tranNgay - n - 1) }
 }
