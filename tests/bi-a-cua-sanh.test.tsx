@@ -2,13 +2,11 @@
 // còn câu ⇒ "Bi-a Phản Ứng · còn c/t câu"; hết trần ⇒ mờ; xong kế hoạch ⇒ Bàn giao hữu; có ca ⇒ mờ; cờ tắt ⇒ không có cửa.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, configure, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import SanhBanDo, { type SanhBanDoProps } from '../src/components/hoa2/SanhBanDo'
 import { docBiaTrenSanh, docSanh, type KetQuaSanh } from '../src/components/hoa2/api'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 
 const mocks = vi.hoisted(() => ({ items: [] as any[] }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: ({ index, level }: any) => <div data-testid="thu" data-index={index} data-level={level} /> }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))
 vi.mock('../src/game/than-thu-v2/academic-sync', () => ({ syncStudentExp: async () => {} }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrlHoacMacDinh: async () => '/test' }))
@@ -44,53 +42,11 @@ beforeEach(() => {
 })
 afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals(); vi.clearAllMocks() })
 
-function veSanh(bia: unknown, ghiDe: Partial<SanhBanDoProps> = {}) {
-  const props: SanhBanDoProps = {
-    ketQua: docSanh({ ...SANH, bia }) as KetQuaSanh, loi: '', dangTai: false, thu: { index: 2, cap: 7, ten: 'Lửa Nhỏ' }, exp: { homNay: 22, conThieu: 160 },
-    chuoiNgay: 5, caDangMo: false, now: NOW, token: 'tk', shopBat: true,
-    onVaoThi: vi.fn(), onPhaPhucKich: vi.fn(), onKhamPhaDao: vi.fn(), onCauDaLam: vi.fn(), onTuiDo: vi.fn(), onCuaHang: vi.fn(),
-    onMoThanThu: vi.fn(), onChonThu: vi.fn(), onDangXuat: vi.fn(), onTaiLai: vi.fn(), onChoiBia: vi.fn(), ...ghiDe,
-  }
-  return { ...render(<SanhBanDo {...props} />), props }
-}
-
 describe('docBiaTrenSanh (đọc chặt)', () => {
   it('cờ tắt / thiếu ⇒ null; số âm hay sai kiểu ⇒ 0; lý do khoá giữ nguyên', () => {
     expect(docBiaTrenSanh(undefined)).toBeNull()
     expect(docBiaTrenSanh({ bat: false, con: 3 })).toBeNull()
     expect(docBiaTrenSanh({ bat: true, con: -2, tong: 'x', giaoHuu: { mo: true, con: 1 }, lyDoKhoa: 'dang_co_ca' })).toEqual({ con: 0, tong: 0, giaoHuu: { mo: true, con: 1 }, lyDoKhoa: 'dang_co_ca' })
-  })
-})
-
-describe('Cửa Bi-a trên Sảnh bản đồ', () => {
-  it('còn câu ⇒ "Bi-a Phản Ứng · còn 12/15 câu", bấm được', () => {
-    const { props } = veSanh(SANH.bia)
-    const nut = screen.getByRole('button', { name: /Bi-a Phản Ứng · còn 12\/15 câu/ }) as HTMLButtonElement
-    expect(nut.disabled).toBe(false)
-    fireEvent.click(nut)
-    expect(props.onChoiBia).toHaveBeenCalledTimes(1)
-  })
-  it('hết trần Bi-a ⇒ "Hết câu Bi-a hôm nay" mờ, nhắc số câu Đoàn/Đảo còn lại', () => {
-    veSanh({ bat: true, con: 0, tong: 15, lyDoKhoa: 'het_tran', giaoHuu: { mo: false, con: 2 } })
-    const nut = screen.getByRole('button', { name: /Hết câu Bi-a hôm nay/ }) as HTMLButtonElement
-    expect(nut.disabled).toBe(true)
-    expect(nut.textContent).toContain('Đoàn còn 4 câu · Đảo còn 28 câu')
-  })
-  it('xong kế hoạch ⇒ Bàn giao hữu (không câu, không EXP)', () => {
-    veSanh({ bat: true, con: 0, tong: 15, lyDoKhoa: 'xong_ke_hoach', giaoHuu: { mo: true, con: 1 } })
-    const nut = screen.getByRole('button', { name: /Bàn giao hữu Bi-a · còn 1\/2 ván/ }) as HTMLButtonElement
-    expect(nut.disabled).toBe(false)
-    expect(nut.textContent).toContain('Không câu, không EXP')
-  })
-  it('đang có ca kiểm tra ⇒ mờ, "Bi-a mở lại khi ca kết thúc"', () => {
-    veSanh({ bat: true, con: 12, tong: 15, lyDoKhoa: 'dang_co_ca', giaoHuu: { mo: false, con: 2 } })
-    const nut = screen.getByRole('button', { name: /đang có ca kiểm tra/ }) as HTMLButtonElement
-    expect(nut.disabled).toBe(true)
-    expect(nut.textContent).toContain('Bi-a mở lại khi ca kết thúc')
-  })
-  it('cờ Bi-a tắt (máy chủ không gửi bia) ⇒ không có cửa', () => {
-    veSanh(undefined)
-    expect(screen.queryByRole('button', { name: /Bi-a/ })).toBeNull()
   })
 })
 

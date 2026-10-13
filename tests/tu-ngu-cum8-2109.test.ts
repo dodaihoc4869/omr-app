@@ -9,8 +9,6 @@ import { describe, expect, it } from 'vitest'
 
 const doc = (t: string) => readFileSync(resolve(__dirname, '..', t), 'utf8')
 const CAP: [string, string, string][] = [
-  ['src/game/than-thu-v2/DoanTiepSuc.tsx', 'Thầy Đỗ Đại Học gạch một đáp án sai', 'Máy gạch một đáp án sai'],
-  ['src/game/than-thu-v2/DoanTiepSuc.tsx', 'Thẻ do Thầy Đỗ Đại Học soạn từ lời giải', 'Thẻ do máy soạn từ lời giải'],
   ['src/screens/PhieuScreen.tsx', 'Đúng bộ câu Thầy Đỗ Đại Học đã gán riêng cho', 'Đúng bộ câu máy đã gán riêng cho'],
   ['src/screens/StudentPortalScreen.tsx', 'để A.I Đỗ Đại Học chấm điểm ngay', 'để máy chấm điểm ngay'],
   ['src/components/KhoiBaiLuyen.tsx', 'Thầy Đỗ Đại Học rút đúng chuyên đề em vừa mất điểm', 'Máy rút đúng chuyên đề em vừa mất điểm'],

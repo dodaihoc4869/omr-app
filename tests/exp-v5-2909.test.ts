@@ -13,7 +13,6 @@ import {
 import { thanhExp, thanhExpV4, tongExpToiCap, tongExpToiCapV4, tongExpToiDinh } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { LUAT_CAP_MOI, LUAT_CAP_V3, LUAT_CAP_V4, chuyenDoiLuatCap, chuyenV4SangV5, nhanV5, sucChuaV5, type HoSoV5 } from '../src/lib/hap-thu-ngay'
 import { HO_SO_MO_PHONG, chayMoPhong } from '../src/lib/mo-phong-bang-gia-exp'
-import { DANH_MUC_PHU_KIEN } from '../src/lib/phu-kien-danh-muc'
 import * as CH from '../server/src/exp-cau-hinh'
 import { EXP_CAU, EXP_CAU_GAME } from '../server/src/exp-cau-hinh'
 import { expMotCau, expMotCauGame, tinhExp, type SuKienExp, type VaoTinhExp } from '../server/src/exp-hoc-tap'
@@ -186,9 +185,6 @@ describe('(6) khiên 36 mảnh + 2 600 vàng + ngày ≥ 36 + 18(k − 1); khoá
   })
   it('bậc 4 cần cấp 10, bậc 5 cần cấp 20, bậc 1–3 không khoá (trường chỉ-thêm `canCap`); giá m1-v2 theo yêu cầu 30/09', () => {
     expect(CAP_MO_BAC_PHU_KIEN).toEqual({ 1: null, 2: null, 3: null, 4: 10, 5: 20 })
-    for (const m of DANH_MUC_PHU_KIEN) expect(m.canCap, m.ma).toBe(m.bac === 4 ? 10 : m.bac === 5 ? 20 : null)
-    expect(DANH_MUC_PHU_KIEN.find((m) => m.ma === 'HQ-07')!.gia).toBe(1200)
-    expect(DANH_MUC_PHU_KIEN.reduce((t, m) => t + m.gia, 0)).toBe(26_270)
   })
 })
 

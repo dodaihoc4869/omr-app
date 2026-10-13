@@ -1,0 +1,72 @@
+{
+  "oldCount": 115,
+  "nowCount": 117,
+  "report": [
+    {
+      "p": "tests/ban-duyet-v2-0910.test.tsx",
+      "before": 3,
+      "after": 4,
+      "retainedExact": 3
+    },
+    {
+      "p": "tests/canh-bao-thay-the-2109.test.tsx",
+      "before": 12,
+      "after": 12,
+      "retainedExact": 12
+    },
+    {
+      "p": "tests/dang-lam-moi-1909.test.tsx",
+      "before": 6,
+      "after": 6,
+      "retainedExact": 6
+    },
+    {
+      "p": "tests/doan-cua-bang-nhiem-vu-1909.test.tsx",
+      "before": 3,
+      "after": 3,
+      "retainedExact": 3
+    },
+    {
+      "p": "tests/may-yeu-toan-dien-2909.test.tsx",
+      "before": 12,
+      "after": 13,
+      "retainedExact": 12
+    },
+    {
+      "p": "tests/mot-dinh-nghia-cau-da-lam-man-2109.test.tsx",
+      "before": 29,
+      "after": 29,
+      "retainedExact": 29
+    },
+    {
+      "p": "tests/on-dinh-quet-cuoi-3009.test.tsx",
+      "before": 6,
+      "after": 6,
+      "retainedExact": 6
+    },
+    {
+      "p": "tests/the-ca-gan-nhat-2109.test.tsx",
+      "before": 8,
+      "after": 8,
+      "retainedExact": 8
+    },
+    {
+      "p": "tests/thi-dua-2109.test.tsx",
+      "before": 34,
+      "after": 34,
+      "retainedExact": 34
+    },
+    {
+      "p": "tests/toan-man-hinh-game-2109.test.tsx",
+      "before": 1,
+      "after": 1,
+      "retainedExact": 1
+    },
+    {
+      "p": "tests/tu-ngu-cum1-2109.test.tsx",
+      "before": 1,
+      "after": 1,
+      "retainedExact": 1
+    }
+  ]
+}

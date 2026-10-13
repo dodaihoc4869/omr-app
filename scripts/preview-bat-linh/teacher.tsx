@@ -15,7 +15,7 @@ import '@fontsource/be-vietnam-pro/vietnamese-600.css'
 import '@fontsource/be-vietnam-pro/vietnamese-700.css'
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import BottomNav from '../../src/components/BottomNav'
-import TongQuanScreen from '../../src/screens/TongQuanScreen'
+import GvHomNayScreen from '../../src/screens/GvHomNayScreen'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import HocSinhScreen from '../../src/screens/HocSinhScreen'
 import CaiDatScreen from '../../src/screens/CaiDatScreen'
@@ -42,5 +42,5 @@ await saveScriptUrl(location.origin);await saveTeacherSecret('preview-du-lieu-gi
 useCoHoa2.getState().dat({bat:true,lop:[],sbd:[]})
 const man=new URLSearchParams(location.search).get('man')??'tongquan'
 useAppStore.setState({screen:man as never,classList:em as never})
-const Screen=man==='chiendich'?ChienDichScreen:man==='hocsinh'?HocSinhScreen:man==='caidat'?CaiDatScreen:TongQuanScreen
+const Screen=man==='chiendich'?ChienDichScreen:man==='hocsinh'?HocSinhScreen:man==='caidat'?CaiDatScreen:GvHomNayScreen
 createRoot(document.getElementById('root')!).render(<div className="m3 m3-thay vo-thay" data-hoa2=""><ThanhBenTrai/><div className="khung-noi-dung"><div className="giua-noi-dung" data-teacher-screen={man}><Screen/></div></div><BottomNav/></div>)

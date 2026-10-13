@@ -3,10 +3,10 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import StudentPortalScreen, { chuanHoaBaiMom } from '../src/screens/StudentPortalScreen'
-const api = vi.hoisted(() => ({ btvn: vi.fn(), mom: vi.fn() }))
-vi.mock('../src/components/hoc-tap/HocTapHomNay', () => ({ default: (p: { ten: string; soBaiTap: number; onDangXuat: () => void; onBaiTap: () => void; onGiaDinh: () => void }) => <div>
+const api = vi.hoisted(() => ({ btvn: vi.fn(), lichSu: vi.fn(), mom: vi.fn() }))
+vi.mock('../src/components/hoc-tap/HocTapHomNay', () => ({ default: (p: { ten: string; soBaiTap: number; onDangXuat: () => void; onBaiTap: () => void; onGiaDinh: () => void; onKetQua: () => void }) => <div>
   <h1>{p.ten}</h1><output data-testid="so-bai">{p.soBaiTap}</output>
-  <button type="button" onClick={p.onDangXuat}>Đăng xuất thử</button><button type="button" onClick={p.onBaiTap}>Mở bài thử</button><button type="button" onClick={p.onGiaDinh}>Mở gia đình thử</button>
+  <button type="button" onClick={p.onDangXuat}>Đăng xuất thử</button><button type="button" onClick={p.onBaiTap}>Mở bài thử</button><button type="button" onClick={p.onGiaDinh}>Mở gia đình thử</button><button type="button" onClick={p.onKetQua}>Mở kết quả thử</button>
 </div> }))
 vi.mock('../src/screens/DangNhapHocSinh', () => ({ default: ({ onDangNhap }: { onDangNhap: (v: unknown) => void }) => <button type="button" onClick={() => onDangNhap({ sbd: 'S2', hoTen: 'Em mới', lop: '12A1', token: 'token-moi' })}>Vào em mới</button> }))
 vi.mock('../src/components/HopThoaiCong', () => ({ useHopThoai: () => ({ hoi: async () => true, bao: vi.fn(), hop: null }) }))
@@ -20,15 +20,92 @@ vi.mock('../src/components/hoa2/api', () => ({ canThanTuSanh: () => false, useSa
 vi.mock('../src/components/bang-nhiem-vu/may-chu', () => ({ useBanNho: () => null, useCaDangMo: () => null, useLamMoiKhiDong: () => 0, useKeHoachNgay: () => ({ keHoach: null, cu: true, daXong: true, dangLamMoi: false }) }))
 vi.mock('../src/game/than-thu-v2/academic-sync', () => ({ syncStudentExp: vi.fn() }))
 vi.mock('../src/lib/exam-db', async (goc) => ({ ...await goc<typeof import('../src/lib/exam-db')>(), loadScriptUrlHoacMacDinh: async () => '/test' }))
-vi.mock('../src/lib/exam-api', async (goc) => ({ ...await goc<typeof import('../src/lib/exam-api')>(), hsLichSuCaApi: async () => ({ ok: true, items: [] }), hsBtvnApi: (...a: unknown[]) => api.btvn(...a) }))
+vi.mock('../src/lib/exam-api', async (goc) => ({ ...await goc<typeof import('../src/lib/exam-api')>(), hsLichSuCaApi: (...a: unknown[]) => api.lichSu(...a), hsBtvnApi: (...a: unknown[]) => api.btvn(...a) }))
 vi.mock('../src/lib/mom-api', () => ({ momApi: (...a: unknown[]) => api.mom(...a), momReviewHtml: vi.fn() }))
 beforeEach(() => {
   localStorage.clear()
   localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'S1', hoTen: 'Em cũ', lop: '12A1', token: 'token-cu' }))
   api.mom.mockResolvedValue({ ok: true, items: [] })
+  api.lichSu.mockResolvedValue({ ok: true, items: [] })
   api.btvn.mockImplementation(async (_url: string, sbd: string) => sbd === 'S1' ? { ok: true, items: [{ maBtvn: 'cu', tenCa: 'Bài em cũ', daNop: false }] } : new Promise(() => {}))
 })
-afterEach(() => { cleanup(); api.btvn.mockReset(); api.mom.mockReset(); localStorage.clear() })
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); api.btvn.mockReset(); api.lichSu.mockReset(); api.mom.mockReset(); localStorage.clear() })
+it('trình duyệt chặn lưu phiên vẫn đăng nhập bằng phiên mới trong bộ nhớ', async () => {
+  localStorage.clear()
+  const luu = Storage.prototype.setItem
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (key, value) {
+    if (key === 'omr_student_portal_auth') throw new DOMException('Không cho lưu phiên', 'SecurityError')
+    luu.call(this, key, value)
+  })
+  render(<StudentPortalScreen />)
+  fireEvent.click(screen.getByRole('button', { name: 'Vào em mới' }))
+  expect(await screen.findByRole('heading', { name: 'Em mới' })).toBeTruthy()
+  expect(localStorage.getItem('omr_student_portal_auth')).toBeNull()
+  await waitFor(() => expect(api.btvn).toHaveBeenCalledWith('/test', 'S2'))
+})
+it('chặn xóa phiên vẫn đăng xuất và dựng cổng sạch cho em mới, không hồi lại em cũ khi vẽ lại', async () => {
+  const xoa = Storage.prototype.removeItem
+  vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(function (key) {
+    if (key === 'omr_student_portal_auth') throw new DOMException('Không cho xóa phiên', 'SecurityError')
+    xoa.call(this, key)
+  })
+  const ui = render(<StudentPortalScreen />)
+  fireEvent.click(screen.getByRole('button', { name: 'Mở bài thử' }))
+  await screen.findByText('Bảng bài thử')
+  fireEvent.click(screen.getByRole('button', { name: 'Đăng xuất thử', hidden: true }))
+  await screen.findByRole('button', { name: 'Vào em mới' })
+  expect(localStorage.getItem('omr_student_portal_auth')).toBe('')
+  ui.rerender(<StudentPortalScreen />)
+  expect(screen.queryByRole('heading', { name: 'Em cũ' })).toBeNull()
+  expect(screen.queryByText('Bảng bài thử')).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Vào em mới' }))
+  await screen.findByRole('heading', { name: 'Em mới' })
+  expect(screen.getByTestId('so-bai').textContent).toBe('0')
+})
+it('đăng xuất ngay cả khi trình duyệt chưa trả về đăng ký thông báo', async () => {
+  const cu = Object.getOwnPropertyDescriptor(navigator, 'serviceWorker')
+  Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: { getRegistration: () => new Promise(() => {}) } })
+  try {
+    render(<StudentPortalScreen />)
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng xuất thử' }))
+    expect(await screen.findByRole('button', { name: 'Vào em mới' })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: 'Em cũ' })).toBeNull()
+  } finally { if (cu) Object.defineProperty(navigator, 'serviceWorker', cu); else Reflect.deleteProperty(navigator, 'serviceWorker') }
+})
+it('với Lịch sử 300 ms và BTVN 100 ms, hai yêu cầu bắt đầu cùng lúc và BTVN hiện ở 100 ms', async () => {
+  vi.useFakeTimers()
+  const batDau = Date.now(), moc: Record<string, number> = {}
+  api.lichSu.mockImplementation(() => { moc.lichSu = Date.now(); return new Promise(resolve => setTimeout(() => resolve({ ok: true, items: [] }), 300)) })
+  api.btvn.mockImplementation(() => { moc.btvn = Date.now(); return new Promise(resolve => setTimeout(() => resolve({ ok: true, items: [{ maBtvn: 'bt1', daNop: false }] }), 100)) })
+  await act(async () => { render(<StudentPortalScreen />) })
+  expect(moc).toEqual({ lichSu: batDau, btvn: batDau })
+  await act(async () => { await vi.advanceTimersByTimeAsync(100) })
+  expect(screen.getByTestId('so-bai').textContent).toBe('1')
+  await act(async () => { await vi.advanceTimersByTimeAsync(200) })
+})
+it('BTVN bắt đầu tải khi Lịch sử ca còn chờ, và hiện ngay khi lượt riêng của nó xong', async () => {
+  let traLichSu!: (v: unknown) => void
+  api.lichSu.mockImplementation(() => new Promise(resolve => { traLichSu = resolve }))
+  render(<StudentPortalScreen />)
+  await waitFor(() => expect(api.btvn).toHaveBeenCalledWith('/test', 'S1'))
+  expect(api.lichSu).toHaveBeenCalledWith('/test', 'S1')
+  expect(screen.getByTestId('so-bai').textContent).toBe('1')
+  await act(async () => { traLichSu({ ok: true, items: [] }) })
+})
+it('Lịch sử ca lỗi mạng vẫn tải và hiện BTVN, không ném lỗi nền', async () => {
+  api.lichSu.mockRejectedValue(new Error('Lịch sử đang mất mạng'))
+  render(<StudentPortalScreen />)
+  await waitFor(() => expect(screen.getByTestId('so-bai').textContent).toBe('1'))
+})
+it('BTVN lỗi mạng vẫn kết thúc tải và giữ được Lịch sử ca đã về', async () => {
+  api.btvn.mockRejectedValue(new Error('Bài tập đang mất mạng'))
+  api.lichSu.mockResolvedValue({ ok: true, items: [{ maCa: 'ca1', tenCa: 'Ca vẫn xem được', diem: 8 }] })
+  render(<StudentPortalScreen />)
+  await waitFor(() => expect(api.lichSu).toHaveBeenCalledWith('/test', 'S1'))
+  fireEvent.click(screen.getByRole('button', { name: 'Mở kết quả thử' }))
+  expect(await screen.findByText('Ca vẫn xem được')).toBeTruthy()
+  expect(screen.getByTestId('so-bai').textContent).toBe('0')
+})
 async function doiEm() {
   fireEvent.click(screen.getByRole('button', { name: 'Đăng xuất thử', hidden: true }))
   fireEvent.click(await screen.findByRole('button', { name: 'Vào em mới' }))

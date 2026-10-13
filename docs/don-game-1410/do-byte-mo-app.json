@@ -1,0 +1,33 @@
+{
+  "nen": "19840386 (cay ma chay/test bang main58d34a69)",
+  "moi": "3148468b",
+  "don_vi": "byte gzip, khong phai LCP san xuat",
+  "truoc": {
+    "giao-vien": {
+      "tep": 17,
+      "gzip": 275655
+    },
+    "hoc-sinh": {
+      "tep": 47,
+      "gzip": 336111
+    },
+    "phu-huynh": {
+      "tep": 27,
+      "gzip": 273054
+    }
+  },
+  "sau": {
+    "giao-vien": {
+      "tep": 17,
+      "gzip": 270801
+    },
+    "hoc-sinh": {
+      "tep": 47,
+      "gzip": 330331
+    },
+    "phu-huynh": {
+      "tep": 24,
+      "gzip": 265731
+    }
+  }
+}

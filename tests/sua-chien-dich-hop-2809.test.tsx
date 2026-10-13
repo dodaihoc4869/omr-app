@@ -6,8 +6,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 const { goi } = vi.hoisted(() => ({ goi: vi.fn() }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
 
-import DsChienDichDaGiao from '../src/components/chien-dich/DsChienDichDaGiao'
-import { useAppStore } from '../src/store/appStore'
+import SuaChienDich from '../src/components/chien-dich/SuaChienDich'
 
 const CD = { id: 'cd-1', ten: 'Chiến dịch luyện', lop: '12A1', maDe: ['DE1'], hanNop: '2026-10-05', theLucNgay: 60, huyetChien: true, maCa: null, taoLuc: 'x', trangThai: 'dang_chay', soCau: 6, soEm: 2, hetHan: false }
 const EM = [
@@ -15,11 +14,13 @@ const EM = [
   { sbd: 'S2', hoTen: 'Bảo', lop: '12', khoi: '12', tenLop: '12A1' },
   { sbd: 'S3', hoTen: 'Chi', lop: '12', khoi: '12', tenLop: '12A2' },
 ]
+const daLuu = vi.fn()
 let choLuu: ((v: unknown) => void) | null = null
 
 beforeEach(() => {
   goi.mockReset()
   choLuu = null
+  daLuu.mockReset()
   goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
     if (duong === '/gv/chien-dich') {
       if (b.action === 'danh-sach') return { ok: true, du: { ok: true, homNay: '2026-09-28', chienDich: [CD, { ...CD, id: 'cd-2', ten: 'Đã xong', trangThai: 'da_dong', hetHan: true }] } }
@@ -48,20 +49,9 @@ const oHan = () => waitFor(() => {
 })
 
 describe('nút Chỉnh sửa chiến dịch đang mở', () => {
-  it('chỉ chiến dịch đang mở có nút "Chỉnh sửa"', async () => {
-    render(<DsChienDichDaGiao />)
-    await screen.findByText('Chiến dịch luyện')
-    const nut = screen.getAllByRole('button', { name: 'Chỉnh sửa' })
-    expect(nut).toHaveLength(1)
-    expect(nut[0]!.closest('tr')!.textContent).toContain('Chiến dịch luyện')
-  })
 
-  it('thêm em + sửa hạn ⇒ tóm tắt "+1 em, hạn 05/10 → 07/10"; Lưu mờ đi khi đang lưu, giữ chữ; lưu xong đóng hộp, báo, tải lại', async () => {
-    const toast = vi.fn()
-    useAppStore.setState({ showToast: toast } as never)
-    render(<DsChienDichDaGiao />)
-    await screen.findByText('Chiến dịch luyện')
-    fireEvent.click(screen.getByRole('button', { name: 'Chỉnh sửa' }))
+  it('thêm em + sửa hạn ⇒ tóm tắt "+1 em, hạn 05/10 → 07/10"; Lưu mờ đi khi đang lưu, giữ chữ; lưu xong trả kết quả cho màn gọi', async () => {
+    render(<SuaChienDich id="cd-1" ten="Chiến dịch luyện" onDong={vi.fn()} onDaLuu={daLuu} />)
     expect(await screen.findByRole('dialog', { name: 'Chỉnh sửa: Chiến dịch luyện' })).toBeTruthy()
     const han = await oHan()
     expect(han.value).toBe('2026-10-05')
@@ -90,17 +80,13 @@ describe('nút Chỉnh sửa chiến dịch đang mở', () => {
     expect(goiLuu[1].botSbd).toBeUndefined()
     expect(goiLuu[1].themMaDe).toBeUndefined()
 
-    const soDanhSach = goi.mock.calls.filter(([, b]) => b.action === 'danh-sach').length
     choLuu!(null)
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Chỉnh sửa: Chiến dịch luyện' })).toBeNull())
-    expect(toast).toHaveBeenCalledWith('Đã lưu chiến dịch: +1 em, hạn 05/10 → 07/10', 'success')
-    await waitFor(() => expect(goi.mock.calls.filter(([, b]) => b.action === 'danh-sach').length).toBeGreaterThan(soDanhSach))
+    await waitFor(() => expect(daLuu).toHaveBeenCalledTimes(1))
+    expect(daLuu).toHaveBeenCalledWith(expect.objectContaining({ id: 'cd-1', themSbd: ['S3'], hanNop: '2026-10-07', tomTat: '+1 em, hạn 05/10 → 07/10' }))
   })
 
   it('hộp nằm trong vỏ màu app thầy (.m3.vo-thay) dù cổng ra document.body — không bị nền trong suốt (thầy 28/09)', async () => {
-    render(<DsChienDichDaGiao />)
-    await screen.findByText('Chiến dịch luyện')
-    fireEvent.click(screen.getByRole('button', { name: 'Chỉnh sửa' }))
+    render(<SuaChienDich id="cd-1" ten="Chiến dịch luyện" onDong={vi.fn()} onDaLuu={daLuu} />)
     const hop = await screen.findByRole('dialog')
     const vo = hop.closest('.m3.vo-thay') as HTMLElement | null
     expect(vo).toBeTruthy()
@@ -108,9 +94,7 @@ describe('nút Chỉnh sửa chiến dịch đang mở', () => {
   })
 
   it('hạn mới trước hôm nay ⇒ báo ngay cạnh ô, không cho lưu', async () => {
-    render(<DsChienDichDaGiao />)
-    await screen.findByText('Chiến dịch luyện')
-    fireEvent.click(screen.getByRole('button', { name: 'Chỉnh sửa' }))
+    render(<SuaChienDich id="cd-1" ten="Chiến dịch luyện" onDong={vi.fn()} onDaLuu={daLuu} />)
     const han = await oHan()
     fireEvent.change(han, { target: { value: '2026-09-20' } })
     expect(screen.getByText('Hạn nộp mới phải từ hôm nay trở đi')).toBeTruthy()
@@ -118,9 +102,7 @@ describe('nút Chỉnh sửa chiến dịch đang mở', () => {
   })
 
   it('rút hạn phải nâng số câu/ngày ⇒ hiện "Số câu/ngày: 12 → 15 (để kịp hạn 02/10)"; thầy nhập tay thấp hơn ⇒ cảnh báo vàng, vẫn cho lưu', async () => {
-    render(<DsChienDichDaGiao />)
-    await screen.findByText('Chiến dịch luyện')
-    fireEvent.click(screen.getByRole('button', { name: 'Chỉnh sửa' }))
+    render(<SuaChienDich id="cd-1" ten="Chiến dịch luyện" onDong={vi.fn()} onDaLuu={daLuu} />)
     const han = await oHan()
     fireEvent.change(han, { target: { value: '2026-10-02' } })
     await waitFor(() => expect(document.querySelector('[data-khoi="so-cau-ngay"]')?.textContent).toBe('Số câu/ngày: 12 → 15 (để kịp hạn 02/10)'), { timeout: 2000 })

@@ -295,7 +295,7 @@ export interface TuCongHocSinh {
 export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSinh; onVe?: () => void } = {}) {
   const showToast = useAppStore((s) => s.showToast)
 
-  const [phase, setPhase] = useState<'join' | 'loading' | 'cho' | 'exam' | 'submitted' | 'error'>('join')
+  const [phase, setPhase] = useState<'join' | 'loading' | 'cho' | 'exam' | 'submitted' | 'error' | 'loi-luu-nop'>('join')
   /** Bản ref của `phase`. Vòng thử lại của phòng chờ chạy ngoài chu kỳ vẽ lại,
    * nên nó phải đọc được màn HIỆN TẠI chứ không phải màn lúc nó khởi hành —
    * em đã vào thi được rồi mà vòng lặp vẫn tưởng chưa thì nó kéo em ra lại. */
@@ -306,6 +306,20 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
    * hết là hành em sáu lần rồi vẫn ra đúng câu ấy. */
   const loiVaoThiRef = useRef('')
   const [errorMsg, setErrorMsg] = useState('')
+  const [loiKhoNen, setLoiKhoNen] = useState(false), [dangLuuNen, setDangLuuNen] = useState(false), [dangLuuNop, setDangLuuNop] = useState(false)
+  const dangLuuNopRef = useRef(false), nopTuDongRef = useRef(false), baoLoiKhoLuc = useRef(0), nhapNopRef = useRef<ExamAttempt | null>(null), lanLuuNen = useRef(0)
+  const luuNen = (a: ExamAttempt) => {
+    const lan = ++lanLuuNen.current
+    setDangLuuNen(true)
+    void saveAttempt(a).then(() => { if (lan === lanLuuNen.current) { setLoiKhoNen(false); setDangLuuNen(false) } }, () => {
+      if (lan !== lanLuuNen.current) return
+      setLoiKhoNen(true); setDangLuuNen(false)
+      if (Date.now() - baoLoiKhoLuc.current > 30_000) {
+        baoLoiKhoLuc.current = Date.now()
+        showToast('Chưa lưu được nháp trên máy. Em giữ màn này rồi thử lại.', 'warn')
+      }
+    })
+  }
   // ĐÃ NỘP RỒI, MỞ LẠI LINK TRÊN MÁY KHÁC — thầy báo 07/09: em bấm link ca để
   // xem điểm thì nhận một ô ĐỎ như app hỏng. Bài đã nộp xong không phải lỗi,
   // nên tách riêng: ô vàng, nói rõ nộp lúc nào và điểm nằm ở đâu.
@@ -492,7 +506,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
       const next: ExamAttempt = { ...cur, hetGioLuc: keo.han }
       attemptRef.current = next
       setAttempt(next)
-      saveAttempt(next)
+      luuNen(next)
       setBaoThemGio(chuBaoThemGio(keo.themPhut))
       if (baoThemGioTimerRef.current) clearTimeout(baoThemGioTimerRef.current)
       baoThemGioTimerRef.current = setTimeout(() => setBaoThemGio(null), MS_HIEN_BAO_THEM_GIO)
@@ -1646,7 +1660,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       if (henLuuIdbRef.current && attemptRef.current) {
         clearTimeout(henLuuIdbRef.current)
         henLuuIdbRef.current = null
-        void saveAttempt(attemptRef.current)
+        luuNen(attemptRef.current)
       }
       // Rời màn làm bài (nộp, hết giờ, đóng tab) thì lưu nốt nhịp cuối.
       luu()
@@ -1703,7 +1717,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const cur = attemptRef.current
       if (!cur || cur.submitted) return
       cur.giayCau = { ...giayCauRef.current }
-      void saveAttempt(cur)
+      luuNen(cur)
     }, 10000)
     return () => {
       io.disconnect()
@@ -1740,7 +1754,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       }
       attemptRef.current = next
       setAttempt(next)
-      saveAttempt(next)
+      luuNen(next)
       pushStatusNow(next, false)
       baoThayGianLan(next)
       doSubmit(next)
@@ -1757,7 +1771,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         const next: ExamAttempt = { ...cur, integrity: { ...cur.integrity, leaveCount, events } }
         attemptRef.current = next
         setAttempt(next)
-        saveAttempt(next)
+        luuNen(next)
         pushStatusNow(next, true)
         const muc = mucKhiRoiMan(leaveCount, cur.integrity.mocMoKhoa ?? 0, nguong)
         if (muc === 'khoa') {
@@ -1790,7 +1804,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         const next: ExamAttempt = { ...cur, integrity: { ...cur.integrity, totalHiddenMs: cur.integrity.totalHiddenMs + ms, events } }
         attemptRef.current = next
         setAttempt(next)
-        saveAttempt(next)
+        luuNen(next)
         pushStatusNow(next, true)
       }
     }
@@ -1913,7 +1927,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const next: ExamAttempt = { ...cur, integrity: { ...cur.integrity, events, blocked: true, lyDoKhoa: lyDo, kenhBao } }
       attemptRef.current = next
       setAttempt(next)
-      saveAttempt(next)
+      luuNen(next)
       pushStatusNow(next, false)
       baoThayGianLan(next)
       void doSubmit(next)
@@ -2298,7 +2312,25 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     })
   }
 
+  /** Khôi phục đúng snapshot đã chốt; không thu hoạch lại DOM/giờ nộp sau hạn. */
+  const luuVaNop = async (snapshot: ExamAttempt, tuDongNop: boolean) => {
+    if (dangLuuNopRef.current) return
+    dangLuuNopRef.current = true; setDangLuuNop(true); nopTuDongRef.current = tuDongNop
+    try { await saveAttempt(snapshot) } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : 'Chưa lưu được bài trên máy. Em giữ màn này rồi thử lại.')
+      setPhase('loi-luu-nop')
+      return
+    } finally { dangLuuNopRef.current = false; setDangLuuNop(false) }
+    nhapNopRef.current = null
+    setPhase('submitted')
+    pushStatusNow(snapshot, false)
+    const giam = tuDongNop ? gianNopTuDong() : 0
+    if (giam > 0) setTimeout(() => void trySend(snapshot), giam)
+    else void trySend(snapshot)
+  }
   const doSubmit = async (aParam: ExamAttempt, tuDongNop = false) => {
+    if (dangLuuNopRef.current) return
+    if (nhapNopRef.current) return luuVaNop(nhapNopRef.current, nopTuDongRef.current)
     let a = attemptRef.current ?? aParam
     // LƯỚI BẢO HIỂM: Thu hoạch trực tiếp giá trị thực tế đang gõ trên DOM (đặc biệt Phần III câu trả lời ngắn)
     // để loại bỏ hoàn toàn khả năng bị rỗng do lệch pha closure hoặc debounce/state update lúc hết giờ.
@@ -2348,11 +2380,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       henLuuIdbRef.current = null
     }
     const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
+    nhapNopRef.current = updated
     attemptRef.current = updated
     setAttempt(updated)
-    await saveAttempt(updated)
-    setPhase('submitted')
-    pushStatusNow(updated, false)
     // GIÃN RIÊNG CÚ GỌI MẠNG, KHÔNG giãn việc lưu. Hết giờ là mốc CHUNG của cả
     // ca: mọi máy đếm về 0 trong cùng một giây rồi cùng bắn một lượt POST. Bài
     // đã lưu xong trên máy em ở dòng trên, `phase` cũng đã sang "đã nộp", nên
@@ -2360,9 +2390,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     //
     // Tự bấm Nộp bài thì KHÔNG giãn — em bấm rồi thì phải thấy máy chạy ngay,
     // và mấy chục em không bao giờ bấm trùng đúng một khoảnh khắc như hết giờ.
-    const giam = tuDongNop ? gianNopTuDong() : 0
-    if (giam > 0) setTimeout(() => void trySend(updated), giam)
-    else void trySend(updated)
+    await luuVaNop(updated, tuDongNop)
   }
 
   // Nhận keyBank (CÓ đáp án) → chấm tại máy em, hiện popup điểm (trừ bài bị
@@ -2512,7 +2540,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const done = { ...a, pendingSubmit: false }
       attemptRef.current = done
       setAttempt(done)
-      await saveAttempt(done)
+      // ACK máy chủ là bằng chứng đã nộp. Ghi ACK local ở nền; lỗi kho giữ pending cũ để replay an toàn.
+      void saveAttempt(done).catch(() => {})
       showToast('Đã nộp bài thành công', 'success')
       lanHong.current = 0
       if (retryTimer.current) {
@@ -2672,26 +2701,24 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         clearTimeout(henLuuIdbRef.current)
         henLuuIdbRef.current = null
       }
-      void saveAttempt(next)
+      luuNen(next)
     } else {
       if (henLuuIdbRef.current) clearTimeout(henLuuIdbRef.current)
       henLuuIdbRef.current = setTimeout(() => {
         henLuuIdbRef.current = null
-        void saveAttempt(next)
+        luuNen(next)
       }, 300)
     }
   }
 
   const updateAndSave = (mutate: (a: ExamAttempt) => ExamAttempt, ngay = true) => {
-    let nextVal: ExamAttempt | null = null
-    setAttempt((cur) => {
-      if (!cur) return cur
-      const next = { ...mutate(cur), giayCau: { ...giayCauRef.current } }
-      attemptRef.current = next
-      nextVal = next
-      return next
-    })
-    if (nextVal) luuAttemptIdb(nextVal, ngay)
+    // React có thể chạy updater sau khi hàm đã trả về. Lấy nháp hiện hành từ ref để lưu ngay cùng đáp án vừa chọn.
+    const cur = attemptRef.current
+    if (!cur || cur.submitted) return
+    const next = { ...mutate(cur), giayCau: { ...giayCauRef.current } }
+    attemptRef.current = next
+    setAttempt(next)
+    luuAttemptIdb(next, ngay)
     // Chấm lưu ở thanh trên: lưu vào IndexedDB máy em NGAY khi chọn (không
     // đợi bấm nộp) — mất mạng/hết pin giữa giờ vẫn còn nguyên đáp án.
     setSaveFlash(true)
@@ -2982,6 +3009,16 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         </div>
       </Trang>
     )
+  }
+  if (phase === 'loi-luu-nop' && attempt) {
+    return <Trang className="flex items-center justify-center px-4">
+      <div className="w-full flex flex-col" style={{ maxWidth: 400, gap: 'var(--k4)' }}>
+        <OThongBao tone="do">{errorMsg} Bài đang được giữ trong màn này; em chưa nên đóng app.</OThongBao>
+        <NutChinh disabled={dangLuuNop} onClick={() => void luuVaNop(nhapNopRef.current ?? attempt, nopTuDongRef.current)}>
+          {dangLuuNop ? 'Đang lưu bài…' : 'Thử lưu và nộp lại'}
+        </NutChinh>
+      </div>
+    </Trang>
   }
 
   // ------------------------------------------------------- XEM LẠI LỜI GIẢI
@@ -3428,8 +3465,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     const d = new Date(attempt.hanNop)
     return Number.isFinite(d.getTime()) ? d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : ''
   })()
-  const dotColor = !online ? 'var(--mo)' : saveFlash ? 'var(--cam)' : 'var(--xanh)'
-  const dotLabel = !online ? 'mất mạng — đã lưu trên máy' : saveFlash ? 'đang lưu…' : 'đã lưu'
+  const dotColor = loiKhoNen || dangLuuNen ? 'var(--cam)' : !online ? 'var(--mo)' : saveFlash ? 'var(--cam)' : 'var(--xanh)'
+  const dotLabel = loiKhoNen ? 'chưa lưu được trên máy' : dangLuuNen ? 'đang lưu…' : !online ? 'mất mạng — đã lưu trên máy' : saveFlash ? 'đang lưu…' : 'đã lưu'
 
   // CÂU HỎI LẠI — tra bằng Set để 40 câu không thành 40 lần duyệt mảng.
   const boHoiLai = new Set(attempt.cauLap ?? [])

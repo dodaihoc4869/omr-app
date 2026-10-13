@@ -7,7 +7,6 @@ import path from 'node:path'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({
   ...(await original<any>()),

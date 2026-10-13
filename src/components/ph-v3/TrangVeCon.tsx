@@ -557,6 +557,7 @@ function LoiThay({ loiThay, thuLai }: { loiThay: { ds: NhanXetCa[] | null; chuLo
   return (
     <section className="tvc-the tvc-loi-thay" data-thu="4" aria-labelledby="tvc-thay" data-vung="loi-thay-moi">
       <DauThe id="tvc-thay" bt={<BtTinNhan co={20} />} mau="hp" tieuDe="Nhận xét của thầy" phu={moi ? `Thầy Đỗ Đại Học · sau ${moi.tenCa}${ngay ? ` · ${thuNgayVn(ngay)}` : ''}` : undefined} />
+      {loiThay.chuLoi && <LoiThe chu={`Nhận xét đang hiển thị bản đã tải. ${loiThay.chuLoi}`} thuLai={thuLai} nut="Thử lại nhận xét" />}
       {moi ? (
         <>
           <blockquote>{chuThay(moi.noiDung)}</blockquote>

@@ -123,11 +123,15 @@ describe('nối vào màn thi (khoá nguồn)', () => {
       'const next: ExamAttempt = { ...cur, hetGioLuc: keo.han }',
       'attemptRef.current = next',
       'setAttempt(next)',
-      'saveAttempt(next)',
+      'luuNen(next)',
       'setBaoThemGio(chuBaoThemGio(keo.themPhut))',
       'setTimeout(() => setBaoThemGio(null), MS_HIEN_BAO_THEM_GIO)',
       'huy()',
     ]) expect(khoi, s).toContain(s)
+    // Đường lưu nền vẫn chuyển đúng attempt vào IndexedDB, không chỉ cập nhật React.
+    const helperLuu = /const luuNen = \(a: ExamAttempt\) => \{([\s\S]*?)\n  \}/.exec(man)?.[1]
+    expect(helperLuu).toBeTruthy()
+    expect(helperLuu).toContain('void saveAttempt(a).then(')
     // không đường nào khác trong màn thi ghi hạn từ giá trị của máy chủ ngoài ba chỗ VÀO THI cũ + chỗ này
     expect((man.match(/hetGioLuc: keo\.han/g) || []).length).toBe(1)
     expect(man).not.toMatch(/hetGioLuc:\s*tin\./)

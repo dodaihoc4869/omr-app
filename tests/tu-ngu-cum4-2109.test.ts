@@ -15,7 +15,6 @@ const dongChu = (p: string) =>
 
 const TEP_HS_PH = [
   'src/components/bang-nhiem-vu/LichSuCaM3.tsx',
-  'src/components/bang-nhiem-vu/muc-menu.tsx',
   'src/components/bang-nhiem-vu/VaoThiForm.tsx',
   'src/components/bang-nhiem-vu/NutVaoThi.tsx',
   'src/lib/nhiem-vu-adapter.ts',
@@ -48,11 +47,7 @@ describe('Học sinh / phụ huynh: không còn "ca thi", "bài thi", "Lịch s�
 
 describe('chữ mới đúng chuẩn', () => {
   it('menu + tiêu đề sheet: "Xem điểm & lịch sử ca kiểm tra", "Báo cáo điểm các ca kiểm tra"', () => {
-    const menu = doc('src/components/bang-nhiem-vu/muc-menu.tsx')
-    expect(menu).toContain("nhan: 'Xem điểm & lịch sử ca kiểm tra'")
     // Menu phụ huynh ĐÃ GỠ (app PH một màn một nút, 21/09): không còn mục "Báo cáo điểm các ca kiểm tra" ở menu.
-    expect(menu).not.toContain('mucMenuPhuHuynh')
-    expect(menu).not.toContain('Báo cáo điểm các ca kiểm tra')
     // SỬA CÓ CHỦ Ý — đợt 18: tiêu đề tấm điểm = tên dòng đã bấm ("Kết quả bài đã nộp").
     expect(doc('src/screens/StudentPortalScreen.tsx')).toContain("tab === 'diem' ? 'Kết quả bài đã nộp'")
   })

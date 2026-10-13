@@ -7,7 +7,6 @@ import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 
 const mocks = vi.hoisted(() => ({ dangNhap: vi.fn(), datMatKhau: vi.fn() }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/components/BangVinhDanh', () => ({ default: () => null }))
 vi.mock('../src/components/BangTinPhuHuynh', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))

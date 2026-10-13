@@ -98,7 +98,7 @@ const html = (raw: unknown, man: 'chinh' | 'bang'): string => {
   return renderToStaticMarkup(cay)
 }
 // Trình duyệt thật + CSS thật: index.css (mũi tên hoá học `.mt`, Tailwind bỏ @import), tokens, m3-theme, m3, ph-moi. Bỏ dòng @import (Chromium không nạp được trong setContent).
-const css = ['src/styles/tokens.css', 'src/components/bang-nhiem-vu/m3-theme.css', 'src/components/m3/m3.css', 'src/index.css', 'src/components/bang-nhiem-vu/bang-nhiem-vu.css', 'src/components/bang-nhiem-vu/canh-bao-thay.css', ...CSS_PH_MOI]
+const css = ['src/styles/tokens.css', 'src/components/bang-nhiem-vu/m3-theme.css', 'src/components/m3/m3.css', 'src/index.css', 'src/components/bang-nhiem-vu/canh-bao-thay.css', ...CSS_PH_MOI]
   .filter((p) => fs.existsSync(path.join(goc, p)))
   .map((p) => doc(p).replace(/@import[^;]*;/g, ''))
   .join('\n')

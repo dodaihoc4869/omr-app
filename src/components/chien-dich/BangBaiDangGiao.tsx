@@ -3,13 +3,18 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { RefreshCw } from 'lucide-react'
 import { goiLenh } from '../../lib/goi-lenh-thay'
+import { theoDoiBaiDangGiao, type BaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
 import { ngayVn, type GoiDu } from './goi7-ui'
 import { chuDemGiao, chuHanDong, goiDangGiao, TOI_DA_DONG_GIAO } from './buoi-day-ui'
 import './sua-han-bai.css'
 
 const CHU_CHUA_CO_LENH = 'Máy chủ chưa có bảng bài 7 ngày.'
 type ThongKe = { soEm: number; pGap: number | null; pTuLam: number | null }
-type DuBang = { bat: boolean; goi: GoiDu[]; thongKe: Record<string, ThongKe>; serverNow?: number }
+type GoiBang = GoiDu & { khoa_bai?: string }
+type DuBang = { bat: boolean; goi: GoiBang[]; thongKe: Record<string, ThongKe>; serverNow?: number }
+// Tick trả ACK trước khi tác vụ nền lập gói xong; tối đa 6 lượt đọc nhẹ trong khoảng 25 giây.
+const CHO_BAI_MS = [0, 800, 1600, 3200, 6400, 12800]
+type ChoBai = { bai: Map<string, BaiDangGiaoThayDoi>; lan: number; han: number }
 type SuaHan = { id: string; han: string; hanCu: string }
 type SuaNhieu = { goi: GoiDu[]; chon: Set<string>; han: string }
 const laHo = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x)
@@ -22,7 +27,7 @@ function docBang(d: Record<string, unknown>): DuBang | null {
   const serverNow = typeof d.serverNow === 'number' && Number.isFinite(d.serverNow) && Number.isFinite(new Date(d.serverNow + 7 * 3600000).getTime()) ? d.serverNow : undefined
   if (!d.bat) return { bat: false, goi: [], thongKe: {}, serverNow }
   if (!Array.isArray(d.goi) || !laHo(d.thongKe)) return null
-  const goi: GoiDu[] = [], thongKe: Record<string, ThongKe> = {}
+  const goi: GoiBang[] = [], thongKe: Record<string, ThongKe> = {}
   for (const g of d.goi) {
     if (!laHo(g) || typeof g.id !== 'string' || !g.id || typeof g.ten !== 'string' || typeof g.lop !== 'string' || typeof g.han !== 'string' || !laNgay(g.han)) return null
     if (goi.some(cu => cu.id === g.id) || g.bat_dau !== undefined && (typeof g.bat_dau !== 'string' || !laNgay(g.bat_dau))) return null
@@ -58,6 +63,10 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
   const [luu, setLuu] = useState(false)
   const [daLuu, setDaLuu] = useState<Record<string, string>>({})
   const [loiHan, setLoiHan] = useState('')
+  const [choBaiMoi, setChoBaiMoi] = useState(false)
+  const choBai = useRef<ChoBai | null>(null), henDoc = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const caCuHien = useRef(caCu)
+  caCuHien.current = caCu
   const docLan = useRef(0), thayDoi = useRef(0), song = useRef(true), dangDoc = useRef(false), dangLuu = useRef(false)
   const idTieuDe = useId(), idNhieu = useId()
   // Ngày cùng lượt máy chủ chọn 12 gói: đồng hồ máy thầy lệch không làm lệch bảng/sàn hạn.
@@ -72,7 +81,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
       const r = await goiLenh('/gv/goi-bai-7', { action: 'tong_hop', ...(caCu ? { caCu: true } : {}) }, CHU_CHUA_CO_LENH)
       if (!song.current || lan !== docLan.current || ban !== thayDoi.current) return
       const moi = r.ok ? docBang(r.du) : null
-      if (!moi) { setLoiTai(r.ok ? 'Máy chủ trả lời chưa đủ số liệu. Thầy thử lại.' : r.chu); return }
+      if (!moi) { setLoiTai(r.ok ? 'Máy chủ trả lời chưa đủ số liệu. Thầy thử lại.' : r.chu); return null }
       const theoId = new Map(moi.goi.map(g => [g.id, g]))
       setDu(moi)
       // Cập nhật sau lỗi 2 máy: giữ ngày thầy đang nhập, lấy hạn hiện tại để so khi lưu lại.
@@ -84,18 +93,62 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
       })
       setDaLuu(cu => Object.fromEntries(Object.entries(cu).filter(([id, han]) => theoId.get(id)?.han === han)))
       setLoiHan('')
+      const cho = choBai.current
+      if (cho) {
+        for (const [khoa, b] of cho.bai) {
+          const co = moi.goi.some(g => g.lop === b.lop && g.khoa_bai === b.khoaBai)
+          if (b.loai === 'tick' ? co : !co) cho.bai.delete(khoa)
+        }
+        if (!cho.bai.size || !moi.bat) {
+          choBai.current = null; setChoBaiMoi(false)
+          if (henDoc.current !== null) { clearTimeout(henDoc.current); henDoc.current = null }
+        }
+      }
+      return moi
     } catch {
       if (song.current && ban === thayDoi.current) setLoiTai('Không nối được máy chủ.')
+      return null
     } finally {
       dangDoc.current = false
       if (song.current && lan === docLan.current) setDangTai(false)
     }
   }, [])
+  const docBaiVuaDoi = useCallback(async () => {
+    henDoc.current = null
+    const cho = choBai.current
+    if (!cho || !song.current) return
+    const chuaSanSang = () => {
+      choBai.current = null; setChoBaiMoi(false)
+      setLoiTai('Bảng chưa cập nhật đủ bài vừa thay đổi. Thầy bấm Cập nhật để đọc lại.')
+    }
+    if (Date.now() >= cho.han) { chuaSanSang(); return }
+    const moi = await tai(caCuHien.current)
+    if (!song.current || cho !== choBai.current) return
+    if (moi === null) { choBai.current = null; setChoBaiMoi(false); return }
+    if (moi) {
+      ++cho.lan
+      if (cho.lan >= CHO_BAI_MS.length) { chuaSanSang(); return }
+    }
+    // Lượt đọc/lưu đang chờ: không nhân API, đợi tới khi bảng rảnh; vẫn có hạn tổng 35 giây.
+    henDoc.current = setTimeout(() => void docBaiVuaDoi(), moi ? CHO_BAI_MS[cho.lan] : 800)
+  }, [tai])
   useEffect(() => {
     song.current = true
     void tai()
-    return () => { song.current = false }
-  }, [tai])
+    const boNghe = theoDoiBaiDangGiao(bai => {
+      ++thayDoi.current // Lượt đọc trước ACK tick/bỏ tick không ghi lại bảng cũ.
+      const doi = new Map(choBai.current?.bai)
+      for (const b of bai) doi.set(JSON.stringify([b.lop, b.khoaBai]), b)
+      choBai.current = { bai: doi, lan: 0, han: Date.now() + 35000 }
+      setChoBaiMoi(true)
+      if (henDoc.current !== null) clearTimeout(henDoc.current)
+      henDoc.current = setTimeout(() => void docBaiVuaDoi(), CHO_BAI_MS[0])
+    })
+    return () => {
+      song.current = false; boNghe(); choBai.current = null
+      if (henDoc.current !== null) clearTimeout(henDoc.current)
+    }
+  }, [tai, docBaiVuaDoi])
 
   // Lọc metadata ở máy thầy ngay; số liệu quá hạn đọc bằng một tổng hợp giới hạn, giữ nguyên bảng.
   const tatCa = du?.goi.filter(g => caCu || g.han >= homNay) ?? []
@@ -179,6 +232,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
         </div>
       </div>}
       {loiTai && <p className="dh-loi" role="alert">{du ? 'Chưa cập nhật được bài đang giao: ' : 'Chưa tải được bài đang giao: '}{loiTai}</p>}
+      {choBaiMoi && <p className="dh-phu" role="status">Đang cập nhật bài vừa thay đổi…</p>}
 
       {!du && dangTai ? (
         <div className="gvv2-bdg-xuong" role="status" aria-label="Đang tải bài đang giao">

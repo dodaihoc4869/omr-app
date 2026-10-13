@@ -88,15 +88,32 @@ describe('index.html — phục hồi không hủy dữ liệu trên máy yếu'
 })
 
 describe('scripts/kiem-sw.mjs — cửa này PHẢI bắt được bản hỏng', () => {
-  const chay = (ma: string, trang: string): number => {
+  // Ba cổng có đủ entry đã dựng và helper nhập tĩnh; AppHocSinh còn nhập
+  // StudentPortalScreen nên fixture giữ cả lớp vỏ học sinh và màn bên trong.
+  const TEP_KHOI_DONG = {
+    'App-aaaaaaaa.js': 'import "./gv-helper-11111111.js";',
+    'AppHocSinh-bbbbbbbb.js': 'import { StudentPortalScreen } from "./StudentPortalScreen-cccccccc.js";',
+    'StudentPortalScreen-cccccccc.js': 'import "./hs-helper-22222222.js"; export const StudentPortalScreen = {};',
+    'ParentPortalScreen-dddddddd.js': 'import "./ph-helper-33333333.js";',
+    'gv-helper-11111111.js': 'export { chung } from "./chung-helper-44444444.js";',
+    'hs-helper-22222222.js': 'import "./chung-helper-44444444.js";',
+    'ph-helper-33333333.js': 'import "./chung-helper-44444444.js";',
+    'chung-helper-44444444.js': 'export const chung = 1;',
+  }
+  const MANIFEST_LANH = JSON.stringify(['index.html', ...Object.keys(TEP_KHOI_DONG).map(ten => 'assets/' + ten)].map(url => ({ revision: null, url })))
+  const chay = (ma: string, trang: string, boTep = ''): number => {
     const thu = fs.mkdtempSync(path.join(os.tmpdir(), 'kiem-sw-'))
     fs.writeFileSync(path.join(thu, 'sw.js'), ma)
     fs.writeFileSync(path.join(thu, 'index.html'), trang)
+    fs.mkdirSync(path.join(thu, 'assets'))
+    for (const [ten, noiDung] of Object.entries(TEP_KHOI_DONG)) if (ten !== boTep) fs.writeFileSync(path.join(thu, 'assets', ten), noiDung)
     try {
       execFileSync('node', ['scripts/kiem-sw.mjs', path.join(thu, 'sw.js')], { cwd: GOC, stdio: 'pipe' })
       return 0
     } catch (e) {
       return (e as { status?: number }).status ?? -1
+    } finally {
+      fs.rmSync(thu, { recursive: true, force: true })
     }
   }
 
@@ -105,7 +122,7 @@ describe('scripts/kiem-sw.mjs — cửa này PHẢI bắt được bản hỏng'
   const LANH = `(function(){
     ${'revision'.repeat(60)}
     // Thêm 21/09 (P1 máy kẹt bản cũ): cửa nay còn đòi precache NHỎ (đếm theo "url") + kho chạy-lúc + chốt không cất HTML.
-    const manifest = [{"revision":null,"url":"index.html"}];
+    const manifest = ${MANIFEST_LANH};
     const kho = ["omr-manh-chay-lan", "omr-anh-chay-lan"]; const chot = /text\\/html/i;
     self.skipWaiting();
     const x = "index.html";
@@ -119,10 +136,21 @@ describe('scripts/kiem-sw.mjs — cửa này PHẢI bắt được bản hỏng'
     expect(chay(LANH, TRANG_LANH)).toBe(0)
   })
 
+  it('bắt được: helper tĩnh của mỗi cổng thiếu khỏi precache, kể cả helper bắc cầu', () => {
+    for (const ten of ['gv-helper-11111111.js', 'hs-helper-22222222.js', 'ph-helper-33333333.js', 'chung-helper-44444444.js']) {
+      const thieu = LANH.replace(`"url":"assets/${ten}"`, '"url":"assets/khac-55555555.js"')
+      expect(chay(thieu, TRANG_LANH), ten).toBe(1)
+    }
+  })
+
+  it('bắt được: helper có trong manifest nhưng tệp đã dựng không tồn tại', () => {
+    expect(chay(LANH, TRANG_LANH, 'chung-helper-44444444.js')).toBe(1)
+  })
+
   // P1 21/09 (máy học sinh kẹt bản cũ): ba điều mới cửa phải bắt.
   it('bắt được: precache phình to lại (200 tệp > trần 170) — tất-cả-hoặc-không nên mạng yếu rớt một tệp là cả lượt cài hỏng', () => {
     const nhieu = Array.from({ length: 200 }, (_, i) => `{"revision":null,"url":"assets/x${i}.js"}`).join(',')
-    expect(chay(LANH.replace('[{"revision":null,"url":"index.html"}]', `[${nhieu}]`), TRANG_LANH)).toBe(1)
+    expect(chay(LANH.replace(MANIFEST_LANH, `[${nhieu}]`), TRANG_LANH)).toBe(1)
   })
 
   it('bắt được: bỏ mảnh khỏi precache mà không có kho chạy-lúc', () => {

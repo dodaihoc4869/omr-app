@@ -25,6 +25,8 @@ import { ngayVn } from '../components/chien-dich/ngay'
 import { demEmTheoLop, soVi, thongKeThang } from '../lib/tong-quan-gv'
 import './gv-hoa2.css'
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
+import { caConEmDangLam, trangThaiCa } from '../lib/ca-dang-chay'
+export { caConEmDangLam, trangThaiCa } from '../lib/ca-dang-chay'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -38,33 +40,6 @@ export const CHU_CA_TRONG_HOA2 = 'Chưa có ca kiểm tra nào. Bấm Mở ca ki
 /** Bảng 2.0 hiện bấy nhiêu dòng rồi mới "Xem thêm". */
 const SO_DONG_TRANG = 20
 const TONE_CHIP: Record<string, string> = { tim: 'la', xanh: 'la', cam: 'vang', do: 'do', xam: 'xam' }
-
-/** Trạng thái hiển thị của ca theo mốc thời gian máy chủ + số đã nộp. */
-export function trangThaiCa(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetHanVao' | 'daVao' | 'daNop'>, nowMs: number): { ten: string; tone: 'xanh' | 'cam' | 'do' | 'tim' | 'xam' } {
-  if (ca.trangThai === 'dong') return { ten: 'Đã đóng', tone: 'xam' }
-  const batDau = ca.batDau ? new Date(ca.batDau).getTime() : NaN
-  if (Number.isFinite(batDau) && nowMs < batDau) return { ten: 'Chưa mở', tone: 'xam' }
-  const hetHan = ca.hetHanVao ? new Date(ca.hetHanVao).getTime() : NaN
-  if (Number.isFinite(hetHan) && nowMs > hetHan) {
-    if (ca.daVao > 0 && ca.daNop >= ca.daVao) return { ten: 'Xong', tone: 'xanh' }
-    return { ten: ca.daVao > ca.daNop ? 'Còn em đang làm' : 'Hết giờ vào', tone: 'cam' }
-  }
-  return { ten: 'Đang mở', tone: 'tim' }
-}
-
-/** CA NÀY CÒN EM CHƯA NỘP XONG KHÔNG — dùng để cảnh báo trước khi xoá.
- *
- * Xoá ca là xoá MỀM, nhưng máy chủ coi `da_xoa` là KHOÁ (`caDangKhoa_`), nên
- * `nopBai` trả "Ca đã khoá — không lưu thêm được". Nghĩa là xoá một ca đang
- * chạy thì em đang làm dở KHÔNG NỘP ĐƯỢC BÀI. Khôi phục ca lại được, nhưng
- * mấy phút em ngồi bấm nút mà máy báo lỗi thì không lấy lại được.
- *
- * Dùng lại `trangThaiCa` chứ không viết luật thứ hai: hai bản đếm giờ lệch
- * nhau là cảnh báo hiện sai lúc, còn tệ hơn không có. */
-export function caConEmDangLam(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetHanVao' | 'daVao' | 'daNop'>, nowMs: number): boolean {
-  const t = trangThaiCa(ca, nowMs).ten
-  return t === 'Đang mở' || t === 'Còn em đang làm'
-}
 
 function ngayGio(iso: string): string {
   const d = new Date(iso)

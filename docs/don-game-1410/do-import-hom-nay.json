@@ -1,0 +1,217 @@
+{
+  "scope": "Tệp runtime nội bộ đóng tĩnh từ GvHomNayScreen, TypeScript transpile loại import chỉ kiểu, chưa minify/gzip",
+  "before": {
+    "files": 122,
+    "sourceBytes": 1475511
+  },
+  "after": {
+    "files": 72,
+    "sourceBytes": 962868
+  },
+  "removed": [
+    {
+      "file": "src/screens/LichSuCaScreen.tsx",
+      "bytes": 43836
+    },
+    {
+      "file": "src/lib/tong-quan-gv.ts",
+      "bytes": 8344
+    },
+    {
+      "file": "src/lib/nhip-chien-dich.ts",
+      "bytes": 1289
+    },
+    {
+      "file": "src/components/chien-dich/co-hoa2.ts",
+      "bytes": 2813
+    },
+    {
+      "file": "src/lib/em-toan-canh.ts",
+      "bytes": 10744
+    },
+    {
+      "file": "src/screens/lich-su-ca-m3.css",
+      "bytes": 6760
+    },
+    {
+      "file": "src/components/NutDongBoMoiCa.tsx",
+      "bytes": 6516
+    },
+    {
+      "file": "src/lib/exam-sync.ts",
+      "bytes": 11935
+    },
+    {
+      "file": "src/lib/exam-kho-de-import.ts",
+      "bytes": 24623
+    },
+    {
+      "file": "src/lib/cau-hinh-chua.ts",
+      "bytes": 2865
+    },
+    {
+      "file": "src/lib/chu-la-pdf.ts",
+      "bytes": 3500
+    },
+    {
+      "file": "src/lib/hanh-trinh-nhan.ts",
+      "bytes": 1112
+    },
+    {
+      "file": "src/data/examContent.ts",
+      "bytes": 17211
+    },
+    {
+      "file": "src/lib/sua-dang.ts",
+      "bytes": 3635
+    },
+    {
+      "file": "src/lib/tu-vung-dang.ts",
+      "bytes": 11661
+    },
+    {
+      "file": "src/lib/phieu-ca-ca.ts",
+      "bytes": 23525
+    },
+    {
+      "file": "src/lib/classlist-db.ts",
+      "bytes": 2091
+    },
+    {
+      "file": "src/lib/bo-cau-chuan.ts",
+      "bytes": 8794
+    },
+    {
+      "file": "src/lib/bo-cau-tu-bai-lam.ts",
+      "bytes": 4902
+    },
+    {
+      "file": "src/lib/exam-assign.ts",
+      "bytes": 7048
+    },
+    {
+      "file": "src/lib/exam-grade.ts",
+      "bytes": 6931
+    },
+    {
+      "file": "src/lib/link-phieu-ca.ts",
+      "bytes": 4070
+    },
+    {
+      "file": "src/lib/phieu-link.ts",
+      "bytes": 5268
+    },
+    {
+      "file": "src/components/NutPhieuHtml.tsx",
+      "bytes": 7101
+    },
+    {
+      "file": "src/lib/nap-manh.ts",
+      "bytes": 5199
+    },
+    {
+      "file": "src/components/KhungXemPhieu.tsx",
+      "bytes": 15709
+    },
+    {
+      "file": "src/lib/loi-giai-api.ts",
+      "bytes": 11730
+    },
+    {
+      "file": "src/components/m3/khung-xem-phieu.css",
+      "bytes": 1308
+    },
+    {
+      "file": "src/lib/may-yeu.ts",
+      "bytes": 6750
+    },
+    {
+      "file": "src/components/m3/index.ts",
+      "bytes": 2206
+    },
+    {
+      "file": "src/components/m3/m3-tuong-thich.css",
+      "bytes": 31038
+    },
+    {
+      "file": "src/components/m3/m3.css",
+      "bytes": 11547
+    },
+    {
+      "file": "src/components/bang-nhiem-vu/m3-theme.css",
+      "bytes": 6986
+    },
+    {
+      "file": "src/lib/phieu-du-lieu.ts",
+      "bytes": 52099
+    },
+    {
+      "file": "src/lib/chong-gian-lan.ts",
+      "bytes": 9012
+    },
+    {
+      "file": "src/lib/chan-doan-phieu.ts",
+      "bytes": 10329
+    },
+    {
+      "file": "src/lib/chan-doan-cau-hinh.ts",
+      "bytes": 5175
+    },
+    {
+      "file": "src/lib/chan-doan.ts",
+      "bytes": 8124
+    },
+    {
+      "file": "src/lib/phan-cau-len-bang.ts",
+      "bytes": 1494
+    },
+    {
+      "file": "src/lib/rut-de-chua.ts",
+      "bytes": 21242
+    },
+    {
+      "file": "src/lib/loc-sao.ts",
+      "bytes": 3940
+    },
+    {
+      "file": "src/lib/bai-tap-pdf.ts",
+      "bytes": 18552
+    },
+    {
+      "file": "src/lib/goi-len-bang.ts",
+      "bytes": 11102
+    },
+    {
+      "file": "src/lib/loc-cau-rut.ts",
+      "bytes": 8208
+    },
+    {
+      "file": "src/lib/phan-tich-lam-bai.ts",
+      "bytes": 14307
+    },
+    {
+      "file": "src/lib/nhan-xet-theo-ca.ts",
+      "bytes": 9180
+    },
+    {
+      "file": "src/lib/phieu-hang-loat.ts",
+      "bytes": 1296
+    },
+    {
+      "file": "src/lib/chi-tiet-cau.ts",
+      "bytes": 6285
+    },
+    {
+      "file": "src/components/DesignSystem.tsx",
+      "bytes": 10063
+    },
+    {
+      "file": "src/lib/nam-sinh-ca.ts",
+      "bytes": 4470
+    },
+    {
+      "file": "src/components/ChuTheLoc.tsx",
+      "bytes": 907
+    }
+  ]
+}

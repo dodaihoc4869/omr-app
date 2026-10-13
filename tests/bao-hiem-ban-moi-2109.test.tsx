@@ -11,7 +11,6 @@ import { batBaoHiemBanMoi, CHO_BAN_MOI_TU_LEN_MS, epLenBanMoi, GIAN_CACH_KIEM_MS
 import { chuBanApp, datDangLamBai, datDangMoKhoa } from '../src/lib/cap-nhat-app'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({
   ...(await original<any>()),
@@ -391,8 +390,8 @@ describe('precache nhỏ + kho chạy-lúc (vite.config.ts · sw.ts · kiem-sw.m
   const sw = boDong(doc('src/sw.ts'))
   const kiem = doc('scripts/kiem-sw.mjs')
 
-  it('màn thầy, game, máy chiếu, phiếu, phông trùng (ttf/woff), biểu tượng 512 và logo app thầy KHÔNG nằm trong precache', () => {
-    for (const ten of ['GoiLenBangScreen', 'ExamMonitorScreen', 'HocSinhScreen', 'PhanCongScreen', 'ExamSetupScreen', 'ExamHubScreen', 'Game', 'DoanHoTong', 'DaoThanThu', 'html-may-chieu']) expect(vite, ten).toContain(ten)
+  it('màn thầy, máy chiếu, phiếu, phông trùng (ttf/woff), biểu tượng 512 và logo app thầy KHÔNG nằm trong precache', () => {
+    for (const ten of ['GoiLenBangScreen', 'ExamMonitorScreen', 'HocSinhScreen', 'PhanCongScreen', 'ExamSetupScreen', 'ExamHubScreen', 'html-may-chieu']) expect(vite, ten).toContain(ten)
     expect(vite).toContain("'**/html-phieu-*.js'")
     expect(vite).toContain("'**/*-512*.png'")
     expect(vite).toContain("'**/logo-gv-*'")
@@ -477,12 +476,5 @@ describe('số bản ở cuối menu ba chấm', () => {
     // điều khoá vẫn giữ: số bản ở cuối menu, ngay dưới "Đổi số báo danh".
     expect([...menu.querySelectorAll('[role="menuitem"]')].map((x) => x.textContent)).toEqual(['Thông tin và giao diện', 'Đổi số báo danh'])
     expect(menu.lastElementChild!.getAttribute('data-vung')).toBe('ban-app')
-  })
-
-  it('cổng học sinh và phụ huynh dùng CHUNG một DauTrang ⇒ một chỗ sửa (khoá nguồn); chữ tiếng Việt, số có nhãn "Bản app"', () => {
-    const dt = doc('src/components/bang-nhiem-vu/DauTrang.tsx')
-    expect(dt).toContain("import { chuBanApp } from '../../lib/cap-nhat-app'")
-    expect(dt).toContain('<p className="bnv-menu-ban">{chuBanApp()}</p>')
-    expect(doc('src/components/bang-nhiem-vu/bang-nhiem-vu.css')).toMatch(/\.bnv-menu-ban \{[^}]*color: var\(--m3-on-surface-variant\)/)
   })
 })

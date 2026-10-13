@@ -7,14 +7,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
 import GiaoThemChoCon from '../src/components/bang-nhiem-vu/GiaoThemChoCon'
-import * as mucMenuTep from '../src/components/bang-nhiem-vu/muc-menu'
 import { chuGoiGanNhat, chuLuot, chuThanhPhan, docKetQuaGiaoThem, theTuChoi, theXacNhan } from '../src/lib/giao-them-hien-thi'
 import { phGiaoThemApi } from '../src/lib/giao-them-api'
 import { useGiaoThem, type ViewGiaoThem } from '../src/lib/use-giao-them'
 
 configure({ asyncUtilTimeout: 8000 })
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({
   ...(await original<any>()),
@@ -321,13 +319,6 @@ describe('GiaoThemChoCon — màn', () => {
   })
 })
 
-describe('Menu phụ huynh — ĐÃ GỠ (một màn một nút, 21/09)', () => {
-  it('muc-menu không còn xuất hàm menu phụ huynh; menu học sinh giữ nguyên', () => {
-    expect((mucMenuTep as Record<string, unknown>).mucMenuPhuHuynh).toBeUndefined()
-    expect(typeof mucMenuTep.mucMenuHocSinh).toBe('function')
-  })
-})
-
 // ĐÃ GỠ 28/09: describe "Cổng phụ huynh thật — MỘT màn, MỘT nút" (4 test trên ParentPortalScreen). Thầy lệnh 28/09: "app phụ huynh không có giao bài cho con nữa
 // chỉ xem được báo cáo mọi thứ về con" ⇒ cổng phụ huynh không còn nút "Giao thêm bài cho con" và không gọi /ph/giao-them (khoá ở tests/ph-v3-app-2809.test.tsx).
 // Các mảnh còn lại của tệp này (lớp đọc, API, hook, GiaoThemChoCon) vẫn khoá vì mã còn trong kho.
@@ -354,10 +345,6 @@ describe('cổng phụ huynh thật (28/09): KHÔNG còn nút giao bài', () => 
 
 describe('khoá nguồn', () => {
   it('BangNhiemVu: nút CHỈ ở phụ huynh và LUÔN hiện khi có giaoThem (không còn ô cũ); màn phụ huynh truyền SBD cho hook', () => {
-    const b = doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')
-    expect(b).toContain('{laPh && giaoThem && <GiaoThemChoCon v={giaoThem} />}')
-    expect(b).not.toContain('bnv-giao-bai')
-    expect(b).not.toContain('onGiaoHangNgay')
     // 28/09: màn phụ huynh KHÔNG còn nối hook giao thêm (thầy: không giao bài cho con nữa).
     const p = doc('src/screens/ParentPortalScreen.tsx').replace(/\/\/.*$/gm, '')
     expect(p).not.toContain('useGiaoThem')

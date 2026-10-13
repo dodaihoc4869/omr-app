@@ -1,0 +1,134 @@
+{
+  "base": "2ad8bafd",
+  "truoc": {
+    "soModule": 867,
+    "soReachable": 732,
+    "dynamicComputed": [],
+    "targets": [
+      {
+        "tep": "src/screens/TongQuanScreen.tsx",
+        "tonTai": true,
+        "reachable": false,
+        "consumers": []
+      },
+      {
+        "tep": "src/components/chien-dich/GiaoChienDich.tsx",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/screens/ChienDichScreen.tsx",
+          "src/screens/ExamMonitorScreen.tsx"
+        ]
+      },
+      {
+        "tep": "src/components/chien-dich/DsChienDichDaGiao.tsx",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/screens/ChienDichScreen.tsx",
+          "src/screens/TongQuanScreen.tsx"
+        ]
+      },
+      {
+        "tep": "src/components/chien-dich/DongHoSucChua.tsx",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/components/chien-dich/GiaoChienDich.tsx"
+        ]
+      },
+      {
+        "tep": "src/components/chien-dich/NutGiaoTheoBai.tsx",
+        "tonTai": true,
+        "reachable": false,
+        "consumers": []
+      },
+      {
+        "tep": "src/components/chien-dich/SuaChienDich.tsx",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/components/chien-dich/DsChienDichDaGiao.tsx",
+          "src/components/day-hoc/BaiHomNay.tsx"
+        ]
+      },
+      {
+        "tep": "src/components/chien-dich/HopChon.tsx",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/components/chien-dich/SuaChienDich.tsx"
+        ]
+      },
+      {
+        "tep": "src/lib/tom-tat-sua-chien-dich.ts",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/components/chien-dich/SuaChienDich.tsx"
+        ]
+      }
+    ]
+  },
+  "sau": {
+    "soModule": 862,
+    "soReachable": 728,
+    "dynamicComputed": [],
+    "targets": [
+      {
+        "tep": "src/screens/TongQuanScreen.tsx",
+        "tonTai": false,
+        "reachable": false,
+        "consumers": []
+      },
+      {
+        "tep": "src/components/chien-dich/GiaoChienDich.tsx",
+        "tonTai": false,
+        "reachable": false,
+        "consumers": []
+      },
+      {
+        "tep": "src/components/chien-dich/DsChienDichDaGiao.tsx",
+        "tonTai": false,
+        "reachable": false,
+        "consumers": []
+      },
+      {
+        "tep": "src/components/chien-dich/DongHoSucChua.tsx",
+        "tonTai": false,
+        "reachable": false,
+        "consumers": []
+      },
+      {
+        "tep": "src/components/chien-dich/NutGiaoTheoBai.tsx",
+        "tonTai": false,
+        "reachable": false,
+        "consumers": []
+      },
+      {
+        "tep": "src/components/chien-dich/SuaChienDich.tsx",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/components/day-hoc/BaiHomNay.tsx"
+        ]
+      },
+      {
+        "tep": "src/components/chien-dich/HopChon.tsx",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/components/chien-dich/SuaChienDich.tsx"
+        ]
+      },
+      {
+        "tep": "src/lib/tom-tat-sua-chien-dich.ts",
+        "tonTai": true,
+        "reachable": true,
+        "consumers": [
+          "src/components/chien-dich/SuaChienDich.tsx"
+        ]
+      }
+    ]
+  }
+}

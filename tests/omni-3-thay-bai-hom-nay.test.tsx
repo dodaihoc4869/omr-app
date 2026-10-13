@@ -40,6 +40,10 @@ import {
   type ToBai,
 } from '../src/lib/bai-hom-nay'
 import { hienHanNop } from '../src/components/chien-dich/ngay'
+import { theoDoiBaiDangGiao } from '../src/lib/bai-dang-giao-thay-doi'
+
+const baiVuaDoi = vi.fn()
+let boNgheBai: () => void
 
 let soCau = 0
 const cau = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-I-${++soCau}`, text: `Câu ${soCau} của ${maDe}`, choices: ['a', 'b', 'c', 'd'], correct: 'A' }))
@@ -112,6 +116,8 @@ const lenh = (action: string) => goi.mock.calls.filter(([d, b]) => d === '/gv/ba
 
 beforeEach(() => {
   goi.mockReset()
+  baiVuaDoi.mockReset()
+  boNgheBai = theoDoiBaiDangGiao(baiVuaDoi)
   khoGia.loiLan = 0; khoGia.docLan = 0
   co = { bat: true, lop: ['12A1'], sbd: [] }
   xem = XEM
@@ -123,6 +129,7 @@ beforeEach(() => {
 })
 afterEach(() => {
   cleanup()
+  boNgheBai()
   localStorage.clear()
   document.body.innerHTML = ''
 })
@@ -344,6 +351,7 @@ describe('màn: bước Bài hôm nay', () => {
     })
     // Giao xong: nạp lại trạng thái lớp, thẻ xác nhận đóng.
     await waitFor(() => expect(lenh('danh-sach').length).toBeGreaterThanOrEqual(2))
+    expect(baiVuaDoi).toHaveBeenCalledExactlyOnceWith([{ lop: '12A1', khoaBai: 'DH-12-C1-B3', loai: 'tick' }])
     await waitFor(() => expect(document.querySelector('[data-khoi="xac-nhan-tick"]')).toBeNull())
   })
 
@@ -406,10 +414,12 @@ describe('màn: bước Bài hôm nay', () => {
     fireEvent.click(within(hop).getByRole('button', { name: 'Giữ bài' }))
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
     expect(lenh('bo-tick')).toHaveLength(0)
+    expect(baiVuaDoi).not.toHaveBeenCalled()
     fireEvent.click(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Bỏ tick' }))
     hop = await screen.findByRole('alertdialog')
     fireEvent.click(within(hop).getByRole('button', { name: 'Bỏ tick' }))
     await waitFor(() => expect(lenh('bo-tick')).toEqual([{ action: 'bo-tick', lop: '12A1', khoaBai: 'DH-12-C1-B2' }]))
+    await waitFor(() => expect(baiVuaDoi).toHaveBeenCalledExactlyOnceWith([{ lop: '12A1', khoaBai: 'DH-12-C1-B2', loai: 'bo-tick' }]))
   })
 })
 
@@ -625,31 +635,18 @@ describe('bài đứng trước hiện "Đã dạy" (thầy 06/10: "khi tôi ch�
   })
 })
 
-describe('"Giao theo bài" ở mục Chiến dịch luyện — lối vào thứ hai của cùng bước Bài hôm nay', () => {
-  it('OMNI bật ⇒ nút hiện; bấm ⇒ sang Lên bảng và mục ấy mở sẵn thẻ Dạy học (khoá phiên đọc một lần rồi xoá)', async () => {
-    const [{ default: NutGiaoTheoBai }, { useAppStore }, { default: GoiLenBangScreen }, { KHOA_MO_THE_DAY_HOC, docMoTheDayHoc }] = await Promise.all([
-      import('../src/components/chien-dich/NutGiaoTheoBai'),
-      import('../src/store/appStore'),
+describe('lối vào Dạy học qua khoá phiên cũ', () => {
+  it('khoá phiên mở sẵn Dạy học ở Lên bảng, đọc một lần rồi xoá', async () => {
+    const [{ default: GoiLenBangScreen }, { KHOA_MO_THE_DAY_HOC, docMoTheDayHoc }] = await Promise.all([
       import('../src/screens/GoiLenBangScreen'),
       import('../src/lib/bai-hom-nay'),
     ])
-    render(<NutGiaoTheoBai />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Giao theo bài' }))
-    expect(useAppStore.getState().screen).toBe('goilenbang')
-    expect(sessionStorage.getItem(KHOA_MO_THE_DAY_HOC)).toBe('1')
-    cleanup()
+    sessionStorage.setItem(KHOA_MO_THE_DAY_HOC, '1')
     render(<GoiLenBangScreen />)
     expect(screen.getByRole('tab', { name: 'Dạy học' }).getAttribute('aria-selected')).toBe('true')
     expect(await screen.findByRole('heading', { name: 'Bài hôm nay' })).toBeTruthy()
     expect(sessionStorage.getItem(KHOA_MO_THE_DAY_HOC)).toBeNull()
     expect(docMoTheDayHoc()).toBe(false)
-  })
-  it('OMNI tắt ⇒ không có nút (màn như cũ)', async () => {
-    co = { bat: false, lop: [], sbd: [] }
-    const { default: NutGiaoTheoBai } = await import('../src/components/chien-dich/NutGiaoTheoBai')
-    const { container } = render(<NutGiaoTheoBai />)
-    await waitFor(() => expect(goi.mock.calls.some(([d]) => d === '/gv/omni')).toBe(true))
-    expect(container.innerHTML).toBe('')
   })
 })
 

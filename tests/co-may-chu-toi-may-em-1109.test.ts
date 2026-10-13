@@ -43,7 +43,7 @@ const DB = fs.readFileSync(path.join(process.cwd(), 'src/lib/exam-db.ts'), 'utf8
 const CFG = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'public/cau-hinh.json'), 'utf8')) as Record<string, string>
 
 const kho = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn() }))
-vi.mock('idb', () => ({ openDB: async () => kho }))
+vi.mock('idb', () => ({ openDB: async () => ({ ...kho, transaction: (table: string) => ({ store: { get: (key: string) => kho.get(table, key) }, done: Promise.resolve(), abort() {} }) }) }))
 beforeEach(() => {
   vi.resetModules()
   kho.get.mockReset().mockResolvedValue(undefined)

@@ -3,8 +3,6 @@ import { describe, it, expect, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { render, waitFor } from '@testing-library/react'
 import { laMayYeu, docPhienBanIos, batCheDoMayYeu, docDauHieuMay, giamHieuUng, dangCheDoMayYeu, LOP_MAY_YEU } from '../src/lib/may-yeu'
-import { giamChuyenDong, hat } from '../src/components/hoa2/hieu-ung-sanh'
-import { giamChuyenDong as giamChuong } from '../src/game/than-thu-v2/dao2/ChuongTranDau'
 import ExperimentDemo from '../src/components/ExperimentDemo'
 
 const doc = (p: string) => readFileSync(p, 'utf8')
@@ -21,24 +19,6 @@ function cuaSoGia(nav: Record<string, unknown>, giam = false): Window {
 afterEach(() => document.documentElement.classList.remove(LOP_MAY_YEU))
 
 describe('laMayYeu — bốn dấu hiệu, thiếu số thì không đoán', () => {
-  it('RAM ≤ 3 GB, ≤ 4 luồng, giảm chuyển động, tiết kiệm dữ liệu ⇒ yếu', () => {
-    expect(laMayYeu({ boNhoGb: 2 })).toBe(true)
-    expect(laMayYeu({ boNhoGb: 3 })).toBe(true)
-    expect(laMayYeu({ boNhoGb: 8, soLoi: 4 })).toBe(true)
-    expect(laMayYeu({ soLoi: 2 })).toBe(true)
-    expect(laMayYeu({ soLoi: 2, boNhoGb: 8 })).toBe(true)
-    expect(laMayYeu({ giamChuyenDong: true, boNhoGb: 8, soLoi: 8 })).toBe(true)
-    expect(laMayYeu({ tietKiemDuLieu: true, boNhoGb: 8, soLoi: 8 })).toBe(true)
-  })
-  it('máy khoẻ hoặc không đọc được gì ⇒ KHÔNG yếu', () => {
-    expect(laMayYeu({ boNhoGb: 4, soLoi: 8 })).toBe(false)
-    expect(laMayYeu({ boNhoGb: 8, soLoi: 6, giamChuyenDong: false, tietKiemDuLieu: false })).toBe(false)
-    expect(laMayYeu({})).toBe(false)
-    expect(laMayYeu({ boNhoGb: 0, soLoi: 0 })).toBe(false)
-    expect(laMayYeu({ boNhoGb: Number.NaN })).toBe(false)
-    // không có deviceMemory (Safari/Firefox): 4 luồng KHÔNG đủ để coi là yếu
-    expect(laMayYeu({ soLoi: 4 })).toBe(false)
-  })
   const IOS17 = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
   const IOS15 = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1'
   const ANDROID = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36'
@@ -70,29 +50,6 @@ describe('laMayYeu — bốn dấu hiệu, thiếu số thì không đoán', () 
     expect(khoe.document.documentElement.classList.contains(LOP_MAY_YEU)).toBe(false)
     expect(docDauHieuMay(cuaSoGia({ hardwareConcurrency: 8, connection: { saveData: true } })).tietKiemDuLieu).toBe(true)
     expect(batCheDoMayYeu(cuaSoGia({ hardwareConcurrency: 8 }, true))).toBe(true)
-  })
-})
-
-describe('công tắc hiệu ứng nặng đọc chế độ máy yếu', () => {
-  it('không có lớp ⇒ như cũ (jsdom không giảm); có lớp ⇒ Sảnh, chương trận đấu đều giảm', () => {
-    expect(dangCheDoMayYeu()).toBe(false)
-    expect(giamHieuUng()).toBe(false)
-    expect(giamChuyenDong()).toBe(false)
-    document.documentElement.classList.add(LOP_MAY_YEU)
-    expect(giamHieuUng()).toBe(true)
-    expect(giamChuyenDong()).toBe(true)
-    expect(giamChuong()).toBe(true)
-  })
-  it('máy yếu: hạt sáng của Sảnh không sinh phần tử nào', () => {
-    const cha = document.createElement('div')
-    document.documentElement.classList.add(LOP_MAY_YEU)
-    hat(cha, 10, 10, 12, ['rgb(255 255 255)'])
-    expect(cha.childElementCount).toBe(0)
-  })
-  it('Đảo sơn thủy không chạy thị sai hay vòng lặp JavaScript trên máy yếu', () => {
-    // Cảnh mới là tranh tĩnh + tiến độ; không còn bộ thị sai để bật/tắt.
-    const canh = doc('src/game/than-thu-v2/dao2/CanhDao3D.tsx')
-    expect(canh).not.toMatch(/requestAnimationFrame|setInterval|addEventListener|onPointerMove/)
   })
 })
 

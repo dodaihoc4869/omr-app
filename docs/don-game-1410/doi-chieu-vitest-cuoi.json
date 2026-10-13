@@ -1,0 +1,20 @@
+{
+  "nen": "19840386 (runtime/test bang main58d34a69)",
+  "runtime": "3148468b",
+  "head_full": "708ead01",
+  "baseline": {
+    "numPassedTests": 15453,
+    "numFailedTests": 125,
+    "numPendingTests": 28,
+    "numFailedTestSuites": 134
+  },
+  "branch": {
+    "numPassedTests": 14284,
+    "numFailedTests": 120,
+    "numPendingTests": 27,
+    "numFailedTestSuites": 126
+  },
+  "newFailures": [],
+  "newFailedFiles": [],
+  "newEmptyFailedSuites": []
+}

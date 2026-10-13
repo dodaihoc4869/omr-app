@@ -1,0 +1,12 @@
+[
+  {
+    "scope": "Mom/card AST+hash",
+    "unchanged": true,
+    "sha256": "f203b1678407e231d71338dca3c51cdc704cf63c60317e32ccf317a59c7ce327"
+  },
+  {
+    "scope": "Whitelist D208/hash + legacy29 + authorized3",
+    "unchanged": true,
+    "sha256": "330733e6bc4bef5547f64d3875779bf57f3b6f4989d003f7c0ab803e2fcc9e62"
+  }
+]

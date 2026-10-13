@@ -1,6 +1,5 @@
 // GỌI LỆNH `/gv/chien-dich` CỦA MÁY CHỦ (Game Hóa 2.0 — hợp đồng `docs/hop-dong-game-hoa-2.md` mục B).
-// Một cửa duy nhất cho mọi màn chiến dịch của app thầy: công tắc, giao chiến dịch (đồng hồ sức chứa), bảng chiến dịch,
-// buổi chữa, "Chữa xong". Không ném lỗi — trả `KetQuaLenh` với MỘT câu nói thật (màn hiện đúng câu ấy).
+// Một cửa duy nhất cho các luồng học đang dùng: công tắc, bảng Hành trình, buổi chữa, "Chữa xong". Không ném lỗi — trả `KetQuaLenh` với MỘT câu nói thật (màn hiện đúng câu ấy).
 import { goiLenh, type KetQuaLenh } from '../../lib/goi-lenh-thay'
 
 export const DUONG_CHIEN_DICH = '/gv/chien-dich'
@@ -66,54 +65,6 @@ export interface ThongKeChienDich {
 export interface DanhSachChienDich {
   homNay: string
   chienDich: ChienDichTom[]
-}
-
-export type MucSucChua = 'xanh' | 'vang' | 'do'
-
-export interface SucChua {
-  soCau: number
-  /** Thể lực/ngày nhỏ nhất bảo đảm mục tiêu (em giữa lớp ≤ 70%, không em nào quá tải) — nút gạt "Tự động". Máy chủ cũ không có. */
-  theLucDeXuat?: number
-  /** Số câu dùng được MỖI tờ góp vào (đã bỏ trùng, tự luận, chưa duyệt) — cộng lại = soCau. Máy chủ cũ không có. */
-  soCauTheoTo?: Record<string, number>
-  /** Số câu theo mức độ (Nhận biết / Thông hiểu / Vận dụng…) — cộng lại = soCau. Máy chủ cũ không có. */
-  soCauTheoMucDo?: Record<string, number>
-  soEm: number
-  /** Số ngày còn lại tính cả hôm nay. */
-  D: number
-  /** D × thể lực/ngày (lượt). */
-  sucChua: number
-  /** Số lượt em ở giữa lớp cần. */
-  khoiLuongTrungVi: number
-  /** Lượt của em ở giữa lớp = câu mới × 2 + lượt ôn (null khi không có em đúng bằng trung vị; máy chủ cũ không có). */
-  tachGiua?: { cauMoi: number; luotOn: number; /** Lượt nợ cũ của em giữa lớp (Sổ nợ 29/09; máy chủ cũ không có). */ luotNoCu?: number } | null
-  tiLe: number
-  muc: MucSucChua
-  soEmQuaTai: number
-  /** Sổ nợ 29/09: em có nợ cũ cần nhiều ngày để trả hết (máy chủ cũ không có). */
-  noCu?: DongNoCu[]
-  /** Rải đều câu mới (30/09): cờ đã gửi lên + ≈ số câu mới mỗi ngày của em giữa lớp = ceil(câu mới / (D − 3)); máy chủ cũ không có. */
-  raiDeu?: boolean
-  cauMoiMoiNgay?: number | null
-  goiY: { rutCon: { soCau: number; tiLe: number } | null; luiHan: { hanNop: string; tiLe: number } | null } | null
-}
-
-/** Đầu vào chung của `suc-chua` và `tao`. */
-export interface DauVaoGiao {
-  ten?: string
-  lop?: string
-  sbd?: string[]
-  maDe: string[]
-  hanNop: string
-  /** Ngày bắt đầu `YYYY-MM-DD` (thầy 28/09). Vắng ⇒ bắt đầu ngay lúc giao. */
-  batDau?: string
-  theLucNgay?: number
-  huyetChien?: boolean
-  /** Rải đều câu mới theo ngày (thầy 30/09). Vắng ⇒ máy chủ coi là BẬT. */
-  raiDeu?: boolean
-  maCa?: string
-  /** Trường cũ của máy chủ (rút bớt số câu) — giao diện KHÔNG còn nút này (thầy 28/09); giữ kiểu để khớp hợp đồng API. */
-  rutCon?: number
 }
 
 export interface EmBang {
@@ -251,24 +202,8 @@ export const luuCo = async (co: CoHoa2): Promise<KetQuaLenh<CoHoa2>> => {
   return { ok: true, du: r.du.co ?? co }
 }
 export const danhSach = () => goiChienDich<DanhSachChienDich>('danh-sach')
-/** Danh sách kèm số liệu lớp từng chiến dịch (bảng Chiến dịch đã giao). */
-export const danhSachThongKe = () => goiChienDich<DanhSachChienDich>('danh-sach', { thongKe: true })
 /** Danh sách học sinh máy chủ (sbd, họ tên, lớp) cho bộ chọn khối → lớp → em. */
 export const docDsEm = () => goiChienDich<{ em: { sbd: string; hoTen: string; lop: string; khoi?: string; tenLop?: string }[] }>('ds-em', {})
-export const tinhSucChua = (dv: DauVaoGiao) => goiChienDich<SucChua>('suc-chua', { ...dv })
-export const taoChienDich = (dv: DauVaoGiao & { ten: string }) => goiChienDich<{ id: string; soCau: number; soEm: number }>('tao', { ...dv })
-/** Kết quả thu hồi máy chủ báo khi HUỶ (thầy 06/10: huỷ = thu hồi hết phần đã phân): số em của chiến dịch, số lượt game đang mở đã thu hồi, bài tích gắn chiến dịch đã nhả chưa. */
-export interface KetQuaThuHoi { soEm: number; soLuotDangMo: number; nhaTick: boolean }
-export const huyChienDich = (id: string) => goiChienDich<{ ok: true; thuHoi?: KetQuaThuHoi }>('huy', { id })
-/** Lời báo sau khi HUỶ chiến dịch: nói rõ câu chưa làm đã thu hồi khỏi bao nhiêu em (có nhãn); bài tích gắn chiến dịch được nhả thì báo bài không còn tính là đã dạy. Máy chủ cũ không trả `thuHoi` ⇒ lời cũ. */
-export function loiBaoDaHuy(thuHoi?: Partial<KetQuaThuHoi> | null): string {
-  const soEm = Math.max(0, Math.floor(Number(thuHoi?.soEm) || 0))
-  if (!soEm) return 'Đã huỷ chiến dịch'
-  return `Đã huỷ chiến dịch — câu chưa làm đã thu hồi khỏi ${soEm} em${thuHoi?.nhaTick ? '; bài này không còn tính là đã dạy' : ''}`
-}
-/** Công tắc rải đều câu mới trên chiến dịch đang chạy (thầy 30/09) — có hiệu lực từ kế hoạch ngày kế tiếp. */
-export const doiRaiDeu = (id: string, bat: boolean) => goiChienDich<{ id: string; raiDeu: boolean }>('rai-deu', { id, bat })
-export const dongChienDich = (id: string) => goiChienDich<{ ok: true }>('dong', { id })
 export const docBang = (id: string) => goiChienDich<BangChienDich>('bang', { id })
 /** Chỉ xếp buổi sau khi thầy đã điểm danh; danh sách có mặt được gửi tường minh lên máy chủ. */
 export const docBuoiChua = (id: string, coMat: string[]) => goiChienDich<BuoiChuaMayChu>('buoi-chua', { id, coMat })

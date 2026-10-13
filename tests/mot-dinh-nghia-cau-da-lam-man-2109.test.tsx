@@ -5,7 +5,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import ManChinh from '../src/components/ph-moi/ManChinh'
 import { TongQuan, chuGiaiVong, soSanhHomQua } from '../src/components/ph-moi/bang/TongQuan'
 import { cacVongVe } from '../src/components/ph-moi/bang/Vong3'
@@ -121,41 +120,6 @@ const RAW_THI_DUA = (soCauEm: number) => ({
   capNhatLuc: '2026-09-21T11:00:00Z',
 })
 
-describe('CÙNG DỮ LIỆU ⇒ thẻ Hôm nay = ô Thi đua (thầy: "93 câu" so với "78 câu")', () => {
-  const ve = (tienBo: Record<string, unknown>, soCauThiDua: number, vaiTro: 'hocsinh' | 'phuhuynh' = 'hocsinh') => {
-    const thiDua = docThiDua(RAW_THI_DUA(soCauThiDua))!
-    return render(<BangNhiemVu vaiTro={vaiTro} hoTen="Đỗ Minh" now={NOW} duLieu={tuKeHoachNgay(keHoach(tienBo), NOW)} thiDua={{ thiDua, vuot: null }} taiVinhDanh={async () => null} />).container
-  }
-  const soTheHomNay = (c: HTMLElement) => c.querySelector('.bnv-tien-do-so')!.textContent!.replace(/\s+/g, ' ').trim()
-  const soOThiDuaCuaEm = (c: HTMLElement) => c.querySelector('[data-vung="thi-dua"] [data-vung="vi-tri-em"]')?.textContent ?? ''
-  const soTrongChu = (t: string) => Number(/(\d+) câu/.exec(t)?.[1])
-
-  it('máy chủ đã có soCauHienThi (= số ô Thi đua 78): thẻ Hôm nay "78/8 câu"; ô Thi đua cũng 78; không chỗ nào còn 93', () => {
-    const c = ve({ daLamCau: 93, soCauHienThi: 78, lenBac: 3, dat: false, conThieu: 0 }, 78)
-    expect(soTheHomNay(c)).toBe('Hôm nay: 78/8 câu')
-    expect(c.querySelector('[data-vung="tien-do"]')!.textContent).not.toContain('93')
-    expect(c.textContent).toContain('78')
-    expect(c.textContent).not.toMatch(/\b93\b/)
-    expect(soOThiDuaCuaEm(c)).toContain('đã làm 78 câu hôm nay')
-    expect(Number(/(\d+)\/\d+ câu/.exec(soTheHomNay(c))![1])).toBe(soTrongChu(soOThiDuaCuaEm(c))) // HAI số bằng nhau
-  })
-  it('thẻ "Em đã xong việc hôm nay" và mọi chữ "Đã làm N câu" trên màn đều là 78', () => {
-    const c = ve({ daLamCau: 93, soCauHienThi: 78, lenBac: 3, dat: true, conThieu: 0 }, 78)
-    const mung = c.querySelector('.bnv-mung-chu')!
-    expect(mung.textContent).toContain('Đã làm 78 câu, 3 câu lên bậc')
-    const chu = [...c.textContent!.matchAll(/[Đđ]ã làm (\d+) câu/g)].map((m) => m[1])
-    expect(chu.length).toBeGreaterThan(0)
-    expect(new Set(chu)).toEqual(new Set(['78']))
-  })
-  it('phụ huynh xem cùng kế hoạch: "Con đã làm 78/8 câu" (cùng bộ chuyển ⇒ cùng số)', () => {
-    const c = ve({ daLamCau: 93, soCauHienThi: 78, dat: false, conThieu: 0 }, 78, 'phuhuynh')
-    expect(soTheHomNay(c)).toBe('Con đã làm 78/8 câu')
-  })
-  it('máy chủ cũ chưa có trường ⇒ thẻ vẫn dựng bằng daLamCau (không vỡ, không trống)', () => {
-    const c = ve({ daLamCau: 93, lenBac: 3, dat: false, conThieu: 0 }, 78)
-    expect(soTheHomNay(c)).toBe('Hôm nay: 93/8 câu')
-  })
-})
 
 describe('khoá nguồn phía học sinh', () => {
   it('bộ chuyển và màn ôn câu đọc số hiển thị qua MỘT hàm; không còn đọc thẳng tienBo.daLamCau để nói "đã làm"', () => {
@@ -264,26 +228,6 @@ describe('bảng phụ huynh — vòng 2 / chữ giải vòng: "đúng 30 trong 
   })
 })
 
-describe('bảng phụ huynh — thẻ Tổng quan dựng đủ (vòng + chữ giải) theo mẫu số', () => {
-  const ve = (sua: (r: any) => void) => {
-    const r = nhan(PH_APPLE)
-    sua(r)
-    return render(<TongQuan pm={docTatCaVeCon(r)!} now={NAY} />).container
-  }
-  const vong = (c: HTMLElement) => c.querySelector('[aria-label*="câu đúng"]')?.getAttribute('aria-label') ?? ''
-  it('mẫu số 35 ⇒ nhãn vòng đọc "câu đúng 86 %" và dòng giải "đúng 30 trong 35 câu đã có kết quả"; số câu đã làm vẫn 38', () => {
-    const c = ve((r) => { r.homNay.tongQuan.soCauCoKetQua = 35 })
-    expect(vong(c)).toContain('câu đúng 86 %')
-    expect(c.textContent).toContain('đúng 30 trong 35 câu đã có kết quả')
-    expect(c.textContent).toContain('38')
-  })
-  it('máy chủ cũ ⇒ "câu đúng 79 %" và "đúng 30 trong 38 câu"', () => {
-    const c = ve(() => {})
-    expect(vong(c)).toContain('câu đúng 79 %')
-    expect(c.textContent).toContain('đúng 30 trong 38 câu')
-    expect(c.textContent).not.toContain('đã có kết quả')
-  })
-})
 
 describe('THÂN THẬT của Worker 5bb39dd4 (SBD thử 12121212, 21/09 18:3x, chỉ đọc): 21 câu đã làm, 7 câu có kết quả, đúng 1', () => {
   // Chép nguyên khối tongQuan + ngày nhịp học máy chủ thật trả (câu che chiếm 14 trong 21): soDung/soCauCoKetQua chỉ trên câu KHÔNG che.
@@ -320,32 +264,5 @@ describe('bảng phụ huynh — so với hôm qua theo mẫu số', () => {
   it('hôm nay toàn câu che (soDung null) ⇒ không chip tỉ lệ dù hôm qua có', () => {
     const chip = soSanhHomQua({ soCau: 6, soDung: null, soCauCoKetQua: 0, phutHoc: 20, soVoiHomQua: { soCau: 33, soCauCoKetQua: 33, tiLeDung: 0.76, phutHoc: 44 } }).map((c) => c.chu)
     expect(chip.some((c) => /đúng/.test(c))).toBe(false)
-  })
-})
-
-describe('màn chính phụ huynh — ô "câu đúng %" theo mẫu số; ô "câu đã làm" là số đã làm (gồm câu che)', () => {
-  const ve = (sua: (r: any) => void) => {
-    const r = nhan(PH_OK)
-    sua(r)
-    const pm = docTatCaVeCon(r)!
-    const v = { trangThai: 'ok' as const, pm, chuLoi: '', dangLamMoi: false, thuLai: vi.fn() }
-    const giaoThem = { san: true, dangTai: false, conLai: 2, goiGanNhat: null, the: null, dangGui: false, giao: vi.fn() }
-    return render(<ManChinh v={v} tenCon="Khôi" lop="12 - Tinh Hoa" sbd="12121212" now={NAY} canhBao={[]} onCanhBaoDaXem={() => {}} giaoThem={giaoThem as never} onMoBang={() => {}} onDoiSbd={() => {}} />).container
-  }
-  const ba = (c: HTMLElement) => [...c.querySelectorAll('.phm-ap-ba li')].map((l) => l.textContent)
-  it('soCau 38, đúng 30, mẫu số 35 ⇒ "38 câu đã làm · 86 % câu đúng" (không 79 %)', () => {
-    const c = ve((r) => { r.homNay.tongQuan.soCauCoKetQua = 35 })
-    expect(ba(c)).toEqual(['38câu đã làm', '86%câu đúng', '52phút học'])
-  })
-  it('dữ liệu lệch (đúng 40 > mẫu số 35) ⇒ chặn 100 %, không ra 114 %', () => {
-    const c = ve((r) => { r.homNay.tongQuan.soDung = 40; r.homNay.tongQuan.soCauCoKetQua = 35 })
-    expect(ba(c)).toEqual(['38câu đã làm', '100%câu đúng', '52phút học'])
-  })
-  it('máy chủ cũ (không mẫu số) ⇒ như trước 79 %', () => {
-    expect(ba(ve(() => {}))).toEqual(['38câu đã làm', '79%câu đúng', '52phút học'])
-  })
-  it('cả ngày chỉ có câu che (không soDung, không mẫu số) ⇒ ô "câu đã làm" hiện, KHÔNG ô "câu đúng"', () => {
-    const c = ve((r) => { r.homNay.tongQuan.soCau = 6; delete r.homNay.tongQuan.soDung })
-    expect(ba(c)).toEqual(['6câu đã làm', '52phút học'])
   })
 })

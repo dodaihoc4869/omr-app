@@ -1,0 +1,27 @@
+{
+  "runtime": "3148468b",
+  "reviewer": "ph_perf_1410, worktree độc lập",
+  "phat_hien": "Upgrade đã bắt đầu trước deadline nhưng chưa commit: thiếu abort active có thể commit migration muộn",
+  "sua": "0f4f487d→3148468b",
+  "doc_lap_upgrade": {
+    "passed": 3,
+    "failed": 0,
+    "cases": [
+      "active trước hạn abort1/rollback nháp/close late open",
+      "bắt đầu sau hạn abort trước mutation",
+      "done trước hạn không abort lại dù open thành công tới muộn"
+    ]
+  },
+  "lien_quan_kho_man_goi_de": {
+    "passed": 15,
+    "failed": 0
+  },
+  "doc_lap_nop_hai_lan": {
+    "passed": 1,
+    "failed": 0,
+    "snapshot": 1,
+    "submit": 1,
+    "submittedAt": "giữ nguyên"
+  },
+  "gioi_han": "Dữ liệu giả, test+đọc các nhánh chỉ định; không xác minh mọi dòng/mọi app, Safari hoặc D1 production"
+}

@@ -8,18 +8,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/components/KhoiCauSai', () => ({ LoiGiaiCauSai: () => <p>Lời giải từ kho</p> }))
-vi.mock('../src/game/than-thu-v2/battle-audio', () => ({ unlockBattleAudio: vi.fn(), playBattleSound: vi.fn() }))
 // Game.tsx: bắt PROP `call` mà Game truyền cho ba màn con để thử đúng cổng thật (không dựng cả game).
 const bat = vi.hoisted(() => ({ dao: null as null | ((a: string, d?: Record<string, unknown>) => Promise<any>), doan: null as null | ((a: string, d?: Record<string, unknown>) => Promise<any>), voDai: null as null | ((a: string, d?: Record<string, unknown>) => Promise<any>) }))
-vi.mock('../src/game/than-thu-v2/dao/DaoThanThu', () => ({ default: (p: any) => { bat.dao = p.call; return <div data-testid="vo-dao" /> } }))
-vi.mock('../src/game/than-thu-v2/DoanHoTong', () => ({ default: (p: any) => { bat.doan = p.call; return <div data-testid="doan-that" /> } }))
-vi.mock('../src/game/than-thu-v2/EscortRoom', () => ({ default: (p: any) => { bat.voDai = p.call; return <div data-testid="vo-dai" /> } }))
-vi.mock('../src/game/than-thu-v2/ProgressChart', () => ({ default: () => null }))
-vi.mock('../src/game/than-thu-v2/LearningBattle', () => ({ default: () => null, SpellPreview: () => null }))
-vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => null }))
-vi.mock('../src/game/than-thu-v2/SpiritArt', () => ({ default: () => null }))
-vi.mock('../src/game/than-thu-v2/ImmortalShield', () => ({ default: () => null }))
-import Game from '../src/game/than-thu-v2/Game'
 import { chanCauTuLuan, chanPhanHoiCau, choPhepCauChoEm, quenDaBao } from '../src/lib/cau-tu-luan-may-hs'
 import { taiCauTheoQid } from '../src/components/bang-nhiem-vu/cau-on-api'
 import { hopLeDeRut } from '../src/lib/loc-cau-rut'
@@ -100,47 +90,6 @@ describe('chanCauTuLuan — bộ lọc cuối', () => {
   })
 })
 
-describe('Game.tsx — cổng `request` chung cho Đảo thần thú, Đoàn Hộ Tống, Võ đài', () => {
-  const THU_BAY = Date.parse('2026-09-26T09:00:00+07:00') // Võ đài mở thứ Bảy
-  function mayChu(doanMo: boolean) {
-    const hoSo = { pet: 'lua_phuong', choice: false, cap: 5, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null }
-    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-      const lenh = String(url).split('/game-v2/')[1]
-      const them = lenh === 'start' ? { id: 's1', questions: [I_OK, SACCA, II_OK, NHAN_TL, III_OK] } : lenh === 'resume' ? { id: 's0', mode: 'adventure', questions: [MA_TL, I_THIEU], answered: [] } : {}
-      return { json: async () => ({ ok: true, profile: hoSo, revision: 1, tasks: [], suggestions: [], doanMo, ...them }) }
-    }))
-  }
-  beforeEach(() => { sessionStorage.clear(); localStorage.clear(); bat.dao = bat.doan = bat.voDai = null })
-
-  it('ĐẢO: `start` chỉ còn câu rút được, câu saccharose không tới màn; `resume` toàn câu tự luận ⇒ không còn câu nào', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(THU_BAY); mayChu(false)
-    render(<Game sbd="S1" token="t" onDong={() => {}} />)
-    await screen.findByTestId('vo-dao')
-    const s = await act(async () => bat.dao!('start', { mode: 'adventure' }))
-    expect(s.questions.map((c: { qid: string }) => c.qid)).toEqual([I_OK.qid, II_OK.qid, III_OK.qid])
-    expect(s.id).toBe('s1')
-    const cu = await act(async () => bat.dao!('resume'))
-    expect(cu.questions).toEqual([])
-  })
-  it('VÕ ĐÀI: cùng cổng, `start` mode arena cũng được lọc', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(THU_BAY); mayChu(false)
-    render(<Game sbd="S1" token="t" onDong={() => {}} />)
-    await waitFor(() => expect(bat.voDai).not.toBeNull())
-    const s = await act(async () => bat.voDai!('start', { mode: 'arena' }))
-    expect(s.questions.map((c: { qid: string }) => c.qid)).toEqual([I_OK.qid, II_OK.qid, III_OK.qid])
-  })
-  it('ĐOÀN: lệnh của Đoàn đi cùng cổng; phản hồi không có `questions` (gói doan) đi qua nguyên vẹn', async () => {
-    mayChu(true)
-    render(<Game sbd="S1" token="t" manDau="doan" onDong={() => {}} />)
-    await screen.findByTestId('doan-that')
-    const s = await act(async () => bat.doan!('start', { mode: 'adventure' }))
-    expect(s.questions.map((c: { qid: string }) => c.qid)).toEqual([I_OK.qid, II_OK.qid, III_OK.qid])
-    const khac = await act(async () => bat.doan!('doan-xem'))
-    expect(khac.questions).toBeUndefined()
-    expect(khac.doanMo).toBe(true)
-  })
-})
-
 describe('Ôn lại — POST /hs/cau-theo-qid', () => {
   it('câu tự luận máy chủ lỡ trả về KHÔNG vào màn ôn; câu tốt giữ thứ tự', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, cau: [I_OK, SACCA, II_OK, III_OK, MA_TL], khongCo: [] }) })))
@@ -148,33 +97,6 @@ describe('Ôn lại — POST /hs/cau-theo-qid', () => {
     expect(r.ok).toBe(true)
     if (r.ok) expect(r.cau.map((c) => c.qid)).toEqual([I_OK.qid, II_OK.qid, III_OK.qid])
     expect(canhBao).toHaveBeenCalled()
-  })
-})
-
-describe('Phiếu / rút đề — hopLeDeRut cùng dùng định nghĩa chung', () => {
-  it('câu gắn nhãn tự luận, mã -TL, phần I thiếu phương án: KHÔNG hợp lệ để rút (dù bộ lọc cũ cho qua)', () => {
-    const kho = (q: Record<string, unknown>) => ({ phan: String(q.phan), maDe: String(q.maDe), q })
-    expect(hopLeDeRut(kho({ phan: 'I', maDe: 'DH-12-C2-B6-TN', text: 'Este nào?', pa: ['a', 'b', 'c', 'd'], dap_an: 'A' }))).toBe(true)
-    expect(hopLeDeRut(kho({ phan: 'I', maDe: 'DH-12-C2-B6-TN', text: 'Este nào?', pa: ['a', 'b'], dap_an: 'A' }))).toBe(false) // thiếu phương án
-    expect(hopLeDeRut(kho({ phan: 'III', maDe: 'DH-12-C2-B6-TN', text: 'Tính m (gam).', dap_an: '12,5', kieu: 'tu_luan' }))).toBe(false) // nhãn
-    expect(hopLeDeRut({ phan: 'I', maDe: 'DH-12-C2-B6-TL', dapAn: 'A', text: 'Este nào?', choices: ['a', 'b', 'c', 'd'] })).toBe(false) // mã -TL
-  })
-  it('phần III hỏi mở ("Theo em… phương pháp nào") chưa có đáp án ⇒ bị loại; câu tính toán bình thường vẫn rút được', () => {
-    expect(hopLeDeRut({ phan: 'III', maDe: 'DH-12-C2-B6-TN', text: 'Theo em, có thể dùng phương pháp nào để tách saccharose?', q: { correct: 'kết tinh lại' } })).toBe(false)
-    expect(hopLeDeRut({ phan: 'III', maDe: 'DH-12-C2-B6-TN', dapAn: '2', text: 'Tính khối lượng saccharose (gam).' })).toBe(true)
-  })
-  it('các trường đứng NGOÀI `q` (phan, maDe, đáp án) cũng được tính khi `q` không mang chúng', () => {
-    const q4 = { pa: ['a', 'b', 'c', 'd'] }
-    expect(hopLeDeRut({ phan: 'I', maDe: 'DH-12-C2-B6-TN', q: { pa: ['a', 'b'], text: 'Este nào?' } })).toBe(false) // phan ở ngoài ⇒ luật phần I thiếu phương án áp được
-    expect(hopLeDeRut({ phan: 'I', maDe: 'DH-12-C2-B6-TL', q: { ...q4, text: 'Este nào?' } })).toBe(false) // maDe ở ngoài mang -TL
-    expect(hopLeDeRut({ phan: 'II', maDe: 'DH-12-C2-B6-TN', dapAn: 'DS', q: { ideas: ['một', 'hai', 'ba', 'bốn'], text: 'Xét đúng sai:' } })).toBe(false) // đáp án ở ngoài không đủ 4 ý Đ/S
-    expect(hopLeDeRut({ phan: 'II', maDe: 'DH-12-C2-B6-TN', dapAn: 'DSDS', q: { ideas: ['một', 'hai', 'ba', 'bốn'], text: 'Xét đúng sai:' } })).toBe(true)
-  })
-  it('đáp án RỖNG đứng ngoài `q` là "chưa biết", không phải "không có đáp án" ⇒ không kết tội', () => {
-    expect(hopLeDeRut({ phan: 'I', maDe: 'DH-12-C2-B6-TN', dapAn: '', text: 'Este nào?', q: { pa: ['a', 'b', 'c', 'd'] } })).toBe(true)
-  })
-  it('khuôn thiếu trường đáp án (bảng câu sai của em) KHÔNG bị kết tội vì thiếu đáp án', () => {
-    expect(hopLeDeRut({ phan: 'I', maDe: 'DH-12-C2-B6-TN', text: 'Este nào?', choices: ['a', 'b', 'c', 'd'] })).toBe(true)
   })
 })
 

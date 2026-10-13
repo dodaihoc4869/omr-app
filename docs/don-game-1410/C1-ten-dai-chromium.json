@@ -1,0 +1,133 @@
+{
+  "component": "HocTapHomNay",
+  "chromium": "/usr/bin/chromium",
+  "fixture": "TênChuyênĐềHoáHọcKhôngNgắtDòng lặp8 lần ở tên và lớp; source/bộ assert từ kiem-tran-giao-dien-2309, chỉ chọn kindhs để kiểm vùng CSS",
+  "before": {
+    "label": "hs 390px 100% light",
+    "scroll": 3567,
+    "bad": [
+      "chữ:  · TênChuyênĐềHoáHọcKhôngNgắtD",
+      "chữ: Chào TênChuyênĐềHoáHọcKhôngNgắ"
+    ]
+  },
+  "after": [
+    {
+      "label": "hs 320px 100% light",
+      "scroll": 320,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 390px 100% light",
+      "scroll": 390,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 768px 100% light",
+      "scroll": 768,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 1280px 100% light",
+      "scroll": 1280,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 320px 115% light",
+      "scroll": 320,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 390px 115% light",
+      "scroll": 390,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 768px 115% light",
+      "scroll": 768,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 1280px 115% light",
+      "scroll": 1280,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 320px 100% dark",
+      "scroll": 320,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 390px 100% dark",
+      "scroll": 390,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 768px 100% dark",
+      "scroll": 768,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 1280px 100% dark",
+      "scroll": 1280,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 320px 115% dark",
+      "scroll": 320,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 390px 115% dark",
+      "scroll": 390,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 768px 115% dark",
+      "scroll": 768,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    },
+    {
+      "label": "hs 1280px 115% dark",
+      "scroll": 1280,
+      "bad": [],
+      "titleChars": 245,
+      "titleGiữNguyên": true
+    }
+  ],
+  "passed": 16,
+  "phuDe": "giữ nguyên245ký tự tiêu đề, không overflow:hidden/cắt chữ; không đổi màu/phông/nội dung",
+  "anh": {
+    "before": "/tmp/c1-ten-before/ten-dai-truoc.jpg",
+    "after": "/tmp/c1-ten-after/ten-dai-sau.jpg"
+  }
+}

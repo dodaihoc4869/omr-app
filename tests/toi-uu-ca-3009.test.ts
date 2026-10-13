@@ -1,4 +1,4 @@
-import { xoaDemPhongCho } from '../server/src/phong-cho-dong-thoi'
+import { HAN_PHONG_CHO_MS, xoaDemPhongCho } from '../server/src/phong-cho-dong-thoi'
 // @vitest-environment node
 // TỐI ƯU CA KIỂM TRA 30/09 (docs/do-toi-uu-ca-3009.md) — chốt BẤT BIẾN của đường nóng sau khi gộp vòng D1 + đệm isolate:
 //   · số vòng đi-về D1 của /vao-thi (2), /nop (1; ca "chỉ nộp phút cuối" 2), /phong-cho, /de/ (0 lượt R2 khi đệm còn đúng phiên);
@@ -7,7 +7,7 @@ import { xoaDemPhongCho } from '../server/src/phong-cho-dong-thoi'
 //   · luật "chỉ nộp trong 1 phút cuối" y như cũ; nộp lại không ghi đè; không mất đáp án đã lưu;
 //   · CHẤM Y HỆT: điểm tính từ bài đã cất bằng `gradeFromKeyBank` trùng điểm tính từ bài máy em gửi; `/cham-diem` gộp batch cho ra bảng
 //     tiến độ đúng như vòng lặp cũ (mỗi em: tien_do_hs = tổng tien_do_ca theo chuyên đề).
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import worker, { locGoiDeRiengChoEm } from '../server/src/index'
 import { taoD1That } from './_d1-that'
 import { gradeFromKeyBank } from '../src/lib/exam-grade'
@@ -158,16 +158,30 @@ describe('/vao-thi — MỘT batch đọc + MỘT câu ghi; bản đồ đề ri
   it('300 học sinh hỏi phòng chờ: I/O riêng, đệm giá trị xong; đổi ca không lộ đề/đáp án', async () => {
     const { d, env, dem } = await dung({ phongCho: 1 })
     const t = dem.vong
-    const rs = await Promise.all(Array.from({length:300},()=>goi(env,'/phong-cho?maCa=C1')))
-    expect(dem.vong-t).toBe(1)
-    for(const r of rs) {
-      expect(r.status).toBe(200)
-      expect(r.j).toMatchObject({ok:true,phongCho:true,batDau:false,trangThai:'mo'})
-      expect(r.j.bank).toBeUndefined();expect(r.j.keyBank).toBeUndefined()
+    // Chỉ cố định giờ của đợt cùng lúc, giữ timer I/O thật. Full suite trên
+    // máy bận có thể chạy >250 ms: đệm hết hạn được phép đọc lại, không phải
+    // lỗi gộp yêu cầu. Kiểm hết hạn riêng bằng mốc sau TTL, không nới TTL.
+    const moc = Date.now()
+    const gio = vi.spyOn(Date, 'now').mockReturnValue(moc)
+    try {
+      const rs = await Promise.all(Array.from({length:300},()=>goi(env,'/phong-cho?maCa=C1')))
+      expect(dem.vong-t).toBe(1)
+      for(const r of rs) {
+        expect(r.status).toBe(200)
+        expect(r.j).toMatchObject({ok:true,phongCho:true,batDau:false,trangThai:'mo'})
+        expect(r.j.bank).toBeUndefined();expect(r.j.keyBank).toBeUndefined()
+      }
+      gio.mockReturnValue(moc + HAN_PHONG_CHO_MS + 1)
+      const hetHan = await goi(env,'/phong-cho?maCa=C1')
+      expect(dem.vong-t).toBe(2)
+      expect(hetHan.j).toMatchObject({ok:true,phongCho:true,batDau:false,trangThai:'mo'})
+      expect(hetHan.j.bank).toBeUndefined();expect(hetHan.j.keyBank).toBeUndefined()
+      d.sql.exec("UPDATE ca SET phong_cho=0,bat_dau_thi_luc='2026-10-01T00:00:00Z' WHERE ma_ca='C1'")
+      xoaDemPhongCho(env)
+      expect((await goi(env,'/phong-cho?maCa=C1')).j).toMatchObject({ok:true,phongCho:false,batDau:true,batDauLuc:'2026-10-01T00:00:00Z'})
+    } finally {
+      gio.mockRestore()
     }
-    d.sql.exec("UPDATE ca SET phong_cho=0,bat_dau_thi_luc='2026-10-01T00:00:00Z' WHERE ma_ca='C1'")
-    xoaDemPhongCho(env)
-    expect((await goi(env,'/phong-cho?maCa=C1')).j).toMatchObject({ok:true,phongCho:false,batDau:true,batDauLuc:'2026-10-01T00:00:00Z'})
   })
   it('cổng danh sách lớp vẫn chặn + ghi sổ chặn', async () => {
     const { d, env } = await dung()

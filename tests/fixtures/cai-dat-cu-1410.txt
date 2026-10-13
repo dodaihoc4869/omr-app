@@ -1,0 +1,119 @@
+export default function CaiDatScreen() {
+  const showToast = useAppStore((s) => s.showToast)
+  const [giaoDien, datGiaoDien] = useGiaoDien()
+  const hoa2 = useHoa2Bat()
+  const [moKyThuat, setMoKyThuat] = useState(false)
+  const setScreen = useAppStore((s) => s.setScreen)
+  const moChienDichDaGiao = () => {
+    useSoDemGv.getState().datMoHanhTrinh({ the: 'chien-dich' })
+    setScreen('chiendich')
+  }
+
+  const ketNoi = (
+    <TheNoiDung>
+      <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k3)' }}>Kết nối máy chủ</h2>
+      <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+        <KhoiKetNoiKhoDe showToast={showToast} />
+        <div style={{ height: 1, background: 'var(--vien)' }} />
+        <KhoiMayChuMoi showToast={showToast} />
+      </div>
+    </TheNoiDung>
+  )
+  const matKhau = (
+    <TheNoiDung>
+      <KhoiMatKhauApp showToast={showToast} />
+    </TheNoiDung>
+  )
+  const capNhat = (
+    <TheNoiDung>
+      <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k3)' }}>Cập nhật app</h2>
+      <p style={{ marginBottom: 'var(--k3)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Tải bản mới nhất và mở lại app.</p>
+      <NutCapNhatApp />
+    </TheNoiDung>
+  )
+
+  return (
+    <div className="gv-page gv-cai-dat-day-du min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
+      <div className="gv-page-header">
+        <div>
+          <h1>Cài đặt</h1>
+        </div>
+      </div>
+
+      <TheNoiDung>
+        <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k3)' }}>Giao diện</h2>
+        <div role="radiogroup" aria-label="Giao diện" className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+          {LUA_CHON.map(({ v, ten, icon: Icon }) => (
+            <button
+              key={v}
+              type="button"
+              role="radio"
+              aria-checked={giaoDien === v}
+              onClick={() => datGiaoDien(v)}
+              className={`m3-nut-chu${giaoDien === v ? ' m3-nut-tonal' : ' m3-nut-vien'}`}
+              style={{ gap: 'var(--k2)' }}
+            >
+              <Icon size={18} aria-hidden="true" />
+              {ten}
+            </button>
+          ))}
+        </div>
+        <p style={{ marginTop: 'var(--k3)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Tự lưu trên máy này.</p>
+      </TheNoiDung>
+
+      {/* GAME HÓA 2.0 — công tắc cả trung tâm / theo lớp (`/gv/chien-dich` co-luu), có hộp xác nhận nói rõ hậu quả. */}
+      <CongTacHoa2 />
+      {/* OMNI 3 (05/10) — công tắc theo lớp (`/gv/omni` co-luu) + số lượt mỗi ngày theo lớp + ma trận đề thi 2026 (`cau-hinh-luu`). */}
+      <CongTacOmni />
+      {/* BI-A PHẢN ỨNG — cửa thứ ba trên Sảnh Bát Linh (`/gv/chien-dich` bia-co-luu, khoá riêng `bi_a`, mặc định TẮT). */}
+      <CongTacBia />
+      {/* HỎI THẦY (AI) (13/10) — trần lượt, đặt lại lượt hôm nay của một em, SBD thử không giới hạn lượt (`/gv/hoi-tro-ly/*`). */}
+      <CongTacHoiThay />
+
+      {/* CHIẾN DỊCH ĐÃ GIAO (09/10 tối) — lối vào gọn sau khi thẻ ấy rời màn Hành trình. */}
+      {hoa2 && (
+        <TheNoiDung>
+          <div className="flex flex-wrap" style={{ gap: 'var(--k3)', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+              <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700 }}>Chiến dịch đã giao</h2>
+              <p style={{ marginTop: 'var(--k1)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Ba hành trình và chiến dịch luyện cũ: xem bảng, kết thúc, huỷ, giao chiến dịch mới.</p>
+            </div>
+            <button type="button" className="m3-nut-chu" onClick={moChienDichDaGiao} style={{ gap: 'var(--k1)' }}>
+              Mở danh sách chiến dịch
+              <ChevronRight size={18} aria-hidden="true" />
+            </button>
+          </div>
+        </TheNoiDung>
+      )}
+
+      {hoa2 ? (
+        <section aria-labelledby="cai-dat-ky-thuat">
+          <button type="button" id="cai-dat-ky-thuat" className="m3-nut-chu" aria-expanded={moKyThuat} aria-controls="cai-dat-ky-thuat-than" onClick={() => setMoKyThuat((v) => !v)} style={{ gap: 'var(--k2)', fontSize: 'var(--cx-3)', fontWeight: 700, color: 'var(--muc)' }}>
+            {moKyThuat ? <ChevronDown size={20} aria-hidden="true" /> : <ChevronRight size={20} aria-hidden="true" />}
+            Công cụ kỹ thuật
+          </button>
+          {!moKyThuat && (
+            <p style={{ margin: '0 0 0 var(--k2)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
+              Kết nối máy chủ · Mật khẩu mở app · Cập nhật app · Đồng bộ lại phiếu mọi ca · Đồng bộ danh sách lớp
+            </p>
+          )}
+          <div id="cai-dat-ky-thuat-than" hidden={!moKyThuat} className="flex flex-col" style={{ gap: 'var(--k5)', marginTop: 'var(--k3)' }}>
+            {ketNoi}
+            {matKhau}
+            {capNhat}
+            <NutDongBoMoiCa />
+            <KhoiNho tieuDe="Đồng bộ danh sách lớp">
+              <NutDongBoDanhSach onXong={(soEm, tomTat) => showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')} />
+            </KhoiNho>
+          </div>
+        </section>
+      ) : (
+        <>
+          {ketNoi}
+          {matKhau}
+          {capNhat}
+        </>
+      )}
+    </div>
+  )
+}

@@ -1,0 +1,71 @@
+{
+  "test": "tests/toi-uu-ca-3009.test.ts :: 300 học sinh hỏi phòng chờ: I/O riêng, đệm giá trị xong; đổi ca không lộ đề/đáp án",
+  "baselineWorktree": "/workspace/tick-nhanh-1310",
+  "baselineHeadThucTe": "3d702f0a4f1239e8ea49a6d67a13b1e6233b751b",
+  "fullCuoi": {
+    "json": "/tmp/night-1410-final-full.json",
+    "failedDurationMs": 401.61104799999976,
+    "expectedQueries": 1,
+    "actualQueries": 2
+  },
+  "TTLms": 250,
+  "paired": [
+    {
+      "luot": 1,
+      "root": {
+        "passed": 22,
+        "failed": 0,
+        "burstStatus": "passed",
+        "burstDurationMs": 218.78694499999983
+      },
+      "baseline": {
+        "passed": 22,
+        "failed": 0,
+        "burstStatus": "passed",
+        "burstDurationMs": 187.56355199999962
+      }
+    },
+    {
+      "luot": 2,
+      "root": {
+        "passed": 22,
+        "failed": 0,
+        "burstStatus": "passed",
+        "burstDurationMs": 208.4418340000002
+      },
+      "baseline": {
+        "passed": 22,
+        "failed": 0,
+        "burstStatus": "passed",
+        "burstDurationMs": 194.406524
+      }
+    }
+  ],
+  "sha256GiongTungByte": {
+    "server/src/phong-cho-dong-thoi.ts": {
+      "same": true,
+      "sha256": "1af1d131ffd9b0468dfdd686dce0b514954dd04ce9187bcc3dbd4438953f882d"
+    },
+    "server/src/index.ts": {
+      "same": true,
+      "sha256": "1653ce5803ca8cedb1c7ff3b013dbae2709b5ea48e40fc87bb601f327becfcac"
+    }
+  },
+  "leafTest": "ead9c836",
+  "ketLuan": "0 lỗi mới còn tái hiện trong tệp liên quan; lỗi full dùng wall-clock thật và đi qua TTL250ms. Không sửa runtime/server/grading. Chưa chạy lại full suite.",
+  "TTLtests-root": {
+    "passed": 6,
+    "failed": 0,
+    "phamVi": "Hết hạn250ms, đổi ca xóa đệm, I/O không chia Promise, không lộ đề/đáp án, lượt cũ không lấp lại đệm, đọc treo có hạn, lỗi D1 thử lại"
+  },
+  "TTLtests-baseline": {
+    "passed": 6,
+    "failed": 0,
+    "phamVi": "Hết hạn250ms, đổi ca xóa đệm, I/O không chia Promise, không lộ đề/đáp án, lượt cũ không lấp lại đệm, đọc treo có hạn, lỗi D1 thử lại"
+  },
+  "sauSuaTest": {
+    "passed": 28,
+    "failed": 0,
+    "gio": "SpyDate.now trongtry/finally; timerI/O thật. Đợt300 cùngmốc, hếtTTL+1ms phải đọcD1 lần2; đổi ca/không lộ đáp án giữ nguyên."
+  }
+}
