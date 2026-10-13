@@ -221,7 +221,7 @@ function IconMui({ huong }: { huong: 'trai' | 'phai' }) {
 /**
  * KHUNG LÀM BÀI NGANG / MÁY TÍNH (dùng chung Tu luyện + Luyện đề cấu trúc).
  *   · 'rong': đầu màn gọn ở trên; TRÁI danh sách câu (rộng ~720 px, cuộn theo trang/khung); PHẢI cột dính: đồng hồ, đã làm, lưới số câu theo phần,
- *     câu trước/sau, Nộp bài, gợi ý phím tắt.
+ *     câu trước/sau, Nộp bài (phím tắt vẫn chạy, đợt 18 bỏ dòng chú thích phím tắt).
  *   · 'ngang': TRÁI khung đề cuộn riêng (cao trọn màn, không thanh nào che); PHẢI: đầu màn, đồng hồ, PHIẾU TRẢ LỜI chạm được, câu trước/sau + Nộp bài.
  * `children` = các thẻ câu, mỗi thẻ mang `id = domId(qid)`.
  */
@@ -294,11 +294,6 @@ export function KhungLamRong(p: {
             {p.loi}
             {p.nutNop}
           </div>
-          {boCuc === 'rong' && (
-            <p className="tlu-phim">
-              Phím tắt: <kbd>←</kbd> <kbd>→</kbd> đổi câu · <kbd>A</kbd>–<kbd>D</kbd> chọn phương án · <kbd>Đ</kbd> / <kbd>S</kbd> điền ý đúng–sai
-            </p>
-          )}
         </aside>
       </div>
     </>

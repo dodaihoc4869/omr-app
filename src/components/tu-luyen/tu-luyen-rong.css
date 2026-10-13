@@ -1233,3 +1233,10 @@ html.may-yeu .tlu-rong *::after {
   animation: none !important;
   transition: none !important;
 }
+
+/* ĐỢT 18 · LÀN H (thầy 12/10: màn làm bài "siêu đẹp và thân thiện" ở dọc/ngang/máy tính). CHỈ bố cục — màu giữ biến --tlu-* sẵn có.
+ * Cột phải: đồng hồ đứng thẳng hàng với "Đã làm" như một con số của ô (trước đây là viên thuốc lồng trong ô, lệch vào trong);
+ * khi sắp hết giờ vẫn là viên đỏ cũ. Điện thoại xoay ngang: dòng "Đang lưu… / Đã lưu" không bị lưới phiếu ép mất. */
+.tlu-ben-o .ldct-dong-ho:not([data-gap='true']) { min-height: 0; padding: 0; border: 0; background: transparent; font-size: 24px; line-height: 1.1; }
+.tlu-lam-luoi[data-bo-cuc='ngang'] .tlu-ben-o .ldct-dong-ho:not([data-gap='true']) { min-height: 0; padding: 0; font-size: 18px; }
+.tlu-lam-luoi[data-bo-cuc='ngang'] .tlu-ben-luu { flex-shrink: 0; }

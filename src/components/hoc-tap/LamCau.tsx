@@ -197,7 +197,6 @@ export function OTraLoiNgan({ value }: { value: string }) {
     <section className="ht2-lam-tln" aria-label="Ô trả lời">
       <OPhieu value={value} />
       <output className="ht2-an" aria-live="polite">{value ? `Đáp án của em: ${[...value].map(kyTuHien).join('')}` : 'Chưa nhập đáp án'}</output>
-      <small>Tối đa 4 kí tự như phiếu: chữ số, dấu phẩy, dấu trừ</small>
     </section>
   )
 }

@@ -53,7 +53,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
           Chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.
         </p>
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          Rút từ BỘ ĐỀ lớp 12 theo thuật toán ma trận đẳng cấu chuẩn Bộ GD&ĐT · 50 phút · 28 câu: 18 câu chọn đáp án (Phần I), 4 câu đúng/sai (Phần II), 6 câu trả lời ngắn (Phần III).
+          50 phút · 28 câu: 18 câu Trắc nghiệm, 4 câu Đúng–sai, 6 câu Trả lời ngắn.
         </p>
         <label className="flex gap-3 items-center min-h-[48px] text-xs font-medium cursor-pointer text-slate-800 dark:text-slate-200">
           <input
