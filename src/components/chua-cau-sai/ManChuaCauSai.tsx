@@ -234,7 +234,7 @@ export default function ManChuaCauSai({
     const n = ++goiRef.current
     ;(async () => {
       // 13/10 (thầy: "chỗ này mở câu quá lâu"): mở đợt + phát bước đầu MỘT lượt đi-về; máy chủ cũ không trả `phat` ⇒ gọi phat-item như trước.
-      const r = await apiMoDot(token, qid, undefined, true)
+      const r = await apiMoDot(token, qid)
       const phat = docPhatKem(r.phat)
       if (huy || n !== goiRef.current) return
       if (!r.ok || !r.dotId) {

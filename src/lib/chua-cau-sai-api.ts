@@ -150,12 +150,13 @@ const loiCua = (j: Obj | null): string =>
 // ---------------------------------------------------------------------------
 
 /** Mở/lấy đợt lỗi theo qid câu sai đã nộp. `phat` (13/10 — thầy: "chỗ này mở câu quá lâu"): xin máy chủ phát luôn bước đầu trong CÙNG lượt ⇒ kết
- *  quả nằm ở `phat` (màn đọc bằng `docPhatKem` trong ManChuaCauSai); máy chủ bản cũ không trả `phat` ⇒ nơi gọi tự gọi `apiPhatItem` như trước. */
+ *  quả nằm ở `phat` (màn đọc bằng `docPhatKem` trong ManChuaCauSai); máy chủ bản cũ không trả `phat` ⇒ nơi gọi tự gọi `apiPhatItem` như trước.
+ *  Mặc định bật khi mở từ màn Sửa từng bước (không `nguonSai`); lượt ghi nhận lỗi từ nơi khác (`nguonSai`) không cần bước đầu. */
 export async function apiMoDot(
   token: string,
   qid: string,
   nguonSai?: string,
-  phat = false,
+  phat = nguonSai === undefined,
 ): Promise<KetQuaDot & { phat?: unknown }> {
   const j = await goi('mo-dot', token, {
     qid,
