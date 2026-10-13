@@ -44,9 +44,19 @@ database_id = "d2e6d322-374a-45d7-83a3-9fac486b23f1"
 name = "BAN_BIA"
 class_name = "BanBiA"
 
+# Trạm gọi Gemini (14/10, server/src/tram-gemini.ts): Durable Object ghim châu Đại Dương (locationHint "oc") — chỉ dùng khi Google
+# chặn vị trí trạm Worker đang chạy (placement "smart" kéo Worker về sát D1 ở Hồng Kông, Gemini không phục vụ Hồng Kông).
+[[durable_objects.bindings]]
+name = "TRAM_GEMINI"
+class_name = "TramGemini"
+
 [[migrations]]
 tag = "bia-v1"
 new_sqlite_classes = ["BanBiA"]
+
+[[migrations]]
+tag = "tram-gemini-v1"
+new_sqlite_classes = ["TramGemini"]
 
 [[r2_buckets]]
 binding = "DE"

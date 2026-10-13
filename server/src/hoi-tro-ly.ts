@@ -8,6 +8,7 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import { DemTTL } from './dem-chung'
 import { nguCanhHoiTroLy } from './loi-giai'
 import { qidGoc } from './srs2-d1'
+import { quaTram } from './tram-gemini'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 import { SCHEMA_TRA_LOI, chuPhang, lamSachCauTruc, tachCauTruc, type CauTrucTraLoi } from './hoi-tro-ly-cau-truc'
 
@@ -243,13 +244,16 @@ export type GoiAi = (key: string, cfg: CauHinhHoiThem, noiDung: NoiDungGemini) =
  *  này thỉnh thoảng treo lâu bất thường. Lượt đầu quá `choKep` ms chưa về ⇒ bắn thêm MỘT lượt y hệt; lượt nào trả được trước thì lấy, huỷ lượt
  *  kia. Trần: lượt đầu 25 s, lượt kép 20 s ⇒ máy chủ trả lời (hoặc ghi lỗi `cham` vào sổ) trước khi máy em hết 45 s chờ. */
 export const CHO_GOI_KEP_MS = 8_000
-export function taoGoiGemini(choKep = CHO_GOI_KEP_MS): GoiAi {
+/** `tram` (tram-gemini.ts): Google trả 400 "User location is not supported" ⇒ gọi lại qua trạm ghim châu Đại Dương, và 10 phút sau đó
+ *  đi thẳng qua trạm (khỏi tốn một lượt bị chặn). Vắng ⇒ chỉ gọi thẳng như cũ. */
+export type GoiThang = (url: string, init: RequestInit) => Promise<Response>
+export function taoGoiGemini(choKep = CHO_GOI_KEP_MS, tram?: GoiThang): GoiAi {
   return async (key, cfg, noiDung) => {
     const ds = [cfg.model, ...DS_MODEL_DU_PHONG.filter((m) => m !== cfg.model)]
     const vet: string[] = []
     let kq: KetQuaAi = { ok: false, ma: 'loi_ai', chiTiet: 'chưa gọi' }
     for (const model of ds) {
-      kq = await goiKep(key, cfg, model, noiDung, choKep)
+      kq = await goiKep(key, cfg, model, noiDung, choKep, tram)
       if (kq.ok || !MA_KHONG_CO_MODEL.has(kq.http ?? 0)) return kq
       console.error('[hoi-tro-ly] model', model, `báo ${kq.http} — thử tên kế`)
       vet.push(`${model}: ${kq.chiTiet}`)
@@ -259,15 +263,15 @@ export function taoGoiGemini(choKep = CHO_GOI_KEP_MS): GoiAi {
 }
 export const goiGemini: GoiAi = taoGoiGemini()
 
-async function goiKep(key: string, cfg: CauHinhHoiThem, model: string, noiDung: NoiDungGemini, choKep: number): Promise<KetQuaAi> {
+async function goiKep(key: string, cfg: CauHinhHoiThem, model: string, noiDung: NoiDungGemini, choKep: number, tram?: GoiThang): Promise<KetQuaAi> {
   const dk = [new AbortController(), new AbortController()] as const
-  const p1 = goiMotModel(key, cfg, model, noiDung, dk[0].signal, 25_000)
+  const p1 = goiMotModel(key, cfg, model, noiDung, dk[0].signal, 25_000, tram)
   let hen: ReturnType<typeof setTimeout> | undefined
   const quaHan = new Promise<'qua_han'>((ok) => { hen = setTimeout(() => ok('qua_han'), choKep) })
   const dau = await Promise.race([p1, quaHan])
   if (dau !== 'qua_han') { clearTimeout(hen); return dau }
   console.warn('[hoi-tro-ly] model', model, `quá ${choKep} ms chưa trả — gọi kép`)
-  const p2 = goiMotModel(key, cfg, model, noiDung, dk[1].signal, 20_000)
+  const p2 = goiMotModel(key, cfg, model, noiDung, dk[1].signal, 20_000, tram)
   return new Promise<KetQuaAi>((ok) => {
     let con = 2
     let loiDau: KetQuaAi | null = null
@@ -282,7 +286,11 @@ async function goiKep(key: string, cfg: CauHinhHoiThem, model: string, noiDung: 
 }
 
 /** `huy`: lượt kép kia đã trả ⇒ thôi chờ lượt này. `hanMs`: trần chờ riêng của lượt này. */
-async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiDung: NoiDungGemini, huy?: AbortSignal, hanMs = 30_000): Promise<KetQuaAi> {
+/** Google chặn vị trí trạm Cloudflare đang chạy (HTTP 400 "User location is not supported") — nhớ trong isolate tới mốc này. */
+let quaTramDen = 0
+export const xoaNhoTram = () => { quaTramDen = 0 }
+const RE_CHAN_VI_TRI = /location is not supported/i
+async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiDung: NoiDungGemini, huy?: AbortSignal, hanMs = 30_000, tram?: GoiThang): Promise<KetQuaAi> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`
   const gen: Obj = {
     temperature: cfg.nhietDo, maxOutputTokens: 2048 + (cfg.thinkingBudget ?? 0),
@@ -297,7 +305,13 @@ async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiD
   const thoi = () => ac.abort()
   huy?.addEventListener('abort', thoi)
   try {
-    const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify({ ...noiDung, generationConfig: gen }), signal: ac.signal })
+    const init: RequestInit = { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify({ ...noiDung, generationConfig: gen }), signal: ac.signal }
+    let r = tram && Date.now() < quaTramDen ? await tram(url, init) : await fetch(url, init)
+    if (tram && r.status === 400 && RE_CHAN_VI_TRI.test(await r.clone().text().catch(() => ''))) {
+      console.warn('[hoi-tro-ly] Google chặn vị trí trạm đang chạy — gọi lại qua trạm châu Đại Dương')
+      quaTramDen = Date.now() + 10 * 60_000
+      r = await tram(url, init)
+    }
     const j = (await r.json().catch(() => null)) as Obj | null
     if (!r.ok) return { ok: false, ma: r.status === 429 || r.status === 503 ? 'qua_tai' : 'loi_ai', http: r.status, chiTiet: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 200)}` }
     const ung = (j?.candidates as Obj[] | undefined)?.[0]
@@ -511,7 +525,7 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const dapAnEm = str(b.dapAnEm).replace(/\s+/g, ' ').trim().slice(0, 40)
   const noiDung = dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm, dangLam })
   const bd = Date.now()
-  const kq = await (phu.goiAi ?? goiGemini)(key, cfg, noiDung)
+  const kq = await (phu.goiAi ?? (env.TRAM_GEMINI ? taoGoiGemini(CHO_GOI_KEP_MS, quaTram(env.TRAM_GEMINI)) : goiGemini))(key, cfg, noiDung)
   const ms = Date.now() - bd
   const luc = new Date(nowMs).toISOString(), nguon = str(b.nguon).slice(0, 40) || 'luyen'
   if (!kq.ok) {
