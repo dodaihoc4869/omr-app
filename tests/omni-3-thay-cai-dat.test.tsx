@@ -117,12 +117,12 @@ describe('thẻ số lượt mỗi ngày theo lớp + ma trận đề thi 2026',
 })
 
 describe('màn Cài đặt đặt thẻ OMNI ngay sau Game Hóa 2.0', () => {
-  it('nguồn CaiDatScreen: <CongTacOmni /> đứng sau <CongTacHoa2 /> và trước <CongTacBia />', async () => {
+  it('nguồn CaiDatScreen: <CongTacOmni /> đứng sau <CongTacHoa2 /> và trước <CongTacHoiThay />', async () => {
     const { readFileSync } = await import('node:fs')
     const nguon = readFileSync('src/screens/CaiDatScreen.tsx', 'utf8')
     const a = nguon.indexOf('<CongTacHoa2 />')
     const b = nguon.indexOf('<CongTacOmni />')
-    const c = nguon.indexOf('<CongTacBia />')
+    const c = nguon.indexOf('<CongTacHoiThay />')
     expect(a).toBeGreaterThan(0)
     expect(b).toBeGreaterThan(a)
     expect(c).toBeGreaterThan(b)

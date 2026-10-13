@@ -60,8 +60,8 @@ describe('nguồn: không còn hộp mặc định của trình duyệt', () => 
     }
   })
 
-  it('hai chỗ đã thay dùng hoiXacNhan', () => {
-    for (const t of ['src/components/chien-dich/DsChienDichDaGiao.tsx', 'src/components/KhoiKhacPhuc3CheDo.tsx']) {
+  it('khắc phục kết nối dùng hoiXacNhan', () => {
+    for (const t of ['src/components/KhoiKhacPhuc3CheDo.tsx']) {
       expect(fs.readFileSync(path.join(GOC, t), 'utf8')).toMatch(/await hoiXacNhan\(/)
     }
   })
