@@ -61,3 +61,17 @@ jobs:
           console.log('=== Worker omr theo 5 phút (UTC) ===')
           for (const x of w5?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log([x.dimensions.datetimeFiveMinutes.slice(11, 16), `yc=${x.sum.requests}`, `loi=${x.sum.errors}`, `p50=${Math.round(x.quantiles.durationP50)}`, `p90=${Math.round(x.quantiles.durationP90)}`, `p99=${Math.round(x.quantiles.durationP99)}`, `cpu99=${Math.round(x.quantiles.cpuTimeP99)}`].join(' '))
           JS
+      - name: Tem kho câu đổi bao nhiêu lần (chỉ SELECT — bộ đệm siêu dữ liệu câu xoá mỗi khi tem đổi)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          TU=$(date -u -d "-${GIO%.*} hour" +%Y-%m-%dT%H:%M:%S 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%S)
+          TU1=$(date -u -d '-1 hour' +%Y-%m-%dT%H:%M:%S)
+          echo "== tem kho: tổng tờ, số tờ lập chỉ mục trong 1 giờ qua, mốc mới nhất"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS so_to, SUM(CASE WHEN indexed_at >= '$TU1' THEN 1 ELSE 0 END) AS lap_1h, MAX(indexed_at) AS moi_nhat FROM game_v2_index" | jq -c ".[0].results"
+          echo "== 15 tờ lập chỉ mục gần nhất"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT ma_de, indexed_at FROM game_v2_index ORDER BY indexed_at DESC LIMIT 15" | jq -c ".[0].results[]"
+          echo "== tờ đang LỆCH chỉ mục (de_kho.cap_nhat_luc khác game_v2_index.source_version)"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS lech FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc)" | jq -c ".[0].results"
