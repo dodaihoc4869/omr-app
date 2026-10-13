@@ -3,10 +3,10 @@
 // hoặc câu thuộc đề của ca chưa công bố ⇒ trả lời lý do, không trả lời giải. Có hồ sơ từng bước ⇒ mở khung; chưa có ⇒ báo "thầy đang soạn" (thầy chốt 29/09: không hiện lời giải ngắn).
 // `onHoi`: gọi khi lời giải đã mở (game dùng để tính câu này là "có trợ giúp" — không nhận thưởng).
 import NutChuaTungBuoc from '../chua-cau-sai/NutChuaTungBuoc'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { docTokenHs, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung } from '../../lib/loi-giai-api'
-import KhungLoiGiai from './KhungLoiGiai'
-import HoiThemThay from './HoiThemThay'
+const KhungLoiGiai = lazy(() => import('./KhungLoiGiai'))
+const HoiThemThay = lazy(() => import('./HoiThemThay'))
 import './loi-giai.css'
 
 export const CHU_DANG_SOAN = 'Thầy đang soạn lời giải từng bước cho câu này. Em chờ một chút rồi bấm lại nhé.'
@@ -36,8 +36,8 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: s
       </button>
       <NutChuaTungBuoc qid={qid} />
       {loi && <span className="lg-loi" role="status">{loi}</span>}
-      {loi === CHU_DANG_SOAN && hoiThemSoan && <HoiThemThay qid={qid} nguon={nguon} gon onTraLoi={onHoi} />}
-      {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} hoiThem={mo.hoiThem} onDong={() => setMo(null)} />}
+      {loi === CHU_DANG_SOAN && hoiThemSoan && <Suspense fallback={null}><HoiThemThay qid={qid} nguon={nguon} gon onTraLoi={onHoi} /></Suspense>}
+      {mo && <Suspense fallback={null}><KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} hoiThem={mo.hoiThem} onDong={() => setMo(null)} /></Suspense>}
     </div>
   )
 }

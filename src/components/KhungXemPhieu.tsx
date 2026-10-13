@@ -29,7 +29,7 @@
 // `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
 // thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
 // là phiếu co theo ngay.
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { ThanhTren, dungM3 } from './m3'
@@ -37,7 +37,7 @@ import { themCssMayYeu } from '../lib/may-yeu'
 import './m3/khung-xem-phieu.css'
 import type { TinNopChang } from '../lib/btvn-nop-chang-em'
 import { hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu } from '../lib/loi-giai-api'
-import KhungLoiGiai from './loi-giai/KhungLoiGiai'
+const KhungLoiGiai = lazy(() => import('./loi-giai/KhungLoiGiai'))
 
 export interface KhungXemPhieuProps {
   /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
@@ -245,7 +245,7 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
           ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo.
           (Dưới M3 nút Đóng nằm trong thanh trên ở trên.) */}
       {phu}
-      {hoi && <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" hoiThem={hoi.hoiThem} onDong={() => setHoi(null)} />}
+      {hoi && <Suspense fallback={null}><KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" hoiThem={hoi.hoiThem} onDong={() => setHoi(null)} /></Suspense>}
       {loiHoi && (
         <div className="lg-bao-loi m3" role="alert">
           <span>{loiHoi}</span>

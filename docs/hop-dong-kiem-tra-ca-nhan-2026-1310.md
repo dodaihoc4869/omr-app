@@ -30,7 +30,7 @@ Nộp kiểm tra ghi một receipt ổn định/câu đã trả lời đủ vào
 
 Giữ bản vá Claude: `kiem_tra_ca_nhan_meta`, snapshot+meta cùng batch nguyên tử, `COT_META_KT` đường nóng chỉ bóc JSON nhỏ, `buMetaKt` cron. Đọc lịch Gói7 song song câu/sổ/quota. Khi cờ tắt, cron ngoài cao điểm (trước19h VN) chỉ chuyển các lịch tương lai sẵn có; không giao chu kỳ tiếp hay chấm bài bị ẩn. Script bật ghi batLuc; cron không chấm lịch hết hạn trước mốc bật đó. Đường /hs/ke-hoach-ngay cũ cũng đọc mức 12 và số bài ngày riêng, không dựng thêm kế hoạch cũ. Chuẩn bị lúc phát hành chỉ một lô nhỏ; không 500 vòng quét toàn học sinh. Script bật lại cờ chặn lịch tương lai chưa chuyển về 28/50.
 
-Cờ kiểm tra đang tạm tắt sau sự cố D1. PR này chưa bật cờ/chưa phân lại D1 thật; mô phỏng chỉ SELECT. Gộp sau Claude soát, không phát hành chồng với main đang chạy; chưa thể bật toàn bộ nếu nguồn đã duyệt còn thiếu. Tắt cờ là cách lùi, giữ lịch/bài nộp/điểm/sổ.
+Claude đã bật lại cờ qua workflow38376337214 (main124208fb), kết quả success. Bản sửa hạn này chưa áp hạn/D1 thật; mô phỏng nguồn trước đó chỉ SELECT. Lịch thiếu nguồn đủ cổng vẫn ở cho_nguon, không giả độ phủ. Gộp phần bổ sung sau Claude soát, không phát hành chồng. Tắt cờ là cách lùi, giữ lịch/bài nộp/điểm/sổ.
 
 ## Sửa hạn bài đã tick
 
