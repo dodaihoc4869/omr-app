@@ -342,3 +342,4 @@ Thầy nhắn thêm (ảnh thẻ "12 bậc từ Lười đến Chăm · Số em 
 - [ ] App phụ huynh: BẢN VẼ xem trước (thầy duyệt) — đủ mọi số đo được về con, không giấu, ấm áp | bằng chứng: (chưa có)
 - [ ] App phụ huynh: dựng theo bản vẽ đã duyệt | bằng chứng: (chờ thầy duyệt bản vẽ)
 Giả định: "tính cách" — app KHÔNG đo tính cách; chỉ hiện đúng những gì đo được (thái độ làm bài: nhịp học, bậc, quá nhanh, chọn lặp, đúng/sai theo thời gian, tự sửa, số giây…), không gán nhãn tính cách không có số liệu.
+Thầy chốt: "không hiện tính cách cũng được" ⇒ app phụ huynh không có mục tính cách; chỉ hiện số đo được.
