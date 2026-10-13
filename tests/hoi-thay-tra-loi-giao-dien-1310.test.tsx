@@ -7,7 +7,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-thu' }))
 import HoiThemThay from '../src/components/loi-giai/HoiThemThay'
 import NutHoiThay from '../src/components/loi-giai/NutHoiThay'
-import TraLoiThay, { docCauTruc } from '../src/components/loi-giai/TraLoiThay'
+import TraLoiThay, { chuHoa, docCauTruc } from '../src/components/loi-giai/TraLoiThay'
 
 type PhanHoi = Record<string, unknown>
 let phanHoi: PhanHoi[] = []
@@ -66,6 +66,19 @@ describe('TraLoiThay', () => {
     expect(container.querySelector('.lg-tl > .lg-tl-bang-cuon table')).toBeTruthy()
     expect(screen.getByText('Gợi hướng')).toBeTruthy()
     expect(screen.queryByRole('group', { name: 'Hỏi tiếp' })).toBeNull()
+  })
+
+  it('gốc hữu cơ có gạch (thầy báo 13/10, ảnh "gốc alkyl là gì ạ"): CH3-, C2H5-, C3H7- hạ đủ chỉ số, gạch giữ thường (không thành điện tích)', () => {
+    const cau = 'Gốc methyl là CH3-, ethyl là C2H5-, propyl là C3H7-.'
+    const { container } = render(<TraLoiThay ct={docCauTruc({ yChinh: 'Gốc alkyl là **C6H5-** thì sai.', buoc: [{ ten: 'Ví dụ gốc alkyl', chu: cau }] })!} />)
+    const p = container.querySelector('.lg-tl-buoc p')!
+    expect([...p.querySelectorAll('sub')].map((x) => x.textContent)).toEqual(['3', '2', '5', '3', '7'])
+    expect(p.querySelector('sup')).toBeNull()
+    expect(p.textContent).toBe('Gốc methyl là CH3-, ethyl là C2H5-, propyl là C3H7-.')
+    expect([...container.querySelectorAll('.lg-tl-chinh strong sub')].map((x) => x.textContent)).toEqual(['6', '5'])
+    // Không đụng: ion (đi bảng ion quen thuộc của ChemText), công thức cấu tạo, mã đề, chữ đã đánh dấu, chỉ số Unicode trộn.
+    for (const giu of ['HCO3-', 'SO42-', 'NH4+', 'CH3-CH2-OH', 'C6H5-NH2', '12-C1-B2-D1', 'OH-', 'CH3COO-']) expect(chuHoa(giu)).toBe(giu)
+    expect(chuHoa('gốc C₂H5- và (CH3)2CH2-')).toBe('gốc C_{2}H_{5}- và (CH_{3})_{2}CH_{2}-')
   })
 
   it('docCauTruc: sai khuôn / rỗng ⇒ null; thiếu phần nào hiện phần có được', () => {

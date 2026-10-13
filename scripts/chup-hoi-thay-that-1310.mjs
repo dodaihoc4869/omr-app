@@ -59,6 +59,21 @@ const CAU = {
       hoiTiep: ['Gợi ý thêm cho ý d'],
     },
   },
+  // Thầy báo 13/10 (ảnh "gốc alkyl là gì ạ"): CH3-, C2H5-, C3H7- không hạ chỉ số ⇒ ảnh 09 soát lại đúng câu ấy.
+  goc: {
+    cau: { qid: 'Q', so: 'Câu 11', chuong: 'Hợp chất chứa nitrogen', de: '<p>Cho các amine có công thức cấu tạo dưới đây. Có bao nhiêu alkylamine?</p>', y: {} },
+    hoi: 'gốc alkyl là gì ạ',
+    ct: {
+      yChinh: 'Gốc alkyl là phần còn lại sau khi bớt một nguyên tử H từ alkane, có công thức chung là CnH2n+1-.',
+      buoc: [
+        { ten: 'Ví dụ gốc alkyl', chu: 'Gốc methyl là CH3-, ethyl là C2H5-, propyl là C3H7-.' },
+        { ten: 'Nhận diện', chu: 'Trong phân tử amine, nếu N chỉ nối với các gốc này thì đó là alkylamine.' },
+      ],
+      bang: null,
+      ghiNho: 'Gốc alkyl không chứa vòng benzene.',
+      hoiTiep: ['Vậy chất (3) có phải alkylamine không?'],
+    },
+  },
 }
 // [tên, loại, rộng, cao, tối?, mở đề lại sau khi Thầy trả lời?]
 const KHUNG = [
@@ -70,6 +85,7 @@ const KHUNG = [
   ['06-trac-nghiem-ngang-toi', 'tn', 844, 390, true, false],
   ['07-tra-loi-ngan-may-tinh-sang', 'tln', 1440, 900, false, true],
   ['08-trac-nghiem-may-tinh-toi', 'tn', 1440, 900, true, false],
+  ['09-goc-alkyl-chi-so-sang', 'goc', 470, 900, false, false],
 ]
 
 const vite = await createServer({ root: GOC, logLevel: 'error', server: { port: 0, host: '127.0.0.1', watch: null, hmr: false } })
