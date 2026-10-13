@@ -47,7 +47,11 @@ function boDemDot(goc: Env['DB']) {
     for (;;) {
       await raNgoai()
       if (xong) break
-      if (hang.length) { dot++; for (const f of hang.splice(0)) f() }
+      if (!hang.length) continue
+      // Chờ hàng YÊN rồi mới thả (đỏ oan 13/10 lúc chạy toàn bộ: máy tải nặng ⇒ phép băm crypto xong chậm hơn một tick ⇒ lệnh D1 cùng đợt bị
+      // tách thành đợt riêng). Lệnh cần kết quả đợt trước không thể vào hàng trước khi thả ⇒ chờ thêm không làm đếm thiếu.
+      for (let n = hang.length, yen = 0; yen < 3; ) { await new Promise<void>((r) => setTimeout(r, 2)); if (hang.length === n) yen++; else { n = hang.length; yen = 0 } }
+      dot++; for (const f of hang.splice(0)) f()
     }
     let phuXong = false
     const phu = Promise.allSettled(viecPhu).finally(() => { phuXong = true })

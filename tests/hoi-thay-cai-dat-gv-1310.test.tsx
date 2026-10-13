@@ -60,4 +60,34 @@ describe('khối Hỏi Thầy (AI) ở Cài đặt', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Xem lượt' }))
     await waitFor(() => expect(screen.getByRole('alert').textContent).toBe('Sai mã bí mật'))
   })
+  it('Sổ hỏi Thầy: chỉ tải khi bấm; hiện tổng, từng em (SBD, tên, lớp), các lượt (câu hỏi, trả lời); bấm em ⇒ chỉ lượt của em ấy', async () => {
+    const so = (sbd?: unknown) => ({
+      ok: true,
+      tong: { luot: sbd ? 2 : 3, traLoi: sbd ? 2 : 2, ngoaiPhamVi: 0, loi: sbd ? 0 : 1, soEm: sbd ? 1 : 2, soCau: 2, dau: '2026-10-13T09:36:00Z' },
+      theoEm: [{ sbd: '12121212', ten: 'Nguyễn Văn Thử', lop: '12A1', soLuot: 2, soCau: 2, ganNhat: '2026-10-13T15:59:00Z' }, ...(sbd ? [] : [{ sbd: '20200001', ten: 'Trần Thị B', lop: '12A2', soLuot: 0, soCau: 1, ganNhat: '2026-10-13T11:18:00Z' }])],
+      luot: [
+        { luc: '2026-10-13T15:59:00Z', sbd: '12121212', ten: 'Nguyễn Văn Thử', qid: '12-KT-C1-D4-II-4', nguon: 'tu_chua', cauHoi: 'Câu này bắt đầu từ đâu hả thầy', traLoi: 'Em viết phương trình trước.', ngoaiPhamVi: false, model: 'gemini-3.1-flash-lite', ms: 1800, loi: '' },
+        ...(sbd ? [] : [{ luc: '2026-10-13T11:18:00Z', sbd: '20200001', ten: 'Trần Thị B', qid: '12-KT-C1-D2-III-6', nguon: 'bai_hang_ngay', cauHoi: 'Sao ra 58 ạ?', traLoi: '', ngoaiPhamVi: false, model: 'gemini-2.5-flash', ms: 400, loi: 'loi_ai: HTTP 404' }]),
+      ],
+    })
+    traLoi = (url, b) => (url.endsWith('/gv/hoi-tro-ly/so') ? so(b.sbd) : url.endsWith('/gv/hoi-tro-ly/luot') ? { ok: true, tranNgay: 12, tranCau: 6, sbdThu: [] } : { ok: false })
+    const { container } = render(<CongTacHoiThay />)
+    await waitFor(() => expect(goi.some((g) => g.url.endsWith('/luot'))).toBe(true))
+    expect(goi.some((g) => g.url.endsWith('/so'))).toBe(false) // mở Cài đặt không tải sổ
+    fireEvent.click(screen.getByRole('button', { name: 'Xem sổ hỏi Thầy' }))
+    await waitFor(() => expect(container.querySelector('[data-so-tong]')).toBeTruthy())
+    expect(container.querySelector('[data-so-tong]')!.textContent).toContain('Thầy trả lời 2 · ngoài phạm vi 0 · lỗi 1')
+    const bang = container.querySelector('[data-so-em]')!
+    expect(bang.textContent).toContain('12121212')
+    expect(bang.textContent).toContain('Trần Thị B')
+    const luot = container.querySelector('[data-so-luot]')!
+    expect(luot.textContent).toContain('Câu này bắt đầu từ đâu hả thầy')
+    expect(luot.textContent).toContain('Em viết phương trình trước.')
+    expect(luot.textContent).toContain('Lỗi')
+    expect(goi.find((g) => g.url.endsWith('/so'))!.ma).toBe('ma-thu')
+    fireEvent.click(screen.getByRole('button', { name: 'Xem các lượt hỏi của Nguyễn Văn Thử' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Đang xem SBD 12121212 · Xem tất cả' })).toBeTruthy())
+    expect(goi.filter((g) => g.url.endsWith('/so')).at(-1)!.body).toMatchObject({ sbd: '12121212' })
+    expect(container.querySelector('[data-so-luot]')!.textContent).not.toContain('Sao ra 58 ạ?')
+  })
 })
