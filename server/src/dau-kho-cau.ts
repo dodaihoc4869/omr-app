@@ -18,3 +18,14 @@ export async function dauKhoCau(env: Env): Promise<string> {
     return ''
   }
 }
+
+/**
+ * Đệm đã đọc kho lúc `docLuc` (ms) mà CHƯA biết dấu (lần đọc đầu không hỏi dấu để không thêm lệnh): dữ liệu còn đúng nếu mốc lập chỉ mục mới nhất
+ * trong dấu `d` có TRƯỚC lúc đọc (định dạng ISO như `indexed_at` máy chủ ghi). Mốc lạ/không so được ⇒ false (đọc lại cho chắc).
+ */
+export function dauTruocLucDoc(d: string, docLuc: number): boolean {
+  const moc = d.slice(d.indexOf('|') + 1)
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(moc) || !Number.isFinite(docLuc)) return false
+  return moc < new Date(docLuc).toISOString()
+}
+

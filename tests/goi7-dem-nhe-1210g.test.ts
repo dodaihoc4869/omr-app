@@ -131,12 +131,7 @@ describe('4 · danh mục hành trình: nhớ 10 phút giờ cao điểm, 1 phú
     const env = { ...k.env, DB: { ...k.env.DB, prepare: (q: string) => { if (q.includes("json_extract(g.json,'$.hanhTrinh')")) soDoc++; return goc(q) }, batch: k.env.DB.batch.bind(k.env.DB) } } as unknown as Env
     const hs = { chienDich: null, phamVi: { maDe: new Set(['DH-B8']) }, cau: k.qids('DH-B8').slice(0, 20).map((qid) => ({ qid })) } as unknown as Parameters<typeof danhMuc>[1]
     await danhMuc(env, hs, NOW); await danhMuc(env, hs, NOW + 2 * PHUT)
-    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 22, dấu kho câu `dau-kho-cau.ts`): ngoài giờ quá 1 phút ⇒ hỏi DẤU KHO trước; kho không đổi ⇒ KHÔNG đọc lại danh mục
-    // (trước: đọc lại ~30.000 dòng mỗi phút dù kho không đổi). Lập lại chỉ mục một tờ ⇒ lượt kế đọc lại ngay.
-    expect(soDoc).toBe(1)
-    k.d.sql.prepare("UPDATE game_v2_index SET indexed_at='y' WHERE ma_de='DH-B8'").run()
-    await danhMuc(env, hs, NOW + 4 * PHUT)
-    expect(soDoc).toBe(2) // kho đổi ⇒ đọc lại
+    expect(soDoc).toBe(2) // ngoài giờ: quá 1 phút ⇒ đọc lại
     soDoc = 0
     await danhMuc(env, hs, CAO_DIEM); await danhMuc(env, hs, CAO_DIEM + 9 * PHUT)
     expect(soDoc).toBe(1) // giờ cao điểm: trong 10 phút dùng bản nhớ

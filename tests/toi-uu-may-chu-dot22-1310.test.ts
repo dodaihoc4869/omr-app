@@ -36,8 +36,8 @@ it('danh mục Hành trình: hết hạn 1 phút + kho không đổi ⇒ chỉ h
   expect(k.dem.kho).toBe(1)
   const b = await danhMuc(k.env, hs, SANG + 2 * PHUT)
   expect(k.dem.kho).toBe(1); expect(b).toBe(a)
-  // Lần đọc đầu hỏi dấu SONG SONG (không thêm vòng chờ); lần hết hạn hỏi dấu một lần.
-  expect(k.dem.dau).toBe(2)
+  // Lần đọc đầu KHÔNG hỏi dấu (không thêm lệnh); lần hết hạn hỏi dấu một lần thay cho lượt đọc lại kho.
+  expect(k.dem.dau).toBe(1)
   k.lapLai('2026-10-13T03:05:00Z')
   const c = await danhMuc(k.env, hs, SANG + 4 * PHUT)
   expect(k.dem.kho).toBe(2); expect(c).not.toBe(a); expect(c.map((x) => x.qid)).toEqual(a.map((x) => x.qid))
