@@ -193,7 +193,7 @@ export interface TrangVeConProps {
 
 export default function TrangVeCon(p: TrangVeConProps) {
   const { v, hoc2, tongQuan, nhip, sbd, tenCon, lop } = p
-  const pm = v.pm
+  const pm = v.pm, kiem=hoc2?.kiemTraCaNhan
   const tq = tongQuan.v
   const nowMs = tq?.serverNow ?? pm?.serverNow ?? Date.now()
   const [moDuoi, setMoDuoi] = useState(false)
@@ -285,12 +285,9 @@ export default function TrangVeCon(p: TrangVeConProps) {
       ) : (
         <div className="tvc-luoi">
           <div className="tvc-nhom-trai">
-            {/* Kiểm tra cá nhân (Codex PR258, docs/hop-dong-kiem-tra-ca-nhan-1310.md — giữ đúng luồng của ManHomNay cũ): ngày con có bài kiểm tra ⇒ thẻ
-                kiểm tra thay khối Hôm nay (ngày ấy không phát bài thường); ngày khác ⇒ thẻ lịch kiểm tra sắp tới ngay dưới khối Hôm nay. */}
-            {hoc2?.kiemTraCaNhan?.homNay
-              ? <Suspense fallback={<section className="tvc-the tvc-cho tt-xuong" role="status" aria-label="Đang mở bài kiểm tra của con" />}><TheKiemTraCon kt={hoc2.kiemTraCaNhan} /></Suspense>
-              : <HomNay pm={pm} hoc2={hoc2} tq={tq} k={nhip.k} nowMs={nowMs} />}
-            {hoc2?.kiemTraCaNhan && !hoc2.kiemTraCaNhan.homNay && hoc2.kiemTraCaNhan.trangThai !== 'cho_nguon' && <Suspense fallback={null}><TheKiemTraCon kt={hoc2.kiemTraCaNhan} /></Suspense>}
+            {/* Ngày một kiểm tra mới vẫn giữ kế hoạch 12 câu; lịch cũ chỉ kiểm tra. */}
+            {(!kiem?.homNay || !!kiem.baiNgayToiThieu) && <HomNay pm={pm} hoc2={hoc2} tq={tq} k={nhip.k} nowMs={nowMs} />}
+            {kiem && kiem.trangThai !== 'cho_nguon' && <Suspense fallback={null}><TheKiemTraCon kt={kiem} /></Suspense>}
             <NhipHoc pm={pm} tq={tq} nhip={nhip} />
           </div>
           <div className="tvc-nhom-phai">

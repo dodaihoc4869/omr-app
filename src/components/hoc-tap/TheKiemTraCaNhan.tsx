@@ -43,7 +43,7 @@ export default function TheKiemTraCaNhan({ du, onMo, disabled = false }: { du: T
         <p className="ktcn-ly-do"><b>{thuNgay(du.ngay)}</b>{con > 0 ? ` · còn ${con} ngày` : ''}<br />Mở {gioVn(du.moLuc)} · hoàn thành trong 24 giờ</p>
       </div></div>
       <div className="ktcn-o-so"><div><b>{du.tong}</b><small>câu</small></div><div><b>{du.phut}</b><small>phút</small></div><div><b>{du.soBai}</b><small>bài đã học</small></div></div>
-      <p className="ktcn-loi">Đề chọn riêng cho em từ các bài đã học. Ngày đó không có bài tập thường.</p>
+      <p className="ktcn-loi">{du.baiNgayToiThieu ? `Đề chọn riêng cho em từ các bài đã học. Ngày đó vẫn có kế hoạch học nhẹ: tối thiểu ${du.baiNgayToiThieu} câu.` : 'Đề chọn riêng cho em từ các bài đã học. Ngày đó không có bài tập thường.'}</p>
       {onMo && <button type="button" className="ktcn-nut-phu" disabled={disabled} onClick={onMo}>Xem lịch kiểm tra<ArrowRight size={18} aria-hidden="true" /></button>}
     </section>
   }
@@ -62,7 +62,7 @@ export default function TheKiemTraCaNhan({ du, onMo, disabled = false }: { du: T
         {du.diem !== null ? <div><small>Điểm lần này</small><p className="ktcn-diem"><b>{diemChu(du.diem)}</b><span>/10</span></p></div> : <div><small>Điểm lần này</small><p className="ktcn-diem"><span>Đang chấm</span></p></div>}
         <p className="ktcn-tra"><b>{du.daTra}/{du.tong}</b> câu đã trả lời</p>
       </div>
-      {!het && <p className="ktcn-loi">Bài đã nộp. Bài tập tiếp tục vào ngày học kế tiếp.</p>}
+      {!het && <p className="ktcn-loi">{du.baiNgayToiThieu && du.homNay ? `Bài đã nộp. Hôm nay em làm tiếp kế hoạch học nhẹ: tối thiểu ${du.baiNgayToiThieu} câu.` : 'Bài đã nộp. Bài tập tiếp tục vào ngày học kế tiếp.'}</p>}
       {onMo && <button type="button" className={het ? 'ktcn-nut-phu' : 'ktcn-nut-chinh'} disabled={disabled} onClick={onMo}>Xem kết quả<ArrowRight size={20} aria-hidden="true" /></button>}
     </section>
   }
@@ -82,7 +82,7 @@ export default function TheKiemTraCaNhan({ du, onMo, disabled = false }: { du: T
         <li><CalendarDays size={20} aria-hidden="true" /><span>Hạn nộp <b>{gioHan(du.hanLuc, du.ngay)}</b></span></li>
       </ul>
     </div>
-    <div className="ktcn-loi"><p>Hôm nay em chỉ cần làm bài kiểm tra này.</p><p>Đồng hồ mỗi chặng chỉ chạy khi em bấm vào chặng đó.</p></div>
+    <div className="ktcn-loi"><p>{du.baiNgayToiThieu ? `Hôm nay có thêm kế hoạch học nhẹ: tối thiểu ${du.baiNgayToiThieu} câu, giữ tiến độ bài mới.` : 'Hôm nay em chỉ cần làm bài kiểm tra này.'}</p><p>Đồng hồ mỗi chặng chỉ chạy khi em bấm vào chặng đó.</p></div>
     {onMo && <button type="button" className="ktcn-nut-chinh" disabled={disabled} onClick={onMo}>{du.daTra > 0 ? `Làm tiếp · còn ${du.con} câu` : 'Làm bài kiểm tra'}<ArrowRight size={20} aria-hidden="true" /></button>}
   </section>
 }

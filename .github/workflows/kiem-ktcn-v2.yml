@@ -1,0 +1,26 @@
+name: Mô phỏng đề kiểm tra cá nhân trên nguồn thật (chỉ đọc)
+on:
+  push:
+    branches: [codex/de-kiem-tra-2026-1310]
+    paths: [scripts/kiem-ktcn-v2.ts, .github/workflows/kiem-ktcn-v2.yml, server/src/kiem-tra-ca-nhan.ts, server/src/kiem-tra-ca-nhan-loi.ts, server/src/kiem-tra-ca-nhan-ma-tran.ts, server/src/kiem-tra-ca-nhan-nguon.ts]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - run: npm ci
+      - run: bash scripts/lam-sach-khoa-cf.sh
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - run: |
+          npx esbuild scripts/kiem-ktcn-v2.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/ktcn-v2.mjs --log-level=warning
+          node /tmp/ktcn-v2.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
