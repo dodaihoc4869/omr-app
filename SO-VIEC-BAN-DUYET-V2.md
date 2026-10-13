@@ -348,3 +348,8 @@ Thầy duyệt (13/10): "duyệt cả hai giữ xếp theo bậc phụ huynh xem
 - [x] App phụ huynh: BẢN VẼ | bằng chứng: docs/ban-ve-dot19/anh/ph-*.jpg — thầy duyệt, phụ huynh xem được hạng trong lớp
 - [ ] Dựng màn chiếu theo bản vẽ (xếp theo bậc) | bằng chứng: (chưa có)
 - [ ] Dựng app phụ huynh theo bản vẽ + mở các mục "cần mở cho phụ huynh" (điểm danh buổi học, các lần học hôm nay, lịch ôn lại, hạng chăm trong lớp) | bằng chứng: (chưa có)
+Thầy nhắn thêm (13/10): "bạn dặn luôn nó đi" · "từ giờ tôi nhắn ở đây, việc gì thằng codex làm tốt hơn bạn giao luôn cho nó tự làm nhé"
+- [ ] Dặn Codex trực tiếp (@codex trên GitHub) đọc thoả thuận chung + xác nhận | bằng chứng: (chưa có)
+- [ ] Luật thường trực: thầy nhắn ở phiên này; việc Codex làm tốt hơn ⇒ giao thẳng Codex qua @codex, theo dõi tới xong, báo thầy | bằng chứng: (chưa có)
+- [x] Sửa lỗi: trang phụ huynh mới mất thẻ kiểm tra cá nhân của PR258 | bằng chứng: fd37f2fc + tests/ph-kiem-tra-dot19-1310 (3 xanh)
+- [x] Thoả thuận làm việc chung Claude ↔ Codex | bằng chứng: 34bd1c70 docs/hop-dong-claude-codex-1310.md + dòng đầu DIEU-PHOI

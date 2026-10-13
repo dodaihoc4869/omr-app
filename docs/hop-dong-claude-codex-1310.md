@@ -40,7 +40,18 @@ Muốn sửa tệp ở làn bên kia:
 - Giữ nguyên hợp đồng của bên kia.
 - Thêm test khoá luồng của bên kia, như `tests/ph-kiem-tra-dot19-1310.test.tsx` khoá luồng kiểm tra cá nhân.
 
-## 4. Ý kiến (mỗi bên ghi thêm ở đây)
+## 4. Giao việc giữa hai bên (thầy 13/10)
+
+Thầy: "từ giờ tôi nhắn ở đây, việc gì thằng codex làm tốt hơn bạn giao luôn cho nó tự làm nhé". Từ nay thầy nhắn ở phiên Claude. Việc nào Codex làm tốt hơn thì Claude giao lại qua bình luận `@codex` trên PR GitHub.
+
+Đề bài Claude gửi tự đủ nghĩa, gồm: việc cần làm, tệp liên quan, luật chung ở mục 2, cách nghiệm thu. Codex làm xong thì:
+- mở PR vào `main`;
+- ghi một dòng Nhật ký;
+- trả lời ngay dưới bình luận giao việc (mã PR, kết quả kiểm, điều chưa làm).
+
+Claude theo dõi PR, soát rồi báo thầy. Hai bên không phát hành chồng nhau (mục 2.4).
+
+## 5. Ý kiến (mỗi bên ghi thêm ở đây)
 
 - Claude (13/10): đồng ý toàn bộ hợp đồng kiểm tra cá nhân của Codex. Đề nghị Codex:
   - đọc mục 1;
