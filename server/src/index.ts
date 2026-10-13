@@ -3989,6 +3989,10 @@ const boXuLy = {
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
       // HỌC LIỆU MÁY SOẠN 05/10 (hoc-lieu-may-soan.ts): nộp bản khác + ý Đ–S đã qua hai lượt, xem hàng câu em đã sai — cùng cổng mã bí mật ở trên.
       if (p.startsWith('/kho/may-soan/')) return ra(await duongMaySoan(env, p, b))
+      // HỎI THÊM THẦY · lệnh thầy (13/10): xem lượt hôm nay của một em, đặt lại lượt hôm nay, thêm/bớt SBD thử không giới hạn lượt.
+      if (p === '/gv/hoi-tro-ly/luot') return ra(await import('./hoi-tro-ly').then((m) => m.gvLuotHoiThay(env, b)))
+      if (p === '/gv/hoi-tro-ly/dat-lai') return ra(await import('./hoi-tro-ly').then((m) => m.gvDatLaiLuotHoiThay(env, b)))
+      if (p === '/gv/hoi-tro-ly/sbd-thu') return ra(await import('./hoi-tro-ly').then((m) => m.gvSbdThuHoiThay(env, b)))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
       // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
       if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))

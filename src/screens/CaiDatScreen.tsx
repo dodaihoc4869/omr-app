@@ -15,6 +15,7 @@ import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { TheNoiDung } from '../components/DesignSystem'
 import CongTacHoa2 from '../components/chien-dich/CongTacHoa2'
 import CongTacBia from '../components/chien-dich/CongTacBia'
+import CongTacHoiThay from '../components/chien-dich/CongTacHoiThay'
 import CongTacOmni from '../components/chien-dich/CongTacOmni'
 import KhoiKetNoiKhoDe from '../components/KhoiKetNoiKhoDe'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
@@ -98,6 +99,8 @@ export default function CaiDatScreen() {
       <CongTacOmni />
       {/* BI-A PHẢN ỨNG — cửa thứ ba trên Sảnh Bát Linh (`/gv/chien-dich` bia-co-luu, khoá riêng `bi_a`, mặc định TẮT). */}
       <CongTacBia />
+      {/* HỎI THẦY (AI) (13/10) — trần lượt, đặt lại lượt hôm nay của một em, SBD thử không giới hạn lượt (`/gv/hoi-tro-ly/*`). */}
+      <CongTacHoiThay />
 
       {/* CHIẾN DỊCH ĐÃ GIAO (09/10 tối) — lối vào gọn sau khi thẻ ấy rời màn Hành trình. */}
       {hoa2 && (
