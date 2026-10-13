@@ -19,8 +19,8 @@ import { BANG_GIU_HOA2 } from '../server/src/reset-hoa2'
 const NOW=Date.parse('2026-10-10T02:00:00Z')
 beforeEach(()=>{vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(NOW)})
 afterEach(()=>{vi.useRealTimers();xoaDemPhamVi();xoaDemChienDich();xoaDemCaBaoVe()})
-async function kho(n=127){
-  const k=taoKhoOmni({'DH-B1':n})
+async function kho(n=127,soCauKhac:Record<string,number>={}){
+  const k=taoKhoOmni({'DH-B1':n,...soCauKhac})
   await damBaoBangBaiDaDay(k.env)
   k.d.sql.exec(`INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DH-B1','Bài mới',${n},0,'v1');INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DH-B1','v1','x');
     INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('goi_bai_7_v1','{"bat":true,"batDau":"2026-10-10"}','x')`)
@@ -286,11 +286,114 @@ it('ngày một kiểm tra: API vẫn mở chặng Gói7, đúng 12 câu riêng;
  k.d.sql.prepare("INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) VALUES('ktcn:S1:2026-10-10','S1','12A1','2026-10-10',?,?,'hen',?,?)").run(NOW-3600000,NOW-3600000+86400000,JSON.stringify(d),NOW)
  k.d.sql.prepare('INSERT INTO kiem_tra_ca_nhan_meta(id,meta_json) VALUES(?,?)').run('ktcn:S1:2026-10-10',JSON.stringify(metaKt(d as Parameters<typeof metaKt>[0])))
  xoaMoiDem()
+ // Thêm nợ từ gói cũ, nguồn thật khác bài mới: nợ không được ăn hết 12 chỗ của ngày nhẹ.
+ k.d.sql.exec(`INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DH-B0','Bài cũ',8,0,'v1');INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DH-B0','v1','x');
+ INSERT INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) VALUES('g7:old','old','12A1','B0','Bài cũ','2026-09-01','2026-09-07','x');
+ INSERT INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) VALUES('g7:old','S1','2026-09-01','2026-09-07')`)
+ for(const qid of k.qids('DH-B0')){const q=JSON.parse(String(k.d.sql.prepare('SELECT json FROM game_v2_question WHERE qid=?').get(qid)!.json));k.d.sql.prepare('INSERT INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) VALUES(?,?,?,?,?)').run('g7:old',qid,'v1','DH-B0',JSON.stringify({qid,maDe:'DH-B0',version:'v1',group:q.group,phan:q.phan,kho:false,tinhToan:false,hopLe:true,kyNang:[q.dang]}))}
+ const lap=await lapGoi7(k.env,'S1',NOW),gMoi=lap!.goi.find(g=>g.id==='g7:latest')!
+ expect(lap!.plan.viec.filter(v=>v.qid.startsWith('DH-B1-')).length).toBeGreaterThanOrEqual(gMoi.quota)
+ expect(lap!.goi.find(g=>g.id==='g7:old')!.cau).toHaveLength(8)
+ expect(lap!.goi.reduce((n,g)=>n+g.quota,0)).toBeLessThanOrEqual(12)
  const r=await gameV2(k.env,'hoc-tap-sanh',{token:k.token});expect(r.kiemTraCaNhan).toMatchObject({homNay:true,baiNgayToiThieu:12});expect(r.goi7).toMatchObject({toiThieu:12,daLamHomNay:0})
  const ch=await gameV2(k.env,'hoc-tap-start',{token:k.token});expect((ch.questions as unknown[]).length).toBeGreaterThan(0)
  const qid=k.qids('DH-B1')[100]!;await lam(k.env,'S1',qid,NOW,true,{maNguon:'ktcn:S1:2026-10-10',purpose:'de_thu',cauVersion:'v1'})
- const gs=await docGoiCuaEm7(k.env,'S1',NOW);expect(gs[0]!.daGap.has(qid)).toBe(true)
+ const gs=await docGoiCuaEm7(k.env,'S1',NOW);expect(gs.find(g=>g.id==='g7:latest')!.daGap.has(qid)).toBe(true)
  const dem=await gameV2(k.env,'hoc-tap-dem',{token:k.token});expect(dem).toMatchObject({toiThieu:12,daLamHomNay:0})
+ const worker=(await import('../server/src/index')).default,req=new Request('https://omr.test/hs/ke-hoach-ngay',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:k.token})}),res=await worker.fetch(req,k.env),du=await res.json() as Record<string,unknown>
+ expect(du).toMatchObject({cheDoNgay:'goi7',nganSach:{toiThieuCau:12},tienBo:{daLamCau:0,toiThieuCau:12}})
  const report=await docNgayCacEm(k.env,[{sbd:'S1',hoTen:'Em',lop:'12A1',khoi:'12',goi7Tu:'2026-10-10'}],'2026-10-10','2026-10-10','2026-10-10',[])
  expect(report.get('S1')![0]).toMatchObject({mucToiThieu:12,daLam:0,cheDo:'goi7'})
+})
+
+it('164 câu với ngày kiểm tra ở ngày cuối vẫn chia hết trong bảy ngày nếu em theo kế hoạch; không dồn quá 12 vào ngày kiểm tra',async()=>{
+ const {quotaHocKt}=await import('../server/src/kiem-tra-ca-nhan-loi'),lich=new Map([['2026-10-14',1],['2026-10-16',1]])
+ let con=164
+ for(let i=0;i<7;i++){const d=`2026-10-${10+i}`,n=quotaHocKt(con,d,'2026-10-16',lich);if(lich.has(d))expect(n).toBeLessThanOrEqual(12);con-=n}
+ expect(con).toBe(0)
+})
+it('hai gói 164 câu cùng hạn: API dự trù chung 12 chỗ ngày kiểm tra cuối, hoàn thành đủ từng gói trong bảy ngày',async()=>{
+ const k=await kho(164,{'DH-B0':164}),{damBaoKtCn}=await import('../server/src/kiem-tra-ca-nhan-schema'),{metaKt}=await import('../server/src/kiem-tra-ca-nhan'),{xoaMoiDem}=await import('../server/src/dem-chung')
+ await damBaoKtCn(k.env)
+ k.d.sql.exec(`INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DH-B0','Bài khác',164,0,'v1');INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DH-B0','v1','x');
+ INSERT INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) VALUES('g7:old','old','12A1','B0','Bài khác','2026-10-10','2026-10-16','x');
+ INSERT INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) VALUES('g7:old','S1','2026-10-10','2026-10-16');
+ INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('kiem_tra_ca_nhan_v1','{"bat":true}','x')`)
+ for(const qid of k.qids('DH-B0')){
+  const q=JSON.parse(String(k.d.sql.prepare('SELECT json FROM game_v2_question WHERE qid=?').get(qid)!.json))
+  k.d.sql.prepare('INSERT INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) VALUES(?,?,?,?,?)').run('g7:old',qid,'v1','DH-B0',JSON.stringify({qid,maDe:'DH-B0',version:'v1',group:q.group,phan:q.phan,kho:false,tinhToan:false,hopLe:true,kyNang:[q.dang]}))
+ }
+ const d={phienBan:3,baiNgayToiThieu:12,lyDo:'Kiểm tra',bai:[],muc:[],cau:[],soPhu:0,phut:50,thieu:[],chang:[]},mo=Date.parse('2026-10-16T00:00:00+07:00')
+ k.d.sql.prepare("INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) VALUES('ktcn:S1:2026-10-16','S1','12A1','2026-10-16',?,?,'hen',?,?)").run(mo,mo+86400000,JSON.stringify(d),NOW)
+ k.d.sql.prepare('INSERT INTO kiem_tra_ca_nhan_meta(id,meta_json) VALUES(?,?)').run('ktcn:S1:2026-10-16',JSON.stringify(metaKt(d as Parameters<typeof metaKt>[0])));xoaMoiDem()
+ for(let i=0;i<7;i++){
+  const now=NOW+i*86400000;vi.setSystemTime(now)
+  const gs=await docGoiCuaEm7(k.env,'S1',now)
+  if(i===6)expect(gs.reduce((n,g)=>n+g.quota,0)).toBeLessThanOrEqual(12)
+  for(const g of gs)for(const c of g.cau.filter(c=>!g.daGap.has(c.qid)).slice(0,g.quota))k.d.sql.prepare('INSERT INTO goi_bai_7_gap(receipt,goi_id,sbd,qid,version,kieu,luc) VALUES(?,?,?,?,?,?,?)').run(`gap-${c.qid}`,g.id,'S1',c.qid,c.version,'cho_thay',new Date(now).toISOString())
+ }
+ const gs=await docGoiCuaEm7(k.env,'S1',NOW+6*86400000)
+ expect(gs.map(g=>g.daGap.size)).toEqual([164,164]);expect(gs.map(g=>g.cau.length-g.daGap.size)).toEqual([0,0])
+})
+it('chia nhiều hạn dùng chung lịch kiểm tra; nợ quá hạn không chiếm chỗ dự trù và ngày hai kiểm tra không giao câu',async()=>{
+ const {quotaCacGoiHocKt}=await import('../server/src/kiem-tra-ca-nhan-loi')
+ const lich=new Map([['2026-10-10',1],['2026-10-14',2],['2026-10-16',1]])
+ const goi=[{id:'som',chuaGap:80,han:'2026-10-13'},{id:'muon',chuaGap:164,han:'2026-10-16'},{id:'no',chuaGap:60,han:'2026-10-07'}]
+ expect(quotaCacGoiHocKt(goi,'2026-10-10',lich).get('no')).toBe(0)
+ for(let n=10;n<=16;n++){
+  const ngay=`2026-10-${n}`,q=quotaCacGoiHocKt(goi,ngay,lich)
+  if(lich.has(ngay))expect([...q.values()].reduce((a,b)=>a+b,0)).toBeLessThanOrEqual(lich.get(ngay)===1?12:0)
+  for(const g of goi)g.chuaGap=Math.max(0,g.chuaGap-(q.get(g.id)??0))
+  if(n===13)expect(goi[0]!.chuaGap).toBe(0)
+ }
+ expect(goi.map(g=>g.chuaGap)).toEqual([0,0,0])
+})
+it('hạn sửa rất xa vẫn tính nhẹ; chia quota khớp phép chia sức chứa từng ngày ở cả lịch cũ/mới và nợ quá hạn',async()=>{
+ const {quotaHocKt}=await import('../server/src/kiem-tra-ca-nhan-loi'),lich=new Map([['2026-10-11',1],['2026-10-13',2],['2026-10-15',1]]),cu=new Set(lich.keys())
+ // Đối chứng độc lập bằng mô phỏng sức học từng ngày, không dùng hàm lập lịch để sinh đáp án.
+ for(const ds of [lich,cu])for(const u of [0,12,80,127,164,300])for(let n=10;n<=18;n++){
+  const ngay=`2026-10-${n}`,weight=(d:string)=>ds instanceof Map?(ds.get(d)===1?12:ds.has(d)?0:24):ds.has(d)?0:24
+  let tong=0,t=0,k=0;for(let i=n;i<=16;i++){const d=`2026-10-${i}`,v=weight(d);tong+=v;if(ds instanceof Map&&ds.has(d))k+=v;else if(v)t++}
+  const w=weight(ngay),phan=w?ds instanceof Map&&u>tong&&t&&!ds.has(ngay)?Math.ceil((u-k)/t):Math.ceil(u*w/Math.max(w,tong)):0
+  expect(quotaHocKt(u,ngay,'2026-10-16',ds)).toBe(ds instanceof Map&&ds.get(ngay)===1?Math.min(12,phan):phan)
+ }
+ const t=performance.now();expect(quotaHocKt(127,'2026-10-10','9999-12-31',lich)).toBe(1);expect(performance.now()-t).toBeLessThan(50)
+})
+
+it('sửa hạn từng bài/lớp: tính lại theo tiến độ từng em, giữ sổ/điểm/phiên; cron và em mới kế thừa hạn mới',async()=>{
+ const k=await kho(127),qid=k.qids('DH-B1')[0]!
+ await lam(k.env,'S1',qid,NOW-86400000,true,{cauVersion:'v1'})
+ for(const [i,q] of k.qids('DH-B1').slice(1,20).entries())k.d.sql.prepare('INSERT INTO goi_bai_7_gap(receipt,goi_id,sbd,qid,version,kieu,luc) VALUES(?,?,?,?,?,?,?)').run(`hoc-${i}`,'g7:latest','S1',q,'v1','cho_thay',new Date(NOW-86400000).toISOString())
+ const ch=await startGoi7(k.env,'S1',NOW),session=k.d.sql.prepare('SELECT json FROM game_v2_session WHERE id=?').get(String(ch!.id))!.json
+ await docGoiCuaEm7(k.env,'S2',NOW)
+ k.d.sql.exec("INSERT INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES('S2','2026-10-10',1,24,19,24,'x'); INSERT INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) VALUES('other','S9','2026-10-10',99)")
+ const soTruoc=k.d.sql.prepare('SELECT COUNT(*) n FROM su_kien_hoc').get()!.n
+ expect(await gvGoi7(k.env,{action:'sua_han',goiId:'g7:latest',hanCu:'2026-10-16',han:'2026-10-19'})).toMatchObject({ok:true,tuDongTinhLai:true})
+ const a=(await docGoiCuaEm7(k.env,'S1',NOW))[0]!,b=(await docGoiCuaEm7(k.env,'S2',NOW))[0]!
+ expect(a).toMatchObject({han:'2026-10-19',quota:11});expect(a.daGap.size).toBe(20);expect(a.daGap.has(qid)).toBe(true);expect(b.quota).toBe(13)
+ expect(k.d.sql.prepare('SELECT COUNT(*) n FROM su_kien_hoc').get()!.n).toBe(soTruoc)
+ expect(k.d.sql.prepare('SELECT json FROM game_v2_session WHERE id=?').get(String(ch!.id))!.json).toBe(session)
+ expect(k.d.sql.prepare("SELECT quota FROM goi_bai_7_ngay WHERE goi_id='other'").get()!.quota).toBe(99)
+ expect(k.d.sql.prepare("SELECT COUNT(*) n FROM goi_bai_7_muc_ngay WHERE sbd='S2'").get()!.n).toBe(0)
+ // Rút ngắn lại: câu chưa gặp được ưu tiên theo hạn mới, không mất bằng chứng cũ.
+ await gvGoi7(k.env,{action:'sua_han',goiId:'g7:latest',hanCu:'2026-10-19',han:'2026-10-11'})
+ expect((await docGoiCuaEm7(k.env,'S1',NOW))[0]!.quota).toBe(54)
+ expect((await docGoiCuaEm7(k.env,'S2',NOW))[0]!.quota).toBe(64)
+ k.d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S4','Em mới','12A1','x')").run()
+ await dongBoGoi7(k.env,NOW+21000,10,'',true)
+ expect(k.d.sql.prepare("SELECT han FROM goi_bai_7_em WHERE sbd='S4'").get()!.han).toBe('2026-10-11')
+ expect(k.d.sql.prepare('SELECT COUNT(*) n FROM goi_bai_7_sua_han').get()!.n).toBe(2)
+})
+it('hạn không hợp lệ/quá khứ, bài bỏ tick và sửa từ bản cũ bị chặn; giao dịch không sửa nhầm hạn',async()=>{
+ const k=await kho(28),doi=(han:string,hanCu='2026-10-16')=>gvGoi7(k.env,{action:'sua_han',goiId:'g7:latest',hanCu,han})
+ for(const han of ['2026-02-30','2026-10-09','khong-phai-ngay'])await expect(doi(han)).rejects.toThrow()
+ await doi('2026-10-18');await expect(doi('2026-10-19')).rejects.toThrow('máy khác')
+ k.d.sql.prepare("UPDATE bai_da_day SET bo_tick_luc='x' WHERE id='latest'").run()
+ await expect(doi('2026-10-19','2026-10-18')).rejects.toThrow('không còn được tick')
+ expect(k.d.sql.prepare('SELECT han FROM goi_bai_7').get()!.han).toBe('2026-10-18')
+ expect(k.d.sql.prepare('SELECT COUNT(*) n FROM goi_bai_7_sua_han').get()!.n).toBe(1)
+ k.d.sql.prepare("UPDATE bai_da_day SET bo_tick_luc=NULL WHERE id='latest'").run()
+ k.d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,bat_dau,het_han_vao,thoi_gian_phut,loai,cong_bo,bank_r2,cap_nhat_luc) VALUES('MO','Ca','mo','x','x',45,'thi','khong','de/x','x')").run()
+ await expect(doi('2026-10-20','2026-10-18')).rejects.toThrow('ca kiểm tra mở')
+ expect(k.d.sql.prepare('SELECT han FROM goi_bai_7').get()!.han).toBe('2026-10-18')
 })

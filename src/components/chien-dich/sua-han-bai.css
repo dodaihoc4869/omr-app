@@ -1,0 +1,7 @@
+/* Chỉ màn thầy sửa hạn mới nạp; không làm nặng lần mở app học sinh/phụ huynh. */
+.gvv2-bdg-cu { display: flex; align-items: center; gap: 8px; min-height: 48px; color: var(--gvm-chu-3); font-size: 13px; }
+.gvv2-bdg-sua-han { display: grid; gap: 4px; min-width: 0; font-size: 12px; }
+.gvv2-bdg-sua-han label { display: grid; gap: 4px; }
+.gvv2-bdg-sua-han input { box-sizing: border-box; width: 100%; min-width: 0; min-height: 48px; padding: 4px; border: 1px solid var(--gvm-vien); border-radius: 8px; background: var(--gvm-mat); color: var(--gvm-chu); font: inherit; }
+.gvv2-bdg-sua-han > span { display: flex; flex-wrap: wrap; }
+.gvv2-bdg-sua-han p { margin: 0; color: var(--gvm-chu); overflow-wrap: anywhere; }

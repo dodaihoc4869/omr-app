@@ -9,6 +9,7 @@ import { RefreshCw } from 'lucide-react'
 import { goiLenh } from '../../lib/goi-lenh-thay'
 import { ngayVn, type DuGoi7, type GoiDu } from './goi7-ui'
 import { chuDemGiao, chuHanDong, dongBaiDangGiao, goiDangGiao, TOI_DA_DONG_GIAO, type DongBaiDangGiao } from './buoi-day-ui'
+import './sua-han-bai.css'
 
 const CHU_CHUA_CO_LENH = 'Máy chủ chưa có bảng bài 7 ngày.'
 /** Số lệnh đọc chi tiết gói chạy cùng lúc (đỡ dồn máy chủ). */
@@ -35,6 +36,11 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
   const [trang, setTrang] = useState<Trang>({ loai: 'tai' })
   const [chiTiet, setChiTiet] = useState<ChiTiet>({})
   const [lan, setLan] = useState(0)
+  const [caCu, setCaCu] = useState(false)
+  const [sua, setSua] = useState<{id:string;han:string;hanCu:string}|null>(null)
+  const [luu, setLuu] = useState(false)
+  const [bao, setBao] = useState('')
+  const [loiHan, setLoiHan] = useState('')
   const idTieuDe = useId()
   const homNay = ngayVn()
 
@@ -54,7 +60,8 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
         setTrang({ loai: 'tat' })
         return
       }
-      const tatCa = goiDangGiao(Array.isArray(d.goi) ? d.goi : [], ngayVn())
+      const ds = Array.isArray(d.goi) ? d.goi : []
+      const tatCa = caCu ? [...goiDangGiao(ds, ngayVn()), ...ds.filter(g=>g.han<ngayVn()).sort((a,b)=>b.han.localeCompare(a.han))] : goiDangGiao(ds, ngayVn())
       const goi = tatCa.slice(0, TOI_DA_DONG_GIAO)
       setTrang({ loai: 'co', goi, conNua: tatCa.length - goi.length })
       // Gói máy chủ vừa trả kèm chi tiết (gói đầu) — dùng luôn, không gọi lại.
@@ -76,7 +83,18 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
     return () => {
       huy = true
     }
-  }, [lan])
+  }, [lan, caCu])
+
+  const luuHan = async () => {
+    if(!sua||luu)return
+    setLuu(true);setLoiHan('');setBao('')
+    try{
+      const r=await goiLenh('/gv/goi-bai-7',{action:'sua_han',goiId:sua.id,han:sua.han,hanCu:sua.hanCu},CHU_CHUA_CO_LENH)
+      if(!r.ok){setLoiHan(r.chu);return}
+      if(r.du.goiId!==sua.id||r.du.han!==sua.han){setLoiHan('Chưa nhận được xác nhận lưu hạn. Thầy cập nhật rồi thử lại.');return}
+      setSua(null);setBao('Đã lưu hạn mới. Kế hoạch từng em tự tính lại theo tiến độ còn thiếu và lịch kiểm tra.');setLan(n=>n+1)
+    }finally{setLuu(false)}
+  }
 
   const dong = trang.loai === 'co' ? trang.goi : []
   const capNhat = (
@@ -94,6 +112,8 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
         {trang.loai === 'co' && dong.length > 0 && <span className="gvv2-bdg-chu-thich">Mỗi thanh: phần câu gốc cả lớp đã gặp / đã tự làm</span>}
         {trang.loai === 'co' && capNhat}
       </div>
+      {trang.loai==='co'&&<label className="gvv2-bdg-cu"><input type="checkbox" checked={caCu} disabled={luu} onChange={e=>{setCaCu(e.target.checked);setSua(null);setLoiHan('')}} /> Hiện cả bài đã quá hạn để sửa</label>}
+      {bao&&<p role="status" className="dh-phu">{bao}</p>}
 
       {trang.loai === 'tai' ? (
         <div className="gvv2-bdg-xuong" role="status" aria-label="Đang tải bài đang giao">
@@ -138,10 +158,17 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
                         <span className="gvv2-bdg-bai">{g.ten}</span>
                       </td>
                       <td data-nhan="Hạn nộp">
+                        {sua?.id===g.id?<form className="gvv2-bdg-sua-han" onSubmit={e=>{e.preventDefault();void luuHan()}}>
+                          <label>Hạn mới · 23:59 giờ Việt Nam<input autoFocus type="date" required min={homNay>String(g.bat_dau??'')?homNay:g.bat_dau} value={sua.han} disabled={luu} aria-label={`Hạn mới của ${g.ten} · ${g.lop}`} onChange={e=>setSua({...sua,han:e.target.value})} /></label>
+                          <span><button type="submit" className="gvv2-nut-chu" disabled={luu}>{luu?'Đang lưu…':'Lưu hạn'}</button><button type="button" className="gvv2-nut-chu" disabled={luu} onClick={()=>{setSua(null);setLoiHan('')}}>Hủy</button></span>
+                          {loiHan&&<p role="alert">{loiHan}</p>}
+                        </form>:<>
                         <span className="gvv2-bdg-han" title={han.du}>
                           <span className="gvv2-so">{han.ngan}</span>
                           {han.con && <small>{han.con}</small>}
                         </span>
+                        <button type="button" className="gvv2-nut-chu" aria-label={`Sửa hạn ${g.ten} · ${g.lop}`} disabled={luu} onClick={()=>{setSua({id:g.id,han:g.han<homNay?homNay:g.han,hanCu:g.han});setLoiHan('');setBao('')}}>Sửa hạn</button>
+                        </>}
                       </td>
                       {!ct ? (
                         <td colSpan={2} data-nhan="Tiến độ">

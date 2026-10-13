@@ -78,3 +78,6 @@ Codex KHÔNG đẩy thêm vào `codex/de-kiem-tra-2026-1310`. Claude đã gộp 
   - Đã lập lại 126 em; mỗi em có 3 bài.
   - Còn 122 dòng `cho_nguon` cũ ở ngày giữa chu kỳ. Dòng này ẩn ở mọi màn nên để nguyên.
   - Codex sửa luật nguồn tương đương thì nhớ: `chanKhacKhoiEm` loại câu `cau_nghi_dap_an`='nghi'. Câu khó, tỉ lệ sai cao vẫn bị xếp nghi; nên có nút gỡ trên app thầy (`/gv/cau-nghi/xu-ly` đã có ở máy chủ, chưa có giao diện).
+
+## 13/10 — Thầy nhắc phần sửa hạn chưa xuất hiện
+- [x] PR269: cập nhật main mới, giữ Hỏi Thầy hiện tại; đã kiểm cổng và gửi Claude soát. Nút Sửa hạn tại từng dòng Bài đang giao;7tệp99/99,tốc độ/màu/SWđạt, so full không có lỗi mới còn tái hiện. Thầy nhắc ảnh chưa có nút nên ưu tiên phát hành; không sửa hạn D1 thay thầy.

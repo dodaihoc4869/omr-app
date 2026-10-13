@@ -211,6 +211,34 @@ describe('mục Dạy học & đầu giờ: MỘT buổi dạy 4 bước', () =>
 })
 
 describe('bảng Bài đang giao', () => {
+  it('sửa hạn đúng bài/lớp; lỗi giữ ngày đã chọn, lưu xong thông báo tính lại; có thể gia hạn bài cũ',async()=>{
+    const {container}=render(<BangBaiDangGiao />)
+    const nut=await screen.findByRole('button',{name:'Sửa hạn Bài 8. Amine · 12 - Tinh Hoa'})
+    fireEvent.click(nut)
+    const o=screen.getByLabelText('Hạn mới của Bài 8. Amine · 12 - Tinh Hoa') as HTMLInputElement
+    expect(o.min).toBe('2026-10-12');fireEvent.change(o,{target:{value:'2026-10-20'}})
+    let thatBai=true
+    goi7=b=>b.action==='sua_han'?(thatBai?{ok:false,chu:'Đang có ca kiểm tra mở.'}:{ok:true,du:{ok:true,goiId:b.goiId,han:b.han}}):{ok:true,du:b.goiId==='g7:thuong'?CT_THUONG:CT_TINH_HOA}
+    fireEvent.click(screen.getByRole('button',{name:'Lưu hạn'}))
+    expect((await screen.findByRole('alert')).textContent).toContain('ca kiểm tra mở')
+    expect(o.value).toBe('2026-10-20');thatBai=false
+    fireEvent.click(screen.getByRole('button',{name:'Lưu hạn'}))
+    await screen.findByText(/Đã lưu hạn mới/)
+    expect(lenh('/gv/goi-bai-7').filter(([,b])=>b.action==='sua_han').map(([,b])=>b)).toEqual(Array.from({length:2},()=>({action:'sua_han',goiId:'g7:tinh-hoa',hanCu:'2026-10-17',han:'2026-10-20'})))
+    fireEvent.click(screen.getByRole('checkbox',{name:'Hiện cả bài đã quá hạn để sửa'}))
+    await waitFor(()=>expect(container.querySelectorAll('[data-khoi="dong-giao"]')).toHaveLength(3))
+    fireEvent.click(screen.getByRole('button',{name:'Sửa hạn Bài 6. Tinh bột · 11'}))
+    expect((screen.getByLabelText('Hạn mới của Bài 6. Tinh bột · 11') as HTMLInputElement).value).toBe('2026-10-12')
+    fireEvent.click(screen.getByRole('button',{name:'Hủy'}));expect(screen.queryByRole('button',{name:'Lưu hạn'})).toBeNull()
+  })
+  it('máy chủ chưa có lệnh sửa hạn không bị báo thành công giả; giữ ngày để thử lại',async()=>{
+    render(<BangBaiDangGiao />)
+    fireEvent.click(await screen.findByRole('button',{name:'Sửa hạn Bài 8. Amine · 12 - Tinh Hoa'}))
+    fireEvent.click(screen.getByRole('button',{name:'Lưu hạn'}))
+    expect((await screen.findByRole('alert')).textContent).toContain('Chưa nhận được xác nhận lưu hạn')
+    expect(screen.queryByText(/Đã lưu hạn mới/)).toBeNull()
+    expect(screen.getByRole('button',{name:'Lưu hạn'})).toBeTruthy()
+  })
   it('mỗi gói còn hạn một dòng (hạn gần trước); hai thanh có nhãn; lớp chưa em nào nhận ⇒ câu nói thật thay vì 0%; lối sang Chữa bài', async () => {
     const sang = vi.fn()
     const { container } = render(<BangBaiDangGiao onMoChuaBai={sang} />)

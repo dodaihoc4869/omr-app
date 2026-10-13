@@ -68,9 +68,41 @@ export function henKt(a: { sbd: string; homNay: string; lanTruoc?: string; bangC
 export function quotaHocKt(u: number, ngay: string, han: string, lich: ReadonlySet<string>|ReadonlyMap<string,number>, sanNgay=24): number {
  const trong=(d:string)=>lich instanceof Map?(lich.get(d)===1?12:(lich.get(d)??0)>=2?0:sanNgay):(lich.has(d)?0:sanNgay)
  const homNay=trong(ngay);if(!homNay)return 0
- let suc=0;for(let n=ngay;n<=han;n=congNgayKt(n,1))suc+=trong(n)
- const quota=Math.ceil(Math.max(0,u)*homNay/Math.max(homNay,suc))
+ // Hạn thầy sửa có thể rất xa: tính số ngày trực tiếp, chỉ duyệt các ngày kiểm tra, không lặp từng ngày tới năm9999.
+ let thuong=Math.max(0,1+Math.floor((Date.parse(han)-Date.parse(ngay))/86400000)),suc=thuong*sanNgay,sucKiem=0
+ for(const d of lich.keys())if(d>=ngay&&d<=han){const v=trong(d);suc+=v-sanNgay;thuong--;sucKiem+=v}
+ // Quá sức chứa chuẩn: giữ ngày kiểm tra ở 12, chia phần dư cho ngày thường từ trước (không dồn sang ngày kiểm tra cuối).
+ const quota=lich instanceof Map&&u>suc&&thuong&&!lich.has(ngay)?Math.ceil(Math.max(0,u-sucKiem)/thuong):Math.ceil(Math.max(0,u)*homNay/Math.max(homNay,suc))
  return lich instanceof Map&&lich.get(ngay)===1?Math.min(12,quota):quota
+}
+
+/** 12 chỗ ngày kiểm tra là của em, không phải 12 chỗ cho MỖI gói.
+ * Dự trù chỗ chung trên toàn lịch đã công bố trước khi chia phần còn lại sang ngày thường.
+ * Chỉ duyệt ngày kiểm tra; hạn rất xa không tạo vòng lặp theo từng ngày. */
+export function quotaCacGoiHocKt(goi:readonly {id:string;chuaGap:number;han:string}[],ngay:string,lich:ReadonlyMap<string,number>,sanNgay=24):Map<string,number>{
+ const ds=[...goi].sort((a,b)=>Number(a.han<ngay)-Number(b.han<ngay)||a.han.localeCompare(b.han)||a.id.localeCompare(b.id))
+ const ngayKiem=[...lich.keys()].filter(d=>d>=ngay&&(lich.get(d)??0)>0).sort()
+ const du=new Map(ds.map(g=>[g.id,Math.max(0,g.chuaGap)])),cho=new Map<string,Map<string,number>>()
+ for(const d of ngayKiem){
+  let con=lich.get(d)===1?12:0
+  for(const g of ds){
+   if(!con)break
+   // Nợ quá hạn chỉ nhận chỗ hôm nay còn dư sau các gói đang hạn, không chiếm dự trù tương lai.
+   if(g.han<d&&!(g.han<ngay&&d===ngay))continue
+   const n=Math.min(con,du.get(g.id)??0)
+   if(!n)continue
+   const m=cho.get(g.id)??new Map<string,number>();m.set(d,n);cho.set(g.id,m)
+   du.set(g.id,(du.get(g.id)??0)-n);con-=n
+  }
+ }
+ return new Map(ds.map(g=>{
+  const han=g.han<ngay?ngay:g.han,kiem=ngayKiem.filter(d=>d<=han)
+  const thuong=Math.max(0,1+Math.floor((Date.parse(han)-Date.parse(ngay))/NGAY_KT)-kiem.length)
+  const m=cho.get(g.id),sucKiem=kiem.reduce((n,d)=>n+(m?.get(d)??0),0),suc=thuong*sanNgay+sucKiem
+  const w=lich.has(ngay)?m?.get(ngay)??0:sanNgay,u=Math.max(0,g.chuaGap)
+  const quota=!w?0:!lich.has(ngay)&&u>suc&&thuong?Math.ceil((u-sucKiem)/thuong):Math.ceil(u*w/Math.max(w,suc))
+  return [g.id,lich.has(ngay)?Math.min(w,quota):quota]
+ }))
 }
 
 export function phutCauKt(phan: string, ms: readonly number[]): number {
