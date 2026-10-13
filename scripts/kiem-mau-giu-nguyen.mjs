@@ -20,15 +20,71 @@ import ts from 'typescript'
 const MOC = process.argv[2] || 'origin/main'
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
 
-const THUOC_TINH_MAU = /^(?:color|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?|outline(?:-color)?|fill|stroke|box-shadow|text-shadow|caret-color|accent-color|column-rule(?:-color)?|text-decoration(?:-color)?|--[\w-]+)$/i
-const MAU_THO = /rgba?\(|hsla?\(|#[0-9a-fA-F]{3,8}\b|\b(?:white|black|red|green|blue|yellow|orange|purple|pink|gray|grey|silver|gold|navy|teal|maroon|olive|lime|aqua|fuchsia)\b/i
-const LA_MAU = (gt) => MAU_THO.test(gt) || /var\(--|color-mix\(|currentcolor|transparent|gradient\(/i.test(gt)
+const THUOC_TINH_MAU = /^(?:color|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?|outline(?:-color)?|fill|stroke|stop-color|box-shadow|text-shadow|caret-color|accent-color|column-rule(?:-color)?|text-decoration(?:-color)?|--[\w-]+)$/i
+// Đủ 148 tên màu của CSS Color 4; currentColor và transparent là từ khoá hợp lệ, không phải màu thô.
+const TEN_MAU_CSS = `aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood
+cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey
+darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey
+darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite
+gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon
+lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue
+lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid
+mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin
+navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff
+peru pink plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver
+skyblue slateblue slategray slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen`
+  .split(/\s+/)
+const MAU_THO = new RegExp(`(?<![\\w-])(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\\(|#[0-9a-f]{3,8}\\b|(?<![\\w-])(?:${TEN_MAU_CSS.join('|')})(?![\\w-])`, 'i')
+
+// Tên màu trong đường dẫn/fragment không phải màu: url('/icons/red.svg'), url('#blue').
+// Giữ nguyên các phần khác, kể cả màu fallback trong var() và màu pha trong color-mix().
+function vanMau(van) {
+  return van.replace(/\burl\(\s*(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^)]*)\s*\)/gi, '')
+}
+const LA_MAU = (gt) => {
+  const van = vanMau(gt)
+  return MAU_THO.test(van) || /var\(\s*--|color-mix\(|currentcolor|transparent|gradient\(/i.test(van)
+}
+
+// Chỉ lấy thuộc tính tô màu SVG, không lấy title/aria-label/data-fill hoặc chữ giao diện.
+const THE_SVG = new Set('svg g path circle ellipse rect line polygon polyline text tspan textpath use symbol marker pattern mask clippath filter lineargradient radialgradient stop defs switch image foreignobject'.split(' '))
+const TEN_THUOC_SVG = /^(?:fill|stroke|stopColor|stop-color)$/
+function mauSvg(van, ten) {
+  const ra = []
+  const them = (ten, gt) => {
+    if (LA_MAU(gt) || /^(?:none|inherit|initial|unset)$/i.test(gt)) ra.push(`${ten.replace(/[A-Z]/g, c => '-' + c.toLowerCase())}: ${gt.replace(/\s+/g, ' ').trim()}`)
+  }
+  const html = (s) => {
+    for (const m of s.replace(/<!--[\s\S]*?-->/g, '').matchAll(/<([a-z][\w:-]*)\b([^<>]*)>/gi)) {
+      if (!THE_SVG.has(m[1].toLowerCase())) continue
+      for (const a of m[2].matchAll(/(?<![\w:-])(fill|stroke|stopColor|stop-color)\s*=\s*(["'])(.*?)\2/g)) them(a[1], a[3])
+    }
+  }
+  if (ten.endsWith('.html')) { html(van); return ra }
+  const tep = ts.createSourceFile('mau-svg.tsx', van, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+  const doc = n => {
+    if (ts.isJsxAttribute(n) && TEN_THUOC_SVG.test(n.name.getText(tep))) {
+      const the = n.parent.parent
+      if (THE_SVG.has(the.tagName?.getText(tep).toLowerCase())) {
+        const init = n.initializer
+        const giaTri = init && (ts.isStringLiteral(init) ? init : ts.isJsxExpression(init) && init.expression && ts.isStringLiteralLike(init.expression) ? init.expression : null)
+        if (giaTri) them(n.name.getText(tep), giaTri.text)
+      }
+    }
+    // Các phiếu HTML dùng string/template; ghép bằng dấu ngăn để không đoán giá trị nội suy.
+    if (ts.isStringLiteralLike(n) && !ts.isJsxAttribute(n.parent)) html(n.text)
+    if (ts.isTemplateExpression(n)) html([n.head.text, ...n.templateSpans.map(x => x.literal.text)].join(' _bien_ '))
+    ts.forEachChild(n, doc)
+  }
+  doc(tep)
+  return ra
+}
 
 /** Khai báo màu trong một đoạn văn bản: CSS `a: b;` và style JSX `{ color: 'var(--x)' }` / `background: \`…\``. */
-function khaiBaoMau(van) {
+function khaiBaoMau(van, ten = '') {
   const ra = []
   const bo = (s) => s.replace(/\s+/g, ' ').trim()
-  for (const m of van.matchAll(/(?<![\w-])(--[\w-]+|[a-z-]+)\s*:\s*([^;{}]+?)\s*(?=;|}|$)/gim)) {
+  for (const m of vanMau(van).matchAll(/(?<![\w-])(--[\w-]+|[a-z-]+)\s*:\s*([^;{}]+?)\s*(?=;|}|$)/gim)) {
     const tt = m[1].toLowerCase()
     if (!THUOC_TINH_MAU.test(tt)) continue
     const gt = bo(m[2])
@@ -36,10 +92,11 @@ function khaiBaoMau(van) {
     if (!LA_MAU(gt) && !/^(?:none|inherit|initial|unset|0)$/i.test(gt)) continue
     ra.push(`${tt}: ${gt}`)
   }
-  for (const m of van.matchAll(/\b(color|background(?:Color|Image)?|border(?:Color|Top|Bottom|Left|Right)?|outline(?:Color)?|fill|stroke|boxShadow|textShadow|caretColor|accentColor)\s*:\s*(['"`])([^'"`]+)\2/g)) {
+  for (const m of van.matchAll(/\b(color|background(?:Color|Image)?|border(?:Color|Top|Bottom|Left|Right)?|outline(?:Color)?|fill|stroke|stopColor|boxShadow|textShadow|caretColor|accentColor)\s*:\s*(['"`])([^'"`]+)\2/g)) {
     const tt = m[1].replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())
     if (LA_MAU(m[3])) ra.push(`${tt}: ${bo(m[3])}`)
   }
+  if (!ten.endsWith('.css')) ra.push(...mauSvg(van, ten))
   return ra
 }
 
@@ -158,7 +215,7 @@ for (const [trangThai, f, f2] of doi) {
   let moi = ''
   try { moi = trangThai.startsWith('D') ? '' : readFileSync(ten, 'utf8') } catch { moi = '' }
   const dem = (ds) => ds.reduce((m, k) => m.set(k, (m.get(k) ?? 0) + 1), new Map())
-  const a = dem(khaiBaoMau(cu)), b = dem(khaiBaoMau(moi))
+  const a = dem(khaiBaoMau(cu, ten)), b = dem(khaiBaoMau(moi, ten))
   const htmlCu = trangThai === 'M' && ten === 'src/screens/StudentPortalScreen.tsx' ? htmlMomTuCham(cu) : ''
   if (htmlCu && createHash('sha256').update(htmlCu).digest('hex') === HASH_HTML_MOM_CU && !htmlMomTuCham(moi)) {
     for (const [k, n] of dem(khaiBaoMau(htmlCu))) a.set(k, Math.max(0, (a.get(k) ?? 0) - n))
@@ -171,7 +228,7 @@ for (const [trangThai, f, f2] of doi) {
   for (const [k, n] of b) {
     if ((a.get(k) ?? 0) >= n) continue
     const gt = k.slice(k.indexOf(':') + 1)
-    if (MAU_THO.test(gt) && !MAU_THAY_RA_LENH.has(`${ten} · ${k}`)) loi.push(`MÀU THÔ mới (phải dùng biến chuẩn) · ${ten} · ${k}`)
+    if (MAU_THO.test(vanMau(gt)) && !MAU_THAY_RA_LENH.has(`${ten} · ${k}`)) loi.push(`MÀU THÔ mới (phải dùng biến chuẩn) · ${ten} · ${k}`)
     for (const m of gt.matchAll(/var\(\s*(--[\w-]+)/g)) if (!dinh.has(m[1])) loi.push(`BIẾN MÀU chưa định nghĩa · ${ten} · ${k}`)
   }
 }
