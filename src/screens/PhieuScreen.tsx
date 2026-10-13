@@ -55,6 +55,7 @@ function mauDiem(diem: number): string {
 
 import { CSS_BAO_CAO as CSS } from '../lib/css-bao-cao'
 import { themCssMayYeu } from '../lib/may-yeu'
+import NgheHoiThayPhieu from '../components/loi-giai/NgheHoiThayPhieu'
 
 // ------------------------------------------------------------------ tiện ích
 /** Hiện dần khi cuộn tới. Dùng IntersectionObserver để không phải nghe sự kiện
@@ -332,9 +333,16 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
   }, [du])
 
   const [oDau, raDau] = useHienKhiToi<HTMLDivElement>(tat)
+  const khungBt = useRef<HTMLIFrameElement>(null)
 
   if (phieuBt) {
-    return <iframe title="Phiếu bài tập" srcDoc={themCssMayYeu(phieuBt)} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
+    // 13/10: nút Hỏi thầy trên phiếu nhắn lên đây (trước đây không ai nghe ⇒ nút chết).
+    return (
+      <>
+        <iframe ref={khungBt} title="Phiếu bài tập" srcDoc={themCssMayYeu(phieuBt)} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
+        <NgheHoiThayPhieu khung={khungBt} />
+      </>
+    )
   }
 
   // VỎ LỖI mặc M3 ở cổng học sinh / phụ huynh (dungM3()): nền surface, chữ theo bảng màu M3 (sáng/tối), nút Thử lại đủ

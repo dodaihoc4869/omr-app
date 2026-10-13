@@ -1,6 +1,6 @@
 # Hỏi thêm Thầy (AI Gemini) — hướng dẫn thầy · 13/10/2026
 
-Trong khung **Hỏi thầy** (mọi câu ngoài giờ kiểm tra), dưới lời giải có ô **"Em còn chỗ chưa hiểu? Nhắn hỏi Thầy"**. Em nhắn, Gemini trả lời đúng giọng Thầy Đỗ Đại Học (xưng "Thầy", gọi "em", theo quy tắc viết của Thầy), căn cứ trọn đề (chữ, phương án/ý, bảng, hình) và trọn lời giải (kho, lời giải từng bước, lời Thầy gỡ, học liệu). Mã: `server/src/hoi-tro-ly.ts`, `src/components/loi-giai/HoiThemThay.tsx`.
+Mọi câu em làm ngoài giờ kiểm tra và ngoài Gọi lên bảng có hai nút: **Hỏi thầy** (nổi bật) mở hộp thoại nảy lên có đề câu và ô nhắn; **Lời giải từng bước** mở khung lời giải như cũ. Em nhắn, Gemini trả lời đúng giọng Thầy Đỗ Đại Học (xưng "Thầy", gọi "em", theo quy tắc viết của Thầy), căn cứ trọn đề (chữ, phương án/ý, bảng, hình) và trọn lời giải (kho, lời giải từng bước, lời Thầy gỡ, học liệu). Em chưa làm câu đó thì Thầy gợi hướng trước, em hỏi thẳng đáp án mới nêu. Mã: `server/src/hoi-tro-ly.ts`, `src/components/loi-giai/NutHoiThay.tsx`, `HopHoiThay.tsx`, `HoiThemThay.tsx`.
 
 ## Bật
 1. aistudio.google.com → Get API key → Create API key (nên dùng dự án Google Cloud đã bật thanh toán: tầng miễn phí cho Google dùng nội dung để cải thiện sản phẩm — kiểm lại điều khoản lúc bật).
@@ -8,9 +8,9 @@ Trong khung **Hỏi thầy** (mọi câu ngoài giờ kiểm tra), dưới lời
 3. Có khoá là bật cho mọi em. Chưa có khoá ⇒ ô hỏi tự ẩn.
 
 ## Tuỳ chỉnh (không cần phát hành lại) — `cau_hinh.khoa = 'hoi_tro_ly'`, giá trị JSON, mọi khoá tuỳ chọn
-`{"bat": true, "lop": ["12A1"], "sbd": [], "model": "gemini-2.5-flash", "tranNgay": 20, "tranCau": 6, "thinkingBudget": 1024, "nhietDo": 0.3}`
+`{"bat": true, "lop": ["12A1"], "sbd": [], "model": "gemini-3.5-flash-lite", "tranNgay": 20, "tranCau": 6, "thinkingBudget": 1024, "nhietDo": 0.3}`
 - `bat:false` tắt hẳn · `lop`/`sbd` chỉ mở cho lớp/em đó (chạy thử) · `tranNgay` câu hỏi/em/ngày · `tranCau` lần hỏi/câu/ngày.
-- Đổi `model` sang bản mạnh hơn khi cần; `thinkingBudget` chỉ gửi cho model 2.5 (`null` = không gửi).
+- Mặc định `gemini-3.5-flash-lite` (thầy chọn 13/10). Google báo 404 (model ngừng cấp cho khoá mới) ⇒ máy chủ tự thử `gemini-flash-lite-latest` rồi `gemini-flash-latest`; sổ ghi đúng model đã trả lời. `thinkingBudget` chỉ gửi cho model 2.5 (`null` = không gửi).
 
 ## Luật máy chủ (không tin máy em)
 - Cùng cổng chặn nút Hỏi thầy: em có ca kiểm tra mở ⇒ khoá; câu thuộc ca chưa công bố (kể cả bản chép ở tờ khác) ⇒ khoá.
@@ -20,3 +20,10 @@ Trong khung **Hỏi thầy** (mọi câu ngoài giờ kiểm tra), dưới lời
 
 ## Xem lại
 Bảng D1 `hoi_tro_ly`: sbd, qid, câu hỏi, trả lời, `lien_quan`, model, token vào/ra, thời gian, lỗi. Lỗi Gemini không trừ lượt của em. Chi phí: nhân số token với bảng giá hiện hành tại ai.google.dev/pricing.
+
+## Nút Hỏi thầy ở mọi câu (thầy 13/10)
+Thầy: "Nút hỏi bài phải đặt ở tất cả các câu, trừ các câu trong màn kiểm tra và gọi lên bảng. Đặt ở vị trí để học sinh dễ nhìn thấy thuận tiện ưu tiên hỏi bài thầy mọi lúc nếu cần."
+- Vị trí: ngay DƯỚI phần trả lời của thẻ câu (TheCau, phiếu HTML, Ôn câu, Bài hằng ngày), luôn hiện, không phải mở lời giải.
+- Em ĐANG LÀM (chưa trả lời/nộp): chỉ nút Hỏi thầy. Máy chủ trả đề KHÔNG đáp án (`/hs/hoi-thay` + `chiHoi`), Thầy chỉ gợi hướng (`/hs/hoi-tro-ly` + `dangLam`); máy chủ lọc thêm mọi câu lộ đáp án (`chanLoDapAn`). Game: Thầy trả lời ⇒ bật "có trợ giúp"; Ôn câu ⇒ lần làm hôm nay "có trợ giúp"; ghi `loi_giai_hoi` ⇒ kiểm tra cá nhân vẫn chặn câu này 12 giờ.
+- Sau khi trả lời/nộp: Hỏi thầy + Lời giải từng bước (như trước).
+- KHÔNG có nút: màn thi (ExamTakeScreen), Gọi lên bảng, lúc làm kiểm tra cá nhân, Đề thử có giờ (Đảo 2), Tám câu Bi-a có giờ, Đoàn Hộ Tống lúc đang đấu đội, bài gia đình giao có giờ.

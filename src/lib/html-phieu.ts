@@ -1254,7 +1254,7 @@ export function theCauHtml(
   choLam = false,
   laBtvn = false,
   soCauSang?: number,
-  /** Nút "Hỏi thầy" (thầy lệnh 29/09): chỉ phiếu HỌC SINH (giao diện M3), không phải phiếu in của thầy. */
+  /** Nút "Hỏi thầy" (thầy lệnh 29/09 + 13/10): chỉ phiếu HỌC SINH (giao diện M3), không phải phiếu in của thầy. */
   hoiThay = false,
 ): string {
   // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
@@ -1363,11 +1363,15 @@ export function theCauHtml(
   const txtDinhDang = tachDongTheoY(c.text)
   const deBai = (c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text" style="white-space: pre-line;">${chuHtml(txtDinhDang)}</div>`) + experimentHtml(txtDinhDang)
   const giai = anGiai ? '' : oGiaiHtml(c)
-  // Nút Hỏi thầy nằm TRONG khối lời giải (thầy lệnh 30/09): lời giải thu gọn / không có lời giải ⇒ không thấy nút.
-  const nutHoi = giai && hoiThay && c.id ? `<div class="q-hoi-thay"><button type="button" class="nut-hoi-thay" data-hoi-thay="${thoat(c.id)}">Hỏi thầy</button></div>` : ''
+  // THẦY 13/10 "nút hỏi bài ở tất cả các câu… vị trí học sinh dễ nhìn thấy… hỏi bài thầy mọi lúc": nút ngay DƯỚI phần trả lời, luôn hiện
+  // (không còn nằm trong lời giải thu gọn). Phiếu không kèm lời giải (`anGiai`, phiếu làm bài) ⇒ `data-dang-lam`: Thầy chỉ gợi hướng, không đáp án;
+  // phiếu còn khoá lời giải tới lúc nộp (`body.chua-nop`) mã nhắn tự xét. Phiếu xem kết quả ca chưa công bố (anGiai, không cho làm) ⇒ không nút.
+  const nutHoi = hoiThay && c.id && (!anGiai || choLam)
+    ? `<div class="q-hoi-thay"><button type="button" class="nut-hoi-thay" data-hoi-thay="${thoat(c.id)}"${anGiai ? ' data-dang-lam="1"' : ''}>${ICO_HOI_THAY}<span>Hỏi thầy</span></button></div>`
+    : ''
   const nut = giai
     ? `<button class="q-nut-giai" type="button" aria-expanded="${moSan ? 'true' : 'false'}" aria-controls="giai-${stt}">${MUI_TEN}<span class="chu-mo">Xem lời giải</span><span class="chu-dong">Ẩn lời giải</span></button>
-  <div class="sol-wrap" id="giai-${stt}"><div class="sol-inner">${giai}${nutHoi}</div></div>`
+  <div class="sol-wrap" id="giai-${stt}"><div class="sol-inner">${giai}</div></div>`
     : ''
 
   const oLamLai =
@@ -1408,7 +1412,7 @@ export function theCauHtml(
     ${bangHtml(c.bang)}
     ${experimentOriginal(c.text,hinhTaiViTri(c, 'sau_de'))}
     ${than}
-    ${hinhTaiViTri(c, 'cuoi_cau')}${cn?.daCham ? `<div class="lam-ket">${cn.daCham.dung ? 'Đúng' : 'Sai'}</div>` : ''}
+    ${hinhTaiViTri(c, 'cuoi_cau')}${cn?.daCham ? `<div class="lam-ket">${cn.daCham.dung ? 'Đúng' : 'Sai'}</div>` : ''}${nutHoi}
   </div>
   ${nut}
 </article>`
@@ -3364,7 +3368,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const soThuSuc = caNhan ? cau.filter((c) => c.caNhan?.thuSuc).length : 0
   const soBatBuoc = cau.length - soThuSuc
   // NÚT "HỎI THẦY" trên phiếu học sinh: bấm ⇒ phiếu nhắn app (khung xem phiếu) mở lời giải từng bước; máy chủ tự chặn câu đang thi / ca chưa công bố.
-  const coHoiThay = m3 && !anGiai
+  const coHoiThay = m3 && (!anGiai || !!nop)
   const the = cau
     .map((c, i) => (caNhan && c.caNhan?.thuSuc && !cau.slice(0, i).some((x) => x.caNhan?.thuSuc) ? nhomThuSucHtml(soThuSuc) : '') + theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang, coHoiThay))
     .join('\n') + (soThuSuc > 0 && caNhan?.thuSuc ? '\n' + nopThuSucHtml(caNhan.thuSuc.nut, caNhan.thuSuc.tat) : '')
@@ -3432,19 +3436,29 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   return taiLieuHtml(than + goiNop + (coHoiThay ? HOI_THAY_PHIEU : ''), `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody, m3, caNhan ? CSS_PHIEU_CA_NHAN : '')
 }
 
-/** Kiểu + mã nút Hỏi thầy trên phiếu học sinh: bắt trước mọi trình nghe khác của thẻ câu (không mở/đóng lời giải cũ), nhắn app đúng qid. */
+/** Biểu tượng "hỏi" (nét, theo màu chữ) cho nút Hỏi thầy trên phiếu. */
+const ICO_HOI_THAY = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>'
+
+/** Kiểu + mã nút Hỏi thầy trên phiếu học sinh: bắt trước mọi trình nghe khác của thẻ câu (không mở/đóng lời giải cũ), nhắn app đúng qid
+ *  + `dangLam` (phiếu không kèm lời giải, hoặc còn khoá lời giải tới lúc nộp ⇒ Thầy chỉ gợi hướng). */
 const HOI_THAY_PHIEU = `<style>
 .q-hoi-thay{display:flex;justify-content:flex-end;padding:0 16px 14px}
-.q-card:not(.mo) .q-hoi-thay{display:none}
 .nut-hoi-thay{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer;touch-action:manipulation}
 .nut-hoi-thay:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+/* 13/10 (thầy: nút Hỏi thầy "nổi bật hơn", đặt chỗ dễ thấy): nút luôn hiện dưới phần trả lời, nền màu chính của phiếu M3. */
+.q-than .q-hoi-thay{justify-content:flex-start;padding:12px 0 2px}
+.q-than .nut-hoi-thay{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 20px 0 16px;border:0;background:var(--gm-primary);color:var(--gm-on-primary);font-size:15px;box-shadow:0 4px 12px color-mix(in srgb,var(--gm-primary) 28%,transparent);transition:transform .16s ease,box-shadow .16s ease}
+.q-than .nut-hoi-thay:hover{transform:translateY(-1px);box-shadow:0 8px 18px color-mix(in srgb,var(--gm-primary) 34%,transparent)}
+.q-than .nut-hoi-thay:focus-visible{outline-color:var(--gm-primary);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.nut-hoi-thay{transition:none}.nut-hoi-thay:hover{transform:none}}
 @media print{.q-hoi-thay{display:none}}
 </style><script>
 document.addEventListener('click', function (e) {
   var b = e.target && e.target.closest ? e.target.closest('[data-hoi-thay]') : null;
   if (!b) return;
   e.preventDefault(); e.stopPropagation();
-  try { window.parent.postMessage({ type: 'ddh-hoi-thay', qid: b.getAttribute('data-hoi-thay') }, '*'); } catch (x) {}
+  var dl = b.getAttribute('data-dang-lam') === '1' || document.body.classList.contains('chua-nop');
+  try { window.parent.postMessage({ type: 'ddh-hoi-thay', qid: b.getAttribute('data-hoi-thay'), dangLam: dl }, '*'); } catch (x) {}
 }, true);
 <\/script>`
 

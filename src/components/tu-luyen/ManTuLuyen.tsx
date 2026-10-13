@@ -926,6 +926,8 @@ function DongHo({ giayRef }: { giayRef: { current: number } }) {
 function TheCauLam({ cau: c, stt, giaTri, onDoi }: { cau: CauCongKhai; stt: number; giaTri: string | undefined; onDoi: (v: string) => void }) {
   const chung = {
     cheDo: 'thi' as const,
+    // Thầy 13/10: Hỏi thầy ở mọi câu, cả lúc đang làm (Thầy chỉ gợi hướng, không đáp án).
+    hoiThay: { qid: qidGoc(c.qid), nguon: 'tu_luyen' },
     stt,
     id: `tlu-cau-${stt}`,
     text: chiSoDuoiRo(c.text),
@@ -967,7 +969,7 @@ function TheCauLam({ cau: c, stt, giaTri, onDoi }: { cau: CauCongKhai; stt: numb
 function TheCauXem({ cau: c, kq, stt, onHoi }: { cau: CauCongKhai; kq: KetQuaCau | undefined; stt: number; onHoi?: () => void }) {
   const chung = {
     cheDo: 'xem_lai' as const,
-    // Hỏi thầy nằm trong khối lời giải của TheCau (thầy lệnh 30/09: chỉ hiện khi lời giải đang hiện).
+    // Hỏi thầy trên đầu thẻ; Lời giải từng bước trong khối lời giải của TheCau (lệnh 30/09 + 13/10).
     hoiThay: { qid: qidGoc(c.qid), nguon: 'tu_luyen', onHoi, gon: true },
     stt,
     text: chiSoDuoiRo(c.text),

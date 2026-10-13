@@ -117,11 +117,13 @@ function useGachPhuongAn(goc:{current:HTMLElement|null},gach:readonly string[]){
 }
 export interface TheCauAiProps{cau:CauDao2;stt:number;traLoi:string;khoa:boolean;onTraLoi:(v:string)=>void;onZoom?:(src:string)=>void;onHinhLoi?:()=>void
  /** Nhãn đọc máy của thẻ (mặc định "Ải k"; đề thử OMNI 3 dùng "Câu k"). */
- nhan?:string}
-export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi,nhan}:TheCauAiProps){
+ nhan?:string
+ /** Thầy 13/10: Hỏi thầy cả lúc đang làm (Thầy gợi hướng, không đáp án); `onHoi` ⇒ bật "có trợ giúp". KHÔNG truyền ở đề thử có giờ. */
+ hoi?:{nguon:string;onHoi?:()=>void}}
+export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi,nhan,hoi}:TheCauAiProps){
  const goiY=docGoiY(q.goiY,q.phan),gach=goiY?.gach??[],goc=useRef<HTMLDivElement>(null)
  useGachPhuongAn(goc,gach)
- const chung={stt,onZoom,text:chiSoRo(q.text),table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'thi' as const}
+ const chung={stt,onZoom,text:chiSoRo(q.text),table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'thi' as const,...(hoi?{hoiThay:{qid:q.qid,nguon:hoi.nguon,onHoi:hoi.onHoi}}:{})}
  const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:(q.choices as string[]).map(chiSoRo) as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
    selected:(/^[ABCD]$/.test(traLoi)?traLoi:null) as 'A'|'B'|'C'|'D'|null,onSelect:v=>{if(!khoa&&!gach.includes(v))onTraLoi(v)}}
   :q.phan==='II'?{...chung,phan:'II',ideas:(q.ideas as string[]).map(chiSoRo) as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
@@ -156,7 +158,7 @@ export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom,nguon='dao',nhan
   :{...chung,phan:'III',selected:em||null,correct:dap}
  return <section ref={goc} className="dao2-the-giai m3" aria-label={nhan?`Lời giải ${nhan.toLocaleLowerCase('vi')}`:`Lời giải ải ${stt}`} data-mo-loi-giai={moLoiGiai?'':undefined}>
   <p className="dao2-giai-dau"><b data-vai={nhan?undefined:vai??undefined}>{nhan??`ẢI ${stt}${vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}`}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
-  {/* Hỏi thầy nằm trong khối LỜI GIẢI của TheCau (thầy lệnh 30/09: chỉ hiện khi lời giải đang hiện). */}
+  {/* Hỏi thầy + Lời giải từng bước ngay dưới phần trả lời của TheCau (lệnh 30/09 + 13/10). */}
   <TheCau {...pc} hoiThay={{qid:q.qid,nguon,gon:true}}/>
   <HinhTaiViTri hinhAnh={phanHoi.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={onZoom}/>
  </section>
@@ -251,7 +253,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
   {!phanHoi?<>
    {/* BẢN DUYỆT V2 (09/10): thẻ môn + số câu ngay trên đề (khối đọc từ mã đề; không đọc được ⇒ chỉ "Hoá học") */}
    <p className="dao2-v2-dau-cau"><span className="dao2-v2-mon">{monCau(q.maDe)}</span><span className="dao2-v2-so-cau">Câu {viTri+1}/{cau.length}</span></p>
-   <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy||cho} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
+   <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy||cho} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)} hoi={{nguon:'dao',onHoi:()=>onAssisted(true)}}/>
    {hinhLoi&&<p role="alert" className="dao2-loi">Hình của câu chưa tải được. Em về bản đồ rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
   </>:<KhoiLoiGiai cau={q} stt={viTri+1} phanHoi={phanHoi} traLoiMay={traLoi} onZoom={setZoom}/>}
   </div>

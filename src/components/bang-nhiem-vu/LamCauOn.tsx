@@ -8,6 +8,7 @@ import '../m3'
 import './lam-cau-on.css'
 import { MomOption, MomQuestionStem } from '../MomQuestionMedia'
 import { LoiGiaiCauSai } from '../KhoiCauSai'
+import NutHoiThay from '../loi-giai/NutHoiThay'
 import { HinhTaiViTri } from '../QuestionMedia'
 import OSoTraLoi from '../OSoTraLoi'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
@@ -499,7 +500,9 @@ function TheCauOn({
         </div>
       )}
 
-      {/* Nút Hỏi thầy CHỈ nằm trong hộp lời giải (hiện sau khi nộp) — thầy lệnh 30/09: chưa hiện lời giải thì chưa có nút. */}
+      {/* Thầy 13/10 "nút hỏi bài ở tất cả các câu… hỏi bài thầy mọi lúc": chưa nộp ⇒ Hỏi thầy ngay dưới phần trả lời (Thầy gợi hướng, không
+          đáp án; máy chủ ghi lần làm hôm nay là "có trợ giúp"). Sau nộp ⇒ Hỏi thầy + Lời giải từng bước trong hộp lời giải (lệnh 30/09). */}
+      {!daCham && <NutHoiThay gon dangLam qid={c.qid} nguon="on_lai" />}
 
       {daCham && (
         <div className="lco-loi-giai">

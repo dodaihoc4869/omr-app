@@ -6,7 +6,7 @@ import path from 'node:path'
 import worker from '../server/src/index'
 import { gameToken } from '../server/src/game-v2-auth'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
-import { CAU_NGOAI_PHAM_VI, dapAnDeDoc, dungNoiDung, giaiCauHinhHoiThem, lamSachTraLoi, tachKetQua, type NguCanhCau } from '../server/src/hoi-tro-ly'
+import { CAU_CHUA_NOP, CAU_NGOAI_PHAM_VI, DS_MODEL_DU_PHONG, chanLoDapAn, dapAnDeDoc, dungNoiDung, giaiCauHinhHoiThem, lamSachTraLoi, tachKetQua, type NguCanhCau } from '../server/src/hoi-tro-ly'
 
 const GOC = path.resolve(__dirname, '..')
 const MAU = JSON.parse(fs.readFileSync(path.join(GOC, 'docs/ra-soat-hien-thi-de-2809/sao-luu-truoc-sua.json'), 'utf8')) as Record<string, { cau: Record<string, unknown> }>
@@ -58,9 +58,9 @@ afterEach(() => { vi.restoreAllMocks() })
 
 describe('hàm thuần', () => {
   it('cấu hình: mặc định bật, chặn biên, JSON hỏng ⇒ mặc định', () => {
-    expect(giaiCauHinhHoiThem(null)).toMatchObject({ bat: true, tranNgay: 20, tranCau: 6, model: 'gemini-2.5-flash' })
+    expect(giaiCauHinhHoiThem(null)).toMatchObject({ bat: true, tranNgay: 20, tranCau: 6, model: 'gemini-3.5-flash-lite' }) // thầy 13/10: "đổi sang gemini 3.5 flash lite"
     expect(giaiCauHinhHoiThem('{"bat":false,"tranNgay":999,"lop":["12A1"," "],"model":"gemini-2.5-pro"}')).toMatchObject({ bat: false, tranNgay: 200, lop: ['12A1'], model: 'gemini-2.5-pro' })
-    expect(giaiCauHinhHoiThem('{"model":"../x"}').model).toBe('gemini-2.5-flash')
+    expect(giaiCauHinhHoiThem('{"model":"../x"}').model).toBe('gemini-3.5-flash-lite')
     expect(giaiCauHinhHoiThem('không phải json')).toMatchObject({ bat: true })
   })
   it('đáp án Phần II viết theo từng ý; phần khác giữ nguyên', () => {
@@ -75,6 +75,19 @@ describe('hàm thuần', () => {
   it('làm sạch theo quy tắc của Thầy: bỏ in đậm, gạch ngang dài, emoji; gạch đầu dòng ⇒ •', () => {
     expect(lamSachTraLoi('**Chỗ em sai** — em ghép nhầm gốc 😀\n- bước 1\n\n\n\nhết')).toBe('Chỗ em sai, em ghép nhầm gốc\n• bước 1\n\nhết')
   })
+  it('em ĐANG LÀM: bỏ câu lộ đáp án (phương án đúng, chữ phương án đúng, đúng/sai từng ý, đáp số); giữ câu gợi hướng', () => {
+    const pa = { A: '8,2 gam', B: '9,6 gam', C: '6,8 gam', D: '4,1 gam' }
+    expect(chanLoDapAn('Em viết phương trình thuỷ phân trước.\nĐáp án là A nhé.', 'I', 'A', pa)).toBe('Em viết phương trình thuỷ phân trước.')
+    expect(chanLoDapAn('Tính n ester trước. Ra m = 8,2 gam.', 'I', 'A', pa)).toBe('Tính n ester trước.')
+    expect(chanLoDapAn('Em chọn B là sai vì ghép nhầm gốc.', 'I', 'A', pa)).toBe(CAU_CHUA_NOP)
+    expect(chanLoDapAn('Muối ứng với gốc acid, em xem lại tên ester.', 'I', 'A', pa)).toBe('Muối ứng với gốc acid, em xem lại tên ester.')
+    expect(chanLoDapAn('Ý a sai vì chưa đun. Em đọc kĩ điều kiện phản ứng.', 'II', 'SDDS', null)).toBe('Em đọc kĩ điều kiện phản ứng.')
+    expect(chanLoDapAn('b) đúng.', 'II', 'SDDS', null)).toBe(CAU_CHUA_NOP)
+    expect(chanLoDapAn('Bảo toàn khối lượng cho CO2. Kết quả 58 nhé.', 'III', '58', null)).toBe('Bảo toàn khối lượng cho CO2.')
+    expect(chanLoDapAn('Có 0,58 mol khí, 158 gam muối.', 'III', '58', null)).toBe('Có 0,58 mol khí, 158 gam muối.')
+    expect(chanLoDapAn('Ra 2,5 mol.', 'III', '2.5', null)).toBe(CAU_CHUA_NOP)
+  })
+
   it('nội dung gửi Gemini: đủ đề, phương án, bảng, HÌNH (ảnh nhúng), đáp án, lời giải; giọng Thầy; không lời nào có SBD', () => {
     const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
     const nc: NguCanhCau = {
@@ -123,10 +136,11 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     expect(r).toMatchObject({ ok: true, traLoi: 'Ý b sai vì em nhầm chất, xem lại bước 2.', conLai: 19, ngoaiPhamVi: false })
     expect(goi).toHaveLength(1)
     const g = goi[0]!
-    expect(g.url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent')
+    expect(g.url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent')
     expect(g.url).not.toContain('khoa-thu-gemini')
     expect(g.headers['x-goog-api-key']).toBe('khoa-thu-gemini')
-    expect(g.body.generationConfig).toMatchObject({ responseMimeType: 'application/json', thinkingConfig: { thinkingBudget: 1024 } })
+    expect(g.body.generationConfig).toMatchObject({ responseMimeType: 'application/json' })
+    expect(g.body.generationConfig.thinkingConfig).toBeUndefined() // thinkingBudget chỉ gửi cho dòng 2.5 (dòng khác báo lỗi tham số)
     const dl = g.body.contents[0].parts[0].text as string
     const goc = MAU[Q_DS].cau as Record<string, unknown>
     const deTho = String(goc.de ?? '').replace(/<[^>]+>/g, '').slice(0, 25)
@@ -185,6 +199,38 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     expect(await em(d, '/hs/hoi-tro-ly', { token, qid: QA.tn, cauHoi: 'Câu khác' })).toMatchObject({ ok: true, conLai: 0 })
     expect(await em(d, '/hs/hoi-tro-ly', { token, qid: QA.tn, cauHoi: 'Thêm nữa' })).toMatchObject({ ok: false, ma: 'het_luot' })
     expect(goi).toHaveLength(2)
+  })
+
+  it('em ĐANG LÀM (chưa nộp): Hỏi thầy chỉ trả đề, KHÔNG đáp án/lời giải, không ghi đã xem lời giải; Thầy gợi hướng, lọc câu lộ đáp án', async () => {
+    const { d, token } = await chuanBi()
+    const mo = await em(d, '/hs/hoi-thay', { token, qid: QA.tn, nguon: 'luyen', chiHoi: true })
+    expect(mo).toMatchObject({ ok: true, chiHoi: true, hoiThem: true })
+    expect(mo.hoSo).toBeUndefined()
+    expect(mo.loiGiaiChu).toBeUndefined()
+    expect(JSON.stringify(mo)).not.toMatch(/dap_?an|loi_?giai|"dapAn"/i)
+    expect(d.dem('loi_giai_hoi', `sbd='${SBD}'`)).toBe(0)
+    const dapAn = String(MAU[Q_TN].cau.dap_an)
+    const goi = giaGemini(() => traLoiJson({ lienQuan: true, traLoi: `Em viết phương trình trước.\nĐáp án là ${dapAn}.` }))
+    const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.tn, nguon: 'luyen', cauHoi: 'Câu này làm sao ạ?', dangLam: true })
+    expect(r).toMatchObject({ ok: true, traLoi: 'Em viết phương trình trước.', ngoaiPhamVi: false })
+    const dl = goi[0]!.body.contents[0].parts[0].text as string
+    expect(dl).toContain('EM ĐANG LÀM CÂU NÀY, CHƯA NỘP')
+    // Thầy đã gợi hướng ⇒ một dòng "đã được chữa" (kiểm tra cá nhân chặn câu này 12 giờ)
+    expect(d.dem('loi_giai_hoi', `sbd='${SBD}' AND co_ho_so=0 AND nguon='luyen:goi_y'`)).toBe(1)
+    // không gửi `dangLam` mà chưa mở lời giải ⇒ vẫn chặn như cũ
+    expect(await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Vì sao ạ?' })).toMatchObject({ ok: false, ma: 'chua_mo' })
+  })
+
+  it('model Google báo 404 (ngừng cấp cho khoá mới) ⇒ tự thử tên dự phòng, em vẫn được trả lời; sổ ghi model thật đã trả lời', async () => {
+    const { d, token } = await chuanBi()
+    const goi = giaGemini(() => traLoiJson({ lienQuan: true, traLoi: 'Em tính lại số mol trước.' }))
+    await em(d, '/hs/hoi-thay', { token, qid: QA.ds })
+    vi.mocked(globalThis.fetch).mockImplementationOnce(async () => new Response(JSON.stringify({ error: { code: 404, message: 'models/gemini-3.5-flash-lite is not found' } }), { status: 404, headers: { 'content-type': 'application/json' } }))
+    const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Vì sao ạ?' })
+    expect(r).toMatchObject({ ok: true, traLoi: 'Em tính lại số mol trước.', conLai: 19 })
+    expect(goi.map((g) => g.url.split('/models/')[1])).toEqual(['gemini-flash-lite-latest:generateContent'])
+    expect(DS_MODEL_DU_PHONG[0]).toBe('gemini-flash-lite-latest')
+    expect(d.dem('hoi_tro_ly', "model='gemini-flash-lite-latest' AND loi IS NULL")).toBe(1)
   })
 
   it('Gemini quá tải (429) ⇒ lời của Thầy cho em, KHÔNG trừ lượt, ghi lỗi vào sổ', async () => {

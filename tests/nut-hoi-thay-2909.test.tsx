@@ -64,13 +64,11 @@ describe('KHÔNG có nút Hỏi thầy trong lúc kiểm tra (khoá nguồn)', (
     const fs = await import('node:fs')
     const ma = fs.readFileSync('src/screens/ExamTakeScreen.tsx', 'utf8')
     expect(ma).not.toMatch(/NutHoiThay|hoi-thay|hoiThay/)
-    // SỬA CÓ CHỦ Ý 30/09 (thầy: nút chỉ hiện khi lời giải đang hiện): TheCau vẽ nút TRONG khối LỜI GIẢI (chỉ chế độ xem_lai)
-    // và chỉ khi nơi gọi truyền `hoiThay` — màn thi không truyền (kiểm ở trên). Không gọi /hs/hoi-thay trực tiếp.
+    // SỬA CÓ CHỦ Ý 13/10 (thầy: "Nút hỏi bài phải đặt ở tất cả các câu, trừ các câu trong màn kiểm tra và gọi lên bảng"): TheCau vẽ
+    // nút dưới phần trả lời ở mọi chế độ, CHỈ khi nơi gọi truyền `hoiThay` — màn thi không truyền (kiểm ở trên). Không gọi /hs/hoi-thay trực tiếp.
     const the = fs.readFileSync('src/components/TheCau.tsx', 'utf8')
     expect(the).not.toMatch(/hoi-thay/)
-    expect(the).toContain('{xemLai && <LoiGiai props={props}')
-    const lg = the.slice(the.indexOf('function LoiGiai('), the.indexOf('export default function TheCau'))
-    expect(lg).toContain('<NutHoiThay')
+    expect(the).toContain('{props.hoiThay && (')
     expect(the.split('<NutHoiThay').length).toBe(2)
   })
 })

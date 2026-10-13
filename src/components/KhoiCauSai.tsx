@@ -291,8 +291,8 @@ export function LoiGiaiCauSai({ c, qid, nguon }: { c: Omit<CauSaiHienThi, 'loiGi
   return (
     <div data-loi-giai-chuan="1">
       <KhoiLoiGiaiChuan phan={phan} loiGiai={lg} correct={c.dapAnDung || ''} />
-      {/* Hỏi thầy chỉ khi hộp lời giải có nội dung (thầy lệnh 30/09). */}
-      {qid && lg && <NutHoiThay qid={qid} nguon={nguon ?? 'luyen'} gon />}
+      {/* Thầy 13/10: Hỏi thầy ở mọi câu; Lời giải từng bước chỉ khi hộp lời giải có nội dung (lệnh 30/09). */}
+      {qid && <NutHoiThay qid={qid} nguon={nguon ?? 'luyen'} gon chi={lg ? undefined : 'hoi'} />}
     </div>
   )
 }
