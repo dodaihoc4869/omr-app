@@ -39,9 +39,11 @@ export function laLoiThieuManh(e: unknown): boolean {
  * (lúc đó hàm gọi chỉ cần báo một dòng rồi thôi, trang sắp đi). */
 export function taiLaiMotLan(nay: number = Date.now(), kho: Storage | null = layKho()): boolean {
   if (!kho) return false
-  const truoc = Number(kho.getItem(KHOA) || 0)
-  if (truoc && nay - truoc < KHOANG_CHO) return false
-  kho.setItem(KHOA, String(nay))
+  try {
+    const truoc = Number(kho.getItem(KHOA) || 0)
+    if (truoc && nay - truoc < KHOANG_CHO) return false
+    kho.setItem(KHOA, String(nay))
+  } catch { return false } // Không giữ được mốc chống vòng lặp ⇒ để màn báo thử lại.
   if (typeof location !== 'undefined') {
     const u = new URL(location.href)
     u.searchParams.set('_moi', String(nay))
