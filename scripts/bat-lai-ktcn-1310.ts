@@ -1,10 +1,10 @@
 // KHẨN 13/10 — BẬT LẠI kiểm tra riêng sau bản vá D1 quá tải. Chạy SAU KHI Worker sống đã có bản vá (số tính sẵn).
 // 1) kiểm ca mở (import kiem-phat-hanh-chua.mjs dừng nếu có ca) · 2) tạo bảng chỉ-thêm · 3) bù số tính sẵn cho MỌI lịch cũ
 // (Worker tự tính từ JSON đề, D1 chỉ đọc/ghi dòng) · 4) còn dòng thiếu ⇒ DỪNG, không bật · 5) bật cờ.
-// Không xoá/sửa lịch, bài nộp, điểm.
+// Không xoá lịch; không đụng bài đã mở/đã làm/đã nộp, điểm. Lịch tương lai chưa mở được làm mới theo khung đề Hóa 2026 (28 câu/50 phút).
 import type { Env } from '../server/src/kieu'
 import { SQL_KT_CN } from '../server/src/kiem-tra-ca-nhan-schema'
-import { buMetaKt } from '../server/src/kiem-tra-ca-nhan'
+import { buMetaKt, lapKtCn } from '../server/src/kiem-tra-ca-nhan'
 import { query } from './kiem-phat-hanh-chua.mjs'
 const token=process.env.CLOUDFLARE_API_TOKEN,account=process.env.CLOUDFLARE_ACCOUNT_ID
 if(!token||!account)throw new Error('Thiếu cấu hình Cloudflare.')
@@ -12,6 +12,20 @@ const db={prepare(sql:string){const st={sql,params:[] as unknown[],bind(...param
 const env={DB:db} as unknown as Env
 if(SQL_KT_CN.some(s=>!/^CREATE (TABLE|INDEX) IF NOT EXISTS (kiem_tra_ca_nhan|ktcn_)/.test(s)))throw new Error('Schema kiểm tra phải chỉ-thêm.')
 for(const sql of SQL_KT_CN)await query(sql)
+// Đề Hóa 2026 (Claude gộp 13/10): cờ tắt thì cron chưa chuyển đề ⇒ chuyển MỌI lịch tương lai CHƯA MỞ, chưa làm chặng nào về 28 câu/50 phút
+// TRƯỚC khi bật cờ (lapKtCn làm mới, giữ ngày đã hẹn; cổng ghi trong lapKtCn chỉ sửa lịch mo_luc > bây giờ, chưa nộp, chưa có chặng).
+// Từng em, tuần tự: D1 chỉ một lượt nặng mỗi lúc. Em không lập được ⇒ bỏ qua; cổng "quaTai" bên dưới chặn bật cờ nếu còn đề cũ. Chỉ in số đếm.
+const daThu:string[]=[]
+let daChuyen=0,loiLap=0
+for(let i=0;i<600;i++){
+  if(i%10===0&&Number((await query(`SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'`))[0]?.n))throw new Error('Ca vừa mở: dừng chuyển đề, CHƯA bật cờ.')
+  const em=await db.prepare(`SELECT k.sbd FROM kiem_tra_ca_nhan k LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE k.mo_luc>?1 AND k.nop_luc IS NULL AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=k.id) AND COALESCE(json_extract(km.meta_json,'$.phienBan'),1)<>3 AND k.sbd NOT IN(SELECT value FROM json_each(?2)) GROUP BY k.sbd ORDER BY MIN(k.ngay) LIMIT 1`).bind(Date.now(),JSON.stringify(daThu)).first<{sbd:string}>()
+  if(!em)break
+  daThu.push(em.sbd)
+  try{if(await lapKtCn(env,em.sbd,Date.now(),true,false,true))daChuyen++}catch{loiLap++}
+  if(i%20===19)console.log(JSON.stringify({dangChuyenDe2026:true,daThu:daThu.length,daChuyen,loiLap}))
+}
+console.log(JSON.stringify({chuyenDe2026:true,daThu:daThu.length,daChuyen,loiLap}))
 let daBu=0
 for(let i=0;i<400;i++){const n=await buMetaKt(env,5);daBu+=n;if(!n)break}
 const con=Number((await query(`SELECT COUNT(*) n FROM kiem_tra_ca_nhan k LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE km.id IS NULL`))[0]?.n)
@@ -21,5 +35,5 @@ if(quaTai)throw new Error(`Còn ${quaTai} đề chưa chuyển về 28 câu/50 p
 const luc=new Date().toISOString()
 await query(`UPDATE cau_hinh SET gia_tri='{"bat":true}',cap_nhat_luc='${luc}' WHERE khoa='kiem_tra_ca_nhan_v1' AND NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')`)
 const co=(await query(`SELECT gia_tri FROM cau_hinh WHERE khoa='kiem_tra_ca_nhan_v1'`))[0]
-console.log(JSON.stringify({daBuSoTinhSan:daBu,conThieu:con,co:co?.gia_tri}))
+console.log(JSON.stringify({daChuyenDe2026:daChuyen,daBuSoTinhSan:daBu,conThieu:con,co:co?.gia_tri}))
 if(!String(co?.gia_tri).includes('"bat":true'))throw new Error('Cờ chưa bật (có thể vừa có ca mở).')
