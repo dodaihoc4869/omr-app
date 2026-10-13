@@ -301,3 +301,5 @@ Thầy nhắn thêm (13/10): "Tôi muốn bạn tính toán tối ưu sắp xế
 - [ ] Hiển thị + sắp xếp theo bậc ở app thầy (Nhịp học cả lớp, hồ sơ em) | bằng chứng: (chưa có)
 - [ ] Mỗi bậc một màu riêng (12 màu, dẫn từ biến màu chuẩn, sáng + tối) | bằng chứng: (chưa có)
 - [ ] Không chậm hơn: không thêm truy vấn D1, cổng kiem:toc-do xanh | bằng chứng: (chưa có)
+Thầy nhắn thêm: "Hiện bậc trên màn chiếu luôn nhé."
+- [ ] Hiện bậc 1–12 (màu riêng) trên màn chiếu điểm danh cả lớp | bằng chứng: (chưa có)
