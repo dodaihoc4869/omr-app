@@ -26,6 +26,7 @@ async function phamVi() {
   ])
   return { tick, truoc }
 }
+console.log(JSON.stringify({ kiemCaTruocPhatHanh: true, chiDoc: true, luc: new Date().toISOString(), ...(await doc("SELECT COUNT(*) soCaMo FROM ca WHERE trang_thai='mo'"))[0] }))
 const dau = await phamVi()
 const lop = [...new Set(dau.tick.map(r => String(r.lop)))].sort()
 const phamViLop = lop.map(l => {
@@ -62,8 +63,8 @@ for (const p of phamViLop) {
   const tongMoi = ds.filter(r => p.toMoi.has(r.ma_de)).length
   const duBao = [24, 30, 36].map(d => {
     const tongLuot = 5 * d + 2 * (12 + 28), con = Math.max(0, tongLuot - moi.size - 20)
-    const tuan = Math.min(cu.size, con), bonTuan = Math.min(cu.size, con * 4)
-    return { mucNgay: d, tongLuotTuan: tongLuot, cauCuTuan: tuan, cauCuBonTuan: bonTuan,
+    const tuan = Math.min(cu.size - cuNghi, con), bonTuan = Math.min(cu.size - cuNghi, Math.max(0, 4 * tongLuot - moi.size - 80)), bonTuanCoBaiMoiHangTuan = Math.min(cu.size - cuNghi, con * 4)
+    return { mucNgay: d, tongLuotTuan: tongLuot, giaDinh: '2 kiểm tra/tuần;20 lượt lặp bổ sung/tuần;4 tuần ngân hàng giữ nguyên và không tick thêm bài mới', cauCuTuan: tuan, cauCuBonTuan: bonTuan, cauCuBonTuanCoBaiMoiHangTuan: bonTuanCoBaiMoiHangTuan,
       phanTramTuan: cu.size ? +(100 * tuan / cu.size).toFixed(2) : null,
       phanTramBonTuan: cu.size ? +(100 * bonTuan / cu.size).toFixed(2) : null }
   })
