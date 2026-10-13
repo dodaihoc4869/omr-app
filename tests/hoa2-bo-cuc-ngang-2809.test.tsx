@@ -245,7 +245,7 @@ describe('Câu đã làm ngang (Ngang-CauDaLam)', () => {
     await waitFor(() => expect(phai.textContent).toContain('Chất nào sau đây thuộc loại disaccharide?'))
     expect(trai.querySelector('[data-chon="true"]')!.textContent).toContain('Câu 22')
     // Tải PDF: ở hàng trên, đúng số câu đang lọc
-    const pdf = screen.getByRole('button', { name: 'Tải PDF · 2 câu đang lọc' })
+    const pdf = screen.getByRole('button', { name: 'Tải PDF · 2 câu' })
     expect(container.querySelector('.h2-cdl-ng-dau')!.contains(pdf)).toBe(true)
     expect(screen.getByRole('button', { name: 'Về Hôm nay' }).textContent).toContain('Về Hôm nay')
   })
