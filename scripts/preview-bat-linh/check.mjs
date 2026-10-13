@@ -11,16 +11,12 @@ mkdirSync(out, { recursive: true })
 const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM ?? '/usr/bin/chromium', args: ['--no-sandbox'] })
 const checks = []
 const scenarios = [
-  ['sanh', 'trang.html?man=sanh', '.bl-dong-hanh'],
-  ['xong', 'trang.html?man=xong', '.h2-xong, .h2-ng-xong'],
-  ['ph', 'trang.html?man=ph', '.ph3-ah'],
+  ['hoc-tap', 'trang.html?man=hoc-tap', '.ht-app'],
+  ['xong', 'trang.html?man=xong', '.ht-app'],
+  ['ph', 'trang.html?man=ph', '.ph3[data-app="ph3"]'],
   ['tl', 'trang.html?man=tl', '.tlu-the-che-do'],
   ['hs-login', 'trang.html?man=hs-login', '#hs-dn-sbd'],
   ['ph-login', 'trang.html?man=ph-login', '#ph3-sbd'],
-  ['dao', 'games.html?game=dao&thu=1&cap=50', '.dao2'],
-  ['shop', 'games.html?game=shop&pet=1&cap=50', '.ps-the'],
-  ['doan', 'games.html?game=doan&man=tran', '.dh2'],
-  ['bia', 'games.html?game=bia', '.bia'],
 ]
 const base = `${origin}/scripts/preview-bat-linh/`
 async function pageFor(width, height, dark = false) {
@@ -49,7 +45,7 @@ try {
         const brokenImages = await page.locator('img').evaluateAll(imgs => imgs.filter(i => i.complete && !i.naturalWidth).map(i => i.getAttribute('src')))
         const record = { name, width, height, dark, overflow, brokenImages, errors }
         checks.push(record)
-        if (width === 390 || width === 1440 || errors.length || overflow > 1) await capture(page, `${name}-${width}${dark ? '-dark' : ''}`, name !== 'shop')
+        if (width === 390 || width === 1440 || errors.length || overflow > 1) await capture(page, `${name}-${width}${dark ? '-dark' : ''}`, true)
         assert.equal(errors.length, 0, `${name}: JavaScript errors`)
         assert.equal(brokenImages.length, 0, `${name}: broken images`)
         assert.ok(overflow <= 1, `${name} ${width}×${height}: ${overflow}px overflow`)
@@ -58,11 +54,8 @@ try {
   }
   // Exercise real controls, not just screenshots.
   const p = await pageFor(390, 844)
-  await p.goto(base + 'trang.html?man=sanh')
-  await p.locator('.bl-ban-do summary').click()
-  assert.ok(await p.locator('.bl-ban-do .h2-ban-do').isVisible())
-  await p.locator('.bl-ban-do summary').click()
-  assert.ok(!(await p.locator('.bl-ban-do .h2-ban-do').isVisible()))
+  await p.goto(base + 'trang.html?man=hoc-tap')
+  await p.getByRole('button', { name: 'Ôn & sửa', exact: true }).click()
   await p.getByRole('button', { name: /Tu luyện/ }).click()
   await p.locator('.tlu-the-che-do[data-che-do="3"]').click()
   await p.locator('.tlu-nut-rong').click()
@@ -75,17 +68,22 @@ try {
   await p.getByRole('button', { name: 'Xem tổng hợp' }).click()
   await p.waitForSelector('.tlu-hero')
   await capture(p, 'luyen-tong-hop-390')
-  checks.push({ flow: 'Home map toggle → practice → submit → feedback → progress', passed: true })
+  checks.push({ flow: 'Ôn & sửa → Tu luyện → nộp → lời giải → tổng hợp', passed: true })
 
   await p.goto(base + 'trang.html?man=ph')
-  for (const [hash, name] of [['diem', 'ph-diem'], ['tien-bo', 'ph-tien-bo'], ['loi-thay', 'ph-loi-thay']]) {
-    await p.locator(`.ph3-muc[href="#${hash}"]`).click()
-    await p.locator(`.ph3-muc[href="#${hash}"][aria-current="page"]`).waitFor()
-    assert.equal(await p.locator(`.ph3-muc[href="#${hash}"]`).getAttribute('aria-current'), 'page')
+  await p.setViewportSize({ width: 1440, height: 900 })
+  for (const [hash, name] of [['phan-kiem-tra', 'ph-diem'], ['phan-nhip', 'ph-tien-bo'], ['phan-thai-do', 'ph-thai-do']]) {
+    await p.locator(`.tvc-ben-muc[href="#${hash}"]`).click()
+    await p.locator(`#${hash}`).waitFor()
+    assert.ok(await p.locator(`#${hash}`).isVisible())
+    await p.setViewportSize({ width: 390, height: 844 })
     await capture(p, `${name}-390`)
+    await p.setViewportSize({ width: 1440, height: 900 })
   }
-  await p.locator('.ph3-muc[href="#diem"]').click()
-  await p.locator('a[href="#ca/CA-2"]').first().click()
+  await p.goto(base + 'trang.html?man=ph#loi-thay')
+  await p.getByRole('heading', { name: /Nhận xét|Lời thầy/ }).first().waitFor()
+  await capture(p, 'ph-loi-thay-390')
+  await p.goto(base + 'trang.html?man=ph#ca/CA-2')
   await p.waitForSelector('[data-vung="diem-ca"]')
   await capture(p, 'ph-chi-tiet-390')
   checks.push({ flow: 'Parent all tabs → published exam report', passed: true })

@@ -1,6 +1,6 @@
 import CauDaLam from '../../src/components/hoa2/CauDaLam'
 // TRANG CHỤP ẢNH TU LUYỆN (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
-// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|tl`.
+// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=hoc-tap|tl`.
 import { createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource/be-vietnam-pro/vietnamese-400.css'
@@ -18,7 +18,7 @@ import '../../src/index.css'
 import '../../src/styles/the-loc.css'
 import '../../src/components/m3'
 import '../../src/components/bang-nhiem-vu/sheet-m3.css'
-import SanhBanDo from '../../src/components/hoa2/SanhBanDo'
+import HocTapHomNay from '../../src/components/hoc-tap/HocTapHomNay'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen'
 
@@ -31,8 +31,7 @@ import { PH_OK, CHI_TIET } from '../../tests/_ph-moi/du-lieu-mau'
 const man = new URLSearchParams(location.search).get('man') ?? 'tl'
 const now = Date.now()
 const noop = () => {}
-const moGame = (query: string) => () => location.assign('games.html?' + query)
-const veSanh = () => location.assign('?man=sanh')
+const veHocTap = () => location.assign('?man=hoc-tap')
 try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk-gia', sbd: 'GIA' })) } catch { /* bỏ qua */ }
 
 // ---------------------------------------------------------------- máy chủ giả
@@ -210,18 +209,20 @@ const SANH = {
   chienDich: { id: 'cd1', ten: 'Ester – Lipid', hanNop: '2026-10-04', D: 5, tong: 120, coXat: 67, thanhThao: 0, canDayLai: 0, thanhThaoTangTu: '2026-10-02' },
   theLuc: { con: 32, tong: 40 }, huyetChien: false, doan: { con: 4 }, dao: { con: 28 }, khoaDao: false, loiKhoaDao: '',
   ruong: { daLam: 8, tong: 40, moDuoc: false, daMo: false },
+  hanhTrinh: { tang: 2, toiThieu: 40, daLam: 8, daXep: 40, conThieu: 0, soChang: 5, changHienTai: 2, cauTrongChang: 8 },
 }
 if (man.endsWith('login')) { localStorage.removeItem('omr_student_portal_auth'); localStorage.removeItem('omr_ph_sbd') }
-if (man === 'xong') { SANH.theLuc.con = 0; SANH.doan.con = 0; SANH.dao.con = 0; SANH.ruong.daLam = 40 }
+if (man === 'xong') { SANH.theLuc.con = 0; SANH.doan.con = 0; SANH.dao.con = 0; SANH.ruong.daLam = 40; SANH.hanhTrinh.daLam = 40 }
 const con = man === 'hs-login' ? h(StudentPortalScreen)
   : man === 'ph-login' ? h(ParentPortalScreen)
-  : man === 'cau-da-lam' ? h(CauDaLam, {token:'tk-gia',hoTen:'Nguyễn Minh Khôi',sbd:'GIA',lop:'12A1',onVe:veSanh})
+  : man === 'cau-da-lam' ? h(CauDaLam, {token:'tk-gia',hoTen:'Nguyễn Minh Khôi',sbd:'GIA',lop:'12A1',onVe:veHocTap})
   : man.startsWith('ph') ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Khôi', lop: '12A1', onDoiSbd: () => location.assign('?man=ph-login') })
-  : man === 'sanh' || man === 'xong'
-  ? h(SanhBanDo, {
-      ketQua: docSanh(SANH) as KetQuaSanh, loi: '', dangTai: false, thu: { index: 1, cap: 50, ten: 'Thuỷ Long' }, exp: { homNay: 22, conThieu: 160 },
-      chuoiNgay: 5, caDangMo: false, now, token: 'tk', shopBat: true, onVaoThi: noop, onPhaPhucKich: moGame('game=doan&man=sanh'), onKhamPhaDao: moGame('game=dao&thu=1&cap=50'), onCauDaLam: () => location.assign('?man=cau-da-lam'),
-      onTuiDo: moGame('game=thu&man=tui'), onCuaHang: moGame('game=shop&pet=1&cap=50'), onMoThanThu: moGame('game=thu&man=dao&thu=1&cap=50'), onChonThu: moGame('game=thu&man=chon'), onDangXuat: () => location.assign('?man=hs-login'), onTaiLai: noop, onTuLuyen: () => location.assign('?man=tl'),
+  : man === 'hoc-tap' || man === 'sanh' || man === 'xong'
+  ? h(HocTapHomNay, {
+      ten: 'Minh Khôi', lop: '12A1', ketQua: docSanh(SANH) as KetQuaSanh, loi: '', dangTai: false, coCa: false,
+      onHoc: () => location.assign('?man=tl'), onXemLai: () => location.assign('?man=cau-da-lam'), onChua: noop,
+      onThi: noop, onTuLuyen: () => location.assign('?man=tl'), onLichSu: noop, onBaiTap: noop,
+      onGiaDinh: () => location.assign('?man=ph'), onDangXuat: () => location.assign('?man=hs-login'), onTaiLai: noop,
     })
-  : h(ManTuLuyen, { token: 'tk-gia', sbd: 'GIA', onVe: veSanh })
+  : h(ManTuLuyen, { token: 'tk-gia', sbd: 'GIA', onVe: veHocTap })
 createRoot(document.getElementById('root')!).render(h(BatLinhShell, { vai: man.startsWith('ph') ? 'ph' : 'hs', children: con }))
