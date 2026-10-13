@@ -1,0 +1,35 @@
+# KHẨN 13/10 — BẬT LẠI kiểm tra riêng sau bản vá D1 quá tải (số liệu lịch tính sẵn, bảng kiem_tra_ca_nhan_meta).
+# Chỉ bấm SAU KHI lượt "Phát hành lên Cloudflare Pages" của bản vá đã thành công (Worker sống đã có bản vá).
+# Kịch bản scripts/bat-lai-ktcn-1310.ts: kiểm ca mở → tạo bảng chỉ-thêm → bù số tính sẵn cho mọi lịch cũ → còn thiếu thì DỪNG → bật cờ.
+# Không xoá/sửa lịch, bài nộp, điểm.
+name: Khẩn — bật lại kiểm tra riêng (sau bản vá số liệu tính sẵn)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: phat-hanh
+  cancel-in-progress: false
+jobs:
+  bat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Bù số tính sẵn rồi bật cờ
+        run: |
+          npx esbuild scripts/bat-lai-ktcn-1310.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/bat-lai-ktcn.mjs --log-level=warning
+          node /tmp/bat-lai-ktcn.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}

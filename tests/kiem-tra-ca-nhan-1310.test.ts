@@ -2,7 +2,7 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
-import { lapKtCn, docKtCn, tomTatKt, ktCnAction, dongBoKtCn, chotKtCn } from '../server/src/kiem-tra-ca-nhan'
+import { lapKtCn, docKtCn, tomTatKt, ktCnAction, dongBoKtCn, chotKtCn, buMetaKt } from '../server/src/kiem-tra-ca-nhan'
 import { chonDeKt, henKt, quotaHocKt, phutCauKt, dauNgayKt, type MucKt } from '../server/src/kiem-tra-ca-nhan-loi'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
@@ -181,8 +181,32 @@ it('đọc lịch nhẹ không mang đề/đáp án; số câu trả lời khớ
  const mau=d.cau[0],cases=[['I','A'],['I','AB'],['II','DSDS'],['II','DSD'],['III','2,4'],['III',' \t\n\u00a0']]
  d.cau=cases.map(([phan,a],i)=>({...mau,q:{...mau.q,qid:'edge'+i,phan},answer:a}))
  k.d.sql.prepare('UPDATE kiem_tra_ca_nhan SET json=?,tra_json=? WHERE id=?').run(JSON.stringify(d),JSON.stringify(Object.fromEntries(d.cau.map((c:{q:{qid:string};answer:string})=>[c.q.qid,c.answer]))),String(r.id))
- const full=(await docKtCn(k.env,'S1',NOW))!,meta=(await docKtCn(k.env,'S1',NOW,true))!
- expect(meta).not.toHaveProperty('json');expect(meta).not.toHaveProperty('tra_json')
- expect(JSON.stringify(meta)).not.toContain('correct')
- expect(tomTatKt(meta,NOW)).toEqual(tomTatKt(full,NOW));expect(tomTatKt(meta,NOW).daTra).toBe(3)
+ // SỬA CÓ CHỦ ĐÍCH 13/10 (khẩn D1 quá tải): số liệu nay TÍNH SẴN lúc lập đề (kiem_tra_ca_nhan_meta). Đề vừa bị sửa thẳng bằng SQL ở trên
+ // (ngoài đường lapKtCn) ⇒ bỏ số tính sẵn cũ, kiểm CẢ HAI nhánh: (1) dòng chưa có số ⇒ phép tính cũ; (2) sau khi bù (buMetaKt) ⇒ số tính sẵn.
+ k.d.sql.prepare('DELETE FROM kiem_tra_ca_nhan_meta WHERE id=?').run(String(r.id))
+ const full=(await docKtCn(k.env,'S1',NOW))!
+ for(const nhanh of ['cu','tinh-san']){
+  if(nhanh==='tinh-san')expect(await buMetaKt(k.env,10)).toBe(1)
+  const meta=(await docKtCn(k.env,'S1',NOW,true))!
+  expect(meta).not.toHaveProperty('json');expect(meta).not.toHaveProperty('tra_json')
+  expect(JSON.stringify(meta)).not.toContain('correct');expect(String(meta.meta_json)).not.toContain('"phan"')
+  expect(tomTatKt(meta,NOW)).toEqual(tomTatKt(full,NOW));expect(tomTatKt(meta,NOW).daTra).toBe(3)
+ }
+})
+it('khẩn 13/10: lập đề ghi luôn số tính sẵn; đọc lịch nhẹ không bóc JSON đề trong SQL',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!
+ const so=k.d.sql.prepare('SELECT meta_json FROM kiem_tra_ca_nhan_meta WHERE id=?').get(String(r.id)) as {meta_json:string}|undefined
+ expect(so).toBeTruthy()
+ const d=JSON.parse(String(r.json)),m=JSON.parse(so!.meta_json)
+ expect(m.tong).toBe(d.cau.length);expect(Object.keys(m.phan)).toEqual(d.cau.map((c:{q:{qid:string}})=>c.q.qid))
+ expect(m).not.toHaveProperty('cau');expect(so!.meta_json).not.toContain('correct')
+ // Lượt đọc nhẹ đi nhánh số tính sẵn: không json_each trên k.json (gốc lỗi 0,9 s/dòng).
+ const prepare=k.env.DB.prepare.bind(k.env.DB),sqls:string[]=[]
+ vi.spyOn(k.env.DB,'prepare').mockImplementation(sql=>{sqls.push(sql);return prepare(sql)})
+ const meta=(await docKtCn(k.env,'S1',NOW,true))!
+ vi.restoreAllMocks()
+ expect(tomTatKt(meta,NOW)).toEqual(tomTatKt(r,NOW))
+ const doc=sqls.find(x=>x.includes('kiem_tra_ca_nhan_meta'))!
+ const nhanhMoi=doc.slice(doc.indexOf('COALESCE((SELECT'),doc.indexOf("json_object('tong'"))
+ expect(nhanhMoi).toContain('kiem_tra_ca_nhan_meta');expect(nhanhMoi).not.toMatch(/k\.json/)
 })
