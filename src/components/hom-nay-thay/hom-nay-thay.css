@@ -135,6 +135,14 @@ button.gvhn-the-nut:hover:not(:disabled) { border-color: color-mix(in srgb, var(
 .nht-so b { font-size: var(--t-than, 15px); font-weight: 700; color: var(--nht-so-chu); white-space: nowrap; }
 .nht-so small { font-size: 12px; color: var(--gvm-chu-3); }
 .nht-ly-do { grid-area: dai; font-size: var(--t-phu, 13px); line-height: 1.4; color: var(--gvm-tim-dam); overflow-wrap: anywhere; }
+/* chip độ tin cậy của nhóm (13/10 đợt 18) — cùng tông chip của tấm Hồ sơ làm bài: từ 90% xanh lá, dưới 90% hổ phách "đang theo dõi" */
+.nht-tin {
+  display: inline-flex; align-items: center; min-height: 22px; margin-left: 8px; padding: 0 8px; border-radius: 999px; vertical-align: 1px;
+  font-size: 12px; font-weight: 700; line-height: 1.2; white-space: nowrap; background: var(--gvm-mat-2); color: var(--gvm-chu-2);
+}
+.nht-tin[data-du='true'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+.nht-tin[data-du='false'] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); }
+.nht-tin-them { display: block; margin-top: 4px; font-size: 12px; font-weight: 500; line-height: 1.45; color: var(--gvm-hp-dam); }
 .nht-xem-du { align-self: flex-start; margin: 6px 0 0 -12px; }
 .nht-them { align-self: flex-start; margin-top: 6px; }
 .nht-ghi-nho { margin: 6px 0 0; font-size: 12px; line-height: 1.45; color: var(--gvm-chu-3); }
@@ -223,6 +231,7 @@ button.gvhn-the-nut:hover:not(:disabled) { border-color: color-mix(in srgb, var(
   .nht-em { grid-template-columns: 36px minmax(0, 1fr); grid-template-areas: 'av ten' 'av so' 'av dai'; align-items: start; gap: 4px 10px; padding: 10px 2px; }
   .nht-av { width: 36px; height: 36px; font-size: 12px; }
   .nht-ten { font-size: 14px; }
+  .nht-tin { margin-left: 6px; white-space: normal; }
   .nht-so { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 4px; max-width: none; text-align: left; }
   .nht-so b { font-size: var(--t-phu, 13px); }
   .nht-so small::before { content: '· '; }

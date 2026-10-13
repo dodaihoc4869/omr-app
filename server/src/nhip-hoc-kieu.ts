@@ -80,6 +80,12 @@ export interface EmNhipHoc {
   lam: number[]
   /** null = không có dấu hiệu đối phó (hoặc chưa đủ lượt để đo). */
   doiPho: DoiPhoEm | null
+  // ---- CHỈ THÊM 13/10 đợt 18 (máy chủ cũ không có ⇒ app ẩn chip) ----
+  /** Độ tin cậy 0–99 của NHÓM em (nhóm app tính bằng `tomTatNhip` trên đúng `muc` / `lam` / `ngayVao` / `homNay` của trả lời này) — ĐÚNG phép
+   *  `tinCayNhomNhip` (nhip-hoc.ts) mà `/hs/nhip-hoc`, `/ph/nhip-hoc` dùng ⇒ cùng số với bảng của em. 'chua-du' ⇒ vắng. KHÔNG đổi nhóm. */
+  doTinCay?: number
+  /** Khi `doTinCay` dưới 90: câu nói thật cần thêm bao nhiêu ngày có số liệu. */
+  canThem?: string
 }
 
 export interface KetQuaNhipHoc {

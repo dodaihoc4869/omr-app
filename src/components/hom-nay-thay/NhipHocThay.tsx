@@ -8,13 +8,15 @@
 //     tại chỗ có ô tìm tên) · chú giải màu · "Có dấu hiệu đối phó · N em" (3 em đầu + Xem đủ) | "Theo lớp" (lớp nhiều em lười đứng trước).
 //   · Điện thoại (≤ 600 px): thẻ phân đoạn Lười · Chăm · Đối phó thay cho hai cột; dòng em xếp tên → số → dải ô (bản vẽ điện thoại).
 //   · Bấm một em ⇒ tấm Hồ sơ làm bài sẵn có (`HoSoLamCauEm`, nạp lười); đóng tấm ⇒ focus về đúng nút.
+//   · 13/10 đợt 18: mỗi dòng em có chip "Độ tin cậy N%" của nhóm (máy chủ gửi, cùng số bảng của em); dưới 90% ⇒ "· đang theo dõi" tông hổ phách,
+//     câu "cần thêm" hiện khi trỏ chuột (title) và hiện thành dòng chữ khi mở rộng cột ("Xem đủ"). Ở cột Đối phó chip kèm tên nhóm của em.
 // Số CHỈ từ lệnh CHỈ ĐỌC `/gv/nhip-hoc` (src/lib/nhip-hoc-thay.ts: luật nhóm + phép thuần có test). Màu chỉ biến --gvm-* (hom-nay-thay.css); ô ngày
 // dùng ĐÚNG bộ màu bảng nhiệt `bai-hang-ngay.css` (lớp `gvv2-bhn-mau-o`).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Activity, Check, ChevronRight, Clock, RefreshCw, Search, TriangleAlert } from 'lucide-react'
 import {
-  chuCham, chuDieuKien, chuLuoi, chuMotO, LUAT_NHOM_NHIP, ngayNgan, TEN_LOAI_O, tinhNhipHoc, xepCham, xepDoiPho, xepLuoi,
+  chipTinCay, chuCham, chuDieuKien, chuLuoi, chuMotO, LUAT_NHOM_NHIP, ngayNgan, TEN_LOAI_O, TEN_NHOM_NHIP, tinhNhipHoc, xepCham, xepDoiPho, xepLuoi,
   type DongNhipHoc, type KetQuaNhipHoc, type ONgay,
 } from '../../lib/nhip-hoc-thay'
 import { chuCaiTen, khopTim } from '../chien-dich/nhip-hanh-trinh'
@@ -105,8 +107,11 @@ function chuDong(d: DongNhipHoc, kieu: Kieu): { chinh: string; phu: string } {
   return { chinh: '', phu: d.doiPho?.lyDo.join(' · ') ?? '' }
 }
 
-function DongEm({ d, kieu, onMo }: { d: DongNhipHoc; kieu: Kieu; onMo: (d: DongNhipHoc, nut: HTMLButtonElement) => void }) {
+function DongEm({ d, kieu, moRong = false, onMo }: { d: DongNhipHoc; kieu: Kieu; moRong?: boolean; onMo: (d: DongNhipHoc, nut: HTMLButtonElement) => void }) {
   const c = chuDong(d, kieu)
+  const tin = chipTinCay(d)
+  // cột Đối phó không phải một nhóm ⇒ chip kèm tên nhóm của em; cột Lười / Chăm đã có tên nhóm ở tiêu đề cột
+  const chuTin = tin ? `${kieu === 'doi-pho' ? `${TEN_NHOM_NHIP[d.nhom]} · ` : ''}${tin.chu}` : ''
   return (
     <li>
       <button
@@ -115,7 +120,7 @@ function DongEm({ d, kieu, onMo }: { d: DongNhipHoc; kieu: Kieu; onMo: (d: DongN
         data-kieu={kieu}
         data-sbd={d.sbd}
         onClick={(ev) => onMo(d, ev.currentTarget)}
-        aria-label={`${d.hoTen}${d.lop ? `, ${d.lop}` : ''}: ${kieu === 'doi-pho' ? c.phu : `${c.chinh}${c.phu ? `, ${c.phu}` : ''}`} — xem hồ sơ làm bài`}
+        aria-label={`${d.hoTen}${d.lop ? `, ${d.lop}` : ''}: ${kieu === 'doi-pho' ? c.phu : `${c.chinh}${c.phu ? `, ${c.phu}` : ''}`}${tin ? `; ${chuTin}${tin.tam ? `. ${tin.giaiThich}` : ''}` : ''} — xem hồ sơ làm bài`}
       >
         <span className="nht-av" aria-hidden="true">
           {chuCaiTen(d.hoTen)}
@@ -123,6 +128,16 @@ function DongEm({ d, kieu, onMo }: { d: DongNhipHoc; kieu: Kieu; onMo: (d: DongN
         <span className="nht-ten">
           <b>{d.hoTen}</b>
           {d.lop && <small> · {d.lop}</small>}
+          {tin && (
+            <span className="nht-tin gvv2-so" data-du={tin.tam ? 'false' : 'true'} title={tin.giaiThich} aria-hidden="true">
+              {chuTin}
+            </span>
+          )}
+          {tin?.tam && moRong && (
+            <span className="nht-tin-them" aria-hidden="true">
+              {tin.giaiThich}
+            </span>
+          )}
         </span>
         {kieu === 'doi-pho' ? (
           <span className="nht-ly-do">{c.phu}</span>
@@ -178,7 +193,7 @@ function CotEm(p: {
       ) : (
         <ul className="nht-em-ds">
           {hien.map((d) => (
-            <DongEm key={d.sbd} d={d} kieu={p.kieu} onMo={p.onMo} />
+            <DongEm key={d.sbd} d={d} kieu={p.kieu} moRong={moRong} onMo={p.onMo} />
           ))}
         </ul>
       )}
