@@ -6,5 +6,7 @@ export const SQL_KT_CN = [
   `CREATE INDEX IF NOT EXISTS ktcn_lich ON kiem_tra_ca_nhan(trang_thai,ngay,cap_nhat_luc)`,
   `CREATE TABLE IF NOT EXISTS kiem_tra_ca_nhan_chang (bai_id TEXT NOT NULL,stt INTEGER NOT NULL,bat_dau INTEGER NOT NULL,han INTEGER NOT NULL,chot_luc INTEGER,PRIMARY KEY(bai_id,stt))`,
   `CREATE TABLE IF NOT EXISTS kiem_tra_ca_nhan_dieu_phoi (sbd TEXT PRIMARY KEY,lop TEXT NOT NULL,thu_luc INTEGER NOT NULL,loi TEXT NOT NULL DEFAULT '')`,
+  // KHẨN 13/10 (D1 quá tải): số liệu lịch tính sẵn lúc lập đề — đọc lịch không bóc JSON đề lớn trong SQL. Chỉ-thêm.
+  `CREATE TABLE IF NOT EXISTS kiem_tra_ca_nhan_meta (id TEXT PRIMARY KEY,meta_json TEXT NOT NULL)`,
 ] as const
 export const damBaoKtCn = (env: Env) => chayDdlMotLan(env, 'kiem_tra_ca_nhan_v1', SQL_KT_CN)
