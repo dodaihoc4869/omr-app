@@ -18,8 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     env:
-      # 13/10 (VN): thầy hỏi "giờ app hs load bình thường chưa" ⇒ đo 20 phút gần nhất (sau lượt phát hành cuối ~21:15).
-      GIO: '0.34'
+      # 13/10 (VN): đo 1 giờ SAU PR280 (sống 21:03:41 VN) — khung cố định 21:20–22:20 VN (14:20–15:20 UTC): sau phát hành 16 phút, TRƯỚC lượt phát hành PR283 (22:25 VN).
+      # So với 1 giờ cao điểm TRƯỚC sửa (12:11–13:11 UTC, workflow 38402898461). DEN rỗng ⇒ tới hiện tại.
+      GIO: '1'
+      DEN: '2026-10-13T15:20:00Z'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
@@ -34,8 +36,8 @@ jobs:
           ACC: ${{ env.CF_ACC_SACH }}
         run: |
           node - <<'JS'
-          const { TOKEN, ACC, GIO, DB_ID } = process.env
-          const den = new Date(), tu = new Date(den.getTime() - Number(GIO) * 3600_000)
+          const { TOKEN, ACC, GIO, DB_ID, DEN } = process.env
+          const den = DEN ? new Date(DEN) : new Date(), tu = new Date(den.getTime() - Number(GIO) * 3600_000)
           const hoi = async (query, variables) => {
             const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ query, variables }) })
             const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
