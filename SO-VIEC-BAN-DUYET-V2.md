@@ -429,3 +429,17 @@ Thầy (13/10 21:26, ảnh HS kẹt "Đang chuẩn bị những câu phù hợp 
 - [x] Tìm nguyên nhân HS lag 21:26 | bằng chứng: workflow 38414976153 (20:52–21:37): 19.234 yc/45 phút (≈2,7× giờ 19:11–20:11), 0 lỗi, p50 0,20 s · p90 1,25 s · p99 3,75 s (trước 0,05/0,46/1,49), CPU p99 0,74 s; 3 lượt phát hành giữa cao điểm (20:52 PR269, 21:03 PR280, ~21:15 PR282) xoá đệm Worker ⇒ docMetaCau 3.111 lần × 33 ms (~1.270 dòng/lần); tem kho KHÔNG đổi (workflow 38415223402: 0 tờ lập chỉ mục/1 giờ, 0 tờ lệch)
 - [x] Tối 13/10 giờ cao điểm: đo số thật (routine) | bằng chứng: do-d1-cao-diem 38415277120 (24 giờ): docMetaCau 26.950→21.982 lần (37,6→30,7 ms); danhMuc 8.903→4.708 lần (vẫn đọc 123 triệu dòng/ngày — lớn nhất); upsert goi_bai_7_cau 1,04 triệu dòng→hết khỏi top; hanh_trinh_v4_canh ghi ~2,5 triệu→~0,98 triệu dòng
 - [ ] LUẬT: không phát hành 19:00–23:59 trừ sửa khẩn; việc dở tối nay phát hành sau 24:00
+Thầy (13/10 ~21:45): "tất cả mọi chỗ rút câu rất là lag, bạn tối ưu máy chủ chuyên sâu cho app hoạt động mượt mà và tức thì ngay và luôn nhé"
+- [~] Tối ưu chuyên sâu mọi đường rút câu | bằng chứng: ma trận kỹ năng Gói 7 đệm isolate (bỏ hai SQL ~380 giây D1/ngày), sảnh lần đầu 30 đợt/37 lệnh = mốc; lớp đệm colo BỎ (workers.dev không có tác dụng) — commit d357c183 + a0d77d01. CHƯA PHÁT HÀNH (chờ 00:00). Còn: đo số D1 thật sau phát hành
+Thầy (13/10 tối, 2 ảnh: "Đủ mức hôm nay · Đã làm 24/24" và ô lịch "Hôm nay 13/10 · 19/24 · thiếu 5"): "app báo đủ mức rồi mà hôm nay lại báo thiếu, sửa triệt để đi nhé"
+- [x] Sửa triệt để: hai chỗ đếm "đã làm hôm nay" lệch nhau (24/24 vs 19/24) | bằng chứng: nguyên nhân gốc = phần "vừa làm" cộng mã GỐC của câu bản ảo (~ss/~bt/#n) trong khi sổ ghi mã ảo ⇒ đếm hai lần 15 phút; test tái hiện đúng 24 vs 19 rồi xanh (tests/goi7-vua-lam-dem-1310 5/5); số thật 13/10: 137 lượt mã ảo, 14 em ≥3 lượt ảo/10 phút; commit 4f4f1fdd (+ chỉ cộng lượt chưa có dòng sổ). CHƯA PHÁT HÀNH (chờ 00:00)
+Thầy (13/10 22:2x): "sau 00h bạn phải tối ưu chuyên sâu tốc độ ở mọi chỗ, xóa tất cả các code không liên quan, đảo đoàn, bia , chiến dịch cũ các thứ. Phải rút gọn và tối ưu code ở cấp độ siêu chuyên nghiệp giống google facebook, tối ưu code siêu thông minh ngắn gọn đẳng cấp, để app hoạt động siêu mượt mà đỉnh cao. Cái này phải làm bằng được"
+Thầy (tiếp): "bạn làm việc này với thằng codex nữa nhé để tạo ra những dòng code đỉnh cao nhất thế giới về trải nghiệm app"
+- [ ] Sau 00h: kiểm kê code Đảo thần thú / Đoàn Hộ Tống / Bia / chiến dịch cũ (tệp, bảng D1, chỗ dùng chung với kho câu) | bằng chứng: (chưa có)
+- [ ] Sau 00h: xoá code các phần đó (KHÔNG xoá bảng/dữ liệu D1 — chỉ gỡ code), tsc + vitest + build xanh | bằng chứng: (chưa có)
+- [ ] Sau 00h: tối ưu tốc độ mọi chỗ (byte tải từng app + đợt chờ D1), mốc docs/moc-toc-do.json hạ | bằng chứng: (chưa có)
+- [ ] Chia việc với Codex: ghi mục [ ] vào docs/viec-giao-codex.md, đẩy main, theo dõi PR | bằng chứng: (chưa có)
+- [x] Kiểm kê code Đảo/Đoàn/Bi-a/chiến dịch cũ | bằng chứng: docs/kiem-ke-don-game-1410.md (commit fbb1ee3e)
+- [x] Giao Codex C1–C3 (phía app + Tick bài) | bằng chứng: docs/viec-giao-codex.md (commit de937717, 3a8b6710) — lên main cùng PR 00:00
+- [~] Gỡ máy chủ Bi-a (679e3646) + Đoàn/cửa hàng/võ đài/phòng (90f612af, test đang sửa) trong worktree wt-don — chưa đẩy
+- [ ] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts, /gv/chien-dich/sua) — SAU khi C3 Codex gộp
