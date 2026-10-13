@@ -2,7 +2,7 @@
   "timezone": "Asia/Saigon",
   "not_before": "2026-10-14T00:00:00+07:00",
   "continuation_at": "2026-10-14T00:05:00+07:00",
-  "phase": "applied_on_isolated_branch_final_gate_in_progress",
+  "phase": "local_gates_passed_waiting_ci_release",
   "base": "58d34a69",
   "teacher_priority_pr": 285,
   "lanes": [
@@ -44,7 +44,7 @@
     {
       "lane": "integration_pwa",
       "worktree": "/workspace/don-ma-sau-00-1410",
-      "result": "offline/staticclosure13/13;18 Chromiumtổ hợp; full cuối đang chạy"
+      "result": "offline/staticclosure13/13;18Chromium; full0lỗi mới; chờCI/release"
     }
   ],
   "limits": [
@@ -62,5 +62,13 @@
     "status": "success"
   },
   "report": "docs/ket-qua-toi-uu-toan-app-1410.md",
-  "integration_pr": 290
+  "integration_pr": 290,
+  "runtime_commit": "3148468b",
+  "full": {
+    "passed": 14284,
+    "failed_baseline_only": 120,
+    "pending_inherited": 27,
+    "new_failures": 0,
+    "new_failed_files": 0
+  }
 }

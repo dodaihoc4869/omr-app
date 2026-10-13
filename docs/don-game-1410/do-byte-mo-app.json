@@ -1,6 +1,6 @@
 {
   "nen": "19840386 (cay ma chay/test bang main58d34a69)",
-  "moi": "1048c7b5; ddac65f5 chi sua glob PWA/staticclosure va gate, khong doi app source",
+  "moi": "3148468b",
   "don_vi": "byte gzip, khong phai LCP san xuat",
   "truoc": {
     "giao-vien": {
@@ -19,15 +19,15 @@
   "sau": {
     "giao-vien": {
       "tep": 17,
-      "gzip": 270358
+      "gzip": 270801
     },
     "hoc-sinh": {
       "tep": 47,
-      "gzip": 329897
+      "gzip": 330331
     },
     "phu-huynh": {
       "tep": 24,
-      "gzip": 265273
+      "gzip": 265731
     }
   }
 }

@@ -1,15 +1,15 @@
 {
-  "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
-  "runtimeHash": "ddac65f5",
-  "distTag": "ddac65f · 2026-10-13 18:18",
-  "swBuiltAt": 1791915487,
+  "hash": "708ead01ed570c0f8402514115c122f659de6dab",
+  "runtimeHash": "3148468b",
+  "distTag": "3148468 · 2026-10-13 19:26",
+  "swBuiltAt": 1791919574,
   "results": [
     {
       "role": "gv",
       "width": 360,
       "height": 800,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -54,11 +54,11 @@
           "action": "danh-sach"
         },
         {
-          "path": "/gv/nut-that/ds",
+          "path": "/gv/chua-cau-sai/hang-chieu",
           "action": ""
         },
         {
-          "path": "/gv/chua-cau-sai/hang-chieu",
+          "path": "/gv/nut-that/ds",
           "action": ""
         }
       ],
@@ -76,7 +76,7 @@
       "width": 360,
       "height": 800,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -143,7 +143,7 @@
       "width": 800,
       "height": 390,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -188,11 +188,11 @@
           "action": "danh-sach"
         },
         {
-          "path": "/gv/chua-cau-sai/hang-chieu",
+          "path": "/gv/nut-that/ds",
           "action": ""
         },
         {
-          "path": "/gv/nut-that/ds",
+          "path": "/gv/chua-cau-sai/hang-chieu",
           "action": ""
         }
       ],
@@ -210,7 +210,7 @@
       "width": 800,
       "height": 390,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -277,7 +277,7 @@
       "width": 1280,
       "height": 800,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -344,7 +344,7 @@
       "width": 1280,
       "height": 800,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -411,7 +411,7 @@
       "width": 360,
       "height": 800,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -488,7 +488,7 @@
       "width": 360,
       "height": 800,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -565,7 +565,7 @@
       "width": 800,
       "height": 390,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -642,7 +642,7 @@
       "width": 800,
       "height": 390,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -719,7 +719,7 @@
       "width": 1280,
       "height": 800,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -796,7 +796,7 @@
       "width": 1280,
       "height": 800,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -873,7 +873,7 @@
       "width": 360,
       "height": 800,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -928,7 +928,7 @@
       "width": 360,
       "height": 800,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -983,7 +983,7 @@
       "width": 800,
       "height": 390,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -1038,7 +1038,7 @@
       "width": 800,
       "height": 390,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -1093,7 +1093,7 @@
       "width": 1280,
       "height": 800,
       "scheme": "light",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -1156,7 +1156,7 @@
       "width": 1280,
       "height": 800,
       "scheme": "dark",
-      "hash": "ddac65f50147191138b28a4f6ae0db6f91a1a827",
+      "hash": "708ead01ed570c0f8402514115c122f659de6dab",
       "js": [],
       "external": [],
       "overflow": 0,
@@ -1594,13 +1594,13 @@
       "unknown": [],
       "writes": [],
       "publicLeaks": [],
-      "controller": "http://127.0.0.1:33943/sw.js",
+      "controller": "http://127.0.0.1:38873/sw.js",
       "entries": [
         {
-          "key": "workbox-precache-v2-http://127.0.0.1:33943/",
+          "key": "workbox-precache-v2-http://127.0.0.1:38873/",
           "size": 168,
           "app": [
-            "http://127.0.0.1:33943/assets/App-Da6ZrmQ-.js"
+            "http://127.0.0.1:38873/assets/App-_gg4m6wm.js"
           ]
         }
       ]
@@ -1615,7 +1615,7 @@
       "publicLeaks": [],
       "appProbe": [
         {
-          "url": "http://127.0.0.1:33943/assets/App-Da6ZrmQ-.js",
+          "url": "http://127.0.0.1:38873/assets/App-_gg4m6wm.js",
           "status": 200,
           "length": 56644
         }
@@ -1714,7 +1714,7 @@
   "phamVi": {
     "trinhDuyet": "Chromium hệ thống /usr/bin/chromium, Playwright",
     "duLieu": "Chỉ dữ liệu giả; fixture scripts/chup-ph-dot19/gia.ts và scripts/chup-v2/gia/nhip-hoc.ts",
-    "entry": "Entry build thật của DDAC; không dựng component thay thế",
+    "entry": "Entry build thật3148468b; không dựng component thay thế",
     "maTran": "GV/HS/PH × 360×800, 800×390, 1280×800 × sáng/tối",
     "gioiHan": "Đo UI/main entry và SW Chromium local; không xác nhận Safari/production, không gửi bài hoặc chấm điểm, không mở chặng KTCN hay thử toàn bộ màn/ngách ứng dụng."
   },
