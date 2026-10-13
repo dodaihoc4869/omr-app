@@ -1,3 +1,4 @@
+// @vitest-environment node
 // CNH-1.0 P07 — immutable SERVER-ISSUED task/attempt reward snapshot registry.
 //
 // ⚠️ RUNTIME: these tests run the REAL migration + REAL SQL against the in-memory SQLite

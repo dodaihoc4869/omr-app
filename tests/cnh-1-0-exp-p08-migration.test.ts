@@ -1,3 +1,4 @@
+// @vitest-environment node
 // CNH-1.0 P08 — BẰNG CHỨNG LƯỢC ĐỒ: migration CHỈ-THÊM, ràng buộc fail-closed, lùi SẠCH.
 //
 // Chạy trên `node:sqlite` THẬT (qua `taoD1That()`, nạp `schema.sql` + MỌI `server/migration-*.sql`)

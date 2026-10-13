@@ -1,5 +1,5 @@
 import { Component, lazy, memo, startTransition, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, laLoiDongNguoi } from '../lib/nhip-gui-lai'
+import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { qidDaGap, type SoCauMoiPhan } from '../lib/bo-cau-tu-bai-lam'
@@ -1399,7 +1399,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
       let kq: KetQuaVaoThi | null = null
       if (url) {
-        daGianVaoThiRef.current = true
+        // XẾP HÀNG 0–3 GIÂY TRƯỚC LƯỢT VÀO ĐẦU TIÊN (T5). Chỉ giãn LẦN ĐẦU — em bấm lại sau khi hỏng thì vào thẳng.
+        // (Khôi phục 13/10: 6f9b8c67 lỡ bỏ cổng này, cờ chỉ còn được gán mà không ai đọc ⇒ tests/gian-va-thu-lai-t5-1009.test.ts đỏ.)
+        if (!daGianVaoThiRef.current) {
+          daGianVaoThiRef.current = true
+          const cho = gianVaoThi()
+          if (cho > 0) await new Promise((nghi) => setTimeout(nghi, cho))
+        }
         try {
           kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam, xacNhanTen: xacNhan !== null, matKhau: matKhauCa.trim() })
         } catch {

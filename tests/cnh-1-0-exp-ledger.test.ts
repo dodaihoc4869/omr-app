@@ -1,3 +1,4 @@
+// @vitest-environment node
 // CNH-1.0 P07 — CORE ENTITLEMENT SETTLEMENT SUBSTRATE tests.
 //
 // ⚠️ RUNTIME: these tests run against `taoD1That()` — an IN-MEMORY node:sqlite database that

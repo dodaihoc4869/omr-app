@@ -14,14 +14,17 @@
 //   việc thầy cần nhắc ngay. So sánh bằng số nguyên (đủ × 100 so với tỉ lệ × số ngày) — không làm tròn ở biên 80% / 40%.
 //   PHÉP THUẦN MỘT CHỖ cho cả máy chủ và hai app: `server/src/nhip-hoc-luat.ts` (tệp này chỉ gọi lại, giữ nguyên chữ ký cũ).
 // "Có dấu hiệu đối phó" là cờ RIÊNG (máy chủ tính theo lô, đúng ngưỡng `NGUONG_THAI_DO`), độc lập với nhóm.
+// ĐỘ TIN CẬY CỦA NHÓM (13/10 đợt 18, máy chủ CHỈ THÊM `doTinCay` / `canThem` mỗi em — cùng phép `/hs/nhip-hoc`): app chỉ ĐỌC và chuyển nguyên vào dòng,
+// KHÔNG tính lại, KHÔNG đổi nhóm. Máy chủ cũ không gửi ⇒ trường vắng, màn y như trước.
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
 import type { DoiPhoChonLap, DoiPhoEm, DoiPhoQuaNhanh, EmNhipHoc, KetQuaNhipHoc, NhomNhip } from '../../server/src/nhip-hoc-kieu'
 import { LUAT_NHOM_NHIP } from '../../server/src/nhip-hoc-kieu'
-import { nhomNhipTheoLuat, tomTatNhip } from '../../server/src/nhip-hoc-luat'
+import { nhomNhipTheoLuat, TEN_NHOM_NHIP, tomTatNhip } from '../../server/src/nhip-hoc-luat'
 import type { LopBaiHangNgay } from '../../server/src/bai-hang-ngay-kieu'
+import { chuCanThem, chuDoTinCay, NGUONG_TIN_CAY } from './nhip-hoc-em'
 
 export type { DoiPhoEm, EmNhipHoc, KetQuaNhipHoc, NhomNhip }
-export { LUAT_NHOM_NHIP }
+export { LUAT_NHOM_NHIP, NGUONG_TIN_CAY, TEN_NHOM_NHIP }
 
 export const DUONG_NHIP_HOC = '/gv/nhip-hoc'
 const CHU_CHUA_CO = 'Máy chủ chưa có lệnh Nhịp học — cần đẩy bản máy chủ mới.'
@@ -72,7 +75,13 @@ export function docNhipHoc(du: O): KetQuaNhipHoc | null {
       const muc = mangSo(o.muc, ngay.length)
       const lam = mangSo(o.lam, ngay.length)
       if (!muc || !lam) return null
-      return { sbd: o.sbd, hoTen: chu(o.hoTen) || o.sbd, lop: chu(o.lop), khoi: chu(o.khoi), ngayVao: laNgay(o.ngayVao) ? o.ngayVao : du.tu as string, muc, lam, doiPho: docDoiPho(o.doiPho) }
+      const tin = so(o.doTinCay)
+      const them = typeof o.canThem === 'string' ? o.canThem.trim() : ''
+      return {
+        sbd: o.sbd, hoTen: chu(o.hoTen) || o.sbd, lop: chu(o.lop), khoi: chu(o.khoi), ngayVao: laNgay(o.ngayVao) ? o.ngayVao : du.tu as string, muc, lam, doiPho: docDoiPho(o.doiPho),
+        // độ tin cậy kẹp 0–99 (không bao giờ ghi 100%); câu "cần thêm" chỉ đi kèm khi có độ tin cậy
+        ...(tin !== null ? { doTinCay: Math.max(0, Math.min(99, Math.round(tin))), ...(them ? { canThem: them } : {}) } : {}),
+      }
     }),
     lop: mang(du.lop, (x): LopBaiHangNgay | null => {
       const o = dt(x)
@@ -135,6 +144,10 @@ export interface DongNhipHoc {
   /** Mỗi ngày từ đầu khoảng tới hôm nay (dải ô). */
   o: ONgay[]
   doiPho: DoiPhoEm | null
+  /** Độ tin cậy 0–99 của `nhom` (máy chủ gửi, cùng phép bảng của em); vắng ⇒ không hiện chip. Dưới `NGUONG_TIN_CAY` ⇒ "đang theo dõi". */
+  doTinCay?: number
+  /** Câu "cần thêm" của máy chủ khi `doTinCay` dưới 90. */
+  canThem?: string
 }
 
 const loaiO = (muc: number, lam: number): Exclude<LoaiO, 'chua-vao'> => (lam >= muc ? 'du' : lam <= 0 ? 'khong-lam' : 2 * lam >= muc ? 'thieu-it' : 'thieu-nhieu')
@@ -175,6 +188,8 @@ export function phanNhomEm(e: EmNhipHoc, ngay: readonly string[], homNay: string
     homNay: t.homNay,
     o,
     doiPho: e.doiPho,
+    // chuyển nguyên của máy chủ (chỉ khi nhóm đã xếp — 'chua-du' không có độ tin cậy)
+    ...(t.nhom !== 'chua-du' && e.doTinCay !== undefined ? { doTinCay: e.doTinCay, ...(e.canThem ? { canThem: e.canThem } : {}) } : {}),
   }
 }
 
@@ -309,6 +324,23 @@ export function chuDaiO(d: DongNhipHoc): string {
   const vao = d.o.some((x) => x.loai === 'chua-vao') ? ` (em vào học từ ${ngayNgan(d.ngayVao)})` : ''
   const h = chuHomNayEm(d)
   return `Từ ${ngayNgan(d.o[0]?.ngay ?? d.ngayVao)} tới hôm nay${vao}: ${d.soNgayDu}/${d.soNgayQua} ngày đủ mức${h ? `; ${h}` : ''}`
+}
+
+/** Chip độ tin cậy của một dòng em (13/10 đợt 18) — CÙNG chữ với chip của tấm Hồ sơ làm bài và bảng của em: "Độ tin cậy 94%"; dưới
+ *  `NGUONG_TIN_CAY` ⇒ "Độ tin cậy 72% · đang theo dõi" + câu "cần thêm" của máy chủ (`giaiThich`: hiện khi trỏ chuột / khi mở rộng cột).
+ *  Máy chủ không gửi độ tin cậy (máy chủ cũ, nhóm 'chua-du') ⇒ null (không chip). Thuần. */
+export function chipTinCay(d: Pick<DongNhipHoc, 'doTinCay' | 'canThem'>): { chu: string; tam: boolean; giaiThich: string } | null {
+  if (d.doTinCay === undefined) return null
+  const tam = d.doTinCay < NGUONG_TIN_CAY
+  return {
+    chu: `${chuDoTinCay(d.doTinCay)}${tam ? ' · đang theo dõi' : ''}`,
+    tam,
+    giaiThich: !tam
+      ? `Kết luận chắc khi độ tin cậy từ ${NGUONG_TIN_CAY}%.`
+      : d.canThem
+        ? chuCanThem(d.canThem)
+        : `Độ tin cậy dưới ${NGUONG_TIN_CAY}%: cần thêm ngày làm bài để chắc.`,
+  }
 }
 
 /** Câu một ô (chú thích khi trỏ chuột). */
