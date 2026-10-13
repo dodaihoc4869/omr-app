@@ -10,7 +10,7 @@ import { chuDemGiao, chuHanDong, goiDangGiao, TOI_DA_DONG_GIAO } from './buoi-da
 import './sua-han-bai.css'
 import type { AckEmNhanBai } from './api-goi7-em'
 
-let cssChuaNap: { duong: string; loi: Error } | null = null
+let cssChuaNap: Error | null = null
 /** Giữ lỗi nạp của đúng tấm tới khi promise kết thúc, kể cả thầy đã đóng tấm chờ. */
 export async function napGiaoDienEm(nap = () => import('./SuaEmNhanBai')) {
   let loi: Error | null = null
@@ -19,17 +19,15 @@ export async function napGiaoDienEm(nap = () => import('./SuaEmNhanBai')) {
     const chu = p instanceof Error ? p.message : String(p)
     if (!/SuaEmNhanBai|sua-em-nhan-bai/.test(chu)) return
     e.preventDefault(); loi = p instanceof Error ? p : new Error(chu)
-    if (/\.css\b/.test(chu)) cssChuaNap = { duong: chu.match(/(?:https?:\/\/|\/)[^\s'"]+\.css(?:\?[^\s'"]*)?/)?.[0] ?? '', loi }
+    if (/\.css\b/.test(chu)) cssChuaNap = loi
   }
   window.addEventListener('vite:preloadError', giu, true)
   try {
     const du = await nap()
     if (loi) throw loi
-    if (cssChuaNap) {
-      const href = cssChuaNap.duong ? new URL(cssChuaNap.duong, document.baseURI).href : ''
-      if (![...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].some(x => x.href === href && x.sheet)) throw cssChuaNap.loi
-      cssChuaNap = null
-    }
+    // Vite nhớ cả URL CSS tải hỏng; link.sheet có thể là sheet rỗng. Chỉ tải lại app
+    // mới khởi động lại việc nạp CSS, không dựng tấm thiếu kiểu sau nút Thử mở lại.
+    if (cssChuaNap) throw cssChuaNap
     return du
   } finally { window.removeEventListener('vite:preloadError', giu, true) }
 }
@@ -63,7 +61,7 @@ export class ChanLoiDanhSach extends Component<{ children: ReactNode; onThu: () 
   state = { loi: false }
   static getDerivedStateFromError() { return { loi: true } }
   render() {
-    return this.state.loi ? <div role="alert"><p>Chưa mở được danh sách nhận bài. Thầy kiểm tra mạng rồi thử lại.</p><button type="button" className="gvv2-nut-chu" onClick={this.props.onThu}>Thử mở danh sách lại</button><button type="button" className="gvv2-nut-chu" onClick={() => window.location.reload()}>Tải lại app</button><button type="button" className="gvv2-nut-chu" onClick={this.props.onDong}>Đóng thông báo</button></div> : this.props.children
+    return this.state.loi ? <div role="alert"><p>Chưa mở được danh sách nhận bài. {cssChuaNap ? 'Phần giao diện chưa tải đủ. Thầy bấm Tải lại app để mở lại.' : 'Thầy kiểm tra mạng rồi thử lại.'}</p><button type="button" className="gvv2-nut-chu" onClick={this.props.onThu}>Thử mở danh sách lại</button><button type="button" className="gvv2-nut-chu" onClick={() => window.location.reload()}>Tải lại app</button><button type="button" className="gvv2-nut-chu" onClick={this.props.onDong}>Đóng thông báo</button></div> : this.props.children
   }
 }
 

@@ -241,19 +241,6 @@ it('lỗi mảnh muộn vẫn xử lý cục bộ tới khi promise kết thúc,
   window.dispatchEvent(sau); expect(sau.defaultPrevented).toBe(false)
 })
 
-it('CSS hỏng dù import JS trả thành công vẫn báo lỗi, retry không render tấm thiếu CSS', async () => {
-  const cho = doi<{ default: typeof SuaEmNhanBai }>(), p = napGiaoDienEm(() => cho.cho)
-  const e = new Event('vite:preloadError', { cancelable: true }) as Event & { payload: Error }
-  e.payload = new Error('Unable to preload CSS for /assets/SuaEmNhanBai-old.css')
-  window.dispatchEvent(e); expect(e.defaultPrevented).toBe(true)
-  const ket = expect(p).rejects.toThrow(/preload CSS/); cho.tra({ default: SuaEmNhanBai }); await ket
-  await expect(napGiaoDienEm(async () => ({ default: SuaEmNhanBai }))).rejects.toThrow(/preload CSS/)
-  // Một stylesheet đã nạp thật (hoặc sau cập nhật thủ công) mới gỡ trạng thái CSS lỗi.
-  const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = '/assets/SuaEmNhanBai-old.css'
-  Object.defineProperty(link, 'sheet', { value: {} }); document.head.append(link)
-  try { await expect(napGiaoDienEm(async () => ({ default: SuaEmNhanBai }))).resolves.toMatchObject({ default: SuaEmNhanBai }) }
-  finally { link.remove() }
-})
 
 it('capture của tấm chỉ nhận đúng mảnh mình, không chặn cứu lỗi mảnh khác', async () => {
   const cho = doi<{ default: typeof SuaEmNhanBai }>(), p = napGiaoDienEm(() => cho.cho)
@@ -297,4 +284,21 @@ it('ACK sửa hạn chỉ phát metadata sau xác nhận đúng; không tạo l�
     expect(metadata).toHaveBeenCalledExactlyOnceWith([{ lop: DU.lop, khoaBai: 'b1', goiId: 'g1', han: '2026-10-22', serverNow: DU.serverNow }])
     expect(lan('tick')).toHaveLength(0); expect(lan('bo-tick')).toHaveLength(0)
   } finally { bo() }
+})
+
+it('CSS hỏng dù import JS trả thành công vẫn báo lỗi, retry không render tấm thiếu CSS', async () => {
+  // Một phiên module riêng tương đương tải mới trang, không làm phụ thuộc thứ tự test.
+  vi.resetModules()
+  const { napGiaoDienEm: napMoi } = await import('../src/components/chien-dich/BangBaiDangGiao')
+  const cho = doi<{ default: typeof SuaEmNhanBai }>(), p = napMoi(() => cho.cho)
+  const e = new Event('vite:preloadError', { cancelable: true }) as Event & { payload: Error }
+  e.payload = new Error('Unable to preload CSS for /assets/SuaEmNhanBai-old.css')
+  window.dispatchEvent(e); expect(e.defaultPrevented).toBe(true)
+  const ket = expect(p).rejects.toThrow(/preload CSS/); cho.tra({ default: SuaEmNhanBai }); await ket
+  await expect(napMoi(async () => ({ default: SuaEmNhanBai }))).rejects.toThrow(/preload CSS/)
+  // Chrome có thể vẫn để lại link.sheet rỗng sau lỗi; nó không chứng minh CSS đã nạp.
+  const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = '/assets/SuaEmNhanBai-old.css'
+  Object.defineProperty(link, 'sheet', { value: {} }); document.head.append(link)
+  try { await expect(napMoi(async () => ({ default: SuaEmNhanBai }))).rejects.toThrow(/preload CSS/) }
+  finally { link.remove() }
 })
