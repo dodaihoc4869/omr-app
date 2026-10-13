@@ -1,10 +1,12 @@
 # Soát công cụ còn nhắc mã Game đã gỡ · 14/10
 
-Soát chỉ đọc trên `/workspace/don-ma-sau-00-1410`, commit `1048c7b5`. Không sửa `src/`, luật chấm, caller Three.js, ảnh hoặc bản build của root. Các bảng dưới là đề nghị cho root; chưa xóa công cụ nào.
+Soát ban đầu chỉ đọc trên `/workspace/don-ma-sau-00-1410`, commit `1048c7b5`. Cập nhật 14/10: đã xóa riêng bốn CLI độc lập ở bảng đầu trên làn C1, sau khi quét lại caller; tám tệp gallery và các công cụ hỗn hợp bên dưới vẫn giữ. Không sửa `src/`, luật chấm, caller Three.js, ảnh hoặc bản build của root.
 
 ## Có thể bỏ độc lập
 
 Bốn CLI sau chỉ điều khiển các màn Game đã ngừng. Quét tệp mã/cấu hình đang theo dõi: không caller ở `.github/`, `package.json`, test học tập hoặc công cụ khác. Các đoạn nhập/điều hướng dùng component/selector Game đã gỡ, không phải đường học tập hiện tại.
+
+Trạng thái: **D · 4 tệp, 11.887 byte** (đo nội dung Git trước khi xóa). Quét lại cả tên có và không có đuôi `.mjs` trong `src`, `server`, `scripts`, `tests`, `.github`, `package.json`, cấu hình Vite/Vitest: **0 caller còn lại**. Tên trong tài liệu kiểm kê là bằng chứng lịch sử. Xóa CLI không ảnh hưởng các kiểm thử ảnh/evolution hiện tại: bộ sinh thumb và `dao-anh-nho` giữ trên leaf `62a7455f`.
 
 | Tệp | Tham chiếu đã mất | Caller trong workflow/test học tập/package |
 | --- | --- | --- |
@@ -28,7 +30,7 @@ Tám tệp này chỉ dựng/kiểm gallery Game. Không caller workflow/test h�
 | `scripts/preview-bat-linh/check-shop-luxury.mjs` | toàn bộ kịch bản Cửa hàng, gọi `games.html?game=shop` |
 | `scripts/preview-bat-linh/chot-anh.mjs` | chỉ chụp Game Đảo/thần thú qua `games.html` |
 
-Tổng 12 ứng viên: **37.335 byte**. Những tên chỉ có trong `docs/soat-app-1310/kiem-ke-ma-cu.json` là kiểm kê cũ, không phải caller thực thi.
+Tổng kiểm kê ban đầu 12 ứng viên: **37.335 byte**; đã xóa bốn CLI **11.887 byte**, còn giữ tám tệp gallery **25.448 byte** chờ cắt dây hỗn hợp. Những tên chỉ có trong `docs/soat-app-1310/kiem-ke-ma-cu.json` là kiểm kê cũ, không phải caller thực thi.
 
 Các dây cần thích nghi khi root bỏ gallery: `preview-bat-linh/{vite.config.mjs,muc-luc.html,trang.tsx,check.mjs,check-theme.mjs,check-bieu-cam.mjs}`. `check-bieu-cam.mjs` có kiểm **Câu đã làm** ở dòng 24, nên chỉ gỡ gallery/xe/trận và giữ phần học tập đó. `check.mjs`/`check-theme.mjs` còn PH, Tu luyện, đăng nhập; `teacher.html`/`teacher.tsx`/`check-teacher-modern.mjs` còn app thầy.
 
