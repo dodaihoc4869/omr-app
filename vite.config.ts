@@ -212,6 +212,9 @@ export default defineConfig({
           // Điểm danh 12/10C (bản vẽ GV-DiemDanh): bước Điểm danh dùng chung (`DiemDanhBuoi` — chỉ năm màn thầy nhập, đều ngoài precache) + hai bản chiếu
           // React (`BanChieuDiemDanh`, nạp lười khi thầy bấm chiếu) ⇒ kho chạy-lúc; máy em / phụ huynh không bao giờ tải.
           '**/{DiemDanhBuoi,BanChieuDiemDanh}-*.{js,css}',
+          // App phụ huynh đợt 19 (làn R): phần dưới trang "Hôm nay của con" + khối bậc + màn con Tiến bộ / Ca kiểm tra đều NẠP KHI CẦN và chỉ có nghĩa khi
+          // có mạng (số của máy chủ) ⇒ kho chạy-lúc, không làm precache vỏ nặng thêm.
+          '**/{TrangVeConDuoi,BacCon,ManTienBo,ManDiemSo}-*.{js,css}',
           // Thầy tự chữa (12/10): tờ chiếu cả đề tách thành mảnh dùng chung CHỈ của màn thầy (Cần thầy chữa, Lên bảng chiến dịch, Gọi lên bảng) ⇒ kho chạy-lúc,
           // không cất sẵn trên máy học sinh / phụ huynh (giữ precache như trước đợt 9).
           '**/{to-chieu,tra-cau-chieu,thong-ke-lop-cau,thay-tu-chua-to}-*.{js,css}',

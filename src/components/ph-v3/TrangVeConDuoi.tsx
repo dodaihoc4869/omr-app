@@ -375,7 +375,7 @@ function ThoiGian({ hoSo, tq, pm, hoc2, moc }: { hoSo: TaiHoSo; tq: ConTongQuan 
           {gio ? <div><dt>Giờ học quen</dt><dd className="tvc-dd-nho">{gio}</dd></div> : gioChon ? <div><dt>Giờ học con chọn</dt><dd className="tvc-dd-nho">{gioChon}</dd></div> : null}
         </dl>
       ) : hoSo.loiTd ? null : <Cho dong={1} />}
-      {gio && gioChon && <p className="tvc-phu">Giờ học con chọn: {gioChon}.</p>}
+      {gio && gioChon && gioChon !== gio && <p className="tvc-phu">Giờ học con chọn: {gioChon}.</p>}
       <h3 className="tvc-tieu-nho">Số giây theo mức độ câu (dễ → khó)</h3>
       {md ? (
         md.length > 0 ? (

@@ -56,7 +56,7 @@ async function cuonHet(t) {
 async function luuJpg(buf0, ten, chup) {
   for (const q of [82, 74, 66, 58, 50, 42, 34]) {
     const buf = await chup(q)
-    if (buf.length <= 150 * 1024 || q === 34) {
+    if (buf.length <= 150_000 || q === 34) {
       writeFileSync(join(RA, `${ten}.jpg`), buf)
       console.log(`${ten}.jpg ${(buf.length / 1024).toFixed(0)} KB (q${q})`)
       return
