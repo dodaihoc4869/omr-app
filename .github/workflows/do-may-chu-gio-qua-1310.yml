@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     env:
-      # 13/10 17:15 (VN): đo 1 giờ sau khi bật lại kiểm tra riêng (09:32 UTC) — có lẫn lượt chuyển/lập đề chạy từ Actions.
-      GIO: '1'
+      # 13/10 17:52 (VN): đo 3 giờ sau đợt 21 (lên 07:47 UTC) — so mốc 3 giờ đến 06:58 UTC; có lẫn lượt chuyển/lập đề kiểm tra riêng chạy từ Actions.
+      GIO: '3'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
