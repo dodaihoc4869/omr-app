@@ -29,7 +29,7 @@
 // `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
 // thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
 // là phiếu co theo ngay.
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { ThanhTren, dungM3 } from './m3'
@@ -37,8 +37,10 @@ import { themCssMayYeu } from '../lib/may-yeu'
 import './m3/khung-xem-phieu.css'
 import type { TinNopChang } from '../lib/btvn-nop-chang-em'
 import { CHU_LAM_XONG, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu } from '../lib/loi-giai-api'
-import KhungLoiGiai from './loi-giai/KhungLoiGiai'
-import HopHoiThay from './loi-giai/HopHoiThay'
+
+// Luật tốc độ (thầy 13/10): khung xem phiếu nằm trong mảnh tải lúc mở app ⇒ hộp hỏi Thầy / khung lời giải tách mảnh, tải khi em bấm Hỏi thầy.
+const KhungLoiGiai = lazy(() => import('./loi-giai/KhungLoiGiai'))
+const HopHoiThay = lazy(() => import('./loi-giai/HopHoiThay'))
 
 export interface KhungXemPhieuProps {
   /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
@@ -250,9 +252,9 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
           (Dưới M3 nút Đóng nằm trong thanh trên ở trên.) */}
       {phu}
       {/* Thầy 13/10: phần hỏi Thầy đang mở ⇒ Hỏi thầy mở thẳng HỘP HỎI THẦY, không mở lời giải từng bước. */}
-      {hoi && (hoi.hoiThem
+      {hoi && <Suspense fallback={null}>{hoi.hoiThem
         ? <HopHoiThay cau={hoi.cau} nguon="phieu" dangLam={hoi.dangLam} onDong={() => setHoi(null)} onMoLoiGiai={hoi.dangLam ? undefined : () => setHoi({ ...hoi, hoiThem: false })} />
-        : <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" onDong={() => setHoi(null)} />)}
+        : <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" onDong={() => setHoi(null)} />}</Suspense>}
       {loiHoi && (
         <div className="lg-bao-loi m3" role="alert">
           <span>{loiHoi}</span>

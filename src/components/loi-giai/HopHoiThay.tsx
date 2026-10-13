@@ -9,6 +9,7 @@ import { BookOpenText, MessageCircleQuestion, X } from 'lucide-react'
 import type { CauChoKhung } from '../../lib/loi-giai-api'
 import HoiThemThay from './HoiThemThay'
 import './loi-giai.css'
+import './hop-hoi-thay.css'
 
 export default function HopHoiThay({ cau, nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false }: { cau: CauChoKhung; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean }) {
   const id = useId()

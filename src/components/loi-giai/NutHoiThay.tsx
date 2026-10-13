@@ -7,13 +7,18 @@
 // `chi`: 'hoi' | 'giai' — chỉ vẽ một nút (màn đã có nút kia ở chỗ khác).
 // Phần hỏi Thầy chưa bật cho em ⇒ "Hỏi thầy" mở lời giải như cũ (không có nút chết). Câu chưa có hồ sơ từng bước ⇒ báo "thầy đang soạn".
 // `onHoi`: gọi khi em nhận được trợ giúp (mở lời giải, hoặc Thầy trả lời câu hỏi đầu tiên) — game tính câu này là "có trợ giúp", không nhận thưởng.
-import NutChuaTungBuoc from '../chua-cau-sai/NutChuaTungBuoc'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { BookOpenText, MessageCircleQuestion } from 'lucide-react'
 import { CHU_LAM_XONG, docTokenHs, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung } from '../../lib/loi-giai-api'
-import KhungLoiGiai from './KhungLoiGiai'
-import HopHoiThay from './HopHoiThay'
 import './loi-giai.css'
+
+// LUẬT TỐC ĐỘ (thầy 13/10): nút nằm ở MỌI thẻ câu (mảnh tải lúc mở app) ⇒ hộp hỏi Thầy, khung lời giải, nút chữa từng bước tách mảnh,
+// chỉ tải khi em bấm — tải SONG SONG với lượt hỏi máy chủ (Promise.all) nên em không chờ thêm.
+const napHop = () => import('./HopHoiThay')
+const napKhung = () => import('./KhungLoiGiai')
+const HopHoiThay = lazy(napHop)
+const KhungLoiGiai = lazy(napKhung)
+const NutChuaTungBuoc = lazy(() => import('../chua-cau-sai/NutChuaTungBuoc'))
 
 export const CHU_DANG_SOAN = 'Thầy đang soạn lời giải từng bước cho câu này. Em chờ một chút rồi bấm lại nhé.'
 export { CHU_LAM_XONG }
@@ -31,7 +36,7 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
   const bam = async (kieu: 'hoi' | 'giai') => {
     setDangTai(kieu)
     setLoi('')
-    const r = await hoiThay(qid, nguon, dangLam)
+    const [r] = await Promise.all([hoiThay(qid, nguon, dangLam), (kieu === 'hoi' ? napHop() : napKhung()).catch(() => null)])
     setDangTai('')
     if (!r.ok) { setLoi(r.loi); return }
     if (kieu === 'hoi' && r.hoiThem) { setHop({ cau: r.cau, dangLam }); return }
@@ -56,10 +61,12 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
           <span>{dangTai === 'giai' ? 'Đang mở…' : 'Lời giải từng bước'}</span>
         </button>
       )}
-      {coGiai && <NutChuaTungBuoc qid={qid} />}
+      {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={qid} /></Suspense>}
       {loi && <span className="lg-loi" role="status">{loi}</span>}
-      {hop && <HopHoiThay cau={hop.cau} nguon={nguon} dangLam={hop.dangLam} onTraLoi={onHoi} onDong={() => setHop(null)} />}
-      {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
+      <Suspense fallback={null}>
+        {hop && <HopHoiThay cau={hop.cau} nguon={nguon} dangLam={hop.dangLam} onTraLoi={onHoi} onDong={() => setHop(null)} />}
+        {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
+      </Suspense>
     </div>
   )
 }

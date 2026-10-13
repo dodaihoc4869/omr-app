@@ -14,7 +14,7 @@
 // Hoạt ảnh chỉ động vào `transform`, `opacity`, `stroke-dashoffset` và chiều cao
 // bằng grid — không thứ nào bắt trình duyệt tính lại bố cục, nên mượt trên máy
 // yếu. Máy bật "giảm chuyển động" thì hiện thẳng trạng thái cuối.
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { classify } from '../engine/score'
 import { chanSoCau, docLinkPhieu } from '../lib/phieu-link'
 import { layPhieu } from '../lib/exam-api'
@@ -55,7 +55,6 @@ function mauDiem(diem: number): string {
 
 import { CSS_BAO_CAO as CSS } from '../lib/css-bao-cao'
 import { themCssMayYeu } from '../lib/may-yeu'
-import NgheHoiThayPhieu from '../components/loi-giai/NgheHoiThayPhieu'
 
 // ------------------------------------------------------------------ tiện ích
 /** Hiện dần khi cuộn tới. Dùng IntersectionObserver để không phải nghe sự kiện
@@ -258,6 +257,9 @@ export function laLoiCho(loi: string): boolean {
   return s.includes('không trả lời sau') || s.includes('Failed to fetch') || s.includes('NetworkError') || s.includes('HTTP 5')
 }
 
+// Nghe nút Hỏi thầy của phiếu bài tập (13/10) — tách mảnh, chỉ tải khi mở phiếu bài tập.
+const NgheHoiThayPhieu = lazy(() => import('../components/loi-giai/NgheHoiThayPhieu'))
+
 export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duCoSan?: PhieuDayDu; laCuaEm?: boolean; xinLink?: () => Promise<string> } = {}) {
   const [du, setDu] = useState<PhieuDayDu | null | undefined>(duCoSan ?? undefined)
   // Link phiếu bài tập: trang này chỉ việc hiện trọn tài liệu HTML đã dựng.
@@ -340,7 +342,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
     return (
       <>
         <iframe ref={khungBt} title="Phiếu bài tập" srcDoc={themCssMayYeu(phieuBt)} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
-        <NgheHoiThayPhieu khung={khungBt} />
+        <Suspense fallback={null}><NgheHoiThayPhieu khung={khungBt} /></Suspense>
       </>
     )
   }
