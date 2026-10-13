@@ -9,6 +9,6 @@ await db.prepare(`INSERT OR IGNORE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) SELE
 const env={DB:db} as unknown as Env
 // Chuyển lần đầu ngoài cao điểm: các lô nhỏ tuần tự đến hết hàng đợi hiện tại, không bắt em mở app để có lịch.
 // Mỗi vòng đều kiểm ca đang mở; hồ sơ lỗi có cooldown nên không giữ cả hàng đợi.
-for(let i=0;i<500;i++){const r=await dongBoKtCn(env,now,2);if(r.hoan)throw new Error('Ca vừa mở: dừng áp lịch riêng.');if(!r.soEm)break;if(i%20===19)console.log(JSON.stringify({dangChuanBiKtCn:true,soLo:i+1}))}
+for(let i=0;i<500;i++){const r=await dongBoKtCn(env,now,2);if(r.hoan)throw new Error('Ca vừa mở: dừng áp lịch riêng.');if(!r.soEm&&!r.soMoi)break;if(i%20===19)console.log(JSON.stringify({dangChuanBiKtCn:true,soLo:i+1}))}
 const stats=(await query(`SELECT COUNT(*) soLich,COUNT(DISTINCT sbd) soEm,SUM(CASE WHEN trang_thai='cho_nguon' THEN 1 ELSE 0 END) choNguon,MIN(ngay) ngaySomNhat,MAX(ngay) ngayMuonNhat,MIN(json_array_length(json_extract(json,'$.cau'))) cauItNhat,MAX(json_array_length(json_extract(json,'$.cau'))) cauNhieuNhat FROM kiem_tra_ca_nhan`))[0]
 console.log(JSON.stringify({apKtCn:true,...stats,giuKetQuaDaNop:true,cronTiepTuc:true}))

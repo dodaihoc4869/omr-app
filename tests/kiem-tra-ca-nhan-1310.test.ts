@@ -37,7 +37,9 @@ it('em chưa vững có thêm câu khác nhóm; em vững không bị giao thêm
  const c=Array.from({length:4},(_,i)=>({qid:String(i),group:String(i),muc:[i%2?'b':'a'],phut:1,hopLe:true,daGap:false}))
  const vung=new Map(muc.map(m=>[m.id,{p:0.97,vung:true,n:9,ngayCuoi:'2026-10-10'}]))
  expect(chonDeKt(muc,c,vung,'S1').qids).toHaveLength(2)
- expect(chonDeKt(muc,c,new Map(),'S1').qids).toHaveLength(4)
+ const yeu=new Map(muc.map(m=>[m.id,{p:0.4,vung:false,n:2,ngayCuoi:'2026-10-10'}]))
+ expect(chonDeKt(muc,c,yeu,'S1').qids).toHaveLength(3)
+ expect(chonDeKt(muc,c,new Map(),'S1').qids).toHaveLength(2)
 })
 it('ngày kiểm tra riêng theo bằng chứng; không luôn Chủ nhật, luôn có 24h',()=>{
  const yeu=henKt({sbd:'S1',homNay:'2026-10-13',bangChung:[{p:0.3,vung:false,n:0,ngayCuoi:null}]})
@@ -185,4 +187,35 @@ it('đọc lịch nhẹ không mang đề/đáp án; số câu trả lời khớ
  expect(meta).not.toHaveProperty('json');expect(meta).not.toHaveProperty('tra_json')
  expect(JSON.stringify(meta)).not.toContain('correct')
  expect(tomTatKt(meta,NOW)).toEqual(tomTatKt(full,NOW));expect(tomTatKt(meta,NOW).daTra).toBe(3)
+})
+it('cùng nền qua 20 bài và bốn độ khó không thành 80 kiến thức; mọi bài vẫn có câu đo riêng',async()=>{
+ const ma=Array.from({length:20},(_,i)=>`DH-L${i}`),k=taoKhoOmni(Object.fromEntries(ma.map(m=>[m,8])))
+ await damBaoBangBaiDaDay(k.env)
+ k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('kiem_tra_ca_nhan_v1','{"bat":true}','x')`)
+ for(let i=0;i<ma.length;i++){
+  const m=ma[i]!;k.d.sql.prepare('INSERT INTO bai_da_day(id,lop,khoa_bai,ten_bai,vi_tri,ma_to_json,tick_luc) VALUES(?,?,?,?,?,?,?)').run('t'+i,'12A1','b'+i,'Bài '+i,i,JSON.stringify([m]),'2026-10-12')
+  k.d.sql.prepare('INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES(?,?,8,0,?)').run(m,m,'v1')
+  k.d.sql.prepare('INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,?,?)').run(m,'v1','x')
+  for(const qid of k.qids(m))k.d.sql.prepare("INSERT INTO omni_q(qid,y,vkn_json,nguon,duyet_luc) VALUES(?,-1,'[\"nen:mol\"]','thay','x')").run(qid)
+ }
+ await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,tt=tomTatKt(r,NOW),d=JSON.parse(String(r.json))
+ expect(tt).toMatchObject({soBai:20,tongKienThuc:1,phuDe:1,nguonDayDu:true,tong:20})
+ expect(new Set(d.cau.flatMap((c:{muc:string[]})=>c.muc.filter(id=>id.startsWith('bai:')))).size).toBe(20)
+ expect(d.cau.every((c:{q:{mucDo:string}})=>c.q.mucDo==='NB')).toBe(true)
+})
+it('làm mới đề cũ chỉ trước ngày mở, giữ ngày đã hẹn và không đổi bài đã nộp',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!
+ const old=JSON.parse(String(r.json));old.phienBan=1;k.d.sql.prepare('UPDATE kiem_tra_ca_nhan SET json=? WHERE id=?').run(JSON.stringify(old),String(r.id))
+ await dongBoKtCn(k.env,NOW+60000)
+ const moi=(await docKtCn(k.env,'S1',NOW))!;expect(moi.ngay).toBe(r.ngay);expect(JSON.parse(String(moi.json)).phienBan).toBe(2)
+ const now=Number(moi.mo_luc)+1000;await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id:moi.id},now)
+ await lapKtCn(k.env,'S1',now+1000,true)
+ expect(k.d.sql.prepare('SELECT nop_luc,diem,json FROM kiem_tra_ca_nhan WHERE id=?').get(String(r.id))).toMatchObject({nop_luc:now,diem:0,json:moi.json})
+})
+it('mô phỏng không DDL/lập lịch/ghi sổ',async()=>{
+ const k=await kho(),prepare=k.env.DB.prepare.bind(k.env.DB)
+ vi.spyOn(k.env.DB,'prepare').mockImplementation(sql=>{if(!/^\s*(SELECT|WITH)\b/.test(sql))throw new Error('Không được ghi');return prepare(sql)})
+ expect(await lapKtCn(k.env,'S1',NOW,true,true)).toMatchObject({soKienThuc:2,thieu:0})
+ expect(k.d.sql.prepare('SELECT COUNT(*) n FROM kiem_tra_ca_nhan').get()).toMatchObject({n:0})
+ vi.restoreAllMocks()
 })
