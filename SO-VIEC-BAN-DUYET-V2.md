@@ -343,3 +343,8 @@ Thầy nhắn thêm (ảnh thẻ "12 bậc từ Lười đến Chăm · Số em 
 - [ ] App phụ huynh: dựng theo bản vẽ đã duyệt | bằng chứng: (chờ thầy duyệt bản vẽ)
 Giả định: "tính cách" — app KHÔNG đo tính cách; chỉ hiện đúng những gì đo được (thái độ làm bài: nhịp học, bậc, quá nhanh, chọn lặp, đúng/sai theo thời gian, tự sửa, số giây…), không gán nhãn tính cách không có số liệu.
 Thầy chốt: "không hiện tính cách cũng được" ⇒ app phụ huynh không có mục tính cách; chỉ hiện số đo được.
+Thầy duyệt (13/10): "duyệt cả hai giữ xếp theo bậc phụ huynh xem được hạng"
+- [x] Màn chiếu điểm danh: BẢN VẼ | bằng chứng: docs/ban-ve-dot19/anh/chieu-*.jpg — thầy duyệt, giữ xếp theo bậc
+- [x] App phụ huynh: BẢN VẼ | bằng chứng: docs/ban-ve-dot19/anh/ph-*.jpg — thầy duyệt, phụ huynh xem được hạng trong lớp
+- [ ] Dựng màn chiếu theo bản vẽ (xếp theo bậc) | bằng chứng: (chưa có)
+- [ ] Dựng app phụ huynh theo bản vẽ + mở các mục "cần mở cho phụ huynh" (điểm danh buổi học, các lần học hôm nay, lịch ôn lại, hạng chăm trong lớp) | bằng chứng: (chưa có)
