@@ -17,6 +17,16 @@ export interface CauTrucTraLoi {
 
 const chuoi = (v: unknown): v is string => typeof v === 'string'
 
+/** GỐC HỮU CƠ CÓ GẠCH (thầy báo 13/10, ảnh "gốc alkyl là gì ạ": "CH3-", "C2H5-", "C3H7-" không hạ chỉ số). ChemText cố ý giữ nguyên số
+ *  đứng ngay trước dấu +/- (vì "SO42-" có thể là điện tích). Gốc hydrocarbon: có C, tận cùng H + số, sau gạch là hết chữ ⇒ gạch là LIÊN KẾT,
+ *  không phải điện tích ⇒ đánh dấu chỉ số tường minh, giữ gạch thường. Ion ("HCO3-", "SO42-", "NH4+") không khớp nên đi đường cũ.
+ *  Chỉ áp trong hộp Hỏi Thầy (mảnh tải lười): byte mở app không đổi. */
+const RE_GOC = /([A-Za-z0-9()_{}]+)-(?=$|[\s,.;:!?)\]…])/g
+export function chuHoa(s: string): string {
+  return chiSoRo(s).replace(RE_GOC, (m, tok: string) =>
+    /^(?:[A-Z][a-z]?|[()]|\d+|_\{\d+\})+$/.test(tok) && /C(?![a-z])/.test(tok) && /H\d+$/.test(tok) ? `${tok.replace(/([A-Za-z)])(\d+)/g, '$1_{$2}')}-` : m)
+}
+
 /** Kiểm khuôn câu trả lời có cấu trúc của máy chủ; sai khuôn / vắng ⇒ null (máy em vẽ chữ phẳng như cũ). */
 export function docCauTruc(v: unknown): CauTrucTraLoi | null {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return null
@@ -36,15 +46,15 @@ export function docCauTruc(v: unknown): CauTrucTraLoi | null {
   }
 }
 
-/** Chữ có **đậm** và ==làm nổi==; phần thường qua ChemText (CH3NH2 ⇒ CH₃NH₂). */
+/** Chữ có **đậm** và ==làm nổi==; phần thường qua ChemText (CH3NH2 ⇒ CH₃NH₂, CH3- ⇒ CH₃-). */
 export function ChuTo({ text }: { text: string }) {
   const phan = text.split(/(\*\*.+?\*\*|==.+?==)/g).filter(Boolean)
   return (
     <>
       {phan.map((p, i) => {
-        if (p.length > 4 && p.startsWith('**') && p.endsWith('**')) return <strong key={i}><ChemText text={chiSoRo(p.slice(2, -2))} /></strong>
-        if (p.length > 4 && p.startsWith('==') && p.endsWith('==')) return <mark key={i}><ChemText text={chiSoRo(p.slice(2, -2))} /></mark>
-        return <ChemText key={i} text={chiSoRo(p)} />
+        if (p.length > 4 && p.startsWith('**') && p.endsWith('**')) return <strong key={i}><ChemText text={chuHoa(p.slice(2, -2))} /></strong>
+        if (p.length > 4 && p.startsWith('==') && p.endsWith('==')) return <mark key={i}><ChemText text={chuHoa(p.slice(2, -2))} /></mark>
+        return <ChemText key={i} text={chuHoa(p)} />
       })}
     </>
   )
@@ -111,7 +121,7 @@ export default function TraLoiThay({ ct, dangLam = false, onHoi, khoa = false }:
       )}
       {onHoi && ct.hoiTiep.length > 0 && (
         <div className="lg-tl-hoi" role="group" aria-label="Hỏi tiếp">
-          {ct.hoiTiep.map((q) => <button key={q} type="button" disabled={khoa} onClick={() => onHoi(q)}><ChemText text={chiSoRo(q)} /></button>)}
+          {ct.hoiTiep.map((q) => <button key={q} type="button" disabled={khoa} onClick={() => onHoi(q)}><ChemText text={chuHoa(q)} /></button>)}
         </div>
       )}
     </div>

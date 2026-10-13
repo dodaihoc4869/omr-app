@@ -4,9 +4,8 @@
 import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { SendHorizontal } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
-import { chiSoRo } from '../../lib/chi-so-ro'
 import { hoiThemThay } from '../../lib/hoi-them-thay-api'
-import TraLoiThay, { docCauTruc, type CauTrucTraLoi } from './TraLoiThay'
+import TraLoiThay, { chuHoa, docCauTruc, type CauTrucTraLoi } from './TraLoiThay'
 
 /** `ct`: câu trả lời có cấu trúc (bản vẽ docs/ban-ve-hoi-thay-1310) — vắng ⇒ vẽ chữ phẳng như cũ. */
 type Tin = { vai: 'em' | 'thay'; chu: string; ct?: CauTrucTraLoi | null }
@@ -75,13 +74,13 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
       )}
       <div className="lg-ht-log" role="log" aria-live="polite" aria-busy={dangGui}>
         {tin.map((m, i) => (m.vai === 'em' ? (
-          <p key={i} className="lg-ht-em"><ChemText text={chiSoRo(m.chu)} /></p>
+          <p key={i} className="lg-ht-em"><ChemText text={chuHoa(m.chu)} /></p>
         ) : m.ct ? (
           <TraLoiThay key={i} ct={m.ct} dangLam={dangLam} khoa={dangGui} onHoi={i === tin.length - 1 && !dung ? (q) => void gui(undefined, q) : undefined} />
         ) : (
           <div key={i} className="lg-ht-thay">
             <span className="lg-ht-nhan">Thầy Đỗ Đại Học</span>
-            {m.chu.split('\n').map((d) => d.trim()).filter(Boolean).map((d, j) => <p key={j}><ChemText text={chiSoRo(d)} /></p>)}
+            {m.chu.split('\n').map((d) => d.trim()).filter(Boolean).map((d, j) => <p key={j}><ChemText text={chuHoa(d)} /></p>)}
           </div>
         )))}
         {dangGui && <p className="lg-ht-cho">Thầy đang trả lời<span className="lg-ht-cham" aria-hidden="true"><i /><i /><i /></span></p>}

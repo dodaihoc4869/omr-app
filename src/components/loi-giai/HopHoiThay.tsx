@@ -9,7 +9,7 @@ import { BookOpenText, MessageCircleQuestion, X } from 'lucide-react'
 import type { CauChoKhung } from '../../lib/loi-giai-api'
 import HoiThemThay from './HoiThemThay'
 import { ChemText } from '../../lib/chem-format'
-import { chiSoRo } from '../../lib/chi-so-ro'
+import { chuHoa } from './TraLoiThay'
 import './loi-giai.css'
 import './hop-hoi-thay.css'
 
@@ -75,7 +75,7 @@ export default function HopHoiThay({ cau, nguon, onDong, onTraLoi, onMoLoiGiai, 
             {/* `cau.de`, chữ từng ý: máy chủ dựng từ chữ kho đã thoát HTML (như khung lời giải) — KHÔNG có đáp án */}
             {de ? (
               <>
-                <p className="lg-de-chu"><b>{cau.so}.</b> <ChemText text={chiSoRo(de.chu)} /></p>
+                <p className="lg-de-chu"><b>{cau.so}.</b> <ChemText text={chuHoa(de.chu)} /></p>
                 {de.con && <div className="lg-chu-de" dangerouslySetInnerHTML={{ __html: de.con }} />}
               </>
             ) : (
@@ -83,7 +83,7 @@ export default function HopHoiThay({ cau, nguon, onDong, onTraLoi, onMoLoiGiai, 
             )}
             {yChu.length > 0 && (
               <ul className="lg-de-pa" data-ds={loai === 'ds' || undefined} data-ngan={ngan || undefined}>
-                {yChu.map(([k, t]) => <li key={k}><span className="lg-de-chu-cai" aria-hidden="true">{k}</span><span className="sr-only">{loai === 'ds' ? `Ý ${k}: ` : `Phương án ${k}: `}</span><span><ChemText text={chiSoRo(t)} /></span></li>)}
+                {yChu.map(([k, t]) => <li key={k}><span className="lg-de-chu-cai" aria-hidden="true">{k}</span><span className="sr-only">{loai === 'ds' ? `Ý ${k}: ` : `Phương án ${k}: `}</span><span><ChemText text={chuHoa(t)} /></span></li>)}
               </ul>
             )}
           </div>
