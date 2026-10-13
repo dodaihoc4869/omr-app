@@ -2,7 +2,7 @@
   "timezone": "Asia/Saigon",
   "not_before": "2026-10-14T00:00:00+07:00",
   "continuation_at": "2026-10-14T00:05:00+07:00",
-  "phase": "local_gates_passed_waiting_ci_release",
+  "phase": "released_verified",
   "base": "58d34a69",
   "teacher_priority_pr": 285,
   "lanes": [
@@ -44,7 +44,7 @@
     {
       "lane": "integration_pwa",
       "worktree": "/workspace/don-ma-sau-00-1410",
-      "result": "offline/staticclosure13/13;18Chromium; full0lỗi mới; chờCI/release"
+      "result": "đã phát hành/đọc thật; SW13/13,18Chromium,full0lỗi mới"
     }
   ],
   "limits": [
@@ -70,5 +70,33 @@
     "pending_inherited": 27,
     "new_failures": 0,
     "new_failed_files": 0
+  },
+  "release": {
+    "pr": 290,
+    "commit": "1b597a082315314e6d05a5745376224a5738cf8c",
+    "actions": 38457735178,
+    "status": "success",
+    "worker_pages_same_commit": true,
+    "official_exam_counts": [
+      0,
+      0
+    ],
+    "goi7": {
+      "goi": 5,
+      "hoc_sinh": 263,
+      "cau": 609,
+      "thieu_quota": 0,
+      "thieu_nguon": 0,
+      "giu_ket_qua_da_nop": true
+    },
+    "ktcn": {
+      "lich": 772,
+      "hoc_sinh": 262,
+      "cau_min_max": [
+        28,
+        28
+      ],
+      "cho_nguon_cu_con_giu": 122
+    }
   }
 }

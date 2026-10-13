@@ -1,6 +1,6 @@
 # Tối ưu ba app và dọn mã đã ngừng — 14/10/2026
 
-Nhánh `codex/don-ma-sau-00-1410`, nền main `58d34a69`. Sáu làn độc lập có worktree riêng; Codex tích hợp app và cổng, Claude phụ trách máy chủ. Không gọi lượt này là kiểm từng dòng hay đã hết mọi lỗi. PR máy chủ của Claude #288/#289 và bản sửa Tick #285 đã lên main trước đợt này; không phát hành song song.
+Đã phát hành PR290: mã sống `1b597a082315314e6d05a5745376224a5738cf8c`, Actions `38457735178` SUCCESS, Worker/Pages cùng SHA. Nhánh `codex/don-ma-sau-00-1410`, nền main `58d34a69`. Sáu làn độc lập có worktree riêng; Codex tích hợp app và cổng, Claude phụ trách máy chủ. Không gọi lượt này là kiểm từng dòng hay đã hết mọi lỗi. PR máy chủ của Claude #288/#289 và bản sửa Tick #285 đã lên main trước đợt này; không phát hành song song.
 
 ## Tick bài đã phát hành trước
 
@@ -45,3 +45,9 @@ Giữ **Sửa em** cũ và các hàm dùng chung cho đến khi bản Thêm/Bớ
 - Nền main vẫn có test đỏ cũ. Không dùng số test ít hơn sau gỡ game để tuyên bố toàn repo xanh. Full baseline `19840386` có cây mã chạy/test bằng main `58d34a69`; readonly workflow khác không ảnh hưởng test.
 - Công cụ hỗn hợp đã sửa import và compile riêng; không xóa công cụ/fixture học tập. Các smoke có phạm vi cụ thể trong README-tools, không tuyên bố mọi chế độ của mọi công cụ đã chạy. Số đo giờ cao điểm sau bản vá bộ nhớ của Claude chưa có trong lượt này; không tuyên bố đã hết `exceededMemory`. Đã báo Claude kiểm peak bộ nhớ qua kênh PR #285.
 - Đã soát độc lập sáu làn và gửi Claude qua PR290; Claude chưa trả lời soát đợt này; các bình luận/nhật ký là bằng chứng phối hợp, không phải bằng chứng Claude đã duyệt. Phát hành chỉ sau cổng cuối và kiểm ca mới, nối sau #285.
+
+## Bản sống đã xác minh
+
+Lượt phát hành kết thúc02:56VN14/10, không chồng #285 hoặc Claude. CI105ad2cb/38456671289 đạt; cổng ca đọc lại trước merge02:46:58VN và các cổng trước đổi bản đều0/0. Worker/Pages cùng1b597a08,5đường giao diện/2cổng quyền đạt. Gói7 sau deploy5gói/263HS/609câu,0thiếuquota/nguồn/chưađủnguồn/chưaduyệt/emđãchọnchưanhậngói, giữkếtquảđãnộp. Kiểm lịch cá nhân772lịch/262HS,28câu min=max,0thiếusốtĩnh;122dòngcho_nguon cũ còn giữ, không tuyên bố mọi lịch đều sẵn. Đọc thật bằng workflow, không sửa hạn thay thầy.
+
+Lùi mã: `git revert -m 1 1b597a082315314e6d05a5745376224a5738cf8c`; giữ dữ liệu và kiểm ca trước phát hành. Cập nhật nhật ký/tài liệu sau phát hành dùng `[skip ci]`, không đổi mã đang chạy.
