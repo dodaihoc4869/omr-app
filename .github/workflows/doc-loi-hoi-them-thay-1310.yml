@@ -28,5 +28,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          npx -y wrangler@4 d1 execute omr --remote --command "SELECT COUNT(*) AS tong, SUM(CASE WHEN loi IS NULL THEN 1 ELSE 0 END) AS tra_loi_duoc, SUM(CASE WHEN loi IS NOT NULL THEN 1 ELSE 0 END) AS loi FROM hoi_tro_ly" 2>&1 | tail -n 20
-          npx -y wrangler@4 d1 execute omr --remote --command "SELECT luc, model, ms, loi FROM hoi_tro_ly WHERE loi IS NOT NULL ORDER BY id DESC LIMIT 10" 2>&1 | tail -n 40
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS tong, SUM(CASE WHEN loi IS NULL THEN 1 ELSE 0 END) AS tra_loi_duoc, SUM(CASE WHEN loi IS NOT NULL THEN 1 ELSE 0 END) AS loi FROM hoi_tro_ly" | jq -c ".[0].results"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT luc, model, ms, loi FROM hoi_tro_ly WHERE loi IS NOT NULL ORDER BY id DESC LIMIT 10" | jq -c ".[0].results"
+          # 13/10 tối: mô hình nào THẬT SỰ trả lời trong 24 giờ (thầy chọn gemini-3.1-flash-lite; dự phòng 404/410 ⇒ 3.5-flash-lite…) — chỉ đếm, không sbd/câu hỏi.
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT model, COUNT(*) AS so_luot, CAST(AVG(ms) AS INTEGER) AS ms_tb, MAX(luc) AS gan_nhat FROM hoi_tro_ly WHERE loi IS NULL AND luc >= strftime('%Y-%m-%dT%H:%M:%S', 'now', '-1 day') GROUP BY model ORDER BY gan_nhat DESC" | jq -c ".[0].results"

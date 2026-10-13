@@ -58,7 +58,7 @@ afterEach(() => { vi.restoreAllMocks() })
 
 describe('hàm thuần', () => {
   it('cấu hình: mặc định bật, chặn biên, JSON hỏng ⇒ mặc định', () => {
-    expect(giaiCauHinhHoiThem(null)).toMatchObject({ bat: true, tranNgay: 20, tranCau: 6, model: 'gemini-3.1-flash-lite' }) // thầy tối 13/10: "chuyển xuống mô hình 3.1 flash lite"
+    expect(giaiCauHinhHoiThem(null)).toMatchObject({ bat: true, tranNgay: 12, tranCau: 6, model: 'gemini-3.1-flash-lite' }) // thầy tối 13/10: "chuyển xuống mô hình 3.1 flash lite"
     expect(giaiCauHinhHoiThem('{"bat":false,"tranNgay":999,"lop":["12A1"," "],"model":"gemini-2.5-pro"}')).toMatchObject({ bat: false, tranNgay: 200, lop: ['12A1'], model: 'gemini-2.5-pro' })
     expect(giaiCauHinhHoiThem('{"model":"../x"}').model).toBe('gemini-3.1-flash-lite')
     expect(giaiCauHinhHoiThem('không phải json')).toMatchObject({ bat: true })
@@ -133,7 +133,7 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     const mo = await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'luyen_de' })
     expect(mo).toMatchObject({ ok: true, coLoiGiai: true, hoiThem: true })
     const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, nguon: 'luyen_de', cauHoi: 'Vì sao ý b sai ạ?', dapAnEm: 'b Đúng' })
-    expect(r).toMatchObject({ ok: true, traLoi: 'Ý b sai vì em nhầm chất, xem lại bước 2.', conLai: 19, ngoaiPhamVi: false })
+    expect(r).toMatchObject({ ok: true, traLoi: 'Ý b sai vì em nhầm chất, xem lại bước 2.', conLai: 11, ngoaiPhamVi: false })
     expect(goi).toHaveLength(1)
     const g = goi[0]!
     expect(g.url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent')
@@ -170,7 +170,7 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     const goi = giaGemini((b) => (b.contents.length > 3 ? traLoiJson({ lienQuan: true, traLoi: 'Bước 2 lấy số mol.' }) : traLoiJson({ lienQuan: false, traLoi: 'Bài Lý số 3 giải thế này…' })))
     await em(d, '/hs/hoi-thay', { token, qid: QA.ds })
     const r1 = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Thầy giải giúp em bài Lý số 3' })
-    expect(r1).toMatchObject({ ok: true, traLoi: CAU_NGOAI_PHAM_VI, ngoaiPhamVi: true, conLai: 19 })
+    expect(r1).toMatchObject({ ok: true, traLoi: CAU_NGOAI_PHAM_VI, ngoaiPhamVi: true, conLai: 11 })
     expect(d.dem('hoi_tro_ly', 'lien_quan=0')).toBe(1)
     await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Vì sao bước 2 vậy ạ?' })
     expect(goi[1]!.body.contents).toHaveLength(3) // dữ liệu · "đã đọc" · câu hỏi mới — lượt ngoài phạm vi không vào lịch sử
@@ -227,7 +227,7 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     await em(d, '/hs/hoi-thay', { token, qid: QA.ds })
     vi.mocked(globalThis.fetch).mockImplementationOnce(async () => new Response(JSON.stringify({ error: { code: 404, message: 'models/gemini-3.1-flash-lite is not found' } }), { status: 404, headers: { 'content-type': 'application/json' } }))
     const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Vì sao ạ?' })
-    expect(r).toMatchObject({ ok: true, traLoi: 'Em tính lại số mol trước.', conLai: 19 })
+    expect(r).toMatchObject({ ok: true, traLoi: 'Em tính lại số mol trước.', conLai: 11 })
     expect(goi.map((g) => g.url.split('/models/')[1])).toEqual(['gemini-3.5-flash-lite:generateContent'])
     expect(DS_MODEL_DU_PHONG[0]).toBe('gemini-3.5-flash-lite')
     expect(d.dem('hoi_tro_ly', "model='gemini-3.5-flash-lite' AND loi IS NULL")).toBe(1)
@@ -250,7 +250,7 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     giaGemini(() => ({ error: { message: 'Resource exhausted' } }), 429)
     await em(d, '/hs/hoi-thay', { token, qid: QA.ds })
     const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Vì sao ạ?' })
-    expect(r).toMatchObject({ ok: false, ma: 'qua_tai', conLai: 20 })
+    expect(r).toMatchObject({ ok: false, ma: 'qua_tai', conLai: 12 })
     expect(String(r.error)).toContain('Thầy đang trả lời nhiều em cùng lúc')
     expect(d.dem('hoi_tro_ly', "loi LIKE 'qua_tai%'")).toBe(1)
   })
