@@ -1,0 +1,43 @@
+# ĐO LỆCH "ĐÃ LÀM HÔM NAY" (CHỈ ĐỌC) — thầy 13/10: app em báo "Đủ mức 24/24" mà ô Hôm nay của thầy "19/24 · thiếu 5".
+# Phía em đếm sổ ∪ câu có hướng dẫn ∪ lượt trả lời ≤ 15 phút (game_v2_attempt); phía thầy chỉ đếm sổ ∪ câu có hướng dẫn.
+# Tệp này đếm lượt trả lời hôm nay của các em Gói 7 theo loại dòng sổ tương ứng (không có dòng sổ / lướt / chẩn đoán / …).
+# Chỉ in số đếm gộp — không in mã em, tên em.
+name: Đo lệch đã làm hôm nay (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/do-lech-da-lam-1310.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-lech-da-lam-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      NGAY: '2026-10-13'
+      TU_UTC: '2026-10-12T17:00:00'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Lượt trả lời hôm nay theo loại dòng sổ (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          A="WITH em AS (SELECT DISTINCT sbd FROM goi_bai_7_em), a AS (SELECT a.id, a.sbd, a.qid, a.created_at FROM em JOIN game_v2_attempt a ON a.sbd=em.sbd AND a.created_at>='$TU_UTC'),
+            x AS (SELECT a.*, s.attempt_id AS co, s.purpose AS p, s.ket_qua AS kq, s.ma_nguon AS mn FROM a LEFT JOIN su_kien_hoc s ON s.sbd=a.sbd AND s.ngay_vn='$NGAY' AND s.attempt_id=a.id)"
+          echo "== tổng lượt · không có dòng sổ · lướt · chẩn đoán · xem lời giải/chữa bước · ktcn · kết quả rỗng"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$A SELECT COUNT(*) tong, SUM(co IS NULL) khong_so, SUM(p='luot') luot, SUM(p='chan_doan') chan_doan, SUM(p IN ('xem_loi_giai','chua_buoc')) xem_chua, SUM(mn LIKE 'ktcn:%') ktcn, SUM(co IS NOT NULL AND kq IS NULL) kq_rong FROM x" | jq -c ".[0].results"
+          echo "== số em có lượt không vào sổ đếm (không dòng sổ / lướt / chẩn đoán), lớn nhất mỗi em"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$A, e AS (SELECT sbd, SUM(co IS NULL) ks, SUM(p IN ('luot','chan_doan')) lc FROM x GROUP BY sbd) SELECT COUNT(*) so_em, SUM(ks>0) em_khong_so, MAX(ks) max_khong_so, SUM(lc>0) em_luot_cd, MAX(lc) max_luot_cd FROM e" | jq -c ".[0].results"
+          echo "== lượt KHÔNG có dòng sổ theo giờ VN"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$A SELECT substr(datetime(created_at,'+7 hours'),12,2) gio, COUNT(*) tong, SUM(co IS NULL) khong_so FROM x GROUP BY gio ORDER BY gio" | jq -c ".[0].results[]"
