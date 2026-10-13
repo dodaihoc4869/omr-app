@@ -13,6 +13,8 @@ export interface ViewPhMoi {
   chuLoi: string
   /** Đang nạp lại (đã có bản cũ hoặc bấm "Thử lại"). */
   dangLamMoi: boolean
+  /** Nhịp đọc thật sau lần mở đầu; các khối phụ nạp cùng lượt, không nạp lại khi bản đầu về. */
+  lanLamMoi?: number
   thuLai: () => void
 }
 
@@ -32,13 +34,15 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
     }
     let huy = false
     let dangChay: Promise<boolean> | null = null
+    let lanDoc = 0
     const doc = async (): Promise<boolean> => {
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return true
-      setS((x) => ({ ...x, dangLamMoi: true }))
+      const lanLamMoi = lanDoc++
+      setS((x) => ({ ...x, dangLamMoi: true, lanLamMoi }))
       const r = await apiRef.current(sbd)
       if (huy) return true
-      if (r.kieu === 'ok') setS({ trangThai: 'ok', pm: r.pm, chuLoi: '', dangLamMoi: false })
-      else setS((x) => (x.pm ? { ...x, chuLoi: r.chu, dangLamMoi: false } : { trangThai: 'loi', pm: null, chuLoi: r.chu, dangLamMoi: false }))
+      if (r.kieu === 'ok') setS({ trangThai: 'ok', pm: r.pm, chuLoi: '', dangLamMoi: false, lanLamMoi })
+      else setS((x) => (x.pm ? { ...x, chuLoi: r.chu, dangLamMoi: false } : { trangThai: 'loi', pm: null, chuLoi: r.chu, dangLamMoi: false, lanLamMoi }))
       return r.kieu === 'ok'
     }
     // Tải lại tay và nhịp nền dùng chung lượt đang đọc; không để bản về muộn ghi đè bản mới.

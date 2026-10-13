@@ -109,10 +109,12 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   const tuyen = useTuyen()
   const v = useTatCaVeCon(sbd)
   const ten = v.pm?.hoTen || hoTen
-  const moc = v.pm?.serverNow ?? null
+  // Bốn lệnh phụ đã nạp song song lúc mở. Chỉ lượt đọc thật kế tiếp mới làm mới;
+  // serverNow của bản đầu xuất hiện không tạo thêm bốn yêu cầu trùng.
+  const lanLamMoi = v.lanLamMoi ?? 0
   const [hoiDoiSbd, setHoiDoiSbd] = useState(false)
 
-  // Game Hoá 2.0 của con: nạp cùng nhịp với "mọi thứ về con" (mỗi lần bản mới về). Lỗi ⇒ giữ bản cũ; chưa từng có ⇒ khối chiến dịch vắng.
+  // Tiến độ học của con: nạp cùng nhịp với "mọi thứ về con". Lỗi ⇒ giữ bản cũ; chưa từng có ⇒ khối vắng.
   const [loiHoc2, setLoiHoc2] = useState('')
   const [nhapHoc2, setNhapHoc2] = useState(0)
   const [hoc2, setHoc2] = useState<Hoc2 | null>(null)
@@ -124,7 +126,7 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
       else setLoiHoc2(r.chu)
     })
     return () => { huy = true }
-  }, [sbd, moc, nhapHoc2])
+  }, [sbd, lanLamMoi, nhapHoc2])
 
   // LÀN PHỤ HUYNH 12/10: tổng quan về con (`/ph/con-tong-quan`, CHỈ ĐỌC) — cùng nhịp với "mọi thứ về con". Lỗi ⇒ giữ bản cũ + "Thử lại" ngay ở khối Gợi ý nhắc con;
   // máy chủ cũ chưa có lệnh ⇒ v null, các khối mới vắng (không báo lỗi giả).
@@ -137,7 +139,7 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
       setTq((x) => (r.kieu === 'ok' ? { v: r.v, daTai: true, chuLoi: '' } : { ...x, daTai: true, chuLoi: r.chu }))
     })
     return () => { huy = true }
-  }, [sbd, moc, nhapTq])
+  }, [sbd, lanLamMoi, nhapTq])
   const thuLaiTq = useCallback(() => { setTq((x) => ({ ...x, chuLoi: '' })); setNhapTq((x) => x + 1) }, [])
   const taiTq: TaiTongQuan = { ...tq, thuLai: thuLaiTq }
 
@@ -152,7 +154,7 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
       setLoiThay(r.kieu === 'ok' ? { ds: r.v, chuLoi: '' } : (x) => ({ ...x, chuLoi: r.chu }))
     })
   }, [sbd])
-  useEffect(() => { napLoiThay() }, [napLoiThay, moc])
+  useEffect(() => { napLoiThay() }, [napLoiThay, lanLamMoi])
 
   // Cảnh báo của thầy cho phụ huynh (cửa sổ 72 giờ, chỉ đúng con; lệnh /ph/ke-hoach — cần liên kết riêng, SBD trần ⇒ rỗng).
   const [canhBao, setCanhBao] = useState<CanhBaoThay[]>([])
@@ -177,7 +179,7 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
       setNhip((x) => (r.ok ? { k: r.du, dangTai: false, loi: '' } : { k: x.k, dangTai: false, loi: r.chu }))
     })
     return () => { huy = true }
-  }, [sbd, moc, nhapNhip])
+  }, [sbd, lanLamMoi, nhapNhip])
   const thuLaiNhip = useCallback(() => setNhapNhip((x) => x + 1), [])
 
   // Hai lệnh của phần dưới trang (Thái độ · Câu sai · Thời gian): gọi khi phần ấy SẮP cuộn tới, SONG SONG, mỗi lệnh cập nhật ngay khi về.
