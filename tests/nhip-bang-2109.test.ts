@@ -12,6 +12,7 @@ const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 
 /** Đồng hồ / hiệu ứng KHÔNG gọi máy chủ (chỉ vẽ lại, đếm giờ cục bộ) — đúng số vòng. */
 const KHONG_GOI_MAY_CHU: Record<string, number> = {
+  'src/components/hoc-tap/ManKiemTraCaNhan.tsx': 1, // 1 s vẽ giờ máy chủ; hết giờ chốt một lần qua tuNop, không vòng hỏi D1.
   'src/components/KhoiKhacPhuc3CheDo.tsx': 1,
   'src/components/KhoiThoiGianCa.tsx': 1,
   'src/components/ca-thi/TheoDoiCa.tsx': 1, // 1 s đồng hồ vòng "phút còn lại" theo gioMayChu() (29/09) — vòng HỎI là /ca/nhip ở màn cha qua useNhipThay

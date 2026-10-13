@@ -42,12 +42,14 @@ Muốn sửa tệp ở làn bên kia:
 
 ## 4. Giao việc giữa hai bên (thầy 13/10)
 
-Thầy: "từ giờ tôi nhắn ở đây, việc gì thằng codex làm tốt hơn bạn giao luôn cho nó tự làm nhé". Từ nay thầy nhắn ở phiên Claude. Việc nào Codex làm tốt hơn thì Claude giao lại qua bình luận `@codex` trên PR GitHub.
+Thầy: "từ giờ tôi nhắn ở đây, việc gì thằng codex làm tốt hơn bạn giao luôn cho nó tự làm nhé". Từ nay thầy nhắn ở phiên Claude. Việc nào Codex làm tốt hơn thì Claude giao lại bằng cách ghi thêm mục `[ ]` vào `docs/viec-giao-codex.md` trên `main`. Codex tự đọc `AGENTS.md` mỗi lần nhận việc, và tệp đó chỉ sang danh sách việc.
+
+Sửa 13/10: không dùng `@codex` trên GitHub nữa. Bot chỉ trả "create an environment", đã thử hai lần ở issue 260.
 
 Đề bài Claude gửi tự đủ nghĩa, gồm: việc cần làm, tệp liên quan, luật chung ở mục 2, cách nghiệm thu. Codex làm xong thì:
 - mở PR vào `main`;
 - ghi một dòng Nhật ký;
-- trả lời ngay dưới bình luận giao việc (mã PR, kết quả kiểm, điều chưa làm).
+- đánh dấu `[x]` / `[!]` cho mục đó trong `docs/viec-giao-codex.md`, ngay trong PR (ghi mã PR, kết quả kiểm, điều chưa làm).
 
 Claude theo dõi PR, soát rồi báo thầy. Hai bên không phát hành chồng nhau (mục 2.4).
 

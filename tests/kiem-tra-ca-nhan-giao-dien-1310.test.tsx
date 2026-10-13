@@ -57,3 +57,20 @@ it('mở lại chặng cho khôi phục nháp chưa đồng bộ, chỉ gửi kh
  await waitFor(()=>expect(api.mock.calls.find(c=>c[0]==='hoc-tap-ktcn-luu')?.[2]).toMatchObject({tra:{q1:'B'},revision:0}))
  expect(api.mock.calls.find(c=>c[0]==='hoc-tap-ktcn-luu')?.[2].tra).not.toHaveProperty('ngoai')
 })
+
+it('nộp khi còn câu trống dùng hộp app: Làm tiếp không nộp; Nộp bài chỉ chốt sau đồng ý',async()=>{
+ api.mockImplementation(async(action:string)=> action==='hoc-tap-ktcn-nop'
+  ? {ok:true,kiemTra:{...kt,nopLuc:now,diem:0,trangThai:'da_nop'},ketQua:{bai:[],cau:[],chu:'Kết quả kiểm tra'}}
+  : {ok:true,kiemTra:kt,chang:[]})
+ render(<div className="m3"><ManKiemTra token="token" sbd="S1" id="kt-S1" onVe={noop} onCapNhat={noop}/></div>)
+ fireEvent.click(await screen.findByRole('button',{name:'Nộp toàn bài'}))
+ const hop=await screen.findByRole('alertdialog',{name:'Nộp bài kiểm tra?'})
+ expect(hop.textContent).toContain('Còn 36 câu chưa trả lời')
+ expect(hop.closest('[data-vo-cong="hop-thoai"]')?.className).toBe('m3')
+ fireEvent.click(screen.getByRole('button',{name:'Làm tiếp'}))
+ await waitFor(()=>expect(screen.queryByRole('alertdialog')).toBeNull())
+ expect(api.mock.calls.some(c=>c[0]==='hoc-tap-ktcn-nop')).toBe(false)
+ fireEvent.click(screen.getByRole('button',{name:'Nộp toàn bài'}))
+ fireEvent.click(await screen.findByRole('button',{name:'Nộp bài'}))
+ await waitFor(()=>expect(api.mock.calls.filter(c=>c[0]==='hoc-tap-ktcn-nop')).toHaveLength(1))
+})

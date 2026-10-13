@@ -6,6 +6,7 @@ import type { Question } from '../../game/than-thu-v2/core'
 import TheCau from '../TheCau'
 import { propsCauHoc } from './ManLamBaiTap'
 import TheKiemTraCaNhan from './TheKiemTraCaNhan'
+import { hoiXacNhan } from '../hop-thoai'
 import './hoc-tap.css'
 import './kiem-tra-ca-nhan.css'
 type Chang={stt:number;soCau:number;giay:number;han:number|null;daChot:boolean}
@@ -20,6 +21,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
  const tai=async()=>{setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id});const t=nhan(r);setChang(r.chang as Chang[]);if(t.nopLuc!==null){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id});nhan(k);setKet(k.ketQua as Ket)}}catch(e){setLoi(e instanceof Error?e.message:'Chưa tải được bài kiểm tra.')}finally{setBusy(false)}}
  useEffect(()=>{mounted.current=true;void tai();return()=>{mounted.current=false;if(timer.current)clearTimeout(timer.current)}},[token,id])
+ // Đồng hồ cục bộ 1 giây: chỉ vẽ giờ; hết hạn chốt một lần qua tuNop, không hỏi máy chủ định kỳ.
  useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(t)},[])
  const save=(submit=false)=>{
   if(stt===null)return Promise.resolve()
@@ -40,7 +42,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  const doi=(qid:string,a:string)=>{const v={...traRef.current,[qid]:a};traRef.current=v;setTra(v);setLuu('Đang lưu…');setNhapCuu(undefined);try{localStorage.setItem(key,JSON.stringify({han,tra:v}))}catch{/* bản nháp máy chủ vẫn là nguồn chính */}if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{void save().catch(e=>{setLoi(e instanceof Error?e.message:'Chưa lưu được bài.');setLuu('Chưa đồng bộ; bản nháp đang ở trên máy')})},400)}
  const phucHoi=()=>{if(!nhapCuu||sec===0)return;traRef.current={...traRef.current,...nhapCuu};setTra(traRef.current);setNhapCuu(undefined);void save().catch(e=>setLoi(e instanceof Error?e.message:'Chưa đồng bộ được bản nháp.'))}
  const ve=async()=>{if(stt!==null){setBusy(true);try{await save();onVe();onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa lưu được bài.')}finally{setBusy(false)}}else{onVe();onCapNhat()}}
- const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!window.confirm(`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại. Em muốn nộp bài?`))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa nộp được bài.')}finally{setBusy(false)}}
+ const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa nộp được bài.')}finally{setBusy(false)}}
  const sec=Math.max(0,Math.ceil((han-now-offset)/1000)),q=cs[viTri]
  return <div className="ht-app ktcn-man" ref={khung}>
   <header className="ktcn-thanh"><button type="button" className="ht-nut-phu" onClick={()=>void ve()} disabled={busy}><ArrowLeft size={18} aria-hidden="true"/>Lưu và về</button><strong>{stt!==null?`Chặng ${stt+1} · Câu ${viTri+1}/${cs.length}`:'Kiểm tra ôn tập'}</strong>{stt!==null&&<time aria-label="Thời gian chặng còn lại">{Math.floor(sec/60)}:{String(sec%60).padStart(2,'0')}</time>}</header>
