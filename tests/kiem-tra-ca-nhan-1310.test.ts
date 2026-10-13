@@ -91,6 +91,21 @@ it('đồng hồ không khởi động lại; lưu/nộp chặng rồi nộp to�
  expect(k.d.sql.prepare("SELECT COUNT(*) n FROM su_kien_hoc WHERE ma_nguon=?").get(id)).toEqual(count)
  r=(await docKtCn(k.env,'S1',now+90000))!;expect(tomTatKt(r,now+90000).homNay).toBe(true)
 })
+it('đợt 20: trạng thái trả số câu đã trả lời TỪNG chặng (chỉ-thêm), đếm chặt như tomTatKt, không thêm lượt D1',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!
+ const now=Number(r.mo_luc)+1000,id=String(r.id),d=JSON.parse(String(r.json))
+ await ktCnAction(k.env,'S1','hoc-tap-ktcn-start',{id,chang:0},now)
+ const c0=d.cau.find((c:{q:{qid:string}})=>d.chang[0].qids.includes(c.q.qid))
+ await ktCnAction(k.env,'S1','hoc-tap-ktcn-luu',{id,chang:0,tra:{[c0.q.qid]:c0.q.correct},revision:Number(k.d.sql.prepare('SELECT revision FROM kiem_tra_ca_nhan WHERE id=?').get(id)!.revision)},now+5000)
+ const prepare=k.env.DB.prepare.bind(k.env.DB);let soLenh=0
+ vi.spyOn(k.env.DB,'prepare').mockImplementation(sql=>{soLenh++;return prepare(sql)})
+ const st=await ktCnAction(k.env,'S1','hoc-tap-ktcn-trang-thai',{id},now+6000)
+ vi.restoreAllMocks()
+ const ch=st.chang as {daTra:number;soCau:number}[]
+ expect(ch[0]!.daTra).toBe(1);expect(ch.slice(1).every(x=>x.daTra===0)).toBe(true)
+ expect((st.kiemTra as {daTra:number}).daTra).toBe(ch.reduce((n,x)=>n+x.daTra,0))
+ expect(soLenh).toBeLessThanOrEqual(3)
+})
 it('hết giờ không nhận nháp muộn, vẫn giữ bỏ trống; hết hạn tự nộp',async()=>{
  const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,id=String(r.id),now=Number(r.mo_luc)+1000
  const ch=await ktCnAction(k.env,'S1','hoc-tap-ktcn-start',{id,chang:0},now)

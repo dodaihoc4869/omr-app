@@ -1,0 +1,56 @@
+# ĐO MÁY CHỦ N GIỜ QUA (CHỈ ĐỌC) — thầy 13/10: "tối ưu máy chủ chuyên sâu hơn nữa, đảm bảo 100% app load tức thì và máy chủ phản hồi tức thì".
+# `wrangler d1 insights` chỉ đo theo NGÀY (gộp cả giờ trước các bản vá) ⇒ tệp này hỏi thẳng GraphQL Analytics theo khung GIỜ:
+#   1) D1: truy vấn tốn nhất theo tổng thời gian (số lần, TB ms, dòng đọc) · 2) Worker "omr": số yêu cầu, lỗi, CPU/thời gian p50–p99.
+# Chỉ in số đếm + SQL rút gọn; không đọc dữ liệu học sinh. Đổi khung giờ: sửa GIO bên dưới rồi đẩy lại.
+name: Đo máy chủ N giờ qua (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/do-may-chu-gio-qua-1310.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-may-chu-gio-qua-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      GIO: '3'
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: GraphQL D1 + Worker (chỉ đọc)
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC, GIO, DB_ID } = process.env
+          const den = new Date(), tu = new Date(den.getTime() - Number(GIO) * 3600_000)
+          const hoi = async (query, variables) => {
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ query, variables }) })
+            const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
+          }
+          const v = { acc: ACC, db: DB_ID, tu: tu.toISOString(), den: den.toISOString() }
+          console.log(`Khung: ${v.tu} → ${v.den} (${GIO} giờ)`)
+          const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1QueriesAdaptiveGroups(limit:30,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
+              count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`, v)
+          const ds = d1?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+          const tong = ds.reduce((n, x) => n + x.sum.queryDurationMs, 0)
+          console.log(`=== D1: ${ds.length} nhóm truy vấn đầu · tổng ${Math.round(tong / 1000)} s thời gian truy vấn ===`)
+          for (const x of ds) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 220)].join(' '))
+          const w = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:5,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den}){
+              sum{requests errors subrequests} quantiles{cpuTimeP50 cpuTimeP90 cpuTimeP99 durationP50 durationP90 durationP99}}}}}`, v)
+          console.log('=== Worker omr ===')
+          for (const x of w?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(JSON.stringify(x))
+          JS

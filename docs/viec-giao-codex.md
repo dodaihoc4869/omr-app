@@ -47,3 +47,16 @@ Thầy đã chuyển bốn việc này cho Codex trên máy thầy ngày 13/10. 
   - Đổi cấu trúc `DeKt` hoặc thêm số vào lịch thì sửa `metaKt` và kiểm `tests/kiem-tra-ca-nhan-1310.test.ts` (test "khẩn 13/10").
   - Truy vấn đọc lịch không gọi `json_each` / `json_extract` trên `k.json` cho nhiều dòng.
 - [ ] Codex gộp `main` mới vào nhánh đang làm, giữ bản vá này (đặc biệt `COT_META_KT`, `lapKtCn` batch, `dongBoKtCn` gọi `buMetaKt`).
+
+## 13/10 13:30 — Claude soát PR262 + quyết định giữ cờ tắt
+- Claude đã soát PR262. Đã gộp `main` f6a86c87 (bản vá D1) vào nhánh; xung đột chỉ ở `DIEU-PHOI.md`, giữ cả hai phía.
+- Kết quả kiểm sau khi gộp:
+  - 9 tệp test liên quan: 113/113 xanh.
+  - `tsc` sạch; build xong.
+  - `kiem:toc-do`: 0 đỏ.
+  - Precache: 169 tệp / 2733 KiB.
+  - `kiem:mau-giu`: 0 vi phạm.
+- PR262 được gộp SAU khi lượt phát hành bản vá D1 xong, để hai lượt không chồng nhau.
+- Theo đề nghị của Codex (thầy phản ánh 333 câu/475 phút), Claude **không bật lại** cờ `kiem_tra_ca_nhan_v1`.
+- [ ] Codex: xong khung 28 câu/50 phút thì bật lại cờ CHỈ bằng workflow `bat-lai-ktcn-1310` (bấm tay trên Actions). Workflow này bù số tính sẵn cho mọi lịch cũ rồi mới bật cờ. Không bật cờ bằng SQL tay.
+- [ ] Codex: khung mới đổi số câu/chặng/phút thì `metaKt` phải theo, và test "khẩn 13/10" trong `tests/kiem-tra-ca-nhan-1310.test.ts` phải xanh.

@@ -145,10 +145,12 @@ export default function HocTapHomNay(p: Props) {
         {muc === 'hom-nay' && <>
           {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
               và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
-          {kiem&&<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
+          {/* Đợt 20 (bản vẽ docs/ban-ve-dot20): ngày kiểm tra ⇒ thẻ kiểm tra là khối CHÍNH; ngày khác (sắp đến / đang chuẩn bị) ⇒ thẻ phụ NẰM SAU khối học. */}
+          {kiem&&ngayKiem&&<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
           {!ngayKiem&&<><TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
             viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
             onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
+          {kiem&&<Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
           <TheMoiTuSua so={soSua} onChua={p.onChua} />
           {goi7 && <TheGoi7 du={goi7} />}
           {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>}
