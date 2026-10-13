@@ -5,9 +5,9 @@ import { KHUNG_KT_2026,chonChuKyKt2026,nhomKienThucKt,type CauMaTranKt } from '.
 import type { MucKt } from '../server/src/kiem-tra-ca-nhan-loi'
 const bai:MucKt[]=Array.from({length:6},(_,i)=>({id:`bai:${i}`,bai:String(i),tenBai:`Bài ${i}`,kyNang:'',mucDo:'',loai:'bai'}))
 const kn=(n:number):MucKt[]=>Array.from({length:n},(_,i)=>({id:`kn:${i}`,bai:'0',tenBai:'Bài 0',kyNang:String(i),mucDo:'',loai:'ky_nang'}))
-function pool(nKn:number){
+function pool(nKn:number,soBan=2){
  const ra:CauMaTranKt[]=[]
- for(const phan of ['I','II','III'] as const)for(const mucDo of ['biet','hieu','van_dung'] as const)for(let j=0;j<KHUNG_KT_2026[phan][mucDo]*2;j++){
+ for(const phan of ['I','II','III'] as const)for(const mucDo of ['biet','hieu','van_dung'] as const)for(let j=0;j<KHUNG_KT_2026[phan][mucDo]*soBan;j++){
   const i=ra.length;ra.push({qid:`q${i}`,group:`g${i}`,phan,mucDo,muc:[`bai:${i%6}`,`kn:${2*i%nKn}`,`kn:${(2*i+1)%nKn}`].filter((v,j,a)=>a.indexOf(v)===j),phut:1,hopLe:true,daGap:false})
  }return ra
 }
@@ -40,4 +40,11 @@ it('phủ kiến thức dùng nhánh cơ chế trong từ vựng thật; nền t
  const r=nhomKienThucKt([a,b,nen,la],[],new Map())
  expect(r.muc.map(m=>m.id)).toEqual(['kien_thuc:ESTER.THUY_PHAN_BASE','n','l'])
  expect(r.anhXa.size).toBe(4);expect(r.muc[0]!.baiLienQuan).toEqual(['B1','B2'])
+})
+
+it('150 kiến thức cần ba đề thì lập đúng ba đề, mỗi đề 28 câu/50 phút, không thêm đề thứ tư',()=>{
+ const qs=pool(150,3),r=chonChuKyKt2026([...bai,...kn(150)],qs,new Map(),'S5')
+ expect(r.du).toBe(true);expect(r.de).toHaveLength(3)
+ for(const d of r.de){expect(d.qids).toHaveLength(28);expect(dem(d.qids,qs)).toEqual(KHUNG_KT_2026)}
+ expect(chonChuKyKt2026([...bai,...kn(200)],pool(200,4),new Map(),'S6').de.length).toBeLessThanOrEqual(3)
 })

@@ -13,6 +13,6 @@ export function changDe2026(cau:readonly CauNguonKt[]){
 }
 export function dongGoiDe2026(a:{ngay:string;qids:string[];nguon:readonly CauNguonKt[];muc:readonly MucKt[];viKyNang:readonly MucKt[];anhXa:ReadonlyMap<string,string>;bai:{khoa:string;ten:string}[];thieu:string[];soDe:number;lan:number;chuKyPhu:number;seed:string;lyDo:string}){
  const kho=new Map(a.nguon.map(c=>[c.q.qid,c])),cau=a.qids.map(id=>{const c=kho.get(id);if(!c)throw new Error('Thiếu nguồn câu khi chốt đề.');return {...c,muc:[...new Set(c.muc.map(id=>a.anhXa.get(id)??id))],y:Object.fromEntries(Object.entries(c.y).map(([y,ms])=>[y,[...new Set(ms.map(id=>a.anhXa.get(id)??id))]]))}}).sort((c,d)=>c.q.phan.localeCompare(d.q.phan)||bamKt(a.seed+c.q.qid)-bamKt(a.seed+d.q.qid))
- const ids=new Set(cau.flatMap(c=>c.muc)),kn=a.muc.filter(m=>m.loai!=='bai'),ngay=congNgayKt(a.ngay,(a.lan-1)*3)
- return {ngay,de:{phienBan:3 as const,lyDo:a.soDe===2?`${a.lyDo} · Bài kiểm tra ${a.lan}/2 trong tuần`:a.lyDo,bai:a.bai,muc:[...a.muc],viKyNang:[...a.viKyNang],cau,soPhu:cau.length,phut:50,thieu:a.thieu,chang:changDe2026(cau),chuKyNgay:a.ngay,lanTrongChuKy:a.lan,soLanTuan:a.soDe,phuKienThuc:kn.filter(m=>ids.has(m.id)).length,phuChuKy:a.chuKyPhu,khung:'hoa-2026-phan-tich-v1'}}
+ const ids=new Set(cau.flatMap(c=>c.muc)),kn=a.muc.filter(m=>m.loai!=='bai'),ngay=congNgayKt(a.ngay,(a.lan-1)*(a.soDe===3?2:3))
+ return {ngay,de:{phienBan:3 as const,baiNgayToiThieu:12,lyDo:a.soDe>1?`${a.lyDo} · Bài kiểm tra ${a.lan}/${a.soDe} trong tuần`:a.lyDo,bai:a.bai,muc:[...a.muc],viKyNang:[...a.viKyNang],cau,soPhu:cau.length,phut:50,thieu:a.thieu,chang:changDe2026(cau),chuKyNgay:a.ngay,lanTrongChuKy:a.lan,soLanTuan:a.soDe,phuKienThuc:kn.filter(m=>ids.has(m.id)).length,phuChuKy:a.chuKyPhu,khung:'hoa-2026-phan-tich-v1'}}
 }

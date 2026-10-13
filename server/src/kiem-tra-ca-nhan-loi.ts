@@ -63,12 +63,14 @@ export function henKt(a: { sbd: string; homNay: string; lanTruoc?: string; bangC
   return { ngay, lyDo: yeu > 0.6 ? 'Kiểm chứng những phần em đang luyện thêm' : yeu > 0.25 ? 'Ôn lại và kiểm chứng các phần đến lịch' : 'Kiểm tra khả năng nhớ sau một khoảng nghỉ' }
 }
 
-/** Ngày kiểm tra không giao câu mới thường. Giữ hạn thật; ngày hết hạn vẫn báo nợ nếu còn. */
-export function quotaHocKt(u: number, ngay: string, han: string, ngayKiem: ReadonlySet<string>): number {
-  if (ngayKiem.has(ngay)) return 0
-  let d = 0
-  for (let n = ngay; n <= han; n = congNgayKt(n, 1)) if (!ngayKiem.has(n)) d++
-  return Math.ceil(Math.max(0, u) / Math.max(1, d))
+/** Lịch cũ khóa ngày kiểm tra; lịch 2026 giữ sức học 12 câu khi có một kiểm tra.
+ * Chia câu chưa gặp theo sức chứa còn lại đến hạn, không kéo hạn và không bỏ nợ. */
+export function quotaHocKt(u: number, ngay: string, han: string, lich: ReadonlySet<string>|ReadonlyMap<string,number>, sanNgay=24): number {
+ const trong=(d:string)=>lich instanceof Map?(lich.get(d)===1?12:(lich.get(d)??0)>=2?0:sanNgay):(lich.has(d)?0:sanNgay)
+ const homNay=trong(ngay);if(!homNay)return 0
+ let suc=0;for(let n=ngay;n<=han;n=congNgayKt(n,1))suc+=trong(n)
+ const quota=Math.ceil(Math.max(0,u)*homNay/Math.max(homNay,suc))
+ return lich instanceof Map&&lich.get(ngay)===1?Math.min(12,quota):quota
 }
 
 export function phutCauKt(phan: string, ms: readonly number[]): number {

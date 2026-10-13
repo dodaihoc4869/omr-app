@@ -136,7 +136,7 @@ export async function duNguonGoi7(env:Env,maTo:readonly string[]):Promise<boolea
   const r=await env.DB.prepare(`SELECT d.ma_de FROM de_kho d JOIN game_v2_index i ON i.ma_de=d.ma_de AND i.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND d.ma_de IN(SELECT value FROM json_each(?))`).bind(JSON.stringify(roots)).all<{ma_de:string}>()
   return new Set(r.results.map(r=>r.ma_de)).size===roots.length
 }
-export interface GoiCuaEm7 { id: string; ten: string; khoaBai: string; batDau: string; han: string; maDeNguon:string[]; cau: CauGoi7[]; daGap: Set<string>; gapNgay: Set<string>; tuLamNgay: Set<string>; choThay: Set<string>; nguonDayDu:boolean; quota: number }
+export interface GoiCuaEm7 { id: string; ten: string; khoaBai: string; batDau: string; han: string; maDeNguon:string[]; cau: CauGoi7[]; daGap: Set<string>; gapNgay: Set<string>; tuLamNgay: Set<string>; choThay: Set<string>; nguonDayDu:boolean; quota: number; kiemNhe?:boolean }
 /** Báo cáo câu mới: vượt quota vẫn hiển thị; một gốc dùng cho hai bài chỉ đếm một lần. */
 export function homNayGoi7(goi:readonly GoiCuaEm7[]){
   const gap=new Set(goi.flatMap(g=>[...g.gapNgay])),daGap=new Set(goi.flatMap(g=>[...g.daGap]).filter(q=>!gap.has(q)))
@@ -171,15 +171,17 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
   // tham số; chỉ đọc bảng tờ/chỉ mục (không lệnh ghi nào của lượt này đụng). Gói không còn câu nào vẫn bỏ qua kết quả như cũ. Lỗi nổi lên đúng chỗ `await` cũ.
   const nguonSom = gs.results.map(g => som(duNguonGoi7(env,mang7(g.ma_to_json))))
   const gids = JSON.stringify(gs.results.map(g => g.id))
-  const [cs, gaps, events, quotas] = await Promise.all([
+  // Lịch kiểm tra chỉ đọc metadata nhỏ, cùng đợt câu/sổ/quota; không bóc đề riêng.
+  const kiemSom=som(import('./kiem-tra-ca-nhan').then(async kt=>await kt.coKtCn(env)?new Map((await env.DB.prepare(`SELECT k.ngay,MAX(COALESCE(json_extract(km.meta_json,'$.baiNgayToiThieu'),0)) hoc,COUNT(*) n FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE k.sbd=? AND k.trang_thai<>'cho_nguon' AND k.ngay>=? GROUP BY k.ngay`).bind(sbd,ngay).all<{ngay:string;hoc:number;n:number}>()).results.map(r=>[r.ngay,r.hoc?Number(r.n):2])):new Map<string,number>()))
+  const [cs, gaps, events, quotas, ngayKiem] = await Promise.all([
     env.DB.prepare('SELECT * FROM goi_bai_7_cau WHERE goi_id IN (SELECT value FROM json_each(?))').bind(gids).all<Row>(),
     env.DB.prepare('SELECT goi_id,qid,version,kieu,luc FROM goi_bai_7_gap WHERE sbd=? AND goi_id IN (SELECT value FROM json_each(?)) ORDER BY luc,receipt').bind(sbd,gids).all<Row>(),
     env.DB.prepare(`SELECT qid,json_extract(raw_json,'$.ht_cau_version') cau_version,ngay_vn,assistance,ket_qua FROM su_kien_hoc WHERE sbd=? AND received_at<=? AND qid IN (SELECT qid FROM goi_bai_7_cau WHERE goi_id IN (SELECT value FROM json_each(?))) AND ${SQL_LUOT_GOI7}`).bind(sbd,now,gids).all<Row>(),
     env.DB.prepare('SELECT * FROM goi_bai_7_ngay WHERE sbd=? AND ngay=?').bind(sbd,ngay).all<Row>(),
+    kiemSom,
   ])
   const out: GoiCuaEm7[] = []
-  const kt=await import('./kiem-tra-ca-nhan')
-  const ngayKiem=await kt.coKtCn(env)?new Set((await env.DB.prepare("SELECT ngay FROM kiem_tra_ca_nhan WHERE sbd=? AND trang_thai<>'cho_nguon' AND ngay>=?").bind(sbd,ngay).all<{ngay:string}>()).results.map(r=>r.ngay)):new Set<string>()
+
   for (const [i, g] of gs.results.entries()) {
     const cau = cs.results.filter(c => c.goi_id === g.id).map(c => json<CauGoi7>(c.meta_json)), versions = new Map(cau.map(c => [c.qid,c.version]))
     const nguonDayDu=cau.length>0&&await nguonSom[i]!
@@ -192,9 +194,10 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
     for (const e of gaps.results) if (e.goi_id === g.id && str(e.version) === versions.get(str(e.qid))) {gap(str(e.qid),ngayVn7(Date.parse(str(e.luc))));if(e.kieu==='cho_thay')choThay.add(str(e.qid));else choThay.delete(str(e.qid))}
     for (const [qid,d] of first) if (d===ngay) gapNgay.add(qid)
     const cu = quotas.results.find(q => q.goi_id === g.id)
-    const quota = ngayKiem.has(ngay)?0:Math.max(cu ? Number(cu.quota) : 0,ngayKiem.size?quotaHocKt(cau.length-daGap.size+gapNgay.size,ngay,str(g.han),ngayKiem):quotaGoi7(cau.length - daGap.size + gapNgay.size, ngay, str(g.han)))
+    const duKiem=(ngayKiem.get(ngay)??0)>=2
+    const quota = duKiem?0:ngayKiem.get(ngay)===1?quotaHocKt(cau.length-daGap.size+gapNgay.size,ngay,str(g.han),ngayKiem):Math.max(cu ? Number(cu.quota) : 0,ngayKiem.size?quotaHocKt(cau.length-daGap.size+gapNgay.size,ngay,str(g.han),ngayKiem):quotaGoi7(cau.length - daGap.size + gapNgay.size, ngay, str(g.han)))
     if (!cu && !chiDoc) await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) VALUES(?,?,?,?)').bind(g.id,sbd,ngay,quota).run()
-    out.push({ id: str(g.id), ten: str(g.ten), khoaBai: str(g.khoa_bai), batDau: str(g.bat_dau), han: str(g.han),maDeNguon:[...new Set(mang7(g.ma_to_json).map(m=>tachMaTo(m).goc))], cau, daGap, gapNgay, tuLamNgay, choThay, nguonDayDu, quota })
+    out.push({ id: str(g.id), ten: str(g.ten), khoaBai: str(g.khoa_bai), batDau: str(g.bat_dau), han: str(g.han),maDeNguon:[...new Set(mang7(g.ma_to_json).map(m=>tachMaTo(m).goc))], cau, daGap, gapNgay, tuLamNgay, choThay, nguonDayDu, quota,kiemNhe:ngayKiem.get(ngay)===1 })
   }
   return out
 }
@@ -213,15 +216,16 @@ export async function docMucNgay7(env: Env, sbd: string, ngay: string): Promise<
   return r && Number(r.muc) > 0 ? { tang: tangHopLe7(r.tang), toiThieuTang: Number(r.toi_thieu_tang) || 0, quota: Number(r.quota) || 0, muc: Number(r.muc), daChot: true } : null
 }
 /** `cuSom` = lượt `docMucNgay7(env,sbd,ngay)` nơi gọi đã bắt đầu sớm (bảng chỉ hàm này ghi ⇒ đọc sớm cùng kết quả); vắng ⇒ đọc như cũ. Lần đọc lại sau ghi luôn đọc mới. */
-export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: TangHanhTrinh, tongQuota: number, now: number, chiDoc = false, cuSom?: Promise<MucNgay7 | null>, giuCho=0): Promise<MucNgay7> {
+export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: TangHanhTrinh, tongQuota: number, now: number, chiDoc = false, cuSom?: Promise<MucNgay7 | null>, giuCho=0,kiemNhe=false): Promise<MucNgay7> {
   const doc = (): Promise<MucNgay7 | null> => docMucNgay7(env, sbd, ngay)
   const cu = await (cuSom ?? doc())
-  if (cu) return cu
-  const toiThieuTang = CAU_TOI_THIEU[tang], quota = Math.max(0, Math.floor(tongQuota) || 0)
-  const moi: MucNgay7 = { tang, toiThieuTang, quota, muc: mucNgayGoi7(toiThieuTang, quota+Math.max(0,giuCho)), daChot: false }
+  if (cu&&!kiemNhe) return cu
+  if(cu&&kiemNhe&&cu.muc===12)return cu
+  const toiThieuTang = kiemNhe?12:CAU_TOI_THIEU[tang], quota = Math.max(0, Math.floor(tongQuota) || 0)
+  const moi: MucNgay7 = { tang, toiThieuTang, quota, muc: kiemNhe?12:mucNgayGoi7(toiThieuTang, quota+Math.max(0,giuCho)), daChot: false }
   if (chiDoc) return moi
-  await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES(?,?,?,?,?,?,?)')
-    .bind(sbd, ngay, moi.tang, moi.toiThieuTang, moi.quota, moi.muc, new Date(now).toISOString()).run()
+  await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES(?,?,?,?,?,?,?) ON CONFLICT(sbd,ngay) DO UPDATE SET toi_thieu_tang=12,quota=excluded.quota,muc=12 WHERE ?=1')
+    .bind(sbd, ngay, moi.tang, moi.toiThieuTang, moi.quota, moi.muc, new Date(now).toISOString(),kiemNhe?1:0).run()
     // Không ghi được (D1 trục trặc) ⇒ em vẫn học với số vừa tính; thầy thấy ngày ấy là mức ước tính — không làm hỏng màn em.
     .catch((e: unknown) => console.error('[goi7] chưa chốt được mức hôm nay:', e instanceof Error ? e.message : e))
   return (await doc()) ?? moi
@@ -231,7 +235,7 @@ export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: Ta
  *  (sảnh, bắt đầu chặng) và lệnh nhẹ `hoc-tap-dem` — hai nơi luôn ra cùng một số. */
 export async function docDaLamNgay7(env: Env, sbd: string, ngay: string): Promise<Set<string>> {
   const [done, guidedToday] = await Promise.all([
-    env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>(),
+    env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>(),
     env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
   ])
   const daLamNgay = new Set(done.results.map(r=>r.qid))
@@ -349,7 +353,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const suaCan=batKt?sua.filter(id=>eligible(id)&&!chua.includes(id)).slice(0,4):[]
   const onCan=batKt?on.filter(id=>eligible(id)&&!suaCan.includes(id)&&!chua.includes(id)):[]
   const giuOn=batKt?Math.min(6,onCan.length):0
-  const muc7 = await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,giuOn+suaCan.length)
+  const muc7 = await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,giuOn+suaCan.length,goi.some(g=>g.kiemNhe))
   const toiThieu = muc7.muc
   const nhomPhu=[...goi].sort((a,b)=>a.han.localeCompare(b.han)).map(g=>({qids:g.cau.map(c=>c.qid),quota:Math.max(0,g.quota-g.gapNgay.size)}))
   const plan = chonGoi7({ cau,daGap,daLamNgay,quotaCon,sanSang,chan,sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,mucTieuNgay:Math.max(0,toiThieu-daLamNgay.size),trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn })

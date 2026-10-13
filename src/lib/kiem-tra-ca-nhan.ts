@@ -1,5 +1,5 @@
 export interface TomTatKiemTra {
- id:string;ngay:string;moLuc:number;hanLuc:number;serverNow:number;trangThai:'cho_nguon'|'sap_den'|'can_lam'|'da_nop'|'het_han';homNay:boolean
+ baiNgayToiThieu?:number; id:string;ngay:string;moLuc:number;hanLuc:number;serverNow:number;trangThai:'cho_nguon'|'sap_den'|'can_lam'|'da_nop'|'het_han';homNay:boolean
  tong:number;daTra:number;con:number;soChang:number;phut:number;soBai:number;tongKienThuc:number;phuDe:number;nguonDayDu:boolean;lyDo:string;thieuNguon:number;diem:number|null;nopLuc:number|null
 }
 export function docKiemTra(x:unknown):TomTatKiemTra|undefined {
@@ -10,6 +10,7 @@ export function docKiemTra(x:unknown):TomTatKiemTra|undefined {
  if(Number(o.daTra)>Number(o.tong)||Number(o.con)!==Number(o.tong)-Number(o.daTra)||Number(o.hanLuc)-Number(o.moLuc)!==86400000)return
  if(typeof o.homNay!=='boolean'||typeof o.nguonDayDu!=='boolean'||typeof o.lyDo!=='string')return
  if(o.diem!==null&&(typeof o.diem!=='number'||o.diem<0||o.diem>10)||o.nopLuc!==null&&typeof o.nopLuc!=='number')return
+ if(o.baiNgayToiThieu!==undefined&&o.baiNgayToiThieu!==12)return
  return o as unknown as TomTatKiemTra
 }
 export const gioKiemTra=(ms:number)=>new Intl.DateTimeFormat('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',hour12:false}).format(new Date(ms))

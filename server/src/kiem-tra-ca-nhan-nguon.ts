@@ -24,6 +24,7 @@ export async function nguonTuongDuongKt(env:Env,a:{sbd:string;khoi:Khoi|null;muc
   const can=new Set(a.muc.map(m=>m.id)),ra:CauNguonKt[]=[]
   for(const {q,y} of qs.values()){
     if(!trongKhoi.has(q.qid)||!chuanMucDo(q.mucDo))continue
+    if(q.phan==='II'&&!y['-1']&&[0,1,2,3].some(i=>!y[String(i)]?.length))continue
     const raw=[...new Set(Object.values(y).flat())],ms=raw.map(kn=>({id:`kn:${kn}`,kyNang:kn,bai:'',tenBai:'',mucDo:''})),nk=nhomKienThucKt(ms,[],new Map())
     // Không thêm bất kỳ kiến thức chưa học nào để làm đủ đề; mã không hiểu cũng bị chặn.
     if(!nk.muc.length||nk.muc.some(m=>!can.has(m.id)))continue

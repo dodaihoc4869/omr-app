@@ -16,6 +16,8 @@ let daBu=0
 for(let i=0;i<400;i++){const n=await buMetaKt(env,5);daBu+=n;if(!n)break}
 const con=Number((await query(`SELECT COUNT(*) n FROM kiem_tra_ca_nhan k LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE km.id IS NULL`))[0]?.n)
 if(con!==0)throw new Error(`Còn ${con} lịch chưa có số tính sẵn: CHƯA bật lại cờ.`)
+const quaTai=Number((await query(`SELECT COUNT(*) n FROM kiem_tra_ca_nhan k JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE k.nop_luc IS NULL AND k.trang_thai<>'cho_nguon' AND k.han_luc>${Date.now()} AND (COALESCE(json_extract(km.meta_json,'$.phienBan'),0)<>3 OR json_extract(km.meta_json,'$.tong')<>28 OR json_extract(km.meta_json,'$.phut')<>50)`))[0]?.n)
+if(quaTai)throw new Error(`Còn ${quaTai} đề chưa chuyển về 28 câu/50 phút: CHƯA bật cờ.`)
 const luc=new Date().toISOString()
 await query(`UPDATE cau_hinh SET gia_tri='{"bat":true}',cap_nhat_luc='${luc}' WHERE khoa='kiem_tra_ca_nhan_v1' AND NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')`)
 const co=(await query(`SELECT gia_tri FROM cau_hinh WHERE khoa='kiem_tra_ca_nhan_v1'`))[0]

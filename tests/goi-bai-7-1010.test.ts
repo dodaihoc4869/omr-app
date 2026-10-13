@@ -270,3 +270,27 @@ it('điểm bản cũ không xác nhận tờ vừa thêm/sửa câu và không 
   expect(diemConDungNguon7(snapshot,[q,{...q,qid:'q2'}])).toBe(false)
   expect(diemConDungNguon7([...snapshot,...snapshot],[q,{...q,qid:'q2'}])).toBe(false)
 })
+
+it('lịch mới: 127 câu vẫn gặp đủ trong 7 ngày với ba ngày kiểm tra nhẹ; nghỉ học không xóa nợ',async()=>{
+ const {quotaHocKt}=await import('../server/src/kiem-tra-ca-nhan-loi')
+ const lich=new Map([['2026-10-11',1],['2026-10-13',1],['2026-10-15',1]])
+ let con=127
+ for(let i=0;i<7;i++){const d=`2026-10-${10+i}`,n=quotaHocKt(con,d,'2026-10-16',lich);if(lich.has(d))expect(n).toBeLessThanOrEqual(12);con-=n}
+ expect(con).toBe(0);expect(quotaHocKt(33,'2026-10-17','2026-10-16',lich)).toBe(33)
+})
+it('ngày một kiểm tra: API vẫn mở chặng Gói7, đúng 12 câu riêng; câu kiểm tra không ăn mục tiêu ngày',async()=>{
+ const k=await kho(127),{damBaoKtCn}=await import('../server/src/kiem-tra-ca-nhan-schema'),{metaKt}=await import('../server/src/kiem-tra-ca-nhan'),{lam}=await import('./omni-3-ke-hoach-chung'),{xoaMoiDem}=await import('../server/src/dem-chung'),{docNgayCacEm}=await import('../server/src/bai-hang-ngay')
+ await damBaoKtCn(k.env)
+ const d={phienBan:3,baiNgayToiThieu:12,lyDo:'Kiểm tra',bai:[{khoa:'B1',ten:'Bài mới'}],muc:[],cau:[],soPhu:0,phut:50,thieu:[],chang:[]}
+ k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('kiem_tra_ca_nhan_v1','{"bat":true}','x')`)
+ k.d.sql.prepare("INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) VALUES('ktcn:S1:2026-10-10','S1','12A1','2026-10-10',?,?,'hen',?,?)").run(NOW-3600000,NOW-3600000+86400000,JSON.stringify(d),NOW)
+ k.d.sql.prepare('INSERT INTO kiem_tra_ca_nhan_meta(id,meta_json) VALUES(?,?)').run('ktcn:S1:2026-10-10',JSON.stringify(metaKt(d as Parameters<typeof metaKt>[0])))
+ xoaMoiDem()
+ const r=await gameV2(k.env,'hoc-tap-sanh',{token:k.token});expect(r.kiemTraCaNhan).toMatchObject({homNay:true,baiNgayToiThieu:12});expect(r.goi7).toMatchObject({toiThieu:12,daLamHomNay:0})
+ const ch=await gameV2(k.env,'hoc-tap-start',{token:k.token});expect((ch.questions as unknown[]).length).toBeGreaterThan(0)
+ const qid=k.qids('DH-B1')[100]!;await lam(k.env,'S1',qid,NOW,true,{maNguon:'ktcn:S1:2026-10-10',purpose:'de_thu',cauVersion:'v1'})
+ const gs=await docGoiCuaEm7(k.env,'S1',NOW);expect(gs[0]!.daGap.has(qid)).toBe(true)
+ const dem=await gameV2(k.env,'hoc-tap-dem',{token:k.token});expect(dem).toMatchObject({toiThieu:12,daLamHomNay:0})
+ const report=await docNgayCacEm(k.env,[{sbd:'S1',hoTen:'Em',lop:'12A1',khoi:'12',goi7Tu:'2026-10-10'}],'2026-10-10','2026-10-10','2026-10-10',[])
+ expect(report.get('S1')![0]).toMatchObject({mucToiThieu:12,daLam:0,cheDo:'goi7'})
+})

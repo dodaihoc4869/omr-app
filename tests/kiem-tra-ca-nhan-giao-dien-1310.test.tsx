@@ -74,3 +74,12 @@ it('nộp khi còn câu trống dùng hộp app: Làm tiếp không nộp; Nộp
  fireEvent.click(await screen.findByRole('button',{name:'Nộp bài'}))
  await waitFor(()=>expect(api.mock.calls.filter(c=>c[0]==='hoc-tap-ktcn-nop')).toHaveLength(1))
 })
+
+it('lịch mới có kiểm tra và kế hoạch học nhẹ cùng ngày; nút bài ngày và nút kiểm tra đều hoạt động',async()=>{
+ const hoc=vi.fn(),kiem=vi.fn(),s=docSanh({cheDo2:true,ngay:kt.ngay,kiemTraCaNhan:{...kt,baiNgayToiThieu:12},theLuc:{tong:12,con:12}})!
+ render(<HocTapHomNay ten="An" lop="12A1" ketQua={s} dangTai={false} loi="" onHoc={hoc} onXemLai={noop} onChua={noop} onThi={noop} onTuLuyen={noop} onLichSu={noop} onBaiTap={noop} onGiaDinh={noop} onTaiLai={noop} onDangXuat={noop} coCa={false} onKiemTra={kiem}/>)
+ expect(await screen.findByText(/kế hoạch học nhẹ/)).toBeTruthy();expect(screen.getByText('Ôn và sửa')).toBeTruthy()
+ fireEvent.click(screen.getByRole('button',{name:'Làm bài kiểm tra'}));expect(kiem).toHaveBeenCalledOnce()
+ const nut=screen.getAllByRole('button').find(b=>/Học ngay|Làm ngay|Bắt đầu|Học tiếp/.test(b.textContent??''))!
+ expect(nut).toBeTruthy();fireEvent.click(nut);expect(hoc).toHaveBeenCalledOnce()
+})

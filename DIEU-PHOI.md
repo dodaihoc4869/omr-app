@@ -806,3 +806,5 @@ Phân vùng dự kiến theo hai bản thiết kế:
 
 - 13/10 · Codex · Nhánh codex/de-kiem-tra-2026-1310 từ dc4512ec: nhận phản ánh 333 câu/475 phút quá tải và chốt mới của thầy cấu trúc thi thật2026, tối đa2lần/tuần, phủ kiến thức đã dạy/chữa sai. Chuẩn hoá kỹ năng toàn cục, tách phủ bài; chuẩn bị mô phỏng chỉ-đọc trước đổi lịch tương lai, giữ bài đã mở/nộp. PR4việc Claude vẫn riêng; không phát hành chồng.
 
+
+- Codex 13/10: định sửa game-v2.ts, goi-bai-7.ts, bai-hang-ngay.ts, HocTapHomNay.tsx và TrangVeCon.tsx theo chỉ đạo mới của thầy: tối đa 3 kiểm tra/7 ngày, giãn ngày; ngày có 1 kiểm tra vẫn có tối thiểu 12 câu riêng, giữ câu mới 7 ngày và sổ sai. Thêm test khóa luồng và giữ metadata D1 của Claude.

@@ -64,7 +64,9 @@ export function chonChuKyKt2026(muc: readonly MucKt[], cau: readonly CauMaTranKt
   for(let thu=0;thu<4;thu++){
     const a=rut(`${seed}:${thu}:1`,new Set(),new Set()),pa=phu(a)
     const b=pa.size===can.size?[]:rut(`${seed}:${thu}:2`,pa,new Set(a.map(q=>q.qid)))
-    const ds=b.length?[a,b]:[a],score=diemPhu(ds.flat())
+    const ds=b.length?[a,b]:[a],pb=phu(ds.flat())
+    if(pb.size<can.size){const c=rut(`${seed}:${thu}:3`,pb,new Set(ds.flatMap(d=>d.map(q=>q.qid))));if(phu(c).size&&[...phu(c)].some(id=>!pb.has(id)))ds.push(c)}
+    const score=diemPhu(ds.flat())
     if(score>diem){best=ds;diem=score}
     if(phu(ds.flat()).size===can.size)break
   }

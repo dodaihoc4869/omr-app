@@ -7,17 +7,18 @@ import {lapKtCn,docKtCn,tomTatKt,ktCnAction,dongBoKtCn} from '../server/src/kiem
 import {KHUNG_KT_2026} from '../server/src/kiem-tra-ca-nhan-ma-tran'
 import {xoaMoiDem} from '../server/src/dem-chung'
 import {congNgayKt} from '../server/src/kiem-tra-ca-nhan-loi'
+import {docLanLam} from '../server/src/srs2-d1'
 import {nguonTuongDuongKt} from '../server/src/kiem-tra-ca-nhan-nguon'
 const NOW=Date.parse('2026-10-13T05:00:00Z'),MA='DH-12-C1-B1'
 afterEach(()=>{xoaMoiDem();xoaDemPhamVi()})
-async function kho(nKn=1){
- const k=taoKhoOmni({[MA]:56},1);await damBaoBangBaiDaDay(k.env);await damBaoKtCn(k.env)
+async function kho(nKn=1,soBan=2){
+ const k=taoKhoOmni({[MA]:28*soBan},1);await damBaoBangBaiDaDay(k.env);await damBaoKtCn(k.env)
  k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('kiem_tra_ca_nhan_v1','{"bat":true}','x');
  INSERT INTO bai_da_day(id,lop,khoa_bai,ten_bai,vi_tri,ma_to_json,tick_luc) VALUES('b','12A1','B1','Bài đã dạy',0,'["${MA}"]','2026-10-12');
- INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('${MA}','Bài đã dạy',56,0,'v1');
+ INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('${MA}','Bài đã dạy',${28*soBan},0,'v1');
  INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('${MA}','v1','x');`)
  let i=0
- for(const phan of ['I','II','III']as const)for(const mucDo of ['biet','hieu','van_dung']as const)for(let j=0;j<KHUNG_KT_2026[phan][mucDo]*2;j++){
+ for(const phan of ['I','II','III']as const)for(const mucDo of ['biet','hieu','van_dung']as const)for(let j=0;j<KHUNG_KT_2026[phan][mucDo]*soBan;j++){
   const qid=k.qids(MA)[i]!,old=JSON.parse(String(k.d.sql.prepare('SELECT json FROM game_v2_question WHERE qid=?').get(qid)!.json))
   const q={...old,phan,mucDo:({biet:'NB',hieu:'TH',van_dung:'VD'}as const)[mucDo],dang:'ESTER.CAU_TAO.NHAN_DANG',choices:phan==='I'?['a','b','c','d']:[],ideas:phan==='II'?['a','b','c','d']:[],correct:phan==='I'?'B':phan==='II'?'DSDS':'4'}
   k.d.sql.prepare('UPDATE game_v2_question SET dang=?,json=? WHERE qid=?').run(q.dang,JSON.stringify(q),qid)
@@ -72,4 +73,25 @@ it('nguồn tương đương chỉ nhận câu đã duyệt, đúng khối và m
  expect(r.map(c=>c.q.qid)).toEqual(['DH-12-C1-B9-Q'])
  k.d.sql.prepare("UPDATE game_v2_question SET json=json_set(json,'$.reviewed',json('false')) WHERE qid=?").run('DH-12-C1-B9-Q')
  expect(await nguonTuongDuongKt(k.env,{sbd:'S1',khoi:12,muc,can:['nen:gia_tri_trung_binh'],baoVe:new Set(),btvn:new Set(),blocked:[],types:[]})).toHaveLength(0)
+})
+
+it('câu sai vào sổ ôn đúng một lần; bỏ trống không tạo lượt làm hay năng lực giả',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,d=JSON.parse(String(r.json)),now=Number(r.mo_luc)+1000
+ const ch=await ktCnAction(k.env,'S1','hoc-tap-ktcn-start',{id:r.id,chang:0},now),qs=ch.questions as {qid:string}[],qid=qs[0]!.qid
+ await ktCnAction(k.env,'S1','hoc-tap-ktcn-chot-chang',{id:r.id,chang:0,tra:{[qid]:'A'},revision:0},now+1000)
+ await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id:r.id},now+2000);await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id:r.id},now+3000)
+ const ls=await docLanLam(k.env,'S1',d.cau.map((c:{q:{qid:string}})=>c.q.qid));expect(ls).toHaveLength(1);expect(ls[0]).toMatchObject({qid,dung:false,coGoiY:false})
+ expect(k.d.sql.prepare("SELECT COUNT(*) n FROM su_kien_hoc WHERE ma_nguon=?").get(String(r.id))).toMatchObject({n:1})
+})
+
+it('ba đề giãn ngày, và cổng ghi không cho quá ba bài trong bất kỳ bảy ngày liên tiếp',async()=>{
+ const k=await kho(150,3);await lapKtCn(k.env,'S1',NOW)
+ const rows=k.d.sql.prepare('SELECT * FROM kiem_tra_ca_nhan ORDER BY ngay').all();expect(rows).toHaveLength(3)
+ expect(rows.map(r=>r.ngay)).toEqual([0,2,4].map(i=>congNgayKt(String(rows[0]!.ngay),i)))
+ for(const r of rows)expect(tomTatKt(r,NOW)).toMatchObject({tong:28,phut:50,baiNgayToiThieu:12})
+ // Lịch đã có đủ ba bài: ép hẹn thêm sớm qua hồ sơ thử không được sinh bài thứ tư.
+ k.d.sql.prepare("INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,nop_luc,cap_nhat_luc) VALUES('moc','S1','12A1','2026-10-11',?,?,'da_nop',?,?,?)").run(NOW-100000,NOW-1,JSON.stringify({...JSON.parse(String(rows[0]!.json)),chuKyNgay:'2026-10-11'}),NOW-1000,NOW)
+ await lapKtCn(k.env,'S1',NOW,true)
+ const so=k.d.sql.prepare("SELECT COUNT(*) n FROM kiem_tra_ca_nhan WHERE ngay BETWEEN ? AND ?").get(String(rows[0]!.ngay),congNgayKt(String(rows[0]!.ngay),6))!
+ expect(Number(so.n)).toBeLessThanOrEqual(3)
 })

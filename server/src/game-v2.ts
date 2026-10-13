@@ -384,7 +384,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   const g7Som=action==='hoc-tap-sanh'||action==='hoc-tap-start'?await import('./goi-bai-7'):undefined
   const dsGoiSom=g7Som?.docDanhSachGoiSom7(env,sbd)
   const kiem=await kt.docKtCn(env,sbd,Date.now(),true)
-  if(kt.laNgayKt(kiem,Date.now())){
+  if(kt.laNgayKt(kiem,Date.now())&&!kt.coHocNgayKt(kiem)){
     const tt=kt.tomTatKt(kiem!,Date.now())
     if(action==='hoc-tap-sanh'||action==='hoa2-sanh')return {ok:true,cheDo2:true,ngay:tt.ngay,kiemTraCaNhan:tt,theLuc:{tong:tt.tong,con:tt.con},chienDich:null,doan:{con:0},dao:{con:0}}
     if(action==='hoc-tap-dem')return {ok:true,daLamHomNay:tt.daTra,toiThieu:tt.tong,kiemTraCaNhan:tt}
