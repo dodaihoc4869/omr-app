@@ -20,12 +20,12 @@ interface BanDe { phien: string; than: ArrayBuffer; etag: string; httpEtag: stri
 interface BanKey { etag: string; tho: string | null; giaTri: unknown }
 
 /** Đệm RIÊNG theo từng đối tượng R2 (WeakMap): R2 giả trong test / bucket khác nhau không bao giờ lẫn nhau. */
-interface KhoDem { de: Map<string, BanDe>; deBay: Map<string, Promise<BanDe | null>>; key: Map<string, BanKey>; keyBay: Map<string, Promise<BanKey | null>>; byte: number }
+interface KhoDem { de: Map<string, BanDe>; deBay: Map<string, Promise<BanDe | null>>; key: Map<string, BanKey>; keyBay: Map<string, Promise<BanKey | null>>; keyDoi: Map<string, object>; byte: number }
 let theoR2 = new WeakMap<object, KhoDem>()
 function khoCua(env: Env): KhoDem {
   const r = env.DE as unknown as object
   let k = theoR2.get(r)
-  if (!k) { k = { de: new Map(), deBay: new Map(), key: new Map(), keyBay: new Map(), byte: 0 }; theoR2.set(r, k) }
+  if (!k) { k = { de: new Map(), deBay: new Map(), key: new Map(), keyBay: new Map(), keyDoi: new Map(), byte: 0 }; theoR2.set(r, k) }
   return k
 }
 
@@ -49,6 +49,30 @@ async function thanCua(o: R2Doc): Promise<ArrayBuffer> {
 /** `R2Bucket.get` có tuỳ chọn `onlyIf` (kiểu tối giản ở kieu.ts chưa khai) — không có thân khi điều kiện không đạt. */
 type R2CoDieuKien = { get(key: string, tuyChon?: { onlyIf: { etagDoesNotMatch: string } }): Promise<unknown> }
 const r2 = (env: Env): R2CoDieuKien => env.DE as unknown as R2CoDieuKien
+
+function doiKey(kho: KhoDem, khoa: string, moi = false): object {
+  let doi = kho.keyDoi.get(khoa)
+  if (!doi || moi) {
+    doi = {}
+    kho.keyDoi.delete(khoa); kho.keyDoi.set(khoa, doi)
+    if (kho.keyDoi.size > 2048) kho.keyDoi.delete(kho.keyDoi.keys().next().value!)
+  }
+  return doi
+}
+
+/** Mỗi lần ghi tờ đáp án chỉ bỏ đệm của chính ca; lượt đọc cũ đang bay không hồi sinh được bản trước. */
+export async function ghiKeyBank(env: Env, maCa: string, than: string): Promise<unknown> {
+  const khoa = `key/${maCa}.json`, kho = khoCua(env)
+  const bo = () => {
+    doiKey(kho, khoa, true)
+    const cu = kho.key.get(khoa)
+    if (cu) { kho.byte -= (cu.tho ?? '').length * 2; kho.key.delete(khoa) }
+    kho.keyBay.delete(khoa)
+  }
+  bo()
+  try { return await env.DE.put(khoa, than) }
+  finally { bo() } // Lượt đọc chen khi put chưa xong cũng phải đọc tươi ở lượt kế.
+}
 
 /** GÓI ĐỀ CÔNG KHAI của ca (`ca.bank_r2`), đệm theo `phien` = `ca.cap_nhat_luc`. `null` ⇒ R2 không có tệp. */
 export async function docGoiDeDem(env: Env, bankR2: string, phien: string, nay = Date.now()): Promise<{ than: ArrayBuffer; httpEtag: string } | null> {
@@ -87,6 +111,7 @@ export async function docKeyBankDem(env: Env, maCa: string): Promise<{ giaTri: u
   if (!env.DE) return { giaTri: null, tho: null }
   const khoa = `key/${maCa}.json`
   const kho = khoCua(env)
+  const doi = doiKey(kho, khoa)
   const cu = kho.key.get(khoa)
   // Chưa có bản nào ⇒ các lượt cùng lúc dùng chung MỘT lượt tải trọn. Đã có bản ⇒ MỖI lượt tự hỏi R2 có điều kiện (không dùng chung
   // lượt đang bay: lượt bắt đầu trước một lần ghi không được trả cho lượt tới sau lần ghi ấy).
@@ -107,6 +132,7 @@ export async function docKeyBankDem(env: Env, maCa: string): Promise<{ giaTri: u
     let hopLe = true
     try { giaTri = JSON.parse(tho) } catch { giaTri = null; hopLe = false }
     const moi: BanKey = { etag: String(o.etag ?? ''), tho: hopLe ? tho : null, giaTri }
+    if (kho.keyDoi.get(khoa) !== doi) return moi
     const dangCo = kho.key.get(khoa)
     if (dangCo) { kho.byte -= (dangCo.tho ?? '').length * 2; kho.key.delete(khoa) }
     kho.key.set(khoa, moi)

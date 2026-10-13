@@ -130,7 +130,7 @@ import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
 import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
-import { docGoiDeDem, docKeyBankDem, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
+import { docGoiDeDem, docKeyBankDem, ghiKeyBank, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
 // lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
@@ -844,7 +844,7 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   // Đề và tờ đáp án cất SONG SONG (01/10, mở ca nhanh) — hai khoá độc lập.
   await Promise.all([
     bankKey ? env.DE!.put(bankKey, JSON.stringify(b.bank)) : null,
-    b.keyBank && env.DE ? env.DE.put(`key/${maCa}.json`, JSON.stringify(b.keyBank)) : null,
+    b.keyBank && env.DE ? ghiKeyBank(env, maCa, JSON.stringify(b.keyBank)) : null,
   ])
   // NGÂN HÀNG CÓ ĐÁP ÁN — khoá RIÊNG, để `/nop` trả ngay cho em khi ca công bố
   // điểm. Đây là thứ gỡ nốt lượt gọi Apps Script cuối cùng khỏi đường của em.
@@ -1688,7 +1688,7 @@ async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Respons
       if (o?.body) cuKey = await new Response(o.body).json()
     } catch { cuKey = null }
     const hopKey = hopNhatKeyBank(cuKey, b.keyBank)
-    if (hopKey) await env.DE.put(`key/${maCa}.json`, JSON.stringify(hopKey))
+    if (hopKey) await ghiKeyBank(env, maCa, JSON.stringify(hopKey))
   }
 
   await env.DB.prepare('UPDATE ca SET sinh_tai_d1 = 1, cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa).run()

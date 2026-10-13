@@ -32,7 +32,7 @@ import { docDsQid, docNamKtChoLop, type NamKtCauMayChu } from './ho-so-len-bang'
 import { tenLopCuaEm } from './ten-lop'
 import { docTrangThaiCongBo, dongChuaCongBo, laSanSangCongBo } from './cong-bo-diem'
 import { chamLuotTuNganHang } from './cham-lai-ca'
-import { docKeyBankDem } from './dem-ca-thi'
+import { docKeyBankDem, ghiKeyBank } from './dem-ca-thi'
 import { buSoCauChoKeyBank, hopNhatKeyBank } from './key-bank-hop-nhat'
 import { expCuaEmTrongCa } from './ca-thi-them'
 
@@ -1909,7 +1909,7 @@ export async function capNhatKeyBank(env: Env, b: Record<string, unknown>): Prom
   } catch { cu = null }
   const hop = hopNhatKeyBank(cu, b.keyBank)
   if (!hop) return { ok: false, error: 'Gói đáp án gửi lên không hợp lệ (thiếu phanI/phanII/phanIII) — không ghi để khỏi xoá tờ đáp án đang có' }
-  await env.DE.put(`key/${maCa}.json`, JSON.stringify(hop))
+  await ghiKeyBank(env, maCa, JSON.stringify(hop))
   xoaDemCaBaoVe()
   const ca = await env.DB.prepare('SELECT cong_bo FROM ca WHERE ma_ca = ?').bind(maCa).first<{ cong_bo: string }>()
   return { ok: true, congBo: chuoi(ca?.cong_bo) || 'khong' }
@@ -2041,7 +2041,7 @@ export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Re
             keyHienTai.phanI = [...(keyHienTai.phanI || []), ...themKI]
             keyHienTai.phanII = [...(keyHienTai.phanII || []), ...themKII]
             keyHienTai.phanIII = [...(keyHienTai.phanIII || []), ...themKIII]
-            await env.DE.put(`key/${maCa}.json`, JSON.stringify(keyHienTai))
+            await ghiKeyBank(env, maCa, JSON.stringify(keyHienTai))
           }
         }
       }
