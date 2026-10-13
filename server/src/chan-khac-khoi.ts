@@ -27,6 +27,7 @@ import type { Env } from './kieu'
 import { khoiCuaEm, khoiCuaLop, phanTichKhoiCau, type Khoi, type LyDoChanKhoi } from '../../src/lib/khoi-cau'
 import { dangKyXoaDem } from './dem-chung'
 import { dbGoc } from './cau-hinh-dem'
+import { daNho, gieoNho, laBanGop, nhoTheoLuot } from './doc-d1-theo-luot'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -113,18 +114,38 @@ const qidGocKhoi = (q: unknown): string => str(q).split('~')[0]!
  * Mọi dòng mô tả câu trong D1 (MỘT truy vấn, ≤ 2 nhánh UNION): `game_v2_question` (ma_de, dang, `lop`/`khoi` trong JSON câu) + `de_kho.lop` của tờ, và `cau_hoi` (ma_de, lop, chuyen_de).
  * Một qid ở nhiều tờ ⇒ nhiều dòng (tờ khác khối ⇒ mâu thuẫn). Lỗi đọc ⇒ rỗng (chỉ xét nguồn tự thân của câu).
  */
-export async function docNguonKhoiD1(env: Env, qids: readonly string[]): Promise<Map<string, Row[]>> {
-  const ra = new Map<string, Row[]>()
-  const ds = [...new Set(qids.map(qidGocKhoi).filter(Boolean))]
-  if (!ds.length) return ra
+/** Câu đọc nguồn khối của các câu `ds` (đã chuẩn hoá qid gốc) — MỘT truy vấn; lỗi ⇒ ném (nơi gọi quyết). */
+function docNguonKhoiTho(env: Env, ds: readonly string[]): Promise<Row[]> {
   const j = JSON.stringify(ds)
   // `khoi` = trường `lop`/`khoi` ghi THẲNG trong JSON câu của chỉ mục game (cách sửa tờ lạc khối đã ghi ở docs/khoi-cau-khong-doc-ra-2109.md, mục 2).
-  const rows = await env.DB.prepare(`SELECT q.qid AS qid, q.ma_de AS ma_de, q.dang AS dang, d.lop AS lop, NULL AS chuyen_de,
+  return env.DB.prepare(`SELECT q.qid AS qid, q.ma_de AS ma_de, q.dang AS dang, d.lop AS lop, NULL AS chuyen_de,
         COALESCE(json_extract(q.json, '$.lop'), json_extract(q.json, '$.khoi')) AS khoi
       FROM game_v2_question q LEFT JOIN de_kho d ON d.ma_de = q.ma_de WHERE q.qid IN (SELECT value FROM json_each(?)) AND json_valid(q.json)
     UNION ALL
     SELECT c.qid, c.ma_de, NULL, c.lop, c.chuyen_de, NULL FROM cau_hoi c WHERE c.qid IN (SELECT value FROM json_each(?))`).bind(j, j).all<Row>()
-    .then((r) => r.results ?? []).catch(() => [] as Row[])
+    .then((r) => r.results ?? [])
+}
+/** Bảng mà câu đọc nguồn khối đọc — lệnh ghi CÙNG lượt nhắc tới một trong số này ⇒ bỏ phần nhớ theo lượt (đọc lại). */
+const BANG_NGUON_KHOI: readonly string[] = ['game_v2_question', 'de_kho', 'cau_hoi']
+const khoaNguonKhoi = (q: string): string => `nguon_khoi|${q}`
+export async function docNguonKhoiD1(env: Env, qids: readonly string[]): Promise<Map<string, Row[]>> {
+  const ra = new Map<string, Row[]>()
+  const ds = [...new Set(qids.map(qidGocKhoi).filter(Boolean))]
+  if (!ds.length) return ra
+  let rows: Row[]
+  if (!laBanGop(env.DB)) rows = await docNguonKhoiTho(env, ds).catch(() => [] as Row[])
+  else {
+    // NHỚ THEO LƯỢT TỪNG CÂU (đợt 18 — luật thầy 13/10 "sửa xong máy chủ phải nhanh hơn"): một lượt Sảnh / Mở chặng qua cổng khối 2–3 lần với các tập câu
+    // chồng nhau (hồ sơ ⇒ kế hoạch gói ⇒ câu phát) — trước: mỗi lần một câu đọc, một đợt D1 nối tiếp. Nay câu đã đọc trong lượt dùng lại dòng của chính nó
+    // (dòng của một câu không phụ thuộc câu khác trong IN); chỉ câu CHƯA đọc mới đi một truy vấn. Lệnh ghi cùng lượt đụng bảng nguồn ⇒ đọc lại như cũ.
+    const thieu = ds.filter((q) => !daNho(env.DB, khoaNguonKhoi(q)))
+    if (thieu.length) {
+      const lo = docNguonKhoiTho(env, thieu)
+      for (const q of thieu) gieoNho(env.DB, khoaNguonKhoi(q), lo.then((rs) => rs.filter((r) => str(r.qid) === q)), BANG_NGUON_KHOI)
+    }
+    const theo = await Promise.all(ds.map((q) => nhoTheoLuot(env.DB, khoaNguonKhoi(q), () => docNguonKhoiTho(env, [q]), BANG_NGUON_KHOI).catch(() => [] as Row[])))
+    rows = theo.flat()
+  }
   for (const r of rows) {
     const q = str(r.qid)
     let a = ra.get(q)

@@ -1,7 +1,11 @@
 // Điểm nối ba cỗ máy: chỉ kế hoạch Hành trình, không đổi chấm điểm/EXP/ca thi.
-import { boChonV5, type BoChonV5 } from './hanh-trinh-v5-d1'
-import { ghiDoV6 } from './hanh-trinh-v6-d1'
-import type { Env } from './kieu'
+import { boChonV5, docChienDichDay, type BoChonV5 } from './hanh-trinh-v5-d1'
+import { ghiDoV6, docChonV6, docMoHinhV6 } from './hanh-trinh-v6-d1'
+import type { MoHinhV6 } from './hanh-trinh-v6-mo-hinh'
+import { SQL_HT6 } from './hanh-trinh-v6-schema'
+import { SQL_HANH_TRINH_V5 } from './hanh-trinh-v5-schema'
+import { docNhom, type PhanNhom } from './hanh-trinh-do-luong'
+import type { Env, D1Result, D1PreparedStatement } from './kieu'
 import { dbGoc } from './cau-hinh-dem'
 import type { HoSo2 } from './srs2-d1'
 import { docMetaCau } from './srs2-d1'
@@ -9,13 +13,13 @@ import { docSuKienOmni, qCuaCau, damBaoBangOmni } from './omni-d1'
 import { phatLaiEm, vknCaCau } from './omni-p-vkn'
 import { duBaoDiem, xacSuatDungCau } from './du-bao-diem'
 import { msKyVong } from './omni-toc-do'
-import { chayDdlMotLan } from './ddl-mot-lan'
+import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { tangCuaCau } from './hanh-trinh-ngay'
 import { quanSatDocLap, chuoiSaiKyNang, type QuanSatHanhTrinh } from './hanh-trinh-quan-sat'
 import { fitHalfLife, henHalfLife } from './half-life'
 import { dungDoThi, canhDangHoc, type CanhHoc } from './do-thi-tien-quyet'
 import { chonBandit, type BangBandit, type CachCuu } from './bandit'
-import type { QCau } from './omni-kieu'
+import type { QCau, SuKienOmni, XacNhanThay } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { bam } from './srs2-loi'
 
@@ -64,11 +68,66 @@ async function docCanhLop(env:Env,targets:readonly string[],now:number):Promise<
   return ds.flatMap(t=>moi.get(t)??dem.theoDen.get(t)??[]).sort((a,b)=>so(String(a.tu),String(b.tu))||so(String(a.den),String(b.den)))
 }
 
-export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true):Promise<DongCoHanhTrinh> {
-  await chayDdlMotLan(env,'hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH)
-  const [so,allowed,xacNhan]=await Promise.all([docSuKienOmni(env,[sbd]),
-    env.DB.prepare(`SELECT khoa FROM su_kien_hoc WHERE sbd=? AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')})) AND (nguon<>'luyen' OR EXISTS(SELECT 1 FROM luyen_de_2026 ld WHERE ld.id=su_kien_hoc.ma_nguon AND ld.sbd=su_kien_hoc.sbd AND ld.status='submitted') OR EXISTS(SELECT 1 FROM omni_de_thu dt WHERE dt.id=substr(su_kien_hoc.ma_nguon,8) AND su_kien_hoc.ma_nguon LIKE 'de_thu:%' AND dt.sbd=su_kien_hoc.sbd AND dt.nop_luc IS NOT NULL AND dt.nop_luc<=?))`).bind(sbd,new Date(now).toISOString()).all<{khoa:string}>(),
-    env.DB.prepare('SELECT sbd,ma_dang AS maDang,ket,luc FROM omni_xac_nhan WHERE sbd=? AND luc<=?').bind(sbd,new Date(now).toISOString()).all<import('./omni-kieu').XacNhanThay>()])
+/** Promise bắt đầu SỚM: đánh dấu đã bắt lỗi để không thành lỗi treo — nơi dùng vẫn `await` và nhận đúng lỗi, đúng chỗ cũ. */
+const som=<T,>(p:Promise<T>):Promise<T>=>{p.catch(()=>{});return p}
+/**
+ * ĐỌC TRƯỚC CỦA ĐỘNG CƠ (đợt 18 — luật thầy 13/10: "sửa xong tốc độ máy chủ phải nhanh hơn"). Trước: các lượt đọc dưới đi NỐI TIẾP bên trong động cơ
+ * (sổ OMNI ⇒ can thiệp/bandit/receipt ⇒ chiến dịch + mô hình v6 ⇒ nhóm thử nghiệm ⇒ [ghi mức] ⇒ nhật ký chọn v6 ⇒ dòng động cơ cũ) ≈ 7 đợt D1 mỗi lần lập
+ * kế hoạch. Mọi lượt ở đây CHỈ phụ thuộc (em, lúc) ⇒ bắt đầu CÙNG LÚC — nơi gọi biết sớm (vd. `lapGoi7` ngay khi biết em có gói) thì gọi sớm hơn nữa.
+ * Cùng câu SQL, cùng tham số; mỗi lượt vẫn chạy SAU đúng lệnh tạo bảng của nó; trong cùng lượt không lệnh ghi nào đụng các bảng này trước lúc đọc cũ
+ * (ghi của động cơ ở lô cuối, sau mọi lượt đọc). `ghi=false` ⇒ không đọc hai bảng chỉ phần ghi cần (như cũ). Lỗi: `som` giữ, nổi lên đúng chỗ `await` cũ.
+ */
+export interface DocTruocDongCo {
+  sbd:string; now:number; ghi:boolean; ddl:Promise<void>
+  so:Promise<Map<string,SuKienOmni[]>>; allowed:Promise<D1Result<{khoa:string}>>; xacNhan:Promise<D1Result<XacNhanThay>>
+  offers:Promise<D1Result<Row>>; stats:Promise<D1Result<BangBandit>>; rewards:Promise<D1Result<{do_receipt:string}>>
+  moHinh:Promise<MoHinhV6|null>; nhom:Promise<PhanNhom|null>; chonV6:Promise<D1Result<Row>>|null; emCu:Promise<DongDongCoCu|null>|null
+  /** Hai lượt đọc theo hồ sơ (β câu của `hs.cau`, dòng chiến dịch của `hs.chienDich`) — khoá theo đúng tham số; lệch ⇒ bắt đầu lại cho đúng tham số. */
+  theoHoSo?:TheoHoSoDongCo
+}
+interface TheoHoSoDongCo { khoaBeta:string; coCd:boolean; cdId:string; beta:Promise<D1Result<{qid:string;beta:number}>>; full:ReturnType<typeof docChienDichDay>|undefined }
+type DongDongCoCu={cap_nhat_luc:number;bam_canh:string|null;canh_luc:number|null}
+export function docTruocDongCo(env:Env,sbd:string,now:number,ghi=true):DocTruocDongCo {
+  const ddl=som(chayDdlMotLan(env,'hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH))
+  const sau=<T,>(f:()=>Promise<T>):Promise<T>=>som(ddl.then(f))
+  const ddl5=som(chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)), ddl6=ghi?som(chayDdlMotLan(env,'hanh_trinh_v6',SQL_HT6)):null
+  return { sbd, now, ghi, ddl,
+    so:sau(()=>docSuKienOmni(env,[sbd])),
+    allowed:sau(()=>env.DB.prepare(`SELECT khoa FROM su_kien_hoc WHERE sbd=? AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')})) AND (nguon<>'luyen' OR EXISTS(SELECT 1 FROM luyen_de_2026 ld WHERE ld.id=su_kien_hoc.ma_nguon AND ld.sbd=su_kien_hoc.sbd AND ld.status='submitted') OR EXISTS(SELECT 1 FROM omni_de_thu dt WHERE dt.id=substr(su_kien_hoc.ma_nguon,8) AND su_kien_hoc.ma_nguon LIKE 'de_thu:%' AND dt.sbd=su_kien_hoc.sbd AND dt.nop_luc IS NOT NULL AND dt.nop_luc<=?))`).bind(sbd,new Date(now).toISOString()).all<{khoa:string}>()),
+    xacNhan:sau(()=>env.DB.prepare('SELECT sbd,ma_dang AS maDang,ket,luc FROM omni_xac_nhan WHERE sbd=? AND luc<=?').bind(sbd,new Date(now).toISOString()).all<XacNhanThay>()),
+    offers:sau(()=>env.DB.prepare('SELECT * FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND goi_luc>=? AND do_luc IS NULL ORDER BY goi_luc DESC,ngay DESC,moc DESC LIMIT 96').bind(sbd,now-15*86400000).all<Row>()),
+    stats:sau(()=>env.DB.prepare(`SELECT context,cach,SUM(CASE WHEN ket_qua=1 THEN 1 ELSE 0 END) dung,SUM(CASE WHEN ket_qua=0 THEN 1 ELSE 0 END) sai FROM hanh_trinh_v4_can_thiep WHERE do_luc>=? AND ket_qua IS NOT NULL GROUP BY context,cach`).bind(now-90*86400000).all<BangBandit>()),
+    rewards:sau(()=>env.DB.prepare('SELECT do_receipt FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND do_receipt IS NOT NULL').bind(sbd).all<{do_receipt:string}>()),
+    moHinh:som(docMoHinhV6(env)),
+    nhom:som(ddl5.then(()=>docNhom(env,sbd))),
+    chonV6:ddl6?som(ddl6.then(()=>docChonV6(env,sbd,now))):null,
+    emCu:ghi?sau(()=>env.DB.prepare(`SELECT cap_nhat_luc,json_extract(mo_hinh_json,'$.bamCanh') AS bam_canh,json_extract(mo_hinh_json,'$.canhLuc') AS canh_luc FROM hanh_trinh_v4_em WHERE sbd=?`).bind(sbd).first<DongDongCoCu>()):null,
+  }
+}
+/** Như `docTruocDongCo` nhưng CHỈ khi ba nhóm bảng của động cơ đã tạo xong trong isolate (thường lệ): gọi rất sớm mà còn phải gửi lệnh tạo bảng (lệnh ghi)
+ *  thì mọi lượt đọc gửi sau trong cùng lượt phải chờ nó — chậm hơn. Chưa sẵn ⇒ undefined (nơi gọi để động cơ tự đọc như trước). */
+export function docTruocDongCoNeuSanBang(env:Env,sbd:string,now:number,ghi=true):DocTruocDongCo|undefined {
+  return ddlDaXong(env,'hanh_trinh_v4')&&ddlDaXong(env,'hanh_trinh_v5')&&ddlDaXong(env,'hanh_trinh_v6')?docTruocDongCo(env,sbd,now,ghi):undefined
+}
+/** Bắt đầu SỚM hai lượt đọc theo hồ sơ (β câu, dòng chiến dịch đầy đủ) — gọi ngay khi có `hs` (vd. `lapGoi7` trước bước cổng khối). Đã bắt đầu cho đúng tham số ⇒ dùng lại. */
+export function docTruocDongCoTheoHoSo(env:Env,t:DocTruocDongCo,hs:Pick<HoSo2,'cau'|'chienDich'>):TheoHoSoDongCo {
+  const khoaBeta=JSON.stringify(hs.cau.map(c=>c.qid)), cd=hs.chienDich, coCd=!!cd, cdId=cd?String(cd.id):''
+  const cu=t.theoHoSo
+  if(cu&&cu.khoaBeta===khoaBeta&&cu.coCd===coCd&&cu.cdId===cdId)return cu
+  const ddl5=som(chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5))
+  const moi:TheoHoSoDongCo={khoaBeta,coCd,cdId,
+    beta:som(t.ddl.then(()=>env.DB.prepare('SELECT qid,beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))').bind(khoaBeta).all<{qid:string;beta:number}>())),
+    full:cd?som(ddl5.then(()=>docChienDichDay(env,cd.id))):undefined}
+  t.theoHoSo=moi
+  return moi
+}
+
+export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true,truoc?:DocTruocDongCo):Promise<DongCoHanhTrinh> {
+  // Đọc trước (đợt 18): dùng bản nơi gọi đã bắt đầu nếu ĐÚNG (em, lúc, ghi); không thì bắt đầu ngay tại đây — mọi lượt đọc độc lập đi CÙNG một đợt.
+  const t=truoc&&truoc.sbd===sbd&&truoc.now===now&&truoc.ghi===ghi?truoc:docTruocDongCo(env,sbd,now,ghi)
+  const th=docTruocDongCoTheoHoSo(env,t,hs)
+  await t.ddl
+  const [so,allowed,xacNhan]=await Promise.all([t.so,t.allowed,t.xacNhan])
   const hopLe=new Set(allowed.results.map(r=>r.khoa))
   const events=(so.get(sbd)??[]).filter(e=>hopLe.has(e.khoa) && e.receivedAt<=now)
   const ids=[...new Set([...hs.cau.map(c=>c.qid),...events.map(e=>e.qid)])]
@@ -80,13 +139,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   }
   const qs=quanSatDocLap(sbd,events,q,now), graph=dungDoThi(qs,now), memory=fitHalfLife(qs)
   const targets=[...new Set(hs.cau.flatMap(c=>vknCaCau(q.get(c.qid)!)))]
-  const [edges,offers,stats,beta,rewards]=await Promise.all([
-    docCanhLop(env,targets,now),
-    env.DB.prepare('SELECT * FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND goi_luc>=? AND do_luc IS NULL ORDER BY goi_luc DESC,ngay DESC,moc DESC LIMIT 96').bind(sbd,now-15*86400000).all<Row>(),
-    env.DB.prepare(`SELECT context,cach,SUM(CASE WHEN ket_qua=1 THEN 1 ELSE 0 END) dung,SUM(CASE WHEN ket_qua=0 THEN 1 ELSE 0 END) sai FROM hanh_trinh_v4_can_thiep WHERE do_luc>=? AND ket_qua IS NOT NULL GROUP BY context,cach`).bind(now-90*86400000).all<BangBandit>(),
-    env.DB.prepare('SELECT qid,beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(hs.cau.map(c=>c.qid))).all<{qid:string;beta:number}>(),
-    env.DB.prepare('SELECT do_receipt FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND do_receipt IS NOT NULL').bind(sbd).all<{do_receipt:string}>(),
-  ])
+  const [edges,offers,stats,beta,rewards]=await Promise.all([docCanhLop(env,targets,now),t.offers,t.stats,th.beta,t.rewards])
   const learned=canhDangHoc(edges), b=new Map((beta.results??[]).map(r=>[r.qid,r.beta]))
   const omni=phatLaiEm(sbd,{suKien:events,q,beta:b,homNay:new Date(now+7*3600000).toISOString().slice(0,10),xacNhan:xacNhan.results})
   const out:DongCoHanhTrinh={chan:new Set(chan),hen:new Map(),trongSo:{},soQuanSat:qs.length,soHalfLife:0,soCanhHoc:learned.length,p8:0}
@@ -102,7 +155,9 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
     const point=qc.phan==='II'?1:0.25
     out.trongSo[c.qid]=((1-weakest)+information+(hs.tt.get(c.qid)?.laMoi?0.2:0)-soft*0.1)*point/minute
   }
-  const v5=await boChonV5(env,sbd,now,hs,q,qs,graph,omni,b,ghi,new Set(events.map(e=>e.contentGroup||q.get(e.qid)?.contentGroup||e.qid)))
+  // Lệnh ghi mức kỹ năng v5 đi CHUNG lô ghi cuối (đợt 18) khi chắc lô ấy được dựng (`hs.chienDich` có — lô cần mã chiến dịch); không thì ghi ngay như cũ.
+  const ghiTre:D1PreparedStatement[]=[]
+  const v5=await boChonV5(env,sbd,now,hs,q,qs,graph,omni,b,ghi,new Set(events.map(e=>e.contentGroup||q.get(e.qid)?.contentGroup||e.qid)),{moHinh:t.moHinh,nhom:t.nhom,full:th.full,...(ghi&&hs.chienDich?{ghiTre}:{})})
   out.v5=v5;for(const id of v5.chan)out.chan.add(id)
   if(v5.nhom==='B')out.trongSo={...out.trongSo,...v5.trongSo}
   // Hai hành động đều là câu thật, chưa gặp, thuộc tầng đã mở. Không rút video/học liệu tưởng tượng.
@@ -128,7 +183,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const forecast=duBaoDiem(omni,scope,{chiKyVong:true}), cursor=omni.cursor
   out.p8=forecast.p8
   if(!ghi) return out
-  await ghiDoV6(env,sbd,now,qs)
+  await ghiDoV6(env,sbd,now,qs,t.chonV6??undefined)
   const firstSeen=new Map<string,number>()
   for(const e of events) {const g=e.contentGroup||q.get(e.qid)?.contentGroup||e.qid;firstSeen.set(g,Math.min(firstSeen.get(g)??Infinity,e.receivedAt))}
   const updates=phanBoCanThiep(offers.results??[],qs,firstSeen,new Set(rewards.results.map(r=>r.do_receipt)))
@@ -137,11 +192,12 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   // ~124 dòng ⇒ ~2,5 triệu dòng ghi/ngày, kể cả khi em chưa làm câu nào mới). Cạnh là số dẫn xuất từ sổ học: bản băm giống lần ghi trước VÀ lần ghi ấy
   // chưa quá 20 giờ ⇒ giữ nguyên các dòng cạnh (bảng y hệt). Vẫn làm mới tối thiểu mỗi 20 giờ để cạnh của em còn trong cửa sổ 7 ngày của số liệu lớp.
   const chuoiCanh=JSON.stringify(graph.canh.map(c=>[c.tu,c.den,c.nCo,c.dungCo,c.nChua,c.dungChua])),bamCanh=`${bam(chuoiCanh)}:${bam(chuoiCanh.split('').reverse().join(''))}:${chuoiCanh.length}`
-  const old=await env.DB.prepare(`SELECT cap_nhat_luc,json_extract(mo_hinh_json,'$.bamCanh') AS bam_canh,json_extract(mo_hinh_json,'$.canhLuc') AS canh_luc FROM hanh_trinh_v4_em WHERE sbd=?`).bind(sbd).first<{cap_nhat_luc:number;bam_canh:string|null;canh_luc:number|null}>()
+  const old=await t.emCu!
   const canhLucCu=Number(old?.canh_luc)
   const giuCanh=!!old&&old.bam_canh===bamCanh&&Number.isFinite(canhLucCu)&&now>=canhLucCu&&now-canhLucCu<20*3_600_000
   const snapshot={halfLife:memory,canh:graph.canh,soQuanSat:qs.length,soHalfLife:out.soHalfLife,soCanhHoc:learned.length,duBao:forecast,phamVi:'ung_vien_ngay',soCau:scope.length,bamCanh,canhLuc:giuCanh?canhLucCu:now}
   const commands=[
+    ...ghiTre,
     ...(giuCanh?[]:[env.DB.prepare(`UPDATE hanh_trinh_v4_canh SET n_co=0,dung_co=0,n_chua=0,dung_chua=0,cap_nhat_luc=? WHERE sbd=? AND cap_nhat_luc<=? AND ${KHONG_CA}`).bind(now,sbd,Math.min(old?.cap_nhat_luc??now,now))]),
     env.DB.prepare(`INSERT INTO hanh_trinh_v4_em SELECT ?,?,?,?,? WHERE ${KHONG_CA} ON CONFLICT(sbd) DO UPDATE SET cursor=excluded.cursor,phien_ban=excluded.phien_ban,mo_hinh_json=excluded.mo_hinh_json,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_em.cap_nhat_luc`).bind(sbd,cursor,'ht4-0910-v1',JSON.stringify(snapshot),now),
     ...(giuCanh?[]:[env.DB.prepare(`INSERT INTO hanh_trinh_v4_canh SELECT ?,json_extract(value,'$.tu'),json_extract(value,'$.den'),json_extract(value,'$.nCo'),json_extract(value,'$.dungCo'),json_extract(value,'$.nChua'),json_extract(value,'$.dungChua'),? FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(sbd,tu,den) DO UPDATE SET n_co=excluded.n_co,dung_co=excluded.dung_co,n_chua=excluded.n_chua,dung_chua=excluded.dung_chua,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_canh.cap_nhat_luc`).bind(sbd,now,JSON.stringify(rows))]),

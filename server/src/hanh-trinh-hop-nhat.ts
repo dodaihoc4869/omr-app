@@ -152,13 +152,17 @@ export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ tran
  */
 export async function ungVienHanhTrinh(env: Env, id: string, sbd: string, ngay: string, qidsCu: readonly string[]): Promise<string[]> {
   const k = id.split('-').at(-1)
-  const raw = await docCauHinhDem(env, `hanh_trinh_v3_kho_${k}`)
-  let tang: Record<string, unknown> = {}
-  try { tang = JSON.parse(String(raw ?? '{}')) as Record<string, unknown> } catch { /* Chưa có kho mới: dùng phạm vi cũ có giới hạn. */ }
-  const [daChot, daLam] = await Promise.all([
+  // Đợt 18: hai lượt đọc sổ dưới KHÔNG phụ thuộc cờ kho ⇒ bắt đầu CÙNG đợt với lượt đọc cờ (trước: nối tiếp sau). Cùng câu SQL, cùng tham số;
+  // lỗi giữ bằng `catch` rỗng và nổi lên đúng chỗ `await` cũ (đọc cờ không bao giờ ném — `docCauHinhDem` trả null khi lỗi).
+  const soSom = Promise.all([
     env.DB.prepare('SELECT dao_json,doan_json FROM srs2_ke_hoach WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>(),
     env.DB.prepare(`SELECT DISTINCT qid,${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND (nguon='game' OR (nguon='luyen' AND ma_nguon LIKE 'de_thu:%' AND EXISTS(SELECT 1 FROM omni_de_thu dt WHERE dt.id=substr(su_kien_hoc.ma_nguon,8) AND dt.sbd=su_kien_hoc.sbd AND dt.nop_luc IS NOT NULL))) AND COALESCE(visibility,'') <> 'embargoed' AND ${SQL_LA_LAN_LAM}`).bind(sbd,ngay).all<Row>(),
   ])
+  soSom.catch(() => {})
+  const raw = await docCauHinhDem(env, `hanh_trinh_v3_kho_${k}`)
+  let tang: Record<string, unknown> = {}
+  try { tang = JSON.parse(String(raw ?? '{}')) as Record<string, unknown> } catch { /* Chưa có kho mới: dùng phạm vi cũ có giới hạn. */ }
+  const [daChot, daLam] = await soSom
   const da = [...mang(daChot?.dao_json), ...mang(daChot?.doan_json)].map(q => q.replace(/#\d+$/, ''))
   const ds = Object.values(tang).filter((a): a is string[] => Array.isArray(a)).flatMap(a =>
     [...a].sort((x, y) => bam(`${sbd}|${ngay}|${x}`) - bam(`${sbd}|${ngay}|${y}`) || x.localeCompare(y)).slice(0, 96))

@@ -7,6 +7,8 @@ import type { Env } from './kieu'
 import { dbGoc } from './cau-hinh-dem'
 
 const daChay = new WeakMap<object, Map<string, Promise<void>>>()
+/** Nhóm DDL đã CHẠY XONG (thành công) trong isolate, theo D1 gốc — chỉ để nơi gọi quyết có ĐỌC ĐOÁN TRƯỚC hay không (đợt 18), không đổi kết quả. */
+const daXong = new WeakMap<object, Set<string>>()
 
 export function chayDdlMotLan(env: Env, nhom: string, lenh: readonly string[]): Promise<void> {
   const goc = dbGoc(env.DB as unknown as object)
@@ -15,9 +17,17 @@ export function chayDdlMotLan(env: Env, nhom: string, lenh: readonly string[]): 
   let p = m.get(nhom)
   if (!p) {
     const bang = m
-    p = env.DB.batch(lenh.map((s) => env.DB.prepare(s))).then(() => undefined)
-    p.catch(() => { if (bang.get(nhom) === p) bang.delete(nhom) })
+    const xong = p = env.DB.batch(lenh.map((s) => env.DB.prepare(s))).then(() => undefined)
+    p.then(() => { if (bang.get(nhom) !== xong) return; let t = daXong.get(goc); if (!t) { t = new Set(); daXong.set(goc, t) } t.add(nhom) }, () => { if (bang.get(nhom) === xong) bang.delete(nhom) })
     m.set(nhom, p)
   }
   return p
+}
+
+/**
+ * Nhóm DDL `nhom` đã chạy xong trong isolate này (D1 gốc của `env.DB`)? Dùng để ĐỌC ĐOÁN TRƯỚC chỉ khi không phải gửi lệnh tạo bảng (đợt 18): lệnh tạo bảng là
+ * lệnh GHI — gửi sớm thì mọi lượt đọc gửi sau nó trong cùng lượt phải chờ nó (bản gộp đọc), có khi làm CHẬM thay vì nhanh. Chưa chạy / đang chạy / lỗi ⇒ false.
+ */
+export function ddlDaXong(env: Env, nhom: string): boolean {
+  return !!daXong.get(dbGoc(env.DB as unknown as object))?.has(nhom)
 }

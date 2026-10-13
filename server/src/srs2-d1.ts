@@ -741,8 +741,10 @@ async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangCh
  *  - ÔN BÀI CŨ: `onBaiCu` (xem HoSo2), `omni` = { bat, cheDoCho, onBaiCuSo }.
  * CẨN THẬN (a) (omni-can-than.ts, đặc tả 4.6; chỉ-thêm): `canThanSom` = nơi gọi ĐÃ có hồ sơ OMNI (lúc LẬP kế hoạch ngày — `layKeHoachChot`) cho biết em có `canThan`
  * không; ĐÚNG ⇒ mốc kiểm duy trì của luật đóng lỗi × 0,7. Vắng / OMNI tắt / sai ⇒ mốc y hệt hôm nay (KHÔNG đọc thêm D1 ở đây).
+ * `ungMoRong`: ứng viên hành trình nơi gọi tự lập (thay `ungVienV6`) — mảng, hoặc Promise của mảng (đợt 18: nơi gọi bắt đầu hồ sơ TRƯỚC khi lập xong ứng viên;
+ * chỉ chờ ở đúng chỗ dùng, sau lượt đọc đầu). Nơi gọi truyền Promise phải tự `som` nó (hồ sơ không có chiến dịch hành trình thì không chờ).
  */
-export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: Promise<boolean>, canThanSom?: Promise<boolean>, khiCoQids?: (qids: readonly string[]) => void, ungMoRong?:readonly string[]): Promise<HoSo2> {
+export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: Promise<boolean>, canThanSom?: Promise<boolean>, khiCoQids?: (qids: readonly string[]) => void, ungMoRong?:readonly string[]|Promise<readonly string[]>): Promise<HoSo2> {
   env = { ...env, DB: gopDocD1(env.DB) }
   const omniP = omniSom ?? omniBatEm(env, sbd)
   const phamViP = omniP.then((bat) => (bat ? lanBaiDaDay().then((m) => m.phamViCuaEm(env, sbd)).catch(() => null) : null))
@@ -751,8 +753,9 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   // OMNI 3: mọi chiến dịch đang chạy, hạn gần trước; cờ tắt ⇒ một chiến dịch (giao gần nhất) như cũ.
   const ht = ds.find(c => laHanhTrinh(c.id) && c.trangThai === 'dang_chay' && !chuaBatDau(c, homNay))
   if (ht) {
-    const rotated = await ungVienHanhTrinh(env, ht.id, sbd, homNay, ht.qids)
-    const ung:readonly string[] = ungMoRong ? ungMoRong : await import('./hanh-trinh-v6-kho').then(m=>m.ungVienV6(env,ht,sbd,homNay,phamVi,rotated))
+    // `ungMoRong` (nơi gọi tự lập ứng viên — Gói 7, kho v6) ⇒ KHÔNG đọc vòng xoay `ungVienHanhTrinh`: kết quả của nó chỉ là đầu vào của `ungVienV6`
+    // (đợt 18 — trước: vẫn đọc rồi bỏ, hai đợt D1 nối tiếp trên đường Sảnh / Mở chặng). Kết quả hồ sơ y hệt.
+    const ung:readonly string[] = ungMoRong ? await ungMoRong : await ungVienHanhTrinh(env, ht.id, sbd, homNay, ht.qids).then((rotated) => import('./hanh-trinh-v6-kho').then(m=>m.ungVienV6(env,ht,sbd,homNay,phamVi,rotated)))
     const can = new Set([...ung, ...qidSaiCa.keys(), ...qidSaiLop.keys(), ...qidSaiMoiKenh.keys()])
     // Không nạp lại toàn bộ kho của các chiến dịch nguồn đã đóng.
     for (let i = 0; i < ds.length; i++) ds[i] = { ...ds[i]!, qids: ds[i]!.qids.filter(q => can.has(q)) }

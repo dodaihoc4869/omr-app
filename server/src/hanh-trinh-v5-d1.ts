@@ -1,4 +1,4 @@
-import type { Env } from './kieu'
+import type { Env, D1PreparedStatement } from './kieu'
 import type { HoSo2 } from './srs2-d1'
 import type { QCau,HoSoOmniEm } from './omni-kieu'
 import { vknCaCau } from './omni-p-vkn'
@@ -10,21 +10,28 @@ import { SQL_HANH_TRINH_V5,KHONG_CA_HT5 } from './hanh-trinh-v5-schema'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { mucKyNang,thieuTheoCau,docNhanHanhTrinh,tienDoMuc,hoTroChuyenDe,type VaiTroCau,type NhanHanhTrinh } from './hanh-trinh-v5-loi'
 import { vaiTroL4 } from './hanh-trinh-l4'
-import { phanNhom,type NhomThu } from './hanh-trinh-do-luong'
+import { phanNhom,type NhomThu,type PhanNhom } from './hanh-trinh-do-luong'
 import { xacSuatDungCau } from './du-bao-diem'
 import { msKyVong } from './omni-toc-do'
 import { tachSongSinh } from './loi-hoc-luat'
 import { bam } from './srs2-loi'
 import { PHIEN_BAN_HT6,quyenCau } from './hanh-trinh-v6-loi'
 import { docMoHinhV6,type ChonV6 } from './hanh-trinh-v6-d1'
+import type { MoHinhV6 } from './hanh-trinh-v6-mo-hinh'
 import { featuresV6,pDoKhoV6,giaTriV6 } from './hanh-trinh-v6-mo-hinh'
 import { dbGoc } from './cau-hinh-dem'
 type Row=Record<string,unknown>
 export interface CauDanhMuc { qid:string;q:QCau;tang:number;nhan:NhanHanhTrinh|null }
 const cache=new WeakMap<object,Map<string,{luc:number;ds:CauDanhMuc[]}>>()
-/** Danh mục đầy đủ trong phạm vi đã cho học; mẫu số không lấy cửa sổ xoay 96 câu. Chỉ đọc nhãn, không đáp án. */
-export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau?:HoSo2['cau']},now:number):Promise<CauDanhMuc[]>{
-  const full=hs.chienDich?await env.DB.prepare('SELECT qid_json,ma_de_json FROM chien_dich WHERE id=?').bind(hs.chienDich.id).first<{qid_json:string;ma_de_json:string}>():null
+type DongChienDichDay={qid_json:string;ma_de_json:string}
+/** Dòng chiến dịch đầy đủ (danh sách câu + tờ) — đầu vào của `danhMuc`. Tách riêng (đợt 18) để động cơ ĐỌC TRƯỚC cùng đợt (cùng câu SQL, cùng tham số). */
+export function docChienDichDay(env:Env,id:string):Promise<DongChienDichDay|null>{
+  return env.DB.prepare('SELECT qid_json,ma_de_json FROM chien_dich WHERE id=?').bind(id).first<DongChienDichDay>()
+}
+/** Danh mục đầy đủ trong phạm vi đã cho học; mẫu số không lấy cửa sổ xoay 96 câu. Chỉ đọc nhãn, không đáp án.
+ *  `fullSom` = lượt `docChienDichDay(env, hs.chienDich.id)` nơi gọi đã bắt đầu sớm cho ĐÚNG chiến dịch này (vắng ⇒ đọc như cũ). */
+export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau?:HoSo2['cau']},now:number,fullSom?:Promise<DongChienDichDay|null>):Promise<CauDanhMuc[]>{
+  const full=hs.chienDich?await (fullSom??docChienDichDay(env,hs.chienDich.id)):null
   const ids=full?JSON.parse(full.qid_json) as string[]:(hs.cau??[]).map(c=>c.qid),mas=[...(hs.phamVi?.maDe??new Set(full?JSON.parse(full.ma_de_json) as string[]:hs.chienDich?.maDe??[]))].sort()
   // Khoá đệm theo D1 GỐC (`dbGoc`) — mỗi lượt gọi bọc D1 riêng (gameV2 › gopDocD1) nên khoá theo `env.DB` chỉ dùng lại TRONG một lượt (số đo 12/10:
   // ~9.000 lần đọc/ngày dù "nhớ 1 phút"). Đợt 17: cả ngày (đúng ý định nhớ 1 phút ban đầu); giờ cao điểm nhớ 10 phút.
@@ -47,11 +54,17 @@ export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau
   if(dem.size>=8)dem.delete(dem.keys().next().value!);dem.set(key,{luc:now,ds});return ds
 }
 export interface BoChonV5 { tang:Map<string,1|2|3|4>;chan:Set<string>;chanDoan:Set<string>;chon:Record<string,ChonV6>;ungNgoai:{qid:string;nhom:string;moi:boolean;hoc:boolean}[];uuTienThamDo?:string;vai:Record<string,VaiTroCau>;trongSo:Record<string,number>;phut:Record<string,number>;phamVi:string;nhom:NhomThu;tienDo:ReturnType<typeof tienDoMuc>;soL4:number;soChanDoan:number }
-export async function boChonV5(env:Env,sbd:string,now:number,hs:HoSo2,q:ReadonlyMap<string,QCau>,qs:readonly QuanSatHanhTrinh[],graph:DoThiHanhTrinh,omni:HoSoOmniEm,beta:ReadonlyMap<string,number>,ghi:boolean,daGap:ReadonlySet<string>=new Set()):Promise<BoChonV5>{
+/**
+ * ĐỌC TRƯỚC / GHI DỒN của `boChonV5` (đợt 18 — luật thầy 13/10: sửa xong máy chủ phải nhanh hơn). Trước: mô hình v6 + dòng chiến dịch (một đợt) ⇒ nhóm thử
+ * nghiệm (một đợt) ⇒ ghi mức kỹ năng (một đợt) — ba đợt D1 nối tiếp. Nay động cơ bắt đầu ba lượt đọc từ đầu (mỗi lượt vẫn SAU lệnh tạo bảng của nó) và
+ * `ghiTre` nhận lệnh ghi `hanh_trinh_v5_muc` để động cơ gửi CHUNG lô ghi cuối (không lệnh đọc nào sau đó đụng bảng này). Vắng ⇒ y như cũ.
+ */
+export interface TruocBoChonV5 { moHinh?:Promise<MoHinhV6|null>; nhom?:Promise<PhanNhom|null>; full?:Promise<DongChienDichDay|null>; ghiTre?:D1PreparedStatement[] }
+export async function boChonV5(env:Env,sbd:string,now:number,hs:HoSo2,q:ReadonlyMap<string,QCau>,qs:readonly QuanSatHanhTrinh[],graph:DoThiHanhTrinh,omni:HoSoOmniEm,beta:ReadonlyMap<string,number>,ghi:boolean,daGap:ReadonlySet<string>=new Set(),truoc:TruocBoChonV5={}):Promise<BoChonV5>{
   await chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)
-  const [ds,model]=await Promise.all([danhMuc(env,hs,now),docMoHinhV6(env)]),byId=new Map(ds.map(c=>[c.qid,c])),m=mucKyNang(qs,graph)
+  const [ds,model]=await Promise.all([danhMuc(env,hs,now,truoc.full),truoc.moHinh??docMoHinhV6(env)]),byId=new Map(ds.map(c=>[c.qid,c])),m=mucKyNang(qs,graph)
   const phamVi=maPhamVi(hs,ds)
-  const nhom=await phanNhom(env,sbd,now,phamVi,ghi),danh=ds.flatMap(c=>vknCaCau(c.q).map(vkn=>({vkn,tang:c.tang})))
+  const nhom=await phanNhom(env,sbd,now,phamVi,ghi,truoc.nhom),danh=ds.flatMap(c=>vknCaCau(c.q).map(vkn=>({vkn,tang:c.tang})))
   const out:BoChonV5={tang:new Map(),chan:new Set(),chanDoan:new Set(),chon:{},ungNgoai:[],vai:{},trongSo:{},phut:{},phamVi,nhom:nhom?.nhom??'B',tienDo:tienDoMuc(danh,m),soL4:0,soChanDoan:0}
   const blocked=new Map<string,{parents:{vkn:string;tang:number}[];targets:string[]}>()
   for(const c of ds){const missing=thieuTheoCau(c.q,c.tang,m,omni,c.nhan);if(!missing.length)continue
@@ -89,7 +102,10 @@ export async function boChonV5(env:Env,sbd:string,now:number,hs:HoSo2,q:Readonly
   const probe=hs.cau.filter(c=>out.chon[c.qid]&&!out.chan.has(c.qid)&&!out.chanDoan.has(c.qid)&&hs.tt.get(c.qid)?.laMoi)
     .sort((a,b)=>out.trongSo[b.qid]!-out.trongSo[a.qid]!||a.qid.localeCompare(b.qid)).slice(0,8)
   if(probe.length){const r=crypto.getRandomValues(new Uint32Array(2)),explore=r[0]!/4294967296<0.1,index=explore?Math.floor(r[1]!/4294967296*probe.length):0,id=probe[index]!.qid;out.uuTienThamDo=id;out.chon[id]!.prop=0.1/probe.length+(index===0?0.9:0)}
-  if(ghi)await env.DB.prepare(`INSERT INTO hanh_trinh_v5_muc SELECT ?,?,?,?,?,? WHERE ${KHONG_CA_HT5} ON CONFLICT(sbd,pham_vi) DO UPDATE SET phien_ban=excluded.phien_ban,muc_json=excluded.muc_json,tien_do_json=excluded.tien_do_json,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v5_muc.cap_nhat_luc`).bind(sbd,phamVi,PHIEN_BAN_HT6,JSON.stringify([...m.values()]),JSON.stringify({...out.tienDo,soL4:out.soL4,soChanDoan:out.soChanDoan}),now).run()
+  if(ghi){
+    const lenh=env.DB.prepare(`INSERT INTO hanh_trinh_v5_muc SELECT ?,?,?,?,?,? WHERE ${KHONG_CA_HT5} ON CONFLICT(sbd,pham_vi) DO UPDATE SET phien_ban=excluded.phien_ban,muc_json=excluded.muc_json,tien_do_json=excluded.tien_do_json,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v5_muc.cap_nhat_luc`).bind(sbd,phamVi,PHIEN_BAN_HT6,JSON.stringify([...m.values()]),JSON.stringify({...out.tienDo,soL4:out.soL4,soChanDoan:out.soChanDoan}),now)
+    if(truoc.ghiTre)truoc.ghiTre.push(lenh);else await lenh.run()
+  }
   return out
 }
 export function lenhQuyetDinhV5(env:Env,sbd:string,ngay:string,moc:number,now:number,d:BoChonV5,qids:readonly string[]){
