@@ -9,7 +9,7 @@ import { goiWorker, taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { gvSuaChienDich } from '../server/src/srs2-sua'
 import { docChienDichCuaEm, docHoSo2, layKeHoachHomNay, qidGoc } from '../server/src/srs2-d1'
-import { chuTomTatSua } from '../src/lib/tom-tat-sua-chien-dich'
+import { chuTomTatSua } from '../server/src/tom-tat-sua-chien-dich'
 import type { Env } from '../server/src/kieu'
 
 const T0 = Date.parse('2026-09-30T02:00:00Z') // 09:00 VN 30/09
