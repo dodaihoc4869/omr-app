@@ -10,6 +10,7 @@ import NutHoiThay from '../src/components/loi-giai/NutHoiThay'
 type PhanHoi = Record<string, unknown>
 let phanHoi: PhanHoi[] = []
 let moCau: PhanHoi = { ok: false, error: 'chưa đặt' } // trả lời của /hs/hoi-thay
+let choMoCau: Promise<void> | null = null // đặt ⇒ /hs/hoi-thay chờ tới khi lời hứa xong (giả máy chủ chậm)
 const goi: { url: string; body: PhanHoi }[] = []
 beforeEach(() => {
   localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tok-em' }))
@@ -17,11 +18,12 @@ beforeEach(() => {
   vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input)
     goi.push({ url, body: JSON.parse(String(init?.body ?? '{}')) })
+    if (url.endsWith('/hs/hoi-thay') && choMoCau) await choMoCau
     const j = url.endsWith('/hs/hoi-tro-ly') ? (phanHoi.shift() ?? { ok: false, error: 'hết' }) : url.endsWith('/hs/hoi-thay') ? moCau : { ok: false }
     return new Response(JSON.stringify(j), { status: 200, headers: { 'content-type': 'application/json' } })
   })
 })
-afterEach(() => { cleanup(); vi.restoreAllMocks(); localStorage.clear() })
+afterEach(() => { cleanup(); vi.restoreAllMocks(); localStorage.clear(); choMoCau = null })
 
 const mo = () => fireEvent.click(screen.getByRole('button', { name: 'Em còn chỗ chưa hiểu? Nhắn hỏi Thầy' }))
 const o = () => screen.getByLabelText('Chỗ em thắc mắc về câu này') as HTMLTextAreaElement
@@ -99,6 +101,34 @@ describe('nút Hỏi thầy + Lời giải từng bước', () => {
     expect(goi.find((g) => g.url.endsWith('/hs/hoi-thay'))!.body).toEqual({ token: 'tok-em', qid: 'DE-I-1', nguon: 'luyen_de' })
     fireEvent.keyDown(window, { key: 'Escape' })
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Hỏi Thầy' })).toBeNull())
+  })
+
+  it('TỐC ĐỘ (thầy 13/10): bấm "Hỏi thầy" ⇒ hộp nảy lên NGAY, đề đang tới; máy chủ trả xong mới hiện đề. Đóng hộp lúc chờ ⇒ không tự mở lại', async () => {
+    moCau = { ok: true, coLoiGiai: true, cau: { ...cau, qid: 'DE-I-9' }, hoSo, hoiThem: true }
+    let xong!: () => void
+    choMoCau = new Promise<void>((r) => { xong = r })
+    render(<NutHoiThay qid="DE-I-9" nguon="luyen_de" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Hỏi thầy' }))
+    const hop = await screen.findByRole('dialog', { name: 'Hỏi Thầy' })
+    expect(hop.textContent).toContain('Đang mở đề câu')
+    expect(hop.textContent).not.toContain('Đun nóng 8,8 gam ester X')
+    expect(screen.getByLabelText('Chỗ em thắc mắc về câu này')).toBeTruthy() // gõ trước được
+    xong()
+    await waitFor(() => expect(screen.getByRole('dialog', { name: 'Hỏi Thầy' }).textContent).toContain('Đun nóng 8,8 gam ester X'))
+    expect(screen.getByRole('dialog', { name: 'Hỏi Thầy' }).textContent).toContain('Câu 1 · Ester')
+    // lần hai: mỗi lần bấm máy chủ đều được hỏi (kiểm chặn lại)
+    fireEvent.click(screen.getByRole('button', { name: 'Đóng' }))
+    choMoCau = new Promise<void>((r) => { xong = r })
+    fireEvent.click(screen.getByRole('button', { name: 'Hỏi thầy' }))
+    await screen.findByRole('dialog', { name: 'Hỏi Thầy' })
+    expect(goi.filter((g) => g.url.endsWith('/hs/hoi-thay'))).toHaveLength(2)
+    // đóng lúc máy chủ chưa trả ⇒ phản hồi tới muộn không mở lại hộp
+    fireEvent.keyDown(window, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    xong()
+    await new Promise((r) => setTimeout(r, 20))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect((screen.getByRole('button', { name: 'Hỏi thầy' }) as HTMLButtonElement).disabled).toBe(false)
   })
 
   it('"Lời giải từng bước" ⇒ khung lời giải (iframe), không có hộp hỏi Thầy', async () => {

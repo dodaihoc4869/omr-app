@@ -27,3 +27,10 @@ Thầy: "Nút hỏi bài phải đặt ở tất cả các câu, trừ các câu
 - Em ĐANG LÀM (chưa trả lời/nộp): chỉ nút Hỏi thầy. Máy chủ trả đề KHÔNG đáp án (`/hs/hoi-thay` + `chiHoi`), Thầy chỉ gợi hướng (`/hs/hoi-tro-ly` + `dangLam`); máy chủ lọc thêm mọi câu lộ đáp án (`chanLoDapAn`). Game: Thầy trả lời ⇒ bật "có trợ giúp"; Ôn câu ⇒ lần làm hôm nay "có trợ giúp"; ghi `loi_giai_hoi` ⇒ kiểm tra cá nhân vẫn chặn câu này 12 giờ.
 - Sau khi trả lời/nộp: Hỏi thầy + Lời giải từng bước (như trước).
 - KHÔNG có nút: màn thi (ExamTakeScreen), Gọi lên bảng, lúc làm kiểm tra cá nhân, Đề thử có giờ (Đảo 2), Tám câu Bi-a có giờ, Đoàn Hộ Tống lúc đang đấu đội, bài gia đình giao có giờ.
+
+## Tốc độ mở hộp + ô nhắn mới (thầy 13/10)
+Thầy: "chỉnh lại ô này cho thật đẹp, tinh tế, câu slogan ở dưới chỉnh vào giữa nổi bật chút nhé. Tốc độ bấm vào hỏi thầy hơi chậm tối ưu lại tốc độ nhanh nhất nhé".
+- Bấm "Hỏi thầy" ⇒ hộp nảy lên NGAY (ba vạch chờ thay chỗ đề), đề câu tới sau; máy chủ từ chối (ca kiểm tra, câu chưa công bố) thì hộp đóng, báo đúng lý do như cũ. Mảnh hộp tải sẵn lúc máy rảnh.
+- Máy chủ `/hs/hoi-thay`: các lượt đọc độc lập chạy cùng một đợt, việc ghi sổ chạy sau phản hồi. Đo bằng `tests/toc-do-mo-hoi-thay-1310.test.ts`: có lời giải 12 → 5 đợt D1 (lần sau 6 → 2), đang làm 8 → 4 (3 → 2).
+- Ô nhắn: một khung bo tròn (ô gõ tự giãn, cỡ chữ 16 để iPhone không phóng to; chip "Còn N câu hỏi hôm nay", số ký tự, nút gửi trong khung). Khẩu hiệu căn giữa, chữ đậm màu nhấn, một dòng trên điện thoại. CSS ở `hop-hoi-thay.css` (mảnh lười).
+- Lệnh của thầy (duyệt lời giải) tách sang `src/lib/loi-giai-gv-api.ts`: máy học sinh/phụ huynh không tải phần ấy lúc mở app.

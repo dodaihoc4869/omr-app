@@ -1,7 +1,7 @@
 // HỎI THÊM THẦY (thầy 13/10): dưới lời giải của nút Hỏi thầy, em nhắn chỗ còn thắc mắc về CHÍNH câu này; máy chủ (server/src/hoi-tro-ly.ts)
 // trả lời theo lời giải của Thầy, giọng Thầy Đỗ Đại Học. Máy chủ chặn ca kiểm tra, câu chưa công bố, câu hỏi ngoài phạm vi, trần câu hỏi mỗi ngày.
 // `gon`: mở sẵn, không nút thu gọn. `hop`: nằm trong hộp thoại Hỏi Thầy (HopHoiThay) — lấp đầy hộp, không tiêu đề riêng.
-import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useId, useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { SendHorizontal } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import { hoiThemThay } from '../../lib/hoi-them-thay-api'
@@ -24,6 +24,13 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
   const [conLai, setConLai] = useState<number | null>(null)
   const [dung, setDung] = useState(false)
   const oRef = useRef<HTMLTextAreaElement>(null)
+  // Ô gõ TỰ GIÃN theo chữ (một dòng lúc trống, tối đa ~5 dòng rồi cuộn) — không còn góc kéo cỡ.
+  useLayoutEffect(() => {
+    const o = oRef.current
+    if (!o) return
+    o.style.height = 'auto'
+    o.style.height = `${Math.min(o.scrollHeight, 132)}px`
+  }, [chu, mo])
 
   if (!mo) {
     return (
@@ -86,22 +93,24 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
         {dangGui && <p className="lg-ht-cho">Thầy đang trả lời<span className="lg-ht-cham" aria-hidden="true"><i /><i /><i /></span></p>}
       </div>
       {loi && <p className="lg-ht-loi" role="alert">{loi}</p>}
-      <form className="lg-ht-nhap" onSubmit={gui}>
-        <div className="lg-ht-dem">
-          <span>{conLai === null ? '' : `Còn ${conLai} câu hỏi hôm nay`}</span>
-          <span>{chu.length}/{TOI_DA_KY_TU} ký tự</span>
-        </div>
-        <div className="lg-ht-hang">
+      {/* Ô NHẮN (thầy 13/10 "chỉnh lại ô này cho thật đẹp, tinh tế, câu slogan ở dưới chỉnh vào giữa nổi bật"): một khung bo tròn chứa ô gõ tự
+          giãn + hàng dưới (câu hỏi còn lại · số ký tự · nút gửi trong khung); khẩu hiệu căn giữa, chữ đậm màu nhấn. CSS: hop-hoi-thay.css (mảnh lười). */}
+      <form className="lg-nh" onSubmit={gui}>
+        <div className="lg-nh-khung" data-tat={dung || undefined}>
           <label htmlFor={`${id}-o`} className="sr-only">Chỗ em thắc mắc về câu này</label>
           <textarea
-            id={`${id}-o`} ref={oRef} className="lg-ht-o" rows={2} maxLength={TOI_DA_KY_TU} value={chu} disabled={dung} autoFocus={hop}
+            id={`${id}-o`} ref={oRef} className="lg-nh-o" rows={1} maxLength={TOI_DA_KY_TU} value={chu} disabled={dung} autoFocus={hop}
             placeholder="Nhắn chỗ em còn thắc mắc…" onChange={(e) => setChu(e.target.value)} onKeyDown={phim}
           />
-          <button type="submit" className="lg-ht-gui" aria-label="Gửi" disabled={dangGui || dung || chu.trim().length < 2}>
-            <SendHorizontal aria-hidden="true" size={20} strokeWidth={2.2} />
-          </button>
+          <div className="lg-nh-chan">
+            <span className="lg-nh-con">{conLai === null ? '' : `Còn ${conLai} câu hỏi hôm nay`}</span>
+            <span className="lg-nh-dem" data-gan={chu.length > TOI_DA_KY_TU - 50 || undefined}>{chu.length}/{TOI_DA_KY_TU}</span>
+            <button type="submit" className="lg-nh-gui" aria-label="Gửi" disabled={dangGui || dung || chu.trim().length < 2}>
+              <SendHorizontal aria-hidden="true" size={19} strokeWidth={2.3} />
+            </button>
+          </div>
         </div>
-        <p className="lg-ht-phu">KIÊN TRÌ là vũ khí tối thượng để chiến thắng mọi thứ</p>
+        <p className="lg-nh-khau">KIÊN TRÌ là vũ khí tối thượng để chiến thắng mọi thứ</p>
       </form>
     </section>
   )

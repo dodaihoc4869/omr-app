@@ -61,3 +61,60 @@
 .lg-de-pa > li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 14px; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; background: var(--m3-surface); border: 1px solid var(--m3-surface-container-high); }
 .lg-de-chu-cai { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--m3-surface-container-high); color: var(--m3-on-surface); }
 .lg-de-pa[data-ds] .lg-de-chu-cai { border-radius: 8px; }
+
+/* Ô NHẮN HỎI THẦY (thầy 13/10: "chỉnh lại ô này cho thật đẹp, tinh tế, câu slogan ở dưới chỉnh vào giữa nổi bật"): MỘT khung bo tròn chứa
+   ô gõ tự giãn (cỡ 16 ⇒ iPhone không phóng to khi chạm) + hàng dưới (câu hỏi còn lại · số ký tự · nút gửi tròn trong khung). Chạm vào ô
+   ⇒ khung sáng viền màu nhấn + quầng mềm. Khẩu hiệu căn giữa, chữ đậm màu nhấn, hai vạch mảnh hai bên. Chỉ biến M3 có sẵn. */
+.lg-nh { flex: none; display: flex; flex-direction: column; gap: 10px; margin-top: 2px; }
+.lg-nh-khung {
+  display: flex; flex-direction: column; border-radius: 24px; box-sizing: border-box;
+  background: var(--m3-surface-container-low); border: 1.5px solid var(--m3-outline-variant, transparent);
+  transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+.lg-nh-khung:focus-within {
+  border-color: var(--m3-primary); background: var(--m3-surface);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--m3-primary) 14%, transparent), 0 6px 18px color-mix(in srgb, var(--m3-on-surface) 8%, transparent);
+}
+.lg-nh-khung[data-tat] { opacity: .7; }
+.lg-nh-o {
+  display: block; width: 100%; min-height: 44px; max-height: 132px; box-sizing: border-box; resize: none; overflow-y: auto; margin: 0;
+  padding: 12px 18px 0; border: 0; outline: 0; background: transparent; color: var(--m3-on-surface);
+  font: inherit; font-size: 16px; line-height: 1.5;
+}
+.lg-nh-o::placeholder { color: var(--m3-on-surface-variant); opacity: .9; }
+.lg-nh-o:disabled { cursor: not-allowed; }
+.lg-nh-chan { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 0 4px 4px 14px; box-sizing: border-box; }
+.lg-nh-con {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 10px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; background: var(--m3-primary-container); color: var(--m3-on-primary-container);
+}
+.lg-nh-con:empty { display: none; }
+.lg-nh-dem { margin-left: auto; flex: none; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--m3-on-surface-variant); }
+.lg-nh-dem[data-gan] { color: var(--m3-error); font-weight: 600; }
+.lg-nh-gui {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; cursor: pointer; touch-action: manipulation;
+  background: var(--m3-primary); color: var(--m3-on-primary); box-shadow: 0 3px 10px color-mix(in srgb, var(--m3-primary) 32%, transparent);
+  transition: transform .14s ease, background-color .16s ease, box-shadow .16s ease, color .16s ease;
+}
+.lg-nh-gui svg { transform: translateX(1px); }
+.lg-nh-gui:not(:disabled):active { transform: scale(.92); }
+.lg-nh-gui:disabled { cursor: default; background: var(--m3-surface-container-high); color: var(--m3-on-surface-variant); box-shadow: none; }
+.lg-nh-gui:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+.lg-nh-khau {
+  margin: 0; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center; text-wrap: balance;
+  font-size: 13.5px; line-height: 1.45; font-weight: 700; letter-spacing: .01em; color: var(--m3-primary);
+}
+.lg-nh-khau::before, .lg-nh-khau::after { content: ''; flex: 0 1 36px; min-width: 12px; height: 1.5px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--m3-primary)); opacity: .55; }
+.lg-nh-khau::after { background: linear-gradient(270deg, transparent, var(--m3-primary)); }
+/* Điện thoại: bỏ hai vạch để khẩu hiệu nằm trọn MỘT dòng; máy hẹp (≤ 380 px) hạ cỡ chữ một chút. */
+@media (max-width: 480px) { .lg-nh-khau { font-size: 13px; letter-spacing: 0; } .lg-nh-khau::before, .lg-nh-khau::after { display: none; } }
+@media (max-width: 380px) { .lg-nh-khau { font-size: 12.5px; } }
+@media (prefers-reduced-motion: reduce) { .lg-nh-khung, .lg-nh-gui { transition: none; } }
+
+/* Hộp mở ngay khi em bấm, đề câu đang tới (tốc độ, thầy 13/10): ba vạch nhấp nháy nhẹ thay chỗ đề. */
+.lg-hh-cho-de { display: flex; flex-direction: column; gap: 10px; padding: 6px 0 8px; }
+.lg-hh-cho-de > i { display: block; height: 14px; border-radius: 7px; background: var(--m3-surface-container-high); animation: lg-hh-nhay 1.2s ease-in-out infinite; }
+.lg-hh-cho-de > i:nth-of-type(2) { width: 86%; animation-delay: .12s; }
+.lg-hh-cho-de > i:nth-of-type(3) { width: 58%; animation-delay: .24s; }
+@keyframes lg-hh-nhay { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .lg-hh-cho-de > i { animation: none; } }

@@ -2,7 +2,8 @@
 // ("máy duyệt luôn") ⇒ màn này để xem câu có cờ đáp án, xem lại / trả lại câu chưa ổn kèm ghi chú cho máy soạn làm lại.
 // Chỉ câu trắc nghiệm, Đúng/Sai, trả lời ngắn (tự luận không soạn). Máy chủ: server/src/loi-giai.ts.
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { gvChoDuyet, gvDuyetLoiGiai, gvSoanGap, gvXemLoiGiai, type CauChoDuyet, type CauChoKhung, type HoSoLoiGiai, type KetQuaChoDuyet, type TrangThaiLoiGiai } from '../lib/loi-giai-api'
+import type { CauChoKhung, HoSoLoiGiai } from '../lib/loi-giai-api'
+import { gvChoDuyet, gvDuyetLoiGiai, gvSoanGap, gvXemLoiGiai, type CauChoDuyet, type KetQuaChoDuyet, type TrangThaiLoiGiai } from '../lib/loi-giai-gv-api'
 import KhungLoiGiai from '../components/loi-giai/KhungLoiGiai'
 import '../components/loi-giai/loi-giai.css'
 import './gv-hoa2.css'
