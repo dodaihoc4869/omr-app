@@ -60,3 +60,16 @@ Thầy đã chuyển bốn việc này cho Codex trên máy thầy ngày 13/10. 
 - Theo đề nghị của Codex (thầy phản ánh 333 câu/475 phút), Claude **không bật lại** cờ `kiem_tra_ca_nhan_v1`.
 - [ ] Codex: xong khung 28 câu/50 phút thì bật lại cờ CHỈ bằng workflow `bat-lai-ktcn-1310` (bấm tay trên Actions). Workflow này bù số tính sẵn cho mọi lịch cũ rồi mới bật cờ. Không bật cờ bằng SQL tay.
 - [ ] Codex: khung mới đổi số câu/chặng/phút thì `metaKt` phải theo, và test "khẩn 13/10" trong `tests/kiem-tra-ca-nhan-1310.test.ts` phải xanh.
+
+## 13/10 15:40 — Claude nhận phần soát + gộp + bật cờ của nhánh đề Hóa 2026 (thầy: "bạn làm đỡ được codex phần nào để tăng tốc không")
+Codex KHÔNG đẩy thêm vào `codex/de-kiem-tra-2026-1310`. Claude đã gộp nhánh vào `claude/amazing-albattani-03aros` cùng main mới (đợt 20, 21) và mở PR vào `main`. Việc tiếp theo làm từ `main`.
+- [x] Gộp `main` mới, giữ bản vá D1: `COT_META_KT`, `lapKtCn` batch, `dongBoKtCn` gọi `buMetaKt` (Claude, khi gộp nhánh).
+  - Xung đột `TheKiemTraCaNhan.tsx`: giữ thiết kế đợt 20 thầy duyệt, thêm chữ "kế hoạch học nhẹ tối thiểu 12 câu" khi có `baiNgayToiThieu`.
+- [x] `metaKt` theo khung mới (`phienBan`, `baiNgayToiThieu`); test "khẩn 13/10" xanh.
+- [x] Soát D1: lệnh cron `dongBoKtCn` chọn đề cần chuyển từng gọi `json_extract(k.json,'$.phienBan')` trên MỌI lịch tương lai mỗi phút ⇒ Claude đổi sang đọc `kiem_tra_ca_nhan_meta` (`COALESCE(phienBan,1)`).
+  - Test mới trong `tests/kiem-tra-chu-ky-2026-1310.test.ts`.
+  - SỬA CÓ CHỦ ĐÍCH bản giả trong `tests/kiem-tra-ca-nhan-1310.test.ts`.
+- [ ] Bật lại cờ (Claude làm): workflow `bat-lai-ktcn-1310`.
+  - Số thật lúc 15:22: 261 lịch đều ngày 17–19/10, chưa em nào mở; khối 11 có 89 lịch đề cũ ("hen"), khối 10/12 có 172 lịch "cho_nguon".
+  - Đã thêm bước chuyển từng em về 28 câu/50 phút TRƯỚC khi bật, vì cờ tắt thì cron chưa chuyển.
+- [ ] Khối 12 còn thiếu nguồn đã duyệt cho `nen:gia_tri_trung_binh` (52/53) ⇒ lịch khối 12 vẫn "Đang chuẩn bị". Cần thầy duyệt câu đang chờ; Codex/Claude không tự duyệt.
