@@ -1,8 +1,10 @@
 {
   "base": "803f28eedd9085adcb20ff2abb908cfacd169314",
   "phamVi": "import/export/dynamic import literal tương đối trong scripts, đã đối chiếu đường dẫn và phần mở rộng",
-  "tong": 26,
-  "imports": [
+  "tong": 0,
+  "imports": [],
+  "tongTruoc": 26,
+  "daGiaiQuyet": [
     {
       "file": "scripts/chup-dot16-lan-b/trang.tsx",
       "line": 37,
@@ -133,5 +135,7 @@
       "line": 22,
       "spec": "../../src/components/bang-nhiem-vu/BangNhiemVu"
     }
-  ]
+  ],
+  "tepDaQuet": 186,
+  "kiemMoiNhat": "TypeScript AST + compile các config tuần tự, publicDir:false vào/tmp; không thaygia/ảnh/fixtures học"
 }
