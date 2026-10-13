@@ -20,7 +20,10 @@ import { apLamLaiKhac } from './cau-anh-em'
 import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
 import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
-import { docCauHinhDem } from './cau-hinh-dem'
+import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
+import { cacheChung, docChung, ghiChung } from './dem-chung-colo'
+import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
+import { bam } from './srs2-loi'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -300,14 +303,7 @@ function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: reado
     const phamVi = await phamViLop(env,lop)
     const maCu = [...(phamVi?.maDe ?? [])].filter(m => !goi.some(g => g.maDeNguon.includes(m)))
     // Ma trận cũ là toàn phạm vi; mẫu bổ sung chọn theo độ yếu, không chỉ câu đã làm.
-    return Promise.all([
-      env.DB.prepare(`SELECT DISTINCT j.value AS kn,p.trang_thai FROM game_v2_question q LEFT JOIN omni_q o ON q.qid=o.qid,
-      json_each(CASE WHEN json_array_length(COALESCE(o.vkn_json,'[]'))>0 THEN o.vkn_json ELSE json_array(CASE WHEN COALESCE(q.dang,'')<>'' THEN 'dang:'||q.dang ELSE 'cau:'||q.qid END) END) j LEFT JOIN omni_p_vkn p ON p.vkn_id=j.value AND p.sbd=? WHERE q.ma_de IN (SELECT value FROM json_each(?))`).bind(sbd,JSON.stringify(maCu)).all<Row>(),
-      env.DB.prepare(`SELECT q.qid,MIN(COALESCE(p.p,0.3)) yeu FROM game_v2_question q LEFT JOIN omni_q o ON o.qid=q.qid,
-      json_each(CASE WHEN json_array_length(COALESCE(o.vkn_json,'[]'))>0 THEN o.vkn_json ELSE json_array(CASE WHEN COALESCE(q.dang,'')<>'' THEN 'dang:'||q.dang ELSE 'cau:'||q.qid END) END) j LEFT JOIN omni_p_vkn p ON p.vkn_id=j.value AND p.sbd=?
-      WHERE q.ma_de IN(SELECT value FROM json_each(?)) AND json_extract(q.json,'$.reviewed')=1
-      GROUP BY q.qid ORDER BY yeu,q.qid LIMIT 96`).bind(sbd,JSON.stringify(maCu)).all<Row>(),
-    ])
+    return docMaTranCu7(env, sbd, maCu, now)
   })())
   const ungMoRong = som(Promise.all([qidsGoi, oldUngSom]).then(([qids, [, ungCu]]) => [...qids, ...ungCu.results.map(r => str(r.qid))]))
   const hsSom = som(docHoSo2(env, sbd, ngay, undefined, undefined, undefined, ungMoRong))
@@ -316,6 +312,61 @@ function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: reado
   const dongCo = docTruocDongCoNeuSanBang(env, sbd, now)
   const mucSom = som(docMucNgay7(env, sbd, ngay))
   return { phuSom, khoiSom, daLamSom, xemChuaSom, kiemSom, oldUngSom, hsSom, dongCo, mucSom }
+}
+/** Phần CHỈ PHỤ THUỘC KHO của hai câu SQL cũ (ma trận nhãn + 96 câu yếu; bản gốc giữ trong tests/goi7-ma-tran-cu-1310.test.ts làm phép thử): mỗi (câu, tờ, nhãn kỹ năng) — [qid, đã duyệt 0/1, nhãn]. Cùng CASE nhãn dự phòng (dạng / câu). */
+const SQL_KN_TINH = `SELECT q.qid,CASE WHEN json_extract(q.json,'$.reviewed')=1 THEN 1 ELSE 0 END duyet,j.value AS kn FROM game_v2_question q LEFT JOIN omni_q o ON o.qid=q.qid,
+      json_each(CASE WHEN json_array_length(COALESCE(o.vkn_json,'[]'))>0 THEN o.vkn_json ELSE json_array(CASE WHEN COALESCE(q.dang,'')<>'' THEN 'dang:'||q.dang ELSE 'cau:'||q.qid END) END) j WHERE q.ma_de IN (SELECT value FROM json_each(?))`
+type KnTinh7 = [string, number, string][]
+/** Hạn tối đa của bản đồ câu → nhãn kỹ năng (tính từ lúc DỰNG): nhãn mới duyệt vào chậm nhất 10 phút — như danh mục Hành trình (HAN_TOI_DA_DANH_MUC). */
+const HAN_KN_TINH_MS = 600_000
+/** Sau bao lâu thì hỏi lại dấu kho (một dòng) trước khi dùng tiếp bản đồ — câu sửa/duyệt vào chậm nhất chừng này, như danh mục ngoài cao điểm. */
+const KIEM_KN_TINH_MS = 60_000
+const demKnTinh = new WeakMap<object, Map<string, { luc: number; kiem: number; dau: string; tinh: KnTinh7 }>>()
+/**
+ * MA TRẬN CŨ + ỨNG VIÊN YẾU của Gói 7 (13/10 tối — thầy: "tất cả mọi chỗ rút câu rất là lag, bạn tối ưu máy chủ chuyên sâu"). Số đo D1 thật 24 giờ:
+ * hai câu SQL cũ (ma trận nhãn + 96 câu yếu, bản gốc ở test) chạy ~24.000 lần/ngày, mỗi lần quét ~6.500–8.900 dòng câu kèm tách JSON (~300 + 80 giây D1/ngày) — trong khi phần quét
+ * kho (câu → nhãn kỹ năng, đã duyệt) giống hệt cho mọi em cùng phạm vi; chỉ điểm kỹ năng `omni_p_vkn` (khoá chính (sbd, vkn_id) ⇒ ≤ 1 dòng/nhãn) là của em.
+ * Nay: bản đồ tĩnh (SQL_KN_TINH, MỘT lần quét thay hai) đệm theo isolate (khoá D1 gốc + phạm vi), dùng lại tới 10 phút từ lúc dựng, quá 60 giây thì hỏi
+ * dấu kho (một dòng) CÙNG đợt với lượt đọc điểm của em; có đệm chung colo (tên miền riêng) thì isolate mới lấy từ đó. Điểm của em LUÔN đọc mới, rồi tính
+ * ĐÚNG phép SQL cũ: DISTINCT (nhãn, trạng thái) và MIN(COALESCE(p, 0,3)) theo câu đã duyệt, xếp (độ yếu, mã câu), lấy 96. Số đợt D1 không tăng.
+ */
+export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[], now: number): Promise<[{ results: Row[] }, { results: Row[] }]> {
+  const thamSo = JSON.stringify(maCu), khoa = [...maCu].sort().join('|'), goc = dbGoc(env.DB as unknown as object)
+  const pSom = env.DB.prepare('SELECT vkn_id,p,trang_thai FROM omni_p_vkn WHERE sbd=?').bind(sbd).all<Row>()
+  pSom.catch(() => {})
+  let bang = demKnTinh.get(goc)
+  if (!bang) { bang = new Map(); demKnTinh.set(goc, bang) }
+  let e = bang.get(khoa)
+  if (e && !(now - e.luc >= 0 && now - e.luc < HAN_KN_TINH_MS)) e = undefined
+  if (e && !(now - e.kiem >= 0 && now - e.kiem < KIEM_KN_TINH_MS)) {
+    const d = await dauKhoCau(env)
+    if (d && (e.dau ? d === e.dau : dauTruocLucDoc(d, e.luc))) { e.dau = d; e.kiem = now } else e = undefined
+  }
+  if (!e) {
+    const chung = await cacheChung()
+    const dau = chung ? await dauKhoCau(env) : ''
+    const m = dau ? await docChung<{ luc: number; r: KnTinh7 }>(`omni-kn/${dau}/${bam(khoa)}`) : null
+    if (m && Array.isArray(m.r) && Number.isFinite(m.luc) && now - m.luc >= 0 && now - m.luc < HAN_KN_TINH_MS) e = { luc: m.luc, kiem: now, dau, tinh: m.r }
+    else {
+      const r = await env.DB.prepare(SQL_KN_TINH).bind(thamSo).all<Row>()
+      e = { luc: now, kiem: now, dau, tinh: (r.results ?? []).map((x) => [str(x.qid), Number(x.duyet) === 1 ? 1 : 0, str(x.kn)] as [string, number, string]) }
+      if (dau) await ghiChung(`omni-kn/${dau}/${bam(khoa)}`, { luc: now, r: e.tinh }, HAN_KN_TINH_MS / 1000)
+    }
+    if (bang.size >= 16) bang.delete(bang.keys().next().value!)
+    bang.set(khoa, e)
+  }
+  const tinh = e.tinh
+  const p = new Map(((await pSom).results ?? []).map((x) => [str(x.vkn_id), x]))
+  const da = new Set<string>(), kn: Row[] = []
+  for (const [, , k] of tinh) { const t = p.get(k)?.trang_thai ?? null; const d = `${k}\u0000${t}`; if (da.has(d)) continue; da.add(d); kn.push({ kn: k, trang_thai: t }) }
+  const yeu = new Map<string, number>()
+  for (const [qid, duyet, k] of tinh) {
+    if (!duyet) continue
+    const v = p.get(k)?.p, y = v == null ? 0.3 : Number(v), cu = yeu.get(qid)
+    if (cu === undefined || y < cu) yeu.set(qid, y)
+  }
+  const ung = [...yeu].sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).slice(0, 96).map(([qid, y]) => ({ qid, yeu: y }))
+  return [{ results: kn }, { results: ung }]
 }
 /** `gsSom`: danh sách gói đã đọc đoán cùng đợt cờ Gói 7 (`docDanhSachGoiSom7`); vắng ⇒ đọc như cũ. */
 export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>) {

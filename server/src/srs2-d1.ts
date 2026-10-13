@@ -20,6 +20,7 @@ import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { chanMetaKhacKhoi, docCauNghiDem, docKhoiEmCong } from './chan-khac-khoi'
 import { DemTTL } from './dem-chung'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
+import { cacheChung, docChung, ghiChung, nganCua } from './dem-chung-colo'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import {
   lapKeHoachNgay, laNo, nhanNo, khoiLuongCan, TRAN_NGAY, type NguonNhan, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
@@ -383,6 +384,8 @@ function gonDongMeta(x: Row): Row {
 interface DemMeta { tem: string; luc: number; temLuc: number; dong: Map<string, Row[]> }
 const demMeta = new WeakMap<object, DemMeta>()
 const TEM_MOI_MS = 5_000, TUOI_DEM_META_MS = 10 * 60_000, TRAN_DEM_META = 30_000
+/** Số ngăn đệm chung siêu dữ liệu câu (cả kho ~15.000 câu ⇒ ~470 câu/ngăn, ~120 KB/ngăn). */
+const SO_NGAN_META = 32
 /** Bỏ đệm siêu dữ liệu câu (test / sau khi lập lại chỉ mục trong cùng isolate). */
 export function xoaDemMetaCau(): void { demMetaDoi++ }
 /** Đệm dựa vào GIỜ THẬT (`Date.now()`) ⇒ trong bộ test mặc định TẮT (kết quả test không phụ thuộc lúc chạy); test đệm bật bằng `batDemMetaCau(true)`. */
@@ -407,12 +410,31 @@ async function docMetaCauTho(env: Env, qids: readonly string[]): Promise<Row[]> 
   const dem = d
   const coSan = new Map<string, Row[]>()
   for (const q of ds) { const a = dem.dong.get(q); if (a) coSan.set(q, a) }
-  const thieu = ds.filter((q) => !coSan.has(q))
+  let thieu = ds.filter((q) => !coSan.has(q))
   const moi = new Map<string, Row[]>()
+  // 13/10 tối (thầy: "mọi chỗ rút câu rất là lag … tối ưu chuyên sâu"): câu isolate này chưa có ⇒ tra ĐỆM CHUNG cùng colo (dem-chung-colo.ts) trước
+  // D1 — 32 ngăn theo băm mã câu, khoá = dấu kho (số tờ | mốc lập chỉ mục mới nhất, cùng lệnh tem ở trên). Dòng trong ngăn là ĐÚNG dòng đã gọn
+  // (`gonDongMeta`) isolate khác đọc từ D1 ⇒ kết quả y hệt. Câu vẫn thiếu ⇒ đọc D1 như cũ rồi gộp vào ngăn (ghi đè lẫn nhau chỉ làm mất phần gộp,
+  // lần sau đọc lại — không bao giờ sai). Node test không có Cache API ⇒ bỏ qua cả khối.
+  const temChung = thieu.length && (await cacheChung()) ? dem.tem.slice(0, dem.tem.lastIndexOf('|')) : ''
+  // Ngăn mang `luc` lúc TẠO ⇒ dòng trong ngăn không bao giờ cũ quá TUOI_DEM_META_MS (như đệm isolate), dù ngăn được gộp thêm nhiều lần.
+  const nganChung = new Map<number, { luc: number; r: Record<string, Row[]> }>()
+  if (temChung) {
+    const canNgan = [...new Set(thieu.map((q) => nganCua(q, SO_NGAN_META)))]
+    const doc = await Promise.all(canNgan.map((n) => docChung<{ luc: number; r: Record<string, Row[]> }>(`meta/${temChung}/${n}`).then((v) => [n, v] as const)))
+    for (const [n, v] of doc) if (v && v.r && typeof v.r === 'object' && Number.isFinite(v.luc) && now - v.luc >= 0 && now - v.luc < TUOI_DEM_META_MS) nganChung.set(n, v)
+    for (const q of thieu) { const a = nganChung.get(nganCua(q, SO_NGAN_META))?.r[q]; if (Array.isArray(a)) { coSan.set(q, a); dem.dong.set(q, a) } }
+    thieu = thieu.filter((q) => !coSan.has(q))
+  }
   if (thieu.length) {
     for (const x of await docMetaCauD1(env, thieu)) { const q = str(x.qid); let a = moi.get(q); if (!a) { a = []; moi.set(q, a) } a.push(gonDongMeta(x)) }
     if (dem.dong.size + thieu.length > TRAN_DEM_META) dem.dong.clear()
     for (const q of thieu) dem.dong.set(q, moi.get(q) ?? [])
+    if (temChung) {
+      const doi = new Set<number>()
+      for (const q of thieu) { const n = nganCua(q, SO_NGAN_META); const v = nganChung.get(n) ?? { luc: now, r: {} }; v.r[q] = moi.get(q) ?? []; nganChung.set(n, v); doi.add(n) }
+      await Promise.all([...doi].map((n) => { const v = nganChung.get(n)!; return ghiChung(`meta/${temChung}/${n}`, v, Math.max(1, (TUOI_DEM_META_MS - (now - v.luc)) / 1000)) }))
+    }
   }
   return ds.flatMap((q) => coSan.get(q) ?? moi.get(q) ?? [])
 }
