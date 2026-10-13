@@ -8,6 +8,7 @@ import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
 import { chuDanhSachCau, chuThoiGian, coChuSo, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
+import NutHoiThay from '../loi-giai/NutHoiThay'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
 import './hoc-tap.css'
@@ -97,6 +98,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // kết quả tự đọc (aria-live / role=status); có kết quả thì con trỏ bàn phím sang nút chính "Câu tiếp theo" (Enter = đi tiếp), không vẽ viền khi em chạm.
   const veDau = () => gocRef.current?.scrollIntoView?.({ block: 'start' })
   const daMo = useRef(false)
+  // Thầy 13/10: em hỏi Thầy (AI gợi hướng) lúc đang làm câu ⇒ lần nộp câu đó là "có trợ giúp" (như Gợi ý).
+  const daHoiThay = useRef('')
   useEffect(() => { if (!q) return; if (daMo.current) veDau(); daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (k) { veDau(); nutTiepRef.current?.focus({ preventScroll: true }) } }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   const nopCau = async () => {
@@ -104,7 +107,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     gui.current = true; setNop(true); setLoi('')
     const msLam = Math.max(0, Date.now() - batDau.current)
     try {
-      const r = await goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted: !!q.goiY, msLam }, 40)
+      const r = await goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted: !!q.goiY || daHoiThay.current === q.qid, msLam }, 40)
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam }))
       // CHẤM THEO ĐÚNG ĐÁP ÁN MÁY CHỦ ĐÃ CHẤM (khẩn 12/10 23h — thầy: "hs làm đúng cả 4 ý nhưng app lại báo sai"): mỗi câu của một đợt chỉ chấm MỘT lần
@@ -270,6 +273,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {k && !k.choThay && (q.phan !== 'II' || moLoiGiai
             ? <LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />
             : <button type="button" className="ht2-lam-nut ht2-lam-nut-mo" aria-expanded={false} onClick={() => setMoLoiGiai(true)}><ChevronDown size={18} aria-hidden="true" />{coLyDoY ? 'Xem lời giải đầy đủ cả 4 ý' : 'Xem lời giải đầy đủ'}</button>)}
+          {/* Thầy 13/10 "nút hỏi bài ở tất cả các câu… hỏi bài thầy mọi lúc": đang làm ⇒ Hỏi thầy (gợi hướng, không đáp án); có kết quả ⇒ thêm Lời giải từng bước. */}
+          {dangTraLoi && <NutHoiThay gon dangLam qid={q.qid} nguon="bai_hang_ngay" onHoi={() => { daHoiThay.current = q.qid }} />}
+          {k && !k.choThay && <NutHoiThay gon qid={q.qid} nguon="bai_hang_ngay" />}
           {dangTraLoi && coHuongDan && <button type="button" className="ht2-lam-nut ht2-lam-nut-mo" onClick={() => void hocHuongDan()} disabled={nop}><BookOpen size={18} aria-hidden="true" />Chưa làm được? Học cách giải</button>}
           {!traLoiPhai && ghiTraLoi}
         </> : null}

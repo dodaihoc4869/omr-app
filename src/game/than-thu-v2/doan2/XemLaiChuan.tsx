@@ -35,7 +35,8 @@ export interface XemLaiChuanProps {
 
 export default function XemLaiChuan({ q, chon, dapAn, solution, solutionImages, stt, onZoom }: XemLaiChuanProps) {
   const { loiGiai, explanation } = loiGiaiChoTheCau(chiSoRoSau(solution), q.phan, dapAn)
-  const chung = { cheDo: 'xem_lai' as const, stt, tieuDe: q.tenDang || 'Hoá học', text: chiSoRo(q.text), thanCauImg: q.thanCauImg, table: q.table, imageDataUrl: q.imageDataUrl, hinhAnh: q.hinhAnh as HinhAnh[], loiGiai, explanation, onZoom }
+  // Thầy 13/10: Hỏi thầy + Lời giải từng bước ở mọi câu đã chốt (dưới phần trả lời của TheCau).
+  const chung = { cheDo: 'xem_lai' as const, hoiThay: { qid: q.qid, nguon: 'doan', gon: true }, stt, tieuDe: q.tenDang || 'Hoá học', text: chiSoRo(q.text), thanCauImg: q.thanCauImg, table: q.table, imageDataUrl: q.imageDataUrl, hinhAnh: q.hinhAnh as HinhAnh[], loiGiai, explanation, onZoom }
   const the = q.phan === 'I' ? (
     <TheCau {...chung} phan="I" choices={bon(q.choices?.map(chiSoRo))} choiceImgs={bonTuyChon(q.choiceImgs)} choicePerm={[0, 1, 2, 3]}
       selected={/^[ABCD]$/.test(chon) ? chon as Chu : null} correct={/^[ABCD]$/.test(dapAn) ? dapAn as Chu : undefined} />

@@ -7,7 +7,7 @@ import { gameIdentity } from './game-v2-auth'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { DemTTL } from './dem-chung'
 import { nguCanhHoiTroLy } from './loi-giai'
-import { ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
+import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown): string => (typeof v === 'string' ? v : v == null ? '' : String(v))
@@ -24,7 +24,11 @@ export interface CauHinhHoiThem {
   thinkingBudget: number | null
   nhietDo: number
 }
-export const MAC_DINH_HOI_THEM: CauHinhHoiThem = { bat: true, lop: [], sbd: [], model: 'gemini-2.5-flash', tranNgay: 20, tranCau: 6, thinkingBudget: 1024, nhietDo: 0.3 }
+// 13/10: Google báo 404 "gemini-2.5-flash is no longer available to new users … use models/gemini-3.8-flash" (sổ hoi_tro_ly, lượt đầu tiên thật);
+// thầy chọn Gemini 3.5 Flash Lite.
+export const MAC_DINH_HOI_THEM: CauHinhHoiThem = { bat: true, lop: [], sbd: [], model: 'gemini-3.5-flash-lite', tranNgay: 20, tranCau: 6, thinkingBudget: 1024, nhietDo: 0.3 }
+/** Model báo 404 (sai tên, hoặc Google ngừng cấp cho tài khoản mới) ⇒ thử lần lượt các tên chung luôn trỏ bản mới nhất. */
+export const DS_MODEL_DU_PHONG: readonly string[] = ['gemini-flash-lite-latest', 'gemini-flash-latest']
 
 /** `cau_hinh.hoi_tro_ly` (JSON, mọi khoá tuỳ chọn) ⇒ cấu hình đã chặn biên. Hỏng / vắng ⇒ mặc định. */
 export function giaiCauHinhHoiThem(tho: unknown): CauHinhHoiThem {
@@ -82,7 +86,7 @@ const SQL_BANG = [
 
 // ---------------------------------------------------------------- giọng Thầy (quy tắc viết của Thầy Đỗ Đại Học)
 
-export const CHI_DAN_THAY = `Bạn trả lời học sinh THPT thay cho Thầy Đỗ Đại Học, giáo viên luyện thi Hoá 15 năm, về MỘT câu Hoá em đang xem lời giải. Viết đúng như Thầy nhắn trực tiếp cho em.
+export const CHI_DAN_THAY = `Bạn trả lời học sinh THPT thay cho Thầy Đỗ Đại Học, giáo viên luyện thi Hoá 15 năm, về MỘT câu Hoá em đang làm hoặc đang xem lời giải. Viết đúng như Thầy nhắn trực tiếp cho em.
 
 XƯNG HÔ
 - Tự xưng "Thầy", gọi học sinh là "em". Không dùng "tôi", "mình", "trợ lý", "AI".
@@ -99,6 +103,8 @@ CÁCH THẦY TRẢ LỜI
 - Câu đầu vào thẳng chỗ em hỏi. Không chào, không khen, không chúc, không câu kết tóm tắt, không hỏi lại "em có muốn".
 - Chỉ ra đúng chỗ em vướng: bước nào, vì sao, sửa thế nào. Nêu lỗi bằng việc em làm ("em ghép nhầm gốc ethyl vào muối"), không bằng tính cách ("em cẩu thả").
 - Biết em chọn phương án nào thì nói thẳng phương án đó sai ở đâu, dựa vào lý do từng phương án trong lời giải.
+- DỮ LIỆU ghi EM ĐANG LÀM (chưa nộp): KHÔNG nêu đáp án, phương án đúng, đúng/sai của từng ý hay kết quả số cuối, kể cả khi em đòi. Chỉ gợi kiến thức cần dùng và bước đầu để em tự làm. Em đòi đáp án thì nhắn em làm xong, nộp rồi xem lời giải từng bước.
+- Em chưa có kết quả câu này nhưng không ghi ĐANG LÀM: gợi hướng trước; em hỏi thẳng đáp án thì nêu kèm cách ra đáp án.
 - Có tính toán thì viết từng dòng ngắn: phương trình hoặc công thức, thay số, kết quả kèm đơn vị.
 - Em còn sai hoặc còn vướng thì kết thúc bằng một việc cụ thể em làm ngay. Không thêm câu nào sau việc đó.
 - Mỗi câu tối đa 30 chữ, mỗi đoạn tối đa 4 câu, cả trả lời tối đa 180 chữ.
@@ -170,7 +176,7 @@ export function dapAnDeDoc(phan: string, dapAn: string, y: Record<string, string
   return da
 }
 
-export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: string }[], cauHoi: string, em: { ketQuaGanNhat: 'dung' | 'sai' | 'chua_lam'; dapAnEm: string }): NoiDungGemini {
+export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: string }[], cauHoi: string, em: { ketQuaGanNhat: 'dung' | 'sai' | 'chua_lam'; dapAnEm: string; dangLam?: boolean }): NoiDungGemini {
   const c = nc.cau
   const anh: PhanGemini[] = []
   const dong: string[] = []
@@ -195,6 +201,7 @@ export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: st
   if (boTro) dong.push(`HỌC LIỆU BỔ TRỢ (các bước, câu kiểm kèm đáp án): ${boTro}`)
   const hocLieu = jsonGon(nc.hocLieu, anh, 20_000)
   if (hocLieu) dong.push(`HỌC LIỆU CHỮA CÂU SAI (bước, gợi ý theo mức, lỗi thường gặp): ${hocLieu}`)
+  if (em.dangLam) dong.push('EM ĐANG LÀM CÂU NÀY, CHƯA NỘP: chỉ gợi hướng; không nêu đáp án, phương án đúng, đúng/sai từng ý hay kết quả cuối.')
   dong.push(`EM: lần gần nhất em làm câu này ${em.ketQuaGanNhat === 'dung' ? 'ĐÚNG' : em.ketQuaGanNhat === 'sai' ? 'SAI' : 'chưa có kết quả'}${em.dapAnEm ? `; em chọn/ghi: ${em.dapAnEm}` : ''}.`)
   const contents: NoiDungGemini['contents'] = [
     { role: 'user', parts: [{ text: dong.join('\n\n') }, ...anh] },
@@ -209,30 +216,43 @@ export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: st
 
 // ---------------------------------------------------------------- gọi Gemini
 
-export type KetQuaAi = { ok: true; chu: string; vao: number; ra: number } | { ok: false; ma: 'qua_tai' | 'cham' | 'rong' | 'loi_ai' | 'mang'; chiTiet: string }
+export type KetQuaAi = { ok: true; chu: string; vao: number; ra: number; model?: string } | { ok: false; ma: 'qua_tai' | 'cham' | 'rong' | 'loi_ai' | 'mang'; chiTiet: string; http?: number }
 export type GoiAi = (key: string, cfg: CauHinhHoiThem, noiDung: NoiDungGemini) => Promise<KetQuaAi>
 
 export const goiGemini: GoiAi = async (key, cfg, noiDung) => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(cfg.model)}:generateContent`
+  const ds = [cfg.model, ...DS_MODEL_DU_PHONG.filter((m) => m !== cfg.model)]
+  const vet: string[] = []
+  let kq: KetQuaAi = { ok: false, ma: 'loi_ai', chiTiet: 'chưa gọi' }
+  for (const model of ds) {
+    kq = await goiMotModel(key, cfg, model, noiDung)
+    if (kq.ok || kq.http !== 404) return kq
+    console.error('[hoi-tro-ly] model', model, 'báo 404 — thử tên kế')
+    vet.push(`${model}: ${kq.chiTiet}`)
+  }
+  return kq.ok ? kq : { ...kq, chiTiet: vet.join(' | ').slice(0, 280) }
+}
+
+async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiDung: NoiDungGemini): Promise<KetQuaAi> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`
   const gen: Obj = {
     temperature: cfg.nhietDo, maxOutputTokens: 2048 + (cfg.thinkingBudget ?? 0),
     // CHỐT CỨNG phạm vi (thầy 13/10): mô hình phải tự khai câu hỏi có thuộc câu đang xem không; máy chủ quyết theo cờ này, không theo lời văn.
     responseMimeType: 'application/json',
     responseSchema: { type: 'OBJECT', properties: { lienQuan: { type: 'BOOLEAN' }, traLoi: { type: 'STRING' } }, required: ['lienQuan', 'traLoi'], propertyOrdering: ['lienQuan', 'traLoi'] },
   }
-  if (cfg.thinkingBudget !== null && /2\.5/.test(cfg.model)) gen.thinkingConfig = { thinkingBudget: cfg.thinkingBudget }
+  if (cfg.thinkingBudget !== null && /2\.5/.test(model)) gen.thinkingConfig = { thinkingBudget: cfg.thinkingBudget }
   const ac = new AbortController()
   const hen = setTimeout(() => ac.abort(), 30_000)
   try {
     const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify({ ...noiDung, generationConfig: gen }), signal: ac.signal })
     const j = (await r.json().catch(() => null)) as Obj | null
-    if (!r.ok) return { ok: false, ma: r.status === 429 || r.status === 503 ? 'qua_tai' : 'loi_ai', chiTiet: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 200)}` }
+    if (!r.ok) return { ok: false, ma: r.status === 429 || r.status === 503 ? 'qua_tai' : 'loi_ai', http: r.status, chiTiet: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 200)}` }
     const ung = (j?.candidates as Obj[] | undefined)?.[0]
     const phan = (((ung?.content as Obj | undefined)?.parts as Obj[] | undefined) ?? [])
     const chu = phan.filter((p) => p.thought !== true).map((p) => str(p.text)).join('').trim()
     const u = (j?.usageMetadata ?? {}) as Obj
     if (!chu) return { ok: false, ma: 'rong', chiTiet: `finishReason=${str(ung?.finishReason)} block=${str((j?.promptFeedback as Obj | undefined)?.blockReason)}` }
-    return { ok: true, chu, vao: Number(u.promptTokenCount) || 0, ra: (Number(u.candidatesTokenCount) || 0) + (Number(u.thoughtsTokenCount) || 0) }
+    return { ok: true, chu, model, vao: Number(u.promptTokenCount) || 0, ra: (Number(u.candidatesTokenCount) || 0) + (Number(u.thoughtsTokenCount) || 0) }
   } catch (e) {
     return { ok: false, ma: ac.signal.aborted ? 'cham' : 'mang', chiTiet: e instanceof Error ? e.message.slice(0, 200) : 'lỗi' }
   } finally {
@@ -277,7 +297,35 @@ const LOI_CHO_EM: Record<string, string> = {
 
 // ---------------------------------------------------------------- lệnh /hs/hoi-tro-ly
 
-export interface PhuThuocHoiThem { nguCanh?: (env: Env, sbd: string, qid: string, nowMs: number) => Promise<{ ok: false; khoa?: string; error: string } | ({ ok: true } & NguCanhCau)>; goiAi?: GoiAi; nowMs?: number }
+export interface PhuThuocHoiThem { nguCanh?: (env: Env, sbd: string, qid: string, nowMs: number, dangLam: boolean) => Promise<{ ok: false; khoa?: string; error: string } | ({ ok: true } & NguCanhCau)>; goiAi?: GoiAi; nowMs?: number }
+
+/** Em ĐANG LÀM (chưa nộp): bỏ mọi câu (dòng / câu văn) lộ đáp án — phương án đúng, chữ của phương án đúng, đúng/sai từng ý, đáp số
+ *  phần III. Bỏ hết ⇒ câu cố định nhắc em làm xong rồi xem lời giải. Chỉ dẫn đã dặn mô hình không nêu; đây là chốt chặn thứ hai. */
+export const CAU_CHUA_NOP = 'Lúc em đang làm, Thầy chỉ gợi hướng, chưa nói đáp án. Em làm xong, nộp bài rồi bấm Lời giải từng bước để đối chiếu nhé.'
+export function chanLoDapAn(traLoi: string, phan: string, dapAn: string, pa: Record<string, string> | null): string {
+  const da = str(dapAn).trim()
+  const boDau = (t: string) => t.toLowerCase().replace(/\s+/g, ' ')
+  const lo: ((cau: string) => boolean)[] = [
+    (c) => /(đáp án|đáp số|chọn|khoanh|phương án đúng|câu đúng)[^.\n]{0,24}(?<![\p{L}\d])[A-D](?![\p{L}\d])/iu.test(c),
+    (c) => /(?<![\p{L}\d])[A-D](?![\p{L}\d])\s*(\.|:)?\s*(là\s*)?(đúng|là đáp án)/u.test(c),
+  ]
+  if (phan === 'I' && pa) {
+    const k = Object.keys(pa)
+    const i = 'ABCD'.indexOf(da.toUpperCase())
+    const chuDung = boDau(String(pa[da.toUpperCase()] ?? (i >= 0 ? pa[k[i] ?? ''] : '') ?? '').replace(/<[^>]+>/g, '')).trim()
+    if (chuDung.length >= 3) lo.push((c) => boDau(c).includes(chuDung))
+  }
+  if (phan === 'II') {
+    lo.push((c) => /(ý|mệnh đề|phát biểu)\s*\(?[a-d]\)?[^.\n]{0,24}(đúng|sai)/iu.test(c), (c) => /(?<![\p{L}\d])[a-d]\)\s*(là\s*)?(đúng|sai)/iu.test(c))
+  }
+  if (phan === 'III' && /\d/.test(da)) {
+    const so = da.replace(/\s+/g, '').replace(/[\\^$*+?()[\]{}|/]/g, '\\$&').replace(/[.,]/g, '[.,]')
+    const re = new RegExp(`(?<![\\p{L}\\d.,])${so}(?![.,]?\\d)`, 'u')
+    lo.push((c) => re.test(c))
+  }
+  const giu = traLoi.split('\n').map((d) => d.split(/(?<=[.!?])\s+/).filter((c) => !lo.some((f) => f(c))).join(' ').trim()).filter(Boolean)
+  return giu.length ? giu.join('\n') : CAU_CHUA_NOP
+}
 
 export async function hsHoiTroLy(env: Env, b: Obj): Promise<Obj> {
   const sbd = await gameIdentity(env, b)
@@ -292,7 +340,9 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const cauHoi = str(b.cauHoi).replace(/\s+/g, ' ').trim().slice(0, 500)
   if (cauHoi.length < 2) return { ok: false, ma: 'trong', error: 'Em nhắn chỗ em thắc mắc trước nhé.' }
   await chayDdlMotLan(env, 'hoi_tro_ly_v1', SQL_BANG)
-  const nc = await (phu.nguCanh ?? (nguCanhHoiTroLy as NonNullable<PhuThuocHoiThem['nguCanh']>))(env, sbd, str(b.qid), nowMs)
+  // Em đang làm câu (chưa nộp, máy em gửi `dangLam`) ⇒ Thầy chỉ gợi hướng; máy chủ lọc thêm câu lộ đáp án (chanLoDapAn).
+  const dangLam = b.dangLam === true
+  const nc = await (phu.nguCanh ?? (nguCanhHoiTroLy as NonNullable<PhuThuocHoiThem['nguCanh']>))(env, sbd, str(b.qid), nowMs, dangLam)
   if (!nc.ok) return { ok: false, ma: nc.khoa ?? 'khong_mo', error: nc.error }
   const ngay = ngayVn(nowMs)
   const dem = await env.DB.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN qid = ? THEN 1 ELSE 0 END), 0) AS c FROM hoi_tro_ly WHERE sbd = ? AND ngay_vn = ? AND loi IS NULL')
@@ -309,7 +359,7 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
     .catch(() => env.DB.prepare('SELECT ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid = ? ORDER BY luc DESC LIMIT 1').bind(sbd, nc.qid).first<Obj>().catch(() => null))
   const ketQuaGanNhat = kq0 && kq0.ket_qua !== null && kq0.ket_qua !== undefined ? (Number(kq0.ket_qua) === 1 ? 'dung' : 'sai') : 'chua_lam'
   const dapAnEm = str(b.dapAnEm).replace(/\s+/g, ' ').trim().slice(0, 40)
-  const noiDung = dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm })
+  const noiDung = dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm, dangLam })
   const bd = Date.now()
   const kq = await (phu.goiAi ?? goiGemini)(key, cfg, noiDung)
   const ms = Date.now() - bd
@@ -321,11 +371,21 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
     return { ok: false, ma: kq.ma, conLai: cfg.tranNgay - n, error: LOI_CHO_EM[kq.ma] ?? LOI_CHO_EM.loi_ai }
   }
   const tach = tachKetQua(kq.chu)
-  const traLoiAi = lamSachTraLoi(tach.traLoi)
+  const traLoiAi = dangLam ? chanLoDapAn(lamSachTraLoi(tach.traLoi), nc.cau.phan, nc.cau.dapAn, nc.cau.pa) : lamSachTraLoi(tach.traLoi)
   // Ngoài phạm vi (cờ của mô hình) hoặc trả lời rỗng ⇒ câu cố định do MÁY CHỦ viết; lượt vẫn tính vào trần ngày.
   const ngoai = !tach.lienQuan || !traLoiAi
   const traLoi = ngoai ? CAU_NGOAI_PHAM_VI : traLoiAi
   await env.DB.prepare('INSERT INTO hoi_tro_ly (sbd, qid, ngay_vn, luc, nguon, cau_hoi, tra_loi, lien_quan, model, token_vao, token_ra, ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
-    .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, traLoi, ngoai ? 0 : 1, cfg.model, kq.vao, kq.ra, ms).run()
+    .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, traLoi, ngoai ? 0 : 1, kq.model ?? cfg.model, kq.vao, kq.ra, ms).run()
+  // ÔN LẠI, em đang làm mà Thầy đã gợi hướng ⇒ như bấm Hỏi thầy trước khi nộp (loi-giai.ts hsHoiThay): lần làm hôm nay là "có trợ giúp",
+  // không EXP, câu quay lại lịch ôn. Đã nộp rồi thì khoá trùng ⇒ không đổi gì.
+  if (dangLam && !ngoai && nguon === 'on_lai') {
+    await ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngay}`, sbd, qid: nc.qid, lan: 1, ketQua: 0, luc, assistance: 'assisted', purpose: MUC_DICH_XEM_LOI_GIAI }]).catch(() => null)
+  }
+  // Thầy đã gợi hướng câu em đang làm ⇒ ghi `loi_giai_hoi` như một lần được chữa: kiểm tra cá nhân (kiem-tra-ca-nhan.ts) vẫn chặn vào chặng
+  // có câu này trong 12 giờ ("kiểm chứng độc lập"), sổ chất lượng sửa lỗi biết câu có trợ giúp. Chỉ thêm dòng, không đổi điểm.
+  if (dangLam && !ngoai) {
+    await env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,0)').bind(sbd, nc.qid, `${nguon}:goi_y`.slice(0, 40), luc).run().catch(() => null)
+  }
   return { ok: true, traLoi, ngoaiPhamVi: ngoai, conLai: Math.max(0, cfg.tranNgay - n - 1) }
 }

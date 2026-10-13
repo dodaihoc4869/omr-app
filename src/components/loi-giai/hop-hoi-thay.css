@@ -1,0 +1,49 @@
+/* HỘP HỎI THẦY (HopHoiThay.tsx + HoiThemThay trong hộp) — tách khỏi loi-giai.css (luật tốc độ thầy 13/10): chỉ tải cùng mảnh hộp thoại,
+   khi em bấm Hỏi thầy. Nạp SAU loi-giai.css (mảnh lười) ⇒ `.lg-ht--hop` đè đúng `.lg-ht`. Chỉ biến M3 có sẵn. */
+.lg-hh-nen {
+  position: fixed; inset: 0; z-index: 2147483300; display: grid; place-items: center; padding: 16px; box-sizing: border-box;
+  background: color-mix(in srgb, var(--m3-on-surface) 42%, transparent); animation: lg-hh-mo-nen .2s ease-out both;
+}
+.lg-hh {
+  width: min(560px, 100%); max-height: min(88dvh, 780px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;
+  background: var(--m3-surface); color: var(--m3-on-surface); border-radius: 28px;
+  box-shadow: 0 28px 64px color-mix(in srgb, var(--m3-on-surface) 26%, transparent), 0 2px 8px color-mix(in srgb, var(--m3-on-surface) 12%, transparent);
+  animation: lg-hh-nay .32s cubic-bezier(.2, .9, .25, 1.15) both; transform-origin: 50% 85%;
+}
+.lg-hh-dau { flex: none; display: flex; align-items: center; gap: 12px; padding: 16px 12px 12px 18px; }
+.lg-hh-hinh { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--m3-primary-container); color: var(--m3-on-primary-container); }
+.lg-hh-ten { flex: 1; min-width: 0; }
+.lg-hh-tieu-de { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.25; }
+.lg-hh-phu { margin: 2px 0 0; font-size: 13px; color: var(--m3-on-surface-variant); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lg-hh-dong {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer;
+  background: var(--m3-surface-container-high); color: var(--m3-on-surface);
+}
+.lg-hh-de { flex: none; margin: 0 16px; border-radius: 18px; background: var(--m3-surface-container-low); border: 1px solid var(--m3-outline-variant, transparent); }
+.lg-hh-de > summary {
+  list-style: none; cursor: pointer; min-height: 44px; box-sizing: border-box; padding: 10px 14px; border-radius: 18px;
+  display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; color: var(--m3-primary);
+}
+.lg-hh-de > summary::-webkit-details-marker { display: none; }
+.lg-hh-de > summary::after { content: ''; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .16s ease; }
+.lg-hh-de[open] > summary::after { transform: rotate(-135deg) translateY(-2px); }
+.lg-hh-de-than { max-height: 26dvh; overflow: auto; overscroll-behavior: contain; padding: 0 14px 12px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.6; }
+.lg-hh-sang-giai { align-self: flex-start; margin: 10px 16px 0; min-height: 44px; }
+.lg-hh-goi { margin: 10px 16px 0; padding: 8px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.45; background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
+.lg-ht--hop { flex: 1; min-height: 0; max-height: none; border-top: 0; background: transparent; padding: 12px 16px 16px; }
+.lg-ht--hop .lg-ht-thay { background: var(--m3-surface-container-low); }
+.lg-ht-cham { display: inline-flex; gap: 3px; margin-left: 6px; vertical-align: middle; }
+.lg-ht-cham i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: lg-ht-cham 1s ease-in-out infinite; }
+.lg-ht-cham i:nth-child(2) { animation-delay: .15s; }
+.lg-ht-cham i:nth-child(3) { animation-delay: .3s; }
+@keyframes lg-hh-mo-nen { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lg-hh-nay { from { opacity: 0; transform: translateY(18px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes lg-ht-cham { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+@media (max-width: 520px) {
+  .lg-hh-nen { align-items: end; padding: 8px; }
+  .lg-hh { max-height: 92dvh; border-radius: 28px; transform-origin: 50% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lg-hh-nen, .lg-hh, .lg-ht-cham i { animation: none; }
+  .lg-hh-de > summary::after { transition: none; }
+}

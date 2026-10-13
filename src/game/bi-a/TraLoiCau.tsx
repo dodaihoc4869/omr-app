@@ -109,7 +109,7 @@ export default function TraLoiCau({ token, onVe }: TraLoiCauProps) {
             {cau.nhanNo && <p className="bia-nhan-no" data-khoi="nhan-no">{cau.nhanNo}</p>}
             <div className="dao2 bia-dao2">
               {!phanHoi
-                ? <TheCauAi cau={cau} stt={viTri + 1} traLoi={traLoi} khoa={dang} onTraLoi={setTraLoi} />
+                ? <TheCauAi cau={cau} stt={viTri + 1} traLoi={traLoi} khoa={dang} onTraLoi={setTraLoi} hoi={{ nguon: 'bi_a', onHoi: () => setTroGiup(true) }} />
                 : <KhoiLoiGiai nguon="bi_a" cau={cau} stt={viTri + 1} phanHoi={phanHoiChoLoiGiai(phanHoi)} traLoiMay={traLoi} />}
             </div>
             {!phanHoi && troGiup && <small className="bia-chu-nho">Có trợ giúp · câu này không tính EXP và sẽ quay lại để em tự làm.</small>}
