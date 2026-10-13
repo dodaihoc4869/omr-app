@@ -36,3 +36,5 @@ in1('phamViLop12', await doc(`SELECT lop,COUNT(*) bai,SUM(ma_de_json LIKE '%DH-1
 in1('hoiThemLoi', await doc(`SELECT luc,model,ms,substr(loi,1,260) loi FROM hoi_tro_ly WHERE loi IS NOT NULL ORDER BY id DESC LIMIT 8`))
 in1('hoiThemDem', await doc(`SELECT ngay_vn,COUNT(*) n,SUM(loi IS NULL) ok,SUM(loi IS NOT NULL) loi FROM hoi_tro_ly GROUP BY 1 ORDER BY 1 DESC LIMIT 3`))
 in1('hoiThemCauHinh', await doc(`SELECT gia_tri,cap_nhat_luc FROM cau_hinh WHERE khoa LIKE '%hoi_them%' OR khoa LIKE '%hoi_tro_ly%'`))
+// 18:30: mô hình nào đã trả lời được (PR271 đổi mặc định sang gemini-3.5-flash-lite; Claude đặt cau_hinh gemini-3.8-flash lúc 18:21).
+in1('hoiThemGanNhat', await doc(`SELECT luc,model,ms,loi IS NULL ok,token_ra,substr(COALESCE(loi,''),1,120) loi FROM hoi_tro_ly ORDER BY id DESC LIMIT 10`))
