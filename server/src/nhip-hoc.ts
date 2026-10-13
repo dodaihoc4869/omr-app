@@ -23,6 +23,7 @@ import { docCauKho } from './omni-d1'
 import { tomTatNhip } from './nhip-hoc-luat'
 import { tinCayNhomNhip } from './thai-do-tin-cay'
 import { bacChamChi } from './bac-cham-chi'
+import { dbGoc } from './cau-hinh-dem'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -156,7 +157,8 @@ export function doiPhoCuaEm(giay: DemGiayEm | null, lap: DemLapEm | null): DoiPh
 
 // ------------------------------------------------------------------ CỜ ĐỐI PHÓ (đọc D1 theo lô)
 
-/** Số giây của lượt: cột `giay` (> 0) ⇒ `raw_json.ms` (> 0, đổi giây) — đúng thứ tự `giayDoCuaLuot`; câu gốc = `raw_json.tc` hoặc mã câu. */
+/** Số giây của lượt: cột `giay` (> 0) ⇒ `raw_json.ms` (> 0, đổi giây) — đúng thứ tự `giayDoCuaLuot`; câu gốc = `raw_json.tc` hoặc mã câu.
+ * Đợt 21: `l` MATERIALIZED — ba nhánh UNION ALL dùng chung MỘT lượt quét sổ + bóc JSON (trước: quét lại 3 lần; đo SQLite 145 → 67 ms/lô, cùng kết quả). */
 export const SQL_GIAY_LO = `WITH r AS (
     SELECT sbd, qid, ket_qua AS kq, CAST(giay AS REAL) AS gc,
       CASE WHEN json_valid(raw_json) THEN CAST(json_extract(raw_json, '$.ms') AS REAL) END AS ms,
@@ -164,7 +166,7 @@ export const SQL_GIAY_LO = `WITH r AS (
     FROM su_kien_hoc
     WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility, '') <> 'embargoed'
   ),
-  l AS (
+  l AS MATERIALIZED (
     SELECT sbd, COALESCE(NULLIF(tc, ''), qid) AS q, kq,
       CASE WHEN gc > 0 THEN MAX(1, ROUND(gc)) WHEN ms > 0 THEN MAX(1, ROUND(ms / 1000.0)) END AS g
     FROM r
@@ -192,7 +194,19 @@ export const SQL_LAP_LO = `WITH t AS (
 
 const laPhanBa = (goc: string, phanKho: string | undefined): boolean => (phanKho || /-(III|II|I)-\d+$/.exec(goc)?.[1] || '') === 'III'
 
-async function docDoiPho(
+/** Đợt 21: kết quả "đối phó" (14 ngày, cả trường) đổi chậm ⇒ nhớ 5 phút theo isolate (khoá D1 gốc + khoảng ngày + danh sách em). Đọc lỗi ⇒ không nhớ. */
+const demDoiPho = new WeakMap<object, Map<string, { luc: number; kq: Awaited<ReturnType<typeof docDoiPhoTho>> }>>()
+async function docDoiPho(env: Env, em: readonly EmGoc[], tu: string, den: string, canhBao: string[], nowMs = Date.now()): Promise<Awaited<ReturnType<typeof docDoiPhoTho>>> {
+  const goc = dbGoc(env.DB as unknown as object)
+  const m = demDoiPho.get(goc) ?? demDoiPho.set(goc, new Map()).get(goc)!
+  const khoa = `${tu}|${den}|${em.map((e) => e.sbd).join(',')}`
+  const cu = m.get(khoa)
+  if (cu && nowMs - cu.luc < 300_000 && nowMs >= cu.luc) return cu.kq
+  const kq = await docDoiPhoTho(env, em, tu, den, canhBao)
+  if (kq.daTinh.quaNhanh && kq.daTinh.chonLap) { if (m.size > 8) m.clear(); m.set(khoa, { luc: nowMs, kq }) }
+  return kq
+}
+async function docDoiPhoTho(
   env: Env,
   em: readonly EmGoc[],
   tu: string,
@@ -269,7 +283,7 @@ export async function gvNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<T
   let vao: Map<string, string>
   let dp: Awaited<ReturnType<typeof docDoiPho>>
   try {
-    ;[ngayEm, vao, dp] = await Promise.all([docNgayCacEm(env, tatCa, tu, den, homNay, canhBao), docNgayVao(env, tatCa, tu), docDoiPho(env, tatCa, tu, den, canhBao)])
+    ;[ngayEm, vao, dp] = await Promise.all([docNgayCacEm(env, tatCa, tu, den, homNay, canhBao), docNgayVao(env, tatCa, tu), docDoiPho(env, tatCa, tu, den, canhBao, nowMs)])
   } catch (e) {
     return { ok: false, error: e instanceof LoiDocSo ? e.message : 'Không đọc được sổ học của các em.' }
   }

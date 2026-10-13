@@ -51,14 +51,16 @@ const SQL_CANH_LOP=`SELECT tu,den,SUM(n_co) nCo,SUM(dung_co) dungCo,SUM(n_chua) 
 /**
  * CẠNH TIÊN QUYẾT CẢ LỚP. Giờ cao điểm 20:00–23:59 VN (khẩn 12/10 23h — số đo D1 thật: câu tổng hợp này ~9.700 lần/ngày × 26 ms, ~9.400 dòng/lần): số
  * liệu cả lớp đổi chậm ⇒ nhớ 10 phút theo isolate (khoá D1 gốc), THEO TỪNG kỹ năng đích `den` — GROUP BY (tu, den) nên dòng của mỗi `den` độc lập; em sau
- * chỉ đọc kỹ năng còn thiếu. Trả theo thứ tự (tu, den) như GROUP BY. Ngoài giờ cao điểm: đọc thẳng như cũ.
+ * chỉ đọc kỹ năng còn thiếu. Trả theo thứ tự (tu, den) như GROUP BY.
+ * ĐỢT 21 (thầy 13/10 "tối ưu máy chủ chuyên sâu"; số đo D1 3 giờ trưa: 512 lần × 17 ms, ~9.700 dòng/lần ngoài cao điểm): nhớ CẢ NGÀY — ngoài cao điểm
+ * 3 phút (số liệu 7 ngày cả lớp, lệch tối đa 3 phút không đổi thứ tự ưu tiên bài), cao điểm 10 phút như cũ.
  */
 const demCanh=new WeakMap<object,{luc:number;moc:number;theoDen:Map<string,CanhHoc[]>}>()
 async function docCanhLop(env:Env,targets:readonly string[],now:number):Promise<CanhHoc[]>{
-  if(new Date(now+7*3_600_000).getUTCHours()<20)return (await env.DB.prepare(SQL_CANH_LOP).bind(JSON.stringify(targets),now-7*86400000).all<CanhHoc>()).results??[]
+  const han=new Date(now+7*3_600_000).getUTCHours()>=20?600_000:180_000
   const goc=dbGoc(env.DB as unknown as object)
   let d=demCanh.get(goc)
-  if(!d||now-d.luc>=600_000||now<d.luc){d={luc:now,moc:now-7*86400000,theoDen:new Map()};demCanh.set(goc,d)}
+  if(!d||now-d.luc>=han||now<d.luc){d={luc:now,moc:now-7*86400000,theoDen:new Map()};demCanh.set(goc,d)}
   const dem=d,ds=[...new Set(targets)],thieu=ds.filter(t=>!dem.theoDen.has(t)),moi=new Map<string,CanhHoc[]>(thieu.map(t=>[t,[]]))
   if(thieu.length){
     for(const x of (await env.DB.prepare(SQL_CANH_LOP).bind(JSON.stringify(thieu),dem.moc).all<CanhHoc>()).results??[])moi.get(String(x.den))?.push(x)

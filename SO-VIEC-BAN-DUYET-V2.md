@@ -382,3 +382,4 @@ Thầy nhắn thêm (13/10, giữa lúc dựng đợt 20): "khi mọi thứ xong
 - [x] Dựng thẻ Kiểm tra ôn tập 5 trạng thái + màn làm bài theo bản vẽ | bằng chứng: 9aa10496; tests/kiem-tra-on-tap-dot20-1310 9/9, kiem-tra-ca-nhan-1310 23/23; ảnh Chromium docs/anh-dot20 16 khung (0 lỗi trang · 0 tràn · 0 đích < 44 px); tsc app+server sạch; kiem:toc-do 0 đỏ (HS 341567 → 341333 B, hạ mốc); SW 13/13 (169 tệp); kiem:mau-giu 0; soi:giao-dien 0 LỖI
 - [x] Toàn bộ vitest so tên với main (đã gộp PR262): 2 tên mới đỏ đều chập chờn, không thuộc phần đổi — ph-v3-app-2809 đỏ cả trên main (1/4 lượt), escort-context-menu xanh 4/4 khi chạy lại
 - [!] Test chập chờn có sẵn: tests/ph-v3-app-2809 "BA mục điều hướng…" (đỏ ngẫu nhiên ~1/4 cả trên main) — sửa gốc trong đợt tối ưu sau
+- [x] Phát hành đợt 20 | bằng chứng: PR264 → main da132cbd, Actions 38360819715 SUCCESS 14:17 VN. Lùi: git revert da132cbd && git push origin main
