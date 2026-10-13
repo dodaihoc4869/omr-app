@@ -86,7 +86,7 @@ describe('Trải nghiệm sửa từng bước', () => {
     expect((input as HTMLInputElement).disabled).toBe(true)
     expect(api.apiPhatItem).toHaveBeenCalledTimes(1)
     fireEvent.click(
-      screen.getByRole('button', { name: 'Em sẵn sàng · Tiếp tục' }),
+      screen.getByRole('button', { name: 'Tiếp tục' }), // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18): nút gọn
     )
     await waitFor(() => expect(api.apiPhatItem).toHaveBeenCalledTimes(2))
   })

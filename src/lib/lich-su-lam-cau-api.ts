@@ -51,6 +51,9 @@ function docCauSai(x: unknown): CauEmSai | null {
     lanCuoiDung: o.lanCuoiDung === true,
     lanCuoi: chu(o.lanCuoi),
     giaySai: Array.isArray(o.giaySai) ? o.giaySai.map((g) => (so(g) !== null && (g as number) > 0 ? Math.round(g as number) : null)) : [],
+    // Đợt 18 (13/10): GIỮ khoá mở Tự sửa lỗi của bản học sinh ("g<số>" — server/src/ho-so-em-hs-loc.ts). Trước đây hàm đọc bỏ trường này ⇒ hộp
+    // "Chưa sửa được" gửi khoá "c<số>" và màn Tự sửa lỗi không khớp được câu. Bản thầy không có trường ⇒ không đổi.
+    ...(typeof o.moChua === 'string' && /^g\d+$/.test(o.moChua) ? { moChua: o.moChua } : {}),
   }
 }
 

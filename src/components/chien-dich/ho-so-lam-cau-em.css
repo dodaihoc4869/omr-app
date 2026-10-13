@@ -180,3 +180,18 @@
 @media (prefers-reduced-motion: reduce) {
   .hslc-o-nut { transition: none; }
 }
+
+/* ---------- ĐỢT 18 (13/10 — thầy: "Làm nổi bật phần tự sửa lỗi lên và mời gọi thân thiện"): CHỈ chế độ học sinh ----------
+ * Dòng mời đầu nhóm "Chưa sửa được" ("N câu đang chờ em tự sửa") + nút "Sửa câu này" thành viên thuốc trên hộp câu có trong Tự sửa lỗi.
+ * MÀU: cặp --gvm-xd-nen / --gvm-xd-dam sẵn có (cùng sắc nhấn "xanh dương" của chữ "Sửa câu này" cũ), sáng và tối theo máy — tương phản chữ:
+ * chữ --gvm-xd-dam trên nền --gvm-xd-nen ≈ 10,0:1 (sáng) · ≈ 9,8:1 (tối). Không màu thô, không đổi khai báo cũ. */
+.hslc-cs-moi {
+  display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 14px; border-radius: var(--r-nho, 12px);
+  background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); font-size: 15px; line-height: 1.4;
+}
+.hslc-cs-moi svg { flex: none; }
+.hslc-cs-moi b { font-weight: 800; }
+.hslc-o-nut .hslc-o-mo {
+  min-height: 32px; padding: 0 12px 0 14px; border-radius: var(--r-vien, 999px);
+  background: var(--gvm-xd-nen); color: var(--gvm-xd-dam);
+}

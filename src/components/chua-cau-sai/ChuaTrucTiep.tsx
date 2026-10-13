@@ -9,6 +9,9 @@
 //   3. Đáp án và lời giải — đáp án đúng + lời giải của kho (TheCau xem lại) + Hỏi thầy; CHỈ mở sau bước 2 và CHỈ khi máy chủ cho.
 // Lần tự làm lại so trên máy với đáp án máy chủ đã cho (em đã nộp câu này) — lần tự kiểm: không ghi sổ, không tính điểm.
 // Quyền xem đáp án + luật so: src/lib/chua-truc-tiep.ts (chú thích đầu tệp).
+// ĐỢT 18 (13/10 — thầy: "Tối ưu lại câu từ cho dễ hiểu … Bỏ hết các gợi ý hướng dẫn để học sinh phụ huynh không bị phân tâm"): bỏ dòng nhỏ dưới tên
+// bước, đoạn mở đầu dài của từng trạng thái (giữ tiêu đề), lời dặn "Trong lúc chờ…", "Em bấm Hỏi thầy…", "Em tự làm lại câu này trước…", lời khuyên
+// sau lần sai; giữ mọi trạng thái, số, lời báo lỗi và nút. Nút không còn dấu gạch dài ("Em chưa làm được · xem lời giải").
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import TheCau, { type TheCauProps } from '../TheCau'
 import NutHoiThay from '../loi-giai/NutHoiThay'
@@ -82,8 +85,11 @@ function deTuCauGoc(c: NonNullable<KetQuaDot['cauGoc']>): DeHien | null {
 }
 
 const BUOC = ['Xem lại câu gốc', 'Tự làm lại', 'Đáp án và lời giải'] as const
-/** Đợt 16 (12/10): một dòng nhỏ dưới tên bước (máy tính) nói VÌ SAO có thứ tự này — tự làm lại trước, đối chiếu sau. */
-const GOI_BUOC = ['Đề và lựa chọn cũ của em', 'Trước khi xem đáp án', 'Tìm chỗ em làm khác'] as const
+/** Đợt 18: dưới tiêu đề trạng thái chỉ giữ điều em CẦN BIẾT (không lời dặn cách làm). Trạng thái khác: chỉ tiêu đề. */
+const CHU_MO_DAU: Partial<Record<string, string>> = {
+  can_thay: 'Bước còn mắc đã được xếp vào buổi chữa trên lớp. Em không cần gửi riêng cho thầy.',
+  tam_khoa: 'Tiến độ của em vẫn được giữ.',
+}
 const nhanTra = (phan: Phan) => (phan === 'I' ? 'Em đã chọn' : 'Em đã trả lời')
 
 function IconBuoc({ so, xong }: { so: number; xong: boolean }) {
@@ -172,7 +178,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
 
   // ---- nút đáy của bước hiện tại: MỘT nút chính, tối đa một nút phụ
   const nutVe = <button type="button" className="ccs-nut-phu" onClick={onVe} disabled={ban}>{nhanVe}</button>
-  const nutChuaLamDuoc = <button type="button" className="ccs-nut-phu" onClick={xemLoiGiai}>Em chưa làm được — xem lời giải</button>
+  const nutChuaLamDuoc = <button type="button" className="ccs-nut-phu" onClick={xemLoiGiai}>Em chưa làm được · xem lời giải</button>
   let nutChinh: ReactNode = null
   let nutPhu: ReactNode = nutVe
   if (hen?.daToi) {
@@ -197,7 +203,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
       nutChinh = <button type="button" className="ccs-nut-chinh" onClick={() => doiBuoc(3)}>Xem đáp án và lời giải</button>
     }
   } else if (buoc === 2 && cachLam === 'giay') {
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={xemLoiGiai}>Em đã giải xong — xem lời giải để đối chiếu</button>
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={xemLoiGiai}>Em đã giải xong · xem lời giải</button>
   } else if (buoc === 3 && moLoiGiai && ct) {
     nutChinh = <button type="button" className="ccs-nut-chinh" onClick={onVe} disabled={ban}>{nhanVe}</button>
     nutPhu = cachLam === 'cham' ? <button type="button" className="ccs-nut-phu" onClick={batDauLamLai}>Làm lại lần nữa</button> : null
@@ -231,7 +237,6 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
                   <button type="button" aria-current={so === buoc ? 'step' : undefined} disabled={!duoc(so)} onClick={() => (so === 2 && buoc === 1 ? batDauLamLai() : doiBuoc(so))}>
                     <IconBuoc so={so} xong={xong} />
                     <b>{ten}</b>
-                    <small className="ccs-buoc-goi">{GOI_BUOC[i]}</small>
                   </button>
                 </li>
               )
@@ -243,13 +248,13 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
         {dau}
         <section className="ccs-trang-thai ccs-mo-dau" data-trang-thai={ph.trangThai}>
           <h2>{moDau.tieuDe}</h2>
-          <p>{moDau.chu}</p>
+          {ph.trangThai && CHU_MO_DAU[ph.trangThai] && <p>{CHU_MO_DAU[ph.trangThai]}</p>}
           {ph.trangThai === 'cho_gap_lai_2' && (
             <p className="ccs-hen" role="status">
               {hen ? (
-                hen.daToi ? <>Đã tới lần gặp lại 2 (hẹn <b>{hen.luc}</b>). Em bấm "Làm lần gặp lại 2" để tự làm bản mới.</>
-                  : <>Lần gặp lại 2 mở lúc <b className="ccs-so">{hen.luc}</b> ({hen.conLai}). Trong lúc chờ, em chữa câu khác hoặc tự làm lại câu gốc ở dưới.</>
-              ) : 'Lần gặp lại 2 mở sau ít nhất 24 giờ kể từ lúc em ghép xong bài. Trong lúc chờ, em chữa câu khác.'}
+                hen.daToi ? <>Đã tới lần gặp lại 2 (hẹn <b>{hen.luc}</b>).</>
+                  : <>Lần gặp lại 2 mở lúc <b className="ccs-so">{hen.luc}</b> ({hen.conLai}).</>
+              ) : 'Lần gặp lại 2 mở sau ít nhất 24 giờ kể từ lúc em ghép xong bài.'}
             </p>
           )}
         </section>
@@ -273,10 +278,10 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
               </dl>
             ) : null}
             {cg.trangThai === 'khoa' ? (
-              <p className="ccs-goi-y" role="status">Câu này chưa được mở đáp án, thầy sẽ chữa. Câu đang nằm trong một ca kiểm tra chưa công bố kết quả — đáp án và lời giải mở sau khi thầy công bố.</p>
+              <p className="ccs-goi-y" role="status">Câu này chưa được mở đáp án, thầy sẽ chữa. Đáp án và lời giải mở sau khi thầy công bố ca kiểm tra.</p>
             ) : cg.trangThai === 'khong_co' ? (
               <div className="ccs-goi-y" role="status">
-                <p>{de ? 'Chưa mở được đáp án của câu này ở đây.' : 'Chưa tải được câu gốc ở đây.'} Em bấm Hỏi thầy để xem lời giải câu này (lời giải chỉ mở khi câu không còn nằm trong ca kiểm tra chưa công bố).</p>
+                <p>{de ? 'Chưa mở được đáp án của câu này ở đây.' : 'Chưa tải được câu gốc ở đây.'}</p>
                 <NutHoiThay qid={qid} nguon="tu_chua" />
               </div>
             ) : cg.trangThai === 'loi' ? (
@@ -284,16 +289,14 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
                 <p>{cg.loi}</p>
                 <button type="button" className="ccs-nut-phu" onClick={() => setLanTai((n) => n + 1)}>Thử lại</button>
               </div>
-            ) : (
-              <p className="ccs-ghi-nho">Em tự làm lại câu này trước, rồi mới xem đáp án và lời giải để đối chiếu.</p>
-            )}
+            ) : null}
           </>
         ) : buoc === 2 && de ? (
           cachLam === 'giay' ? (
             <>
               {khungCau(propsCauLam(de, ''), 'ccs-chi-de')}
               <p className="ccs-goi-y" role="status">
-                {ct?.tuLuan ? 'Câu tự luận — không chấm tự động.' : 'Câu trả lời ngắn — em giải ra giấy.'} Em tự giải ra giấy đến kết quả cuối, xong bấm nút dưới để đối chiếu với lời giải.
+                {ct?.tuLuan ? 'Câu tự luận, không chấm tự động: em giải ra giấy rồi đối chiếu lời giải.' : 'Câu trả lời ngắn: em giải ra giấy rồi đối chiếu lời giải.'}
               </p>
             </>
           ) : (
@@ -301,22 +304,14 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
               {khungCau(propsCauLam(de, tra, (v) => setTra(v), ket !== null))}
               {cachLam === 'khong_cham' ? (
                 <div className="ccs-goi-y" role="status">
-                  <p>{cg.trangThai === 'khoa' ? 'Câu này chưa được mở đáp án, thầy sẽ chữa. Em cứ tự làm lại để nhớ cách giải — lần này không chấm.' : 'Chưa mở được đáp án ở đây nên lần làm lại này không chấm. Em bấm Hỏi thầy để xem lời giải.'}</p>
+                  <p>{cg.trangThai === 'khoa' ? 'Câu này chưa được mở đáp án, thầy sẽ chữa. Lần làm lại này không chấm.' : 'Chưa mở được đáp án ở đây nên lần làm lại này không chấm.'}</p>
                   {cg.trangThai !== 'khoa' && <NutHoiThay qid={qid} nguon="tu_chua" />}
                 </div>
               ) : ket !== null ? (
                 <section className="ccs-phan-hoi" data-dung={ket} role="status" aria-live="polite">
                   <h3>{ket ? 'Em đã tự sửa đúng' : lanSai < 2 ? 'Chưa đúng' : 'Vẫn chưa đúng'}</h3>
-                  <p>
-                    {ket
-                      ? 'Em xem lời giải để đối chiếu cách làm của mình. Lần tự làm lại này để em tự kiểm — không tính điểm, không đổi lịch ôn.'
-                      : lanSai < 2
-                        ? 'Em đọc lại đề, soát từng bước rồi thử thêm một lần.'
-                        : 'Không sao — em xem đáp án và lời giải, tìm chỗ mình làm khác.'}
-                  </p>
+                  {ket && <p>Lần tự làm lại này không tính điểm, không đổi lịch ôn.</p>}
                 </section>
-              ) : lanSai > 0 ? (
-                <p className="ccs-ghi-nho">Lần thử thêm — em chọn lại đáp án.</p>
               ) : null}
             </>
           )

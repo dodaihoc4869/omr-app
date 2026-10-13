@@ -54,18 +54,21 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+// SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 18 — thầy: "Mời gọi học sinh tự sửa lỗi … Bỏ hết các gợi ý hướng dẫn"): chữ "chữa" của em ⇒ "sửa" ("Sửa trên câu gốc",
+// "Câu cần sửa", "Bắt đầu sửa", nhóm "Cần sửa"); tiêu đề thẻ tổng là lời mời "Sửa lại câu em làm sai"; bỏ câu "lịch ôn 1 · 3 · 7 ngày" và lời dặn
+// "Em chọn một câu trong danh sách để chữa." (nay khoá: KHÔNG còn). Hành vi, số, thứ tự không đổi.
 describe('Mở thẳng một câu (từ hồ sơ / màn làm câu) ⇒ đúng chỗ tự sửa', () => {
   it('câu có trong danh sách (kể cả bản đổi số "~3") ⇒ mở đúng đợt, đầu màn mang tên câu; Quay lại ⇒ danh sách', async () => {
     api.apiDanhSachTuChua.mockResolvedValue(DS)
     api.apiMoDot.mockResolvedValue({ ok: true, dotId: 'D2', trangThai: 'thieu_hoc_lieu' })
     render(<ManTuChua token="t" qid="Q2~3" onVe={() => {}} />)
-    expect(await screen.findByText('Chữa trực tiếp câu gốc')).toBeTruthy()
+    expect(await screen.findByText('Sửa trên câu gốc')).toBeTruthy()
     expect(api.apiMoDot).toHaveBeenCalledTimes(1)
     expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q2') // mã đợt trong danh sách, không phải mã bản đổi số
     expect(await screen.findByRole('heading', { level: 1, name: 'Chất béo' })).toBeTruthy()
-    expect(screen.queryByRole('heading', { name: 'Câu em cần chữa' })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Sửa lại câu em làm sai' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Quay lại' }))
-    expect(await screen.findByRole('heading', { name: 'Câu em cần chữa' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Sửa lại câu em làm sai' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /Chất béo/ })).toBeTruthy()
     await waitFor(() => expect(api.apiDanhSachTuChua).toHaveBeenCalledTimes(2)) // quay ra ⇒ tải lại trạng thái
   })
@@ -77,10 +80,10 @@ describe('Mở thẳng một câu (từ hồ sơ / màn làm câu) ⇒ đúng ch
     const bao = await screen.findByRole('alert')
     expect(bao.textContent).toContain('Chưa mở được câu em chọn')
     expect(bao.textContent).toContain('Câu này chưa có lỗi đang mở đã công bố.')
-    expect(bao.textContent).toContain('Em chọn một câu trong danh sách để chữa.')
+    expect(bao.textContent).not.toContain('Em chọn một câu trong danh sách')
     expect(api.apiMoDot).toHaveBeenCalledWith('t', 'QX')
     // danh sách vẫn ở đó, không khung lỗi riêng của màn chữa
-    expect(screen.getByRole('heading', { name: 'Câu em cần chữa' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Sửa lại câu em làm sai' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /Thuỷ phân ester/ })).toBeTruthy()
     expect(screen.queryByRole('heading', { name: 'Chưa mở được câu này' })).toBeNull()
     fireEvent.click(within(bao).getByRole('button', { name: 'Thử mở lại' }))
@@ -92,7 +95,7 @@ describe('Mở thẳng một câu (từ hồ sơ / màn làm câu) ⇒ đúng ch
     api.apiDanhSachTuChua.mockResolvedValue(DS)
     api.apiMoDot.mockResolvedValue({ ok: true, dotId: 'D7', trangThai: 'thieu_hoc_lieu' })
     render(<ManTuChua token="t" qid="QX" onVe={() => {}} />)
-    expect(await screen.findByText('Chữa trực tiếp câu gốc')).toBeTruthy()
+    expect(await screen.findByText('Sửa trên câu gốc')).toBeTruthy()
     expect(api.apiMoDot).toHaveBeenCalledWith('t', 'QX')
     expect(await screen.findByRole('heading', { level: 1, name: 'Saccharose' })).toBeTruthy()
   })
@@ -104,11 +107,11 @@ describe('Mở thẳng một câu (từ hồ sơ / màn làm câu) ⇒ đúng ch
     api.apiMoDot.mockResolvedValue({ ok: true, dotId: 'D1', trangThai: 'thieu_hoc_lieu' })
     render(<ManTuChua token="t" qid="Q1" onVe={() => {}} />)
     const loi = await screen.findByRole('alert')
-    expect(loi.textContent).toContain('Chưa mở được câu em chọn vì chưa tải được danh sách câu cần chữa.')
+    expect(loi.textContent).toContain('Chưa mở được câu em chọn vì chưa tải được danh sách câu cần sửa.')
     expect(loi.textContent).toContain('Chưa nối được máy chủ')
     expect(api.apiMoDot).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
-    expect(await screen.findByText('Chữa trực tiếp câu gốc')).toBeTruthy()
+    expect(await screen.findByText('Sửa trên câu gốc')).toBeTruthy()
     expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q1')
   })
 
@@ -137,13 +140,13 @@ describe('Thẻ tổng: số từ máy chủ, có nhãn, một nút chính theo 
     ] })
     api.apiMoDot.mockResolvedValue({ ok: true, dotId: 'D2', trangThai: 'thieu_hoc_lieu' })
     render(<ManTuChua token="t" onVe={() => {}} />)
-    const tong = await screen.findByRole('region', { name: 'Câu em cần chữa' })
-    expect(within(tong).getByText('câu cần chữa').parentElement?.textContent).toBe('3câu cần chữa')
+    const tong = await screen.findByRole('region', { name: 'Sửa lại câu em làm sai' })
+    expect(within(tong).getByText('câu cần sửa').parentElement?.textContent).toBe('3câu cần sửa')
     expect(tong.querySelector('.tcl-tien-do-chu')?.textContent).toBe('Đã tự sửa2/6 câu')
     expect(within(tong).getByRole('img', { name: 'Đã tự sửa 2 trong 6 câu, 1 câu chờ lần gặp lại' })).toBeTruthy()
     expect(within(tong).getByText('Chờ lần gặp lại: 1 câu')).toBeTruthy()
-    expect(within(tong).getByText(/lịch ôn 1 · 3 · 7 ngày/)).toBeTruthy()
-    expect(screen.getByRole('region', { name: 'Cần chữa: 3 câu' })).toBeTruthy()
+    expect(within(tong).queryByText(/lịch ôn 1 · 3 · 7 ngày|Cách tự chữa/)).toBeNull()
+    expect(screen.getByRole('region', { name: 'Cần sửa: 3 câu' })).toBeTruthy()
     expect(screen.getByRole('region', { name: 'Đang chờ lần gặp lại: 1 câu' })).toBeTruthy()
     expect(screen.getByRole('region', { name: 'Đã tự sửa: 2 câu' })).toBeTruthy()
     // đúng MỘT nút chính trên màn; câu đầu tiên theo thứ tự máy chủ
@@ -151,8 +154,8 @@ describe('Thẻ tổng: số từ máy chủ, có nhãn, một nút chính theo 
     expect(screen.getByText(/Câu đầu tiên:/).textContent).toBe('Câu đầu tiên: Chất béo')
     // không mã nội bộ trên màn học sinh
     expect(document.body.textContent ?? '').not.toMatch(/\bQ\d\b|\bD\d\b|thieu_hoc_lieu|cho_gap_lai_2|da_tu_sua|can_thay|qid/)
-    fireEvent.click(screen.getByRole('button', { name: 'Bắt đầu chữa' }))
-    expect(await screen.findByText('Chữa trực tiếp câu gốc')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Bắt đầu sửa' }))
+    expect(await screen.findByText('Sửa trên câu gốc')).toBeTruthy()
     expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q2')
   })
 
@@ -162,10 +165,10 @@ describe('Thẻ tổng: số từ máy chủ, có nhãn, một nút chính theo 
     ] })
     const ve = vi.fn()
     render(<ManTuChua token="t" onVe={ve} />)
-    const tong = await screen.findByRole('region', { name: 'Câu em cần chữa' })
-    expect(within(tong).getByText('câu cần chữa').parentElement?.textContent).toBe('0câu cần chữa')
-    expect(within(tong).getByText(/Lúc này chưa có câu cần chữa ngay/)).toBeTruthy()
-    expect(within(tong).queryByRole('button', { name: 'Bắt đầu chữa' })).toBeNull()
+    const tong = await screen.findByRole('region', { name: 'Sửa lại câu em làm sai' })
+    expect(within(tong).getByText('câu cần sửa').parentElement?.textContent).toBe('0câu cần sửa')
+    expect(within(tong).getByText(/Lúc này chưa có câu cần sửa ngay/)).toBeTruthy()
+    expect(within(tong).queryByRole('button', { name: 'Bắt đầu sửa' })).toBeNull()
     fireEvent.click(within(tong).getByRole('button', { name: 'Về Hôm nay' }))
     expect(ve).toHaveBeenCalled()
   })
@@ -173,7 +176,7 @@ describe('Thẻ tổng: số từ máy chủ, có nhãn, một nút chính theo 
   it('đã tự sửa hết ⇒ mừng mà nói thật: số câu đã tự sửa có nhãn + việc tiếp; danh sách đã sửa vẫn mở lại được', async () => {
     api.apiDanhSachTuChua.mockResolvedValue({ trangThai: 'bat', ds: [{ dotId: 'D5', qid: 'Q1', trangThai: 'da_tu_sua' }] })
     render(<ManTuChua token="t" onVe={() => {}} onTuLuyen={() => {}} />)
-    expect(await screen.findByRole('heading', { name: 'Em không còn câu nào cần chữa' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Em không còn câu nào cần sửa' })).toBeTruthy()
     expect(screen.getByText(/Đã tự sửa:/).textContent).toBe('Đã tự sửa: 1 câu')
     expect(screen.getByRole('region', { name: 'Đã tự sửa: 1 câu' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /Thuỷ phân ester.*Xem lại/ })).toBeTruthy()
