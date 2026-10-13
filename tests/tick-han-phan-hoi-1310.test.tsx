@@ -18,7 +18,8 @@ const bang = (caCu = false) => ({ ok: true, du: { bat: true, goi: GOI, thongKe: 
 const xacNhan = (b: Record<string, unknown>) => ({ ok: true, du: { goiId: b.goiId, han: b.han } })
 const doi = <T,>() => { let tra!: (x: T) => void; const cho = new Promise<T>(r => { tra = r }); return { cho, tra } }
 const sua = async (lop = '12 - Tinh Hoa') => {
-  fireEvent.click(await screen.findByRole('button', { name: `Sửa hạn Bài 8. Amine · ${lop}` }))
+  // Bước Dạy học nạp lười: chờ mảnh thật xong kể cả khi cổng kiểm chạy đồng thời.
+  fireEvent.click(await screen.findByRole('button', { name: `Sửa hạn Bài 8. Amine · ${lop}` }, { timeout: 5000 }))
   const o = screen.getByLabelText(`Hạn mới của Bài 8. Amine · ${lop}`)
   fireEvent.change(o, { target: { value: '2026-10-20' } })
   return o as HTMLInputElement

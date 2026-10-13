@@ -17,6 +17,7 @@
 // buổi (`lopTay`, `chonNho`, `datNho`) ⇒ mở lại màn vẫn còn.
 import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
+import { baoBaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
 import type { TeacherExamSource } from '../../data/examContent'
 import { THAM_SO_OMNI, type CoOmni } from '../../../server/src/omni-kieu'
 import { TI_LE_ON_BAI_CU_TOI_DA, xemOnBaiCu } from '../../../server/src/omni-on-bai-cu'
@@ -417,7 +418,10 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
       showToast([moi.length ? `Đã giao ${ten} cho ${moi.length} lớp: ${moi.join(', ')}` : '', cu.length ? `${cu.join(', ')} đã có ${ten} từ trước — giữ chiến dịch có sẵn` : ''].filter(Boolean).join(' · '), 'success')
     }
     if (loi.length) setLoiGiao(loi.length === 1 && dauVaoLop.length === 1 ? loi[0]!.chu : loi.map((x) => `${x.lop}: ${x.chu}`).join(' · '))
-    if (ok.length) void taiDs()
+    if (ok.length) {
+      baoBaiDangGiaoThayDoi(ok.map(k => ({ lop: k.lop, khoaBai: chon.khoaBai, loai: 'tick' })))
+      void taiDs()
+    }
     if (!loi.length) setChonNho(null)
   }
 
@@ -448,6 +452,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
           : `Đã bỏ tick ${ten}`,
       'success',
     )
+    baoBaiDangGiaoThayDoi([{ lop: lopBo, khoaBai: b.khoaBai, loai: 'bo-tick' }])
     void taiDs()
   }
 
