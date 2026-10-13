@@ -29,8 +29,6 @@ describe('Màn đang dở giữ trang (không tự tải lại vì bản mới)'
   })
 })
 
-describe('Lệnh game có hạn chờ', () => {
-})
 
 function VoManh(): React.ReactElement {
   throw new TypeError('Failed to fetch dynamically imported module: https://x/assets/ManTuLuyen-abc.js')

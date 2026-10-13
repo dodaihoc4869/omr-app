@@ -41,7 +41,22 @@ const BAI = [
 ]
 const sanh = (o: Record<string, unknown> = {}) => (docSanh({ ...SANH, ...o }) as Extract<KetQuaSanh, { sanh: SanhHoa2 }>).sanh
 
-describe('Hôm nay V2 · hàm thuần', () => {
+describe('Hành trình · đọc dữ liệu phòng thủ', () => {
+  it('hanhTrinh.bai đọc phòng thủ: sai kiểu bỏ qua, vung sai kiểu chỉ bỏ vung; vắng ⇒ không có trường', () => {
+    expect(docBaiHanhTrinh(undefined)).toBeNull()
+    expect(docBaiHanhTrinh('x')).toBeNull()
+    expect(docBaiHanhTrinh([])).toBeNull()
+    expect(docBaiHanhTrinh([{ khoa: 'b1', ten: 'Bài 1', tangMo: 5 }, { khoa: '', ten: 'x', tangMo: 1 }, null, { khoa: 'b2', ten: 'Bài 2', tangMo: '2' }])).toBeNull()
+    expect(docBaiHanhTrinh([{ khoa: 'b1', ten: ' Bài 1 ', tangMo: 3, vung: { a: 9, b: 6 } }, { khoa: 'b2', ten: 'Bài 2', tangMo: 1, vung: { a: 'x', b: 4 } }])).toEqual([
+      { khoa: 'b1', ten: 'Bài 1', tangMo: 3, vung: { a: 6, b: 6 } },
+      { khoa: 'b2', ten: 'Bài 2', tangMo: 1 },
+    ])
+    expect(sanh().hanhTrinh!.bai).toBeUndefined()
+    expect(sanh({ hanhTrinh: { ...SANH.hanhTrinh, bai: BAI } }).hanhTrinh!.bai).toEqual([
+      { khoa: 'b1', ten: 'Bài 1 · Ester', tangMo: 2, vung: { a: 5, b: 8 } },
+      { khoa: 'b2', ten: 'Bài 2 · Lipid', tangMo: 1 },
+    ])
+  })
 })
 
 describe('Thần thú V2 · Câu đã làm (bản vẽ tối giản 09/10)', () => {

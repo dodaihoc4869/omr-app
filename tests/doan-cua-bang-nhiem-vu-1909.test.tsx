@@ -59,14 +59,6 @@ describe('adapter: doanMo đọc CHẶT', () => {
   })
 })
 
-describe('thẻ mời trên Bảng nhiệm vụ', () => {
-  afterEach(() => cleanup())
-})
-
-
-
-describe('CSS thẻ Đoàn', () => {
-})
 
 // 10/10: Đoàn là nguồn ôn trong kế hoạch, không còn cửa game ở cổng.
 it('bản nhớ màn Đoàn cũ không mở game trong cổng học tập',async()=>{localStorage.setItem('omr_student_portal_auth',JSON.stringify({sbd:'test',hoTen:'Em thử',token:'test-token'}));sessionStorage.setItem('game-v2:man-dau','doan');render(<StudentPortalScreen/>);expect(await screen.findByRole('button',{name:'Của em'})).toBeTruthy();expect(screen.queryByRole('button',{name:'Lên đường cùng Đoàn Hộ Tống'})).toBeNull();expect(screen.queryByTestId('game')).toBeNull()})

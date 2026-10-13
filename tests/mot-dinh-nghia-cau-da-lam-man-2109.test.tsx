@@ -120,11 +120,6 @@ const RAW_THI_DUA = (soCauEm: number) => ({
   capNhatLuc: '2026-09-21T11:00:00Z',
 })
 
-describe('CÙNG DỮ LIỆU ⇒ thẻ Hôm nay = ô Thi đua (thầy: "93 câu" so với "78 câu")', () => {
-  const soTheHomNay = (c: HTMLElement) => c.querySelector('.bnv-tien-do-so')!.textContent!.replace(/\s+/g, ' ').trim()
-  const soOThiDuaCuaEm = (c: HTMLElement) => c.querySelector('[data-vung="thi-dua"] [data-vung="vi-tri-em"]')?.textContent ?? ''
-  const soTrongChu = (t: string) => Number(/(\d+) câu/.exec(t)?.[1])
-})
 
 describe('khoá nguồn phía học sinh', () => {
   it('bộ chuyển và màn ôn câu đọc số hiển thị qua MỘT hàm; không còn đọc thẳng tienBo.daLamCau để nói "đã làm"', () => {
@@ -233,9 +228,6 @@ describe('bảng phụ huynh — vòng 2 / chữ giải vòng: "đúng 30 trong 
   })
 })
 
-describe('bảng phụ huynh — thẻ Tổng quan dựng đủ (vòng + chữ giải) theo mẫu số', () => {
-  const vong = (c: HTMLElement) => c.querySelector('[aria-label*="câu đúng"]')?.getAttribute('aria-label') ?? ''
-})
 
 describe('THÂN THẬT của Worker 5bb39dd4 (SBD thử 12121212, 21/09 18:3x, chỉ đọc): 21 câu đã làm, 7 câu có kết quả, đúng 1', () => {
   // Chép nguyên khối tongQuan + ngày nhịp học máy chủ thật trả (câu che chiếm 14 trong 21): soDung/soCauCoKetQua chỉ trên câu KHÔNG che.
@@ -273,8 +265,4 @@ describe('bảng phụ huynh — so với hôm qua theo mẫu số', () => {
     const chip = soSanhHomQua({ soCau: 6, soDung: null, soCauCoKetQua: 0, phutHoc: 20, soVoiHomQua: { soCau: 33, soCauCoKetQua: 33, tiLeDung: 0.76, phutHoc: 44 } }).map((c) => c.chu)
     expect(chip.some((c) => /đúng/.test(c))).toBe(false)
   })
-})
-
-describe('màn chính phụ huynh — ô "câu đúng %" theo mẫu số; ô "câu đã làm" là số đã làm (gồm câu che)', () => {
-  const ba = (c: HTMLElement) => [...c.querySelectorAll('.phm-ap-ba li')].map((l) => l.textContent)
 })

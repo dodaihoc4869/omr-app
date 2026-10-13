@@ -100,6 +100,3 @@ describe('chonTheCaGanNhat — chọn ca + luật công bố (thuần)', () => {
 
 // ĐÃ GỠ 21/09 (app phụ huynh MỚI): describe "Bảng nhiệm vụ phụ huynh — thẻ ở ĐẦU…" (3 test trên ParentPortalScreen). Thẻ ca gần nhất của màn chính mới + bảng khoá ở tests/ph-moi-man-2109.test.tsx.
 // GỌN MÃ 06/10 (lần 2): `TheCaGanNhatCua` đã xoá (xem ghi chú đầu tệp).
-
-describe('khoá nguồn', () => {
-})

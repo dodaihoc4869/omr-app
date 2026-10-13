@@ -155,6 +155,17 @@ describe('trang nhúng (phiếu HTML) + độ phân giải canvas ở chế đ�
 })
 
 describe('hoạt ảnh số / cuộn mượt nghe chế độ máy yếu', () => {
+  it('số đếm bảng tin: máy yếu ⇒ nhảy thẳng số cuối', () => {
+    const mm = window.matchMedia
+    window.matchMedia = ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia
+    try {
+      expect(giamBangTin()).toBe(false)
+      document.documentElement.classList.add(LOP_MAY_YEU)
+      expect(giamBangTin()).toBe(true)
+    } finally {
+      window.matchMedia = mm
+    }
+  })
 })
 
 describe('tải KaTeX nối sau mảnh màn em (3G)', () => {

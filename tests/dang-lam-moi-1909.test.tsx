@@ -137,9 +137,6 @@ describe('hook useKeHoachNgay: cờ dangLamMoi', () => {
   })
 })
 
-describe('dải "đang làm mới" trên Bảng nhiệm vụ', () => {
-  const duLieu = () => tuKeHoachNgay(KE_HOACH as any, Date.now(), {})
-})
 
 describe('StudentPortalScreen thật khi máy chủ đang làm mới', () => {
   beforeEach(() => {

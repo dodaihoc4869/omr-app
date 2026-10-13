@@ -18,8 +18,6 @@ const keHoach = (): KeHoachNgayMayChu => ({
 beforeEach(() => localStorage.clear())
 afterEach(() => cleanup())
 
-describe('Đầu Bảng nhiệm vụ: biệt danh đi sau "Thần thú của em/con"', () => {
-})
 
 describe('Vinh danh: biệt danh đứng sau "Thần thú"; phiếu không có "nắm chắc"', () => {
   it('html-phieu.ts không còn chữ "nắm chắc" (nộp ≠ nắm; bộ soi giao diện báo LỖI ở dòng 1566)', () => {

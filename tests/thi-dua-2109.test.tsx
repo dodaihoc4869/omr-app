@@ -253,24 +253,6 @@ describe('OThiDua — "vừa vượt lên"', () => {
   })
 })
 
-describe('hai nút dẫn tới VIỆC CHƯA XONG ĐẦU TIÊN của Bảng nhiệm vụ (hết việc ⇒ Đảo thần thú)', () => {
-  const NOW = Date.parse('2026-09-21T10:00:00+07:00')
-  const gio = (h: number) => new Date(NOW + h * 3600_000).toISOString()
-  const vm = (o: object) => ({ thuTu: 1, batBuoc: false, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: '', chiTiet: {}, hanCung: null, hanMem: null, soCau: 6, ...o })
-  const kh = (viec: unknown[]): KeHoachNgayMayChu => ({
-    ok: true,
-    nganSach: { mucTieuCau: 12, toiThieuCau: 6, vanTocGiay: 78, vanTocNguon: 'do', ghiChuVanToc: '' },
-    viec: viec as any,
-    canhBao: [],
-    quaHan: [],
-    tienBo: { daLamCau: 0, lenBac: 0, conThieu: 6 },
-    chuoiDat: 0,
-    lanNghi: false,
-    capNhatLuc: gio(-0.1),
-  })
-  const phu = { dsBtvn: [{ maBtvn: 'BT-A', maCa: 'CA-A', tenBtvn: 'BTVN A', soCau: 12 }, { maBtvn: 'BT-B', maCa: 'CA-B', tenBtvn: 'BTVN B', soCau: 12 }], dsMomGiao: [] as any[] }
-  const dl = (viec: unknown[]) => ({ ...tuKeHoachNgay(kh(viec), NOW, phu), thanThu: { kieu: 'co', pet: LUA, cap: 12, ten: 'Hoả Long' } as const })
-})
 
 describe('taiThiDua — không có lệnh / lỗi ⇒ null, không ném', () => {
   beforeEach(() => {

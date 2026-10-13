@@ -127,6 +127,3 @@ describe('TheCanhBaoThay', () => {
     expect(ten).toEqual(['Cảnh báo của thầy: Thầy nhắc: em chưa nộp Bài A', 'Cảnh báo của thầy: Thầy nhắc: em chưa nộp Bài B'])
   })
 })
-
-describe('trên Bảng nhiệm vụ', () => {
-})

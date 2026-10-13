@@ -83,8 +83,5 @@ const KE_HOACH = {
 // ─── khoá nguồn: mọi cửa vào game đều đi qua moGame / xin trong cú chạm ───
 
 
-describe('CSS: nút "Về app học sinh" luôn hiện, ≥ 48 px, chừa vùng an toàn', () => {
-})
-
 // 10/10: cổng học sinh không còn mở game/toàn màn hình; thư viện game lưu trữ vẫn kiểm ở trên.
 it('cổng học tập không tự gọi toàn màn hình hoặc tải màn game',()=>{const c=doc('src/screens/StudentPortalScreen.tsx');expect(c).not.toContain('useToanManHinhGame(');expect(c).not.toContain("import('../game/than-thu-v2/Game')");expect(c).toContain("t === 'thanthu' || t === 'bia' ? 'hoctap' : t");expect(doc('src/screens/ExamTakeScreen.tsx')).not.toContain('toan-man-hinh-game')})
