@@ -9,7 +9,8 @@ const khung = 'export const man = `<section style="color: rgb(30, 41, 59);">Màn
 const mau = readFileSync(resolve('tests/fixtures/mom-html-tu-cham-legacy-1310.txt'), 'utf8')
 const mauTuCham = `async function nopBaiCuaMom() { try { const htmlKetQua = ${mau}; return htmlKetQua } catch {} }\n`
 const theCu = readFileSync(resolve('tests/fixtures/the-chien-dich-cu-1410.txt'), 'utf8')
-const caiDatCu = `export default function CaiDatScreen() { return <>${theCu}</> }`
+const caiDatCu = readFileSync(resolve('tests/fixtures/cai-dat-cu-1410.txt'), 'utf8')
+const caiDatMoi = readFileSync(resolve('tests/fixtures/cai-dat-moi-1410.txt'), 'utf8')
 
 function kiem(cu: string, moi: string | null, tep = 'src/screens/StudentPortalScreen.tsx') {
   const thu = mkdtempSync(join(tmpdir(), 'mau-mom-1310-'))
@@ -70,7 +71,7 @@ describe('Ngoại lệ nguyên tệp game đã có bằng chứng', () => {
 describe('Giữ màu khi gỡ thẻ quản lý chiến dịch cũ', () => {
   const tep = 'src/screens/CaiDatScreen.tsx'
   it('gỡ nguyên thẻ đã ngừng dùng nhưng giữ màu các thẻ khác', () => {
-    expect(kiem(khung + caiDatCu, khung + 'export default function CaiDatScreen() { return <CaiDatHienTai /> }', tep).status).toBe(0)
+    expect(kiem(khung + caiDatCu, khung + caiDatMoi, tep).status).toBe(0)
   })
   it('đổi màu còn dùng cùng tệp vẫn bị chặn', () => {
     expect(kiem(khung + caiDatCu, khung.replace('rgb(30, 41, 59)', 'rgb(0, 0, 0)'), tep).status).toBe(1)
@@ -83,5 +84,10 @@ describe('Giữ màu khi gỡ thẻ quản lý chiến dịch cũ', () => {
   it('thẻ trong hàm con còn dùng hoặc xoá nguyên màn Cài đặt vẫn bị chặn', () => {
     expect(kiem(`export default function CaiDatScreen() { function con() { return <>${theCu}</> } return con() }`, '', tep).status).toBe(1)
     expect(kiem(caiDatCu, null, tep).status).toBe(1)
+  })
+  it.each(['Chiến dịch đã giao', 'moChienDichDaGiao'])('đổi nhãn/callback %s của thẻ vẫn còn không che được đổi màu', (chu) => {
+    const van = caiDatCu.replace(chu, 'QuanLyBai')
+    expect(kiem(van + khung, van + khung.replace('rgb(30, 41, 59)', 'rgb(0, 0, 0)'), tep).status).toBe(1)
+    expect(kiem(caiDatCu + khung, van + khung.replace('rgb(30, 41, 59)', 'rgb(0, 0, 0)'), tep).status).toBe(1)
   })
 })

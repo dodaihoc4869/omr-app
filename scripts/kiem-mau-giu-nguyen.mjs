@@ -83,6 +83,14 @@ function theChienDichCu(van) {
   return ds.length === 1 ? ds[0] : ''
 }
 const HASH_THE_CHIEN_DICH_CU = '7977f3eefcb87b9f79c99be702d1830deac0e35e78edc2bd563d4ceb2290689b'
+// Snapshot sau khi gỡ đã được soát: đổi nhãn/callback của thẻ còn sống không
+// được hiểu là đã gỡ. Mọi thay đổi khác trong hàm đều dùng cổng màu đầy đủ.
+function hashCaiDat(van) {
+  const tep = ts.createSourceFile('CaiDatScreen.tsx', van, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+  const fn = tep.statements.find(n => ts.isFunctionDeclaration(n) && n.name?.text === 'CaiDatScreen')
+  return fn ? createHash('sha256').update(fn.getText(tep)).digest('hex') : ''
+}
+const HASH_CAI_DAT_SAU_GO = '992464e17d32709a088761586ed3f47705d52043b3528e4bf9f5fde18957f297'
 
 const LA_TEP = (f) => (/^src\/.*\.(css|tsx?|html)$/.test(f) || f === 'index.html') && !f.includes('graphify-out')
 const doi = git('diff', '--name-status', MOC, '--', 'src', 'index.html').trim().split('\n').filter(Boolean)
@@ -156,7 +164,7 @@ for (const [trangThai, f, f2] of doi) {
     for (const [k, n] of dem(khaiBaoMau(htmlCu))) a.set(k, Math.max(0, (a.get(k) ?? 0) - n))
   }
   const theCu = trangThai === 'M' && ten === 'src/screens/CaiDatScreen.tsx' ? theChienDichCu(cu) : ''
-  if (theCu && createHash('sha256').update(theCu).digest('hex') === HASH_THE_CHIEN_DICH_CU && !theChienDichCu(moi)) {
+  if (theCu && createHash('sha256').update(theCu).digest('hex') === HASH_THE_CHIEN_DICH_CU && hashCaiDat(moi) === HASH_CAI_DAT_SAU_GO) {
     for (const [k, n] of dem(khaiBaoMau(theCu))) a.set(k, Math.max(0, (a.get(k) ?? 0) - n))
   }
   for (const [k, n] of a) if ((b.get(k) ?? 0) < n) loi.push(`ĐỔI/XOÁ màu đang có · ${ten} · ${k}`)

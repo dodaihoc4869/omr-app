@@ -7,7 +7,7 @@
 //
 // Bốn điều dưới đây, thiếu một là cả ba app không mở được trên máy đã cài.
 // Thoát mã 1 để `DAY-TAT-CA.command` dừng, không đẩy bản hỏng lên.
-import { readFileSync, existsSync, statSync } from 'node:fs'
+import { readFileSync, existsSync, statSync, readdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -70,11 +70,32 @@ function doPrecache(ma, thuMuc) {
 }
 const pc = doPrecache(s, dirname(SW))
 
+// Cài SW mới rồi mở cổng khi mất mạng không được thiếu import tĩnh dù entry
+// đã nằm trong precache (14/10: rut-de-chua bị bỏ khiến /gv và /ph trắng).
+const cached = new Set([...s.matchAll(/"url"\s*:\s*"([^"]+)"/g)].map(m => m[1]))
+const thuAssets = resolve(dirname(SW), 'assets')
+const tepAssets = existsSync(thuAssets) ? readdirSync(thuAssets) : []
+const thieuKhoiDong = new Set()
+for (const ten of ['App', 'AppHocSinh', 'StudentPortalScreen', 'ParentPortalScreen']) {
+  const dau = tepAssets.find(f => new RegExp(`^${ten}-[A-Za-z0-9_-]{8}\\.js$`).test(f))
+  if (!dau) { thieuKhoiDong.add(ten); continue }
+  const da = new Set(), hang = [dau]
+  while (hang.length) {
+    const f = hang.pop()
+    if (da.has(f)) continue
+    da.add(f)
+    if (!cached.has('assets/' + f)) thieuKhoiDong.add(f)
+    const p = resolve(thuAssets, f)
+    if (!existsSync(p)) { thieuKhoiDong.add(f); continue }
+    for (const m of readFileSync(p, 'utf8').matchAll(/(?:\bfrom\s*|\bimport\s*)["']\.\/([^"']+\.js)["']/g)) hang.push(m[1])
+  }
+}
+
 const phep = [
   [
-    'danh sách tệp đã được chèn',
-    !s.includes('__WB_MANIFEST') && (s.match(/revision/g) || []).length > 50,
-    'còn nguyên `self.__WB_MANIFEST` hoặc danh sách rỗng — máy mất sạch phần chạy offline',
+    'danh sách tệp đã được chèn và đủ đóng khởi động ba cổng',
+    !s.includes('__WB_MANIFEST') && (s.match(/revision/g) || []).length > 50 && thieuKhoiDong.size === 0,
+    `precache chưa đủ cho lượt mở offline: ${[...thieuKhoiDong].join(', ') || 'danh sách chưa được chèn'}`,
   ],
   [
     'dạng IIFE, không phải ES module',
