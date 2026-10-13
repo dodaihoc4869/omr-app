@@ -2,7 +2,7 @@ name: Mô phỏng đề kiểm tra cá nhân trên nguồn thật (chỉ đọc)
 on:
   push:
     branches: [codex/de-kiem-tra-2026-1310]
-    paths: [scripts/kiem-ktcn-v2.ts, .github/workflows/kiem-ktcn-v2.yml, server/src/kiem-tra-ca-nhan.ts, server/src/kiem-tra-ca-nhan-loi.ts, server/src/kiem-tra-ca-nhan-ma-tran.ts]
+    paths: [scripts/kiem-ktcn-v2.ts, .github/workflows/kiem-ktcn-v2.yml, server/src/kiem-tra-ca-nhan.ts, server/src/kiem-tra-ca-nhan-loi.ts, server/src/kiem-tra-ca-nhan-ma-tran.ts, server/src/kiem-tra-ca-nhan-nguon.ts]
   workflow_dispatch:
 permissions:
   contents: read

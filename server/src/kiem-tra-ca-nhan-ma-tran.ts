@@ -31,7 +31,7 @@ export function chonChuKyKt2026(muc: readonly MucKt[], cau: readonly CauMaTranKt
     const m=muc.find(m=>m.id===id),b=hs.get(id)
     return m?.loai==='bai'?100:1+(1-(b?.p??0.3))*2+(b?.n?0:1)
   }
-  const w = new Map([...can].map(id=>[id,trongSo(id)]))
+  const w = new Map([...can].map(id=>[id,trongSo(id)*(1+4/Math.sqrt(Math.max(1,nguon.filter(q=>q.muc.includes(id)).length)))]))
   const phu = (ds: readonly CauMaTranKt[]) => new Set(ds.flatMap(q=>q.muc).filter(id=>can.has(id)))
   const diemPhu = (ds: readonly CauMaTranKt[]) => [...phu(ds)].reduce((n,id)=>n+(w.get(id)??0),0)
   function rut(seedRut:string, daPhu:ReadonlySet<string>, daDung:ReadonlySet<string>) {
