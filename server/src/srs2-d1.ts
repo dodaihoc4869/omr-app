@@ -19,6 +19,7 @@ import type { D1PreparedStatement, D1Result, Env } from './kieu'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { chanMetaKhacKhoi, docCauNghiDem, docKhoiEmCong } from './chan-khac-khoi'
 import { DemTTL } from './dem-chung'
+import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import {
   lapKeHoachNgay, laNo, nhanNo, khoiLuongCan, TRAN_NGAY, type NguonNhan, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
@@ -673,15 +674,21 @@ export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<st
 export const TRAN_UNG_VIEN_ON_BAI_CU = 800
 /** `theoTo[tờ]` = số câu tờ ấy góp (sau bỏ trùng), cùng thứ tự `maDe` ⇒ chia được câu về từng bài (06/10, chia ôn bài cũ đều). */
 interface CauPhamVi { qids: string[]; theoTo: Record<string, number> }
-/** Câu hợp lệ của các tờ trong phạm vi (dùng chung mọi em của lớp, đổi chậm) — đệm 5 phút trong isolate; khoá = danh sách tờ theo thứ tự đọc. */
-const demCauPhamVi = new DemTTL<CauPhamVi>(5 * 60_000, 64, 400_000)
-async function cauCuaToPhamVi(env: Env, maDe: readonly string[]): Promise<CauPhamVi> {
+/** Câu hợp lệ của các tờ trong phạm vi (dùng chung mọi em của lớp, đổi chậm) — đệm 5 phút trong isolate; khoá = danh sách tờ theo thứ tự đọc.
+ *  Đợt 22 (số đo 13/10: 444 lần/3 giờ × 65 ms, mỗi lần đọc JSON cả tờ): quá 5 phút thì hỏi DẤU KHO (`dau-kho-cau.ts`, một dòng) — kho không đổi
+ *  ⇒ dùng tiếp; tuổi tối đa 30 phút (hạn của đệm) dù dấu không đổi. Kho đổi (lập lại chỉ mục) ⇒ đọc lại ngay lượt kế. */
+const HAN_KIEM_CAU_PHAM_VI = 5 * 60_000
+const demCauPhamVi = new DemTTL<{ v: CauPhamVi; dau: string; kiem: number; luc: number }>(30 * 60_000, 64, 400_000)
+export async function cauCuaToPhamVi(env: Env, maDe: readonly string[], now: number = Date.now()): Promise<CauPhamVi> {
   const khoa = maDe.join('|')
-  const co = demCauPhamVi.doc(khoa, Date.now())
-  if (co) return co
+  const co = demCauPhamVi.doc(khoa, now)
+  if (co && Math.abs(now - co.kiem) < HAN_KIEM_CAU_PHAM_VI) return co.v
+  // Lần đọc đầu KHÔNG hỏi dấu (không thêm lệnh); lần kiểm đầu tiên: mốc lập chỉ mục mới nhất có trước lúc đọc ⇒ dữ liệu đang giữ là bản mới nhất.
+  if (co) { const d = await dauKhoCau(env); if (d && (co.dau ? d === co.dau : dauTruocLucDoc(d, co.luc))) { co.dau = d; co.kiem = now; return co.v } }
   const { qids, theoTo } = await (await lanGv()).cauCuaToChiTiet(env, maDe)
-  demCauPhamVi.ghi(khoa, Date.now(), { qids, theoTo }, qids.length + 1)
-  return { qids, theoTo }
+  const v = { qids, theoTo }
+  demCauPhamVi.ghi(khoa, now, { v, dau: '', kiem: now, luc: now }, qids.length + 1)
+  return v
 }
 /** Thư mục của các tờ; lỗi đọc ⇒ luật lùi (mã "DH-" là DẠY HỌC, còn lại TU LUYỆN). */
 async function thuMucAnToan(env: Env, maDe: readonly string[]): Promise<Map<string, ThuMuc>> {

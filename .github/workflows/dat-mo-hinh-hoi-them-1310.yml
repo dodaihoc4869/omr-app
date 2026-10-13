@@ -1,0 +1,25 @@
+# Claude 13/10 — đặt mô hình Gemini cho Hỏi thêm Thầy (Google ngừng gemini-2.5-flash với khoá mới: HTTP 404). Ghi MỘT dòng cau_hinh.hoi_tro_ly.
+name: Đặt/gỡ mô hình Hỏi thêm Thầy
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['scripts/dat-mo-hinh-hoi-them-1310.mjs', '.github/workflows/dat-mo-hinh-hoi-them-1310.yml']
+permissions:
+  contents: read
+jobs:
+  dat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Ghi cấu hình
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/dat-mo-hinh-hoi-them-1310.mjs

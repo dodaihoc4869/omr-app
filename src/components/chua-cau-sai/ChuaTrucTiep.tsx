@@ -301,7 +301,8 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
             </>
           ) : (
             <>
-              {khungCau(propsCauLam(de, tra, (v) => setTra(v), ket !== null))}
+              {/* Thầy 13/10: Hỏi thầy cả lúc em đang làm lại (Thầy gợi hướng, không đáp án). */}
+              {khungCau({ ...propsCauLam(de, tra, (v) => setTra(v), ket !== null), ...(ket === null && cg.trangThai !== 'khoa' && cachLam !== 'khong_cham' ? { hoiThay: { qid, nguon: 'tu_chua' } } : {}) })}
               {cachLam === 'khong_cham' ? (
                 <div className="ccs-goi-y" role="status">
                   <p>{cg.trangThai === 'khoa' ? 'Câu này chưa được mở đáp án, thầy sẽ chữa. Lần làm lại này không chấm.' : 'Chưa mở được đáp án ở đây nên lần làm lại này không chấm.'}</p>

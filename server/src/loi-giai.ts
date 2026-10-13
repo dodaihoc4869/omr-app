@@ -571,6 +571,9 @@ export async function hsHoiThay(env: Env, b: Obj) {
   if (!ht) return { ok: false, error: 'Không tìm thấy câu này trong kho đề.' }
   // Bản chép cùng nội dung ở tờ khác đang bảo vệ ⇒ khoá như chính câu ấy (dùng chung hồ sơ lời giải và đáp án).
   if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
+  // THẦY 13/10 "nút hỏi bài ở tất cả các câu… hỏi bài thầy mọi lúc": em ĐANG LÀM câu (chưa trả lời/nộp) bấm Hỏi thầy ⇒ `chiHoi`: chỉ đề
+  // để hiện trong hộp hỏi Thầy, KHÔNG đáp án, KHÔNG lời giải, KHÔNG ghi `loi_giai_hoi` (em chưa xem lời giải). Thầy (AI) chỉ gợi hướng.
+  if (b.chiHoi === true) return { ok: true, chiHoi: true, cau: cauChoKhung(ht.c) }
   const dong = await env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>()
   const hoSo = dong ? await docHoSo(env, ht.bam) : null
   const luc = new Date(nay).toISOString()
@@ -686,7 +689,7 @@ export async function hsDocLoiGiai(env: Env, b: Obj) {
 
 /** Ngữ cảnh một câu cho phần hỏi thêm: ĐÚNG cổng chặn của nút Hỏi thầy, thêm điều kiện em đã bấm Hỏi thầy câu này trong 24 giờ qua
  *  (dòng `loi_giai_hoi` ⇒ lần xem đã tính "có trợ giúp" như hiện nay). Trả câu kho, hồ sơ xem được (nếu có), lời giải chữ, lời thầy gỡ. */
-export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, nowMs = Date.now()) {
+export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, nowMs = Date.now(), dangLam = false) {
   await damBaoBangLoiGiai(env)
   const qid = qidGoc(str(qidVao))
   if (!qid) return { ok: false as const, error: 'Thiếu câu cần hỏi.' }
@@ -697,7 +700,8 @@ export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, now
   if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false as const, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
   const daHoi = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_hoi WHERE sbd = ? AND qid = ? AND luc >= ? LIMIT 1')
     .bind(sbd, qid, new Date(nowMs - 24 * 3_600_000).toISOString()).first<Obj>()
-  if (!daHoi) return { ok: false as const, khoa: 'chua_mo', error: 'Em bấm Hỏi thầy ở câu này trước rồi nhắn hỏi nhé.' }
+  // Em đang làm (chưa nộp) ⇒ không cần đã mở lời giải: Thầy chỉ gợi hướng, không nêu đáp án (hoi-tro-ly.ts, `dangLam`).
+  if (!daHoi && !dangLam) return { ok: false as const, khoa: 'chua_mo', error: 'Em bấm Hỏi thầy ở câu này trước rồi nhắn hỏi nhé.' }
   const dong = await env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>().catch(() => null)
   const hoSo = dong ? await docHoSo(env, ht.bam).catch(() => null) : null
   const kiem = hoSo ? await kiemChoKhung(env, ht.bam).catch(() => undefined) : undefined

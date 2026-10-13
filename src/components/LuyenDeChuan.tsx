@@ -218,7 +218,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
                 stt: i + 1,
                 explanation: sol?.explanation,
                 loiGiai: sol?.loiGiai,
-                // Hỏi thầy nằm trong khối lời giải của TheCau ⇒ chỉ hiện khi đã nộp và lời giải đang hiện (thầy lệnh 30/09).
+                // Hỏi thầy dưới phần trả lời của TheCau, cả lúc đang làm (Thầy gợi hướng); Lời giải từng bước chỉ sau nộp (lệnh 30/09 + 13/10).
                 hoiThay: { qid: q.id, nguon: 'luyen_de', gon: true },
               }
               if ('choices' in q)

@@ -4,10 +4,9 @@
 // Câu CHƯA có hồ sơ từng bước (nút Hỏi thầy): hộp hiện lời giải chữ đang có của kho, vẽ bằng React (chữ kho là chữ thường, React tự thoát).
 // Vòng học v2 GĐ2: câu có học liệu `kiem` ⇒ khung thêm "Đọc từng bước"; câu kiểm khung gửi lên ('khung-cau-kiem') được chuyển tới máy chủ
 // (`/hs/cau-kiem`, chấm ở máy chủ) rồi trả kết quả vào khung ('cau-kiem-kq'); dưới hộp có thanh thang tự gỡ (ThanhThangGo). Màn thầy không có.
-import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { baoDocLoiGiai, guiCauKiem, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu, type SuKienKhung } from '../../lib/loi-giai-api'
 import ThanhThangGo from './ThanhThangGo'
-const HoiThemThay = lazy(() => import('./HoiThemThay'))
 import KhoiLoiGiaiChuan, { chuanSangCauTruc } from './KhoiLoiGiaiChuan'
 import './loi-giai.css'
 
@@ -42,7 +41,7 @@ function LoiGiaiChuView({ cau, lg }: { cau: CauChoKhung; lg: LoiGiaiChu }) {
 
 const KIEU_SU_KIEN = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot', 'mo_buoc', 'kiem'])
 
-export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', trongTrang = false, hoiThem = false, onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; trongTrang?: boolean; hoiThem?: boolean; onDong: () => void }) {
+export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', trongTrang = false, onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; trongTrang?: boolean; onDong: () => void }) {
   const khung = useRef<HTMLIFrameElement>(null)
   // GĐ1 v2: gom thao tác em làm trong khung (khung chỉ postMessage, không gọi mạng) — đóng hộp thì gửi một lần. Màn thầy không gửi.
   const suKien = useRef<SuKienKhung[]>([])
@@ -110,7 +109,6 @@ export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false
         <div className="lg-cuon"><LoiGiaiChuView cau={cau} lg={loiGiaiChu} /></div>
       ) : null}
       {coThang && kiem && <ThanhThangGo qid={cau.qid} kiem={kiem} lanTai={lanTai} layDang={layDang} />}
-      {hoiThem && !thay && <Suspense fallback={null}><HoiThemThay qid={cau.qid} nguon={nguon} /></Suspense>}
     </div>
   )
 }

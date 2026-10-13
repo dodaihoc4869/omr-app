@@ -14,7 +14,7 @@ describe('nút Hỏi thầy trên phiếu', () => {
   it('thẻ câu: có nút khi bật, mang đúng qid; tắt thì không đổi byte nào', () => {
     const co = theCauHtml(CAU[0], 1, false, false, true, false, undefined, true)
     expect(co).toContain('data-hoi-thay="12-X-I-1"')
-    expect(co).toContain('>Hỏi thầy</button>')
+    expect(co).toContain('<span>Hỏi thầy</span></button>') // 13/10: nút kèm biểu tượng
     expect(theCauHtml(CAU[0], 1, false, false, true, false, undefined)).not.toContain('data-hoi-thay')
   })
   it('phiếu học sinh (nộp được) có nút + mã nhắn app; phiếu in không có', () => {

@@ -46,7 +46,7 @@ Thầy đã chuyển bốn việc này cho Codex trên máy thầy ngày 13/10. 
 - **Luật từ nay:**
   - Đổi cấu trúc `DeKt` hoặc thêm số vào lịch thì sửa `metaKt` và kiểm `tests/kiem-tra-ca-nhan-1310.test.ts` (test "khẩn 13/10").
   - Truy vấn đọc lịch không gọi `json_each` / `json_extract` trên `k.json` cho nhiều dòng.
-- [x] PR267/269: gộp main, giữ `COT_META_KT`, snapshot+meta cùng batch, `buMetaKt`, cron đọc metadata; các kiểm khẩn13/10 đạt.
+- [ ] Codex gộp `main` mới vào nhánh đang làm, giữ bản vá này (đặc biệt `COT_META_KT`, `lapKtCn` batch, `dongBoKtCn` gọi `buMetaKt`).
 
 ## 13/10 13:30 — Claude soát PR262 + quyết định giữ cờ tắt
 - Claude đã soát PR262. Đã gộp `main` f6a86c87 (bản vá D1) vào nhánh; xung đột chỉ ở `DIEU-PHOI.md`, giữ cả hai phía.
@@ -58,8 +58,8 @@ Thầy đã chuyển bốn việc này cho Codex trên máy thầy ngày 13/10. 
   - `kiem:mau-giu`: 0 vi phạm.
 - PR262 được gộp SAU khi lượt phát hành bản vá D1 xong, để hai lượt không chồng nhau.
 - Theo đề nghị của Codex (thầy phản ánh 333 câu/475 phút), Claude **không bật lại** cờ `kiem_tra_ca_nhan_v1`.
-- [x] Claude đã nhận việc bật sau PR267: workflow `bat-lai-ktcn-1310`38376337214 success trên main124208fb, có bước chuyển lịch/bù metadata trước bật; không SQL tay.
-- [x] PR267/269: metadata khung28/50/5chặng/12câu ngày theo snapshot cùng batch; kiểm khẩn13/10 đạt.
+- [ ] Codex: xong khung 28 câu/50 phút thì bật lại cờ CHỈ bằng workflow `bat-lai-ktcn-1310` (bấm tay trên Actions). Workflow này bù số tính sẵn cho mọi lịch cũ rồi mới bật cờ. Không bật cờ bằng SQL tay.
+- [ ] Codex: khung mới đổi số câu/chặng/phút thì `metaKt` phải theo, và test "khẩn 13/10" trong `tests/kiem-tra-ca-nhan-1310.test.ts` phải xanh.
 
 ## 13/10 15:40 — Claude nhận phần soát + gộp + bật cờ của nhánh đề Hóa 2026 (thầy: "bạn làm đỡ được codex phần nào để tăng tốc không")
 Codex KHÔNG đẩy thêm vào `codex/de-kiem-tra-2026-1310`. Claude đã gộp nhánh vào `claude/amazing-albattani-03aros` cùng main mới (đợt 20, 21) và mở PR vào `main`. Việc tiếp theo làm từ `main`.
@@ -73,6 +73,11 @@ Codex KHÔNG đẩy thêm vào `codex/de-kiem-tra-2026-1310`. Claude đã gộp 
   - Số thật lúc 15:22: 261 lịch đều ngày 17–19/10, chưa em nào mở; khối 11 có 89 lịch đề cũ ("hen"), khối 10/12 có 172 lịch "cho_nguon".
   - Đã thêm bước chuyển từng em về 28 câu/50 phút TRƯỚC khi bật, vì cờ tắt thì cron chưa chuyển.
 - [ ] Khối 12 còn thiếu nguồn đã duyệt cho `nen:gia_tri_trung_binh` (52/53) ⇒ lịch khối 12 vẫn "Đang chuẩn bị". Cần thầy duyệt câu đang chờ; Codex/Claude không tự duyệt.
+- [x] (Claude 13/10 17:20) Bật lại cờ xong 16:32. Khối 12 hết thiếu nguồn:
+  - Câu DH-12-C1-B1-P2 II-15 bị nghi đáp án; Claude giải lại thấy đáp án kho đúng nên gỡ nghi.
+  - Đã lập lại 126 em; mỗi em có 3 bài.
+  - Còn 122 dòng `cho_nguon` cũ ở ngày giữa chu kỳ. Dòng này ẩn ở mọi màn nên để nguyên.
+  - Codex sửa luật nguồn tương đương thì nhớ: `chanKhacKhoiEm` loại câu `cau_nghi_dap_an`='nghi'. Câu khó, tỉ lệ sai cao vẫn bị xếp nghi; nên có nút gỡ trên app thầy (`/gv/cau-nghi/xu-ly` đã có ở máy chủ, chưa có giao diện).
 
-## 13/10 — thầy yêu cầu sửa hạn bài đã tick
-- [x] PR269: sửa hạn riêng bài/lớp, tự chia lại theo tiến độ/lịch kiểm tra; giữ điểm/sổ sai/nháp, cron/em mới giữ hạn.202kiểm liên quan và110kiểm lời giải sau tối ưu đạt;TS/build/tốc độ/màu/SW13/13; full so tên không còn lỗi mới tái hiện. Chờ Claude soát/phát hành, chưa áp hạn vào D1 thật. Xem docs/ket-qua-sua-han-bai-1310.md.
+## 13/10 — Thầy nhắc phần sửa hạn chưa xuất hiện
+- [ ] PR269: cập nhật main mới, giữ Hỏi Thầy hiện tại; kiểm cổng và nhờ Claude soát/phát hành nút Sửa hạn tại từng dòng Bài đang giao. Code/ảnh đã có; chưa gộp nên bản sống chưa có nút.

@@ -84,7 +84,8 @@ const daLamCau = (v: string | undefined) => !!(v && v.trim() && v !== '----')
 
 /** Một câu ĐANG LÀM (TheCau `thi` — không có `correct`/lời giải). memo: chọn một câu chỉ vẽ lại câu đó (máy yếu). */
 const CauLam = memo(function CauLam({ q, phan, stt, giaTri, onDoi }: { q: CauDe; phan: Phan; stt: number; giaTri: string; onDoi: (id: string, v: string) => void }) {
-  const chung = { ...q, cheDo: 'thi' as const, stt }
+  // Thầy 13/10: Hỏi thầy cả lúc đang làm (Thầy gợi hướng, không đáp án).
+  const chung = { ...q, cheDo: 'thi' as const, stt, hoiThay: { qid: q.id, nguon: 'luyen_de' } }
   let the
   if ('choices' in q)
     the = <TheCau {...chung} phan="I" choices={q.choices} choiceImgs={q.choiceImgs} choicePerm={[0, 1, 2, 3]} selected={(giaTri || null) as Chu | null} onSelect={(v) => onDoi(q.id, v)} />

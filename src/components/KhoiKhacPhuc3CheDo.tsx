@@ -854,7 +854,7 @@ export default function KhoiKhacPhuc3CheDo({
                 thanCauImg: q.anhThanCau,
                 table: q.bang || undefined,
                 explanation: q.chot || (q.buoc && q.buoc.length > 0 ? q.buoc.join('\n') : undefined),
-                // Hỏi thầy trong khối lời giải của TheCau ⇒ chỉ hiện sau khi nộp, khi lời giải đang hiện (thầy lệnh 30/09).
+                // Hỏi thầy dưới phần trả lời của TheCau, cả lúc đang làm (Thầy gợi hướng); Lời giải từng bước chỉ sau nộp (lệnh 30/09 + 13/10).
                 hoiThay: { qid: q.id, nguon: 'khac_phuc', gon: true },
               }
 
