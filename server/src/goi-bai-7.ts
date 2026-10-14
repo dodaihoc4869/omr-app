@@ -17,7 +17,7 @@ import { dongCoHanhTrinh, docTruocDongCo, docTruocDongCoNeuSanBang, docTruocDong
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { CAU_TOI_THIEU, tangCuaCau, tangCuaEm, type TangHanhTrinh } from './hanh-trinh-ngay'
-import { chanKhacKhoiEm } from './chan-khac-khoi'
+import { chanKhacKhoiEm, docCauNghiDem } from './chan-khac-khoi'
 import { apLamLaiKhac } from './cau-anh-em'
 import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
@@ -294,7 +294,8 @@ export async function demHomNay7(env: Env, sbd: string, now: number): Promise<Re
  * danh sách ứng viên (câu gói + ma trận cũ) ở đúng chỗ dùng. Lỗi: `som` giữ, nổi lên đúng chỗ `await` cũ.
  */
 function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: readonly GoiNhe7[], qidsGoi: Promise<readonly string[]>, lopSom: Promise<string | null>) {
-  const phuSom = som(Promise.all([protectedQuestions(env), docCauBtvnChuaNop(env, sbd), readGameScope(env, sbd),docChanCauMoiGoi7(env,sbd)]))
+  // Câu NGHI SAI ĐÁP ÁN (đệm 60 giây trong isolate) đọc cùng đợt — kế hoạch và cổng phát câu dùng CHUNG tập này (lỗi 14/10, xem `lapGoi7`).
+  const phuSom = som(Promise.all([protectedQuestions(env), docCauBtvnChuaNop(env, sbd), readGameScope(env, sbd),docChanCauMoiGoi7(env,sbd),docCauNghiDem(env, now)]))
   const khoiSom = som(docKhoiEm(env, sbd))
   const daLamSom = som(docDaLamVaVuaLam7(env, sbd, ngay, now))
   const xemChuaSom = som(Promise.all([
@@ -399,7 +400,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const som7 = giu.s ?? batDauSom7(env,sbd,now,ngay,goi,qidsGoi,lopSom)
   const { phuSom, khoiSom, daLamSom, xemChuaSom, kiemSom } = som7
   const [old] = await som7.oldUngSom
-  const [hs, [baoVe, btvn, control,chanMoi]] = await Promise.all([som7.hsSom, phuSom])
+  const [hs, [baoVe, btvn, control,chanMoi,nghi]] = await Promise.all([som7.hsSom, phuSom])
   // Chỉ lọc ứng viên phát MỚI; metadata/ref của phiên đã cấp và câu đã gặp vẫn giữ cho resume/ôn/sửa.
   hs.cau=hs.cau.filter(c=>!chanMoi.has(c.qid))
   // β câu + dòng chiến dịch đầy đủ của động cơ (theo hồ sơ) đi CÙNG đợt với bước cổng khối dưới (đợt 18).
@@ -407,6 +408,10 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   docTruocDongCoTheoHoSo(env, dongCo, hs)
   const chan = new Set([...baoVe,...btvn,...control.blocked,...goi.flatMap(g=>g.cau.filter(c=>c.hopLe===false).map(c=>c.qid))])
   if (control.types.length) for (const c of hs.cau) if (!c.dang || !control.types.includes(c.dang)) chan.add(c.qid)
+  // CÂU NGHI SAI ĐÁP ÁN (lỗi 14/10 — thầy: "học sinh còn 1 câu nhưng app ko cho làm, sửa triệt để nhé"; đo D1 thật 21:40: 3 em 23/24, kế hoạch còn ĐÚNG 1 câu
+  // ôn/sửa là câu nghi). Cổng phát câu (`chanKhacKhoiEm`) loại câu nghi, còn kế hoạch chỉ xét câu nghi cho câu gói CHƯA gặp ⇒ câu ôn / sửa / chữa đang nghi vẫn
+  // vào kế hoạch (vừa đúng phần còn lại của mức) ⇒ mở chặng rỗng ⇒ "Em đã hoàn thành…". Nay chặn ngay ở kế hoạch, cùng phép quy mã gốc của cổng (`~` ⇒ gốc).
+  if (nghi.size) for (const c of [...hs.cau, ...goi.flatMap(g => g.cau)]) if (nghi.has(c.qid.split('~')[0]!)) chan.add(c.qid)
   // CÙNG CỔNG VỚI LÚC PHÁT CÂU (khẩn 12/10 23h — thầy: "học sinh báo lỗi 2 câu cuối app không cho làm tiếp bảo tìm câu phù hợp"): câu gói em KHÔNG nhận
   // được ở `startGoi7` — không còn trong chỉ mục, tự luận, sai dạng thầy giới hạn, khác khối / câu nghi (`chanKhacKhoiEm`, đúng tham số của startGoi7) —
   // trước đây vẫn vào kế hoạch (vai tiếp cận, xếp CUỐI) ⇒ em làm hết phần còn lại thì sảnh "Còn 2 câu" mà mở chặng rỗng. Nay chặn ngay ở kế hoạch.
@@ -417,7 +422,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
     const [khoiEm, metaThem] = await Promise.all([khoiSom, thieuMeta.length ? docMetaCau(env, thieuMeta, goi.flatMap(g => g.maDeNguon)) : Promise.resolve(new Map<string, never>())])
     const metaCua = (qid: string) => hs.meta.get(qid) ?? metaThem.get(qid)
     const coTheGiao = ungGoi.filter(c => { const m = metaCua(c.qid); return !!m && !m.tuLuan && !(control.types.length && (!m.dang || !control.types.includes(m.dang))) })
-    const quaCong = new Set((await chanKhacKhoiEm(env, 'goi7', { sbd, khoiEm }, coTheGiao, { cauCua: (c) => metaCua(c.qid) })).map(c => c.qid))
+    const quaCong = new Set((await chanKhacKhoiEm(env, 'goi7', { sbd, khoiEm }, coTheGiao, { cauCua: (c) => metaCua(c.qid), nghiSan: nghi })).map(c => c.qid))
     for (const c of ungGoi) if (!quaCong.has(c.qid)) chan.add(c.qid)
   }
   const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan,true,dongCo)
@@ -436,7 +441,10 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   // MỘT CON SỐ (thầy 12/10): mức hôm nay M = max(mức theo tầng, Σ câu mới theo lịch các gói) — chốt lần lập đầu tiên trong ngày, các lần sau đọc lại.
   // Kế hoạch đúng M − đã làm câu: câu mới theo lịch vẫn đứng đầu nhưng không vượt phần còn lại của M (`chiTrongMuc`).
   const batKt=await import('./kiem-tra-ca-nhan').then(m=>m.coKtCn(env))
-  const eligible=(id:string)=>sanSang.has(id)&&!daLamNgay.has(id)&&!chan.has(id)
+  // Câu VỪA LÀM (≤ 15 phút, kể cả gốc của bản ảo) `startGoi7` không phát lại ⇒ kế hoạch cũng không xếp vào sửa / ôn / chữa (lỗi 14/10: kế hoạch và lúc phát
+  // phải cùng một luật, không thì phần còn lại của mức rơi vào câu không phát được). Mức hôm nay vẫn tính theo `daLamNgay` thật.
+  const khongXep = vuaLam.size ? new Set([...daLamNgay, ...vuaLam]) : daLamNgay
+  const eligible=(id:string)=>sanSang.has(id)&&!khongXep.has(id)&&!chan.has(id)
   const suaCan=batKt?sua.filter(id=>eligible(id)&&!chua.includes(id)).slice(0,4):[]
   const onCan=batKt?on.filter(id=>eligible(id)&&!suaCan.includes(id)&&!chua.includes(id)):[]
   const giuOn=batKt?Math.min(6,onCan.length):0
@@ -445,7 +453,12 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const kiemNhe=goi.some(g=>g.kiemNhe)
   // 12 chỗ của ngày kiểm tra giữ tiến độ bài đang trong hạn; nợ cũ vẫn ở hàng đợi.
   const nhomPhu=[...goi].sort((a,b)=>(kiemNhe?Number(a.han<ngay)-Number(b.han<ngay):0)||a.han.localeCompare(b.han)).map(g=>({qids:g.cau.map(c=>c.qid),quota:Math.max(0,g.quota-g.gapNgay.size)}))
-  const plan = chonGoi7({ cau,daGap:vuaLam.size?new Set([...daGap,...vuaLam]):daGap,daLamNgay,quotaCon,sanSang,chan,sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,mucTieuNgay:Math.max(0,toiThieu-daLamNgay.size),trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn })
+  const vaoPlan = { cau,daGap:vuaLam.size?new Set([...daGap,...vuaLam]):daGap,daLamNgay:khongXep,quotaCon,sanSang,chan,sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn }
+  const plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-daLamNgay.size) })
+  // DỰ PHÒNG KHI MỞ CHẶNG (lỗi 14/10, "còn 1 câu nhưng app ko cho làm"): kế hoạch xếp VỪA ĐÚNG phần còn lại của mức, nên một câu của nó lúc phát không còn phát
+  // được (thầy vừa sửa / rút câu, đọc lại câu lỗi, cổng khối …) là đủ để chặng rỗng. `startGoi7` khi đó đi tiếp TOÀN BỘ hàng chờ theo CÙNG luật xếp (mới theo lịch
+  // → chữa → sửa → ôn → mới → tiếp cận), bỏ câu đã có trong kế hoạch. Chỉ tính khi cần — CPU, không đọc D1.
+  const duPhong = (): ViecGoi7[] => { const co = new Set(plan.viec.map(v => v.qid)); return chonGoi7({ ...vaoPlan, mucTieuNgay: cau.length + hs.cau.length }).viec.filter(v => !co.has(v.qid)) }
   const kiem=await kiemSom
   const diemDaDo=kiem.results.filter(r=>diemConDungNguon7(json<Row>(r.json).cau,goi.find(g=>g.id===r.goi_id)?.cau.filter(c=>(c.maTo??c.maDe)===r.ma_de)??[])).map(r=>({goiId:str(r.goi_id),maDe:str(r.ma_de),diem:Number(r.diem),luc:str(r.nop_luc),cauMoi:Number(json<Row>(r.json).cauMoi??0),tong:Number(json<Row>(r.json).tong??0)}))
   const skills = new Map(old.results.map(r => [str(r.kn),r.trang_thai === 'vung']))
@@ -458,7 +471,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
     const q = new Set(g.cau.map(c => c.qid)), ds = hs.cau.filter(c => q.has(c.qid))
     if (ds.some(c => tangCuaCau(c) !== null)) tangGoi.set(g.id, tangCuaEm(ds, hs.tt, nhom7))
   }
-  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:daLamNgay.size, tang, tangGoi, vuaLam }
+  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:daLamNgay.size, tang, tangGoi, vuaLam, nghi, duPhong }
 }
 
 /** Số đếm hợp lệ (hữu hạn, ≥ 0); còn lại ⇒ 0 — không để NaN thành `null` trong JSON (app đọc chặt). */
@@ -527,18 +540,20 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   const viec = saved ? saved.questions.filter(r => !done.has(r.qid)).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = []
   // Đợt cũ còn câu mà không câu nào phát được nữa ⇒ lấy theo kế hoạch hôm nay; kế hoạch đi tiếp qua câu không phát được cho đủ 6 câu (khẩn 12/10 23h).
-  const lanThu = viec.length ? [viec, lap.plan.viec] : [lap.plan.viec]
+  // Kế hoạch cũng không phát được câu nào mà em CÒN THIẾU mức ⇒ hàng chờ dự phòng (`lapGoi7` → `duPhong`, lỗi 14/10) — chặng chỉ rỗng khi thật hết câu.
+  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => lap.plan.viec, ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [])]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
   // ĐỌC SONG SONG THEO LÔ (đợt 17): trước đây TỪNG câu đọc nối tiếp (đọc câu theo ref ⇒ cổng khối) — 6 câu ≈ 12 lượt D1 chờ nhau ("Đang chuẩn bị những
   // câu…" lâu giờ cao điểm). Nay mỗi lô (đủ chỗ còn thiếu + 2 dự phòng) đọc các câu CÙNG LÚC, cổng khối MỘT lần cho cả lô (từng câu xét độc lập); vẫn
   // duyệt ĐÚNG thứ tự kế hoạch, ĐÚNG mọi điều kiện cũ ⇒ cùng bộ câu như trước.
-  for (const ds of lanThu) { if (refs.length) break
+  for (const lay of lanThu) { if (refs.length) break
+    const ds = lay()
     const ung = ds.map(v => { const oldRef = saved?.questions.find(r=>r.qid===v.qid); return { v, oldRef, meta: oldRef ?? lap.hs.meta.get(v.qid) ?? cauGoi.get(v.qid) } })
       .filter(x => x.meta && !lap.chan.has(x.v.qid) && !lap.chan.has(x.meta.group) && (ds === viec || !vuaLam.has(x.v.qid)))
     for (let i = 0; i < ung.length && refs.length < 6;) {
     const lo = ung.slice(i, i + 6 - refs.length + 2); i += lo.length
     const daDoc = (await Promise.all(lo.map(x => currentQuestion(env, x.meta!).then(q => ({ ...x, q }), () => null)))).filter((x): x is NonNullable<typeof x> => !!x)
-    const quaKhoi = new Set(await chanKhacKhoiEm(env,'goi7',{sbd,khoiEm:khoi},daDoc.map(x => x.q)))
+    const quaKhoi = new Set(await chanKhacKhoiEm(env,'goi7',{sbd,khoiEm:khoi},daDoc.map(x => x.q),{nghiSan:lap.nghi})) // CÙNG tập câu nghi với kế hoạch
     for (const x of daDoc) {
     if (refs.length >= 6) break
     const v = x.v, oldRef = x.oldRef
