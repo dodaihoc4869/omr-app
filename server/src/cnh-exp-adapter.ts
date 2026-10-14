@@ -13,22 +13,16 @@
 import type { Env } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
 import {
-  doiVangCore,
   dungKhienCore,
   ghiManhNgayDat,
-  giaiQuyetKhiendau,
   hapThuCore,
   renKhienCore,
   type ChungLenhP08,
-  type PhanHoiDoiVang,
   type PhanHoiDungKhien,
-  type PhanHoiGiaiQuyet,
   type PhanHoiHapThu,
   type PhanHoiKhien,
   type PhanHoiManhNgayDat,
   type PhuThuocLenhP08,
-  type YeuCauDoiVang,
-  type YeuCauGiaiQuyet,
   type YeuCauManhNgayDat,
 } from './cnh-exp-p08-lenh'
 import {
@@ -189,17 +183,6 @@ export async function renKhienQuaP08(
   return renKhienCore(env, yeuCau, phuThuoc)
 }
 
-export async function doiVangQuaP08(
-  env: Env,
-  duong: string,
-  yeuCau: YeuCauDoiVang,
-  phuThuoc: PhuThuocLenhP08 = {},
-): Promise<PhanHoiDoiVang> {
-  void duong // hành vi NỘI BỘ (nhánh `vang-doi` của Cửa hàng) — không phải route trong sổ kiểm
-  const cua = await cuaP08Mo(env)
-  if (!cua.choPhep) throw new LoiCuaExp(cua.ma, cua.lyDo)
-  return doiVangCore(env, yeuCau, phuThuoc)
-}
 
 export async function dungKhienQuaP08(
   env: Env,
@@ -225,13 +208,3 @@ export async function ghiManhQuaP08(
   return ghiManhNgayDat(env, yeuCau, phuThuoc)
 }
 
-/** Giải quyết nhánh `legacy_unresolved` — hành vi NỘI BỘ (công cụ giáo viên), cửa dùng chung. */
-export async function giaiQuyetQuaP08(
-  env: Env,
-  yeuCau: YeuCauGiaiQuyet,
-  phuThuoc: PhuThuocLenhP08 = {},
-): Promise<PhanHoiGiaiQuyet> {
-  const cua = await cuaP08Mo(env)
-  if (!cua.choPhep) throw new LoiCuaExp(cua.ma, cua.lyDo)
-  return giaiQuyetKhiendau(env, yeuCau, phuThuoc)
-}

@@ -229,7 +229,6 @@ const soNgayTre = (ngayCuoi: string | null, ngayGiao: string, homNay: string): n
 export const DEM_THONG_KE_MS = 60_000
 type ThongKeLop = Awaited<ReturnType<typeof thongKeLopTho>>
 const demThongKe = new WeakMap<object, Map<string, { het: number; p: Promise<ThongKeLop> }>>()
-export function xoaDemThongKe(env: Env): void { if (env.DB) demThongKe.delete(dbGoc(env.DB as unknown as object)) }
 function thongKeLop(env: Env, cd: ChienDich, homNay: string, nowMs: number): Promise<ThongKeLop> {
   const db = dbGoc(env.DB as unknown as object)
   let m = demThongKe.get(db)

@@ -64,8 +64,6 @@ export const SO_TICH_HOP: readonly DongSoTichHop[] = Object.freeze([
   { duong: '/hs/ke-hoach-ngay', xuLy: 'dungKeHoachEm', vai: ['doc_so_du'], tien: 'khong', khoaIdempotency: null, trangThai: 'da_noi', ghiChu: 'Chỉ ĐỌC số để hiển thị; không đổi tiền — giữ nguyên, không cần P07.' },
 ])
 
-/** Số dòng có tác động tiền (cong|chi) — test canh để không ai thêm đường tiền mà quên khai báo. */
-export const SO_DONG_TIEN = SO_TICH_HOP.filter((d) => d.tien !== 'khong').length
 
 /** Tra một đường. KHÔNG có ⇒ `null`; nơi gọi PHẢI fail-closed (xem `kiemTichHopRoute`). */
 export function timDong(duong: string): DongSoTichHop | null {

@@ -7,7 +7,6 @@
 //   · `ngoai_le` = ngoại lệ CÓ TÊN (thi/ca · giáo viên ghim bài) — nêu rõ tên + vì sao không nới sang kênh khác.
 //
 // Hợp đồng chung gồm 6 phần: scope · difficulty · repeat · budget · reserve · score (xem `HOP_DONG`).
-import type { Env } from './kieu'
 
 export const HOP_DONG = ['scope', 'difficulty', 'repeat', 'budget', 'reserve', 'score'] as const
 export type PhanHopDong = (typeof HOP_DONG)[number]
@@ -79,14 +78,3 @@ export const CO_DUONG_PHAT_CAU = {
   nang_luc_v1: 'bản dựng năng lực theo kỹ năng (nguồn: sổ sự kiện)',
 } as const
 
-export async function docCoDangBat(env: Env): Promise<Record<string, boolean>> {
-  const ra: Record<string, boolean> = {}
-  try {
-    const r = await env.DB.prepare('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (SELECT value FROM json_each(?))')
-      .bind(JSON.stringify(Object.keys(CO_DUONG_PHAT_CAU))).all<{ khoa: string; gia_tri: string }>()
-    for (const x of r.results ?? []) ra[String(x.khoa)] = String(x.gia_tri).trim() === 'bat'
-  } catch {
-    /* chưa đọc được ⇒ coi như TẮT (đường cũ) */
-  }
-  return ra
-}

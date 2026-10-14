@@ -3,7 +3,7 @@
 // KHÔNG đọc D1 trực tiếp — nhận tham số từ route handler.
 import type {
   TrangThaiDay, LoaiItem, BuocChua, HocLieuChua, BuocTienDo,
-  TrangThaiBuoc, ItemCongKhai, PhanHoiItem, CauHinhChuaCauSai,
+  TrangThaiBuoc, PhanHoiItem, CauHinhChuaCauSai,
 } from './chua-cau-sai-kieu'
 
 // ---------------------------------------------------------------------------
@@ -37,42 +37,6 @@ export const SAU_THANH_PHAN: readonly BuocHieu[] = [
 // ---------------------------------------------------------------------------
 // Chọn loại item tiếp theo cho một bước (§5.6 — giảm hỗ trợ dần)
 // ---------------------------------------------------------------------------
-export function chonLoaiItemTiep(
-  buoc: BuocChua,
-  tienDo: BuocTienDo,
-  cauHinh: CauHinhChuaCauSai,
-): LoaiItem | null {
-  const soVong = tienDo.soVongHoTro
-  const mucHoTro = tienDo.mucHoTroCaoNhat
-
-  // Bước 1: Chẩn đoán — luôn chạy trước
-  if (!tienDo.receiptChanDoan) {
-    if (buoc.chanDoan.length > 0) return 'chan_doan'
-    if (buoc.phanBiet.length > 0) return 'phan_biet'
-  }
-
-  // Bước 2: Sau chẩn đoán đúng → kiểm lý do (§5.5 thành phần 1-3)
-  if (tienDo.receiptChanDoan && !tienDo.receiptLyDo) {
-    if (buoc.hieuBuoc?.kiemLyDo?.length) return 'kiem_ly_do'
-  }
-
-  // Bước 3: Sau hiểu lý do → kiểm lại tự làm (§5.5 thành phần 4-5)
-  if (tienDo.receiptLyDo && !tienDo.receiptChuyenGiao) {
-    if (buoc.kiemLai.length > 0) return 'kiem_lai'
-  }
-
-  // Bước 4: Chuyển giao sang bài mới (§5.5 thành phần 5-6)
-  if (tienDo.receiptLyDo && buoc.hieuBuoc?.chuyenGiao?.length) {
-    return 'chuyen_giao'
-  }
-
-  // §5.6 — Giảm hỗ trợ: nếu quá số vòng tối đa mà vẫn chưa qua → chuyển thầy
-  if (soVong >= cauHinh.vongHoTroToiDaMoiBuoc && mucHoTro >= 3) {
-    return null  // cần thầy
-  }
-
-  return null
-}
 
 // ---------------------------------------------------------------------------
 // Chuyển trạng thái FSM sau khi nộp item
@@ -211,20 +175,3 @@ export function khoiTaoTienDo(hocLieu: HocLieuChua): BuocTienDo[] {
 // ---------------------------------------------------------------------------
 // Xây ItemCongKhai từ BuocChua + loại item (KHÔNG có đáp án)
 // ---------------------------------------------------------------------------
-export function xayItemCongKhai(
-  id: string,
-  loai: LoaiItem,
-  buocSo: number | undefined,
-  buoc: BuocChua | null,
-): ItemCongKhai {
-  return {
-    id,
-    loai,
-    buocSo,
-    tieuDe: buoc?.tieuDe ?? '',
-    kieu: 'chon',
-    hoi: '',          // Route handler điền từ ProbeRef → câu hỏi thực
-    luaChon: null,
-    // Đáp án KHÔNG có ở đây
-  }
-}

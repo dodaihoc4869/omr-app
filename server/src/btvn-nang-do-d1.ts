@@ -400,8 +400,6 @@ export function nganSachVaSucChua(sbd: string, now: number, hanMs: number, dv: D
   return { nganSach, goc: { cauMoiNgay, onLaiMoiNgay }, giay, sc }
 }
 
-/** Tương thích: chỉ phần ngân sách đưa cho lõi. */
-export const nganSachChoEm = (sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: Pick<HoSoRutCuaEm, 'chuaKhacPhuc' | 'toiHan'>): NganSachBai => nganSachVaSucChua(sbd, now, hanMs, dv, hs).nganSach
 
 /** Lịch mở từng chặng (MỘT lần, lúc chốt) bằng `xepLichChang`; lỗi thời gian ⇒ `null` (dùng `moLucChang` cũ). Trả cả chuỗi JSON để lưu ở `chang_mo_json`. */
 export function xepLichChoBo(chotLuc: string, hanNop: string, chang: string[][], goc: { cauMoiNgay: number; onLaiMoiNgay: number }, giay: number): { json: string; lich: LichDaLuu } | null {

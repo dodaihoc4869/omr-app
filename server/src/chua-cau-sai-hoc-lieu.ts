@@ -272,6 +272,3 @@ export async function docHocLieu(
     ? { duDung: false, lyDo: loi.join(', '), hocLieu: null }
     : { duDung: true, lyDo: '', hocLieu: h }
 }
-export function timBuocVuong(h: HocLieuChua, da: Set<number>): number {
-  return h.buoc.findIndex((_, i) => !da.has(i))
-}

@@ -348,13 +348,6 @@ async function docTrangThaiChungDem(env: Env, nowMs: number): Promise<TrangThaiC
   return v
 }
 
-export async function laHuy(env: Env): Promise<boolean> {
-  return (await docTrangThaiChung(env)).huy
-}
-/** Cờ LÊN ĐẠN: chỉ khi `true` job mới chạy và cổng đóng băng mới bật. */
-export async function laChoPhep(env: Env): Promise<boolean> {
-  return (await docTrangThaiChung(env)).choPhep
-}
 
 export async function docTrangThaiReset(env: Env, j: KhoaJobReset = KHOA_JOB_2109): Promise<TrangThaiReset | null> {
   return (await docTrangThaiChung(env, j)).khoa

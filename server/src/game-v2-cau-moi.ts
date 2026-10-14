@@ -50,32 +50,6 @@ export function chonLauNhat<T extends { qid: string; group: string }>(cu: readon
   return [...cu].sort((a, b) => luc(a) - luc(b) || (a.qid < b.qid ? -1 : a.qid > b.qid ? 1 : 0)).slice(0, Math.max(0, k))
 }
 
-/**
- * Với các câu TRÙM ứng viên: số em trong đoàn ĐÃ THẤY câu ấy (đã làm ở bất kỳ nguồn nào, hoặc trùm đã ra ở chặng trước của em đó). 0 = chưa ai thấy ⇒ đứng trước.
- * `qids` = qid ứng viên; đọc theo lô `json_each` (không quá giới hạn tham số D1). Lỗi đọc ⇒ rỗng.
- */
-export async function demEmDaThayTrum(env: Env, dsSbd: readonly string[], qids: readonly string[]): Promise<Map<string, number>> {
-  const ra = new Map<string, number>()
-  if (dsSbd.length === 0 || qids.length === 0) return ra
-  const them = (qid: string, sbd: string, thay: Map<string, Set<string>>) => { const s = thay.get(qid) ?? new Set<string>(); s.add(sbd); thay.set(qid, s) }
-  const thay = new Map<string, Set<string>>()
-  try {
-    for (const sbd of dsSbd) {
-      const r = await env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))').bind(sbd, JSON.stringify(qids)).all<{ qid: string }>()
-      for (const x of r.results ?? []) them(String(x.qid), sbd, thay)
-    }
-    const t = await env.DB.prepare(
-      `SELECT DISTINCT t.qid, l.sbd FROM doan_trum_cau t JOIN doan_luot l ON l.ma_chang = t.ma_chang
-        WHERE l.sbd IN (SELECT value FROM json_each(?)) AND t.qid IN (SELECT value FROM json_each(?))`,
-    ).bind(JSON.stringify(dsSbd), JSON.stringify(qids)).all<{ qid: string; sbd: string }>()
-    for (const x of t.results ?? []) them(String(x.qid), String(x.sbd), thay)
-  } catch (e) {
-    console.error('[cau-moi] không đọc được câu trùm đã thấy (giữ thứ tự cũ):', e instanceof Error ? e.message : e)
-    return new Map()
-  }
-  for (const [q, s] of thay) ra.set(q, s.size)
-  return ra
-}
 
 /** Số vòng NỚI tối đa khi bù câu lâu nhất (kho lớp có thể hàng nghìn câu cũ: không lặp theo cỡ kho ⇒ không cháy CPU của Worker). Vòng cuối thử TOÀN BỘ câu cũ. */
 export const TOI_DA_VONG_BU = 8
