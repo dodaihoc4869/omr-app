@@ -460,5 +460,5 @@ Thầy (14/10 08:3x): "Tối ưu chuyên sâu toàn bộ cho giờ cao điểm l
 - [ ] Sửa các điểm nghẽn lớn nhất (bộ nhớ isolate, câu SQL nặng, vòng chờ nối tiếp), cổng tốc độ 0 đỏ, phát hành TRƯỚC 19:00 | bằng chứng: (chưa có)
 - [ ] Đo lại cao điểm tối 14/10 (21:35) so 13/10 | bằng chứng: (chưa có)
 Thầy (14/10 ~11:15): "code đã thực sự sạch chưa? siêu tối ưu code thật sạch gọn và cực kì thông minh để tăng tối đa tốc độ phản hồi nhé"
-- [ ] Đo mã chết máy chủ bằng công cụ (tệp không tới được từ index.ts, lệnh không app nào gọi, export không ai dùng) | bằng chứng: (chưa có)
+- [x] Đo mã chết máy chủ bằng công cụ (tệp không tới được từ index.ts, lệnh không app nào gọi, export không ai dùng) | bằng chứng: esbuild metafile 281 tệp/10 ngoài bundle (6 EXP + 4 tệp kiểu); 236 đường: 28 chết, 19 công cụ tay giữ; 22 export chết
 - [ ] Gỡ mã chết đã đo (không đổi hành vi, test so main 0 đỏ mới), phát hành trước 19:00 | bằng chứng: (chưa có)
