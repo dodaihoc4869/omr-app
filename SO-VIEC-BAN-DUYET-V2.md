@@ -462,3 +462,5 @@ Thầy (14/10 08:3x): "Tối ưu chuyên sâu toàn bộ cho giờ cao điểm l
 Thầy (14/10 ~11:15): "code đã thực sự sạch chưa? siêu tối ưu code thật sạch gọn và cực kì thông minh để tăng tối đa tốc độ phản hồi nhé"
 - [x] Đo mã chết máy chủ bằng công cụ (tệp không tới được từ index.ts, lệnh không app nào gọi, export không ai dùng) | bằng chứng: esbuild metafile 281 tệp/10 ngoài bundle (6 EXP + 4 tệp kiểu); 236 đường: 28 chết, 19 công cụ tay giữ; 22 export chết
 - [x] Gỡ mã chết đã đo (không đổi hành vi, test so main 0 đỏ mới), phát hành trước 19:00 | bằng chứng: PR #302 main 28ef299c, Actions 38505471042 SUCCESS; vitest so main 0 đỏ mới
+Thầy (14/10 ~10:35): "gỡ nốt 10 lệnh chết còn lại đi nhé"
+- [ ] Gỡ: /gv/v2/tong · /gv/cau-sai-mo-coi · /gv/doi-sbd · /gv/buoi-chua-de-xuat · 7 lệnh KPI /gv/chua-cau-sai/* (+ màn KpiChuaCauSai chưa gắn) · /hs/chua-cau-sai/gui-thay, tien-do · /game-v2-parent · /hoa2/ph-ngung · /hs|ph/thoi-gian-hoc · /ho-so/nang-luc, cong-bo · /kho/nen/day, rut-cau, xoa | GIỮ: /gv/cau-nghi/xu-ly + /ca/cau-nghi-dap-an (đã hẹn nút ở app thầy), /chua-day /da-day /phieu/xoa (Apps Script ngoài repo có thể gọi), 19 công cụ tay | bằng chứng: (chưa có)
