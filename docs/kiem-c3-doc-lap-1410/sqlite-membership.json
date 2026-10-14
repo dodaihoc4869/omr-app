@@ -1,7 +1,7 @@
 {
   "duLieu": "SQLite :memory: thật, SQL source được load bằng Vite; không D1/Worker runtime/production",
-  "repo": "mã nguồn 439a6f29",
-  "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+  "repo": "mã nguồn a2da228b",
+  "hash": "a2da228b154a44b494aa770ae411f14104566210",
   "rows": [
     {
       "name": "read-minimal-and-no-answer-data",

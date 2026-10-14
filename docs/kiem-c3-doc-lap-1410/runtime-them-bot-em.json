@@ -1,8 +1,8 @@
 {
   "duLieu": "Giả cục bộ; entry /gv thực; không D1/R2/API production",
-  "hash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
-  "runtimeHash": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
-  "dist": "dist của mã 439a6f29",
+  "hash": "a2da228b154a44b494aa770ae411f14104566210",
+  "runtimeHash": "a2da228b154a44b494aa770ae411f14104566210",
+  "dist": "dist của mã a2da228b",
   "missing": [],
   "matrix": [
     {
@@ -54,11 +54,11 @@
           "action": "danh-sach"
         },
         {
-          "path": "/gv/nut-that/ds",
+          "path": "/gv/chua-cau-sai/hang-chieu",
           "action": ""
         },
         {
-          "path": "/gv/chua-cau-sai/hang-chieu",
+          "path": "/gv/nut-that/ds",
           "action": ""
         },
         {
@@ -95,7 +95,7 @@
           "action": "sua_em",
           "goiId": "G-C3",
           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "requestId": "375bbb48-04a5-4875-aa17-1ebbf3440d7c",
+          "requestId": "f0a83321-ffa8-47a7-b6ed-abb4e39568bc",
           "them": [
             "12000003"
           ],
@@ -195,7 +195,7 @@
           "action": "sua_em",
           "goiId": "G-C3",
           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "requestId": "36664974-e90a-40a6-8da0-6f55fe353e8c",
+          "requestId": "0c6607e8-f4ce-436c-8893-d2f7d02f1d5f",
           "them": [
             "12000003"
           ],
@@ -295,7 +295,7 @@
           "action": "sua_em",
           "goiId": "G-C3",
           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "requestId": "f68d82b9-bea3-4dcf-9017-baf2e0f3e57a",
+          "requestId": "bb6f5277-5a40-440c-b753-23d3ccc772ed",
           "them": [
             "12000003"
           ],
@@ -395,7 +395,7 @@
           "action": "sua_em",
           "goiId": "G-C3",
           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "requestId": "3397f251-8827-4abc-902f-a024330c766e",
+          "requestId": "cef0ae13-fdae-44ed-bbfa-321d9232b63f",
           "them": [
             "12000003"
           ],
@@ -454,11 +454,11 @@
           "action": "danh-sach"
         },
         {
-          "path": "/gv/chua-cau-sai/hang-chieu",
+          "path": "/gv/nut-that/ds",
           "action": ""
         },
         {
-          "path": "/gv/nut-that/ds",
+          "path": "/gv/chua-cau-sai/hang-chieu",
           "action": ""
         },
         {
@@ -495,7 +495,7 @@
           "action": "sua_em",
           "goiId": "G-C3",
           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "requestId": "1c576696-aa30-457a-b3b2-3c88f40ff463",
+          "requestId": "7feccbae-a0ec-486c-8e48-71930af0ba3e",
           "them": [
             "12000003"
           ],
@@ -562,6 +562,14 @@
           "action": ""
         },
         {
+          "path": "/gv/goi-bai-7",
+          "action": "tong_hop"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
           "path": "/gv/lop",
           "action": ""
         },
@@ -572,14 +580,6 @@
         {
           "path": "/gv/kiem-tra-ca-nhan",
           "action": ""
-        },
-        {
-          "path": "/gv/goi-bai-7",
-          "action": "tong_hop"
-        },
-        {
-          "path": "/gv/omni",
-          "action": "co-doc"
         },
         {
           "path": "/gv/goi-bai-7",
@@ -595,7 +595,7 @@
           "action": "sua_em",
           "goiId": "G-C3",
           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "requestId": "59d31641-dabe-45a3-89df-fcb6fb706464",
+          "requestId": "e90f196a-06d3-49df-b9a1-94e210e2405c",
           "them": [
             "12000003"
           ],
@@ -706,7 +706,7 @@
     {
       "name": "cold-shell-before-module-and-safe-late-error-after-cancel",
       "ok": true,
-      "shellMs": 119,
+      "shellMs": 135,
       "heldRequests": 1,
       "navigations": 0,
       "js": [],

@@ -296,6 +296,12 @@ try{
      assert(navigations===0,'Thử mở lại tự điều hướng/refresh toàn app')
      await x.context.close();return {extension,blocked,navigations,retrySucceeded,js:x.js,external:x.external}
    })
+   if(args.legacy==='1')await caseRun('legacy-phone-without-at-or-randomUUID',async()=>{
+     const x=await open();await x.page.evaluate(()=>{Array.prototype.at=undefined;Object.defineProperty(crypto,'randomUUID',{value:undefined,configurable:true})})
+     const d=await openPicker(x.page);await change(x.page,d);await d.getByRole('button',{name:'Lưu danh sách',exact:true}).click();await d.getByText('Đã lưu danh sách',{exact:true}).waitFor()
+     const writes=await x.page.evaluate(()=>window.__c3.writes);assert(writes.length===1&&typeof writes[0].requestId==='string'&&writes[0].requestId.length>=8,'Máy thiếu API mới không tạo được mã yêu cầu')
+     assert(!x.js.length&&!x.external.length,'Máy thiếu API mới có lỗi JS hoặc mạng ngoài fixture');await x.context.close();return {writes:1,js:x.js,external:x.external}
+   })
    await caseRun('double-click-and-keyboard-no-parent-submit',async()=>{
      const x=await open(),d=await openPicker(x.page);await change(x.page,d);await x.page.evaluate(()=>window.__c3.mode='write-hold')
      await d.getByRole('button',{name:'Lưu danh sách',exact:true}).evaluate(e=>{e.click();e.click()})

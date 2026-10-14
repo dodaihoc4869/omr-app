@@ -1,0 +1,18 @@
+{
+  "duLieu": "Giả cục bộ; entry /gv thực; không D1/R2/API production",
+  "hash": "a2da228b154a44b494aa770ae411f14104566210",
+  "runtimeHash": "a2da228b154a44b494aa770ae411f14104566210",
+  "dist": "dist của mã a2da228b",
+  "missing": [],
+  "matrix": [],
+  "cases": [
+    {
+      "name": "legacy-phone-without-at-or-randomUUID",
+      "ok": true,
+      "writes": 1,
+      "js": [],
+      "external": []
+    }
+  ],
+  "errors": []
+}
