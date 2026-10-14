@@ -1,0 +1,125 @@
+/* KHỐI HÌNH trong câu trả lời của Thầy (bản vẽ docs/ban-ve-hoi-thay-v2-1410, thầy 14/10). Nạp cùng KhoiTraLoi (mảnh lười của hộp Hỏi Thầy).
+   Chỉ biến màu có sẵn (tokens.css, m3-theme.css) — luật màu 05/10. Sáng/tối theo máy như cả hộp. */
+
+/* — Tô màu chữ: đúng / sai, nhóm chức, thuốc thử, hiện tượng — */
+.lg-tl .lg-dung { font-weight: 700; color: color-mix(in srgb, var(--gg-luc) 75%, var(--m3-on-surface)); }
+.lg-tl .lg-sai { font-weight: 700; color: var(--do); text-decoration: line-through; text-decoration-thickness: 2px; }
+.lg-tl .lg-nhom { display: inline-block; padding: 0 7px; border-radius: 7px; font-weight: 700; font-size: .93em; white-space: nowrap; line-height: 1.5; background: var(--m3-surface-container-high); color: var(--m3-on-surface); }
+.lg-nhom[data-n="nh2"] { background: color-mix(in srgb, var(--gg-xanh) 16%, transparent); color: var(--gg-xanh); }
+.lg-nhom[data-n="cho"] { background: color-mix(in srgb, var(--cam) 20%, transparent); color: color-mix(in srgb, var(--cam) 55%, var(--m3-on-surface)); }
+.lg-nhom[data-n="oh"] { background: color-mix(in srgb, var(--gg-luc) 18%, transparent); color: color-mix(in srgb, var(--gg-luc) 70%, var(--m3-on-surface)); }
+.lg-nhom[data-n="coo"] { background: color-mix(in srgb, var(--do) 15%, transparent); color: var(--do); }
+.lg-tl .lg-thuoc { font-weight: 700; color: var(--tim); }
+.lg-tl .lg-hien { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+/* Màu chữ hiện tượng (nhãn dưới ống + dòng nhận biết) */
+.lg-hien[data-h="quy-xanh"], .lg-tn[data-h="quy-xanh"] .lg-tn-chu b, .lg-hien[data-h="tua-xanh"], .lg-tn[data-h="tua-xanh"] .lg-tn-chu b,
+.lg-hien[data-h="dd-xanh-lam"], .lg-tn[data-h="dd-xanh-lam"] .lg-tn-chu b { color: var(--gg-xanh); }
+.lg-hien[data-h="quy-do"], .lg-tn[data-h="quy-do"] .lg-tn-chu b { color: var(--do); }
+.lg-hien[data-h="trang-bac"], .lg-tn[data-h="trang-bac"] .lg-tn-chu b { color: color-mix(in srgb, var(--slate-400) 55%, var(--m3-on-surface)); }
+.lg-hien[data-h="tua-trang"] { text-decoration-color: var(--slate-300); }
+.lg-hien[data-h="tua-vang"], .lg-tn[data-h="tua-vang"] .lg-tn-chu b, .lg-hien[data-h="tach-lop"], .lg-tn[data-h="tach-lop"] .lg-tn-chu b { color: color-mix(in srgb, var(--gg-vang) 65%, var(--m3-on-surface)); }
+.lg-hien[data-h="tua-nau-do"], .lg-tn[data-h="tua-nau-do"] .lg-tn-chu b { color: color-mix(in srgb, var(--vd-nau) 70%, var(--m3-on-surface)); }
+.lg-hien[data-h="tim"], .lg-tn[data-h="tim"] .lg-tn-chu b, .lg-hien[data-h="xanh-tim"], .lg-tn[data-h="xanh-tim"] .lg-tn-chu b { color: var(--tim); }
+.lg-hien[data-h="mat-mau"], .lg-tn[data-h="mat-mau"] .lg-tn-chu b { color: color-mix(in srgb, var(--cam) 60%, var(--m3-on-surface)); }
+.lg-hien[data-h="khi"], .lg-tn[data-h="khi"] .lg-tn-chu b, .lg-hien[data-h="khong-doi"], .lg-tn[data-h="khong-doi"] .lg-tn-chu b { color: var(--m3-on-surface-variant); }
+
+/* — Vỏ chung của một khối — */
+.lg-k { border-radius: 16px; background: var(--m3-surface); border: 1px solid var(--m3-surface-container-high); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.lg-k-dau { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; color: var(--m3-on-surface-variant); }
+.lg-k-dau svg { flex: none; color: var(--m3-primary); }
+.lg-k-dau button { margin-left: auto; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--m3-outline); background: var(--m3-surface); color: var(--m3-primary); font: inherit; font-size: 13.5px; font-weight: 700; text-transform: none; letter-spacing: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.lg-k-dau button:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+
+/* — THÍ NGHIỆM ẢO: ống nghiệm + giọt thuốc thử + hiện tượng. Đứng ở khung đầu tới khi khối lọt vào màn (data-chay). — */
+/* Mọi ống một hàng (tối đa 4): cột ≥ 64 px ở máy 360 px khi khe 4 px. */
+.lg-tn-hang { display: grid; grid-template-columns: repeat(var(--so, 3), minmax(0, 1fr)); gap: 8px 4px; }
+.lg-tn-hang:not([data-chay]) * { animation-play-state: paused; }
+.lg-tn { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; --tre: 0s; }
+.lg-tn-nhan { font-weight: 800; font-size: 15px; color: var(--m3-on-surface); text-align: center; }
+.lg-tn-thuoc { font-size: 12px; font-weight: 700; color: var(--tim); text-align: center; line-height: 1.3; min-height: 38px; display: flex; align-items: flex-end; overflow-wrap: anywhere; }
+/* Ống canh giữa cột (cột hẹp tới 54 px vẫn vừa: 4 ống ở máy 360 px). */
+.lg-tn-voi { position: relative; width: 100%; max-width: 64px; height: 160px; }
+.lg-tn-ong { position: absolute; left: 50%; margin-left: -22px; top: 32px; width: 44px; height: 110px; box-sizing: border-box; border: 2.5px solid color-mix(in srgb, var(--m3-outline) 80%, transparent); border-top: 0; border-radius: 0 0 22px 22px; overflow: hidden; background: color-mix(in srgb, var(--m3-surface-container) 40%, transparent); }
+.lg-tn-mieng { position: absolute; left: 50%; margin-left: -27px; top: 28px; width: 54px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--m3-outline) 80%, transparent); }
+.lg-tn-long { position: absolute; left: 0; right: 0; bottom: 0; height: 58%; background: var(--sau, color-mix(in srgb, var(--m3-primary) 7%, transparent)); animation: lg-tn-doi-mau 1s ease-in-out calc(var(--tre) + .7s) both; }
+@keyframes lg-tn-doi-mau { from { background: var(--truoc, color-mix(in srgb, var(--m3-primary) 7%, transparent)); } }
+.lg-tn-giot { position: absolute; left: 50%; margin-left: -4px; top: 0; width: 9px; height: 12px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: var(--mau-giot, var(--slate-300)); opacity: 0; animation: lg-tn-giot .75s ease-in calc(var(--tre) + .1s) both; }
+@keyframes lg-tn-giot { 0% { opacity: 1; transform: translateY(0); } 85% { opacity: 1; } 100% { opacity: 0; transform: translateY(72px); } }
+.lg-tn-lua { position: absolute; left: 50%; margin-left: -7px; top: 145px; width: 14px; height: 15px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: linear-gradient(to top, var(--cam), var(--gg-vang)); transform-origin: 50% 100%; animation: lg-tn-lua .45s ease-in-out infinite alternate; }
+@keyframes lg-tn-lua { to { transform: scaleY(1.25); } }
+/* Dung dịch đổi màu */
+.lg-tn[data-h="dd-xanh-lam"] { --mau-giot: color-mix(in srgb, var(--gg-xanh) 70%, var(--slate-50)); --sau: color-mix(in srgb, var(--gg-xanh) 55%, transparent); }
+.lg-tn[data-h="tim"] { --sau: color-mix(in srgb, var(--tim) 60%, transparent); }
+.lg-tn[data-h="xanh-tim"] { --mau-giot: var(--vd-nau); --sau: color-mix(in srgb, var(--tim) 72%, var(--gg-xanh)); }
+.lg-tn[data-h="mat-mau"] { --mau-giot: var(--cam); }
+/* Quỳ tím: mẩu giấy trong ống đổi màu */
+.lg-tn-quy { position: absolute; left: 16px; bottom: 26px; width: 10px; height: 58px; border-radius: 2px; background: var(--quy-sau, var(--gg-xanh)); animation: lg-tn-quy 1s ease calc(var(--tre) + .7s) both; }
+@keyframes lg-tn-quy { from { background: var(--tim); } }
+.lg-tn[data-h="quy-do"] { --quy-sau: var(--do); }
+/* Kết tủa: hạt lắng xuống đáy */
+.lg-tn-tua { position: absolute; left: 0; right: 0; bottom: 0; height: 24px; background: radial-gradient(circle at 20% 70%, var(--tua) 0 3px, transparent 3.5px), radial-gradient(circle at 45% 55%, var(--tua) 0 3px, transparent 3.5px), radial-gradient(circle at 70% 75%, var(--tua) 0 3px, transparent 3.5px), radial-gradient(circle at 32% 88%, var(--tua) 0 3px, transparent 3.5px), radial-gradient(circle at 60% 90%, var(--tua) 0 3px, transparent 3.5px), linear-gradient(to top, var(--tua) 0 9px, transparent 9px); filter: drop-shadow(0 0 1px var(--slate-500)); animation: lg-tn-lang 1.4s ease-out calc(var(--tre) + 1s) both; }
+@keyframes lg-tn-lang { from { opacity: 0; transform: translateY(-46px); } }
+.lg-tn[data-h="tua-trang"] { --tua: color-mix(in srgb, var(--slate-50) 82%, var(--slate-400)); }
+.lg-tn[data-h="tua-vang"] { --tua: var(--gg-vang); }
+.lg-tn[data-h="tua-xanh"] { --tua: color-mix(in srgb, var(--gg-xanh) 70%, var(--slate-50)); }
+.lg-tn[data-h="tua-nau-do"] { --tua: color-mix(in srgb, var(--vd-nau) 70%, var(--do)); }
+/* Gương bạc bám thành ống */
+.lg-tn-guong { position: absolute; inset: 0; border-radius: 0 0 20px 20px; background: linear-gradient(90deg, var(--slate-500) 0 6px, transparent 6px calc(100% - 6px), var(--slate-500) calc(100% - 6px)), linear-gradient(to top, var(--slate-400) 0 6px, transparent 6px); box-shadow: inset 3px 0 0 var(--slate-100), inset -3px 0 0 var(--slate-100); animation: lg-tn-guong 1.6s ease calc(var(--tre) + .9s) both; }
+@keyframes lg-tn-guong { from { opacity: 0; } }
+/* Bọt khí sủi lên (lặp) */
+.lg-tn-bot { position: absolute; bottom: 6px; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--m3-on-surface) 45%, transparent); animation: lg-tn-bot 1.6s ease-in calc(var(--tre) + .9s) infinite; }
+.lg-tn-bot:nth-child(2) { animation-delay: calc(var(--tre) + 1.2s); }
+.lg-tn-bot:nth-child(3) { animation-delay: calc(var(--tre) + 1.5s); width: 5px; height: 5px; }
+.lg-tn-bot:nth-child(4) { animation-delay: calc(var(--tre) + 1.9s); }
+@keyframes lg-tn-bot { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-62px); opacity: 0; } }
+/* Tách lớp: lớp trên (chất béo / ester / aniline) nổi lên */
+.lg-tn-lop { position: absolute; left: 0; right: 0; bottom: 58%; height: 20px; background: color-mix(in srgb, var(--vd-vang) 40%, transparent); border-bottom: 1.5px solid color-mix(in srgb, var(--vd-vang) 70%, var(--m3-outline)); animation: lg-tn-guong 1.2s ease calc(var(--tre) + .9s) both; }
+.lg-tn-chu { font-size: 12.5px; line-height: 1.35; text-align: center; font-weight: 600; color: var(--m3-on-surface); min-height: 34px; overflow-wrap: anywhere; }
+.lg-tn-chu b { display: block; font-weight: 800; }
+@media (prefers-reduced-motion: reduce) {
+  .lg-tn * { animation: none !important; }
+  .lg-tn-bot:nth-child(1) { bottom: 12px; } .lg-tn-bot:nth-child(2) { bottom: 28px; } .lg-tn-bot:nth-child(3) { bottom: 40px; } .lg-tn-bot:nth-child(4) { bottom: 20px; }
+}
+
+/* — PHƯƠNG TRÌNH: chất tham gia → (điều kiện trên mũi tên) → sản phẩm; chất chính viền đậm — */
+.lg-pt { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 16px; line-height: 1.4; }
+.lg-pt .c { padding: 3px 9px; border-radius: 9px; font-weight: 700; white-space: nowrap; background: color-mix(in srgb, var(--m3-primary) 10%, transparent); color: var(--m3-on-surface); }
+.lg-pt .c[data-sp] { background: color-mix(in srgb, var(--gg-luc) 16%, transparent); }
+.lg-pt .c[data-chinh] { outline: 2px solid var(--m3-primary); outline-offset: 1px; }
+.lg-pt .cong { color: var(--m3-on-surface-variant); font-weight: 700; }
+.lg-pt .mui { white-space: nowrap; display: inline-flex; flex-direction: column; align-items: center; min-width: 44px; color: var(--m3-on-surface-variant); font-size: 12px; font-weight: 700; line-height: 1.1; }
+.lg-pt .mui i { font-style: normal; font-size: 20px; line-height: 1; color: var(--m3-on-surface); }
+.lg-pt + .lg-pt { padding-top: 8px; border-top: 1px dashed var(--m3-surface-container-high); }
+
+/* — TÍNH NHANH: từng dòng "đại lượng = phép tính = kết quả", Đáp số làm nổi — */
+.lg-tinh { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 10px; align-items: baseline; font-size: 15.5px; line-height: 1.45; margin: 0; }
+.lg-tinh-dong { display: contents; }
+.lg-tinh dt { font-weight: 700; color: var(--m3-on-surface-variant); white-space: nowrap; }
+.lg-tinh dd { margin: 0; font-variant-numeric: tabular-nums; color: var(--m3-on-surface); overflow-wrap: anywhere; }
+.lg-tinh dd b { font-weight: 800; color: var(--m3-primary); }
+.lg-tinh .cuoi { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--m3-primary-container); color: var(--m3-on-primary-container); font-weight: 800; font-size: 16.5px; }
+.lg-tinh .cuoi dt, .lg-tinh .cuoi dd { color: inherit; font-weight: 800; }
+
+/* — SƠ ĐỒ CHUYỂN HOÁ: luôn dọc (hộp rộng tối đa ~560 px, dàn ngang sẽ gãy hàng giữa mũi tên) — */
+.lg-sd { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.lg-sd li { display: flex; flex-direction: column; align-items: flex-start; }
+.lg-sd .nut { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 12px; font-weight: 800; font-size: 15.5px; background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
+.lg-sd .nut small { font-weight: 700; font-size: 12px; padding: 1px 7px; border-radius: 999px; background: var(--m3-surface); color: var(--m3-primary); }
+.lg-sd .nut[data-dau] { background: var(--m3-surface-container-high); color: var(--m3-on-surface); }
+.lg-sd .nut[data-cuoi] { background: var(--m3-primary); color: var(--m3-on-primary); }
+.lg-sd .mui { display: flex; align-items: center; gap: 10px; margin: 2px 0 2px 22px; min-height: 40px; padding-left: 12px; border-left: 2.5px solid var(--m3-primary); font-size: 13px; font-weight: 700; color: var(--m3-on-surface-variant); }
+.lg-sd .mui > span:not(.sr-only) { padding: 2px 8px; border-radius: 8px; background: var(--m3-surface-container); color: var(--tim); }
+
+/* — HIỆN TƯỢNG → NHÓM CHỨC — */
+.lg-nb { display: flex; flex-direction: column; gap: 8px; }
+.lg-nb-dong { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 9px 12px; border-radius: 12px; background: var(--m3-surface-container-low); font-size: 14px; line-height: 1.45; }
+.lg-nb-dong > span { font-weight: 600; color: var(--m3-on-surface); white-space: nowrap; }
+.lg-nb-dong > i { font-style: normal; color: var(--m3-on-surface-variant); font-weight: 700; }
+.lg-nb-dong > span:last-child { white-space: normal; }
+
+/* — BẪY HAY NHẦM / CHỖ EM NHẦM — */
+.lg-bay { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--m3-error-container); color: var(--m3-on-error-container); font-size: 14.5px; line-height: 1.5; }
+.lg-bay b.tieu { display: block; font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; }
+.lg-bay svg { margin-top: 2px; }
+.lg-tl .lg-bay .lg-sai { color: inherit; }

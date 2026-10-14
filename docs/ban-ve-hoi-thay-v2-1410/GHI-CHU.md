@@ -1,10 +1,12 @@
-# Hỏi Thầy v2: câu trả lời linh hoạt theo từng câu hỏi (bản vẽ 14/10/2026, CHỜ THẦY DUYỆT)
+# Hỏi Thầy v2: câu trả lời linh hoạt theo từng câu hỏi (bản vẽ 14/10/2026, THẦY DUYỆT 14/10, ĐÃ BUILD)
 
 Thầy (14/10): "Tôi muốn nội dung trả lời hiển thị nó linh hoạt hơn cho từng câu hỏi của học sinh, nếu cần vẽ sơ đồ tạo thí nghiệm ảo nhẹ, làm mọi thứ để trả lời học sinh tốt nhất hiểu bài nhanh, in đậm tô màu mọi thứ có thể. Vẽ trước cho tôi xem trước khi build."
 
 - Bản vẽ: `hoi-thay-v2.html` (mở `?k=tn` · `?k=tinh` · `?k=so-do`; thêm `&de=1` để mở đề). Dùng CSS THẬT của app (`tokens.css`, `m3-theme.css`, `loi-giai.css`, `hop-hoi-thay.css`, `tra-loi-thay.css`) + khối mới ngay trong tệp.
 - Ảnh: `anh/` chụp bằng `node scripts/chup-ban-ve-hoi-thay-v2-1410.mjs` (Chromium thật, 3 khổ, sáng/tối). Video hoạt cảnh: `anh/11-thi-nghiem-hoat-canh.webm`.
-- Chưa sửa dòng nào trong `src/` hay `server/`.
+- Thầy duyệt (14/10): "Làm mọi thứ tốt nhất để hs hỏi cái là hiểu được bài ngay" ⇒ build.
+- Code: `server/src/hoi-tro-ly-cau-truc.ts` (lược đồ + làm sạch khối), `server/src/hoi-tro-ly.ts` (chỉ dẫn KHỐI HÌNH), `src/components/loi-giai/KhoiTraLoi.tsx` + `khoi-tra-loi.css` (vẽ khối), `TraLoiThay.tsx` (thứ tự, ++đúng++ / !!sai!!, nhãn nhóm chức, chỉ số polymer).
+- Khác bản vẽ: em ĐANG LÀM thì máy chủ bỏ hẳn phương trình + tính nhanh (sản phẩm và số liệu là đáp án); sơ đồ chỉ giữ ký hiệu (X, Y) của chất cần tìm. Biểu tượng khối vẽ tại chỗ (không dùng lucide) để byte mở app không tăng.
 
 ## 1. Mục tiêu sư phạm, ai dùng
 
@@ -55,18 +57,18 @@ type Khoi =
   | { loai: 'soDo'; nut: { ten: string; nhan?: string }[]; dk: string[] }                                   // ≤ 6 nút
   | { loai: 'tinh'; dong: { nhan: string; bieuThuc: string; ketQua: string }[]; dapSo?: string }            // ≤ 6 dòng
   | { loai: 'bay'; tieuDe: 'Bẫy hay nhầm' | 'Chỗ em nhầm'; chu: string }
-type HienTuong = 'quy-xanh' | 'quy-do' | 'trang-bac' | 'tua-trang' | 'tua-vang' | 'tua-xanh' | 'dd-xanh-lam'
-  | 'tim' | 'xanh-tim' | 'mat-mau' | 'khi' | 'khong-doi'
+type HienTuong = 'quy-xanh' | 'quy-do' | 'trang-bac' | 'tua-trang' | 'tua-vang' | 'tua-xanh' | 'tua-nau-do' | 'dd-xanh-lam'
+  | 'tim' | 'xanh-tim' | 'mat-mau' | 'khi' | 'tach-lop' | 'khong-doi'
 ```
 
-- Hiện tượng là **danh sách đóng 12 loại**: máy em tự vẽ đúng màu, Gemini không gửi mã màu hay hình vẽ.
+- Hiện tượng là **danh sách đóng 14 loại**: máy em tự vẽ đúng màu, Gemini không gửi mã màu hay hình vẽ.
 - Gemini vẫn trả JSON theo `responseSchema` (thêm `khoi` vào `SCHEMA_TRA_LOI`). Chỉ dẫn hệ thống thêm luật: khi nào dùng khối nào, tối đa 3 khối, câu lý thuyết ngắn thì không dùng khối.
 - Máy chủ làm sạch từng ô như hiện nay (bỏ HTML, cắt độ dài, giới hạn số cụm tô đậm); loại `loai`/`hien` lạ; `chuPhang` (ghi sổ, gửi lại làm lịch sử) gồm cả chữ trong khối.
 - Bản vẽ dùng dữ liệu giả sát thực tế; số liệu khung 2 đã tính lại: M(CH₃COOC₂H₅) = 88, M(CH₃COONa) = 82, M(C₂H₅COONa) = 96 (đúng ra 9,6 nếu em lấy nhầm gốc).
 
 ## 5. Ngoại lệ
 
-- **Em đang làm**: máy chủ bỏ `dapSo`, bỏ khối có chữ trùng nội dung phương án (dùng lại bộ chặn lộ đáp án hiện có); khối thí nghiệm chỉ được dùng nhãn trong đề (X, Y, Z…).
+- **Em đang làm**: máy chủ bỏ hẳn phương trình và tính nhanh; sơ đồ chỉ giữ ký hiệu chất cần tìm; nhãn ống dài hơn 4 ký tự bị bỏ; không tô "đúng"; mọi ô chữ trong khối qua bộ chặn lộ đáp án hiện có.
 - **Gemini trả khối hỏng** (thiếu trường, mảng rỗng, loại lạ): bỏ khối đó, phần còn lại vẫn hiện; hỏng hết thì về khuôn cũ.
 - **Công thức dài**: ô chất không ngắt giữa công thức, tự xuống dòng giữa các ô; điều kiện phản ứng một dòng.
 - **Bấm "Làm lại" liên tục**: mỗi lần chỉ dựng lại phần ống, không gọi máy chủ.
