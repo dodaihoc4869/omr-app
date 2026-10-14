@@ -1,5 +1,6 @@
 // @vitest-environment node
 // 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ khối "B · Đoàn Hộ Tống" (3 ca: câu cá nhân, câu chung trùm, phòng cũ ghim tự luận).
+// 14/10: gỡ lệnh chết /kho/rut-cau — bỏ ca chỉ mục rút câu của lệnh ấy.
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // CẤM RÚT CÂU TỰ LUẬN — MÁY CHỦ (Code 3, 21/09/2026). Đề bài: prompt-cam-rut-tu-luan.md.
 // Thầy: "Tuyệt đối không rút câu tự luận, chỉ được rút câu trắc nghiệm, đúng sai, trả lời ngắn — ở mọi chỗ rút đề, TRỪ màn Gọi lên bảng".
@@ -250,7 +251,7 @@ describe('E · luyện đề 2026 (luyen-de.ts)', () => {
 })
 
 // ───────────────────────────── F · KHẮC PHỤC SAU CA + DẠNG BÀI + PHIẾU + RÚT CÂU ─────────────────────────────
-describe('F · khắc phục sau ca, dạng bài, phiếu, /kho/rut-cau', () => {
+describe('F · khắc phục sau ca, dạng bài, phiếu', () => {
   const qidCauTrongGoi = (goi: any) => (goi.cau as Tho[]).map((c) => `${MA}-${c.phan}-${c.so}`)
 
   it('cauKhacPhucGoi theo chuyên đề (không dsDang): thuTu và gói trả về KHÔNG còn câu tự luận', async () => {
@@ -271,21 +272,6 @@ describe('F · khắc phục sau ca, dạng bài, phiếu, /kho/rut-cau', () => 
     const r = await deTheoDangBai(d.env, { ma: 'DB-K' }) as { ok: boolean; de: { cau: Tho[] } }
     expect(r.ok).toBe(true)
     expect(r.de.cau.map((c) => `${c.phan}-${c.so}`).sort()).toEqual(['I-1', 'I-2', 'II-1', 'III-1'])
-  })
-  it('/kho/rut-cau: chỉ mục trả về không có câu tự luận; coSan và soBoTuLuan khớp; gói hỏng/không có ⇒ không kết tội', async () => {
-    const d = dungKho()
-    const r = await goiWorker(worker, d.env, '/kho/rut-cau', { chuyenDe: ['CD1'], soCau: 50 }, true) as { ok: boolean; ds: { qid: string }[]; coSan: number; soBoTuLuan: number }
-    expect(r.ok).toBe(true)
-    expect(r.ds.map((x) => x.qid).sort()).toEqual([...RUT_DUOC].sort())
-    expect(r).toMatchObject({ coSan: RUT_DUOC.length, soBoTuLuan: TU_LUAN.length })
-    const ghi = await goiWorker(worker, d.env, '/kho/rut-cau', { chuyenDe: ['CD1'], soCau: 2 }, true)
-    expect(ghi.ds).toHaveLength(2) // đủ số cần thì dừng, mọi câu ra đều rút được
-    for (const x of ghi.ds) expect(RUT_DUOC).toContain(x.qid)
-    // Tờ thứ hai mà gói R2 MẤT: không đọc được ⇒ không biết ⇒ KHÔNG kết tội (giữ cả 8 dòng chỉ mục của tờ ấy)
-    themTo(d, 'DE-NG'); d.objects.delete('kho/DE-NG.json')
-    const khongDoc = await goiWorker(worker, d.env, '/kho/rut-cau', { chuyenDe: ['CD1'], soCau: 50 }, true)
-    expect(khongDoc.ds.filter((x: { maDe: string }) => x.maDe === 'DE-NG')).toHaveLength(KHO_THO.length)
-    expect(khongDoc.ds.filter((x: { maDe: string }) => x.maDe === MA)).toHaveLength(RUT_DUOC.length)
   })
   it('hsCauSai (khắc phục câu sai theo ca đã thi): câu sai ở ca cũ là tự luận (phần I thiếu phương án) KHÔNG được trả lại; câu rút được vẫn trả', async () => {
     const d = dungKho()

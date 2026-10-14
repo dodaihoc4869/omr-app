@@ -6,7 +6,6 @@
 // TƯƠI KHI ĐỌC, KHÔNG PHẢI KHI GHI: kế hoạch được lập lại mỗi lần em mở (và mỗi đêm bằng cron), nên "lập lại khi có sự
 // kiện" của đề xuất đạt được mà không thêm một câu truy vấn nào vào đường nộp bài. Hồ sơ được dựng lại khi số dòng sổ
 // của em khác số lúc lập kế hoạch trước (`so_su_kien`).
-import { emCoGhi } from './dem-ke-hoach'
 import type { D1Result, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { dungLaiHoSo } from './ho-so-nam-kt'
@@ -837,22 +836,5 @@ export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promi
   return { ok: true, ...kh, thanThu: await thanThuSom }
 }
 
-/** `POST /hs/thoi-gian-hoc {token, phut}` — em đặt số phút học mỗi ngày (10–45). Chỉ HẠ mục tiêu, không nâng vượt trần 16. */
-export async function hsThoiGianHoc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const sbd = await gameIdentity(env, b)
-  return datPhutMoiNgay(env, sbd, b.phut)
-}
 
-/** Đặt số phút học mỗi ngày (10–45) của MỘT em: dùng chung cho em (`/hs/thoi-gian-hoc`) và phụ huynh (`/ph/thoi-gian-hoc`). `sbd` đã được xác thực bởi nơi gọi. */
-export async function datPhutMoiNgay(env: Env, sbd: string, phutTho: unknown): Promise<Record<string, unknown>> {
-  const phut = Math.round(Number(phutTho))
-  if (!Number.isFinite(phut) || phut < PHUT_NGAY_TOI_THIEU || phut > PHUT_NGAY_TOI_DA) {
-    return { ok: false, error: `Số phút mỗi ngày phải từ ${PHUT_NGAY_TOI_THIEU} đến ${PHUT_NGAY_TOI_DA}.` }
-  }
-  await env.DB.prepare(
-    'INSERT INTO study_preferences (sbd, minutes, updated_at) VALUES (?,?,?) ON CONFLICT(sbd) DO UPDATE SET minutes = excluded.minutes, updated_at = excluded.updated_at',
-  ).bind(sbd, phut, new Date().toISOString()).run()
-  emCoGhi(sbd) // số phút mỗi ngày đổi ⇒ ngân sách kế hoạch đổi
-  return { ok: true, phut }
-}
 

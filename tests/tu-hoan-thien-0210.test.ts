@@ -1,5 +1,6 @@
 // @vitest-environment node
 // Vòng học v2 — GĐ5 tự hoàn thiện hằng tuần: hiệu chỉnh luật theo tỉ lệ sai lại; câu nghi sai đáp án.
+// 14/10: gỡ lệnh chết /gv/v2/tong — bỏ phần gọi lệnh ấy.
 import { describe, expect, it } from 'vitest'
 import { taoD1That, goiWorker } from './_d1-that'
 import worker from '../server/src/index'
@@ -35,7 +36,7 @@ describe('tự hoàn thiện', () => {
     expect(r.map((x) => x.qid)).toEqual(['NGHI'])
     expect(r[0]).toMatchObject({ soLan: 6, soSai: 6, tyLeSai: 1 })
   })
-  it('chạy D1: ghi nhật ký tuần một lần, đổi tham số khi đủ dữ liệu, kế hoạch đọc được; route thầy', async () => {
+  it('chạy D1: ghi nhật ký tuần một lần, đổi tham số khi đủ dữ liệu, kế hoạch đọc được', async () => {
     const d = taoD1That(); const env = d.env as unknown as Env
     const ghi = d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn) VALUES(?,?,?,?,?,1,?,?,?)')
     for (let e = 0; e < 40; e++) for (const x of [...DONG, L('2026-10-17', e < 20 ? 0 : 1)]) ghi.run(`k${e}${x.luc}`, `E${e}`, 'Q1', 'game', 'M', x.ketQua, x.luc, x.ngayVn)
@@ -44,8 +45,6 @@ describe('tự hoàn thiện', () => {
     expect(r).toMatchObject({ chay: true, kiem: 40, saiLai: 20 })
     expect((await docThamSo(env)).cachSaiCuoi).toBe(4)
     expect(await chayTuHoanThien(env, now)).toMatchObject({ chay: false })
-    const tong = await goiWorker(worker, d.env, '/gv/v2/tong', {}, true)
-    expect(tong).toMatchObject({ ok: true, thamSo: { cachSaiCuoi: 4 } })
-    expect((await goiWorker(worker, d.env, '/gv/v2/tong', {})).ok).not.toBe(true)
+    // 14/10: gỡ lệnh chết /gv/v2/tong (không app nào gọi) — tham số đã kiểm thẳng bằng docThamSo ở trên.
   })
 })

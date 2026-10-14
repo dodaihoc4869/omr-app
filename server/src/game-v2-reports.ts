@@ -1,18 +1,8 @@
 import type {Env} from './kieu'
-import {parentIdentity} from './game-v2-auth'
 import type {Profile} from './game-v2'
 export interface Scope {enabled:boolean;types:string[];blocked:string[]}
 export async function readGameScope(env:Env,sbd:string):Promise<Scope>{const row=await env.DB.prepare('SELECT json FROM game_v2_scope WHERE sbd=?').bind(sbd).first<{json:string}>();return row?JSON.parse(row.json):{enabled:true,types:[],blocked:[]}}
 async function report(env:Env,sbd:string){const row=await env.DB.prepare('SELECT json FROM game_v2_profile WHERE sbd=?').bind(sbd).first<{json:string}>();if(!row)return {sbd,mastery:[],played:false};const p=JSON.parse(row.json) as Profile;return {sbd,played:true,mastery:p.mastery.map(m=>({dang:m.key,stage:m.stage,due:m.due,distinct:m.groups.length})),earned:p.earned,cutover:p.cutover}}
-export async function parentGame(env:Env,b:Record<string,unknown>):Promise<Record<string,unknown>>{
- const sbd=await parentIdentity(env,String(b.pass??''));const r=await report(env,sbd)
- if(b.action==='task'){
-  const dang=String(b.dang??'');if(!r.mastery.some(m=>m.dang===dang)||!/^[A-Z0-9_]+\.[A-Z0-9_]+\.[A-Z0-9_]+$/.test(dang))throw new Error('Chỉ nhắc ôn dạng con đã học và đã có kết quả game.')
-  const existing=await env.DB.prepare('SELECT id FROM game_v2_task WHERE sbd=? AND dang=? AND completed_at IS NULL').bind(sbd,dang).first<{id:string}>()
-  if(!existing)await env.DB.prepare('INSERT INTO game_v2_task(id,sbd,dang,created_at) VALUES(?,?,?,?)').bind(crypto.randomUUID(),sbd,dang,new Date().toISOString()).run()
- }
- return {ok:true,report:r}
-}
 export async function adminGame(env:Env,b:Record<string,unknown>):Promise<Record<string,unknown>>{
  const sbd=String(b.sbd??'').trim();if(!sbd)throw new Error('Nhập SBD cần xem.')
  if(b.action==='spirit'){

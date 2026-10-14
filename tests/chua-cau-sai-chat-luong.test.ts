@@ -1,4 +1,5 @@
 // @vitest-environment node
+// 14/10: gỡ lệnh chết /gv/chua-cau-sai/{thong-ke,hang-thay}, /hs/chua-cau-sai/{gui-thay,tien-do} — bỏ 2 ca KPI/hàng thầy; ca quyền dùng lệnh còn sống (danh-sach, hang-chieu).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That, serialiseD1, goiWorker } from './_d1-that'
 import { seedChua, Q, hocLieuMau } from './_chua-cau-sai-fixture'
@@ -7,7 +8,6 @@ import {
   phatItem,
   nopItem,
   xinGoiY,
-  thongKeKpi,
 } from '../server/src/chua-cau-sai'
 import { kiemTinhDayDu } from '../server/src/chua-cau-sai-hoc-lieu'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
@@ -178,16 +178,14 @@ describe('Vòng chữa — API, SQL thật, quyền và bằng chứng', () => {
     const d = await dung()
     expect(
       (
-        await goiWorker(worker, d.env, '/hs/chua-cau-sai/tien-do?sbd=HS1', {
-          dotId: 'x',
-        })
+        await goiWorker(worker, d.env, '/hs/chua-cau-sai/danh-sach?sbd=HS1', {})
       ).ma,
     ).toBe('CAN_DANG_NHAP')
     expect(
-      (await goiWorker(worker, d.env, '/gv/chua-cau-sai/thong-ke', {})).ok,
+      (await goiWorker(worker, d.env, '/gv/chua-cau-sai/hang-chieu', {})).ok,
     ).toBe(false)
     expect(
-      (await goiWorker(worker, d.env, '/gv/chua-cau-sai/thong-ke', {}, true))
+      (await goiWorker(worker, d.env, '/gv/chua-cau-sai/hang-chieu', {}, true))
         .ok,
     ).toBe(true)
   })
@@ -255,24 +253,6 @@ describe('Vòng chữa — API, SQL thật, quyền và bằng chứng', () => {
     expect(ns.map((r) => r.status).sort()).toEqual([200, 409])
     expect(d.dem('chua_loi_nop')).toBe(1)
   })
-  it('KPI gồm bỏ dở và thiếu học liệu, không cần đã gặp lại 2', async () => {
-    const d = await dung(),
-      id = await mo(d)
-    await sua(d, id)
-    vi.setSystemTime(T + 86400001)
-    const r = await phat(d, id)
-    await nop(d, id, r.item, '171')
-    d.sql
-      .prepare(
-        "INSERT INTO chua_loi_dot(id,sbd,qid_chuan,cohort_id,mo_luc,trang_thai_day,giao_luc,chot_do_luc,tao_luc,cap_nhat_luc) VALUES('D2','HS1','Q2','pilot-chua-cau-sai-v1',1,'can_chan_doan',?,?,1,1),('D3','HS1','Q3','pilot-chua-cau-sai-v1',1,'thieu_hoc_lieu',?,?,1,1)",
-      )
-      .run(T, T + 7 * 86400000, T, T + 7 * 86400000)
-    vi.setSystemTime(T + 7 * 86400000 + 1)
-    const k = await (await thongKeKpi(d.env, {})).json()
-    expect(k.mauSo).toBe(3)
-    expect(k.tuSo).toBe(1)
-    expect(k.kpiPhanTram).toBe(33.3)
-  })
   it('hết câu mới và thiếu kiểm lý do phải báo thiếu học liệu', () => {
     const h = hocLieuMau()
     h.buoc[0].hieuBuoc!.kiemLyDo = []
@@ -302,28 +282,6 @@ describe('Phạm vi toàn trường và hàng giúp đỡ', () => {
       .run()
     expect(d.dem('chua_loi_dot')).toBe(n + 1)
     expect(d.dem('chua_loi_dot', "qid_chuan='Q2'")).toBe(1)
-  })
-  it('yêu cầu em gửi thật sự vào hàng thầy và giáo viên đọc được bằng quyền riêng', async () => {
-    const d = await dung(),
-      id = await mo(d)
-    for (const tra of ['40', 'A', 'A']) {
-      const p = await phat(d, id)
-      await nop(d, id, p.item, tra)
-    }
-    const r = await goiWorker(worker, d.env, '/hs/chua-cau-sai/gui-thay', {
-      token: d.token,
-      dotId: id,
-    })
-    expect(r.daLuu).toBe(true)
-    expect(d.dem('chua_loi_thay')).toBe(1)
-    const h = await goiWorker(
-      worker,
-      d.env,
-      '/gv/chua-cau-sai/hang-thay',
-      {},
-      true,
-    )
-    expect(h.ds[0].sbd).toBe('HS1')
   })
   it('gợi ý được retry không nâng mức hoặc đổi thời điểm hỗ trợ', async () => {
     const d = await dung(),

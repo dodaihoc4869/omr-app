@@ -1,5 +1,6 @@
 // @vitest-environment node
 // 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "Đoàn kho lớp" (doan-mo đã gỡ); ca nợ mọi nguồn dựng lại bằng startDao2(…, true) thay startDoan2.
+// 14/10: gỡ lệnh chết /gv/buoi-chua-de-xuat — bỏ ca LUẬT B "Buổi chữa tối nay".
 // CHẶN CÂU KHÁC KHỐI — TỪNG KÊNH RÚT CÂU (luật A) + TỪNG DANH SÁCH CHỮA BÀI / CHIẾU LÊN BẢNG (luật B) trên D1 THẬT (điều phối 05/10/2026).
 // Lệnh thầy 05/10 (nguyên văn):
 //   1) "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé"
@@ -257,17 +258,6 @@ describe('LUẬT A cho từng em do MÁY gợi ý ở lớp — Kiểm tra đầ
     const r = await hoSoOnCa(d.env, { dsSbd: ['S1'], maCa: 'CA-MOI', ngayCa: NGAY }, T0) as Record<string, any>
     expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
     chiKhoi11((r.em.S1.sai as { qid: string }[]).map((x) => x.qid), 'hồ sơ ôn ca')
-  })
-})
-
-describe('LUẬT B — "Buổi chữa tối nay" (`/gv/buoi-chua-de-xuat`, lớp 11)', () => {
-  it('câu nhiều em sai của lớp 11: KHÔNG câu khác khối / mâu thuẫn', async () => {
-    const { gvBuoiChuaDeXuat } = await import('../server/src/gv-buoi-chua-de-xuat')
-    const d = await dungKho()
-    for (const s of ['S1', 'S2', 'S4']) await ghiSai(d, s, mauMoiTo(3), T0 - 1 * MOT_NGAY, { nguon: ['game'] })
-    const r = await gvBuoiChuaDeXuat(d.env, { ngay: NGAY, lop: '11' }) as Record<string, any>
-    expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
-    khongKhacKhoi11(((r.cauSaiNhieu ?? []) as { qid: string }[]).map((x) => x.qid), 'Buổi chữa tối nay')
   })
 })
 

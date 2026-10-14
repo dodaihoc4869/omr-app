@@ -1,5 +1,6 @@
 // @vitest-environment node
 // ĐỆM + DỒN LƯỢT `/hs/ke-hoach-ngay` (Boss 21/09 ~21:05): lượt trùng dùng chung MỘT lần tính; đệm 20 giây theo em (mức mô-đun); em GHI ⇒ đệm bỏ ngay (số ở thẻ Hôm nay không đứng);
+// 14/10: gỡ lệnh chết /hs/thoi-gian-hoc — bỏ ca xoá đệm sau khi đổi số phút.
 // lượt đệm KHÔNG ghi gì và KHÔNG lặp thông báo một lần; hai em không lẫn; lỗi không được đệm; thanThu đọc tươi.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
@@ -109,15 +110,5 @@ describe('/hs/ke-hoach-ngay qua Worker', () => {
   it('lỗi (em không có thật) không được đệm; lượt kế vẫn báo lỗi đúng', async () => {
     const d = taoD1That()
     expect((await goi(d, 'KHONGCO')).ok).toBe(false); expect((await goi(d, 'KHONGCO')).ok).toBe(false)
-  })
-  it('lệnh nộp qua Worker (canh-bao/xem của em, thoi-gian-hoc) xoá đệm: đổi số phút ⇒ ngân sách mới NGAY', async () => {
-    const d = truong(); const token = await gameToken(d.env, 'S1')
-    d.sql.prepare("UPDATE hoc_sinh SET mat_khau='mk' WHERE sbd='S1'").run()
-    const tk = await gameToken(d.env, 'S1'); void token
-    const a = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { token: tk })
-    expect(a.ok).toBe(true)
-    const doi = await goiWorker(worker, d.env, '/hs/thoi-gian-hoc', { token: tk, phut: 12 }); expect(doi.ok).toBe(true)
-    const b = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { token: tk })
-    expect(b.ok).toBe(true); expect(JSON.stringify(b.nganSach)).not.toBe(JSON.stringify(a.nganSach))
   })
 })

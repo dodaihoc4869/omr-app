@@ -173,20 +173,6 @@ export async function chayTuHoanThien(env: Env, nowMs: number): Promise<Record<s
   return { chay: true, tuan, kiem, saiLai, thamSo: moi, cauNghi: nghi.length, emRieng: soEm }
 }
 
-/** `/gv/v2/tong` (thầy): tham số đang dùng, 8 tuần hiệu chỉnh gần nhất, câu đang nghi sai đáp án. */
-export async function gvTongV2(env: Env): Promise<Record<string, unknown>> {
-  await damBaoBangTuHoanThien(env)
-  await damBaoBangThamSoEm(env)
-  const [ts, hc, ng, em] = await Promise.all([
-    docThamSo(env),
-    env.DB.prepare('SELECT * FROM v2_hieu_chinh ORDER BY tuan DESC LIMIT 8').all<Row>(),
-    env.DB.prepare("SELECT * FROM cau_nghi_dap_an WHERE trang_thai = 'nghi' ORDER BY ty_le_sai DESC LIMIT 100").all<Row>(),
-    // Em có ngưỡng riêng, hay quên nhất trước (để thầy biết em nào được kiểm lại sớm hơn).
-    env.DB.prepare('SELECT t.sbd, h.ho_ten, t.ty_le, t.n_kiem, t.n_sai_lai, t.tham_so_json FROM v2_tham_so_em t LEFT JOIN hoc_sinh h ON h.sbd = t.sbd ORDER BY t.ty_le DESC LIMIT 30').all<Row>(),
-  ])
-  const emRieng = (em.results ?? []).map((x) => { let t: Partial<ThamSoLuat> = {}; try { t = JSON.parse(str(x.tham_so_json)) } catch { /* bỏ */ } return { sbd: str(x.sbd), hoTen: str(x.ho_ten), tyLeSaiLai: Number(x.ty_le), soLuotKiem: Number(x.n_kiem), cachSaiCuoi: t.cachSaiCuoi, mocDuyTri: t.mocDuyTri } })
-  return { ok: true, thamSo: ts, hieuChinh: hc.results ?? [], cauNghi: ng.results ?? [], emRieng }
-}
 /** `/ca/cau-nghi-dap-an` (thầy): qid đang nghi ⇒ rút đề ca thi tạm bỏ. */
 export async function dsCauNghi(env: Env): Promise<{ ok: true; qid: string[] }> {
   await damBaoBangTuHoanThien(env)

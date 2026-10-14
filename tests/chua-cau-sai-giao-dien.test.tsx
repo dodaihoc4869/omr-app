@@ -5,7 +5,6 @@ const api = vi.hoisted(() => ({
   apiPhatItem: vi.fn(),
   apiNopItem: vi.fn(),
   apiXinGoiY: vi.fn(),
-  apiGuiThay: vi.fn(),
   apiCoChua: vi.fn(),
 }))
 vi.mock('../src/lib/chua-cau-sai-api', () => api)
@@ -55,7 +54,6 @@ describe('Trải nghiệm sửa từng bước', () => {
     expect(
       screen.queryByRole('button', { name: /Nhờ thầy|Gửi thầy/ }),
     ).toBeNull()
-    expect(api.apiGuiThay).not.toHaveBeenCalled()
   })
   it('mất mạng lúc mở đầu có thể tải lại và bắt đầu đúng phiên', async () => {
     api.apiMoDot

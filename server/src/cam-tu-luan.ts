@@ -6,7 +6,6 @@
 //
 // Kênh KHÔNG được gọi (thầy loại trừ): Gọi lên bảng (`len-bang*`, `ho-so-len-bang`), ca thi và bài thầy tự chọn bộ câu (`choThiLai`, `noiKhoCa`, `layDeKho`) — server chỉ kiểm thành viên.
 // Câu tự luận em ĐÃ TỪNG sai vẫn nằm nguyên trong hồ sơ (`nam_kt_cau`, `su_kien_hoc`); chỉ là không phục vụ lại qua các kênh rút.
-import type { Env } from './kieu'
 import { chuBaoBoTuLuan, laCauTuLuan, locCauRutDuoc, lyDoTuLuan, type PhanCau } from '../../src/lib/cau-tu-luan'
 
 export { chuBaoBoTuLuan, laCauTuLuan, locCauRutDuoc, lyDoTuLuan }
@@ -58,30 +57,7 @@ export function goTuLuanKhoiGoi(goi: unknown, maDe = ''): { soBo: number; qidBo:
 }
 
 // Đệm theo phiên bản tờ: `<mã đề>|<cap_nhat_luc>` → qid tự luận của tờ. Isolate của Worker sống lâu nên lượt rút sau không đọc lại R2; đổi phiên bản tờ ⇒ khoá mới.
-const DEM_TO = new Map<string, Set<string>>()
-const DEM_TO_TOI_DA = 400
 
-/**
- * Qid TỰ LUẬN của một tờ kho (đọc gói R2 `kho/<mã đề>.json`, có đệm theo phiên bản tờ). `null` = KHÔNG đọc được gói ⇒ không biết ⇒ nơi gọi KHÔNG kết tội (giữ câu),
- * đúng nguyên tắc của hàm chung. Dùng ở các lệnh chỉ trả CHỈ MỤC (không có đáp án) như `/kho/rut-cau`.
- */
-export async function qidTuLuanCuaTo(env: Pick<Env, 'DE'>, maDe: string, phienBan: string): Promise<Set<string> | null> {
-  const khoa = `${maDe}|${phienBan}`
-  const co = DEM_TO.get(khoa)
-  if (co) return co
-  if (!env.DE || !maDe) return null
-  try {
-    const o = await env.DE.get(`kho/${maDe}.json`)
-    if (!o?.body) return null
-    const goi = await new Response(o.body).json()
-    const qidBo = goTuLuanKhoiGoi(goi, maDe).qidBo
-    if (DEM_TO.size >= DEM_TO_TOI_DA) DEM_TO.clear()
-    DEM_TO.set(khoa, qidBo)
-    return qidBo
-  } catch {
-    return null
-  }
-}
 
 /** PHIẾU BÀI TẬP (`phieu.cau[]`, khuôn `CauLuyen`): bản đã gỡ câu tự luận + số câu bị gỡ. Phiếu không có mảng `cau` (phiếu kết quả / báo cáo) ⇒ giữ nguyên, 0. */
 export function locPhieuBaiTap<T>(phieu: T): { phieu: T; soBo: number } {

@@ -27,8 +27,6 @@ export const KHOA_CAU_HINH = 'canh_bao_tu_dong'
 export const KHOA_LAN_CHAY = 'nhac_tu_dong_lan'
 export const CAC_MOC = ['M1', 'M2', 'M3', 'M4'] as const
 export type Moc = (typeof CAC_MOC)[number]
-/** Trần phụ huynh: mỗi ngày ≤ 1 tin, mỗi 7 ngày ≤ 3 tin (đếm theo nhóm tin `ph_nhom`). */
-export const PH_TOI_DA_MOI_NGAY = 1
 export const PH_TOI_DA_7_NGAY = 3
 export const NGAY_PH_DEM = 7
 /** M1: còn ≤ ngần này giờ; M2/M3 gửi từ 20:00; M4 từ 07:00 sáng hôm sau; M3: chậm ≥ ngần này chặng và bài còn ≥ 1 ngày. */
