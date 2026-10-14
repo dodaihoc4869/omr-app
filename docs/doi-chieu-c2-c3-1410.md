@@ -1,8 +1,12 @@
-# Bàn giao phần còn lại C2/C3 · 14/10/2026
+# Đối chiếu C2/C3 trước và sau thay thế · 14/10/2026
 
-Đối chiếu main `bd4c5086b53f7ce8a01543a6f6b171f39ed745e3`, mã sống PR290 `1b597a08`. Có một agent rà soát độc lập chỉ đọc; kết luận dưới đây được đối chiếu với source. Không tạo đợt phát hành khác hoặc sửa D1 thật.
+Bản đối chiếu ban đầu dùng main `bd4c5086b53f7ce8a01543a6f6b171f39ed745e3`, mã sống PR290 `1b597a08`. Phần bên dưới lưu nguyên bằng chứng trước sửa; trạng thái mới ở đoạn cập nhật và [báo cáo C3](ket-qua-c3-1410.md). Có một agent rà soát độc lập chỉ đọc; kết luận dưới đây được đối chiếu với source. Không tạo đợt phát hành khác hoặc sửa D1 thật.
 
-## Phạm vi đã hoàn thành
+## Trạng thái cập nhật sau thầy chốt
+
+Thầy đã duyệt “Ok chốt”; Codex build đủ doc_em/sua_em, CAS/biên nhận và quyền nhận bền, nối giao diện nạp lười, gỡ Sửa em cũ cùng PR291. Đã gộp main `2f91f0e4` và giữ Hỏi Thầy/KTCN của Claude. Chromium22/22 +18 tổ hợp ba app +11 ca PWA/URL cũ, SQL độc lập18/18 và soát toàn tuyến19/19 đạt. TS/build/tốc độ/màu/SW đạt trên nguồn `a2da228b`; full theo tên và trạng thái phát hành ghi trong báo cáo. Các kết luận “chưa API/chưa duyệt” dưới đây chỉ đúng tại thời điểm đối chiếu ban đầu. Không suy bằng chứng local thành kiểm D1 thật.
+
+## Phạm vi tại lần đối chiếu ban đầu
 
 - **C1:** đã phát hành PR290; không dọn lại những tệp đã gỡ. Bằng chứng đồ thị, byte tải, TypeScript, màu, SW, Chromium và đối chiếu full theo tên nằm trong [báo cáo phát hành](ket-qua-toi-uu-toan-app-1410.md).
 - **C2:** đã gỡ phần không còn dùng. Giữ `SuaChienDich`, `HopChon`, CSS/helper/API của nó và nút **Sửa em** vì còn caller thật. Gỡ chúng cùng bản phát hành Thêm/Bớt em mới, sau khi bản thay thế đã được duyệt và kiểm đạt.

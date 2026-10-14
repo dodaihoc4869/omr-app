@@ -1,0 +1,41 @@
+{
+  "agent_sha": "5413dbb10e66299ed4f9f708d32662a1991b297c",
+  "integration_sha": "a2da228b154a44b494aa770ae411f14104566210",
+  "suite": "/tmp/c3-soat-sql/c3-doc-lap.test.ts",
+  "log": "/tmp/c3-soat-sql/ket-qua-5413.log",
+  "tests": 19,
+  "pass": 19,
+  "fail": 0,
+  "duration_seconds": 4.52,
+  "C3_server_files_equal_except_index": true,
+  "integration_index_diff": "Chỉ thêm export TramGemini; route/ACK membership không đổi.",
+  "other_server_diffs": [
+    "hoi-tro-ly.ts",
+    "kieu.ts",
+    "srs2-sua.ts",
+    "tom-tat-sua-chien-dich.ts",
+    "tram-gemini.ts"
+  ],
+  "permission_sql_unchanged": true,
+  "source_sha256": {
+    "server/src/bai-da-day.ts": "4f0849b58d531f5c7e5f4b0e0d90be428cc76737295f360d3e5ca3378af52bd7",
+    "server/src/bai-hang-ngay.ts": "66d90f6b51710bde01bcdd12092070f5a32b97fe59674666bc639a710bf93345",
+    "server/src/game-v2-luot.ts": "a0d0a7fba67ca2fc66501ae70732df54ccb86c9c52291480c0c6490e19b9c1d2",
+    "server/src/game-v2.ts": "109f02c24b1832cf7a52a6bc34a396078c21ddf0b7fc4be5da28974dfc19f95f",
+    "server/src/goi-bai-7-chan-moi.ts": "8e052f40293c684a2960ff243c674bb2a40b6403eec250e83668829b97958a09",
+    "server/src/goi-bai-7-kiem.ts": "947b574f070ab2eceee2838f62143ca7a0fa67652d95ebee5a9ac9cdb184830c",
+    "server/src/goi-bai-7-membership.ts": "7c11c5c65876be514f16b6a88f8e96d25a277465791c60b43a7f3830e442cb45",
+    "server/src/goi-bai-7-quyen.ts": "60ece09227255fbf1be6962f394bdacb9c4c50a0d607fcd2d23f61df3e93b58d",
+    "server/src/goi-bai-7-schema.ts": "4b335897add824ee31e10e0c75df4254cea42a9cc33e2a957ca587856014017a",
+    "server/src/goi-bai-7-thay.ts": "32603c368fb296416590cab2f29226b65390c8e5ebd51ab629ac3bc256470b80",
+    "server/src/goi-bai-7-tong-hop.ts": "f7790215964eade2e644c2aa532ceb01c9cdf30dd59d11de7533d333aed202bf",
+    "server/src/goi-bai-7.ts": "2fa6c722776aace2b032033bffcebad13cf58d395a31ff40ce55c6db555efc11",
+    "server/src/index.ts": "5512dce9db60739ec20caa21ae746556fa37167eb4a2c8dc551b626e268d1119",
+    "server/src/kiem-tra-ca-nhan.ts": "43b34e71ebb25fb8b5641cc3ef723da061c1447d6eff5473513f29804346bae7",
+    "server/src/reset-hoa2.ts": "45e680a195851f616463379691308bfdebf6a8b3549c1c998e7c782691399714",
+    "server/src/reset-toan-app.ts": "c770850e6ece340566626ff0bd3c4ec77b74f195b465f842ebe56986fc4fd3af",
+    "server/src/srs2-d1.ts": "35a0818ce97d431ba798c21b054b58b4fdd229fd0df9f9cbb79a8d0b9c08ebc3",
+    "server/src/srs2-game.ts": "8e4231c4644cac368585e71fb9ab00d25b56d2da8dba5328bd5f66ca6bb19833"
+  },
+  "runtime": "SQLite bộ nhớ, lược đồ thật và full gameV2 router; không Cloudflare D1 production/replica."
+}

@@ -1,0 +1,14 @@
+  ✓  danh sách tệp đã được chèn và đủ đóng khởi động ba cổng
+  ✓  dạng IIFE, không phải ES module
+  ✓  có đường lui ra mạng cho lượt điều hướng
+  ✓  có đường lui cuối vào CacheStorage
+  ✓  trang app là index.html
+  ✓  chiếm quyền ngay
+  ✓  KHÔNG tự gỡ đăng ký service worker
+  ✓  KHÔNG xoá sạch CacheStorage
+  ✓  KHÔNG ép tab đang mở điều hướng lại
+  ✓  precache nhỏ (169 tệp / 2896 KB; trần 170 tệp / 3000 KB)
+  ✓  có kho chạy-lúc cho mảnh ngoài precache
+  ✓  kho chạy-lúc KHÔNG cất trang HTML dưới tên mảnh
+  ✓  có chốt tự sửa khi app trắng màn
+KẾT LUẬN SERVICE WORKER: ĐẠT  13/13

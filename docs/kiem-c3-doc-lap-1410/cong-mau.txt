@@ -1,0 +1,5 @@
+
+> omr-app@0.0.0 check:mau
+> node scripts/check-mau.mjs
+
+✅ Không có mã màu # nào ngoài src/styles/tokens.css

@@ -1,0 +1,22 @@
+{
+ "sanh-lan-dau": {
+  "dot": 29,
+  "lenh": 36
+ },
+ "sanh-lan-sau": {
+  "dot": 6,
+  "lenh": 10
+ },
+ "mo-chang": {
+  "dot": 10,
+  "lenh": 16
+ },
+ "nop-cau": {
+  "dot": 9,
+  "lenh": 12
+ },
+ "dem-hom-nay": {
+  "dot": 1,
+  "lenh": 1
+ }
+}

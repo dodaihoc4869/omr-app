@@ -1,0 +1,17 @@
+
+> omr-app@0.0.0 kiem:toc-do
+> node scripts/kiem-toc-do-tai.mjs && vitest run tests/toc-do-may-chu-lenh-nong-1310.test.ts --reporter=dot
+
+✓ bằng mốc — giao-vien: 264.4 KB nén, 17 tệp (mốc 264.0 KB, +0.4 KB)
+✓ bằng mốc — hoc-sinh: 322.7 KB nén, 47 tệp (mốc 322.2 KB, +0.5 KB)
+✓ bằng mốc — phu-huynh: 259.6 KB nén, 24 tệp (mốc 259.1 KB, +0.5 KB)
+
+ RUN  v4.1.11 /workspace/chot-ban-ve-c3-1410
+
+·
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  00:10:49
+   Duration  5.53s (transform 4.02s, setup 326ms, import 4.28s, tests 765ms, environment 0ms)
+
