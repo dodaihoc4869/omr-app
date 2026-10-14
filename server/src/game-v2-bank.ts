@@ -6,6 +6,7 @@ import { laQidChanDoan } from './lam-lai-so'
 /** 06/10: giải mã câu chẩn đoán bước sai — nhập trễ (chan-doan-buoc-sai.ts kéo theo omni-d1 / thang-tu-go: tránh vòng nạp với tệp nền này). */
 const lanChanDoan = () => import('./chan-doan-buoc-sai')
 import {DemTTL} from './dem-chung'
+import { cauGonTuDong, SQL_CAU_GON_KIEN_THUC } from './cau-gon'
 import {dbGoc} from './cau-hinh-dem'
 import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
 import { docKhoDeGiaoCuaEm, locTheoKhoDeGiao } from './kho-de-giao'
@@ -271,6 +272,8 @@ export async function napDayDuMem(env:Env,ds:readonly {maDe:string;qid:string;ve
 // ĐỆM KHO NHẸ THEO DẠNG (Code 1 đo trên kho thật: 15.359 câu / 953 dạng / 60 triệu ký tự JSON ⇒ đệm json 16 triệu ký tự bị đẩy liên tục): chỉ giữ SIÊU DỮ LIỆU (~300 byte/câu ⇒ cả kho ~5 MB), sống 15 phút;
 // đổi kho (thêm/sửa/xoá tờ) đổi khoá `phienBanKho` nên không bao giờ dùng bản cũ. Câu đầy đủ chỉ nạp cho vài câu được chọn (`doDayDu`).
 const demKhoDang=new DemTTL<{k:string;q:CauPool}[]>(900_000,1500,30_000_000)
+/** Lượt nạp dạng ĐANG chạy trong isolate (khoá = phiên bản kho | mã dạng) — yêu cầu đến cùng lúc chờ chung (14/10, trước: mỗi yêu cầu tự nạp cả kho dạng). */
+const dangNapKhoDang=new Map<string,Promise<{k:string;q:CauPool}[]>>()
 // CACHE API `caches.default` (Boss 22/09, tốc độ tối đa — LỚP 2: sống sót qua khởi động lạnh, DÙNG CHUNG giữa các isolate
 // trong CÙNG colo Cloudflare; `demKhoDang` ở trên chỉ sống trong MỘT isolate = LỚP 1, D1 = LỚP 3). Thứ tự đọc:
 // demKhoDang → caches.default → D1. Khoá theo `phienBanKho` (kho đổi ⇒ khoá đổi ⇒ KHÔNG cần móc bất hoạt, khoá cũ tự
@@ -370,24 +373,41 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
   let phienBanKho='?';let coPhamVi=false;try{const v=await env.DB.prepare(`SELECT COUNT(*) AS n, COALESCE(MAX(d.cap_nhat_luc),'') AS t, COALESCE(GROUP_CONCAT(d.ma_de),'') AS ids, (SELECT gia_tri FROM cau_hinh WHERE khoa='pham_vi_hoc') AS co_pv FROM de_kho d JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0`).first<{n:number;t:string;ids:string;co_pv:string|null}>();phienBanKho=`${v?.n}|${v?.t}|${v?.ids}`;coPhamVi=String(v?.co_pv??'').trim()==='bat'}catch{phienBanKho='?'+Math.random()}
   const bayGio=Date.now()
   for(let i=0;i<types.length;i+=60){const ids=types.slice(i,i+60)
-    const theoDang=new Map<string,{k:string;q:CauPool}[]>();const thieu:string[]=[]
+    const theoDang=new Map<string,{k:string;q:CauPool}[]>();const thieu:string[]=[];const cho:[string,Promise<{k:string;q:CauPool}[]>][]=[]
     // LỚP 1 (demKhoDang, một isolate) → LỚP 2 (caches.default, cả colo) → LỚP 3 (D1, dưới).
     for(const d of ids){
       const c=demKhoDang.doc(phienBanKho+'|'+d,bayGio)
       if(c){theoDang.set(d,c);continue}
-      const viaCache=await docKhoCacheAPI(phienBanKho,d)
-      if(viaCache){theoDang.set(d,viaCache);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,viaCache,viaCache.length*300+64);continue}
+      // 14/10 MỘT LƯỢT NẠP mỗi dạng mỗi isolate: lượt khác đang nạp đúng dạng này (cùng phiên bản kho) ⇒ chờ chung, không nạp lần hai.
+      const dangNap=dangNapKhoDang.get(phienBanKho+'|'+d)
+      if(dangNap){cho.push([d,dangNap]);continue}
       thieu.push(d)
     }
     if(thieu.length){
-      const khoa=await env.DB.prepare(`SELECT q.dang,q.ma_de,q.qid FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${thieu.map(()=>'?').join(',')})`).bind(...thieu).all<{dang:string;ma_de:string;qid:string}>()
+      // Đăng ký lượt nạp NGAY (trước mọi `await`) để yêu cầu đến sau thấy và chờ chung.
+      const nap=(async()=>{
+      const moi=new Map<string,{k:string;q:CauPool}[]>()
+      const can:string[]=[]
+      for(const d of thieu){const viaCache=await docKhoCacheAPI(phienBanKho,d);if(viaCache){moi.set(d,viaCache);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,viaCache,viaCache.length*300+64)}else can.push(d)}
+      if(!can.length)return moi
+      const khoa=await env.DB.prepare(`SELECT q.dang,q.ma_de,q.qid FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${can.map(()=>'?').join(',')})`).bind(...can).all<{dang:string;ma_de:string;qid:string}>()
       const dangCua=new Map(khoa.results.map(k=>[str(k.ma_de)+'|'+str(k.qid),str(k.dang)] as [string,string]))
       const ds=khoa.results.map(k=>[str(k.ma_de),str(k.qid)] as [string,string]).sort((a,b)=>{const x=a[0]+'|'+a[1],y=b[0]+'|'+b[1];return x<y?-1:x>y?1:0})
-      const moi=new Map<string,{k:string;json:string}[]>(thieu.map(d=>[d,[]]))
-      for(let j=0;j<ds.length;j+=300){const r=await env.DB.prepare(`SELECT q.ma_de,q.qid,q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') ORDER BY j.key`).bind(JSON.stringify(ds.slice(j,j+300))).all<{ma_de:string;qid:string;json:string}>()
-        for(const x of r.results){const k=str(x.ma_de)+'|'+str(x.qid);moi.get(dangCua.get(k)??'')?.push({k,json:str(x.json)})}}
-      for(const [d,v] of moi){const nhe=v.map(x=>({k:x.k,q:lamNhe(JSON.parse(x.json) as PrivateQuestion)}));theoDang.set(d,nhe);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,nhe,nhe.length*300+64);await ghiKhoCacheAPI(phienBanKho,d,nhe)}
+      for(const d of can)moi.set(d,[])
+      // 14/10 (giờ cao điểm 13/10: 135 yêu cầu chết vì isolate vượt 128 MB): đọc câu RÚT GỌN (cau-gon.ts — không ảnh / lời giải / bảng, giữ nhãn kiến thức)
+      // thay JSON đầy đủ (~3.950 ký tự/câu, có câu 290.000) rồi `lamNhe` NGAY từng lô. Cờ tự luận trùng `laCauTuLuan` câu đầy đủ (tests/cau-gon-1410).
+      for(let j=0;j<ds.length;j+=300){const r=await env.DB.prepare(`SELECT game_v2_question.ma_de AS ma_de,game_v2_question.qid AS qid,${SQL_CAU_GON_KIEN_THUC} FROM json_each(?) j JOIN game_v2_question ON game_v2_question.ma_de=json_extract(j.value,'$[0]') AND game_v2_question.qid=json_extract(j.value,'$[1]') WHERE json_valid(game_v2_question.json) ORDER BY j.key`).bind(JSON.stringify(ds.slice(j,j+300))).all<Record<string,unknown>>()
+        for(const x of r.results){const k=str(x.ma_de)+'|'+str(x.qid);const c=cauGonTuDong(x);if(!c)continue/* JSON không phải đối tượng câu: không bao giờ phục vụ được */;moi.get(dangCua.get(k)??'')?.push({k,q:lamNhe(c as unknown as PrivateQuestion)})}}
+      for(const d of can){const nhe=moi.get(d)!;demKhoDang.ghi(phienBanKho+'|'+d,Date.now(),nhe,nhe.length*300+64);await ghiKhoCacheAPI(phienBanKho,d,nhe)}
+      return moi
+      })()
+      for(const d of thieu){
+        const khoaNap=phienBanKho+'|'+d,p=nap.then(m=>m.get(d)??[])
+        dangNapKhoDang.set(khoaNap,p);const bo=()=>{if(dangNapKhoDang.get(khoaNap)===p)dangNapKhoDang.delete(khoaNap)};p.then(bo,bo)
+        cho.push([d,p])
+      }
     }
+    for(const [d,p] of cho)theoDang.set(d,await p)
     const gop=ids.flatMap(d=>theoDang.get(d)??[]).sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0)
     pool.push(...gop.map(x=>x.q))
   }

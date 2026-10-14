@@ -21,7 +21,8 @@ function kho() {
   const dem = { kho: 0, dau: 0 }
   const goc = k.env.DB
   const env = { ...k.env, DB: { prepare: (q: string) => {
-    if (q.includes("json_extract(g.json,'$.hanhTrinh')") || q.startsWith('SELECT ma_de, qid, json FROM game_v2_question')) dem.kho++
+    // 14/10: `cauCuaToChiTiet` đọc câu RÚT GỌN (cau-gon.ts) — nhận cả câu SQL mới (cùng một lượt đọc kho câu các tờ).
+    if (q.includes("json_extract(g.json,'$.hanhTrinh')") || q.startsWith('SELECT ma_de, qid, json FROM game_v2_question') || q.startsWith('SELECT ma_de, qid, json_remove(game_v2_question.json')) dem.kho++
     if (q === SQL_DAU_KHO_CAU) dem.dau++
     return goc.prepare(q)
   }, batch: goc.batch.bind(goc) } } as unknown as Env

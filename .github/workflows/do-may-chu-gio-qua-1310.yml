@@ -20,8 +20,9 @@ jobs:
     env:
       # 13/10 (VN): đo 1 giờ SAU PR280 (sống 21:03:41 VN) — khung cố định 21:20–22:20 VN (14:20–15:20 UTC): sau phát hành 16 phút, TRƯỚC lượt phát hành PR283 (22:25 VN).
       # So với 1 giờ cao điểm TRƯỚC sửa (12:11–13:11 UTC, workflow 38402898461). DEN rỗng ⇒ tới hiện tại.
-      GIO: '1'
-      DEN: '2026-10-13T15:20:00Z'
+      # 14/10: cao điểm TRỌN 13/10 19:30–22:30 VN (12:30–15:30 UTC) — tìm điểm nghẽn theo từng câu SQL cho đợt tối ưu giờ cao điểm.
+      GIO: '3'
+      DEN: '2026-10-13T15:30:00Z'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
@@ -45,12 +46,12 @@ jobs:
           const v = { acc: ACC, db: DB_ID, tu: tu.toISOString(), den: den.toISOString() }
           console.log(`Khung: ${v.tu} → ${v.den} (${GIO} giờ)`)
           const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
-            d1QueriesAdaptiveGroups(limit:30,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
+            d1QueriesAdaptiveGroups(limit:50,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
               count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`, v)
           const ds = d1?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
           const tong = ds.reduce((n, x) => n + x.sum.queryDurationMs, 0)
           console.log(`=== D1: ${ds.length} nhóm truy vấn đầu · tổng ${Math.round(tong / 1000)} s thời gian truy vấn ===`)
-          for (const x of ds) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 220)].join(' '))
+          for (const x of ds) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 420)].join(' '))
           const w = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
             workersInvocationsAdaptive(limit:5,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den}){
               sum{requests errors subrequests} quantiles{cpuTimeP50 cpuTimeP90 cpuTimeP99 durationP50 durationP90 durationP99}}}}}`, v)

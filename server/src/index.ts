@@ -2,7 +2,7 @@ import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { khoiPhucChienDich0810 } from './khoi-phuc-chien-dich-0810'
 import { nhipCa } from './nhip-ca'
 import { anhCo, anhDay, layAnh } from './kho-anh'
-import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
+import { ghiDoLenh, heSoGoiNen, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
@@ -4046,7 +4046,7 @@ export default {
     try { res = await boXuLy.fetch(req, env, ctx) } catch (e) { console.error('[may-chu] lỗi chưa bắt:', tenLenh(new URL(req.url).pathname), e); res = raLoi(e) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
     // HEADER song song với trường JSON `nhipDeNghi` (Code 2: máy em yếu, khỏi phải clone + parse thân phản hồi 20–100 KB): `x-nhip-de-nghi: 1|2|4` + cho trình duyệt đọc qua CORS. Thân phản hồi đi nguyên (stream).
     const h = new Headers(res.headers)
-    h.set('x-nhip-de-nghi', String(nhipDeNghi().heSo))
+    h.set('x-nhip-de-nghi', String(heSoGoiNen(new URL(req.url).pathname)))
     const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-nhip-de-nghi` : 'x-nhip-de-nghi')
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   },
