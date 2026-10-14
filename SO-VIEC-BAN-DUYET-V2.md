@@ -454,4 +454,8 @@ Thầy (14/10 ~06:00, ảnh thẻ Kiểm tra ôn tập 17/10): "Bỏ nút xem l�
 - [ ] Sau khi thầy duyệt Thêm/Bớt em: Claude làm API máy chủ /gv/goi-bai-7 doc_em/sua_em (ngừng nhận bền theo gói × SBD, CAS, requestId), Codex làm giao diện | bằng chứng: (chưa có)
 Thầy (14/10 07:5x): "Duyệt" (bản vẽ Thêm/Bớt em).
 - [x] Thêm/Bớt em trong Tick bài | bằng chứng: Codex làm cả giao diện + API (PR #291, #295 thầy gộp 07:29/07:45), Actions 38491930339 SUCCESS 07:49 VN. Claude soát máy chủ: mọi chỗ đọc goi_bai_7_em dùng `sqlEmDangNhan7`; `dongBoGoi7` theo `goi_bai_7_chon_em` (em bị bớt không tự thêm lại); ghi một batch CAS + requestId; từ chối khi ca mở — đạt.
-- [~] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts, tom-tat-sua-chien-dich.ts, /gv/chien-dich/sua) | commit 49818746; 5 tệp test liên quan 90/90 + đo máy chủ 3/3; tsc sạch; kiem:toc-do 0 đỏ; đang chạy vitest toàn bộ so main.
+- [x] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts, tom-tat-sua-chien-dich.ts, /gv/chien-dich/sua) | bằng chứng: PR #297 main 1b1328c1, Actions 38495467408 SUCCESS 08:32 VN, Worker 6e5187e6; vitest toàn bộ so main 0 đỏ mới (118→117), 21 ca bỏ chỉ khoá lệnh đã gỡ; tsc sạch; kiem:toc-do 0 đỏ.
+Thầy (14/10 08:3x): "Tối ưu chuyên sâu toàn bộ cho giờ cao điểm luôn nhé"
+- [x] Đo giờ cao điểm hôm qua theo TỪNG câu SQL (D1 insights: thời gian, dòng đọc) + theo lệnh, tìm điểm nghẽn thật | bằng chứng: workflow 38496981327 (13/10 19:30–22:30 VN: 50.755 yc, 135 exceededMemory từ 21:10, D1 1.631 s); 38497270246 (kho 15.359 câu, JSON TB 3.946, max 289.745; sổ 202.342 dòng, TB 775/em); đo heap: đệm sổ 50k dòng ≈ 47 MB
+- [ ] Sửa các điểm nghẽn lớn nhất (bộ nhớ isolate, câu SQL nặng, vòng chờ nối tiếp), cổng tốc độ 0 đỏ, phát hành TRƯỚC 19:00 | bằng chứng: (chưa có)
+- [ ] Đo lại cao điểm tối 14/10 (21:35) so 13/10 | bằng chứng: (chưa có)

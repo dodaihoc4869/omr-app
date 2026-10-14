@@ -29,7 +29,8 @@ import {
 } from './srs2-loi'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { protectedQuestions } from './game-v2-bank'
-import { docCauTuJson, jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
+import { jsonLaTuLuan } from './cam-tu-luan'
+import { SQL_CAU_GON, tuLuanTuMeta } from './cau-gon'
 import { docNhomTheoQid } from './nhom-noi-dung'
 // OMNI 3 (05/10) — mọi hành vi mới CHỈ khi `omniBat(env, sbd)`; cờ tắt ⇒ mọi đường dưới đây y hệt trước (khoá: tests/omni-3-ke-hoach-co-tat.test.ts).
 import type { PhamViLop } from './bai-da-day'
@@ -318,40 +319,8 @@ export interface MetaCau {
   /** Khối ghi THẲNG trong JSON câu (`lop`/`khoi`) — một nguồn khối của câu khi mã tờ không mang khối (luật thầy 05/10, `khoi-cau.ts`). Vắng ⇒ không có. */
   lop?: string | null
 }
-/**
- * Phần SQL đọc câu RÚT GỌN cho `tuLuanTuMeta` (bảng `game_v2_question`, cột `json`): câu bỏ trường nặng (ảnh, lời giải, bảng), ảnh phương án/ý thay bằng
- * mảng 0/1 cùng thứ tự, hình kèm câu thay bằng `{viTri, src: 'x'|''}`. Đủ MỌI trường `lyDoTuLuan` đọc ⇒ kết quả trùng `laCauTuLuan(câu đầy đủ)`
- * (phản biện #108: trước đây độn phương án bằng 'x' theo số lượng ⇒ phương án rỗng chữ lọt, kế hoạch đếm mà Đảo bỏ ⇒ rương vẫn kẹt).
- * CHÚ Ý: trong `json_each(...)` phải ghi `game_v2_question.json` — tên trần `json` bị hiểu là cột ẩn `json` của chính `json_each` (ra mảng rỗng).
- */
-/** SQL: giá trị JSON (kiểu `t`, giá trị `v` của `json_each`) có "thật" theo JS `Boolean` không (null/false/''/0 ⇒ 0, còn lại — kể cả mảng/đối tượng rỗng — ⇒ 1). */
-const THAT_JS = (v: string, t: string) => `(CASE ${t} WHEN 'null' THEN 0 WHEN 'false' THEN 0 WHEN 'text' THEN ${v} <> '' WHEN 'integer' THEN ${v} <> 0 WHEN 'real' THEN ${v} <> 0 ELSE 1 END)`
-/** SQL: cờ 0/1 của MỘT phần tử mảng ảnh phương án/ý đúng như `CO_ANH` (src/lib/cau-tu-luan.ts): mảng ⇒ có phần tử "thật"; còn lại ⇒ `Boolean`. */
-const CO_ANH_SQL = `CASE WHEN e.type = 'array' THEN EXISTS (SELECT 1 FROM json_each(e.value) f WHERE ${THAT_JS('f.value', 'f.type')}) ELSE ${THAT_JS('e.value', 'e.type')} END`
-/** SQL: đường dẫn của khoá đầu tiên CÓ MẶT (kể cả JSON null) — đúng `lay(c, khoa1, khoa2)` (`!== undefined`). */
-const KHOA_DAU = (a: string, b: string) => `(CASE WHEN json_type(game_v2_question.json,'$.${a}') IS NOT NULL THEN '$.${a}' ELSE '$.${b}' END)`
-/** SQL: mảng cờ ảnh (chỉ khi giá trị là MẢNG — JS `Array.isArray(anh) ? anh : []`; chuỗi/đối tượng đơn ⇒ không có cờ nào). */
-const CO_ANH_MANG = (a: string, b: string) =>
-  `(SELECT json_group_array(${CO_ANH_SQL}) FROM json_each(game_v2_question.json, ${KHOA_DAU(a, b)}) e WHERE json_type(game_v2_question.json, ${KHOA_DAU(a, b)}) = 'array')`
-/** SQL: "thật" của khoá `k` trong đối tượng `e.value` (khoá vắng/null ⇒ NULL để COALESCE sang khoá kế — đúng `??`). */
-const THAT_KHOA = (k: string) => `CASE WHEN COALESCE(json_type(e.value,'$.${k}'),'null') = 'null' THEN NULL ELSE ${THAT_JS(`json_extract(e.value,'$.${k}')`, `json_type(e.value,'$.${k}')`)} END`
-const SQL_CAU_GON = `json_remove(json,'$.imageDataUrl','$.thanCauImg','$.solution','$.table','$.choiceImgs','$.ideaImgs','$.hinhAnh','$.hinh','$.kienThuc','$.anhLuaChon','$.anhY') AS gon,
-        ${CO_ANH_MANG('choiceImgs', 'anhLuaChon')} AS anh_pa,
-        ${CO_ANH_MANG('ideaImgs', 'anhY')} AS anh_y,
-        (SELECT json_group_array(json_object('viTri', COALESCE(json_extract(e.value,'$.viTri'), json_extract(e.value,'$.vi_tri')),
-            'src', CASE WHEN COALESCE(${THAT_KHOA('src')}, ${THAT_KHOA('url')}, ${THAT_KHOA('data')}, 0) THEN 'x' ELSE '' END))
-          FROM json_each(game_v2_question.json, ${KHOA_DAU('hinh', 'hinhAnh')}) e
-          WHERE e.type = 'object' AND json_type(game_v2_question.json, ${KHOA_DAU('hinh', 'hinhAnh')}) = 'array') AS hinh_gon`
-const mangJson = (v: unknown): unknown[] => {
-  try { const a = JSON.parse(typeof v === 'string' ? v : '[]') as unknown; return Array.isArray(a) ? a : [] } catch { return [] }
-}
-/** Cờ tự luận của một dòng đọc bằng `SQL_CAU_GON`: dựng lại câu (ảnh = cờ) rồi hỏi ĐÚNG `laCauTuLuan` như lúc phát câu. JSON không đọc được ⇒ tự luận (không phục vụ). */
-export function tuLuanTuMeta(x: Row): boolean {
-  const c = docCauTuJson(x.gon)
-  if (!c) return true
-  const anhPa = mangJson(x.anh_pa), anhY = mangJson(x.anh_y), hinh = mangJson(x.hinh_gon)
-  return laCauTuLuan({ ...c, ...(anhPa.length ? { choiceImgs: anhPa } : {}), ...(anhY.length ? { ideaImgs: anhY } : {}), ...(hinh.length ? { hinhAnh: hinh } : {}) })
-}
+// Câu RÚT GỌN (`SQL_CAU_GON`, `tuLuanTuMeta`) chuyển sang cau-gon.ts (14/10) để mọi chỗ cần lọc/đếm câu đọc bản gọn thay vì JSON đầy đủ.
+export { tuLuanTuMeta } from './cau-gon'
 /**
  * Siêu dữ liệu câu (không đáp án xuống máy em, không lời giải). Câu có ở nhiều tờ: ưu tiên tờ thuộc `uuTienMaDe`.
  * 30/09: bỏ dòng JSON hỏng (`json_valid`) hoặc JSON không mang đúng `qid`/`version` của cột (khoá nạp `maDe|qid|version` ở `napDayDuMem` không khớp ⇒ câu ấy

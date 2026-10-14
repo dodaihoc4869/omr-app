@@ -441,10 +441,13 @@ const COT_SO_MOI = `${COT_SO_CU}, received_at, assistance, purpose, visibility, 
 interface DemSo { n: number; r: number }
 /**
  * ĐỆM DÒNG SỔ theo em (giờ cao điểm: mỗi câu trả lời thêm MỘT dòng ⇒ khỏi đọc lại cả sổ): khớp (n, r) ⇒ dùng lại; sổ chỉ THÊM dòng mới hơn ⇒ đọc phần
- * `received_at ≥ r` rồi kiểm tổng số dòng (lệch — vd dòng tới muộn mang mốc cũ — ⇒ đọc lại cả sổ). Trần 50 000 dòng mỗi isolate, 5 phút.
+ * `received_at ≥ r` rồi kiểm tổng số dòng (lệch — vd dòng tới muộn mang mốc cũ — ⇒ đọc lại cả sổ). Trần `TRAN_DONG_DEM_SO` dòng mỗi isolate, 5 phút.
  * Dòng SỬA tại chỗ (chấm lại ca, công bố đổi `visibility`) không đổi (n, r) ⇒ trễ tối đa 5 phút ở isolate đã đệm (như mọi đệm hồ sơ).
  */
-const demSo = new DemTTL<{ rows: Row[] } & DemSo>(5 * 60_000, 100, 50_000)
+/** 14/10 (giờ cao điểm 13/10: 135 yêu cầu chết vì isolate vượt 128 MB): đo heap — 50.000 dòng sổ (17 cột, raw_json TB 73 ký tự) ≈ 47 MB, gần NỬA trần isolate.
+ *  Hạ trần còn 15.000 dòng (≈ 14 MB, ~19 em × 775 dòng TB): em ngoài đệm đọc lại cả sổ (~11 ms) thay vì cả isolate bị giết. */
+export const TRAN_DONG_DEM_SO = 15_000
+const demSo = new DemTTL<{ rows: Row[] } & DemSo>(5 * 60_000, 100, TRAN_DONG_DEM_SO)
 const maxNhan = (rows: readonly Row[]): number => rows.reduce((m, x) => Math.max(m, Number(x.received_at) || 0), 0)
 async function docDongSoTho(env: Env, sbds: readonly string[], tuNhan?: number): Promise<Row[]> {
   const ds = dsJson(sbds)

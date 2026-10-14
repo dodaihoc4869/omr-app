@@ -8,8 +8,8 @@ import { noiDungCauChienDich } from './noi-dung-cau-chien-dich'
 import { thuHoiKhiHuy } from './thu-hoi-chien-dich'
 import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
-import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
+import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
 import { khoaCau } from '../../src/lib/khu-trung-cau'
 import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, HANG_MUC_DO, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
@@ -99,12 +99,12 @@ export const maGocCuaTo = (maDe: readonly string[]): string[] => [...new Set(maD
  * `theoTo`: số câu dùng được mà MỖI tờ góp vào (sau khi bỏ trùng) — cộng lại đúng bằng `qids.length`, để màn giao hiện số từng tờ khớp tổng.
  */
 export async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<{ qids: string[]; theoTo: Record<string, number>; theoMucDo: Record<string, number> }> {
-  const r = await env.DB.prepare('SELECT ma_de, qid, json FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) ORDER BY rowid').bind(JSON.stringify(maGocCuaTo(maDe))).all<Row>()
+  // 14/10: đọc câu RÚT GỌN (cau-gon.ts — không ảnh/lời giải, ~650 so với ~3.950 ký tự/câu): chỉ cần duyệt / tự luận / phần / mức độ. Dòng JSON hỏng bị bỏ như cũ.
+  const r = await env.DB.prepare(`SELECT ma_de, qid, ${SQL_CAU_GON} FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY rowid`).bind(JSON.stringify(maGocCuaTo(maDe))).all<Row>()
   const theoGoc = new Map<string, { qid: string; phan: string; mucDo: string }[]>()
   for (const x of r.results ?? []) {
-    let q: PrivateQuestion
-    try { q = JSON.parse(str(x.json)) as PrivateQuestion } catch { continue }
-    if (!q.reviewed || laCauTuLuan(q)) continue
+    const q = cauGonTuDong(x)
+    if (!q || !q.reviewed || laCauTuLuan(q)) continue
     const k = str(x.ma_de)
     theoGoc.set(k, [...(theoGoc.get(k) ?? []), { qid: str(x.qid), phan: str(q.phan), mucDo: str((q as { mucDo?: unknown }).mucDo).trim() }])
   }
