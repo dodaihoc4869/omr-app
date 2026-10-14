@@ -26,7 +26,6 @@ const str = (v: unknown): string => (v == null ? '' : String(v))
 
 /** Số câu một chuyến thám hiểm (6 ải) và số câu riêng của một chặng Đoàn (8 hiệp − 2 hiệp trùm). */
 export const SO_CAU_CHUYEN = 6
-export const SO_CAU_CHANG = 6
 /** Rương Bát Linh: vàng (mua phụ kiện ở Cửa hàng), KHÔNG phải EXP — không đụng trần 120 EXP/ngày. */
 export const VANG_RUONG = 20
 

@@ -7,7 +7,6 @@
 //   · `ngoai_le` = ngoại lệ CÓ TÊN (thi/ca · giáo viên ghim bài) — nêu rõ tên + vì sao không nới sang kênh khác.
 //
 // Hợp đồng chung gồm 6 phần: scope · difficulty · repeat · budget · reserve · score (xem `HOP_DONG`).
-import type { Env } from './kieu'
 
 export const HOP_DONG = ['scope', 'difficulty', 'repeat', 'budget', 'reserve', 'score'] as const
 export type PhanHopDong = (typeof HOP_DONG)[number]
@@ -36,7 +35,6 @@ export const DUONG_PHAT_CAU: readonly DuongPhatCau[] = [
   { path: '/hs/ke-hoach-ngay', cach: 'ke_hoach', hopDong: ['scope', 'budget', 'score'], ghiChu: 'bộ điều phối NGÀY: việc ôn/BTVN/Mom lấy từ kế hoạch đã chốt' },
   { path: '/hs/thu-thach-hom-nay', tienTo: true, cach: 'ngoai_le', hopDong: ['scope'], ngoaiLeTen: 'thu_thach_rieng_bo_nao', ghiChu: 'thẻ thử thách do Bộ não chốt trước; chưa đi bộ chọn chung ⇒ ghi nhận là ngoại lệ tạm, có tên' },
   { path: '/hs/on-lai', tienTo: true, cach: 'ngoai_le', hopDong: ['scope', 'repeat'], ngoaiLeTen: 'on_lai_nop_theo_qid', ghiChu: 'NỘP câu đã phát (`layCauChoEm` kiểm đã gặp + bảo vệ), không tự chọn câu mới' },
-  { path: '/vo-dai', tienTo: true, cach: 'ngoai_le', hopDong: ['scope'], ngoaiLeTen: 'vo_dai_doi_khang', ghiChu: 'đấu đối kháng theo ca/giải; câu do luật võ đài chọn, không dùng để tính đạt ngày' },
   { path: '/luyen-de', tienTo: true, cach: 'ngoai_le', hopDong: ['scope'], ngoaiLeTen: 'luyen_de_tron_de', ghiChu: 'luyện TRỌN ĐỀ theo yêu cầu: giữ nội dung đề, KHÔNG dùng để tính đạt ngày' },
   { path: '/goi', cach: 'ngoai_le', hopDong: [], ngoaiLeTen: 'kenh_cu_appscript', ghiChu: 'kênh CŨ (Apps Script) — giữ để lùi, không cấp câu mới theo cá nhân' },
 ]
@@ -52,7 +50,7 @@ export function traDuong(p: string): DuongPhatCau | undefined {
  * trong `DUONG_PHAT_CAU` ⇒ coi như SÓT (test đỏ). Thêm kênh mới phải cập nhật cả hai chỗ.
  */
 export const MAU_PHAT_CAU: readonly string[] = [
-  '/game-v2', '/luyen-de', '/vo-dai', '/hs/thu-thach-hom-nay', '/hs/ke-hoach-ngay', '/goi', '/hs/on-lai',
+  '/game-v2', '/luyen-de', '/hs/thu-thach-hom-nay', '/hs/ke-hoach-ngay', '/goi', '/hs/on-lai',
 ]
 
 /** Đường này có phải cổng vào có thể phát câu/đề (theo `MAU_PHAT_CAU`). */
@@ -80,14 +78,3 @@ export const CO_DUONG_PHAT_CAU = {
   nang_luc_v1: 'bản dựng năng lực theo kỹ năng (nguồn: sổ sự kiện)',
 } as const
 
-export async function docCoDangBat(env: Env): Promise<Record<string, boolean>> {
-  const ra: Record<string, boolean> = {}
-  try {
-    const r = await env.DB.prepare('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (SELECT value FROM json_each(?))')
-      .bind(JSON.stringify(Object.keys(CO_DUONG_PHAT_CAU))).all<{ khoa: string; gia_tri: string }>()
-    for (const x of r.results ?? []) ra[String(x.khoa)] = String(x.gia_tri).trim() === 'bat'
-  } catch {
-    /* chưa đọc được ⇒ coi như TẮT (đường cũ) */
-  }
-  return ra
-}

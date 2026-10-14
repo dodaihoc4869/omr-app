@@ -100,7 +100,6 @@ import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
 import { capNhatSaiNhanhNeuCu } from './sai-nhanh-gv'
-import * as VD from './vo-dai'
 import type { D1PreparedStatement, D1Result, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
@@ -110,7 +109,6 @@ import { gvDauGio } from './dau-gio'
 import { thayChuaCau } from './thay-chua-cau'
 import { aiSaiCau } from './ai-sai-cau'
 import { doiSbd } from './doi-sbd'
-import { quetKhoi } from './quet-khoi'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 // OMNI 3 (05/10): tick bài đã dạy · hai thư mục kho · lệnh thầy OMNI · việc đêm (công tắc cau_hinh.omni mặc định TẮT).
@@ -3644,16 +3642,6 @@ const boXuLy = {
       if (p === '/hs/than-thu') return ra(await G.thanThuDoc(env, b))
       if (p === '/hs/than-thu-ghi') return ra(await G.thanThuGhi(env, b))
       if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))
-      // ĐẤU TRƯỜNG CHÂN LÝ — phòng sáu người. Máy chủ chỉ cất đội hình đã nộp;
-      // trận đánh do máy em tính, và nó tất định. Xem `server/src/vo-dai.ts`.
-      if (p === '/vo-dai/tao') return ra(await VD.voDaiTao(env, b))
-      if (p === '/vo-dai/moi') return ra(await VD.voDaiMoi(env, b))
-      if (p === '/vo-dai/loi-moi') return ra(await VD.voDaiLoiMoi(env, b))
-      if (p === '/vo-dai/vao') return ra(await VD.voDaiVao(env, b))
-      if (p === '/vo-dai/bat-dau') return ra(await VD.voDaiBatDau(env, b))
-      if (p === '/vo-dai/xem') return ra(await VD.voDaiXem(env, b))
-      if (p === '/vo-dai/nop') return ra(await VD.voDaiNop(env, b))
-      if (p === '/vo-dai/dong') return ra(await VD.voDaiDong(env, b))
       // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
       if (p === '/goi') {
         if (String(b.action??'').trim()==='nopKhacPhuc') return await traLoiNopBtvn(()=>goiCu(req,env,b))
@@ -3801,7 +3789,6 @@ const boXuLy = {
       if (p === '/gv/chua-nop') return ra(await gvChuaNop(envDoc, b))
       if (p === '/gv/can-giup') return ra(await gvCanGiup(envDoc, b))
       if (p === '/gv/vinh-danh-ngay') return ra(await gvVinhDanhNgay(envDoc, b))
-      if (p === '/gv/quet-khoi') return ra(await quetKhoi(envDoc, b)) // 06/10: CHỈ ĐỌC — câu lọt khối trong sổ làm của em khối `khoi`
       if (p === '/gv/tim-em') return ra(await gvTimEm(envDoc, b))
       if (p === '/gv/em-toan-canh') return ra(await gvEmToanCanh(envDoc, b))
       // GỌI LÊN BẢNG (thầy lệnh 21/09): em đã làm câu này chưa, đúng hay sai, quét HẾT lịch sử (KHÔNG áp mốc 12:00). ĐỌC-CHỈ, ≤ 200 cặp, 2 truy vấn (docs/hop-dong-lich-su-cau-len-bang-2109.md).
