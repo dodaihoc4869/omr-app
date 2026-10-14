@@ -26,7 +26,7 @@ Main nền mới nhất: `2f91f0e402b9a737bca370236d492cf86f27dc4b` (giữ PR292
 | Bước vận hành | 10/10 SQL nguyên văn, hai agent đối chiếu; node24 bundle đạt. [Bằng chứng](kiem-c3-doc-lap-1410/buoc-van-hanh.json) |
 | SQL độc lập | 18/18 membership; agent khác soát toàn tuyến19/19, gồm fallback, phiên bản câu, deadline gói khác, CAS ở thời điểm ghi. [Báo cáo tuyến](kiem-c3-doc-lap-1410/soat-tuyen-may-chu.json) |
 | Full Vitest | Mã a2: **14353đạt/120đỏ nền/27pending**, main2f14293/120/27. **0 tên lỗi mới (đếm cả tên trùng),0 tệp lỗi mới,0 suite rỗng lỗi mới,0 skip mới**;59 tệp lỗi cùng nền. [Đối chiếu cuối](kiem-c3-doc-lap-1410/full-cuoi.json). Tám ca giao diện cũ gỡ/viết lại đúng kiểm kê, giữ các ca server/mixed còn dùng |
-| CI/kiểm ca/phát hành | Head nguồn đã đẩy PR291; đang chốt CI/kiểm ca mới trước gộp. Chưa phát hành tại thời điểm ghi bảng này |
+| CI/kiểm ca/phát hành | PR291 đã gộp mainc2f0e407 sau CI38489782261 SUCCESS và cổngca07:28 VN0/0. Deploy38490438544 dừng ở validator schema, Worker/Pages **skipped**. Bản sửa riêng scripts giữ mã nguồn/tests bằng byte; cổng mới20DDL hợp lệ/83trường hợp sai đạt, bundleNode24 đạt. Chưa phát hành C3 tại thời điểm ghi bảng này |
 
 ## Lỗi thực tế phát hiện và sửa
 
@@ -37,6 +37,12 @@ Main nền mới nhất: `2f91f0e402b9a737bca370236d492cf86f27dc4b` (giữ PR292
 5. Lưu UUID trần và `Array.at` không dùng được trên iPhone cũ; đổi sang helper có dự phòng và chỉ số mảng, thêm ca máy thiếu UUID/giữ mã retry.
 6. Đọc cờ Gói7 trong đường Hành trình trùng với nhóm cờ OMNI đang đọc: tái dùng Promise đọc cấu hình, nạp mô-đun song song. Hai cổng chi phí cũ xanh mà không nâng trần. Giữ khoảng trắng tiền tố SQL BTVN để fault-injection kiểm chính xác hai đường lỗi, không nới kiểm che câu.
 7. Bước `ap-goi7-song` trước sửa đếm toàn membership vật lý, có thể bù quota em đã loại/báo em không được chọn là thiếu; sửa đọc cùng policy nhận, giữ số lịch sử bằng nhãn riêng.
+
+## Sửa cổng vận hành sau gộp
+
+Cổng cũ `ap-migration-goi7.ts` chỉ nhận tên `goi_bai_7`, nên chặn chỉ mục đã duyệt trên `game_v2_attempt`. Thay bằng `scripts/cong-migration-goi7.mjs`: chỉ nhận một CREATE TABLE/INDEX đúng namespace Gói7; ngoại lệ duy nhất ngoài namespace khớp **nguyên văn** DDL index `game_v2_attempt_sbd_qid` đúng bảng/cột. Giữ preflight ca và vòng query nguyên trạng, không mở regex cho mọi bảng game hoặc nới sang DROP/ALTER/DML.
+
+`node scripts/kiem-cong-migration-goi7-1410.mjs`:20/20 DDL thật đạt,83/83 trường hợp suffixSQL/đổi tên/target/lệnh sai bị chặn, không kết nối dữ liệu. Bản sửa chỉ scripts/tài liệu, `src/server/tests/public/Vite/package` bằng byte với a2: kế thừa full và cổng của đúng cây mã chạy, không gọi đây là full mới. Chờ workflow áp lại và kiểm bản sống.
 
 ## Tái hiện đối chiếu full
 
