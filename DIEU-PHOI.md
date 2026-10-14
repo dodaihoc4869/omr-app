@@ -897,3 +897,7 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - 14/10 07:12 VN · Codex · Đóng nguồn C3 `a2da228b` sau full439 bắt tương thích máy cũ và truy vấn cờ trùng; giữ ngưỡng/test cũ,184/184server+33/33UI đạt. Cổng TS/build/tốc độ0đỏ/màu0/SW13/13 đạt, đang full cuối so main2f và Chromium/SQL mới. Script phát hành10/10 độc lập dùng policy nhận, không D1 thật; PR291 còn nháp/chưa phát hành.
 
 - 14/10 07:22 VN · Codex · Full cuối nguồn `a2da228b` **14353đạt/120đỏ nền/27pending** so main2f14293/120/27:0 tên lỗi mới kể cả trùngtên,0 tệp/suite lỗi mới,0skip mới. C2/C3 build và cổng đã xong PR291; Chromium22+18+11+probe máy cũ/SQL18+19+vận hành10 đạt. Chốt CI/ca và tránh deploy chồng trước gộp; chưa phát hành. Bằng chứng docs/ket-qua-c3-1410.md.
+
+- 14/10 07:37 VN · Codex · PR291 đã gộp `c2f0e407`, deploy38490438544 **dừng trước Worker/Pages** ở validator `ap-migration-goi7.ts`: regex chỉ tên Gói7 chặn chỉ mục đọc nhanh `game_v2_attempt_sbd_qid`. Định sửa riêng cổng script bằng allowlist DDL chính xác, giữ chỉ-thêm, source/server/tests a2 bằng byte. Nhánh riêng sửa vận hành; không dữ liệu thật/không phát hành chồng, đã báo Claude PR291. Chưa phát hành C3.
+
+- 14/10 07:42 VN · Codex · Cổng migration đã sửa:20DDL thật chấp nhận/83trường hợp sai từ chối, ngoại lệ nguyên văn index game_v2_attempt_sbd_qid. Giữ preflight/vòng query; source/runtime/tests bằng byte a2, không chạy lại full không đổi. PR vận hành riêng chuẩn bị gộp khi ca mới0/0 và không deploy chồng; liveC3 chưa thay.
