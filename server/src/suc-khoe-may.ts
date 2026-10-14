@@ -54,3 +54,20 @@ export function nhipDeNghi(nowMs: number = Date.now()): { heSo: 1 | 2 | 4; muc: 
   const s = sucKhoeMay(nowMs)
   return { heSo: s.heSo, muc: s.muc }
 }
+/** Giờ cao điểm học sinh làm bài: 19:00–22:59 giờ Việt Nam. */
+export function laGioCaoDiemVn(nowMs: number): boolean {
+  const h = new Date(nowMs + 7 * 3_600_000).getUTCHours()
+  return h >= 19 && h < 23
+}
+/** Lệnh của app HỌC SINH / PHỤ HUYNH (không có lệnh của app thầy, không có `/presence` — app nào cũng gọi). */
+const LENH_EM_PH = ['/hs/', '/ph/', '/game-v2/', '/mom', '/notifications/', '/daily-honors', '/student-news', '/parent-news']
+/**
+ * Hệ số cho HEADER `x-nhip-de-nghi` (thầy 14/10: "Tối ưu chuyên sâu toàn bộ cho giờ cao điểm"). Số đo cao điểm 13/10: ~2.500 yêu cầu/5 phút, phần lớn là
+ * vòng hỏi NỀN của app em (8 vòng 180 giây + hiện diện 60 giây mỗi máy). Giờ cao điểm, phản hồi lệnh của app em/phụ huynh đề nghị SÀN ×2 (180 → 360 giây)
+ * ngay cả khi máy chủ còn nhanh — bớt tải TRƯỚC khi nghẽn thay vì đợi p95 vượt 1,5 giây. Ngoài giờ / lệnh app thầy: đúng `nhipDeNghi` như cũ.
+ * Vòng hiện diện và vòng "ca đang mở" tự chặn hệ số 1 phía máy em (vào thi không chậm).
+ */
+export function heSoGoiNen(duong: string, nowMs: number = Date.now()): 1 | 2 | 4 {
+  const h = nhipDeNghi(nowMs).heSo
+  return h === 1 && laGioCaoDiemVn(nowMs) && LENH_EM_PH.some((x) => duong.startsWith(x)) ? 2 : h
+}

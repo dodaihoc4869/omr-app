@@ -1,12 +1,16 @@
 // @vitest-environment node
 // SỨC KHOẺ MÁY CHỦ (M3): p50/p95 trong bộ nhớ ⇒ mức tốt/bận/nghẽn ⇒ hệ số nhịp `nhipDeNghi` ở MỌI phản hồi JSON + lệnh /gv/suc-khoe-may-chu (chỉ thầy, không chạm D1).
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
-import { CUA_SO_MS, NGUONG_BAN_MS, NGUONG_NGHEN_MS, TOI_DA_MAU, TOI_THIEU_MAU, ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh, xoaSucKhoe } from '../server/src/suc-khoe-may'
+import { CUA_SO_MS, NGUONG_BAN_MS, NGUONG_NGHEN_MS, TOI_DA_MAU, TOI_THIEU_MAU, ghiDoLenh, heSoGoiNen, laGioCaoDiemVn, nhipDeNghi, sucKhoeMay, tenLenh, xoaSucKhoe } from '../server/src/suc-khoe-may'
 import { goiWorker, taoD1That } from './_d1-that'
 
 const T = 1_000_000
 beforeEach(() => xoaSucKhoe())
+// 14/10: header có SÀN ×2 giờ cao điểm (19:00–22:59 VN) cho lệnh app em/phụ huynh ⇒ các ca đi qua Worker GHIM giờ ngoài cao điểm (10:00 VN) — trước đây chạy giờ thật.
+const NGOAI_CAO_DIEM = Date.parse('2026-10-14T03:00:00Z')
+afterEach(() => { vi.useRealTimers() })
+const ghimGio = (t = NGOAI_CAO_DIEM) => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(t) }
 const dat = (n: number, ms: number, duong = '/hs/ke-hoach-ngay', at = T) => { for (let i = 0; i < n; i++) ghiDoLenh(duong, ms, at + i) }
 
 describe('mức sức khoẻ', () => {
@@ -51,6 +55,7 @@ describe('mức sức khoẻ', () => {
 })
 
 describe('qua Worker', () => {
+  beforeEach(() => ghimGio())
   it('MỌI phản hồi JSON mang nhipDeNghi {heSo, muc}; lệnh lỗi cũng có', async () => {
     const d = taoD1That()
     const a = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'KHONGCO' }, false, true)
@@ -90,5 +95,32 @@ describe('qua Worker', () => {
     const d = taoD1That(); xoaSucKhoe()
     await worker.fetch(new Request('https://test/hs/ke-hoach-ngay', { method: 'OPTIONS' }), d.env); expect(sucKhoeMay().soLuot).toBe(0)
     await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'KHONGCO' }, false, true); expect(sucKhoeMay().soLuot).toBe(1)
+  })
+})
+
+describe('giờ cao điểm 19:00–22:59 VN (14/10): sàn ×2 cho vòng hỏi nền của app em / phụ huynh', () => {
+  it('laGioCaoDiemVn: 19:00 → 22:59 trong, 18:59 và 23:00 ngoài', () => {
+    expect(laGioCaoDiemVn(Date.parse('2026-10-14T12:00:00Z'))).toBe(true)  // 19:00 VN
+    expect(laGioCaoDiemVn(Date.parse('2026-10-14T15:59:59Z'))).toBe(true)  // 22:59:59 VN
+    expect(laGioCaoDiemVn(Date.parse('2026-10-14T11:59:59Z'))).toBe(false) // 18:59:59 VN
+    expect(laGioCaoDiemVn(Date.parse('2026-10-14T16:00:00Z'))).toBe(false) // 23:00 VN
+  })
+  it('heSoGoiNen: lệnh em/phụ huynh ⇒ 2; lệnh thầy, /presence ⇒ 1; máy nghẽn vẫn 4; ngoài giờ ⇒ như nhipDeNghi', () => {
+    const t = Date.parse('2026-10-14T13:30:00Z') // 20:30 VN
+    for (const d of ['/hs/ke-hoach-ngay', '/ph/tat-ca-ve-con', '/game-v2/academic-sync', '/mom', '/notifications/list', '/daily-honors', '/student-news']) expect(heSoGoiNen(d, t), d).toBe(2)
+    for (const d of ['/gv/bang-tin-song', '/presence', '/khoe', '/goi']) expect(heSoGoiNen(d, t), d).toBe(1)
+    expect(heSoGoiNen('/hs/ke-hoach-ngay', Date.parse('2026-10-14T03:00:00Z'))).toBe(1)
+    for (let i = 0; i < 40; i++) ghiDoLenh('/hs/ke-hoach-ngay', 5000, t)
+    expect(heSoGoiNen('/hs/ke-hoach-ngay', t)).toBe(4)
+    expect(heSoGoiNen('/gv/bang-tin-song', t)).toBe(4)
+  })
+  it('qua Worker lúc 20:30 VN: header lệnh em = 2, lệnh thầy = 1; trường JSON nhipDeNghi giữ số đo thật (1)', async () => {
+    ghimGio(Date.parse('2026-10-14T13:30:00Z'))
+    const d = taoD1That()
+    const goi = (path: string) => worker.fetch(new Request(`https://test${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sbd: 'KHONGCO' }) }), d.env)
+    const em = await goi('/hs/ke-hoach-ngay')
+    expect(em.headers.get('x-nhip-de-nghi')).toBe('2')
+    expect(((await em.json()) as { nhipDeNghi: { heSo: number } }).nhipDeNghi.heSo).toBe(1)
+    expect((await goi('/gv/suc-khoe-may-chu')).headers.get('x-nhip-de-nghi')).toBe('1')
   })
 })

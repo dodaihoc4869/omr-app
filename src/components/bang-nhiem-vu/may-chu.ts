@@ -71,13 +71,14 @@ const nguoiCua = (d: DinhDanh) => d.token || d.sbd || ''
 
 /** Nhịp gọi lại: mở màn, mỗi ~180 s (±30 s) khi tab đang hiện, khi quay lại tab (dội ≥ 20 s), và khi `khoa` đổi. */
 /** `chay` trả (Promise của) `false` = lượt lỗi ⇒ nhịp lùi dần; giá trị khác / không trả gì = thành công. */
-function useNhipGoi(chay: () => Promise<boolean> | boolean | void, bat: boolean, khoa: string) {
+/** `heSoToiDa` (14/10): trần hệ số giãn nhịp máy chủ đề nghị (`x-nhip-de-nghi`); vắng ⇒ mặc định của `batNhipBenVung`. */
+function useNhipGoi(chay: () => Promise<boolean> | boolean | void, bat: boolean, khoa: string, heSoToiDa?: number) {
   const ref = useRef(chay)
   ref.current = chay
   useEffect(() => {
     if (!bat) return
     // Nhịp nền CHẬM (180 s ± 30 s, không gọi chồng; sự cố D1 21/09: 60 giây × mọi máy × nhiều hook): mở màn gọi ngay; quay lại tab / đổi khoá vẫn nạp nhưng chặn dội ≥ 20 giây.
-    const nhip = batNhipBenVung(async () => (await ref.current()) !== false)
+    const nhip = batNhipBenVung(async () => (await ref.current()) !== false, heSoToiDa === undefined ? {} : { heSoToiDa })
     const goi = () => nhip.kich()
     window.addEventListener('focus', goi)
     document.addEventListener('visibilitychange', goi)
@@ -86,7 +87,7 @@ function useNhipGoi(chay: () => Promise<boolean> | boolean | void, bat: boolean,
       window.removeEventListener('focus', goi)
       document.removeEventListener('visibilitychange', goi)
     }
-  }, [bat, khoa])
+  }, [bat, khoa, heSoToiDa])
 }
 
 export interface TrangThaiKeHoach {
@@ -134,6 +135,7 @@ export function useCaDangMo(d: DinhDanh, bat: boolean): boolean {
     }),
     bat && !!nguoi,
     nguoi,
+    1, // 14/10: giờ cao điểm máy chủ đề nghị giãn vòng nền ×2 — "ca đang mở" KHÔNG giãn (em vào thi không chậm)
   )
   return bat && !!nguoi ? co : false
 }
