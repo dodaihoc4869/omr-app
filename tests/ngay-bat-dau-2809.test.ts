@@ -1,13 +1,12 @@
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // NGÀY BẮT ĐẦU CHIẾN DỊCH (thầy 28/09: "cho tôi thêm đặt thời gian bắt đầu chiến dịch nhé").
+// 14/10: gỡ Sửa chiến dịch cũ (srs2-sua.ts, /gv/chien-dich/sua) — bỏ 4 ca sửa ngày bắt đầu / tóm tắt sửa.
 // Máy chủ chạy THẬT trên SQLite lược đồ thật (`_d1-that`). Bảng phụ `chien_dich_bat_dau` tạo lúc chạy (không ALTER `chien_dich`).
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
-import { gvSuaChienDich } from '../server/src/srs2-sua'
 import { docChienDichCuaEm, layKeHoachHomNay, sanh2 } from '../server/src/srs2-d1'
-import { chuTomTatSua } from '../server/src/tom-tat-sua-chien-dich'
 import type { Env } from '../server/src/kieu'
 
 const T0 = Date.parse('2026-09-30T02:00:00Z') // 09:00 VN 30/09
@@ -91,44 +90,6 @@ describe('D, sức chứa, đề xuất số lượt/ngày tính từ ngày bắ
   })
 })
 
-describe('sửa ngày bắt đầu', () => {
-  it('chưa bắt đầu ⇒ đổi được, tóm tắt "bắt đầu 01/10 → 02/10"; ngày mới sau hạn / trước hôm nay ⇒ từ chối', async () => {
-    const { env } = dung()
-    const { id } = await tao(env, { batDau: '2026-10-01' })
-    const doc = (await gvSuaChienDich(env, { action: 'doc', id }, T0)) as { chienDich: Record<string, unknown> }
-    expect(doc.chienDich).toMatchObject({ batDau: '2026-10-01', daBatDau: false })
-    expect(await gvSuaChienDich(env, { action: 'xem-truoc', id, batDau: '2026-10-06' }, T0)).toMatchObject({ ok: false, error: 'Ngày bắt đầu không được sau hạn nộp.' })
-    expect(await gvSuaChienDich(env, { action: 'xem-truoc', id, batDau: '2026-09-29' }, T0)).toMatchObject({ ok: false, error: 'Ngày bắt đầu phải từ hôm nay trở đi.' })
-    // Rút hạn về trước ngày bắt đầu cũng bị chặn.
-    expect(await gvSuaChienDich(env, { action: 'xem-truoc', id, hanNop: '2026-09-30' }, T0)).toMatchObject({ ok: false, error: 'Ngày bắt đầu không được sau hạn nộp.' })
-    const r = await gvSuaChienDich(env, { action: 'luu', id, batDau: '2026-10-02' }, T0)
-    expect(r).toMatchObject({ ok: true, tomTat: 'bắt đầu 01/10 → 02/10', batDauCu: '2026-10-01', batDau: '2026-10-02' })
-    expect((await docChienDichCuaEm(env, 'S1'))[0]!.batDau).toBe('2026-10-02')
-    expect((await layKeHoachHomNay(env, 'S1', T0 + NGAY)).kh.tong).toBe(0) // 01/10 vẫn chưa bắt đầu
-    expect((await layKeHoachHomNay(env, 'S1', T0 + 2 * NGAY)).kh.tong).toBeGreaterThan(0)
-  })
-
-  it('đã bắt đầu ⇒ từ chối đổi ngày bắt đầu; thay đổi khác vẫn lưu được', async () => {
-    const { env } = dung()
-    const { id } = await tao(env)
-    const doc = (await gvSuaChienDich(env, { action: 'doc', id }, T0)) as { chienDich: Record<string, unknown> }
-    expect(doc.chienDich).toMatchObject({ batDau: '2026-09-30', daBatDau: true })
-    expect(await gvSuaChienDich(env, { action: 'luu', id, batDau: '2026-10-02' }, T0)).toMatchObject({ ok: false, error: 'Chiến dịch đã bắt đầu — không đổi được ngày bắt đầu.' })
-    // Chiến dịch bắt đầu 01/10 ⇒ tới 01/10 là đã bắt đầu.
-    const { id: id2 } = await tao(env, { batDau: '2026-10-01' })
-    expect(await gvSuaChienDich(env, { action: 'luu', id: id2, batDau: '2026-10-03' }, T0 + NGAY)).toMatchObject({ ok: false, error: 'Chiến dịch đã bắt đầu — không đổi được ngày bắt đầu.' })
-    expect(await gvSuaChienDich(env, { action: 'luu', id: id2, batDau: '2026-10-01', hanNop: '2026-10-06' }, T0 + NGAY)).toMatchObject({ ok: true, tomTat: 'hạn 05/10 → 06/10' })
-  })
-
-  it('dời ngày bắt đầu muộn hơn ⇒ tự NÂNG số câu/ngày theo số ngày từ ngày bắt đầu MỚI tới hạn', async () => {
-    const { env } = dung()
-    const { id } = await tao(env, { batDau: '2026-10-01', theLucNgay: 10 })
-    // 6 câu mới × 2 lượt = 12 lượt; bắt đầu 05/10 = hạn ⇒ 1 ngày ⇒ cần 12 câu/ngày (tính từ hôm nay sẽ là 6 ngày ⇒ không nâng).
-    const r = await gvSuaChienDich(env, { action: 'xem-truoc', id, batDau: '2026-10-05' }, T0)
-    expect(r).toMatchObject({ ok: true, theLucCu: 10, theLucNgay: 12, theLucCan: 12, tuNang: true, tomTat: 'bắt đầu 01/10 → 05/10, số câu/ngày 10 → 12' })
-  })
-})
-
 describe('danh sách + bảng chiến dịch', () => {
   it('chưa tới ngày bắt đầu ⇒ `sapBatDau: true` kèm `batDau`; tới ngày thì hết', async () => {
     const { env } = dung()
@@ -144,9 +105,5 @@ describe('danh sách + bảng chiến dịch', () => {
     const { id } = await tao(env, { batDau: '2026-10-02' })
     const b = (await gvChienDich(env, { action: 'bang', id }, T0 + 3 * NGAY)) as { lop: { ngayThu: number; tongNgay: number } }
     expect(b.lop).toMatchObject({ ngayThu: 2, tongNgay: 4 })
-  })
-  it('tóm tắt sửa: "bắt đầu 30/09 → 01/10"', () => {
-    expect(chuTomTatSua({ themDe: 0, themEm: 0, botEm: 0, hanCu: '2026-10-05', hanMoi: null, batDauCu: '2026-09-30', batDauMoi: '2026-10-01' })).toBe('bắt đầu 30/09 → 01/10')
-    expect(chuTomTatSua({ themDe: 0, themEm: 0, botEm: 0, hanCu: '2026-10-05', hanMoi: null, batDauCu: '2026-09-30', batDauMoi: null })).toBe('')
   })
 })

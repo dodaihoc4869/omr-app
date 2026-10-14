@@ -3,6 +3,7 @@
 // THÀNH THẠO LẦN ĐẦU (thầy CHỐT 28/09/2026): đúng ngay lần đầu, không gợi ý ⇒ thành thạo luôn — CHỈ với câu khó đoán mò:
 // Phần II (đúng cả 4 ý), Phần III, Phần I Nhận biết; trừ câu 2 sao. Còn lại (Phần I Thông hiểu/Vận dụng, câu 2 sao, câu có gợi ý,
 // câu sai lần đầu): đúng 2 ngày khác nhau như cũ. Ước lượt: P1 (câu mới 2 lượt) — MỘT hàm `khoiLuongCan` cho mọi ô.
+// 14/10: gỡ Sửa chiến dịch cũ (srs2-sua.ts) — bỏ phần "Sửa chiến dịch tự nâng" trong ca cùng số lượt.
 import { describe, expect, it } from 'vitest'
 import {
   congNgay, henThanhThaoLanDau, khoiLuongCan, laCauKhoDoanMo, lapKeHoachNgay, phatLaiCau, soNgayConLai, HEN_DUY_TRI, THANH_THAO_LAN_DAU,
@@ -12,7 +13,6 @@ import * as loi from '../server/src/srs2-loi'
 import { isAnswerCorrect } from '../server/src/btvn-grading'
 import { docHoSo2, docLoaiCau } from '../server/src/srs2-d1'
 import { gvChienDich, theLucDeXuat, trangThaiLop } from '../server/src/srs2-gv'
-import { gvSuaChienDich, theLucSauSua } from '../server/src/srs2-sua'
 import { taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 
@@ -170,12 +170,11 @@ describe('máy chủ: loại câu + các ô tự tính dùng CÙNG `khoiLuongCan
     expect(r.tiLe).toBeCloseTo(12 / 18)
     expect(r.theLucDeXuat).toBe(theLucDeXuat(12, 12, 6))
   })
-  it('sau khi em làm: thầy (trangThaiLop), em (docHoSo2 + Huyết Chiến) và Sửa chiến dịch (tự nâng) ra CÙNG số lượt', async () => {
+  it('sau khi em làm: thầy (trangThaiLop) và em (docHoSo2 + Huyết Chiến) ra CÙNG số lượt', async () => {
     const { env, lamDb } = dung()
-    const id = ((await gvChienDich(env, { action: 'tao', ten: 'x', sbd: ['S1'], maDe: ['DE1'], hanNop: '2026-10-05', theLucNgay: 1 }, T0)) as { id: string }).id
+    await gvChienDich(env, { action: 'tao', ten: 'x', sbd: ['S1'], maDe: ['DE1'], hanNop: '2026-10-05', theLucNgay: 1 }, T0)
     // S1 đúng Q1 (I-NB), Q2 (II), Q3 (III) ⇒ thành thạo lần đầu (0 lượt); Q4 (I-TH) đúng ⇒ 1; Q5 (2 sao) đúng ⇒ 1; Q6 sai ⇒ 2.
     for (const [q, dg] of [['Q1', true], ['Q2', true], ['Q3', true], ['Q4', true], ['Q5', true], ['Q6', false]] as const) lamDb('S1', q, T0 + GIO, dg)
-    const nowMs = T0 + 2 * GIO
     const phia = await trangThaiLop(env, ['S1'], ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6'], '2026-10-05', new Date(T0).toISOString())
     const tt = phia.get('S1')!
     expect(['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6'].map((q) => tt.get(q)!.thanhThao)).toEqual([true, true, true, false, false, false])
@@ -183,9 +182,5 @@ describe('máy chủ: loại câu + các ô tự tính dùng CÙNG `khoiLuongCan
     const hs = await docHoSo2(env, 'S1', '2026-09-30')
     expect(khoiLuongCan(hs.ttChienDich)).toBe(4)
     expect(lapKeHoachNgay(hs.cau, hs.tt, { homNay: '2026-09-30', hanNop: '2026-10-05' }).khoiLuong).toBe(4)
-    // Sửa: thêm DE2 (Q7, Q8 mới = 4 lượt) + rút hạn còn 2 ngày ⇒ (4 + 4) / 2 = 4 câu/ngày.
-    const xem = await gvSuaChienDich(env, { action: 'xem-truoc', id, themMaDe: ['DE2'], hanNop: '2026-10-01' }, nowMs)
-    expect(xem).toMatchObject({ ok: true, theLucCan: 4, theLucNgay: 4, tuNang: true })
-    expect(theLucSauSua(1, 8, 2, true)).toEqual({ can: 4, sau: 4 })
   })
 })
