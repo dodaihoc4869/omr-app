@@ -4,7 +4,7 @@ name: Gói 7 — chặng rỗng khi còn thiếu mức (chỉ đọc, chỉ đ�
 on:
   workflow_dispatch:
   push:
-    paths: ['.github/workflows/do-goi7-chang-rong-1410.yml', 'scripts/do-goi7-chang-rong-1410.ts']
+    paths: ['.github/workflows/do-goi7-chang-rong-1410.yml', 'scripts/do-goi7-chang-rong-1410.ts', 'server/src/goi-bai-7.ts']
     branches-ignore: [main]
 permissions:
   contents: read
@@ -33,5 +33,12 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           export OMR_D1_ID=$(grep -m1 '^database_id' server/wrangler.toml | sed -E 's/.*"([^"]+)".*/\1/')
-          npx esbuild scripts/do-goi7-chang-rong-1410.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-g7.mjs --log-level=warning
-          OMR_SONG_SONG=3 OMR_GIOI_HAN_MS=1500000 timeout 1600 node --no-warnings /tmp/do-g7.mjs || echo "(thoát mã $?)"
+          # TRƯỚC = mã máy chủ của main (đang chạy thật) · SAU = mã nhánh này. Cùng bộ đo, chạy nối tiếp cách nhau ~2 phút.
+          git fetch -q --depth=1 origin main && git worktree add -q --detach /tmp/main FETCH_HEAD
+          cp scripts/do-goi7-chang-rong-1410.ts /tmp/main/scripts/ && ln -s "$PWD/node_modules" /tmp/main/node_modules
+          (cd /tmp/main && npx esbuild scripts/do-goi7-chang-rong-1410.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-g7-truoc.mjs --log-level=warning)
+          npx esbuild scripts/do-goi7-chang-rong-1410.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-g7-sau.mjs --log-level=warning
+          echo '=== TRƯỚC (main) ==='
+          OMR_SONG_SONG=3 OMR_GIOI_HAN_MS=700000 timeout 760 node --no-warnings /tmp/do-g7-truoc.mjs | grep -v '^\[chan-khac-khoi\]' || echo "(thoát mã $?)"
+          echo '=== SAU (nhánh sửa) ==='
+          OMR_SONG_SONG=3 OMR_GIOI_HAN_MS=700000 timeout 760 node --no-warnings /tmp/do-g7-sau.mjs | grep -v '^\[chan-khac-khoi\]' || echo "(thoát mã $?)"

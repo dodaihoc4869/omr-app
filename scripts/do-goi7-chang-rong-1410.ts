@@ -7,7 +7,7 @@
 // `env.DB` là lớp mỏng gọi D1 qua API REST: CHỈ GỬI SELECT/WITH; mọi lệnh ghi bị bỏ qua tại chỗ (trả "0 dòng đổi", không bao giờ tới D1).
 import { writeSync } from 'node:fs'
 import '../server/src/index' // nạp theo ĐÚNG thứ tự của Worker thật (các tệp máy chủ nhập vòng nhau)
-import { demHomNay7, lapGoi7 } from '../server/src/goi-bai-7'
+import { demHomNay7, lapGoi7, startGoi7 } from '../server/src/goi-bai-7'
 import { ngayVn7 } from '../server/src/goi-bai-7-loi'
 import { docCauTheoRef, docKhoiEm } from '../server/src/game-v2-bank'
 import { chanKhacKhoiEm } from '../server/src/chan-khac-khoi'
@@ -50,7 +50,8 @@ function lopMong(query: string) {
     async all<T>() { return { results: (await hoi(query, values)) as T[], success: true, meta: { changes: 0, last_row_id: 0, rows_read: 0, rows_written: 0 } } },
     async raw() { return (await hoi(query, values)).map((r) => Object.values(r)) },
     // Lệnh ghi (chốt quota/mức lần đầu trong ngày) KHÔNG gửi tới D1: trả "0 dòng đổi" — hàm máy chủ đọc lại dòng đã có như khi bị trùng.
-    async run() { if (!laDocDuoc(query)) { soGhiBoQua++; return { success: true, meta: { changes: 0 } } } await hoi(query, values); return { success: true, meta: { changes: 0 } } },
+    // Lưu phiên chặng mới (`startGoi7`): trả "1 dòng" để hàm đi hết như thật — vẫn KHÔNG gửi tới D1.
+    async run() { if (!laDocDuoc(query)) { soGhiBoQua++; return { success: true, meta: { changes: /INSERT INTO game_v2_session/i.test(query) ? 1 : 0 } } } await hoi(query, values); return { success: true, meta: { changes: 0 } } },
     _q: query,
   }
   return st
@@ -74,12 +75,13 @@ if (CHE_DO === 'local') {
 
 const dem = (m: Map<string, number>, k: string, n = 1): void => void m.set(k, (m.get(k) ?? 0) + n)
 const chuMap = (m: Map<string, number>): string => [...m].sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k}=${n}`).join(' · ') || '—'
-const nhomEm = new Map<string, number>(), lyDoBo = new Map<string, number>(), vaiBo = new Map<string, number>()
+const nhomEm = new Map<string, number>(), lyDoBo = new Map<string, number>(), vaiBo = new Map<string, number>(), moChang = new Map<string, number>()
 function tongHop(): void {
   ra('--- TỔNG HỢP (số đếm)')
   ra(`em theo tình trạng: ${chuMap(nhomEm)}`)
   ra(`câu kế hoạch bị bỏ lúc mở chặng, theo lý do: ${chuMap(lyDoBo)}`)
   ra(`câu kế hoạch bị bỏ, theo vai: ${chuMap(vaiBo)}`)
+  ra(`MỞ CHẶNG THẬT (startGoi7) với em còn thiếu mức: ${chuMap(moChang)}`)
   ra(`tổng truy vấn đọc D1: ${soTruyVan} · lệnh ghi bị bỏ qua tại chỗ (không gửi D1): ${soGhiBoQua}`)
 }
 
@@ -127,7 +129,12 @@ async function xet(sbd: string, i: number): Promise<void> {
     nhom = `thiếu_mức·kế_hoạch_RỖNG·thiếu_phủ=${lap.plan.thieuPhu > 0 ? 'có' : 'không'}`
   } else nhom = phatDuoc ? 'thiếu_mức·phát_được' : 'thiếu_mức·kế_hoạch_có_câu_nhưng_KHÔNG_PHÁT_ĐƯỢC'
   dem(nhomEm, nhom)
-  ra(`em#${i}: đã làm ${daLam}/${muc} (thiếu ${thieu}) · kế hoạch ${lap.plan.viec.length} câu [${[...new Set(lap.plan.viec.map((v) => v.vai))].join(',')}] · phát được ${phatDuoc} · bỏ: ${chuMap(boEm)} · thiếu phủ ${lap.plan.thieuPhu} · vừa làm ${lap.vuaLam.size} · ${nhom}`)
+  // Mở chặng THẬT bằng đúng hàm máy chủ (lệnh ghi bị chặn tại chỗ) — kết quả em thấy khi bấm "Học tiếp".
+  const r = await startGoi7(env, sbd, now).catch((e: unknown) => ({ loi: e instanceof Error ? e.message : String(e) })) as { questions?: unknown[]; loi?: string } | null
+  const mo = !r ? 'null' : r.loi ? `LỖI(${r.loi.slice(0, 40)})` : r.questions?.length ? 'có_câu' : 'RỖNG'
+  dem(moChang, mo)
+  const dp = mo === 'có_câu' || typeof (lap as { duPhong?: unknown }).duPhong !== 'function' ? '' : ` · dự phòng ${(lap as unknown as { duPhong: () => unknown[] }).duPhong().length} câu`
+  ra(`em#${i}: đã làm ${daLam}/${muc} (thiếu ${thieu}) · kế hoạch ${lap.plan.viec.length} câu [${[...new Set(lap.plan.viec.map((v) => v.vai))].join(',')}] · phát được ${phatDuoc} · bỏ: ${chuMap(boEm)} · thiếu phủ ${lap.plan.thieuPhu} · vừa làm ${lap.vuaLam.size} · ${nhom} · mở chặng: ${mo}${dp}`)
 }
 
 let viTri = 0
