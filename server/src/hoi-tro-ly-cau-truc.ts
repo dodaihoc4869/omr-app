@@ -53,7 +53,8 @@ export const SCHEMA_TRA_LOI = {
     bay: { type: 'OBJECT', properties: { tieuDe: { type: 'STRING', format: 'enum', enum: ['Bẫy hay nhầm', 'Chỗ em nhầm'] }, chu: S } },
   },
   required: ['lienQuan', 'yChinh'],
-  propertyOrdering: ['lienQuan', 'yChinh', 'soDo', 'thiNghiem', 'nhanBiet', 'phuongTrinh', 'tinh', 'buoc', 'bang', 'bay', 'ghiNho', 'hoiTiep'],
+  // `bay` ngay sau ý chính (đo 14/10: 0/99 câu trả lời có ô bẫy khi đứng gần cuối) — máy em vẫn vẽ theo thứ tự cố định của mình.
+  propertyOrdering: ['lienQuan', 'yChinh', 'bay', 'soDo', 'thiNghiem', 'nhanBiet', 'phuongTrinh', 'tinh', 'buoc', 'bang', 'ghiNho', 'hoiTiep'],
 } as const
 
 /** LƯỢC ĐỒ CŨ (khuôn 13/10, không khối hình): đường lui khi Google từ chối lược đồ v2 (HTTP 400) — em vẫn được trả lời như trước. */
@@ -186,7 +187,9 @@ function lamSachKhoi(o: Obj, dangLam: boolean, loc: (t: string) => string) {
     if (pt.length && con()) { k.phuongTrinh = pt.map((x) => ({ ...x, chinh: [...x.trai, ...x.phai].includes(x.chinh) ? x.chinh : '' })); k.so++ }
     const ti = o.tinh && typeof o.tinh === 'object' ? (o.tinh as Obj) : null
     if (ti && con()) {
-      const dong = (Array.isArray(ti.dong) ? ti.dong : []).slice(0, 6).map((d) => (Array.isArray(d) ? d.map(str) : str(d).split('|')).map((c) => boDau(sachO(c, 60))))
+      // Dòng thiếu " | " mà viết kiểu "n ester = 8,8 : 88 = 0,1 mol" ⇒ tách theo " = " (mô hình hay viết thế).
+      const tachDong = (d: unknown) => (Array.isArray(d) ? d.map(str) : str(d).includes('|') ? str(d).split('|') : str(d).split(/\s=\s/))
+      const dong = (Array.isArray(ti.dong) ? ti.dong : []).slice(0, 6).map((d) => tachDong(d).map((c) => boDau(sachO(c, 60))))
         .filter((d) => d.length >= 2 && d.some(Boolean)).map((d) => (d.length === 2 ? { nhan: d[0]!, phep: '', kq: d[1]! } : { nhan: d[0]!, phep: d[1]!, kq: d.slice(2).join(' ') }))
       if (dong.length) { k.tinh = { dong, dapSo: boDau(sachO(ti.dapSo, 40)) }; k.so++ }
     }
@@ -205,9 +208,10 @@ export function chuPhang(c: CauTrucTraLoi): string {
   const ten = (n: { ten: string; nhan: string }) => (n.ten && n.nhan ? `${n.ten} (${n.nhan})` : n.ten || n.nhan)
   if (c.soDo) d.push(`Sơ đồ: ${c.soDo.nut.map((n, i) => (i ? `→${c.soDo!.dk[i - 1] ? ` (${c.soDo!.dk[i - 1]})` : ''} ${ten(n)}` : ten(n))).join(' ')}`)
   for (const t of c.thiNghiem ?? []) d.push(`Thí nghiệm: ${t.nhan ? `${t.nhan} + ` : ''}${t.thuoc}: ${t.chu}${t.phu ? ` (${t.phu})` : ''}`)
-  for (const r of c.nhanBiet ?? []) d.push(`${r.thuoc} → ${r.chu || r.hien} ⇒ ${r.nhom}`)
-  for (const p of c.phuongTrinh ?? []) d.push(`${p.trai.join(' + ')} ${p.mui}${p.dk ? ` (${p.dk})` : ''} ${p.phai.join(' + ')}`)
-  for (const r of c.tinh?.dong ?? []) d.push(`${r.nhan}${r.phep ? ` = ${r.phep}` : ''} = ${r.kq}`)
+  // Mỗi khối một tiền tố cố định: sổ đếm được câu trả lời nào có khối gì (workflow chỉ đọc), mô hình đọc lại lịch sử cũng rõ.
+  for (const r of c.nhanBiet ?? []) d.push(`Nhận biết: ${r.thuoc} → ${r.chu || r.hien} ⇒ ${r.nhom}`)
+  for (const p of c.phuongTrinh ?? []) d.push(`Phương trình: ${p.trai.join(' + ')} ${p.mui}${p.dk ? ` (${p.dk})` : ''} ${p.phai.join(' + ')}`)
+  for (const r of c.tinh?.dong ?? []) d.push(`Tính: ${r.nhan}${r.phep ? ` = ${r.phep}` : ''} = ${r.kq}`)
   if (c.tinh?.dapSo) d.push(`Đáp số: ${c.tinh.dapSo}`)
   c.buoc.forEach((b, i) => {
     d.push(`${i + 1}. ${b.ten ? `${b.ten}: ` : ''}${boDau(b.chu)}`)

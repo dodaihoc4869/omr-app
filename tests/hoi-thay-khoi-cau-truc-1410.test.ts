@@ -81,6 +81,33 @@ describe('hàm thuần', () => {
     expect(c.yChinh).toBe('Muối là CH3COONa, không phải !!C2H5COONa!! ⇒ 8,2 gam.')
   })
 
+  it('v2.1 (đo 14/10: 7/99 câu có khối, 0 ô bẫy): câu mẫu trong chỉ dẫn là khuôn KHỐI MỚI và làm sạch ra đủ khối; luật bắt buộc theo dấu hiệu; ô bẫy đứng ngay sau ý chính', () => {
+    const mau = CHI_DAN_THAY.slice(CHI_DAN_THAY.indexOf('Thầy trả lời:\n') + 'Thầy trả lời:\n'.length, CHI_DAN_THAY.indexOf('\nĐề nhận biết'))
+    const c = lamSachCauTruc(JSON.parse(mau), false)!
+    expect(c.phuongTrinh![0]!.chinh).toBe('CH3COONa')
+    expect(c.tinh!.dapSo).toBe('8,2 gam')
+    expect(c.tinh!.dong).toHaveLength(3)
+    expect(c.bay!.tieuDe).toBe('Chỗ em nhầm')
+    expect(c.yChinh).toContain('!!C2H5COONa!!')
+    const mau2 = CHI_DAN_THAY.slice(CHI_DAN_THAY.indexOf('làm sao ạ?" ⇒ ') + 'làm sao ạ?" ⇒ '.length).split('\n')[0]!
+    const c2 = lamSachCauTruc(JSON.parse(mau2), true)!
+    expect(c2.thiNghiem!.map((o) => o.hien)).toEqual(['quy-xanh', 'trang-bac'])
+    expect(c2.nhanBiet).toHaveLength(2)
+    expect(c2.bay!.tieuDe).toBe('Bẫy hay nhầm')
+    for (const k of ['BẮT BUỘC bay', 'BẮT BUỘC tinh', 'BẮT BUỘC thiNghiem', 'BẮT BUỘC soDo']) expect(CHI_DAN_THAY).toContain(k)
+    expect(CHI_DAN_THAY).not.toContain('chỉ dùng khi giúp em hiểu nhanh hơn chữ')
+    expect(SCHEMA_TRA_LOI.propertyOrdering.indexOf('bay')).toBe(2)
+  })
+
+  it('tính nhanh: dòng viết kiểu "a = b = c" (thiếu " | ") vẫn tách đúng ô; chữ phẳng có tiền tố từng khối', () => {
+    const c = lamSachCauTruc({ lienQuan: true, yChinh: 'Em tính lại.', tinh: { dong: ['n ester = 8,8 : 88 = 0,1 mol', 'm muối = 8,2 gam', 'không có dấu'], dapSo: '8,2 gam' }, phuongTrinh: MAU_DU.phuongTrinh }, false)!
+    expect(c.tinh!.dong).toEqual([{ nhan: 'n ester', phep: '8,8 : 88', kq: '0,1 mol' }, { nhan: 'm muối', phep: '', kq: '8,2 gam' }])
+    const p = chuPhang(c)
+    expect(p).toContain('Tính: n ester = 8,8 : 88 = 0,1 mol')
+    expect(p).toContain('Phương trình: CH3COOC2H5 + NaOH → (t°) CH3COONa + C2H5OH')
+    expect(chuPhang(lamSachCauTruc({ lienQuan: true, yChinh: 'x', nhanBiet: MAU_DU.nhanBiet }, false)!)).toContain('Nhận biết: Quỳ tím → hoá xanh ⇒ –NH2 gắn gốc no')
+  })
+
   it('chỉ có khối (ý chính rỗng) vẫn là câu trả lời; chữ phẳng có đủ chữ khối, không còn dấu tô', () => {
     expect(lamSachCauTruc({ lienQuan: true, yChinh: '', thiNghiem: MAU_DU.thiNghiem.slice(0, 1) }, false)).not.toBeNull()
     const c = lamSachCauTruc({ ...MAU_DU, soDo: undefined, nhanBiet: undefined }, false)!

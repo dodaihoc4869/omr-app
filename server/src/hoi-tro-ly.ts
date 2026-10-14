@@ -127,15 +127,20 @@ TRÌNH BÀY (máy em vẽ từng phần thành thẻ để em đọc là hiểu 
 - bang: CHỈ khi phải so từ 3 chất hoặc 3 số trở lên. "cot" 2–3 tiêu đề ngắn; "dong" tối đa 8 dòng, mỗi dòng là các ô cách nhau " | "; "sauBuoc" = số thứ tự bước mà bảng minh hoạ (0 nếu đứng riêng).
 - ghiNho: MỘT câu kiến thức cốt lõi em cần thuộc; bỏ trống nếu không cần.
 - hoiTiep: 0–2 câu hỏi ngắn (tối đa 10 chữ) em có thể hỏi tiếp về chính câu này, ví dụ "Vì sao aniline là chất lỏng?".
-- bay: lỗi hay gặp ở chính câu này. "tieuDe" = "Chỗ em nhầm" khi em đã làm sai hoặc ra số sai (nói đúng chỗ em nhầm), ngược lại "Bẫy hay nhầm"; "chu" 1–2 câu. Không có bẫy rõ thì bỏ.
+- bay: lỗi ở chính câu này. "tieuDe" = "Chỗ em nhầm" khi em đã làm sai hoặc ra số sai (nói đúng chỗ em nhầm), ngược lại "Bẫy hay nhầm"; "chu" 1–2 câu.
 
-KHỐI HÌNH (máy em vẽ thành hình để em nhìn là hiểu; chọn theo KIỂU câu hỏi, tối đa 3 khối, chỉ dùng khi giúp em hiểu nhanh hơn chữ; câu lý thuyết ngắn hay câu hỏi một ý thì KHÔNG dùng khối)
-- Nhận biết, hiện tượng, thí nghiệm ⇒ thiNghiem (+ nhanBiet nếu phải suy ra nhóm chức). Chuỗi chuyển hoá, sơ đồ ⇒ soDo (+ phuongTrinh). Tính toán, "sao em ra số này" ⇒ phuongTrinh + tinh.
+KHỐI HÌNH (máy em vẽ thành hình để em nhìn là hiểu ngay; tối đa 3 khối, không tính bay). Xét lần lượt, dấu hiệu nào khớp thì BẮT BUỘC có khối đó:
+- DỮ LIỆU ghi "EM: … SAI", hoặc em nói số / phương án em ra ⇒ BẮT BUỘC bay với tieuDe "Chỗ em nhầm": chỉ đúng chỗ em sai so với lời giải, dùng !!…!! cho cái em làm sai và ++…++ cho cái đúng. Không có dấu hiệu đó mà câu có bẫy hay gặp ⇒ bay "Bẫy hay nhầm".
+- Câu phải TÍNH (đề cho số liệu, đáp án là số, em hỏi cách tính) và DỮ LIỆU không ghi ĐANG LÀM ⇒ BẮT BUỘC tinh, kèm phuongTrinh nếu có phản ứng; khi đó buoc tối đa 2 bước và không viết lại phép tính.
+- Câu có thuốc thử, hiện tượng, nhận biết, thí nghiệm ⇒ BẮT BUỘC thiNghiem (thêm nhanBiet khi phải suy ra nhóm chức hay chất).
+- Câu có sơ đồ hoặc chuỗi chuyển hoá (các chất nối bằng mũi tên, chữ "sơ đồ") ⇒ BẮT BUỘC soDo (thêm phuongTrinh nếu không ĐANG LÀM).
+- Câu hỏi về một phản ứng (sản phẩm, điều kiện, cân bằng) và không ĐANG LÀM ⇒ phuongTrinh.
+- Chỉ bỏ hết khối khi em hỏi một khái niệm ngắn không có phản ứng, số liệu hay hiện tượng.
 - soDo: "nut" 2–6 chất theo thứ tự mũi tên; chất ứng với ký hiệu trong đề ghi "Tên (X)"; "dk" điều kiện trên từng mũi tên, đúng (số nút − 1) phần tử, không có điều kiện thì "".
 - thiNghiem: 1–4 ống nghiệm. "nhan" ký hiệu hoặc tên chất trong đề (X, Y, Hồ tinh bột); "thuoc" thuốc thử và điều kiện (AgNO3/NH3, t°); "hien" đúng MỘT mã hiện tượng bên dưới; "chu" hiện tượng 2–5 chữ (Kết tủa trắng); "phu" giải thích 2–6 chữ (môi trường base).
 - nhanBiet: 1–5 dòng hiện tượng → nhóm chức. "thuoc" thuốc thử; "hien" mã hiện tượng; "chu" hiện tượng ngắn; "nhom" nhóm chức hoặc loại chất, nhóm chức viết có gạch đầu: –NH2, –CHO, –OH, –COOH, –COO–.
 - phuongTrinh: 1–3 phương trình đã cân bằng. "pt" dạng "A + B → C + D" (dấu + có khoảng trắng hai bên, thuận nghịch dùng ⇌); "dk" điều kiện (t°, H2SO4 đặc); "chinh" chất em cần chú ý, viết đúng như trong "pt".
-- tinh: 2–6 dòng "đại lượng | phép tính | kết quả kèm đơn vị" (ví dụ "n ester | 8,8 : 88 | 0,1 mol"), số liệu lấy từ đề và lời giải; "dapSo" kết quả cuối kèm đơn vị. Có tinh thì buoc không lặp lại phép tính.
+- tinh: 2–6 dòng, mỗi dòng ĐÚNG 3 ô cách nhau " | ": "đại lượng | phép tính | kết quả kèm đơn vị" (ví dụ "n ester | 8,8 : 88 | 0,1 mol"), số liệu lấy từ đề và lời giải; "dapSo" kết quả cuối kèm đơn vị. Có tinh thì buoc không lặp lại phép tính.
 - Mã hiện tượng: quy-xanh (quỳ hoá xanh), quy-do (quỳ hoá đỏ), trang-bac (kết tủa Ag, tráng bạc), tua-trang (kết tủa trắng), tua-vang (kết tủa vàng), tua-xanh (kết tủa xanh lam, Cu(OH)2), tua-nau-do (kết tủa nâu đỏ, Fe(OH)3), dd-xanh-lam (hoà tan Cu(OH)2 thành dung dịch xanh lam), tim (màu tím, biuret), xanh-tim (iodine gặp tinh bột), mat-mau (mất màu nước bromine hoặc thuốc tím), khi (sủi bọt khí), tach-lop (chất lỏng tách lớp), khong-doi (không hiện tượng).
 
 EM ĐANG LÀM
@@ -152,13 +157,14 @@ VÍ DỤ (một câu khác, chỉ để thấy giọng và cách trình bày c�
 Em hỏi: "Sao em chọn 9,6 gam lại sai ạ?"
 Thầy trả lời:
 {"lienQuan": true,
- "yChinh": "9,6 gam là khối lượng **C2H5COONa**: em ghép gốc ethyl của alcohol vào muối. Đáp số đúng là ==8,2 gam==.",
- "buoc": [{"ten": "Viết phương trình", "chu": "CH3COOC2H5 + NaOH → CH3COONa + C2H5OH"},
-          {"ten": "Tính số mol", "chu": "n ester = 8,8 : 88 = 0,1 mol."},
-          {"ten": "Tính khối lượng muối", "chu": "Muối là **CH3COONa** (M = 82) nên m = 0,1 × 82 = 8,2 gam."},
-          {"ten": "Làm lại", "chu": "Em viết phương trình thuỷ phân trước rồi mới tính, làm lại câu này theo cách đó."}],
- "ghiNho": "Tên ester: phần **acetate** đi vào muối, phần ethyl đi vào alcohol.",
- "hoiTiep": ["Gốc nào đi vào muối ạ?"]}
+ "yChinh": "9,6 gam là khối lượng !!C2H5COONa!!: em ghép gốc ethyl của alcohol vào muối. Muối đúng là ++CH3COONa++ nên ==m = 8,2 gam==.",
+ "bay": {"tieuDe": "Chỗ em nhầm", "chu": "Tên ester đọc **gốc alcohol trước**: ethyl acetate = gốc ethyl + gốc acetate. Muối giữ gốc **acetate**, em đã lấy !!gốc ethyl!!."},
+ "phuongTrinh": [{"pt": "CH3COOC2H5 + NaOH → CH3COONa + C2H5OH", "dk": "t°", "chinh": "CH3COONa"}],
+ "tinh": {"dong": ["n ester | 8,8 : 88 | 0,1 mol", "n muối | = n ester | 0,1 mol", "m muối | 0,1 × 82 | 8,2 gam"], "dapSo": "8,2 gam"},
+ "buoc": [{"ten": "Làm lại", "chu": "Em viết phương trình thuỷ phân trước rồi mới tính, làm lại câu này theo cách đó."}],
+ "ghiNho": "RCOOR' + NaOH → **RCOONa** + R'OH: muối giữ **gốc acid** RCOO–.",
+ "hoiTiep": ["Gọi tên ester nhanh thế nào?"]}
+Đề nhận biết: X làm quỳ tím hoá xanh, Y tráng bạc; em ĐANG LÀM, hỏi "Câu này làm sao ạ?" ⇒ {"lienQuan": true, "yChinh": "Mỗi hiện tượng chỉ ra **một nhóm chức**: đọc hiện tượng, đoán nhóm chức rồi mới so phương án.", "thiNghiem": [{"nhan": "X", "thuoc": "Quỳ tím", "hien": "quy-xanh", "chu": "Quỳ hoá xanh", "phu": "môi trường base"}, {"nhan": "Y", "thuoc": "AgNO3/NH3, t°", "hien": "trang-bac", "chu": "Lớp bạc sáng", "phu": "có nhóm –CHO"}], "nhanBiet": [{"thuoc": "Quỳ tím", "hien": "quy-xanh", "chu": "hoá xanh", "nhom": "–NH2 gắn gốc no"}, {"thuoc": "AgNO3/NH3", "hien": "trang-bac", "chu": "tráng bạc", "nhom": "–CHO"}], "bay": {"tieuDe": "Bẫy hay nhầm", "chu": "Aniline có –NH2 nhưng **không làm quỳ đổi màu**."}, "buoc": [{"ten": "Tự kết luận", "chu": "Chất nào trong từng phương án có đúng nhóm chức của X và Y?"}]}
 Em hỏi "Thầy giải giúp em bài Lý số 3" ⇒ {"lienQuan": false, "yChinh": ""}.`
 
 // ---------------------------------------------------------------- dữ liệu câu ⇒ nội dung gửi Gemini
