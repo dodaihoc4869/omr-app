@@ -895,3 +895,5 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - 14/10 06:59 VN · Codex · Định sửa `scripts/ap-goi7-song.ts`: bước vận hành còn dùng membership vật lý, có thể bù quota em đã bớt hoặc báo thiếu em cố ý không chọn. Dùng chung policy đang nhận, giữ lịch sử/quota thuật toán; kiểm SQLite độc lập, không sửa D1 thật. Nguồn giao diện/máy chủ đóng băng 439a6f29; main 2f91f0e4 đã gộp, đang đối chiếu full. Đã báo Claude tại PR291, không phát hành chồng.
 
 - 14/10 07:12 VN · Codex · Đóng nguồn C3 `a2da228b` sau full439 bắt tương thích máy cũ và truy vấn cờ trùng; giữ ngưỡng/test cũ,184/184server+33/33UI đạt. Cổng TS/build/tốc độ0đỏ/màu0/SW13/13 đạt, đang full cuối so main2f và Chromium/SQL mới. Script phát hành10/10 độc lập dùng policy nhận, không D1 thật; PR291 còn nháp/chưa phát hành.
+
+- 14/10 07:22 VN · Codex · Full cuối nguồn `a2da228b` **14353đạt/120đỏ nền/27pending** so main2f14293/120/27:0 tên lỗi mới kể cả trùngtên,0 tệp/suite lỗi mới,0skip mới. C2/C3 build và cổng đã xong PR291; Chromium22+18+11+probe máy cũ/SQL18+19+vận hành10 đạt. Chốt CI/ca và tránh deploy chồng trước gộp; chưa phát hành. Bằng chứng docs/ket-qua-c3-1410.md.

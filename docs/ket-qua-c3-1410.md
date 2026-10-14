@@ -25,8 +25,8 @@ Main nền mới nhất: `2f91f0e402b9a737bca370236d492cf86f27dc4b` (giữ PR292
 | Chromium độc lập | 22/22 tình huống feature;18/18 tổ hợp ba app +11 kiểm URL cũ/public/offline/SW. Không lỗi JS/tràn/đích chạm dưới48px ở phạm vi kiểm. [24 ảnh và JSON](kiem-c3-doc-lap-1410/README.md) |
 | Bước vận hành | 10/10 SQL nguyên văn, hai agent đối chiếu; node24 bundle đạt. [Bằng chứng](kiem-c3-doc-lap-1410/buoc-van-hanh.json) |
 | SQL độc lập | 18/18 membership; agent khác soát toàn tuyến19/19, gồm fallback, phiên bản câu, deadline gói khác, CAS ở thời điểm ghi. [Báo cáo tuyến](kiem-c3-doc-lap-1410/soat-tuyen-may-chu.json) |
-| Full Vitest | Đang chạy mới trêna2. Lượt439:14345đạt/127đỏ/27pending so main2f14293/120/27, bắt lỗi máy cũ/chi phí/SQL lỗi dự phòng. Sau sửa184/184server+33/33UI/compat đạt; không nâng ngưỡng/sửa test cũ. Ba lỗi kiểu hết giờ kiểm lại cùng nền20đạt/2đỏ, tên lỗi trùng nhau. Chưa dùng lượt439 để phát hành |
-| CI/kiểm ca/phát hành | Chưa gộp hoặc phát hành PR291 tại thời điểm ghi bảng này |
+| Full Vitest | Mã a2: **14353đạt/120đỏ nền/27pending**, main2f14293/120/27. **0 tên lỗi mới (đếm cả tên trùng),0 tệp lỗi mới,0 suite rỗng lỗi mới,0 skip mới**;59 tệp lỗi cùng nền. [Đối chiếu cuối](kiem-c3-doc-lap-1410/full-cuoi.json). Tám ca giao diện cũ gỡ/viết lại đúng kiểm kê, giữ các ca server/mixed còn dùng |
+| CI/kiểm ca/phát hành | Head nguồn đã đẩy PR291; đang chốt CI/kiểm ca mới trước gộp. Chưa phát hành tại thời điểm ghi bảng này |
 
 ## Lỗi thực tế phát hiện và sửa
 
@@ -37,6 +37,16 @@ Main nền mới nhất: `2f91f0e402b9a737bca370236d492cf86f27dc4b` (giữ PR292
 5. Lưu UUID trần và `Array.at` không dùng được trên iPhone cũ; đổi sang helper có dự phòng và chỉ số mảng, thêm ca máy thiếu UUID/giữ mã retry.
 6. Đọc cờ Gói7 trong đường Hành trình trùng với nhóm cờ OMNI đang đọc: tái dùng Promise đọc cấu hình, nạp mô-đun song song. Hai cổng chi phí cũ xanh mà không nâng trần. Giữ khoảng trắng tiền tố SQL BTVN để fault-injection kiểm chính xác hai đường lỗi, không nới kiểm che câu.
 7. Bước `ap-goi7-song` trước sửa đếm toàn membership vật lý, có thể bù quota em đã loại/báo em không được chọn là thiếu; sửa đọc cùng policy nhận, giữ số lịch sử bằng nhãn riêng.
+
+## Tái hiện đối chiếu full
+
+Chạy `npx vitest run --reporter=json --outputFile=/tmp/main.json` trên main2f và tương tự `/tmp/head.json` trên mã a2; cổng full có lỗi nền nên exit1 ở cả hai. Sau đó:
+
+```sh
+node scripts/doi-chieu-vitest-theo-ten.mjs /tmp/main.json /tmp/head.json /tmp/so-full.json 2f91f0e402b9a737bca370236d492cf86f27dc4b a2da228b154a44b494aa770ae411f14104566210
+```
+
+CLI exit0 khi không có tên/tệp/suite lỗi hoặc skip mới. Lượt trước439 có7 tên lỗi mới được lưu [nguyên kết quả so](kiem-c3-doc-lap-1410/full-truoc-khi-sua.json); không dùng lượt lỗi đó để phát hành.
 
 ## Phối hợp và giới hạn
 
