@@ -1214,10 +1214,14 @@ export async function docKeHoachDaChot(env: Env, sbd: string, nowMs: number): Pr
 export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanTruoc?: Promise<Set<string>>, omniTruoc?: Promise<boolean>,quyenTruoc?:Promise<ReadonlySet<string>>): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
   // 29/09 (cao điểm 20h–24h): tập câu bảo vệ ca thi (dùng chung mọi em, đệm 5 s trong isolate) đọc SONG SONG với kế hoạch — trước: một đợt D1 nối tiếp sau kế hoạch.
   // `chanTruoc` (chỉ-thêm 30/09): nơi gọi đã bắt đầu đọc tập ấy (Sảnh cần lại cho Thử sức thêm) ⇒ dùng chung, không đọc hai lần.
-  const quyenSom=quyenTruoc??import('./goi-bai-7-chan-moi').then(m=>m.docChanCauMoiNeuBat7(env,sbd))
+  const omniSom=omniTruoc??(hs?Promise.resolve(!!hs.omni?.bat):omniBatEm(env,sbd))
+  // OMNI đã đọc kèm cờ Gói7 trong NHOM_CO: chờ đúng lượt đọc hiện có trước khi hỏi cờ ấy, không gửi truy vấn trùng khi nhóm đang bay.
+  // Nạp mô-đun cùng lúc I/O cấu hình, để mở lại không thêm đợt chờ. Promise chỉ thuộc request này.
+  const quyenApi=quyenTruoc?null:import('./goi-bai-7-chan-moi')
+  const quyenSom=quyenTruoc??Promise.all([omniSom,quyenApi!]).then(([,m])=>m.docChanCauMoiNeuBat7(env,sbd))
   const chanSom=Promise.all([chanTruoc??protectedQuestions(env).catch(()=>new Set<string>()),quyenSom]).then(([ca,quyen])=>new Set([...ca,...quyen]))
   const nghiSom = docCauNghiDem(env, nowMs) // 06/10: câu nghi đáp án — cùng đợt với kế hoạch (đệm 60 s trong isolate; không bao giờ ném)
-  const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom, omniTruoc,quyenSom)
+  const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom, omniSom,quyenSom)
   const kh = await tamHoanCauKhoa(env, r.kh, r.hs, chanSom, nghiSom, sbd)
   if (kh.hanhTrinh) kh.hanhTrinh = { ...tienDoHanhTrinh(kh.hanhTrinh.tang, kh.hanhTrinh.toiThieu, kh.tong, kh.tong - kh.conDao.length - kh.conDoan.length), ...(kh.hanhTrinh.bai ? { bai: kh.hanhTrinh.bai } : {}) }
   return { kh, hs: r.hs }

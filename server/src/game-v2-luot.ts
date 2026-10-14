@@ -167,9 +167,9 @@ export async function docCauBtvnChuaNop(env: Env, sbd: string): Promise<Set<stri
       for (const x of r.results ?? []) { ra.add(String(x.qid)); if (x.grp) ra.add(String(x.grp)) }
     } catch { /* thiếu bảng/cột: bỏ nguồn */ }
   }
-  const caNhan=`SELECT q.qid AS qid,q.content_group AS grp FROM btvn_em_cau ec JOIN btvn_em be ON be.ma_btvn=ec.ma_btvn AND be.sbd=ec.sbd JOIN btvn b ON b.ma_btvn=ec.ma_btvn
+  const caNhan=`SELECT q.qid AS qid, q.content_group AS grp FROM btvn_em_cau ec JOIN btvn_em be ON be.ma_btvn=ec.ma_btvn AND be.sbd=ec.sbd JOIN btvn b ON b.ma_btvn=ec.ma_btvn
     JOIN game_v2_question q ON q.qid=ec.qid WHERE ec.sbd=?1 AND be.nop_luc IS NULL AND b.da_xoa=0 AND COALESCE(be.thu_hoi,0)=0`
-  const caTo=`SELECT q.qid AS qid,q.content_group AS grp FROM btvn b JOIN btvn_em be ON be.ma_btvn=b.ma_btvn JOIN game_v2_question q ON q.ma_de=b.ma_de
+  const caTo=`SELECT q.qid AS qid, q.content_group AS grp FROM btvn b JOIN btvn_em be ON be.ma_btvn=b.ma_btvn JOIN game_v2_question q ON q.ma_de=b.ma_de
     WHERE be.sbd=?1 AND be.nop_luc IS NULL AND b.da_xoa=0 AND COALESCE(b.ca_nhan,0)=0 AND COALESCE(be.thu_hoi,0)=0`
   try {
     // Hai nguồn độc lập cùng một SELECT; Set giữ đúng kết quả cũ, giảm một lượt chờ/lệnh ở mọi màn học.

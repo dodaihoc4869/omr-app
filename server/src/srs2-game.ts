@@ -201,8 +201,10 @@ export async function startDao2(env: Env, sbd: string, nowMs: number, tapTrung =
   const dangChoSom = env.DB.prepare(`SELECT id, json FROM game_v2_session s WHERE sbd = ? AND created_at >= ? AND json_extract(json,'$.hoa2') = 1 AND COALESCE(json_extract(json,'$.doan'),0) = 0 AND COALESCE(json_extract(json,'$.bia'),0) = 0 AND COALESCE(json_extract(json,'$.hocTap'),0) = ?
       AND NOT EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id) ORDER BY created_at DESC LIMIT 1`).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString(), Number(tapTrung)).first<Row>().catch(() => null)
   const hdSom = hoSoDangSom(env, sbd)
-  const quyenSom=chanMoi?Promise.resolve(chanMoi):import('./goi-bai-7-chan-moi').then(m=>m.docChanCauMoiNeuBat7(env,sbd))
-  const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs,undefined,undefined,undefined,quyenSom)
+  const omniSom=omniBat(env,sbd).catch(()=>false)
+  const quyenApi=chanMoi?null:import('./goi-bai-7-chan-moi')
+  const quyenSom=chanMoi?Promise.resolve(chanMoi):Promise.all([omniSom,quyenApi!]).then(([,m])=>m.docChanCauMoiNeuBat7(env,sbd))
+  const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs,undefined,undefined,omniSom,quyenSom)
   const quyen=await quyenSom
   const khoaCau = tapTrung ? [...kh.conDoan, ...kh.conDao] : kh.conDao
   const tamHoan = kh.tamHoan?.ca ?? 0
