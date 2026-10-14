@@ -14,12 +14,12 @@
 //   · Phạm vi đã dạy của lớp = bài đang tick ∪ mọi bài đứng TRƯỚC bài tick xa nhất (danh sách `phamVi` app thầy gửi lúc tick).
 //   · Lớp của em: đúng nguồn màn Học sinh (`danh_sach` + `hoc_sinh.ten_lop`, tên lớp mặc định theo khối — ten-lop.ts), em đã khoá không tính.
 import type { Env } from './kieu'
-import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { DemTTL } from './dem-chung'
 import { nhoTheoLuot } from './doc-d1-theo-luot'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { laCauTuLuan } from './cam-tu-luan'
+import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
 import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { tenLopCuaEm } from './ten-lop'
 import { cauCuaToChiTiet, gvChienDich, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
@@ -374,14 +374,16 @@ async function tinhHan(env: Env, dv: DauVaoBai, nowMs: number): Promise<{ hanNop
 /** Đếm câu TỰ LUẬN đã bị bỏ (câu đã duyệt) + nhãn kiến thức của các câu dùng được, theo đúng phần của tờ đã tách. */
 async function docCauBai(env: Env, maDe: readonly string[]): Promise<{ soTuLuan: number; kienThuc: string[] }> {
   const goc = [...new Set(maDe.map((m) => tachMaTo(m).goc))]
-  const r = await env.DB.prepare('SELECT ma_de, qid, json FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) ORDER BY rowid').bind(JSON.stringify(goc)).all<Row>()
-  const theoGoc = new Map<string, { qid: string; q: PrivateQuestion }[]>()
+  // 14/10: câu RÚT GỌN (cau-gon.ts) + nhãn kiến thức riêng — không nạp ảnh/lời giải của cả tờ (~6× nhẹ hơn JSON đầy đủ). Dòng JSON hỏng bị bỏ như cũ.
+  const r = await env.DB.prepare(`SELECT ma_de, qid, ${SQL_CAU_GON}, CASE WHEN json_type(json,'$.kienThuc')='array' THEN json_extract(json,'$.kienThuc') END AS kien_thuc FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY rowid`).bind(JSON.stringify(goc)).all<Row>()
+  const theoGoc = new Map<string, { qid: string; q: Record<string, unknown> }[]>()
   for (const x of r.results ?? []) {
-    let q: PrivateQuestion
-    try { q = JSON.parse(str(x.json)) as PrivateQuestion } catch { continue }
-    if (!q.reviewed) continue
+    const gon = cauGonTuDong(x)
+    if (!gon || !gon.reviewed) continue
+    let kienThuc: unknown = undefined
+    try { kienThuc = x.kien_thuc == null ? undefined : JSON.parse(str(x.kien_thuc)) } catch { /* chỉ mảng mới đọc — như `Array.isArray` cũ */ }
     const k = str(x.ma_de)
-    theoGoc.set(k, [...(theoGoc.get(k) ?? []), { qid: str(x.qid), q }])
+    theoGoc.set(k, [...(theoGoc.get(k) ?? []), { qid: str(x.qid), q: { ...gon, kienThuc } }])
   }
   const tuLuan = new Set<string>(), daXet = new Set<string>(), kienThuc = new Set<string>()
   for (const m of maDe) {

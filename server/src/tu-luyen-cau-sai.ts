@@ -18,6 +18,7 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import type { CauLuyen } from '../../src/lib/bai-tap-pdf'
 import { cauLuyenTuBoCau } from '../../src/lib/bai-tap-pdf'
 import { laCauTuLuan } from './cam-tu-luan'
+import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { docBaoVeKho, LOI_CHUA_KIEM_BAO_VE } from './bao-ve-kho-cong-khai'
 import { chanKhacKhoiEm } from './chan-khac-khoi'
@@ -164,6 +165,7 @@ export function cauLuyenTuCauGame(q: PrivateQuestion): CauLuyen {
 
 export interface CauSaiKho {
   qid: string
+  /** Câu RÚT GỌN (14/10 — không ảnh / lời giải / bảng; đủ lọc/đếm). Cần nội dung đầy đủ (phát câu, dựng đề) ⇒ `napDayDuCauSai`. */
   q: PrivateQuestion
   lanSai: LanSai[]
   kho: boolean
@@ -327,6 +329,36 @@ export async function docNoiDung(env: Env, qids: string[]): Promise<Map<string, 
 }
 
 /**
+ * Câu RÚT GỌN (cau-gon.ts: không ảnh / lời giải / bảng) cùng điều kiện tờ còn + chỉ mục khớp nguồn như `docNoiDung` — đủ cho lọc tự luận, khối,
+ * câu khó, nhóm nội dung. 14/10 (giờ cao điểm 13/10: isolate vượt 128 MB): kho câu sai TB ~1.500 câu/em; JSON đầy đủ ≈ 6 triệu ký tự mỗi lượt mở
+ * Tự luyện ⇒ nay ≈ 1 triệu. Nội dung đầy đủ chỉ nạp cho câu thật sự phát (`docNoiDung` ở tu-luyen.ts).
+ */
+export async function docNoiDungGon(env: Env, qids: string[]): Promise<Map<string, { group: string; q: PrivateQuestion }>> {
+  const ra = new Map<string, { group: string; q: PrivateQuestion }>()
+  for (let i = 0; i < qids.length; i += 800) {
+    const r = await env.DB.prepare(`SELECT game_v2_question.qid AS qid, game_v2_question.content_group AS content_group, ${SQL_CAU_GON}
+        FROM game_v2_question JOIN de_kho d ON d.ma_de = game_v2_question.ma_de
+        JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+       WHERE COALESCE(d.da_xoa, 0) = 0 AND game_v2_question.qid IN (SELECT value FROM json_each(?)) AND json_valid(game_v2_question.json)`)
+      .bind(JSON.stringify(qids.slice(i, i + 800))).all<Row>()
+    for (const x of r.results ?? []) {
+      const qid = str(x.qid)
+      if (ra.has(qid)) continue
+      const q = cauGonTuDong(x)
+      if (q) ra.set(qid, { group: str(x.content_group), q: q as unknown as PrivateQuestion })
+    }
+  }
+  return ra
+}
+
+/** Thay câu RÚT GỌN của kho câu sai bằng nội dung ĐẦY ĐỦ (để phát / dựng đề) — một lượt đọc cho đúng các câu cần. Câu vắng (vừa rút khỏi kho) giữ bản gọn. */
+export async function napDayDuCauSai<T extends { qid: string; q: PrivateQuestion }>(env: Env, ds: readonly T[]): Promise<T[]> {
+  if (!ds.length) return []
+  const nd = await docNoiDung(env, [...new Set(ds.map((c) => c.qid))])
+  return ds.map((c) => { const day = nd.get(c.qid); return day ? { ...c, q: day.q } : c })
+}
+
+/**
  * KHO CÂU SAI CHUNG của em từ mốc (chế độ 1, 2, 4 cùng dùng) — khử trùng qid + nhóm nội dung; bỏ tự luận, câu đang bảo vệ, câu đã đổi/rút khỏi kho;
  * kèm trạng thái ôn cách quãng từng câu; câu ĐÃ KHẮC PHỤC (không sai lại sau đó) rời `ds` nhưng vẫn đếm vào `tong` / `daKhacPhuc`.
  * `loi` ≠ '' khi kho (còn lại) rỗng hoặc phải đóng cửa.
@@ -341,7 +373,8 @@ export async function docKhoCauSai(env: Env, sbd: string): Promise<KhoCauSai> {
     if (LA_TRO.has(l.loai)) l.tenChienDich = tenCd.get(l.qid) ?? ''
     theoQid.set(l.qid, [...(theoQid.get(l.qid) ?? []), l])
   }
-  const noiDung = await docNoiDung(env, [...theoQid.keys()])
+  // 14/10: câu RÚT GỌN — `q` của mỗi phần tử `ds` là bản gọn; nơi phát câu / dựng đề gọi `napDayDuCauSai` cho đúng câu cần.
+  const noiDung = await docNoiDungGon(env, [...theoQid.keys()])
   const baoVe = await docBaoVeKho(env)
   if (!baoVe) return rong(LOI_CHUA_KIEM_BAO_VE)
   // Khử trùng theo NHÓM NỘI DUNG: cùng một đề chép ở nhiều tờ ⇒ một câu (gộp lịch sử sai), giữ qid có lần sai gần nhất.

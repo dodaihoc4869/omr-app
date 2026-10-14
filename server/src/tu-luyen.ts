@@ -43,6 +43,7 @@ import {
   chuSauCham,
   docKhacPhuc,
   docKhoCauSai,
+  napDayDuCauSai,
   docLanLuyen,
   docNoiDung,
   lenhGhiKhacPhuc,
@@ -194,8 +195,9 @@ function cauSaiDauVaoTu(ds: readonly PrivateQuestion[], chuyenDe: Map<string, st
 
 /** Kho câu sai (kho chung) ⇒ `CauSaiDauVao` — đã qua cửa `hopLeDeRut` như khối cũ. */
 async function cauSaiTuKho(env: Env, kho: KhoCauSai): Promise<CauSaiDauVao[]> {
-  const cd = await docChuyenDe(env, kho.ds.map((c) => c.qid))
-  return cauSaiDauVaoTu(kho.ds.map((c) => c.q), cd).filter((c) => hopLeDeRut({ phan: c.phan, maDe: c.maCa, dapAnDung: c.dapAnDung, text: c.text, choices: c.choices || c.ideas }))
+  // 14/10: kho câu sai giữ câu RÚT GỌN — dựng đề cần nội dung đầy đủ (chữ, phương án, ảnh, đáp án) ⇒ nạp đúng các câu của kho, song song chuyên đề.
+  const [cd, day] = await Promise.all([docChuyenDe(env, kho.ds.map((c) => c.qid)), napDayDuCauSai(env, kho.ds)])
+  return cauSaiDauVaoTu(day.map((c) => c.q), cd).filter((c) => hopLeDeRut({ phan: c.phan, maDe: c.maCa, dapAnDung: c.dapAnDung, text: c.text, choices: c.choices || c.ideas }))
 }
 
 // ------------------------------------------------------------------ DỰ PHÒNG khi kho câu sai trống (thầy 30/09: "không bao giờ khoá")
@@ -535,6 +537,8 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
     const dsCau: CauLuyen[] = []
     // 06/10 THANG làm lại câu sai (tu-luyen-thang.ts): thứ tự + số câu + nhãn GIỮ NGUYÊN; câu đang trong cửa sổ lỗi hiển thị BẢN KHÁC (câu anh em đúng khối / song sinh / xáo),
     // không có bản khác ⇒ nguyên văn (lệnh thầy 30/09). Mã câu trong lượt vẫn là câu GỐC (đơn vị ôn cách quãng, đếm lần luyện, nhãn) — chỉ NỘI DUNG câu đổi.
+    // 14/10: kho câu sai giữ câu RÚT GỌN — nạp nội dung ĐẦY ĐỦ chỉ cho các câu vừa chọn (trước: cả kho ~1.500 câu JSON đầy đủ mỗi lượt).
+    for (const c of await napDayDuCauSai(env, [...new Set(chon.map((x) => x.qid))].map((q) => theo.get(q)!))) theo.set(c.qid, c)
     const hien = await thayCauSaiTheoThang(env, sbd, chon.map((x) => theo.get(x.qid)!.q), now)
     for (const [i, x] of chon.entries()) {
       const c = theo.get(x.qid)!
