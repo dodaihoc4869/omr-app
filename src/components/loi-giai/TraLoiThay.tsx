@@ -1,13 +1,17 @@
 // CÂU TRẢ LỜI CỦA THẦY (bản vẽ docs/ban-ve-hoi-thay-1310, thầy chốt 13/10: "Phần hướng dẫn lời giải phải hiển thị khoa học hơn, ngắt câu
 // tô đậm … sao cho hs đọc cái hiểu ngay"): ý chính (cụm then chốt đậm, đáp số làm nổi) → các bước đánh số (tên in đậm) → bảng nhanh → ghi nhớ
 // → nút hỏi tiếp. Máy chủ (server/src/hoi-tro-ly-cau-truc.ts) đã làm sạch; ở đây chỉ kiểm khuôn. Công thức qua ChemText (hạ chỉ số).
+// v2 (bản vẽ docs/ban-ve-hoi-thay-v2-1410, thầy 14/10: "Làm mọi thứ tốt nhất để hs hỏi cái là hiểu được bài ngay"): KHỐI HÌNH tuỳ câu hỏi
+// (KhoiTraLoi.tsx: sơ đồ chuyển hoá · thí nghiệm ảo · hiện tượng → nhóm chức · phương trình · tính nhanh · bẫy), ++đúng++ xanh, !!sai!! đỏ gạch,
+// nhóm chức (–NH2, –CHO, –OH, –COOH, –COO–) tự thành nhãn màu. Thứ tự: ý chính → khối hình → bước → bảng → bẫy → ghi nhớ → hỏi tiếp.
 import { Lightbulb } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
 import { chiSoRo } from '../../lib/chi-so-ro'
+import { Bay, NhanBiet, PhuongTrinh, SoDo, ThiNghiem, TinhNhanh, docKhoi, type KhoiHinh } from './KhoiTraLoi'
 import './tra-loi-thay.css'
 
-export interface CauTrucTraLoi {
+export interface CauTrucTraLoi extends KhoiHinh {
   yChinh: string
   buoc: { ten: string; chu: string }[]
   bang: { cot: string[]; dong: string[][]; sauBuoc: number } | null
@@ -26,8 +30,10 @@ const RE_GOC = /([A-Za-z0-9()_{}]+)-(?=$|[\s,.;:!?)\]…])/g
  *  chỉ hiểu điện tích liền sau công thức ⇒ đổi thành mũ tường minh `^{2-}`. Chỉ khi phía trước là công thức (có chữ in hoa): "Fe(III)",
  *  "(1)", "x(2-)" giữ nguyên. Dấu trừ Unicode "−" coi như "-". Không dùng lookbehind (máy iOS cũ). */
 const RE_DIEN_TICH_NGOAC = /([A-Za-z0-9)\]]+)\((\d{0,2})([+\-−])\)/g
+/** POLYMER "(C6H10O5)n", "(-CH2-CH2-)n": n sau ngoặc đóng của một công thức (trong ngoặc có chữ in hoa và số) là chỉ số ⇒ hạ xuống. */
+const RE_POLYME = /(\([^()\s]*[A-Z][^()\s]*\d[^()\s]*\))n(?=$|[\s,.;:+→⟶)])/g
 export function chuHoa(s: string): string {
-  return chiSoRo(s).replace(RE_DIEN_TICH_NGOAC, (m, truoc: string, so: string, dau: string) => (/[A-Z]/.test(truoc) ? `${truoc}^{${so}${dau === '+' ? '+' : '-'}}` : m)).replace(RE_GOC, (m, tok: string) =>
+  return chiSoRo(s).replace(RE_POLYME, '$1_{n}').replace(RE_DIEN_TICH_NGOAC, (m, truoc: string, so: string, dau: string) => (/[A-Z]/.test(truoc) ? `${truoc}^{${so}${dau === '+' ? '+' : '-'}}` : m)).replace(RE_GOC, (m, tok: string) =>
     /^(?:[A-Z][a-z]?|[()]|\d+|_\{\d+\})+$/.test(tok) && /C(?![a-z])/.test(tok) && /H\d+$/.test(tok) ? `${tok.replace(/([A-Za-z)])(\d+)/g, '$1_{$2}')}-` : m)
 }
 
@@ -40,25 +46,55 @@ export function docCauTruc(v: unknown): CauTrucTraLoi | null {
   const cot = b && Array.isArray(b.cot) ? b.cot.filter(chuoi) : []
   const dong = b && Array.isArray(b.dong) ? b.dong.filter((d): d is string[] => Array.isArray(d) && d.every(chuoi)) : []
   const yChinh = chuoi(o.yChinh) ? o.yChinh : ''
-  if (!yChinh && !buoc.length) return null
+  const khoi = docKhoi(o)
+  if (!yChinh && !buoc.length && !Object.keys(khoi).length) return null
   return {
     yChinh,
     buoc,
     bang: cot.length >= 2 && dong.length ? { cot, dong, sauBuoc: Number(b?.sauBuoc) || 0 } : null,
     ghiNho: chuoi(o.ghiNho) ? o.ghiNho : '',
     hoiTiep: Array.isArray(o.hoiTiep) ? o.hoiTiep.filter(chuoi).slice(0, 2) : [],
+    ...khoi,
   }
 }
 
-/** Chữ có **đậm** và ==làm nổi==; phần thường qua ChemText (CH3NH2 ⇒ CH₃NH₂, CH3- ⇒ CH₃-). */
+/** NHÓM CHỨC có gạch đầu (–NH2, -CHO, –OH, –COOH, –COO–) đứng riêng ⇒ nhãn màu theo nhóm. Không dùng lookbehind (máy iOS cũ): bắt cả kí tự đứng
+ *  trước. "CH3NH2", "C6H5-NH2" (gạch dính công thức) không khớp ⇒ giữ nguyên. */
+const RE_NHOM = /(^|[\s(,;:/])([–-](?:NH2|CHO|OH|COOH|COO[–-]?))(?=$|[\s),.;:/])/g
+const LOAI_NHOM: Record<string, string> = { NH2: 'nh2', CHO: 'cho', OH: 'oh', COOH: 'coo', COO: 'coo' }
+export function nhomChuc(t: string): string {
+  return LOAI_NHOM[t.replace(/^[–-]|[–-]$/g, '')] ?? ''
+}
+function ChuHoa({ text }: { text: string }) {
+  const phan: ReactNode[] = []
+  let truoc = 0, m: RegExpExecArray | null
+  RE_NHOM.lastIndex = 0
+  while ((m = RE_NHOM.exec(text))) {
+    const dau = m.index + m[1]!.length
+    if (dau > truoc) phan.push(<ChemText key={truoc} text={chuHoa(text.slice(truoc, dau))} />)
+    const nhom = m[2]!.replace(/^-/, '–').replace(/-$/, '–')
+    phan.push(<span key={`n${dau}`} className="lg-nhom" data-n={nhomChuc(nhom)}><ChemText text={chuHoa(nhom.replace(/–$/, ''))} />{nhom.endsWith('–') ? '–' : ''}</span>)
+    truoc = dau + m[2]!.length
+  }
+  if (!phan.length) return <ChemText text={chuHoa(text)} />
+  if (truoc < text.length) phan.push(<ChemText key={truoc} text={chuHoa(text.slice(truoc))} />)
+  return <>{phan}</>
+}
+
+/** Chữ có **đậm**, ==làm nổi==, ++đúng++ (xanh), !!sai!! (đỏ gạch ngang); phần thường qua ChemText (CH3NH2 ⇒ CH₃NH₂, CH3- ⇒ CH₃-),
+ *  nhóm chức đứng riêng thành nhãn màu. ++…++ không bắt khi trong/ngoài cặp là "+" hay khoảng trắng (ion "NH4^+ + OH^-" giữ nguyên). */
+const RE_TO = /(\*\*.+?\*\*|==.+?==|\+\+[^+\s](?:[^+]*?[^+\s])?\+\+|!![^!\s](?:[^!]*?[^!\s])?!!)/g
 export function ChuTo({ text }: { text: string }) {
-  const phan = text.split(/(\*\*.+?\*\*|==.+?==)/g).filter(Boolean)
+  const phan = text.split(RE_TO).filter(Boolean)
   return (
     <>
       {phan.map((p, i) => {
-        if (p.length > 4 && p.startsWith('**') && p.endsWith('**')) return <strong key={i}><ChemText text={chuHoa(p.slice(2, -2))} /></strong>
-        if (p.length > 4 && p.startsWith('==') && p.endsWith('==')) return <mark key={i}><ChemText text={chuHoa(p.slice(2, -2))} /></mark>
-        return <ChemText key={i} text={chuHoa(p)} />
+        const trong = p.slice(2, -2)
+        if (p.length > 4 && p.startsWith('**') && p.endsWith('**')) return <strong key={i}><ChuHoa text={trong} /></strong>
+        if (p.length > 4 && p.startsWith('==') && p.endsWith('==')) return <mark key={i}><ChemText text={chuHoa(trong)} /></mark>
+        if (p.length > 4 && p.startsWith('++') && p.endsWith('++')) return <span key={i} className="lg-dung"><ChemText text={chuHoa(trong)} /></span>
+        if (p.length > 4 && p.startsWith('!!') && p.endsWith('!!')) return <span key={i} className="lg-sai"><span className="sr-only">(sai) </span><ChemText text={chuHoa(trong)} /></span>
+        return <ChuHoa key={i} text={p} />
       })}
     </>
   )
@@ -102,6 +138,11 @@ export default function TraLoiThay({ ct, dangLam = false, onHoi, khoa = false }:
         {dangLam && <span className="lg-tl-the">Gợi hướng</span>}
       </div>
       {ct.yChinh && <p className="lg-tl-chinh"><ChuTo text={ct.yChinh} /></p>}
+      {ct.soDo && <SoDo soDo={ct.soDo} />}
+      {ct.thiNghiem && <ThiNghiem ong={ct.thiNghiem} />}
+      {ct.nhanBiet && <NhanBiet dong={ct.nhanBiet} />}
+      {ct.phuongTrinh && <PhuongTrinh pt={ct.phuongTrinh} />}
+      {ct.tinh && <TinhNhanh tinh={ct.tinh} />}
       {ct.buoc.length > 0 && (
         <ol className="lg-tl-buoc">
           {ct.buoc.map((b, i) => (
@@ -117,6 +158,7 @@ export default function TraLoiThay({ ct, dangLam = false, onHoi, khoa = false }:
         </ol>
       )}
       {bang && !sau && <BangNhanh bang={bang} />}
+      {ct.bay && <Bay bay={ct.bay} />}
       {ct.ghiNho && (
         <aside className="lg-tl-nho" aria-label="Ghi nhớ">
           <Lightbulb size={20} strokeWidth={2} aria-hidden="true" />
