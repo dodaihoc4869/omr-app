@@ -1,0 +1,70 @@
+{
+  "pr": [
+    291,
+    295
+  ],
+  "sourceCommit": "a2da228b154a44b494aa770ae411f14104566210",
+  "liveCommit": "f1e3d6098d17c67be359297ba276b56160bdb149",
+  "workflow": {
+    "run": 38491930339,
+    "job": 115618898079,
+    "conclusion": "success"
+  },
+  "data": [
+    {
+      "utc": "2026-10-14T00:47:38.1354887Z",
+      "data": {
+        "schemaGoi7": true,
+        "soLenhChiThem": 20
+      }
+    },
+    {
+      "utc": "2026-10-14T00:48:27.2592445Z",
+      "data": {
+        "workerCommit": "f1e3d6098d17c67be359297ba276b56160bdb149",
+        "pagesCommit": "f1e3d6098d17c67be359297ba276b56160bdb149",
+        "duongGiaoDienTot": 5,
+        "congQuyenVongChuaTot": 2
+      }
+    },
+    {
+      "utc": "2026-10-14T00:48:53.3141787Z",
+      "data": {
+        "apGoi7": true,
+        "ngay": "2026-10-14",
+        "soGoi": 5,
+        "soEm": 262,
+        "soEmDaTungNhan": 263,
+        "soCau": 609,
+        "emChuaCoQuota": 0,
+        "goiThieuNguon": 0,
+        "goiNguonChuaDu": 0,
+        "cauChuaDuyet": 0,
+        "hocSinhDaChonChuaNhanGoi": 0,
+        "giuKetQuaDaNop": true
+      }
+    },
+    {
+      "utc": "2026-10-14T00:48:58.6656737Z",
+      "data": {
+        "apKtCn": true,
+        "soLich": 772,
+        "soEm": 262,
+        "choNguon": 122,
+        "ngaySomNhat": "2026-10-17",
+        "ngayMuonNhat": "2026-10-22",
+        "cauItNhat": 28,
+        "cauNhieuNhat": 28,
+        "chuaCoSoTinhSan": 0,
+        "giuKetQuaDaNop": true,
+        "cronTiepTuc": true
+      }
+    }
+  ],
+  "limits": [
+    "Không sửa membership/hạn nộp thật để thử tính năng.",
+    "Số262 đang nhận khác263 từng nhận là aggregate theo policy/lớp/khóa hiện tại, không suy là xóa học sinh.",
+    "122 lịch cho_nguon cũ được giữ/ẩn theo main, không tuyên bố mọi lịch đều sẵn sàng.",
+    "Chromium fixture/SQLite không chứng minh Safari hoặc tải production cao điểm."
+  ]
+}
