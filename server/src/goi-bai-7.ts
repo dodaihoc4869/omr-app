@@ -441,7 +441,10 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   // MỘT CON SỐ (thầy 12/10): mức hôm nay M = max(mức theo tầng, Σ câu mới theo lịch các gói) — chốt lần lập đầu tiên trong ngày, các lần sau đọc lại.
   // Kế hoạch đúng M − đã làm câu: câu mới theo lịch vẫn đứng đầu nhưng không vượt phần còn lại của M (`chiTrongMuc`).
   const batKt=await import('./kiem-tra-ca-nhan').then(m=>m.coKtCn(env))
-  const eligible=(id:string)=>sanSang.has(id)&&!daLamNgay.has(id)&&!chan.has(id)
+  // Câu VỪA LÀM (≤ 15 phút, kể cả gốc của bản ảo) `startGoi7` không phát lại ⇒ kế hoạch cũng không xếp vào sửa / ôn / chữa (lỗi 14/10: kế hoạch và lúc phát
+  // phải cùng một luật, không thì phần còn lại của mức rơi vào câu không phát được). Mức hôm nay vẫn tính theo `daLamNgay` thật.
+  const khongXep = vuaLam.size ? new Set([...daLamNgay, ...vuaLam]) : daLamNgay
+  const eligible=(id:string)=>sanSang.has(id)&&!khongXep.has(id)&&!chan.has(id)
   const suaCan=batKt?sua.filter(id=>eligible(id)&&!chua.includes(id)).slice(0,4):[]
   const onCan=batKt?on.filter(id=>eligible(id)&&!suaCan.includes(id)&&!chua.includes(id)):[]
   const giuOn=batKt?Math.min(6,onCan.length):0
@@ -450,7 +453,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const kiemNhe=goi.some(g=>g.kiemNhe)
   // 12 chỗ của ngày kiểm tra giữ tiến độ bài đang trong hạn; nợ cũ vẫn ở hàng đợi.
   const nhomPhu=[...goi].sort((a,b)=>(kiemNhe?Number(a.han<ngay)-Number(b.han<ngay):0)||a.han.localeCompare(b.han)).map(g=>({qids:g.cau.map(c=>c.qid),quota:Math.max(0,g.quota-g.gapNgay.size)}))
-  const vaoPlan = { cau,daGap:vuaLam.size?new Set([...daGap,...vuaLam]):daGap,daLamNgay,quotaCon,sanSang,chan,sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn }
+  const vaoPlan = { cau,daGap:vuaLam.size?new Set([...daGap,...vuaLam]):daGap,daLamNgay:khongXep,quotaCon,sanSang,chan,sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn }
   const plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-daLamNgay.size) })
   // DỰ PHÒNG KHI MỞ CHẶNG (lỗi 14/10, "còn 1 câu nhưng app ko cho làm"): kế hoạch xếp VỪA ĐÚNG phần còn lại của mức, nên một câu của nó lúc phát không còn phát
   // được (thầy vừa sửa / rút câu, đọc lại câu lỗi, cổng khối …) là đủ để chặng rỗng. `startGoi7` khi đó đi tiếp TOÀN BỘ hàng chờ theo CÙNG luật xếp (mới theo lịch
