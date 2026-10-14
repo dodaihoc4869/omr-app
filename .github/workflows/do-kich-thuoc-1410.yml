@@ -1,0 +1,44 @@
+# ĐO KÍCH THƯỚC DỮ LIỆU (CHỈ ĐỌC) — thầy 14/10: "Tối ưu chuyên sâu toàn bộ cho giờ cao điểm".
+# Cao điểm 13/10: 135 yêu cầu chết vì isolate vượt 128 MB (exceededMemory). Tệp này đo cỡ thật của những thứ máy chủ giữ trong bộ nhớ
+# (dòng sổ kèm raw_json, JSON câu, danh mục) để định lượng bộ đệm nào phình. Chỉ in số đếm gộp — không in mã em, tên em, nội dung.
+name: Đo kích thước dữ liệu (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/do-kich-thuoc-1410.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-kich-thuoc-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Cỡ dữ liệu (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results"; }
+          q "sổ học: tổng dòng · số em · TB/max độ dài raw_json · TB subitem_json · tổng raw_json (ký tự)" \
+            "SELECT COUNT(*) n, COUNT(DISTINCT sbd) em, ROUND(AVG(length(raw_json))) tb_raw, MAX(length(raw_json)) max_raw, ROUND(AVG(length(subitem_json))) tb_sub, SUM(length(raw_json)) tong_raw FROM su_kien_hoc"
+          q "sổ học theo em: TB / max số dòng · TB / max tổng ký tự raw_json+subitem_json" \
+            "SELECT ROUND(AVG(n)) tb_dong, MAX(n) max_dong, ROUND(AVG(c)) tb_ky_tu, MAX(c) max_ky_tu FROM (SELECT sbd, COUNT(*) n, SUM(COALESCE(length(raw_json),0)+COALESCE(length(subitem_json),0)) c FROM su_kien_hoc GROUP BY sbd)"
+          q "kho câu: số dòng · TB / max độ dài JSON · tổng ký tự JSON" \
+            "SELECT COUNT(*) n, ROUND(AVG(length(json))) tb, MAX(length(json)) mx, SUM(length(json)) tong FROM game_v2_question"
+          q "kho câu: TB độ dài JSON sau bỏ ảnh/lời giải (đúng SQL_CAU_GON của docMetaCau)" \
+            "SELECT ROUND(AVG(length(json_remove(json,'\$.imageDataUrl','\$.thanCauImg','\$.solution','\$.table','\$.choiceImgs','\$.ideaImgs','\$.hinhAnh','\$.hinh','\$.kienThuc','\$.anhLuaChon','\$.anhY')))) tb_gon FROM game_v2_question"
+          q "omni_p_vkn: tổng dòng · TB dòng mỗi em" \
+            "SELECT COUNT(*) n, ROUND(1.0*COUNT(*)/MAX(1,COUNT(DISTINCT sbd))) tb_moi_em FROM omni_p_vkn"
+          q "hanh_trinh_v4_canh: tổng dòng" "SELECT COUNT(*) n FROM hanh_trinh_v4_canh"
+          q "game_v2_attempt: tổng dòng · TB độ dài json nếu có" "SELECT COUNT(*) n FROM game_v2_attempt"
