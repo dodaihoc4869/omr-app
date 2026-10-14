@@ -188,7 +188,7 @@ export const chuaBatDau = (cd: ChienDich, homNay: string): boolean => cd.batDau 
  */
 /**
  * Chiến dịch ĐÃ HUỶ từ 29/09 (thầy 06/10: "hủy chiến dịch thì những học sinh đã phân phải đc thu hồi hết") — chỉ giữ thứ đủ để THU HỒI nợ do chiến dịch ấy sinh ra
- * (`docHoSo2`, nguồn thứ 4): tập em, tập câu, mốc giao, lúc huỷ. Đọc CÙNG câu đọc danh sách chiến dịch (đệm 15 s) ⇒ không thêm lượt D1.
+ * (`docHoSo2`, nguồn thứ 4): tập em, tập câu, mốc giao, lúc huỷ. Đọc CÙNG câu đọc danh sách chiến dịch (đệm 60 s) ⇒ không thêm lượt D1.
  */
 export interface ChienDichDaHuy { id: string; qids: ReadonlySet<string>; taoLuc: string; dongLuc: string }
 /** Dòng thô của chiến dịch đã huỷ trong đệm: tập em / tập câu CHỈ đọc (parse) khi có em thật sự thuộc chiến dịch ấy — danh sách đã huỷ chỉ dài thêm theo thời gian. */
@@ -198,7 +198,9 @@ const qidDaHuyMemo = new WeakMap<DongDaHuy, Set<string>>()
 const qidCuaDaHuy = (c: DongDaHuy): Set<string> => { let t = qidDaHuyMemo.get(c); if (!t) { t = tapChuoiJson(c.qidJson); qidDaHuyMemo.set(c, t) } return t }
 type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; huy: DongDaHuy[]; bd: Map<string, string>; rd: Map<string, number> }
 type OChienDich = { ds: DsChienDich | null; dangDoc: boolean }
-const demChienDich = new DemTTL<OChienDich>(15_000, 2)
+// 14/10 (số đo cao điểm 13/10: câu `SELECT * FROM chien_dich …` 3.238 lần/3 giờ × 9,4 ms — mỗi isolate đọc lại sau mỗi 15 giây): đệm 60 giây. Chiến dịch nay
+// do hệ thống quản (giao chiến dịch tay đã gỡ 14/10); ghi trong isolate vẫn xoá đệm ngay (`xoaDemChienDich`), isolate khác thấy sau ≤ 60 giây.
+const demChienDich = new DemTTL<OChienDich>(60_000, 2)
 export function xoaDemChienDich(): void { demChienDich.xoa() }
 async function docMoiChienDich(env: Env): Promise<DsChienDich> {
   const co = demChienDich.doc('ds', Date.now())
@@ -349,9 +351,12 @@ function gonDongMeta(x: Row): Row {
  * Thứ tự trả: các câu theo mã câu tăng dần (đúng thứ tự D1 trả khi dò chỉ mục `game_v2_question_qid` theo danh sách IN), các dòng của CÙNG một câu
  * giữ đúng thứ tự máy trả — `metaCauTuDong` chọn tờ theo thứ tự ấy.
  */
-interface DemMeta { tem: string; luc: number; temLuc: number; dong: Map<string, Row[]> }
+/** `dang` (14/10): câu ĐANG được đọc trong isolate — yêu cầu đến cùng lúc (isolate mới giờ cao điểm) chờ chung thay vì đọc trùng ~1.000 dòng mỗi yêu cầu. */
+interface DemMeta { tem: string; luc: number; temLuc: number; dong: Map<string, Row[]>; dang: Map<string, Promise<Row[]>> }
 const demMeta = new WeakMap<object, DemMeta>()
-const TEM_MOI_MS = 5_000, TUOI_DEM_META_MS = 10 * 60_000, TRAN_DEM_META = 30_000
+// 14/10 (số đo cao điểm 13/10: câu đọc này đứng ĐẦU tổng thời gian D1 — 7.814 lần/3 giờ × ~1.050 dòng × 26 ms, phần lớn là đệm hết TUỔI 10 phút dù tem
+// không đổi): tuổi tối đa 30 phút — bằng hạn tối đa của đệm câu phạm vi (`demCauPhamVi`); kho đổi vẫn đọc lại sau ≤ 5 giây nhờ tem.
+export const TEM_MOI_MS = 5_000, TUOI_DEM_META_MS = 30 * 60_000, TRAN_DEM_META = 30_000
 /** Bỏ đệm siêu dữ liệu câu (test / sau khi lập lại chỉ mục trong cùng isolate). */
 export function xoaDemMetaCau(): void { demMetaDoi++ }
 /** Đệm dựa vào GIỜ THẬT (`Date.now()`) ⇒ trong bộ test mặc định TẮT (kết quả test không phụ thuộc lúc chạy); test đệm bật bằng `batDemMetaCau(true)`. */
@@ -370,7 +375,8 @@ async function docMetaCauTho(env: Env, qids: readonly string[]): Promise<Row[]> 
     const tem = await env.DB.prepare('SELECT COUNT(*) AS n, MAX(indexed_at) AS m FROM game_v2_index').first<Row>()
       .then((r) => `${str(r?.n)}|${str(r?.m)}|${demMetaDoi}`).catch(() => null)
     if (tem === null) return (await docMetaCauD1(env, ds)).map(gonDongMeta)
-    if (!d || d.tem !== tem || now - d.luc >= TUOI_DEM_META_MS || now < d.luc) { d = { tem, luc: now, temLuc: now, dong: new Map() }; demMeta.set(goc, d) }
+    d = demMeta.get(goc) // 14/10: đọc lại sau `await` — lượt chạy song song có thể vừa dựng đệm cùng tem (giữ chung để chờ chung lượt đọc câu)
+    if (!d || d.tem !== tem || now - d.luc >= TUOI_DEM_META_MS || now < d.luc) { d = { tem, luc: now, temLuc: now, dong: new Map(), dang: new Map() }; demMeta.set(goc, d) }
     else d.temLuc = now
   }
   const dem = d
@@ -379,7 +385,18 @@ async function docMetaCauTho(env: Env, qids: readonly string[]): Promise<Row[]> 
   const thieu = ds.filter((q) => !coSan.has(q))
   const moi = new Map<string, Row[]>()
   if (thieu.length) {
-    for (const x of await docMetaCauD1(env, thieu)) { const q = str(x.qid); let a = moi.get(q); if (!a) { a = []; moi.set(q, a) } a.push(gonDongMeta(x)) }
+    // Câu lượt khác ĐANG đọc ⇒ chờ chung; còn lại đọc MỘT lượt và đăng ký NGAY (trước mọi `await`) để lượt đến sau thấy.
+    const cho = thieu.flatMap((q) => { const p = dem.dang.get(q); return p ? [[q, p] as const] : [] }), doc = thieu.filter((q) => !dem.dang.has(q))
+    if (doc.length) {
+      const p = docMetaCauD1(env, doc).then((rows) => {
+        const m = new Map<string, Row[]>()
+        for (const x of rows) { const q = str(x.qid); let a = m.get(q); if (!a) { a = []; m.set(q, a) } a.push(gonDongMeta(x)) }
+        return m
+      })
+      for (const q of doc) { const pq = p.then((m) => m.get(q) ?? []); dem.dang.set(q, pq); const bo = () => { if (dem.dang.get(q) === pq) dem.dang.delete(q) }; pq.then(bo, bo) }
+      for (const [q, a] of await p) moi.set(q, a)
+    }
+    for (const [q, p] of cho) moi.set(q, await p)
     if (dem.dong.size + thieu.length > TRAN_DEM_META) dem.dong.clear()
     for (const q of thieu) dem.dong.set(q, moi.get(q) ?? [])
   }
