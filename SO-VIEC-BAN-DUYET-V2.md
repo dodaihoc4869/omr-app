@@ -450,3 +450,5 @@ Thầy (tiếp): "bạn làm việc này với thằng codex nữa nhé để t�
 - [ ] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts) SAU khi C3 gộp | bằng chứng: (chưa có)
 Thầy (14/10 ~06:00, ảnh thẻ Kiểm tra ôn tập 17/10): "Bỏ nút xem lịch kiểm tra, khi nào tới lịch kiểm tra thì hiển bảng đó lên đầu và mở nút bắt đầu kiểm tra nhé"
 - [x] Bỏ nút Xem lịch kiểm tra; ngày kiểm tra thẻ lên đầu + nút Làm bài kiểm tra | bằng chứng: tests/ktcn-len-dau-1410 (3/4 đỏ mã cũ → 4/4), vitest so main 0 đỏ mới, PR #294 main 2f91f0e4, Actions 38485946948 SUCCESS
+- [x] Soát Codex C1–C3 (hẹn 07:20 14/10) | bằng chứng: C1 xong (PR290 main 1b597a08, Actions 38457735178); C2 một phần (giữ Sửa em cũ tới khi có Thêm/Bớt em); C3: tải nhẹ + Lưu không nhảy màn + sửa hạn hàng loạt đã phát hành (PR285, PR290); Thêm/Bớt em: đặc tả docs/them-bot-em-tick-1410.md + 6 ảnh docs/ban-ve-tick-em-1410/ — đã gửi thầy duyệt
+- [ ] Sau khi thầy duyệt Thêm/Bớt em: Claude làm API máy chủ /gv/goi-bai-7 doc_em/sua_em (ngừng nhận bền theo gói × SBD, CAS, requestId), Codex làm giao diện | bằng chứng: (chưa có)
