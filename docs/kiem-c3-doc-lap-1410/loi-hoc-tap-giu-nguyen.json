@@ -1,0 +1,36 @@
+{
+  "base": "2f91f0e4",
+  "verifiedCommit": "a2da228b154a44b494aa770ae411f14104566210",
+  "files": [
+    {
+      "path": "server/src/goi-bai-7-loi.ts",
+      "sha256": "5d9ef43eb93e8892172251cd3c130cc904b90aec0bd0de73e2b5f68b04be840c",
+      "sameBytes": true
+    },
+    {
+      "path": "server/src/kiem-tra-ca-nhan-loi.ts",
+      "sha256": "b206be2d87cf7a346c4667407b79e82d2533b7f4edca155c1cdb5694ce337098",
+      "sameBytes": true
+    },
+    {
+      "path": "server/src/kiem-tra-ca-nhan-chu-ky.ts",
+      "sha256": "3e734b09df3893116ffa5da864be7476b2b60acaf35c58bc6918f613ee96de67",
+      "sameBytes": true
+    },
+    {
+      "path": "src/lib/cham-so.ts",
+      "sha256": "341bef1ec57cb18eebbea3026cc94ee7e6b347e03037bd960a83cec6abae331a",
+      "sameBytes": true
+    },
+    {
+      "path": "src/game/than-thu-v2/core.ts",
+      "sha256": "866a2fb03a62d2b17f2296caf24c21788080f678c48b11c02cc306da4fcc8072",
+      "sameBytes": true
+    },
+    {
+      "path": "server/src/srs2-loi.ts",
+      "sha256": "ac580f269b663e379f5be1a099c66361a6efcc8359544bc08662b6a3ccc3368a",
+      "sameBytes": true
+    }
+  ]
+}

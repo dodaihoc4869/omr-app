@@ -1,0 +1,742 @@
+{
+  "duLieu": "Giả cục bộ; entry /gv thực; không D1/R2/API production",
+  "hash": "a2da228b154a44b494aa770ae411f14104566210",
+  "runtimeHash": "a2da228b154a44b494aa770ae411f14104566210",
+  "dist": "dist của mã a2da228b",
+  "missing": [],
+  "matrix": [
+    {
+      "width": 360,
+      "height": 800,
+      "scheme": "light",
+      "js": [],
+      "external": [],
+      "bytes": 35818,
+      "screenshot": "360x800-light.jpg",
+      "overflow": 0,
+      "touch": [],
+      "contrast": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "tong_hop"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/lop",
+          "action": ""
+        },
+        {
+          "path": "/gv/buoi-hoc",
+          "action": "dang-mo"
+        },
+        {
+          "path": "/gv/kiem-tra-ca-nhan",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "doc_em"
+        }
+      ],
+      "unknown": [],
+      "authErrors": [],
+      "focusInDialog": true,
+      "text": "12 - Tinh Hoa · đang nhận 2 em\n\nEm nhận Bài 8. Amine · DỮ LIỆU GIẢ\n×\n\nDanh sách sẽ thay đổi\n\nThêm\n1 em\nBớt\n1 em\nSẽ nhận\n2 em\n\nThêm\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn\n\nBớt\nTrần Thanh Bình\n\nEm được thêm nhận cùng bài và hạn của lớp. Kết quả đã làm được giữ.\n\nEm nhận bài\n\n12 - Tinh Hoa · 2/3 em\n×\nĐóng\n▾\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn · 12 - Tinh Hoa · 12000003\n1 em khớp\nChọn hết\nBỏ chọn hết\nXong\nEm đã chọn theo lớp\n12 - Tinh Hoa\n2 / 3 em\nĐã chọn 2/3 em\n\nEm đang khóa không được thêm: Phạm Đăng Dũng (đã khóa).\n\n2 em thay đổi\n\nHủy\nLưu danh sách",
+      "writes": [
+        {
+          "action": "sua_em",
+          "goiId": "G-C3",
+          "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "requestId": "f0a83321-ffa8-47a7-b6ed-abb4e39568bc",
+          "them": [
+            "12000003"
+          ],
+          "bot": [
+            "12000002"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 360,
+      "height": 800,
+      "scheme": "dark",
+      "js": [],
+      "external": [],
+      "bytes": 32887,
+      "screenshot": "360x800-dark.jpg",
+      "overflow": 0,
+      "touch": [],
+      "contrast": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "tong_hop"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/lop",
+          "action": ""
+        },
+        {
+          "path": "/gv/buoi-hoc",
+          "action": "dang-mo"
+        },
+        {
+          "path": "/gv/kiem-tra-ca-nhan",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "doc_em"
+        }
+      ],
+      "unknown": [],
+      "authErrors": [],
+      "focusInDialog": true,
+      "text": "12 - Tinh Hoa · đang nhận 2 em\n\nEm nhận Bài 8. Amine · DỮ LIỆU GIẢ\n×\n\nDanh sách sẽ thay đổi\n\nThêm\n1 em\nBớt\n1 em\nSẽ nhận\n2 em\n\nThêm\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn\n\nBớt\nTrần Thanh Bình\n\nEm được thêm nhận cùng bài và hạn của lớp. Kết quả đã làm được giữ.\n\nEm nhận bài\n\n12 - Tinh Hoa · 2/3 em\n×\nĐóng\n▾\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn · 12 - Tinh Hoa · 12000003\n1 em khớp\nChọn hết\nBỏ chọn hết\nXong\nEm đã chọn theo lớp\n12 - Tinh Hoa\n2 / 3 em\nĐã chọn 2/3 em\n\nEm đang khóa không được thêm: Phạm Đăng Dũng (đã khóa).\n\n2 em thay đổi\n\nHủy\nLưu danh sách",
+      "writes": [
+        {
+          "action": "sua_em",
+          "goiId": "G-C3",
+          "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "requestId": "0c6607e8-f4ce-436c-8893-d2f7d02f1d5f",
+          "them": [
+            "12000003"
+          ],
+          "bot": [
+            "12000002"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 800,
+      "height": 390,
+      "scheme": "light",
+      "js": [],
+      "external": [],
+      "bytes": 39817,
+      "screenshot": "800x390-light.jpg",
+      "overflow": 0,
+      "touch": [],
+      "contrast": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "tong_hop"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/lop",
+          "action": ""
+        },
+        {
+          "path": "/gv/buoi-hoc",
+          "action": "dang-mo"
+        },
+        {
+          "path": "/gv/kiem-tra-ca-nhan",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "doc_em"
+        }
+      ],
+      "unknown": [],
+      "authErrors": [],
+      "focusInDialog": true,
+      "text": "12 - Tinh Hoa · đang nhận 2 em\n\nEm nhận Bài 8. Amine · DỮ LIỆU GIẢ\n×\n\nDanh sách sẽ thay đổi\n\nThêm\n1 em\nBớt\n1 em\nSẽ nhận\n2 em\n\nThêm\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn\n\nBớt\nTrần Thanh Bình\n\nEm được thêm nhận cùng bài và hạn của lớp. Kết quả đã làm được giữ.\n\n12 - Tinh Hoa · 2/3 em\n×\nĐóng\n▾\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn · 12 - Tinh Hoa · 12000003\n1 em khớp\nChọn hết\nBỏ chọn hết\nXong\nEm đã chọn theo lớp\n12 - Tinh Hoa\n2 / 3 em\nĐã chọn 2/3 em\n\nEm đang khóa không được thêm: Phạm Đăng Dũng (đã khóa).\n\n2 em thay đổi\n\nHủy\nLưu danh sách",
+      "writes": [
+        {
+          "action": "sua_em",
+          "goiId": "G-C3",
+          "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "requestId": "bb6f5277-5a40-440c-b753-23d3ccc772ed",
+          "them": [
+            "12000003"
+          ],
+          "bot": [
+            "12000002"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 800,
+      "height": 390,
+      "scheme": "dark",
+      "js": [],
+      "external": [],
+      "bytes": 37128,
+      "screenshot": "800x390-dark.jpg",
+      "overflow": 0,
+      "touch": [],
+      "contrast": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "tong_hop"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/lop",
+          "action": ""
+        },
+        {
+          "path": "/gv/buoi-hoc",
+          "action": "dang-mo"
+        },
+        {
+          "path": "/gv/kiem-tra-ca-nhan",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "doc_em"
+        }
+      ],
+      "unknown": [],
+      "authErrors": [],
+      "focusInDialog": true,
+      "text": "12 - Tinh Hoa · đang nhận 2 em\n\nEm nhận Bài 8. Amine · DỮ LIỆU GIẢ\n×\n\nDanh sách sẽ thay đổi\n\nThêm\n1 em\nBớt\n1 em\nSẽ nhận\n2 em\n\nThêm\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn\n\nBớt\nTrần Thanh Bình\n\nEm được thêm nhận cùng bài và hạn của lớp. Kết quả đã làm được giữ.\n\n12 - Tinh Hoa · 2/3 em\n×\nĐóng\n▾\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn · 12 - Tinh Hoa · 12000003\n1 em khớp\nChọn hết\nBỏ chọn hết\nXong\nEm đã chọn theo lớp\n12 - Tinh Hoa\n2 / 3 em\nĐã chọn 2/3 em\n\nEm đang khóa không được thêm: Phạm Đăng Dũng (đã khóa).\n\n2 em thay đổi\n\nHủy\nLưu danh sách",
+      "writes": [
+        {
+          "action": "sua_em",
+          "goiId": "G-C3",
+          "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "requestId": "cef0ae13-fdae-44ed-bbfa-321d9232b63f",
+          "them": [
+            "12000003"
+          ],
+          "bot": [
+            "12000002"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "scheme": "light",
+      "js": [],
+      "external": [],
+      "bytes": 86208,
+      "screenshot": "1280x800-light.jpg",
+      "overflow": 0,
+      "touch": [],
+      "contrast": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "tong_hop"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/lop",
+          "action": ""
+        },
+        {
+          "path": "/gv/buoi-hoc",
+          "action": "dang-mo"
+        },
+        {
+          "path": "/gv/kiem-tra-ca-nhan",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "doc_em"
+        }
+      ],
+      "unknown": [],
+      "authErrors": [],
+      "focusInDialog": true,
+      "text": "12 - Tinh Hoa · đang nhận 2 em\n\nEm nhận Bài 8. Amine · DỮ LIỆU GIẢ\n×\n\nDanh sách sẽ thay đổi\n\nThêm\n1 em\nBớt\n1 em\nSẽ nhận\n2 em\n\nThêm\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn\n\nBớt\nTrần Thanh Bình\n\nEm được thêm nhận cùng bài và hạn của lớp. Kết quả đã làm được giữ.\n\nEm nhận bài\n\n12 - Tinh Hoa · 2/3 em\n×\nĐóng\n▾\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn · 12 - Tinh Hoa · 12000003\n1 em khớp\nChọn hết\nBỏ chọn hết\nXong\nEm đã chọn theo lớp\n12 - Tinh Hoa\n2 / 3 em\nĐã chọn 2/3 em\n\nEm đang khóa không được thêm: Phạm Đăng Dũng (đã khóa).\n\n2 em thay đổi\n\nHủy\nLưu danh sách",
+      "writes": [
+        {
+          "action": "sua_em",
+          "goiId": "G-C3",
+          "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "requestId": "7feccbae-a0ec-486c-8e48-71930af0ba3e",
+          "them": [
+            "12000003"
+          ],
+          "bot": [
+            "12000002"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "scheme": "dark",
+      "js": [],
+      "external": [],
+      "bytes": 79665,
+      "screenshot": "1280x800-dark.jpg",
+      "overflow": 0,
+      "touch": [],
+      "contrast": [],
+      "requests": [
+        {
+          "path": "/presence",
+          "action": ""
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/chien-dich",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/nhip-hoc",
+          "action": ""
+        },
+        {
+          "path": "/ca/danh-sach",
+          "action": ""
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCauHoi"
+        },
+        {
+          "path": "/goi",
+          "action": "danhSachCa"
+        },
+        {
+          "path": "/gv/bai-da-day",
+          "action": "danh-sach"
+        },
+        {
+          "path": "/gv/nut-that/ds",
+          "action": ""
+        },
+        {
+          "path": "/gv/chua-cau-sai/hang-chieu",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "tong_hop"
+        },
+        {
+          "path": "/gv/omni",
+          "action": "co-doc"
+        },
+        {
+          "path": "/gv/lop",
+          "action": ""
+        },
+        {
+          "path": "/gv/buoi-hoc",
+          "action": "dang-mo"
+        },
+        {
+          "path": "/gv/kiem-tra-ca-nhan",
+          "action": ""
+        },
+        {
+          "path": "/gv/goi-bai-7",
+          "action": "doc_em"
+        }
+      ],
+      "unknown": [],
+      "authErrors": [],
+      "focusInDialog": true,
+      "text": "12 - Tinh Hoa · đang nhận 2 em\n\nEm nhận Bài 8. Amine · DỮ LIỆU GIẢ\n×\n\nDanh sách sẽ thay đổi\n\nThêm\n1 em\nBớt\n1 em\nSẽ nhận\n2 em\n\nThêm\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn\n\nBớt\nTrần Thanh Bình\n\nEm được thêm nhận cùng bài và hạn của lớp. Kết quả đã làm được giữ.\n\nEm nhận bài\n\n12 - Tinh Hoa · 2/3 em\n×\nĐóng\n▾\nLê Hoàng Anh Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn Nguyễn · 12 - Tinh Hoa · 12000003\n1 em khớp\nChọn hết\nBỏ chọn hết\nXong\nEm đã chọn theo lớp\n12 - Tinh Hoa\n2 / 3 em\nĐã chọn 2/3 em\n\nEm đang khóa không được thêm: Phạm Đăng Dũng (đã khóa).\n\n2 em thay đổi\n\nHủy\nLưu danh sách",
+      "writes": [
+        {
+          "action": "sua_em",
+          "goiId": "G-C3",
+          "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "requestId": "e90f196a-06d3-49df-b9a1-94e210e2405c",
+          "them": [
+            "12000003"
+          ],
+          "bot": [
+            "12000002"
+          ]
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "matrix-360x800-light",
+      "ok": true,
+      "writes": 1
+    },
+    {
+      "name": "matrix-360x800-dark",
+      "ok": true,
+      "writes": 1
+    },
+    {
+      "name": "matrix-800x390-light",
+      "ok": true,
+      "writes": 1
+    },
+    {
+      "name": "matrix-800x390-dark",
+      "ok": true,
+      "writes": 1
+    },
+    {
+      "name": "matrix-1280x800-light",
+      "ok": true,
+      "writes": 1
+    },
+    {
+      "name": "matrix-1280x800-dark",
+      "ok": true,
+      "writes": 1
+    },
+    {
+      "name": "deny-invalid-ack",
+      "ok": true,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "deny-wrong-ack",
+      "ok": true,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "deny-duplicate-ack",
+      "ok": true,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "deny-offline",
+      "ok": true,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "deny-lost-ack",
+      "ok": true,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "deny-conflict",
+      "ok": true,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "deny-exam",
+      "ok": true,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "read-skeleton-and-offline-retry",
+      "ok": true,
+      "reads": 3
+    },
+    {
+      "name": "reject-read-other-class",
+      "ok": true
+    },
+    {
+      "name": "cancel-escape-focus-and-enter",
+      "ok": true,
+      "writes": 0
+    },
+    {
+      "name": "remove-all-members-keep-tick-row",
+      "ok": true,
+      "writes": 1
+    },
+    {
+      "name": "old-summary-response-cannot-overwrite-ack",
+      "ok": true,
+      "members": 3
+    },
+    {
+      "name": "cold-shell-before-module-and-safe-late-error-after-cancel",
+      "ok": true,
+      "shellMs": 135,
+      "heldRequests": 1,
+      "navigations": 0,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "cold-feature-js-failure-stays-local",
+      "ok": true,
+      "extension": "js",
+      "blocked": 1,
+      "navigations": 0,
+      "retrySucceeded": false,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "cold-feature-css-failure-stays-local",
+      "ok": true,
+      "extension": "css",
+      "blocked": 1,
+      "navigations": 0,
+      "retrySucceeded": false,
+      "js": [],
+      "external": []
+    },
+    {
+      "name": "double-click-and-keyboard-no-parent-submit",
+      "ok": true,
+      "writes": 1
+    }
+  ],
+  "errors": []
+}

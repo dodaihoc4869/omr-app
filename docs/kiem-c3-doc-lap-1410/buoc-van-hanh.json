@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "soCa": 10,
+  "ca": [
+    "tick cũ mặc định cả lớp, tên lớp hiệu lực khối 12",
+    "tick mới chọn 2/5 không báo thiếu 3 em chủ ý chưa chọn",
+    "override bớt giữ raw membership và lịch sử nhưng không seed quota",
+    "thêm lại có chủ đích vượt whitelist tick, cùng gói và hạn",
+    "em mới chưa chọn, em khóa và chuyển lớp không báo thiếu/nhận quota",
+    "missing membership hợp lệ vẫn bị cổng phát hành bắt",
+    "tick đã bỏ không seed quota hoặc tính nguồn chưa duyệt trong báo cáo active",
+    "QID dùng chung khác lớp không kéo raw membership ngoài lớp vào quota",
+    "retry idempotent giữ quota đã chốt, không sửa dữ liệu học cũ",
+    "ca mở chặn cả hai INSERT quota; đóng ca rồi retry mới seed"
+  ],
+  "phamVi": "SQL nguyên văn quota/thống kê/cổng của ap-goi7-song trên SQLite bộ nhớ; không chạy preflight/Cloudflare/D1 production",
+  "verifiedOperationalCommit": "9b36b567",
+  "independentReview": "Agent SQL khác đối chiếu diff và chạy SQL nguyên văn10/10: activeclass/tick, cùngpolicy, ceil/ngày/version/ca giữ; bắteligiblethiếu một gói dù cógóikhác; khôngcoi emchủýkhôngchọn làthiếu. Chưa kiểm Cloudflare production."
+}

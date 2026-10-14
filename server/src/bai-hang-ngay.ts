@@ -23,6 +23,7 @@ import type {
 import { NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO as NG, TEN_NHAN_THAI_DO, TOI_DA_SO_NGAY_BAI_HANG_NGAY } from './bai-hang-ngay-kieu'
 import { CAU_TOI_THIEU } from './hanh-trinh-ngay'
 import { SQL_LUOT_GOI7, sqlTenLopHs } from './goi-bai-7'
+import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
 import { mucNgayGoi7 } from './goi-bai-7-loi'
 import { SQL_TC } from './lam-lai-so'
 import { idDaLam } from './hanh-trinh-nguon-cau'
@@ -186,7 +187,11 @@ const SQL_DEM_GAP = `SELECT g.sbd AS sbd, date(g.luc, '+7 hours') AS ngay, COUNT
 /** Mức hôm nay đã chốt của ngày Gói 7 (`chotMucNgay7`) — đúng số em thấy trên app. */
 const SQL_MUC_GOI7 = 'SELECT sbd, ngay, tang, muc FROM goi_bai_7_muc_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
 /** Σ lịch câu mới các gói của em mỗi ngày — chỉ dùng ƯỚC TÍNH ngày Gói 7 chưa có dòng chốt. */
-const SQL_QUOTA_GOI7 = 'SELECT sbd, ngay, SUM(quota) AS q FROM goi_bai_7_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3 GROUP BY sbd, ngay'
+const SQL_QUOTA_GOI7 = `SELECT n.sbd,n.ngay,SUM(n.quota) AS q FROM goi_bai_7_ngay n
+  WHERE n.sbd IN(SELECT value FROM json_each(?1)) AND n.ngay BETWEEN ?2 AND ?3 AND (n.ngay<?4 OR EXISTS(
+    SELECT 1 FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop
+    JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.goi_id=n.goi_id AND e.sbd=n.sbd AND ${sqlEmDangNhan7('e','g','h')}
+  )) GROUP BY n.sbd,n.ngay`
 const SQL_KE_HOACH = 'SELECT sbd, ngay, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
 export const SQL_LUOT_KE_HOACH = `SELECT sbd, ngay_vn AS ngay, qid, ${SQL_TC} AS tc FROM su_kien_hoc
   WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LUOT_GOI7}
@@ -241,7 +246,7 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
       ht.length ? hoi(env, SQL_KE_HOACH, j(ht), tu, denHt) : rong,
       ht.length ? hoi(env, SQL_LUOT_KE_HOACH, j(ht), tu, denHt) : rong,
       goi.length ? hoi(env, SQL_MUC_GOI7, j(goi), tuGoi, den) : rong,
-      goi.length ? hoi(env, SQL_QUOTA_GOI7, j(goi), tuGoi, den) : rong,
+      goi.length ? hoi(env, SQL_QUOTA_GOI7, j(goi), tuGoi, den, homNay) : rong,
     ])
     // Sổ chính hỏng ⇒ cả lệnh báo lỗi (không trả số sai). Bảng kế hoạch không đọc được ⇒ lượt kế hoạch cũng không đọc được: chỉ cảnh báo.
     if (rGoi === null || (rLuot === null && rKh !== null)) throw new LoiDocSo('Không đọc được sổ học của các em.')
@@ -309,7 +314,7 @@ async function docCoGoi7(env: Env): Promise<boolean> {
 // Đúng điều kiện `docGoiCuaEm7`: so lớp gói (TÊN LỚP) với TÊN LỚP hiệu lực của em (`sqlTenLopHs`) — trước 12/10 so `h.lop` (KHỐI) nên em khối 12 lớp
 // "12 - Lớp Thường" bị tính theo Hành trình phía thầy trong khi máy em đang ở Gói 7.
 const SQL_GOI7_EM = `SELECT e.sbd AS sbd, MIN(e.bat_dau) AS bat_dau FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id = e.goi_id
-  JOIN hoc_sinh h ON h.sbd = e.sbd AND ${sqlTenLopHs('h')} = g.lop JOIN bai_da_day b ON b.id = g.tick_id AND b.bo_tick_luc IS NULL`
+  JOIN hoc_sinh h ON h.sbd = e.sbd AND ${sqlTenLopHs('h')} = g.lop JOIN bai_da_day b ON b.id = g.tick_id AND b.bo_tick_luc IS NULL AND ${sqlEmDangNhan7('e','g','h')}`
 /** sbd → ngày bắt đầu Gói 7 sớm nhất (đúng điều kiện `docGoiCuaEm7`). Cờ tắt ⇒ rỗng. Lỗi đọc ⇒ null. */
 async function docGoi7Em(env: Env, sbd?: string): Promise<Map<string, string> | null> {
   if (!(await docCoGoi7(env))) return new Map()

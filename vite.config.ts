@@ -259,7 +259,7 @@ export default defineConfig({
           // OMNI 3 (05/10, điều phối): mảnh CHỈ màn thầy nhập (đồ thị nhập đã soát: mọi nơi nhập đều là màn thầy — Theo dõi ca, Giao/Sửa chiến dịch,
           // Gọi lên bảng, Lên bảng chiến dịch, Cài đặt, Chiến dịch, Mở ca, danh sách chiến dịch đã giao — đều đã ngoài precache): phần tính chiến dịch `tinh`
           // (nay gộp cả bộ chọn em), Sửa chiến dịch, API OMNI của thầy, cây thư mục mục đích, Bài hôm nay, đồng bộ thư mục ⇒ kho chạy-lúc.
-          '**/{tinh,SuaChienDich,api-omni,cay-muc-dich,bai-hom-nay,dong-bo-thu-muc}-*.{js,css}',
+          '**/{tinh,SuaEmNhanBai,api-omni,cay-muc-dich,bai-hom-nay,dong-bo-thu-muc}-*.{js,css}',
           // Bù chỗ cho phần OMNI của Sảnh em (≈ 14 KB, mảnh khởi động): "Làm câu ôn" (bảng nhiệm vụ cũ) nạp LƯỜI khi em bấm và mọi việc của nó cần máy chủ
           // (tải câu, chấm) — mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc (như Tu luyện 30/09).
           '**/LamCauOn-*.{js,css}',

@@ -560,6 +560,10 @@ async function ghiDaDayChoEm(env: Env, sbd: readonly string[], kienThuc: readonl
 async function tick(env: Env, b: Row, nowMs: number): Promise<Record<string, unknown>> {
   const dv = await docDauVaoBai(env, b, nowMs, true)
   if ('loi' in dv) return { ok: false, error: dv.loi }
+  if(Array.isArray(b.sbd)&&(await import('./goi-bai-7').then(m=>m.coGoi7(env))).bat){
+    const lopEm=await bangLopCacEm(env,nowMs)
+    if(dv.em.some(e=>lopEm.get(e.sbd)?.lop!==dv.lop))return {ok:false,error:'Có em không thuộc lớp. Thầy đọc lại danh sách lớp.'}
+  }
   await damBaoBangBaiDaDay(env)
   // Idempotent: bài còn hiệu lực của lớp ⇒ trả chiến dịch cũ (dòng giữ chỗ còn mới ⇒ một lượt khác đang tạo).
   const cu = await dongConHieuLuc(env, dv.lop, dv.khoaBai)
@@ -574,9 +578,12 @@ async function tick(env: Env, b: Row, nowMs: number): Promise<Record<string, unk
   let id = cu ? str(cu.id) : ''
   if (!cu) {
     id = crypto.randomUUID()
+    if (Array.isArray(b.sbd)) await import('./goi-bai-7').then(m=>m.damBaoGoi7(env))
     try {
-      await env.DB.prepare(`INSERT INTO bai_da_day (id, lop, khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc, nguoi, chien_dich_id, bo_tick_luc)
-          VALUES (?,?,?,?,?,?,?,?,NULL,NULL)`).bind(id, dv.lop, dv.khoaBai, dv.tenBai, dv.viTri, JSON.stringify(dv.maDe), luc, dv.nguoi).run()
+      const ghiTick = env.DB.prepare(`INSERT INTO bai_da_day (id, lop, khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc, nguoi, chien_dich_id, bo_tick_luc)
+          VALUES (?,?,?,?,?,?,?,?,NULL,NULL)`).bind(id, dv.lop, dv.khoaBai, dv.tenBai, dv.viTri, JSON.stringify(dv.maDe), luc, dv.nguoi)
+      if (Array.isArray(b.sbd)) await env.DB.batch([ghiTick, env.DB.prepare('INSERT INTO goi_bai_7_tick_em(tick_id,sbd_json,luc) VALUES(?,?,?)').bind(id,JSON.stringify(dv.em.map(e=>e.sbd).sort()),luc)])
+      else await ghiTick.run()
     } catch (e) {
       const lai = await dongConHieuLuc(env, dv.lop, dv.khoaBai)
       if (lai) return traDaCo(env, lai)
@@ -662,26 +669,40 @@ async function danhSach(env: Env, b: Row, nowMs: number): Promise<Record<string,
   // Ghép đúng như `docChienDichKemBatDau` (tra theo mã ⇒ mã thừa không ảnh hưởng).
   const pBdRd = Promise.all([docBatDauMap(env, ids), docRaiDeuMap(env, ids)])
   const pDat = demChungChi(env, ids)
+  // Metadata Gói7 có nguồn membership hiện hành; chạy cùng đợt chiến dịch, không quét câu/sổ từng em.
+  const pGoi=import('./goi-bai-7').then(async m=>{
+    if(!(await m.coGoi7(env)).bat)return [] as Row[]
+    await m.damBaoGoi7(env)
+    const q=await import('./goi-bai-7-quyen')
+    return (await env.DB.prepare(`SELECT g.tick_id,g.id,g.han,COUNT(CASE WHEN h.sbd IS NOT NULL AND ${q.sqlEmDangNhan7('e','g','h')} THEN 1 END) so_em
+      FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL
+      LEFT JOIN goi_bai_7_em e ON e.goi_id=g.id LEFT JOIN hoc_sinh h ON h.sbd=e.sbd AND ${m.sqlTenLopHs('h')}=g.lop
+      WHERE g.lop=? GROUP BY g.id`).bind(lop).all<Row>()).results
+  })
   pBdRd.catch(() => {}); pDat.catch(() => {})
+  pGoi.catch(()=>{})
   const cdRows = ids.length ? (await env.DB.prepare('SELECT * FROM chien_dich WHERE id IN (SELECT value FROM json_each(?))').bind(JSON.stringify(ids)).all<Row>()).results ?? [] : []
-  const [[bd, rd], dat] = await Promise.all([pBdRd, pDat])
+  const [[bd, rd], dat,goiRows] = await Promise.all([pBdRd, pDat,pGoi])
+  const goiTheoTick=new Map(goiRows.map(g=>[str(g.tick_id),g]))
   const dsCd = cdRows.map((r) => docChienDichTuDong({ ...r, bat_dau: bd.get(str(r.id)) ?? null, rai_deu: rd.get(str(r.id)) ?? null }))
   const cds = new Map(dsCd.map((c) => [c.id, c]))
   const homNay = ngayVnCua(nowMs)
   const bai = rows.map((r) => {
     const cd = cds.get(str(r.chien_dich_id)) ?? null
-    const dangLuyen = !!cd && cd.trangThai === 'dang_chay' && cd.hanNop >= homNay
+    const g=goiTheoTick.get(str(r.id)),hanNop=g?str(g.han):cd?.hanNop??null
+    const dangLuyen = g?!!hanNop&&hanNop>=homNay:!!cd && cd.trangThai === 'dang_chay' && cd.hanNop >= homNay
     return {
       khoaBai: str(r.khoa_bai), tenBai: str(r.ten_bai), viTri: Number(r.vi_tri) || 0, tickLuc: str(r.tick_luc),
       chienDichId: str(r.chien_dich_id) || null,
       trangThai: dangLuyen ? 'dang_luyen' : 'da_day',
-      hanNop: cd?.hanNop ?? null,
-      conNgay: dangLuyen ? soNgayConLai(homNay, cd!.hanNop) : null,
+      hanNop,
+      conNgay: dangLuyen ? soNgayConLai(homNay, hanNop!) : null,
+      ...(g?{goi7:{goiId:str(g.id),soEm:Number(g.so_em),han:hanNop}}:{}),
       chungChi: { dat: cd ? dat.get(cd.id) ?? 0 : 0, tong: cd?.sbd.length ?? 0 },
     }
   })
   // Chờ bài mới: không còn bài đang luyện ⇒ số ngày từ hạn của bài gần nhất (chiến dịch chưa huỷ).
-  const hanGanNhat = dsCd.filter((c) => c.trangThai !== 'da_huy').map((c) => c.hanNop).filter((h) => NGAY.test(h)).sort().pop()
+  const hanGanNhat = rows.map(r=>{const g=goiTheoTick.get(str(r.id)),cd=cds.get(str(r.chien_dich_id));return g?str(g.han):cd&&cd.trangThai!=='da_huy'?cd.hanNop:null}).filter((h):h is string=>!!h&&NGAY.test(h)).sort().pop()
   const choBaiMoi = !bai.some((x) => x.trangThai === 'dang_luyen') && hanGanNhat ? { soNgay: Math.max(0, soNgayGiua(hanGanNhat, homNay)) } : null
   return { ok: true, bai, choBaiMoi }
 }

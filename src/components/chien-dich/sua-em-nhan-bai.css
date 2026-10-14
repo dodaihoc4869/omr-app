@@ -1,0 +1,88 @@
+/* Bố cục đã duyệt C3; chỉ token app thầy, tấm nạp khi bấm. */
+.sen-vo { display: contents; }
+.sen-phu { position: fixed; inset: 0; background: var(--phu); display: grid; place-items: center; padding: 20px; }
+.sen-tam { width: min(880px, 100%); height: min(700px, calc(100dvh - 40px)); background: var(--gvm-mat); border: 1px solid var(--gvm-vien); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--gvm-bong); }
+.sen-tam header { display: flex; align-items: center; gap: 12px; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--gvm-vien); }
+.sen-tam h2 { margin: 4px 0 0; font-size: 22px; line-height: 1.3; }
+.sen-nhan { margin: 0; color: var(--gvm-chu-2); font-size: 13px; }
+.sen-dong { width: 48px; height: 48px; flex: none; border: 0; border-radius: 12px; color: var(--gvm-chu); background: var(--gvm-nen); font-size: 28px; }
+.sen-than { flex: 1; min-height: 0; display: grid; grid-template-columns: 224px 1fr; gap: 24px; padding: 20px 24px; }
+.sen-than > * { min-width: 0; }
+.sen-so { display: grid; gap: 8px; margin-top: 12px; }
+.sen-so span { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sen-so b { color: var(--gvm-xd-dam); }
+.sen-thay-doi { border-top: 1px solid var(--gvm-vien); margin-top: 20px; padding-top: 12px; }
+.sen-thay-doi p { margin: 0 0 12px; display: grid; gap: 4px; }
+.sen-thay-doi b { font-size: 13px; color: var(--gvm-chu-2); }
+.sen-chu { margin-top: 20px; color: var(--gvm-chu-2); font-size: 13px; }
+.sen-bo-chon { display: grid; align-content: start; gap: 8px; }
+.sen-bo-chon .cd-the-xoa { min-height: 48px; min-width: 48px; }
+.sen-bo-chon .cd-cay-gap { min-height: 48px; min-width: 48px; }
+.sen-bo-chon .cd-cay-nhan, .sen-bo-chon .cd-tam-nut label { min-height: 48px; }
+.sen-bo-chon .cd-tam-chon { max-height: 420px; }
+.sen-bo-chon .cd-tim-em { background: var(--bts-mat); color: var(--bts-chu); }
+.sen-bo-chon .cd-tim-em::placeholder { color: var(--gvm-chu-2); opacity: 1; }
+.sen-tam footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--gvm-vien); }
+.sen-tam footer p { margin: 0; color: var(--gvm-chu-2); font-size: 13px; }
+.sen-tam footer > div { display: flex; gap: 8px; }
+.sen-tam footer button { min-height: 48px; }
+@media (max-width: 650px) and (min-height: 501px) {
+  .sen-phu { padding: 8px; }
+  .sen-tam { height: calc(100dvh - 16px); border-radius: 20px; }
+  .sen-tam header { padding: 16px; }
+  .sen-tam h2 { font-size: 19px; }
+  .sen-than { padding: 16px; gap: 16px; display: flex; flex-direction: column; overflow-y: auto; }
+  .sen-so { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .sen-so span { display: grid; gap: 0; }
+  .sen-thay-doi { display: flex; gap: 16px; padding-top: 8px; margin-top: 12px; }
+  .sen-thay-doi p { margin: 0; font-size: 13px; }
+  .sen-chu { margin: 12px 0 0; }
+  .sen-bo-chon .cd-tam-chon { max-height: min(300px, calc(100dvh - 480px)); }
+  .sen-tam footer { padding: 12px 16px; }
+  .sen-tam footer button { padding: 0 12px; }
+}
+@media (max-height: 500px) {
+  .sen-phu { padding: 8px; }
+  .sen-tam { width: min(920px, 100%); height: calc(100dvh - 16px); border-radius: 16px; }
+  .sen-tam header { padding: 8px 16px; }
+  .sen-tam h2 { font-size: 19px; }
+  .sen-than { grid-template-columns: 216px 1fr; gap: 16px; padding: 8px 16px; }
+  .sen-thay-doi { margin-top: 8px; padding-top: 4px; }
+  .sen-thay-doi p { display: flex; gap: 8px; margin-bottom: 4px; font-size: 13px; }
+  .sen-so { margin-top: 4px; gap: 2px; }
+  .sen-chu { margin-top: 8px; }
+  .sen-bo-chon > .sen-nhan { display: none; }
+  .sen-bo-chon .cd-tam-chon { max-height: 164px; gap: 4px; padding: 8px; }
+  .sen-bo-chon .cd-tam-chan { padding-top: 4px; }
+  .sen-tam footer { padding: 8px 16px; }
+}
+
+.sen-phu { z-index: 200; }
+.sen-tam { color: var(--gvm-chu); font: 15px/1.5 'Be Vietnam Pro', sans-serif; }
+.sen-tam *, .sen-tam *::before, .sen-tam *::after { box-sizing: border-box; }
+.sen-tam header > span { min-width: 0; }
+.sen-tam h2, .sen-tam p, .sen-tam .cd-cay-ten, .sen-tam .cd-the-chon { overflow-wrap: anywhere; }
+.sen-tam button { white-space: normal; max-width: 100%; min-height: 48px; touch-action: manipulation; }
+.sen-tam button:focus-visible, .sen-tam input:focus-visible { outline: 2px solid var(--gvm-xd); outline-offset: 3px; }
+.sen-tam fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.sen-tam fieldset:disabled { opacity: .65; }
+.sen-than > aside, .sen-bo-chon { overflow-y: auto; }
+.sen-tam .cd-tim-em { min-height: 48px; }
+.sen-tam .cd-tam-chon { position: static; width: 100%; }
+.sen-tam .cd-cay-hang { min-width: 0; }
+.sen-tam .cd-cay-nhan { min-width: 0; }
+.sen-tam .cd-cay-nhan input { flex: none; }
+.sen-xuong { display: grid; gap: 12px; }
+.sen-xuong span { display: block; height: 48px; border-radius: 12px; }
+.sen-loi { margin: 0; color: var(--gvm-chu); }
+.sen-doi-chieu, .sen-hoi { padding: 12px; border: 1px solid var(--gvm-vien); border-radius: 12px; background: var(--gvm-nen); }
+.sen-doi-chieu p, .sen-hoi p { margin: 0 0 8px; }
+.sen-hoi { margin: 0 16px; }
+.sen-hoi button { margin-right: 8px; }
+@media (max-width: 650px) and (min-height: 501px) {
+  .sen-than > aside, .sen-bo-chon { overflow-y: visible; flex: none; }
+  .sen-thay-doi { flex-wrap: wrap; }
+  .sen-tam footer { flex-wrap: wrap; }
+  .sen-tam footer > div { margin-left: auto; }
+  .sen-bo-chon .cd-tam-chon { max-height: 320px; }
+}

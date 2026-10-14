@@ -1,0 +1,42 @@
+{
+  "base": "2026541127c4c53e66c80024ef3a0c7da09691c3",
+  "muc": "C2 còn lại, thay thế cùng C3 đã được thầy duyệt",
+  "deleted": [
+    {
+      "path": "src/components/chien-dich/SuaChienDich.tsx",
+      "sha256": "476a403cb22024355c80f86758bbcc3ac7d407be9369892d372d4704bd237677",
+      "lines": 316
+    },
+    {
+      "path": "src/components/chien-dich/HopChon.tsx",
+      "sha256": "5d489429d471dd69ff5f2356721e06c32fedfb6b23df475606db3a01441d34a1",
+      "lines": 68
+    },
+    {
+      "path": "src/components/chien-dich/sua-chien-dich.css",
+      "sha256": "2859595e1a63e46d63a8c0ac0a4ff26f9bc6144bfa33c541daecdf509dc84762",
+      "lines": 71
+    },
+    {
+      "path": "src/lib/tom-tat-sua-chien-dich.ts",
+      "sha256": "ba528a98188fc122832c3858a6f4f37a284f4da649f606c1d7cd27c6fa45ade7",
+      "lines": 37
+    }
+  ],
+  "retiredUiTest": "tests/sua-chien-dich-hop-2809.test.tsx",
+  "mixedTestsPreserved": [
+    "tests/sua-chien-dich-2809.test.ts",
+    "tests/ngay-bat-dau-2809.test.ts",
+    "tests/ngay-bat-dau-giao-dien-2809.test.tsx",
+    "tests/omni-3-thay-bai-hom-nay.test.tsx",
+    "tests/omni-3-thay-nhieu-lop-0610.test.tsx"
+  ],
+  "helperRelocated": {
+    "from": "src/lib/tom-tat-sua-chien-dich.ts",
+    "to": "server/src/tom-tat-sua-chien-dich.ts",
+    "sameBytes": true,
+    "sha256": "ba528a98188fc122832c3858a6f4f37a284f4da649f606c1d7cd27c6fa45ade7"
+  },
+  "contract": "docs/them-bot-em-tick-1410.md",
+  "limit": "Chỉ chứng minh phạm vi thay thế giao diện này; không khẳng định toàn repository hết mã không dùng."
+}

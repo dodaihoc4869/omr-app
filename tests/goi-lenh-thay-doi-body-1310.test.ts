@@ -39,4 +39,13 @@ describe('Lệnh thầy: thời hạn chờ gồm cả phần dữ liệu', () =
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({ ok: false, loi: 'Một lớp đã đổi hạn. Thầy cập nhật rồi thử lại.' }, { status: 409 })))
     await expect(goiLenh('/gv/goi-bai-7', {}, 'Chưa có bảng')).resolves.toEqual({ ok: false, loai: 'tu_choi', chu: 'Một lớp đã đổi hạn. Thầy cập nhật rồi thử lại.' })
   })
+
+  it('giữ mã xung đột đúng dạng cho tấm danh sách; phản hồi cũ không thêm thuộc tính rỗng', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ ok: false, error: 'Danh sách vừa thay đổi.', code: 'xung_dot' }, { status: 409 })))
+    await expect(goiLenh('/gv/goi-bai-7', {}, 'Chưa có bảng')).resolves.toEqual({ ok: false, loai: 'tu_choi', chu: 'Danh sách vừa thay đổi.', code: 'xung_dot' })
+    for (const code of [undefined, 2, 'MÃ SAI', 'x'.repeat(41)]) {
+      vi.stubGlobal('fetch', vi.fn(async () => Response.json({ ok: false, error: 'Chưa lưu.', code })))
+      await expect(goiLenh('/gv/goi-bai-7', {}, 'Chưa có bảng')).resolves.toEqual({ ok: false, loai: 'tu_choi', chu: 'Chưa lưu.' })
+    }
+  })
 })

@@ -15,6 +15,7 @@ import { diemGoi7, diemTo7 } from './goi-bai-7-loi'
 import { khopPhanIII } from '../../src/lib/cham-so'
 import { ketQuaTungY } from './omni-game'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
+import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
 import { sqlTenLopHs } from './goi-bai-7'
 import { henHalfLife, type MoHinhHalfLife } from './half-life'
 import { dongGoiDe2026 } from './kiem-tra-ca-nhan-chu-ky'
@@ -144,7 +145,7 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
   const nhip = new Map<number, number>()
   for (const d of new Set(lichSu.results.map(l => s(l.ngay_vn)))) { const thu = new Date(d + 'T00:00:00Z').getUTCDay(); nhip.set(thu, (nhip.get(thu) ?? 0) + 1) }
   const maxNhip = Math.max(1, ...nhip.values()); for (const [k, v] of nhip) nhip.set(k, v / maxNhip)
-  const hanBai = await env.DB.prepare(`SELECT e.han FROM goi_bai_7_em e WHERE e.sbd=? AND e.han>=?`).bind(sbd, ngayKt(now)).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const hanBai = await env.DB.prepare(`SELECT e.han FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? AND e.han>=? AND ${sqlEmDangNhan7('e','g','h')}`).bind(sbd, ngayKt(now)).all<Row>().catch(() => ({ results: [] as Row[] }))
   const hen = henKt({ sbd, homNay: ngayKt(now), lanTruoc: lanCuoi ? s(dungKhung2026?(lanCuoi.chu_ky_ngay??lanCuoi.ngay):lanCuoi.ngay) : undefined, bangChung: [...bc.values()], nhip: nhip, hanBai: hanBai.results.map(r => s(r.han)) })
   if(dungKhung2026&&lanCuoi)hen.ngay=[congNgayKt(s(lanCuoi.chu_ky_ngay??lanCuoi.ngay),7),congNgayKt(ngayKt(now),1)].sort().at(-1)!
   if(cu&&Number(cu.mo_luc)>now)hen.ngay=s(cu.ngay)

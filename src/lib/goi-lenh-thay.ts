@@ -4,11 +4,11 @@ import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { loadTeacherSecret } from './exam-db'
 
 /** Kết quả một lệnh: hoặc có số thật, hoặc MỘT câu nói thật vì sao không có (màn hiện đúng câu ấy). */
-export type KetQuaLenh<T> = { ok: true; du: T } | { ok: false; loai: 'chua_co_lenh' | 'mang' | 'cham' | 'tu_choi' | 'khong_doc_duoc'; chu: string }
+export type KetQuaLenh<T> = { ok: true; du: T } | { ok: false; loai: 'chua_co_lenh' | 'mang' | 'cham' | 'tu_choi' | 'khong_doc_duoc'; chu: string; code?: string }
 
 const HAN_GIAY = 20
 
-export type Thoat = { ok: false; loai: 'chua_co_lenh' | 'mang' | 'cham' | 'tu_choi' | 'khong_doc_duoc'; chu: string }
+export type Thoat = { ok: false; loai: 'chua_co_lenh' | 'mang' | 'cham' | 'tu_choi' | 'khong_doc_duoc'; chu: string; code?: string }
 const thoat = (loai: Thoat['loai'], chu: string): Thoat => ({ ok: false, loai, chu })
 
 /** Gọi một lệnh thầy `/ai/...` (POST + mã bí mật). Không ném lỗi: trả `KetQuaLenh`. `chuKhongCoLenh` là câu nói thật khi máy chủ chưa có lệnh (404). */
@@ -42,7 +42,7 @@ export async function goiLenh(duong: string, body: unknown, chuKhongCoLenh: stri
     }
     if (!res.ok || j.ok !== true) {
       const chu = String(j.error || j.loi || 'Máy chủ không đồng ý lệnh này.')
-      return thoat('tu_choi', res.status === 403 && /mã bí mật/i.test(chu) ? `${chu} — ${CHU_HUONG_DAN_MA}` : chu)
+      return { ...thoat('tu_choi', res.status === 403 && /mã bí mật/i.test(chu) ? `${chu} — ${CHU_HUONG_DAN_MA}` : chu), ...(typeof j.code === 'string' && /^[a-z_]{1,40}$/.test(j.code) ? { code: j.code } : {}) }
     }
     return { ok: true, du: j }
   } catch (e) {

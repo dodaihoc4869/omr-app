@@ -1,5 +1,6 @@
 import type { Env } from './kieu'
 import { SQL_LUOT_GOI7, sqlTenLopHs } from './goi-bai-7'
+import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
 import { ngayVn7 } from './goi-bai-7-loi'
 
 type Row = Record<string, unknown>
@@ -17,9 +18,9 @@ export async function tongHopGoi7(env: Env, lop: string, caCu = false): Promise<
     ...(caCu ? goi.filter(g => chu(g.han) < ngay).sort((a, b) => chu(b.han).localeCompare(chu(a.han))) : [])].slice(0, TOI_DA_DONG)
   if (!hien.length) return { ok: true, bat: true, goi, thongKe: {}, serverNow }
   const r = await env.DB.prepare(`WITH
-    goi AS (SELECT g.id,g.lop FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE g.id IN(SELECT value FROM json_each(?))),
+    goi AS (SELECT g.id,g.tick_id,g.lop FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE g.id IN(SELECT value FROM json_each(?))),
     cau AS (SELECT c.goi_id,c.qid,c.version FROM goi_bai_7_cau c JOIN goi g ON g.id=c.goi_id),
-    em AS (SELECT e.goi_id,e.sbd FROM goi_bai_7_em e JOIN goi g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND g.lop=${sqlTenLopHs('h')}),
+    em AS (SELECT e.goi_id,e.sbd FROM goi_bai_7_em e JOIN goi g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND g.lop=${sqlTenLopHs('h')} WHERE ${sqlEmDangNhan7('e','g','h')}),
     lan AS (SELECT e.goi_id,e.sbd,c.qid,
       CASE WHEN COALESCE(su_kien_hoc.assistance,'none') IN ('','none') AND NOT EXISTS(
         SELECT 1 FROM loi_giai_hoi l WHERE l.sbd=su_kien_hoc.sbd AND l.qid=su_kien_hoc.qid

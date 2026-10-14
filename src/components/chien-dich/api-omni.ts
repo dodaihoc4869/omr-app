@@ -62,6 +62,8 @@ export interface BaiDaTick {
   chungChi: { dat: number; tong: number } | null
   /** Số em đã giao (chiến dịch của bài) — máy chủ gửi thì dùng; vắng ⇒ null (màn lấy `chungChi.tong`). */
   soEm: number | null
+  /** Metadata Gói7 hiện tại; tách khỏi chứng chỉ/chiến dịch lịch sử. */
+  goi7?: { goiId: string; soEm: number; han: string }
 }
 export interface DanhSachBaiDaDay {
   bai: BaiDaTick[]
@@ -134,6 +136,7 @@ function docBaiDaTick(x: unknown): BaiDaTick | null {
     conNgay: so(x.conNgay),
     chungChi: cc,
     soEm: so(x.soEm) === null ? null : soNguyen(x.soEm),
+    ...(laHo(x.goi7) && chu(x.goi7.goiId) && typeof x.goi7.soEm === 'number' && Number.isInteger(x.goi7.soEm) && x.goi7.soEm >= 0 && typeof x.goi7.han === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.goi7.han) ? { goi7: { goiId: chu(x.goi7.goiId), soEm: x.goi7.soEm, han: x.goi7.han } } : {}),
   }
 }
 

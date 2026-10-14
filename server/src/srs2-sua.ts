@@ -22,7 +22,7 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import { cauCuaToChiTiet, maGocCuaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
 import { xoaDemChienDich, batDauCua, chuaBatDau, docChienDichKemBatDau, docMocThemCaLop, ghiBatDau, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 import { khoiLuongCan, soNgayConLai } from './srs2-loi'
-import { chuTomTatSua } from '../../src/lib/tom-tat-sua-chien-dich'
+import { chuTomTatSua } from './tom-tat-sua-chien-dich'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))

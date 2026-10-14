@@ -4,7 +4,7 @@
 // Trắc nghiệm / Đúng sai / Trả lời ngắn TỰ GIAO, không ô tích, bỏ hẳn Ví dụ minh hoạ + Các dạng toán trọng tâm) và phamVi (mọi bài đứng TRƯỚC, cùng luật
 // tờ); sửa hạn nộp / số lượt; "Bỏ tick" hỏi lại rồi gọi `bo-tick`; dòng chờ bài mới.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
 
 // Kho giả nằm trong khối `vi.hoisted` (gán sau khi dựng `KHO`) ⇒ nhà máy `vi.mock` không đọc biến trước khi khai báo (luật no-use-before-define).
@@ -40,7 +40,7 @@ import {
   type ToBai,
 } from '../src/lib/bai-hom-nay'
 import { hienHanNop } from '../src/components/chien-dich/ngay'
-import { theoDoiBaiDangGiao } from '../src/lib/bai-dang-giao-thay-doi'
+import { baoMetadataBaiDangGiao, theoDoiBaiDangGiao } from '../src/lib/bai-dang-giao-thay-doi'
 
 const baiVuaDoi = vi.fn()
 let boNgheBai: () => void
@@ -562,16 +562,13 @@ describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của c
     expect(screen.queryByRole('heading', { name: 'Giao cho' })).toBeNull()
   })
 
-  it('bài ĐÃ tick: "Đã giao N em" + "Sửa em" mở hộp sửa chiến dịch sẵn có; không có mã chiến dịch ⇒ sang mục Chiến dịch luyện', async () => {
+  it('bài đã tick giữ số em và Bỏ tick; danh sách nhận bài chỉnh tại bảng Gói7, không mở chiến dịch cũ', async () => {
     cd1 = null
-    const { useAppStore } = await import('../src/store/appStore')
     const buoc = await moBuoc()
     expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 44 em')
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Sửa em' }))
-    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/chien-dich/sua', { action: 'doc', id: 'cd-2' }))
-    expect(await screen.findByText(/Chỉnh sửa: Bài 2\. Lipid/)).toBeTruthy()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B1')).getByRole('button', { name: 'Sửa em' }))
-    expect(useAppStore.getState().screen).toBe('chiendich')
+    expect(within(dong(buoc, 'DH-12-C1-B2')).queryByRole('button', { name: 'Sửa em' })).toBeNull()
+    expect(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Bỏ tick' })).toBeTruthy()
+    expect(goi.mock.calls.some(([duong]) => duong === '/gv/chien-dich/sua')).toBe(false)
   })
 })
 
@@ -690,5 +687,46 @@ describe('Tick bài tải lỗi và thử lại tại màn đang mở', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Chọn câu để chiếu' }))
     expect(await screen.findByText('Bài 3. Xà phòng và chất giặt rửa')).toBeTruthy()
     expect(khoGia.docLan).toBe(1)
+  })
+})
+
+// Metadata Gói7 phải thống nhất giữa bảng đang giao và cây, không đọc lại lịch sử cả lớp.
+describe('metadata hiện tại của Gói7 tại cây Tick bài', () => {
+  const NOW = Date.parse('2026-10-14T00:00:00Z')
+  const layDs = (r: any, soEm = 2) => ({ ...r, du: { ...r.du, bai: r.du.bai.map((b: any) => b.khoaBai === 'DH-12-C1-B2' ? { ...b, goi7: { goiId: 'g2', soEm, han: b.hanNop } } : b) } })
+  it('đọc count Gói7=0 thật thay chứng chỉ44; ACK count/hạn cập nhật tại chỗ đúng bài và không khởi động vòng Tick', async () => {
+    const goc = goi.getMockImplementation()!
+    goi.mockImplementation(async (d: string, b: Record<string, unknown>) => {
+      const r = await goc(d, b)
+      return d === '/gv/bai-da-day' && b.action === 'danh-sach' ? layDs(r, 0) : r
+    })
+    const buoc = await moBuoc()
+    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 0 em'))
+    const truoc = lenh('danh-sach').length
+    act(() => baoMetadataBaiDangGiao([{ lop: '12A1', khoaBai: 'DH-12-C1-B2', goiId: 'g2', soEm: 3, han: '2026-10-20', serverNow: NOW }]))
+    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 3 em')
+    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đang luyện · còn 7 ngày')
+    expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã giao 44 em')
+    expect(lenh('danh-sach')).toHaveLength(truoc); expect(baiVuaDoi).not.toHaveBeenCalled()
+    act(() => baoMetadataBaiDangGiao([{ lop: '12A1', khoaBai: 'DH-12-C1-B2', goiId: 'goi-khac', soEm: 9, serverNow: NOW }]))
+    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 3 em')
+  })
+  it('ACK tới khi danh sách ban đầu còn chờ: vẫn dựng các bài, áp metadata đúng dòng để phản hồi cũ không đè', async () => {
+    const goc = goi.getMockImplementation()!
+    let tra!: (x: unknown) => void, duCu: unknown
+    const cho = new Promise(r => { tra = r })
+    goi.mockImplementation(async (d: string, b: Record<string, unknown>) => {
+      const r = await goc(d, b)
+      if (d === '/gv/bai-da-day' && b.action === 'danh-sach') { duCu = layDs(r, 2); return cho }
+      return r
+    })
+    const buoc = await moBuoc()
+    await waitFor(() => expect(duCu).toBeTruthy())
+    act(() => baoMetadataBaiDangGiao([{ lop: '12A1', khoaBai: 'DH-12-C1-B2', goiId: 'g2', soEm: 0, han: '2026-10-20', serverNow: NOW }]))
+    await act(async () => tra(duCu))
+    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 0 em')
+    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đang luyện · còn 7 ngày')
+    expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã giao 44 em')
+    expect(lenh('danh-sach')).toHaveLength(1)
   })
 })
