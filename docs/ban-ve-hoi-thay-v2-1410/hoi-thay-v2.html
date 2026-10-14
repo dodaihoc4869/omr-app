@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản vẽ Hỏi Thầy v2</title>
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-500-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-600-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-800-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Noto Serif';font-weight:400;src:url(../../node_modules/@fontsource/noto-serif/files/noto-serif-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Noto Serif';font-weight:400;src:url(../../node_modules/@fontsource/noto-serif/files/noto-serif-latin-400-normal.woff2) format('woff2')}
+</style>
+<!-- BẢN VẼ HỎI THẦY v2 (14/10) — thầy: "Tôi muốn nội dung trả lời hiển thị nó linh hoạt hơn cho từng câu hỏi của học sinh, nếu cần vẽ sơ đồ
+     tạo thí nghiệm ảo nhẹ, làm mọi thứ để trả lời học sinh tốt nhất hiểu bài nhanh, in đậm tô màu mọi thứ có thể — vẽ trước cho tôi xem trước khi build".
+     CHỈ là bản vẽ (quy trình 4 bước): nội dung mẫu, CHƯA sửa src/. Nạp ĐÚNG CSS thật của app; khối mới chỉ dùng biến màu có sẵn
+     (tokens.css + m3-theme.css). Khung: ?k=tn | tinh | so-do ; &de=1 mở đề ; &dong=1 bật chuyển động (mặc định theo máy). -->
+<link rel="stylesheet" href="../../src/styles/tokens.css">
+<link rel="stylesheet" href="../../src/components/bang-nhiem-vu/m3-theme.css">
+<link rel="stylesheet" href="../../src/components/loi-giai/loi-giai.css">
+<link rel="stylesheet" href="../../src/components/loi-giai/hop-hoi-thay.css">
+<link rel="stylesheet" href="../../src/components/loi-giai/tra-loi-thay.css">
+<style>
+html,body{margin:0;font-family:'Be Vietnam Pro',system-ui,sans-serif}
+body{background:var(--m3-surface-container-low)}
+.trang{min-height:100dvh;padding:16px;box-sizing:border-box}
+.trang-dau{display:flex;align-items:center;gap:12px;font-weight:700;font-size:20px;color:var(--m3-on-surface)}
+.trang-dau small{display:block;font-weight:400;font-size:14px;color:var(--m3-on-surface-variant)}
+.khung{display:none}.khung[data-hien]{display:block}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.lg-hh-de > summary{gap:8px}
+.lg-de-tom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400;color:var(--m3-on-surface-variant)}
+.lg-de-loai{margin-left:auto;margin-right:6px;flex:none;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--m3-secondary-container);color:var(--m3-on-secondary-container)}
+.lg-de-chu{margin:0;font-size:17px;line-height:1.62;color:var(--m3-on-surface)}
+.lg-de-chu>b:first-child{color:var(--m3-primary)}
+
+/* ================= KHỐI MỚI v2 (chỉ biến màu có sẵn) ================= */
+/* — Tô màu chữ tự động: công thức, nhóm chức, thuốc thử, hiện tượng, đúng/sai — */
+.lg-tl .ct{font-weight:600;color:var(--m3-primary);white-space:nowrap}
+.lg-tl .nhom{display:inline-block;padding:0 7px;border-radius:7px;font-weight:700;font-size:.93em;white-space:nowrap;line-height:1.5}
+.nhom[data-n="nh2"]{background:color-mix(in srgb,var(--gg-xanh) 16%,transparent);color:var(--gg-xanh)}
+.nhom[data-n="cho"]{background:color-mix(in srgb,var(--cam) 20%,transparent);color:color-mix(in srgb,var(--cam) 55%,var(--m3-on-surface))}
+.nhom[data-n="oh"]{background:color-mix(in srgb,var(--gg-luc) 18%,transparent);color:color-mix(in srgb,var(--gg-luc) 70%,var(--m3-on-surface))}
+.nhom[data-n="coo"]{background:color-mix(in srgb,var(--do) 15%,transparent);color:var(--do)}
+.lg-tl .thuoc{font-weight:700;color:var(--tim)}
+.lg-tl .hien{font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.hien[data-h="xanh"]{color:var(--gg-xanh)}
+.hien[data-h="bac"]{color:color-mix(in srgb,var(--slate-400) 55%,var(--m3-on-surface))}
+.hien[data-h="trang"]{color:var(--m3-on-surface);text-decoration-color:var(--slate-300)}
+.hien[data-h="khi"]{color:var(--m3-on-surface-variant)}
+.lg-tl .dung{font-weight:700;color:color-mix(in srgb,var(--gg-luc) 75%,var(--m3-on-surface))}
+.lg-tl .sai{font-weight:700;color:var(--do);text-decoration:line-through;text-decoration-thickness:2px}
+
+/* — Vỏ chung của một khối — */
+.lg-k{border-radius:16px;background:var(--m3-surface);border:1px solid var(--m3-surface-container-high);padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.lg-k-dau{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--m3-on-surface-variant)}
+.lg-k-dau svg{flex:none;color:var(--m3-primary)}
+.lg-k-dau button{margin-left:auto;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--m3-outline);background:var(--m3-surface);color:var(--m3-primary);font:inherit;font-size:13.5px;font-weight:700;text-transform:none;letter-spacing:0;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+
+/* — THÍ NGHIỆM ẢO: ống nghiệm + giọt thuốc thử + hiện tượng (chuyển động CSS, máy giảm chuyển động ⇒ hiện ngay kết quả) — */
+.lg-tn-hang{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:8px}
+.lg-tn{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;--tre:0s}
+.lg-tn-nhan{font-weight:800;font-size:15px;color:var(--m3-on-surface)}
+.lg-tn-thuoc{font-size:12px;font-weight:700;color:var(--tim);text-align:center;line-height:1.3;min-height:31px;display:flex;align-items:flex-end}
+.lg-tn-voi{position:relative;width:64px;height:160px}
+.lg-tn-ong{position:absolute;left:10px;top:32px;width:44px;height:110px;box-sizing:border-box;border:2.5px solid color-mix(in srgb,var(--m3-outline) 80%,transparent);border-top:0;border-radius:0 0 22px 22px;overflow:hidden;background:color-mix(in srgb,var(--m3-surface-container) 40%,transparent)}
+.lg-tn-ong::before{content:'';position:absolute;top:0;left:-6px;right:-6px;height:6px}
+.lg-tn-mieng{position:absolute;left:5px;top:28px;width:54px;height:6px;border-radius:3px;background:color-mix(in srgb,var(--m3-outline) 80%,transparent)}
+.lg-tn-long{position:absolute;left:0;right:0;bottom:0;height:58%;background:var(--sau,color-mix(in srgb,var(--m3-primary) 7%,transparent));animation:tn-doi-mau 1s ease-in-out calc(var(--tre) + .7s) both}
+@keyframes tn-doi-mau{from{background:var(--truoc,color-mix(in srgb,var(--m3-primary) 7%,transparent))}}
+.lg-tn-giot{position:absolute;left:28px;top:0;width:9px;height:12px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:var(--mau-giot,var(--tim));opacity:0;animation:tn-giot .75s ease-in calc(var(--tre) + .1s) both}
+@keyframes tn-giot{0%{opacity:1;transform:translateY(0)}85%{opacity:1}100%{opacity:0;transform:translateY(72px)}}
+.lg-tn-lua{position:absolute;left:25px;top:145px;width:14px;height:15px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:linear-gradient(to top,var(--cam),var(--gg-vang));transform-origin:50% 100%;animation:tn-lua .45s ease-in-out infinite alternate}
+@keyframes tn-lua{to{transform:scaleY(1.25)}}
+.lg-tn[data-h="tim"] .lg-tn-chu b{color:var(--tim)}
+/* quỳ tím: mẩu giấy trong ống đổi màu */
+.lg-tn-quy{position:absolute;left:16px;bottom:26px;width:10px;height:58px;border-radius:2px;background:var(--quy-sau,var(--gg-xanh));animation:tn-quy 1s ease calc(var(--tre) + .7s) both}
+@keyframes tn-quy{from{background:var(--tim)}}
+/* kết tủa: hạt lắng xuống đáy */
+.lg-tn-tua{position:absolute;left:0;right:0;bottom:0;height:24px;background:radial-gradient(circle at 20% 70%,var(--tua) 0 3px,transparent 3.5px),radial-gradient(circle at 45% 55%,var(--tua) 0 3px,transparent 3.5px),radial-gradient(circle at 70% 75%,var(--tua) 0 3px,transparent 3.5px),radial-gradient(circle at 32% 88%,var(--tua) 0 3px,transparent 3.5px),radial-gradient(circle at 60% 90%,var(--tua) 0 3px,transparent 3.5px),linear-gradient(to top,var(--tua) 0 9px,transparent 9px);animation:tn-lang 1.4s ease-out calc(var(--tre) + 1s) both;filter:drop-shadow(0 0 1px var(--slate-500))}
+@keyframes tn-lang{from{opacity:0;transform:translateY(-46px)}}
+.lg-tn[data-h="trang"]{--tua:color-mix(in srgb,var(--slate-50) 82%,var(--slate-400))}
+/* gương bạc bám thành ống */
+.lg-tn-guong{position:absolute;inset:0;border-radius:0 0 20px 20px;background:linear-gradient(90deg,var(--slate-500) 0 6px,transparent 6px calc(100% - 6px),var(--slate-500) calc(100% - 6px)),linear-gradient(to top,var(--slate-400) 0 6px,transparent 6px);box-shadow:inset 3px 0 0 var(--slate-100),inset -3px 0 0 var(--slate-100);animation:tn-guong 1.6s ease calc(var(--tre) + .9s) both}
+@keyframes tn-guong{from{opacity:0}}
+/* bọt khí sủi lên (lặp) */
+.lg-tn-bot{position:absolute;bottom:6px;width:7px;height:7px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--m3-on-surface) 45%,transparent);animation:tn-bot 1.6s ease-in calc(var(--tre) + .9s) infinite}
+.lg-tn-bot:nth-child(2){left:12px;animation-delay:calc(var(--tre) + 1.2s)}
+.lg-tn-bot:nth-child(3){left:22px;animation-delay:calc(var(--tre) + 1.5s);width:5px;height:5px}
+.lg-tn-bot:nth-child(4){left:28px;animation-delay:calc(var(--tre) + 1.9s)}
+@keyframes tn-bot{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(-62px);opacity:0}}
+.lg-tn-chu{font-size:12.5px;line-height:1.35;text-align:center;font-weight:600;color:var(--m3-on-surface);min-height:34px}
+.lg-tn-chu b{display:block;font-weight:800}
+.lg-tn[data-h="xanh"] .lg-tn-chu b{color:var(--gg-xanh)}
+.lg-tn[data-h="bac"] .lg-tn-chu b{color:color-mix(in srgb,var(--slate-400) 55%,var(--m3-on-surface))}
+.lg-tn[data-h="khi"] .lg-tn-chu b{color:var(--m3-on-surface-variant)}
+.lg-tn-ket{margin:0;font-size:13.5px;line-height:1.5;color:var(--m3-on-surface-variant)}
+@media (prefers-reduced-motion:reduce){.lg-tn *{animation:none!important}.lg-tn-bot:nth-child(1){bottom:12px}.lg-tn-bot:nth-child(2){bottom:28px}.lg-tn-bot:nth-child(3){bottom:40px}.lg-tn-bot:nth-child(4){bottom:20px}}
+
+/* — PHƯƠNG TRÌNH: chất tham gia → (điều kiện trên mũi tên) → sản phẩm — */
+.lg-pt{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:16px;line-height:1.4}
+.lg-pt .c{padding:3px 9px;border-radius:9px;font-weight:700;white-space:nowrap;background:color-mix(in srgb,var(--m3-primary) 10%,transparent);color:var(--m3-on-surface)}
+.lg-pt .c[data-sp]{background:color-mix(in srgb,var(--gg-luc) 16%,transparent)}
+.lg-pt .c[data-chinh]{outline:2px solid var(--m3-primary);outline-offset:1px}
+.lg-pt .cong{color:var(--m3-on-surface-variant);font-weight:700}
+.lg-pt .mui{white-space:nowrap;display:inline-flex;flex-direction:column;align-items:center;min-width:44px;color:var(--m3-on-surface-variant);font-size:12px;font-weight:700;line-height:1.1}
+.lg-pt .mui i{font-style:normal;font-size:20px;line-height:1;color:var(--m3-on-surface)}
+.lg-pt + .lg-pt{padding-top:8px;border-top:1px dashed var(--m3-surface-container-high)}
+
+/* — TÍNH NHANH: từng dòng "đại lượng = biểu thức = kết quả", kết quả cuối làm nổi — */
+.lg-tinh{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:baseline;font-size:15.5px;line-height:1.45;margin:0}
+.lg-tinh dt{font-weight:700;color:var(--m3-on-surface-variant);white-space:nowrap}
+.lg-tinh dd{margin:0;font-variant-numeric:tabular-nums;color:var(--m3-on-surface);overflow-wrap:anywhere}
+.lg-tinh dd b{font-weight:800;color:var(--m3-primary)}
+.lg-tinh .cuoi{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;background:var(--m3-primary-container);color:var(--m3-on-primary-container);font-weight:800;font-size:16.5px}
+
+/* — SƠ ĐỒ CHUYỂN HOÁ: điện thoại dọc, máy rộng ngang — */
+.lg-sd{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;align-items:flex-start}
+.lg-sd li{display:flex;flex-direction:column;align-items:flex-start}
+.lg-sd .nut{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:12px;font-weight:800;font-size:15.5px;background:var(--m3-secondary-container);color:var(--m3-on-secondary-container)}
+.lg-sd .nut small{font-weight:700;font-size:12px;padding:1px 7px;border-radius:999px;background:var(--m3-surface);color:var(--m3-primary)}
+.lg-sd .nut[data-dau]{background:var(--m3-surface-container-high);color:var(--m3-on-surface)}
+.lg-sd .nut[data-cuoi]{background:var(--m3-primary);color:var(--m3-on-primary)}
+.lg-sd .mui{display:flex;align-items:center;gap:10px;margin:2px 0 2px 22px;min-height:40px;padding-left:12px;border-left:2.5px solid var(--m3-primary);font-size:13px;font-weight:700;color:var(--m3-on-surface-variant)}
+.lg-sd .mui span{padding:2px 8px;border-radius:8px;background:var(--m3-surface-container);color:var(--tim)}
+/* Sơ đồ luôn dọc: hộp Hỏi Thầy rộng tối đa ~560 px, chuỗi 4 chất dàn ngang sẽ gãy hàng giữa mũi tên. */
+
+/* — NHẬN BIẾT: thuốc thử → hiện tượng → nhóm chức (không ghép với phương án khi em đang làm) — */
+.lg-nb{display:flex;flex-direction:column;gap:8px}
+.lg-nb-dong{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:9px 12px;border-radius:12px;background:var(--m3-surface-container-low);font-size:14px;line-height:1.45}
+.lg-nb-dong > span{font-weight:600;color:var(--m3-on-surface);white-space:nowrap}
+.lg-nb-dong > i{font-style:normal;color:var(--m3-on-surface-variant);font-weight:700}
+.lg-nb-dong > span:last-child{white-space:normal}
+
+/* — BẪY HAY NHẦM — */
+.lg-bay{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:10px 12px;border-radius:14px;background:var(--m3-error-container);color:var(--m3-on-error-container);font-size:14.5px;line-height:1.5}
+.lg-bay b.tieu{display:block;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
+.lg-bay svg{margin-top:2px}
+.lg-bay .sai{color:inherit}
+</style>
+</head>
+<body class="m3">
+<div class="trang" aria-hidden="true">
+  <div class="trang-dau"><span>‹</span><div>Chặng 1 · Câu 1/4<small>4/24 câu hôm nay</small></div></div>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-hoi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-den" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-binh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></symbol>
+  <symbol id="i-pt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/></symbol>
+  <symbol id="i-tinh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8"/><path d="M16 14v4"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></symbol>
+  <symbol id="i-so-do" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></symbol>
+  <symbol id="i-tim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-bay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-lai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-gui" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.7 3.7 21 12 3.7 20.3 6 12Z"/><path d="M6 12h15"/></symbol>
+</svg>
+
+<template id="o-nhan">
+  <form class="lg-nh">
+    <div class="lg-nh-khung">
+      <label class="sr-only" for="o">Chỗ em thắc mắc về câu này</label>
+      <textarea id="o" class="lg-nh-o" rows="1" placeholder="Nhắn chỗ em còn thắc mắc…"></textarea>
+      <div class="lg-nh-chan"><span class="lg-nh-con">Còn 11 câu hỏi hôm nay</span><span class="lg-nh-dem">0/500</span><button type="button" class="lg-nh-gui" aria-label="Gửi" disabled><svg width="19" height="19"><use href="#i-gui"/></svg></button></div>
+    </div>
+    <p class="lg-nh-khau">KIÊN TRÌ là vũ khí tối thượng để chiến thắng mọi thứ</p>
+  </form>
+</template>
+
+<!-- ============ KHUNG 1: Nhận biết qua thí nghiệm — em ĐANG LÀM (Thầy gợi hướng, không ghép đáp án) ============ -->
+<div class="khung" data-k="tn"><div class="lg-hh-nen m3"><div class="lg-hh" role="dialog" aria-label="Hỏi Thầy">
+  <header class="lg-hh-dau">
+    <span class="lg-hh-hinh" aria-hidden="true"><svg width="22" height="22"><use href="#i-hoi"/></svg></span>
+    <div class="lg-hh-ten"><h2 class="lg-hh-tieu-de">Hỏi Thầy</h2><p class="lg-hh-phu">Câu 75 · Hợp chất chứa nitrogen</p></div>
+    <button type="button" class="lg-hh-dong" aria-label="Đóng"><svg width="20" height="20"><use href="#i-x"/></svg></button>
+  </header>
+  <details class="lg-hh-de">
+    <summary>Đề câu <span class="lg-de-tom">Kết quả thí nghiệm của các chất X, Y, Z với các thuốc thử…</span><span class="lg-de-loai">Trắc nghiệm</span></summary>
+    <div class="lg-hh-de-than lg-de-chuan">
+      <p class="lg-de-chu"><b>Câu 75.</b> Kết quả thí nghiệm của các chất X, Y, Z với các thuốc thử: X + quỳ tím → chuyển màu xanh; Y + dung dịch AgNO<sub>3</sub> trong NH<sub>3</sub>, đun nóng → tạo kết tủa Ag; Z + nước bromine → tạo kết tủa trắng. Các chất X, Y, Z lần lượt là</p>
+    </div>
+  </details>
+  <p class="lg-hh-goi">Em đang làm câu này nên Thầy gợi hướng, chưa nói đáp án.</p>
+  <section class="lg-ht lg-ht--hop" aria-label="Hỏi Thầy về câu này">
+    <div class="lg-ht-log" role="log">
+      <p class="lg-ht-em">Câu này làm sao ạ?</p>
+      <article class="lg-ht-thay lg-tl">
+        <div class="lg-tl-dau"><span class="lg-tl-avt" aria-hidden="true">Đ</span><span class="lg-ht-nhan">Thầy Đỗ Đại Học</span><span class="lg-tl-the">Gợi hướng</span></div>
+        <p class="lg-tl-chinh">Mỗi hiện tượng chỉ ra <strong>một nhóm chức</strong>. Em đọc hiện tượng → đoán nhóm chức → rồi mới so với phương án.</p>
+
+        <div class="lg-k" data-khoi="thi-nghiem">
+          <div class="lg-k-dau"><svg width="18" height="18"><use href="#i-binh"/></svg>Thí nghiệm ảo<button type="button" data-lam-lai><svg width="16" height="16"><use href="#i-lai"/></svg>Làm lại</button></div>
+          <div class="lg-tn-hang">
+            <div class="lg-tn" data-h="xanh" style="--tre:0s">
+              <span class="lg-tn-nhan">X</span><span class="lg-tn-thuoc"><span>Quỳ tím</span></span>
+              <div class="lg-tn-voi"><span class="lg-tn-mieng"></span><div class="lg-tn-ong"><div class="lg-tn-long"></div><div class="lg-tn-quy"></div></div></div>
+              <span class="lg-tn-chu"><b>Quỳ hoá xanh</b>môi trường base</span>
+            </div>
+            <div class="lg-tn" data-h="bac" style="--tre:.9s;--mau-giot:var(--slate-300)">
+              <span class="lg-tn-nhan">Y</span><span class="lg-tn-thuoc"><span>AgNO<sub>3</sub>/NH<sub>3</sub>, t°</span></span>
+              <div class="lg-tn-voi"><span class="lg-tn-giot"></span><span class="lg-tn-mieng"></span><div class="lg-tn-ong"><div class="lg-tn-long"></div><div class="lg-tn-guong"></div></div><span class="lg-tn-lua"></span></div>
+              <span class="lg-tn-chu"><b>Lớp bạc sáng</b>bám thành ống</span>
+            </div>
+            <div class="lg-tn" data-h="trang" style="--tre:1.8s;--mau-giot:color-mix(in srgb,var(--cam) 60%,var(--vd-nau));--truoc:color-mix(in srgb,var(--cam) 45%,var(--vd-nau) 20%);--sau:color-mix(in srgb,var(--m3-primary) 6%,transparent)">
+              <span class="lg-tn-nhan">Z</span><span class="lg-tn-thuoc"><span>Nước bromine</span></span>
+              <div class="lg-tn-voi"><span class="lg-tn-giot"></span><span class="lg-tn-mieng"></span><div class="lg-tn-ong"><div class="lg-tn-long"></div><div class="lg-tn-tua"></div></div></div>
+              <span class="lg-tn-chu"><b>Kết tủa trắng</b>lắng ở đáy ống</span>
+            </div>
+          </div>
+          <p class="lg-tn-ket">Ống nghiệm vẽ đúng hiện tượng trong đề. Thầy chưa ghép chất nào vào X, Y, Z: phần đó em tự làm.</p>
+        </div>
+
+        <div class="lg-k" data-khoi="nhan-biet">
+          <div class="lg-k-dau"><svg width="18" height="18"><use href="#i-tim"/></svg>Hiện tượng → nhóm chức</div>
+          <div class="lg-nb">
+            <div class="lg-nb-dong"><span><span class="thuoc">Quỳ tím</span></span><i>→</i><span><span class="hien" data-h="xanh">hoá xanh</span></span><i>⇒</i><span><span class="nhom" data-n="nh2">–NH<sub>2</sub></span> gắn gốc no</span></div>
+            <div class="lg-nb-dong"><span><span class="thuoc">AgNO<sub>3</sub>/NH<sub>3</sub></span></span><i>→</i><span><span class="hien" data-h="bac">tráng bạc</span></span><i>⇒</i><span><span class="nhom" data-n="cho">–CHO</span></span></div>
+            <div class="lg-nb-dong"><span><span class="thuoc">Nước Br<sub>2</sub></span></span><i>→</i><span><span class="hien" data-h="trang">kết tủa trắng</span></span><i>⇒</i><span><span class="nhom" data-n="nh2">–NH<sub>2</sub></span> / <span class="nhom" data-n="oh">–OH</span> gắn vòng benzene</span></div>
+          </div>
+        </div>
+
+        <ol class="lg-tl-buoc">
+          <li><span class="lg-tl-so" aria-hidden="true">1</span><div><b>Khoanh nhóm chức</b><p>Viết công thức các chất trong 4 phương án, khoanh <span class="nhom" data-n="nh2">–NH<sub>2</sub></span>, <span class="nhom" data-n="cho">–CHO</span>, <span class="nhom" data-n="oh">–OH</span>.</p></div></li>
+          <li><span class="lg-tl-so" aria-hidden="true">2</span><div><b>Loại phương án sai</b><p>Chất nào <strong>không có</strong> nhóm chức khớp hiện tượng của ống ấy thì gạch cả phương án.</p></div></li>
+        </ol>
+
+        <aside class="lg-bay" aria-label="Bẫy hay nhầm"><svg width="20" height="20"><use href="#i-bay"/></svg><div><b class="tieu">Bẫy hay nhầm</b>Aniline có <span class="nhom" data-n="nh2">–NH<sub>2</sub></span> nhưng <strong>không làm quỳ đổi màu</strong>: vòng benzene làm tính base rất yếu.</div></aside>
+        <aside class="lg-tl-nho" aria-label="Ghi nhớ"><svg width="20" height="20"><use href="#i-den"/></svg><div><b>Ghi nhớ</b><span>Quỳ xanh: <strong>amine no</strong> · Tráng bạc: <strong>–CHO</strong> · Br<sub>2</sub> kết tủa trắng: <strong>aniline, phenol</strong>.</span></div></aside>
+        <div class="lg-tl-hoi" role="group" aria-label="Hỏi tiếp"><button type="button">Vì sao aniline không làm quỳ đổi màu?</button><button type="button">Glucose có –CHO ở đâu?</button></div>
+      </article>
+    </div>
+    <div data-o-nhan></div>
+  </section>
+</div></div></div>
+
+<!-- ============ KHUNG 2: Tính toán — em đã nộp, ra 9,6 (sai) ============ -->
+<div class="khung" data-k="tinh"><div class="lg-hh-nen m3"><div class="lg-hh" role="dialog" aria-label="Hỏi Thầy">
+  <header class="lg-hh-dau">
+    <span class="lg-hh-hinh" aria-hidden="true"><svg width="22" height="22"><use href="#i-hoi"/></svg></span>
+    <div class="lg-hh-ten"><h2 class="lg-hh-tieu-de">Hỏi Thầy</h2><p class="lg-hh-phu">Câu 6 · Ester – Lipid</p></div>
+    <button type="button" class="lg-hh-dong" aria-label="Đóng"><svg width="20" height="20"><use href="#i-x"/></svg></button>
+  </header>
+  <details class="lg-hh-de">
+    <summary>Đề câu <span class="lg-de-tom">Thuỷ phân hoàn toàn 8,8 gam ethyl acetate…</span><span class="lg-de-loai">Trả lời ngắn</span></summary>
+    <div class="lg-hh-de-than lg-de-chuan"><p class="lg-de-chu"><b>Câu 6.</b> Thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong dung dịch NaOH dư, đun nóng. Khối lượng muối thu được là bao nhiêu gam?</p></div>
+  </details>
+  <section class="lg-ht lg-ht--hop" aria-label="Hỏi Thầy về câu này">
+    <div class="lg-ht-log" role="log">
+      <p class="lg-ht-em">Sao em ra 9,6 ạ?</p>
+      <article class="lg-ht-thay lg-tl">
+        <div class="lg-tl-dau"><span class="lg-tl-avt" aria-hidden="true">Đ</span><span class="lg-ht-nhan">Thầy Đỗ Đại Học</span></div>
+        <p class="lg-tl-chinh">Em ghép nhầm gốc: muối là <span class="dung">CH<sub>3</sub>COONa</span> (M = 82), không phải <span class="sai">C<sub>2</sub>H<sub>5</sub>COONa</span> (M = 96) ⇒ <mark>m = 8,2 gam</mark>.</p>
+
+        <div class="lg-k" data-khoi="phuong-trinh">
+          <div class="lg-k-dau"><svg width="18" height="18"><use href="#i-pt"/></svg>Phương trình</div>
+          <div class="lg-pt"><span class="c">CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub></span><span class="cong">+</span><span class="c">NaOH</span><span class="mui"><span>t°</span><i>⟶</i></span><span class="c" data-sp data-chinh>CH<sub>3</sub>COONa</span><span class="cong">+</span><span class="c" data-sp>C<sub>2</sub>H<sub>5</sub>OH</span></div>
+        </div>
+
+        <div class="lg-k" data-khoi="tinh">
+          <div class="lg-k-dau"><svg width="18" height="18"><use href="#i-tinh"/></svg>Tính nhanh</div>
+          <dl class="lg-tinh">
+            <dt>n<sub>ester</sub></dt><dd>8,8 : 88 = <b>0,1 mol</b></dd>
+            <dt>n<sub>muối</sub></dt><dd>= n<sub>ester</sub> = <b>0,1 mol</b> <span style="color:var(--m3-on-surface-variant)">(tỉ lệ 1 : 1)</span></dd>
+            <dt>m<sub>muối</sub></dt><dd>0,1 × 82 = <b>8,2 gam</b></dd>
+            <div class="cuoi"><span>Đáp số</span><span>8,2 gam</span></div>
+          </dl>
+        </div>
+
+        <aside class="lg-bay" aria-label="Bẫy hay nhầm"><svg width="20" height="20"><use href="#i-bay"/></svg><div><b class="tieu">Chỗ em nhầm</b>Tên ester đọc <strong>gốc alcohol trước</strong>: ethyl acetate = gốc ethyl (C<sub>2</sub>H<sub>5</sub>–) + gốc acetate (CH<sub>3</sub>COO–). Muối lấy gốc <strong>acetate</strong>, em đã lấy <span class="sai">gốc ethyl</span>.</div></aside>
+        <aside class="lg-tl-nho" aria-label="Ghi nhớ"><svg width="20" height="20"><use href="#i-den"/></svg><div><b>Ghi nhớ</b><span>RCOOR' + NaOH → <strong>RCOONa</strong> + R'OH: muối giữ <strong>gốc acid</strong> RCOO–.</span></div></aside>
+        <div class="lg-tl-hoi" role="group" aria-label="Hỏi tiếp"><button type="button">Gọi tên ester nhanh thế nào?</button><button type="button">Dùng KOH thì muối nặng bao nhiêu?</button></div>
+      </article>
+    </div>
+    <div data-o-nhan></div>
+  </section>
+</div></div></div>
+
+<!-- ============ KHUNG 3: Sơ đồ chuyển hoá — em đã nộp, hỏi để hiểu ============ -->
+<div class="khung" data-k="so-do"><div class="lg-hh-nen m3"><div class="lg-hh" role="dialog" aria-label="Hỏi Thầy">
+  <header class="lg-hh-dau">
+    <span class="lg-hh-hinh" aria-hidden="true"><svg width="22" height="22"><use href="#i-hoi"/></svg></span>
+    <div class="lg-hh-ten"><h2 class="lg-hh-tieu-de">Hỏi Thầy</h2><p class="lg-hh-phu">Câu 12 · Carbohydrate</p></div>
+    <button type="button" class="lg-hh-dong" aria-label="Đóng"><svg width="20" height="20"><use href="#i-x"/></svg></button>
+  </header>
+  <details class="lg-hh-de">
+    <summary>Đề câu <span class="lg-de-tom">Cho sơ đồ chuyển hoá: Tinh bột → X → Y → Acetic acid…</span><span class="lg-de-loai">Trắc nghiệm</span></summary>
+    <div class="lg-hh-de-than lg-de-chuan"><p class="lg-de-chu"><b>Câu 12.</b> Cho sơ đồ chuyển hoá: Tinh bột → X → Y → Acetic acid. X, Y lần lượt là</p></div>
+  </details>
+  <section class="lg-ht lg-ht--hop" aria-label="Hỏi Thầy về câu này">
+    <div class="lg-ht-log" role="log">
+      <p class="lg-ht-em">Em chưa hiểu sơ đồ này ạ</p>
+      <article class="lg-ht-thay lg-tl">
+        <div class="lg-tl-dau"><span class="lg-tl-avt" aria-hidden="true">Đ</span><span class="lg-ht-nhan">Thầy Đỗ Đại Học</span></div>
+        <p class="lg-tl-chinh">Đi theo từng mũi tên: <strong>thuỷ phân</strong> tinh bột ra <span class="dung">glucose (X)</span>, <strong>lên men rượu</strong> ra <span class="dung">ethanol (Y)</span>, <strong>lên men giấm</strong> ra acetic acid.</p>
+
+        <div class="lg-k" data-khoi="so-do">
+          <div class="lg-k-dau"><svg width="18" height="18"><use href="#i-so-do"/></svg>Sơ đồ chuyển hoá</div>
+          <ol class="lg-sd">
+            <li><span class="nut" data-dau>Tinh bột</span></li>
+            <li><span class="mui"><span>+H<sub>2</sub>O, H<sup>+</sup>, t°</span></span><span class="nut">Glucose <small>X</small></span></li>
+            <li><span class="mui"><span>men rượu, 30–35 °C</span></span><span class="nut">Ethanol <small>Y</small></span></li>
+            <li><span class="mui"><span>O<sub>2</sub>, men giấm</span></span><span class="nut" data-cuoi>Acetic acid</span></li>
+          </ol>
+        </div>
+
+        <div class="lg-k" data-khoi="thi-nghiem">
+          <div class="lg-k-dau"><svg width="18" height="18"><use href="#i-binh"/></svg>Thí nghiệm ảo<button type="button" data-lam-lai><svg width="16" height="16"><use href="#i-lai"/></svg>Làm lại</button></div>
+          <div class="lg-tn-hang">
+            <div class="lg-tn" data-h="tim" style="--tre:0s;--mau-giot:var(--vd-nau);--sau:color-mix(in srgb,var(--tim) 72%,var(--gg-xanh))">
+              <span class="lg-tn-nhan">Hồ tinh bột</span><span class="lg-tn-thuoc"><span>Dung dịch iodine</span></span>
+              <div class="lg-tn-voi"><span class="lg-tn-giot"></span><span class="lg-tn-mieng"></span><div class="lg-tn-ong"><div class="lg-tn-long"></div></div></div>
+              <span class="lg-tn-chu"><b>Xanh tím</b>nhận ra tinh bột</span>
+            </div>
+            <div class="lg-tn" data-h="khi" style="--tre:.9s;--mau-giot:var(--vd-vang)">
+              <span class="lg-tn-nhan">Glucose</span><span class="lg-tn-thuoc"><span>Men rượu</span></span>
+              <div class="lg-tn-voi"><span class="lg-tn-giot"></span><span class="lg-tn-mieng"></span><div class="lg-tn-ong"><div class="lg-tn-long"><span class="lg-tn-bot" style="left:6px"></span><span class="lg-tn-bot"></span><span class="lg-tn-bot"></span><span class="lg-tn-bot"></span></div></div></div>
+              <span class="lg-tn-chu"><b>Sủi bọt khí</b>khí CO<sub>2</sub></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg-k" data-khoi="phuong-trinh">
+          <div class="lg-k-dau"><svg width="18" height="18"><use href="#i-pt"/></svg>Phương trình</div>
+          <div class="lg-pt"><span class="c">(C<sub>6</sub>H<sub>10</sub>O<sub>5</sub>)<sub>n</sub></span><span class="cong">+</span><span class="c">nH<sub>2</sub>O</span><span class="mui"><span>H<sup>+</sup>, t°</span><i>⟶</i></span><span class="c" data-sp data-chinh>nC<sub>6</sub>H<sub>12</sub>O<sub>6</sub></span></div>
+          <div class="lg-pt"><span class="c">C<sub>6</sub>H<sub>12</sub>O<sub>6</sub></span><span class="mui"><span>men rượu</span><i>⟶</i></span><span class="c" data-sp data-chinh>2C<sub>2</sub>H<sub>5</sub>OH</span><span class="cong">+</span><span class="c" data-sp>2CO<sub>2</sub></span></div>
+        </div>
+        <aside class="lg-tl-nho" aria-label="Ghi nhớ"><svg width="20" height="20"><use href="#i-den"/></svg><div><b>Ghi nhớ</b><span>Lên men rượu: <strong>1 glucose → 2 ethanol + 2 CO<sub>2</sub></strong>.</span></div></aside>
+        <div class="lg-tl-hoi" role="group" aria-label="Hỏi tiếp"><button type="button">Vì sao cần men giấm?</button><button type="button">Tinh bột thuỷ phân cần gì?</button></div>
+      </article>
+    </div>
+    <div data-o-nhan></div>
+  </section>
+</div></div></div>
+
+<script>
+const q = new URLSearchParams(location.search)
+const k = q.get('k') || 'tn'
+document.querySelector(`.khung[data-k="${k}"]`)?.setAttribute('data-hien', '')
+for (const ch of document.querySelectorAll('[data-o-nhan]')) ch.replaceWith(document.getElementById('o-nhan').content.cloneNode(true))
+if (q.get('de') === '1') for (const d of document.querySelectorAll('.lg-hh-de')) d.open = true
+for (const b of document.querySelectorAll('[data-lam-lai]')) b.addEventListener('click', () => {
+  const khoi = b.closest('.lg-k')
+  for (const t of khoi.querySelectorAll('.lg-tn')) { const ban = t.cloneNode(true); t.replaceWith(ban) }
+})
+</script>
+</body>
+</html>
