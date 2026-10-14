@@ -368,7 +368,7 @@ async function tao(env: Env, b: Row, nowMs: number) {
   await env.DB.prepare(`INSERT INTO chien_dich (id, ten, lop, sbd_json, ma_de_json, qid_json, han_nop, the_luc_ngay, huyet_chien, ma_ca, tao_luc, trang_thai)
       VALUES (?,?,?,?,?,?,?,?,?,?,?,'dang_chay')`)
     .bind(id, dv.ten, dv.lop, JSON.stringify(dv.sbd), JSON.stringify(maGocCuaTo(dv.maDe)), JSON.stringify(qids), dv.hanNop, dv.theLucNgay, dv.huyetChien ? 1 : 0, dv.maCa, new Date(nowMs).toISOString()).run()
-  xoaDemChienDich() // danh sách chiến dịch đệm 15 s (srs2-d1.ts) ⇒ em thấy chiến dịch mới ngay
+  xoaDemChienDich() // danh sách chiến dịch đệm 60 s (srs2-d1.ts) ⇒ em thấy chiến dịch mới ngay
   if (dv.batDau) await ghiBatDau(env, id, dv.batDau)
   // Luôn ghi dòng (phản biện vòng 2 #110): "không có dòng" chỉ còn nghĩa là chiến dịch giao TRƯỚC khi có công tắc ⇒ màn thầy hiện "Bật (mặc định)".
   // Ghi dòng BẬT lỗi thì thôi (không dòng vẫn là bật — chỉ mang nhãn "mặc định"); dòng TẮT phải ghi được.

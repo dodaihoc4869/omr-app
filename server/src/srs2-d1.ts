@@ -188,7 +188,7 @@ export const chuaBatDau = (cd: ChienDich, homNay: string): boolean => cd.batDau 
  */
 /**
  * Chiến dịch ĐÃ HUỶ từ 29/09 (thầy 06/10: "hủy chiến dịch thì những học sinh đã phân phải đc thu hồi hết") — chỉ giữ thứ đủ để THU HỒI nợ do chiến dịch ấy sinh ra
- * (`docHoSo2`, nguồn thứ 4): tập em, tập câu, mốc giao, lúc huỷ. Đọc CÙNG câu đọc danh sách chiến dịch (đệm 15 s) ⇒ không thêm lượt D1.
+ * (`docHoSo2`, nguồn thứ 4): tập em, tập câu, mốc giao, lúc huỷ. Đọc CÙNG câu đọc danh sách chiến dịch (đệm 60 s) ⇒ không thêm lượt D1.
  */
 export interface ChienDichDaHuy { id: string; qids: ReadonlySet<string>; taoLuc: string; dongLuc: string }
 /** Dòng thô của chiến dịch đã huỷ trong đệm: tập em / tập câu CHỈ đọc (parse) khi có em thật sự thuộc chiến dịch ấy — danh sách đã huỷ chỉ dài thêm theo thời gian. */
@@ -198,7 +198,9 @@ const qidDaHuyMemo = new WeakMap<DongDaHuy, Set<string>>()
 const qidCuaDaHuy = (c: DongDaHuy): Set<string> => { let t = qidDaHuyMemo.get(c); if (!t) { t = tapChuoiJson(c.qidJson); qidDaHuyMemo.set(c, t) } return t }
 type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; huy: DongDaHuy[]; bd: Map<string, string>; rd: Map<string, number> }
 type OChienDich = { ds: DsChienDich | null; dangDoc: boolean }
-const demChienDich = new DemTTL<OChienDich>(15_000, 2)
+// 14/10 (số đo cao điểm 13/10: câu `SELECT * FROM chien_dich …` 3.238 lần/3 giờ × 9,4 ms — mỗi isolate đọc lại sau mỗi 15 giây): đệm 60 giây. Chiến dịch nay
+// do hệ thống quản (giao chiến dịch tay đã gỡ 14/10); ghi trong isolate vẫn xoá đệm ngay (`xoaDemChienDich`), isolate khác thấy sau ≤ 60 giây.
+const demChienDich = new DemTTL<OChienDich>(60_000, 2)
 export function xoaDemChienDich(): void { demChienDich.xoa() }
 async function docMoiChienDich(env: Env): Promise<DsChienDich> {
   const co = demChienDich.doc('ds', Date.now())
