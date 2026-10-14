@@ -103,7 +103,6 @@ import { capNhatSaiNhanhNeuCu } from './sai-nhanh-gv'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, D1Result, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
-import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
 import { gvLichSuLamCau } from './lich-su-lam-cau'
 import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc'
@@ -3842,8 +3841,6 @@ const boXuLy = {
         return ra(kq)
       }
       if (p === '/gv/omni') return ra(await gvOmni(env, b))
-      // SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09, srs2-sua.ts): thêm đề (chia lại câu chưa làm), thêm/bớt em (không xoá sổ), sửa hạn (hết hạn ⇒ mở lại). GHI — dùng env.
-      if (p === '/gv/chien-dich/sua') return ra(await gvSuaChienDich(env, b))
       // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
       // LỊCH SỬ LÀM CÂU CỦA MỘT EM (thầy 09/10 khuya, server/src/lich-su-lam-cau.ts; hợp đồng lich-su-lam-cau-kieu.ts): CHỈ ĐỌC sổ — mọi lượt · câu sai · số giây.

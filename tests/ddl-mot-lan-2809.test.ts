@@ -1,23 +1,30 @@
 // @vitest-environment node
 // Tối ưu máy chủ 28/09 (việc 5): CREATE TABLE IF NOT EXISTS lúc chạy ⇒ MỘT batch, MỘT lần mỗi isolate; lỗi ⇒ lượt sau thử lại.
+// 14/10: gỡ Sửa chiến dịch cũ (srs2-sua.ts) — ca 4 lệnh DDL dùng bộ lệnh dựng tại chỗ, giữ nguyên khẳng định.
 import { describe, it, expect } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { demVongD1 } from './_dem-vong-d1'
 import { chayDdlMotLan } from '../server/src/ddl-mot-lan'
-import { LENH_TAO_BANG_SUA } from '../server/src/srs2-sua'
 import { ghiBatDau } from '../server/src/srs2-d1'
 import type { Env } from '../server/src/kieu'
 
+const LENH_4 = [
+  'CREATE TABLE IF NOT EXISTS ddl_thu_a (id TEXT PRIMARY KEY, sbd TEXT NOT NULL)',
+  'CREATE INDEX IF NOT EXISTS idx_ddl_thu_a_sbd ON ddl_thu_a(sbd)',
+  'CREATE TABLE IF NOT EXISTS ddl_thu_b (id INTEGER PRIMARY KEY AUTOINCREMENT, a_id TEXT NOT NULL, luc TEXT NOT NULL)',
+  'CREATE INDEX IF NOT EXISTS idx_ddl_thu_b_a ON ddl_thu_b(a_id, luc)',
+]
+
 describe('DDL một lần mỗi isolate', () => {
-  it('srs2-sua: 4 lệnh DDL ⇒ 1 vòng lần đầu (trước: 4 vòng MỖI lượt), 0 vòng các lượt sau', async () => {
+  it('4 lệnh DDL ⇒ 1 vòng lần đầu (trước: 4 vòng MỖI lượt), 0 vòng các lượt sau', async () => {
     const d = taoD1That()
     const { env, d: dem } = demVongD1(d.env as unknown as Env)
-    await chayDdlMotLan(env, 'chien_dich_sua', LENH_TAO_BANG_SUA)
+    await chayDdlMotLan(env, 'ddl_thu', LENH_4)
     expect(dem.vong).toBe(1)
-    await chayDdlMotLan(env, 'chien_dich_sua', LENH_TAO_BANG_SUA)
-    await chayDdlMotLan(env, 'chien_dich_sua', LENH_TAO_BANG_SUA)
+    await chayDdlMotLan(env, 'ddl_thu', LENH_4)
+    await chayDdlMotLan(env, 'ddl_thu', LENH_4)
     expect(dem.vong).toBe(1)
-    expect(d.dem('chien_dich_em')).toBe(0) // bảng có thật
+    expect(d.dem('ddl_thu_a')).toBe(0) // bảng có thật
   })
   it('ghiBatDau: lượt 2 chỉ còn câu INSERT (trước: DDL + INSERT mỗi lượt)', async () => {
     const d = taoD1That()

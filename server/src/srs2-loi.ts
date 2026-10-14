@@ -349,7 +349,7 @@ export function trongSoOn(t: TrangThaiCau, homNay: string): number {
 /**
  * Lượt tối thiểu còn cần: câu mới 2, câu đang ôn 2 − cc; bỏ câu đã thành thạo (kể cả thành thạo lần đầu) và câu cắt tỉa.
  * MỘT hàm cho mọi nơi ước khối lượng (thầy chốt 28/09, phương án P1): Huyết Chiến (`lapKeHoachNgay`), đồng hồ sức chứa +
- * "Tự tính" + quá tải ở Giao chiến dịch (`srs2-gv.ts`), tự nâng số câu/ngày ở Sửa chiến dịch (`srs2-sua.ts`).
+ * "Tự tính" + quá tải ở Giao chiến dịch (`srs2-gv.ts`).
  * Câu mới vẫn ước 2 lượt dù có thể thành thạo lần đầu (an toàn; máy tính lại mỗi ngày theo tình trạng thật).
  */
 export function khoiLuongCan(ds: Iterable<TrangThaiCau>): number {

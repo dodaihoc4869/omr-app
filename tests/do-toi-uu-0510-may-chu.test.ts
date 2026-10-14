@@ -218,12 +218,16 @@ async function dungThe(omni: boolean): Promise<The> {
       the.chienDich.push(String(t.chienDichId))
     }
     if (ngay === '2026-10-01') {
-      // Thầy giao trước cho lớp 12A2 (bắt đầu 07/10) và thêm một em học ghép vào chiến dịch đang chạy của 12A1 (đường thật /gv/chien-dich, /gv/chien-dich/sua).
+      // Thầy giao trước cho lớp 12A2 (bắt đầu 07/10) và thêm một em học ghép vào chiến dịch đang chạy của 12A1 (đường thật /gv/chien-dich; thêm em ghi thẳng như lệnh sửa cũ).
       datGio(gio(ngay, '09:00'))
       const t3 = (await goiTho(env, '/gv/chien-dich', { action: 'tao', ten: 'Giao trước · Ester 12A2', lop: LOP2, sbd: EM2, maDe: [DE[0]!, DE[1]!], hanNop: '2026-10-14', huyetChien: true, raiDeu: true, batDau: '2026-10-07' }, true)).j
       expect(t3.ok, JSON.stringify(t3).slice(0, 300)).toBe(true)
-      const sua = (await goiTho(env, '/gv/chien-dich/sua', { action: 'luu', id: the.chienDich[1], themSbd: [EM2[0]] }, true)).j
-      expect(sua.ok, JSON.stringify(sua).slice(0, 300)).toBe(true)
+      // 14/10: lệnh /gv/chien-dich/sua đã gỡ ⇒ thêm em bằng đúng các dòng lệnh đó từng ghi (sbd_json + chien_dich_em + đánh dấu lập lại kế hoạch hôm nay).
+      const idCd = the.chienDich[1]!, lucThem = new Date().toISOString()
+      the.d.sql.prepare("UPDATE chien_dich SET sbd_json = json_insert(sbd_json, '$[#]', ?) WHERE id = ?").run(EM2[0]!, idCd)
+      the.d.sql.exec('CREATE TABLE IF NOT EXISTS chien_dich_em (chien_dich_id TEXT NOT NULL, sbd TEXT NOT NULL, them_luc TEXT, bot_luc TEXT, PRIMARY KEY (chien_dich_id, sbd))')
+      the.d.sql.prepare('INSERT INTO chien_dich_em (chien_dich_id, sbd, them_luc, bot_luc) VALUES (?,?,?,NULL)').run(idCd, EM2[0]!, lucThem)
+      the.d.sql.prepare('UPDATE srs2_ke_hoach SET chien_dich_id = ? WHERE ngay = ? AND chien_dich_id = ?').run(`${idCd}#sua`, ngay, idCd)
     }
     datGio(gio(ngay, '19:00'))
     await choiNgay(the, 'S01', 4, omni)
