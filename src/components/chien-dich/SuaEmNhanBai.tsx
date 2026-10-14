@@ -1,6 +1,7 @@
 // Tấm chỉnh em nhận bài đã tick; không tạo chiến dịch, không đổi màn sau lưu.
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import ChonEmGiao from './ChonEmGiao'
 import { luuEmNhanBai, taiEmNhanBai, type AckEmNhanBai, type DanhSachNhanBai, type SuaEmNhanBai } from './api-goi7-em'
 import './sua-em-nhan-bai.css'
@@ -66,7 +67,7 @@ export default function SuaEmNhanBai({ goiId, lop, ten, onDong, onDaLuu }: Props
       if (e.key !== 'Tab') return
       const trong = tam.current?.querySelector('[role="alertdialog"]') ?? tam.current
       const nut = [...(trong?.querySelectorAll<HTMLElement>(phimDuoc) ?? [])].filter(x => !x.closest('fieldset:disabled') && x.getAttribute('aria-hidden') !== 'true')
-      const dau = nut[0], cuoi = nut.at(-1)
+      const dau = nut[0], cuoi = nut[nut.length - 1]
       if (!dau) { e.preventDefault(); tam.current?.focus(); return }
       if (e.shiftKey && (document.activeElement === dau || !tam.current?.contains(document.activeElement))) { e.preventDefault(); cuoi?.focus() }
       else if (!e.shiftKey && (document.activeElement === cuoi || !tam.current?.contains(document.activeElement))) { e.preventDefault(); dau.focus() }
@@ -84,7 +85,7 @@ export default function SuaEmNhanBai({ goiId, lop, ten, onDong, onDaLuu }: Props
   const luuDanhSach = async () => {
     if (!goc || dangLuu.current || doc || xungDot || (!them.length && !bot.length && !guiLan.current)) return
     const lanGui = guiLan.current ?? {
-      gui: { action: 'sua_em' as const, goiId, revision: goc.revision, requestId: crypto.randomUUID(), them: them.map(e => e.sbd).sort(), bot: bot.map(e => e.sbd).sort() },
+      gui: { action: 'sua_em' as const, goiId, revision: goc.revision, requestId: sinhMaNgauNhien(), them: them.map(e => e.sbd).sort(), bot: bot.map(e => e.sbd).sort() },
       nhan: [...chon].sort(),
     }
     guiLan.current = lanGui

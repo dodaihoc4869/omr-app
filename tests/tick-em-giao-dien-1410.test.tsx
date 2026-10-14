@@ -302,3 +302,15 @@ it('CSS hỏng dù import JS trả thành công vẫn báo lỗi, retry không r
   try { await expect(napMoi(async () => ({ default: SuaEmNhanBai }))).rejects.toThrow(/preload CSS/) }
   finally { link.remove() }
 })
+
+it('máy chưa có randomUUID vẫn lưu được bằng getRandomValues và thử lại giữ đúng mã', async () => {
+  const ngauNhien = vi.fn((b: Uint8Array) => { b.fill(13); return b })
+  vi.stubGlobal('crypto', { getRandomValues: ngauNhien })
+  try {
+    mo(); await themBao(); goi.mockResolvedValueOnce({ ok: false, loai: 'mang', chu: 'Mất mạng' })
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu danh sách' })); await screen.findByText('Mất mạng')
+    expect(lan('sua_em')[0].requestId).toBe('0d'.repeat(16))
+    fireEvent.click(screen.getByRole('button', { name: 'Thử lưu lại' })); await screen.findByText('Đã lưu danh sách')
+    expect(ngauNhien).toHaveBeenCalledTimes(1); expect(lan('sua_em')[1]).toEqual(lan('sua_em')[0])
+  } finally { vi.unstubAllGlobals() }
+})
