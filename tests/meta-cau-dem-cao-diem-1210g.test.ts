@@ -8,7 +8,7 @@
 //  · danh mục hành trình giờ cao điểm dùng chung giữa các lượt gọi (bản bọc khác nhau, cùng D1 gốc).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
-import { batDemMetaCau, docMetaCau, xoaDemMetaCau } from '../server/src/srs2-d1'
+import { batDemMetaCau, docMetaCau, TUOI_DEM_META_MS, xoaDemMetaCau } from '../server/src/srs2-d1'
 import { danhMuc } from '../server/src/hanh-trinh-v5-d1'
 import { gopDocD1 } from '../server/src/doc-d1-theo-luot'
 import type { Env } from '../server/src/kieu'
@@ -66,6 +66,30 @@ describe('siêu dữ liệu câu giờ cao điểm', () => {
     expect(k.dem.cau.at(-1)).toEqual([...k.b8.slice(12, 20)].sort())
     batDemMetaCau(false)
     expect(ra(dem)).toEqual(ra(await docMetaCau(k.luot(), hoi, ['DH-ON8'])))
+  })
+  it('14/10: 5 lượt CÙNG LÚC ở isolate mới ⇒ một lượt đọc câu chung; lượt đến sau chỉ đọc phần chưa ai đọc; kết quả như đọc thẳng', async () => {
+    const k = kho()
+    const hoi = k.b8.slice(0, 12)
+    const kq = await Promise.all(Array.from({ length: 5 }, () => docMetaCau(k.luot(), hoi, ['DH-ON8'])))
+    expect(k.dem.lan).toBe(1)
+    const them = await Promise.all([docMetaCau(k.luot(), k.b8.slice(10, 20)), docMetaCau(k.luot(), k.b8.slice(14, 22))])
+    expect(k.dem.cau.slice(1).flat().sort()).toEqual([...k.b8.slice(12, 22)].sort()) // không câu nào đọc hai lần
+    batDemMetaCau(false)
+    for (const r of kq) expect(ra(r)).toEqual(ra(await docMetaCau(k.luot(), hoi, ['DH-ON8'])))
+    expect(ra(them[1])).toEqual(ra(await docMetaCau(k.luot(), k.b8.slice(14, 22))))
+  })
+  it('14/10: tem không đổi ⇒ dùng tiếp tới 30 phút (trước: 10 phút); quá 30 phút ⇒ đọc lại', async () => {
+    const k = kho()
+    const hoi = k.b8.slice(0, 6)
+    await docMetaCau(k.luot(), hoi)
+    expect(k.dem.lan).toBe(1)
+    expect(TUOI_DEM_META_MS).toBe(30 * 60_000)
+    vi.setSystemTime(CAO_DIEM + 25 * 60_000)
+    await docMetaCau(k.luot(), hoi)
+    expect(k.dem.lan).toBe(1)
+    vi.setSystemTime(CAO_DIEM + 31 * 60_000)
+    await docMetaCau(k.luot(), hoi)
+    expect(k.dem.lan).toBe(2)
   })
   it('kho lập lại chỉ mục (game_v2_index đổi) ⇒ sau 5 giây đọc lại, thấy bản mới', async () => {
     const k = kho()
