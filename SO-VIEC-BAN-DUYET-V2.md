@@ -455,3 +455,7 @@ Thầy (14/10 ~06:00, ảnh thẻ Kiểm tra ôn tập 17/10): "Bỏ nút xem l�
 Thầy (14/10 07:5x): "Duyệt" (bản vẽ Thêm/Bớt em).
 - [x] Thêm/Bớt em trong Tick bài | bằng chứng: Codex làm cả giao diện + API (PR #291, #295 thầy gộp 07:29/07:45), Actions 38491930339 SUCCESS 07:49 VN. Claude soát máy chủ: mọi chỗ đọc goi_bai_7_em dùng `sqlEmDangNhan7`; `dongBoGoi7` theo `goi_bai_7_chon_em` (em bị bớt không tự thêm lại); ghi một batch CAS + requestId; từ chối khi ca mở — đạt.
 - [x] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts, tom-tat-sua-chien-dich.ts, /gv/chien-dich/sua) | bằng chứng: PR #297 main 1b1328c1, Actions 38495467408 SUCCESS 08:32 VN, Worker 6e5187e6; vitest toàn bộ so main 0 đỏ mới (118→117), 21 ca bỏ chỉ khoá lệnh đã gỡ; tsc sạch; kiem:toc-do 0 đỏ.
+Thầy (14/10 08:3x): "Tối ưu chuyên sâu toàn bộ cho giờ cao điểm luôn nhé"
+- [ ] Đo giờ cao điểm hôm qua theo TỪNG câu SQL (D1 insights: thời gian, dòng đọc) + theo lệnh, tìm điểm nghẽn thật | bằng chứng: (chưa có)
+- [ ] Sửa các điểm nghẽn lớn nhất (bộ nhớ isolate, câu SQL nặng, vòng chờ nối tiếp), cổng tốc độ 0 đỏ, phát hành TRƯỚC 19:00 | bằng chứng: (chưa có)
+- [ ] Đo lại cao điểm tối 14/10 (21:35) so 13/10 | bằng chứng: (chưa có)
