@@ -36,7 +36,6 @@ export const DUONG_PHAT_CAU: readonly DuongPhatCau[] = [
   { path: '/hs/ke-hoach-ngay', cach: 'ke_hoach', hopDong: ['scope', 'budget', 'score'], ghiChu: 'bộ điều phối NGÀY: việc ôn/BTVN/Mom lấy từ kế hoạch đã chốt' },
   { path: '/hs/thu-thach-hom-nay', tienTo: true, cach: 'ngoai_le', hopDong: ['scope'], ngoaiLeTen: 'thu_thach_rieng_bo_nao', ghiChu: 'thẻ thử thách do Bộ não chốt trước; chưa đi bộ chọn chung ⇒ ghi nhận là ngoại lệ tạm, có tên' },
   { path: '/hs/on-lai', tienTo: true, cach: 'ngoai_le', hopDong: ['scope', 'repeat'], ngoaiLeTen: 'on_lai_nop_theo_qid', ghiChu: 'NỘP câu đã phát (`layCauChoEm` kiểm đã gặp + bảo vệ), không tự chọn câu mới' },
-  { path: '/vo-dai', tienTo: true, cach: 'ngoai_le', hopDong: ['scope'], ngoaiLeTen: 'vo_dai_doi_khang', ghiChu: 'đấu đối kháng theo ca/giải; câu do luật võ đài chọn, không dùng để tính đạt ngày' },
   { path: '/luyen-de', tienTo: true, cach: 'ngoai_le', hopDong: ['scope'], ngoaiLeTen: 'luyen_de_tron_de', ghiChu: 'luyện TRỌN ĐỀ theo yêu cầu: giữ nội dung đề, KHÔNG dùng để tính đạt ngày' },
   { path: '/goi', cach: 'ngoai_le', hopDong: [], ngoaiLeTen: 'kenh_cu_appscript', ghiChu: 'kênh CŨ (Apps Script) — giữ để lùi, không cấp câu mới theo cá nhân' },
 ]
@@ -52,7 +51,7 @@ export function traDuong(p: string): DuongPhatCau | undefined {
  * trong `DUONG_PHAT_CAU` ⇒ coi như SÓT (test đỏ). Thêm kênh mới phải cập nhật cả hai chỗ.
  */
 export const MAU_PHAT_CAU: readonly string[] = [
-  '/game-v2', '/luyen-de', '/vo-dai', '/hs/thu-thach-hom-nay', '/hs/ke-hoach-ngay', '/goi', '/hs/on-lai',
+  '/game-v2', '/luyen-de', '/hs/thu-thach-hom-nay', '/hs/ke-hoach-ngay', '/goi', '/hs/on-lai',
 ]
 
 /** Đường này có phải cổng vào có thể phát câu/đề (theo `MAU_PHAT_CAU`). */
