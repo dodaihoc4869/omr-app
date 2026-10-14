@@ -1,0 +1,37 @@
+# LỖI 14/10 (thầy: "học sinh còn 1 câu nhưng app ko cho làm, sửa triệt để nhé") — em còn thiếu mức Gói 7 mà mở chặng rỗng: kế hoạch rỗng hay câu kế hoạch
+# bị lọc lúc phát? Chạy ĐÚNG mã máy chủ trên D1 thật, CHỈ ĐỌC (lớp mỏng chỉ gửi SELECT), CHỈ IN SỐ ĐẾM (repo công khai: không số báo danh / tên / mã câu).
+name: Gói 7 — chặng rỗng khi còn thiếu mức (chỉ đọc, chỉ đếm)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/do-goi7-chang-rong-1410.yml', 'scripts/do-goi7-chang-rong-1410.ts']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: do-goi7-chang-rong-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cài gói (để gói bộ đo bằng esbuild)
+        run: npm ci --ignore-scripts
+      - name: "Đo: em còn thiếu mức — kế hoạch có câu không, câu nào bị lọc lúc mở chặng (chỉ đọc)"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          export OMR_D1_ID=$(grep -m1 '^database_id' server/wrangler.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          npx esbuild scripts/do-goi7-chang-rong-1410.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-g7.mjs --log-level=warning
+          OMR_SONG_SONG=3 OMR_GIOI_HAN_MS=1500000 timeout 1600 node --no-warnings /tmp/do-g7.mjs || echo "(thoát mã $?)"
