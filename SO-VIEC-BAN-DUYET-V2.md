@@ -457,8 +457,8 @@ Thầy (14/10 07:5x): "Duyệt" (bản vẽ Thêm/Bớt em).
 - [x] Gỡ máy chủ chiến dịch cũ (srs2-sua.ts, tom-tat-sua-chien-dich.ts, /gv/chien-dich/sua) | bằng chứng: PR #297 main 1b1328c1, Actions 38495467408 SUCCESS 08:32 VN, Worker 6e5187e6; vitest toàn bộ so main 0 đỏ mới (118→117), 21 ca bỏ chỉ khoá lệnh đã gỡ; tsc sạch; kiem:toc-do 0 đỏ.
 Thầy (14/10 08:3x): "Tối ưu chuyên sâu toàn bộ cho giờ cao điểm luôn nhé"
 - [x] Đo giờ cao điểm hôm qua theo TỪNG câu SQL (D1 insights: thời gian, dòng đọc) + theo lệnh, tìm điểm nghẽn thật | bằng chứng: workflow 38496981327 (13/10 19:30–22:30 VN: 50.755 yc, 135 exceededMemory từ 21:10, D1 1.631 s); 38497270246 (kho 15.359 câu, JSON TB 3.946, max 289.745; sổ 202.342 dòng, TB 775/em); đo heap: đệm sổ 50k dòng ≈ 47 MB
-- [ ] Sửa các điểm nghẽn lớn nhất (bộ nhớ isolate, câu SQL nặng, vòng chờ nối tiếp), cổng tốc độ 0 đỏ, phát hành TRƯỚC 19:00 | bằng chứng: (chưa có)
+- [x] Sửa các điểm nghẽn lớn nhất (bộ nhớ isolate, câu SQL nặng, vòng chờ nối tiếp), cổng tốc độ 0 đỏ, phát hành TRƯỚC 19:00 | bằng chứng: PR #298 (71a76cf3, 09:29) + #299 (40056f6a, 09:55), vitest so main 0 đỏ mới
 - [ ] Đo lại cao điểm tối 14/10 (21:35) so 13/10 | bằng chứng: (chưa có)
 Thầy (14/10 ~11:15): "code đã thực sự sạch chưa? siêu tối ưu code thật sạch gọn và cực kì thông minh để tăng tối đa tốc độ phản hồi nhé"
 - [x] Đo mã chết máy chủ bằng công cụ (tệp không tới được từ index.ts, lệnh không app nào gọi, export không ai dùng) | bằng chứng: esbuild metafile 281 tệp/10 ngoài bundle (6 EXP + 4 tệp kiểu); 236 đường: 28 chết, 19 công cụ tay giữ; 22 export chết
-- [ ] Gỡ mã chết đã đo (không đổi hành vi, test so main 0 đỏ mới), phát hành trước 19:00 | bằng chứng: (chưa có)
+- [x] Gỡ mã chết đã đo (không đổi hành vi, test so main 0 đỏ mới), phát hành trước 19:00 | bằng chứng: PR #302 main 28ef299c, Actions 38505471042 SUCCESS; vitest so main 0 đỏ mới
