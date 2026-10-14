@@ -253,8 +253,8 @@ describe('màn: giao Bài cho nhiều lớp', () => {
       ['12 - Lớp Thường', '12 - Lớp Thường: Đã dạy'],
       ['12 - Tinh Hoa', '12 - Tinh Hoa: Chưa dạy'],
     ])
-    expect(within(dong(buoc, 'DH-12-C1-B1')).queryByRole('button', { name: /Sửa em \/ Bỏ tick theo lớp/ })).toBeNull()
-    expect(within(dong(buoc, 'DH-12-C3-B8')).getByRole('button', { name: /Sửa em \/ Bỏ tick theo lớp/ })).toBeTruthy() // Bài 8 tick thật ở lớp Thường
+    expect(within(dong(buoc, 'DH-12-C1-B1')).queryByRole('button', { name: /Bỏ tick theo lớp/ })).toBeNull()
+    expect(within(dong(buoc, 'DH-12-C3-B8')).getByRole('button', { name: /Bỏ tick theo lớp/ })).toBeTruthy() // Bài 8 tick thật ở lớp Thường
   })
 
   it('chip bài gộp qua lớp ("Đã dạy · 2/3 lớp"), chấm từng lớp; chọn bài ⇒ xem-truoc TỪNG LỚP chưa có bài, sbd chia đúng lớp; "Giao Bài 8 cho 3 lớp" ⇒ 3 lệnh tick lần lượt cùng phamVi', async () => {
@@ -342,12 +342,12 @@ describe('màn: giao Bài cho nhiều lớp', () => {
     expect(within(document.querySelector('[data-khoi="xac-nhan-tick"]') as HTMLElement).getByRole('button', { name: 'Giao Bài 8 cho 12 - Nhóm 10 điểm' })).toBeTruthy()
   })
 
-  it('"Bỏ tick" theo lớp trong "Sửa em / Bỏ tick theo lớp": gọi bo-tick đúng lớp + khoá bài', async () => {
+  it('"Bỏ tick" theo lớp trong "Bỏ tick theo lớp": gọi bo-tick đúng lớp + khoá bài', async () => {
     const buoc = await moBuoc()
     moTam(buoc)
     await tichLop(/^12 - Lớp Thường/)
     await waitFor(() => expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã dạy · 2/2 lớp'))
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B1')).getByText('Sửa em / Bỏ tick theo lớp'))
+    fireEvent.click(within(dong(buoc, 'DH-12-C1-B1')).getByText('Bỏ tick theo lớp'))
     fireEvent.click(within(dong(buoc, 'DH-12-C1-B1')).getByRole('button', { name: 'Bỏ tick · 12 - Lớp Thường' }))
     const hop = await screen.findByRole('alertdialog')
     expect(hop.textContent).toContain('lớp 12 - Lớp Thường')

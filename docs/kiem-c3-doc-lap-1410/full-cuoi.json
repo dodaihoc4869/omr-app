@@ -1,0 +1,66 @@
+{
+  "baseCommit": "2f91f0e402b9a737bca370236d492cf86f27dc4b",
+  "sourceCommit": "a2da228b154a44b494aa770ae411f14104566210",
+  "base": {
+    "passed": 14293,
+    "failed": 120,
+    "pending": 27,
+    "files": 1106,
+    "failedFiles": 59,
+    "emptyFailedSuites": 0
+  },
+  "head": {
+    "passed": 14353,
+    "failed": 120,
+    "pending": 27,
+    "files": 1107,
+    "failedFiles": 59,
+    "emptyFailedSuites": 0
+  },
+  "newFailedTests": [],
+  "newFailedFiles": [],
+  "newEmptyFailedSuites": [],
+  "newSkippedTests": [],
+  "removedTests": [
+    {
+      "file": "tests/ngay-bat-dau-giao-dien-2809.test.tsx",
+      "name": "hộp Chỉnh sửa: ngày bắt đầu chưa bắt đầu ⇒ đổi được, tóm tắt \"bắt đầu 01/10 → 02/10\", gửi batDau",
+      "count": 1
+    },
+    {
+      "file": "tests/ngay-bat-dau-giao-dien-2809.test.tsx",
+      "name": "hộp Chỉnh sửa: ngày bắt đầu đã bắt đầu ⇒ ô khoá kèm chú thích",
+      "count": 1
+    },
+    {
+      "file": "tests/omni-3-thay-bai-hom-nay.test.tsx",
+      "name": "chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của chiến dịch cũ + chọn theo điểm danh) bài ĐÃ tick: \"Đã giao N em\" + \"Sửa em\" mở hộp sửa chiến dịch sẵn có; không có mã chiến dịch ⇒ sang mục Chiến dịch luyện",
+      "count": 1
+    },
+    {
+      "file": "tests/omni-3-thay-nhieu-lop-0610.test.tsx",
+      "name": "màn: giao Bài cho nhiều lớp \"Bỏ tick\" theo lớp trong \"Sửa em / Bỏ tick theo lớp\": gọi bo-tick đúng lớp + khoá bài",
+      "count": 1
+    },
+    {
+      "file": "tests/sua-chien-dich-hop-2809.test.tsx",
+      "name": "nút Chỉnh sửa chiến dịch đang mở thêm em + sửa hạn ⇒ tóm tắt \"+1 em, hạn 05/10 → 07/10\"; Lưu mờ đi khi đang lưu, giữ chữ; lưu xong trả kết quả cho màn gọi",
+      "count": 1
+    },
+    {
+      "file": "tests/sua-chien-dich-hop-2809.test.tsx",
+      "name": "nút Chỉnh sửa chiến dịch đang mở hộp nằm trong vỏ màu app thầy (.m3.vo-thay) dù cổng ra document.body — không bị nền trong suốt (thầy 28/09)",
+      "count": 1
+    },
+    {
+      "file": "tests/sua-chien-dich-hop-2809.test.tsx",
+      "name": "nút Chỉnh sửa chiến dịch đang mở hạn mới trước hôm nay ⇒ báo ngay cạnh ô, không cho lưu",
+      "count": 1
+    },
+    {
+      "file": "tests/sua-chien-dich-hop-2809.test.tsx",
+      "name": "nút Chỉnh sửa chiến dịch đang mở rút hạn phải nâng số câu/ngày ⇒ hiện \"Số câu/ngày: 12 → 15 (để kịp hạn 02/10)\"; thầy nhập tay thấp hơn ⇒ cảnh báo vàng, vẫn cho lưu",
+      "count": 1
+    }
+  ]
+}

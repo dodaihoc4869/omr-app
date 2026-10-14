@@ -181,8 +181,8 @@ function raLoi(e: unknown): Response {
   return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
 }
 
-function ra(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
+function ra(data: unknown, status = 200,giuServerNow=false): Response {
+  return new Response(JSON.stringify({ ...(data as object), serverNow: giuServerNow&&Number.isFinite((data as {serverNow?:unknown}).serverNow)?(data as {serverNow:number}).serverNow:Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
 }
 
 async function traLoiNopBtvn(nop:()=>Promise<Response>):Promise<Response> {
@@ -3825,7 +3825,7 @@ const boXuLy = {
       }
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
       // GAME HÓA 2.0 (srs2-gv.ts): chiến dịch luyện — giao, đồng hồ sức chứa, bảng chiến dịch, buổi chữa, chữa xong, công tắc.
-      if (p === '/gv/goi-bai-7') return ra(await import('./goi-bai-7-thay').then(m=>m.gvGoi7(env,b)))
+      if (p === '/gv/goi-bai-7') return ra(await import('./goi-bai-7-thay').then(m=>m.gvGoi7(env,b)),200,b.action==='doc_em'||b.action==='sua_em')
       if (p === '/gv/kiem-tra-ca-nhan') return ra(await import('./kiem-tra-ca-nhan-thay').then(m=>m.gvKtCn(env,b,Date.now())))
       if (p === '/gv/ung-vien-chieu') return ra(await import('./ung-vien-chieu').then(m=>m.ungVienChieu(env,b)))
       if (p === '/gv/chien-dich') return ra(await gvChienDich(env, b))

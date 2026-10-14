@@ -1,0 +1,113 @@
+{
+  "mau": "SQLite cục bộ, 500 câu chưa gặp, 5000 attempts owned/6ref và 5000 gap câu cũ khác",
+  "coChiMuc": [
+    {
+      "ms": 1.9155540000001565,
+      "rows": 500
+    },
+    {
+      "ms": 2.0659310000000914,
+      "rows": 500
+    },
+    {
+      "ms": 1.937087000000247,
+      "rows": 500
+    },
+    {
+      "ms": 2.0150239999993573,
+      "rows": 500
+    },
+    {
+      "ms": 1.8730599999998958,
+      "rows": 500
+    }
+  ],
+  "truoc": [
+    {
+      "ms": 347.1724740000009,
+      "rows": 500
+    },
+    {
+      "ms": 349.27102399999967,
+      "rows": 500
+    },
+    {
+      "ms": 352.7475889999996,
+      "rows": 500
+    },
+    {
+      "ms": 339.5447469999999,
+      "rows": 500
+    },
+    {
+      "ms": 342.4501479999999,
+      "rows": 500
+    }
+  ],
+  "taoChiMucMs": 2.7829799999999523,
+  "plan": [
+    "CO-ROUTINE (subquery-21)",
+    "MATERIALIZE em",
+    "SEARCH hoc_sinh USING INDEX sqlite_autoindex_hoc_sinh_1 (sbd=?)",
+    "MATERIALIZE goi",
+    "MERGE (UNION)",
+    "LEFT",
+    "SCAN h",
+    "SEARCH g USING INDEX goi_bai_7_lop (lop=?)",
+    "SEARCH b USING INDEX sqlite_autoindex_bai_da_day_1 (id=?)",
+    "CORRELATED SCALAR SUBQUERY 2",
+    "SEARCH x USING INDEX sqlite_autoindex_goi_bai_7_chon_em_1 (goi_id=? AND sbd=?)",
+    "CORRELATED SCALAR SUBQUERY 3",
+    "SEARCH t USING COVERING INDEX sqlite_autoindex_goi_bai_7_tick_em_1 (tick_id=?)",
+    "CORRELATED SCALAR SUBQUERY 4",
+    "SEARCH t USING INDEX sqlite_autoindex_goi_bai_7_tick_em_1 (tick_id=?)",
+    "SCAN j VIRTUAL TABLE INDEX 1:",
+    "USE TEMP B-TREE FOR ORDER BY",
+    "RIGHT",
+    "SCAN g USING INDEX sqlite_autoindex_goi_bai_7_1",
+    "SEARCH b USING INDEX sqlite_autoindex_bai_da_day_1 (id=?)",
+    "SEARCH e USING COVERING INDEX sqlite_autoindex_goi_bai_7_em_1 (goi_id=?)",
+    "SEARCH h USING AUTOMATIC COVERING INDEX (sbd=?)",
+    "CORRELATED SCALAR SUBQUERY 6",
+    "SEARCH x USING INDEX sqlite_autoindex_goi_bai_7_chon_em_1 (goi_id=? AND sbd=?)",
+    "CORRELATED SCALAR SUBQUERY 7",
+    "SEARCH t USING COVERING INDEX sqlite_autoindex_goi_bai_7_tick_em_1 (tick_id=?)",
+    "CORRELATED SCALAR SUBQUERY 8",
+    "SEARCH t USING INDEX sqlite_autoindex_goi_bai_7_tick_em_1 (tick_id=?)",
+    "SCAN j VIRTUAL TABLE INDEX 1:",
+    "USE TEMP B-TREE FOR LAST 3 TERMS OF ORDER BY",
+    "SCAN h",
+    "SCAN g",
+    "SEARCH c USING INDEX sqlite_autoindex_goi_bai_7_cau_1 (goi_id=?)",
+    "CORRELATED SCALAR SUBQUERY 13",
+    "SEARCH c2 USING COVERING INDEX goi_bai_7_cau_qid (qid=?)",
+    "SEARCH g2 USING INDEX sqlite_autoindex_goi_bai_7_1 (id=?)",
+    "SEARCH e2 USING COVERING INDEX sqlite_autoindex_goi_bai_7_em_1 (goi_id=? AND sbd=?)",
+    "CORRELATED SCALAR SUBQUERY 10",
+    "SEARCH x USING INDEX sqlite_autoindex_goi_bai_7_chon_em_1 (goi_id=? AND sbd=?)",
+    "CORRELATED SCALAR SUBQUERY 11",
+    "SEARCH t USING COVERING INDEX sqlite_autoindex_goi_bai_7_tick_em_1 (tick_id=?)",
+    "CORRELATED SCALAR SUBQUERY 12",
+    "SEARCH t USING INDEX sqlite_autoindex_goi_bai_7_tick_em_1 (tick_id=?)",
+    "SCAN j VIRTUAL TABLE INDEX 1:",
+    "SEARCH b2 USING INDEX sqlite_autoindex_bai_da_day_1 (id=?)",
+    "CORRELATED SCALAR SUBQUERY 14",
+    "SEARCH a USING COVERING INDEX goi_bai_7_gap_sbd_qid (sbd=? AND qid=? AND version=?)",
+    "CORRELATED SCALAR SUBQUERY 15",
+    "SEARCH a USING COVERING INDEX game_v2_attempt_sbd_qid (sbd=? AND qid=?)",
+    "SEARCH ps USING INDEX sqlite_autoindex_game_v2_session_1 (id=?)",
+    "SCAN ref VIRTUAL TABLE INDEX 3:",
+    "CORRELATED SCALAR SUBQUERY 20",
+    "SEARCH su_kien_hoc USING INDEX idx_skh_em_qid_ngay (sbd=? AND qid=?)",
+    "CORRELATED SCALAR SUBQUERY 19",
+    "SEARCH c USING INDEX sqlite_autoindex_ca_1 (ma_ca=?)",
+    "CORRELATED SCALAR SUBQUERY 16",
+    "SEARCH cb_a USING COVERING INDEX idx_luot_em (ma_ca=?)",
+    "CORRELATED SCALAR SUBQUERY 17",
+    "SEARCH cb_a USING COVERING INDEX idx_luot_em (ma_ca=?)",
+    "CORRELATED SCALAR SUBQUERY 18",
+    "SEARCH cb_b USING COVERING INDEX idx_luot_ca_tt (ma_ca=? AND trang_thai=?)",
+    "USE TEMP B-TREE FOR DISTINCT",
+    "SCAN (subquery-21)"
+  ]
+}

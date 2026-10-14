@@ -8,3 +8,14 @@ export function theoDoiBaiDangGiao(nhan: (bai: readonly BaiDangGiaoThayDoi[]) =>
   nghe.add(nhan)
   return () => { nghe.delete(nhan) }
 }
+
+// ACK chỉnh danh sách/hạn có metadata thật: cập nhật cùng phiên, không khởi động vòng chờ Tick.
+export type MetadataBaiDangGiao = { lop: string; khoaBai: string; goiId: string; soEm?: number; han?: string; serverNow?: number }
+const ngheMetadata = new Set<(bai: readonly MetadataBaiDangGiao[]) => void>()
+export function baoMetadataBaiDangGiao(bai: readonly MetadataBaiDangGiao[]) {
+  if (bai.length) for (const nhan of ngheMetadata) nhan(bai)
+}
+export function theoDoiMetadataBaiDangGiao(nhan: (bai: readonly MetadataBaiDangGiao[]) => void) {
+  ngheMetadata.add(nhan)
+  return () => { ngheMetadata.delete(nhan) }
+}

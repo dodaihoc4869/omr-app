@@ -15,4 +15,13 @@ export const SQL_GOI7: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS goi_bai_7_muc_ngay (sbd TEXT NOT NULL,ngay TEXT NOT NULL,tang INTEGER NOT NULL,toi_thieu_tang INTEGER NOT NULL,quota INTEGER NOT NULL,muc INTEGER NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,ngay))`,
   // Hạn thầy sửa: nhật ký chỉ-thêm, đồng thời là biên nhận cho giao dịch đổi hạn/tính lại kế hoạch.
   `CREATE TABLE IF NOT EXISTS goi_bai_7_sua_han (id TEXT PRIMARY KEY,goi_id TEXT NOT NULL,han_cu TEXT NOT NULL,han_moi TEXT NOT NULL,luc TEXT NOT NULL)`,
+  // Chỉ mục cho cổng câu mới theo em/QID/bản hiện tại; EXISTS không quét toàn bộ sổ hay JSON đề.
+  `CREATE INDEX IF NOT EXISTS goi_bai_7_cau_qid ON goi_bai_7_cau(qid,version,goi_id)`,
+  `CREATE INDEX IF NOT EXISTS goi_bai_7_gap_sbd_qid ON goi_bai_7_gap(sbd,qid,version)`,
+  `CREATE INDEX IF NOT EXISTS game_v2_attempt_sbd_qid ON game_v2_attempt(sbd,qid,session)`,
+  // Quyết định nhận bài và biên nhận CHỈ THÊM. Không xóa membership/sổ gặp khi thầy bớt em.
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_tick_em (tick_id TEXT PRIMARY KEY,sbd_json TEXT NOT NULL,luc TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_chon_em (goi_id TEXT NOT NULL,sbd TEXT NOT NULL,nhan INTEGER NOT NULL CHECK(nhan IN(0,1)),luc TEXT NOT NULL,PRIMARY KEY(goi_id,sbd))`,
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_revision (goi_id TEXT PRIMARY KEY,revision INTEGER NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_sua_em (goi_id TEXT NOT NULL,request_id TEXT NOT NULL,payload TEXT NOT NULL,nonce TEXT NOT NULL,ack_json TEXT NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(goi_id,request_id))`,
 ]

@@ -1,0 +1,25 @@
+{
+  "base": {
+    "passed": 20,
+    "failed": 2,
+    "failedNames": [
+      "chạy thử lúc mở ca → chốt lúc Bắt đầu chạy thử cả lớp; Bắt đầu dùng LẠI bộ đã chạy thử, chỉ rút thêm cho em vào sau; câu song sinh được nối vào kho ca (bản em không có đáp án)",
+      "chạy thử lúc mở ca → chốt lúc Bắt đầu nối kho hỏng ⇒ rút lại chỉ từ kho ca (không phát câu máy em không có) và nói ra"
+    ]
+  },
+  "head439": {
+    "passed": 20,
+    "failed": 2,
+    "failedNames": [
+      "chạy thử lúc mở ca → chốt lúc Bắt đầu chạy thử cả lớp; Bắt đầu dùng LẠI bộ đã chạy thử, chỉ rút thêm cho em vào sau; câu song sinh được nối vào kho ca (bản em không có đáp án)",
+      "chạy thử lúc mở ca → chốt lúc Bắt đầu nối kho hỏng ⇒ rút lại chỉ từ kho ca (không phát câu máy em không có) và nói ra"
+    ]
+  },
+  "sameFailedNames": true,
+  "scope": [
+    "btvn-nang-do-lich-gio-2109",
+    "migration-chua-cli",
+    "rut-de-v2-0210-may-thay"
+  ],
+  "note": "Ba tên lỗi mới dạng STACK_TRACE_ERROR trong full439 được chạy lại cùng nền2f; btvn/migration cùng xanh, rut-de hai tên lỗi trùng main. Không sửa timeout/test/luật chấm để che lỗi."
+}

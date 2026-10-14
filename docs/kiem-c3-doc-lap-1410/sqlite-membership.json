@@ -1,0 +1,117 @@
+{
+  "duLieu": "SQLite :memory: thật, SQL source được load bằng Vite; không D1/Worker runtime/production",
+  "repo": "mã nguồn a2da228b",
+  "hash": "a2da228b154a44b494aa770ae411f14104566210",
+  "rows": [
+    {
+      "name": "read-minimal-and-no-answer-data",
+      "ok": true,
+      "queries": 1
+    },
+    {
+      "name": "add-remove-only-changed-plans-and-keep-history",
+      "ok": true,
+      "ackMembers": [
+        "A",
+        "C"
+      ],
+      "unchangedTables": [
+        "goi_bai_7",
+        "goi_bai_7_cau",
+        "goi_bai_7_gap",
+        "goi_bai_7_chua",
+        "goi_bai_7_kiem",
+        "lich_su",
+        "game_v2_session",
+        "game_v2_attempt",
+        "kiem_tra_ca_nhan"
+      ]
+    },
+    {
+      "name": "durable-remove-auto-enroll-then-intentional-readd",
+      "ok": true,
+      "syncRounds": 5
+    },
+    {
+      "name": "idempotency-exact-ack-and-payload-tamper",
+      "ok": true,
+      "receipts": 1
+    },
+    {
+      "name": "parallel-cas-only-one-winner",
+      "ok": true,
+      "winner": "REQ1"
+    },
+    {
+      "name": "exam-opens-after-read-atomic-cas",
+      "ok": true,
+      "code": "xung_dot"
+    },
+    {
+      "name": "flag-disabled-after-read-atomic-cas",
+      "ok": true,
+      "code": "xung_dot"
+    },
+    {
+      "name": "tick-removed-after-read-atomic-cas",
+      "ok": true,
+      "code": "xung_dot"
+    },
+    {
+      "name": "student-moves-after-read-atomic-cas",
+      "ok": true,
+      "code": "xung_dot"
+    },
+    {
+      "name": "student-locked-after-read-atomic-cas",
+      "ok": true,
+      "code": "xung_dot"
+    },
+    {
+      "name": "reject-wrong-class-all-or-none",
+      "ok": true,
+      "code": "khong_hop_le"
+    },
+    {
+      "name": "reject-locked-all-or-none",
+      "ok": true,
+      "code": "khong_hop_le"
+    },
+    {
+      "name": "reject-duplicate-all-or-none",
+      "ok": true,
+      "code": "khong_hop_le"
+    },
+    {
+      "name": "reject-add-remove-overlap-all-or-none",
+      "ok": true,
+      "code": "khong_hop_le"
+    },
+    {
+      "name": "reject-mixed-valid-invalid-all-or-none",
+      "ok": true,
+      "code": "khong_hop_le"
+    },
+    {
+      "name": "batch-error-rolls-back-receipt-and-members",
+      "ok": true,
+      "failureStatement": 4
+    },
+    {
+      "name": "remove-all-keeps-tick-and-history",
+      "ok": true,
+      "members": 0
+    },
+    {
+      "name": "new-tick-explicit-selection-and-old-default",
+      "ok": true,
+      "selected": [
+        "A"
+      ],
+      "legacyDefault": [
+        "A",
+        "B"
+      ]
+    }
+  ]
+}

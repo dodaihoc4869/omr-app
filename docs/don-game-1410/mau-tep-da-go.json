@@ -2,7 +2,8 @@
   "base": "888c34d4",
   "evidence": [
     "C1-kiem-ke.json",
-    "C2-do-thi.json"
+    "C2-do-thi.json",
+    "C2-thay-the-kiem-ke.json"
   ],
   "files": [
     {
@@ -78,8 +79,20 @@
       "sha256": "06556f286302d18ddb5cc885de293189f369eb555c6e87e825796c28c584d31f"
     },
     {
+      "path": "src/components/chien-dich/HopChon.tsx",
+      "sha256": "5d489429d471dd69ff5f2356721e06c32fedfb6b23df475606db3a01441d34a1"
+    },
+    {
       "path": "src/components/chien-dich/NutGiaoTheoBai.tsx",
       "sha256": "531d4a665a169284dc25a3011fb67c47befc383c438e08f027f3868819d53020"
+    },
+    {
+      "path": "src/components/chien-dich/SuaChienDich.tsx",
+      "sha256": "476a403cb22024355c80f86758bbcc3ac7d407be9369892d372d4704bd237677"
+    },
+    {
+      "path": "src/components/chien-dich/sua-chien-dich.css",
+      "sha256": "2859595e1a63e46d63a8c0ac0a4ff26f9bc6144bfa33c541daecdf509dc84762"
     },
     {
       "path": "src/components/hoa2/CanhSanh3D.tsx",
@@ -828,6 +841,10 @@
     {
       "path": "src/lib/toan-man-hinh-game.ts",
       "sha256": "71ea1a425a7bef9ec84bd17216564aa78591335119ef8ac7984005b62197611a"
+    },
+    {
+      "path": "src/lib/tom-tat-sua-chien-dich.ts",
+      "sha256": "ba528a98188fc122832c3858a6f4f37a284f4da649f606c1d7cd27c6fa45ade7"
     },
     {
       "path": "src/screens/TongQuanScreen.tsx",

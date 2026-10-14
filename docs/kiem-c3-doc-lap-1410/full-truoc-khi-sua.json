@@ -1,0 +1,130 @@
+{
+  "baseCommit": "2f91f0e402b9a737bca370236d492cf86f27dc4b",
+  "sourceCommit": "439a6f29be18ae38dc3ea44e4fe71da06dccfeb7",
+  "base": {
+    "passed": 14293,
+    "failed": 120,
+    "pending": 27,
+    "files": 1106,
+    "failedFiles": 59,
+    "emptyFailedSuites": 0
+  },
+  "head": {
+    "passed": 14345,
+    "failed": 127,
+    "pending": 27,
+    "files": 1107,
+    "failedFiles": 65,
+    "emptyFailedSuites": 0
+  },
+  "newFailedTests": [
+    {
+      "file": "tests/btvn-nang-do-lich-gio-2109.test.ts",
+      "name": "DEADLINE THẮNG: mọi mốc mở < hạn, không giảm, ở mọi hạn/giờ chốt lưới 4 giờ chốt × 7 hạn: lịch lưu hợp lệ; hạn ≤ 48 giờ ⇒ ngan; > 48 giờ ⇒ dai hoặc ngan (tải); chặng 0 = lúc chốt",
+      "total": 1,
+      "failed": 1,
+      "pending": 0,
+      "baseFailed": 0
+    },
+    {
+      "file": "tests/do-toi-uu-may-chu-2809.test.ts",
+      "name": "ĐO vòng D1 (in ra để so trước/sau) Sảnh hoa2 (mở lần 2 trong ngày: kế hoạch đã chốt)",
+      "total": 1,
+      "failed": 1,
+      "pending": 0,
+      "baseFailed": 0
+    },
+    {
+      "file": "tests/hanh-trinh-bai-thu-suc-0910.test.ts",
+      "name": "hoa2-sanh giữ chi phí mở lại khi có nguồn dự phòng mở lại và sau đủ sàn không thêm lệnh; lần đầu chỉ thêm tối đa hai lệnh chuẩn bị nguồn",
+      "total": 1,
+      "failed": 1,
+      "pending": 0,
+      "baseFailed": 0
+    },
+    {
+      "file": "tests/khong-cu-phap-may-cu-2109.test.ts",
+      "name": "không dùng cú pháp / API mà iPhone cũ (iOS 14–15) không chạy được MỌI tệp src/**/*.{ts,tsx} (trừ graphify-out): 0 vi phạm",
+      "total": 1,
+      "failed": 1,
+      "pending": 0,
+      "baseFailed": 0
+    },
+    {
+      "file": "tests/migration-chua-cli.test.ts",
+      "name": "migration vòng chữa áp hai lần trên D1 cục bộ, giữ nguyên dữ liệu đã có",
+      "total": 1,
+      "failed": 1,
+      "pending": 0,
+      "baseFailed": 0
+    },
+    {
+      "file": "tests/ph-tat-ca-ve-con-may-chu-2109.test.ts",
+      "name": "luật che THEO CÂU — mọi kênh; danh sách ⇔ chi tiết P0: lỗi đọc truy vấn gộp ⇒ lùi về docCauBtvnChuaNop (vẫn che câu được giao); lỗi cả hai ⇒ KHÔNG che thêm, KHÔNG sập bảng, có ghi console",
+      "total": 1,
+      "failed": 1,
+      "pending": 0,
+      "baseFailed": 0
+    },
+    {
+      "file": "tests/rut-de-v2-0210-may-thay.test.tsx",
+      "name": "chạy thử lúc mở ca → chốt lúc Bắt đầu chạy thử cả lớp; Bắt đầu dùng LẠI bộ đã chạy thử, chỉ rút thêm cho em vào sau; câu song sinh được nối vào kho ca (bản em không có đáp án)",
+      "total": 1,
+      "failed": 1,
+      "pending": 0,
+      "baseFailed": 0
+    }
+  ],
+  "newFailedFiles": [
+    "tests/btvn-nang-do-lich-gio-2109.test.ts",
+    "tests/do-toi-uu-may-chu-2809.test.ts",
+    "tests/hanh-trinh-bai-thu-suc-0910.test.ts",
+    "tests/khong-cu-phap-may-cu-2109.test.ts",
+    "tests/migration-chua-cli.test.ts",
+    "tests/ph-tat-ca-ve-con-may-chu-2109.test.ts"
+  ],
+  "newEmptyFailedSuites": [],
+  "newSkippedTests": [],
+  "removedTests": [
+    {
+      "file": "tests/ngay-bat-dau-giao-dien-2809.test.tsx",
+      "name": "hộp Chỉnh sửa: ngày bắt đầu chưa bắt đầu ⇒ đổi được, tóm tắt \"bắt đầu 01/10 → 02/10\", gửi batDau",
+      "count": 1
+    },
+    {
+      "file": "tests/ngay-bat-dau-giao-dien-2809.test.tsx",
+      "name": "hộp Chỉnh sửa: ngày bắt đầu đã bắt đầu ⇒ ô khoá kèm chú thích",
+      "count": 1
+    },
+    {
+      "file": "tests/omni-3-thay-bai-hom-nay.test.tsx",
+      "name": "chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của chiến dịch cũ + chọn theo điểm danh) bài ĐÃ tick: \"Đã giao N em\" + \"Sửa em\" mở hộp sửa chiến dịch sẵn có; không có mã chiến dịch ⇒ sang mục Chiến dịch luyện",
+      "count": 1
+    },
+    {
+      "file": "tests/omni-3-thay-nhieu-lop-0610.test.tsx",
+      "name": "màn: giao Bài cho nhiều lớp \"Bỏ tick\" theo lớp trong \"Sửa em / Bỏ tick theo lớp\": gọi bo-tick đúng lớp + khoá bài",
+      "count": 1
+    },
+    {
+      "file": "tests/sua-chien-dich-hop-2809.test.tsx",
+      "name": "nút Chỉnh sửa chiến dịch đang mở thêm em + sửa hạn ⇒ tóm tắt \"+1 em, hạn 05/10 → 07/10\"; Lưu mờ đi khi đang lưu, giữ chữ; lưu xong trả kết quả cho màn gọi",
+      "count": 1
+    },
+    {
+      "file": "tests/sua-chien-dich-hop-2809.test.tsx",
+      "name": "nút Chỉnh sửa chiến dịch đang mở hộp nằm trong vỏ màu app thầy (.m3.vo-thay) dù cổng ra document.body — không bị nền trong suốt (thầy 28/09)",
+      "count": 1
+    },
+    {
+      "file": "tests/sua-chien-dich-hop-2809.test.tsx",
+      "name": "nút Chỉnh sửa chiến dịch đang mở hạn mới trước hôm nay ⇒ báo ngay cạnh ô, không cho lưu",
+      "count": 1
+    },
+    {
+      "file": "tests/sua-chien-dich-hop-2809.test.tsx",
+      "name": "nút Chỉnh sửa chiến dịch đang mở rút hạn phải nâng số câu/ngày ⇒ hiện \"Số câu/ngày: 12 → 15 (để kịp hạn 02/10)\"; thầy nhập tay thấp hơn ⇒ cảnh báo vàng, vẫn cho lưu",
+      "count": 1
+    }
+  ]
+}
