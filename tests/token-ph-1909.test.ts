@@ -1,5 +1,6 @@
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
+// 14/10: gỡ lệnh chết /ph/thoi-gian-hoc, /hs/thoi-gian-hoc — bỏ 2 ca đặt số phút học.
 // TOKEN PHỤ HUYNH — GIAI ĐOẠN MỀM (server/src/ph-truy-cap.ts; hợp đồng docs/token-phu-huynh-1909.md). SQLite thật, lược đồ thật + mọi migration.
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'
@@ -170,35 +171,6 @@ describe('/ph/xac-dinh và /ph/ke-hoach: chỉ nhận token', () => {
     for (const cam of ['T1', 'T2', 'T3', 'chiTiet', 'ghiChu', 'noiDung', 'qid', 'sbd', 'B1', 'DE12']) expect(chuoi, cam).not.toContain(cam)
     expect(d.sql.prepare("SELECT COUNT(*) AS n FROM ke_hoach_ngay WHERE sbd='S1'").get()).toEqual({ n: 1 })
     expect(d.sql.prepare("SELECT COUNT(*) AS n FROM ke_hoach_ngay WHERE sbd='S2'").get()).toEqual({ n: 0 })
-  })
-})
-
-describe('/ph/thoi-gian-hoc: phụ huynh xem và đặt số phút học mỗi ngày của con', () => {
-  it('đọc mặc định 20; đặt 30 ⇒ lưu study_preferences, kế hoạch dùng ngay; 9, 46, chữ ⇒ từ chối và KHÔNG đổi; token của em A không đổi em B', async () => {
-    const d = await dung()
-    const t = await parentPass(d.env, 'S1')
-    expect(await goi(d, '/ph/thoi-gian-hoc', { pass: t })).toMatchObject({ ok: true, phut: 20, laMacDinh: true, toiThieu: 10, toiDa: 45 })
-    expect(await goi(d, '/ph/thoi-gian-hoc', { pass: t, phut: 30, sbd: 'S2' })).toMatchObject({ ok: true, phut: 30, laMacDinh: false })
-    expect(d.sql.prepare('SELECT sbd, minutes FROM study_preferences ORDER BY sbd').all()).toEqual([{ sbd: 'S1', minutes: 30 }])
-    expect((await goi(d, '/ph/ke-hoach', { pass: t })).phutMoiNgay).toBe(30)
-    for (const xau of [9, 46, 'abc', 0, -5, 1000]) {
-      const r = await goi(d, '/ph/thoi-gian-hoc', { pass: t, phut: xau })
-      expect(r.ok, String(xau)).toBe(false)
-      expect(String(r.error)).toMatch(/từ 10 đến 45/)
-    }
-    expect(d.sql.prepare("SELECT minutes FROM study_preferences WHERE sbd='S1'").get()).toEqual({ minutes: 30 })
-    expect((await goi(d, '/ph/thoi-gian-hoc', { pass: t, phut: 10 })).phut).toBe(10)
-    expect((await goi(d, '/ph/thoi-gian-hoc', { pass: t, phut: 45 })).phut).toBe(45)
-    expect(await goi(d, '/ph/thoi-gian-hoc', { sbd: 'S1', phut: 15 })).toMatchObject({ ok: false })
-    expect(d.sql.prepare("SELECT minutes FROM study_preferences WHERE sbd='S1'").get()).toEqual({ minutes: 45 })
-  })
-  it('lệnh của em `/hs/thoi-gian-hoc` vẫn chạy như cũ (dùng chung một hàm ghi)', async () => {
-    const d = await dung()
-    const tk = await gameToken(d.env, 'S1')
-    expect(await goi(d, '/hs/thoi-gian-hoc', { token: tk, phut: 25 })).toMatchObject({ ok: true, phut: 25 })
-    expect((await goi(d, '/hs/thoi-gian-hoc', { token: tk, phut: 99 })).ok).toBe(false)
-    expect(d.sql.prepare("SELECT minutes FROM study_preferences WHERE sbd='S1'").get()).toEqual({ minutes: 25 })
-    expect(await goi(d, '/ph/thoi-gian-hoc', { pass: await parentPass(d.env, 'S1') })).toMatchObject({ phut: 25, laMacDinh: false })
   })
 })
 

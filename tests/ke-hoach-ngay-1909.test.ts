@@ -1,5 +1,6 @@
 // @vitest-environment node
 // GĐ 2 — KẾ HOẠCH NGÀY (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.3, nghiệm thu GĐ 2).
+// 14/10: gỡ lệnh chết /hs/thoi-gian-hoc — bỏ ca em tự đặt số phút/ngày.
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'
 import { gameToken } from '../server/src/game-v2-auth'
@@ -420,21 +421,6 @@ describe('D1 thật: /hs/ke-hoach-ngay, lưu, chốt ngày, cron', () => {
     expect(kh.chuoiDat).toBe(2)
   })
 
-  it('em đặt phút/ngày (cần token, 10–45): kế hoạch phản ánh; token sai/không hợp lệ bị từ chối', async () => {
-    const d = taoD1That()
-    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES('S1','Em','mk','x')").run()
-    const token = await gameToken(d.env, 'S1')
-    expect((await goiWorker(worker, d.env, '/hs/thoi-gian-hoc', { token, phut: 5 })).ok).toBe(false)
-    expect((await goiWorker(worker, d.env, '/hs/thoi-gian-hoc', { token, phut: 46 })).ok).toBe(false)
-    await expect(hsThoiGianHoc(d.env, { token: token + 'x', phut: 20 })).rejects.toThrow()
-    expect((await goiWorker(worker, d.env, '/hs/thoi-gian-hoc', { token, phut: 10 })).ok).toBe(true)
-    const kh = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { token })
-    expect(kh.nganSach).toMatchObject({ phutNgay: 10, phutNgayLaMacDinh: false, mucTieuCau: 8 })
-    const d2 = taoD1That()
-    themHs(d2, 'S9')
-    const mac = await goiWorker(worker, d2.env, '/hs/ke-hoach-ngay', { sbd: 'S9' })
-    expect(mac.nganSach).toMatchObject({ phutNgay: 20, phutNgayLaMacDinh: true })
-  })
 
   it('cron cả lớp: lập kế hoạch cho mọi em (không khoá), chốt ngày cũ; ≤ 50 em/lô và số câu truy vấn KHÔNG tăng theo số em', async () => {
     const d = taoD1That()

@@ -1,5 +1,6 @@
 // @vitest-environment node
 // OMNI 3 · LÀN B3 — (1) LỌC LƯỚT ở mọi bộ đọc sổ đang bỏ 'xem_loi_giai': thêm dòng lướt (purpose 'luot', ket_qua NULL) KHÔNG đổi kết quả;
+// 14/10: gỡ lệnh chết /gv/cau-sai-mo-coi (cau-sai-mo-coi.ts) — bỏ phần so "câu sai mồ côi".
 // không có dòng lướt ⇒ y cũ (bộ test cũ của từng mô-đun giữ xanh). (2) FSRS 4 mức: thiếu tự tin/nhãn tốc độ ⇒ Again/Good y hệt; có ⇒ Hard/Easy.
 import { describe, expect, it } from 'vitest'
 import { createEmptyCard, fsrs, Rating, type Card } from 'ts-fsrs'
@@ -8,7 +9,6 @@ import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import { docSuKienDoc, phatLaiSuKien, xoaBietCotHoTro, type SuKienDoc } from '../server/src/ho-so-nam-kt'
 import { docSuKienNL, xoaBietCotChuanNL } from '../server/src/nang-luc-d1'
 import { docQidSaiV2 } from '../server/src/hang-chua-loi'
-import { gvCauSaiMoCoi } from '../server/src/cau-sai-mo-coi'
 import { docCauDaDung } from '../server/src/cau-da-dung'
 import { CAU_HINH_FSRS, hangFsrsTu, PHIEN_BAN_FSRS, taoLichOnFsrs } from '../server/src/lich-on-fsrs'
 import { MUC_DICH_LUOT } from '../server/src/omni-kieu'
@@ -61,12 +61,9 @@ describe('OMNI 3 · B3 — lọc lướt ở bộ đọc sổ', () => {
     expect(rb).toEqual(ra)
     expect(ra.ds.length).toBe(GOC.length)
   })
-  it('hàng chữa lỗi (docQidSaiV2), câu sai mồ côi, câu đã đúng: thêm dòng lướt không đổi kết quả', async () => {
+  it('hàng chữa lỗi (docQidSaiV2), câu đã đúng: thêm dòng lướt không đổi kết quả', async () => {
     const a = await dung(GOC), b = await dung([...GOC, ...LUOT])
     expect(await docQidSaiV2(b.env, 'S1')).toEqual(await docQidSaiV2(a.env, 'S1'))
-    // Q1: lần tự làm cuối là ĐÚNG (lướt sau đó không phải một lần làm) ⇒ không thành "câu sai bỏ trống"
-    const ma = await gvCauSaiMoCoi(a.env, {}), mb = await gvCauSaiMoCoi(b.env, {})
-    expect(mb).toEqual(ma)
     expect(await docCauDaDung(b.env, ['S1'])).toEqual(await docCauDaDung(a.env, ['S1']))
   })
 })

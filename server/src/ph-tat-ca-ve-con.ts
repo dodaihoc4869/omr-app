@@ -54,7 +54,7 @@ export const SO_NGAY_VUA_LEN_BAC = 3
 export const PHIEN_CACH_TOI_DA_PHUT = 10
 export const TOI_DA_CAU_HOM_NAY = 120
 export const DE_RUT_GON_TOI_DA = 160
-export const TOI_DA_TRUY_VAN = 15 // 12 + 1 truy vấn gộp thử thách riêng + lần nhắc hạn (bảng kiểu Apple, 21/09) + 1 câu của bài chưa nộp (che theo bài, 21/09) + 1 điểm danh buổi học (đợt 19, cùng đợt đầu)
+ // 12 + 1 truy vấn gộp thử thách riêng + lần nhắc hạn (bảng kiểu Apple, 21/09) + 1 câu của bài chưa nộp (che theo bài, 21/09) + 1 điểm danh buổi học (đợt 19, cùng đợt đầu)
 /** Câu làm từ chừng này giây trở lên là "làm lâu" (bộ lọc "Làm lâu" ở bảng phụ huynh; máy khách không phải chép ngưỡng). */
 export const NGUONG_LAM_LAU_GIAY = 120
 export const SO_NGAY_LICH_ON_TOI = 7

@@ -1,6 +1,6 @@
 // Các route chỉ đặt sau cổng laThay trong Worker. Học liệu không bao giờ đi route học sinh.
 import type { Env } from './kieu'
-import { chuanCauHinh, docCauHinh, xoaDemChua } from './chua-cau-sai-cau-hinh'
+import { docCauHinh } from './chua-cau-sai-cau-hinh'
 import { kiemTinhDayDu } from './chua-cau-sai-hoc-lieu'
 import { kiemBangMay } from './chua-hoc-lieu-kiem-may'
 import { giaoDotCuaEm } from './chua-cau-sai'
@@ -10,23 +10,6 @@ import type { HocLieuChua } from './chua-cau-sai-kieu'
 import { dongBoTuLuyen } from './chua-cau-sai-tu-luyen'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
-export async function cauHinhThay(env: Env, b: Obj): Promise<Response> {
-  if (b.luu === true) {
-    const cfg = chuanCauHinh(b.cauHinh)
-    if ((b.cauHinh as Obj)?.bat === true && !cfg.bat)
-      return Response.json(
-        { ok: false, mo: 'Cần chọn lớp hoặc học sinh trước khi bật pilot.' },
-        { status: 422 },
-      )
-    await env.DB.prepare(
-      `INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('chua_cau_sai_v1',?,?) ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri,cap_nhat_luc=excluded.cap_nhat_luc`,
-    )
-      .bind(JSON.stringify(cfg), new Date().toISOString())
-      .run()
-    xoaDemChua(env)
-  }
-  return Response.json({ ok: true, cauHinh: await docCauHinh(env) })
-}
 export async function hocLieuThay(env: Env, b: Obj): Promise<Response> {
   if (b.luu !== true && str(b.qid)) {
     const row = await env.DB.prepare(
@@ -159,12 +142,6 @@ export async function hocLieuThay(env: Env, b: Obj): Promise<Response> {
   ).all()
   return Response.json({ ok: true, ds: rows.results ?? [] })
 }
-export async function hangHocLieu(env: Env): Promise<Response> {
-  const rows = await env.DB.prepare(
-    `SELECT qid_chuan AS qid,phien_ban_cau AS version,trang_thai_day AS trangThai,ly_do_thieu AS lyDo,COUNT(*) AS soDot,COUNT(DISTINCT sbd) AS soEm,MIN(chot_do_luc) AS hanGanNhat FROM chua_loi_dot WHERE dong_luc IS NULL AND trang_thai_day IN ('thieu_hoc_lieu','cau_thay_doi','tam_khoa') GROUP BY qid_chuan,phien_ban_cau,trang_thai_day,ly_do_thieu ORDER BY soEm DESC,hanGanNhat ASC LIMIT 200`,
-  ).all()
-  return Response.json({ ok: true, ds: rows.results ?? [] })
-}
 export async function giaoPilot(env: Env, b: Obj): Promise<Response> {
   const cfg = await docCauHinh(env)
   if (!cfg.bat)
@@ -238,33 +215,4 @@ export async function dongBoTuCu(env: Env, b: Obj): Promise<Response> {
       { status: 503 },
     )
   return Response.json({ ok: true, con: true, cursor: row.id })
-}
-export async function hangThay(env: Env, b: Obj): Promise<Response> {
-  if (b.moLai === true || str(b.loiGo) || b.xong === true)
-    return Response.json(
-      {
-        ok: false,
-        mo: 'Chữa bước cuối tại Lên bảng → Câu cần chữa; bấm Thầy chữa trên tờ để các em có mặt tiếp tục tự kiểm.',
-      },
-      { status: 422 },
-    )
-  const rows = await env.DB.prepare(
-    `SELECT t.dot_id AS dotId,t.sbd,h.ho_ten AS hoTen,t.qid,t.bang_chung_json AS bangChung,t.gui_luc AS guiLuc,d.trang_thai_day AS trangThai,d.ly_do_thieu AS lyDoThieu FROM chua_loi_thay t LEFT JOIN hoc_sinh h ON h.sbd=t.sbd JOIN chua_loi_dot d ON d.id=t.dot_id WHERE t.trang_thai='cho_thay' ORDER BY t.gui_luc ASC LIMIT 100`,
-  ).all()
-  const ds = rows.results ?? []
-  const ns = await env.DB.prepare(
-    `SELECT n.dot_id AS dotId,n.tra_loi AS traLoi,n.dung,n.co_ho_tro AS coHoTro,i.public_json AS cau FROM chua_loi_nop n JOIN chua_loi_item i ON i.id=n.item_id WHERE n.dot_id IN (SELECT value FROM json_each(?)) ORDER BY n.nop_luc DESC LIMIT 1200`,
-  )
-    .bind(JSON.stringify(ds.map((x: any) => x.dotId)))
-    .all<any>()
-  return Response.json({
-    ok: true,
-    ds: ds.map((x: any) => ({
-      ...x,
-      baiLam: (ns.results ?? [])
-        .filter((n) => n.dotId === x.dotId)
-        .slice(0, 12)
-        .map((n) => ({ ...n, cau: JSON.parse(n.cau) })),
-    })),
-  })
 }

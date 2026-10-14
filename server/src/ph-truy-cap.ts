@@ -11,8 +11,8 @@ import { canhBaoChoPh, phXemCanhBao } from './canh-bao-thay'
 import type { Env, ExecutionContext } from './kieu'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import { parentIdentity, parentPass } from './game-v2-auth'
-import { PHUT_NGAY_MAC_DINH, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-so-cau-hinh'
-import { datPhutMoiNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
+import { PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-so-cau-hinh'
+import { lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 import { viecPhu } from './viec-phu'
 
 export type KieuTruyCap = 'token' | 'sbd_tran'
@@ -122,18 +122,6 @@ export async function phCanhBaoXem(env: Env, b: Record<string, unknown>): Promis
   return { ...(await phXemCanhBao(env, sbd, String(b.id ?? ''))) }
 }
 
-/** `POST /ph/thoi-gian-hoc {pass, phut?}` — phụ huynh xem hoặc đặt số phút học mỗi ngày của con (10–45). Không có `phut` thì chỉ đọc. Chỉ nhận token. */
-export async function phThoiGianHoc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-thoi-gian-hoc', { chiToken: true })
-  if (b.phut !== undefined && b.phut !== null) {
-    const r = await datPhutMoiNgay(env, sbd, b.phut)
-    if (r.ok !== true) return r
-  }
-  const row = await env.DB.prepare('SELECT minutes FROM study_preferences WHERE sbd = ?').bind(sbd).first<{ minutes: number | null }>()
-  const dat = Number(row?.minutes)
-  const coDat = Number.isFinite(dat) && dat >= PHUT_NGAY_TOI_THIEU && dat <= PHUT_NGAY_TOI_DA
-  return { ok: true, phut: coDat ? dat : PHUT_NGAY_MAC_DINH, laMacDinh: !coDat, toiThieu: PHUT_NGAY_TOI_THIEU, toiDa: PHUT_NGAY_TOI_DA }
-}
 
 // --- Lệnh của THẦY (đòi mã bí mật) -------------------------------------------------------------------------------
 

@@ -109,17 +109,12 @@ export const CUA_SO_LOI_NGAY = 7
 export const SO_LOI_MO_DOT = 3
 /** Ít nhất bấy nhiêu family đã xác minh trong ba lỗi đó (§3.3). */
 export const SO_FAMILY_LOI = 2
-/** Hai câu chính liên tiếp sai trong lượt ⇒ giảm độ khó phần chưa mở (§3.3). */
-export const SAI_LIEN_TIEP_CAN_HO_TRO = 2
 /** Phục hồi: cách lần hướng dẫn ≥ bấy nhiêu nhiệm vụ khác (§3.3). */
 export const NHIEM_VU_CACH_PHUC_HOI = 2
 /** Phục hồi: HOẶC ≥ bấy nhiêu giây hoạt động hợp lệ kể từ lần hướng dẫn (§3.3). */
 export const GIAY_HOAT_DONG_PHUC_HOI = 300
 /** `stable`: lần độc lập đúng ở NGÀY KHÁC, cách `recovered` ≥ 24 giờ (§3.3, THAM-SO `stableGapSeconds`). */
 export const GIAY_CACH_STABLE = 86_400_000
-/** Mỗi skill chỉ mở một đợt cần dạy lại tại một thời điểm (§3.3), và mỗi skill/ngày tối đa một probe (§3.2.3). */
-export const SO_DOT_MO_MOI_SKILL = 1
-export const SO_PROBE_MOI_SKILL_NGAY = 1
 
 // --- Điểm chọn câu §7.2 (P05) ---------------------------------------------------
 // Nguồn: 02 §7.2 + THAM-SO.json `planning.scoreWeights`. BẢN DUY NHẤT — `bo-chon-diem.ts` không tự khai lại.

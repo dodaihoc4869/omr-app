@@ -17,7 +17,6 @@ const api = vi.hoisted(() => ({
   apiPhatItem: vi.fn(),
   apiNopItem: vi.fn(),
   apiXinGoiY: vi.fn(),
-  apiGuiThay: vi.fn(),
   apiCoChua: vi.fn(),
 }))
 vi.mock('../src/lib/chua-cau-sai-api', () => api)

@@ -1,9 +1,10 @@
 // @vitest-environment node
+// 14/10: gỡ lệnh chết /hs/chua-cau-sai/gui-thay (guiThay).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That, goiWorker } from './_d1-that'
 import { seedChua, Q, probe } from './_chua-cau-sai-fixture'
 import { gameToken } from '../server/src/game-v2-auth'
-import { moDot, phatItem, nopItem, guiThay } from '../server/src/chua-cau-sai'
+import { moDot, phatItem, nopItem } from '../server/src/chua-cau-sai'
 import { daChuaTrenLop, hangChieu } from '../server/src/chua-cau-sai-chieu'
 import { xoaDemChua } from '../server/src/chua-cau-sai-cau-hinh'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
@@ -103,11 +104,11 @@ async function body(d: Awaited<ReturnType<typeof dung>>) {
   }
 }
 describe('Chữa cuối trên lớp — Worker và SQLite thật', () => {
-  it('không gửi thầy ở giữa vòng tự chữa; route danh sách/ghi chỉ thầy truy cập', async () => {
+  it('không có đường gửi thầy giữa vòng tự chữa; route danh sách/ghi chỉ thầy truy cập', async () => {
     const d = taoD1That(),
       token = await seedChua(d.env),
       id = (await (await moDot(d.env, { token, qid: Q })).json()).dotId
-    expect((await guiThay(d.env, { token, dotId: id })).status).toBe(409)
+    void id // 14/10: lệnh "gửi thầy" (guiThay, /hs/chua-cau-sai/gui-thay) đã gỡ — em không có đường gửi thầy giữa vòng tự chữa
     expect(d.dem('chua_loi_thay')).toBe(0)
     expect(
       (await goiWorker(worker, d.env, '/gv/chua-cau-sai/hang-chieu', { token }))

@@ -20,8 +20,6 @@
 import { kiemTraAnhChup, LoiAnhChup, type AnhChupNhiemVu, type Phan } from './cnh-exp-task'
 import { chamTheoPolicy, ChamInputError, ChamMaterialError, type GradingResult } from '../../src/lib/cham-so-policy'
 
-/** Version tag for the grading-material contracts understood by this adapter. */
-export const GRADING_MATERIAL_VERSION = 'CNH-1.0' as const
 
 /** Typed error codes for grading failures. */
 export type MaLoiCham =

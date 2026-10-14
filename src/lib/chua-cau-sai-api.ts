@@ -211,13 +211,6 @@ export async function apiXinGoiY(
   return j as unknown as KetQuaGoiY
 }
 
-export async function apiGuiThay(
-  token: string,
-  dotId: string,
-): Promise<{ ok: boolean; loi?: string }> {
-  const j = await goi('gui-thay', token, { dotId })
-  return j?.ok ? { ok: true } : { ok: false, loi: loiCua(j) }
-}
 const demCo = new Map<string, { den: number; p: Promise<boolean> }>()
 export function apiCoChua(token: string): Promise<boolean> {
   const hit = demCo.get(token)

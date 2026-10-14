@@ -28,11 +28,6 @@ export type BuocHieu =
   | 'dung_vao_bai_moi'   // (5) Dùng vào bài mới
   | 'noi_lai_bai_lon'    // (6) Nối lại bài lớn
 
-/** Danh sách sáu thành phần theo thứ tự. */
-export const SAU_THANH_PHAN: readonly BuocHieu[] = [
-  'nhan_cach_nghi', 'tim_diem_re', 'thay_vi_sao',
-  'tu_sua_quan_he', 'dung_vao_bai_moi', 'noi_lai_bai_lon',
-]
 
 // ---------------------------------------------------------------------------
 // Chọn loại item tiếp theo cho một bước (§5.6 — giảm hỗ trợ dần)

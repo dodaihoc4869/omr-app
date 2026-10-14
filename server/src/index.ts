@@ -8,13 +8,10 @@ import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-g
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
 import { lopCua } from '../../src/lib/loi-giai-kiem'
 import { kiemGoiDe } from '../../src/lib/kiem-goi-de'
-import {qidTuLuanCuaTo} from './cam-tu-luan'
 import {ghiSuKien,ghiSuKienThi,chuanBiSuKienLoBtvn,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
-import {congBoSuKien,dungLaiNangLuc,nangLucBat} from './nang-luc-d1'
-import {dtoNangLuc} from './ho-so-dto'
-import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
+import {chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,dangLamMoiTuDem,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {cronResetHoa2,lenhGhiResetHoa2,xuLyLenhResetHoa2} from './reset-hoa2'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
@@ -34,7 +31,6 @@ import { phConTongQuan } from './ph-con-tong-quan'
 import {gvCongBoCa,gvDongCuaVao,gvNhanXetCaEm} from './ca-thi-them'
 import {gvBangTinSong} from './gv-bang-tin-song'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
-import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
 import {gvBangTin} from './gv-bang-tin'
 import {ghiLoiMay} from './nhat-ky-may'
 import {chotNgayRoiTruKhien} from './khien-mat'
@@ -43,9 +39,8 @@ import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
 import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
-import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
 import { ghiCauBoTro } from './cau-bo-tro'
-import { chayTuHoanThien, dsCauNghi, gvTongV2, gvXuLyCauNghi } from './tu-hoan-thien'
+import { chayTuHoanThien, dsCauNghi, gvXuLyCauNghi } from './tu-hoan-thien'
 import { gvChatLuongLoi } from './chat-luong-loi'
 import { gvNutThatDs, gvNutThatGo, hsLoiGo } from './ban-go-nut-that'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
@@ -55,7 +50,7 @@ import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
 import {parentNews,refreshDailyNews} from './parent-news'
-import {phCanhBaoXem,phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} from './ph-truy-cap'
+import {phCanhBaoXem,phCapMa,phDemTruyCap,phKeHoach,phXacDinh} from './ph-truy-cap'
 import {homNayThay} from './hom-nay-thay'
 import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
@@ -68,7 +63,7 @@ import {buSoCauChoKeyBank, hopNhatKeyBank} from './key-bank-hop-nhat'
 import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
-import {adminGame,parentGame} from './game-v2-reports'
+import {adminGame} from './game-v2-reports'
 import { gameV2, laLenhCongSongSong } from './game-v2'
 import { kemSanhBiTat, luongDangNhapKemSanh, sanhKemDangNhap } from './dang-nhap-kem-sanh'
 import { RAO_GHI } from './doc-d1-theo-luot'
@@ -94,8 +89,7 @@ import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
 import { tinhNangBat as tinhNangChuaBat } from './chua-cau-sai-cau-hinh'
 import { hangChieu, daChuaTrenLop } from './chua-cau-sai-chieu'
-import { cauHinhThay, hocLieuThay, giaoPilot, hangThay, dongBoTuCu, hangHocLieu } from './chua-cau-sai-thay'
-import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, tienDo as chuaTienDo, thongKeKpi as chuaThongKe, guiThay as chuaGuiThay, danhSach as chuaDanhSach } from './chua-cau-sai'
+import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, danhSach as chuaDanhSach } from './chua-cau-sai'
 import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
@@ -2555,54 +2549,6 @@ async function dungChiMucKho(env: Env, b: Record<string, unknown>): Promise<Resp
   return ra({ ok: true, xong, hong, conLai: Number(rCon?.n) || 0, tongCau: Number(tong?.n) || 0 })
 }
 
-/** RÚT CÂU THEO CHUYÊN ĐỀ — nguồn của bài luyện và câu khắc phục.
- *
- * `boQua` là danh sách qid KHÔNG phát lại (câu em đã làm). Trả về CHỈ MỤC; chỗ
- * gọi tự lấy nội dung từ gói đề. */
-async function rutCau(env: Env, b: Record<string, unknown>): Promise<Response> {
-  const ds = Array.isArray(b.chuyenDe) ? (b.chuyenDe as unknown[]).map((x) => String(x)).filter(Boolean) : []
-  const soCau = Math.max(1, Math.min(200, Number(b.soCau) || 20))
-  const boQua = new Set(Array.isArray(b.boQua) ? (b.boQua as unknown[]).map((x) => String(x)) : [])
-  if (ds.length === 0) return ra({ ok: false, error: 'Thiếu chuyên đề' })
-
-  const oCd = ds.map(() => '?').join(',')
-  const r = await env.DB.prepare(
-    `SELECT c.qid, c.ma_de, c.chuyen_de, c.muc_do, c.phan, d.cap_nhat_luc AS phien_ban
-       FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
-      WHERE d.da_xoa = 0 AND c.chuyen_de IN (${oCd})
-      LIMIT 2000`,
-  )
-    .bind(...ds)
-    .all<Record<string, unknown>>()
-
-  const con0 = (r.results ?? []).filter((x) => !boQua.has(String(x.qid ?? '')))
-  // CẤM RÚT TỰ LUẬN (21/09): chỉ mục `cau_hoi` không có đáp án nên phải nhìn gói của tờ (đệm theo phiên bản tờ). Duyệt theo thứ tự cũ, chỉ mở những tờ cần cho đủ `soCau`;
-  // không đọc được gói ⇒ không biết ⇒ giữ câu (không kết tội). Các dòng chưa duyệt tính là còn dùng được (số `coSan` chỉ có thể lệch cao vài câu, không bao giờ trả tự luận).
-  const chon: Record<string, unknown>[] = []
-  const tuLuanTheoTo = new Map<string, Set<string> | null>()
-  let soBoTuLuan = 0
-  for (const x of con0) {
-    if (chon.length >= soCau) break
-    const maDe = String(x.ma_de ?? '')
-    if (!tuLuanTheoTo.has(maDe)) tuLuanTheoTo.set(maDe, await qidTuLuanCuaTo(env, maDe, String(x.phien_ban ?? '')))
-    if (tuLuanTheoTo.get(maDe)?.has(String(x.qid ?? ''))) { soBoTuLuan++; continue }
-    chon.push(x)
-  }
-  return ra({
-    ok: true,
-    // Nói rõ kho còn bao nhiêu câu dùng được: hứa 40 câu mà kho chỉ có 12 thì
-    // phải nói ra, không im lặng trả 12.
-    coSan: con0.length - soBoTuLuan,
-    ...(soBoTuLuan > 0 ? { soBoTuLuan } : {}),
-    ds: chon.map((x) => ({
-      qid: String(x.qid ?? ''),
-      maDe: String(x.ma_de ?? ''),
-      chuyenDe: String(x.chuyen_de ?? ''),
-      mucDo: String(x.muc_do ?? ''),
-      phan: String(x.phan ?? ''),
-    })),
-  })
-}
 
 // ===========================================================================
 // KHỐI A — CHẤM ĐIỂM TRỌN VẸN TRÊN MÁY CHỦ MỚI
@@ -3601,14 +3547,10 @@ const boXuLy = {
           throw e
         }
       }
-      if (p === '/game-v2-parent') return ra(await parentGame(env,b))
       // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
-      // GAME HÓA 2.0: app phụ huynh ngừng khi công tắc bật CẢ TRUNG TÂM (thầy chốt 27/09 "bỏ hẳn app phụ huynh"). Công khai, chỉ trả đúng/sai.
-      if (p === '/hoa2/ph-ngung') return ra({ ok: true, ngung: await docCoHoa2(env).then((c) => c.bat && !c.lop.length && !c.sbd.length).catch(() => false) })
       if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
       if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b, envDoc, ctx))
       if (p === '/ph/canh-bao/xem') return ra(await phCanhBaoXem(env, b))
-      if (p === '/ph/thoi-gian-hoc') return ra(await phThoiGianHoc(env, b))
       if (p === '/ph/giao-them') return ra(await phGiaoThem(env, b))
       // "Mọi thứ về con" (Code 4, đã soát): ĐỌC-CHỈ, token hoặc SBD trần; chi tiết một câu (lời giải) cùng luật che.
       if (p === '/ph/tat-ca-ve-con') return ra(await phTatCaVeCon(env, b, Date.now(), envDoc, ctx))
@@ -3709,19 +3651,16 @@ const boXuLy = {
       if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))
       // VÒNG CHỮA CÂU SAI (07/10, server/src/chua-cau-sai.ts): đặc tả §10; SBD từ token.
       if (p === '/hs/chua-cau-sai/co') { const sbd=await gameIdentity(env,b); return ra({ok:await tinhNangChuaBat(env,{sbd})}) }
-      if (p === '/hs/chua-cau-sai/gui-thay') return raChua(await chuaGuiThay(env,b))
       if (p === '/hs/chua-cau-sai/danh-sach') return raChua(await chuaDanhSach(env,b))
       if (p === '/hs/chua-cau-sai/mo-dot') return raChua(await chuaMoDot(env, b))
       if (p === '/hs/chua-cau-sai/phat-item') return raChua(await chuaPhatItem(env, b))
       if (p === '/hs/chua-cau-sai/nop-item') return raChua(await chuaNopItem(env, b))
       if (p === '/hs/chua-cau-sai/xin-goi-y') return raChua(await chuaXinGoiY(env, b))
-      if (p === '/hs/chua-cau-sai/tien-do') return raChua(await chuaTienDo(env, b))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.
       if (p === '/hs/thu-thach-hom-nay') return ra({ ok: true, co: false })
       if (p === '/hs/thu-thach-hom-nay/nop') return ra({ ok: false, error: DA_GO_BO_NAO })
-      if (p === '/hs/thoi-gian-hoc') return ra(await sauGhi(env, b, hsThoiGianHoc(env, b)))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
 
@@ -3751,21 +3690,6 @@ const boXuLy = {
         return ra({ ok: true, ...(await dungLaiHoSo(env, ds, new Date().toISOString())) })
       }
       if (p === '/ho-so/xem') return ra({ ok: true, ...(await docHoSoEm(env, String(b.sbd ?? '').trim())) })
-      // HỒ SƠ NĂNG LỰC CNH-1.0 (P03): dựng lại từ bằng chứng theo cửa sổ 30 ngày rồi trả DTO CHUNG cho ba app.
-      // Cờ `nang_luc_v1` chỉ để biết đường học đã bật chưa; lệnh này chỉ ĐỌC/DỰNG, không cộng tiền.
-      if (p === '/ho-so/nang-luc') {
-        const sbd = String(b.sbd ?? '').trim()
-        if (!sbd) return ra({ ok: false, error: 'Thiếu "sbd".' })
-        const bang = await dungLaiNangLuc(env, sbd, { denNgay: ngayVn(Date.now()), moc: new Date().toISOString() })
-        return ra({ ok: true, bat: await nangLucBat(env), hoSo: dtoNangLuc(bang) })
-      }
-      // CÔNG BỐ kết quả một đợt (ca thi/bài) ⇒ kết quả rời trạng thái che, mới vào bằng chứng năng lực (T47).
-      if (p === '/ho-so/cong-bo') {
-        const nguon = String(b.nguon ?? '').trim()
-        const maNguon = String(b.maNguon ?? '').trim()
-        if (!nguon || !maNguon) return ra({ ok: false, error: 'Cần "nguon" và "maNguon".' })
-        return ra({ ok: true, daCongBo: await congBoSuKien(env, nguon, maNguon) })
-      }
       if (p === '/ho-so/do-phu-dang') return ra(await docDoPhuDang(env))
       // Chạy thử reset (chỉ ĐẾM, không ghi): job sẽ xoá bảng nào, bao nhiêu dòng, giữ bảng nào.
       if (p === '/reset/dry-run') return ra(await resetDryRun(env))
@@ -3855,20 +3779,11 @@ const boXuLy = {
       if (p === '/gv/buoi-hoc/suc-hoc') return ra(await gvSucHocBuoi(envDoc, b))
       // DẢI THỐNG KÊ LỚP (phím T) cho buổi chữa KHÔNG từ ca (hoàn thiện bản vẽ 28/09): chỉ số GỘP theo câu từ sổ su_kien_hoc, không tên em. ĐỌC-CHỈ.
       if (p === '/gv/thong-ke-lop-cau') return ra(await gvThongKeLopCau(envDoc, b))
-      // THỐNG KÊ KPI vòng chữa câu sai (07/10, server/src/chua-cau-sai.ts).
-      if (p === '/gv/chua-cau-sai/cau-hinh') return raChua(await cauHinhThay(env,b))
-      if (p === '/gv/chua-cau-sai/hoc-lieu') return raChua(await hocLieuThay(env,b))
-      if (p === '/gv/chua-cau-sai/hang-hoc-lieu') return raChua(await hangHocLieu(env))
-      if (p === '/gv/chua-cau-sai/giao-pilot') return raChua(await giaoPilot(env,b))
-      if (p === '/gv/chua-cau-sai/dong-bo-tu-cu') return raChua(await dongBoTuCu(env,b))
+      // Vòng chữa câu sai phía thầy (07/10, chua-cau-sai-chieu.ts): hàng chiếu, đã chữa trên lớp.
       if (p === '/gv/chua-cau-sai/hang-chieu') return raChua(await hangChieu(env,b))
       if (p === '/gv/chua-cau-sai/da-chua-tren-lop') return raChua(await daChuaTrenLop(env,b))
-      if (p === '/gv/chua-cau-sai/hang-thay') return raChua(await hangThay(env,b))
-      if (p === '/gv/chua-cau-sai/thong-ke') return raChua(await chuaThongKe(env, b))
       if (p === '/gv/lop') return ra(await gvLop(envDoc))
       if (p === '/gv/doi-lop-em') return ra(await gvDoiLopEm(env, b))
-      // BUỔI CHỮA TỐI NAY (B6, docs/hop-dong-buoi-chua-de-xuat-2109.md): số liệu thô ĐỌC-CHỈ, ≤ 12 truy vấn.
-      if (p === '/gv/buoi-chua-de-xuat') return ra(await gvBuoiChuaDeXuat(envDoc, b))
       // BẢNG TIN CỦA THẦY bản 3 (docs/hop-dong-bang-tin-v3-2109.md): MỘT lệnh đọc-chỉ ≤ 12 truy vấn cho cả màn Hôm nay, số liệu tính từ mốc `cau_hinh.bang_tin_tu`.
       // `chuaHocHomNay` (Code 4, Điều 8): chỉ-thêm, khối RIÊNG ngoài bộ đếm truy vấn của bảng tin; lỗi/thiếu ⇒ vắng khoá (máy thầy ẩn khối, không bịa).
       if (p === '/gv/bang-tin') { const r = await gvBangTin(envDoc, b); if (r.ok !== false) { try { r.chuaHocHomNay = await gvChuaHocHomNay(envDoc) } catch (e) { console.error('[bang-tin] chưa học hôm nay lỗi:', e) } } return ra(r) }
@@ -3956,12 +3871,10 @@ const boXuLy = {
       if (p === '/kho/thu-muc') return ra(await gvKhoThuMuc(env, b))
       if (p === '/kho/danh-sach') return danhSachDeKho(env, b)
       if (p === '/kho/lay') return layDeKho(env, String(b.maDe ?? ''))
-      if (p === '/kho/xoa') return xoaDeKho(env, b)
-      if (p === '/kho/rut-cau') return rutCau(env, b)
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
       // LỜI GIẢI TỪNG BƯỚC: máy soạn của thầy (lấp kho, nhận lô, nộp hồ sơ) + màn Duyệt lời giải.
       if (p === '/kho/loi-giai/nap-hang') return ra(await napHangTuKho(env, b))
-      // Ngân hàng câu kiến thức nền của thang tự gỡ (thang-tu-go.ts): nạp / cập nhật theo id.
+      // Ngân hàng câu kiến thức nền của thang tự gỡ (thang-tu-go.ts): nạp / cập nhật theo id — công cụ thầy chạy tay (đường duy nhất nạp ngân hàng nền).
       if (p === '/kho/nen/day') return ra(await thayDayNen(env, b))
       if (p === '/kho/loi-giai/viec') return ra(await layViec(env, b))
       if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
@@ -3978,8 +3891,6 @@ const boXuLy = {
       // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
       if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))
       if (p === '/gv/nut-that/go') return ra(await gvNutThatGo(env, b))
-      if (p === '/gv/cau-sai-mo-coi') return ra(await gvCauSaiMoCoi(env, b))
-      if (p === '/gv/v2/tong') return ra(await gvTongV2(env))
       // 5 THƯỚC ĐO CHẤT LƯỢNG SỬA LỖI theo lớp (thầy 05/10, server/src/chat-luong-loi.ts): thẻ ở Tổng quan app thầy. CHỈ ĐỌC (SELECT) ⇒ `envDoc`.
       if (p === '/gv/chat-luong-loi') return ra(await gvChatLuongLoi(envDoc, b))
       if (p === '/gv/cau-nghi/xu-ly') return ra(await gvXuLyCauNghi(env, b))

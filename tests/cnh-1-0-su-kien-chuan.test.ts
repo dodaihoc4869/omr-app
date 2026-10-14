@@ -1,5 +1,6 @@
 // @vitest-environment node
 // P03 — SỰ KIỆN HỌC CHUẨN (04 §2/§3) trên D1 THẬT (`node:sqlite`, đúng schema + mọi migration) và
+// 14/10: gỡ lệnh chết /ho-so/nang-luc — bỏ 2 ca đi qua đường ấy (thư viện năng lực giữ nguyên).
 // Worker THẬT (`goiWorker`). Phần chứng minh ở đây gồm:
 //   · attempt key + idempotency ngữ nghĩa (phần EVENT của T14 — phần tiền thuộc P07);
 //   · `assistance`/`purpose`/raw data được LƯU (bảo toàn dữ liệu thô, không chứa đáp án đúng);
@@ -194,32 +195,6 @@ describe('T29 — hỗ trợ QUA MÁY CHỦ ở game: em mở màn khác nộp �
     }) as Record<string, unknown>
     expect(r.ok).toBe(true)
     expect(Number((d.sql.prepare("SELECT COUNT(*) n FROM su_kien_hoc WHERE sbd = 'S1'").get() as { n: number }).n)).toBe(0)
-  })
-})
-describe('DTO chung + đường route thật của Worker', () => {
-  it('`/ho-so/nang-luc`: một hình dữ liệu cho ba app, kèm MỘT chỗ nói lý do chưa xác nhận mức', async () => {
-    const { d } = dungKho()
-    await ghiSuKien(d.env, [ev({ qid: 'Q0' }), ev({ qid: 'Q1' }), ev({ qid: 'Q2' })])
-    const r = await goiWorker(worker, d.env, '/ho-so/nang-luc', { sbd: 'S1' }, true) as any
-    expect(r.ok).toBe(true)
-    expect(r.bat).toBe(false) // cờ mặc định TẮT (đường học đang chạy không đổi)
-    expect(r.hoSo.policyVersion).toBe('CNH-1.0')
-    expect(r.hoSo.skills).toHaveLength(1)
-    const s = r.hoSo.skills[0]
-    expect(s).not.toHaveProperty('validatedLevelCuaThu') // KHÔNG có cấp thú trong DTO năng lực
-    expect(s.nhanMuc).toMatch(/chưa đủ căn cứ/)
-    expect(s.nhanTinCay).toMatch(/bằng chứng/)
-    // Kho tổng hợp CHƯA gắn nhãn family ⇒ 0 family (KHÔNG bịa `family=qid`), nên thiếu cả 5;
-    // và mới có 1 ngày. Đây là lý do thật để giáo viên biết cần gắn nhãn gì (P02 `baoThieuNhan`).
-    expect(r.hoSo.lyDo[0]).toMatchObject({ skillId: 'SK1', lyDo: 'THIEU_FAMILY', thieuFamily: 5, thieuNgay: 1 })
-    expect(JSON.stringify(r)).not.toMatch(/correct|dap_an/i) // DTO KHÔNG chứa đáp án
-  })
-
-  it('/ho-so/nang-luc thiếu sbd ⇒ từ chối rõ ràng (không dựng hồ sơ rỗng)', async () => {
-    const { d } = dungKho()
-    const r = await goiWorker(worker, d.env, '/ho-so/nang-luc', {}, true) as any
-    expect(r).toMatchObject({ ok: false })
-    expect(r.error).toMatch(/sbd/)
   })
 })
 
