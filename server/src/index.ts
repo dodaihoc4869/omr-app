@@ -3334,6 +3334,8 @@ const boXuLy = {
     if(event.cron==='* * * * *') {
       await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now(),2,true,new Date(Date.now()+7*3600000).getUTCHours()<19)).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
       await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
+      // B2 (15/10): dựng lại bảng siêu dữ liệu câu tính sẵn cho tờ vừa lập chỉ mục (cau-meta.ts). Thường ngày không tờ nào lệch ⇒ một câu đọc nhẹ.
+      await import('./cau-meta').then(m=>m.dongBoCauMeta(env,laGioCaoDiemVn(Date.now())?5:40)).catch(e=>console.error('[cau-meta] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
       if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)

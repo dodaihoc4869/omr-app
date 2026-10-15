@@ -1,5 +1,6 @@
 import type { Env, D1PreparedStatement } from './kieu'
 import type { HoSo2 } from './srs2-d1'
+import { KHOP } from './cau-meta'
 import type { QCau,HoSoOmniEm } from './omni-kieu'
 import { vknCaCau } from './omni-p-vkn'
 import { qCuaCau } from './omni-d1'
@@ -66,7 +67,9 @@ export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau
   return p
 }
 async function dungDanhMuc(env:Env,ids:readonly string[],mas:readonly string[]):Promise<CauDanhMuc[]>{
-  const r=await env.DB.prepare(`SELECT g.qid,g.dang,g.content_group,json_extract(g.json,'$.phan') phan,json_extract(g.json,'$.mucDo') muc,json_extract(g.json,'$.sao') sao,json_extract(g.json,'$.chuyenDe') cd,json_extract(g.json,'$.reviewed') duyet,json_extract(g.json,'$.hanhTrinh') nhan,json_extract(g.json,'$.kienThuc') kn,(SELECT oq.vkn_json FROM omni_q oq WHERE oq.qid=g.qid AND oq.y=-1 AND oq.duyet_luc IS NOT NULL) q_kn FROM game_v2_question g WHERE g.qid IN(SELECT value FROM json_each(?)) AND g.ma_de IN(SELECT value FROM json_each(?)) AND json_valid(g.json) AND json_extract(g.json,'$.reviewed')=1 ORDER BY g.qid,g.ma_de`).bind(JSON.stringify(ids),JSON.stringify(mas)).all<Row>()
+  // B2 (15/10): bảng tính sẵn `cau_meta` khớp kho ⇒ đọc bảng ấy (không tách JSON ~23.000 câu); lệch ⇒ CÙNG câu đọc thẳng `game_v2_question` như cũ.
+  const r=await env.DB.prepare(`SELECT g.qid,g.ma_de,g.dang,g.content_group,g.phan,g.muc_do muc,g.sao,g.chuyen_de cd,g.reviewed duyet,g.nhan_ht nhan,g.kien_thuc kn,(SELECT oq.vkn_json FROM omni_q oq WHERE oq.qid=g.qid AND oq.y=-1 AND oq.duyet_luc IS NOT NULL) q_kn FROM cau_meta g WHERE ${KHOP} AND g.qid IN(SELECT value FROM json_each(?1)) AND g.ma_de IN(SELECT value FROM json_each(?2)) AND g.reviewed=1
+    UNION ALL SELECT g.qid,g.ma_de,g.dang,g.content_group,json_extract(g.json,'$.phan') phan,json_extract(g.json,'$.mucDo') muc,json_extract(g.json,'$.sao') sao,json_extract(g.json,'$.chuyenDe') cd,json_extract(g.json,'$.reviewed') duyet,json_extract(g.json,'$.hanhTrinh') nhan,json_extract(g.json,'$.kienThuc') kn,(SELECT oq.vkn_json FROM omni_q oq WHERE oq.qid=g.qid AND oq.y=-1 AND oq.duyet_luc IS NOT NULL) q_kn FROM game_v2_question g WHERE NOT ${KHOP} AND g.qid IN(SELECT value FROM json_each(?1)) AND g.ma_de IN(SELECT value FROM json_each(?2)) AND json_valid(g.json) AND json_extract(g.json,'$.reviewed')=1 ORDER BY qid,ma_de`).bind(JSON.stringify(ids),JSON.stringify(mas)).all<Row>()
   const fullQ=await qCuaCau(env,[...new Set(r.results.map(x=>String(x.qid)))])
   const ds:CauDanhMuc[]=[],da=new Set<string>()
   for(const x of r.results){const qid=String(x.qid);if(da.has(qid))continue;da.add(qid)

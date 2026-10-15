@@ -31,6 +31,7 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { protectedQuestions } from './game-v2-bank'
 import { jsonLaTuLuan } from './cam-tu-luan'
 import { SQL_CAU_GON, tuLuanTuMeta } from './cau-gon'
+import { KHOP } from './cau-meta'
 import { docNhomTheoQid } from './nhom-noi-dung'
 // OMNI 3 (05/10) — mọi hành vi mới CHỈ khi `omniBat(env, sbd)`; cờ tắt ⇒ mọi đường dưới đây y hệt trước (khoá: tests/omni-3-ke-hoach-co-tat.test.ts).
 import type { PhamViLop } from './bai-da-day'
@@ -332,11 +333,19 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
   if (!qids.length) return new Map<string, MetaCau>()
   return metaCauTuDong(await docMetaCauTho(env, qids), uuTienMaDe, maDeCua)
 }
-/** Câu SQL đọc siêu dữ liệu câu từ D1 (`qids` đã khử trùng, khác rỗng). */
+/**
+ * Câu SQL đọc siêu dữ liệu câu từ D1 (`qids` đã khử trùng, khác rỗng). B2 (15/10): bảng tính sẵn `cau_meta` khớp kho ⇒ đọc bảng ấy; lệch ⇒ CÙNG câu
+ * đọc thẳng `game_v2_question` như cũ (cau-meta.ts). Thứ tự: mã câu tăng dần, các dòng cùng câu theo `rowid` (`thu_tu`) — đúng thứ tự dò chỉ mục
+ * `game_v2_question_qid` của câu cũ.
+ */
 function docMetaCauD1(env: Env, qids: readonly string[]): Promise<Row[]> {
-  return env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao, COALESCE(json_extract(json,'$.lop'), json_extract(json,'$.khoi')) AS lop_json,
-        ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version
-      FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json)`).bind(JSON.stringify(qids)).all<Row>().then((r) => r.results ?? [])
+  return env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, phan, muc_do, ten_dang, sao, lop_json, gon, anh_pa, anh_y, hinh_gon, j_qid, j_version, thu_tu
+      FROM cau_meta WHERE ${KHOP} AND qid IN (SELECT value FROM json_each(?1))
+      UNION ALL
+      SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao, COALESCE(json_extract(json,'$.lop'), json_extract(json,'$.khoi')) AS lop_json,
+        ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version, rowid AS thu_tu
+      FROM game_v2_question WHERE NOT ${KHOP} AND qid IN (SELECT value FROM json_each(?1)) AND json_valid(json)
+      ORDER BY qid, thu_tu`).bind(JSON.stringify(qids)).all<Row>().then((r) => (r.results ?? []).map(({ thu_tu: _t, ...x }) => x))
 }
 /** Dòng đệm: tính sẵn cờ tự luận (đúng `tuLuanTuMeta`) rồi bỏ JSON câu rút gọn / cờ ảnh — đệm nhẹ, `metaCauTuDong` dùng `tu_luan`. */
 function gonDongMeta(x: Row): Row {
