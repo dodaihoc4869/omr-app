@@ -489,13 +489,13 @@ Thầy (15/10 ~08:5x, sau khi đọc đề xuất docs/de-xuat-toi-uu-1510.md): 
 - [x] A4 không hiện "dấu hiệu đối phó" cho học sinh | bằng chứng: 7142dc81 (chỉ ẩn ở app em — phụ huynh đọc chung bản dữ liệu nên KHÔNG lọc máy chủ); test 3 chế độ, đỏ trên mã cũ 1/2
 - [x] A5 chữ lệch chuẩn | bằng chứng: 3a51d35f; soi:giao-dien 1 lỗi → 0; "lộ mã câu" kiểm lại: máy chủ bản HS/PH đã thay (tieuDeCauHs) — không phải lỗi
 - [x] B1 3 chỉ mục còn thiếu | bằng chứng: migration-z-1510-chi-muc.sql chạy D1 thật (run 38669736912); EXPLAIN trước/sau (38669626084 → 38669862783): SCAN cau_bo_tro → SEARCH idx_cau_bo_tro_mau · canh → COVERING INDEX · sổ em bỏ TEMP B-TREE ORDER BY
-- [ ] C1 tách React thành mảnh riêng mã băm ổn định | bằng chứng: (chưa có)
-- [ ] C2 nạp lười mã ít dùng trong mảnh chung 3 app | bằng chứng: (chưa có)
-- [ ] C3 nạp lười phần màn học sinh chỉ mở khi bấm | bằng chứng: (chưa có)
+- [x] C1 tách React thành mảnh riêng mã băm ổn định | bằng chứng: 331df118; react-BT75DBbd.js 57,5 KB nén, đổi chữ màn em rồi dựng lại ⇒ tên mảnh React giữ nguyên
+- [x] C2 nạp lười mã ít dùng trong mảnh chung 3 app | bằng chứng: 331df118; cảnh thí nghiệm, fflate, exam-kho-de-import nạp khi cần; bai-tap-pdf ra khỏi lượt mở HS/PH
+- [x] C3 nạp lười phần màn học sinh chỉ mở khi bấm | bằng chứng: 331df118; Khắc phục/BTVN/Bài gia đình giao vào mảnh nạp lười; bản gộp: GV 264,2→251,8 · HS 322,5→283,3 · PH 259,3→242,6 KB; kiem-sw 13/13; mau-giu 0
 - [ ] Đợt 1: cổng (tsc, vitest so main, build, kiem:toc-do 0 đỏ + hạ mốc, kiem:mau-giu 0, kiem-sw) → PR → phát hành trước 19:00, 0 ca mở | bằng chứng: (chưa có)
 - [ ] R gộp đợt chờ D1 nối tiếp: sảnh lần đầu, isolate ấm, sảnh lần sau, mở chặng, nộp câu (hạ mốc) | bằng chứng: (chưa có)
-- [ ] B2 bảng cau_meta tính sẵn | bằng chứng: (chưa có)
-- [ ] B3 Nhịp học thầy: ngày đã qua tính sẵn | bằng chứng: (chưa có)
+- [x] B2 bảng cau_meta tính sẵn | bằng chứng: 2c250480; migration chạy D1 thật (38670743551); test so khớp 4/4; cổng tốc độ bằng mốc (lần đầu +2 đợt do câu mở đầu WITH — đã sửa)
+- [x] B3 Nhịp học thầy: ngày đã qua tính sẵn | bằng chứng: 9ee948c2 (trợ lý); D1 workerd 180k dòng: 2.980.659→158.652 dòng đọc, 1430→90 ms; trigger vô hiệu theo (em, ngày); cron 00:01 dựng
 - [ ] B4 đệm danh mục Hành trình + sổ học | bằng chứng: (chưa có)
-- [ ] B5 thi đua ngày đã qua | bằng chứng: (chưa có)
+- [x] B5 thi đua ngày đã qua | bằng chứng: c17416a4 (trợ lý); lớp 40 em 45.035→5.835 dòng, 19→4 ms, 2→1 vòng
 - [ ] Đợt 2: cổng → PR → phát hành trước 19:00, 0 ca mở; đo lại cao điểm tối 15/10 | bằng chứng: (chưa có)
