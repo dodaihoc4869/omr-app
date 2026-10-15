@@ -1,5 +1,5 @@
 // KIỂM KHO: câu Phần III đáp số DÀI HƠN 4 Ô PHIẾU (sửa lỗi 15/10 "10000 chỉ nhập được 1000"). CHỈ ĐỌC D1, không ghi gì.
-// In danh sách để thầy sửa đề về chuẩn 4 ô nếu muốn: (1) câu cần hơn 4 ô (máy chủ đã gửi kèm số ô, em gõ đủ được); (2) câu "phần III" số mà
+// In: (0) PHÂN BỐ SỐ Ô 1..TRAN_O của câu vào kênh nhập số (thầy 15/10: số ô = đúng số kí tự đáp số); (1) câu cần hơn 4 ô; (2) câu "phần III" số mà
 // bàn phím số không gõ được trong TRAN_O ô ⇒ bị chặn khỏi kênh nhập số (`ngoaiKenhSo`, chốt ở kho game). Câu tự luận gắn nhầm phần III chỉ đếm.
 // Chạy:  npm run kiem:kho-so-o            (gọi `wrangler d1 execute omr --remote`, cần đăng nhập wrangler)
 //        npm run kiem:kho-so-o -- --tep ket-qua-wrangler.json   (đọc tệp JSON `wrangler d1 execute --json` có sẵn, không gọi mạng)
@@ -24,6 +24,7 @@ function docDong(): Dong[] {
 const dong = docDong()
 const canHon4: string[] = [], chan: string[] = []
 let tuLuan = 0, vao = 0
+const phanBo = new Array<number>(TRAN_O + 1).fill(0)
 for (const x of dong) {
   const c = String(x.c ?? '')
   // Cờ `tuLuan` của chỉ mục có thể do chính chốt kênh số gắn lúc nhập kho ⇒ xét luật chung KHÔNG kèm cờ, rồi chốt kênh số.
@@ -33,9 +34,12 @@ for (const x of dong) {
   if (ngoaiKenhSo({ phan: 'III', correct: c })) { chan.push(`${x.qid}\t${x.ma_de}\t${JSON.stringify(c)}\tgõ ${JSON.stringify(dapSoGoPhim(c))}`); continue }
   if (x.tl) { tuLuan++; continue } // nhãn tự luận của kho (kieu tu_luan)
   vao++
+  if (soO !== null) phanBo[soO]!++
   if (soO !== null && soO > SO_O_PHIEU) canHon4.push(`${x.qid}\t${x.ma_de}\t${JSON.stringify(c)}\tgõ ${dapSoGoPhim(c)}\t${soO} ô`)
 }
 console.log(`Kho Phần III: ${dong.length} câu · vào kênh nhập số ${vao} · tự luận/đáp án chữ (không vào kênh số) ${tuLuan} · chặn vì cần hơn ${TRAN_O} ô ${chan.length}`)
+console.log(`\n(0) Phân bố số ô của câu vào kênh nhập số (số ô = đúng số kí tự đáp số gõ chuẩn):`)
+for (let n = 1; n <= TRAN_O; n++) console.log(`  ${n} ô: ${phanBo[n]} câu`)
 console.log(`\n(1) Câu cần HƠN ${SO_O_PHIEU} Ô (${canHon4.length}) — app đã cho đủ ô; thầy sửa đề về 4 ô nếu muốn đúng phiếu:`)
 console.log(canHon4.join('\n') || '  (không có)')
 console.log(`\n(2) Câu bị CHẶN khỏi kênh nhập số (${chan.length}):`)
