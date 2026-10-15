@@ -308,11 +308,14 @@ const vknTuDong = (x: Row): Vkn => ({
 async function docNhanNen(env: Env, qids: readonly string[]): Promise<Map<string, { buoc: number; nen: string }[]>> {
   const ra = new Map<string, { buoc: number; nen: string }[]>()
   if (!qids.length) return ra
+  // Gói R 15/10 (đọc kho câu gom đợt): lượt LÙI theo `qid_mau` đọc CÙNG đợt với bổ trợ theo nội dung, cho mọi câu được hỏi — trước: chờ bổ trợ xong rồi mới đọc
+  // phần thiếu (một đợt D1 nối tiếp). Câu đã có nhãn từ bổ trợ bị bỏ qua ĐÚNG như vòng lặp cũ (`!ra.has`) ⇒ kết quả y hệt; chỉ đọc thừa dòng của câu ấy.
+  const luiP = env.DB.prepare('SELECT qid_mau, nhan_nen_json FROM cau_bo_tro WHERE qid_mau IN (SELECT value FROM json_each(?))').bind(dsJson(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
   const bt = await boTroTheoQid(env, qids).catch(() => new Map())
   for (const [q, b] of bt) if (b.nhanNen?.length) ra.set(q, b.nhanNen)
   const thieu = qids.filter((q) => !ra.has(q))
   if (thieu.length) {
-    const r = await env.DB.prepare('SELECT qid_mau, nhan_nen_json FROM cau_bo_tro WHERE qid_mau IN (SELECT value FROM json_each(?))').bind(dsJson(thieu)).all<Row>().catch(() => ({ results: [] as Row[] }))
+    const r = await luiP
     for (const x of r.results ?? []) {
       let a: unknown = []
       try { a = JSON.parse(str(x.nhan_nen_json) || '[]') } catch { a = [] }
@@ -323,8 +326,10 @@ async function docNhanNen(env: Env, qids: readonly string[]): Promise<Map<string
   }
   return ra
 }
-/** Q của các câu (qid GỐC) khi đã có siêu dữ liệu kho; câu kho ⇒ đệm 10 phút. */
-async function qTuKho(env: Env, qids: readonly string[], kho: ReadonlyMap<string, CauKho>, goiY?: ReadonlyMap<string, GoiYCau>): Promise<Map<string, QCau>> {
+/** Lượt đọc `omni_q` bắt đầu SỚM (Gói R 15/10) cho tập câu `ds` — `qTuKho` chỉ dùng phần của các câu nó cần (`can` ⊆ `ds`), câu ngoài `ds` đọc bù. */
+interface DongQSom { ds: ReadonlySet<string>; p: Promise<Map<string, { thay: Map<number, string[]>; goiY: Map<number, string[]> }>> }
+/** Q của các câu (qid GỐC) khi đã có siêu dữ liệu kho; câu kho ⇒ đệm 10 phút. `dongSom`: lượt đọc `omni_q` nơi gọi đã bắt đầu cùng đợt với siêu dữ liệu kho. */
+async function qTuKho(env: Env, qids: readonly string[], kho: ReadonlyMap<string, CauKho>, goiY?: ReadonlyMap<string, GoiYCau>, dongSom?: DongQSom): Promise<Map<string, QCau>> {
   const ra = new Map<string, QCau>()
   const now = Date.now()
   const can: string[] = []
@@ -334,7 +339,14 @@ async function qTuKho(env: Env, qids: readonly string[], kho: ReadonlyMap<string
     else can.push(q)
   }
   if (!can.length) return ra
-  const dong = await docDongQ(env, can)
+  // Dòng omni_q của mỗi câu độc lập với câu khác trong IN ⇒ lấy phần `can` từ lượt đọc sớm, câu nào lượt sớm không hỏi thì đọc bù — cùng kết quả `docDongQ(env, can)`.
+  const dong = dongSom ? await (async () => {
+    const thieu = can.filter((q) => !dongSom.ds.has(q))
+    const [som, bu] = await Promise.all([dongSom.p, thieu.length ? docDongQ(env, thieu) : Promise.resolve(new Map() as Awaited<DongQSom['p']>)])
+    const m: Awaited<DongQSom['p']> = new Map()
+    for (const q of can) { const o = som.get(q) ?? bu.get(q); if (o) m.set(q, o) }
+    return m
+  })() : await docDongQ(env, can)
   const chuaCo = can.filter((q) => !dong.has(q) && kho.has(q))
   const [vknDang, nhanNen] = await Promise.all([
     docVknTheoDang(env, chuaCo.map((q) => kho.get(q)!.dang ?? '').filter(Boolean)),
@@ -373,7 +385,11 @@ export async function qCuaCau(env: Env, qids: readonly string[], goiY?: Readonly
   const goc = [...new Set(qids.map((q) => tachSongSinh(q).goc).filter(Boolean))]
   let theoGoc = new Map<string, QCau>()
   try {
-    theoGoc = await qTuKho(env, goc, await docCauKho(env, goc), goiY)
+    // Gói R 15/10 (đọc kho câu gom đợt): `omni_q` của các câu CHƯA có Q trong đệm đọc CÙNG đợt với siêu dữ liệu kho — trước: chờ kho xong (một đợt nối tiếp).
+    // Đệm ấm (mọi câu có Q) ⇒ không đọc gì thêm, như cũ.
+    const nowQ = Date.now(), chuaQ = goc.filter((q) => !demQ.doc(q, nowQ))
+    const dongSom: DongQSom | undefined = chuaQ.length ? { ds: new Set(chuaQ), p: docDongQ(env, chuaQ) } : undefined
+    theoGoc = await qTuKho(env, goc, await docCauKho(env, goc), goiY, dongSom)
   } catch { /* lỗi đọc ⇒ lùi mặc định bên dưới */ }
   for (const q of qids) {
     const g = tachSongSinh(q).goc
