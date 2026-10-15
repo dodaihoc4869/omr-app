@@ -44,6 +44,15 @@ export function coTenThat(c: Pick<ChienDichCau, 'id' | 'ten'>): boolean {
 export function chienDichHienChon<T extends Pick<ChienDichCau, 'id' | 'ten' | 'hanNop'>>(ds: readonly T[]): T[] {
   return ds.filter((c) => !laHanhTrinhCd(c) && coTenThat(c))
 }
+/** LỖI 15/10 (em báo "có 3 câu thôi"): mục bị bỏ khỏi ô chọn (Hành trình, "#cd…") không được làm mất câu em đã làm ⇒ có câu nằm NGOÀI mọi bài
+ *  trong ô chọn thì thêm mục đầu "Tất cả các bài" (không phải một bài) gom MỌI câu và chọn sẵn mục ấy. Câu đều nằm trong bài thật ⇒ như cũ. */
+export const TAT_CA_BAI = '__tat-ca-bai__'
+export function canMucTatCa(dsBai: readonly Pick<ChienDichCau, 'id'>[], cau: readonly Pick<CauDaLamMuc, 'chienDichId'>[]): boolean {
+  const bai = new Set(dsBai.map((b) => b.id))
+  return cau.some((c) => !bai.has(c.chienDichId))
+}
+/** "Tất cả các bài" hiện từng trang (chỉ lấy lời giải câu đang hiện — em có thể đã làm vài trăm câu, mở màn không bắn hàng loạt lượt chi tiết). */
+export const CAU_MOI_TRANG = 30
 
 /** Xếp theo lần làm gần nhất (mới trước), cùng ngày thì theo số câu. */
 export function xepCau(ds: CauDaLamMuc[]): CauDaLamMuc[] {
@@ -118,6 +127,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
   const [luot, setLuot] = useState(0)
   const [cdChon, setCdChon] = useState('')
   const [loc, setLoc] = useState<BoLoc>('tat_ca')
+  const [soHien, setSoHien] = useState(CAU_MOI_TRANG)
   const [mo, setMo] = useState<string | null>(null)
   const [chiTiet, setChiTiet] = useState<Record<string, TrangThaiChiTiet>>({})
   const [pdf, setPdf] = useState<TrangThaiPdf>(PDF_TRONG)
@@ -150,22 +160,26 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
   useEffect(() => xoaCauDaLamSom, []) // rời màn ⇒ bỏ lệnh sớm chưa ai nhận
 
   const dsChienDichGoc = useMemo(() => (du && du.cheDo2 ? du.chienDich : []), [du])
-  // Ô chọn chỉ có bài thật (bỏ Hành trình, bỏ mục mang mã nội bộ). Không còn bài nào ⇒ màn vẫn dùng danh sách gốc để em thấy câu, chỉ ẩn ô chọn.
+  // Ô chọn chỉ có bài thật (bỏ Hành trình, bỏ mục mang mã nội bộ — thầy 12/10). Câu của mục bị bỏ vẫn hiện ở "Tất cả các bài" (lỗi 15/10).
   const dsBai = useMemo(() => chienDichHienChon(dsChienDichGoc), [dsChienDichGoc])
-  const dsChienDich = dsBai.length > 0 ? dsBai : dsChienDichGoc
-  const tatCaCau = du && du.cheDo2 ? du.cau : []
-  // Mặc định: chiến dịch mới nhất có câu em đã làm (máy chủ xếp mới trước).
+  const tatCaCau = useMemo(() => (du && du.cheDo2 ? du.cau : []), [du])
+  const coTatCa = dsBai.length > 0 && canMucTatCa(dsBai, tatCaCau)
+  // Mặc định: "Tất cả các bài" khi có (hoặc khi không còn bài thật nào); không thì bài mới nhất có câu em đã làm (máy chủ xếp mới trước).
   const cdHienTai = useMemo(() => {
-    if (cdChon && dsChienDich.some((c) => c.id === cdChon)) return cdChon
-    return (dsChienDich.find((c) => tatCaCau.some((q) => q.chienDichId === c.id)) ?? dsChienDich[0])?.id ?? ''
-  }, [cdChon, dsChienDich, tatCaCau])
-  const cd = dsChienDich.find((c) => c.id === cdHienTai) ?? null
+    if (dsBai.length === 0) return TAT_CA_BAI
+    if (cdChon && ((cdChon === TAT_CA_BAI && coTatCa) || dsBai.some((c) => c.id === cdChon))) return cdChon
+    if (coTatCa) return TAT_CA_BAI
+    return (dsBai.find((c) => tatCaCau.some((q) => q.chienDichId === c.id)) ?? dsBai[0])?.id ?? ''
+  }, [cdChon, dsBai, coTatCa, tatCaCau])
+  const cd = dsBai.find((c) => c.id === cdHienTai) ?? null
   /** Tên in lên tệp PDF / bản in — mã nội bộ không bao giờ ra tới em. */
   const tenCdHien = cd && coTenThat(cd) ? cd.ten : ''
-  const cauCd = useMemo(() => xepCau(tatCaCau.filter((c) => c.chienDichId === cdHienTai)), [tatCaCau, cdHienTai])
+  const cauCd = useMemo(() => xepCau(cdHienTai === TAT_CA_BAI ? tatCaCau : tatCaCau.filter((c) => c.chienDichId === cdHienTai)), [tatCaCau, cdHienTai])
   const dem = useMemo(() => Object.fromEntries(BO_LOC.map((b) => [b.id, cauCd.filter(b.hop).length])) as Record<BoLoc, number>, [cauCd])
   const boLoc = BO_LOC.find((b) => b.id === loc)!
   const dsLoc = useMemo(() => cauCd.filter(boLoc.hop), [cauCd, boLoc])
+  // Chỉ "Tất cả các bài" (không giới hạn, có em vài trăm câu) hiện từng trang; một bài giữ như cũ (lấy sẵn lời giải mọi câu đang lọc để Tải PDF nhanh).
+  const dsHien = useMemo(() => (cdHienTai === TAT_CA_BAI ? dsLoc.slice(0, soHien) : dsLoc), [dsLoc, soHien, cdHienTai])
 
   /** Lấy chi tiết các câu chưa có (một lượt ≤ 60 câu — `taiChiTiet` tự chia). */
   const napChiTiet = useCallback(
@@ -197,10 +211,10 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
     [token],
   )
 
-  // Thẻ đóng cần một dòng đề + đáp án (bản vẽ) ⇒ lấy chi tiết cho các câu ĐANG LỌC chưa có.
+  // Thẻ đóng cần một dòng đề + đáp án (bản vẽ) ⇒ lấy chi tiết cho các câu ĐANG HIỆN (trang hiện tại của bộ lọc) chưa có.
   useEffect(() => {
-    napChiTiet(dsLoc.map((c) => c.qid).filter((q) => !daXin.current.has(q)))
-  }, [dsLoc, napChiTiet])
+    napChiTiet(dsHien.map((c) => c.qid).filter((q) => !daXin.current.has(q)))
+  }, [dsHien, napChiTiet])
 
   const moThe = (qid: string) => {
     if (mo === qid) {
@@ -307,8 +321,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
   const chonNgang = ngang ? (mo && dsLoc.some((c) => c.qid === mo) ? mo : (dsLoc[0]?.qid ?? null)) : null
 
   // ── các mảnh dùng chung bản dọc và bản ngang ──
-  // Một bài ⇒ tiêu đề trơn (không hộp chọn); không bài nào ⇒ không có gì; từ hai bài ⇒ hộp chọn như cũ.
-  const chonCd = dsBai.length === 0 ? null : dsBai.length === 1 ? (
+  // Một bài (mọi câu em làm thuộc bài ấy) ⇒ tiêu đề trơn; không bài nào ⇒ không có gì; còn lại ⇒ hộp chọn: "Tất cả các bài" (nếu có) + bài thật.
+  const chonCd = dsBai.length === 0 ? null : dsBai.length === 1 && !coTatCa ? (
     <p className="h2-cdl-bai">
       <b>{dsBai[0]!.ten}</b> · {dsBai[0]!.tong} câu
     </p>
@@ -316,8 +330,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
     <div className="h2-cdl-chon">
       <span className="h2-cdl-chon-hien" aria-hidden="true">
         <span className="h2-cdl-chon-chu">
-          Chiến dịch: <b>{cd?.ten ?? ''}</b>
-          {cd ? ` · ${cd.tong} câu` : ''}
+          Chiến dịch: <b>{cd?.ten ?? 'Tất cả các bài'}</b>
+          {cd ? ` · ${cd.tong} câu` : ` · ${tatCaCau.length} câu đã làm`}
         </span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
           <path d="M6 9l6 6 6-6" />
@@ -329,8 +343,10 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
         onChange={(e) => {
           setCdChon(e.target.value)
           setMo(null)
+          setSoHien(CAU_MOI_TRANG)
         }}
       >
+        {coTatCa && <option value={TAT_CA_BAI}>Tất cả các bài · {tatCaCau.length} câu đã làm</option>}
         {dsBai.map((c) => (
           <option key={c.id} value={c.id}>
             {c.ten} · {c.tong} câu
@@ -353,6 +369,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
             onClick={() => {
               setLoc(b.id)
               setMo(null)
+              setSoHien(CAU_MOI_TRANG)
               setPdf(PDF_TRONG)
             }}
           >
@@ -391,7 +408,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
       {trangThaiDs === 'trong' && (
         <div className="h2-cdl-thong-bao">
           <p>
-            {dsChienDich.length === 0
+            {dsChienDichGoc.length === 0
               ? 'Em chưa có bài học được giao. Câu đã làm theo kế hoạch sẽ hiện ở đây.'
               : 'Em chưa làm câu nào của bài học này. Câu đã làm theo kế hoạch sẽ hiện ở đây.'}
           </p>
@@ -400,7 +417,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
       {trangThaiDs === 'co' && dsLoc.length === 0 && (
         <div className="h2-cdl-thong-bao">
           <p>Không có câu nào ở mục "{boLoc.nhan}".</p>
-          <button type="button" className="h2-cdl-nut-phu" onClick={() => setLoc('tat_ca')}>
+          <button type="button" className="h2-cdl-nut-phu" onClick={() => { setLoc('tat_ca'); setSoHien(CAU_MOI_TRANG) }}>
             Xem tất cả câu
           </button>
         </div>
@@ -440,6 +457,12 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
         </button>
       )}
     </div>
+  )
+  const conLai = trangThaiDs === 'co' ? dsLoc.length - dsHien.length : 0
+  const nutXemThem = conLai > 0 && (
+    <button type="button" className="h2-cdl-nut-phu h2-cdl-them" onClick={() => setSoHien((n) => n + CAU_MOI_TRANG)}>
+      Xem thêm {Math.min(CAU_MOI_TRANG, conLai)} câu
+    </button>
   )
   const nutDuPhong = pdf.duPhong && !pdf.dang && (
     <button type="button" className="h2-cdl-nut-phu h2-cdl-du-phong" onClick={() => void moBanIn()}>
@@ -584,7 +607,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
             <div className="h2-cdl-ds">
               {thongBao}
               {trangThaiDs === 'co' &&
-                dsLoc.map((c) => {
+                dsHien.map((c) => {
                   const ttin = thongTin(c)
                   const chon = c.qid === chonNgang
                   return (
@@ -599,6 +622,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
                     </article>
                   )
                 })}
+              {nutXemThem}
             </div>
           </aside>
           <section id="h2-cdl-chi-tiet" className="h2-cdl-ng-phai m3" aria-label="Chi tiết câu" aria-live="polite">
@@ -639,7 +663,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
       <main className="h2-cdl-ds">
         {thongBao}
         {trangThaiDs === 'co' &&
-          dsLoc.map((c) => {
+          dsHien.map((c) => {
             const dangMo = mo === c.qid
             const ttin = thongTin(c)
             return (
@@ -662,6 +686,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
               </article>
             )
           })}
+        {nutXemThem}
       </main>
 
       {trangThaiDs === 'co' && (
