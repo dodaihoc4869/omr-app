@@ -499,4 +499,4 @@ Thầy (15/10 ~08:5x, sau khi đọc đề xuất docs/de-xuat-toi-uu-1510.md): 
 - [!] B4 đệm danh mục Hành trình + sổ học | KHÔNG LÀM: danh mục đã nhẹ nhờ B2 (đọc bảng tính sẵn); kéo dài đệm sổ học làm điểm/ca vừa công bố hiện chậm hơn với em — đổi hành vi, lợi ít
 - [x] B5 thi đua ngày đã qua | bằng chứng: c17416a4 (trợ lý); lớp 40 em 45.035→5.835 dòng, 19→4 ms, 2→1 vòng
 - [x] Đợt 2: cổng → PR → phát hành trước 19:00, 0 ca mở | bằng chứng: PR #313 main b5610792, Actions 38685547388 SUCCESS 12:21; vitest so đợt 1: 0 đỏ mới, đỏ nền 122→119; tsc, build, kiem:toc-do, kiem-sw 13/13, mau-giu 0
-- [ ] Đo lại cao điểm tối 15/10 (19:30–22:30) so 14/10 | bằng chứng: (hẹn 22:36, trig_01X5F6L11AF5Cg23jFi6bma2)
+- [x] Đo lại cao điểm tối 15/10 (19:30–22:30) so 14/10 | bằng chứng: run 38762133091 vs 38590197763 — p50 0,033→0,029 s · p90 0,273→0,255 · p99 1,00→0,79 · lỗi 0 · D1 50 nhóm đầu 1.047→839 s; 3 câu tách JSON 235,5→126,1 s; điểm nóng mới docCauBai 55,7 s (đề xuất làm tiếp)
