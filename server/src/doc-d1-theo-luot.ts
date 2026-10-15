@@ -1,6 +1,6 @@
 // Gộp CHỈ SELECT độc lập của MỘT lượt game/hồ sơ. Không có Promise dùng chung giữa các HTTP request (chỉ ĐỆM KẾT QUẢ bảng dùng chung, dưới).
 // Ghi/CAS giữ nguyên lô và thứ tự; xả nhóm đọc trước khi gửi ghi. Không gộp ghi vào nhóm đọc.
-import type { D1Database, D1PreparedStatement, D1Result } from './kieu'
+import type { D1Database, D1PreparedStatement, D1Result, Env } from './kieu'
 import { gan } from './cau-hinh-dem'
 import { dangKyXoaDem, DemTTL } from './dem-chung'
 const DA_GOP = Symbol('omr.docD1TheoLuot')
@@ -115,8 +115,29 @@ export function raoGhiD1(db: D1Database, rao: Promise<unknown>): D1Database {
     },
   }, db)
 }
+/** D1 BÊN TRONG của bản gộp đọc (D1 gốc, hoặc bản rào ghi cổng đóng băng của lượt nếu có) + phép đổi lệnh của bản gộp ⇒ lệnh tương ứng bên trong. */
+const TRONG = Symbol('omr.docD1Trong')
+type Trong = { db: D1Database; lenh: (st: D1PreparedStatement) => D1PreparedStatement }
+/** D1 bên trong của bản gộp đọc (`gopDocD1`) — đi thẳng, KHÔNG qua hàng rào + sổ nhớ của bản gộp, VẪN qua rào ghi cổng đóng băng (nếu lượt có). Không phải bản gộp ⇒ chính nó. */
+export function dbTrong(db: D1Database): D1Database {
+  return ((db as unknown as Record<symbol, Trong | undefined>)[TRONG])?.db ?? db
+}
+/** Lệnh tạo từ bản gộp đọc ⇒ lệnh tương ứng của D1 bên trong (`dbTrong`) — để gửi lô qua đường riêng. Lệnh lạ / không phải bản gộp ⇒ chính nó. */
+export function lenhTrong(db: D1Database, st: D1PreparedStatement): D1PreparedStatement {
+  return ((db as unknown as Record<symbol, Trong | undefined>)[TRONG])?.lenh(st) ?? st
+}
 /**
- * ĐỆM ISOLATE "BẢNG CHƯA CÓ" (tối ưu 05/10): một câu ĐỌC nhắc bảng phụ chưa được tạo (bảng dựng lười bằng DDL, vd. `chien_dich_em`, `loi_giai_hoi`)
+ * ĐƯỜNG GHI RIÊNG của lượt (Gói R 15/10 — luật thầy 13/10 "sửa xong máy chủ phải nhanh hơn"): `env` mà D1 là D1 bên trong của bản gộp đọc (`dbTrong`: không qua
+ * hàng rào + sổ nhớ của bản gộp, VẪN qua rào ghi cổng đóng băng của lượt như mọi lệnh ghi khác). CHỈ cho lệnh ghi ĐỘC LẬP: việc phụ sau phản hồi, hay lệnh ghi tự
+ * nuốt lỗi vào bảng mà không lượt đọc nào khác của lượt đọc lại sau đó (chính nó đọc lại dòng thắng qua cùng đường này) — để nó chạy SONG SONG thay vì xếp hàng
+ * nối tiếp với các lượt đọc/ghi của đường trả lời (mỗi chỗ xếp hàng là một đợt D1). Không phải bản gộp ⇒ chính `env`.
+ */
+export function envGhiRieng(env: Env): Env {
+  const db = dbTrong(env.DB)
+  return db === env.DB ? env : { ...env, DB: db }
+}
+/**
+ * ĐỆM ISOLATE "BẢNG CHƯA CÓ" (tối ưu 05/10):một câu ĐỌC nhắc bảng phụ chưa được tạo (bảng dựng lười bằng DDL, vd. `chien_dich_em`, `loi_giai_hoi`)
  * làm HỎNG CẢ LÔ đọc gộp ⇒ trước: mọi câu của lô chạy lại từng câu ở MỘT ĐỢT SAU. Nay: bảng D1 báo "no such table: X" được nhớ trong isolate
  * `HAN_BANG_VANG` ms; trong thời gian ấy câu nhắc X đi RIÊNG (song song với lô, không vào lô) ⇒ lô của các câu còn lại không hỏng theo. Câu đi riêng
  * vẫn ra ĐÚNG kết quả như cũ (bảng đã có ⇒ đọc bình thường; chưa có ⇒ lỗi ở đúng câu ấy, nơi gọi tự bắt như cũ). Chỉ đổi cách GỬI, không đổi kết quả.
@@ -150,6 +171,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
   if (!bat) {
     const wrapped = gan({ prepare: db.prepare.bind(db), batch: db.batch.bind(db) }, db)
     Object.defineProperty(wrapped, DA_GOP, { value: true })
+    Object.defineProperty(wrapped, TRONG, { value: { db, lenh: (st: D1PreparedStatement) => st } satisfies Trong })
     return wrapped
   }
   type Cho = { st: D1PreparedStatement; xong: (r: D1Result) => void; loi: (e: unknown) => void; sql: string }
@@ -258,5 +280,6 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
   }, db)
   Object.defineProperty(wrapped, DA_GOP, { value: true })
   Object.defineProperty(wrapped, NHO, { value: nho })
+  Object.defineProperty(wrapped, TRONG, { value: { db, lenh: (st: D1PreparedStatement) => goc.get(st)?.st ?? st } satisfies Trong })
   return wrapped
 }
