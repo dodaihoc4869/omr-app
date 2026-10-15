@@ -3334,6 +3334,8 @@ const boXuLy = {
     if(event.cron==='* * * * *') {
       await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now(),2,true,new Date(Date.now()+7*3600000).getUTCHours()<19)).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
       await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
+      // B2 (15/10): dựng lại bảng siêu dữ liệu câu tính sẵn cho tờ vừa lập chỉ mục (cau-meta.ts). Thường ngày không tờ nào lệch ⇒ một câu đọc nhẹ.
+      await import('./cau-meta').then(m=>m.dongBoCauMeta(env,laGioCaoDiemVn(Date.now())?5:40)).catch(e=>console.error('[cau-meta] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
       if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)
@@ -3350,6 +3352,9 @@ const boXuLy = {
     if(event.cron==='1 17 * * *'){
       // Chỉ mục CHỈ-THÊM (chi-muc-luc-chay.ts, 29/09): dựng lúc 00:01 VN, ngoài cao điểm; IF NOT EXISTS ⇒ các đêm sau là lệnh rỗng. Lỗi chỉ ghi nhật ký máy.
       await dungChiMucCronDem(env).then(async n=>{if(n)await ghiLoiMay(env,'chi_muc_dem')}).catch(async e=>{console.error('[chi-muc] cron lỗi:',e);await ghiLoiMay(env,'chi_muc_dem')})
+      // B3 (15/10): đệm theo ngày cờ "đối phó" Nhịp học thầy (nhip-hoc-dem.ts) — dựng bảng + trigger (một lần mỗi isolate), lấp (em, ngày) còn thiếu tới HÔM QUA.
+      // Lỗi chỉ ghi log: lệnh thầy vẫn đúng (phần thiếu tính trực tiếp, bảng chưa có thì đi đường cũ).
+      await import('./nhip-hoc-dem').then(m=>m.lapDemDoiPho(env,Date.now())).then(r=>console.log('[nhip-hoc-dem] lấp',JSON.stringify(r))).catch(e=>console.error('[nhip-hoc-dem] cron lỗi:',e))
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
       // THỨ TỰ: kế hoạch ngày TRƯỚC, tin phụ huynh SAU — tin phụ huynh (GĐ 5) đọc số câu từ kế hoạch vừa lập; chạy song song

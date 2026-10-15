@@ -11,6 +11,7 @@
 //   · β câu (`omni_beta_cau`) = trung vị thời gian lượt đúng tự làm 60 ngày (việc đêm). Thiếu ⇒ ước lượng theo phần × mức (omni-toc-do.ts).
 // Mọi đường đọc của em/PH: lỗi ⇒ trả giá trị an toàn (hồ sơ rỗng / null), KHÔNG làm hỏng Sảnh, trả lời, PH.
 import type { Env } from './kieu'
+import { KHOP } from './cau-meta'
 import {
   CAC_KHUNG_GIO, KHOA_CO_OMNI, KHOA_THAM_SO_OMNI, MUC_DICH_LUOT, PHIEN_BAN_OMNI, THAM_SO_OMNI,
   coOmniApCho, docCoOmniTu, khungGioCua,
@@ -216,10 +217,14 @@ export function chuyenDeCua(dang: string | null | undefined, chuyenDe?: string |
   const d = str(dang).trim()
   return d ? d.split('.')[0]! : null
 }
-const SQL_CAU_KHO = `SELECT ma_de, qid, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do,
+// B2 (15/10): bảng tính sẵn `cau_meta` khớp kho ⇒ đọc bảng ấy; lệch ⇒ CÙNG câu đọc thẳng `game_v2_question` như cũ (cau-meta.ts).
+const SQL_CAU_KHO = `SELECT ma_de, qid, content_group, dang, phan, muc_do, ten_dang, chuyen_de, kien_thuc, kien_thuc_y, tu_luan, reviewed
+  FROM cau_meta WHERE ${KHOP} AND qid IN (SELECT value FROM json_each(?1))
+  UNION ALL
+  SELECT ma_de, qid, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do,
     json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.chuyenDe') AS chuyen_de, json_extract(json,'$.kienThuc') AS kien_thuc,
     json_extract(json,'$.kienThucY') AS kien_thuc_y, json_extract(json,'$.tuLuan') AS tu_luan, json_extract(json,'$.reviewed') AS reviewed
-  FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY qid, ma_de`
+  FROM game_v2_question WHERE NOT ${KHOP} AND qid IN (SELECT value FROM json_each(?1)) AND json_valid(json) ORDER BY qid, ma_de`
 const cauKhoTuDong = (x: Row): CauKho => {
   const dang = str(x.dang).trim() || null
   return {

@@ -1,0 +1,43 @@
+# ĐO KẾ HOẠCH TRUY VẤN (CHỈ ĐỌC) — B1 tối ưu 15/10 (thầy: "làm cả đợt 1 và 2"). In EXPLAIN QUERY PLAN của các truy vấn nóng + số dòng bảng
+# + số ca đang mở, để chứng minh chỉ mục mới (server/migration-z-1510-chi-muc.sql) được dùng. Không in mã em, tên em, nội dung.
+name: Đo kế hoạch truy vấn (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/do-chi-muc-1510.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-chi-muc-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kế hoạch truy vấn (chỉ EXPLAIN / SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results | map(.detail // .)'; }
+          q "ca đang mở" "SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'"
+          q "chỉ mục đã có trên 3 bảng" "SELECT tbl_name, name FROM sqlite_master WHERE type='index' AND tbl_name IN ('cau_bo_tro','hanh_trinh_v4_canh','su_kien_hoc') ORDER BY tbl_name, name"
+          q "số dòng" "SELECT (SELECT COUNT(*) FROM cau_bo_tro) bo_tro, (SELECT COUNT(*) FROM hanh_trinh_v4_canh) canh, (SELECT COUNT(*) FROM su_kien_hoc) so_hoc"
+          q "PLAN nhãn nền câu bổ trợ" "EXPLAIN QUERY PLAN SELECT qid_mau, nhan_nen_json FROM cau_bo_tro WHERE qid_mau IN (SELECT value FROM json_each('[\"a\",\"b\"]'))"
+          q "PLAN cạnh cả lớp" "EXPLAIN QUERY PLAN SELECT tu,den,SUM(n_co) nCo,SUM(dung_co) dungCo,SUM(n_chua) nChua,SUM(dung_chua) dungChua,COUNT(DISTINCT sbd) soEm FROM hanh_trinh_v4_canh WHERE den IN (SELECT value FROM json_each('[\"a\"]')) AND cap_nhat_luc>=0 AND n_co+n_chua>0 GROUP BY tu,den"
+          q "PLAN sổ một em theo thời gian" "EXPLAIN QUERY PLAN SELECT khoa, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de FROM su_kien_hoc WHERE sbd = 'x' ORDER BY luc, khoa"
+          q "B2: số tờ có mốc · số tờ có câu · số tờ mồ côi (có câu, không mốc) · số câu" "SELECT (SELECT COUNT(*) FROM game_v2_index) to_moc, (SELECT COUNT(DISTINCT ma_de) FROM game_v2_question) to_cau, (SELECT COUNT(DISTINCT q.ma_de) FROM game_v2_question q WHERE NOT EXISTS (SELECT 1 FROM game_v2_index gi WHERE gi.ma_de=q.ma_de)) mo_coi, (SELECT COUNT(*) FROM game_v2_question) cau"
+          q "B2: bảng cau_meta đã có chưa" "SELECT name FROM sqlite_master WHERE name IN ('cau_meta','cau_meta_to','cau_meta_qid')"
+          q "PLAN lần làm theo câu (srs2-d1 docLanLam, sbd + qid + luc)" "EXPLAIN QUERY PLAN SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon, purpose, json_extract(raw_json,'\$.tc') AS tc FROM su_kien_hoc WHERE sbd = 'x' AND qid IN (SELECT value FROM json_each('[\"a\",\"b\"]')) AND luc >= '2026-10-01' AND COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chua_buoc') UNION ALL SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon, purpose, json_extract(raw_json,'\$.tc') AS tc FROM su_kien_hoc WHERE sbd = 'x' AND json_extract(raw_json,'\$.tc') IS NOT NULL AND json_extract(raw_json,'\$.tc') IN (SELECT value FROM json_each('[\"a\"]')) AND qid NOT IN (SELECT value FROM json_each('[\"a\",\"b\"]')) AND luc >= '2026-10-01' AND COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chua_buoc')"
+          q "PLAN sổ em từ mốc (sbd + luc)" "EXPLAIN QUERY PLAN SELECT qid, ngay_vn, luc, ket_qua FROM su_kien_hoc WHERE sbd = 'x' AND luc >= '2026-10-01'"
+          q "PLAN câu đã làm cả lớp (bai-da-day)" "EXPLAIN QUERY PLAN SELECT 1 AS co FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each('[\"x\"]')) AND qid IN (SELECT value FROM json_each('[\"a\"]')) AND luc >= '2026-10-01'"
+          q "sqlite_stat1 có không" "SELECT COUNT(*) n FROM sqlite_master WHERE name='sqlite_stat1'"

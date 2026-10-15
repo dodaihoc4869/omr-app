@@ -7,7 +7,9 @@ const DA_GOP = Symbol('omr.docD1TheoLuot')
 // ĐỆM DÙNG CHUNG GIỮA CÁC LƯỢT (sự cố 09/10 cả trường "Chưa kết nối" sau khi bật Hành trình): mỗi lần mở Sảnh, mỗi em đọc lại ~5.000 dòng kho câu /
 // OMNI / danh sách GIỐNG HỆT em khác ⇒ D1 quá tải giờ cao điểm. SELECT mà MỌI bảng nhắc tới đều thuộc BANG_DUNG_CHUNG được nhớ 60 giây theo (SQL, tham số);
 // lệnh ghi qua bản gộp đụng các bảng này ⇒ xoá ngay (isolate khác cũ tối đa 60 giây). KHÔNG đưa `hoc_sinh` vào (có token/mật khẩu). Trả bản sao từng dòng.
-export const BANG_DUNG_CHUNG: readonly string[] = ['game_v2_question', 'omni_q', 'danh_sach']
+// B2 (15/10): câu đọc siêu dữ liệu câu nay nhắc thêm bảng tính sẵn `cau_meta` + `cau_meta_to` và bảng mốc `game_v2_index` (điều kiện khớp, cau-meta.ts)
+// ⇒ ba bảng này vào danh sách để các câu ấy GIỮ đệm chung 60 giây như trước. Mốc lập chỉ mục đổi cùng lô với câu ⇒ độ trễ kho không đổi (≤ 60 giây).
+export const BANG_DUNG_CHUNG: readonly string[] = ['game_v2_question', 'omni_q', 'danh_sach', 'game_v2_index', 'cau_meta', 'cau_meta_to']
 // Trần bộ nhớ (đo 13/10 21:20–22:05: 111 lỗi `exceededMemory`): trọng lượng = số ký tự JSON; chữ Việt ⇒ 2 byte/ký tự và đối tượng dòng còn tốn gấp vài lần
 // ⇒ trước 16 triệu ký tự (một mục tới 4 triệu) có thể chiếm hàng chục MB của 128 MB isolate. Nay 6 triệu tổng, 1,5 triệu mỗi mục (mục lớn hơn đọc thẳng D1).
 const demChung = new DemTTL<D1Result>(60_000, 300, 6_000_000)

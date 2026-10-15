@@ -468,3 +468,34 @@ Thầy (14/10 ~15:1x, ảnh "Chặng học của em — Em đã hoàn thành ph�
 - [x] Tái hiện + nguyên nhân gốc + sửa + test khoá + phát hành | bằng chứng: đo D1 thật chỉ-đọc (do-goi7-chang-rong-1410) 21:40: 3 em 23/24, câu cuối là câu ôn/sửa NGHI SAI ĐÁP ÁN ⇒ chặng rỗng. Nguyên nhân gốc: cổng phát câu loại câu nghi, kế hoạch không xét câu nghi cho ôn/sửa/chữa (kế hoạch xếp vừa đúng phần còn lại của mức). Sửa PR #305 (main 0d4badeb, Actions 38590095839 SUCCESS 22:40, 0 ca mở): kế hoạch chặn câu nghi + câu vừa làm 15 phút (cùng luật lúc phát, chung tập câu nghi), hàng chờ dự phòng khi còn thiếu mức. A/B D1 thật (38583483924): rỗng 3 → 0; sau phát hành (38591381871): 34/34 em thiếu mức mở chặng có câu. Test khoá goi7-chang-rong-con-cau-1410: main 3/4 đỏ (đúng màn em), nhánh 4/4. Vitest toàn bộ 0 đỏ mới; kiem:toc-do 0 đỏ, bớt 1 lệnh D1 ở sảnh/mở chặng (đã hạ mốc).
 Việc tự hẹn (lịch 21:35): đo cao điểm 14/10 so 13/10
 - [x] Đo 19:30–22:30 VN cùng khung 13/10 | bằng chứng: run 38590197763 vs 38496981327 — yc 50.755→37.102; lỗi 135 (100% exceededMemory)→0; p50 0,084→0,033 s; p90 0,723→0,273 s; p99 3,75→1,00 s; D1 50 nhóm đầu 1.631→1.047 s (32,1→28,2 ms/yc)
+Thầy (15/10, ảnh "Hộp thư Zalo" phong cách retro): "bạn thử vẽ giao diện học sinh theo phong cách restro này, nhưng cải tiến đẹp hơn, thân thiện hơn và thích mắt hơn, vẽ trước khi tôi quyết định build nhé"
+- [x] Đặc tả 7 mục + bản vẽ HTML các màn chính app học sinh (Hôm nay · Làm câu · Xong chặng · Hành trình · trạng thái) phong cách retro | bằng chứng: docs/ban-ve-hs-retro-1510/hs-retro.html + GHI-CHU.md (dữ liệu thật của app, 0 lệnh máy chủ mới, 0 byte phông mới)
+- [x] Ảnh Chromium thật 3 khổ (390 dọc · 844 ngang · 1440), sáng + tối; soát 0 lỗi trang · 0 tràn · 0 đích chạm < 44 px | bằng chứng: 20 ảnh docs/ban-ve-hs-retro-1510/anh (≤ 150 KB/ảnh), node scripts/chup-ban-ve-hs-retro-1510.mjs → "SOÁT: 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ"
+- [ ] KHÔNG build — chờ thầy duyệt (quy trình 4 bước) + 3 quyết định trong GHI-CHU (luật màu 05/10, phạm vi đợt 1, bỏ ô Tự sửa lỗi trùng) | bằng chứng: đã gửi ảnh, chờ thầy
+Thầy (15/10 ~07:5x, sau khi xem bản vẽ retro): "thay đổi mọi chỗ trong giao diện chứ"
+- [!] Đổi giao diện retro cho MỌI màn app học sinh | DỪNG theo lệnh thầy 15/10: "dừng việc làm giao diện lại". Chưa commit/build/phát hành; phần dở cất ở tệp vá trong scratchpad phiên (giao-dien-retro-dang-do-1510.patch), tokens.css + hoc-tap.css trả về nguyên trạng
+- [!] Bản thật trên Pages xem trước → thầy chốt → phát hành | DỪNG theo lệnh thầy 15/10
+Thầy (15/10 ~08:3x): "giờ quét toàn app xem tối ưu thân thiện nhất được gì không, tối ưu máy chủ tốc độ load app rút câu mọi thứ, đề xuất cho tôi trước khi build nhé"
+- [x] Quét thân thiện 3 app (HS/PH/GV) — chỉ đọc | bằng chứng: HS 12 mục (soi:giao-dien 1 lỗi + 3 cảnh báo); PH 8 mục; GV 8 mục (có lỗi thật: nút "Giao bài riêng" ở Toàn cảnh em / báo cáo ca không chạy khi Game Hoá 2.0 bật)
+- [x] Quét máy chủ: truy vấn D1 nặng nhất giờ cao điểm + đợt chờ nối tiếp lệnh nóng | bằng chứng: D1 xong — 11 đề xuất, ước ~310 s/1.047 s D1 mỗi 3 giờ cao điểm (−30%), đo tỉ lệ trên SQLite cục bộ; tem kho không đổi từ 07/10 (run 38590197763) ⇒ đệm trượt do isolate mới/chết, không do kho đổi. Đợt chờ nối tiếp đo được: sảnh lần đầu 29/35, isolate ấm 13/15, mở chặng 10/15, nộp câu 9/12; dự kiến sau sửa ~12 · ~4 · 4–5 · 4 (ước)
+- [x] Quét tốc độ tải app (byte mở từng app, mảnh nặng nhất) | bằng chứng: kiem-toc-do --in: gv 264,1 · hs 322,3 · ph 259,2 KB nén; quy byte theo sourcemap: react-dom ~55/61 KB khối index (đổi mỗi lần phát hành); mảnh chung DesignSystem 34 KB nạp ở cả 3 app chứa experiments/expanded ~6,4 · exam-kho-de-import ~3,5 · fflate ~2,8 · bai-tap-pdf ~1,8 KB; StudentPortalScreen 58 KB chứa KhoiKhacPhuc3CheDo ~11,6 KB; CSS toàn cục 52,5 KB gồm CSS app thầy
+- [x] Quét luồng rút câu (lập kế hoạch Gói 7, mở chặng, nộp câu) | bằng chứng: liệt kê từng đợt + 12 đề xuất; lỗi thật hanh-trinh-dong-co.ts:210 (hs.chienDich!.id)
+- [x] Đề xuất xếp ưu tiên gửi thầy — KHÔNG build trước khi thầy chọn | bằng chứng: docs/de-xuat-toi-uu-1510.md (gói A sửa lỗi · B máy chủ · R rút câu · C tải app · D thân thiện cần bản vẽ)
+Thầy (15/10 ~08:5x, sau khi đọc đề xuất docs/de-xuat-toi-uu-1510.md): "giữ làm cả đợt 1 và 2"
+- [x] Chữ "Lười": GIỮ nguyên (thầy: "giữ") | bằng chứng: không đổi chữ
+- [x] A1 thẻ đăng nhập /hs có nền, ô nhập ≥ 16 px | bằng chứng: 129644bf; Chromium 390: nền thẻ rgba(0,0,0,0)→rgb(255,254,251) (tối rgb(32,39,48)), ô nhập 14→16 px; ảnh docs/anh-sua-1510/
+- [x] A2 ẩn "Giao bài riêng" khi Game Hoá 2.0 bật (ToanCanhEm, BaoCaoChiTiet) | bằng chứng: 86f27541; test em-toan-canh 20/20 (ca mới: 2.0 bật ⇒ không nút, Cho thi lại là nút chính)
+- [x] A3 hanh-trinh-dong-co.ts:210 em Gói 7 không có chiến dịch không nổ | bằng chứng: 2ddaf20f; test đỏ trước (Cannot read properties of null) → xanh; 5 tệp động cơ 64/64
+- [x] A4 không hiện "dấu hiệu đối phó" cho học sinh | bằng chứng: 7142dc81 (chỉ ẩn ở app em — phụ huynh đọc chung bản dữ liệu nên KHÔNG lọc máy chủ); test 3 chế độ, đỏ trên mã cũ 1/2
+- [x] A5 chữ lệch chuẩn | bằng chứng: 3a51d35f; soi:giao-dien 1 lỗi → 0; "lộ mã câu" kiểm lại: máy chủ bản HS/PH đã thay (tieuDeCauHs) — không phải lỗi
+- [x] B1 3 chỉ mục còn thiếu | bằng chứng: migration-z-1510-chi-muc.sql chạy D1 thật (run 38669736912); EXPLAIN trước/sau (38669626084 → 38669862783): SCAN cau_bo_tro → SEARCH idx_cau_bo_tro_mau · canh → COVERING INDEX · sổ em bỏ TEMP B-TREE ORDER BY
+- [x] C1 tách React thành mảnh riêng mã băm ổn định | bằng chứng: 331df118; react-BT75DBbd.js 57,5 KB nén, đổi chữ màn em rồi dựng lại ⇒ tên mảnh React giữ nguyên
+- [x] C2 nạp lười mã ít dùng trong mảnh chung 3 app | bằng chứng: 331df118; cảnh thí nghiệm, fflate, exam-kho-de-import nạp khi cần; bai-tap-pdf ra khỏi lượt mở HS/PH
+- [x] C3 nạp lười phần màn học sinh chỉ mở khi bấm | bằng chứng: 331df118; Khắc phục/BTVN/Bài gia đình giao vào mảnh nạp lười; bản gộp: GV 264,2→251,8 · HS 322,5→283,3 · PH 259,3→242,6 KB; kiem-sw 13/13; mau-giu 0
+- [ ] Đợt 1: cổng (tsc, vitest so main, build, kiem:toc-do 0 đỏ + hạ mốc, kiem:mau-giu 0, kiem-sw) → PR → phát hành trước 19:00, 0 ca mở | bằng chứng: (chưa có)
+- [ ] R gộp đợt chờ D1 nối tiếp: sảnh lần đầu, isolate ấm, sảnh lần sau, mở chặng, nộp câu (hạ mốc) | bằng chứng: (chưa có)
+- [x] B2 bảng cau_meta tính sẵn | bằng chứng: 2c250480; migration chạy D1 thật (38670743551); test so khớp 4/4; cổng tốc độ bằng mốc (lần đầu +2 đợt do câu mở đầu WITH — đã sửa)
+- [x] B3 Nhịp học thầy: ngày đã qua tính sẵn | bằng chứng: 9ee948c2 (trợ lý); D1 workerd 180k dòng: 2.980.659→158.652 dòng đọc, 1430→90 ms; trigger vô hiệu theo (em, ngày); cron 00:01 dựng
+- [ ] B4 đệm danh mục Hành trình + sổ học | bằng chứng: (chưa có)
+- [x] B5 thi đua ngày đã qua | bằng chứng: c17416a4 (trợ lý); lớp 40 em 45.035→5.835 dòng, 19→4 ms, 2→1 vòng
+- [ ] Đợt 2: cổng → PR → phát hành trước 19:00, 0 ca mở; đo lại cao điểm tối 15/10 | bằng chứng: (chưa có)

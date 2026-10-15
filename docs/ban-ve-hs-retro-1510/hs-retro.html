@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>App học sinh · phong cách Retro</title>
+<style>
+/* BẢN VẼ 15/10 — app học sinh phong cách "retro giấy ô li" (thầy gửi ảnh Hộp thư Zalo: nền kem, viền mực dày, bóng cứng lệch, nhãn in hoa giãn chữ).
+   Chỉ là bản vẽ: số liệu GIẢ, chưa đụng src/. Phông: ĐÚNG Be Vietnam Pro 400/600/700 app đang nạp (src/main.tsx) — không thêm byte phông nào. */
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-600-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+/* ===== BẢNG MÀU "GIẤY Ô LI" — sáng ===== */
+:root{
+  --giay:#F7EFE0;        /* nền giấy kem */
+  --o-li:rgba(38,40,56,.055);
+  --the:#FFFBF3;         /* mặt thẻ */
+  --the-lom:#F1E7D4;     /* ô lõm, khung xương */
+  --muc:#262838;         /* mực: chữ chính + viền */
+  --muc-2:#565B6E;       /* chữ phụ */
+  --nhan:#2B6468;        /* nhãn in hoa (xanh két) */
+  --bong:#262838;        /* bóng cứng */
+  --cam:#FF7B47;         /* nút chính — cam quýt */
+  --tren-cam:#1F1F2B;
+  --dao:#FFE0CC;         /* đào: đang chọn / đang học */
+  --dao-dam:#9A3B12;
+  --bac-ha:#CDEBDC;      /* bạc hà: đúng / đã xong */
+  --bac-ha-dam:#1D6649;
+  --hong:#F9D6D1;        /* hồng: sai / lỗi / mất mạng */
+  --hong-dam:#9E2B25;
+  --bo:#FFE9A6;          /* vàng bơ: chú ý */
+  --bo-dam:#6F5100;
+  --oai:#DDD6F8;         /* oải hương: trả lời ngắn / huy hiệu */
+  --oai-dam:#4A3D9E;
+  --vien:2px;
+  --lech:4px;
+  color-scheme:light;
+}
+/* ===== tối: "đêm ô li" — nền mực, viền kem, bóng đen ===== */
+@media (prefers-color-scheme:dark){:root{
+  --giay:#15171F; --o-li:rgba(243,233,214,.045); --the:#20232F; --the-lom:#2A2E3C;
+  --muc:#F2E8D5; --muc-2:#C2BAAA; --nhan:#8FD0CB; --bong:#5A4D3A;
+  --cam:#FF8D5E; --tren-cam:#1A1B24;
+  --dao:#4A2D20; --dao-dam:#FFC2A1;
+  --bac-ha:#1C4436; --bac-ha-dam:#9DE6C4;
+  --hong:#4B2321; --hong-dam:#FFB7AD;
+  --bo:#463A12; --bo-dam:#FFDB72;
+  --oai:#302A59; --oai-dam:#CDC4FF;
+  color-scheme:dark;
+}}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--muc);background:var(--giay);
+  background-image:linear-gradient(var(--o-li) 1px,transparent 1px),linear-gradient(90deg,var(--o-li) 1px,transparent 1px);
+  background-size:22px 22px;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.khung{display:none}
+.khung[data-hien]{display:block}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.so{font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.tab{font-variant-numeric:tabular-nums}
+.nhan-in{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--nhan)}
+.phu{color:var(--muc-2);font-size:14px}
+b,strong{font-weight:700}
+sub{font-size:.72em;line-height:0}
+
+/* ---- thẻ, nút, chip ---- */
+.the{background:var(--the);border:var(--vien) solid var(--muc);border-radius:18px;box-shadow:var(--lech) var(--lech) 0 var(--bong);padding:16px}
+.nut{font:inherit;font-weight:700;font-size:16px;color:var(--muc);background:var(--the);border:var(--vien) solid var(--muc);border-radius:14px;
+  box-shadow:3px 3px 0 var(--bong);min-height:48px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;
+  touch-action:manipulation;transition:transform .12s,box-shadow .12s}
+.nut:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--bong)}
+.nut:focus-visible{outline:3px solid var(--cam);outline-offset:3px}
+.nut-chinh{background:var(--cam);color:var(--tren-cam);font-weight:700}
+.nut:disabled{box-shadow:none;border-style:dashed;color:var(--muc-2);background:var(--the-lom);cursor:not-allowed}
+.nut-to{width:100%;min-height:56px;font-size:17px}
+.nut-nho{min-height:44px;font-size:14px;padding:0 14px;border-radius:999px}
+.nut-vuong{width:44px;height:44px;min-height:44px;padding:0;border-radius:12px}
+.nut-chu{background:none;border:none;box-shadow:none;color:var(--muc);text-decoration:underline;text-underline-offset:4px;font-weight:600;padding:0 4px}
+.nut-chu:active{transform:none}
+.chip{display:inline-flex;align-items:center;gap:6px;border:var(--vien) solid var(--muc);border-radius:999px;padding:3px 12px;font-size:13px;font-weight:700;background:var(--the);white-space:nowrap}
+.chip svg.i{width:16px;height:16px}
+.chip-bac-ha{background:var(--bac-ha);color:var(--bac-ha-dam);border-color:currentColor}
+.chip-bo{background:var(--bo);color:var(--bo-dam);border-color:currentColor}
+.chip-oai{background:var(--oai);color:var(--oai-dam);border-color:currentColor}
+.chip-dao{background:var(--dao);color:var(--dao-dam);border-color:currentColor}
+.chip-hong{background:var(--hong);color:var(--hong-dam);border-color:currentColor}
+.chip-dut{border-style:dashed}
+.hang{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.gian{justify-content:space-between}
+.vach-ke{flex:1;height:2px;background:var(--muc);min-width:24px;opacity:.85}
+.nhan-dan{position:relative}
+.sticker{display:inline-block;transform:rotate(-3deg);background:var(--bo);color:var(--bo-dam);border:var(--vien) solid var(--muc);border-radius:12px;
+  box-shadow:3px 3px 0 var(--bong);padding:6px 14px;font-weight:700;font-size:15px}
+.thanh{height:16px;border:var(--vien) solid var(--muc);border-radius:999px;background:var(--the-lom);overflow:hidden}
+.thanh>i{display:block;height:100%;background:repeating-linear-gradient(-45deg,var(--cam) 0 8px,color-mix(in srgb,var(--cam) 78%,#fff) 8px 16px);border-right:var(--vien) solid var(--muc)}
+.thanh.xanh>i{background:repeating-linear-gradient(-45deg,#3FB489 0 8px,#5CC79F 8px 16px)}
+
+/* ---- khung app: điện thoại có thanh đáy; ≥ 900 px có cột trái ---- */
+.app{min-height:100vh;display:flex;flex-direction:column}
+.noi-dung{flex:1;padding:12px 16px 104px;display:flex;flex-direction:column;gap:18px;max-width:560px;width:100%;margin:0 auto}
+.dau{display:flex;align-items:center;gap:10px;padding:12px 16px 0;max-width:560px;width:100%;margin:0 auto}
+.logo{width:44px;height:44px;border-radius:13px;background:var(--cam);color:var(--tren-cam);border:var(--vien) solid var(--muc);display:grid;place-items:center;box-shadow:3px 3px 0 var(--bong);flex:none}
+.ten-app{line-height:1.2;min-width:0}
+.ten-app b{display:block;font-size:16px;font-weight:700}
+.ten-app span{font-size:12px;color:var(--muc-2)}
+.dau .phai{margin-left:auto;display:flex;gap:8px}
+.avatar{font:inherit;cursor:pointer;width:44px;height:44px;border-radius:50%;border:var(--vien) solid var(--muc);background:var(--oai);color:var(--oai-dam);display:grid;place-items:center;font-weight:700;font-size:15px;box-shadow:3px 3px 0 var(--bong)}
+.dai{display:flex;align-items:center;gap:10px;margin-top:4px}
+.dai .nhan-in{white-space:nowrap}
+.luoi-mt{display:flex;flex-direction:column;gap:18px}
+.luoi-mt>div{display:contents}
+/* điện thoại: đúng thứ tự app đang chạy — việc hôm nay → tự sửa lỗi → bài học 7 ngày → ôn và sửa */
+.luoi-mt .the-chinh{order:1}.luoi-mt .the-sua{order:2}.luoi-mt .bay-ngay{order:3}.luoi-mt .on-sua{order:4}.luoi-mt .chi-mt{order:5}
+.nut-nho{white-space:nowrap}
+.dai .chi-dt{margin-left:auto;padding:0 12px;gap:8px}
+.dai .chi-dt svg.i{width:18px;height:18px}
+@media (max-width:440px){.dai:has(.chi-dt) .vach-ke{display:none}.dai:has(.chi-dt) .nhan-in{letter-spacing:.1em}}
+h1{font-size:30px;line-height:1.15;font-weight:700;margin:0;letter-spacing:-.01em}
+h2{font-size:18px;margin:0;font-weight:700}
+.day-nav{position:fixed;left:0;right:0;bottom:0;background:var(--the);border-top:var(--vien) solid var(--muc);display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+.day-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;border-radius:14px;color:var(--muc-2);text-decoration:none;font-size:12px;font-weight:700;border:var(--vien) solid transparent}
+.day-nav a[aria-current]{background:var(--cam);color:var(--tren-cam);border-color:var(--muc);box-shadow:3px 3px 0 var(--bong)}
+.cot-trai{display:none}
+@media (min-width:900px){
+  .app{flex-direction:row}
+  .cot-trai{display:flex;flex-direction:column;gap:10px;width:248px;flex:none;padding:20px 16px;border-right:var(--vien) solid var(--muc);background:var(--the);position:sticky;top:0;height:100vh}
+  .cot-trai .dau-trai{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .cot-trai a{display:flex;align-items:center;gap:12px;min-height:50px;padding:0 14px;border-radius:14px;color:var(--muc);text-decoration:none;font-weight:700;border:var(--vien) solid transparent}
+  .cot-trai a[aria-current]{background:var(--cam);color:var(--tren-cam);border-color:var(--muc);box-shadow:3px 3px 0 var(--bong)}
+  .cot-trai .duoi{margin-top:auto}
+  .day-nav{display:none}
+  .chinh{flex:1;min-width:0}
+  .dau{max-width:1120px;padding:20px 32px 0}
+  .dau .logo,.dau .ten-app{display:none}
+  .noi-dung{max-width:1120px;padding:16px 32px 40px}
+  .luoi-mt{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;align-items:start}
+  .luoi-mt>div{display:flex;flex-direction:column;gap:24px}
+  .luoi-mt .the-chinh,.luoi-mt .the-sua,.luoi-mt .bay-ngay,.luoi-mt .on-sua,.luoi-mt .chi-mt{order:0}
+}
+
+/* ---- Hôm nay ---- */
+.the-chinh{padding:18px;display:flex;flex-direction:column;gap:12px;position:relative}
+.con-cau{display:flex;align-items:baseline;gap:10px}
+.con-cau .so{font-size:64px;letter-spacing:-.02em}
+.con-cau span{font-size:20px;font-weight:700}
+.tau{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.toa{border:var(--vien) solid var(--muc);border-radius:12px;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--the-lom);color:var(--muc-2)}
+.toa b{font-size:15px;color:var(--muc)}
+.toa.xong{background:var(--bac-ha);color:var(--bac-ha-dam)}
+.toa.xong b{color:var(--bac-ha-dam)}
+.toa.dang{background:repeating-linear-gradient(-45deg,var(--dao) 0 7px,color-mix(in srgb,var(--dao) 70%,var(--cam)) 7px 9px);color:var(--dao-dam);box-shadow:3px 3px 0 var(--bong)}
+.toa.dang b{color:var(--dao-dam)}
+.dong-bai{display:flex;align-items:center;gap:10px;padding:10px 12px;border:var(--vien) dashed var(--muc);border-radius:12px;background:var(--the)}
+.dong-bai .min{min-width:0}
+.dong-bai b{display:block}
+.the-sua{background:var(--bo);border-style:dashed;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px}
+.the-sua .min{flex:1;min-width:180px;color:var(--bo-dam)}
+.the-sua .min>b{color:var(--muc);display:block}
+.o-icon{width:44px;height:44px;border-radius:12px;border:var(--vien) solid var(--muc);display:grid;place-items:center;background:var(--the);flex:none}
+.bai{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-top:var(--vien) dashed color-mix(in srgb,var(--muc) 35%,transparent)}
+.bai:first-of-type{border-top:none;padding-top:6px}
+.bai .ten{font-weight:700;font-size:16px}
+.luoi-o{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.o-luoi{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px;text-decoration:none;color:var(--muc);min-height:96px}
+.o-luoi b{font-size:15px}
+
+/* ---- Làm câu ---- */
+.lam{min-height:100vh;display:flex;flex-direction:column}
+.thanh-lam{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--the);border-bottom:var(--vien) solid var(--muc);position:sticky;top:0;z-index:2}
+.thanh-lam .giua{flex:1;min-width:0}
+.thanh-lam .giua b{font-size:16px;font-weight:700}
+.vach-cau{display:flex;gap:5px;margin-top:6px}
+.vach-cau i{flex:1;height:10px;border-radius:999px;border:var(--vien) solid var(--muc);background:var(--the-lom)}
+.vach-cau i.d{background:#3FB489}
+.vach-cau i.s{background:#E8645A}
+.vach-cau i.h{background:var(--cam)}
+.than-lam{flex:1;padding:16px 16px 120px;display:flex;flex-direction:column;gap:14px;max-width:640px;width:100%;margin:0 auto}
+.de{font-size:17px;line-height:1.6;margin:10px 0 0}
+.lc{display:flex;flex-direction:column;gap:12px}
+.lc .nut{justify-content:flex-start;text-align:left;font-weight:600;min-height:58px;padding:8px 14px;width:100%;border-radius:16px}
+.chu-cai{width:36px;height:36px;border-radius:10px;border:var(--vien) solid var(--muc);display:grid;place-items:center;font-weight:700;flex:none;background:var(--the-lom)}
+.lc .nut[aria-pressed=true]{background:var(--dao);box-shadow:5px 5px 0 var(--bong);transform:translate(-1px,-1px)}
+.lc .nut[aria-pressed=true] .chu-cai{background:var(--cam);color:var(--tren-cam)}
+.lc .nut.dung{background:var(--bac-ha)}
+.lc .nut.dung .chu-cai{background:#3FB489;color:#0F2A1F}
+.lc .nut.sai{background:var(--hong)}
+.lc .nut.sai .chu-cai{background:#E8645A;color:#2B0F0D}
+.lc .nut .ct{min-width:0}
+.lc .nut .duoi-phai{margin-left:auto;font-size:13px;font-weight:700}
+.day-lam{position:fixed;left:0;right:0;bottom:0;background:var(--the);border-top:var(--vien) solid var(--muc);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;z-index:3}
+.day-lam .nut-chinh{flex:1}
+.dai-kq{border:var(--vien) solid var(--muc);border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:var(--lech) var(--lech) 0 var(--bong)}
+.dai-kq.sai{background:var(--hong)}
+.dai-kq.dung{background:var(--bac-ha)}
+.dai-kq b{display:block;font-size:17px}
+.dai-kq .phu{color:inherit;opacity:.9}
+.dai-kq.sai b,.dai-kq.sai .phu{color:var(--hong-dam)}
+.dai-kq.dung b,.dai-kq.dung .phu{color:var(--bac-ha-dam)}
+.tro-giup{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+/* đúng – sai */
+.y{display:flex;align-items:center;gap:12px;padding:10px 12px;border:var(--vien) solid var(--muc);border-radius:14px;background:var(--the)}
+.y .noi{flex:1;min-width:0;font-size:15px}
+.y .noi b{margin-right:6px}
+.cap{display:flex;border:var(--vien) solid var(--muc);border-radius:12px;overflow:hidden;flex:none;box-shadow:3px 3px 0 var(--bong)}
+.cap button{font:inherit;font-weight:700;font-size:14px;min-width:60px;min-height:44px;border:none;background:var(--the);color:var(--muc);cursor:pointer}
+.cap button+button{border-left:var(--vien) solid var(--muc)}
+.cap button[aria-pressed=true].d{background:var(--bac-ha);color:var(--bac-ha-dam)}
+.cap button[aria-pressed=true].s{background:var(--hong);color:var(--hong-dam)}
+.ban-do{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ban-do span{border:var(--vien) solid var(--muc);border-radius:8px;padding:2px 8px;font-size:13px;font-weight:700;background:var(--the)}
+/* trả lời ngắn */
+.phieu{display:flex;gap:8px;justify-content:center}
+.phieu i{width:56px;height:64px;border:var(--vien) solid var(--muc);border-radius:12px;background:var(--the);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:30px;box-shadow:3px 3px 0 var(--bong)}
+.phieu i.tro{background:var(--oai)}
+.phieu i.trong{background:var(--the-lom);box-shadow:none;color:var(--muc-2)}
+.phim{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.phim .nut{min-height:54px;font-size:21px;padding:0}
+.phim .nut.so-0{grid-column:span 2}
+.phim .nut.xoa-het{grid-column:span 2;font-size:15px}
+
+/* ngang: câu bên trái, đáp án bên phải */
+@media (min-width:700px) and (max-height:520px){
+  .than-lam{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px;padding:10px 16px 78px;align-items:start}
+  .thanh-lam{padding:6px 16px}
+  .thanh-lam .giua b{font-size:15px}
+  .vach-cau{margin-top:4px}.vach-cau i{height:8px}
+  .day-lam{padding:6px 16px;align-items:center}
+  .day-lam .nut-to{min-height:48px}
+  .the{padding:12px 14px}
+  .de{font-size:15px;margin-top:6px}
+  .y{padding:3px 3px 3px 12px;min-height:50px;border-radius:12px}
+  .y .noi{font-size:14px;line-height:1.35}
+  .cot-dap{display:flex;flex-direction:column;gap:6px!important}
+}
+/* máy tính: làm câu có cột phải */
+@media (min-width:1100px){
+  .than-lam.rong{max-width:1120px;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;padding:28px 32px 120px;align-items:start}
+  .than-lam.rong .cot-phai{display:flex}
+  .day-lam.rong{justify-content:center}
+  .day-lam.rong .nut-chinh{flex:0 0 420px}
+  .lam:has(.than-lam.rong) .thanh-lam .chip{display:none}
+}
+.cot-phai{display:none;flex-direction:column;gap:16px;position:sticky;top:96px}
+.ban-do-chang{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ban-do-chang span{border:var(--vien) solid var(--muc);border-radius:12px;min-height:48px;display:grid;place-items:center;font-weight:700}
+
+/* ---- Xong chặng ---- */
+.mung{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:26px 16px 22px;position:relative;overflow:hidden}
+.mung .so{font-size:72px}
+.hoa{position:absolute;width:14px;height:14px;border:var(--vien) solid var(--muc);border-radius:3px}
+.list-cau{display:flex;flex-direction:column;gap:8px}
+.list-cau li{list-style:none;display:flex;align-items:center;gap:10px;padding:10px 12px;border:var(--vien) solid var(--muc);border-radius:12px;background:var(--the)}
+.min-li{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.min-li .phu{font-size:13px}
+.list-cau ul{margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.dau-tron{width:30px;height:30px;border-radius:50%;border:var(--vien) solid var(--muc);display:grid;place-items:center;flex:none}
+.dau-tron.d{background:#3FB489;color:#0F2A1F}
+.dau-tron.s{background:#E8645A;color:#2B0F0D}
+.dau-tron.h{background:var(--oai);color:var(--oai-dam)}
+.dau-tron svg.i{width:16px;height:16px;stroke-width:3}
+
+/* ---- Hành trình: bậc thang 4 tầng ---- */
+.thang{display:grid;grid-template-columns:repeat(4,1fr);align-items:end;gap:8px;padding:8px 2px 0}
+.bac{border:var(--vien) solid var(--muc);border-radius:14px 14px 6px 6px;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:4px;padding:10px 4px;text-align:center;font-size:12px;font-weight:700;background:var(--the-lom);color:var(--muc-2)}
+.bac b{font-size:14px;color:var(--muc)}
+.bac.vung{background:var(--bac-ha);color:var(--bac-ha-dam)}
+.bac.dang{background:var(--dao);color:var(--dao-dam);box-shadow:4px 4px 0 var(--bong)}
+.bac.dang b,.bac.vung b{color:inherit}
+.bac svg.i{width:20px;height:20px}
+.bac:nth-child(1){height:96px}.bac:nth-child(2){height:128px}.bac:nth-child(3){height:160px}.bac:nth-child(4){height:192px}
+.chi-mt{display:none}
+@media (min-width:900px){.chi-mt{display:block}}
+.thang-nho .bac:nth-child(1){height:64px}.thang-nho .bac:nth-child(2){height:84px}.thang-nho .bac:nth-child(3){height:104px}.thang-nho .bac:nth-child(4){height:124px}
+.mui{font-size:13px;color:var(--dao-dam);font-weight:700;text-align:center}
+
+/* ---- trạng thái ---- */
+.chu-thich{display:flex;align-items:center;gap:10px;margin:8px 0 2px}
+.xuong{background:repeating-linear-gradient(-45deg,var(--the-lom) 0 10px,color-mix(in srgb,var(--the-lom) 70%,var(--the)) 10px 20px);border:var(--vien) dashed color-mix(in srgb,var(--muc) 45%,transparent);border-radius:14px}
+.bao-mat{display:flex;align-items:center;gap:12px;background:var(--hong);color:var(--hong-dam);border:var(--vien) solid var(--muc);border-radius:14px;padding:12px 14px;font-weight:700;box-shadow:3px 3px 0 var(--bong)}
+.bao-mat .min{flex:1;min-width:0}
+.mo{opacity:.55;filter:saturate(.6)}
+
+/* ---- tổng quan ---- */
+.tong-quan{padding:28px 32px;display:flex;flex-direction:column;gap:18px}
+.tong-quan .hang-dt{display:flex;gap:24px}
+.dt{display:flex;flex-direction:column;gap:10px;align-items:center}
+.dt iframe{width:390px;height:844px;border:3px solid var(--muc);border-radius:34px;box-shadow:6px 6px 0 var(--bong);background:var(--giay);zoom:.86}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-nha" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></symbol>
+  <symbol id="i-duong" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></symbol>
+  <symbol id="i-on" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+  <symbol id="i-ket" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></symbol>
+  <symbol id="i-chuong" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-tai" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-ca" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol>
+  <symbol id="i-den" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-phai" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-trai" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+  <symbol id="i-dung" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-sai" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-khoa" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-mat-mang" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/><path d="M5 13a10 10 0 0 1 5.24-2.76"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-hoi" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-nguyen-tu" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/></symbol>
+  <symbol id="i-sua" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+  <symbol id="i-sach" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-da-lam" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></symbol>
+  <symbol id="i-btvn" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></symbol>
+  <symbol id="i-xoa" viewBox="0 0 24 24"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></symbol>
+  <symbol id="i-lich" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></symbol>
+</svg>
+
+<!-- ======================= HÔM NAY ======================= -->
+<section class="khung" data-man="hom-nay">
+<div class="app">
+  <nav class="cot-trai" aria-label="Mục chính">
+    <div class="dau-trai"><span class="logo"><svg class="i"><use href="#i-nguyen-tu"/></svg></span><span class="ten-app"><b>Đỗ Đại Học</b><span>Học Hoá mỗi ngày</span></span></div>
+    <a href="#" aria-current="page"><svg class="i"><use href="#i-nha"/></svg>Hôm nay</a>
+    <a href="#"><svg class="i"><use href="#i-duong"/></svg>Hành trình</a>
+    <a href="#"><svg class="i"><use href="#i-on"/></svg>Ôn &amp; sửa</a>
+    <a href="#"><svg class="i"><use href="#i-ket"/></svg>Kết quả</a>
+    <div class="duoi"><button class="nut nut-to" type="button"><svg class="i"><use href="#i-ca"/></svg>Vào ca kiểm tra</button></div>
+  </nav>
+  <div class="chinh">
+    <header class="dau">
+      <span class="logo"><svg class="i"><use href="#i-nguyen-tu"/></svg></span>
+      <span class="ten-app"><b>Đỗ Đại Học</b><span>Học Hoá mỗi ngày</span></span>
+      <span class="phai">
+        <button class="nut nut-vuong" type="button" aria-label="Thông báo"><svg class="i"><use href="#i-chuong"/></svg></button>
+        <button class="nut nut-vuong" type="button" aria-label="Tải lại"><svg class="i"><use href="#i-tai"/></svg></button>
+        <button class="avatar" type="button" aria-label="Của em">MA</button>
+      </span>
+    </header>
+    <main class="noi-dung">
+      <div>
+        <div class="dai"><span class="nhan-in">Thứ Tư 15/10 · Lớp 12A1</span><span class="vach-ke"></span><button class="nut nut-nho chi-dt" type="button"><svg class="i"><use href="#i-ca"/></svg>Vào ca kiểm tra</button></div>
+        <h1 style="margin-top:8px">Chào Minh Anh</h1>
+      </div>
+      <div class="luoi-mt">
+        <div>
+          <section class="the the-chinh" aria-label="Việc hôm nay">
+            <div class="hang gian"><span class="nhan-in">Việc hôm nay</span><span class="chip chip-bac-ha">Nhóm Chăm</span></div>
+            <div class="con-cau"><span class="so">Còn 6</span><span>câu</span></div>
+            <div class="phu">Đã làm <b class="tab">18/24</b> câu hôm nay</div>
+            <div class="tau" role="img" aria-label="Xong 3 trên 4 chặng">
+              <div class="toa xong"><b>✓</b>Chặng 1</div><div class="toa xong"><b>✓</b>Chặng 2</div><div class="toa xong"><b>✓</b>Chặng 3</div><div class="toa dang"><b>6 câu</b>Chặng 4</div>
+            </div>
+            <div class="phu">Xong <b class="tab">3/4</b> chặng · mỗi chặng tối đa 6 câu</div>
+            <div class="dong-bai"><span class="o-icon"><svg class="i"><use href="#i-sach"/></svg></span><span class="min"><b>Bài 8 · Amine</b><span class="phu">14 câu tự làm · 4 câu học có hỗ trợ</span></span></div>
+            <button class="nut nut-chinh nut-to" type="button">Học tiếp · 6 câu<svg class="i"><use href="#i-phai"/></svg></button>
+          </section>
+          <section class="the bay-ngay" aria-label="Bài học trong 7 ngày">
+            <div class="hang gian"><span class="nhan-in">Bài học trong 7 ngày</span><span class="chip">2 bài</span></div>
+            <div class="bai">
+              <div class="hang gian"><span class="ten">Bài 8 · Amine</span><span class="chip chip-bo"><svg class="i"><use href="#i-lich"/></svg>Hạn 18/10</span></div>
+              <div class="thanh" role="img" aria-label="Gặp câu gốc 32 trên 48 câu"><i style="width:66.7%"></i></div>
+              <div class="hang gian phu"><span>Gặp câu gốc <b class="tab">32/48</b> câu</span><span>Câu mới hôm nay <b class="tab">6/8</b></span></div>
+            </div>
+            <div class="bai">
+              <div class="hang gian"><span class="ten">Bài 6 · Tinh bột và cellulose</span><span class="chip chip-hong"><svg class="i"><use href="#i-lich"/></svg>Hạn 16/10</span></div>
+              <div class="thanh xanh" role="img" aria-label="Gặp câu gốc 44 trên 52 câu"><i style="width:84.6%"></i></div>
+              <div class="hang gian phu"><span>Gặp câu gốc <b class="tab">44/52</b> câu</span><span>Còn <b class="tab">8</b> câu trong bài</span></div>
+            </div>
+          </section>
+        </div>
+        <div>
+          <section class="the chi-mt" aria-label="Tầng đang luyện">
+            <div class="hang gian"><span class="nhan-in">Bài 8 · Amine</span><a class="nut nut-chu" href="#" style="min-height:44px">Xem hành trình</a></div>
+            <p class="phu" style="margin:4px 0 0">Em đang luyện tầng <b style="color:var(--muc)">Hiểu</b></p>
+            <div class="thang thang-nho" role="list">
+              <div class="bac vung" role="listitem"><b>Nền</b>Đã vững</div>
+              <div class="bac dang" role="listitem"><b>Hiểu</b>Đang luyện</div>
+              <div class="bac" role="listitem"><b>Vận dụng</b>Còn khoá</div>
+              <div class="bac" role="listitem"><b>Tổng hợp</b>Còn khoá</div>
+            </div>
+          </section>
+          <section class="the the-sua" aria-label="Tự sửa lỗi">
+            <span class="o-icon"><svg class="i"><use href="#i-sua"/></svg></span>
+            <span class="min"><b>Tự sửa lỗi</b><span><b class="tab">3</b> câu đang chờ em sửa</span></span>
+            <button class="nut nut-nho" type="button">Sửa lỗi ngay</button>
+          </section>
+          <section class="on-sua" aria-label="Ôn và sửa">
+            <div class="dai" style="margin-bottom:12px"><span class="nhan-in">Ôn và sửa</span><span class="vach-ke"></span></div>
+            <div class="luoi-o">
+              <a class="the o-luoi" href="#"><span class="o-icon" style="background:var(--oai)"><svg class="i"><use href="#i-da-lam"/></svg></span><b>Câu đã làm</b><span class="phu">Xem lại lời giải</span></a>
+              <a class="the o-luoi" href="#"><span class="o-icon" style="background:var(--bac-ha)"><svg class="i"><use href="#i-btvn"/></svg></span><b>Bài tập về nhà</b><span class="phu">Thầy đang giao <b class="tab">2</b> bài</span></a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <nav class="day-nav" aria-label="Mục chính">
+    <a href="#" aria-current="page"><svg class="i"><use href="#i-nha"/></svg>Hôm nay</a>
+    <a href="#"><svg class="i"><use href="#i-duong"/></svg>Hành trình</a>
+    <a href="#"><svg class="i"><use href="#i-on"/></svg>Ôn &amp; sửa</a>
+    <a href="#"><svg class="i"><use href="#i-ket"/></svg>Kết quả</a>
+  </nav>
+</div>
+</section>
+
+<!-- ======================= LÀM CÂU · PHẦN I ======================= -->
+<section class="khung" data-man="lam-cau">
+<div class="lam">
+  <header class="thanh-lam">
+    <button class="nut nut-vuong" type="button" aria-label="Về Hôm nay"><svg class="i"><use href="#i-trai"/></svg></button>
+    <div class="giua"><b>Chặng 4 · Câu 2/6</b>
+      <div class="vach-cau" role="img" aria-label="Câu 1 đúng, đang làm câu 2"><i class="d"></i><i class="h"></i><i></i><i></i><i></i><i></i></div></div>
+    <span class="chip tab" title="câu hôm nay">19/24 hôm nay</span>
+  </header>
+  <main class="than-lam rong">
+    <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+      <article class="the">
+        <div class="hang"><span class="chip chip-bo">Trắc nghiệm</span><span class="chip">Câu mới · Bài 8 · Amine</span></div>
+        <p class="de">Cho các chất: CH<sub>3</sub>NH<sub>2</sub>, (CH<sub>3</sub>)<sub>2</sub>NH, C<sub>6</sub>H<sub>5</sub>NH<sub>2</sub>, NH<sub>3</sub>. Chất có lực base <b>yếu nhất</b> là</p>
+      </article>
+      <div class="dai-kq sai kq-sai" hidden><span class="dau-tron s"><svg class="i"><use href="#i-sai"/></svg></span><span><b>Chưa đúng · đáp án C</b><span class="phu">câu này vào lịch ôn 1 · 3 · 7 ngày</span></span></div>
+      <div class="dai-kq dung kq-dung" hidden><span class="dau-tron d"><svg class="i"><use href="#i-dung"/></svg></span><span><b>Đúng · tự làm</b><span class="phu">1 phút 12 giây</span></span></div>
+      <div class="lc" role="group" aria-label="Chọn đáp án">
+        <button class="nut" type="button" aria-pressed="false"><span class="chu-cai">A</span><span class="ct">CH<sub>3</sub>NH<sub>2</sub></span></button>
+        <button class="nut lc-b" type="button" aria-pressed="false"><span class="chu-cai">B</span><span class="ct">(CH<sub>3</sub>)<sub>2</sub>NH</span><span class="duoi-phai nhan-b"></span></button>
+        <button class="nut lc-c" type="button" aria-pressed="true"><span class="chu-cai">C</span><span class="ct">C<sub>6</sub>H<sub>5</sub>NH<sub>2</sub></span><span class="duoi-phai nhan-c"></span></button>
+        <button class="nut" type="button" aria-pressed="false"><span class="chu-cai">D</span><span class="ct">NH<sub>3</sub></span></button>
+      </div>
+      <div class="tro-giup truoc-nop">
+        <button class="nut nut-nho" type="button"><svg class="i"><use href="#i-den"/></svg>Gợi ý</button>
+        <button class="nut nut-nho" type="button"><svg class="i"><use href="#i-hoi"/></svg>Hỏi thầy</button>
+        <button class="nut nut-chu" type="button" style="min-height:44px">Chưa làm được? Học cách giải</button>
+      </div>
+    </div>
+    <aside class="cot-phai">
+      <section class="the">
+        <div class="nhan-in" style="margin-bottom:10px">Chặng 4 · 6 câu</div>
+        <div class="ban-do-chang"><span style="background:var(--bac-ha);color:var(--bac-ha-dam)">1 ✓</span><span style="background:var(--dao);color:var(--dao-dam);box-shadow:3px 3px 0 var(--bong)">2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      </section>
+      <section class="the">
+        <div class="nhan-in">Hôm nay</div>
+        <div class="con-cau" style="margin:6px 0"><span class="so" style="font-size:44px">19/24</span><span style="font-size:15px">câu</span></div>
+        <div class="thanh"><i style="width:79%"></i></div>
+      </section>
+    </aside>
+  </main>
+  <footer class="day-lam rong">
+    <button class="nut nut-chinh nut-to nut-nop" type="button">Nộp câu · đã chọn C<svg class="i"><use href="#i-phai"/></svg></button>
+  </footer>
+</div>
+</section>
+
+<!-- ======================= LÀM CÂU · PHẦN II ĐÚNG – SAI ======================= -->
+<section class="khung" data-man="dung-sai">
+<div class="lam">
+  <header class="thanh-lam">
+    <button class="nut nut-vuong" type="button" aria-label="Về Hôm nay"><svg class="i"><use href="#i-trai"/></svg></button>
+    <div class="giua"><b>Chặng 4 · Câu 3/6</b>
+      <div class="vach-cau" role="img" aria-label="Câu 1 đúng, câu 2 sai, đang làm câu 3"><i class="d"></i><i class="s"></i><i class="h"></i><i></i><i></i><i></i></div></div>
+    <span class="chip tab">20/24 hôm nay</span>
+  </header>
+  <main class="than-lam">
+    <article class="the">
+      <div class="hang"><span class="chip chip-bac-ha">Đúng – sai</span><span class="chip">Bài 8 · Amine</span></div>
+      <p class="de">Cho các phát biểu về aniline (C<sub>6</sub>H<sub>5</sub>NH<sub>2</sub>). Em chọn Đúng hoặc Sai cho từng ý.</p>
+    </article>
+    <div class="cot-dap" style="display:flex;flex-direction:column;gap:10px">
+      <div class="y"><span class="noi"><b>a</b>Aniline làm quỳ tím ẩm hoá xanh.</span><span class="cap"><button class="d" aria-pressed="false">Đúng</button><button class="s" aria-pressed="true">Sai</button></span></div>
+      <div class="y"><span class="noi"><b>b</b>Aniline tác dụng với nước bromine tạo kết tủa trắng.</span><span class="cap"><button class="d" aria-pressed="true">Đúng</button><button class="s" aria-pressed="false">Sai</button></span></div>
+      <div class="y"><span class="noi"><b>c</b>Aniline tan tốt trong nước ở nhiệt độ thường.</span><span class="cap"><button class="d" aria-pressed="false">Đúng</button><button class="s" aria-pressed="false">Sai</button></span></div>
+      <div class="y"><span class="noi"><b>d</b>Aniline tác dụng với dung dịch HCl tạo muối tan.</span><span class="cap"><button class="d" aria-pressed="false">Đúng</button><button class="s" aria-pressed="false">Sai</button></span></div>
+    </div>
+  </main>
+  <footer class="day-lam" style="align-items:center">
+    <div class="ban-do" aria-label="Đã chọn"><span>a · S</span><span>b · Đ</span><span style="border-style:dashed">c · –</span><span style="border-style:dashed">d · –</span></div>
+    <button class="nut nut-to" type="button" style="flex:1" disabled>Còn 2 ý chưa chọn</button>
+  </footer>
+</div>
+</section>
+
+<!-- ======================= LÀM CÂU · PHẦN III TRẢ LỜI NGẮN ======================= -->
+<section class="khung" data-man="tra-loi-ngan">
+<div class="lam">
+  <header class="thanh-lam">
+    <button class="nut nut-vuong" type="button" aria-label="Về Hôm nay"><svg class="i"><use href="#i-trai"/></svg></button>
+    <div class="giua"><b>Chặng 4 · Câu 4/6</b>
+      <div class="vach-cau" role="img" aria-label="Đang làm câu 4"><i class="d"></i><i class="s"></i><i class="d"></i><i class="h"></i><i></i><i></i></div></div>
+    <span class="chip tab">21/24 hôm nay</span>
+  </header>
+  <main class="than-lam">
+    <article class="the">
+      <div class="hang"><span class="chip chip-oai">Trả lời ngắn</span><span class="chip">Bài 8 · Amine</span></div>
+      <p class="de">Đốt cháy hoàn toàn 0,1 mol một amine no, đơn chức, mạch hở X, thu được 0,3 mol CO<sub>2</sub>. Số nguyên tử hydrogen trong phân tử X là bao nhiêu?</p>
+    </article>
+    <div class="phieu" role="img" aria-label="Đáp án em nhập: 9"><i class="tro">9</i><i class="trong"></i><i class="trong"></i><i class="trong"></i></div>
+    <div class="phim" role="group" aria-label="Bàn phím số">
+      <button class="nut" type="button">1</button><button class="nut" type="button">2</button><button class="nut" type="button">3</button><button class="nut" type="button" aria-label="Xoá một kí tự"><svg class="i"><use href="#i-xoa"/></svg></button>
+      <button class="nut" type="button">4</button><button class="nut" type="button">5</button><button class="nut" type="button">6</button><button class="nut" type="button">,</button>
+      <button class="nut" type="button">7</button><button class="nut" type="button">8</button><button class="nut" type="button">9</button><button class="nut" type="button" aria-label="Dấu trừ">−</button>
+      <button class="nut so-0" type="button">0</button><button class="nut xoa-het" type="button">Xoá hết</button>
+    </div>
+  </main>
+  <footer class="day-lam"><button class="nut nut-vuong" type="button" aria-label="Gợi ý" style="width:56px;height:56px"><svg class="i"><use href="#i-den"/></svg></button><button class="nut nut-chinh nut-to" type="button">Nộp câu · 9<svg class="i"><use href="#i-phai"/></svg></button></footer>
+</div>
+</section>
+
+<!-- ======================= XONG CHẶNG ======================= -->
+<section class="khung" data-man="xong-chang">
+<div class="lam">
+  <header class="thanh-lam">
+    <button class="nut nut-vuong" type="button" aria-label="Về Hôm nay"><svg class="i"><use href="#i-trai"/></svg></button>
+    <div class="giua"><b>Xong chặng 3</b><div class="vach-cau" role="img" aria-label="5 đúng 1 sai"><i class="d"></i><i class="d"></i><i class="s"></i><i class="d"></i><i class="d"></i><i class="d"></i></div></div>
+    <span class="chip tab">18/24 hôm nay</span>
+  </header>
+  <main class="than-lam">
+    <section class="the mung">
+      <i class="hoa" style="left:24px;top:22px;background:var(--cam);transform:rotate(18deg)"></i>
+      <i class="hoa" style="right:30px;top:30px;background:var(--oai);transform:rotate(-12deg);border-radius:50%"></i>
+      <i class="hoa" style="left:40px;top:96px;background:var(--bac-ha);transform:rotate(40deg)"></i>
+      <i class="hoa" style="right:36px;top:110px;background:var(--bo);transform:rotate(8deg)"></i>
+      <span class="sticker">Đã lưu chặng 3</span>
+      <span class="so"><span class="tab">5/6</span></span>
+      <b style="font-size:18px">câu tự làm đúng</b>
+      <span class="phu">Còn <b class="tab">6</b> câu là đủ mức hôm nay</span>
+      <div class="thanh" style="width:100%;max-width:300px" role="img" aria-label="Đã làm 18 trên 24 câu"><i style="width:75%"></i></div>
+    </section>
+    <section class="the list-cau" aria-label="Các câu của chặng">
+      <div class="nhan-in">Chặng 3 · 6 câu</div>
+      <ul>
+        <li><span class="dau-tron d"><svg class="i"><use href="#i-dung"/></svg></span><span class="min-li"><b>Câu 1</b><span class="phu">Trắc nghiệm</span></span><span class="chip chip-bac-ha">Đúng · tự làm</span></li>
+        <li><span class="dau-tron d"><svg class="i"><use href="#i-dung"/></svg></span><span class="min-li"><b>Câu 2</b><span class="phu">Đúng – sai</span></span><span class="chip chip-bac-ha">Đúng · tự làm</span></li>
+        <li><span class="dau-tron s"><svg class="i"><use href="#i-sai"/></svg></span><span class="min-li"><b>Câu 3</b><span class="phu">Trắc nghiệm</span></span><span class="chip chip-hong">Ôn lại sau 1 ngày</span></li>
+        <li><span class="dau-tron d"><svg class="i"><use href="#i-dung"/></svg></span><span class="min-li"><b>Câu 4</b><span class="phu">Trả lời ngắn</span></span><span class="chip chip-bac-ha">Đúng · tự làm</span></li>
+        <li><span class="dau-tron d"><svg class="i"><use href="#i-dung"/></svg></span><span class="min-li"><b>Câu 5</b><span class="phu">Trắc nghiệm</span></span><span class="chip chip-bac-ha">Đúng · tự làm</span></li>
+        <li><span class="dau-tron d"><svg class="i"><use href="#i-dung"/></svg></span><span class="min-li"><b>Câu 6</b><span class="phu">Trắc nghiệm</span></span><span class="chip chip-bac-ha">Đúng · tự làm</span></li>
+      </ul>
+    </section>
+  </main>
+  <footer class="day-lam" style="flex-direction:column">
+    <button class="nut nut-chinh nut-to" type="button">Học tiếp chặng 4<svg class="i"><use href="#i-phai"/></svg></button>
+    <button class="nut nut-to" type="button" style="min-height:48px">Nghỉ và về Hôm nay</button>
+  </footer>
+</div>
+</section>
+
+<!-- ======================= HÀNH TRÌNH ======================= -->
+<section class="khung" data-man="hanh-trinh">
+<div class="app">
+  <div class="chinh">
+    <header class="dau">
+      <span class="logo"><svg class="i"><use href="#i-nguyen-tu"/></svg></span>
+      <span class="ten-app"><b>Đỗ Đại Học</b><span>Học Hoá mỗi ngày</span></span>
+      <span class="phai"><button class="nut nut-vuong" type="button" aria-label="Thông báo"><svg class="i"><use href="#i-chuong"/></svg></button><button class="avatar" type="button" aria-label="Của em">MA</button></span>
+    </header>
+    <main class="noi-dung">
+      <div><div class="dai"><span class="vach-ke"></span><span class="nhan-in">Thang 4 tầng của mỗi bài</span><span class="vach-ke"></span></div>
+        <h1 style="margin-top:10px">Hành trình</h1></div>
+      <section class="the" aria-label="Bài 8 Amine">
+        <div class="hang gian"><h2>Bài 8 · Amine</h2><span class="chip chip-bo"><svg class="i"><use href="#i-lich"/></svg>Hạn 18/10</span></div>
+        <p class="phu" style="margin:6px 0 0">Em đang luyện tầng <b style="color:var(--muc)">Hiểu</b></p>
+        <div class="thang" role="list">
+          <div class="bac vung" role="listitem"><svg class="i"><use href="#i-dung"/></svg><b>Nền</b>Đã vững</div>
+          <div class="bac dang" role="listitem"><svg class="i"><use href="#i-phai"/></svg><b>Hiểu</b>Đang luyện</div>
+          <div class="bac" role="listitem"><svg class="i"><use href="#i-khoa"/></svg><b>Vận dụng</b>Còn khoá</div>
+          <div class="bac" role="listitem"><svg class="i"><use href="#i-khoa"/></svg><b>Tổng hợp</b>Còn khoá</div>
+        </div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+          <div class="thanh" role="img" aria-label="Gặp câu gốc 32 trên 48 câu"><i style="width:66.7%"></i></div>
+          <div class="phu">Gặp câu gốc <b class="tab">32/48</b> câu</div>
+          <button class="nut nut-chinh nut-to" type="button">Học tầng Hiểu<svg class="i"><use href="#i-phai"/></svg></button>
+        </div>
+      </section>
+      <section aria-label="Bài đang luyện">
+        <div class="dai" style="margin-bottom:12px"><span class="nhan-in">Bài đang luyện · 2 bài</span><span class="vach-ke"></span></div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <a class="the" href="#" aria-current="true" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:8px;background:var(--dao)">
+            <div class="hang gian"><b style="font-size:16px">Bài 8 · Amine</b><span class="chip chip-dao">Đang xem</span></div>
+            <span class="phu" style="color:var(--dao-dam)">Đang luyện tầng <b>Hiểu</b> · Hạn 18/10</span>
+          </a>
+          <a class="the" href="#" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:8px">
+            <div class="hang gian"><b style="font-size:16px">Bài 6 · Tinh bột và cellulose</b><span class="chip chip-hong">Hạn 16/10</span></div>
+            <span class="phu">Đang luyện tầng <b style="color:var(--muc)">Vận dụng</b></span>
+            <div class="thanh xanh"><i style="width:84.6%"></i></div>
+            <span class="phu">Gặp câu gốc <b class="tab">44/52</b> câu</span>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+  <nav class="day-nav" aria-label="Mục chính">
+    <a href="#"><svg class="i"><use href="#i-nha"/></svg>Hôm nay</a>
+    <a href="#" aria-current="page"><svg class="i"><use href="#i-duong"/></svg>Hành trình</a>
+    <a href="#"><svg class="i"><use href="#i-on"/></svg>Ôn &amp; sửa</a>
+    <a href="#"><svg class="i"><use href="#i-ket"/></svg>Kết quả</a>
+  </nav>
+</div>
+</section>
+
+<!-- ======================= TRẠNG THÁI ======================= -->
+<section class="khung" data-man="trang-thai">
+<main class="noi-dung" style="padding-bottom:32px">
+  <div class="chu-thich"><span class="nhan-in">1 · Đang tải</span><span class="vach-ke"></span></div>
+  <div class="the" style="display:flex;flex-direction:column;gap:12px" aria-busy="true" aria-label="Đang tải việc hôm nay">
+    <div class="xuong" style="height:18px;width:40%"></div>
+    <div class="xuong" style="height:58px;width:55%"></div>
+    <div class="tau"><div class="xuong" style="height:52px"></div><div class="xuong" style="height:52px"></div><div class="xuong" style="height:52px"></div><div class="xuong" style="height:52px"></div></div>
+    <div class="xuong" style="height:56px"></div>
+  </div>
+
+  <div class="chu-thich"><span class="nhan-in">2 · Mất mạng</span><span class="vach-ke"></span></div>
+  <div class="bao-mat" role="status"><svg class="i"><use href="#i-mat-mang"/></svg><span class="min">Mất kết nối mạng. Em kiểm tra wifi hoặc 4G rồi bấm Thử lại.</span><button class="nut nut-nho" type="button">Thử lại</button></div>
+  <div class="the the-chinh mo" aria-hidden="true">
+    <div class="hang gian"><span class="nhan-in">Việc hôm nay</span><span class="chip">Nhóm Chăm</span></div>
+    <div class="con-cau"><span class="so">Còn 6</span><span>câu</span></div>
+  </div>
+
+  <div class="chu-thich"><span class="nhan-in">3 · Lỗi</span><span class="vach-ke"></span></div>
+  <div class="the" style="display:flex;flex-direction:column;gap:10px">
+    <div class="hang"><span class="o-icon" style="background:var(--hong);color:var(--hong-dam)"><svg class="i"><use href="#i-sai"/></svg></span><b style="font-size:17px">Chưa tải được việc hôm nay</b></div>
+    <span class="phu">Máy chủ trả lời chậm. Các câu em đã nộp vẫn được giữ.</span>
+    <button class="nut nut-chinh nut-to" type="button"><svg class="i"><use href="#i-tai"/></svg>Thử lại</button>
+  </div>
+
+  <div class="chu-thich"><span class="nhan-in">4 · Đủ mức hôm nay</span><span class="vach-ke"></span></div>
+  <div class="the mung">
+    <i class="hoa" style="left:22px;top:24px;background:var(--cam);transform:rotate(18deg)"></i>
+    <i class="hoa" style="right:28px;top:28px;background:var(--oai);border-radius:50%"></i>
+    <i class="hoa" style="left:36px;top:92px;background:var(--bac-ha);transform:rotate(40deg)"></i>
+    <span class="sticker" style="background:var(--bac-ha);color:var(--bac-ha-dam)">Đủ mức hôm nay</span>
+    <span class="so tab">24/24</span>
+    <b>câu đã làm · xong 4/4 chặng</b>
+    <span class="phu">Mai em quay lại học tiếp nhé.</span>
+    <button class="nut nut-to" type="button" style="max-width:320px">Học thêm</button>
+  </div>
+</main>
+</section>
+
+<!-- ======================= TỔNG QUAN (4 màn điện thoại cạnh nhau) ======================= -->
+<section class="khung" data-man="tong-quan">
+<div class="tong-quan">
+  <div class="dai"><span class="nhan-in">Bản vẽ app học sinh · phong cách retro giấy ô li · 15/10</span><span class="vach-ke"></span><span class="chip chip-bo chip-dut">Chưa build · chờ thầy duyệt</span></div>
+  <div class="hang-dt">
+    <div class="dt"><iframe title="Hôm nay" data-src="?m=hom-nay"></iframe><span class="chip">1 · Hôm nay</span></div>
+    <div class="dt"><iframe title="Làm câu" data-src="?m=lam-cau"></iframe><span class="chip">2 · Làm câu</span></div>
+    <div class="dt"><iframe title="Xong chặng" data-src="?m=xong-chang"></iframe><span class="chip">3 · Xong chặng</span></div>
+    <div class="dt"><iframe title="Hành trình" data-src="?m=hanh-trinh"></iframe><span class="chip">4 · Hành trình</span></div>
+  </div>
+</div>
+</section>
+
+<script>
+const ts = new URLSearchParams(location.search)
+const m = ts.get('m') || 'tong-quan'
+const k = document.querySelector(`.khung[data-man="${m}"]`)
+if (k) k.setAttribute('data-hien', '')
+// iframe chỉ gắn nguồn ở trang tổng quan (không thì mỗi trang lại tải 4 trang con — lồng nhau vô hạn).
+if (m === 'tong-quan') document.querySelectorAll('iframe[data-src]').forEach((f) => { f.src = f.dataset.src })
+// Nút "Vào ca kiểm tra" cạnh lời chào chỉ hiện trên điện thoại (máy tính đã có ở cột trái).
+document.querySelectorAll('.chi-dt').forEach((e) => { if (matchMedia('(min-width:900px)').matches) e.hidden = true })
+// Làm câu: kq=sai (em chọn B) · kq=dung (em chọn C) — trạng thái SAU khi nộp.
+const kq = ts.get('kq')
+if (m === 'lam-cau' && kq) {
+  const b = document.querySelector('.lc-b'), c = document.querySelector('.lc-c')
+  document.querySelector('.truoc-nop').hidden = true
+  c.setAttribute('aria-pressed', 'false')
+  if (kq === 'sai') {
+    document.querySelector('.kq-sai').hidden = false
+    b.classList.add('sai'); b.querySelector('.nhan-b').textContent = 'Em chọn'
+    c.classList.add('dung'); c.querySelector('.nhan-c').textContent = 'Đáp án'
+  } else {
+    document.querySelector('.kq-dung').hidden = false
+    c.classList.add('dung'); c.querySelector('.nhan-c').textContent = 'Em chọn'
+  }
+  document.querySelector('.thanh-lam .vach-cau i.h').className = kq === 'sai' ? 's' : 'd'
+  const f = document.querySelector('.nut-nop')
+  f.innerHTML = 'Câu tiếp theo<svg class="i"><use href="#i-phai"/></svg>'
+  const s = document.createElement('button'); s.className = 'nut'; s.type = 'button'; s.textContent = 'Sửa câu này'; s.style.minHeight = '56px'
+  if (kq === 'sai') f.before(s)
+}
+</script>
+</body>
+</html>

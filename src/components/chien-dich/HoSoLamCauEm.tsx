@@ -570,7 +570,7 @@ function DaiMuoiBon({ ngay, chuoi }: { ngay: readonly NgayHoatDong[]; chuoi?: nu
  *  Đợt 16: chip "Độ tin cậy N%" + kết luận tạm khi dưới 90%; dải 14 ngày gần nhất.
  *  13/10: máy chủ có `bacCham` (đã kiểm khớp nhóm) ⇒ chip "Bậc N/12 · Tên" ngay cạnh tên nhóm (cùng chip 3 app). Vắng ⇒ y như trước.
  *  13/10 đợt 19: chip là NÚT (NutBac, ChipBac.tsx) mở tấm đủ 12 bậc nằm TRÊN tấm hồ sơ (Esc đóng tấm bậc trước, hồ sơ vẫn mở). */
-function DauThaiDo({ td, matDau, ngoi, laThay }: { td: KetQuaHoSoThaiDo; matDau: string; ngoi: Ngoi; laThay: boolean }) {
+function DauThaiDo({ td, matDau, ngoi, laThay, laHocSinh }: { td: KetQuaHoSoThaiDo; matDau: string; ngoi: Ngoi; laThay: boolean; laHocSinh: boolean }) {
   const k = td.ketLuan as KetLuanThaiDoApp
   const nhom = td.nhomNhip
   const nhan: NhanThaiDo = nhom ? NHAN_THEO_NHOM[nhom] : k.nhan
@@ -597,7 +597,7 @@ function DauThaiDo({ td, matDau, ngoi, laThay }: { td: KetQuaHoSoThaiDo; matDau:
             {nhom ? TEN_NHOM_NHIP_HOC[nhom] : k.chu}
           </h3>
           {nhom && td.bacCham && <NutBac kq={td.bacCham} xung={ngoi} />}
-          {nhom && td.coDoiPho && (
+          {nhom && td.coDoiPho && !laHocSinh && (
             <span className="gvv2-tdo-co-doi-pho">
               <TriangleAlert size={15} aria-hidden="true" />
               Có dấu hiệu đối phó
@@ -1046,7 +1046,7 @@ export default function HoSoLamCauEm({
           <div className="hslc-luoi">
             {/* 1 · Thái độ / Nhịp học — điểm nhấn của tấm (nhãn · lý do · độ tin cậy · dải 14 ngày) */}
             {td ? (
-              <DauThaiDo td={td} matDau={chuCd.matDau} ngoi={ngoi} laThay={laThay} />
+              <DauThaiDo td={td} matDau={chuCd.matDau} ngoi={ngoi} laThay={laThay} laHocSinh={cheDo === 'hoc-sinh'} />
             ) : dangTaiTd ? (
               <XuongThaiDo chu={chuCd.dangTai} />
             ) : (

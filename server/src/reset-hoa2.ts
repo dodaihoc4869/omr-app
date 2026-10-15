@@ -55,7 +55,7 @@ export const BANG_XOA_HOA2: readonly string[] = [
 export const BANG_GIU_HOA2: readonly string[] = [
   'kiem_tra_ca_nhan', 'kiem_tra_ca_nhan_chang', 'kiem_tra_ca_nhan_dieu_phoi',
   // Tài khoản, lớp, phụ huynh (tài khoản giữ để khôi phục được dù bỏ app PH), kho đề, chỉ mục game, cấu hình, cài đặt em, đăng ký đẩy, thống kê dùng app, mã đã dùng.
-  'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
+  'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_meta', 'cau_meta_to', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
   'study_preferences', 'student_push', 'app_presence', 'ma_da_dung', 'khien_truoc_reset_2109', 'ph_truy_cap',
   // SỔ + HỒ SƠ của từng em (thầy 27/09: "giữ lại toàn bộ hồ sơ dữ liệu của từng học sinh"). `su_kien_hoc` là NGUỒN: hồ sơ dựng lại từ sổ.
   'chua_loi_dot', 'chua_loi_phien', 'chua_loi_item', 'chua_loi_nop', 'chua_loi_hoc_lieu', 'chua_loi_thay', 'chua_loi_trai_nghiem', 'chua_loi_tu_receipt', 'chua_loi_chua_lop',
@@ -97,6 +97,9 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
   // Bảng vận hành đã GIỮ lần 21/09: bộ não A.I, bảng lưu em đã gỡ, nhật ký máy, thử thách riêng (kết quả ở sổ).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin', 'hoc_sinh_da_go', 'danh_sach_da_go', 'nhat_ky_may', 'thu_thach_rieng',
+  // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10): dẫn xuất từ sổ su_kien_hoc (GIỮ) ⇒ GIỮ cho nhất quán (như nam_kt_cau).
+  // Trigger trên sổ trỏ tới bảng này: xoá DỮ LIỆU thì được, KHÔNG BAO GIỜ DROP bảng khi chưa DROP ba trigger `nhip_hoc_doi_pho_sau_*`.
+  'nhip_hoc_doi_pho_ngay',
 ]
 
 /** Có ca thi đang mở (`trang_thai = 'mo'`, trừ ca đo tải)? MỘT truy vấn. Không đọc được bảng `ca` ⇒ HOÃN cho chắc (không chắc là không có ca mở). */

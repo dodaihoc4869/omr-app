@@ -138,7 +138,7 @@ export default function HocTapHomNay(p: Props) {
       <main className="ht-noi-dung ht2-noi-dung tt-vao-muc" key={muc}>
         <div className="ht2-mo-dau"><p>{homNayChu()}{p.lop ? ` · ${p.lop}` : ''}{muc === 'hanh-trinh' && sanh?.chienDich?.ten ? ` · ${sanh.chienDich.ten}` : ''}</p><h1>{muc === 'hom-nay' ? `Chào ${p.ten || 'em'}` : MENU.find(x => x.id === muc)?.ten}</h1></div>
         {p.canhBao}
-        {p.dangLamMoi && <p className="ht-thong-bao" data-vung="dang-lam-moi" role="status">Hệ thống đang làm mới, khoảng 1–5 phút. Em cứ để app mở, app tự vào lại.</p>}
+        {p.dangLamMoi && <p className="ht-thong-bao" data-vung="dang-lam-moi" role="status">App đang làm mới, khoảng 1–5 phút. Em cứ để app mở, app tự vào lại.</p>}
         {p.loi && <div className="ht-thong-bao ht2-loi" role="alert"><span>{p.loi}</span><button className="ht-nut-phu" onClick={p.onTaiLai}>Thử lại</button></div>}
         {p.coCa && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 

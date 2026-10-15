@@ -131,7 +131,7 @@ export const BANG_XOA: readonly string[] = [
 /** GIỮ — tài khoản, lớp, kho, cấu hình, cài đặt. `cau_hinh` và `game_v2_settings` chỉ bị GHI đúng vài dòng (xem `chayReset`), không bị xoá. */
 export const BANG_GIU: readonly string[] = [
   'kiem_tra_ca_nhan', 'kiem_tra_ca_nhan_chang', 'kiem_tra_ca_nhan_dieu_phoi',
-  'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
+  'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_meta', 'cau_meta_to', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
   'study_preferences', 'student_push', 'app_presence', 'ma_da_dung', 'khien_truoc_reset_2109',
   // Đếm truy cập cổng phụ huynh (token PH giai đoạn mềm): số liệu vận hành, không thuộc dữ liệu học của em
   'ph_truy_cap',
@@ -199,6 +199,8 @@ export const BANG_GIU: readonly string[] = [
   'goi_bai_7','goi_bai_7_cau','goi_bai_7_em','goi_bai_7_gap','goi_bai_7_ngay','goi_bai_7_chua','goi_bai_7_kiem','goi_bai_7_muc_ngay','goi_bai_7_sua_han','goi_bai_7_tick_em','goi_bai_7_chon_em','goi_bai_7_revision','goi_bai_7_sua_em',
   'hanh_trinh_nguon_cau', 'hanh_trinh_v6_chon','hanh_trinh_v6_do','hanh_trinh_v6_fit', 'hanh_trinh_v5_muc', 'hanh_trinh_v5_phan_nhom', 'hanh_trinh_v5_quyet_dinh', 'hanh_trinh_v5_de_thu',
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
+  // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10) — sinh sau lần 21/09: GIỮ = không đụng. Dẫn xuất từ sổ su_kien_hoc (GIỮ).
+  'nhip_hoc_doi_pho_ngay',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */

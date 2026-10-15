@@ -265,23 +265,40 @@ async function soLieuCuaLop(env: Env, cungLop: [string, EmTrongTruong][], sbdThe
   ghiDemThiDua(khoa, nowMs, kq)
   return { ...kq, tuoi: true }
 }
+/**
+ * B5 (15/10, giờ cao điểm — trước: mỗi lần ĐỌC + GOM mọi lượt 60 ngày của cả lớp): MỘT câu, hai phần.
+ *   · HÔM NAY (?2): y hệt câu cũ — mỗi (em, qid) lần đầu có kết quả từ mốc, đếm qid + lúc đạt câu thứ N.
+ *   · 59 NGÀY TRƯỚC (?4 = danh sách ngày): chuỗi ngày học chỉ cần biết ngày ấy CÓ dòng `luc ≥ mốc` có kết quả hay không ⇒ mỗi (em, ngày) một lần dò
+ *     EXISTS theo chỉ mục (sbd, ngay_vn), dừng ở dòng đầu thoả, thay vì đọc mọi lượt. `+s.luc` để bộ lập kế hoạch không chọn chỉ mục `idx_skh_luc`
+ *     (quét theo thời gian cả trường); so sánh chữ y như cũ (cột TEXT với tham số chữ). Cùng tập ngày ⇒ cùng chuỗi (test thi-dua-qua-ngay-1510).
+ *   KHÔNG đệm ngày đã qua tới nửa đêm: lượt nộp bù mang giờ cũ phải nối chuỗi NGAY như bản cũ (đệm 30 giây của lớp giữ nguyên).
+ * Hàng trả: (sbd, ngay_vn, n, luc) — ngày đã qua có n = 1, luc NULL (chỉ hôm nay dùng hai cột ấy, như trước).
+ */
+export const SQL_SO_CAU_LOP = `SELECT sbd, ngay_vn, COUNT(*) AS n, MAX(luc1) AS luc FROM (
+         SELECT sbd, ngay_vn, qid, MIN(luc) AS luc1 FROM su_kien_hoc
+          WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn = ?2 AND luc >= ?3 AND ket_qua IS NOT NULL
+          GROUP BY sbd, ngay_vn, qid
+       ) GROUP BY sbd, ngay_vn
+       UNION ALL
+       SELECT em.sbd, ng.value, 1, NULL FROM (SELECT DISTINCT value AS sbd FROM json_each(?1)) em, json_each(?4) ng
+        WHERE EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.sbd = em.sbd AND s.ngay_vn = ng.value AND +s.luc >= ?3 AND s.ket_qua IS NOT NULL)`
+/** 59 ngày trước hôm nay (cũ → mới) — cùng cửa sổ `SO_NGAY_DOC_CHUOI` của câu cũ, trừ hôm nay. */
+export const ngayTruocCuaChuoi = (homNay: string): string[] => Array.from({ length: SO_NGAY_DOC_CHUOI - 1 }, (_, i) => themNgay(homNay, i - (SO_NGAY_DOC_CHUOI - 1)))
+
 async function soLieuCuaLopTho(env: Env, cungLop: [string, EmTrongTruong][], sbdThem: string | null, nowMs: number, moc: MocHienThi): Promise<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null }> {
   const homNay = ngayVn(nowMs)
   const dsSbd = [...cungLop.map(([s]) => s), ...(sbdThem ? [sbdThem] : [])]
-  const rSo = await tat(
-    () => env.DB.prepare(
-      `SELECT sbd, ngay_vn, COUNT(*) AS n, MAX(luc1) AS luc FROM (
-         SELECT sbd, ngay_vn, qid, MIN(luc) AS luc1 FROM su_kien_hoc
-          WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn >= ? AND ngay_vn <= ? AND luc >= ? AND ket_qua IS NOT NULL
-          GROUP BY sbd, ngay_vn, qid
-       ) GROUP BY sbd, ngay_vn`,
-    ).bind(json(dsSbd), themNgay(homNay, -(SO_NGAY_DOC_CHUOI - 1)), homNay, moc.iso).all<Dong>(), // `luc >= mốc` ⇒ chuỗi chỉ đếm từ ngày mốc
-    rong,
-  )
-  const rDat = await tat(
-    () => env.DB.prepare("SELECT DISTINCT sbd FROM exp_so WHERE ngay_vn = ? AND loai = 'dat_ngay' AND sbd IN (SELECT value FROM json_each(?))").bind(homNay, json(dsSbd)).all<Dong>(),
-    rong,
-  )
+  // Hai câu độc lập ⇒ chạy song song (một vòng chờ thay vì hai).
+  const [rSo, rDat] = await Promise.all([
+    tat(
+      () => env.DB.prepare(SQL_SO_CAU_LOP).bind(json(dsSbd), homNay, moc.iso, json(ngayTruocCuaChuoi(homNay))).all<Dong>(), // `luc >= mốc` ⇒ chuỗi chỉ đếm từ ngày mốc
+      rong,
+    ),
+    tat(
+      () => env.DB.prepare("SELECT DISTINCT sbd FROM exp_so WHERE ngay_vn = ? AND loai = 'dat_ngay' AND sbd IN (SELECT value FROM json_each(?))").bind(homNay, json(dsSbd)).all<Dong>(),
+      rong,
+    ),
+  ])
   const ngayCoHoc = new Map<string, string[]>()
   const homNayCua = new Map<string, { n: number; luc: number }>()
   for (const x of rSo.results ?? []) {

@@ -321,6 +321,15 @@ export default defineConfig({
           // đã ngoài precache); cây Dạy học `day-hoc-len-bang` (CHỈ màn thầy: Dạy học lên bảng, Bài hôm nay, Hành trình V2). Bù chỗ: mô tả ca của tấm Chiếu mã
           // `mo-ta-ca-chieu-ma` (CHỈ màn thầy: Mở ca, Theo dõi ca, phòng chờ của thầy, điểm danh — đều đã ngoài precache) ⇒ kho chạy-lúc.
           '**/{ThanThuV2,tran-v2,may-chu-that,day-hoc-len-bang,mo-ta-ca-chieu-ma}-*.{js,css}',
+          // Gói C 15/10 (app mở nhanh hơn — React riêng, bảng tra cảnh thí nghiệm + cửa nạp kho đề nạp lười, ba khối cổng học sinh vào mảnh nạp lười:
+          // Rolldown tách thêm 7 tệp precache: react, expanded, exam-kho-de-import, bai-tap-pdf, cau-hinh-chua, luyen-khac-phuc .js/.css) — bù đủ 7, giữ 169 tệp
+          // (mảnh vỏ `cau-on-api` 76 byte bỏ ở màn cổng học sinh — nhập tĩnh; sáu tệp ở (2) ra kho chạy-lúc; (1) giữ fflate không thành tệp precache mới):
+          // (1) `fflate` (nén gzip) nay nạp KHI CẦN, chỉ lúc máy thầy trình duyệt cũ gửi gói ca lớn lên máy chủ — việc vốn phải có mạng ⇒ kho chạy-lúc.
+          // (2) Năm mảnh nhỏ (6 tệp) mà MỌI nơi nạp (nhập tĩnh, import(), danh sách nạp kèm) đều là mảnh đã ngoài precache — đồ thị đã soát trên dist:
+          //     `HoSoCuaConPh` (chỉ TrangVeConDuoi), `nhan` (chỉ TrangVeConDuoi / ManDiemSo / ManTienBo / ManChiTietCa), `ChuTheLoc` (chỉ Câu đã làm +
+          //     màn thầy), `tai-gioi-han` + `buoi-day-ui` (chỉ màn thầy). Chúng chỉ được tải cùng mảnh ngoài precache ấy (đang có mạng) ⇒ cùng kho chạy-lúc.
+          '**/fflate-*.js',
+          '**/{HoSoCuaConPh,nhan,ChuTheLoc,tai-gioi-han,buoi-day-ui}-*.{js,css}',
           // CHỐNG TRÙNG (28/09): 14 biểu tượng nhỏ dưới đây đã có trong `includeAssets` (precache đích danh) — để globPatterns bắt lại lần nữa
           // thì dist/sw.js ghi mỗi tệp HAI lần (178 mục cho 164 tệp). Bỏ ở phía glob, giữ ở phía includeAssets.
           '{favicon.svg,apple-touch-icon.png,icon-192.png,logo-huy-hieu-96-v3.png}',
@@ -361,7 +370,16 @@ export default defineConfig({
           // precache lên đúng trần 170. Gom vào CÙNG mảnh biểu tượng (mảnh này index.html luôn tải sẵn) ⇒ không thêm tệp nào.
           // 29/09: gom thêm ba mô-đun nhỏ (~1 KB mỗi cái) mà index.html VỐN nạp sẵn ở mọi đường (vai-tro, dia-chi-may-chu,
           // hieu-chinh-giay-thuc) vào cùng mảnh này ⇒ bớt tệp precache / vòng mạng, chừa chỗ dưới trần 170.
-          groups: [{ name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/ }],
+          // REACT RIÊNG, MÃ BĂM ỔN ĐỊNH (Gói C 15/10): react + react-dom + scheduler (cả react/jsx-runtime) trước nằm trong mảnh `index` — mảnh này đổi
+          // gần như mỗi lượt phát hành (nó chứa danh sách mảnh), nên mỗi lần thầy đẩy bản mới máy em lại tải lại cả React (~57 KB nén). Nay React ở mảnh
+          // `react` riêng: nội dung chỉ là mã thư viện ⇒ tên tệp giữ nguyên qua các lượt phát hành, máy em dùng lại bản đã cất. Đứng ĐẦU danh sách để
+          // giành mô-đun trước nhóm `bieu-tuong` (nhóm đó kéo theo phụ thuộc — trước đây kéo luôn `react` vào). index.html vẫn nạp tĩnh (modulepreload).
+          groups: [
+            { name: 'react', test: /node_modules[\\/](?:react|react-dom|scheduler)[\\/]/ },
+            { name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/ },
+            // fflate (nạp động trong day-ca-may-chu-moi.ts) — đặt tên mảnh rõ để globIgnores ở trên bắt đúng nó (tên tự sinh là `browser-*`, quá chung).
+            { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
+          ],
         },
       },
     },
