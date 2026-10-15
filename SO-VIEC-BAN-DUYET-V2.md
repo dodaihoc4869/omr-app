@@ -481,3 +481,21 @@ Thầy (15/10 ~08:3x): "giờ quét toàn app xem tối ưu thân thiện nhất
 - [x] Quét tốc độ tải app (byte mở từng app, mảnh nặng nhất) | bằng chứng: kiem-toc-do --in: gv 264,1 · hs 322,3 · ph 259,2 KB nén; quy byte theo sourcemap: react-dom ~55/61 KB khối index (đổi mỗi lần phát hành); mảnh chung DesignSystem 34 KB nạp ở cả 3 app chứa experiments/expanded ~6,4 · exam-kho-de-import ~3,5 · fflate ~2,8 · bai-tap-pdf ~1,8 KB; StudentPortalScreen 58 KB chứa KhoiKhacPhuc3CheDo ~11,6 KB; CSS toàn cục 52,5 KB gồm CSS app thầy
 - [x] Quét luồng rút câu (lập kế hoạch Gói 7, mở chặng, nộp câu) | bằng chứng: liệt kê từng đợt + 12 đề xuất; lỗi thật hanh-trinh-dong-co.ts:210 (hs.chienDich!.id)
 - [x] Đề xuất xếp ưu tiên gửi thầy — KHÔNG build trước khi thầy chọn | bằng chứng: docs/de-xuat-toi-uu-1510.md (gói A sửa lỗi · B máy chủ · R rút câu · C tải app · D thân thiện cần bản vẽ)
+Thầy (15/10 ~08:5x, sau khi đọc đề xuất docs/de-xuat-toi-uu-1510.md): "giữ làm cả đợt 1 và 2"
+- [x] Chữ "Lười": GIỮ nguyên (thầy: "giữ") | bằng chứng: không đổi chữ
+- [ ] A1 thẻ đăng nhập /hs có nền, ô nhập ≥ 16 px | bằng chứng: (chưa có)
+- [ ] A2 ẩn "Giao bài riêng" khi Game Hoá 2.0 bật (ToanCanhEm, BaoCaoChiTiet) | bằng chứng: (chưa có)
+- [ ] A3 hanh-trinh-dong-co.ts:210 em Gói 7 không có chiến dịch không nổ | bằng chứng: (chưa có)
+- [ ] A4 không hiện "dấu hiệu đối phó" cho học sinh (máy chủ bỏ coDoiPho ở bản HS) | bằng chứng: (chưa có)
+- [ ] A5 chữ lệch chuẩn (lộ mã câu, "Hệ thống", aria-label, G03) | bằng chứng: (chưa có)
+- [ ] B1 3 chỉ mục còn thiếu (EXPLAIN trên D1 thật trước/sau) | bằng chứng: (chưa có)
+- [ ] C1 tách React thành mảnh riêng mã băm ổn định | bằng chứng: (chưa có)
+- [ ] C2 nạp lười mã ít dùng trong mảnh chung 3 app | bằng chứng: (chưa có)
+- [ ] C3 nạp lười phần màn học sinh chỉ mở khi bấm | bằng chứng: (chưa có)
+- [ ] Đợt 1: cổng (tsc, vitest so main, build, kiem:toc-do 0 đỏ + hạ mốc, kiem:mau-giu 0, kiem-sw) → PR → phát hành trước 19:00, 0 ca mở | bằng chứng: (chưa có)
+- [ ] R gộp đợt chờ D1 nối tiếp: sảnh lần đầu, isolate ấm, sảnh lần sau, mở chặng, nộp câu (hạ mốc) | bằng chứng: (chưa có)
+- [ ] B2 bảng cau_meta tính sẵn | bằng chứng: (chưa có)
+- [ ] B3 Nhịp học thầy: ngày đã qua tính sẵn | bằng chứng: (chưa có)
+- [ ] B4 đệm danh mục Hành trình + sổ học | bằng chứng: (chưa có)
+- [ ] B5 thi đua ngày đã qua | bằng chứng: (chưa có)
+- [ ] Đợt 2: cổng → PR → phát hành trước 19:00, 0 ca mở; đo lại cao điểm tối 15/10 | bằng chứng: (chưa có)
