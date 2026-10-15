@@ -147,7 +147,7 @@ export function docTruocDongCoTheoHoSo(env:Env,t:DocTruocDongCo,hs:Pick<HoSo2,'c
 }
 
 /** Lô ghi cuối của động cơ (Gói R 15/10): `ghiTruoc` = lệnh ghi nơi gọi DỒN lại (vd. quota ngày Gói 7) — gửi ĐẦU lô (một đợt D1 thay vì thêm một đợt giữa lượt);
- *  `hoan` có ⇒ KHÔNG gửi lô: đẩy đủ lệnh (đúng thứ tự) vào `hoan` để nơi gọi gửi CHUNG lô ghi của chính nó (vd. mở chặng: cùng lô lưu phiên). */
+ *  `hoan` có ⇒ KHÔNG gửi lô: đẩy đủ lệnh (đúng thứ tự) vào `hoan` để nơi gọi tự gửi (mở chặng: song song lượt đọc câu, xong hẳn trước khi lưu phiên). */
 export interface GhiDongCo { ghiTruoc?: readonly D1PreparedStatement[]; hoan?: D1PreparedStatement[] }
 export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true,truoc?:DocTruocDongCo,ghiNoi:GhiDongCo={}):Promise<DongCoHanhTrinh> {
   const ghiTruoc=ghiNoi.ghiTruoc??[]

@@ -393,7 +393,7 @@ export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[
   return [{ results: kn }, { results: ung }]
 }
 /** `gsSom`: danh sách gói đã đọc đoán cùng đợt cờ Gói 7 (`docDanhSachGoiSom7`); vắng ⇒ đọc như cũ.
- *  `hoan` (Gói R 15/10): có ⇒ lô ghi cuối của động cơ (kèm quota ngày) KHÔNG gửi ở đây mà đẩy vào `hoan` để nơi gọi gửi CHUNG lô ghi của chính nó (`startGoi7`). */
+ *  `hoan` (Gói R 15/10): có ⇒ lô ghi cuối của động cơ (kèm quota ngày) KHÔNG gửi ở đây mà đẩy vào `hoan` để nơi gọi tự gửi (`startGoi7`: song song lượt đọc câu). */
 export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
   const ngay = ngayVn7(now)
   // Lớp của em (bảng lớp dùng chung cả trường, đệm 30 giây trong isolate — `lopCuaEm`) bắt đầu CÙNG đợt danh sách gói (đợt 18): đệm vừa hết hạn thì phạm vi
