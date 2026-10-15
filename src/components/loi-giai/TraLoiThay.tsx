@@ -133,7 +133,7 @@ function BangNhanh({ bang }: { bang: NonNullable<CauTrucTraLoi['bang']> }) {
 
 /** Các bước đánh số; `thu` (khuôn Tính): bước `thu.buoc` để em THỬ tính trước, các bước sau và `sauKhiXong` (tính nhanh) hiện khi em xong. */
 function CacBuoc({ ct, sauKhiXong }: { ct: CauTrucTraLoi; sauKhiXong?: ReactNode }) {
-  const [xong, setXong] = useState(false)
+  const [xong, setXong] = useState<'' | 'dung' | 'xem'>('') // em tự tính đúng, hay bấm "Xem luôn bước n"
   const bang = ct.bang
   const sau = bang && bang.sauBuoc >= 1 && bang.sauBuoc <= ct.buoc.length ? bang.sauBuoc : 0
   const thu = ct.buocThu && ct.buocThu.buoc <= ct.buoc.length ? ct.buocThu : undefined
@@ -147,7 +147,8 @@ function CacBuoc({ ct, sauKhiXong }: { ct: CauTrucTraLoi; sauKhiXong?: ReactNode
               <span className="lg-tl-so" aria-hidden="true">{i + 1}</span>
               <div data-moi={(thu && xong && i + 1 > thu.buoc) || undefined}>
                 {b.ten && <b><ChuTo text={b.ten} /></b>}
-                {thu && !xong && i + 1 === thu.buoc ? <EmThu thu={thu} onXong={() => setXong(true)} /> : <p><ChuTo text={b.chu} /></p>}
+                {thu && !xong && i + 1 === thu.buoc ? <EmThu thu={thu} onXong={(dung) => setXong(dung ? 'dung' : 'xem')} /> : <p><ChuTo text={b.chu} /></p>}
+                {thu && xong === 'dung' && i + 1 === thu.buoc && <p className="lg-thu-kq" data-kq="dung" role="status">Em tính đúng: {thu.dap}.</p>}
                 {bang && sau === i + 1 && <BangNhanh bang={bang} />}
               </div>
             </li>

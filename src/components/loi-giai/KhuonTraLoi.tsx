@@ -256,20 +256,21 @@ export function thuDung(em: string, dap: string): boolean {
   return b === 0 ? a === 0 : Math.abs(a - b) <= Math.abs(b) * 0.01
 }
 /** K3 · EM THỬ một bước: tính đúng (hoặc bấm "Xem luôn") thì `onXong`. */
-export function EmThu({ thu, onXong }: { thu: BuocThu; onXong: () => void }) {
+/** Em tính đúng ⇒ `onXong(true)` (nơi gọi mở bước, ghi "Em tính đúng"); bấm "Xem luôn" ⇒ `onXong(false)`. */
+export function EmThu({ thu, onXong }: { thu: BuocThu; onXong: (dung: boolean) => void }) {
   const [gia, setGia] = useState('')
-  const [kq, setKq] = useState<'' | 'dung' | 'sai'>('')
-  const kiem = () => { const d = thuDung(gia, thu.dap); setKq(d ? 'dung' : 'sai'); if (d) onXong() }
+  const [sai, setSai] = useState(false)
+  const kiem = () => { if (thuDung(gia, thu.dap)) onXong(true); else setSai(true) }
   return (
     <div className="lg-thu">
       <label><ChemText text={chuHoa(`Em thử: ${thu.hoi}`)} /></label>
       <div className="lg-thu-hang">
         <input inputMode="decimal" autoComplete="off" value={gia} placeholder="Nhập số, ví dụ 0,5" aria-label="Kết quả em tính"
-          onChange={(e) => { setGia(e.target.value); setKq('') }} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kiem() } }} />
+          onChange={(e) => { setGia(e.target.value); setSai(false) }} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kiem() } }} />
         <button type="button" onClick={kiem} disabled={!gia.trim()}>Kiểm tra</button>
       </div>
-      <p className="lg-thu-kq" data-kq={kq || undefined} aria-live="polite">{kq === 'dung' ? `Đúng rồi: ${thu.dap}.` : kq === 'sai' ? (thu.goiYSai || 'Chưa đúng, em tính lại nhé.') : ''}</p>
-      {kq !== 'dung' && <button type="button" className="lg-nut-chu" onClick={onXong}>Xem luôn bước {thu.buoc}</button>}
+      <p className="lg-thu-kq" data-kq={sai ? 'sai' : undefined} aria-live="polite">{sai ? (thu.goiYSai || 'Chưa đúng, em tính lại nhé.') : ''}</p>
+      <button type="button" className="lg-nut-chu" onClick={() => onXong(false)}>Xem luôn bước {thu.buoc}</button>
     </div>
   )
 }

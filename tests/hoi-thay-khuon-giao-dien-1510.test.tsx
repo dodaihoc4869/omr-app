@@ -81,12 +81,14 @@ describe('năm khuôn', () => {
     expect(container.querySelectorAll('.lg-tl-buoc > li')).toHaveLength(3)
     expect(container.querySelector('.lg-tinh .cuoi')!.textContent).toContain('3,97 L')
     expect(container.querySelector('.lg-tl-buoc > li:nth-child(2) p')!.textContent).toBe('n = 0,16 mol')
+    expect(container.querySelector('.lg-tl-buoc > li:nth-child(2) .lg-thu-kq[data-kq="dung"]')!.textContent).toBe('Em tính đúng: 0,16.') // em biết mình đúng
   })
 
   it('"Xem luôn bước n" bỏ qua phần thử', () => {
     const { container } = ve({ khuon: 'tinh', yChinh: 'x', buoc: [{ ten: 'A', chu: 'a' }, { ten: 'B', chu: 'b' }], buocThu: { buoc: 1, hoi: 'A?', dap: '1', goiYSai: '' } })
     fireEvent.click(screen.getByRole('button', { name: 'Xem luôn bước 1' }))
     expect(container.querySelectorAll('.lg-tl-buoc > li')).toHaveLength(2)
+    expect(container.querySelector('.lg-thu-kq[data-kq="dung"]')).toBeNull()
     expect(container.querySelector('.lg-thu')).toBeNull()
   })
 })

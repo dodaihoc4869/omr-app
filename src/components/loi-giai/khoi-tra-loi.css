@@ -28,7 +28,7 @@
 .lg-k { border-radius: 16px; background: var(--m3-surface); border: 1px solid var(--m3-surface-container-high); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .lg-k-dau { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; color: var(--m3-on-surface-variant); }
 .lg-k-dau svg { flex: none; color: var(--m3-primary); }
-.lg-k-dau button { margin-left: auto; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--m3-outline); background: var(--m3-surface); color: var(--m3-primary); font: inherit; font-size: 13.5px; font-weight: 700; text-transform: none; letter-spacing: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.lg-k-dau button { margin-left: auto; min-height: 48px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--m3-outline); background: var(--m3-surface); color: var(--m3-primary); font: inherit; font-size: 13.5px; font-weight: 700; text-transform: none; letter-spacing: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 .lg-k-dau button:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
 
 /* — THÍ NGHIỆM ẢO: ống nghiệm + giọt thuốc thử + hiện tượng. Đứng ở khung đầu tới khi khối lọt vào màn (data-chay). — */
