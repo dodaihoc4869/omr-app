@@ -59,6 +59,9 @@ const now=()=>new Date().toISOString()
 const hetTran=(n:number)=>Object.assign(new Error(`Em đã hoàn thành ${n} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`),{ma:'het_tran'})
 /** Hai câu ĐỌC của `loadProfile` (mùa + hồ sơ) — nơi gọi có thể gắn vào CUỐI một lô ghi của chính lượt mình (tối ưu 05/10: đọc lại hồ sơ cùng lô ghi). */
 export const lenhDocHoSo=(env:Env,sbd:string)=>[env.DB.prepare("SELECT json FROM game_v2_settings WHERE key='season'"),env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd)]
+/** Dòng thần thú CŨ của em (`than_thu`) — chỉ cần khi em CHƯA có hồ sơ game (lần đầu). Nhớ theo lượt (Gói R 15/10): `batDauDocSom` thấy lượt đọc hồ sơ không có dòng ⇒
+ *  đọc NGAY (cùng đợt các lượt đọc sau hồ sơ, không chờ bước xác thực xong); `loadProfile` dùng lại đúng lượt ấy. Ngoài bản gộp ⇒ đọc thẳng như cũ. */
+const docThanThuCu=(env:Env,sbd:string)=>nhoTheoLuot(env.DB,`than_thu|${sbd}`,()=>env.DB.prepare('SELECT du_lieu_json AS json FROM than_thu WHERE sbd=?').bind(sbd).first<{json:string}>(),['than_thu'])
 /** `docSan` (chỉ-thêm, tối ưu 05/10): kết quả hai câu `lenhDocHoSo` nơi gọi VỪA chạy (cuối lô ghi của chính lượt này) ⇒ khỏi đọc lại; mọi bước sau y như cũ. */
 export async function loadProfile(env:Env,sbd:string,docSan?:readonly {results:Row[]}[]):Promise<{profile:Profile;revision:number}>{
   // Cao điểm 01/10: hai SELECT tươi trong MỘT batch của CHÍNH request này, không đệm hồ sơ/vàng hay mùa.
@@ -68,7 +71,7 @@ export async function loadProfile(env:Env,sbd:string,docSan?:readonly {results:R
   const season=reset?String(JSON.parse(String(reset.json)).id):''
   let row:Row|null|undefined=row0
   if(!row){
-    const legacy=await env.DB.prepare('SELECT du_lieu_json AS json FROM than_thu WHERE sbd=?').bind(sbd).first<{json:string}>()
+    const legacy=await docThanThuCu(env,sbd)
     let old:Record<string,unknown>={};try{old=JSON.parse(legacy?.json??'{}')}catch{/* Keep raw snapshot below. */}
     const id=String(old.idThanhThuChon??old.thanThuId??'');const pet=ALIASES[id]??id
     const profile:Profile={pet:PETS.some(p=>p.id===pet)?pet:'dat_quy',choice:!id||OLD_SIX.has(id)||!PETS.some(p=>p.id===pet),legacy:legacy?.json??null,
@@ -289,6 +292,8 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   // Nhớ theo lượt: lệnh `answer` NỘI BỘ của Đoàn (cùng request, chưa ghi gì từ lúc này) dùng lại đúng lượt đọc này thay vì đọc hồ sơ lần nữa.
   const hoSoSom=som(nhoTheoLuot(env.DB,`hoso|${sbd}`,()=>env.DB.batch<Row>(lenhDocHoSo(env,sbd)),BANG_HO_SO))
   gieoNho(env.DB,'mua',hoSoSom.then(r=>r[0]?.results[0]??null),BANG_MUA)
+  // Gói R 15/10: em CHƯA có hồ sơ game (lần đầu) ⇒ dòng thần thú cũ (`loadProfile` cần để tạo hồ sơ) đọc ngay khi lượt đọc hồ sơ về — không chờ bước xác thực. Chỉ đọc.
+  void hoSoSom.then(r=>{if(!r[1]?.results[0])void docThanThuCu(env,sbd).catch(()=>null)},()=>{})
   // CHỐT ĐÁP ÁN (thầy 29/09 "bấm chốt đáp án nó chấm 1 lúc mới được"): lượt, câu bảo vệ ca thi, phạm vi thầy đặt, bản chấm cũ KHÔNG phụ thuộc hồ sơ ⇒
   // bắt đầu CÙNG đợt với loadProfile (trước: 5 đợt nối tiếp). Nhánh `answer` vẫn await đúng thứ tự cũ ⇒ lỗi nào báo trước vẫn như cũ.
   const truocAnswer=action==='answer'?docTruocAnswer(env,sbd,b):null
