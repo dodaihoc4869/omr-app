@@ -472,3 +472,6 @@ Thầy (15/10, ảnh "Hộp thư Zalo" phong cách retro): "bạn thử vẽ gia
 - [x] Đặc tả 7 mục + bản vẽ HTML các màn chính app học sinh (Hôm nay · Làm câu · Xong chặng · Hành trình · trạng thái) phong cách retro | bằng chứng: docs/ban-ve-hs-retro-1510/hs-retro.html + GHI-CHU.md (dữ liệu thật của app, 0 lệnh máy chủ mới, 0 byte phông mới)
 - [x] Ảnh Chromium thật 3 khổ (390 dọc · 844 ngang · 1440), sáng + tối; soát 0 lỗi trang · 0 tràn · 0 đích chạm < 44 px | bằng chứng: 20 ảnh docs/ban-ve-hs-retro-1510/anh (≤ 150 KB/ảnh), node scripts/chup-ban-ve-hs-retro-1510.mjs → "SOÁT: 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ"
 - [ ] KHÔNG build — chờ thầy duyệt (quy trình 4 bước) + 3 quyết định trong GHI-CHU (luật màu 05/10, phạm vi đợt 1, bỏ ô Tự sửa lỗi trùng) | bằng chứng: đã gửi ảnh, chờ thầy
+Thầy (15/10 ~07:5x, sau khi xem bản vẽ retro): "thay đổi mọi chỗ trong giao diện chứ"
+- [!] Đổi giao diện retro cho MỌI màn app học sinh | DỪNG theo lệnh thầy 15/10: "dừng việc làm giao diện lại". Chưa commit/build/phát hành; phần dở cất ở tệp vá trong scratchpad phiên (giao-dien-retro-dang-do-1510.patch), tokens.css + hoc-tap.css trả về nguyên trạng
+- [!] Bản thật trên Pages xem trước → thầy chốt → phát hành | DỪNG theo lệnh thầy 15/10
