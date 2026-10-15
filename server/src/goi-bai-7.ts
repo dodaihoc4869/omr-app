@@ -23,6 +23,7 @@ import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
 import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
+import { envGhiRieng, lenhTrong } from './doc-d1-theo-luot'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
 
 type Row = Record<string, unknown>
@@ -390,8 +391,9 @@ export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[
   const ung = [...yeu].sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).slice(0, 96).map(([qid, y]) => ({ qid, yeu: y }))
   return [{ results: kn }, { results: ung }]
 }
-/** `gsSom`: danh sách gói đã đọc đoán cùng đợt cờ Gói 7 (`docDanhSachGoiSom7`); vắng ⇒ đọc như cũ. */
-export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>) {
+/** `gsSom`: danh sách gói đã đọc đoán cùng đợt cờ Gói 7 (`docDanhSachGoiSom7`); vắng ⇒ đọc như cũ.
+ *  `hoan` (Gói R 15/10): có ⇒ lô ghi cuối của động cơ (kèm quota ngày) KHÔNG gửi ở đây mà đẩy vào `hoan` để nơi gọi gửi CHUNG lô ghi của chính nó (`startGoi7`). */
+export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
   const ngay = ngayVn7(now)
   // Lớp của em (bảng lớp dùng chung cả trường, đệm 30 giây trong isolate — `lopCuaEm`) bắt đầu CÙNG đợt danh sách gói (đợt 18): đệm vừa hết hạn thì phạm vi
   // bài ⇒ ma trận cũ ⇒ hồ sơ không phải chờ thêm một đợt. Lỗi đọc ⇒ null như cũ (hàm tự bắt).
@@ -435,7 +437,14 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
     const quaCong = new Set((await chanKhacKhoiEm(env, 'goi7', { sbd, khoiEm }, coTheGiao, { cauCua: (c) => metaCua(c.qid), nghiSan: nghi })).map(c => c.qid))
     for (const c of ungGoi) if (!quaCong.has(c.qid)) chan.add(c.qid)
   }
-  const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan,true,dongCo,ghiTre7)
+  const nhom7 = new Map([...hs.meta].map(([qid,m])=>[qid,m.group]))
+  const tang = tangCuaEm(hs.cau,hs.tt,nhom7)
+  // Gói R 15/10: lịch kiểm tra riêng TẮT ⇒ mức hôm nay KHÔNG phụ thuộc động cơ (chỗ giữ ôn/sửa = 0) ⇒ chốt NGAY, SONG SONG với động cơ, qua đường ghi riêng
+  // (`envGhiRieng`: D1 gốc, vẫn qua rào cổng; lệnh ghi tự nuốt lỗi như cũ, đọc lại dòng thắng qua cùng đường; không lượt đọc nào khác của lượt đọc bảng mức hôm nay)
+  // — trước: nối tiếp SAU lô ghi của động cơ, hai đợt D1. Cùng đối số y hệt lời gọi cũ bên dưới. Lịch bật / cờ lỗi ⇒ chốt ở chỗ cũ như trước.
+  const batKtSom = som(import('./kiem-tra-ca-nhan').then(m=>m.coKtCn(env)))
+  const chotSom = batKtSom.then(bat => bat === false ? chotMucNgay7(envGhiRieng(env),sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,0,goi.some(g=>g.kiemNhe),goi.map(g=>g.id)) : null).catch(() => null)
+  const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan,true,dongCo,{ghiTruoc:ghiTre7,hoan})
   const sanSang = new Set(hs.cau.filter(c => !engine.chan.has(c.qid) && !chan.has(c.qid) && !chan.has(hs.meta.get(c.qid)?.group??'') && !hs.meta.get(c.qid)?.tuLuan).map(c => c.qid))
   const { daLam: daLamNgay, vuaLam } = await daLamSom
   const [views,teacherCorrections]=await xemChuaSom
@@ -446,11 +455,9 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const chua=goi.flatMap(g=>g.cau.filter(c=>g.choThay.has(c.qid)&&teacherCorrections.results.some(r=>r.goi_id===g.id&&r.qid===c.qid&&r.version===c.version)).map(c=>c.qid))
   const cau = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid,c])).values()]
   const quotaCon = goi.reduce((n,g) => n+Math.max(0,g.quota-g.gapNgay.size),0)
-  const nhom7 = new Map([...hs.meta].map(([qid,m])=>[qid,m.group]))
-  const tang = tangCuaEm(hs.cau,hs.tt,nhom7)
   // MỘT CON SỐ (thầy 12/10): mức hôm nay M = max(mức theo tầng, Σ câu mới theo lịch các gói) — chốt lần lập đầu tiên trong ngày, các lần sau đọc lại.
   // Kế hoạch đúng M − đã làm câu: câu mới theo lịch vẫn đứng đầu nhưng không vượt phần còn lại của M (`chiTrongMuc`).
-  const batKt=await import('./kiem-tra-ca-nhan').then(m=>m.coKtCn(env))
+  const batKt=await batKtSom
   // Câu VỪA LÀM (≤ 15 phút, kể cả gốc của bản ảo) `startGoi7` không phát lại ⇒ kế hoạch cũng không xếp vào sửa / ôn / chữa (lỗi 14/10: kế hoạch và lúc phát
   // phải cùng một luật, không thì phần còn lại của mức rơi vào câu không phát được). Mức hôm nay vẫn tính theo `daLamNgay` thật.
   const khongXep = vuaLam.size ? new Set([...daLamNgay, ...vuaLam]) : daLamNgay
@@ -458,7 +465,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const suaCan=batKt?sua.filter(id=>eligible(id)&&!chua.includes(id)).slice(0,4):[]
   const onCan=batKt?on.filter(id=>eligible(id)&&!suaCan.includes(id)&&!chua.includes(id)):[]
   const giuOn=batKt?Math.min(6,onCan.length):0
-  const muc7 = await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,giuOn+suaCan.length,goi.some(g=>g.kiemNhe),goi.map(g=>g.id))
+  const muc7 = (!batKt ? await chotSom : null) ?? await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,giuOn+suaCan.length,goi.some(g=>g.kiemNhe),goi.map(g=>g.id))
   const toiThieu = muc7.muc
   const kiemNhe=goi.some(g=>g.kiemNhe)
   // 12 chỗ của ngày kiểm tra giữ tiến độ bài đang trong hạn; nợ cũ vẫn ở hàng đợi.
@@ -528,8 +535,14 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   // (`ctx.waitUntil`). Bấm "Học tiếp" ngay ⇒ kế hoạch lập khi sổ chưa kịp có câu cuối ⇒ xếp lại câu vừa làm. Nay câu em vừa trả lời trong 15 phút
   // (đọc từ bảng ghi ngay) không vào chặng mới; sau đó sổ đã có, kế hoạch tự loại như cũ. 13/10 tối: tập này nay đọc CÙNG lượt "đã làm hôm nay" của
   // `lapGoi7` (`docDaLamVaVuaLam7`) — kế hoạch + bộ đếm đã tính câu vừa làm; ở đây giữ làm chốt chặn cho đợt cũ còn câu.
-  const lap = await lapGoi7(env,sbd,now,gsSom)
+  // Gói R 15/10: lô ghi cuối của động cơ (kèm quota ngày) KHÔNG chặn các lượt đọc câu của chặng: gửi qua đường ghi riêng (D1 gốc, vẫn qua rào cổng) NGAY khi
+  // lập xong, SONG SONG với lượt đọc câu (chỉ đọc bảng câu/khối — không đụng bảng của lô này); mọi lối ra (kể cả lưu phiên) chờ lô xong trước như thứ tự ghi cũ.
+  const hoan: D1PreparedStatement[] = []
+  const lap = await lapGoi7(env,sbd,now,gsSom,hoan)
+  const ghiDongCo = som((async () => { const db = envGhiRieng(env).DB; for (let i = 0; i < hoan.length; i += 30) await db.batch(hoan.slice(i, i + 30).map(st => lenhTrong(env.DB, st))) })())
+  try {
   if (!lap) {
+    await ghiDongCo
     // Bớt em chỉ ngừng cấp câu mới. Phiên đã cấp vẫn tiếp tục đúng payload/thứ tự, qua các cổng nguồn/khối/ca hiện hành.
     const [khoi,{old,answered},baoVe,btvn,control]=await Promise.all([khoiSom,cuSom,protectedQuestions(env),docCauBtvnChuaNop(env,sbd),readGameScope(env,sbd)])
     if (!old || !control.enabled) return null
@@ -542,7 +555,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
       .map(({r,q})=>({...publicQuestion(apXaoTheoRef(q,r)),...(r.goiY?{goiY:r.goiY}:{}),vaiGoi7:r.vai,huongDan7:r.huongDan,coGoi7:true}))
     return questions.length?{ok:true,id:str(old.id),questions}:null
   }
-  if (!lap.control.enabled) throw new Error('Thầy đang tạm dừng bài học cho em.')
+  if (!lap.control.enabled) { await ghiDongCo; throw new Error('Thầy đang tạm dừng bài học cho em.') }
   const [khoi, { old, answered }] = await Promise.all([khoiSom, cuSom])
   const vuaLam = lap.vuaLam
   const saved = old ? json<{questions:RefGoi7[]}>(old.json) : null
@@ -579,6 +592,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
       role:v.vai==='moi'?'cau_moi':v.vai==='sua'?'on_lai':'on_lai',vai:v.vai,huongDan:v.huongDan}
     refs.push(ref); questions.push({...publicQuestion(q),...(ref.goiY?{goiY:ref.goiY}:{}),vaiGoi7:v.vai,huongDan7:v.huongDan,coGoi7:lap.goi.some(g=>g.cau.some(c=>c.qid===q.qid&&c.version===q.version))})
   } } }
+  await ghiDongCo
   if (!refs.length) return {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}
   const id = viec.length && refs.length === viec.length && refs.every(r => viec.some(v => v.qid === r.qid)) ? str(old!.id) : crypto.randomUUID()
   if (id !== str(old?.id)) {
@@ -587,6 +601,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
     if(!Number(rs.meta.changes))throw new Error('Danh sách bài vừa thay đổi. Em cập nhật lại trước khi học tiếp; bài đang làm vẫn được giữ.')
   }
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
+  } catch (e) { await ghiDongCo.catch(() => {}); throw e } // lối ra lỗi giữa chừng: lô ghi của động cơ vẫn xong trước (như thứ tự cũ: ghi trong lúc lập)
 }
 interface RefGoi7 extends LamLaiRef { qid:string; maDe:string; version:string; group:string; novel:boolean; role:string; vai:ViecGoi7['vai']; huongDan:boolean; goiY?:unknown }
 

@@ -124,8 +124,11 @@ export function docTruocDongCoTheoHoSo(env:Env,t:DocTruocDongCo,hs:Pick<HoSo2,'c
   return moi
 }
 
-/** `ghiTruoc` (Gói R 15/10): lệnh ghi nơi gọi DỒN lại (vd. quota ngày Gói 7) — gửi ĐẦU lô ghi cuối của động cơ (một đợt D1 thay vì thêm một đợt giữa lượt). */
-export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true,truoc?:DocTruocDongCo,ghiTruoc:readonly D1PreparedStatement[]=[]):Promise<DongCoHanhTrinh> {
+/** Lô ghi cuối của động cơ (Gói R 15/10): `ghiTruoc` = lệnh ghi nơi gọi DỒN lại (vd. quota ngày Gói 7) — gửi ĐẦU lô (một đợt D1 thay vì thêm một đợt giữa lượt);
+ *  `hoan` có ⇒ KHÔNG gửi lô: đẩy đủ lệnh (đúng thứ tự) vào `hoan` để nơi gọi gửi CHUNG lô ghi của chính nó (vd. mở chặng: cùng lô lưu phiên). */
+export interface GhiDongCo { ghiTruoc?: readonly D1PreparedStatement[]; hoan?: D1PreparedStatement[] }
+export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true,truoc?:DocTruocDongCo,ghiNoi:GhiDongCo={}):Promise<DongCoHanhTrinh> {
+  const ghiTruoc=ghiNoi.ghiTruoc??[]
   // Đọc trước (đợt 18): dùng bản nơi gọi đã bắt đầu nếu ĐÚNG (em, lúc, ghi); không thì bắt đầu ngay tại đây — mọi lượt đọc độc lập đi CÙNG một đợt.
   const t=truoc&&truoc.sbd===sbd&&truoc.now===now&&truoc.ghi===ghi?truoc:docTruocDongCo(env,sbd,now,ghi)
   const th=docTruocDongCoTheoHoSo(env,t,hs)
@@ -185,7 +188,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const scope=hs.cau.filter(c=>c.nguon==='chien_dich').map(c=>q.get(c.qid)!)
   const forecast=duBaoDiem(omni,scope,{chiKyVong:true}), cursor=omni.cursor
   out.p8=forecast.p8
-  if(!ghi){if(ghiTruoc.length)await env.DB.batch([...ghiTruoc]);return out}
+  if(!ghi){if(ghiNoi.hoan)ghiNoi.hoan.push(...ghiTruoc);else if(ghiTruoc.length)await env.DB.batch([...ghiTruoc]);return out}
   await ghiDoV6(env,sbd,now,qs,t.chonV6??undefined)
   const firstSeen=new Map<string,number>()
   for(const e of events) {const g=e.contentGroup||q.get(e.qid)?.contentGroup||e.qid;firstSeen.set(g,Math.min(firstSeen.get(g)??Infinity,e.receivedAt))}
@@ -211,6 +214,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   await damBaoBangOmni(env)
   commands.push(env.DB.prepare(`INSERT INTO omni_du_bao(sbd,pham_vi,ky_vong,p8,sai_so,s_dung,con_duong,con_thieu_json,so_bang_chung,luc) SELECT ?,?,?,?,?,?,?,?,?,? WHERE ${KHONG_CA} ON CONFLICT(sbd,pham_vi) DO UPDATE SET ky_vong=excluded.ky_vong,p8=excluded.p8,sai_so=excluded.sai_so,s_dung=excluded.s_dung,con_duong=excluded.con_duong,con_thieu_json=excluded.con_thieu_json,so_bang_chung=excluded.so_bang_chung,luc=excluded.luc`).bind(sbd,`${hs.chienDich!.id}:ung_vien_ngay`,forecast.kyVong,forecast.p8,forecast.saiSo,omni.sEm,forecast.conDuong,JSON.stringify(forecast.conThieu),forecast.soBangChung,new Date(now).toISOString()))
   // Gói lớn có trần 30 lệnh; mỗi lệnh tự kiểm ca, không ghi điểm/sổ học.
+  if(ghiNoi.hoan){ghiNoi.hoan.push(...commands);return out}
   for(let i=0;i<commands.length;i+=30) await env.DB.batch(commands.slice(i,i+30))
   return out
 }
