@@ -74,8 +74,9 @@ export async function loadProfile(env:Env,sbd:string,docSan?:readonly {results:R
     const profile:Profile={pet:PETS.some(p=>p.id===pet)?pet:'dat_quy',choice:!id||OLD_SIX.has(id)||!PETS.some(p=>p.id===pet),legacy:legacy?.json??null,
       cap:Math.max(1,Math.min(120,Number(old.capDo)||1)),exp:Math.max(0,Number(old.exp)||0),wallet:Math.max(0,Number(old.khoExp)||0),earned:0,tower:Math.max(1,Math.min(999,Number(old.tangThapCaoNhat)||1)),mastery:[],arena:null,cutover:now()}
     if(season)Object.assign(profile,{pet:'dat_quy',choice:true,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,season,luatCap:LUAT_CAP_MOI,mocVang:0})
-    await env.DB.prepare('INSERT OR IGNORE INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').bind(sbd,JSON.stringify(profile),now()).run()
-    row=await env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd).first<Row>()
+    // Gói R 15/10: tạo hồ sơ + ĐỌC LẠI DÒNG THẮNG trong CÙNG một lô (một đợt D1 thay hai; hai máy cùng mở lần đầu vẫn cùng thấy dòng thắng). Lỗi lô ⇒ ném như cũ.
+    const [,doc]=await env.DB.batch<Row>([env.DB.prepare('INSERT OR IGNORE INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').bind(sbd,JSON.stringify(profile),now()),env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd)])
+    row=doc?.results?.[0]??null
   }
   if(!row)throw new Error('Chưa mở được hồ sơ game.')
   const current=JSON.parse(row.json) as Profile
