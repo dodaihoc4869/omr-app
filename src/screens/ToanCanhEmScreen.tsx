@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Clock, Eye, Flame, Info, Shield } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
+import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import OTraCuu from '../components/hom-nay/OTraCuu'
 import { BanDoDang, DongThoiGian, NhipHoc30, TheHuynh } from '../components/toan-canh/CacKhoi'
 import { layToanCanh, moiXemChu, type LoaiSuKien, type SuKienEm, type ToanCanh } from '../lib/em-toan-canh'
@@ -96,6 +97,7 @@ export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHo
   const dsTraCuu = useMemo(() => classList.map((h) => ({ sbd: h.sbd, hoTen: h.hoTen, lop: h.lop })), [classList])
   // Ca gần nhất của em (để "Cho thi lại" mở đúng ca): ưu tiên mã ca trong điểm ca gần nhất, sau đó việc loại `ca` mới nhất đã tải.
   const maCaGanNhat = tc?.em.diemCaGanNhat?.maCa || dong.find((v) => v.loai === 'ca' && v.maCa)?.maCa || ''
+  const hoa2 = useHoa2Bat()
   const giaoRieng = () => {
     datSbdGiaoRieng(sbd) // màn Giao bài mở sẵn chế độ chọn từng em, đã tick em này
     setScreen('giaobtvn')
@@ -156,11 +158,15 @@ export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHo
           )}
         </div>
         <div className="tc-hanh-dong">
-          <button type="button" className="hn2-nut hn2-nut--chinh" onClick={giaoRieng}>
-            Giao bài riêng
-          </button>
+          {/* Game Hoá 2.0 bật ⇒ màn Giao BTVN đã bỏ (App.tsx MAN_AN_KHI_HOA2): nút này chỉ đưa thầy về Hôm nay (quét 15/10) ⇒ ẩn như HocSinhScreen;
+              "Cho thi lại" lên làm nút chính. */}
+          {!hoa2 && (
+            <button type="button" className="hn2-nut hn2-nut--chinh" onClick={giaoRieng}>
+              Giao bài riêng
+            </button>
+          )}
           {maCaGanNhat && (
-            <button type="button" className="hn2-nut hn2-nut--vien" onClick={() => moChiTietCa(maCaGanNhat)}>
+            <button type="button" className={`hn2-nut ${hoa2 ? 'hn2-nut--chinh' : 'hn2-nut--vien'}`} onClick={() => moChiTietCa(maCaGanNhat)}>
               Cho thi lại
             </button>
           )}

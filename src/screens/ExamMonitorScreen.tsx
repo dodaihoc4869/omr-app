@@ -2433,7 +2433,8 @@ export default function ExamMonitorScreen() {
             return coViec ? veHanhDongEm(e) : null
           })()}
           onToanCanh={(sbd) => moToanCanh(sbd)}
-          onGiaoRieng={(sbd) => {
+          // Game Hoá 2.0 bật ⇒ màn Giao BTVN đã bỏ: không truyền ⇒ báo cáo không vẽ nút "Giao bài riêng" (bấm chỉ về Hôm nay — quét 15/10).
+          onGiaoRieng={hoa2 ? undefined : (sbd) => {
             datSbdGiaoRieng(sbd) // màn Giao bài mở sẵn chế độ chọn từng em, đã tick em này
             setScreen('giaobtvn')
           }}

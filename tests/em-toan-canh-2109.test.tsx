@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import ToanCanhEmScreen from '../src/screens/ToanCanhEmScreen'
 import { useAppStore } from '../src/store/appStore'
+import { useCoHoa2 } from '../src/components/chien-dich/co-hoa2'
 import { docToanCanh, gioPhutVN, layToanCanh, luoiNhip, moiXemChu, nhanNgay, nhomTheoNgay, ngayThuChu, ngayVN, tomTatNhip, type NhipNgay, type SuKienEm } from '../src/lib/em-toan-canh'
 
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }) }))
@@ -207,6 +208,17 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
     useAppStore.setState({ screen: 'toancanh' } as never)
     fireEvent.click(screen.getByRole('button', { name: /Về danh sách học sinh/ }))
     expect(useAppStore.getState().screen).toBe('hocsinh')
+  })
+
+  it('Game Hoá 2.0 bật (quét 15/10): KHÔNG có "Giao bài riêng" (màn Giao BTVN đã bỏ, bấm chỉ về Hôm nay) · "Cho thi lại" là nút chính', async () => {
+    useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
+    try {
+      await chay()
+      expect(screen.queryByRole('button', { name: 'Giao bài riêng' })).toBeNull()
+      expect(screen.getByRole('button', { name: 'Cho thi lại' }).className).toContain('hn2-nut--chinh')
+    } finally {
+      useCoHoa2.getState().dat(null)
+    }
   })
 
   it('"Cho thi lại" CHỈ hiện khi biết ca (không đoán mã ca)', async () => {
