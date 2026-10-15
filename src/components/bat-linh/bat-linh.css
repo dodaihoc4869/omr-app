@@ -85,7 +85,9 @@
 .ht-shell .bl-login :is(input, select) { font-size: 16px; }
 @media (min-width: 960px) {
   .bl-login { padding: 48px; }
-  .bl-login__card { width: 460px; padding: 32px; margin-left: min(36vw, 520px); }
+  /* T10 15/10: bỏ `margin-left: min(36vw, 520px)` của bố cục cũ (thẻ đẩy sang phải ảnh cảnh); từ 900 px .bl-login là lưới 2 cột
+     (styles/giao-dien-day-du.css), lề này đẩy thẻ ra khỏi ô 480 px ⇒ tràn phải 120–195 px ở 1024–1440. */
+  .bl-login__card { width: 460px; padding: 32px; }
 }
 @media (max-width: 600px) {
   :is(.bl-app, body[data-bat-linh]) { --bl-scene: url('/bat-linh/canh-dao-nho.webp'); }
