@@ -8,6 +8,8 @@
 // ĐẶC TẢ (viết theo HÀNH VI, không khoá tên hàm chưa có):
 //   a) câu đáp số "10000": em nhập đủ "10000" bằng bàn phím số VÀ bằng phím máy tính ⇒ giá trị gửi đi là "10000" ⇒ lệnh máy chủ `answer` chấm ĐÚNG.
 //   b) câu đáp số ≤ 4 kí tự: GIỮ 4 ô như phiếu (kí tự thứ 5 không vào, phím mờ khi đủ 4) — không đổi giao diện câu thường; đáp án KHÔNG xuống máy em trước khi nộp.
+//      CẬP NHẬT 15/10 ~10:30 (Lập trình, việc v_a254c6118c6b) theo lệnh thầy "tuỳ vào đáp án mà hiển thị đúng số ô cần điền": số ô = ĐÚNG số kí tự đáp số
+//      ("7,5" ⇒ 3 ô, "-0,5" / "2024" ⇒ 4 ô); kí tự vượt số ô không vào, phím mờ khi đủ. Phần "đáp án không xuống máy em" giữ nguyên.
 //   c) chốt chặn: không câu phần III nào được phát cho em mà đáp số (dạng gõ được bằng bàn phím số) dài hơn số ô nhập; câu đáp án chữ / tự luận gắn nhầm
 //      phần III không lọt vào đề trả lời ngắn.
 //
@@ -175,17 +177,18 @@ describe('a) câu đáp số "10000" (DH-10-C1-B1-III-18): em nhập đủ 5 kí
 })
 
 // ═════════════════════════════ b) CÂU THƯỜNG ≤ 4 KÍ TỰ GIỮ NGUYÊN ═════════════════════════════
-describe('b) câu đáp số ≤ 4 kí tự: giữ 4 ô như phiếu; đáp án không xuống máy em trước khi nộp', () => {
+describe('b) câu đáp số ≤ 4 kí tự: đúng số ô theo đáp số (thầy 15/10); đáp án không xuống máy em trước khi nộp', () => {
   const THUONG = [cauRieng('DE-TLN-III-1', '7,5'), cauRieng('DE-TLN-III-2', '-0,5'), cauRieng('DE-TLN-III-3', '2024')]
 
-  it.each(THUONG.map((q) => [q.correct, q] as const))('đáp số "%s": 4 ô; kí tự thứ 5 không vào (bàn phím số + phím máy tính), phím số mờ khi đủ', async (_d, q) => {
+  it.each(THUONG.map((q) => [q.correct, q] as const))('đáp số "%s": số ô = số kí tự đáp số; kí tự vượt số ô không vào (bàn phím số + phím máy tính), phím số mờ khi đủ', async (d, q) => {
     const daGui = await moManCau(publicQuestion(q), (tra) => ({ correct: khopPhanIII(tra, q.correct), answer: q.correct }))
-    expect(soO()).toBe(4)
+    const n = d.length // "7,5" ⇒ 3, "-0,5" ⇒ 4, "2024" ⇒ 4
+    expect(soO()).toBe(n)
     goBanPhimSo('1234'); goBanPhimSo('5'); goMayTinh('6')
-    expect(giaTriO()).toBe('1234')
-    expect(soO()).toBe(4)
+    expect(giaTriO()).toBe('123456'.slice(0, n))
+    expect(soO()).toBe(n)
     expect((banPhim().getByRole('button', { name: '7' }) as HTMLButtonElement).disabled).toBe(true)
-    expect(await nop(daGui)).toBe('1234')
+    expect(await nop(daGui)).toBe('123456'.slice(0, n))
   })
 
   it('câu công khai (câu thường lẫn câu 10000) không mang correct / solution / chuỗi đáp án; màn chưa nộp không hiện đáp án', async () => {

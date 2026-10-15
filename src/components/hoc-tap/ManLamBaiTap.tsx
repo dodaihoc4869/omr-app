@@ -56,7 +56,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const batDau = useRef(0), gui = useRef(false), traRef = useRef('')
   const gocRef = useRef<HTMLDivElement>(null), nutTiepRef = useRef<HTMLButtonElement>(null)
   const q = cau[viTri], k = q ? ket[q.qid] : undefined
-  // 15/10 (em Lê Công: đáp án 10000 chỉ nhập được 1000): số ô của câu Trả lời ngắn do máy chủ gửi kèm (đáp số dài hơn 4 kí tự), thiếu ⇒ 4.
+  // 15/10 (em Lê Công: đáp án 10000 chỉ nhập được 1000; thầy: "hiển thị đúng số ô cần điền"): số ô của câu Trả lời ngắn = đúng số kí tự đáp số, máy
+  // chủ gửi kèm; thiếu ⇒ 4.
   const soO = soOCuaCau(q), soORef = useRef(soO)
   soORef.current = soO
   const homNayHien: SoHomNay | null | undefined = (dem && soHomNayGoi7(dem.daLam, dem.muc)) || homNay

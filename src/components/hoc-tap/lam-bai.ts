@@ -4,9 +4,10 @@ import type { KetQuaSanh } from '../hoa2/api'
 import { DAU_AM, coPhay, doiDau, laAm } from '../../lib/nhap-dap-so'
 import { SO_O_PHIEU } from '../../lib/so-o-tra-loi-ngan'
 
-// ───────────────────────────── Ô TRẢ LỜI NGẮN: 4 ô như phiếu (hoặc số ô máy chủ gửi kèm câu) + bàn phím số riêng ─────────────────────────────
+// ───────────────────────────── Ô TRẢ LỜI NGẮN: số ô máy chủ gửi kèm câu (thiếu ⇒ 4 như phiếu) + bàn phím số riêng ─────────────────────────────
 
-/** Phiếu Phần III có 4 ô: mỗi chữ số, dấu phẩy, dấu trừ chiếm một ô. Câu đáp số dài hơn (vd "10000") máy chủ gửi kèm `soO` (`soOCuaCau`). */
+/** Phiếu Phần III có 4 ô: mỗi chữ số, dấu phẩy, dấu trừ chiếm một ô. Máy chủ gửi kèm mỗi câu `soO` = đúng số kí tự đáp số ("24" ⇒ 2, "10000" ⇒ 5;
+ *  `soOCuaCau`); câu thiếu `soO` ⇒ 4. */
 export const TOI_DA_KY_TU = SO_O_PHIEU
 export type PhimSo = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | ',' | '-' | 'xoa' | 'xoa-het'
 export const LA_CHU_SO = (p: PhimSo) => p.length === 1 && p >= '0' && p <= '9'
@@ -17,7 +18,7 @@ export const LA_CHU_SO = (p: PhimSo) => p.length === 1 && p >= '0' && p <= '9'
  *  · chữ số / "," nối vào cuối khi còn chỗ (≤ `soO` kí tự, mặc định 4); "," chỉ khi chưa có dấu thập phân;
  *  · "-" BẬT/TẮT dấu âm ở đầu (bấm "1" rồi "−" ⇒ "-1", bấm lại ⇒ "1"); thêm dấu mà vượt `soO` kí tự ⇒ giữ nguyên;
  *  · "xoa" xoá một kí tự cuối; "xoa-het" xoá hết.
- * 15/10 (em Lê Công: đáp án 10000 chỉ nhập được 1000): `soO` = số ô của CÂU (máy chủ gửi kèm khi đáp số dài hơn 4 kí tự).
+ * 15/10 (em Lê Công: đáp án 10000 chỉ nhập được 1000; thầy: "hiển thị đúng số ô cần điền"): `soO` = số ô của CÂU (máy chủ gửi kèm, 1..8).
  */
 export function nhanPhim(v: string, phim: PhimSo, soO: number = TOI_DA_KY_TU): string {
   const s = String(v ?? '')
