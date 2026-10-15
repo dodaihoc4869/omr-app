@@ -99,6 +99,7 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
       <form className="lg-nh" onSubmit={gui}>
         <div className="lg-nh-khung" data-tat={dung || undefined}>
           <label htmlFor={`${id}-o`} className="sr-only">Chỗ em thắc mắc về câu này</label>
+          {/* soi-bo-qua: G07 có nhãn: <label htmlFor> ngay trên trỏ đúng id này (công cụ soi không đọc được id dựng bằng chuỗi mẫu) */}
           <textarea
             id={`${id}-o`} ref={oRef} className="lg-nh-o" rows={1} maxLength={TOI_DA_KY_TU} value={chu} disabled={dung} autoFocus={hop}
             placeholder="Nhắn chỗ em còn thắc mắc…" onChange={(e) => setChu(e.target.value)} onKeyDown={phim}
