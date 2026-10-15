@@ -199,6 +199,8 @@ export const BANG_GIU: readonly string[] = [
   'goi_bai_7','goi_bai_7_cau','goi_bai_7_em','goi_bai_7_gap','goi_bai_7_ngay','goi_bai_7_chua','goi_bai_7_kiem','goi_bai_7_muc_ngay','goi_bai_7_sua_han','goi_bai_7_tick_em','goi_bai_7_chon_em','goi_bai_7_revision','goi_bai_7_sua_em',
   'hanh_trinh_nguon_cau', 'hanh_trinh_v6_chon','hanh_trinh_v6_do','hanh_trinh_v6_fit', 'hanh_trinh_v5_muc', 'hanh_trinh_v5_phan_nhom', 'hanh_trinh_v5_quyet_dinh', 'hanh_trinh_v5_de_thu',
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
+  // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10) — sinh sau lần 21/09: GIỮ = không đụng. Dẫn xuất từ sổ su_kien_hoc (GIỮ).
+  'nhip_hoc_doi_pho_ngay',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */

@@ -10,6 +10,8 @@
 //          `docCauKho`, thiếu kho ⇒ đuôi mã câu "-III-n" như hồ sơ một em);
 //       2) chọn lặp: hàm cửa sổ ROW_NUMBER (khoảng liền cùng chữ, cùng ngày, xếp theo giờ) ⇒ chỉ trả các chuỗi ≥ 6 lượt + tổng lượt A–D mỗi em.
 //     Không gọi `/gv/ho-so-thai-do` từng em. Truy vấn chọn lặp hỏng (D1 cũ thiếu cột) ⇒ chỉ dùng tín hiệu quá nhanh + cảnh báo nói thật.
+//     B3 (15/10): hai truy vấn ấy nay là ĐƯỜNG LÙI — đường chính đọc ĐỆM THEO NGÀY `nhip_hoc_doi_pho_ngay` (nhip-hoc-dem.ts: ngày đã qua tính sẵn
+//     bởi cron đêm, trigger trên sổ xoá ngày bị ghi muộn; chỉ hôm nay tính trực tiếp), MỘT câu mỗi lô, cùng số.
 //   · ĐỘ TIN CẬY CỦA NHÓM mỗi em (13/10 đợt 18, CHỈ THÊM `doTinCay` / `canThem`): phép thuần `tinCayNhomNhip` (dưới) trên đúng dãy ngày đã đọc —
 //     cùng phép `/hs/nhip-hoc` · `/ph/nhip-hoc` (nhip-hoc-em.ts) ⇒ thầy và em thấy cùng một số. KHÔNG truy vấn D1 nào thêm; nhóm vẫn do app tính.
 import type { Env } from './kieu'
@@ -24,6 +26,7 @@ import { tomTatNhip } from './nhip-hoc-luat'
 import { tinCayNhomNhip } from './thai-do-tin-cay'
 import { bacChamChi } from './bac-cham-chi'
 import { dbGoc } from './cau-hinh-dem'
+import { demDoiPhoDungDuoc, docDoiPhoLoQuaDem, nghiDemDoiPho } from './nhip-hoc-dem'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -202,27 +205,43 @@ async function docDoiPho(env: Env, em: readonly EmGoc[], tu: string, den: string
   const khoa = `${tu}|${den}|${em.map((e) => e.sbd).join(',')}`
   const cu = m.get(khoa)
   if (cu && nowMs - cu.luc < 300_000 && nowMs >= cu.luc) return cu.kq
-  const kq = await docDoiPhoTho(env, em, tu, den, canhBao)
+  const kq = await docDoiPhoTho(env, em, tu, den, canhBao, nowMs)
   if (kq.daTinh.quaNhanh && kq.daTinh.chonLap) { if (m.size > 8) m.clear(); m.set(khoa, { luc: nowMs, kq }) }
   return kq
 }
-async function docDoiPhoTho(
+/**
+ * B3 (15/10, giờ cao điểm): mỗi lô đọc qua ĐỆM THEO NGÀY (`nhip-hoc-dem.ts` — ngày đã qua tính sẵn, chỉ hôm nay tính trực tiếp; MỘT câu thay hai,
+ * cùng một vòng chờ). Câu đệm lỗi (bảng chưa dựng trước đêm đầu, D1 cũ…) ⇒ lô ấy và isolate này 10 phút đi ĐÚNG hai truy vấn cũ bên dưới.
+ * Hai đường cho cùng số (test so khớp `nhip-hoc-dem-1510.test.ts`). `dungDem = false` chỉ để test ép đường cũ.
+ */
+export async function docDoiPhoTho(
   env: Env,
   em: readonly EmGoc[],
   tu: string,
   den: string,
   canhBao: string[],
+  nowMs = Date.now(),
+  dungDem = true,
 ): Promise<{ theoEm: Map<string, DoiPhoEm>; daTinh: { quaNhanh: boolean; chonLap: boolean } }> {
   const theoEm = new Map<string, DoiPhoEm>()
+  const homNay = ngayVnCua(nowMs)
   let docGiay = true
   let docLap = true
   for (let i = 0; i < em.length; i += LO_EM_BAI_HANG_NGAY) {
     const lo = em.slice(i, i + LO_EM_BAI_HANG_NGAY)
     const j = JSON.stringify(lo.map((e) => e.sbd))
-    const [rG, rL] = await Promise.all([
-      docGiay ? hoi(env, SQL_GIAY_LO, j, tu, den, NG.giayNhanhTracNghiem, NG.giayNhanhTuTinh) : Promise.resolve(null),
-      docLap ? hoi(env, SQL_LAP_LO, j, tu, den, NG.chuoiLap) : Promise.resolve(null),
-    ])
+    let rG: Row[] | null
+    let rL: Row[] | null
+    const quaDem = dungDem && docGiay && docLap && demDoiPhoDungDuoc(env, nowMs)
+      ? await docDoiPhoLoQuaDem(env, lo.map((e) => e.sbd), tu, den, homNay).catch(() => { nghiDemDoiPho(env, nowMs); return null })
+      : null
+    if (quaDem) ({ rG, rL } = quaDem)
+    else {
+      ;[rG, rL] = await Promise.all([
+        docGiay ? hoi(env, SQL_GIAY_LO, j, tu, den, NG.giayNhanhTracNghiem, NG.giayNhanhTuTinh) : Promise.resolve(null),
+        docLap ? hoi(env, SQL_LAP_LO, j, tu, den, NG.chuoiLap) : Promise.resolve(null),
+      ])
+    }
     if (rG === null) docGiay = false
     if (rL === null) docLap = false
     // câu 8–14 giây: Phần III (tự tính) mới tính là quá nhanh ⇒ tra kho câu (đệm sẵn của omni-d1), thiếu kho ⇒ đuôi mã câu.
