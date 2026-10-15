@@ -113,6 +113,8 @@ async function bangLopCacEm(env: Env, nowMs = Date.now()): Promise<Map<string, E
 }
 /** Lượt đọc bảng lớp ĐANG BAY theo D1 gốc (tối ưu 05/10). */
 const dangDocLop = new WeakMap<object, Promise<Map<string, EmLop>>>()
+/** Bảng lớp dựng GẦN NHẤT theo D1 gốc, kể cả đã quá DEM_LOP_MS (Gói R 15/10) — CHỈ để ĐOÁN lớp mà đọc trước phạm vi (`phamViCuaEm`); không bao giờ là kết quả. */
+const bangLopGanNhat = new WeakMap<object, Map<string, EmLop>>()
 async function docBangLopCacEm(env: Env, nowMs: number, db: object): Promise<Map<string, EmLop>> {
   const hoi = async (sql: string): Promise<Row[] | null> => {
     try {
@@ -142,6 +144,7 @@ async function docBangLopCacEm(env: Env, nowMs: number, db: object): Promise<Map
     v.set(sbd, { lop: tenLopCuaEm(x.lop, x.ten_lop), ten: str(x.ho_ten).trim() || sbd })
   }
   demLop.ghi('bang', nowMs, { db, v }, 1)
+  bangLopGanNhat.set(db, v)
   return v
 }
 
@@ -277,6 +280,10 @@ export async function phamViCuaEm(env: Env, sbd: string): Promise<PhamViLop | nu
   const s = str(sbd).trim()
   if (!s) return null
   try {
+    // Gói R 15/10: đệm lớp vừa hết hạn ⇒ ĐOÁN lớp theo bảng dựng gần nhất và đọc trước phạm vi của lớp ấy CÙNG đợt với lượt đọc lại bảng lớp (phạm vi dùng chung
+    // lượt đọc đang bay theo lớp — `phamViLop`). Đoán đúng (em không đổi lớp) ⇒ khỏi một đợt D1 nối tiếp; đoán sai ⇒ chỉ phí một lượt đọc, kết quả theo lớp thật.
+    const doan = bangLopGanNhat.get(dbGoc(env.DB as unknown as object))?.get(s)?.lop
+    if (doan) void phamViLop(env, doan).catch(() => null)
     const lop = await lopCuaEm(env, s)
     if (lop) {
       const pv = await phamViLop(env, lop)

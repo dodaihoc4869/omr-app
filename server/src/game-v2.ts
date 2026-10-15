@@ -42,6 +42,7 @@ import {cheDo2,docCoHoa2} from './srs2-d1'
 import {startDao2,startDao2CoVe,hoa2Action,LENH_HOA2} from './srs2-game'
 import {omniBat,LENH_TAO_BANG_OMNI} from './omni-d1'
 import {guiDdlSom} from './ddl-mot-lan'
+import {dbGoc} from './cau-hinh-dem'
 import {SQL_GOI7} from './goi-bai-7-schema'
 import {SQL_DONG_CO_HANH_TRINH} from './hanh-trinh-dong-co-schema'
 import {SQL_HANH_TRINH_V5} from './hanh-trinh-v5-schema'
@@ -576,7 +577,12 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(control.types.length&&!laCD&&(!q.dang||!control.types.includes(q.dang)))throw new Error('Thầy vừa đổi phạm vi luyện. Em mở lượt mới.')
     if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Câu đang được dùng cho ca thi. Em mở lượt học khác; câu này không bị tính sai.')
     // Hậu xử lý có thể chạy lại từ receipt nếu lần nộp trước dừng giữa chừng.
+    // Gói R 15/10: sổ học là VIỆC PHỤ sau phản hồi (`ctx.waitUntil`) ⇒ ghi THẲNG D1 gốc (vẫn qua rào cổng đóng băng `RAO_GHI` như mọi lệnh ghi của lượt), không
+    // xếp hàng chung với đường trả lời — trước: lệnh ghi sổ vào hàng ghi của bản gộp đọc ⇒ lượt đọc EXP còn lại của phản hồi phải chờ nó (một đợt D1). Phần còn lại
+    // của phản hồi không đọc bảng sổ. Không có `ctx` (việc phụ chạy tại chỗ, nối tiếp) ⇒ y như cũ.
+    const envSo:Env=ctx?(()=>{const goc=dbGoc(env.DB as unknown as object) as unknown as Env['DB'],rao=(env as unknown as Record<symbol,unknown>)[RAO_GHI] as Promise<unknown>|undefined;return {...env,DB:rao?raoGhiD1(goc,rao):goc}})():env
     const ghiSoHoc=async(attempt:Attempt,chon?:string,so?:SoOmni)=>{
+      const env=envSo
       // CNH-1.0 P03: khi cờ `nang_luc_v1` BẬT, sự kiện ĐƯỢC HỖ TRỢ cũng vào sổ (kèm `assistance:'assisted'`)
       // để phần hỗ trợ có bằng chứng và KHÔNG bị tính là lần tự làm. Cờ TẮT ⇒ giữ nguyên hành vi cũ (bỏ qua),
       // không đổi hồ sơ mạnh yếu đang chạy.
