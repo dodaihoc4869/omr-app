@@ -483,12 +483,12 @@ Thầy (15/10 ~08:3x): "giờ quét toàn app xem tối ưu thân thiện nhất
 - [x] Đề xuất xếp ưu tiên gửi thầy — KHÔNG build trước khi thầy chọn | bằng chứng: docs/de-xuat-toi-uu-1510.md (gói A sửa lỗi · B máy chủ · R rút câu · C tải app · D thân thiện cần bản vẽ)
 Thầy (15/10 ~08:5x, sau khi đọc đề xuất docs/de-xuat-toi-uu-1510.md): "giữ làm cả đợt 1 và 2"
 - [x] Chữ "Lười": GIỮ nguyên (thầy: "giữ") | bằng chứng: không đổi chữ
-- [ ] A1 thẻ đăng nhập /hs có nền, ô nhập ≥ 16 px | bằng chứng: (chưa có)
-- [ ] A2 ẩn "Giao bài riêng" khi Game Hoá 2.0 bật (ToanCanhEm, BaoCaoChiTiet) | bằng chứng: (chưa có)
-- [ ] A3 hanh-trinh-dong-co.ts:210 em Gói 7 không có chiến dịch không nổ | bằng chứng: (chưa có)
-- [ ] A4 không hiện "dấu hiệu đối phó" cho học sinh (máy chủ bỏ coDoiPho ở bản HS) | bằng chứng: (chưa có)
-- [ ] A5 chữ lệch chuẩn (lộ mã câu, "Hệ thống", aria-label, G03) | bằng chứng: (chưa có)
-- [ ] B1 3 chỉ mục còn thiếu (EXPLAIN trên D1 thật trước/sau) | bằng chứng: (chưa có)
+- [x] A1 thẻ đăng nhập /hs có nền, ô nhập ≥ 16 px | bằng chứng: 129644bf; Chromium 390: nền thẻ rgba(0,0,0,0)→rgb(255,254,251) (tối rgb(32,39,48)), ô nhập 14→16 px; ảnh docs/anh-sua-1510/
+- [x] A2 ẩn "Giao bài riêng" khi Game Hoá 2.0 bật (ToanCanhEm, BaoCaoChiTiet) | bằng chứng: 86f27541; test em-toan-canh 20/20 (ca mới: 2.0 bật ⇒ không nút, Cho thi lại là nút chính)
+- [x] A3 hanh-trinh-dong-co.ts:210 em Gói 7 không có chiến dịch không nổ | bằng chứng: 2ddaf20f; test đỏ trước (Cannot read properties of null) → xanh; 5 tệp động cơ 64/64
+- [x] A4 không hiện "dấu hiệu đối phó" cho học sinh | bằng chứng: 7142dc81 (chỉ ẩn ở app em — phụ huynh đọc chung bản dữ liệu nên KHÔNG lọc máy chủ); test 3 chế độ, đỏ trên mã cũ 1/2
+- [x] A5 chữ lệch chuẩn | bằng chứng: 3a51d35f; soi:giao-dien 1 lỗi → 0; "lộ mã câu" kiểm lại: máy chủ bản HS/PH đã thay (tieuDeCauHs) — không phải lỗi
+- [x] B1 3 chỉ mục còn thiếu | bằng chứng: migration-z-1510-chi-muc.sql chạy D1 thật (run 38669736912); EXPLAIN trước/sau (38669626084 → 38669862783): SCAN cau_bo_tro → SEARCH idx_cau_bo_tro_mau · canh → COVERING INDEX · sổ em bỏ TEMP B-TREE ORDER BY
 - [ ] C1 tách React thành mảnh riêng mã băm ổn định | bằng chứng: (chưa có)
 - [ ] C2 nạp lười mã ít dùng trong mảnh chung 3 app | bằng chứng: (chưa có)
 - [ ] C3 nạp lười phần màn học sinh chỉ mở khi bấm | bằng chứng: (chưa có)
