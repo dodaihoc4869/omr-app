@@ -32,7 +32,8 @@ export interface CauHinhHoiThem {
 // 13/10: Google báo 404 "gemini-2.5-flash is no longer available to new users … use models/gemini-3.8-flash" (sổ hoi_tro_ly, lượt đầu tiên thật);
 // thầy chọn Gemini 3.5 Flash Lite; tối 13/10 thầy: "chuyển xuống mô hình 3.1 flash lite" ⇒ mặc định gemini-3.1-flash-lite (tên ổn định trong tài liệu Gemini API).
 // Trần lượt (thầy tối 13/10): "chỉnh lại 12 câu/ngày và tối đa mỗi câu bài tập 6 lần/ngày".
-export const MAC_DINH_HOI_THEM: CauHinhHoiThem = { bat: true, lop: [], sbd: [], model: 'gemini-3.1-flash-lite', tranNgay: 12, tranCau: 6, sbdKhongTran: [], thinkingBudget: 1024, nhietDo: 0.3 }
+// Trần mỗi em mỗi ngày: thầy 14/10 khuya "tăng lượt hỏi cho học sinh mỗi ngày lên 36 lần hỏi" (trước đó 12). Mỗi câu vẫn tối đa 6 lần/ngày.
+export const MAC_DINH_HOI_THEM: CauHinhHoiThem = { bat: true, lop: [], sbd: [], model: 'gemini-3.1-flash-lite', tranNgay: 36, tranCau: 6, sbdKhongTran: [], thinkingBudget: 1024, nhietDo: 0.3 }
 /** Model báo 404 / 410 (sai tên, Google ngừng cấp cho khoá mới, hoặc đã gỡ model) ⇒ thử lần lượt: 3.5 Flash-Lite (đã chạy thật 13/10:
  *  1,4–1,7 s/lượt), rồi các tên chung luôn trỏ bản mới nhất. */
 export const DS_MODEL_DU_PHONG: readonly string[] = ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-flash-latest']
