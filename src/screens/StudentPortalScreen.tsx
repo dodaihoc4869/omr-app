@@ -5,7 +5,9 @@ import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
 import { useKhoaCuonTrang } from '../lib/khoa-cuon-trang'
 import { canThanTuSanh, useSanhHoa2 } from '../components/hoa2/api'
 import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
-import { type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
+// `nopOnLai` nhập TĨNH (Gói C 15/10): dòng này vốn đã kéo cả mô-đun vào mảnh cổng (verbatimModuleSyntax giữ lệnh nhập), nên `import()` cũ chỉ
+// sinh một mảnh vỏ 76 byte — thêm một tệp precache, thêm một vòng mạng, không bớt byte nào.
+import { nopOnLai, type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
 import { dungBangNhiemVu, soThuSucCua } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import NhanHanBaiTap from '../components/NhanHanBaiTap'
@@ -15,16 +17,17 @@ import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
-import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
+// Gói C 15/10: KhoiKhacPhuc3CheDo nay nạp lười (mảnh khối phụ, dưới) — nhưng thẻ câu GIỮ trong mảnh mở cổng như trước: các màn lười của em
+// (Ôn câu, Làm bài tập, Câu đã làm…) vẫn dựa vào tờ kiểu đi cùng nó (m3/the-cau.css: `.m3 .loi-giai`, `.m3 .the-cau`). Bỏ dòng này là đổi màu.
+import '../components/TheCau'
 import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
 import TheCanhBaoThay from '../components/bang-nhiem-vu/TheCanhBaoThay'
 import { useHopThoai } from '../components/HopThoaiCong'
-import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
 import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
-import { MomDanhSachM3, MomLamBaiM3, type BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
+import type { BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
 // Tạm dừng hoạt ảnh Sảnh khi bị màn toàn màn hình che (lớp `sanh-bi-che`, xem hiệu ứng ngay dưới `cheDo2`).
 import '../styles/sanh-bi-che.css'
@@ -64,7 +67,7 @@ import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './DangNhapHocSinh'
 import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
-import { boNap, nenNapTruoc, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
+import { boNap, nenNapTruoc, veNgayKhiCo, type BoNap } from '../components/hoa2/nap-truoc-man'
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
@@ -97,9 +100,26 @@ const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
 const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang'))
 // MÁY YẾU (29/09): Bảng tin + hộp Khắc phục câu sai chỉ hiện khi em BẤM mở — nạp lười (một mảnh chung, xem cong-hs-nap-luoi.ts)
 // để lượt mở /hs đầu tiên không phải tải + dịch ≈ 55 KB mã chưa dùng. Tên biến giữ nguyên để JSX không đổi.
-const napKhoiPhu = () => import('../components/cong-hs-nap-luoi')
+const napKhoiPhu = boNap(() => import('../components/cong-hs-nap-luoi'))
 const BangTinPhuHuynh = lazy(() => napKhoiPhu().then((m) => ({ default: m.BangTinPhuHuynh })))
 const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.ModalKhacPhucCauSai })))
+// Gói C 15/10 (app mở nhanh hơn): ba tab chỉ mở khi em BẤM — Khắc phục, Bài tập về nhà, Bài gia đình giao — cũng vào mảnh trên (lượt mở /hs bớt
+// mã ba khối ấy cùng cửa nạp kho đề, thuật toán rút câu sai, phiếu luyện mà chỉ chúng dùng). Mảnh được nạp trước lúc rảnh ở Hôm nay (cùng nhịp nạp trước màn thi, dưới) ⇒ lúc em bấm, khối đã có thì VẼ THẲNG (veNgayKhiCo,
+// không treo Suspense, không màn chờ); chưa có (2G / tiết kiệm dữ liệu / bấm quá sớm) ⇒ React.lazy, chỗ chờ giữ khung như các khối lười khác.
+type KhoiPhu = typeof import('../components/cong-hs-nap-luoi')
+function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3'>(ten: K) {
+  const bo: BoNap<{ default: KhoiPhu[K] }> = Object.assign(() => napKhoiPhu().then((m) => ({ default: m[ten] })), {
+    san: () => {
+      const m = napKhoiPhu.san()
+      return m ? { default: m[ten] } : null
+    },
+  })
+  return veNgayKhiCo(lazy(bo), bo)
+}
+const KhoiKhacPhuc3CheDo = khoiPhu('KhoiKhacPhuc3CheDo')
+const BtvnM3 = khoiPhu('BtvnM3')
+const MomDanhSachM3 = khoiPhu('MomDanhSachM3')
+const MomLamBaiM3 = khoiPhu('MomLamBaiM3')
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import OSoTraLoi from '../components/OSoTraLoi'
@@ -213,6 +233,17 @@ function ChoNapManCon() {
   return (
     <div role="status" className="flex items-center justify-center" style={{ minHeight: '60vh', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>
       Đang mở…
+    </div>
+  )
+}
+
+/** Chỗ giữ khung cho khối nạp lười trong sheet (Khắc phục, Bài tập về nhà, Bài gia đình giao — Gói C 15/10): hai thẻ xương M3 như lúc
+ * các khối ấy chờ danh sách (BtvnM3 `dangTai`), cùng khe dọc ⇒ không nhảy bố cục. Chỉ hiện khi mảnh chưa nạp trước được (2G / tiết kiệm dữ liệu). */
+function ChoKhoiPhu() {
+  return (
+    <div role="status" aria-busy="true" aria-label="Đang mở…" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k3, 12px)' }}>
+      <div className="m3-xuong" style={{ height: 160 }} />
+      <div className="m3-xuong" style={{ height: 160 }} />
     </div>
   )
 }
@@ -555,7 +586,6 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       // Ôn câu / thử thách riêng: máy chủ khoá sổ (kênh, ngày, sbd, qid) đầu thắng ⇒ nộp lại an toàn. Nộp được: màn ôn đang mở nhận kết quả qua sự kiện; hỏi lại kế hoạch ngày.
       const g = m.goi as { traLoi?: MucTraLoi[]; duong?: string }
       if (!auth?.token || !Array.isArray(g.traLoi) || g.traLoi.length === 0) return 'bo'
-      const { nopOnLai } = await import('../components/bang-nhiem-vu/cau-on-api')
       const r = await nopOnLai(auth.token, g.traLoi, g.duong)
       if (r.ban) return 'ban'
       if (!r.ok) {
@@ -719,10 +749,11 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   // SỬA LỖI 12/10 "không vuốt lên được": có màn con ⇒ khoá trang Hôm nay phía sau, cú vuốt luôn thuộc màn đang nhìn (src/lib/khoa-cuon-trang.ts).
   useKhoaCuonTrang(dangMoManCon)
   // Chỉ nạp trước màn thi sau xác thực, ở Hôm nay và lúc máy rảnh; bấm Vào thi vẫn tải ngay.
+  // Gói C 15/10: màn thi về xong thì nạp tiếp mảnh khối phụ (Khắc phục / Bài tập về nhà / Bài gia đình giao) — NỐI SAU, không tranh lượt.
   useEffect(() => {
     if (typeof window === 'undefined' || !auth?.token || dangMoManCon || !nenNapTruoc()) return
     let huy = false
-    const cb = () => { if (!huy) void boNapExam().catch(() => {}) }
+    const cb = () => { if (!huy) void boNapExam().then(() => { if (!huy) return napKhoiPhu() }).catch(() => {}) }
     const hen = ('requestIdleCallback' in window
       ? (window as Window & { requestIdleCallback: (fn: () => void) => number }).requestIdleCallback
       : (fn: () => void) => setTimeout(fn, 1200))(cb)
@@ -1141,6 +1172,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
 
         {/* TAB 2: NỘP BÀI TẬP VỀ NHÀ */}
         {tab === 'btvn' && vaoM3 && (
+          <Suspense fallback={<ChoKhoiPhu />}>
           <BtvnM3
             dangTai={dangTaiBtvn}
             ds={dsBtvn}
@@ -1150,6 +1182,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
             onMo={(bt, lamLai) => void moBaiTap(bt, lamLai)}
             onTaiLai={() => void napLaiBtvn()}
           />
+          </Suspense>
         )}
         {tab === 'btvn' && !vaoM3 && (
           <div className="space-y-4 animate-google-fade">
@@ -1363,7 +1396,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
 
         {/* TAB 2.5: BÀI CỦA MOM GIAO (HẠN 2 TIẾNG) */}
         {tab === 'mom' && vaoM3 && auth && (
-          <>
+          <Suspense fallback={<ChoKhoiPhu />}>
             {dangLamMom ? (
               <DemGioMom mom={dangLamMom}>{(giayConLaiMom) => (
               <MomLamBaiM3
@@ -1407,7 +1440,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                 }}
               />
             )}
-          </>
+          </Suspense>
         )}
         {tab === 'mom' && !vaoM3 && (
           <div className="space-y-4 animate-google-fade">
@@ -1698,6 +1731,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
               <Suspense fallback={<ChoNapGame/>}><LuyenDeChuan sbd={auth.sbd} token={auth.token} /></Suspense>
             </div>
             <div>
+              <Suspense fallback={<ChoKhoiPhu />}>
               <KhoiKhacPhuc3CheDo
                 sbd={auth.sbd}
                 token={auth.token}
@@ -1707,6 +1741,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                 initialCheDo={cheDoKhacPhuc}
                 lop={auth.lop}
               />
+              </Suspense>
             </div>
           </div>
         )}

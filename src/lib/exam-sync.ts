@@ -13,7 +13,8 @@ import { capNhatKeyBank, danhSachCa, danhSachDe, layDe, type KhoDeItem } from '.
 import { apDungSoSua } from './sua-dang'
 import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, saveExamSource, saveSessionTeacherBank, loadSoSuaDang, xoaSessionTeacherBank } from './exam-db'
 import { mergeKeepAnswers } from '../data/examContent'
-import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from './exam-kho-de-import'
+// Cửa nạp kho đề (`exam-kho-de-import`, ≈ 3,5 KB nén) NẠP KHI CẦN (Gói C 15/10): chỉ dùng khi thật sự có đề mới/cập nhật để tải —
+// trước đây nó đi theo App.tsx vào mảnh chung cả 3 app tải lúc mở.
 
 export interface KetQuaDongBo {
   moi: string[] // mã đề mới tải về
@@ -171,6 +172,7 @@ export async function dongBoNganHang(scriptUrl: string, secret: string, epTaiLai
   for (const item of [...moi, ...capNhat]) {
     try {
       const raw = await layDe(scriptUrl, secret, item.maDe)
+      const { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } = await import('./exam-kho-de-import')
       const parsed = parseKhoDeJsonText(JSON.stringify(raw))
       if (!parsed.ok || !parsed.json) throw new Error(parsed.errors[0] || 'JSON đề không hợp lệ')
       const { source, errors, canXemList } = buildTeacherSourceFromKhoDe(parsed.json)
