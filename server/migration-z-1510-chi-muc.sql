@@ -3,5 +3,5 @@
 CREATE INDEX IF NOT EXISTS idx_cau_bo_tro_mau ON cau_bo_tro(qid_mau);
 -- 2) Cạnh tiên quyết cả lớp (hanh-trinh-dong-co.ts SQL_CANH_LOP): chỉ mục PHỦ — đọc đủ cột từ chỉ mục, không quay lại bảng từng dòng.
 CREATE INDEX IF NOT EXISTS hanh_trinh_v4_canh_den_phu ON hanh_trinh_v4_canh(den,cap_nhat_luc,tu,sbd,n_co,dung_co,n_chua,dung_chua);
--- 3) Sổ học một em theo thời gian (exp-d1.ts docSo: `WHERE sbd=? ORDER BY luc, khoa`) — bỏ bước sắp xếp tạm.
-CREATE INDEX IF NOT EXISTS idx_skh_em_luc ON su_kien_hoc(sbd,luc,khoa);
+-- (Chỉ mục thứ ba idx_skh_em_luc(sbd,luc,khoa) cho exp-d1 docSo ĐÃ GỠ cùng ngày: D1 không có sqlite_stat1 nên bộ lập kế hoạch lấy nó cho câu
+--  "lần làm" sbd + qid + luc thay chỉ mục (sbd, qid) / idx_skh_em_tc ⇒ chậm hơn. Xem .github/workflows/go-chi-muc-skh-luc-1510.yml.)

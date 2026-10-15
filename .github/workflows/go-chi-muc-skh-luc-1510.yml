@@ -1,0 +1,33 @@
+# GỠ CHỈ MỤC idx_skh_em_luc (15/10, tối ưu B1) — chỉ mục này do CHÍNH phiên Claude thêm lúc ~09:12 VN cùng ngày (migration-z-1510-chi-muc.sql).
+# Đo lại trên D1 thật (run 38671813636): KHÔNG có sqlite_stat1 ⇒ bộ lập kế hoạch chuyển câu "lần làm" (srs2-d1 docLanLam: sbd + qid + luc, nhánh câu
+# "thay cho" theo idx_skh_em_tc) và câu bai-da-day sang chỉ mục (sbd, luc) — đọc mọi dòng trong khoảng ngày rồi lọc ⇒ CHẬM HƠN. Gỡ để trả đúng kế hoạch
+# cũ (idx_skh_em_qid / idx_skh_em_tc). Không đụng dữ liệu: chỉ xoá chỉ mục vừa thêm. Lệnh duy nhất, cố định trong tệp.
+name: Gỡ chỉ mục idx_skh_em_luc (trả kế hoạch cũ)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/go-chi-muc-skh-luc-1510.yml']
+permissions:
+  contents: read
+concurrency:
+  group: phat-hanh
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Gỡ chỉ mục và soi lại kế hoạch
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx -y wrangler@4 d1 execute omr --remote --command "DROP INDEX IF EXISTS idx_skh_em_luc"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT name FROM sqlite_master WHERE tbl_name='su_kien_hoc' AND type='index' ORDER BY name" | jq -c '.[0].results'
