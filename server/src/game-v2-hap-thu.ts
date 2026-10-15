@@ -76,12 +76,16 @@ async function docLieuChuyenDoi(env: Env, dsSbd: string[], tuNgay: string): Prom
   const ra = new Map<string, LieuChuyenDoi>(dsSbd.map((s) => [s, { ngayCoHoc: new Set<string>(), ngayDat: [] }]))
   if (dsSbd.length === 0) return ra
   const arr = JSON.stringify(dsSbd)
-  const hoc = await env.DB.prepare(
+  // Gói R 15/10: hai câu đọc ĐỘC LẬP đi CÙNG đợt (trước: nối tiếp — hai đợt D1). Lỗi: câu ngày học vẫn báo trước như cũ.
+  const hocP = env.DB.prepare(
     `SELECT sbd, d FROM (SELECT sbd, ngay_vn AS d FROM exp_so WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn >= ?
                          UNION SELECT sbd, date(created_at, '+7 hours') AS d FROM game_v2_attempt WHERE sbd IN (SELECT value FROM json_each(?)) AND created_at >= ?)`,
   ).bind(arr, tuNgay, arr, batDauNgay(tuNgay)).all<{ sbd: string; d: string }>()
+  const datP = env.DB.prepare("SELECT sbd, ngay_vn FROM exp_so WHERE sbd IN (SELECT value FROM json_each(?)) AND loai = 'dat_ngay' AND ngay_vn >= ? AND ngay_vn < ?").bind(arr, tuNgay, NGAY_BANG_GIA_MOI).all<{ sbd: string; ngay_vn: string }>()
+  datP.catch(() => {})
+  const hoc = await hocP
   for (const x of hoc.results ?? []) ra.get(String(x.sbd))?.ngayCoHoc.add(String(x.d))
-  const dat = await env.DB.prepare("SELECT sbd, ngay_vn FROM exp_so WHERE sbd IN (SELECT value FROM json_each(?)) AND loai = 'dat_ngay' AND ngay_vn >= ? AND ngay_vn < ?").bind(arr, tuNgay, NGAY_BANG_GIA_MOI).all<{ sbd: string; ngay_vn: string }>()
+  const dat = await datP
   for (const x of dat.results ?? []) ra.get(String(x.sbd))?.ngayDat.push(String(x.ngay_vn))
   return ra
 }

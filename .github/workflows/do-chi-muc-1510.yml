@@ -41,3 +41,4 @@ jobs:
           q "PLAN sổ em từ mốc (sbd + luc)" "EXPLAIN QUERY PLAN SELECT qid, ngay_vn, luc, ket_qua FROM su_kien_hoc WHERE sbd = 'x' AND luc >= '2026-10-01'"
           q "PLAN câu đã làm cả lớp (bai-da-day)" "EXPLAIN QUERY PLAN SELECT 1 AS co FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each('[\"x\"]')) AND qid IN (SELECT value FROM json_each('[\"a\"]')) AND luc >= '2026-10-01'"
           q "sqlite_stat1 có không" "SELECT COUNT(*) n FROM sqlite_master WHERE name='sqlite_stat1'"
+          q "B2 sau phát hành: số tờ đã dựng · có dấu khớp · dòng cau_meta · tờ còn lệch" "SELECT (SELECT COUNT(*) FROM cau_meta_to WHERE ma_de NOT IN ('*','!')) da_dung, (SELECT COUNT(*) FROM cau_meta_to WHERE ma_de='*') dau, (SELECT COUNT(*) FROM cau_meta_to WHERE ma_de='!') mo_coi, (SELECT COUNT(*) FROM cau_meta) dong, (SELECT COUNT(*) FROM game_v2_index gi LEFT JOIN cau_meta_to mt ON mt.ma_de=gi.ma_de WHERE mt.indexed_at IS NOT gi.indexed_at) con_lech"

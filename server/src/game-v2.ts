@@ -1,6 +1,6 @@
 import { khopPhanIII } from '../../src/lib/cham-so'
 import { ngoaiKenhSo } from '../../src/lib/so-o-tra-loi-ngan'
-import { BANG_HO_SO, BANG_MUA, docDongLop, gieoNho, gopDocD1, laBanGop, nhoTheoLuot, RAO_GHI, raoGhiD1 } from './doc-d1-theo-luot'
+import { BANG_HO_SO, BANG_MUA, docDongLop, envGhiRieng, gieoNho, gopDocD1, laBanGop, nhoTheoLuot, RAO_GHI, raoGhiD1 } from './doc-d1-theo-luot'
 import {BANG_NGAY_CAP,EXP_MOI_VANG,MANH_REN_KHIEN,VANG_REN_KHIEN,ngayDatKhien} from '../../src/lib/kinh-te-game'
 import {moCuaRoute,cuaP08Mo,hapThuQuaP08,renKhienQuaP08,dungKhienQuaP08,docCauHinhKichHoat} from './cnh-exp-adapter'
 import {tramP08LenHienThi} from './cnh-exp-p08-hien-thi'
@@ -40,7 +40,13 @@ import {LUAT_CAP_MOI,dangChoNgayV5,ngayConThieuLenCap,type TranV5,type TruocSiet
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
 import {cheDo2,docCoHoa2} from './srs2-d1'
 import {startDao2,startDao2CoVe,hoa2Action,LENH_HOA2} from './srs2-game'
-import {omniBat} from './omni-d1'
+import {omniBat,LENH_TAO_BANG_OMNI} from './omni-d1'
+import {guiDdlSom} from './ddl-mot-lan'
+import {SQL_GOI7} from './goi-bai-7-schema'
+import {SQL_DONG_CO_HANH_TRINH} from './hanh-trinh-dong-co-schema'
+import {SQL_HANH_TRINH_V5} from './hanh-trinh-v5-schema'
+import {SQL_HT6} from './hanh-trinh-v6-schema'
+import {lopCuaEm} from './bai-da-day'
 import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
 import {TRAN_CAU_DAO_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
@@ -53,6 +59,9 @@ const now=()=>new Date().toISOString()
 const hetTran=(n:number)=>Object.assign(new Error(`Em đã hoàn thành ${n} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`),{ma:'het_tran'})
 /** Hai câu ĐỌC của `loadProfile` (mùa + hồ sơ) — nơi gọi có thể gắn vào CUỐI một lô ghi của chính lượt mình (tối ưu 05/10: đọc lại hồ sơ cùng lô ghi). */
 export const lenhDocHoSo=(env:Env,sbd:string)=>[env.DB.prepare("SELECT json FROM game_v2_settings WHERE key='season'"),env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd)]
+/** Dòng thần thú CŨ của em (`than_thu`) — chỉ cần khi em CHƯA có hồ sơ game (lần đầu). Nhớ theo lượt (Gói R 15/10): `batDauDocSom` thấy lượt đọc hồ sơ không có dòng ⇒
+ *  đọc NGAY (cùng đợt các lượt đọc sau hồ sơ, không chờ bước xác thực xong); `loadProfile` dùng lại đúng lượt ấy. Ngoài bản gộp ⇒ đọc thẳng như cũ. */
+const docThanThuCu=(env:Env,sbd:string)=>nhoTheoLuot(env.DB,`than_thu|${sbd}`,()=>env.DB.prepare('SELECT du_lieu_json AS json FROM than_thu WHERE sbd=?').bind(sbd).first<{json:string}>(),['than_thu'])
 /** `docSan` (chỉ-thêm, tối ưu 05/10): kết quả hai câu `lenhDocHoSo` nơi gọi VỪA chạy (cuối lô ghi của chính lượt này) ⇒ khỏi đọc lại; mọi bước sau y như cũ. */
 export async function loadProfile(env:Env,sbd:string,docSan?:readonly {results:Row[]}[]):Promise<{profile:Profile;revision:number}>{
   // Cao điểm 01/10: hai SELECT tươi trong MỘT batch của CHÍNH request này, không đệm hồ sơ/vàng hay mùa.
@@ -62,14 +71,15 @@ export async function loadProfile(env:Env,sbd:string,docSan?:readonly {results:R
   const season=reset?String(JSON.parse(String(reset.json)).id):''
   let row:Row|null|undefined=row0
   if(!row){
-    const legacy=await env.DB.prepare('SELECT du_lieu_json AS json FROM than_thu WHERE sbd=?').bind(sbd).first<{json:string}>()
+    const legacy=await docThanThuCu(env,sbd)
     let old:Record<string,unknown>={};try{old=JSON.parse(legacy?.json??'{}')}catch{/* Keep raw snapshot below. */}
     const id=String(old.idThanhThuChon??old.thanThuId??'');const pet=ALIASES[id]??id
     const profile:Profile={pet:PETS.some(p=>p.id===pet)?pet:'dat_quy',choice:!id||OLD_SIX.has(id)||!PETS.some(p=>p.id===pet),legacy:legacy?.json??null,
       cap:Math.max(1,Math.min(120,Number(old.capDo)||1)),exp:Math.max(0,Number(old.exp)||0),wallet:Math.max(0,Number(old.khoExp)||0),earned:0,tower:Math.max(1,Math.min(999,Number(old.tangThapCaoNhat)||1)),mastery:[],arena:null,cutover:now()}
     if(season)Object.assign(profile,{pet:'dat_quy',choice:true,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,season,luatCap:LUAT_CAP_MOI,mocVang:0})
-    await env.DB.prepare('INSERT OR IGNORE INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').bind(sbd,JSON.stringify(profile),now()).run()
-    row=await env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd).first<Row>()
+    // Gói R 15/10: tạo hồ sơ + ĐỌC LẠI DÒNG THẮNG trong CÙNG một lô (một đợt D1 thay hai; hai máy cùng mở lần đầu vẫn cùng thấy dòng thắng). Lỗi lô ⇒ ném như cũ.
+    const [,doc]=await env.DB.batch<Row>([env.DB.prepare('INSERT OR IGNORE INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').bind(sbd,JSON.stringify(profile),now()),env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd)])
+    row=doc?.results?.[0]??null
   }
   if(!row)throw new Error('Chưa mở được hồ sơ game.')
   const current=JSON.parse(row.json) as Profile
@@ -282,6 +292,8 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   // Nhớ theo lượt: lệnh `answer` NỘI BỘ của Đoàn (cùng request, chưa ghi gì từ lúc này) dùng lại đúng lượt đọc này thay vì đọc hồ sơ lần nữa.
   const hoSoSom=som(nhoTheoLuot(env.DB,`hoso|${sbd}`,()=>env.DB.batch<Row>(lenhDocHoSo(env,sbd)),BANG_HO_SO))
   gieoNho(env.DB,'mua',hoSoSom.then(r=>r[0]?.results[0]??null),BANG_MUA)
+  // Gói R 15/10: em CHƯA có hồ sơ game (lần đầu) ⇒ dòng thần thú cũ (`loadProfile` cần để tạo hồ sơ) đọc ngay khi lượt đọc hồ sơ về — không chờ bước xác thực. Chỉ đọc.
+  void hoSoSom.then(r=>{if(!r[1]?.results[0])void docThanThuCu(env,sbd).catch(()=>null)},()=>{})
   // CHỐT ĐÁP ÁN (thầy 29/09 "bấm chốt đáp án nó chấm 1 lúc mới được"): lượt, câu bảo vệ ca thi, phạm vi thầy đặt, bản chấm cũ KHÔNG phụ thuộc hồ sơ ⇒
   // bắt đầu CÙNG đợt với loadProfile (trước: 5 đợt nối tiếp). Nhánh `answer` vẫn await đúng thứ tự cũ ⇒ lỗi nào báo trước vẫn như cũ.
   const truocAnswer=action==='answer'?docTruocAnswer(env,sbd,b):null
@@ -300,19 +312,38 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   const cauDaLamSom=action==='hoa2-cau-da-lam'||action==='hoa2-cau-chi-tiet'?som(hoa2Action(env,sbd,action,b)):null
   return {sbd,hoSoSom,truocAnswer,truocComplete,cheDo2Som,cauDaLamSom}
 }
+/** Nhóm bảng (tạo lúc chạy) mà Sảnh / Mở chặng học tập cần: Gói 7, động cơ Hành trình v4/v5/v6, OMNI 3 — tên nhóm + lệnh ĐÚNG như nơi tạo của từng nhóm. */
+const DDL_LUOT_HOC:readonly (readonly [string,readonly string[]])[]=[['goi_bai_7_v1',SQL_GOI7],['hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH],['hanh_trinh_v5',SQL_HANH_TRINH_V5],['hanh_trinh_v6',SQL_HT6],['omni_3_0510',LENH_TAO_BANG_OMNI]]
+/**
+ * ĐẦU LƯỢT của Sảnh / Mở chặng học tập (Gói R 15/10 — luật thầy 13/10 "sửa xong máy chủ phải nhanh hơn"), gọi khi token đã qua kiểm chữ ký/hạn (token giả bị chặn
+ * trước mọi lượt D1 như cũ), CÙNG đợt với lượt đọc mật khẩu: (1) lệnh tạo bảng của cả lượt gửi ngay, song song, thẳng D1 gốc (`guiDdlSom` — isolate mới: trước
+ * 5 đợt nối tiếp rải trong lượt); (2) các lượt CHỈ ĐỌC đầu tiên của lượt: lịch kiểm tra riêng + cờ Gói 7 (một câu đọc nhóm cờ, đệm 15 s), danh sách gói (khi bảng
+ * gói đã sẵn — `docDanhSachGoiSom7`), lớp của em (đệm 30 s dùng chung — `lapGoi7` dùng lại đúng lượt đọc đang bay). Không ghi dữ liệu, không trả gì trước khi
+ * xác thực xong; mọi kết quả chỉ dùng sau `await` xác thực, lỗi nổi lên đúng chỗ `await` cũ.
+ */
+function batDauHocTapSom(env:Env,sbd:string){
+  guiDdlSom(env,DDL_LUOT_HOC)
+  void lopCuaEm(env,sbd).catch(()=>null)
+  const kiem=som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,sbd,Date.now(),true)))
+  // Bọc trong đối tượng: lời hứa đọc gói giữ NGUYÊN (không bị `then` mở ra) để nơi gọi truyền tiếp như `docDanhSachGoiSom7`.
+  const dsGoi=som(import('./goi-bai-7').then(g7=>({p:g7.docDanhSachGoiSom7(env,sbd)})))
+  return {sbd,kiem,dsGoi}
+}
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
   // token giả bị chặn trước mọi lượt D1 như cũ). Không ghi gì, không trả gì trước khi xác thực xong. `gameIdentity` bị thay (test) ⇒ đọc sau xác thực như cũ.
-  const giu:{ds:ReturnType<typeof batDauDocSom>|null}={ds:null}
-  const sbd=await gameIdentity(env,b,s=>{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s)})
+  const giu:{ds:ReturnType<typeof batDauDocSom>|null;hocTap?:ReturnType<typeof batDauHocTapSom>}={ds:null}
+  const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s);else if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s)})
   // Kiểm tra theo lịch RIÊNG từng em sở hữu cả ngày, kể cả khi em đã nộp sớm.
   // Cổng ở trước lập Gói 7/Hành trình: API cũ và phiên cũ không phát bài thường song song.
   const kt=await import('./kiem-tra-ca-nhan')
   if(action.startsWith('hoc-tap-ktcn-'))return kt.ktCnAction(env,sbd,action,b,Date.now())
   // Hai lượt chỉ đọc độc lập chạy cùng đợt; lịch kiểm tra vẫn chặn trước mọi lệnh lập/ghi bài thường.
   const g7Som=action==='hoc-tap-sanh'||action==='hoc-tap-start'?await import('./goi-bai-7'):undefined
-  const dsGoiSom=g7Som?.docDanhSachGoiSom7(env,sbd)
-  const kiem=await kt.docKtCn(env,sbd,Date.now(),true)
+  // Gói R: lượt đọc đầu đã bắt đầu cùng đợt mật khẩu (`batDauHocTapSom`) ⇒ dùng lại; danh sách gói chưa đọc được lúc ấy (bảng gói chưa sẵn) ⇒ đọc như cũ.
+  const hocTapSom=giu.hocTap&&giu.hocTap.sbd===sbd?giu.hocTap:undefined
+  const dsGoiSom=(hocTapSom?(await hocTapSom.dsGoi).p:undefined)??g7Som?.docDanhSachGoiSom7(env,sbd)
+  const kiem=await (hocTapSom?hocTapSom.kiem:kt.docKtCn(env,sbd,Date.now(),true))
   if(kt.laNgayKt(kiem,Date.now())&&!kt.coHocNgayKt(kiem)){
     const tt=kt.tomTatKt(kiem!,Date.now())
     if(action==='hoc-tap-sanh'||action==='hoa2-sanh')return {ok:true,cheDo2:true,ngay:tt.ngay,kiemTraCaNhan:tt,theLuc:{tong:tt.tong,con:tt.con},chienDich:null,doan:{con:0},dao:{con:0}}
@@ -550,7 +581,12 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(control.types.length&&!laCD&&(!q.dang||!control.types.includes(q.dang)))throw new Error('Thầy vừa đổi phạm vi luyện. Em mở lượt mới.')
     if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Câu đang được dùng cho ca thi. Em mở lượt học khác; câu này không bị tính sai.')
     // Hậu xử lý có thể chạy lại từ receipt nếu lần nộp trước dừng giữa chừng.
+    // Gói R 15/10: sổ học là VIỆC PHỤ sau phản hồi (`ctx.waitUntil`) ⇒ ghi THẲNG D1 gốc (vẫn qua rào cổng đóng băng `RAO_GHI` như mọi lệnh ghi của lượt), không
+    // xếp hàng chung với đường trả lời — trước: lệnh ghi sổ vào hàng ghi của bản gộp đọc ⇒ lượt đọc EXP còn lại của phản hồi phải chờ nó (một đợt D1). Phần còn lại
+    // của phản hồi không đọc bảng sổ. Không có `ctx` (việc phụ chạy tại chỗ, nối tiếp) ⇒ y như cũ.
+    const envSo:Env=ctx?envGhiRieng(env):env
     const ghiSoHoc=async(attempt:Attempt,chon?:string,so?:SoOmni)=>{
+      const env=envSo
       // CNH-1.0 P03: khi cờ `nang_luc_v1` BẬT, sự kiện ĐƯỢC HỖ TRỢ cũng vào sổ (kèm `assistance:'assisted'`)
       // để phần hỗ trợ có bằng chứng và KHÔNG bị tính là lần tự làm. Cờ TẮT ⇒ giữ nguyên hành vi cũ (bỏ qua),
       // không đổi hồ sơ mạnh yếu đang chạy.
