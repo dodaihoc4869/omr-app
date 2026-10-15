@@ -476,7 +476,7 @@ Thầy (15/10 ~07:5x, sau khi xem bản vẽ retro): "thay đổi mọi chỗ tr
 - [!] Đổi giao diện retro cho MỌI màn app học sinh | DỪNG theo lệnh thầy 15/10: "dừng việc làm giao diện lại". Chưa commit/build/phát hành; phần dở cất ở tệp vá trong scratchpad phiên (giao-dien-retro-dang-do-1510.patch), tokens.css + hoc-tap.css trả về nguyên trạng
 - [!] Bản thật trên Pages xem trước → thầy chốt → phát hành | DỪNG theo lệnh thầy 15/10
 Thầy (15/10 ~08:3x): "giờ quét toàn app xem tối ưu thân thiện nhất được gì không, tối ưu máy chủ tốc độ load app rút câu mọi thứ, đề xuất cho tôi trước khi build nhé"
-- [~] Quét thân thiện 3 app (HS/PH/GV) — chỉ đọc | bằng chứng: HS xong (12 mục, soi:giao-dien 1 lỗi + 3 cảnh báo); PH/GV đang chạy
+- [x] Quét thân thiện 3 app (HS/PH/GV) — chỉ đọc | bằng chứng: HS 12 mục (soi:giao-dien 1 lỗi + 3 cảnh báo); PH 8 mục; GV 8 mục (có lỗi thật: nút "Giao bài riêng" ở Toàn cảnh em / báo cáo ca không chạy khi Game Hoá 2.0 bật)
 - [ ] Quét máy chủ: truy vấn D1 nặng nhất giờ cao điểm + đợt chờ nối tiếp lệnh nóng | bằng chứng: (chưa có)
 - [x] Quét tốc độ tải app (byte mở từng app, mảnh nặng nhất) | bằng chứng: kiem-toc-do --in: gv 264,1 · hs 322,3 · ph 259,2 KB nén; quy byte theo sourcemap: react-dom ~55/61 KB khối index (đổi mỗi lần phát hành); mảnh chung DesignSystem 34 KB nạp ở cả 3 app chứa experiments/expanded ~6,4 · exam-kho-de-import ~3,5 · fflate ~2,8 · bai-tap-pdf ~1,8 KB; StudentPortalScreen 58 KB chứa KhoiKhacPhuc3CheDo ~11,6 KB; CSS toàn cục 52,5 KB gồm CSS app thầy
 - [ ] Quét luồng rút câu (lập kế hoạch Gói 7, mở chặng, nộp câu) | bằng chứng: (chưa có)
