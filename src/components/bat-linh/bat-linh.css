@@ -79,6 +79,10 @@
 .bl-app .bl-login :is(input, select) { background: rgb(255 255 250); border-color: var(--bl-line); color: var(--bl-ink); font-size: 16px; }
 .bl-app .bl-login :is(label, .text-slate-700, .text-slate-900) { color: var(--bl-ink); }
 .bl-app .bl-login :is(.text-slate-300, .text-slate-400, .text-slate-500, .text-slate-600) { color: var(--bl-muted); }
+/* /hs (quét 15/10): vỏ học sinh là `.ht-shell` + body[data-hoc-tap=hs], KHÔNG có biến --bl-* ⇒ thẻ đăng nhập mất nền, ô nhập 14 px (iPhone tự
+   phóng to khi chạm). Dùng token sẵn có của app học sinh. */
+.ht-shell .bl-login__card { background: var(--the); color: var(--muc); border-color: var(--vien); }
+.ht-shell .bl-login :is(input, select) { font-size: 16px; }
 @media (min-width: 960px) {
   .bl-login { padding: 48px; }
   .bl-login__card { width: 460px; padding: 32px; margin-left: min(36vw, 520px); }
