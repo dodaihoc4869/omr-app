@@ -53,6 +53,9 @@ export function canMucTatCa(dsBai: readonly Pick<ChienDichCau, 'id'>[], cau: rea
 }
 /** "Tất cả các bài" hiện từng trang (chỉ lấy lời giải câu đang hiện — em có thể đã làm vài trăm câu, mở màn không bắn hàng loạt lượt chi tiết). */
 export const CAU_MOI_TRANG = 30
+/** VÒNG 2 (15/10/2026): giới hạn trần 60 câu khi Tải PDF ở mục "Tất cả các bài" (tránh tệp 252 câu 65 MB gây treo máy yếu).
+ *  60 câu khớp đúng 1 lượt lấy chi tiết tối đa của máy chủ (`TOI_DA_MOT_LUOT`). */
+export const TRAN_CAU_PDF_TAT_CA = 60
 
 /** Xếp theo lần làm gần nhất (mới trước), cùng ngày thì theo số câu. */
 export function xepCau(ds: CauDaLamMuc[]): CauDaLamMuc[] {
@@ -180,6 +183,10 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
   const dsLoc = useMemo(() => cauCd.filter(boLoc.hop), [cauCd, boLoc])
   // Chỉ "Tất cả các bài" (không giới hạn, có em vài trăm câu) hiện từng trang; một bài giữ như cũ (lấy sẵn lời giải mọi câu đang lọc để Tải PDF nhanh).
   const dsHien = useMemo(() => (cdHienTai === TAT_CA_BAI ? dsLoc.slice(0, soHien) : dsLoc), [dsLoc, soHien, cdHienTai])
+  // Vòng 2 (15/10): ở mục "Tất cả các bài", Tải PDF / Mở bản in chỉ lấy tối đa 60 câu đầu của danh sách đang lọc (xếp mới nhất trước).
+  // Mục một bài giữ nguyên (lấy đủ).
+  const tranPdf = cdHienTai === TAT_CA_BAI && dsLoc.length > TRAN_CAU_PDF_TAT_CA
+  const dsIn = useMemo(() => (tranPdf ? dsLoc.slice(0, TRAN_CAU_PDF_TAT_CA) : dsLoc), [tranPdf, dsLoc])
 
   /** Lấy chi tiết các câu chưa có (một lượt ≤ 60 câu — `taiChiTiet` tự chia). */
   const napChiTiet = useCallback(
@@ -243,8 +250,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
   }
 
   const taiPdf = async (chiDe = false) => {
-    if (pdf.dang || dsLoc.length === 0) return
-    const ds = dsLoc
+    if (pdf.dang || dsIn.length === 0) return
+    const ds = dsIn
     const tenCd = tenCdHien
     setPdf({ ...PDF_TRONG, dang: true, chu: `Đang lấy ${ds.length} câu…` })
     let buoc: 'lay' | 'dung' = 'lay'
@@ -278,8 +285,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
 
   /** Dự phòng: phiếu HTML chuẩn (`dungPhieu`) + hộp In của phiếu. */
   const moBanIn = async () => {
-    if (pdf.dang || dsLoc.length === 0) return
-    const ds = dsLoc
+    if (pdf.dang || dsIn.length === 0) return
+    const ds = dsIn
     setPdf({ ...PDF_TRONG, dang: true, chu: 'Đang dựng bản in…' })
     try {
       const theoQid = await layChiTietDs(ds)
@@ -439,13 +446,14 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
       )}
     </>
   )
+  const nhanNutPdf = tranPdf ? `Tải PDF · ${TRAN_CAU_PDF_TAT_CA} câu gần nhất` : `Tải PDF · ${dsLoc.length} câu`
   const nutPdf = (
     <div className="h2-cdl-hang-pdf">
       <button type="button" className="h2-cdl-nut-chinh" disabled={pdf.dang || dsLoc.length === 0} aria-busy={pdf.dang} onClick={() => void taiPdf()}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
           <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
         </svg>
-        {pdf.dang ? pdf.chu : `Tải PDF · ${dsLoc.length} câu`}
+        {pdf.dang ? pdf.chu : nhanNutPdf}
       </button>
       {/* Chế độ CHỈ ĐỀ (thầy 28/09): tờ sạch để em in ra làm lại — không đáp án, không lời giải. */}
       {!pdf.dang && (
