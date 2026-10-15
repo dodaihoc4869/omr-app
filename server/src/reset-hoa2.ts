@@ -97,6 +97,9 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
   // Bảng vận hành đã GIỮ lần 21/09: bộ não A.I, bảng lưu em đã gỡ, nhật ký máy, thử thách riêng (kết quả ở sổ).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin', 'hoc_sinh_da_go', 'danh_sach_da_go', 'nhat_ky_may', 'thu_thach_rieng',
+  // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10): dẫn xuất từ sổ su_kien_hoc (GIỮ) ⇒ GIỮ cho nhất quán (như nam_kt_cau).
+  // Trigger trên sổ trỏ tới bảng này: xoá DỮ LIỆU thì được, KHÔNG BAO GIỜ DROP bảng khi chưa DROP ba trigger `nhip_hoc_doi_pho_sau_*`.
+  'nhip_hoc_doi_pho_ngay',
 ]
 
 /** Có ca thi đang mở (`trang_thai = 'mo'`, trừ ca đo tải)? MỘT truy vấn. Không đọc được bảng `ca` ⇒ HOÃN cho chắc (không chắc là không có ca mở). */
