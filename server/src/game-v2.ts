@@ -1,4 +1,5 @@
 import { khopPhanIII } from '../../src/lib/cham-so'
+import { ngoaiKenhSo } from '../../src/lib/so-o-tra-loi-ngan'
 import { BANG_HO_SO, BANG_MUA, docDongLop, gieoNho, gopDocD1, laBanGop, nhoTheoLuot, RAO_GHI, raoGhiD1 } from './doc-d1-theo-luot'
 import {BANG_NGAY_CAP,EXP_MOI_VANG,MANH_REN_KHIEN,VANG_REN_KHIEN,ngayDatKhien} from '../../src/lib/kinh-te-game'
 import {moCuaRoute,cuaP08Mo,hapThuQuaP08,renKhienQuaP08,dungKhienQuaP08,docCauHinhKichHoat} from './cnh-exp-adapter'
@@ -99,7 +100,8 @@ async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string}
   else cau=await docCauTheoRef(env,q)
   if(!cau)throw loiCauDoi()
   // CẤM RÚT TỰ LUẬN (21/09): lượt đã tạo trước lệnh cấm mà còn câu tự luận thì đóng như câu rút khỏi kho — không phục vụ, không chấm.
-  if(laCauTuLuan(cau))throw loiCauDoi()
+  // 15/10 CHỐT LÚC PHÁT: câu phần III bàn phím số không gõ đủ đáp số (`ngoaiKenhSo`) cũng đóng như vậy (chỉ mục cũ chưa mang cờ vẫn bị chặn).
+  if(laCauTuLuan(cau)||ngoaiKenhSo(cau))throw loiCauDoi()
   return cau
 }
 /** Các qid trong LƯỢT mà hiện là TỰ LUẬN (lượt soạn trước lệnh cấm 21/09). MỘT truy vấn theo (qid, version); không thấy dòng ⇒ không kết tội. */

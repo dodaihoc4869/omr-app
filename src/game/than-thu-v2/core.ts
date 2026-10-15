@@ -1,5 +1,6 @@
 import type { NhanKhoHanhTrinh } from '../../lib/hanh-trinh-nhan'
 import { soKhopSo } from '../../lib/cham-so'
+import { SO_O_PHIEU, soOPhanIII } from '../../lib/so-o-tra-loi-ngan'
 import { cauHopKhoi, type Khoi } from '../../lib/khoi-cau'
 import { gomDiemNhan, thuongNhan, type BangChungCau, type LichSuCuaEm } from '../../lib/uu-tien-nhan-kho'
 
@@ -24,14 +25,19 @@ export interface Question {
   dang:string|null; tenDang:string; mucDo:string|null; sao:number|null; kienThuc:string[]
   /** NHÃN FAMILY từ kho (tuỳ chọn — kho thật chưa gắn; KHÔNG suy từ qid/group). CNH-1.0: luật chống lặp. */
   family?:string|null
+  /** SỐ Ô TRẢ LỜI NGẮN (15/10, lỗi "10000 chỉ nhập được 1000"): chỉ có ở câu Phần III đáp số dài hơn 4 kí tự — máy chủ tính từ đáp án lúc phát câu
+   *  (`publicQuestion`), CHỈ gửi con số, không gửi đáp án. Thiếu ⇒ 4 ô như phiếu. */
+  soO?:number
 }
 export interface PrivateQuestion extends Question { correct:string; solution:unknown; reviewed:boolean;hanhTrinh?:NhanKhoHanhTrinh }
 export interface Evidence { qid:string; group:string; dang:string|null; mucDo:string|null; kienThuc:string[]; wrong:boolean; date:string; ca:string }
 export interface Attempt { id:string; session:string; group:string; qid:string; dang:string|null; mucDo:string|null; correct:boolean; assisted:boolean; at:number; novel:boolean }
 export interface Mastery { key:string; stage:number; first:number; due:number; groups:string[]; repaired:boolean }
 export function publicQuestion(q:PrivateQuestion):Question {
-  const {correct:_,solution:__,reviewed:___,hanhTrinh:____,...pub}=q
-  return {...pub,hinhAnh:pub.hinhAnh.filter(h=>h.viTri!=='sau_loi_giai')}
+  const {correct:_,solution:__,reviewed:___,hanhTrinh:____,soO:_____,...pub}=q
+  // 15/10: câu Phần III cần hơn 4 ô (đáp số "10000", "6724,2"…) ⇒ kèm số ô để bàn phím số nhận đủ; ≤ 4 kí tự ⇒ không thêm trường, giữ 4 ô như phiếu.
+  const soO=q.phan==='III'?soOPhanIII(q.correct):null
+  return {...pub,hinhAnh:pub.hinhAnh.filter(h=>h.viTri!=='sau_loi_giai'),...(soO!==null&&soO>SO_O_PHIEU?{soO}:{})}
 }
 export function grade(q:Pick<PrivateQuestion,'phan'|'correct'>, answer:string):boolean {
   if(!answer.trim()) return false

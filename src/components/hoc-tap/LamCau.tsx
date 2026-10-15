@@ -2,7 +2,7 @@
 // (thẻ câu dùng chung cho màn thi, màn thầy, phiếu…); chỉ dùng lại các mảnh hiển thị đề/hình/công thức mà `TheCau` cũng dùng
 // (ChemText · tachDongTheoY · ExperimentDemo · BangSoLieu · CauHinh · HinhTaiViTri · KhoiLoiGiaiChuan) để chữ và hình ra y hệt.
 // Màu: chỉ biến của app học sinh (hoc-tap.css, khối `.ht2-lam*`). Đáp án chỉ có ở các khối PHẢN HỒI — nhận từ máy chủ SAU khi nộp.
-import { useRef, useSyncExternalStore, type KeyboardEvent as KE, type ReactNode } from 'react'
+import { useRef, useSyncExternalStore, type CSSProperties, type KeyboardEvent as KE, type ReactNode } from 'react'
 import { Check, Delete, X as XIcon } from 'lucide-react'
 import ExperimentDemo, { ExperimentOriginal } from '../ExperimentDemo'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
@@ -176,13 +176,14 @@ export function ChonTracNghiem({ q, value, onChon, khoa }: { q: Question; value:
   )
 }
 
-// ───────────────────────────── TRẢ LỜI NGẮN · 4 ô như phiếu + bàn phím số ─────────────────────────────
+// ───────────────────────────── TRẢ LỜI NGẮN · 4 ô như phiếu (hoặc số ô của câu) + bàn phím số ─────────────────────────────
 
-/** Bốn ô như phiếu (đáp án cũ dài hơn 4 kí tự vẫn hiện đủ). Ô đang nhập viền nét đứt. KHÔNG có ô nhập ⇒ không bật bàn phím điện thoại. */
-export function OPhieu({ value, ket }: { value: string; ket?: 'dung' | 'sai' | 'trung' }) {
-  const so = Math.max(TOI_DA_KY_TU, value.length)
+/** Bốn ô như phiếu; câu đáp số dài hơn ⇒ `soO` ô máy chủ gửi kèm (ô co lại cho vừa màn). Đáp án cũ dài hơn vẫn hiện đủ. Ô đang nhập viền nét đứt.
+ *  KHÔNG có ô nhập ⇒ không bật bàn phím điện thoại. */
+export function OPhieu({ value, ket, soO = TOI_DA_KY_TU }: { value: string; ket?: 'dung' | 'sai' | 'trung'; soO?: number }) {
+  const so = Math.max(soO, value.length)
   return (
-    <div className="ht2-lam-o-hang" aria-hidden="true" data-ket={ket}>
+    <div className="ht2-lam-o-hang" aria-hidden="true" data-ket={ket} data-nhieu={so > TOI_DA_KY_TU || undefined} style={so > TOI_DA_KY_TU ? { '--so-o': so } as CSSProperties : undefined}>
       {Array.from({ length: so }, (_, i) => (
         <span key={i} className="ht2-lam-o" data-tt={i < value.length ? 'co' : i === value.length && !ket ? 'dang' : 'trong'}>
           {i < value.length ? kyTuHien(value[i]!) : i === value.length && !ket ? <i className="ht2-lam-con-tro" /> : ''}
@@ -192,10 +193,10 @@ export function OPhieu({ value, ket }: { value: string; ket?: 'dung' | 'sai' | '
   )
 }
 
-export function OTraLoiNgan({ value }: { value: string }) {
+export function OTraLoiNgan({ value, soO }: { value: string; soO?: number }) {
   return (
     <section className="ht2-lam-tln" aria-label="Ô trả lời">
-      <OPhieu value={value} />
+      <OPhieu value={value} soO={soO} />
       <output className="ht2-an" aria-live="polite">{value ? `Đáp án của em: ${[...value].map(kyTuHien).join('')}` : 'Chưa nhập đáp án'}</output>
     </section>
   )
@@ -207,12 +208,12 @@ const HANG_PHIM: { p: PhimSo; chu?: string; ten?: string; chuc?: true; rong?: tr
   { p: '7' }, { p: '8' }, { p: '9' }, { p: '-', chu: '−', ten: 'Dấu trừ', chuc: true },
   { p: '0', rong: true }, { p: 'xoa-het', chu: 'Xoá hết', chuc: true, rong: true },
 ]
-/** Bàn phím số riêng trong thanh đáy: 1–9, 0, dấu phẩy, dấu trừ, xoá một kí tự, xoá hết. Phím hết tác dụng thì mờ (đủ 4 kí tự, đã có dấu phẩy…). */
-export function BanPhimSo({ value, onPhim, khoa }: { value: string; onPhim: (p: PhimSo) => void; khoa: boolean }) {
+/** Bàn phím số riêng trong thanh đáy: 1–9, 0, dấu phẩy, dấu trừ, xoá một kí tự, xoá hết. Phím hết tác dụng thì mờ (đủ `soO` kí tự, đã có dấu phẩy…). */
+export function BanPhimSo({ value, onPhim, khoa, soO = TOI_DA_KY_TU }: { value: string; onPhim: (p: PhimSo) => void; khoa: boolean; soO?: number }) {
   return (
     <div className="ht2-lam-phim" role="group" aria-label="Bàn phím số">
       {HANG_PHIM.map(({ p, chu, ten, chuc, rong }) => (
-        <button key={p} type="button" aria-label={ten} data-chuc={chuc || undefined} data-rong={rong || undefined} disabled={khoa || !phimCoTacDung(value, p)} onClick={() => onPhim(p)}>
+        <button key={p} type="button" aria-label={ten} data-chuc={chuc || undefined} data-rong={rong || undefined} disabled={khoa || !phimCoTacDung(value, p, soO)} onClick={() => onPhim(p)}>
           {p === 'xoa' ? <Delete size={22} aria-hidden="true" /> : chu ?? p}
         </button>
       ))}
@@ -275,12 +276,12 @@ export function PhanHoiTracNghiem({ q, tra, dapAn }: { q: Question; tra: string;
   )
 }
 
-/** Trả lời ngắn sau khi nộp: 4 ô với đáp án của em + dòng "Em trả lời … · đáp án …". */
-export function PhanHoiTraLoiNgan({ tra, dapAn, dung }: { tra: string; dapAn: string; dung: boolean }) {
+/** Trả lời ngắn sau khi nộp: các ô (4 hoặc số ô của câu) với đáp án của em + dòng "Em trả lời … · đáp án …". */
+export function PhanHoiTraLoiNgan({ tra, dapAn, dung, soO }: { tra: string; dapAn: string; dung: boolean; soO?: number }) {
   const ket = !tra ? 'trung' : dung ? 'dung' : 'sai'
   return (
     <section className="ht2-lam-tln" aria-label="Đáp án">
-      {tra && <OPhieu value={tra} ket={ket} />}
+      {tra && <OPhieu value={tra} ket={ket} soO={soO} />}
       <p className="ht2-lam-y-ket" data-ket={ket}>
         {ket === 'sai' ? <DauSai /> : <DauDung />}
         {tra ? <>Em trả lời {[...tra].map(kyTuHien).join('')} · đáp án <ChemText text={dapAn} /></> : <>Đáp án <ChemText text={dapAn} /></>}

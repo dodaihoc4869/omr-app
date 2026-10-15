@@ -1,0 +1,2292 @@
+{
+"_nguon": "D1 that game_v2_question phan III, doc 15/10/2026 08:1x VN (chi doc). dai: moi cau dap an > 4 ki tu; ngan: moi dap an <= 4 ki tu khac nhau.",
+"dai": [
+{
+"qid": "DH-10-C1-B3-DT-III-1",
+"maDe": "DH-10-C1-B3-DT",
+"c": "X: Al 1s²2s²2p⁶3s²3p¹; Y: Cl 1s²2s²2p⁶3s²3p⁵"
+},
+{
+"qid": "DH-10-C1-B3-DT-III-2",
+"maDe": "DH-10-C1-B3-DT",
+"c": "AlCl₃"
+},
+{
+"qid": "DH-10-C1-B3-DT-III-3",
+"maDe": "DH-10-C1-B3-DT",
+"c": "X: Z = 6 (C); Y: Z = 8 (O)"
+},
+{
+"qid": "DH-10-C1-B3-VD-III-1",
+"maDe": "DH-10-C1-B3-VD",
+"c": "X: Ca (1s²2s²2p⁶3s²3p⁶4s²) kim loại; Y: P (1s²2s²2p⁶3s²3p³) phi kim"
+},
+{
+"qid": "DH-10-C1-B3-VD-III-2",
+"maDe": "DH-10-C1-B3-VD",
+"c": "X là Cl (1 electron độc thân); Y là Ca (0 electron độc thân)"
+},
+{
+"qid": "DH-10-C2-B5-DT-III-1",
+"maDe": "DH-10-C2-B5-DT",
+"c": "6 electron ngoài cùng (3s²3p⁴); 1s²2s²2p⁶3s²3p⁴; phi kim"
+},
+{
+"qid": "DH-10-C2-B5-DT-III-2",
+"maDe": "DH-10-C2-B5-DT",
+"c": "X: Ne; Y: K; T: Cu"
+},
+{
+"qid": "DH-10-C2-B5-DT-III-3",
+"maDe": "DH-10-C2-B5-DT",
+"c": "X: Kr (ck4, VIIIA, khí hiếm); Y: Br (ck4, VIIA, phi kim); Z: Rb (ck5, IA, kim loại)"
+},
+{
+"qid": "DH-10-C2-B5-DT-III-4",
+"maDe": "DH-10-C2-B5-DT",
+"c": "Na (Z = 11) và K (Z = 19)"
+},
+{
+"qid": "DH-10-C2-B5-DT-III-5",
+"maDe": "DH-10-C2-B5-DT",
+"c": "Z(X) = 20 (Ca) và Z(Y) = 38 (Sr)"
+},
+{
+"qid": "DH-11-C1-B1-VD-III-1",
+"maDe": "DH-11-C1-B1-VD",
+"c": "a) tăng t° cho (1), giảm t° cho (2); b) đẩy cân bằng (2) theo chiều thuận; c) (1) nghịch, (2) không đổi"
+},
+{
+"qid": "DH-11-C1-B2-VD-III-2",
+"maDe": "DH-11-C1-B2-VD",
+"c": "acid: HI; base: CH₃COO⁻, CO₃²⁻, NH₃; lưỡng tính: H₂PO₄⁻"
+},
+{
+"qid": "DH-11-C1-B2-VD-III-3",
+"maDe": "DH-11-C1-B2-VD",
+"c": "Đất chua; [H⁺] ≈ 3,0×10⁻⁵ M"
+},
+{
+"qid": "DH-11-C2-B4-VD-III-1",
+"maDe": "DH-11-C2-B4-VD",
+"c": "N₂ ở số oxi hoá 0 là trung gian: N₂ + 3H₂ → 2NH₃ (N₂ là chất oxi hoá); N₂ + O₂ → 2NO (N₂ là chất khử)"
+},
+{
+"qid": "DH-11-C2-B4-VD-III-2",
+"maDe": "DH-11-C2-B4-VD",
+"c": "N: 0 → −3 và H: 0 → +1; nitrogen là chất oxi hoá"
+},
+{
+"qid": "DH-11-C2-B5-VD-III-1",
+"maDe": "DH-11-C2-B5-VD",
+"c": "NH₃ tạo được liên kết hydrogen nên nhiệt độ sôi cao hơn hẳn N₂ và H₂"
+},
+{
+"qid": "DH-11-C2-B6-VD-III-1",
+"maDe": "DH-11-C2-B6-VD",
+"c": "tan vô hạn trong nước; acid mạnh; tính oxi hoá mạnh"
+},
+{
+"qid": "DH-11-C2-B6-VD-III-2",
+"maDe": "DH-11-C2-B6-VD",
+"c": "cả ba phản ứng HNO₃ thể hiện tính acid"
+},
+{
+"qid": "DH-11-C2-B6-VD-III-3",
+"maDe": "DH-11-C2-B6-VD",
+"c": "HNO₃ đặc : HCl đặc = 1 : 3; Au + HNO₃ + 3HCl → AuCl₃ + NO + 2H₂O"
+},
+{
+"qid": "DH-11-C2-B7-VD-III-1",
+"maDe": "DH-11-C2-B7-VD",
+"c": "a) vòng S₈ hình vương miện; b) liên kết S-S không cực, phân tử đối xứng; c) (1) và (3)"
+},
+{
+"qid": "DH-11-C2-B7-VD-III-2",
+"maDe": "DH-11-C2-B7-VD",
+"c": "Fe + S →(t°) FeS; Fe là chất khử, S là chất oxi hoá"
+},
+{
+"qid": "DH-11-C2-B7-VD-III-3",
+"maDe": "DH-11-C2-B7-VD",
+"c": "S + O₂ →(t°) SO₂; S là chất khử, O₂ là chất oxi hoá; trong O₂ nguyên chất cháy mãnh liệt hơn"
+},
+{
+"qid": "DH-11-C2-B7-VD-III-4",
+"maDe": "DH-11-C2-B7-VD",
+"c": "Với H₂, Al, Hg: S 0 → −2, S là chất oxi hoá; với F₂: S 0 → +6, S là chất khử"
+},
+{
+"qid": "DH-11-C2-B7-VD-III-5",
+"maDe": "DH-11-C2-B7-VD",
+"c": "mỏ sulfur đơn chất; quặng sulfide (FeS₂, PbS, ZnS); quặng sulfate (CaSO₄, BaSO₄); H₂S trong khí và dầu mỏ"
+},
+{
+"qid": "DH-11-C2-B7-VD-III-6",
+"maDe": "DH-11-C2-B7-VD",
+"c": "S ở +4 là mức trung gian nên SO₂ vừa có tính oxi hoá vừa có tính khử"
+},
+{
+"qid": "DH-11-C2-B7-VD-III-7",
+"maDe": "DH-11-C2-B7-VD",
+"c": "SO₂ + CaO → CaSO₃; SO₂ + Ca(OH)₂ → CaSO₃ + H₂O; SO₂ thể hiện tính oxide acid"
+},
+{
+"qid": "DH-11-C2-B8-VD-III-1",
+"maDe": "DH-11-C2-B8-VD",
+"c": "Fe + H₂SO₄ → FeSO₄ + H₂; MgO + H₂SO₄ → MgSO₄ + H₂O; Na₂CO₃ + H₂SO₄ → Na₂SO₄ + CO₂ + H₂O; BaCl₂ + H₂SO₄ → BaSO₄↓ + 2HCl"
+},
+{
+"qid": "DH-11-C2-B8-VD-III-2",
+"maDe": "DH-11-C2-B8-VD",
+"c": "Cu + 2H₂SO₄(đặc) →(t°) CuSO₄ + SO₂ + 2H₂O; Cu là chất khử, H₂SO₄ là chất oxi hoá"
+},
+{
+"qid": "DH-12-C1-B2-VD-III-1",
+"maDe": "DH-12-C1-B2-VD",
+"c": "(a), (d) là xà phòng; (b), (c) là chất giặt rửa tổng hợp"
+},
+{
+"qid": "DH-12-C2-B5-VD-III-1",
+"maDe": "DH-12-C2-B5-VD",
+"c": "hoà tan Cu(OH)₂ cho dung dịch xanh lam; bị thuỷ phân thành glucose và fructose; không tráng bạc"
+},
+{
+"qid": "DH-12-C2-B5-VD-III-2",
+"maDe": "DH-12-C2-B5-VD",
+"c": "phương pháp kết tinh; dựa vào độ tan của saccharose thay đổi mạnh theo nhiệt độ"
+},
+{
+"qid": "DH-12-C3-B9-P2-VD-III-1",
+"maDe": "DH-12-C3-B9-P2-VD",
+"c": "Tyr-Gly-Gly-Phe-Leu"
+},
+{
+"qid": "DH-10-C2-B6-VD-III-1",
+"maDe": "DH-10-C2-B6-VD",
+"c": "Na mạnh hơn Mg"
+},
+{
+"qid": "DH-10-C2-B6-VD-III-2",
+"maDe": "DH-10-C2-B6-VD",
+"c": "Cl mạnh hơn I"
+},
+{
+"qid": "DH-12-C3-B8-VD-III-2",
+"maDe": "DH-12-C3-B8-VD",
+"c": "a) 4 chất khí: methylamine, trimethylamine, dimethylamine, ethylamine; b) nhiệt độ sôi tăng; c) trimethylamine không tạo được liên kết hydrogen",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-VD-III-1",
+"maDe": "DH-10-C2-B8-VD",
+"c": "5e ngoài cùng; phi kim; P₂O₅; PH₃; H₃PO₄; đều có tính acid",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-VD-III-2",
+"maDe": "DH-10-C2-B8-VD",
+"c": "Ca (Z = 20) và Sr (Z = 38)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-VD-III-3",
+"maDe": "DH-10-C2-B8-VD",
+"c": "Mg và Ca; %Mg = 60%, %Ca = 40%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-VD-III-4",
+"maDe": "DH-10-C2-B8-VD",
+"c": "Na và K",
+"tuLuan": true
+},
+{
+"qid": "11-C5-B20-III-6",
+"maDe": "11-C5-B20",
+"c": "2116,4"
+},
+{
+"qid": "12-C1-B2-III-21",
+"maDe": "12-C1-B2",
+"c": "9166,7"
+},
+{
+"qid": "DB-10-B2-D1-III-61",
+"maDe": "DB-10-B2-D1",
+"c": "p = 8; n = 8",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B2-D2-III-120",
+"maDe": "DB-10-B2-D2",
+"c": "1,108.10²³"
+},
+{
+"qid": "DB-10-B2-D2-III-121",
+"maDe": "DB-10-B2-D2",
+"c": "1,33.10²³"
+},
+{
+"qid": "DB-10-B2-D2-III-122",
+"maDe": "DB-10-B2-D2",
+"c": "72,7%; 0,073 mol và 0,027 mol; 28,7%",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B2-D2-III-123",
+"maDe": "DB-10-B2-D2",
+"c": "²⁴Mg 79%; ²⁵Mg 10%",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B2-D2-III-124",
+"maDe": "DB-10-B2-D2",
+"c": "Y₁: 37; Y₂: 35",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B2-D2-III-125",
+"maDe": "DB-10-B2-D2",
+"c": "Có — %¹³C = 0,98% < 1,11%",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B3-D1-III-278",
+"maDe": "DB-10-B3-D1",
+"c": "1s²2s²2p⁶3s²3p⁵ — lớp M 7e, 1e độc thân, họ p, là phi kim",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B3-D1-III-279",
+"maDe": "DB-10-B3-D1",
+"c": "X: Z = 19, 4 lớp / 6 phân lớp, kim loại; Y: Z = 16, 3 lớp / 5 phân lớp, phi kim",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B3-D1-III-280",
+"maDe": "DB-10-B3-D1",
+"c": "X: Ca (1s²2s²2p⁶3s²3p⁶4s²) kim loại; Y: P (1s²2s²2p⁶3s²3p³) phi kim",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B3-D1-III-281",
+"maDe": "DB-10-B3-D1",
+"c": "X: Al 1s²2s²2p⁶3s²3p¹; Y: Cl 1s²2s²2p⁶3s²3p⁵",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B3-D2-III-62",
+"maDe": "DB-10-B3-D2",
+"c": "p = 13; n = 14; e = 13",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B3-D2-III-93",
+"maDe": "DB-10-B3-D2",
+"c": "X là Cl (1 electron độc thân); Y là Ca (0 electron độc thân)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B3-D2-III-94",
+"maDe": "DB-10-B3-D2",
+"c": "AlCl₃",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B3-D2-III-95",
+"maDe": "DB-10-B3-D2",
+"c": "X: Z = 6 (C); Y: Z = 8 (O)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B5-D1-III-102",
+"maDe": "DB-10-B5-D1",
+"c": "6 electron ngoài cùng (3s²3p⁴); 1s²2s²2p⁶3s²3p⁴; phi kim",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B5-D1-III-103",
+"maDe": "DB-10-B5-D1",
+"c": "X: Ne; Y: K; T: Cu",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B5-D1-III-104",
+"maDe": "DB-10-B5-D1",
+"c": "X: Kr (ck4, VIIIA, khí hiếm); Y: Br (ck4, VIIA, phi kim); Z: Rb (ck5, IA, kim loại)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B5-D1-III-122",
+"maDe": "DB-10-B5-D1",
+"c": "a) Na ck3 IA, Al ck3 IIIA, K ck4 IA; b) Al < Na < K; c) K 0,82 – Na 0,93 – Al 1,31; d) K > Na > Al",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B5-D1-III-142",
+"maDe": "DB-10-B5-D1",
+"c": "Sulfur (S)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B8-D3-III-8",
+"maDe": "DB-10-B8-D3",
+"c": "Na mạnh hơn Mg",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B8-D3-III-12",
+"maDe": "DB-10-B8-D3",
+"c": "Mg và Ca; %Mg = 60%, %Ca = 40%",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B8-D3-III-13",
+"maDe": "DB-10-B8-D3",
+"c": "Na và K",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B1-D1-III-197",
+"maDe": "DB-11-B1-D1",
+"c": "311,31"
+},
+{
+"qid": "DB-11-B1-D1-III-198",
+"maDe": "DB-11-B1-D1",
+"c": "0,2744"
+},
+{
+"qid": "DB-11-B1-D1-III-201",
+"maDe": "DB-11-B1-D1",
+"c": "3,125"
+},
+{
+"qid": "DB-11-B1-D1-III-202",
+"maDe": "DB-11-B1-D1",
+"c": "a) thuận; b) không chuyển dịch; c) nghịch; d) nghịch",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B1-D1-III-203",
+"maDe": "DB-11-B1-D1",
+"c": "a) tăng t° cho (1), giảm t° cho (2); b) đẩy cân bằng (2) theo chiều thuận; c) (1) nghịch, (2) không đổi",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B1-D1-III-204",
+"maDe": "DB-11-B1-D1",
+"c": "311,3"
+},
+{
+"qid": "DB-11-B1-D1-III-208",
+"maDe": "DB-11-B1-D1",
+"c": "a) 6,3; b) x ≈ 0,28 M",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B1-D1-III-210",
+"maDe": "DB-11-B1-D1",
+"c": "a) pH = 2,87; b) môi trường base; c) pH = 4,74",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B2-D2-III-165",
+"maDe": "DB-11-B2-D2",
+"c": "Acid mạnh, base tan và muối tan điện li hoàn toàn (→); CH₃COOH và HF điện li thuận nghịch (⇌); Cu(OH)₂ không tan",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B2-D3-III-174",
+"maDe": "DB-11-B2-D3",
+"c": "Đất chua; [H⁺] ≈ 3,0×10⁻⁵ M",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B2-D5-III-58",
+"maDe": "DB-11-B2-D5",
+"c": "0,12 M; 3,4 g CaO; pH ≈ 13,4",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B2-D6-III-3",
+"maDe": "DB-11-B2-D6",
+"c": "1,3.10⁻³"
+},
+{
+"qid": "DB-11-B2-D6-III-4",
+"maDe": "DB-11-B2-D6",
+"c": "1,76.10⁻⁵"
+},
+{
+"qid": "DH-11-C2-B5-III-29",
+"maDe": "DH-11-C2-B5",
+"c": "1,2375.10⁹"
+},
+{
+"qid": "DH-11-C2-B5-III-30",
+"maDe": "DH-11-C2-B5",
+"c": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B5-III-31",
+"maDe": "DH-11-C2-B5",
+"c": "a) quỳ hoá xanh; b) khói trắng NH₄Cl; c) kết tủa keo trắng Al(OH)₃ không tan trong NH₃ dư",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B5-III-32",
+"maDe": "DH-11-C2-B5",
+"c": "Tính base khi nhận H⁺ (NH₃ + HCl → NH₄Cl); tính khử khi N tăng số oxi hoá (4NH₃ + 3O₂ → 2N₂ + 6H₂O)",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B5-III-33",
+"maDe": "DH-11-C2-B5",
+"c": "NH₃ tạo được liên kết hydrogen nên nhiệt độ sôi cao hơn hẳn N₂ và H₂",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B5-III-35",
+"maDe": "DH-11-C2-B5",
+"c": "25% N₂; 25% H₂; 50% NH₃",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B5-III-36",
+"maDe": "DH-11-C2-B5",
+"c": "1,2375×10⁹ kJ"
+},
+{
+"qid": "DH-11-C2-B4-III-16",
+"maDe": "DH-11-C2-B4",
+"c": "N₂ ở số oxi hoá 0 là trung gian: N₂ + 3H₂ → 2NH₃ (N₂ là chất oxi hoá); N₂ + O₂ → 2NO (N₂ là chất khử)",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B4-III-17",
+"maDe": "DH-11-C2-B4",
+"c": "N: 0 → −3 và H: 0 → +1; nitrogen là chất oxi hoá",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B5-D1-III-11",
+"maDe": "DB-11-B5-D1",
+"c": "N: 0 → −3 và H: 0 → +1; nitrogen là chất oxi hoá",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B5-D2-III-86",
+"maDe": "DB-11-B5-D2",
+"c": "1,2375.10⁹"
+},
+{
+"qid": "DB-11-B5-D2-III-87",
+"maDe": "DB-11-B5-D2",
+"c": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B5-D2-III-88",
+"maDe": "DB-11-B5-D2",
+"c": "a) quỳ hoá xanh; b) khói trắng NH₄Cl; c) kết tủa keo trắng Al(OH)₃ không tan trong NH₃ dư",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B5-D2-III-89",
+"maDe": "DB-11-B5-D2",
+"c": "Tính base khi nhận H⁺ (NH₃ + HCl → NH₄Cl); tính khử khi N tăng số oxi hoá (4NH₃ + 3O₂ → 2N₂ + 6H₂O)",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B5-D2-III-90",
+"maDe": "DB-11-B5-D2",
+"c": "NH₃ tạo được liên kết hydrogen nên nhiệt độ sôi cao hơn hẳn N₂ và H₂",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B5-D2-III-92",
+"maDe": "DB-11-B5-D2",
+"c": "1,2375×10⁹ kJ"
+},
+{
+"qid": "DB-11-B6-D1-III-14",
+"maDe": "DB-11-B6-D1",
+"c": "74370"
+},
+{
+"qid": "DB-11-B6-D2-III-80",
+"maDe": "DB-11-B6-D2",
+"c": "Fe₃O₄",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D2-III-83",
+"maDe": "DB-11-B6-D2",
+"c": "CaCO₃ + H₂SO₄ → CaSO₄ + CO₂ + H₂O; Fe + H₂SO₄ loãng → FeSO₄ + H₂",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D2-III-84",
+"maDe": "DB-11-B6-D2",
+"c": "liên kết cộng hoá trị (có một liên kết cho – nhận); N có số oxi hoá +5; HNO₃ là chất oxi hoá",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D2-III-85",
+"maDe": "DB-11-B6-D2",
+"c": "tan vô hạn trong nước; acid mạnh; tính oxi hoá mạnh",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D2-III-86",
+"maDe": "DB-11-B6-D2",
+"c": "cả ba phản ứng HNO₃ thể hiện tính acid",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D2-III-87",
+"maDe": "DB-11-B6-D2",
+"c": "tính oxi hoá mạnh",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D2-III-88",
+"maDe": "DB-11-B6-D2",
+"c": "HNO₃ đặc : HCl đặc = 1 : 3; Au + HNO₃ + 3HCl → AuCl₃ + NO + 2H₂O",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D2-III-89",
+"maDe": "DB-11-B6-D2",
+"c": "Fe₃O₄",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D2-III-93",
+"maDe": "DB-11-B6-D2",
+"c": "37185"
+},
+{
+"qid": "DB-11-B6-D2-III-94",
+"maDe": "DB-11-B6-D2",
+"c": "với O₂ và NO₂: SO₂ là chất khử (S +4 → +6); với H₂S: SO₂ là chất oxi hoá (S +4 → 0)",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D3-III-9",
+"maDe": "DB-11-B6-D3",
+"c": "−748,6 kJ; phản ứng toả nhiệt mạnh nên thuận lợi về năng lượng",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B6-D3-III-10",
+"maDe": "DB-11-B6-D3",
+"c": "≈ 6724,2 kJ"
+},
+{
+"qid": "DB-11-B7-D1-III-11",
+"maDe": "DB-11-B7-D1",
+"c": "12395"
+},
+{
+"qid": "DB-11-B7-D1-III-12",
+"maDe": "DB-11-B7-D1",
+"c": "12395"
+},
+{
+"qid": "DB-11-B7-D2-III-69",
+"maDe": "DB-11-B7-D2",
+"c": "a) vòng S₈ hình vương miện; b) liên kết S-S không cực, phân tử đối xứng; c) (1) và (3)",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B7-D2-III-70",
+"maDe": "DB-11-B7-D2",
+"c": "thấp (khoảng 113 °C)",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B7-D2-III-71",
+"maDe": "DB-11-B7-D2",
+"c": "Fe + S →(t°) FeS; Fe là chất khử, S là chất oxi hoá",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B7-D2-III-72",
+"maDe": "DB-11-B7-D2",
+"c": "S + O₂ →(t°) SO₂; S là chất khử, O₂ là chất oxi hoá; trong O₂ nguyên chất cháy mãnh liệt hơn",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B7-D2-III-73",
+"maDe": "DB-11-B7-D2",
+"c": "Với H₂, Al, Hg: S 0 → −2, S là chất oxi hoá; với F₂: S 0 → +6, S là chất khử",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B7-D2-III-74",
+"maDe": "DB-11-B7-D2",
+"c": "S ở +4 là mức trung gian nên SO₂ vừa có tính oxi hoá vừa có tính khử",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B7-D3-III-3",
+"maDe": "DB-11-B7-D3",
+"c": "169,8"
+},
+{
+"qid": "DB-11-B7-D3-III-4",
+"maDe": "DB-11-B7-D3",
+"c": "(1) −517,9 kJ; (2) −221,1 kJ; thiếu oxygen thì H₂S chuyển thành sulfur",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B8-D1-III-18",
+"maDe": "DB-11-B8-D1",
+"c": "25% N₂; 25% H₂; 50% NH₃",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B8-D1-III-111",
+"maDe": "DB-11-B8-D1",
+"c": "Fe + H₂SO₄ → FeSO₄ + H₂; MgO + H₂SO₄ → MgSO₄ + H₂O; Na₂CO₃ + H₂SO₄ → Na₂SO₄ + CO₂ + H₂O; BaCl₂ + H₂SO₄ → BaSO₄↓ + 2HCl",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B8-D1-III-112",
+"maDe": "DB-11-B8-D1",
+"c": "a) 2550 kg; b) 1,05 kg; c) 25 mg",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B8-D2-III-31",
+"maDe": "DB-11-B8-D2",
+"c": "Cu + 2H₂SO₄(đặc) →(t°) CuSO₄ + SO₂ + 2H₂O; Cu là chất khử, H₂SO₄ là chất oxi hoá",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B8-D2-III-32",
+"maDe": "DB-11-B8-D2",
+"c": "%Al = 13,8%; %Fe = 86,2%",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B8-D3-III-21",
+"maDe": "DB-11-B8-D3",
+"c": "-96,9"
+},
+{
+"qid": "DB-11-B8-D3-III-22",
+"maDe": "DB-11-B8-D3",
+"c": "mỏ sulfur đơn chất; quặng sulfide (FeS₂, PbS, ZnS); quặng sulfate (CaSO₄, BaSO₄); H₂S trong khí và dầu mỏ",
+"tuLuan": true
+},
+{
+"qid": "DB-11-B8-D3-III-24",
+"maDe": "DB-11-B8-D3",
+"c": "-96,9"
+},
+{
+"qid": "DB-11-B8-D4-III-23",
+"maDe": "DB-11-B8-D4",
+"c": "SO₂ + CaO → CaSO₃; SO₂ + Ca(OH)₂ → CaSO₃ + H₂O; SO₂ thể hiện tính oxide acid",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B1-P2-D1-III-48",
+"maDe": "DB-12-B1-P2-D1",
+"c": "9166,7"
+},
+{
+"qid": "DB-12-B2-D1-III-215",
+"maDe": "DB-12-B2-D1",
+"c": "(a), (d) là xà phòng; (b), (c) là chất giặt rửa tổng hợp",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B5-D1-III-33",
+"maDe": "DB-12-B5-D1",
+"c": "X: tinh bột (C₆H₁₀O₅)ₙ; Y: glucose; Z: CO₂; E: C₂H₅OH; G: O₂",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B8-D1-III-430",
+"maDe": "DB-12-B8-D1",
+"c": "C₇H₉N",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B8-D1-III-431",
+"maDe": "DB-12-B8-D1",
+"c": "(CH₃)₃N",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B8-D1-III-433",
+"maDe": "DB-12-B8-D1",
+"c": "a) 4 chất khí: methylamine, trimethylamine, dimethylamine, ethylamine; b) nhiệt độ sôi tăng; c) trimethylamine không tạo được liên kết hydrogen",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B8-D1-III-434",
+"maDe": "DB-12-B8-D1",
+"c": "C₂H₇N — CH₃CH₂NH₂ (ethylamine); nhóm N-H",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B9-P1-D1-III-260",
+"maDe": "DB-12-B9-P1-D1",
+"c": "C₄H₉NO₂ — CH₃CH₂CH(NH₂)COOH",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B9-P1-D1-III-261",
+"maDe": "DB-12-B9-P1-D1",
+"c": "A: C₂H₅NO₂ — H₂NCH₂COOH (glycine); B: H₂NCH₂COOCH₃",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B9-P1-D2-III-124",
+"maDe": "DB-12-B9-P1-D2",
+"c": "112,2"
+},
+{
+"qid": "DB-12-B9-P2-D1-III-222",
+"maDe": "DB-12-B9-P2-D1",
+"c": "(Ala)₄",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B9-P2-D1-III-223",
+"maDe": "DB-12-B9-P2-D1",
+"c": "C₅H₁₀N₂O₃ — Gly-Ala: H₂NCH₂CO-NH-CH(CH₃)-COOH",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B9-P2-D2-III-149",
+"maDe": "DB-12-B9-P2-D2",
+"c": "Tyr-Gly-Gly-Phe-Leu",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-DT-III-3",
+"maDe": "DH-10-C1-B1-DT",
+"c": "Mg: +12; O: +8",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-DT-III-5",
+"maDe": "DH-10-C1-B1-DT",
+"c": "AlCl₃",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-DT-III-9",
+"maDe": "DH-10-C1-B1-DT",
+"c": "5,7×10⁻¹²",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-VD-III-1",
+"maDe": "DH-10-C1-B1-VD",
+"c": "10000",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-VD-III-4",
+"maDe": "DH-10-C1-B1-VD",
+"c": "13,1 g; 14,1 g; 0,007 g",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-VD-III-5",
+"maDe": "DH-10-C1-B1-VD",
+"c": "p = 8; n = 8",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-VD-III-6",
+"maDe": "DH-10-C1-B1-VD",
+"c": "p = 13; n = 14; e = 13",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-III-23",
+"maDe": "DH-10-C1-B2",
+"c": "1,1.10²³"
+},
+{
+"qid": "DH-10-C1-B2-III-24",
+"maDe": "DH-10-C1-B2",
+"c": "1,3.10²³"
+},
+{
+"qid": "DH-10-C1-B2-III-25",
+"maDe": "DH-10-C1-B2",
+"c": "Mg: 12 proton, 12 neutron, 12 electron",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-III-26",
+"maDe": "DH-10-C1-B2",
+"c": "a) 72,7%; b) 0,073 mol và 0,027 mol; c) 28,7%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-III-27",
+"maDe": "DH-10-C1-B2",
+"c": "²⁴Mg 79%; ²⁵Mg 10%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-III-28",
+"maDe": "DH-10-C1-B2",
+"c": "Y₁: 37; Y₂: 35",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-III-29",
+"maDe": "DH-10-C1-B2",
+"c": "Có — %¹³C = 0,98% < 1,11%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-DT-III-2",
+"maDe": "DH-10-C1-B2-DT",
+"c": "1,1.10²³",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-DT-III-3",
+"maDe": "DH-10-C1-B2-DT",
+"c": "1,3.10²³",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-DT-III-4",
+"maDe": "DH-10-C1-B2-DT",
+"c": "Mg: 12 proton, 12 neutron, 12 electron",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-DT-III-5",
+"maDe": "DH-10-C1-B2-DT",
+"c": "a) 72,7%; b) 0,073 mol và 0,027 mol; c) 28,7%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-DT-III-6",
+"maDe": "DH-10-C1-B2-DT",
+"c": "²⁴Mg 79%; ²⁵Mg 10%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-DT-III-7",
+"maDe": "DH-10-C1-B2-DT",
+"c": "Y₁: 37; Y₂: 35",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B2-DT-III-8",
+"maDe": "DH-10-C1-B2-DT",
+"c": "Có — %¹³C = 0,98% < 1,11%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B3-III-41",
+"maDe": "DH-10-C1-B3",
+"c": "a) s hình cầu, p hình số tám nổi; b) theo ba trục x, y, z vuông góc; c) khoảng 50%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B3-III-42",
+"maDe": "DH-10-C1-B3",
+"c": "1s²2s²2p⁶3s²3p⁵ — lớp M 7e, 1e độc thân, họ p, là phi kim",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B3-III-43",
+"maDe": "DH-10-C1-B3",
+"c": "X: Z = 19, 4 lớp / 6 phân lớp, kim loại; Y: Z = 16, 3 lớp / 5 phân lớp, phi kim",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B3-III-44",
+"maDe": "DH-10-C1-B3",
+"c": "X: Ca (1s²2s²2p⁶3s²3p⁶4s²) kim loại; Y: P (1s²2s²2p⁶3s²3p³) phi kim",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B3-III-45",
+"maDe": "DH-10-C1-B3",
+"c": "X là Cl (1 electron độc thân); Y là Ca (0 electron độc thân)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B3-III-46",
+"maDe": "DH-10-C1-B3",
+"c": "X: Al 1s²2s²2p⁶3s²3p¹; Y: Cl 1s²2s²2p⁶3s²3p⁵",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B3-III-47",
+"maDe": "DH-10-C1-B3",
+"c": "AlCl₃",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B3-III-48",
+"maDe": "DH-10-C1-B3",
+"c": "X: Z = 6 (C); Y: Z = 8 (O)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B7-III-25",
+"maDe": "DH-10-C2-B7",
+"c": "Cl: ô 17, ck 3, nhóm VIIA, phi kim; Cl₂O₇ và HClO₄ đều có tính acid mạnh",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B7-III-26",
+"maDe": "DH-10-C2-B7",
+"c": "Al(OH)₃ < Mg(OH)₂ < NaOH",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B7-III-27",
+"maDe": "DH-10-C2-B7",
+"c": "Nitrogen (N)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B7-III-28",
+"maDe": "DH-10-C2-B7",
+"c": "Sulfur (S)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B7-III-29",
+"maDe": "DH-10-C2-B7",
+"c": "Silicon (Si)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B7-DT-III-2",
+"maDe": "DH-10-C2-B7-DT",
+"c": "Nitrogen (N)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B7-DT-III-3",
+"maDe": "DH-10-C2-B7-DT",
+"c": "Sulfur (S)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B7-DT-III-4",
+"maDe": "DH-10-C2-B7-DT",
+"c": "Silicon (Si)",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B1-III-19",
+"maDe": "DH-11-C1-B1",
+"c": "311,31"
+},
+{
+"qid": "DH-11-C1-B1-III-20",
+"maDe": "DH-11-C1-B1",
+"c": "0,2744"
+},
+{
+"qid": "DH-11-C1-B1-III-23",
+"maDe": "DH-11-C1-B1",
+"c": "3,125"
+},
+{
+"qid": "DH-11-C1-B1-III-24",
+"maDe": "DH-11-C1-B1",
+"c": "a) thuận; b) không chuyển dịch; c) nghịch; d) nghịch",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B1-III-25",
+"maDe": "DH-11-C1-B1",
+"c": "a) tăng t° cho (1), giảm t° cho (2); b) đẩy cân bằng (2) theo chiều thuận; c) (1) nghịch, (2) không đổi",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B1-III-26",
+"maDe": "DH-11-C1-B1",
+"c": "311,3"
+},
+{
+"qid": "DH-11-C1-B1-III-30",
+"maDe": "DH-11-C1-B1",
+"c": "a) 6,3; b) 0,28",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B2-III-56",
+"maDe": "DH-11-C1-B2",
+"c": "1,3.10⁻³"
+},
+{
+"qid": "DH-11-C1-B2-III-57",
+"maDe": "DH-11-C1-B2",
+"c": "1,76.10⁻⁵"
+},
+{
+"qid": "DH-11-C1-B2-III-60",
+"maDe": "DH-11-C1-B2",
+"c": "Acid mạnh, base tan và muối tan điện li hoàn toàn (→); CH₃COOH và HF điện li thuận nghịch (⇌); Cu(OH)₂ không tan",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B2-III-61",
+"maDe": "DH-11-C1-B2",
+"c": "acid: HI; base: CH₃COO⁻, CO₃²⁻, NH₃; lưỡng tính: H₂PO₄⁻",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B2-III-62",
+"maDe": "DH-11-C1-B2",
+"c": "Đất chua; [H⁺] ≈ 3,0×10⁻⁵ M",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B2-III-64",
+"maDe": "DH-11-C1-B2",
+"c": "a) 0,12 M; b) 3,4 g CaO; c) pH = 13,4",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B2-III-66",
+"maDe": "DH-11-C1-B2",
+"c": "a) pH = 2,9; b) môi trường base; c) pH = 4,7",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B2-DT-III-8",
+"maDe": "DH-11-C1-B2-DT",
+"c": "1,3.10⁻³",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B2-DT-III-9",
+"maDe": "DH-11-C1-B2-DT",
+"c": "1,76.10⁻⁵",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C1-B2-DT-III-13",
+"maDe": "DH-11-C1-B2-DT",
+"c": "a) pH = 2,9; b) môi trường base; c) pH = 4,7",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B5-DT-III-5",
+"maDe": "DH-11-C2-B5-DT",
+"c": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B5-DT-III-6",
+"maDe": "DH-11-C2-B5-DT",
+"c": "1,2375×10⁹ kJ",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-24",
+"maDe": "DH-11-C2-B6",
+"c": "74370"
+},
+{
+"qid": "DH-11-C2-B6-III-25",
+"maDe": "DH-11-C2-B6",
+"c": "Fe₃O₄",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-28",
+"maDe": "DH-11-C2-B6",
+"c": "CaCO₃ + H₂SO₄ → CaSO₄ + CO₂ + H₂O; Fe + H₂SO₄ loãng → FeSO₄ + H₂",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-29",
+"maDe": "DH-11-C2-B6",
+"c": "liên kết cộng hoá trị (có một liên kết cho – nhận); N có số oxi hoá +5; HNO₃ là chất oxi hoá",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-30",
+"maDe": "DH-11-C2-B6",
+"c": "tan vô hạn trong nước; acid mạnh; tính oxi hoá mạnh",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-31",
+"maDe": "DH-11-C2-B6",
+"c": "cả ba phản ứng HNO₃ thể hiện tính acid",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-32",
+"maDe": "DH-11-C2-B6",
+"c": "tính oxi hoá mạnh",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-33",
+"maDe": "DH-11-C2-B6",
+"c": "HNO₃ đặc : HCl đặc = 1 : 3; Au + HNO₃ + 3HCl → AuCl₃ + NO + 2H₂O",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-34",
+"maDe": "DH-11-C2-B6",
+"c": "Fe₃O₄",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-35",
+"maDe": "DH-11-C2-B6",
+"c": "−748,6 kJ; phản ứng toả nhiệt mạnh nên thuận lợi về năng lượng",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B6-III-36",
+"maDe": "DH-11-C2-B6",
+"c": "6724,2"
+},
+{
+"qid": "DH-11-C2-B6-DT-III-4",
+"maDe": "DH-11-C2-B6-DT",
+"c": "Fe₃O₄",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-DT-III-2",
+"maDe": "DH-11-C2-B7-DT",
+"c": "37185",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-DT-III-4",
+"maDe": "DH-11-C2-B7-DT",
+"c": "12 395",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-DT-III-6",
+"maDe": "DH-11-C2-B7-DT",
+"c": "-96,9",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B8-DT-III-4",
+"maDe": "DH-11-C2-B8-DT",
+"c": "%Al = 13,8%; %Fe = 86,2%",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C1-B2-III-27",
+"maDe": "DH-12-C1-B2",
+"c": "(a), (d) là xà phòng; (b), (c) là chất giặt rửa tổng hợp",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C2-B4-DT-III-13",
+"maDe": "DH-12-C2-B4-DT",
+"c": "13507,3",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C2-B5-III-31",
+"maDe": "DH-12-C2-B5",
+"c": "208,5"
+},
+{
+"qid": "DH-12-C2-B5-III-33",
+"maDe": "DH-12-C2-B5",
+"c": "hoà tan Cu(OH)₂ cho dung dịch xanh lam; bị thuỷ phân thành glucose và fructose; không tráng bạc",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C2-B5-III-34",
+"maDe": "DH-12-C2-B5",
+"c": "phương pháp kết tinh; dựa vào độ tan của saccharose thay đổi mạnh theo nhiệt độ",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C2-B5-DT-III-4",
+"maDe": "DH-12-C2-B5-DT",
+"c": "208,5",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C2-B6-DT-III-9",
+"maDe": "DH-12-C2-B6-DT",
+"c": "[C₆H₇O₂(OH)(ONO₂)₂]ₙ — cellulose dinitrate",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B8-III-34",
+"maDe": "DH-12-C3-B8",
+"c": "C₇H₉N",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B8-III-35",
+"maDe": "DH-12-C3-B8",
+"c": "(CH₃)₃N",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B8-III-39",
+"maDe": "DH-12-C3-B8",
+"c": "a) 4 chất khí: methylamine, trimethylamine, dimethylamine, ethylamine; b) nhiệt độ sôi tăng; c) trimethylamine không tạo được liên kết hydrogen",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B8-III-40",
+"maDe": "DH-12-C3-B8",
+"c": "C₂H₇N — CH₃CH₂NH₂ (ethylamine); nhóm N-H",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B8-DT-III-1",
+"maDe": "DH-12-C3-B8-DT",
+"c": "C₇H₉N",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B8-DT-III-2",
+"maDe": "DH-12-C3-B8-DT",
+"c": "(CH₃)₃N",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P1-III-39",
+"maDe": "DH-12-C3-B9-P1",
+"c": "112,2"
+},
+{
+"qid": "DH-12-C3-B9-P1-III-40",
+"maDe": "DH-12-C3-B9-P1",
+"c": "C₄H₉NO₂ — CH₃CH₂CH(NH₂)COOH",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P1-III-41",
+"maDe": "DH-12-C3-B9-P1",
+"c": "A: C₂H₅NO₂ — H₂NCH₂COOH (glycine); B: H₂NCH₂COOCH₃",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P1-DT-III-2",
+"maDe": "DH-12-C3-B9-P1-DT",
+"c": "112,2",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P1-DT-III-3",
+"maDe": "DH-12-C3-B9-P1-DT",
+"c": "C₄H₉NO₂ — CH₃CH₂CH(NH₂)COOH",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P1-DT-III-4",
+"maDe": "DH-12-C3-B9-P1-DT",
+"c": "A: C₂H₅NO₂ — H₂NCH₂COOH (glycine); B: H₂NCH₂COOCH₃",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P2-III-31",
+"maDe": "DH-12-C3-B9-P2",
+"c": "Tyr-Gly-Gly-Phe-Leu",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P2-III-34",
+"maDe": "DH-12-C3-B9-P2",
+"c": "(Ala)₄",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P2-III-37",
+"maDe": "DH-12-C3-B9-P2",
+"c": "C₅H₁₀N₂O₃ — Gly-Ala: H₂NCH₂CO-NH-CH(CH₃)-COOH",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P2-DT-III-1",
+"maDe": "DH-12-C3-B9-P2-DT",
+"c": "(Ala)₄",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C3-B9-P2-DT-III-4",
+"maDe": "DH-12-C3-B9-P2-DT",
+"c": "C₅H₁₀N₂O₃ — Gly-Ala: H₂NCH₂CO-NH-CH(CH₃)-COOH",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B7-D1-III-63",
+"maDe": "DB-10-B7-D1",
+"c": "Cl: ô 17, ck 3, nhóm VIIA, phi kim; Cl₂O₇ và HClO₄ đều có tính acid mạnh",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B7-D1-III-64",
+"maDe": "DB-10-B7-D1",
+"c": "Nitrogen (N)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B7-D1-III-65",
+"maDe": "DB-10-B7-D1",
+"c": "Silicon (Si)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B7-D1-III-79",
+"maDe": "DB-10-B7-D1",
+"c": "5e ngoài cùng; phi kim; P₂O₅; PH₃; H₃PO₄; đều có tính acid",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B7-D1-III-80",
+"maDe": "DB-10-B7-D1",
+"c": "K: ô 19, chu kì 4, nhóm IA; tính kim loại K > Na và K > Ca",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B7-D1-III-81",
+"maDe": "DB-10-B7-D1",
+"c": "M là Fe (ô 26, ck 4, VIIIB); Y là Br (ô 35, ck 4, VIIA)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B8-D1-III-64",
+"maDe": "DB-10-B8-D1",
+"c": "Cl mạnh hơn I",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B8-D1-III-65",
+"maDe": "DB-10-B8-D1",
+"c": "a) Cs và F; b) kim loại ở dưới – bên trái, phi kim ở trên – bên phải; c) nhóm IA và nhóm VIIA",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B8-D1-III-75",
+"maDe": "DB-10-B8-D1",
+"c": "Al(OH)₃ < Mg(OH)₂ < NaOH",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B6-III-19",
+"maDe": "DH-10-C2-B6",
+"c": "Na mạnh hơn Mg",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B6-III-20",
+"maDe": "DH-10-C2-B6",
+"c": "Cl mạnh hơn I",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B6-III-21",
+"maDe": "DH-10-C2-B6",
+"c": "a) Cs và F; b) kim loại ở dưới – bên trái, phi kim ở trên – bên phải; c) nhóm IA và nhóm VIIA",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B6-III-22",
+"maDe": "DH-10-C2-B6",
+"c": "a) Na ck3 IA, Al ck3 IIIA, K ck4 IA; b) Al < Na < K; c) K 0,82 – Na 0,93 – Al 1,31; d) K > Na > Al",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-III-15",
+"maDe": "DH-10-C2-B8",
+"c": "5e ngoài cùng; phi kim; P₂O₅; PH₃; H₃PO₄; đều có tính acid",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-III-16",
+"maDe": "DH-10-C2-B8",
+"c": "K: ô 19, chu kì 4, nhóm IA; tính kim loại K > Na và K > Ca",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-III-17",
+"maDe": "DH-10-C2-B8",
+"c": "M là Fe (ô 26, ck 4, VIIIB); Y là Br (ô 35, ck 4, VIIA)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-III-18",
+"maDe": "DH-10-C2-B8",
+"c": "Ca (Z = 20) và Sr (Z = 38)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-III-19",
+"maDe": "DH-10-C2-B8",
+"c": "Mg và Ca; %Mg = 60%, %Ca = 40%",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B8-III-20",
+"maDe": "DH-10-C2-B8",
+"c": "Na và K",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B5-III-31",
+"maDe": "DH-10-C2-B5",
+"c": "6 electron ngoài cùng (3s²3p⁴); 1s²2s²2p⁶3s²3p⁴; phi kim",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B5-III-32",
+"maDe": "DH-10-C2-B5",
+"c": "X: Ne; Y: K; T: Cu",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B5-III-33",
+"maDe": "DH-10-C2-B5",
+"c": "X: Kr (ck4, VIIIA, khí hiếm); Y: Br (ck4, VIIA, phi kim); Z: Rb (ck5, IA, kim loại)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B5-III-34",
+"maDe": "DH-10-C2-B5",
+"c": "Na (Z = 11) và K (Z = 19)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C2-B5-III-35",
+"maDe": "DH-10-C2-B5",
+"c": "Z(X) = 20 (Ca) và Z(Y) = 38 (Sr)",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-III-18",
+"maDe": "DH-10-C1-B1",
+"c": "10000"
+},
+{
+"qid": "DH-10-C1-B1-III-25",
+"maDe": "DH-10-C1-B1",
+"c": "a) proton và neutron; b) neutron; c) proton; d) electron",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-III-26",
+"maDe": "DH-10-C1-B1",
+"c": "100,0"
+},
+{
+"qid": "DH-10-C1-B1-III-27",
+"maDe": "DH-10-C1-B1",
+"c": "13,1 g; 14,1 g; 0,007 g",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-III-28",
+"maDe": "DH-10-C1-B1",
+"c": "p = 8; n = 8",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-III-29",
+"maDe": "DH-10-C1-B1",
+"c": "p = 13; n = 14; e = 13",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-III-30",
+"maDe": "DH-10-C1-B1",
+"c": "Mg: +12; O: +8",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-III-32",
+"maDe": "DH-10-C1-B1",
+"c": "AlCl₃",
+"tuLuan": true
+},
+{
+"qid": "DH-10-C1-B1-III-36",
+"maDe": "DH-10-C1-B1",
+"c": "5,7×10⁻¹²"
+},
+{
+"qid": "DB-10-B1-D1-III-163",
+"maDe": "DB-10-B1-D1",
+"c": "10000"
+},
+{
+"qid": "DB-10-B1-D1-III-168",
+"maDe": "DB-10-B1-D1",
+"c": "a) proton và neutron; b) neutron; c) proton; d) electron",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B1-D1-III-169",
+"maDe": "DB-10-B1-D1",
+"c": "100,0"
+},
+{
+"qid": "DB-10-B1-D1-III-170",
+"maDe": "DB-10-B1-D1",
+"c": "13,1 g; 14,1 g; 0,007 g",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B1-D1-III-171",
+"maDe": "DB-10-B1-D1",
+"c": "Mg: +12; O: +8",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B1-D1-III-173",
+"maDe": "DB-10-B1-D1",
+"c": "AlCl₃",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B1-D1-III-182",
+"maDe": "DB-10-B1-D1",
+"c": "Mg: 12 proton, 12 neutron, 12 electron",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B1-D1-III-210",
+"maDe": "DB-10-B1-D1",
+"c": "a) s hình cầu, p hình số tám nổi; b) theo ba trục x, y, z vuông góc; c) khoảng 50%",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B1-D2-III-12",
+"maDe": "DB-10-B1-D2",
+"c": "5,74×10⁻¹²"
+},
+{
+"qid": "DB-10-B8-D2-III-19",
+"maDe": "DB-10-B8-D2",
+"c": "Na (Z = 11) và K (Z = 19)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B8-D2-III-20",
+"maDe": "DB-10-B8-D2",
+"c": "Z(X) = 20 (Ca) và Z(Y) = 38 (Sr)",
+"tuLuan": true
+},
+{
+"qid": "DB-10-B8-D2-III-51",
+"maDe": "DB-10-B8-D2",
+"c": "Ca (Z = 20) và Sr (Z = 38)",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B4-D2-III-122",
+"maDe": "DB-12-B4-D2",
+"c": "13507,3"
+},
+{
+"qid": "DB-12-B5-D2-III-316",
+"maDe": "DB-12-B5-D2",
+"c": "208,5"
+},
+{
+"qid": "DB-12-B5-D2-III-317",
+"maDe": "DB-12-B5-D2",
+"c": "hoà tan Cu(OH)₂ cho dung dịch xanh lam; bị thuỷ phân thành glucose và fructose; không tráng bạc",
+"tuLuan": true
+},
+{
+"qid": "DB-12-B5-D2-III-318",
+"maDe": "DB-12-B5-D2",
+"c": "phương pháp kết tinh; dựa vào độ tan của saccharose thay đổi mạnh theo nhiệt độ",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-23",
+"maDe": "DH-11-C2-B7",
+"c": "37185"
+},
+{
+"qid": "DH-11-C2-B7-III-24",
+"maDe": "DH-11-C2-B7",
+"c": "12395"
+},
+{
+"qid": "DH-11-C2-B7-III-27",
+"maDe": "DH-11-C2-B7",
+"c": "-96,9"
+},
+{
+"qid": "DH-11-C2-B7-III-28",
+"maDe": "DH-11-C2-B7",
+"c": "a) vòng S₈ hình vương miện; b) liên kết S-S không cực, phân tử đối xứng; c) (1) và (3)",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-29",
+"maDe": "DH-11-C2-B7",
+"c": "thấp (khoảng 113 °C)",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-30",
+"maDe": "DH-11-C2-B7",
+"c": "Fe + S →(t°) FeS; Fe là chất khử, S là chất oxi hoá",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-31",
+"maDe": "DH-11-C2-B7",
+"c": "S + O₂ →(t°) SO₂; S là chất khử, O₂ là chất oxi hoá; trong O₂ nguyên chất cháy mãnh liệt hơn",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-32",
+"maDe": "DH-11-C2-B7",
+"c": "Với H₂, Al, Hg: S 0 → −2, S là chất oxi hoá; với F₂: S 0 → +6, S là chất khử",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-33",
+"maDe": "DH-11-C2-B7",
+"c": "mỏ sulfur đơn chất; quặng sulfide (FeS₂, PbS, ZnS); quặng sulfate (CaSO₄, BaSO₄); H₂S trong khí và dầu mỏ",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-34",
+"maDe": "DH-11-C2-B7",
+"c": "S ở +4 là mức trung gian nên SO₂ vừa có tính oxi hoá vừa có tính khử",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-35",
+"maDe": "DH-11-C2-B7",
+"c": "với O₂ và NO₂: SO₂ là chất khử (S +4 → +6); với H₂S: SO₂ là chất oxi hoá (S +4 → 0)",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-36",
+"maDe": "DH-11-C2-B7",
+"c": "SO₂ + CaO → CaSO₃; SO₂ + Ca(OH)₂ → CaSO₃ + H₂O; SO₂ thể hiện tính oxide acid",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B7-III-37",
+"maDe": "DH-11-C2-B7",
+"c": "12395"
+},
+{
+"qid": "DH-11-C2-B7-III-39",
+"maDe": "DH-11-C2-B7",
+"c": "169,8"
+},
+{
+"qid": "DH-11-C2-B7-III-40",
+"maDe": "DH-11-C2-B7",
+"c": "-96,9"
+},
+{
+"qid": "DH-11-C2-B7-III-41",
+"maDe": "DH-11-C2-B7",
+"c": "(1) −517,9 kJ; (2) −221,1 kJ; thiếu oxygen thì H₂S chuyển thành sulfur",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B8-III-33",
+"maDe": "DH-11-C2-B8",
+"c": "Fe + H₂SO₄ → FeSO₄ + H₂; MgO + H₂SO₄ → MgSO₄ + H₂O; Na₂CO₃ + H₂SO₄ → Na₂SO₄ + CO₂ + H₂O; BaCl₂ + H₂SO₄ → BaSO₄↓ + 2HCl",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B8-III-34",
+"maDe": "DH-11-C2-B8",
+"c": "Cu + 2H₂SO₄(đặc) →(t°) CuSO₄ + SO₂ + 2H₂O; Cu là chất khử, H₂SO₄ là chất oxi hoá",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B8-III-35",
+"maDe": "DH-11-C2-B8",
+"c": "%Al = 13,8%; %Fe = 86,2%",
+"tuLuan": true
+},
+{
+"qid": "DH-11-C2-B8-III-36",
+"maDe": "DH-11-C2-B8",
+"c": "a) 2550 kg; b) 1,05 kg; c) 25 mg",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C2-B4-III-49",
+"maDe": "DH-12-C2-B4",
+"c": "13507,3"
+},
+{
+"qid": "DH-12-C2-B6-III-45",
+"maDe": "DH-12-C2-B6",
+"c": "X: tinh bột (C₆H₁₀O₅)ₙ; Y: glucose; Z: CO₂; E: C₂H₅OH; G: O₂",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C2-B6-III-46",
+"maDe": "DH-12-C2-B6",
+"c": "a) amylase thuỷ phân tinh bột thành maltose ngọt; b) hạt ngô nhiều tinh bột, lõi ngô nhiều cellulose; c) nhờ vi sinh vật tiết cellulase; d) amylopectin phân nhánh, nhiều đầu mạch; e) tinh bột hồ hoá tạo hồ keo nhớt",
+"tuLuan": true
+},
+{
+"qid": "DH-12-C2-B6-III-49",
+"maDe": "DH-12-C2-B6",
+"c": "[C₆H₇O₂(OH)(ONO₂)₂]ₙ — cellulose dinitrate",
+"tuLuan": true
+}
+],
+"ngan": [
+"+6",
+"+7",
+"+8",
+"-1",
+"-105",
+"-3",
+"-396",
+"-41",
+"-5",
+"-78",
+"-851",
+"0",
+"0,02",
+"0,03",
+"0,04",
+"0,05",
+"0,06",
+"0,09",
+"0,1",
+"0,12",
+"0,13",
+"0,14",
+"0,15",
+"0,19",
+"0,2",
+"0,25",
+"0,26",
+"0,27",
+"0,29",
+"0,3",
+"0,33",
+"0,34",
+"0,38",
+"0,39",
+"0,4",
+"0,44",
+"0,46",
+"0,49",
+"0,5",
+"0,54",
+"0,6",
+"0,63",
+"0,66",
+"0,72",
+"0,75",
+"0,77",
+"0,78",
+"0,8",
+"0,87",
+"1",
+"1,0",
+"1,02",
+"1,03",
+"1,04",
+"1,12",
+"1,2",
+"1,22",
+"1,24",
+"1,3",
+"1,33",
+"1,35",
+"1,36",
+"1,4",
+"1,45",
+"1,5",
+"1,6",
+"1,64",
+"1,68",
+"1,8",
+"1,85",
+"1,9",
+"1,96",
+"10",
+"10,2",
+"10,3",
+"10,4",
+"10,5",
+"10,8",
+"100",
+"1000",
+"1007",
+"102",
+"104",
+"105",
+"1052",
+"106",
+"107",
+"1072",
+"109",
+"1091",
+"11",
+"11,5",
+"11,7",
+"11,8",
+"111",
+"1111",
+"112",
+"1120",
+"113",
+"117",
+"118",
+"12",
+"12,3",
+"12,4",
+"12,7",
+"12,9",
+"1200",
+"1209",
+"1210",
+"1213",
+"122",
+"123",
+"1234",
+"1235",
+"124",
+"1245",
+"1247",
+"125",
+"1260",
+"1278",
+"128",
+"13",
+"13,3",
+"13,5",
+"1315",
+"132",
+"133",
+"134",
+"1345",
+"136",
+"138",
+"1381",
+"1388",
+"14",
+"14,1",
+"14,4",
+"14,5",
+"14,6",
+"14,8",
+"1400",
+"142",
+"143",
+"1440",
+"145",
+"146",
+"148",
+"149",
+"15",
+"15,4",
+"152",
+"155",
+"1562",
+"16",
+"16,2",
+"16,6",
+"162",
+"166",
+"1666",
+"168",
+"169",
+"17",
+"17,7",
+"17,9",
+"171",
+"1747",
+"175",
+"176",
+"177",
+"179",
+"18",
+"18,5",
+"18,8",
+"184",
+"188",
+"189",
+"1890",
+"19",
+"19,2",
+"19,4",
+"19,7",
+"19,8",
+"1904",
+"191",
+"1930",
+"196",
+"2",
+"2,0",
+"2,1",
+"2,13",
+"2,2",
+"2,25",
+"2,35",
+"2,38",
+"2,43",
+"2,5",
+"2,51",
+"2,6",
+"2,7",
+"2,77",
+"2,8",
+"2,83",
+"20",
+"20,7",
+"20,8",
+"200",
+"2000",
+"205",
+"208",
+"209",
+"21",
+"21,4",
+"21,6",
+"2134",
+"2143",
+"218",
+"22",
+"22,2",
+"22,5",
+"220",
+"222",
+"223",
+"225",
+"229",
+"230",
+"231",
+"2314",
+"232",
+"233",
+"234",
+"2341",
+"2345",
+"235",
+"2356",
+"236",
+"238",
+"24",
+"24,3",
+"240",
+"243",
+"245",
+"25",
+"25,1",
+"25,4",
+"25,6",
+"25,7",
+"250",
+"2510",
+"252",
+"2527",
+"2540",
+"26",
+"26,4",
+"26,7",
+"262",
+"27",
+"27,2",
+"27,8",
+"273",
+"275",
+"278",
+"28",
+"28,1",
+"281",
+"285",
+"29",
+"29,5",
+"294",
+"2975",
+"3",
+"3,06",
+"3,1",
+"3,16",
+"3,2",
+"3,22",
+"3,4",
+"3,42",
+"3,44",
+"3,45",
+"3,47",
+"3,5",
+"3,6",
+"3,60",
+"3,65",
+"3,8",
+"3,92",
+"30",
+"30,1",
+"300",
+"3000",
+"301",
+"304",
+"306",
+"31",
+"31,0",
+"31,5",
+"311",
+"312",
+"3142",
+"315",
+"32",
+"32,1",
+"32,4",
+"32,6",
+"32,9",
+"321",
+"3214",
+"322",
+"3241",
+"328",
+"33",
+"330",
+"333",
+"338",
+"34",
+"34,3",
+"34,4",
+"34,5",
+"340",
+"3412",
+"342",
+"3421",
+"345",
+"35",
+"35,5",
+"359",
+"36",
+"3600",
+"37",
+"37,3",
+"37,4",
+"3749",
+"38,8",
+"389",
+"39",
+"396",
+"397",
+"4",
+"4,0",
+"4,3",
+"4,4",
+"4,5",
+"4,62",
+"4,63",
+"4,7",
+"4,8",
+"4,9",
+"4,95",
+"40",
+"40,0",
+"40,2",
+"4000",
+"4036",
+"406",
+"41,4",
+"41,9",
+"410",
+"4132",
+"416",
+"42",
+"42,5",
+"4231",
+"43,5",
+"43,8",
+"4309",
+"4319",
+"436",
+"44",
+"440",
+"444",
+"45",
+"45,2",
+"459",
+"46",
+"47",
+"47,6",
+"479",
+"48",
+"480",
+"4800",
+"482",
+"49,1",
+"49,6",
+"49,8",
+"492",
+"5",
+"5,0",
+"5,3",
+"5,4",
+"5,54",
+"5,6",
+"5,7",
+"5,75",
+"5,8",
+"5,97",
+"50",
+"50,3",
+"50,8",
+"500",
+"510",
+"5121",
+"5146",
+"52",
+"5218",
+"526",
+"53,3",
+"53,4",
+"53,6",
+"54",
+"55",
+"55,8",
+"55,9",
+"5578",
+"56",
+"56,8",
+"58",
+"58,3",
+"58,5",
+"6",
+"6,1",
+"6,2",
+"6,21",
+"6,3",
+"6,4",
+"6,67",
+"6,7",
+"6,75",
+"6,8",
+"6,93",
+"60",
+"6000",
+"61,5",
+"62",
+"62,5",
+"6246",
+"642",
+"6498",
+"65,0",
+"65,5",
+"653",
+"655",
+"66,7",
+"666",
+"67,5",
+"673",
+"6761",
+"68",
+"68,4",
+"7",
+"7,1",
+"7,25",
+"7,27",
+"7,3",
+"7,4",
+"7,5",
+"7,69",
+"7,8",
+"7,9",
+"70",
+"70,6",
+"718",
+"72,5",
+"720",
+"74,1",
+"741",
+"7437",
+"75",
+"757",
+"76,5",
+"77,4",
+"7702",
+"78",
+"7986",
+"8",
+"8,6",
+"8,64",
+"8,8",
+"8,9",
+"8,94",
+"80",
+"80,2",
+"800",
+"82",
+"82,3",
+"820",
+"828",
+"83,2",
+"832",
+"84",
+"840",
+"85,5",
+"8500",
+"86",
+"863",
+"88,3",
+"884",
+"886",
+"89",
+"9",
+"9,04",
+"9,1",
+"9,15",
+"9,3",
+"9,5",
+"9,9",
+"90,0",
+"90,3",
+"90,5",
+"9167",
+"92",
+"92,3",
+"925",
+"929",
+"93",
+"94",
+"94,0",
+"95",
+"95,0",
+"960",
+"97,2",
+"98",
+"98,0",
+"99",
+"990",
+"FeS₂",
+"K₂O",
+"N",
+"S",
+"Si"
+]
+}

@@ -305,6 +305,9 @@ body[data-hoc-tap=hs] .h2-cdl{--h2c-xanh-chu:var(--the)}
 .ht2-lam-tln{display:flex;flex-direction:column;align-items:center;gap:8px;padding:4px 0}
 .ht2-lam-tln>small{font-size:12px;line-height:1.4;color:var(--nhat);text-align:center}
 .ht2-lam-o-hang{display:grid;grid-auto-flow:column;grid-auto-columns:58px;gap:8px}
+/* 15/10: câu đáp số dài hơn 4 kí tự (máy chủ gửi số ô, tối đa 8) ⇒ các ô chia đều bề ngang, không rộng hơn ô phiếu 58 px, vừa màn 340 px. */
+.ht2-lam-o-hang[data-nhieu]{width:100%;max-width:calc(var(--so-o) * 58px + (var(--so-o) - 1) * 6px);grid-auto-columns:minmax(0,1fr);gap:6px}
+.ht2-lam-o-hang[data-nhieu] .ht2-lam-o{font-size:clamp(20px,7vw,30px)}
 .ht2-lam-o{height:64px;display:grid;place-items:center;border-radius:14px;background:var(--the);border:2px solid var(--lam-vien);font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--muc)}
 .ht2-lam-o[data-tt=co]{border-color:var(--lg-nhan)}
 .ht2-lam-o[data-tt=dang]{border:2px dashed color-mix(in srgb,var(--lg-nhan) 55%,var(--the));box-shadow:0 0 0 4px var(--lam-nhan-nen)}
