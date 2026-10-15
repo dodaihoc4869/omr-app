@@ -22,11 +22,10 @@
 //     Số có đơn vị / ×10ⁿ / phân cách nghìn ("1,2375×10⁹ kJ", "25%", "1.237.500") vẫn là trả lời ngắn.
 //   • Phần III thiếu đáp án (khuôn công khai) mà đề RA LỆNH viết/vẽ/xác định công thức/viết phương trình/chứng minh/sắp xếp… và KHÔNG hỏi một đại lượng
 //     ("bao nhiêu", "giá trị", "tổng hệ số", "tính …") ⇒ TỰ LUẬN. Có đáp án số thì chữ đề không kết tội.
-// Các tệp nhập vào đều THUẦN (không IO, không đồng hồ) nên tệp này vẫn chạy chung được ở máy chủ và mọi máy.
+// Hai tệp nhập vào đều THUẦN (không IO, không đồng hồ) nên tệp này vẫn chạy chung được ở máy chủ và mọi máy.
 
 import { docSoPhanIII } from './doc-so-phan-iii'
 import { chuanHoaSoNhap, tachSoVaDonVi } from './cham-so-policy'
-import { TRAN_O, soOPhanIII } from './so-o-tra-loi-ngan'
 
 export type PhanCau = 'I' | 'II' | 'III'
 
@@ -168,9 +167,6 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
       if ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da)) return 'phần III đáp án dài / nhiều dòng (tự luận)'
       if (laChuNhieuTu(da)) return 'phần III đáp án là chữ nhiều từ (không phải số hay mã ngắn)'
       if (!laMotSoPhanIII(da)) return 'phần III đáp án không phải một số (công thức / chữ / nhiều số) — không chấm tự động'
-      // 15/10 (lỗi "10000 chỉ nhập được 1000"): mỗi câu phần III vào kênh nhập số phải gõ ĐỦ đáp số trên bàn phím số trong số ô máy chủ gửi
-      // (`soOPhanIII`, tối đa TRAN_O). Không gõ được ⇒ không rút, không phát — một chốt cho mọi kênh và lúc nhập kho (`normalizeBank` gắn cờ tự luận).
-      if (soOPhanIII(da) === null) return `phần III đáp số không nhập được bằng ô số (cần hơn ${TRAN_O} ô)`
     }
     if (text && !(coDapAn && laMotSoPhanIII(da)) && hoiMo(text)) return 'phần III hỏi mở (theo em / phương pháp nào / giải thích / viết công thức …)'
   }

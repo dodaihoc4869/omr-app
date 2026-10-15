@@ -3,7 +3,10 @@
 // cho 4 ô ⇒ em nhập được "1000", gửi "1000", bị chấm sai. Nguyên nhân gốc: `TOI_DA_KY_TU = 4` cứng trong `nhanPhim` (bàn phím số lẫn phím máy tính).
 // Khoá: (1) gõ đủ "10000" (bàn phím số + phím máy tính), gửi "10000", máy chủ chấm đúng, máy chủ không cắt độ dài; (2) câu ≤ 4 kí tự giữ 4 ô, đáp án
 // không xuống máy em; (3) BẤT BIẾN trên kho thật (D1 15/10, tests/fixtures/kho-phan3-so-o-1510.json): mọi câu phần III vào kênh nhập số gõ ĐỦ đáp số
-// trong số ô máy chủ gửi; câu đáp án chữ (tự luận gắn nhầm phần III) và đáp số không gõ được không vào kênh nhập số.
+// trong số ô máy chủ gửi; câu đáp án chữ (tự luận gắn nhầm phần III) và đáp số không gõ được không vào kênh nhập số (chốt ở kho game lúc nhập kho
+// `normalizeBank` + lúc phát `currentQuestion`; luật tự luận dùng chung `laCauTuLuan` KHÔNG đổi).
+/** Câu KHÔNG vào kênh nhập số của màn làm bài: tự luận (luật chung) hoặc bàn phím số không gõ đủ (chốt kênh số). */
+const ngoaiKenh = (q: PrivateQuestion) => laCauTuLuan(q) || ngoaiKenhSo(q)
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
@@ -14,7 +17,8 @@ import { nhanPhim, phimTuBanPhim, type PhimSo } from '../src/components/hoc-tap/
 import { grade, publicQuestion, type PrivateQuestion } from '../src/game/than-thu-v2/core'
 import { khopPhanIII } from '../src/lib/cham-so'
 import { laCauTuLuan } from '../src/lib/cau-tu-luan'
-import { SO_O_PHIEU, TRAN_O, dapSoGoPhim, soOCuaCau, soOPhanIII } from '../src/lib/so-o-tra-loi-ngan'
+import { SO_O_PHIEU, TRAN_O, dapSoGoPhim, ngoaiKenhSo, soOCuaCau, soOPhanIII } from '../src/lib/so-o-tra-loi-ngan'
+import { normalizeBank } from '../server/src/game-v2-bank'
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.mocked(goiHoa2).mockReset(); localStorage.clear() })
 
@@ -65,7 +69,7 @@ describe('BẤT BIẾN trên kho thật (D1 15/10): câu phần III vào kênh n
     let vao = 0, canHon4 = 0, tuLuan = 0
     for (const x of KHO.dai) {
       const q = cauIII(x.qid, x.maDe, x.c, x.tuLuan ? { tuLuan: true } as Partial<PrivateQuestion> : {})
-      if (laCauTuLuan(q)) { tuLuan++; continue }
+      if (ngoaiKenh(q)) { tuLuan++; continue }
       vao++
       const dapSo = dapSoGoPhim(x.c)!, soO = soOCuaCau(publicQuestion(q))
       expect(dapSo, x.qid).not.toBeNull()
@@ -82,16 +86,35 @@ describe('BẤT BIẾN trên kho thật (D1 15/10): câu phần III vào kênh n
   it('đáp án chữ / công thức / nhiều số ở "phần III" (tự luận gắn nhầm) không vào kênh nhập số', () => {
     for (const c of ['a) proton và neutron; b) neutron; c) proton; d) electron', 'Mg: +12; O: +8', 'AlCl₃', 'Cl mạnh hơn I', 'Sulfur (S)'])
       expect(laCauTuLuan(cauIII('X-III-1', 'X', c)), c).toBe(true)
-    for (const x of KHO.dai) if (dapSoGoPhim(x.c) === null) expect(laCauTuLuan(cauIII(x.qid, x.maDe, x.c)), x.qid).toBe(true)
+    for (const x of KHO.dai) if (dapSoGoPhim(x.c) === null) expect(ngoaiKenh(cauIII(x.qid, x.maDe, x.c)), x.qid).toBe(true)
   })
   it('528 đáp án ≤ 4 kí tự trong kho: không câu nào bị chặn thêm, đều 4 ô và gõ đủ', () => {
     for (const c of KHO.ngan) {
       const q = cauIII('Y-III-1', 'Y', c)
-      if (laCauTuLuan(q)) { expect(soOPhanIII(c), c).toBeNull(); continue }
+      expect(ngoaiKenhSo(q), c).toBe(laCauTuLuan(q)) // không câu ngắn nào bị chốt kênh số chặn thêm
+      if (laCauTuLuan(q)) continue
       expect(soOCuaCau(publicQuestion(q)), c).toBe(SO_O_PHIEU)
       const d = dapSoGoPhim(c)!
       expect(go(d), c).toBe(d)
     }
+  })
+})
+
+describe('chốt kênh nhập số ở kho game, luật tự luận chung giữ nguyên', () => {
+  it('nhập kho (normalizeBank): câu phần III cần hơn 8 ô mang cờ, không vào kênh học/game; câu 10000 và câu số thường không mang cờ', async () => {
+    const goi = { ma_de: 'KHO-SO-O', cau: [
+      { phan: 'III', so: 1, de: 'Tính số hạt.', dap_an: '123456789', kieu: 'bai_tap', muc_do: 'hieu' },
+      { phan: 'III', so: 2, de: 'Gấp bao nhiêu lần?', dap_an: '10000', kieu: 'bai_tap', muc_do: 'hieu' },
+      { phan: 'III', so: 3, de: 'Tính V (lít).', dap_an: '2,24', kieu: 'bai_tap', muc_do: 'hieu' },
+    ] }
+    const qs = await normalizeBank(goi as unknown as Record<string, unknown>, 'KHO-SO-O')
+    expect(qs.map((q) => laCauTuLuan(q))).toEqual([true, false, false])
+    expect(qs.map((q) => (q as { tuLuan?: boolean }).tuLuan === true)).toEqual([true, false, false])
+    expect(publicQuestion(qs[1]!).soO).toBe(TRAN_O); expect(publicQuestion(qs[2]!)).not.toHaveProperty('soO')
+  })
+  it('luật tự luận dùng chung KHÔNG đổi: số dài như 1.237.500.000 vẫn là trả lời ngắn ở các kênh khác (luật 30/09)', () => {
+    expect(laCauTuLuan(cauIII('Z-III-1', 'Z', '1.237.500.000'))).toBe(false)
+    expect(ngoaiKenhSo(cauIII('Z-III-1', 'Z', '1.237.500.000'))).toBe(true) // 10 chữ số > 8 ô ⇒ chỉ chặn ở kênh bàn phím số
   })
 })
 

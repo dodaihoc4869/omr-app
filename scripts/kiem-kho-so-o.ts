@@ -1,13 +1,13 @@
 // KIỂM KHO: câu Phần III đáp số DÀI HƠN 4 Ô PHIẾU (sửa lỗi 15/10 "10000 chỉ nhập được 1000"). CHỈ ĐỌC D1, không ghi gì.
 // In danh sách để thầy sửa đề về chuẩn 4 ô nếu muốn: (1) câu cần hơn 4 ô (máy chủ đã gửi kèm số ô, em gõ đủ được); (2) câu "phần III" số mà
-// bàn phím số không gõ được trong TRAN_O ô ⇒ đang bị chặn khỏi kênh nhập số (luật chung `laCauTuLuan`). Câu tự luận gắn nhầm phần III chỉ đếm.
+// bàn phím số không gõ được trong TRAN_O ô ⇒ bị chặn khỏi kênh nhập số (`ngoaiKenhSo`, chốt ở kho game). Câu tự luận gắn nhầm phần III chỉ đếm.
 // Chạy:  npm run kiem:kho-so-o            (gọi `wrangler d1 execute omr --remote`, cần đăng nhập wrangler)
 //        npm run kiem:kho-so-o -- --tep ket-qua-wrangler.json   (đọc tệp JSON `wrangler d1 execute --json` có sẵn, không gọi mạng)
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { lyDoTuLuan } from '../src/lib/cau-tu-luan'
-import { SO_O_PHIEU, TRAN_O, dapSoGoPhim, soOPhanIII } from '../src/lib/so-o-tra-loi-ngan'
+import { SO_O_PHIEU, TRAN_O, dapSoGoPhim, ngoaiKenhSo, soOPhanIII } from '../src/lib/so-o-tra-loi-ngan'
 
 const SQL = "SELECT ma_de, qid, json_extract(json,'$.correct') AS c, json_extract(json,'$.tuLuan') AS tl FROM game_v2_question WHERE json_extract(json,'$.phan')='III' ORDER BY ma_de, qid"
 type Dong = { ma_de: string; qid: string; c: string | null; tl: number | null }
@@ -26,13 +26,12 @@ const canHon4: string[] = [], chan: string[] = []
 let tuLuan = 0, vao = 0
 for (const x of dong) {
   const c = String(x.c ?? '')
-  const ly = lyDoTuLuan({ qid: x.qid, maDe: x.ma_de, phan: 'III', correct: c, ...(x.tl ? { tuLuan: true } : {}) })
+  // Cờ `tuLuan` của chỉ mục có thể do chính chốt kênh số gắn lúc nhập kho ⇒ xét luật chung KHÔNG kèm cờ, rồi chốt kênh số.
+  const ly = lyDoTuLuan({ qid: x.qid, maDe: x.ma_de, phan: 'III', correct: c })
   const soO = soOPhanIII(c)
-  if (ly) {
-    if (ly.startsWith('phần III đáp số không nhập được')) chan.push(`${x.qid}\t${x.ma_de}\t${JSON.stringify(c)}\tgõ ${JSON.stringify(dapSoGoPhim(c))}`)
-    else tuLuan++
-    continue
-  }
+  if (ly) { tuLuan++; continue }
+  if (ngoaiKenhSo({ phan: 'III', correct: c })) { chan.push(`${x.qid}\t${x.ma_de}\t${JSON.stringify(c)}\tgõ ${JSON.stringify(dapSoGoPhim(c))}`); continue }
+  if (x.tl) { tuLuan++; continue } // nhãn tự luận của kho (kieu tu_luan)
   vao++
   if (soO !== null && soO > SO_O_PHIEU) canHon4.push(`${x.qid}\t${x.ma_de}\t${JSON.stringify(c)}\tgõ ${dapSoGoPhim(c)}\t${soO} ô`)
 }

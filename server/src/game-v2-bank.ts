@@ -1,5 +1,6 @@
 import { docNhanKhoHanhTrinh } from '../../src/lib/hanh-trinh-nhan'
 import {laCauTuLuan} from '../../src/lib/cau-tu-luan'
+import { ngoaiKenhSo } from '../../src/lib/so-o-tra-loi-ngan'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuSongSinhTheoQid } from './song-sinh-game'
 import { laQidChanDoan } from './lam-lai-so'
@@ -49,7 +50,9 @@ export async function normalizeBank(raw:Row,maDe:string):Promise<PrivateQuestion
       // 30/09 luật tự luận chặt: nhãn tự luận của kho (`kieu: 'tu_luan'` ⇒ `tuLuan`) đi theo câu vào chỉ mục/pool; `laCauTuLuan(q)` đọc cờ này
       // (câu phần III đáp án không phải một số thì hàm dùng chung tự nhận ra từ `correct`). Không đổi version/nhóm nội dung.
       // 30/09: chỉ mục TỰ MANG cờ khi luật dùng chung cũng xem câu là tự luận (vd. phần III đáp án là công thức) ⇒ kế hoạch ngày (`docMetaCau`) đọc một cột, không cần đoán lại.
-      if(c.tuLuan===true||laCauTuLuan(q))(q as PrivateQuestion&{tuLuan?:boolean}).tuLuan=true
+      // 15/10 CHỐT LÚC NHẬP KHO (lỗi "10000 chỉ nhập được 1000"): câu phần III mà bàn phím số không gõ đủ đáp số trong số ô tối đa (`ngoaiKenhSo`)
+      // cũng mang cờ ⇒ không vào kênh học/game nào đọc chỉ mục này. Luật tự luận dùng chung KHÔNG đổi.
+      if(c.tuLuan===true||laCauTuLuan(q)||ngoaiKenhSo(q))(q as PrivateQuestion&{tuLuan?:boolean}).tuLuan=true
       q.group=await contentGroup(q);q.version=await versionCau(q);result.push(q)
     }
   }

@@ -48,3 +48,12 @@ export function soOCuaCau(q: { soO?: unknown } | null | undefined): number {
   const n = Number(q?.soO)
   return Number.isInteger(n) && n > SO_O_PHIEU && n <= TRAN_O ? n : SO_O_PHIEU
 }
+
+/**
+ * CHỐT CHẶN KÊNH NHẬP SỐ (15/10): câu Phần III mà bàn phím số KHÔNG gõ được đủ đáp số trong `TRAN_O` ô ⇒ không vào kênh học/game (màn làm bài
+ * của em). Chỉ dùng cho kho game (`normalizeBank` lúc nhập kho, `currentQuestion` lúc phát/chấm) — KHÔNG đổi luật tự luận dùng chung `laCauTuLuan`
+ * (luật 30/09 của thầy: số như "1.237.500.000" vẫn là trả lời ngắn ở các kênh khác). Kho thật 15/10: 0 câu bị chặn.
+ */
+export function ngoaiKenhSo(q: { phan?: unknown; correct?: unknown }): boolean {
+  return q.phan === 'III' && soOPhanIII(q.correct) === null
+}
