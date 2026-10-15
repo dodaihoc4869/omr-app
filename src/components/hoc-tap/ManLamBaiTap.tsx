@@ -8,7 +8,7 @@ import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
-import { chuDanhSachCau, chuThoiGian, coChuSo, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
+import { chuDanhSachCau, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
@@ -26,6 +26,14 @@ export function propsCauHoc(q: Cau, stt: number, value: string, onChange: (v: st
 }
 /** Đủ điều kiện bấm "Nộp câu" ở màn luyện: `duTraLoi` + Phần III có ít nhất một chữ số (không nộp "-" hay "," trơn). */
 export const nopDuoc = (phan: string, value: string) => duTraLoi(phan, value) && (phan !== 'III' || coChuSo(value))
+
+/** Khung cuộn gần nhất chứa màn (cổng học sinh: lớp bọc `fixed inset-0 overflow-y-auto`); không có ⇒ null (cuộn cả trang). */
+function khungCuonCua(el: HTMLElement): HTMLElement | null {
+  for (let p: HTMLElement | null = el; p; p = p.parentElement) {
+    if (/(auto|scroll|overlay)/.test(getComputedStyle(p).overflowY) && p.scrollHeight > p.clientHeight) return p
+  }
+  return null
+}
 
 type TT = 'dung' | 'sai' | 'ho-tro' | 'dang' | 'cho'
 const CHU_TT: Record<TT, string> = { dung: 'tự làm đúng', sai: 'sai', 'ho-tro': 'có hỗ trợ', dang: 'đang làm', cho: 'chưa làm' }
@@ -102,6 +110,19 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // Sang câu mới / vừa có kết quả ⇒ đưa màn về đầu (dải kết quả, đề) — em không phải tự vuốt ngược. Trình đọc màn hình: tiêu đề "Câu x/y" và dải
   // kết quả tự đọc (aria-live / role=status); có kết quả thì con trỏ bàn phím sang nút chính "Câu tiếp theo" (Enter = đi tiếp), không vẽ viền khi em chạm.
   const veDau = () => gocRef.current?.scrollIntoView?.({ block: 'start' })
+  // Trả lời ngắn (15/10, việc văn phòng a254c6118c6b): màn nhỏ, câu dài ⇒ thanh đáy (bàn phím số) che hàng ô. Em BẤM PHÍM (phím số của app hoặc phím
+  // máy tính) mà hàng ô còn dưới thanh ⇒ cuộn khung cuộn vừa đủ để hàng ô nằm trên thanh 12 px (`cuonDeThayO`). Lúc mở câu không cuộn (em đọc đề
+  // trước). Màn rộng: hàng ô nằm trong cột phải (không ở thân) hoặc thanh không chồng ngang ⇒ không cuộn.
+  const keoOVaoTam = () => {
+    const goc = gocRef.current
+    const hang = goc?.querySelector('.ht2-lam-than .ht2-lam-o-hang'), thanh = goc?.querySelector('.ht2-lam-day')
+    if (!goc || !hang || !thanh) return
+    const top = cuonDeThayO(hang.getBoundingClientRect(), thanh.getBoundingClientRect())
+    if (top <= 0) return
+    const behavior: ScrollBehavior = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    const khung = khungCuonCua(goc)
+    if (khung) khung.scrollBy({ top, behavior }); else window.scrollBy({ top, behavior })
+  }
   const daMo = useRef(false)
   // Thầy 13/10: em hỏi Thầy (AI gợi hướng) lúc đang làm câu ⇒ lần nộp câu đó là "có trợ giúp" (như Gợi ý).
   const daHoiThay = useRef('')
@@ -162,7 +183,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
       const p = phimTuBanPhim(e.key)
       if (!p) return
-      e.preventDefault(); doiTra(nhanPhim(traRef.current, p, soORef.current))
+      e.preventDefault(); doiTra(nhanPhim(traRef.current, p, soORef.current)); keoOVaoTam()
     }
     window.addEventListener('keydown', f)
     return () => window.removeEventListener('keydown', f)
@@ -213,7 +234,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         <button type="button" className="ht2-lam-nut ht2-lam-nut-chinh" onClick={() => setTuLam(true)} disabled={nop}>Tự làm câu này</button>
       </div>
     : q.phan === 'II' ? <><div className="ht2-lam-hang-ban-do"><BanDoY value={tra} />{nutGoiY}</div>{nutNop}</>
-    : q.phan === 'III' ? <><BanPhimSo value={tra} khoa={nop} soO={soO} onPhim={(p: PhimSo) => doiTra(nhanPhim(tra, p, soO))} /><div className="ht2-lam-hang-nop" data-goi-y={!!nutGoiY || undefined}>{nutGoiY}{nutNop}</div></>
+    : q.phan === 'III' ? <><BanPhimSo value={tra} khoa={nop} soO={soO} onPhim={(p: PhimSo) => { doiTra(nhanPhim(tra, p, soO)); keoOVaoTam() }} /><div className="ht2-lam-hang-nop" data-goi-y={!!nutGoiY || undefined}>{nutGoiY}{nutNop}</div></>
     : <div className="ht2-lam-hang-nop" data-goi-y={!!nutGoiY || undefined}>{nutGoiY}{nutNop}</div>
 
   // Dải kết quả sau khi nộp: máy tính ⇒ đầu cột phải, ngay trên các phương án đã tô (điện thoại xoay ngang: giữ trên đề cho cột phải vừa một màn).
