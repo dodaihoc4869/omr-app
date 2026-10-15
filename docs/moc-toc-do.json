@@ -1,21 +1,21 @@
 {
- "ghiChu": "Mốc tốc độ (luật thầy 13/10: sửa xong phải nhanh bằng/hơn). Đo trên bản đang chạy thật 81f13983. mayChu: số đợt chờ D1 nối tiếp + số lệnh D1 trên đường trả lời (tests/toc-do-may-chu-lenh-nong-1310.test.ts). taiApp: byte nén phải tải để mở từng app (scripts/kiem-toc-do-tai.mjs). Mốc CHỈ HẠ, không nâng. HẠ taiApp 13/10 (Hỏi thầy ở mọi câu: hộp thoại, khung lời giải, nút chữa từng bước tách mảnh nạp khi bấm). HẠ mayChu 14/10 (câu nghi đáp án Gói 7 đọc chung đợt song song, cổng lúc phát dùng lại: sảnh 36→35, 10→9; mở chặng 16→15 lệnh).",
+ "ghiChu": "Mốc tốc độ (luật thầy 13/10: sửa xong phải nhanh bằng/hơn). Đo trên bản đang chạy thật 81f13983. mayChu: số đợt chờ D1 nối tiếp + số lệnh D1 trên đường trả lời (tests/toc-do-may-chu-lenh-nong-1310.test.ts). taiApp: byte nén phải tải để mở từng app (scripts/kiem-toc-do-tai.mjs). Mốc CHỈ HẠ, không nâng. HẠ taiApp 13/10 (Hỏi thầy ở mọi câu: hộp thoại, khung lời giải, nút chữa từng bước tách mảnh nạp khi bấm). HẠ mayChu 14/10 (câu nghi đáp án Gói 7 đọc chung đợt song song, cổng lúc phát dùng lại: sảnh 36→35, 10→9; mở chặng 16→15 lệnh). HẠ mayChu 15/10 Gói R (DDL gửi sớm song song, ghi dồn cuối lô, đọc lại dòng thắng cùng lô, kho câu / β / danh mục gom đợt, việc phụ đi đường ghi riêng): sảnh lần đầu 29/35→13/26, lần sau 6/9→5/7, mở chặng 10/15→6/13, nộp câu 9/12→7/9.",
  "mayChu": {
   "sanh-lan-dau": {
-   "dot": 29,
-   "lenh": 35
+   "dot": 13,
+   "lenh": 26
   },
   "sanh-lan-sau": {
-   "dot": 6,
-   "lenh": 9
+   "dot": 5,
+   "lenh": 7
   },
   "mo-chang": {
-   "dot": 10,
-   "lenh": 15
+   "dot": 6,
+   "lenh": 13
   },
   "nop-cau": {
-   "dot": 9,
-   "lenh": 12
+   "dot": 7,
+   "lenh": 9
   },
   "dem-hom-nay": {
    "dot": 1,
