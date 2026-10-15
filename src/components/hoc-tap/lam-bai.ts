@@ -2,37 +2,39 @@
 // (không React, không DOM) để test kỹ: bàn phím số của ô Trả lời ngắn, số "đã làm/M câu hôm nay" lấy từ Sảnh, chữ phản hồi sau khi nộp.
 import type { KetQuaSanh } from '../hoa2/api'
 import { DAU_AM, coPhay, doiDau, laAm } from '../../lib/nhap-dap-so'
+import { SO_O_PHIEU } from '../../lib/so-o-tra-loi-ngan'
 
-// ───────────────────────────── Ô TRẢ LỜI NGẮN: 4 ô như phiếu + bàn phím số riêng ─────────────────────────────
+// ───────────────────────────── Ô TRẢ LỜI NGẮN: 4 ô như phiếu (hoặc số ô máy chủ gửi kèm câu) + bàn phím số riêng ─────────────────────────────
 
-/** Phiếu Phần III có 4 ô: mỗi chữ số, dấu phẩy, dấu trừ chiếm một ô. */
-export const TOI_DA_KY_TU = 4
+/** Phiếu Phần III có 4 ô: mỗi chữ số, dấu phẩy, dấu trừ chiếm một ô. Câu đáp số dài hơn (vd "10000") máy chủ gửi kèm `soO` (`soOCuaCau`). */
+export const TOI_DA_KY_TU = SO_O_PHIEU
 export type PhimSo = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | ',' | '-' | 'xoa' | 'xoa-het'
 export const LA_CHU_SO = (p: PhimSo) => p.length === 1 && p >= '0' && p <= '9'
 
 /**
  * Một lần bấm phím → chuỗi mới. ĐÚNG quy ước của ô đáp số cũ (`OSoTraLoi chuanViet` + `src/lib/nhap-dap-so.ts`): dấu âm là "-" (U+002D) ở ĐẦU số,
  * dấu thập phân là "," và chỉ MỘT dấu; không tự chuẩn hoá thêm (em bấm gì gửi nấy, máy chủ chấm bằng `khopPhanIII`).
- *  · chữ số / "," nối vào cuối khi còn chỗ (≤ 4 kí tự); "," chỉ khi chưa có dấu thập phân;
- *  · "-" BẬT/TẮT dấu âm ở đầu (bấm "1" rồi "−" ⇒ "-1", bấm lại ⇒ "1"); thêm dấu mà vượt 4 kí tự ⇒ giữ nguyên;
+ *  · chữ số / "," nối vào cuối khi còn chỗ (≤ `soO` kí tự, mặc định 4); "," chỉ khi chưa có dấu thập phân;
+ *  · "-" BẬT/TẮT dấu âm ở đầu (bấm "1" rồi "−" ⇒ "-1", bấm lại ⇒ "1"); thêm dấu mà vượt `soO` kí tự ⇒ giữ nguyên;
  *  · "xoa" xoá một kí tự cuối; "xoa-het" xoá hết.
+ * 15/10 (em Lê Công: đáp án 10000 chỉ nhập được 1000): `soO` = số ô của CÂU (máy chủ gửi kèm khi đáp số dài hơn 4 kí tự).
  */
-export function nhanPhim(v: string, phim: PhimSo): string {
+export function nhanPhim(v: string, phim: PhimSo, soO: number = TOI_DA_KY_TU): string {
   const s = String(v ?? '')
   if (phim === 'xoa') return s.slice(0, -1)
   if (phim === 'xoa-het') return ''
   if (phim === '-') {
     const moi = doiDau(s)
-    return laAm(s) || moi.length <= TOI_DA_KY_TU ? moi : s
+    return laAm(s) || moi.length <= soO ? moi : s
   }
-  if (s.length >= TOI_DA_KY_TU) return s
+  if (s.length >= soO) return s
   if (phim === ',') return coPhay(s) ? s : s + ','
   return s + phim
 }
 
 /** Phím này bấm có đổi được gì không (để làm mờ phím hết tác dụng). */
-export function phimCoTacDung(v: string, phim: PhimSo): boolean {
-  return nhanPhim(v, phim) !== String(v ?? '')
+export function phimCoTacDung(v: string, phim: PhimSo, soO: number = TOI_DA_KY_TU): boolean {
+  return nhanPhim(v, phim, soO) !== String(v ?? '')
 }
 
 /** Phím của máy tính → phím của bàn phím số (gõ số trên máy tính vẫn nhập được). Không phải phím của ô ⇒ null. */

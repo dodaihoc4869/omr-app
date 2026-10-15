@@ -3,6 +3,7 @@
 //   ?man=lam13            chặng 2 (đã làm 6/24 câu hôm nay): 3 trắc nghiệm · 1 đúng–sai · 1 trắc nghiệm · 1 trả lời ngắn (số câu đúng bản vẽ)
 //   ?man=lam13&lam=g7     câu mới của bài (Gói 7 ngày): chặng 3 · câu 1/6 · "Câu này em chọn làm thế nào?" (đã làm 12/24)
 //   ?man=lam13&lam=ds-dau đúng–sai đứng đầu (kịch bản vuốt: ý d + nút cuối phải tới được bằng vuốt)
+//   ?man=lam13&lam=so-o   15/10: câu trả lời ngắn đáp số "10000" (máy chủ gửi kèm `soO: 8`) rồi câu 4 ô thường — soát 8 ô vừa màn 340 px
 const thamSo = new URLSearchParams(location.search)
 export const LA_LAM13 = thamSo.get('man') === 'lam13'
 const kieu = thamSo.get('lam') ?? ''
@@ -35,7 +36,13 @@ const CAU_G7: CauGia[] = [
     loiGiai: { chot: 'n(aniline) = 4,65 : 93 = 0,05 mol = n(muối).', buoc: ['C6H5NH2 + HCl → C6H5NH3Cl', 'm(muối) = 0,05 × 129,5 = 6,475 ≈ 6,48 gam'] } },
   ...CAU.slice(0, 5).map((c, i) => ({ ...c, qid: `G${i + 2}` })),
 ]
-const ds = kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : CAU
+// 15/10 (lỗi em Lê Công): câu thật DH-10-C1-B1-III-18 — đáp số 5 kí tự, máy chủ gửi số ô 8 (`publicQuestion`), không gửi đáp án.
+const CAU_SO_O: CauGia[] = [
+  { ...nen, qid: 'DH-10-C1-B1-III-18', maDe: 'DH-10-C1-B1', phan: 'III', tenDang: 'Cấu tạo nguyên tử', soO: 8, choices: [], ideas: [], dapAn: '10000',
+    text: 'Phóng đại nguyên tử Gold lên 1 tỉ lần thì đường kính nguyên tử khoảng 30 cm, đường kính hạt nhân khoảng 0,003 cm. Đường kính nguyên tử lớn gấp bao nhiêu lần đường kính hạt nhân?',
+    loiGiai: { chot: '30 : 0,003 = 10000. Nguyên tử lớn gấp khoảng 10000 lần hạt nhân.' } },
+]
+const ds = kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? [...CAU_SO_O, CAU[5]!] : CAU
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
 

@@ -27,6 +27,7 @@ import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
 import { publicQuestion, type PrivateQuestion } from '../src/game/than-thu-v2/core'
 import { khopPhanIII } from '../src/lib/cham-so'
+import { dinhTriKhoa } from '../src/lib/cham-so-policy'
 import { laCauTuLuan } from '../src/lib/cau-tu-luan'
 import { docSoPhanIII } from '../src/lib/doc-so-phan-iii'
 import { gameV2 } from '../server/src/game-v2'
@@ -52,6 +53,10 @@ const TU_LUAN_THAT = ['a) proton và neutron; b) neutron; c) proton; d) electron
 /** Dạng em GÕ được bằng bàn phím số (chữ số, một dấu phẩy, dấu trừ đầu) của một đáp án — số thập phân chính xác, null nếu không đọc được thành số. */
 function dangBanPhim(dapAn: string): string | null {
   if (/^-?\d+(,\d+)?$/.test(dapAn)) return dapAn
+  // Lập trình 15/10: khoá ×10ⁿ ⇒ em gõ ĐỊNH TRỊ (luật chấm 01/10 trong cham-so.ts: "1,2375×10⁹ kJ" ghi "1,2375" là đúng — ô số không gõ được ×10ⁿ).
+  // Vẫn phải qua `khopPhanIII(go, dapAn)` ở dưới, nên không nới hành vi: dạng gõ nào máy chủ chấm sai thì vẫn đỏ.
+  const dinhTri = dinhTriKhoa(dapAn)
+  if (dinhTri && /^-?\d+(,\d+)?$/.test(dinhTri)) return dinhTri
   const so = docSoPhanIII(dapAn)?.so
   return so && /^-?\d+(\.\d+)?$/.test(so) ? so.replace('.', ',') : null
 }
