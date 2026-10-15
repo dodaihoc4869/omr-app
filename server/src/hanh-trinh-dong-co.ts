@@ -1,10 +1,10 @@
 // Điểm nối ba cỗ máy: chỉ kế hoạch Hành trình, không đổi chấm điểm/EXP/ca thi.
-import { boChonV5, docChienDichDay, type BoChonV5 } from './hanh-trinh-v5-d1'
+import { boChonV5, danhMuc, docChienDichDay, type BoChonV5 } from './hanh-trinh-v5-d1'
 import { ghiDoV6, docChonV6, docMoHinhV6 } from './hanh-trinh-v6-d1'
 import type { MoHinhV6 } from './hanh-trinh-v6-mo-hinh'
 import { SQL_HT6 } from './hanh-trinh-v6-schema'
 import { SQL_HANH_TRINH_V5 } from './hanh-trinh-v5-schema'
-import { docNhom, type PhanNhom } from './hanh-trinh-do-luong'
+import { docNhom, docDauVaoNhom, type PhanNhom } from './hanh-trinh-do-luong'
 import type { Env, D1Result, D1PreparedStatement } from './kieu'
 import { dbGoc } from './cau-hinh-dem'
 import type { HoSo2 } from './srs2-d1'
@@ -84,6 +84,8 @@ export interface DocTruocDongCo {
   so:Promise<Map<string,SuKienOmni[]>>; allowed:Promise<D1Result<{khoa:string}>>; xacNhan:Promise<D1Result<XacNhanThay>>
   offers:Promise<D1Result<Row>>; stats:Promise<D1Result<BangBandit>>; rewards:Promise<D1Result<{do_receipt:string}>>
   moHinh:Promise<MoHinhV6|null>; nhom:Promise<PhanNhom|null>; chonV6:Promise<D1Result<Row>>|null; emCu:Promise<DongDongCoCu|null>|null
+  /** Gói R 15/10: em CHƯA có nhóm thử nghiệm (lần đầu) ⇒ đầu vào phân nhóm đọc NGAY sau lượt đọc nhóm (trước: nối tiếp sau danh mục — một đợt riêng); có nhóm ⇒ null, không đọc. */
+  vaoNhom:Promise<Awaited<ReturnType<typeof docDauVaoNhom>>>|null
   /** Hai lượt đọc theo hồ sơ (β câu của `hs.cau`, dòng chiến dịch của `hs.chienDich`) — khoá theo đúng tham số; lệch ⇒ bắt đầu lại cho đúng tham số. */
   theoHoSo?:TheoHoSoDongCo
 }
@@ -93,7 +95,8 @@ export function docTruocDongCo(env:Env,sbd:string,now:number,ghi=true):DocTruocD
   const ddl=som(chayDdlMotLan(env,'hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH))
   const sau=<T,>(f:()=>Promise<T>):Promise<T>=>som(ddl.then(f))
   const ddl5=som(chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)), ddl6=ghi?som(chayDdlMotLan(env,'hanh_trinh_v6',SQL_HT6)):null
-  return { sbd, now, ghi, ddl,
+  const nhom=som(ddl5.then(()=>docNhom(env,sbd)))
+  return { sbd, now, ghi, ddl, nhom, vaoNhom:ghi?som(nhom.then(n=>n?null:docDauVaoNhom(env,sbd,now))):null,
     so:sau(()=>docSuKienOmni(env,[sbd])),
     allowed:sau(()=>env.DB.prepare(`SELECT khoa FROM su_kien_hoc WHERE sbd=? AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')})) AND (nguon<>'luyen' OR EXISTS(SELECT 1 FROM luyen_de_2026 ld WHERE ld.id=su_kien_hoc.ma_nguon AND ld.sbd=su_kien_hoc.sbd AND ld.status='submitted') OR EXISTS(SELECT 1 FROM omni_de_thu dt WHERE dt.id=substr(su_kien_hoc.ma_nguon,8) AND su_kien_hoc.ma_nguon LIKE 'de_thu:%' AND dt.sbd=su_kien_hoc.sbd AND dt.nop_luc IS NOT NULL AND dt.nop_luc<=?))`).bind(sbd,new Date(now).toISOString()).all<{khoa:string}>()),
     xacNhan:sau(()=>env.DB.prepare('SELECT sbd,ma_dang AS maDang,ket,luc FROM omni_xac_nhan WHERE sbd=? AND luc<=?').bind(sbd,new Date(now).toISOString()).all<XacNhanThay>()),
@@ -101,7 +104,6 @@ export function docTruocDongCo(env:Env,sbd:string,now:number,ghi=true):DocTruocD
     stats:sau(()=>env.DB.prepare(`SELECT context,cach,SUM(CASE WHEN ket_qua=1 THEN 1 ELSE 0 END) dung,SUM(CASE WHEN ket_qua=0 THEN 1 ELSE 0 END) sai FROM hanh_trinh_v4_can_thiep WHERE do_luc>=? AND ket_qua IS NOT NULL GROUP BY context,cach`).bind(now-90*86400000).all<BangBandit>()),
     rewards:sau(()=>env.DB.prepare('SELECT do_receipt FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND do_receipt IS NOT NULL').bind(sbd).all<{do_receipt:string}>()),
     moHinh:som(docMoHinhV6(env)),
-    nhom:som(ddl5.then(()=>docNhom(env,sbd))),
     chonV6:ddl6?som(ddl6.then(()=>docChonV6(env,sbd,now))):null,
     emCu:ghi?sau(()=>env.DB.prepare(`SELECT cap_nhat_luc,json_extract(mo_hinh_json,'$.bamCanh') AS bam_canh,json_extract(mo_hinh_json,'$.canhLuc') AS canh_luc FROM hanh_trinh_v4_em WHERE sbd=?`).bind(sbd).first<DongDongCoCu>()):null,
   }
@@ -138,6 +140,10 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const events=(so.get(sbd)??[]).filter(e=>hopLe.has(e.khoa) && e.receivedAt<=now)
   const ids=[...new Set([...hs.cau.map(c=>c.qid),...events.map(e=>e.qid)])]
   const [rawQ,metaCu]=await Promise.all([qCuaCau(env,ids),docMetaCau(env,ids.filter(q=>!hs.meta.has(q)))])
+  // Gói R 15/10: danh mục của bộ chọn v5 (chỉ phụ thuộc hồ sơ + dòng chiến dịch, cùng đối số) bắt đầu NGAY đây, CÙNG đợt với cạnh lớp — trước: nối tiếp sau cạnh
+  // lớp (một đợt D1 riêng khi đệm danh mục lạnh / đến hạn hỏi dấu kho). Bắt đầu SAU ma trận Q của động cơ ⇒ đệm câu đã ấm, danh mục không đọc lại các câu ấy.
+  // Lỗi: `som` giữ, nổi lên đúng chỗ bộ chọn `await` như cũ.
+  const dsSom=som(chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5).then(()=>danhMuc(env,hs,now,th.full)))
   const q=new Map<string,QCau>()
   for(const [id,c] of rawQ) {
     const m=hs.meta.get(id)??metaCu.get(id)
@@ -163,7 +169,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   }
   // Lệnh ghi mức kỹ năng v5 đi CHUNG lô ghi cuối (đợt 18) khi chắc lô ấy được dựng (`hs.chienDich` có — lô cần mã chiến dịch); không thì ghi ngay như cũ.
   const ghiTre:D1PreparedStatement[]=[]
-  const v5=await boChonV5(env,sbd,now,hs,q,qs,graph,omni,b,ghi,new Set(events.map(e=>e.contentGroup||q.get(e.qid)?.contentGroup||e.qid)),{moHinh:t.moHinh,nhom:t.nhom,full:th.full,...(ghi&&hs.chienDich?{ghiTre}:{})})
+  const v5=await boChonV5(env,sbd,now,hs,q,qs,graph,omni,b,ghi,new Set(events.map(e=>e.contentGroup||q.get(e.qid)?.contentGroup||e.qid)),{moHinh:t.moHinh,nhom:t.nhom,...(t.vaoNhom?{vaoNhom:t.vaoNhom}:{}),full:th.full,ds:dsSom,...(ghi&&hs.chienDich?{ghiTre}:{})})
   out.v5=v5;for(const id of v5.chan)out.chan.add(id)
   if(v5.nhom==='B')out.trongSo={...out.trongSo,...v5.trongSo}
   // Hai hành động đều là câu thật, chưa gặp, thuộc tầng đã mở. Không rút video/học liệu tưởng tượng.

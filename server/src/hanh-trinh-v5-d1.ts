@@ -84,12 +84,16 @@ export interface BoChonV5 { tang:Map<string,1|2|3|4>;chan:Set<string>;chanDoan:S
  * nghiệm (một đợt) ⇒ ghi mức kỹ năng (một đợt) — ba đợt D1 nối tiếp. Nay động cơ bắt đầu ba lượt đọc từ đầu (mỗi lượt vẫn SAU lệnh tạo bảng của nó) và
  * `ghiTre` nhận lệnh ghi `hanh_trinh_v5_muc` để động cơ gửi CHUNG lô ghi cuối (không lệnh đọc nào sau đó đụng bảng này). Vắng ⇒ y như cũ.
  */
-export interface TruocBoChonV5 { moHinh?:Promise<MoHinhV6|null>; nhom?:Promise<PhanNhom|null>; full?:Promise<DongChienDichDay|null>; ghiTre?:D1PreparedStatement[] }
+export interface TruocBoChonV5 { moHinh?:Promise<MoHinhV6|null>; nhom?:Promise<PhanNhom|null>; full?:Promise<DongChienDichDay|null>; ghiTre?:D1PreparedStatement[]
+  /** Gói R 15/10: đầu vào phân nhóm lần đầu động cơ đã đọc trước (`docDauVaoNhom`) — vắng ⇒ phân nhóm tự đọc như cũ. */
+  vaoNhom?:Promise<{ten_lop:string;lop:string;diem:number|null}|null>
+  /** Gói R 15/10: lượt `danhMuc(env,hs,now,full)` động cơ đã bắt đầu sớm (cùng đối số) — vắng ⇒ đọc như cũ. */
+  ds?:Promise<CauDanhMuc[]> }
 export async function boChonV5(env:Env,sbd:string,now:number,hs:HoSo2,q:ReadonlyMap<string,QCau>,qs:readonly QuanSatHanhTrinh[],graph:DoThiHanhTrinh,omni:HoSoOmniEm,beta:ReadonlyMap<string,number>,ghi:boolean,daGap:ReadonlySet<string>=new Set(),truoc:TruocBoChonV5={}):Promise<BoChonV5>{
   await chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)
-  const [ds,model]=await Promise.all([danhMuc(env,hs,now,truoc.full),truoc.moHinh??docMoHinhV6(env)]),byId=new Map(ds.map(c=>[c.qid,c])),m=mucKyNang(qs,graph)
+  const [ds,model]=await Promise.all([truoc.ds??danhMuc(env,hs,now,truoc.full),truoc.moHinh??docMoHinhV6(env)]),byId=new Map(ds.map(c=>[c.qid,c])),m=mucKyNang(qs,graph)
   const phamVi=maPhamVi(hs,ds)
-  const nhom=await phanNhom(env,sbd,now,phamVi,ghi,truoc.nhom),danh=ds.flatMap(c=>vknCaCau(c.q).map(vkn=>({vkn,tang:c.tang})))
+  const nhom=await phanNhom(env,sbd,now,phamVi,ghi,truoc.nhom,truoc.vaoNhom),danh=ds.flatMap(c=>vknCaCau(c.q).map(vkn=>({vkn,tang:c.tang})))
   const out:BoChonV5={tang:new Map(),chan:new Set(),chanDoan:new Set(),chon:{},ungNgoai:[],vai:{},trongSo:{},phut:{},phamVi,nhom:nhom?.nhom??'B',tienDo:tienDoMuc(danh,m),soL4:0,soChanDoan:0}
   const blocked=new Map<string,{parents:{vkn:string;tang:number}[];targets:string[]}>()
   for(const c of ds){const missing=thieuTheoCau(c.q,c.tang,m,omni,c.nhan);if(!missing.length)continue
