@@ -192,6 +192,8 @@ export default defineConfig({
           '**/{HoiThemThay,hoi-them-thay,hoi-them-thay-api}-*.{js,css}',
           // Khung mở sau khi lấy lời giải từ máy chủ; mảnh này dùng kho chạy-lúc hiện có.
           '**/{KhungLoiGiai,ThanhThangGo}-*.js',
+          // Đường /hoi-thay (15/10) chạy trong iframe trang bài làm và KHÔNG đăng ký service worker (main.tsx): mảnh riêng của nó không cất sẵn.
+          '**/{HoiThayScreen,hoi-thay-goc}-*.{js,css}',
           // Kiểm tra riêng cần máy chủ để mở chặng/lưu giờ: chỉ tải khi đến lịch, cất ở kho chạy-lúc.
           '**/{ManKiemTraCaNhan,TheKiemTraCaNhan,TheKiemTraCon}-*.{js,css}',
           '**/kiem-tra-ca-nhan-*.css',

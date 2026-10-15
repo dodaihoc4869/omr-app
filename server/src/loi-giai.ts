@@ -92,6 +92,14 @@ export function uuTienCau(c: CauKho, dang: DangLoiGiai): number {
 // ---------------------------------------------------------------- móc nạp đề
 
 /**
+ * GÓI NGOÀI KHO (15/10, đường /hoi-thay): câu của trang bài làm văn phòng không có trong kho đề app ⇒ văn phòng đẩy gói R2 `kho/TL-<mã>.json`
+ * (cùng khuôn gói kho, KHÔNG có dòng de_kho nên không hiện trong kho của thầy). Nút Hỏi thầy đọc được câu qua qid `TL-<mã>-<phần>-<số>`, nhưng
+ * câu này KHÔNG BAO GIỜ vào hàng soạn lời giải (loi_giai_viec): không lẫn vào hàng duyệt của thầy. Chặn tường minh ở đây, không trông vào
+ * luật tự luận (`-TL`) vô tình loại nó.
+ */
+export const laGoiNgoaiKho = (maDe: string): boolean => maDe.startsWith('TL-')
+
+/**
  * GHI CÂU CỦA MỘT GÓI ĐỀ VÀO HÀNG LỜI GIẢI. Gọi từ `dayDeKho` (mọi đường nạp đề đi qua đó) và từ `/kho/loi-giai/nap-hang` (lấp kho cũ).
  * Câu mới hoặc đổi nội dung (băm mới, chưa có hồ sơ) ⇒ vào hàng; câu trùng đề khác ⇒ dùng chung hồ sơ, không soạn lại.
  */
@@ -113,7 +121,7 @@ export async function ghiCauVaoHang(env: Env, maDe: string, goi: unknown): Promi
        ON CONFLICT(qid) DO UPDATE SET bam=excluded.bam, ma_de=excluded.ma_de, dang=excluded.dang, lop=excluded.lop, bo=excluded.bo, cap_nhat_luc=excluded.cap_nhat_luc`,
     ).bind(c.qid, bam, maDe, dang, lop, bo, nay))
     laViec.push(false)
-    if (bamDaCo.has(bam)) continue
+    if (laGoiNgoaiKho(maDe) || bamDaCo.has(bam)) continue
     bamDaCo.add(bam)
     lenh.push(env.DB.prepare(
       `INSERT INTO loi_giai_viec (bam, qid, ma_de, dang, lop, bo, tang, uu_tien, trang_thai, so_lan, tao_luc)
@@ -594,7 +602,7 @@ export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: str
     const luc = new Date(nay).toISOString()
     const ghiHet = (async () => {
       const ghi = [env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,?)').bind(sbd, qid, nguon, luc, hoSo ? 1 : 0)]
-      if (!hoSo) {
+      if (!hoSo && !laGoiNgoaiKho(ht.c.maDe)) {
         // Câu học sinh hỏi mà chưa có hồ sơ ⇒ lên đầu hàng soạn (mục 5.6: câu học sinh cần). Chưa vào hàng thì xếp cả đề ngay.
         const coViec = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_viec WHERE bam = ?').bind(ht.bam).first<Obj>()
         if (!coViec) await ghiCauVaoHang(env, ht.c.maDe, await docGoi(env, ht.c.maDe)).catch(() => null)
