@@ -71,7 +71,8 @@ export const SCHEMA_TRA_LOI = {
     nhanBiet: { type: 'ARRAY', items: { type: 'OBJECT', properties: { thuoc: S, hien: HIEN, chu: S, nhom: S }, required: ['thuoc', 'hien', 'nhom'] } },
     phuongTrinh: { type: 'ARRAY', items: { type: 'OBJECT', properties: { pt: S, dk: S, chinh: S }, required: ['pt'] } },
     tinh: { type: 'OBJECT', properties: { dong: DS, dapSo: S } },
-    bay: { type: 'OBJECT', properties: { tieuDe: { type: 'STRING', format: 'enum', enum: ['Bẫy hay nhầm', 'Chỗ em nhầm'] }, chu: S } },
+    // ĐO 15/10 (sổ 284 lượt): khối toàn chữ/số KHÔNG khai `required` ⇒ bản lite trả {} (bay 0 lượt từ 14/10), khối có `required` thì điền ⇒ luôn khai.
+    bay: { type: 'OBJECT', properties: { tieuDe: { type: 'STRING', format: 'enum', enum: ['Bẫy hay nhầm', 'Chỗ em nhầm'] }, chu: S }, required: ['tieuDe', 'chu'] },
   },
   required: ['lienQuan', 'yChinh'],
   // `bay` ngay sau ý chính (đo 14/10: 0/99 câu trả lời có ô bẫy khi đứng gần cuối) — máy em vẫn vẽ theo thứ tự cố định của mình.
@@ -93,11 +94,11 @@ const INT = { type: 'INTEGER' } as const
 const PHAN_MOI: Obj = {
   soSanh: { type: 'ARRAY', items: { type: 'OBJECT', properties: { em: S, dung: S, lech: BOOL }, required: ['em', 'dung'] } },
   nac: { type: 'ARRAY', items: { type: 'OBJECT', properties: { ten: S, chu: S, khoi: { type: 'STRING', format: 'enum', enum: ['khong', 'thiNghiem', 'nhanBiet', 'soDo'] } }, required: ['ten', 'chu'] } },
-  xepHang: { type: 'OBJECT', properties: { tieuChi: S, chat: { type: 'ARRAY', items: { type: 'OBJECT', properties: { ct: S, ten: S }, required: ['ct'] } }, hoi: INT, nguongSau: INT, nguongTren: S, nguongDuoi: S } },
+  xepHang: { type: 'OBJECT', properties: { tieuChi: S, chat: { type: 'ARRAY', items: { type: 'OBJECT', properties: { ct: S, ten: S }, required: ['ct'] } }, hoi: INT, nguongSau: INT, nguongTren: S, nguongDuoi: S }, required: ['tieuChi', 'chat'] },
   hinhDung: { type: 'STRING', format: 'enum', enum: [...HINH_DUNG] },
-  doiChieu: { type: 'OBJECT', properties: { a: S, b: S, dong: { type: 'ARRAY', items: { type: 'OBJECT', properties: { tieuChi: S, a: S, b: S }, required: ['tieuChi', 'a', 'b'] } } } },
+  doiChieu: { type: 'OBJECT', properties: { a: S, b: S, dong: { type: 'ARRAY', items: { type: 'OBJECT', properties: { tieuChi: S, a: S, b: S }, required: ['tieuChi', 'a', 'b'] } } }, required: ['a', 'b', 'dong'] },
   lyDoY: { type: 'ARRAY', items: { type: 'OBJECT', properties: { y: { type: 'STRING', format: 'enum', enum: ['a', 'b', 'c', 'd'] }, lyDo: S }, required: ['y', 'lyDo'] } },
-  buocThu: { type: 'OBJECT', properties: { buoc: INT, hoi: S, dap: S, goiYSai: S } },
+  buocThu: { type: 'OBJECT', properties: { buoc: INT, hoi: S, dap: S, goiYSai: S }, required: ['buoc', 'hoi', 'dap'] },
   kiemLai: { type: 'OBJECT', properties: { hoi: S, lua: DS, dung: INT, vi: S, goiYSai: S }, required: ['hoi', 'lua', 'dung'] },
   chuaHieu: DS,
 }
@@ -113,7 +114,9 @@ const PHAN_KHUON: Record<Khuon, string[]> = {
 export function schemaChoKhuon(k: Khuon) {
   const ten = ['lienQuan', 'yChinh', ...PHAN_KHUON[k]]
   const nguon = SCHEMA_TRA_LOI.properties as unknown as Obj
-  return { type: 'OBJECT', properties: Object.fromEntries(ten.map((t) => [t, nguon[t] ?? PHAN_MOI[t]])), required: ['lienQuan', 'yChinh'], propertyOrdering: ten }
+  // Chỉ chỗ sai: máy chủ chỉ chọn khi đã có bài em ⇒ "Chỗ em nhầm" luôn có nội dung ⇒ bắt buộc (đo 15/10: 0/5 lượt có khi để tuỳ chọn).
+  const batBuoc = k === 'cho-sai' ? ['lienQuan', 'yChinh', 'bay'] : ['lienQuan', 'yChinh']
+  return { type: 'OBJECT', properties: Object.fromEntries(ten.map((t) => [t, nguon[t] ?? PHAN_MOI[t]])), required: batBuoc, propertyOrdering: ten }
 }
 /** Dòng gửi kèm DỮ LIỆU CÂU: khuôn máy chủ đã chọn + phần BẮT BUỘC của khuôn đó. */
 export const CHI_DAN_KHUON: Record<Khuon, string> = {
@@ -219,6 +222,8 @@ export function lamSachCauTruc(o: Obj, dangLam: boolean, chan?: (t: string) => s
 }
 
 const chuanSo = (t: string) => t.replace(/\s+/g, '').replace('.', ',')
+/** Đáp số Em thử: chỉ giữ CON SỐ. Đuôi đơn vị toàn chữ ("0,16 mol", "3,97 L", "80%") bỏ đi; đuôi có chữ số ("2×10^-3") giữ nguyên để bị loại. */
+const soThu = (t: string) => { const s = chuanSo(t).replace(/^[≈~=]/, ''); const m = /^(-?\d+(?:,\d+)?)[\p{L}%°/]*$/u.exec(s); return m ? m[1]! : s }
 const gon = (t: string) => t.toLowerCase().replace(/<[^>]*>/g, '').replace(/[^\p{L}\p{N}]+/gu, '')
 /** Làm sạch phần v3; `so` = số phần có được. Em đang làm ⇒ chỉ chuaHieu, nac, hinhDung (không phần nào chứa đáp án / so với đáp án). */
 function lamSachV3(o: Obj, dangLam: boolean, loc: (t: string) => string, soBuoc: number, bo?: BoiCanhKhuon) {
@@ -264,7 +269,7 @@ function lamSachV3(o: Obj, dangLam: boolean, loc: (t: string) => string, soBuoc:
   }
   // EM THỬ TÍNH một bước giữa: đáp số chỉ là số.
   const bt = o.buocThu && typeof o.buocThu === 'object' ? (o.buocThu as Obj) : null
-  const btDap = bt ? chuanSo(str(bt.dap)) : ''
+  const btDap = bt ? soThu(str(bt.dap)) : ''
   if (bt && Number.isInteger(Number(bt.buoc)) && Number(bt.buoc) >= 1 && Number(bt.buoc) <= soBuoc && /^-?\d+(?:,\d+)?$/.test(btDap) && o1(bt.hoi, 120)) {
     k.buocThu = { buoc: Number(bt.buoc), hoi: o1(bt.hoi, 120), dap: btDap, goiYSai: o1(bt.goiYSai, 140) }
     k.so++
