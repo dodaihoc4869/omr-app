@@ -3,7 +3,9 @@
 //   ?man=lam13            chặng 2 (đã làm 6/24 câu hôm nay): 3 trắc nghiệm · 1 đúng–sai · 1 trắc nghiệm · 1 trả lời ngắn (số câu đúng bản vẽ)
 //   ?man=lam13&lam=g7     câu mới của bài (Gói 7 ngày): chặng 3 · câu 1/6 · "Câu này em chọn làm thế nào?" (đã làm 12/24)
 //   ?man=lam13&lam=ds-dau đúng–sai đứng đầu (kịch bản vuốt: ý d + nút cuối phải tới được bằng vuốt)
-//   ?man=lam13&lam=so-o   15/10: câu trả lời ngắn đáp số "10000" (máy chủ gửi kèm `soO: 8`) rồi câu 4 ô thường — soát 8 ô vừa màn 340 px
+//   ?man=lam13&lam=so-o   15/10: số ô = đúng số kí tự đáp số (thầy 15/10 ~10:25): câu amine "24" (2 ô) · "6,48" (4 ô) · "10000" (5 ô)
+import { soOPhanIII } from '../../../src/lib/so-o-tra-loi-ngan'
+
 const thamSo = new URLSearchParams(location.search)
 export const LA_LAM13 = thamSo.get('man') === 'lam13'
 const kieu = thamSo.get('lam') ?? ''
@@ -36,13 +38,20 @@ const CAU_G7: CauGia[] = [
     loiGiai: { chot: 'n(aniline) = 4,65 : 93 = 0,05 mol = n(muối).', buoc: ['C6H5NH2 + HCl → C6H5NH3Cl', 'm(muối) = 0,05 × 129,5 = 6,475 ≈ 6,48 gam'] } },
   ...CAU.slice(0, 5).map((c, i) => ({ ...c, qid: `G${i + 2}` })),
 ]
-// 15/10 (lỗi em Lê Công): câu thật DH-10-C1-B1-III-18 — đáp số 5 kí tự, máy chủ gửi số ô 8 (`publicQuestion`), không gửi đáp án.
+// 15/10: số ô = đúng số kí tự đáp số (máy chủ tính bằng `soOPhanIII` trong `publicQuestion`, chỉ gửi con số). Câu amine "24" là câu trong ảnh thầy gửi
+// (12-C3-B8-D2 câu III.7); câu thật DH-10-C1-B1-III-18 đáp số "10000" (lỗi em Lê Công sáng 15/10).
 const CAU_SO_O: CauGia[] = [
-  { ...nen, qid: 'DH-10-C1-B1-III-18', maDe: 'DH-10-C1-B1', phan: 'III', tenDang: 'Cấu tạo nguyên tử', soO: 8, choices: [], ideas: [], dapAn: '10000',
+  { ...nen, qid: '12-C3-B8-D2-III-7', maDe: '12-C3-B8-D2', phan: 'III', tenDang: 'Tính base của amine', choices: [], ideas: [], dapAn: '24',
+    text: 'Cho các chất sau:\n(1) ammonia,\n(2) methylamine,\n(3) aniline,\n(4) dimethylamine.\n\nLiệt kê các chất theo số thứ tự tăng dần có lực base mạnh hơn ammonia?',
+    loiGiai: { chot: 'Amine béo (methylamine, dimethylamine) có lực base mạnh hơn ammonia; aniline yếu hơn ammonia. Đáp án: 24.' } },
+  { ...nen, qid: 'SO-O-648', maDe: 'BAI8-AMINE', phan: 'III', tenDang: 'Muối của amine', choices: [], ideas: [], dapAn: '6,48',
+    text: 'Cho 4,65 gam aniline tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là bao nhiêu gam? (Làm tròn đến hàng phần trăm.)',
+    loiGiai: { chot: 'n(aniline) = 4,65 : 93 = 0,05 mol = n(muối).', buoc: ['C6H5NH2 + HCl → C6H5NH3Cl', 'm(muối) = 0,05 × 129,5 = 6,475 ≈ 6,48 gam'] } },
+  { ...nen, qid: 'DH-10-C1-B1-III-18', maDe: 'DH-10-C1-B1', phan: 'III', tenDang: 'Cấu tạo nguyên tử', choices: [], ideas: [], dapAn: '10000',
     text: 'Phóng đại nguyên tử Gold lên 1 tỉ lần thì đường kính nguyên tử khoảng 30 cm, đường kính hạt nhân khoảng 0,003 cm. Đường kính nguyên tử lớn gấp bao nhiêu lần đường kính hạt nhân?',
     loiGiai: { chot: '30 : 0,003 = 10000. Nguyên tử lớn gấp khoảng 10000 lần hạt nhân.' } },
 ]
-const ds = kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? [...CAU_SO_O, CAU[5]!] : CAU
+const ds = kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
 
@@ -51,7 +60,8 @@ let daNop = 0
 const DAU = kieu === 'g7' ? 12 : 6
 export const soHomNayLam13 = () => ({ daLam: DAU + daNop, muc: 24, chang: Math.floor(DAU / 6) + 1, soChang: 4 })
 
-const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => q
+// Như `publicQuestion`: câu Phần III kèm số ô = đúng số kí tự đáp số (chỉ con số), không kèm đáp án.
+const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => { const n = q.phan === 'III' ? soOPhanIII(_d) : null; return n === null ? q : { ...q, soO: n } }
 const so = (v: string) => Number(String(v).replace(',', '.'))
 /** Trả lời các lệnh `/game-v2/hoc-tap-*` + `answer` của màn làm bài; lệnh khác ⇒ null (bộ giả chung lo). */
 export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<string, unknown> | null {

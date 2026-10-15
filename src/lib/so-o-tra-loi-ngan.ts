@@ -1,7 +1,8 @@
 // SỐ Ô TRẢ LỜI NGẮN THEO TỪNG CÂU (sửa lỗi 15/10, em Lê Công báo: câu DH-10-C1-B1-III-18 đáp án "10000" mà màn làm bài chỉ cho 4 ô ⇒ em chỉ
 // nhập được "1000" và bị chấm sai; từ bản dot13 12/10 mọi lượt ở 42 câu đáp số dài hơn 4 kí tự đều bị cắt như vậy).
-// Phiếu Phần III mặc định 4 ô. Câu nào đáp số chuẩn dài hơn 4 kí tự thì máy chủ gửi kèm SỐ Ô (chỉ con số `TRAN_O`, KHÔNG gửi đáp án, không lộ độ
-// dài) để bàn phím số nhận đủ. Mọi phép ở đây THUẦN để test kỹ và dùng chung cho máy chủ (phát câu, nhập kho) lẫn máy học sinh.
+// Thầy 15/10 ~10:25 (ảnh câu amine đáp án "24" mà màn hiện 4 ô): "tuỳ vào đáp án mà hiển thị đúng số ô cần điền nhé" ⇒ SỐ Ô = ĐÚNG số kí tự của đáp số
+// gõ chuẩn (`dapSoGoPhim`): "24" ⇒ 2 ô, "7,5" ⇒ 3, "10000" ⇒ 5 (thay mức cố định 4 / 8 ô của bản sáng 15/10). Máy chủ gửi kèm mọi câu Phần III gõ được CHỈ con
+// số ô, KHÔNG gửi đáp án. Câu thiếu số ô (gói cũ) ⇒ 4 ô như phiếu. Mọi phép ở đây THUẦN để test kỹ và dùng chung cho máy chủ (phát câu, nhập kho) lẫn máy học sinh.
 import { khopPhanIII, soKhopSo } from './cham-so'
 import { chuanHoaSoNhap, dinhTriKhoa, tachSoVaDonVi } from './cham-so-policy'
 
@@ -35,18 +36,19 @@ export function dapSoGoPhim(correct: unknown): string | null {
 }
 
 /**
- * Số ô cho câu Phần III: đáp số gõ ≤ 4 kí tự ⇒ 4 như phiếu; dài hơn ⇒ `TRAN_O` ô — MỘT MỨC CỐ ĐỊNH chứ không đúng bằng độ dài, để số ô không lộ đáp số
- * có mấy kí tự (em gõ "1000" mà thấy đúng 5 ô là đoán ra mình sai). Không gõ được hoặc cần hơn `TRAN_O` ô ⇒ null (câu KHÔNG vào kênh nhập số).
+ * Số ô cho câu Phần III = ĐÚNG số kí tự đáp số gõ chuẩn (1..`TRAN_O`; thầy 15/10: "tuỳ vào đáp án mà hiển thị đúng số ô cần điền"). Không gõ được hoặc
+ * cần hơn `TRAN_O` ô ⇒ null (câu KHÔNG vào kênh nhập số).
  */
 export function soOPhanIII(correct: unknown): number | null {
   const x = dapSoGoPhim(correct)
-  return x === null || x.length > TRAN_O ? null : x.length > SO_O_PHIEU ? TRAN_O : SO_O_PHIEU
+  return x === null || x.length > TRAN_O ? null : x.length
 }
 
-/** Số ô máy học sinh dùng: số máy chủ gửi kèm câu (4 < n ≤ TRAN_O) hoặc 4 như phiếu. Giá trị lạ ⇒ 4. */
+/** Số ô máy học sinh dùng: số máy chủ gửi kèm câu (số nguyên 1..TRAN_O) hoặc 4 như phiếu khi thiếu. Giá trị lạ ⇒ 4. */
 export function soOCuaCau(q: { soO?: unknown } | null | undefined): number {
-  const n = Number(q?.soO)
-  return Number.isInteger(n) && n > SO_O_PHIEU && n <= TRAN_O ? n : SO_O_PHIEU
+  const v = q?.soO
+  const n = typeof v === 'number' || typeof v === 'string' ? Number(v) : NaN
+  return Number.isInteger(n) && n >= 1 && n <= TRAN_O ? n : SO_O_PHIEU
 }
 
 /**

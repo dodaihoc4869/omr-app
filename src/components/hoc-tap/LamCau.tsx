@@ -176,9 +176,10 @@ export function ChonTracNghiem({ q, value, onChon, khoa }: { q: Question; value:
   )
 }
 
-// ───────────────────────────── TRẢ LỜI NGẮN · 4 ô như phiếu (hoặc số ô của câu) + bàn phím số ─────────────────────────────
+// ───────────────────────────── TRẢ LỜI NGẮN · đúng số ô của câu (thiếu ⇒ 4 như phiếu) + bàn phím số ─────────────────────────────
 
-/** Bốn ô như phiếu; câu đáp số dài hơn ⇒ `soO` ô máy chủ gửi kèm (ô co lại cho vừa màn). Đáp án cũ dài hơn vẫn hiện đủ. Ô đang nhập viền nét đứt.
+/** `soO` ô = đúng số kí tự đáp số máy chủ gửi kèm (thầy 15/10; 1–4 ô giữ cỡ ô phiếu 58 px, hơn 4 ô co lại cho vừa màn); thiếu ⇒ 4 như phiếu.
+ *  Đáp án cũ dài hơn vẫn hiện đủ. Ô đang nhập viền nét đứt.
  *  KHÔNG có ô nhập ⇒ không bật bàn phím điện thoại. */
 export function OPhieu({ value, ket, soO = TOI_DA_KY_TU }: { value: string; ket?: 'dung' | 'sai' | 'trung'; soO?: number }) {
   const so = Math.max(soO, value.length)
@@ -276,7 +277,7 @@ export function PhanHoiTracNghiem({ q, tra, dapAn }: { q: Question; tra: string;
   )
 }
 
-/** Trả lời ngắn sau khi nộp: các ô (4 hoặc số ô của câu) với đáp án của em + dòng "Em trả lời … · đáp án …". */
+/** Trả lời ngắn sau khi nộp: các ô (số ô của câu, thiếu ⇒ 4) với đáp án của em + dòng "Em trả lời … · đáp án …". */
 export function PhanHoiTraLoiNgan({ tra, dapAn, dung, soO }: { tra: string; dapAn: string; dung: boolean; soO?: number }) {
   const ket = !tra ? 'trung' : dung ? 'dung' : 'sai'
   return (

@@ -5,6 +5,8 @@
 // không xuống máy em; (3) BẤT BIẾN trên kho thật (D1 15/10, tests/fixtures/kho-phan3-so-o-1510.json): mọi câu phần III vào kênh nhập số gõ ĐỦ đáp số
 // trong số ô máy chủ gửi; câu đáp án chữ (tự luận gắn nhầm phần III) và đáp số không gõ được không vào kênh nhập số (chốt ở kho game lúc nhập kho
 // `normalizeBank` + lúc phát `currentQuestion`; luật tự luận dùng chung `laCauTuLuan` KHÔNG đổi).
+// CẬP NHẬT 15/10 ~10:30 theo lệnh thầy ("tuỳ vào đáp án mà hiển thị đúng số ô cần điền", ảnh câu "24" hiện 4 ô): số ô = ĐÚNG số kí tự đáp số gõ chuẩn,
+// bỏ mức cố định 4 / 8 ô. Các ca khẳng định "câu ≤ 4 kí tự không có soO", "mọi câu dài cùng 8 ô" đổi theo luật mới; luật mới khoá ở so-o-dung-do-dai-1510.
 /** Câu KHÔNG vào kênh nhập số của màn làm bài: tự luận (luật chung) hoặc bàn phím số không gõ đủ (chốt kênh số). */
 const ngoaiKenh = (q: PrivateQuestion) => laCauTuLuan(q) || ngoaiKenhSo(q)
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -31,14 +33,14 @@ const cauIII = (qid: string, maDe: string, correct: string, them: Partial<Privat
 const go = (chuoi: string, soO?: number) => [...chuoi].reduce((v, c) => nhanPhim(v, c as PhimSo, soO), '')
 
 describe('nguyên nhân gốc và cách sửa (phép thuần)', () => {
-  it('câu DH-10-C1-B1-III-18: máy chủ gửi 8 ô (mức cố định, không lộ độ dài), em gõ đủ 10000; không có số ô thì vẫn 4 như phiếu', () => {
+  it('câu DH-10-C1-B1-III-18: máy chủ gửi 5 ô (đúng số kí tự, thầy 15/10), em gõ đủ 10000; không có số ô thì vẫn 4 như phiếu', () => {
     const q = cauIII('DH-10-C1-B1-III-18', 'DH-10-C1-B1', '10000')
     const pub = publicQuestion(q) as unknown as Record<string, unknown>
-    expect(pub.soO).toBe(TRAN_O)
+    expect(pub.soO).toBe(5)
     expect(pub).not.toHaveProperty('correct'); expect(pub).not.toHaveProperty('solution')
-    expect(JSON.stringify(pub)).not.toContain('10000') // chỉ con số 8, không lộ đáp án
-    // mọi câu dài hơn 4 kí tự cùng MỘT số ô ⇒ số ô không cho biết đáp số dài mấy kí tự
-    expect(new Set(['10000', '6724,2', '13507,3', '-96,9', '1,2375×10⁹ kJ'].map(soOPhanIII))).toEqual(new Set([TRAN_O]))
+    expect(JSON.stringify(pub)).not.toContain('10000') // chỉ con số ô, không lộ đáp án
+    // số ô = đúng số kí tự đáp số gõ chuẩn (thầy 15/10 ~10:25 thay mức cố định 8)
+    expect(['10000', '6724,2', '13507,3', '-96,9', '1,2375×10⁹ kJ'].map(soOPhanIII)).toEqual([5, 6, 7, 5, 6])
     expect(go('10000', soOCuaCau(pub))).toBe('10000')
     expect(go('10000')).toBe('1000') // hành vi cũ khi thiếu số ô (bản trước sửa) — đúng lỗi em báo
     // phím máy tính đi cùng phép
@@ -49,16 +51,17 @@ describe('nguyên nhân gốc và cách sửa (phép thuần)', () => {
     expect(khopPhanIII('10000', q.correct)).toBe(true); expect(grade(q, '10000')).toBe(true)
     expect(khopPhanIII('1000', q.correct)).toBe(false); expect(grade(q, '1000')).toBe(false)
   })
-  it('câu ≤ 4 kí tự: KHÔNG thêm trường số ô (4 ô như phiếu); phần I/II không có số ô', () => {
-    for (const c of ['1234', '-1,5', '0,54', '7', '25%', '0,1 mol', '1,76.10⁻⁵']) expect(publicQuestion(cauIII('q', 'd', c))).not.toHaveProperty('soO')
+  it('câu ≤ 4 kí tự: số ô = đúng số kí tự đáp số gõ (thầy 15/10, trước là "không thêm trường, 4 ô"); phần I/II không có số ô', () => {
+    const SO = [['1234', 4], ['-1,5', 4], ['0,54', 4], ['7', 1], ['25%', 2], ['0,1 mol', 3], ['1,76.10⁻⁵', 4]] as const
+    for (const [c, n] of SO) expect((publicQuestion(cauIII('q', 'd', c)) as { soO?: number }).soO, c).toBe(n)
     const tn = { ...cauIII('q1', 'd', 'A'), phan: 'I' as const, choices: ['a', 'b', 'c', 'd'] }
     expect(publicQuestion(tn)).not.toHaveProperty('soO')
-    expect(soOCuaCau({})).toBe(SO_O_PHIEU); expect(soOCuaCau({ soO: 3 })).toBe(SO_O_PHIEU); expect(soOCuaCau({ soO: 99 })).toBe(SO_O_PHIEU); expect(soOCuaCau({ soO: '6' })).toBe(6)
+    expect(soOCuaCau({})).toBe(SO_O_PHIEU); expect(soOCuaCau({ soO: 3 })).toBe(3); expect(soOCuaCau({ soO: 99 })).toBe(SO_O_PHIEU); expect(soOCuaCau({ soO: '6' })).toBe(6)
   })
   it('đáp số gõ: số mũ ⇒ định trị, đơn vị viết theo bị bỏ, phân cách nghìn gộp; không gõ được ⇒ null', () => {
-    expect(dapSoGoPhim('1,2375×10⁹ kJ')).toBe('1,2375'); expect(soOPhanIII('1,2375×10⁹ kJ')).toBe(TRAN_O)
+    expect(dapSoGoPhim('1,2375×10⁹ kJ')).toBe('1,2375'); expect(soOPhanIII('1,2375×10⁹ kJ')).toBe(6)
     expect(dapSoGoPhim('≈ 6724,2 kJ')).toBe('6724,2'); expect(dapSoGoPhim('0.54')).toBe('0,54'); expect(dapSoGoPhim('1.237.500')).toBe('1237500')
-    expect(dapSoGoPhim('-96,9')).toBe('-96,9'); expect(soOPhanIII('-96,9')).toBe(TRAN_O); expect(soOPhanIII('-9,6')).toBe(SO_O_PHIEU)
+    expect(dapSoGoPhim('-96,9')).toBe('-96,9'); expect(soOPhanIII('-96,9')).toBe(5); expect(soOPhanIII('-9,6')).toBe(4)
     for (const c of ['AlCl₃', 'Na mạnh hơn Mg', 'p = 8; n = 8', '', '13,1 g; 14,1 g']) expect(soOPhanIII(c)).toBeNull()
     expect(soOPhanIII('123456789')).toBeNull() // cần hơn TRAN_O ô
   })
@@ -88,14 +91,16 @@ describe('BẤT BIẾN trên kho thật (D1 15/10): câu phần III vào kênh n
       expect(laCauTuLuan(cauIII('X-III-1', 'X', c)), c).toBe(true)
     for (const x of KHO.dai) if (dapSoGoPhim(x.c) === null) expect(ngoaiKenh(cauIII(x.qid, x.maDe, x.c)), x.qid).toBe(true)
   })
-  it('528 đáp án ≤ 4 kí tự trong kho: không câu nào bị chặn thêm, đều 4 ô và gõ đủ', () => {
+  it('528 đáp án ≤ 4 kí tự trong kho: không câu nào bị chặn thêm, số ô = đúng số kí tự đáp số gõ (1–4) và gõ đủ, chấm đúng', () => {
     for (const c of KHO.ngan) {
       const q = cauIII('Y-III-1', 'Y', c)
       expect(ngoaiKenhSo(q), c).toBe(laCauTuLuan(q)) // không câu ngắn nào bị chốt kênh số chặn thêm
       if (laCauTuLuan(q)) continue
-      expect(soOCuaCau(publicQuestion(q)), c).toBe(SO_O_PHIEU)
-      const d = dapSoGoPhim(c)!
-      expect(go(d), c).toBe(d)
+      const d = dapSoGoPhim(c)!, soO = soOCuaCau(publicQuestion(q))
+      expect(soO, c).toBe(d.length)
+      expect(soO, c).toBeLessThanOrEqual(SO_O_PHIEU)
+      expect(go(d, soO), c).toBe(d)
+      expect(khopPhanIII(go(d, soO), c), c).toBe(true)
     }
   })
 })
@@ -110,7 +115,7 @@ describe('chốt kênh nhập số ở kho game, luật tự luận chung giữ 
     const qs = await normalizeBank(goi as unknown as Record<string, unknown>, 'KHO-SO-O')
     expect(qs.map((q) => laCauTuLuan(q))).toEqual([true, false, false])
     expect(qs.map((q) => (q as { tuLuan?: boolean }).tuLuan === true)).toEqual([true, false, false])
-    expect(publicQuestion(qs[1]!).soO).toBe(TRAN_O); expect(publicQuestion(qs[2]!)).not.toHaveProperty('soO')
+    expect(publicQuestion(qs[1]!).soO).toBe(5); expect(publicQuestion(qs[2]!).soO).toBe(4)
   })
   it('luật tự luận dùng chung KHÔNG đổi: số dài như 1.237.500.000 vẫn là trả lời ngắn ở các kênh khác (luật 30/09)', () => {
     expect(laCauTuLuan(cauIII('Z-III-1', 'Z', '1.237.500.000'))).toBe(false)
@@ -119,26 +124,26 @@ describe('chốt kênh nhập số ở kho game, luật tự luận chung giữ 
 })
 
 describe('màn làm bài: gõ đủ 10000, gửi đúng "10000"', () => {
-  const TLN5 = { maDe: 'DH-10-C1-B1', version: 'v1', group: 'g', hinhAnh: [], dang: null, tenDang: 'Cấu tạo nguyên tử', mucDo: 'hieu', sao: 0, kienThuc: [], qid: 'DH-10-C1-B1-III-18', phan: 'III' as const, text: 'Hạt nhân nhỏ hơn nguyên tử bao nhiêu lần?', choices: [], ideas: [], soO: 8 }
+  const TLN5 = { maDe: 'DH-10-C1-B1', version: 'v1', group: 'g', hinhAnh: [], dang: null, tenDang: 'Cấu tạo nguyên tử', mucDo: 'hieu', sao: 0, kienThuc: [], qid: 'DH-10-C1-B1-III-18', phan: 'III' as const, text: 'Hạt nhân nhỏ hơn nguyên tử bao nhiêu lần?', choices: [], ideas: [], soO: 5 }
   const moMan = (cau: object[]) => {
     vi.mocked(goiHoa2).mockResolvedValueOnce({ ok: true, id: 'p1', questions: cau })
     return render(<ManLamBaiTap token="tk" sbd="10000" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 0, muc: 6, chang: 1, soChang: 1 }} />)
   }
-  it('bàn phím số: 8 ô, phím 0 thứ năm vẫn bấm được, nộp gửi "10000"', async () => {
+  it('bàn phím số: 5 ô, phím 0 thứ năm vẫn bấm được, nộp gửi "10000"', async () => {
     moMan([TLN5])
     const phim = within(await screen.findByRole('group', { name: 'Bàn phím số' }))
     for (const p of ['1', '0', '0', '0', '0']) fireEvent.click(phim.getByRole('button', { name: p }))
-    expect(document.querySelectorAll('.ht2-lam-o')).toHaveLength(8)
+    expect(document.querySelectorAll('.ht2-lam-o')).toHaveLength(5)
     expect(screen.getByRole('button', { name: /Nộp câu · 10000/ })).toBeTruthy()
     vi.mocked(goiHoa2).mockResolvedValueOnce({ ok: true, correct: true, answer: '10000', solution: 'x' })
     fireEvent.click(screen.getByRole('button', { name: /Nộp câu · 10000/ }))
     await waitFor(() => expect(vi.mocked(goiHoa2).mock.calls.some(([lenh, , than]) => lenh === 'answer' && (than as { answer?: string }).answer === '10000')).toBe(true))
   })
-  it('đủ 8 kí tự thì phím số mờ, kí tự thứ 9 không vào', async () => {
+  it('đủ 5 kí tự thì phím số mờ, kí tự thứ 6 không vào', async () => {
     moMan([TLN5])
     const phim = within(await screen.findByRole('group', { name: 'Bàn phím số' }))
     for (let i = 0; i < 9; i++) fireEvent.click(phim.getByRole('button', { name: '9' }))
-    expect(screen.getByRole('button', { name: /Nộp câu · 99999999$/ })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Nộp câu · 99999$/ })).toBeTruthy()
     expect((phim.getByRole('button', { name: '9' }) as HTMLButtonElement).disabled).toBe(true)
   })
   it('phím máy tính: gõ 10000 ⇒ gửi "10000"', async () => {
