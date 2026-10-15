@@ -38,7 +38,7 @@ function tachDe(html: string): { chu: string; con: string } | null {
 }
 const LOAI_CAU = { tn: 'Trắc nghiệm', ds: 'Đúng / Sai', tln: 'Trả lời ngắn' } as const
 
-export default function HopHoiThay({ cau, qid = '', nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false }: { cau: CauChoKhung | null; qid?: string; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean }) {
+export default function HopHoiThay({ cau, qid = '', nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false, dapAnEm }: { cau: CauChoKhung | null; qid?: string; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean; dapAnEm?: string }) {
   const id = useId()
   const dongRef = useRef(onDong)
   dongRef.current = onDong
@@ -98,7 +98,7 @@ export default function HopHoiThay({ cau, qid = '', nguon, onDong, onTraLoi, onM
             <span>Xem lời giải từng bước</span>
           </button>
         )}
-        <HoiThemThay qid={cau?.qid ?? qid} nguon={nguon} hop dangLam={dangLam} choDe={!cau} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
+        <HoiThemThay qid={cau?.qid ?? qid} nguon={nguon} hop dangLam={dangLam} dapAnEm={dapAnEm} choDe={!cau} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
       </div>
     </div>,
     document.body,

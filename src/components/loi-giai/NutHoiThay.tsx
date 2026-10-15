@@ -36,8 +36,9 @@ function napSanHop() {
 export const CHU_DANG_SOAN = 'Thầy đang soạn lời giải từng bước cho câu này. Em chờ một chút rồi bấm lại nhé.'
 export { CHU_LAM_XONG }
 
-export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = false, chi }: {
-  qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean; dangLam?: boolean; chi?: 'hoi' | 'giai'
+/** `dapAnEm` (v3, 15/10): bài em đã nộp ("DSSD", "B", "8,2") ⇒ Thầy so bài em với lời giải, câu Đúng/Sai ghi "Em: …" từng ý. */
+export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = false, chi, dapAnEm }: {
+  qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean; dangLam?: boolean; chi?: 'hoi' | 'giai'; dapAnEm?: string
 }) {
   const [dangTai, setDangTai] = useState<'' | 'hoi' | 'giai'>('')
   const [loi, setLoi] = useState('')
@@ -45,10 +46,11 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
   const [hop, setHop] = useState<{ cau: CauChoKhung | null; dangLam: boolean } | null>(null)
   const luot = useRef(0) // lượt bấm hiện tại: em đóng hộp trong lúc chờ ⇒ phản hồi đến muộn không mở lại hộp
   const coPhien = !!qid && !!docTokenHs()
-  useEffect(() => { if (coPhien && chi !== 'giai') napSanHop() }, [coPhien, chi])
-  if (!qid || !coPhien) return null
   const coHoi = chi !== 'giai'
+  useEffect(() => { if (coPhien && coHoi) napSanHop() }, [coPhien, coHoi])
+  if (!qid || !coPhien) return null
   const coGiai = chi !== 'hoi' && !dangLam
+  const ban = dangTai !== ''
   const bam = async (kieu: 'hoi' | 'giai') => {
     const so = ++luot.current
     setDangTai(kieu)
@@ -70,13 +72,13 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
   return (
     <div className={lop}>
       {coHoi && (
-        <button type="button" className="lg-nut-hoi-thay" onClick={() => void bam('hoi')} disabled={dangTai !== ''} aria-haspopup="dialog">
+        <button type="button" className="lg-nut-hoi-thay" onClick={() => void bam('hoi')} disabled={ban} aria-haspopup="dialog">
           <MessageCircleQuestion aria-hidden="true" size={20} strokeWidth={2.2} />
           <span>{dangTai === 'hoi' ? 'Đang mở…' : 'Hỏi thầy'}</span>
         </button>
       )}
       {coGiai && (
-        <button type="button" className="lg-nut-loi-giai" onClick={() => void bam('giai')} disabled={dangTai !== ''}>
+        <button type="button" className="lg-nut-loi-giai" onClick={() => void bam('giai')} disabled={ban}>
           <BookOpenText aria-hidden="true" size={18} strokeWidth={2} />
           <span>{dangTai === 'giai' ? 'Đang mở…' : 'Lời giải từng bước'}</span>
         </button>
@@ -84,7 +86,7 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
       {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={qid} /></Suspense>}
       {loi && <span className="lg-loi" role="status">{loi}</span>}
       <Suspense fallback={null}>
-        {hop && <HopHoiThay cau={hop.cau} qid={qid} nguon={nguon} dangLam={hop.dangLam} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
+        {hop && <HopHoiThay cau={hop.cau} qid={qid} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
         {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
       </Suspense>
     </div>
