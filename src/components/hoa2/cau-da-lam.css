@@ -689,3 +689,5 @@
 .h2-cdl-ngang .h2-cdl-bai { flex: 0 1 340px; }
 /* Thẻ lọc ≥ 44 px cả trên máy tính (trước chỉ màn cảm ứng). */
 .h2-cdl-loc .tl-the { height: auto; min-height: 44px; }
+/* LỖI 15/10: "Tất cả các bài" có thể vài trăm câu ⇒ hiện từng trang, nút "Xem thêm N câu" giữa danh sách (lưới 2 cột màn rộng: trải cả hàng). */
+.h2-cdl-them { align-self: center; justify-self: center; grid-column: 1 / -1; flex-shrink: 0; margin: 4px auto 8px; }

@@ -131,13 +131,13 @@ describe('Câu đã làm (CauDaLam)', () => {
     expect(coTenThat({ id: 'cau-sai-ca-kiem-tra', ten: 'Câu sai trong ca kiểm tra' })).toBe(true)
   })
   it('chỉ còn MỘT bài ⇒ tiêu đề trơn "Bài 8 · Amine · 164 câu", không hộp chọn, không mã "#cd…", không Hành trình', async () => {
-    const { container } = moCdl([BAI8, MA, HT], [cau('A1', 'cd8', 'Amine bậc hai'), cau('H1', HT.id, 'Glucose')])
+    // Lỗi 15/10: em có câu ở Hành trình / "#cd…" thì có thêm mục "Tất cả các bài" (tests/cau-da-lam-tat-ca-1510) ⇒ ở đây mọi câu thuộc bài 8.
+    const { container } = moCdl([BAI8, MA, HT], [cau('A1', 'cd8', 'Amine bậc hai'), cau('A2', 'cd8', 'Amine bậc ba')])
     await screen.findByText('Amine bậc hai')
     expect(screen.queryByRole('combobox')).toBeNull()
     expect(container.querySelector('.h2-cdl-bai')!.textContent).toBe('Bài 8 · Amine · 164 câu')
     expect(container.textContent).not.toContain('#cd')
     expect(container.textContent).not.toContain('Hành trình')
-    expect(container.textContent).not.toContain('Glucose') // câu của mục đã bỏ không lẫn vào danh sách bài 8
   })
   it('không còn bài thật nào (chỉ Hành trình) ⇒ ẩn ô chọn nhưng danh sách câu vẫn chạy', async () => {
     const { container } = moCdl([HT], [cau('H1', HT.id, 'Glucose')])
