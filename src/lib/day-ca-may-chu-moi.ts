@@ -1,4 +1,3 @@
-import { gzipSync } from 'fflate'
 // ĐẨY CA, GÓI ĐỀ VÀ DANH SÁCH LỚP LÊN MÁY CHỦ MỚI — 11/09.
 //
 // VÌ SAO PHẢI CÓ TỆP NÀY: Worker có sẵn `/ca/day` từ đợt 2, nhưng KHÔNG tệp nào
@@ -426,6 +425,9 @@ async function guiGoiCa(
         const stream = new Response(bodyString).body!.pipeThrough(new CompressionStream('gzip'))
         body = new Uint8Array(await new Response(stream).arrayBuffer())
       } else if (typeof TextEncoder !== 'undefined') {
+        // fflate (≈ 3,6 KB nén) NẠP KHI CẦN (Gói C 15/10): chỉ trình duyệt cũ thiếu CompressionStream mới tới nhánh này — trước đây nó
+        // nằm trong mảnh chung cả 3 app tải lúc mở. Nạp hỏng ⇒ `catch` dưới, gửi chuỗi chưa nén như gói nhỏ.
+        const { gzipSync } = await import('fflate')
         const u8 = new TextEncoder().encode(bodyString)
         const compressed = gzipSync(u8)
         body = compressed

@@ -1,10 +1,21 @@
 // PHẦN NHẸ của minh hoạ thí nghiệm (máy yếu 29/09): dấu vân tay đề + hai minh hoạ đã duyệt (verified.ts) + bảng tra cảnh (expanded.ts).
 // KHÔNG kéo catalog.ts/scene.ts (≈ 77 KB) — phần đó nạp lười qua ExperimentDemo khi câu thật sự có cảnh. Nội dung dời nguyên văn từ render.ts.
+// Gói C 15/10 (app mở nhanh hơn): bảng tra cảnh expanded.ts (≈ 6 KB nén) cũng NẠP LƯỜI — trước nằm trong mảnh chung cả 3 app tải lúc mở.
+// Chưa nạp xong ⇒ coi như chưa có cảnh (câu có cảnh vốn đã hiện trống tới khi bộ vẽ về); hai minh hoạ đã duyệt không nằm trong bảng ⇒ vẫn vẽ ngay.
 import {EXPERIMENTS} from './verified'
-import {EXPANDED} from './expanded'
+type BangCanh=Record<string,string[]>
+let bangCanh:BangCanh|null=null
+let dangNapBang:Promise<BangCanh>|null=null
+/** Nạp bảng tra cảnh một lần; lỗi mạng ⇒ lần sau thử lại. */
+export function napBangCanh():Promise<BangCanh>{
+ if(bangCanh)return Promise.resolve(bangCanh)
+ return dangNapBang??=import('./expanded').then(m=>(bangCanh=m.EXPANDED)).catch(e=>{dangNapBang=null;throw e})
+}
+/** Bảng tra cảnh nếu đã nạp (null = chưa). */
+export function bangCanhDaNap():BangCanh|null{return bangCanh}
 export function experimentKey(text?:string):string{let a=2166136261,b=5381;for(const c of (text||'').normalize('NFC').replace(/\s+/g,' ').trim()){a=Math.imul(a^c.charCodeAt(0),16777619);b=Math.imul(b,33)^c.charCodeAt(0)}return `${a>>>0}-${b>>>0}`}
-/** Câu có cảnh minh hoạ trong catalog (cần nạp lười phần nặng)? */
-export function coCanhMinhHoa(text:string):boolean{return Boolean(EXPANDED[experimentKey(text)])}
+/** Câu có cảnh minh hoạ trong catalog (cần nạp lười phần nặng)? Tra trong bảng đã nạp (`napBangCanh`); chưa nạp ⇒ false. */
+export function coCanhMinhHoa(text:string,bang:BangCanh|null=bangCanh):boolean{return Boolean(bang?.[experimentKey(text)])}
 /** HTML của hai minh hoạ đã duyệt (NO₂ / Rutherford); không có ⇒ ''. */
 export function htmlMinhHoaNhe(text:string):string{
  const kind=EXPERIMENTS[experimentKey(text)];if(!kind)return ''
