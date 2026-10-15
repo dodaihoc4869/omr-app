@@ -40,7 +40,13 @@ import {LUAT_CAP_MOI,dangChoNgayV5,ngayConThieuLenCap,type TranV5,type TruocSiet
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
 import {cheDo2,docCoHoa2} from './srs2-d1'
 import {startDao2,startDao2CoVe,hoa2Action,LENH_HOA2} from './srs2-game'
-import {omniBat} from './omni-d1'
+import {omniBat,LENH_TAO_BANG_OMNI} from './omni-d1'
+import {guiDdlSom} from './ddl-mot-lan'
+import {SQL_GOI7} from './goi-bai-7-schema'
+import {SQL_DONG_CO_HANH_TRINH} from './hanh-trinh-dong-co-schema'
+import {SQL_HANH_TRINH_V5} from './hanh-trinh-v5-schema'
+import {SQL_HT6} from './hanh-trinh-v6-schema'
+import {lopCuaEm} from './bai-da-day'
 import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
 import {TRAN_CAU_DAO_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
@@ -300,19 +306,38 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   const cauDaLamSom=action==='hoa2-cau-da-lam'||action==='hoa2-cau-chi-tiet'?som(hoa2Action(env,sbd,action,b)):null
   return {sbd,hoSoSom,truocAnswer,truocComplete,cheDo2Som,cauDaLamSom}
 }
+/** Nhóm bảng (tạo lúc chạy) mà Sảnh / Mở chặng học tập cần: Gói 7, động cơ Hành trình v4/v5/v6, OMNI 3 — tên nhóm + lệnh ĐÚNG như nơi tạo của từng nhóm. */
+const DDL_LUOT_HOC:readonly (readonly [string,readonly string[]])[]=[['goi_bai_7_v1',SQL_GOI7],['hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH],['hanh_trinh_v5',SQL_HANH_TRINH_V5],['hanh_trinh_v6',SQL_HT6],['omni_3_0510',LENH_TAO_BANG_OMNI]]
+/**
+ * ĐẦU LƯỢT của Sảnh / Mở chặng học tập (Gói R 15/10 — luật thầy 13/10 "sửa xong máy chủ phải nhanh hơn"), gọi khi token đã qua kiểm chữ ký/hạn (token giả bị chặn
+ * trước mọi lượt D1 như cũ), CÙNG đợt với lượt đọc mật khẩu: (1) lệnh tạo bảng của cả lượt gửi ngay, song song, thẳng D1 gốc (`guiDdlSom` — isolate mới: trước
+ * 5 đợt nối tiếp rải trong lượt); (2) các lượt CHỈ ĐỌC đầu tiên của lượt: lịch kiểm tra riêng + cờ Gói 7 (một câu đọc nhóm cờ, đệm 15 s), danh sách gói (khi bảng
+ * gói đã sẵn — `docDanhSachGoiSom7`), lớp của em (đệm 30 s dùng chung — `lapGoi7` dùng lại đúng lượt đọc đang bay). Không ghi dữ liệu, không trả gì trước khi
+ * xác thực xong; mọi kết quả chỉ dùng sau `await` xác thực, lỗi nổi lên đúng chỗ `await` cũ.
+ */
+function batDauHocTapSom(env:Env,sbd:string){
+  guiDdlSom(env,DDL_LUOT_HOC)
+  void lopCuaEm(env,sbd).catch(()=>null)
+  const kiem=som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,sbd,Date.now(),true)))
+  // Bọc trong đối tượng: lời hứa đọc gói giữ NGUYÊN (không bị `then` mở ra) để nơi gọi truyền tiếp như `docDanhSachGoiSom7`.
+  const dsGoi=som(import('./goi-bai-7').then(g7=>({p:g7.docDanhSachGoiSom7(env,sbd)})))
+  return {sbd,kiem,dsGoi}
+}
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
   // token giả bị chặn trước mọi lượt D1 như cũ). Không ghi gì, không trả gì trước khi xác thực xong. `gameIdentity` bị thay (test) ⇒ đọc sau xác thực như cũ.
-  const giu:{ds:ReturnType<typeof batDauDocSom>|null}={ds:null}
-  const sbd=await gameIdentity(env,b,s=>{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s)})
+  const giu:{ds:ReturnType<typeof batDauDocSom>|null;hocTap?:ReturnType<typeof batDauHocTapSom>}={ds:null}
+  const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s);else if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s)})
   // Kiểm tra theo lịch RIÊNG từng em sở hữu cả ngày, kể cả khi em đã nộp sớm.
   // Cổng ở trước lập Gói 7/Hành trình: API cũ và phiên cũ không phát bài thường song song.
   const kt=await import('./kiem-tra-ca-nhan')
   if(action.startsWith('hoc-tap-ktcn-'))return kt.ktCnAction(env,sbd,action,b,Date.now())
   // Hai lượt chỉ đọc độc lập chạy cùng đợt; lịch kiểm tra vẫn chặn trước mọi lệnh lập/ghi bài thường.
   const g7Som=action==='hoc-tap-sanh'||action==='hoc-tap-start'?await import('./goi-bai-7'):undefined
-  const dsGoiSom=g7Som?.docDanhSachGoiSom7(env,sbd)
-  const kiem=await kt.docKtCn(env,sbd,Date.now(),true)
+  // Gói R: lượt đọc đầu đã bắt đầu cùng đợt mật khẩu (`batDauHocTapSom`) ⇒ dùng lại; danh sách gói chưa đọc được lúc ấy (bảng gói chưa sẵn) ⇒ đọc như cũ.
+  const hocTapSom=giu.hocTap&&giu.hocTap.sbd===sbd?giu.hocTap:undefined
+  const dsGoiSom=(hocTapSom?(await hocTapSom.dsGoi).p:undefined)??g7Som?.docDanhSachGoiSom7(env,sbd)
+  const kiem=await (hocTapSom?hocTapSom.kiem:kt.docKtCn(env,sbd,Date.now(),true))
   if(kt.laNgayKt(kiem,Date.now())&&!kt.coHocNgayKt(kiem)){
     const tt=kt.tomTatKt(kiem!,Date.now())
     if(action==='hoc-tap-sanh'||action==='hoa2-sanh')return {ok:true,cheDo2:true,ngay:tt.ngay,kiemTraCaNhan:tt,theLuc:{tong:tt.tong,con:tt.con},chienDich:null,doan:{con:0},dao:{con:0}}
