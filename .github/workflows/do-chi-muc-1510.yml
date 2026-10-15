@@ -1,5 +1,5 @@
 # ĐO KẾ HOẠCH TRUY VẤN (CHỈ ĐỌC) — B1 tối ưu 15/10 (thầy: "làm cả đợt 1 và 2"). In EXPLAIN QUERY PLAN của các truy vấn nóng + số dòng bảng
-# + số ca đang mở, để chứng minh chỉ mục mới (server/migration-1510-chi-muc.sql) được dùng. Không in mã em, tên em, nội dung.
+# + số ca đang mở, để chứng minh chỉ mục mới (server/migration-z-1510-chi-muc.sql) được dùng. Không in mã em, tên em, nội dung.
 name: Đo kế hoạch truy vấn (chỉ đọc)
 on:
   workflow_dispatch:
