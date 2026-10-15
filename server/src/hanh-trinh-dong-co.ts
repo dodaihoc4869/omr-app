@@ -8,7 +8,7 @@ import { docNhom, docDauVaoNhom, type PhanNhom } from './hanh-trinh-do-luong'
 import type { Env, D1Result, D1PreparedStatement } from './kieu'
 import { dbGoc } from './cau-hinh-dem'
 import type { HoSo2 } from './srs2-d1'
-import { docMetaCau } from './srs2-d1'
+import { docMetaCau, docChienDichThoCuaEm } from './srs2-d1'
 import { docSuKienOmni, qCuaCau, damBaoBangOmni } from './omni-d1'
 import { phatLaiEm, vknCaCau } from './omni-p-vkn'
 import { duBaoDiem, xacSuatDungCau } from './du-bao-diem'
@@ -88,6 +88,24 @@ export interface DocTruocDongCo {
   vaoNhom:Promise<Awaited<ReturnType<typeof docDauVaoNhom>>>|null
   /** Hai lượt đọc theo hồ sơ (β câu của `hs.cau`, dòng chiến dịch của `hs.chienDich`) — khoá theo đúng tham số; lệch ⇒ bắt đầu lại cho đúng tham số. */
   theoHoSo?:TheoHoSoDongCo
+  /** Gói R 15/10: β câu ĐỌC ĐOÁN cho cả tập ứng viên của hồ sơ (`docBetaRongSom`, cùng đợt lượt đọc meta của hồ sơ). */
+  betaRong?:{ds:ReadonlySet<string>;p:Promise<D1Result<{qid:string;beta:number}>>}
+}
+const SQL_BETA_CAU='SELECT qid,beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))'
+/**
+ * β câu ĐỌC ĐOÁN (Gói R 15/10 — luật thầy 13/10 "sửa xong máy chủ phải nhanh hơn"): nơi gọi biết tập ứng viên của hồ sơ (`docHoSo2` › `khiCoQids`, trước lượt đọc
+ * meta/lần làm) ⇒ đọc β của CẢ tập ấy cùng đợt — trước: chờ hồ sơ xong mới đọc β đúng `hs.cau` (một đợt D1 riêng). `docTruocDongCoTheoHoSo` chỉ dùng khi `hs.cau`
+ * nằm trọn trong tập, và chỉ lấy ĐÚNG các dòng của `hs.cau` (khoá chính qid ⇒ cùng dòng như câu đọc cũ); không trọn ⇒ đọc như cũ. Chỉ đọc bảng β (không lệnh ghi nào đụng).
+ */
+export function docBetaRongSom(env:Env,t:DocTruocDongCo,qids:readonly string[]):void {
+  if(t.theoHoSo)return
+  t.betaRong={ds:new Set(qids),p:som(t.ddl.then(()=>env.DB.prepare(SQL_BETA_CAU).bind(JSON.stringify([...new Set(qids)])).all<{qid:string;beta:number}>()))}
+}
+/** Dòng chiến dịch đầy đủ của `hs.chienDich` (Gói R 15/10 — dùng lại dòng chiến dịch ĐÃ ĐỌC): lấy từ danh sách chiến dịch của em mà hồ sơ vừa đọc (`docChienDichThoCuaEm`,
+ *  đệm dùng chung — CÙNG ảnh chụp đã dựng `hs.chienDich`) thay cho một lượt đọc lại bảng `chien_dich`; không thấy dòng ⇒ đọc như cũ. */
+async function docChienDichDayDaDoc(env:Env,sbd:string,id:string):ReturnType<typeof docChienDichDay>{
+  const r=(await docChienDichThoCuaEm(env,sbd)).find(x=>String(x.id)===id)
+  return r?{qid_json:r.qid_json as string,ma_de_json:r.ma_de_json as string}:docChienDichDay(env,id)
 }
 interface TheoHoSoDongCo { khoaBeta:string; coCd:boolean; cdId:string; beta:Promise<D1Result<{qid:string;beta:number}>>; full:ReturnType<typeof docChienDichDay>|undefined }
 type DongDongCoCu={cap_nhat_luc:number;bam_canh:string|null;canh_luc:number|null}
@@ -119,9 +137,11 @@ export function docTruocDongCoTheoHoSo(env:Env,t:DocTruocDongCo,hs:Pick<HoSo2,'c
   const cu=t.theoHoSo
   if(cu&&cu.khoaBeta===khoaBeta&&cu.coCd===coCd&&cu.cdId===cdId)return cu
   const ddl5=som(chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5))
+  const rong=t.betaRong,tap=new Set(hs.cau.map(c=>c.qid))
   const moi:TheoHoSoDongCo={khoaBeta,coCd,cdId,
-    beta:som(t.ddl.then(()=>env.DB.prepare('SELECT qid,beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))').bind(khoaBeta).all<{qid:string;beta:number}>())),
-    full:cd?som(ddl5.then(()=>docChienDichDay(env,cd.id))):undefined}
+    beta:rong&&[...tap].every(q=>rong.ds.has(q))?som(rong.p.then(r=>({...r,results:(r.results??[]).filter(x=>tap.has(x.qid))})))
+      :som(t.ddl.then(()=>env.DB.prepare(SQL_BETA_CAU).bind(khoaBeta).all<{qid:string;beta:number}>())),
+    full:cd?som(ddl5.then(()=>docChienDichDayDaDoc(env,t.sbd,String(cd.id)))):undefined}
   t.theoHoSo=moi
   return moi
 }
