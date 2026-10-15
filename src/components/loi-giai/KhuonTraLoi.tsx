@@ -5,6 +5,7 @@
 // TRÊN MÁY EM, không gọi máy chủ. Biểu tượng vẽ tại chỗ (không lucide) để byte mở app không đổi.
 import { useState, type ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
+import OSoTraLoi from '../OSoTraLoi'
 import { ChuTo, chuHoa } from './TraLoiThay'
 import './khuon-tra-loi.css'
 
@@ -264,12 +265,12 @@ export function EmThu({ thu, onXong }: { thu: BuocThu; onXong: (dung: boolean) =
   return (
     <div className="lg-thu">
       <label><ChemText text={chuHoa(`Em thử: ${thu.hoi}`)} /></label>
-      <div className="lg-thu-hang">
-        <input inputMode="decimal" autoComplete="off" value={gia} placeholder="Nhập số, ví dụ 0,5" aria-label="Kết quả em tính"
-          onChange={(e) => { setGia(e.target.value); setSai(false) }} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kiem() } }} />
+      {/* Ô số dùng chung (luật 21/09: mọi ô đáp số có nút "−" và ","); Enter trong ô = Kiểm tra. */}
+      <div className="lg-thu-hang" onKeyDown={(e) => { if (e.key === 'Enter' && e.target instanceof HTMLInputElement) { e.preventDefault(); kiem() } }}>
+        <OSoTraLoi value={gia} onChange={(v) => { setGia(v); setSai(false) }} placeholder="Ví dụ 0,5" ariaLabel="Kết quả em tính" maxLength={12} />
         <button type="button" onClick={kiem} disabled={!gia.trim()}>Kiểm tra</button>
       </div>
-      <p className="lg-thu-kq" data-kq={sai ? 'sai' : undefined} aria-live="polite">{sai ? (thu.goiYSai || 'Chưa đúng, em tính lại nhé.') : ''}</p>
+      <p className="lg-thu-kq" data-kq={sai ? 'sai' : undefined} aria-live="polite">{sai && <Ct t={thu.goiYSai || 'Chưa đúng, em tính lại nhé.'} />}</p>
       <button type="button" className="lg-nut-chu" onClick={() => onXong(false)}>Xem luôn bước {thu.buoc}</button>
     </div>
   )

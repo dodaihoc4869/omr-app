@@ -116,11 +116,11 @@
 /* — EM THỬ TÍNH — */
 .lg-thu { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; padding: 10px 12px; border-radius: 14px; border: 1.5px dashed var(--m3-primary); background: color-mix(in srgb, var(--m3-primary) 5%, transparent); }
 .lg-thu label { font-weight: 700; font-size: 14.5px; color: var(--m3-on-surface); }
-.lg-thu-hang { display: flex; gap: 8px; }
-.lg-thu input { flex: 1; min-width: 0; min-height: 48px; box-sizing: border-box; border-radius: 12px; border: 1px solid var(--m3-outline); background: var(--m3-surface); color: var(--m3-on-surface); font: inherit; font-size: 16px; padding: 0 12px; }
-.lg-thu input:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 1px; }
-.lg-thu-hang button { min-height: 48px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--m3-primary); color: var(--m3-on-primary); font: inherit; font-weight: 800; cursor: pointer; }
-.lg-thu-hang button:disabled { opacity: .55; cursor: default; }
+.lg-thu-hang { display: flex; flex-wrap: wrap; gap: 8px; }
+.lg-thu .osl { flex: 1 1 200px; --osl-cao: 56px; --osl-nut-cao: 48px; --osl-nut-rong: 48px; --osl-nen: var(--m3-surface); --osl-chu: var(--m3-on-surface); --osl-vien: var(--m3-outline); --osl-tieu-diem: var(--m3-primary); }
+.lg-thu .osl > input { font: inherit; font-size: 16px; }
+.lg-thu-hang > button { min-height: 56px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--m3-primary); color: var(--m3-on-primary); font: inherit; font-weight: 800; cursor: pointer; }
+.lg-thu-hang > button:disabled { opacity: .55; cursor: default; }
 .lg-thu-kq { margin: 0; font-size: 14.5px; font-weight: 700; }
 .lg-thu-kq:empty { display: none; }
 .lg-thu-kq[data-kq="dung"] { color: color-mix(in srgb, var(--gg-luc) 75%, var(--m3-on-surface)); }
