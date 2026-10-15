@@ -4,14 +4,17 @@
 // v2 (bản vẽ docs/ban-ve-hoi-thay-v2-1410, thầy 14/10: "Làm mọi thứ tốt nhất để hs hỏi cái là hiểu được bài ngay"): KHỐI HÌNH tuỳ câu hỏi
 // (KhoiTraLoi.tsx: sơ đồ chuyển hoá · thí nghiệm ảo · hiện tượng → nhóm chức · phương trình · tính nhanh · bẫy), ++đúng++ xanh, !!sai!! đỏ gạch,
 // nhóm chức (–NH2, –CHO, –OH, –COOH, –COO–) tự thành nhãn màu. Thứ tự: ý chính → khối hình → bước → bảng → bẫy → ghi nhớ → hỏi tiếp.
+// v3 (bản vẽ docs/ban-ve-hoi-thay-v3-1510, thầy chốt 15/10): có `khuon` (máy chủ chọn) ⇒ vẽ theo KHUÔN (KhuonTraLoi.tsx): mỗi khuôn một thứ tự,
+// phần phụ gập lại, "Em chưa hiểu chỗ nào?" + "Thầy hỏi lại 1 câu" + "Giải thích dễ hơn". Không có khuôn (câu trả lời cũ) ⇒ vẽ như v2.
 import { Lightbulb } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
 import { chiSoRo } from '../../lib/chi-so-ro'
 import { Bay, NhanBiet, PhuongTrinh, SoDo, ThiNghiem, TinhNhanh, docKhoi, type KhoiHinh } from './KhoiTraLoi'
+import { ChuaHieu, DoiChieuKhoi, EmThu, GoiYNac, Gon, HinhDungKhoi, KiemLaiKhoi, NHAN_KHUON, Net, SoSanh, TungY, XepHangKhoi, docKhuon, type PhanKhuon } from './KhuonTraLoi'
 import './tra-loi-thay.css'
 
-export interface CauTrucTraLoi extends KhoiHinh {
+export interface CauTrucTraLoi extends KhoiHinh, PhanKhuon {
   yChinh: string
   buoc: { ten: string; chu: string }[]
   bang: { cot: string[]; dong: string[][]; sauBuoc: number } | null
@@ -47,7 +50,8 @@ export function docCauTruc(v: unknown): CauTrucTraLoi | null {
   const dong = b && Array.isArray(b.dong) ? b.dong.filter((d): d is string[] => Array.isArray(d) && d.every(chuoi)) : []
   const yChinh = chuoi(o.yChinh) ? o.yChinh : ''
   const khoi = docKhoi(o)
-  if (!yChinh && !buoc.length && !Object.keys(khoi).length) return null
+  const phan = docKhuon(o)
+  if (!yChinh && !buoc.length && !Object.keys(khoi).length && !Object.keys(phan).filter((k) => k !== 'khuon').length) return null
   return {
     yChinh,
     buoc,
@@ -55,6 +59,7 @@ export function docCauTruc(v: unknown): CauTrucTraLoi | null {
     ghiNho: chuoi(o.ghiNho) ? o.ghiNho : '',
     hoiTiep: Array.isArray(o.hoiTiep) ? o.hoiTiep.filter(chuoi).slice(0, 2) : [],
     ...khoi,
+    ...phan,
   }
 }
 
@@ -126,31 +131,23 @@ function BangNhanh({ bang }: { bang: NonNullable<CauTrucTraLoi['bang']> }) {
   )
 }
 
-/** `dangLam`: em đang làm ⇒ nhãn "Gợi hướng". `onHoi`: bấm câu hỏi tiếp (chỉ truyền cho câu trả lời MỚI NHẤT). */
-export default function TraLoiThay({ ct, dangLam = false, onHoi, khoa = false }: { ct: CauTrucTraLoi; dangLam?: boolean; onHoi?: (cau: string) => void; khoa?: boolean }) {
+/** Các bước đánh số; `thu` (khuôn Tính): bước `thu.buoc` để em THỬ tính trước, các bước sau và `sauKhiXong` (tính nhanh) hiện khi em xong. */
+function CacBuoc({ ct, sauKhiXong }: { ct: CauTrucTraLoi; sauKhiXong?: ReactNode }) {
+  const [xong, setXong] = useState(false)
   const bang = ct.bang
   const sau = bang && bang.sauBuoc >= 1 && bang.sauBuoc <= ct.buoc.length ? bang.sauBuoc : 0
+  const thu = ct.buocThu && ct.buocThu.buoc <= ct.buoc.length ? ct.buocThu : undefined
+  const an = (i: number) => !!thu && !xong && i + 1 > thu.buoc
   return (
-    <div className="lg-ht-thay lg-tl">
-      <div className="lg-tl-dau">
-        <span className="lg-tl-avt" aria-hidden="true">Đ</span>
-        <span className="lg-ht-nhan">Thầy Đỗ Đại Học</span>
-        {dangLam && <span className="lg-tl-the">Gợi hướng</span>}
-      </div>
-      {ct.yChinh && <p className="lg-tl-chinh"><ChuTo text={ct.yChinh} /></p>}
-      {ct.soDo && <SoDo soDo={ct.soDo} />}
-      {ct.thiNghiem && <ThiNghiem ong={ct.thiNghiem} />}
-      {ct.nhanBiet && <NhanBiet dong={ct.nhanBiet} />}
-      {ct.phuongTrinh && <PhuongTrinh pt={ct.phuongTrinh} />}
-      {ct.tinh && <TinhNhanh tinh={ct.tinh} />}
+    <>
       {ct.buoc.length > 0 && (
         <ol className="lg-tl-buoc">
-          {ct.buoc.map((b, i) => (
+          {ct.buoc.map((b, i) => an(i) ? null : (
             <li key={i}>
               <span className="lg-tl-so" aria-hidden="true">{i + 1}</span>
-              <div>
+              <div data-moi={(thu && xong && i + 1 > thu.buoc) || undefined}>
                 {b.ten && <b><ChuTo text={b.ten} /></b>}
-                <p><ChuTo text={b.chu} /></p>
+                {thu && !xong && i + 1 === thu.buoc ? <EmThu thu={thu} onXong={() => setXong(true)} /> : <p><ChuTo text={b.chu} /></p>}
                 {bang && sau === i + 1 && <BangNhanh bang={bang} />}
               </div>
             </li>
@@ -158,16 +155,83 @@ export default function TraLoiThay({ ct, dangLam = false, onHoi, khoa = false }:
         </ol>
       )}
       {bang && !sau && <BangNhanh bang={bang} />}
-      {ct.bay && <Bay bay={ct.bay} />}
-      {ct.ghiNho && (
-        <aside className="lg-tl-nho" aria-label="Ghi nhớ">
-          <Lightbulb size={20} strokeWidth={2} aria-hidden="true" />
-          <div><b>Ghi nhớ</b><span><ChuTo text={ct.ghiNho} /></span></div>
-        </aside>
+      {(!thu || xong) && sauKhiXong}
+    </>
+  )
+}
+
+function GhiNho({ chu }: { chu: string }) {
+  return (
+    <aside className="lg-tl-nho" aria-label="Ghi nhớ">
+      <Lightbulb size={20} strokeWidth={2} aria-hidden="true" />
+      <div><b>Ghi nhớ</b><span><ChuTo text={chu} /></span></div>
+    </aside>
+  )
+}
+
+/** Thân câu trả lời theo KHUÔN v3 (phần dưới ý chính). */
+function ThanKhuon({ ct, dangLam }: { ct: CauTrucTraLoi; dangLam: boolean }) {
+  const k = ct.khuon!
+  const v2 = { soDo: ct.soDo && <SoDo soDo={ct.soDo} />, thiNghiem: ct.thiNghiem && <ThiNghiem ong={ct.thiNghiem} />, nhanBiet: ct.nhanBiet && <NhanBiet dong={ct.nhanBiet} /> }
+  const pt = ct.phuongTrinh && <PhuongTrinh pt={ct.phuongTrinh} />
+  const tinh = ct.tinh && <TinhNhanh tinh={ct.tinh} />
+  const bay = ct.bay && <Bay bay={ct.bay} />
+  const nho = ct.ghiNho && <GhiNho chu={ct.ghiNho} />
+  const coBuoc = ct.buoc.length > 0 || !!ct.bang
+  if (k === 'cho-sai') {
+    const phu = pt || tinh || coBuoc || nho
+    return <>{ct.soSanh && <SoSanh dong={ct.soSanh} />}{bay}{v2.soDo}{v2.thiNghiem}{v2.nhanBiet}
+      {phu && <Gon tieu={pt || tinh ? 'Xem phương trình và cách tính đầy đủ' : 'Xem các bước và ghi nhớ'}>{pt}{tinh}<CacBuoc ct={{ ...ct, buocThu: undefined }} />{nho}</Gon>}</>
+  }
+  if (k === 'goi-y' && ct.nac) {
+    const dung = new Set(ct.nac.map((n) => n.khoi).filter(Boolean))
+    return <><GoiYNac nac={ct.nac} dangLam={dangLam} khoiCua={(kk) => (kk ? v2[kk] : null)} />
+      {!dung.has('soDo') && v2.soDo}{!dung.has('thiNghiem') && v2.thiNghiem}{!dung.has('nhanBiet') && v2.nhanBiet}<CacBuoc ct={ct} />{bay}</>
+  }
+  if (k === 'giai-thich') {
+    return <>{ct.xepHang && <XepHangKhoi xh={ct.xepHang} />}{ct.hinhDung && <HinhDungKhoi ma={ct.hinhDung} />}{v2.soDo}{v2.thiNghiem}{v2.nhanBiet}{pt}
+      <CacBuoc ct={ct} sauKhiXong={tinh} />{ct.doiChieu && <Gon tieu={`So sánh chi tiết ${ct.doiChieu.a} và ${ct.doiChieu.b}`}><DoiChieuKhoi dc={ct.doiChieu} /></Gon>}{bay}{nho}</>
+  }
+  if (k === 'tung-y') {
+    return <>{ct.yDS && <TungY y={ct.yDS} />}{v2.soDo}{v2.thiNghiem}{v2.nhanBiet}<CacBuoc ct={ct} />{bay}{nho}</>
+  }
+  if (k === 'tinh') {
+    return <>{pt}{v2.soDo}{v2.thiNghiem}{v2.nhanBiet}<CacBuoc ct={ct} sauKhiXong={tinh} />{bay}{nho}</>
+  }
+  // Khuôn có nhưng thiếu phần chính (mô hình lỡ khuôn / lược đồ cũ) ⇒ vẽ như v2.
+  return <>{v2.soDo}{v2.thiNghiem}{v2.nhanBiet}{pt}{tinh}<CacBuoc ct={ct} />{bay}{nho}</>
+}
+
+/** `dangLam`: em đang làm ⇒ nhãn "Gợi hướng". `onHoi`: bấm câu hỏi tiếp (chỉ truyền cho câu trả lời MỚI NHẤT). */
+export default function TraLoiThay({ ct, dangLam = false, onHoi, khoa = false }: { ct: CauTrucTraLoi; dangLam?: boolean; onHoi?: (cau: string) => void; khoa?: boolean }) {
+  const nhan = ct.khuon ? NHAN_KHUON[ct.khuon] : null
+  // Khuôn v3: luôn có "Giải thích dễ hơn" cạnh các câu hỏi tiếp mô hình gợi ý (tối đa 3 nút, không trùng).
+  const hoi = [...new Set([...ct.hoiTiep, ...(ct.khuon ? ['Giải thích dễ hơn'] : [])])].slice(0, 3)
+  return (
+    <div className="lg-ht-thay lg-tl">
+      <div className="lg-tl-dau">
+        <span className="lg-tl-avt" aria-hidden="true">Đ</span>
+        <span className="lg-ht-nhan">Thầy Đỗ Đại Học</span>
+        {nhan ? <span className="lg-tl-the" data-khuon><Net ten={nhan.net} co={14} />{nhan.chu}</span> : dangLam && <span className="lg-tl-the">Gợi hướng</span>}
+      </div>
+      {ct.yChinh && <p className="lg-tl-chinh"><ChuTo text={ct.yChinh} /></p>}
+      {ct.khuon ? <ThanKhuon ct={ct} dangLam={dangLam} /> : (
+        <>
+          {ct.soDo && <SoDo soDo={ct.soDo} />}
+          {ct.thiNghiem && <ThiNghiem ong={ct.thiNghiem} />}
+          {ct.nhanBiet && <NhanBiet dong={ct.nhanBiet} />}
+          {ct.phuongTrinh && <PhuongTrinh pt={ct.phuongTrinh} />}
+          {ct.tinh && <TinhNhanh tinh={ct.tinh} />}
+          <CacBuoc ct={ct} />
+          {ct.bay && <Bay bay={ct.bay} />}
+          {ct.ghiNho && <GhiNho chu={ct.ghiNho} />}
+        </>
       )}
-      {onHoi && ct.hoiTiep.length > 0 && (
+      {onHoi && ct.chuaHieu && ct.chuaHieu.length > 0 && <ChuaHieu ds={ct.chuaHieu} onHoi={onHoi} khoa={khoa} />}
+      {ct.kiemLai && <KiemLaiKhoi k={ct.kiemLai} />}
+      {onHoi && hoi.length > 0 && (
         <div className="lg-tl-hoi" role="group" aria-label="Hỏi tiếp">
-          {ct.hoiTiep.map((q) => <button key={q} type="button" disabled={khoa} onClick={() => onHoi(q)}><ChemText text={chuHoa(q)} /></button>)}
+          {hoi.map((q) => <button key={q} type="button" disabled={khoa} onClick={() => onHoi(q)}><ChemText text={chuHoa(q)} /></button>)}
         </div>
       )}
     </div>

@@ -78,7 +78,7 @@ chuaHieu?: string[]                                              // ≤ 3 chạm
 ## 5. Ngoại lệ
 
 - **Em đang làm**: không có `soSanh`, `yDS`, `buocThu`, `kiemLai`. Nấc cuối qua bộ chặn lộ đáp án hiện có; nấc nào lộ thì bỏ nấc đó.
-- **Thầy hỏi lại**: máy chủ bỏ câu hỏi lại nếu chữ trùng đề hoặc trùng phương án của câu đang hỏi (không cho em "luyện đáp án").
+- **Thầy hỏi lại**: máy chủ bỏ câu hỏi lại nếu nó lặp chính đề đang hỏi. Lựa chọn có chung chất với phương án thì giữ, vì cùng chủ đề hay có chung chất và câu hỏi lại chỉ có khi em đã nộp (build 15/10).
 - **Gemini trả thiếu phần bắt buộc của khuôn**: vẽ các phần có được. Thiếu cả phần chính thì quay về khuôn v2 (ý chính + khối + bước).
 - **Chạm "Em chưa hiểu…" khi hết lượt / mất mạng**: báo như khi gửi câu thường.
 - **Chữ hoặc công thức dài**: bảng 2 cột tự xuống dòng; thang dọc mỗi chất một dòng; công thức không ngắt giữa.
@@ -97,7 +97,7 @@ chuaHieu?: string[]                                              // ≤ 3 chạm
   - máy chủ chọn đúng khuôn theo dữ liệu (đang làm / phần II đã nộp / em sai);
   - Đúng/Sai từng ý lấy từ kho chứ không lấy từ Gemini;
   - đang làm thì không có `soSanh`, `yDS`, `buocThu`, `kiemLai`;
-  - câu hỏi lại trùng đề hoặc phương án bị bỏ;
+  - câu hỏi lại lặp chính đề bị bỏ;
   - chữ phẳng có chữ các phần mới.
 - `tests/hoi-thay-khuon-giao-dien-1510.test.tsx`:
   - đủ 5 khuôn vẽ đúng thứ tự;

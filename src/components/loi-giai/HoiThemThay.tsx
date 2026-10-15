@@ -15,7 +15,7 @@ const MA_DUNG_HAN = new Set(['het_luot', 'het_luot_cau', 'chua_bat', 'dang_kiem_
 /** `onTraLoi`: gọi một lần khi Thầy trả lời được câu đầu (game tính câu này là "có trợ giúp", như khi mở lời giải).
  *  `dangLam`: em đang làm câu, chưa nộp ⇒ máy chủ chỉ cho Thầy gợi hướng, không nêu đáp án.
  *  `choDe`: hộp vừa mở, đề câu chưa về (máy chủ chưa ghi "em đã mở câu") ⇒ gõ trước được, CHƯA gửi. */
-export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dangLam = false, choDe = false, onTraLoi }: { qid: string; nguon: string; gon?: boolean; hop?: boolean; dangLam?: boolean; choDe?: boolean; onTraLoi?: () => void }) {
+export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dangLam = false, choDe = false, onTraLoi, dapAnEm = '' }: { qid: string; nguon: string; gon?: boolean; hop?: boolean; dangLam?: boolean; choDe?: boolean; onTraLoi?: () => void; dapAnEm?: string }) {
   const id = useId()
   const [mo, setMo] = useState(gon || hop)
   const [tin, setTin] = useState<Tin[]>([])
@@ -52,7 +52,7 @@ export default function HoiThemThay({ qid, nguon, gon = false, hop = false, dang
     setLoi('')
     setTin((t) => [...t, { vai: 'em', chu: cau }])
     if (cauSan === undefined) setChu('')
-    const r = await hoiThemThay(qid, nguon, cau, '', dangLam)
+    const r = await hoiThemThay(qid, nguon, cau, dangLam ? '' : dapAnEm, dangLam)
     setDangGui(false)
     if (r.ok) {
       if (!r.ngoaiPhamVi && !tin.some((m) => m.vai === 'thay')) onTraLoi?.()

@@ -10,7 +10,7 @@ import { nguCanhHoiTroLy } from './loi-giai'
 import { qidGoc } from './srs2-d1'
 import { quaTram } from './tram-gemini'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
-import { SCHEMA_TRA_LOI, SCHEMA_TRA_LOI_CU, chuPhang, lamSachCauTruc, tachCauTruc, type CauTrucTraLoi } from './hoi-tro-ly-cau-truc'
+import { CHI_DAN_KHUON, SCHEMA_TRA_LOI, SCHEMA_TRA_LOI_CU, chonKhuon, chuPhang, lamSachCauTruc, schemaChoKhuon, tachCauTruc, type CauTrucTraLoi, type Khuon } from './hoi-tro-ly-cau-truc'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown): string => (typeof v === 'string' ? v : v == null ? '' : String(v))
@@ -144,6 +144,17 @@ KHỐI HÌNH (máy em vẽ thành hình để em nhìn là hiểu ngay; tối đ
 - tinh: 2–6 dòng, mỗi dòng ĐÚNG 3 ô cách nhau " | ": "đại lượng | phép tính | kết quả kèm đơn vị" (ví dụ "n ester | 8,8 : 88 | 0,1 mol"), số liệu lấy từ đề và lời giải; "dapSo" kết quả cuối kèm đơn vị. Có tinh thì buoc không lặp lại phép tính.
 - Mã hiện tượng: quy-xanh (quỳ hoá xanh), quy-do (quỳ hoá đỏ), trang-bac (kết tủa Ag, tráng bạc), tua-trang (kết tủa trắng), tua-vang (kết tủa vàng), tua-xanh (kết tủa xanh lam, Cu(OH)2), tua-nau-do (kết tủa nâu đỏ, Fe(OH)3), dd-xanh-lam (hoà tan Cu(OH)2 thành dung dịch xanh lam), tim (màu tím, biuret), xanh-tim (iodine gặp tinh bột), mat-mau (mất màu nước bromine hoặc thuốc tím), khi (sủi bọt khí), tach-lop (chất lỏng tách lớp), khong-doi (không hiện tượng).
 
+KHUÔN TRẢ LỜI (v3 — DỮ LIỆU CÂU ghi "KHUÔN TRẢ LỜI" máy chủ đã chọn; lược đồ chỉ gồm các phần của khuôn đó): làm đúng khuôn, điền ĐỦ phần BẮT BUỘC.
+- soSanh: mỗi dòng một bước theo thứ tự làm; "em" = em đã làm gì (suy từ đáp án em ghi), "dung" = bước đúng; đúng MỘT dòng "lech": true ở dòng đầu tiên em làm khác.
+- nac: 3 nấc gợi ý từ nhẹ tới sâu, "ten" 2–5 chữ, "chu" 1–2 câu; "khoi" = thiNghiem / nhanBiet / soDo khi nấc đó cần khối ấy (và điền khối ấy), ngược lại "khong".
+- xepHang: "tieuChi" (Tính base, Nhiệt độ sôi…); "chat" 2–5 chất xếp từ MẠNH / LỚN tới YẾU / NHỎ, "ct" công thức, "ten" tên; "hoi" = thứ tự (từ 0) chất em hỏi; có ngưỡng (quỳ đổi màu…) thì "nguongSau" = thứ tự chất cuối còn TRÊN ngưỡng, "nguongTren" / "nguongDuoi" chữ hai bên ngưỡng.
+- hinhDung (hình vẽ sẵn): cap-e-amine (cặp electron của N: amine no và aniline), lien-ket-hydrogen (alcohol, acid với ester: nhiệt độ sôi, độ tan), glucose-mach-ho (5 nhóm –OH, 1 nhóm –CHO), xa-phong-hoa (gốc acid vào muối, gốc alcohol vào alcohol). Chỉ chọn khi đúng chủ đề.
+- doiChieu: hai chất "a", "b" và ≤ 4 dòng {tieuChi, a, b} ngắn.
+- lyDoY: mỗi ý {y, lyDo} một câu.
+- buocThu: một bước giữa em tự tính; "dap" chỉ là số.
+- kiemLai: 1 câu trắc nghiệm, "lua" đúng 3 lựa chọn ngắn, "dung" = thứ tự lựa chọn đúng (0, 1, 2), "vi" = 1 câu vì sao đúng, "goiYSai" = 1 câu gợi ý khi em chọn sai. KHÔNG lặp đề hay phương án của câu này.
+- chuaHieu: 2–3 chỗ em dễ chưa hiểu, mỗi chỗ tối đa 4 chữ (ví dụ "Chỗ lệch", "Vì sao M = 82?").
+
 EM ĐANG LÀM
 - Không dùng ==…== và ++…++, không có bang, phuongTrinh, tinh; không bước nào nêu kết quả; bước cuối là một câu hỏi để em tự kết luận.
 - soDo chỉ ghi chất đề đã cho và ký hiệu (X, Y) của chất cần tìm, không ghi tên chất cần tìm. thiNghiem "nhan" chỉ là ký hiệu trong đề. Không ghép chất vào ký hiệu.
@@ -159,13 +170,16 @@ Em hỏi: "Sao em chọn 9,6 gam lại sai ạ?"
 Thầy trả lời:
 {"lienQuan": true,
  "yChinh": "9,6 gam là khối lượng !!C2H5COONa!!: em ghép gốc ethyl của alcohol vào muối. Muối đúng là ++CH3COONa++ nên ==m = 8,2 gam==.",
+ "soSanh": [{"em": "n ester = 8,8 : 88 = 0,1 mol", "dung": "n ester = 0,1 mol", "lech": false}, {"em": "Muối: C2H5COONa (M = 96)", "dung": "Muối: CH3COONa (M = 82)", "lech": true}, {"em": "m = 0,1 × 96 = 9,6 gam", "dung": "m = 0,1 × 82 = 8,2 gam", "lech": false}],
  "bay": {"tieuDe": "Chỗ em nhầm", "chu": "Tên ester đọc **gốc alcohol trước**: ethyl acetate = gốc ethyl + gốc acetate. Muối giữ gốc **acetate**, em đã lấy !!gốc ethyl!!."},
  "phuongTrinh": [{"pt": "CH3COOC2H5 + NaOH → CH3COONa + C2H5OH", "dk": "t°", "chinh": "CH3COONa"}],
  "tinh": {"dong": ["n ester | 8,8 : 88 | 0,1 mol", "n muối | = n ester | 0,1 mol", "m muối | 0,1 × 82 | 8,2 gam"], "dapSo": "8,2 gam"},
  "buoc": [{"ten": "Làm lại", "chu": "Em viết phương trình thuỷ phân trước rồi mới tính, làm lại câu này theo cách đó."}],
  "ghiNho": "RCOOR' + NaOH → **RCOONa** + R'OH: muối giữ **gốc acid** RCOO–.",
+ "chuaHieu": ["Chỗ lệch", "Vì sao M = 82?"],
+ "kiemLai": {"hoi": "Thuỷ phân methyl propionate (C2H5COOCH3) trong NaOH, muối thu được là?", "lua": ["CH3COONa", "C2H5COONa", "CH3ONa"], "dung": 1, "vi": "Muối giữ gốc acid: propionate ⇒ C2H5COONa.", "goiYSai": "Muối giữ gốc ACID, phần đọc sau trong tên ester."},
  "hoiTiep": ["Gọi tên ester nhanh thế nào?"]}
-Đề nhận biết: X làm quỳ tím hoá xanh, Y tráng bạc; em ĐANG LÀM, hỏi "Câu này làm sao ạ?" ⇒ {"lienQuan": true, "yChinh": "Mỗi hiện tượng chỉ ra **một nhóm chức**: đọc hiện tượng, đoán nhóm chức rồi mới so phương án.", "thiNghiem": [{"nhan": "X", "thuoc": "Quỳ tím", "hien": "quy-xanh", "chu": "Quỳ hoá xanh", "phu": "môi trường base"}, {"nhan": "Y", "thuoc": "AgNO3/NH3, t°", "hien": "trang-bac", "chu": "Lớp bạc sáng", "phu": "có nhóm –CHO"}], "nhanBiet": [{"thuoc": "Quỳ tím", "hien": "quy-xanh", "chu": "hoá xanh", "nhom": "–NH2 gắn gốc no"}, {"thuoc": "AgNO3/NH3", "hien": "trang-bac", "chu": "tráng bạc", "nhom": "–CHO"}], "bay": {"tieuDe": "Bẫy hay nhầm", "chu": "Aniline có –NH2 nhưng **không làm quỳ đổi màu**."}, "buoc": [{"ten": "Tự kết luận", "chu": "Chất nào trong từng phương án có đúng nhóm chức của X và Y?"}]}
+Đề nhận biết: X làm quỳ tím hoá xanh, Y tráng bạc; em ĐANG LÀM, hỏi "Câu này làm sao ạ?" ⇒ {"lienQuan": true, "yChinh": "Mỗi hiện tượng chỉ ra **một nhóm chức**: đọc hiện tượng, đoán nhóm chức rồi mới so phương án.", "nac": [{"ten": "Đọc hiện tượng", "chu": "Mỗi ống có **một hiện tượng**, mỗi hiện tượng chỉ ra một nhóm chức.", "khoi": "khong"}, {"ten": "Hiện tượng → nhóm chức", "chu": "Quỳ hoá xanh, tráng bạc: mỗi hiện tượng ứng với nhóm chức nào?", "khoi": "thiNghiem"}, {"ten": "Loại phương án", "chu": "Phương án nào có chất không có đúng nhóm chức của ống ấy thì gạch cả phương án.", "khoi": "khong"}], "chuaHieu": ["Vì sao quỳ hoá xanh?", "Tráng bạc là gì?"], "thiNghiem": [{"nhan": "X", "thuoc": "Quỳ tím", "hien": "quy-xanh", "chu": "Quỳ hoá xanh", "phu": "môi trường base"}, {"nhan": "Y", "thuoc": "AgNO3/NH3, t°", "hien": "trang-bac", "chu": "Lớp bạc sáng", "phu": "có nhóm –CHO"}], "nhanBiet": [{"thuoc": "Quỳ tím", "hien": "quy-xanh", "chu": "hoá xanh", "nhom": "–NH2 gắn gốc no"}, {"thuoc": "AgNO3/NH3", "hien": "trang-bac", "chu": "tráng bạc", "nhom": "–CHO"}], "bay": {"tieuDe": "Bẫy hay nhầm", "chu": "Aniline có –NH2 nhưng **không làm quỳ đổi màu**."}, "buoc": [{"ten": "Tự kết luận", "chu": "Chất nào trong từng phương án có đúng nhóm chức của X và Y?"}]}
 Em hỏi "Thầy giải giúp em bài Lý số 3" ⇒ {"lienQuan": false, "yChinh": ""}.`
 
 // ---------------------------------------------------------------- dữ liệu câu ⇒ nội dung gửi Gemini
@@ -180,7 +194,8 @@ export interface NguCanhCau {
   hocLieu?: unknown
 }
 export interface PhanGemini { text?: string; inline_data?: { mime_type: string; data: string } }
-export interface NoiDungGemini { systemInstruction: { parts: PhanGemini[] }; contents: { role: 'user' | 'model'; parts: PhanGemini[] }[] }
+/** `luocDo`: lược đồ riêng của khuôn (v3); vắng ⇒ lược đồ v2. KHÔNG gửi lên Google như một trường riêng (nằm trong generationConfig). */
+export interface NoiDungGemini { systemInstruction: { parts: PhanGemini[] }; contents: { role: 'user' | 'model'; parts: PhanGemini[] }[]; luocDo?: unknown }
 
 const RE_ANH = /^data:(image\/(?:png|jpe?g|gif|webp));base64,([A-Za-z0-9+/=\s]+)$/
 const TOI_DA_ANH = 8
@@ -217,7 +232,7 @@ export function dapAnDeDoc(phan: string, dapAn: string, y: Record<string, string
   return da
 }
 
-export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: string }[], cauHoi: string, em: { ketQuaGanNhat: 'dung' | 'sai' | 'chua_lam'; dapAnEm: string; dangLam?: boolean }): NoiDungGemini {
+export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: string }[], cauHoi: string, em: { ketQuaGanNhat: 'dung' | 'sai' | 'chua_lam'; dapAnEm: string; dangLam?: boolean; khuon?: Khuon }): NoiDungGemini {
   const c = nc.cau
   const anh: PhanGemini[] = []
   const dong: string[] = []
@@ -244,6 +259,7 @@ export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: st
   if (hocLieu) dong.push(`HỌC LIỆU CHỮA CÂU SAI (bước, gợi ý theo mức, lỗi thường gặp): ${hocLieu}`)
   if (em.dangLam) dong.push('EM ĐANG LÀM CÂU NÀY, CHƯA NỘP: chỉ gợi hướng; không nêu đáp án, phương án đúng, đúng/sai từng ý hay kết quả cuối.')
   dong.push(`EM: lần gần nhất em làm câu này ${em.ketQuaGanNhat === 'dung' ? 'ĐÚNG' : em.ketQuaGanNhat === 'sai' ? 'SAI' : 'chưa có kết quả'}${em.dapAnEm ? `; em chọn/ghi: ${em.dapAnEm}` : ''}.`)
+  if (em.khuon) dong.push(CHI_DAN_KHUON[em.khuon])
   const contents: NoiDungGemini['contents'] = [
     { role: 'user', parts: [{ text: dong.join('\n\n') }, ...anh] },
     { role: 'model', parts: [{ text: 'Thầy đã đọc hết đề, hình và lời giải của câu này.' }] },
@@ -319,7 +335,7 @@ async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiD
     // CHỐT CỨNG phạm vi (thầy 13/10): mô hình phải tự khai câu hỏi có thuộc câu đang xem không; máy chủ quyết theo cờ này, không theo lời văn.
     responseMimeType: 'application/json',
     // Khuôn có cấu trúc (bản vẽ docs/ban-ve-hoi-thay-1310): ý chính · các bước · bảng nhanh · ghi nhớ · hỏi tiếp.
-    responseSchema: Date.now() < luocDoCuDen ? SCHEMA_TRA_LOI_CU : SCHEMA_TRA_LOI,
+    responseSchema: Date.now() < luocDoCuDen ? SCHEMA_TRA_LOI_CU : (noiDung.luocDo ?? SCHEMA_TRA_LOI),
   }
   if (cfg.thinkingBudget !== null && /2\.5/.test(model)) gen.thinkingConfig = { thinkingBudget: cfg.thinkingBudget }
   const ac = new AbortController()
@@ -327,17 +343,18 @@ async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiD
   const thoi = () => ac.abort()
   huy?.addEventListener('abort', thoi)
   try {
-    const init: RequestInit = { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify({ ...noiDung, generationConfig: gen }), signal: ac.signal }
+    const goi = { systemInstruction: noiDung.systemInstruction, contents: noiDung.contents }
+    const init: RequestInit = { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify({ ...goi, generationConfig: gen }), signal: ac.signal }
     let r = tram && Date.now() < quaTramDen ? await tram(url, init) : await fetch(url, init)
     if (tram && r.status === 400 && RE_CHAN_VI_TRI.test(await r.clone().text().catch(() => ''))) {
       console.warn('[hoi-tro-ly] Google chặn vị trí trạm đang chạy — gọi lại qua trạm châu Đại Dương')
       quaTramDen = Date.now() + 10 * 60_000
       r = await tram(url, init)
     }
-    if (r.status === 400 && gen.responseSchema === SCHEMA_TRA_LOI && !RE_CHAN_VI_TRI.test(await r.clone().text().catch(() => ''))) {
-      console.warn('[hoi-tro-ly] Google từ chối lược đồ có khối hình — gọi lại bằng lược đồ cũ')
+    if (r.status === 400 && gen.responseSchema !== SCHEMA_TRA_LOI_CU && !RE_CHAN_VI_TRI.test(await r.clone().text().catch(() => ''))) {
+      console.warn('[hoi-tro-ly] Google từ chối lược đồ có khối hình / khuôn — gọi lại bằng lược đồ cũ')
       luocDoCuDen = Date.now() + 10 * 60_000
-      const cu: RequestInit = { ...init, body: JSON.stringify({ ...noiDung, generationConfig: { ...gen, responseSchema: SCHEMA_TRA_LOI_CU } }) }
+      const cu: RequestInit = { ...init, body: JSON.stringify({ ...goi, generationConfig: { ...gen, responseSchema: SCHEMA_TRA_LOI_CU } }) }
       r = tram && Date.now() < quaTramDen ? await tram(url, cu) : await fetch(url, cu)
     }
     const j = (await r.json().catch(() => null)) as Obj | null
@@ -551,7 +568,9 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const lichSu = ((ls as { results?: Obj[] }).results ?? []).reverse().map((x) => ({ cauHoi: str(x.cau_hoi), traLoi: str(x.tra_loi) })).filter((x) => x.cauHoi && x.traLoi)
   const ketQuaGanNhat = kq0 && kq0.ket_qua !== null && kq0.ket_qua !== undefined ? (Number(kq0.ket_qua) === 1 ? 'dung' : 'sai') : 'chua_lam'
   const dapAnEm = str(b.dapAnEm).replace(/\s+/g, ' ').trim().slice(0, 40)
-  const noiDung = dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm, dangLam })
+  // v3: máy chủ chọn KHUÔN trả lời từ dữ liệu đã có (không đọc thêm), gửi lược đồ riêng của khuôn.
+  const khuon = chonKhuon({ dangLam, phan: nc.cau.phan, ketQua: ketQuaGanNhat, cauHoi, de: nc.cau.de, dapAnEm })
+  const noiDung = { ...dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm, dangLam, khuon }), luocDo: schemaChoKhuon(khuon) }
   const bd = Date.now()
   const kq = await (phu.goiAi ?? (env.TRAM_GEMINI ? taoGoiGemini(CHO_GOI_KEP_MS, quaTram(env.TRAM_GEMINI)) : goiGemini))(key, cfg, noiDung)
   const ms = Date.now() - bd
@@ -568,7 +587,8 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   let cauTruc: CauTrucTraLoi | null = null, traLoiAi: string, lienQuan: boolean
   if (ct) {
     lienQuan = ct.lienQuan
-    cauTruc = lamSachCauTruc(ct.o, dangLam, dangLam ? (t) => { const r = chanLoDapAn(t, nc.cau.phan, nc.cau.dapAn, nc.cau.pa); return r === CAU_CHUA_NOP ? '' : r } : undefined)
+    cauTruc = lamSachCauTruc(ct.o, dangLam, dangLam ? (t) => { const r = chanLoDapAn(t, nc.cau.phan, nc.cau.dapAn, nc.cau.pa); return r === CAU_CHUA_NOP ? '' : r } : undefined,
+      { khuon, phan: nc.cau.phan, de: nc.cau.de, pa: nc.cau.pa, y: nc.cau.y, dapAn: nc.cau.dapAn, dapAnEm })
     traLoiAi = cauTruc ? chuPhang(cauTruc) : dangLam && str(ct.o.yChinh).trim() ? CAU_CHUA_NOP : ''
   } else {
     const tach = tachKetQua(kq.chu)

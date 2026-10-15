@@ -278,7 +278,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
             : <button type="button" className="ht2-lam-nut ht2-lam-nut-mo" aria-expanded={false} onClick={() => setMoLoiGiai(true)}><ChevronDown size={18} aria-hidden="true" />{coLyDoY ? 'Xem lời giải đầy đủ cả 4 ý' : 'Xem lời giải đầy đủ'}</button>)}
           {/* Thầy 13/10 "nút hỏi bài ở tất cả các câu… hỏi bài thầy mọi lúc": đang làm ⇒ Hỏi thầy (gợi hướng, không đáp án); có kết quả ⇒ thêm Lời giải từng bước. */}
           {dangTraLoi && <NutHoiThay gon dangLam qid={q.qid} nguon="bai_hang_ngay" onHoi={() => { daHoiThay.current = q.qid }} />}
-          {k && !k.choThay && <NutHoiThay gon qid={q.qid} nguon="bai_hang_ngay" />}
+          {k && !k.choThay && <NutHoiThay gon qid={q.qid} nguon="bai_hang_ngay" dapAnEm={traHien} />}
           {dangTraLoi && coHuongDan && <button type="button" className="ht2-lam-nut ht2-lam-nut-mo" onClick={() => void hocHuongDan()} disabled={nop}><BookOpen size={18} aria-hidden="true" />Chưa làm được? Học cách giải</button>}
           {!traLoiPhai && ghiTraLoi}
         </> : null}
