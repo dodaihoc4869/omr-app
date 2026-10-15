@@ -124,7 +124,8 @@ export function docTruocDongCoTheoHoSo(env:Env,t:DocTruocDongCo,hs:Pick<HoSo2,'c
   return moi
 }
 
-export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true,truoc?:DocTruocDongCo):Promise<DongCoHanhTrinh> {
+/** `ghiTruoc` (Gói R 15/10): lệnh ghi nơi gọi DỒN lại (vd. quota ngày Gói 7) — gửi ĐẦU lô ghi cuối của động cơ (một đợt D1 thay vì thêm một đợt giữa lượt). */
+export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true,truoc?:DocTruocDongCo,ghiTruoc:readonly D1PreparedStatement[]=[]):Promise<DongCoHanhTrinh> {
   // Đọc trước (đợt 18): dùng bản nơi gọi đã bắt đầu nếu ĐÚNG (em, lúc, ghi); không thì bắt đầu ngay tại đây — mọi lượt đọc độc lập đi CÙNG một đợt.
   const t=truoc&&truoc.sbd===sbd&&truoc.now===now&&truoc.ghi===ghi?truoc:docTruocDongCo(env,sbd,now,ghi)
   const th=docTruocDongCoTheoHoSo(env,t,hs)
@@ -184,7 +185,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const scope=hs.cau.filter(c=>c.nguon==='chien_dich').map(c=>q.get(c.qid)!)
   const forecast=duBaoDiem(omni,scope,{chiKyVong:true}), cursor=omni.cursor
   out.p8=forecast.p8
-  if(!ghi) return out
+  if(!ghi){if(ghiTruoc.length)await env.DB.batch([...ghiTruoc]);return out}
   await ghiDoV6(env,sbd,now,qs,t.chonV6??undefined)
   const firstSeen=new Map<string,number>()
   for(const e of events) {const g=e.contentGroup||q.get(e.qid)?.contentGroup||e.qid;firstSeen.set(g,Math.min(firstSeen.get(g)??Infinity,e.receivedAt))}
@@ -199,6 +200,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const giuCanh=!!old&&old.bam_canh===bamCanh&&Number.isFinite(canhLucCu)&&now>=canhLucCu&&now-canhLucCu<20*3_600_000
   const snapshot={halfLife:memory,canh:graph.canh,soQuanSat:qs.length,soHalfLife:out.soHalfLife,soCanhHoc:learned.length,duBao:forecast,phamVi:'ung_vien_ngay',soCau:scope.length,bamCanh,canhLuc:giuCanh?canhLucCu:now}
   const commands=[
+    ...ghiTruoc,
     ...ghiTre,
     ...(giuCanh?[]:[env.DB.prepare(`UPDATE hanh_trinh_v4_canh SET n_co=0,dung_co=0,n_chua=0,dung_chua=0,cap_nhat_luc=? WHERE sbd=? AND cap_nhat_luc<=? AND ${KHONG_CA}`).bind(now,sbd,Math.min(old?.cap_nhat_luc??now,now))]),
     env.DB.prepare(`INSERT INTO hanh_trinh_v4_em SELECT ?,?,?,?,? WHERE ${KHONG_CA} ON CONFLICT(sbd) DO UPDATE SET cursor=excluded.cursor,phien_ban=excluded.phien_ban,mo_hinh_json=excluded.mo_hinh_json,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_em.cap_nhat_luc`).bind(sbd,cursor,'ht4-0910-v1',JSON.stringify(snapshot),now),

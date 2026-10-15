@@ -1,4 +1,4 @@
-import type { Env } from './kieu'
+import type { Env, D1PreparedStatement } from './kieu'
 import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
 import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
@@ -163,8 +163,10 @@ export function docDanhSachGoiSom7(env: Env, sbd: string): Promise<{ results: Ro
 }
 /** `khiCoGoi` (đợt 18): em CÓ gói ⇒ báo nơi gọi NGAY sau lượt đọc danh sách gói để nó bắt đầu các lượt đọc của riêng nó CÙNG đợt với lượt đọc câu/sổ bên dưới
  *  (trước: chờ hàm này xong — hai đợt D1 nối tiếp). Lỗi của móc không làm hỏng việc đọc gói.
- *  `gsSom` = lượt `docDanhSachGoiSom7(env, sbd)` (đọc đoán cùng đợt cờ Gói 7); vắng ⇒ đọc như cũ (sau `damBaoGoi7`). */
-export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=false, khiCoGoi?: (goi: readonly GoiNhe7[]) => void, gsSom?: Promise<{ results: Row[] }>): Promise<GoiCuaEm7[]> {
+ *  `gsSom` = lượt `docDanhSachGoiSom7(env, sbd)` (đọc đoán cùng đợt cờ Gói 7); vắng ⇒ đọc như cũ (sau `damBaoGoi7`).
+ *  `ghiTre` (Gói R 15/10): nhận lệnh ghi quota ngày `goi_bai_7_ngay` thay vì ghi ngay — nơi gọi gửi CHUNG lô ghi cuối của lượt (trước: một lệnh ghi giữa lượt,
+ *  mọi lượt đọc sau phải chờ nó — một đợt D1). Không lượt đọc nào của lượt đọc lại bảng này sau đây. Vắng ⇒ ghi ngay như cũ. */
+export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=false, khiCoGoi?: (goi: readonly GoiNhe7[]) => void, gsSom?: Promise<{ results: Row[] }>, ghiTre?: D1PreparedStatement[]): Promise<GoiCuaEm7[]> {
   if(!chiDoc)await damBaoGoi7(env)
   const ngay = ngayVn7(now)
   const gs = await (gsSom ?? docDanhSachGoi7(env, sbd))
@@ -205,7 +207,10 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
     const chia=quotaCacGoiHocKt(out.map(g=>({id:g.id,han:g.han,chuaGap:g.cau.length-g.daGap.size+g.gapNgay.size})),ngay,ngayKiem)
     for(const g of out)g.quota=ngayKiem.has(ngay)?chia.get(g.id)??0:Math.max(g.quota,chia.get(g.id)??0)
   }
-  for(const g of out)if(!chiDoc&&!quotas.results.some(q=>q.goi_id===g.id))await env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) SELECT ?,?,?,? WHERE ${sqlCacGoiConNhan7('?','?',sqlTenLopHs('h'))}`).bind(g.id,sbd,ngay,g.quota,JSON.stringify([g.id]),sbd).run()
+  for(const g of out)if(!chiDoc&&!quotas.results.some(q=>q.goi_id===g.id)){
+    const lenh=env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) SELECT ?,?,?,? WHERE ${sqlCacGoiConNhan7('?','?',sqlTenLopHs('h'))}`).bind(g.id,sbd,ngay,g.quota,JSON.stringify([g.id]),sbd)
+    if(ghiTre)ghiTre.push(lenh);else await lenh.run()
+  }
   return out
 }
 
@@ -303,13 +308,15 @@ function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: reado
     env.DB.prepare('SELECT goi_id,qid,version FROM goi_bai_7_chua WHERE goi_id IN(SELECT value FROM json_each(?))').bind(JSON.stringify(goi.map(g=>g.id))).all<Row>(),
   ]))
   const kiemSom = som(env.DB.prepare('SELECT goi_id,ma_de,diem,nop_luc,json FROM goi_bai_7_kiem WHERE sbd=? AND nop_luc IS NOT NULL ORDER BY nop_luc DESC LIMIT 30').bind(sbd).all<Row>())
+  // Gói R 15/10: điểm kỹ năng của em (chỉ theo SBD) đọc NGAY đợt này — trước: chờ lớp ⇒ phạm vi rồi mới đọc (thêm một đợt nối tiếp khi đệm lớp/phạm vi vừa hết).
+  const diemSom = docDiemKyNang7(env, sbd)
   // Phạm vi bài đã dạy theo TÊN LỚP của em (cùng nguồn màn Học sinh) — `hoc_sinh.lop` là khối, không khớp `bai_da_day.lop` (lỗi 12/10, xem sqlTenLopHs).
   const oldUngSom = som((async () => {
     const lop = (await lopSom) ?? ''
     const phamVi = await phamViLop(env,lop)
     const maCu = [...(phamVi?.maDe ?? [])].filter(m => !goi.some(g => g.maDeNguon.includes(m)))
     // Ma trận cũ là toàn phạm vi; mẫu bổ sung chọn theo độ yếu, không chỉ câu đã làm.
-    return docMaTranCu7(env, sbd, maCu, now)
+    return docMaTranCu7(env, sbd, maCu, now, diemSom)
   })())
   const ungMoRong = som(Promise.all([qidsGoi, oldUngSom]).then(([qids, [, ungCu]]) => [...qids, ...ungCu.results.map(r => str(r.qid))]))
   const hsSom = som(docHoSo2(env, sbd, ngay, undefined, undefined, undefined, ungMoRong))
@@ -349,10 +356,11 @@ const demKnTinh = new WeakMap<object, Map<string, { luc: number; kiem: number; d
  * dấu kho (một dòng) CÙNG đợt với lượt đọc điểm của em. Điểm của em LUÔN đọc mới, rồi tính
  * ĐÚNG phép SQL cũ: DISTINCT (nhãn, trạng thái) và MIN(COALESCE(p, 0,3)) theo câu đã duyệt, xếp (độ yếu, mã câu), lấy 96. Số đợt D1 không tăng.
  */
-export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[], now: number): Promise<[{ results: Row[] }, { results: Row[] }]> {
+const docDiemKyNang7 = (env: Env, sbd: string) => som(env.DB.prepare('SELECT vkn_id,p,trang_thai FROM omni_p_vkn WHERE sbd=?').bind(sbd).all<Row>())
+/** `diemSom` (Gói R 15/10) = lượt đọc điểm kỹ năng của em (`omni_p_vkn`, chỉ theo SBD) nơi gọi đã bắt đầu sớm — cùng câu SQL; vắng ⇒ đọc như cũ. */
+export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[], now: number, diemSom?: Promise<{ results: Row[] }>): Promise<[{ results: Row[] }, { results: Row[] }]> {
   const thamSo = JSON.stringify(maCu), khoa = [...maCu].sort().join('|'), goc = dbGoc(env.DB as unknown as object)
-  const pSom = env.DB.prepare('SELECT vkn_id,p,trang_thai FROM omni_p_vkn WHERE sbd=?').bind(sbd).all<Row>()
-  pSom.catch(() => {})
+  const pSom = diemSom ?? docDiemKyNang7(env, sbd)
   let bang = demKnTinh.get(goc)
   if (!bang) { bang = new Map(); demKnTinh.set(goc, bang) }
   let e = bang.get(khoa)
@@ -392,8 +400,10 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   let traQids: (q: readonly string[]) => void = () => {}, loiQids: (e: unknown) => void = () => {}
   const qidsGoi = som(new Promise<readonly string[]>((ok, loi) => { traQids = ok; loiQids = loi }))
   const giu: { s: ReturnType<typeof batDauSom7> | null } = { s: null }
+  // Gói R: lệnh ghi quota ngày của gói đi CHUNG lô ghi cuối của động cơ (đứng đầu lô — đúng thứ tự ghi cũ), không chặn các lượt đọc giữa lượt.
+  const ghiTre7: D1PreparedStatement[] = []
   let goi: GoiCuaEm7[]
-  try { goi = await docGoiCuaEm7(env,sbd,now,false,(ds) => { giu.s = batDauSom7(env,sbd,now,ngay,ds,qidsGoi,lopSom) },gsSom) } catch (e) { loiQids(e); throw e }
+  try { goi = await docGoiCuaEm7(env,sbd,now,false,(ds) => { giu.s = batDauSom7(env,sbd,now,ngay,ds,qidsGoi,lopSom) },gsSom,ghiTre7) } catch (e) { loiQids(e); throw e }
   const qids = [...new Set(goi.flatMap(g => g.cau.map(c => c.qid)))]
   traQids(qids)
   if (!goi.length) return null
@@ -425,7 +435,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
     const quaCong = new Set((await chanKhacKhoiEm(env, 'goi7', { sbd, khoiEm }, coTheGiao, { cauCua: (c) => metaCua(c.qid), nghiSan: nghi })).map(c => c.qid))
     for (const c of ungGoi) if (!quaCong.has(c.qid)) chan.add(c.qid)
   }
-  const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan,true,dongCo)
+  const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan,true,dongCo,ghiTre7)
   const sanSang = new Set(hs.cau.filter(c => !engine.chan.has(c.qid) && !chan.has(c.qid) && !chan.has(hs.meta.get(c.qid)?.group??'') && !hs.meta.get(c.qid)?.tuLuan).map(c => c.qid))
   const { daLam: daLamNgay, vuaLam } = await daLamSom
   const [views,teacherCorrections]=await xemChuaSom

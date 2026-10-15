@@ -8,7 +8,8 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 export const THU_NGHIEM_HT5='ht6-hoc-va-chon-cau-0910'
 export type NhomThu='A'|'B'
 export interface PhanNhom { nhom:NhomThu;bat_dau:number;pham_vi:string;diem_dau:number|null;ma_tran_dau?:string|null }
-export async function docNhom(env:Env,sbd:string):Promise<PhanNhom|null>{return env.DB.prepare('SELECT nhom,bat_dau,pham_vi,diem_dau,ma_tran_dau FROM hanh_trinh_v5_phan_nhom WHERE thu_nghiem=? AND sbd=?').bind(THU_NGHIEM_HT5,sbd).first<PhanNhom>()}
+const lenhDocNhom=(env:Env,sbd:string)=>env.DB.prepare('SELECT nhom,bat_dau,pham_vi,diem_dau,ma_tran_dau FROM hanh_trinh_v5_phan_nhom WHERE thu_nghiem=? AND sbd=?').bind(THU_NGHIEM_HT5,sbd)
+export async function docNhom(env:Env,sbd:string):Promise<PhanNhom|null>{return lenhDocNhom(env,sbd).first<PhanNhom>()}
 /** `cuSom` = lượt `docNhom(env,sbd)` nơi gọi đã bắt đầu sớm SAU lệnh tạo bảng v5 (đợt 18 — động cơ đọc trước cùng đợt); vắng ⇒ đọc như cũ. */
 export async function phanNhom(env:Env,sbd:string,now:number,phamVi:string,ghi=true,cuSom?:Promise<PhanNhom|null>):Promise<PhanNhom|null>{
   await chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)
@@ -19,8 +20,9 @@ export async function phanNhom(env:Env,sbd:string,now:number,phamVi:string,ghi=t
   const tang=`${r.lop}|${r.ten_lop}|${r.diem===null?'chua_do':r.diem<5?'duoi5':r.diem<8?'5den8':'tu8'}`
   // Một INSERT SELECT nguyên tử: cân bằng trong tầng phân, coin crypto khi bằng nhau; đọc lại không đổi nhóm.
   const coin=crypto.getRandomValues(new Uint32Array(1))[0]!%2===0?'A':'B'
-  await env.DB.prepare(`INSERT OR IGNORE INTO hanh_trinh_v5_phan_nhom SELECT ?1,?2,CASE WHEN SUM(CASE WHEN nhom='A' THEN 1 ELSE 0 END)<SUM(CASE WHEN nhom='B' THEN 1 ELSE 0 END) THEN 'A' WHEN SUM(CASE WHEN nhom='A' THEN 1 ELSE 0 END)>SUM(CASE WHEN nhom='B' THEN 1 ELSE 0 END) THEN 'B' ELSE ?3 END,?4,?5,NULL,NULL,?6 FROM hanh_trinh_v5_phan_nhom WHERE thu_nghiem=?1 AND tang_phan=?4 HAVING ${KHONG_CA_HT5}`).bind(THU_NGHIEM_HT5,sbd,coin,tang,now,phamVi).run()
-  return docNhom(env,sbd)
+  // Gói R 15/10: ĐỌC LẠI DÒNG THẮNG CÙNG LÔ với lệnh ghi (một đợt D1 thay hai; hai máy cùng phân lần đầu vẫn cùng thấy dòng thắng). Lỗi lô ⇒ ném như cũ.
+  const [,dong]=await env.DB.batch<PhanNhom>([env.DB.prepare(`INSERT OR IGNORE INTO hanh_trinh_v5_phan_nhom SELECT ?1,?2,CASE WHEN SUM(CASE WHEN nhom='A' THEN 1 ELSE 0 END)<SUM(CASE WHEN nhom='B' THEN 1 ELSE 0 END) THEN 'A' WHEN SUM(CASE WHEN nhom='A' THEN 1 ELSE 0 END)>SUM(CASE WHEN nhom='B' THEN 1 ELSE 0 END) THEN 'B' ELSE ?3 END,?4,?5,NULL,NULL,?6 FROM hanh_trinh_v5_phan_nhom WHERE thu_nghiem=?1 AND tang_phan=?4 HAVING ${KHONG_CA_HT5}`).bind(THU_NGHIEM_HT5,sbd,coin,tang,now,phamVi),lenhDocNhom(env,sbd)])
+  return dong?.results?.[0]??null
 }
 export interface MauDo { sbd:string;nhom:NhomThu;batDau:number;diemDau:number|null;id:string;luc:number;diem:number;docLap:boolean;phamVi:string;phamViDau:string;maTran:string;phut:number|null }
 /** Một em một điểm kiểm đầu tiên ngày 7–14, cùng phạm vi/ma trận. Thiếu điểm đầu không tự gán 0. */
