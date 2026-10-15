@@ -57,7 +57,7 @@
  .h2-cdl .h2-cdl-ds { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
  .h2-cdl .h2-lsc-diem { font-size:44px; }
  .bl-login { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,480px); align-items:center; gap:64px; padding:64px; }
- .bl-login .bl-login__card { width:100%; max-width:480px; }
+ .bl-login .bl-login__card { width:100%; max-width:480px; margin-left:0; } /* T10 15/10: thẻ nằm trọn ô lưới, không nhận lề 36vw của bố cục cũ */
  .ph3 .ph3-vao { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,480px); gap:64px; padding:64px; align-items:center; max-width:1440px; margin-inline:auto; }
 }
 @media (max-width:899px) {
