@@ -86,6 +86,19 @@ describe('làm sạch phần v3', () => {
     expect(trungDe.kiemLai).toBeUndefined()
   })
 
+  it('ĐO 15/10 (bay, xepHang, doiChieu, buocThu 0 lượt): khối dạng object luôn khai required; Chỉ chỗ sai bắt buộc bay; đáp số em thử kèm đơn vị chữ vẫn nhận', () => {
+    for (const k of KHUON) {
+      const p = schemaChoKhuon(k).properties as Record<string, { type?: string; required?: string[] }>
+      for (const ten of ['bay', 'xepHang', 'doiChieu', 'buocThu', 'kiemLai']) if (p[ten]) expect(p[ten]!.required?.length, `${k}.${ten}`).toBeGreaterThan(0)
+    }
+    expect(schemaChoKhuon('cho-sai').required).toEqual(['lienQuan', 'yChinh', 'bay'])
+    for (const k of KHUON.filter((x) => x !== 'cho-sai')) expect(schemaChoKhuon(k).required).toEqual(['lienQuan', 'yChinh'])
+    const thu = (dap: string) => lamSachCauTruc({ ...MO, buocThu: { buoc: 2, hoi: 'Mol CO2?', dap } }, false, undefined, BO)!.buocThu?.dap
+    expect(['0,16 mol', '0.16mol', '≈ 0,16', '3,97 L', '80%'].map(thu)).toEqual(['0,16', '0,16', '0,16', '3,97', '80'])
+    expect(thu('2×10^-3')).toBeUndefined()
+    expect(thu('0,1 và 0,2')).toBeUndefined()
+  })
+
   it('Từng ý a–d: "Em" từ bài em gửi, "Đáp án" từ KHO (mô hình không ghi đè); lý do theo từng ý', () => {
     const bo: BoiCanhKhuon = { khuon: 'tung-y', phan: 'II', de: 'Phát biểu về glucose', pa: null, y: { a: 'Có 5 nhóm –OH.', b: 'Bị khử bởi AgNO3/NH3.', c: '<b>Hoà tan</b> Cu(OH)2.', d: 'Là disaccharide.' }, dapAn: 'DSDS', dapAnEm: 'ddss' }
     const c = lamSachCauTruc({ lienQuan: true, yChinh: 'Em sai ý b, c.', lyDoY: [{ y: 'b', lyDo: 'Glucose bị **oxi hoá**.', dapAn: 'D' }, { y: 'c', lyDo: 'Nhiều –OH kề nhau.' }] }, false, undefined, bo)!
