@@ -1,0 +1,33 @@
+/* ĐƯỜNG /hoi-thay (HoiThayScreen.tsx, 15/10/2026). Chỉ biến màu M3 / app học sinh có sẵn (luật màu thầy 05/10), không thêm màu mới. */
+
+/* Nằm trong iframe lớp phủ của trang bài làm: nền TRONG SUỐT để thấy trang mẹ phía sau; hộp Hỏi Thầy tự có nền mờ (.lg-hh-nen). */
+html[data-hoi-thay-nhung],
+html[data-hoi-thay-nhung] body,
+html[data-hoi-thay-nhung] #root,
+html[data-hoi-thay-nhung] .ht-shell { background: transparent; }
+
+/* Màn đăng nhập (chưa có phiên): giữ nguyên nền app học sinh như /hs, thêm nút đóng và một dòng lý do. */
+html[data-hoi-thay-nhung] .htt-dang-nhap { min-height: 100%; background: var(--nen); }
+.htt-dang-nhap { position: relative; }
+.htt-dong {
+  position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 60;
+  width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 999px; cursor: pointer; touch-action: manipulation;
+  background: var(--m3-surface-container-high); color: var(--m3-on-surface); border: 1px solid var(--m3-outline-variant, currentColor);
+}
+.htt-dong:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+.htt-vi-sao {
+  margin: 0; padding: calc(16px + env(safe-area-inset-top, 0px)) 68px 0 16px; font-size: 15px; font-weight: 600; line-height: 1.4;
+  color: var(--m3-on-surface);
+}
+
+/* Mở thẳng (không trong iframe) rồi đóng hộp: thẻ nhỏ giữa màn, lối về bài làm hoặc hỏi lại. */
+.htt-nen { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 16px; box-sizing: border-box; }
+.htt-the {
+  width: min(420px, 100%); box-sizing: border-box; padding: 24px 20px; border-radius: 28px; text-align: center;
+  background: var(--m3-surface); color: var(--m3-on-surface);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--m3-on-surface) 14%, transparent);
+}
+.htt-the-chu { margin: 0 0 16px; font-size: 17px; font-weight: 600; }
+.htt-the-nut { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; }
+
+.htt-cho { min-height: 100vh; }

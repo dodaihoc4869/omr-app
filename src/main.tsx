@@ -107,8 +107,16 @@ khoaVaiVaoUrl(import.meta.env.BASE_URL)
 type GocApp = { default: ComponentType; huaManEmSom: () => Promise<unknown> | null }
 const thuLai = <T,>(nap: () => Promise<T>): Promise<T> => nap().catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(nap))
 // Link riêng CŨ (`/hs/<token>?vai=hocsinh`…) App.tsx chặn bằng màn "link đã ngừng dùng" TRƯỚC nhánh cổng ⇒ đi App.tsx như cũ.
-const laCongHocSinh = docDuongVao(location.search, location.pathname).vai === 'hocsinh' && !laLinkAppCu(location.search, location.pathname)
-const napGoc: Promise<GocApp> = laCongHocSinh ? thuLai(() => import('./AppHocSinh')) : thuLai(() => import('./App'))
+const dvMo = docDuongVao(location.search, location.pathname)
+const laCongHocSinh = dvMo.vai === 'hocsinh' && !laLinkAppCu(location.search, location.pathname)
+// ĐƯỜNG /hoi-thay (15/10, HoiThayScreen.tsx): trang bài làm văn phòng nhúng hộp Hỏi Thầy trong iframe ⇒ gốc RIÊNG, nhẹ (không App.tsx).
+// Nhận thẳng ở đây, không thêm vai vào vai-tro.ts (mã nằm trong gói mở cả ba app; vai-tro trả null cho đường này nên không đổi gì khác).
+const laHoiThay = /^\/hoi-thay\/?$/.test(location.pathname)
+const napGoc: Promise<GocApp> = laCongHocSinh
+  ? thuLai(() => import('./AppHocSinh'))
+  : laHoiThay
+    ? thuLai(() => import('./screens/hoi-thay-goc').then((m) => m.napHoiThay()))
+    : thuLai(() => import('./App'))
 /** Lượt tải mảnh màn em (màn thi / cổng học sinh) của gốc vừa chọn — KaTeX tải NỐI SAU nó. */
 const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
 
@@ -124,10 +132,10 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
   else if (dv.vai === 'phuhuynh') nhoVaiDaDung('ph')
   // CHẾ ĐỘ MÁY YẾU (thầy 29/09): máy em / phụ huynh ít RAM, ít lõi, xin giảm chuyển động hay tiết kiệm dữ liệu ⇒ gắn lớp
   // `may-yeu` lên <html> TRƯỚC khi React dựng (tắt kính mờ, bớt hoạt ảnh trang trí, bớt hạt/thị sai). Máy thầy không đụng.
-  if (dv.vai === 'hocsinh' || dv.vai === 'phuhuynh' || dv.vai === 'diem' || dv.vai === 'phieu' || !!dv.maCa) batCheDoMayYeu()
-  // KaTeX: đường vào có công thức ngay (màn thi, xem điểm, cổng học sinh, phiếu) ⇒ tải NGAY, song song với
+  if (dv.vai === 'hocsinh' || dv.vai === 'phuhuynh' || dv.vai === 'diem' || dv.vai === 'phieu' || laHoiThay || !!dv.maCa) batCheDoMayYeu()
+  // KaTeX: đường vào có công thức ngay (màn thi, xem điểm, cổng học sinh, phiếu, hỏi thầy) ⇒ tải NGAY, song song với
   // mảnh màn; đường khác (màn khoá thầy, cổng phụ huynh) ⇒ tải lúc rảnh sau khi trang đã hiện.
-  const canCongThucNgay = !!dv.maCa || dv.vai === 'diem' || dv.vai === 'hocsinh' || dv.vai === 'phieu'
+  const canCongThucNgay = !!dv.maCa || dv.vai === 'diem' || dv.vai === 'hocsinh' || dv.vai === 'phieu' || laHoiThay
   // MÁY YẾU / 3G (29/09): vào thi (`/t/<mã ca>`) và cổng học sinh thì màn ĐẦU (ô số báo danh, đăng nhập) không có công thức ⇒
   // KaTeX (~83 KB gzip) tải NGAY SAU mảnh màn thay vì giành đường truyền với nó (đo Fast 3G: màn đầu hiện sớm hơn). Xem điểm /
   // phiếu có công thức ngay ⇒ vẫn tải liền như cũ.
@@ -210,11 +218,13 @@ if (laCongHocSinh && typeof navigator !== 'undefined' && navigator.serviceWorker
   }
   window.addEventListener('ddh-sanh-da-ve', dangKyMotLan, { once: true })
   setTimeout(dangKyMotLan, 30_000)
-} else dangKySW()
+} else if (!laHoiThay) dangKySW()
+// /hoi-thay KHÔNG đăng ký service worker: em chỉ mở một hộp hỏi trong iframe trang bài làm ⇒ không bắt máy em tải precache (~3 MB) vì một câu hỏi.
 // LỚP BẢO HIỂM 4 (P1 21/09): ba lớp trên đều trông vào service worker cài được bản mới; máy nào cài hỏng (mạng yếu rớt một tệp precache) thì kẹt bản cũ mãi.
 // Lớp này tự hỏi sw-version.json rồi so với giờ dựng đóng trong gói; mới hơn mà 20 giây sau chưa tự lên thì xoá kho SW + nạp lại. Rào: không ép lúc em làm bài;
 // mỗi bản tối đa 2 lần; không đụng IndexedDB/localStorage. Xem bao-hiem-ban-moi.ts.
-batBaoHiemBanMoi()
+// /hoi-thay: không service worker (mở là bản mới nhất); tự nạp lại giữa lúc em đang hỏi Thầy sẽ mất cuộc hỏi ⇒ không bật.
+if (!laHoiThay) batBaoHiemBanMoi()
 
 const goc = createRoot(document.getElementById('root')!)
 void napGoc.then(({ default: App }) =>
@@ -225,4 +235,5 @@ void napGoc.then(({ default: App }) =>
   ),
 )
 
-startAppPresence()
+// /hoi-thay: không đếm vào "đang online" (app-presence coi đường lạ là máy thầy).
+if (!laHoiThay) startAppPresence()
