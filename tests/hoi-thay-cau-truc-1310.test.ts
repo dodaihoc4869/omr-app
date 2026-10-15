@@ -8,7 +8,7 @@ import path from 'node:path'
 import worker from '../server/src/index'
 import { gameToken } from '../server/src/game-v2-auth'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
-import { SCHEMA_TRA_LOI, chuPhang, lamSachCauTruc, tachCauTruc } from '../server/src/hoi-tro-ly-cau-truc'
+import { SCHEMA_TRA_LOI, chuPhang, lamSachCauTruc, schemaChoKhuon, tachCauTruc } from '../server/src/hoi-tro-ly-cau-truc'
 import { CAU_CHUA_NOP, chanLoDapAn } from '../server/src/hoi-tro-ly'
 
 const GOC = path.resolve(__dirname, '..')
@@ -119,11 +119,13 @@ describe('đầu-cuối /hs/hoi-tro-ly', () => {
     const goi = giaGemini(MAU_AMINE)
     await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'luyen_de' })
     const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, nguon: 'luyen_de', cauHoi: 'Em dùng kiến thức gì ạ?' })
-    expect(goi[0]!.generationConfig.responseSchema).toEqual(JSON.parse(JSON.stringify(SCHEMA_TRA_LOI)))
+    // v3 (15/10): phần II đã nộp ⇒ máy chủ chọn khuôn "Từng ý a–d", gửi lược đồ RIÊNG của khuôn (không còn lược đồ v2 chung).
+    expect(goi[0]!.generationConfig.responseSchema).toEqual(JSON.parse(JSON.stringify(schemaChoKhuon('tung-y'))))
     expect(String(goi[0]!.systemInstruction.parts[0].text)).toContain('TRÌNH BÀY')
     expect(r).toMatchObject({ ok: true, ngoaiPhamVi: false, conLai: 35 }) // trần 36 câu/ngày (thầy 14/10; trước đó 12, PR #275)
     expect((r.cauTruc as { bang: { sauBuoc: number } }).bang.sauBuoc).toBe(2)
-    expect(r.traLoi).toBe(chuPhang(lamSachCauTruc(MAU_AMINE, false)!))
+    const c = MAU[Q_DS].cau as { y: Record<string, string>; dap_an: string; de: string }
+    expect(r.traLoi).toBe(chuPhang(lamSachCauTruc(MAU_AMINE, false, undefined, { khuon: 'tung-y', phan: 'II', de: c.de, pa: null, y: c.y, dapAn: c.dap_an, dapAnEm: '' })!))
     const so = d.sql.prepare('SELECT tra_loi FROM hoi_tro_ly WHERE sbd=?').get(SBD) as { tra_loi: string }
     expect(so.tra_loi).toBe(r.traLoi)
   })
