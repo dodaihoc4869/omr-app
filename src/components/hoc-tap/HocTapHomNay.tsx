@@ -103,6 +103,11 @@ export default function HocTapHomNay(p: Props) {
   // Thẻ mời Tự sửa lỗi: tải lười khi Hôm nay đã có số (không tranh lượt với Sảnh); em làm thêm câu ⇒ xem lại bản nhớ (hết hạn mới hỏi máy chủ).
   const soSua = useSoCauCanSua(p.token, !!sanh || !p.dangTai, so?.daLam)
   const coMoiSua = !!soSua && soSua > 0
+  // Mở chặng trước (thầy 16/10 "load lâu quá … tối ưu tốc độ tức thì"): Hôm nay đã có số, nút Học tiếp bấm được ⇒ gọi sẵn lệnh mở chặng để em bấm là có câu
+  // ngay (mo-chang-truoc.ts — kết quả y hệt gọi lúc bấm; mỗi token tối đa một lượt mỗi 10 phút). Nạp ĐỘNG mảnh màn làm bài (cùng mảnh nút Học tiếp mở): không
+  // thêm tệp vào lượt mở app / precache, và màn làm bài được nạp sẵn luôn.
+  const coTheHoc = !!sanh && !ngayKiem && !khoaHoc && !!con && con > 0 && !p.coCa
+  useEffect(() => { if (coTheHoc && p.token) { const token = p.token; void import('./ManLamBaiTap').then((m) => m.moChangTruoc(token)).catch(() => {}) } }, [coTheHoc, p.token])
 
   // Tấm "Của em": Esc đóng, focus vào tấm khi mở và trả về ảnh đại diện khi đóng.
   useEffect(() => {
