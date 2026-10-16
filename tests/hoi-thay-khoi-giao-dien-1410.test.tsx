@@ -32,7 +32,9 @@ describe('khối hình', () => {
     const ct = docCauTruc(MAY_CHU)!
     const { container } = render(<TraLoiThay ct={ct} onHoi={() => {}} />)
     const thuTu = [...container.querySelectorAll('.lg-tl > *')].map((e) => e.getAttribute('aria-label') ?? e.className)
-    expect(thuTu).toEqual(['lg-tl-dau', 'lg-tl-chinh', 'Sơ đồ chuyển hoá', 'Thí nghiệm ảo', 'Hiện tượng và nhóm chức', 'Phương trình', 'Tính nhanh', 'lg-tl-buoc', 'Chỗ em nhầm', 'Ghi nhớ', 'Hỏi tiếp'])
+    // SỬA CÓ CHỦ ĐÍCH 16/10: nhãn trợ giảng AI đã được thầy duyệt; vẫn kiểm đủ thứ tự mọi khối học thuật.
+    expect(thuTu).toEqual(['lg-tl-dau', 'lg-ht-ai', 'lg-tl-chinh', 'Sơ đồ chuyển hoá', 'Thí nghiệm ảo', 'Hiện tượng và nhóm chức', 'Phương trình', 'Tính nhanh', 'lg-tl-buoc', 'Chỗ em nhầm', 'Ghi nhớ', 'Hỏi tiếp'])
+    expect(container.querySelector('.lg-ht-ai')!.textContent).toBe('Trợ giảng AI của thầy Học')
     // thí nghiệm: một ống mỗi chất, đúng mã hiện tượng, quỳ có mẩu giấy, tráng bạc có gương + lửa, kết tủa có lớp tủa
     const ong = [...container.querySelectorAll('.lg-tn')]
     expect(ong.map((o) => o.getAttribute('data-h'))).toEqual(['quy-xanh', 'trang-bac', 'tua-trang'])
