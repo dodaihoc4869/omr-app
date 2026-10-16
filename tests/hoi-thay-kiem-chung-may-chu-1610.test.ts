@@ -89,6 +89,23 @@ describe('Hỏi thầy · kiểm chứng do máy chủ giữ', () => {
     const a = await mo(); await nop(a.phienId, rieng(a.phienId).q.correct)
     expect(spy).not.toHaveBeenCalled()
   })
+  it('lời thầy cũ không đi cùng câu kiểm độc lập; lời mới được giữ ở phiên assisted và trạng thái chờ', async () => {
+    const cu = HOM_NAY - 25 * 3600000
+    d.sql.prepare(`INSERT INTO hoi_thay_can_giup(sbd,qid,trang_thai,loi_thay,loi_luc,doc_luc,gui_luc,cap_nhat_luc)
+      VALUES('HS1',?,'da_ho_tro','Lời thầy cũ',?,?,?,?)`).run(Q, cu, cu, cu, cu)
+    d.sql.prepare("INSERT INTO loi_giai_hoi(sbd,qid,nguon,luc,co_ho_so) VALUES('HS1',?,'hoi_thay:thay_go',?,0)").run(Q, new Date(cu).toISOString())
+    const a = await mo(), resume = await mo()
+    expect(a).toMatchObject({ trangThai: 'co_cau' }); expect(a).not.toHaveProperty('loiThay')
+    expect(resume.phienId).toBe(a.phienId); expect(resume).not.toHaveProperty('loiThay')
+    expect((await nop(a.phienId, rieng(a.phienId).q.correct)).trangThai).toBe('da_tu_lam')
+    expect(await mo()).toMatchObject({ trangThai: 'cho_kiem_lai', loiThay: 'Lời thầy cũ' })
+    vi.setSystemTime(HOM_NAY + 25 * 3600000)
+    d.sql.prepare("UPDATE hoi_thay_can_giup SET loi_thay='Lời mới',loi_luc=?,doc_luc=0,revision=revision+1 WHERE sbd='HS1' AND qid=?").run(Date.now(), Q)
+    const b = await mo(), lai = await mo()
+    expect(b).toMatchObject({ trangThai: 'co_cau', loiThay: 'Lời mới' })
+    expect(lai).toMatchObject({ trangThai: 'co_cau', phienId: b.phienId, loiThay: 'Lời mới' })
+    expect((await nop(b.phienId, rieng(b.phienId).q.correct)).trangThai).toBe('cho_kiem_lai')
+  })
   it('lịch kiểm trực tiếp vẫn có khi chưa có đợt sửa; hôm sau mở kiểm không cần hỏi AI lại', async () => {
     // Em từng làm ĐÚNG câu gốc, sau đó hỏi để hiểu sâu hơn: không có đợt lỗi để gắn nút vào.
     d.sql.prepare("UPDATE su_kien_hoc SET ket_qua=1 WHERE khoa='sai1'").run()

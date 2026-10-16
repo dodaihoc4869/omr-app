@@ -61,9 +61,9 @@ async function daXacNhan(env: Env, sbd: string, qid: string, ds: Dong[], now: nu
   if (!ds.some(d => d.trang_thai === 'da_nop')) return false
   return (await dongBoSuaLoiHoiThay(env, sbd, qid, now)).daXacNhan
 }
-function traCau(d: Dong) {
+function traCau(d: Dong, loiThay: { loiThay?: string } = {}) {
   const c = docSnapshot(d)
-  return c ? { ok: true, trangThai: 'co_cau', phienId: d.id, cau: congKhaiKiemHoiThay(c.q), thongBao: 'Em tự làm câu tương đương này. Kết quả đầu tiên được lưu để chọn cách hỗ trợ tiếp.' } : LOI_CHO()
+  return c ? { ok: true, trangThai: 'co_cau', phienId: d.id, cau: congKhaiKiemHoiThay(c.q), ...(d.assistance === 'assisted' ? loiThay : {}), thongBao: 'Em tự làm câu tương đương này. Kết quả đầu tiên được lưu để chọn cách hỗ trợ tiếp.' } : LOI_CHO()
 }
 
 export async function hsMoKiemHoiThay(env: Env, b: Obj): Promise<Obj> {
@@ -84,7 +84,7 @@ export async function hsMoKiemHoiThay(env: Env, b: Obj): Promise<Obj> {
     const mo = dungBan.find(d => d.trang_thai === 'dang_lam' && d.het_han_luc > now)
     if (mo) {
       const c = docSnapshot(mo), nguon = await docNguonKiemHoiThay(env, goc, undefined, mo.khoa_noi_dung)
-      if (c && nguon.cau.some(x => x.khoa === c.khoa && x.q.version === c.q.version)) return { ...traCau(mo), ...loiThay }
+      if (c && nguon.cau.some(x => x.khoa === c.khoa && x.q.version === c.q.version)) return traCau(mo, loiThay)
       // Học liệu vừa sửa/thu hồi: không chấm ảnh cũ bằng nguồn mới.
       await env.DB.prepare("UPDATE hoi_thay_kiem SET trang_thai='het_han',revision=revision+1 WHERE id=? AND trang_thai='dang_lam'").bind(mo.id).run()
       return loi('CAU_THAY_DOI', 'Câu kiểm vừa được cập nhật. Em mở lại để nhận đúng bản nhé.')
@@ -112,7 +112,7 @@ export async function hsMoKiemHoiThay(env: Env, b: Obj): Promise<Obj> {
     ])
     const d = r[2]?.results[0] as Dong | undefined
     if (d?.trang_thai === 'da_nop' && d.den_han) return { ok: true, trangThai: 'cho_kiem_lai', ...loiThay, denHan: new Date(d.den_han).toISOString(), thongBao: 'Kết quả đầu tiên đã được lưu. Em kiểm lại theo lịch ôn chung nhé.' }
-    return d?.trang_thai === 'dang_lam' ? { ...traCau(d), ...loiThay } : LOI_CHO()
+    return d?.trang_thai === 'dang_lam' ? traCau(d, loiThay) : LOI_CHO()
   } catch { return loi('CHO_CHUAN_BI', 'Chưa mở được câu kiểm. Tiến độ của em vẫn được giữ; em thử lại sau nhé.') }
 }
 
