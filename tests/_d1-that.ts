@@ -9,13 +9,17 @@
 // lược đồ THẬT (nạp đúng tệp `server/schema.sql` + mọi `server/migration-*.sql`),
 // nên `json_each`, `ON CONFLICT`, `date(...,'+7 hours')` được kiểm chứng chứ không
 // đoán. `batch` chạy trong một giao dịch, giống D1.
-import { DatabaseSync } from 'node:sqlite'
 import { readFileSync, readdirSync } from 'node:fs'
 import type { D1PreparedStatement, Env } from '../server/src/kieu'
 import { xoaDemThiDua } from '../server/src/dem-thi-dua'
 import { xoaMoiDem } from '../server/src/dem-chung'
 import { xoaDemKeHoach } from '../server/src/dem-ke-hoach'
 import { xoaSucKhoe } from '../server/src/suc-khoe-may'
+
+// Nạp node:sqlite LÚC CHẠY, không `import` tĩnh (16/10): tệp test vừa dựng màn (jsdom) vừa dùng D1 giả — vd
+// `tra-loi-ngan-qua-4-o-1510` — chạy ở môi trường client của vitest 4, nơi chỉ module có trong `builtinModules` được để
+// ngoài. Node 22 KHÔNG liệt kê `node:sqlite` (Node 24 có) ⇒ import tĩnh báo "Cannot bundle Node.js built-in" và 0 test chạy.
+const { DatabaseSync } = process.getBuiltinModule('node:sqlite')
 
 /** Duy nhất tệp này phụ thuộc thứ tự (cần `game_v2_settings` dựng trước) — bỏ qua, không dùng tới. */
 const BO_QUA = new Set(['migration-1609-academic-start.sql'])
