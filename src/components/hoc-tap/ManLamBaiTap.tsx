@@ -3,6 +3,9 @@ import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Info, Lightbulb, P
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2 } from '../hoa2/api'
+import { GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc } from './mo-chang-truoc'
+// Hôm nay nạp ĐỘNG đúng mảnh này để mở chặng trước (không sinh thêm tệp nạp / precache; mảnh màn làm bài được nạp sẵn luôn).
+export { moChangTruoc } from './mo-chang-truoc'
 import type { HinhAnh } from '../../data/examContent'
 import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
@@ -75,7 +78,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   useEffect(() => {
     let huy = false
     setTai(true); setLoi(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); soLuotDem.current++
-    void goiHoa2('hoc-tap-start', token, {}, 40).then(r => {
+    // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi như cũ.
+    void (layChangMoTruoc(token) ?? goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)).then(r => {
       if (huy) return
       if (!r.ok) throw new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được chặng học.')
       const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []
@@ -157,7 +161,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       setKet(v=>({...v,[q.qid]:r as unknown as Ket}));capNhatSo()
     } catch(e){setLoi(e instanceof Error?e.message:'Chưa tải được phần chữa.')}finally{gui.current=false;setNop(false)}
   }
-  const tiep = () => { setLoi(''); if (viTri + 1 < cau.length) setViTri(i => i + 1); else { setXong(true); canTaiSanh.current = false; onCapNhat(); gocRef.current?.scrollIntoView?.({ block: 'start' }) } }
+  // Xong chặng: câu cuối đã nộp ⇒ mở trước chặng sau (em bấm "Học tiếp chặng N" là có câu ngay).
+  const tiep = () => { setLoi(''); if (viTri + 1 < cau.length) setViTri(i => i + 1); else { setXong(true); canTaiSanh.current = false; onCapNhat(); moChangTruoc(token); gocRef.current?.scrollIntoView?.({ block: 'start' }) } }
 
   const ttCau = (c: Cau, i: number): TT => { const r = ket[c.qid]; return r ? (r.choThay || r.hocCoHoTro || r.omni?.luot ? 'ho-tro' : r.correct ? (r.assisted ? 'ho-tro' : 'dung') : 'sai') : i === viTri && !xong ? 'dang' : 'cho' }
   const soDung = cau.filter((c, i) => ttCau(c, i) === 'dung').length

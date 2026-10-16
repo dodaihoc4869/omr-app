@@ -1,0 +1,61 @@
+# ĐO THỜI GIAN THẬT TỪNG LỆNH (CHỈ ĐỌC) — thầy 16/10 (ảnh "Chặng học của em — Đang chuẩn bị những câu phù hợp với em…"): "phần này load lâu quá,
+# quét và tối ưu tốc độ tức thì nhé". `wrangler tail` vài phút trên Worker sống, gộp theo ĐƯỜNG DẪN (/game-v2/<lệnh>): số lần, thời gian thực (wallTime)
+# và CPU (cpuTime) p50/p90/max. CHỈ in số gộp — không in nhật ký, không in thân yêu cầu, không in mã em. PHUT = số phút theo dõi.
+name: Đo thời gian thật từng lệnh (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/do-tail-lenh-1610.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-tail-lenh-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PHUT: '6'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Theo dõi Worker sống rồi gộp số
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          timeout $((PHUT*60)) npx -y wrangler@4 tail omr --format json > /tmp/tail.jsonl 2>/tmp/tail.err || true
+          echo "dòng nhận: $(wc -l < /tmp/tail.jsonl)"; tail -n 3 /tmp/tail.err | sed 's/[0-9a-f]\{32,\}/<id>/g'
+          node - <<'JS'
+          const fs = require('fs')
+          const raw = fs.readFileSync('/tmp/tail.jsonl', 'utf8')
+          // wrangler in mỗi sự kiện là một khối JSON nhiều dòng ⇒ tách theo cân ngoặc
+          const ev = []; let d = 0, s = -1, inStr = false, esc = false
+          for (let i = 0; i < raw.length; i++) { const c = raw[i]
+            if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; continue }
+            if (c === '"') { inStr = true; continue }
+            if (c === '{') { if (d++ === 0) s = i } else if (c === '}') { if (--d === 0 && s >= 0) { try { ev.push(JSON.parse(raw.slice(s, i + 1))) } catch {} s = -1 } } }
+          console.log('sự kiện:', ev.length, '· khoá cấp 1 của sự kiện đầu:', ev[0] ? Object.keys(ev[0]).join(',') : '-')
+          const nhom = new Map()
+          for (const e of ev) {
+            const url = e?.event?.request?.url; if (!url) continue
+            let p; try { p = new URL(url).pathname } catch { continue }
+            p = p.replace(/\/[0-9a-f-]{20,}/gi, '/<id>').replace(/\/\d{4,}/g, '/<so>')
+            const g = nhom.get(p) ?? { n: 0, w: [], c: [], loi: 0 }; g.n++
+            if (typeof e.wallTime === 'number') g.w.push(e.wallTime)
+            if (typeof e.cpuTime === 'number') g.c.push(e.cpuTime)
+            if (e.outcome && e.outcome !== 'ok') g.loi++
+            nhom.set(p, g)
+          }
+          const pt = (a, q) => { if (!a.length) return '-'; const b = [...a].sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.floor(q * b.length))] }
+          console.log('đường dẫn | lần | wall p50/p90/max ms | cpu p50/p90/max ms | khác ok')
+          for (const [p, g] of [...nhom].sort((a, b) => b[1].n - a[1].n).slice(0, 40))
+            console.log(`${p} | ${g.n} | ${pt(g.w, .5)}/${pt(g.w, .9)}/${pt(g.w, 1)} | ${pt(g.c, .5)}/${pt(g.c, .9)}/${pt(g.c, 1)} | ${g.loi}`)
+          JS
