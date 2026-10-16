@@ -500,3 +500,6 @@ Thầy (15/10 ~08:5x, sau khi đọc đề xuất docs/de-xuat-toi-uu-1510.md): 
 - [x] B5 thi đua ngày đã qua | bằng chứng: c17416a4 (trợ lý); lớp 40 em 45.035→5.835 dòng, 19→4 ms, 2→1 vòng
 - [x] Đợt 2: cổng → PR → phát hành trước 19:00, 0 ca mở | bằng chứng: PR #313 main b5610792, Actions 38685547388 SUCCESS 12:21; vitest so đợt 1: 0 đỏ mới, đỏ nền 122→119; tsc, build, kiem:toc-do, kiem-sw 13/13, mau-giu 0
 - [x] Đo lại cao điểm tối 15/10 (19:30–22:30) so 14/10 | bằng chứng: run 38762133091 vs 38590197763 — p50 0,033→0,029 s · p90 0,273→0,255 · p99 1,00→0,79 · lỗi 0 · D1 50 nhóm đầu 1.047→839 s; 3 câu tách JSON 235,5→126,1 s; điểm nóng mới docCauBai 55,7 s (đề xuất làm tiếp)
+Thầy (16/10 ~09:3x, ảnh màn "Chặng học của em — Đang chuẩn bị những câu phù hợp với em..."): "phần này load lâu quá, quét và tối ưu tốc độ tức thì nhé"
+- [ ] Đo thời gian thật màn mở chặng (máy chủ hoc-tap-start + app): từng bước tốn bao nhiêu ms, ở đâu | bằng chứng: (chưa có)
+- [ ] Sửa các điểm chậm lớn nhất để mở chặng gần như tức thì (không đổi giao diện), cổng tốc độ 0 đỏ, phát hành ngoài 19:00–23:59 | bằng chứng: (chưa có)
