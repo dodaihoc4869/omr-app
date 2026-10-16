@@ -218,7 +218,8 @@ describe('nút Hỏi thầy (/hs/hoi-thay) — mọi câu luyện tập, trừ l
     const { d, token } = await coDe()
     const r = await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'on_lai' })
     expect(r).toMatchObject({ ok: true, coLoiGiai: false, cau: { qid: QA.ds }, loiGiaiChu: { dapAn: expect.stringMatching(/^[DS]{4}$/) } })
-    expect(d.dem('loi_giai_hoi', `sbd='E1' AND qid='${QA.ds}' AND nguon='on_lai' AND co_ho_so=0`)).toBe(1)
+    // 16/10: đã nhận đáp án/lời giải kho vẫn là hỗ trợ thật dù chưa có hồ sơ từng bước.
+    expect(d.dem('loi_giai_hoi', `sbd='E1' AND qid='${QA.ds}' AND nguon='on_lai:giai_kho' AND co_ho_so=0`)).toBe(1)
     expect(d.dem('loi_giai_viec', `qid='${QA.ds}' AND uu_tien >= 3000`)).toBe(1)
   })
 

@@ -1,6 +1,7 @@
 import { canBangL4 } from './hanh-trinh-l4'
 import type { VaiTroCau } from './hanh-trinh-v5-loi'
 import { phanBoV6 } from './hanh-trinh-v6-loi'
+import { thaySlotOnHoiThay } from './hoi-thay-thay-slot'
 // Hành trình giỏi hoá: mức tối thiểu theo ngày, câu khác nhau, chặng ngắn.
 // Không dùng hạng L1–L4 (tỉ lệ đúng) thay cho tầng nội dung của bài.
 import { HANG_MUC_DO, bam, soSanhNo, type CauSrs, type TrangThaiCau } from './srs2-loi'
@@ -95,12 +96,37 @@ export interface DauVaoHanhTrinh {
   uuTienThamDo?: string
   nganSachChanDoan?:number
   chanDoan?: ReadonlySet<string>
+  /** Ưu tiên chỉ bên trong phần ôn/sửa, sau cổng tầng/lịch/nhóm. */
+  hoiThayDenHan?: readonly string[]
 }
 
 /** Chọn phần còn lại; không lặp nội dung để đủ sàn, không kéo ôn chưa đến hạn.
  * Nợ nặng ⇒ tăng phần sửa lỗi. Phần trống được chuyển cho nhóm khác hợp lệ.
  */
 export function chonCauHanhTrinh(a: DauVaoHanhTrinh): { dao: string[]; doan: string[] } {
+  const baseline = chonCauHanhTrinhCoBan(a)
+  if (!a.hoiThayDenHan?.length) return baseline
+  const cau = new Map(a.cau.map(c => [c.qid, c]))
+  const da = new Set(a.daLam), daNhom = new Set(a.daLam.map(id => a.nhom.get(id) || id))
+  const ids = [...baseline.dao, ...baseline.doan]
+  const giu = new Set(ids.filter(id => id === a.uuTienCanThiep || id === a.uuTienThamDo || a.chanDoan?.has(id)))
+  const chon = thaySlotOnHoiThay(ids, a.hoiThayDenHan, {
+    laMoi: id => a.tt.get(id)?.laMoi === true,
+    nhom: id => a.nhom.get(id) || id,
+    vaiTro: id => a.tang === 4 && a.vaiTro ? a.vaiTro[id] ?? 'khac' : a.tt.get(id)?.thanhThao ? 'on' : 'sua',
+    giu,
+    duoc: id => {
+      const c = cau.get(id), t = a.tt.get(id), g = a.nhom.get(id) || id
+      if (!c || !t || t.laMoi || t.catTia || da.has(id) || daNhom.has(g) || a.chan.has(id) || a.chan.has(g)) return false
+      const tang = tangCuaCau(c)
+      return tang != null && tang <= (a.tangSanSang?.get(id) ?? a.tang)
+    },
+  })
+  return { dao: chon.filter(id => a.tt.get(id)!.laMoi || cau.get(id)!.phan === 'II'),
+    doan: chon.filter(id => !a.tt.get(id)!.laMoi && cau.get(id)!.phan !== 'II') }
+}
+
+function chonCauHanhTrinhCoBan(a: DauVaoHanhTrinh): { dao: string[]; doan: string[] } {
   const da = new Set(a.daLam)
   const nhomDa = new Set(a.daLam.map(q => a.nhom.get(q) || q))
   const ung = a.cau.filter(c => {

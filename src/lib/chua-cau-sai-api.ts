@@ -239,16 +239,24 @@ export interface MucChua {
   trangThai: string
   denHan?: string
   lanGapLai?: number
+  /** Đã có lần tự kiểm sau Hỏi thầy; mở kiểm lại trực tiếp, không cần hỏi AI lại. */
+  kiemHoiThay?: boolean
 }
+export interface DemDanhSachChua { tong: number; can: number; cho: number; xong: number }
+export interface MocDanhSachChua { hang: number; giaoLuc: number; dotId: string; nay: string }
+export interface LichKiemLaiHoiThay { qid: string; ten: string; phan: string; trangThai: 'dang_lam' | 'den_han' | 'cho_kiem_lai'; denHan?: string }
 export type KetQuaDanhSachChua =
-  | { trangThai: 'bat'; ds: MucChua[] }
+  | { trangThai: 'bat'; ds: MucChua[]; dem?: DemDanhSachChua; sau?: MocDanhSachChua; kiemLaiHoiThay?: LichKiemLaiHoiThay[] }
   | { trangThai: 'tat' }
   | { trangThai: 'loi'; loi: string }
-export async function apiDanhSachTuChua(token: string): Promise<KetQuaDanhSachChua> {
-  const co = await goi('co', token)
-  if (!co) return { trangThai: 'loi', loi: LOI_MANG }
-  if (co.ok !== true) return { trangThai: 'tat' }
-  const j = await goi('danh-sach', token)
+export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): Promise<KetQuaDanhSachChua> {
+  if (!sau) {
+    const co = await goi('co', token)
+    if (!co) return { trangThai: 'loi', loi: LOI_MANG }
+    if (co.ok !== true) return { trangThai: 'tat' }
+  }
+  const j = await goi('danh-sach', token, sau ? { sau } : {})
+  if (j?.ma === 'FEATURE_TAT') return { trangThai: 'tat' }
   if (!j?.ok || !Array.isArray(j.ds)) return { trangThai: 'loi', loi: loiCua(j) }
   const ds = (j.ds as Obj[])
     .filter((x) => !!x && typeof x.qid === 'string' && !!x.qid)
@@ -258,6 +266,24 @@ export async function apiDanhSachTuChua(token: string): Promise<KetQuaDanhSachCh
       trangThai: chu(x.trangThai),
       ...(typeof x.denHan === 'string' && x.denHan ? { denHan: x.denHan } : {}),
       ...(typeof x.lanGapLai === 'number' ? { lanGapLai: x.lanGapLai } : {}),
+      ...(typeof x.kiemHoiThay === 'boolean' || typeof x.kiemHoiThay === 'number' ? { kiemHoiThay: x.kiemHoiThay === true || x.kiemHoiThay === 1 } : {}),
     }))
-  return { trangThai: 'bat', ds }
+  const dem = j.dem && typeof j.dem === 'object' ? j.dem as Obj : null
+  const moc = j.sau && typeof j.sau === 'object' ? j.sau as Obj : null
+  const demDung = dem && ['tong', 'can', 'cho', 'xong'].every((k) => Number.isSafeInteger(dem[k]) && Number(dem[k]) >= 0)
+    && Number(dem.can) + Number(dem.cho) + Number(dem.xong) === dem.tong
+  const lich = new Map<string, LichKiemLaiHoiThay>()
+  if (Array.isArray(j.kiemLaiHoiThay)) for (const x of j.kiemLaiHoiThay.slice(0, 12) as Obj[]) {
+    if (!x || typeof x.qid !== 'string' || !x.qid) continue
+    lich.set(x.qid, { qid: x.qid, ten: chu(x.ten), phan: chu(x.phan),
+      trangThai: x.trangThai === 'dang_lam' || x.trangThai === 'den_han' ? x.trangThai : 'cho_kiem_lai',
+      ...(typeof x.denHan === 'string' ? { denHan: x.denHan } : {}),
+    })
+  }
+  return { trangThai: 'bat', ds,
+    ...(Array.isArray(j.kiemLaiHoiThay) ? { kiemLaiHoiThay: [...lich.values()] } : {}),
+    ...(demDung ? { dem: { tong: Number(dem.tong), can: Number(dem.can), cho: Number(dem.cho), xong: Number(dem.xong) } } : {}),
+    ...(moc && [0, 1, 2].includes(Number(moc.hang)) && Number.isSafeInteger(moc.giaoLuc) && typeof moc.dotId === 'string' && typeof moc.nay === 'string'
+      ? { sau: { hang: Number(moc.hang), giaoLuc: Number(moc.giaoLuc), dotId: moc.dotId, nay: moc.nay } } : {}),
+  }
 }

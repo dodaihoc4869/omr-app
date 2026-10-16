@@ -599,9 +599,14 @@ export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: str
     if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
     if (chiHoi || !dongP || !hoSoP || !kiemP) return { ok: true, chiHoi: true, cau: cauChoKhung(ht.c) }
     const hoSo = (await dongP) ? await hoSoP : null
+    const loiChu = hoSo ? null : loiGiaiChu(ht.c)
+    // Khung ngắn có hiện cả đáp án: kể cả chưa có hồ sơ từng bước thì đây
+    // vẫn là trợ giúp thật. Khung chỉ có đề/hoàn toàn trống không mang dấu này.
+    const coGiaiKho = !!loiChu && [loiChu.dapAn, loiChu.chot, loiChu.ketQua, ...loiChu.buoc, ...loiChu.tung.map(x => x.viSao)].some(x => x.trim())
+    const nguonDoc = coGiaiKho ? `${nguon.slice(0, 31)}:giai_kho` : nguon
     const luc = new Date(nay).toISOString()
     const ghiHet = (async () => {
-      const ghi = [env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,?)').bind(sbd, qid, nguon, luc, hoSo ? 1 : 0)]
+      const ghi = [env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,?)').bind(sbd, qid, nguonDoc, luc, hoSo ? 1 : 0)]
       if (!hoSo && !laGoiNgoaiKho(ht.c.maDe)) {
         // Câu học sinh hỏi mà chưa có hồ sơ ⇒ lên đầu hàng soạn (mục 5.6: câu học sinh cần). Chưa vào hàng thì xếp cả đề ngay.
         const coViec = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_viec WHERE bam = ?').bind(ht.bam).first<Obj>()
@@ -629,7 +634,7 @@ export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: str
       const kiem = await kiemP
       return { ok: true, coLoiGiai: true, hoSo, cau, ...(kiem ? { kiem } : {}) }
     }
-    return { ok: true, coLoiGiai: false, cau, loiGiaiChu: loiGiaiChu(ht.c) }
+    return { ok: true, coLoiGiai: false, cau, loiGiaiChu: loiChu }
   })()
   if (kq.ok === true && hoiThemP) kq.hoiThem = await hoiThemP
   return kq

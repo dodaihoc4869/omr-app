@@ -11,6 +11,7 @@
 // trọng số câu (`trongSoCau`), dạng đã vững (`dangVung`), ôn bài cũ (`onBaiCu`, `tiLeOnBaiCu`), chế độ chờ bài mới (`cheDoCho`). Vắng mọi trường mới ⇒ JSON
 // kế hoạch Y HỆT bản trước (khoá bằng tests/omni-3-ke-hoach-chot-cu.test.ts, 30 kịch bản).
 import { THAM_SO_OMNI } from './omni-kieu'
+import { thaySlotOnHoiThay } from './hoi-thay-thay-slot'
 
 export type Phan = 'I' | 'II' | 'III'
 
@@ -284,6 +285,10 @@ export interface TuyChonKeHoach {
    * như câu ôn (Phần II ⇒ Đảo, còn lại ⇒ Đoàn, theo `onVaoDao`).
    */
   onBaiCu?: readonly CauSrs[]
+  /** Chỉ đổi thứ tự ứng viên ôn/sửa đã hợp lệ, không thay quota mới hoặc trần ngày. */
+  hoiThayDenHan?: readonly string[]
+  /** Nhóm nội dung chỉ dùng khi thay slot ôn, để giữ mọi nhóm câu mới đã phân. */
+  nhomCau?: ReadonlyMap<string, string>
   /** Tỉ lệ trần ôn bài cũ khi có chiến dịch (`omni-ke-hoach.ts` `tiLeOnBaiCu`: ngày 4–5 của bài 0,4, còn lại 0,2). Vắng ⇒ THAM_SO_OMNI.ON_BAI_CU_TI_LE. */
   tiLeOnBaiCu?: number
   /**
@@ -620,6 +625,29 @@ export function coLoThuSucThem(soMoiConLai: number, homNay: string, hanNop: stri
  * nợ lấp lượt dư) là ÔN BÀI CŨ (`tc.onBaiCu`); không chiến dịch + `tc.cheDoCho` ⇒ kế hoạch nhẹ. Vắng mọi trường mới ⇒ từng phép tính y như bản trước.
  */
 export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<string, TrangThaiCau>, tc: TuyChonKeHoach, daLamHomNay = 0): KeHoachNgay {
+  const baseline = lapKeHoachNgayCoBan(cau, trangThai, tc, daLamHomNay)
+  if (!tc.hoiThayDenHan?.length) return baseline
+  const theoId = new Map(cau.map(c => [c.qid, c]))
+  for (const c of tc.onBaiCu ?? []) if (!theoId.has(c.qid)) theoId.set(c.qid, c)
+  const nguon = (id: string) => theoId.get(id)?.nguon ?? 'chien_dich'
+  const ids = [...baseline.dao, ...baseline.doan]
+  const chon = thaySlotOnHoiThay(ids, tc.hoiThayDenHan, {
+    laMoi: id => trangThai.get(id)?.laMoi === true,
+    nhom: id => tc.nhomCau?.get(id) || id.split('~')[0]!,
+    vaiTro: id => nguon(id) === 'on_bai_cu' ? 'on_bai_cu' : nguon(id) === 'duy_tri' ? 'duy_tri' : trangThai.get(id)?.thanhThao ? 'cung_co' : 'sua',
+    duoc: id => {
+      const c = theoId.get(id), t = trangThai.get(id)
+      if (!c || !t || t.laMoi || t.catTia) return false
+      return nguon(id) === 'chien_dich' || nguon(id) === 'duy_tri' || !t.thanhThao
+    },
+  })
+  const doi = new Map(ids.map((id, i) => [id, chon[i]!]))
+  const vaoDao = (id: string) => tc.onVaoDao || trangThai.get(id)!.laMoi || theoId.get(id)!.phan === 'II'
+  return { ...baseline, dao: chon.filter(vaoDao), doan: chon.filter(id => !vaoDao(id)),
+    ...(baseline.onBaiCu ? { onBaiCu: baseline.onBaiCu.map(id => doi.get(id) ?? id) } : {}) }
+}
+
+function lapKeHoachNgayCoBan(cau: readonly CauSrs[], trangThai: ReadonlyMap<string, TrangThaiCau>, tc: TuyChonKeHoach, daLamHomNay = 0): KeHoachNgay {
   const tt = (c: CauSrs) => trangThai.get(c.qid)!
   const nguonCua = (c: CauSrs) => c.nguon ?? 'chien_dich'
   // NHÓM câu mới. Đường cũ: một nhóm khi `hanNop` còn hạn. OMNI 3 (`tc.chienDich`): mỗi chiến dịch đang chạy một nhóm, hạn gần trước (EDF).

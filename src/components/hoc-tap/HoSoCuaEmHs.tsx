@@ -15,7 +15,7 @@ import { createPortal } from 'react-dom'
 import HoSoLamCauEm from '../chien-dich/HoSoLamCauEm'
 import { taoNguonHoSoEm } from '../../lib/ho-so-em-hs-api'
 import { useKhoaCuonTrang } from '../../lib/khoa-cuon-trang'
-import { mucCanSua, taiTuSuaLoi } from '../../lib/tu-sua-loi'
+import { mucCanSua, soCauCanSua, taiTuSuaLoi } from '../../lib/tu-sua-loi'
 import type { KetQuaDanhSachChua } from '../../lib/chua-cau-sai-api'
 import { khoaMoChua } from '../../../server/src/ho-so-em-hs-loc'
 // Tấm thầy dựa vào kiểu dáng khung của app thầy (gv-v2.css — chỉ lớp `.gvv2-*`, không luật toàn cục) mà app học sinh không nạp sẵn.
@@ -50,11 +50,12 @@ export default function HoSoCuaEmHs({ token, tenEm, lop, onDong, onChuaCau }: Ho
   const nguon = useMemo(() => taoNguonHoSoEm(token), [token])
   const coDuong = !!onChuaCau
   const [coTheChua, setCoTheChua] = useState<ReadonlySet<string>>(RONG)
+  const [soCanSua, setSoCanSua] = useState<number | null>(null)
   useEffect(() => {
     if (!coDuong || !token) return
     let huy = false
     void taiTuSuaLoi(token, { toiDaMs: NHO_HO_SO_MS }).then((kq) => {
-      if (!huy) setCoTheChua(khoaCanSua(kq, Date.now()))
+      if (!huy) { setCoTheChua(khoaCanSua(kq, Date.now())); setSoCanSua(soCauCanSua(kq, Date.now())) }
     })
     return () => {
       huy = true
@@ -73,7 +74,7 @@ export default function HoSoCuaEmHs({ token, tenEm, lop, onDong, onChuaCau }: Ho
   )
   return createPortal(
     <div className="hs-ho-so-em" data-che-do="hoc-sinh">
-      <HoSoLamCauEm em={em} nguon={nguon} cheDo="hoc-sinh" onDong={onDong} onChuaCau={onChuaCau} coTheChua={coTheChua} />
+      <HoSoLamCauEm em={em} nguon={nguon} cheDo="hoc-sinh" onDong={onDong} onChuaCau={onChuaCau} coTheChua={coTheChua} soCauCanSua={soCanSua ?? undefined} />
     </div>,
     document.body,
   )

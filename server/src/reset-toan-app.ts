@@ -130,6 +130,8 @@ export const BANG_XOA: readonly string[] = [
 
 /** GIỮ — tài khoản, lớp, kho, cấu hình, cài đặt. `cau_hinh` và `game_v2_settings` chỉ bị GHI đúng vài dòng (xem `chayReset`), không bị xoá. */
 export const BANG_GIU: readonly string[] = [
+  // Hỏi thầy: bằng chứng học tập và biên nhận, luôn bảo toàn.
+  'hoi_thay_kiem', 'hoi_thay_can_giup', 'hoi_thay_ho_tro_receipt',
   'kiem_tra_ca_nhan', 'kiem_tra_ca_nhan_chang', 'kiem_tra_ca_nhan_dieu_phoi',
   'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_meta', 'cau_meta_to', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
   'study_preferences', 'student_push', 'app_presence', 'ma_da_dung', 'khien_truoc_reset_2109',

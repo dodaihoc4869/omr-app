@@ -129,11 +129,12 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
 
   it('đầu-cuối: Gemini nhận TRỌN đề + ý + đáp án + lời giải kho + hồ sơ từng bước; khoá ở header; không SBD/tên; trả lời đã làm sạch; ghi sổ', async () => {
     const { d, token } = await chuanBi()
-    const goi = giaGemini(() => traLoiJson({ lienQuan: true, traLoi: 'Ý b sai vì **em nhầm** chất — xem lại bước 2.' }))
+    // SỬA CÓ CHỦ ĐÍCH 16/10: ví dụ giải thích kiến thức, không quy kết bài nháp chưa có.
+    const goi = giaGemini(() => traLoiJson({ lienQuan: true, traLoi: 'Ý b sai vì **điều kiện** chưa đủ — xem lại bước 2.' }))
     const mo = await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'luyen_de' })
     expect(mo).toMatchObject({ ok: true, coLoiGiai: true, hoiThem: true })
     const r = await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, nguon: 'luyen_de', cauHoi: 'Vì sao ý b sai ạ?', dapAnEm: 'b Đúng' })
-    expect(r).toMatchObject({ ok: true, traLoi: 'Ý b sai vì em nhầm chất, xem lại bước 2.', conLai: 35, ngoaiPhamVi: false })
+    expect(r).toMatchObject({ ok: true, traLoi: 'Ý b sai vì điều kiện chưa đủ, xem lại bước 2.', conLai: 35, ngoaiPhamVi: false })
     expect(goi).toHaveLength(1)
     const g = goi[0]!
     expect(g.url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent')
@@ -216,7 +217,7 @@ describe('/hs/hoi-tro-ly qua Worker, D1 thật', () => {
     const dl = goi[0]!.body.contents[0].parts[0].text as string
     expect(dl).toContain('EM ĐANG LÀM CÂU NÀY, CHƯA NỘP')
     // Thầy đã gợi hướng ⇒ một dòng "đã được chữa" (kiểm tra cá nhân chặn câu này 12 giờ)
-    expect(d.dem('loi_giai_hoi', `sbd='${SBD}' AND co_ho_so=0 AND nguon='luyen:goi_y'`)).toBe(1)
+    expect(d.dem('loi_giai_hoi', `sbd='${SBD}' AND co_ho_so=0 AND nguon='luyen:tro_ly'`)).toBe(1)
     // không gửi `dangLam` mà chưa mở lời giải ⇒ vẫn chặn như cũ
     expect(await em(d, '/hs/hoi-tro-ly', { token, qid: QA.ds, cauHoi: 'Vì sao ạ?' })).toMatchObject({ ok: false, ma: 'chua_mo' })
   })

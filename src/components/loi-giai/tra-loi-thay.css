@@ -26,3 +26,5 @@
 .lg-tl-hoi button { min-height: 48px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--m3-outline); background: var(--m3-surface); color: var(--m3-primary); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; text-align: left; }
 .lg-tl-hoi button:disabled { opacity: .55; cursor: default; }
 .lg-tl-hoi button:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+.lg-ht-tin:not([hidden]) { display: flex; flex-direction: column; gap: 10px; }
+.lg-ht-ai { display: block; margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: var(--m3-on-surface-variant); }

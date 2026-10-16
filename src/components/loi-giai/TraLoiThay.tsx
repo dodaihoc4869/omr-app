@@ -215,6 +215,7 @@ export default function TraLoiThay({ ct, dangLam = false, onHoi, khoa = false }:
         <span className="lg-ht-nhan">Thầy Đỗ Đại Học</span>
         {nhan ? <span className="lg-tl-the" data-khuon><Net ten={nhan.net} co={14} />{nhan.chu}</span> : dangLam && <span className="lg-tl-the">Gợi hướng</span>}
       </div>
+      <span className="lg-ht-ai">Trợ giảng AI của thầy Học</span>
       {ct.yChinh && <p className="lg-tl-chinh"><ChuTo text={ct.yChinh} /></p>}
       {ct.khuon ? <ThanKhuon ct={ct} dangLam={dangLam} /> : (
         <>

@@ -2,9 +2,10 @@
 // Cài đặt · Hỏi Thầy (AI). Chỉ tải khi thầy bấm "Xem sổ hỏi Thầy" (Cài đặt mở không chờ thêm lượt nào). Ba phần: số tổng · từng em
 // (bấm một em ⇒ chỉ xem lượt của em ấy) · các lượt gần nhất (giờ, em, mã câu, câu em hỏi, câu Thầy trả lời rút gọn, trạng thái).
 // Máy chủ `/gv/hoi-tro-ly/so` (chỉ đọc, sau cổng mã bí mật). Lỗi ⇒ hiện đúng lời máy chủ ngay dưới nút.
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { docSoHoiThay, type SoHoiThay as So } from '../../lib/hoi-thay-gv-api'
 import { Nhan } from '../DesignSystem'
+import CanGiupHoiThay from './CanGiupHoiThay'
 
 const gio = (iso: string) => {
   const d = new Date(iso)
@@ -18,9 +19,13 @@ export default function SoHoiThay() {
   const [em, setEm] = useState('')
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
+  const song = useRef(true), lanTai = useRef(0)
+  useEffect(() => { song.current = true; return () => { song.current = false; lanTai.current++ } }, [])
   const tai = async (sbd = '') => {
+    const lan = ++lanTai.current
     setDang(true); setLoi('')
     const r = await docSoHoiThay(sbd, sbd ? 200 : 100)
+    if (!song.current || lan !== lanTai.current) return
     setDang(false)
     if (!r.ok) { setLoi(r.loi); return }
     setSo(r.du); setEm(sbd)
@@ -94,6 +99,7 @@ export default function SoHoiThay() {
           </ol>
         </>
       )}
+      <CanGiupHoiThay />
     </section>
   )
 }

@@ -55,6 +55,7 @@ export default function HopHoiThay({ cau, qid = '', nguon, onDong, onTraLoi, onM
   const ngan = loai === 'tn' && yChu.every(([, t]) => t.length <= 24)
   // Đề mở sẵn lúc em chưa hỏi; Thầy trả lời câu đầu ⇒ gập thành một dòng nhường chỗ cho lời giải (chạm để mở lại).
   const [deMo, setDeMo] = useState(true)
+  const [dangKiem, setDangKiem] = useState(false)
   return createPortal(
     <div className="lg-hh-nen m3">
       <div className="lg-hh" role="dialog" aria-modal="true" aria-labelledby={`${id}-t`}>
@@ -92,13 +93,13 @@ export default function HopHoiThay({ cau, qid = '', nguon, onDong, onTraLoi, onM
           </div>
         </details>
         {dangLam && <p className="lg-hh-goi">Em đang làm câu này nên Thầy gợi hướng, chưa nói đáp án.</p>}
-        {onMoLoiGiai && !dangLam && (
+        {onMoLoiGiai && !dangLam && !dangKiem && (
           <button type="button" className="lg-nut-loi-giai lg-hh-sang-giai" onClick={onMoLoiGiai}>
             <BookOpenText aria-hidden="true" size={18} strokeWidth={2} />
             <span>Xem lời giải từng bước</span>
           </button>
         )}
-        <HoiThemThay qid={cau?.qid ?? qid} nguon={nguon} hop dangLam={dangLam} dapAnEm={dapAnEm} choDe={!cau} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
+        <HoiThemThay qid={cau?.qid ?? qid} nguon={nguon} hop dangLam={dangLam} dapAnEm={dapAnEm} choDe={!cau} onDangKiem={setDangKiem} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
       </div>
     </div>,
     document.body,

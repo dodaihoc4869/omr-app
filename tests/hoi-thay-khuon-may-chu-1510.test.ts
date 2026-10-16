@@ -12,16 +12,17 @@ import { CHI_DAN_KHUON, HINH_DUNG, KHUON, chonKhuon, chuPhang, lamSachCauTruc, s
 import { CAU_CHUA_NOP, CHI_DAN_THAY, chanLoDapAn, xoaNhoTram } from '../server/src/hoi-tro-ly'
 
 const CHON = { dangLam: false, phan: 'I', ketQua: 'chua_lam' as const, cauHoi: 'Câu này làm sao ạ?', de: 'Chất nào làm quỳ tím hoá xanh?', dapAnEm: '' }
-const BO: BoiCanhKhuon = { khuon: 'cho-sai', phan: 'I', de: 'Thuỷ phân 8,8 gam ethyl acetate trong NaOH dư. Muối thu được là', pa: { A: 'CH3COONa', B: 'C2H5COONa', C: 'HCOONa', D: 'CH3ONa' }, y: null, dapAn: 'A', dapAnEm: 'B' }
+// SỬA CÓ CHỦ ĐÍCH 16/10: đối chiếu bước chỉ hợp lệ khi em thực sự cung cấp bài nháp.
+const BO: BoiCanhKhuon = { khuon: 'cho-sai', phan: 'I', de: 'Thuỷ phân 8,8 gam ethyl acetate trong NaOH dư. Muối thu được là', pa: { A: 'CH3COONa', B: 'C2H5COONa', C: 'HCOONa', D: 'CH3ONa' }, y: null, dapAn: 'A', dapAnEm: 'B', baiNhap: 'n = 0,1 mol; C2H5COONa; m = 9,6' }
 
 describe('chọn khuôn (máy chủ, không đọc D1 thêm)', () => {
   it('đang làm ⇒ gợi ý; phần II ⇒ từng ý; "vì sao" ⇒ giải thích; có bài em ⇒ chỉ chỗ sai; câu có số ⇒ tính', () => {
     expect(chonKhuon({ ...CHON, dangLam: true, ketQua: 'sai', dapAnEm: 'B' })).toBe('goi-y')
     expect(chonKhuon({ ...CHON, phan: 'II', ketQua: 'sai' })).toBe('tung-y')
     expect(chonKhuon({ ...CHON, ketQua: 'sai', cauHoi: 'Vì sao aniline không làm quỳ tím đổi màu ạ?' })).toBe('giai-thich')
-    expect(chonKhuon({ ...CHON, ketQua: 'sai', dapAnEm: 'B' })).toBe('cho-sai')
-    expect(chonKhuon({ ...CHON, cauHoi: 'Sao em ra 9,6 ạ?' })).toBe('cho-sai')
-    expect(chonKhuon({ ...CHON, cauHoi: 'Em chọn B sai ở đâu ạ?' })).toBe('cho-sai')
+    expect(chonKhuon({ ...CHON, ketQua: 'sai', dapAnEm: 'B', baiNhap: BO.baiNhap })).toBe('cho-sai')
+    expect(chonKhuon({ ...CHON, cauHoi: 'Sao em ra 9,6 ạ?' })).toBe('giai-thich')
+    expect(chonKhuon({ ...CHON, cauHoi: 'Em chọn B sai ở đâu ạ?' })).toBe('giai-thich')
     expect(chonKhuon({ ...CHON, ketQua: 'sai', cauHoi: 'Sao em sai ạ?' })).toBe('giai-thich') // không biết bài em ⇒ không đoán cột "Em làm"
     expect(chonKhuon({ ...CHON, phan: 'III' })).toBe('tinh')
     expect(chonKhuon({ ...CHON, ketQua: 'dung', de: 'Thuỷ phân 8,8 gam ethyl acetate…' })).toBe('tinh')

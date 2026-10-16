@@ -1,0 +1,557 @@
+{
+  "moTa": "Chromium thật; linh kiện thật; API giả, không phải số đo máy chủ thật",
+  "ketQua": [
+    {
+      "khung": "doc-sang",
+      "trangThai": "moi-tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "mat-mang",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "cho-kiem-lai",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "da-gui-thay",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "giao-vien-da-tai",
+      "ngang": false,
+      "nho": [],
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "giao-vien-da-gui",
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "tu-sua-loi-100-trong-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 100,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "tu-sua-loi-da-tai-du-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 104,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "kiem-lai-truc-tiep-khong-hoi-ai",
+      "ngang": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "kiem-lai-truc-tiep-ve-cap-nhat-so",
+      "soCan": 101,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "kiem-lai-rieng-khong-tang-loi",
+      "soCan": 0,
+      "kiemRieng": 1,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-sang",
+      "trangThai": "kiem-lai-rieng-mo-khong-hoi-ai",
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "moi-tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "mat-mang",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "cho-kiem-lai",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "da-gui-thay",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "giao-vien-da-tai",
+      "ngang": false,
+      "nho": [],
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "giao-vien-da-gui",
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "tu-sua-loi-100-trong-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 100,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "tu-sua-loi-da-tai-du-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 104,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "kiem-lai-truc-tiep-khong-hoi-ai",
+      "ngang": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "kiem-lai-truc-tiep-ve-cap-nhat-so",
+      "soCan": 101,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "kiem-lai-rieng-khong-tang-loi",
+      "soCan": 0,
+      "kiemRieng": 1,
+      "loiTrang": []
+    },
+    {
+      "khung": "doc-toi",
+      "trangThai": "kiem-lai-rieng-mo-khong-hoi-ai",
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "moi-tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "mat-mang",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "cho-kiem-lai",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "da-gui-thay",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "giao-vien-da-tai",
+      "ngang": false,
+      "nho": [],
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "giao-vien-da-gui",
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "tu-sua-loi-100-trong-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 100,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "tu-sua-loi-da-tai-du-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 104,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "kiem-lai-truc-tiep-khong-hoi-ai",
+      "ngang": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "kiem-lai-truc-tiep-ve-cap-nhat-so",
+      "soCan": 101,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "kiem-lai-rieng-khong-tang-loi",
+      "soCan": 0,
+      "kiemRieng": 1,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-sang",
+      "trangThai": "kiem-lai-rieng-mo-khong-hoi-ai",
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "moi-tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "mat-mang",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "cho-kiem-lai",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "da-gui-thay",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "giao-vien-da-tai",
+      "ngang": false,
+      "nho": [],
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "giao-vien-da-gui",
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "tu-sua-loi-100-trong-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 100,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "tu-sua-loi-da-tai-du-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 104,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "kiem-lai-truc-tiep-khong-hoi-ai",
+      "ngang": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "kiem-lai-truc-tiep-ve-cap-nhat-so",
+      "soCan": 101,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "kiem-lai-rieng-khong-tang-loi",
+      "soCan": 0,
+      "kiemRieng": 1,
+      "loiTrang": []
+    },
+    {
+      "khung": "ngang-toi",
+      "trangThai": "kiem-lai-rieng-mo-khong-hoi-ai",
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "moi-tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "mat-mang",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "cho-kiem-lai",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "da-gui-thay",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "giao-vien-da-tai",
+      "ngang": false,
+      "nho": [],
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "giao-vien-da-gui",
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "tu-sua-loi-100-trong-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 100,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "tu-sua-loi-da-tai-du-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 104,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "kiem-lai-truc-tiep-khong-hoi-ai",
+      "ngang": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "kiem-lai-truc-tiep-ve-cap-nhat-so",
+      "soCan": 101,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "kiem-lai-rieng-khong-tang-loi",
+      "soCan": 0,
+      "kiemRieng": 1,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-sang",
+      "trangThai": "kiem-lai-rieng-mo-khong-hoi-ai",
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "moi-tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "tu-lam",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "mat-mang",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "cho-kiem-lai",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "da-gui-thay",
+      "ngoai": [],
+      "nho": [],
+      "trangTran": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "giao-vien-da-tai",
+      "ngang": false,
+      "nho": [],
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "giao-vien-da-gui",
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "tu-sua-loi-100-trong-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 100,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "tu-sua-loi-da-tai-du-104",
+      "ngang": false,
+      "soCan": "102",
+      "soDaTai": 104,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "kiem-lai-truc-tiep-khong-hoi-ai",
+      "ngang": false,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "kiem-lai-truc-tiep-ve-cap-nhat-so",
+      "soCan": 101,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "kiem-lai-rieng-khong-tang-loi",
+      "soCan": 0,
+      "kiemRieng": 1,
+      "loiTrang": []
+    },
+    {
+      "khung": "may-tinh-toi",
+      "trangThai": "kiem-lai-rieng-mo-khong-hoi-ai",
+      "loiTrang": []
+    }
+  ]
+}

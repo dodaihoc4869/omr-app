@@ -179,6 +179,7 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
     const q = cauTheoQid.get(x.qid)!
     return {
       nguon: opt.nguon, maNguon, sbd, qid: x.qid, lan: 1, luc, giay: x.giay, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
+      cauVersion: snapTheoQid.get(x.qid)?.questionVersion ?? q.version,
       ketQua: cham(x, q) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
     }
   })
@@ -186,11 +187,32 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
   if (!ghi.ok) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
 
   // Kết quả LẦN ĐẦU đã lưu (nộp lại cùng câu cùng ngày không đổi được).
+  const idsNhan = JSON.stringify(nhanSau.map((x) => x.qid))
+  const docCu = () => env.DB.prepare(
+    'SELECT qid,ket_qua FROM su_kien_hoc WHERE sbd=? AND nguon=? AND ma_nguon=? AND lan=1 AND qid IN(SELECT value FROM json_each(?))',
+  ).bind(sbd, opt.nguon, maNguon, idsNhan).all<{ qid: string; ket_qua: number | null; kiem_hoi_thay?: number }>()
   const daLuu = await env.DB.prepare(
-    `SELECT qid, ket_qua FROM su_kien_hoc WHERE sbd = ? AND nguon = ? AND ma_nguon = ? AND lan = 1 AND qid IN (SELECT value FROM json_each(?))`,
-  ).bind(sbd, opt.nguon, maNguon, JSON.stringify(nhanSau.map((x) => x.qid))).all<{ qid: string; ket_qua: number | null }>()
+    `SELECT s.qid, s.ket_qua, EXISTS(SELECT 1 FROM hoi_thay_kiem h
+      WHERE h.sbd=s.sbd AND h.qid_goc=s.qid AND h.trang_thai='da_nop' AND h.den_han IS NOT NULL) kiem_hoi_thay
+      FROM su_kien_hoc s WHERE s.sbd = ? AND s.nguon = ? AND s.ma_nguon = ? AND s.lan = 1 AND s.qid IN (SELECT value FROM json_each(?))`,
+  ).bind(sbd, opt.nguon, maNguon, idsNhan).all<{ qid: string; ket_qua: number | null; kiem_hoi_thay?: number }>()
+    .catch(e => {
+      // Bản chưa áp schema mới vẫn nộp ôn được; lỗi D1 khác giữ nguyên đường báo lỗi.
+      if (/no such table:\s*hoi_thay_kiem/i.test(e instanceof Error ? e.message : String(e))) return docCu()
+      throw e
+    })
   const ketQuaLuu = new Map((daLuu.results ?? []).map((x) => [String(x.qid), x.ket_qua === null ? null : Number(x.ket_qua)]))
   if (nhanSau.some((x) => !ketQuaLuu.has(x.qid))) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
+
+  // Cờ đi cùng lần đọc biên nhận có sẵn; chỉ câu có lịch Hỏi thầy mới phát lại bằng chứng.
+  // Việc phụ lỗi không làm hỏng lượt nộp: lịch còn nguyên và lần mở kiểm sau sẽ tự đồng bộ.
+  const kiemLai = [...new Set(daLuu.results.filter(x => Number(x.kiem_hoi_thay) === 1).map(x => x.qid))]
+  if (kiemLai.length) await viecPhu(ctx, async () => {
+    try {
+      const { dongBoSuaLoiHoiThay } = await import('./hoi-thay-dong-bo-sua')
+      for (const qid of kiemLai) await dongBoSuaLoiHoiThay(env, sbd, qid, now)
+    } catch (e) { console.error('[on-lai] chưa đồng bộ kiểm lại Hỏi thầy:', e instanceof Error ? e.message : e) }
+  })
 
   // HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): hồ sơ mạnh/yếu KHÔNG nằm trong hợp đồng phản hồi (tienBo dưới đây đọc thẳng
   // su_kien_hoc, không đọc nam_kt_cau/nam_kt_dang) ⇒ hoãn qua ctx.waitUntil. Tự lành nếu chạy chưa xong: `/hs/ke-hoach-ngay`

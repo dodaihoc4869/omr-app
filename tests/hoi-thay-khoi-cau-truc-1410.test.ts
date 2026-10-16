@@ -94,7 +94,8 @@ describe('hàm thuần', () => {
     expect(c2.thiNghiem!.map((o) => o.hien)).toEqual(['quy-xanh', 'trang-bac'])
     expect(c2.nhanBiet).toHaveLength(2)
     expect(c2.bay!.tieuDe).toBe('Bẫy hay nhầm')
-    for (const k of ['BẮT BUỘC bay', 'BẮT BUỘC tinh', 'BẮT BUỘC thiNghiem', 'BẮT BUỘC soDo']) expect(CHI_DAN_THAY).toContain(k)
+    // SỬA CÓ CHỦ ĐÍCH 16/10: sai đáp án không đủ bằng chứng ép mô hình quy kết bước sai.
+    for (const k of ['Chỉ có đáp án cuối', 'BẮT BUỘC tinh', 'BẮT BUỘC thiNghiem', 'BẮT BUỘC soDo']) expect(CHI_DAN_THAY).toContain(k)
     expect(CHI_DAN_THAY).not.toContain('chỉ dùng khi giúp em hiểu nhanh hơn chữ')
     expect(SCHEMA_TRA_LOI.propertyOrdering.indexOf('bay')).toBe(2)
   })
@@ -160,7 +161,7 @@ describe('đầu-cuối /hs/hoi-tro-ly', () => {
     giaGemini(MAU_TINH)
     await em(d, '/hs/hoi-thay', { token, qid: Q, nguon: 'luyen' })
     const r = await em(d, '/hs/hoi-tro-ly', { token, qid: Q, nguon: 'luyen', cauHoi: 'Sao em ra 9,6 ạ?' })
-    expect(r).toMatchObject({ ok: true, ngoaiPhamVi: false, cauTruc: { yChinh: 'Muối là ++CH3COONa++.', tinh: { dapSo: '8,2 gam' }, bay: { tieuDe: 'Chỗ em nhầm' } } })
+    expect(r).toMatchObject({ ok: true, ngoaiPhamVi: false, cauTruc: { yChinh: 'Muối là ++CH3COONa++.', tinh: { dapSo: '8,2 gam' }, bay: { tieuDe: 'Bẫy hay nhầm' } } })
     expect((r.cauTruc as { phuongTrinh: unknown[] }).phuongTrinh).toHaveLength(1)
     const so = d.sql.prepare('SELECT tra_loi FROM hoi_tro_ly WHERE sbd=?').get(SBD) as { tra_loi: string }
     expect(so.tra_loi).toBe(r.traLoi)
