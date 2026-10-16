@@ -5,6 +5,7 @@ import { Check, ChevronRight, MessageCircleQuestion } from 'lucide-react'
 import TheCau from '../TheCau'
 import { guiThayKiemChung, moKiemChung, nopKiemChung, type CauKiemChung, type MoKiemChung, type NopKiemChung } from '../../lib/hoi-thay-kiem-chung-api'
 import { docTokenHs } from '../../lib/loi-giai-api'
+import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { ChemText } from '../../lib/chem-format'
 import './hoi-thay-kiem-chung.css'
 
@@ -82,7 +83,7 @@ function PhienKiem({ qid, token: tokenCuaPhien, khoa = false, tuMo = false, onDa
   const nop = async () => {
     if (!phien || dang.current || khoa || khoiPhuc || !dayDu(phien.cau, gia)) return
     // Giữ nguyên cả bài làm khi mạng lỗi: không tạo lượt mới để vô tình thử nhiều đáp án.
-    if (!guiLan.current) guiLan.current = { id: crypto.randomUUID(), gia }
+    if (!guiLan.current) guiLan.current = { id: sinhMaNgauNhien(), gia }
     dang.current = true; setCho('nop'); setLoi('')
     const r = await nopKiemChung(phien.phienId, guiLan.current.id, guiLan.current.gia, tokenCuaPhien)
     if (!song.current) return
