@@ -1,6 +1,6 @@
 # Hỏi thầy cá nhân — kết quả kiểm 16/10/2026
 
-PR [318](https://github.com/dodaihoc4869/omr-app/pull/318), đối chiếu main `60ade920`. Mã chạy đã chốt `d5f88086`; chưa phát hành tại thời điểm viết mục này. Thầy đã duyệt đề xuất và yêu cầu build/phát hành khi cổng tốc độ, ổn định và ca thi đạt. [Đặc tả](hoi-thay-ca-nhan-1610.md), [ảnh và kiểm giao diện](hoi-thay-ca-nhan-1610/ket-qua-giao-dien.md).
+PR [318](https://github.com/dodaihoc4869/omr-app/pull/318), đối chiếu main `60ade920`. Mã chạy đã chốt `d5f88086`; **đã phát hành lúc 09:14 VN ngày 16/10/2026**, merge `8427ff3d8e182d8fbda85aa0fd22e2f460e441a1`. Thầy đã duyệt đề xuất và yêu cầu build/phát hành khi cổng tốc độ, ổn định và ca thi đạt. [Đặc tả](hoi-thay-ca-nhan-1610.md), [ảnh và kiểm giao diện](hoi-thay-ca-nhan-1610/ket-qua-giao-dien.md).
 
 ## Thay đổi
 
@@ -59,3 +59,13 @@ Claude đã được mời soát trên PR qua kênh repository; chưa có xác n
 Phát hành qua `deploy.yml` từ main, một hàng chờ duy nhất. Runner Hỏi thầy chỉ nhận DDL tạo ba bảng/chỉ mục riêng, kiểm ca thường và chặng kiểm cá nhân đang làm trước khi áp qua API. Không thêm chỉ mục trên `su_kien_hoc`, không nhập `--file` cho schema mới. Worker lên trước, Pages theo sau; bước cuối xác minh hai nơi cùng SHA.
 
 Lùi bằng revert merge PR318 sau khi qua cổng ca, giữ nguyên bảng/biên nhận và lịch sử đã ghi. Chưa gọi lệnh lùi trong đợt này.
+
+## Bản sống 09:14 VN ngày 16/10
+
+[Actions 38838674354](https://github.com/dodaihoc4869/omr-app/actions/runs/38838674354) kết thúc **SUCCESS** lúc 02:14:45 UTC. Worker chạy 100% và Pages đều mang `8427ff3d8e182d8fbda85aa0fd22e2f460e441a1`; cây mã merge giống nhánh đã kiểm. Kiểm trực tiếp từ runner lúc 02:14:11 UTC đạt năm đường giao diện và hai cổng quyền vòng chữa hiện hữu. Schema Hỏi thầy: tám lệnh chỉ-thêm, không có chặng kiểm tra cá nhân đang làm. Các lần kiểm ca trước/sau đổi bản đều 0 ca mở / 0 lượt đang làm. Các bước đồng bộ kế hoạch/lịch cuối workflow đã hoàn tất.
+
+Bước full trong workflow phát hành bị giới hạn năm phút và thoát 124 theo cấu hình `continue-on-error` sẵn có; **không dùng trạng thái SUCCESS để nói full xanh**. Bằng chứng full là lượt local 838 giây và đối chiếu/rerun ghi trên; các bước hợp đồng bắt buộc của workflow đều đạt.
+
+Kiểm bổ sung trực tiếp từ workspace bị chặn bởi đường mạng ra (DNS EAI_AGAIN; curl qua proxy trả 403 CONNECT); công cụ đọc web cũng không truy cập được hai domain. Vì vậy xác minh bản sống dựa vào runner GitHub đã gọi Cloudflare và HTTP thật, không nhận là đã mở trình duyệt production từ workspace. Năm đường Hỏi thầy mới được kiểm quyền/biên nhận ở local; không ghi là đã probe riêng năm POST này trên production. [Biên bản tổng hợp](hoi-thay-ca-nhan-1610/phat-hanh.json).
+
+Lệnh lùi cụ thể: `git revert -m 1 8427ff3d8e182d8fbda85aa0fd22e2f460e441a1`, qua cổng ca và workflow như thường; giữ bảng/biên nhận đã ghi. Chưa thực hiện lùi. Commit ghi biên bản sau phát hành chỉ sửa tài liệu và mang `[skip ci] [CF-Pages-Skip]`, giữ nguyên bản sống vừa xác minh.
