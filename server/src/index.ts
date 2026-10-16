@@ -3642,6 +3642,9 @@ const boXuLy = {
         }))
       }
       if (p === '/hs/hoi-tro-ly') return ra(await import('./hoi-tro-ly').then((m) => m.hsHoiTroLy(env, b)))
+      if (p === '/hs/hoi-tro-ly/kiem/mo') return ra(await import('./hoi-thay-kiem-chung').then((m) => m.hsMoKiemHoiThay(env, b)))
+      if (p === '/hs/hoi-tro-ly/kiem/nop') return ra(await import('./hoi-thay-kiem-chung').then((m) => m.hsNopKiemHoiThay(env, b)))
+      if (p === '/hs/hoi-tro-ly/kiem/gui-thay') return ra(await import('./hoi-thay-can-giup').then((m) => m.hsGuiThayHoiThay(env, b)))
       if (p === '/hs/doc-loi-giai') return ra(await hsDocLoiGiai(env, b))
       // THANG TỰ GỠ (Vòng học v2 GĐ2, server/src/thang-tu-go.ts): câu kiểm từng bước chấm ở máy chủ, cổng nỗ lực, luyện nền, gửi thầy.
       if (p === '/hs/cau-kiem') return ra(await hsCauKiem(env, b))
@@ -3892,6 +3895,8 @@ const boXuLy = {
       if (p === '/gv/hoi-tro-ly/sbd-thu') return ra(await import('./hoi-tro-ly').then((m) => m.gvSbdThuHoiThay(env, b)))
       // Sổ hỏi Thầy (13/10 khuya): số lượt, từng em, các lượt gần nhất — chỉ đọc, sau cổng mã bí mật ở trên.
       if (p === '/gv/hoi-tro-ly/so') return ra(await import('./hoi-tro-ly').then((m) => m.gvSoHoiThay(env, b)))
+      if (p === '/gv/hoi-tro-ly/can-giup') return ra(await import('./hoi-thay-can-giup').then((m) => m.gvSoCanGiupHoiThay(envDoc, b)))
+      if (p === '/gv/hoi-tro-ly/ho-tro') return ra(await import('./hoi-thay-can-giup').then((m) => m.gvGhiHoTroHoiThay(env, b)))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
       // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
       if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))

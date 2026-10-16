@@ -41,6 +41,7 @@ import { KHOA_THE_LUC_LOP, MUC_DICH_CHAN_DOAN, SQL_LA_LAN_LAM, SQL_LA_LAN_LAM_GI
 // 06/10 — ÔN BÀI CŨ chia đều theo bài/dạng + tỉ lệ theo lớp (omni-on-bai-cu.ts thuần, omni-on-bai-cu-d1.ts đọc cấu hình; công tắc `on_bai_cu_deu` = {"bat":false} ⇒ y hệt cũ).
 import { capCongBang, chiaCauTheoBai, xepCongBang, type TiLeMotPhan } from './omni-on-bai-cu'
 import { docTiLeRiengCuaLop, onBaiCuDeuBat } from './omni-on-bai-cu-d1'
+import { sqlCauHoiThayDenHan } from './hoi-thay-lich-on'
 // Mô-đun các làn khác (omni-d1, bai-da-day, kho-thu-muc, srs2-gv) nạp LƯỜI bằng import động: chúng import ngược srs2-d1 (srs2-gv → bi-a → srs2-game →
 // omni-game → srs2-d1) — import tĩnh tạo vòng khiến `vi.mock(..., importOriginal)` của test làn khác nhận nhầm bản gốc; cờ tắt cũng không nạp gì thêm.
 const lanOmniD1 = () => import('./omni-d1')
@@ -582,6 +583,8 @@ export interface HoSo2 {
    * câu chưa gặp → câu đã gặp chưa tới lịch; trong mỗi nhóm bài gần nhất (vị trí lớn nhất) trước.
    */
   onBaiCu?: CauSrs[]
+  /** Câu Hỏi thầy đã đến lịch kiểm, dùng đổi thứ tự trong phần ôn/sửa sẵn có. */
+  hoiThayDenHan?: string[]
   /**
    * HỢP ĐỒNG (làn game đọc `hs.omni?.cheDoCho`): OMNI bật; chế độ chờ bài mới (không chiến dịch đang chạy và lớp đã có bài tick); số ứng viên ôn bài cũ.
    * `bat` LUÔN là `true` khi có khoá này (cờ tắt ⇒ không có khoá `omni`); khai kiểu `boolean` để mã làn game (`o.bat !== false`, srs2-game.ts) vẫn biên dịch.
@@ -602,10 +605,17 @@ export function theLucChienDichVuaDong(ds: readonly ChienDich[], homNay: string)
  * SỔ NỢ (thầy chốt 29/09): câu em làm SAI khi Lên bảng (`len_bang`) hoặc Kiểm tra đầu giờ (`dau_gio`) ⇒ vào sổ nợ NGAY, kể cả câu không
  * thuộc chiến dịch nào. Trả qid → lúc sai SỚM NHẤT. Chỉ câu có trong kho game, không tự luận. Lỗi đọc ⇒ rỗng.
  */
-export async function docQidSaiTaiLop(env: Env, sbd: string): Promise<Map<string, string>> {
+export async function docQidSaiTaiLop(env: Env, sbd: string, hoiThay?: { now: number; nhan: (qid: string[]) => void }): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
-  const rows = (await env.DB.prepare(`SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND nguon IN ('len_bang','dau_gio') AND ket_qua = 0 AND COALESCE(qid,'') <> '' GROUP BY qid`)
-    .bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
+  const cu = `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND nguon IN ('len_bang','dau_gio') AND ket_qua = 0 AND COALESCE(qid,'') <> '' GROUP BY qid`
+  const docCu = () => env.DB.prepare(cu).bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] }))
+  // Một hàng phụ tối đa12 mã, cùng truy vấn đã có trên bảng sổ luôn tồn tại.
+  // Không thêm đợt D1; thiếu schema mới thì đọc lại query cũ, không mất nợ tại lớp.
+  const r = hoiThay ? await env.DB.prepare(`${cu} UNION ALL SELECT NULL,
+    (SELECT json_group_array(qid_goc) FROM (${sqlCauHoiThayDenHan('x.sbd', 'x.now')}))
+    FROM (SELECT ? AS sbd,? AS now) x`).bind(sbd, sbd, hoiThay.now).all<Row>().catch(docCu) : await docCu()
+  if (hoiThay) hoiThay.nhan(parseMang((r.results ?? []).find(x => x.qid == null)?.luc))
+  const rows = (r.results ?? []).filter(x => x.qid != null)
   if (!rows.length) return ra
   const hopLe = await cauKhoKhongTuLuan(env, rows.map((x) => str(x.qid)))
   for (const x of rows) if (hopLe.has(str(x.qid))) ra.set(str(x.qid), str(x.luc))
@@ -751,14 +761,15 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   const omniP = omniSom ?? omniBatEm(env, sbd)
   const phamViP = omniP.then((bat) => (bat ? lanBaiDaDay().then((m) => m.phamViCuaEm(env, sbd)).catch(() => null) : null))
   // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
-  const [{ ds, daHuy }, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2, omni, phamVi] = await Promise.all([docChienDichKemDaHuyCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), Promise.all([docThamSoEm(env, sbd).catch(() => null), docThamSo(env)]).then(([em, chung]) => em ?? chung), omniP, phamViP])
+  let hoiThayDenHan: string[] = []
+  const [{ ds, daHuy }, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2, omni, phamVi] = await Promise.all([docChienDichKemDaHuyCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd, { now: Date.now(), nhan: q => { hoiThayDenHan = q } }), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), Promise.all([docThamSoEm(env, sbd).catch(() => null), docThamSo(env)]).then(([em, chung]) => em ?? chung), omniP, phamViP])
   // OMNI 3: mọi chiến dịch đang chạy, hạn gần trước; cờ tắt ⇒ một chiến dịch (giao gần nhất) như cũ.
   const ht = ds.find(c => laHanhTrinh(c.id) && c.trangThai === 'dang_chay' && !chuaBatDau(c, homNay))
   if (ht) {
     // `ungMoRong` (nơi gọi tự lập ứng viên — Gói 7, kho v6) ⇒ KHÔNG đọc vòng xoay `ungVienHanhTrinh`: kết quả của nó chỉ là đầu vào của `ungVienV6`
     // (đợt 18 — trước: vẫn đọc rồi bỏ, hai đợt D1 nối tiếp trên đường Sảnh / Mở chặng). Kết quả hồ sơ y hệt.
     const ung:readonly string[] = ungMoRong ? await ungMoRong : await ungVienHanhTrinh(env, ht.id, sbd, homNay, ht.qids).then((rotated) => import('./hanh-trinh-v6-kho').then(m=>m.ungVienV6(env,ht,sbd,homNay,phamVi,rotated)))
-    const can = new Set([...ung, ...qidSaiCa.keys(), ...qidSaiLop.keys(), ...qidSaiMoiKenh.keys()])
+    const can = new Set([...ung, ...qidSaiCa.keys(), ...qidSaiLop.keys(), ...qidSaiMoiKenh.keys(), ...hoiThayDenHan])
     // Không nạp lại toàn bộ kho của các chiến dịch nguồn đã đóng.
     for (let i = 0; i < ds.length; i++) ds[i] = { ...ds[i]!, qids: ds[i]!.qids.filter(q => can.has(q)) }
   }
@@ -810,6 +821,11 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     nguonTheoQid.set(q, 'cu')
     tuLucTheoQid.set(q, luc)
     qidSaiV2.add(q)
+  }
+  // Receipt máy chủ của chính em chỉ bổ sung ứng viên ôn; metadata/khối/phạm vi,
+  // tự luận và lịch đến hạn vẫn qua các cổng chung dưới đây như mọi câu cũ.
+  for (const q of hoiThayDenHan) if (!nguonTheoQid.has(q) && (coLichSuSai(q) || !daThuHoi(q, new Date(Date.now()).toISOString()))) {
+    nguonTheoQid.set(q, 'cu'); tuLucTheoQid.set(q, '')
   }
   const qids = [...nguonTheoQid.keys()]
   // Nơi gọi (chỉ "Câu đã làm") biết tập câu từ đây ⇒ bắt đầu các lượt ĐỌC của riêng nó CÙNG đợt với meta/lần làm bên dưới (trước: nối tiếp sau cả hồ sơ). Lỗi của nó không làm hỏng hồ sơ.
@@ -924,6 +940,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     : dangChay ? dangChay.qids.flatMap((q) => theoQid.get(q) ?? []) : []
   return {
     chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo, qidSaiV2, loiV2, songSinhCho, boTro, ...(songSinhLamLai.size ? { songSinhLamLai } : {}), ...(banKhacTiep.size ? { banKhacTiep } : {}), ...(chanDoanXong.size ? { chanDoanXong } : {}),
+    ...(hoiThayDenHan.length ? { hoiThayDenHan } : {}),
     ...(omni ? { chienDichHet: dsDangChay, onBaiCu, omni: { bat: true, cheDoCho: !dangChay && !!phamVi && phamVi.baiDaTick.length > 0, onBaiCuSo: onBaiCu.length }, phamVi: phamVi ?? null } : {}),
   }
 }
@@ -1406,6 +1423,7 @@ export function tuyChonGocOmni(hoSo: HoSo2, ngay: string): TuyChonKeHoach {
     ...(ds.length ? { tranHuyetChien: ds.some((c) => c.huyetChien) ? tranHuyetChienTheo(theLuc) : theLuc, raiDeu: cd?.raiDeu ?? true } : {}),
     chienDich: ds.map((c) => ({ id: c.id, hanNop: c.hanNop, theLucNgay: c.theLucNgay, raiDeu: c.raiDeu, batDau: c.batDau })),
     onBaiCu: hoSo.onBaiCu ?? [],
+    ...(hoSo.hoiThayDenHan?.length ? { hoiThayDenHan: hoSo.hoiThayDenHan, nhomCau: new Map([...hoSo.meta].map(([id, m]) => [id, m.group])) } : {}),
   }
 }
 /**
@@ -1610,7 +1628,7 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
   const cd = hoSo.chienDich
   // SỔ NỢ (29/09): không chiến dịch ⇒ trần = thể lực của chiến dịch vừa đóng gần nhất (mặc định 40).
   const tranNgay = cd?.theLucNgay ?? hoSo.theLucNoCu
-  const tuyChonGoc = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay, raiDeu: cd.raiDeu } : {}) }
+  const tuyChonGoc = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay, raiDeu: cd.raiDeu } : {}), ...(hoSo.hoiThayDenHan?.length ? { hoiThayDenHan: hoSo.hoiThayDenHan, nhomCau: new Map([...hoSo.meta].map(([id, m]) => [id, m.group])) } : {}) }
   // Bốc câu mới cá nhân hoá (thầy 28/09): hạng theo dạng CHỈ đọc khi thật sự lập kế hoạch (kế hoạch đã chốt thì khỏi đọc).
   // Lỗi đọc hồ sơ ⇒ không có hạng ⇒ hành vi cũ (dễ trước), không làm hỏng kế hoạch.
   // CÁ NHÂN HOÁ (02/10): nhịp học riêng (tỉ lệ trần nợ) + kênh riêng (em không mở Đoàn ⇒ câu ôn vào Đảo) — ca-nhan-hoa-v2.ts.

@@ -265,6 +265,7 @@ export function EmThu({ thu, onXong }: { thu: BuocThu; onXong: (dung: boolean) =
   return (
     <div className="lg-thu">
       <label><ChemText text={chuHoa(`Em thử: ${thu.hoi}`)} /></label>
+      <p className="lg-ht-ai">Luyện nhanh trong hướng dẫn · chưa tính xác nhận khắc phục.</p>
       {/* Ô số dùng chung (luật 21/09: mọi ô đáp số có nút "−" và ","); Enter trong ô = Kiểm tra. */}
       <div className="lg-thu-hang" onKeyDown={(e) => { if (e.key === 'Enter' && e.target instanceof HTMLInputElement) { e.preventDefault(); kiem() } }}>
         <OSoTraLoi value={gia} onChange={(v) => { setGia(v); setSai(false) }} placeholder="Ví dụ 0,5" ariaLabel="Kết quả em tính" maxLength={12} />
@@ -283,6 +284,7 @@ export function KiemLaiKhoi({ k }: { k: KiemLai }) {
   return (
     <section className="lg-kiem" aria-label="Thầy hỏi lại một câu">
       <div className="lg-kiem-dau"><Net ten="hoi" co={16} />Thầy hỏi lại 1 câu</div>
+      <p className="lg-ht-ai">Luyện nhanh trong hướng dẫn · chưa tính xác nhận khắc phục.</p>
       <p className="lg-kiem-hoi"><ChemText text={chuHoa(k.hoi)} /></p>
       <div className="lg-kiem-lua">
         {k.lua.map((l, i) => (

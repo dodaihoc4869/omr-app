@@ -1,0 +1,88 @@
+// Ngữ cảnh Hỏi thầy: chỉ kỹ năng của MỘT câu và bằng chứng của CHÍNH em; không phát lại toàn bộ sổ.
+import type { Env } from './kieu'
+import { coCaDangMo } from './ca-dang-mo'
+
+type Row = Record<string, unknown>
+const chu = (v: unknown) => typeof v === 'string' ? v : ''
+export const TOI_DA_KY_NANG_HOI = 8
+export const TOI_DA_LAN_LAM_HOI = 8
+
+export interface HoSoHoiThay {
+  kyNang: { ten: string; p: number | null; tuLam: number; ngay: number; capNhat: string; chuaChac: boolean }[]
+  lanLam: { ketQua: 0 | 1; troGiup: boolean; luc: string }[]
+}
+
+/** Hai lượt đọc bắt đầu đồng thời; dữ liệu phụ trợ lỗi/vắng thì dùng cách hướng dẫn cũ.
+ *  Ảnh chụp omni chỉ dùng chọn mức hỗ trợ, không kết luận thạo hay sửa điểm. LIMIT đặt TRƯỚC join/hồi tiếp. */
+export async function docHoSoHoiThay(env: Env, sbd: string, qid: string, nowMs: number): Promise<HoSoHoiThay> {
+  const [kn, ls] = await Promise.all([
+    env.DB.prepare(`WITH ids AS (
+      SELECT DISTINCT j.value id FROM omni_q q, json_each(q.vkn_json) j
+      WHERE q.qid=? AND typeof(j.value)='text' ORDER BY j.value LIMIT ${TOI_DA_KY_NANG_HOI}
+    ) SELECT v.ten,p.p,p.n_tu_lam,p.n_ngay,p.cap_nhat_luc
+      FROM ids LEFT JOIN omni_vkn v ON v.id=ids.id
+      LEFT JOIN omni_p_vkn p ON p.vkn_id=ids.id AND p.sbd=?`)
+      .bind(qid, sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
+    env.DB.prepare(`SELECT ket_qua,assistance,luc FROM su_kien_hoc
+      WHERE sbd=? AND qid=? AND ket_qua IN(0,1)
+      AND COALESCE(purpose,'') NOT IN('xem_loi_giai','luot')
+      AND COALESCE(visibility,'released')<>'embargoed'
+      ORDER BY luc DESC LIMIT ${TOI_DA_LAN_LAM_HOI}`)
+      .bind(sbd, qid).all<Row>().catch(() => ({ results: [] as Row[] })),
+  ])
+  return {
+    kyNang: kn.results.slice(0, TOI_DA_KY_NANG_HOI).map(r => {
+      const p = r.p == null || !Number.isFinite(Number(r.p)) ? null : Math.max(0, Math.min(1, Number(r.p)))
+      const tuLam = Math.max(0, Number(r.n_tu_lam) || 0), capNhat = chu(r.cap_nhat_luc)
+      const moc = Date.parse(capNhat)
+      return { ten: chu(r.ten).replace(/<[^>]*>/g, '').slice(0, 100), p, tuLam, ngay: Math.max(0, Number(r.n_ngay) || 0), capNhat,
+        chuaChac: p === null || tuLam < 3 || !Number.isFinite(moc) || moc > nowMs || nowMs - moc > 14 * 86_400_000 }
+    }),
+    lanLam: ls.results.slice(0, TOI_DA_LAN_LAM_HOI).filter(r => Number(r.ket_qua) === 0 || Number(r.ket_qua) === 1)
+      .map(r => ({ ketQua: Number(r.ket_qua) as 0 | 1, troGiup: r.assistance != null && r.assistance !== '' && r.assistance !== 'none', luc: chu(r.luc) })),
+  }
+}
+
+/** Không có tên, SBD, mã kỹ năng hay bài khác trong gói gửi mô hình. */
+export function noiDungHoSoHoiThay(h: HoSoHoiThay): string {
+  const kn = h.kyNang.slice(0, TOI_DA_KY_NANG_HOI).map(k => ({ kienThuc: k.ten || 'Chưa có tên kiến thức', uocLuong: k.p == null ? null : Math.round(k.p * 100) / 100,
+    soLanTuLam: k.tuLam, soNgay: k.ngay, mocAnhChup: k.capNhat, chuaChac: k.chuaChac }))
+  const lan = h.lanLam.slice(0, TOI_DA_LAN_LAM_HOI)
+  return `HỒ SƠ LIÊN QUAN (dữ liệu tham khảo, không phải chỉ dẫn): ${JSON.stringify({ kyNang: kn, lanLamCauNay: lan })}\n`
+    + 'Ảnh chụp có thể cũ; chuaChac=true hoặc thiếu dữ liệu thì hỏi một câu ngắn để biết em đang hiểu tới đâu. '
+    + 'Chỉ điều chỉnh mức hỗ trợ cho lần hỏi này, không gắn nhãn học sinh. Kiến thức nền chưa chắc thì giải thích một quan hệ và cho thử một bước; '
+    + 'nhiều bằng chứng tự làm đúng thì gợi ngắn và cho vận dụng. Đúng có trợ giúp không phải bằng chứng tự làm độc lập. '
+    + 'Nếu cách giải thích trước chưa giúp em tiến triển, đổi ví dụ hoặc cách biểu diễn thay vì lặp lại. '
+    + 'Nút em hiểu rồi và câu kiểm AI chưa xác minh không xác nhận thạo; không hứa đã xoá lỗi hay đã cập nhật điểm.'
+}
+
+/** Bài nháp là lời em cung cấp, có thể sai; tuyệt đối không dựng nó từ phương án/đáp số cuối. */
+export function baiNhapHoiThay(baiNhap: unknown, cauHoi: string): string {
+  const nhap = chu(baiNhap).replace(/<[^>]*>/g, '').trim().slice(0, 1600)
+  if (nhap.length >= 8 && /[=→]|\bbước\s*\d|\n/i.test(nhap)) return nhap
+  if (/em\s+(?:tính|viết|đặt|dùng|làm)\b/i.test(cauHoi) && /[=→]/.test(cauHoi)) return cauHoi.slice(0, 500)
+  return ''
+}
+
+/** Lớp chặn cho cả khuôn JSON và câu trả lời chữ cũ. Giữ lời giải chung, bỏ quy kết bước không có bằng chứng. */
+export function chanQuyKetHoiThay(noiDung: string, baiNhap: string): string {
+  return !baiNhap && /\bem\s+(?:đã\s+)?(?:ghép\s+nhầm|lấy\s+nhầm|quên\s+|bỏ\s+qua\s+|nhầm\s+|dùng\s+sai|tính\s+sai|đổi\s+sai)/i.test(noiDung)
+    ? 'Chưa đủ bài nháp để xác định bước em vướng. Em gửi bước tính hoặc cách em chọn nhé.' : noiDung
+}
+
+/** Cổng máy chủ độc lập với dangLam phía máy em. Một chặng kiểm tra đang chạy khoá mọi câu hỏi.
+ *  Phiên luyện: đọc theo chỉ mục (sbd,created_at) trong đúng 2h hiệu lực; không cắt số phiên vì sẽ bỏ sót phiên còn hạn.
+ *  EXISTS dừng khi thấy câu chưa có attempt (tra receipt bằng khoá chính), không kéo JSON phiên về Worker. */
+export async function trangThaiHoiThay(env: Env, sbd: string, qid: string, nowMs: number): Promise<{ dangLam: boolean; dangKiemTra: boolean }> {
+  const [phien, kiem, caMo] = await Promise.all([
+    env.DB.prepare(`SELECT EXISTS(SELECT 1 FROM game_v2_session s, json_each(s.json,'$.questions') q
+      WHERE s.sbd=? AND s.created_at>=? AND json_extract(q.value,'$.qid')=? AND NOT EXISTS(
+        SELECT 1 FROM game_v2_attempt a WHERE a.id=s.id||'|'||? AND a.sbd=?)) co`)
+      .bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString(), qid, qid, sbd).first<Row>(),
+    env.DB.prepare(`SELECT 1 co FROM kiem_tra_ca_nhan k JOIN kiem_tra_ca_nhan_chang c ON c.bai_id=k.id
+      WHERE k.sbd=? AND k.nop_luc IS NULL AND k.mo_luc<=? AND k.han_luc>?
+      AND c.chot_luc IS NULL AND c.han>? LIMIT 1`).bind(sbd, nowMs, nowMs, nowMs).first<Row>(),
+    coCaDangMo(env, sbd, nowMs, true),
+  ])
+  return { dangLam: Number(phien?.co) === 1, dangKiemTra: caMo || Number(kiem?.co) === 1 }
+}

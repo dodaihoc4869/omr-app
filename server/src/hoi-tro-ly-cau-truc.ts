@@ -11,6 +11,8 @@
 // (`schemaChoKhuon`) chỉ gồm phần khuôn cần ⇒ mô hình lite buộc điền đúng phần (đo 14/10: để mô hình tự chọn thì 7/99 câu có khối).
 // Đúng/Sai từng ý (`yDS`) do MÁY CHỦ điền từ đáp án kho + bài em; mô hình chỉ viết lý do. Em đang làm ⇒ chỉ gợi ý từng nấc + khối không lộ đáp án.
 
+import { chanQuyKetHoiThay } from './hoi-thay-ca-nhan'
+
 type Obj = Record<string, unknown>
 const str = (v: unknown): string => (typeof v === 'string' ? v : v === null || v === undefined ? '' : String(v))
 
@@ -120,7 +122,7 @@ export function schemaChoKhuon(k: Khuon) {
 }
 /** Dòng gửi kèm DỮ LIỆU CÂU: khuôn máy chủ đã chọn + phần BẮT BUỘC của khuôn đó. */
 export const CHI_DAN_KHUON: Record<Khuon, string> = {
-  'cho-sai': 'KHUÔN TRẢ LỜI "Chỉ chỗ sai". BẮT BUỘC: soSanh 2–5 dòng theo thứ tự làm, mỗi dòng {em: em đã làm gì ở bước đó (suy từ đáp án em ghi), dung: bước đúng}, đúng MỘT dòng lech = true là dòng ĐẦU TIÊN em làm khác lời giải; bay tieuDe "Chỗ em nhầm" nói vì sao em nhầm; kiemLai 1 câu cùng lỗi nhưng với chất hay số khác. Có tính toán thì thêm phuongTrinh, tinh. chuaHieu 2–3 chỗ.',
+  'cho-sai': 'KHUÔN TRẢ LỜI "Chỉ chỗ sai". BẮT BUỘC: chỉ đối chiếu các bước em THỰC SỰ cung cấp trong BÀI NHÁP, không dựng bước từ đáp số cuối. soSanh chỉ gồm các dòng có bằng chứng, em trích đúng bài nháp, dung là bước đúng; đánh dấu dòng lệch đầu tiên nếu xác định được. bay nêu điều kiểm chứng được, chưa chắc thì hỏi MỘT câu phân biệt. kiemLai 1 câu cùng kiến thức nhưng với chất hay số khác, chỉ là luyện chưa xác minh. Có tính toán thì thêm phuongTrinh, tinh. chuaHieu 2–3 chỗ.',
   'goi-y': 'KHUÔN TRẢ LỜI "Gợi ý từng nấc" (em ĐANG LÀM). BẮT BUỘC nac đúng 3 nấc từ nhẹ tới sâu: nấc 1 gợi kiến thức cần dùng, nấc 2 gợi cách làm (câu có hiện tượng / thuốc thử / sơ đồ thì khoi = thiNghiem / nhanBiet / soDo và điền khối đó), nấc 3 gợi bước cuối để em TỰ kết luận. KHÔNG nấc nào nêu đáp án, phương án đúng, đúng/sai từng ý hay kết quả số. chuaHieu 2 chỗ.',
   'giai-thich': 'KHUÔN TRẢ LỜI "Giải thích". yChinh MỘT câu trả lời thẳng. Câu có so sánh, thứ tự, mạnh/yếu ⇒ BẮT BUỘC xepHang. Có hình vẽ sẵn hợp ⇒ hinhDung. So hai chất ⇒ doiChieu. BẮT BUỘC kiemLai 1 câu về đúng kiến thức vừa giải thích. chuaHieu 2–3 chỗ.',
   'tung-y': 'KHUÔN TRẢ LỜI "Từng ý a–d". BẮT BUỘC lyDoY đủ 4 ý a, b, c, d, mỗi ý MỘT câu lý do (KHÔNG mở đầu bằng chữ Đúng hay Sai: máy em tự ghi theo đáp án). yChinh nói em sai ý nào và gốc chung nếu có. kiemLai 1 câu về kiến thức của ý em sai. chuaHieu ghi "Ý b", "Ý c"… cho ý em sai.',
@@ -130,19 +132,19 @@ export const CHI_DAN_KHUON: Record<Khuon, string> = {
 const RE_KHAI_NIEM = /(vì sao|tại sao|giải thích|là gì|khác (gì|nhau)|giống|so sánh|sắp xếp|thứ tự|mạnh hơn|yếu hơn|dễ hơn|ví dụ khác|chưa hiểu|nghĩa là)/i
 const RE_BAI_EM = /(sao em|em (ra|chọn|được|làm|tính|ghi|sai)|nhầm|sai ở đâu|sai chỗ nào)/i
 const RE_SO_DON_VI = /\d+(?:[.,]\d+)?\s*(?:gam|g|kg|mol|lít|l|ml|%|m3|tấn)(?![\p{L}])/iu
-/** Máy chủ chọn khuôn trước khi gọi Gemini (không đọc D1 thêm). Có số liệu bài em (đáp án em ghi, hoặc em nói số / phương án em ra) mới
- *  "Chỉ chỗ sai" — không có thì cột "Em làm" sẽ là đoán ⇒ dùng khuôn tính / giải thích. */
-export function chonKhuon(x: { dangLam: boolean; phan: string; ketQua: 'dung' | 'sai' | 'chua_lam'; cauHoi: string; de: string; dapAnEm: string }): Khuon {
+/** Chỉ đối chiếu bước khi có bài nháp; đáp án cuối không cho biết em đã làm những bước nào. */
+export function chonKhuon(x: { dangLam: boolean; phan: string; ketQua: 'dung' | 'sai' | 'chua_lam'; cauHoi: string; de: string; dapAnEm: string; baiNhap?: string }): Khuon {
   if (x.dangLam) return 'goi-y'
   if (x.phan === 'II') return 'tung-y'
   const baiEm = RE_BAI_EM.test(x.cauHoi)
   if (RE_KHAI_NIEM.test(x.cauHoi) && !baiEm) return 'giai-thich'
-  if ((x.ketQua === 'sai' && x.dapAnEm) || (baiEm && (x.dapAnEm || /\d|(^|[^\p{L}])[A-D]([^\p{L}]|$)/u.test(x.cauHoi)))) return 'cho-sai'
+  if (x.baiNhap && (x.ketQua === 'sai' || baiEm)) return 'cho-sai'
+  if ((x.ketQua === 'sai' && x.dapAnEm) || baiEm) return 'giai-thich'
   if (x.phan === 'III' || RE_SO_DON_VI.test(x.de) || /tính|bao nhiêu/i.test(x.cauHoi)) return 'tinh'
   return 'giai-thich'
 }
 /** Bối cảnh máy chủ biết để làm sạch phần v3 (khuôn đã chọn, câu, đáp án, bài em). */
-export interface BoiCanhKhuon { khuon: Khuon; phan: string; de: string; pa: Record<string, string> | null; y: Record<string, string> | null; dapAn: string; dapAnEm: string }
+export interface BoiCanhKhuon { khuon: Khuon; phan: string; de: string; pa: Record<string, string> | null; y: Record<string, string> | null; dapAn: string; dapAnEm: string; baiNhap?: string }
 
 /** Đầu ra JSON có `yChinh` hoặc `buoc` ⇒ khuôn mới; khác ⇒ null (nơi gọi đọc khuôn cũ `{lienQuan, traLoi}`). */
 export function tachCauTruc(chu: string): { lienQuan: boolean; o: Obj } | null {
@@ -171,7 +173,11 @@ const boDau = (s: string): string => boDungSai(s.replace(/\*\*(.+?)\*\*/g, '$1')
 
 /** Làm sạch đối tượng mô hình trả về. `chan` (em đang làm): lọc câu lộ đáp án trong từng phần ('' = bỏ cả phần). Rỗng hết ⇒ null. */
 export function lamSachCauTruc(o: Obj, dangLam: boolean, chan?: (t: string) => string, bo?: BoiCanhKhuon): CauTrucTraLoi | null {
-  const loc = (t: string) => (t && chan ? chan(t) : t)
+  const loc = (t: string) => {
+    const sach = t && chan ? chan(t) : t
+    // Mô hình vẫn có thể bỏ qua chỉ dẫn: chặn lời quy kết bước làm chưa được em cung cấp.
+    return bo ? chanQuyKetHoiThay(sach, bo.baiNhap ?? '') : sach
+  }
   const yChinh = loc(sachO(o.yChinh, 220))
   const buoc = (Array.isArray(o.buoc) ? o.buoc : []).slice(0, 4)
     .map((b) => { const x = (b && typeof b === 'object' ? b : {}) as Obj; return { ten: boDau(sachO(x.ten, 48)), chu: loc(sachO(x.chu, 320)) } })
@@ -214,7 +220,7 @@ export function lamSachCauTruc(o: Obj, dangLam: boolean, chan?: (t: string) => s
   if (khoi.nhanBiet) kq.nhanBiet = khoi.nhanBiet
   if (khoi.phuongTrinh) kq.phuongTrinh = khoi.phuongTrinh
   if (khoi.tinh) kq.tinh = khoi.tinh
-  if (khoi.bay) kq.bay = { ...khoi.bay, chu: dam(dungSai(khoi.bay.chu.replace(/==(.+?)==/g, '$1'))) }
+  if (khoi.bay) kq.bay = { ...khoi.bay, ...(bo && !bo.baiNhap ? { tieuDe: 'Bẫy hay nhầm' } : {}), chu: dam(dungSai(khoi.bay.chu.replace(/==(.+?)==/g, '$1'))) }
   const { so: _so, ...phan3 } = v3
   if (bo) kq.khuon = bo.khuon
   Object.assign(kq, phan3)
@@ -237,9 +243,10 @@ function lamSachV3(o: Obj, dangLam: boolean, loc: (t: string) => string, soBuoc:
   if (nac.length >= 2) { k.nac = nac; k.so++ }
   if ((HINH_DUNG as readonly string[]).includes(str(o.hinhDung))) { k.hinhDung = str(o.hinhDung) as HinhDung; k.so++ }
   if (dangLam) return k
-  // SO BÀI EM VỚI LỜI GIẢI: giữ đúng MỘT dòng lệch (dòng lệch đầu tiên).
+  // SO BÀI EM VỚI LỜI GIẢI: chỉ giữ bước trích được trong bài nháp, không nhận bước mô hình dựng từ đáp án cuối.
   let daLech = false
-  const ss = mang(o.soSanh, 5).map((x) => ({ em: o1(x.em, 90), dung: o1(x.dung, 90), lech: x.lech === true })).filter((x) => x.em && x.dung)
+  const nhap = gon(bo?.baiNhap ?? '')
+  const ss = mang(o.soSanh, 5).map((x) => ({ em: o1(x.em, 90), dung: o1(x.dung, 90), lech: x.lech === true })).filter((x) => x.em && x.dung && gon(x.em).length >= 3 && nhap.includes(gon(x.em)))
     .map((x) => { const lech = x.lech && !daLech; if (lech) daLech = true; return { ...x, lech } })
   if (ss.length >= 2) { k.soSanh = ss; k.so++ }
   // THANG XẾP HẠNG: mạnh/lớn ở đầu; `hoi` = chất em hỏi; ngưỡng nằm SAU chất thứ `nguongSau`.

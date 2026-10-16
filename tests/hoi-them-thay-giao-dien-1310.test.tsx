@@ -29,7 +29,7 @@ const mo = () => fireEvent.click(screen.getByRole('button', { name: 'Em còn ch�
 const o = () => screen.getByLabelText('Chỗ em thắc mắc về câu này') as HTMLTextAreaElement
 
 describe('ô hỏi thêm Thầy', () => {
-  it('gửi câu hỏi ⇒ lời trả lời có nhãn "Thầy Đỗ Đại Học", đếm câu hỏi còn lại; không có chữ "trợ lý" ở đâu', async () => {
+  it('gửi câu hỏi ⇒ giữ tên Thầy Đỗ Đại Học, ghi rõ trợ giảng AI theo đề xuất thầy duyệt 16/10, đếm câu hỏi còn lại', async () => {
     phanHoi = [{ ok: true, traLoi: 'Ý b sai vì em nhầm chất.\nEm xem lại bước 2.', conLai: 19, ngoaiPhamVi: false }]
     const onTraLoi = vi.fn()
     const { container } = render(<HoiThemThay qid="DE-II-4" nguon="luyen_de" onTraLoi={onTraLoi} />)
@@ -46,6 +46,7 @@ describe('ô hỏi thêm Thầy', () => {
     expect(onTraLoi).toHaveBeenCalledTimes(1)
     expect(o().value).toBe('')
     expect(container.textContent!.toLowerCase()).not.toContain('trợ lý')
+    expect(screen.getByText('Trợ giảng AI của thầy Học')).toBeTruthy()
     expect(screen.getByText('KIÊN TRÌ là vũ khí tối thượng để chiến thắng mọi thứ')).toBeTruthy() // thầy 13/10: thay dòng "Trả lời tự động…"
   })
 

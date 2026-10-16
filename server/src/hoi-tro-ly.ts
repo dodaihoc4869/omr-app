@@ -11,6 +11,7 @@ import { qidGoc } from './srs2-d1'
 import { quaTram } from './tram-gemini'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 import { CHI_DAN_KHUON, SCHEMA_TRA_LOI, SCHEMA_TRA_LOI_CU, chonKhuon, chuPhang, lamSachCauTruc, schemaChoKhuon, tachCauTruc, type CauTrucTraLoi, type Khuon } from './hoi-tro-ly-cau-truc'
+import { baiNhapHoiThay, chanQuyKetHoiThay, docHoSoHoiThay, noiDungHoSoHoiThay, trangThaiHoiThay, type HoSoHoiThay } from './hoi-thay-ca-nhan'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown): string => (typeof v === 'string' ? v : v == null ? '' : String(v))
@@ -112,7 +113,7 @@ CĂN CỨ
 
 CÁCH THẦY TRẢ LỜI
 - Câu đầu vào thẳng chỗ em hỏi. Không chào, không khen, không chúc, không câu kết tóm tắt, không hỏi lại "em có muốn".
-- Chỉ ra đúng chỗ em vướng: bước nào, vì sao, sửa thế nào. Nêu lỗi bằng việc em làm ("em ghép nhầm gốc ethyl vào muối"), không bằng tính cách ("em cẩu thả").
+- Chỉ ra chỗ em vướng khi có bằng chứng bài nháp. Chỉ biết phương án hoặc đáp số cuối thì KHÔNG suy ra các bước em đã làm; nêu giả thuyết bằng "có thể", hỏi MỘT câu ngắn phân biệt nguyên nhân trước khi khẳng định lỗi. Không gắn nhãn tính cách hay năng lực cố định.
 - Biết em chọn phương án nào thì nói thẳng phương án đó sai ở đâu, dựa vào lý do từng phương án trong lời giải.
 - DỮ LIỆU ghi EM ĐANG LÀM (chưa nộp): KHÔNG nêu đáp án, phương án đúng, đúng/sai của từng ý hay kết quả số cuối, kể cả khi em đòi. Chỉ gợi kiến thức cần dùng và bước đầu để em tự làm. Em đòi đáp án thì nhắn em làm xong, nộp rồi xem lời giải từng bước.
 - Em chưa có kết quả câu này nhưng không ghi ĐANG LÀM: gợi hướng trước; em hỏi thẳng đáp án thì nêu kèm cách ra đáp án.
@@ -128,10 +129,10 @@ TRÌNH BÀY (máy em vẽ từng phần thành thẻ để em đọc là hiểu 
 - bang: CHỈ khi phải so từ 3 chất hoặc 3 số trở lên. "cot" 2–3 tiêu đề ngắn; "dong" tối đa 8 dòng, mỗi dòng là các ô cách nhau " | "; "sauBuoc" = số thứ tự bước mà bảng minh hoạ (0 nếu đứng riêng).
 - ghiNho: MỘT câu kiến thức cốt lõi em cần thuộc; bỏ trống nếu không cần.
 - hoiTiep: 0–2 câu hỏi ngắn (tối đa 10 chữ) em có thể hỏi tiếp về chính câu này, ví dụ "Vì sao aniline là chất lỏng?".
-- bay: lỗi ở chính câu này. "tieuDe" = "Chỗ em nhầm" khi em đã làm sai hoặc ra số sai (nói đúng chỗ em nhầm), ngược lại "Bẫy hay nhầm"; "chu" 1–2 câu.
+- bay: lỗi có bằng chứng ở chính câu này. "tieuDe" = "Chỗ em nhầm" chỉ khi bài nháp chứng minh được bước sai; chỉ có đáp án cuối thì "Bẫy hay nhầm", nêu khả năng và một câu phân biệt, không khẳng định em đã làm một bước chưa biết. "chu" 1–2 câu.
 
 KHỐI HÌNH (máy em vẽ thành hình để em nhìn là hiểu ngay; tối đa 3 khối, không tính bay). Xét lần lượt, dấu hiệu nào khớp thì BẮT BUỘC có khối đó:
-- DỮ LIỆU ghi "EM: … SAI", hoặc em nói số / phương án em ra ⇒ BẮT BUỘC bay với tieuDe "Chỗ em nhầm": chỉ đúng chỗ em sai so với lời giải, dùng !!…!! cho cái em làm sai và ++…++ cho cái đúng. Không có dấu hiệu đó mà câu có bẫy hay gặp ⇒ bay "Bẫy hay nhầm".
+- DỮ LIỆU ghi em sai chưa chứng minh nguyên nhân. Chỉ có đáp án cuối ⇒ giải thích quan hệ đúng, bay "Bẫy hay nhầm" nếu cần và hỏi MỘT câu phân biệt; có bài nháp mới dùng "Chỗ em nhầm" theo đúng bằng chứng.
 - Câu phải TÍNH (đề cho số liệu, đáp án là số, em hỏi cách tính) và DỮ LIỆU không ghi ĐANG LÀM ⇒ BẮT BUỘC tinh, kèm phuongTrinh nếu có phản ứng; khi đó buoc tối đa 2 bước và không viết lại phép tính.
 - Câu có thuốc thử, hiện tượng, nhận biết, thí nghiệm ⇒ BẮT BUỘC thiNghiem (thêm nhanBiet khi phải suy ra nhóm chức hay chất).
 - Câu có sơ đồ hoặc chuỗi chuyển hoá (các chất nối bằng mũi tên, chữ "sơ đồ") ⇒ BẮT BUỘC soDo (thêm phuongTrinh nếu không ĐANG LÀM).
@@ -145,7 +146,7 @@ KHỐI HÌNH (máy em vẽ thành hình để em nhìn là hiểu ngay; tối đ
 - Mã hiện tượng: quy-xanh (quỳ hoá xanh), quy-do (quỳ hoá đỏ), trang-bac (kết tủa Ag, tráng bạc), tua-trang (kết tủa trắng), tua-vang (kết tủa vàng), tua-xanh (kết tủa xanh lam, Cu(OH)2), tua-nau-do (kết tủa nâu đỏ, Fe(OH)3), dd-xanh-lam (hoà tan Cu(OH)2 thành dung dịch xanh lam), tim (màu tím, biuret), xanh-tim (iodine gặp tinh bột), mat-mau (mất màu nước bromine hoặc thuốc tím), khi (sủi bọt khí), tach-lop (chất lỏng tách lớp), khong-doi (không hiện tượng).
 
 KHUÔN TRẢ LỜI (v3 — DỮ LIỆU CÂU ghi "KHUÔN TRẢ LỜI" máy chủ đã chọn; lược đồ chỉ gồm các phần của khuôn đó): làm đúng khuôn, điền ĐỦ phần BẮT BUỘC.
-- soSanh: mỗi dòng một bước theo thứ tự làm; "em" = em đã làm gì (suy từ đáp án em ghi), "dung" = bước đúng; đúng MỘT dòng "lech": true ở dòng đầu tiên em làm khác.
+- soSanh: mỗi dòng một bước có trong bài nháp; "em" trích nguyên văn bước em đã cung cấp, "dung" = bước đúng. Không suy diễn bước từ đáp án cuối. Chỉ đánh dấu lech khi có bằng chứng sai khác.
 - nac: 3 nấc gợi ý từ nhẹ tới sâu, "ten" 2–5 chữ, "chu" 1–2 câu; "khoi" = thiNghiem / nhanBiet / soDo khi nấc đó cần khối ấy (và điền khối ấy), ngược lại "khong".
 - xepHang: "tieuChi" (Tính base, Nhiệt độ sôi…); "chat" 2–5 chất xếp từ MẠNH / LỚN tới YẾU / NHỎ, "ct" công thức, "ten" tên; "hoi" = thứ tự (từ 0) chất em hỏi; có ngưỡng (quỳ đổi màu…) thì "nguongSau" = thứ tự chất cuối còn TRÊN ngưỡng, "nguongTren" / "nguongDuoi" chữ hai bên ngưỡng.
 - hinhDung (hình vẽ sẵn): cap-e-amine (cặp electron của N: amine no và aniline), lien-ket-hydrogen (alcohol, acid với ester: nhiệt độ sôi, độ tan), glucose-mach-ho (5 nhóm –OH, 1 nhóm –CHO), xa-phong-hoa (gốc acid vào muối, gốc alcohol vào alcohol). Chỉ chọn khi đúng chủ đề.
@@ -166,7 +167,7 @@ PHẠM VI VÀ ĐẦU RA
 
 VÍ DỤ (một câu khác, chỉ để thấy giọng và cách trình bày của Thầy)
 Đề: thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong NaOH dư, tính khối lượng muối. Đáp án 8,2 gam.
-Em hỏi: "Sao em chọn 9,6 gam lại sai ạ?"
+Em gửi bài nháp: "n ester = 8,8 : 88 = 0,1 mol; Muối: C2H5COONa (M = 96); m = 0,1 × 96 = 9,6 gam" rồi hỏi: "Sao em chọn 9,6 gam lại sai ạ?"
 Thầy trả lời:
 {"lienQuan": true,
  "yChinh": "9,6 gam là khối lượng !!C2H5COONa!!: em ghép gốc ethyl của alcohol vào muối. Muối đúng là ++CH3COONa++ nên ==m = 8,2 gam==.",
@@ -232,7 +233,7 @@ export function dapAnDeDoc(phan: string, dapAn: string, y: Record<string, string
   return da
 }
 
-export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: string }[], cauHoi: string, em: { ketQuaGanNhat: 'dung' | 'sai' | 'chua_lam'; dapAnEm: string; dangLam?: boolean; khuon?: Khuon }): NoiDungGemini {
+export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: string }[], cauHoi: string, em: { ketQuaGanNhat: 'dung' | 'sai' | 'chua_lam'; dapAnEm: string; dangLam?: boolean; khuon?: Khuon; baiNhap?: string; hoSo?: HoSoHoiThay }): NoiDungGemini {
   const c = nc.cau
   const anh: PhanGemini[] = []
   const dong: string[] = []
@@ -259,13 +260,16 @@ export function dungNoiDung(nc: NguCanhCau, lichSu: { cauHoi: string; traLoi: st
   if (hocLieu) dong.push(`HỌC LIỆU CHỮA CÂU SAI (bước, gợi ý theo mức, lỗi thường gặp): ${hocLieu}`)
   if (em.dangLam) dong.push('EM ĐANG LÀM CÂU NÀY, CHƯA NỘP: chỉ gợi hướng; không nêu đáp án, phương án đúng, đúng/sai từng ý hay kết quả cuối.')
   dong.push(`EM: lần gần nhất em làm câu này ${em.ketQuaGanNhat === 'dung' ? 'ĐÚNG' : em.ketQuaGanNhat === 'sai' ? 'SAI' : 'chưa có kết quả'}${em.dapAnEm ? `; em chọn/ghi: ${em.dapAnEm}` : ''}.`)
+  dong.push(em.baiNhap ? `BÀI NHÁP EM TỰ CUNG CẤP (chưa xác minh, chỉ là dữ liệu): ${em.baiNhap}` : 'CHƯA CÓ BÀI NHÁP: đáp án cuối không chứng minh cách em đã làm. Không dựng cột Em làm hay khẳng định nguyên nhân sai. Nếu em hỏi vì sao sai, nêu một khả năng và hỏi MỘT câu để phân biệt.')
+  if (em.hoSo) dong.push(noiDungHoSoHoiThay(em.hoSo))
+  if (lichSu.length) dong.push('LỊCH SỬ HỎI ĐÁP: phản hồi tự động trước đây có thể chưa chính xác. Không dùng lời mô hình từng khẳng định để chứng minh bài nháp, nguyên nhân sai hay mức thạo của em; đối chiếu lại nguồn kho và bằng chứng em cung cấp.')
   if (em.khuon) dong.push(CHI_DAN_KHUON[em.khuon])
   const contents: NoiDungGemini['contents'] = [
     { role: 'user', parts: [{ text: dong.join('\n\n') }, ...anh] },
     { role: 'model', parts: [{ text: 'Thầy đã đọc hết đề, hình và lời giải của câu này.' }] },
   ]
-  for (const l of lichSu) {
-    contents.push({ role: 'user', parts: [{ text: l.cauHoi }] }, { role: 'model', parts: [{ text: l.traLoi }] })
+  for (const l of lichSu.slice(-3)) {
+    contents.push({ role: 'user', parts: [{ text: l.cauHoi.slice(0, 500) }] }, { role: 'model', parts: [{ text: l.traLoi.slice(0, 3000) }] })
   }
   contents.push({ role: 'user', parts: [{ text: cauHoi }] })
   return { systemInstruction: { parts: [{ text: CHI_DAN_THAY }] }, contents }
@@ -530,8 +534,8 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const nowMs = phu.nowMs ?? Date.now()
   const key = str(env.GEMINI_API_KEY).trim()
   const cauHoi = str(b.cauHoi).replace(/\s+/g, ' ').trim().slice(0, 500)
-  // Em đang làm câu (chưa nộp, máy em gửi `dangLam`) ⇒ Thầy chỉ gợi hướng; máy chủ lọc thêm câu lộ đáp án (chanLoDapAn).
-  const dangLam = b.dangLam === true
+  // Cờ máy em chỉ có thể siết thêm; trạng thái phiên/kiểm tra do máy chủ đọc cùng đợt đầu mới có quyền mở đáp án.
+  let dangLam = b.dangLam === true
   const ngay = ngayVn(nowMs)
   // TỐC ĐỘ (thầy 13/10, ảnh "Thầy trả lời chưa kịp" — sổ cho thấy Gemini chỉ 1,4–3,9 s, phần chậm là ~12 lượt D1 NỐI TIẾP của máy chủ):
   // mọi lượt ĐỌC (cấu hình, ngữ cảnh câu, số câu đã hỏi hôm nay, ba lượt hỏi–đáp gần nhất, kết quả làm gần nhất) bắt đầu CÙNG lúc;
@@ -541,6 +545,8 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const cfgP = docCauHinhHoiThem(env)
   const duocP = cfgP.then((cfg) => emDuocDung(env, sbd, cfg))
   const ncP = (phu.nguCanh ?? (nguCanhHoiTroLy as NonNullable<PhuThuocHoiThem['nguCanh']>))(env, sbd, str(b.qid), nowMs, dangLam)
+  const hoSoP = docHoSoHoiThay(env, sbd, qidDoan, nowMs)
+  const trangThaiP = trangThaiHoiThay(env, sbd, qidDoan, nowMs)
   const docDem = (q: string) => ddl.then(() => env.DB.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN qid = ? THEN 1 ELSE 0 END), 0) AS c FROM hoi_tro_ly WHERE sbd = ? AND ngay_vn = ? AND loi IS NULL')
     .bind(q, sbd, ngay).first<Obj>())
   // Ba lượt hỏi–đáp gần nhất của chính em ở câu này (24 giờ) — đọc từ sổ máy chủ, không tin lịch sử máy em gửi.
@@ -550,7 +556,7 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
     .bind(sbd, q, MUC_DICH_XEM_LOI_GIAI).first<Obj>()
     .catch(() => env.DB.prepare('SELECT ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid = ? ORDER BY luc DESC LIMIT 1').bind(sbd, q).first<Obj>().catch(() => null))
   const demP = docDem(qidDoan), lsP = docLs(qidDoan), kq0P = docKq0(qidDoan)
-  for (const p of [duocP, ncP, demP, ddl]) p.catch(() => {})
+  for (const p of [duocP, ncP, demP, ddl, trangThaiP]) p.catch(() => {})
   const [, cfg] = await Promise.all([phu.xong, cfgP])
   if (!key || !(await duocP)) return { ok: false, ma: 'chua_bat', error: 'Phần hỏi thêm Thầy chưa mở cho em.' }
   if (cauHoi.length < 2) return { ok: false, ma: 'trong', error: 'Em nhắn chỗ em thắc mắc trước nhé.' }
@@ -559,7 +565,11 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   if (!nc.ok) return { ok: false, ma: nc.khoa ?? 'khong_mo', error: nc.error }
   // Ngữ cảnh trả qid khác qid đoán (chỉ khi thay bộ dựng ngữ cảnh) ⇒ đọc lại theo đúng qid của ngữ cảnh.
   const cungQid = nc.qid === qidDoan
-  const [dem, ls, kq0] = await Promise.all(cungQid ? [demP, lsP, kq0P] : [docDem(nc.qid), docLs(nc.qid), docKq0(nc.qid)])
+  const [dem, ls, kq0, hoSo, trangThai] = await Promise.all(cungQid
+    ? [demP, lsP, kq0P, hoSoP, trangThaiP]
+    : [docDem(nc.qid), docLs(nc.qid), docKq0(nc.qid), docHoSoHoiThay(env, sbd, nc.qid, nowMs), trangThaiHoiThay(env, sbd, nc.qid, nowMs)])
+  if (trangThai.dangKiemTra) return { ok: false, ma: 'dang_kiem_tra', error: 'Em hoàn thành bài kiểm tra đang làm rồi hỏi Thầy nhé.' }
+  dangLam ||= trangThai.dangLam
   const n = Number(dem?.n) || 0, daHoiCau = Number(dem?.c) || 0
   // SBD thử của thầy ⇒ không chặn trần (vẫn ghi sổ như mọi lượt); số "còn lại" luôn hiện đủ trần.
   const khongTran = cfg.sbdKhongTran.includes(sbd)
@@ -568,9 +578,10 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const lichSu = ((ls as { results?: Obj[] }).results ?? []).reverse().map((x) => ({ cauHoi: str(x.cau_hoi), traLoi: str(x.tra_loi) })).filter((x) => x.cauHoi && x.traLoi)
   const ketQuaGanNhat = kq0 && kq0.ket_qua !== null && kq0.ket_qua !== undefined ? (Number(kq0.ket_qua) === 1 ? 'dung' : 'sai') : 'chua_lam'
   const dapAnEm = str(b.dapAnEm).replace(/\s+/g, ' ').trim().slice(0, 40)
+  const baiNhap = baiNhapHoiThay(b.baiNhap, cauHoi)
   // v3: máy chủ chọn KHUÔN trả lời từ dữ liệu đã có (không đọc thêm), gửi lược đồ riêng của khuôn.
-  const khuon = chonKhuon({ dangLam, phan: nc.cau.phan, ketQua: ketQuaGanNhat, cauHoi, de: nc.cau.de, dapAnEm })
-  const noiDung = { ...dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm, dangLam, khuon }), luocDo: schemaChoKhuon(khuon) }
+  const khuon = chonKhuon({ dangLam, phan: nc.cau.phan, ketQua: ketQuaGanNhat, cauHoi, de: nc.cau.de, dapAnEm, baiNhap })
+  const noiDung = { ...dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm, dangLam, khuon, baiNhap, hoSo }), luocDo: schemaChoKhuon(khuon) }
   const bd = Date.now()
   const kq = await (phu.goiAi ?? (env.TRAM_GEMINI ? taoGoiGemini(CHO_GOI_KEP_MS, quaTram(env.TRAM_GEMINI)) : goiGemini))(key, cfg, noiDung)
   const ms = Date.now() - bd
@@ -588,30 +599,31 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   if (ct) {
     lienQuan = ct.lienQuan
     cauTruc = lamSachCauTruc(ct.o, dangLam, dangLam ? (t) => { const r = chanLoDapAn(t, nc.cau.phan, nc.cau.dapAn, nc.cau.pa); return r === CAU_CHUA_NOP ? '' : r } : undefined,
-      { khuon, phan: nc.cau.phan, de: nc.cau.de, pa: nc.cau.pa, y: nc.cau.y, dapAn: nc.cau.dapAn, dapAnEm })
+      { khuon, phan: nc.cau.phan, de: nc.cau.de, pa: nc.cau.pa, y: nc.cau.y, dapAn: nc.cau.dapAn, dapAnEm, baiNhap })
     traLoiAi = cauTruc ? chuPhang(cauTruc) : dangLam && str(ct.o.yChinh).trim() ? CAU_CHUA_NOP : ''
   } else {
     const tach = tachKetQua(kq.chu)
     lienQuan = tach.lienQuan
-    traLoiAi = dangLam ? chanLoDapAn(lamSachTraLoi(tach.traLoi), nc.cau.phan, nc.cau.dapAn, nc.cau.pa) : lamSachTraLoi(tach.traLoi)
+    const chuCu = chanQuyKetHoiThay(lamSachTraLoi(tach.traLoi), baiNhap)
+    traLoiAi = dangLam ? chanLoDapAn(chuCu, nc.cau.phan, nc.cau.dapAn, nc.cau.pa) : chuCu
   }
   // Ngoài phạm vi (cờ của mô hình) hoặc trả lời rỗng ⇒ câu cố định do MÁY CHỦ viết; lượt vẫn tính vào trần ngày.
   const ngoai = !lienQuan || !traLoiAi
   const traLoi = ngoai ? CAU_NGOAI_PHAM_VI : traLoiAi
-  // Ba lượt ghi chạy CÙNG một đợt (tốc độ 13/10): sổ hỏi–đáp (lỗi ⇒ báo lỗi như cũ), sự kiện ôn lại, dấu đã được chữa.
+  // Sổ hỏi–đáp và dấu trợ giúp cùng giao dịch: không có hội thoại đã lưu mà thiếu dấu trợ giúp vì nửa lượt ghi lỗi.
+  const ghi = [env.DB.prepare('INSERT INTO hoi_tro_ly (sbd, qid, ngay_vn, luc, nguon, cau_hoi, tra_loi, lien_quan, model, token_vao, token_ra, ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
+    .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, traLoi, ngoai ? 0 : 1, kq.model ?? cfg.model, kq.vao, kq.ra, ms)]
+  // Mọi hướng dẫn liên quan đều là trợ giúp, kể cả sau khi nộp. co_ho_so giữ 0 (không đổi nghĩa học liệu).
+  // Chỉ thêm dấu; không ghi điểm, không coi lượt chat hay nút hiểu là bằng chứng thạo.
+  if (!ngoai) ghi.push(env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,0)')
+    .bind(sbd, nc.qid, `${nguon.slice(0, 33)}:tro_ly`, luc))
   await Promise.all([
-    env.DB.prepare('INSERT INTO hoi_tro_ly (sbd, qid, ngay_vn, luc, nguon, cau_hoi, tra_loi, lien_quan, model, token_vao, token_ra, ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
-      .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, traLoi, ngoai ? 0 : 1, kq.model ?? cfg.model, kq.vao, kq.ra, ms).run(),
+    env.DB.batch(ghi),
     // ÔN LẠI, em đang làm mà Thầy đã gợi hướng ⇒ như bấm Hỏi thầy trước khi nộp (loi-giai.ts hsHoiThay): lần làm hôm nay là "có trợ giúp",
     // không EXP, câu quay lại lịch ôn. Đã nộp rồi thì khoá trùng ⇒ không đổi gì.
     dangLam && !ngoai && nguon === 'on_lai'
       ? ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngay}`, sbd, qid: nc.qid, lan: 1, ketQua: 0, luc, assistance: 'assisted', purpose: MUC_DICH_XEM_LOI_GIAI }]).catch(() => null)
       : null,
-    // Thầy đã gợi hướng câu em đang làm ⇒ ghi `loi_giai_hoi` như một lần được chữa: kiểm tra cá nhân (kiem-tra-ca-nhan.ts) vẫn chặn vào chặng
-    // có câu này trong 12 giờ ("kiểm chứng độc lập"), sổ chất lượng sửa lỗi biết câu có trợ giúp. Chỉ thêm dòng, không đổi điểm.
-    dangLam && !ngoai
-      ? env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,0)').bind(sbd, nc.qid, `${nguon}:goi_y`.slice(0, 40), luc).run().catch(() => null)
-      : null,
   ])
-  return { ok: true, traLoi, ...(cauTruc && !ngoai ? { cauTruc } : {}), ngoaiPhamVi: ngoai, conLai: khongTran ? cfg.tranNgay : Math.max(0, cfg.tranNgay - n - 1) }
+  return { ok: true, traLoi, ...(cauTruc && !ngoai ? { cauTruc } : {}), dangLam, ngoaiPhamVi: ngoai, conLai: khongTran ? cfg.tranNgay : Math.max(0, cfg.tranNgay - n - 1) }
 }

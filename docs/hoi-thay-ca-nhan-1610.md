@@ -15,6 +15,7 @@ Thầy đã duyệt đề xuất trong chat và yêu cầu **build, phát hành 
 - Một chỗ cần hiểu mỗi lần; em mở thêm minh hoạ hoặc gợi ý. Nhãn nhỏ “Trợ giảng AI của thầy Học”.
 - Sau phản hồi hợp lệ, khi đã nộp câu gốc: “Tự làm một câu tương đương”; em đang làm chỉ nhận gợi ý.
 - Câu kiểm vẽ bằng thẻ câu/ô số dùng chung; đang gửi khoá nút, xong có lời xác nhận đúng trạng thái máy chủ.
+- Kiểm lại ở Tự sửa lỗi đi thẳng vào câu đã duyệt, không yêu cầu hỏi AI lại. Câu chưa có đợt lỗi nằm trong khu riêng, không tăng bộ đếm lỗi.
 - Có đường “Cần thầy hỗ trợ”, báo đã gửi sau khi máy chủ thực sự lưu.
 - Màn thầy: danh sách cần giúp nhóm theo câu, số em và kết quả tự thử, mở theo nhu cầu; không tải thêm khi mở app.
 
@@ -48,6 +49,7 @@ Thầy đã duyệt đề xuất trong chat và yêu cầu **build, phát hành 
 - Không thêm D1, vòng nền hoặc nội dung nặng vào Hôm nay/sảnh/ca thi. Chỉ mở câu kiểm khi em bấm.
 - Hồ sơ câu/skills có trần, không quét JSON toàn đề/sổ; không N+1. Hướng dẫn vẫn một lời gọi mô hình thông thường.
 - Tận dụng bộ chấm, sổ học và luật ôn chung, không lập bộ bài giao thứ hai.
+- Lịch kiểm đến hạn chỉ ưu tiên trong chỗ ôn/sửa hiện có, giữ câu mới và các cổng sẵn sàng. Hết chỗ thì giữ hàng đợi, không tăng tổng ngày. Các lượt ôn chung đúng phiên bản cũng được dùng làm bằng chứng; đủ chuẩn thì dọn lịch đặc biệt trong giao dịch được bảo vệ.
 - Schema chỉ-thêm áp từng lệnh DDL qua API, sau cổng ca và trước Worker; không dùng nhập `--file` gây D1 ngừng phục vụ.
 - Phát hành duy nhất từ nhánh sạch, PR, main mới nhất, không chồng lượt Claude; cổng ca dừng khi có ca mở.
 - Lùi mã bằng revert PR; giữ toàn bộ bảng và receipt đã có dữ liệu thật.

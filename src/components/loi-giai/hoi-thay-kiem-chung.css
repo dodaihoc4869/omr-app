@@ -1,0 +1,19 @@
+/* Cùng bảng màu M3 hiện tại; chỉ tải cùng phần tự làm, không thêm vào lúc mở app. */
+.lg-kc { flex: none; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 14px; border: 1px solid var(--m3-outline-variant); border-radius: 20px; background: var(--m3-surface-container-low); color: var(--m3-on-surface); }
+.lg-kc-dau { display: flex; align-items: flex-start; gap: 10px; }
+.lg-kc-icon { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--m3-primary-container); color: var(--m3-on-primary-container); }
+.lg-kc h3 { margin: 0 0 4px; font-size: 16px; line-height: 1.4; }
+.lg-kc p { margin: 0; font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
+.lg-kc-dau p, .lg-kc-chu { color: var(--m3-on-surface-variant); }
+.lg-kc-mo, .lg-kc-phu { min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border-radius: 14px; font: inherit; font-size: 15px; font-weight: 650; cursor: pointer; touch-action: manipulation; }
+.lg-kc-mo { border: 0; background: var(--m3-primary); color: var(--m3-on-primary); }
+.lg-kc-phu { border: 1px solid var(--m3-outline-variant); background: var(--m3-surface); color: var(--m3-primary); }
+.lg-kc-mo:focus-visible, .lg-kc-phu:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+.lg-kc-mo:disabled, .lg-kc-phu:disabled { cursor: default; opacity: .65; }
+.lg-kc-cau { margin: 0; padding: 0; border: 0; min-width: 0; }
+.lg-kc-nhac, .lg-kc-bien-nhan { padding: 12px; border-radius: 14px; background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
+.lg-kc-bien-nhan { display: flex; flex-direction: column; gap: 8px; }
+.lg-kc-bien-nhan > b { font-size: 15px; }
+.lg-kc-bien-nhan[data-can-thay] { background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container); }
+.lg-kc-thay { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.lg-kc-thay p { font-size: 13px; }

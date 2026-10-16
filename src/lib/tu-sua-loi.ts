@@ -8,7 +8,7 @@
 //   · Lỗi mạng / máy chủ ⇒ KHÔNG ghi bản nhớ (lần sau thử lại); nơi dùng coi như không có số (thẻ mời ẩn, hồ sơ không hiện nút sửa).
 // Nguồn: đúng lệnh sẵn có `apiDanhSachTuChua` (`/hs/chua-cau-sai/co` rồi `danh-sach`) — không lệnh máy chủ mới.
 import { useEffect, useState } from 'react'
-import { apiDanhSachTuChua, type KetQuaDanhSachChua, type MucChua } from './chua-cau-sai-api'
+import type { KetQuaDanhSachChua, MocDanhSachChua, MucChua } from './chua-cau-sai-api'
 
 export type NhomMucChua = 'can' | 'cho' | 'xong'
 
@@ -29,7 +29,7 @@ export function mucCanSua(kq: KetQuaDanhSachChua | null | undefined, nayMs: numb
 
 /** Số câu em cần sửa; `null` khi chưa có danh sách (đang tải, lỗi, vòng chữa chưa mở cho em). */
 export function soCauCanSua(kq: KetQuaDanhSachChua | null | undefined, nayMs: number): number | null {
-  return kq?.trangThai === 'bat' ? mucCanSua(kq, nayMs).length : null
+  return kq?.trangThai === 'bat' ? kq.dem?.can ?? mucCanSua(kq, nayMs).length : null
 }
 
 /** Bản nhớ giữ 10 phút (cùng nhịp với Nhịp học ở Hôm nay — giờ cao điểm bớt lượt gọi máy chủ). */
@@ -59,18 +59,30 @@ export function ngheTuSua(fn: (token: string, kq: KetQuaDanhSachChua) => void): 
 }
 
 /** Danh sách Tự sửa lỗi của em. `moi` ⇒ luôn hỏi máy chủ (màn Tự sửa lỗi); không thì dùng bản nhớ còn hạn `toiDaMs`, hoặc chung lượt đang chờ. */
-export function taiTuSuaLoi(token: string, tuy: { moi?: boolean; toiDaMs?: number } = {}): Promise<KetQuaDanhSachChua> {
-  if (!tuy.moi) {
+export function taiTuSuaLoi(token: string, tuy: { moi?: boolean; toiDaMs?: number; sau?: MocDanhSachChua } = {}): Promise<KetQuaDanhSachChua> {
+  if (!tuy.moi && !tuy.sau) {
     const c = docNhoTuSua(token, tuy.toiDaMs)
     if (c) return Promise.resolve(c)
     const d = DANG.get(token)
     if (d) return d
   }
   const p: Promise<KetQuaDanhSachChua> = Promise.resolve()
-    .then(() => apiDanhSachTuChua(token))
+    .then(() => import('./chua-cau-sai-api'))
+    .then(({ apiDanhSachTuChua }) => tuy.sau ? apiDanhSachTuChua(token, tuy.sau) : apiDanhSachTuChua(token))
     .catch((): KetQuaDanhSachChua => ({ trangThai: 'loi', loi: 'Chưa nối được máy chủ. Em kiểm tra mạng rồi thử lại.' }))
     .then((kq) => {
-      if (DANG.get(token) === p) DANG.delete(token)
+      // Một lần tải mới hơn đã bắt đầu: phản hồi cũ không ghi đè bản nhớ hoặc phát số cũ cho Hôm nay.
+      if (DANG.get(token) !== p) return kq
+      // Trang tiếp được nhập vào bản nhớ, không thay danh sách bằng riêng 100 câu cuối.
+      const cu = tuy.sau ? NHO.get(token)?.kq : null
+      if (cu?.trangThai === 'bat' && kq.trangThai === 'bat') {
+        const ds = new Map<string, MucChua>()
+        for (const m of [...cu.ds, ...kq.ds]) ds.set(m.dotId ?? m.qid, m)
+        kq = { ...kq, ds: [...ds.values()], ...(kq.dem ? {} : cu.dem ? { dem: cu.dem } : {}),
+          ...(kq.kiemLaiHoiThay ? {} : cu.kiemLaiHoiThay ? { kiemLaiHoiThay: cu.kiemLaiHoiThay } : {}),
+        }
+      }
+      DANG.delete(token)
       if (kq.trangThai !== 'loi') {
         NHO.set(token, { kq, luc: Date.now() })
         for (const f of NGHE) f(token, kq)

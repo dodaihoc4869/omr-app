@@ -111,6 +111,8 @@ jobs:
           node /tmp/goi7-schema.mjs
           npx esbuild scripts/ap-migration-ktcn.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/ktcn-schema.mjs --log-level=warning
           node /tmp/ktcn-schema.mjs
+          npx esbuild scripts/ap-migration-hoi-thay.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/hoi-thay-schema.mjs --log-level=warning
+          node /tmp/hoi-thay-schema.mjs
           node scripts/kiem-phat-hanh-chua.mjs --schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}

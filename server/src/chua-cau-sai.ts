@@ -8,6 +8,7 @@ import { docHocLieu } from './chua-cau-sai-hoc-lieu'
 import {
   qidChuan,
   docTrangThaiLoiDau,
+  SQL_DAU_HO_TRO_CHUA,
   docLuatChua,
 } from './chua-cau-sai-adapter'
 import { tinhTienDo } from './chua-cau-sai-fsm'
@@ -23,6 +24,7 @@ import { lenhGhiSuKienNguyenTu, ngayVn } from './su-kien-hoc'
 import { emCoGhi } from './dem-ke-hoach'
 import type { ItemCongKhai, ProbeRef } from './chua-cau-sai-kieu'
 import { khopPhanIII } from '../../src/lib/cham-so'
+import { SQL_LICH_KIEM_HOI_THAY, lichKiemHoiThayCongKhai } from './hoi-thay-kiem-chung-metadata'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
@@ -644,7 +646,7 @@ export async function nopItem(env: Env, b: Obj): Promise<Response> {
     now = Date.now(),
     id = crypto.randomUUID()
   const doc = await env.DB.prepare(
-    `SELECT MAX(luc) AS luc FROM loi_giai_hoi WHERE sbd=? AND co_ho_so=1 AND (qid=? OR qid IN (SELECT qid FROM game_v2_question WHERE content_group=?))`,
+    `SELECT MAX(luc) AS luc FROM loi_giai_hoi WHERE sbd=? AND ${SQL_DAU_HO_TRO_CHUA} AND (qid=? OR qid IN (SELECT qid FROM game_v2_question WHERE content_group=?))`,
   )
     .bind(sbd, dot.qid_chuan, dot.content_group)
     .first<{ luc: string | null }>()
@@ -897,10 +899,38 @@ export async function xinGoiY(env: Env, b: Obj): Promise<Response> {
 export async function danhSach(env: Env, b: Obj): Promise<Response> {
   const sbd = await quyen(env, b)
   if (sbd instanceof Response) return sbd
-  const rows = await env.DB.prepare(
-    `SELECT id AS dotId,qid_chuan AS qid,trang_thai_day AS trangThai,lan_gap_lai AS lanGapLai,den_han AS denHan FROM chua_loi_dot WHERE sbd=? ORDER BY CASE WHEN trang_thai_day='cho_gap_lai_2' AND den_han<=? THEN 0 WHEN trang_thai_day='da_tu_sua' THEN 2 ELSE 1 END,giao_luc DESC LIMIT 100`,
-  )
-    .bind(sbd, new Date().toISOString())
-    .all()
-  return Response.json({ ok: true, ds: rows.results ?? [] })
+  const c = b.sau && typeof b.sau === 'object' ? b.sau as Obj : null
+  if (c && (![0, 1, 2].includes(Number(c.hang)) || !Number.isSafeInteger(c.giaoLuc) ||
+    !str(c.dotId) || str(c.dotId).length > 160 || !Number.isFinite(Date.parse(str(c.nay)))))
+    return loi('SAI_MOC', 'Em tải lại danh sách rồi xem tiếp nhé.')
+  // Giữ cùng mốc thời gian giữa các trang: câu tới lịch trong lúc đọc không bị đổi thứ tự hoặc lặp.
+  const nay = c ? new Date(str(c.nay)).toISOString() : new Date().toISOString()
+  const thuTu = `CASE WHEN trang_thai_day='cho_gap_lai_2' AND julianday(den_han)<=julianday(?) THEN 0 WHEN trang_thai_day='da_tu_sua' THEN 2 ELSE 1 END`
+  // Cùng luật nhomMucChua: hạn thiếu/sai hoặc còn ở tương lai vẫn là chờ; đúng giờ hạn thì cần sửa.
+  const nhom = `CASE WHEN trang_thai_day='da_tu_sua' THEN 'xong' WHEN trang_thai_day='cho_gap_lai_2' AND (julianday(den_han) IS NULL OR julianday(den_han)>julianday(?)) THEN 'cho' ELSE 'can' END`
+  const lichSql = SQL_LICH_KIEM_HOI_THAY.replace(/\?1\b/g, '?3').replace(/\?2\b/g, '?4')
+  const r = await env.DB.batch([
+    env.DB.prepare(`WITH muc AS (SELECT id AS dotId,qid_chuan AS qid,trang_thai_day AS trangThai,
+      lan_gap_lai AS lanGapLai,den_han AS denHan,giao_luc AS giaoLuc,${thuTu} AS hang FROM chua_loi_dot WHERE sbd=?)
+      SELECT *,EXISTS(SELECT 1 FROM hoi_thay_kiem k WHERE k.sbd=? AND k.qid_goc=muc.qid) AS kiemHoiThay
+      FROM muc WHERE (?=0 OR hang>? OR (hang=? AND (giaoLuc<? OR (giaoLuc=? AND dotId>?))))
+      ORDER BY hang,giaoLuc DESC,dotId LIMIT 101`)
+      .bind(nay, sbd, sbd, c ? 1 : 0, c ? num(c.hang) : 0, c ? num(c.hang) : 0,
+        c ? num(c.giaoLuc) : 0, c ? num(c.giaoLuc) : 0, c ? str(c.dotId) : ''),
+    env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom FROM chua_loi_dot WHERE sbd=?)
+      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,
+      (SELECT json_group_array(json_object('qid',qid,'ten',ten,'phan',phan,'trangThai',trangThai,'denHan',denHan))
+        FROM (${lichSql}) lich) AS lichHoiThay FROM muc`)
+      .bind(nay, sbd, sbd, Date.now()),
+  ])
+  const rows = (r[0]?.results ?? []) as Obj[], ds = rows.slice(0, 100), cuoi = ds.at(-1)
+  const d = r[1]?.results?.[0] as Obj | undefined
+  let lich: Obj[] = []
+  try { const j: unknown = JSON.parse(str(d?.lichHoiThay)); if (Array.isArray(j)) lich = j.filter(x => x && typeof x === 'object') as Obj[] } catch { /* Không phát trường riêng nếu metadata chưa đọc được. */ }
+  return Response.json({ ok: true,
+    ds: ds.map(({ hang: _hang, giaoLuc: _giao, ...m }) => ({ ...m, kiemHoiThay: num(m.kiemHoiThay) === 1 })),
+    dem: { tong: num(d?.tong), can: num(d?.can), cho: num(d?.cho), xong: num(d?.xong) },
+    kiemLaiHoiThay: lichKiemHoiThayCongKhai(lich),
+    ...(rows.length > 100 && cuoi ? { sau: { hang: num(cuoi.hang), giaoLuc: num(cuoi.giaoLuc), dotId: str(cuoi.dotId), nay } } : {}),
+  })
 }
