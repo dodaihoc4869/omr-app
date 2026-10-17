@@ -1,0 +1,58 @@
+{
+  "pullRequest": "https://github.com/dodaihoc4869/omr-app/pull/318",
+  "mergeSha": "8427ff3d8e182d8fbda85aa0fd22e2f460e441a1",
+  "workflow": {
+    "id": 38838674354,
+    "conclusion": "success",
+    "finishedUtc": "2026-10-16T02:14:45Z",
+    "url": "https://github.com/dodaihoc4869/omr-app/actions/runs/38838674354"
+  },
+  "liveCheck": {
+    "via": "GitHub Actions runner, Cloudflare API and real HTTP",
+    "atUtc": "2026-10-16T02:14:11.0408219Z",
+    "workerCommit": "8427ff3d8e182d8fbda85aa0fd22e2f460e441a1",
+    "pagesCommit": "8427ff3d8e182d8fbda85aa0fd22e2f460e441a1",
+    "duongGiaoDienTot": 5,
+    "congQuyenVongChuaHienHuuTot": 2
+  },
+  "schemaHoiThay": {
+    "atUtc": "2026-10-16T02:13:29.9858993Z",
+    "schemaHoiThay": true,
+    "soLenhChiThem": 8,
+    "soChangDangLam": 0
+  },
+  "examGate": {
+    "soCaMo": 0,
+    "soLuotDangLam": 0,
+    "lastCheckUtc": "2026-10-16T02:14:37.9739611Z"
+  },
+  "fullVitestLocal": {
+    "sourceSha": "d5f8808681b1c8e62cbcc11ba92acfd7881ed1bf",
+    "seconds": 838.028,
+    "passed": 14542,
+    "failedRaw": 122,
+    "pending": 27,
+    "baselinePassed": 14358,
+    "baselineFailed": 122,
+    "baselinePending": 27,
+    "sameFailuresByName": 121,
+    "newBadgeExpectationResolved": 1,
+    "relatedRerunPassed": 37,
+    "unresolvedNewFailures": 0,
+    "newSkips": 0,
+    "removedTestFiles": 0,
+    "runtimeChangesAfterFull": 0
+  },
+  "deploymentFullStep": {
+    "timeoutSeconds": 300,
+    "exit": 124,
+    "continueOnErrorAlreadyInWorkflow": true,
+    "notEvidenceOfFullPassing": true
+  },
+  "limits": [
+    "Workspace DNS/proxy blocks direct Cloudflare domain access; live verification is from the runner.",
+    "Additional five new anonymous POST probes were not completed on production. New endpoint permissions/receipts were tested locally.",
+    "No 7/14-day learning outcomes or real peak-load claims."
+  ],
+  "rollback": "git revert -m 1 8427ff3d8e182d8fbda85aa0fd22e2f460e441a1"
+}

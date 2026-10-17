@@ -52,7 +52,7 @@ export function goiYCho(q: PrivateQuestion, t: TrangThaiCau | undefined, khoa: s
 }
 
 /** `tc`/`xt`/`nv` (05/10, cau-anh-em.ts): làm lại câu sai bằng bản khác — chỉ ở JSON phiên máy chủ (chấm, ghi sổ), KHÔNG xuống máy em. */
-export interface RefPhien extends LamLaiRef { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3; /** Nhãn nợ (Sổ nợ 29/09). */ nhanNo?: string }
+export interface RefPhien extends LamLaiRef { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3; hoiThayKiem?:true; /** Nhãn nợ (Sổ nợ 29/09). */ nhanNo?: string }
 
 /**
  * ĐAN XEN (thầy 29/09): câu của LƯỢT TỚI (chuyến Đảo / chặng Đoàn) — chia phần kế hoạch còn lại theo mật độ của em (`chiaLuot`), lấy lượt
@@ -241,11 +241,14 @@ export async function startDao2(env: Env, sbd: string, nowMs: number, tapTrung =
     return { ok: true, questions: [], lyDo, message: LOI_LUOT_RONG[lyDo], ...tomTat }
   }
   const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid), nhanSom.ls(chon.map(({ q }) => q.qid))).catch(() => new Map<string, string>())
+  const kiemHoiThay = new Set(hs.hoiThayDenHan ?? [])
   const refs: RefPhien[] = chon.map((x, i) => {
     const { q, m } = x, t = hs.tt.get(q.qid)
     const g = goiYCho(q, t, `${sbd}|${q.qid}|${kh.ngay}`)
     const n = nhan.get(q.qid)
-    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: i === chon.length - 1 && chon.length === SO_CAU_CHUYEN ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}), ...refLamLai(x) }
+    const lamLai = refLamLai(x)
+    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: i === chon.length - 1 && chon.length === SO_CAU_CHUYEN ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}), ...lamLai,
+      ...(kiemHoiThay.has(q.qid)||kiemHoiThay.has(tachSongSinh(lamLai?.tc??q.qid).goc)?{hoiThayKiem:true as const}:{}) }
   })
   const id = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, ...(tapTrung ? { hocTap: 1 } : {}), questions: refs }), new Date(nowMs).toISOString()).run()

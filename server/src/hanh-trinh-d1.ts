@@ -85,7 +85,7 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     const daDiag=new Set(diagCu.results.filter(c=>daLam.has(c.qid)).map(c=>c.nhom)).size
     // Thử sức thêm (09/10): phần em đã tự lấy vượt sàn hôm nay (tổng kế hoạch đã chốt > sàn) được GIỮ khi chọn lại phần chưa làm — không vượt 2 × sàn.
     const tongCu = cu && cu.chien_dich_id === hs.chienDich?.id ? ds(cu.dao_json).length + ds(cu.doan_json).length : 0
-    const a={ ngay, tang: tangNgay, toiThieu: mucNgayHanhTrinh(toiThieu, tongCu), daLam: xong, cau: cung.filter(c=>!laBanBu(c.qid)), tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, chanDoan:engine.v5?.chanDoan, nganSachChanDoan:Math.max(0,2-daDiag), uuTienThamDo:engine.v5?.uuTienThamDo, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined }
+    const a={ ngay, tang: tangNgay, toiThieu: mucNgayHanhTrinh(toiThieu, tongCu), daLam: xong, cau: cung.filter(c=>!laBanBu(c.qid)), tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, chanDoan:engine.v5?.chanDoan, nganSachChanDoan:Math.max(0,2-daDiag), uuTienThamDo:engine.v5?.uuTienThamDo, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined, hoiThayDenHan: hs.hoiThayDenHan }
     let lap = chonCauHanhTrinh(a)
     // Lần chuẩn bị nguồn đầu tiên giữa chặng giữ các câu còn hợp lệ đang giao.
     // Câu mới chỉ nối sau; khi hết chặng hoặc có lỗi vẫn chọn lại theo động cơ.

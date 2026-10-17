@@ -37,14 +37,20 @@ export const CHU_DANG_SOAN = 'Thầy đang soạn lời giải từng bước ch
 export { CHU_LAM_XONG }
 
 /** `dapAnEm` (v3, 15/10): bài em đã nộp ("DSSD", "B", "8,2") ⇒ Thầy so bài em với lời giải, câu Đúng/Sai ghi "Em: …" từng ý. */
-export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = false, chi, dapAnEm }: {
-  qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean; dangLam?: boolean; chi?: 'hoi' | 'giai'; dapAnEm?: string
-}) {
+type Props = {
+  qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean; dangLam?: boolean; chi?: 'hoi' | 'giai'; dapAnEm?: string; luotId?: string; soCau?: number
+}
+// Mỗi câu/lượt có hộp và vòng chờ riêng; phản hồi cũ không được mở sang câu mới.
+export default function NutHoiThay(props: Props) {
+  return <NutHoiThayCau key={`${props.qid}\n${props.nguon}\n${props.luotId ?? ''}\n${!!props.dangLam}`} {...props} />
+}
+function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, dapAnEm, luotId, soCau }: Props) {
   const [dangTai, setDangTai] = useState<'' | 'hoi' | 'giai'>('')
   const [loi, setLoi] = useState('')
   const [mo, setMo] = useState<{ cau: CauChoKhung; hoSo: HoSoLoiGiai; kiem?: KiemKhung } | null>(null)
   const [hop, setHop] = useState<{ cau: CauChoKhung | null; dangLam: boolean } | null>(null)
   const luot = useRef(0) // lượt bấm hiện tại: em đóng hộp trong lúc chờ ⇒ phản hồi đến muộn không mở lại hộp
+  useEffect(() => () => { luot.current++ }, [])
   const coPhien = !!qid && !!docTokenHs()
   const coHoi = chi !== 'giai'
   useEffect(() => { if (coPhien && coHoi) napSanHop() }, [coPhien, coHoi])
@@ -56,10 +62,11 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
     setDangTai(kieu)
     setLoi('')
     if (kieu === 'hoi') setHop({ cau: null, dangLam })
-    const [r] = await Promise.all([hoiThay(qid, nguon, dangLam), (kieu === 'hoi' ? napHop() : napKhung()).catch(() => null)])
+    const [r] = await Promise.all([hoiThay(qid, nguon, dangLam, luotId), (kieu === 'hoi' ? napHop() : napKhung()).catch(() => null)])
     if (so !== luot.current) return
     setDangTai('')
     if (!r.ok) { setHop(null); setLoi(r.loi); return }
+    if (soCau) r.cau = { ...r.cau, so: `Câu ${soCau}` }
     if (kieu === 'hoi' && r.hoiThem) { setHop({ cau: r.cau, dangLam }); return }
     setHop(null)
     if (dangLam || 'chiHoi' in r) { setLoi(CHU_LAM_XONG); return }
@@ -83,10 +90,10 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false, dangLam = f
           <span>{dangTai === 'giai' ? 'Đang mở…' : 'Lời giải từng bước'}</span>
         </button>
       )}
-      {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={qid} /></Suspense>}
+      {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={luotId ? qid.replace(/~\d+$/, '') : qid} /></Suspense>}
       {loi && <span className="lg-loi" role="status">{loi}</span>}
       <Suspense fallback={null}>
-        {hop && <HopHoiThay cau={hop.cau} qid={qid} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
+        {hop && <HopHoiThay cau={hop.cau} qid={qid} luotId={luotId} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
         {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
       </Suspense>
     </div>

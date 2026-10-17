@@ -1,0 +1,21 @@
+.ht-can-giup { min-width: 0; margin-top: var(--k4); padding-top: var(--k4); border-top: 1px solid var(--vien); }
+.ht-can-giup-dau { display: flex; flex-wrap: wrap; align-items: center; gap: var(--k3); }
+.ht-can-giup-dau > div { flex: 1 1 220px; min-width: 0; }
+.ht-can-giup h3 { margin: 0 0 var(--k1); font-size: var(--cx-2); font-weight: 700; }
+.ht-can-giup p { margin: var(--k2) 0; line-height: 1.5; overflow-wrap: anywhere; }
+.ht-can-giup button, .ht-can-giup summary { min-height: 48px; }
+.ht-can-giup button { max-width: 100%; white-space: normal; }
+.ht-can-giup-ds { display: grid; gap: var(--k3); margin-top: var(--k3); }
+.ht-can-giup-nhom { min-width: 0; padding: var(--k3); border: 1px solid var(--vien); border-radius: var(--bo-2); background: var(--m3-surface-container-low); }
+.ht-can-giup-nhan { display: flex; flex-wrap: wrap; align-items: center; gap: var(--k2); color: var(--nhat); font-size: var(--cx-1); }
+.ht-can-giup-nhan b { margin-left: auto; color: var(--muc); }
+.ht-can-giup h4 { margin: var(--k2) 0; font-size: var(--cx-2); line-height: 1.5; overflow-wrap: anywhere; }
+.ht-can-giup-ma { font-size: var(--cx-1); }
+.ht-can-giup details { margin-bottom: var(--k3); }
+.ht-can-giup summary { display: list-item; align-content: center; cursor: pointer; color: var(--muc); overflow-wrap: anywhere; }
+.ht-can-giup ul { margin: var(--k1) 0; padding-left: var(--k4); }
+.ht-can-giup li { margin: var(--k2) 0; overflow-wrap: anywhere; }
+.ht-can-giup li span, .ht-can-giup li small { display: block; color: var(--nhat); line-height: 1.5; }
+.ht-can-giup textarea { width: 100%; min-width: 0; box-sizing: border-box; resize: vertical; min-height: 108px; padding: var(--k2); font: inherit; line-height: 1.5; color: var(--muc); background: var(--nen); border: 1px solid var(--vien); border-radius: var(--bo-1); }
+.ht-can-giup-da-gui { padding: var(--k3); background: var(--m3-surface-container-low); border: 1px solid var(--vien); border-radius: var(--bo-2); color: var(--muc); }
+.ht-can-giup-tiep { margin-top: var(--k3); }

@@ -322,19 +322,21 @@ function DsCauSai({
   lan,
   onChuaCau,
   coTheChua,
+  soCauCanSua,
   ngoi,
 }: {
   cauSai: readonly CauEmSai[]
   lan: readonly LanLamCau[]
   onChuaCau?: (qid: string) => void
   coTheChua?: ReadonlySet<string>
+  soCauCanSua?: number
   ngoi: Ngoi
 }) {
   const id = useId()
   if (cauSai.length === 0) return <p className="gvv2-trong">{hoa(ngoi)} chưa sai câu nào trong các lượt đã ghi.</p>
   const chua = cauSai.filter((c) => !c.lanCuoiDung)
   const da = cauSai.filter((c) => c.lanCuoiDung)
-  const soSua = onChuaCau ? chua.filter((c) => coNutSua(c, coTheChua)).length : 0
+  const soSua = onChuaCau ? soCauCanSua ?? chua.filter((c) => coNutSua(c, coTheChua)).length : 0
   return (
     <div className="hslc-cs">
       <section className="hslc-cs-nhom" data-loai="chua" aria-labelledby={`${id}-chua`}>
@@ -868,6 +870,7 @@ export default function HoSoLamCauEm({
   cheDo = 'thay',
   onChuaCau,
   coTheChua,
+  soCauCanSua,
 }: {
   em: EmHoSo
   nhom?: LoaiNhomNhip
@@ -881,6 +884,8 @@ export default function HoSoLamCauEm({
   /** Đợt 18 — CHỈ chế độ học sinh: tập khoá mở ("g<số>") của câu đang ở Tự sửa lỗi và còn cần sửa. Hộp có khoá trong tập mới có nút "Sửa câu này";
    *  vắng ⇒ không hộp nào có nút. */
   coTheChua?: ReadonlySet<string>
+  /** Tổng thật từ Tự sửa lỗi; tập khoá trên chỉ quyết định nút ở những câu đã tải. */
+  soCauCanSua?: number
 }) {
   const laThay = cheDo === 'thay'
   const chuCd = CHU_CHE_DO[cheDo]
@@ -1202,7 +1207,7 @@ export default function HoSoLamCauEm({
                       </div>
                       <div role="tabpanel" id={`gvv2-hs-o-${the}`} aria-labelledby={`gvv2-hs-the-${the}`} className="gvv2-hs-o-the">
                         {the === 'cau-sai' ? (
-                          <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} ngoi={ngoi} />
+                          <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} soCauCanSua={soCauCanSua} ngoi={ngoi} />
                         ) : the === 'lich-su' ? (
                           <LichSu kq={kq} dangTai={dangTai} onTaiThem={() => void tai(TRAN_GIOI_HAN)} ngoi={ngoi} laThay={laThay} />
                         ) : td ? (

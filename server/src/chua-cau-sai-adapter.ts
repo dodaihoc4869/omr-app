@@ -26,6 +26,8 @@ export function qidChuan(qid: string): string {
 }
 type Row = Record<string, unknown>
 const str = (v: unknown) => (v == null ? '' : String(v))
+import { SQL_DAU_HO_TRO_CHUA } from './dau-ho-tro-chua'
+export { SQL_DAU_HO_TRO_CHUA }
 export async function docLuatChua(env: Env, sbd: string): Promise<ThamSoLuat> {
   return (await docThamSoEm(env, sbd)) ?? (await docThamSo(env))
 }
@@ -63,7 +65,7 @@ export async function docNhieuTrangThaiLoiDau(
       .bind(sbd, TU_NGAY, tat, tcList)
       .all<Row>(),
     env.DB.prepare(
-      'SELECT qid,luc FROM loi_giai_hoi WHERE sbd=? AND co_ho_so=1 AND luc>=?',
+      `SELECT qid,luc FROM loi_giai_hoi WHERE sbd=? AND ${SQL_DAU_HO_TRO_CHUA} AND luc>=?`,
     )
       .bind(sbd, `${TU_NGAY}T00:00:00`)
       .all<{ qid: string; luc: string }>(),

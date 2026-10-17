@@ -114,8 +114,6 @@ const daTraLoi = (c: CauCongKhai, v: string | undefined): boolean => {
   return v.trim().length > 0
 }
 const dongHo = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-/** Mã câu trong lượt có thể mang đuôi bản lặp `~2` (chế độ 1) — Hỏi thầy / lời giải đi theo câu GỐC. */
-const qidGoc = (qid: string) => qid.replace(/~\d+$/, '')
 const pt = (x: number) => `${x.toLocaleString('vi-VN', { maximumFractionDigits: 1 })}%`
 const PHAN: CauCongKhai['phan'][] = ['I', 'II', 'III']
 /** Nhóm câu theo phần cho bảng câu bên phải (số câu giữ đúng thứ tự trong lượt). */
@@ -441,9 +439,9 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
             <NhanLuyen c={kq ? { ...c, conMotLan: undefined } : c} />
           </div>
           {kq ? (
-            kq.anDapAn ? <p className="tlu-ghi">Câu này vừa vào một ca kiểm tra chưa công bố — đáp án và lời giải hiện lại sau khi thầy công bố điểm.</p> : <TheCauXem cau={c} kq={kq} stt={i + 1} onHoi={() => setBai((b) => (b && !b.coGoiY.includes(c.qid) ? { ...b, coGoiY: [...b.coGoiY, c.qid] } : b))} />
+            kq.anDapAn ? <p className="tlu-ghi">Câu này vừa vào một ca kiểm tra chưa công bố — đáp án và lời giải hiện lại sau khi thầy công bố điểm.</p> : <TheCauXem cau={c} kq={kq} stt={i + 1} luotId={bai.luotId} onHoi={() => setBai((b) => (b && !b.coGoiY.includes(c.qid) ? { ...b, coGoiY: [...b.coGoiY, c.qid] } : b))} />
           ) : (
-            <TheCauLam cau={c} stt={i + 1} giaTri={bai.traLoi[c.qid]} onDoi={(v) => traLoi(c.qid, v)} />
+            <TheCauLam cau={c} stt={i + 1} luotId={bai.luotId} giaTri={bai.traLoi[c.qid]} onDoi={(v) => traLoi(c.qid, v)} />
           )}
           {kq?.khacPhuc && <p className="tlu-khac-phuc" data-dung={kq.dung ? 'true' : 'false'} role="status">{kq.khacPhuc}</p>}
           {bai.chamTungCau && (
@@ -923,11 +921,11 @@ function DongHo({ giayRef }: { giayRef: { current: number } }) {
 }
 
 /** Một câu ở chế độ LÀM: TheCau `thi` — không truyền `correct`/lời giải (máy em không có). */
-function TheCauLam({ cau: c, stt, giaTri, onDoi }: { cau: CauCongKhai; stt: number; giaTri: string | undefined; onDoi: (v: string) => void }) {
+function TheCauLam({ cau: c, stt, luotId, giaTri, onDoi }: { cau: CauCongKhai; stt: number; luotId: string; giaTri: string | undefined; onDoi: (v: string) => void }) {
   const chung = {
     cheDo: 'thi' as const,
     // Thầy 13/10: Hỏi thầy ở mọi câu, cả lúc đang làm (Thầy chỉ gợi hướng, không đáp án).
-    hoiThay: { qid: qidGoc(c.qid), nguon: 'tu_luyen' },
+    hoiThay: { qid: c.qid, nguon: 'tu_luyen', luotId },
     stt,
     id: `tlu-cau-${stt}`,
     text: chiSoDuoiRo(c.text),
@@ -966,11 +964,11 @@ function TheCauLam({ cau: c, stt, giaTri, onDoi }: { cau: CauCongKhai; stt: numb
 }
 
 /** Một câu SAU NỘP: TheCau `xem_lai` — đáp án đúng (máy chủ chấm) + lời giải chuẩn. */
-function TheCauXem({ cau: c, kq, stt, onHoi }: { cau: CauCongKhai; kq: KetQuaCau | undefined; stt: number; onHoi?: () => void }) {
+function TheCauXem({ cau: c, kq, stt, luotId, onHoi }: { cau: CauCongKhai; kq: KetQuaCau | undefined; stt: number; luotId: string; onHoi?: () => void }) {
   const chung = {
     cheDo: 'xem_lai' as const,
     // Hỏi thầy trên đầu thẻ; Lời giải từng bước trong khối lời giải của TheCau (lệnh 30/09 + 13/10).
-    hoiThay: { qid: qidGoc(c.qid), nguon: 'tu_luyen', onHoi, gon: true },
+    hoiThay: { qid: c.qid, nguon: 'tu_luyen', luotId, onHoi, gon: true },
     stt,
     text: chiSoDuoiRo(c.text),
     thanCauImg: c.anhThanCau,
@@ -1068,7 +1066,7 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
           {k?.anDapAn ? (
             <p className="tlu-ghi">Câu này vừa vào một ca kiểm tra chưa công bố — đáp án và lời giải hiện lại sau khi thầy công bố điểm.</p>
           ) : (
-            <TheCauXem cau={c} kq={k} stt={i + 1} />
+            <TheCauXem cau={c} kq={k} stt={i + 1} luotId={kq.luotId} />
           )}
           {k?.khacPhuc && <p className="tlu-khac-phuc" data-dung={k.dung ? 'true' : 'false'}>{k.khacPhuc}</p>}
           {coChua && !k?.dung && !k?.anDapAn && (

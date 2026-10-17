@@ -25,6 +25,7 @@ import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { envGhiRieng, lenhTrong } from './doc-d1-theo-luot'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
+import { soSanhOnHoiThay } from './hoi-thay-lich-on'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -450,9 +451,11 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const { daLam: daLamNgay, vuaLam } = await daLamSom
   const [views,teacherCorrections]=await xemChuaSom
   const vuaXem=new Set(views.results.map(r=>r.qid)),daGap = new Set(goi.flatMap(g => [...g.daGap]))
-  const uuTien=(a:{qid:string},b:{qid:string})=>(engine.trongSo[b.qid]??0)-(engine.trongSo[a.qid]??0)||a.qid.localeCompare(b.qid)
+  // Hồ sơ đọc tối đa 12 lịch kiểm trong query mốc đã có. Chỉ đổi thứ tự ôn/sửa, giữ nguyên quota câu mới.
+  const kiemDenHan = new Set(hs.hoiThayDenHan ?? [])
+  const uuTien=(a:{qid:string},b:{qid:string})=>soSanhOnHoiThay(a.qid,b.qid,kiemDenHan)||(engine.trongSo[b.qid]??0)-(engine.trongSo[a.qid]??0)||a.qid.localeCompare(b.qid)
   const sua = hs.cau.filter(c => !vuaXem.has(c.qid)&&['mo','cho_kiem'].includes(hs.loiV2?.get(c.qid)?.trangThai ?? '')).sort(uuTien).map(c => c.qid)
-  const on = hs.cau.filter(c => !vuaXem.has(c.qid)&&(!qids.includes(c.qid)||daGap.has(c.qid)) && (hs.tt.get(c.qid)?.laMoi || (engine.hen.get(c.qid) ?? hs.tt.get(c.qid)?.henOn ?? '9999') <= ngay)).sort(uuTien).map(c => c.qid)
+  const on = hs.cau.filter(c => !vuaXem.has(c.qid)&&(!qids.includes(c.qid)||daGap.has(c.qid)) && (kiemDenHan.has(c.qid) || hs.tt.get(c.qid)?.laMoi || (engine.hen.get(c.qid) ?? hs.tt.get(c.qid)?.henOn ?? '9999') <= ngay)).sort(uuTien).map(c => c.qid)
   const chua=goi.flatMap(g=>g.cau.filter(c=>g.choThay.has(c.qid)&&teacherCorrections.results.some(r=>r.goi_id===g.id&&r.qid===c.qid&&r.version===c.version)).map(c=>c.qid))
   const cau = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid,c])).values()]
   const quotaCon = goi.reduce((n,g) => n+Math.max(0,g.quota-g.gapNgay.size),0)
@@ -563,6 +566,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   const done = new Set(answered.results.map(r => r.qid))
   const viec = saved ? saved.questions.filter(r => !done.has(r.qid)).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = []
+  const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
   // Đợt cũ còn câu mà không câu nào phát được nữa ⇒ lấy theo kế hoạch hôm nay; kế hoạch đi tiếp qua câu không phát được cho đủ 6 câu (khẩn 12/10 23h).
   // Kế hoạch cũng không phát được câu nào mà em CÒN THIẾU mức ⇒ hàng chờ dự phòng (`lapGoi7` → `duPhong`, lỗi 14/10) — chặng chỉ rỗng khi thật hết câu.
   const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => lap.plan.viec, ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [])]
@@ -590,7 +594,8 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
       if(m){const x=(await apLamLaiKhac(env,lap.hs,[{q,m}],{sbd,nowMs:now,keHoach:lap.plan.viec.map(v=>v.qid)},new Set([...lap.chan,...refs.map(r=>r.qid)])))[0];if(x){q=x.q;lamLai=x.lamLai;const ss=tachSongSinh(q.qid);if(ss.songSinh!==null)lamLai={...lamLai,tc:ss.goc}}}
     }
     const ref: RefGoi7 = {...oldRef,...lamLai,qid:q.qid,maDe:q.maDe,version:q.version,group:q.group,novel:lap.hs.tt.get(q.qid)?.laMoi ?? true,
-      role:v.vai==='moi'?'cau_moi':v.vai==='sua'?'on_lai':'on_lai',vai:v.vai,huongDan:v.huongDan}
+      role:v.vai==='moi'?'cau_moi':v.vai==='sua'?'on_lai':'on_lai',vai:v.vai,huongDan:v.huongDan,
+      ...(kiemHoiThay.has(q.qid)||kiemHoiThay.has(tachSongSinh(lamLai?.tc??oldRef?.tc??q.qid).goc)?{hoiThayKiem:true as const}:{})}
     refs.push(ref); questions.push({...publicQuestion(q),...(ref.goiY?{goiY:ref.goiY}:{}),vaiGoi7:v.vai,huongDan7:v.huongDan,coGoi7:lap.goi.some(g=>g.cau.some(c=>c.qid===q.qid&&c.version===q.version))})
   } } }
   await ghiDongCo
@@ -604,7 +609,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
   } catch (e) { await ghiDongCo.catch(() => {}); throw e } // lối ra lỗi giữa chừng: lô ghi của động cơ vẫn xong trước (như thứ tự cũ: ghi trong lúc lập)
 }
-interface RefGoi7 extends LamLaiRef { qid:string; maDe:string; version:string; group:string; novel:boolean; role:string; vai:ViecGoi7['vai']; huongDan:boolean; goiY?:unknown }
+interface RefGoi7 extends LamLaiRef { qid:string; maDe:string; version:string; group:string; novel:boolean; role:string; vai:ViecGoi7['vai']; huongDan:boolean; goiY?:unknown; hoiThayKiem?:true }
 
 /** Em chọn "Chưa tự làm được" là nộp yêu cầu học có hỗ trợ, không phải một câu làm đúng/sai. */
 export async function gapHuongDan7(env: Env,sbd: string,b: Row,now: number) {

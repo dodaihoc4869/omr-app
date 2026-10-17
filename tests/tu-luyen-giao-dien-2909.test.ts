@@ -18,9 +18,9 @@ describe('Tu luyện — nối vào app', () => {
     expect(man).not.toMatch(/chamCauTuLuyen|khopPhanIII|napKhoChoMayEm|hsCauSaiApi|deTheoDangBai|cauKhacPhuc/)
     expect(man).toContain("cheDo: 'thi' as const")
     expect(man).toContain("cheDo: 'xem_lai' as const")
-    // SỬA CÓ CHỦ Ý 30/09: chế độ 1 có bản lặp `<qid>~2` ⇒ Hỏi thầy đi theo câu GỐC.
-    // SỬA CÓ CHỦ Ý 30/09 (thầy: Hỏi thầy chỉ hiện khi lời giải đang hiện) ⇒ nút đi qua TheCau `hoiThay` trong khối lời giải.
-    expect(man).toContain("hoiThay: { qid: qidGoc(c.qid), nguon: 'tu_luyen'")
+    // SỬA CÓ CHỦ Ý 18/10: giữ nguyên mã chấm/lặp và lượt. Máy chủ mới xác minh mã NỘI DUNG thực tế, thay vì mở nhầm câu gốc.
+    // Hành vi Câu7/câu anh em, lượt cũ và ~2 được chạy thật trong hoi-thay-*-1810, không chỉ so chuỗi nguồn.
+    expect(man).toContain("hoiThay: { qid: c.qid, nguon: 'tu_luyen', luotId")
   })
   it('máy chủ định tuyến /hs/tu-luyen/*', () => {
     expect(may).toContain("if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))")

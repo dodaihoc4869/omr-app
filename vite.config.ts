@@ -190,6 +190,8 @@ export default defineConfig({
         globIgnores: [
           // Hỏi thêm cần máy chủ và chỉ mở trong lời giải: nạp khi dùng, không cất sẵn.
           '**/{HoiThemThay,hoi-them-thay,hoi-them-thay-api}-*.{js,css}',
+          // Kiểm sau hỏi cần máy chủ giữ snapshot/receipt; chỉ tải khi em bấm, dùng kho chạy-lúc.
+          '**/{HoiThayKiemChung,hoi-thay-kiem-chung-api,chua-cau-sai-api}-*.{js,css}',
           // Khung mở sau khi lấy lời giải từ máy chủ; mảnh này dùng kho chạy-lúc hiện có.
           '**/{KhungLoiGiai,ThanhThangGo}-*.js',
           // Đường /hoi-thay (15/10) chạy trong iframe trang bài làm và KHÔNG đăng ký service worker (main.tsx): mảnh riêng của nó không cất sẵn.
