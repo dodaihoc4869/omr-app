@@ -16,7 +16,7 @@ import BieuDoTienBoGoogle from '../components/BieuDoTienBoGoogle'
 import { useLopThay } from '../lib/ten-lop-thay'
 import ChuTheLoc, { tenTheLoc } from '../components/ChuTheLoc'
 import DoiLopMotEm from '../components/DoiLopMotEm'
-import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
+import { danhSachEm, deleteStudentRegistration, danhDauNghiHocApi, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
@@ -179,8 +179,32 @@ export default function HocSinhScreen() {
    * danh sách sẽ đông, chạm nhầm rất dễ. Xoá hồ sơ chứ KHÔNG xoá bài làm —
    * điểm và lịch sử ca vẫn nằm trong LuotThi, em thi lại là tên hiện ra lại. */
   /** Hộp xác nhận M3 (thay hộp hỏi gốc của trình duyệt — dọn dư thừa G9). `null` = không có hộp nào đang mở. */
-  const [canXacNhan, setCanXacNhan] = useState<{ loai: 'xoa-em' | 'dat-lai-mat-khau'; sbd: string; hoTen: string } | null>(null)
+  const [canXacNhan, setCanXacNhan] = useState<{ loai: 'xoa-em' | 'dat-lai-mat-khau' | 'nghi-hoc'; sbd: string; hoTen: string } | null>(null)
   const [dangXoaEm, setDangXoaEm] = useState(false)
+  const [dangDoiNghiHoc, setDangDoiNghiHoc] = useState(false)
+  const hoiNghiHoc = (sbd: string, hoTen: string) => {
+    if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
+    setCanXacNhan({ loai: 'nghi-hoc', sbd, hoTen })
+  }
+  const doiTrangThaiNghiHoc = async (sbd: string) => {
+    if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
+    setDangDoiNghiHoc(true)
+    try {
+      const res = await danhDauNghiHocApi(cauHinh.url, cauHinh.mat, sbd)
+      if (res.ok) {
+        showToast(`Đã đánh dấu SBD ${sbd} đã nghỉ học`, 'success')
+        setHoSo((cu) => (cu ? { ...cu, em: { ...cu.em, trangThai: res.trangThai } } : cu))
+        setDs((cu) => (cu ?? []).map((e) => (e.sbd === sbd ? { ...e, trangThai: res.trangThai } : e)))
+      } else {
+        showToast(res.error || 'Không cập nhật được trạng thái', 'error')
+      }
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi kết nối máy chủ', 'error')
+    } finally {
+      setDangDoiNghiHoc(false)
+      setCanXacNhan(null)
+    }
+  }
   const hoiXoaEm = (sbd: string, hoTen: string) => {
     if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
     setCanXacNhan({ loai: 'xoa-em', sbd, hoTen })
@@ -316,6 +340,21 @@ export default function HocSinhScreen() {
         onHuy={() => setCanXacNhan(null)}
       />
     )}
+    {canXacNhan?.loai === 'nghi-hoc' && (
+      <HopXacNhan
+        tieuDe="Xác nhận học sinh nghỉ học?"
+        noiDung={<>
+          <p>Đánh dấu {canXacNhan.hoTen || `SBD ${canXacNhan.sbd}`} <b>nghỉ học</b>.</p>
+          <p>Em sẽ không nhận bài mới và không có trong danh sách chăm sóc học tập. Điểm và lịch sử vẫn được giữ.</p>
+        </>}
+        nhanXacNhan="Đánh dấu nghỉ học"
+        nhanDangLam="Đang lưu…"
+        nguyHiem
+        dangLam={dangDoiNghiHoc}
+        onXacNhan={() => void doiTrangThaiNghiHoc(canXacNhan.sbd)}
+        onHuy={() => setCanXacNhan(null)}
+      />
+    )}
     </>
   )
 
@@ -376,6 +415,21 @@ export default function HocSinhScreen() {
                           {khoiTuNamSinh(hoSo.em.namSinh) ? ` (khối ${khoiTuNamSinh(hoSo.em.namSinh)})` : ''}
                         </span>
                       )}
+                      {hoSo.em.trangThai === 'da_nghi' && (
+                        <span
+                          className="hs-da-nghi inline-flex items-center font-bold"
+                          style={{
+                            padding: '2px 8px',
+                            borderRadius: 'var(--bo-tron)',
+                            background: 'var(--do-nen)',
+                            color: 'var(--do)',
+                            border: '1px solid var(--do)',
+                            fontSize: 'var(--cx-1)',
+                          }}
+                        >
+                          Đã nghỉ
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -416,6 +470,16 @@ export default function HocSinhScreen() {
                   onClick={() => caGanNhatCuaEm && moChiTietCa(caGanNhatCuaEm.maCa)}
                 >
                   Cho thi lại
+                </button>
+                <button
+                  type="button"
+                  className="tap-target hs-nut-vien"
+                  onClick={() => hoiNghiHoc(hoSo.em.sbd, hoSo.em.hoTen)}
+                  style={hoSo.em.trangThai === 'da_nghi' ? { color: 'var(--do)', borderColor: 'var(--do)' } : undefined}
+                  disabled={dangDoiNghiHoc || hoSo.em.trangThai === 'da_nghi'}
+                  title="Đánh dấu học sinh nghỉ học"
+                >
+                  {hoSo.em.trangThai === 'da_nghi' ? 'Đã nghỉ' : 'Nghỉ học'}
                 </button>
               </div>
 
@@ -793,6 +857,7 @@ export default function HocSinhScreen() {
                     <Nhan tone={toneXepLoai(e.diemGanNhat)}>{e.diemGanNhat === null ? 'chưa có điểm' : classify(e.diemGanNhat)}</Nhan>
                     {!e.hoTen && <Nhan tone="cam">chưa có tên</Nhan>}
                     {e.trangThai === 'ngoai_danh_sach' && <Nhan tone="do">ngoài danh sách</Nhan>}
+                    {e.trangThai === 'da_nghi' && <Nhan tone="do">đã nghỉ</Nhan>}
                     {e.soCa === 0 && <Nhan tone="xam">chưa thi ca nào</Nhan>}
                   </span>
 

@@ -349,7 +349,7 @@ export async function docDanhSachEm(env: Env, canhBao: string[]): Promise<EmGoc[
   for (const s of sbd) {
     if (!s || s === SBD_THU) continue
     const h = hsTheo.get(s), d = dsTheo.get(s)
-    if (str(h?.trang_thai) === 'khoa' || (!h && !d)) continue
+    if (str(h?.trang_thai) === 'khoa' || str(h?.trang_thai) === 'da_nghi' || (!h && !d)) continue
     ra.push({
       sbd: s,
       hoTen: str(d?.ho_ten) || str(h?.ho_ten) || s,

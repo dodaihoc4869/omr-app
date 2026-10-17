@@ -462,7 +462,7 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
   const Q = boDem(env)
 
   // 1 · đầu trang: em + thần thú + phụ huynh xem + EXP + hoạt động cuối + điểm ca gần nhất (5 truy vấn nhỏ)
-  const rEm = await Q.hoi('SELECT ho_ten, nam_sinh, lop, 1 AS uu FROM hoc_sinh WHERE sbd = ? UNION ALL SELECT ho_ten, nam_sinh, lop, 0 FROM danh_sach WHERE sbd = ? ORDER BY uu DESC LIMIT 1', sbd, sbd)
+  const rEm = await Q.hoi('SELECT ho_ten, nam_sinh, lop, trang_thai, 1 AS uu FROM hoc_sinh WHERE sbd = ? UNION ALL SELECT ho_ten, nam_sinh, lop, NULL AS trang_thai, 0 FROM danh_sach WHERE sbd = ? ORDER BY uu DESC LIMIT 1', sbd, sbd)
   if (!rEm) return { ok: false, error: 'Không đọc được học sinh', soTruyVan: Q.dem() }
   if (rEm.length === 0) return { ok: false, error: 'Không tìm thấy học sinh', soTruyVan: Q.dem() }
   const rTt = await Q.hoi('SELECT json FROM game_v2_profile WHERE sbd = ?', sbd)
@@ -494,6 +494,7 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
   const em = {
     sbd, hoTen: chuoi(emRow.ho_ten), lop: chuoi(emRow.lop),
     ...(chuoi(emRow.nam_sinh) ? { namSinh: chuoi(emRow.nam_sinh) } : {}),
+    ...(chuoi(emRow.trang_thai) ? { trangThai: chuoi(emRow.trang_thai) } : {}),
     ...(thanThu ? { thanThu } : {}),
     chuoiNgay: demChuoiDat(lichSuChuoi as never),
     ...(cuoiLuc ? { hoatDongCuoi: { luc: cuoiLuc, viec: viecCuoi } } : {}),

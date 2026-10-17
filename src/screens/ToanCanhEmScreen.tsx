@@ -125,6 +125,11 @@ export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHo
             <span className="hn2-chip">#{sbd}</span>
             {lop && <span className="hn2-chip">Lớp {lop}</span>}
             {namSinh && <span className="hn2-chip hn2-chip--trung">sinh {namSinh}</span>}
+            {tc?.em.trangThai === 'da_nghi' && (
+              <span className="hn2-chip" style={{ color: 'var(--do)', borderColor: 'var(--do)', background: 'var(--do-nen)' }}>
+                Đã nghỉ
+              </span>
+            )}
           </div>
           {tc && (
             <div className="tc-nhan">

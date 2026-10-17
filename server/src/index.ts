@@ -1540,9 +1540,11 @@ function doJson(v: unknown): unknown {
 async function danhSachEmMoi(env: Env): Promise<Response> {
   const r = await env.DB.prepare(
     `SELECT d.sbd, d.ho_ten, d.nam_sinh, d.lop,
+            h.trang_thai,
             (SELECT COUNT(*) FROM luot l WHERE l.sbd = d.sbd AND l.ma_ca <> 'DOTAI') AS so_ca,
             g.tong AS diem_gan_nhat, g.ma_ca AS ca_gan_nhat, g.nop_luc AS nop_gan_nhat
        FROM danh_sach d
+       LEFT JOIN hoc_sinh h ON h.sbd = d.sbd
        LEFT JOIN (
          SELECT l1.sbd, l1.tong, l1.ma_ca, l1.nop_luc
            FROM luot l1
@@ -1560,7 +1562,7 @@ async function danhSachEmMoi(env: Env): Promise<Response> {
     namSinh: String(v.nam_sinh ?? ''),
     lop: String(v.lop ?? ''),
     ...(tenLop ? { tenLop: tenLopCuaEm(v.lop, tenLop.get(String(v.sbd ?? ''))) } : {}),
-    trangThai: '',
+    trangThai: String(v.trang_thai ?? ''),
     soCa: Number(v.so_ca) || 0,
     diemGanNhat: v.diem_gan_nhat === null || v.diem_gan_nhat === undefined ? null : Number(v.diem_gan_nhat),
     caGanNhat: String(v.ca_gan_nhat ?? ''),
@@ -3131,7 +3133,7 @@ const LENH_CUA_THAY = new Set([
   // Hồ sơ CẢ LỚP là dữ liệu của nhiều em — lệnh của THẦY, không mở cho máy em.
   'hoSoLopLenBang', 'hoSoOnCa',
   'sendTeacherMessage', 'listMessages', 'demTinMoi', 'listStudents', 'markMessagesRead',
-  'resetMatKhauHs',
+  'resetMatKhauHs', 'danhDauNghiHoc', 'nghiHoc',
 ])
 
 /** RÚT DANH SÁCH CÂU TỪ MỘT GÓI ĐỀ. Kho đi qua nhiều đời nên gói có ba dáng:
@@ -3234,6 +3236,8 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
     case 'napDanhSachLop': return dayDanhSach(env, { ds: b.items })
     case 'themEmVaoSheet': return ra(await G.themEm(env, b))
     case 'deleteStudent': return ra(await G.xoaEm(env, b))
+    case 'danhDauNghiHoc':
+    case 'nghiHoc': return ra(await G.danhDauNghiHoc(env, b))
     case 'listStudents': return ra(await G.dsEmDangKy(env))
     case 'linkDanhSachLop': return ra({ ok: true, links: (await G.layCauHinh(env, 'link_danh_sach_lop')) ?? [] })
     case 'luuLinkDanhSachLop': {
@@ -3739,6 +3743,7 @@ const boXuLy = {
         return ra(await gvBangTinSong(envDoc, b, Date.now(), { khoiRieng: async (e) => ({ chuaHocHomNay: await gvChuaHocHomNay(e) }) }))
       }
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
+      if (p === '/gv/nghi-hoc') return ra(await import('./goi-cu').then((m) => m.danhDauNghiHoc(env, b)))
       // GAME HÓA 2.0 (srs2-gv.ts): chiến dịch luyện — giao, đồng hồ sức chứa, bảng chiến dịch, buổi chữa, chữa xong, công tắc.
       if (p === '/gv/goi-bai-7') return ra(await import('./goi-bai-7-thay').then(m=>m.gvGoi7(env,b)),200,b.action==='doc_em'||b.action==='sua_em')
       if (p === '/gv/kiem-tra-ca-nhan') return ra(await import('./kiem-tra-ca-nhan-thay').then(m=>m.gvKtCn(env,b,Date.now())))

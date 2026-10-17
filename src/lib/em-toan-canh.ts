@@ -47,6 +47,7 @@ export interface HoSoToanCanh {
   hoTen: string
   lop: string
   namSinh: string
+  trangThai?: string
   thanThu: { ten: string; cap: number | null } | null
   chuoiNgay: number | null
   hoatDongCuoi: { luc: string; viec: string } | null
@@ -123,6 +124,7 @@ export function docToanCanh(j: Record<string, unknown>): ToanCanh | null {
       hoTen: chu(e.hoTen) || `SBD ${chu(e.sbd)}`,
       lop: chu(e.lop),
       namSinh: chu(e.namSinh),
+      trangThai: chu(e.trangThai),
       thanThu: tt && chu(tt.ten) ? { ten: chu(tt.ten), cap: so(tt.cap) } : null,
       chuoiNgay: so(e.chuoiNgay),
       hoatDongCuoi: hd && chu(hd.luc) ? { luc: chu(hd.luc), viec: chu(hd.viec) } : null,
