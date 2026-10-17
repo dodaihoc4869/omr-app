@@ -17,7 +17,7 @@ export function docTokenHs(): string {
   }
 }
 
-async function goiHs(duong: string, body: Record<string, unknown>): Promise<Record<string, unknown> | null> {
+export async function goiHs(duong: string, body: Record<string, unknown>): Promise<Record<string, unknown> | null> {
   const dk = new AbortController()
   const t = setTimeout(() => dk.abort(), 15000)
   try {
@@ -79,16 +79,11 @@ export type KetQuaHoiThay =
 /** Em đang làm câu mà phần hỏi Thầy chưa bật cho em ⇒ lời nhắc (không mở lời giải trước khi em làm xong). */
 export const CHU_LAM_XONG = 'Em làm xong câu này rồi bấm Hỏi thầy để xem lời giải nhé.'
 
-export async function hoiThay(qid: string, nguon: string, chiHoi = false): Promise<KetQuaHoiThay> {
-  const token = docTokenHs()
-  if (!token) return { ok: false, loi: 'Em đăng nhập lại để hỏi thầy.' }
-  const j = await goiHs('/hs/hoi-thay', chiHoi ? { token, qid, nguon, chiHoi: true } : { token, qid, nguon })
-  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được lời giải.'), khoa: j.khoa as 'dang_kiem_tra' | 'ca_chua_cong_bo' | undefined }
-  const hoiThem = j.hoiThem === true
-  if (chiHoi && j.chiHoi === true) return { ok: true, chiHoi: true, cau: j.cau as CauChoKhung, hoiThem }
-  if (j.coLoiGiai === true) return { ok: true, cau: j.cau as CauChoKhung, hoSo: j.hoSo as HoSoLoiGiai, ...(j.kiem ? { kiem: j.kiem as KiemKhung } : {}), hoiThem }
-  return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu, hoiThem }
+// Lệnh chỉ dùng sau khi bấm: nạp cùng hộp Hỏi Thầy, không mang phần mạng vào gói mở app.
+const napLenh = () => import('./hoi-them-thay-api')
+const loiMang = () => ({ ok: false as const, loi: 'Chưa nối được máy chủ. Em thử lại sau.' })
+export function hoiThay(...args: [qid: string, nguon: string, chiHoi?: boolean, luotId?: string]): Promise<KetQuaHoiThay> {
+  return napLenh().then((m) => m.hoiThay(...args)).catch(loiMang)
 }
 
 // ---------------------------------------------------------------- hỏi thêm Thầy (AI theo lời giải của Thầy, server/src/hoi-tro-ly.ts)
@@ -100,7 +95,7 @@ export type KetQuaHoiThem =
 
 /** Em nhắn một câu hỏi về câu đang mở lời giải. Chờ tối đa 45 giây (Thầy suy nghĩ rồi mới trả lời). */
 export const hoiThemThay = (...a: Parameters<typeof import('./hoi-them-thay-api').hoiThemThay>): Promise<KetQuaHoiThem> =>
-  import('./hoi-them-thay-api').then(m => m.hoiThemThay(...a)).catch(() => ({ ok: false, ma: 'mang', loi: 'Chưa nối được máy chủ. Em thử lại sau.' }))
+  napLenh().then(m => m.hoiThemThay(...a)).catch(() => ({ ok: false, ma: 'mang', loi: 'Chưa nối được máy chủ. Em thử lại sau.' }))
 
 /** Một thao tác em làm trong khung lời giải (GĐ1 v2): chọn Đ/S một ý, xin gợi ý, gắn chìa khoá, câu tương tự, trả lời số, chốt. */
 export interface SuKienKhung { k: string; y?: string; d?: boolean; m?: number; t: number }
@@ -124,52 +119,17 @@ export function baoDocLoiGiai(qid: string, nguon: string, giay: number, suKien: 
 export type KetQuaCauKiem = { ok: true; dung: boolean; dapAn?: string; nhanNen?: string; tenNen?: string } | { ok: false; loi: string }
 
 /** Câu kiểm một bước: máy chủ chấm (đáp án không có ở máy em). */
-export async function guiCauKiem(qid: string, buoc: number, traLoi: string, giay: number): Promise<KetQuaCauKiem> {
-  const token = docTokenHs()
-  if (!token) return { ok: false, loi: 'Em đăng nhập lại để trả lời.' }
-  const j = await goiHs('/hs/cau-kiem', { token, qid, buoc, traLoi, giay })
-  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa kiểm được câu trả lời.') }
-  return { ok: true, dung: j.dung === true, ...(typeof j.dapAn === 'string' ? { dapAn: j.dapAn } : {}), ...(typeof j.nhanNen === 'string' ? { nhanNen: j.nhanNen, tenNen: String(j.tenNen ?? '') } : {}) }
-}
+export const guiCauKiem = (...a: Parameters<typeof import('./hoi-them-thay-api').guiCauKiem>): ReturnType<typeof import('./hoi-them-thay-api').guiCauKiem> => napLenh().then((m) => m.guiCauKiem(...a)).catch(loiMang)
 
 export interface MucCong { ma: 'tu_lam' | 'doc_het' | 'lam_lai' | 'chi_buoc' | 'khong_bua'; dat: boolean; viec: string }
 export interface ThangGo { bac: 1 | 2 | 3 | 4 | 5; cong: MucCong[]; coTheGui: boolean; soBuoc: number; buocVuong?: number; nhanNenVuong?: string; tenNenVuong?: string }
 
 /** Em đang ở bậc nào của thang tự gỡ. `dang`: thao tác của lần đọc đang mở (máy chủ chỉ tính, không ghi). null = lỗi / câu không có thang. */
-export async function thangGo(qid: string, dang?: { giay: number; suKien: SuKienKhung[] }): Promise<ThangGo | null> {
-  const token = docTokenHs()
-  if (!token) return null
-  const j = await goiHs('/hs/thang-go', { token, qid, ...(dang ? { dang: { giay: dang.giay, suKien: dang.suKien.slice(0, 200) } } : {}) })
-  if (!j || j.ok !== true || j.coThang !== true) return null
-  return j as unknown as ThangGo
-}
+export const thangGo = (...a: Parameters<typeof import('./hoi-them-thay-api').thangGo>): ReturnType<typeof import('./hoi-them-thay-api').thangGo> => napLenh().then((m) => m.thangGo(...a)).catch(() => null)
 
 export interface CauNen { id: string; muc: number; kieu: 'so' | 'tn'; de: string; pa?: Record<string, string> }
-export async function luyenNen(nhan: string): Promise<{ ok: true; ten: string; cau: CauNen[] } | { ok: false; loi: string }> {
-  const token = docTokenHs()
-  if (!token) return { ok: false, loi: 'Em đăng nhập lại để luyện.' }
-  const j = await goiHs('/hs/luyen-nen', { token, nhan })
-  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được bài luyện.') }
-  return { ok: true, ten: String(j.ten ?? ''), cau: Array.isArray(j.cau) ? (j.cau as CauNen[]) : [] }
-}
+export const luyenNen = (...a: Parameters<typeof import('./hoi-them-thay-api').luyenNen>): ReturnType<typeof import('./hoi-them-thay-api').luyenNen> => napLenh().then((m) => m.luyenNen(...a)).catch(loiMang)
 export type KetQuaNopNen = { ok: true; dung: boolean; dapAn: string; giai: string[]; meo: string } | { ok: false; loi: string }
-export async function nopLuyenNen(id: string, traLoi: string, qid: string): Promise<KetQuaNopNen> {
-  const token = docTokenHs()
-  if (!token) return { ok: false, loi: 'Em đăng nhập lại để nộp.' }
-  const j = await goiHs('/hs/luyen-nen/nop', { token, id, traLoi, qid })
-  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa nộp được.') }
-  return { ok: true, dung: j.dung === true, dapAn: String(j.dapAn ?? ''), giai: Array.isArray(j.giai) ? (j.giai as unknown[]).map(String) : [], meo: String(j.meo ?? '') }
-}
+export const nopLuyenNen = (...a: Parameters<typeof import('./hoi-them-thay-api').nopLuyenNen>): ReturnType<typeof import('./hoi-them-thay-api').nopLuyenNen> => napLenh().then((m) => m.nopLuyenNen(...a)).catch(loiMang)
 
-export async function guiThay(qid: string, buoc: number, viet: string): Promise<{ ok: true } | { ok: false; loi: string; cong?: MucCong[] }> {
-  const token = docTokenHs()
-  if (!token) return { ok: false, loi: 'Em đăng nhập lại để gửi.' }
-  const j = await goiHs('/hs/gui-thay', { token, qid, buoc, viet })
-  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok === true) return { ok: true }
-  const cong = Array.isArray(j.cong) ? (j.cong as MucCong[]) : undefined
-  return { ok: false, loi: String(j.error ?? cong?.find((c) => !c.dat)?.viec ?? 'Chưa gửi được.'), ...(cong ? { cong } : {}) }
-}
+export const guiThay = (...a: Parameters<typeof import('./hoi-them-thay-api').guiThay>): ReturnType<typeof import('./hoi-them-thay-api').guiThay> => napLenh().then((m) => m.guiThay(...a)).catch(loiMang)

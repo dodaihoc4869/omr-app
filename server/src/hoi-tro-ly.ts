@@ -187,6 +187,7 @@ Em hỏi "Thầy giải giúp em bài Lý số 3" ⇒ {"lienQuan": false, "yChin
 
 export interface NguCanhCau {
   qid: string
+  dangLam?: boolean
   cau: { phan: string; so: string; chuong?: string; mucDo?: string; de: string; pa: Record<string, string> | null; y: Record<string, string> | null; dapAn: string; bang: string[][] | null; hinh: { viTri: string; duLieu: string }[]; loiGiai: unknown }
   hoSo: unknown
   loiGiaiChu: unknown
@@ -379,14 +380,15 @@ async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiD
 
 export const CAU_NGOAI_PHAM_VI = 'Ở đây Thầy chỉ trả lời về câu em đang xem. Em hỏi về đề, cách giải hay chỗ em sai ở câu này nhé.'
 
-/** Đọc đầu ra JSON `{lienQuan, traLoi}`. Không phải JSON đúng khuôn ⇒ coi cả chữ là lời trả lời (mô hình lỡ khuôn, vẫn trong ngữ cảnh một câu). */
+/** Đọc khuôn chữ cũ; JSON hỏng/sai khuôn không được rơi xuống đường hiển thị chữ. */
 export function tachKetQua(chu: string): { lienQuan: boolean; traLoi: string } {
   const s = str(chu).trim().replace(/^```(?:json)?\s*|\s*```$/g, '')
   try {
     const o = JSON.parse(s) as Obj
-    if (o && typeof o === 'object' && typeof o.lienQuan === 'boolean') return { lienQuan: o.lienQuan, traLoi: str(o.traLoi) }
+    if (o && typeof o === 'object' && !Array.isArray(o) && typeof o.lienQuan === 'boolean' && typeof o.traLoi === 'string') return { lienQuan: o.lienQuan, traLoi: o.traLoi }
+    return { lienQuan: true, traLoi: '' }
   } catch { /* lỡ khuôn */ }
-  return { lienQuan: true, traLoi: s }
+  return { lienQuan: true, traLoi: /^[{\[]|"(?:lienQuan|yChinh|soDo|traLoi)"\s*:/.test(s) ? '' : s }
 }
 
 /** Ép đúng quy tắc trình bày của Thầy dù mô hình lỡ tay: bỏ markdown, gạch ngang dài, emoji; gọn dòng trống; cắt 2.000 ký tự. */
@@ -410,11 +412,12 @@ const LOI_CHO_EM: Record<string, string> = {
   rong: 'Câu này Thầy chưa trả lời tự động được. Em mang lên lớp hỏi Thầy nhé.',
   loi_ai: 'Phần hỏi thêm Thầy đang gặp lỗi. Em thử lại sau ít phút.',
   mang: 'Phần hỏi thêm Thầy đang gặp lỗi. Em thử lại sau ít phút.',
+  dinh_dang: 'Câu trả lời vừa bị lỗi hiển thị. Em gửi lại câu hỏi, lượt này chưa tính vào số lần hỏi.',
 }
 
 // ---------------------------------------------------------------- lệnh /hs/hoi-tro-ly
 
-export interface PhuThuocHoiThem { nguCanh?: (env: Env, sbd: string, qid: string, nowMs: number, dangLam: boolean) => Promise<{ ok: false; khoa?: string; error: string } | ({ ok: true } & NguCanhCau)>; goiAi?: GoiAi; nowMs?: number; xong?: Promise<unknown> }
+export interface PhuThuocHoiThem { nguCanh?: (env: Env, sbd: string, qid: string, nowMs: number, dangLam: boolean, luot?: { luotId: string; qidTrongLuot: string }) => Promise<{ ok: false; khoa?: string; error: string } | ({ ok: true } & NguCanhCau)>; goiAi?: GoiAi; nowMs?: number; xong?: Promise<unknown> }
 
 /** Em ĐANG LÀM (chưa nộp): bỏ mọi câu (dòng / câu văn) lộ đáp án — phương án đúng, chữ của phương án đúng, đúng/sai từng ý, đáp số
  *  phần III. Bỏ hết ⇒ câu cố định nhắc em làm xong rồi xem lời giải. Chỉ dẫn đã dặn mô hình không nêu; đây là chốt chặn thứ hai. */
@@ -544,7 +547,7 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const ddl = chayDdlMotLan(env, 'hoi_tro_ly_v1', SQL_BANG)
   const cfgP = docCauHinhHoiThem(env)
   const duocP = cfgP.then((cfg) => emDuocDung(env, sbd, cfg))
-  const ncP = (phu.nguCanh ?? (nguCanhHoiTroLy as NonNullable<PhuThuocHoiThem['nguCanh']>))(env, sbd, str(b.qid), nowMs, dangLam)
+  const ncP = (phu.nguCanh ?? (nguCanhHoiTroLy as NonNullable<PhuThuocHoiThem['nguCanh']>))(env, sbd, str(b.qid), nowMs, dangLam, b.nguon === 'tu_luyen' && b.luotId ? { luotId: str(b.luotId), qidTrongLuot: str(b.qidTrongLuot) } : undefined)
   const hoSoP = docHoSoHoiThay(env, sbd, qidDoan, nowMs)
   const trangThaiP = trangThaiHoiThay(env, sbd, qidDoan, nowMs)
   const docDem = (q: string) => ddl.then(() => env.DB.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN qid = ? THEN 1 ELSE 0 END), 0) AS c FROM hoi_tro_ly WHERE sbd = ? AND ngay_vn = ? AND loi IS NULL')
@@ -563,6 +566,7 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   await ddl
   const nc = await ncP
   if (!nc.ok) return { ok: false, ma: nc.khoa ?? 'khong_mo', error: nc.error }
+  dangLam ||= nc.dangLam === true
   // Ngữ cảnh trả qid khác qid đoán (chỉ khi thay bộ dựng ngữ cảnh) ⇒ đọc lại theo đúng qid của ngữ cảnh.
   const cungQid = nc.qid === qidDoan
   const [dem, ls, kq0, hoSo, trangThai] = await Promise.all(cungQid
@@ -603,6 +607,11 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
     traLoiAi = cauTruc ? chuPhang(cauTruc) : dangLam && str(ct.o.yChinh).trim() ? CAU_CHUA_NOP : ''
   } else {
     const tach = tachKetQua(kq.chu)
+    if (tach.lienQuan && !tach.traLoi.trim()) {
+      await env.DB.prepare('INSERT INTO hoi_tro_ly (sbd, qid, ngay_vn, luc, nguon, cau_hoi, model, ms, loi) VALUES (?,?,?,?,?,?,?,?,?)')
+        .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, kq.model ?? cfg.model, ms, 'dinh_dang: JSON không hoàn chỉnh hoặc sai khuôn').run()
+      return { ok: false, ma: 'dinh_dang', conLai: khongTran ? cfg.tranNgay : Math.max(0, cfg.tranNgay - n), error: LOI_CHO_EM.dinh_dang }
+    }
     lienQuan = tach.lienQuan
     const chuCu = chanQuyKetHoiThay(lamSachTraLoi(tach.traLoi), baiNhap)
     traLoiAi = dangLam ? chanLoDapAn(chuCu, nc.cau.phan, nc.cau.dapAn, nc.cau.pa) : chuCu
