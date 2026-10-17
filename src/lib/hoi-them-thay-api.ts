@@ -14,7 +14,7 @@ export async function hoiThay(qid: string, nguon: string, chiHoi = false, luotId
   return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu, hoiThem }
 }
 
-export async function hoiThemThay(qid: string, nguon: string, cauHoi: string, dapAnEm = '', dangLam = false): Promise<KetQuaHoiThem> {
+export async function hoiThemThay(qid: string, nguon: string, cauHoi: string, dapAnEm = '', dangLam = false, luot?: { luotId: string; qidTrongLuot: string }): Promise<KetQuaHoiThem> {
   const token = docTokenHs()
   if (!token) return { ok: false, ma: 'dang_nhap', loi: 'Em đăng nhập lại để hỏi Thầy.' }
   const dk = new AbortController()
@@ -22,7 +22,7 @@ export async function hoiThemThay(qid: string, nguon: string, cauHoi: string, da
   try {
     const url = await layDiaChiMayChu()
     if (!url) return { ok: false, ma: 'mang', loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-    const r = await fetch(`${url}/hs/hoi-tro-ly`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(dangLam ? { token, qid, nguon, cauHoi, dapAnEm, dangLam: true } : { token, qid, nguon, cauHoi, dapAnEm }), signal: dk.signal })
+    const r = await fetch(`${url}/hs/hoi-tro-ly`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token, qid, nguon, cauHoi, dapAnEm, ...(dangLam ? { dangLam: true } : {}), ...(luot ?? {}) }), signal: dk.signal })
     const j = (await r.json()) as Record<string, unknown>
     const conLai = typeof j.conLai === 'number' ? j.conLai : undefined
     if (j.ok === true) return { ok: true, traLoi: String(j.traLoi ?? ''), cauTruc: j.cauTruc, conLai: conLai ?? 0, ngoaiPhamVi: j.ngoaiPhamVi === true }

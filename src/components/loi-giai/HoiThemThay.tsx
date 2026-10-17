@@ -11,7 +11,7 @@ import TraLoiThay, { chuHoa, docCauTruc, type CauTrucTraLoi } from './TraLoiThay
 type Tin = { vai: 'em' | 'thay'; chu: string; ct?: CauTrucTraLoi | null }
 export const TOI_DA_KY_TU = 500
 const MA_DUNG_HAN = new Set(['het_luot', 'het_luot_cau', 'chua_bat', 'dang_kiem_tra', 'ca_chua_cong_bo', 'chua_mo'])
-type HoiThemProps = { qid: string; nguon: string; gon?: boolean; hop?: boolean; dangLam?: boolean; choDe?: boolean; onTraLoi?: () => void; onDangKiem?: (dang: boolean) => void; dapAnEm?: string }
+type HoiThemProps = { qid: string; luotId?: string; qidTrongLuot?: string; nguon: string; gon?: boolean; hop?: boolean; dangLam?: boolean; choDe?: boolean; onTraLoi?: () => void; onDangKiem?: (dang: boolean) => void; dapAnEm?: string }
 const KiemDau = lazy(() => import('./HoiThayKiemChung'))
 class ChanKiem extends Component<{ children: ReactNode; onThu: () => void; onDangKiem: (dang: boolean) => void }, { loi: boolean }> {
   state = { loi: false }
@@ -30,13 +30,13 @@ function PhanKiem({ qid, khoa, onDangKiem }: { qid: string; khoa: boolean; onDan
 
 // Đổi câu/nguồn hoặc trạng thái đang làm ⇒ không để hội thoại hay kết quả câu trước trôi sang.
 export default function HoiThemThay(props: HoiThemProps) {
-  return <HoiThemCau key={`${props.qid}\n${props.nguon}\n${!!props.dangLam}`} {...props} />
+  return <HoiThemCau key={`${props.qidTrongLuot ?? props.qid}\n${props.nguon}\n${!!props.dangLam}\n${props.luotId ?? ''}`} {...props} />
 }
 
 /** `onTraLoi`: gọi một lần khi Thầy trả lời được câu đầu (game tính câu này là "có trợ giúp", như khi mở lời giải).
  *  `dangLam`: em đang làm câu, chưa nộp ⇒ máy chủ chỉ cho Thầy gợi hướng, không nêu đáp án.
  *  `choDe`: hộp vừa mở, đề câu chưa về (máy chủ chưa ghi "em đã mở câu") ⇒ gõ trước được, CHƯA gửi. */
-function HoiThemCau({ qid, nguon, gon = false, hop = false, dangLam = false, choDe = false, onTraLoi, onDangKiem, dapAnEm = '' }: HoiThemProps) {
+function HoiThemCau({ qid, luotId, qidTrongLuot, nguon, gon = false, hop = false, dangLam = false, choDe = false, onTraLoi, onDangKiem, dapAnEm = '' }: HoiThemProps) {
   const id = useId()
   const [mo, setMo] = useState(gon || hop)
   const [tin, setTin] = useState<Tin[]>([])
@@ -82,7 +82,7 @@ function HoiThemCau({ qid, nguon, gon = false, hop = false, dangLam = false, cho
     setLoi('')
     setTin((t) => [...t, { vai: 'em', chu: cau }])
     if (cauSan === undefined) setChu('')
-    const r = await hoiThemThay(qid, nguon, cau, dangLam ? '' : dapAnEm, dangLam)
+    const r = await hoiThemThay(qid, nguon, cau, dangLam ? '' : dapAnEm, dangLam, luotId && qidTrongLuot ? { luotId, qidTrongLuot } : undefined)
     if (!song.current) return
     guiRef.current = false
     setDangGui(false)

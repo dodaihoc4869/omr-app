@@ -21,7 +21,7 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { coCaDangMo } from './ca-dang-mo'
 import { protectedQuestions } from './game-v2-bank'
 import { qidGoc } from './srs2-d1'
-import { cauHoiThayTuLuyen } from './tu-luyen-hoi-thay'
+import { cauHoiThayTuLuyen, type NguCanhLuotTuLuyen } from './tu-luyen-hoi-thay'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 import {
   bamCau, boCua, cauTrongGoi, chuHtml, dauVao, deHtml, gonHoSo, kiemHoSo, laHoSoSach, lopCua, loaiCau, tangCau,
@@ -159,7 +159,13 @@ async function cauHienTai(env: Env, qid: string, maDeGoiY?: string, boNho?: Map<
 /** Câu để KHUNG hiển thị: đề (HTML đã thoát, có bảng + hình), chữ từng ý / phương án. Không kèm đáp án — đáp án nằm trong hồ sơ. */
 function cauChoKhung(c: CauKho) {
   const o = c.pa ?? c.y ?? {}
-  return { qid: c.qid, so: `Câu ${c.so}`, nguon: c.maDe, chuong: c.chuong, de: deHtml(c), y: Object.fromEntries(Object.entries(o).map(([k, v]) => [k, chuHtml(v)])) }
+  // Hộp hỏi lấy chữ thuần của từng phương án; ảnh phải ở phần HTML của đề và có nhãn đúng phương án.
+  const anhPa = c.hinh.filter((h) => /^(?:pa_[A-D]|y_[a-d])$/.test(h.viTri))
+  const de = deHtml({ ...c, hinh: c.hinh.filter((h) => !anhPa.includes(h)) }) + anhPa.map((h) => {
+    const nhan = h.viTri.startsWith('pa_') ? `Phương án ${h.viTri.slice(3)}` : `Ý ${h.viTri.slice(2)}`
+    return `<p>${nhan}: <img alt="${nhan}" src="${h.duLieu}"></p>`
+  }).join('')
+  return { qid: c.qid, so: `Câu ${c.so}`, nguon: c.maDe, chuong: c.chuong, de, y: Object.fromEntries(Object.entries(o).map(([k, v]) => [k, chuHtml(v)])) }
 }
 
 async function docHoSo(env: Env, bam: string): Promise<Obj | null> {
@@ -576,17 +582,20 @@ function loiGiaiChu(c: CauKho) {
 export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: string) => Promise<boolean>; sau?: (viec: Promise<unknown>) => void } = {}) {
   const bang = damBaoBangLoiGiai(env)
   const { sbd, xong } = await gameIdentityHaiBuoc(env, b) // bước 1 không chạm D1: token hỏng ⇒ ném ngay như cũ
-  const cauTrongLuot = b.nguon === 'tu_luyen' && b.luotId
+  const theoLuot = b.nguon === 'tu_luyen' && b.luotId
+  const cauTrongLuot = theoLuot
     ? await cauHoiThayTuLuyen(env, sbd, str(b.luotId), str(b.qid)).catch(() => null)
-    : str(b.qid)
-  if (!cauTrongLuot) { await Promise.all([bang, xong]); return { ok: false, error: 'Không tìm thấy câu này trong lượt luyện của em.' } }
-  const qid = qidGoc(cauTrongLuot) // mã nội dung hiển thị; mã chấm/tiến độ gốc giữ nguyên
+    : null
+  if (theoLuot && !cauTrongLuot) { await Promise.all([bang, xong]); return { ok: false, error: 'Không tìm thấy câu này trong lượt luyện của em.' } }
+  const qid = qidGoc(cauTrongLuot?.qid ?? str(b.qid)) // mã nội dung hiển thị; mã chấm/tiến độ gốc giữ nguyên
   const nguon = str(b.nguon).slice(0, 40) || 'luyen'
   if (!qid) { await Promise.all([bang, xong]); return { ok: false, error: 'Thiếu câu cần hỏi.' } }
   const nay = Date.now()
   const hoiThemP = tuyChon.hoiThem ? tuyChon.hoiThem(sbd).catch(() => false) : undefined
   const [, , caMo, baoVe, ht] = await Promise.all([
-    bang, xong, coCaDangMo(env, sbd, nay), cauDangBaoVe(env, qid), cauHienTaiSongSong(env, qid, bang).catch(() => null),
+    bang, xong, coCaDangMo(env, sbd, nay),
+    Promise.all([qid, ...(cauTrongLuot?.baoVe ?? [])].map((q) => cauDangBaoVe(env, q))).then((ds) => ds.some(Boolean)),
+    cauTrongLuot?.c && cauTrongLuot.bam ? { c: cauTrongLuot.c, bam: cauTrongLuot.bam } : cauHienTaiSongSong(env, qid, bang).catch(() => null),
   ])
   const kq = await (async (): Promise<Obj> => {
     if (caMo) return { ok: false, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở nên nút Hỏi thầy tạm khoá. Làm xong ca kiểm tra rồi hỏi nhé.' }
@@ -594,7 +603,7 @@ export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: str
     if (!ht) return { ok: false, error: 'Không tìm thấy câu này trong kho đề.' }
     // THẦY 13/10 "nút hỏi bài ở tất cả các câu… hỏi bài thầy mọi lúc": em ĐANG LÀM câu (chưa trả lời/nộp) bấm Hỏi thầy ⇒ `chiHoi`: chỉ đề
     // để hiện trong hộp hỏi Thầy, KHÔNG đáp án, KHÔNG lời giải, KHÔNG ghi `loi_giai_hoi` (em chưa xem lời giải). Thầy (AI) chỉ gợi hướng.
-    const chiHoi = b.chiHoi === true
+    const chiHoi = b.chiHoi === true || !!cauTrongLuot?.dangLam
     // Đọc theo băm SONG SONG với lượt kiểm bản chép: hồ sơ R2 + học liệu chỉ dùng khi qua chặn và hồ sơ xem được (lỗi đọc như cũ: chỉ khi cần).
     const dongP = chiHoi ? null : env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>()
     const hoSoP = chiHoi ? null : docHoSo(env, ht.bam)
@@ -612,7 +621,7 @@ export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: str
     const luc = new Date(nay).toISOString()
     const ghiHet = (async () => {
       const ghi = [env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,?)').bind(sbd, qid, nguonDoc, luc, hoSo ? 1 : 0)]
-      if (!hoSo && !laGoiNgoaiKho(ht.c.maDe)) {
+      if (!hoSo && !cauTrongLuot?.c && !laGoiNgoaiKho(ht.c.maDe)) {
         // Câu học sinh hỏi mà chưa có hồ sơ ⇒ lên đầu hàng soạn (mục 5.6: câu học sinh cần). Chưa vào hàng thì xếp cả đề ngay.
         const coViec = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_viec WHERE bam = ?').bind(ht.bam).first<Obj>()
         if (!coViec) await ghiCauVaoHang(env, ht.c.maDe, await docGoi(env, ht.c.maDe)).catch(() => null)
@@ -748,12 +757,15 @@ export async function hsDocLoiGiai(env: Env, b: Obj) {
 
 /** Ngữ cảnh một câu cho phần hỏi thêm: ĐÚNG cổng chặn của nút Hỏi thầy, thêm điều kiện em đã bấm Hỏi thầy câu này trong 24 giờ qua
  *  (dòng `loi_giai_hoi` ⇒ lần xem đã tính "có trợ giúp" như hiện nay). Trả câu kho, hồ sơ xem được (nếu có), lời giải chữ, lời thầy gỡ. */
-export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, nowMs = Date.now(), dangLam = false) {
+export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, nowMs = Date.now(), dangLam = false, luot?: NguCanhLuotTuLuyen) {
   // TỐC ĐỘ (thầy 13/10, ảnh "Thầy trả lời chưa kịp"): trước đây ~9 lượt D1/R2 NỐI TIẾP trước khi gọi Gemini. Nay: đợt 1 = ca mở, tập câu
   // bảo vệ, mã đề + gói R2, đã bấm Hỏi thầy chưa, học liệu chữa câu sai; đợt 2 (theo băm) = bản chép bảo vệ, hồ sơ, học liệu bổ trợ, lời gỡ.
   // Thứ tự CHẶN và lời báo giữ như cũ; lượt đọc thừa (bị chặn) chỉ bỏ kết quả.
   const bang = damBaoBangLoiGiai(env)
-  const qid = qidGoc(str(qidVao))
+  const snap = luot ? await cauHoiThayTuLuyen(env, sbd, luot.luotId, luot.qidTrongLuot).catch(() => null) : null
+  if (luot && (!snap || snap.qid !== str(qidVao))) { await bang; return { ok: false as const, error: 'Không tìm thấy câu này trong lượt luyện của em.' } }
+  dangLam ||= !!snap?.dangLam
+  const qid = qidGoc(snap?.qid ?? str(qidVao))
   if (!qid) { await bang; return { ok: false as const, error: 'Thiếu câu cần hỏi.' } }
   // Em đang làm (chưa nộp) ⇒ không cần đã mở lời giải: Thầy chỉ gợi hướng, không nêu đáp án (hoi-tro-ly.ts, `dangLam`).
   const daHoiP = dangLam ? null : bang.then(() => env.DB.prepare('SELECT 1 AS co FROM loi_giai_hoi WHERE sbd = ? AND qid = ? AND luc >= ? LIMIT 1')
@@ -761,7 +773,9 @@ export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, now
   daHoiP?.catch(() => {})
   const hlP = env.DB.prepare("SELECT hoc_lieu_json FROM chua_loi_hoc_lieu WHERE qid_chuan = ? AND trang_thai = 'du_dung' ORDER BY cap_nhat_luc DESC LIMIT 1")
     .bind(qid).first<Obj>().catch(() => null)
-  const [, caMo, baoVe, ht] = await Promise.all([bang, coCaDangMo(env, sbd, nowMs), cauDangBaoVe(env, qid), cauHienTaiSongSong(env, qid, bang).catch(() => null)])
+  const [, caMo, baoVe, ht] = await Promise.all([bang, coCaDangMo(env, sbd, nowMs),
+    Promise.all([qid, ...(snap?.baoVe ?? [])].map((q) => cauDangBaoVe(env, q))).then((ds) => ds.some(Boolean)),
+    snap?.c && snap.bam ? { c: snap.c, bam: snap.bam } : cauHienTaiSongSong(env, qid, bang).catch(() => null)])
   if (caMo) return { ok: false as const, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở nên phần hỏi Thầy tạm khoá. Làm xong ca kiểm tra rồi hỏi nhé.' }
   if (baoVe) return { ok: false as const, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
   if (!ht) return { ok: false as const, error: 'Không tìm thấy câu này trong kho đề.' }
@@ -778,5 +792,5 @@ export async function nguCanhHoiTroLy(env: Env, sbd: string, qidVao: string, now
   const boTro = boTroMap.get(ht.bam) ?? null
   let hocLieu: unknown = null
   try { hocLieu = hl ? JSON.parse(str(hl.hoc_lieu_json)) : null } catch { hocLieu = null }
-  return { ok: true as const, qid, cau: ht.c, hoSo, loiGiaiChu: loiGiaiChu(ht.c), kiem, boTro, hocLieu }
+  return { ok: true as const, qid, dangLam, cau: ht.c, hoSo, loiGiaiChu: loiGiaiChu(ht.c), kiem, boTro, hocLieu }
 }

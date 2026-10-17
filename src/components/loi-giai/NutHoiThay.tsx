@@ -90,10 +90,10 @@ function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, d
           <span>{dangTai === 'giai' ? 'Đang mở…' : 'Lời giải từng bước'}</span>
         </button>
       )}
-      {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={qid} /></Suspense>}
+      {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={luotId ? qid.replace(/~\d+$/, '') : qid} /></Suspense>}
       {loi && <span className="lg-loi" role="status">{loi}</span>}
       <Suspense fallback={null}>
-        {hop && <HopHoiThay cau={hop.cau} qid={qid} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
+        {hop && <HopHoiThay cau={hop.cau} qid={qid} luotId={luotId} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
         {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
       </Suspense>
     </div>
