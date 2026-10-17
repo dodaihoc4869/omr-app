@@ -1576,6 +1576,17 @@ export async function deleteStudentRegistration(scriptUrl: string, secret: strin
   if (!result.ok) throw new Error(result.error || 'Xoá đăng ký thất bại')
 }
 
+/** Đánh dấu học sinh nghỉ học — chỉ thầy (mã bí mật). */
+export async function danhDauNghiHocApi(
+  scriptUrl: string,
+  secret: string,
+  sbd: string,
+): Promise<{ ok: boolean; sbd: string; daNghi: boolean; trangThai: string; error?: string }> {
+  const result = await postJson(scriptUrl, { action: 'danhDauNghiHoc', secret, sbd })
+  if (!result.ok) throw new Error(result.error || 'Cập nhật trạng thái thất bại')
+  return result as { ok: boolean; sbd: string; daNghi: boolean; trangThai: string; error?: string }
+}
+
 // ============================================================================
 // TIN NHẮN PHỤ HUYNH/HỌC SINH ↔ THẦY — nhắn trực tiếp qua app, thầy xem chung 1 hộp thư
 // ============================================================================
@@ -1702,7 +1713,7 @@ export interface CaCuaEm {
 }
 
 export interface HoSoEm {
-  em: { sbd: string; hoTen: string; namSinh: string; lop: string }
+  em: { sbd: string; hoTen: string; namSinh: string; lop: string; trangThai?: string }
   /** Chuyên đề CỘNG DỒN mọi ca — dùng cho bảng mạnh/yếu. */
   chuyenDe: ChuyenDeEm[]
   ca: CaCuaEm[]
@@ -1815,7 +1826,7 @@ export async function hoSoEm(scriptUrl: string, quyen: QuyenHoSo): Promise<HoSoE
   }
 
   return {
-    em: { ...r.em, sbd: chuoi(r.em.sbd), hoTen: chuoi(r.em.hoTen), namSinh: chuoi(r.em.namSinh), lop: chuoi(r.em.lop) },
+    em: { ...r.em, sbd: chuoi(r.em.sbd), hoTen: chuoi(r.em.hoTen), namSinh: chuoi(r.em.namSinh), lop: chuoi(r.em.lop), trangThai: chuoi(r.em.trangThai) },
     chuyenDe,
     ca: (r.ca || []).map((c: CaCuaEm) => ({ ...c, maCa: String(c.maCa) })),
     caGanNhat: r.caGanNhat ? { ...r.caGanNhat, maCa: String(r.caGanNhat.maCa) } : null,

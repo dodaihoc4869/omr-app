@@ -292,6 +292,11 @@ export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
                             SBD {e.sbd}
                             {!e.hoTen && ' · chưa có tên'}
                             {e.trangThai === 'ngoai_danh_sach' && ' · ngoài danh sách'}
+                            {e.trangThai === 'da_nghi' && (
+                              <span className="font-bold" style={{ color: 'var(--do)', marginLeft: 6 }}>
+                                · Đã nghỉ
+                              </span>
+                            )}
                           </small>
                         </span>
                       </span>

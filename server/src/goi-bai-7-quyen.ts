@@ -7,7 +7,7 @@ export function sqlQuyetDinhNhan7(goi: string, sbd: string): string {
 
 /** Đã JOIN lớp hiệu lực và tick còn hoạt động ở nơi gọi; không sửa lịch sử của em khóa/chuyển lớp. */
 export const sqlEmDangNhan7 = (em: string, goi: string, hs: string) =>
-  `COALESCE(${hs}.trang_thai,'')<>'khoa' AND ${sqlQuyetDinhNhan7(goi, `${em}.sbd`)}`
+  `COALESCE(${hs}.trang_thai,'') NOT IN ('khoa', 'da_nghi') AND ${sqlQuyetDinhNhan7(goi, `${em}.sbd`)}`
 
 /** Khóa ghi tính sẵn/cấp phiên từ ảnh đọc trước: chỉ cần một gói ngừng nhận thì không ghi bản kế hoạch cũ. */
 export function sqlCacGoiConNhan7(ids: string, sbd: string, tenLop: string): string {

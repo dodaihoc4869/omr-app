@@ -207,7 +207,14 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
 
   const em = await env.DB.prepare(
-    `SELECT d.sbd, d.ho_ten, d.nam_sinh, d.lop FROM danh_sach d WHERE d.sbd = ?`,
+    `SELECT COALESCE(d.sbd, h.sbd) AS sbd,
+            COALESCE(d.ho_ten, h.ho_ten) AS ho_ten,
+            COALESCE(d.nam_sinh, h.nam_sinh) AS nam_sinh,
+            COALESCE(d.lop, h.lop) AS lop,
+            h.trang_thai
+       FROM (SELECT ? AS sbd) s
+       LEFT JOIN danh_sach d ON d.sbd = s.sbd
+       LEFT JOIN hoc_sinh h ON h.sbd = s.sbd`,
   )
     .bind(sbd)
     .first<Record<string, unknown>>()
@@ -307,6 +314,7 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
       hoTen: chuoi(em?.ho_ten),
       namSinh: chuoi(em?.nam_sinh),
       lop: chuoi(em?.lop),
+      trangThai: chuoi(em?.trang_thai),
     },
     chuyenDe: (rCd.results ?? []).map((x) => {
       const soCau = Number(x.so_cau) || 0
@@ -1252,6 +1260,32 @@ export async function xoaEm(env: Env, b: Record<string, unknown>): Promise<Recor
     env.DB.prepare('DELETE FROM danh_sach WHERE sbd = ?').bind(sbd),
   ])
   return { ok: true, daXoaKhoiDanhSach: (d?.meta?.changes ?? 0) > 0 }
+}
+
+/** Đánh dấu nghỉ học một chiều; giữ nguyên tài khoản, điểm và lịch sử. */
+export async function danhDauNghiHoc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const sbd = chuoi(b.sbd).trim()
+  if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
+  if (b.nghi === false) return { ok: false, error: 'Chưa hỗ trợ khôi phục đi học lại' }
+  const em = await env.DB.prepare(
+    `SELECT h.trang_thai FROM (SELECT sbd FROM danh_sach WHERE sbd = ? UNION SELECT sbd FROM hoc_sinh WHERE sbd = ?) e
+     LEFT JOIN hoc_sinh h ON h.sbd = e.sbd`,
+  ).bind(sbd, sbd).first<{ trang_thai: string | null }>()
+  if (!em) return { ok: false, error: 'Không tìm thấy học sinh' }
+  if (em.trang_thai === 'khoa') return { ok: false, error: 'Học sinh đang bị khóa; không đổi trạng thái' }
+  if (em.trang_thai === 'da_nghi') return { ok: true, sbd, daNghi: true, trangThai: 'da_nghi' }
+  await env.DB.batch([
+    env.DB.prepare(
+      `INSERT INTO hoc_sinh (sbd, ho_ten, nam_sinh, lop, trang_thai, cap_nhat_luc)
+       SELECT sbd, ho_ten, nam_sinh, lop, 'da_nghi', ? FROM danh_sach WHERE sbd = ?
+       ON CONFLICT(sbd) DO UPDATE SET trang_thai = 'da_nghi', cap_nhat_luc = excluded.cap_nhat_luc
+       WHERE COALESCE(hoc_sinh.trang_thai,'') <> 'khoa'`,
+    ).bind(NAY(), sbd),
+    env.DB.prepare("UPDATE hoc_sinh SET trang_thai = 'da_nghi', cap_nhat_luc = ? WHERE sbd = ? AND COALESCE(trang_thai,'') <> 'khoa'").bind(NAY(), sbd),
+  ])
+  const sau = await env.DB.prepare('SELECT trang_thai FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ trang_thai: string }>()
+  if (sau?.trang_thai !== 'da_nghi') return { ok: false, error: 'Trạng thái đã thay đổi; hãy tải lại hồ sơ' }
+  return { ok: true, sbd, daNghi: true, trangThai: 'da_nghi' }
 }
 
 export async function dsEmDangKy(env: Env): Promise<Record<string, unknown>> {
