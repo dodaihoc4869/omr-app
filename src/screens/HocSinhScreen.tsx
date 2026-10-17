@@ -193,7 +193,7 @@ export default function HocSinhScreen() {
       const res = await danhDauNghiHocApi(cauHinh.url, cauHinh.mat, sbd)
       if (res.ok) {
         showToast(`Đã đánh dấu SBD ${sbd} đã nghỉ học`, 'success')
-        setHoSo((cu) => (cu ? { ...cu, em: { ...cu.em, trangThai: res.trangThai } } : cu))
+        setHoSo((cu) => (cu?.em.sbd === sbd ? { ...cu, em: { ...cu.em, trangThai: res.trangThai } } : cu))
         setDs((cu) => (cu ?? []).map((e) => (e.sbd === sbd ? { ...e, trangThai: res.trangThai } : e)))
       } else {
         showToast(res.error || 'Không cập nhật được trạng thái', 'error')

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-const m=vi.hoisted(()=>({ghi:vi.fn(),toast:vi.fn(),trangThai:''}))
-vi.mock('../src/store/appStore',()=>({useAppStore:(sel:(s:Record<string,unknown>)=>unknown)=>sel({sbdDangXem:'11035',moHoSoEm:vi.fn(),showToast:m.toast,setScreen:vi.fn(),moChiTietCa:vi.fn(),datSbdGiaoRieng:vi.fn()})}))
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+const m=vi.hoisted(()=>({ghi:vi.fn(),toast:vi.fn(),trangThai:'',sbd:'11035'}))
+vi.mock('../src/store/appStore',()=>({useAppStore:(sel:(s:Record<string,unknown>)=>unknown)=>sel({sbdDangXem:m.sbd,moHoSoEm:vi.fn(),showToast:m.toast,setScreen:vi.fn(),moChiTietCa:vi.fn(),datSbdGiaoRieng:vi.fn()})}))
 vi.mock('../src/lib/exam-db',()=>({loadScriptUrl:async()=>'https://may-chu-thu',loadTeacherSecret:async()=>'ma-thu'}))
-vi.mock('../src/lib/exam-api',async(goc)=>({...await goc<Record<string,unknown>>(),danhSachEm:async()=>[],hoSoEm:async()=>({em:{sbd:'11035',hoTen:'Nguyễn Thành Đạt',namSinh:'2010',lop:'11',trangThai:m.trangThai},ca:[],chuyenDe:[]}),danhDauNghiHocApi:(...a:unknown[])=>m.ghi(...a)}))
+vi.mock('../src/lib/exam-api',async(goc)=>({...await goc<Record<string,unknown>>(),danhSachEm:async()=>[],hoSoEm:async(_url:string,q:{sbd:string})=>({em:{sbd:q.sbd,hoTen:'Nguyễn Thành Đạt',namSinh:'2010',lop:'11',trangThai:m.trangThai},ca:[],chuyenDe:[]}),danhDauNghiHocApi:(...a:unknown[])=>m.ghi(...a)}))
 vi.mock('../src/lib/ten-lop-thay',()=>({useLopThay:()=>({ds:null,tenLopCua:(_s:string,lop:string)=>lop})}))
 vi.mock('../src/lib/hoc-phi',async(goc)=>({...await goc<Record<string,unknown>>(),taiHocPhi:async()=>new Map()}))
 vi.mock('../src/screens/ToanCanhEmScreen',()=>({default:()=>null}))
@@ -13,7 +13,7 @@ vi.mock('../src/components/NutBaiTapPdf',()=>({default:()=>null}))
 vi.mock('../src/components/KhoiTienBo',()=>({default:()=>null}))
 vi.mock('../src/components/KhoiHoSoHocTap',()=>({default:()=>null}))
 const {default:HocSinhScreen}=await import('../src/screens/HocSinhScreen')
-beforeEach(()=>{m.trangThai='';m.ghi.mockReset();m.toast.mockReset()})
+beforeEach(()=>{m.sbd='11035';m.trangThai='';m.ghi.mockReset();m.toast.mockReset()})
 afterEach(cleanup)
 describe('Nút nghỉ học trong hồ sơ',()=>{
   it('phải xác nhận đúng tên trước khi ghi; hủy không ghi',async()=>{
@@ -39,4 +39,15 @@ describe('Nút nghỉ học trong hồ sơ',()=>{
     r.unmount();m.trangThai='da_nghi';render(<HocSinhScreen/>)
     expect((await screen.findByRole('button',{name:'Đã nghỉ'}) as HTMLButtonElement).disabled).toBe(true)
   })
+  it('đổi sang hồ sơ em khác khi đang lưu không gán nhãn nghỉ nhầm người',async()=>{
+    let xong!:(v:unknown)=>void
+    m.ghi.mockImplementation(()=>new Promise(r=>{xong=r}))
+    const r=render(<HocSinhScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Nghỉ học'}));fireEvent.click(screen.getByRole('button',{name:'Đánh dấu nghỉ học'}))
+    m.sbd='12129';r.rerender(<HocSinhScreen/>)
+    await screen.findByText('#12129')
+    await act(async()=>{xong({ok:true,sbd:'11035',daNghi:true,trangThai:'da_nghi'})})
+    expect(screen.queryByRole('button',{name:'Đã nghỉ'})).toBeNull()
+    expect(screen.getByRole('button',{name:'Nghỉ học'})).toBeTruthy()
+  })
+
 })
