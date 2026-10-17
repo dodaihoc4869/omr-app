@@ -79,10 +79,10 @@ export type KetQuaHoiThay =
 /** Em đang làm câu mà phần hỏi Thầy chưa bật cho em ⇒ lời nhắc (không mở lời giải trước khi em làm xong). */
 export const CHU_LAM_XONG = 'Em làm xong câu này rồi bấm Hỏi thầy để xem lời giải nhé.'
 
-export async function hoiThay(qid: string, nguon: string, chiHoi = false): Promise<KetQuaHoiThay> {
+export async function hoiThay(qid: string, nguon: string, chiHoi = false, luotId?: string): Promise<KetQuaHoiThay> {
   const token = docTokenHs()
   if (!token) return { ok: false, loi: 'Em đăng nhập lại để hỏi thầy.' }
-  const j = await goiHs('/hs/hoi-thay', chiHoi ? { token, qid, nguon, chiHoi: true } : { token, qid, nguon })
+  const j = await goiHs('/hs/hoi-thay', { token, qid, nguon, ...(chiHoi ? { chiHoi: true } : {}), ...(luotId ? { luotId } : {}) })
   if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
   if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được lời giải.'), khoa: j.khoa as 'dang_kiem_tra' | 'ca_chua_cong_bo' | undefined }
   const hoiThem = j.hoiThem === true

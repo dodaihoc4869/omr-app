@@ -21,6 +21,7 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { coCaDangMo } from './ca-dang-mo'
 import { protectedQuestions } from './game-v2-bank'
 import { qidGoc } from './srs2-d1'
+import { cauHoiThayTuLuyen } from './tu-luyen-hoi-thay'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 import {
   bamCau, boCua, cauTrongGoi, chuHtml, dauVao, deHtml, gonHoSo, kiemHoSo, laHoSoSach, lopCua, loaiCau, tangCau,
@@ -575,7 +576,11 @@ function loiGiaiChu(c: CauKho) {
 export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: string) => Promise<boolean>; sau?: (viec: Promise<unknown>) => void } = {}) {
   const bang = damBaoBangLoiGiai(env)
   const { sbd, xong } = await gameIdentityHaiBuoc(env, b) // bước 1 không chạm D1: token hỏng ⇒ ném ngay như cũ
-  const qid = qidGoc(str(b.qid)) // câu game có hậu tố "#n" cho lượt lặp
+  const cauTrongLuot = b.nguon === 'tu_luyen' && b.luotId
+    ? await cauHoiThayTuLuyen(env, sbd, str(b.luotId), str(b.qid)).catch(() => null)
+    : str(b.qid)
+  if (!cauTrongLuot) { await Promise.all([bang, xong]); return { ok: false, error: 'Không tìm thấy câu này trong lượt luyện của em.' } }
+  const qid = qidGoc(cauTrongLuot) // mã nội dung hiển thị; mã chấm/tiến độ gốc giữ nguyên
   const nguon = str(b.nguon).slice(0, 40) || 'luyen'
   if (!qid) { await Promise.all([bang, xong]); return { ok: false, error: 'Thiếu câu cần hỏi.' } }
   const nay = Date.now()

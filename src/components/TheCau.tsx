@@ -68,7 +68,7 @@ interface BaseProps {
   /** Nút "Hỏi thầy". THẦY 13/10 ("nút hỏi bài ở tất cả các câu… dễ nhìn thấy… hỏi bài thầy mọi lúc"): ngay DƯỚI phần trả lời, mọi chế độ;
    * chế độ `thi` (em chưa trả lời) ⇒ chỉ Hỏi thầy, Thầy gợi hướng không đáp án. "Lời giải từng bước" chỉ ở chế độ xem lại khi câu có lời giải
    * (lệnh 30/09). KHÔNG truyền trong màn thi, Gọi lên bảng, lúc làm bài kiểm tra cá nhân. */
-  hoiThay?: { qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean }
+  hoiThay?: { qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean; luotId?: string }
 }
 
 interface McqProps extends BaseProps {
@@ -475,6 +475,7 @@ export default function TheCau(props: TheCauProps) {
             Đang làm (`thi`) ⇒ chỉ Hỏi thầy, Thầy gợi hướng không đáp án; xem lại + có lời giải ⇒ thêm Lời giải từng bước (lệnh 30/09). */}
         {props.hoiThay && (
           <NutHoiThay gon qid={props.hoiThay.qid} nguon={props.hoiThay.nguon} onHoi={props.hoiThay.onHoi}
+            luotId={props.hoiThay.luotId} soCau={props.hoiThay.luotId ? stt : undefined}
             dangLam={!xemLai} chi={xemLai && coLoiGiai(props) ? undefined : 'hoi'} />
         )}
         {xemLai && <LoiGiai props={props} nhan={props.nhanLoiGiai} />}

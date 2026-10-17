@@ -379,14 +379,15 @@ async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiD
 
 export const CAU_NGOAI_PHAM_VI = 'Ở đây Thầy chỉ trả lời về câu em đang xem. Em hỏi về đề, cách giải hay chỗ em sai ở câu này nhé.'
 
-/** Đọc đầu ra JSON `{lienQuan, traLoi}`. Không phải JSON đúng khuôn ⇒ coi cả chữ là lời trả lời (mô hình lỡ khuôn, vẫn trong ngữ cảnh một câu). */
+/** Đọc khuôn chữ cũ; JSON hỏng/sai khuôn không được rơi xuống đường hiển thị chữ. */
 export function tachKetQua(chu: string): { lienQuan: boolean; traLoi: string } {
   const s = str(chu).trim().replace(/^```(?:json)?\s*|\s*```$/g, '')
   try {
     const o = JSON.parse(s) as Obj
-    if (o && typeof o === 'object' && typeof o.lienQuan === 'boolean') return { lienQuan: o.lienQuan, traLoi: str(o.traLoi) }
+    if (o && typeof o === 'object' && !Array.isArray(o) && typeof o.lienQuan === 'boolean' && typeof o.traLoi === 'string') return { lienQuan: o.lienQuan, traLoi: o.traLoi }
+    return { lienQuan: true, traLoi: '' }
   } catch { /* lỡ khuôn */ }
-  return { lienQuan: true, traLoi: s }
+  return { lienQuan: true, traLoi: /^[{\[]|"(?:lienQuan|yChinh|soDo|traLoi)"\s*:/.test(s) ? '' : s }
 }
 
 /** Ép đúng quy tắc trình bày của Thầy dù mô hình lỡ tay: bỏ markdown, gạch ngang dài, emoji; gọn dòng trống; cắt 2.000 ký tự. */
@@ -410,6 +411,7 @@ const LOI_CHO_EM: Record<string, string> = {
   rong: 'Câu này Thầy chưa trả lời tự động được. Em mang lên lớp hỏi Thầy nhé.',
   loi_ai: 'Phần hỏi thêm Thầy đang gặp lỗi. Em thử lại sau ít phút.',
   mang: 'Phần hỏi thêm Thầy đang gặp lỗi. Em thử lại sau ít phút.',
+  dinh_dang: 'Câu trả lời vừa bị lỗi hiển thị. Em gửi lại câu hỏi, lượt này chưa tính vào số lần hỏi.',
 }
 
 // ---------------------------------------------------------------- lệnh /hs/hoi-tro-ly
@@ -603,6 +605,11 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
     traLoiAi = cauTruc ? chuPhang(cauTruc) : dangLam && str(ct.o.yChinh).trim() ? CAU_CHUA_NOP : ''
   } else {
     const tach = tachKetQua(kq.chu)
+    if (tach.lienQuan && !tach.traLoi.trim()) {
+      await env.DB.prepare('INSERT INTO hoi_tro_ly (sbd, qid, ngay_vn, luc, nguon, cau_hoi, model, ms, loi) VALUES (?,?,?,?,?,?,?,?,?)')
+        .bind(sbd, nc.qid, ngay, luc, nguon, cauHoi, kq.model ?? cfg.model, ms, 'dinh_dang: JSON không hoàn chỉnh hoặc sai khuôn').run()
+      return { ok: false, ma: 'dinh_dang', conLai: khongTran ? cfg.tranNgay : Math.max(0, cfg.tranNgay - n), error: LOI_CHO_EM.dinh_dang }
+    }
     lienQuan = tach.lienQuan
     const chuCu = chanQuyKetHoiThay(lamSachTraLoi(tach.traLoi), baiNhap)
     traLoiAi = dangLam ? chanLoDapAn(chuCu, nc.cau.phan, nc.cau.dapAn, nc.cau.pa) : chuCu
