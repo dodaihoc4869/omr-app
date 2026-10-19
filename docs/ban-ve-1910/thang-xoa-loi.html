@@ -91,7 +91,7 @@ html,body{margin:0;background:var(--nen)}
 .tcl-man .tcl-the[data-nhom='xoa']{--a:color-mix(in srgb,var(--xanh) 55%,var(--muc));background:color-mix(in srgb,var(--the) 55%,var(--nen))}
 .tcl-the > .ht2-dong-bt{grid-area:bt}
 .tcl-the-chu{grid-area:chu;display:flex;flex-direction:column;gap:2px;min-width:0}
-.tcl-the-nut{grid-area:nut;min-height:44px;min-width:72px;padding:0 18px;border-radius:12px;font-size:15px;font-weight:750;border-color:color-mix(in srgb,var(--lg-nhan) 45%,var(--vien));color:var(--lg-nhan)}
+.tcl-man .tcl-the-nut{grid-area:nut;min-height:44px;min-width:72px;padding:0 18px;border-radius:12px;font-size:15px;font-weight:700;border-color:color-mix(in srgb,var(--lg-nhan) 45%,var(--vien));color:var(--lg-nhan)}
 .tcl-the-duoi{grid-area:duoi;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-width:0}
 .tcl-the-tt{display:flex;align-items:flex-start;gap:6px;min-width:0;font-size:14px;font-weight:750;line-height:1.45;color:var(--a);font-variant-numeric:tabular-nums}
 .tcl-the-tt svg{flex:none;margin-top:2px}
@@ -101,7 +101,7 @@ html,body{margin:0;background:var(--nen)}
 .tcl-thang{display:flex;align-items:center;margin:0;padding:6px 12px;list-style:none;border-radius:12px;background:var(--the-2);min-width:0;max-width:100%}
 .tcl-the[data-nhom='cho'] .tcl-thang,.tcl-the[data-nhom='xoa'] .tcl-thang{background:color-mix(in srgb,var(--the-2) 70%,var(--the))}
 .tcl-thang li{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;line-height:1.6;color:var(--nhat);white-space:nowrap}
-.tcl-thang li + li::before{content:"";flex:none;width:16px;height:2px;margin:0 6px 0 2px;border-radius:2px;background:var(--vien-dam)}
+.tcl-thang li + li::before{content:"";flex:none;width:14px;height:2px;margin:0 6px;border-radius:2px;background:var(--vien-dam)}
 .tcl-thang li[data-tt='xong'] + li::before{background:var(--a)}
 .tcl-thang i{flex:none;display:grid;place-items:center;width:16px;height:16px;border-radius:50%;border:2px solid var(--vien-dam);background:var(--the)}
 .tcl-thang li[data-tt='xong']{color:var(--muc)}
@@ -134,6 +134,7 @@ html,body{margin:0;background:var(--nen)}
  .tcl-bo-cuc{grid-template-columns:380px minmax(0,1fr);gap:32px}
  .tcl-tong{padding:28px}
  .tcl-so{min-width:108px;min-height:108px}.tcl-so b{font-size:52px}
+ .tcl-the-duoi{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center}
 }
 @media (min-width:1100px) and (min-height:640px){.tcl-bo-cuc > .tcl-tong{position:sticky;top:96px}}
 /* ── Điện thoại dọc ── */

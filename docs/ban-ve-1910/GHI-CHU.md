@@ -52,3 +52,29 @@ Quy trình 4 bước (`docs/quy-trinh-4-buoc-1310.md`): đây là bước 2 (đ�
 6. **Chi phí máy chủ.** +1 lượt đọc song song (không thêm đợt chờ), không ghi thêm; tính luật ở máy chủ vài ms/em. Không có đáp án nào xuống máy trước khi nộp.
 7. **Nghiệm thu đo bằng máy.** `tests/tu-sua-thang-xoa-loi-1910.test.ts` (3 bước · sai về bước 2 · sai 2 lần liền ⇒ cần thầy · đủ 3 bước ⇒ rời nhóm còn lỗi · đếm "làm được ngay / xoá trong 3 ngày" đúng) · `tests/tu-sua-thang-xoa-loi-giao-dien-1910.test.tsx` · `npm run kiem:toc-do` 0 đỏ · `npm run kiem:mau-giu` 0 · ảnh Chromium 0 lỗi / 0 tràn / 0 đích < 44 px.
    **Làn:** Tự sửa lỗi là làn Claude.
+
+---
+## Ảnh
+Bản vẽ: `chua-tat-ca.html` (F1, chỉ bảng `--gvm-*` của app thầy) · `thang-xoa-loi.html` (F2, đúng bộ biến `tokens.css` mà `tu-chua.css` đang dùng). Ảnh trong `anh/`, chụp bằng `node scripts/chup-ban-ve-1910.mjs` (Chromium thật). Số trong ảnh là số GIẢ.
+
+- `01-chua-tat-ca-may-tinh.jpg` — máy tính 1440, sáng: thẻ "Chữa tất cả · 18 em có mặt" đầu khối, 4 ô số một hàng, mở "thứ tự 47 câu" (thấy nhóm 1 và 2).
+- `02-chua-tat-ca-may-tinh-toi.jpg` — như 01, nền tối.
+- `03-chua-tat-ca-doc.jpg` — điện thoại dọc 390, sáng, chụp cả trang: 4 ô số xếp dọc, nút chính, danh sách xem trước đủ 4 nhóm, phần "Hoặc chiếu từng bài" bên dưới.
+- `04-chua-tat-ca-ngang.jpg` — điện thoại ngang 844×390, sáng: cuộn tới thẻ, 4 ô số một hàng, danh sách đang gập.
+- `05-chua-tat-ca-chua-diem-danh-doc.jpg` — điện thoại dọc: chưa điểm danh, thẻ mờ "Điểm danh xong là chiếu tất cả được" + nút chữ "Mở điểm danh".
+- `06-chua-tat-ca-rong-doc-toi.jpg` — điện thoại dọc, tối: rỗng ("Các em có mặt không còn câu sai…").
+- `07-thang-xoa-loi-doc.jpg` — điện thoại dọc 390, sáng, cả trang: thẻ tổng "Còn 12 lỗi" + 3 dòng + nút "Sửa lỗi đến lượt · 3"; nhóm Làm được ngay (3), Chờ tới lượt (3/9 thẻ), Đã xoá (gập).
+- `08-thang-xoa-loi-doc-toi.jpg` — như 07, nền tối.
+- `09-thang-xoa-loi-ngang.jpg` — điện thoại ngang 844×390: hai cột, thẻ tổng trái (nút chính trong màn đầu), danh sách phải.
+- `10-thang-xoa-loi-may-tinh.jpg` — máy tính 1440, cả trang: hai cột, thang 3 chấm cạnh dòng chính; nhóm Đã xoá mở để thấy dòng "Đã xoá 18/10 · kiểm nhẹ lại 01/11".
+- `11-thang-xoa-loi-rong-doc.jpg` — điện thoại dọc: rỗng ("Không còn lỗi nào cần sửa. Lỗi mới hiện ở đây sau khi em làm sai.").
+- `12-thang-xoa-loi-mat-mang-doc-toi.jpg` — điện thoại dọc, tối: dải "Đang mất mạng", giữ bản vừa xem.
+
+**Soát máy (19/10, 12 khung): 0 lỗi trang · 0 tràn · 0 đích < 44 px** · mỗi khung đúng 1 nút chính.
+
+Ghi chú khi vẽ (thầy xem khi duyệt):
+- Ngày: đặc tả ghi "19:30 Thứ Ba 21/10", nhưng 21/10/2026 là Thứ Tư. Bản vẽ lấy "bây giờ" là 21:05 Thứ Hai 19/10 và ghi "19:30 Thứ Ba 20/10".
+- F1: thẻ có dữ liệu mà thầy lại chọn một bài ở "Hoặc chiếu từng bài" thì nút "Chiếu lên bảng" phải đổi thành nút viền (mỗi màn một nút chính). Ảnh vẽ lúc chưa chọn bài. Khối A "Học sinh cần chữa" (nằm trên khối này) không vẽ.
+- F1: danh sách xem trước hiện 2–3 câu đầu mỗi nhóm, dòng "Còn N câu nữa" và nút "Xem đủ 47 câu". Lúc mở, nút chữ đổi thành "Ẩn thứ tự 47 câu" (đặc tả chưa ghi chữ này). Nhóm 3–4 ghi mức khó + "18/18 em làm đúng" thay cho số em sai.
+- F2: 3 lỗi làm được ngay gồm 1 lỗi "Thầy sẽ chữa trên lớp" (sai 2 lần liền ⇒ về bước Sửa). Nhóm Chờ tới lượt hiện 3/9 thẻ + nút "Xem cả 9 lỗi đang chờ".
+- Chưa vẽ: đang tải, lỗi tải, "Điểm danh vừa đổi" (F1); đang tải, lỗi tải, "câu vừa được thầy sửa" (F2).

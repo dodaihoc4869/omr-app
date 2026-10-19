@@ -71,8 +71,10 @@ for (const [ten, tep, hash, w, h, caTrang] of KHUNG) {
       const chinh = document.querySelectorAll('.gvv2-nut-chinh, .ht-nut-chinh').length
       return { tran, nho, chinh, cao: de.scrollHeight }
     })
+    // Cả trang: soát ở khổ thật trước, rồi kéo khung nhìn bằng chiều cao trang để thanh đáy cố định nằm đúng đáy ảnh (fullPage để nó lơ lửng giữa trang).
+    if (caTrang) { await t.setViewportSize({ width: w, height: kq.cao }); await t.waitForTimeout(150) }
     q = 80
-    for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q, fullPage: caTrang }); if (buf.length <= 150_000 || q <= 50) break; q -= 5 }
+    for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q }); if (buf.length <= 150_000 || q <= 50) break; q -= 5 }
     await ctx.close()
     if (buf.length <= 150_000 || dpr <= 1) break
     dpr = Math.max(1, Math.round((dpr - 0.25) * 100) / 100)

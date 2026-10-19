@@ -167,14 +167,15 @@ button{cursor:pointer}
 .gvv2-cta-o .nhan{font-size:15px;font-weight:800;line-height:1.3}
 .gvv2-cta-o .mo-ta{font-size:12px;line-height:1.4;opacity:.9}
 .gvv2-cta-cuoi{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
-.gvv2-cta-tong{flex:1 1 260px;min-width:0;margin:0;font-size:var(--t-than);color:var(--gvm-chu-2)}
+.gvv2-cta-trai{flex:1 1 320px;min-width:0;display:grid;gap:4px}
+.gvv2-cta-tong{margin:0;font-size:var(--t-than);color:var(--gvm-chu-2)}
 .gvv2-cta-tong b{color:var(--gvm-chu);font-weight:800;font-size:17px}
 .gvv2-cta-nut{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 .gvv2-cta-nut .gvv2-nut-chu{order:1}
 .gvv2-cta-nut .gvv2-nut-chinh{order:2;min-height:var(--nut-chinh-cao);padding:0 24px;font-size:16px}
 .gvv2-cta-nut .gvv2-nut-chu svg{transition:transform 200ms}
 .gvv2-cta-nut .gvv2-nut-chu[aria-expanded='true'] svg{transform:rotate(180deg)}
-.gvv2-cta-goi-y{margin:-4px 0 0;font-size:var(--t-phu);line-height:1.5;color:var(--gvm-chu-2)}
+.gvv2-cta-goi-y{margin:0;font-size:var(--t-phu);line-height:1.5;color:var(--gvm-chu-2)}
 .gvv2-cta-goi-y b{color:var(--gvm-chu);font-weight:800}
 /* danh sách xem trước thứ tự chiếu */
 .gvv2-cta-ds .ten{font-size:var(--t-than);font-weight:700;color:var(--gvm-chu);overflow-wrap:anywhere}
@@ -187,6 +188,14 @@ button{cursor:pointer}
 .gvv2-cta-ds-cuoi{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px}
 .gvv2-cta-ds-cuoi .gvv2-nut-chu{margin-left:-12px}
 .gvv2-cta-ds-cuoi span{font-size:var(--t-phu);color:var(--gvm-chu-3)}
+/* máy tính: mỗi dòng một hàng (tên dạng + nhãn cùng hàng) để thấy nhiều câu hơn */
+@media (min-width:1024px){
+ .gvv2-cta-ds .gvv2-ttc-dong{min-height:50px;padding:7px 18px}
+ .gvv2-cta-ds .gvv2-ttc-cau{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+ .gvv2-cta-ds .gvv2-ttc-stt{width:32px;height:32px}
+ .gvv2-cta-ds .gvv2-ttc-sai[data-thanh]{grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:10px}
+ .gvv2-cta-them{padding:7px 18px 7px 70px}
+}
 /* chưa điểm danh: thẻ mờ · rỗng */
 .gvv2-cta[data-mo]{border-style:dashed;border-color:var(--gvm-vien);background:var(--gvm-mat-2)}
 .gvv2-cta[data-mo] .gvv2-cta-bt{background:var(--gvm-mat);color:var(--gvm-chu-3);border:1px solid var(--gvm-vien)}
@@ -210,6 +219,7 @@ button{cursor:pointer}
  .gvv2-ttc-dong{grid-template-columns:32px minmax(0,1fr);gap:8px 12px;padding:12px}
  .gvv2-ttc-stt{width:32px;height:32px}
  .gvv2-ttc-sai{grid-column:2}
+ .gvv2-ttc-sai[data-thanh]{grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:10px}
  .gvv2-ttc-cuoi{padding:12px}
  .gvv2-ttc-cuoi>.gvv2-nut-chinh{flex:1 0 100%}
  /* thẻ mới: một cột, 4 ô số xếp dọc (số trái · nhãn phải) */
@@ -313,7 +323,6 @@ const DONG = [
   [0, 'Amine — bậc amine', 7, 'Bài 8. Amine', 'I', false, 9],
   [0, 'Ester — thuỷ phân', 3, 'Bài 6. Ester – Lipid', 'II', false, 7],
   [0, 'Bài toán hỗn hợp kim loại + HNO<sub>3</sub>', 2, 'Bài 14. Kim loại', 'III', true, 7],
-  [0, 'Peptide — đếm liên kết', 11, 'Bài 9. Amino acid – Peptide', 'III', true, 6],
   [1, 'Điện phân dung dịch', 5, 'Bài 16. Điện phân', 'III', true, 5],
   [1, 'Ăn mòn kim loại — pin điện hoá', 9, 'Bài 15. Pin điện', 'I', false, 4],
   [2, 'Chất béo — chỉ số acid', 18, 'Bài 6. Ester – Lipid', 'III', true, 'Vận dụng cao'],
@@ -321,13 +330,13 @@ const DONG = [
   [3, 'Carbohydrate — phản ứng tráng bạc', 8, 'Bài 7. Carbohydrate', 'I', false, 'Vận dụng cao'],
   [3, 'Amine — so sánh lực base', 10, 'Bài 8. Amine', 'II', false, '2 sao'],
 ]
-const THEM = { 0: 'Còn 17 câu nữa, xếp theo số em sai giảm dần (5 → 1 em)', 1: 'Còn 7 câu nữa, xếp theo số em chưa gặp giảm dần', 2: 'Còn 6 câu nữa', 3: 'Còn 7 câu nữa' }
+const THEM = { 0: 'Còn 18 câu nữa, xếp theo số em sai giảm dần (7 → 1 em)', 1: 'Còn 7 câu nữa, xếp theo số em chưa gặp giảm dần', 2: 'Còn 6 câu nữa', 3: 'Còn 7 câu nữa' }
 
 const dong = (d, stt) => {
   const [n, ten, cau, bai, phan, tinh, chi] = d, nh = NHOM[n]
   let phai
-  if (n === 0) phai = `<span class="gvv2-ttc-sai" data-cao="${chi / SO_EM >= 0.3}"><b class="gvv2-so">${chi}/${SO_EM} em sai</b><span class="gvv2-ttc-thanh" aria-hidden="true"><i style="width:${Math.round(chi / SO_EM * 100)}%"></i></span></span>`
-  else if (n === 1) phai = `<span class="gvv2-ttc-sai" data-mau="hp"><b class="gvv2-so">${chi} em chưa làm</b><span class="gvv2-ttc-thanh" aria-hidden="true"><i style="width:${Math.round(chi / SO_EM * 100)}%"></i></span></span>`
+  if (n === 0) phai = `<span class="gvv2-ttc-sai" data-thanh data-cao="${chi / SO_EM >= 0.3}"><b class="gvv2-so">${chi}/${SO_EM} em sai</b><span class="gvv2-ttc-thanh" aria-hidden="true"><i style="width:${Math.round(chi / SO_EM * 100)}%"></i></span></span>`
+  else if (n === 1) phai = `<span class="gvv2-ttc-sai" data-thanh data-mau="hp"><b class="gvv2-so">${chi} em chưa làm</b><span class="gvv2-ttc-thanh" aria-hidden="true"><i style="width:${Math.round(chi / SO_EM * 100)}%"></i></span></span>`
   else phai = `<span class="gvv2-ttc-sai"><b>${chi}</b><small class="gvv2-so">${SO_EM}/${SO_EM} em làm đúng</small></span>`
   return `<li class="gvv2-ttc-dong"><span class="gvv2-ttc-stt gvv2-so">${stt}</span><div class="gvv2-ttc-cau"><span class="ten">${ten}</span>
    <span class="gvv2-ttc-meta"><span class="gvv2-cta-nhom" data-mau="${nh.ma}">${nh.ten}</span><span class="gvv2-ttc-loai" data-phan="${phan}">${TEN_PHAN[phan]}</span>${tinh ? '<span class="gvv2-ttc-the" data-loai="tinh">Có tính toán</span>' : ''}<span>Câu ${cau} · ${bai}</span></span></div>${phai}</li>`
@@ -352,13 +361,13 @@ function theCo() {
     ${NHOM.map((n, i) => `<li class="gvv2-cta-o" data-mau="${n.ma}"><span class="so"><b class="gvv2-so">${n.so}</b><small>câu</small></span><span class="nhan">${i + 1}. ${n.ten}</span><span class="mo-ta">${n.moTa}</span></li>`).join('')}
    </ol>
    <div class="gvv2-cta-cuoi">
-    <p class="gvv2-cta-tong">Tổng <b class="gvv2-so">${tong} câu</b> (câu trùng chỉ tính một lần)</p>
+    <div class="gvv2-cta-trai"><p class="gvv2-cta-tong">Tổng <b class="gvv2-so">${tong} câu</b> (câu trùng chỉ tính một lần)</p>
+     <p class="gvv2-cta-goi-y">Chiếu liền một mạch, thầy dừng lúc nào cũng được. Tờ chiếu giữ <b>Đạt / Chưa đạt</b> · <b>Gọi em khác</b> như Chiếu lên bảng.</p></div>
     <div class="gvv2-cta-nut">
      <button type="button" class="gvv2-nut-chinh"><svg width="20" height="20" aria-hidden="true"><use href="#i-chieu"/></svg>Chiếu tất cả · ${tong} câu</button>
      <button type="button" class="gvv2-nut-chu" aria-expanded="${xem}" aria-controls="cta-ds">${xem ? `Ẩn thứ tự ${tong} câu` : `Xem thứ tự ${tong} câu`}<svg width="18" height="18" aria-hidden="true"><use href="#i-xuong"/></svg></button>
     </div>
    </div>
-   <p class="gvv2-cta-goi-y">Chiếu liền một mạch, thầy dừng lúc nào cũng được. Tờ chiếu giữ <b>Đạt / Chưa đạt</b> · <b>Gọi em khác</b> như Chiếu lên bảng.</p>
    ${ds}
   </section>`
 }
