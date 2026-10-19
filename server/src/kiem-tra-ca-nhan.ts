@@ -195,6 +195,27 @@ async function kiemNguon(env: Env, sbd: string, cs: readonly CauDe[]) {
   for (let i=0;i<cs.length;i++) { const q=cs[i]!.q, current=refs[i]; if (!current?.reviewed || current.version!==q.version || !qua.has(q.qid) || baoVe.has(q.qid) || baoVe.has(q.group) || btvn.has(q.qid) || scope.blocked.includes(q.qid) || scope.types.length && (!q.dang || !scope.types.includes(q.dang))) throw new Error('Một câu của bài đang đổi nguồn hoặc được giữ cho ca kiểm tra. Thầy sẽ xử lý; kết quả đã lưu của em được giữ.') }
 }
 
+const XEM_CHUA_MS = 12 * 3_600_000
+/**
+ * Câu của đề mà em đã xem phần chữa (`loi_giai_hoi`, mọi nguồn) trong khoảng [mở chặng chứa câu − 12 giờ, lúc chặng chốt/hết giờ] ⇒ lần làm trong bài kiểm tra là
+ * CÓ TRỢ GIÚP (thay cho lệnh khoá chặng 12 giờ cũ). Hai lượt đọc song song, chỉ chạy một lần lúc ghi sổ. Lỗi đọc ⇒ coi như không có (như trước khi có luật này).
+ */
+async function trongXemChua12h(env: Env, r: Row, d: ReturnType<typeof de>): Promise<Set<string>> {
+  const qids=d.cau.map(c=>c.q.qid)
+  const [ch,xem]=await Promise.all([
+    env.DB.prepare('SELECT stt,bat_dau,han,chot_luc FROM kiem_tra_ca_nhan_chang WHERE bai_id=?').bind(r.id).all<Row>(),
+    env.DB.prepare('SELECT qid,luc FROM loi_giai_hoi WHERE sbd=? AND qid IN(SELECT value FROM json_each(?))').bind(r.sbd,JSON.stringify(qids)).all<Row>(),
+  ]).catch(()=>[null,null] as const)
+  const khung=new Map<string,[number,number]>()
+  for(const c of ch?.results??[]){
+    const qs=d.chang[Number(c.stt)]?.qids??[],bd=Number(c.bat_dau),het=c.chot_luc!=null?Number(c.chot_luc):Number(c.han)
+    if(Number.isFinite(bd)&&Number.isFinite(het))for(const q of qs)khung.set(q,[bd-XEM_CHUA_MS,het])
+  }
+  const ra=new Set<string>()
+  for(const x of xem?.results??[]){const k=khung.get(s(x.qid)),l=Date.parse(s(x.luc));if(k&&l>=k[0]&&l<=k[1])ra.add(s(x.qid))}
+  return ra
+}
+
 /** Chốt một lần, ghi sổ có receipt ổn định; retry/cron có thể hồi phục sau khi ghi sổ lỗi. */
 export async function chotKtCn(env: Env, r: Row, now: number, hetHan = false) {
   for(let lan=0;!r.nop_luc&&lan<4;lan++) {
@@ -206,7 +227,8 @@ export async function chotKtCn(env: Env, r: Row, now: number, hetHan = false) {
   if(!r.nop_luc)throw new Error('Bản nháp đang cập nhật. Em thử nộp lại để chốt đúng câu trả lời mới nhất.')
   if (Number(r.da_ghi)===1) return r
   const d=de(r), t=tra(r), luc=new Date(Number(r.nop_luc)).toISOString()
-  const events:SuKien[]=d.cau.filter(c=>duTraKt(c.q.phan,t[c.q.qid]??'')).map(c=>({nguon:'game',maNguon:s(r.id),sbd:s(r.sbd),qid:c.q.qid,cauVersion:c.q.version,lan:1,ketQua:dungKt(c.q,t[c.q.qid]!)?1:0,luc,receivedAt:Number(r.nop_luc),assistance:'none',purpose:'de_thu',attemptId:`${s(r.id)}|${c.q.qid}`,maDang:c.q.dang,mucDo:c.q.mucDo??undefined,raw:{answer:t[c.q.qid],kiemTraCaNhan:true,recall:true},...(c.q.phan==='II'?{subitem:ketQuaTungY(t[c.q.qid]!,c.q.correct)}:{})}))
+  const coTroGiup=await trongXemChua12h(env,r,d)
+  const events:SuKien[]=d.cau.filter(c=>duTraKt(c.q.phan,t[c.q.qid]??'')).map(c=>({nguon:'game',maNguon:s(r.id),sbd:s(r.sbd),qid:c.q.qid,cauVersion:c.q.version,lan:1,ketQua:dungKt(c.q,t[c.q.qid]!)?1:0,luc,receivedAt:Number(r.nop_luc),assistance:coTroGiup.has(c.q.qid)?'assisted':'none',purpose:'de_thu',attemptId:`${s(r.id)}|${c.q.qid}`,maDang:c.q.dang,mucDo:c.q.mucDo??undefined,raw:{answer:t[c.q.qid],kiemTraCaNhan:true,recall:true},...(c.q.phan==='II'?{subitem:ketQuaTungY(t[c.q.qid]!,c.q.correct)}:{})}))
   const ghi=await ghiSuKien(env,events)
   if (ghi.ok) { await env.DB.prepare('UPDATE kiem_tra_ca_nhan SET da_ghi=1 WHERE id=? AND nop_luc IS NOT NULL').bind(r.id).run(); r.da_ghi=1 }
   return r
@@ -246,8 +268,10 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   let row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
   if (action==='hoc-tap-ktcn-start') {
     await kiemNguon(env,sbd,cs)
-    const views=await env.DB.prepare('SELECT qid FROM loi_giai_hoi WHERE sbd=? AND qid IN(SELECT value FROM json_each(?)) AND julianday(luc)>julianday(?)-0.5 LIMIT 1').bind(sbd,JSON.stringify(ch.qids),new Date(now).toISOString()).first()
-    if(views)throw new Error('Em vừa xem phần chữa của một câu trong chặng. Hãy quay lại sau ít nhất 12 giờ để kiểm chứng độc lập.')
+    // KHÔNG KHOÁ CHẶNG VÌ "VỪA XEM PHẦN CHỮA" (lỗi 17–18/10 — thầy 19/10 gửi ảnh "Em vừa xem phần chữa… quay lại sau ít nhất 12 giờ" lúc còn 1 giờ 37 phút tới hạn
+    // 24:00, và "Không cho làm chặng 3"): từ 16/10 mỗi câu nộp ở bài thường cũng ghi `loi_giai_hoi` (nguồn 'goi7:sau_nop' — game-v2.ts) ⇒ đề kiểm tra có câu em
+    // vừa làm trong 12 giờ là chặng bị khoá, kể cả chặng ĐÃ MỞ, tới hạn thì chốt 0 câu. Nay em luôn mở/làm tiếp được; câu em xem phần chữa trong 12 giờ trước
+    // khi mở chặng (hoặc trong lúc làm) vẫn tính điểm bài nhưng ghi sổ là CÓ TRỢ GIÚP (`trongXemChua12h` lúc chốt) — không tính là kiểm chứng độc lập.
     await env.DB.prepare(`INSERT OR IGNORE INTO kiem_tra_ca_nhan_chang(bai_id,stt,bat_dau,han) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM kiem_tra_ca_nhan WHERE id=? AND nop_luc IS NULL AND han_luc>?) AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt<>? AND chot_luc IS NULL AND han>?)`).bind(r.id,stt,now,Math.min(Number(r.han_luc),now+ch.giay*1000),r.id,now,r.id,stt,now).run()
     row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
     if (!row) throw new Error('Em hoàn thành chặng đang mở trước nhé.')
