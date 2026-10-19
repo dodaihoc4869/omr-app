@@ -29,5 +29,4 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
-          SOI_NGU: '160' # ký tự ngữ cảnh quanh token lỗi (đề câu hiển thị cho học sinh, không có đáp án)
         run: node --experimental-strip-types scripts/soi-phong-cu-kho.mjs
