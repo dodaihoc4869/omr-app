@@ -8,7 +8,7 @@
 /** Ký tự CHỈ có trong phông TCVN3, không dùng trong chữ Việt Unicode, tiếng Anh hay kí hiệu Hoá thường gặp (loại ×, ·, µ, ½, ø, ö, ü là kí hiệu hợp lệ). */
 const KY_TU_TCVN3 = '¸¶ª«¬¨»®ÆÇËÏÐÑÞß¡¢£¤¥¦'
 const RE_CHU_HOA_GIUA = /[a-zà-ỹ][ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝÖ]/
-const RE_XEN_KE = /[A-Za-zÀ-ỹ]ⁿ[A-Za-zÀ-ỹ]|⁼|₍[A-Za-z¸-ÿ]{3,}₎/
+const RE_XEN_KE = /[A-Za-zÀ-ỹ]ⁿ[A-Za-zÀ-ỹ₀-₉₌]|⁼|₍[A-Za-z¸-ÿ]{3,}₎/
 const RE_NGAT = /[\s→⟶⇌⇄]+/
 
 export type PhongCuTim = { loai: 'tcvn3' | 'xen-ke'; token: string; ngu: string }
@@ -54,11 +54,15 @@ export function giaiMaTcvn3(s: string): string {
 // Hai hàng chữ xếp chồng quanh mũi tên bị đọc theo CỘT ⇒ KHÔNG đảo ngược được bằng luật chung (không biết hàng nào chữ nào) nếu không có từ điển.
 // Chỉ sửa chuỗi ĐÃ ĐỐI CHIẾU bằng tay với câu gốc (khoá = chuỗi bỏ hết khoảng trắng); chuỗi lạ giữ nguyên, để công cụ soi kho báo.
 // Mỗi mục: [nhãn TRÊN mũi tên, nhãn DƯỚI mũi tên] — dạng đúng của sách giáo khoa.
-// "¸nh s¸ng" + "chÊt diÖp lôc (chlorophyll)" xen kẽ theo cột — có trong đề của 3 câu cùng bài (DB-12-B6-D3-III-46, DH-12-C2-B6-III-51, DH-12-C2-B6-DT-III-10).
-// Các dạng vỡ khác (vd "SH⁼⁹⁶%→…", "ch¸ÊⁿthdisÖ¸pⁿlgôc") chỉ còn trong ô GHI CHÚ nội bộ của lời giải, không tới học sinh.
+// Soi toàn kho 19/10 (D1 `game_v2_question`, 15 359 câu / 268 tờ): đúng 5 câu có chữ trên-dưới mũi tên vỡ, thuộc ba dạng — mỗi dạng một nhánh dưới đây:
+//  · "¸nh s¸ng" + "chÊt diÖp lôc (chlorophyll)" xen kẽ theo cột — DB-12-B6-D3-III-46, DH-12-C2-B6-III-51, DH-12-C2-B6-DT-III-10;
+//  · "eⁿzim" / "eⁿzyme": chữ "n" của enzim thành số mũ, dính ngay trước mũi tên — DH-12-C2-B6-DT-III-8, DH-12-C2-B5-DT-III-6 (mũi tên thứ nhất);
+//  · "Heⁿ₌z₈y₀m%e": hàng trên "enzyme" xen hàng dưới "H=80%" — DH-12-C2-B5-DT-III-6 (mũi tên thứ hai).
+// Các dạng vỡ khác ("SH⁼⁹⁶%→…", "ch¸ÊⁿthdisÖ¸pⁿlgôc") chỉ còn trong ô GHI CHÚ nội bộ của lời giải, không tới học sinh.
 // Viết gọn có chủ ý: mô-đun này nằm trong gói MỞ app học sinh (luật tốc độ) — thêm chuỗi đã đối chiếu = thêm một nhánh vào biểu thức dưới.
-const RE_NHAN_XEN_KE = /chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎(\s*→\s*)?/g
+const RE_NHAN_XEN_KE = /\s*(?:(chÊtdiÖp[^→]*₎)|eⁿz(im|yme)|(Heⁿ₌[^→]*%e))\s*→\s*/g
 
-/** Thay chữ xen kẽ ĐÃ BIẾT bằng nhãn đúng: đứng trước mũi tên ⇒ thành `→(trên)(dưới) ` (mũi tên đi theo được nuốt), đứng riêng ⇒ "trên, dưới". */
+/** Thay chữ vỡ ĐÃ BIẾT (và mũi tên theo sau) bằng `→(nhãn trên)(nhãn dưới) `: bộ hiển thị vẽ nhãn lên / xuống thân mũi tên như sách. */
 export const suaNhanXenKe = (t: string): string =>
-  t.replace(RE_NHAN_XEN_KE, (_m, mui?: string) => (mui ? '→(ánh sáng)(chất diệp lục (chlorophyll)) ' : 'ánh sáng, chất diệp lục (chlorophyll)'))
+  t.replace(RE_NHAN_XEN_KE, (_m, quangHop?: string, enzim?: string, hieuSuat?: string) =>
+    ` →(${quangHop ? 'ánh sáng)(chất diệp lục (chlorophyll)' : hieuSuat ? 'enzyme)(H = 80%' : 'enz' + enzim}) `)

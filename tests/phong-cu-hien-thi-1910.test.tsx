@@ -14,6 +14,13 @@ describe('ChemText với nhãn mũi tên xen kẽ', () => {
     expect(container.textContent).not.toMatch(/chÊt|¸|ⁿ|gorophyll₎/)
     expect(container.querySelector('.mt-phai')).not.toBeNull()
   })
+  it('câu enzim: hai mũi tên có nhãn enzim; mũi tên thứ hai thêm H = 80%', () => {
+    const { container } = render(<ChemText text="sơ đồ: Disaccharide eⁿzyme→ Monosaccharide Heⁿ₌z₈y₀m%e→ Ethanol (D=0,8kg/L)" />)
+    expect(container.textContent).not.toMatch(/ⁿ|₌|₈|m%e/)
+    expect(container.textContent?.match(/enzyme/g)).toHaveLength(2)
+    expect(container.textContent).toContain('H = 80%')
+    expect(container.querySelectorAll('.mt-phai')).toHaveLength(2)
+  })
   it('chữ thường có số mũ 10ⁿ vẫn vẽ như cũ', () => {
     const { container } = render(<ChemText text="Nồng độ 10ⁿ mol/L và Fe²⁺ + OH⁻" />)
     expect(container.textContent).toContain('10')

@@ -6,11 +6,13 @@ import { giaiMaTcvn3, suaNhanXenKe, timPhongCu } from '../src/lib/phong-cu'
 import { chuHtml } from '../src/lib/html-phieu'
 import { parseChemText } from '../src/lib/chem-format'
 
+// Chuỗi trong ảnh thầy chụp 19/10 (câu quang hợp).
 const DE_THAT = 'Quá trình quang hợp của cây xanh diễn ra theo phương trình hóa học tổng quát sau:\nCO₂ + H₂O chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎→(C₆H₁₀O₅)ₙ + O₂ Biết rằng để tổng hợp được 1 mol mắt xích tinh bột'
 
 describe('phát hiện chữ phông cũ / xen kẽ', () => {
   it('bắt chuỗi thật trong ảnh và dạng "H⁼⁹⁶%"; không bắt ký hiệu hợp lệ', () => {
     expect(timPhongCu(DE_THAT).map((x) => x.token)).toEqual(['chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎'])
+    expect(timPhongCu('Disaccharide eⁿzyme→ Monosaccharide Heⁿ₌z₈y₀m%e→ Ethanol').map((x) => x.token)).toEqual(['eⁿzyme', 'Heⁿ₌z₈y₀m%e'])
     expect(timPhongCu('S → SH⁼⁹⁶%→SO₂')[0]).toMatchObject({ loai: 'xen-ke', token: 'SH⁼⁹⁶%' })
     const HOP_LE = ['Brønsted', 'CuSO₄·5H₂O', '1,98·10¹⁰', 'cm⁻¹', '½O₂(g)', '3×10⁻³', '5 µm', '(C₆H₁₀O₅)ₙ', 'Fe²⁺ + 2OH⁻', 'Êm đềm, Đồng và Ôn tập', 'ÀÁẢ ĐẠI HỌC',
       'Hợp chất hữu cơ chứa nitơ: amine, amino acid, peptide; thủy phân hoàn toàn thu được muối của ánh sáng và chất diệp lục.']
@@ -30,8 +32,12 @@ describe('sửa nhãn xen kẽ đã biết (tầng hiển thị)', () => {
     expect(suaNhanXenKe(DE_THAT)).toContain('CO₂ + H₂O →(ánh sáng)(chất diệp lục (chlorophyll)) (C₆H₁₀O₅)ₙ + O₂ Biết rằng')
     expect(suaNhanXenKe(DE_THAT)).not.toMatch(/chÊt|¸|ⁿ|₍/)
   })
-  it('đứng riêng (không có mũi tên theo sau) ⇒ "trên, dưới"; dạng chỉ nằm ở ghi chú nội bộ không đụng tới', () => {
-    expect(suaNhanXenKe('x chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎ y')).toBe('x ánh sáng, chất diệp lục (chlorophyll) y')
+  it('câu enzim: "n" thành số mũ dính trước mũi tên ⇒ nhãn enzim trên mũi tên; mũi tên có thêm H = 80% (DH-12-C2-B6-DT-III-8, DH-12-C2-B5-DT-III-6)', () => {
+    expect(suaNhanXenKe('theo sơ đồ: (C₆H₁₀O₅)ₙeⁿzim→C₆H₁₂O₆eⁿzim→C₂H₅OH Để điều chế 10 L')).toBe('theo sơ đồ: (C₆H₁₀O₅)ₙ →(enzim) C₆H₁₂O₆ →(enzim) C₂H₅OH Để điều chế 10 L')
+    expect(suaNhanXenKe('theo sơ đồ: Disaccharide eⁿzyme→ Monosaccharide Heⁿ₌z₈y₀m%e→ Ethanol (D=0,8kg/L).'))
+      .toBe('theo sơ đồ: Disaccharide →(enzyme) Monosaccharide →(enzyme)(H = 80%) Ethanol (D=0,8kg/L).')
+  })
+  it('dạng chỉ nằm ở ghi chú nội bộ của lời giải không đụng tới', () => {
     expect(suaNhanXenKe("ghi chú ('ch¸ÊⁿthdisÖ¸pⁿlgôc')")).toBe("ghi chú ('ch¸ÊⁿthdisÖ¸pⁿlgôc')")
   })
   it('chuỗi lạ / chữ thường giữ nguyên; chạy hai lần không đổi thêm', () => {

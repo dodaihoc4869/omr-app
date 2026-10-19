@@ -376,12 +376,6 @@ function chanCauHinh(ch: string | undefined): boolean {
  * phan tich san co. Chi ghi ion CO SO di kem dau; ion mot dau (`Na+`, `Cl-`,
  * `OH-`) da chay dung tu truoc. */
 const ION_QUEN_THUOC: Record<string, string> = {
-  // --- cation kim loai ---
-  'Be2+': 'Be^{2+}', 'Mg2+': 'Mg^{2+}', 'Ca2+': 'Ca^{2+}', 'Sr2+': 'Sr^{2+}', 'Ba2+': 'Ba^{2+}',
-  'Zn2+': 'Zn^{2+}', 'Cu2+': 'Cu^{2+}', 'Fe2+': 'Fe^{2+}', 'Fe3+': 'Fe^{3+}', 'Al3+': 'Al^{3+}',
-  'Ni2+': 'Ni^{2+}', 'Pb2+': 'Pb^{2+}', 'Sn2+': 'Sn^{2+}', 'Sn4+': 'Sn^{4+}', 'Mn2+': 'Mn^{2+}',
-  'Cr2+': 'Cr^{2+}', 'Cr3+': 'Cr^{3+}', 'Co2+': 'Co^{2+}', 'Co3+': 'Co^{3+}', 'Cd2+': 'Cd^{2+}',
-  'Hg2+': 'Hg^{2+}', 'Au3+': 'Au^{3+}', 'Pt2+': 'Pt^{2+}',
   // --- cation nhieu nguyen tu ---
   'NH4+': 'NH_{4}^{+}',
   // --- anion nhieu nguyen tu ---
@@ -393,6 +387,10 @@ const ION_QUEN_THUOC: Record<string, string> = {
   'ClO3-': 'ClO_{3}^{-}', 'ClO4-': 'ClO_{4}^{-}',
   'AlO2-': 'AlO_{2}^{-}', 'SiO32-': 'SiO_{3}^{2-}', 'S2O32-': 'S_{2}O_{3}^{2-}',
   'CH3COO-': 'CH_{3}COO^{-}', 'HCOO-': 'HCOO^{-}',
+}
+// Cation kim loai: dang chung `X2+` -> `X^{2+}` (suy tu khoa, khong liet ke hai lan — giu goi mo app hoc sinh nhe, luat toc do).
+for (const k of 'Be2+ Mg2+ Ca2+ Sr2+ Ba2+ Zn2+ Cu2+ Fe2+ Fe3+ Al3+ Ni2+ Pb2+ Sn2+ Sn4+ Mn2+ Cr2+ Cr3+ Co2+ Co3+ Cd2+ Hg2+ Au3+ Pt2+'.split(' ')) {
+  ION_QUEN_THUOC[k] = k.replace(/(\d[+-])$/, '^{$1}')
 }
 
 // Không dùng lookbehind: Safari trước 16.4 ném lỗi ngay khi nạp module.
