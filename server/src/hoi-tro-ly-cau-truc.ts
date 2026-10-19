@@ -160,9 +160,15 @@ const EMOJI = /\p{Extended_Pictographic}️?/gu
 /** Một ô chữ: bỏ HTML, markdown khác, emoji, gạch ngang dài; gọn khoảng trắng; cắt `toiDa`; GIỮ **…**, ==…==, ++đúng++, !!sai!! (máy em vẽ). */
 function sachO(v: unknown, toiDa: number): string {
   let s = str(v).replace(/<[^>]*>/g, '').replace(EMOJI, '').replace(/__(.+?)__/g, '$1').replace(/^#{1,6}\s*|#{2,}\s*/gm, '').replace(/\s*—\s*/g, ', ').replace(/\s+/g, ' ').trim()
+    // *nghiêng* kiểu markdown (một dấu sao): máy em không vẽ nghiêng ⇒ bỏ dấu, giữ chữ (sổ 19/10: có ở nấc gợi ý 1).
+    .replace(/(?<![*\p{L}\d])\*(?![\s*])([^*\n]{1,120}?)(?<![\s*])\*(?![*\p{L}\d])/gu, '$1')
   if (s.length > toiDa) s = s.slice(0, toiDa).replace(/\s+\S*$/, '').trim() + '…'
   // Cắt giữa chừng hay mô hình lỡ tay ⇒ dấu lẻ không thành cặp thì bỏ.
-  for (const dau of ['**', '==', '!!']) if (s.split(dau).length % 2 === 0) { const i = s.lastIndexOf(dau); s = s.slice(0, i) + s.slice(i + dau.length) }
+  return boDauLe(s, ['**', '==', '!!'])
+}
+/** Dấu tô (**, ==, !!, ++) lẻ — không thành cặp — thì bỏ dấu cuối (máy em sẽ in nguyên "**" ra màn). */
+function boDauLe(s: string, dau: string[]): string {
+  for (const d of dau) if (s.split(d).length % 2 === 0) { const i = s.lastIndexOf(d); s = s.slice(0, i) + s.slice(i + d.length) }
   return s
 }
 /** ++đúng++: nội dung không bắt đầu/kết thúc bằng khoảng trắng hay "+" (ion "NH4^+ + OH^-" không bị hiểu nhầm). */
@@ -174,7 +180,8 @@ const boDau = (s: string): string => boDungSai(s.replace(/\*\*(.+?)\*\*/g, '$1')
 /** Làm sạch đối tượng mô hình trả về. `chan` (em đang làm): lọc câu lộ đáp án trong từng phần ('' = bỏ cả phần). Rỗng hết ⇒ null. */
 export function lamSachCauTruc(o: Obj, dangLam: boolean, chan?: (t: string) => string, bo?: BoiCanhKhuon): CauTrucTraLoi | null {
   const loc = (t: string) => {
-    const sach = t && chan ? chan(t) : t
+    // THẦY 19/10 ("gợi ý tới bước ba bị lỗi hiển thị kí tự"): chặn lộ đáp án bỏ CÂU — câu bị bỏ có thể chứa nửa cặp **…** ⇒ cân dấu lại SAU khi lọc.
+    const sach = t && chan ? boDauLe(chan(t), ['**', '==', '!!', '++']) : t
     // Mô hình vẫn có thể bỏ qua chỉ dẫn: chặn lời quy kết bước làm chưa được em cung cấp.
     return bo ? chanQuyKetHoiThay(sach, bo.baiNhap ?? '') : sach
   }
