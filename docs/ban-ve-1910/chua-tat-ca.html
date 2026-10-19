@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Bản vẽ Chữa tất cả</title>
+<!-- BẢN VẼ 19/10 · F1 — thầy: "sau khi điểm danh xong cho tôi 1 nút chữa tất cả những câu sai nhiều nhất …" (đặc tả: GHI-CHU.md mục F1).
+     CHỈ là bản vẽ: số liệu GIẢ, chưa sửa src/. Màu = đúng tên + giá trị bảng --gvm-* của app thầy (src/styles/tokens.css, sáng + tối), không màu mới.
+     Hình khối chép từ khối thật "Chữa câu khó & tính toán" (src/components/chien-dich/ThayTuChua.tsx + thay-tu-chua.css + gv-v2.css).
+     Lớp MỚI của thẻ: gvv2-cta-*. Mở khung bằng #tt=co|chua-dd|rong &xem=1 (mở thứ tự) &toi=1 (nền tối) &cuon=1 (cuộn tới thẻ) — xem scripts/chup-ban-ve-1910.mjs. -->
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-600-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-800-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-800-normal.woff2) format('woff2')}
+
+/* Biến chuẩn app thầy (cùng tên, cùng giá trị src/styles/tokens.css — bảng --gvm-*) + thang chung (src/styles/thang.css) */
+:root{--gvm-nen:#f6f7fc;--gvm-mat:#ffffff;--gvm-mat-2:#eef1fa;--gvm-vien:#dde2f0;--gvm-chu:#1a1c24;--gvm-chu-2:#454a5c;--gvm-chu-3:#5f6579;
+ --gvm-xd:#1f5fd6;--gvm-xd-nen:#dbe6ff;--gvm-xd-dam:#0b2f75;--gvm-xl:#0f8a5f;--gvm-xl-nen:#c9f2de;--gvm-xl-dam:#04402a;--gvm-hp:#b86a00;--gvm-hp-nen:#ffe2b3;--gvm-hp-dam:#4d2c00;
+ --gvm-ho:#c42a5c;--gvm-ho-nen:#ffd9e3;--gvm-ho-dam:#5c0a27;--gvm-tim:#6a4fd8;--gvm-tim-nen:#e7defe;--gvm-tim-dam:#2a1872;--gvm-tren-dac:#ffffff;
+ --gvm-bong:0 1px 2px rgb(30 40 80 / 0.06),0 4px 14px rgb(30 40 80 / 0.06);--gvm-bong-nut:0 2px 8px rgb(31 95 214 / 0.35);
+ --sans:'Be Vietnam Pro','Noto Sans',-apple-system,'Segoe UI',Roboto,sans-serif;
+ --t-phu:13px;--t-than:15px;--t-the:17px;--t-khoi:24px;--r-nho:12px;--r-vua:16px;--r-vien:999px;--nut-chinh-cao:56px;--nut-phu-cao:48px;--nut-chu-cao:44px;color-scheme:light}
+:root[data-toi]{--gvm-nen:#10131c;--gvm-mat:#181c27;--gvm-mat-2:#1f2433;--gvm-vien:#2c3245;--gvm-chu:#e8eaf3;--gvm-chu-2:#b9bed1;--gvm-chu-3:#8c92a8;
+ --gvm-xd:#9cbcff;--gvm-xd-nen:#1d3363;--gvm-xd-dam:#dbe6ff;--gvm-xl:#6fdcab;--gvm-xl-nen:#0f3d2b;--gvm-xl-dam:#c9f2de;--gvm-hp:#ffc164;--gvm-hp-nen:#43290a;--gvm-hp-dam:#ffe2b3;
+ --gvm-ho:#ff8fb0;--gvm-ho-nen:#4d1428;--gvm-ho-dam:#ffd9e3;--gvm-tim:#c3b3ff;--gvm-tim-nen:#2d2352;--gvm-tim-dam:#e7defe;--gvm-tren-dac:#0b1a3a;
+ --gvm-bong:0 1px 2px rgb(0 0 0 / 0.3);--gvm-bong-nut:0 1px 2px rgb(0 0 0 / 0.3);color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--gvm-nen);color:var(--gvm-chu);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,select{font:inherit;color:inherit;touch-action:manipulation}
+button{cursor:pointer}
+.gvv2-so{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ── Vỏ app thầy: thanh bên (máy tính) · thanh trên + thanh đáy (điện thoại) · thanh bên gọn (điện thoại ngang) ── */
+.vo{min-height:100dvh;display:flex}
+.ray{display:none}
+.cot{flex:1;min-width:0;display:flex;flex-direction:column}
+.tren{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 16px;background:var(--gvm-mat);border-bottom:1px solid var(--gvm-vien)}
+.logo{flex:none;width:44px;height:44px;border-radius:14px;background:var(--gvm-xd);color:var(--gvm-tren-dac);display:grid;place-items:center}
+.logo-chu{display:grid;line-height:1.15;min-width:0}.logo-chu b{font-size:16px;font-weight:800}.logo-chu small{font-size:13px;color:var(--gvm-chu-2)}
+.tren .gian{flex:1}
+.ava{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--gvm-mat-2);color:var(--gvm-chu);font-weight:800;font-size:14px}
+.duoi{position:fixed;left:0;right:0;bottom:0;z-index:5;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:6px 6px calc(6px + env(safe-area-inset-bottom));background:var(--gvm-mat);border-top:1px solid var(--gvm-vien)}
+.duoi a,.ray a{position:relative;display:flex;align-items:center;color:var(--gvm-chu-2);font-weight:700;text-decoration:none;border-radius:14px}
+.duoi a{flex-direction:column;justify-content:center;gap:2px;min-height:56px;font-size:12px}
+.duoi a[aria-current],.ray a[aria-current]{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
+.dem{display:inline-grid;place-items:center;min-width:22px;height:20px;padding:0 6px;border-radius:999px;background:var(--gvm-hp-nen);color:var(--gvm-hp-dam);font-size:12px;font-weight:800;line-height:1}
+.duoi .dem{position:absolute;top:4px;right:calc(50% - 26px)}
+.noi{flex:1;min-width:0;width:100%;padding:20px 16px 104px}
+@media (min-width:1024px){
+ .tren,.duoi{display:none}
+ .ray{display:flex;flex-direction:column;gap:6px;width:248px;flex:none;padding:20px 16px;border-right:1px solid var(--gvm-vien);background:var(--gvm-mat);position:sticky;top:0;height:100dvh}
+ .ray .thuong-hieu{display:flex;align-items:center;gap:12px;padding:4px 6px 18px}
+ .ray a{gap:12px;min-height:48px;padding:0 14px;font-size:15px}
+ .ray a .dem{margin-left:auto}
+ .ray .cuoi{margin-top:auto}
+ .noi{padding:32px 40px 48px;max-width:1180px}
+}
+@media (orientation:landscape) and (max-height:500px){
+ .tren,.duoi{display:none}
+ .ray{display:flex;flex-direction:column;gap:4px;width:92px;flex:none;padding:8px;border-right:1px solid var(--gvm-vien);background:var(--gvm-mat);position:sticky;top:0;height:100dvh}
+ .ray .thuong-hieu{display:grid;place-items:center;padding:2px 0 6px}.ray .thuong-hieu .logo-chu{display:none}
+ .ray a{flex-direction:column;justify-content:center;gap:2px;min-height:52px;padding:4px;font-size:11px;text-align:center}
+ .ray a .dem{position:absolute;top:2px;right:6px}
+ .ray .cuoi{display:none}
+ .noi{padding:14px 20px 24px}
+}
+
+/* ── Đầu màn Hành trình + hai mục (chép gv-v2.css) ── */
+.gvv2{display:grid;gap:18px;min-width:0}
+.gvv2-h1{margin:0;font-size:clamp(24px,3vw,32px);font-weight:800;letter-spacing:-0.01em;line-height:1.2}
+.gvv2-phu{margin:4px 0 0;font-size:15px;color:var(--gvm-chu-2)}
+.gvv2-muc{display:flex;flex-wrap:wrap;gap:8px}
+.gvv2-muc-nut{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 22px;border:1px solid var(--gvm-vien);border-radius:16px;background:var(--gvm-mat);color:var(--gvm-chu);font-size:16px;font-weight:700;white-space:nowrap}
+.gvv2-muc-nut[aria-selected='true']{border-color:transparent;background:var(--gvm-xd);color:var(--gvm-tren-dac);box-shadow:var(--gvm-bong-nut)}
+.gvv2-muc-dem{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 8px;border-radius:999px;background:var(--gvm-ho);color:var(--gvm-tren-dac);font-size:13px;font-weight:800}
+.gvv2-muc-nut[aria-selected='true'] .gvv2-muc-dem{background:var(--gvm-mat);color:var(--gvm-ho)}
+@media (max-width:600px){
+ .gvv2-muc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .gvv2-muc-nut{justify-content:center;gap:6px;padding:8px 10px;font-size:15px;line-height:1.25;text-align:center;white-space:normal}
+}
+@media (orientation:landscape) and (max-height:500px){.gvv2-h1{font-size:22px}.gvv2-phu{font-size:14px}.gvv2-muc-nut{min-height:48px}}
+
+/* ── Nút chung (gv-v2.css) ── */
+.gvv2-nut-chinh{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:14px;background:var(--gvm-xd);color:var(--gvm-tren-dac);font-weight:700;font-size:15px;box-shadow:var(--gvm-bong-nut)}
+.gvv2-nut-vien{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;border-radius:12px;border:1px solid var(--gvm-vien);background:var(--gvm-mat);color:var(--gvm-xd);font-weight:700;font-size:15px}
+.gvv2-nut-chu{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--nut-chu-cao);padding:0 12px;border:0;border-radius:var(--r-nho);background:none;color:var(--gvm-xd);font-size:var(--t-than);font-weight:700;white-space:nowrap}
+.gvv2-nut-chu:hover{background:var(--gvm-xd-nen)}
+.gvv2-nut-chu:focus-visible,.gvv2-nut-vien:focus-visible,.gvv2-nut-chinh:focus-visible,.gvv2-muc-nut:focus-visible{outline:3px solid var(--gvm-xd);outline-offset:2px}
+.gvv2-the{background:var(--gvm-mat);border:1px solid var(--gvm-vien);border-radius:24px;box-shadow:var(--gvm-bong)}
+
+/* ── Khối (B) "Chữa câu khó & tính toán" (thay-tu-chua.css) ── */
+.gvv2-ttc{display:grid;gap:18px;min-width:0;padding:24px 28px}
+.gvv2-ttc-dau{display:grid;gap:4px}
+.gvv2-ttc-tieu{margin:0;font-size:var(--t-khoi);font-weight:800;line-height:1.2}
+.gvv2-ttc-phu{margin:0;max-width:75ch;font-size:var(--t-phu);line-height:1.5;color:var(--gvm-chu-2)}
+.gvv2-ttc-than{display:grid;gap:14px;min-width:0}
+.gvv2-ttc-chon{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;min-width:0}
+.gvv2-ttc-o{display:grid;gap:6px;min-width:0;font-size:var(--t-phu);font-weight:700;color:var(--gvm-chu-2)}
+.gvv2-ttc-o--lop{flex:0 1 240px;min-width:200px}.gvv2-ttc-o--bai{flex:1 1 300px}
+.gvv2-ttc-o select{width:100%;min-width:0;min-height:var(--nut-phu-cao);padding:0 12px;border:1px solid var(--gvm-vien);border-radius:var(--r-nho);background:var(--gvm-mat);color:var(--gvm-chu);font-size:var(--t-than);font-weight:600;color-scheme:light dark}
+.gvv2-ttc-to{display:grid;gap:6px;min-width:0}
+.gvv2-ttc-chip-hang{display:flex;flex-wrap:wrap;gap:8px}
+.gvv2-ttc-nhan{margin-right:4px;font-size:var(--t-phu);font-weight:700;color:var(--gvm-chu-2)}
+.gvv2-ttc-chip{display:inline-flex;align-items:center;gap:6px;min-height:var(--nut-phu-cao);padding:0 14px;border:1px solid var(--gvm-vien);border-radius:999px;background:var(--gvm-mat);color:var(--gvm-chu-2);font-size:var(--t-than);white-space:nowrap}
+.gvv2-ttc-chip b{font-weight:700}.gvv2-ttc-chip small{font-size:var(--t-phu);color:var(--gvm-chu-3)}
+.gvv2-ttc-chip[aria-pressed='true']{border-color:var(--gvm-xd);background:var(--gvm-xd-nen);color:var(--gvm-xd-dam);box-shadow:inset 0 0 0 1px var(--gvm-xd)}
+.gvv2-ttc-chip[aria-pressed='true'] small{color:var(--gvm-xd-dam)}
+.gvv2-ttc-chip[aria-pressed='true'] b::before{content:'✓ '}
+.gvv2-ttc-so4{display:flex;flex-wrap:wrap;gap:10px}
+.gvv2-ttc-o-so{display:inline-flex;align-items:baseline;gap:6px;padding:10px 14px;border-radius:14px;font-size:var(--t-phu);font-weight:600;background:var(--gvm-mat-2);color:var(--gvm-chu-2)}
+.gvv2-ttc-o-so b{font-size:18px;font-weight:800;color:var(--gvm-chu)}
+.gvv2-ttc-o-so[data-mau='tim']{background:var(--gvm-tim-nen);color:var(--gvm-tim-dam)}
+.gvv2-ttc-o-so[data-mau='xd']{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
+.gvv2-ttc-o-so[data-mau='ho']{background:var(--gvm-ho-nen);color:var(--gvm-ho-dam)}
+.gvv2-ttc-o-so[data-mau] b{color:inherit}
+.gvv2-ttc-ghi,.gvv2-ttc-trong-chu{margin:0;font-size:var(--t-phu);color:var(--gvm-chu-2)}
+.gvv2-ttc-trong-chu{font-size:var(--t-than)}
+.gvv2-ttc-ds{list-style:none;margin:0;padding:0;border:1px solid var(--gvm-vien);border-radius:var(--r-vua);overflow:hidden;background:var(--gvm-mat)}
+.gvv2-ttc-dong{display:grid;grid-template-columns:36px minmax(0,1fr) 200px;align-items:center;gap:16px;min-height:56px;padding:12px 18px;border-top:1px solid var(--gvm-vien)}
+.gvv2-ttc-dong:first-child{border-top:0}
+.gvv2-ttc-stt{display:grid;place-items:center;width:36px;height:36px;border-radius:999px;background:var(--gvm-mat-2);color:var(--gvm-chu);font-size:var(--t-than);font-weight:800}
+.gvv2-ttc-cau{display:grid;gap:4px;min-width:0}
+.gvv2-ttc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:var(--t-phu);color:var(--gvm-chu-2)}
+.gvv2-ttc-the,.gvv2-ttc-loai{display:inline-flex;align-items:center;min-height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--gvm-mat-2);color:var(--gvm-chu-2)}
+.gvv2-ttc-the[data-loai='tinh']{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
+.gvv2-ttc-loai[data-phan='II']{background:var(--gvm-tim-nen);color:var(--gvm-tim-dam)}
+.gvv2-ttc-loai[data-phan='III']{background:var(--gvm-xl-nen);color:var(--gvm-xl-dam)}
+.gvv2-ttc-sai{display:grid;gap:6px;min-width:0;line-height:1.1}
+.gvv2-ttc-sai b{font-size:var(--t-than);font-weight:800;color:var(--gvm-chu)}
+.gvv2-ttc-sai[data-cao='true'] b{color:var(--gvm-ho)}
+.gvv2-ttc-sai small{font-size:12px;color:var(--gvm-chu-3);white-space:nowrap}
+.gvv2-ttc-thanh{display:block;height:8px;border-radius:999px;background:var(--gvm-mat-2);overflow:hidden}
+.gvv2-ttc-thanh>i{display:block;height:100%;border-radius:inherit;background:var(--gvm-chu-3)}
+.gvv2-ttc-sai[data-cao='true'] .gvv2-ttc-thanh>i{background:var(--gvm-ho)}
+.gvv2-ttc-sai[data-mau='hp'] .gvv2-ttc-thanh>i{background:var(--gvm-hp)}
+.gvv2-ttc-cuoi{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:16px 18px;border-radius:var(--r-vua);background:var(--gvm-mat-2)}
+.gvv2-ttc-cuoi>.gvv2-nut-chinh{min-height:var(--nut-chinh-cao);padding:0 24px;border-radius:14px;font-size:16px}
+.gvv2-ttc-goi-y{flex:1 1 260px;min-width:0;font-size:var(--t-phu);line-height:1.5;color:var(--gvm-chu-2)}
+.gvv2-ttc-goi-y b{font-weight:800;color:var(--gvm-chu)}
+@media (max-width:960px){.gvv2-ttc-dong{grid-template-columns:36px minmax(0,1fr) 170px}}
+
+/* ════════ THẺ MỚI "CHỮA TẤT CẢ" (gvv2-cta-*) — đứng ĐẦU khối B ════════ */
+.gvv2-cta{display:grid;gap:16px;min-width:0;padding:20px 22px;border-radius:20px;border:1px solid color-mix(in srgb,var(--gvm-xd) 30%,var(--gvm-vien));background:color-mix(in srgb,var(--gvm-xd-nen) 40%,var(--gvm-mat))}
+.gvv2-cta-dau{display:flex;align-items:center;gap:14px;min-width:0}
+.gvv2-cta-bt{flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:var(--gvm-xd);color:var(--gvm-tren-dac)}
+.gvv2-cta-chu{display:grid;gap:2px;min-width:0}
+.gvv2-cta-tieu{margin:0;font-size:20px;font-weight:800;line-height:1.25;letter-spacing:-0.01em}
+.gvv2-cta-phu{margin:0;font-size:var(--t-phu);color:var(--gvm-chu-2)}
+/* 4 ô số có nhãn — cùng màu với nhãn nhóm trong danh sách xem trước */
+.gvv2-cta-so4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0;padding:0;list-style:none}
+.gvv2-cta-o{display:grid;align-content:start;gap:2px;min-width:0;padding:14px 16px;border-radius:16px;background:var(--n);color:var(--d)}
+.gvv2-cta-o[data-mau='ho']{--n:var(--gvm-ho-nen);--d:var(--gvm-ho-dam)}
+.gvv2-cta-o[data-mau='hp']{--n:var(--gvm-hp-nen);--d:var(--gvm-hp-dam)}
+.gvv2-cta-o[data-mau='xd']{--n:var(--gvm-xd-nen);--d:var(--gvm-xd-dam)}
+.gvv2-cta-o[data-mau='tim']{--n:var(--gvm-tim-nen);--d:var(--gvm-tim-dam)}
+.gvv2-cta-o .so{display:flex;align-items:baseline;gap:5px;line-height:1.1}
+.gvv2-cta-o .so b{font-size:30px;font-weight:800;letter-spacing:-0.02em}
+.gvv2-cta-o .so small{font-size:13px;font-weight:700}
+.gvv2-cta-o .nhan{font-size:15px;font-weight:800;line-height:1.3}
+.gvv2-cta-o .mo-ta{font-size:12px;line-height:1.4;opacity:.9}
+.gvv2-cta-cuoi{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.gvv2-cta-trai{flex:1 1 320px;min-width:0;display:grid;gap:4px}
+.gvv2-cta-tong{margin:0;font-size:var(--t-than);color:var(--gvm-chu-2)}
+.gvv2-cta-tong b{color:var(--gvm-chu);font-weight:800;font-size:17px}
+.gvv2-cta-nut{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.gvv2-cta-nut .gvv2-nut-chu{order:1}
+.gvv2-cta-nut .gvv2-nut-chinh{order:2;min-height:var(--nut-chinh-cao);padding:0 24px;font-size:16px}
+.gvv2-cta-nut .gvv2-nut-chu svg{transition:transform 200ms}
+.gvv2-cta-nut .gvv2-nut-chu[aria-expanded='true'] svg{transform:rotate(180deg)}
+.gvv2-cta-goi-y{margin:0;font-size:var(--t-phu);line-height:1.5;color:var(--gvm-chu-2)}
+.gvv2-cta-goi-y b{color:var(--gvm-chu);font-weight:800}
+/* danh sách xem trước thứ tự chiếu */
+.gvv2-cta-ds .ten{font-size:var(--t-than);font-weight:700;color:var(--gvm-chu);overflow-wrap:anywhere}
+.gvv2-cta-nhom{display:inline-flex;align-items:center;min-height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:800;background:var(--n);color:var(--d)}
+.gvv2-cta-nhom[data-mau='ho']{--n:var(--gvm-ho-nen);--d:var(--gvm-ho-dam)}
+.gvv2-cta-nhom[data-mau='hp']{--n:var(--gvm-hp-nen);--d:var(--gvm-hp-dam)}
+.gvv2-cta-nhom[data-mau='xd']{--n:var(--gvm-xd-nen);--d:var(--gvm-xd-dam)}
+.gvv2-cta-nhom[data-mau='tim']{--n:var(--gvm-tim-nen);--d:var(--gvm-tim-dam)}
+.gvv2-cta-them{display:block;padding:9px 18px 9px 70px;border-top:1px solid var(--gvm-vien);background:var(--gvm-mat-2);font-size:var(--t-phu);color:var(--gvm-chu-2)}
+.gvv2-cta-ds-cuoi{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px}
+.gvv2-cta-ds-cuoi .gvv2-nut-chu{margin-left:-12px}
+.gvv2-cta-ds-cuoi span{font-size:var(--t-phu);color:var(--gvm-chu-3)}
+/* máy tính: mỗi dòng một hàng (tên dạng + nhãn cùng hàng) để thấy nhiều câu hơn */
+@media (min-width:1024px){
+ .gvv2-cta-ds .gvv2-ttc-dong{min-height:50px;padding:7px 18px}
+ .gvv2-cta-ds .gvv2-ttc-cau{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+ .gvv2-cta-ds .gvv2-ttc-stt{width:32px;height:32px}
+ .gvv2-cta-ds .gvv2-ttc-sai[data-thanh]{grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:10px}
+ .gvv2-cta-them{padding:7px 18px 7px 70px}
+}
+/* chưa điểm danh: thẻ mờ · rỗng */
+.gvv2-cta[data-mo]{border-style:dashed;border-color:var(--gvm-vien);background:var(--gvm-mat-2)}
+.gvv2-cta[data-mo] .gvv2-cta-bt{background:var(--gvm-mat);color:var(--gvm-chu-3);border:1px solid var(--gvm-vien)}
+.gvv2-cta[data-mo] .gvv2-cta-tieu{color:var(--gvm-chu-2)}
+.gvv2-cta[data-rong]{background:var(--gvm-mat);border-color:var(--gvm-vien)}
+.gvv2-cta[data-rong] .gvv2-cta-bt{background:var(--gvm-xl-nen);color:var(--gvm-xl-dam)}
+.gvv2-cta-bao{margin:0;font-size:var(--t-than);line-height:1.5;color:var(--gvm-chu-2)}
+.gvv2-cta-bao b{color:var(--gvm-chu)}
+.gvv2-cta-hang{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.gvv2-cta-hang .gvv2-cta-bao{flex:1 1 260px}
+.gvv2-cta-hang .gvv2-nut-chu{margin-left:-12px}
+.gvv2-cta-hoac{margin:4px 0 0;padding-top:16px;border-top:1px solid var(--gvm-vien);font-size:var(--t-the);font-weight:800}
+
+@media (max-width:600px){
+ .gvv2-ttc{padding:16px}
+ .gvv2-ttc-tieu{font-size:var(--t-the)}
+ .gvv2-ttc-o--lop,.gvv2-ttc-o--bai,.gvv2-ttc-to{flex:1 0 100%;min-width:0}
+ .gvv2-ttc-chip{flex:1 1 auto;justify-content:center;padding:0 12px}
+ .gvv2-ttc-nhan{flex:1 0 100%}
+ .gvv2-ttc-o-so{flex:1 1 40%}
+ .gvv2-ttc-dong{grid-template-columns:32px minmax(0,1fr);gap:8px 12px;padding:12px}
+ .gvv2-ttc-stt{width:32px;height:32px}
+ .gvv2-ttc-sai{grid-column:2}
+ .gvv2-ttc-sai[data-thanh]{grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:10px}
+ .gvv2-ttc-cuoi{padding:12px}
+ .gvv2-ttc-cuoi>.gvv2-nut-chinh{flex:1 0 100%}
+ /* thẻ mới: một cột, 4 ô số xếp dọc (số trái · nhãn phải) */
+ .gvv2-cta{padding:16px;gap:14px}
+ .gvv2-cta-tieu{font-size:18px}
+ .gvv2-cta-so4{grid-template-columns:1fr;gap:8px}
+ .gvv2-cta-o{grid-template-columns:76px minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;align-items:center;padding:10px 14px}
+ .gvv2-cta-o .so{grid-row:1 / 3}
+ .gvv2-cta-o .so b{font-size:28px}
+ .gvv2-cta-nut{flex:1 0 100%;flex-direction:column;align-items:stretch}
+ .gvv2-cta-nut .gvv2-nut-chinh{order:1}.gvv2-cta-nut .gvv2-nut-chu{order:2}
+ .gvv2-cta-them{padding-left:56px}
+}
+@media (orientation:landscape) and (max-height:500px){
+ .gvv2-ttc{padding:16px 18px;gap:14px}
+ .gvv2-ttc-tieu{font-size:20px}
+ .gvv2-cta{padding:14px 16px;gap:12px}
+ .gvv2-cta-o{padding:10px 12px}
+ .gvv2-cta-o .so b{font-size:26px}
+ .gvv2-cta-o .nhan{font-size:14px}
+ .gvv2-cta-nut .gvv2-nut-chinh{min-height:52px}
+}
+@media (prefers-reduced-motion:reduce){.gvv2-cta-nut .gvv2-nut-chu svg{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <symbol id="i-logo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/></g><circle cx="12" cy="12" r="1.6" fill="currentColor"/></symbol>
+  <symbol id="i-nha" viewBox="0 0 24 24"><path d="M4 10.5L12 4l8 6.5V20H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-duong" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 18H15a3 3 0 000-6H9a3 3 0 010-6h6.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-lich" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M3.5 10h17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-em" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14a6 6 0 013.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-kho" viewBox="0 0 24 24"><path d="M4 4h4v16H4zM10 4h4v16h-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 5l3.5-1 3 15.5-3.5 1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cai" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-man" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-but" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.5 6.5l4 4M13 20h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-chieu" viewBox="0 0 24 24"><rect x="2.5" y="3.5" width="19" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 7.5v5l4.5-2.5z" fill="currentColor"/><path d="M8 20.5h8M12 16.5v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-tat-ca" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-xuong" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-phai" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-dd" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 4.5h6M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-xong" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ </defs>
+</svg>
+
+<div class="vo">
+ <nav class="ray" aria-label="Mục chính">
+  <div class="thuong-hieu"><span class="logo"><svg width="24" height="24"><use href="#i-logo"/></svg></span><span class="logo-chu"><b>Đỗ Đại Học</b><small>Giáo viên</small></span></div>
+  <a href="#"><svg width="22" height="22" aria-hidden="true"><use href="#i-nha"/></svg><span>Hôm nay</span></a>
+  <a href="#" aria-current="page"><svg width="22" height="22" aria-hidden="true"><use href="#i-duong"/></svg><span>Hành trình</span><span class="dem gvv2-so" aria-label="Cần thầy chữa: 9 chỗ">9</span></a>
+  <a href="#"><svg width="22" height="22" aria-hidden="true"><use href="#i-lich"/></svg><span>Ca kiểm tra</span></a>
+  <a href="#"><svg width="22" height="22" aria-hidden="true"><use href="#i-em"/></svg><span>Học sinh</span></a>
+  <a href="#"><svg width="22" height="22" aria-hidden="true"><use href="#i-kho"/></svg><span>Kho đề</span></a>
+  <a href="#" class="cuoi"><svg width="22" height="22" aria-hidden="true"><use href="#i-cai"/></svg><span>Cài đặt</span></a>
+ </nav>
+ <div class="cot">
+  <header class="tren"><span class="logo"><svg width="24" height="24"><use href="#i-logo"/></svg></span><span class="logo-chu"><b>Đỗ Đại Học</b><small>Giáo viên</small></span><span class="gian"></span><span class="ava" aria-label="Thầy Đỗ Đại Học">ĐH</span></header>
+  <main class="noi">
+   <div class="gvv2">
+    <header><h1 class="gvv2-h1">Hành trình giỏi Hóa</h1><p class="gvv2-phu">Thầy dạy và tick bài, app tự lập bài cho từng em mỗi ngày</p></header>
+    <nav class="gvv2-muc" role="tablist" aria-label="Hành trình">
+     <button type="button" role="tab" aria-selected="false" class="gvv2-muc-nut"><svg width="20" height="20" aria-hidden="true"><use href="#i-man"/></svg>Dạy học &amp; đầu giờ</button>
+     <button type="button" role="tab" aria-selected="true" class="gvv2-muc-nut"><svg width="20" height="20" aria-hidden="true"><use href="#i-but"/></svg>Chữa bài<span class="gvv2-muc-dem gvv2-so"><span class="sr"> · </span>9<span class="sr"> chỗ cần chữa</span></span></button>
+    </nav>
+    <section class="gvv2-the gvv2-ttc" aria-labelledby="gvv2-ttc-tieu">
+     <div class="gvv2-ttc-dau">
+      <h2 id="gvv2-ttc-tieu" class="gvv2-ttc-tieu">Chữa câu khó &amp; tính toán</h2>
+      <p class="gvv2-ttc-phu">Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Gọi em đã tự làm đúng; nếu chưa có, chọn em dự kiến làm được.</p>
+     </div>
+     <div class="gvv2-ttc-than" id="than"></div>
+    </section>
+   </div>
+  </main>
+  <nav class="duoi" aria-label="Mục chính">
+   <a href="#"><svg width="22" height="22" aria-hidden="true"><use href="#i-nha"/></svg>Hôm nay</a>
+   <a href="#" aria-current="page"><svg width="22" height="22" aria-hidden="true"><use href="#i-duong"/></svg>Hành trình<span class="dem gvv2-so" aria-label="Cần thầy chữa: 9 chỗ">9</span></a>
+   <a href="#"><svg width="22" height="22" aria-hidden="true"><use href="#i-lich"/></svg>Ca kiểm tra</a>
+   <a href="#"><svg width="22" height="22" aria-hidden="true"><use href="#i-em"/></svg>Học sinh</a>
+   <a href="#"><svg width="22" height="22" aria-hidden="true"><use href="#i-kho"/></svg>Kho đề</a>
+  </nav>
+ </div>
+</div>
+
+<script>
+const q = new URLSearchParams(location.hash.slice(1))
+const tt = q.get('tt') || 'co', xem = q.get('xem') === '1'
+if (q.get('toi')) document.documentElement.dataset.toi = ''
+const SO_EM = 18
+
+// ── Số GIẢ: 4 nhóm, tổng 47 câu (21 + 9 + 8 + 9), không trùng câu ──
+const NHOM = [
+  { ma: 'ho', ten: 'Sai nhiều nhất', so: 21, tu: 1, moTa: 'ít nhất 1 em có mặt làm sai' },
+  { ma: 'hp', ten: 'Chưa làm tới', so: 9, tu: 22, moTa: 'câu bài đang giao, có em chưa gặp' },
+  { ma: 'xd', ten: 'Tính toán khó', so: 8, tu: 31, moTa: 'có tính toán, từ 2 sao hoặc Vận dụng cao' },
+  { ma: 'tim', ten: 'Câu khó', so: 9, tu: 39, moTa: 'câu khó còn lại, từ 2 sao hoặc Vận dụng cao' },
+]
+const TEN_PHAN = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
+// [nhóm, tên dạng, câu, bài, phần, có tính toán, chỉ số]
+const DONG = [
+  [0, 'Amine — bậc amine', 7, 'Bài 8. Amine', 'I', false, 9],
+  [0, 'Ester — thuỷ phân', 3, 'Bài 6. Ester – Lipid', 'II', false, 7],
+  [0, 'Bài toán hỗn hợp kim loại + HNO<sub>3</sub>', 2, 'Bài 14. Kim loại', 'III', true, 7],
+  [1, 'Điện phân dung dịch', 5, 'Bài 16. Điện phân', 'III', true, 5],
+  [1, 'Ăn mòn kim loại — pin điện hoá', 9, 'Bài 15. Pin điện', 'I', false, 4],
+  [2, 'Chất béo — chỉ số acid', 18, 'Bài 6. Ester – Lipid', 'III', true, 'Vận dụng cao'],
+  [2, 'Polymer — hệ số trùng hợp', 15, 'Bài 12. Polymer', 'III', true, '3 sao'],
+  [3, 'Carbohydrate — phản ứng tráng bạc', 8, 'Bài 7. Carbohydrate', 'I', false, 'Vận dụng cao'],
+  [3, 'Amine — so sánh lực base', 10, 'Bài 8. Amine', 'II', false, '2 sao'],
+]
+const THEM = { 0: 'Còn 18 câu nữa, xếp theo số em sai giảm dần (7 → 1 em)', 1: 'Còn 7 câu nữa, xếp theo số em chưa gặp giảm dần', 2: 'Còn 6 câu nữa', 3: 'Còn 7 câu nữa' }
+
+const dong = (d, stt) => {
+  const [n, ten, cau, bai, phan, tinh, chi] = d, nh = NHOM[n]
+  let phai
+  if (n === 0) phai = `<span class="gvv2-ttc-sai" data-thanh data-cao="${chi / SO_EM >= 0.3}"><b class="gvv2-so">${chi}/${SO_EM} em sai</b><span class="gvv2-ttc-thanh" aria-hidden="true"><i style="width:${Math.round(chi / SO_EM * 100)}%"></i></span></span>`
+  else if (n === 1) phai = `<span class="gvv2-ttc-sai" data-thanh data-mau="hp"><b class="gvv2-so">${chi} em chưa làm</b><span class="gvv2-ttc-thanh" aria-hidden="true"><i style="width:${Math.round(chi / SO_EM * 100)}%"></i></span></span>`
+  else phai = `<span class="gvv2-ttc-sai"><b>${chi}</b><small class="gvv2-so">${SO_EM}/${SO_EM} em làm đúng</small></span>`
+  return `<li class="gvv2-ttc-dong"><span class="gvv2-ttc-stt gvv2-so">${stt}</span><div class="gvv2-ttc-cau"><span class="ten">${ten}</span>
+   <span class="gvv2-ttc-meta"><span class="gvv2-cta-nhom" data-mau="${nh.ma}">${nh.ten}</span><span class="gvv2-ttc-loai" data-phan="${phan}">${TEN_PHAN[phan]}</span>${tinh ? '<span class="gvv2-ttc-the" data-loai="tinh">Có tính toán</span>' : ''}<span>Câu ${cau} · ${bai}</span></span></div>${phai}</li>`
+}
+
+function theCo() {
+  const tong = NHOM.reduce((s, n) => s + n.so, 0)
+  let ds = ''
+  if (xem) {
+    let li = ''
+    for (let n = 0; n < 4; n++) {
+      DONG.filter((d) => d[0] === n).forEach((d, i) => { li += dong(d, NHOM[n].tu + i) })
+      li += `<li class="gvv2-cta-them">${THEM[n]}</li>`
+    }
+    ds = `<ol class="gvv2-ttc-ds gvv2-cta-ds" id="cta-ds" aria-label="Thứ tự ${tong} câu sẽ chiếu">${li}</ol>
+     <div class="gvv2-cta-ds-cuoi"><button type="button" class="gvv2-nut-chu">Xem đủ ${tong} câu<svg width="18" height="18" aria-hidden="true"><use href="#i-phai"/></svg></button><span>Câu song sinh đã gộp về câu gốc · không có câu tự luận</span></div>`
+  }
+  return `<section class="gvv2-cta" id="cta" aria-labelledby="cta-tieu">
+   <div class="gvv2-cta-dau"><span class="gvv2-cta-bt"><svg width="26" height="26" aria-hidden="true"><use href="#i-tat-ca"/></svg></span>
+    <div class="gvv2-cta-chu"><h3 id="cta-tieu" class="gvv2-cta-tieu">Chữa tất cả · <span class="gvv2-so">${SO_EM}</span> em có mặt</h3><p class="gvv2-cta-phu">12A1 · điểm danh lúc 18:05 Thứ Hai 19/10 · câu của 3 bài đang giao</p></div></div>
+   <ol class="gvv2-cta-so4" aria-label="Bốn nhóm câu, chiếu theo thứ tự này">
+    ${NHOM.map((n, i) => `<li class="gvv2-cta-o" data-mau="${n.ma}"><span class="so"><b class="gvv2-so">${n.so}</b><small>câu</small></span><span class="nhan">${i + 1}. ${n.ten}</span><span class="mo-ta">${n.moTa}</span></li>`).join('')}
+   </ol>
+   <div class="gvv2-cta-cuoi">
+    <div class="gvv2-cta-trai"><p class="gvv2-cta-tong">Tổng <b class="gvv2-so">${tong} câu</b> (câu trùng chỉ tính một lần)</p>
+     <p class="gvv2-cta-goi-y">Chiếu liền một mạch, thầy dừng lúc nào cũng được. Tờ chiếu giữ <b>Đạt / Chưa đạt</b> · <b>Gọi em khác</b> như Chiếu lên bảng.</p></div>
+    <div class="gvv2-cta-nut">
+     <button type="button" class="gvv2-nut-chinh"><svg width="20" height="20" aria-hidden="true"><use href="#i-chieu"/></svg>Chiếu tất cả · ${tong} câu</button>
+     <button type="button" class="gvv2-nut-chu" aria-expanded="${xem}" aria-controls="cta-ds">${xem ? `Ẩn thứ tự ${tong} câu` : `Xem thứ tự ${tong} câu`}<svg width="18" height="18" aria-hidden="true"><use href="#i-xuong"/></svg></button>
+    </div>
+   </div>
+   ${ds}
+  </section>`
+}
+const theChuaDd = () => `<section class="gvv2-cta" data-mo id="cta" aria-labelledby="cta-tieu">
+  <div class="gvv2-cta-dau"><span class="gvv2-cta-bt"><svg width="26" height="26" aria-hidden="true"><use href="#i-tat-ca"/></svg></span>
+   <div class="gvv2-cta-chu"><h3 id="cta-tieu" class="gvv2-cta-tieu">Chữa tất cả</h3><p class="gvv2-cta-phu">12A1 · hôm nay chưa có buổi điểm danh</p></div></div>
+  <div class="gvv2-cta-hang"><p class="gvv2-cta-bao"><b>Điểm danh xong là chiếu tất cả được</b> — câu sai nhiều nhất, câu chưa làm tới, câu tính toán khó và câu khó của các em có mặt.</p>
+   <button type="button" class="gvv2-nut-chu"><svg width="20" height="20" aria-hidden="true"><use href="#i-dd"/></svg>Mở điểm danh</button></div>
+ </section>`
+const theRong = () => `<section class="gvv2-cta" data-rong id="cta" aria-labelledby="cta-tieu">
+  <div class="gvv2-cta-dau"><span class="gvv2-cta-bt"><svg width="26" height="26" aria-hidden="true"><use href="#i-xong"/></svg></span>
+   <div class="gvv2-cta-chu"><h3 id="cta-tieu" class="gvv2-cta-tieu">Chữa tất cả · <span class="gvv2-so">${SO_EM}</span> em có mặt</h3><p class="gvv2-cta-phu">12A1 · điểm danh lúc 18:05 Thứ Hai 19/10</p></div></div>
+  <p class="gvv2-cta-bao">Các em có mặt không còn câu sai, câu chưa làm tới hay câu khó trong bài đang giao.</p>
+ </section>`
+
+// Phần chọn từng bài như cũ (dưới thẻ). Thẻ có dữ liệu ⇒ chưa chọn bài (không có nút chính thứ hai);
+// chưa điểm danh / rỗng ⇒ thầy chiếu từng bài, nút "Chiếu lên bảng" là nút chính duy nhất của màn.
+const tungBai = (coBai) => `<h3 class="gvv2-cta-hoac">Hoặc chiếu từng bài</h3>
+ <div class="gvv2-ttc-chon">
+  <label class="gvv2-ttc-o gvv2-ttc-o--lop"><span>Lớp</span><select><option>12A1 · 32 em</option></select></label>
+  <label class="gvv2-ttc-o gvv2-ttc-o--bai"><span>Bài trong Dạy học · Khối 12</span><select>${coBai ? '<option>Bài 8. Amine</option>' : '<option>Chọn bài cần chữa</option>'}</select></label>
+  ${coBai ? `<div class="gvv2-ttc-to" role="group" aria-label="Tờ đề của Bài 8. Amine"><span class="gvv2-ttc-nhan">Đề</span><span class="gvv2-ttc-chip-hang">
+   <button type="button" class="gvv2-ttc-chip" aria-pressed="true"><b>Trắc nghiệm</b> <small class="gvv2-so">· 18 câu</small></button>
+   <button type="button" class="gvv2-ttc-chip" aria-pressed="false"><b>Đúng–sai</b> <small class="gvv2-so">· 4 câu</small></button>
+   <button type="button" class="gvv2-ttc-chip" aria-pressed="true"><b>Trả lời ngắn</b> <small class="gvv2-so">· 6 câu</small></button></span></div>` : ''}
+ </div>
+ ${coBai ? `<div class="gvv2-ttc-so4"><span class="gvv2-ttc-o-so"><b class="gvv2-so">24</b> câu sẽ chiếu</span><span class="gvv2-ttc-o-so" data-mau="tim"><b class="gvv2-so">0</b> câu Đúng–sai</span><span class="gvv2-ttc-o-so" data-mau="xd"><b class="gvv2-so">7</b> câu có tính toán</span><span class="gvv2-ttc-o-so" data-mau="ho"><b class="gvv2-so">5</b> câu lớp sai từ 30%</span></div>
+ <div class="gvv2-ttc-cuoi"><button type="button" class="gvv2-nut-chinh"><svg width="20" height="20" aria-hidden="true"><use href="#i-chieu"/></svg>Chiếu lên bảng</button><span class="gvv2-ttc-goi-y">Tờ chiếu chuẩn như Chiếu lên bảng: <b>L</b> gọi em lên bảng · <b>Đạt / Chưa đạt</b> ghi sổ · <b>G</b> lời giải hiện dần · <b>Space</b> lật trang</span></div>`
+ : '<p class="gvv2-ttc-trong-chu">Chọn một bài để xem các câu sẽ chiếu.</p>'}`
+
+const than = document.getElementById('than')
+than.innerHTML = (tt === 'chua-dd' ? theChuaDd() : tt === 'rong' ? theRong() : theCo()) + tungBai(tt !== 'co')
+if (q.get('cuon')) { const t = document.getElementById('cta'); scrollTo(0, t.getBoundingClientRect().top + scrollY - 12) }
+</script>
+</body>
+</html>

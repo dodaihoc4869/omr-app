@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Bản vẽ Thang xoá lỗi</title>
+<!-- BẢN VẼ 19/10 · F2 — thầy: "Phần tự sửa lỗi phải có cơ chế giảm câu để cho học sinh biết …" (đặc tả: GHI-CHU.md mục F2).
+     CHỈ là bản vẽ: số liệu GIẢ, chưa sửa src/. Màu = đúng tên + giá trị biến chuẩn của src/styles/tokens.css (sáng + tối) — đúng bộ biến
+     src/components/hoc-tap/tu-chua.css đang dùng (--nen --the --the-2 --vien --muc --nhat --lg-nhan --vang-diu --xanh --do); sắc nhạt pha bằng color-mix.
+     Hình khối chép từ màn thật ManTuChua.tsx (tcl-*, ht-*, ht2-*). Lớp MỚI: tcl-ba-dong, tcl-thang, tcl-the-duoi, tcl-the-nut, tcl-chip, tcl-gap, tcl-mat-mang.
+     Mở khung bằng #tt=co|rong &mang=0 (mất mạng) &xoa=1 (mở nhóm Đã xoá) &toi=1 (nền tối) — xem scripts/chup-ban-ve-1910.mjs. -->
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-600-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-800-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-800-normal.woff2) format('woff2')}
+
+/* Biến chuẩn (cùng tên, cùng giá trị src/styles/tokens.css — sáng ở :root, tối ở khối @media prefers-color-scheme: dark) */
+:root{--nen:#f5f4ef;--the:#fffefb;--the-2:#eeeee8;--muc:#1a2332;--nhat:#505b69;--mo:#626c7b;--muc-nguoc:#ffffff;--vien:#e5e7eb;--vien-dam:#d1d5db;
+ --xanh:#10b981;--xanh-nen:#ecfdf5;--do:#ef4444;--do-nen:#fef2f2;--cam:#f59e0b;--cam-nen:#fffbeb;--tim:#6366f1;--tim-nen:#eef2ff;--lg-nhan:#4338ca;--vang-diu:#91691e;--vang-diu-nen:#f7efd9;
+ --sans:'Be Vietnam Pro','Noto Sans',-apple-system,'Segoe UI',Roboto,sans-serif;color-scheme:light}
+:root[data-toi]{--nen:#171c23;--the:#202730;--the-2:#29323d;--muc:#e8eaed;--nhat:#c2c8cf;--mo:#a6b0bc;--muc-nguoc:#0f1419;--vien:#2a323d;--vien-dam:#3a434f;
+ --xanh:#34d399;--xanh-nen:#0d2f24;--do:#f87171;--do-nen:#2f1516;--cam:#fbbf24;--cam-nen:#2d2411;--tim:#818cf8;--tim-nen:#1e1f3d;--lg-nhan:#a5b4fc;--vang-diu:#e4c47e;--vang-diu-nen:#343126;color-scheme:dark}
+
+/* ── Nền app học sinh (hoc-tap.css) ── */
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--nen)}
+.ht-app{min-height:100dvh;background:var(--nen);color:var(--muc);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.ht-app button{font:inherit;cursor:pointer;touch-action:manipulation}
+.ht-app button:focus-visible{outline:3px solid var(--tim);outline-offset:4px}
+.ht-app.ht2{font-size:15px;line-height:1.55;overflow-x:clip}
+.ht-app p{margin:0}
+.ht-thanh{display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--vien)}
+.ht-nut-chinh,.ht-nut-phu{min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:12px 20px;border-radius:12px;font-weight:650}
+.ht-nut-chinh{background:var(--muc);color:var(--the);border:1px solid var(--muc)}
+.ht-nut-phu{background:var(--the);color:var(--muc);border:1px solid var(--vien)}
+.ht2-nut-lon{min-height:56px;font-size:17px;border-radius:16px;padding:12px 24px}
+.ht2-phu{margin:0;font-size:15px;color:var(--nhat)}
+.ht2-hang-nut{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.ht2-dong-bt{width:42px;height:42px;flex:0 0 42px;border-radius:13px;display:grid;place-items:center}
+.ht2-dong-bt[data-sac=cham]{background:color-mix(in srgb,var(--lg-nhan) 14%,var(--the));color:var(--lg-nhan)}
+.ht2-dong-bt[data-sac=vang]{background:color-mix(in srgb,var(--vang-diu) 16%,var(--the));color:var(--vang-diu)}
+.ht2-dong-bt[data-sac=muc]{background:var(--the-2);color:var(--muc)}
+.so{font-variant-numeric:tabular-nums}
+
+/* ── Màn Tự sửa lỗi (tu-chua.css) ── */
+.tcl-man{color-scheme:light dark}
+.tcl-man .ht-thanh.tcl-dau-trang{position:sticky;top:0;z-index:5;min-height:72px;justify-content:flex-start;gap:16px;padding:12px max(16px,calc((100% - 1200px) / 2 + 24px));background:var(--nen)}
+.tcl-dau-trang-ten{min-width:0;font-size:17px;font-weight:800;letter-spacing:-0.01em}
+.tcl-noi-dung{display:flex;flex-direction:column;gap:16px;width:100%;max-width:1200px;margin:0 auto;padding:24px 24px 48px}
+.tcl-bo-cuc{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.tcl-ds{display:flex;flex-direction:column;gap:24px;min-width:0}
+.tcl-tong{display:flex;flex-direction:column;gap:16px;min-width:0;padding:24px;border-radius:28px;border:1px solid var(--vien);background:var(--the);box-shadow:0 16px 36px -28px color-mix(in srgb,var(--muc) 45%,transparent)}
+.tcl-tong-dau{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+.tcl-so{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:96px;min-height:96px;padding:10px 12px;border-radius:22px;text-align:center;background:color-mix(in srgb,var(--lg-nhan) 10%,var(--the));color:var(--lg-nhan)}
+.tcl-so b{font-size:44px;font-weight:800;line-height:1;letter-spacing:-0.04em;font-variant-numeric:tabular-nums}
+.tcl-so small{font-size:13px;font-weight:700;line-height:1.3}
+.tcl-man .tcl-tong h1{margin:0;font-size:clamp(22px,2.4vw,28px);font-weight:800;letter-spacing:-0.02em;line-height:1.2}
+.tcl-man .tcl-nut-chinh{width:100%;justify-content:space-between}
+.tcl-nhom{display:flex;flex-direction:column;gap:10px;min-width:0}
+.tcl-nhom-dau{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:0 4px}
+.tcl-man .tcl-nhom-dau h2{margin:0;font-size:17px;font-weight:800;letter-spacing:-0.01em;line-height:1.3}
+.tcl-dem{flex:0 0 auto;font-size:14px;font-weight:700;color:var(--nhat);font-variant-numeric:tabular-nums}
+.tcl-the-ten{display:-webkit-box;overflow:hidden;font-size:16px;font-weight:750;line-height:1.35;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere}
+.tcl-the-phu{font-size:13px;line-height:1.5;color:var(--nhat)}
+.tcl-trong{display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-width:0;padding:28px 24px;border-radius:28px;border:1px solid var(--vien);background:var(--the);box-shadow:0 16px 36px -28px color-mix(in srgb,var(--muc) 45%,transparent)}
+.tcl-man .tcl-trong h1{margin:0;font-size:clamp(21px,2.2vw,26px);font-weight:800;letter-spacing:-0.02em;line-height:1.25}
+.tcl-trong .ht2-hang-nut{margin-top:4px}
+.tcl-trong-bt{display:grid;place-items:center;width:56px;height:56px;border-radius:18px}
+.tcl-trong-bt[data-sac='xanh']{background:color-mix(in srgb,var(--xanh) 14%,var(--the));color:color-mix(in srgb,var(--xanh) 55%,var(--muc))}
+.tcl-trong-so{font-size:15px;color:var(--nhat)}.tcl-trong-so b{color:var(--muc);font-variant-numeric:tabular-nums}
+
+/* ════════ MỚI (thang xoá lỗi) ════════ */
+/* thẻ tổng: 3 dòng có nhãn */
+.tcl-ba-dong{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.tcl-ba-dong li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:center;font-size:15px;line-height:1.45;color:var(--nhat)}
+.tcl-ba-dong li b{color:var(--muc);font-weight:800;font-variant-numeric:tabular-nums}
+.tcl-ba-dong li > span:first-child{display:grid;place-items:center;width:32px;height:32px;border-radius:10px}
+.tcl-ba-dong [data-sac=cham]{background:color-mix(in srgb,var(--lg-nhan) 14%,var(--the));color:var(--lg-nhan)}
+.tcl-ba-dong [data-sac=vang]{background:color-mix(in srgb,var(--vang-diu) 16%,var(--the));color:var(--vang-diu)}
+.tcl-ba-dong [data-sac=xanh]{background:color-mix(in srgb,var(--xanh) 14%,var(--the));color:color-mix(in srgb,var(--xanh) 55%,var(--muc))}
+/* thẻ từng lỗi: hàng trên (biểu tượng · tên · nút) + hàng dưới (thang 3 chấm · dòng chính) */
+.tcl-man .tcl-the{--a:var(--lg-nhan);display:grid;grid-template-columns:42px minmax(0,1fr) auto;grid-template-areas:"bt chu nut" "duoi duoi duoi";gap:12px 14px;align-items:center;padding:14px 16px;border-radius:18px;border:1px solid var(--vien);background:var(--the);color:var(--muc);margin:0}
+.tcl-man .tcl-the[data-nhom='can']{box-shadow:inset 4px 0 0 var(--lg-nhan)}
+.tcl-man .tcl-the[data-nhom='cho']{--a:var(--vang-diu);background:color-mix(in srgb,var(--the) 55%,var(--nen));box-shadow:inset 4px 0 0 color-mix(in srgb,var(--vang-diu) 60%,var(--the))}
+.tcl-man .tcl-the[data-nhom='xoa']{--a:color-mix(in srgb,var(--xanh) 55%,var(--muc));background:color-mix(in srgb,var(--the) 55%,var(--nen))}
+.tcl-the > .ht2-dong-bt{grid-area:bt}
+.tcl-the-chu{grid-area:chu;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tcl-man .tcl-the-nut{grid-area:nut;min-height:44px;min-width:72px;padding:0 18px;border-radius:12px;font-size:15px;font-weight:700;border-color:color-mix(in srgb,var(--lg-nhan) 45%,var(--vien));color:var(--lg-nhan)}
+.tcl-the-duoi{grid-area:duoi;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-width:0}
+.tcl-the-tt{display:flex;align-items:flex-start;gap:6px;min-width:0;font-size:14px;font-weight:750;line-height:1.45;color:var(--a);font-variant-numeric:tabular-nums}
+.tcl-the-tt svg{flex:none;margin-top:2px}
+.tcl-the[data-nhom='xoa'] .tcl-the-tt{color:var(--nhat)}
+.tcl-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;min-height:26px;margin-top:4px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:700;background:color-mix(in srgb,var(--lg-nhan) 12%,var(--the));color:var(--lg-nhan)}
+/* thang 3 chấm: Sửa — Gặp lại 1 — Gặp lại 2 */
+.tcl-thang{display:flex;align-items:center;margin:0;padding:6px 12px;list-style:none;border-radius:12px;background:var(--the-2);min-width:0;max-width:100%}
+.tcl-the[data-nhom='cho'] .tcl-thang,.tcl-the[data-nhom='xoa'] .tcl-thang{background:color-mix(in srgb,var(--the-2) 70%,var(--the))}
+.tcl-thang li{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;line-height:1.6;color:var(--nhat);white-space:nowrap}
+.tcl-thang li + li::before{content:"";flex:none;width:14px;height:2px;margin:0 6px;border-radius:2px;background:var(--vien-dam)}
+.tcl-thang li[data-tt='xong'] + li::before{background:var(--a)}
+.tcl-thang i{flex:none;display:grid;place-items:center;width:16px;height:16px;border-radius:50%;border:2px solid var(--vien-dam);background:var(--the)}
+.tcl-thang li[data-tt='xong']{color:var(--muc)}
+.tcl-thang li[data-tt='xong'] i{border-color:var(--a);background:var(--a);color:var(--the)}
+.tcl-thang li[data-tt='den']{color:var(--a)}
+.tcl-thang li[data-tt='den'] i{border-color:var(--a);box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 22%,transparent)}
+.tcl-thang li[data-tt='cho'] i{border-color:var(--a);border-style:dashed}
+.tcl-thang li[data-tt='cho']{color:var(--a)}
+/* nhóm gập "Đã xoá" */
+.tcl-gap{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;margin:0;padding:0 16px;border-radius:16px;border:1px dashed var(--vien-dam);background:transparent;color:var(--muc);text-align:left}
+.tcl-gap > span{display:flex;align-items:baseline;gap:8px;min-width:0}
+.tcl-gap b{font-size:17px;font-weight:800;letter-spacing:-0.01em}
+.tcl-gap small{font-size:14px;font-weight:700;color:var(--nhat);font-variant-numeric:tabular-nums}
+.tcl-gap svg{flex:none;color:var(--nhat);transition:transform 200ms}
+.tcl-gap[aria-expanded='true'] svg{transform:rotate(180deg)}
+.tcl-gap-h{margin:0;font:inherit}
+.tcl-xem-them{width:100%}
+/* dải mất mạng (giữ bản vừa xem) */
+.tcl-mat-mang{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:18px;border:1px solid color-mix(in srgb,var(--vang-diu) 45%,var(--vien));background:color-mix(in srgb,var(--vang-diu) 10%,var(--the));color:var(--muc)}
+.tcl-mat-mang > svg{flex:none;color:var(--vang-diu)}
+.tcl-mat-mang span{display:flex;flex-direction:column;min-width:0}
+.tcl-mat-mang strong{font-size:15px}
+.tcl-mat-mang small{font-size:14px;line-height:1.45;color:var(--nhat)}
+
+/* ── Ngang / máy tính bảng: hai cột ── */
+@media (min-width:700px){.tcl-bo-cuc{grid-template-columns:minmax(280px,340px) minmax(0,1fr);gap:20px}}
+/* ── Máy tính ── */
+@media (min-width:1100px){
+ .tcl-noi-dung{padding:32px 24px 56px}
+ .tcl-bo-cuc{grid-template-columns:380px minmax(0,1fr);gap:32px}
+ .tcl-tong{padding:28px}
+ .tcl-so{min-width:108px;min-height:108px}.tcl-so b{font-size:52px}
+ .tcl-the-duoi{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center}
+}
+@media (min-width:1100px) and (min-height:640px){.tcl-bo-cuc > .tcl-tong{position:sticky;top:96px}}
+/* ── Điện thoại dọc ── */
+@media (max-width:699px){
+ .tcl-man .ht-thanh.tcl-dau-trang{min-height:64px;padding:10px 16px}
+ .tcl-noi-dung{padding:16px 16px 32px}
+ .tcl-tong,.tcl-trong{padding:20px;border-radius:24px}
+ .tcl-so{min-width:84px;min-height:84px;border-radius:20px}.tcl-so b{font-size:38px}
+ .tcl-man .tcl-tong h1{font-size:22px}
+ .tcl-man .tcl-the{gap:10px 12px;padding:12px 14px}
+ .tcl-trong .ht2-hang-nut{width:100%;flex-direction:column;align-items:stretch}
+ .tcl-trong .ht2-hang-nut > *{width:100%}
+}
+/* ── Điện thoại xoay ngang ── */
+@media (max-height:520px) and (orientation:landscape){
+ .tcl-man .ht-thanh.tcl-dau-trang{min-height:56px;padding-top:6px;padding-bottom:6px}
+ .tcl-noi-dung{padding-top:12px}
+ .tcl-tong{gap:12px;padding:16px;border-radius:22px}
+ .tcl-tong-dau{gap:12px}
+ .tcl-so{min-width:76px;min-height:76px;padding:6px;border-radius:18px}.tcl-so b{font-size:34px}
+ .tcl-man .tcl-tong h1{font-size:20px}
+ .tcl-ba-dong{gap:8px}.tcl-ba-dong li{font-size:14px;grid-template-columns:28px minmax(0,1fr);gap:10px}.tcl-ba-dong li > span:first-child{width:28px;height:28px}
+ .tcl-man .tcl-nut-chinh{min-height:52px}
+}
+@media (prefers-reduced-motion:reduce){.tcl-gap svg{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <symbol id="i-lui" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-mui" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-but" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.5 6.5l4 4M13 20h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-dh" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-xong" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-khoa" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V8a4 4 0 018 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-dung" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-xuong" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-mang" viewBox="0 0 24 24"><path d="M2 8.5a15 15 0 0120 0M5.5 12a10 10 0 0113 0M9 15.5a5 5 0 016 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19" r="1.4" fill="currentColor"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-thay" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+ </defs>
+</svg>
+
+<div class="ht-app ht2 tcl-man">
+ <header class="ht-thanh tcl-dau-trang"><button type="button" class="ht-nut-phu"><svg width="18" height="18" aria-hidden="true"><use href="#i-lui"/></svg>Hôm nay</button><strong class="tcl-dau-trang-ten">Tự sửa lỗi</strong></header>
+ <main class="tcl-noi-dung" id="noi"></main>
+</div>
+
+<script>
+const q = new URLSearchParams(location.hash.slice(1))
+const tt = q.get('tt') || 'co', matMang = q.get('mang') === '0', moXoa = q.get('xoa') === '1'
+if (q.get('toi')) document.documentElement.dataset.toi = ''
+
+// ── Số GIẢ, "bây giờ" = 21:05 Thứ Hai 19/10. Còn 12 lỗi = 3 làm được ngay + 9 chờ tới lượt. ──
+// buoc: bước đang tới (1 Sửa · 2 Gặp lại 1 · 3 Gặp lại 2 · 4 đã xoá); nhom: can (đến lượt) · cho (chưa tới) · xoa (đã xoá)
+const LOI = [
+  { nhom: 'can', ten: 'Amine — bậc amine', phan: 'Trắc nghiệm', sai: 2, gan: '15/10', buoc: 3, tt: 'Còn 1 lần làm đúng là xoá · làm ngay', nut: 'Làm' },
+  { nhom: 'can', ten: 'Ester — thuỷ phân', phan: 'Đúng–sai', sai: 3, gan: '18/10', buoc: 2, tt: 'Còn 2 lần làm đúng là xoá · làm ngay', nut: 'Làm' },
+  { nhom: 'can', ten: 'Peptide — đếm liên kết', phan: 'Trả lời ngắn', sai: 4, gan: '19/10', buoc: 1, tt: 'Sửa lại từng bước · sau đó còn 2 lần làm đúng là xoá', nut: 'Sửa', thay: true },
+  { nhom: 'cho', ten: 'Điện phân dung dịch', phan: 'Trả lời ngắn', sai: 2, gan: '19/10', buoc: 2, tt: 'Còn 2 lần làm đúng · lần tới từ 19:30 Thứ Ba 20/10' },
+  { nhom: 'cho', ten: 'Bài toán hỗn hợp kim loại + HNO<sub>3</sub>', tenDoc: 'Bài toán hỗn hợp kim loại + HNO3', phan: 'Trả lời ngắn', sai: 3, gan: '17/10', buoc: 3, tt: 'Còn 1 lần làm đúng là xoá · lần tới từ 21:40 Thứ Ba 20/10' },
+  { nhom: 'cho', ten: 'Carbohydrate — phản ứng tráng bạc', phan: 'Trắc nghiệm', sai: 2, gan: '18/10', buoc: 3, tt: 'Còn 1 lần làm đúng là xoá · lần tới từ 08:15 Thứ Tư 21/10' },
+  { nhom: 'xoa', ten: 'Ester — xà phòng hoá chất béo', phan: 'Trắc nghiệm', sai: 1, gan: '14/10', buoc: 4, tt: 'Đã xoá 18/10 · kiểm nhẹ lại 01/11' },
+  { nhom: 'xoa', ten: 'Kim loại — dãy điện hoá', phan: 'Đúng–sai', sai: 2, gan: '12/10', buoc: 4, tt: 'Đã xoá 17/10 · kiểm nhẹ lại 31/10' },
+]
+const DEM = { con: 12, ngay: 3, xoa3: 5, xoaTuan: 18, cho: 9, daXoa: 31 }
+const BUOC = ['Sửa', 'Gặp lại 1', 'Gặp lại 2']
+
+function thang(l) {
+  const xong = BUOC.filter((_, i) => i + 1 < l.buoc), con = BUOC.filter((_, i) => i + 1 >= l.buoc)
+  const nhan = l.buoc > 3 ? 'Đã xong cả 3 bước: Sửa, Gặp lại 1, Gặp lại 2' : `${xong.length ? `Đã xong: ${xong.join(', ')}. ` : ''}Còn: ${con.join(', ')}`
+  return `<ol class="tcl-thang" aria-label="${nhan}">${BUOC.map((b, i) => {
+    const s = i + 1 < l.buoc ? 'xong' : i + 1 === l.buoc ? (l.nhom === 'can' ? 'den' : 'cho') : 'chua'
+    return `<li data-tt="${s}"><i>${s === 'xong' ? '<svg width="10" height="10" aria-hidden="true"><use href="#i-dung"/></svg>' : ''}</i>${b}</li>`
+  }).join('')}</ol>`
+}
+const the = (l) => {
+  const sac = l.nhom === 'can' ? 'cham' : l.nhom === 'cho' ? 'vang' : 'muc'
+  const bt = l.nhom === 'can' ? 'i-but' : l.nhom === 'cho' ? 'i-khoa' : 'i-xong'
+  const icon = l.nhom === 'cho' ? '<svg width="16" height="16" aria-hidden="true"><use href="#i-dh"/></svg>' : ''
+  return `<article class="tcl-the" data-nhom="${l.nhom}" aria-label="${l.tenDoc || l.ten}">
+   <span class="ht2-dong-bt" data-sac="${sac}" aria-hidden="true"><svg width="20" height="20"><use href="#${bt}"/></svg></span>
+   <div class="tcl-the-chu"><strong class="tcl-the-ten">${l.ten}</strong><small class="tcl-the-phu so">${l.phan} · Sai ${l.sai} lần · gần nhất ${l.gan}</small>${l.thay ? '<span class="tcl-chip"><svg width="14" height="14" aria-hidden="true"><use href="#i-thay"/></svg>Thầy sẽ chữa trên lớp</span>' : ''}</div>
+   ${l.nut ? `<button type="button" class="ht-nut-phu tcl-the-nut">${l.nut}</button>` : ''}
+   <div class="tcl-the-duoi">${thang(l)}<p class="tcl-the-tt">${icon}<span>${l.tt}</span></p></div>
+  </article>`
+}
+const nhomXoa = () => `<section class="tcl-nhom" aria-label="Đã xoá: ${DEM.daXoa} lỗi">
+  <h2 class="tcl-gap-h"><button type="button" class="tcl-gap" aria-expanded="${moXoa}"><span><b>Đã xoá</b><small>${DEM.daXoa} lỗi</small></span><svg width="22" height="22" aria-hidden="true"><use href="#i-xuong"/></svg></button></h2>
+  ${moXoa ? LOI.filter((l) => l.nhom === 'xoa').map(the).join('') + `<button type="button" class="ht-nut-phu tcl-xem-them">Xem cả ${DEM.daXoa} lỗi đã xoá</button>` : ''}
+ </section>`
+const theTong = () => `<section class="tcl-tong" aria-labelledby="tcl-tong-tieu">
+  <div class="tcl-tong-dau"><p class="tcl-so"><small>Còn</small><b>${DEM.con}</b><small>lỗi</small></p><div><h1 id="tcl-tong-tieu">Sửa lại câu em làm sai</h1></div></div>
+  <ul class="tcl-ba-dong">
+   <li><span data-sac="cham" aria-hidden="true"><svg width="18" height="18"><use href="#i-but"/></svg></span><span><b>${DEM.ngay} lỗi</b> làm được ngay</span></li>
+   <li><span data-sac="vang" aria-hidden="true"><svg width="18" height="18"><use href="#i-dh"/></svg></span><span><b>${DEM.xoa3} lỗi</b> xoá được trong 3 ngày tới nếu em làm đúng</span></li>
+   <li><span data-sac="xanh" aria-hidden="true"><svg width="18" height="18"><use href="#i-xong"/></svg></span><span>Tuần này đã xoá <b>${DEM.xoaTuan} lỗi</b></span></li>
+  </ul>
+  <button type="button" class="ht-nut-chinh ht2-nut-lon tcl-nut-chinh"><span>Sửa lỗi đến lượt · ${DEM.ngay}</span><svg width="20" height="20" aria-hidden="true"><use href="#i-mui"/></svg></button>
+ </section>`
+const danhSach = () => `<div class="tcl-ds">
+  <section class="tcl-nhom" data-nhom="can" aria-label="Làm được ngay: ${DEM.ngay} lỗi"><div class="tcl-nhom-dau"><h2>Làm được ngay</h2><span class="tcl-dem">${DEM.ngay} lỗi</span></div>${LOI.filter((l) => l.nhom === 'can').map(the).join('')}</section>
+  <section class="tcl-nhom" data-nhom="cho" aria-label="Chờ tới lượt: ${DEM.cho} lỗi"><div class="tcl-nhom-dau"><h2>Chờ tới lượt</h2><span class="tcl-dem">${DEM.cho} lỗi</span></div>${LOI.filter((l) => l.nhom === 'cho').map(the).join('')}
+   <button type="button" class="ht-nut-phu tcl-xem-them">Xem cả ${DEM.cho} lỗi đang chờ</button></section>
+  ${nhomXoa()}
+ </div>`
+const rong = () => `<div class="tcl-bo-cuc">
+  <section class="tcl-trong" aria-labelledby="tcl-rong-tieu">
+   <span class="tcl-trong-bt" data-sac="xanh"><svg width="28" height="28" aria-hidden="true"><use href="#i-xong"/></svg></span>
+   <h1 id="tcl-rong-tieu">Không còn lỗi nào cần sửa</h1>
+   <p class="ht2-phu">Lỗi mới hiện ở đây sau khi em làm sai.</p>
+   <p class="tcl-trong-so">Tuần này đã xoá: <b>${DEM.xoaTuan} lỗi</b></p>
+   <div class="ht2-hang-nut"><button type="button" class="ht-nut-chinh ht2-nut-lon">Về Hôm nay</button><button type="button" class="ht-nut-phu">Luyện thêm ở Tu luyện</button></div>
+  </section>
+  <div class="tcl-ds">${nhomXoa()}</div>
+ </div>`
+
+const noi = document.getElementById('noi')
+noi.innerHTML = (matMang ? `<div class="tcl-mat-mang" role="status"><svg width="22" height="22" aria-hidden="true"><use href="#i-mang"/></svg><span><strong>Đang mất mạng</strong><small>Em đang xem bản lúc 21:02 · có mạng lại, danh sách tự cập nhật.</small></span></div>` : '')
+  + (tt === 'rong' ? rong() : `<div class="tcl-bo-cuc">${theTong()}${danhSach()}</div>`)
+</script>
+</body>
+</html>
