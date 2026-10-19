@@ -432,10 +432,48 @@ export async function phanLoaiTuLuanDaLam(env: Env, sbd: string, ds: readonly { 
   return { tuLuan, daTraLoi }
 }
 
+/** Câu trả lời đã lưu của một lượt làm (bài kiểm tra: `luot.dap_an_json` theo phần; Phần II mảng ⇒ "S-DD", ô trống là "-"). */
+function traLoiTrongBai(json: unknown, qid: string): string | null {
+  let o: Record<string, Record<string, unknown> | undefined>
+  try { o = JSON.parse(str(json) || '{}') } catch { return null }
+  for (const p of ['phanI', 'phanII', 'phanIII']) {
+    const v = o?.[p]?.[qid]
+    if (Array.isArray(v)) return v.some((x) => x === 'D' || x === 'S') ? v.map((x) => (x === 'D' || x === 'S' ? x : '-')).join('') : null
+    if (v != null && str(v).trim()) return str(v).trim()
+  }
+  return null
+}
+
+/**
+ * SỬA LỖI 19/10 (em báo "đáp án em 40 trùng đáp án đúng 40 mà vẫn bị xếp vào câu sai phải sửa"): đợt tự sửa mở từ lần SAI (ở đây bài kiểm tra
+ * 01/10, em ghi 5,88), nhưng `emTraLoi` là lần làm game MỚI NHẤT (sau đó em làm đúng 40) ⇒ màn "Sửa trên câu gốc" ghi "Em đã trả lời lần trước: 40".
+ * Nay màn tự sửa xin thêm câu trả lời của lần SAI gần nhất theo sổ `su_kien_hoc` (không `embargoed`): bài kiểm tra đọc `luot.dap_an_json`
+ * (đúng lượt làm, khung gốc — ca thi không xáo chữ cái), kênh khác đọc lượt game cùng phiên (`traLoiGoc` của bản xáo). Không tìm được ⇒ null.
+ */
+async function docTraLoiSai(env: Env, sbd: string, qid: string): Promise<string | null> {
+  const r = await env.DB.prepare(
+    `SELECT s.nguon,
+       CASE WHEN s.nguon = 'thi'
+         THEN (SELECT l.dap_an_json FROM luot l WHERE l.ma_ca = s.ma_nguon AND l.sbd = s.sbd ORDER BY (l.lan_thu = s.lan) DESC, l.lan_thu DESC LIMIT 1)
+         ELSE (SELECT COALESCE(json_extract(a.json,'$.traLoiGoc'), json_extract(a.json,'$.traLoi')) FROM game_v2_attempt a WHERE a.id = s.ma_nguon || '|' || s.qid)
+       END AS t
+     FROM su_kien_hoc s
+     WHERE s.sbd = ? AND s.qid = ? AND s.ket_qua = 0 AND COALESCE(s.visibility,'released') <> 'embargoed'
+     ORDER BY s.luc DESC LIMIT 5`,
+  ).bind(sbd, qid).all<Row>()
+  for (const x of r.results ?? []) {
+    const t = str(x.nguon) === 'thi' ? traLoiTrongBai(x.t, qid) : str(x.t).trim() || null
+    if (t) return t
+  }
+  return null
+}
+
 /** Đề + đáp án + lời giải của câu em ĐÃ làm (đáp án không bao giờ xuống máy trước khi em làm câu đó). Tối đa 60 câu/lượt (tải PDF). */
 async function cauChiTiet(env: Env, sbd: string, b: Row): Promise<Record<string, unknown>> {
   const qids = (Array.isArray(b.qids) ? b.qids : [b.qid]).map(str).filter(Boolean).slice(0, 60)
   if (!qids.length) return { ok: false, error: 'Thiếu câu cần xem.' }
+  // Màn tự sửa (một câu, `traLoiSai: true`) xin thêm câu trả lời của lần SAI — đọc CÙNG đợt với các lượt đọc dưới, không thêm vòng chờ nối tiếp.
+  const saiSom = b.traLoiSai === true && qids.length === 1 ? docTraLoiSai(env, sbd, qids[0]!).catch(() => null) : null
   // Tối ưu 05/10: ba lượt ĐỌC độc lập (câu em đã làm, siêu dữ liệu câu, câu đang bảo vệ) bắt đầu CÙNG lúc — trước: nối tiếp. Dùng đúng thứ tự cũ.
   // 13/10 (thầy báo màn Đường tự gỡ "Máy chủ phản hồi chậm", lệnh này quá 30 s giờ cao điểm): trước dựng CẢ hồ sơ 2.0 (`docHoSo2`: mọi chiến dịch,
   // nợ, ôn bài cũ, ứng viên hành trình — có lượt quét cả kho 24 nghìn dòng khi isolate nguội) chỉ để tra mã tờ + phiên bản của vài câu ⇒ nay tra
@@ -474,7 +512,8 @@ async function cauChiTiet(env: Env, sbd: string, b: Row): Promise<Record<string,
       if (!tapBaoVe || tapBaoVe.has(qid) || tapBaoVe.has(q.group)) { khoa.push(qid); continue }
       const tl = await v.tl
       // 30/09: câu tự luận ⇒ `tuLuan: true` — máy em hiện "Câu tự luận — không chấm tự động" thay đỏ/xanh (PDF cũng vậy).
-      ra.push({ de: publicQuestionDayDu(q), dapAn: q.correct, loiGiai: q.solution, emTraLoi: tl?.t == null ? null : str(tl.t), ...(laCauTuLuan(q) ? { tuLuan: true } : {}) })
+      const sai = saiSom ? await saiSom : null
+      ra.push({ de: publicQuestionDayDu(q), dapAn: q.correct, loiGiai: q.solution, emTraLoi: tl?.t == null ? null : str(tl.t), ...(saiSom ? { emTraLoiSai: sai } : {}), ...(laCauTuLuan(q) ? { tuLuan: true } : {}) })
     } catch { /* câu đã rút khỏi kho */ }
   }
   return { ok: true, cau: ra, ...(khoa.length ? { khoa } : {}) }

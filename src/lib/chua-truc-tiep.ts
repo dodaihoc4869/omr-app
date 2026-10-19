@@ -56,17 +56,28 @@ const goc = (q: string) => q.replace(/(~\d+|#\d+)$/, '').replace(/^tc:/, '')
 /** Đề + đáp án + lời giải câu em ĐÃ làm, đúng quyền của máy chủ (xem chú thích đầu tệp). */
 export async function taiCauGocDaLam(token: string, qid: string): Promise<CauGocDaLam> {
   try {
-    const o = await goiHoa2('hoa2-cau-chi-tiet', token, { qid }, 30)
+    const o = await goiHoa2('hoa2-cau-chi-tiet', token, { qid, traLoiSai: true }, 30)
     const khoa = Array.isArray(o.khoa) ? o.khoa.map(String) : []
     if (khoa.some((k) => k === qid || goc(k) === goc(qid))) return { trangThai: 'khoa' }
     for (const c of Array.isArray(o.cau) ? o.cau : []) {
       const ct = docChiTiet(c)
-      if (ct && (ct.de.qid === qid || goc(ct.de.qid) === goc(qid))) return { trangThai: 'co', ct }
+      if (ct && (ct.de.qid === qid || goc(ct.de.qid) === goc(qid))) return { trangThai: 'co', ct: { ...ct, emTraLoi: traLoiLanSai(ct) } }
     }
     return { trangThai: 'khong_co' }
   } catch (e) {
     return { trangThai: 'loi', loi: e instanceof LoiHoa2 ? e.message : 'Chưa tải được câu gốc. Em thử lại nhé.' }
   }
+}
+
+/**
+ * "Em đã trả lời lần trước" ở màn tự sửa = câu trả lời của lần SAI đã mở đợt (sửa lỗi 19/10: trước hiện lần làm MỚI NHẤT — em làm đúng 40 sau lần sai
+ * 5,88 ở bài kiểm tra ⇒ màn ghi 40 cạnh đáp án 40, em tưởng app chấm nhầm). Máy chủ không tìm được lần sai mà lần mới nhất lại ĐÚNG ⇒ không hiện
+ * (màn ghi "chưa lưu") thay vì hiện một câu trả lời đúng như thể là lần sai. Máy chủ cũ (chưa có trường) ⇒ cùng chốt chặn đó.
+ */
+export function traLoiLanSai(ct: ChiTietCau): string | null {
+  if (ct.emTraLoiSai) return ct.emTraLoiSai
+  if (!ct.emTraLoi || ct.tuLuan) return ct.emTraLoi
+  return soTuLam(ct.de.phan, ct.emTraLoi, ct.dapAn) ? null : ct.emTraLoi
 }
 
 const chuan = (s: string | null | undefined) => String(s ?? '').trim().toUpperCase().replace(/Đ/g, 'D')

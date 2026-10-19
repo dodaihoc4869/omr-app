@@ -144,6 +144,8 @@ export interface ChiTietCau {
   dapAn: string
   loiGiai: unknown
   emTraLoi: string | null
+  /** 19/10: câu trả lời của lần SAI gần nhất — chỉ khi xin `traLoiSai` (màn tự sửa); máy chủ không tìm được ⇒ null; máy chủ cũ ⇒ không có. */
+  emTraLoiSai?: string | null
   /** 30/09: câu TỰ LUẬN (máy chủ gắn, hoặc máy em tự nhận ra bằng luật chung `laCauTuLuan` khi có đáp án) — không chấm đúng/sai. */
   tuLuan?: boolean
 }
@@ -404,7 +406,7 @@ export function docChiTiet(x: unknown): ChiTietCau | null {
   const dapAn = chu(o.dapAn).trim()
   // Máy chủ cũ chưa gắn `tuLuan` ⇒ máy em tự xét bằng ĐÚNG luật chung (câu đã làm nên có đáp án).
   const tuLuan = o.tuLuan === true || laCauTuLuan({ phan: de.phan, qid: de.qid, text: de.text, dapAn, tuLuan: d.tuLuan === true })
-  return { de, dapAn, loiGiai: o.loiGiai, emTraLoi: o.emTraLoi == null ? null : chu(o.emTraLoi).trim() || null, ...(tuLuan ? { tuLuan: true } : {}) }
+  return { de, dapAn, loiGiai: o.loiGiai, emTraLoi: o.emTraLoi == null ? null : chu(o.emTraLoi).trim() || null, ...('emTraLoiSai' in o ? { emTraLoiSai: o.emTraLoiSai == null ? null : chu(o.emTraLoiSai).trim() || null } : {}), ...(tuLuan ? { tuLuan: true } : {}) }
 }
 
 /** Máy chủ nhận tối đa 60 câu một lượt (`hoa2-cau-chi-tiet`). */
