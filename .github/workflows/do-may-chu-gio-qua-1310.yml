@@ -23,8 +23,9 @@ jobs:
       # 14/10: cao điểm TRỌN 13/10 19:30–22:30 VN (12:30–15:30 UTC) — tìm điểm nghẽn theo từng câu SQL cho đợt tối ưu giờ cao điểm (run 38496981327).
       # 14/10 tối: CÙNG khung 19:30–22:30 VN của 14/10 — sau đợt tối ưu giờ cao điểm (#298 #299 #302 #303) — so trước/sau.
       # 15/10 tối: CÙNG khung 19:30–22:30 VN của 15/10 — sau tối ưu 15/10 (#312 #313) — so 14/10 (run 38590197763).
+      # 19/10: cao điểm 18/10 19:30–22:30 VN — thầy gửi ảnh nộp câu 21:56 báo "Máy chủ phản hồi chậm hoặc mạng gián đoạn" (so 15/10 run 38762133091).
       GIO: '3'
-      DEN: '2026-10-15T15:30:00Z'
+      DEN: '2026-10-18T15:30:00Z'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
