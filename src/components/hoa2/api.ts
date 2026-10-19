@@ -194,11 +194,26 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
   } catch (e) {
     if (e instanceof LoiHoa2) throw e
     if ((e as { name?: string })?.name === 'AbortError') {
-      throw new LoiHoa2('Máy chủ phản hồi chậm hoặc mạng gián đoạn. Em thử lại nhé.')
+      throw new LoiHoa2('Máy chủ phản hồi chậm hoặc mạng gián đoạn. Em thử lại nhé.', 'het_gio')
     }
-    throw new LoiHoa2('Chưa kết nối được máy chủ. Em kiểm tra mạng rồi thử lại.')
+    throw new LoiHoa2('Chưa kết nối được máy chủ. Em kiểm tra mạng rồi thử lại.', 'mat_mang')
   } finally {
     clearTimeout(hen)
+  }
+}
+
+/**
+ * Lệnh CHỐNG TRÙNG (máy chủ khoá theo biên nhận — nộp lại trả đúng kết quả lần đầu, vd `answer`): mỗi lượt chờ `giay`, lỗi ĐƯỜNG TRUYỀN (hết giờ chờ / mất kết nối)
+ * ⇒ tự gửi lại tối đa `lan` lần rồi mới báo em. Lỗi máy chủ trả lời (`ok:false`) báo ngay như cũ. (Thầy 19/10, ảnh 18/10 21:56 "Máy chủ phản hồi chậm hoặc mạng
+ * gián đoạn": cả cao điểm 18/10 máy chủ 0 lỗi, 99% lượt < 0,73 giây — lượt ấy kẹt đường truyền, em phải chờ đủ 40 giây rồi tự bấm lại.)
+ */
+export async function goiHoa2GuiLai(lenh: string, token: string, du: Record<string, unknown> = {}, giay = 15, lan = 2, goi: typeof goiHoa2 = goiHoa2): Promise<Record<string, unknown>> {
+  for (let i = 0; ; i++) {
+    try {
+      return await goi(lenh, token, du, giay)
+    } catch (e) {
+      if (i >= lan || !(e instanceof LoiHoa2) || (e.ma !== 'het_gio' && e.ma !== 'mat_mang')) throw e
+    }
   }
 }
 

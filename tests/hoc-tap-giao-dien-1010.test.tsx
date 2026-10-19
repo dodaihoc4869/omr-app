@@ -33,7 +33,7 @@ it('trước nộp không có đáp án, sau nộp dùng phản hồi máy chủ
   fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn A' }))
   await screen.findByText('Đúng · tự làm')
   expect(localStorage.getItem('hoc-tap:nhap:gia:gia-1:v1')).toBeNull()
-  await waitFor(() => expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'gia', expect.objectContaining({ session: 'p1', qid: 'gia-1', answer: 'A' }), 40))
+  await waitFor(() => expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'gia', expect.objectContaining({ session: 'p1', qid: 'gia-1', answer: 'A' }), 15))
 })
 it('đúng-sai phải đủ bốn ý; props làm bài không mang đáp án/lời giải trước nộp', () => {
   expect(duTraLoi('II', 'DS-D')).toBe(false); expect(duTraLoi('II', 'DSDS')).toBe(true)

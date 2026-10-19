@@ -86,7 +86,7 @@ describe('màn làm bài', () => {
     fireEvent.click(y('d').getByRole('button', { name: 'Đúng' }))
     expect(nut().textContent).toBe('Nộp câu'); fireEvent.click(nut())
     await screen.findByText('Đúng 3/4 ý · sai ý d')
-    expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'tk', expect.objectContaining({ session: 'p1', qid: 'ds1', answer: 'DDDD', assisted: false, msLam: expect.any(Number) }), 40)
+    expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'tk', expect.objectContaining({ session: 'p1', qid: 'ds1', answer: 'DDDD', assisted: false, msLam: expect.any(Number) }), 15)
     expect(screen.getByText(/câu này vào lịch ôn 1 · 3 · 7 ngày/)).toBeTruthy()
     expect(within(screen.getByRole('region', { name: 'Ý d, sai' })).getByText('Em chọn Đúng · đáp án Sai')).toBeTruthy()
     expect(within(screen.getByRole('region', { name: 'Ý a, đúng' })).getByText('Em chọn Đúng · đáp án Đúng')).toBeTruthy()
@@ -112,7 +112,7 @@ describe('màn làm bài', () => {
     vi.mocked(goiHoa2).mockResolvedValueOnce({ ok: true, correct: true, answer: '-1,5', solution: { chot: 'Bảo toàn nguyên tố N.' } })
     fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · −1,5' }))
     await screen.findByText('Đúng · tự làm')
-    expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'tk', expect.objectContaining({ answer: '-1,5' }), 40)
+    expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'tk', expect.objectContaining({ answer: '-1,5' }), 15)
     fireEvent.click(phim.queryByRole('button', { name: '1' }) ?? document.body) // bàn phím đã thu sau khi nộp
     expect(screen.queryByRole('group', { name: 'Bàn phím số' })).toBeNull()
     expect(screen.getByText('Bảo toàn nguyên tố N.')).toBeTruthy()
@@ -165,7 +165,7 @@ describe('màn làm bài', () => {
     vi.mocked(goiHoa2).mockResolvedValueOnce({ ok: true, correct: true, answer: 'B', solution: '' })
     fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
     await screen.findByText('Đúng · có gợi ý')
-    expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'tk', expect.objectContaining({ assisted: true }), 40)
+    expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'tk', expect.objectContaining({ assisted: true }), 15)
   })
   it('xong chặng: "Đã lưu chặng 2", số câu tự làm đúng, câu sai vào lịch ôn, thẻ Hôm nay + nút học tiếp / nghỉ', async () => {
     const { rerender, onCapNhat } = moMan([TN, DS])
