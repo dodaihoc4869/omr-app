@@ -13,8 +13,8 @@ const RE_NGAT = /[\s→⟶⇌⇄]+/
 
 export type PhongCuTim = { loai: 'tcvn3' | 'xen-ke'; token: string; ngu: string }
 
-/** Liệt kê các token nghi là chữ phông cũ / chữ xen kẽ (không sửa). Mỗi token ≤ 80 ký tự, kèm 24 ký tự quanh. */
-export function timPhongCu(text: string): PhongCuTim[] {
+/** Liệt kê các token nghi là chữ phông cũ / chữ xen kẽ (không sửa). Mỗi token ≤ 80 ký tự, kèm `soNgu` (mặc định 24) ký tự quanh. */
+export function timPhongCu(text: string, soNgu = 24): PhongCuTim[] {
   const out: PhongCuTim[] = []
   if (!text || !/[^\x00-\x7F]/.test(text)) return out
   let vt = 0
@@ -25,7 +25,7 @@ export function timPhongCu(text: string): PhongCuTim[] {
     const tcvn = [...t].some((c) => KY_TU_TCVN3.includes(c)) || RE_CHU_HOA_GIUA.test(t)
     const xen = RE_XEN_KE.test(t)
     if (!tcvn && !xen) continue
-    out.push({ loai: tcvn ? 'tcvn3' : 'xen-ke', token: t.slice(0, 80), ngu: text.slice(Math.max(0, i - 24), i + t.length + 24).replace(/\s+/g, ' ') })
+    out.push({ loai: tcvn ? 'tcvn3' : 'xen-ke', token: t.slice(0, 80), ngu: text.slice(Math.max(0, i - soNgu), i + t.length + soNgu).replace(/\s+/g, ' ') })
   }
   return out
 }

@@ -26,7 +26,7 @@ for (let i = 0; i < ung.length; i += 40) {
     try { o = JSON.parse(r.json) } catch { continue }
     let co = false
     const duyet = (v, duong) => {
-      if (typeof v === 'string') { for (const h of timPhongCu(v)) { co = true; const k = `${h.loai}|${h.token}`; const e = gap.get(k) ?? { n: 0, loai: h.loai, token: h.token, truong: new Set(), qid: [], ngu: h.ngu }; e.n++; e.truong.add(duong); if (e.qid.length < 6 && !e.qid.includes(r.qid)) e.qid.push(r.qid); gap.set(k, e) } return }
+      if (typeof v === 'string') { for (const h of timPhongCu(v, Number(process.env.SOI_NGU) || 24)) { co = true; const k = `${h.loai}|${h.token}`; const e = gap.get(k) ?? { n: 0, loai: h.loai, token: h.token, truong: new Set(), qid: [], ngu: h.ngu }; e.n++; e.truong.add(duong); if (e.qid.length < 6 && !e.qid.includes(r.qid)) e.qid.push(r.qid); gap.set(k, e) } return }
       if (Array.isArray(v)) { v.forEach((x) => duyet(x, `${duong}[]`)); return }
       if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) { if (k === 'hinh' || k === 'anh' || k === 'src') continue; duyet(x, duong ? `${duong}.${k}` : k) }
     }
