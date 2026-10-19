@@ -5,7 +5,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
-import { goiHoa2, goiHoa2GuiLai, LoiHoa2 } from '../src/components/hoa2/api'
+import { goiHoa2, guiLaiKhiKetMang, LoiHoa2 } from '../src/components/hoa2/api'
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 afterEach(() => { cleanup(); vi.mocked(goiHoa2).mockReset(); localStorage.clear() })
 
@@ -13,17 +13,17 @@ const TN = { maDe: 'de-8', version: 'v1', group: 'g', hinhAnh: [], dang: null, t
 const lanNop = () => vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'answer')
 const HET_GIO = () => new LoiHoa2('Máy chủ phản hồi chậm hoặc mạng gián đoạn. Em thử lại nhé.', 'het_gio')
 
-describe('goiHoa2GuiLai', () => {
+describe('guiLaiKhiKetMang', () => {
   it('lỗi đường truyền ⇒ gửi lại; lỗi máy chủ trả lời ⇒ báo ngay, không gửi lại', async () => {
     const goi = vi.fn().mockRejectedValueOnce(HET_GIO()).mockRejectedValueOnce(new LoiHoa2('Chưa kết nối được máy chủ.', 'mat_mang')).mockResolvedValueOnce({ ok: true, id: 'x' })
-    expect(await goiHoa2GuiLai('answer', 't', { a: 1 }, 15, 2, goi)).toEqual({ ok: true, id: 'x' })
+    expect(await guiLaiKhiKetMang(() => goi('answer', 't', { a: 1 }, 15))).toEqual({ ok: true, id: 'x' })
     expect(goi).toHaveBeenCalledTimes(3)
     expect(goi).toHaveBeenNthCalledWith(3, 'answer', 't', { a: 1 }, 15)
     const loiMayChu = vi.fn().mockRejectedValue(new LoiHoa2('Câu không thuộc lượt học.'))
-    await expect(goiHoa2GuiLai('answer', 't', {}, 15, 2, loiMayChu)).rejects.toThrow('Câu không thuộc lượt học.')
+    await expect(guiLaiKhiKetMang(() => loiMayChu('answer', 't', {}, 15))).rejects.toThrow('Câu không thuộc lượt học.')
     expect(loiMayChu).toHaveBeenCalledTimes(1)
     const hong = vi.fn().mockRejectedValue(HET_GIO())
-    await expect(goiHoa2GuiLai('answer', 't', {}, 15, 2, hong)).rejects.toThrow('Máy chủ phản hồi chậm')
+    await expect(guiLaiKhiKetMang(() => hong('answer', 't', {}, 15))).rejects.toThrow('Máy chủ phản hồi chậm')
     expect(hong).toHaveBeenCalledTimes(3) // 1 lần đầu + 2 lần gửi lại rồi mới báo em
   })
 })
