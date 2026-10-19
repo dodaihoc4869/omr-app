@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { giaiMaTcvn3, suaNhanXenKe, timPhongCu } from '../src/lib/phong-cu'
 import { chuHtml } from '../src/lib/html-phieu'
 import { parseChemText } from '../src/lib/chem-format'
+import { dungNoiDung } from '../server/src/hoi-tro-ly'
 
 // Chuỗi trong ảnh thầy chụp 19/10 (câu quang hợp).
 const DE_THAT = 'Quá trình quang hợp của cây xanh diễn ra theo phương trình hóa học tổng quát sau:\nCO₂ + H₂O chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎→(C₆H₁₀O₅)ₙ + O₂ Biết rằng để tổng hợp được 1 mol mắt xích tinh bột'
@@ -58,5 +59,14 @@ describe('sửa nhãn xen kẽ đã biết (tầng hiển thị)', () => {
     expect(mui).toMatchObject({ t: 'mui', mui: '→', tren: 'ánh sáng', duoi: 'chất diệp lục (chlorophyll)' })
     const chu = phan.map((p) => ('v' in p ? p.v : '')).join('')
     expect(chu).not.toMatch(/Ê|¸|ⁿ|gorophyll/)
+  })
+})
+
+describe('Hỏi Thầy gửi Gemini đề đã sửa', () => {
+  it('dòng ĐỀ trong dữ liệu câu không còn chữ rác của nhãn mũi tên (máy chủ dùng chung suaNhanXenKe)', () => {
+    const nc = { qid: 'DB-12-B6-D3-III-46', cau: { phan: 'III', so: '46', chuong: 'Carbohydrate', mucDo: 'vận dụng', de: DE_THAT, pa: null, y: null, dapAn: '3,45', bang: null, hinh: [] }, hoSo: null, loiGiaiChu: null, kiem: null, boTro: null, hocLieu: null } as unknown as Parameters<typeof dungNoiDung>[0]
+    const dl = dungNoiDung(nc, [], 'Câu này làm sao ạ?', { ketQuaGanNhat: 'chua_lam', dapAnEm: '', dangLam: true }).contents[0]!.parts[0]!.text!
+    expect(dl).toContain('→(ánh sáng)(chất diệp lục (chlorophyll)) (C₆H₁₀O₅)ₙ')
+    expect(dl).not.toMatch(/chÊt|¸l|ⁿôhc/)
   })
 })
