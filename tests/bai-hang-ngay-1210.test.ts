@@ -171,6 +171,18 @@ describe('mức / đã làm / thiếu — đúng như kế hoạch đang chấm'
     expect(mucCuaNgay('2026-10-16', 'hanh-trinh', [])).toEqual({ muc: 24, tang: 1, nguon: 'mac-dinh', uoc: true })
     expect(mucCuaNgay('2026-10-16', 'goi7', [])).toEqual({ muc: 24, tang: 1, nguon: 'uoc-goi7', uoc: true })
   })
+
+  // SỬA LỖI 19/10 (HS 10011): ngày trước dòng chốt đầu tiên (bảng mức chỉ có từ 09/10), app giao đúng kế hoạch ngày ấy và báo hoàn thành
+  // ⇒ mức = số câu kế hoạch, không phải 36 câu ước tính từ tầng 3 của ngày sau.
+  it('mucCuaNgay: Hành trình trước dòng chốt đầu tiên + có kế hoạch ⇒ mức = số câu kế hoạch (không vượt mức ước tính)', () => {
+    const c = [{ ngay: '2026-10-09', tang: 3 as const, toiThieu: 36 }]
+    expect(mucCuaNgay('2026-10-05', 'hanh-trinh', c, undefined, 10)).toEqual({ muc: 10, tang: 3, nguon: 'da-chot', uoc: false })
+    expect(mucCuaNgay('2026-10-05', 'hanh-trinh', [], undefined, 4)).toEqual({ muc: 4, tang: 1, nguon: 'da-chot', uoc: false })
+    expect(mucCuaNgay('2026-10-05', 'hanh-trinh', c)).toEqual({ muc: 36, tang: 3, nguon: 'tang-gan-nhat', uoc: true }) // không có kế hoạch ⇒ như cũ
+    expect(mucCuaNgay('2026-10-04', 'hanh-trinh', c, undefined, 49)).toEqual({ muc: 36, tang: 3, nguon: 'tang-gan-nhat', uoc: true }) // không nâng mức
+    expect(mucCuaNgay('2026-10-12', 'hanh-trinh', c, undefined, 10)).toEqual({ muc: 36, tang: 3, nguon: 'tang-gan-nhat', uoc: true }) // sau chốt đầu ⇒ như cũ
+    expect(mucCuaNgay('2026-10-09', 'hanh-trinh', c, undefined, 10)).toEqual({ muc: 36, tang: 3, nguon: 'da-chot', uoc: false })
+  })
 })
 
 describe('xếp em + lọc', () => {
@@ -401,6 +413,26 @@ describe('mốc 01/10 — mặc định, ngày trước Gói 7, khoảng đọc,
     expect(h.ngay.find((n) => n.ngay === '2026-10-05')).toMatchObject({ soLuot: 3, soDung: 2, soSai: 1, cheDo: 'hanh-trinh' })
     expect(h.dem.soLuot).toBe(6)
     expect(h.tinHieu.find((t) => t.ma === 'ngay-du-muc')).toMatchObject({ tu: 0, mau: 13, muc: 'xau' })
+  })
+
+  it('SỬA LỖI 19/10 (HS 10011): ngày trước bảng mức (chốt đầu 09/10 tầng 3) — làm đủ kế hoạch nhỏ app giao ⇒ đủ mức, không bị tính thiếu theo 36', async () => {
+    const d = taoD1()
+    const env = d.env as unknown as Env
+    em(d, 'K', 'Lê Khoa', '10', '10 - Tinh Hoa')
+    hanhTrinh(d, '10', ['K'])
+    goi7(d, 'K', '2026-10-10')
+    chot(d, 'K', '2026-10-09', 3, 36)
+    keHoach(d, 'K', '2026-10-06', ['A1', 'A2', 'A3', 'A4'])
+    for (const q of ['A1', 'A2', 'A3', 'A4']) sk(d, { sbd: 'K', qid: q, luc: luc('2026-10-06', 20) })
+    keHoach(d, 'K', '2026-10-07', ['B1', 'B2'])
+    sk(d, { sbd: 'K', qid: 'B1', luc: luc('2026-10-07', 20) })
+    const r = (await gvBaiHangNgay(env, {}, NOW)) as KetQuaBaiHangNgay
+    const theoNgay = Object.fromEntries(theo(r, 'K').ngay.map((n) => [n.ngay, o(n)]))
+    expect(theoNgay['2026-10-06']).toEqual(['2026-10-06', 4, 4, 0, true, 'da-chot', 'hanh-trinh'])
+    expect(theoNgay['2026-10-07']).toEqual(['2026-10-07', 2, 1, 1, false, 'da-chot', 'hanh-trinh']) // làm chưa hết kế hoạch ⇒ vẫn thiếu, đúng số
+    expect(theoNgay['2026-10-05']).toEqual(['2026-10-05', 36, 0, 36, false, 'tang-gan-nhat', 'hanh-trinh']) // không mở kế hoạch ⇒ như cũ
+    const h = (await gvHoSoThaiDo(env, { sbd: 'K' }, NOW)) as KetQuaHoSoThaiDo
+    expect(h.ngay.find((n) => n.ngay === '2026-10-06')).toMatchObject({ mucToiThieu: 4, daLam: 4, datMuc: true, mucUocTinh: false })
   })
 
   it('khoảng đọc theo chế độ: sổ Gói 7 từ ngày gói sớm nhất của lô, kế hoạch Hành trình tới trước ngày gói muộn nhất (chưa có gói ⇒ tới den)', () => {

@@ -111,9 +111,12 @@ export interface Goi7Ngay { chot?: { tang: Tang; muc: number } | null; quota?: n
  *   · Gói 7 (thầy 12/10 "một con số"): có dòng chốt `goi_bai_7_muc_ngay` ⇒ đúng M em thấy (`da-chot`). Chưa có (ngày trước khi có bảng / em chưa mở
  *     bài ngày ấy) ⇒ ƯỚC TÍNH M = `mucNgayGoi7(CAU_TOI_THIEU[1], Σ quota ngày ấy)`, tầng 1, `uoc-goi7` — tầng tính trên phạm vi câu của bài mới nên
  *     những ngày đầu bài gần như chắc là tầng 1; KHÔNG dùng tầng Hành trình (lỗi cũ: 36 câu trong khi em được giao 24).
+ *   · Hành trình, ngày TRƯỚC dòng chốt đầu tiên của em (bảng mức 24/30/36 chỉ có từ 09/10) mà em đã có kế hoạch ngày (`soCauKeHoach`) ⇒ app hồi ấy
+ *     giao đúng kế hoạch đó và báo hoàn thành khi làm xong ⇒ mức = số câu kế hoạch (không vượt mức ước tính), `da-chot`. Lỗi cũ (HS 10011, 19/10):
+ *     05/10 được giao 10 câu, làm đủ 10 vẫn bị tính thiếu theo 36 câu ước tính từ tầng 3 của 09/10.
  * `chot` đã sắp theo ngày tăng dần.
  */
-export function mucCuaNgay(ngay: string, cheDo: CheDoNgay, chot: readonly ChotNgay[], goi7?: Goi7Ngay): { muc: number; tang: Tang; nguon: NguonMuc; uoc: boolean } {
+export function mucCuaNgay(ngay: string, cheDo: CheDoNgay, chot: readonly ChotNgay[], goi7?: Goi7Ngay, soCauKeHoach = 0): { muc: number; tang: Tang; nguon: NguonMuc; uoc: boolean } {
   if (cheDo === 'goi7') {
     const c = goi7?.chot
     if (c && c.muc > 0) return { muc: c.muc, tang: c.tang, nguon: 'da-chot', uoc: false }
@@ -124,8 +127,9 @@ export function mucCuaNgay(ngay: string, cheDo: CheDoNgay, chot: readonly ChotNg
   let gan: ChotNgay | undefined
   for (const c of chot) if (c.ngay <= ngay) gan = c
   gan ??= chot.find((c) => c.ngay > ngay)
-  if (!gan) return { muc: CAU_TOI_THIEU[1], tang: 1, nguon: 'mac-dinh', uoc: true }
-  return { muc: CAU_TOI_THIEU[gan.tang], tang: gan.tang, nguon: 'tang-gan-nhat', uoc: true }
+  const uoc = gan ? { muc: CAU_TOI_THIEU[gan.tang], tang: gan.tang, nguon: 'tang-gan-nhat' as const, uoc: true } : { muc: CAU_TOI_THIEU[1], tang: 1 as const, nguon: 'mac-dinh' as const, uoc: true }
+  if (soCauKeHoach > 0 && soCauKeHoach <= uoc.muc && (!chot.length || ngay < chot[0]!.ngay)) return { muc: soCauKeHoach, tang: uoc.tang, nguon: 'da-chot', uoc: false }
+  return uoc
 }
 
 const gocKeHoach = (q: string) => q.replace(/#\d+$/, '')
@@ -275,7 +279,8 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
         const test=ktNgay.get(k(e.sbd,d))
         if(test&&!test.baiNgayToiThieu)return {ngay:d,mucToiThieu:test.tong,daLam:test.daTra,thieu:Math.max(0,test.tong-test.daTra),datMuc:test.nopLuc!==null&&test.daTra>=test.tong,mucUocTinh:false,nguonMuc:'da-chot' as const,tang:1 as const,cheDo:'kiem-tra' as const,homNay:d===homNay}
         const cheDo: CheDoNgay = e.goi7Tu !== null && e.goi7Tu <= d ? 'goi7' : 'hanh-trinh'
-        const m = test?.baiNgayToiThieu?{muc:12,tang:1 as const,nguon:'da-chot' as const,uoc:false}:mucCuaNgay(d, cheDo, c, cheDo === 'goi7' ? { chot: muc7.get(k(e.sbd, d)) ?? null, quota: quota7.get(k(e.sbd, d)) ?? 0 } : undefined)
+        const kh = cheDo === 'hanh-trinh' ? keHoach.get(k(e.sbd, d)) : undefined
+        const m = test?.baiNgayToiThieu?{muc:12,tang:1 as const,nguon:'da-chot' as const,uoc:false}:mucCuaNgay(d, cheDo, c, cheDo === 'goi7' ? { chot: muc7.get(k(e.sbd, d)) ?? null, quota: quota7.get(k(e.sbd, d)) ?? 0 } : undefined, kh ? new Set([...kh.dao, ...kh.doan].map(gocKeHoach)).size : 0)
         const daLam = cheDo === 'goi7' ? (demGoi.get(k(e.sbd, d)) ?? 0) + (demGap.get(k(e.sbd, d)) ?? 0) : daLamKeHoach(keHoach.get(k(e.sbd, d)), luot.get(k(e.sbd, d)) ?? [])
         return { ...(test?.baiNgayToiThieu?{kiemTra:test}:{}),ngay: d, mucToiThieu: m.muc, daLam, thieu: Math.max(0, m.muc - daLam), datMuc: daLam >= m.muc, mucUocTinh: m.uoc, nguonMuc: m.nguon, tang: m.tang, cheDo, homNay: d === homNay }
       }))
