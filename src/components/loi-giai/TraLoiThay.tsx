@@ -99,7 +99,8 @@ export function ChuTo({ text }: { text: string }) {
         if (p.length > 4 && p.startsWith('==') && p.endsWith('==')) return <mark key={i}><ChemText text={chuHoa(trong)} /></mark>
         if (p.length > 4 && p.startsWith('++') && p.endsWith('++')) return <span key={i} className="lg-dung"><ChemText text={chuHoa(trong)} /></span>
         if (p.length > 4 && p.startsWith('!!') && p.endsWith('!!')) return <span key={i} className="lg-sai"><span className="sr-only">(sai) </span><ChemText text={chuHoa(trong)} /></span>
-        return <ChuHoa key={i} text={p} />
+        // Dấu tô lẻ (câu trả lời cũ trong lịch sử, hay máy chủ cắt câu giữa cặp) không bao giờ in ra màn (thầy 19/10).
+        return <ChuHoa key={i} text={p.replace(/\*\*|==|!!/g, '')} />
       })}
     </>
   )
