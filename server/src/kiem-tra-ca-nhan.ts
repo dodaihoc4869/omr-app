@@ -190,7 +190,8 @@ async function docBai(env: Env, sbd: string, id: string) {
 async function kiemNguon(env: Env, sbd: string, cs: readonly CauDe[]) {
   const [baoVe, scope, btvn, khoi] = await Promise.all([protectedQuestions(env),readGameScope(env,sbd),docCauBtvnChuaNop(env,sbd),docKhoiEm(env,sbd)])
   if (!scope.enabled) throw new Error('Việc học đang tạm dừng.')
-  const qua = new Set((await chanKhacKhoiEm(env,'ktcn',{sbd,khoiEm:khoi},cs.map(c=>c.q))).map(q=>q.qid))
+  // Đề đã lập: câu bị nghi đáp án SAU lúc lập vẫn giữ (`ktcn_cu`), không thì cả chặng chứa câu không mở được (lỗi em báo 19/10 "ko làm đc chặng 4").
+  const qua = new Set((await chanKhacKhoiEm(env,'ktcn_cu',{sbd,khoiEm:khoi},cs.map(c=>c.q))).map(q=>q.qid))
   const refs = await Promise.all(cs.map(c=>docCauTheoRef(env,c.q)))
   for (let i=0;i<cs.length;i++) { const q=cs[i]!.q, current=refs[i]; if (!current?.reviewed || current.version!==q.version || !qua.has(q.qid) || baoVe.has(q.qid) || baoVe.has(q.group) || btvn.has(q.qid) || scope.blocked.includes(q.qid) || scope.types.length && (!q.dang || !scope.types.includes(q.dang))) throw new Error('Một câu của bài đang đổi nguồn hoặc được giữ cho ca kiểm tra. Thầy sẽ xử lý; kết quả đã lưu của em được giữ.') }
 }

@@ -242,8 +242,9 @@ interface DemNghi { at: number; p: Promise<ReadonlySet<string>> }
 let demNghi = new WeakMap<object, DemNghi>()
 /** Xoá đệm danh sách câu nghi (test / sau khi thầy chốt câu nghi ở cùng isolate). `xoaMoiDem()` (dem-chung.ts) gọi hàm này. */
 export function xoaDemCauNghi(): void { demNghi = new WeakMap() }
-/** Kênh KHÔNG lọc câu nghi: lượt ĐÃ phát (resume) — câu đã qua cổng lúc phát; thêm một truy vấn ở mỗi lần mở app không đáng (đáp án chỉ bị nghi sau khi tự hoàn thiện đêm thứ Hai chạy). */
-export const KENH_GIU_CAU_NGHI: ReadonlySet<string> = new Set(['luot_cu'])
+/** Kênh KHÔNG lọc câu nghi: lượt ĐÃ phát (resume) — câu đã qua cổng lúc phát; thêm một truy vấn ở mỗi lần mở app không đáng (đáp án chỉ bị nghi sau khi tự hoàn thiện đêm thứ Hai chạy).
+ *  `ktcn_cu` (19/10): đề Kiểm tra ôn tập ĐÃ LẬP (mở chặng / xem kết quả) — câu bị nghi sau lúc lập mà bị loại thì cả chặng không mở được, tới hạn chốt 0 câu. Lúc LẬP đề (`ktcn`) vẫn loại. */
+export const KENH_GIU_CAU_NGHI: ReadonlySet<string> = new Set(['luot_cu', 'ktcn_cu'])
 dangKyXoaDem(xoaDemCauNghi)
 const RONG: ReadonlySet<string> = new Set()
 /**
