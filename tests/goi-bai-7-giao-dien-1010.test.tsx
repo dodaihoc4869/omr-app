@@ -40,7 +40,7 @@ it('học có hỗ trợ là hành động riêng, không hiện sai hoặc làm
   fireEvent.click(screen.getByRole('button',{name:'Học cách giải'}))
   await screen.findByText(/đã gặp với hỗ trợ, chưa tính tự làm đúng/)
   expect(screen.queryByText('Em đã trả lời đúng.')).toBeNull();expect(screen.queryByRole('button',{name:'Sửa câu này'})).toBeNull()
-  expect(goiHoa2).toHaveBeenLastCalledWith('hoc-tap-gap','t',{session:'p',qid:'q1',chuaTuLam:true},40)
+  expect(goiHoa2).toHaveBeenLastCalledWith('hoc-tap-gap','t',{session:'p',qid:'q1',chuaTuLam:true},15)
 })
 // Đã gỡ 12/10: test màn tự kiểm (ManKiemGoi7) — thầy bỏ phần Tự kiểm kiến thức khỏi app học sinh, màn ấy không còn lối vào nên đã xoá.
 it('nhờ thầy chữa không lộ đáp án, không hiện làm sai và vẫn chuyển được câu',async()=>{

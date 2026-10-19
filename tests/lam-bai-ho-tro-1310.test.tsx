@@ -21,7 +21,7 @@ it('câu đã Hỏi Thầy hiện đúng có hỗ trợ và không cộng vào c
   fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn A' }))
   await screen.findByText('Đúng · có hỗ trợ')
   expect(screen.queryByText('Đúng · tự làm')).toBeNull()
-  await waitFor(() => expect(goiHoa2).toHaveBeenLastCalledWith('answer', 't', expect.objectContaining({ assisted: true }), 40))
+  await waitFor(() => expect(goiHoa2).toHaveBeenLastCalledWith('answer', 't', expect.objectContaining({ assisted: true }), 15))
   fireEvent.click(screen.getByRole('button', { name: /Kết thúc chặng/ }))
   expect(screen.getByText(/câu tự làm đúng/).textContent).toBe('0/1 câu tự làm đúng')
   expect(screen.getByRole('img', { name: 'Câu 1 có hỗ trợ' })).toBeTruthy()

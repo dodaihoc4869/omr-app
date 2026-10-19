@@ -9,6 +9,7 @@ import {congExpVaoHoSo} from './exp-ho-so-game'
 import {renKhienVang} from './vang-duc'
 import {normalizePetName} from '../../src/game/than-thu-v2/pet-name'
 import {readGameScope} from './game-v2-reports'
+import {boKeHoach7} from './goi-bai-7-nho'
 import type {D1Result,Env,ExecutionContext} from './kieu'
 import {viecPhu} from './viec-phu'
 import {gameIdentity,parentPass} from './game-v2-auth'
@@ -334,6 +335,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // token giả bị chặn trước mọi lượt D1 như cũ). Không ghi gì, không trả gì trước khi xác thực xong. `gameIdentity` bị thay (test) ⇒ đọc sau xác thực như cũ.
   const giu:{ds:ReturnType<typeof batDauDocSom>|null;hocTap?:ReturnType<typeof batDauHocTapSom>}={ds:null}
   const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s);else if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s)})
+  // Kế hoạch sảnh vừa nhớ (goi-bai-7-nho.ts) chỉ dành cho lượt mở chặng NGAY sau đó: mọi lệnh khác của em (nộp câu, học cách giải, kiểm…) xoá bản nhớ.
+  if(action!=='hoc-tap-sanh'&&action!=='hoc-tap-start')boKeHoach7(env.DB,sbd)
   // Kiểm tra theo lịch RIÊNG từng em sở hữu cả ngày, kể cả khi em đã nộp sớm.
   // Cổng ở trước lập Gói 7/Hành trình: API cũ và phiên cũ không phát bài thường song song.
   const kt=await import('./kiem-tra-ca-nhan')
@@ -366,7 +369,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
       if(action==='hoc-tap-dem')return g7.demHomNay7(env,sbd,Date.now())
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
-      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now());return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now());return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 
