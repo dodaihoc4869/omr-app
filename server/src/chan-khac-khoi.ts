@@ -24,7 +24,7 @@
 // TỐN D1: khối em truyền sẵn ⇒ 0 truy vấn; chỉ có SBD ⇒ 1 truy vấn `hoc_sinh`. Làm giàu nguồn khối từ D1 (`de_kho.lop`, `cau_hoi.lop/chuyen_de`,
 // `game_v2_question.ma_de/dang`) — MỘT truy vấn — mặc định chỉ cho câu tự thân không đọc ra khối (hiếm: kho thật 28/15 359 câu, tờ `100`).
 import type { Env } from './kieu'
-import { khoiCuaEm, khoiCuaLop, phanTichKhoiCau, type Khoi, type LyDoChanKhoi } from '../../src/lib/khoi-cau'
+import { khoiCuaEm, khoiCuaLop, phanTichKhoiCau as phanTichKhoiCauGoc, type Khoi, type LyDoChanKhoi, type PhanTichKhoi } from '../../src/lib/khoi-cau'
 import { dangKyXoaDem } from './dem-chung'
 import { dbGoc } from './cau-hinh-dem'
 import { daNho, gieoNho, laBanGop, nhoTheoLuot } from './doc-d1-theo-luot'
@@ -153,6 +153,32 @@ export async function docNguonKhoiD1(env: Env, qids: readonly string[]): Promise
     a.push(r)
   }
   return ra
+}
+
+// ---------------------------------------------------------------- nhớ khối từng câu (thuần)
+// TỐC ĐỘ (thầy 16/10 "phần này load lâu quá…", 19/10 "tiếp tục hoàn thiện tốc độ đỉnh cao nhất"; đo CPU tại chỗ cỡ thật 960 câu / sổ 900 dòng): mỗi lệnh sảnh / mở
+// chặng / kế hoạch ngày đưa ~1.000 câu qua cổng khối 2–3 lần, mỗi lần chuẩn hoá NFC + so mẫu lại TỪ ĐẦU ~10 trường ⇒ ~18 ms CPU/lệnh. Kết quả chỉ phụ thuộc
+// đúng các trường `phanTichKhoiCau` đọc ⇒ nhớ theo chuỗi giá trị của các trường ấy (đổi trường nào ⇒ khoá khác ⇒ phân tích lại; không nhớ theo đối tượng).
+// Kết quả nhớ đóng băng (nơi gọi chỉ đọc). Trần 50.000 khoá/isolate (kho ~15.400 câu) — vượt ⇒ xoá sạch, nhớ lại dần.
+const TRUONG_KHOI = ['maDe', 'ma_de', 'maTo', 'ma_to', 'qid', 'id', 'lop', 'khoi', 'lopTo', 'lop_to', 'nhom', 'dang', 'ma_dang', 'maDang', 'chuong', 'tenChuong', 'chuyenDe', 'chuyen_de'] as const
+const NHO_KHOI = new Map<string, PhanTichKhoi>()
+const giaTriKhoa = (v: unknown): string => (typeof v === 'string' ? v : typeof v === 'number' ? String(v) : '')
+function phanTichKhoiCau(c: unknown): PhanTichKhoi {
+  let k: string
+  if (typeof c === 'string' || typeof c === 'number') k = '\u0002' + String(c)
+  else if (c !== null && typeof c === 'object' && !Array.isArray(c)) {
+    const o = c as Record<string, unknown>
+    k = ''
+    for (const f of TRUONG_KHOI) k += giaTriKhoa(o[f]) + '\u0001'
+  } else return phanTichKhoiCauGoc(c)
+  let r = NHO_KHOI.get(k)
+  if (!r) {
+    if (NHO_KHOI.size >= 50_000) NHO_KHOI.clear()
+    r = phanTichKhoiCauGoc(c)
+    Object.freeze(r.cacKhoi); Object.freeze(r)
+    NHO_KHOI.set(k, r)
+  }
+  return r
 }
 
 // ---------------------------------------------------------------- lõi cổng (thuần)
