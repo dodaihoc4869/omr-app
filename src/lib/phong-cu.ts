@@ -29,3 +29,44 @@ export function timPhongCu(text: string): PhongCuTim[] {
   }
   return out
 }
+
+// ---------------------------------------------------------------- GIẢI MÃ TCVN3 → Unicode
+// Bảng chữ thường TCVN3 (ABC): mã 0xA1–0xFE đọc như Latin-1. Chữ HOA có dấu của TCVN3 nằm ở phông riêng (VnTimeH) nên chỉ có Ă Â Ê Ô Ơ Ư Đ.
+const TCVN3: Record<string, string> = {
+  'µ': 'à', '¸': 'á', '¶': 'ả', '·': 'ã', '¹': 'ạ', '¨': 'ă', '»': 'ằ', '¾': 'ắ', '¼': 'ẳ', '½': 'ẵ', 'Æ': 'ặ',
+  '©': 'â', 'Ç': 'ầ', 'Ê': 'ấ', 'È': 'ẩ', 'É': 'ẫ', 'Ë': 'ậ', '®': 'đ',
+  'Ì': 'è', 'Ð': 'é', 'Î': 'ẻ', 'Ï': 'ẽ', 'Ñ': 'ẹ', 'ª': 'ê', 'Ò': 'ề', 'Õ': 'ế', 'Ó': 'ể', 'Ô': 'ễ', 'Ö': 'ệ',
+  '×': 'ì', 'Ý': 'í', 'Ø': 'ỉ', 'Ü': 'ĩ', 'Þ': 'ị',
+  'ß': 'ò', 'ã': 'ó', 'á': 'ỏ', 'â': 'õ', 'ä': 'ọ', '«': 'ô', 'å': 'ồ', 'è': 'ố', 'æ': 'ổ', 'ç': 'ỗ', 'é': 'ộ',
+  '¬': 'ơ', 'ê': 'ờ', 'í': 'ớ', 'ë': 'ở', 'ì': 'ỡ', 'î': 'ợ',
+  'ï': 'ù', 'ó': 'ú', 'ñ': 'ủ', 'ò': 'ũ', 'ô': 'ụ', '­': 'ư', 'õ': 'ừ', 'ø': 'ứ', 'ö': 'ử', '÷': 'ữ', 'ù': 'ự',
+  'ú': 'ỳ', 'ý': 'ý', 'û': 'ỷ', 'ü': 'ỹ', 'þ': 'ỵ',
+  '¡': 'Ă', '¢': 'Â', '£': 'Ê', '¤': 'Ô', '¥': 'Ơ', '¦': 'Ư', '§': 'Đ',
+}
+/** Đọc lại chuỗi TCVN3 bị đọc như Unicode. CHỈ gọi cho chuỗi đã biết là TCVN3 (mọi chữ cái có dấu trong đó là mã TCVN3). */
+export function giaiMaTcvn3(s: string): string {
+  let out = ''
+  for (const c of s) out += TCVN3[c] ?? c
+  return out
+}
+
+// ---------------------------------------------------------------- SỬA chữ trên-dưới mũi tên bị xen kẽ (dạng ĐÃ BIẾT CHẮC)
+// Hai hàng chữ xếp chồng quanh mũi tên bị đọc theo CỘT ⇒ KHÔNG đảo ngược được bằng luật chung (không biết hàng nào chữ nào) nếu không có từ điển.
+// Chỉ sửa chuỗi ĐÃ ĐỐI CHIẾU bằng tay với câu gốc (khoá = chuỗi bỏ hết khoảng trắng); chuỗi lạ giữ nguyên, để công cụ soi kho báo.
+// Mỗi mục: [nhãn TRÊN mũi tên, nhãn DƯỚI mũi tên] — dạng đúng của sách giáo khoa.
+const NHAN_XEN_KE_DA_BIET: Record<string, [string, string]> = {
+  // "¸nh s¸ng" + "chÊt diÖp lôc (chlorophyll)" xen kẽ theo cột (DB-12-B6-D3-III-46, thầy chụp 19/10)
+  'chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎': ['ánh sáng', 'chất diệp lục (chlorophyll)'],
+  // cùng cặp nhãn, không có phần "(chlorophyll)" (lời giải cùng câu)
+  'ch¸ÊⁿthdisÖ¸pⁿlgôc': ['ánh sáng', 'chất diệp lục'],
+}
+const RE_TOKEN_XEN_KE = new RegExp(`(${Object.keys(NHAN_XEN_KE_DA_BIET).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(\\s*→\\s*)?`, 'g')
+
+/** Thay chữ xen kẽ ĐÃ BIẾT bằng nhãn đúng: đứng trước mũi tên ⇒ thành `→(trên)(dưới)` (mũi tên đi theo được nuốt), đứng riêng ⇒ "trên, dưới". */
+export function suaNhanXenKe(text: string): string {
+  if (!text || !/[¸Ê]/.test(text)) return text
+  return text.replace(RE_TOKEN_XEN_KE, (_m, tok: string, mui?: string) => {
+    const [tren, duoi] = NHAN_XEN_KE_DA_BIET[tok]!
+    return mui ? `→(${tren})(${duoi}) ` : `${tren}, ${duoi}`
+  })
+}
