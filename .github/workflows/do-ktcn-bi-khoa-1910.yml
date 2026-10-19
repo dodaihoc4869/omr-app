@@ -1,0 +1,35 @@
+# ĐẾM BÀI KIỂM TRA ÔN TẬP BỊ KHOÁ CHẶNG (CHỈ ĐỌC) — thầy 19/10 gửi ảnh "Em vừa xem phần chữa của một câu trong chặng. Hãy quay lại sau ít nhất 12 giờ…"
+# và "Không cho làm chặng 3". Từ 16/10 mỗi câu nộp ở bài thường ghi loi_giai_hoi 'goi7:sau_nop' ⇒ chặng có câu em vừa làm bị khoá tới hạn.
+# Đếm theo ngày: số bài, số bài có chặng CHƯA MỞ, trong đó số bài có câu của đề em đã làm ở bài thường trong [mở bài − 12 giờ, hạn] (nghi bị khoá).
+# Cùng: ca đang mở, bài kiểm tra đang mở hôm nay. CHỈ in số đếm gộp — không mã em, tên em, mã câu (repo công khai).
+name: Đếm bài kiểm tra bị khoá chặng (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/do-ktcn-bi-khoa-1910.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-ktcn-bi-khoa-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "ca thi đang mở" "SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'"
+          q "theo ngày từ 15/10: bài · đã nộp · hết hạn · có chặng chưa mở · có chặng chưa mở VÀ có câu đề em đã làm ở bài thường trong [mở − 12 giờ, hạn]" "WITH k AS (SELECT id,sbd,ngay,trang_thai,mo_luc,han_luc,json, json_array_length(json,'\$.chang') so_chang, (SELECT COUNT(*) FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id) da_mo FROM kiem_tra_ca_nhan WHERE ngay>='2026-10-15') SELECT ngay, COUNT(*) bai, SUM(trang_thai='da_nop') da_nop, SUM(trang_thai='het_han') het_han, SUM(da_mo<so_chang) co_chang_chua_mo, SUM(da_mo<so_chang AND EXISTS(SELECT 1 FROM json_each(k.json,'\$.cau') j JOIN loi_giai_hoi l ON l.sbd=k.sbd AND l.qid=json_extract(j.value,'\$.q.qid') WHERE l.nguon='goi7:sau_nop' AND julianday(l.luc)>=julianday(k.mo_luc/1000.0,'unixepoch')-0.5 AND julianday(l.luc)<=julianday(k.han_luc/1000.0,'unixepoch'))) nghi_bi_khoa FROM k GROUP BY ngay ORDER BY ngay"
