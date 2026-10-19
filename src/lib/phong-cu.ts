@@ -54,19 +54,11 @@ export function giaiMaTcvn3(s: string): string {
 // Hai hàng chữ xếp chồng quanh mũi tên bị đọc theo CỘT ⇒ KHÔNG đảo ngược được bằng luật chung (không biết hàng nào chữ nào) nếu không có từ điển.
 // Chỉ sửa chuỗi ĐÃ ĐỐI CHIẾU bằng tay với câu gốc (khoá = chuỗi bỏ hết khoảng trắng); chuỗi lạ giữ nguyên, để công cụ soi kho báo.
 // Mỗi mục: [nhãn TRÊN mũi tên, nhãn DƯỚI mũi tên] — dạng đúng của sách giáo khoa.
-const NHAN_XEN_KE_DA_BIET: Record<string, [string, string]> = {
-  // "¸nh s¸ng" + "chÊt diÖp lôc (chlorophyll)" xen kẽ theo cột (DB-12-B6-D3-III-46, thầy chụp 19/10)
-  'chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎': ['ánh sáng', 'chất diệp lục (chlorophyll)'],
-  // cùng cặp nhãn, không có phần "(chlorophyll)" (lời giải cùng câu)
-  'ch¸ÊⁿthdisÖ¸pⁿlgôc': ['ánh sáng', 'chất diệp lục'],
-}
-const RE_TOKEN_XEN_KE = new RegExp(`(${Object.keys(NHAN_XEN_KE_DA_BIET).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(\\s*→\\s*)?`, 'g')
+// "¸nh s¸ng" + "chÊt diÖp lôc (chlorophyll)" xen kẽ theo cột — có trong đề của 3 câu cùng bài (DB-12-B6-D3-III-46, DH-12-C2-B6-III-51, DH-12-C2-B6-DT-III-10).
+// Các dạng vỡ khác (vd "SH⁼⁹⁶%→…", "ch¸ÊⁿthdisÖ¸pⁿlgôc") chỉ còn trong ô GHI CHÚ nội bộ của lời giải, không tới học sinh.
+// Viết gọn có chủ ý: mô-đun này nằm trong gói MỞ app học sinh (luật tốc độ) — thêm chuỗi đã đối chiếu = thêm một nhánh vào biểu thức dưới.
+const RE_NHAN_XEN_KE = /chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎(\s*→\s*)?/g
 
-/** Thay chữ xen kẽ ĐÃ BIẾT bằng nhãn đúng: đứng trước mũi tên ⇒ thành `→(trên)(dưới)` (mũi tên đi theo được nuốt), đứng riêng ⇒ "trên, dưới". */
-export function suaNhanXenKe(text: string): string {
-  if (!text || !/[¸Ê]/.test(text)) return text
-  return text.replace(RE_TOKEN_XEN_KE, (_m, tok: string, mui?: string) => {
-    const [tren, duoi] = NHAN_XEN_KE_DA_BIET[tok]!
-    return mui ? `→(${tren})(${duoi}) ` : `${tren}, ${duoi}`
-  })
-}
+/** Thay chữ xen kẽ ĐÃ BIẾT bằng nhãn đúng: đứng trước mũi tên ⇒ thành `→(trên)(dưới) ` (mũi tên đi theo được nuốt), đứng riêng ⇒ "trên, dưới". */
+export const suaNhanXenKe = (t: string): string =>
+  t.replace(RE_NHAN_XEN_KE, (_m, mui?: string) => (mui ? '→(ánh sáng)(chất diệp lục (chlorophyll)) ' : 'ánh sáng, chất diệp lục (chlorophyll)'))

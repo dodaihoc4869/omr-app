@@ -3,7 +3,7 @@
 // ngoặc hàng dưới thành "₍ ₎"). Sửa ở tầng hiển thị (goKyTuLa — đường chung của ChemText, chuHtml, cửa nạp đề), không ghi kho.
 import { describe, expect, it } from 'vitest'
 import { giaiMaTcvn3, suaNhanXenKe, timPhongCu } from '../src/lib/phong-cu'
-import { goKyTuLa } from '../src/lib/chu-la-pdf'
+import { chuHtml } from '../src/lib/html-phieu'
 import { parseChemText } from '../src/lib/chem-format'
 
 const DE_THAT = 'Quá trình quang hợp của cây xanh diễn ra theo phương trình hóa học tổng quát sau:\nCO₂ + H₂O chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎→(C₆H₁₀O₅)ₙ + O₂ Biết rằng để tổng hợp được 1 mol mắt xích tinh bột'
@@ -30,8 +30,9 @@ describe('sửa nhãn xen kẽ đã biết (tầng hiển thị)', () => {
     expect(suaNhanXenKe(DE_THAT)).toContain('CO₂ + H₂O →(ánh sáng)(chất diệp lục (chlorophyll)) (C₆H₁₀O₅)ₙ + O₂ Biết rằng')
     expect(suaNhanXenKe(DE_THAT)).not.toMatch(/chÊt|¸|ⁿ|₍/)
   })
-  it('dạng không có (chlorophyll) trong lời giải; đứng riêng ⇒ "trên, dưới"', () => {
-    expect(suaNhanXenKe("x ('ch¸ÊⁿthdisÖ¸pⁿlgôc'); y")).toBe("x ('ánh sáng, chất diệp lục'); y")
+  it('đứng riêng (không có mũi tên theo sau) ⇒ "trên, dưới"; dạng chỉ nằm ở ghi chú nội bộ không đụng tới', () => {
+    expect(suaNhanXenKe('x chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎ y')).toBe('x ánh sáng, chất diệp lục (chlorophyll) y')
+    expect(suaNhanXenKe("ghi chú ('ch¸ÊⁿthdisÖ¸pⁿlgôc')")).toBe("ghi chú ('ch¸ÊⁿthdisÖ¸pⁿlgôc')")
   })
   it('chuỗi lạ / chữ thường giữ nguyên; chạy hai lần không đổi thêm', () => {
     const lanh = 'Hợp chất amine: CH₃NH₂ + HCl → CH₃NH₃Cl; chÊt lạ chưa đối chiếu'
@@ -39,11 +40,14 @@ describe('sửa nhãn xen kẽ đã biết (tầng hiển thị)', () => {
     const mot = suaNhanXenKe(DE_THAT)
     expect(suaNhanXenKe(mot)).toBe(mot)
   })
-  it('goKyTuLa (đường chung của ChemText, chuHtml, cửa nạp đề) đã sửa', () => {
-    expect(goKyTuLa(DE_THAT)).toBe(suaNhanXenKe(DE_THAT))
+  it('chuHtml (phiếu, tờ chiếu, PDF) đã sửa: nhãn đúng, không còn chữ rác', () => {
+    const h = chuHtml(DE_THAT)
+    expect(h).toContain('ánh sáng')
+    expect(h).toContain('chất diệp lục (chlorophyll)')
+    expect(h).not.toMatch(/chÊt|¸|ⁿ|gorophyll₎/)
   })
   it('bộ hiển thị dựng mũi tên có nhãn TRÊN "ánh sáng" và nhãn DƯỚI "chất diệp lục (chlorophyll)"', () => {
-    const phan = parseChemText(goKyTuLa('CO₂ + H₂O chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎→(C₆H₁₀O₅)ₙ + O₂'))
+    const phan = parseChemText(suaNhanXenKe('CO₂ + H₂O chÊtdiÖp¸lⁿôhc₍sc¸hⁿlgorophyll₎→(C₆H₁₀O₅)ₙ + O₂'))
     const mui = phan.find((p) => p.t === 'mui')
     expect(mui).toMatchObject({ t: 'mui', mui: '→', tren: 'ánh sáng', duoi: 'chất diệp lục (chlorophyll)' })
     const chu = phan.map((p) => ('v' in p ? p.v : '')).join('')

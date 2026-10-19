@@ -25,6 +25,7 @@
 import { memo, useEffect, useSyncExternalStore, type JSX } from 'react'
 import type KatexT from 'katex'
 import { goKyTuLa } from './chu-la-pdf'
+import { suaNhanXenKe } from './phong-cu'
 import { gomTuCongThuc, laNhanMuiTen, nhanTruocMuiTenVeSau, tachDongSoDo } from './chem-format-so-do'
 
 export type ChemPart =
@@ -895,7 +896,8 @@ const ChemFormula = memo(function ChemFormula({ t, latex: latexGoc }: { t: 'ce' 
 export const ChemText = memo(function ChemText({ text }: { text: string }): JSX.Element {
   // Lớp chắn cuối cho ký tự vùng dùng riêng: đề cũ đã nằm trong máy trước khi
   // cửa nạp biết dọn thì vẫn hiện đúng chứ không ra ô vuông rỗng.
-  const khucs = tachDongSoDo(goKyTuLa(text ?? ''))
+  // Nhãn trên/dưới mũi tên bị xen kẽ (phông TCVN3, thầy chụp 19/10): `phong-cu.ts`.
+  const khucs = tachDongSoDo(suaNhanXenKe(goKyTuLa(text ?? '')))
   if (khucs.length === 1 && khucs[0].t === 'chu') return <ChemDong text={khucs[0].v} />
   return (
     <>
