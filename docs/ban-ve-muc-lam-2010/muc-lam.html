@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản vẽ Mức làm bài</title>
+<!-- BẢN VẼ MỨC LÀM BÀI (20/10) — sinh bởi scripts/dung-ban-ve-muc-lam-2010.mjs từ docs/ban-ve-muc-lam-2010/du-lieu-gia.mjs. Số GIẢ, ngưỡng TẠM. Chưa sửa src/.
+     Mở từng khung bằng #k=<khung>&toi=1 (xem scripts/chup-ban-ve-muc-lam-2010.mjs). Nhãn Thêm / Đổi / Giữ chỉ để thầy xem bản vẽ, không có trong app. -->
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-500-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-600-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-800-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Noto Serif';font-weight:400;src:url(../../node_modules/@fontsource/noto-serif/files/noto-serif-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Noto Serif';font-weight:400;src:url(../../node_modules/@fontsource/noto-serif/files/noto-serif-latin-400-normal.woff2) format('woff2')}
+/* Bản vẽ Mức làm bài (20/10) — CSS nguồn, được scripts/dung-ban-ve-muc-lam-2010.mjs nhúng vào muc-lam.html.
+   MÀU = đúng giá trị biến chuẩn của src/styles/tokens.css: --gvm-* (app thầy) · --nen/--the/--muc… (học sinh, phụ huynh) · --km-*, --bt-dang-lam, --bts-ai-do (bản chiếu).
+   Tên ngắn trong tệp này (--f nền · --s mặt · --s2 mặt 2 · --l viền · --t chữ · --t2 · --t3 · --a nhấn · --mN/--mN-n/--mN-d = màu đậm / nền tông / chữ trên nền tông của Mức làm N).
+   Không màu nào ngoài bảng ấy. Không màu là kênh duy nhất: mọi mức đều kèm chữ "Mức làm N" hoặc số. */
+
+/* ── App thầy (--gvm-*) ── */
+.kh[data-ap='gv'] {
+  --f: #f6f7fc; --s: #ffffff; --s2: #eef1fa; --l: #dde2f0; --t: #1a1c24; --t2: #454a5c; --t3: #5f6579; --a: #1f5fd6; --an: #dbe6ff; --on: #ffffff;
+  --m1: #c42a5c; --m1-n: #ffd9e3; --m1-d: #5c0a27; --m2: #b86a00; --m2-n: #ffe2b3; --m2-d: #4d2c00; --m3: #1f5fd6; --m3-n: #dbe6ff; --m3-d: #0b2f75; --m4: #0f8a5f; --m4-n: #c9f2de; --m4-d: #04402a;
+  --bong: 0 1px 2px rgb(30 40 80 / 0.06), 0 4px 14px rgb(30 40 80 / 0.06);
+}
+:root[data-toi] .kh[data-ap='gv'] {
+  --f: #10131c; --s: #181c27; --s2: #1f2433; --l: #2c3245; --t: #e8eaf3; --t2: #b9bed1; --t3: #8c92a8; --a: #9cbcff; --an: #1d3363; --on: #0b1a3a;
+  --m1: #ff8fb0; --m1-n: #4d1428; --m1-d: #ffd9e3; --m2: #ffc164; --m2-n: #43290a; --m2-d: #ffe2b3; --m3: #9cbcff; --m3-n: #1d3363; --m3-d: #dbe6ff; --m4: #6fdcab; --m4-n: #0f3d2b; --m4-d: #c9f2de;
+  --bong: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+/* ── App học sinh và phụ huynh (--nen --the --muc …) ── */
+.kh[data-ap='hs'] {
+  --f: #f5f4ef; --s: #fffefb; --s2: #eeeee8; --l: #e5e7eb; --t: #1a2332; --t2: #505b69; --t3: #626c7b; --a: #4338ca; --an: #eef2ff; --on: #ffffff;
+  --m1: #f59e0b; --m1-n: #fffbeb; --m1-d: #1a2332; --m2: #91691e; --m2-n: #f7efd9; --m2-d: #1a2332; --m3: #6366f1; --m3-n: #eef2ff; --m3-d: #1a2332; --m4: #10b981; --m4-n: #ecfdf5; --m4-d: #1a2332;
+  --bong: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+:root[data-toi] .kh[data-ap='hs'] {
+  --f: #0f1419; --s: #171d24; --s2: #1e252e; --l: #2a323d; --t: #e8eaed; --t2: #c2c8cf; --t3: #a6b0bc; --a: #a5b4fc; --an: #1e1f3d; --on: #0f1419;
+  --m1: #fbbf24; --m1-n: #2d2411; --m1-d: #e8eaed; --m2: #e4c47e; --m2-n: #343126; --m2-d: #e8eaed; --m3: #818cf8; --m3-n: #1e1f3d; --m3-d: #e8eaed; --m4: #34d399; --m4-n: #0d2f24; --m4-d: #e8eaed;
+  --bong: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+/* ── Bản chiếu (nền tối --km-*, luôn tối) ── */
+.kh[data-ap='chieu'] {
+  --u: calc(100vw / 1920);
+  --f: rgb(18 18 17); --s: rgb(26 26 25); --s2: color-mix(in srgb, #fff 9%, rgb(26 26 25)); --l: color-mix(in srgb, #fff 26%, rgb(26 26 25)); --t: #fff; --t2: rgb(195 194 183); --t3: rgb(195 194 183); --a: #f1b44c; --on: rgb(18 18 17);
+  --m1: #f28b82; --m1-n: color-mix(in srgb, #f28b82 22%, rgb(26 26 25)); --m1-d: #fff; --m2: #f1b44c; --m2-n: color-mix(in srgb, #f1b44c 20%, rgb(26 26 25)); --m2-d: #fff;
+  --m3: rgb(85 152 231); --m3-n: color-mix(in srgb, rgb(85 152 231) 22%, rgb(26 26 25)); --m3-d: #fff; --m4: rgb(25 158 112); --m4-n: color-mix(in srgb, rgb(25 158 112) 24%, rgb(26 26 25)); --m4-d: #fff;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: #888; font-family: 'Be Vietnam Pro', 'Noto Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.kh { background: var(--f); color: var(--t); min-height: 100vh; font-size: 16px; line-height: 1.55; }
+.kh[hidden] { display: none; }
+.xem-het { margin-bottom: 40px; border-bottom: 6px dashed #888; }
+.kh h1, .kh h2, .kh p, .kh ul, .kh ol { margin: 0; padding: 0; }
+.kh ul, .kh ol { list-style: none; }
+.kh button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; touch-action: manipulation; }
+.so { font-variant-numeric: tabular-nums; }
+.kh b { font-weight: 700; }
+.kh small { font-size: 13px; color: var(--t3); line-height: 1.5; }
+
+/* ── nhãn xem bản vẽ ── */
+.ve { position: absolute; top: 10px; right: 12px; padding: 1px 9px; border-radius: 99px; border: 1.5px dashed var(--t3); background: var(--s); color: var(--t2); font-size: 12px; font-weight: 700; line-height: 1.5; z-index: 2; }
+.ve[data-k='moi'] { border-color: var(--a); color: var(--a); }
+.ve[data-k='doi'] { border-color: var(--m2); color: var(--m2); }
+
+/* ── thẻ + trang ── */
+.the { position: relative; display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 20px; border: 1px solid var(--l); border-radius: 24px; background: var(--s); box-shadow: var(--bong); }
+.the h2 { font-size: 18px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; padding-right: 64px; }
+.the-dau { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.phu-s { font-size: 13px; font-weight: 600; color: var(--t3); }
+.ghi { font-size: 13px; line-height: 1.55; color: var(--t2); }
+.dobao { font-size: 15px; line-height: 1.55; color: var(--t2); }
+.dobao b { color: var(--t); }
+.trang { max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 16px; }
+.dau-trang h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.25; }
+.dau-trang p { margin-top: 4px; font-size: 15px; color: var(--t2); }
+.luoi { display: grid; gap: 16px; min-width: 0; }
+.cot-phu { display: grid; gap: 16px; min-width: 0; align-content: start; }
+.ba-the { display: grid; gap: 16px; }
+@media (min-width: 1024px) {
+  .trang { padding: 32px 40px 56px; gap: 20px; }
+  .luoi { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .ba-the { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+}
+@media (max-height: 500px) and (min-width: 601px) { .trang { padding-top: 12px; } }
+
+/* ── chip mức ── */
+.ch { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 3px 11px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--m0, var(--t3)) 40%, transparent); background: var(--m0-n, var(--s2)); color: var(--m0-d, var(--t2)); font-size: 13px; line-height: 1.5; white-space: nowrap; }
+.ch > span { font-weight: 500; white-space: normal; }
+.ch[data-m='1'] { --m0: var(--m1); --m0-n: var(--m1-n); --m0-d: var(--m1-d); }
+.ch[data-m='2'] { --m0: var(--m2); --m0-n: var(--m2-n); --m0-d: var(--m2-d); }
+.ch[data-m='3'] { --m0: var(--m3); --m0-n: var(--m3-n); --m0-d: var(--m3-d); }
+.ch[data-m='4'] { --m0: var(--m4); --m0-n: var(--m4-n); --m0-d: var(--m4-d); }
+.ch[data-m='0'] { --m0: var(--t3); --m0-n: var(--s2); --m0-d: var(--t2); border-style: dashed; }
+
+/* ── thước ── */
+.th { position: relative; padding-top: 30px; min-width: 0; }
+.th-diem { position: absolute; top: 0; transform: translateX(-50%); padding: 2px 10px; border-radius: 99px; background: var(--t); color: var(--s); font-size: 13px; line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.th-diem::after { content: ''; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: var(--t); transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+.th-vung { position: relative; height: 18px; }
+.th-z { position: absolute; inset: 0; border-radius: 99px; overflow: hidden; background: var(--s2); }
+.th-z i, .thn i { position: absolute; top: 0; bottom: 0; }
+.th-z i[data-m='1'], .thn i[data-m='1'] { background: color-mix(in srgb, var(--m1) 52%, var(--s2)); }
+.th-z i[data-m='2'], .thn i[data-m='2'] { background: color-mix(in srgb, var(--m2) 52%, var(--s2)); }
+.th-z i[data-m='3'], .thn i[data-m='3'] { background: color-mix(in srgb, var(--m3) 52%, var(--s2)); }
+.th-z i[data-m='4'], .thn i[data-m='4'] { background: color-mix(in srgb, var(--m4) 52%, var(--s2)); }
+.th-ch { position: absolute; top: 50%; width: 18px; height: 18px; border-radius: 50%; background: var(--t); border: 3px solid var(--s); transform: translate(-50%, -50%); box-shadow: 0 0 0 1px var(--t); }
+.th-moc { position: relative; height: 22px; margin-top: 6px; font-size: 12px; color: var(--t2); font-variant-numeric: tabular-nums; }
+.th-moc span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.th-moc span:first-child { transform: none; }
+.th-moc .th-cuoi { transform: translateX(-100%); color: var(--t3); }
+.thn { position: relative; display: block; height: 8px; margin-top: 8px; border-radius: 99px; overflow: visible; background: var(--s2); }
+.thn i:first-child { border-radius: 99px 0 0 99px; }
+.thn i:last-of-type { border-radius: 0 99px 99px 0; }
+.thn-t { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--t); opacity: 0.75; transform: translateX(-1px); }
+.thn-d { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: var(--t); border: 2.5px solid var(--s); transform: translate(-50%, -50%); box-shadow: 0 0 0 1px var(--t); }
+
+/* ── thanh chồng bốn mức ── */
+.tm { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tm-thanh { display: flex; gap: 3px; height: 20px; }
+.tm-thanh i { border-radius: 99px; min-width: 6px; }
+.tm-thanh i[data-m='1'] { background: var(--m1); }
+.tm-thanh i[data-m='2'] { background: var(--m2); }
+.tm-thanh i[data-m='3'] { background: var(--m3); }
+.tm-thanh i[data-m='4'] { background: var(--m4); }
+.tm-cg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+.tm-cg li { display: grid; grid-template-columns: 12px minmax(0, 1fr); column-gap: 8px; align-items: center; }
+.tm-d { width: 12px; height: 12px; border-radius: 50%; grid-row: 1 / 3; }
+.tm-cg li[data-m='1'] .tm-d { background: var(--m1); } .tm-cg li[data-m='2'] .tm-d { background: var(--m2); } .tm-cg li[data-m='3'] .tm-d { background: var(--m3); } .tm-cg li[data-m='4'] .tm-d { background: var(--m4); }
+.tm-cg b { font-size: 14px; line-height: 1.3; }
+.tm-s { font-size: 13px; color: var(--t2); font-variant-numeric: tabular-nums; }
+@media (min-width: 640px) { .tm-cg { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* ── khung 1: thang ── */
+.dn { display: flex; flex-direction: column; gap: 12px; }
+.dn li { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 4px 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--l); }
+.dn li:first-child { border-top: 0; }
+.dn li > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dn li > div > b { font-size: 15px; line-height: 1.4; }
+.dn li > div > span { font-size: 14px; line-height: 1.5; color: var(--t2); }
+.dn-m { padding-top: 2px; }
+@media (max-width: 520px) { .dn li { grid-template-columns: minmax(0, 1fr); } }
+.cong-thuc { display: flex; flex-direction: column; }
+.cong-thuc li { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-top: 1px solid var(--l); }
+.cong-thuc li:first-child { border-top: 0; padding-top: 0; }
+.cong-thuc li > b { font-size: 14px; color: var(--t2); }
+.cong-thuc .ct { font-size: 15px; line-height: 1.5; }
+.ba-thuoc { display: flex; flex-direction: column; gap: 14px; }
+.ba-hang { display: grid; gap: 2px; }
+.ba-ten { display: flex; flex-direction: column; }
+.ba-ten span { font-size: 13px; color: var(--t2); }
+.the-luu p { font-size: 15px; line-height: 1.6; color: var(--t2); }
+
+/* ── khung 2: đo ── */
+.the > p { font-size: 15px; line-height: 1.6; color: var(--t2); }
+.gb { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.gb li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; font-size: 14px; border-top: 1px solid var(--l); }
+.gb-tong { font-weight: 700; border-top: 2px solid var(--t) !important; }
+.bang { display: flex; flex-direction: column; }
+.bang-d, .bang-h { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--l); font-size: 14px; line-height: 1.5; }
+.bang-d { border-top: 0; font-size: 13px; font-weight: 700; color: var(--t3); }
+.bang-h .sau { color: var(--m4); font-weight: 700; }
+:root[data-toi] .bang-h .sau { color: var(--m4); }
+@media (max-width: 640px) { .bang-d { display: none; } .bang-h { grid-template-columns: minmax(0, 1fr); gap: 2px; } .bang-h span:nth-of-type(1)::before { content: 'Hiện tại: '; color: var(--t3); } .bang-h .sau::before { content: 'Sau: '; color: var(--t3); font-weight: 500; } }
+.phu { display: flex; flex-direction: column; gap: 10px; }
+.phu li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(80px, 1.2fr) auto; gap: 12px; align-items: center; font-size: 14px; }
+.phu-th { height: 10px; border-radius: 99px; background: var(--s2); overflow: hidden; }
+.phu-th i { display: block; height: 100%; background: var(--m4); }
+@media (max-width: 640px) { .phu li { grid-template-columns: minmax(0, 1fr) auto; } .phu-th { grid-column: 1 / -1; order: 3; } }
+
+/* ── panel kiểu tấm (hồ sơ, ai sai, lên bảng) ── */
+.tam { background: var(--f); min-height: 100vh; display: flex; flex-direction: column; }
+.tam-dau { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--s); border-bottom: 1px solid var(--l); }
+.tam-dau h1 { font-size: 20px; font-weight: 800; line-height: 1.25; letter-spacing: -0.01em; }
+.tam-dau p { font-size: 13px; color: var(--t2); line-height: 1.45; }
+.tam-dau > div { min-width: 0; flex: 1; }
+.nut-lui { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; border-radius: 14px; border: 1px solid var(--l); background: var(--s); color: var(--t); }
+.ava { flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--an); color: var(--a); display: grid; place-items: center; font-size: 15px; font-weight: 800; }
+.chi-thay { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 4px 12px; border-radius: 99px; background: var(--s2); color: var(--t2); font-size: 13px; font-weight: 600; }
+.tam-than { display: grid; gap: 16px; padding: 16px 16px 32px; align-content: start; min-width: 0; }
+@media (min-width: 1024px) {
+  .tam { width: min(1200px, calc(100% - 48px)); margin: 24px auto; min-height: 0; border: 1px solid var(--l); border-radius: 28px; overflow: hidden; box-shadow: var(--bong); }
+  .tam-dau { padding: 18px 28px; }
+  .tam-than { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 24px 28px 32px; }
+  .tam-than > .the-lon, .tam-than > .gc-rieng { grid-column: 1 / -1; }
+  .tam-than { align-items: start; }
+  .tam[data-bo='hs'] .tam-than > :nth-child(1) { grid-column: 1; grid-row: 1; }
+  .tam[data-bo='hs'] .tam-than > :nth-child(2) { grid-column: 2; grid-row: 1 / span 2; }
+  .tam[data-bo='hs'] .tam-than > :nth-child(3) { grid-column: 1; grid-row: 2; }
+}
+@media (max-width: 480px) { .chi-thay span { display: none; } .chi-thay { padding: 8px; } }
+.gc-rieng { display: flex; align-items: flex-start; gap: 8px; padding: 0 4px; }
+.gc-rieng svg { flex: none; margin-top: 2px; }
+.the-lon .tm { margin-top: 2px; }
+
+/* hồ sơ */
+.cheo { display: flex; flex-direction: column; border: 1px solid var(--l); border-radius: 16px; overflow: hidden; }
+.cheo-d, .cheo-h { display: grid; grid-template-columns: minmax(0, 1fr) 64px 64px; align-items: center; gap: 8px; padding: 8px 14px; font-size: 14px; }
+.cheo-d { background: var(--s2); font-size: 13px; font-weight: 700; color: var(--t2); }
+.cheo-d span:not(:first-child), .cheo-h b { text-align: right; }
+.cheo-h { border-top: 1px solid var(--l); min-height: 48px; }
+.cheo-h .sai { color: var(--t); }
+.cheo-t { background: var(--s2); font-weight: 700; }
+.hai-so { display: grid; gap: 12px; }
+.hai-so > div { display: flex; align-items: baseline; gap: 12px; padding: 12px 14px; border-radius: 16px; background: var(--s2); }
+.hai-so b { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
+.hai-so span { font-size: 14px; color: var(--t2); line-height: 1.45; }
+@media (min-width: 640px) { .hai-so { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hai-so > div { flex-direction: column; gap: 2px; } }
+.lh-ds, .as-ds { display: flex; flex-direction: column; }
+.lh, .as { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'c m' 't t'; gap: 6px 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--l); min-width: 0; }
+.lh-c, .as-ten { grid-area: c; }
+.lh-t, .as-t { grid-area: t; display: flex; flex-direction: column; min-width: 0; }
+.lh-m, .as-m { grid-area: m; justify-self: end; }
+.lh:first-child, .as:first-child { border-top: 0; padding-top: 0; }
+.lh-c, .as-ten { display: flex; flex-direction: column; min-width: 0; }
+.lh-c b, .as-ten b { font-size: 15px; line-height: 1.4; }
+.lh-c span, .as-ten span { font-size: 13px; color: var(--t2); }
+.lh-s { font-size: 13px; color: var(--t2); }
+.lh-s b { color: var(--t); }
+.lh-m, .as-m { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lh-gc { font-size: 13px; color: var(--t2); }
+.lh[data-m='0'] .lh-s { color: var(--t3); }
+.tin-hieu { display: flex; flex-direction: column; }
+.tin-hieu li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 44px; padding: 6px 0; border-top: 1px solid var(--l); font-size: 14px; line-height: 1.4; }
+.tin-hieu li:first-child { border-top: 0; }
+.tin-hieu li > b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: var(--s2); color: var(--t2); font-size: 13px; }
+.tin-hieu em { font-style: normal; font-size: 12px; font-weight: 700; color: var(--t3); }
+.tin-hieu li.doi { background: color-mix(in srgb, var(--m2) 10%, var(--s)); border-radius: 12px; padding-left: 8px; padding-right: 10px; }
+.tin-hieu li.doi em { color: var(--m2); }
+@media (min-width: 720px) and (max-width: 1023px) {
+  .lh, .as { grid-template-columns: minmax(150px, 0.9fr) minmax(0, 1.5fr) auto; grid-template-areas: 'c t m'; gap: 16px; }
+}
+/* lên bảng */
+.lb-so { display: flex; align-items: baseline; gap: 8px 12px; flex-wrap: wrap; }
+.lb-so b { font-size: 34px; line-height: 1.1; letter-spacing: -0.02em; }
+.lb-so span { font-size: 14px; color: var(--t2); }
+.lb-so i { width: 1px; height: 28px; background: var(--l); align-self: center; margin: 0 4px; }
+.lb-chip { display: flex; }
+
+/* ── bản chiếu ── */
+.kh[data-ap='chieu'] { overflow: hidden; height: 100vh; min-height: 0; }
+.cd { height: 100vh; display: flex; flex-direction: column; gap: calc(16 * var(--u)); padding: calc(22 * var(--u)) calc(26 * var(--u)); }
+.cd-dau { display: flex; align-items: center; justify-content: space-between; gap: calc(24 * var(--u)); }
+.cd-dau small { display: block; font-size: max(calc(17 * var(--u)), 11px); font-weight: 800; letter-spacing: 0.08em; color: var(--t2); }
+.cd-dau > div > b { display: block; font-size: max(calc(38 * var(--u)), 20px); font-weight: 800; line-height: 1.2; }
+.cd-mat { text-align: right; }
+.cd-mat b { font-size: max(calc(64 * var(--u)), 30px); line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cd-mat b i { font-style: normal; font-size: 0.5em; color: var(--t2); font-weight: 600; }
+.cd-than { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: calc(22 * var(--u)); }
+.cd-trai { display: flex; flex-direction: column; gap: calc(16 * var(--u)); min-width: 0; min-height: 0; }
+.cd-thang { padding: calc(16 * var(--u)) calc(20 * var(--u)); border-radius: calc(18 * var(--u)); background: var(--s); border: 1px solid var(--l); }
+.cd-thang small { font-size: max(calc(16 * var(--u)), 10px); color: var(--t2); }
+.cd-cot { display: flex; align-items: flex-end; gap: calc(8 * var(--u)); height: calc(104 * var(--u)); margin-top: calc(6 * var(--u)); }
+.cd-cot .cd-n { color: var(--t); font-weight: 700; min-height: 1em; }
+.cd-cot span { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 2px; }
+.cd-cot i { display: block; width: 100%; border-radius: 6px 6px 0 0; background: color-mix(in srgb, var(--m3) 70%, var(--s)); }
+.cd-cot em { font-style: normal; font-size: max(calc(14 * var(--u)), 9px); color: var(--t2); }
+.cd-em { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(10 * var(--u)); align-content: start; }
+.cd-em li { display: flex; align-items: center; gap: calc(10 * var(--u)); padding: calc(9 * var(--u)) calc(12 * var(--u)); border-radius: calc(14 * var(--u)); background: var(--s); border: 1px solid var(--l); min-width: 0; }
+.cd-hh { flex: none; display: grid; place-items: center; width: calc(44 * var(--u)); height: calc(44 * var(--u)); min-width: 26px; min-height: 26px; border-radius: 50%; background: color-mix(in srgb, var(--m4) 40%, var(--s)); font-size: max(calc(20 * var(--u)), 12px); font-weight: 800; }
+.cd-em li > div { min-width: 0; display: flex; flex-direction: column; flex: 1; }
+.cd-em b { font-size: max(calc(20 * var(--u)), 12px); line-height: 1.25; }
+.cd-em small { font-size: max(calc(15 * var(--u)), 9.5px); color: var(--t2); }
+.cd-mini { display: flex; gap: 2px; height: max(calc(8 * var(--u)), 4px); margin-top: calc(6 * var(--u)); }
+.cd-mini i { border-radius: 99px; }
+.cd-mini i[data-m='1'] { background: var(--m1); } .cd-mini i[data-m='2'] { background: var(--m2); } .cd-mini i[data-m='3'] { background: var(--m3); } .cd-mini i[data-m='4'] { background: var(--m4); }
+.cd-phai { display: flex; flex-direction: column; gap: calc(16 * var(--u)); min-width: 0; }
+.cd-the { position: relative; display: flex; flex-direction: column; gap: calc(12 * var(--u)); padding: calc(20 * var(--u)) calc(24 * var(--u)); border-radius: calc(20 * var(--u)); background: var(--s); border: 1px solid var(--l); }
+.cd-the > small { font-size: max(calc(17 * var(--u)), 10px); font-weight: 800; letter-spacing: 0.06em; color: var(--t2); }
+.cd-the .ve { top: calc(14 * var(--u)); right: calc(16 * var(--u)); font-size: max(calc(15 * var(--u)), 10px); }
+.cd-moi { border-color: color-mix(in srgb, var(--a) 55%, var(--l)); }
+.cd-do, .cd-ket { font-size: max(calc(21 * var(--u)), 12px); line-height: 1.45; color: var(--t2); }
+.cd-do b, .cd-ket b { color: var(--t); font-variant-numeric: tabular-nums; }
+.cd-ket { color: var(--t); }
+.cd-vinh { font-size: max(calc(34 * var(--u)), 16px); }
+.cd-the > span { font-size: max(calc(20 * var(--u)), 11px); color: var(--t2); }
+.cd-the .tm-thanh { height: max(calc(24 * var(--u)), 10px); }
+.cd-the .tm-cg { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(8 * var(--u)) calc(14 * var(--u)); }
+.cd-the .tm-cg b { font-size: max(calc(19 * var(--u)), 11px); }
+.cd-the .tm-s { font-size: max(calc(18 * var(--u)), 10px); color: var(--t2); }
+.cd-the .tm-d { width: max(calc(14 * var(--u)), 8px); height: max(calc(14 * var(--u)), 8px); }
+.cd-x { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+.cd-de { justify-content: flex-start; }
+.cd-x > .cd-de { align-self: start; }
+.cd-de p { font-size: max(calc(30 * var(--u)), 15px); line-height: 1.5; }
+.cd-de ul { display: flex; flex-direction: column; gap: calc(10 * var(--u)); font-size: max(calc(28 * var(--u)), 14px); }
+.cd-dung { font-size: max(calc(26 * var(--u)), 13px); color: color-mix(in srgb, var(--m4) 60%, #fff); }
+.cd-ten { font-size: max(calc(22 * var(--u)), 12px); line-height: 1.7; color: var(--t); }
+.cd-chan { display: flex; align-items: center; justify-content: space-between; gap: calc(24 * var(--u)); font-size: max(calc(19 * var(--u)), 11px); color: var(--t2); }
+.cd-chan kbd { display: inline-grid; place-items: center; min-width: 1.6em; padding: 0 0.3em; border-radius: 6px; background: color-mix(in srgb, var(--a) 62%, #fff); color: var(--on); font: inherit; font-weight: 800; }
+.cd-ghc { text-align: right; }
+
+/* ── app học sinh / phụ huynh ── */
+.cot-hs { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; display: grid; gap: 16px; }
+@media (min-width: 1024px) { .cot-hs { max-width: 760px; padding: 36px 24px 56px; gap: 20px; } }
+.the-hs { position: relative; display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 18px; border: 1px solid var(--l); border-radius: 24px; background: var(--s); }
+.hs-dau { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-right: 60px; }
+.hs-dau h1, .hs-dau h2 { font-size: 20px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; }
+.hs-dau > span { font-size: 13px; color: var(--t2); }
+.hs-ds { display: flex; flex-direction: column; gap: 10px; }
+.hs-hang { padding: 14px 16px; border: 1px solid var(--l); border-radius: 18px; background: var(--s); min-width: 0; }
+.hs-ten { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.hs-ten b { font-size: 16px; line-height: 1.35; font-weight: 750; }
+.hs-ten small { font-size: 13px; }
+.hs-tt { font-weight: 700; color: var(--a) !important; }
+.hs-lan { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 6px; font-size: 14px; color: var(--t2); }
+.hs-lan b { color: var(--t); }
+.hs-nhan { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 8px; border-radius: 99px; background: var(--m0-n); color: var(--m0-d); border: 1px solid color-mix(in srgb, var(--m0) 45%, transparent); font-size: 13px; font-weight: 700; line-height: 1.5; }
+.hs-nhan i { width: 9px; height: 9px; border-radius: 50%; background: var(--m0); }
+.hs-nhan[data-m='1'] { --m0: var(--m1); --m0-n: var(--m1-n); --m0-d: var(--m1-d); }
+.hs-nhan[data-m='2'] { --m0: var(--m2); --m0-n: var(--m2-n); --m0-d: var(--m2-d); }
+.hs-nhan[data-m='3'] { --m0: var(--m3); --m0-n: var(--m3-n); --m0-d: var(--m3-d); }
+.hs-nhan[data-m='4'] { --m0: var(--m4); --m0-n: var(--m4-n); --m0-d: var(--m4-d); }
+.hs-ct { display: flex; flex-direction: column; gap: 10px; }
+.hs-big { font-size: 20px; line-height: 1.4; }
+.hs-big span { color: var(--t3); }
+.hs-gc { font-size: 14px; line-height: 1.55; color: var(--t2); }
+.hs-doan { font-size: 16px; line-height: 1.65; color: var(--t); }
+.hs-nho .hs-hang { padding: 12px 14px; }
+.the-hs .tm-cg { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.the-hs .tm-thanh i[data-m] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ── biểu đồ chấm của lớp ── */
+.cl { --d: 12px; position: relative; min-width: 0; }
+.cl.chieu { --d: max(calc(20 * var(--u)), 10px); }
+.cl-vung { position: relative; height: calc(var(--cao) * (var(--d) + 3px) + 8px); border-bottom: 2px solid var(--l); }
+.cl-vung i { position: absolute; bottom: calc(4px + var(--k) * (var(--d) + 3px)); width: var(--d); height: var(--d); border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 0 1px var(--s); }
+.cl-vung i[data-m='1'] { background: var(--m1); } .cl-vung i[data-m='2'] { background: var(--m2); } .cl-vung i[data-m='3'] { background: var(--m3); } .cl-vung i[data-m='4'] { background: var(--m4); }
+.cl-vung u { position: absolute; top: 0; bottom: -2px; width: 2px; background: var(--t); opacity: 0.75; transform: translateX(-1px); }
+.cl.chieu .th-moc { font-size: max(calc(17 * var(--u)), 9.5px); height: max(calc(26 * var(--u)), 14px); }
+/* chú giải thước + gạch đầu dòng */
+.cgt { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--t2); }
+.cgt span { display: inline-flex; align-items: center; gap: 6px; }
+.cgt i { width: 10px; height: 10px; border-radius: 50%; }
+.cgt i[data-m='1'] { background: var(--m1); } .cgt i[data-m='2'] { background: var(--m2); } .cgt i[data-m='3'] { background: var(--m3); } .cgt i[data-m='4'] { background: var(--m4); }
+.cgt u { width: 2px; height: 12px; background: var(--t); opacity: 0.75; }
+.cgt b { width: 10px; height: 10px; border-radius: 50%; background: var(--t); }
+.dong-y { display: flex; flex-direction: column; gap: 8px; }
+.dong-y li { position: relative; padding-left: 16px; font-size: 15px; line-height: 1.55; color: var(--t2); }
+.dong-y li::before { content: ''; position: absolute; left: 2px; top: 0.65em; width: 6px; height: 6px; border-radius: 50%; background: var(--t3); }
+.phu li.thieu .phu-th i { background: var(--m1); }
+.phu li.thieu b { color: var(--m1); }
+.cd-vua { display: flex; flex-direction: column; gap: calc(8 * var(--u)); }
+.cd-vua li { display: flex; align-items: baseline; gap: calc(14 * var(--u)); font-size: max(calc(20 * var(--u)), 11px); }
+.cd-vua li > span:first-child { color: var(--t2); }
+.cd-vua li > b { flex: 1; min-width: 0; }
+.cd-vua li > span:last-child { color: var(--t2); }
+.hs-cg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; font-size: 13px; line-height: 1.45; color: var(--t2); }
+.hs-cg li { display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 8px; align-items: start; }
+.hs-cg i { width: 12px; height: 12px; margin-top: 3px; border-radius: 50%; }
+.hs-cg li[data-m='1'] i { background: var(--m1); } .hs-cg li[data-m='2'] i { background: var(--m2); } .hs-cg li[data-m='3'] i { background: var(--m3); } .hs-cg li[data-m='4'] i { background: var(--m4); }
+@media (max-width: 480px) { .hs-cg { grid-template-columns: minmax(0, 1fr); } }
+.lh-gc { display: block; margin-top: 4px; }
+
+.cheo-c { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.cheo-c small { color: var(--t2); font-size: 13px; line-height: 1.35; }
+@media (min-width: 640px) { .cheo-c { flex-direction: row; align-items: center; gap: 12px; } }
+
+/* ── bảng điểm danh của thầy ── */
+.dd-ba { display: grid; gap: 16px; }
+@media (min-width: 900px) { .dd-ba { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; } }
+.dd-xam { background: color-mix(in srgb, var(--s2) 55%, var(--s)); }
+.dd-ma { font-size: 34px; font-weight: 800; letter-spacing: 0.08em; line-height: 1.1; }
+.dd-co { display: flex; align-items: baseline; gap: 6px; }
+.dd-co b { font-size: 40px; line-height: 1; }
+.dd-co span { color: var(--t2); font-size: 18px; }
+.dd-xam .phu-th { display: block; }
+.dd-ds { display: flex; flex-direction: column; }
+.dd-hang { position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 12px; align-items: center; min-height: 64px; padding: 12px 0; border-top: 1px solid var(--l); }
+.dd-hang:first-child { border-top: 0; }
+.dd-gio { color: var(--t2); font-size: 14px; }
+.dd-ten { display: flex; flex-direction: column; min-width: 0; }
+.dd-ten b { font-size: 16px; line-height: 1.35; }
+.dd-ten small { color: var(--t2); }
+.dd-nhom { display: inline-block; padding: 0 8px; border-radius: 99px; border: 1px solid var(--l); font-weight: 700; color: var(--t); }
+.dd-cach { position: relative; grid-column: 2; display: flex; flex-direction: column; gap: 4px; padding-right: 64px; min-width: 0; }
+.dd-cach small { color: var(--t2); }
+.dd-cach .cd-mini { height: 8px; margin-top: 2px; }
+.dd-cach .ve { top: 0; }
+.dd-ds .cd-mini { display: flex; gap: 2px; }
+.dd-ds .cd-mini i { border-radius: 99px; }
+.dd-ds .cd-mini i[data-m='1'] { background: var(--m1); } .dd-ds .cd-mini i[data-m='2'] { background: var(--m2); } .dd-ds .cd-mini i[data-m='3'] { background: var(--m3); } .dd-ds .cd-mini i[data-m='4'] { background: var(--m4); }
+@media (min-width: 720px) {
+  .dd-hang { grid-template-columns: 56px minmax(0, 1fr) minmax(220px, 0.9fr); }
+  .dd-cach { grid-column: 3; padding-right: 0; }
+  .dd-cach .ve { top: -6px; right: 0; }
+}
+
+</style>
+</head>
+<body>
+<section class="kh" id="k-thang" data-ap="gv" hidden>
+  <div class="trang"><header class="dau-trang"><h1>Thang Mức làm bài</h1><p>Một câu, một thước. Câu 12 · Pin điện hóa · Phần I · 46 từ, không hình.</p></header>
+  <div class="luoi">
+  <article class="the">
+    <h2>Bốn mức theo số giây em làm câu này</h2>
+    <span class="ve" data-k="moi">Thêm</span>
+    <div class="th" role="img" aria-label="Làm 31 giây; đọc hết đề cần 24 giây; có thời gian nghĩ từ 30 giây; làm kỹ từ 54 giây">
+    <span class="th-diem" style="left:34.44444444444444%"><b>31 giây</b></span>
+    <div class="th-vung"><div class="th-z"><i data-m="1" style="left:0%;width:26.666666666666668%"></i><i data-m="2" style="left:26.666666666666668%;width:6.666666666666668%"></i><i data-m="3" style="left:33.333333333333336%;width:26.666666666666664%"></i><i data-m="4" style="left:60%;width:40%"></i></div><b class="th-ch" style="left:34.44444444444444%"></b></div>
+    <div class="th-moc"><span style="left:0%">0</span><span style="left:26.666666666666668%">24</span><span style="left:33.333333333333336%">30</span><span style="left:60%">54</span><span class="th-cuoi" style="left:100%">90 giây</span></div>
+  </div>
+    <p class="ghi">Chấm trên thước là một lượt làm 31 giây. Thước của mỗi câu, mỗi em tự co giãn theo độ dài đề và nhịp đọc của em.</p>
+    <ul class="dn">
+      <li data-m="1"><span class="dn-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></span><div><b>Chưa đọc hết đề</b><span>Nộp khi chưa tới <b class="so">24</b> giây: chưa đủ thời gian đọc hết đề.</span></div></li>
+      <li data-m="2"><span class="dn-m"><span class="ch" data-m="2"><b>Mức làm 2</b></span></span><div><b>Đọc xong, chưa kịp nghĩ</b><span>Từ <b class="so">24</b> tới <b class="so">29</b> giây: đủ đọc, chưa tới 6 giây để nghĩ.</span></div></li>
+      <li data-m="3"><span class="dn-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></span><div><b>Có nghĩ</b><span>Từ <b class="so">30</b> tới <b class="so">53</b> giây: đọc xong và còn dành thời gian nghĩ.</span></div></li>
+      <li data-m="4"><span class="dn-m"><span class="ch" data-m="4"><b>Mức làm 4</b></span></span><div><b>Làm kỹ</b><span>Từ <b class="so">54</b> giây, tức 0,8 × thời gian thường của lớp (<b class="so">68</b> giây).</span></div></li>
+      <li data-m="0"><span class="dn-m"><span class="ch" data-m="0"><b>Chưa có số đo</b></span></span><div><b>Lượt cũ, không đo lùi được</b><span>Trước 21/10 nhiều nguồn không có giây. Không ước, không xếp mức.</span></div></li>
+    </ul>
+  </article>
+  <div class="cot-phu">
+  <article class="the">
+    <h2>Cách tính, đều dùng số đã có trong hệ thống</h2>
+    <span class="ve" data-k="moi">Thêm</span>
+    <ol class="cong-thuc">
+      <li><b>Đọc hết đề</b><span class="ct">8 + 0,35 × 46 từ + 10 × 0 hình = <b class="so">24 giây</b></span><small>Công thức đã dùng cho thời gian lên bảng.</small></li>
+      <li><b>Nhịp đọc của em</b><span class="ct">e<sup>−τ</sup>, kẹp 0,75 – 1,5. Chưa có τ ⇒ 1,0</span><small>τ lấy từ tốc độ OMNI của em.</small></li>
+      <li><b>Sàn nghĩ</b><span class="ct">Phần I 6 · Phần II 12 · Phần III 15 giây</span><small>Ngưỡng tạm, chỉnh theo dữ liệu thật.</small></li>
+      <li><b>Mức làm 4</b><span class="ct">≥ 0,8 × thời gian thường của em</span><small>Lớp chưa đủ 8 lượt của câu thì không xét Mức làm 4.</small></li>
+    </ol>
+  </article>
+  <article class="the">
+    <h2>Cùng một câu, thước mỗi em một khác</h2>
+    <div class="ba-thuoc"><div class="ba-hang"><div class="ba-ten"><b>Phạm Quốc Huy</b><span>τ 0,2 · hệ số 0,82 · đọc hết đề <b class="so">20</b> giây</span></div><span class="thn" role="img" aria-label="null giây, đọc hết đề cần 20 giây"><i data-m="1" style="left:0%;width:22.22222222222222%"></i><i data-m="2" style="left:22.22222222222222%;width:6.666666666666668%"></i><i data-m="3" style="left:28.88888888888889%;width:21.11111111111111%"></i><i data-m="4" style="left:50%;width:50%"></i><u class="thn-t" style="left:22.22222222222222%"></u></span></div><div class="ba-hang"><div class="ba-ten"><b>Em chưa có τ</b><span>chưa có τ · hệ số 1,0 · đọc hết đề <b class="so">24</b> giây</span></div><span class="thn" role="img" aria-label="null giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:26.666666666666668%"></i><i data-m="2" style="left:26.666666666666668%;width:6.666666666666668%"></i><i data-m="3" style="left:33.333333333333336%;width:26.666666666666664%"></i><i data-m="4" style="left:60%;width:40%"></i><u class="thn-t" style="left:26.666666666666668%"></u></span></div><div class="ba-hang"><div class="ba-ten"><b>Bùi Tuấn Kiệt</b><span>τ -0,2 · hệ số 1,22 · đọc hết đề <b class="so">29</b> giây</span></div><span class="thn" role="img" aria-label="null giây, đọc hết đề cần 29 giây"><i data-m="1" style="left:0%;width:32.22222222222222%"></i><i data-m="2" style="left:32.22222222222222%;width:6.666666666666664%"></i><i data-m="3" style="left:38.888888888888886%;width:34.44444444444444%"></i><i data-m="4" style="left:73.33333333333333%;width:26.66666666666667%"></i><u class="thn-t" style="left:32.22222222222222%"></u></span></div></div>
+    <p class="ghi">Vạch đứng là mốc đọc hết đề của từng em.</p>
+  </article>
+  <article class="the the-luu">
+    <h2>Câu trả lời đúng thì sao?</h2>
+    <p>Đúng mà làm chậm hơn thời gian đọc: bình thường, không xếp mức vội.</p>
+    <p>Đúng mà nộp trước khi đọc hết đề: chỉ ghi chú riêng cho thầy, “đúng trước khi đọc hết đề”. Không đếm là lượt vội.</p>
+    <span class="ve" data-k="moi">Thêm</span>
+  </article></div></div></div></section>
+<section class="kh" id="k-do" data-ap="gv" hidden>
+  <div class="trang"><header class="dau-trang"><h1>Mọi câu đều có số đo</h1><p>Đã làm, đang làm và sắp làm. Lượt nào cũng có giây đo thật, không ước.</p></header>
+  <div class="ba-the">
+    <article class="the"><h2>Đã làm</h2><span class="ve" data-k="moi">Thêm</span><ul class="dong-y"><li>Từ <b>21/10</b>, mọi lượt mới đều có giây đo thật.</li><li>Lượt cũ không đo lùi được. Hiện “Chưa có số đo”, không điền số ước vào cột giây.</li><li>Ca thi, game và chữa lỗi đã có giây từ trước: các lượt đó vẫn xếp mức được.</li></ul></article>
+    <article class="the"><h2>Đang làm</h2><span class="ve" data-k="moi">Thêm</span><ul class="dong-y"><li>Một cách đo chung cho mọi màn làm câu: từ lúc câu hiện đủ trên màn tới lúc em nộp.</li><li>Dừng khi tab ẩn, khóa màn hình hoặc em không chạm màn 180 giây (tạm).</li><li>Trần 900 giây một lượt. Làm lại câu là lượt mới, giây riêng.</li></ul></article>
+    <article class="the"><h2>Sắp làm</h2><span class="ve" data-k="moi">Thêm</span><p>Thời gian đọc hết đề tính sẵn cho từng câu trong kho, thầy thấy ngay khi giao bài. Ví dụ bài sắp giao:</p>
+      <ul class="gb"><li><span>Câu 12 · Pin điện hóa</span><b class="so">24 giây</b></li><li><span>Câu 7 · Điện phân</span><b class="so">43 giây</b></li><li><span>Câu 15 · Ăn mòn điện hóa</span><b class="so">39 giây</b></li><li><span>Câu 9 · Pin điện hóa</span><b class="so">26 giây</b></li><li><span>Câu 21 · Điện phân</span><b class="so">29 giây</b></li><li class="gb-tong"><span>Đọc hết 5 câu</span><b class="so">2 phút 41 giây</b></li></ul></article>
+  </div>
+  <article class="the"><h2>Từng nguồn: hiện tại và sau khi đổi</h2><span class="ve" data-k="moi">Thêm</span>
+    <div class="bang" role="table" aria-label="Nguồn và cách đo"><div class="bang-d" role="row"><span role="columnheader">Nguồn</span><span role="columnheader">Hiện tại</span><span role="columnheader">Sau khi đổi</span></div>
+    <div class="bang-h" role="row"><b role="cell">Ca thi</b><span role="cell">Có giây từng câu, dừng khi tab ẩn.</span><span role="cell" class="sau">Giữ nguyên</span></div><div class="bang-h" role="row"><b role="cell">BTVN · BTVN lỡ · Khắc phục (phiếu)</b><span role="cell">Không có giây.</span><span role="cell" class="sau">Đồng hồ trong phiếu, gửi cùng đáp án</span></div><div class="bang-h" role="row"><b role="cell">Game (Làm bài tập)</b><span role="cell">Máy em gửi, máy chủ bỏ khi OMNI tắt.</span><span role="cell" class="sau">Máy chủ ghi cả khi OMNI tắt</span></div><div class="bang-h" role="row"><b role="cell">Chữa lỗi</b><span role="cell">Giờ máy chủ, cộng cả lúc em rời màn.</span><span role="cell" class="sau">Đồng hồ máy em, dừng khi rời màn</span></div><div class="bang-h" role="row"><b role="cell">Ôn lại</b><span role="cell">Máy chủ nhận giây, máy em không gửi.</span><span role="cell" class="sau">Máy em gửi giây</span></div><div class="bang-h" role="row"><b role="cell">Tự luyện</b><span role="cell">Giây nằm ở bảng riêng, sổ để trống.</span><span role="cell" class="sau">Ghi vào sổ chung</span></div><div class="bang-h" role="row"><b role="cell">Mở bài · Luyện đề · Nền · Kiểm tra cá nhân</b><span role="cell">Không có giây.</span><span role="cell" class="sau">Đồng hồ chung, gửi cùng lượt</span></div><div class="bang-h" role="row"><b role="cell">Lên bảng · Đầu giờ (thầy chấm)</b><span role="cell">Giây thực nằm ở bảng riêng.</span><span role="cell" class="sau">Chuyển vào sổ để xếp mức</span></div></div>
+  </article>
+  <article class="the"><h2>Độ phủ đo, 7 ngày gần nhất</h2><span class="ve" data-k="moi">Thêm</span>
+    <ul class="phu"><li><span>Ca thi</span><span class="phu-th"><i style="width:100%"></i></span><b class="so">34/34 lượt · 100%</b></li><li><span>BTVN · Khắc phục</span><span class="phu-th"><i style="width:100%"></i></span><b class="so">412/412 lượt · 100%</b></li><li><span>Game</span><span class="phu-th"><i style="width:100%"></i></span><b class="so">240/240 lượt · 100%</b></li><li><span>Tự luyện</span><span class="phu-th"><i style="width:100%"></i></span><b class="so">96/96 lượt · 100%</b></li><li class="thieu"><span>Ôn lại</span><span class="phu-th"><i style="width:95%"></i></span><b class="so">58/61 lượt · 95%</b></li><li><span>Kiểm tra cá nhân</span><span class="phu-th"><i style="width:100%"></i></span><b class="so">27/27 lượt · 100%</b></li></ul>
+    <p class="ghi">Nguồn nào dưới 100% hiện màu cảnh báo (như Ôn lại ở trên, thiếu 3 lượt) và ghi vào nhật ký điều phối để sửa ngay.</p>
+  </article></div></section>
+<section class="kh" id="k-diem-danh" data-ap="gv" hidden>
+  <div class="trang"><header class="dau-trang"><h1>Điểm danh — việc đầu tiên của buổi</h1><p>12A1 · Thứ Ba 27/10 · màn của thầy, không chiếu.</p></header>
+  <div class="dd-ba">
+    <article class="the dd-xam"><h2>Mã buổi</h2><p class="dd-ma so">4827 19</p><p class="ghi">Mở 18:10 · mã đổi mỗi phút</p><span class="ve" data-k="giu">Giữ</span></article>
+    <article class="the dd-xam"><h2>Có mặt</h2><p class="dd-co"><b class="so">31</b><span>/34 em</span></p><span class="phu-th"><i style="width:91%"></i></span><span class="ve" data-k="giu">Giữ</span></article>
+    <article class="the dd-xam"><h2>Vắng 3 em</h2><p class="dobao">Cao Thái Sơn · Trịnh Diệu Linh · Võ Tuấn Anh</p><span class="ve" data-k="giu">Giữ</span></article>
+  </div>
+  <article class="the"><div class="the-dau"><h2>Vừa điểm danh</h2><span class="phu-s">Bấm tên em để mở hồ sơ làm bài</span></div><span class="ve" data-k="moi">Thêm thanh Mức làm ở mỗi dòng</span>
+    <p class="ghi">Thanh nhỏ bên phải: số lượt làm 14 ngày theo Mức làm 1 → 4. Màn riêng của thầy, em khác không nhìn thấy.</p>
+    <p class="cgt"><span><i data-m="1"></i>Mức làm 1</span><span><i data-m="2"></i>2</span><span><i data-m="3"></i>3</span><span><i data-m="4"></i>4</span></p>
+    <ul class="dd-ds"><li class="dd-hang"><span class="dd-gio so">18:31</span><div class="dd-ten"><b>Bùi Ngọc Mai</b><small><span class="dd-nhom" data-n="Chăm">Chăm</span> · Bậc 8 · Điểm chăm 67</small></div>
+      <div class="dd-cach"><span class="cd-mini" aria-label="Mức làm 14 ngày"><i data-m="1" style="flex:6"></i><i data-m="2" style="flex:9"></i><i data-m="3" style="flex:27"></i><i data-m="4" style="flex:10"></i></span><small>Mức làm 1–2: <b class="so">15/52</b> lượt</small></div></li><li class="dd-hang"><span class="dd-gio so">18:29</span><div class="dd-ten"><b>Trịnh Nhật Nam</b><small><span class="dd-nhom" data-n="Chăm">Chăm</span> · Bậc 9 · Điểm chăm 79</small></div>
+      <div class="dd-cach"><span class="cd-mini" aria-label="Mức làm 14 ngày"><i data-m="1" style="flex:3"></i><i data-m="2" style="flex:6"></i><i data-m="3" style="flex:24"></i><i data-m="4" style="flex:7"></i></span><small>Mức làm 1–2: <b class="so">9/40</b> lượt</small></div></li><li class="dd-hang"><span class="dd-gio so">18:27</span><div class="dd-ten"><b>Đỗ Khánh Linh</b><small><span class="dd-nhom" data-n="Chưa đều">Chưa đều</span> · Bậc 6 · Điểm chăm 50</small></div>
+      <div class="dd-cach"><span class="cd-mini" aria-label="Mức làm 14 ngày"><i data-m="1" style="flex:12"></i><i data-m="2" style="flex:10"></i><i data-m="3" style="flex:20"></i><i data-m="4" style="flex:6"></i></span><small>Mức làm 1–2: <b class="so">22/48</b> lượt</small></div></li><li class="dd-hang"><span class="dd-gio so">18:26</span><div class="dd-ten"><b>Đặng Phúc Lâm</b><small><span class="dd-nhom" data-n="Lười">Lười</span> · Bậc 2 · Điểm chăm 24</small></div>
+      <div class="dd-cach"><span class="cd-mini" aria-label="Mức làm 14 ngày"><i data-m="1" style="flex:10"></i><i data-m="2" style="flex:8"></i><i data-m="3" style="flex:18"></i><i data-m="4" style="flex:4"></i></span><small>Mức làm 1–2: <b class="so">18/40</b> lượt</small></div></li><li class="dd-hang"><span class="dd-gio so">18:24</span><div class="dd-ten"><b>Lý Hải Nam</b><small><span class="dd-nhom" data-n="Chưa đều">Chưa đều</span> · Bậc 7 · Điểm chăm 62</small></div>
+      <div class="dd-cach"><span class="cd-mini" aria-label="Mức làm 14 ngày"><i data-m="1" style="flex:5"></i><i data-m="2" style="flex:8"></i><i data-m="3" style="flex:26"></i><i data-m="4" style="flex:9"></i></span><small>Mức làm 1–2: <b class="so">13/48</b> lượt</small></div></li><li class="dd-hang"><span class="dd-gio so">18:22</span><div class="dd-ten"><b>Phạm Thanh Trúc</b><small><span class="dd-nhom" data-n="Chăm">Chăm</span> · Bậc 11 · Điểm chăm 90</small></div>
+      <div class="dd-cach"><span class="cd-mini" aria-label="Mức làm 14 ngày"><i data-m="1" style="flex:1"></i><i data-m="2" style="flex:3"></i><i data-m="3" style="flex:23"></i><i data-m="4" style="flex:17"></i></span><small>Mức làm 1–2: <b class="so">4/44</b> lượt</small></div></li></ul>
+  </article></div></section>
+<section class="kh" id="k-ho-so" data-ap="gv" hidden>
+  <div class="tam" data-bo="hs"><header class="tam-dau"><button class="nut-lui" aria-label="Đóng hồ sơ"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><span class="ava">ĐA</span><div><h1>Nguyễn Đức Anh</h1><p>12A1 · SBD 12A1-07 · 14 ngày gần nhất</p></div></header>
+  <div class="tam-than">
+    <article class="the the-lon"><div class="the-dau"><h2>Cách làm bài</h2><span class="ve" data-k="moi">Thêm</span></div>
+      <p class="dobao">Đo được <b class="so">65/87</b> lượt. <b class="so">22</b> lượt cũ (trước 21/10) chưa có số đo.</p>
+      <div class="tm ">
+    <div class="tm-thanh" role="img" aria-label="Mức làm 1: 13 lượt; Mức làm 2: 13 lượt; Mức làm 3: 28 lượt; Mức làm 4: 11 lượt"><i data-m="1" style="flex:13"></i><i data-m="2" style="flex:13"></i><i data-m="3" style="flex:28"></i><i data-m="4" style="flex:11"></i></div>
+    <ul class="tm-cg"><li data-m="1"><span class="tm-d"></span><b>Mức làm 1</b><span class="tm-s">13 lượt · 20%</span></li><li data-m="2"><span class="tm-d"></span><b>Mức làm 2</b><span class="tm-s">13 lượt · 20%</span></li><li data-m="3"><span class="tm-d"></span><b>Mức làm 3</b><span class="tm-s">28 lượt · 43%</span></li><li data-m="4"><span class="tm-d"></span><b>Mức làm 4</b><span class="tm-s">11 lượt · 17%</span></li></ul>
+  </div>
+      <div class="cheo" role="table" aria-label="Mức làm theo đúng và sai"><div class="cheo-d" role="row"><span></span><span role="columnheader">Đúng</span><span role="columnheader">Sai</span></div>
+    <div class="cheo-h" role="row" data-m="1"><span role="rowheader" class="cheo-c"><span class="ch" data-m="1"><b>Mức làm 1</b></span><small>Chưa đọc hết đề</small></span><b class="so" role="cell">4</b><b class="so sai" role="cell">9</b></div><div class="cheo-h" role="row" data-m="2"><span role="rowheader" class="cheo-c"><span class="ch" data-m="2"><b>Mức làm 2</b></span><small>Đọc xong, chưa kịp nghĩ</small></span><b class="so" role="cell">5</b><b class="so sai" role="cell">8</b></div><div class="cheo-h" role="row" data-m="3"><span role="rowheader" class="cheo-c"><span class="ch" data-m="3"><b>Mức làm 3</b></span><small>Có nghĩ</small></span><b class="so" role="cell">22</b><b class="so sai" role="cell">6</b></div><div class="cheo-h" role="row" data-m="4"><span role="rowheader" class="cheo-c"><span class="ch" data-m="4"><b>Mức làm 4</b></span><small>Làm kỹ</small></span><b class="so" role="cell">9</b><b class="so sai" role="cell">2</b></div>
+    <div class="cheo-h cheo-t" role="row"><span role="rowheader">Cộng</span><b class="so" role="cell">40</b><b class="so" role="cell">25</b></div></div>
+      <div class="hai-so"><div><b class="so">17/25</b><span>lượt sai là lúc làm vội (Mức làm 1–2), 68%</span></div><div><b class="so">8/25</b><span>lượt sai dù đã nghĩ (Mức làm 3–4), 32%</span></div></div>
+      <p class="ghi">4 lượt đúng nộp trước khi đọc hết đề. Chỉ ghi chú, không tính là vội.</p>
+    </article>
+    <article class="the"><div class="the-dau"><h2>Lượt gần đây</h2><span class="ve" data-k="moi">Thêm</span></div><p class="cgt"><span><i data-m="1"></i>Mức làm 1</span><span><i data-m="2"></i>2</span><span><i data-m="3"></i>3</span><span><i data-m="4"></i>4</span><span><u></u>Đọc hết đề</span><span><b></b>Giây em làm</span></p><ul class="lh-ds"><li class="lh" data-m="1">
+    <div class="lh-c"><b>Câu 12 · Pin điện hóa</b><span>BTVN tuần 43 · 26/10 · Sai</span></div>
+    <div class="lh-t"><span class="lh-s"><b class="so">14</b> giây · đọc hết đề <b class="so">23</b> giây</span><span class="thn" role="img" aria-label="14 giây, đọc hết đề cần 23 giây"><i data-m="1" style="left:0%;width:23%"></i><i data-m="2" style="left:23%;width:6%"></i><i data-m="3" style="left:29%;width:23%"></i><i data-m="4" style="left:52%;width:48%"></i><u class="thn-t" style="left:23%"></u><b class="thn-d" style="left:14%"></b></span></div>
+    <div class="lh-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div>
+  </li><li class="lh" data-m="2">
+    <div class="lh-c"><b>Câu 7 · Điện phân</b><span>BTVN tuần 43 · 26/10 · Sai</span></div>
+    <div class="lh-t"><span class="lh-s"><b class="so">47</b> giây · đọc hết đề <b class="so">41</b> giây</span><span class="thn" role="img" aria-label="47 giây, đọc hết đề cần 41 giây"><i data-m="1" style="left:0%;width:27.333333333333332%"></i><i data-m="2" style="left:27.333333333333332%;width:10.000000000000004%"></i><i data-m="3" style="left:37.333333333333336%;width:38.666666666666664%"></i><i data-m="4" style="left:76%;width:24%"></i><u class="thn-t" style="left:27.333333333333332%"></u><b class="thn-d" style="left:31.333333333333332%"></b></span></div>
+    <div class="lh-m"><span class="ch" data-m="2"><b>Mức làm 2</b></span></div>
+  </li><li class="lh" data-m="4">
+    <div class="lh-c"><b>Câu 15 · Ăn mòn điện hóa</b><span>Luyện theo dạng · 25/10 · Đúng</span></div>
+    <div class="lh-t"><span class="lh-s"><b class="so">96</b> giây · đọc hết đề <b class="so">37</b> giây</span><span class="thn" role="img" aria-label="96 giây, đọc hết đề cần 37 giây"><i data-m="1" style="left:0%;width:30.833333333333332%"></i><i data-m="2" style="left:30.833333333333332%;width:10.000000000000004%"></i><i data-m="3" style="left:40.833333333333336%;width:34.99999999999999%"></i><i data-m="4" style="left:75.83333333333333%;width:24.16666666666667%"></i><u class="thn-t" style="left:30.833333333333332%"></u><b class="thn-d" style="left:80%"></b></span></div>
+    <div class="lh-m"><span class="ch" data-m="4"><b>Mức làm 4</b></span></div>
+  </li><li class="lh" data-m="1">
+    <div class="lh-c"><b>Câu 9 · Pin điện hóa</b><span>BTVN tuần 43 · 26/10 · Đúng</span></div>
+    <div class="lh-t"><span class="lh-s"><b class="so">8</b> giây · đọc hết đề <b class="so">25</b> giây</span><span class="thn" role="img" aria-label="8 giây, đọc hết đề cần 25 giây"><i data-m="1" style="left:0%;width:25%"></i><i data-m="2" style="left:25%;width:6%"></i><i data-m="3" style="left:31%;width:15%"></i><i data-m="4" style="left:46%;width:54%"></i><u class="thn-t" style="left:25%"></u><b class="thn-d" style="left:8%"></b></span><span class="lh-s lh-gc">Đúng trước khi đọc hết đề: ghi chú riêng, không tính là vội.</span></div>
+    <div class="lh-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div>
+  </li><li class="lh" data-m="3">
+    <div class="lh-c"><b>Câu 21 · Điện phân</b><span>Tự sửa lỗi · 24/10 · Sai</span></div>
+    <div class="lh-t"><span class="lh-s"><b class="so">41</b> giây · đọc hết đề <b class="so">28</b> giây</span><span class="thn" role="img" aria-label="41 giây, đọc hết đề cần 28 giây"><i data-m="1" style="left:0%;width:28%"></i><i data-m="2" style="left:28%;width:6%"></i><i data-m="3" style="left:34%;width:23%"></i><i data-m="4" style="left:57%;width:43%"></i><u class="thn-t" style="left:28%"></u><b class="thn-d" style="left:41%"></b></span></div>
+    <div class="lh-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></div>
+  </li><li class="lh" data-m="0">
+    <div class="lh-c"><b>Câu 3 · Đại cương kim loại</b><span>BTVN tuần 42 · 19/10 · Sai</span></div>
+    <div class="lh-t"><span class="lh-s">Lượt cũ, trước 21/10</span></div>
+    <div class="lh-m"><span class="ch" data-m="0"><b>Chưa có số đo</b></span></div>
+  </li></ul></article>
+    <article class="the"><div class="the-dau"><h2>Sáu tín hiệu thái độ</h2><span class="ve" data-k="doi">Đổi</span></div>
+      <ul class="tin-hieu">
+        <li><b>a</b><span>Làm đủ bài trong tuần</span><em>Giữ</em></li>
+        <li class="doi"><b>b</b><span>Làm vội: <b class="so">17/25</b> lượt sai ở Mức làm 1–2</span><em>Đổi</em></li>
+        <li><b>c</b><span>Bỏ dở giữa chừng</span><em>Giữ</em></li>
+        <li><b>d</b><span>Đoán mò, đáp án lặp</span><em>Giữ</em></li>
+        <li><b>e</b><span>Không xem lại lời giải</span><em>Giữ</em></li>
+        <li><b>g</b><span>Không làm lại câu sai</span><em>Giữ</em></li>
+      </ul>
+      <p class="ghi">Tín hiệu b hiện đo bằng ngưỡng cố định 8 giây (trắc nghiệm) và 15 giây (tự luận). Đề xuất đo theo Mức làm, chỉ tính lượt sai, để chỉ còn MỘT cách đo. Cần thầy chốt.</p>
+    </article>
+  </div></div></section>
+<section class="kh" id="k-ai-sai" data-ap="gv" hidden>
+  <div class="tam" data-bo="ai"><header class="tam-dau"><button class="nut-lui" aria-label="Quay lại"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button><div><h1>Ai đã sai câu này</h1><p>Câu 12 · Pin điện hóa · Phần I · BTVN tuần 43</p></div></header>
+  <div class="tam-than">
+    <article class="the the-lon"><div class="the-dau"><h2>34 em làm: 15 đúng, 19 sai</h2><span class="ve" data-k="moi">Thêm</span></div>
+      <p class="dobao">Đo được <b class="so">19/19</b> lượt sai. Đọc hết đề câu này cần <b class="so">24</b> giây (chưa tính nhịp đọc từng em).</p>
+      <div class="tm ">
+    <div class="tm-thanh" role="img" aria-label="Mức làm 1: 5 lượt; Mức làm 2: 6 lượt; Mức làm 3: 6 lượt; Mức làm 4: 2 lượt"><i data-m="1" style="flex:5"></i><i data-m="2" style="flex:6"></i><i data-m="3" style="flex:6"></i><i data-m="4" style="flex:2"></i></div>
+    <ul class="tm-cg"><li data-m="1"><span class="tm-d"></span><b>Mức làm 1</b><span class="tm-s">5 lượt · 26%</span></li><li data-m="2"><span class="tm-d"></span><b>Mức làm 2</b><span class="tm-s">6 lượt · 32%</span></li><li data-m="3"><span class="tm-d"></span><b>Mức làm 3</b><span class="tm-s">6 lượt · 32%</span></li><li data-m="4"><span class="tm-d"></span><b>Mức làm 4</b><span class="tm-s">2 lượt · 11%</span></li></ul>
+  </div>
+      <div class="cl " style="--cao:3" role="img" aria-label="19 lượt sai theo số giây; vạch đứng là thời gian đọc hết đề 24 giây">
+    <div class="cl-vung"><i data-m="1" style="left:6%;--k:0"></i><i data-m="1" style="left:9%;--k:0"></i><i data-m="1" style="left:11%;--k:1"></i><i data-m="1" style="left:14%;--k:0"></i><i data-m="1" style="left:19%;--k:0"></i><i data-m="2" style="left:23%;--k:0"></i><i data-m="2" style="left:25%;--k:0"></i><i data-m="2" style="left:27%;--k:1"></i><i data-m="2" style="left:28%;--k:0"></i><i data-m="2" style="left:29%;--k:1"></i><i data-m="2" style="left:31%;--k:2"></i><i data-m="3" style="left:36%;--k:0"></i><i data-m="3" style="left:38%;--k:1"></i><i data-m="3" style="left:41%;--k:0"></i><i data-m="3" style="left:44%;--k:0"></i><i data-m="3" style="left:47%;--k:1"></i><i data-m="3" style="left:52%;--k:0"></i><i data-m="4" style="left:58%;--k:0"></i><i data-m="4" style="left:61%;--k:0"></i><u style="left:24%"></u></div>
+    <div class="th-moc"><span style="left:0">0</span><span style="left:24%">24</span><span style="left:50%">50</span><span class="th-cuoi" style="left:100%">100 giây</span></div></div>
+      <p class="ghi">Mỗi chấm là một lượt sai, không kèm tên. Vạch đứng: đọc hết đề 24 giây (thước chung của câu). Màu chấm theo thước riêng của từng em.</p>
+    </article>
+    <article class="the"><div class="the-dau"><h2>Sai dù đã nghĩ · 8 em</h2><span class="phu-s">Mức làm 3–4</span></div><ul class="as-ds"><li class="as" data-m="3"><div class="as-ten"><b>Mai Hồng Nhung</b><span>chưa có τ</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">36</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="36 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:36%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></div></li><li class="as" data-m="3"><div class="as-ten"><b>Phan Đức Thịnh</b><span>chưa có τ</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">38</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="38 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:38%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></div></li><li class="as" data-m="3"><div class="as-ten"><b>Võ Mai Phương</b><span>τ 0,15</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">41</b> giây · đọc hết đề <b class="so">21</b> giây</span><span class="thn" role="img" aria-label="41 giây, đọc hết đề cần 21 giây"><i data-m="1" style="left:0%;width:21%"></i><i data-m="2" style="left:21%;width:6%"></i><i data-m="3" style="left:27%;width:20%"></i><i data-m="4" style="left:47%;width:53%"></i><u class="thn-t" style="left:21%"></u><b class="thn-d" style="left:41%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></div></li><li class="as" data-m="3"><div class="as-ten"><b>Cao Văn Tùng</b><span>τ 0,1</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">44</b> giây · đọc hết đề <b class="so">22</b> giây</span><span class="thn" role="img" aria-label="44 giây, đọc hết đề cần 22 giây"><i data-m="1" style="left:0%;width:22%"></i><i data-m="2" style="left:22%;width:6%"></i><i data-m="3" style="left:28%;width:22%"></i><i data-m="4" style="left:50%;width:50%"></i><u class="thn-t" style="left:22%"></u><b class="thn-d" style="left:44%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></div></li><li class="as" data-m="3"><div class="as-ten"><b>Trịnh Nhật Nam</b><span>chưa có τ</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">47</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="47 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:47%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></div></li><li class="as" data-m="3"><div class="as-ten"><b>Dương Ngọc Anh</b><span>τ -0,15</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">52</b> giây · đọc hết đề <b class="so">28</b> giây</span><span class="thn" role="img" aria-label="52 giây, đọc hết đề cần 28 giây"><i data-m="1" style="left:0%;width:28%"></i><i data-m="2" style="left:28%;width:6%"></i><i data-m="3" style="left:34%;width:29%"></i><i data-m="4" style="left:63%;width:37%"></i><u class="thn-t" style="left:28%"></u><b class="thn-d" style="left:52%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></div></li><li class="as" data-m="4"><div class="as-ten"><b>Tô Gia Hân</b><span>τ 0,2</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">58</b> giây · đọc hết đề <b class="so">20</b> giây</span><span class="thn" role="img" aria-label="58 giây, đọc hết đề cần 20 giây"><i data-m="1" style="left:0%;width:20%"></i><i data-m="2" style="left:20%;width:6%"></i><i data-m="3" style="left:26%;width:19%"></i><i data-m="4" style="left:45%;width:55%"></i><u class="thn-t" style="left:20%"></u><b class="thn-d" style="left:58%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="4"><b>Mức làm 4</b></span></div></li><li class="as" data-m="4"><div class="as-ten"><b>Lương Tuệ Minh</b><span>chưa có τ</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">61</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="61 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:61%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="4"><b>Mức làm 4</b></span></div></li></ul></article>
+    <article class="the"><div class="the-dau"><h2>Sai khi làm vội · 11 em</h2><span class="phu-s">Mức làm 1–2</span></div><ul class="as-ds"><li class="as" data-m="1"><div class="as-ten"><b>Phạm Quốc Huy</b><span>τ 0,2</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">6</b> giây · đọc hết đề <b class="so">20</b> giây</span><span class="thn" role="img" aria-label="6 giây, đọc hết đề cần 20 giây"><i data-m="1" style="left:0%;width:20%"></i><i data-m="2" style="left:20%;width:6%"></i><i data-m="3" style="left:26%;width:19%"></i><i data-m="4" style="left:45%;width:55%"></i><u class="thn-t" style="left:20%"></u><b class="thn-d" style="left:6%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div></li><li class="as" data-m="1"><div class="as-ten"><b>Nguyễn Hải Đăng</b><span>chưa có τ</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">9</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="9 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:9%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div></li><li class="as" data-m="1"><div class="as-ten"><b>Lê Thu Hà</b><span>τ -0,1</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">11</b> giây · đọc hết đề <b class="so">27</b> giây</span><span class="thn" role="img" aria-label="11 giây, đọc hết đề cần 27 giây"><i data-m="1" style="left:0%;width:27%"></i><i data-m="2" style="left:27%;width:6%"></i><i data-m="3" style="left:33%;width:27%"></i><i data-m="4" style="left:60%;width:40%"></i><u class="thn-t" style="left:27%"></u><b class="thn-d" style="left:11%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div></li><li class="as" data-m="1"><div class="as-ten"><b>Vũ Minh Quân</b><span>τ 0,05</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">14</b> giây · đọc hết đề <b class="so">23</b> giây</span><span class="thn" role="img" aria-label="14 giây, đọc hết đề cần 23 giây"><i data-m="1" style="left:0%;width:23%"></i><i data-m="2" style="left:23%;width:6%"></i><i data-m="3" style="left:29%;width:23%"></i><i data-m="4" style="left:52%;width:48%"></i><u class="thn-t" style="left:23%"></u><b class="thn-d" style="left:14%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div></li><li class="as" data-m="1"><div class="as-ten"><b>Đỗ Khánh Linh</b><span>chưa có τ</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">19</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="19 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:19%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div></li><li class="as" data-m="2"><div class="as-ten"><b>Đặng Phúc Lâm</b><span>τ 0,25</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">23</b> giây · đọc hết đề <b class="so">19</b> giây</span><span class="thn" role="img" aria-label="23 giây, đọc hết đề cần 19 giây"><i data-m="1" style="left:0%;width:19%"></i><i data-m="2" style="left:19%;width:6%"></i><i data-m="3" style="left:25%;width:17%"></i><i data-m="4" style="left:42%;width:58%"></i><u class="thn-t" style="left:19%"></u><b class="thn-d" style="left:23%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="2"><b>Mức làm 2</b></span></div></li><li class="as" data-m="2"><div class="as-ten"><b>Trần Bảo Ngọc</b><span>τ 0,1</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">25</b> giây · đọc hết đề <b class="so">22</b> giây</span><span class="thn" role="img" aria-label="25 giây, đọc hết đề cần 22 giây"><i data-m="1" style="left:0%;width:22%"></i><i data-m="2" style="left:22%;width:6%"></i><i data-m="3" style="left:28%;width:22%"></i><i data-m="4" style="left:50%;width:50%"></i><u class="thn-t" style="left:22%"></u><b class="thn-d" style="left:25%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="2"><b>Mức làm 2</b></span></div></li><li class="as" data-m="2"><div class="as-ten"><b>Hoàng Gia Bảo</b><span>chưa có τ</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">27</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="27 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:27%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="2"><b>Mức làm 2</b></span></div></li><li class="as" data-m="2"><div class="as-ten"><b>Ngô Diệp Chi</b><span>chưa có τ</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">28</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="28 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:28%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="2"><b>Mức làm 2</b></span></div></li><li class="as" data-m="2"><div class="as-ten"><b>Lý Anh Thư</b><span>τ 0</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">29</b> giây · đọc hết đề <b class="so">24</b> giây</span><span class="thn" role="img" aria-label="29 giây, đọc hết đề cần 24 giây"><i data-m="1" style="left:0%;width:24%"></i><i data-m="2" style="left:24%;width:6%"></i><i data-m="3" style="left:30%;width:24%"></i><i data-m="4" style="left:54%;width:46%"></i><u class="thn-t" style="left:24%"></u><b class="thn-d" style="left:29%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="2"><b>Mức làm 2</b></span></div></li><li class="as" data-m="2"><div class="as-ten"><b>Bùi Tuấn Kiệt</b><span>τ -0,2</span></div>
+    <div class="as-t"><span class="lh-s"><b class="so">31</b> giây · đọc hết đề <b class="so">29</b> giây</span><span class="thn" role="img" aria-label="31 giây, đọc hết đề cần 29 giây"><i data-m="1" style="left:0%;width:29%"></i><i data-m="2" style="left:29%;width:6%"></i><i data-m="3" style="left:35%;width:31%"></i><i data-m="4" style="left:66%;width:34%"></i><u class="thn-t" style="left:29%"></u><b class="thn-d" style="left:31%"></b></span></div>
+    <div class="as-m"><span class="ch" data-m="2"><b>Mức làm 2</b></span></div></li></ul></article>
+    <p class="cgt"><span><i data-m="1"></i>Mức làm 1</span><span><i data-m="2"></i>2</span><span><i data-m="3"></i>3</span><span><i data-m="4"></i>4</span><span><u></u>Đọc hết đề</span><span><b></b>Giây em làm</span></p>
+    <p class="ghi gc-rieng"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12s3.5-6 9-6c1.5 0 2.9.4 4.1 1M21 12s-3.5 6-9 6c-1.5 0-2.9-.4-4.1-1M4 4l16 16"/></svg><span>Màn này chỉ thầy thấy. Tờ chiếu “ai sai câu này” (phím X) chỉ hiện số em theo mức, không hiện tên kèm mức.</span></p>
+  </div></div></section>
+<section class="kh" id="k-len-bang" data-ap="gv" hidden>
+  <div class="tam tam-lb"><header class="tam-dau"><button class="nut-lui" aria-label="Đóng"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><span class="ava">TH</span><div><h1>Lê Thu Hà</h1><p>Đang được gọi lên bảng · Câu 12 · Pin điện hóa</p></div><span class="chi-thay"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12s3.5-6 9-6c1.5 0 2.9.4 4.1 1M21 12s-3.5 6-9 6c-1.5 0-2.9-.4-4.1-1M4 4l16 16"/></svg><span>Chỉ thầy thấy</span></span></header>
+  <div class="tam-than">
+    <article class="the the-lon"><div class="the-dau"><h2>Em làm câu này thế nào</h2><span class="ve" data-k="moi">Thêm</span></div>
+      <p class="lb-so"><b class="so">11</b><span>giây em làm</span><i></i><b class="so">27</b><span>giây đọc hết đề</span></p>
+      <div class="th" role="img" aria-label="Làm 11 giây; đọc hết đề cần 27 giây; có thời gian nghĩ từ 33 giây; làm kỹ từ 60 giây">
+    <span class="th-diem" style="left:11%"><b>11 giây</b></span>
+    <div class="th-vung"><div class="th-z"><i data-m="1" style="left:0%;width:27%"></i><i data-m="2" style="left:27%;width:6%"></i><i data-m="3" style="left:33%;width:27%"></i><i data-m="4" style="left:60%;width:40%"></i></div><b class="th-ch" style="left:11%"></b></div>
+    <div class="th-moc"><span style="left:0%">0</span><span style="left:27%">27</span><span style="left:33%">33</span><span style="left:60%">60</span><span class="th-cuoi" style="left:100%">100 giây</span></div>
+  </div>
+      <div class="lb-chip"><span class="ch" data-m="1"><b>Mức làm 1</b><span>Chưa đọc hết đề</span></span></div>
+      <p class="ghi">Đề dài 46 từ, không hình: đọc hết đề cần 24 giây. Nhịp đọc của Hà chậm hơn lớp một chút (hệ số 1,11) nên mốc là 27 giây. Thời gian thường của Hà ở câu này: 75 giây.</p>
+    </article>
+    <article class="the"><div class="the-dau"><h2>Hà trong 14 ngày</h2><span class="ve" data-k="moi">Thêm</span></div>
+      <p class="dobao">Đo được <b class="so">60</b> lượt.</p>
+      <div class="tm ">
+    <div class="tm-thanh" role="img" aria-label="Mức làm 1: 8 lượt; Mức làm 2: 9 lượt; Mức làm 3: 31 lượt; Mức làm 4: 12 lượt"><i data-m="1" style="flex:8"></i><i data-m="2" style="flex:9"></i><i data-m="3" style="flex:31"></i><i data-m="4" style="flex:12"></i></div>
+    
+  </div>
+      <div class="cheo" role="table" aria-label="Mức làm theo đúng và sai"><div class="cheo-d" role="row"><span></span><span role="columnheader">Đúng</span><span role="columnheader">Sai</span></div>
+    <div class="cheo-h" role="row" data-m="1"><span role="rowheader" class="cheo-c"><span class="ch" data-m="1"><b>Mức làm 1</b></span><small>Chưa đọc hết đề</small></span><b class="so" role="cell">2</b><b class="so sai" role="cell">6</b></div><div class="cheo-h" role="row" data-m="2"><span role="rowheader" class="cheo-c"><span class="ch" data-m="2"><b>Mức làm 2</b></span><small>Đọc xong, chưa kịp nghĩ</small></span><b class="so" role="cell">3</b><b class="so sai" role="cell">6</b></div><div class="cheo-h" role="row" data-m="3"><span role="rowheader" class="cheo-c"><span class="ch" data-m="3"><b>Mức làm 3</b></span><small>Có nghĩ</small></span><b class="so" role="cell">26</b><b class="so sai" role="cell">5</b></div><div class="cheo-h" role="row" data-m="4"><span role="rowheader" class="cheo-c"><span class="ch" data-m="4"><b>Mức làm 4</b></span><small>Làm kỹ</small></span><b class="so" role="cell">10</b><b class="so sai" role="cell">2</b></div>
+    <div class="cheo-h cheo-t" role="row"><span role="rowheader">Cộng</span><b class="so" role="cell">41</b><b class="so" role="cell">19</b></div></div>
+    </article>
+    <article class="the"><div class="the-dau"><h2>Lượt gần đây của Hà</h2><span class="ve" data-k="moi">Thêm</span></div><p class="cgt"><span><i data-m="1"></i>Mức làm 1</span><span><i data-m="2"></i>2</span><span><i data-m="3"></i>3</span><span><i data-m="4"></i>4</span><span><u></u>Đọc hết đề</span><span><b></b>Giây em làm</span></p><ul class="lh-ds"><li class="lh" data-m="1">
+    <div class="lh-c"><b>Câu 12 · Pin điện hóa</b><span>BTVN tuần 43 · 26/10 · Sai</span></div>
+    <div class="lh-t"><span class="lh-s"><b class="so">11</b> giây · đọc hết đề <b class="so">27</b> giây</span><span class="thn" role="img" aria-label="11 giây, đọc hết đề cần 27 giây"><i data-m="1" style="left:0%;width:27%"></i><i data-m="2" style="left:27%;width:6%"></i><i data-m="3" style="left:33%;width:27%"></i><i data-m="4" style="left:60%;width:40%"></i><u class="thn-t" style="left:27%"></u><b class="thn-d" style="left:11%"></b></span></div>
+    <div class="lh-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div>
+  </li><li class="lh" data-m="3">
+    <div class="lh-c"><b>Câu 9 · Pin điện hóa</b><span>BTVN tuần 43 · 26/10 · Đúng</span></div>
+    <div class="lh-t"><span class="lh-s"><b class="so">52</b> giây · đọc hết đề <b class="so">29</b> giây</span><span class="thn" role="img" aria-label="52 giây, đọc hết đề cần 29 giây"><i data-m="1" style="left:0%;width:29%"></i><i data-m="2" style="left:29%;width:6%"></i><i data-m="3" style="left:35%;width:18%"></i><i data-m="4" style="left:53%;width:47%"></i><u class="thn-t" style="left:29%"></u><b class="thn-d" style="left:52%"></b></span></div>
+    <div class="lh-m"><span class="ch" data-m="3"><b>Mức làm 3</b></span></div>
+  </li><li class="lh" data-m="1">
+    <div class="lh-c"><b>Câu 21 · Điện phân</b><span>Luyện theo dạng · 25/10 · Sai</span></div>
+    <div class="lh-t"><span class="lh-s"><b class="so">22</b> giây · đọc hết đề <b class="so">32</b> giây</span><span class="thn" role="img" aria-label="22 giây, đọc hết đề cần 32 giây"><i data-m="1" style="left:0%;width:32%"></i><i data-m="2" style="left:32%;width:6%"></i><i data-m="3" style="left:38%;width:28%"></i><i data-m="4" style="left:66%;width:34%"></i><u class="thn-t" style="left:32%"></u><b class="thn-d" style="left:22%"></b></span></div>
+    <div class="lh-m"><span class="ch" data-m="1"><b>Mức làm 1</b></span></div>
+  </li></ul></article>
+    <p class="ghi gc-rieng"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12s3.5-6 9-6c1.5 0 2.9.4 4.1 1M21 12s-3.5 6-9 6c-1.5 0-2.9-.4-4.1-1M4 4l16 16"/></svg><span>Không hiện lên bản chiếu. Người được gọi vẫn do máy chọn như trước, mức chỉ để thầy nhìn.</span></p>
+  </div></div></section>
+<section class="kh" id="k-chieu-tat" data-ap="chieu" hidden>
+  <div class="cd"><header class="cd-dau"><div><small>ĐIỂM DANH ĐẦU GIỜ</small><b>Thứ Ba 27/10 · Buổi tối</b></div><div class="cd-mat"><small>Có mặt</small><b>31<i>/34</i></b></div></header>
+  <div class="cd-than">
+    <div class="cd-trai">
+      <div class="cd-thang"><small>Số em ở mỗi bậc</small><div class="cd-cot"><span><em class="cd-n"></em><i style="height:3%"></i><em>1</em></span><span><em class="cd-n">3</em><i style="height:60.8%"></i><em>2</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>3</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>4</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>5</em></span><span><em class="cd-n">5</em><i style="height:96%"></i><em>6</em></span><span><em class="cd-n">3</em><i style="height:60.8%"></i><em>7</em></span><span><em class="cd-n">4</em><i style="height:78.4%"></i><em>8</em></span><span><em class="cd-n">5</em><i style="height:96%"></i><em>9</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>10</em></span><span><em class="cd-n">1</em><i style="height:25.6%"></i><em>11</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>12</em></span></div></div>
+      <ul class="cd-em"><li><span class="cd-hh">12</span><div><b>Nguyễn Đức Anh</b><small>Bậc 12 · Điểm chăm 99</small></div></li><li><span class="cd-hh">12</span><div><b>Vũ Gia Huy</b><small>Bậc 12 · Điểm chăm 99</small></div></li><li><span class="cd-hh">11</span><div><b>Phạm Thanh Trúc</b><small>Bậc 11 · Điểm chăm 90</small></div></li><li><span class="cd-hh">10</span><div><b>Hoàng Bảo Khang</b><small>Bậc 10 · Điểm chăm 85</small></div></li><li><span class="cd-hh">10</span><div><b>Lê Hoàng Long</b><small>Bậc 10 · Điểm chăm 84</small></div></li><li><span class="cd-hh">9</span><div><b>Trịnh Nhật Nam</b><small>Bậc 9 · Điểm chăm 79</small></div></li><li><span class="cd-hh">9</span><div><b>Đỗ Phương Thảo</b><small>Bậc 9 · Điểm chăm 79</small></div></li><li><span class="cd-hh">9</span><div><b>Mai Hồng Nhung</b><small>Bậc 9 · Điểm chăm 78</small></div></li><li><span class="cd-hh">9</span><div><b>Trần Minh Châu</b><small>Bậc 9 · Điểm chăm 78</small></div></li><li><span class="cd-hh">9</span><div><b>Ngô Quang Vinh</b><small>Bậc 9 · Điểm chăm 73</small></div></li><li><span class="cd-hh">8</span><div><b>Cao Văn Tùng</b><small>Bậc 8 · Điểm chăm 73</small></div></li><li><span class="cd-hh">8</span><div><b>Phan Khánh Vy</b><small>Bậc 8 · Điểm chăm 68</small></div></li><li><span class="cd-hh">8</span><div><b>Bùi Ngọc Mai</b><small>Bậc 8 · Điểm chăm 67</small></div></li><li><span class="cd-hh">8</span><div><b>Lương Tuệ Minh</b><small>Bậc 8 · Điểm chăm 65</small></div></li><li><span class="cd-hh">7</span><div><b>Lý Hải Nam</b><small>Bậc 7 · Điểm chăm 62</small></div></li><li><span class="cd-hh">7</span><div><b>Tô Gia Hân</b><small>Bậc 7 · Điểm chăm 59</small></div></li><li><span class="cd-hh">7</span><div><b>Võ Mai Phương</b><small>Bậc 7 · Điểm chăm 58</small></div></li><li><span class="cd-hh">6</span><div><b>Đặng Thu Trang</b><small>Bậc 6 · Điểm chăm 56</small></div></li><li><span class="cd-hh">6</span><div><b>Dương Ngọc Anh</b><small>Bậc 6 · Điểm chăm 53</small></div></li><li><span class="cd-hh">6</span><div><b>Phan Đức Thịnh</b><small>Bậc 6 · Điểm chăm 52</small></div></li><li><span class="cd-hh">6</span><div><b>Đỗ Khánh Linh</b><small>Bậc 6 · Điểm chăm 50</small></div></li><li><span class="cd-hh">6</span><div><b>Lý Anh Thư</b><small>Bậc 6 · Điểm chăm 49</small></div></li><li><span class="cd-hh">5</span><div><b>Vũ Minh Quân</b><small>Bậc 5 · Điểm chăm 44</small></div></li><li><span class="cd-hh">5</span><div><b>Ngô Diệp Chi</b><small>Bậc 5 · Điểm chăm 43</small></div></li><li><span class="cd-hh">4</span><div><b>Lê Thu Hà</b><small>Bậc 4 · Điểm chăm 37</small></div></li><li><span class="cd-hh">4</span><div><b>Hoàng Gia Bảo</b><small>Bậc 4 · Điểm chăm 36</small></div></li><li><span class="cd-hh">3</span><div><b>Nguyễn Hải Đăng</b><small>Bậc 3 · Điểm chăm 31</small></div></li><li><span class="cd-hh">3</span><div><b>Trần Bảo Ngọc</b><small>Bậc 3 · Điểm chăm 30</small></div></li><li><span class="cd-hh">2</span><div><b>Đặng Phúc Lâm</b><small>Bậc 2 · Điểm chăm 24</small></div></li><li><span class="cd-hh">2</span><div><b>Bùi Tuấn Kiệt</b><small>Bậc 2 · Điểm chăm 23</small></div></li><li><span class="cd-hh">2</span><div><b>Phạm Quốc Huy</b><small>Bậc 2 · Điểm chăm 16</small></div></li></ul>
+    </div>
+    <aside class="cd-phai">
+      <section class="cd-the cd-moi"><span class="ve" data-k="moi">Thêm</span><small>HÔM QUA LỚP LÀM BÀI THẾ NÀO</small>
+        <p class="cd-do"><b>412</b> lượt BTVN · đo được <b>412/412</b></p>
+        <div class="tm chieu">
+    <div class="tm-thanh" role="img" aria-label="Mức làm 1: 38 lượt; Mức làm 2: 61 lượt; Mức làm 3: 233 lượt; Mức làm 4: 80 lượt"><i data-m="1" style="flex:38"></i><i data-m="2" style="flex:61"></i><i data-m="3" style="flex:233"></i><i data-m="4" style="flex:80"></i></div>
+    <ul class="tm-cg"><li data-m="1"><span class="tm-d"></span><b>Mức làm 1</b><span class="tm-s">38 lượt · 9%</span></li><li data-m="2"><span class="tm-d"></span><b>Mức làm 2</b><span class="tm-s">61 lượt · 15%</span></li><li data-m="3"><span class="tm-d"></span><b>Mức làm 3</b><span class="tm-s">233 lượt · 57%</span></li><li data-m="4"><span class="tm-d"></span><b>Mức làm 4</b><span class="tm-s">80 lượt · 19%</span></li></ul>
+  </div>
+        <p class="cd-ket"><b>69</b> trong <b>142</b> lượt sai (<b>49%</b>) nộp khi chưa kịp nghĩ.</p>
+      </section>
+      <section class="cd-the"><small>Bậc cao nhất lớp</small><b class="cd-vinh">Nguyễn Đức Anh</b><span>Bậc 12 · Điểm chăm 99</span><span class="ve" data-k="giu">Giữ</span></section>
+      <section class="cd-the"><small>Vừa điểm danh</small><ul class="cd-vua"><li><span class="so">18:31</span><b>Bùi Ngọc Mai</b><span>Bậc 8</span></li><li><span class="so">18:29</span><b>Trịnh Nhật Nam</b><span>Bậc 9</span></li><li><span class="so">18:27</span><b>Đỗ Khánh Linh</b><span>Bậc 6</span></li><li><span class="so">18:26</span><b>Đặng Phúc Lâm</b><span>Bậc 2</span></li></ul><span class="ve" data-k="giu">Giữ</span></section>
+    </aside>
+  </div>
+  <footer class="cd-chan"><span><kbd>H</kbd> Cách làm từng em: <b>Tắt</b></span><span class="cd-ghc">Mặc định tắt: tên em không kèm Mức làm trên bản chiếu.</span></footer></div></section>
+<section class="kh" id="k-chieu-bat" data-ap="chieu" hidden>
+  <div class="cd"><header class="cd-dau"><div><small>ĐIỂM DANH ĐẦU GIỜ</small><b>Thứ Ba 27/10 · Buổi tối</b></div><div class="cd-mat"><small>Có mặt</small><b>31<i>/34</i></b></div></header>
+  <div class="cd-than">
+    <div class="cd-trai">
+      <div class="cd-thang"><small>Số em ở mỗi bậc</small><div class="cd-cot"><span><em class="cd-n"></em><i style="height:3%"></i><em>1</em></span><span><em class="cd-n">3</em><i style="height:60.8%"></i><em>2</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>3</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>4</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>5</em></span><span><em class="cd-n">5</em><i style="height:96%"></i><em>6</em></span><span><em class="cd-n">3</em><i style="height:60.8%"></i><em>7</em></span><span><em class="cd-n">4</em><i style="height:78.4%"></i><em>8</em></span><span><em class="cd-n">5</em><i style="height:96%"></i><em>9</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>10</em></span><span><em class="cd-n">1</em><i style="height:25.6%"></i><em>11</em></span><span><em class="cd-n">2</em><i style="height:43.2%"></i><em>12</em></span></div></div>
+      <ul class="cd-em"><li><span class="cd-hh">12</span><div><b>Nguyễn Đức Anh</b><small>Bậc 12 · Điểm chăm 99</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:13"></i><i data-m="2" style="flex:13"></i><i data-m="3" style="flex:28"></i><i data-m="4" style="flex:11"></i></span></div></li><li><span class="cd-hh">12</span><div><b>Vũ Gia Huy</b><small>Bậc 12 · Điểm chăm 99</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:4"></i><i data-m="2" style="flex:6"></i><i data-m="3" style="flex:26"></i><i data-m="4" style="flex:20"></i></span></div></li><li><span class="cd-hh">11</span><div><b>Phạm Thanh Trúc</b><small>Bậc 11 · Điểm chăm 90</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:1"></i><i data-m="2" style="flex:3"></i><i data-m="3" style="flex:23"></i><i data-m="4" style="flex:17"></i></span></div></li><li><span class="cd-hh">10</span><div><b>Hoàng Bảo Khang</b><small>Bậc 10 · Điểm chăm 85</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:1"></i><i data-m="2" style="flex:2"></i><i data-m="3" style="flex:22"></i><i data-m="4" style="flex:16"></i></span></div></li><li><span class="cd-hh">10</span><div><b>Lê Hoàng Long</b><small>Bậc 10 · Điểm chăm 84</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:3"></i><i data-m="2" style="flex:5"></i><i data-m="3" style="flex:25"></i><i data-m="4" style="flex:19"></i></span></div></li><li><span class="cd-hh">9</span><div><b>Trịnh Nhật Nam</b><small>Bậc 9 · Điểm chăm 79</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:3"></i><i data-m="2" style="flex:6"></i><i data-m="3" style="flex:24"></i><i data-m="4" style="flex:7"></i></span></div></li><li><span class="cd-hh">9</span><div><b>Đỗ Phương Thảo</b><small>Bậc 9 · Điểm chăm 79</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:2"></i><i data-m="2" style="flex:4"></i><i data-m="3" style="flex:24"></i><i data-m="4" style="flex:18"></i></span></div></li><li><span class="cd-hh">9</span><div><b>Mai Hồng Nhung</b><small>Bậc 9 · Điểm chăm 78</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:6"></i><i data-m="2" style="flex:9"></i><i data-m="3" style="flex:27"></i><i data-m="4" style="flex:10"></i></span></div></li><li><span class="cd-hh">9</span><div><b>Trần Minh Châu</b><small>Bậc 9 · Điểm chăm 78</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:1"></i><i data-m="2" style="flex:2"></i><i data-m="3" style="flex:22"></i><i data-m="4" style="flex:16"></i></span></div></li><li><span class="cd-hh">9</span><div><b>Ngô Quang Vinh</b><small>Bậc 9 · Điểm chăm 73</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:4"></i><i data-m="2" style="flex:7"></i><i data-m="3" style="flex:25"></i><i data-m="4" style="flex:8"></i></span></div></li><li><span class="cd-hh">8</span><div><b>Cao Văn Tùng</b><small>Bậc 8 · Điểm chăm 73</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:5"></i><i data-m="2" style="flex:8"></i><i data-m="3" style="flex:26"></i><i data-m="4" style="flex:9"></i></span></div></li><li><span class="cd-hh">8</span><div><b>Phan Khánh Vy</b><small>Bậc 8 · Điểm chăm 68</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:3"></i><i data-m="2" style="flex:6"></i><i data-m="3" style="flex:24"></i><i data-m="4" style="flex:7"></i></span></div></li><li><span class="cd-hh">8</span><div><b>Bùi Ngọc Mai</b><small>Bậc 8 · Điểm chăm 67</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:6"></i><i data-m="2" style="flex:9"></i><i data-m="3" style="flex:27"></i><i data-m="4" style="flex:10"></i></span></div></li><li><span class="cd-hh">8</span><div><b>Lương Tuệ Minh</b><small>Bậc 8 · Điểm chăm 65</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:7"></i><i data-m="2" style="flex:10"></i><i data-m="3" style="flex:28"></i><i data-m="4" style="flex:11"></i></span></div></li><li><span class="cd-hh">7</span><div><b>Lý Hải Nam</b><small>Bậc 7 · Điểm chăm 62</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:5"></i><i data-m="2" style="flex:8"></i><i data-m="3" style="flex:26"></i><i data-m="4" style="flex:9"></i></span></div></li><li><span class="cd-hh">7</span><div><b>Tô Gia Hân</b><small>Bậc 7 · Điểm chăm 59</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:4"></i><i data-m="2" style="flex:7"></i><i data-m="3" style="flex:25"></i><i data-m="4" style="flex:8"></i></span></div></li><li><span class="cd-hh">7</span><div><b>Võ Mai Phương</b><small>Bậc 7 · Điểm chăm 58</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:7"></i><i data-m="2" style="flex:10"></i><i data-m="3" style="flex:28"></i><i data-m="4" style="flex:11"></i></span></div></li><li><span class="cd-hh">6</span><div><b>Đặng Thu Trang</b><small>Bậc 6 · Điểm chăm 56</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:7"></i><i data-m="2" style="flex:10"></i><i data-m="3" style="flex:28"></i><i data-m="4" style="flex:11"></i></span></div></li><li><span class="cd-hh">6</span><div><b>Dương Ngọc Anh</b><small>Bậc 6 · Điểm chăm 53</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:6"></i><i data-m="2" style="flex:9"></i><i data-m="3" style="flex:27"></i><i data-m="4" style="flex:10"></i></span></div></li><li><span class="cd-hh">6</span><div><b>Phan Đức Thịnh</b><small>Bậc 6 · Điểm chăm 52</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:4"></i><i data-m="2" style="flex:7"></i><i data-m="3" style="flex:25"></i><i data-m="4" style="flex:8"></i></span></div></li><li><span class="cd-hh">6</span><div><b>Đỗ Khánh Linh</b><small>Bậc 6 · Điểm chăm 50</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:12"></i><i data-m="2" style="flex:10"></i><i data-m="3" style="flex:20"></i><i data-m="4" style="flex:6"></i></span></div></li><li><span class="cd-hh">6</span><div><b>Lý Anh Thư</b><small>Bậc 6 · Điểm chăm 49</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:12"></i><i data-m="2" style="flex:10"></i><i data-m="3" style="flex:20"></i><i data-m="4" style="flex:6"></i></span></div></li><li><span class="cd-hh">5</span><div><b>Vũ Minh Quân</b><small>Bậc 5 · Điểm chăm 44</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:14"></i><i data-m="2" style="flex:12"></i><i data-m="3" style="flex:22"></i><i data-m="4" style="flex:8"></i></span></div></li><li><span class="cd-hh">5</span><div><b>Ngô Diệp Chi</b><small>Bậc 5 · Điểm chăm 43</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:14"></i><i data-m="2" style="flex:12"></i><i data-m="3" style="flex:22"></i><i data-m="4" style="flex:8"></i></span></div></li><li><span class="cd-hh">4</span><div><b>Lê Thu Hà</b><small>Bậc 4 · Điểm chăm 37</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:8"></i><i data-m="2" style="flex:9"></i><i data-m="3" style="flex:31"></i><i data-m="4" style="flex:12"></i></span></div></li><li><span class="cd-hh">4</span><div><b>Hoàng Gia Bảo</b><small>Bậc 4 · Điểm chăm 36</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:11"></i><i data-m="2" style="flex:9"></i><i data-m="3" style="flex:19"></i><i data-m="4" style="flex:5"></i></span></div></li><li><span class="cd-hh">3</span><div><b>Nguyễn Hải Đăng</b><small>Bậc 3 · Điểm chăm 31</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:13"></i><i data-m="2" style="flex:11"></i><i data-m="3" style="flex:21"></i><i data-m="4" style="flex:7"></i></span></div></li><li><span class="cd-hh">3</span><div><b>Trần Bảo Ngọc</b><small>Bậc 3 · Điểm chăm 30</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:13"></i><i data-m="2" style="flex:11"></i><i data-m="3" style="flex:21"></i><i data-m="4" style="flex:7"></i></span></div></li><li><span class="cd-hh">2</span><div><b>Đặng Phúc Lâm</b><small>Bậc 2 · Điểm chăm 24</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:10"></i><i data-m="2" style="flex:8"></i><i data-m="3" style="flex:18"></i><i data-m="4" style="flex:4"></i></span></div></li><li><span class="cd-hh">2</span><div><b>Bùi Tuấn Kiệt</b><small>Bậc 2 · Điểm chăm 23</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:10"></i><i data-m="2" style="flex:8"></i><i data-m="3" style="flex:18"></i><i data-m="4" style="flex:4"></i></span></div></li><li><span class="cd-hh">2</span><div><b>Phạm Quốc Huy</b><small>Bậc 2 · Điểm chăm 16</small><span class="cd-mini" aria-label="Cách làm 14 ngày"><i data-m="1" style="flex:10"></i><i data-m="2" style="flex:8"></i><i data-m="3" style="flex:18"></i><i data-m="4" style="flex:4"></i></span></div></li></ul>
+    </div>
+    <aside class="cd-phai">
+      <section class="cd-the cd-moi"><span class="ve" data-k="moi">Thêm</span><small>HÔM QUA LỚP LÀM BÀI THẾ NÀO</small>
+        <p class="cd-do"><b>412</b> lượt BTVN · đo được <b>412/412</b></p>
+        <div class="tm chieu">
+    <div class="tm-thanh" role="img" aria-label="Mức làm 1: 38 lượt; Mức làm 2: 61 lượt; Mức làm 3: 233 lượt; Mức làm 4: 80 lượt"><i data-m="1" style="flex:38"></i><i data-m="2" style="flex:61"></i><i data-m="3" style="flex:233"></i><i data-m="4" style="flex:80"></i></div>
+    <ul class="tm-cg"><li data-m="1"><span class="tm-d"></span><b>Mức làm 1</b><span class="tm-s">38 lượt · 9%</span></li><li data-m="2"><span class="tm-d"></span><b>Mức làm 2</b><span class="tm-s">61 lượt · 15%</span></li><li data-m="3"><span class="tm-d"></span><b>Mức làm 3</b><span class="tm-s">233 lượt · 57%</span></li><li data-m="4"><span class="tm-d"></span><b>Mức làm 4</b><span class="tm-s">80 lượt · 19%</span></li></ul>
+  </div>
+        <p class="cd-ket"><b>69</b> trong <b>142</b> lượt sai (<b>49%</b>) nộp khi chưa kịp nghĩ.</p>
+      </section>
+      <section class="cd-the"><small>Bậc cao nhất lớp</small><b class="cd-vinh">Nguyễn Đức Anh</b><span>Bậc 12 · Điểm chăm 99</span><span class="ve" data-k="giu">Giữ</span></section>
+      <section class="cd-the"><small>Vừa điểm danh</small><ul class="cd-vua"><li><span class="so">18:31</span><b>Bùi Ngọc Mai</b><span>Bậc 8</span></li><li><span class="so">18:29</span><b>Trịnh Nhật Nam</b><span>Bậc 9</span></li><li><span class="so">18:27</span><b>Đỗ Khánh Linh</b><span>Bậc 6</span></li><li><span class="so">18:26</span><b>Đặng Phúc Lâm</b><span>Bậc 2</span></li></ul><span class="ve" data-k="giu">Giữ</span></section>
+    </aside>
+  </div>
+  <footer class="cd-chan"><span><kbd>H</kbd> Cách làm từng em: <b>Bật</b></span><span class="cd-ghc">Thanh nhỏ dưới tên: tỉ lệ Mức làm 14 ngày, không kèm chữ.</span></footer></div></section>
+<section class="kh" id="k-chieu-x" data-ap="chieu" hidden>
+  <div class="cd"><header class="cd-dau"><div><small>CÂU 12 · PIN ĐIỆN HÓA</small><b>19 em sai · 15 em đúng</b></div><div class="cd-mat"><small>Đọc hết đề cần</small><b>24<i> giây</i></b></div></header>
+  <div class="cd-than cd-x">
+    <section class="cd-the cd-de"><small>ĐỀ BÀI</small><p>Cho pin điện hóa Zn–Cu ở điều kiện chuẩn. Phát biểu nào sau đây đúng khi pin hoạt động?</p><ul><li>A. Zn là cực dương</li><li>B. Electron chuyển từ Cu sang Zn qua dây dẫn</li><li>C. Khối lượng điện cực Zn giảm</li><li>D. Nồng độ Cu²⁺ trong dung dịch tăng</li></ul><b class="cd-dung">Đáp án đúng: C</b></section>
+    <aside class="cd-phai">
+      <section class="cd-the cd-moi"><span class="ve" data-k="moi">Thêm</span><small>CÁC EM SAI LÀM THẾ NÀO</small>
+        <div class="tm chieu">
+    <div class="tm-thanh" role="img" aria-label="Mức làm 1: 5 lượt; Mức làm 2: 6 lượt; Mức làm 3: 6 lượt; Mức làm 4: 2 lượt"><i data-m="1" style="flex:5"></i><i data-m="2" style="flex:6"></i><i data-m="3" style="flex:6"></i><i data-m="4" style="flex:2"></i></div>
+    <ul class="tm-cg"><li data-m="1"><span class="tm-d"></span><b>Mức làm 1</b><span class="tm-s">5 lượt · 26%</span></li><li data-m="2"><span class="tm-d"></span><b>Mức làm 2</b><span class="tm-s">6 lượt · 32%</span></li><li data-m="3"><span class="tm-d"></span><b>Mức làm 3</b><span class="tm-s">6 lượt · 32%</span></li><li data-m="4"><span class="tm-d"></span><b>Mức làm 4</b><span class="tm-s">2 lượt · 11%</span></li></ul>
+  </div>
+        <p class="cd-ket"><b>11</b> trong <b>19</b> em nộp trước khi kịp nghĩ.</p>
+        <div class="cl chieu" style="--cao:3" role="img" aria-label="19 lượt sai theo số giây; vạch đứng là thời gian đọc hết đề 24 giây">
+    <div class="cl-vung"><i data-m="1" style="left:6%;--k:0"></i><i data-m="1" style="left:9%;--k:0"></i><i data-m="1" style="left:11%;--k:1"></i><i data-m="1" style="left:14%;--k:0"></i><i data-m="1" style="left:19%;--k:0"></i><i data-m="2" style="left:23%;--k:0"></i><i data-m="2" style="left:25%;--k:0"></i><i data-m="2" style="left:27%;--k:1"></i><i data-m="2" style="left:28%;--k:0"></i><i data-m="2" style="left:29%;--k:1"></i><i data-m="2" style="left:31%;--k:2"></i><i data-m="3" style="left:36%;--k:0"></i><i data-m="3" style="left:38%;--k:1"></i><i data-m="3" style="left:41%;--k:0"></i><i data-m="3" style="left:44%;--k:0"></i><i data-m="3" style="left:47%;--k:1"></i><i data-m="3" style="left:52%;--k:0"></i><i data-m="4" style="left:58%;--k:0"></i><i data-m="4" style="left:61%;--k:0"></i><u style="left:24%"></u></div>
+    <div class="th-moc"><span style="left:0">0</span><span style="left:24%">24</span><span style="left:50%">50</span><span class="th-cuoi" style="left:100%">100 giây</span></div></div>
+        <p class="cd-do">Mỗi chấm một lượt sai, không tên. Vạch đứng: đọc hết đề 24 giây.</p></section>
+      <section class="cd-the"><small>Các em sai</small><p class="cd-ten">Ngọc Anh · Gia Bảo · Diệp Chi · Hải Đăng · Thu Hà · Gia Hân · Quốc Huy · Tuấn Kiệt · Phúc Lâm · Khánh Linh · Tuệ Minh · Nhật Nam · Bảo Ngọc · Hồng Nhung · Mai Phương · Minh Quân · Đức Thịnh · Anh Thư · Văn Tùng</p><span class="ve" data-k="giu">Giữ</span></section>
+    </aside>
+  </div>
+  <footer class="cd-chan"><span><kbd>H</kbd> Cách làm từng em: <b>Tắt</b></span><span class="cd-ghc">Tên và Mức làm của từng em chỉ hiện ở màn thầy.</span></footer></div></section>
+<section class="kh" id="k-hs" data-ap="hs" hidden>
+  <div class="app"><div class="cot-hs">
+    <section class="the-hs"><div class="hs-dau"><h1>Chặng 1/3</h1><span>4 câu</span></div>
+      <ul class="hs-ds"><li class="hs-hang"><div class="hs-ten"><b>Pin điện hóa · Câu 12</b><small>BTVN tuần 43 · 26/10</small><small class="hs-tt">Sửa từng bước · bước 1</small>
+      <p class="hs-lan"><span class="hs-nhan" data-m="1"><i></i>Nộp trước khi đọc hết đề</span><span class="so">14 giây · đọc hết đề cần ≈ 23 giây</span></p>
+      <span class="thn" role="img" aria-label="14 giây, đọc hết đề cần 23 giây"><i data-m="1" style="left:0%;width:23%"></i><i data-m="2" style="left:23%;width:6%"></i><i data-m="3" style="left:29%;width:23%"></i><i data-m="4" style="left:52%;width:48%"></i><u class="thn-t" style="left:23%"></u><b class="thn-d" style="left:14%"></b></span></div></li><li class="hs-hang"><div class="hs-ten"><b>Điện phân · Câu 7</b><small>BTVN tuần 43 · 26/10</small><small class="hs-tt">Sửa từng bước · bước 2</small>
+      <p class="hs-lan"><span class="hs-nhan" data-m="2"><i></i>Đọc xong thì nộp ngay</span><span class="so">47 giây · đọc hết đề cần ≈ 41 giây</span></p>
+      <span class="thn" role="img" aria-label="47 giây, đọc hết đề cần 41 giây"><i data-m="1" style="left:0%;width:27.333333333333332%"></i><i data-m="2" style="left:27.333333333333332%;width:10.000000000000004%"></i><i data-m="3" style="left:37.333333333333336%;width:38.666666666666664%"></i><i data-m="4" style="left:76%;width:24%"></i><u class="thn-t" style="left:27.333333333333332%"></u><b class="thn-d" style="left:31.333333333333332%"></b></span></div></li><li class="hs-hang"><div class="hs-ten"><b>Điện phân · Câu 21</b><small>Tự sửa lỗi · 24/10</small><small class="hs-tt">Chỉ còn làm bản mới là xong</small>
+      <p class="hs-lan"><span class="hs-nhan" data-m="3"><i></i>Có thời gian nghĩ</span><span class="so">41 giây · đọc hết đề cần ≈ 28 giây</span></p>
+      <span class="thn" role="img" aria-label="41 giây, đọc hết đề cần 28 giây"><i data-m="1" style="left:0%;width:28%"></i><i data-m="2" style="left:28%;width:6%"></i><i data-m="3" style="left:34%;width:23%"></i><i data-m="4" style="left:57%;width:43%"></i><u class="thn-t" style="left:28%"></u><b class="thn-d" style="left:41%"></b></span></div></li><li class="hs-hang"><div class="hs-ten"><b>Đại cương kim loại · Câu 3</b><small>BTVN tuần 42 · 19/10</small><small class="hs-tt">Sửa từng bước · bước 1</small>
+      <p class="hs-lan"><span>Lần làm trước chưa có số đo (trước 21/10).</span></p></div></li></ul>
+      <span class="ve" data-k="moi">Thêm</span></section>
+    <section class="the-hs"><div class="hs-dau"><h2>Màn sửa câu</h2><span>Đầu màn, trước khi sửa</span></div>
+      <div class="hs-ct"><p class="hs-lan"><b>Lần làm trước của em</b></p>
+      <p class="lb-so"><b class="so">14</b><span>giây em làm</span><i></i><b class="so">23</b><span>giây đọc hết đề cần</span></p>
+      <div class="th" role="img" aria-label="Làm 14 giây; đọc hết đề cần 23 giây; có thời gian nghĩ từ 29 giây; làm kỹ từ 52 giây">
+    <span class="th-diem" style="left:14%"><b>14 giây</b></span>
+    <div class="th-vung"><div class="th-z"><i data-m="1" style="left:0%;width:23%"></i><i data-m="2" style="left:23%;width:6%"></i><i data-m="3" style="left:29%;width:23%"></i><i data-m="4" style="left:52%;width:48%"></i></div><b class="th-ch" style="left:14%"></b></div>
+    <div class="th-moc"><span style="left:0%">0</span><span style="left:23%">23</span><span style="left:29%">29</span><span style="left:52%">52</span><span class="th-cuoi" style="left:100%">100 giây</span></div>
+  </div>
+      <ul class="hs-cg"><li data-m="1"><i></i><span>Dưới 23 giây: chưa đọc hết đề</span></li><li data-m="2"><i></i><span>23–28 giây: đọc xong, nộp ngay</span></li><li data-m="3"><i></i><span>29–51 giây: có thời gian nghĩ</span></li><li data-m="4"><i></i><span>Từ 52 giây: làm kỹ</span></li></ul>
+      <p class="hs-gc">Lần này em thử đọc hết đề rồi mới chọn. Việc này không tính điểm và không có thưởng.</p></div><span class="ve" data-k="moi">Thêm</span></section>
+    <section class="the-hs"><div class="hs-dau"><h2>Câu đã làm</h2><span>Danh sách</span></div>
+      <ul class="hs-ds hs-nho"><li class="hs-hang"><div class="hs-ten"><b>Pin điện hóa · Câu 9</b><small>BTVN tuần 43 · 26/10 · Đúng</small><p class="hs-lan"><span class="so">8 giây · đọc hết đề cần ≈ 25 giây</span></p></div></li><li class="hs-hang"><div class="hs-ten"><b>Ăn mòn điện hóa · Câu 15</b><small>Luyện theo dạng · 25/10 · Đúng</small><p class="hs-lan"><span class="hs-nhan" data-m="4"><i></i>Làm kỹ, đúng nhịp lớp</span><span class="so">96 giây · đọc hết đề cần ≈ 37 giây</span></p></div></li></ul>
+      <p class="hs-gc">Câu đúng chỉ hiện nhãn khi em làm có nghĩ hoặc làm kỹ. Câu đúng mà nộp nhanh chỉ hiện số giây.</p><span class="ve" data-k="moi">Thêm</span></section>
+  </div></div></section>
+<section class="kh" id="k-ph" data-ap="hs" hidden>
+  <div class="app"><div class="cot-hs">
+    <section class="the-hs"><div class="hs-dau"><h1>Cách làm bài của con</h1><span>14 ngày gần nhất</span></div>
+      <p class="hs-doan">Trong <b>25</b> lượt sai, <b>17</b> lượt con nộp trước khi kịp nghĩ (nộp khi chưa đọc hết đề hoặc vừa đọc xong). <b>8</b> lượt sai còn lại con đã dành thời gian nghĩ.</p>
+      <div class="tm ph">
+    <div class="tm-thanh" role="img" aria-label="Mức làm 1: 13 lượt; Mức làm 2: 13 lượt; Mức làm 3: 28 lượt; Mức làm 4: 11 lượt"><i data-m="1" style="flex:13"></i><i data-m="2" style="flex:13"></i><i data-m="3" style="flex:28"></i><i data-m="4" style="flex:11"></i></div>
+    <ul class="tm-cg"><li data-m="1"><span class="tm-d"></span><b>Mức làm 1</b><span class="tm-s">13 lượt · 20%</span></li><li data-m="2"><span class="tm-d"></span><b>Mức làm 2</b><span class="tm-s">13 lượt · 20%</span></li><li data-m="3"><span class="tm-d"></span><b>Mức làm 3</b><span class="tm-s">28 lượt · 43%</span></li><li data-m="4"><span class="tm-d"></span><b>Mức làm 4</b><span class="tm-s">11 lượt · 17%</span></li></ul>
+  </div>
+      <p class="hs-gc">Đo được 65/87 lượt. 22 lượt trước 21/10 chưa có số đo.</p><span class="ve" data-k="moi">Thêm</span></section>
+    <section class="the-hs"><div class="hs-dau"><h2>Hai câu gần đây</h2><span>Số giây của con và của đề</span></div>
+      <ul class="hs-ds"><li class="hs-hang"><div class="hs-ten"><b>Câu 12 · Pin điện hóa</b><small>BTVN tuần 43 · 26/10 · Sai</small><p class="hs-lan"><span class="hs-nhan" data-m="1"><i></i>Nộp trước khi đọc hết đề</span><span class="so">14 giây · đọc hết đề cần ≈ 23 giây</span></p><span class="thn" role="img" aria-label="14 giây, đọc hết đề cần 23 giây"><i data-m="1" style="left:0%;width:23%"></i><i data-m="2" style="left:23%;width:6%"></i><i data-m="3" style="left:29%;width:23%"></i><i data-m="4" style="left:52%;width:48%"></i><u class="thn-t" style="left:23%"></u><b class="thn-d" style="left:14%"></b></span></div></li><li class="hs-hang"><div class="hs-ten"><b>Câu 15 · Ăn mòn điện hóa</b><small>Luyện theo dạng · 25/10 · Đúng</small><p class="hs-lan"><span class="hs-nhan" data-m="4"><i></i>Làm kỹ, đúng nhịp lớp</span><span class="so">96 giây · đọc hết đề cần ≈ 37 giây</span></p><span class="thn" role="img" aria-label="96 giây, đọc hết đề cần 37 giây"><i data-m="1" style="left:0%;width:30.833333333333332%"></i><i data-m="2" style="left:30.833333333333332%;width:10.000000000000004%"></i><i data-m="3" style="left:40.833333333333336%;width:34.99999999999999%"></i><i data-m="4" style="left:75.83333333333333%;width:24.16666666666667%"></i><u class="thn-t" style="left:30.833333333333332%"></u><b class="thn-d" style="left:80%"></b></span></div></li></ul><span class="ve" data-k="moi">Thêm</span></section>
+  </div></div></section>
+<script>
+(() => {
+  const q = new URLSearchParams(location.hash.slice(1))
+  const k = q.get('k')
+  if (q.get('toi')) document.documentElement.setAttribute('data-toi', '')
+  const ds = [...document.querySelectorAll('.kh')]
+  if (!k) { ds.forEach((s) => { s.hidden = false; s.classList.add('xem-het') }); return }
+  const mot = ds.find((s) => s.id === 'k-' + k)
+  if (mot) mot.hidden = false
+})()
+</script>
+</body>
+</html>
