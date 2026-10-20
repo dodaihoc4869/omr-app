@@ -2,7 +2,7 @@
 // lệnh sẵn có /ph/chi-tiet-cau-ve-con). Ca CHƯA công bố: chỉ tên ca + câu "chờ thầy công bố" (máy chủ không gửi điểm/đáp án; lớp đọc cũng bỏ nếu lỡ có).
 // Trung tu 09/10: nút quay lại về mục "Ca kiểm tra" (trả đúng chỗ đang cuộn); không còn style viết thẳng — mọi khoảng cách, cỡ chữ ở ph-v3.css theo thang chung.
 import { useEffect, useState } from 'react'
-import { ChemText } from '../../lib/chem-format'
+import { ChemText, napKatex } from '../../lib/chem-format'
 import { tachDongTheoY } from '../../lib/tach-dong-cau'
 import { taiChiTietCau } from '../../lib/ph-moi/api'
 import { docLoiGiai, type ChiTietCau } from '../../lib/ph-moi/du-lieu'
@@ -21,6 +21,8 @@ type TrangThai = { kieu: 'tai' } | { kieu: 'loi'; chu: string } | { kieu: 'ok'; 
 export default function ManChiTietCa({ sbd, maCa }: { sbd: string; maCa: string }) {
   const [tt, setTt] = useState<TrangThai>({ kieu: 'tai' })
   const [lan, setLan] = useState(0)
+  // KaTeX (~83 KB nén) CHỈ màn này vẽ công thức trong app phụ huynh ⇒ bắt đầu tải ngay lúc mở màn, song song với lượt tải báo cáo (21/10: `main.tsx` không còn tải nền khi mở /ph).
+  useEffect(() => { void napKatex().catch(() => {}) }, [])
   useEffect(() => {
     let huy = false
     setTt({ kieu: 'tai' })
