@@ -18,7 +18,8 @@ import NutHoiThay from '../loi-giai/NutHoiThay'
 import { chiSoDuoiRo, propsTheCau } from '../hoa2/cau-chuyen'
 import type { HinhAnh } from '../../data/examContent'
 import type { KetQuaDot } from '../../lib/chua-cau-sai-api'
-import { chuDapAn, daTraLoiDu, henGapLai, loiMoTrucTiep, soTuLam, taiCauGocDaLam, type CauGocDaLam } from '../../lib/chua-truc-tiep'
+import { chuDapAn, daTraLoiDu, henGapLai, LUAT_BAN_MOI, loiMoTrucTiep, soTuLam, taiCauGocDaLam, type CauGocDaLam } from '../../lib/chua-truc-tiep'
+import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 
 type Chu = 'A' | 'B' | 'C' | 'D'
 type DS = 'D' | 'S'
@@ -167,6 +168,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
     const dung = soTuLam(phan, tra, ct.dapAn)
     setTraCuoi(tra)
     setKet(dung)
+    if (ph.dotId) ghiXongHomNay(ph.dotId) // Việc hôm nay: em đã tự làm lại câu gốc ít nhất một lần
     if (dung) setMoLoiGiai(true)
     else {
       const n = lanSai + 1
@@ -203,7 +205,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
       nutChinh = <button type="button" className="ccs-nut-chinh" onClick={() => doiBuoc(3)}>Xem đáp án và lời giải</button>
     }
   } else if (buoc === 2 && cachLam === 'giay') {
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={xemLoiGiai}>Em đã giải xong · xem lời giải</button>
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={() => { if (ph.dotId) ghiXongHomNay(ph.dotId); xemLoiGiai() }}>Em đã giải xong · xem lời giải</button>
   } else if (buoc === 3 && moLoiGiai && ct) {
     nutChinh = <button type="button" className="ccs-nut-chinh" onClick={onVe} disabled={ban}>{nhanVe}</button>
     nutPhu = cachLam === 'cham' ? <button type="button" className="ccs-nut-phu" onClick={batDauLamLai}>Làm lại lần nữa</button> : null
@@ -257,6 +259,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
               ) : 'Lần gặp lại 2 mở sau ít nhất 24 giờ kể từ lúc em ghép xong bài.'}
             </p>
           )}
+          {hen?.daToi && <p className="ccs-luat">{LUAT_BAN_MOI}</p>}
         </section>
 
         <div className="ccs-buoc-truc-tiep">

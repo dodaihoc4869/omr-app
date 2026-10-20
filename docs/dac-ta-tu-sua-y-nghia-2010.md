@@ -1,6 +1,7 @@
 # Đặc tả Tự sửa lỗi (app học sinh): việc vừa sức, tiến độ thật, bằng chứng đã sửa — 20/10/2026
 
-**Trạng thái: CHỜ THẦY DUYỆT ẢNH. Chưa sửa `src/`, chưa build.**
+**Trạng thái (20/10 tối): ĐỢT A ĐÃ BUILD, CHƯA ĐẨY — chờ thầy báo mới đẩy. Thầy đã chốt A–F ở mục 5 và đổi A thành 12 câu/ngày, chia chặng.**
+Phần dưới viết lúc đặc tả (3 câu/ngày); ĐÃ ĐỔI theo mục 5. Số trong ảnh bản vẽ HTML (`anh/`) là bản 3 câu; ảnh của màn thật nằm ở `anh-that/`.
 Bản vẽ: `docs/ban-ve-tu-sua-2010/tu-sua.html` · ảnh Chromium thật ở `docs/ban-ve-tu-sua-2010/anh/` (6 khung, 3 khổ, sáng + tối, chụp bằng `node scripts/chup-ban-ve-tu-sua-2010.mjs`). Số liệu trong ảnh là số GIẢ.
 
 ## 1. Vấn đề thầy chỉ ra
@@ -80,16 +81,23 @@ Bảng dữ liệu:
 - `npm run kiem:toc-do` 0 đỏ · `npm run kiem:mau-giu` 0 · `npm run check:mau` · `tsc` hai phía · `node scripts/kiem-sw.mjs`.
 - Ảnh Chromium sau build: 0 lỗi trang, 0 tràn, 0 đích chạm < 44 px, sáng + tối, 390 / 844 / 1440.
 
-## 5. Quyết định cần thầy chốt
-- **A. Số câu mỗi ngày.** Bản vẽ dùng **3**. Với 155 câu thì 3 câu/ngày chưa hết trong nhiều tháng, nhưng em thấy tiến độ thật nhờ màn Sửa theo dạng. Thầy muốn 3, 5, hay để mỗi em tự chọn?
-- **B. Dòng điều kiện ở bản mới.** Đi ngược một phần lệnh 13/10 ("bỏ hết gợi ý hướng dẫn"). Đề xuất đúng **một dòng**, chỉ hiện lúc em sắp làm bản mới, không có khối hướng dẫn nào khác. Đồng ý hay bỏ?
-- **C. "Trước đây / Bây giờ".** Chỉ hiện khi hệ thống đã xác nhận được chỗ em nghĩ sai (không bịa). Đồng ý?
-- **D. "7 ngày gần đây".** Chỉ đếm câu đã sửa xong, ngày không làm để xám, không có chuỗi ngày, không tô đỏ. Giữ hay bỏ?
-- **F. Câu em làm hết sức nhưng sai ở chặng cuối** (đợt chuyển sang "Chờ chữa trên lớp"). Có tính là "xong phần hôm nay" không? Đề xuất **có**, vì hôm nay em không còn gì làm thêm được. Thẻ chỉ ghi "xong phần", không ghi "tự sửa xong".
-- **E. Màn Sửa theo dạng** (khung 06) làm cùng đợt hay đợt sau? Đợt sau thì đợt A không cần lệnh máy chủ mới.
+## 5. Quyết định (thầy giao Claude chốt, 20/10; A do thầy đổi)
+- **A. 12 câu mỗi ngày, chia 3 chặng × 4 câu** (thầy: "cho sửa ít nhất 12 câu mỗi ngày, chia làm các chặng cho thông minh và cảm hứng"). "Ít nhất" nghĩa là em xong 12 câu vẫn có nút "Sửa thêm 1 chặng" (thêm 4 câu). Thứ tự trong ngày: câu **gần xong** (đã tới lần gặp lại 2) → câu **đang sửa dở** → câu **mới có bài luyện từng bước** → câu **chỉ có lối tự làm lại trên câu gốc**. Em chỉ thấy MỘT chặng 4 câu tại một lúc, chặng sau gọn một dòng. Không đủ 12 câu làm được ⇒ ngày nhỏ hơn đúng số có.
+- **B. Một dòng điều kiện ở bản mới:** có. Chữ: "Tự làm, không xem gợi ý hay lời giải. Đúng thì câu này tính là đã tự sửa." Không nhắc mốc 12 giờ (chưa kiểm xem lời giải ở màn câu gốc có ghi dấu hỗ trợ không, mục 6 điểm 1).
+- **C. "Trước đây / Bây giờ" và 4 mốc có ngày:** Đợt B (cần dữ liệu máy chủ chưa có ở máy em).
+- **D. "7 ngày gần đây": bỏ.** Đợt A không cần cột giờ xong của máy chủ.
+- **E. Màn Sửa theo dạng:** Đợt B.
+- **F. Câu hết sức mà vướng (chờ chữa trên lớp):** tính "xong phần hôm nay". Thẻ chỉ ghi "xong phần", không ghi "tự sửa xong".
+- **Không EXP, không điểm thưởng, không xếp hạng, không đếm ngược** (thầy 20/10: app mới không liên quan cộng EXP).
+
+**Đợt A đã build (chỉ app học sinh, KHÔNG đụng máy chủ, không migration, không lệnh D1 mới):**
+- Thẻ Hôm nay: "Hôm nay sửa 12 câu" (4 trạng thái: chưa làm · có câu chỉ còn làm bản mới · đã xong phần của N câu · xong phần hôm nay) + ô tiến độ chia chặng; bấm mở THẲNG câu kế tiếp. Không có phiên đăng nhập hoặc danh sách lỗi ⇒ thẻ cũ y nguyên.
+- Màn Tự sửa lỗi: khối "Việc hôm nay" (một chặng 4 câu, 4 chấm đường sửa mỗi câu, nút chính tới câu kế tiếp), danh sách đầy đủ gập lại ("Tất cả câu cần sửa · 155 câu"), "Còn N câu cho các ngày sau. Em không cần sửa hết hôm nay."
+- Màn chữa: một dòng điều kiện ở bản mới (cả ở bước làm bản mới lẫn nút "Làm lần gặp lại 2"); sau khi nộp: "Em đã tự sửa xong câu này" / "Em đã ghép lại xong cả bài" + "Bản mới mở lúc 17:40 · Thứ Tư 21/10/2026".
+- "Xong phần hôm nay" ghi trên máy em (khoá theo SBD + ngày VN) lúc nộp chặng cuối làm được; câu chỉ có lối câu gốc tính khi em bấm "Kiểm tra lại" (hoặc "Em đã giải xong"), KHÔNG tính khi chỉ bấm "Em chưa làm được · xem lời giải". Danh sách chỉ trả 100 dòng nên câu rớt khỏi danh sách không bao giờ bị tính là xong.
 
 ## 6. Điều chưa kiểm chứng hay cần người khác xác nhận
-0. **Bao nhiêu câu trong số 155 của một em thật có bước để làm?** Nếu phần lớn là `thieu_hoc_lieu` thì "Việc hôm nay" sẽ trống và đề xuất 1–2 không dùng được như bản vẽ. Phiên này không đọc được D1 thật (token Cloudflare báo không hợp lệ, tôi không thử cách khác), nên **phải đếm trạng thái các câu `chua_loi_dot` của vài em trước khi chốt build** (đọc chỉ đọc, báo Boss).
+0. **ĐÃ ĐO THẬT (20/10, Actions chỉ đọc, run 39390801120, chỉ số gộp):** 19 702 đợt của 264 em; **94% (18 546) là `thieu_hoc_lieu`** — chưa có bài luyện từng bước; chỉ 1 128 trên 19 701 đợt chưa xong có học liệu từng bước (5,7%); có **đúng 1 đợt `da_tu_sua`** và 1 đợt `cho_gap_lai_2` trong cả trung tâm; 48 em có từ 100 đợt. Số em có ≥ 3 việc làm được từng bước: 169/264; 62 em không có việc nào. Hệ quả: 12 câu/ngày chỉ đầy được nhờ lối "tự làm lại trên câu gốc"; đây cũng là lý do toàn trung tâm gần như chưa có ai "xong". Cái cần làm tiếp là **tăng số câu có bài luyện từng bước** (máy soạn học liệu), không phải thêm giao diện.
 1. **Xem lời giải ở màn "Sửa trên câu gốc" có ghi dấu hỗ trợ không?** `xemLoiGiai` gọi `hoa2-cau-chi-tiet`; chưa kiểm xem lệnh này có ghi vào `loi_giai_hoi`. Nếu có thì em xem lời giải trong 12 giờ trước lần gặp lại 2 sẽ bị tính có hỗ trợ, và màn phải báo trước khi bấm. Phải kiểm trước khi viết dòng điều kiện cuối cùng.
 2. **Ba nghĩa của "xong"** đang cùng tồn tại: `da_tu_sua` (vòng chữa), đóng lỗi `dong` (`loi-hoc-luat.ts`, mở lại ở mốc 14/30 ngày), `da_khac_phuc` ở hồ sơ (đúng 3 ngày khác nhau). Bản vẽ chỉ dùng chữ "Đã tự sửa". Thống nhất ba luật thuộc Boss.
 3. **Làn.** Màn Hôm nay, Tự sửa lỗi, Chữa trực tiếp thuộc làn Claude. Vòng chữa máy chủ (`chua-cau-sai*.ts`) chưa có làn rõ và Codex PR318 đã chạm đường đọc ⇒ báo Boss trước khi thêm cột chỉ-thêm.

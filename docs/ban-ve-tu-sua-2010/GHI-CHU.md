@@ -16,3 +16,9 @@ Bản vẽ ở `tu-sua.html`, ảnh Chromium thật ở `anh/` (chụp bằng `n
 | 6 | `06-theo-dang-` | Sửa theo dạng: 9 dạng, mỗi dạng một thanh tiến độ |
 
 Soát bằng máy: 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ hơn 44 px. Màu chỉ dùng biến chuẩn của `src/styles/tokens.css`, không thêm màu mới.
+
+## Ảnh của MÀN THẬT (Đợt A đã build, chưa đẩy) — `anh-that/`
+Chụp bằng component THẬT + máy chủ giả (`node scripts/chup-tu-sua-2010/chup.mjs`, trang `scripts/chup-tu-sua-2010/trang.tsx`). Số giả khớp ảnh thầy gửi: 155 câu cần sửa · 4 chờ lần gặp lại · 50 đã tự sửa (tổng 209). Ngày là **12 câu chia 3 chặng × 4 câu** (thầy đổi từ 3 câu ở bản vẽ HTML).
+- `hom-nay-<moi|gan|dang|xong>-…`: thẻ ở Hôm nay, 4 trạng thái.
+- `man-<moi|gan|dang|xong>-…`: màn Tự sửa lỗi (Việc hôm nay).
+Soát cả 48 tổ hợp (2 màn × 4 trạng thái × 3 khổ × sáng/tối): 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ hơn 44 px.

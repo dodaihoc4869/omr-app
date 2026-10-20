@@ -95,6 +95,8 @@ export interface KetQuaNop {
   diemlech?: string
   giaThiet?: string
   trangThaiMoi?: TrangThaiChua
+  /** Hẹn lần gặp lại 2 (ISO) khi đợt vừa chuyển sang chờ bản mới. */
+  denHan?: string
   ma?: string
   loi?: string
 }

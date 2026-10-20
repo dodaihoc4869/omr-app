@@ -22,7 +22,8 @@ import TheCau from '../TheCau'
 import { BangSoLieu, ZoomableImage } from '../QuestionMedia'
 import ChuaTrucTiep, { propsCauLam } from './ChuaTrucTiep'
 import { TrongManChua } from './trong-man-chua'
-import { canChuaTrucTiep } from '../../lib/chua-truc-tiep'
+import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
+import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import '../tu-luyen/tu-luyen.css'
 import './chua-cau-sai.css'
 export interface PropsChuaCauSai {
@@ -310,6 +311,8 @@ export default function ManChuaCauSai({
       localStorage.removeItem(khoaNop(payload.itemId))
     } catch {}
     setCho(null)
+    // Việc hôm nay (thầy 20/10): nộp xong chặng cuối làm được hôm nay (ghép xong / tự sửa xong / hết sức mà vướng) ⇒ ghi trên máy em.
+    if (r.trangThaiMoi === 'cho_gap_lai_2' || r.trangThaiMoi === 'da_tu_sua' || r.trangThaiMoi === 'can_thay') ghiXongHomNay(ph.dotId)
     setHoi(r)
   }
   const xin = async () => {
@@ -499,6 +502,9 @@ export default function ManChuaCauSai({
                       >
                         {ph.item.tieuDe}
                       </h2>
+                      {ph.item.loai === 'kiem_chung' && !phanHoi && (
+                        <p className="ccs-luat">{LUAT_BAN_MOI}</p>
+                      )}
                     </div>
                     <form
                       onSubmit={(e) => {
@@ -526,9 +532,13 @@ export default function ManChuaCauSai({
                         aria-live="polite"
                       >
                         <h3>
-                          {phanHoi.dung
-                            ? 'Bước này em làm được rồi'
-                            : 'Ta đã thấy chỗ cần gỡ'}
+                          {phanHoi.trangThaiMoi === 'da_tu_sua'
+                            ? 'Em đã tự sửa xong câu này'
+                            : phanHoi.trangThaiMoi === 'cho_gap_lai_2'
+                              ? 'Em đã ghép lại xong cả bài'
+                              : phanHoi.dung
+                                ? 'Bước này em làm được rồi'
+                                : 'Ta đã thấy chỗ cần gỡ'}
                         </h3>
                         {[
                           phanHoi.phanGiuDuoc,
@@ -542,6 +552,11 @@ export default function ManChuaCauSai({
                               <ChemText text={t!} />
                             </p>
                           ))}
+                        {phanHoi.trangThaiMoi === 'cho_gap_lai_2' && henGapLai(phanHoi.denHan, Date.now()) && (
+                          <p>
+                            Bản mới mở lúc <b>{henGapLai(phanHoi.denHan, Date.now())!.luc}</b>.
+                          </p>
+                        )}
                         {phanHoi.dieuCanHieu && (
                           <details>
                             <summary>Hiểu bước này trong bài</summary>

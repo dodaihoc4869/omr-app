@@ -179,10 +179,11 @@ describe('HoSoCuaEmHs dựng tập từ danh sách Tự sửa lỗi', () => {
 })
 
 describe('Hôm nay: thẻ mời Tự sửa lỗi', () => {
-  it('có số ⇒ nhãn + số câu + MỘT nút "Sửa lỗi ngay"; 0 / chưa có số ⇒ không vẽ', () => {
+  // 20/10: thẻ mời nạp LƯỜI (vỏ mỏng ở HocTapHomNay, thẻ thật ở TheMoiTuSua.tsx) ⇒ chờ thẻ hiện; không có phiên đăng nhập ⇒ thẻ CŨ y nguyên.
+  it('có số ⇒ nhãn + số câu + MỘT nút "Sửa lỗi ngay"; 0 / chưa có số ⇒ không vẽ', async () => {
     const onChua = vi.fn()
     const { container, rerender } = render(<TheMoiTuSua so={3} onChua={onChua} />)
-    const the = screen.getByRole('region', { name: '3 câu đang chờ em sửa' })
+    const the = await screen.findByRole('region', { name: '3 câu đang chờ em sửa' })
     expect(the.textContent).toContain('Tự sửa lỗi')
     const nut = within(the).getAllByRole('button')
     expect(nut).toHaveLength(1)
