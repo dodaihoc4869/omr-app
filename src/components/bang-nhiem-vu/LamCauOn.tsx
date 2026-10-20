@@ -12,6 +12,7 @@ import NutHoiThay from '../loi-giai/NutHoiThay'
 import { HinhTaiViTri } from '../QuestionMedia'
 import OSoTraLoi from '../OSoTraLoi'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
+import { cumDoGiay, useGiayNhieuCau } from '../../lib/dong-ho-cau'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
 import { SoExpCau, ThanhExpNho, useCheDoHieuUng } from '../exp-cau/ExpCau'
@@ -145,6 +146,9 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     })
   }, [])
 
+  // 20/10 đo giây: nhiều câu cùng hiện ⇒ chỉ cộng cho MỘT câu em đang làm (chạm gần nhất nếu còn hiện ≥ 50%, không thì câu hiện lớn nhất).
+  const dsRef = useRef<HTMLOListElement>(null)
+  const dongHo = useGiayNhieuCau(dsRef, pha === 'lam')
   const dsChuaCham = useMemo(() => cau.filter((c) => !ketQua[c.qid]), [cau, ketQua])
   const soDaTraLoi = useMemo(() => dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).length, [dsChuaCham, traLoi])
   const soChuaTraLoi = dsChuaCham.length - soDaTraLoi
@@ -153,7 +157,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
   // ─── (3) nộp ───
   const nop = async () => {
     if (dangNop) return
-    const gui = dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).map((c) => ({ qid: c.qid, dapAn: c.phan === 'II' ? chuanDS(traLoi[c.qid]) : (traLoi[c.qid] || '').trim() }))
+    const gui = dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).map((c) => ({ qid: c.qid, dapAn: c.phan === 'II' ? chuanDS(traLoi[c.qid]) : (traLoi[c.qid] || '').trim(), doGiay: cumDoGiay(dongHo.giay(c.qid), c.phan, c) }))
     if (gui.length === 0) return
     setDangNop(true)
     setLoiNop('')
@@ -301,7 +305,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
       )}
 
       {pha === 'lam' && (
-        <ol className="lco-ds">
+        <ol className="lco-ds" ref={dsRef}>
           {cau.map((c, i) => (
             <TheCauOn
               key={c.qid}
@@ -408,7 +412,7 @@ function TheCauOn({
   const trangThai = daCham ? (ketQua!.dung ? 'dung' : 'sai') : chuaTraLoi ? 'chua' : ''
   const anhLoi = (ketQua?.anhLoiGiai || []).map((h) => ({ ...h, viTri: 'sau_loi_giai' as const }))
   return (
-    <li className="lco-the" data-trang-thai={trangThai || undefined} aria-labelledby={`${idTen}-ten`}>
+    <li className="lco-the" data-qid={c.qid} data-trang-thai={trangThai || undefined} aria-labelledby={`${idTen}-ten`}>
       <div className="lco-the-dau">
         <h3 id={`${idTen}-ten`} className="lco-the-ten">
           Câu {so}
