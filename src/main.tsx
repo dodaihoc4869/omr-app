@@ -157,6 +157,8 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
   if (huaMan && dv.vai === 'hocsinh') void huaMan.then(napKhiRanh, napKhiRanh).catch(() => {})
   else if (huaMan) void huaMan.then(napKatex, napKatex).catch(() => {})
   else if (canCongThucNgay) void napKatex().catch(() => {})
+  // CỔNG PHỤ HUYNH (21/10): chỉ màn Chi tiết ca kiểm tra vẽ công thức và nó TỰ tải KaTeX lúc mở (`ManChiTietCa`) ⇒ không tải nền khi mở app: bớt ~83 KB nén + ~270 KB mã phải dịch trên điện thoại phụ huynh mỗi lần mở.
+  else if (dv.vai === 'phuhuynh') { /* không tải KaTeX nền */ }
   else napKhiRanh()
 }
 

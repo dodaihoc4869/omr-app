@@ -10,7 +10,7 @@
 import { canhBaoChoPh, phXemCanhBao } from './canh-bao-thay'
 import type { Env, ExecutionContext } from './kieu'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
-import { parentIdentity, parentPass } from './game-v2-auth'
+import { parentIdentityVoiHang, parentPass } from './game-v2-auth'
 import { PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-so-cau-hinh'
 import { lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 import { viecPhu } from './viec-phu'
@@ -54,30 +54,49 @@ export async function sbdCuaPhuHuynh(
   duong: DuongPh,
   tuyChon: { chiToken?: boolean; envGhi?: Env; ctx?: ExecutionContext } = {},
 ): Promise<{ sbd: string; kieu: KieuTruyCap }> {
+  const { sbd, kieu } = await sbdVaHangCuaPhuHuynh(env, b, duong, tuyChon)
+  return { sbd, kieu }
+}
+
+/** Lõi của `sbdCuaPhuHuynh`: trả thêm HÀNG `hoc_sinh` (tên + lớp) đã đọc khi xác thực để `xac-dinh` khỏi đọc lại. Hình dạng `{sbd, kieu}` của hàm trên được test ghim nên giữ nguyên. */
+export async function sbdVaHangCuaPhuHuynh(
+  env: Env,
+  b: Record<string, unknown>,
+  duong: DuongPh,
+  tuyChon: { chiToken?: boolean; envGhi?: Env; ctx?: ExecutionContext; layTen?: boolean } = {},
+): Promise<{ sbd: string; kieu: KieuTruyCap; hang: { ho_ten: string | null; lop: string | null } }> {
   const coToken = b.pass !== undefined && b.pass !== null && String(b.pass).trim() !== ''
   let sbd: string
   let kieu: KieuTruyCap
+  let hang: { ho_ten: string | null; lop: string | null } | null = null
   if (coToken) {
-    sbd = await parentIdentity(env, String(b.pass).trim())
+    // Token có `pk` đã đọc hàng `hoc_sinh` khi kiểm mật khẩu ⇒ dùng luôn làm bằng chứng "em tồn tại" (bớt 1 đợt D1 nối tiếp ở mọi lệnh /ph).
+    ;({ sbd, hang } = await parentIdentityVoiHang(env, String(b.pass).trim(), !!tuyChon.layTen))
     kieu = 'token'
   } else {
     if (tuyChon.chiToken) throw new Error('Cần liên kết riêng của con. Anh/chị nhờ Thầy gửi liên kết.')
     sbd = String(b.sbd ?? '').trim()
     kieu = 'sbd_tran'
   }
-  if (!sbd || sbd.length > 40 || !(await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd = ?').bind(sbd).first())) {
-    throw new Error('Không tìm thấy số báo danh của con.')
+  if (!sbd || sbd.length > 40) throw new Error('Không tìm thấy số báo danh của con.')
+  if (!hang) {
+    const row = await env.DB.prepare(tuyChon.layTen ? 'SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?' : 'SELECT sbd FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten?: string | null; lop?: string | null }>()
+    if (!row) throw new Error('Không tìm thấy số báo danh của con.')
+    hang = { ho_ten: row.ho_ten ?? null, lop: row.lop ?? null }
   }
   const envGhi = tuyChon.envGhi ?? env
   await viecPhu(tuyChon.ctx, () => ghiTruyCap(envGhi, sbd, kieu, duong))
-  return { sbd, kieu }
+  return { sbd, kieu, hang }
 }
 
-/** `POST /ph/xac-dinh {pass}` — cổng phụ huynh hỏi "liên kết này là của em nào" để hiện tên con. Chỉ nhận token. */
-export async function phXacDinh(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-xac-dinh', { chiToken: true })
-  const em = await env.DB.prepare('SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
-  return { ok: true, sbd, hoTen: em?.ho_ten ?? '', lop: em?.lop ?? '' }
+/**
+ * `POST /ph/xac-dinh {pass}` — cổng phụ huynh hỏi "liên kết này là của em nào" để hiện tên con. Chỉ nhận token.
+ * Là lệnh ĐẦU TIÊN trên đường mở app phụ huynh bằng liên kết riêng (6 lệnh còn lại chờ nó) ⇒ làm ít đợt nhất có thể: tên + lớp lấy luôn từ hàng đã đọc khi xác thực,
+ * đếm truy cập hoãn qua `ctx` (trước 21/10: không có `ctx` nên đếm chạy NGAY và chặn phản hồi thêm 1 đợt).
+ */
+export async function phXacDinh(env: Env, b: Record<string, unknown>, ctx?: ExecutionContext): Promise<Record<string, unknown>> {
+  const { sbd, hang } = await sbdVaHangCuaPhuHuynh(env, b, 'ph-xac-dinh', { chiToken: true, ctx, layTen: true })
+  return { ok: true, sbd, hoTen: hang.ho_ten ?? '', lop: hang.lop ?? '' }
 }
 
 /**

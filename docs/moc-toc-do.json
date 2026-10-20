@@ -35,5 +35,32 @@
    "tep": 25,
    "gzip": 248381
   }
- }
+ },
+ "mayChuPh": {
+  "ph-tat-ca-ve-con": {
+   "dot": 5,
+   "lenh": 21
+  },
+  "ph-hoc-2": {
+   "dot": 5,
+   "lenh": 10
+  },
+  "ph-con-tong-quan": {
+   "dot": 5,
+   "lenh": 17
+  },
+  "ph-loi-thay": {
+   "dot": 2,
+   "lenh": 3
+  },
+  "ph-nhip-hoc": {
+   "dot": 5,
+   "lenh": 19
+  },
+  "ph-xac-dinh": {
+   "dot": 1,
+   "lenh": 1
+  }
+ },
+ "ghiChuPh": "Mốc cổng phụ huynh (21/10, đo trên main a746fbc trước khi tối ưu): số đợt chờ D1 nối tiếp + số lệnh D1 của 6 lệnh /ph, giờ cao điểm, token có pk. Chỉ hạ."
 }

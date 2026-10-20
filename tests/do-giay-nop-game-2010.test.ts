@@ -40,14 +40,16 @@ describe('game: giây + kích thước đề vào sổ (OMNI tắt)', () => {
     const r = dong(d, 'Q0')!
     expect(r.giay).toBe(14)
     // Câu Q0: "Đề Q0" (2 từ) + 4 phương án "A. a"… (2 từ mỗi phương án) = 10 từ, không hình, Phần I.
-    expect(JSON.parse(r.raw_json!).doc).toEqual({ t: 10, h: 0, p: 'I' })
+    expect(JSON.parse(r.raw_json!).doc).toEqual({ t: 10, h: 0, p: 'I', dh: 1 }) // dh:1 = giây từ ĐỒNG HỒ MỚI của máy em
   })
   it('chỉ có `msLam` (máy cũ) ⇒ giây = ms/1000 và máy chủ vẫn tự đo kích thước đề vào raw.doc', async () => {
     const d = dungPhien()
     await tra(d, 'Q1', { msLam: 30_400 })
     const r = dong(d, 'Q1')!
     expect(r.giay).toBe(30)
+    // Không có `dh`: giây này là đồng hồ tường cũ (chạy cả khi tab ẩn) — phải phân biệt được với đồng hồ mới khi tính Mức làm.
     expect(JSON.parse(r.raw_json!).doc).toEqual({ t: 10, h: 0, p: 'I' })
+    expect(JSON.parse(r.raw_json!).doc.dh).toBeUndefined()
   })
   it('không gửi gì ⇒ giây NULL như hôm nay; đồng hồ hỏng báo 0 ⇒ NULL (không thành Mức làm 1 oan)', async () => {
     const d = dungPhien()
