@@ -133,7 +133,7 @@ function khungThang() {
 
 // ───────────────────────── KHUNG 2 · ĐO MỌI LƯỢT
 const NGUON = [
-  ['Ca thi', 'Có giây từng câu, dừng khi tab ẩn.', 'Giữ nguyên'],
+  ['Ca thi', 'Có giây, nhưng tính cho MỘT câu trong số các câu cùng hiện trên màn.', 'Định nghĩa lại cho ca thi (cần chốt)'],
   ['BTVN · BTVN lỡ · Khắc phục (phiếu)', 'Không có giây.', 'Đồng hồ trong phiếu, gửi cùng đáp án'],
   ['Game (Làm bài tập)', 'Máy em gửi, máy chủ bỏ khi OMNI tắt.', 'Máy chủ ghi cả khi OMNI tắt'],
   ['Chữa lỗi', 'Giờ máy chủ, cộng cả lúc em rời màn.', 'Đồng hồ máy em, dừng khi rời màn'],
@@ -150,7 +150,7 @@ function khungDo() {
   return `<section class="kh" id="k-do" data-ap="gv" hidden>
   <div class="trang"><header class="dau-trang"><h1>Mọi câu đều có số đo</h1><p>Đã làm, đang làm và sắp làm. Lượt nào cũng có giây đo thật, không ước.</p></header>
   <div class="ba-the">
-    <article class="the"><h2>Đã làm</h2>${nhanVe('moi', 'Thêm')}<ul class="dong-y"><li>Từ <b>${D.NGAY_BAT_DO}</b>, mọi lượt mới đều có giây đo thật.</li><li><b>Đã có trong sổ:</b> ca thi, chữa lỗi (chữa lỗi cộng cả lúc em rời màn, nên chỉ có thể thiếu Mức làm 1, không bịa ra).</li><li><b>Còn ở kho khác, nạp lùi được nếu thầy duyệt:</b> tự luyện, game có OMNI, lên bảng.</li><li><b>Mất hẳn, hiện “Chưa có số đo”:</b> BTVN, khắc phục, mở bài, luyện đề, nền, kiểm tra cá nhân, ôn lại trước ${D.NGAY_BAT_DO}.</li></ul></article>
+    <article class="the"><h2>Đã làm</h2>${nhanVe('moi', 'Thêm')}<ul class="dong-y"><li>Từ <b>${D.NGAY_BAT_DO}</b>, mọi lượt mới đều có giây đo thật.</li><li><b>Đã có trong sổ:</b> ca thi (cách đếm cũ chia giây cho một câu trong số câu cùng hiện, chưa đủ tin để xếp Mức làm 1–2), chữa lỗi (cộng cả lúc em rời màn, nên chỉ có thể thiếu Mức làm 1, không bịa ra).</li><li><b>Còn ở kho khác, nạp lùi được nếu thầy duyệt:</b> tự luyện, game có OMNI, lên bảng.</li><li><b>Mất hẳn, hiện “Chưa có số đo”:</b> BTVN, khắc phục, mở bài, luyện đề, nền, kiểm tra cá nhân, ôn lại, game khi OMNI tắt, trước ${D.NGAY_BAT_DO}.</li></ul></article>
     <article class="the"><h2>Đang làm</h2>${nhanVe('moi', 'Thêm')}<ul class="dong-y"><li>Một cách đo chung cho mọi màn làm câu: từ lúc câu hiện đủ trên màn tới lúc em nộp.</li><li>Dừng khi tab ẩn, khóa màn hình hoặc em không chạm màn 180 giây (tạm).</li><li>Trần ${900} giây một lượt. Làm lại câu là lượt mới, giây riêng.</li></ul></article>
     <article class="the"><h2>Sắp làm</h2>${nhanVe('moi', 'Thêm')}<p>Thời gian đọc hết đề tính sẵn cho từng câu trong kho, thầy thấy ngay khi giao bài. Ví dụ bài sắp giao:</p>
       <ul class="gb">${D.GIAO_BAI.map((c) => `<li><span>Câu ${c.so} · ${e(c.chuyenDe)}</span><b class="so">${D.tDocGoc(c)} giây</b></li>`).join('')}<li class="gb-tong"><span>Đọc hết ${D.GIAO_BAI.length} câu</span><b class="so">${mm(tongDoc)}</b></li></ul></article>

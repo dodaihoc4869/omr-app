@@ -8,7 +8,7 @@ Trạng thái: **CHỜ THẦY DUYỆT ẢNH.** Chưa sửa `src/`, `server/`. Ch
 - **"Tất cả các câu học sinh đã làm, đang làm hoặc sắp làm đều phải đo được."**
 
 Nói thẳng trước một điều: **câu "đã làm" không đo lùi được hết.** Giây không được ghi lúc ấy thì không có cách nào biết, và máy không được bịa số. Lượt cũ chia ba nhóm:
-- **Đã có trong sổ (`su_kien_hoc.giay`):** ca thi; chữa lỗi (giờ máy chủ, cộng cả lúc em rời màn nên giây chỉ có thể bị thổi lên, tức có thể thiếu Mức làm 1–2 chứ không bịa ra Mức làm 1–2).
+- **Đã có trong sổ (`su_kien_hoc.giay`):** ca thi, nhưng cách đếm cũ chưa đủ tin để xếp Mức làm 1–2 (ca thi là danh sách cuộn nhiều câu cùng hiện trên màn; `ExamTakeScreen.tsx:1696-1714` cộng giây cho MỘT câu có tỉ lệ hiện lớn nhất, hòa thì một câu, nên câu còn lại bị thiếu giây; lại không kiểm em có đang rảnh). **Giây cũ của ca thi không xếp Mức làm 1–2** cho tới khi chốt cách đo mới của ca thi (mục 4, 9); chữa lỗi (giờ máy chủ, cộng cả lúc em rời màn nên giây chỉ có thể bị thổi lên, tức có thể thiếu Mức làm 1–2 chứ không bịa ra Mức làm 1–2).
 - **Còn nằm ở kho khác, nạp lùi được:** tự luyện (`tu_luyen_cau.giay`), game có OMNI (`ms` trong bảng OMNI, `omni-d1.ts:561`), lên bảng (`len_bang.giay_thuc`). Nạp lùi hay đọc ghép là việc chạm dữ liệu thật ⇒ **quyết định I**, chưa làm gì.
 - **Mất hẳn:** BTVN, BTVN lỡ, khắc phục, mở bài, luyện đề, nền, kiểm tra cá nhân, ôn lại, và mọi thứ của game khi OMNI tắt, trước ngày bật đo. Hiện "Chưa có số đo".
 
@@ -40,6 +40,7 @@ Từ ngày bật đo trở đi mọi lượt đều có giây thật. Vì vậy 
 | Chưa có số đo | lượt không có giây đo thật. **Không ước, không xếp mức.** Giây `uoc` không bao giờ cho Mức làm 1–2 | Chưa có số đo |
 
 Quy tắc đi kèm:
+- Giây `do` theo cách đếm CŨ của ca thi không xếp Mức làm 1–2 (mục 4); chỉ giây theo định nghĩa mới của mục 4 mới xếp được.
 - **Mức chỉ dùng để giải thích lượt SAI.** Câu đúng mà làm chậm hơn T_đọc: bình thường. Câu đúng mà nộp trước T_đọc: chỉ ghi chú riêng cho thầy "đúng trước khi đọc hết đề" (có thể đã biết bài, có thể đoán trúng). Không đếm là lượt vội, không buộc tội.
 - Lượt `luot` hiện bị loại khỏi `LA_LAN_LAM`/`SQL_LA_LAN_LAM`. Phải đếm riêng vào Mức làm 1, nếu không nhóm "chưa đọc hết đề" rỗng đúng chỗ lẽ ra đông nhất.
 - "Đúng nhưng chậm" (> 2,0 × thời gian thường, OMNI) **giữ nguyên** là cờ riêng, không phải mức.
@@ -52,7 +53,7 @@ Quy tắc đi kèm:
 
 | Nguồn | Màn → hàm nộp → lệnh máy chủ | Hiện tại | Việc cần làm |
 |---|---|---|---|
-| thi | `ExamTakeScreen.tsx:1696` → `/nop` `chamDiem` → `ghiSuKienThi` (`su-kien-hoc.ts:468`) | Có `giayCau{qid}` | Giữ; đổi sang đồng hồ dùng chung cho cùng định nghĩa |
+| thi | `ExamTakeScreen.tsx:1696` → `/nop` `chamDiem` → `ghiSuKienThi` (`su-kien-hoc.ts:468`) | Có `giayCau{qid}`, nhưng đếm cho MỘT câu trong số câu cùng hiện (`IntersectionObserver`, tỉ lệ hiện lớn nhất), không kiểm rảnh | **Định nghĩa lại cho ca thi** (đề xuất: tính cho mọi câu hiện ≥ 50% trên màn, gắn cờ "hiện cùng câu khác"; cần chốt, làn ca thi). Giây thi cũ không xếp Mức làm 1–2 |
 | btvn, khắc phục | phiếu HTML `html-phieu.ts:2468` (`gui`) → `nopBtvnQuaPhieu` (`goi-cu.ts:900/961`), `nopKhacPhuc` (`:1041`) | Có dòng, `giay` NULL, không gửi giây | Bộ đếm viết thẳng trong JS phiếu (chạy trong iframe), gửi `giayCau{qid}` cùng đáp án |
 | btvn_lo | `html-phieu.ts:2536,2572` → `btvn-nop-chang-em.ts:94` → `/btvn/xong-lo` → `nopChangCaNhan` (`btvn-nang-do-d1.ts:817`) | NULL | Như trên. Chặng thường gửi `xongLoBtvn` không kèm `dapAn` (`KhungXemPhieu.tsx:173`): chưa chắc có ghi sổ, phải kiểm |
 | mom | `StudentPortalScreen.tsx:526` `nopBaiCuaMom` → `ghiHocMom` (`mom.ts:87`) | NULL | Hook đo, gửi giây |
@@ -139,7 +140,7 @@ Bảng màu: Mức làm 1→4 là MỘT dải màu theo độ đậm (không đ�
 
 - **A. Tên.** "Mức làm bài / Mức làm 1–4" dùng đúng chữ của thầy, nhưng chữ "mức" đã có ở "Đủ mức" (bản chiếu), "mức thường của em" (OMNI), "mức độ của câu". Khuyến nghị: giữ "Mức làm", luôn kèm số (không bao giờ viết "mức 2" trơ trọi), thêm một dòng vào `CHUAN-TU-NGU-VA-GIAO-DIEN.md`. Phương án khác: "Cách làm 1–4".
 - **B. Tín hiệu (b) "quá nhanh" cứng 8/15 giây.** Thầy duyệt 12/10. Khuyến nghị: thay bằng Mức làm 1–2 trên lượt sai, để chỉ còn một cách đo; không thì hồ sơ có hai kết luận "quá nhanh" mâu thuẫn. **Đổi luật đã duyệt ⇒ đi qua Boss.**
-- **C. Mức từng em trên bản chiếu.** Đã kiểm mã: (1) nút H chỉ có ở chế độ Nhịp học của lớp và chỉ ẩn tên nhóm Lười (mặc định tên HIỆN), chế độ Điểm danh không có H; (2) tờ chiếu "Ai đã sai?" ĐÃ hiện giây từng lượt cạnh tên từng em (thầy yêu cầu 09/10). Nên thầy đã chấp nhận lộ số giây từng em; thứ mới là chip "Mức làm" kèm chữ đánh giá. Khuyến nghị: mặc định chỉ chiếu số gộp của lớp; chip/thanh từng em nằm sau nút mới **M** (mặc định Tắt, vẽ ở khung 10); khi thầy bấm tên em trên bản chiếu thì hồ sơ mở ra cũng ẩn khối "Cách làm bài" và "Lịch sử làm câu" kèm mức trừ khi M bật. Phím M chưa thấy dùng ở hai màn này, Code 1 kiểm lại. Nếu thầy muốn luôn hiện thì đó là quyết định của thầy.
+- **C. Mức từng em trên bản chiếu.** Đã kiểm mã: (1) nút H chỉ có ở chế độ Nhịp học của lớp và chỉ ẩn tên nhóm Lười (mặc định tên HIỆN), chế độ Điểm danh không có H; (2) tờ chiếu "Ai đã sai?" ĐÃ hiện giây từng lượt cạnh tên từng em (thầy yêu cầu 09/10). Nên thầy đã chấp nhận lộ số giây từng em; thứ mới là chip "Mức làm" kèm chữ đánh giá. Khuyến nghị: mặc định chỉ chiếu số gộp của lớp; chip/thanh từng em nằm sau nút mới **M** (mặc định Tắt, vẽ ở khung 10); khi thầy bấm tên em trên bản chiếu thì hồ sơ mở ra cũng ẩn khối "Cách làm bài" và "Lịch sử làm câu" kèm mức trừ khi M bật. Phím M: đã grep `'M'`/`"M"` trong `BanChieuDiemDanh.tsx` và `len-bang-moi-to-chieu.ts`, không thấy phím M nào, nên dùng được; Code 1 xác nhận lại với bản `html-may-chieu`. Nếu thầy muốn luôn hiện thì đó là quyết định của thầy.
 - **D. Chữ ở app học sinh.** Khuyến nghị: số giây trước, nhãn hành vi sau, không nhãn năng lực. "Nộp trước khi đọc hết đề · Đọc xong thì nộp ngay · Có thời gian nghĩ · Làm kỹ, đúng nhịp lớp". Câu **đúng** chỉ hiện nhãn khi Mức làm 3–4; câu đúng mà nộp nhanh chỉ hiện số giây. Không điểm, không thưởng, không xếp hạng.
 - **E. Phụ huynh thấy gì.** Khuyến nghị: một đoạn số thật + thanh 4 mức + 2 câu gần đây (khung 08). Tin nhắn riêng cho phụ huynh vẫn do thầy soạn.
 - **F. Ngưỡng tạm.** Sàn nghĩ 6/12/15 giây, 0,8 × thời gian thường, 180 giây không chạm, 0,5 × T_đọc cho câu ảnh. Hiệu chỉnh bằng số thật; xem mục 9 (có hai câu SQL chỉ-đọc để thầy chạy trên Console, hoặc cho phép em đẩy một workflow chỉ-đọc).
@@ -173,6 +174,6 @@ Bảng màu: Mức làm 1→4 là MỘT dải màu theo độ đậm (không đ�
 - Chưa xác nhận phiếu HTML (iframe) gửi được giây cùng `gui`; chưa chắc `btvn_lo` thường có ghi sổ.
 - β của OMNI hiện chỉ lấy từ lượt game có `msLam`. Khi mọi nguồn đã đo, có thể cho β lấy mẫu từ mọi nguồn để nhiều câu có Mức làm 4; đó là đổi `omni-toc-do.ts`, hỏi Boss sau Đợt 1.
 - "Ngày bật đo 21/10" trong ảnh là giả; thật là ngày Đợt 1 phát hành.
-- Ca thi đo "câu chiếm nhiều màn nhất", `msLam` đo "từ lúc hiện": hai kiểu khác nhau; mục 4 chốt một định nghĩa nhưng chưa thử trên máy thật.
+- Ca thi đo "câu có tỉ lệ hiện lớn nhất" trong danh sách cuộn, `msLam` đo "từ lúc hiện", chữa lỗi đo giờ máy chủ: ba kiểu khác nhau; mục 4 chốt một định nghĩa nhưng riêng ca thi (nhiều câu cùng hiện) cần thiết kế thêm và chưa thử trên máy thật.
 - Chưa đo kích thước gói và số tệp precache thật vì chưa build (Đợt 2–3 đo bằng `kiem:toc-do` và `kiem-sw.mjs`).
 - Một ảnh (`05-ai-sai-ngang-sang`) hơi quá 150 KB (chuẩn của repo cho ảnh bằng chứng); không ảnh hưởng nội dung.
