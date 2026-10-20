@@ -191,3 +191,11 @@ Bảng màu: Mức làm 1→4 là MỘT dải màu theo độ đậm (không đ�
 
 **Chưa đo (làm tiếp):** ca thi (cần định nghĩa lại vì danh sách cuộn nhiều câu cùng hiện; giây cũ của thi không xếp Mức làm 1–2), mở bài (`mom`; nằm trong `StudentPortalScreen`, thuộc gói tải mở app nên phải bù byte), luyện đề, nền, tự luyện (đồng hồ riêng đang tính cả lúc ẩn tab, sổ để trống), kiểm tra cá nhân (trạng thái chặng/nháp phức tạp, cần cột lưu giây), Đoàn Hộ Tống; chữa lỗi phía máy em (bước chữa không phải đọc đề câu gốc); `/btvn/xong-lo` nhánh cũ có `dapAn` (chỉ ghi giây, thiếu kích thước đề). Chặng `btvn_lo` thường không ghi sổ (không kèm đáp án), giây đi theo lượt nộp cả bài.
 **Chưa làm theo đặc tả:** Mức làm 4, τ riêng từng em và tín hiệu (b) mới (cần β thật của lớp: lấy từ OMNI hoặc từ chính các lượt đã đo, quyết định sau khi có số); bảng `cau_doc_giay` "sắp làm" (không cần cho Đợt 1 vì kích thước đề ghi theo từng lượt).
+
+### 10b. Cờ nguồn đồng hồ `doc.dh` (21/10, PR 4) — đọc trước khi tính Mức làm từ dữ liệu thật
+- Phát hành Đợt 1 (Worker `2c7ff01`, 21/10 ≈ 01:33 VN) ghi `giay` cho game từ MỘT trong hai nguồn mà chưa đánh dấu: (a) cụm `doGiay.g` của đồng hồ MỚI (dừng khi tab ẩn, 180 s không chạm); (b) `msLam` của máy em bản CŨ (đồng hồ tường, chạy cả khi tab ẩn, trần 900 s). Máy em chỉ nạp bản mới khi mở lại app, nên hai nguồn lẫn nhau trong cùng cột.
+- PR 4 thêm `raw_json.doc.dh = 1` CHỈ khi giây đến từ `doGiay` hợp lệ; giây suy từ `msLam` thì KHÔNG có `dh`. Quy tắc đọc: `doc.dh = 1` ⇒ đồng hồ mới (dùng được cho Mức làm); dòng game có `giay` mà không `dh` ⇒ đồng hồ cũ hoặc không rõ — KHÔNG xếp Mức 1–2 từ giây này (dễ nhiễm tab ẩn), chỉ dùng làm chặn trên thô.
+- Dòng ghi giữa 01:33 VN và giờ phát hành PR 4 (xem Nhật ký `DIEU-PHOI.md`) không có `dh` kể cả khi từ đồng hồ mới ⇒ coi là "không rõ".
+- Không UPDATE bù dòng cũ (quyết định 21/10): dòng cũ không có giây đo thật để bù; kích thước đề của dòng có giây (thi, chữa lỗi) sẽ TÍNH LÚC ĐỌC từ nội dung câu khi làm Đợt 2, không ghi đè dữ liệu thật.
+- Công cụ: `.github/workflows/do-phu-giay-2110.yml` có thêm cột `dong_ho_moi`, phân bố theo `dh`, và truy vấn 4 (so lượt ≥ 600 s giữa hai đồng hồ — nếu đồng hồ cũ nhiễm tab ẩn thì tỉ lệ ≥ 600 s của nhóm không `dh` cao hơn rõ).
+

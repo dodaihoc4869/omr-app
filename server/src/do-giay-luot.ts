@@ -1,7 +1,7 @@
 // ĐO GIÂY TỪNG LƯỢT LÀM CÂU (thầy 20/10/2026: "tất cả các câu học sinh đã làm, đang làm hoặc sắp làm đều phải đo được").
 // Đặc tả: docs/dac-ta-muc-lam-bai-2010.md mục 4. Máy em gửi MỘT cụm `doGiay` cùng lượt nộp; máy chủ CHỈ làm sạch rồi ghi vào sổ:
 //   · cột `giay` (số nguyên 1–900) — giây câu hiện đủ trên màn, tab đang hiện, dừng khi 180 giây không chạm;
-//   · `raw_json.doc = { t: số từ của đề, h: có hình 0/1, p: phần I/II/III }` — kích thước đề tại lúc làm, để sau này tính "thời gian đọc hết đề"
+//   · `raw_json.doc = { t: số từ của đề, h: có hình 0/1, p: phần I/II/III, dh: 1 nếu giây từ đồng hồ MỚI }` — kích thước đề tại lúc làm, để sau này tính "thời gian đọc hết đề"
 //     (8 + 0,35 × số từ + 10 × có hình, `thoi-gian-len-bang.ts`) và xếp Mức làm mà KHÔNG cần đọc lại đề.
 // Máy chủ KHÔNG bao giờ tự ước giây vào sổ. Thiếu / sai khuôn / ngoài khoảng ⇒ bỏ giá trị đó (NULL), lượt vẫn ghi như cũ.
 // Giây < 1 bị bỏ: đồng hồ hỏng báo 0 sẽ thành "Mức làm 1" oan cho cả lớp.
@@ -18,6 +18,8 @@ export interface DoLuot {
   /** Có hình/bảng (1) hay không (0), hoặc null khi máy em không báo. */
   hinh: 0 | 1 | null
   phan: PhanDo | null
+  /** 1 = giây đến từ ĐỒNG HỒ MỚI của máy em (cụm `doGiay`: dừng khi tab ẩn / 180 giây không chạm). Vắng = suy từ `msLam` cũ (đồng hồ tường, chạy cả khi tab ẩn) hoặc không rõ. */
+  dh?: 1
 }
 
 const laObj = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x)
@@ -33,7 +35,7 @@ export function lamSachDo(x: unknown): DoLuot | null {
   const hinh = x.h === 1 || x.h === true ? 1 : x.h === 0 || x.h === false ? 0 : null
   const phan = x.p === 'I' || x.p === 'II' || x.p === 'III' ? x.p : null
   if (giay === null && tu === null) return null
-  return { giay, tu, hinh, phan }
+  return { giay, tu, hinh, phan, ...(giay !== null ? { dh: 1 as const } : {}) }
 }
 
 /**
@@ -66,7 +68,7 @@ export function docDoGiayNhieu(body: unknown): Map<string, DoLuot> {
 export function ghepDocVaoRaw(raw: unknown, d: DoLuot | null | undefined): unknown {
   if (!d || d.tu === null) return raw
   const goc = laObj(raw) ? { ...raw } : {}
-  goc.doc = { t: d.tu, ...(d.hinh !== null ? { h: d.hinh } : {}), ...(d.phan ? { p: d.phan } : {}) }
+  goc.doc = { t: d.tu, ...(d.hinh !== null ? { h: d.hinh } : {}), ...(d.phan ? { p: d.phan } : {}), ...(d.dh ? { dh: 1 } : {}) }
   return goc
 }
 

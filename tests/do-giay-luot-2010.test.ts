@@ -4,7 +4,7 @@ import { boSungKichThuocDe, docDoGiayMot, docDoGiayNhieu, ghepDocVaoRaw, lamSach
 
 describe('lamSachDo', () => {
   it('nhận cụm hợp lệ và làm tròn', () => {
-    expect(lamSachDo({ g: 14.4, t: 46, h: 0, p: 'I' })).toEqual({ giay: 14, tu: 46, hinh: 0, phan: 'I' })
+    expect(lamSachDo({ g: 14.4, t: 46, h: 0, p: 'I' })).toEqual({ giay: 14, tu: 46, hinh: 0, phan: 'I', dh: 1 })
   })
   it('giây < 1 hoặc > 900 bị bỏ (đồng hồ hỏng không thành Mức làm 1 oan), số từ vẫn giữ', () => {
     expect(lamSachDo({ g: 0, t: 30 })).toEqual({ giay: null, tu: 30, hinh: null, phan: null })
@@ -20,7 +20,7 @@ describe('lamSachDo', () => {
     expect(lamSachDo({ g: 0 })).toBeNull()
   })
   it('phần lạ và số từ ngoài khoảng bị bỏ', () => {
-    expect(lamSachDo({ g: 10, t: 99999, p: 'IV' })).toEqual({ giay: 10, tu: null, hinh: null, phan: null })
+    expect(lamSachDo({ g: 10, t: 99999, p: 'IV' })).toEqual({ giay: 10, tu: null, hinh: null, phan: null, dh: 1 })
     expect(lamSachDo({ g: 10, t: -1 })?.tu).toBeNull()
   })
   it('cờ hình nhận 0/1/true/false', () => {
@@ -32,7 +32,7 @@ describe('lamSachDo', () => {
 
 describe('docDoGiayMot / docDoGiayNhieu', () => {
   it('một câu', () => {
-    expect(docDoGiayMot({ qid: 'a', doGiay: { g: 22, t: 40, h: 1, p: 'III' } })).toEqual({ giay: 22, tu: 40, hinh: 1, phan: 'III' })
+    expect(docDoGiayMot({ qid: 'a', doGiay: { g: 22, t: 40, h: 1, p: 'III' } })).toEqual({ giay: 22, tu: 40, hinh: 1, phan: 'III', dh: 1 })
     expect(docDoGiayMot({ qid: 'a' })).toBeNull()
     expect(docDoGiayMot(undefined)).toBeNull()
   })
@@ -78,5 +78,25 @@ describe('boSungKichThuocDe', () => {
     const doi = { get text(): string { throw new Error('khuôn lạ') } }
     expect(() => boSungKichThuocDe(d, 'I', doi)).not.toThrow()
     expect(boSungKichThuocDe(d, 'I', doi)).toEqual(d)
+  })
+})
+
+describe('cờ nguồn đồng hồ `dh` (21/10)', () => {
+  it('chỉ giây từ cụm `doGiay` hợp lệ mới mang dh:1; giây suy từ `msLam` cũ và cụm không có giây thì không', () => {
+    expect(lamSachDo({ g: 9 })?.dh).toBe(1)
+    expect(lamSachDo({ g: 0, t: 30 })?.dh).toBeUndefined()
+    expect(docDoGiayMot({}, { ms: 12_000 })?.dh).toBeUndefined()
+    expect(docDoGiayMot({ doGiay: { g: 12 } }, { ms: 99_000 })).toMatchObject({ giay: 12, dh: 1 }) // có cả hai ⇒ đồng hồ mới thắng
+  })
+  it('dh đi vào raw.doc (cùng t/h/p) và KHÔNG xuất hiện khi giây không từ đồng hồ mới', () => {
+    const moi = ghepDocVaoRaw({ ms: 1 }, { giay: 9, tu: 20, hinh: 1, phan: 'II', dh: 1 }) as { doc: Record<string, unknown>; ms: number }
+    expect(moi.doc).toEqual({ t: 20, h: 1, p: 'II', dh: 1 })
+    expect(moi.ms).toBe(1) // không đụng khoá sẵn có
+    const cu = ghepDocVaoRaw(undefined, { giay: 9, tu: 20, hinh: 1, phan: 'II' }) as { doc: Record<string, unknown> }
+    expect(cu.doc).toEqual({ t: 20, h: 1, p: 'II' })
+  })
+  it('boSungKichThuocDe giữ dh khi bổ sung số từ/hình/phần', () => {
+    const r = boSungKichThuocDe({ giay: 14, tu: null, hinh: null, phan: null, dh: 1 }, 'I', { text: 'a b c', options: [] })
+    expect(r?.dh).toBe(1)
   })
 })
