@@ -14,6 +14,9 @@ import { khopPhanIII } from './cham-so'
 import { gioDayDu } from './ngay-gio-24'
 import type { KetQuaDot, TrangThaiChua } from './chua-cau-sai-api'
 
+/** MỘT dòng điều kiện lúc em sắp làm bản mới (thầy 20/10; chỉ nói luật tự làm, không hứa gì về mốc giờ). */
+export const LUAT_BAN_MOI = 'Tự làm, không xem gợi ý hay lời giải. Đúng thì câu này tính là đã tự sửa.'
+
 /** Trạng thái đợt không còn bước nào để làm ⇒ chữa trực tiếp trên câu gốc. */
 export const TRANG_THAI_TRUC_TIEP: ReadonlySet<TrangThaiChua> = new Set<TrangThaiChua>(['thieu_hoc_lieu', 'can_thay', 'tam_khoa', 'cau_thay_doi', 'cho_gap_lai_2', 'da_tu_sua'])
 

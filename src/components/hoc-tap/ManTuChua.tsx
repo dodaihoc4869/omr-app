@@ -20,13 +20,18 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3, Lock, PencilLine, RotateCcw } from 'lucide-react'
 import type { KetQuaDanhSachChua, LichKiemLaiHoiThay, MucChua } from '../../lib/chua-cau-sai-api'
 import { nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
+import { dungViecHomNay, docSbdHs, luuViecHomNay, themMotChang } from '../../lib/tu-sua-viec-hom-nay'
+import ViecHomNay from './ViecHomNay'
 import { taiCauDaLam, NHAN_NGUON_LAN, type CauDaLamMuc } from '../hoa2/api'
 import { henGapLai } from '../../lib/chua-truc-tiep'
 import { khoaMoChua } from '../../../server/src/ho-so-em-hs-loc'
+
 import './hoc-tap.css'
 import './tu-chua.css'
 const ManChua = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
+// Thẻ mời ở Hôm nay đi CÙNG khối mã với màn này (một khối nạp lười, không thêm tệp precache — trần 170 tệp của kiem-sw).
+export { default as TheMoiTuSua } from './TheMoiTuSua'
 
 /** Trạng thái đợt chữa ⇒ chữ em đọc được (bảng từ chuẩn: không mã nội bộ). */
 export const CHU_TRANG_THAI_CHUA: Record<string, string> = {
@@ -150,6 +155,11 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     return () => { huy = true; lanDoc.current++ }
   }, [token, lan])
   const dong = useMemo(() => (kq?.trangThai === 'bat' ? kq.ds.map((m, i) => dungDong(m, i, cdl, Date.now())) : []), [kq, cdl])
+  // VIỆC HÔM NAY (thầy 20/10): tối thiểu 12 câu/ngày chia chặng 4 câu; cần SBD để giữ ổn định trong ngày — thiếu ⇒ danh sách cũ.
+  const sbd = useMemo(() => docSbdHs(), [])
+  const [lanThem, setLanThem] = useState(0)
+  const { viec, luu } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null }), [kq, sbd, lanThem])
+  useEffect(() => { luuViecHomNay(luu) }, [luu])
 
   // Câu mở thẳng: danh sách về ⇒ mở đúng đợt (hoặc thử mở câu chưa có đợt); vòng chữa tắt ⇒ bỏ, hiện màn "chưa mở cho em".
   useEffect(() => {
@@ -320,11 +330,22 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
           </div>
         ) : (
           <div className="tcl-bo-cuc">
-            <TheTong can={can} soCan={soCan} soCho={soCho} soXong={soXong} tong={tong} onChon={moCau} onVe={onVe} onTaiThem={kq.sau ? () => void taiThem() : undefined} dangThem={dangThem} />
+            {viec && viec.tong > 0
+              ? <div className="vh-cot"><ViecHomNay
+                  viec={viec} soXong={soXong} tong={tong} nayMs={Date.now()}
+                  thongTin={(m, i) => { const d = dungDong(m, i, cdl, Date.now()); return { ten: d.ten, phu: d.phu, trangThai: d.trangThai } }}
+                  onChon={(m, i) => moCau(dungDong(m, i, cdl, Date.now()))}
+                  onThem={() => { themMotChang(kq); setLanThem((n) => n + 1) }}
+                  onVe={onVe} /></div>
+              : <TheTong can={can} soCan={soCan} soCho={soCho} soXong={soXong} tong={tong} onChon={moCau} onVe={onVe} onTaiThem={kq.sau ? () => void taiThem() : undefined} dangThem={dangThem} />}
             <div className="tcl-ds">
               {(['can', 'cho', 'xong'] as Nhom[]).map((n) => {
                 const ds = dong.filter((d) => d.nhom === n)
-                return ds.length ? <DanhSach key={n} nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} /> : null
+                if (!ds.length) return null
+                // Có việc hôm nay ⇒ danh sách đầy đủ gập lại (em không phải nhìn cả trăm câu một lúc).
+                return viec && viec.tong > 0
+                  ? <details className="vh-gap" key={n}><summary><b>{n === 'can' ? 'Tất cả câu cần sửa' : TEN_NHOM[n]}</b><span>{dem?.[n] ?? ds.length} câu</span></summary><DanhSach nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} /></details>
+                  : <DanhSach key={n} nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} />
               })}
             </div>
           </div>

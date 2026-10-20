@@ -1,0 +1,164 @@
+// @vitest-environment jsdom
+// VIỆC HÔM NAY của Tự sửa lỗi — GIAO DIỆN (thầy 20/10: "cho sửa ít nhất 12 câu mỗi ngày, chia làm các chặng cho thông minh và cảm hứng").
+// Khoá: thẻ ở Hôm nay (4 trạng thái, bấm mở THẲNG câu kế tiếp, không có phiên ⇒ thẻ cũ), khối đầu màn Tự sửa lỗi (một chặng 4 câu, chặng sau gọn một dòng,
+// danh sách đầy đủ gập lại, nút chính tới câu kế tiếp, xong cả ngày ⇒ Về Hôm nay + Sửa thêm 1 chặng), một dòng điều kiện ở bản mới, tiêu đề sau khi nộp.
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+
+const api = vi.hoisted(() => ({ apiDanhSachTuChua: vi.fn() }))
+vi.mock('../src/lib/chua-cau-sai-api', async (goc) => ({ ...(await goc<typeof import('../src/lib/chua-cau-sai-api')>()), apiDanhSachTuChua: api.apiDanhSachTuChua }))
+vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test', quenDiaChiMayChu: () => {} }))
+vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }), xongNapDiaChi: async () => {} }))
+vi.mock('../src/components/chua-cau-sai/ManChuaCauSai', () => ({
+  default: ({ qid, onVe }: { qid: string; onVe: () => void }) => (<div><p>Đang chữa {qid}</p><button type="button" onClick={onVe}>Ra danh sách</button></div>),
+}))
+
+import type { MucChua } from '../src/lib/chua-cau-sai-api'
+import { taiTuSuaLoi, xoaNhoTuSua } from '../src/lib/tu-sua-loi'
+import { ghiXongHomNay } from '../src/lib/tu-sua-viec-hom-nay'
+import { LUAT_BAN_MOI } from '../src/lib/chua-truc-tiep'
+const { default: ManTuChua } = await import('../src/components/hoc-tap/ManTuChua')
+const { TheMoiTuSua } = await import('../src/components/hoc-tap/HocTapHomNay')
+
+const QUA = new Date(Date.now() - 3600_000).toISOString()
+const mot = (n: number, tt: string, tien: string, denHan?: string): MucChua[] => Array.from({ length: n }, (_, i) => ({ qid: `${tien}${i}`, dotId: `${tien}-d${i}`, trangThai: tt, ...(denHan ? { denHan } : {}) }))
+/** 2 câu chỉ còn bản mới · 3 đang dở · 3 câu mới · 10 chỉ có lối câu gốc (18 câu). */
+const DANH_SACH: MucChua[] = [...mot(10, 'thieu_hoc_lieu', 'g'), ...mot(3, 'can_chan_doan', 'm'), ...mot(3, 'dang_chua_buoc', 'k'), ...mot(2, 'cho_gap_lai_2', 'x', QUA), ...mot(4, 'da_tu_sua', 'z')]
+const bat = (ds: MucChua[]) => ({ trangThai: 'bat', ds, dem: { tong: ds.length, can: ds.filter((m) => m.trangThai !== 'da_tu_sua').length, cho: 0, xong: ds.filter((m) => m.trangThai === 'da_tu_sua').length } })
+const dangNhap = (sbd = '11010') => localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd, token: 'tk' }))
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  localStorage.clear()
+  xoaNhoTuSua()
+  vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, cheDo2: true, chienDich: [], cau: [] }) })))
+})
+afterEach(() => { cleanup(); vi.unstubAllGlobals() })
+
+describe('Thẻ ở Hôm nay', () => {
+  const ve = async (ds: MucChua[], onChua = vi.fn()) => {
+    api.apiDanhSachTuChua.mockResolvedValue(bat(ds))
+    await taiTuSuaLoi('tk', { moi: true })
+    return { onChua, ...render(<TheMoiTuSua so={bat(ds).dem.can} token="tk" onChua={onChua} />) }
+  }
+
+  it('có câu gần xong ⇒ "2 câu chỉ còn làm bản mới là xong", nút "Làm bản mới" mở THẲNG câu đó', async () => {
+    dangNhap()
+    const { onChua } = await ve(DANH_SACH)
+    const the = await screen.findByRole('region', { name: /câu chỉ còn làm bản mới là xong/ })
+    expect(the.textContent).toContain('2 câu chỉ còn làm bản mới là xong')
+    expect(the.textContent).toContain('0/12 câu')
+    expect(the.querySelectorAll('.vh-nhom')).toHaveLength(3)
+    fireEvent.click(within(the).getByRole('button', { name: /Làm bản mới/ }))
+    expect(onChua).toHaveBeenCalledWith('x0')
+  })
+
+  it('chưa có câu gần xong ⇒ "Hôm nay sửa 12 câu", 3 chặng; còn bao nhiêu câu cho các ngày sau; "Bắt đầu sửa"', async () => {
+    dangNhap()
+    const { onChua } = await ve(mot(30, 'can_chan_doan', 'm'))
+    const the = await screen.findByRole('region', { name: /Hôm nay sửa 12 câu/ })
+    expect(the.textContent).toContain('3 chặng, mỗi chặng 4 câu. Còn 18 câu cho các ngày sau.')
+    fireEvent.click(within(the).getByRole('button', { name: /Bắt đầu sửa/ }))
+    expect(onChua).toHaveBeenCalledWith('m0')
+  })
+
+  it('đã xong phần của vài câu ⇒ nói đúng việc đã làm và nút "Sửa tiếp · chặng k/n"; xong cả ngày ⇒ thẻ xanh + "Sửa thêm 1 chặng"', async () => {
+    dangNhap()
+    const ds = mot(30, 'can_chan_doan', 'm')
+    const { onChua } = await ve(ds)
+    await screen.findByRole('region', { name: /Hôm nay sửa 12 câu/ })
+    cleanup()
+    for (let i = 0; i < 5; i++) ghiXongHomNay(`m-d${i}`)
+    render(<TheMoiTuSua so={30} token="tk" onChua={onChua} />)
+    const dang = await screen.findByRole('region', { name: /xong phần của 5 câu/ })
+    expect(dang.textContent).toContain('Tự sửa lỗi · Chặng 2/3 · còn 3 câu')
+    fireEvent.click(within(dang).getByRole('button', { name: /Sửa tiếp · chặng 2\/3/ }))
+    expect(onChua).toHaveBeenCalledWith('m5')
+    cleanup()
+    for (let i = 5; i < 12; i++) ghiXongHomNay(`m-d${i}`)
+    render(<TheMoiTuSua so={30} token="tk" onChua={onChua} />)
+    const xong = await screen.findByRole('region', { name: /xong phần của 12 câu/ })
+    expect(xong.getAttribute('data-tt')).toBe('xong')
+    expect(xong.textContent).toContain('Còn 18 câu cho các ngày sau.')
+    fireEvent.click(within(xong).getByRole('button', { name: 'Sửa thêm 1 chặng' }))
+    expect(onChua).toHaveBeenLastCalledWith('m12')
+  })
+
+  it('không có phiên đăng nhập ⇒ thẻ CŨ y nguyên (một con số, một nút)', async () => {
+    const { onChua } = await ve(DANH_SACH)
+    const the = await screen.findByRole('region', { name: /câu đang chờ em sửa/ })
+    expect(the.textContent).toContain('Sửa lỗi ngay')
+    fireEvent.click(within(the).getByRole('button'))
+    expect(onChua).toHaveBeenCalledWith()
+  })
+
+  it('chỉ có câu tự làm lại trên câu gốc vẫn có ngày làm được (94% đợt chưa có bài luyện từng bước)', async () => {
+    dangNhap()
+    await ve(mot(40, 'thieu_hoc_lieu', 'g'))
+    expect((await screen.findByRole('region', { name: /Hôm nay sửa 12 câu/ })).textContent).toContain('Còn 28 câu cho các ngày sau')
+  })
+})
+
+describe('Màn Tự sửa lỗi: Việc hôm nay', () => {
+  it('một chặng 4 câu (gần xong trước), chặng sau gọn một dòng, danh sách đầy đủ gập lại, nút chính mở câu kế tiếp', async () => {
+    dangNhap()
+    api.apiDanhSachTuChua.mockResolvedValue(bat(DANH_SACH))
+    const { container } = render(<ManTuChua token="tk" onVe={() => {}} />)
+    expect(await screen.findByRole('heading', { name: 'Việc hôm nay: 12 câu' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Chặng 1/3' })).toBeTruthy()
+    const hang = [...container.querySelectorAll<HTMLElement>('.vh-cau')]
+    expect(hang).toHaveLength(4)
+    expect(hang[0]!.textContent).toContain('Chỉ còn làm bản mới là xong')
+    expect(hang[2]!.textContent).toContain('Đang sửa từng bước')
+    expect(container.querySelector('.vh-sau')!.textContent).toContain('Chặng 2/3 · 4 câu')
+    expect(container.querySelector('.vh-sau')!.textContent).toContain('Chặng 3/3 · 4 câu')
+    // danh sách đầy đủ gập lại: không còn tường cả trăm câu
+    const gap = container.querySelector('details.vh-gap')!
+    expect(gap.hasAttribute('open')).toBe(false)
+    expect(gap.querySelector('summary')!.textContent).toContain('Tất cả câu cần sửa')
+    expect(container.textContent).toContain('Còn 6 câu cho các ngày sau. Em không cần sửa hết hôm nay.')
+    fireEvent.click(screen.getByRole('button', { name: /Bắt đầu sửa/ }))
+    expect(await screen.findByText('Đang chữa x0')).toBeTruthy()
+  })
+
+  it('xong chặng 1 ⇒ "Đã xong chặng 1/3" và nút "Sửa tiếp · chặng 2/3"; xong cả ngày ⇒ Về Hôm nay + Sửa thêm 1 chặng', async () => {
+    dangNhap()
+    api.apiDanhSachTuChua.mockResolvedValue(bat(DANH_SACH))
+    for (const k of ['x-d0', 'x-d1', 'k-d0', 'k-d1']) ghiXongHomNay(k)
+    const { container, unmount } = render(<ManTuChua token="tk" onVe={() => {}} />)
+    expect(await screen.findByText('Đã xong chặng 1/3. Nghỉ một chút cũng được.')).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Sửa tiếp · chặng 2\/3/ })).toBeTruthy()
+    expect(container.querySelector('.vh-man h1')!.textContent).toBe('Việc hôm nay: 12 câu')
+    unmount()
+    for (const m of DANH_SACH.filter((x) => x.trangThai !== 'da_tu_sua')) ghiXongHomNay(m.dotId!)
+    const onVe = vi.fn()
+    render(<ManTuChua token="tk" onVe={onVe} />)
+    expect(await screen.findByRole('heading', { name: 'Hôm nay em đã xong phần của 12 câu' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Về Hôm nay' }))
+    expect(onVe).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: 'Sửa thêm 1 chặng' })).toBeTruthy()
+  })
+
+  it('không có SBD ⇒ giao diện danh sách cũ (không việc hôm nay)', async () => {
+    api.apiDanhSachTuChua.mockResolvedValue(bat(DANH_SACH))
+    render(<ManTuChua token="tk" onVe={() => {}} />)
+    expect(await screen.findByRole('region', { name: /Cần sửa: \d+ câu/ })).toBeTruthy()
+    expect(screen.queryByText(/Việc hôm nay/)).toBeNull()
+  })
+
+  it('lỗi tải ⇒ không dựng việc hôm nay, vẫn báo lỗi + Thử lại', async () => {
+    dangNhap()
+    api.apiDanhSachTuChua.mockResolvedValue({ trangThai: 'loi', loi: 'Mạng yếu' })
+    render(<ManTuChua token="tk" onVe={() => {}} />)
+    await waitFor(() => expect(screen.getByText(/Mạng yếu/)).toBeTruthy())
+    expect(screen.queryByText(/Việc hôm nay/)).toBeNull()
+    expect(screen.getByRole('button', { name: 'Thử lại' })).toBeTruthy()
+  })
+})
+
+describe('Một dòng điều kiện ở bản mới', () => {
+  it('lời nói đúng luật tự làm, không hứa mốc giờ, không nhắc 12 giờ', () => {
+    expect(LUAT_BAN_MOI).toBe('Tự làm, không xem gợi ý hay lời giải. Đúng thì câu này tính là đã tự sửa.')
+    expect(LUAT_BAN_MOI).not.toMatch(/12 giờ|24 giờ/)
+  })
+})

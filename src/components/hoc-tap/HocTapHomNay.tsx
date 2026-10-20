@@ -29,7 +29,7 @@ interface Props {
   dangLamMoi?: boolean; nguon?: string; onKetQua?: () => void; onLuyenLai?: () => void; onBangTin?: () => void;
   thongBao?: ReactNode; canhBao?: ReactNode; tienDoCu?: { daLam: number; mucTieu: number };
   ten: string; lop: string; ketQua: KetQuaSanh | null; dangTai: boolean; loi: string
-  onHoc: () => void; onXemLai: () => void; onChua: () => void; onThi: () => void
+  onHoc: () => void; onXemLai: () => void; onChua: (qid?: string) => void; onThi: () => void
   onTuLuyen: () => void; onLichSu: () => void; onBaiTap: () => void; onGiaDinh: () => void
   onTaiLai: () => void; onDangXuat: () => void; coCa: boolean
   /** Số bài tập về nhà thầy đang giao (dòng ở Hôm nay chỉ hiện khi > 0). */
@@ -67,17 +67,13 @@ function Dong({ ten, chu, icon: Icon, hinh, sac, so, donVi, onClick }: { ten: st
 /** Tên mục Tự sửa lỗi (chữ của thầy 13/10) — MỘT tên ở Hôm nay, Ôn & sửa và đầu màn Tự sửa lỗi. */
 export const TEN_TU_SUA = 'Tự sửa lỗi'
 
-/** Thẻ mời Tự sửa lỗi ở Hôm nay: chỉ hiện khi biết chắc còn câu cần sửa (`so` > 0); 0 / chưa có số ⇒ không vẽ gì. */
-export function TheMoiTuSua({ so, onChua }: { so: number | null; onChua: () => void }) {
-  if (!so || so <= 0) return null
-  return <section className="ht2-moi-sua" aria-labelledby="ht2-moi-sua-tieu">
-    <span className="ht2-moi-sua-bt" aria-hidden="true">{hinhTuSua(true)}</span>
-    <div className="ht2-moi-sua-chu">
-      <span className="ht2-moi-sua-nhan">{TEN_TU_SUA}</span>
-      <h2 id="ht2-moi-sua-tieu"><b>{so}</b> câu đang chờ em sửa</h2>
-    </div>
-    <button type="button" className="ht2-moi-sua-nut" onClick={onChua}>Sửa lỗi ngay<ArrowRight size={20} aria-hidden="true" /></button>
-  </section>
+/** Thẻ mời Tự sửa lỗi ở Hôm nay (thầy 20/10: "Hôm nay sửa 12 câu", chia chặng — thay cho một con số lớn làm em nản). Vỏ mỏng: thẻ thật (cả thẻ cũ lẫn việc hôm nay) ở khối NẠP LƯỜI
+ *  `TheMoiTuSua.tsx` (đi cùng khối mã màn Tự sửa lỗi), nạp trước lúc trình duyệt rảnh (cùng lượt nạp Hành trình / Ôn & sửa) ⇒ không thêm byte tải mở app; chưa nạp xong thì chưa vẽ thẻ (như khi chưa có số). Chỉ hiện khi biết chắc còn câu cần sửa. */
+const napTheMoi = () => import('./ManTuChua')
+const TheMoi = lazy(() => napTheMoi().then((m) => ({ default: m.TheMoiTuSua })))
+export function TheMoiTuSua(p: { so: number | null; token?: string; onChua: (qid?: string) => void }) {
+  if (!p.so || p.so <= 0) return null
+  return <Suspense fallback={null}><TheMoi {...p} /></Suspense>
 }
 
 export default function HocTapHomNay(p: Props) {
@@ -123,7 +119,7 @@ export default function HocTapHomNay(p: Props) {
   useEffect(() => {
     if (!coSanh) return
     const w = window as Window & { requestIdleCallback?: (f: () => void) => number; cancelIdleCallback?: (id: number) => void }
-    const nap = () => { void napHanhTrinhOnSua().catch(() => {}) }
+    const nap = () => { void napHanhTrinhOnSua().catch(() => {}); void napTheMoi().catch(() => {}) }
     if (w.requestIdleCallback) { const id = w.requestIdleCallback(nap); return () => w.cancelIdleCallback?.(id) }
     const id = window.setTimeout(nap, 1500); return () => window.clearTimeout(id)
   }, [coSanh])
@@ -158,7 +154,7 @@ export default function HocTapHomNay(p: Props) {
             viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
             onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
           {kiem&&!kiemHomNay&&<Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
-          <TheMoiTuSua so={soSua} onChua={p.onChua} />
+          <TheMoiTuSua so={soSua} token={p.token} onChua={p.onChua} />
           {goi7 && <TheGoi7 du={goi7} />}
           {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>}
           {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>}
