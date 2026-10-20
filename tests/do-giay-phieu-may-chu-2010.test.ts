@@ -247,6 +247,21 @@ describe('(d) hàm thuần của máy chủ', () => {
     expect(ra[2]).toBe(ds[2]) // giây 0 ⇒ bỏ cả cụm, lời khai t bị bỏ
   })
 
+  it('câu cầm trong tay mà đếm ra 0 từ (thiếu trường chữ) ⇒ chỉ ghi giây, KHÔNG ghi raw.doc 0 từ', () => {
+    const m = docDoGiayNhieu({ doGiay: { a: { g: 12 }, b: { g: 9 } } })
+    const ra = ganDoGiay([sk('a'), sk('b')], m, new Map([['a', { phan: 'I', text: '', choices: [] }], ['b', cauKhoDangGoc({ phan: 'III', so: 3, dap_an: '1' })]]))
+    expect(ra.map((x) => [x.qid, x.giay, x.raw])).toEqual([['a', 12, undefined], ['b', 9, undefined]])
+  })
+
+  it('tờ kho thiếu chữ đề (như vài tờ cũ): nộp vẫn ghi giây, raw_json NULL — không đoán', async () => {
+    const d = taoD1That()
+    d.objects.set('kho/DE9.json', { ma_de: 'DE9', cau: [{ phan: 'III', so: 1, dap_an: '1', chuyen_de: 'Este', muc_do: 'biet' }] })
+    d.sql.prepare('INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc) VALUES(?,?,?,?,?,?,0,?)').run('B9', 'CA1', 'DE9', 1, NOP_LUC, HAN_XA, NOP_LUC)
+    d.sql.prepare('INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES(?,?,?,?)').run('B9|S1', 'B9', 'S1', 'Em Một')
+    await nopKhacPhuc(d.env, { ma: 'B9', sbd: 'S1', dapAn: { 'DE9-III-1': '1' }, doGiay: { 'DE9-III-1': { g: 18 } } })
+    expect(so(d, "nguon='btvn'").map((x) => [x.qid, x.giay, x.raw_json])).toEqual([['DE9-III-1', 18, null]])
+  })
+
   it('cauKhoDangGoc / cauLuyenDangGoc: đổi khuôn kho / phiếu về khuôn đo từ; ảnh lời giải không phải đề', () => {
     expect(cauKhoDangGoc(KHO.cau[0] as never)).toMatchObject({ phan: 'I', text: 'Chất nào sau đây là ester?', choices: ['CH3COOCH3', 'HCOOH', 'C2H5OH', 'CH3CHO'], hinhAnh: [] })
     expect(cauKhoDangGoc(KHO.cau[2] as never).hinhAnh).toHaveLength(1)
@@ -258,5 +273,6 @@ describe('(d) hàm thuần của máy chủ', () => {
       hinhAnh: [{ viTri: 'trong_de' }],
     })
     expect(cauLuyenDangGoc({ phan: 'III', text: 'đề', luaChon: null } as never)).not.toHaveProperty('choices')
+    expect(cauKhoDangGoc({ phan: 'I', so: 2, text: 'đề cũ', choices: ['a', 'b', 'c', 'd'] })).toMatchObject({ text: 'đề cũ', choices: ['a', 'b', 'c', 'd'] }) // tờ kho đời cũ
   })
 })

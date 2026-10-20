@@ -62,7 +62,9 @@ export function ganDoGiay(ds: SuKien[], doGiay?: ReadonlyMap<string, DoLuot> | n
     if (!g || g.giay === null) return e
     const q = cauGoc?.get(e.qid)
     const sach: DoLuot = { giay: g.giay, tu: null, hinh: null, phan: null }
-    return { ...e, ...phanSoCuaDo(q ? boSungKichThuocDe(sach, q.phan, q) : sach, e.raw) }
+    const do_ = q ? boSungKichThuocDe(sach, q.phan, q) : sach
+    // Đề thật không bao giờ có 0 từ: câu cầm trong tay mà đếm ra 0 là câu thiếu trường chữ (khuôn lạ / bị rút gọn) — ghi giây thôi, KHÔNG ghi raw.doc 0 từ (sẽ thành "đọc xong trong 8 giây" sai).
+    return { ...e, ...phanSoCuaDo(do_ && do_.tu !== null && do_.tu > 0 ? do_ : sach, e.raw) }
   })
 }
 
@@ -73,9 +75,9 @@ export function cauKhoDangGoc(c: Hang): Hang {
   const y = c.y && typeof c.y === 'object' ? (c.y as Hang) : {}
   return {
     phan: c.phan,
-    text: chuoi(c.de),
-    choices: ['A', 'B', 'C', 'D'].map((k) => chuoi(pa[k])),
-    ideas: ['a', 'b', 'c', 'd'].map((k) => chuoi(y[k])),
+    text: chuoi(c.de ?? c.text), // tờ kho đời cũ (phanI/phanII/phanIII) có thể ghi khuôn text / choices / ideas
+    choices: c.pa ? ['A', 'B', 'C', 'D'].map((k) => chuoi(pa[k])) : Array.isArray(c.choices) ? c.choices : [],
+    ideas: c.y ? ['a', 'b', 'c', 'd'].map((k) => chuoi(y[k])) : Array.isArray(c.ideas) ? c.ideas : [],
     table: c.bang,
     hinhAnh: (Array.isArray(c.hinh) ? (c.hinh as Hang[]) : []).filter((h) => h && h.vi_tri !== 'sau_loi_giai'),
   }
