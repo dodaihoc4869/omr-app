@@ -163,8 +163,8 @@ h1.chao{font-size:26px;line-height:1.25;font-weight:800;letter-spacing:-.01em;ma
 .tien .so-lon{display:flex;align-items:baseline;gap:8px}
 .tien .so-lon b{font-size:44px;line-height:1;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .tien .so-lon span{font-size:15px;color:var(--nhat)}
-.tuan{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:64px}
-.tuan div{display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;height:100%}
+.tuan{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:84px}
+.tuan div{display:flex;flex-direction:column;align-items:center;gap:3px;justify-content:flex-end;height:100%}.tuan b{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
 .tuan i{display:block;width:100%;max-width:28px;border-radius:6px 6px 3px 3px;background:var(--xanh);min-height:4px}
 .tuan i[data-0]{background:var(--the-2);border:1px solid var(--vien-dam);height:4px}
 .tuan small{font-size:12px;color:var(--nhat)}
@@ -281,8 +281,8 @@ h2.muc{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
 <template id="the-moi">
  <section class="moi" aria-labelledby="m1">
   <span class="bt"><svg viewBox="0 0 64 64" class="bt64" data-sac="sua" aria-hidden="true"><use href="#bt-sua"/></svg></span>
-  <div class="chu"><span class="nhan">Tự sửa lỗi</span><h2 id="m1">Hôm nay sửa <b>3</b> câu</h2><p class="phu">Cùng dạng Cân bằng phản ứng oxi hóa – khử. Còn 152 câu cho các ngày sau.</p></div>
-  <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã sửa 0 trong 3 câu"><i data-tt="nay"></i><i></i><i></i></div><b class="so">0/3 câu</b></div>
+  <div class="chu"><span class="nhan">Tự sửa lỗi</span><h2 id="m1">Hôm nay sửa <b>3</b> câu</h2><p class="phu">Còn 152 câu cho các ngày sau.</p></div>
+  <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã xong phần của 0 trong 3 câu"><i data-tt="nay"></i><i></i><i></i></div><b class="so">0/3 câu</b></div>
   <button class="nut-vien" type="button">Bắt đầu sửa<svg width="20" height="20"><use href="#i-mui"/></svg></button>
  </section>
 </template>
@@ -290,23 +290,23 @@ h2.muc{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
  <section class="moi" aria-labelledby="m2">
   <span class="bt"><svg viewBox="0 0 64 64" class="bt64" data-sac="sua" aria-hidden="true"><use href="#bt-sua"/></svg></span>
   <div class="chu"><span class="nhan">Tự sửa lỗi</span><h2 id="m2"><b>2</b> câu chỉ còn làm bản mới là xong</h2><p class="phu">Bản mới đã mở. Em tự làm, không xem gợi ý hay lời giải.</p></div>
-  <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã sửa 0 trong 3 câu"><i data-tt="nay"></i><i></i><i></i></div><b class="so">0/3 câu</b></div>
+  <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã xong phần của 0 trong 3 câu"><i data-tt="nay"></i><i></i><i></i></div><b class="so">0/3 câu</b></div>
   <button class="nut-vien" type="button">Làm bản mới<svg width="20" height="20"><use href="#i-mui"/></svg></button>
  </section>
 </template>
 <template id="the-dang">
  <section class="moi" aria-labelledby="m3">
   <span class="bt"><svg viewBox="0 0 64 64" class="bt64" data-sac="sua" aria-hidden="true"><use href="#bt-sua"/></svg></span>
-  <div class="chu"><span class="nhan">Tự sửa lỗi</span><h2 id="m3">Hôm nay đã sửa xong <b>1</b> câu</h2><p class="phu">Câu 2 · Cân bằng phản ứng oxi hóa – khử · đang ở bước 2/3.</p></div>
-  <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã sửa 1 trong 3 câu"><i data-tt="xong"></i><i data-tt="nay"></i><i></i></div><b class="so">1/3 câu</b></div>
-  <button class="nut-vien" type="button">Sửa tiếp câu 2<svg width="20" height="20"><use href="#i-mui"/></svg></button>
+  <div class="chu"><span class="nhan">Tự sửa lỗi</span><h2 id="m3">Hôm nay em đã xong phần của <b>2</b> câu</h2><p class="phu">Còn bản mới của câu 3 đang chờ em.</p></div>
+  <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã xong phần của 2 trong 3 câu"><i data-tt="xong"></i><i data-tt="xong"></i><i data-tt="nay"></i></div><b class="so">2/3 câu</b></div>
+  <button class="nut-vien" type="button">Làm bản mới câu 3<svg width="20" height="20"><use href="#i-mui"/></svg></button>
  </section>
 </template>
 <template id="the-xong">
  <section class="moi" data-tt="xong" aria-labelledby="m4">
   <span class="bt"><svg viewBox="0 0 64 64" class="bt64" data-sac="xanh" aria-hidden="true"><use href="#bt-xong"/></svg></span>
-  <div class="chu"><span class="nhan">Tự sửa lỗi</span><h2 id="m4">Hôm nay em đã sửa xong <b>3</b> câu</h2><p class="phu">Còn 149 câu cho các ngày sau. Em nghỉ cũng được, sửa thêm cũng được.</p></div>
-  <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã sửa 3 trong 3 câu"><i data-tt="xong"></i><i data-tt="xong"></i><i data-tt="xong"></i></div><b class="so">3/3 câu</b></div>
+  <div class="chu"><span class="nhan">Tự sửa lỗi</span><h2 id="m4">Hôm nay em đã xong phần của <b>3</b> câu</h2><p class="phu">Bản mới của 1 câu mở lúc 17:40 · Thứ Tư 21/10/2026. Còn 152 câu cho các ngày sau.</p></div>
+  <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã xong phần của 3 trong 3 câu"><i data-tt="xong"></i><i data-tt="xong"></i><i data-tt="xong"></i></div><b class="so">3/3 câu</b></div>
   <button class="nut-chu" type="button">Sửa thêm 1 câu</button>
  </section>
 </template>
@@ -326,8 +326,8 @@ h2.muc{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
  <div class="cot bang">
   <div><span class="ghi">1 · Có việc, chưa làm</span><div data-the="moi"></div></div>
   <div><span class="ghi">2 · Có câu chỉ còn làm bản mới (gần xong nên đứng đầu)</span><div data-the="gan"></div></div>
-  <div><span class="ghi">3 · Đang làm dở</span><div data-the="dang"></div></div>
-  <div><span class="ghi">4 · Xong phần hôm nay</span><div data-the="xong"></div></div>
+  <div><span class="ghi">3 · Đã xong phần của 2 câu, còn 1</span><div data-the="dang"></div></div>
+  <div><span class="ghi">4 · Xong phần hôm nay (nghỉ cũng được, sửa thêm cũng được)</span><div data-the="xong"></div></div>
   <p class="ghi-chu-khung">Không còn câu nào cần sửa ⇒ không vẽ thẻ (như hiện tại).</p>
  </div>
 </template>
@@ -338,14 +338,10 @@ h2.muc{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
   <div style="display:grid;gap:16px;min-width:0">
    <div class="dau-man"><button class="lui" type="button" aria-label="Về Hôm nay"><svg width="22" height="22"><use href="#i-lui"/></svg></button><h1 class="tieu">Tự sửa lỗi</h1></div>
    <section class="hom-nay" aria-labelledby="hn">
-    <div class="dau"><span class="bt"><svg viewBox="0 0 64 64" class="bt64" data-sac="sua" aria-hidden="true"><use href="#bt-sua"/></svg></span><div><h2 id="hn">Việc hôm nay: 3 câu</h2><p class="phu">Cùng dạng Cân bằng phản ứng oxi hóa – khử.</p></div></div>
-    <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã sửa 1 trong 3 câu"><i data-tt="xong"></i><i data-tt="nay"></i><i></i></div><b class="so">1/3 câu</b></div>
-    <ul class="ds">
-     <li><button class="cau" data-tt="xong" type="button"><span><span class="ten">Câu 1 · Trắc nghiệm</span><br><span class="phu2">Sai lần gần nhất 12/10 · Kiểm tra ôn tập</span><br><span class="tt">Đã tự sửa hôm nay lúc 08:12</span></span><span class="xanh-dau"><svg width="14" height="14"><use href="#i-dung"/></svg></span></button></li>
-     <li><button class="cau" data-tt="gan" type="button"><span><span class="ten">Câu 2 · Đúng–sai</span><br><span class="phu2">Sai lần gần nhất 14/10 · Bài tập về nhà</span><br><span class="tt">Chỉ còn làm bản mới là xong</span><br><span class="cham4" aria-label="Đã qua 2 trong 4 chặng"><i data-tt="xong"></i><i data-tt="xong"></i><i data-tt="nay"></i><i></i></span></span><span class="mui"><svg width="22" height="22"><use href="#i-chev"/></svg></span></button></li>
-     <li><button class="cau" type="button"><span><span class="ten">Câu 3 · Trả lời ngắn</span><br><span class="phu2">Sai lần gần nhất 15/10 · Ôn lại</span><br><span class="tt">Đang sửa từng bước · bước 2/3</span><br><span class="cham4" aria-label="Đang ở chặng 1 trong 4 chặng"><i data-tt="nay"></i><i></i><i></i><i></i></span></span><span class="mui"><svg width="22" height="22"><use href="#i-chev"/></svg></span></button></li>
-    </ul>
-    <button class="nut-chinh" type="button">Làm bản mới · câu 2/3<svg width="20" height="20"><use href="#i-mui"/></svg></button>
+    <div class="dau"><span class="bt"><svg viewBox="0 0 64 64" class="bt64" data-sac="sua" aria-hidden="true"><use href="#bt-sua"/></svg></span><div><h2 id="hn">Việc hôm nay: 3 câu</h2><p class="phu">Làm xong phần này là đủ cho hôm nay.</p></div></div>
+    <div class="hang-o3"><div class="o3" role="img" aria-label="Hôm nay đã xong phần của 2 trong 3 câu"><i data-tt="xong"></i><i data-tt="xong"></i><i data-tt="nay"></i></div><b class="so">2/3 câu</b></div>
+    <ul class="ds"><li><button class="cau" data-tt="xong" type="button"><span><span class="ten">Câu 1 · Đúng–sai</span><br><span class="phu2">Sai lần gần nhất 14/10 · Bài tập về nhà</span><br><span class="tt">Đã tự sửa hôm nay lúc 17:52</span></span><span class="xanh-dau"><svg width="14" height="14"><use href="#i-dung"/></svg></span></button></li><li><button class="cau" data-tt="xong" type="button"><span><span class="ten">Câu 2 · Trả lời ngắn</span><br><span class="phu2">Sai lần gần nhất 15/10 · Ôn lại</span><br><span class="tt">Đã ghép xong cả bài · bản mới mở 17:40 · Thứ Tư 21/10/2026</span><br><span class="cham4" aria-label="Đường sửa 4 chặng"><i data-tt="xong"></i><i data-tt="xong"></i><i data-tt="nay"></i><i></i></span></span><span class="xanh-dau"><svg width="14" height="14"><use href="#i-dung"/></svg></span></button></li><li><button class="cau" data-tt="gan" type="button"><span><span class="ten">Câu 3 · Trắc nghiệm</span><br><span class="phu2">Sai lần gần nhất 12/10 · Kiểm tra ôn tập</span><br><span class="tt">Chỉ còn làm bản mới là xong</span><br><span class="cham4" aria-label="Đường sửa 4 chặng"><i data-tt="xong"></i><i data-tt="xong"></i><i data-tt="nay"></i><i></i></span></span><span class="mui"><svg width="22" height="22"><use href="#i-chev"/></svg></span></button></li></ul>
+    <button class="nut-chinh" type="button">Làm bản mới · câu 3/3<svg width="20" height="20"><use href="#i-mui"/></svg></button>
    </section>
    <p class="chu-nho" style="padding:0 4px">Còn 152 câu cho các ngày sau. Em không cần sửa hết hôm nay.</p>
    <button class="nhom-hang" type="button"><b>Xem theo dạng</b><span class="ben">9 dạng<svg width="20" height="20"><use href="#i-chev"/></svg></span></button>
@@ -355,12 +351,10 @@ h2.muc{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
   <aside class="the tien" aria-label="Tiến độ của em">
    <p class="nhan">Em đã tự sửa</p>
    <p class="so-lon"><b>50</b><span>câu từng sai</span></p>
-   <div class="thanh-dang" role="img" aria-label="Đã tự sửa 50 trong 205 câu từng sai"><i class="da" style="width:24.4%"></i></div>
-   <p class="chu-nho">50 trên 205 câu từng sai đã sửa xong. Phần còn lại là 155 câu.</p>
-   <p class="nhan" style="margin-top:6px">7 ngày gần đây · 9 câu</p>
-   <div class="tuan" role="img" aria-label="Số câu tự sửa xong mỗi ngày trong 7 ngày gần đây">
-    <div><i data-0></i><small>T4</small></div><div><i style="height:30%"></i><small>T5</small></div><div><i style="height:55%"></i><small>T6</small></div><div><i data-0></i><small>T7</small></div><div><i style="height:80%"></i><small>CN</small></div><div><i style="height:30%"></i><small>T2</small></div><div data-nay><i style="height:30%"></i><small>T3</small></div>
-   </div>
+   <div class="thanh-dang" role="img" aria-label="Đã tự sửa 50 trong 208 câu từng sai"><i class="da" style="width:24%"></i></div>
+   <p class="chu-nho">50 trên 208 câu từng sai đã sửa xong. Còn 154 câu cần sửa và 4 câu đang chờ lần gặp lại.</p>
+   <p class="nhan" style="margin-top:6px">7 ngày gần đây · 8 câu tự sửa xong</p>
+   <div class="tuan" role="img" aria-label="Số câu tự sửa xong mỗi ngày trong 7 ngày gần đây"><div><b>0</b><i data-0></i><small>T4</small></div><div><b>1</b><i style="height:33%"></i><small>T5</small></div><div><b>2</b><i style="height:66%"></i><small>T6</small></div><div><b>0</b><i data-0></i><small>T7</small></div><div><b>3</b><i style="height:100%"></i><small>CN</small></div><div><b>1</b><i style="height:33%"></i><small>T2</small></div><div data-nay><b>1</b><i style="height:33%"></i><small>T3</small></div></div>
   </aside>
  </div>
 </template>
@@ -380,10 +374,10 @@ h2.muc{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
     <div class="pa" role="radiogroup" aria-label="Phương án"><label><b>A</b>7</label><label data-chon><b>B</b>8</label><label><b>C</b>9</label><label><b>D</b>10</label></div>
    </section>
   </div>
-  <aside class="the tien" aria-label="Vì sao có bản mới">
-   <p class="nhan">Bản mới mở sau khi em ghép xong bài</p>
-   <p style="font-size:16px;line-height:1.55">Em ghép xong bài lúc 17:40 · Thứ Hai 19/10/2026. Bản mới mở lúc 17:40 · Thứ Ba 20/10/2026, sau đủ 24 giờ.</p>
-   <p class="chu-nho">Câu này là bản khác của câu em từng sai. Đúng ở đây là em tự làm được, không chỉ nhớ đáp án.</p>
+  <aside class="the tien" aria-label="Giờ mở bản mới">
+   <p class="nhan">Bản mới mở lúc</p>
+   <p style="font-size:18px;font-weight:700;line-height:1.4">17:40 · Thứ Ba 20/10/2026</p>
+   <p class="chu-nho">Em ghép xong bài lúc 17:40 · Thứ Hai 19/10/2026.</p>
   </aside>
  </div>
  <div class="thanh-nop"><div class="cot"><button class="nut-chinh" type="button">Nộp bản mới</button></div></div>
@@ -408,9 +402,10 @@ h2.muc{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
    </section>
   </div>
   <aside style="display:grid;gap:16px;min-width:0">
-   <section class="the tien"><p class="nhan">Dạng Cân bằng phản ứng oxi hóa – khử</p><p class="so-lon"><b>10</b><span>trên 34 câu từng sai đã sửa xong</span></p><div class="thanh-dang" role="img" aria-label="Đã sửa 10 trong 34 câu của dạng này"><i class="da" style="width:26.5%"></i><i class="vua" style="width:2.9%"></i></div><p class="chu-nho">Câu vừa xong là câu thứ 10. Còn 24 câu của dạng này.</p></section>
+   <section class="the tien"><p class="nhan">Dạng Cân bằng phản ứng oxi hóa – khử</p><p class="so-lon"><b>10</b><span>trên 33 câu từng sai đã sửa xong</span></p><div class="thanh-dang" role="img" aria-label="Đã sửa 10 trong 33 câu của dạng này"><i class="da" style="width:27.3%"></i><i class="vua" style="width:3%"></i></div><p class="chu-nho">Câu vừa xong là câu thứ 10 của dạng này. Còn 23 câu.</p></section>
+   <section class="the tien"><p class="nhan">Hôm nay</p><p style="font-size:18px;font-weight:700;line-height:1.4">Em đã xong phần của 3 câu</p><div class="o3" role="img" aria-label="Hôm nay đã xong phần của 3 trong 3 câu"><i data-tt="xong"></i><i data-tt="xong"></i><i data-tt="xong"></i></div></section>
    <p class="chu-nho" style="padding:0 4px">Lịch ôn chung sẽ kiểm tra tiếp ở những ngày khác để xác nhận em nhớ lâu.</p>
-   <div class="hang-nut"><button class="nut-chinh" type="button">Sửa câu 3/3 hôm nay<svg width="20" height="20"><use href="#i-mui"/></svg></button><button class="nut-vien" type="button" style="border-color:var(--vien-dam)">Về danh sách</button></div>
+   <div class="hang-nut"><button class="nut-chinh" type="button">Về Hôm nay</button><button class="nut-vien" type="button" style="border-color:var(--vien-dam)">Sửa thêm 1 câu</button></div>
   </aside>
  </div>
 </template>
@@ -419,18 +414,8 @@ h2.muc{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
 <template id="k-theo-dang" data-nav="on-sua">
  <div class="cot">
   <div class="dau-man"><button class="lui" type="button" aria-label="Về Tự sửa lỗi"><svg width="22" height="22"><use href="#i-lui"/></svg></button><h1 class="tieu">Sửa theo dạng</h1></div>
-  <section class="the tien" aria-labelledby="dh"><p class="nhan" id="dh">Dạng em đang luyện thêm</p><p class="so-lon"><b>9</b><span>dạng · đã sửa 50 trên 205 câu từng sai</span></p></section>
-  <ul class="luoi">
-   <li><button class="dang" data-nay type="button"><span class="gan">Dạng em đang sửa hôm nay</span><span class="d1"><b>Cân bằng phản ứng oxi hóa – khử</b><span>9/33 câu</span></span><span class="thanh-dang"><i class="da" style="width:27.3%"></i></span><span class="d2"><span>Đã sửa 9 câu</span><span>Còn 24 câu</span></span></button></li>
-   <li><button class="dang" type="button"><span class="d1"><b>Este – lipit</b><span>6/37 câu</span></span><span class="thanh-dang"><i class="da" style="width:16.2%"></i></span><span class="d2"><span>Đã sửa 6 câu</span><span>Còn 31 câu</span></span></button></li>
-   <li><button class="dang" type="button"><span class="d1"><b>Điện phân dung dịch</b><span>3/25 câu</span></span><span class="thanh-dang"><i class="da" style="width:12%"></i></span><span class="d2"><span>Đã sửa 3 câu</span><span>Còn 22 câu</span></span></button></li>
-   <li><button class="dang" type="button"><span class="d1"><b>Amino axit – peptit</b><span>5/24 câu</span></span><span class="thanh-dang"><i class="da" style="width:20.8%"></i></span><span class="d2"><span>Đã sửa 5 câu</span><span>Còn 19 câu</span></span></button></li>
-   <li><button class="dang" type="button"><span class="d1"><b>Ăn mòn điện hóa</b><span>8/25 câu</span></span><span class="thanh-dang"><i class="da" style="width:32%"></i></span><span class="d2"><span>Đã sửa 8 câu</span><span>Còn 17 câu</span></span></button></li>
-   <li><button class="dang" type="button"><span class="d1"><b>Tính pH dung dịch</b><span>4/19 câu</span></span><span class="thanh-dang"><i class="da" style="width:21%"></i></span><span class="d2"><span>Đã sửa 4 câu</span><span>Còn 15 câu</span></span></button></li>
-   <li><button class="dang" type="button"><span class="d1"><b>Kim loại tác dụng với axit</b><span>6/18 câu</span></span><span class="thanh-dang"><i class="da" style="width:33.3%"></i></span><span class="d2"><span>Đã sửa 6 câu</span><span>Còn 12 câu</span></span></button></li>
-   <li><button class="dang" type="button"><span class="d1"><b>Đồng phân – danh pháp</b><span>2/12 câu</span></span><span class="thanh-dang"><i class="da" style="width:16.7%"></i></span><span class="d2"><span>Đã sửa 2 câu</span><span>Còn 10 câu</span></span></button></li>
-   <li><button class="dang" type="button"><span class="d1"><b>Polime</b><span>7/12 câu</span></span><span class="thanh-dang"><i class="da" style="width:58.3%"></i></span><span class="d2"><span>Đã sửa 7 câu</span><span>Còn 5 câu</span></span></button></li>
-  </ul>
+  <section class="the tien" aria-labelledby="dh"><p class="nhan" id="dh">Dạng em đang luyện thêm</p><p class="so-lon"><b>9</b><span>dạng · đã sửa 50 trên 208 câu từng sai</span></p></section>
+  <ul class="luoi"><li><button class="dang" type="button"><span class="d1"><b>Este – lipit</b><span>6/36 câu</span></span><span class="thanh-dang"><i class="da" style="width:16.7%"></i></span><span class="d2"><span>Đã sửa 6 câu</span><span>Còn 30 câu</span></span></button></li><li><button class="dang" type="button"><span class="d1"><b>Cân bằng phản ứng oxi hóa – khử</b><span>9/33 câu</span></span><span class="thanh-dang"><i class="da" style="width:27.3%"></i></span><span class="d2"><span>Đã sửa 9 câu</span><span>Còn 24 câu</span></span></button></li><li><button class="dang" type="button"><span class="d1"><b>Điện phân dung dịch</b><span>3/25 câu</span></span><span class="thanh-dang"><i class="da" style="width:12.0%"></i></span><span class="d2"><span>Đã sửa 3 câu</span><span>Còn 22 câu</span></span></button></li><li><button class="dang" type="button"><span class="d1"><b>Amino axit – peptit</b><span>5/24 câu</span></span><span class="thanh-dang"><i class="da" style="width:20.8%"></i></span><span class="d2"><span>Đã sửa 5 câu</span><span>Còn 19 câu</span></span></button></li><li><button class="dang" type="button"><span class="d1"><b>Ăn mòn điện hóa</b><span>8/25 câu</span></span><span class="thanh-dang"><i class="da" style="width:32.0%"></i></span><span class="d2"><span>Đã sửa 8 câu</span><span>Còn 17 câu</span></span></button></li><li><button class="dang" type="button"><span class="d1"><b>Tính pH dung dịch</b><span>4/19 câu</span></span><span class="thanh-dang"><i class="da" style="width:21.1%"></i></span><span class="d2"><span>Đã sửa 4 câu</span><span>Còn 15 câu</span></span></button></li><li><button class="dang" type="button"><span class="d1"><b>Kim loại tác dụng với axit</b><span>6/18 câu</span></span><span class="thanh-dang"><i class="da" style="width:33.3%"></i></span><span class="d2"><span>Đã sửa 6 câu</span><span>Còn 12 câu</span></span></button></li><li><button class="dang" type="button"><span class="d1"><b>Đồng phân – danh pháp</b><span>2/12 câu</span></span><span class="thanh-dang"><i class="da" style="width:16.7%"></i></span><span class="d2"><span>Đã sửa 2 câu</span><span>Còn 10 câu</span></span></button></li><li><button class="dang" type="button"><span class="d1"><b>Polime</b><span>7/16 câu</span></span><span class="thanh-dang"><i class="da" style="width:43.8%"></i></span><span class="d2"><span>Đã sửa 7 câu</span><span>Còn 9 câu</span></span></button></li></ul>
   <p class="chu-nho" style="padding:0 4px">Mỗi dạng ghi số câu em đã sửa xong trên số câu em từng sai ở dạng đó.</p>
  </div>
 </template>
