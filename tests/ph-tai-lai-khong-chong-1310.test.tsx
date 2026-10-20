@@ -41,3 +41,38 @@ describe('báo cáo phụ huynh: tải lại không tạo lượt đọc chồng
     expect(result.current.dangLamMoi).toBe(false)
   })
 })
+
+describe('báo cáo phụ huynh: có mạng lại thì đọc ngay', () => {
+  it('lỗi lần đầu rồi có mạng: sự kiện online đọc lại ngay, dội liên tiếp vẫn chỉ một lượt (chặn dội 20 giây)', async () => {
+    vi.useFakeTimers()
+    vi.spyOn(Math, 'random').mockReturnValue(0.5)
+    const api = vi.fn().mockResolvedValueOnce({ kieu: 'loi', chu: 'Mất mạng' }).mockResolvedValue({ kieu: 'ok', pm })
+    const { result } = renderHook(() => useTatCaVeCon('A', api))
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(api).toHaveBeenCalledTimes(1)
+    expect(result.current.trangThai).toBe('loi')
+    // Chưa qua 20 giây từ lượt trước: online bị chặn dội, không gọi thêm.
+    await act(async () => { window.dispatchEvent(new Event('online')); await vi.advanceTimersByTimeAsync(5000) })
+    expect(api).toHaveBeenCalledTimes(1)
+    // Qua 20 giây (nhịp lùi mới hẹn ≥ 30 s, nhịp nền 180 s): online đọc lại ngay.
+    await act(async () => { await vi.advanceTimersByTimeAsync(20_000) })
+    expect(api).toHaveBeenCalledTimes(1)
+    await act(async () => { window.dispatchEvent(new Event('online')); window.dispatchEvent(new Event('online')); await vi.advanceTimersByTimeAsync(0) })
+    expect(api).toHaveBeenCalledTimes(2)
+    expect(result.current.pm).toBe(pm)
+    expect(result.current.trangThai).toBe('ok')
+  })
+
+  it('gỡ máy nghe online khi hook tháo: online sau đó không gọi thêm', async () => {
+    vi.useFakeTimers()
+    vi.spyOn(Math, 'random').mockReturnValue(0.5)
+    const api = vi.fn().mockResolvedValue({ kieu: 'ok', pm })
+    const { unmount } = renderHook(() => useTatCaVeCon('A', api))
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    unmount()
+    await act(async () => { await vi.advanceTimersByTimeAsync(60_000) })
+    window.dispatchEvent(new Event('online'))
+    await vi.advanceTimersByTimeAsync(0)
+    expect(api).toHaveBeenCalledTimes(1)
+  })
+})

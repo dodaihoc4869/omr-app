@@ -64,10 +64,13 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
       if (document.visibilityState === 'visible') nhip.kich()
     }
     document.addEventListener('visibilitychange', khiHien)
+    // Có mạng lại sau lỗi (thang máy, vùng sóng yếu): đọc ngay thay vì chờ nhịp lùi 30–300 s. Đi qua `kich()` nên vẫn chặn dội ≥ 20 s và không chạy chồng lượt đang bay.
+    window.addEventListener('online', khiHien)
     return () => {
       huy = true
       nhip.dung()
       document.removeEventListener('visibilitychange', khiHien)
+      window.removeEventListener('online', khiHien)
     }
   }, [sbd, pass])
   const thuLai = useCallback(() => {
