@@ -1,4 +1,5 @@
 // Hợp đồng chữa lỗi: quyền từ token, ảnh chụp bất biến, CAS và sổ học trong cùng batch.
+import { docDoGiayMot, ghepDocVaoRaw } from './do-giay-luot'
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { coCaDangMo } from './ca-dang-mo'
@@ -693,10 +694,14 @@ export async function nopItem(env: Env, b: Obj): Promise<Response> {
       td?.receiptChuyenGiao,
     ].filter(Boolean),
   }
-  const giay = Math.min(
+  const giayMayChu = Math.min(
     1800,
     Math.max(0, Math.floor((now - num(item.phat_luc)) / 1000)),
   )
+  // 20/10 đo giây: máy em gửi `doGiay` (đồng hồ máy em, dừng khi rời màn / 180 giây không chạm) ⇒ dùng số ấy; vắng ⇒ giờ máy chủ như cũ.
+  // `raw.doc` (kích thước đề) CHỈ ghi khi có giây đo thật của máy em, để một dòng không lẫn giây máy chủ (cộng cả lúc rời màn) với "Mức làm".
+  const dg = docDoGiayMot(b)
+  const giay = dg?.giay ?? giayMayChu
   const cong = 'EXISTS(SELECT 1 FROM chua_loi_nop WHERE id=?)'
   const events = lenhGhiSuKienNguyenTu(
     env,
@@ -718,7 +723,7 @@ export async function nopItem(env: Env, b: Obj): Promise<Response> {
         purpose: ['ghep_bai', 'kiem_chung'].includes(str(item.loai))
           ? 'repair'
           : 'chua_buoc',
-        raw: {
+        raw: ghepDocVaoRaw({
           traLoi: tra,
           ...(['ghep_bai', 'kiem_chung'].includes(str(item.loai))
             ? { tc: dot.qid_chuan }
@@ -734,7 +739,7 @@ export async function nopItem(env: Env, b: Obj): Promise<Response> {
             banTuongDuongDaKiem: p.laTuongDuong,
             probeId: p.qid,
           },
-        },
+        }, dg && dg.giay !== null ? dg : null),
       },
     ],
     { sql: cong, params: [id] },

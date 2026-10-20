@@ -34,9 +34,17 @@ export function lamSachDo(x: unknown): DoLuot | null {
   return { giay, tu, hinh, phan }
 }
 
-/** Lệnh nộp MỘT câu (game, ôn lại, chữa lỗi): thân có `doGiay: {g, t, h, p}`. */
-export function docDoGiayMot(body: unknown): DoLuot | null {
-  return laObj(body) ? lamSachDo(body.doGiay) : null
+/**
+ * Lệnh nộp MỘT câu (game, ôn lại, chữa lỗi): thân có `doGiay: {g, t, h, p}`.
+ * `ms` (tuỳ chọn): số mili-giây cũ của lệnh (game gửi `msLam`) — chỉ dùng khi `doGiay.g` vắng, đổi ra giây (1–900).
+ */
+export function docDoGiayMot(body: unknown, tuy: { ms?: unknown } = {}): DoLuot | null {
+  const d = laObj(body) ? lamSachDo(body.doGiay) : null
+  if (d && d.giay !== null) return d
+  const ms = laSo(tuy.ms) ? Math.round(tuy.ms / 1000) : null
+  const giay = ms !== null && ms >= 1 && ms <= GIAY_LUOT_TOI_DA ? ms : null
+  if (giay === null) return d
+  return { giay, tu: d?.tu ?? null, hinh: d?.hinh ?? null, phan: d?.phan ?? null }
 }
 
 /** Lệnh nộp NHIỀU câu (phiếu BTVN, khắc phục, chặng lô): thân có `doGiay: { [qid]: {g, t, h, p} }`. Tối đa 200 câu. */
