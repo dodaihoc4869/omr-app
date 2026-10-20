@@ -5,7 +5,7 @@ import { LoiChao } from '../components/bat-linh/LoiChao'
 // Tệp này chỉ còn ĐĂNG NHẬP (liên kết riêng ?ph=<pass> hoặc số báo danh của con, như cũ) rồi giao cho `components/ph-v3/AppPhuHuynh` (Hôm nay · Tiến bộ · Ca kiểm tra — bản vẽ tối giản thầy chốt 09/10).
 import { useEffect, useRef, useState } from 'react'
 import { datPassPhuHuynh } from '../lib/mom-api'
-import { docPass, nhanPassTuDiaChi, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
+import { docPass, nhanPassTuDiaChi, tachPass, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
 import { LogoDoc } from '../components/LogoVai'
 import AppPhuHuynh from '../components/ph-v3/AppPhuHuynh'
 import { tenTheoSbd } from '../lib/exam-api'
@@ -26,6 +26,11 @@ export default function ParentPortalScreen() {
   const [dangTai, setDangTai] = useState(false)
   const [thongBaoLoi, setThongBaoLoi] = useState('')
   const luotDangNhap = useRef(0)
+  // Máy đã lưu liên kết / số báo danh (hoặc đang mở bằng liên kết `?ph=`) thì cổng sắp tự vào ngay: KHÔNG tự đặt con trỏ vào ô nhập — trên điện thoại bàn phím bật lên che nửa màn rồi biến mất (21/10).
+  // Ô vẫn hiện và nhập được (đổi con khi liên kết đang xác định vẫn được); chỉ bỏ tự lấy tiêu điểm.
+  const [coPhienLuu] = useState(() => {
+    try { return !!docPass() || !!tachPass(location.search).pass || !!(localStorage.getItem(SBD_STORAGE_KEY) ?? '').trim() } catch { return false }
+  })
 
   useEffect(() => {
     const luot = ++luotDangNhap.current
@@ -156,7 +161,7 @@ export default function ParentPortalScreen() {
                 value={sbdInput}
                 onChange={(e) => setSbdInput(e.target.value)}
                 placeholder="Ví dụ: 12001, 12002…"
-                autoFocus
+                autoFocus={!coPhienLuu}
               />
               {thongBaoLoi && <p className="ph3-vao__loi" role="alert">{thongBaoLoi}</p>}
               <button type="submit" className="m3-nut-chinh ph3-vao__nut" disabled={!sbdInput.trim() || dangTai}>

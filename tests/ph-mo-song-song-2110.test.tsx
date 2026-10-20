@@ -46,3 +46,20 @@ it('không có liên kết: không gọi lệnh xác định, vào bằng số b
   await screen.findByRole('heading', { name: /Con B7/ })
   expect(m.xac).not.toHaveBeenCalled()
 })
+
+it('lần đầu (máy chưa lưu gì): ô số báo danh tự lấy tiêu điểm; máy đã lưu liên kết hoặc số báo danh: KHÔNG (bàn phím không bật rồi tắt)', async () => {
+  m.url.mockImplementation(() => new Promise(() => {})) // giữ ở màn nhập
+  const { unmount } = render(<ParentPortalScreen />)
+  expect(document.activeElement).toBe(screen.getByLabelText('Số báo danh của con'))
+  unmount()
+  localStorage.setItem('omr_ph_pass', 'LIEN-KET-DA-LUU')
+  m.xac.mockImplementation(() => new Promise(() => {}))
+  const r2 = render(<ParentPortalScreen />)
+  expect(document.activeElement).not.toBe(screen.getByLabelText('Số báo danh của con'))
+  expect(screen.getByLabelText('Số báo danh của con')).toBeTruthy() // ô vẫn hiện, nhập được
+  r2.unmount()
+  xoaPass(); localStorage.clear(); localStorage.setItem('omr_ph_sbd', 'B9')
+  render(<ParentPortalScreen />)
+  expect(document.activeElement).not.toBe(screen.getByLabelText('Số báo danh của con'))
+})
+
