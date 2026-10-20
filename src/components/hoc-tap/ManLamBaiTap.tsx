@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Info, Lightbulb, PenLine, RefreshCw, X as XIcon } from 'lucide-react'
 import type { TheCauProps } from '../TheCau'
-import { cumDoGiay, loiGiaiChuanTuKho, useGiayCau } from '../loi-giai/KhoiLoiGiaiChuan'
+import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2, guiLaiKhiKetMang } from '../hoa2/api'
 import { GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc } from './mo-chang-truoc'
 // Hôm nay nạp ĐỘNG đúng mảnh này để mở chặng trước (không sinh thêm tệp nạp / precache; mảnh màn làm bài được nạp sẵn luôn).
@@ -67,8 +67,18 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const batDau = useRef(0), gui = useRef(false), traRef = useRef('')
   const gocRef = useRef<HTMLDivElement>(null), nutTiepRef = useRef<HTMLButtonElement>(null)
   const q = cau[viTri], k = q ? ket[q.qid] : undefined
-  // 20/10 đo giây (thầy: mọi câu đều đo được): đồng hồ máy em, dừng khi tab ẩn / 180 giây không chạm; gửi cùng lượt nộp. `msLam` cũ giữ nguyên cho OMNI.
-  const dongHo = useGiayCau(q?.qid ?? null)
+  // 20/10 đo giây (thầy: mọi câu đều đo được): giây câu đang hiện, CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900; gửi cùng lượt nộp
+  // (`doGiay: {g}`; số từ/hình/phần do máy chủ tự đo). `msLam` cũ giữ nguyên cho OMNI. Viết nội tuyến (không tệp chung): thêm một tệp dùng chung làm tăng
+  // tải mở cả ba app (cổng `kiem:toc-do`) hoặc thêm một chunk (cổng `kiem-sw` đang 170/170). Cùng định nghĩa với màn ôn lại (LamCauOn).
+  const dhMs = useRef(0), dhCham = useRef(Date.now())
+  useEffect(() => { dhMs.current = 0; dhCham.current = Date.now() }, [q?.qid])
+  useEffect(() => {
+    const id = window.setInterval(() => { if (document.visibilityState === 'visible' && Date.now() - dhCham.current <= 180_000) dhMs.current = Math.min(900_000, dhMs.current + 1000) }, 1000)
+    const cham = () => { dhCham.current = Date.now() }
+    const ev = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel']
+    for (const e of ev) window.addEventListener(e, cham, { passive: true, capture: true })
+    return () => { window.clearInterval(id); for (const e of ev) window.removeEventListener(e, cham, { capture: true }) }
+  }, [])
   // 15/10 (em Lê Công: đáp án 10000 chỉ nhập được 1000; thầy: "hiển thị đúng số ô cần điền"): số ô của câu Trả lời ngắn = đúng số kí tự đáp số, máy
   // chủ gửi kèm; thiếu ⇒ 4.
   const soO = soOCuaCau(q), soORef = useRef(soO)
@@ -140,7 +150,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     const msLam = Math.max(0, Date.now() - batDau.current)
     const assisted = !!q.goiY || daHoiThay.current === q.qid
     try {
-      const r = await guiLaiKhiKetMang(() => goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted, msLam, doGiay: cumDoGiay(dongHo.giay(q.qid)) }, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
+      const r = await guiLaiKhiKetMang(() => goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted, msLam, doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000) } : undefined }, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam }))
       // CHẤM THEO ĐÚNG ĐÁP ÁN MÁY CHỦ ĐÃ CHẤM (khẩn 12/10 23h — thầy: "hs làm đúng cả 4 ý nhưng app lại báo sai"): mỗi câu của một đợt chỉ chấm MỘT lần

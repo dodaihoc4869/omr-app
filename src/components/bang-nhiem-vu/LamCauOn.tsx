@@ -12,7 +12,6 @@ import NutHoiThay from '../loi-giai/NutHoiThay'
 import { HinhTaiViTri } from '../QuestionMedia'
 import OSoTraLoi from '../OSoTraLoi'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
-import { cumDoGiay, useGiayNhieuCau } from '../loi-giai/KhoiLoiGiaiChuan'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
 import { SoExpCau, ThanhExpNho, useCheDoHieuUng } from '../exp-cau/ExpCau'
@@ -146,9 +145,39 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     })
   }, [])
 
-  // 20/10 đo giây: nhiều câu cùng hiện ⇒ chỉ cộng cho MỘT câu em đang làm (chạm gần nhất nếu còn hiện ≥ 50%, không thì câu hiện lớn nhất).
+  // 20/10 đo giây (cùng định nghĩa với màn Làm bài tập): CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900 giây một câu.
+  // Nhiều câu cùng hiện ⇒ chỉ cộng cho MỘT câu em đang làm: câu em chạm gần nhất nếu nó còn hiện ≥ 50% trên màn, không thì câu hiện lớn nhất.
+  // Viết nội tuyến (không tệp chung) để không tăng tải mở app và không thêm chunk (cổng `kiem:toc-do`, `kiem-sw`). Chỉ gửi giây; số từ/hình/phần do máy chủ đo.
   const dsRef = useRef<HTMLOListElement>(null)
-  const dongHo = useGiayNhieuCau(dsRef, pha === 'lam')
+  const dhMs = useRef<Record<string, number>>({})
+  const lamCau = pha === 'lam'
+  useEffect(() => {
+    const goc = dsRef.current
+    if (!lamCau || !goc) return
+    const tiLe: Record<string, number> = {}
+    let cham = Date.now(), chamQid = ''
+    const io = typeof IntersectionObserver === 'function'
+      ? new IntersectionObserver((ds) => { for (const e of ds) { const q = (e.target as HTMLElement).dataset.qid; if (q) tiLe[q] = e.isIntersecting ? e.intersectionRatio : 0 } }, { threshold: [0, 0.25, 0.5, 0.75, 1] })
+      : null
+    const xem = () => { if (io) goc.querySelectorAll<HTMLElement>('[data-qid]').forEach((c) => io.observe(c)) }
+    xem()
+    const id = window.setInterval(() => {
+      xem()
+      if (document.visibilityState !== 'visible' || Date.now() - cham > 180_000) return
+      let q = chamQid && (tiLe[chamQid] ?? 0) >= 0.5 ? chamQid : ''
+      if (!q) { let max = 0; for (const k of Object.keys(tiLe)) if (tiLe[k]! > max) { max = tiLe[k]!; q = k } }
+      if (q) dhMs.current[q] = Math.min(900_000, (dhMs.current[q] ?? 0) + 1000)
+    }, 1000)
+    const chamTay = (e: Event) => {
+      cham = Date.now()
+      const c = (e.target as HTMLElement | null)?.closest?.('[data-qid]') as HTMLElement | null
+      if (c?.dataset.qid && goc.contains(c)) chamQid = c.dataset.qid
+    }
+    const ev = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel']
+    for (const e of ev) window.addEventListener(e, chamTay, { passive: true, capture: true })
+    return () => { window.clearInterval(id); io?.disconnect(); for (const e of ev) window.removeEventListener(e, chamTay, { capture: true }) }
+  }, [lamCau])
+  const giayCua = (qid: string) => { const m = dhMs.current[qid] ?? 0; return m >= 1000 ? { g: Math.round(m / 1000) } : undefined }
   const dsChuaCham = useMemo(() => cau.filter((c) => !ketQua[c.qid]), [cau, ketQua])
   const soDaTraLoi = useMemo(() => dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).length, [dsChuaCham, traLoi])
   const soChuaTraLoi = dsChuaCham.length - soDaTraLoi
@@ -157,7 +186,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
   // ─── (3) nộp ───
   const nop = async () => {
     if (dangNop) return
-    const gui = dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).map((c) => ({ qid: c.qid, dapAn: c.phan === 'II' ? chuanDS(traLoi[c.qid]) : (traLoi[c.qid] || '').trim(), doGiay: cumDoGiay(dongHo.giay(c.qid)) }))
+    const gui = dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).map((c) => ({ qid: c.qid, dapAn: c.phan === 'II' ? chuanDS(traLoi[c.qid]) : (traLoi[c.qid] || '').trim(), doGiay: giayCua(c.qid) }))
     if (gui.length === 0) return
     setDangNop(true)
     setLoiNop('')
