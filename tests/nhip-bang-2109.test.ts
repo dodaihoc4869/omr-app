@@ -27,7 +27,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/hooks/useGioHocTap.ts': 1,
   'src/lib/html-may-chieu.ts': 0,
   'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao/kiểm tra cá nhân (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe
-  'src/lib/html-phieu.ts': 1,
+  'src/lib/html-phieu.ts': 2, // 20/10 đo giây: +1 vòng 1 s TRONG trang phiếu (iframe), chỉ cục bộ, không gọi máy chủ; dừng khi tab ẩn / 180 giây không chạm
   'src/lib/thu-tin-hieu.ts': 1,
   'src/lib/to-chieu-cau-noi.ts': 1,
   'src/screens/KhoaAppScreen.tsx': 1,
