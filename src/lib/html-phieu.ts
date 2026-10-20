@@ -1758,6 +1758,181 @@ export function thanhHtml(soCau: number, anGiai = false): string {
 </div>`
 }
 
+/**
+ * BỘ ĐO GIÂY TỪNG CÂU TRONG PHIẾU (thầy 20/10/2026, docs/dac-ta-muc-lam-bai-2010.md mục 4). Chạy TRONG trang phiếu (iframe của KhungXemPhieu),
+ * nên hàm này được in NGUYÊN VĂN vào trang bằng `toString()` (như `docSoPhanIII`): TỰ ĐỦ, không tham chiếu gì ngoài tham số và đối tượng toàn cục,
+ * viết kiểu ES5. Phiếu chỉ gửi GIÂY; số từ / hình / phần của đề do MÁY CHỦ đo từ câu nó chấm.
+ *
+ * Định nghĩa (một cho mọi màn): giây của câu = số lần đồng hồ 1 giây/lần rơi vào lúc
+ *   · tab đang hiện (`visibilityState === 'visible'`), VÀ em đã chạm màn trong 180 giây gần nhất (khoá màn / để quên thì dừng, chạm lại thì chạy tiếp), VÀ
+ *   · câu ấy là MỘT câu "đang làm": câu em tương tác gần nhất (focus / click / input / change, cả chạm vào ô chọn) nếu nó còn hiện đủ trên màn;
+ *     không thì câu hiện lớn nhất. Mỗi nhịp cộng cho ĐÚNG MỘT câu.
+ * "Hiện đủ" = IntersectionObserver báo ≥ 50% câu nằm trong màn, hoặc phần câu nằm trong màn chiếm ≥ 50% chiều cao màn (câu dài hơn hai màn không bao giờ đạt 50% của chính nó).
+ * Câu em tương tác lần cuối mà đã cuộn ra khỏi màn thì KHÔNG giữ quyền ưu tiên (không thì thời gian đọc câu mới bị cộng nhầm vào câu cũ).
+ * Trần 900 giây/câu. Câu chưa có nhịp nào ⇒ KHÔNG có mặt trong kết quả (không gửi 0). Bỏ qua thẻ đã chấm (`da-cham`).
+ * Giây lưu qua `tuy.luu(bảng)` để mở lại phiếu (hoặc dựng lại sau nộp chặng) vẫn cộng dồn; câu ĐÃ có đáp án từ lần mở trước mà không có đồng hồ cũ thì
+ * KHÔNG đo (`khoiPhuc`): giây chỉ của lần mở này sẽ ngắn sai, và "ngắn" chính là tín hiệu "chưa đọc hết đề".
+ * `tuy.bayGio` (tuỳ chọn) thay `Date.now` để test điều khiển giờ.
+ */
+export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
+  var CHAM_MS = 180000
+  var TRAN = 900
+  var cfg = tuy || {}
+  var bayGio = typeof cfg.bayGio === 'function' ? cfg.bayGio : function () { return Date.now() }
+  var co = function (o: any, k: any) { return Object.prototype.hasOwnProperty.call(o, k) }
+  var the: any[] = []
+  var theTheoQid: any = {}
+  var hien: any[] = []
+  var dem: any = {}
+  var boQua: any = {}
+  var daGan: any[] = []
+  var cauCuoi: any = null
+  var cuoiCham = bayGio()
+  var thayDoi = 0
+  var coIO = false
+  var i: number
+  var ds = doc.querySelectorAll('.q-card[data-qid]')
+  for (i = 0; i < ds.length; i++) {
+    the.push(ds[i])
+    theTheoQid[ds[i].getAttribute('data-qid')] = ds[i]
+    hien.push({ ti: 0, cao: 0 })
+  }
+  var caoMan = function () { return win.innerHeight || (doc.documentElement && doc.documentElement.clientHeight) || 0 }
+  var hienDu = function (vt: number) {
+    var h = hien[vt]
+    var cm = caoMan()
+    return h.ti >= 0.5 || (cm > 0 && h.cao >= 0.5 * cm)
+  }
+  var luuNgay = function () {
+    if (thayDoi === 0) return
+    thayDoi = 0
+    if (typeof cfg.luu === 'function') {
+      try { cfg.luu(JSON.parse(JSON.stringify(dem))) } catch (e) { /* không lưu được thì thôi: đồng hồ vẫn chạy trong phiên này */ }
+    }
+  }
+  var gan = function (muc: any, ten: string, ham: any, tuyChon: any) {
+    muc.addEventListener(ten, ham, tuyChon)
+    daGan.push([muc, ten, ham, tuyChon])
+  }
+  var cham = function () { cuoiCham = bayGio() }
+  var theCua = function (t: any) { return t && t.closest ? t.closest('.q-card[data-qid]') : null }
+  var tuongTac = function (e: any) {
+    cham()
+    var c = theCua(e && e.target)
+    if (c) cauCuoi = c
+  }
+  // Cú chạm di động: ô chọn bắt ở `touchend` rồi chặn `click`, nên đánh dấu câu ngay lúc đặt tay xuống ô chọn. Chạm để cuộn trang chỉ tính là "có mặt".
+  var chamNut = function (e: any) {
+    cham()
+    var t = e && e.target
+    if (t && t.closest && t.closest('.lam-o, .lam-nhap, .lam-nut')) {
+      var c = theCua(t)
+      if (c) cauCuoi = c
+    }
+  }
+  var chiCham = function () { cham() }
+  var ev = ['focusin', 'click', 'input', 'change']
+  for (i = 0; i < ev.length; i++) gan(doc, ev[i], tuongTac, true)
+  ev = ['pointerdown', 'touchstart']
+  for (i = 0; i < ev.length; i++) gan(doc, ev[i], chamNut, { capture: true, passive: true })
+  ev = ['keydown', 'wheel', 'scroll']
+  for (i = 0; i < ev.length; i++) gan(doc, ev[i], chiCham, { capture: true, passive: true })
+  gan(doc, 'visibilitychange', function () { if (doc.visibilityState !== 'visible') luuNgay() }, false)
+  if (typeof win.addEventListener === 'function') gan(win, 'pagehide', luuNgay, false)
+
+  var io: any = null
+  if (typeof win.IntersectionObserver === 'function' && the.length > 0) {
+    try {
+      var moc: number[] = []
+      for (i = 0; i <= 10; i++) moc.push(i / 10)
+      io = new win.IntersectionObserver(function (dsE: any) {
+        for (var a = 0; a < dsE.length; a++) {
+          var vt = the.indexOf(dsE[a].target)
+          if (vt >= 0) hien[vt] = { ti: dsE[a].intersectionRatio || 0, cao: dsE[a].intersectionRect ? dsE[a].intersectionRect.height || 0 : 0 }
+        }
+      }, { threshold: moc })
+      for (i = 0; i < the.length; i++) io.observe(the[i])
+      coIO = true
+    } catch (e) {
+      io = null
+      coIO = false
+    }
+  }
+
+  var chonCau = function () {
+    if (cauCuoi && !cauCuoi.classList.contains('da-cham')) {
+      var v = the.indexOf(cauCuoi)
+      if (!coIO || (v >= 0 && hienDu(v))) return cauCuoi
+    }
+    if (!coIO) return null
+    var tot = -1
+    for (var k = 0; k < the.length; k++) {
+      if (the[k].classList.contains('da-cham') || !hienDu(k)) continue
+      if (tot < 0 || hien[k].cao > hien[tot].cao) tot = k
+    }
+    return tot >= 0 ? the[tot] : null
+  }
+  var tick = function () {
+    if (doc.visibilityState !== 'visible') return
+    if (bayGio() - cuoiCham >= CHAM_MS) return
+    var c = chonCau()
+    if (!c) return
+    var q = c.getAttribute('data-qid')
+    if (co(boQua, q)) return
+    var n = co(dem, q) ? dem[q] : 0
+    if (n >= TRAN) return
+    dem[q] = n + 1
+    thayDoi++
+    if (thayDoi >= 10) luuNgay()
+  }
+  var hen = win.setInterval(tick, 1000)
+
+  return {
+    /** Nạp giây đã lưu ở lần mở trước (`daLuu`: {qid: giây}) và đánh dấu câu đã có đáp án mà không có đồng hồ cũ (`qidCoSan`) là KHÔNG ĐO. */
+    khoiPhuc: function (daLuu: any, qidCoSan: any) {
+      if (daLuu && typeof daLuu === 'object') {
+        for (var q in daLuu) {
+          if (!co(daLuu, q) || !co(theTheoQid, q)) continue
+          var n = Math.round(Number(daLuu[q]))
+          if (n > 0) dem[q] = Math.min(TRAN, n)
+        }
+      }
+      var ds2 = qidCoSan || []
+      for (var j = 0; j < ds2.length; j++) if (!co(dem, ds2[j])) boQua[ds2[j]] = true
+    },
+    /** `{qid: {g}}` cho các câu trong `dsQid` (mặc định: mọi câu) có giây đo thật; không câu nào ⇒ null (đừng gửi khoá `doGiay`). */
+    layDoGiay: function (dsQid: any) {
+      var ra: any = {}
+      var nhieu = 0
+      var dsq = dsQid || Object.keys(dem)
+      for (var j = 0; j < dsq.length; j++) {
+        var q = dsq[j]
+        if (!co(dem, q) || co(boQua, q) || !(dem[q] > 0)) continue
+        ra[q] = { g: Math.min(TRAN, Math.round(dem[q])) }
+        nhieu++
+      }
+      return nhieu > 0 ? ra : null
+    },
+    /** Xoá giây của các câu vừa nộp xong (mặc định: tất cả): lượt làm lại là lượt mới, giây riêng. */
+    datLai: function (dsQid: any) {
+      var dsq = dsQid || Object.keys(dem)
+      for (var j = 0; j < dsq.length; j++) if (co(dem, dsq[j])) { delete dem[dsq[j]]; thayDoi++ }
+      luuNgay()
+    },
+    /** Dừng đồng hồ và gỡ mọi bộ nghe (dùng trong test). */
+    dung: function () {
+      win.clearInterval(hen)
+      for (var j = 0; j < daGan.length; j++) daGan[j][0].removeEventListener(daGan[j][1], daGan[j][2], daGan[j][3])
+      daGan = []
+      if (io) io.disconnect()
+    },
+  }
+}
+
+/** Khối script đưa hàm đo giây vào trang phiếu NỘP ĐƯỢC (chỉ khi chỗ gọi khai `nop`; phiếu in / phiếu giáo viên không có một byte nào). Mã của phiếu
+ * (`JS_PHIEU`, chạy sau) lấy hàm ở `window.__taoBoDoGiay`; vắng (trang dựng bởi bản cũ) ⇒ không đo, mọi thứ chạy y như trước. */
+export const DO_GIAY_PHIEU = `<script>window.__taoBoDoGiay=${taoBoDoGiay.toString()};<\/script>`
+
 /** Kịch bản gập mở. Uỷ quyền một chỗ nên thêm bao nhiêu câu cũng không phải
  * gắn thêm bộ nghe; và toàn bộ trang vẫn đọc được nếu trình duyệt tắt JS,
  * chỉ mất phần gập. */
@@ -2169,6 +2344,37 @@ export const JS_PHIEU = `
       // trên đổi từ "còn khoá" sang "hiện hết". Chỉ báo MỘT LẦN mỗi lần mở
       // phiếu (biến daBaoXongLo); báo lại giữa hai lần mở là bình thường, máy
       // chủ tự lọc trùng (chỉ tăng, không lùi tiến độ).
+      // ĐO GIÂY TỪNG CÂU (thầy 20/10, docs/dac-ta-muc-lam-bai-2010.md mục 4): hàm đo do một khối mã riêng của phiếu nộp được đưa vào (window.__taoBoDoGiay).
+      // Phiếu CHỈ gửi giây (doGiay: {qid: {g}}) cùng lúc nộp; số từ / hình / phần của đề do máy chủ tự đo. Giây lưu ở máy cạnh bản nháp để mở lại phiếu vẫn cộng dồn.
+      // Câu đã có đáp án từ lần mở trước mà không có đồng hồ cũ ⇒ KHÔNG đo (giây chỉ của lần này sẽ ngắn sai). Không có hàm đo ⇒ boDem = null ⇒ gói gửi y như trước.
+      var KHOA_GIAY = KHOA_LUU + '.giay';
+      var boDem = null;
+      try {
+        if (typeof window.__taoBoDoGiay === 'function') {
+          boDem = window.__taoBoDoGiay(window, document, {
+            luu: function (bang) { try { localStorage.setItem(KHOA_GIAY, JSON.stringify(bang)); } catch (eG1) {} }
+          });
+          var giayCu = {};
+          try { giayCu = JSON.parse(localStorage.getItem(KHOA_GIAY) || '{}') || {}; } catch (eG2) { giayCu = {}; }
+          var coSanG = [];
+          for (var ig = 0; ig < du.cau.length; ig++) {
+            if (/[^-\\s]/.test(String(lam[du.cau[ig].id] == null ? '' : lam[du.cau[ig].id]))) coSanG.push(du.cau[ig].id);
+          }
+          boDem.khoiPhuc(giayCu, coSanG);
+        }
+      } catch (eG3) { boDem = null; }
+      /** Giây của các câu ĐÃ TRẢ LỜI trong dsQid (mặc định: mọi câu của phiếu) — câu bỏ trống không phải một lượt làm. Không có giây nào ⇒ null. */
+      function layDoGiayPhieu(dsQid) {
+        if (!boDem) return null;
+        var ds = [];
+        var nguonQ = dsQid;
+        if (!nguonQ) { nguonQ = []; for (var iq = 0; iq < du.cau.length; iq++) nguonQ.push(du.cau[iq].id); }
+        for (var jq = 0; jq < nguonQ.length; jq++) {
+          if (/[^-\\s]/.test(String(lam[nguonQ[jq]] == null ? '' : lam[nguonQ[jq]]))) ds.push(nguonQ[jq]);
+        }
+        try { return boDem.layDoGiay(ds); } catch (eG4) { return null; }
+      }
+      var dsDangNop = [];
       var daBaoXongLo = false;
       function baoXongLo() {
         if (daBaoXongLo || !du.soCauMocLo) return;
@@ -2465,12 +2671,17 @@ export const JS_PHIEU = `
       /** GỬI LÊN MÁY CHỦ. Mất mạng thì GIỮ LẠI và tự gửi lần mở sau — nuốt bài
        * im lặng là em làm xong mà thầy không thấy gì. */
       function gui(choLai) {
-        var than = JSON.stringify({ action: 'nopKhacPhuc', ma: du.ma, sbd: du.sbd, dapAn: lam });
+        var goiG = { action: 'nopKhacPhuc', ma: du.ma, sbd: du.sbd, dapAn: lam };
+        var dgG = layDoGiayPhieu(null);
+        if (dgG) goiG.doGiay = dgG;
+        var than = JSON.stringify(goiG);
         return fetch(du.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: than })
           .then(function (r) { return r.json(); })
           .then(function (j) {
             if (!j || !j.ok) throw new Error((j && j.error) || 'Không nộp được bài');
             try { localStorage.removeItem(KHOA_LUU + '.cho'); } catch (e6) {}
+            // Nộp xong: giây đã sang máy chủ — lượt làm lại là lượt mới, đo lại từ đầu.
+            if (boDem && dgG) { try { boDem.datLai(Object.keys(dgG)); } catch (eG5) {} }
             return j;
           })
           .catch(function (err) {
@@ -2533,7 +2744,10 @@ export const JS_PHIEU = `
         if (oLoiTs) oLoiTs.hidden = true;
         try {
           if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ type: 'ddh-btvn-nop-chang', ma: du.ma, sbd: du.sbd, chiSo: du.caNhan.chiSoThuSuc, dapAn: guiTs }, '*');
+            var tinTs = { type: 'ddh-btvn-nop-chang', ma: du.ma, sbd: du.sbd, chiSo: du.caNhan.chiSoThuSuc, dapAn: guiTs };
+            var dgTs = layDoGiayPhieu(Object.keys(guiTs));
+            if (dgTs) { tinTs.doGiay = dgTs; dsDangNop = Object.keys(dgTs); }
+            window.parent.postMessage(tinTs, '*');
             return;
           }
         } catch (eTs) {}
@@ -2569,7 +2783,10 @@ export const JS_PHIEU = `
         if (oLoiNop) oLoiNop.hidden = true;
         try {
           if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ type: 'ddh-btvn-nop-chang', ma: du.ma, sbd: du.sbd, chiSo: du.caNhan.chiSo, dapAn: guiDi }, '*');
+            var tinNc = { type: 'ddh-btvn-nop-chang', ma: du.ma, sbd: du.sbd, chiSo: du.caNhan.chiSo, dapAn: guiDi };
+            var dgNc = layDoGiayPhieu(Object.keys(guiDi));
+            if (dgNc) { tinNc.doGiay = dgNc; dsDangNop = Object.keys(dgNc); }
+            window.parent.postMessage(tinNc, '*');
             return;
           }
         } catch (eNc) {}
@@ -2578,6 +2795,8 @@ export const JS_PHIEU = `
       window.addEventListener('message', function (e) {
         var d = e && e.data;
         if (!du.caNhan || !d || d.type !== 'ddh-btvn-nop-chang-ket' || e.source !== window.parent) return;
+        // Máy chủ đã nhận: giây của các câu vừa nộp đã sang sổ, xoá để lần nộp sau (phiếu còn mở) không gửi lại.
+        if (d.ok === true && boDem && dsDangNop.length > 0) { try { boDem.datLai(dsDangNop); } catch (eG6) {} dsDangNop = []; }
         if (d.ok === false) {
           var chuLoi = String(d.error || 'Chưa nộp được chặng. Bài của em vẫn được giữ, em thử lại nhé.');
           var laTs = dangNopTs;
@@ -3433,7 +3652,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   // `co-lam` bật khổ ô Đ/S to bằng ngón tay. Tách khỏi `chua-nop` vì thầy có
   // thể bật HIEN_GIAI_TRUOC_NOP — lúc đó vẫn làm bài, chỉ là không khoá giải.
   const lopBody = [nop ? 'co-lam' : '', khoaGiai ? 'chua-nop' : '', caNhan ? 'ca-nhan' : ''].filter(Boolean).join(' ')
-  return taiLieuHtml(than + goiNop + (coHoiThay ? HOI_THAY_PHIEU : ''), `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody, m3, caNhan ? CSS_PHIEU_CA_NHAN : '')
+  return taiLieuHtml(than + goiNop + (coHoiThay ? HOI_THAY_PHIEU : '') + (nop ? DO_GIAY_PHIEU : ''), `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody, m3, caNhan ? CSS_PHIEU_CA_NHAN : '')
 }
 
 /** Biểu tượng "hỏi" (nét, theo màu chữ) cho nút Hỏi thầy trên phiếu. */

@@ -9,11 +9,19 @@
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
 import { docBaiCaNhan, doiLuotLam, luuKetQuaChang, type KetQuaChang } from './btvn-ca-nhan-em'
 
+/** GIÂY MỘT CÂU do phiếu đo (thầy 20/10, docs/dac-ta-muc-lam-bai-2010.md mục 4): `g` giây (1–900). Máy em CHỈ gửi giây; số từ / hình / phần của đề do máy chủ
+ * tự đo từ câu nó chấm (không tin máy em), nên không có thêm trường nào ở đây. Máy chủ làm sạch lại (`docDoGiayNhieu`). */
+export interface DoGiayCau {
+  g: number
+}
+
 export interface TinNopChang {
   ma: string
   sbd: string
   chiSo: number
   dapAn: Record<string, string>
+  /** Giây từng câu của đúng các câu trong `dapAn` (chỉ câu có đo thật). Vắng ⇒ gói gửi y như trước. */
+  doGiay?: Record<string, DoGiayCau>
 }
 
 export interface KqNopChang {
@@ -50,6 +58,17 @@ export function loiChoEm(ket: Pick<KetQuaChang, 'lyDo' | 'error'>): string {
   return ket.error && ket.error.trim() ? ket.error : LOI_CHUNG
 }
 
+/** ĐO GIÂY: giữ từng câu có giây là số hữu hạn (`{g}` — bỏ mọi trường khác phiếu lỡ gửi), tối đa 200 câu. Không còn câu nào ⇒ undefined (thân nộp bỏ khoá `doGiay`). */
+function lamSachDoGiay(x: unknown): Record<string, DoGiayCau> | undefined {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return undefined
+  const ra: Record<string, DoGiayCau> = {}
+  for (const [q, v] of Object.entries(x as Record<string, unknown>).slice(0, 200)) {
+    const g = (v as { g?: unknown } | null)?.g
+    if (typeof g === 'number' && Number.isFinite(g)) ra[q] = { g }
+  }
+  return Object.keys(ra).length > 0 ? ra : undefined
+}
+
 const dapAnHopLe = (d: unknown): d is Record<string, string> =>
   typeof d === 'object' && d !== null && !Array.isArray(d) && Object.values(d).every((v) => typeof v === 'string')
 
@@ -59,7 +78,9 @@ export async function nopChangCaNhan(tin: TinNopChang, maCa: string, dep: PhuThu
   }
   try {
     const ch = await dep.layCauHinh()
-    const ket = await dep.nopChang(ch, { ...tin, maBtvn: tin.ma })
+    const { doGiay: giayTho, ...goc } = tin
+    const doGiay = lamSachDoGiay(giayTho)
+    const ket = await dep.nopChang(ch, { ...goc, maBtvn: tin.ma, ...(doGiay ? { doGiay } : {}) })
     if (!ket.ok) return laMayChuBan(ket) ? { ok: false, error: LOI_MAY_CHU_BAN, ban: true } : { ok: false, error: loiChoEm(ket) }
     // Không câu nào được chấm (đáp án chưa hợp lệ: Phần II chưa đủ 4 ý, Phần III chưa có số…) ⇒ báo, không dựng lại.
     if (ket.ketQua.length === 0) return { ok: false, error: 'Chưa có câu nào được chấm. Em kiểm tra lại đáp án (Phần II cần đủ 4 ý, Phần III cần có số) rồi nộp lại nhé.', ket }
@@ -91,7 +112,12 @@ export async function nopChangCaNhan(tin: TinNopChang, maCa: string, dep: PhuThu
 function macDinh(): PhuThuocNopChang {
   return {
     layCauHinh: async () => (await import('./btvn-cho-em')).layCauHinhChoEmBtvn(),
-    nopChang: async (ch, d) => (await import('./btvn-may-chu-moi')).nopChangBtvn(ch, { maBtvn: d.maBtvn, sbd: d.sbd, chiSo: d.chiSo, dapAn: d.dapAn }),
+    nopChang: async (ch, d) => {
+      // `doGiay` (đã làm sạch ở trên) đi theo thân gửi khi phiếu có đo — `nopChangBtvn` chuyển NGUYÊN thân lên máy chủ. Dựng thành biến rồi mới đưa vào: hàm kia
+      // (btvn-may-chu-moi.ts, ngoài làn) khai thân bốn trường nên không nhận thêm trường trong literal. Không đo ⇒ thân y hệt cũ, không một byte thêm.
+      const than = { maBtvn: d.maBtvn, sbd: d.sbd, chiSo: d.chiSo, dapAn: d.dapAn, ...(d.doGiay ? { doGiay: d.doGiay } : {}) }
+      return (await import('./btvn-may-chu-moi')).nopChangBtvn(ch, than)
+    },
     cuaEm: async (ch, maCa, sbd, maBtvn) => (await import('./btvn-may-chu-moi')).btvnCuaEm(ch, maCa, sbd, maBtvn),
     dungPhieu: async (r, maCa, sbd) => (await import('./btvn-cho-em')).dungPhieuBtvn(r as never, maCa, sbd),
   }

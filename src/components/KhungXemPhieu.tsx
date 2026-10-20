@@ -188,7 +188,8 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
         if (e.data.dapAn && typeof e.data.dapAn === 'object') for (const [q, v] of Object.entries(e.data.dapAn)) if (typeof v === 'string') dapAn[q] = v
         const ham = nopChangRef.current
         if (!ham) return traLoi({ ok: false, error: 'Không nộp được chặng từ chỗ này. Em mở bài trong app nhé.' })
-        void ham({ ma: String(e.data.ma), sbd: String(e.data.sbd || ''), chiSo: Number(e.data.chiSo), dapAn }).then(
+        // ĐO GIÂY (20/10): chuyển nguyên `doGiay` của phiếu ({qid: {g}}); việc làm sạch nằm ở `nopChangCaNhan` (mảnh nạp lười — khung này nằm trong gói mở app, giữ cho nhẹ).
+        void ham({ ma: String(e.data.ma), sbd: String(e.data.sbd || ''), chiSo: Number(e.data.chiSo), dapAn, doGiay: e.data.doGiay }).then(
           (kq) => traLoi(kq),
           () => traLoi({ ok: false, error: 'Máy chủ đang bận, bài của em vẫn ở máy. Bấm nộp lại sau 1 phút.', ban: true }),
         )
