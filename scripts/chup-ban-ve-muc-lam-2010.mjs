@@ -25,7 +25,7 @@ const soat = []
 
 const THUONG = ['thang', 'do', 'diem-danh', 'ho-so', 'ai-sai', 'len-bang', 'hs', 'ph']
 const CHIEU = ['chieu-tat', 'chieu-bat', 'chieu-x']
-const KHO = [['doc', 390, 844, 1.5], ['ngang', 844, 390, 1.5], ['may-tinh', 1440, 900, 1]]
+const KHO = [['doc', 390, 844, 1.25], ['ngang', 844, 390, 1.25], ['may-tinh', 1440, 900, 1]]
 const KHO_CHIEU = [['1920', 1920, 1080, 1], ['1280', 1280, 720, 1]]
 const lamMot = async (k, ten, w, h, dpr, toi, chieu) => {
   const ctx = await trinh.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, colorScheme: toi ? 'dark' : 'light', reducedMotion: 'reduce', locale: 'vi-VN' })

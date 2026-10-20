@@ -16,10 +16,11 @@ const pct = (n, t) => D.phanTram(n, t)
 
 // ───────────────────────── BỘ PHẬN DÙNG CHUNG
 const CHIP_DAI = (m) => D.TEN_MUC[m].ngan
+const pip = (n) => `<span class="pip" data-n="${n}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>`
 function chip(m, { dai = false, hs = false } = {}) {
   if (m === 0) return `<span class="ch" data-m="0"><b>Chưa có số đo</b></span>`
   const ten = hs ? D.TEN_MUC[m].dai : CHIP_DAI(m)
-  return `<span class="ch" data-m="${m}"><b>Mức làm ${m}</b>${dai ? `<span>${e(ten)}</span>` : ''}</span>`
+  return `<span class="ch" data-m="${m}">${pip(m)}<b>Mức làm ${m}</b>${dai ? `<span>${e(ten)}</span>` : ''}</span>`
 }
 function nhanVe(k, chu) { return `<span class="ve" data-k="${k}">${chu}</span>` }
 
@@ -66,7 +67,7 @@ const chuGiaiThuoc = () => `<p class="cgt"><span><i data-m="1"></i>Mức làm 1<
 function chamLop(ds, { t, max = 100, kieu = '' }) {
   const p = (x) => Math.min(100, (100 * x) / max)
   const bin = new Map()
-  const cham = ds.map((x) => { const b = Math.floor(x.giay / 4); const k = bin.get(b) ?? 0; bin.set(b, k + 1); return { ...x, k } })
+  const cham = ds.map((x) => { const b = Math.floor(x.giay / 5); const k = bin.get(b) ?? 0; bin.set(b, k + 1); return { ...x, k } })
   const cao = Math.max(...cham.map((x) => x.k)) + 1
   return `<div class="cl ${kieu}" style="--cao:${cao}" role="img" aria-label="${ds.length} lượt sai theo số giây; vạch đứng là thời gian đọc hết đề ${t} giây">
     <div class="cl-vung">${cham.map((x) => `<i data-m="${x.muc}" style="left:${p(x.giay)}%;--k:${x.k}"></i>`).join('')}<u style="left:${p(t)}%"></u></div>
@@ -149,7 +150,7 @@ function khungDo() {
   return `<section class="kh" id="k-do" data-ap="gv" hidden>
   <div class="trang"><header class="dau-trang"><h1>Mọi câu đều có số đo</h1><p>Đã làm, đang làm và sắp làm. Lượt nào cũng có giây đo thật, không ước.</p></header>
   <div class="ba-the">
-    <article class="the"><h2>Đã làm</h2>${nhanVe('moi', 'Thêm')}<ul class="dong-y"><li>Từ <b>${D.NGAY_BAT_DO}</b>, mọi lượt mới đều có giây đo thật.</li><li>Lượt cũ không đo lùi được. Hiện “Chưa có số đo”, không điền số ước vào cột giây.</li><li>Ca thi, game và chữa lỗi đã có giây từ trước: các lượt đó vẫn xếp mức được.</li></ul></article>
+    <article class="the"><h2>Đã làm</h2>${nhanVe('moi', 'Thêm')}<ul class="dong-y"><li>Từ <b>${D.NGAY_BAT_DO}</b>, mọi lượt mới đều có giây đo thật.</li><li><b>Đã có trong sổ:</b> ca thi, chữa lỗi (chữa lỗi cộng cả lúc em rời màn, nên chỉ có thể thiếu Mức làm 1, không bịa ra).</li><li><b>Còn ở kho khác, nạp lùi được nếu thầy duyệt:</b> tự luyện, game có OMNI, lên bảng.</li><li><b>Mất hẳn, hiện “Chưa có số đo”:</b> BTVN, khắc phục, mở bài, luyện đề, nền, kiểm tra cá nhân, ôn lại trước ${D.NGAY_BAT_DO}.</li></ul></article>
     <article class="the"><h2>Đang làm</h2>${nhanVe('moi', 'Thêm')}<ul class="dong-y"><li>Một cách đo chung cho mọi màn làm câu: từ lúc câu hiện đủ trên màn tới lúc em nộp.</li><li>Dừng khi tab ẩn, khóa màn hình hoặc em không chạm màn 180 giây (tạm).</li><li>Trần ${900} giây một lượt. Làm lại câu là lượt mới, giây riêng.</li></ul></article>
     <article class="the"><h2>Sắp làm</h2>${nhanVe('moi', 'Thêm')}<p>Thời gian đọc hết đề tính sẵn cho từng câu trong kho, thầy thấy ngay khi giao bài. Ví dụ bài sắp giao:</p>
       <ul class="gb">${D.GIAO_BAI.map((c) => `<li><span>Câu ${c.so} · ${e(c.chuyenDe)}</span><b class="so">${D.tDocGoc(c)} giây</b></li>`).join('')}<li class="gb-tong"><span>Đọc hết ${D.GIAO_BAI.length} câu</span><b class="so">${mm(tongDoc)}</b></li></ul></article>
@@ -167,23 +168,25 @@ function khungDo() {
 // ───────────────────────── KHUNG 3 · BẢNG ĐIỂM DANH CỦA THẦY (màn riêng, không chiếu)
 function khungDiemDanh() {
   const em = D.EM_CHIEU
-  const nhom = (b) => (b <= 5 ? 'Lười' : b <= 7 ? 'Chưa đều' : 'Chăm')
+  const TEN_NHOM = { cham: 'Chăm', 'chua-deu': 'Chưa đều', luoi: 'Lười' }
+  const dem = { cham: 0, 'chua-deu': 0, luoi: 0 }
+  em.forEach((x) => { dem[D.nhomCua(x.bac)]++ })
   const vua = [['18:31', em[12]], ['18:29', em[5]], ['18:27', em[20]], ['18:26', em[28]], ['18:24', em[14]], ['18:22', em[2]]]
   const dongVua = ([g, x]) => {
-    const tg = x.mini.reduce((a, b) => a + b, 0), voi = x.mini[0] + x.mini[1]
-    return `<li class="dd-hang"><span class="dd-gio so">${g}</span><div class="dd-ten"><b>${e(x.ten)}</b><small><span class="dd-nhom" data-n="${nhom(x.bac)}">${nhom(x.bac)}</span> · Bậc ${x.bac} · Điểm chăm ${x.diem}</small></div>
-      <div class="dd-cach"><span class="cd-mini" aria-label="Mức làm 14 ngày">${x.mini.map((n, k) => `<i data-m="${k + 1}" style="flex:${n}"></i>`).join('')}</span><small>Mức làm 1–2: <b class="so">${voi}/${tg}</b> lượt</small></div></li>`
+    const tg = x.mini.reduce((a, b) => a + b, 0), voi = x.mini[0] + x.mini[1], n = D.nhomCua(x.bac)
+    return `<li class="dd-hang"><span class="dd-gio so">${g}</span><b class="dd-ten">${e(x.ten)}</b><span class="dd-chips"><span class="dd-nhom" data-n="${n}">${TEN_NHOM[n]}</span><span class="dd-bac">Bậc ${x.bac}</span></span>
+      <div class="dd-cach"><span class="cd-mini" aria-label="Mức làm 14 ngày">${x.mini.map((n2, k) => `<i data-m="${k + 1}" style="flex:${n2}"></i>`).join('')}</span><small>Mức làm 1–2: <b class="so">${voi}/${tg}</b> lượt</small></div></li>`
   }
-  const vang = ['Cao Thái Sơn', 'Trịnh Diệu Linh', 'Võ Tuấn Anh']
+  const vang = D.EM_LOP.filter((x) => !x.coMat).map((x) => x.ten)
   return `<section class="kh" id="k-diem-danh" data-ap="gv" hidden>
   <div class="trang"><header class="dau-trang"><h1>Điểm danh — việc đầu tiên của buổi</h1><p>${D.LOP.ten} · ${D.HOM_NAY.replace('/2026', '')} · màn của thầy, không chiếu.</p></header>
   <div class="dd-ba">
-    <article class="the dd-xam"><h2>Mã buổi</h2><p class="dd-ma so">4827 19</p><p class="ghi">Mở 18:10 · mã đổi mỗi phút</p>${nhanVe('giu', 'Giữ')}</article>
-    <article class="the dd-xam"><h2>Có mặt</h2><p class="dd-co"><b class="so">${em.length}</b><span>/${D.LOP.siSo} em</span></p><span class="phu-th"><i style="width:${pct(em.length, D.LOP.siSo)}%"></i></span>${nhanVe('giu', 'Giữ')}</article>
+    <article class="the dd-xam"><h2>Mã buổi</h2><div class="dd-mq"><span class="dd-qr" aria-hidden="true"></span><div><p class="dd-ma so">4827 19</p><p class="ghi">Mở 18:10 · mã đổi mỗi phút</p></div></div>${nhanVe('giu', 'Giữ')}</article>
+    <article class="the dd-xam"><h2>Có mặt</h2><p class="dd-co"><b class="so">${em.length}</b><span>/${D.LOP.siSo} em</span></p><span class="phu-th"><i style="width:${pct(em.length, D.LOP.siSo)}%"></i></span><p class="ghi">Chăm ${dem.cham} · Chưa đều ${dem['chua-deu']} · Lười ${dem.luoi}</p>${nhanVe('giu', 'Giữ')}</article>
     <article class="the dd-xam"><h2>Vắng ${vang.length} em</h2><p class="dobao">${vang.join(' · ')}</p>${nhanVe('giu', 'Giữ')}</article>
   </div>
-  <article class="the"><div class="the-dau"><h2>Vừa điểm danh</h2><span class="phu-s">Bấm tên em để mở hồ sơ làm bài</span></div>${nhanVe('moi', 'Thêm thanh Mức làm ở mỗi dòng')}
-    <p class="ghi">Thanh nhỏ bên phải: số lượt làm 14 ngày theo Mức làm 1 → 4. Màn riêng của thầy, em khác không nhìn thấy.</p>
+  <article class="the"><div class="the-dau"><h2>Vừa điểm danh <small>· bấm em ⇒ hồ sơ làm bài</small></h2></div>${nhanVe('moi', 'Thêm thanh Mức làm')}
+    <p class="ghi">Thanh nhỏ bên phải: số lượt làm 14 ngày theo Mức làm 1 → 4. Màn riêng của thầy.</p>
     ${chuGiaiThuoc().replace('<span><u></u>Đọc hết đề</span><span><b></b>Giây em làm</span>', '')}
     <ul class="dd-ds">${vua.map(dongVua).join('')}</ul>
   </article></div></section>`
@@ -201,9 +204,15 @@ function dongLuot(l) {
 }
 function khungHoSo() {
   const vois = pct(saiVoi, D.tongSai()), nghi = pct(saiNghi, D.tongSai())
+  const x = D.EM_LOP.find((r) => r.ten === emA.ten)
+  const thieu = [2, 9].slice(0, 14 - x.du)
+  const lich = Array.from({ length: 14 }, (_, i) => (thieu.includes(i) ? 'thieu' : 'du'))
   return `<section class="kh" id="k-ho-so" data-ap="gv" hidden>
   <div class="tam" data-bo="hs"><header class="tam-dau"><button class="nut-lui" aria-label="Đóng hồ sơ">${kyHieuDong}</button><span class="ava">ĐA</span><div><h1>${e(emA.ten)}</h1><p>${emA.lop} · SBD ${emA.sbd} · 14 ngày gần nhất</p></div></header>
   <div class="tam-than">
+    <article class="the the-rong"><div class="the-dau"><h2>Đầu tấm: nhóm, lý do, lịch 14 ngày</h2>${nhanVe('giu', 'Giữ nguyên')}</div>
+      <p class="dobao">Nhãn nhóm <b>Chăm</b> · đủ mức <b class="so">${x.du}/14</b> ngày · lý do và độ tin cậy như hiện có.</p>
+      <ol class="lich14" aria-label="Lịch làm bài theo ngày">${lich.map((k, i) => `<li data-k="${k}"><span>${13 + i > 31 ? 13 + i - 31 : 13 + i}</span></li>`).join('')}</ol></article>
     <article class="the the-lon"><div class="the-dau"><h2>Cách làm bài</h2>${nhanVe('moi', 'Thêm')}</div>
       <p class="dobao">Đo được <b class="so">${tong}/${D.TONG_LUOT}</b> lượt. <b class="so">${D.chuaCoSoDo()}</b> lượt cũ (trước ${D.NGAY_BAT_DO}) chưa có số đo.</p>
       ${thanhMuc(demMuc, tong)}
@@ -211,17 +220,16 @@ function khungHoSo() {
       <div class="hai-so"><div><b class="so">${saiVoi}/${D.tongSai()}</b><span>lượt sai là lúc làm vội (Mức làm 1–2), ${vois}%</span></div><div><b class="so">${saiNghi}/${D.tongSai()}</b><span>lượt sai dù đã nghĩ (Mức làm 3–4), ${nghi}%</span></div></div>
       <p class="ghi">${dungNhanh} lượt đúng nộp trước khi đọc hết đề. Chỉ ghi chú, không tính là vội.</p>
     </article>
-    <article class="the"><div class="the-dau"><h2>Lượt gần đây</h2>${nhanVe('moi', 'Thêm')}</div>${chuGiaiThuoc()}<ul class="lh-ds">${D.LUOT_GAN_DAY.map(dongLuot).join('')}</ul></article>
-    <article class="the"><div class="the-dau"><h2>Sáu tín hiệu thái độ</h2>${nhanVe('doi', 'Đổi')}</div>
+    <article class="the"><div class="the-dau"><h2>Lịch sử làm câu</h2></div>${nhanVe('doi', 'Đổi: thêm thước và Mức làm')}${chuGiaiThuoc()}<ul class="lh-ds">${D.LUOT_GAN_DAY.map(dongLuot).join('')}</ul></article>
+    <article class="the"><div class="the-dau"><h2>Sáu tín hiệu thái độ</h2></div>
       <ul class="tin-hieu">
-        <li><b>a</b><span>Làm đủ bài trong tuần</span><em>Giữ</em></li>
-        <li class="doi"><b>b</b><span>Làm vội: <b class="so">${saiVoi}/${D.tongSai()}</b> lượt sai ở Mức làm 1–2</span><em>Đổi</em></li>
-        <li><b>c</b><span>Bỏ dở giữa chừng</span><em>Giữ</em></li>
-        <li><b>d</b><span>Đoán mò, đáp án lặp</span><em>Giữ</em></li>
-        <li><b>e</b><span>Không xem lại lời giải</span><em>Giữ</em></li>
-        <li><b>g</b><span>Không làm lại câu sai</span><em>Giữ</em></li>
+        <li><b>a</b><span>Ngày đủ mức</span><em>Giữ</em></li>
+        <li class="doi"><b>b</b><span>Trả lời quá nhanh: <b class="so">${saiVoi}/${D.tongSai()}</b> lượt sai ở Mức làm 1–2</span><em>Đổi</em></li>
+        <li><b>c</b><span>Dồn bài cuối ngày</span><em>Giữ</em></li>
+        <li><b>d</b><span>Dùng gợi ý, đọc lời giải</span><em>Giữ</em></li>
+        <li><b>e</b><span>Chọn lặp một phương án</span><em>Giữ</em></li>
+        <li><b>f</b><span>Độ đúng theo thời gian</span><em>Giữ</em></li>
       </ul>
-      <p class="ghi">Tín hiệu b hiện đo bằng ngưỡng cố định 8 giây (trắc nghiệm) và 15 giây (tự luận). Đề xuất đo theo Mức làm, chỉ tính lượt sai, để chỉ còn MỘT cách đo. Cần thầy chốt.</p>
     </article>
   </div></div></section>`
 }
@@ -284,48 +292,47 @@ function khungChieuA(bat) {
   const L = D.LOP_HOM_QUA
   const sai = L.saiTheoMuc.reduce((a, b) => a + b, 0)
   const voi = L.saiTheoMuc[0] + L.saiTheoMuc[1]
-  const em = D.EM_CHIEU
-  const dinh = Math.max(...D.THANG_BAC)
-  const vua = [['18:31', em[12]], ['18:29', em[5]], ['18:27', em[20]], ['18:26', em[28]]]
+  const lop = D.EM_LOP, tg = lop.length
+  const cot = { cham: lop.filter((x) => D.nhomCua(x.bac) === 'cham'), 'chua-deu': lop.filter((x) => D.nhomCua(x.bac) === 'chua-deu'), luoi: lop.filter((x) => D.nhomCua(x.bac) === 'luoi') }
+  const TEN = { cham: 'Chăm', 'chua-deu': 'Chưa đều', luoi: 'Lười' }
+  const DK = { cham: 'đủ mức ≥ 10/14 ngày', 'chua-deu': 'đủ mức 6–9/14 ngày', luoi: 'thoát khi đủ mức 6 ngày liền' }
+  const hang = (x) => `<li class="nl-hang"${x.coMat ? '' : ' data-vang=""'}><span class="nl-bac">${x.bac}</span><span class="nl-ten">${e(x.ten)}${x.coMat ? '' : ' <small>vắng</small>'}</span>${bat ? `<span class="cd-mini nl-mini" aria-label="Mức làm 14 ngày">${x.mini.map((n, k) => `<i data-m="${k + 1}" style="flex:${n}"></i>`).join('')}</span>` : ''}<b class="so">${x.du}/14</b></li>`
   return `<section class="kh" id="k-chieu-${bat ? 'bat' : 'tat'}" data-ap="chieu" hidden>
-  <div class="cd"><header class="cd-dau"><div><small>ĐIỂM DANH ĐẦU GIỜ</small><b>${D.HOM_NAY.replace('Thứ Ba ', 'Thứ Ba ').replace('/2026', '')} · Buổi tối</b></div><div class="cd-mat"><small>Có mặt</small><b>${em.length}<i>/${D.LOP.siSo}</i></b></div></header>
-  <div class="cd-than">
-    <div class="cd-trai">
-      <div class="cd-thang"><small>Số em ở mỗi bậc</small><div class="cd-cot">${D.THANG_BAC.map((n, i) => `<span><em class="cd-n">${n || ''}</em><i style="height:${n ? 8 + (88 * n) / dinh : 3}%"></i><em>${i + 1}</em></span>`).join('')}</div></div>
-      <ul class="cd-em">${em.map((x) => `<li><span class="cd-hh">${x.bac}</span><div><b>${e(x.ten)}</b><small>Bậc ${x.bac} · Điểm chăm ${x.diem}</small>${bat ? `<span class="cd-mini" aria-label="Cách làm 14 ngày">${x.mini.map((n, k) => `<i data-m="${k + 1}" style="flex:${n}"></i>`).join('')}</span>` : ''}</div></li>`).join('')}</ul>
-    </div>
-    <aside class="cd-phai">
-      <section class="cd-the cd-moi">${nhanVe('moi', 'Thêm')}<small>HÔM QUA LỚP LÀM BÀI THẾ NÀO</small>
-        <p class="cd-do"><b>${L.luot}</b> lượt BTVN · đo được <b>${L.luot}/${L.luot}</b></p>
-        ${thanhMuc(L.mucDem, L.luot, { kieu: 'chieu' })}
-        <p class="cd-ket"><b>${voi}</b> trong <b>${sai}</b> lượt sai (<b>${pct(voi, sai)}%</b>) nộp khi chưa kịp nghĩ.</p>
-      </section>
-      <section class="cd-the"><small>Bậc cao nhất lớp</small><b class="cd-vinh">${e(em[0].ten)}</b><span>Bậc ${em[0].bac} · Điểm chăm ${em[0].diem}</span>${nhanVe('giu', 'Giữ')}</section>
-      <section class="cd-the"><small>Vừa điểm danh</small><ul class="cd-vua">${vua.map(([g, x]) => `<li><span class="so">${g}</span><b>${e(x.ten)}</b><span>Bậc ${x.bac}</span></li>`).join('')}</ul>${nhanVe('giu', 'Giữ')}</section>
-    </aside>
-  </div>
-  <footer class="cd-chan"><span><kbd>H</kbd> Cách làm từng em: <b>${bat ? 'Bật' : 'Tắt'}</b></span><span class="cd-ghc">${bat ? 'Thanh nhỏ dưới tên: tỉ lệ Mức làm 14 ngày, không kèm chữ.' : 'Mặc định tắt: tên em không kèm Mức làm trên bản chiếu.'}</span></footer></div></section>`
+  <div class="cd"><header class="cd-dau"><div><small>NHỊP HỌC ${D.LOP.ten}</small><b>Từ 13/10 đến 26/10 · 14 ngày đã qua</b></div><div class="cd-mat"><small>Có mặt ${lop.filter((x) => x.coMat).length}/${D.LOP.siSo} · Vắng ${lop.filter((x) => !x.coMat).length}</small></div></header>
+  <div class="nl-nhom">${['cham', 'chua-deu', 'luoi'].map((k) => `<span data-g="${k}" style="flex:${cot[k].length}">${TEN[k]} ${cot[k].length} em · ${pct(cot[k].length, tg)}%</span>`).join('')}</div>
+  <section class="cd-the cd-moi nl-moi">${nhanVe('moi', 'Thêm')}<div class="nl-moi-trai"><small>HÔM QUA LỚP LÀM BÀI THẾ NÀO</small><p class="cd-do"><b>${L.luot}</b> lượt BTVN · đo được <b>${L.luot}/${L.luot}</b></p></div>
+    <div class="nl-moi-giua">${thanhMuc(L.mucDem, L.luot, { kieu: 'chieu' })}</div>
+    <p class="cd-ket nl-moi-phai"><b>${voi}</b> trong <b>${sai}</b> lượt sai (<b>${pct(voi, sai)}%</b>) nộp khi chưa kịp nghĩ.</p></section>
+  <div class="nl-ba">${['cham', 'chua-deu', 'luoi'].map((k) => `<section class="nl-cot" data-g="${k}"><div class="nl-cot-dau"><h2>${TEN[k]} <span>· ${cot[k].length} em</span></h2><small>${DK[k]}</small></div><ul class="nl-ds">${cot[k].map(hang).join('')}</ul></section>`).join('')}</div>
+  <footer class="cd-chan"><span class="nl-chan-so">Hôm qua cả lớp <b>25/34</b> em đủ mức · hôm nay đã có <b>12</b> em đủ mức</span>
+    <span class="nl-nut"><span class="nl-b">← Điểm danh</span><span class="nl-b"><kbd>H</kbd> Ẩn tên nhóm Lười</span><span class="nl-b nl-b-moi" data-bat="${bat ? '' : undefined}"><kbd>M</kbd> Mức làm từng em: ${bat ? 'Bật' : 'Tắt'}${nhanVe('moi', 'Thêm')}</span><span class="nl-b nl-b-chinh"><kbd>→</kbd> Sang Gọi lên bảng đầu giờ</span></span></footer></div></section>`
 }
 
 // ───────────────────────── KHUNG 7 · TỜ CHIẾU "AI SAI CÂU NÀY" (phím X)
 function khungChieuX() {
-  const ds = D.SAI_CAU12, dem = D.demTheoMuc(ds)
+  const ds = D.LUOT_SAI_C12, dem = D.demTheoMuc(ds), em = D.EM_SAI_C12
+  const theoNoi = { BTVN: 0, 'Luyện theo dạng': 0, 'Tự sửa lỗi': 0 }
+  ds.forEach((l) => { theoNoi[l.nguon]++ })
+  const theoNgay = [['22/10', 0], ['23/10', 0], ['24/10', ds.filter((l) => l.ngay === '24/10').length], ['25/10', ds.filter((l) => l.ngay === '25/10').length], ['26/10', ds.filter((l) => l.ngay === '26/10').length]]
+  const maxNg = Math.max(...theoNgay.map((x) => x[1]))
+  const maxNoi = Math.max(...Object.values(theoNoi))
+  const nhieu = em.map((ten) => ({ ten, l: ds.filter((l) => l.ten === ten).sort((a, b) => a.ngay.localeCompare(b.ngay) || a.gio.localeCompare(b.gio)) })).filter((x) => x.l.length > 1).slice(0, 8)
+  const chuCai = (ten) => ten.split(' ').slice(-1)[0][0]
   const t = D.tDocGoc(c12)
-  const nb = (x) => e(x).replace(/ /g, '\u00a0')
   return `<section class="kh" id="k-chieu-x" data-ap="chieu" hidden>
-  <div class="cd"><header class="cd-dau"><div><small>CÂU ${c12.so} · ${e(c12.chuyenDe).toUpperCase()}</small><b>${ds.length} em sai · ${D.SO_DUNG_C12} em đúng</b></div><div class="cd-mat"><small>Đọc hết đề cần</small><b>${t}<i> giây</i></b></div></header>
-  <div class="cd-than cd-x">
-    <section class="cd-the cd-de"><small>ĐỀ BÀI</small><p>Cho pin điện hóa Zn–Cu ở điều kiện chuẩn. Phát biểu nào sau đây đúng khi pin hoạt động?</p><ul><li>A. Zn là cực dương</li><li>B. Electron chuyển từ Cu sang Zn qua dây dẫn</li><li>C. Khối lượng điện cực Zn giảm</li><li>D. Nồng độ Cu²⁺ trong dung dịch tăng</li></ul><b class="cd-dung">Đáp án đúng: C</b></section>
-    <aside class="cd-phai">
-      <section class="cd-the cd-moi">${nhanVe('moi', 'Thêm')}<small>CÁC EM SAI LÀM THẾ NÀO</small>
-        ${thanhMuc(dem, ds.length, { kieu: 'chieu' })}
-        <p class="cd-ket"><b>${dem[0] + dem[1]}</b> trong <b>${ds.length}</b> em nộp trước khi kịp nghĩ.</p>
-        ${chamLop(ds, { t, max: 100, kieu: 'chieu' })}
-        <p class="cd-do">Mỗi chấm một lượt sai, không tên. Vạch đứng: đọc hết đề ${t} giây.</p></section>
-      <section class="cd-the"><small>Các em sai</small><p class="cd-ten">${[...ds].sort((a, b) => a.ten.split(' ').slice(-1)[0].localeCompare(b.ten.split(' ').slice(-1)[0], 'vi')).map((x) => nb(x.ten.split(' ').slice(-2).join(' '))).join(' · ')}</p>${nhanVe('giu', 'Giữ')}</section>
-    </aside>
+  <div class="cd"><header class="cd-dau"><div><small>CÂU ${c12.so} · AI ĐÃ SAI?</small><b>Học sinh làm sai câu này</b></div><div class="cd-mat"><small>Đọc hết đề cần</small><b>${t}<i> giây</i></b></div></header>
+  <div class="sai-o4"><div><b>${em.length}</b><span>em làm sai</span></div><div><b>${ds.length}</b><span>lượt làm sai</span></div><div><b>${D.giayTbSaiC12()} giây</b><span>trung bình mỗi lượt</span></div><div><b>BTVN</b><span>sai nhiều nhất (${theoNoi.BTVN} lượt)</span></div></div>
+  <div class="sai-ba">
+    <section class="cd-the"><small>LƯỢT SAI THEO NƠI LÀM</small>${Object.entries(theoNoi).map(([n, v]) => `<div class="sai-thanh"><span>${n}</span><i style="width:${Math.max(4, Math.round((v / maxNoi) * 100))}%"></i><em>${v}</em></div>`).join('')}${nhanVe('giu', 'Giữ')}</section>
+    <section class="cd-the"><small>LƯỢT SAI THEO NGÀY</small><div class="sai-cot">${theoNgay.map(([n, v]) => `<div><b>${v}</b><i style="height:${Math.max(3, Math.round((v / maxNg) * 82))}%"></i></div>`).join('')}</div><div class="sai-ngay">${theoNgay.map(([n]) => `<span>${n}</span>`).join('')}</div>${nhanVe('giu', 'Giữ')}</section>
+    <section class="cd-the cd-moi">${nhanVe('moi', 'Thêm')}<small>LƯỢT SAI THEO MỨC LÀM</small>
+      ${thanhMuc(dem, ds.length, { kieu: 'chieu', chuGiai: false })}
+      ${chamLop(ds, { t, max: 100, kieu: 'chieu' })}
+      ${chuGiaiThuoc()}
+      <p class="cd-ket"><b>${dem[0] + dem[1]}</b> trong <b>${ds.length}</b> lượt nộp trước khi kịp nghĩ.</p></section>
   </div>
-  <footer class="cd-chan"><span><kbd>H</kbd> Cách làm từng em: <b>Tắt</b></span><span class="cd-ghc">Tên và Mức làm của từng em chỉ hiện ở màn thầy.</span></footer></div></section>`
+  <section class="sai-em" aria-label="Từng em"><h3>Từng em</h3>${nhanVe('giu', 'Giữ')}<div class="sai-luoi">${nhieu.map((x) => `<article><span class="sai-anh" aria-hidden="true">${chuCai(x.ten)}</span><div><b>${e(x.ten)}</b><small>${x.l.length} lần sai · trung bình ${Math.round(x.l.reduce((a, l) => a + l.giay, 0) / x.l.length)} giây</small><p>${x.l.map((l) => `<span>${l.ngay} ${l.gio} · ${l.nguon} · <u>${l.giay} giây</u></span>`).join('')}</p></div></article>`).join('')}</div></section>
+  <footer class="cd-chan"><span class="nl-nut"><span class="nl-b"><kbd>M</kbd> Mức làm từng lượt: Tắt${nhanVe('moi', 'Thêm')}</span></span><span class="cd-ghc">Mỗi chấm là một lượt sai, không kèm tên.</span></footer></div></section>`
 }
 
 // ───────────────────────── KHUNG 8 · APP HỌC SINH
@@ -333,7 +340,7 @@ function khungHs() {
   const [a, b, , , c, d] = D.LUOT_GAN_DAY
   const max = (l) => Math.max(100, Math.ceil((l.top * 1.3) / 10) * 10)
   const hang = (l, tt, ten) => `<li class="hs-hang"><div class="hs-ten"><b>${ten}</b><small>${e(l.nguon)} · ${l.ngay}</small><small class="hs-tt">${tt}</small>
-      ${l.muc === 0 ? `<p class="hs-lan"><span>Lần làm trước chưa có số đo (trước ${D.NGAY_BAT_DO}).</span></p>` : `<p class="hs-lan"><span class="hs-nhan" data-m="${l.muc}"><i></i>${D.TEN_MUC[l.muc].dai}</span><span class="so">${l.giay} giây · đọc hết đề cần ≈ ${l.t} giây</span></p>
+      ${l.muc === 0 ? `<p class="hs-lan"><span>Lần làm trước chưa có số đo (trước ${D.NGAY_BAT_DO}).</span></p>` : `<p class="hs-lan"><span class="hs-nhan" data-m="${l.muc}">${pip(l.muc)}${D.TEN_MUC[l.muc].dai}</span><span class="so">${l.giay} giây · đọc hết đề cần ≈ ${l.t} giây</span></p>
       ${thuoc({ giay: l.giay, t: l.t, san: l.san, top: l.top, max: max(l), nho: true })}`}</div></li>`
   const lg = (m, chu) => `<li data-m="${m}"><i></i><span>${chu}</span></li>`
   return `<section class="kh" id="k-hs" data-ap="hs" hidden>
@@ -346,10 +353,10 @@ function khungHs() {
       <p class="lb-so"><b class="so">${a.giay}</b><span>giây em làm</span><i></i><b class="so">${a.t}</b><span>giây đọc hết đề cần</span></p>
       ${thuoc({ giay: a.giay, t: a.t, san: a.san, top: a.top, max: 100 })}
       <ul class="hs-cg">${lg(1, `Dưới ${a.t} giây: chưa đọc hết đề`)}${lg(2, `${a.t}–${a.t + a.san - 1} giây: đọc xong, nộp ngay`)}${lg(3, `${a.t + a.san}–${a.top - 1} giây: có thời gian nghĩ`)}${lg(4, `Từ ${a.top} giây: làm kỹ`)}</ul>
-      <p class="hs-gc">Lần này em thử đọc hết đề rồi mới chọn. Việc này không tính điểm và không có thưởng.</p></div>${nhanVe('moi', 'Thêm')}</section>
+      </div>${nhanVe('moi', 'Thêm')}</section>
     <section class="the-hs"><div class="hs-dau"><h2>Câu đã làm</h2><span>Danh sách</span></div>
-      <ul class="hs-ds hs-nho">${[D.LUOT_GAN_DAY[3], D.LUOT_GAN_DAY[2]].map((l) => `<li class="hs-hang"><div class="hs-ten"><b>${e(l.cau.chuyenDe)} · Câu ${l.cau.so}</b><small>${e(l.nguon)} · ${l.ngay} · ${l.ketQua ? 'Đúng' : 'Sai'}</small><p class="hs-lan">${l.ketQua && l.muc >= 3 ? `<span class="hs-nhan" data-m="${l.muc}"><i></i>${D.TEN_MUC[l.muc].dai}</span>` : ''}<span class="so">${l.giay} giây · đọc hết đề cần ≈ ${l.t} giây</span></p></div></li>`).join('')}</ul>
-      <p class="hs-gc">Câu đúng chỉ hiện nhãn khi em làm có nghĩ hoặc làm kỹ. Câu đúng mà nộp nhanh chỉ hiện số giây.</p>${nhanVe('moi', 'Thêm')}</section>
+      <ul class="hs-ds hs-nho">${[D.LUOT_GAN_DAY[3], D.LUOT_GAN_DAY[2]].map((l) => `<li class="hs-hang"><div class="hs-ten"><b>${e(l.cau.chuyenDe)} · Câu ${l.cau.so}</b><small>${e(l.nguon)} · ${l.ngay} · ${l.ketQua ? 'Đúng' : 'Sai'}</small><p class="hs-lan">${l.ketQua && l.muc >= 3 ? `<span class="hs-nhan" data-m="${l.muc}">${pip(l.muc)}${D.TEN_MUC[l.muc].dai}</span>` : ''}<span class="so">${l.giay} giây · đọc hết đề cần ≈ ${l.t} giây</span></p></div></li>`).join('')}</ul>
+      ${nhanVe('moi', 'Thêm')}</section>
   </div></div></section>`
 }
 
@@ -363,7 +370,7 @@ function khungPh() {
       ${thanhMuc(demMuc, tong, { kieu: 'ph' })}
       <p class="hs-gc">Đo được ${tong}/${D.TONG_LUOT} lượt. ${D.chuaCoSoDo()} lượt trước ${D.NGAY_BAT_DO} chưa có số đo.</p>${nhanVe('moi', 'Thêm')}</section>
     <section class="the-hs"><div class="hs-dau"><h2>Hai câu gần đây</h2><span>Số giây của con và của đề</span></div>
-      <ul class="hs-ds">${[D.LUOT_GAN_DAY[0], D.LUOT_GAN_DAY[2]].map((l) => `<li class="hs-hang"><div class="hs-ten"><b>Câu ${l.cau.so} · ${e(l.cau.chuyenDe)}</b><small>${e(l.nguon)} · ${l.ngay} · ${l.ketQua ? 'Đúng' : 'Sai'}</small><p class="hs-lan"><span class="hs-nhan" data-m="${l.muc}"><i></i>${D.TEN_MUC[l.muc].dai}</span><span class="so">${l.giay} giây · đọc hết đề cần ≈ ${l.t} giây</span></p>${thuoc({ giay: l.giay, t: l.t, san: l.san, top: l.top, max: Math.max(100, Math.ceil(l.top * 1.3 / 10) * 10), nho: true })}</div></li>`).join('')}</ul>${nhanVe('moi', 'Thêm')}</section>
+      <ul class="hs-ds">${[D.LUOT_GAN_DAY[0], D.LUOT_GAN_DAY[2]].map((l) => `<li class="hs-hang"><div class="hs-ten"><b>Câu ${l.cau.so} · ${e(l.cau.chuyenDe)}</b><small>${e(l.nguon)} · ${l.ngay} · ${l.ketQua ? 'Đúng' : 'Sai'}</small><p class="hs-lan"><span class="hs-nhan" data-m="${l.muc}">${pip(l.muc)}${D.TEN_MUC[l.muc].dai}</span><span class="so">${l.giay} giây · đọc hết đề cần ≈ ${l.t} giây</span></p>${thuoc({ giay: l.giay, t: l.t, san: l.san, top: l.top, max: Math.max(100, Math.ceil(l.top * 1.3 / 10) * 10), nho: true })}</div></li>`).join('')}</ul>${nhanVe('moi', 'Thêm')}</section>
   </div></div></section>`
 }
 

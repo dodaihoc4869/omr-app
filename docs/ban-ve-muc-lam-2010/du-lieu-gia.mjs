@@ -67,6 +67,21 @@ export const SAI_CAU12 = SAI_C12.map(([ten, tau, giay]) => {
   return { ten, tau, giay, ...r }
 }).sort((a, b) => a.muc - b.muc || a.giay - b.giay)
 export const SO_LAM_C12 = 34
+// Lượt sai KHÁC của cùng câu 12 ở nơi làm khác (tờ chiếu "ai sai" thật gộp mọi nơi làm: 300 lượt gần nhất)
+const THEM_C12 = [
+  ['Phạm Quốc Huy', 0.2, 9, 'Luyện theo dạng', '24/10', '20:12'], ['Vũ Minh Quân', 0.05, 21, 'Luyện theo dạng', '24/10', '20:31'],
+  ['Lương Tuệ Minh', null, 70, 'Luyện theo dạng', '24/10', '21:05'], ['Mai Hồng Nhung', null, 33, 'Luyện theo dạng', '24/10', '21:20'],
+  ['Đỗ Khánh Linh', null, 17, 'Luyện theo dạng', '24/10', '21:44'], ['Lê Thu Hà', -0.1, 24, 'Tự sửa lỗi', '25/10', '19:08'],
+  ['Bùi Tuấn Kiệt', -0.2, 38, 'Tự sửa lỗi', '25/10', '19:40'], ['Tô Gia Hân', 0.2, 49, 'Tự sửa lỗi', '25/10', '20:03'],
+]
+const gioBtvn = (i) => { const ph = 18 * 60 + 30 + i * 9; return `${String(Math.floor(ph / 60)).padStart(2, '0')}:${String(ph % 60).padStart(2, '0')}` }
+const byTen = new Map(SAI_C12.map((r, i) => [r[0], i]))
+export const LUOT_SAI_C12 = [
+  ...SAI_C12.map(([ten, tau, giay], i) => ({ ten, tau, giay, nguon: 'BTVN', ngay: '26/10', gio: gioBtvn(i) })),
+  ...THEM_C12.map(([ten, tau, giay, nguon, ngay, gio]) => ({ ten, tau, giay, nguon, ngay, gio })),
+].map((l) => ({ ...l, ...mucCuaLuot({ giay: l.giay, cau: CAU.c12, tau: l.tau }) }))
+export const EM_SAI_C12 = [...new Set(LUOT_SAI_C12.map((l) => l.ten))]
+export const giayTbSaiC12 = () => Math.round(LUOT_SAI_C12.reduce((a, l) => a + l.giay, 0) / LUOT_SAI_C12.length)
 export const SO_DUNG_C12 = SO_LAM_C12 - SAI_CAU12.length
 
 export const demTheoMuc = (ds) => [1, 2, 3, 4].map((m) => ds.filter((x) => x.muc === m).length)
@@ -115,6 +130,12 @@ export const EM_CHIEU = goc34.filter((x) => !VANG_MAT.has(x.ten)).map((x, i) => 
   if (x.ten === HA.ten) mini = HA_CHEO.map((r) => r[0] + r[1])
   return { ten: x.ten, bac, diem: Math.min(99, Math.round(bac * 8.1 + ((i * 7) % 9))), mini }
 }).sort((a, b) => b.bac - a.bac || b.diem - a.diem)
+const VANG_BAC = { 'Cao Thái Sơn': [8, 70], 'Trịnh Diệu Linh': [9, 82], 'Võ Tuấn Anh': [6, 52] }
+export const EM_LOP = [
+  ...EM_CHIEU.map((x) => ({ ...x, coMat: true })),
+  ...Object.entries(VANG_BAC).map(([ten, [bac, diem]]) => ({ ten, bac, diem, mini: KIEU.deu, coMat: false })),
+].map((x) => ({ ...x, du: Math.round((x.diem / 100) * 14) })).sort((a, b) => b.bac - a.bac || b.diem - a.diem)
+export const nhomCua = (bac) => (bac >= 8 ? 'cham' : bac >= 6 ? 'chua-deu' : 'luoi')
 export const THANG_BAC = Array.from({ length: 12 }, (_, i) => EM_CHIEU.filter((x) => x.bac === i + 1).length)
 
 // ───────────────────────────── CẢ LỚP, HÔM QUA (BTVN, thứ Hai 26/10): 412 lượt, đo được 412

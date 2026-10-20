@@ -2,7 +2,7 @@
 
 Thầy dặn: tính thời gian đọc hết đề từng câu cho từng em, đo thời gian làm, ra các mức làm; hiện ở điểm danh, hồ sơ, ai đã sai câu này, gọi lên bảng, app học sinh; **mọi câu đã làm, đang làm, sắp làm đều phải đo được**; vẽ trước khi build.
 
-Đặc tả đầy đủ và các quyết định cần thầy chốt: `docs/dac-ta-muc-lam-bai-2010.md`. Chưa sửa `src/`, `server/`. Số trong ảnh là số GIẢ, tính từ MỘT bảng (`du-lieu-gia.mjs`); ngưỡng là TẠM.
+Đặc tả đầy đủ và các quyết định cần thầy chốt: `docs/dac-ta-muc-lam-bai-2010.md`. Chưa sửa `src/`, `server/`. Số trong ảnh là số GIẢ, tính từ MỘT bảng (`du-lieu-gia.mjs`); ngưỡng là TẠM. Khung 05 và 06 là bố cục đề xuất (chưa đối chiếu màn thầy hiện có), các khung còn lại đã đối chiếu mã, xem mục 9 của đặc tả.
 
 Dựng lại: `node scripts/dung-ban-ve-muc-lam-2010.mjs && node scripts/chup-ban-ve-muc-lam-2010.mjs` (nguồn: `du-lieu-gia.mjs`, `muc-lam.css`, sinh ra `muc-lam.html` và `anh/`). Mở từng khung bằng `muc-lam.html#k=<khung>&toi=1`. Nhãn "Thêm / Đổi / Giữ" chỉ để thầy xem bản vẽ, không có trong app.
 
@@ -16,9 +16,9 @@ Dựng lại: `node scripts/dung-ban-ve-muc-lam-2010.mjs && node scripts/chup-ba
 | 06 | `06-len-bang-` | Em được gọi lên bảng | Riêng, không lên chiếu |
 | 07 | `07-hs-` | App học sinh: Tự sửa lỗi, màn sửa câu, Câu đã làm | Riêng |
 | 08 | `08-ph-` | App phụ huynh | Riêng |
-| 09 | `09-chieu-tat-` | Bản chiếu điểm danh, mặc định (chỉ số gộp của lớp) | **Chiếu** |
-| 10 | `10-chieu-bat-` | Bản chiếu điểm danh, bật công tắc H (thanh nhỏ từng em) | **Chiếu** |
-| 11 | `11-chieu-x-` | Tờ chiếu "ai sai câu này" (phím X) | **Chiếu** |
+| 09 | `09-chieu-tat-` | Bản chiếu **Nhịp học của lớp**, mặc định (chỉ số gộp của lớp; chế độ Điểm danh/QR không đổi) | **Chiếu** |
+| 10 | `10-chieu-bat-` | Như 09, bật nút mới M (thanh nhỏ Mức làm cạnh tên từng em) | **Chiếu** |
+| 11 | `11-chieu-x-` | Tờ chiếu "Ai đã sai?" (phím X), vẽ đúng cấu trúc thật + ô mới | **Chiếu** |
 
 Khung 01–08: ba khổ `doc` 390 · `ngang` 844 · `may-tinh` 1440 × `sang` / `toi`. Khung 09–11: 1920×1080 và 1280×720 (bản chiếu luôn nền tối).
 
