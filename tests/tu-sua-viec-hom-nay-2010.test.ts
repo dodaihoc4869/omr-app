@@ -153,3 +153,44 @@ describe('sửa thêm một chặng và dòng mô tả chặng', () => {
     expect(moTaChang([])).toBe('')
   })
 })
+
+describe('Xoay vòng câu gốc qua nhiều ngày', () => {
+  const NGAY2 = NAY + 86_400_000
+  const khoaCuaGoc = (v: NonNullable<ReturnType<typeof dungViecHomNay>['viec']>) => v.muc.filter((x) => x.loai === 'goc').map((x) => x.khoa)
+  it('hôm sau ra các câu gốc KHÁC (chưa làm bao giờ trước); các nhóm gần xong / dở / mới giữ nguyên', () => {
+    const d = ds(dai(4, 'can_chan_doan', 'm'), dai(16, 'thieu_hoc_lieu', 'g'))
+    const v1 = dungNgay(d)!
+    const goc1 = khoaCuaGoc(v1)
+    expect(goc1).toHaveLength(8)
+    for (const k of goc1) ghiXongHomNay(k, NAY) // hôm nay em đã tự làm lại 8 câu gốc
+    const v2 = dungViecHomNay(bat(d), NGAY2, '11010').viec!
+    const goc2 = khoaCuaGoc(v2)
+    expect(goc2).toHaveLength(8)
+    expect(goc2.filter((k) => goc1.includes(k))).toEqual([]) // không lặp
+    expect(v2.muc.filter((x) => x.loai === 'moi').map((x) => x.khoa)).toEqual(v1.muc.filter((x) => x.loai === 'moi').map((x) => x.khoa))
+    expect(v2.xong).toBe(0)
+  })
+  it('chỉ còn câu gốc làm gần đây vẫn lấp đủ ngày (không loại câu nào); câu làm lâu nhất đứng trước', () => {
+    const d = ds(dai(4, 'can_chan_doan', 'm'), dai(8, 'thieu_hoc_lieu', 'g'))
+    const v1 = dungNgay(d)!
+    for (const k of khoaCuaGoc(v1)) ghiXongHomNay(k, NAY)
+    expect(khoaCuaGoc(dungViecHomNay(bat(d), NGAY2, '11010').viec!).sort()).toEqual(khoaCuaGoc(v1).sort())
+    // ngày kế tiếp có 12 câu gốc, 4 câu cũ làm hôm qua: bốn câu làm hôm qua đứng SAU các câu chưa làm
+    const d3 = ds(dai(12, 'thieu_hoc_lieu', 'h'))
+    localStorage.clear()
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: '11010' }))
+    ghiXongHomNay('h-thieu_hoc_lieu-0', NAY); ghiXongHomNay('h-thieu_hoc_lieu-1', NAY - 86_400_000 * 5)
+    const goc3 = khoaCuaGoc(dungViecHomNay(bat(d3), NGAY2, '11010').viec!)
+    expect(goc3).toHaveLength(12)
+    // chưa làm bao giờ đứng trước; trong số đã làm: làm lâu hơn (5 ngày trước) đứng trước câu làm hôm qua
+    expect(goc3.slice(-2)).toEqual(['h-thieu_hoc_lieu-1', 'h-thieu_hoc_lieu-0'])
+  })
+  it('giữ ~30 ngày và tối đa 400 mục', () => {
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: '11010' }))
+    ghiXongHomNay('cu', NAY - 40 * 86_400_000)
+    for (let i = 0; i < 405; i++) ghiXongHomNay(`k${i}`, NAY)
+    const map = JSON.parse(localStorage.getItem('omr_tu_sua_lan_cuoi_11010')!) as Record<string, string>
+    expect(map.cu).toBeUndefined()
+    expect(Object.keys(map)).toHaveLength(400)
+  })
+})

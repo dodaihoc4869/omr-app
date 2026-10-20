@@ -77,7 +77,8 @@ export default function ViecHomNay({ viec, thongTin, soXong, tong, nayMs, onChon
             {chang.map((x) => {
               const i = chiSo.get(x.khoa) ?? 0
               const tt = thongTin(x.m, i)
-              const cham = chamDuong(x)
+              // Câu đã xong phần mà danh sách chưa tải lại ⇒ không vẽ chấm cũ (khỏi nói "đang ở bước 1" cạnh "Xong phần hôm nay").
+              const cham = x.xong && x.m.trangThai !== 'cho_gap_lai_2' && x.m.trangThai !== 'da_tu_sua' ? null : chamDuong(x)
               return (
                 <li key={x.khoa}>
                   <button type="button" className="vh-cau" data-khoa={x.khoa} data-tt={x.xong ? 'xong' : x.loai === 'gan' ? 'gan' : undefined} onClick={() => onChon(x.m, i)}>

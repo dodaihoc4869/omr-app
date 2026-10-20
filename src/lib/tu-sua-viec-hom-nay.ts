@@ -5,6 +5,8 @@
 //   · "XONG PHẦN HÔM NAY" ≠ "đã tự sửa": một câu không thể đi từ lúc bắt đầu tới `da_tu_sua` trong một ngày (ghép bài → chờ ≥ 24 giờ → bản mới). Câu tính là xong phần
 //     khi hôm nay em đã nộp chặng cuối làm được: ghép xong cả bài (`cho_gap_lai_2`) · tự sửa xong bản mới (`da_tu_sua`) · hết sức mà còn vướng (`can_thay`) ·
 //     hoặc với câu chỉ có lối câu gốc: em đã bấm "Kiểm tra lại" ít nhất một lần.
+//   · XOAY VÒNG câu gốc: câu chỉ có lối câu gốc không đổi trạng thái sau khi em tự làm lại, nên mỗi câu có "lần cuối em làm" (map nhỏ theo SBD, giữ ~30 ngày); trong nhóm câu gốc,
+//     câu CHƯA làm bao giờ / làm lâu nhất đứng trước ⇒ hôm sau ra câu khác, không lặp cùng tám câu. Không loại câu nào: chỉ còn câu làm gần đây thì vẫn lấp đủ ngày.
 //   · Danh sách chỉ trả tối đa 100 dòng (câu đã tự sửa đứng cuối, câu chờ có thể rớt trang 1) ⇒ "không còn trong danh sách" KHÔNG nghĩa là xong. Mỗi câu của ngày được
 //     lưu kèm bản chụp mục (qid, dotId, trạng thái lúc chọn) và danh sách "đã xong" ghi lúc nộp; khoá theo SBD + ngày VN (đăng nhập lại không mất).
 import type { MucChua } from './chua-cau-sai-api'
@@ -15,6 +17,9 @@ export const SO_CAU_MOI_CHANG = 4
 /** Khoá phiên cổng học sinh (viết thẳng, như hoi-thay-nhung.ts — không nhập phien-hoc-sinh.ts để khỏi tách khối tải). */
 const KHOA_PHIEN = 'omr_student_portal_auth'
 const khoaNhatKy = (sbd: string) => `omr_tu_sua_hom_nay_${sbd}`
+const khoaLanCuoi = (sbd: string) => `omr_tu_sua_lan_cuoi_${sbd}`
+const NGAY_GIU_LAN_CUOI = 30
+const TOI_DA_LAN_CUOI = 400
 
 /** gan = chỉ còn làm bản mới · dang = đang sửa dở · moi = có bài luyện từng bước, chưa bắt đầu · goc = chỉ có lối tự làm lại trên câu gốc. */
 export type LoaiViec = 'gan' | 'dang' | 'moi' | 'goc'
@@ -85,11 +90,26 @@ function luuNhatKy(sbd: string, nk: NhatKy): void {
   if (!sbd) return
   try { localStorage.setItem(khoaNhatKy(sbd), JSON.stringify(nk)) } catch { /* không lưu được: màn vẫn đúng trong phiên này */ }
 }
+/** Map {khoá đợt → ngày VN em làm lần cuối} (xoay vòng câu gốc). Hỏng / chưa có ⇒ rỗng. */
+function docLanCuoi(sbd: string): Record<string, string> {
+  if (!sbd) return {}
+  try {
+    const o = JSON.parse(localStorage.getItem(khoaLanCuoi(sbd)) || 'null') as Record<string, unknown> | null
+    return o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([, v]) => typeof v === 'string')) as Record<string, string> : {}
+  } catch { return {} }
+}
+function ghiLanCuoi(sbd: string, khoa: string, nayMs: number): void {
+  const han = ngayVnTuSua(nayMs - NGAY_GIU_LAN_CUOI * 86_400_000)
+  const cu = Object.entries({ ...docLanCuoi(sbd), [khoa]: ngayVnTuSua(nayMs) }).filter(([, d]) => d >= han)
+  const giu = cu.length > TOI_DA_LAN_CUOI ? cu.sort((a, b) => (a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0)).slice(0, TOI_DA_LAN_CUOI) : cu
+  try { localStorage.setItem(khoaLanCuoi(sbd), JSON.stringify(Object.fromEntries(giu))) } catch { /* không lưu được: bỏ qua */ }
+}
 /** Ghi: hôm nay em đã xong phần của đợt `dotId` (gọi lúc nộp bước ghép bài / bản mới, hoặc lúc bấm "Kiểm tra lại" ở câu gốc). Lặp lại không đổi gì. */
 export function ghiXongHomNay(dotId: string, nayMs = Date.now()): void {
   const sbd = docSbdHs()
   if (!sbd || !dotId) return
   const nk = docNhatKy(sbd, nayMs)
+  ghiLanCuoi(sbd, dotId, nayMs)
   if (nk.x.includes(dotId)) return
   luuNhatKy(sbd, { ...nk, x: [...nk.x, dotId] })
 }
@@ -121,10 +141,12 @@ export function dungViecHomNay(
   // Bổ sung từ danh sách hiện tại (theo thứ tự máy chủ, ổn định theo loại) khi ngày chưa đủ số câu.
   const them_: MucLuu[] = []
   if (nk.m.length < soMuc) {
+    const lanCuoi = docLanCuoi(sbd)
+    const truoc = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
     const ung = ds
       .map((m, i) => ({ m, i, l: loaiViec(m, nayMs) }))
       .filter((x): x is { m: MucChua; i: number; l: LoaiViec } => x.l !== null && !co.has(khoaMuc(x.m)))
-      .sort((a, b) => THU_TU[a.l] - THU_TU[b.l] || a.i - b.i)
+      .sort((a, b) => THU_TU[a.l] - THU_TU[b.l] || (a.l === 'goc' ? truoc(lanCuoi[khoaMuc(a.m)] ?? '', lanCuoi[khoaMuc(b.m)] ?? '') : 0) || a.i - b.i)
       .slice(0, soMuc - nk.m.length)
     for (const x of ung) them_.push({ q: x.m.qid, ...(x.m.dotId ? { d: x.m.dotId } : {}), t: x.m.trangThai, ...(x.m.denHan ? { h: x.m.denHan } : {}), l: x.l })
   }
