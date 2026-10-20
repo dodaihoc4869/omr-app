@@ -116,8 +116,8 @@ export interface MucTraLoi {
   /** Phần I: một chữ A–D. Phần II: 4 ký tự D/S (ô bỏ trống ghi "-"). Phần III: số. Rỗng = chưa trả lời. */
   dapAn: string
   giay?: number
-  /** 20/10 đo giây: giây đo thật của máy em + kích thước đề (src/lib/dong-ho-cau.ts); máy chủ làm sạch rồi ghi sổ. */
-  doGiay?: { g: number; t: number; h: 0 | 1; p: 'I' | 'II' | 'III' }
+  /** 20/10 đo giây: giây đo thật của máy em (src/lib/dong-ho-cau.ts). Kích thước đề do máy chủ tự đo từ câu nó chấm. */
+  doGiay?: { g: number }
 }
 
 /** `POST /hs/on-lai/nop` — BẮT BUỘC token học sinh. Đáp án/lời giải chỉ có trong phản hồi `ok:true`. */

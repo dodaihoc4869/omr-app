@@ -145,3 +145,7 @@ export function KhoiLoiGiaiTuCT({ ct, chuNgan, dapAn, tach }: { ct: { chot: stri
   )
   return <KhoiLoiGiaiChuan phan={phan} loiGiai={lg} correct={phan === 'III' ? '' : dapChuan} giuDong={!!tach} />
 }
+
+// 20/10 đo giây: đồng hồ làm câu (src/lib/dong-ho-cau.ts) được XUẤT QUA tệp này để Rollup gộp nó vào chunk lười đã có của hai màn dùng (Làm bài tập, ôn lại)
+// thay vì tạo thêm một tệp chunk: cổng service worker đang đúng 170/170 tệp precache (`node scripts/kiem-sw.mjs`).
+export { cumDoGiay, DongHoCau, useGiayCau, useGiayNhieuCau } from '../../lib/dong-ho-cau'

@@ -34,19 +34,20 @@ const tra = async (d: D1That, qid: string, them: Record<string, unknown>) =>
 const dong = (d: D1That, qid: string) => d.sql.prepare("SELECT giay, raw_json FROM su_kien_hoc WHERE sbd='S1' AND nguon='game' AND qid=?").get(qid) as { giay: number | null; raw_json: string | null } | undefined
 
 describe('game: giây + kích thước đề vào sổ (OMNI tắt)', () => {
-  it('`doGiay` đầy đủ ⇒ cột giay + raw.doc', async () => {
+  it('`doGiay` ⇒ cột giay + raw.doc do MÁY CHỦ đo từ câu (bỏ qua số từ máy em tự khai)', async () => {
     const d = dungPhien()
-    expect((await tra(d, 'Q0', { doGiay: { g: 14.4, t: 46, h: 0, p: 'I' } })).ok).toBe(true)
+    expect((await tra(d, 'Q0', { doGiay: { g: 14.4, t: 9999, h: 1, p: 'III' } })).ok).toBe(true)
     const r = dong(d, 'Q0')!
     expect(r.giay).toBe(14)
-    expect(JSON.parse(r.raw_json!).doc).toEqual({ t: 46, h: 0, p: 'I' })
+    // Câu Q0: "Đề Q0" (2 từ) + 4 phương án "A. a"… (2 từ mỗi phương án) = 10 từ, không hình, Phần I.
+    expect(JSON.parse(r.raw_json!).doc).toEqual({ t: 10, h: 0, p: 'I' })
   })
-  it('chỉ có `msLam` (máy cũ) ⇒ giây = ms/1000, không có raw.doc', async () => {
+  it('chỉ có `msLam` (máy cũ) ⇒ giây = ms/1000 và máy chủ vẫn tự đo kích thước đề vào raw.doc', async () => {
     const d = dungPhien()
     await tra(d, 'Q1', { msLam: 30_400 })
     const r = dong(d, 'Q1')!
     expect(r.giay).toBe(30)
-    expect(r.raw_json === null || JSON.parse(r.raw_json).doc === undefined).toBe(true)
+    expect(JSON.parse(r.raw_json!).doc).toEqual({ t: 10, h: 0, p: 'I' })
   })
   it('không gửi gì ⇒ giây NULL như hôm nay; đồng hồ hỏng báo 0 ⇒ NULL (không thành Mức làm 1 oan)', async () => {
     const d = dungPhien()

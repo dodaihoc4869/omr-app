@@ -48,7 +48,7 @@ import {SQL_DONG_CO_HANH_TRINH} from './hanh-trinh-dong-co-schema'
 import {SQL_HANH_TRINH_V5} from './hanh-trinh-v5-schema'
 import {SQL_HT6} from './hanh-trinh-v6-schema'
 import {lopCuaEm} from './bai-da-day'
-import {docDoGiayMot,phanSoCuaDo} from './do-giay-luot'
+import {boSungKichThuocDe,docDoGiayMot,phanSoCuaDo} from './do-giay-luot'
 import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
 import {TRAN_CAU_DAO_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
@@ -600,7 +600,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // 05/10 (cau-anh-em.ts): `raw` thêm tc (câu anh em thay cho câu gốc) / xt (bản xáo; `chon` quy về khung gốc) / nv (nguyên văn); không có ⇒ y hệt hôm nay.
       // 06/10 (chan-doan-buoc-sai.ts): câu CHẨN ĐOÁN ⇒ purpose 'chan_doan' (không phải lần làm của câu lỗi — mọi bộ đọc lần làm bỏ qua; OMNI coi là quan sát của vi kỹ năng
       // nó kiểm), raw thêm `cd: 1` (+ `tc` = câu lỗi từ ref). Em làm SAI (tự làm, không lướt) ⇒ một dòng `omni_buoc_sai` cho câu lỗi như em tự khai bước sai.
-      const ghi=ghiAssisted?await ghiSuKien(env,[{nguon:'game',maNguon:id,sbd,qid,lan:1,ketQua:so?.luot?null:attempt.correct?1:0,luc:new Date(attempt.at).toISOString(),maDang:q.dang,chuyenDe:'',mucDo:q.mucDo??'',attemptId:receipt,assistance:attempt.assisted?'assisted':'none',purpose:laCD?MUC_DICH_CHAN_DOAN:so?.purpose??(session.mode==='repair'?'repair':session.mode==='tower'?'consolidation':'maintenance'),receivedAt:attempt.at,...phanSoCuaDo(docDoGiayMot(b,{ms:b.msLam}),rawSo(rawLamLai(ref,q.phan,chon),so?.raw).raw), // 20/10 đo giây: giây + kích thước đề vào sổ CẢ KHI OMNI tắt (trước: bị bỏ)
+      const ghi=ghiAssisted?await ghiSuKien(env,[{nguon:'game',maNguon:id,sbd,qid,lan:1,ketQua:so?.luot?null:attempt.correct?1:0,luc:new Date(attempt.at).toISOString(),maDang:q.dang,chuyenDe:'',mucDo:q.mucDo??'',attemptId:receipt,assistance:attempt.assisted?'assisted':'none',purpose:laCD?MUC_DICH_CHAN_DOAN:so?.purpose??(session.mode==='repair'?'repair':session.mode==='tower'?'consolidation':'maintenance'),receivedAt:attempt.at,...phanSoCuaDo(boSungKichThuocDe(docDoGiayMot(b,{ms:b.msLam}),q.phan,q),rawSo(rawLamLai(ref,q.phan,chon),so?.raw).raw), // 20/10 đo giây: giây + kích thước đề vào sổ CẢ KHI OMNI tắt (trước: bị bỏ)
         ...(so?.subitem?{subitem:so.subitem}:{}),cauVersion:qGoc.version}]):null
       // Chỉ ref máy chủ đã xếp từ lịch Hỏi thầy mới cần khép projection. Đợi sổ ghi bền; việc này vốn chạy trong waitUntil, câu thường không đọc thêm D1.
       if(ghi?.ok===true&&ghi.soGui>0&&ref.hoiThayKiem===true)try{await(await import('./hoi-thay-dong-bo-sua')).dongBoSuaLoiHoiThay(env,sbd,tachSongSinh(ref.tc??ref.qid).goc,attempt.at)}catch(e){console.error('[hoi-thay] chưa đồng bộ ôn chung:',e instanceof Error?e.message:String(e))}

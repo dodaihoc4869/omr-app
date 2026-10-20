@@ -29,10 +29,15 @@ import { TIEN_BO_NGAY } from './ke-hoach-ngay-d1'
 import { docCauDaLamHomNay } from './cau-da-lam'
 import { DAI_QID_TOI_DA, donQid, layCauChoEm, TOI_DA_QID_MOT_LUOT } from './cau-theo-qid'
 import { ghiSuKien, ngayVn, phanTuQid, type SuKien } from './su-kien-hoc'
-import { ghepDocVaoRaw, lamSachDo, type DoLuot } from './do-giay-luot'
+import { boSungKichThuocDe, ghepDocVaoRaw, lamSachDo, type DoLuot } from './do-giay-luot'
 import { chamTheoSnapshot, docSnapshotNhieu, quyetDinhSnapshot, type CauSnapshot } from './cau-snapshot'
 
 export const CAN_DANG_NHAP = 'Em đăng nhập lại để nộp câu ôn.'
+/** `raw.doc` của một lượt: kích thước đề do MÁY CHỦ đo từ câu vừa chấm (không tin số máy em); không có giây đo thật ⇒ không ghi. */
+const rawDoc = (x: BaiLam, q: unknown) => {
+  const d = boSungKichThuocDe(x.doc ?? null, (q as { phan?: unknown }).phan, q)
+  return d && d.giay !== null && d.tu !== null ? (ghepDocVaoRaw(undefined, d) as Record<string, unknown>) : undefined
+}
 const GIAY_MIN = 5
 const GIAY_MAX = 1200
 const DAI_DAP_AN_TOI_DA = 40
@@ -185,7 +190,7 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
     const q = cauTheoQid.get(x.qid)!
     return {
       nguon: opt.nguon, maNguon, sbd, qid: x.qid, lan: 1, luc, giay: x.giay, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
-      ...(x.doc?.tu != null ? { raw: ghepDocVaoRaw(undefined, x.doc) } : {}),
+      ...(rawDoc(x, q) ? { raw: rawDoc(x, q) } : {}),
       cauVersion: snapTheoQid.get(x.qid)?.questionVersion ?? q.version,
       ketQua: cham(x, q) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
     }

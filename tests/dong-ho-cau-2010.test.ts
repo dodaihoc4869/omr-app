@@ -45,16 +45,10 @@ describe('DongHoCau', () => {
 })
 
 describe('cumDoGiay', () => {
-  const cau = { text: 'Cho pin điện hóa Zn Cu ở điều kiện chuẩn đúng', choices: ['A. a b', 'B. c d'] }
-  it('đếm số từ bằng hàm của màn lên bảng, có hình/không hình', () => {
-    const c = cumDoGiay(14, 'I', cau)!
-    expect(c).toMatchObject({ g: 14, p: 'I', h: 0 })
-    expect(c.t).toBeGreaterThan(8)
-    expect(cumDoGiay(9, 'I', { ...cau, thanCauImg: 'data:x' })!.h).toBe(1)
-  })
-  it('chưa có giây ⇒ undefined; giây > 900 bị kẹp', () => {
-    expect(cumDoGiay(null, 'I', cau)).toBeUndefined()
-    expect(cumDoGiay(0, 'I', cau)).toBeUndefined()
-    expect(cumDoGiay(5000, 'II', cau)!.g).toBe(900)
+  it('chỉ gửi giây; chưa có giây ⇒ undefined; giây > 900 bị kẹp', () => {
+    expect(cumDoGiay(14)).toEqual({ g: 14 })
+    expect(cumDoGiay(null)).toBeUndefined()
+    expect(cumDoGiay(0)).toBeUndefined()
+    expect(cumDoGiay(5000)).toEqual({ g: 900 })
   })
 })

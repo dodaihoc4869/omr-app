@@ -37,12 +37,11 @@ describe('Làm câu ôn: đồng hồ đo giây', () => {
     fireEvent.click(within(the(1)).getAllByRole('radio')[2]!)
     fireEvent.click(screen.getByRole('button', { name: /^Kiểm tra/ }))
     await waitFor(() => expect(goi.some((g) => g.url === '/hs/on-lai/nop')).toBe(true))
-    const nop = goi.find((g) => g.url === '/hs/on-lai/nop')!.body.traLoi as { qid: string; doGiay?: { g: number; t: number; h: number; p: string } }[]
+    const nop = goi.find((g) => g.url === '/hs/on-lai/nop')!.body.traLoi as { qid: string; doGiay?: { g: number } }[]
     const c1 = nop.find((x) => x.qid === 'on1')!
     expect(c1.doGiay!.g).toBeGreaterThanOrEqual(1)
     expect(c1.doGiay!.g).toBeLessThanOrEqual(3)
-    expect(c1.doGiay!.t).toBeGreaterThan(10)
-    expect(c1.doGiay).toMatchObject({ h: 0, p: 'I' })
+    expect(Object.keys(c1.doGiay!)).toEqual(['g']) // máy em chỉ gửi giây; số từ/hình/phần do máy chủ tự đo
     expect(nop.find((x) => x.qid === 'on4')!.doGiay).toBeUndefined() // em không chạm câu 2 ⇒ không có giây của câu 2
   }, 15000)
 })

@@ -5,6 +5,8 @@
 //     (8 + 0,35 × số từ + 10 × có hình, `thoi-gian-len-bang.ts`) và xếp Mức làm mà KHÔNG cần đọc lại đề.
 // Máy chủ KHÔNG bao giờ tự ước giây vào sổ. Thiếu / sai khuôn / ngoài khoảng ⇒ bỏ giá trị đó (NULL), lượt vẫn ghi như cũ.
 // Giây < 1 bị bỏ: đồng hồ hỏng báo 0 sẽ thành "Mức làm 1" oan cho cả lớp.
+import { noiDungTuCauGoc } from '../../src/lib/thoi-gian-len-bang'
+
 export const GIAY_LUOT_TOI_DA = 900
 export const SO_TU_TOI_DA = 3000
 export type PhanDo = 'I' | 'II' | 'III'
@@ -73,4 +75,15 @@ export function phanSoCuaDo(d: DoLuot | null | undefined, rawCu?: unknown): { gi
   if (!d) return rawCu === undefined ? {} : { raw: rawCu }
   const raw = ghepDocVaoRaw(rawCu, d)
   return { ...(d.giay !== null ? { giay: d.giay } : {}), ...(raw !== undefined ? { raw } : {}) }
+}
+
+/**
+ * Máy chủ TỰ đo kích thước đề từ chính câu nó vừa chấm (không tin số máy em gửi, không đọc thêm D1/R2): số từ + có hình + phần, bằng ĐÚNG hàm của
+ * màn lên bảng (`noiDungTuCauGoc`). Chỉ cần khi lượt có giây đo thật; phần lạ ⇒ trả nguyên.
+ */
+export function boSungKichThuocDe(d: DoLuot | null, phan: unknown, cau: unknown): DoLuot | null {
+  if (!d || d.giay === null) return d
+  if (phan !== 'I' && phan !== 'II' && phan !== 'III') return d
+  const nd = noiDungTuCauGoc(phan, cau)
+  return { ...d, tu: Math.min(SO_TU_TOI_DA, Math.max(0, nd.soTu)), hinh: nd.coHinh ? 1 : 0, phan }
 }

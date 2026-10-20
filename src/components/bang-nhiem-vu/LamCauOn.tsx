@@ -12,7 +12,7 @@ import NutHoiThay from '../loi-giai/NutHoiThay'
 import { HinhTaiViTri } from '../QuestionMedia'
 import OSoTraLoi from '../OSoTraLoi'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
-import { cumDoGiay, useGiayNhieuCau } from '../../lib/dong-ho-cau'
+import { cumDoGiay, useGiayNhieuCau } from '../loi-giai/KhoiLoiGiaiChuan'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
 import { SoExpCau, ThanhExpNho, useCheDoHieuUng } from '../exp-cau/ExpCau'
@@ -157,7 +157,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
   // ─── (3) nộp ───
   const nop = async () => {
     if (dangNop) return
-    const gui = dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).map((c) => ({ qid: c.qid, dapAn: c.phan === 'II' ? chuanDS(traLoi[c.qid]) : (traLoi[c.qid] || '').trim(), doGiay: cumDoGiay(dongHo.giay(c.qid), c.phan, c) }))
+    const gui = dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).map((c) => ({ qid: c.qid, dapAn: c.phan === 'II' ? chuanDS(traLoi[c.qid]) : (traLoi[c.qid] || '').trim(), doGiay: cumDoGiay(dongHo.giay(c.qid)) }))
     if (gui.length === 0) return
     setDangNop(true)
     setLoiNop('')

@@ -2,9 +2,8 @@
 // Đặc tả: docs/dac-ta-muc-lam-bai-2010.md mục 4. MỘT định nghĩa cho mọi màn làm câu:
 //   giây của một câu = tổng thời gian câu đang là "câu em làm" TRONG LÚC tab đang hiện, tính từ lúc câu hiện tới lúc nộp;
 //   dừng khi tab ẩn / khoá màn hình, hoặc 180 giây em không chạm màn (chạm lại thì chạy tiếp); trần 900 giây một câu.
-// Máy chủ KHÔNG ước giây thay máy em (server/src/do-giay-luot.ts chỉ làm sạch rồi ghi). Câu chưa đủ 1 giây ⇒ KHÔNG gửi (không gửi số 0).
+// Máy chủ KHÔNG ước giây thay máy em (server/src/do-giay-luot.ts chỉ làm sạch rồi ghi; số từ/hình/phần của đề do máy chủ tự đo). Câu chưa đủ 1 giây ⇒ KHÔNG gửi (không gửi số 0).
 import { useEffect, useRef, type RefObject } from 'react'
-import { noiDungTuCauGoc } from './thoi-gian-len-bang'
 
 export const IM_LANG_MS = 180_000
 export const TRAN_MS = 900_000
@@ -104,9 +103,8 @@ export function useGiayNhieuCau(goc: RefObject<HTMLElement | null>, bat: boolean
   return { giay: (qid) => dh.current!.giay(qid) }
 }
 
-/** Cụm `doGiay` gửi cùng lượt nộp: giây đo thật + kích thước đề (đếm bằng chính hàm của màn lên bảng, để số từ khớp mọi nơi). Chưa có giây ⇒ undefined. */
-export function cumDoGiay(giay: number | null, phan: 'I' | 'II' | 'III', cau: unknown): { g: number; t: number; h: 0 | 1; p: 'I' | 'II' | 'III' } | undefined {
+/** Cụm `doGiay` gửi cùng lượt nộp: CHỈ giây đo thật. Kích thước đề (số từ, hình, phần) do máy chủ tự đo từ câu nó chấm — không tin số máy em. Chưa có giây ⇒ undefined. */
+export function cumDoGiay(giay: number | null): { g: number } | undefined {
   if (giay === null || giay < 1) return undefined
-  const nd = noiDungTuCauGoc(phan, cau)
-  return { g: Math.min(900, giay), t: nd.soTu, h: nd.coHinh ? 1 : 0, p: phan }
+  return { g: Math.min(900, giay) }
 }
