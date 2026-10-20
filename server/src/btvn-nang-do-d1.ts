@@ -21,7 +21,8 @@ import { qidDangBaoVe } from './game-v2-bank'
 import { PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU, TY_LE_ON_TOI_DA } from './ho-so-cau-hinh'
 import { dungLaiHoSo, themNgay } from './ho-so-nam-kt'
 import { tinhNganSach, tinhVanToc, type DauVaoKeHoach } from './ke-hoach-ngay'
-import { chuyenDeThat, ghiSuKien, ngayVn, phanTuQid, suKienChamBai, suKienTuKetQuaCham, cauTuKho } from './su-kien-hoc'
+import { chuyenDeThat, ghiSuKien, ngayVn, phanTuQid, suKienChamBai, suKienTuKetQuaCham, cauTuKho, type SuKien } from './su-kien-hoc'
+import { boSungKichThuocDe, phanSoCuaDo, type DoLuot } from './do-giay-luot'
 import { daTraLoi } from './on-lai-nop'
 /** Cổng điều chỉnh tuỳ chọn của lõi (`DieuChinhEm`). Bộ não A.I đã GỠ (28/09/2026) ⇒ máy chủ KHÔNG còn nguồn điều chỉnh nào: mọi lời gọi truyền `undefined` (đường mặc định). */
 export interface DieuChinhHieuLuc { dieuChinh: DieuChinhEm; ngay?: string }
@@ -46,6 +47,62 @@ const chuanHoaKienThuc = (v: unknown): string[] =>
   [...new Set((Array.isArray(v) ? v : []).filter((x): x is string => typeof x === 'string' && x.trim().length > 0).map((x) => x.trim()))]
 /** Câu thưởng: nhãn `thu_thach` hoặc `loi_cao` — đúng thì tính, sai thì KHÔNG vào mẫu điểm. */
 export const laCauThuong = (nhan: unknown): boolean => nhan === 'thu_thach' || nhan === 'loi_cao'
+
+/**
+ * ĐO GIÂY TỪNG CÂU (thầy 20/10, docs/dac-ta-muc-lam-bai-2010.md mục 4). Máy em CHỈ gửi giây (`doGiay: {qid: {g}}`); máy chủ gắn `giay` vào sổ và
+ * TỰ đo kích thước đề (`raw.doc` = số từ, có hình, phần) từ chính câu nó vừa lấy để chấm — `boSungKichThuocDe`, cùng hàm đếm của màn lên bảng —
+ * KHÔNG tin số từ/hình/phần máy em khai (bỏ hết, kể cả khi lượt không có câu trong tay). Dùng chung cho nộp phiếu (btvn, khắc phục) và nộp chặng (btvn_lo).
+ * THUẦN: không D1/R2, không `await` ⇒ không thêm vòng chờ. Không có cụm (phiếu bản cũ đang mở) ⇒ trả đúng mảng đưa vào, hành vi y như trước.
+ * `cauGoc` = câu ĐÃ ĐỔI sang khuôn `noiDungTuCauGoc` theo qid; thiếu câu ⇒ chỉ ghi `giay`. Lượt không có giây hợp lệ ⇒ giữ nguyên (NULL). Máy chủ không tự ước giây.
+ */
+export function ganDoGiay(ds: SuKien[], doGiay?: ReadonlyMap<string, DoLuot> | null, cauGoc?: ReadonlyMap<string, Hang> | null): SuKien[] {
+  if (!doGiay || doGiay.size === 0) return ds
+  return ds.map((e) => {
+    const g = doGiay.get(e.qid)
+    if (!g || g.giay === null) return e
+    const q = cauGoc?.get(e.qid)
+    const sach: DoLuot = { giay: g.giay, tu: null, hinh: null, phan: null }
+    const do_ = q ? boSungKichThuocDe(sach, q.phan, q) : sach
+    // Đề thật không bao giờ có 0 từ: câu cầm trong tay mà đếm ra 0 là câu thiếu trường chữ (khuôn lạ / bị rút gọn) — ghi giây thôi, KHÔNG ghi raw.doc 0 từ (sẽ thành "đọc xong trong 8 giây" sai).
+    return { ...e, ...phanSoCuaDo(do_ && do_.tu !== null && do_.tu > 0 ? do_ : sach, e.raw) }
+  })
+}
+
+/** Câu TỜ KHO (`homeworkQuestions`: `de` / `pa{A..D}` / `y{a..d}` / `bang` / `hinh[{vi_tri}]`) → khuôn `noiDungTuCauGoc` (`text` / `choices` / `ideas` / `table` / `hinhAnh`).
+ * Truyền thẳng câu kho vào `boSungKichThuocDe` sẽ đếm 0 từ (kho không có khoá `text`) — phải đổi khuôn trước. Ảnh ở vị trí `sau_loi_giai` không phải đề. */
+export function cauKhoDangGoc(c: Hang): Hang {
+  const pa = c.pa && typeof c.pa === 'object' ? (c.pa as Hang) : {}
+  const y = c.y && typeof c.y === 'object' ? (c.y as Hang) : {}
+  return {
+    phan: c.phan,
+    text: chuoi(c.de ?? c.text), // tờ kho đời cũ (phanI/phanII/phanIII) có thể ghi khuôn text / choices / ideas
+    choices: c.pa ? ['A', 'B', 'C', 'D'].map((k) => chuoi(pa[k])) : Array.isArray(c.choices) ? c.choices : [],
+    ideas: c.y ? ['a', 'b', 'c', 'd'].map((k) => chuoi(y[k])) : Array.isArray(c.ideas) ? c.ideas : [],
+    table: c.bang,
+    hinhAnh: (Array.isArray(c.hinh) ? (c.hinh as Hang[]) : []).filter((h) => h && h.vi_tri !== 'sau_loi_giai'),
+  }
+}
+
+/** Câu PHIẾU đã lưu (`CauLuyen`: `text` / `luaChon` / `anhThanCau` / `anhLuaChon` / `hinh[{viTri}]` / `bang`) → khuôn `noiDungTuCauGoc`. */
+export function cauLuyenDangGoc(c: Hang): Hang {
+  const lc = Array.isArray(c.luaChon) ? (c.luaChon as unknown[]) : []
+  const anh = Array.isArray(c.anhLuaChon) ? (c.anhLuaChon as unknown[]) : []
+  return {
+    phan: c.phan,
+    text: chuoi(c.text),
+    ...(c.phan === 'I' ? { choices: lc, choiceImgs: anh } : {}),
+    ...(c.phan === 'II' ? { ideas: lc, ideaImgs: anh } : {}),
+    thanCauImg: c.anhThanCau,
+    table: c.bang,
+    hinhAnh: (Array.isArray(c.hinh) ? (c.hinh as Hang[]) : []).filter((h) => h && h.viTri !== 'sau_loi_giai'),
+  }
+}
+
+/** `ganDoGiay` cho các đường đã cầm sẵn câu TỜ KHO trong tay lúc chấm (không đọc thêm gì). Không có cụm giây ⇒ không dựng bản đồ nào. */
+export function ganDoGiayTuKho(ds: SuKien[], doGiay: ReadonlyMap<string, DoLuot> | null | undefined, cauKho: readonly Hang[]): SuKien[] {
+  if (!doGiay || doGiay.size === 0) return ds
+  return ganDoGiay(ds, doGiay, new Map(cauKho.map((c) => [chuoi(c.qid), cauKhoDangGoc(c)])))
+}
 
 // ================================================================== CỜ + LƯỢC ĐỒ ==================================================================
 
@@ -722,7 +779,7 @@ export async function docConLaiLenCap(env: Env, sbd: string): Promise<number | n
  * NỘP MỘT CHẶNG của bài `ca_nhan`. `dapAnTho` = `{qid: đáp án}` của các câu chặng (máy em gửi); rỗng/vắng ⇒ chỉ báo trạng thái.
  * Luật: chỉ câu ĐÃ TRẢ LỜI (`daTraLoi`) mới chấm/ghi sổ/khoá/nhận lời giải; đáp án ĐẦU khoá; đáp án + lời giải CHỈ ra sau khi đã ghi sổ.
  */
-export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: number, dapAnTho: Hang | null, now: number): Promise<Hang> {
+export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: number, dapAnTho: Hang | null, now: number, doGiay?: ReadonlyMap<string, DoLuot> | null): Promise<Hang> {
   const maBtvn = chuoi(bt.ma_btvn)
   const khoa = `${maBtvn}|${sbd}`
   const chiSo = Math.floor(chiSoTho)
@@ -734,7 +791,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   if (!em.nop_luc && Number.isFinite(Date.parse(chuoi(bt.han_nop))) && now > Date.parse(chuoi(bt.han_nop)) && !(await btvnNopTreBat(env, bt.giao_luc))) return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' } // cờ lùi `btvn_nop_tre = 'tat'`: luật cũ
   const chotLuc = chuoi(em.chot_luc)
   const loDaXong = Math.min(soChang, soHoac(em.lo_da_xong))
-  if (chiSo === soChang && soChang > 0) return nopThuSucThem(env, bt, em, sbd, dapAnTho, now) // chặng ẢO "thử sức thêm" (bản 1.2): nộp RIÊNG, tới hạn nộp kể cả khi phần bắt buộc đã nộp
+  if (chiSo === soChang && soChang > 0) return nopThuSucThem(env, bt, em, sbd, dapAnTho, now, doGiay) // chặng ẢO "thử sức thêm" (bản 1.2): nộp RIÊNG, tới hạn nộp kể cả khi phần bắt buộc đã nộp
   if (chiSo < 0 || chiSo >= soChang) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
   const moLuc = docLichDaLuu(em.chang_mo_json, soChang, { chotLuc, hanNop: chuoi(bt.han_nop), nowMs: now })?.moLuc ?? moLucChang(chotLuc, soChang)
   if (!(chiSo === 0 || (chiSo <= loDaXong && now >= Date.parse(moLuc[chiSo])))) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
@@ -814,7 +871,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   const luc = new Date(now).toISOString()
   // `lan` của sổ = chỉ số chặng ở lượt 1; lượt làm lại (thầy bấm "Cho làm lại") cộng 1000 mỗi lượt để khoá sổ khác đi, kết quả lượt mới không bị nuốt.
   const lanSo = chiSo + LAN_MOI_LUOT * (Math.max(1, soHoac(em.so_lan_lam, 1)) - 1)
-  const ghi = await ghiSuKien(env, suKienChamBai('btvn_lo', maBtvn, sbd, lanSo, luc, cauTuKho(daLam), gop))
+  const ghi = await ghiSuKien(env, ganDoGiayTuKho(suKienChamBai('btvn_lo', maBtvn, sbd, lanSo, luc, cauTuKho(daLam), gop), doGiay, daLam))
   if (!ghi.ok) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
   try {
     await dungLaiHoSo(env, [sbd], luc)
@@ -886,7 +943,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
  *   · sổ `su_kien_hoc` CHỈ ghi câu ĐÚNG (sai không hẹn ôn, không thành câu sai của hồ sơ); EXP theo câu như thường, KHÔNG có EXP "xong chặng".
  * Ra như một chặng thường: `ketQua[]` (đúng/sai + lời giải), `chang`, `exp`, kèm `thuSucThem {chiSo, soCau, soDaLam, soDung, daNop}`.
  */
-async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTho: Hang | null, now: number): Promise<Hang> {
+async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTho: Hang | null, now: number, doGiay?: ReadonlyMap<string, DoLuot> | null): Promise<Hang> {
   const maBtvn = chuoi(bt.ma_btvn)
   const khoa = `${maBtvn}|${sbd}`
   let em = em0
@@ -952,7 +1009,7 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
   const lanSo = soChang + LAN_MOI_LUOT * (Math.max(1, soHoac(em.so_lan_lam, 1)) - 1)
   const dungHet = daLam.filter((c) => dungCua(c, gop[chuoi(c.qid)]!))
   if (dungHet.length > 0) {
-    const ghi = await ghiSuKien(env, suKienChamBai('btvn_lo', maBtvn, sbd, lanSo, luc, cauTuKho(dungHet), gop))
+    const ghi = await ghiSuKien(env, ganDoGiayTuKho(suKienChamBai('btvn_lo', maBtvn, sbd, lanSo, luc, cauTuKho(dungHet), gop), doGiay, dungHet))
     if (!ghi.ok) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
     try {
       await dungLaiHoSo(env, [sbd], luc)

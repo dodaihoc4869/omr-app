@@ -1,0 +1,32 @@
+# ĐO ĐỘ PHỦ GIÂY TỪNG LƯỢT (CHỈ ĐỌC) — thầy 20/10: "tất cả các câu học sinh đã làm, đang làm hoặc sắp làm đều phải đo được" (docs/dac-ta-muc-lam-bai-2010.md mục 4).
+# Sau Đợt 1 (đo giây): đếm lượt 24 giờ qua theo nguồn — tổng · có giây · có kích thước đề (`raw_json.doc`) — và phân bố giây theo phần để hiệu chỉnh ngưỡng Mức làm.
+# CHỈ SELECT gộp: không mã em, không tên em, không mã câu (repo công khai). Bấm tay (workflow_dispatch) sau khi phát hành.
+name: Đo độ phủ giây từng lượt (chỉ đọc)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: do-phu-giay-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "1 lượt 24 giờ qua theo nguồn: tổng · có giây · có kích thước đề" "SELECT nguon, COUNT(*) luot, SUM(giay IS NOT NULL) co_giay, SUM(json_extract(raw_json,'\$.doc.t') IS NOT NULL) co_doc FROM su_kien_hoc WHERE luc >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 day') GROUP BY nguon ORDER BY luot DESC"
+          q "2 phân bố giây của lượt có kích thước đề, theo phần" "SELECT json_extract(raw_json,'\$.doc.p') phan, COUNT(*) n, MIN(giay) nho, MAX(giay) lon, ROUND(AVG(giay),1) tb FROM su_kien_hoc WHERE giay IS NOT NULL AND json_extract(raw_json,'\$.doc.t') IS NOT NULL GROUP BY 1 ORDER BY 1"
+          q "3 lượt có giây nhưng thiếu kích thước đề (đường chưa gửi được số từ)" "SELECT nguon, COUNT(*) n FROM su_kien_hoc WHERE giay IS NOT NULL AND json_extract(raw_json,'\$.doc.t') IS NULL AND luc >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 day') GROUP BY nguon ORDER BY n DESC"

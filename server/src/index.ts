@@ -9,6 +9,7 @@ import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-lu
 import { lopCua } from '../../src/lib/loi-giai-kiem'
 import { kiemGoiDe } from '../../src/lib/kiem-goi-de'
 import {ghiSuKien,ghiSuKienThi,chuanBiSuKienLoBtvn,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
+import {docDoGiayNhieu} from './do-giay-luot'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
@@ -2043,7 +2044,8 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>, ctx?: ExecutionC
   }
   if (btLo && ND.laBaiCaNhan(btLo)) {
     const dapAnCn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
-    return ra(await ND.nopChangCaNhan(env, btLo, sbd, chiSo, dapAnCn, Date.now()))
+    // ĐO GIÂY (20/10): cụm `doGiay` làm sạch ở đây (thuần, không D1), nộp chặng gắn vào sổ `btvn_lo`. Vắng ⇒ Map rỗng ⇒ y như trước.
+    return ra(await ND.nopChangCaNhan(env, btLo, sbd, chiSo, dapAnCn, Date.now(), docDoGiayNhieu(b)))
   }
 
   const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
@@ -2052,7 +2054,7 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>, ctx?: ExecutionC
     // Preserve the unassigned response before reading/grading any key material.
     const assigned = await env.DB.prepare('SELECT 1 FROM btvn_em WHERE khoa=?').bind(`${maBtvn}|${sbd}`).first()
     if (!assigned) return ra({ok:false,error:'Em không có bài tập này.'})
-    prepared = await chuanBiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn)
+    prepared = ND.ganDoGiay(await chuanBiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn), docDoGiayNhieu(b))
   }
   const loDaXongMoi = Math.floor(chiSo) + 1
   let r: { meta: { changes: number } }

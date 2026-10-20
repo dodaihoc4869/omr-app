@@ -186,6 +186,28 @@ describe('chấm tại máy chủ, ghi sổ, hồ sơ lên bậc', () => {
     expect(r.ketQua.map((x: { dung: unknown }) => x.dung)).toEqual([true, true])
   })
 
+  it('20/10 đo giây: `doGiay` (1–900) ghi giây đo thật + raw.doc, kể cả lượt dưới 5 giây (chính là "chưa đọc hết đề"); giây cũ 5..1200 vẫn thắng khi có', async () => {
+    const d = await dung()
+    await nop(d, [{ qid: I1, dapAn: 'B', doGiay: { g: 3, t: 9999, h: 1, p: 'III' } }])
+    const dong = suKien(d, I1)[0]!
+    expect(dong.giay).toBe(3)
+    const doc = JSON.parse(dong.raw_json).doc
+    expect(doc.p).toBe('I') // máy chủ đo từ câu đã chấm (câu mẫu có hình ⇒ h=1), KHÔNG tin t/h/p máy em gửi (p 'III', t 9999)
+    expect(doc.h).toBe(1)
+    expect(doc.t).toBeLessThan(200)
+    const d2 = await dung()
+    await nop(d2, [{ qid: I1, dapAn: 'B', giay: 42, doGiay: { g: 9, t: 20 } }])
+    expect(suKien(d2, I1)[0]!.giay).toBe(42)
+    const d3 = await dung()
+    await nop(d3, [{ qid: I1, dapAn: 'B', doGiay: { g: 0, t: 30 } }]) // đồng hồ hỏng báo 0 ⇒ không có giây, vẫn lưu kích thước đề
+    expect(suKien(d3, I1)[0]!.giay).toBeNull()
+    expect(JSON.parse(suKien(d3, I1)[0]!.raw_json ?? '{}').doc).toBeUndefined() // không có giây đo thật ⇒ không ghi kích thước đề
+    const d4 = await dung()
+    await nop(d4, [{ qid: I1, dapAn: 'B' }]) // máy cũ không gửi doGiay ⇒ y hệt hôm nay
+    expect(suKien(d4, I1)[0]!.giay).toBeNull()
+    expect(JSON.parse(suKien(d4, I1)[0]!.raw_json ?? '{}').doc).toBeUndefined()
+  })
+
   it('giây hợp lệ 5..1200 thì ghi (làm tròn); ngoài khoảng hoặc không phải số thì NULL', async () => {
     const d = await dung()
     d.sql.prepare("INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn) VALUES('x|1','S1','Q-PHU','btvn','B',1,0,'2026-09-16T00:00:00Z','2026-09-16')").run()

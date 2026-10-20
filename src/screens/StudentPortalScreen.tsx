@@ -597,10 +597,10 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       return 'xong'
     }
     if (m.loai !== 'btvn_chang') return 'bo'
-    const g = m.goi as { ma?: string; chiSo?: number; dapAn?: Record<string, string>; maCa?: string }
+    const g = m.goi as { ma?: string; chiSo?: number; dapAn?: Record<string, string>; maCa?: string; doGiay?: Record<string, { g: number }> }
     if (!g.ma || typeof g.chiSo !== 'number' || !g.dapAn) return 'bo'
     const [{ nopChangCaNhan }, { theChangView }] = await Promise.all([import('../lib/btvn-nop-chang-em'), import('../lib/btvn-ca-nhan-kieu')])
-    const kq = await nopChangCaNhan({ ma: g.ma, sbd: m.sbd, chiSo: g.chiSo, dapAn: g.dapAn }, g.maCa || 'Riêng')
+    const kq = await nopChangCaNhan({ ma: g.ma, sbd: m.sbd, chiSo: g.chiSo, dapAn: g.dapAn, doGiay: g.doGiay }, g.maCa || 'Riêng')
     if (kq.ban) return 'ban'
     if (!kq.ok) {
       void bao(kq.error || 'Chưa nộp được chặng.', 'Chưa nộp được chặng')
@@ -1892,7 +1892,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
             const idHang = khoaChang(tin.sbd || auth?.sbd || '', tin.ma, tin.chiSo)
             if (kq.ban && auth) {
               // Máy chủ bận: GIỮ bài ở máy và để hàng đợi tự nộp lại (không bắt em bấm lại). Phiếu hiện "Đã lưu ở máy, đang chờ máy chủ".
-              hangNop.them({ id: idHang, loai: 'btvn_chang', sbd: auth.sbd, goi: { ma: tin.ma, chiSo: tin.chiSo, dapAn: tin.dapAn, maCa: maCaPhieuRef.current } })
+              hangNop.them({ id: idHang, loai: 'btvn_chang', sbd: auth.sbd, goi: { ma: tin.ma, chiSo: tin.chiSo, dapAn: tin.dapAn, maCa: maCaPhieuRef.current, doGiay: tin.doGiay } })
               return { ok: false, ban: true, daLuu: true, error: CHU_DA_LUU_MAY }
             }
             if (!kq.ok) return { ok: false, error: kq.error }

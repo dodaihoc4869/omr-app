@@ -29,9 +29,15 @@ import { TIEN_BO_NGAY } from './ke-hoach-ngay-d1'
 import { docCauDaLamHomNay } from './cau-da-lam'
 import { DAI_QID_TOI_DA, donQid, layCauChoEm, TOI_DA_QID_MOT_LUOT } from './cau-theo-qid'
 import { ghiSuKien, ngayVn, phanTuQid, type SuKien } from './su-kien-hoc'
+import { boSungKichThuocDe, ghepDocVaoRaw, lamSachDo, type DoLuot } from './do-giay-luot'
 import { chamTheoSnapshot, docSnapshotNhieu, quyetDinhSnapshot, type CauSnapshot } from './cau-snapshot'
 
 export const CAN_DANG_NHAP = 'Em đăng nhập lại để nộp câu ôn.'
+/** `raw.doc` của một lượt: kích thước đề do MÁY CHỦ đo từ câu vừa chấm (không tin số máy em); không có giây đo thật ⇒ không ghi. */
+const rawDoc = (x: BaiLam, q: unknown) => {
+  const d = boSungKichThuocDe(x.doc ?? null, (q as { phan?: unknown }).phan, q)
+  return d && d.giay !== null && d.tu !== null ? (ghepDocVaoRaw(undefined, d) as Record<string, unknown>) : undefined
+}
 const GIAY_MIN = 5
 const GIAY_MAX = 1200
 const DAI_DAP_AN_TOI_DA = 40
@@ -41,6 +47,8 @@ interface BaiLam {
   qid: string
   dapAn: string
   giay: number | null
+  /** 20/10 đo giây: cụm `doGiay` (giây đo thật 1–900 + kích thước đề) của máy em; vắng ⇒ y như cũ. */
+  doc?: DoLuot
 }
 
 /** Đọc `traLoi` do máy em gửi: bỏ mục hỏng, khử trùng theo qid (giữ mục ĐẦU), đáp án cắt ở 40 ký tự, giây hợp lệ 5..1200 hoặc null. */
@@ -53,7 +61,10 @@ export function docTraLoi(ds: unknown[]): BaiLam[] {
     if (!qid || qid.length > DAI_QID_TOI_DA || ra.has(qid)) continue
     const dapAn = (Array.isArray(o.dapAn) ? o.dapAn.join('') : typeof o.dapAn === 'string' || typeof o.dapAn === 'number' ? String(o.dapAn) : '').trim().slice(0, DAI_DAP_AN_TOI_DA)
     const g = typeof o.giay === 'number' ? o.giay : NaN
-    ra.set(qid, { qid, dapAn, giay: Number.isFinite(g) && g >= GIAY_MIN && g <= GIAY_MAX ? Math.round(g) : null })
+    const doc = lamSachDo(o.doGiay)
+    // `giay` cũ giữ luật 5..1200; không có thì lấy giây đo thật của `doGiay` (1–900: lượt dưới 5 giây chính là "chưa đọc hết đề", không được bỏ).
+    const giay = Number.isFinite(g) && g >= GIAY_MIN && g <= GIAY_MAX ? Math.round(g) : (doc?.giay ?? null)
+    ra.set(qid, { qid, dapAn, giay, ...(doc ? { doc } : {}) })
   }
   return [...ra.values()]
 }
@@ -179,6 +190,7 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
     const q = cauTheoQid.get(x.qid)!
     return {
       nguon: opt.nguon, maNguon, sbd, qid: x.qid, lan: 1, luc, giay: x.giay, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
+      ...(rawDoc(x, q) ? { raw: rawDoc(x, q) } : {}),
       cauVersion: snapTheoQid.get(x.qid)?.questionVersion ?? q.version,
       ketQua: cham(x, q) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
     }

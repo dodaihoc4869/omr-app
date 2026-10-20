@@ -6,7 +6,8 @@ import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect,kiemTraDapA
 import {ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,laBoTrong,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
-import {docBoCuaCacEm,docTomTat,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
+import {cauKhoDangGoc,cauLuyenDangGoc,docBoCuaCacEm,docTomTat,ganDoGiay,ganDoGiayTuKho,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
+import {docDoGiayNhieu,type DoLuot} from './do-giay-luot'
 import {btvnNopTreBat,ghiNopTre} from './btvn-nang-do-chang'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './cam-tu-luan'
@@ -902,6 +903,8 @@ export async function nopBtvnQuaPhieu(
   bt: Record<string, unknown>,
   sbd: string,
   lam: Record<string, unknown>,
+  /** ĐO GIÂY (20/10): giây từng câu máy em gửi cùng lượt nộp (`docDoGiayNhieu`). Vắng ⇒ sổ ghi y như trước (giay NULL). */
+  doGiay?: ReadonlyMap<string, DoLuot> | null,
 ): Promise<Record<string, unknown>> {
   const maBtvn = chuoi(bt.ma_btvn)
   const han = chuoi(bt.han_nop)
@@ -913,8 +916,10 @@ export async function nopBtvnQuaPhieu(
   if (laBaiCaNhan(bt)) return nopBaiCaNhan(env, bt, sbd, lam, Date.now())
 
   let graded
+  let cauKho: Record<string, unknown>[] = [] // câu tờ kho đã cầm để chấm — dùng lại để máy chủ tự đo kích thước đề cho sổ (không đọc thêm)
   try {
-    const keys = homeworkKeys(await homeworkQuestions(env, chuoi(bt.ma_de), { sourceMaterial: true }))
+    cauKho = await homeworkQuestions(env, chuoi(bt.ma_de), { sourceMaterial: true })
+    const keys = homeworkKeys(cauKho)
     graded = gradeHomework(keys, lam, chuoi(bt.ma_de))
     // Validate canonical effective answers before consuming a submission. Blank markers keep
     // their existing grading/event semantics; this normalized view is not saved as the answer.
@@ -958,7 +963,7 @@ export async function nopBtvnQuaPhieu(
   // SỔ SỰ KIỆN HỌC (GĐ 0): mỗi câu của tờ là một sự kiện `btvn`, lan = lượt làm, dựng từ CHÍNH kết quả
   // `gradeHomework` vừa chấm (không đọc lại R2). Lượt 1 bỏ qua câu đã ghi qua lô (`btvn_lo`) để nộp cả
   // bài không đếm đôi. Lỗi sổ không làm hỏng lượt nộp.
-  await ghiSuKien(env, suKienTuKetQuaCham('btvn', maBtvn, sbd, lanMoi, nay, graded), { tranhTrungLo: lanMoi === 1 })
+  await ghiSuKien(env, ganDoGiayTuKho(suKienTuKetQuaCham('btvn', maBtvn, sbd, lanMoi, nay, graded), doGiay, cauKho), { tranhTrungLo: lanMoi === 1 })
   // EXP HỌC TẬP MỚI (exp-d1.ts): chỉ đính thêm `expNhan`/`manhNhan` khi đã bật cho em; tắt thì phản hồi y hệt cũ.
   return { ok: true, lanThu: lanMoi, soCau, soDung, qidSai, nopLuc: nay, soLanLamLaiConLai: Math.max(0, 4 - lanMoi), ...(await expNhanSauNop(env, sbd, Date.now())) }
 }
@@ -1054,7 +1059,9 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
   const bt = await env.DB.prepare('SELECT * FROM btvn WHERE ma_btvn = ? AND da_xoa = 0')
     .bind(ma)
     .first<Record<string, unknown>>()
-  if (bt) return nopBtvnQuaPhieu(env, bt, sbd, lam)
+  // ĐO GIÂY (20/10): cụm `doGiay` làm sạch MỘT lần, dùng cho cả hai nhánh (btvn / khắc phục). Thân không có `doGiay` ⇒ Map rỗng ⇒ y như trước.
+  const doGiay = docDoGiayNhieu(b)
+  if (bt) return nopBtvnQuaPhieu(env, bt, sbd, lam, doGiay)
   const recalled = await env.DB.prepare('SELECT ma_btvn FROM btvn WHERE ma_btvn = ? AND da_xoa <> 0').bind(ma).first()
   if (recalled) return {ok:false,error:'Bài tập đã được thầy thu hồi.'}
 
@@ -1064,6 +1071,7 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
   if (!lam || typeof lam !== 'object' || Array.isArray(lam)) throw new LoiChamBtvn('BTVN_GRADING_INPUT_INVALID', 'Đáp án gửi lên chưa đúng định dạng.')
   const dapAnDung: Record<string, string> = Object.create(null)
   const cauSo: CauChamBai[] = []
+  const cauGoc = new Map<string, Record<string, unknown>>() // câu đã cầm để chấm, đổi sang khuôn đo từ: máy chủ tự đo kích thước đề cho sổ
   let maCa = ''
   const o = await env.DE?.get(`phieu/${ma}.json`)
   if (o) {
@@ -1086,6 +1094,7 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
       if (!qid.trim() || !dung || Object.hasOwn(dapAnDung, qid)) throw loiMaterial()
       dapAnDung[qid] = dung
       cauSo.push({ qid, dapAnDung: dung, chuyenDe: chuoi(c.chuyenDe), mucDo: chuoi(c.mucDo) })
+      cauGoc.set(qid, cauLuyenDangGoc(c))
     }
   } else {
     // Client-generated worksheets have no assigned manifest. These are requested qids,
@@ -1107,6 +1116,7 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
         const c = theoQid.get(qid), dung = keys.get(qid)
         if (!c || !dung) throw loiMaterial()
         cauSo.push({ qid, dapAnDung: dung, chuyenDe: chuoi(c.chuyen_de ?? c.chuyenDe), mucDo: chuoi(c.muc_do ?? c.mucDo), phan: chuoi(c.phan) })
+        cauGoc.set(qid, cauKhoDangGoc(c))
       }
     }
     // Keep legacy fallback score 0/0; prepared bank material is for validated events.
@@ -1143,7 +1153,7 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
       lan = 2
     }
   }
-  const prepared = daDoi ? suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauSo, lam) : []
+  const prepared = daDoi ? ganDoGiay(suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauSo, lam), doGiay, cauGoc) : []
   await env.DB.prepare(
     `INSERT INTO nop_khac_phuc (khoa, ma_phieu, sbd, ma_ca, dap_an_json, so_dung, so_cau, nop_luc)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
