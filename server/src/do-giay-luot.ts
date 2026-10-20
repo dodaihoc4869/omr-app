@@ -84,6 +84,11 @@ export function phanSoCuaDo(d: DoLuot | null | undefined, rawCu?: unknown): { gi
 export function boSungKichThuocDe(d: DoLuot | null, phan: unknown, cau: unknown): DoLuot | null {
   if (!d || d.giay === null) return d
   if (phan !== 'I' && phan !== 'II' && phan !== 'III') return d
-  const nd = noiDungTuCauGoc(phan, cau)
-  return { ...d, tu: Math.min(SO_TU_TOI_DA, Math.max(0, nd.soTu)), hinh: nd.coHinh ? 1 : 0, phan }
+  // Đường ghi sổ là đường QUAN TRỌNG NHẤT của lượt nộp: câu có khuôn lạ làm hàm đếm ném lỗi thì chỉ bỏ phần kích thước đề, TUYỆT ĐỐI không để lỗi lan ra làm mất dòng sổ.
+  try {
+    const nd = noiDungTuCauGoc(phan, cau)
+    return { ...d, tu: Math.min(SO_TU_TOI_DA, Math.max(0, nd.soTu)), hinh: nd.coHinh ? 1 : 0, phan }
+  } catch {
+    return d
+  }
 }

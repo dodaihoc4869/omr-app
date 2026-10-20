@@ -1,6 +1,6 @@
 // Đo giây từng lượt (20/10): máy chủ chỉ làm sạch, không ước. Kiểm ranh giới và việc ghép `raw.doc`.
 import { describe, expect, it } from 'vitest'
-import { docDoGiayMot, docDoGiayNhieu, ghepDocVaoRaw, lamSachDo, phanSoCuaDo } from '../server/src/do-giay-luot'
+import { boSungKichThuocDe, docDoGiayMot, docDoGiayNhieu, ghepDocVaoRaw, lamSachDo, phanSoCuaDo } from '../server/src/do-giay-luot'
 
 describe('lamSachDo', () => {
   it('nhận cụm hợp lệ và làm tròn', () => {
@@ -60,5 +60,23 @@ describe('ghép vào sổ', () => {
     expect(phanSoCuaDo(null, { x: 1 })).toEqual({ raw: { x: 1 } })
     expect(phanSoCuaDo({ giay: null, tu: 12, hinh: 1, phan: null })).toEqual({ raw: { doc: { t: 12, h: 1 } } })
     expect(phanSoCuaDo({ giay: 7, tu: null, hinh: null, phan: null })).toEqual({ giay: 7 })
+  })
+})
+
+describe('boSungKichThuocDe', () => {
+  const d = { giay: 14, tu: null, hinh: null, phan: null } as const
+  it('đo từ chính câu, bỏ số máy em khai', () => {
+    const r = boSungKichThuocDe({ giay: 14, tu: 9999, hinh: 1, phan: 'III' }, 'I', { text: 'Đề một hai ba', choices: ['a b', 'c d', 'e f', 'g h'] })
+    expect(r).toEqual({ giay: 14, tu: 4 + 8, hinh: 0, phan: 'I' })
+  })
+  it('không có giây thì trả nguyên; phần lạ thì trả nguyên', () => {
+    expect(boSungKichThuocDe({ giay: null, tu: 5, hinh: null, phan: null }, 'I', { text: 'x' })).toEqual({ giay: null, tu: 5, hinh: null, phan: null })
+    expect(boSungKichThuocDe(d, 'IV', { text: 'x' })).toEqual(d)
+    expect(boSungKichThuocDe(null, 'I', {})).toBeNull()
+  })
+  it('câu khuôn lạ làm hàm đếm ném lỗi thì KHÔNG ném ra ngoài (không được làm mất dòng sổ), chỉ bỏ kích thước đề', () => {
+    const doi = { get text(): string { throw new Error('khuôn lạ') } }
+    expect(() => boSungKichThuocDe(d, 'I', doi)).not.toThrow()
+    expect(boSungKichThuocDe(d, 'I', doi)).toEqual(d)
   })
 })
