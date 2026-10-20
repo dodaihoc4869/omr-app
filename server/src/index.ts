@@ -3559,7 +3559,7 @@ const boXuLy = {
         }
       }
       // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
-      if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
+      if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b, ctx))
       if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b, envDoc, ctx))
       if (p === '/ph/canh-bao/xem') return ra(await phCanhBaoXem(env, b))
       if (p === '/ph/giao-them') return ra(await phGiaoThem(env, b))

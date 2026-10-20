@@ -38,28 +38,28 @@
  },
  "mayChuPh": {
   "ph-tat-ca-ve-con": {
-   "dot": 6,
-   "lenh": 22
+   "dot": 5,
+   "lenh": 21
   },
   "ph-hoc-2": {
-   "dot": 6,
-   "lenh": 11
+   "dot": 5,
+   "lenh": 10
   },
   "ph-con-tong-quan": {
-   "dot": 9,
-   "lenh": 18
+   "dot": 8,
+   "lenh": 17
   },
   "ph-loi-thay": {
-   "dot": 3,
-   "lenh": 4
+   "dot": 2,
+   "lenh": 3
   },
   "ph-nhip-hoc": {
-   "dot": 6,
-   "lenh": 20
+   "dot": 5,
+   "lenh": 19
   },
   "ph-xac-dinh": {
-   "dot": 4,
-   "lenh": 4
+   "dot": 1,
+   "lenh": 1
   }
  },
  "ghiChuPh": "Mốc cổng phụ huynh (21/10, đo trên main a746fbc trước khi tối ưu): số đợt chờ D1 nối tiếp + số lệnh D1 của 6 lệnh /ph, giờ cao điểm, token có pk. Chỉ hạ."

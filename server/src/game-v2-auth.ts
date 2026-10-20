@@ -63,14 +63,21 @@ export async function parentPass(env:Env,sbd:string,ngayHan=30):Promise<string>{
   const payload=btoa(JSON.stringify(o));return `${payload}.${await signature(env,payload)}`
 }
 const soSanhHang=(a:string,b:string)=>{let d=a.length^b.length;for(let i=0;i<a.length;i++)d|=a.charCodeAt(i)^(b.charCodeAt(i)||0);return d===0}
-export async function parentIdentity(env:Env,token:string):Promise<string>{
+/**
+ * Như `parentIdentity` nhưng trả luôn HÀNG `hoc_sinh` đã đọc khi kiểm `pk` (tên + lớp). Token có `pk` thì hàng này đã chứng tỏ em tồn tại ⇒ chỗ gọi khỏi hỏi lại
+ * `SELECT sbd FROM hoc_sinh` (21/10, cổng tốc độ `/ph`: bớt 1 đợt D1 nối tiếp ở MỌI lệnh phụ huynh). Token cũ không `pk` ⇒ `hang` null, chỗ gọi tự kiểm tồn tại như trước.
+ */
+export async function parentIdentityVoiHang(env:Env,token:string,layTen=false):Promise<{sbd:string;hang:{ho_ten:string|null;lop:string|null}|null}>{
   const [payload,sig]=String(token??'').split('.');if(!payload||!sig||!soSanhHang(await signature(env,payload),sig))throw new Error('Mã xem tiến bộ không hợp lệ.')
   let o:{sbd?:unknown;exp?:unknown;purpose?:unknown;pk?:unknown};try{o=JSON.parse(atob(payload))}catch{throw new Error('Mã xem tiến bộ không hợp lệ.')}
   if(o.purpose!=='game-parent'||!(Number(o.exp)>=Date.now()))throw new Error('Mã xem tiến bộ đã hết hạn.')
   const sbd=String(o.sbd??'');if(!sbd)throw new Error('Mã xem tiến bộ không hợp lệ.')
   if(typeof o.pk==='string'){
-    const row=await env.DB.prepare('SELECT mat_khau FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{mat_khau:string|null}>()
+    // Chỉ `/ph/xac-dinh` cần tên + lớp (`layTen`); các lệnh khác đọc đúng cột như trước.
+    const row=await env.DB.prepare(layTen?'SELECT mat_khau, ho_ten, lop FROM hoc_sinh WHERE sbd=?':'SELECT mat_khau FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{mat_khau:string|null;ho_ten?:string|null;lop?:string|null}>()
     if(!row?.mat_khau||await hash(row.mat_khau)!==o.pk)throw new Error('Mật khẩu của con đã đổi nên liên kết này hết hiệu lực. Anh/chị nhờ Thầy gửi lại liên kết mới.')
+    return {sbd,hang:{ho_ten:row.ho_ten??null,lop:row.lop??null}}
   }
-  return sbd
+  return {sbd,hang:null}
 }
+export async function parentIdentity(env:Env,token:string):Promise<string>{return (await parentIdentityVoiHang(env,token)).sbd}
