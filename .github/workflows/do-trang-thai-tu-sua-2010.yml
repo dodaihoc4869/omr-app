@@ -1,0 +1,38 @@
+# ĐẾM TRẠNG THÁI CÁC ĐỢT TỰ SỬA LỖI (CHỈ ĐỌC) — thầy 20/10 cần biết "Việc hôm nay" có đủ câu làm được không (đặc tả docs/dac-ta-tu-sua-y-nghia-2010.md mục 6 điểm 0).
+# Đếm: đợt theo trạng thái (cả trung tâm, riêng em từ 100 đợt), đợt chưa xong có học liệu từng bước, số việc làm được hôm nay của mỗi em,
+# và lượt nộp 14 ngày gần đây theo trangThaiMoi (kiểm `response_json` có khoá này thật). CHỈ SELECT gộp — không mã em, tên em, mã câu (repo công khai).
+name: Đếm trạng thái đợt tự sửa (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-trang-thai-tu-sua-2010.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-trang-thai-tu-sua-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "1 đợt theo trạng thái (cả trung tâm)" "SELECT trang_thai_day, COUNT(*) n FROM chua_loi_dot GROUP BY trang_thai_day ORDER BY n DESC"
+          q "2 số em có đợt · em từ 50 đợt · em từ 100 đợt" "SELECT COUNT(*) so_em, SUM(n>=50) em_tu_50, SUM(n>=100) em_tu_100 FROM (SELECT sbd, COUNT(*) n FROM chua_loi_dot GROUP BY sbd)"
+          q "3 đợt theo trạng thái, riêng em từ 100 đợt" "SELECT trang_thai_day, COUNT(*) n FROM chua_loi_dot WHERE sbd IN (SELECT sbd FROM chua_loi_dot GROUP BY sbd HAVING COUNT(*)>=100) GROUP BY trang_thai_day ORDER BY n DESC"
+          q "4 đợt chưa xong · trong đó có học liệu từng bước" "SELECT COUNT(*) chua_xong, SUM(CASE WHEN EXISTS (SELECT 1 FROM chua_loi_hoc_lieu h WHERE h.qid_chuan=d.qid_chuan AND h.trang_thai='du_dung') THEN 1 ELSE 0 END) co_hoc_lieu FROM chua_loi_dot d WHERE d.trang_thai_day<>'da_tu_sua'"
+          q "5 số việc làm được hôm nay của mỗi em (đợt có chặng để nộp)" "WITH e AS (SELECT sbd, COUNT(*) tong, SUM(CASE WHEN trang_thai_day IN ('can_chan_doan','dang_chua_buoc','dang_ghep_bai','dang_kiem_chung') OR (trang_thai_day='cho_gap_lai_2' AND julianday(den_han)<=julianday('now')) THEN 1 ELSE 0 END) lam_duoc FROM chua_loi_dot GROUP BY sbd) SELECT COUNT(*) so_em, SUM(lam_duoc=0) em_0_viec, SUM(lam_duoc BETWEEN 1 AND 2) em_1_2_viec, SUM(lam_duoc>=3) em_tu_3_viec, SUM(tong>=100) em_tu_100_dot, SUM(tong>=100 AND lam_duoc>=3) em_100_dot_du_3_viec, SUM(tong>=100 AND lam_duoc=0) em_100_dot_0_viec FROM e"
+          q "6 lượt nộp 14 ngày gần đây theo trangThaiMoi" "SELECT json_extract(response_json,'$.trangThaiMoi') tt, COUNT(*) n FROM chua_loi_nop WHERE nop_luc >= (strftime('%s','now')-14*86400)*1000 GROUP BY tt ORDER BY n DESC"
