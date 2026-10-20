@@ -29,14 +29,17 @@ export default function ParentPortalScreen() {
 
   useEffect(() => {
     const luot = ++luotDangNhap.current
+    // LIÊN KẾT RIÊNG CỦA CON (?ph=<pass>, giai đoạn mềm): nhận + xoá khỏi địa chỉ, xác định con bằng token; lỗi thì hiện câu của máy chủ
+    // và cho nhập SBD như cũ. Không có liên kết mà máy đã nhớ pass thì dùng lại pass đó.
+    // Lệnh mạng chạy SONG SONG với việc đọc địa chỉ đã lưu (IndexedDB): trước đây nối tiếp, máy yếu mở IndexedDB chậm thì lệnh mạng đứng chờ vô ích.
+    // `xacDinhPhuHuynh` tự tìm địa chỉ máy chủ và không bao giờ ném lỗi nên khởi động sớm không để lại lời hứa lỗi treo.
+    const pass = nhanPassTuDiaChi() || docPass()
+    const hoiCon = pass ? xacDinhPhuHuynh(pass) : null
     loadScriptUrl().then(async (u) => {
       if (luot !== luotDangNhap.current) return
       setScriptUrl(u)
-      // LIÊN KẾT RIÊNG CỦA CON (?ph=<pass>, giai đoạn mềm): nhận + xoá khỏi địa chỉ, xác định con bằng token; lỗi thì hiện câu của máy chủ
-      // và cho nhập SBD như cũ. Không có liên kết mà máy đã nhớ pass thì dùng lại pass đó.
-      const pass = nhanPassTuDiaChi() || docPass()
-      if (pass) {
-        const kq = await xacDinhPhuHuynh(pass)
+      if (hoiCon) {
+        const kq = await hoiCon
         if (luot !== luotDangNhap.current) return
         if (kq.ok) {
           datPassPhuHuynh(pass)
