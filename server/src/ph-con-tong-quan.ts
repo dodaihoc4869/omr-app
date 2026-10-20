@@ -247,6 +247,13 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
   const truocTu = congNgay(homNay, -13), truocDen = congNgay(homNay, -7)
   const soNgayDoc = Math.round((Date.parse(`${homNay}T00:00:00Z`) - Date.parse(`${tuNgay}T00:00:00Z`)) / MOT_NGAY) + 1
 
+  // 0 · ĐỌC SỚM các việc KHÔNG phụ thuộc sổ (21/10, cổng tốc độ `/ph`: 8 → 5 đợt D1 nối tiếp). Chỉ ĐỌC; `hoi` nuốt lỗi bảng thiếu, `ngayBaiCuaMotEm` có `.catch` ⇒ không có lời hứa lỗi treo
+  //     nếu sổ lỗi mà ta trả sớm. Kết quả và thứ tự dùng y như cũ (chờ ở đúng chỗ cần).
+  const pKh = hoi(env, 'SELECT ngay, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd = ? AND ngay >= ? AND ngay <= ?', sbd, tuNgay, homNay)
+  // đủ mọi ngày từ `tuNgay` (mốc 01/10, khoảng dài dần) + ngày đã lưu gần nhất trước đó để ước tính tầng
+  const pMuc = hoi(env, `SELECT ngay, tang, toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd = ? AND ngay <= ? ORDER BY ngay DESC LIMIT ${Math.max(60, soNgayDoc + 1)}`, sbd, homNay)
+  const pChung = ngayBaiCuaMotEm(env, sbd, tuNgay, homNay, homNay).catch(() => null)
+
   // 1 · sổ: CHỈ lần làm, KHÔNG sự kiện còn giấu, KHÔNG lượt của ca chưa công bố. Lỗi ⇒ trả lỗi (không lùi về câu lệnh không lọc).
   let rSo: Row[]
   try {
@@ -280,13 +287,18 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
   // 2 · tra phụ song song: số giây còn thiếu (chi tiết ca đã công bố · ước tính lượt game), kế hoạch đã chốt, mức đã lưu.
   const thiThieu = dong.filter((d) => d.giay === null && d.nguon === 'thi')
   const gameThieu = dong.filter((d) => d.giay === null && d.nguon === 'game')
-  const [ct, uoc, rKh, rMuc] = await Promise.all([
+  // 5a · (chuyển lên sớm) câu sai + câu gần đây chỉ phụ thuộc `dong` ⇒ bắt đầu đọc kho tên câu NGAY, song song với tra phụ và bảng chung (trước: nối tiếp sau cả hai).
+  const theoGoc = new Map<string, Dong[]>()
+  for (const d of dong) if (d.kq !== null) (theoGoc.get(d.goc) ?? theoGoc.set(d.goc, []).get(d.goc)!).push(d)
+  const sai = [...theoGoc.entries()].filter(([, ds]) => ds.some(laSai))
+  const ganDayDong = dong.slice(0, SO_LUOT_GAN_DAY)
+  const canTen = [...new Set([...ganDayDong.map((d) => d.goc), ...sai.map(([g]) => g)])]
+  const pKho = docCauKho(env, canTen).catch(() => new Map<string, { tenDang: string | null }>())
+  const [ct, uoc] = await Promise.all([
     thiThieu.length ? chiTietCauCuaLuot(env, thiThieu.map((d) => d.maNguon), [sbd], thiThieu.map((d) => d.qid)).catch(() => new Map<string, { giay: number | null }>()) : Promise.resolve(new Map<string, { giay: number | null }>()),
     gameThieu.length ? giayUocTinhGame(env, gameThieu.map((d) => ({ sbd, phien: d.maNguon }))).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
-    hoi(env, 'SELECT ngay, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd = ? AND ngay >= ? AND ngay <= ?', sbd, tuNgay, homNay),
-    // đủ mọi ngày từ `tuNgay` (mốc 01/10, khoảng dài dần) + ngày đã lưu gần nhất trước đó để ước tính tầng
-    hoi(env, `SELECT ngay, tang, toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd = ? AND ngay <= ? ORDER BY ngay DESC LIMIT ${Math.max(60, soNgayDoc + 1)}`, sbd, homNay),
   ])
+  const [rKh, rMuc] = await Promise.all([pKh, pMuc])
   for (const d of thiThieu) {
     const k = `${d.maNguon}|${sbd}|${d.qid}`
     const g = (ct.get(`${k}|${d.lan}`) ?? ct.get(`${k}|*`))?.giay ?? null
@@ -327,7 +339,7 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
   }
   // 3b · "đã làm / mức" mỗi ngày lấy ĐÚNG phép tính bảng "Bài hằng ngày" của thầy (Gói 7 đếm câu của gói, Hành trình đếm câu kế hoạch) để phụ huynh và
   //      thầy thấy cùng một số. Không đọc đủ được ⇒ giữ cách tính riêng ở trên.
-  const chung = await ngayBaiCuaMotEm(env, sbd, tuNgay, homNay, homNay).catch(() => null)
+  const chung = await pChung
   if (chung) {
     const theo = new Map(chung.map((x) => [x.ngay, x]))
     for (const h of ngay) {
@@ -347,13 +359,8 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
   const truoc = trong(truocTu, truocDen)
   const khuyaDs = bay.filter((d) => laGioKhuya(d.luc))
 
-  // 5 · câu sai trong khoảng đọc (gom theo câu gốc; `dong` đang mới trước) + tiêu đề cho câu sai và lượt gần đây
-  const theoGoc = new Map<string, Dong[]>()
-  for (const d of dong) if (d.kq !== null) (theoGoc.get(d.goc) ?? theoGoc.set(d.goc, []).get(d.goc)!).push(d)
-  const sai = [...theoGoc.entries()].filter(([, ds]) => ds.some(laSai))
-  const ganDayDong = dong.slice(0, SO_LUOT_GAN_DAY)
-  const canTen = [...new Set([...ganDayDong.map((d) => d.goc), ...sai.map(([g]) => g)])]
-  const kho = await docCauKho(env, canTen).catch(() => new Map<string, { tenDang: string | null }>())
+  // 5 · câu sai trong khoảng đọc (gom theo câu gốc; `dong` đang mới trước) + tiêu đề cho câu sai và lượt gần đây (phần gom đã dựng ở 5a)
+  const kho = await pKho
   const tenTuKho = (g: string) => str(kho.get(g)?.tenDang)
   const maDangThieu = [...new Set([...ganDayDong, ...sai.flatMap(([, ds]) => ds)].filter((d) => !tenTuKho(d.goc) && d.maDang).map((d) => d.maDang))]
   const tenDang = maDangThieu.length ? await tenCuaDang(env, maDangThieu).catch(() => new Map<string, string>()) : new Map<string, string>()
