@@ -20,6 +20,8 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/NutNopBtvn.tsx': 1,
   'src/components/PhongChoGame.tsx': 0, // 01/10: Chuyến bay dùng RAF, bỏ đồng hồ cao độ 100 ms
   'src/components/bang-nhiem-vu/DanhSachNhiemVu.tsx': 1,
+  'src/components/bang-nhiem-vu/LamCauOn.tsx': 1, // 20/10 đo giây (thầy: mọi câu đều đo được): 1 s cộng giây câu em đang làm, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
+  'src/components/hoc-tap/ManLamBaiTap.tsx': 1, // 20/10 đo giây: 1 s cộng giây câu đang hiện, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
   'src/components/bang-tin-san/hooks.ts': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
   'src/components/tu-luyen/ManTuLuyen.tsx': 2, // 30/09 thầy duyệt "Bàn Bi-a mới": bỏ hai nút ◀ ▶ (vòng 45 ms khi GIỮ nút) — thay bằng bánh xe kéo, không hẹn giờ
   'src/hooks/useGioHocTap.ts': 1,
