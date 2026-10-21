@@ -73,7 +73,8 @@ export default function TheEmVaCau({ em, dangLam, mo, onMo, onHoi, khoa }: Props
             {c.tuLam > 0
               ? <p className="lg-ev-so"><b>{c.tuLamDung}/{c.tuLam}</b><span>lần em tự làm đúng câu này</span></p>
               : <p className="lg-ev-so"><b>{c.lan.length}</b><span>lần em làm câu này, đều có trợ giúp</span></p>}
-            <p className="lg-ev-gan">Lần gần nhất: <strong>{c.lan.at(-1)!.ketQua ? 'Đúng' : 'Sai'}</strong>{gioLan(c.lan.at(-1)!) ? ` · ${gioLan(c.lan.at(-1)!)}` : ''}</p>
+            {/* Lấy phần tử cuối bằng chỉ số: hàm Array "at" không có trên iPhone cũ iOS 14–15 (tests/khong-cu-phap-may-cu-2109). */}
+            <p className="lg-ev-gan">Lần gần nhất: <strong>{c.lan[c.lan.length - 1]!.ketQua ? 'Đúng' : 'Sai'}</strong>{gioLan(c.lan[c.lan.length - 1]!) ? ` · ${gioLan(c.lan[c.lan.length - 1]!)}` : ''}</p>
             <ol className="lg-ev-lan" aria-label="Từng lần làm, từ cũ tới mới">
               {c.lan.map((l, i) => (
                 <li key={`${l.luc}-${i}`} data-kq={l.ketQua ? 'dung' : 'sai'} data-tro={l.troGiup || undefined}>
