@@ -30,3 +30,14 @@ it('xếp: câu khó vào nhóm ưu tiên đầu tờ cùng câu tính toán; c�
   expect(ds.filter(laCauKhoHoacTinh).map((x) => x.qid)).toEqual(['q1', 'q3', 'q4'])
   expect(demTuChua(ds).kho).toBe(2)
 })
+
+it('22/10 (thầy báo đề Trả lời ngắn 40/40): câu ĐẾM lý thuyết Phần III không là "có tính toán"; câu Phần III có phép tính vẫn là', async () => {
+  const { laCauTinhToan } = await import('../src/lib/thay-tu-chua')
+  const III = (text: string) => laCauTinhToan({ phan: 'III', text })
+  for (const t of ['Cho các phát biểu sau về ester. Có bao nhiêu phát biểu đúng?', 'Số đồng phân cấu tạo ứng với công thức C4H10O là bao nhiêu?', 'Trong các chất sau, có bao nhiêu chất làm mất màu nước bromine?', 'Thực hiện các thí nghiệm sau. Số thí nghiệm xảy ra phản ứng là'])
+    expect(III(t), t).toBe(false)
+  for (const t of ['Tổng hợp ammonia với hiệu suất 25%. Cần bao nhiêu lít N2 (đkc) để thu được 6,8 gam ammonia?', 'Cần bao nhiêu gam NaOH để trung hoà 0,2 mol HCl?', 'Tính pH của dung dịch HCl 0,01 M.', 'Đốt cháy hoàn toàn m gam ester X thu được 0,3 mol CO2. Giá trị của m là', 'Có bao nhiêu phát biểu đúng? (a) 0,1 mol glucose tạo 0,2 mol Ag.'])
+    expect(III(t), t).toBe(true)
+  // tự luận Phần III vẫn xét theo nội dung như cũ
+  expect(laCauTinhToan({ phan: 'III', text: 'Giải thích vì sao ammonia tan nhiều trong nước.' }, true)).toBe(false)
+})

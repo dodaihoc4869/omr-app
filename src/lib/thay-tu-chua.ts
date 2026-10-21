@@ -38,13 +38,22 @@ export const MAU_TINH_TOAN_GOI_7 = /(?:tính|khối lượng|số mol|thể tíc
 export const CUM_TINH_LY_THUYET = /lưỡng\s+tính|tính\s+(?:chất|base|bazơ|bazo|acid|axit|khử|oxi\s*h(?:oá|óa|oa)|oxy\s*h(?:oá|óa|oa)|kim\s*loại|phi\s*kim|tan|dẻo|cứng|dẫn|thơm|đặc\s*trưng)/giu
 const boCumLyThuyet = (s: string | undefined) => String(s ?? '').replace(CUM_TINH_LY_THUYET, ' ')
 
+/** CÂU ĐẾM LÝ THUYẾT của Phần III (thầy báo 22/10: bật "Chỉ hiện câu khó & tính toán" ở đề Trả lời ngắn vẫn hiện 40/40): đáp số là một con số nhưng là
+ *  ĐẾM (phát biểu / chất / thí nghiệm… đúng), không phải tính. "bao nhiêu gam / lít / mol / %" là câu tính ⇒ không khớp mẫu này. */
+export const MAU_DEM_LY_THUYET = /(?:có\s+)?bao\s+nhiêu\s+(?:chất|phát\s*biểu|nhận\s*định|ý|thí\s*nghiệm|trường\s*hợp|đồng\s*phân|công\s*thức|phản\s*ứng|polymer|polime|tơ|dung\s*dịch|kim\s*loại|ester|este|amine|amin|hợp\s*chất|loại|phân\s*tử|nguyên\s*tử|liên\s*kết|nhóm|ion|muối|hydrocarbon|alkene|alkyne|alcohol|ancol|aldehyde|carboxylic|chất\s*béo|carbohydrate|cacbohiđrat|peptide|peptit|protein|ống\s*nghiệm|cặp|phát\s*biểu\s*đúng)|\bsố\s+(?:phát\s*biểu|nhận\s*định|chất|thí\s*nghiệm|trường\s*hợp|đồng\s*phân|phản\s*ứng|ý|polymer|tơ|dung\s*dịch|kim\s*loại|ester|este|ống\s*nghiệm)\b/iu
+/** Dấu hiệu PHÉP TÍNH thật trong đề (số kèm đơn vị, đại lượng phải tính). */
+const DAU_HIEU_TINH = /\d+(?:[.,]\d+)?\s*(?:mol|gam|g\b|kg|tấn|lít|l\b|mL|ml|kJ|%|M\b|atm|°C)|khối\s*lượng|số\s*mol|thể\s*tích|nồng\s*độ|hiệu\s*suất|phần\s*trăm|\btính\b/iu
+/** pH viết đúng hoa thường, không dính chữ cái ("phát biểu" không phải pH). Không dùng nhìn lùi (Safari cũ). */
+const CO_PH = /(?:^|[^\p{L}])pH(?![\p{L}])/u
+
 /** Câu có phải làm tính không. Xem đầu tệp: nhãn kho / `dangCua` trước, chỉ câu "chưa rõ" mới dùng biểu thức của gói 7.
  *  `tuLuan`: câu tự luận Phần III ("Giải thích vì sao…") KHÔNG mặc nhiên là tính toán — xét theo nội dung như câu thường. */
 export function laCauTinhToan(
   c: { phan: PhanCau; text?: string; luaChon?: readonly (string | undefined)[]; dapAn?: string; mucDo?: string; kieu?: string; tenDang?: string },
   tuLuan = false,
 ): boolean {
-  if (c.phan === 'III' && !tuLuan) return true
+  // Phần III: đáp số là số ⇒ mặc định là câu tính, TRỪ câu đếm lý thuyết không có dấu hiệu phép tính (22/10).
+  if (c.phan === 'III' && !tuLuan) { const t = boCumLyThuyet(c.text); return !(MAU_DEM_LY_THUYET.test(t) && !DAU_HIEU_TINH.test(t) && !CO_PH.test(t)) }
   const text = boCumLyThuyet(c.text)
   const luaChon = (c.luaChon ?? []).map((x) => boCumLyThuyet(x))
   const dang = dangCua({ phan: tuLuan ? undefined : c.phan, text, luaChon, dapAn: tuLuan ? '' : (c.dapAn ?? ''), mucDo: c.mucDo, kieu: c.kieu })
