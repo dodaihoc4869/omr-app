@@ -16,7 +16,8 @@ afterEach(() => vi.restoreAllMocks())
 
 function kyNang(d: D1That, sbd: string, id: string, p: number, capNhat = ISO, tuLam = 6) {
   d.sql.prepare('INSERT OR IGNORE INTO omni_vkn(id,ma_dang,ten) VALUES(?,?,?)').run(id, 'ester', `Kiến thức ${id}`)
-  d.sql.prepare("INSERT INTO omni_p_vkn(sbd,vkn_id,p,n_tu_lam,n_ngay,trang_thai,phien_ban,cap_nhat_luc) VALUES(?,?,?,?,?,'vung','thu',?)").run(sbd, id, p, tuLam, 3, capNhat)
+  // trang_thai theo luật SPRT ước lượng từ p (21/10: kiến thức cùng dạng chia vững / đang luyện thêm theo trang_thai, không theo ngưỡng p).
+  d.sql.prepare("INSERT INTO omni_p_vkn(sbd,vkn_id,p,n_tu_lam,n_ngay,trang_thai,phien_ban,cap_nhat_luc) VALUES(?,?,?,?,?,?,'thu',?)").run(sbd, id, p, tuLam, 3, p >= 0.8 ? 'vung' : p < 0.6 ? 'chua_vung' : 'chua_du', capNhat)
 }
 function suKien(d: D1That, sbd: string, qid: string, so: number, ketQua: number, assistance = 'none', purpose = 'luyen', visibility = 'released') {
   d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,ket_qua,luc,ngay_vn,assistance,purpose,visibility) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
@@ -81,7 +82,7 @@ describe('hồ sơ hẹp, có độ chưa chắc, cách ly học sinh', () => {
     const nd = noiDungHoSoHoiThay(h)
     expect(nd).not.toContain('EM-A'); expect(nd).not.toContain('EM-B')
     // 21/10: kiến thức KHÁC cùng dạng chỉ vào mục kienThucCungDang (≤ 3 mỗi bên), chỉ của chính em: em B p 0,99 không thành "đã vững" của em A.
-    expect(h.cungDang!.canOn[0]).toEqual({ ten: 'Kiến thức ngoai-cau', p: 0.1, tuLam: 6 })
+    expect(h.cungDang!.canOn[0]).toEqual({ ten: 'Kiến thức ngoai-cau', p: 0.1, tuLam: 6, ngay: 3, capNhat: ISO })
     expect(h.cungDang!.canOn).toHaveLength(3); expect(h.cungDang!.vung).toEqual([])
     expect(nd).toContain('"kienThucCungDang":{"emConYeu":[{"kienThuc":"Kiến thức ngoai-cau"')
     expect(nd.length).toBeLessThan(4000)

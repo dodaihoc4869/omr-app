@@ -2,16 +2,18 @@
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { docTokenHs, goiHs, type CauNen, type KetQuaCauKiem, type ThangGo, type SuKienKhung, type KetQuaNopNen, type MucCong, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu, type KetQuaHoiThay, type KetQuaHoiThem } from './loi-giai-api'
 
-export async function hoiThay(qid: string, nguon: string, chiHoi = false, luotId?: string): Promise<KetQuaHoiThay> {
+export async function hoiThay(qid: string, nguon: string, chiHoi = false, luotId?: string, emVaCau = false): Promise<KetQuaHoiThay> {
   const token = docTokenHs()
   if (!token) return { ok: false, loi: 'Em đăng nhập lại để hỏi thầy.' }
-  const j = await goiHs('/hs/hoi-thay', { token, qid, nguon, ...(chiHoi ? { chiHoi: true } : {}), ...(luotId ? { luotId } : {}) })
+  const j = await goiHs('/hs/hoi-thay', { token, qid, nguon, ...(chiHoi ? { chiHoi: true } : {}), ...(luotId ? { luotId } : {}), ...(emVaCau ? { emVaCau: true } : {}) })
   if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
   if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được lời giải.'), khoa: j.khoa as 'dang_kiem_tra' | 'ca_chua_cong_bo' | undefined }
   const hoiThem = j.hoiThem === true
-  if (chiHoi && j.chiHoi === true) return { ok: true, chiHoi: true, cau: j.cau as CauChoKhung, hoiThem }
-  if (j.coLoiGiai === true) return { ok: true, cau: j.cau as CauChoKhung, hoSo: j.hoSo as HoSoLoiGiai, ...(j.kiem ? { kiem: j.kiem as KiemKhung } : {}), hoiThem }
-  return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu, hoiThem }
+  // Thô: chỉ hộp Hỏi Thầy (TheEmVaCau ⇒ docEmVaCau) đọc khuôn ⇒ em-va-cau.ts nằm trọn trong mảnh của hộp, không tách thêm tệp precache.
+  const em = emVaCau ? { emVaCau: j.emVaCau ?? null } : {}
+  if (chiHoi && j.chiHoi === true) return { ok: true, chiHoi: true, cau: j.cau as CauChoKhung, hoiThem, ...em }
+  if (j.coLoiGiai === true) return { ok: true, cau: j.cau as CauChoKhung, hoSo: j.hoSo as HoSoLoiGiai, ...(j.kiem ? { kiem: j.kiem as KiemKhung } : {}), hoiThem, ...em }
+  return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu, hoiThem, ...em }
 }
 
 export async function hoiThemThay(qid: string, nguon: string, cauHoi: string, dapAnEm = '', dangLam = false, luot?: { luotId: string; qidTrongLuot: string }): Promise<KetQuaHoiThem> {

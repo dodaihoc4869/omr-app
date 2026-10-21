@@ -68,11 +68,13 @@ export interface KiemKhung {
   cauKiem: { buoc: number; kieu: 'so' | 'chon'; hoi: string; lua_chon?: string[] }[]
   loiGo: { buoc: number; noiDung: string }[]
 }
+/** `emVaCau` (thầy 21/10): dữ liệu THÔ của thẻ «Em và câu này» — chỉ có khi máy em xin (mở hộp Hỏi Thầy); hộp tự kiểm khuôn (`docEmVaCau`). */
+type EmKem = { emVaCau?: unknown }
 export type KetQuaHoiThay =
-  | { ok: true; cau: CauChoKhung; hoSo: HoSoLoiGiai; loiGiaiChu?: undefined; kiem?: KiemKhung; hoiThem?: boolean }
-  | { ok: true; cau: CauChoKhung; hoSo?: undefined; loiGiaiChu: LoiGiaiChu; hoiThem?: boolean }
+  | ({ ok: true; cau: CauChoKhung; hoSo: HoSoLoiGiai; loiGiaiChu?: undefined; kiem?: KiemKhung; hoiThem?: boolean } & EmKem)
+  | ({ ok: true; cau: CauChoKhung; hoSo?: undefined; loiGiaiChu: LoiGiaiChu; hoiThem?: boolean } & EmKem)
   /** Em ĐANG LÀM câu (chưa nộp): chỉ đề cho hộp hỏi Thầy — KHÔNG đáp án, KHÔNG lời giải (thầy 13/10). */
-  | { ok: true; chiHoi: true; cau: CauChoKhung; hoSo?: undefined; loiGiaiChu?: undefined; hoiThem?: boolean }
+  | ({ ok: true; chiHoi: true; cau: CauChoKhung; hoSo?: undefined; loiGiaiChu?: undefined; hoiThem?: boolean } & EmKem)
   | { ok: false; loi: string; khoa?: 'dang_kiem_tra' | 'ca_chua_cong_bo' }
 
 /** `nguon`: nơi em bấm (on_lai, luyen_de, khac_phuc, btvn, gia_dinh, game, dao, doan, vo_dai, bi_a…) — chỉ để thầy xem thống kê. */
@@ -82,7 +84,7 @@ export const CHU_LAM_XONG = 'Em làm xong câu này rồi bấm Hỏi thầy đ�
 // Lệnh chỉ dùng sau khi bấm: nạp cùng hộp Hỏi Thầy, không mang phần mạng vào gói mở app.
 const napLenh = () => import('./hoi-them-thay-api')
 const loiMang = () => ({ ok: false as const, loi: 'Chưa nối được máy chủ. Em thử lại sau.' })
-export function hoiThay(...args: [qid: string, nguon: string, chiHoi?: boolean, luotId?: string]): Promise<KetQuaHoiThay> {
+export function hoiThay(...args: [qid: string, nguon: string, chiHoi?: boolean, luotId?: string, emVaCau?: boolean]): Promise<KetQuaHoiThay> {
   return napLenh().then((m) => m.hoiThay(...args)).catch(loiMang)
 }
 

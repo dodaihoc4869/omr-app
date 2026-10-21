@@ -34,7 +34,7 @@ describe('NutHoiThay', () => {
     await waitFor(() => expect(screen.getByText(/Thầy đang soạn lời giải từng bước cho câu này/)).toBeTruthy())
     const hoi = goi.find(x=>x.url==='https://may.test/hs/hoi-thay')
     expect(hoi).toBeTruthy()
-    expect(hoi!.body).toEqual({ token: 'tok', qid: '12-A-II-4', nguon: 'on_lai' })
+    expect(hoi!.body).toEqual({ token: 'tok', qid: '12-A-II-4', nguon: 'on_lai', emVaCau: true }) // bấm Hỏi thầy ⇒ xin thêm thẻ «Em và câu này» (21/10)
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(screen.queryByText('Chốt thử')).toBeNull()
     expect(onHoi).not.toHaveBeenCalled()

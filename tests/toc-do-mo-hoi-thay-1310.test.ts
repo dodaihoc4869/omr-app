@@ -143,3 +143,17 @@ it('gửi câu hỏi Thầy (/hs/hoi-tro-ly) — số đợt chờ D1 không vư
   console.info(`gửi câu hỏi: lần đầu ${dau.dot} đợt, lần sau ${sau.dot} đợt (mốc ${MOC.hoi.join(' / ')})`)
   expect([dau.dot, sau.dot]).toEqual([Math.min(dau.dot, MOC.hoi[0]!), Math.min(sau.dot, MOC.hoi[1]!)])
 })
+
+// THẺ «EM VÀ CÂU NÀY» (thầy 21/10): xin thêm `emVaCau` KHÔNG được thêm đợt chờ (3 lệnh đọc chạy chung đợt đầu) ⇒ cùng mốc như trên.
+it('mở hộp kèm thẻ «Em và câu này» — cùng mốc đợt D1, có trường emVaCau; đang làm chỉ có số lần', async () => {
+  const [dau, sau] = await doMo({ qid: Q_DS, nguon: 'luyen', emVaCau: true })
+  for (const r of [dau, sau]) expect(r.kq).toMatchObject({ ok: true, coLoiGiai: true, emVaCau: { kienThuc: [], hoiNhanh: [] } })
+  console.info(`mở Hỏi thầy + thẻ em: lần đầu ${dau.dot} đợt, lần sau ${sau.dot} đợt (mốc ${MOC.coHoSo.join(' / ')})`)
+  expect([dau.dot, sau.dot]).toEqual([Math.min(dau.dot, MOC.coHoSo[0]!), Math.min(sau.dot, MOC.coHoSo[1]!)])
+  const [dl] = await doMo({ qid: Q_DS, nguon: 'luyen', chiHoi: true, emVaCau: true })
+  expect(dl.kq).toMatchObject({ ok: true, chiHoi: true, emVaCau: { kienThuc: [], hoiNhanh: [] } })
+  expect(dl.dot).toBeLessThanOrEqual(MOC.chiHoi[0]!)
+  // Không xin thì không có trường (Lời giải từng bước không đọc thêm gì).
+  const [khong] = await doMo({ qid: Q_DS, nguon: 'luyen' })
+  expect('emVaCau' in khong.kq).toBe(false)
+})

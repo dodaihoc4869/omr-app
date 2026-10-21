@@ -11,7 +11,9 @@ import TraLoiThay, { chuHoa, docCauTruc, type CauTrucTraLoi } from './TraLoiThay
 type Tin = { vai: 'em' | 'thay'; chu: string; ct?: CauTrucTraLoi | null }
 export const TOI_DA_KY_TU = 500
 const MA_DUNG_HAN = new Set(['het_luot', 'het_luot_cau', 'chua_bat', 'dang_kiem_tra', 'ca_chua_cong_bo', 'chua_mo'])
-type HoiThemProps = { qid: string; luotId?: string; qidTrongLuot?: string; nguon: string; gon?: boolean; hop?: boolean; dangLam?: boolean; choDe?: boolean; onTraLoi?: () => void; dapAnEm?: string }
+/** `hoiNhanh`: câu em chạm ở thẻ «Em và câu này» (HopHoiThay) — mỗi `n` mới gửi đúng một lần như em tự gõ. `onDangGui`: báo thẻ khoá nút hỏi nhanh. */
+type HoiThemProps = { qid: string; luotId?: string; qidTrongLuot?: string; nguon: string; gon?: boolean; hop?: boolean; dangLam?: boolean; choDe?: boolean; onTraLoi?: () => void; dapAnEm?: string
+  hoiNhanh?: { n: number; cau: string } | null; onDangGui?: (dang: boolean) => void }
 // Thầy 21/10 "bỏ phần làm câu tương đương đi": sau hướng dẫn KHÔNG còn mời em tự làm câu tương đương (HoiThayKiemChung chỉ còn ở dữ liệu cũ).
 
 // Đổi câu/nguồn hoặc trạng thái đang làm ⇒ không để hội thoại hay kết quả câu trước trôi sang.
@@ -22,7 +24,7 @@ export default function HoiThemThay(props: HoiThemProps) {
 /** `onTraLoi`: gọi một lần khi Thầy trả lời được câu đầu (game tính câu này là "có trợ giúp", như khi mở lời giải).
  *  `dangLam`: em đang làm câu, chưa nộp ⇒ máy chủ chỉ cho Thầy gợi hướng, không nêu đáp án.
  *  `choDe`: hộp vừa mở, đề câu chưa về (máy chủ chưa ghi "em đã mở câu") ⇒ gõ trước được, CHƯA gửi. */
-function HoiThemCau({ qid, luotId, qidTrongLuot, nguon, gon = false, hop = false, dangLam = false, choDe = false, onTraLoi, dapAnEm = '' }: HoiThemProps) {
+function HoiThemCau({ qid, luotId, qidTrongLuot, nguon, gon = false, hop = false, dangLam = false, choDe = false, onTraLoi, dapAnEm = '', hoiNhanh, onDangGui }: HoiThemProps) {
   const id = useId()
   const [mo, setMo] = useState(gon || hop)
   const [tin, setTin] = useState<Tin[]>([])
@@ -36,6 +38,15 @@ function HoiThemCau({ qid, luotId, qidTrongLuot, nguon, gon = false, hop = false
   const daBaoTraLoi = useRef(false)
   useEffect(() => { song.current = true; return () => { song.current = false } }, [])
   const oRef = useRef<HTMLTextAreaElement>(null)
+  // Gửi câu hỏi nhanh (hook đứng TRƯỚC lối ra sớm `!mo`): `guiNgay` trỏ tới hàm gửi của lượt vẽ mới nhất; mỗi `n` chỉ gửi một lần.
+  const guiNgay = useRef<((cau: string) => void) | null>(null)
+  const daGuiN = useRef(0)
+  useEffect(() => {
+    if (!hoiNhanh || hoiNhanh.n === daGuiN.current) return
+    daGuiN.current = hoiNhanh.n
+    guiNgay.current?.(hoiNhanh.cau)
+  }, [hoiNhanh])
+  useEffect(() => { onDangGui?.(dangGui || dung) }, [dangGui, dung, onDangGui])
   // Ô gõ TỰ GIÃN theo chữ (một dòng lúc trống, tối đa ~5 dòng rồi cuộn) — không còn góc kéo cỡ.
   useLayoutEffect(() => {
     const o = oRef.current
@@ -82,6 +93,7 @@ function HoiThemCau({ qid, luotId, qidTrongLuot, nguon, gon = false, hop = false
     if (r.conLai !== undefined) setConLai(r.conLai)
     if (MA_DUNG_HAN.has(r.ma)) setDung(true)
   }
+  guiNgay.current = (cau) => { void gui(undefined, cau) }
   const phim = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void gui() }
   }
