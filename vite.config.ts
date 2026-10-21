@@ -121,6 +121,27 @@ function boGhiChuHtml(): Plugin {
   }
 }
 
+// Gói vừa dựng (giữ để `modulePreload.resolveDependencies` tra đóng tĩnh của mảnh đang gọi). Hook chạy TRƯỚC bước Vite ghi danh sách mảnh con.
+let goiVuaDung: Record<string, { type: string; imports?: string[]; viteMetadata?: { importedCss: Set<string> } }> = {}
+const dongTinh = new Map<string, Set<string>>()
+function dongTinhCua(ten: string): Set<string> {
+  const co = dongTinh.get(ten)
+  if (co) return co
+  const ra = new Set<string>(), hang = [ten]
+  while (hang.length) {
+    const t = hang.pop()!
+    const m = goiVuaDung[t]
+    if (!m || m.type !== 'chunk') continue
+    for (const c of m.viteMetadata?.importedCss ?? []) ra.add(c)
+    for (const con of m.imports ?? []) if (!ra.has(con)) { ra.add(con); hang.push(con) }
+  }
+  dongTinh.set(ten, ra)
+  return ra
+}
+function giuGoiVuaDung(): Plugin {
+  return { name: 'giu-goi-vua-dung', apply: 'build', enforce: 'pre', generateBundle: { order: 'pre', handler(_o, goi) { goiVuaDung = goi as unknown as typeof goiVuaDung; dongTinh.clear() } } }
+}
+
 export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? REPO_BASE : '/',
   define: {
@@ -131,6 +152,7 @@ export default defineConfig({
   plugins: [
     react(),
     napTruocManEm(),
+    giuGoiVuaDung(),
     boGhiChuHtml(),
     VitePWA({
       // SERVICE WORKER VIẾT TAY (`src/sw.ts`), KHÔNG dùng bản tự sinh nữa.
@@ -377,6 +399,16 @@ export default defineConfig({
     }),
   ],
   build: {
+    // 21/10 (luật tốc độ: mọi đường chỉ nhanh hơn): danh sách mảnh con mà mỗi lượt `import()` ghi kèm (`__vite__mapDeps`) BỎ các tệp index.html
+    // ĐÃ nạp ở MỌI đường trước khi mã nào chạy — mảnh vào `index`, `react`, `bieu-tuong`, `rolldown-runtime` + tờ `index.css`. Nạp trước lại một
+    // tệp đã có là việc thừa (trình duyệt bỏ qua), nhưng tên tệp lặp trong danh sách của mọi mảnh làm các mảnh nặng thêm.
+    modulePreload: {
+      resolveDependencies: (_url, deps, { hostId }) => {
+        // Thêm: tệp mà CHÍNH mảnh đang gọi đã `import` tĩnh (trực tiếp hay gián tiếp) — chắc chắn đã chạy xong trước khi mã của mảnh ấy chạy.
+        const tinh = dongTinhCua(hostId)
+        return deps.filter((d) => !/(?:^|\/)(?:index|react|bieu-tuong|rolldown-runtime)-[\w-]{8}\.(?:js|css)$/.test(d) && !tinh.has(d))
+      },
+    },
     target: ['es2020', 'safari14', 'ios14'],
     cssTarget: ['safari14', 'ios14'],
     rolldownOptions: {
