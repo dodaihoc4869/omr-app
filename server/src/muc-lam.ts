@@ -40,6 +40,10 @@ export interface MucLamLuot {
   ranh2: number
   ranh3: number
   ranh4?: number
+  /** ĐO LẠI LƯỢT CŨ (thầy 21/10: "phải tìm cách đo lại hết"): vắng ⇒ giây đo bằng đồng hồ MỚI (chắc). 'cu' = giây của đồng hồ CŨ (máy em cũ đo bằng đồng hồ tường, ca thi cũ) — chỉ có thể DƯ
+   *  (kể cả lúc tab ẩn), không bao giờ thiếu; 'uoc' = giây ƯỚC TÍNH từ mốc trả lời trước trong phiên game (gồm cả lúc xem kết quả / nghỉ) — cũng chỉ có thể DƯ. Mức xếp từ hai loại này
+   *  hiện kèm dấu "≈" và KHÔNG BAO GIỜ là Mức làm 4 (Mức 4 cần giây đo thật + thời gian thường của lớp). Mức làm 1 từ giây dư vẫn chắc (giây thật chỉ nhỏ hơn). */
+  uocTinh?: 'cu' | 'uoc'
 }
 
 export interface DauVaoMucLam {
@@ -55,6 +59,8 @@ export interface DauVaoMucLam {
   thuongGiay?: number | null
   /** Hệ số đọc của em (e^(−τ) kẹp 0,75–1,5); vắng ⇒ 1,0. */
   heSoDoc?: number
+  /** Giây không phải số đo đồng hồ mới (xem `MucLamLuot.uocTinh`). */
+  uocTinh?: 'cu' | 'uoc'
 }
 
 const kep = (x: number, thap: number, cao: number): number => Math.min(cao, Math.max(thap, x))
@@ -68,7 +74,8 @@ export function mucLamCuaLuot(d: DauVaoMucLam): MucLamLuot | null {
   const he = typeof d.heSoDoc === 'number' && Number.isFinite(d.heSoDoc) ? kep(d.heSoDoc, 0.75, 1.5) : 1
   const doc = Math.round(thoiGianDoc(d.soTu, d.coHinh) * he)
   const xapXi = d.soTu === SO_TU_CAU_ANH && d.coHinh
-  const thuong = typeof d.thuongGiay === 'number' && Number.isFinite(d.thuongGiay) && d.thuongGiay > 0 ? Math.round(d.thuongGiay) : null
+  // Giây cũ / ước tính chỉ có thể dư ⇒ không đủ chắc để xếp "làm kỹ": bỏ thời gian thường (không có Mức làm 4).
+  const thuong = !d.uocTinh && typeof d.thuongGiay === 'number' && Number.isFinite(d.thuongGiay) && d.thuongGiay > 0 ? Math.round(d.thuongGiay) : null
   const giay = Math.round(d.giay)
   // Câu ảnh: ranh giới Mức 1 | Mức 2 hạ về 0,5 × T_đọc (T_đọc chỉ là ước lượng). Giây nguyên ⇒ "giây < x" ⇔ "giây < ceil(x)", "giây ≥ x" ⇔ "giây ≥ ceil(x)".
   const ranh2 = Math.ceil(xapXi ? doc * TI_LE_MUC_1_CAU_ANH : doc)
@@ -90,6 +97,7 @@ export function mucLamCuaLuot(d: DauVaoMucLam): MucLamLuot | null {
     ...(thuong !== null ? { thuong } : {}),
     ...(xapXi ? { xapXi: true as const } : {}),
     ...(ma === 1 && d.dung === true ? { ghiChu: 'dung_truoc_doc' as const } : {}),
+    ...(d.uocTinh ? { uocTinh: d.uocTinh } : {}),
   }
 }
 
@@ -117,11 +125,13 @@ export interface TongMucLam {
   dungTruocDoc: number
   /** Có ít nhất một lượt có β thật (⇒ Mức làm 4 xếp được). false ⇒ ghi chú "lớp chưa đủ mẫu" ở giao diện. */
   coBetaThat: boolean
+  /** Trong `soDo`: số lượt xếp từ giây CŨ hoặc ƯỚC TÍNH (hiện dấu "≈"; xem `MucLamLuot.uocTinh`). */
+  soUocTinh: number
 }
 
 export function tongMucLam(luot: readonly { mucLam?: MucLamLuot | null; dung: boolean | null }[]): TongMucLam {
   const theoMuc: TongMucLam['theoMuc'] = [1, 2, 3, 4].map((ma) => ({ ma: ma as MaMucLam, luot: 0, dung: 0, sai: 0 })) as TongMucLam['theoMuc']
-  let soDo = 0, chuaCoSoDo = 0, saiLamVoi = 0, saiDuNghi = 0, dungTruocDoc = 0, coBetaThat = false
+  let soDo = 0, chuaCoSoDo = 0, saiLamVoi = 0, saiDuNghi = 0, dungTruocDoc = 0, coBetaThat = false, soUocTinh = 0
   for (const l of luot) {
     const m = l.mucLam
     if (!m) { chuaCoSoDo++; continue }
@@ -133,6 +143,7 @@ export function tongMucLam(luot: readonly { mucLam?: MucLamLuot | null; dung: bo
     if (l.dung !== true) { if (m.ma <= 2) saiLamVoi++; else saiDuNghi++ }
     if (m.ghiChu === 'dung_truoc_doc') dungTruocDoc++
     if (m.thuong !== undefined) coBetaThat = true
+    if (m.uocTinh) soUocTinh++
   }
-  return { soDo, chuaCoSoDo, theoMuc, saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat }
+  return { soDo, chuaCoSoDo, theoMuc, saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat, soUocTinh }
 }

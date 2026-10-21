@@ -6,6 +6,7 @@
 // Không đọc D1 ở đây: nơi gọi tự đọc β (`docBetaCau`) trong CÙNG đợt `Promise.all` với các lượt đọc khác của mình (không thêm vòng chờ nối tiếp).
 import { msKyVong } from './omni-toc-do'
 import { mucLamCuaLuot, type MucLamLuot, type PhanMucLam } from './muc-lam'
+import type { KichThuocCau } from './cau-doc-giay'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -50,6 +51,9 @@ export interface DongMucTho {
   mucDo: string
   /** true = đúng · false = sai · null = bỏ trống / chưa chấm. */
   dung: boolean | null
+  /** ĐO LẠI LƯỢT CŨ (21/10): giây của đồng hồ CŨ ('cu': cột `giay` / `raw_json.ms` của lượt không có `doc.dh`) hoặc ƯỚC TÍNH ('uoc': mốc trả lời trước trong phiên game — `giayUocTinhGame`) — dùng khi lượt KHÔNG có số đo mới. */
+  giayCu?: number | null
+  loaiCu?: 'cu' | 'uoc'
 }
 
 /** Các mã câu gốc cần β: chỉ lượt ĐỦ điều kiện xếp mức ⇒ tập nhỏ (rỗng khi chưa máy nào nạp bản mới). */
@@ -57,9 +61,16 @@ export function gocCanBeta(dong: readonly Pick<DongMucTho, 'doMuc' | 'giayDo' | 
   return [...new Set(dong.filter((d) => d.doMuc && d.giayDo !== null && d.goc).map((d) => d.goc))]
 }
 
-/** Mức làm của một lượt; thiếu số đo ⇒ null. `beta` = kết quả `docBetaCau` cho `gocCanBeta`. */
-export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>): MucLamLuot | null {
-  if (!d.doMuc || d.giayDo === null) return null
+/**
+ * Mức làm của một lượt; thiếu số đo ⇒ null. `beta` = kết quả `docBetaCau` cho `gocCanBeta`. `kichThuoc` = `docKichThuocCau` (bảng tính sẵn) — CHỈ dùng để ĐO LẠI lượt cũ không có `doc`:
+ * lượt có giây cũ / ước tính (`giayCu`, `loaiCu`) và câu có kích thước đề ⇒ Mức làm với cờ `uocTinh`, KHÔNG có Mức làm 4 (giây cũ chỉ có thể dư). Lượt có số đo MỚI đi đường cũ, không đổi.
+ */
+export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>, kichThuoc?: ReadonlyMap<string, KichThuocCau>): MucLamLuot | null {
+  if (!d.doMuc || d.giayDo === null) {
+    const kt = !d.doMuc && d.giayCu !== null && d.giayCu !== undefined && d.loaiCu ? kichThuoc?.get(d.goc) : undefined
+    if (!kt || d.giayCu === null || d.giayCu === undefined) return null
+    return mucLamCuaLuot({ giay: d.giayCu, soTu: kt.soTu, coHinh: kt.coHinh, phan: kt.phan, dung: d.dung, thuongGiay: null, uocTinh: d.loaiCu })
+  }
   const b = beta.get(d.goc)
   return mucLamCuaLuot({
     giay: d.giayDo,

@@ -166,6 +166,29 @@ it('lệnh mở app phụ huynh: số đợt chờ D1 không vượt mốc bản
   expect(vuot, 'CHẬM HƠN bản trước — làm lại cho nhanh bằng/hơn rồi mới đẩy').toEqual([])
 })
 
+// ĐO LẠI LƯỢT CŨ (21/10): em có 10 lượt game CŨ không giây (chưa có `doc`) ⇒ Lịch sử làm câu và chi tiết em lên bảng chạy thêm đọc kích thước đề (+1 lệnh) và, ở chi tiết em, một lô «ước tính từ mốc trả lời»
+// (`giayUocTinhGame`, giống Lịch sử và tờ chiếu). Cổng chính ở trên dùng em CHƯA có lượt cũ nên không đo hai đường này. Số đo trên bản đang chạy (main 722426e) cùng kịch bản: gv-lich-su-lam-cau 4 đợt / 8 lệnh,
+// gv-ho-so-len-bang 15 đợt / 35 lệnh (4 và 15 đợt đã vượt mốc của em chưa có lượt cũ — có sẵn từ trước, KHÔNG phải do bản này). Khoá: số ĐỢT không tăng so với bản đó, lệnh tăng tối đa +2 — không thêm vòng chờ nối tiếp.
+const BAN_TRUOC_LUOT_CU: Record<string, { dot: number; lenh: number }> = { 'gv-lich-su-lam-cau': { dot: 4, lenh: 8 }, 'gv-ho-so-len-bang': { dot: 15, lenh: 35 } }
+it('em có lượt game cũ không giây: số đợt chờ D1 của Lịch sử làm câu và chi tiết em lên bảng KHÔNG tăng so với bản trước, lệnh tăng tối đa +2', async () => {
+  const k = await kho()
+  const ghi = k.d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, raw_json) VALUES (?, 'S1', ?, 'game', 'sess-cu', 1, ?, NULL, ?, ?, '{}')")
+  for (let i = 0; i < 10; i++) {
+    const luc = new Date(NOW + 2_000_000 + i * 20_000).toISOString()
+    ghi.run(`cu|${i}`, k.qids[i % k.qids.length]!, i % 2, luc, luc.slice(0, 10))
+  }
+  vi.setSystemTime(NOW + 3_600_000)
+  const vuot: string[] = []
+  for (const [ten, m] of Object.entries(BAN_TRUOC_LUOT_CU)) {
+    const l = LENH_PH.find((x) => x.ten === ten)!
+    const r = await goiRaw(k, l.duong, l.than(k), l.tieuDe)
+    expect(r.kq.ok, `${ten}: ${JSON.stringify(r.kq).slice(0, 240)}`).toBe(true)
+    if (r.dot > m.dot) vuot.push(`${ten}: ${r.dot} đợt (bản trước ${m.dot})`)
+    if (r.lenh > m.lenh + 2) vuot.push(`${ten}: ${r.lenh} lệnh D1 (bản trước ${m.lenh}, tối đa +2)`)
+  }
+  expect(vuot, 'Đường đo lại lượt cũ làm thêm vòng chờ nối tiếp').toEqual([])
+})
+
 // MỞ CHẶNG SỚM (21/10, đoạn mã nội tuyến index.html gửi `hoc-tap-start` NGAY lúc đọc HTML khi đệm Sảnh hôm nay nói em còn việc): từ nay Sảnh và mở chặng của CÙNG một em có thể
 // chạy ĐỒNG THỜI (trước: mở chặng chạy SAU Sảnh và dùng lại kế hoạch Sảnh vừa nhớ). Phải an toàn khi hai lượt cùng lập kế hoạch / cùng ghi.
 it('mở chặng sớm: Sảnh và hoc-tap-start của cùng một em chạy ĐỒNG THỜI ⇒ cả hai ok; lượt mở chặng kế tiếp trả CÙNG phiên và CÙNG bộ câu', async () => {

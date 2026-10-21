@@ -284,6 +284,35 @@ describe('D/K + nhãn trên thẻ tên + bảng chi tiết em (cầu nối)', ()
     t.phim('Escape')
   })
 
+  it('(thầy 21/10, đo lại lượt cũ) lần làm cũ xếp từ giây đồng hồ cũ ⇒ "≈ Mức làm N", "≈ giây", lời nói rõ có thể dư, không Mức làm 4; Cách làm bài 14 ngày ghi số lượt ≈', () => {
+    const t = moTo([o('A', 'Lê Thu Hà')], { cauNoi: true })
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI })
+    t.phim('l')
+    ;(t.doc.querySelector('.mc-em[id]') as HTMLElement).click()
+    const xin = t.guiLen.find((m) => m.type === TIN_TO_CHIEU.HO_SO)!
+    const muc = (ma: number, giay: number, o: Record<string, unknown> = {}) => ({ ma, giay, giayDoc: 24, sanNghi: 6, ranh2: 24, ranh3: 30, ...o })
+    t.tuCha({ type: TIN_TO_CHIEU.HO_SO_TRA, id: xin.id, hoSo: {
+      em: { hoTen: 'Lê Thu Hà' },
+      cauNay: { soLan: 2, soDung: 0, soSai: 2, lan: [
+        { luc: '2026-10-24T13:12:00Z', dung: false, coGoiY: false, nguon: 'Ôn lại', giay: 12, chon: 'B', mucLam: muc(1, 12, { uocTinh: 'uoc' }) },
+        { luc: '2026-10-26T11:48:00Z', dung: false, coGoiY: false, nguon: 'BTVN', giay: 41, chon: 'C', mucLam: muc(3, 41, { uocTinh: 'cu' }) },
+      ] },
+      cachLam14: { soDo: 2, chuaCoSoDo: 1, theoMuc: [{ ma: 1, luot: 1, dung: 0, sai: 1 }, { ma: 2, luot: 0, dung: 0, sai: 0 }, { ma: 3, luot: 1, dung: 0, sai: 1 }, { ma: 4, luot: 0, dung: 0, sai: 0 }], saiLamVoi: 1, saiDuNghi: 1, dungTruocDoc: 0, coBetaThat: false, soUocTinh: 2 },
+    } })
+    const ct = t.doc.querySelector('.mc-ct')!
+    const gan = ct.querySelector('.mc-gan')!
+    expect(gan.querySelector('.mc-gan-so')!.textContent).toBe('≈ 41giây em làm24giây đọc hết đề cần')
+    expect(gan.querySelector('.mc-chm-lon')!.textContent).toBe('≈ Mức làm 3 Có nghĩ')
+    expect(gan.querySelector('.mc-th')!.getAttribute('aria-label')).toBe('Làm khoảng 41 giây; đọc hết đề cần 24 giây; có thời gian nghĩ từ 30 giây')
+    expect(gan.querySelector('.mc-gan-gt')!.textContent).toContain('số giây chỉ là ước tính nên không xếp Mức làm 4')
+    const lan = [...ct.querySelectorAll('.mc-lanl')]
+    expect(lan.map((l) => l.querySelector('.mc-chm')!.textContent)).toEqual(['≈ Mức làm 3', '≈ Mức làm 1'])
+    expect(lan[1]!.querySelector('.mc-lanl-gt')!.textContent).toBe('Chưa đọc hết đề · ≈ 12 giây, đọc hết đề cần 24 giây. Giây ước tính từ mốc trả lời trước trong lượt chơi, có thể dư.')
+    expect(lan[0]!.querySelector('.mc-lanl-gt')!.textContent).toContain('Giây đo bằng đồng hồ cũ, có thể dư.')
+    const cach = ct.querySelector('.mc-cach')!
+    expect(cach.querySelector('.mc-rong')!.textContent).toBe('2 lượt xếp từ số giây đồng hồ cũ hoặc ước tính (≈): có thể cao hơn thật nên mức chỉ là ước tính, không xếp Mức làm 4.')
+  })
+
   it('tờ mở riêng (không có app cha) ⇒ bảng chi tiết nói rõ không lấy được số, không bịa', () => {
     const t = moTo([o('A', 'An')])
     t.phim('l')

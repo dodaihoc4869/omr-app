@@ -167,7 +167,7 @@ describe('học sinh và phụ huynh: cùng tấm, chỉ lượt SAI, chữ nh�
       'Mức làm 3 Có thời gian nghĩ 1 lượt sai',
       'Mức làm 4 Làm kỹ, đúng nhịp lớp 0 lượt sai',
     ])
-    expect(chu(khoi.querySelector('.hslc-ghi'))).toBe('Đo được 5/8 lượt sai. 3 lượt sai chưa có số đo (làm trước khi máy dùng đồng hồ mới).')
+    expect(chu(khoi.querySelector('.hslc-ghi'))).toBe('Đo được 5/8 lượt sai. 3 lượt sai chưa có số đo (chưa có số giây đáng tin để xếp).')
     expect(chu(khoi)).not.toMatch(/Chỉ ghi chú|đúng trước|Cách tính Mức làm|Lớp chưa đủ mẫu/i)
     moLichSu(tam)
     expect(tam.querySelectorAll('.hslc-muc-luot-ghi')).toHaveLength(0)

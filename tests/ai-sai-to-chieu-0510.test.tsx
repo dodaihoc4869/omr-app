@@ -121,6 +121,25 @@ describe('tờ chạy thật — nút X', () => {
     expect(panel.textContent).not.toContain('≈')
     expect(panel.querySelector('.mc-ai-chan')!.textContent).toContain('Mức làm có từ khi máy em dùng đồng hồ mới')
   })
+  it('(thầy 21/10, đo lại lượt cũ) lượt xếp từ giây đồng hồ cũ / ước tính (mucLam.uocTinh) ⇒ vẫn vào làn Mức làm với "≈" trước số giây + chú thích; lượt có số đo mới không "≈"', () => {
+    const t = moTo()
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
+    t.phim('x')
+    const m = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    const muc = (ma: number, giay: number, o: Record<string, unknown> = {}) => ({ ma, giay, giayDoc: 24, sanNghi: 6, ranh2: 24, ranh3: 30, ...o })
+    t.tuCha({
+      type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id,
+      ds: [
+        { sbd: 'S1', ten: 'Nguyễn Đức Anh', luc: '2026-10-26T11:48:00Z', noi: 'Ôn lại', giay: 9, uocTinh: true, mucLam: muc(1, 9, { uocTinh: 'uoc' }) },
+        { sbd: 'S2', ten: 'Lê Thu Hà', luc: '2026-10-26T11:50:00Z', noi: 'Đảo', giay: 26, mucLam: muc(2, 26, { uocTinh: 'cu' }) },
+        { sbd: 'S3', ten: 'Vũ Minh Quân', luc: '2026-10-26T11:52:00Z', noi: 'BTVN', giay: 40, mucLam: muc(3, 40) },
+      ],
+    })
+    const panel = t.doc.querySelector('.mc-aisai')!
+    expect([...panel.querySelectorAll('.mc-ln[data-m="1"] .mc-pl u, .mc-ln[data-m="2"] .mc-pl u, .mc-ln[data-m="3"] .mc-pl u')].map((x) => x.textContent)).toEqual(['≈ 9 giây', '≈ 26 giây', '40 giây'])
+    expect(panel.querySelector('.mc-ln-chua')).toBeNull() // không còn lượt nào "Chưa có số đo"
+    expect(panel.querySelector('.mc-ai-chan')!.textContent).toContain('≈ là số giây ước tính hoặc đo bằng đồng hồ cũ')
+  })
   it('(thầy 21/10) Mức làm 1–4: làn theo mức với khoảng giây lấy từ ranh giới máy chủ gửi; thẻ tên + giây; thanh 4 mức; câu chưa đủ mẫu ⇒ không Mức làm 4', () => {
     const t = moTo()
     t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
@@ -141,8 +160,8 @@ describe('tờ chạy thật — nút X', () => {
       'Mức làm 1Chưa đọc hết đề · dưới 24 giây1 lượt|Nguyễn Đức Anh9 giây', // jsdom không đo bố cục ⇒ giữ tên đầy đủ; bản viết tắt nằm ở data-t
       'Mức làm 2Đọc xong, chưa kịp nghĩ · 24–29 giây1 lượt|Lê Thu Hà26 giây',
       'Mức làm 3Có nghĩ · từ 30 giây1 lượt|Vũ Minh Quân40 giây', // không ranh4 ⇒ Mức làm 3 mở tới hết thước
-      'Mức làm 4Lớp chưa đủ mẫu của câu này để xếp Mức làm 4|',
-      'Chưa có số đoLượt làm trước khi máy em dùng đồng hồ mới1 lượt|Đỗ Khánh Linh≈ 12 giây',
+      'Mức làm 4Lớp chưa đủ mẫu của câu này, hoặc số giây là ước tính, nên chưa xếp Mức làm 4|',
+      'Chưa có số đoLượt chưa có số giây đáng tin để xếp mức1 lượt|Đỗ Khánh Linh≈ 12 giây',
     ])
     expect(panel.querySelector('.mc-pl b')!.getAttribute('data-t')).toBe('Nguyễn Đ. Anh') // tên viết tắt chữ đệm khi thẻ hẹp
     expect([...panel.querySelectorAll('.mc-ai-tn > i')].map((i) => [i.getAttribute('data-m'), i.textContent])).toEqual([['1', '1'], ['2', '1'], ['3', '1'], ['0', '1']])
