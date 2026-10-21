@@ -52,6 +52,7 @@ import { chuCanThem, chuDoTinCay, NGUONG_TIN_CAY } from '../../lib/nhip-hoc-em'
 import { LUAT_NHOM_NHIP } from '../../../server/src/nhip-hoc-kieu'
 import { TEN_NHOM_NHIP as TEN_NHOM_NHIP_HOC } from '../../../server/src/nhip-hoc-luat'
 import { NutBac } from '../bac-cham-chi/ChipBac'
+import { chuanHoaMucLam, ChipChuaCoSoDo, ChipMuc, ChuGiaiThuoc, KhoiCachLamBai, MucCuaLuot } from './muc-lam-giao-dien'
 import './bai-hang-ngay.css'
 import './ho-so-lam-cau-em.css'
 
@@ -277,8 +278,10 @@ export function coNutSua(c: Pick<CauEmSai, 'moChua'>, coTheChua: ReadonlySet<str
 }
 
 /** Một hộp câu từng sai. Có `onChua` (chỉ chế độ học sinh, câu đang ở Tự sửa lỗi) ⇒ cả hộp là MỘT nút mở đúng câu ấy. */
-function OCauSai({ c, lan, onChua }: { c: CauEmSai; lan: readonly LanLamCau[]; onChua?: (qid: string) => void }) {
+function OCauSai({ c, lan, onChua, cheDo }: { c: CauEmSai; lan: readonly LanLamCau[]; onChua?: (qid: string) => void; cheDo: CheDoHoSo }) {
   const { ds, truoc } = giayCacLan(c, lan)
+  // Mức làm của lượt GẦN NHẤT của câu (máy chủ trả mới trước); chưa có số đo ⇒ không chip (không đoán).
+  const mucGanNhat = lan.find((l) => l.qid === c.qid)?.mucLam
   const muc = tenMucDo(c.mucDo)
   const lanCuoi = ngayGio(c.lanCuoi)
   const sua = c.lanCuoiDung
@@ -295,6 +298,12 @@ function OCauSai({ c, lan, onChua }: { c: CauEmSai; lan: readonly LanLamCau[]; o
         {muc ? `${muc} · ` : ''}sai {c.soSai} lần · đúng {c.soDung} lần{lanCuoi ? ` · lần cuối ${lanCuoi}` : ''}
       </span>
       <GiayTungLan ds={ds} truoc={truoc} />
+      {mucGanNhat && (
+        <span className="hslc-o-muc">
+          <span className="hslc-giay-nhan">Lần gần nhất:</span>{' '}
+          <ChipMuc ma={mucGanNhat.ma} cheDo={cheDo} dai />
+        </span>
+      )}
       {onChua && (
         <span className="hslc-o-mo" aria-hidden="true">
           {CHU_SUA_CAU}
@@ -324,6 +333,7 @@ function DsCauSai({
   coTheChua,
   soCauCanSua,
   ngoi,
+  cheDo,
 }: {
   cauSai: readonly CauEmSai[]
   lan: readonly LanLamCau[]
@@ -331,6 +341,7 @@ function DsCauSai({
   coTheChua?: ReadonlySet<string>
   soCauCanSua?: number
   ngoi: Ngoi
+  cheDo: CheDoHoSo
 }) {
   const id = useId()
   if (cauSai.length === 0) return <p className="gvv2-trong">{hoa(ngoi)} chưa sai câu nào trong các lượt đã ghi.</p>
@@ -357,7 +368,7 @@ function DsCauSai({
         ) : (
           <ul className="gvv2-hs-cau-ds hslc-o-luoi">
             {chua.map((c) => (
-              <OCauSai key={c.qid} c={c} lan={lan} onChua={onChuaCau && coNutSua(c, coTheChua) ? onChuaCau : undefined} />
+              <OCauSai key={c.qid} c={c} lan={lan} cheDo={cheDo} onChua={onChuaCau && coNutSua(c, coTheChua) ? onChuaCau : undefined} />
             ))}
           </ul>
         )}
@@ -370,7 +381,7 @@ function DsCauSai({
           </h4>
           <ul className="gvv2-hs-cau-ds hslc-o-luoi">
             {da.map((c) => (
-              <OCauSai key={c.qid} c={c} lan={lan} />
+              <OCauSai key={c.qid} c={c} lan={lan} cheDo={cheDo} />
             ))}
           </ul>
         </section>
@@ -379,7 +390,7 @@ function DsCauSai({
   )
 }
 
-function LichSu({ kq, onTaiThem, dangTai, ngoi, laThay }: { kq: KetQuaLichSuLamCau; onTaiThem: () => void; dangTai: boolean; ngoi: Ngoi; laThay: boolean }) {
+function LichSu({ kq, onTaiThem, dangTai, ngoi, laThay, cheDo }: { kq: KetQuaLichSuLamCau; onTaiThem: () => void; dangTai: boolean; ngoi: Ngoi; laThay: boolean; cheDo: CheDoHoSo }) {
   const [chiSai, setChiSai] = useState(false)
   const [soHien, setSoHien] = useState(MOI_DOT)
   const loc = useMemo(() => (chiSai ? kq.lan.filter((l) => l.dung === false) : kq.lan), [kq.lan, chiSai])
@@ -406,6 +417,7 @@ function LichSu({ kq, onTaiThem, dangTai, ngoi, laThay }: { kq: KetQuaLichSuLamC
         </button>
       </div>
       {laThay && <p className="hslc-ls-ghi">Mỗi lượt: giờ · câu · nơi làm · mức độ · kết quả · số giây (≈ là ước tính, — là chưa đo được).</p>}
+      {laThay && kq.mucLam && <ChuGiaiThuoc />} {/* máy chủ chưa có Mức làm (không có `mucLam`) ⇒ không vẽ chú giải / nhãn "Chưa có số đo" */}
       {loc.length === 0 ? (
         <p className="gvv2-trong">{chiSai ? `${hoa(ngoi)} chưa có lần sai nào trong các lượt đã tải.` : 'Chưa có lượt nào.'}</p>
       ) : (
@@ -421,7 +433,7 @@ function LichSu({ kq, onTaiThem, dangTai, ngoi, laThay }: { kq: KetQuaLichSuLamC
                 const phu = [l.noi, muc, l.chon ? `Chọn ${l.chon}` : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join(' · ')
                 const k = l.dung === true ? 'dung' : l.dung === false ? 'sai' : 'trong'
                 return (
-                  <li key={`${l.luc}-${l.qid}-${i}`} className="gvv2-hs-lan hslc-lan" data-kq={k}>
+                  <li key={`${l.luc}-${l.qid}-${i}`} className="gvv2-hs-lan hslc-lan" data-kq={k} data-m={l.mucLam?.ma}>
                     <time className="gvv2-so" dateTime={l.luc}>
                       {gioPhutVN(l.luc)}
                     </time>
@@ -433,8 +445,14 @@ function LichSu({ kq, onTaiThem, dangTai, ngoi, laThay }: { kq: KetQuaLichSuLamC
                       <span className="gvv2-hs-kq" data-kq={k}>
                         {chuKetQua(l.dung)}
                       </span>
-                      <GiayO giay={l.giay} nguon={l.nguonGiay} />
+                      {!l.mucLam && (
+                        <>
+                          <GiayO giay={l.giay} nguon={l.nguonGiay} />
+                          {laThay && kq.mucLam && <ChipChuaCoSoDo />}
+                        </>
+                      )}
                     </span>
+                    {l.mucLam && <MucCuaLuot m={l.mucLam} cheDo={cheDo} />}
                   </li>
                 )
               })}
@@ -915,7 +933,7 @@ export default function HoSoLamCauEm({
         r = { ok: false, loai: 'mang', chu: lyDoDeHieu(e) }
       }
       if (l !== lan.current) return
-      if (r.ok) setKq(r.du)
+      if (r.ok) setKq(chuanHoaMucLam(r.du))
       else setLoi(r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu))
       setDangTai(false)
     },
@@ -1188,6 +1206,7 @@ export default function HoSoLamCauEm({
                     </p>
                   ) : (
                     <>
+                      {kq.mucLam && <KhoiCachLamBai tong={kq.mucLam} cheDo={cheDo} ngoi={ngoi} soSaiTong={t!.soSai + t!.soBoTrong} />}
                       <GiayMucDo lan={kq.lan} laThay={laThay} />
                       <div className="gvv2-con hslc-the-con" data-so="4" role="tablist" aria-label={`Toàn bộ sổ của ${ngoi}`}>
                         {the4.map(([k, nhan, so]) => (
@@ -1207,9 +1226,9 @@ export default function HoSoLamCauEm({
                       </div>
                       <div role="tabpanel" id={`gvv2-hs-o-${the}`} aria-labelledby={`gvv2-hs-the-${the}`} className="gvv2-hs-o-the">
                         {the === 'cau-sai' ? (
-                          <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} soCauCanSua={soCauCanSua} ngoi={ngoi} />
+                          <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} soCauCanSua={soCauCanSua} ngoi={ngoi} cheDo={cheDo} />
                         ) : the === 'lich-su' ? (
-                          <LichSu kq={kq} dangTai={dangTai} onTaiThem={() => void tai(TRAN_GIOI_HAN)} ngoi={ngoi} laThay={laThay} />
+                          <LichSu kq={kq} dangTai={dangTai} onTaiThem={() => void tai(TRAN_GIOI_HAN)} ngoi={ngoi} laThay={laThay} cheDo={cheDo} />
                         ) : td ? (
                           <DsCauTomTat
                             key={the}

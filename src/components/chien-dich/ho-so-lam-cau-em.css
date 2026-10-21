@@ -195,3 +195,105 @@
   min-height: 32px; padding: 0 12px 0 14px; border-radius: var(--r-vien, 999px);
   background: var(--gvm-xd-nen); color: var(--gvm-xd-dam);
 }
+
+/* ---------- MỨC LÀM 1–4 (thầy 21/10: "từng câu học sinh làm phải hiển thị chi tiết 4 mức … thiết kế lại cho thật đẹp mắt, chi tiết, rõ ràng") ----------
+ * Bản vẽ đã duyệt: docs/ban-ve-muc-lam-2010/. Ba chế độ (thầy · học sinh · phụ huynh) dùng CHUNG các luật này. CHỈ THÊM luật mới.
+ * MÀU: Mức làm 1 → 4 là MỘT dải xanh theo độ đậm, dựng bằng color-mix() từ biến sẵn có --gvm-xd / --gvm-mat-2 (không màu thô); đỏ · vàng · xanh lá dành cho đúng/sai và Chăm/Chưa đều/Lười.
+ * Màu KHÔNG là kênh duy nhất: mọi mức đều có chữ "Mức làm N" + ký hiệu bốn vạch (n vạch tô). Chữ ≥ 12 px; chip không bấm được (không phải đích chạm). */
+.hslc {
+  --hslc-m1: color-mix(in srgb, var(--gvm-xd) 24%, var(--gvm-mat-2));
+  --hslc-m2: color-mix(in srgb, var(--gvm-xd) 46%, var(--gvm-mat-2));
+  --hslc-m3: color-mix(in srgb, var(--gvm-xd) 72%, var(--gvm-mat-2));
+  --hslc-m4: var(--gvm-xd);
+}
+.hslc [data-m='1'] { --hslc-c: var(--hslc-m1); }
+.hslc [data-m='2'] { --hslc-c: var(--hslc-m2); }
+.hslc [data-m='3'] { --hslc-c: var(--hslc-m3); }
+.hslc [data-m='4'] { --hslc-c: var(--hslc-m4); }
+
+/* ký hiệu bốn vạch */
+.hslc-pip { display: inline-flex; align-items: flex-end; gap: 2px; flex: none; width: 16px; height: 14px; color: var(--gvm-xd); }
+.hslc-pip i { flex: 1 1 0; border-radius: 1px; background: color-mix(in srgb, var(--gvm-xd) 24%, transparent); }
+.hslc-pip i:nth-child(1) { height: 32%; }
+.hslc-pip i:nth-child(2) { height: 55%; }
+.hslc-pip i:nth-child(3) { height: 78%; }
+.hslc-pip i:nth-child(4) { height: 100%; }
+.hslc-pip[data-n='1'] i:nth-child(-n + 1),
+.hslc-pip[data-n='2'] i:nth-child(-n + 2),
+.hslc-pip[data-n='3'] i:nth-child(-n + 3),
+.hslc-pip[data-n='4'] i:nth-child(-n + 4) { background: currentColor; }
+
+/* chip "Mức làm N" / "Chưa có số đo" */
+.hslc-chip-m {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 28px; padding: 2px 12px 2px 8px; border-radius: var(--r-vien, 999px);
+  background: var(--gvm-mat-2); box-shadow: inset 0 0 0 1.5px var(--hslc-c, var(--gvm-vien)); font-size: 13px; line-height: 1.3; color: var(--gvm-chu);
+}
+.hslc-chip-m b { font-weight: 800; white-space: nowrap; }
+.hslc-chip-m-ten { min-width: 0; font-weight: 600; color: var(--gvm-chu-2); overflow-wrap: anywhere; }
+.hslc-chip-m--chua {
+  padding-left: 12px; background: transparent; box-shadow: none; border: 1.5px dashed var(--gvm-chu-3); color: var(--gvm-chu-2); cursor: help;
+}
+.hslc-chip-m--chua b { font-weight: 700; }
+
+/* thước giây một lượt: bốn đoạn Mức làm, vạch đứng = đọc hết đề, chấm = giây của em */
+.hslc-thuoc-m { display: block; width: 100%; padding: 8px 8px 6px; }
+.hslc-thuoc-m-z { position: relative; display: block; height: 10px; border-radius: var(--r-vien, 999px); background: var(--gvm-mat-2); }
+.hslc-thuoc-m-z i { position: absolute; top: 0; bottom: 0; background: var(--hslc-c); }
+.hslc-thuoc-m-z i:first-child { border-radius: var(--r-vien, 999px) 0 0 var(--r-vien, 999px); }
+.hslc-thuoc-m-z i:last-of-type { border-radius: 0 var(--r-vien, 999px) var(--r-vien, 999px) 0; }
+.hslc-thuoc-m-z u { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--gvm-chu); }
+.hslc-thuoc-m-z b {
+  position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--gvm-chu);
+  border: 3px solid var(--gvm-mat); box-shadow: 0 0 0 2px var(--gvm-chu);
+}
+
+/* dòng lịch sử có mức: khối dưới tên câu, trải hai cột phải */
+.hslc-lan .hslc-muc-luot { grid-column: 2 / -1; display: grid; gap: 4px; min-width: 0; }
+.hslc-muc-luot-dong { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
+.hslc-muc-luot-so { font-size: 13px; font-weight: 700; color: var(--gvm-chu); }
+.hslc-muc-luot-ghi { font-size: 12px; line-height: 1.4; color: var(--gvm-chu-2); }
+.hslc-lan-phai { align-content: start; }
+
+/* chú giải thước (thầy) */
+.hslc-chu-giai-m { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0; font-size: 13px; font-weight: 600; color: var(--gvm-chu-2); }
+.hslc-chu-giai-m span { display: inline-flex; align-items: center; gap: 6px; }
+.hslc-chu-giai-m i { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--hslc-c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gvm-xd) 35%, transparent); }
+.hslc-chu-giai-m u { flex: none; width: 2px; height: 16px; border-radius: 1px; background: var(--gvm-chu); }
+.hslc-chu-giai-m b { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--gvm-chu); box-shadow: 0 0 0 2px var(--gvm-mat), 0 0 0 3.5px var(--gvm-chu); margin: 0 3px; }
+
+/* hộp câu sai: mức lượt gần nhất */
+.hslc-o-muc { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.hslc-o-muc .hslc-giay-nhan { flex-basis: auto; }
+
+/* khối "Cách làm bài" */
+.hslc-cl { gap: 12px; }
+.hslc-cl-do { margin: 0; font-size: 14px; line-height: 1.5; color: var(--gvm-chu-2); }
+.hslc-cl-do b { color: var(--gvm-chu); font-weight: 800; }
+.hslc-tm { display: flex; gap: 3px; height: 28px; }
+.hslc-tm i { display: grid; place-items: center; min-width: 38px; border-radius: var(--r-vien, 999px); background: var(--hslc-c); font-style: normal; }
+.hslc-tm b { min-width: 22px; padding: 0 8px; border-radius: var(--r-vien, 999px); background: var(--gvm-mat); color: var(--gvm-chu); font-size: 13px; font-weight: 800; line-height: 20px; text-align: center; } /* số trên nền đặc ⇒ luôn đủ tương phản ở cả bốn mức */
+.hslc-cl-cheo { display: grid; margin: 0; padding: 0; list-style: none; border-radius: var(--r-nho, 12px); background: var(--gvm-mat-2); overflow: hidden; }
+.hslc-cl-cheo li { display: grid; grid-template-columns: minmax(0, 1fr) 56px 56px; align-items: center; gap: 4px; padding: 8px 12px; border-top: 1px solid var(--gvm-vien); }
+.hslc-cl-cheo li:first-child { border-top: 0; }
+.hslc-cl-cheo i { position: relative; font-style: normal; text-align: right; font-size: 15px; font-weight: 800; color: var(--gvm-chu); }
+.hslc-cl-cheo i[data-sai] { color: var(--gvm-ho-dam); }
+.hslc-cl-cheo-d { font-size: 12px; font-weight: 700; color: var(--gvm-chu-2); }
+.hslc-cl-cheo-d i { font-size: 12px; font-weight: 700; color: var(--gvm-chu-2); }
+.hslc-cl-cheo-ten { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; min-width: 0; }
+.hslc-cl-cheo-ten small { font-size: 13px; color: var(--gvm-chu-2); }
+@container hslc (max-width: 559px) { .hslc-cl-cheo-ten small { flex-basis: 100%; } }
+.hslc-cl-cheo-t { font-weight: 800; background: color-mix(in srgb, var(--gvm-xd) 8%, transparent); }
+.hslc-cl-hai { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@container hslc (min-width: 560px) { .hslc-cl-hai { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.hslc-cl-hai p { display: grid; gap: 2px; margin: 0; padding: 12px 14px; border-radius: var(--r-nho, 12px); background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }
+.hslc-cl-hai b { font-size: 26px; font-weight: 800; line-height: 1.1; }
+.hslc-cl-hai span { font-size: 14px; line-height: 1.4; }
+.hslc-cl-em { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.hslc-cl-em li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'chip ten luot'; align-items: center; gap: 4px 12px; }
+.hslc-cl-em .hslc-chip-m { grid-area: chip; justify-self: start; }
+.hslc-cl-em-ten { grid-area: ten; font-size: 14px; color: var(--gvm-chu-2); }
+.hslc-cl-em-luot { grid-area: luot; font-size: 14px; font-weight: 800; color: var(--gvm-chu); white-space: nowrap; }
+@media (max-width: 600px) { .hslc-cl-em li { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'chip luot' 'ten ten'; } }
+/* chưa lượt nào có số đo — viền nét đứt, MỘT câu lý do */
+.hslc-cl-trong { display: grid; justify-items: start; gap: 8px; padding: 14px 16px; border: 1.5px dashed var(--gvm-chu-3); border-radius: var(--r-vua, 16px); }
+.hslc-cl-trong p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--gvm-chu-2); }

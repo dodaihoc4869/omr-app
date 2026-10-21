@@ -3,9 +3,9 @@
 // dùng chung `server/src/lich-su-lam-cau-kieu.ts` (làn máy chủ viết lệnh, app CHỈ ĐỌC). Không ném lỗi: trả `KetQuaLenh` với MỘT câu nói thật.
 // Trường thiếu / sai kiểu ⇒ bỏ dòng ấy (không bịa số); thiếu cả khung ⇒ "không đọc được".
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
-import type { CauEmSai, KetQuaLichSuLamCau, LanLamCau, NguonGiay, TongLichSuLamCau } from '../../server/src/lich-su-lam-cau-kieu'
+import type { CauEmSai, KetQuaLichSuLamCau, LanLamCau, MucLamLuot, NguonGiay, TongLichSuLamCau, TongMucLam } from '../../server/src/lich-su-lam-cau-kieu'
 
-export type { CauEmSai, KetQuaLichSuLamCau, LanLamCau, NguonGiay, TongLichSuLamCau }
+export type { CauEmSai, KetQuaLichSuLamCau, LanLamCau, MucLamLuot, NguonGiay, TongLichSuLamCau, TongMucLam }
 
 export const DUONG_LICH_SU_LAM_CAU = '/gv/lich-su-lam-cau'
 /** Trần số lượt máy chủ chịu trả trong `lan` (hợp đồng: mặc định 1000, trần 5000 = cửa sổ đọc của máy chủ; 21/10 nâng từ 2000). */
@@ -34,6 +34,8 @@ function docLan(x: unknown): LanLamCau | null {
     // Không có số giây ⇒ không có nguồn (không ghi "đo thật" cho một ô trống).
     nguonGiay: giay !== null && giay > 0 ? nguon(o.nguonGiay) : null,
     coGoiY: o.coGoiY === true,
+    // Mức làm: máy chủ đã xếp; ở đây CHỈ chuyển tiếp (giữ tệp này gọn — nó nằm trong đường tải mở của app phụ huynh). Kiểm khung ở `chuanHoaMucLam` (muc-lam-giao-dien.tsx), trước khi tấm vẽ.
+    ...(o.mucLam && typeof o.mucLam === 'object' ? { mucLam: o.mucLam as MucLamLuot } : {}),
   }
 }
 
@@ -76,6 +78,7 @@ export function docLichSuLamCau(du: Record<string, unknown>): KetQuaLichSuLamCau
       tongGiay: so(tong.tongGiay) ?? 0,
     },
     lan: du.lan.map(docLan).filter((l): l is LanLamCau => l !== null),
+    ...(du.mucLam && typeof du.mucLam === 'object' ? { mucLam: du.mucLam as TongMucLam } : {}),
     cauSai: du.cauSai.map(docCauSai).filter((c): c is CauEmSai => c !== null),
     conNua: du.conNua === true,
     catBot: du.catBot === true,
