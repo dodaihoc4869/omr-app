@@ -1,0 +1,35 @@
+# ĐO ĐỘ PHỦ GIÂY TOÀN BỘ LỊCH SỬ (CHỈ ĐỌC) — thầy 21/10: "Phải đo hết tất cả lượt hs đã làm" (docs/dac-ta-muc-lam-bai-2010.md mục 12).
+# Đếm TOÀN BỘ sổ `su_kien_hoc` (không chỉ 24 giờ): theo nguồn · có giây · giây từ đâu (cột `giay`, `raw_json.ms`) · có kích thước đề · phân bố giây
+# (để biết lượt cũ nào xếp Mức làm được khi tính kích thước đề LÚC ĐỌC từ nội dung câu, và lượt nào hoàn toàn không có số đo để xếp).
+# CHỈ SELECT gộp: không mã em, không tên em, không mã câu (repo công khai). Bấm tay (workflow_dispatch).
+name: Đo độ phủ giây toàn bộ lịch sử (chỉ đọc)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: do-phu-giay-lich-su-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "1 toàn bộ sổ theo nguồn: tổng · có kết quả · có giây (cột) · có ms trong raw · có kích thước đề · đồng hồ mới" "SELECT nguon, COUNT(*) luot, SUM(ket_qua IS NOT NULL) co_ket_qua, SUM(giay IS NOT NULL) co_giay, SUM(json_extract(raw_json,'\$.ms') IS NOT NULL) co_ms, SUM(json_extract(raw_json,'\$.doc.t') IS NOT NULL) co_doc, SUM(json_extract(raw_json,'\$.doc.dh')=1) dong_ho_moi FROM su_kien_hoc GROUP BY nguon ORDER BY luot DESC"
+          q "2 phân bố giây của lượt có giây, theo nguồn (xô: <5 · 5-14 · 15-29 · 30-59 · 60-119 · 120-299 · 300-599 · 600+)" "SELECT nguon, SUM(giay<5) x0, SUM(giay>=5 AND giay<15) x1, SUM(giay>=15 AND giay<30) x2, SUM(giay>=30 AND giay<60) x3, SUM(giay>=60 AND giay<120) x4, SUM(giay>=120 AND giay<300) x5, SUM(giay>=300 AND giay<600) x6, SUM(giay>=600) x7, MAX(giay) lon FROM su_kien_hoc WHERE giay IS NOT NULL GROUP BY nguon ORDER BY nguon"
+          q "3 lượt KHÔNG có giây theo nguồn: có ms trong raw · có thời điểm bắt đầu/kết thúc trong raw" "SELECT nguon, COUNT(*) n, SUM(json_extract(raw_json,'\$.ms') IS NOT NULL) co_ms, SUM(json_extract(raw_json,'\$.batDau') IS NOT NULL OR json_extract(raw_json,'\$.start') IS NOT NULL) co_bat_dau FROM su_kien_hoc WHERE giay IS NULL AND ket_qua IS NOT NULL GROUP BY nguon ORDER BY n DESC"
+          q "4 lượt có kết quả theo tháng: tổng · có giây" "SELECT substr(ngay_vn,1,7) thang, COUNT(*) n, SUM(giay IS NOT NULL) co_giay FROM su_kien_hoc WHERE ket_qua IS NOT NULL GROUP BY 1 ORDER BY 1"
+          q "5 các bảng có thể chứa thời gian làm của game (chỉ tên bảng)" "SELECT name FROM sqlite_master WHERE type='table' AND (name LIKE '%attempt%' OR name LIKE '%luot%' OR name LIKE '%game%') ORDER BY name"
