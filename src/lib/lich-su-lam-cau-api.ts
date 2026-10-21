@@ -8,8 +8,8 @@ import type { CauEmSai, KetQuaLichSuLamCau, LanLamCau, NguonGiay, TongLichSuLamC
 export type { CauEmSai, KetQuaLichSuLamCau, LanLamCau, NguonGiay, TongLichSuLamCau }
 
 export const DUONG_LICH_SU_LAM_CAU = '/gv/lich-su-lam-cau'
-/** Trần số lượt máy chủ chịu trả trong `lan` (hợp đồng: mặc định 1000, trần 2000). */
-export const TRAN_GIOI_HAN = 2000
+/** Trần số lượt máy chủ chịu trả trong `lan` (hợp đồng: mặc định 1000, trần 5000 = cửa sổ đọc của máy chủ; 21/10 nâng từ 2000). */
+export const TRAN_GIOI_HAN = 5000
 const CHU_CHUA_CO_LENH = 'Máy chủ chưa có lệnh Lịch sử làm câu — cần đẩy bản máy chủ mới.'
 
 const so = (x: unknown): number | null => (typeof x === 'number' && Number.isFinite(x) ? x : null)

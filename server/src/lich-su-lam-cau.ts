@@ -4,7 +4,7 @@
 // `POST /gv/lich-su-lam-cau {sbd, gioiHan?}` — LỆNH THẦY, CHỈ ĐỌC (sau cổng `laThay`, chạy trên `envDoc`). Không ghi gì.
 //   · Đọc sổ `su_kien_hoc` của MỘT em (lọc `sbd` ⇒ chỉ mục `idx_skh_em_ngay`), mọi nguồn, tối đa 5000 lượt gần nhất (`catBot` khi vượt);
 //     bỏ sự kiện "đọc lời giải" (`purpose = 'xem_loi_giai'`) và sự kiện còn giấu (`visibility = 'embargoed'`). D1 cũ thiếu cột chuẩn ⇒ lùi câu cột gốc.
-//   · `lan`: `gioiHan` lượt mới nhất (mặc định 1000, trần 2000). `tong` + `cauSai` tính trên MỌI lượt đã đọc.
+//   · `lan`: `gioiHan` lượt mới nhất (mặc định 1000, trần 5000 = đúng cửa sổ đọc). `tong` + `cauSai` tính trên MỌI lượt đã đọc.
 //   · SỐ GIÂY (không bịa): cột `giay` (> 0) ⇒ `raw_json.ms` (> 0, làm tròn, ≥ 1) ⇒ 'do'; ca thi còn thiếu ⇒ `chi_tiet_cau.giay` ⇒ 'do';
 //     game còn thiếu ⇒ ƯỚC TÍNH từ mốc trả lời (`giayUocTinhGame`, ai-sai-cau.ts) ⇒ 'uoc'; còn lại null.
 //   · ĐÁP ÁN CHỌN (như `gvHoSoLenBang`): `raw_json.chon`/`traLoi` ⇒ `game_v2_attempt` (`traLoiGoc`/`traLoi`) ⇒ `chi_tiet_cau.dap_an_chon` (ca thi).
@@ -32,7 +32,8 @@ const str = (x: unknown): string => (x === null || x === undefined ? '' : String
 /** Số lượt gần nhất máy chủ đọc tối đa cho một em (vượt ⇒ `catBot`). */
 export const TOI_DA_LUOT_DOC_LICH_SU = 5000
 export const GIOI_HAN_LAN_MAC_DINH = 1000
-export const TRAN_GIOI_HAN_LAN = 2000
+// Trần = đúng cửa sổ đọc (21/10, số đo thật: 267 em, 108 em vượt 1000 dòng, 3 em vượt 2000, nhiều nhất 2544 ⇒ trần cũ 2000 giấu lượt cũ nhất của 3 em). Mặc định VẪN 1000: đường mở tấm không nặng thêm.
+export const TRAN_GIOI_HAN_LAN = TOI_DA_LUOT_DOC_LICH_SU
 
 async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | null> {
   try {

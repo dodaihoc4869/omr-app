@@ -147,6 +147,27 @@ describe('lọc, xếp, tiêu đề, câu sai', () => {
   }, 30_000)
 })
 
+describe('trần trả về = cửa sổ đọc 5000 (21/10: 3/267 em vượt 2000 dòng)', () => {
+  it('em có 2100 lượt: gioiHan lớn trả ĐỦ 2100 (trần cũ 2000 giấu 100 lượt cũ nhất), conNua tắt; mặc định vẫn 1000 + conNua', async () => {
+    const d = taoD1That()
+    const env = d.env as unknown as Env
+    em(d)
+    const st = d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, luc, ngay_vn) VALUES (?, 'S1', ?, 'btvn', 'B', 1, 1, ?, ?)")
+    const t0 = Date.parse('2026-09-01T00:00:00Z')
+    d.sql.exec('BEGIN')
+    for (let i = 0; i < 2100; i++) { const luc = new Date(t0 + i * 60_000).toISOString(); st.run(`m${i}`, `X-I-${i % 40}`, luc, luc.slice(0, 10)) }
+    d.sql.exec('COMMIT')
+    const macDinh = await goi(env, { sbd: 'S1' })
+    expect(macDinh.lan).toHaveLength(1000)
+    expect(macDinh).toMatchObject({ conNua: true, catBot: false, tong: { soLuot: 2100 } })
+    const het = await goi(env, { sbd: 'S1', gioiHan: 5000 })
+    expect(het.lan).toHaveLength(2100)
+    expect(het.conNua).toBe(false)
+    expect(het.lan.at(-1)!.luc).toBe(new Date(t0).toISOString()) // lượt cũ nhất cũng có mặt
+    expect((await goi(env, { sbd: 'S1', gioiHan: 99_999 })).lan).toHaveLength(2100)
+  }, 30_000)
+})
+
 describe('D1 cũ thiếu cột chuẩn (raw_json, purpose, visibility…)', () => {
   it('truy vấn đủ cột lỗi ⇒ lùi câu cột gốc: vẫn trả lịch sử, giây từ cột sổ, chọn = null', async () => {
     const d = taoD1That()

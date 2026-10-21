@@ -43,7 +43,7 @@ export async function hsHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promis
   return hoSoThaiDoBanHocSinh(env, sbd, nowMs, LOI_HO_SO_EM)
 }
 
-/** `POST /hs/lich-su-lam-cau {token, gioiHan?}` — xem đầu tệp. `gioiHan` như lệnh thầy (mặc định 1000, trần 2000). */
+/** `POST /hs/lich-su-lam-cau {token, gioiHan?}` — xem đầu tệp. `gioiHan` như lệnh thầy (mặc định 1000, trần 5000). */
 export async function hsLichSuLamCau(env: Env, b: Row): Promise<TraLoiLichSuLamCau> {
   const sbd = await sbdTuToken(env, b)
   if (!sbd) return { ok: false, error: CAN_DANG_NHAP_HO_SO }

@@ -70,7 +70,7 @@ export interface KetQuaLichSuLamCau {
   ok: true
   em: { sbd: string; hoTen: string; lop: string }
   tong: TongLichSuLamCau
-  /** Mới trước; tối đa `gioiHan` (mặc định 1000, trần 2000). */
+  /** Mới trước; tối đa `gioiHan` (mặc định 1000, trần 5000). */
   lan: LanLamCau[]
   /** Câu từng sai: CHƯA đúng lại trước, rồi nhiều lần sai trước, rồi gần đây trước. */
   cauSai: CauEmSai[]
