@@ -67,7 +67,7 @@ export function gocCanBeta(dong: readonly Pick<DongMucTho, 'doMuc' | 'giayDo' | 
  */
 export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>, kichThuoc?: ReadonlyMap<string, KichThuocCau>): MucLamLuot | null {
   if (!d.doMuc || d.giayDo === null) {
-    const kt = d.giayCu !== null && d.giayCu !== undefined && d.loaiCu ? kichThuoc?.get(d.goc) : undefined
+    const kt = !d.doMuc && d.giayCu !== null && d.giayCu !== undefined && d.loaiCu ? kichThuoc?.get(d.goc) : undefined
     if (!kt || d.giayCu === null || d.giayCu === undefined) return null
     return mucLamCuaLuot({ giay: d.giayCu, soTu: kt.soTu, coHinh: kt.coHinh, phan: kt.phan, dung: d.dung, thuongGiay: null, uocTinh: d.loaiCu })
   }

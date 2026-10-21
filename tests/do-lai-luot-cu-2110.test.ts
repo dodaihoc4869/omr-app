@@ -62,16 +62,26 @@ describe('cau_doc_giay — kích thước đề tính sẵn', () => {
     expect(await dongBoCauDocGiay(env(d), 3)).toEqual({ them: 3, conNua: true })
     expect(await dongBoCauDocGiay(env(d), 3)).toEqual({ them: 2, conNua: false })
   })
-  it('đã lấp đầy ⇒ nghỉ 30 phút (không quét cả bảng mỗi phút); câu mới thêm sau đó chờ hết nghỉ; mã nhiều đề chỉ một dòng', async () => {
+  it('con trỏ theo MAX(qid): câu mới phía sau được lấp ngay; hết thì quét cả bảng tìm "lỗ" tối đa 30 phút một lần (dòng đánh dấu bền trong bảng); mã nhiều đề chỉ một dòng', async () => {
     const d = dung()
     cau(d, 'D-1')
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DH-Y', 'D-1', 'v1', 'g-d1', 'DH-Y.D0', JSON.stringify({ qid: 'D-1', phan: 'I', text: 'a b', choices: ['a', 'b', 'c', 'd'] }))
     expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 1, conNua: false })
-    expect(d.sql.prepare('SELECT COUNT(*) n FROM cau_doc_giay').get()).toMatchObject({ n: 1 })
-    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 0, conNua: false }) // quét lại: hết câu thiếu ⇒ ghi nhớ "đầy"
+    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 0, conNua: false })        // hết phần sau con trỏ, quét cả bảng không có lỗ ⇒ ghi dấu
+    expect(d.sql.prepare("SELECT COUNT(*) n FROM cau_doc_giay WHERE qid <> ''").get()).toMatchObject({ n: 1 })
     cau(d, 'D-2')
-    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 0, conNua: false }) // đang nghỉ
-    expect(d.sql.prepare('SELECT COUNT(*) n FROM cau_doc_giay').get()).toMatchObject({ n: 1 })
+    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 1, conNua: false })        // phía sau con trỏ: lấp ngay, không chờ
+    cau(d, 'C-0')                                                                          // "lỗ": mã nhỏ hơn con trỏ
+    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 0, conNua: false })        // dấu còn mới ⇒ nghỉ
+    d.sql.prepare("UPDATE cau_doc_giay SET tinh_luc = ? WHERE qid = ''").run(new Date(Date.now() - 31 * 60_000).toISOString())
+    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 1, conNua: false })        // hết nghỉ ⇒ quét cả bảng, lấp lỗ
+    expect((d.sql.prepare("SELECT qid FROM cau_doc_giay WHERE qid <> '' ORDER BY qid").all() as { qid: string }[]).map((x) => x.qid)).toEqual(['C-0', 'D-1', 'D-2'])
+  })
+  it('chuỗi rỗng KHÔNG phải ảnh: thanCauImg:"" và imageDataUrl:"" không thêm hình / không bỏ số từ thân câu', async () => {
+    const d = dung()
+    cau(d, 'E-1', 16, { thanCauImg: '', imageDataUrl: '' })
+    await dongBoCauDocGiay(env(d), 10)
+    expect(d.sql.prepare("SELECT so_tu, co_hinh FROM cau_doc_giay WHERE qid = 'E-1'").get()).toMatchObject({ so_tu: 20, co_hinh: 0 })
   })
 })
 
@@ -114,7 +124,9 @@ describe('Lịch sử làm câu — đo lại lượt cũ', () => {
     expect(mucCua(r, 'C-4')).toMatchObject({ ma: 3, uocTinh: 'cu' })
     expect(mucCua(r, 'C-4')!.ranh4).toBeUndefined()
     expect(mucCua(r, 'C-4')!.thuong).toBeUndefined()
-    expect(mucCua(r, 'C-5')).toMatchObject({ ma: 3, uocTinh: 'cu', giay: 25 })
+    // ca thi cũ: giây có thể THIẾU (chỉ cộng cho một câu hiện nhiều nhất, bỏ qua lúc tab ẩn) ⇒ KHÔNG xếp mức, vẫn hiện số giây
+    expect(mucCua(r, 'C-5')).toBeUndefined()
+    expect(r.lan.find((x) => x.qid === 'C-5')).toMatchObject({ giay: 25 })
     expect(mucCua(r, 'C-3B')).toMatchObject({ ma: 1, uocTinh: 'uoc', giay: 12 })
     expect(r.lan.find((x) => x.qid === 'C-3B')).toMatchObject({ giay: 12, nguonGiay: 'uoc' })
     expect(mucCua(r, 'C-6')).toBeUndefined()                                  // ôn lại nộp lô: không có giây, không mức
@@ -125,14 +137,15 @@ describe('Lịch sử làm câu — đo lại lượt cũ', () => {
     expect(mucCua(r, 'C-9')).toBeUndefined()
     expect(r.lan.find((x) => x.qid === 'C-9')?.giay ?? null).toBeNull()
     // tổng: soUocTinh đếm đúng phần xếp từ giây cũ / ước tính
-    expect(r.mucLam).toMatchObject({ soDo: 6, soUocTinh: 6, coBetaThat: false })
+    expect(r.mucLam).toMatchObject({ soDo: 5, soUocTinh: 5, coBetaThat: false })
+    expect(r.mucLam!.chuaCoSoDo).toBeGreaterThanOrEqual(6) // C-5 (thi), C-6, C-7, C-8, C-9, C-KHONG
   })
   it('bản học sinh: lượt ĐÚNG ở Mức 1–2 (giây cũ) không mang mức và không vào tổng; lượt sai giữ mức kèm uocTinh', async () => {
     const d = await dungLuotCu()
     const r = await lichSu(env(d), 'hoc-sinh')
     expect(mucCua(r, 'C-2')).toBeUndefined()
     expect(mucCua(r, 'C-1')).toMatchObject({ ma: 1, uocTinh: 'cu' })
-    // C-5 là ca thi chưa công bố (không có hàng `ca`) ⇒ học sinh không thấy; còn lại C-1, C-3, C-4, C-7
+    // C-5 là ca thi (không đo lại) ⇒ không mức; còn lại C-1, C-3, C-4, C-3B
     expect(mucCua(r, 'C-5')).toBeUndefined()
     expect(r.mucLam).toMatchObject({ soDo: 4, soUocTinh: 4, dungTruocDoc: 0 })
   })

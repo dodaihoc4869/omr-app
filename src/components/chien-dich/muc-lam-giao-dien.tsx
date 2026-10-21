@@ -71,7 +71,7 @@ export const TEN_MUC_EM: Readonly<Record<MaMuc, string>> = { 1: 'Nộp trước 
 export const tenMucLam = (ma: MaMuc, cheDo: CheDoMuc): string => (cheDo === 'thay' ? TEN_MUC_THAY[ma] : TEN_MUC_EM[ma])
 
 export const CHU_CHUA_CO_SO_DO = 'Chưa có số đo'
-const GIAI_THICH_CHUA_CO_SO_DO = 'Lượt không có số giây đáng tin (nộp cả lô, chưa từng bấm giờ) hoặc câu chưa tính kích thước đề — chưa xếp Mức làm, không đoán.'
+const GIAI_THICH_CHUA_CO_SO_DO = 'Lượt không có số giây đáng tin (nộp cả lô, chưa từng bấm giờ, ca thi cũ) hoặc câu chưa tính kích thước đề — chưa xếp Mức làm, không đoán.'
 /** Giải thích dấu "≈": số giây lấy từ đồng hồ cũ / ước tính, chỉ có thể DƯ (không thể thiếu) ⇒ mức có thể thấp hơn, không bao giờ Mức làm 4. */
 export const GIAI_THICH_UOC_TINH = 'Số giây từ đồng hồ cũ hoặc ước tính từ mốc trả lời của lượt chơi — có thể cao hơn thật, nên mức chỉ là ước tính và không xếp Mức làm 4.'
 /** Bản học sinh / phụ huynh: không nói "đồng hồ cũ" (chữ nội bộ) — chỉ nói số giây là ước tính. */

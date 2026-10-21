@@ -160,7 +160,7 @@ describe('tờ chạy thật — nút X', () => {
       'Mức làm 1Chưa đọc hết đề · dưới 24 giây1 lượt|Nguyễn Đức Anh9 giây', // jsdom không đo bố cục ⇒ giữ tên đầy đủ; bản viết tắt nằm ở data-t
       'Mức làm 2Đọc xong, chưa kịp nghĩ · 24–29 giây1 lượt|Lê Thu Hà26 giây',
       'Mức làm 3Có nghĩ · từ 30 giây1 lượt|Vũ Minh Quân40 giây', // không ranh4 ⇒ Mức làm 3 mở tới hết thước
-      'Mức làm 4Lớp chưa đủ mẫu của câu này để xếp Mức làm 4|',
+      'Mức làm 4Lớp chưa đủ mẫu của câu này, hoặc số giây là ước tính, nên chưa xếp Mức làm 4|',
       'Chưa có số đoLượt chưa có số giây đáng tin để xếp mức1 lượt|Đỗ Khánh Linh≈ 12 giây',
     ])
     expect(panel.querySelector('.mc-pl b')!.getAttribute('data-t')).toBe('Nguyễn Đ. Anh') // tên viết tắt chữ đệm khi thẻ hẹp

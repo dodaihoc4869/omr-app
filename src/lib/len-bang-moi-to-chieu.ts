@@ -840,7 +840,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
         var gc = gioVn(cuoiL.luc), mc = cuoiL.mucLam;
         h += '<div class="mc-kpi"><p><b>' + c.soLan + '</b><span>lần làm</span></p><p class="mc-k-d"><b>' + c.soDung + '</b><span>đúng</span></p><p class="mc-k-s"><b>' + c.soSai + '</b><span>sai</span></p></div><div class="mc-gan"><p class="mc-gan-t">Lần gần nhất · ' + gc.ngan + ' ' + gc.gio + ' · ' + (cuoiL.dung ? 'đúng' : 'sai') + '</p>';
         if (mc) h += '<p class="mc-gan-so"><b>' + (mc.uocTinh ? '≈ ' : '') + mc.giay + '</b><span>giây em làm</span><i></i><b>' + (mc.xapXi ? '≈ ' : '') + mc.giayDoc + '</b><span>giây đọc hết đề cần</span></p>' + thuocCt(mc, false) + '<p class="mc-gan-nhan">' + chipCt(mc.ma, true, mc.uocTinh) + '</p><p class="mc-gan-gt">Đọc hết đề cần ' + mc.giayDoc + ' giây, rồi cần thêm ít nhất ' + mc.sanNghi + ' giây để nghĩ' + (typeof mc.thuong === 'number' ? ' · thời gian thường của lớp ở câu này: ' + mc.thuong + ' giây.' : mc.uocTinh ? ' · số giây chỉ là ước tính nên không xếp Mức làm 4.' : ' · lớp chưa đủ mẫu của câu này nên chưa có thời gian thường.') + '</p>' + chuGiaiCt(mc);
-        else h += '<p class="mc-gan-chua">' + chipCt(0, true) + '</p><p class="mc-gan-gt">Lượt này chưa có số giây đáng tin (nộp cả lô hoặc chưa từng bấm giờ) nên chưa xếp được Mức làm. Từ lần làm tới, mức hiện ở đây.</p>';
+        else h += '<p class="mc-gan-chua">' + chipCt(0, true) + '</p><p class="mc-gan-gt">Lượt này chưa có số giây đáng tin (nộp cả lô, chưa từng bấm giờ, ca thi cũ) hoặc câu chưa tính kích thước đề nên chưa xếp được Mức làm. Từ lần làm tới, mức hiện ở đây.</p>';
         h += '</div>';
       }
       h += '</section><section class="mc-the-ct mc-lan-the"><h4>Các lần làm câu này</h4>' + (lans.length ? '<ul class="mc-lan-ds">' + lans.slice().reverse().map(dongLanCt).join('') + '</ul>' : RONG) + '</section></div><div class="mc-ct-luoi' + (cn ? ' mc-ct-4' : '') + '">';
@@ -942,7 +942,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     h += '<div class="mc-ai-lan">';
     for (var k = 1; k <= 4; k++) {
       var kh = khoangMuc(r, k), tenM = TEN_MUC[k];
-      if (k === 4 && r && typeof r.ranh4 !== 'number' && !theo[4].length) { h += '<section class="mc-ln mc-ln-rong" data-m="4"><header>' + pipHtml(4) + '<b>Mức làm 4</b><span>Lớp chưa đủ mẫu của câu này để xếp Mức làm 4</span></header></section>'; continue; }
+      if (k === 4 && r && typeof r.ranh4 !== 'number' && !theo[4].length) { h += '<section class="mc-ln mc-ln-rong" data-m="4"><header>' + pipHtml(4) + '<b>Mức làm 4</b><span>Lớp chưa đủ mẫu của câu này, hoặc số giây là ước tính, nên chưa xếp Mức làm 4</span></header></section>'; continue; }
       if (!theo[k].length) { h += '<section class="mc-ln mc-ln-rong" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '</span></header></section>'; continue; }
       h += '<section class="mc-ln" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '</span><em>' + theo[k].length + ' lượt</em></header><ul class="mc-pls" style="--mc-cot:' + cot + '">' + sapXep(theo[k]).map(function (x) { return the(x, false); }).join('') + '</ul></section>';
     }

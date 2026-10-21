@@ -190,7 +190,8 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   // Mức làm 1–4: CHỈ lượt có số đo mới (đồng hồ mới + kích thước đề) cần β của câu ⇒ tập này nhỏ (0 lượt trước khi máy em nạp bản mới); đọc CÙNG đợt với các khối dưới (0 vòng chờ nối tiếp thêm).
   const gocMuc = gocCanBeta(dong.map((d, i) => ({ doMuc: d.doMuc, giayDo: doThat[i] ?? null, goc: d.goc })))
   // ĐO LẠI LƯỢT CŨ (21/10): kích thước đề (bảng tính sẵn) của các câu mà lượt chưa có `doc` — MỘT lệnh đọc CÙNG đợt, lỗi / bảng chưa có ⇒ rỗng (lượt cũ vẫn "Chưa có số đo").
-  const gocCanKichThuoc = [...new Set(dong.filter((d) => !d.doMuc && d.goc).map((d) => d.goc))]
+  // CA THI KHÔNG ĐO LẠI: giây ca thi cũ chỉ cộng cho MỘT câu hiện nhiều nhất và bỏ qua lúc tab ẩn ⇒ có thể THIẾU (không phải chặn trên) — xếp mức từ đó sẽ sai chiều. Chỉ xin cho lượt CÓ THỂ có giây (cột/ms hoặc game có mốc trả lời).
+  const gocCanKichThuoc = [...new Set(dong.filter((d, i) => !d.doMuc && d.goc && d.nguon !== 'thi' && (doThat[i] != null || d.nguon === 'game')).map((d) => d.goc))]
   const [kho, loai, rAtt, uoc, ct, beta, kichThuoc] = await Promise.all([
     docCauKho(env, goc).catch(() => new Map<string, KhoGon>()) as Promise<Map<string, KhoGon>>,
     loaiGameCua(env, game.map((d) => d.maNguon)).catch(() => new Map<string, 'doan' | 'bia' | 'dao'>()),
@@ -226,7 +227,7 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   const mucTho: (MucLamLuot | null)[] = dong.map((d, i) =>
     mucLamTuDong({
       doMuc: d.doMuc, giayDo: doThat[i] ?? null, goc: d.goc, mucDo: d.mucDo, dung: d.ketQua === null ? null : d.ketQua === 1,
-      ...(giaySo[i]!.loai === 'cu' || giaySo[i]!.loai === 'uoc' ? { giayCu: giaySo[i]!.g, loaiCu: giaySo[i]!.loai as 'cu' | 'uoc' } : {}),
+      ...((giaySo[i]!.loai === 'cu' || giaySo[i]!.loai === 'uoc') && d.nguon !== 'thi' ? { giayCu: giaySo[i]!.g, loaiCu: giaySo[i]!.loai as 'cu' | 'uoc' } : {}),
     }, beta, kichThuoc))
   const anMuc = (i: number): boolean => nguoiDoc === 'hoc-sinh' && !!mucTho[i] && dong[i]!.ketQua === 1 && mucTho[i]!.ma <= 2
   const tatCa: LanLamCau[] = dong.map((d, i) => {

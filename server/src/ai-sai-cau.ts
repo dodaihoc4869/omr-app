@@ -135,7 +135,8 @@ export async function aiSaiCau(env: Env, b: Row): Promise<Row> {
   })
   const gocMuc = gocCanBeta(dongMuc)
   // ĐO LẠI LƯỢT CŨ (21/10): kích thước đề (bảng tính sẵn) của các câu mà lượt chưa có `doc` — MỘT lệnh đọc CÙNG đợt; lỗi / bảng chưa có ⇒ rỗng (lượt cũ vẫn "Chưa có số đo").
-  const gocCanKichThuoc = [...new Set(dongMuc.filter((d) => !d.doMuc && d.goc).map((d) => d.goc))]
+  // CA THI KHÔNG ĐO LẠI (giây ca thi cũ có thể THIẾU: chỉ cộng cho một câu hiện nhiều nhất, bỏ qua lúc tab ẩn) — chỉ xin kích thước cho lượt game / lượt có giây cột-ms.
+  const gocCanKichThuoc = [...new Set(dongMuc.filter((d, i) => !d.doMuc && d.goc && str(rows[i]?.nguon) !== 'thi').map((d) => d.goc))]
   const [loai, uoc, ct, beta, kichThuoc] = await Promise.all([
     loaiGameCua(env, dongGame.map((x) => x.phien)).catch(() => new Map<string, 'doan' | 'bia' | 'dao'>()),
     giayUocTinhGame(env, gameThieu).catch(() => new Map<string, number>()),
@@ -151,13 +152,13 @@ export async function aiSaiCau(env: Env, b: Row): Promise<Row> {
     // Lượt có `doc` mới ⇒ số đo chắc; không có ⇒ giây CŨ ('cu') hoặc ƯỚC TÍNH ('uoc') + kích thước đề tính sẵn ⇒ Mức làm với cờ `uocTinh` (không Mức 4) — `mucLamTuDong`.
     const cu = (giay: number, loaiCu: 'cu' | 'uoc') => mucLamTuDong({ ...dongMuc[i]!, giayCu: giay, loaiCu }, beta, kichThuoc)
     if (g !== null && g !== undefined) {
-      const muc = dongMuc[i]!.doMuc ? mucLamTuDong(dongMuc[i]!, beta) : cu(g, 'cu')
+      const muc = dongMuc[i]!.doMuc ? mucLamTuDong(dongMuc[i]!, beta) : nguon === 'thi' ? null : cu(g, 'cu')
       return { ...chung, giay: g, ...(muc ? { mucLam: muc } : {}) }
     }
     if (nguon === 'thi') {
       const k = `${str(x.ma_nguon)}|${str(x.sbd)}|${str(x.qid)}`
       const c = ct.get(`${k}|${Number(x.lan) || 1}`) ?? ct.get(`${k}|*`)
-      const muc = c?.giay != null ? cu(c.giay, 'cu') : null
+      const muc = null // giây ca thi cũ có thể thiếu ⇒ không xếp mức (chỉ hiện số giây)
       return { ...chung, giay: c?.giay ?? null, ...(muc ? { mucLam: muc } : {}) }
     }
     const u = nguon === 'game' ? uoc.get(`${str(x.ma_nguon)}|${Date.parse(str(x.luc))}`) : undefined

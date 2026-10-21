@@ -26,7 +26,8 @@ const laPhan = (p: unknown): p is PhanMucLam => p === 'I' || p === 'II' || p ===
 
 /** Các cột thêm vào `SQL_CAU_GON` cho phần câu rút gọn bỏ đi mà `noiDungTuCauGoc` còn hỏi: ảnh thân câu, ảnh dữ liệu, bảng (chỉ ĐỌC KIỂU, không sao chép nội dung nặng). */
 const COT_THEM = `json_extract(game_v2_question.json,'$.phan') AS phan,
-  json_type(game_v2_question.json,'$.thanCauImg') AS t_than, json_type(game_v2_question.json,'$.imageDataUrl') AS t_url,
+  CASE WHEN json_type(game_v2_question.json,'$.thanCauImg') = 'text' AND json_extract(game_v2_question.json,'$.thanCauImg') <> '' THEN 'text' END AS t_than,
+  CASE WHEN json_type(game_v2_question.json,'$.imageDataUrl') = 'text' AND json_extract(game_v2_question.json,'$.imageDataUrl') <> '' THEN 'text' END AS t_url,
   CASE WHEN json_type(game_v2_question.json,'$.table') = 'array' THEN json_array_length(game_v2_question.json,'$.table') ELSE 0 END AS n_bang`
 
 /** Kích thước đề của MỘT dòng đọc bằng `SQL_CAU_GON` + `COT_THEM`. Câu không đọc được / phần lạ / hàm đếm ném lỗi ⇒ null (không bao giờ ném). Thuần. */
@@ -65,8 +66,10 @@ export async function docKichThuocCau(env: Env, goc: readonly string[]): Promise
     if (c && now - c.luc < HAN_DEM_MS) ra.set(q, c.v)
     else can.push(q)
   }
-  for (let i = 0; i < can.length; i += 800) {
-    const r = await env.DB.prepare('SELECT qid, so_tu, co_hinh, phan FROM cau_doc_giay WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(can.slice(i, i + 800))).all<Row>().catch(() => null)
+  const lo: string[][] = []
+  for (let i = 0; i < can.length; i += 800) lo.push(can.slice(i, i + 800))
+  const kq = await Promise.all(lo.map((m) => env.DB.prepare('SELECT qid, so_tu, co_hinh, phan FROM cau_doc_giay WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(m)).all<Row>().catch(() => null)))
+  for (const r of kq) {
     for (const x of r?.results ?? []) {
       const phan = str(x.phan)
       if (!laPhan(phan)) continue // dòng DẤU "không tính được" (phan '?'): có mặt để cron không tính lại, không dùng
@@ -90,24 +93,34 @@ function damBaoBang(env: Env): Promise<void> {
   return p
 }
 
-/** Đã lấp đầy (không còn câu nào thiếu dòng) lúc nào, theo từng D1 — cron nghỉ `NGHI_KHI_DAY_MS` rồi mới quét lại (câu mới thêm vào kho chờ tối đa chừng ấy). */
-const daDay = new WeakMap<object, number>()
+/** Dòng ĐÁNH DẤU (qid rỗng, `phan = '?'`): lần cuối cron quét TOÀN BẢNG mà không còn câu thiếu — bền qua isolate, đọc bằng một tra khoá chính. Không bao giờ trùng mã câu thật. */
+const MA_DANH_DAU = ''
 const NGHI_KHI_DAY_MS = 30 * 60_000
 
 /**
  * Cron mỗi phút: tính tối đa `toiDa` câu CHƯA có dòng trong `cau_doc_giay` (lấp dần, ngoài cao điểm). Câu không tính được vẫn ghi dòng DẤU (`phan = '?'`) để không tính lại mãi.
- * Chỉ THÊM dòng (INSERT OR IGNORE) — không sửa dòng đã có. Lỗi ⇒ ném cho nơi gọi ghi log (cron đã bắt).
- * NHẸ CHO D1 (đơn luồng, dùng chung với lệnh của em): bước 1 chỉ đi trên chỉ mục `game_v2_question_qid` (không đụng cột `json` nặng tới 290.000 ký tự) và dừng ngay khi đủ `toiDa + 1` mã;
- * bước 2 đọc câu rút gọn của đúng các mã ấy; ghi bằng MỘT lệnh (`json_each`). Khi đã đủ hết ⇒ nghỉ 30 phút (không quét cả bảng mỗi phút).
+ * Chỉ THÊM dòng (INSERT OR IGNORE) — không sửa dòng đã có (câu sửa nội dung sau này không tự tính lại; xoá dòng thì cron dựng lại). Lỗi ⇒ ném cho nơi gọi ghi log (cron đã bắt).
+ * NHẸ CHO D1 (đơn luồng, dùng chung với lệnh của em): lấp THEO THỨ TỰ MÃ CÂU nên con trỏ là `MAX(qid)` của chính bảng — bước 1 chỉ đi chỉ mục `game_v2_question_qid` từ con trỏ trở đi
+ * (không quét lại phần đã lấp, không đụng cột `json` nặng tới 290.000 ký tự); hết phần sau con trỏ thì mới quét cả bảng tìm "lỗ" (câu mới có mã nhỏ hơn con trỏ), tối đa 30 phút một lần
+ * (dòng đánh dấu); bước 2 đọc câu rút gọn của đúng các mã đó; ghi bằng MỘT lệnh (`json_each`).
  */
 export async function dongBoCauDocGiay(env: Env, toiDa: number): Promise<{ them: number; conNua: boolean }> {
-  const db = env.DB as unknown as object
-  const nghi = daDay.get(db)
-  if (nghi !== undefined && Date.now() - nghi < NGHI_KHI_DAY_MS) return { them: 0, conNua: false }
   await damBaoBang(env)
-  const thieu = await env.DB.prepare('SELECT DISTINCT qid FROM game_v2_question WHERE qid NOT IN (SELECT qid FROM cau_doc_giay) LIMIT ?1').bind(toiDa + 1).all<Row>()
-  const ids = (thieu.results ?? []).map((x) => str(x.qid)).filter(Boolean)
-  if (!ids.length) { daDay.set(db, Date.now()); return { them: 0, conNua: false } }
+  let thieu = await env.DB.prepare(
+    "SELECT DISTINCT qid FROM game_v2_question WHERE qid > COALESCE((SELECT MAX(qid) FROM cau_doc_giay), '') ORDER BY qid LIMIT ?1",
+  ).bind(toiDa + 1).all<Row>()
+  let ids = (thieu.results ?? []).map((x) => str(x.qid)).filter(Boolean)
+  if (!ids.length) {
+    const dau = await env.DB.prepare('SELECT tinh_luc FROM cau_doc_giay WHERE qid = ?1').bind(MA_DANH_DAU).all<Row>()
+    const luc = Date.parse(str(dau.results?.[0]?.tinh_luc))
+    if (Number.isFinite(luc) && Date.now() - luc < NGHI_KHI_DAY_MS) return { them: 0, conNua: false }
+    thieu = await env.DB.prepare('SELECT DISTINCT qid FROM game_v2_question WHERE qid <> ?2 AND qid NOT IN (SELECT qid FROM cau_doc_giay) LIMIT ?1').bind(toiDa + 1, MA_DANH_DAU).all<Row>()
+    ids = (thieu.results ?? []).map((x) => str(x.qid)).filter(Boolean)
+    if (!ids.length) {
+      await env.DB.prepare("INSERT OR REPLACE INTO cau_doc_giay(qid, so_tu, co_hinh, phan, tinh_luc) VALUES (?1, 0, 0, '?', ?2)").bind(MA_DANH_DAU, new Date().toISOString()).run()
+      return { them: 0, conNua: false }
+    }
+  }
   const lam = ids.slice(0, toiDa)
   const r = await env.DB.prepare(
     `SELECT game_v2_question.qid AS qid, ${COT_THEM}, ${SQL_CAU_GON}

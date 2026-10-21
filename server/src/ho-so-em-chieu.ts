@@ -49,6 +49,8 @@ export function tienDoCapTuHoSo(json: unknown): { cap: number; exp: number; moc:
 }
 
 type Row = Record<string, unknown>
+/** Số lượt tối đa đọc cho «Cách làm bài 14 ngày»; chạm trần ⇒ tổng bị cắt nên KHÔNG hiện thẻ (không in số sai). */
+const TOI_DA_LUOT_14 = 2000
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x))
 const num = (x: unknown): number => (Number.isFinite(Number(x)) ? Number(x) : 0)
 
@@ -127,7 +129,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     // Cách làm bài 14 ngày (Mức làm 1–4, thầy 21/10): các lượt CÓ kết quả mà máy đo bằng đồng hồ mới (`doc.dh = 1`) — hiện 0 dòng trước khi máy em nạp bản mới; tổng số lượt có kết quả đếm riêng (mẫu số "đo được N/M").
     hoi(env, `SELECT qid, ket_qua, giay, muc_do, nguon, ma_nguon, luc, json_extract(raw_json, '$.ms') AS ms, json_extract(raw_json, '$.doc') AS doc, json_extract(raw_json, '$.tc') AS tc FROM su_kien_hoc
        WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(visibility, '') <> 'embargoed'
-         AND json_valid(raw_json) AND (json_extract(raw_json, '$.doc.dh') = 1 OR giay > 0 OR json_extract(raw_json, '$.ms') > 0 OR nguon = 'game') ORDER BY luc DESC LIMIT 800`, sbd, d13, homNay),
+         AND json_valid(raw_json) AND (json_extract(raw_json, '$.doc.dh') = 1 OR giay > 0 OR json_extract(raw_json, '$.ms') > 0 OR nguon = 'game') ORDER BY luc DESC LIMIT ${TOI_DA_LUOT_14}`, sbd, d13, homNay),
     hoi(env, "SELECT COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(visibility, '') <> 'embargoed'", sbd, d13, homNay),
   ])
   const tenLop = str(rTenLop?.[0]?.ten_lop).trim()
@@ -158,7 +160,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
   // ĐO LẠI LƯỢT CŨ (21/10): lượt không có `doc` mới mà có giây cũ (cột `giay` / `raw_json.ms`) ⇒ Mức làm "≈" — cần kích thước đề của câu (bảng tính sẵn, MỘT lệnh đọc CÙNG đợt).
   // Lượt game không giây nào: ƯỚC TÍNH từ mốc trả lời của lượt chơi (`giayUocTinhGame`, như Lịch sử làm câu và tờ chiếu «Ai đã sai?» — ba màn một số). Không nạp được ⇒ Map rỗng ⇒ "chưa có số đo".
   const gameThieu = [...dongMuc, ...dong14].filter((d) => !d.doMuc && d.giayDo === null && d.nguon === 'game' && d.maNguon)
-  const gocCanKichThuoc = [...new Set([...dongMuc, ...dong14].filter((d) => !d.doMuc && (d.giayDo !== null || (d.nguon === 'game' && d.maNguon)) && d.goc).map((d) => d.goc))]
+  const gocCanKichThuoc = [...new Set([...dongMuc, ...dong14].filter((d) => !d.doMuc && d.nguon !== 'thi' && (d.giayDo !== null || (d.nguon === 'game' && d.maNguon)) && d.goc).map((d) => d.goc))]
   const idGame = (lan ?? []).filter((x) => str(x.nguon) === 'game').map((x) => str(x.attempt_id) || `${str(x.ma_nguon)}|${qid}`)
   const phien = [...new Set((lan ?? []).filter((x) => str(x.nguon) === 'game').map((x) => str(x.ma_nguon)))]
   const caThi = [...new Set((lan ?? []).filter((x) => str(x.nguon) === 'thi').map((x) => str(x.ma_nguon)))]
@@ -174,7 +176,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
   ])
   /** Dòng đưa vào xếp Mức làm: có đồng hồ MỚI ⇒ như cũ; không thì giây CŨ (cột `giay` / `raw_json.ms`) ⇒ 'cu'; lượt game không giây có mốc trả lời ⇒ 'uoc'; còn lại không giây (không đoán). */
   const dongCu = <T extends { doMuc: ReturnType<typeof docDoMuc>; giayDo: number | null; nguon: string; maNguon: string; luc: string }>(d: T) => {
-    if (d.doMuc) return d
+    if (d.doMuc || d.nguon === 'thi') return d // ca thi cũ: giây có thể THIẾU ⇒ không xếp mức
     if (d.giayDo !== null) return { ...d, giayCu: d.giayDo, loaiCu: 'cu' as const }
     const u = d.nguon === 'game' ? uoc.get(`${d.maNguon}|${Date.parse(d.luc)}`) : undefined
     return u !== undefined ? { ...d, giayCu: u, loaiCu: 'uoc' as const } : d
@@ -240,7 +242,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
 
   // Cách làm bài 14 ngày: đếm theo Mức làm (cùng `tongMucLam` của Lịch sử làm câu); khoá vắng khi hai truy vấn lỗi (D1 cũ thiếu cột) — không bịa số.
   let cachLam14: ReturnType<typeof tongMucLam> | null = null
-  if (r14Muc && r14Tong) {
+  if (r14Muc && r14Tong && r14Muc.length < TOI_DA_LUOT_14) {
     const co = dong14.map((d) => ({ mucLam: mucLamTuDong(dongCu(d), beta, kichThuoc), dung: d.dung as boolean | null })).filter((d) => d.mucLam)
     const t = tongMucLam(co)
     cachLam14 = { ...t, chuaCoSoDo: Math.max(0, num(r14Tong[0]?.n) - t.soDo) }
