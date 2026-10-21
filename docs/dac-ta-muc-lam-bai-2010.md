@@ -195,12 +195,12 @@ Bảng màu: Mức làm 1→4 là MỘT dải màu theo độ đậm (không đ�
 ### 10b. Cờ nguồn đồng hồ `doc.dh` (21/10, PR 4) — đọc trước khi tính Mức làm từ dữ liệu thật
 - Phát hành Đợt 1 (Worker `2c7ff01`, 21/10 ≈ 01:33 VN) ghi `giay` cho game từ MỘT trong hai nguồn mà chưa đánh dấu: (a) cụm `doGiay.g` của đồng hồ MỚI (dừng khi tab ẩn, 180 s không chạm); (b) `msLam` của máy em bản CŨ (đồng hồ tường, chạy cả khi tab ẩn, trần 900 s). Máy em chỉ nạp bản mới khi mở lại app, nên hai nguồn lẫn nhau trong cùng cột.
 - PR 4 thêm `raw_json.doc.dh = 1` CHỈ khi giây đến từ `doGiay` hợp lệ; giây suy từ `msLam` thì KHÔNG có `dh`. Quy tắc đọc: `doc.dh = 1` ⇒ đồng hồ mới (dùng được cho Mức làm); dòng game có `giay` mà không `dh` ⇒ đồng hồ cũ hoặc không rõ — KHÔNG xếp Mức 1–2 từ giây này (dễ nhiễm tab ẩn), chỉ dùng làm chặn trên thô.
-- Dòng ghi giữa 01:33 VN và giờ phát hành PR 4 (xem Nhật ký `DIEU-PHOI.md`) không có `dh` kể cả khi từ đồng hồ mới ⇒ coi là "không rõ".
+- Dòng ghi giữa 01:33 VN (Worker `2c7ff01`) và 06:44:15 VN 21/10 (Worker PR 4, main `299a873`, Actions `39516150163`) không có `dh` kể cả khi từ đồng hồ mới ⇒ coi là "không rõ".
 - Không UPDATE bù dòng cũ (quyết định 21/10): dòng cũ không có giây đo thật để bù; kích thước đề của dòng có giây (thi, chữa lỗi) sẽ TÍNH LÚC ĐỌC từ nội dung câu khi làm Đợt 2, không ghi đè dữ liệu thật.
 - Công cụ: `.github/workflows/do-phu-giay-2110.yml` có thêm cột `dong_ho_moi`, phân bố theo `dh`, và truy vấn 4 (so lượt ≥ 600 s giữa hai đồng hồ — nếu đồng hồ cũ nhiễm tab ẩn thì tỉ lệ ≥ 600 s của nhóm không `dh` cao hơn rõ).
 
 
-## 11. Tờ chiếu: "Ai đã sai?" hai thẻ và chi tiết em gọi lên bảng (thầy 21/10) — chờ thầy duyệt ảnh
+## 11. Tờ chiếu: "Ai đã sai?" hai thẻ và chi tiết em gọi lên bảng (thầy 21/10) — ĐÃ XÂY trên nhánh, chờ thầy duyệt ảnh rồi mới phát hành
 
 **Thầy dặn (21/10):** (a) Ai đã sai? (phím X) khi bấm hiện HAI thẻ — thẻ 1 là em **đã điểm danh** làm sai câu đó, thẻ 2 là **cả lớp** làm sai câu đó — thiết kế lại "siêu đẹp, trực quan, khoa học", hiện đủ Mức làm 1–4; (b) chi tiết em được gọi lên bảng cũng hiện đủ Mức làm 1–4; (c) **bỏ câu "chỉ thầy nhìn, không hiện lên màn chiếu"** — bấm chi tiết là hiện đủ trên màn chiếu. Quyết định này **thay** ghi chú ở khung 06 và 11 của bản duyệt 20/10 ("Chỉ thầy thấy", "mức chỉ để thầy nhìn", mặc định tắt chấm Mức).
 
@@ -213,5 +213,9 @@ Bảng màu: Mức làm 1→4 là MỘT dải màu theo độ đậm (không đ�
 **5 · Luật hiển thị (theo thầy 21/10).** Hiện ĐỦ trên màn chiếu, kể cả tên và Mức của từng lượt; lượt ĐÚNG ở Mức 1 ghi trung tính "Đúng · nộp sau N giây, trước khi đọc hết đề". Không có phím ẩn riêng; nếu thầy muốn che tên khi chiếu thì thêm sau.
 **6 · Hiệu năng.** `/gv/ai-sai-cau`: 2 đợt D1 như cũ, thêm MỘT lệnh β cùng đợt (0 lệnh khi chưa lượt nào có số đo mới). `/gv/ho-so-len-bang`: các khối đọc song song — 29 đợt → 14 đợt (đo trên cổng `tests/toc-do-may-chu-ph-2110.test.ts`).
 **7 · Nghiệm thu.** Ảnh Chromium thật ở `docs/ban-ve-chieu-muc-lam-2110/anh/` (1920×1080 và 1280×720, nền tối): 12a có số đo · 12b lớp đông · 12c những ngày đầu · 12d chưa điểm danh · 13a chi tiết em · 13b chi tiết em chưa có số đo. Soát: 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ · 0 khung bị cắt. Dựng lại: `node scripts/dung-ban-ve-chieu-muc-lam-2110.mjs && node scripts/chup-ban-ve-chieu-muc-lam-2110.mjs`.
+
+**Đã xây (21/10, nhánh `claude/stoic-einstein-7jkysb`):** tấm Hồ sơ làm bài ở ba app (`14101d5`, `7159fad`) · máy chủ `/gv/ai-sai-cau` (lọc theo `sbds`, `mucLam` kèm ranh) và `/gv/ho-so-len-bang` (`cachLam14`) · tờ chiếu phím X hai thẻ + chi tiết em (`5f8ae2f`). Ảnh nghiệm thu là ảnh CHỤP TỪ MÃ THẬT của tờ chiếu (không phải bản vẽ HTML): `docs/anh-muc-lam-chieu-2110/` (12 ảnh JPG ≤ 150 KB), dựng lại bằng `npx vite build --config scripts/chup-muc-lam-2110/vite.config.mjs --outDir <tạm>` rồi `node scripts/chup-muc-lam-2110/chup-chieu.mjs <tạm>`. Soát: 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ · 0 khung bị cắt; MỘT trường hợp cực đoan (`ai-sai-dong-em-1280`: lớp rất đông trên khổ 1280×720) có 7 tên bị cắt bằng "…" — chấp nhận, vì tên đầy đủ vẫn ở cột còn lại và ở chi tiết em.
+Khác bản vẽ: biểu đồ cột "nơi sai / ngày sai" của bản vẽ không đưa vào tờ chiếu (giờ + nơi làm của từng lượt chỉ còn ở chú thích khi rê chuột — máy chiếu không có rê chuột nên không thấy; muốn hiện thì thêm sau); lịch sử cũ phần lớn hiện "Chưa có số đo" cho tới khi đồng hồ mới chạy đủ ngày (xem 10b).
+**Màu:** dải xanh Mức làm 1→4 đúng bản thầy duyệt 20/10; chín biến gốc của hai bảng khai MỘT chỗ, mọi màu còn lại là `var()`/`color-mix()`; khai báo màu của bản cũ biến mất theo lệnh thầy 21/10 (danh sách đóng `docs/mau-thay-ra-lenh-2110.json`, đọc bởi `scripts/kiem-mau-giu-nguyen.mjs`).
 
 **Giả định đã dùng (thầy sửa được):** (1) "bấm làm lại" ở tin nhắn thầy = bấm X trên tờ chiếu của câu đang chiếu; (2) "đã điểm danh" lấy từ bước Điểm danh của buổi đang chiếu, "cả lớp" = danh sách em của lớp đó; (3) số liệu trong ảnh là số giả (tên giả, ngưỡng 24 / 6 / 60 giây).
