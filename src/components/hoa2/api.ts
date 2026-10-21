@@ -168,9 +168,15 @@ export class LoiHoa2 extends Error {
 /** Gọi `POST /game-v2/<lenh>` với token của em. Máy chủ báo `ok:false` ⇒ ném `LoiHoa2` kèm câu của máy chủ. */
 export async function goiHoa2(lenh: string, token: string, du: Record<string, unknown> = {}, giay = 20): Promise<Record<string, unknown>> {
   const c = new AbortController()
-  const hen = setTimeout(() => c.abort(), giay * 1000)
+  let hen: ReturnType<typeof setTimeout>
+  const hetHan = new Promise<never>((_, hong) => {
+    hen = setTimeout(() => { c.abort(); hong(new DOMException('Đã hết giờ', 'AbortError')) }, giay * 1000)
+  })
   try {
+    // Hạn bao cả đọc cấu hình/IndexedDB và thân phản hồi, kể cả bước không nghe AbortSignal.
+    return await Promise.race([hetHan, (async () => {
     const goc = (await layDiaChiMayChu('')) || 'https://omr.ttadodaihoc.workers.dev'
+    if (c.signal.aborted) throw new DOMException('Đã hết giờ', 'AbortError')
     const url = `${goc}/game-v2/${lenh}`
     const than = JSON.stringify({ ...du, token })
     // Lệnh đã HỎI SỚM (lúc mở app / vừa đăng nhập, src/lib/hoi-som.ts) ⇒ nhận phản hồi ấy, không gửi lại; không có / hỏng ⇒ gửi như cũ.
@@ -193,6 +199,7 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
     // Lời máy chủ: `error` hoặc `loi` (vd. `hoa2-ruong-mo` chưa đủ: ma `chua_du`).
     if (o.ok !== true) throw new LoiHoa2(loiCuaKetQua(o) || 'Máy chủ chưa trả lời được. Em thử lại sau ít phút.', chu(o.ma))
     return o
+    })()])
   } catch (e) {
     if (e instanceof LoiHoa2) throw e
     if ((e as { name?: string })?.name === 'AbortError') {
@@ -200,7 +207,7 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
     }
     throw new LoiHoa2('Chưa kết nối được máy chủ. Em kiểm tra mạng rồi thử lại.', 'mat_mang')
   } finally {
-    clearTimeout(hen)
+    clearTimeout(hen!)
   }
 }
 
