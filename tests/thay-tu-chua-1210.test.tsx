@@ -310,7 +310,7 @@ describe('giao diện: khối "Chữa câu khó & tính toán" trong mục Chữ
     expect(dong().filter((l) => l.textContent!.includes('Có tính toán')).map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-I-2', 'DH-11-C2-B6-II-2', 'DH-11-C2-B6-III-1'])
     expect(screen.getByText(/1 câu mang mã khối khác Khối 11/)).toBeTruthy()
     // bốn ô số (ô "lớp sai từ 30%" có khi đã có số liệu lớp)
-    await waitFor(() => expect([...document.querySelectorAll('.gvv2-ttc-o-so')].map((o) => o.textContent)).toEqual(['7 câu sẽ chiếu', '2 câu Đúng–sai', '3 câu có tính toán', '1 câu lớp sai từ 30%']))
+    await waitFor(() => expect([...document.querySelectorAll('.gvv2-ttc-o-so')].map((o) => o.textContent)).toEqual(['7 câu sẽ chiếu', '2 câu Đúng–sai', '3 câu có tính toán', '1 câu khó', '1 câu lớp sai từ 30%']))
     // tỉ lệ sai lớp: số gộp của đúng các em lớp 11B, đúng mã câu (máy chủ cũ chưa có lệnh theo lô ⇒ lùi về số gộp)
     await waitFor(() => expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai2/3 em sai'))
     expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.getAttribute('data-cao')).toBe('true')
@@ -326,6 +326,15 @@ describe('giao diện: khối "Chữa câu khó & tính toán" trong mục Chữ
     expect(dong().map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-III-1', 'DH-11-C2-B6-II-2', 'DH-11-C2-B6-II-1', 'DH-11-C2-B6-III-2'])
     fireEvent.click(chip[0]!)
     await waitFor(() => expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai2/3 em sai'))
+
+    // 21/10: câu Vận dụng mang nhãn "Câu khó"; công tắc "Chỉ hiện câu khó & tính toán" ⇒ chỉ còn câu khó / có tính toán, tắt ⇒ đủ đề lại
+    expect(dong().filter((l) => l.textContent!.includes('Câu khó')).map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-I-2'])
+    const loc = screen.getByRole('switch', { name: /Chỉ hiện câu khó & tính toán/ })
+    fireEvent.click(loc)
+    expect([...dong().map((l) => l.dataset.qid!)].sort()).toEqual(['DH-11-C2-B6-I-2', 'DH-11-C2-B6-II-2', 'DH-11-C2-B6-III-1'])
+    expect(screen.getByText('3/7 câu')).toBeTruthy()
+    fireEvent.click(loc)
+    expect(dong().map((l) => l.dataset.qid)).toEqual(THU_TU)
 
     // dòng phím trên tờ (bản vẽ): L · Đạt / Chưa đạt · G · T · X · Space
     expect(document.querySelector('.gvv2-ttc-goi-y')!.textContent).toBe(
@@ -381,7 +390,7 @@ describe('giao diện: khối "Chữa câu khó & tính toán" trong mục Chữ
     expect(screen.getByText(/Chưa tải được danh sách lớp/)).toBeTruthy()
     fireEvent.change(screen.getByRole('combobox', { name: /Bài trong Dạy học/ }), { target: { value: 'DH-11-C2-B6' } })
     expect(screen.getByText('Chọn một lớp để thấy tỉ lệ sai và em được gọi lên bảng.')).toBeTruthy()
-    expect(document.querySelectorAll('.gvv2-ttc-o-so')).toHaveLength(3)
+    expect(document.querySelectorAll('.gvv2-ttc-o-so')).toHaveLength(4)
     expect(g.tk).not.toHaveBeenCalled()
   })
 })

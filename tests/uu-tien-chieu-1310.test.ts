@@ -6,7 +6,7 @@ const api=vi.hoisted(()=>vi.fn())
 vi.mock('../src/lib/goi-lenh-thay',()=>({goiLenh:api}))
 afterEach(()=>api.mockReset())
 it('trộn ba nhóm chung: đủ câu, không trùng, không lần lượt nhóm; cùng buổi ổn định kể cả mảng vào đổi thứ tự',()=>{
- const ds=Array.from({length:9},(_,i)=>({qid:`q${i}`,phan:'I' as const,tinhToan:i<3,thuTuDe:i,q:{sao:i>=3&&i<6?3:0}}))
+ const ds=Array.from({length:9},(_,i)=>({qid:`q${i}`,phan:'I' as const,tinhToan:i<3,thuTuDe:i,q:{canChua:i>=3&&i<6?{sao:2 as const,dk:[],ly_do:'',bay:null}:undefined}}))
  const soLop=new Map(['q6','q7'].map(q=>[q,{sai:6,lam:10}]))
  const orders=Array.from({length:30},(_,i)=>xepThuTuChua([...ds,ds[3]!],soLop,`buoi${i}`).map(q=>q.qid))
  for(const r of orders){expect(new Set(r).size).toBe(9);expect(r.at(-1)).toBe('q8');expect(new Set(r.slice(0,8))).toEqual(new Set(ds.slice(0,8).map(q=>q.qid)))}
