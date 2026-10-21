@@ -3,6 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { KHOA_DIA_CHI_HS, KHOA_PHIEN_HS, LENH_HOI_SOM, taoMaNapTruoc, type BangNapTruoc } from '../src/lib/nap-truoc-man-em'
 import { batDauHoiSom, danhDauDaNhan, ghiDiaChiDaDung, layHoiSom, xemHoiSomDaVe } from '../src/lib/hoi-som'
+import { ghiNhoKetQuaSanh, type KetQuaSanh } from '../src/components/hoa2/api'
 
 const BANG: BangNapTruoc = {
   thi: ['/assets/ExamTakeScreen-a.js'],
@@ -17,7 +18,7 @@ const BANG: BangNapTruoc = {
 const GOC = 'https://omr.ttadodaihoc.workers.dev'
 
 type The = { rel: string; as?: string; type?: string; href: string; crossOrigin: string | null; fetchPriority?: string }
-function chay(duong: string, q: string, o: { phien?: object | null; diaChi?: string; coSw?: boolean } = {}) {
+function chay(duong: string, q: string, o: { phien?: object | null; diaChi?: string; coSw?: boolean; luu?: Record<string, string>; caMo?: 'khong' | 'co' | 'hong' } = {}) {
   const them: The[] = []
   const goi: { url: string; than: string }[] = []
   const khiXong: (() => void)[] = []
@@ -29,10 +30,17 @@ function chay(duong: string, q: string, o: { phien?: object | null; diaChi?: str
   const kho: Record<string, string> = {}
   if (o.phien) kho[KHOA_PHIEN_HS] = JSON.stringify(o.phien)
   if (o.diaChi) kho[KHOA_DIA_CHI_HS] = o.diaChi
+  Object.assign(kho, o.luu ?? {})
   const localStorage = { getItem: (k: string) => kho[k] ?? null }
   const navigator = { serviceWorker: o.coSw ? { controller: {} } : { controller: null } }
   const fetch = (url: string, init: { body: string }) => {
     goi.push({ url, than: init.body })
+    // Chỉ khi test nói rõ về ca đang mở thì lệnh `/hs/ca-dang-mo` mới có phản hồi (mọi lệnh khác treo như cũ).
+    if (o.caMo && url.endsWith('/hs/ca-dang-mo')) {
+      if (o.caMo === 'hong') return Promise.reject(new Error('mạng'))
+      const text = JSON.stringify({ ok: true, coCaMo: o.caMo === 'co', soCa: o.caMo === 'co' ? 1 : 0 })
+      return Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve(text), headers: { get: () => null } })
+    }
     return new Promise(() => {})
   }
   const window = { fetch } as Record<string, unknown>
@@ -71,6 +79,64 @@ describe('đoạn mã nội tuyến — cổng học sinh', () => {
       { url: GOC + '/hs/lich-su', than: '{"sbd":"99001"}' },
     ])
     expect(LENH_HOI_SOM).toHaveLength(5)
+  })
+
+  // MỞ CHẶNG SỚM (21/10, ảnh thầy "Đang chuẩn bị những câu phù hợp với em…" — "bình thường vào tức thì"): chỉ khi đệm Sảnh HÔM NAY nói em còn việc
+  // VÀ lệnh hỏi sớm `/hs/ca-dang-mo` báo KHÔNG có ca đang mở. Đệm ghi bằng đúng hàm thật `ghiNhoKetQuaSanh` (khoá + hình dạng do app tự ghi).
+  describe('mở chặng sớm (hoc-tap-start lúc đọc HTML)', () => {
+    const hom = () => new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10)
+    const SBD = ' 99001 ' // có khoảng trắng như phiên lưu — khoá đệm dùng đúng chuỗi này
+    const phien = { sbd: SBD, token: 'tk1' }
+    const xong = () => new Promise<void>((r) => setTimeout(r, 0))
+    /** Đệm Sảnh do hàm THẬT ghi vào jsdom, rồi chép sang kho giả của đoạn mã nội tuyến. */
+    const dem = (sanh: object, sbd = SBD) => {
+      ghiNhoKetQuaSanh(sbd, { cheDo2: true, sanh } as unknown as KetQuaSanh)
+      const k = `omr_hoa2_sanh_dem:${sbd}`
+      const v = localStorage.getItem(k)!
+      localStorage.removeItem(k)
+      return { [k]: v }
+    }
+    const duongGoi = (r: ReturnType<typeof chay>) => r.goi.map((g) => g.url.replace(GOC, ''))
+    const CON = (con: number, them: object = {}) => ({ ngay: hom(), theLuc: { con, tong: 12 }, ...them })
+    it('đệm hôm nay CÒN VIỆC + KHÔNG ca đang mở ⇒ gửi thêm hoc-tap-start với thân {"token":…}, hạn dùng 10 phút; vẫn đúng 5 lệnh Sảnh trước', async () => {
+      const r = chay('/hs', '', { phien, diaChi: GOC, luu: dem(CON(12)), caMo: 'khong' })
+      expect(duongGoi(r)).toEqual(['/game-v2/hoc-tap-sanh', '/hs/ke-hoach-ngay', '/hs/ca-dang-mo', '/hs/buoi-hoc', '/hs/lich-su']) // chưa biết ca ⇒ chưa gửi
+      await xong()
+      expect(duongGoi(r).at(-1)).toBe('/game-v2/hoc-tap-start')
+      expect(r.goi.at(-1)).toEqual({ url: GOC + '/game-v2/hoc-tap-start', than: '{"token":"tk1"}' })
+      const muc = (r.window.__ddhHoiSom as Record<string, { het?: number; tuHtml?: boolean }>)['/game-v2/hoc-tap-start']!
+      expect(muc.tuHtml).toBe(true)
+      expect(muc.het! - Date.now()).toBeGreaterThan(590_000)
+      expect(muc.het! - Date.now()).toBeLessThanOrEqual(600_000)
+    })
+    it('KHÔNG gửi khi: có ca đang mở · lệnh ca lỗi / chưa về · chưa có đệm · đệm ngày khác · hết việc (con = 0) · ngày kiểm tra riêng · đệm hỏng', async () => {
+      const ca = (caMo: 'co' | 'hong' | undefined, luu: Record<string, string>) => chay('/hs', '', { phien, diaChi: GOC, luu, caMo })
+      const rs = [
+        ca('co', dem(CON(12))),
+        ca('hong', dem(CON(12))),
+        ca(undefined, dem(CON(12))), // lệnh ca treo
+        ca('khong', {}),
+        ca('khong', dem({ ngay: '2000-01-01', theLuc: { con: 12 } })),
+        ca('khong', dem(CON(0))),
+        ca('khong', dem(CON(12, { kiemTraCaNhan: { homNay: true, baiNgayToiThieu: false } }))),
+        ca('khong', { [`omr_hoa2_sanh_dem:${SBD}`]: '{khong-phai-json' }),
+      ]
+      await xong()
+      for (const r of rs) expect(duongGoi(r)).toHaveLength(5)
+    })
+    it('ngày kiểm tra riêng NHƯNG có bài ngày tối thiểu (baiNgayToiThieu) ⇒ vẫn học được ⇒ gửi (cùng luật `ngayKiem` của HocTapHomNay)', async () => {
+      const r = chay('/hs', '', { phien, diaChi: GOC, luu: dem(CON(5, { kiemTraCaNhan: { homNay: true, baiNgayToiThieu: true } })), caMo: 'khong' })
+      await xong()
+      expect(duongGoi(r).at(-1)).toBe('/game-v2/hoc-tap-start')
+    })
+    it('khoá đệm khớp cả khi phiên lưu SBD sạch khoảng trắng; máy chưa đăng nhập / địa chỉ máy chủ lạ ⇒ không gửi gì, kể cả có đệm', async () => {
+      const r = chay('/hs', '', { phien: { sbd: '99001', token: 'tk1' }, diaChi: GOC, luu: dem(CON(3), '99001'), caMo: 'khong' })
+      await xong()
+      expect(duongGoi(r).at(-1)).toBe('/game-v2/hoc-tap-start')
+      const luu = dem(CON(12))
+      expect(chay('/hs', '', { luu, caMo: 'khong' }).goi).toEqual([])
+      expect(chay('/hs', '', { phien, diaChi: 'http://x.dev', luu, caMo: 'khong' }).goi).toEqual([])
+    })
   })
 
   it('phông Sảnh chỉ nạp trước khi trang do service worker phục vụ', () => {

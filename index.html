@@ -2,6 +2,9 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
+    <!-- MỞ SẴN ĐƯỜNG TỚI MÁY CHỦ (21/10, "app load chậm"): bắt tay DNS + TLS với Worker ngay khi HTML về, song song với việc tải mã — lệnh đầu tiên của cả ba app
+         (đọc cấu hình rồi gọi máy chủ) không còn tốn thêm lượt bắt tay. Địa chỉ trùng `mayChuMoi` trong public/cau-hinh.json; đổi địa chỉ thì gợi ý này chỉ thành vô hại. -->
+    <link rel="preconnect" href="https://omr.ttadodaihoc.workers.dev" crossorigin />
 
 
     <!-- CHỌN MANIFEST NGAY LÚC PHÂN TÍCH HTML, TRƯỚC KHI REACT CHẠY.
