@@ -11,8 +11,8 @@
 // NHẬN DIỆN "CÓ TÍNH TOÁN" (`laCauTinhToan`): gói bài 7 ngày ghi lý do "Có tính toán" bằng một biểu thức viết liền trong máy chủ (`server/src/goi-bai-7.ts`,
 // không có hàm xuất) — `Phần III ∨ /tính|khối lượng|số mol|…|số kèm đơn vị/`. Biểu thức ấy bắt cả "tính chất", "tính base" (câu lý thuyết) nên KHÔNG dùng
 // một mình: trước hết dùng luật lý thuyết / bài tập MỘT NGUỒN của app (`dangCua`, src/lib/dang-cau.ts — nhãn `kieu` của kho trước, Phần III luôn là
-// bài tập, rồi điểm mặt chữ đã đo trên 2.520 câu); chỉ câu `dangCua` còn "chưa rõ" mới dùng đúng biểu thức của gói 7 (`MAU_TINH_TOAN_GOI_7`, test khoá
-// chữ biểu thức trùng với máy chủ). Trước khi chấm mặt chữ, bỏ các cụm LÝ THUYẾT có chữ "tính" ("tính chất", "tính base", "lưỡng tính"…
+// bài tập, rồi điểm mặt chữ đã đo trên 2.520 câu); chỉ câu `dangCua` còn "chưa rõ" mới dùng biểu thức của gói 7 (`MAU_TINH_TOAN_GOI_7`, test khoá
+// chữ biểu thức trùng với máy chủ) — bản `MAU_TINH_TOAN_LOC` đã chặn "pH" khớp "phân/phát" (22/10). TRẢ LỜI NGẮN (22/10) xét riêng, xem hàm. Trước khi chấm mặt chữ, bỏ các cụm LÝ THUYẾT có chữ "tính" ("tính chất", "tính base", "lưỡng tính"…
 // — `CUM_TINH_LY_THUYET`) để "Tính chất hoá học của ammonia là" không thành câu tính toán.
 // TỰ LUẬN: thầy TỰ CHỌN đề ⇒ câu tự luận có trong tờ vẫn hiện, ghi nhãn "Tự luận" (luật CLAUDE.md "riêng Gọi lên bảng thầy chọn gì hiện đúng thế" —
 // cùng cách bảng Dạy học `cauTuDeChon`). Đây KHÔNG phải kênh rút đề tự động.
@@ -33,18 +33,14 @@ export const TEN_LOAI_CAU: Record<PhanCau, string> = { I: 'Trắc nghiệm', II:
 /** Biểu thức "Có tính toán" của gói bài 7 ngày — CHÉP NGUYÊN từ `server/src/goi-bai-7.ts` (`cauTuTick7`, trường `tinhToan`). Test so chữ với máy chủ. */
 export const MAU_TINH_TOAN_GOI_7 = /(?:tính|khối lượng|số mol|thể tích|nồng độ|hiệu suất|phần trăm|pH|\d+[.,]?\d*\s*(?:mol|gam|g\b|lít|mL|kJ|%))/i
 
+/** Bản dùng cho BỘ LỌC "câu khó & tính toán" (22/10): như `MAU_TINH_TOAN_GOI_7` nhưng "pH" phải đứng riêng — cờ /i làm "pH" khớp cả "PHân tử",
+ *  "PHát biểu", "PHân bón", biến câu đếm / lý thuyết thành câu tính. Biểu thức gói 7 giữ nguyên (test khoá trùng máy chủ). */
+export const MAU_TINH_TOAN_LOC = new RegExp(MAU_TINH_TOAN_GOI_7.source.replace('|pH|', '|pH(?![a-zà-ỹ])|'), 'i')
+
 /** Cụm từ LÝ THUYẾT mang chữ "tính" (không phải phép tính) — bỏ khỏi mặt chữ trước khi chấm, nếu không cả `dangCua` (động từ hỏi "tính …")
  *  lẫn biểu thức gói 7 đều nhận nhầm. */
 export const CUM_TINH_LY_THUYET = /lưỡng\s+tính|tính\s+(?:chất|base|bazơ|bazo|acid|axit|khử|oxi\s*h(?:oá|óa|oa)|oxy\s*h(?:oá|óa|oa)|kim\s*loại|phi\s*kim|tan|dẻo|cứng|dẫn|thơm|đặc\s*trưng)/giu
 const boCumLyThuyet = (s: string | undefined) => String(s ?? '').replace(CUM_TINH_LY_THUYET, ' ')
-
-/** CÂU ĐẾM LÝ THUYẾT của Phần III (thầy báo 22/10: bật "Chỉ hiện câu khó & tính toán" ở đề Trả lời ngắn vẫn hiện 40/40): đáp số là một con số nhưng là
- *  ĐẾM (phát biểu / chất / thí nghiệm… đúng), không phải tính. "bao nhiêu gam / lít / mol / %" là câu tính ⇒ không khớp mẫu này. */
-export const MAU_DEM_LY_THUYET = /(?:có\s+)?bao\s+nhiêu\s+(?:chất|phát\s*biểu|nhận\s*định|ý|thí\s*nghiệm|trường\s*hợp|đồng\s*phân|công\s*thức|phản\s*ứng|polymer|polime|tơ|dung\s*dịch|kim\s*loại|ester|este|amine|amin|hợp\s*chất|loại|phân\s*tử|nguyên\s*tử|liên\s*kết|nhóm|ion|muối|hydrocarbon|alkene|alkyne|alcohol|ancol|aldehyde|carboxylic|chất\s*béo|carbohydrate|cacbohiđrat|peptide|peptit|protein|ống\s*nghiệm|cặp|phát\s*biểu\s*đúng)|\bsố\s+(?:phát\s*biểu|nhận\s*định|chất|thí\s*nghiệm|trường\s*hợp|đồng\s*phân|phản\s*ứng|ý|polymer|tơ|dung\s*dịch|kim\s*loại|ester|este|ống\s*nghiệm)\b/iu
-/** Dấu hiệu PHÉP TÍNH thật trong đề (số kèm đơn vị, đại lượng phải tính). */
-const DAU_HIEU_TINH = /\d+(?:[.,]\d+)?\s*(?:mol|gam|g\b|kg|tấn|lít|l\b|mL|ml|kJ|%|M\b|atm|°C)|khối\s*lượng|số\s*mol|thể\s*tích|nồng\s*độ|hiệu\s*suất|phần\s*trăm|\btính\b/iu
-/** pH viết đúng hoa thường, không dính chữ cái ("phát biểu" không phải pH). Không dùng nhìn lùi (Safari cũ). */
-const CO_PH = /(?:^|[^\p{L}])pH(?![\p{L}])/u
 
 /** Câu có phải làm tính không. Xem đầu tệp: nhãn kho / `dangCua` trước, chỉ câu "chưa rõ" mới dùng biểu thức của gói 7.
  *  `tuLuan`: câu tự luận Phần III ("Giải thích vì sao…") KHÔNG mặc nhiên là tính toán — xét theo nội dung như câu thường. */
@@ -52,13 +48,20 @@ export function laCauTinhToan(
   c: { phan: PhanCau; text?: string; luaChon?: readonly (string | undefined)[]; dapAn?: string; mucDo?: string; kieu?: string; tenDang?: string },
   tuLuan = false,
 ): boolean {
-  // Phần III: đáp số là số ⇒ mặc định là câu tính, TRỪ câu đếm lý thuyết không có dấu hiệu phép tính (22/10).
-  if (c.phan === 'III' && !tuLuan) { const t = boCumLyThuyet(c.text); return !(MAU_DEM_LY_THUYET.test(t) && !DAU_HIEU_TINH.test(t) && !CO_PH.test(t)) }
   const text = boCumLyThuyet(c.text)
+  // TRẢ LỜI NGẮN (thầy 22/10, kèm ảnh: "bộ lọc câu khó và tính toán chưa hoạt động à, tôi tick vào vẫn y nguyên"): trước đây MỌI câu Phần III mặc
+  // nhiên "có tính toán" ⇒ đề Trả lời ngắn lọc ra 40/40, câu đếm ("Số nguyên tử hydrogen trong trimethylamine…") cũng mang nhãn tính toán.
+  // Nay: nhãn kho `kieu` thắng; còn lại là câu tính khi có dấu hiệu phép tính (biểu thức gói 7: khối lượng, số mol, số kèm đơn vị, %…) HOẶC
+  // `dangCua` chấm mặt chữ ra bài tập (không truyền phần / đáp số — Phần III luôn "bài tập" và đáp số luôn là số). Câu đếm / lý thuyết ⇒ không.
+  if (c.phan === 'III' && !tuLuan) {
+    if (c.kieu === 'ly_thuyet' || c.kieu === 'bai_tap') return c.kieu === 'bai_tap'
+    if (MAU_TINH_TOAN_LOC.test(`${text} ${boCumLyThuyet(c.tenDang)}`)) return true
+    return dangCua({ text, luaChon: [], dapAn: '', mucDo: c.mucDo }) === 'bai_tap'
+  }
   const luaChon = (c.luaChon ?? []).map((x) => boCumLyThuyet(x))
   const dang = dangCua({ phan: tuLuan ? undefined : c.phan, text, luaChon, dapAn: tuLuan ? '' : (c.dapAn ?? ''), mucDo: c.mucDo, kieu: c.kieu })
   if (dang !== 'chua_ro') return dang === 'bai_tap'
-  return MAU_TINH_TOAN_GOI_7.test(`${text} ${boCumLyThuyet(c.tenDang)}`)
+  return MAU_TINH_TOAN_LOC.test(`${text} ${boCumLyThuyet(c.tenDang)}`)
 }
 
 /** CÂU KHÓ (thầy chốt 21/10): mức Vận dụng (kho đã gộp VDC vào `van_dung` lúc nạp — `chuanHoaMucDo`) HOẶC câu 2 sao cần chữa (`canChua.sao`, đọc qua `soSao`).
