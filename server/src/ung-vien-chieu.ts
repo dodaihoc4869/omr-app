@@ -13,14 +13,15 @@ export async function ungVienChieu(env:Env,b:Row){
  if(!sbds.length&&typeof b.lop==='string'&&b.lop){const r=await env.DB.prepare(`SELECT h.sbd FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa' LIMIT 200`).bind(b.lop).all<{sbd:string}>();sbds=r.results.map(e=>e.sbd)}
  if(!sbds.length||!qids.length)return {ok:true,cau:{}}
 const J=(v:unknown)=>JSON.stringify(v)
- const [em,cau,kn,p,luot,lb,md]=await Promise.all([
-  env.DB.prepare(`SELECT sbd,ho_ten FROM hoc_sinh h WHERE sbd IN(SELECT value FROM json_each(?)) AND COALESCE(trang_thai,'')<>'khoa' AND (?='' OR ${sqlTenLopHs('h')}=?)`).bind(JSON.stringify(sbds),typeof b.lop==='string'?b.lop:'',typeof b.lop==='string'?b.lop:'').all<Row>(),
-  env.DB.prepare('SELECT qid,version FROM game_v2_question WHERE qid IN(SELECT value FROM json_each(?))').bind(JSON.stringify(qids)).all<Row>(),
-  env.DB.prepare('SELECT qid,vkn_json FROM omni_q WHERE qid IN(SELECT value FROM json_each(?))').bind(JSON.stringify(qids)).all<Row>(),
-  env.DB.prepare('SELECT sbd,vkn_id,p FROM omni_p_vkn WHERE sbd IN(SELECT value FROM json_each(?))').bind(JSON.stringify(sbds)).all<Row>(),
-  env.DB.prepare(`SELECT s.sbd,s.qid,s.ket_qua,s.luc,json_extract(CASE WHEN json_valid(s.raw_json) THEN s.raw_json ELSE '{}' END,'$.ht_cau_version') version FROM su_kien_hoc s WHERE s.sbd IN(SELECT value FROM json_each(?)) AND s.qid IN(SELECT value FROM json_each(?)) AND ${SQL_LA_LAN_LAM} AND COALESCE(s.assistance,'none')='none' AND COALESCE(s.visibility,'')<>'embargoed' AND (s.nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=s.ma_nguon AND ${SQL_DA_CONG_BO('c')})) AND NOT EXISTS(SELECT 1 FROM loi_giai_hoi h WHERE h.sbd=s.sbd AND h.qid=s.qid AND julianday(h.luc)<=julianday(s.luc) AND julianday(h.luc)>julianday(s.luc)-0.5) ORDER BY s.luc DESC LIMIT 20000`).bind(JSON.stringify(sbds),JSON.stringify(qids)).all<Row>(),
-  env.DB.prepare(`SELECT sbd,SUM(luc>=?) n,MAX(luc) cuoi FROM len_bang WHERE sbd IN(SELECT value FROM json_each(?)) AND luc>=? GROUP BY sbd`).bind(new Date(Date.now()-14*864e5).toISOString(),J(sbds),new Date(Date.now()-60*864e5).toISOString()).all<Row>(),
-  env.DB.prepare('SELECT qid,MAX(muc_do) md FROM cau_meta WHERE qid IN(SELECT value FROM json_each(?)) GROUP BY qid').bind(J(qids)).all<Row>(),
+ // MỘT lượt khứ hồi D1 cho cả 7 câu đọc (batch) — trước 21/10 là 5 lượt song song; không thêm đợt chờ nối tiếp.
+ const [em,cau,kn,p,luot,lb,md]=await env.DB.batch<Row>([
+  env.DB.prepare(`SELECT sbd,ho_ten FROM hoc_sinh h WHERE sbd IN(SELECT value FROM json_each(?)) AND COALESCE(trang_thai,'')<>'khoa' AND (?='' OR ${sqlTenLopHs('h')}=?)`).bind(JSON.stringify(sbds),typeof b.lop==='string'?b.lop:'',typeof b.lop==='string'?b.lop:''),
+  env.DB.prepare('SELECT qid,version FROM game_v2_question WHERE qid IN(SELECT value FROM json_each(?))').bind(JSON.stringify(qids)),
+  env.DB.prepare('SELECT qid,vkn_json FROM omni_q WHERE qid IN(SELECT value FROM json_each(?))').bind(JSON.stringify(qids)),
+  env.DB.prepare('SELECT sbd,vkn_id,p FROM omni_p_vkn WHERE sbd IN(SELECT value FROM json_each(?))').bind(JSON.stringify(sbds)),
+  env.DB.prepare(`SELECT s.sbd,s.qid,s.ket_qua,s.luc,json_extract(CASE WHEN json_valid(s.raw_json) THEN s.raw_json ELSE '{}' END,'$.ht_cau_version') version FROM su_kien_hoc s WHERE s.sbd IN(SELECT value FROM json_each(?)) AND s.qid IN(SELECT value FROM json_each(?)) AND ${SQL_LA_LAN_LAM} AND COALESCE(s.assistance,'none')='none' AND COALESCE(s.visibility,'')<>'embargoed' AND (s.nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=s.ma_nguon AND ${SQL_DA_CONG_BO('c')})) AND NOT EXISTS(SELECT 1 FROM loi_giai_hoi h WHERE h.sbd=s.sbd AND h.qid=s.qid AND julianday(h.luc)<=julianday(s.luc) AND julianday(h.luc)>julianday(s.luc)-0.5) ORDER BY s.luc DESC LIMIT 20000`).bind(JSON.stringify(sbds),JSON.stringify(qids)),
+  env.DB.prepare(`SELECT sbd,SUM(luc>=?) n,MAX(luc) cuoi FROM len_bang WHERE sbd IN(SELECT value FROM json_each(?)) AND luc>=? GROUP BY sbd`).bind(new Date(Date.now()-14*864e5).toISOString(),J(sbds),new Date(Date.now()-60*864e5).toISOString()),
+  env.DB.prepare('SELECT qid,MAX(muc_do) md FROM cau_meta WHERE qid IN(SELECT value FROM json_each(?)) GROUP BY qid').bind(J(qids)),
  ])
  const versions=new Map(cau.results.map(q=>[String(q.qid),String(q.version)])),skills=new Map<string,Set<string>>()
  for(const r of kn.results){const a=skills.get(String(r.qid))??new Set<string>();const values=JSON.parse(String(r.vkn_json)) as unknown;if(!Array.isArray(values))throw new Error('Ma trận kỹ năng của câu chưa hợp lệ.');for(const k of values)if(typeof k==='string'&&k)a.add(k);skills.set(String(r.qid),a)}
