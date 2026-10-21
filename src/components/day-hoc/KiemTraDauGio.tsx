@@ -41,18 +41,20 @@ export interface TuyChonKiemTraDauGio {
   soBuoc?: number
   /** Báo cha bước đã xong (đã gọi và chấm hết, hoặc đã kết thúc) — thanh bước của buổi dạy. */
   onXong?: (xong: boolean) => void
+  /** Báo cha số đếm (dòng tóm tắt khi bước thu gọn ở Hành trình, 21/10): đã gọi · Đạt · Chưa đạt. */
+  onTomTat?: (t: { goi: number; dat: number; chuaDat: number }) => void
 }
 
 /** Vắng `dd` ⇒ tự tạo điểm danh như cũ (màn Lên bảng); có `dd` ⇒ một bước gọn trong buổi dạy. */
-export default function KiemTraDauGio({ dd, soBuoc, onXong }: TuyChonKiemTraDauGio = {}) {
-  return dd ? <KiemTraDauGioThan dd={dd} nhung soBuoc={soBuoc} onXong={onXong} /> : <KiemTraDauGioTuTao />
+export default function KiemTraDauGio({ dd, soBuoc, onXong, onTomTat }: TuyChonKiemTraDauGio = {}) {
+  return dd ? <KiemTraDauGioThan dd={dd} nhung soBuoc={soBuoc} onXong={onXong} onTomTat={onTomTat} /> : <KiemTraDauGioTuTao />
 }
 function KiemTraDauGioTuTao() {
   const dd = useDiemDanhBuoi()
   return <KiemTraDauGioThan dd={dd} nhung={false} />
 }
 
-function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong }: { dd: DiemDanhBuoi; nhung: boolean; soBuoc?: number; onXong?: (xong: boolean) => void }) {
+function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong, onTomTat }: { dd: DiemDanhBuoi; nhung: boolean; soBuoc?: number; onXong?: (xong: boolean) => void; onTomTat?: TuyChonKiemTraDauGio['onTomTat'] }) {
   const showToast = useAppStore((s) => s.showToast)
   const { tt, idBuoi, coMat, lopCuaEm } = dd
   const buoiMo = !!tt?.buoi.dangMo
@@ -274,6 +276,9 @@ function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong }: { dd: DiemDanhBuoi
   useEffect(() => {
     onXong?.(xong)
   }, [xong, onXong])
+  useEffect(() => {
+    onTomTat?.({ goi: dem.goi, dat: dem.dat, chuaDat: dem.chuaDat })
+  }, [dem.goi, dem.dat, dem.chuaDat, onTomTat])
 
   const khungChieu = html ? (
     <KhungXemPhieu

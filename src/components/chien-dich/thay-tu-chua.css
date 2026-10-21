@@ -85,6 +85,8 @@
 .gvv2-ttc-o-so[data-mau='tim'] { background: var(--gvm-tim-nen); color: var(--gvm-tim-dam); }
 .gvv2-ttc-o-so[data-mau='xd'] { background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }
 .gvv2-ttc-o-so[data-mau='ho'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.gvv2-ttc-o-so[data-mau='xl'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+.gvv2-ttc-o-so[data-mau='xl'] b { color: inherit; }
 .gvv2-ttc-o-so[data-mau='tim'] b, .gvv2-ttc-o-so[data-mau='xd'] b, .gvv2-ttc-o-so[data-mau='ho'] b { color: inherit; }
 
 .gvv2-ttc-tom { margin: 0; font-size: var(--t-than, 15px); color: var(--gvm-chu-2); }
@@ -114,6 +116,12 @@
 }
 .gvv2-ttc-the[data-loai='tinh'] { background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }
 .gvv2-ttc-the[data-loai='thieu'] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); }
+.gvv2-ttc-the[data-loai='kho'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+/* Công tắc "Chỉ hiện câu khó & tính toán" (21/10) */
+.gvv2-ttc-loc { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 48px; padding: 6px 14px; border-radius: 16px; background: var(--gvm-mat-2); color: var(--gvm-chu); cursor: pointer; }
+.gvv2-ttc-loc input { width: 22px; height: 22px; accent-color: var(--gvm-xd); margin: 0; }
+.gvv2-ttc-loc span { font-weight: 700; font-size: var(--t-than, 15px); }
+.gvv2-ttc-loc small { font-size: var(--t-phu, 13px); color: var(--gvm-chu-3); }
 .gvv2-ttc-loai[data-phan='II'] { background: var(--gvm-tim-nen); color: var(--gvm-tim-dam); }
 .gvv2-ttc-loai[data-phan='III'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
 .gvv2-ttc-de {

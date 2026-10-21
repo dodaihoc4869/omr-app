@@ -197,6 +197,8 @@ Bảng màu: Mức làm 1→4 là MỘT dải màu theo độ đậm (không đ�
 - PR 4 thêm `raw_json.doc.dh = 1` CHỈ khi giây đến từ `doGiay` hợp lệ; giây suy từ `msLam` thì KHÔNG có `dh`. Quy tắc đọc: `doc.dh = 1` ⇒ đồng hồ mới (dùng được cho Mức làm); dòng game có `giay` mà không `dh` ⇒ đồng hồ cũ hoặc không rõ. Đồng hồ cũ (tường) chỉ có thể ĐO DƯ (cộng cả lúc tab ẩn), không bao giờ đo thiếu ⇒ giây cũ nhỏ hơn thời gian đọc hết đề thì Mức làm 1 vẫn CHẮC; Mức làm 2–3 chỉ là ước tính (thật có thể thấp hơn); không bao giờ Mức làm 4. Cách hiện: xem §12.
 - Dòng ghi giữa 01:33 VN (Worker `2c7ff01`) và 06:44:15 VN 21/10 (Worker PR 4, main `299a873`, Actions `39516150163`) không có `dh` kể cả khi từ đồng hồ mới ⇒ coi là "không rõ".
 - Không UPDATE bù dòng cũ (quyết định 21/10): dòng cũ không có giây đo thật để bù; kích thước đề của dòng cũ không ghi đè vào dữ liệu thật mà nằm ở bảng dẫn xuất `cau_doc_giay` (§12).
+- Mốc giờ chính xác (bước «Đẩy lên Cloudflare Worker» của Actions): Đợt 1 lên 21/10 **01:31:35 VN** (run `39474357107`, commit `2c7ff01`); cờ `doc.dh` lên 21/10 **06:44:15 VN** (run `39516150163`, commit `299a873`, PR #333).
+- Đo lại 21/10 22:01 VN (run `39621967509`, 24 giờ qua): game 7 389 lượt, 3 263 có giây + kích thước đề, 3 200 có `dh = 1`. Nhóm `dh = 1` 3 203 lượt game: 1 lượt ≥ 600 s, trung bình 28,6 s; nhóm không `dh` 63 lượt: 0 lượt ≥ 600 s, trung bình 18,8 s ⇒ CHƯA thấy dấu hiệu đồng hồ cũ nhiễm tab ẩn. Đường ôn lại (`on-lai-nop.ts`): có cả trường `giay` cũ thì giây cũ thắng và BỎ cờ `dh` (test `on-lai-nop-1909`).
 - Công cụ: `.github/workflows/do-phu-giay-2110.yml` có thêm cột `dong_ho_moi`, phân bố theo `dh`, và truy vấn 4 (so lượt ≥ 600 s giữa hai đồng hồ — nếu đồng hồ cũ nhiễm tab ẩn thì tỉ lệ ≥ 600 s của nhóm không `dh` cao hơn rõ).
 
 

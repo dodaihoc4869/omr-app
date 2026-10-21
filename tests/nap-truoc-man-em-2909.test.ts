@@ -18,8 +18,10 @@ describe('chọn mảnh nạp trước theo đường vào', () => {
     ['/', '?vai=phuhuynh', 'ph'],
     ['/gv', '', null],
     ['/', '', null],
-    ['/p', '', null],
-    ['/', '?vai=phieu', null],
+    // 21/10: màn Phiếu nạp muộn ⇒ đường phiếu nạp trước mảnh phiếu
+    ['/p', '', 'phieu'],
+    ['/', '?vai=phieu', 'phieu'],
+    ['/', '?vai=gv', null],
     ['/', '?vai=gv&examCode=123456', null],
     ['/hs/abcdefgh1234', '', null],
   ]
@@ -30,7 +32,7 @@ describe('chọn mảnh nạp trước theo đường vào', () => {
   it('khớp luật docDuongVao của app (thi = có mã ca hoặc xem điểm; hs = cổng học sinh)', () => {
     for (const [duong, q] of ca) {
       const dv = docDuongVao(q, duong)
-      const app = dv.vai === 'gv' || dv.vai === 'phieu' ? null : dv.vai === 'phuhuynh' ? 'ph' : dv.maCa || dv.vai === 'diem' ? 'thi' : dv.vai === 'hocsinh' ? 'hs' : null
+      const app = dv.vai === 'phieu' ? 'phieu' : dv.vai === 'gv' ? null : dv.vai === 'phuhuynh' ? 'ph' : dv.maCa || dv.vai === 'diem' ? 'thi' : dv.vai === 'hocsinh' ? 'hs' : null
       expect(chonMangNapTruoc(duong, q)).toBe(app)
     }
   })

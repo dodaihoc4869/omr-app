@@ -286,8 +286,8 @@ describe('giao diện hai khối + nút "Chiếu lên bảng"', () => {
     expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('75% lớp sai3/4 em sai')
     expect(dong()[2]!.querySelector('.gvv2-ttc-goi')!.textContent).toBe('Chưa đủ dữ liệu chọn em — thầy chữa cho cả lớp')
     expect(dong()[3]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('chưa em nào làm')
-    expect([...document.querySelectorAll('.gvv2-ttc-o-so')].map((o) => o.textContent)).toEqual(['5 câu sẽ chiếu', '2 câu Đúng–sai', '3 câu có tính toán', '2 câu lớp sai từ 30%'])
-    expect(screen.getByText('Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Gọi em đã tự làm đúng; nếu chưa có, chọn em dự kiến làm được.')).toBeTruthy()
+    expect([...document.querySelectorAll('.gvv2-ttc-o-so')].map((o) => o.textContent)).toEqual(['5 câu sẽ chiếu', '2 câu Đúng–sai', '3 câu có tính toán', '1 câu khó', '2 câu lớp sai từ 30%'])
+    expect(screen.getByText('Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Em lên bảng chia đều Khá · Trung bình · Cần kèm: câu dễ gọi em Cần kèm, câu khó gọi em Khá, mỗi em một lần.')).toBeTruthy()
     expect(g.goi.mock.calls.filter(([dd]) => dd === '/gv/ai-sai-nhieu-cau')).toHaveLength(1)
 
     const nut = screen.getByRole('button', { name: 'Chiếu lên bảng' })
@@ -299,7 +299,8 @@ describe('giao diện hai khối + nút "Chiếu lên bảng"', () => {
     expect(g.toast).toHaveBeenCalledWith('1 câu chưa có chuyên đề — trên tờ các câu ấy không có nút Đạt / Chưa đạt (chưa ghi sổ được)', 'warn')
   })
 
-  it('mục Chữa bài: (A) số thứ tự trong ô màu theo loại + thanh số em + nút ≥ 48; (B) mở sẵn ngay sau; mở một dòng ⇒ hai khối ẩn (không gỡ)', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 21/10 (Hành trình một trang, bước 4 "Chữa câu khó & tính toán" — bản vẽ docs/ban-ve-hanh-trinh-2110): khối câu khó (B) đứng TRƯỚC.
+  it('mục Chữa bài: (A) số thứ tự trong ô màu theo loại + thanh số em + nút ≥ 48; (B) mở sẵn, đứng trước; mở một dòng ⇒ hai khối ẩn (không gỡ)', async () => {
     g.goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
       if (duong === '/gv/lop') return { ok: true, du: { lop: LOP } }
       if (duong === '/gv/chien-dich' && b.action === 'danh-sach') return { ok: true, du: { homNay: '2026-10-12', chienDich: [] } }
@@ -308,7 +309,7 @@ describe('giao diện hai khối + nút "Chiếu lên bảng"', () => {
     const { container } = render(<TheCanThayChua />)
     const a = screen.getByRole('region', { name: 'Học sinh cần chữa' })
     const b = screen.getByRole('region', { name: 'Chữa câu khó & tính toán' })
-    expect(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(within(a).getByRole('button', { name: 'Làm mới' })).toBeTruthy()
     expect(await screen.findByText('Chưa có câu nào cần thầy chữa.')).toBeTruthy()
     // CSS: ô số thứ tự 48, thanh số em, nút ≥ 48 (thang chung), khối B chỉ biến --gvm-*

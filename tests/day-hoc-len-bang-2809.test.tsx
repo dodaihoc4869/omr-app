@@ -185,8 +185,10 @@ describe('màn Lên bảng — thẻ Dạy học', () => {
     const nut = await screen.findByRole('button', { name: 'Chiếu lên bảng' })
     await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
     fireEvent.click(nut)
-    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/buoi-hoc/suc-hoc', expect.objectContaining({ sbd: ['S1', 'S2'] })))
     await waitFor(() => expect(document.querySelector('.lop-xem-phieu iframe')).toBeTruthy())
+    // 21/10: một lượt mạng — bộ chọn phân tầng nhận em có mặt; không còn vòng đọc sức học chạy trước rồi bị thay
+    expect(goi).toHaveBeenCalledWith('/gv/ung-vien-chieu', expect.objectContaining({ sbd: ['S1', 'S2'] }))
+    expect(goi.mock.calls.some(([d]) => d === '/gv/buoi-hoc/suc-hoc')).toBe(false)
     const dong = document.querySelector('.dh-giao')!.closest('li')!
     expect(within(dong).getByText('Trần Bảo')).toBeTruthy()
     expect(within(dong).queryByText('Nguyễn An')).toBeNull()

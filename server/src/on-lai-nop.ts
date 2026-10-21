@@ -63,8 +63,11 @@ export function docTraLoi(ds: unknown[]): BaiLam[] {
     const g = typeof o.giay === 'number' ? o.giay : NaN
     const doc = lamSachDo(o.doGiay)
     // `giay` cũ giữ luật 5..1200; không có thì lấy giây đo thật của `doGiay` (1–900: lượt dưới 5 giây chính là "chưa đọc hết đề", không được bỏ).
-    const giay = Number.isFinite(g) && g >= GIAY_MIN && g <= GIAY_MAX ? Math.round(g) : (doc?.giay ?? null)
-    ra.set(qid, { qid, dapAn, giay, ...(doc ? { doc } : {}) })
+    const tuCu = Number.isFinite(g) && g >= GIAY_MIN && g <= GIAY_MAX
+    const giay = tuCu ? Math.round(g) : (doc?.giay ?? null)
+    // Cờ `dh` (đồng hồ MỚI) chỉ khi cột giay lấy TỪ `doGiay`; giây lấy từ trường `giay` cũ thì bỏ cờ (không trộn hai nguồn đồng hồ).
+    const docGhi = doc && tuCu && doc.dh ? (({ dh: _bo, ...con }) => con)(doc) : doc
+    ra.set(qid, { qid, dapAn, giay, ...(docGhi ? { doc: docGhi } : {}) })
   }
   return [...ra.values()]
 }

@@ -1,0 +1,34 @@
+# ĐẾM LẦN ĐỔI BẢN PAGES (CHỈ ĐỌC) — thầy 21/10 lúc đang dạy: "App liên tục load lại". Mỗi lần Pages đổi bản, máy thầy / em tự tải lại một lần (cap-nhat-app.ts). Hỏi: trong vài giờ qua
+# Pages sống đổi bản mấy lần, từ nguồn nào (workflow phát hành = ad_hoc · tích hợp Git của Cloudflare = github), commit nào. Không in khoá, chỉ in bảng triển khai (mã commit, giờ, nguồn).
+name: Đếm lần đổi bản Pages (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/do-pages-ban-giao-2110.yml']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: do-pages-ban-giao-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Liệt kê triển khai Pages (chỉ đọc)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          echo "== giờ hiện tại (UTC): $(date -u +%H:%M:%S)"
+          echo "== triển khai PRODUCTION gần nhất"
+          npx -y wrangler@4 pages deployment list --project-name omr-app --environment production 2>&1 | head -40 | cut -c1-260
+          echo "== triển khai PREVIEW gần nhất (nhánh, không ảnh hưởng bản sống)"
+          npx -y wrangler@4 pages deployment list --project-name omr-app --environment preview 2>&1 | head -12 | cut -c1-260

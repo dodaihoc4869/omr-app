@@ -56,13 +56,15 @@ export async function gvLop(env: Env): Promise<Dong> {
     }
   }
   let coCot = true
-  let hs = await hoi("SELECT sbd, lop, ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'")
+  // 21/10 (tối ưu tốc độ): hai bảng đọc SONG SONG — một vòng chờ D1 thay vì hai (cột ten_lop thiếu thì đọc lại hoc_sinh như cũ).
+  const [hsDau, dsDoc] = await Promise.all([hoi("SELECT sbd, lop, ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'"), hoi('SELECT sbd, lop FROM danh_sach')])
+  let hs = hsDau
   if (!hs) {
     coCot = false
     hs = await hoi("SELECT sbd, lop, NULL AS ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'")
   }
   if (!hs) return { ok: false, error: 'Không đọc được danh sách học sinh.', soTruyVan: n }
-  const ds = (await hoi('SELECT sbd, lop FROM danh_sach')) ?? []
+  const ds = dsDoc ?? []
   const em = new Map<string, { khoi: string; tenLop: string }>()
   for (const x of hs) {
     const sbd = chuoi(x.sbd)

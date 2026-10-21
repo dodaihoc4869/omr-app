@@ -16,7 +16,7 @@
 // — `CUM_TINH_LY_THUYET`) để "Tính chất hoá học của ammonia là" không thành câu tính toán.
 // TỰ LUẬN: thầy TỰ CHỌN đề ⇒ câu tự luận có trong tờ vẫn hiện, ghi nhãn "Tự luận" (luật CLAUDE.md "riêng Gọi lên bảng thầy chọn gì hiện đúng thế" —
 // cùng cách bảng Dạy học `cauTuDeChon`). Đây KHÔNG phải kênh rút đề tự động.
-import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
+import { soSao, type CanChua, type TeacherExamSource, type TeacherMcqQuestion, type TeacherShortAnswerQuestion, type TeacherTrueFalseQuestion } from '../data/examContent'
 import { dangCua } from './dang-cau'
 import { laCauTuLuan } from './cau-tu-luan'
 import { qidMayChuCuaIdCau } from './lich-su-cau-len-bang'
@@ -52,6 +52,14 @@ export function laCauTinhToan(
   return MAU_TINH_TOAN_GOI_7.test(`${text} ${boCumLyThuyet(c.tenDang)}`)
 }
 
+/** CÂU KHÓ (thầy chốt 21/10): mức Vận dụng (kho đã gộp VDC vào `van_dung` lúc nạp — `chuanHoaMucDo`) HOẶC câu 2 sao cần chữa (`canChua.sao`, đọc qua `soSao`).
+ *  Trước 21/10 hàm xếp đọc nhầm `q.sao` (không có trường này) và so `VDC`/`van_dung_cao` (kho không bao giờ có) ⇒ không câu nào được nhận là khó. */
+export function laCauKho(q: { mucDo?: string; canChua?: CanChua } | null | undefined): boolean {
+  if (!q) return false
+  const m = String(q.mucDo ?? '').toLowerCase()
+  return soSao(q) === 2 || m === 'van_dung' || m === 'van_dung_cao' || m === 'vdc' || m === 'vd'
+}
+
 /** Một câu của đề thầy chọn, sẵn để xếp + chiếu. */
 export interface CauTuChua {
   /** Id câu trong kho (khoá React, khoá tra). */
@@ -67,6 +75,8 @@ export interface CauTuChua {
   thuTuDe: number
   q: CauGocTuChua
   tinhToan: boolean
+  /** `laCauKho`: Vận dụng hoặc 2 sao. */
+  kho: boolean
   tuLuan: boolean
   /** Câu không có chữ đề lẫn hình trên máy này ⇒ tờ chiếu dùng dòng thay thế. */
   thieuNoiDung: boolean
@@ -104,6 +114,7 @@ export function cauCuaDe(dsTo: readonly TeacherExamSource[]): CauTuChua[] {
           thuTuDe: ra.length,
           q,
           tinhToan: laCauTinhToan({ phan, text: q.text, luaChon, dapAn, mucDo: q.mucDo, kieu: (q as { kieu?: string }).kieu, tenDang: q.dang?.ten }, tuLuan),
+          kho: laCauKho(q),
           tuLuan,
           thieuNoiDung: !coNoiDung(q),
         })
@@ -129,11 +140,16 @@ export function hangCau(c: Pick<CauTuChua, 'phan' | 'tinhToan'>): 0 | 1 | 2 | 3 
   return c.tinhToan ? 2 : 3
 }
 
+/** Câu khó hoặc có tính toán — đúng điều kiện công tắc "Chỉ hiện câu khó & tính toán". Đối tượng không mang `kho` ⇒ tính từ `q`. */
+export function laCauKhoHoacTinh(c: { tinhToan: boolean; kho?: boolean; q?: unknown }): boolean {
+  return c.tinhToan || (c.kho ?? laCauKho(c.q as Parameters<typeof laCauKho>[0]))
+}
+
 /** Trộn chung nhóm ưu tiên, ổn định theo buổi; giữ nguyên mảng vào, câu còn lại theo đề. */
 export function xepThuTuChua<T extends Pick<CauTuChua, 'phan' | 'tinhToan' | 'thuTuDe'>>(ds: readonly T[], soLop?:ReadonlyMap<string,{sai:number;lam:number}>|null,seed=sinhMaNgauNhien()): T[] {
   const hash=(s:string)=>{let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
   const key=(c:T)=>String((c as T&{qid?:string}).qid??c.thuTuDe)
-  const uu=(c:T)=>{const q=(c as T&{q?:{sao?:number;mucDo?:string}}).q,g=soLop?.get(key(c));return c.tinhToan||Number(q?.sao)>=2||['VDC','van_dung_cao'].includes(q?.mucDo??'')||!!g&&g.lam>=5&&g.sai/g.lam>=0.3}
+  const uu=(c:T)=>{const g=soLop?.get(key(c));return laCauKhoHoacTinh(c)||!!g&&g.lam>=5&&g.sai/g.lam>=0.3}
   const unique=[...new Map(ds.map(c=>[key(c),c])).values()].sort((a,b)=>a.thuTuDe-b.thuTuDe)
   let state=hash(seed)||1
   const a=unique.filter(uu)
@@ -142,11 +158,12 @@ export function xepThuTuChua<T extends Pick<CauTuChua, 'phan' | 'tinhToan' | 'th
 }
 
 /** Đếm cho dòng tóm tắt. */
-export function demTuChua(ds: readonly CauTuChua[]): { tong: number; dungSai: number; tinhToan: number; tuLuan: number; thieu: number } {
+export function demTuChua(ds: readonly CauTuChua[]): { tong: number; dungSai: number; tinhToan: number; kho: number; tuLuan: number; thieu: number } {
   return {
     tong: ds.length,
     dungSai: ds.filter((c) => c.phan === 'II').length,
     tinhToan: ds.filter((c) => c.tinhToan).length,
+    kho: ds.filter((c) => c.kho).length,
     tuLuan: ds.filter((c) => c.tuLuan).length,
     thieu: ds.filter((c) => c.thieuNoiDung).length,
   }

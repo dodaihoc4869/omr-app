@@ -14,7 +14,10 @@
 // tới bài đang chọn (`nho` của HopChonDe); (2) phần nhớ theo buổi KHÔNG đè lựa chọn thầy vừa làm khi buổi mới có (bấm Điểm danh / buổi về muộn) —
 // lựa chọn theo sang buổi ấy; đổi sang buổi KHÁC thật thì nạp phần nhớ của buổi đó và BÁO; (3) "Dùng" lại đúng bộ cũ không xoá câu đã bỏ / em đã gọi;
 // (4) lớp + bài đang chọn của bước Bài hôm nay nhớ cùng buổi (mở lại màn vẫn còn). Khoá nhớ `ddh.dayHoc.<buổi>` GIỮ NGUYÊN, chỉ thêm hai trường.
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
+// 21/10 — thầy: "bỏ cái phần tick bài vừa dạy khỏi hành trình đi" (bản vẽ docs/ban-ve-hanh-trinh-2110): khi NHÚNG (bước 3 "Dạy học" của Hành trình)
+// không còn khối Tick bài, không đọc cờ OMNI; `sauBaiHomNay` (Bài đang giao) nằm cuối bước 3. Hai trường nhớ lớp + bài của khoá `ddh.dayHoc.<buổi>`
+// nay do hộp "Bổ sung bài hôm nay" (`HopBoSungBai.tsx`) và màn Lên bảng ghi ⇒ khi nhúng, ghi phần nhớ GIỮ NGUYÊN hai trường ấy (không ghi đè null).
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Check, Eye, EyeOff, Lightbulb, MonitorPlay, RefreshCw, Shuffle, UserCheck, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
@@ -24,22 +27,26 @@ import { thayChuaQuaMayChu, useGhiToChieu } from '../chien-dich/ghi-to-chieu'
 import { ngayVn } from '../chien-dich/ngay'
 import { laySucHoc } from '../../lib/buoi-hoc-api'
 import { cauTuDeChon, demCau, dungToChieuDayHoc, khoDayHoc, tomTatDe, type CauDayHoc, type EmLenCau } from '../../lib/day-hoc-len-bang'
-import { chonEmChoCau, mucCauSo, TEN_MUC_CAU, xepEmChoDanhSach, type KetQuaChon, type SucHocEm } from '../../lib/chon-em-day-hoc'
+import { chonEmChoCau, mucCauSo, TEN_MUC_CAU, type KetQuaChon, type SucHocEm } from '../../lib/chon-em-day-hoc'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { ChemText } from '../../lib/chem-format'
 import TheCauHienThi from './TheCauHienThi'
 import { BuocDiemDanh, useDiemDanhBuoi, type DiemDanhBuoi } from './DiemDanhBuoi'
 import { BuocBaiHomNay, DongChoBaiMoi, useBaiHomNay, type BaiChonNho, type BaiHomNay } from './BaiHomNay'
+import { KhoiChonEm, ChipTang } from '../goi-len-bang/ChonEm'
+import { docCheDo, phanBoGoi, type CheDoChonEm, type Tang } from '../../lib/chon-em-phan-tang'
 import './day-hoc.css'
 
 /** Chữ tấm chiếu mã điểm danh — nay nằm ở `DiemDanhBuoi.tsx` (dùng chung với Kiểm tra đầu giờ); giữ lối xuất cũ. */
 export { CHU_DIEM_DANH } from './DiemDanhBuoi'
+/** Bước Bài hôm nay — hộp "Bổ sung bài hôm nay" nhập qua đây để cùng mảnh với bảng (không tách mảnh riêng, 21/10). */
+export { BuocBaiHomNay, useBaiHomNay, type BaiChonNho } from './BaiHomNay'
 
 /** Nhớ trên máy theo buổi: đề đã tích, câu đã bỏ, em đã giao + (đợt 16) lớp thầy tự chọn và bài đang chọn ở bước Bài hôm nay. Hỏng/không có ⇒ bắt đầu trống. */
 interface NhoBuoi {
   maChon: string[]
   boCau: string[]
-  giao: Record<string, { sbd: string; hoTen: string; xacSuat: number; uocLuong: boolean; lyDo: string; boQua: string[]; daDung?:boolean }>
+  giao: Record<string, { sbd: string; hoTen: string; xacSuat: number; uocLuong: boolean; lyDo: string; boQua: string[]; daDung?:boolean; tang?:Tang; chuaCo?:boolean }>
   lopNhan: string[] | null
   baiChon: BaiChonNho | null
 }
@@ -82,11 +89,9 @@ export function daTickHomNay(bhn: Pick<BaiHomNay, 'lopChon' | 'dsTheoLop' | 'hom
 export interface TuyChonDayHoc {
   /** Điểm danh dùng chung do cha tạo (mục Hành trình "Dạy học & đầu giờ"): có ⇒ KHÔNG tạo buổi riêng, KHÔNG vẽ bước Điểm danh. */
   dd?: DiemDanhBuoi
-  /** Số của bước "Dạy và chiếu câu" (bước "Tick bài vừa dạy" = số này + 1). Chỉ khi có `dd`; mặc định 3. */
+  /** Số của bước "Dạy học" trong Hành trình. Chỉ khi có `dd`; mặc định 3. */
   soBuocDau?: number
-  /** Tăng mỗi lần thầy bấm "Bổ sung bài" (Hôm nay / lối vào khác) ⇒ mở bước Bài hôm nay. Chỉ khi có `dd`. */
-  lanBoSung?: number
-  /** Khối thêm ở cuối bước "Tick bài vừa dạy" (bảng Bài đang giao). Chỉ khi có `dd`. */
+  /** Khối thêm ở cuối bước "Dạy học" (bảng Bài đang giao). Chỉ khi có `dd`. */
   sauBaiHomNay?: ReactNode
   /** Báo cha hai bước đã xong chưa (thanh bước): `day` = đã mở tờ chiếu / đã ghi kết quả em lên bảng; `tick` = lớp đã có bài tick hôm nay. */
   onTrangThai?: (t: { day: boolean; tick: boolean }) => void
@@ -101,7 +106,7 @@ function DayHocTuTao() {
   return <DayHocThan dd={dd} nhung={false} />
 }
 
-function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onTrangThai }: Omit<TuyChonDayHoc, 'dd'> & { dd: DiemDanhBuoi; nhung: boolean }) {
+function DayHocThan({ dd, nhung, soBuocDau = 3, sauBaiHomNay, onTrangThai }: Omit<TuyChonDayHoc, 'dd'> & { dd: DiemDanhBuoi; nhung: boolean }) {
   const showToast = useAppStore((s) => s.showToast)
 
   // ───── 1 · ĐIỂM DANH (dùng chung với Kiểm tra đầu giờ — `DiemDanhBuoi.tsx`) ─────
@@ -114,6 +119,9 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   const [maChon, setMaChon] = useState<Set<string>>(new Set())
   const [boCau, setBoCau] = useState<Set<string>>(new Set())
   const [giao, setGiao] = useState<NhoBuoi['giao']>({})
+  // Gọi lên bảng phân tầng (21/10): chế độ nhớ theo kênh; mỗi lần "Chọn lại em" rút lượt mới (hạt giống khác).
+  const [cheDo, setCheDo] = useState<CheDoChonEm>(() => docCheDo('day-hoc'))
+  const [luotRut, setLuotRut] = useState(0)
   // Hộp chọn bài dựng lại mỗi lần mở ⇒ giữ chữ tìm + chip khối ở đây (đợt 16).
   const nhoHop = useRef<NhoHopChonDe | null>(null)
 
@@ -148,8 +156,8 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   useEffect(() => {
     if (maChon.size && !kho) void napKho()
   }, [maChon, kho, napKho])
-  // ───── 4 · BÀI HÔM NAY (OMNI 3) — dùng chung kho Dạy học đã nạp; ẩn hẳn khi OMNI tắt ─────
-  const bhn = useBaiHomNay(dd, kho, napKho)
+  // ───── 4 · BÀI HÔM NAY (OMNI 3) — dùng chung kho Dạy học đã nạp; ẩn hẳn khi OMNI tắt. Nhúng ở Hành trình ⇒ không có bước này, không đọc cờ. ─────
+  const bhn = useBaiHomNay(dd, kho, napKho, { docCo: !nhung })
 
   // ───── NHỚ THEO BUỔI: nạp một lần mỗi buổi, ghi lại mỗi lần đổi ─────
   const daNap = useRef('')
@@ -157,6 +165,12 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   const banDaNap = useRef('')
   const lopNhan = bhn.lopTay
   const baiChon = bhn.chonNho
+  /** Nhúng ⇒ hai trường lớp + bài là của hộp Bổ sung bài: giữ bản đang lưu, không ghi đè. */
+  const ghiNho = (k: string, n: NhoBuoi) => {
+    if (!nhung) return ghiNhoBuoi(k, n)
+    const cu = docNhoBuoi(k)
+    ghiNhoBuoi(k, { ...n, lopNhan: cu.lopNhan, baiChon: cu.baiChon })
+  }
   useEffect(() => {
     const k = idBuoi || '_'
     const cu = daNap.current
@@ -166,7 +180,7 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
     const chuHien = JSON.stringify(hien)
     // Buổi vừa có (bấm Điểm danh / buổi đang mở về muộn) sau khi thầy đã chọn ⇒ lựa chọn vừa làm THEO SANG buổi này, không bị phần nhớ đè.
     if (cu && (cu === '_' || k === '_') && chuHien !== banDaNap.current) {
-      ghiNhoBuoi(k, hien)
+      ghiNho(k, hien)
       banDaNap.current = chuHien
       return
     }
@@ -183,7 +197,8 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idBuoi])
   useEffect(() => {
-    if (daNap.current) ghiNhoBuoi(daNap.current, { maChon: [...maChon], boCau: [...boCau], giao, lopNhan, baiChon })
+    if (daNap.current) ghiNho(daNap.current, { maChon: [...maChon], boCau: [...boCau], giao, lopNhan, baiChon })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maChon, boCau, giao, lopNhan, baiChon])
 
   const tatCaCau = useMemo(() => (kho ? cauTuDeChon(kho, maChon) : []), [kho, maChon])
@@ -205,7 +220,8 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
 
   const [xemLoiGiai, setXemLoiGiai] = useState<Set<string>>(new Set())
 
-  const moTo = async (coEm: boolean, giaoMoi = giao) => {
+  /** giu=true (mở lại / đổi em): em đang giao ở các câu được giữ nguyên; false: rút lại cả tờ. */
+  const moTo = async (coEm: boolean, giaoMoi = giao, tc: { cheDo?: CheDoChonEm; luot?: number; giu?: boolean; doi?: string } = {}) => {
     if (!cauChieu.length) {
       showToast('Chưa chọn câu nào để chiếu', 'warn')
       return
@@ -222,8 +238,10 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
           m.set(c.khoa, { sbd: g.sbd, hoTen: g.hoTen, lop: lopCuaEm.get(g.sbd) || tt?.buoi.lop || undefined, lanLenBang: lan })
         }
       const boQua=new Map(cauChieu.map(c=>[c.qid,new Set(giaoMoi[c.khoa]?.boQua??[])]))
-      const { html: h, o, emGoi } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined, false,coMat.map(e=>e.sbd),boQua)
-      if(coEm){const moi:NhoBuoi['giao']={};for(const [k,e] of emGoi)moi[k]={sbd:e.sbd,hoTen:e.ten,xacSuat:e.p??0.3,uocLuong:e.loai==='du_bao',daDung:e.loai==='da_dung',lyDo:e.loai==='da_dung'?'Đã tự làm đúng câu này':'Dự kiến làm được câu này',boQua:giaoMoi[k]?.boQua??[]};setGiao(moi)}
+      const giu = tc.giu ?? true
+      const coDinh = new Map(giu ? cauChieu.flatMap((c) => (c.khoa !== tc.doi && giaoMoi[c.khoa] && !giaoMoi[c.khoa]!.boQua.includes(giaoMoi[c.khoa]!.sbd) ? [[c.qid, giaoMoi[c.khoa]!.sbd] as const] : [])) : [])
+      const { html: h, o, emGoi } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined, false,coMat.map(e=>e.sbd),boQua,{ cheDo: tc.cheDo ?? cheDo, hatGiong: `day-hoc|${idBuoi}|${tc.luot ?? luotRut}`, coDinh })
+      if(coEm){const moi:NhoBuoi['giao']={};for(const [k,e] of emGoi)moi[k]={sbd:e.sbd,hoTen:e.ten,xacSuat:e.p??0.3,uocLuong:e.loai==='du_bao',daDung:e.loai==='da_dung',chuaCo:e.loai==='chua_co',tang:e.tang,lyDo:e.lyDo??(e.loai==='da_dung'?'Đã tự làm đúng câu này':'Dự kiến làm được câu này'),boQua:giaoMoi[k]?.boQua??[]};setGiao(moi)}
       ganO(ma, o)
       setHtml(h)
       setDaChieu(true)
@@ -250,20 +268,29 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
 
   const chieuLenBang = async () => {
     if (!coMat.length || !cauChieu.length) return
-    setDangChieu(true)
-    const sh = await napSucHoc()
-    const kq = xepEmChoDanhSach(cauChieu.map(cauChon), coMat, sh)
-    const moi: NhoBuoi['giao'] = {}
-    cauChieu.forEach((c, i) => {
-      const k = kq[i]
-      if (k) moi[c.khoa] = { sbd: k.sbd, hoTen: k.hoTen, xacSuat: k.xacSuat, uocLuong: k.uocLuong, lyDo: k.lyDo, boQua: [] }
-    })
-    setGiao(moi)
-    await moTo(true, moi)
+    // 21/10: một lượt mạng — bộ chọn phân tầng trong `moTo` chọn em cho cả tờ (bỏ vòng đọc sức học + chọn kiểu cũ chạy trước rồi bị thay).
+    const luot = luotRut + 1
+    setLuotRut(luot)
+    await moTo(true, {}, { luot, giu: false })
   }
+
+  const doiCheDo = (v: CheDoChonEm) => {
+    setCheDo(v)
+    if (cauChieu.some((c) => giao[c.khoa])) void moTo(true, giao, { cheDo: v, giu: false })
+  }
+  const phanBo = useMemo(() => phanBoGoi(cauChieu.flatMap((c) => { const g = giao[c.khoa]; return g?.tang ? [{ sbd: g.sbd, tang: g.tang }] : [] })), [cauChieu, giao])
 
   const doiEm = async (c: CauDayHoc) => {
     const cu = giao[c.khoa]
+    if (html && cu) {
+      // Tờ đang mở: rút lại riêng câu này trong bộ chọn phân tầng (một lượt mạng), trừ các em đã bỏ qua; hết em ⇒ quay vòng, chỉ trừ em đang đứng.
+      let bo = [...new Set([...cu.boQua, cu.sbd])]
+      if (coMat.every((e) => bo.includes(e.sbd))) bo = [cu.sbd]
+      const moi = { ...giao, [c.khoa]: { ...cu, boQua: bo } }
+      setGiao(moi)
+      await moTo(true, moi, { doi: c.khoa })
+      return
+    }
     const sh = Object.keys(sucHoc).length ? sucHoc : await napSucHoc()
     const daGoi: Record<string, number> = {}
     for (const x of cauChieu) if (x.khoa !== c.khoa && giao[x.khoa]) daGoi[giao[x.khoa]!.sbd] = (daGoi[giao[x.khoa]!.sbd] ?? 0) + 1
@@ -281,7 +308,6 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
     }
     const moi = { ...giao, [c.khoa]: { sbd: k.sbd, hoTen: k.hoTen, xacSuat: k.xacSuat, uocLuong: k.uocLuong, lyDo: k.lyDo, boQua: [...boQua] } }
     setGiao(moi)
-    if (html) await moTo(true, moi)
   }
 
   const ghiKq = async (c: CauDayHoc, dat: boolean) => {
@@ -298,20 +324,6 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   useEffect(() => {
     if (nhung) onTrangThai?.({ day: dayXong, tick: tickHomNay })
   }, [nhung, dayXong, tickHomNay, onTrangThai])
-  // Bước Bài hôm nay GẬP sẵn trong buổi dạy (bản vẽ 12/10: bước 4 chỉ hiện bảng Bài đang giao); "Tick bài hôm nay" / "Bổ sung bài" mở rồi cuộn tới.
-  const [moTick, setMoTick] = useState(lanBoSung > 0)
-  const [lanCuonTick, setLanCuonTick] = useState(0)
-  useEffect(() => {
-    if (lanBoSung > 0) setMoTick(true)
-  }, [lanBoSung])
-  const khungTick = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (!lanCuonTick) return
-    const giamChuyenDong = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    khungTick.current?.scrollIntoView?.({ block: 'start', behavior: giamChuyenDong ? 'auto' : 'smooth' })
-  }, [lanCuonTick])
-  const idKhungTick = useId()
-
   const moHopChon = () => {
     setMaTam(new Set(maChon))
     setHopMo(true)
@@ -408,8 +420,9 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
                     <div className="dh-giao">
                       <span className="dh-giao-em">
                         <UserCheck size={16} aria-hidden="true" /> <b>{g.hoTen || g.sbd}</b>
+                        {g.tang && <ChipTang tang={g.tang} />}
                         <span className="dh-giao-p" title={g.lyDo}>
-                          {g.daDung?'Đã tự làm đúng câu này':`khả năng đúng ≈ ${pt(g.xacSuat)}`}
+                          {g.daDung?'Đã tự làm đúng câu này':g.chuaCo?'Chưa có số đo câu này':`khả năng đúng ≈ ${pt(g.xacSuat)}`}
                         </span>
                         {g.uocLuong && <span className="dh-chip dh-chip--vang">Ước lượng</span>}
                       </span>
@@ -445,9 +458,11 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
     ? 'Chọn câu ở bước 2 trước.'
     : !coMat.length
       ? `${cauChieu.length} câu sẵn sàng — cần danh sách có mặt (bước 1) để app gọi em.`
-      : `${cauChieu.length} câu · ${coMat.length} em có mặt. App chọn em có mức ≥ mức độ câu, khả năng đúng cao nhất; mỗi em tối đa 2 lần.`
+      : `${cauChieu.length} câu · ${coMat.length} em có mặt.`
 
   const hangChieu = (
+    <>
+    {coMat.length > 0 && <KhoiChonEm kenh="day-hoc" cheDo={cheDo} onDoi={doiCheDo} phanBo={phanBo} />}
     <div className="dh-hang">
       <button type="button" className="m3-nut-chinh dh-nut" disabled={dangChieu || !cauChieu.length || !coMat.length} onClick={() => void chieuLenBang()}>
         <MonitorPlay size={18} aria-hidden="true" /> {dangChieu ? 'Đang dựng tờ chiếu…' : coGiao ? 'Chọn lại em và chiếu' : 'Chiếu lên bảng'}
@@ -461,6 +476,7 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
         </button>
       )}
     </div>
+    </>
   )
 
   const hopChon = hopMo && (
@@ -536,17 +552,16 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
 
   if (nhung) {
     const so3 = soBuocDau
-    const so4 = soBuocDau + 1
     return (
       <>
-        {/* ───── BƯỚC 3 · DẠY VÀ CHIẾU CÂU (Chọn câu + Chiếu của bảng đầy đủ) ───── */}
+        {/* ───── BƯỚC 3 · DẠY HỌC (Chọn câu + Chiếu của bảng đầy đủ) + Bài đang giao ───── */}
         <section className="dh-buoc gvv2-bd-buoc" data-buoc={so3} data-khoi="buoc-day-chieu" aria-labelledby={`bd-b${so3}`}>
           <div className="dh-buoc-dau">
             <span className="dh-so" aria-hidden="true">
               {so3}
             </span>
             <div className="dh-buoc-ten">
-              <h2 id={`bd-b${so3}`}>Dạy và chiếu câu</h2>
+              <h2 id={`bd-b${so3}`}>Dạy học</h2>
               <p>
                 {maChon.size && kho && cauChieu.length
                   ? moTaChieu
@@ -561,44 +576,6 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
           </div>
           {maChon.size > 0 && danhSachCau}
           {maChon.size > 0 && kho && cauChieu.length > 0 && hangChieu}
-        </section>
-
-        {/* ───── BƯỚC 4 · TICK BÀI VỪA DẠY (Bài hôm nay gập sẵn + bảng Bài đang giao) ───── */}
-        <section className="dh-buoc gvv2-bd-buoc" data-buoc={so4} data-khoi="buoc-tick-bai" aria-labelledby={`bd-b${so4}`}>
-          <div className="dh-buoc-dau">
-            <span className="dh-so" aria-hidden="true">
-              {so4}
-            </span>
-            <div className="dh-buoc-ten">
-              <h2 id={`bd-b${so4}`}>Tick bài vừa dạy</h2>
-              <p>Tick xong, app giao bài đó cho lớp trong 7 ngày: mỗi em gặp đủ câu gốc rồi tự làm.</p>
-            </div>
-            {bhn.bat && (
-              <div className="gvv2-bd-nut">
-                <button
-                  type="button"
-                  className="m3-nut-chinh dh-nut"
-                  aria-expanded={moTick}
-                  aria-controls={idKhungTick}
-                  onClick={() => {
-                    setMoTick(true)
-                    setLanCuonTick((n) => n + 1)
-                  }}
-                >
-                  {tickHomNay ? 'Bổ sung bài' : 'Tick bài hôm nay'}
-                </button>
-              </div>
-            )}
-          </div>
-          <DongChoBaiMoi bhn={bhn} />
-          {!bhn.co && bhn.dangTaiCo && <p className="dh-phu" role="status">Đang đọc cấu hình giao bài…</p>}
-          {bhn.loiCo && <div className="dh-hang"><p className="dh-loi" role="alert">Chưa tải được phần Tick bài: {bhn.loiCo}</p><button type="button" className="m3-nut-vien dh-nut-nho" disabled={bhn.dangTaiCo} onClick={() => void bhn.taiCo()}>Thử tải Tick bài lại</button></div>}
-          {bhn.co && !bhn.bat && <p className="dh-phu">Tick bài vừa dạy cần bật OMNI cho lớp ở Cài đặt › OMNI (theo lớp).</p>}
-          {bhn.bat && moTick && (
-            <div id={idKhungTick} ref={khungTick} className="gvv2-bd-tick">
-              <BuocBaiHomNay bhn={bhn} kho={kho} loiKho={loiKho} thuKho={() => void napKho()} soBuoc={so4} />
-            </div>
-          )}
           {sauBaiHomNay}
         </section>
         {hopChon}

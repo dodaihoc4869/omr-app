@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản vẽ Gọi lên bảng phân tầng</title>
+<!-- BẢN VẼ HÀNH TRÌNH GIỎI HÓA · MỘT TRANG 4 BƯỚC (21/10) — thầy: "bỏ thẻ dạy học và đầu giờ và thẻ chữa bài đi, phần này sẽ theo tiến trình
+     từ trên xuống dưới, 1 điểm danh, 2 là gọi lên bảng đầu giờ, 3 dạy học, 4 chữa câu khó và tính toán … vẽ trước khi tôi duyệt build".
+     CHỈ là bản vẽ: số liệu GIẢ, chưa sửa src/. Màu = đúng tên + giá trị biến --gvm-* của src/styles/tokens.css (sáng + tối), không màu mới.
+     Nhãn nhỏ "Mới / Đổi / Giữ / Bỏ" chỉ để thầy đọc bản vẽ, KHÔNG có trong app.
+     Mở từng khung: #k=<diem-danh|day-hoc|chua-cau>&toi=1 (xem scripts/chup-ban-ve-hanh-trinh-2110.mjs). -->
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-600-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-800-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-800-normal.woff2) format('woff2')}
+
+/* Biến chuẩn app thầy (cùng tên, cùng giá trị src/styles/tokens.css) */
+:root{--gvm-nen:#f6f7fc;--gvm-mat:#fff;--gvm-mat-2:#eef1fa;--gvm-vien:#dde2f0;--gvm-chu:#1a1c24;--gvm-chu-2:#454a5c;--gvm-chu-3:#5f6579;
+ --gvm-xd:#1f5fd6;--gvm-xd-nen:#dbe6ff;--gvm-xd-dam:#0b2f75;--gvm-xl:#0f8a5f;--gvm-xl-nen:#c9f2de;--gvm-xl-dam:#04402a;
+ --gvm-hp:#b86a00;--gvm-hp-nen:#ffe2b3;--gvm-hp-dam:#4d2c00;--gvm-ho:#c42a5c;--gvm-ho-nen:#ffd9e3;--gvm-ho-dam:#5c0a27;
+ --gvm-tim:#6a4fd8;--gvm-tim-nen:#e7defe;--gvm-tim-dam:#2a1872;--gvm-tren-dac:#fff;
+ --gvm-bong:0 1px 2px rgb(30 40 80 / .06),0 4px 14px rgb(30 40 80 / .06);--gvm-bong-nut:0 2px 8px rgb(31 95 214 / .35);
+ --sans:'Be Vietnam Pro','Noto Sans',system-ui,sans-serif;color-scheme:light}
+:root[data-toi]{--gvm-nen:#10131c;--gvm-mat:#181c27;--gvm-mat-2:#1f2433;--gvm-vien:#2c3245;--gvm-chu:#e8eaf3;--gvm-chu-2:#b9bed1;--gvm-chu-3:#8c92a8;
+ --gvm-xd:#9cbcff;--gvm-xd-nen:#1d3363;--gvm-xd-dam:#dbe6ff;--gvm-xl:#6fdcab;--gvm-xl-nen:#0f3d2b;--gvm-xl-dam:#c9f2de;
+ --gvm-hp:#ffc164;--gvm-hp-nen:#43290a;--gvm-hp-dam:#ffe2b3;--gvm-ho:#ff8fb0;--gvm-ho-nen:#4d1428;--gvm-ho-dam:#ffd9e3;
+ --gvm-tim:#c3b3ff;--gvm-tim-nen:#2d2352;--gvm-tim-dam:#e7defe;--gvm-tren-dac:#0b1a3a;
+ --gvm-bong:0 1px 2px rgb(0 0 0 / .3);--gvm-bong-nut:0 1px 2px rgb(0 0 0 / .3);color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--gvm-nen);color:var(--gvm-chu);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,select{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button{background:none;border:0;padding:0}
+h1,h2,h3,p,ol,ul{margin:0;padding:0}ol,ul{list-style:none}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.so{font-variant-numeric:tabular-nums}
+.khung{display:none}.khung[data-mo]{display:block}
+
+/* nhãn đọc bản vẽ (không có trong app) */
+.tag{display:inline-block;vertical-align:middle;margin-left:8px;padding:1px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-style:normal;border:1px dashed currentColor}
+.tag[data-t=moi]{color:var(--gvm-tim)}.tag[data-t=doi]{color:var(--gvm-hp)}.tag[data-t=giu]{color:var(--gvm-chu-3)}
+
+/* ── khung app thầy ── */
+.app{display:flex;min-height:100dvh}
+.ben{display:none}
+.tren{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--gvm-vien);background:var(--gvm-mat)}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--gvm-xd);color:var(--gvm-tren-dac);display:grid;place-items:center;font-weight:800;font-size:15px;flex:none}
+.tren b{flex:1;font-size:16px}
+.nut-tron{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--gvm-chu-2)}
+.chinh{flex:1;min-width:0;display:flex;flex-direction:column}
+.noi{padding:20px 16px 48px;min-width:0}
+@media (min-width:1024px){
+ .tren{display:none}
+ .ben{display:flex;flex-direction:column;gap:4px;width:232px;flex:none;padding:20px 14px;border-right:1px solid var(--gvm-vien);background:var(--gvm-mat)}
+ .ben .hieu{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;font-weight:800}
+ .ben a{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 14px;border-radius:14px;color:var(--gvm-chu-2);font-weight:600;text-decoration:none}
+ .ben a[aria-current]{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam);font-weight:800}
+ .ben a .dem{margin-left:auto;min-width:26px;height:24px;padding:0 8px;border-radius:999px;background:var(--gvm-hp-nen);color:var(--gvm-hp-dam);font-size:13px;font-weight:800;display:grid;place-items:center}
+ .ben .gian{flex:1}
+ .noi{padding:32px 36px 64px}
+}
+
+/* ── đầu màn ── */
+.dau{margin-bottom:20px}
+.h1{font-size:clamp(24px,3vw,32px);font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.phu{margin-top:4px;font-size:15px;color:var(--gvm-chu-2)}
+
+/* ── bố cục: thước tiến trình + các bước ── */
+.bo-cuc{display:grid;gap:16px;min-width:0}
+@media (min-width:1180px){.bo-cuc{grid-template-columns:272px minmax(0,1fr);gap:24px;align-items:start}}
+
+/* thước tiến trình — MỘT điều khiển duy nhất: dọc dính bên trái (máy tính), ngang dính trên (điện thoại, ngang) */
+.thuoc{position:sticky;top:0;z-index:3;background:var(--gvm-nen);padding:4px 0 8px;margin:0 -16px;padding-inline:16px}
+.thuoc-buoi{display:none}
+.thuoc ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:6px;border:1px solid var(--gvm-vien);border-radius:18px;background:var(--gvm-mat)}
+.thuoc li button{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;min-height:64px;padding:6px 2px;border-radius:12px;color:var(--gvm-chu-2);font-size:12.5px;font-weight:700;line-height:1.2;text-align:center}
+.thuoc li[data-tt=dang] button{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
+.thuoc .tt-phu{display:none}
+.vong{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;background:var(--gvm-mat-2);color:var(--gvm-chu-2);flex:none}
+.vong svg.i{width:16px;height:16px;stroke-width:3}
+[data-tt=xong] .vong{background:var(--gvm-xl);color:var(--gvm-tren-dac)}
+[data-tt=dang] .vong{background:var(--gvm-xd);color:var(--gvm-tren-dac)}
+[data-tt=tudo] .vong{background:var(--gvm-hp-nen);color:var(--gvm-hp-dam)}
+@media (min-width:1180px){
+ .thuoc{top:24px;margin:0;padding:18px;border:1px solid var(--gvm-vien);border-radius:24px;background:var(--gvm-mat);box-shadow:var(--gvm-bong)}
+ .thuoc-buoi{display:block;padding-bottom:14px;margin-bottom:10px;border-bottom:1px solid var(--gvm-vien)}
+ .thuoc-buoi small{display:block;font-size:13px;font-weight:700;color:var(--gvm-chu-3);text-transform:uppercase;letter-spacing:.04em}
+ .thuoc-buoi b{display:block;margin-top:2px;font-size:17px}
+ .thuoc-buoi span{font-size:14px;color:var(--gvm-chu-2)}
+ .thuoc ol{display:block;padding:0;border:0;background:none}
+ .thuoc li{position:relative}
+ .thuoc li:not(:last-child)::after{content:'';position:absolute;left:24px;top:52px;bottom:-6px;width:2px;border-radius:2px;background:var(--gvm-vien)}
+ .thuoc li[data-tt=xong]:not(:last-child)::after{background:var(--gvm-xl)}
+ .thuoc li button{flex-direction:row;align-items:flex-start;gap:12px;min-height:72px;padding:10px;text-align:left;font-size:15px}
+ .thuoc li+li{margin-top:6px}
+ .thuoc .tt-ten{display:grid;gap:2px;padding-top:4px}
+ .thuoc .tt-phu{display:block;font-size:13px;font-weight:500;color:var(--gvm-chu-3)}
+ .thuoc li[data-tt=dang] .tt-phu{color:var(--gvm-xd-dam)}
+ .thuoc li[data-tt=xong] .tt-phu{color:var(--gvm-xl)}
+ .thuoc li[data-tt=tudo] .tt-phu{color:var(--gvm-hp)}
+ .thuoc .ten-dai{display:inline}.thuoc .ten-ngan{display:none}
+}
+.ten-dai{display:none}
+
+/* ── thẻ bước ── */
+.cac-buoc{display:grid;gap:14px;min-width:0}
+.buoc{border:1px solid var(--gvm-vien);border-radius:24px;background:var(--gvm-mat);min-width:0}
+.buoc[data-tt=dang]{border:2px solid var(--gvm-xd);box-shadow:var(--gvm-bong)}
+.buoc-dau{display:flex;align-items:center;gap:14px;padding:16px 18px;min-width:0}
+.buoc[data-tt=dang] .buoc-dau{padding:20px 22px 6px}
+.buoc .vong{width:40px;height:40px;font-size:17px}
+.buoc .vong svg.i{width:20px;height:20px}
+.buoc-ten{flex:1;min-width:0}
+.buoc-ten h2{font-size:18px;font-weight:800;line-height:1.3}
+.buoc[data-tt=dang] .buoc-ten h2{font-size:21px}
+.buoc-ten p{margin-top:2px;font-size:14.5px;color:var(--gvm-chu-2)}
+.buoc[data-tt=xong] .buoc-ten p b{color:var(--gvm-chu)}
+.buoc[data-tt=cho] .buoc-ten h2{color:var(--gvm-chu-2)}
+.buoc-than{padding:10px 22px 22px;display:grid;gap:16px;min-width:0}
+@media (max-width:600px){.buoc-dau{padding:14px}.buoc[data-tt=dang] .buoc-dau{padding:16px 16px 4px}.buoc-than{padding:8px 16px 18px}.buoc .vong{width:36px;height:36px}}
+
+/* nút: MỘT nút chính (bước đang làm), còn lại viền / chữ */
+.nut-chinh{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:14px;background:var(--gvm-xd);color:var(--gvm-tren-dac);font-weight:700;font-size:15.5px;box-shadow:var(--gvm-bong-nut)}
+.nut-vien{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--gvm-vien);background:var(--gvm-mat);color:var(--gvm-xd);font-weight:700;font-size:15px;white-space:nowrap}
+.nut-chu{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:44px;padding:0 12px;border-radius:12px;color:var(--gvm-xd);font-weight:700;font-size:15px;white-space:nowrap}
+.nut-chu.nhat{color:var(--gvm-chu-2)}
+.hang-nut{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.hang-nut .gian{flex:1}
+@media (max-width:600px){.hang-nut .nut-chinh{width:100%}.hang-nut .nut-vien{flex:1 1 140px}.buoc-dau>.chip{display:none}}
+
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;background:var(--gvm-mat-2);color:var(--gvm-chu-2)}
+.chip[data-m=xd]{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
+.chip[data-m=xl]{background:var(--gvm-xl-nen);color:var(--gvm-xl-dam)}
+.chip[data-m=hp]{background:var(--gvm-hp-nen);color:var(--gvm-hp-dam)}
+.chip[data-m=ho]{background:var(--gvm-ho-nen);color:var(--gvm-ho-dam)}
+.chip[data-m=tim]{background:var(--gvm-tim-nen);color:var(--gvm-tim-dam)}
+.thanh{position:relative;display:block;height:8px;border-radius:999px;background:var(--gvm-mat-2);overflow:hidden}
+.thanh>i{position:absolute;inset:0 auto 0 0;border-radius:inherit;background:var(--gvm-xd)}
+.thanh[data-m=xl]>i{background:var(--gvm-xl)}.thanh[data-m=ho]>i{background:var(--gvm-ho)}
+.nhan{font-size:13px;font-weight:700;color:var(--gvm-chu-3);text-transform:uppercase;letter-spacing:.04em}
+.o{border-radius:18px;background:var(--gvm-mat-2);padding:16px;min-width:0}
+.o-vien{border-radius:18px;border:1px solid var(--gvm-vien);padding:16px;min-width:0}
+.ten-em{display:flex;flex-wrap:wrap;gap:6px}
+.ten-em span{padding:4px 10px;border-radius:999px;background:var(--gvm-mat);border:1px solid var(--gvm-vien);font-size:13.5px;font-weight:600}
+
+/* bước 1 */
+.dd-luoi{display:grid;gap:12px}
+@media (min-width:760px){.dd-luoi{grid-template-columns:220px minmax(0,1fr)}}
+.ma{display:flex;gap:14px;align-items:center}
+@media (min-width:760px){.ma{flex-direction:column;align-items:flex-start}}
+.ma svg.qr{width:92px;height:92px;border-radius:10px;background:var(--gvm-mat);padding:6px;flex:none}
+@media (min-width:760px){.ma svg.qr{width:120px;height:120px}}
+.ma-so{font-size:30px;font-weight:800;letter-spacing:.18em;line-height:1.1}
+.ma small{display:block;font-size:13px;color:var(--gvm-chu-3)}
+.co-mat{display:grid;gap:10px}
+.so-lon{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.so-lon b{font-size:40px;font-weight:800;line-height:1;letter-spacing:-.02em}
+.so-lon span{font-size:15px;color:var(--gvm-chu-2)}
+.nhom{display:flex;flex-wrap:wrap;gap:6px}
+.dong-vang{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:14.5px}
+
+/* bước 3 */
+.bai{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.bai-ten{flex:1 1 260px;min-width:0}
+.bai-ten b{display:block;font-size:16.5px}
+.bai-ten span{font-size:14px;color:var(--gvm-chu-2)}
+.goi{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
+.goi .ai{flex:1 1 240px;min-width:0;font-size:15px}
+.goi .ai b{font-weight:800}
+.goi .nut-vien{border-color:transparent}
+.ds-cau{display:grid;gap:8px}
+.cau{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:12px 12px 12px 8px;border:1px solid var(--gvm-vien);border-radius:16px;min-width:0}
+.cau[data-dang]{border-color:var(--gvm-xd);background:color-mix(in srgb,var(--gvm-xd-nen) 45%,var(--gvm-mat))}
+.hop{width:44px;min-height:44px;display:grid;place-items:center;align-content:center;gap:2px;font-size:12px;font-weight:800;color:var(--gvm-chu-2)}
+.hop i{width:22px;height:22px;border-radius:6px;background:var(--gvm-xd);color:var(--gvm-tren-dac);display:grid;place-items:center}
+.hop i svg.i{width:15px;height:15px;stroke-width:3}
+.cau-than{min-width:0;display:grid;gap:4px}
+.cau-the{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--gvm-chu-3)}
+.cau-de{font-size:15.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cau .nut-chu{align-self:center}
+@media (max-width:600px){.cau{grid-template-columns:44px minmax(0,1fr)}.cau .nut-chu{grid-column:2;justify-self:start;margin-left:-12px}}
+.ngan{height:1px;background:var(--gvm-vien)}
+.tick{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.tick .chu{flex:1 1 260px;min-width:0}
+.tick .chu b{display:block;font-size:16.5px}
+.tick .chu span{font-size:14px;color:var(--gvm-chu-2)}
+.dong-gap{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 6px 6px 16px;border:1px solid var(--gvm-vien);border-radius:16px}
+.dong-gap .chu{flex:1;min-width:0;font-size:15px}
+.dong-gap .chu b{font-weight:700}
+.dong-gap .chu span{color:var(--gvm-chu-2)}
+
+/* bước 4 */
+.khoi4{display:grid;gap:12px}
+.khoi4-dau{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.khoi4-dau h3{font-size:17px;font-weight:800;flex:1 1 220px;min-width:0}
+.khoi4-dau h3 small{display:block;font-size:14px;font-weight:500;color:var(--gvm-chu-2)}
+.chon-hang{display:grid;gap:10px}
+@media (min-width:760px){.chon-hang{grid-template-columns:200px minmax(0,1fr) auto;align-items:end}}
+.chon{display:grid;gap:4px;font-size:13px;font-weight:700;color:var(--gvm-chu-2);min-width:0}
+.chon select{min-height:44px;padding:0 12px;border:1px solid var(--gvm-vien);border-radius:12px;background:var(--gvm-mat);color:var(--gvm-chu);font-size:15px;font-weight:700;min-width:0;width:100%}
+.bat{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--gvm-xd);background:var(--gvm-xd-nen);color:var(--gvm-xd-dam);font-weight:700;font-size:14.5px;white-space:nowrap}
+.bat svg.i{width:18px;height:18px;stroke-width:3}
+.cau-kho{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:14px;border:1px solid var(--gvm-vien);border-radius:16px;min-width:0}
+.cau-kho .sai{display:grid;grid-template-columns:auto minmax(60px,1fr);gap:10px;align-items:center;font-size:14px;color:var(--gvm-chu-2)}
+.cau-kho .sai b{color:var(--gvm-ho);font-weight:800}
+.cau-kho .len{font-size:14px;color:var(--gvm-chu-2)}
+.cau-kho .len b{color:var(--gvm-chu)}
+.loc{display:flex;flex-wrap:wrap;gap:6px}
+.loc button{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--gvm-vien);font-size:14px;font-weight:700;color:var(--gvm-chu-2)}
+.loc button[aria-checked=true]{background:var(--gvm-xd);border-color:transparent;color:var(--gvm-tren-dac)}
+.loc button span{opacity:.85;font-weight:600}
+.cho-chua{display:grid;grid-template-columns:32px minmax(0,1fr);gap:4px 12px;padding:14px;border:1px solid var(--gvm-vien);border-radius:16px;min-width:0}
+.cho-chua .stt{width:32px;height:32px;border-radius:10px;background:var(--gvm-mat-2);display:grid;place-items:center;font-weight:800;font-size:14px;color:var(--gvm-chu-2)}
+.cho-chua .ct{min-width:0;display:grid;gap:6px}
+.cho-chua .ct b{font-size:15.5px}
+.cho-chua .ct .phu2{font-size:13.5px;color:var(--gvm-chu-3)}
+.cho-chua .so-em{display:grid;grid-template-columns:auto minmax(60px,180px);gap:10px;align-items:center;font-size:14px;color:var(--gvm-chu-2)}
+.cho-chua .hang-nut{grid-column:2}
+@media (min-width:900px){.cho-chua{grid-template-columns:32px minmax(0,1fr) auto;align-items:center}.cho-chua .hang-nut{grid-column:auto}}
+
+.cuoi{margin-top:4px}
+/* ════════ PHẦN THÊM CỦA BẢN VẼ GỌI LÊN BẢNG (21/10) — chỉ biến --gvm-* + color-mix ════════ */
+:root{--tg1:color-mix(in srgb,var(--gvm-xd) 28%,var(--gvm-mat));--tg2:color-mix(in srgb,var(--gvm-xd) 58%,var(--gvm-mat));--tg3:var(--gvm-xd)}
+.cce{display:grid;gap:10px;padding:14px;border-radius:18px;background:var(--gvm-mat-2);min-width:0}
+.cce-dau{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.cce-dau b{font-size:15.5px}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:16px;background:var(--gvm-mat);border:1px solid var(--gvm-vien)}
+.seg button{min-height:48px;border-radius:12px;font-weight:800;font-size:14.5px;color:var(--gvm-chu-2);padding:4px 8px;line-height:1.2;display:grid;place-items:center;text-align:center}
+.seg button small{display:block;font-size:12px;font-weight:500;color:inherit;opacity:.85}
+.seg button[aria-checked=true]{background:var(--gvm-xd);color:var(--gvm-tren-dac);box-shadow:var(--gvm-bong-nut)}
+.cce .ghi{font-size:13.5px;color:var(--gvm-chu-2);line-height:1.5}
+.tang{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:0 10px 0 8px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;border:1px solid var(--gvm-vien);background:var(--gvm-mat);color:var(--gvm-chu)}
+.pip{display:inline-flex;align-items:flex-end;gap:2px;height:13px}
+.pip i{display:block;width:4px;border-radius:2px;background:var(--gvm-vien)}
+.pip i:nth-child(1){height:5px}.pip i:nth-child(2){height:9px}.pip i:nth-child(3){height:13px}
+[data-t='3'] .pip i{background:var(--tg3)}
+[data-t='2'] .pip i:nth-child(-n+2){background:var(--tg3)}
+[data-t='1'] .pip i:nth-child(1){background:var(--tg3)}
+.pb{display:grid;gap:10px;min-width:0}
+.pb-dau{display:flex;align-items:baseline;justify-content:space-between;gap:6px 12px;flex-wrap:wrap}
+.pb-o{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.otg{display:grid;gap:6px;padding:12px 14px;border-radius:16px;border:1px solid var(--gvm-vien);background:var(--gvm-mat);min-width:0}
+.otg .ten{display:flex;align-items:center;gap:7px;font-weight:800;font-size:14px}
+.otg .lon{font-size:26px;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.otg .lon small{font-size:13px;font-weight:600;color:var(--gvm-chu-3)}
+.otg .thanh>i{background:var(--tg3)}
+.pb-chu{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px;color:var(--gvm-chu-2)}
+.pb-chu b{color:var(--gvm-chu)}
+.pb-chu .ok{color:var(--gvm-xl);font-weight:700}
+.goi .tang{border-color:transparent}
+.goi .ly{display:block;font-size:13px;color:var(--gvm-xd-dam);opacity:.85;margin-top:2px}
+.goi-em{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:4px;padding-top:8px;border-top:1px dashed var(--gvm-vien);font-size:14px;color:var(--gvm-chu-2)}
+.goi-em b{color:var(--gvm-chu);font-weight:800}
+.goi-em .ly{flex:1 1 200px;min-width:0;font-size:13px;color:var(--gvm-chu-3)}
+.goi-em .nut-chu{min-height:44px;margin-left:auto}
+.ds-em{display:grid;gap:8px}
+.em-dong{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:12px 14px;border:1px solid var(--gvm-vien);border-radius:16px;min-width:0}
+.em-dong .stt{width:36px;height:36px;border-radius:12px;background:var(--gvm-mat-2);display:grid;place-items:center;font-weight:800;font-size:14px;color:var(--gvm-chu-2)}
+.em-dong .ct{min-width:0;display:grid;gap:3px}
+.em-dong .ten-hang{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-weight:800;font-size:15.5px}
+.em-dong .cau-nho{font-size:14px;color:var(--gvm-chu-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.em-dong .ly{font-size:13px;color:var(--gvm-chu-3)}
+@media (max-width:600px){.em-dong{grid-template-columns:36px minmax(0,1fr)}.em-dong .nut-chu{grid-column:2;justify-self:start;margin-left:-12px}.em-dong .cau-nho{white-space:normal}}
+.cap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.vai{display:grid;gap:4px;padding:10px 12px;border-radius:14px;background:var(--gvm-mat-2);min-width:0}
+.vai .nhan2{font-size:12.5px;font-weight:700;color:var(--gvm-chu-3)}
+.vai .ten-hang{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-weight:800;font-size:15px}
+.vai .ly{font-size:13px;color:var(--gvm-chu-3)}
+@media (max-width:600px){.cap{grid-template-columns:1fr}.pb-o{gap:6px}.otg{padding:10px}.otg .lon{font-size:22px}.otg .ten{font-size:12.5px}.seg button small{display:none}}
+/* bảng "Cách app chọn em" */
+.man-che{position:fixed;inset:0;background:rgb(10 14 30 / .45);z-index:9}
+.hop-cach{position:fixed;z-index:10;inset:auto 0 0 0;max-height:94dvh;overflow:auto;border-radius:24px 24px 0 0;background:var(--gvm-mat);padding:20px 18px 24px;display:grid;gap:14px;box-shadow:0 -10px 40px rgb(0 0 0 / .25)}
+@media (min-width:900px){.hop-cach{inset:5vh auto auto 50%;transform:translateX(-50%);width:min(860px,92vw);border-radius:28px;max-height:90vh;padding:26px 28px}}
+.hop-cach .dau-hop{display:flex;align-items:center;gap:12px}
+.hop-cach .dau-hop h2{flex:1;font-size:21px;font-weight:800}
+.b4{display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;padding:14px;border-radius:18px;background:var(--gvm-mat-2);min-width:0}
+.b4 .vong{width:32px;height:32px;background:var(--gvm-xd);color:var(--gvm-tren-dac)}
+.b4 h3{font-size:16px;font-weight:800;margin-bottom:2px}
+.b4 p{font-size:14px;color:var(--gvm-chu-2)}
+.lop22{display:grid;grid-template-columns:repeat(22,minmax(0,1fr));gap:3px;margin-top:10px}
+.lop22 i{height:20px;border-radius:5px}
+.lop22 i[data-t='1']{background:var(--tg1)}.lop22 i[data-t='2']{background:var(--tg2)}.lop22 i[data-t='3']{background:var(--tg3)}
+.chu-lop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:6px;font-size:12.5px;font-weight:700;color:var(--gvm-chu-2)}
+.chu-lop span:nth-child(2){text-align:center}.chu-lop span:nth-child(3){text-align:right}
+.ghep{display:grid;gap:6px;margin-top:10px}
+.ghep-dong{display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr);gap:10px;align-items:center;font-size:14px}
+.ghep-dong .chip{justify-self:start}
+.thang-o{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.thang-o span{display:block;height:22px;border-radius:6px;background:var(--gvm-mat);border:1px solid var(--gvm-vien)}
+.thang-o span[data-n='2']{background:var(--tg2);border-color:transparent}
+.thang-o span[data-n='1']{background:var(--tg1);border-color:transparent}
+.can{display:grid;gap:6px;margin-top:10px}
+.can-dong{display:grid;grid-template-columns:minmax(120px,210px) minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:13.5px}
+.can-dong .thanh{height:10px}
+.luat{display:grid;gap:6px;margin-top:8px;font-size:14px;color:var(--gvm-chu-2)}
+.luat li{display:flex;gap:8px}.luat li::before{content:'✓';color:var(--gvm-xl);font-weight:800}
+.chu-chieu{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:16px;border:1px dashed var(--gvm-vien);font-size:14px;color:var(--gvm-chu-2)}
+/* bản chiếu (luôn tối, như tờ chiếu thật) */
+#chieu{background:rgb(18 18 17);color:#fff;min-height:100vh}
+#chieu .cd{--u:calc(100vw / 1920);width:100vw;height:100vh;overflow:hidden;padding:calc(56*var(--u)) calc(80*var(--u));display:grid;grid-template-rows:auto 1fr auto;gap:calc(36*var(--u));position:relative}
+#chieu .cd-dau{display:flex;justify-content:space-between;align-items:center}
+#chieu .cd-dau b{font-size:calc(44*var(--u));font-weight:800}
+#chieu .cd-dau span{font-size:calc(26*var(--u));color:rgb(195 194 183)}
+#chieu .cd-than{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:calc(48*var(--u));align-items:start}
+#chieu .cd-de{font-size:calc(42*var(--u));line-height:1.5}
+#chieu .cd-pa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(18*var(--u)) calc(40*var(--u));margin-top:calc(30*var(--u));font-size:calc(38*var(--u))}
+#chieu .cd-moi{padding:calc(36*var(--u));border-radius:calc(32*var(--u));background:color-mix(in srgb,#fff 9%,rgb(26 26 25));border:calc(2*var(--u)) solid color-mix(in srgb,#fff 26%,rgb(26 26 25));display:grid;gap:calc(14*var(--u))}
+#chieu .cd-moi .nho{font-size:calc(26*var(--u));color:rgb(195 194 183)}
+#chieu .cd-moi b{font-size:calc(60*var(--u));font-weight:800;line-height:1.15}
+#chieu .cd-chan{display:flex;gap:calc(28*var(--u));font-size:calc(24*var(--u));color:rgb(195 194 183)}
+#chieu .tag{font-size:calc(20*var(--u));color:rgb(134 182 239);position:absolute;top:calc(16*var(--u));right:calc(20*var(--u))}
+</style>
+<body>
+<div class="app">
+  <aside class="ben" aria-label="Menu app thầy">
+    <div class="hieu"><span class="logo">ĐH</span>Đỗ Đại Học</div>
+    <a href="#"><svg class="i"><use href="#i-nha"/></svg>Hôm nay</a>
+    <a href="#" aria-current="page"><svg class="i"><use href="#i-co"/></svg>Hành trình<span class="dem so">12</span></a>
+    <a href="#"><svg class="i"><use href="#i-dong-ho"/></svg>Ca kiểm tra</a>
+    <a href="#"><svg class="i"><use href="#i-nguoi"/></svg>Học sinh</a>
+    <a href="#"><svg class="i"><use href="#i-sach"/></svg>Kho đề</a>
+    <span class="gian"></span>
+    <a href="#"><svg class="i"><use href="#i-cai"/></svg>Cài đặt</a>
+  </aside>
+  <div class="chinh">
+    <div class="tren"><span class="logo">ĐH</span><b>Hành trình</b><button class="nut-tron" aria-label="Mở menu"><svg class="i"><use href="#i-menu"/></svg></button></div>
+    <main class="noi">
+      <header class="dau">
+        <h1 class="h1">Hành trình giỏi Hóa</h1>
+        <p class="phu">Bản vẽ gọi lên bảng phân tầng · khung trang 4 bước của phiên Code app 2 · số trong ảnh là số GIẢ.</p>
+      </header>
+
+<section class="khung" id="dau-gio"><div class="bo-cuc"><nav class="thuoc" aria-label="Tiến trình buổi dạy"><div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · Thứ Tư 21/10</span></div><ol><li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span>Điểm danh</span><span class="tt-phu so">Xong · 22/24 em</span></span></button></li><li data-tt="dang"><button><span class="vong">2</span><span class="tt-ten"><span class="ten-dai">Gọi lên bảng đầu giờ</span><span class="ten-ngan">Đầu giờ</span><span class="tt-phu so">Đang làm</span></span></button></li><li data-tt="cho"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu so">Chưa tới</span></span></button></li><li data-tt="tudo"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so">Mở lúc nào cũng được · 12 chỗ</span></span></button></li></ol></nav><div class="cac-buoc"><section class="buoc" data-tt="xong"><div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Điểm danh</h2><p class="so"><b>22/24 em có mặt</b> · Vắng: Phạm Lan, Đỗ Minh</p></div><button class="nut-chu">Mở lại</button></div></section>
+<section class="buoc" data-tt="dang"><div class="buoc-dau"><span class="vong">2</span><div class="buoc-ten"><h2>Gọi lên bảng đầu giờ</h2><p>Kiểm xem em còn nhớ bài cũ: mỗi em một câu chính em từng làm đúng.</p></div></div>
+<div class="buoc-than"><div class="cce"><div class="cce-dau"><b>Cách chọn em <i class="tag" data-t="moi">mới</i></b><button class="nut-chu">Cách app chọn em<svg class="i"><use href="#i-phai"/></svg></button></div><div class="seg" role="radiogroup" aria-label="Cách chọn em"><button role="radio" aria-checked="true">Trộn giỏi – yếu<small>mặc định</small></button><button role="radio" aria-checked="false">Chắc đúng<small>như cũ</small></button><button role="radio" aria-checked="false">Ngẫu nhiên<small>rút thăm đều</small></button></div><p class="ghi">6 em đủ ba tầng, mỗi tầng 2 em. Câu dễ cho em Cần kèm, câu khó cho em Khá. Em lâu chưa lên bảng được ưu tiên.</p></div>
+<div class="pb"><div class="pb-dau"><span class="nhan">Lượt này · 6 em</span></div><div class="pb-o"><div class="otg" data-t="3"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Khá</span><span class="lon so">2 <small>lượt · 2 em</small></span><span class="thanh"><i style="width:33%"></i></span></div><div class="otg" data-t="2"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span><span class="lon so">2 <small>lượt · 2 em</small></span><span class="thanh"><i style="width:33%"></i></span></div><div class="otg" data-t="1"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span><span class="lon so">2 <small>lượt · 2 em</small></span><span class="thanh"><i style="width:33%"></i></span></div></div><p class="pb-chu so"><b>6 em khác nhau</b> · đủ 3 tầng · <span class="ok">không em nào lên 2 lần</span> · 16 em có mặt chưa lên hôm nay</p></div>
+<div class="ds-em"><div class="em-dong"><span class="stt so">1</span><div class="ct"><div class="ten-hang">Trần Minh Khang <span class="tang" data-t="3"><span class="pip"><i></i><i></i><i></i></span>Khá</span> <span class="chip" data-m="xl">Đạt</span></div><p class="cau-nho">Câu 14 · Ester — thuỷ phân trong môi trường kiềm · Vận dụng</p><p class="ly so">Làm đúng 17/10 ở Đảo thần thú · 6 ngày chưa lên bảng</p></div><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div><div class="em-dong"><span class="stt so">2</span><div class="ct"><div class="ten-hang">Lê Bảo Ngọc <span class="tang" data-t="1"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span></div><p class="cau-nho">Câu 3 · Amine — gọi tên theo danh pháp thay thế · Nhận biết</p><p class="ly so">Làm đúng 19/10 ở Bài hôm nay · chưa lên bảng tuần này</p></div><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div><div class="em-dong"><span class="stt so">3</span><div class="ct"><div class="ten-hang">Nguyễn Hà Vy <span class="tang" data-t="2"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span></div><p class="cau-nho">Câu 8 · Peptide — số liên kết peptide · Thông hiểu</p><p class="ly so">Làm đúng 18/10 ở Tự luyện · 9 ngày chưa lên bảng</p></div><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div><div class="em-dong"><span class="stt so">4</span><div class="ct"><div class="ten-hang">Vũ Thảo My <span class="tang" data-t="1"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span></div><p class="cau-nho">Câu 5 · Ester — công thức chung · Nhận biết</p><p class="ly so">Làm đúng 20/10 ở Bài hôm nay · 11 ngày chưa lên bảng</p></div><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div><div class="em-dong"><span class="stt so">5</span><div class="ct"><div class="ten-hang">Phạm Gia Huy <span class="tang" data-t="3"><span class="pip"><i></i><i></i><i></i></span>Khá</span></div><p class="cau-nho">Câu 21 · Amino acid — tính khối lượng muối · Vận dụng</p><p class="ly so">Làm đúng 16/10 ở Kiểm tra ôn tập · 5 ngày chưa lên bảng</p></div><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div><div class="em-dong"><span class="stt so">6</span><div class="ct"><div class="ten-hang">Đặng Quỳnh Anh <span class="tang" data-t="2"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span></div><p class="cau-nho">Câu 11 · Carbohydrate — phản ứng tráng bạc · Thông hiểu</p><p class="ly so">Làm đúng 19/10 ở Đoàn Hộ Tống · 7 ngày chưa lên bảng</p></div><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div></div>
+<div class="hang-nut"><button class="nut-chinh"><svg class="i"><use href="#i-chieu"/></svg>Chiếu lên bảng · 6 em</button><button class="nut-vien"><svg class="i"><use href="#i-doi"/></svg>Rút thăm lại cả lượt</button><button class="nut-chu">Gọi thêm 1 em</button></div>
+</div></section>
+<section class="buoc" data-tt="cho"><div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học</h2><p>Mở sau khi gọi đầu giờ xong.</p></div></div></section><section class="buoc" data-tt="tudo"><div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán</h2><p class="so"><b style="color:var(--gvm-hp)">12 chỗ</b> học sinh cần chữa · mở lúc nào cũng được</p></div><button class="nut-vien">Mở</button></div></section><section class="buoc cuoi" data-tt="cho"><div class="buoc-dau"><span class="vong" aria-hidden="true"><svg class="i"><use href="#i-lich"/></svg></span><div class="buoc-ten"><h2>Kiểm tra ôn tập</h2><p>Ngoài buổi dạy · lịch và đề dành riêng cho từng em</p></div><button class="nut-chu">Xem</button></div></section></div></div></section><section class="khung" id="day-hoc"><div class="bo-cuc"><nav class="thuoc" aria-label="Tiến trình buổi dạy"><div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · Thứ Tư 21/10</span></div><ol><li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span>Điểm danh</span><span class="tt-phu so">Xong · 22/24 em</span></span></button></li><li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span class="ten-dai">Gọi lên bảng đầu giờ</span><span class="ten-ngan">Đầu giờ</span><span class="tt-phu so">Xong · Đạt 5/6</span></span></button></li><li data-tt="dang"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu so">Đang làm</span></span></button></li><li data-tt="tudo"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so">Mở lúc nào cũng được · 12 chỗ</span></span></button></li></ol></nav><div class="cac-buoc"><section class="buoc" data-tt="xong"><div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Điểm danh</h2><p class="so"><b>22/24 em có mặt</b> · Vắng: Phạm Lan, Đỗ Minh</p></div><button class="nut-chu">Mở lại</button></div></section>
+<section class="buoc" data-tt="xong"><div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Gọi lên bảng đầu giờ</h2><p class="so"><b>Đã gọi 6 em</b> · Khá 2 · Trung bình 2 · Cần kèm 2 · Đạt 5 · Chưa đạt 1</p></div><button class="nut-chu">Mở lại</button></div></section>
+<section class="buoc" data-tt="dang"><div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học</h2><p>Chiếu câu, gọi em lên làm, xong thì tick bài vừa dạy.</p></div></div>
+<div class="buoc-than">
+<div class="bai"><div class="bai-ten"><span class="nhan">Bài đang dạy</span><b>Amine — tính base — tính khối lượng</b><span class="so">23 câu · Trắc nghiệm 13 · Đúng–sai 3 · Trả lời ngắn 7 · trong đó 3 câu tự luận</span></div><button class="nut-vien">Đổi bài</button><button class="nut-chu"><svg class="i"><use href="#i-mat"/></svg>Hiện lời giải tất cả</button></div>
+<div class="cce"><div class="cce-dau"><b>Cách chọn em <i class="tag" data-t="moi">mới</i></b><button class="nut-chu">Cách app chọn em<svg class="i"><use href="#i-phai"/></svg></button></div><div class="seg" role="radiogroup" aria-label="Cách chọn em"><button role="radio" aria-checked="true">Trộn giỏi – yếu<small>mặc định</small></button><button role="radio" aria-checked="false">Chắc đúng<small>như cũ</small></button><button role="radio" aria-checked="false">Ngẫu nhiên<small>rút thăm đều</small></button></div><p class="ghi">23 câu chia gần đều cho ba tầng. Câu nhận biết gọi em Cần kèm, câu thông hiểu gọi tầng giữa, câu vận dụng gọi em Khá. Mỗi em một lần trước, đủ cả lớp mới tới lần hai.</p></div>
+<div class="pb"><div class="pb-dau"><span class="nhan">Cả bài · 23 câu</span></div><div class="pb-o"><div class="otg" data-t="3"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Khá</span><span class="lon so">7 <small>lượt · 7 em</small></span><span class="thanh"><i style="width:30%"></i></span></div><div class="otg" data-t="2"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span><span class="lon so">8 <small>lượt · 8 em</small></span><span class="thanh"><i style="width:35%"></i></span></div><div class="otg" data-t="1"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span><span class="lon so">8 <small>lượt · 7 em</small></span><span class="thanh"><i style="width:35%"></i></span></div></div><p class="pb-chu so"><b>22/22 em có mặt đều được gọi</b> · 23 câu nên 1 em lên lần 2 · <span class="ok">không em nào lên hai câu liền nhau</span></p></div>
+<div class="goi"><svg class="i"><use href="#i-nguoi"/></svg><p class="ai">Câu 2 · gọi lên bảng: <b>Nguyễn Hà Vy</b> <span class="tang" data-t="1"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span><span class="ly">Câu dễ → em Cần kèm · 9 ngày chưa lên bảng</span></p><button class="nut-vien">Đổi em cùng tầng</button><button class="nut-vien">Em làm đúng</button><button class="nut-vien">Em làm sai</button></div>
+<div class="ds-cau"><div class="cau"><span class="hop"><i><svg class="i"><use href="#i-dung"/></svg></i>Câu 1</span><div class="cau-than"><div class="cau-the"><span class="chip" data-m="xd">Trắc nghiệm</span><span class="chip">Thông hiểu</span></div><p class="cau-de">Cho 4,5 gam ethylamine tác dụng với dung dịch HCl vừa đủ, thu được m gam muối. Giá trị của m là</p><div class="goi-em"><span>Gọi:</span><b>Đặng Quỳnh Anh</b><span class="tang" data-t="2"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span><span class="ly">Câu thông hiểu → tầng giữa · 7 ngày chưa lên bảng</span><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div></div><button class="nut-chu"><svg class="i"><use href="#i-den"/></svg>Lời giải</button></div><div class="cau" data-dang><span class="hop"><i><svg class="i"><use href="#i-dung"/></svg></i>Câu 2</span><div class="cau-than"><div class="cau-the"><span class="chip" data-m="xd">Trắc nghiệm</span><span class="chip">Nhận biết</span><span>· đang chiếu</span></div><p class="cau-de">Dãy gồm các chất đều làm quỳ tím ẩm chuyển sang màu xanh là</p><div class="goi-em"><span>Gọi:</span><b>Nguyễn Hà Vy</b><span class="tang" data-t="1"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span><span class="ly">Câu dễ → em Cần kèm · 9 ngày chưa lên bảng</span><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div></div><button class="nut-chu"><svg class="i"><use href="#i-den"/></svg>Lời giải</button></div><div class="cau"><span class="hop"><i><svg class="i"><use href="#i-dung"/></svg></i>Câu 3</span><div class="cau-than"><div class="cau-the"><span class="chip" data-m="tim">Đúng–sai</span><span class="chip">Thông hiểu</span></div><p class="cau-de">Cho các phát biểu về aniline: a) Aniline tác dụng với nước bromine tạo kết tủa trắng; b) Dung dịch aniline làm quỳ tím chuyển xanh; c) …</p><div class="goi-em"><span>Gọi:</span><b>Hoàng Đức Minh</b><span class="tang" data-t="2"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span><span class="ly">Câu thông hiểu → tầng giữa · chưa lên bảng tuần này</span><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div></div><button class="nut-chu"><svg class="i"><use href="#i-den"/></svg>Lời giải</button></div><div class="cau"><span class="hop"><i><svg class="i"><use href="#i-dung"/></svg></i>Câu 4</span><div class="cau-than"><div class="cau-the"><span class="chip" data-m="hp">Trả lời ngắn</span><span class="chip">Vận dụng</span></div><p class="cau-de">Đốt cháy hoàn toàn 0,1 mol amine no, đơn chức, mạch hở X thu được 0,3 mol CO₂. Số đồng phân cấu tạo của X là bao nhiêu?</p><div class="goi-em"><span>Gọi:</span><b>Phạm Gia Huy</b><span class="tang" data-t="3"><span class="pip"><i></i><i></i><i></i></span>Khá</span><span class="ly">Câu vận dụng → em Khá · 5 ngày chưa lên bảng</span><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em</button></div></div><button class="nut-chu"><svg class="i"><use href="#i-den"/></svg>Lời giải</button></div><button class="nut-chu" style="justify-self:start">Xem đủ 23 câu</button></div>
+<div class="hang-nut"><button class="nut-chinh"><svg class="i"><use href="#i-chieu"/></svg>Chiếu lên bảng</button><button class="nut-vien">Chiếu đề (chưa gọi em)</button></div>
+<div class="ngan"></div>
+<div class="tick"><div class="chu"><span class="nhan">Cuối phần dạy</span><b>Tick bài vừa dạy</b><span>Tick xong, app tự lập bài cho từng em từ tối nay.</span></div><button class="nut-vien"><svg class="i"><use href="#i-dung"/></svg>Tick bài hôm nay</button></div>
+</div></section><section class="buoc" data-tt="tudo"><div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán</h2><p class="so"><b style="color:var(--gvm-hp)">12 chỗ</b> học sinh cần chữa · mở lúc nào cũng được</p></div><button class="nut-vien">Mở</button></div></section><section class="buoc cuoi" data-tt="cho"><div class="buoc-dau"><span class="vong" aria-hidden="true"><svg class="i"><use href="#i-lich"/></svg></span><div class="buoc-ten"><h2>Kiểm tra ôn tập</h2><p>Ngoài buổi dạy · lịch và đề dành riêng cho từng em</p></div><button class="nut-chu">Xem</button></div></section></div></div></section><section class="khung" id="chua-cau"><div class="bo-cuc"><nav class="thuoc" aria-label="Tiến trình buổi dạy"><div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · Thứ Tư 21/10</span></div><ol><li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span>Điểm danh</span><span class="tt-phu so">Xong · 22/24 em</span></span></button></li><li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span class="ten-dai">Gọi lên bảng đầu giờ</span><span class="ten-ngan">Đầu giờ</span><span class="tt-phu so">Xong · Đạt 5/6</span></span></button></li><li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu so">Xong · đã tick bài</span></span></button></li><li data-tt="dang"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so">Đang làm</span></span></button></li></ol></nav><div class="cac-buoc"><section class="buoc" data-tt="xong"><div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Điểm danh</h2><p class="so"><b>22/24 em có mặt</b> · Vắng: Phạm Lan, Đỗ Minh</p></div><button class="nut-chu">Mở lại</button></div></section>
+<section class="buoc" data-tt="xong"><div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Gọi lên bảng đầu giờ</h2><p class="so"><b>Đã gọi 6 em</b> · Đạt 5 · Chưa đạt 1</p></div><button class="nut-chu">Mở lại</button></div></section><section class="buoc" data-tt="xong"><div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Dạy học</h2><p class="so"><b>Đã chiếu 23 câu · 22 em được gọi</b> · đã tick bài hôm nay</p></div><button class="nut-chu">Mở lại</button></div></section>
+<section class="buoc" data-tt="dang"><div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán</h2><p>Mỗi câu hai em: một em đã sai lên làm, một em đã đúng giảng lại.</p></div></div>
+<div class="buoc-than"><div class="khoi4"><div class="khoi4-dau"><h3>Câu khó &amp; tính toán<small>Thầy chọn bài trong kho Dạy học</small></h3></div>
+<div class="chon-hang"><label class="chon">Lớp<select><option>12A1 · 22 em có mặt</option></select></label><label class="chon">Bài<select><option>Amine — amino acid · Đề 2</option></select></label><button class="bat" role="switch" aria-checked="true"><svg class="i"><use href="#i-dung"/></svg>Chỉ câu có tính toán</button></div>
+<div class="cce"><div class="cce-dau"><b>Cách chọn em <i class="tag" data-t="moi">mới</i></b><button class="nut-chu">Cách app chọn em<svg class="i"><use href="#i-phai"/></svg></button></div><div class="seg" role="radiogroup" aria-label="Cách chọn em"><button role="radio" aria-checked="true">Trộn giỏi – yếu<small>mặc định</small></button><button role="radio" aria-checked="false">Chắc đúng<small>như cũ</small></button><button role="radio" aria-checked="false">Ngẫu nhiên<small>rút thăm đều</small></button></div><p class="ghi">Lên bảng: ưu tiên em đã sai câu đó, trộn đủ tầng. Giảng lại: em đã sửa đúng hoặc làm đúng. Không em nào giữ hai vai trong cùng một câu.</p></div>
+<div class="pb"><div class="pb-dau"><span class="nhan">3 câu · 6 lượt</span></div><div class="pb-o"><div class="otg" data-t="3"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Khá</span><span class="lon so">2 <small>lượt · 2 em</small></span><span class="thanh"><i style="width:33%"></i></span></div><div class="otg" data-t="2"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span><span class="lon so">2 <small>lượt · 2 em</small></span><span class="thanh"><i style="width:33%"></i></span></div><div class="otg" data-t="1"><span class="ten"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span><span class="lon so">2 <small>lượt · 2 em</small></span><span class="thanh"><i style="width:33%"></i></span></div></div><p class="pb-chu so"><b>6 em khác nhau</b> · 3 em lên làm đều là em đã sai câu ấy · 3 em giảng lại đều đã đúng</p></div>
+<div class="cau-kho"><div class="cau-the"><span class="chip" data-m="xd">Câu 7</span><span class="chip" data-m="hp">Có tính toán</span><span class="chip">Vận dụng</span></div><p class="cau-de">Hỗn hợp X gồm glycine và alanine. Cho m gam X tác dụng vừa đủ với 200 ml dung dịch NaOH 1M, thu được 20,8 gam muối. Giá trị của m là</p><div class="sai so"><span><b>Sai 58%</b> · 14/24 em</span><span class="thanh" data-m="ho"><i style="width:58%"></i></span></div><div class="cap"><div class="vai"><span class="nhan2">Lên bảng làm · em đã sai</span><span class="ten-hang">Lê Bảo Ngọc <span class="tang" data-t="1"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span></span><span class="ly so">sai câu này 2 lần · gần nhất 19/10</span></div><div class="vai"><span class="nhan2">Giảng lại cho lớp · em đã đúng</span><span class="ten-hang">Trần Minh Khang <span class="tang" data-t="3"><span class="pip"><i></i><i></i><i></i></span>Khá</span></span><span class="ly so">từng sai, đã sửa đúng 20/10</span></div></div><div class="hang-nut"><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em lên bảng</button><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em giảng lại</button></div></div><div class="cau-kho"><div class="cau-the"><span class="chip" data-m="xd">Câu 9</span><span class="chip" data-m="hp">Có tính toán</span><span class="chip">Vận dụng cao</span></div><p class="cau-de">Đốt cháy hoàn toàn 0,1 mol peptide X mạch hở tạo từ glycine và alanine cần vừa đủ 0,825 mol O₂, thu được N₂, CO₂ và H₂O. Số liên kết peptide trong X là</p><div class="sai so"><span><b>Sai 46%</b> · 11/24 em</span><span class="thanh" data-m="ho"><i style="width:46%"></i></span></div><div class="cap"><div class="vai"><span class="nhan2">Lên bảng làm · em đã sai</span><span class="ten-hang">Hoàng Đức Minh <span class="tang" data-t="2"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span></span><span class="ly so">sai câu này 1 lần · 18/10</span></div><div class="vai"><span class="nhan2">Giảng lại cho lớp · em đã đúng</span><span class="ten-hang">Phạm Gia Huy <span class="tang" data-t="3"><span class="pip"><i></i><i></i><i></i></span>Khá</span></span><span class="ly so">làm đúng ngay lần đầu</span></div></div><div class="hang-nut"><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em lên bảng</button><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em giảng lại</button></div></div><div class="cau-kho"><div class="cau-the"><span class="chip" data-m="xd">Câu 12</span><span class="chip" data-m="hp">Có tính toán</span><span class="chip">Vận dụng</span></div><p class="cau-de">Cho 0,15 mol glutamic acid vào 175 ml dung dịch HCl 2M, thu được dung dịch Y. Cho NaOH dư vào Y. Số mol NaOH đã phản ứng là</p><div class="sai so"><span><b>Sai 38%</b> · 9/24 em</span><span class="thanh" data-m="ho"><i style="width:38%"></i></span></div><div class="cap"><div class="vai"><span class="nhan2">Lên bảng làm · em đã sai</span><span class="ten-hang">Vũ Thảo My <span class="tang" data-t="1"><span class="pip"><i></i><i></i><i></i></span>Cần kèm</span></span><span class="ly so">sai câu này 1 lần · 20/10</span></div><div class="vai"><span class="nhan2">Giảng lại cho lớp · em đã đúng</span><span class="ten-hang">Đặng Quỳnh Anh <span class="tang" data-t="2"><span class="pip"><i></i><i></i><i></i></span>Trung bình</span></span><span class="ly so">từng sai, đã sửa đúng 21/10</span></div></div><div class="hang-nut"><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em lên bảng</button><button class="nut-chu nhat"><svg class="i"><use href="#i-doi"/></svg>Đổi em giảng lại</button></div></div>
+<div class="hang-nut"><button class="nut-chinh"><svg class="i"><use href="#i-chieu"/></svg>Chiếu lên bảng · 3 câu</button><span class="so" style="font-size:14px;color:var(--gvm-chu-2)">Đạt / Chưa đạt ghi sổ · lời giải hiện dần</span></div></div>
+<div class="ngan"></div>
+<div class="khoi4"><div class="khoi4-dau"><h3>Câu học sinh cần chữa <span class="chip so" data-m="hp" style="vertical-align:middle">12 chỗ</span><small>Bấm "Chiếu lên bảng": cũng gọi theo cặp vai và đủ tầng như trên</small></h3></div></div>
+</div></section><section class="buoc cuoi" data-tt="cho"><div class="buoc-dau"><span class="vong" aria-hidden="true"><svg class="i"><use href="#i-lich"/></svg></span><div class="buoc-ten"><h2>Kiểm tra ôn tập</h2><p>Ngoài buổi dạy · lịch và đề dành riêng cho từng em</p></div><button class="nut-chu">Xem</button></div></section></div></div></section><section class="khung" id="cach-chon"><div class="bo-cuc"><nav class="thuoc" aria-label="Tiến trình buổi dạy"><div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · Thứ Tư 21/10</span></div><ol><li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span>Điểm danh</span><span class="tt-phu so">Xong · 22/24 em</span></span></button></li><li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span class="ten-dai">Gọi lên bảng đầu giờ</span><span class="ten-ngan">Đầu giờ</span><span class="tt-phu so">Xong · Đạt 5/6</span></span></button></li><li data-tt="dang"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu so">Đang làm</span></span></button></li><li data-tt="tudo"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so">Mở lúc nào cũng được · 12 chỗ</span></span></button></li></ol></nav><div class="cac-buoc"><section class="buoc" data-tt="xong"><div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Điểm danh</h2><p class="so"><b>22/24 em có mặt</b> · Vắng: Phạm Lan, Đỗ Minh</p></div><button class="nut-chu">Mở lại</button></div></section><section class="buoc" data-tt="xong"><div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Gọi lên bảng đầu giờ</h2><p class="so"><b>Đã gọi 6 em</b> · đủ 3 tầng</p></div><button class="nut-chu">Mở lại</button></div></section><section class="buoc" data-tt="dang"><div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học</h2><p>Chiếu câu, gọi em lên làm.</p></div></div><div class="buoc-than"><div class="cce"><div class="cce-dau"><b>Cách chọn em <i class="tag" data-t="moi">mới</i></b><button class="nut-chu">Cách app chọn em<svg class="i"><use href="#i-phai"/></svg></button></div><div class="seg" role="radiogroup" aria-label="Cách chọn em"><button role="radio" aria-checked="true">Trộn giỏi – yếu<small>mặc định</small></button><button role="radio" aria-checked="false">Chắc đúng<small>như cũ</small></button><button role="radio" aria-checked="false">Ngẫu nhiên<small>rút thăm đều</small></button></div><p class="ghi">23 câu chia gần đều cho ba tầng.</p></div></div></section></div></div><div class="man-che"></div><div class="hop-cach" role="dialog" aria-label="Cách app chọn em">
+<div class="dau-hop"><h2>Cách app chọn em lên bảng</h2><button class="nut-tron" aria-label="Đóng">✕</button></div>
+<div class="b4"><span class="vong">1</span><div><h3>Chia ba tầng theo chính câu này</h3><p>Lấy khả năng làm đúng câu ấy của từng em có mặt: tỉ lệ đúng đã đo, em chưa có dữ liệu xếp tầng dưới. Cắt đều theo 1/3 lớp, nên lớp nào cũng đủ ba tầng.</p><div class="lop22"><i data-t="1"></i><i data-t="1"></i><i data-t="1"></i><i data-t="1"></i><i data-t="1"></i><i data-t="1"></i><i data-t="1"></i><i data-t="2"></i><i data-t="2"></i><i data-t="2"></i><i data-t="2"></i><i data-t="2"></i><i data-t="2"></i><i data-t="2"></i><i data-t="2"></i><i data-t="3"></i><i data-t="3"></i><i data-t="3"></i><i data-t="3"></i><i data-t="3"></i><i data-t="3"></i><i data-t="3"></i></div><div class="chu-lop so"><span>Cần kèm · 7 em</span><span>Trung bình · 8 em</span><span>Khá · 7 em</span></div></div></div>
+<div class="b4"><span class="vong">2</span><div><h3>Ghép tầng theo độ khó của câu</h3><p>Câu dễ để em yếu thành công và tự tin; câu khó để em khá kéo cả lớp. Cả buổi vẫn chia gần đều ba tầng.</p>
+<div class="ghep"><div class="ghep-dong"><span class="chip">Nhận biết</span><span>Gọi em <b>Cần kèm</b> trước, rồi Trung bình</span></div><div class="ghep-dong"><span class="chip">Thông hiểu</span><span>Gọi em <b>Trung bình</b> trước</span></div><div class="ghep-dong"><span class="chip">Vận dụng · VDC</span><span>Gọi em <b>Khá</b> trước, đôi khi Trung bình</span></div></div></div></div>
+<div class="b4"><span class="vong">3</span><div><h3>Rút thăm trong tầng, ưu tiên em lâu chưa lên</h3><p>Trong tầng đã chọn, em càng ít lên bảng 14 ngày qua thì càng dễ được gọi (theo sổ lên bảng). Không ai chắc chắn, không ai bị bỏ quên.</p>
+<div class="can so"><div class="can-dong"><span>Chưa lên lần nào · 14 ngày</span><span class="thanh"><i style="width:100%"></i></span><b>×3</b></div><div class="can-dong"><span>Lên 1 lần</span><span class="thanh"><i style="width:50%"></i></span><b>×1,5</b></div><div class="can-dong"><span>Lên từ 3 lần</span><span class="thanh"><i style="width:22%"></i></span><b>×0,7</b></div></div></div></div>
+<div class="b4"><span class="vong">4</span><div><h3>Luật cứng</h3><ul class="luat"><li>Mỗi em một lần, đủ cả lớp có mặt mới tới lần hai.</li><li>Không gọi một em ở hai câu liền nhau.</li><li>"Đổi em" rút em khác cùng tầng, không xáo cả buổi.</li><li>Mở lại tờ chiếu vẫn đúng danh sách đã rút trong buổi.</li><li>Chỉ gọi em có mặt ở bước 1 Điểm danh; mỗi bước tự chọn theo việc của bước.</li></ul></div></div>
+<p class="chu-chieu"><svg class="i"><use href="#i-chieu"/></svg>Tầng chỉ hiện trên màn của thầy. Bản chiếu chỉ ghi tên em, không bao giờ ghi "Cần kèm".</p>
+</div></section>
+    </main>
+  </div>
+</div>
+
+<section class="khung" id="chieu"><div class="cd"><i class="tag" data-t="giu">bản chiếu · không hiện tầng</i>
+<div class="cd-dau"><b>Câu 2 · Nhận biết</b><span>Dạy học · Amine — tính base · 12A1</span></div>
+<div class="cd-than"><div><p class="cd-de">Dãy gồm các chất đều làm quỳ tím ẩm chuyển sang màu xanh là</p><div class="cd-pa"><span>A. aniline, methylamine, ammonia</span><span>B. methylamine, ammonia, sodium acetate</span><span>C. ammonium chloride, methylamine, sodium hydroxide</span><span>D. aniline, ammonia, sodium hydroxide</span></div></div>
+<div class="cd-moi"><span class="nho">Mời em lên bảng</span><b>Nguyễn Hà Vy</b><span class="nho">Lần đầu lên bảng trong buổi</span></div></div>
+<div class="cd-chan"><span>D · Đạt</span><span>K · Chưa đạt</span><span>E · Đổi em</span><span>G · Lời giải</span></div></div></section>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-dung" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-nha" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></symbol>
+  <symbol id="i-co" viewBox="0 0 24 24"><path d="M4 22V4"/><path d="M4 4h12l-2 4 2 4H4"/></symbol>
+  <symbol id="i-dong-ho" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-nguoi" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></symbol>
+  <symbol id="i-sach" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5a2.5 2.5 0 0 0 0 5H20"/></symbol>
+  <symbol id="i-cai" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 14H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 10h0a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-chieu" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-mat" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-den" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></symbol>
+  <symbol id="i-phai" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-lich" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-lam-moi" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-doi" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M21 3 14 10"/><path d="M8 21H3v-5"/><path d="m3 21 7-7"/></symbol>
+</svg>
+<script>
+// Chọn khung theo #k=…&toi=1
+const q = new URLSearchParams(location.hash.slice(1))
+if (q.get('toi')) document.documentElement.setAttribute('data-toi', '')
+const k = q.get('k') || 'day-hoc'
+if (k === 'chieu') { document.querySelector('.app').style.display = 'none'; document.body.style.background = 'rgb(18 18 17)' } else document.getElementById('chieu').hidden = true
+document.getElementById(k)?.setAttribute('data-mo', '')
+// Mã QR giả (chỉ là hình minh hoạ): ba ô định vị + điểm giả ngẫu nhiên cố định
+const qr = document.getElementById('qr1')
+if (qr) {
+  let s = 7, h = ''
+  const r = () => (s = (s * 9301 + 49297) % 233280) / 233280
+  const dinhVi = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="currentColor"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="var(--gvm-mat)"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="currentColor"/>`
+  for (let y = 0; y < 25; y++) for (let x = 0; x < 25; x++) {
+    const goc = (x < 8 && y < 8) || (x > 16 && y < 8) || (x < 8 && y > 16)
+    if (!goc && r() > 0.52) h += `<rect x="${x}" y="${y}" width="1" height="1" fill="currentColor"/>`
+  }
+  qr.innerHTML = h + dinhVi(0, 0) + dinhVi(18, 0) + dinhVi(0, 18)
+  qr.style.color = 'var(--gvm-chu)'
+}
+</script>
+</body>
+</html>

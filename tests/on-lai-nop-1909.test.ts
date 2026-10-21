@@ -283,6 +283,13 @@ describe('kiểm đầu vào', () => {
     const r = await nop(d, [null, 7, 'x', {}, { qid: 5 }, { qid: 'y'.repeat(500), dapAn: 'A' }, { qid: I1, dapAn: 'B' }])
     expect((r.ketQua as { qid: string }[]).map((x) => x.qid)).toEqual([I1])
   })
+  it('docTraLoi (21/10): cờ đồng hồ mới dh CHỈ khi giây lấy từ doGiay; có trường giay cũ thì giây cũ thắng và bỏ cờ dh', () => {
+    const [moi, cu] = docTraLoi([{ qid: 'a', dapAn: 'A', doGiay: { g: 12, t: 30 } }, { qid: 'b', dapAn: 'B', giay: 40, doGiay: { g: 12, t: 30 } }])
+    expect(moi).toMatchObject({ giay: 12, doc: { giay: 12, tu: 30, dh: 1 } })
+    expect(cu!.giay).toBe(40)
+    expect(cu!.doc).toMatchObject({ tu: 30 })
+    expect(cu!.doc).not.toHaveProperty('dh')
+  })
   it('docTraLoi: dapAn là mảng thì nối; số thì thành chữ; cắt 40 ký tự; giây làm tròn', () => {
     expect(docTraLoi([{ qid: 'a', dapAn: ['D', 'S', 'D', 'S'], giay: 9.4 }, { qid: 'b', dapAn: 3 }, { qid: 'c', dapAn: 'x'.repeat(100) }])).toEqual([
       { qid: 'a', dapAn: 'DSDS', giay: 9 }, { qid: 'b', dapAn: '3', giay: null }, { qid: 'c', dapAn: 'x'.repeat(40), giay: null },

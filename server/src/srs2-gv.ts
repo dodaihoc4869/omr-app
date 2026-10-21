@@ -12,7 +12,7 @@ import { laCauTuLuan } from './cam-tu-luan'
 import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
 import { khoaCau } from '../../src/lib/khu-trung-cau'
 import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, HANG_MUC_DO, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
-import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
+import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docBatDauMap, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 import { cacQidSongSinh } from './loi-hoc-luat'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { lanLamTuDongTc, sqlQidHoacTc } from './lam-lai-so'
@@ -60,9 +60,10 @@ async function coLuu(env: Env, b: Row, nowMs: number, khoa = KHOA_CO_HOA2) {
 
 // ---------------------------------------------------------------- đọc chung
 async function docMot(env: Env, id: string): Promise<ChienDich> {
-  const r = await env.DB.prepare('SELECT * FROM chien_dich WHERE id = ?').bind(id).first<Row>()
+  // 21/10 (tối ưu tốc độ): mã chiến dịch biết trước ⇒ dòng chiến dịch + ngày bắt đầu + cờ rải đều đọc CÙNG lúc (một vòng chờ D1 thay vì hai).
+  const [r, bd, rd] = await Promise.all([env.DB.prepare('SELECT * FROM chien_dich WHERE id = ?').bind(id).first<Row>(), docBatDauMap(env, [id]), docRaiDeuMap(env, [id])])
   if (!r) throw new Error('Không tìm thấy chiến dịch.')
-  return (await docChienDichKemBatDau(env, [r]))[0]!
+  return docChienDichTuDong({ ...r, bat_dau: bd.get(str(r.id)) ?? null, rai_deu: rd.get(str(r.id)) ?? null })
 }
 /** Danh sách học sinh (đang học) cho bộ chọn khối → lớp → em ở màn giao — CÙNG bảng `emCuaLop` dùng, không phụ thuộc bộ nhớ máy thầy. */
 async function dsEm(env: Env) {
@@ -406,6 +407,8 @@ async function bang(env: Env, id: string, nowMs: number, boDoLuong = false) {
   const cd = await docMot(env, id)
   const homNay = ngayVnCua(nowMs)
   if (laHanhTrinh(cd.id)) return import('./hanh-trinh-d1').then(m => m.bangHanhTrinh(env,cd,homNay,boDoLuong))
+  // Kế hoạch hôm nay (huyết chiến) chỉ cần lớp + ngày ⇒ bắt đầu đọc cùng các bảng khác, không chờ tính trạng thái lớp.
+  const huaKh = env.DB.prepare('SELECT sbd, huyet_chien FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))').bind(homNay, JSON.stringify(cd.sbd)).all<Row>().catch(() => ({ results: [] as Row[] }))
   const [lanTho, ten, meta, hoSoDang, them] = await Promise.all([lanLamCaLop(env, cd.sbd, cd.qids), tenEm(env, cd.sbd), docMetaCau(env, cd.qids, cd.maDe), docHoSoDangCaLop(env, cd.sbd), docMocThemCaLop(env, cd.id)])
   const tt = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, lanTho, them)
   // Tên hiển thị của mã dạng (khoá `hangTheoDang` trùng khoá `theoDang`/`dang[]` của bảng).
@@ -416,7 +419,7 @@ async function bang(env: Env, id: string, nowMs: number, boDoLuong = false) {
   }
   const dangTheoQid = new Map(cd.qids.map((q) => [q, meta.get(q)?.tenDang ?? meta.get(q)?.dang ?? 'Chưa gắn dạng']))
   const dang = [...new Set(dangTheoQid.values())]
-  const kh = await env.DB.prepare('SELECT sbd, huyet_chien FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))').bind(homNay, JSON.stringify(cd.sbd)).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const kh = await huaKh
   const huyet = new Set((kh.results ?? []).filter((x) => Number(x.huyet_chien) === 1).map((x) => str(x.sbd)))
   const moc = mocNhip(cd.mocBatDau, cd.hanNop, homNay)
   const soCau = Math.max(1, cd.qids.length)

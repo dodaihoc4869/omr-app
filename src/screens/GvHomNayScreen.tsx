@@ -16,7 +16,7 @@
 //   · Chờ tải: khung xương đúng hình (`.tt-xuong`). Lỗi: câu dễ hiểu (`lyDoDeHieu`), không in lỗi kỹ thuật thô.
 // SỐ CHỈ TỪ API, không số giả: lệnh nào lỗi thì phần của nó KHÔNG vẽ. "Cần thầy chữa" = cùng nguồn và cùng cách gộp với danh sách Cần thầy chữa.
 // Ghi số cho thanh bên (`useSoDemGv`: ca đang mở, Cần thầy chữa). Phép tính thuần xuất ra để test (tests/gv-hom-nay-0910.test.tsx).
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, Check, ChevronRight, CircleHelp, MonitorCheck, PenLine, RefreshCw, type LucideIcon } from 'lucide-react'
 import { danhSachCa, danhSachCauHoi, type CaTomTat } from '../lib/exam-api'
 import { gomTheoCa } from '../lib/hoi-bai'
@@ -40,6 +40,10 @@ import './gv-hoa2.css'
 import '../components/chien-dich/gv-v2.css'
 import './gv-hom-nay.css'
 import '../components/hom-nay-thay/hom-nay-thay.css'
+
+// 21/10 (thầy: "nút này làm riêng bấm vào popup lên để chọn luôn chứ không gắn vào phần hành trình nữa"): "Bổ sung bài hôm nay" / "Bổ sung bài" mở
+// hộp NGAY TẠI CHỖ — mảnh nạp lười, chỉ tải khi bấm (mở màn Hôm nay không thêm byte).
+const HopBoSungBai = lazy(() => import('../components/day-hoc/HopBoSungBai'))
 
 // ------------------------------------------------------------------ PHÉP TÍNH THUẦN
 
@@ -152,21 +156,26 @@ export async function taiHomNay(onPhan?: (d: DuLieuHomNay) => void): Promise<DuL
   const huaPhu = import('../components/chien-dich/TheCanThayChua')
     .then(async (m) => ({ gom: m.gomCanChua, ...(await m.taiNguonPhu()) }))
     .catch(() => null)
-  const [{ ca, loiCa }, { cd, loiCd }, co] = await Promise.all([taiCa(), taiCd(), taiCoOmni()])
-
-  // PHÁT PHẦN ĐẦU NGAY (21/10): ca + chiến dịch về là màn đã có việc để hiện (Ca đang mở · lỗi) — không chờ bảng chiến dịch, OMNI, lớp chờ. Em hỏi bài về lúc nào thì phát thêm lúc ấy.
-  let hoiSom: { hoi: DuLieuHomNay['hoi']; loiHoi: string } | null = null
-  let xongHet = false
-  const phatPhanDau = () => {
-    if (xongHet) return
-    onPhan?.({ ca, loiCa, cd, loiCd, canThayChua: null, choBaiMoi: [], hoi: hoiSom?.hoi ?? null, loiHoi: hoiSom?.loiHoi ?? '', conCho: true })
-  }
-  phatPhanDau()
-  if (onPhan) void huaHoi.then((r) => { hoiSom = r; phatPhanDau() })
-
-  const chay = (cd ?? []).filter((c) => c.trangThai === 'dang_chay')
-  // Lớp chờ bài mới (OMNI) KHÔNG phụ thuộc bảng chiến dịch (chỉ cần công tắc OMNI + danh sách lớp) ⇒ chạy NGAY, song song với đọc bảng (trước đây chờ bảng xong mới bắt đầu).
+  // BỚT MỘT VÒNG CHỜ (21/10, thầy: "tối ưu tốc độ app tức thì"): đọc bảng chiến dịch chỉ cần danh sách chiến dịch, lớp chờ bài mới chỉ cần công tắc
+  // OMNI ⇒ mỗi việc bắt đầu NGAY khi phần nó cần về, không chờ cả ba lệnh đầu (trước: chờ ca + chiến dịch + OMNI rồi mới đọc bảng / lớp chờ).
+  const huaCa = taiCa()
+  const huaCd = taiCd()
+  const huaCo = taiCoOmni()
+  const huaBang = huaCd.then(async ({ cd }) => {
+    const chay = (cd ?? []).filter((c) => c.trangThai === 'dang_chay')
+    const bang: (BangChienDich | null)[] = await taiGioiHan(chay, async (c) => {
+      try {
+        const r = await docBang(c.id, true) // chỉ đếm: bỏ báo cáo A/B nặng (srs2-gv.ts `boDoLuong`)
+        return r.ok ? r.du : null
+      } catch {
+        return null
+      }
+    })
+    return { chay, bang }
+  })
+  // Lớp chờ bài mới (OMNI) KHÔNG phụ thuộc bảng chiến dịch (chỉ cần công tắc OMNI + danh sách lớp) ⇒ chạy ngay khi biết công tắc.
   const taiCho = (async () => {
+    const co = await huaCo
     if (!co?.bat) return []
     try {
       let lop = co.lop
@@ -187,14 +196,19 @@ export async function taiHomNay(onPhan?: (d: DuLieuHomNay) => void): Promise<DuL
       return []
     }
   })()
-  const bang: (BangChienDich | null)[] = await taiGioiHan(chay, async (c) => {
-    try {
-      const r = await docBang(c.id, true) // chỉ đếm: bỏ báo cáo A/B nặng (srs2-gv.ts `boDoLuong`)
-      return r.ok ? r.du : null
-    } catch {
-      return null
-    }
-  })
+  const [{ ca, loiCa }, { cd, loiCd }, co] = await Promise.all([huaCa, huaCd, huaCo])
+
+  // PHÁT PHẦN ĐẦU NGAY (21/10): ca + chiến dịch về là màn đã có việc để hiện (Ca đang mở · lỗi) — không chờ bảng chiến dịch, OMNI, lớp chờ. Em hỏi bài về lúc nào thì phát thêm lúc ấy.
+  let hoiSom: { hoi: DuLieuHomNay['hoi']; loiHoi: string } | null = null
+  let xongHet = false
+  const phatPhanDau = () => {
+    if (xongHet) return
+    onPhan?.({ ca, loiCa, cd, loiCd, canThayChua: null, choBaiMoi: [], hoi: hoiSom?.hoi ?? null, loiHoi: hoiSom?.loiHoi ?? '', conCho: true })
+  }
+  phatPhanDau()
+  if (onPhan) void huaHoi.then((r) => { hoiSom = r; phatPhanDau() })
+
+  const { chay, bang } = await huaBang
 
   // Bảng bài OMNI (ba nhóm Cần thầy chữa): như Lên bảng chiến dịch — chỉ chiến dịch còn chạy, không phải Hành trình; OMNI tắt ⇒ không hỏi.
   const canOmni = chay.map((c, i) => ({ c, b: bang[i] })).filter((x) => co?.bat && x.b && !x.b.hanhTrinhNgay && !x.b.hetHan)
@@ -373,6 +387,7 @@ export default function GvHomNayScreen() {
     datMoHanhTrinh(m)
     setScreen('chiendich')
   }
+  const [moBoSung, setMoBoSung] = useState(false)
 
   // VIỆC CẦN THẦY — xếp theo độ gấp: ca đang mở → Cần thầy chữa → em hỏi bài → lớp chờ bài mới → phần chưa đọc được (Thử lại)
   // → không có chỗ cần chữa (✓, không nút). Việc "em chưa làm câu nào" đã bỏ: khối Nhịp học nói đủ và rõ hơn.
@@ -420,7 +435,7 @@ export default function GvHomNayScreen() {
       soNgan: ds.length === 1 ? `${ds[0]!.soNgay} ngày` : `${ds.length} lớp`,
       phu: ds.length === 1 ? 'Hành trình đang ôn bài cũ · tick bài vừa dạy để mở câu mới' : `${ds.map((x) => `${x.lop}: ${x.soNgay} ngày`).join(' · ')} — tick bài vừa dạy để mở câu mới`,
       nut: 'Bổ sung bài',
-      lam: () => moHanhTrinh({ the: 'day-hoc', boSungBai: true }),
+      lam: () => setMoBoSung(true),
     })
   }
   // Phần chưa đọc được: MỘT thẻ, nói thật phần nào + lý do dễ hiểu + Thử lại (không in lỗi kỹ thuật thô).
@@ -452,7 +467,7 @@ export default function GvHomNayScreen() {
   }
 
   // Nút chính góc phải = việc gấp nhất: có ca đang mở ⇒ theo dõi ca ấy; không thì bổ sung bài hôm nay.
-  const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => moHanhTrinh({ the: 'day-hoc', boSungBai: true }) }
+  const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => setMoBoSung(true) }
   const soEm = nhip?.ok ? nhip.kq.em.length : null
 
   return (
@@ -525,6 +540,17 @@ export default function GvHomNayScreen() {
       </section>
 
       <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} />
+      {moBoSung && (
+        <Suspense fallback={null}>
+          <HopBoSungBai
+            onDong={(daGiao) => {
+              setMoBoSung(false)
+              // Vừa giao / bỏ tick ⇒ tải lại việc (thẻ "Lớp chưa có bài mới" theo đúng máy chủ).
+              if (daGiao) void tai()
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }
