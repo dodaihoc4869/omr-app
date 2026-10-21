@@ -15,8 +15,9 @@ import { layLopThay, type LopThay } from '../../lib/ten-lop-thay'
 import { buoiDangMo, xemBuoiHoc, type TrangThaiBuoi } from '../../lib/buoi-hoc-api'
 import { khoDayHoc } from '../../lib/day-hoc-len-bang'
 import { theoDoiBaiDangGiao } from '../../lib/bai-dang-giao-thay-doi'
-import { BuocBaiHomNay, useBaiHomNay, type BaiChonNho } from './BaiHomNay'
-import './day-hoc.css'
+// Nhập QUA bảng Dạy học (cùng mảnh, kèm kiểu dáng day-hoc): bước Bài hôm nay không tách mảnh riêng ⇒ app thầy mở không thêm tên mảnh nào; hộp nạp
+// mảnh bảng Dạy học — vẫn nhẹ hơn đường cũ (sang cả màn Hành trình), và đã có sẵn nếu thầy vừa mở Hành trình.
+import { BuocBaiHomNay, useBaiHomNay, type BaiChonNho } from './DayHocLenBang'
 import './hop-bo-sung-bai.css'
 
 /** Khoá nhớ theo buổi — CÙNG khoá với bảng Dạy học (`DayHocLenBang.tsx`); hộp chỉ đọc / ghi hai trường của mình. */

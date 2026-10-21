@@ -8,7 +8,7 @@
 // khoá khác ⇒ bước theo điểm danh; `boSungBai` (lối cũ) ⇒ mở hộp Bổ sung bài ngay trên màn này.
 import { lazy, Suspense, useState } from 'react'
 import type { BaiCay } from '../../lib/bai-hom-nay'
-import { mucHanhTrinh, type TheHanhTrinh } from '../../lib/so-dem-gv'
+import type { TheHanhTrinh } from '../../lib/so-dem-gv'
 import './gv-v2.css'
 
 // Phép tính nhịp (khối, bốn chỉ số) ở `nhip-hanh-trinh.ts` (màn Hôm nay dùng) — xuất lại ở đây cho mọi lối nhập cũ.
@@ -21,7 +21,7 @@ const HopBoSungBai = lazy(() => import('../day-hoc/HopBoSungBai'))
 /** 21/10 — Hành trình thành MỘT trang 4 bước (bản vẽ docs/ban-ve-hanh-trinh-2110; đặt ở mảnh nạp lười này, không ở so-dem-gv.ts nạp sẵn — app thầy mở nhẹ hơn): khoá thẻ ⇒ bước mở sẵn. `chua-bai` / `can-chua` ⇒ 4 (Chữa câu khó
  *  & tính toán); `dau-gio` ⇒ 2 (Gọi lên bảng đầu giờ); khoá khác ⇒ null (màn tự chọn bước theo điểm danh — `buocMacDinh`). */
 export function buocHanhTrinh(k: TheHanhTrinh | string | null | undefined): 2 | 4 | null {
-  if (mucHanhTrinh(k) === 'chua-bai') return 4
+  if (k === 'chua-bai' || k === 'can-chua') return 4
   return k === 'dau-gio' ? 2 : null
 }
 

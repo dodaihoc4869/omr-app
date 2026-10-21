@@ -37,6 +37,8 @@ import './day-hoc.css'
 
 /** Chữ tấm chiếu mã điểm danh — nay nằm ở `DiemDanhBuoi.tsx` (dùng chung với Kiểm tra đầu giờ); giữ lối xuất cũ. */
 export { CHU_DIEM_DANH } from './DiemDanhBuoi'
+/** Bước Bài hôm nay — hộp "Bổ sung bài hôm nay" nhập qua đây để cùng mảnh với bảng (không tách mảnh riêng, 21/10). */
+export { BuocBaiHomNay, useBaiHomNay, type BaiChonNho } from './BaiHomNay'
 
 /** Nhớ trên máy theo buổi: đề đã tích, câu đã bỏ, em đã giao + (đợt 16) lớp thầy tự chọn và bài đang chọn ở bước Bài hôm nay. Hỏng/không có ⇒ bắt đầu trống. */
 interface NhoBuoi {
