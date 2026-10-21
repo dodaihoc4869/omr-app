@@ -41,7 +41,7 @@ export const CSS_LEN_BANG_MOI = `
 :root{--mc-ll-nen:rgb(254 243 199);--mc-ll-vien:rgb(253 230 138);--mc-ll-nhan:rgb(120 53 15);--mc-ll-chu:var(--mc-chu,rgb(34 38 43));--mc-ll-chot:rgb(255 251 235);--mc-ll-chon:rgb(16 185 129 / .16);--mc-ll-dung:rgb(4 120 87);--mc-ll-sai:rgb(190 18 60)}
 :root[data-projector="dark"],:root[data-projector="matte-dark"]{--mc-ll-nen:rgb(58 42 20);--mc-ll-vien:rgb(120 53 15);--mc-ll-nhan:rgb(252 211 77);--mc-ll-chu:var(--mc-chu,rgb(244 239 228));--mc-ll-chot:rgb(43 33 24);--mc-ll-chon:rgb(52 211 153 / .18);--mc-ll-dung:rgb(110 231 183);--mc-ll-sai:rgb(253 164 175)}
 /* ═══ LÊN BẢNG — BẢN VẼ MỚI 28/09 ═══ */
-:root{--u:min(1vw,1.777778vh);--mc-den:rgb(0,0,0);--mc-vang-noi:rgb(255,210,122);--mc-thanh2:rgb(27,26,23)}
+:root{--u:min(1vw,1.777778vh);--mc-den:rgb(0,0,0);--mc-vang-noi:rgb(255,210,122);--mc-thanh2:rgb(27,26,23);--mc-b:rgb(255,255,255);--mc-nen:rgb(15,18,30);--mc-s:rgb(229,83,75);--mc-d:rgb(76,179,95);--mc-xam:rgb(120,126,142);--mc-m1:rgb(65,83,112);--mc-m2:rgb(87,114,151);--mc-m3:rgb(110,148,195);--mc-m4:rgb(134,182,239)}
 /* 1 · CHỮ CỐ ĐỊNH: đề = phương án = lời giải = --mc-co (không co, không bậc chữ) cho cả dạy học, đầu giờ và chiến dịch */
 body.mc-bc .mc-vung-de .mc-de,body.mc .mc-de{font-size:var(--mc-co,28px)!important;line-height:1.6!important}
 body.mc-bc .mc-vung-de .mc-pa,body.mc-bc .mc-vung-de .mc-pa-chu{font-size:var(--mc-co,28px)}
@@ -256,7 +256,6 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
   color:rgb(238,241,248);font:500 max(12px,calc(var(--u)*.85))/1.4 var(--mc-sans);display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto 1fr auto;padding:calc(var(--u)*1) calc(var(--u)*1.3) calc(var(--u)*.6);gap:calc(var(--u)*.75);overflow:hidden}
 .mc-ct.mc-mo{transform:none}
 /* ── X · AI ĐÃ SAI? (thầy 21/10): HAI THẺ — em ĐÃ ĐIỂM DANH làm sai · CẢ LỚP làm sai — mỗi thẻ chia theo Mức làm 1–4 (làn + thẻ tên + giây). Bản vẽ: docs/ban-ve-chieu-muc-lam-2110/. ── */
-.mc-aisai,.mc-ct{--mc-b:rgb(255,255,255);--mc-nen:rgb(15,18,30);--mc-s:rgb(229,83,75);--mc-d:rgb(76,179,95);--mc-xam:rgb(120,126,142);--mc-m1:rgb(65,83,112);--mc-m2:rgb(87,114,151);--mc-m3:rgb(110,148,195);--mc-m4:rgb(134,182,239)}
 .mc-aisai{position:fixed;top:0;right:0;bottom:0;width:94%;z-index:81;transform:translateX(104%);transition:transform .5s cubic-bezier(.2,.9,.2,1);background:radial-gradient(120% 70% at 100% 0%,rgba(57,135,229,.22),transparent 60%),radial-gradient(90% 60% at 0% 100%,rgba(213,81,129,.16),transparent 60%),rgb(15,18,30);border-left:1px solid rgba(255,255,255,.14);color:var(--mc-b);font-family:var(--mc-sans);padding:calc(var(--u)*1.5) calc(var(--u)*2) calc(var(--u)*1.1);box-sizing:border-box;box-shadow:-2em 0 4em rgba(0,0,0,.45);display:flex;flex-direction:column;gap:calc(var(--u)*1);overflow:hidden}
 .mc-aisai.mc-mo{transform:none}
 .mc-aisai button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}

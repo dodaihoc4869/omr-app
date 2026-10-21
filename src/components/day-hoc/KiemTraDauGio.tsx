@@ -132,7 +132,9 @@ function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong }: { dd: DiemDanhBuoi
     },
     [idBuoi],
   )
-  const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `dau-gio|${idBuoi}` : '', ghiO, thayChuaO)
+  // Nút X, hai thẻ (thầy 21/10): em của lớp buổi này + em đã điểm danh (chưa tải danh sách lớp ⇒ một thẻ cả lớp như cũ).
+  const lopAiSai = useCallback(() => (tt?.lopEm?.length ? { sbdLop: tt.lopEm.map((e) => e.sbd), coMat: coMat.length ? new Set(coMat.map((e) => e.sbd)) : null } : null), [tt?.lopEm, coMat])
+  const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `dau-gio|${idBuoi}` : '', ghiO, thayChuaO, undefined, lopAiSai)
 
   const [html, setHtml] = useState('')
   const [dangChieu, setDangChieu] = useState(false)

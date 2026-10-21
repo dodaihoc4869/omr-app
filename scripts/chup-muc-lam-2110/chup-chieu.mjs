@@ -2,7 +2,7 @@
 // CHỤP ẢNH TỜ CHIẾU THẬT có Mức làm 1–4 (thầy 21/10) bằng Chromium THẬT: nút X "Ai đã sai?" hai thẻ (4 kịch bản) và bảng chi tiết em gọi lên bảng (2 kịch bản), 1920×1080 và 1280×720 (tờ chiếu luôn nền tối).
 //   npx vite build --config scripts/chup-muc-lam-2110/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/chup-muc-lam-2110/chup-chieu.mjs <thư mục tạm> [thư mục ảnh = docs/anh-muc-lam-chieu-2110]
-// Soát: lỗi trang · tràn ngang · đích chạm < 44 px · NỘI DUNG BỊ CẮT (thẻ cuộn được = có phần bị che) · tên bị cắt bằng "…" (đếm). JPG tự hạ chất lượng tới ≤ 150 KB.
+// Soát: lỗi trang · tràn ngang · đích chạm < 44 px · tương phản chữ ≥ 4,5:1 · NỘI DUNG BỊ CẮT (thẻ cuộn được = có phần bị che) · tên bị cắt bằng "…" (đếm). JPG tự hạ chất lượng tới ≤ 150 KB.
 import { createServer } from 'node:http'
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { extname, join, resolve } from 'node:path'
@@ -67,17 +67,30 @@ for (const [ten, loai, kich] of KICH) {
       const cuon = [...document.querySelectorAll('.mc-ai-the, .mc-the-ct, .mc-cau-nay, .mc-lan-ds, .mc-aisai, .mc-ct')].filter((e) => e.scrollHeight > e.clientHeight + 1 && getComputedStyle(e).display !== 'none').map((e) => `${e.className.split(' ')[0]} ${e.scrollHeight}>${e.clientHeight}`)
       const ngoai = [...document.querySelectorAll('.mc-aisai *, .mc-ct *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.right > innerWidth + 1 || r.bottom > innerHeight + 1) && !e.closest('.mc-ai-the, .mc-ct-luoi > *, .mc-lan-ds') }).length
       const rutGon = [...document.querySelectorAll('.mc-pl b')].filter((b) => b.scrollWidth > b.clientWidth + 1).length
-      return { tran, nho, cuon, ngoai, rutGon }
+      // Tương phản chữ (≥ 4,5:1): chồng các lớp nền nửa trong suốt từ trên xuống tới lớp đặc, chữ nửa trong suốt cũng chồng lên nền.
+      const so = (v) => (v.match(/-?[\d.]+(?:e-?\d+)?/g) ?? []).map(Number)
+      const mau = (v) => { const n = so(v); return v.startsWith('color(') ? [n[0] * 255, n[1] * 255, n[2] * 255, n[3] ?? 1] : [n[0], n[1], n[2], n[3] ?? 1] }
+      const chong = (tren, duoi) => [0, 1, 2].map((i) => tren[i] * tren[3] + duoi[i] * (1 - tren[3]))
+      const nenHL = (el) => { const lop = []; let x = el; while (x) { const c = mau(getComputedStyle(x).backgroundColor); if (c[3] > 0) lop.push(c); if (c[3] >= 0.99) break; x = x.parentElement } let nen = lop.length && lop[lop.length - 1][3] >= 0.99 ? lop.pop().slice(0, 3) : [0, 0, 0]; while (lop.length) { const t = lop.pop(); nen = chong(t, nen) } return nen }
+      const lum = (c) => { const [r, g, b] = c.map((v) => { const t = v / 255; return t <= 0.03928 ? t / 12.92 : ((t + 0.055) / 1.055) ** 2.4 }); return 0.2126 * r + 0.7152 * g + 0.0722 * b }
+      const tuongPhan = (el) => { const nen = nenHL(el), ch = mau(getComputedStyle(el).color), chu = chong(ch, nen); const a = lum(chu), b = lum(nen); return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) }
+      const CHU = '.mc-pl b, .mc-pl u, .mc-ln header b, .mc-ln header span, .mc-ln header em, .mc-ai-tn > i, .mc-ai-ph, .mc-ai-so span, .mc-ai-so b, .mc-ai-chan, .mc-kpi span, .mc-kpi b, .mc-cheo small, .mc-cheo li b, .mc-cheo i, .mc-ct-chips, .mc-gan-t, .mc-gan-gt, .mc-gan-so span, .mc-gan-so b, .mc-lanl .mc-kq2, .mc-lanl-gt, .mc-chm, .mc-th-moc span, .mc-ket, .mc-do, .mc-sai-tt, .mc-ai-thuoc, .mc-ai-thuoc b, .mc-rong, .mc-the-ct h4, .mc-exp-dong span, .mc-cg li, .mc-cau-nay, .mc-chu-giai span, .mc-ai-ky, .mc-ai-rong p, .mc-ai-rong b'
+      const duoc = [...document.querySelectorAll(CHU)].filter((e) => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0 && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))
+      const thap = duoc.map((e) => [`${e.className.split(' ')[0]} "${e.textContent.trim().slice(0, 16)}"`, tuongPhan(e)]).filter(([, t]) => t < 4.5)
+      return { tran, nho, cuon, ngoai, rutGon, thap, soChu: duoc.length }
     })
     if (kq.tran) soat.push(`${nhan}: TRÀN NGANG`)
     if (kq.nho) soat.push(`${nhan}: ${kq.nho} đích chạm nhỏ`)
     if (kq.cuon.length) soat.push(`${nhan}: BỊ CẮT/CUỘN ${kq.cuon.join(' | ')}`)
     if (kq.ngoai) soat.push(`${nhan}: ${kq.ngoai} phần tử lọt ngoài khung`)
+    if (kq.thap.length) soat.push(`${nhan}: tương phản < 4,5:1 — ${kq.thap.slice(0, 5).map(([c, t]) => `${c} ${t.toFixed(2)}`).join(' | ')}`)
     if (kq.rutGon) soat.push(`${nhan}: ${kq.rutGon} tên bị cắt bằng "…" dù đã viết tắt`)
-    let q = 82, buf
-    for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q }); if (buf.length <= 150_000 || q <= 22) break; q -= 6 }
+    // CHAT_LUONG=90 ⇒ ảnh rõ để gửi thầy xem (không hạ chất lượng, không giới hạn 150 KB — KHÔNG đưa vào kho).
+    const roAnh = Number(process.env.CHAT_LUONG) || 0
+    let q = roAnh || 82, buf
+    for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q }); if (roAnh || buf.length <= 150_000 || q <= 22) break; q -= 6 }
     writeFileSync(join(RA, `${nhan}.jpg`), buf)
-    console.log(`${nhan}.jpg ${Math.round(buf.length / 1024)} KB (q${q})`)
+    console.log(`${nhan}.jpg ${Math.round(buf.length / 1024)} KB (q${q}) · ${kq.soChu} chữ đã đo tương phản`)
     await ctx.close()
   }
 }
