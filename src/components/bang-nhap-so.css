@@ -14,8 +14,9 @@
 .bns-o[data-tt=dang]{border:2px dashed color-mix(in srgb,var(--lg-nhan) 55%,var(--the));box-shadow:0 0 0 4px var(--bns-nhan-nen)}
 .bns-con-tro{display:block;width:2px;height:30px;border-radius:2px;background:color-mix(in srgb,var(--lg-nhan) 55%,var(--the))}
 /* Máy yếu (đo 21/10, màn thi 8 câu trả lời ngắn): bàn phím của thẻ NẰM NGOÀI màn không dựng bố cục / tô vẽ tới khi cuộn gần tới — giữ chỗ đúng chiều cao. */
-.bns-phim{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;content-visibility:auto;contain-intrinsic-size:auto 224px}
-.bns-phim-cho{height:224px}
+/* KHÔNG content-visibility / dựng phím lười (đo máy yếu 21/10, 6 lượt xoay vòng): có c-v thì TBT lúc chọn đáp án 681 ms > main 506;
+   bỏ c-v + dựng phím ngay ⇒ 469 < main 573, vào đề 2,2 s < main 2,9 s. */
+.bns-phim{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .bns-phim button{height:50px;display:grid;place-items:center;padding:0;border:0;border-radius:12px;background:color-mix(in srgb,var(--muc) 6%,var(--the-2));color:var(--muc);font-size:21px;font-weight:600;
   font-variant-numeric:tabular-nums;cursor:pointer;touch-action:manipulation;transition:transform 120ms}
 .bns-phim button[data-chuc]{background:color-mix(in srgb,var(--muc) 13%,var(--the-2));font-size:24px;font-weight:700}
@@ -33,7 +34,7 @@
 .bns[data-gon]:not(:focus-visible):not(:focus) .bns-o[data-tt=dang]{border:2px solid var(--bns-vien);box-shadow:none}
 .bns[data-gon]:not(:focus-visible):not(:focus) .bns-con-tro{visibility:hidden}
 .bns-an{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (max-width:380px){.bns{padding:12px}.bns-phim{gap:6px}.bns-phim button{height:46px}.bns-phim-cho{height:202px}}
+@media (max-width:380px){.bns{padding:12px}.bns-phim{gap:6px}.bns-phim button{height:46px}}
 /* ĐIỆN THOẠI XOAY NGANG (cao ≤ 500 px, ảnh Chromium 844×390 21/10): bảng dọc cao 343 px đẩy đề ra khỏi màn ⇒ xếp hàng ô bên trái, bàn phím bên phải,
    phím vẫn ≥ 44 px — bảng thấp còn khoảng một nửa, đề và bảng cùng nằm trong màn. */
 @media (orientation:landscape) and (max-height:500px){
@@ -43,6 +44,5 @@
   .bns:not([data-gon]) .bns-o{height:52px;font-size:24px}
   .bns:not([data-gon]) .bns-phim{flex:1 1 auto;gap:6px}
   .bns:not([data-gon]) .bns-phim button{height:44px}
-  .bns:not([data-gon]) .bns-phim-cho{height:194px}
 }
 @media (prefers-reduced-motion:reduce){.bns-phim button{transition:none}}

@@ -108,3 +108,10 @@ describe('TheCau Phần III', () => {
     expect(container.querySelector('input')).not.toBeNull()
   })
 })
+
+describe('Tốc độ màn thi (đo máy yếu 21/10)', () => {
+  it('bàn phím không dùng content-visibility (làm chậm lúc chọn đáp án trên máy yếu)', async () => {
+    const { readFileSync } = await import('node:fs')
+    expect(readFileSync('src/components/bang-nhap-so.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/content-visibility/)
+  })
+})

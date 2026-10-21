@@ -6,7 +6,7 @@
 // KHÁC màn luyện: nhiều câu trên cùng một trang (màn kiểm tra dọc) ⇒ KHÔNG nghe phím cả cửa sổ; bảng là MỘT vùng nhận tiêu điểm (`tabIndex=0`),
 // gõ số trên máy tính chỉ vào bảng đang được chọn. Không có ô <input> ⇒ bàn phím điện thoại không bật đè lên đề.
 // Giá trị gửi đi y như ô cũ `OSoTraLoi chuanViet`: dấu trừ ASCII "-", dấu thập phân ",". Đáp án đã lưu dài hơn `soO` vẫn hiện đủ (chỉ xoá bớt được).
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
+import type { CSSProperties, KeyboardEvent } from 'react'
 import { kyTuHien, nhanPhim, phimCoTacDung, phimTuBanPhim, type PhimSo } from './hoc-tap/lam-bai'
 import './bang-nhap-so.css'
 
@@ -34,16 +34,6 @@ const HANG_PHIM: { p: PhimSo; chu?: string; ten?: string; chuc?: true; rong?: tr
 export default function BangNhapSo({ value, onChange, soO, disabled, ariaLabel = 'Đáp án của em', id, onFocus, gon }: BangNhapSoProps) {
   const v = value ?? ''
   const so = Math.max(soO, v.length)
-  // DỰNG BÀN PHÍM KHI SẮP THẤY (luật tốc độ thầy: "không được phép chậm hơn"; đo máy yếu 21/10, màn thi 8 câu trả lời ngắn): thẻ ở xa màn chỉ có hàng ô +
-  // khung giữ chỗ đúng chiều cao; cuộn tới gần (cách 600 px) mới dựng 14 phím. Gõ phím máy tính vẫn nhận ngay. Không có IntersectionObserver ⇒ dựng luôn.
-  const goc = useRef<HTMLDivElement>(null)
-  const [thay, setThay] = useState(() => gon || typeof IntersectionObserver === 'undefined')
-  useEffect(() => {
-    if (thay || !goc.current) return
-    const io = new IntersectionObserver((ds) => { if (ds.some((d) => d.isIntersecting)) { setThay(true); io.disconnect() } }, { rootMargin: '600px 0px' })
-    io.observe(goc.current)
-    return () => io.disconnect()
-  }, [thay])
   const nhan = (p: PhimSo) => {
     if (disabled) return
     const moi = nhanPhim(v, p, soO)
@@ -57,7 +47,7 @@ export default function BangNhapSo({ value, onChange, soO, disabled, ariaLabel =
     nhan(p)
   }
   return (
-    <div ref={goc} id={id} className="bns" role="group" aria-label={ariaLabel} tabIndex={disabled ? -1 : 0} onKeyDown={go} onFocus={onFocus} data-khoa={disabled || undefined} data-gon={gon || undefined}>
+    <div id={id} className="bns" role="group" aria-label={ariaLabel} tabIndex={disabled ? -1 : 0} onKeyDown={go} onFocus={onFocus} data-khoa={disabled || undefined} data-gon={gon || undefined}>
       <div className="bns-o-hang" aria-hidden="true" data-nhieu={so > 4 || undefined} style={so > 4 ? ({ '--bns-so-o': so } as CSSProperties) : undefined}>
         {Array.from({ length: so }, (_, i) => (
           <span key={i} className="bns-o" data-tt={i < v.length ? 'co' : i === v.length && !disabled ? 'dang' : 'trong'}>
@@ -66,8 +56,7 @@ export default function BangNhapSo({ value, onChange, soO, disabled, ariaLabel =
         ))}
       </div>
       <output className="bns-an" aria-live="polite">{v ? `Đáp án của em: ${[...v].map(kyTuHien).join('')}` : 'Chưa nhập đáp án'}</output>
-      {!gon && !thay && <div className="bns-phim bns-phim-cho" aria-hidden="true" />}
-      {!gon && thay && <div className="bns-phim" role="group" aria-label="Bàn phím số">
+      {!gon && <div className="bns-phim" role="group" aria-label="Bàn phím số">
         {HANG_PHIM.map(({ p, chu, ten, chuc, rong }) => (
           <button key={p} type="button" tabIndex={-1} aria-label={ten} data-chuc={chuc || undefined} data-rong={rong || undefined} disabled={disabled || !phimCoTacDung(v, p, soO)} onClick={() => nhan(p)}>
             {p === 'xoa' ? <span aria-hidden="true">⌫</span> : chu ?? p}
