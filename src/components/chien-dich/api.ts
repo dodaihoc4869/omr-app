@@ -204,7 +204,8 @@ export const luuCo = async (co: CoHoa2): Promise<KetQuaLenh<CoHoa2>> => {
 export const danhSach = () => goiChienDich<DanhSachChienDich>('danh-sach')
 /** Danh sách học sinh máy chủ (sbd, họ tên, lớp) cho bộ chọn khối → lớp → em. */
 export const docDsEm = () => goiChienDich<{ em: { sbd: string; hoTen: string; lop: string; khoi?: string; tenLop?: string }[] }>('ds-em', {})
-export const docBang = (id: string) => goiChienDich<BangChienDich>('bang', { id })
+/** `chiDem` = chỉ cần số liệu (Hôm nay · Nhịp học · Cần thầy chữa), không hiện khối «Đo hiệu quả học» ⇒ máy chủ bỏ báo cáo A/B nặng (xem `boDoLuong` ở srs2-gv.ts). */
+export const docBang = (id: string, chiDem = false) => goiChienDich<BangChienDich>('bang', chiDem ? { id, boDoLuong: true } : { id })
 /** Chỉ xếp buổi sau khi thầy đã điểm danh; danh sách có mặt được gửi tường minh lên máy chủ. */
 export const docBuoiChua = (id: string, coMat: string[]) => goiChienDich<BuoiChuaMayChu>('buoi-chua', { id, coMat })
 /** Mọi qid cần mở khoá của một dòng (bản đại diện + bản trùng nội dung). */

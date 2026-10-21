@@ -173,7 +173,7 @@ export async function chonLoThuSucHanhTrinh(env: Env, sbd: string, ngay: string,
 }
 
 /** Bảng thầy chỉ đọc kế hoạch hôm nay, không replay toàn kho × toàn khối. */
-export async function bangHanhTrinh(env: Env, cd: ChienDich, ngay: string) {
+export async function bangHanhTrinh(env: Env, cd: ChienDich, ngay: string, boDoLuong = false) {
   const emJson = JSON.stringify(cd.sbd)
   await chayDdlMotLan(env,'hanh_trinh_v5_nguon',[...SQL_HANH_TRINH_V5,...SQL_NGUON_CAU])
   const [hs, kh, snap, suKien, muc, doLuong,nguon] = await Promise.all([
@@ -184,7 +184,7 @@ export async function bangHanhTrinh(env: Env, cd: ChienDich, ngay: string) {
       AND ket_qua IS NOT NULL AND COALESCE(visibility,'') <> 'embargoed' AND ${SQL_LA_LAN_LAM}
       AND (nguon <> 'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`).bind(ngay,emJson).all<Row>(),
     env.DB.prepare('SELECT sbd,tien_do_json,cap_nhat_luc FROM hanh_trinh_v5_muc m WHERE sbd IN(SELECT value FROM json_each(?)) AND cap_nhat_luc=(SELECT MAX(cap_nhat_luc) FROM hanh_trinh_v5_muc WHERE sbd=m.sbd)').bind(emJson).all<Row>(),
-    baoCaoABCoDem(env,cd.sbd),
+    boDoLuong ? Promise.resolve(undefined) : baoCaoABCoDem(env,cd.sbd),
     env.DB.prepare('SELECT * FROM hanh_trinh_nguon_cau WHERE ngay=? AND sbd IN(SELECT value FROM json_each(?)) AND chien_dich_id=?').bind(ngay,emJson,cd.id).all<Row>(),
   ])
   const mucEm=new Map(muc.results.map(r=>[String(r.sbd),r]))

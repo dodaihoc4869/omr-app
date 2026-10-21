@@ -189,7 +189,7 @@ export async function taiHomNay(onPhan?: (d: DuLieuHomNay) => void): Promise<DuL
   })()
   const bang: (BangChienDich | null)[] = await taiGioiHan(chay, async (c) => {
     try {
-      const r = await docBang(c.id)
+      const r = await docBang(c.id, true) // chỉ đếm: bỏ báo cáo A/B nặng (srs2-gv.ts `boDoLuong`)
       return r.ok ? r.du : null
     } catch {
       return null

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 // HỒ SƠ LÀM BÀI TẢI TỨC THÌ (thầy 21/10: "hồ sơ làm bài của học sinh load quá chậm, bạn cho load tức thì đi").
 // Đo thật (wrangler tail 6 phút): máy chủ chờ D1 ~10 giây cho `/gv/lich-su-lam-cau` và `/gv/ho-so-thai-do` (CPU chỉ 21–47 ms) vì hai lệnh nặng chồng nhau cùng các lệnh nặng khác của màn Hôm nay.
-// Nay tấm: (1) khung đầu xin 150 lượt mới nhất — tổng, câu sai, Mức làm vẫn tính trên mọi lượt máy chủ đọc; (2) Thái độ làm bài hỏi SAU khung đầu; (3) phần còn lại nạp NỀN (không khung xương, lỗi nền bỏ qua);
-// (4) mở lại em vừa xem trong 5 phút ⇒ vẽ NGAY bản trong bộ nhớ rồi nạp mới nền.
+// Nay tấm: (1) khung đầu xin 150 lượt mới nhất — tổng, câu sai, Mức làm vẫn tính trên mọi lượt máy chủ đọc; (2) Thái độ làm bài hỏi SAU khung đầu; (3) KHÔNG tự nạp thêm lượt cũ (mỗi lần xin là một lần
+// đọc nặng cả cửa sổ trên D1) — chỉ khi thầy bấm «Tải thêm lượt cũ hơn»; (4) mở lại em vừa xem trong 5 phút ⇒ vẽ NGAY bản trong bộ nhớ rồi đọc mới nền (lỗi nền bỏ qua).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 
@@ -29,11 +29,11 @@ beforeEach(() => {
 afterEach(() => cleanup())
 
 describe('HoSoLamCauEm — tải tức thì', () => {
-  it('khung đầu xin 150 lượt; Thái độ làm bài chỉ hỏi SAU khi khung đầu về; còn lượt cũ ⇒ phần đủ nạp NỀN rồi thay, không khung xương', async () => {
+  it('khung đầu xin 150 lượt; Thái độ làm bài chỉ hỏi SAU khi khung đầu về; còn lượt cũ ⇒ KHÔNG tự nạp thêm', async () => {
     let traKhungDau: (v: unknown) => void = () => {}
     m.goi.mockImplementation((duong: string, b: Record<string, unknown>) => {
       if (duong === '/gv/ho-so-thai-do') return Promise.resolve({ ok: true, du: TD })
-      if (duong === '/gv/lich-su-lam-cau') return b.gioiHan ? new Promise((r) => { traKhungDau = r }) : Promise.resolve({ ok: true, du: { ...LS, conNua: false, tong: { ...LS.tong, soLuot: LS.tong.soLuot + 1 } } })
+      if (duong === '/gv/lich-su-lam-cau') return b.gioiHan ? new Promise((r) => { traKhungDau = r }) : Promise.resolve({ ok: true, du: LS })
       return Promise.resolve({ ok: false, loai: 'chua_co_lenh', chu: 'x' })
     })
     render(<HoSoLamCauEm em={em} onDong={() => {}} />)
@@ -43,8 +43,8 @@ describe('HoSoLamCauEm — tải tức thì', () => {
     traKhungDau({ ok: true, du: { ...LS, conNua: true } })
     await screen.findByText('Số lượt làm câu') // khung đầu đã vẽ
     await waitFor(() => expect(goiThaiDo()).toHaveLength(1))
-    await waitFor(() => expect(goiLichSu()).toEqual([{ sbd: SBD, gioiHan: GIOI_HAN_KHUNG_DAU }, { sbd: SBD }])) // phần đủ nạp nền (mặc định máy chủ)
-    expect(screen.getByRole('dialog').querySelector('[role="status"][aria-busy="true"]')).toBeNull()
+    await new Promise((r) => setTimeout(r, 50))
+    expect(goiLichSu()).toEqual([{ sbd: SBD, gioiHan: GIOI_HAN_KHUNG_DAU }]) // còn lượt cũ nhưng KHÔNG tự xin thêm
   })
   it('khung đầu đã đủ (không còn lượt cũ) ⇒ KHÔNG xin thêm lần nào', async () => {
     m.goi.mockImplementation(async (duong: string) => (duong === '/gv/ho-so-thai-do' ? { ok: true, du: TD } : duong === '/gv/lich-su-lam-cau' ? { ok: true, du: { ...LS, conNua: false } } : { ok: false, loai: 'chua_co_lenh', chu: 'x' }))
@@ -65,7 +65,7 @@ describe('HoSoLamCauEm — tải tức thì', () => {
     const tam = await screen.findByRole('dialog')
     expect(within(tam).getByText('Số lượt làm câu')).toBeTruthy() // vẽ ngay từ bộ nhớ, đồng bộ
     expect(within(tam).getByText(/^Thái độ làm bài ·/)).toBeTruthy()
-    await waitFor(() => expect(goiLichSu()).toEqual([{ sbd: SBD }])) // đọc mới nền, mặc định máy chủ
+    await waitFor(() => expect(goiLichSu()).toEqual([{ sbd: SBD, gioiHan: Math.max(GIOI_HAN_KHUNG_DAU, LS.lan.length) }])) // đọc mới nền, đúng số dòng đang hiện (không rút ngắn)
     expect(within(tam).queryByRole('alert')).toBeNull()
   })
   it('em khác không dùng bản của em này; sau 5 phút bản bộ nhớ hết hạn', async () => {

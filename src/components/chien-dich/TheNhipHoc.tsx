@@ -34,7 +34,7 @@ async function taiNhip(): Promise<DuNhip> {
     const bang = await Promise.all(
       ht.map(async (c) => {
         try {
-          const b = await docBang(c.id)
+          const b = await docBang(c.id, true)
           return b.ok ? { em: b.du.hanhTrinhNgay?.em ?? [], loi: '' } : { em: null, loi: lyDoDeHieu(b.chu) }
         } catch (e) {
           return { em: null, loi: lyDoDeHieu(e) }

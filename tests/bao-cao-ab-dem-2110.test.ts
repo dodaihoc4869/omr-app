@@ -5,10 +5,14 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 import { baoCaoABCoDem, HAN_DEM_AB_MS, HAN_LUOT_AB_DANG_TINH_MS, xoaDemBaoCaoAB } from '../server/src/hanh-trinh-do-luong'
+import { bangHanhTrinh } from '../server/src/hanh-trinh-d1'
+import { SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
+import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
 
 const NOW = Date.parse('2026-10-21T05:00:00Z')
-function envDem() {
+function envDem(ddl = false) {
   const d = taoD1That()
+  if (ddl) for (const q of [...SQL_BANG_HANH_TRINH, ...SQL_GOI7]) d.sql.exec(q)
   let dem = 0
   const goc = d.env.DB as unknown as { prepare: (s: string) => unknown }
   const db = new Proxy(goc, { get: (t, p) => (p === 'prepare' ? (s: string) => { dem++; return t.prepare(s) } : (t as never)[p as never]) })
@@ -57,5 +61,19 @@ describe('baoCaoABCoDem', () => {
     void baoCaoABCoDem(treo, ['S2'], NOW).catch(() => {})
     const lai = await baoCaoABCoDem(env, ['S2'], NOW + HAN_LUOT_AB_DANG_TINH_MS + 1)
     expect(lai.thuNghiem).toBeTruthy()
+  })
+})
+
+describe('bangHanhTrinh — cờ boDoLuong (màn Hôm nay chỉ đếm)', () => {
+  it('boDoLuong ⇒ KHÔNG chạy báo cáo A/B (ít lệnh D1 hơn, không có doLuong); vắng cờ ⇒ như cũ (có doLuong)', async () => {
+    const cd = { id: 'hanh-trinh-v3-khoi-12', sbd: ['S1'], qids: [], maDe: [] } as never
+    const a = envDem(true)
+    const day = (await bangHanhTrinh(a.env, cd, '2026-10-21', false)) as { hanhTrinhNgay: { doLuong?: unknown } }
+    const b = envDem(true)
+    xoaDemBaoCaoAB()
+    const gon = (await bangHanhTrinh(b.env, cd, '2026-10-21', true)) as { hanhTrinhNgay: { doLuong?: unknown } }
+    expect(day.hanhTrinhNgay.doLuong).toBeTruthy()
+    expect(gon.hanhTrinhNgay.doLuong).toBeUndefined()
+    expect(b.lay()).toBeLessThan(a.lay()) // bỏ cả lô truy vấn của báo cáo A/B
   })
 })

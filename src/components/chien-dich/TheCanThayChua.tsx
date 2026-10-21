@@ -240,7 +240,7 @@ async function taiCanChua(): Promise<DuCanChua> {
       const [bang, co] = await Promise.all([
         taiGioiHan(chay, async (c) => {
           try {
-            const b = await docBang(c.id)
+            const b = await docBang(c.id, true)
             return b.ok ? b.du : null
           } catch {
             return null

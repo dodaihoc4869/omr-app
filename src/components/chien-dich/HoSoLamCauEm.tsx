@@ -65,7 +65,7 @@ export const MOI_DOT = 100
 
 // TẢI TỨC THÌ (thầy 21/10: "hồ sơ làm bài của học sinh load quá chậm, bạn cho load tức thì đi"). Tấm trước đây xin MỘT lần 1000 lượt rồi mới vẽ (tổng + từng lượt + Mức làm: nửa MB JSON trên mạng điện thoại),
 // cùng lúc xin thêm Thái độ làm bài — hai lệnh nặng chồng nhau trên D1 đơn luồng. Nay: (1) khung đầu CHỈ xin 150 lượt mới nhất (≥ một đợt hiển thị MOI_DOT) — tổng, câu sai, Mức làm vẫn tính trên MỌI lượt máy chủ đọc,
-// nên vẽ ngay; (2) Thái độ làm bài hỏi SAU khung đầu; (3) phần còn lại (1000 lượt) nạp NỀN, không khung xương, lỗi nền bị bỏ qua (đã có khung đầu); (4) mở lại tấm của em vừa xem trong 5 phút ⇒ vẽ ngay bản
+// nên vẽ ngay; (2) Thái độ làm bài hỏi SAU khung đầu; (3) lượt cũ hơn CHỈ nạp khi thầy bấm «Tải thêm lượt cũ hơn» (máy chủ đọc cả cửa sổ để tính tổng — tự nạp thêm là thêm một lần đọc nặng); (4) mở lại tấm của em vừa xem trong 5 phút ⇒ vẽ ngay bản
 // trong bộ nhớ rồi nạp mới nền. Bản trong bộ nhớ chỉ sống tới khi đóng tab (không ghi đĩa: dữ liệu học sinh).
 export const GIOI_HAN_KHUNG_DAU = 150
 const HAN_DEM_TAM_MS = 5 * 60_000
@@ -995,13 +995,11 @@ export default function HoSoLamCauEm({
   useEffect(() => {
     let huy = false
     void (async () => {
-      // Có bản trong bộ nhớ ⇒ đã vẽ rồi: đọc mới NỀN (đủ lượt), rồi thái độ. Chưa có ⇒ khung đầu nhỏ trước, thái độ sau, rồi phần còn lại nền.
-      const khungDau = await tai(dem0?.kq ? undefined : GIOI_HAN_KHUNG_DAU, !!dem0?.kq)
+      // Chưa có bản trong bộ nhớ: khung đầu nhỏ trước, thái độ sau. Có rồi: đã vẽ — đọc mới NỀN đúng số dòng đang hiện (không rút ngắn danh sách thầy đã mở rộng), rồi thái độ.
+      // KHÔNG tự nạp thêm lượt cũ: máy chủ đọc cả cửa sổ để tính tổng nên mỗi lần xin là một lần đọc nặng trên D1 — thầy bấm «Tải thêm lượt cũ hơn» khi cần.
+      await tai(dem0?.kq ? Math.min(TRAN_GIOI_HAN, Math.max(GIOI_HAN_KHUNG_DAU, dem0.kq.lan.length)) : GIOI_HAN_KHUNG_DAU, !!dem0?.kq)
       if (huy) return
       void taiTd()
-      if (!dem0?.kq && khungDau?.conNua) {
-        await tai(undefined, true)
-      }
     })()
     return () => {
       huy = true
