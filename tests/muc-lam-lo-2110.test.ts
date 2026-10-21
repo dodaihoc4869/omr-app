@@ -6,6 +6,7 @@ import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 import { lichSuLamCauCuaEm } from '../server/src/lich-su-lam-cau'
+import { gvHoSoLenBang } from '../server/src/ho-so-em-chieu'
 import type { KetQuaLichSuLamCau } from '../server/src/lich-su-lam-cau-kieu'
 import { gvMucLamLo, mucLamCacEm, xoaDemMucLamLo, TOI_DA_EM_MUC_LAM_LO, type MucLamEmLo } from '../server/src/muc-lam-lo'
 import { SQL_CAU_DOC_GIAY } from '../server/src/cau-doc-giay'
@@ -68,8 +69,30 @@ async function soTuHoSo(env: Env, sbd: string, tu: string, den: string): Promise
   return { soDo, chuaCoSoDo: trong.length - soDo, m, soUocTinh: soUoc }
 }
 
+/** «Cách làm bài 14 ngày» của chi tiết em lên bảng (tờ chiếu) — cùng nhãn «14 ngày» với dòng điểm danh ⇒ phải CÙNG số. */
+async function cachLam14(env: Env, sbd: string, qid: string): Promise<MucLamEm14> {
+  const r = (await gvHoSoLenBang(env, { sbd, qid }, BAY_GIO)) as unknown as { ok: boolean; cachLam14?: { soDo: number; chuaCoSoDo: number; soUocTinh: number; theoMuc: { luot: number }[] } }
+  expect(r.ok).toBe(true)
+  const c = r.cachLam14!
+  expect(c).toBeTruthy()
+  return { soDo: c.soDo, chuaCoSoDo: c.chuaCoSoDo, m: [c.theoMuc[0]!.luot, c.theoMuc[1]!.luot, c.theoMuc[2]!.luot, c.theoMuc[3]!.luot], soUocTinh: c.soUocTinh }
+}
+type MucLamEm14 = MucLamEmLo
+
 describe('mức làm theo lô em (bảng điểm danh)', () => {
-  it('SỐ CỦA LÔ = SỐ HỒ SƠ cho cùng em + cùng cửa sổ (kể cả lượt ≈ giây cũ, ca thi, lượt bị loại)', async () => {
+  it('CÙNG SỐ với «Cách làm bài 14 ngày» của tờ chiếu (chi tiết em lên bảng) — kể cả khi em có lượt BỎ TRỐNG có giây (cả hai KHÔNG đếm)', async () => {
+    const d = dungDuLieu()
+    const env = d.env as unknown as Env
+    dong(d, 'S1', 'V-I-1', null, 12, DOC(20)) // lượt bỏ trống (ket_qua NULL) có giây: không phải lượt làm câu
+    const kq = await gvMucLamLo(env, { sbds: ['S1', 'S2'] }, BAY_GIO)
+    expect(kq.ok).toBe(true)
+    if (!kq.ok) return
+    expect(kq.em.S1).toEqual(await cachLam14(env, 'S1', 'V-I-1'))
+    expect(kq.em.S2).toEqual(await cachLam14(env, 'S2', 'V-I-3'))
+    expect(kq.em.S1).toEqual({ soDo: 6, chuaCoSoDo: 3, m: [3, 1, 1, 1], soUocTinh: 1 }) // lượt bỏ trống không làm đổi số
+  })
+
+  it('CÙNG HÀM MỨC LÀM với Hồ sơ làm bài: em không có lượt bỏ trống ⇒ số của lô = số tính từ `lichSuLamCauCuaEm` trong cùng cửa sổ (kể cả lượt ≈ giây cũ, ca thi, lượt bị loại)', async () => {
     const d = dungDuLieu()
     const env = d.env as unknown as Env
     const kq = await gvMucLamLo(env, { sbds: ['S1', 'S2'] }, BAY_GIO)

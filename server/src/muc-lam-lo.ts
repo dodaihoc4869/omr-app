@@ -5,7 +5,9 @@
 // Chỉ đọc đúng các em CÓ MẶT đang hiện trên bảng (mặc định 6 em, mở hết ≤ 40): 14 ngày × ~40 lượt = vài trăm dòng, không quét cả trường và KHÔNG thêm bảng đệm / trigger nào.
 //
 // MỘT ĐỊNH NGHĨA MỨC LÀM: dòng sổ → mức đi qua đúng các hàm thuần của Lịch sử làm câu (`lich-su-lam-cau.ts`): `giaySoLuot` · `mucLamCuaDong` (dưới) — cùng `mucLamTuDong` · `tongMucLam`.
-// Test `muc-lam-lo-2110.test.ts` ghim: cùng em, cùng cửa sổ ⇒ số của lô = số tính từ chính `lichSuLamCauCuaEm` (thầy bấm em ra Hồ sơ phải thấy cùng con số — "một con số").
+// CÙNG SỐ VỚI «CÁCH LÀM BÀI 14 NGÀY» CỦA CHI TIẾT EM LÊN BẢNG (`cachLam14`, ho-so-em-chieu.ts — hai nơi cùng nhãn «14 ngày» ⇒ cùng một số): cùng cửa sổ (`ngay_vn` từ hôm nay − 13), CHỈ lượt CÓ KẾT QUẢ
+// (`ket_qua IS NOT NULL` — lượt bỏ trống / chỉ xem không phải lượt làm câu), cùng hàm xếp mức. Hồ sơ làm bài (Lịch sử làm câu) hiện TOÀN BỘ lịch sử và đếm cả lượt bỏ trống nên khác CÓ CHỦ Ý — dòng ghi rõ «14 ngày».
+// Test `muc-lam-lo-2110.test.ts` ghim cả hai: lô = `cachLam14` (cùng em, cùng ngày) và lô = số tính từ `lichSuLamCauCuaEm` khi em không có lượt bỏ trống (cùng hàm Mức làm — "một con số").
 //   · Lượt ca thi KHÔNG xếp mức (giây ca thi cũ có thể THIẾU) — vào "chưa có số đo", như Hồ sơ.
 //   · Bỏ lượt "đọc lời giải" (`purpose = 'xem_loi_giai'`) và lượt còn giấu (`visibility = 'embargoed'`) — như Hồ sơ bản thầy.
 //   · y trong "Mức làm 1–2: x/y" là `soDo` = lượt CÓ số đo; lượt chưa có số đo đi riêng (`chuaCoSoDo`) để giao diện nói thật (phần lớn lịch sử cũ vẫn chưa có số đo).
@@ -116,7 +118,7 @@ export async function mucLamCacEm(env: Env, sbds: readonly string[], tu: string,
        CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.tc') END AS tc,
        CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.doc') END AS doc
      FROM su_kien_hoc s
-     WHERE s.sbd IN (SELECT value FROM json_each(?1)) AND s.ngay_vn BETWEEN ?2 AND ?3
+     WHERE s.sbd IN (SELECT value FROM json_each(?1)) AND s.ngay_vn BETWEEN ?2 AND ?3 AND s.ket_qua IS NOT NULL
        AND COALESCE(s.purpose, '') <> 'xem_loi_giai' AND COALESCE(s.visibility, '') <> 'embargoed'`,
   ).bind(JSON.stringify(sbds), tu, den).all<Row>()
   const dong: DongMucSo[] = (r.results ?? []).map((x) => {
