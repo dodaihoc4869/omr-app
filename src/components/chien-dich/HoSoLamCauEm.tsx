@@ -281,7 +281,7 @@ export function coNutSua(c: Pick<CauEmSai, 'moChua'>, coTheChua: ReadonlySet<str
 function OCauSai({ c, lan, onChua, cheDo }: { c: CauEmSai; lan: readonly LanLamCau[]; onChua?: (qid: string) => void; cheDo: CheDoHoSo }) {
   const { ds, truoc } = giayCacLan(c, lan)
   // Mức làm của lượt GẦN NHẤT của câu (máy chủ trả mới trước); chưa có số đo ⇒ không chip (không đoán).
-  const mucGanNhat = lan.find((l) => l.qid === c.qid)?.mucLam
+  const mucGanNhat = lan.find((l) => l.luc === c.lanCuoi)?.mucLam
   const muc = tenMucDo(c.mucDo)
   const lanCuoi = ngayGio(c.lanCuoi)
   const sua = c.lanCuoiDung

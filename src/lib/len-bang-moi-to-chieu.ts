@@ -393,7 +393,7 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-chu-giai i{display:inline-block;width:.8em;height:.8em;border-radius:.2em;margin-right:.3em;vertical-align:-.05em}
 .mc-nhiet{display:grid;gap:.28em}
 .mc-nhiet .mc-d{display:grid;grid-template-columns:minmax(0,8em) minmax(0,1fr) 2.8em 6.4em;gap:.6em;align-items:center;font-size:.95em}
-.mc-nhiet .mc-th{height:1.05em;border-radius:.3em;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.mc-nhiet .mc-th{padding-top:0;height:1.05em;border-radius:.3em;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
 .mc-nhiet .mc-th i{position:absolute;left:0;top:0;bottom:0;border-radius:.3em}
 .mc-nhiet .mc-moc{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.35)}
 .mc-nhiet b{text-align:right}
@@ -942,7 +942,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     h += '<div class="mc-ai-lan">';
     for (var k = 1; k <= 4; k++) {
       var kh = khoangMuc(r, k), tenM = TEN_MUC[k];
-      if (k === 4 && r && typeof r.ranh4 !== 'number') { h += '<section class="mc-ln mc-ln-rong" data-m="4"><header>' + pipHtml(4) + '<b>Mức làm 4</b><span>Lớp chưa đủ mẫu của câu này để xếp Mức làm 4</span></header></section>'; continue; }
+      if (k === 4 && r && typeof r.ranh4 !== 'number' && !theo[4].length) { h += '<section class="mc-ln mc-ln-rong" data-m="4"><header>' + pipHtml(4) + '<b>Mức làm 4</b><span>Lớp chưa đủ mẫu của câu này để xếp Mức làm 4</span></header></section>'; continue; }
       if (!theo[k].length) { h += '<section class="mc-ln mc-ln-rong" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '</span></header></section>'; continue; }
       h += '<section class="mc-ln" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '</span><em>' + theo[k].length + ' lượt</em></header><ul class="mc-pls" style="--mc-cot:' + cot + '">' + sapXep(theo[k]).map(function (x) { return the(x, false); }).join('') + '</ul></section>';
     }

@@ -126,7 +126,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     // Cách làm bài 14 ngày (Mức làm 1–4, thầy 21/10): các lượt CÓ kết quả mà máy đo bằng đồng hồ mới (`doc.dh = 1`) — hiện 0 dòng trước khi máy em nạp bản mới; tổng số lượt có kết quả đếm riêng (mẫu số "đo được N/M").
     hoi(env, `SELECT qid, ket_qua, giay, muc_do, json_extract(raw_json, '$.ms') AS ms, json_extract(raw_json, '$.doc') AS doc, json_extract(raw_json, '$.tc') AS tc FROM su_kien_hoc
        WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(visibility, '') <> 'embargoed'
-         AND json_valid(raw_json) AND json_extract(raw_json, '$.doc.dh') = 1 LIMIT 800`, sbd, d13, homNay),
+         AND json_valid(raw_json) AND json_extract(raw_json, '$.doc.dh') = 1 ORDER BY luc DESC LIMIT 800`, sbd, d13, homNay),
     hoi(env, "SELECT COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(visibility, '') <> 'embargoed'", sbd, d13, homNay),
   ])
   const tenLop = str(rTenLop?.[0]?.ten_lop).trim()

@@ -157,6 +157,23 @@ describe('tờ chạy thật — nút X', () => {
     t.tuCha({ type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m2[1]!.id, ds: [{ sbd: 'S9', ten: 'Em Chín', luc: '2026-10-26T11:48:00Z', noi: 'BTVN', giay: 70, mucLam: muc(4, 70, { ranh4: 60 }) }] })
     expect(chuLan(t.doc.querySelector('.mc-aisai')!).slice(2)).toEqual(['Mức làm 3Có nghĩ · 30–59 giây', 'Mức làm 4Làm kỹ · từ 60 giây1 lượt|Em Chín70 giây'].map((x, i) => (i === 0 ? x + '|' : x)))
   })
+  it('(thầy 21/10) hai mã gốc cùng một câu chiếu: lượt đầu thuộc mã chưa có β (không ranh4), lượt sau xếp Mức làm 4 ⇒ làn Mức làm 4 vẫn hiện TÊN em (không báo "chưa đủ mẫu")', () => {
+    const t = moTo()
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
+    t.phim('x')
+    const m = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    const muc = (ma: number, giay: number, o: Record<string, unknown> = {}) => ({ ma, giay, giayDoc: 24, sanNghi: 6, ranh2: 24, ranh3: 30, ...o })
+    t.tuCha({
+      type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id,
+      ds: [
+        { sbd: 'S1', ten: 'Nguyễn Đức Anh', luc: '2026-10-26T11:48:00Z', noi: 'BTVN', giay: 9, mucLam: muc(1, 9) },
+        { sbd: 'S2', ten: 'Lê Thu Hà', luc: '2026-10-26T11:50:00Z', noi: 'BTVN', giay: 70, mucLam: muc(4, 70, { ranh4: 60 }) },
+      ],
+    })
+    const lan = chuLan(t.doc.querySelector('.mc-aisai')!)
+    expect(lan.some((x) => x.startsWith('Mức làm 4') && x.includes('Lê Thu Hà70 giây'))).toBe(true)
+    expect(lan.some((x) => x.includes('chưa đủ mẫu'))).toBe(false)
+  })
   it('(thầy 21/10) HAI THẺ: đã điểm danh (em có mặt) · cả lớp (mọi em của lớp, vắng đánh dấu vòng tròn rỗng) — số em / sĩ số, thanh 4 mức riêng từng thẻ', () => {
     const t = moTo()
     t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
