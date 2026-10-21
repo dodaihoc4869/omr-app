@@ -1,0 +1,48 @@
+name: Kiem dieu kien soan sau song sinh (chi doc)
+on:
+  pull_request:
+    paths: ['.github/workflows/kiem-dieu-kien-soan-0710.yml']
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lam sach khoa Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiem ca mo, do phu va quyen soan
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
+          MA_BI_MAT: ${{ secrets.MA_BI_MAT }}
+        run: |
+          node --input-type=module <<'JS'
+          const token=process.env.CLOUDFLARE_API_TOKEN, account=process.env.CLOUDFLARE_ACCOUNT_ID
+          const base='https://api.cloudflare.com/client/v4/accounts/'+account
+          const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'}
+          const counts={}
+          for(const name of ['ANTHROPIC_API_KEY','OPENAI_API_KEY','OMR_MA_BI_MAT','MA_BI_MAT']) counts[name]=!!process.env[name]
+          console.log('CAU_HINH_SOAN',JSON.stringify(counts))
+          async function query(sql) {
+            if(!/^SELECT\b/.test(sql.trim()))throw new Error('Chi SELECT')
+            const r=await fetch(base+'/d1/database/d2e6d322-374a-45d7-83a3-9fac486b23f1/query',{method:'POST',headers,body:JSON.stringify({sql,params:[]}),signal:AbortSignal.timeout(60000)})
+            const j=await r.json();if(!r.ok||!j.success)throw new Error('D1 '+r.status)
+            return j.result.flatMap(x=>x.results??[])
+          }
+          console.log('CA_MO',JSON.stringify(await query("SELECT (SELECT COUNT(*) FROM ca WHERE trang_thai='mo') AS so_ca_mo,(SELECT COUNT(*) FROM luot l JOIN ca c ON c.ma_ca=l.ma_ca WHERE c.trang_thai='mo' AND l.trang_thai='dang_lam') AS so_luot_dang_lam")))
+          console.log('NHOM_NOI_DUNG',JSON.stringify(await query("SELECT COUNT(DISTINCT q.qid) AS cau,COUNT(DISTINCT lc.bam) AS bam,COUNT(DISTINCT CASE WHEN lc.bam IS NULL THEN q.qid END) AS chua_co_bam FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de LEFT JOIN loi_giai_cau lc ON lc.qid=q.qid WHERE COALESCE(d.da_xoa,0)=0 AND json_valid(q.json) AND COALESCE(json_extract(q.json,'$.tuLuan'),0)=0")))
+          const r=await fetch(base+'/ai/models/search?per_page=1',{headers,signal:AbortSignal.timeout(30000)})
+          const j=await r.json()
+          console.log('WORKERS_AI',JSON.stringify({http:r.status,success:j.success??false,codes:(j.errors??[]).map(x=>x.code)}))
+          JS
