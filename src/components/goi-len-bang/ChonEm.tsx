@@ -1,6 +1,6 @@
 // GỌI LÊN BẢNG PHÂN TẦNG (thầy chốt 21/10) — mảnh giao diện dùng chung cho mọi kênh gọi lên bảng của app thầy.
 // Tầng CHỈ hiện trên màn thầy; bản chiếu không bao giờ ghi tầng. Bản vẽ: docs/ban-ve-goi-len-bang-2110.
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TEN_CHE_DO, TEN_TANG, ghiCheDo, type CheDoChonEm, type PhanBoGoi, type Tang } from '../../lib/chon-em-phan-tang'
 import './chon-em.css'
 
@@ -70,11 +70,19 @@ function OPhanBo({ pb }: { pb: PhanBoGoi }) {
 }
 
 function HopCachChon({ dong }: { dong: () => void }) {
+  // Esc đóng tấm phủ; mở ra thì đưa focus vào nút Đóng (bàn phím / trình đọc màn hình).
+  const nutDong = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    nutDong.current?.focus()
+    const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') dong() }
+    document.addEventListener('keydown', phim)
+    return () => document.removeEventListener('keydown', phim)
+  }, [dong])
   return (
     <>
       <div className="cem-nen" onClick={dong} aria-hidden="true" />
       <div className="cem-hop" role="dialog" aria-modal="true" aria-label="Cách app chọn em lên bảng">
-        <div className="dau"><h2>Cách app chọn em lên bảng</h2><button type="button" className="dong" onClick={dong} aria-label="Đóng">✕</button></div>
+        <div className="dau"><h2>Cách app chọn em lên bảng</h2><button type="button" className="dong" ref={nutDong} onClick={dong} aria-label="Đóng hộp Cách app chọn em">✕</button></div>
         <ol>
           <li><b>Chia ba tầng theo chính câu này</b><p>Lấy khả năng làm đúng câu ấy của từng em có mặt (tỉ lệ đúng đã đo; em chưa có số đo xếp tầng Cần kèm). Cắt đều theo 1/3 lớp nên lớp nào cũng đủ Khá · Trung bình · Cần kèm.</p></li>
           <li><b>Ghép tầng theo độ khó của câu</b><p>Nhận biết gọi em Cần kèm trước; Thông hiểu gọi em Trung bình trước; Vận dụng gọi em Khá trước. Cả buổi vẫn chia gần đều ba tầng.</p></li>

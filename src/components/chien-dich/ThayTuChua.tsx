@@ -455,7 +455,7 @@ export default function ThayTuChua() {
           Chữa câu khó &amp; tính toán
         </h2>
         <p className="gvv2-ttc-phu">
-          Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Gọi em đã tự làm đúng; nếu chưa có, chọn em dự kiến làm được.
+          Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Em lên bảng chia đều Khá · Trung bình · Cần kèm: câu dễ gọi em Cần kèm, câu khó gọi em Khá, mỗi em một lần.
         </p>
       </div>
 

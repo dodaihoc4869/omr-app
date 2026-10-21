@@ -94,3 +94,22 @@ describe('lõi chọn em phân tầng', () => {
     expect(['biet', 'Nhận biết', 'hieu', 'VD', 'VDC', 'van_dung', '', null].map(bacCuaMucDo)).toEqual([0, 0, 1, 2, 2, 2, 1, 1])
   })
 })
+
+// Giao diện (21/10): công tắc chế độ ghi nhớ theo kênh; hộp "Cách app chọn em" mở / Esc đóng.
+import { fireEvent, render, screen } from '@testing-library/react'
+import { createElement as h } from 'react'
+import { KhoiChonEm } from '../src/components/goi-len-bang/ChonEm'
+import { docCheDo } from '../src/lib/chon-em-phan-tang'
+describe('KhoiChonEm', () => {
+  it('chọn chế độ ⇒ báo nơi gọi + nhớ theo kênh; Cách app chọn em mở hộp, Esc đóng', () => {
+    let doi = ''
+    render(h(KhoiChonEm, { kenh: 'test-kenh', cheDo: 'tron', onDoi: (v: string) => { doi = v } }))
+    fireEvent.click(screen.getByRole('radio', { name: /Ngẫu nhiên/ }))
+    expect(doi).toBe('ngau')
+    expect(docCheDo('test-kenh')).toBe('ngau')
+    fireEvent.click(screen.getByRole('button', { name: 'Cách app chọn em' }))
+    expect(screen.getByRole('dialog', { name: 'Cách app chọn em lên bảng' })).toBeTruthy()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+})
