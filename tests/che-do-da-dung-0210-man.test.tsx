@@ -39,21 +39,19 @@ const tln = (id: string, mucDo = 'van_dung') => ({ id, text: `Tính thể tích 
 const NGUON = [{ maDe: 'D', phanI: Array.from({ length: 40 }, (_, i) => mcq(`D-I-${i}`)), phanII: [], phanIII: Array.from({ length: 10 }, (_, i) => tln(`D-III-${i}`)) }]
 const da = (qid: string, phan: 'I' | 'III', mucDo: string, noi = 'Ca Kiểm tra tuần 3') => ({ qid, phan, mucDo, dang: '', noi, ngayDung: '2026-09-28', nhan: '', lucDung: '2026-09-28T03:00:00Z', soLanDung: 2, soLanSai: 1 })
 
-describe('khối Bộ câu ra đề — chip "Kiểm chứng câu đã đúng"', () => {
-  it('cạnh "Kiểm tra điểm yếu"; bấm ⇒ ca đề riêng, phạm vi da_dung, số câu theo tỷ lệ ma trận (14 ⇒ 9·2·3; 28 ⇒ 18·4·6)', () => {
+describe('khối Bộ câu ra đề — thẻ "Kiểm chứng câu đã đúng" (thẻ chọn ở màn Mở ca từ 21/10)', () => {
+  it('chế độ da_dung ⇒ ca đề riêng, phạm vi da_dung, số câu theo tỷ lệ ma trận (14 ⇒ 9·2·3; 28 ⇒ 18·4·6)', () => {
     const onDoi = vi.fn()
-    render(<KhoiRutDe nguon={NGUON as never} qidCaTruoc={[]} phutLamBai={45} onDoi={onDoi} />)
-    const chip = screen.getByText('Kiểm chứng câu đã đúng')
-    expect(chip.parentElement).toBe(screen.getByText('Kiểm tra điểm yếu').parentElement)
-    fireEvent.click(chip)
+    const ve = (cheDo: 'da_dung' | 'diem_yeu') => <KhoiRutDe nguon={NGUON as never} qidCaTruoc={[]} phutLamBai={45} onDoi={onDoi} cheDo={cheDo} coCauChuaLoi />
+    const { rerender } = render(ve('da_dung'))
     const cuoi = () => onDoi.mock.calls.at(-1)?.[0] as { soCau: unknown; deRieng?: boolean; lenBang: boolean; phamViHoiLai?: string; ids: Set<string> }
     expect(cuoi()).toMatchObject({ soCau: { I: 9, II: 2, III: 3 }, deRieng: true, lenBang: false, phamViHoiLai: 'da_dung' })
     expect(cuoi().ids.size).toBe(50)
     expect(screen.getByText(/Phần I: 9 câu \(Nhận biết 6 · Thông hiểu 2 · Vận dụng 1\)/)).toBeTruthy()
     fireEvent.click(screen.getByText('28 câu'))
     expect(cuoi().soCau).toEqual({ I: 18, II: 4, III: 6 })
-    // chế độ cũ không đổi: Kiểm tra điểm yếu vẫn là lên bảng, không mang phạm vi da_dung
-    fireEvent.click(screen.getByText('Kiểm tra điểm yếu'))
+    // chế độ khác không đổi: Kiểm tra điểm yếu vẫn là lên bảng, không mang phạm vi da_dung
+    rerender(ve('diem_yeu'))
     expect(cuoi().lenBang).toBe(true)
     expect(cuoi().phamViHoiLai).not.toBe('da_dung')
   })

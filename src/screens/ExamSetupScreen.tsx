@@ -27,10 +27,11 @@ import {
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import NutQuayLai from '../components/NutQuayLai'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
-import KhoiRutDe from '../components/KhoiRutDe'
+import KhoiRutDe, { type CheDoCa } from '../components/KhoiRutDe'
 import HopChonDe from '../components/HopChonDe'
 import HangNhomDe from '../components/HangNhomDe'
-import { locNguonTheoId, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
+import { locNguonTheoId, PHUT_TOI_DA_LEN_BANG, qidDaRaTuCacCa, type SoCauPhan } from '../lib/rut-de'
+import { chuCachRaDe } from '../lib/chu-cach-ra-de'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoiTrucTiep } from '../lib/ca-link'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
@@ -113,6 +114,16 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
 // Cả ba chế độ nay chỉ đòi SỐ BÁO DANH. Em gõ số, máy hiện TÊN của số đó, em
 // nhìn rồi bấm Bắt đầu — gõ nhầm một số là thấy ngay tên người khác. Khác nhau
 
+type BoRut = { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong' | 'da_dung' }
+
+/** BỐN THẺ CÁCH RA ĐỀ (thầy chốt 21/10) — chọn theo MỤC ĐÍCH, một tầng. Tên giữ đúng tên thầy đã quen. */
+const THE_CACH_RA_DE: { id: CheDoCa; ten: string; mota: string }[] = [
+  { id: 'ca_lop', ten: 'Cả lớp cùng một đề', mota: 'Cùng bộ câu, điểm so được với nhau — lấy điểm, xếp hạng, báo phụ huynh.' },
+  { id: 'rieng', ten: 'Đề riêng từng em', mota: 'Mỗi em một bộ câu, chống chép bài; có thể kèm câu chữa lỗi của chính em.' },
+  { id: 'diem_yeu', ten: 'Kiểm tra điểm yếu', mota: '15 phút đầu buổi chữa: câu em đã sai đến hạn, câu song sinh.' },
+  { id: 'da_dung', ten: 'Kiểm chứng câu đã đúng', mota: 'Câu em đã tự làm đúng, đổi số — xem em có nắm thật không.' },
+]
+
 const CACH_CONG_BO: { id: CongBoDiem; ten: string; mota: string }[] = [
   { id: 'khong', ten: 'Không công bố trên máy em', mota: 'Thầy chấm ở màn Theo dõi rồi gửi nhận xét cho phụ huynh.' },
   { id: 'ngay', ten: 'Ngay sau khi em nộp bài', mota: 'Hiện điểm + câu sai + lời giải trên máy em. Em nộp sớm có thể kể đáp án cho em đang làm.' },
@@ -166,8 +177,17 @@ export default function ExamSetupScreen() {
   const [timTen, setTimTen] = useState('')
   // Danh sách em để tích: danh sách lớp trên máy (Google Sheet) — không có thì lấy danh sách lớp đã nạp lên máy chủ.
   const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
-  // Bộ câu màn Rút đề chốt; null = thầy chọn lấy trọn kho (đường cũ).
-  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong' | 'da_dung' } | null>(null)
+  // Bộ câu khối Bộ câu ra đề chốt; null = lấy trọn kho (kho vừa một đề) hoặc Chuẩn Bộ 2026.
+  const [boRutKhoi, setBoRut] = useState<BoRut | null>(null)
+  // CÁCH RA ĐỀ — MỘT tầng, bốn thẻ (thầy chốt 21/10). Giữ ở màn này nên đổi đề
+  // hay mở lại khối không kéo chế độ về mặc định như bản hộp nổi cũ.
+  const [cheDoCa, setCheDoCa] = useState<CheDoCa>('ca_lop')
+  const [coCauChuaLoi, setCoCauChuaLoi] = useState(true)
+  // Chuẩn Bộ 2026: null = tự (bật khi MỌI đề đã tích thuộc 12 · bộ đề); true/false = thầy bấm chip.
+  const [muon2026, setMuon2026] = useState<boolean | null>(null)
+  // Bộ câu CA CHỐT (Buổi chữa) — đứng riêng để khối Bộ câu ra đề không ghi đè lên.
+  const [boChot, setBoChot] = useState<BoRut | null>(null)
+  const boRut = boChot ?? boRutKhoi
   // Câu đã ra ở các ca trước (đọc từ bản đề CÓ đáp án đã lưu của từng ca) — để
   // rút đề tránh phát lại câu lớp vừa làm tuần trước.
   const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
@@ -178,7 +198,6 @@ export default function ExamSetupScreen() {
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string; batDau: string; hetHanVao: string } | null>(null)
   const [daCopy, setDaCopy] = useState(false)
   const [hienChonDe, setHienChonDe] = useState(false)
-  const [hienRutDe, setHienRutDe] = useState(false)
   const [hienChonEm, setHienChonEm] = useState(false)
   const [hienNangCao, setHienNangCao] = useState(false)
   // Mã bí mật — mọi lệnh đọc dữ liệu học sinh của thầy đều phải kèm (BA-APP đợt 1).
@@ -285,7 +304,7 @@ export default function ExamSetupScreen() {
     setKqCaChot(kq)
     if (kq.soKhop === 0) return
     setSelectedMaDe(new Set(kq.maDe))
-    setBoRut({ ids: kq.ids, soCau: kq.soCau, lenBang: false })
+    setBoChot({ ids: kq.ids, soCau: kq.soCau, lenBang: false })
   }, [caChot, savedSources, dsDeTach])
 
   // KHỬ TRÙNG NGAY Ở ĐÂY, trước mọi thứ khác (đếm câu, bộ rút, gói đẩy lên máy
@@ -294,7 +313,12 @@ export default function ExamSetupScreen() {
   // Luật: trùng thì giữ bản trong nhánh "Bộ đề" (thầy chốt 09/09).
   const kqKhuTrung = useMemo(() => khuTrungNguon(dsDeTach.filter((c) => selectedMaDe.has(c.maDe))), [dsDeTach, selectedMaDe])
   const selectedSources = kqKhuTrung.nguon
-  const chuan2026 = selectedSources.some(laBoDe12)
+  const coBoDe12 = selectedSources.some(laBoDe12)
+  const tatCaBoDe12 = selectedSources.length > 0 && selectedSources.every(laBoDe12)
+  // CHUẨN BỘ 2026 chỉ ở thẻ Cả lớp cùng một đề, không ở ca chốt. Tích lẫn đề khác thì
+  // KHÔNG tự bật nữa (bản cũ bật rồi bỏ âm thầm các đề kia) — thầy bấm chip mới bật.
+  const chuan2026 = !boChot && cheDoCa === 'ca_lop' && coBoDe12 && (muon2026 ?? tatCaBoDe12)
+  const soDeNgoai12 = chuan2026 ? selectedSources.filter((s) => !laBoDe12(s)).length : 0
   const soCauTrung = tongBoQua(kqKhuTrung.boQua)
 
   /** Bộ đề THẬT SỰ gửi lên máy chủ: đã cắt xuống còn những câu thầy chốt. */
@@ -323,6 +347,9 @@ export default function ExamSetupScreen() {
     const d = demCauTheoPhan(locMoCa.nguon)
     return d.I + d.II + d.III
   })()
+  // SỐ CÂU MỖI EM LÀM. Ca đề riêng đẩy lên KHO RỘNG nên `tongCauDaChon` là cỡ kho, không phải số câu một em —
+  // ô "Số câu" và màn Ca đã mở phải đọc số này (ảnh 21/10 từng hiện "212 câu mỗi em" cho ca 14 câu).
+  const soCauMoiEm = deRiengBat && soCauRaDe ? soCauRaDe.I + soCauRaDe.II + soCauRaDe.III : tongCauDaChon
 
 
   const handleOpenSession = async () => {
@@ -431,7 +458,7 @@ export default function ExamSetupScreen() {
           tenCa={tenMo}
           joinLink={opened.joinLink}
           lop={lop.trim()}
-          soCau={tongCauDaChon}
+          soCau={soCauMoiEm}
           phut={chuan2026 ? 50 : thoiGianPhut}
           congBo={CACH_CONG_BO.find((c) => c.id === congBoDiem)?.ten ?? ''}
           gio={`Bắt đầu ${gioHienThi(opened.batDau) || 'ngay'} · vào phòng đến ${opened.hetHanVao ? gioHienThi(opened.hetHanVao) : 'không giới hạn'}`}
@@ -487,7 +514,9 @@ export default function ExamSetupScreen() {
   const mocHetVao = hanVaoPhut > 0 ? mocMo + hanVaoPhut * 60000 : null
   const mocEmCuoi = (mocHetVao ?? mocMo) + phutCa * 60000
   const phongChoBat = phongCho || deRiengBat || dongBoGio
-  const cheDoDe = chuan2026 ? 'chuan' : deRiengBat ? 'rieng' : boRut ? 'rut' : 'nguyen'
+  // DÒNG TÓM TẮT cách ra đề — tính từ ĐÚNG các biến handleOpenSession gửi lên máy chủ (chuan2026, deRiengBat, lenBang,
+  // boRut.phamViHoiLai, soCauRaDe), nên màn không thể nói một đằng ca chạy một nẻo.
+  const chuCach = chuCachRaDe({ chuan2026, deRieng: deRiengBat, lenBang, phamViHoiLai: boRut?.phamViHoiLai, soCau: soCauRaDe, caChot: !!boChot })
   // THANH 4 BƯỚC (Game Hóa 2.0 — trung tu 09/10, bản vẽ GV-MoCa thầy duyệt): mỗi bước một dòng trạng thái nói đúng điều thầy đã chọn; bước đang
   // làm `aria-current="step"`, bước đã có lựa chọn có dấu ✓. CHỈ hiển thị — bấm bước vẫn là `setBuocGiaoDien` như nút cũ, logic mở ca không đổi.
   const chuDe = selectedSources.length === 0 ? 'Chưa chọn' : `${selectedSources.length === 1 ? selectedSources[0]!.maDe : `${selectedSources.length} đề`} · ${tongCauDaChon} câu`
@@ -565,7 +594,7 @@ export default function ExamSetupScreen() {
                         : 'Chưa chọn đề kiểm tra'}
                     </b>
                     {selectedSources.length > 0 && (
-                      <div className="ct-ghi so">{chuan2026 ? 'Bộ đề 12 · Chuẩn cấu trúc 2026 (50 phút)' : soCauRaDe ? `Chế độ rút: ${soCauRaDe.I} câu I · ${soCauRaDe.II} câu II · ${soCauRaDe.III} câu III` : 'Lấy nguyên vẹn toàn bộ câu trong đề'}</div>
+                      <div className="ct-ghi so">{chuCach}</div>
                     )}
                     <div className="ct-pha">
                       {selectedSources.length > 0 ? (
@@ -593,18 +622,66 @@ export default function ExamSetupScreen() {
                 </div>
                 {/* BẢN DUYỆT V2 (thầy 09/10): ma trận đề chuyên đề × mức độ — chỉ đọc, đếm đúng các câu sẽ dùng (đã bỏ câu tự luận). */}
                 {selectedSources.length > 0 && <BangMaTranDe nguon={locMoCa.nguon} rut={!!soCauRaDe} />}
-                {!chuan2026 && selectedSources.length > 0 && (
-                  <div className="ct-hang-chip" style={{ marginTop: 10 }} role="group" aria-label="Cách lấy câu">
-                    <button type="button" className="ct-chip" aria-pressed={cheDoDe === 'nguyen'} onClick={() => setBoRut(null)}>
-                      Lấy nguyên đề
-                    </button>
-                    <button type="button" className="ct-chip" aria-pressed={cheDoDe === 'rut'} onClick={() => setHienRutDe(true)}>
-                      {boRut && !deRiengBat ? `Rút ${tongCauDaChon} câu` : 'Rút câu'}
-                    </button>
-                    <button type="button" className="ct-chip" aria-pressed={cheDoDe === 'rieng'} onClick={() => setHienRutDe(true)}>
-                      Mỗi em một bộ câu riêng
+                {/* CÁCH RA ĐỀ — một tầng, bốn thẻ (thầy chốt 21/10). Thay 3 chip + hộp nổi Rút đề. */}
+                {selectedSources.length > 0 && boChot && (
+                  <div className="ct-tam" data-khoi="bo-ca-chot" style={{ marginTop: 10, padding: '12px 16px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+                    <span style={{ flex: '1 1 220px' }}>
+                      <b>Cả lớp cùng một đề · bộ câu ca chốt</b> <span className="so">({tongCauDaChon} câu)</span>
+                    </span>
+                    <button type="button" className="ct-nut ct-nut-vien ct-nut-nho" onClick={() => setBoChot(null)}>
+                      Chọn cách ra đề khác
                     </button>
                   </div>
+                )}
+                {selectedSources.length > 0 && !boChot && (
+                  <>
+                    <div className="ct-o-luat" style={{ marginTop: 12 }} role="radiogroup" aria-label="Cách ra đề">
+                      {THE_CACH_RA_DE.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          role="radio"
+                          className="ct-luat"
+                          aria-checked={cheDoCa === t.id}
+                          aria-pressed={cheDoCa === t.id}
+                          onClick={() => {
+                            setCheDoCa(t.id)
+                            // Bộ câu chẩn đoán chốt cứng 15 phút — đặt giờ ca theo luôn; thầy vẫn sửa được ở bước Giờ.
+                            if (t.id === 'diem_yeu' && thoiGianPhut !== PHUT_TOI_DA_LEN_BANG) setThoiGianPhut(PHUT_TOI_DA_LEN_BANG)
+                          }}
+                        >
+                          <b>{t.ten}</b>
+                          <span>{t.mota}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {soDeNgoai12 > 0 && (
+                      <div role="status" data-khoi="lan-de-ngoai-12" style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10, fontSize: 13.5, fontWeight: 700, color: 'var(--gvm-ho)' }}>
+                        <span style={{ flex: '1 1 220px' }}>
+                          <span className="so">{soDeNgoai12}</span> đề đã tích không thuộc nhóm 12 · bộ đề — Chuẩn Bộ 2026 không dùng các đề này.
+                        </span>
+                        <button
+                          type="button"
+                          className="ct-nut ct-nut-vien ct-nut-nho"
+                          onClick={() => setSelectedMaDe(new Set(dsDeTach.filter((c) => selectedMaDe.has(c.maDe) && laBoDe12(c)).map((c) => c.maDe)))}
+                        >
+                          Chỉ dùng bộ đề 12
+                        </button>
+                      </div>
+                    )}
+                    <KhoiRutDe
+                      nguon={selectedSources}
+                      qidCaTruoc={qidCaTruoc}
+                      phutLamBai={thoiGianPhut}
+                      onDoi={setBoRut}
+                      cheDo={cheDoCa}
+                      coCauChuaLoi={coCauChuaLoi}
+                      onDoiCoCauChuaLoi={setCoCauChuaLoi}
+                      coBoDe12={coBoDe12}
+                      chuan2026={chuan2026}
+                      onDoiChuan2026={setMuon2026}
+                    />
+                  </>
                 )}
                 {(chuBoTuLuan || canhBaoThieu.length > 0) && (
                   <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }} role="status">
@@ -795,8 +872,12 @@ export default function ExamSetupScreen() {
               <dl>
                 <dt>Đề</dt>
                 <dd>{selectedSources.length > 0 ? (selectedSources.length === 1 ? selectedSources[0]!.maDe : `${selectedSources.length} đề`) : 'Chưa chọn'}</dd>
+                <dt>Cách ra đề</dt>
+                <dd data-khoi="tom-tat-cach-ra-de">{selectedSources.length > 0 ? chuCach : 'Chưa chọn'}</dd>
                 <dt>Số câu</dt>
-                <dd className="so">{tongCauDaChon} câu · 10 điểm</dd>
+                <dd className="so">
+                  {soCauMoiEm} câu{deRiengBat ? ' mỗi em' : ''} · 10 điểm
+                </dd>
                 <dt>Ai làm</dt>
                 <dd>{chuAiLam}</dd>
                 <dt>Thời gian</dt>
@@ -889,47 +970,6 @@ export default function ExamSetupScreen() {
               <button
                 type="button"
                 onClick={() => setHienChonDe(false)}
-                className="px-5 py-2 rounded-full bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] font-bold text-xs cursor-pointer shadow-xs active:scale-95"
-              >
-                Xong
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 2: RÚT ĐỀ / CẤU TRÚC */}
-      {hienRutDe && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-end sm:justify-center sm:items-center p-0 sm:p-4 animate-google-fade">
-          <div className="w-full sm:max-w-xl bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <div className="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-                Rút đề theo số câu & dạng bài
-              </h3>
-              <button
-                type="button"
-                aria-label="Đóng rút đề"
-                onClick={() => setHienRutDe(false)}
-                className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="p-3.5 sm:p-4 flex-1 overflow-y-auto">
-              <KhoiRutDe
-                nguon={selectedSources}
-                qidCaTruoc={qidCaTruoc}
-                phutLamBai={thoiGianPhut}
-                onDoi={setBoRut}
-                onDoiPhutLamBai={setThoiGianPhut}
-              />
-            </div>
-
-            <div className="p-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setHienRutDe(false)}
                 className="px-5 py-2 rounded-full bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] font-bold text-xs cursor-pointer shadow-xs active:scale-95"
               >
                 Xong

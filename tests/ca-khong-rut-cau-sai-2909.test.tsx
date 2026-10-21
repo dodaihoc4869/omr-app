@@ -9,6 +9,7 @@
 //   5. Độ trùng giữa các em vẫn thấp; ngân sách thời gian rút.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { CAU_HINH_DE_RIENG_MAC_DINH, cauHinhDeRieng, docPhamViHoiLai, GIAI_THICH_PHAM_VI, MOI_PHAM_VI_HOI_LAI, TEN_PHAM_VI_HOI_LAI, type CauHinhDeRieng } from '../src/lib/cau-hinh-de-rieng'
 import { cauDaGapCuaEm, dungDeRieng, dungDeRiengLuotHai, ngayNganCa, type CaTruocDaCham, type YeuCauDeRieng } from '../src/lib/de-rieng'
 import { doTrung } from '../src/lib/de-rieng-tran-trung'
@@ -344,34 +345,31 @@ describe('7. Tầng lấy dữ liệu — dungDeRiengChoCa chế độ khong', (
 })
 
 // ===========================================================================
-describe('8. Màn Mở ca — khối chế độ đề 3 lựa chọn, bấm lại để bỏ chọn', () => {
+describe('8. Màn Mở ca — Đề riêng từng em: MỘT công tắc "Có câu chữa lỗi" (thầy chốt 21/10, thay các nút phạm vi)', () => {
   const mcq = (id: string) => ({ id, text: `Câu ${id} tính khối lượng m gam`, choices: ['1', '2', '3', '4'] as [string, string, string, string], correct: 'A' as const, chuyenDe: 'Ester', mucDo: 'hieu' })
   const nguon = [{ maDe: 'D', phanI: Array.from({ length: 40 }, (_, i) => mcq(`D-${i}`)), phanII: [], phanIII: [] }]
 
-  it('ba nút; bấm lại nút đang chọn ⇒ "Không rút câu sai"; chữ mô tả đổi theo; onDoi mang phạm vi', () => {
+  it('bật ⇒ gan_nhat + chữ ô chữa lỗi; tắt ⇒ "khong" (100% câu mới); không còn nút phạm vi', () => {
     const onDoi = vi.fn()
-    render(<KhoiRutDe nguon={nguon as never} qidCaTruoc={[]} phutLamBai={45} onDoi={onDoi} />)
-    fireEvent.click(screen.getByText(/Đề riêng từng em/))
-    const nut = (ten: string) => screen.getByRole('checkbox', { name: ten })
-    // ĐỔI CÓ CHỦ Ý 02/10 (thầy: gộp "Ca gần nhất" + "3 ca ngẫu nhiên" — rút đề v2 lấy câu sai từ hàng chữa lỗi chung, hai nút cho cùng kết quả)
-    expect(nut('Câu sai đến lịch ôn lại').getAttribute('aria-checked')).toBe('true')
-    expect(screen.queryByRole('checkbox', { name: '3 ca ngẫu nhiên' })).toBeNull()
-    expect(nut('Không rút câu sai').getAttribute('aria-checked')).toBe('false')
-    // ĐỔI CÓ CHỦ Ý 02/10 (rút đề v2): chữ mô tả theo thang lấp v2, không còn "Cặp đôi Song sinh 50/50".
-    expect(screen.getByText(/Ô chữa lỗi \(tối đa 30% mỗi phần\):/)).toBeTruthy()
-
-    fireEvent.click(nut('Câu sai đến lịch ôn lại'))
-    expect(nut('Không rút câu sai').getAttribute('aria-checked')).toBe('true')
-    expect(nut('Câu sai đến lịch ôn lại').getAttribute('aria-checked')).toBe('false')
-    expect(screen.queryByText(/Cặp đôi Song sinh \(50\/50\):/)).toBeNull()
-    expect(document.querySelector('[data-che-do-cau-sai="khong"]')).toBeTruthy()
-    expect(onDoi.mock.calls.at(-1)?.[0]?.phamViHoiLai).toBe('khong')
-
-    fireEvent.click(nut('Câu sai đến lịch ôn lại'))
+    function Boc() {
+      const [bat, setBat] = useState(true)
+      return <KhoiRutDe nguon={nguon as never} qidCaTruoc={[]} phutLamBai={45} onDoi={onDoi} cheDo="rieng" coCauChuaLoi={bat} onDoiCoCauChuaLoi={setBat} />
+    }
+    render(<Boc />)
+    const congTac = screen.getByRole('switch', { name: 'Có câu chữa lỗi' }) as HTMLInputElement
+    expect(congTac.checked).toBe(true)
+    expect(screen.queryByRole('checkbox', { name: 'Câu sai đến lịch ôn lại' })).toBeNull()
+    expect(screen.queryByRole('checkbox', { name: 'Không rút câu sai' })).toBeNull()
+    expect(screen.getByText(/tối đa 30% mỗi phần là câu sai đến lịch ôn lại/)).toBeTruthy()
     expect(onDoi.mock.calls.at(-1)?.[0]?.phamViHoiLai).toBe('gan_nhat')
-    fireEvent.click(nut('Câu sai đến lịch ôn lại'))
+    expect(onDoi.mock.calls.at(-1)?.[0]?.deRieng).toBe(true)
+
+    fireEvent.click(congTac)
+    expect(congTac.checked).toBe(false)
+    expect(screen.getByText(/100% câu mới, bỏ mọi câu em đã gặp/)).toBeTruthy()
     expect(onDoi.mock.calls.at(-1)?.[0]?.phamViHoiLai).toBe('khong')
-    fireEvent.click(nut('Không rút câu sai'))
-    expect(onDoi.mock.calls.at(-1)?.[0]?.phamViHoiLai).toBe('khong')
+
+    fireEvent.click(congTac)
+    expect(onDoi.mock.calls.at(-1)?.[0]?.phamViHoiLai).toBe('gan_nhat')
   })
 })
