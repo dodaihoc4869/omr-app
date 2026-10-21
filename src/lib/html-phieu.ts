@@ -32,6 +32,7 @@ import { gomTuCongThuc, tachDongSoDo } from './chem-format-so-do'
 import { goKyTuLa } from './chu-la-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
 import { docSoPhanIII } from './doc-so-phan-iii'
+import { soOPhanIII } from './so-o-tra-loi-ngan'
 import { coSoMuRieng, dinhTriKhoa } from './cham-so-policy'
 import { chuPhuongAn } from './anh-phuong-an'
 import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, chipThuSucHtml, ghiThuSucHtml, nhomThuSucHtml, nopThuSucHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
@@ -581,6 +582,21 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .lam-nut { flex: 0 0 auto; min-width: 44px; height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid #e4e0d7; background: var(--o-nen); color: var(--muc); font: inherit; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
 .lam-nut:focus-visible { outline: 3px solid rgba(47,62,70,.35); outline-offset: 2px; }
 .q-card.da-cham .lam-nut { pointer-events: none; opacity: .5; }
+/* BẢNG NHẬP SỐ trên phiếu (thầy 21/10). Ô <input> chứa giá trị nằm ẩn; hàng ô + bàn phím do mã lệnh dưới vẽ lại mỗi lần đổi. */
+.lbns { position: relative; flex-direction: column; align-items: stretch; gap: 10px; max-width: 360px; outline: none; }
+.lbns:focus-visible { box-shadow: 0 0 0 3px var(--chon-vien); border-radius: 12px; }
+/* Ô chứa giá trị: ẩn hẳn, không chiếm chỗ (áo M3 có luật riêng đủ mạnh ở khối M3, nếu không ô rộng 100% ⇒ tràn ngang). */
+.lbns .lam-nhap { position: absolute; left: 0; top: 0; width: 1px; height: 1px; min-width: 0; padding: 0; border: 0; box-shadow: none; opacity: 0; pointer-events: none; overflow: hidden; }
+.lbns-o-hang { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 52px); gap: 6px; justify-content: center; }
+.lbns-o { height: 54px; display: grid; place-items: center; border-radius: 12px; border: 2px solid var(--chon-vien); background: var(--o-nen); color: var(--muc); font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lbns-o.dang { border-style: dashed; }
+.lbns-phim { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.lbns-nut { height: 46px; border: 0; border-radius: 10px; background: var(--chon-nen); color: var(--muc); font: inherit; font-size: 20px; font-weight: 700; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.lbns-nut[data-chuc] { box-shadow: inset 0 0 0 1px var(--chon-vien); }
+.lbns-nut[data-rong] { grid-column: span 2; }
+.lbns-nut[data-phim="xoa-het"] { font-size: 15px; }
+.lbns-nut:disabled { opacity: .45; cursor: default; }
+.q-card.da-cham .lbns-nut, .q-card.da-cham .lbns { pointer-events: none; }
 /* Sau khi nộp: khoá ô lại và tô đúng/sai. Màu KHÔNG đứng một mình — mỗi thẻ
    mang thêm dòng chữ "Đúng"/"Sai" ngay dưới. */
 .q-card.da-cham .lam-o, .q-card.da-cham .lam-nhap { pointer-events: none; opacity: .95; }
@@ -1350,7 +1366,13 @@ export function theCauHtml(
     than = hang
   } else {
     // Phần III cho làm bài: ô điền ĐỨNG THAY dòng kẻ, không thêm hàng mới.
-    const oDien = choLam
+    // BẢNG NHẬP SỐ (thầy 21/10: "mọi chỗ trả lời ngắn … hiện bảng nhập này, tuỳ theo đáp số mà hiện số ô"): phiếu có đáp án và bàn phím số gõ
+    // được đáp số ⇒ hàng ô đúng số kí tự + bàn phím số. Ô <input> cũ GIỮ NGUYÊN (ẩn) làm nơi chứa giá trị ⇒ lưu nháp, nộp, chấm tại chỗ đọc y như trước.
+    // Phiếu chưa có đáp án / đáp án bàn phím không gõ được ⇒ ô nhập tự do cũ.
+    const soO = coDap ? soOPhanIII(c.dapAn) : null
+    const oDien = choLam && soO !== null
+      ? `<div class="lam-nhap-khoi lbns" data-so-o="${soO}" tabindex="0" role="group" aria-label="Đáp án của em — bảng nhập số ${soO} ô"><input class="lam-nhap" data-lbns-giu="1" type="text" tabindex="-1" aria-hidden="true" readonly autocomplete="off"><div class="lbns-o-hang" aria-hidden="true">${Array.from({ length: soO }, () => '<span class="lbns-o"></span>').join('')}</div><div class="lbns-phim" role="group" aria-label="Bàn phím số">${LBNS_PHIM}</div></div>`
+      : choLam
       ? `<div class="lam-nhap-khoi"><button type="button" class="lam-nut" data-lam-nut="am" aria-label="Đổi dấu âm">−</button><input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em" placeholder="Đáp án của em"><button type="button" class="lam-nut" data-lam-nut="phay" aria-label="Thêm dấu phẩy">,</button></div>`
       : `<div class="sa-blank">Đáp án: ……………………………</div>`
     than = anGiai || !coDap
@@ -1732,6 +1754,16 @@ export function khoiChuaGiHtml(cau: CauLuyen[], thieu: { soCau: number; phan?: '
  *
  * `soCau` là số câu CÓ LỜI GIẢI, không phải tổng số câu — câu chưa có đáp án
  * thì không mở được, đếm nó vào mẫu số là mãi mãi không bao giờ đủ. */
+/** Phím của bảng nhập số trên phiếu — cùng hàng phím màn luyện / màn kiểm tra (BangNhapSo): 1–9, xoá, 4–6, phẩy, 7–9, trừ, 0, xoá hết. */
+const LBNS_PHIM = [
+  ['1', '1'], ['2', '2'], ['3', '3'], ['xoa', '⌫', 'Xoá một kí tự'],
+  ['4', '4'], ['5', '5'], ['6', '6'], [',', ',', 'Dấu phẩy'],
+  ['7', '7'], ['8', '8'], ['9', '9'], ['-', '−', 'Dấu trừ'],
+  ['0', '0'], ['xoa-het', 'Xoá hết', 'Xoá hết'],
+]
+  .map(([k, chu, ten]) => `<button type="button" class="lbns-nut" data-phim="${k}"${ten ? ` aria-label="${ten}"` : ''}${k === '0' || k === 'xoa-het' ? ' data-rong="1"' : ''}${/^\d$/.test(k) ? '' : ' data-chuc="1"'}>${chu}</button>`)
+  .join('')
+
 export function thanhHtml(soCau: number, anGiai = false): string {
   if (anGiai) {
     return `<div class="thanh">
@@ -1825,7 +1857,7 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
   var chamNut = function (e: any) {
     cham()
     var t = e && e.target
-    if (t && t.closest && t.closest('.lam-o, .lam-nhap, .lam-nut')) {
+    if (t && t.closest && t.closest('.lam-o, .lam-nhap, .lam-nut, .lbns')) {
       var c = theCua(t)
       if (c) cauCuoi = c
     }
@@ -2414,7 +2446,7 @@ export const JS_PHIEU = `
           var phan = v.getAttribute('data-phan');
           if (phan === 'III') {
             var o = v.querySelector('.lam-nhap');
-            if (o && o.value !== giaTri) o.value = giaTri;
+            if (o && o.value !== giaTri) { o.value = giaTri; if (window.lbnsVeTu) window.lbnsVeTu(o); }
           } else if (phan === 'II') {
             var hangY = v.querySelectorAll('.tf-item[data-y]');
             for (var j = 0; j < hangY.length; j++) {
@@ -2540,6 +2572,52 @@ export const JS_PHIEU = `
         luuLam();
         if (demLam) demLam.textContent = String(soDaLam());
       });
+
+      // BẢNG NHẬP SỐ (thầy 21/10) — CÙNG LUẬT nhanPhim (src/components/hoc-tap/lam-bai.ts): chữ số / "," nối vào cuối khi còn ô ("," chỉ một lần);
+      // "-" bật/tắt dấu âm ở đầu (vượt số ô thì giữ nguyên); xoá một kí tự; xoá hết. Giá trị ghi vào ô <input> ẩn rồi phát 'input' ⇒ lưu / nộp / chấm như cũ.
+      function lbnsNhan(v, k, so) {
+        v = String(v || '');
+        if (k === 'xoa') return v.slice(0, -1);
+        if (k === 'xoa-het') return '';
+        if (k === '-') { var am = v.charAt(0) === '-'; var moiV = am ? v.slice(1) : '-' + v; return am || moiV.length <= so ? moiV : v; }
+        if (v.length >= so) return v;
+        if (k === ',') return v.indexOf(',') >= 0 || v.indexOf('.') >= 0 ? v : v + ',';
+        return v + k;
+      }
+      function lbnsVe(khoi) {
+        if (!khoi) return;
+        var o = khoi.querySelector('.lam-nhap'); if (!o) return;
+        var so = Number(khoi.getAttribute('data-so-o')) || 4, v = String(o.value || ''), n = Math.max(so, v.length);
+        var hang = khoi.querySelector('.lbns-o-hang'), oo = hang.querySelectorAll('.lbns-o');
+        while (oo.length < n) { hang.appendChild(document.createElement('span')).className = 'lbns-o'; oo = hang.querySelectorAll('.lbns-o'); }
+        for (var i = 0; i < oo.length; i++) { oo[i].textContent = i < v.length ? (v.charAt(i) === '-' ? '−' : v.charAt(i)) : ''; oo[i].className = 'lbns-o' + (i < v.length ? ' co' : i === v.length ? ' dang' : ''); }
+        var nut = khoi.querySelectorAll('.lbns-nut');
+        for (var j = 0; j < nut.length; j++) nut[j].disabled = lbnsNhan(v, nut[j].getAttribute('data-phim'), so) === v;
+      }
+      function lbnsDoi(khoi, k) {
+        var o = khoi.querySelector('.lam-nhap'); if (!o || daNop) return;
+        var the = khoi.closest('.q-card[data-qid]'); if (the && the.classList.contains('da-cham')) return;
+        var moiV = lbnsNhan(o.value, k, Number(khoi.getAttribute('data-so-o')) || 4);
+        if (moiV === o.value) return;
+        o.value = moiV;
+        o.dispatchEvent(new Event('input', { bubbles: true }));
+        lbnsVe(khoi);
+      }
+      window.lbnsVeTu = function (o) { lbnsVe(o && o.closest ? o.closest('.lbns') : null); };
+      document.addEventListener('click', function (e) {
+        var nut = e.target && e.target.closest ? e.target.closest('.lbns-nut') : null;
+        if (nut) lbnsDoi(nut.closest('.lbns'), nut.getAttribute('data-phim'));
+      });
+      document.addEventListener('keydown', function (e) {
+        var khoi = e.target && e.target.closest ? e.target.closest('.lbns') : null;
+        if (!khoi || e.ctrlKey || e.metaKey || e.altKey) return;
+        var k = e.key, p = /^[0-9]$/.test(k) ? k : (k === ',' || k === '.' || k === 'Decimal') ? ',' : (k === '-' || k === '−' || k === 'Subtract') ? '-' : k === 'Backspace' ? 'xoa' : k === 'Delete' ? 'xoa-het' : '';
+        if (!p) return;
+        e.preventDefault();
+        lbnsDoi(khoi, p);
+      });
+      var lbnsDs = document.querySelectorAll('.lbns');
+      for (var lb = 0; lb < lbnsDs.length; lb++) lbnsVe(lbnsDs[lb]);
 
       // HAI NÚT "−" VÀ "," cạnh ô trả lời ngắn (bàn phím SỐ của điện thoại không có hai dấu ấy; thầy lệnh 21/09). Cùng phép với src/lib/nhap-dap-so.ts (test đối chiếu):
       // "−" bật/tắt "-" ở ĐẦU số; "," chèn TẠI CON TRỎ, chỉ MỘT dấu thập phân ("," hoặc "."). Em gõ gì gửi nấy: KHÔNG chuẩn hoá ở đây.
@@ -3186,6 +3264,11 @@ html.gd-m3 body .lam-nhap-khoi { max-width: none; }
 html.gd-m3 body .lam-nut { min-width: 48px; height: 56px; border: 0; border-radius: 12px; background: transparent; box-shadow: inset 0 0 0 1.5px var(--gm-outline); color: var(--gm-on-surface); font-size: 22px; }
 html.gd-m3 body .lam-nut:focus-visible { outline: 3px solid var(--gm-primary); }
 html.gd-m3 body .lam-nhap:focus { outline: none; box-shadow: inset 0 0 0 2px var(--gm-primary); }
+html.gd-m3 body .lbns .lam-nhap { width: 1px; height: 1px; min-width: 0; max-width: none; padding: 0; border: 0; box-shadow: none; }
+html.gd-m3 body .lbns-o { border-color: var(--gm-outline); background: transparent; color: var(--gm-on-surface); }
+html.gd-m3 body .lbns-o.co { border-color: var(--gm-primary); }
+html.gd-m3 body .lbns-nut { background: color-mix(in srgb, var(--gm-on-surface) 7%, transparent); color: var(--gm-on-surface); }
+html.gd-m3 body .lbns-nut[data-chuc] { background: color-mix(in srgb, var(--gm-on-surface) 13%, transparent); box-shadow: none; }
 html.gd-m3 body .sa-blank { border-radius: 12px; }
 html.gd-m3 body .sa-answer { background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); border-radius: 12px; }
 
