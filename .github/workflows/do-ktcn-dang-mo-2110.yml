@@ -1,0 +1,33 @@
+# ĐẾM CHẶNG KIỂM TRA CÁ NHÂN ĐANG MỞ (CHỈ ĐỌC) — thầy 21/10: "Xong hết chưa" (bản sửa tốc độ app thầy bị cổng phát hành chặn 3 lần: scripts/hoi-thay-van-hanh.mjs `apSchemaHoiThay` đếm chặng
+# có cửa sổ đang mở = bat_dau ≤ bây giờ < han, bài chưa nộp, chặng chưa chốt). Hỏi: bao nhiêu chặng, còn bao nhiêu phút tới hạn (nhỏ nhất · trung vị · lớn nhất), và bao nhiêu em khác nhau.
+# CHỈ in số đếm gộp — không mã em, tên em, mã bài (repo công khai).
+name: Đếm chặng kiểm tra cá nhân đang mở (chỉ đọc)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: do-ktcn-dang-mo-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          NOW="CAST((julianday('now')-2440587.5)*86400000 AS INTEGER)"
+          echo "== chặng có cửa sổ đang mở (đúng điều kiện cổng phát hành)"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS so_chang, COUNT(DISTINCT k.sbd) AS so_em, ROUND(MIN(c.han-$NOW)/60000.0,1) AS con_it_nhat_phut, ROUND(MAX(c.han-$NOW)/60000.0,1) AS con_nhieu_nhat_phut, ROUND(AVG(c.han-$NOW)/60000.0,1) AS con_tb_phut FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE k.nop_luc IS NULL AND c.chot_luc IS NULL AND c.bat_dau<=$NOW AND c.han>$NOW" | jq -c ".[0].results"
+          echo "== số chặng mở theo số phút còn lại (xô: <5 · 5-14 · 15-29 · 30-59 · 60-179 · 180+)"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT SUM((c.han-$NOW)<300000) x0, SUM((c.han-$NOW)>=300000 AND (c.han-$NOW)<900000) x1, SUM((c.han-$NOW)>=900000 AND (c.han-$NOW)<1800000) x2, SUM((c.han-$NOW)>=1800000 AND (c.han-$NOW)<3600000) x3, SUM((c.han-$NOW)>=3600000 AND (c.han-$NOW)<10800000) x4, SUM((c.han-$NOW)>=10800000) x5 FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE k.nop_luc IS NULL AND c.chot_luc IS NULL AND c.bat_dau<=$NOW AND c.han>$NOW" | jq -c ".[0].results"
