@@ -117,3 +117,29 @@ describe('lịch sử làm câu — Mức làm 1–4 (thầy)', () => {
     expect(mucCua(r, 'A-I-2')).toMatchObject({ ma: 1, xapXi: true })
   })
 })
+
+describe('lịch sử làm câu — chi phí β của Mức làm', () => {
+  /** Bọc D1: ghi lại các câu SQL đọc `omni_beta_cau`. */
+  const theoDoiBeta = (env: Env) => {
+    const goc = env.DB as unknown as { prepare(q: string): unknown }
+    const sql: string[] = []
+    const DB = new Proxy(goc, { get: (t, k, r) => (k === 'prepare' ? (q: string) => { if (/FROM omni_beta_cau/i.test(q)) sql.push(q); return t.prepare(q) } : Reflect.get(t, k, r)) })
+    return { env: { ...env, DB } as unknown as Env, sql }
+  }
+  it('đúng MỘT truy vấn β khi có lượt đủ điều kiện xếp mức; KHÔNG truy vấn nào khi chưa lượt nào có số đo mới', async () => {
+    const d = taoD1That()
+    em(d)
+    d.sql.exec('CREATE TABLE IF NOT EXISTS omni_beta_cau (qid TEXT PRIMARY KEY, beta REAL NOT NULL, n INTEGER NOT NULL, cap_nhat_luc TEXT NOT NULL)')
+    dong(d, 'V-I-1', 0, 12, { t: 20, h: 0, p: 'I' }) // đồng hồ cũ
+    dong(d, 'V-I-2', 0, null, DOC(20))                 // không có giây
+    const cu = theoDoiBeta(d.env as unknown as Env)
+    await lichSuLamCauCuaEm(cu.env, 'S1', undefined, 'thay')
+    expect(cu.sql).toHaveLength(0)
+    dong(d, 'V-I-3', 0, 40, DOC(20))
+    dong(d, 'V-I-4', 0, 18, DOC(20))
+    const moi = theoDoiBeta(d.env as unknown as Env)
+    const r = await lichSuLamCauCuaEm(moi.env, 'S1', undefined, 'thay')
+    expect(moi.sql).toHaveLength(1)
+    expect(r.ok).toBe(true)
+  })
+})

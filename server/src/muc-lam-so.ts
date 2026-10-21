@@ -1,0 +1,72 @@
+// MỨC LÀM TỪ DÒNG SỔ — cầu nối giữa dòng `su_kien_hoc` và lõi thuần `muc-lam.ts`. MỘT đường duy nhất cho mọi màn đọc sổ
+// (Lịch sử làm câu, "Ai đã sai?" trên tờ chiếu, hồ sơ em lên bảng): cùng điều kiện xếp mức, cùng thời gian thường, không màn nào tự tính lại.
+//   · CHỈ xếp mức cho lượt có giây ĐO THẬT (cột `giay` / `raw_json.ms`) bằng đồng hồ MỚI (`raw_json.doc.dh = 1`) và có kích thước đề (`doc.t`, phần `doc.p`).
+//     Giây ước tính (game cũ), giây của ca thi cũ (`chi_tiet_cau`), giây đồng hồ cũ ⇒ KHÔNG có mức ("Chưa có số đo", không đoán).
+//   · Thời gian thường của em = e^(β)/1000 CHỈ khi câu có β thật (`omni_beta_cau`, τ = 0 — τ của OMNI chưa nối). Không β ⇒ không có Mức 4.
+// Không đọc D1 ở đây: nơi gọi tự đọc β (`docBetaCau`) trong CÙNG đợt `Promise.all` với các lượt đọc khác của mình (không thêm vòng chờ nối tiếp).
+import { msKyVong } from './omni-toc-do'
+import { mucLamCuaLuot, type MucLamLuot, type PhanMucLam } from './muc-lam'
+
+type Row = Record<string, unknown>
+const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
+
+/** Mức độ theo hợp đồng: 'biet' | 'hieu' | 'VD' | 'VDC' | ''. Nhận cả cách viết có dấu / viết tắt / `van_dung`. */
+export function chuanMucDo(v: unknown): string {
+  const k = str(v).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/[_\s]+/g, ' ').trim()
+  if (!k) return ''
+  if (k === 'biet' || k === 'nhan biet' || k === 'nb') return 'biet'
+  if (k === 'hieu' || k === 'thong hieu' || k === 'th') return 'hieu'
+  if (k === 'vdc' || k === 'van dung cao') return 'VDC'
+  if (k === 'vd' || k === 'van dung') return 'VD'
+  return ''
+}
+
+/** Kích thước đề + đồng hồ mới của một lượt (`raw_json.doc`). */
+export interface DoMucLuot {
+  soTu: number
+  coHinh: boolean
+  phan: PhanMucLam
+}
+
+/** `raw_json.doc` → đầu vào Mức làm: CHỈ khi giây đến từ đồng hồ MỚI (`dh = 1`) và có số từ + phần hợp lệ. Còn lại ⇒ null. */
+export function docDoMuc(raw: Row | null): DoMucLuot | null {
+  const d = raw?.doc
+  if (!d || typeof d !== 'object' || Array.isArray(d)) return null
+  const o = d as Row
+  const t = typeof o.t === 'number' && Number.isFinite(o.t) && o.t >= 0 ? o.t : null
+  const phan = o.p === 'I' || o.p === 'II' || o.p === 'III' ? o.p : null
+  if (o.dh !== 1 || t === null || phan === null) return null
+  return { soTu: t, coHinh: o.h === 1, phan }
+}
+
+/** Một lượt đã đọc xong các trường cần cho Mức làm. */
+export interface DongMucTho {
+  doMuc: DoMucLuot | null
+  /** Giây ĐO THẬT (`giayDoCuaLuot`: cột sổ ⇒ `raw_json.ms`); null = chưa đo / chỉ có ước tính. */
+  giayDo: number | null
+  /** Mã câu GỐC (đã bỏ hậu tố song sinh) — khoá β. */
+  goc: string
+  /** 'biet' | 'hieu' | 'VD' | 'VDC' | '' (xem `chuanMucDo`). */
+  mucDo: string
+  /** true = đúng · false = sai · null = bỏ trống / chưa chấm. */
+  dung: boolean | null
+}
+
+/** Các mã câu gốc cần β: chỉ lượt ĐỦ điều kiện xếp mức ⇒ tập nhỏ (rỗng khi chưa máy nào nạp bản mới). */
+export function gocCanBeta(dong: readonly Pick<DongMucTho, 'doMuc' | 'giayDo' | 'goc'>[]): string[] {
+  return [...new Set(dong.filter((d) => d.doMuc && d.giayDo !== null && d.goc).map((d) => d.goc))]
+}
+
+/** Mức làm của một lượt; thiếu số đo ⇒ null. `beta` = kết quả `docBetaCau` cho `gocCanBeta`. */
+export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>): MucLamLuot | null {
+  if (!d.doMuc || d.giayDo === null) return null
+  const b = beta.get(d.goc)
+  return mucLamCuaLuot({
+    giay: d.giayDo,
+    soTu: d.doMuc.soTu,
+    coHinh: d.doMuc.coHinh,
+    phan: d.doMuc.phan,
+    dung: d.dung,
+    thuongGiay: b === undefined ? null : msKyVong(b, 0, d.doMuc.phan, d.mucDo || null) / 1000,
+  })
+}

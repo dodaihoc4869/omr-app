@@ -22,8 +22,8 @@ import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame, noiCuaCa } from './a
 import { loaiGameCua } from './dau-gio'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docBetaCau, docCauKho, tenCuaDang } from './omni-d1'
-import { msKyVong } from './omni-toc-do'
-import { mucLamCuaLuot, tongMucLam, type MucLamLuot, type PhanMucLam } from './muc-lam'
+import { tongMucLam, type MucLamLuot } from './muc-lam'
+import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong, type DoMucLuot } from './muc-lam-so'
 import { tenLopCuaEm } from './ten-lop'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
@@ -45,16 +45,7 @@ async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | n
   }
 }
 
-/** Mức độ theo hợp đồng: 'biet' | 'hieu' | 'VD' | 'VDC' | ''. Nhận cả cách viết có dấu / viết tắt / `van_dung`. */
-export function chuanMucDo(v: unknown): string {
-  const k = str(v).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/[_\s]+/g, ' ').trim()
-  if (!k) return ''
-  if (k === 'biet' || k === 'nhan biet' || k === 'nb') return 'biet'
-  if (k === 'hieu' || k === 'thong hieu' || k === 'th') return 'hieu'
-  if (k === 'vdc' || k === 'van dung cao') return 'VDC'
-  if (k === 'vd' || k === 'van dung') return 'VD'
-  return ''
-}
+export { chuanMucDo } // nơi gốc: muc-lam-so.ts (cùng bộ chuẩn hoá cho Lịch sử làm câu, "Ai đã sai?", hồ sơ em lên bảng)
 
 /** Tiêu đề câu: "Câu 25 · <tên dạng>" (số câu theo mã `<mã tờ>-<phần>-<số>` của câu gốc); mã khác quy ước ⇒ chỉ tên dạng; không tên dạng ⇒ ''. */
 export function tieuDeCau(qid: string, tenDang: string): string {
@@ -91,17 +82,6 @@ const ngayVnTuLuc = (luc: string): string => {
   return Number.isFinite(t) ? new Date(t + 7 * 3_600_000).toISOString().slice(0, 10) : ''
 }
 
-/** `raw_json.doc` → đầu vào Mức làm: CHỈ khi giây đến từ đồng hồ MỚI (`dh = 1`) và có số từ + phần hợp lệ (xem muc-lam.ts). Giây cũ / ước / không rõ ⇒ null ("Chưa có số đo"). */
-function docDoMuc(raw: Row | null): Dong['doMuc'] {
-  const d = raw?.doc
-  if (!d || typeof d !== 'object' || Array.isArray(d)) return null
-  const o = d as Row
-  const t = typeof o.t === 'number' && Number.isFinite(o.t) && o.t >= 0 ? o.t : null
-  const phan = o.p === 'I' || o.p === 'II' || o.p === 'III' ? o.p : null
-  if (o.dh !== 1 || t === null || phan === null) return null
-  return { soTu: t, coHinh: o.h === 1, phan }
-}
-
 /** Dòng sổ đã đọc (nội bộ). */
 interface Dong {
   qid: string
@@ -121,7 +101,7 @@ interface Dong {
   raw: Row | null
   tenCa: string
   /** Kích thước đề + đồng hồ MỚI của lượt (`raw_json.doc` với `dh = 1`); null ⇒ lượt chưa có số đo để xếp Mức làm. */
-  doMuc: { soTu: number; coHinh: boolean; phan: PhanMucLam } | null
+  doMuc: DoMucLuot | null
 }
 
 /** AI ĐỌC SỔ (12/10F — học sinh xem hồ sơ của chính mình): 'thay' = lệnh thầy, như trước; 'hoc-sinh' = lệnh em (`/hs/lich-su-lam-cau`,
@@ -207,7 +187,7 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   const caThi = [...new Set(dong.filter((d) => d.nguon === 'thi').map((d) => d.maNguon))]
   type KhoGon = { tenDang: string | null; mucDo: string | null }
   // Mức làm 1–4: CHỈ lượt có số đo mới (đồng hồ mới + kích thước đề) cần β của câu ⇒ tập này nhỏ (0 lượt trước khi máy em nạp bản mới); đọc CÙNG đợt với các khối dưới (0 vòng chờ nối tiếp thêm).
-  const gocMuc = [...new Set(dong.filter((d, i) => d.doMuc && doThat[i] !== null && d.goc).map((d) => d.goc))]
+  const gocMuc = gocCanBeta(dong.map((d, i) => ({ doMuc: d.doMuc, giayDo: doThat[i] ?? null, goc: d.goc })))
   const [kho, loai, rAtt, uoc, ct, beta] = await Promise.all([
     docCauKho(env, goc).catch(() => new Map<string, KhoGon>()) as Promise<Map<string, KhoGon>>,
     loaiGameCua(env, game.map((d) => d.maNguon)).catch(() => new Map<string, 'doan' | 'bia' | 'dao'>()),
@@ -232,12 +212,8 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   }
   // Mức làm của từng lượt (thuần, muc-lam.ts). Thời gian thường CHỈ khi β thật (τ của OMNI chưa nối ⇒ τ = 0, hệ số đọc 1,0 — đặc tả mục 3). Bản học sinh/phụ huynh: lượt ĐÚNG ở Mức 1–2 không mang mức
   // (chỉ số giây) và KHÔNG tính vào tổng — tổng khớp đúng những gì em thấy.
-  const mucTho: (MucLamLuot | null)[] = dong.map((d, i) => {
-    const g = doThat[i]
-    if (!d.doMuc || g === null || g === undefined) return null
-    const b = beta.get(d.goc)
-    return mucLamCuaLuot({ giay: g, soTu: d.doMuc.soTu, coHinh: d.doMuc.coHinh, phan: d.doMuc.phan, dung: d.ketQua === null ? null : d.ketQua === 1, thuongGiay: b === undefined ? null : msKyVong(b, 0, d.doMuc.phan, d.mucDo || null) / 1000 })
-  })
+  const mucTho: (MucLamLuot | null)[] = dong.map((d, i) =>
+    mucLamTuDong({ doMuc: d.doMuc, giayDo: doThat[i] ?? null, goc: d.goc, mucDo: d.mucDo, dung: d.ketQua === null ? null : d.ketQua === 1 }, beta))
   const anMuc = (i: number): boolean => nguoiDoc === 'hoc-sinh' && !!mucTho[i] && dong[i]!.ketQua === 1 && mucTho[i]!.ma <= 2
   const tatCa: LanLamCau[] = dong.map((d, i) => {
     let giay: number | null = doThat[i] ?? null

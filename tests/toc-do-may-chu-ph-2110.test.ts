@@ -116,6 +116,9 @@ const LENH_PH: LenhDo[] = [
   { ten: 'ph-lich-su-lam-cau', duong: '/ph/lich-su-lam-cau', than: (k) => ({ pass: k.pass }) },
   { ten: 'hs-lich-su-lam-cau', duong: '/hs/lich-su-lam-cau', than: (k) => ({ token: k.token }) },
   { ten: 'gv-lich-su-lam-cau', duong: '/gv/lich-su-lam-cau', than: () => ({ sbd: 'S1' }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  // Tờ chiếu cho cả lớp (21/10, Mức làm 1–4 + hai thẻ đã điểm danh / cả lớp): "Ai đã sai?" (phím X) và bảng chi tiết em lên bảng.
+  { ten: 'gv-ai-sai-cau', duong: '/gv/ai-sai-cau', than: (k) => ({ qids: [k.qids[1]!], sbds: ['S1'] }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  { ten: 'gv-ho-so-len-bang', duong: '/gv/ho-so-len-bang', than: (k) => ({ sbd: 'S1', qid: k.qids[1]! }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
 ]
 
 it('lệnh mở app phụ huynh: số đợt chờ D1 không vượt mốc bản trước', async () => {
