@@ -75,7 +75,8 @@ export interface LamBaiNgangProps {
   onNhap: (stt: number, text: string) => void
   /** Ô đáp số Phần III (màn thi dựng bằng `OSoTraLoi` chuanViet). Truyền vào thay vì import để mảnh ngang không tách
    * `OSoTraLoi` khỏi mảnh dùng chung hiện có (precache giữ nguyên số tệp). */
-  oDapSo: (p: { value: string; onChange: (v: string) => void; ariaLabel: string }) => ReactNode
+  /** `stt` để màn cha tra số ô bảng nhập số của đúng câu (thầy 21/10). */
+  oDapSo: (p: { value: string; onChange: (v: string) => void; ariaLabel: string; stt: number }) => ReactNode
   onDoiDau: (stt: number) => void
   /** Chuỗi mm:ss; bài tập về nhà ⇒ null và hiện `chuThayDongHo`. */
   dongHo: string | null
@@ -588,7 +589,7 @@ function LamBaiNgangDu(p: LamBaiNgangProps) {
                       )}
                       {ph === 'III' && (
                         <div className="lb-o3" onFocusCapture={() => chamCau(c.stt)}>
-                          {p.oDapSo({ value: c.tl ?? '', onChange: (v) => p.onNhap(c.stt, v), ariaLabel: `Đáp số câu ${c.stt}` })}
+                          {p.oDapSo({ value: c.tl ?? '', onChange: (v) => p.onNhap(c.stt, v), ariaLabel: `Đáp số câu ${c.stt}`, stt: c.stt })}
                         </div>
                       )}
                     </div>

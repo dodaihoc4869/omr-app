@@ -260,6 +260,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
                   key={q.id}
                   {...common}
                   phan="III"
+                  soO={(q as { soO?: number }).soO}
                   selected={answers[q.id] || ''}
                   correct={sol?.correct as string | undefined}
                   onChange={(v) => change(q.id, v)}

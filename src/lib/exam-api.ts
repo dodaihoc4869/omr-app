@@ -22,7 +22,7 @@ import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayDanhSachMoi, dayMocBatDauM
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 import { docPhamViHoiLaiCa } from './cau-hinh-de-rieng'
-import { daDungCuaEm } from './rut-de-da-dung'
+import { daDungCuaEm } from './nhan-da-dung'
 import { docBangCauGoc, type CauGocCongKhai } from './cau-goc'
 import { donTheoMocReset } from './don-moc-reset-giao-vien'
 

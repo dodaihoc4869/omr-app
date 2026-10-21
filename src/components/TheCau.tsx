@@ -10,7 +10,7 @@ import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
 import { Check, History, RotateCcw, X as XIcon } from 'lucide-react'
 import DaiCauThay from './DaiCauThay'
-import { chuNhanDaDung, laNhanThay } from '../lib/rut-de-da-dung'
+import { chuNhanDaDung, laNhanThay } from '../lib/nhan-da-dung'
 import type { LayCauGoc } from '../lib/cau-goc'
 import { normalizeNumericAnswer } from '../engine/score'
 import { khopPhanIII } from '../lib/cham-so'
@@ -21,6 +21,8 @@ import { tachDongTheoY } from '../lib/tach-dong-cau'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
 import { TheNoiDung, DauThe, Hang, Nhan } from './DesignSystem'
 import OSoTraLoi from './OSoTraLoi'
+import BangNhapSo from './BangNhapSo'
+import { soOHopLe } from '../lib/so-o-tra-loi-ngan'
 import NutHoiThay from './loi-giai/NutHoiThay'
 import KhoiLoiGiaiChuan from './loi-giai/KhoiLoiGiaiChuan'
 import './m3/the-cau.css' // chỉ có hiệu lực dưới tổ tiên `.m3` (luyện đề / khắc phục / báo cáo…); game và app giáo viên không đổi
@@ -104,6 +106,9 @@ interface SaProps extends BaseProps {
   tuLuan?: boolean
   /** Ô đáp số đang khoá (đang gửi / đã chốt) ⇒ khoá cả ô lẫn hai nút "±" ",". */
   khoaO?: boolean
+  /** SỐ Ô của bảng nhập số (thầy 21/10): số kí tự đáp số gõ chuẩn, gói đề / máy chủ gửi kèm. Hợp lệ (1..8) ⇒ BẢNG NHẬP SỐ như màn luyện;
+   *  thiếu (gói ca cũ, đáp án bàn phím số không gõ được) ⇒ ô nhập tự do `OSoTraLoi` như trước — KHÔNG tự về 4 ô (lỗi "10000 ⇒ 1000"). */
+  soO?: number
 }
 
 export type TheCauProps = McqProps | TfProps | SaProps
@@ -354,7 +359,8 @@ export default function TheCau(props: TheCauProps) {
       </div>
     )
   } else {
-    const { selected, onChange, correct, tuLuan, khoaO } = props
+    const { selected, onChange, correct, tuLuan, khoaO, soO } = props
+    const soOBang = soOHopLe(soO)
     const daTraLoi = !!normSo(selected ?? '')
     const dung = xemLai && daTraLoi && khopPhanIII(selected ?? '', correct ?? '') // 29/09: so GIÁ TRỊ như bộ chấm ("1237500000" = "1,2375×10⁹")
     body = xemLai && tuLuan ? (
@@ -394,6 +400,9 @@ export default function TheCau(props: TheCauProps) {
           <div style={NHAN_NHO}>Em chưa trả lời câu này.</div>
         )}
       </div>
+    ) : soOBang !== null ? (
+      // BẢNG NHẬP SỐ (thầy 21/10, kèm ảnh màn luyện): đúng số ô theo đáp số + bàn phím số trên màn — mọi chỗ trả lời ngắn, kể cả màn kiểm tra.
+      <BangNhapSo value={selected ?? ''} onChange={(v) => onChange?.(v)} soO={soOBang} disabled={khoaO} ariaLabel="Đáp án của em" />
     ) : (
       // BÀN PHÍM iPHONE KHÔNG CÓ DẤU TRỪ (thầy báo 06/09). `inputMode="decimal"`
       // cho bàn phím số có dấu phẩy nhưng KHÔNG có dấu âm, mà đáp án phần III

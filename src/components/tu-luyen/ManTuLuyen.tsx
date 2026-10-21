@@ -960,7 +960,7 @@ function TheCauLam({ cau: c, stt, luotId, giaTri, onDoi }: { cau: CauCongKhai; s
       />
     )
   }
-  return <TheCau {...chung} phan="III" selected={giaTri ?? ''} onChange={(t) => onDoi(t)} />
+  return <TheCau {...chung} phan="III" soO={(c as { soO?: number }).soO} selected={giaTri ?? ''} onChange={(t) => onDoi(t)} />
 }
 
 /** Một câu SAU NỘP: TheCau `xem_lai` — đáp án đúng (máy chủ chấm) + lời giải chuẩn. */

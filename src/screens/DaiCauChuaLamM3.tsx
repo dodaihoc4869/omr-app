@@ -2,7 +2,7 @@
 // nút "+K" mở lưới đủ câu; hàng "Đã đánh dấu xem lại" liệt kê câu em đánh dấu (kể cả câu đã làm). CHỈ trình bày lại `chuaLam`, tập câu đánh dấu và hai hàm
 // ĐÃ CÓ của màn (`cuonToiCau`, mở lưới): không state, không gọi gì mới. Chỉ đường học sinh/phụ huynh (dungM3); từ 880 px lưới câu cột trái đã có nên dải ẩn (CSS).
 import { Flag } from 'lucide-react'
-import { memo, type ReactNode } from 'react'
+import { memo, useCallback, useLayoutEffect, useRef, type ReactNode } from 'react'
 import { bangPropsBoQuaHam } from '../lib/so-sanh-props'
 import './man-thi-m3.css'
 
@@ -79,17 +79,29 @@ export default function DaiCauChuaLamM3({
  * mọc/biến theo `soY` — nên thẻ câu KHÔNG bị dựng lại khi em bấm (dựng lại = mất tiêu điểm, cuộn nhảy). `soY` = số ý ĐÃ có đáp án (Phần I/III truyền 0).
  * Nút chỉ gọi `onDoiDau`; việc nhớ dấu nằm ở màn thi (lib/xem-lai-sau.ts) và KHÔNG dính gì tới đáp án hay gói nộp.
  */
-export const KhungCauM3 = memo(function KhungCauM3({ soY, daDanhDau, onDoiDau, children }: { soY: number; daDanhDau: boolean; onDoiDau: () => void; children: ReactNode }) {
+export function KhungCauM3({ soY, daDanhDau, onDoiDau, children }: { soY: number; daDanhDau: boolean; onDoiDau: () => void; children: ReactNode }) {
+  // KHÔNG memo khung (đo máy yếu 21/10): `children` là phần tử thẻ câu MỚI mỗi lần màn thi vẽ lại ⇒ memo khung không bao giờ đứng được, khung + cờ
+  // của MỌI thẻ vẽ lại sau mỗi lần chọn. Thẻ câu tự memo; phần góc (nhãn + nút) memo riêng ⇒ mỗi lần chọn chỉ thẻ vừa đổi vẽ lại.
+  // Góc memo bỏ qua hàm ⇒ nút gọi qua ref tới `onDoiDau` MỚI NHẤT (đánh dấu câu này không được dùng danh sách dấu cũ, xoá mất dấu câu khác).
+  const moiNhat = useRef(onDoiDau)
+  useLayoutEffect(() => { moiNhat.current = onDoiDau })
+  const doi = useCallback(() => moiNhat.current(), [])
   return (
     <div className="thi-cau-boc">
       {children}
-      <div className="thi-cau-goc">
-        {soY > 0 && soY < 4 && <span className="thi-cau-nhan">Mới {soY}/4 ý</span>}
-        <button type="button" className="thi-cau-dau" aria-pressed={daDanhDau} onClick={onDoiDau}>
-          <Flag size={15} aria-hidden="true" fill={daDanhDau ? 'currentColor' : 'none'} />
-          <span>Xem lại sau</span>
-        </button>
-      </div>
+      <GocCauM3 soY={soY} daDanhDau={daDanhDau} onDoiDau={doi} />
+    </div>
+  )
+}
+
+const GocCauM3 = memo(function GocCauM3({ soY, daDanhDau, onDoiDau }: { soY: number; daDanhDau: boolean; onDoiDau: () => void }) {
+  return (
+    <div className="thi-cau-goc">
+      {soY > 0 && soY < 4 && <span className="thi-cau-nhan">Mới {soY}/4 ý</span>}
+      <button type="button" className="thi-cau-dau" aria-pressed={daDanhDau} onClick={onDoiDau}>
+        <Flag size={15} aria-hidden="true" fill={daDanhDau ? 'currentColor' : 'none'} />
+        <span>Xem lại sau</span>
+      </button>
     </div>
   )
 }, bangPropsBoQuaHam)

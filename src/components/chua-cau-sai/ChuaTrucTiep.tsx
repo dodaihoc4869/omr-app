@@ -77,7 +77,7 @@ export function propsCauLam(d: DeHien, tra: string, onDoi?: (v: string) => void,
       onSelect: doi ? (i, v) => { const m = [...mang]; m[i] = v; doi(m.join('')) } : undefined,
     }
   }
-  return { ...chung, phan: 'III', selected: tra, onChange: doi ? (v) => doi(v) : undefined, khoaO: !doi }
+  return { ...chung, phan: 'III', soO: (d as { soO?: number }).soO, selected: tra, onChange: doi ? (v) => doi(v) : undefined, khoaO: !doi }
 }
 
 function deTuCauGoc(c: NonNullable<KetQuaDot['cauGoc']>): DeHien | null {
