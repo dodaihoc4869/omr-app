@@ -83,6 +83,18 @@ describe('bảng nhập số', () => {
   })
 })
 
+describe('bảng gọn (phiếu tô màn kiểm tra trên máy tính)', () => {
+  it('chỉ hàng ô, không bàn phím số; vẫn gõ được bằng phím máy tính', () => {
+    function G() { const [v, setV] = useState(''); return <><BangNhapSo gon value={v} onChange={setV} soO={2} ariaLabel="Đáp số câu 33" /><span data-testid="g">{v}</span></> }
+    const { container } = render(<G />)
+    expect(container.querySelector('.bns-phim')).toBeNull()
+    expect(container.querySelectorAll('.bns-o')).toHaveLength(2)
+    const bang = screen.getByRole('group', { name: 'Đáp số câu 33' })
+    fireEvent.keyDown(bang, { key: '2' }); fireEvent.keyDown(bang, { key: '4' }); fireEvent.keyDown(bang, { key: '5' })
+    expect(screen.getByTestId('g').textContent).toBe('24')
+  })
+})
+
 describe('TheCau Phần III', () => {
   const chung = { cheDo: 'thi' as const, stt: 1, text: 'Đề', phan: 'III' as const, selected: '', onChange: () => {} }
   it('có soO hợp lệ ⇒ bảng nhập số đúng số ô, không ô <input>', () => {

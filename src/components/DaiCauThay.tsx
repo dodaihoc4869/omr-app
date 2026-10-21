@@ -6,7 +6,7 @@
 // em có câu thay ấy (`/hs/cau-goc`). Nội dung tải khi em bấm lần đầu rồi nhớ trong phiên; mất mạng thì nói thật và cho bấm thử lại.
 import { useId, useState } from 'react'
 import { BookOpen, ChevronUp } from 'lucide-react'
-import { chuNganNhanThay, tachNhanThay } from '../lib/rut-de-da-dung'
+import { chuNganNhanThay, tachNhanThay } from '../lib/nhan-da-dung'
 import { ChemText } from '../lib/chem-format'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
 import type { CauGocCongKhai, LayCauGoc } from '../lib/cau-goc'

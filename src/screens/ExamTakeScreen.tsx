@@ -56,7 +56,7 @@ import ManGiuDeDoc from '../components/ManGiuDeDoc'
 import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import { bangPropsBoQuaHam } from '../lib/so-sanh-props'
-import { gocCuaCauThay } from '../lib/rut-de-da-dung'
+import { gocCuaCauThay } from '../lib/nhan-da-dung'
 import type { CauGocCongKhai, LayCauGoc } from '../lib/cau-goc'
 import { flushSync } from 'react-dom'
 import MaCaInput from '../components/MaCaInput'
@@ -3801,7 +3801,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             // BẢNG NHẬP SỐ (thầy 21/10): câu có số ô trong gói đề ⇒ bảng nhập số; gói ca cũ / đáp án bàn phím không gõ được ⇒ ô tự do như trước.
             const f = flat[o.stt - 1]
             const soO = f?.phan === 'III' ? soOHopLe((assignment.phanIII[f.i].question as { soO?: unknown }).soO) : null
-            return soO !== null ? <BangNhapSo value={o.value} onChange={o.onChange} soO={soO} ariaLabel={o.ariaLabel} /> : <OSoTraLoi chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />
+            return soO !== null ? <BangNhapSo gon value={o.value} onChange={o.onChange} soO={soO} ariaLabel={o.ariaLabel} /> : <OSoTraLoi chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />
           }}
           onDoiDau={(n) => {
             const f = flat[n - 1]

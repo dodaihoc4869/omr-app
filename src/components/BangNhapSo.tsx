@@ -20,6 +20,9 @@ export interface BangNhapSoProps {
   ariaLabel?: string
   id?: string
   onFocus?: () => void
+  /** GỌN (phiếu tô cột phải của màn kiểm tra trên máy tính): chỉ hàng ô, gõ bằng bàn phím máy tính — bàn phím số đầy đủ nằm ở thẻ câu bên trái,
+   *  không lặp lại ở từng dòng phiếu. */
+  gon?: boolean
 }
 
 const HANG_PHIM: { p: PhimSo; chu?: string; ten?: string; chuc?: true; rong?: true }[] = [
@@ -29,7 +32,7 @@ const HANG_PHIM: { p: PhimSo; chu?: string; ten?: string; chuc?: true; rong?: tr
   { p: '0', rong: true }, { p: 'xoa-het', chu: 'Xoá hết', chuc: true, rong: true },
 ]
 
-export default function BangNhapSo({ value, onChange, soO, disabled, ariaLabel = 'Đáp án của em', id, onFocus }: BangNhapSoProps) {
+export default function BangNhapSo({ value, onChange, soO, disabled, ariaLabel = 'Đáp án của em', id, onFocus, gon }: BangNhapSoProps) {
   const v = value ?? ''
   const so = Math.max(soO, v.length)
   const nhan = (p: PhimSo) => {
@@ -45,7 +48,7 @@ export default function BangNhapSo({ value, onChange, soO, disabled, ariaLabel =
     nhan(p)
   }
   return (
-    <div id={id} className="bns" role="group" aria-label={ariaLabel} tabIndex={disabled ? -1 : 0} onKeyDown={go} onFocus={onFocus} data-khoa={disabled || undefined}>
+    <div id={id} className="bns" role="group" aria-label={ariaLabel} tabIndex={disabled ? -1 : 0} onKeyDown={go} onFocus={onFocus} data-khoa={disabled || undefined} data-gon={gon || undefined}>
       <div className="bns-o-hang" aria-hidden="true" data-nhieu={so > 4 || undefined} style={so > 4 ? ({ '--bns-so-o': so } as CSSProperties) : undefined}>
         {Array.from({ length: so }, (_, i) => (
           <span key={i} className="bns-o" data-tt={i < v.length ? 'co' : i === v.length && !disabled ? 'dang' : 'trong'}>
@@ -54,13 +57,13 @@ export default function BangNhapSo({ value, onChange, soO, disabled, ariaLabel =
         ))}
       </div>
       <output className="bns-an" aria-live="polite">{v ? `Đáp án của em: ${[...v].map(kyTuHien).join('')}` : 'Chưa nhập đáp án'}</output>
-      <div className="bns-phim" role="group" aria-label="Bàn phím số">
+      {!gon && <div className="bns-phim" role="group" aria-label="Bàn phím số">
         {HANG_PHIM.map(({ p, chu, ten, chuc, rong }) => (
           <button key={p} type="button" tabIndex={-1} aria-label={ten} data-chuc={chuc || undefined} data-rong={rong || undefined} disabled={disabled || !phimCoTacDung(v, p, soO)} onClick={() => nhan(p)}>
             {p === 'xoa' ? <Delete size={22} aria-hidden="true" /> : chu ?? p}
           </button>
         ))}
-      </div>
+      </div>}
     </div>
   )
 }

@@ -10,7 +10,7 @@ import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
 import { Check, History, RotateCcw, X as XIcon } from 'lucide-react'
 import DaiCauThay from './DaiCauThay'
-import { chuNhanDaDung, laNhanThay } from '../lib/rut-de-da-dung'
+import { chuNhanDaDung, laNhanThay } from '../lib/nhan-da-dung'
 import type { LayCauGoc } from '../lib/cau-goc'
 import { normalizeNumericAnswer } from '../engine/score'
 import { khopPhanIII } from '../lib/cham-so'
