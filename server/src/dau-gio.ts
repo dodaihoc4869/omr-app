@@ -188,7 +188,16 @@ export async function gvDauGio(env: Env, b: Row, nowMs: number = Date.now()): Pr
     const luot = (await docLuotBuoi(env, buoiId)).map(luotRa)
     const daGoi = new Set(luot.map((x) => x.sbd))
     const em = [...buoi.coMat.keys()].filter((s) => !daGoi.has(s)).slice(0, TOI_DA_EM_UNG_VIEN)
-    const [dung, daHoi] = await Promise.all([cauDaDung(env, em), daHoiCua(env, em)])
+    // Phân tầng (21/10): khả năng trung bình theo kỹ năng + số lần lên bảng 14 ngày — đọc chung một đợt, không thêm vòng chờ.
+    const J = JSON.stringify(em)
+    const [dung, daHoi, pTb, lb] = await Promise.all([
+      cauDaDung(env, em),
+      daHoiCua(env, em),
+      em.length ? env.DB.prepare('SELECT sbd,AVG(p) p FROM omni_p_vkn WHERE sbd IN(SELECT value FROM json_each(?)) AND p BETWEEN 0 AND 1 GROUP BY sbd').bind(J).all<Row>() : { results: [] as Row[] },
+      em.length ? env.DB.prepare("SELECT sbd,SUM(julianday(luc)>=julianday('now')-14) n,MAX(luc) cuoi FROM len_bang WHERE sbd IN(SELECT value FROM json_each(?)) GROUP BY sbd").bind(J).all<Row>() : { results: [] as Row[] },
+    ])
+    const pEm = new Map(pTb.results.map((r) => [String(r.sbd), Number(r.p)]))
+    const lbEm = new Map(lb.results.map((r) => [String(r.sbd), { soLan14: Number(r.n) || 0, lanCuoiLenBang: r.cuoi == null ? null : String(r.cuoi) }]))
     const cauBuoi = new Set(luot.map((x) => x.qid))
     return {
       ok: true,
@@ -197,6 +206,8 @@ export async function gvDauGio(env: Env, b: Row, nowMs: number = Date.now()): Pr
       em: em.map((s) => ({
         sbd: s,
         hoTen: buoi.coMat.get(s) ?? '',
+        pTb: Number.isFinite(pEm.get(s)) ? pEm.get(s)! : null,
+        ...(lbEm.get(s) ?? { soLan14: 0, lanCuoiLenBang: null }),
         cau: xepUngVien((dung.get(s) ?? []).filter((c) => !daHoi.has(`${s}|${c.qid}`) && !cauBuoi.has(c.qid)), nowMs).slice(0, TOI_DA_UNG_VIEN_MOI_EM),
       })),
     }

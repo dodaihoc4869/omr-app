@@ -258,15 +258,17 @@ export function phanBoGoi(kq: readonly Pick<KetQuaGoi, 'sbd' | 'tang'>[]): PhanB
 
 /** Chế độ thầy chọn, nhớ trên máy theo kênh (localStorage; lỗi / vắng ⇒ mặc định). */
 const KHOA_CHE_DO = 'omr-che-do-chon-em'
+/** Máy chủ (Worker) cũng nạp tệp này qua src/lib/dau-gio.ts — không có kiểu DOM, nên tự khai kho lưu tối thiểu. */
+const kho = (): { getItem(k: string): string | null; setItem(k: string, v: string): void } | undefined => (globalThis as { localStorage?: { getItem(k: string): string | null; setItem(k: string, v: string): void } }).localStorage
 export function docCheDo(kenh: string): CheDoChonEm {
   try {
-    const v = (JSON.parse(globalThis.localStorage?.getItem(KHOA_CHE_DO) ?? '{}') as Record<string, unknown>)[kenh]
+    const v = (JSON.parse(kho()?.getItem(KHOA_CHE_DO) ?? '{}') as Record<string, unknown>)[kenh]
     return v === 'tron' || v === 'chac' || v === 'ngau' ? v : CHE_DO_MAC_DINH
   } catch { return CHE_DO_MAC_DINH }
 }
 export function ghiCheDo(kenh: string, v: CheDoChonEm): void {
   try {
-    const cu = JSON.parse(globalThis.localStorage?.getItem(KHOA_CHE_DO) ?? '{}') as Record<string, unknown>
-    globalThis.localStorage?.setItem(KHOA_CHE_DO, JSON.stringify({ ...cu, [kenh]: v }))
+    const cu = JSON.parse(kho()?.getItem(KHOA_CHE_DO) ?? '{}') as Record<string, unknown>
+    kho()?.setItem(KHOA_CHE_DO, JSON.stringify({ ...cu, [kenh]: v }))
   } catch { /* máy không cho lưu — vẫn dùng trong phiên */ }
 }
