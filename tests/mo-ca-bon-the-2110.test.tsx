@@ -128,6 +128,11 @@ describe('Chuẩn Bộ 2026 không còn bỏ đề âm thầm', () => {
     fireEvent.click(r.getByRole('button', { name: 'Chỉ dùng bộ đề 12' }))
     expect(r.container.querySelector('[data-khoi="lan-de-ngoai-12"]')).toBeNull()
     expect(tomTat(r)).toBe('Cả lớp cùng một đề · Chuẩn Bộ 2026 (18 · 4 · 6 theo ma trận)')
+    // Sang thẻ Đề riêng, bấm chip 28 câu, quay lại Cả lớp ⇒ Chuẩn Bộ 2026 VẪN bật (chip số câu của thẻ khác không tắt nó).
+    fireEvent.click(r.getByRole('radio', { name: /^Đề riêng từng em/ }))
+    fireEvent.click(r.getByRole('checkbox', { name: /^28 câu/ }))
+    fireEvent.click(r.getByRole('radio', { name: /^Cả lớp cùng một đề/ }))
+    expect(tomTat(r)).toBe('Cả lớp cùng một đề · Chuẩn Bộ 2026 (18 · 4 · 6 theo ma trận)')
   }, HAN)
 })
 

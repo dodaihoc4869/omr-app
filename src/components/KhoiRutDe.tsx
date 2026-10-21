@@ -335,7 +335,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, cheDo,
   const chonCauTruc = (s: SoCauPhan) => {
     setSoCau(kep(s))
     setLayTron(false)
-    onDoiChuan2026?.(false)
+    // Chỉ thẻ Cả lớp có chip Chuẩn Bộ 2026 — chip số câu của thẻ Đề riêng không được tắt lựa chọn ấy âm thầm.
+    if (cheDo === 'ca_lop') onDoiChuan2026?.(false)
   }
   const boLocDangBat = chonCd.length > 0 || chonMuc.length > 0 || chonDang !== LOC_DANG_MAC_DINH || chonSao !== LOC_SAO_MAC_DINH
 
