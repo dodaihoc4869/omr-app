@@ -74,12 +74,16 @@ describe('hồ sơ hẹp, có độ chưa chắc, cách ly học sinh', () => {
     suKien(d, A, Q, -3, 1, 'none', 'de_thu', 'embargoed')
     const truoc = d.soLenh.prepare
     const h = await docHoSoHoiThay(d.env, A, Q, NOW)
-    expect(d.soLenh.prepare - truoc).toBe(2)
+    expect(d.soLenh.prepare - truoc).toBe(3) // + kiến thức cùng dạng (21/10), cùng đợt
     expect(h.kyNang).toHaveLength(8); expect(h.lanLam).toHaveLength(8)
     expect(h.kyNang.every(k => k.p === 0.4 && !k.chuaChac)).toBe(true)
     expect(h.lanLam.every(l => l.ketQua === 0)).toBe(true)
     const nd = noiDungHoSoHoiThay(h)
-    expect(nd).not.toContain('EM-A'); expect(nd).not.toContain('EM-B'); expect(nd).not.toContain('ngoai-cau')
+    expect(nd).not.toContain('EM-A'); expect(nd).not.toContain('EM-B')
+    // 21/10: kiến thức KHÁC cùng dạng chỉ vào mục kienThucCungDang (≤ 3 mỗi bên), chỉ của chính em: em B p 0,99 không thành "đã vững" của em A.
+    expect(h.cungDang!.canOn[0]).toEqual({ ten: 'Kiến thức ngoai-cau', p: 0.1, tuLam: 6 })
+    expect(h.cungDang!.canOn).toHaveLength(3); expect(h.cungDang!.vung).toEqual([])
+    expect(nd).toContain('"kienThucCungDang":{"emConYeu":[{"kienThuc":"Kiến thức ngoai-cau"')
     expect(nd.length).toBeLessThan(4000)
   })
   it('ảnh chụp cũ, ít mẫu, chưa có hồ sơ đều không khẳng định thạo; trợ giúp không thành tự làm', async () => {
@@ -94,14 +98,14 @@ describe('hồ sơ hẹp, có độ chưa chắc, cách ly học sinh', () => {
     expect(await docHoSoHoiThay(d.env, 'EM-CHUA-CO', 'CAU-CHUA-CO', NOW)).toEqual({ kyNang: [], lanLam: [] })
     expect(noiDungHoSoHoiThay(h)).toContain('không gắn nhãn học sinh')
   })
-  it('hai đọc phụ trợ cùng bắt đầu, mất mạng/thiếu bảng fallback rỗng, không retry nối tiếp hay ghi điểm', async () => {
+  it('ba đọc phụ trợ cùng bắt đầu, mất mạng/thiếu bảng fallback rỗng, không retry nối tiếp hay ghi điểm', async () => {
     const batDau: string[] = [], tha: (() => void)[] = []
     const env = { DB: { prepare: (q: string) => { batDau.push(q); return { bind: () => ({ all: () => new Promise((_, reject) => tha.push(() => reject(new Error('D1 mang')))) }) } } } } as unknown as Env
     const p = docHoSoHoiThay(env, A, Q, NOW)
-    expect(batDau).toHaveLength(2)
+    expect(batDau).toHaveLength(3)
     for (const f of tha) f()
     expect(await p).toEqual({ kyNang: [], lanLam: [] })
-    expect(batDau).toHaveLength(2)
+    expect(batDau).toHaveLength(3)
   })
 })
 

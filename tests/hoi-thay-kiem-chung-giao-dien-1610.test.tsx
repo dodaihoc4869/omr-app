@@ -29,33 +29,22 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); localStorage.clear(); session
 const bamMo = () => fireEvent.click(screen.getByRole('button', { name: 'Tự làm một câu tương đương' }))
 const hoi = () => { fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Em chưa hiểu vì sao ạ?' } }); fireEvent.click(screen.getByRole('button', { name: 'Gửi' })) }
 
+// Thầy 21/10 "bỏ phần làm câu tương đương đi": sau hướng dẫn KHÔNG còn lời mời tự làm câu tương đương, không gọi kho kiểm, lối lời giải giữ nguyên.
 describe('Hỏi thầy sau hướng dẫn', () => {
-  it('trong hộp: thu lối mở lời giải khi tự làm; có biên nhận mới hiện lại', async () => {
+  it('trong hộp: sau câu trả lời vẫn còn lối mở lời giải, không có lời mời câu tương đương', async () => {
     render(<HopHoiThay cau={{ qid: 'GOC-1', so: 'Câu 1', nguon: 'on_lai', chuong: 'Ester', de: '<p>Câu gốc.</p>', y: {} }} nguon="on_lai" onDong={() => {}} onMoLoiGiai={() => {}} />)
+    hoi(); await screen.findByText('Em phân biệt nhóm chức trong ester nhé.')
     expect(screen.getByRole('button', { name: 'Xem lời giải từng bước' })).toBeTruthy()
-    hoi(); await screen.findByRole('button', { name: 'Tự làm một câu tương đương' })
-    bamMo(); await screen.findByText('Chất nào là ester?')
-    expect(screen.queryByRole('button', { name: 'Xem lời giải từng bước' })).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: /Ethyl acetate/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu tự làm' }))
-    await screen.findByRole('button', { name: 'Xem lời giải từng bước' })
+    expect(screen.queryByRole('button', { name: 'Tự làm một câu tương đương' })).toBeNull()
   })
-  it('không tự gọi kho lúc mở app/hộp; sau reply mới mời và chỉ bấm mới chọn câu; đang làm không mời', async () => {
-    const { rerender } = render(<HoiThemThay qid="GOC-1" nguon="on_lai" hop />)
+  it('chỉ gọi đúng một lệnh hỏi; không gọi kho kiểm; ô nhắn vẫn mở để hỏi tiếp', async () => {
+    render(<HoiThemThay qid="GOC-1" nguon="on_lai" hop />)
     expect(goi).toHaveLength(0)
-    expect(screen.queryByRole('button', { name: 'Tự làm một câu tương đương' })).toBeNull()
-    hoi()
-    await screen.findByRole('button', { name: 'Tự làm một câu tương đương' })
+    hoi(); await screen.findByText('Em phân biệt nhóm chức trong ester nhé.')
     expect(goi).toHaveLength(1)
-    bamMo()
-    await screen.findByText('Chất nào là ester?')
-    expect(goi[1]).toMatchObject({ url: 'https://may-thu/hs/hoi-tro-ly/kiem/mo', body: { qid: 'GOC-1', token: 'token-em' } })
-    expect((screen.getByLabelText('Chỗ em thắc mắc về câu này') as HTMLTextAreaElement).disabled).toBe(true)
-    expect(document.querySelector('.lg-ht-tin')?.hasAttribute('hidden')).toBe(true)
-    rerender(<HoiThemThay qid="GOC-1" nguon="on_lai" hop dangLam />)
-    hoi()
-    await screen.findByText('Em phân biệt nhóm chức trong ester nhé.')
+    expect(goi.some((g) => g.url.includes('/kiem/'))).toBe(false)
     expect(screen.queryByRole('button', { name: 'Tự làm một câu tương đương' })).toBeNull()
+    expect((screen.getByLabelText('Chỗ em thắc mắc về câu này') as HTMLTextAreaElement).disabled).toBe(false)
   })
 
   it('đổi qid khi reply cũ đang chờ: không gắn câu trả lời/biên nhận vào câu mới', async () => {
@@ -72,7 +61,7 @@ describe('Hỏi thầy sau hướng dẫn', () => {
     expect(screen.queryByRole('button', { name: 'Tự làm một câu tương đương' })).toBeNull()
   })
 
-  it('reply ngoài phạm vi không mở kiểm chứng; reply đúng phạm vi sau đó vẫn báo trợ giúp đúng một lần', async () => {
+  it('reply ngoài phạm vi không báo trợ giúp; reply đúng phạm vi sau đó báo trợ giúp đúng một lần', async () => {
     let n = 0
     xuLy = () => tra(n++ === 0 ? { ok: true, traLoi: 'Em hỏi về câu này nhé.', conLai: 5, ngoaiPhamVi: true } : { ok: true, traLoi: 'Em xem nhóm chức.', conLai: 4 })
     const onTraLoi = vi.fn()
@@ -81,7 +70,7 @@ describe('Hỏi thầy sau hướng dẫn', () => {
     expect(screen.queryByRole('button', { name: 'Tự làm một câu tương đương' })).toBeNull()
     hoi(); await screen.findByText('Em xem nhóm chức.')
     expect(onTraLoi).toHaveBeenCalledTimes(1)
-    await screen.findByRole('button', { name: 'Tự làm một câu tương đương' })
+    expect(screen.queryByRole('button', { name: 'Tự làm một câu tương đương' })).toBeNull()
   })
 })
 
