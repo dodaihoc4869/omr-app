@@ -24,6 +24,7 @@ import { useSoDemGv } from '../src/lib/so-dem-gv'
 import { useAppStore } from '../src/store/appStore'
 import { docBaiHangNgay, docHoSoThaiDo, NGAY_BAT_DAU_BAI_HANG_NGAY } from '../src/lib/bai-hang-ngay-api'
 import { mucO, ngayNgan, xepTheoNgay } from '../src/components/chien-dich/bai-hang-ngay-ui'
+import { GIOI_HAN_KHUNG_DAU, xoaDemHoSoLamCau } from '../src/components/chien-dich/HoSoLamCauEm'
 import { MOC_THEO_DOI } from '../server/src/ph-con-tong-quan-kieu'
 import { readFileSync } from 'node:fs'
 const { default: TheBaiHangNgay } = await import('../src/components/chien-dich/TheBaiHangNgay')
@@ -107,6 +108,7 @@ function mayChu({ thaiDo = { ok: true as const, du: THAI_DO } as unknown, bang =
 const tenHang = (c: HTMLElement) => [...c.querySelectorAll('.gvv2-bhn-ten b')].map((b) => b.textContent)
 
 beforeEach(() => {
+  xoaDemHoSoLamCau()
   useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
   useSoDemGv.setState({ moHanhTrinh: null, canThayChua: null })
   useAppStore.getState().setScreen('chiendich')
@@ -228,7 +230,7 @@ describe('bấm em ⇒ tấm Hồ sơ làm bài (trùng tu)', () => {
     fireEvent.click(nut)
     const tam = await screen.findByRole('dialog', { name: 'Lê Bình' })
     expect(m.goi.mock.calls.filter(([d]) => d === '/gv/ho-so-thai-do').map(([, b]) => b)).toEqual([{ sbd: '12' }])
-    expect(m.goi.mock.calls.filter(([d]) => d === '/gv/lich-su-lam-cau').map(([, b]) => b)).toEqual([{ sbd: '12' }])
+    expect(m.goi.mock.calls.filter(([d]) => d === '/gv/lich-su-lam-cau').map(([, b]) => b)).toEqual([{ sbd: '12', gioiHan: GIOI_HAN_KHUNG_DAU }])
     const dau = await within(tam).findByRole('region', { name: 'Có dấu hiệu đối phó' })
     expect(dau.getAttribute('data-nhan')).toBe('doi-pho')
     expect(dau.textContent).toContain('Thái độ làm bài · 12/10 – 14/10')

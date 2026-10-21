@@ -64,6 +64,29 @@ export async function baoCaoAB(env:Env,sbds:readonly string[]){
   return {thuNghiem:THU_NGHIEM_HT5,giuLau:retention.results,thoiGian:timing.results.map(r=>({...r,baoPhu:r.soLuot?Math.round(1000*r.coThoiGian/r.soLuot)/10:0})),moHinh:{soMau:model?.soMau??0,soCauDaKiem:Object.values(model?.cau??{}).filter(x=>x.tot).length,hocDaKiem:model?.hocTot??false},phanNhom:nhom.results,soMauHopLe:rows.reduce((s,r)=>s+r.nhom.reduce((a,n)=>a+n.n,0),0),ketQua:rows,trangThai:rows.some(r=>r.nhom.every(n=>n.n>=30))?'dang_do':'chua_du_du_lieu'}
 }
 
+// ĐỆM + GỘP LƯỢT ĐANG TÍNH cho `baoCaoAB` (21/10, thầy: "app gv không vào được", "hồ sơ làm bài load quá chậm"). Đo thật (D1 insights 2 giờ + wrangler tail 6 phút): câu SQL giữ lâu trong báo cáo
+// (nhớ / chuyển theo nhóm, ≈ 3,4 triệu dòng đọc, ≈ 2,3 giây) chạy MỖI lần thầy mở bảng một chiến dịch Hành trình — mà Hôm nay của thầy mở bảng của mọi chiến dịch đang chạy. D1 chạy MỘT lệnh một lúc: trong 2,3 giây ấy
+// mọi lệnh khác (cả của học sinh) xếp hàng; thầy hết 20 giây thì thử lại ⇒ lại thêm 2,3 giây mỗi chiến dịch. Báo cáo A/B chỉ nằm trong khối «Đo hiệu quả học» (mở/đóng) và tính theo NGÀY (7–14 ngày) ⇒ cũ 10 phút là chấp nhận
+// được. Trong MỘT isolate: cùng danh sách em ⇒ dùng chung lượt đang tính (không chồng) và giữ kết quả 10 phút; lỗi không đệm; lượt "đang tính" treo quá 60 giây bị bỏ.
+type KetQuaAB = Awaited<ReturnType<typeof baoCaoAB>>
+const demAB = new Map<string, { luc: number; kq?: KetQuaAB; dang?: Promise<KetQuaAB> }>()
+export const HAN_DEM_AB_MS = 10 * 60_000
+export const HAN_LUOT_AB_DANG_TINH_MS = 60_000
+export function xoaDemBaoCaoAB(): void { demAB.clear() }
+export async function baoCaoABCoDem(env: Env, sbds: readonly string[], now = Date.now()): Promise<KetQuaAB> {
+  const khoa = JSON.stringify([...sbds].sort())
+  const c = demAB.get(khoa)
+  if (c?.kq && now - c.luc < HAN_DEM_AB_MS) return c.kq
+  if (c?.dang && now - c.luc < HAN_LUOT_AB_DANG_TINH_MS) return c.dang
+  const p: Promise<KetQuaAB> = baoCaoAB(env, sbds).then(
+    (kq) => { demAB.set(khoa, { luc: now, kq }); return kq },
+    (e) => { if (demAB.get(khoa)?.dang === p) demAB.delete(khoa); throw e },
+  )
+  if (demAB.size >= 8) for (const k of [...demAB.keys()]) if (k !== khoa) demAB.delete(k)
+  demAB.set(khoa, { luc: now, dang: p })
+  return p
+}
+
 /** Đề kiểm đầu trong hai ngày đầu là mốc trước học; chỉ ghi một lần và cùng ma trận khi tính tăng điểm. */
 export async function chotDiemDau(env:Env,id:string,sbd:string,now:number,diem:number,soCau:number){
   await chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)

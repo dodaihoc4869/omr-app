@@ -35,7 +35,7 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
     if (action === 'tao') return tao(env, b, nowMs)
     if (action === 'dong' || action === 'huy') return doiTrangThai(env, str(b.id), action === 'dong' ? 'da_dong' : 'da_huy', nowMs)
     if (action === 'rai-deu') return await doiRaiDeu(env, str(b.id), b.bat !== false, nowMs, str(b.nguoi)) // await để lỗi "không tìm thấy" về { ok:false }
-    if (action === 'bang') return bang(env, str(b.id), nowMs)
+    if (action === 'bang') return bang(env, str(b.id), nowMs, b.boDoLuong === true)
     if (action === 'buoi-chua') return buoiChua(env, str(b.id), nowMs, mangChuoi(b.coMat))
     if (action === 'noi-dung-cau') return noiDungCauChienDich(env, await docMot(env, str(b.id)), mangChuoi(b.qids)) // nội dung ĐÚNG mã câu cho tờ chiếu, qua cổng khối (06/10)
     if (action === 'chua-xong') return chuaXong(env, str(b.id), mangChuoi(b.qids), nowMs, mangChuoi(b.coMat))
@@ -401,10 +401,11 @@ async function doiTrangThai(env: Env, id: string, trangThai: 'da_dong' | 'da_huy
 }
 
 // ---------------------------------------------------------------- bảng chiến dịch
-async function bang(env: Env, id: string, nowMs: number) {
+/** `boDoLuong` (CHỈ-THÊM 21/10): màn Hôm nay / Nhịp học / Cần thầy chữa chỉ cần đếm, KHÔNG hiện khối «Đo hiệu quả học» ⇒ bỏ báo cáo A/B Hành trình (câu SQL ≈ 3,4 triệu dòng đọc, ≈ 2,3 giây, chặn D1). Vắng ⇒ như cũ. */
+async function bang(env: Env, id: string, nowMs: number, boDoLuong = false) {
   const cd = await docMot(env, id)
   const homNay = ngayVnCua(nowMs)
-  if (laHanhTrinh(cd.id)) return import('./hanh-trinh-d1').then(m => m.bangHanhTrinh(env,cd,homNay))
+  if (laHanhTrinh(cd.id)) return import('./hanh-trinh-d1').then(m => m.bangHanhTrinh(env,cd,homNay,boDoLuong))
   const [lanTho, ten, meta, hoSoDang, them] = await Promise.all([lanLamCaLop(env, cd.sbd, cd.qids), tenEm(env, cd.sbd), docMetaCau(env, cd.qids, cd.maDe), docHoSoDangCaLop(env, cd.sbd), docMocThemCaLop(env, cd.id)])
   const tt = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, lanTho, them)
   // Tên hiển thị của mã dạng (khoá `hangTheoDang` trùng khoá `theoDang`/`dang[]` của bảng).

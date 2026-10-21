@@ -189,7 +189,7 @@ export async function taiHomNay(onPhan?: (d: DuLieuHomNay) => void): Promise<DuL
   })()
   const bang: (BangChienDich | null)[] = await taiGioiHan(chay, async (c) => {
     try {
-      const r = await docBang(c.id)
+      const r = await docBang(c.id, true) // chỉ đếm: bỏ báo cáo A/B nặng (srs2-gv.ts `boDoLuong`)
       return r.ok ? r.du : null
     } catch {
       return null
@@ -323,7 +323,7 @@ export default function GvHomNayScreen() {
     setDangTai(false)
     if (laDuHomNay(kq)) ghiDem(KHOA_DEM_DU, kq)
   }, [demDu])
-  // Nhịp học: MỘT lệnh, song song với phần việc; lỗi chỉ ảnh hưởng khối Nhịp học (Thử lại riêng).
+  // Nhịp học: MỘT lệnh, hỏi SAU phần việc (xem useEffect dưới); lỗi chỉ ảnh hưởng khối Nhịp học (Thử lại riêng).
   const lanNhip = useRef(0)
   const taiNhip = useCallback(async () => {
     const lan = ++lanNhip.current
@@ -344,9 +344,17 @@ export default function GvHomNayScreen() {
     setDangTaiNhip(false)
   }, [])
   useEffect(() => {
-    void tai()
-    void taiNhip()
+    let huy = false
+    const viec = tai()
+    // NHỊP HỌC ĐỨNG SAU PHẦN VIỆC (21/10, thầy: "app gv không vào được"): nó là lệnh nặng nhất màn này (≈ 188 nghìn dòng đọc) và D1 đơn luồng — chạy CÙNG LÚC thì các lệnh nhẹ của phần việc xếp hàng
+    // sau nó, cả màn quá 20 giây là máy thầy bỏ. Phần việc xong (hoặc quá 5 giây) mới hỏi Nhịp học; đã có bản lần trước thì màn vẫn vẽ ngay, Nhịp học chỉ đọc mới sau.
+    const cho = new Promise<void>((xong) => {
+      const hen = setTimeout(xong, 5000)
+      void viec.finally(() => { clearTimeout(hen); xong() })
+    })
+    void cho.then(() => { if (!huy) void taiNhip() })
     return () => {
+      huy = true
       lanTai.current++
       lanNhip.current++
     }

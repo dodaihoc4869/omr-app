@@ -291,6 +291,40 @@ function demLop(em: readonly EmGoc[]): LopBaiHangNgay[] {
   return [...dem.values()].sort((a, c) => c.khoi.localeCompare(a.khoi) || a.tenLop.localeCompare(c.tenLop, 'vi'))
 }
 
+// ĐỆM NGẮN + GỘP LƯỢT ĐANG TÍNH (21/10, thầy: "app gv không vào được" — Nhịp học báo "Máy chủ trả lời chậm"). Nhịp học là lệnh nặng nhất của màn Hôm nay (≈ 188 nghìn dòng đọc mỗi lần, D1 đơn luồng):
+// khi nó chạy, các lệnh nhẹ cùng màn xếp hàng sau nó; máy thầy hết 20 giây thì bỏ, bấm "Thử lại" lại đẻ THÊM một lượt tính nữa chồng lên lượt cũ còn chạy ⇒ càng thử càng nghẹt. Nay trong MỘT isolate:
+// lượt đang tính được DÙNG CHUNG cho mọi lệnh cùng khoảng ngày (không chồng), và kết quả đọc xong được giữ 90 giây (mở lại / thử lại ngay không tính lại). Nhịp học tính theo NGÀY (mức / đã làm của các ngày đã qua + hôm nay) nên
+// chậm tối đa 90 giây là chấp nhận được. Chỉ đệm kết quả ok; lỗi không đệm. Lượt "đang tính" quá 45 giây coi là treo (isolate bị huỷ giữa chừng) ⇒ bỏ, tính lại.
+const demNhipHoc = new Map<string, { luc: number; kq?: TraLoiNhipHoc; dang?: Promise<TraLoiNhipHoc> }>()
+export const HAN_DEM_NHIP_HOC_MS = 90_000
+export const HAN_LUOT_DANG_TINH_MS = 45_000
+export function xoaDemNhipHoc(): void { demNhipHoc.clear() }
+
+/** Như `gvNhipHoc` nhưng có đệm 90 giây và gộp các lượt đang tính cùng khoảng ngày. Cùng kết quả, cùng hợp đồng. */
+export async function gvNhipHocCoDem(env: Env, b: Row, nowMs = Date.now()): Promise<TraLoiNhipHoc> {
+  const kh = khoangNgay(b, nowMs)
+  if ('error' in kh) return { ok: false, error: kh.error }
+  const khoa = `${kh.tu}|${kh.den}|${kh.homNay}`
+  const c = demNhipHoc.get(khoa)
+  if (c?.kq && nowMs - c.luc < HAN_DEM_NHIP_HOC_MS) return c.kq
+  if (c?.dang && nowMs - c.luc < HAN_LUOT_DANG_TINH_MS) return c.dang
+  const p = gvNhipHoc(env, b, nowMs).then(
+    (kq) => {
+      if (kq.ok) demNhipHoc.set(khoa, { luc: nowMs, kq })
+      else if (demNhipHoc.get(khoa)?.dang === p) demNhipHoc.delete(khoa)
+      return kq
+    },
+    (e) => {
+      if (demNhipHoc.get(khoa)?.dang === p) demNhipHoc.delete(khoa)
+      throw e
+    },
+  )
+  // Giữ tối đa vài khoảng ngày (thầy hiếm khi đổi khoảng): dọn mục cũ để isolate không phình.
+  if (demNhipHoc.size >= 6) for (const k of [...demNhipHoc.keys()]) if (k !== khoa) demNhipHoc.delete(k)
+  demNhipHoc.set(khoa, { luc: nowMs, dang: p })
+  return p
+}
+
 /** `POST /gv/nhip-hoc` — xem đầu tệp. */
 export async function gvNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<TraLoiNhipHoc> {
   const kh = khoangNgay(b, nowMs)

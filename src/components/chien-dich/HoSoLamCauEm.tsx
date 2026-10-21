@@ -62,6 +62,29 @@ export type EmHoSo = Pick<DongNhip, 'sbd' | 'ten' | 'khoi'> & Partial<Omit<DongN
 export { chuDoTinCay, NGUONG_TIN_CAY }
 /** Số lần hiện mỗi đợt ở "Toàn bộ lịch sử" (danh sách dài — chuẩn B16). */
 export const MOI_DOT = 100
+
+// TẢI TỨC THÌ (thầy 21/10: "hồ sơ làm bài của học sinh load quá chậm, bạn cho load tức thì đi"). Tấm trước đây xin MỘT lần 1000 lượt rồi mới vẽ (tổng + từng lượt + Mức làm: nửa MB JSON trên mạng điện thoại),
+// cùng lúc xin thêm Thái độ làm bài — hai lệnh nặng chồng nhau trên D1 đơn luồng. Nay: (1) khung đầu CHỈ xin 150 lượt mới nhất (≥ một đợt hiển thị MOI_DOT) — tổng, câu sai, Mức làm vẫn tính trên MỌI lượt máy chủ đọc,
+// nên vẽ ngay; (2) Thái độ làm bài hỏi SAU khung đầu; (3) lượt cũ hơn CHỈ nạp khi thầy bấm «Tải thêm lượt cũ hơn» (máy chủ đọc cả cửa sổ để tính tổng — tự nạp thêm là thêm một lần đọc nặng); (4) mở lại tấm của em vừa xem trong 5 phút ⇒ vẽ ngay bản
+// trong bộ nhớ rồi nạp mới nền. Bản trong bộ nhớ chỉ sống tới khi đóng tab (không ghi đĩa: dữ liệu học sinh).
+export const GIOI_HAN_KHUNG_DAU = 150
+const HAN_DEM_TAM_MS = 5 * 60_000
+const TOI_DA_DEM_TAM = 12
+const demTam = new Map<string, { luc: number; kq?: KetQuaLichSuLamCau; td?: KetQuaHoSoThaiDo }>()
+/** Xoá bản trong bộ nhớ (đổi tài khoản / thoát; test). */
+export function xoaDemHoSoLamCau(): void {
+  demTam.clear()
+}
+function layDemTam(khoa: string) {
+  const c = demTam.get(khoa)
+  return c && Date.now() - c.luc < HAN_DEM_TAM_MS ? c : null
+}
+function ghiDemTam(khoa: string, ghi: { kq?: KetQuaLichSuLamCau; td?: KetQuaHoSoThaiDo }) {
+  const cu = demTam.get(khoa)
+  demTam.delete(khoa)
+  demTam.set(khoa, { luc: Date.now(), ...(cu && Date.now() - cu.luc < HAN_DEM_TAM_MS ? cu : {}), ...ghi })
+  if (demTam.size > TOI_DA_DEM_TAM) demTam.delete(demTam.keys().next().value as string)
+}
 /** Số lần gần nhất ghi số giây trong một hộp câu (phần còn lại: một chip "+ N lần khác"). */
 export const SO_LAN_GIAY_HOP = 8
 
@@ -909,35 +932,47 @@ export default function HoSoLamCauEm({
   const chuCd = CHU_CHE_DO[cheDo]
   const ngoi = chuCd.ngoi
   const onChua = cheDo === 'hoc-sinh' ? onChuaCau : undefined
-  const [kq, setKq] = useState<KetQuaLichSuLamCau | null>(null)
+  const khoaDem = `${cheDo}|${em.sbd}`
+  const [dem0] = useState(() => layDemTam(khoaDem))
+  const [kq, setKq] = useState<KetQuaLichSuLamCau | null>(dem0?.kq ?? null)
   const [loi, setLoi] = useState('')
-  const [dangTai, setDangTai] = useState(true)
-  const [td, setTd] = useState<KetQuaHoSoThaiDo | null>(null)
+  const [dangTai, setDangTai] = useState(!dem0?.kq)
+  const [td, setTd] = useState<KetQuaHoSoThaiDo | null>(dem0?.td ?? null)
   const [loiTd, setLoiTd] = useState('')
-  const [dangTaiTd, setDangTaiTd] = useState(true)
+  const [dangTaiTd, setDangTaiTd] = useState(!dem0?.td)
   const [the, setThe] = useState<TheCon>('cau-sai')
   const tam = useRef<HTMLElement>(null)
   const nutDong = useRef<HTMLButtonElement>(null)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
 
   const lan = useRef(0)
+  /** Trả kết quả đã chuẩn hoá khi đọc được (nền: không bật khung xương, không báo lỗi — đã có bản đang hiện). */
   const tai = useCallback(
-    async (gioiHan?: number) => {
+    async (gioiHan?: number, nen = false): Promise<KetQuaLichSuLamCau | null> => {
       const l = ++lan.current
-      setDangTai(true)
-      setLoi('')
+      if (!nen) {
+        setDangTai(true)
+        setLoi('')
+      }
       let r: Awaited<ReturnType<typeof layLichSuLamCau>>
       try {
         r = await (nguon ? nguon.lichSu(gioiHan) : layLichSuLamCau(em.sbd, gioiHan))
       } catch (e) {
         r = { ok: false, loai: 'mang', chu: lyDoDeHieu(e) }
       }
-      if (l !== lan.current) return
-      if (r.ok) setKq(chuanHoaMucLam(r.du))
-      else setLoi(r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu))
-      setDangTai(false)
+      if (l !== lan.current) return null
+      let ra: KetQuaLichSuLamCau | null = null
+      if (r.ok) {
+        ra = chuanHoaMucLam(r.du)
+        setKq(ra)
+        // Chỉ cất bản ĐỦ (không bị cắt ở khung đầu) — khung đầu ngắn không được thay bản đủ trong đệm.
+        if (!(gioiHan && gioiHan <= GIOI_HAN_KHUNG_DAU && ra.conNua)) ghiDemTam(khoaDem, { kq: ra })
+        else ghiDemTam(khoaDem, {})
+      } else if (!nen) setLoi(r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu))
+      if (!nen || r.ok) setDangTai(false)
+      return ra
     },
-    [em.sbd, nguon],
+    [em.sbd, nguon, khoaDem],
   )
   const lanTd = useRef(0)
   const taiTd = useCallback(async () => {
@@ -951,18 +986,27 @@ export default function HoSoLamCauEm({
       r = { ok: false, loai: 'mang', chu: lyDoDeHieu(e) }
     }
     if (l !== lanTd.current) return
-    if (r.ok) setTd(r.du)
-    else setLoiTd(r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu))
+    if (r.ok) {
+      setTd(r.du)
+      ghiDemTam(khoaDem, { td: r.du })
+    } else setLoiTd(r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu))
     setDangTaiTd(false)
-  }, [em.sbd, nguon])
+  }, [em.sbd, nguon, khoaDem])
   useEffect(() => {
-    void tai()
-    void taiTd()
+    let huy = false
+    void (async () => {
+      // Chưa có bản trong bộ nhớ: khung đầu nhỏ trước, thái độ sau. Có rồi: đã vẽ — đọc mới NỀN đúng số dòng đang hiện (không rút ngắn danh sách thầy đã mở rộng), rồi thái độ.
+      // KHÔNG tự nạp thêm lượt cũ: máy chủ đọc cả cửa sổ để tính tổng nên mỗi lần xin là một lần đọc nặng trên D1 — thầy bấm «Tải thêm lượt cũ hơn» khi cần.
+      await tai(dem0?.kq ? Math.min(TRAN_GIOI_HAN, Math.max(GIOI_HAN_KHUNG_DAU, dem0.kq.lan.length)) : GIOI_HAN_KHUNG_DAU, !!dem0?.kq)
+      if (huy) return
+      void taiTd()
+    })()
     return () => {
+      huy = true
       lan.current++
       lanTd.current++
     }
-  }, [tai, taiTd])
+  }, [tai, taiTd, dem0])
 
   // Mở tấm ⇒ focus vào nút Đóng (đầu tấm); Esc đóng; Tab / Shift+Tab vòng trong tấm.
   useEffect(() => {
