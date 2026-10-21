@@ -20,7 +20,7 @@ import { lichSuGia } from '../scripts/chup-v2/gia/lich-su-lam-cau'
 import { banHocSinhHoSoThaiDo, banHocSinhLichSu } from '../server/src/ho-so-em-hs-loc'
 import { THUOC_TINH_KHOA_CUON } from '../src/lib/khoa-cuon-trang'
 const { default: HoSoCuaEmHs } = await import('../src/components/hoc-tap/HoSoCuaEmHs')
-const { default: HoSoLamCauEm } = await import('../src/components/chien-dich/HoSoLamCauEm')
+const { default: HoSoLamCauEm, xoaDemHoSoLamCau, GIOI_HAN_KHUNG_DAU } = await import('../src/components/chien-dich/HoSoLamCauEm')
 
 const SBD = '11010'
 const TD = hoSoThaiDoGia(SBD)
@@ -28,6 +28,7 @@ const LS = lichSuGia(SBD, TD.em.hoTen)
 const goiFetch: { duong: string; body: Record<string, unknown> }[] = []
 
 beforeEach(() => {
+  xoaDemHoSoLamCau()
   goiFetch.length = 0
   m.goi.mockReset()
   vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
@@ -162,7 +163,7 @@ describe('HoSoLamCauEm — chế độ thầy (mặc định) giữ nguyên', ()
     expect(within(tam).getByRole('button', { name: /Mở hồ sơ đầy đủ/ })).toBeTruthy()
     expect(tam.textContent).not.toMatch(/Thầy cũng xem hồ sơ này/)
     expect(m.goi).toHaveBeenCalledWith('/gv/ho-so-thai-do', { sbd: SBD })
-    expect(m.goi).toHaveBeenCalledWith('/gv/lich-su-lam-cau', { sbd: SBD })
+    expect(m.goi).toHaveBeenCalledWith('/gv/lich-su-lam-cau', { sbd: SBD, gioiHan: GIOI_HAN_KHUNG_DAU })
     expect(goiFetch).toEqual([])
     // bản thầy có đáp án em chọn ở Toàn bộ lịch sử
     fireEvent.click(within(tam).getByRole('tab', { name: /^Toàn bộ lịch sử/ }))

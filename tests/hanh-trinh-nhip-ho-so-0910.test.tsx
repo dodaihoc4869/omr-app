@@ -22,7 +22,7 @@ import { useCoHoa2 } from '../src/components/chien-dich/co-hoa2'
 import { useSoDemGv } from '../src/lib/so-dem-gv'
 import { useAppStore } from '../src/store/appStore'
 import { khopTim, xepNhomNhip } from '../src/components/chien-dich/nhip-hanh-trinh'
-import { chuGiay, doiGiay, giayCacLanSai, gomTheoNgay, tenMucDo } from '../src/components/chien-dich/HoSoLamCauEm'
+import { chuGiay, doiGiay, GIOI_HAN_KHUNG_DAU, giayCacLanSai, gomTheoNgay, tenMucDo, xoaDemHoSoLamCau } from '../src/components/chien-dich/HoSoLamCauEm'
 const { default: HanhTrinhV2, THE_HANH_TRINH } = await import('../src/components/chien-dich/HanhTrinhV2')
 const { default: TheNhipHoc } = await import('../src/components/chien-dich/TheNhipHoc')
 const { default: ChienDichScreen } = await import('../src/screens/ChienDichScreen')
@@ -94,6 +94,7 @@ const tenNhom = (c: HTMLElement) => [...c.querySelectorAll('.gvv2-nh-nhom-tieu')
 const tenEm = (c: HTMLElement) => [...c.querySelectorAll('.gvv2-nh-ten b')].map((b) => b.textContent)
 
 beforeEach(() => {
+  xoaDemHoSoLamCau()
   useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
   useSoDemGv.setState({ caMo: null, chienDichChay: null, canDayLai: null, canThayChua: null, giaoTuCa: null, moHanhTrinh: null, khoiHocSinh: null })
   useAppStore.getState().setScreen('chiendich')
@@ -222,7 +223,7 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     fireEvent.click(nut)
     const tam = await screen.findByRole('dialog', { name: 'Bùi Khoa' })
     expect(tam.getAttribute('aria-modal')).toBe('true')
-    expect(m.goi.mock.calls.filter(([d]) => d === '/gv/lich-su-lam-cau').map(([, b]) => b)).toEqual([{ sbd: '8' }])
+    expect(m.goi.mock.calls.filter(([d]) => d === '/gv/lich-su-lam-cau').map(([, b]) => b)).toEqual([{ sbd: '8', gioiHan: GIOI_HAN_KHUNG_DAU }])
     // mở tấm ⇒ focus vào nút Đóng
     expect(document.activeElement).toBe(within(tam).getByRole('button', { name: 'Đóng' }))
     await within(tam).findByText('SBD 8 · Lớp 12A1')
@@ -304,6 +305,7 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
 
     let lan = 0
+    xoaDemHoSoLamCau() // lần mở trước đã cất bản trong bộ nhớ (mở lại là vẽ ngay); ở đây thử đúng đường lỗi mạng của lần mở ĐẦU
     mayChu({ lichSu: () => (++lan === 1 ? { ok: false, loai: 'mang', chu: 'Failed to fetch' } : { ok: true, du: LICH_SU }) })
     fireEvent.click(screen.getByRole('button', { name: /^Bùi Khoa, SBD 8/ }))
     tam = await screen.findByRole('dialog')
