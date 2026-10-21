@@ -93,6 +93,9 @@ describe('bốn thẻ, một tầng', () => {
     expect(ct.checked).toBe(true)
     fireEvent.click(ct)
     expect(tomTat(r)).toMatch(/^Đề riêng từng em · 100% câu mới/)
+    // ô Số câu là số câu MỖI EM (9 câu Phần I mặc định), không phải cỡ kho 40 câu
+    const dd = [...r.container.querySelectorAll('dt')].find((d) => d.textContent === 'Số câu')?.nextElementSibling
+    expect(dd?.textContent).toBe('9 câu mỗi em · 10 điểm')
     const goi = await moCa(r)
     expect(goi[7]).toMatchObject({ deRieng: true, phamViHoiLai: 'khong', phongCho: true })
   }, HAN)

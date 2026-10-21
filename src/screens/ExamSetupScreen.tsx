@@ -347,6 +347,9 @@ export default function ExamSetupScreen() {
     const d = demCauTheoPhan(locMoCa.nguon)
     return d.I + d.II + d.III
   })()
+  // SỐ CÂU MỖI EM LÀM. Ca đề riêng đẩy lên KHO RỘNG nên `tongCauDaChon` là cỡ kho, không phải số câu một em —
+  // ô "Số câu" và màn Ca đã mở phải đọc số này (ảnh 21/10 từng hiện "212 câu mỗi em" cho ca 14 câu).
+  const soCauMoiEm = deRiengBat && soCauRaDe ? soCauRaDe.I + soCauRaDe.II + soCauRaDe.III : tongCauDaChon
 
 
   const handleOpenSession = async () => {
@@ -455,7 +458,7 @@ export default function ExamSetupScreen() {
           tenCa={tenMo}
           joinLink={opened.joinLink}
           lop={lop.trim()}
-          soCau={tongCauDaChon}
+          soCau={soCauMoiEm}
           phut={chuan2026 ? 50 : thoiGianPhut}
           congBo={CACH_CONG_BO.find((c) => c.id === congBoDiem)?.ten ?? ''}
           gio={`Bắt đầu ${gioHienThi(opened.batDau) || 'ngay'} · vào phòng đến ${opened.hetHanVao ? gioHienThi(opened.hetHanVao) : 'không giới hạn'}`}
@@ -873,7 +876,7 @@ export default function ExamSetupScreen() {
                 <dd data-khoi="tom-tat-cach-ra-de">{selectedSources.length > 0 ? chuCach : 'Chưa chọn'}</dd>
                 <dt>Số câu</dt>
                 <dd className="so">
-                  {tongCauDaChon} câu{deRiengBat ? ' mỗi em' : ''} · 10 điểm
+                  {soCauMoiEm} câu{deRiengBat ? ' mỗi em' : ''} · 10 điểm
                 </dd>
                 <dt>Ai làm</dt>
                 <dd>{chuAiLam}</dd>
