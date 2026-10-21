@@ -6,7 +6,7 @@
 // (`TheBaiDaDay`). Bước 2–4 độc lập, cùng dùng danh sách có mặt của bước 1. Tick bài vừa dạy rời Hành trình ⇒ hộp "Bổ sung bài hôm nay"
 // (`HopBoSungBai`, mở ở màn Hôm nay). KHOÁ CŨ không gãy (`buocHanhTrinh` ngay dưới): `can-chua` / `chua-bai` ⇒ mở bước 4; `dau-gio` ⇒ bước 2;
 // khoá khác ⇒ bước theo điểm danh; `boSungBai` (lối cũ) ⇒ mở hộp Bổ sung bài ngay trên màn này.
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import type { BaiCay } from '../../lib/bai-hom-nay'
 import type { TheHanhTrinh } from '../../lib/so-dem-gv'
 import './gv-v2.css'
@@ -17,6 +17,9 @@ export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
 // Trang 4 bước và hộp Bổ sung bài là mảnh riêng, chỉ tải khi cần.
 const TheBaiDaDay = lazy(() => import('./TheBaiDaDay'))
 const HopBoSungBai = lazy(() => import('../day-hoc/HopBoSungBai'))
+/** Kiểm tra ôn tập (cuối trang, nạp trong `TheBaiDaDay`): bắt đầu tải mảnh NGAY khi màn mở, song song với mảnh trang — như trước khi có trang
+ *  4 bước (không phải chờ mảnh trang về mới tải); `lazy()` bên trong lấy lại từ bộ nhớ mô-đun. */
+const napKiemTraOnTap = () => import('./BangKiemTraCaNhan')
 
 /** 21/10 — Hành trình thành MỘT trang 4 bước (bản vẽ docs/ban-ve-hanh-trinh-2110; đặt ở mảnh nạp lười này, không ở so-dem-gv.ts nạp sẵn — app thầy mở nhẹ hơn): khoá thẻ ⇒ bước mở sẵn. `chua-bai` / `can-chua` ⇒ 4 (Chữa câu khó
  *  & tính toán); `dau-gio` ⇒ 2 (Gọi lên bảng đầu giờ); khoá khác ⇒ null (màn tự chọn bước theo điểm danh — `buocMacDinh`). */
@@ -54,6 +57,9 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, kho
   void khoiDau
   const [buocDau] = useState(() => buocHanhTrinh(theDau))
   const [moHop, setMoHop] = useState(boSungBai)
+  useEffect(() => {
+    void napKiemTraOnTap().catch(() => {})
+  }, [])
 
   return (
     <div className="gvv2">
