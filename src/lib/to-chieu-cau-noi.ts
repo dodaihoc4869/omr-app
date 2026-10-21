@@ -45,7 +45,7 @@ export const TIN_TO_CHIEU = {
   THAY_CHUA_XONG: 'ddh-mc-thay-chua-xong',
   /** Tờ chiếu → app (thầy 05/10, nút X): xin danh sách em đã làm SAI câu của ô `khoa` (kèm `id`). CHỈ ĐỌC. */
   AI_SAI: 'ddh-mc-ai-sai',
-  /** App → tờ chiếu: `ds` (em · lúc · nơi · giây) hoặc `loi` cho lệnh `AI_SAI` cùng `id`. */
+  /** App → tờ chiếu: `ds` (em · lúc · nơi · giây · `mucLam`) + `lop` (sĩ số · số em có mặt · danh sách em có mặt — hai thẻ của nút X) hoặc `loi` cho lệnh `AI_SAI` cùng `id`. */
   AI_SAI_TRA: 'ddh-mc-ai-sai-tra',
 } as const
 
@@ -348,7 +348,7 @@ export function jsCauNoiToChieu(): string {
       xongTc(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi');
     } else if (d.type === '${TIN_TO_CHIEU.AI_SAI_TRA}') {
       var cbs = hoiSai[String(d.id)];
-      if (cbs) { delete hoiSai[String(d.id)]; cbs(Array.isArray(d.ds) ? d.ds : null, d.loi ? String(d.loi) : '', d.conNua === true); }
+      if (cbs) { delete hoiSai[String(d.id)]; cbs(Array.isArray(d.ds) ? d.ds : null, d.loi ? String(d.loi) : '', d.conNua === true, d.lop && typeof d.lop === 'object' ? d.lop : null); }
     } else if (d.type === '${TIN_TO_CHIEU.HO_SO_TRA}') {
       var cb = hoi[String(d.id)];
       if (cb) { delete hoi[String(d.id)]; cb(d.hoSo && typeof d.hoSo === 'object' ? d.hoSo : null, d.loi ? String(d.loi) : ''); }

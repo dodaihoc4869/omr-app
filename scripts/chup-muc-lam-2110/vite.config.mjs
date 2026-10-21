@@ -10,5 +10,5 @@ export default defineConfig({
   root: goc,
   plugins: [react()],
   define: { __PHIEN_BAN__: JSON.stringify('chup-muc-lam'), __SW_BUILT_AT__: 0 },
-  build: { emptyOutDir: true, rolldownOptions: { input: { chup: resolve(goc, 'scripts/chup-muc-lam-2110/trang.html') } } },
+  build: { emptyOutDir: true, rolldownOptions: { input: { chup: resolve(goc, 'scripts/chup-muc-lam-2110/trang.html'), chieu: resolve(goc, 'scripts/chup-muc-lam-2110/trang-chieu.html') } } },
 })

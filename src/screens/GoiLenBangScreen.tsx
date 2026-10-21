@@ -3,7 +3,7 @@ import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
 import { boTuLuanKhoiBanDe } from '../lib/cau-tu-luan'
 import { hashSeed } from '../lib/exam-shuffle'
 import { TIN_TO_CHIEU, gocGuiLai, khoaToChieu, kiemTinToChieu, taoMaPhienChieu } from '../lib/to-chieu-cau-noi'
-import { aiSaiQuaMayChu, thayChuaQuaMayChu, traAiSai } from '../components/chien-dich/ghi-to-chieu'
+import { aiSaiQuaMayChu, lopAiSaiToChieu, thayChuaQuaMayChu, traAiSai, type LopAiSai } from '../components/chien-dich/ghi-to-chieu'
 // GỌI HỌC SINH LÊN BẢNG — MỘT MÀN, MỘT LUỒNG (thầy chốt 05/09 chiều).
 //
 // Nguồn duy nhất là CA thầy vừa cho lớp làm. Từ một ca ấy ra cả hai việc:
@@ -385,6 +385,9 @@ function GoiLenBangCu() {
   const dangThayChuaKhoa = useRef(new Map<string, Promise<boolean>>())
   const maCaRef = useRef('')
   maCaRef.current = du?.maCa ?? ''
+  /** Lớp đang chiếu cho hai thẻ của nút X (thầy 21/10): em của ca + em đã điểm danh (không ai có mặt ⇒ chưa điểm danh). Đọc lúc bấm X — luôn mới nhất. */
+  const lopAiSaiRef = useRef<() => LopAiSai | null>(() => null)
+  lopAiSaiRef.current = () => (dsEmCa.length ? { sbdLop: dsEmCa.map((e) => e.sbd), coMat: dsEmCa.some((e) => e.coMat) ? new Set(dsEmCa.filter((e) => e.coMat).map((e) => e.sbd)) : null } : null)
   /** PHIÊN TỜ MÁY CHIẾU đang mở: mã phiên ngẫu nhiên, các ô có trên tờ (tra lại theo `khoa`, không tin tin đến),
    * khung iframe đã bắt tay (`cuaSo`) và gốc của nó. `null` khi không có tờ nào đang chiếu. */
   const phienChieu = useRef<{
@@ -1461,8 +1464,9 @@ function GoiLenBangCu() {
       if (tin.loai === 'ai_sai') {
         // Nút X "Ai sai câu này" (thầy 05/10): chỉ đọc sổ, trả danh sách về đúng khung.
         const id = tin.id
-        void aiSaiQuaMayChu([qidMayChuCuaIdCau(o.cau.id) ?? o.cau.id]).then((r) => {
-          if (phienChieu.current === p) traAiSai(cuaSo, goc, p.ma, id, r)
+        const lop = lopAiSaiRef.current()
+        void aiSaiQuaMayChu([qidMayChuCuaIdCau(o.cau.id) ?? o.cau.id], lop?.sbdLop).then((r) => {
+          if (phienChieu.current === p) traAiSai(cuaSo, goc, p.ma, id, r, lopAiSaiToChieu(lop))
         })
         return
       }

@@ -5,6 +5,7 @@
 //   · chống ghi đôi theo khoá `sbd|qid` (ô đã ghi trả "đã ghi" ngay; ô đang chờ thì chờ đúng lượt ấy);
 //   · trả `da_ghi` / `loi` cho tờ; mở tờ mới thì ô đã ghi khoá ngay (`DA_GHI`).
 // Kết quả đã ghi nhớ trên máy này theo chiến dịch (localStorage) để Buổi chữa hiện lại "Đạt" / "Chưa đạt" cạnh tên em.
+import type { MucLamLuot } from '../../lib/lich-su-lam-cau-api'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { TIN_TO_CHIEU, gocGuiLai, kiemTinToChieu, taoMaPhienChieu } from '../../lib/to-chieu-cau-noi'
@@ -66,11 +67,22 @@ export type GhiMotO = (o: OGhiToChieu, dat: boolean, giayThuc?: number) => Promi
  * mặc định `/gv/thay-chua-cau` (nhãn "Thầy đã chữa" + mốc dạy lại) với nguồn `len_bang`. */
 export type ThayChuaMotO = (o: OGhiToChieu) => Promise<{ ok: true } | { ok: false; chu: string }>
 
-/** Một lượt làm sai (nút X "Ai sai" trên tờ, thầy 05/10). */
-export interface LuotSaiToChieu { sbd: string; ten: string; luc: string; noi: string; giay: number | null }
+/** Một lượt làm sai (nút X "Ai sai" trên tờ, thầy 05/10). `uocTinh` = số giây ước tính (lượt game cũ); `mucLam` = Mức làm 1–4 máy chủ đã xếp (21/10) — chuyển nguyên sang tờ. */
+export interface LuotSaiToChieu { sbd: string; ten: string; luc: string; noi: string; giay: number | null; uocTinh?: boolean; mucLam?: MucLamLuot }
 
-/** Lệnh thầy CHỈ ĐỌC `/gv/ai-sai-cau` — em đã làm sai các bản `qids` của một câu. */
-export async function aiSaiQuaMayChu(qids: readonly string[]): Promise<{ ok: true; ds: LuotSaiToChieu[]; conNua: boolean } | { ok: false; chu: string }> {
+/** LỚP đang chiếu cho hai thẻ của nút X (thầy 21/10): em của lớp + tập em ĐÃ ĐIỂM DANH (null ⇒ buổi này chưa điểm danh — thẻ "Đã điểm danh" báo rõ, không để trống). */
+export interface LopAiSai { sbdLop: readonly string[]; coMat: ReadonlySet<string> | null }
+/** Phần lớp gửi sang tờ: sĩ số, số em có mặt, và danh sách em có mặt (đã giao với lớp). */
+export interface LopAiSaiToChieu { soLop: number; soCoMat: number | null; coMat: string[] | null }
+export function lopAiSaiToChieu(l: LopAiSai | null | undefined): LopAiSaiToChieu | null {
+  if (!l || l.sbdLop.length === 0) return null
+  const trongLop = new Set(l.sbdLop)
+  const coMat = l.coMat ? [...l.coMat].filter((x) => trongLop.has(x)) : null
+  return { soLop: trongLop.size, soCoMat: coMat ? coMat.length : null, coMat }
+}
+
+/** Lệnh thầy CHỈ ĐỌC `/gv/ai-sai-cau` — em đã làm sai các bản `qids` của một câu. `sbdLop` ⇒ máy chủ lọc theo lớp TRƯỚC khi cắt 300 lượt; máy chủ cũ (không biết `sbds`) trả mọi em ⇒ lọc lại ở đây. */
+export async function aiSaiQuaMayChu(qids: readonly string[], sbdLop?: readonly string[]): Promise<{ ok: true; ds: LuotSaiToChieu[]; conNua: boolean } | { ok: false; chu: string }> {
   try {
     const [{ layCauHinhMayChu }, { loadTeacherSecret }] = await Promise.all([import('../../lib/may-chu-moi'), import('../../lib/exam-db')])
     const [ch, mat] = await Promise.all([layCauHinhMayChu(), loadTeacherSecret()])
@@ -78,19 +90,21 @@ export async function aiSaiQuaMayChu(qids: readonly string[]): Promise<{ ok: tru
     const res = await fetch(`${ch.URL}/gv/ai-sai-cau`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-ma-bi-mat': mat || '' },
-      body: JSON.stringify({ qids }),
+      body: JSON.stringify(sbdLop?.length ? { qids, sbds: sbdLop } : { qids }),
     })
     const j = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; ds?: LuotSaiToChieu[]; conNua?: boolean }
-    return j.ok === true && Array.isArray(j.ds) ? { ok: true, ds: j.ds, conNua: j.conNua === true } : { ok: false, chu: j.error || 'Không đọc được danh sách làm sai.' }
+    if (!(j.ok === true && Array.isArray(j.ds))) return { ok: false, chu: j.error || 'Không đọc được danh sách làm sai.' }
+    const lop = sbdLop?.length ? new Set(sbdLop) : null
+    return { ok: true, ds: lop ? j.ds.filter((x) => lop.has(x.sbd)) : j.ds, conNua: j.conNua === true }
   } catch {
     return { ok: false, chu: 'Không nối được máy chủ.' }
   }
 }
 
 /** Gửi kết quả `AI_SAI` về đúng khung tờ chiếu (dùng chung cho mọi màn nghe tờ). */
-export function traAiSai(cuaSo: Window, goc: string, maPhien: string, id: string, r: Awaited<ReturnType<typeof aiSaiQuaMayChu>>) {
+export function traAiSai(cuaSo: Window, goc: string, maPhien: string, id: string, r: Awaited<ReturnType<typeof aiSaiQuaMayChu>>, lop?: LopAiSaiToChieu | null) {
   try {
-    cuaSo.postMessage({ type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien, id, ...(r.ok ? { ds: r.ds, conNua: r.conNua } : { loi: r.chu }) }, goc)
+    cuaSo.postMessage({ type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien, id, ...(r.ok ? { ds: r.ds, conNua: r.conNua, ...(lop ? { lop } : {}) } : { loi: r.chu }) }, goc)
   } catch {
     /* khung đã đóng */
   }
@@ -116,7 +130,7 @@ export async function thayChuaQuaMayChu(o: { sbd: string; qid: string }, nguon: 
 
 /** Hook của màn Lên bảng chiến dịch: giữ bảng kết quả của chiến dịch đang chọn và nghe tờ chiếu đang mở. */
 /** `aiSaiQids` (nút X): các qid cần tra cho ô `o` — chiến dịch truyền cả nhóm câu trùng nội dung; mặc định `[o.qid]`. */
-export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thayChuaO?: ThayChuaMotO, aiSaiQids?: (o: OGhiToChieu) => string[]) {
+export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thayChuaO?: ThayChuaMotO, aiSaiQids?: (o: OGhiToChieu) => string[], lopAiSai?: () => LopAiSai | null) {
   const showToast = useAppStore((s) => s.showToast)
   const [ketQua, setKetQua] = useState<BangKetQua>(() => docKetQuaNho(chienDichId))
   const ketQuaRef = useRef(ketQua)
@@ -135,6 +149,8 @@ export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thay
   thayChuaRef.current = thayChuaO
   const aiSaiRef = useRef(aiSaiQids)
   aiSaiRef.current = aiSaiQids
+  const lopAiSaiRef = useRef(lopAiSai)
+  lopAiSaiRef.current = lopAiSai
   useEffect(() => {
     daThayChua.current = new Set()
   }, [chienDichId])
@@ -222,8 +238,9 @@ export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thay
       if (!o) return
       if (tin.loai === 'ai_sai') {
         const id = tin.id
-        void aiSaiQuaMayChu(aiSaiRef.current?.(o) ?? [o.qid]).then((r) => {
-          if (phien.current === p) traAiSai(cuaSo, goc, p.ma, id, r)
+        const lop = lopAiSaiRef.current?.() ?? null
+        void aiSaiQuaMayChu(aiSaiRef.current?.(o) ?? [o.qid], lop?.sbdLop).then((r) => {
+          if (phien.current === p) traAiSai(cuaSo, goc, p.ma, id, r, lopAiSaiToChieu(lop))
         })
         return
       }

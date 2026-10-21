@@ -385,7 +385,9 @@ export default function ThayTuChua() {
     async (o: OGhiToChieu) => (o.sbd ? thayChuaQuaMayChu(o, 'len_bang', maNguon) : { ok: false as const, chu: 'Câu chữa cho cả lớp — không có em để ghi.' }),
     [maNguon],
   )
-  const { moPhien, ganO, dongPhien } = useGhiToChieu(maNguon, ghiO, thayChuaO)
+  // Nút X, hai thẻ (thầy 21/10): lớp đang chọn + em đã điểm danh (chưa điểm danh ⇒ thẻ báo rõ).
+  const lopAiSai = useCallback(() => (sbdLop?.length ? { sbdLop, coMat: coMat && coMat.size > 0 ? coMat : null } : null), [sbdLop, coMat])
+  const { moPhien, ganO, dongPhien } = useGhiToChieu(maNguon, ghiO, thayChuaO, undefined, lopAiSai)
   const chieu = async () => {
     if (!xep.length || !bai) return
     setDangChieu(true)
