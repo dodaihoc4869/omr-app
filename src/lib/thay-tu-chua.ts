@@ -37,6 +37,10 @@ export const MAU_TINH_TOAN_GOI_7 = /(?:tính|khối lượng|số mol|thể tíc
  *  "PHát biểu", "PHân bón", biến câu đếm / lý thuyết thành câu tính. Biểu thức gói 7 giữ nguyên (test khoá trùng máy chủ). */
 export const MAU_TINH_TOAN_LOC = new RegExp(MAU_TINH_TOAN_GOI_7.source.replace('|pH|', '|pH(?![a-zà-ỹ])|'), 'i')
 
+/** CÂU ĐẾM LÝ THUYẾT của Phần III: đáp số là một con số nhưng là ĐẾM (phát biểu / chất / nguyên tử… đúng), không phải tính.
+ *  "bao nhiêu gam / lít / mol" là câu tính — không khớp vì danh từ sau "bao nhiêu" không thuộc danh sách. */
+export const MAU_DEM_LY_THUYET = /bao\s+nhiêu\s+(?:chất|phát\s*biểu|nhận\s*định|ý|thí\s*nghiệm|trường\s*hợp|đồng\s*phân|công\s*thức|phản\s*ứng|polymer|polime|tơ|dung\s*dịch|kim\s*loại|ester|este|amine|amin|hợp\s*chất|loại|phân\s*tử|nguyên\s*tử|liên\s*kết|nhóm|ion|muối|ống\s*nghiệm|cặp)|(?:^|[^\p{L}])số\s+(?:phát\s*biểu|nhận\s*định|chất|thí\s*nghiệm|trường\s*hợp|đồng\s*phân|phản\s*ứng|ý|polymer|tơ|dung\s*dịch|kim\s*loại|ester|este|ống\s*nghiệm|nguyên\s*tử|liên\s*kết|nhóm|ion|công\s*thức|cặp)(?![\p{L}])/iu
+
 /** Cụm từ LÝ THUYẾT mang chữ "tính" (không phải phép tính) — bỏ khỏi mặt chữ trước khi chấm, nếu không cả `dangCua` (động từ hỏi "tính …")
  *  lẫn biểu thức gói 7 đều nhận nhầm. */
 export const CUM_TINH_LY_THUYET = /lưỡng\s+tính|tính\s+(?:chất|base|bazơ|bazo|acid|axit|khử|oxi\s*h(?:oá|óa|oa)|oxy\s*h(?:oá|óa|oa)|kim\s*loại|phi\s*kim|tan|dẻo|cứng|dẫn|thơm|đặc\s*trưng)/giu
@@ -54,8 +58,13 @@ export function laCauTinhToan(
   // Nay: nhãn kho `kieu` thắng; còn lại là câu tính khi có dấu hiệu phép tính (biểu thức gói 7: khối lượng, số mol, số kèm đơn vị, %…) HOẶC
   // `dangCua` chấm mặt chữ ra bài tập (không truyền phần / đáp số — Phần III luôn "bài tập" và đáp số luôn là số). Câu đếm / lý thuyết ⇒ không.
   if (c.phan === 'III' && !tuLuan) {
-    if (c.kieu === 'ly_thuyet' || c.kieu === 'bai_tap') return c.kieu === 'bai_tap'
-    if (MAU_TINH_TOAN_LOC.test(`${text} ${boCumLyThuyet(c.tenDang)}`)) return true
+    // Thứ tự (22/10, gộp): nhãn kho "lý thuyết" ⇒ không; đề CÓ dấu hiệu phép tính ⇒ có; đề là câu ĐẾM lý thuyết (MAU_DEM_LY_THUYET) ⇒ không, KỂ CẢ khi kho
+    // gắn "bài tập" (công cụ gán nhãn có thể coi mọi đáp số là bài tập — chưa đo được trên kho thật); còn lại theo nhãn kho / tên dạng / `dangCua`.
+    if (c.kieu === 'ly_thuyet') return false
+    if (MAU_TINH_TOAN_LOC.test(text)) return true
+    if (MAU_DEM_LY_THUYET.test(text)) return false
+    if (c.kieu === 'bai_tap') return true
+    if (MAU_TINH_TOAN_LOC.test(boCumLyThuyet(c.tenDang))) return true
     return dangCua({ text, luaChon: [], dapAn: '', mucDo: c.mucDo }) === 'bai_tap'
   }
   const luaChon = (c.luaChon ?? []).map((x) => boCumLyThuyet(x))

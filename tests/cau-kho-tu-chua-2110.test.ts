@@ -41,3 +41,12 @@ it('22/10 (thầy báo đề Trả lời ngắn 40/40): câu ĐẾM lý thuyết
   // tự luận Phần III vẫn xét theo nội dung như cũ
   expect(laCauTinhToan({ phan: 'III', text: 'Giải thích vì sao ammonia tan nhiều trong nước.' }, true)).toBe(false)
 })
+
+it('22/10 (gộp): câu ĐẾM Phần III không là "có tính toán" KỂ CẢ khi kho gắn nhãn bài tập; nhãn lý thuyết thắng; câu tính có nhãn bài tập vẫn là tính', async () => {
+  const { laCauTinhToan } = await import('../src/lib/thay-tu-chua')
+  expect(laCauTinhToan({ phan: 'III', kieu: 'bai_tap', text: 'Cho các phát biểu sau. Số phát biểu đúng là' })).toBe(false)
+  expect(laCauTinhToan({ phan: 'III', kieu: 'bai_tap', text: 'Số nguyên tử hydrogen trong phân tử trimethylamine là' })).toBe(false)
+  expect(laCauTinhToan({ phan: 'III', kieu: 'bai_tap', text: 'Cho 2,24 lít khí CO2 vào dung dịch NaOH dư. Khối lượng muối thu được là bao nhiêu gam?' })).toBe(true)
+  expect(laCauTinhToan({ phan: 'III', kieu: 'bai_tap', text: 'Giá trị của m là' })).toBe(true)
+  expect(laCauTinhToan({ phan: 'III', kieu: 'ly_thuyet', text: 'Cho 0,1 mol X… Số chất thoả mãn là' })).toBe(false)
+})

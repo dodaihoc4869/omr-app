@@ -178,7 +178,9 @@ describe('nhận diện "có tính toán"', () => {
       'Dung dịch HCl 0,01 M có pH bằng bao nhiêu?',
     ]
     for (const text of co) expect(laCauTinhToan({ phan: 'III', text }), text).toBe(true)
-    expect(laCauTinhToan({ phan: 'III', text: 'Có bao nhiêu chất?', kieu: 'bai_tap' })).toBe(true)
+    // 22/10 (gộp, Code app 1): câu ĐẾM thuần không có phép tính ⇒ KHÔNG tính toán kể cả nhãn kho "bài tập" (nhãn có thể gán theo đáp số; để nhãn thắng thì đề Trả lời ngắn vẫn 40/40); câu có nhãn bài tập mà không phải câu đếm ⇒ vẫn tính toán.
+    expect(laCauTinhToan({ phan: 'III', text: 'Có bao nhiêu chất?', kieu: 'bai_tap' })).toBe(false)
+    expect(laCauTinhToan({ phan: 'III', text: 'Giá trị của m là', kieu: 'bai_tap' })).toBe(true)
     expect(laCauTinhToan({ phan: 'III', text: 'Cho 9,3 gam aniline…', kieu: 'ly_thuyet' })).toBe(false)
     expect(MAU_TINH_TOAN_LOC.test('Chất nào sau đây là phân bón?')).toBe(false)
     expect(MAU_TINH_TOAN_LOC.test('pH của dung dịch')).toBe(true)
