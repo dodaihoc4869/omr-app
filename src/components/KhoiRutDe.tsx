@@ -40,7 +40,8 @@ function Chip({ chon, onClick, children, mau = 'muc' }: { chon: boolean; onClick
       style={{
         ...SO,
         fontSize: 'var(--cx-1)',
-        minHeight: 36,
+        // Đích chạm ≥ 44 px (CHUAN-TU-NGU-VA-GIAO-DIEN mục B3) — bản cũ 36 px, đo bằng ảnh Chromium 21/10.
+        minHeight: 44,
         padding: '0 var(--k3)',
         borderRadius: 'var(--bo-tron)',
         background: chon ? nenChon : 'var(--the-2)',
