@@ -60,6 +60,15 @@ describe('lõi chọn em phân tầng', () => {
     expect(xepEmPhanTang(cauBac(1), { boQua: bo }).get('Q1')!.sbd).toBe('E05')
   })
 
+  it('đổi em một câu: các câu khác giữ nguyên em (coDinh), câu đổi ra em khác', () => {
+    const goc = xepEmPhanTang(cauBac(6), { hatGiong: 'D' })
+    const coDinh = new Map([...goc].filter(([q]) => q !== 'Q3').map(([q, k]) => [q, k.sbd]))
+    const moi = xepEmPhanTang(cauBac(6), { hatGiong: 'D', coDinh, boQua: new Map([['Q3', new Set([goc.get('Q3')!.sbd])]]) })
+    for (const [q, s] of coDinh) expect(moi.get(q)!.sbd).toBe(s)
+    expect(moi.get('Q3')!.sbd).not.toBe(goc.get('Q3')!.sbd)
+    expect(new Set([...moi.values()].map((k) => k.sbd)).size).toBe(6)
+  })
+
   it('chữa câu: vai lên bảng là em ĐÃ SAI, vai giảng lại là em ĐÃ ĐÚNG, khác em; 3 câu ⇒ 6 em khác nhau', () => {
     const uv = LOP.map((e, i) => ({ ...e, soSai: i < 12 ? 1 + (i % 2) : 0 }))
     const cau: CauCanGoi[] = ['A', 'B', 'C'].map((q) => ({ qid: q, bac: 2, ungVien: uv }))

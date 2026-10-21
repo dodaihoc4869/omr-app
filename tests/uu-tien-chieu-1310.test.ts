@@ -16,12 +16,17 @@ it('trộn ba nhóm chung: đủ câu, không trùng, không lần lượt nhóm
 })
 it('có mặt là cổng cứng; chọn đã đúng trước rồi mới năng lực cao nhất; rải em đã đúng trong nhiều câu',async()=>{
  api.mockResolvedValue({ok:true,du:{cau:{q1:[{sbd:'absent',ten:'Vắng',loai:'da_dung',p:0.99},{sbd:'A',ten:'An',loai:'da_dung',p:0.5},{sbd:'B',ten:'Bình',loai:'da_dung',p:0.7},{sbd:'C',ten:'Chi',loai:'du_bao',p:0.99}],q2:[{sbd:'A',ten:'An',loai:'da_dung',p:0.5},{sbd:'B',ten:'Bình',loai:'da_dung',p:0.7}],q3:[{sbd:'A',ten:'An',loai:'du_bao',p:0.5},{sbd:'C',ten:'Chi',loai:'du_bao',p:0.99}]}}})
- const r=await layEmChieu(['q1','q2','q3'],['absent','A','B','C'],new Set(['A','B','C']))
+ // 21/10: chế độ "Chắc đúng" = bộ chọn cũ, giữ y kết quả cũ.
+ const r=await layEmChieu(['q1','q2','q3'],['absent','A','B','C'],new Set(['A','B','C']),undefined,undefined,{cheDo:'chac'})
  expect(api.mock.calls[0]![1].sbd).toEqual(['A','B','C'])
  expect(r.get('q1')![0].sbd).toBe('A');expect(r.get('q2')![0].sbd).toBe('B');expect(r.get('q3')![0].sbd).toBe('C')
  expect(nhanEmChieu(r.get('q3')![0]).chu).toBe('Dự kiến làm được câu này')
- const doi=await layEmChieu(['q1'],['A','B','C'],undefined,undefined,new Map([['q1',new Set(['A'])]]))
+ const doi=await layEmChieu(['q1'],['A','B','C'],undefined,undefined,new Map([['q1',new Set(['A'])]]),{cheDo:'chac'})
  expect(doi.get('q1')![0].sbd).toBe('B')
+ // Mặc định "Trộn": vẫn chỉ em có mặt, ba câu ba em khác nhau, em được chọn mang tầng + lý do (chỉ màn thầy).
+ const tron=await layEmChieu(['q1','q2','q3'],['absent','A','B','C'],new Set(['A','B','C']),undefined,undefined,{hatGiong:'t'})
+ const ai=['q1','q2','q3'].map(q=>tron.get(q)![0])
+ expect(new Set(ai.map(e=>e.sbd)).size).toBe(3);expect(ai.every(e=>e.sbd!=='absent'&&e.tang&&e.lyDo)).toBe(true)
 })
 it('Kiểm tra đầu giờ giữ người gọi và cầu ghi cũ; Dạy học ghi đúng em mới được chọn',async()=>{
  const c:CauDayHoc={khoa:'k',qid:'DH-12-C1-B1-I-1',phan:'I',q:{id:'k',text:'Chất nào là ester?',choices:['A','B','C','D'],correct:'B',chuyenDe:'Ester'} as CauDayHoc['q'],maDe:'DH-12-C1-B1',tenDe:'Ester',chuyenDe:'Ester',maDang:null,tenDang:null,mucDo:'biet',tuLuan:false}

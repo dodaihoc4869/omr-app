@@ -57,6 +57,8 @@ export interface TuyChonChon {
   daLenTrongBuoi?: ReadonlyMap<string, number>
   /** Em thầy đã bấm "Đổi em" bỏ qua ở từng câu. */
   boQua?: ReadonlyMap<string, ReadonlySet<string>>
+  /** Câu đã có em thầy giữ (bấm "Đổi em" ở câu khác không xáo câu này): em còn trong ứng viên ⇒ giữ, vẫn tính hạn mức tầng. */
+  coDinh?: ReadonlyMap<string, string>
   nowMs?: number
 }
 
@@ -154,8 +156,9 @@ export function xepEmPhanTang(cau: readonly CauCanGoi[], tuy: TuyChonChon = {}):
     const uv = c.ungVien.filter((e) => e.sbd && !bo?.has(e.sbd))
     if (!uv.length) continue
     const tang = chiaTang(uv)
-    let chon: UngVienEm | undefined
-    if (cheDo === 'chac') chon = chonChac(uv, goiLuot)
+    const giu = tuy.coDinh?.get(c.qid)
+    let chon: UngVienEm | undefined = giu ? uv.find((e) => e.sbd === giu) : undefined
+    if (chon) { /* giữ em thầy đã thấy */ } else if (cheDo === 'chac') chon = chonChac(uv, goiLuot)
     else {
       // Luật "mỗi em một lần": chỉ xét em có số lần lên ít nhất trong số ứng viên câu này; tránh em vừa lên câu liền trước nếu còn em khác.
       const it = Math.min(...uv.map((e) => daLen.get(e.sbd) ?? 0))

@@ -351,7 +351,7 @@ export default function ThayTuChua() {
     [xep, coMat],
   )
   const [duGoi,setDuGoi]=useState<{khoa:string;map:Map<string,EmChieu[]>}|null>(null)
-  useEffect(()=>{let huy=false;if(khoaTk&&sbdLop)void layEmChieu(qidKey.split('|'),sbdLop,coMat).then(map=>{if(!huy)setDuGoi({khoa:khoaTk,map})}).catch(()=>{if(!huy)setDuGoi({khoa:khoaTk,map:new Map()})});return()=>{huy=true}},[khoaTk,sbdLop,qidKey,coMat])
+  useEffect(()=>{let huy=false;if(khoaTk&&sbdLop)void layEmChieu(qidKey.split('|'),sbdLop,coMat,undefined,undefined,{kenh:'tu-chua'}).then(map=>{if(!huy)setDuGoi({khoa:khoaTk,map})}).catch(()=>{if(!huy)setDuGoi({khoa:khoaTk,map:new Map()})});return()=>{huy=true}},[khoaTk,sbdLop,qidKey,coMat])
   const dongXem: DongXem[] = useMemo(
     () =>
       xep.map((c) => {

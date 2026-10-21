@@ -30,6 +30,8 @@ import { ChemText } from '../../lib/chem-format'
 import TheCauHienThi from './TheCauHienThi'
 import { BuocDiemDanh, useDiemDanhBuoi, type DiemDanhBuoi } from './DiemDanhBuoi'
 import { BuocBaiHomNay, DongChoBaiMoi, useBaiHomNay, type BaiChonNho, type BaiHomNay } from './BaiHomNay'
+import { KhoiChonEm, ChipTang } from '../goi-len-bang/ChonEm'
+import { docCheDo, phanBoGoi, type CheDoChonEm, type Tang } from '../../lib/chon-em-phan-tang'
 import './day-hoc.css'
 
 /** Chữ tấm chiếu mã điểm danh — nay nằm ở `DiemDanhBuoi.tsx` (dùng chung với Kiểm tra đầu giờ); giữ lối xuất cũ. */
@@ -39,7 +41,7 @@ export { CHU_DIEM_DANH } from './DiemDanhBuoi'
 interface NhoBuoi {
   maChon: string[]
   boCau: string[]
-  giao: Record<string, { sbd: string; hoTen: string; xacSuat: number; uocLuong: boolean; lyDo: string; boQua: string[]; daDung?:boolean }>
+  giao: Record<string, { sbd: string; hoTen: string; xacSuat: number; uocLuong: boolean; lyDo: string; boQua: string[]; daDung?:boolean; tang?:Tang; chuaCo?:boolean }>
   lopNhan: string[] | null
   baiChon: BaiChonNho | null
 }
@@ -114,6 +116,9 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   const [maChon, setMaChon] = useState<Set<string>>(new Set())
   const [boCau, setBoCau] = useState<Set<string>>(new Set())
   const [giao, setGiao] = useState<NhoBuoi['giao']>({})
+  // Gọi lên bảng phân tầng (21/10): chế độ nhớ theo kênh; mỗi lần "Chọn lại em" rút lượt mới (hạt giống khác).
+  const [cheDo, setCheDo] = useState<CheDoChonEm>(() => docCheDo('day-hoc'))
+  const [luotRut, setLuotRut] = useState(0)
   // Hộp chọn bài dựng lại mỗi lần mở ⇒ giữ chữ tìm + chip khối ở đây (đợt 16).
   const nhoHop = useRef<NhoHopChonDe | null>(null)
 
@@ -205,7 +210,8 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
 
   const [xemLoiGiai, setXemLoiGiai] = useState<Set<string>>(new Set())
 
-  const moTo = async (coEm: boolean, giaoMoi = giao) => {
+  /** giu=true (mở lại / đổi em): em đang giao ở các câu được giữ nguyên; false: rút lại cả tờ. */
+  const moTo = async (coEm: boolean, giaoMoi = giao, tc: { cheDo?: CheDoChonEm; luot?: number; giu?: boolean; doi?: string } = {}) => {
     if (!cauChieu.length) {
       showToast('Chưa chọn câu nào để chiếu', 'warn')
       return
@@ -222,8 +228,10 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
           m.set(c.khoa, { sbd: g.sbd, hoTen: g.hoTen, lop: lopCuaEm.get(g.sbd) || tt?.buoi.lop || undefined, lanLenBang: lan })
         }
       const boQua=new Map(cauChieu.map(c=>[c.qid,new Set(giaoMoi[c.khoa]?.boQua??[])]))
-      const { html: h, o, emGoi } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined, false,coMat.map(e=>e.sbd),boQua)
-      if(coEm){const moi:NhoBuoi['giao']={};for(const [k,e] of emGoi)moi[k]={sbd:e.sbd,hoTen:e.ten,xacSuat:e.p??0.3,uocLuong:e.loai==='du_bao',daDung:e.loai==='da_dung',lyDo:e.loai==='da_dung'?'Đã tự làm đúng câu này':'Dự kiến làm được câu này',boQua:giaoMoi[k]?.boQua??[]};setGiao(moi)}
+      const giu = tc.giu ?? true
+      const coDinh = new Map(giu ? cauChieu.flatMap((c) => (c.khoa !== tc.doi && giaoMoi[c.khoa] && !giaoMoi[c.khoa]!.boQua.includes(giaoMoi[c.khoa]!.sbd) ? [[c.qid, giaoMoi[c.khoa]!.sbd] as const] : [])) : [])
+      const { html: h, o, emGoi } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined, false,coMat.map(e=>e.sbd),boQua,{ cheDo: tc.cheDo ?? cheDo, hatGiong: `day-hoc|${idBuoi}|${tc.luot ?? luotRut}`, coDinh })
+      if(coEm){const moi:NhoBuoi['giao']={};for(const [k,e] of emGoi)moi[k]={sbd:e.sbd,hoTen:e.ten,xacSuat:e.p??0.3,uocLuong:e.loai==='du_bao',daDung:e.loai==='da_dung',chuaCo:e.loai==='chua_co',tang:e.tang,lyDo:e.lyDo??(e.loai==='da_dung'?'Đã tự làm đúng câu này':'Dự kiến làm được câu này'),boQua:giaoMoi[k]?.boQua??[]};setGiao(moi)}
       ganO(ma, o)
       setHtml(h)
       setDaChieu(true)
@@ -259,8 +267,16 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
       if (k) moi[c.khoa] = { sbd: k.sbd, hoTen: k.hoTen, xacSuat: k.xacSuat, uocLuong: k.uocLuong, lyDo: k.lyDo, boQua: [] }
     })
     setGiao(moi)
-    await moTo(true, moi)
+    const luot = luotRut + 1
+    setLuotRut(luot)
+    await moTo(true, moi, { luot, giu: false })
   }
+
+  const doiCheDo = (v: CheDoChonEm) => {
+    setCheDo(v)
+    if (cauChieu.some((c) => giao[c.khoa])) void moTo(true, giao, { cheDo: v, giu: false })
+  }
+  const phanBo = useMemo(() => phanBoGoi(cauChieu.flatMap((c) => { const g = giao[c.khoa]; return g?.tang ? [{ sbd: g.sbd, tang: g.tang }] : [] })), [cauChieu, giao])
 
   const doiEm = async (c: CauDayHoc) => {
     const cu = giao[c.khoa]
@@ -281,7 +297,8 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
     }
     const moi = { ...giao, [c.khoa]: { sbd: k.sbd, hoTen: k.hoTen, xacSuat: k.xacSuat, uocLuong: k.uocLuong, lyDo: k.lyDo, boQua: [...boQua] } }
     setGiao(moi)
-    if (html) await moTo(true, moi)
+    // Có tờ đang mở: bộ chọn phân tầng rút lại riêng câu này (trừ em đã bỏ qua), các câu khác giữ em.
+    if (html) await moTo(true, moi, { doi: c.khoa })
   }
 
   const ghiKq = async (c: CauDayHoc, dat: boolean) => {
@@ -408,8 +425,9 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
                     <div className="dh-giao">
                       <span className="dh-giao-em">
                         <UserCheck size={16} aria-hidden="true" /> <b>{g.hoTen || g.sbd}</b>
+                        {g.tang && <ChipTang tang={g.tang} />}
                         <span className="dh-giao-p" title={g.lyDo}>
-                          {g.daDung?'Đã tự làm đúng câu này':`khả năng đúng ≈ ${pt(g.xacSuat)}`}
+                          {g.daDung?'Đã tự làm đúng câu này':g.chuaCo?'Chưa có số đo câu này':`khả năng đúng ≈ ${pt(g.xacSuat)}`}
                         </span>
                         {g.uocLuong && <span className="dh-chip dh-chip--vang">Ước lượng</span>}
                       </span>
@@ -445,9 +463,11 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
     ? 'Chọn câu ở bước 2 trước.'
     : !coMat.length
       ? `${cauChieu.length} câu sẵn sàng — cần danh sách có mặt (bước 1) để app gọi em.`
-      : `${cauChieu.length} câu · ${coMat.length} em có mặt. App chọn em có mức ≥ mức độ câu, khả năng đúng cao nhất; mỗi em tối đa 2 lần.`
+      : `${cauChieu.length} câu · ${coMat.length} em có mặt.`
 
   const hangChieu = (
+    <>
+    {coMat.length > 0 && <KhoiChonEm kenh="day-hoc" cheDo={cheDo} onDoi={doiCheDo} phanBo={phanBo} />}
     <div className="dh-hang">
       <button type="button" className="m3-nut-chinh dh-nut" disabled={dangChieu || !cauChieu.length || !coMat.length} onClick={() => void chieuLenBang()}>
         <MonitorPlay size={18} aria-hidden="true" /> {dangChieu ? 'Đang dựng tờ chiếu…' : coGiao ? 'Chọn lại em và chiếu' : 'Chiếu lên bảng'}
@@ -461,6 +481,7 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
         </button>
       )}
     </div>
+    </>
   )
 
   const hopChon = hopMo && (

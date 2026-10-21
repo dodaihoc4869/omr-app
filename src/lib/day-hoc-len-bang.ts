@@ -164,11 +164,13 @@ export async function dungToChieuDayHoc(
   nutAiSai = true,
   sbdCuaLop:readonly string[] = [],
   boQua?:ReadonlyMap<string,ReadonlySet<string>>,
+  /** Chế độ chọn em / câu giữ em (gọi lên bảng phân tầng 21/10). */
+  tuyChon:import('./ung-vien-chieu').TuyChonEmChieu={},
 ): Promise<{ html: string; o: Map<string, OGhiDayHoc>; emGoi:Map<string,import('./ung-vien-chieu').EmChieu> }> {
   const nhanGoi=new Map<string,import('./lich-su-cau-len-bang').NhanLichSuCau>()
   const emGoi=new Map<string,import('./ung-vien-chieu').EmChieu>()
   // Kiểm tra đầu giờ dùng nutAiSai=true: giữ nguyên người và thuật toán kiểm tra đầu giờ.
-  if(!nutAiSai&&sbdCuaLop.length){const {layEmChieu,nhanEmChieu}=await import('./ung-vien-chieu');const uv=await layEmChieu(dsCau.map(c=>c.qid),sbdCuaLop,undefined,undefined,boQua);const m=new Map<string,EmLenCau>();for(const c of dsCau){const e=uv.get(c.qid)?.[0];if(e){m.set(c.khoa,{sbd:e.sbd,hoTen:e.ten});nhanGoi.set(c.khoa,nhanEmChieu(e));emGoi.set(c.khoa,e)}}giao=m}
+  if(!nutAiSai&&sbdCuaLop.length){const {layEmChieu,nhanEmChieu}=await import('./ung-vien-chieu');const uv=await layEmChieu(dsCau.map(c=>c.qid),sbdCuaLop,undefined,undefined,boQua,{kenh:'day-hoc',mucDo:new Map(dsCau.map(c=>[c.qid,c.mucDo])),...tuyChon});const m=new Map<string,EmLenCau>();for(const c of dsCau){const e=uv.get(c.qid)?.[0];if(e){m.set(c.khoa,{sbd:e.sbd,hoTen:e.ten});nhanGoi.set(c.khoa,nhanEmChieu(e));emGoi.set(c.khoa,e)}}giao=m}
   const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu }, { uocLuongBacCauGoc }, { CAU_HINH_LEN_BANG_MAC_DINH }, { khoaToChieu }] = await Promise.all([
     import('./bai-tap-pdf'),
     import('./html-may-chieu'),
