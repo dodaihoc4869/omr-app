@@ -16,7 +16,7 @@
 //   · Chờ tải: khung xương đúng hình (`.tt-xuong`). Lỗi: câu dễ hiểu (`lyDoDeHieu`), không in lỗi kỹ thuật thô.
 // SỐ CHỈ TỪ API, không số giả: lệnh nào lỗi thì phần của nó KHÔNG vẽ. "Cần thầy chữa" = cùng nguồn và cùng cách gộp với danh sách Cần thầy chữa.
 // Ghi số cho thanh bên (`useSoDemGv`: ca đang mở, Cần thầy chữa). Phép tính thuần xuất ra để test (tests/gv-hom-nay-0910.test.tsx).
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, Check, ChevronRight, CircleHelp, MonitorCheck, PenLine, RefreshCw, type LucideIcon } from 'lucide-react'
 import { danhSachCa, danhSachCauHoi, type CaTomTat } from '../lib/exam-api'
 import { gomTheoCa } from '../lib/hoi-bai'
@@ -40,6 +40,10 @@ import './gv-hoa2.css'
 import '../components/chien-dich/gv-v2.css'
 import './gv-hom-nay.css'
 import '../components/hom-nay-thay/hom-nay-thay.css'
+
+// 21/10 (thầy: "nút này làm riêng bấm vào popup lên để chọn luôn chứ không gắn vào phần hành trình nữa"): "Bổ sung bài hôm nay" / "Bổ sung bài" mở
+// hộp NGAY TẠI CHỖ — mảnh nạp lười, chỉ tải khi bấm (mở màn Hôm nay không thêm byte).
+const HopBoSungBai = lazy(() => import('../components/day-hoc/HopBoSungBai'))
 
 // ------------------------------------------------------------------ PHÉP TÍNH THUẦN
 
@@ -373,6 +377,7 @@ export default function GvHomNayScreen() {
     datMoHanhTrinh(m)
     setScreen('chiendich')
   }
+  const [moBoSung, setMoBoSung] = useState(false)
 
   // VIỆC CẦN THẦY — xếp theo độ gấp: ca đang mở → Cần thầy chữa → em hỏi bài → lớp chờ bài mới → phần chưa đọc được (Thử lại)
   // → không có chỗ cần chữa (✓, không nút). Việc "em chưa làm câu nào" đã bỏ: khối Nhịp học nói đủ và rõ hơn.
@@ -420,7 +425,7 @@ export default function GvHomNayScreen() {
       soNgan: ds.length === 1 ? `${ds[0]!.soNgay} ngày` : `${ds.length} lớp`,
       phu: ds.length === 1 ? 'Hành trình đang ôn bài cũ · tick bài vừa dạy để mở câu mới' : `${ds.map((x) => `${x.lop}: ${x.soNgay} ngày`).join(' · ')} — tick bài vừa dạy để mở câu mới`,
       nut: 'Bổ sung bài',
-      lam: () => moHanhTrinh({ the: 'day-hoc', boSungBai: true }),
+      lam: () => setMoBoSung(true),
     })
   }
   // Phần chưa đọc được: MỘT thẻ, nói thật phần nào + lý do dễ hiểu + Thử lại (không in lỗi kỹ thuật thô).
@@ -452,7 +457,7 @@ export default function GvHomNayScreen() {
   }
 
   // Nút chính góc phải = việc gấp nhất: có ca đang mở ⇒ theo dõi ca ấy; không thì bổ sung bài hôm nay.
-  const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => moHanhTrinh({ the: 'day-hoc', boSungBai: true }) }
+  const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => setMoBoSung(true) }
   const soEm = nhip?.ok ? nhip.kq.em.length : null
 
   return (
@@ -525,6 +530,17 @@ export default function GvHomNayScreen() {
       </section>
 
       <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} />
+      {moBoSung && (
+        <Suspense fallback={null}>
+          <HopBoSungBai
+            onDong={(daGiao) => {
+              setMoBoSung(false)
+              // Vừa giao / bỏ tick ⇒ tải lại việc (thẻ "Lớp chưa có bài mới" theo đúng máy chủ).
+              if (daGiao) void tai()
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

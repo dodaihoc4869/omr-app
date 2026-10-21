@@ -27,10 +27,17 @@ export function mucHanhTrinh(k: TheHanhTrinh | string | null | undefined): MucHa
   return k === 'chua-bai' || k === 'can-chua' ? 'chua-bai' : 'day-hoc'
 }
 
+/** 21/10 — Hành trình thành MỘT trang 4 bước (bản vẽ docs/ban-ve-hanh-trinh-2110): khoá thẻ ⇒ bước mở sẵn. `chua-bai` / `can-chua` ⇒ 4 (Chữa câu khó
+ *  & tính toán); `dau-gio` ⇒ 2 (Gọi lên bảng đầu giờ); khoá khác ⇒ null (màn tự chọn bước theo điểm danh — `buocMacDinh`). */
+export function buocHanhTrinh(k: TheHanhTrinh | string | null | undefined): 2 | 4 | null {
+  if (mucHanhTrinh(k) === 'chua-bai') return 4
+  return k === 'dau-gio' ? 2 : null
+}
+
 /** Màn Hôm nay bấm một việc ⇒ Hành trình mở sẵn đúng thẻ (đọc một lần rồi xoá — như `giaoTuCa`). */
 export interface MoHanhTrinh {
   the: TheHanhTrinh
-  /** "Bổ sung bài": mở và cuộn tới bước "Tick bài vừa dạy" trong mục Dạy học & đầu giờ. */
+  /** Lối cũ "Bổ sung bài" (21/10: nút ở Hôm nay mở hộp ngay tại chỗ) ⇒ Hành trình mở hộp "Bổ sung bài hôm nay". */
   boSungBai?: boolean
   /** Khối chọn sẵn (lối vào cũ của thẻ Nhịp học / Bài hằng ngày — hai thẻ ấy nay ở màn Hôm nay; Hành trình bỏ qua trường này). */
   khoi?: number

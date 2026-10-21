@@ -18,3 +18,8 @@ Bản vẽ nằm ở `hanh-trinh.html`. Ảnh Chromium thật nằm ở `anh/`, 
 | 4 | `04-bo-sung-` | Màn Hôm nay: bấm "Bổ sung bài hôm nay" thì hộp mở ngay tại chỗ (chọn lớp → chọn bài vừa dạy → xác nhận → Giao). Không sang Hành trình. |
 
 Soát bằng máy, đủ 24 ảnh: 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ hơn 44 px. Màu chỉ dùng biến `--gvm-*` của `src/styles/tokens.css` (sáng và tối), không thêm màu mới.
+
+## Ảnh MÀN THẬT (đã build 21/10) — `anh-that/`
+Chụp bằng component THẬT + máy chủ giả: `npx vite build --config scripts/chup-hanh-trinh-2110/vite.config.mjs --outDir <tạm> && node scripts/chup-hanh-trinh-2110/chup.mjs <tạm> docs/ban-ve-hanh-trinh-2110/anh-that`. Số và tên em là GIẢ.
+- `chua-mo-…`: chưa mở buổi (bước 1 mở). `b1-…` · `b2-…` · `b3-…` · `b4-…`: mở sẵn từng bước. `hop-bo-sung-…`: hộp Bổ sung bài hôm nay.
+- Soát cả 36 tổ hợp (6 khung × 3 khổ × sáng/tối): 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ hơn 44 px. Dòng "Chưa tải được thẻ nút thắt / bước cuối" ở ảnh bước 4 là do máy chủ giả không có hai lệnh ấy.

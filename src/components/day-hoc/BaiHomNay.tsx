@@ -138,7 +138,9 @@ export interface BaiChonNho {
 }
 
 /** Trạng thái + lệnh của bước Bài hôm nay. `kho` = kho DẠY HỌC của bảng (`khoDayHoc`), nạp lười bằng `napKho`. */
-export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: TeacherExamSource[] | null, napKho: () => Promise<TeacherExamSource[]>) {
+/** `docCo: false` ⇒ KHÔNG đọc cờ OMNI (nơi không vẽ phần Tick bài — bước Dạy học của Hành trình, 21/10): mọi lệnh khác của hook đều chờ cờ bật nên
+ *  cũng không chạy. */
+export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: TeacherExamSource[] | null, napKho: () => Promise<TeacherExamSource[]>, { docCo = true }: { docCo?: boolean } = {}) {
   const showToast = useAppStore((s) => s.showToast)
   const [co, setCo] = useState<CoOmni | null>(null)
   const [dangTaiCo, setDangTaiCo] = useState(true)
@@ -162,9 +164,10 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
   }, [])
   useEffect(() => {
     coSong.current = true
-    void taiCo()
+    if (docCo) void taiCo()
+    else setDangTaiCo(false)
     return () => { coSong.current = false }
-  }, [taiCo])
+  }, [taiCo, docCo])
   const bat = co?.bat === true
 
   // LỚP: bật theo lớp ⇒ đúng các lớp đã bật; bật cả trung tâm / chạy thử theo em ⇒ mọi lớp. Mặc định = lớp của buổi đang mở (nếu OMNI áp cho lớp ấy).
@@ -676,7 +679,8 @@ function ChuongBai({ bhn, g }: { bhn: BaiHomNay; g: { chuong: string; bai: BaiCa
 }
 
 /** Thẻ bước "Bài hôm nay" — cùng kiểu thẻ bước của bảng Dạy học. OMNI tắt ⇒ không vẽ gì. */
-export function BuocBaiHomNay({ bhn, kho, loiKho = '', thuKho, soBuoc = 4 }: { bhn: BaiHomNay; kho: TeacherExamSource[] | null; loiKho?: string; thuKho?: () => void; soBuoc?: number }) {
+/** `anDau` ⇒ không vẽ số bước + tiêu đề "Bài hôm nay" (trong hộp "Bổ sung bài hôm nay" — hộp đã có tiêu đề riêng, 21/10). */
+export function BuocBaiHomNay({ bhn, kho, loiKho = '', thuKho, soBuoc = 4, anDau = false }: { bhn: BaiHomNay; kho: TeacherExamSource[] | null; loiKho?: string; thuKho?: () => void; soBuoc?: number; anDau?: boolean }) {
   if (!bhn.bat) return null
   const { lop, lopChon, lopChonDuoc, khoi, dsTheoLop, loiDsTheoLop, dangTaiDs, taiDs, dsBai, chon } = bhn
   // Nhóm bài theo chương, giữ thứ tự đã sắp.
@@ -688,17 +692,19 @@ export function BuocBaiHomNay({ bhn, kho, loiKho = '', thuKho, soBuoc = 4 }: { b
   }
   const loiDs = lopChon.filter((l) => loiDsTheoLop[l]).map((l) => (lopChon.length > 1 ? `${l}: ${loiDsTheoLop[l]}` : loiDsTheoLop[l]!))
   return (
-    <section className="dh-buoc bhn" aria-labelledby="dh-b4" data-khoi="bai-hom-nay">
+    <section className={`dh-buoc bhn${anDau ? ' bhn--trong-hop' : ''}`} aria-labelledby={anDau ? undefined : 'dh-b4'} aria-label={anDau ? 'Bài hôm nay' : undefined} data-khoi="bai-hom-nay">
       {lopChon.length > 0 && <NapDsEm onCo={bhn.setDsEm} />}
-      <div className="dh-buoc-dau">
-        <span className="dh-so" aria-hidden="true">
-          {soBuoc}
-        </span>
-        <div className="dh-buoc-ten">
-          <h2 id="dh-b4">Bài hôm nay</h2>
-          <p>Tick bài vừa dạy — {TEN_AI} tự giao luyện theo bài cho các lớp thầy chọn. Bài đứng trước bài đã tick là bài cũ để ôn lại.</p>
+      {!anDau && (
+        <div className="dh-buoc-dau">
+          <span className="dh-so" aria-hidden="true">
+            {soBuoc}
+          </span>
+          <div className="dh-buoc-ten">
+            <h2 id="dh-b4">Bài hôm nay</h2>
+            <p>Tick bài vừa dạy — {TEN_AI} tự giao luyện theo bài cho các lớp thầy chọn. Bài đứng trước bài đã tick là bài cũ để ôn lại.</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Hai cột khi đủ rộng (máy tính): trái = chọn lớp + cây bài, phải = thẻ xác nhận DÍNH theo cuộn; hẹp / điện thoại: xếp dọc, thẻ nằm dưới cây bài (bai-hom-nay.css, @container bhn). */}
       <div className="bhn-ngoai">

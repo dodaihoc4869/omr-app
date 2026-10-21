@@ -1,26 +1,34 @@
-// MỤC "DẠY HỌC & ĐẦU GIỜ" của màn Hành trình (thầy 12/10: Hành trình còn 2 mục; bản vẽ HanhTrinh-DayHoc đã duyệt) — phép THUẦN, không IO:
-//   · thanh bước của MỘT buổi dạy (Điểm danh · Gọi lên bảng đầu giờ · Dạy và chiếu câu · Tick bài vừa dạy) — trạng thái xong / đang / chờ;
-//   · chữ của ô "Buổi dạy";
+// MÀN HÀNH TRÌNH — MỘT TRANG 4 BƯỚC (thầy 21/10, bản vẽ docs/ban-ve-hanh-trinh-2110 đã duyệt: "bỏ thẻ dạy học và đầu giờ và thẻ chữa bài đi …
+// 1 điểm danh, 2 là gọi lên bảng đầu giờ, 3 dạy học, 4 chữa câu khó và tính toán" + "các bước sau đều lấy danh sách điểm danh ở bước 1, các bước
+// sau chọn độc lập được theo chức năng") — phép THUẦN, không IO:
+//   · bốn bước + trạng thái từng bước (xong / đang mở / chưa làm) — mỗi bước tự có cờ xong, KHÔNG khoá theo thứ tự;
+//   · bước mở mặc định khi vào màn; chữ của ô "Buổi dạy";
 //   · bảng "Bài đang giao": gói bài 7 ngày còn hạn (lệnh `/gv/goi-bai-7`, máy chủ `server/src/goi-bai-7-thay.ts`) ⇒ một dòng mỗi lớp/gói, hai tỉ lệ
 //     "Đã gặp câu gốc" ⊇ "Đã tự làm" cộng đúng như `tomTatLop` của thẻ Bài mới trong 7 ngày (không bịa số; lớp chưa em nào nhận ⇒ không tỉ lệ).
 import type { BuoiHoc } from '../../lib/buoi-hoc-api'
 import { chuConLai, phanTram, tomTatLop, type DuGoi7, type GoiDu } from './goi7-ui'
 import { ngayNgan, thuDu, thuNgan } from './bai-hang-ngay-ui'
 
-// ------------------------------------------------------------------ thanh bước
+// ------------------------------------------------------------------ bốn bước
+export type SoBuoc = 1 | 2 | 3 | 4
 export type TrangThaiBuoc = 'xong' | 'dang' | 'cho'
-export const TEN_BUOC = ['Điểm danh', 'Gọi lên bảng đầu giờ', 'Dạy và chiếu câu', 'Tick bài vừa dạy'] as const
-export const CHU_TRANG_THAI_BUOC: Record<TrangThaiBuoc, string> = { xong: 'đã xong', dang: 'đang làm', cho: 'chưa tới' }
+export const TEN_BUOC = ['Điểm danh', 'Gọi lên bảng đầu giờ', 'Dạy học', 'Chữa câu khó & tính toán'] as const
+/** Tên ngắn cho thước tiến trình nằm ngang (điện thoại, màn ngang). */
+export const TEN_NGAN_BUOC = ['Điểm danh', 'Đầu giờ', 'Dạy học', 'Chữa câu'] as const
+export const CHU_TRANG_THAI_BUOC: Record<TrangThaiBuoc, string> = { xong: 'đã xong', dang: 'đang mở', cho: 'chưa làm' }
 
-/** `xong[i]` = bước i đã xong. Bước chưa xong ĐẦU TIÊN là "đang"; các bước chưa xong sau nó là "chờ". */
-export function trangThaiBuoc(xong: readonly boolean[]): TrangThaiBuoc[] {
-  let daCoDang = false
-  return xong.map((x) => {
-    if (x) return 'xong'
-    if (daCoDang) return 'cho'
-    daCoDang = true
-    return 'dang'
-  })
+/** `xong[i]` = cờ xong của CHÍNH bước i+1; `mo` = bước đang mở. Bước đang mở là "dang"; bước khác xong hay chưa theo cờ của nó (bước độc lập). */
+export function trangThaiBuoc(xong: readonly boolean[], mo: number | null): TrangThaiBuoc[] {
+  return xong.map((x, i) => (i + 1 === mo ? 'dang' : x ? 'xong' : 'cho'))
+}
+
+/** Bước mở khi vào màn: lối vào chỉ định (Hôm nay › Cần thầy chữa ⇒ 4) thắng; chưa có em có mặt ⇒ 1; có rồi ⇒ bước thầy mở lần trước trong buổi
+ *  này (nhớ trên máy), không có ⇒ 2. Còn đang tìm buổi ⇒ null (chưa chọn — tránh mở bước 1 rồi nhảy). */
+export function buocMacDinh(o: { chiDinh: SoBuoc | null; dangTai: boolean; coMat: number; nho: SoBuoc | null }): SoBuoc | null {
+  if (o.chiDinh) return o.chiDinh
+  if (o.dangTai) return null
+  if (o.coMat <= 0) return 1
+  return o.nho ?? 2
 }
 
 // ------------------------------------------------------------------ ô "Buổi dạy"

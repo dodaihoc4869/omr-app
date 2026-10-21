@@ -38,13 +38,13 @@ Thầy dặn: "nút này làm riêng bấm vào popup lên để chọn luôn ch
   1. **Lớp nhận bài**: chọn được nhiều lớp cùng khối. Mặc định là lớp của buổi đang mở. Dòng "Giao cho": Cả lớp · Theo điểm danh · Chọn từng em.
   2. **Bài vừa dạy**: cây Dạy học của khối, chọn một bài. Mỗi bài có chip Đã dạy · Bài hôm nay · Chưa dạy, và "Bỏ tick" như cũ.
   3. **Xác nhận trước khi giao**: các con số xem trước (câu rút được, hạn nộp, lượt cần / sức chứa, lượt mỗi ngày, đủ lượt).
-- Chân hộp dính đáy: "Hủy" và nút chính "Giao Bài N cho <lớp>". Giao xong thì hộp báo kết quả thật theo máy chủ rồi tự đóng; Bài đang giao và các số đếm cập nhật.
+- Chân thẻ xác nhận: nút chính "Giao Bài N cho <lớp>" (giữ nguyên của bước Bài hôm nay). Giao xong hộp **vẫn mở** (báo kết quả thật theo máy chủ, còn "Bỏ tick" được); đóng hộp thì màn Hôm nay tải lại việc (thẻ "Lớp chưa có bài mới" theo đúng máy chủ). Đang giao thì nút Đóng / Esc khoá. *(Đổi khi build 21/10: không tự đóng.)*
 - **Thầy chốt 21/10: bỏ hẳn phần "Tick bài vừa dạy" khỏi Hành trình.** Chọn và giao bài chỉ còn một chỗ là hộp này, mở từ màn Hôm nay.
 - Tách thành phần: `HopBoSungBai.tsx` (vỏ hộp) + `BuocBaiHomNay` (thân). Hộp chỉ nạp lười khi bấm nút.
 - **Điểm danh (`dd`) của hộp:** `useBaiHomNay(dd, …)` cần `dd`.
   - Hộp tự gọi `useDiemDanhBuoi()`, và chỉ gọi khi hộp mở (cùng buổi đang mở mà Hành trình dùng).
 - **Nhớ lựa chọn:** lớp tự chọn và bài đang chọn (`lopTay`, `chonNho`, `datNho`, sửa ở Đợt 16) chuyển lên chỗ sống lâu hơn hộp, tức kho chung theo buổi. Đóng hộp rồi mở lại vẫn còn đúng lớp và bài đã chọn.
-- **Công tắc OMNI tắt** hoặc máy chủ chưa có lệnh: **ẩn** nút "Bổ sung bài hôm nay" ở Hôm nay, nút chính trở về việc gấp kế tiếp.
+- **Công tắc OMNI tắt** hoặc chưa đọc được cờ: **nút vẫn giữ**, hộp nói thật — "Tick bài vừa dạy cần bật OMNI cho lớp ở Cài đặt › OMNI (theo lớp)." / lỗi + "Thử tải Tick bài lại". *(Đổi khi build 21/10: ẩn nút cần màn Hôm nay đọc thêm cờ — trái luật tốc độ.)*
 - Bỏ đường `moHanhTrinh({ boSungBai: true })` cùng tham số `boSungBai` / `lanBoSung` (cuộn tới bước Tick). Lối cũ nào còn gọi `boSungBai` thì mở hộp.
 
 ## 2c. Phần còn lại
@@ -85,7 +85,7 @@ Thầy dặn: "nút này làm riêng bấm vào popup lên để chọn luôn ch
 - **0 lệnh máy chủ mới, 0 vòng chờ D1 thêm.**
 - Bước 4 **không tải lúc mở màn**. Phần thân (`TheCanThayChua` + `ThayTuChua`) chỉ nạp lười khi thầy bấm mở bước 4, hoặc bấm "Chữa câu" trên thước, hoặc vào bằng khoá `can-chua`. Như vậy số byte và số lượt đọc lúc mở màn **không tăng** so với mục mặc định "Dạy học & đầu giờ" hiện nay.
 - Hộp Bổ sung bài: **0 lệnh máy chủ mới**. Kho chỉ tải khi mở hộp, như bước Bài hôm nay hiện nay. Màn Hôm nay mở ra không nạp thêm byte nào. Riêng khi mở hộp từ Hôm nay có thêm một lượt tìm buổi đang mở (`useDiemDanhBuoi`), chạy **song song** với lúc tải kho, không nối tiếp.
-- Kiểm tra ôn tập (`BangKiemTraCaNhan`) đang tải ngay lúc mở; sau này chỉ tải khi bấm "Xem", nên giảm được một lượt đọc lúc mở màn.
+- Kiểm tra ôn tập (`BangKiemTraCaNhan`, làn Codex — bọc ngoài, không sửa): vẫn tải lúc mở như trước (cần biết lịch bật hay tắt để hiện / ẩn dòng), nằm trong dòng gập cuối màn. *(Đổi khi build 21/10.)*
 - Đáp án không đổi đường đi. Lời giải chỉ hiện trên máy thầy như cũ.
 
 ## 7. Nghiệm thu đo bằng máy
@@ -96,6 +96,12 @@ Thầy dặn: "nút này làm riêng bấm vào popup lên để chọn luôn ch
 - `npx tsc --noEmit` sạch. `npm run build && npm run kiem:toc-do` 0 đỏ. `npm run kiem:mau-giu` 0. `node scripts/kiem-sw.mjs` đạt.
 - Ảnh Chromium màn thật 390 / 844 / 1440, sáng và tối: 0 lỗi trang, 0 tràn ngang, 0 đích bấm < 44 px.
 
-## Cần thầy chốt
+## Đã build (21/10) — mặc định cho hai câu thầy chưa trả lời
+- Bước 4 giữ CẢ HAI khối (câu khó & tính toán trước, câu học sinh cần chữa sau) — đúng bản vẽ.
+- Kiểm tra ôn tập để cuối màn, dòng gập — đúng bản vẽ.
+- Bước 3 (Dạy học) không còn đọc cờ OMNI ⇒ mở Hành trình bớt một lệnh máy chủ.
+- Ảnh màn thật (component thật + máy chủ giả): `docs/ban-ve-hanh-trinh-2110/anh-that/`, chụp bằng `scripts/chup-hanh-trinh-2110/`.
+
+## Cần thầy chốt (đã dùng mặc định ở trên)
 1. **Bước 4 gồm hai khối** như bản vẽ: (A) câu khó & tính toán thầy tự chọn, rồi (B) câu học sinh cần chữa (12 chỗ). Hay thầy chỉ muốn khối (A)? Nếu bỏ (B) thì con số "cần chữa" ở thanh bên mất chỗ để bấm vào.
 2. **Kiểm tra ôn tập** dời xuống cuối thành một dòng gập. Giữ như vậy, hay chuyển sang màn khác?
