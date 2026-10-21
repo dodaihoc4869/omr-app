@@ -150,7 +150,9 @@ describe('nhận diện "có tính toán"', () => {
   })
   it('nhãn kho `kieu` thắng mặt chữ; câu tính có số kèm đơn vị ⇒ có; "Tính chất…", "tính base", "lưỡng tính" KHÔNG phải tính toán', () => {
     // 22/10 (thầy: "bộ lọc câu khó và tính toán chưa hoạt động à, tôi tick vào vẫn y nguyên"): Phần III KHÔNG còn mặc nhiên là tính toán — xem test dưới.
-    expect(laCauTinhToan({ phan: 'III', text: 'Giá trị của x là bao nhiêu?' })).toBe(false)
+    expect(laCauTinhToan({ phan: 'III', text: 'Chất X trong sơ đồ là chất nào? Ghi số thứ tự của chất.' })).toBe(false)
+    // "Giá trị của x / m / V là" là câu hỏi ẩn của bài tính (22/10, gộp) ⇒ có tính toán
+    expect(laCauTinhToan({ phan: 'III', text: 'Giá trị của x là bao nhiêu?' })).toBe(true)
     expect(laCauTinhToan({ phan: 'I', text: 'Chất nào sau đây là ester?', kieu: 'bai_tap' })).toBe(true)
     expect(laCauTinhToan({ phan: 'I', text: 'Cho 8,8 gam ethyl acetate…', kieu: 'ly_thuyet' })).toBe(false)
     expect(laCauTinhToan({ phan: 'I', text: 'Cho 3,36 lít khí ammonia (đkc) tác dụng với HCl. Khối lượng muối là', mucDo: 'hieu' })).toBe(true)

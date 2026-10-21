@@ -60,11 +60,14 @@ export function laCauTinhToan(
   if (c.phan === 'III' && !tuLuan) {
     // Thứ tự (22/10, gộp): nhãn kho "lý thuyết" ⇒ không; đề CÓ dấu hiệu phép tính ⇒ có; đề là câu ĐẾM lý thuyết (MAU_DEM_LY_THUYET) ⇒ không, KỂ CẢ khi kho
     // gắn "bài tập" (công cụ gán nhãn có thể coi mọi đáp số là bài tập — chưa đo được trên kho thật); còn lại theo nhãn kho / tên dạng / `dangCua`.
+    // Nhãn kho "bài tập" KHÔNG dùng ở Phần III: kho gắn nó cho MỌI câu Phần III (sao lưu docs/ra-soat-hien-thi-de-2809: 5/5; dang-cau.ts: 578/578) ⇒ không mang thông tin.
+    // Tên dạng thật có đuôi việc làm ("— tính khối lượng", "— đếm đồng phân") ⇒ tín hiệu tốt, xét sau nội dung đề.
     if (c.kieu === 'ly_thuyet') return false
-    if (MAU_TINH_TOAN_LOC.test(text)) return true
+    if (MAU_TINH_TOAN_LOC.test(text) || /giá\s*trị\s+(?:của\s+)?[a-zA-Z](?:[₀-₉0-9])?(?![\p{L}])/iu.test(text)) return true
     if (MAU_DEM_LY_THUYET.test(text)) return false
-    if (c.kieu === 'bai_tap') return true
-    if (MAU_TINH_TOAN_LOC.test(boCumLyThuyet(c.tenDang))) return true
+    const dang = boCumLyThuyet(c.tenDang)
+    if (/(?:^|[^\p{L}])đếm(?![\p{L}])/iu.test(dang)) return false
+    if (MAU_TINH_TOAN_LOC.test(dang)) return true
     return dangCua({ text, luaChon: [], dapAn: '', mucDo: c.mucDo }) === 'bai_tap'
   }
   const luaChon = (c.luaChon ?? []).map((x) => boCumLyThuyet(x))
