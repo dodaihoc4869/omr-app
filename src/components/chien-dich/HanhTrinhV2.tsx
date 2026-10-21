@@ -4,11 +4,11 @@
 // 21/10 — THẦY (bản vẽ docs/ban-ve-hanh-trinh-2110 đã duyệt, "ok build đi"): "bỏ thẻ dạy học và đầu giờ và thẻ chữa bài đi, phần này sẽ theo tiến
 // trình từ trên xuống dưới, 1 điểm danh, 2 là gọi lên bảng đầu giờ, 3 dạy học, 4 chữa câu khó và tính toán" ⇒ KHÔNG còn mục / thẻ: MỘT trang 4 bước
 // (`TheBaiDaDay`). Bước 2–4 độc lập, cùng dùng danh sách có mặt của bước 1. Tick bài vừa dạy rời Hành trình ⇒ hộp "Bổ sung bài hôm nay"
-// (`HopBoSungBai`, mở ở màn Hôm nay). KHOÁ CŨ không gãy (`buocHanhTrinh`, so-dem-gv.ts): `can-chua` / `chua-bai` ⇒ mở bước 4; `dau-gio` ⇒ bước 2;
+// (`HopBoSungBai`, mở ở màn Hôm nay). KHOÁ CŨ không gãy (`buocHanhTrinh` ngay dưới): `can-chua` / `chua-bai` ⇒ mở bước 4; `dau-gio` ⇒ bước 2;
 // khoá khác ⇒ bước theo điểm danh; `boSungBai` (lối cũ) ⇒ mở hộp Bổ sung bài ngay trên màn này.
 import { lazy, Suspense, useState } from 'react'
 import type { BaiCay } from '../../lib/bai-hom-nay'
-import { buocHanhTrinh, type TheHanhTrinh } from '../../lib/so-dem-gv'
+import { mucHanhTrinh, type TheHanhTrinh } from '../../lib/so-dem-gv'
 import './gv-v2.css'
 
 // Phép tính nhịp (khối, bốn chỉ số) ở `nhip-hanh-trinh.ts` (màn Hôm nay dùng) — xuất lại ở đây cho mọi lối nhập cũ.
@@ -17,6 +17,13 @@ export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
 // Trang 4 bước và hộp Bổ sung bài là mảnh riêng, chỉ tải khi cần.
 const TheBaiDaDay = lazy(() => import('./TheBaiDaDay'))
 const HopBoSungBai = lazy(() => import('../day-hoc/HopBoSungBai'))
+
+/** 21/10 — Hành trình thành MỘT trang 4 bước (bản vẽ docs/ban-ve-hanh-trinh-2110; đặt ở mảnh nạp lười này, không ở so-dem-gv.ts nạp sẵn — app thầy mở nhẹ hơn): khoá thẻ ⇒ bước mở sẵn. `chua-bai` / `can-chua` ⇒ 4 (Chữa câu khó
+ *  & tính toán); `dau-gio` ⇒ 2 (Gọi lên bảng đầu giờ); khoá khác ⇒ null (màn tự chọn bước theo điểm danh — `buocMacDinh`). */
+export function buocHanhTrinh(k: TheHanhTrinh | string | null | undefined): 2 | 4 | null {
+  if (mucHanhTrinh(k) === 'chua-bai') return 4
+  return k === 'dau-gio' ? 2 : null
+}
 
 /** Chương của khối: số bài + số câu (cộng `soCau` các bài trong cây DẠY HỌC). Màn không còn vẽ thẻ chương — giữ hàm thuần cho lối nhập cũ. */
 export function chuongCuaKhoi(bai: readonly BaiCay[]): { chuong: string; soBai: number; soCau: number }[] {

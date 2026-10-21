@@ -156,21 +156,26 @@ export async function taiHomNay(onPhan?: (d: DuLieuHomNay) => void): Promise<DuL
   const huaPhu = import('../components/chien-dich/TheCanThayChua')
     .then(async (m) => ({ gom: m.gomCanChua, ...(await m.taiNguonPhu()) }))
     .catch(() => null)
-  const [{ ca, loiCa }, { cd, loiCd }, co] = await Promise.all([taiCa(), taiCd(), taiCoOmni()])
-
-  // PHÁT PHẦN ĐẦU NGAY (21/10): ca + chiến dịch về là màn đã có việc để hiện (Ca đang mở · lỗi) — không chờ bảng chiến dịch, OMNI, lớp chờ. Em hỏi bài về lúc nào thì phát thêm lúc ấy.
-  let hoiSom: { hoi: DuLieuHomNay['hoi']; loiHoi: string } | null = null
-  let xongHet = false
-  const phatPhanDau = () => {
-    if (xongHet) return
-    onPhan?.({ ca, loiCa, cd, loiCd, canThayChua: null, choBaiMoi: [], hoi: hoiSom?.hoi ?? null, loiHoi: hoiSom?.loiHoi ?? '', conCho: true })
-  }
-  phatPhanDau()
-  if (onPhan) void huaHoi.then((r) => { hoiSom = r; phatPhanDau() })
-
-  const chay = (cd ?? []).filter((c) => c.trangThai === 'dang_chay')
-  // Lớp chờ bài mới (OMNI) KHÔNG phụ thuộc bảng chiến dịch (chỉ cần công tắc OMNI + danh sách lớp) ⇒ chạy NGAY, song song với đọc bảng (trước đây chờ bảng xong mới bắt đầu).
+  // BỚT MỘT VÒNG CHỜ (21/10, thầy: "tối ưu tốc độ app tức thì"): đọc bảng chiến dịch chỉ cần danh sách chiến dịch, lớp chờ bài mới chỉ cần công tắc
+  // OMNI ⇒ mỗi việc bắt đầu NGAY khi phần nó cần về, không chờ cả ba lệnh đầu (trước: chờ ca + chiến dịch + OMNI rồi mới đọc bảng / lớp chờ).
+  const huaCa = taiCa()
+  const huaCd = taiCd()
+  const huaCo = taiCoOmni()
+  const huaBang = huaCd.then(async ({ cd }) => {
+    const chay = (cd ?? []).filter((c) => c.trangThai === 'dang_chay')
+    const bang: (BangChienDich | null)[] = await taiGioiHan(chay, async (c) => {
+      try {
+        const r = await docBang(c.id, true) // chỉ đếm: bỏ báo cáo A/B nặng (srs2-gv.ts `boDoLuong`)
+        return r.ok ? r.du : null
+      } catch {
+        return null
+      }
+    })
+    return { chay, bang }
+  })
+  // Lớp chờ bài mới (OMNI) KHÔNG phụ thuộc bảng chiến dịch (chỉ cần công tắc OMNI + danh sách lớp) ⇒ chạy ngay khi biết công tắc.
   const taiCho = (async () => {
+    const co = await huaCo
     if (!co?.bat) return []
     try {
       let lop = co.lop
@@ -191,14 +196,19 @@ export async function taiHomNay(onPhan?: (d: DuLieuHomNay) => void): Promise<DuL
       return []
     }
   })()
-  const bang: (BangChienDich | null)[] = await taiGioiHan(chay, async (c) => {
-    try {
-      const r = await docBang(c.id, true) // chỉ đếm: bỏ báo cáo A/B nặng (srs2-gv.ts `boDoLuong`)
-      return r.ok ? r.du : null
-    } catch {
-      return null
-    }
-  })
+  const [{ ca, loiCa }, { cd, loiCd }, co] = await Promise.all([huaCa, huaCd, huaCo])
+
+  // PHÁT PHẦN ĐẦU NGAY (21/10): ca + chiến dịch về là màn đã có việc để hiện (Ca đang mở · lỗi) — không chờ bảng chiến dịch, OMNI, lớp chờ. Em hỏi bài về lúc nào thì phát thêm lúc ấy.
+  let hoiSom: { hoi: DuLieuHomNay['hoi']; loiHoi: string } | null = null
+  let xongHet = false
+  const phatPhanDau = () => {
+    if (xongHet) return
+    onPhan?.({ ca, loiCa, cd, loiCd, canThayChua: null, choBaiMoi: [], hoi: hoiSom?.hoi ?? null, loiHoi: hoiSom?.loiHoi ?? '', conCho: true })
+  }
+  phatPhanDau()
+  if (onPhan) void huaHoi.then((r) => { hoiSom = r; phatPhanDau() })
+
+  const { chay, bang } = await huaBang
 
   // Bảng bài OMNI (ba nhóm Cần thầy chữa): như Lên bảng chiến dịch — chỉ chiến dịch còn chạy, không phải Hành trình; OMNI tắt ⇒ không hỏi.
   const canOmni = chay.map((c, i) => ({ c, b: bang[i] })).filter((x) => co?.bat && x.b && !x.b.hanhTrinhNgay && !x.b.hetHan)

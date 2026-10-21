@@ -9,7 +9,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { goiLenh } from '../src/lib/goi-lenh-thay'
-import { buocHanhTrinh, mucHanhTrinh, useSoDemGv } from '../src/lib/so-dem-gv'
+import { mucHanhTrinh, useSoDemGv } from '../src/lib/so-dem-gv'
+import { buocHanhTrinh } from '../src/components/chien-dich/HanhTrinhV2'
 import ChienDichScreen from '../src/screens/ChienDichScreen'
 
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: vi.fn() }))

@@ -21,11 +21,11 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 // Mục Chữa bài có test riêng (làn Chữa bài) — ở đây chỉ kiểm đường nối.
 vi.mock('../src/components/chien-dich/TheCanThayChua', () => ({ default: () => <p>Giả: mục Chữa bài</p> }))
 
-import { buocHanhTrinh, mucHanhTrinh, useSoDemGv, type TheHanhTrinh } from '../src/lib/so-dem-gv'
+import { mucHanhTrinh, useSoDemGv, type TheHanhTrinh } from '../src/lib/so-dem-gv'
 import { buocMacDinh, chuBuoi, chuDemGiao, dongBaiDangGiao, goiDangGiao, trangThaiBuoc } from '../src/components/chien-dich/buoi-day-ui'
 import { emVangBuoi } from '../src/components/day-hoc/DiemDanhBuoi'
 import { kyTuTen } from '../src/components/day-hoc/KiemTraDauGio'
-const { default: HanhTrinhV2 } = await import('../src/components/chien-dich/HanhTrinhV2')
+const { default: HanhTrinhV2, buocHanhTrinh } = await import('../src/components/chien-dich/HanhTrinhV2')
 const { default: TheBaiDaDay } = await import('../src/components/chien-dich/TheBaiDaDay')
 const { default: BangBaiDangGiao } = await import('../src/components/chien-dich/BangBaiDangGiao')
 

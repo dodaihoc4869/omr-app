@@ -90,7 +90,7 @@
    "lenh": 3
   },
   "gv-hn-chien-dich-bang": {
-   "dot": 5,
+   "dot": 4,
    "lenh": 15
   },
   "gv-hn-omni-co": {
@@ -102,9 +102,9 @@
    "lenh": 22
   },
   "gv-hn-lop": {
-   "dot": 2,
+   "dot": 1,
    "lenh": 2
   }
  },
- "ghiChuPh": "Mốc cổng phụ huynh (21/10, đo trên main a746fbc trước khi tối ưu): số đợt chờ D1 nối tiếp + số lệnh D1 của 6 lệnh /ph, giờ cao điểm, token có pk. Chỉ hạ. 21/10 (Mức làm 1–4 ở Lịch sử làm câu): ba khoá *-lich-su-lam-cau mốc lệnh D1 +1 so lúc đo gốc (7/6/5 → 8/7/6) vì thêm MỘT lệnh đọc β thật (`omni_beta_cau`) cho các lượt đo bằng đồng hồ mới; số ĐỢT chờ không đổi (4/4/3) — lệnh chạy CÙNG đợt với khối tra phụ; em chưa có lượt nào đo mới thì KHÔNG có lệnh ấy. 21/10 (tờ chiếu: Mức làm 1–4 + hai thẻ đã điểm danh / cả lớp): thêm hai lệnh thầy gv-ai-sai-cau (đo gốc 2 đợt / 2 lệnh; nay 2 / 3: thêm MỘT lệnh đọc β cùng đợt, và lọc lớp `sbds` ngay trong truy vấn) và gv-ho-so-len-bang (đo gốc 29 đợt / 32 lệnh khi mọi khối nối tiếp; nay 14 / 35 — các khối độc lập đọc cùng lúc, chiến dịch và toàn cảnh chạy song song từ đầu; +3 lệnh so với 32 đều nằm CÙNG đợt với khối đọc khác (một lệnh β, hai lệnh Cách làm bài 14 ngày), không thêm vòng chờ; 14 đợt còn lại là chuỗi của hàm dùng chung docHoSo2/gvEmToanCanh). 21/10 (đo lại lượt cũ — thầy: \"phải tìm cách đo lại hết\"): bốn khoá ph/hs/gv-lich-su-lam-cau và gv-ho-so-len-bang mốc lệnh D1 +1 (8/7/6/35 → 9/8/7/36) vì thêm MỘT lệnh `SELECT` bảng tính sẵn `cau_doc_giay` (kích thước đề từng câu) cho các lượt CŨ chưa có số đo mới; số ĐỢT chờ không đổi (lệnh chạy CÙNG đợt với các lượt đọc khác của nơi gọi, theo chỉ mục khoá chính, có đệm 10 phút trong isolate); em chưa có lượt cũ nào cần kích thước thì KHÔNG có lệnh ấy. gv-ho-so-len-bang còn thêm MỘT lô hai lệnh (`giayUocTinhGame`, cùng đợt) CHỈ khi em có lượt game không giây — giống Lịch sử làm câu và tờ chiếu «Ai đã sai?» để ba màn cho cùng một số."
+ "ghiChuPh": "Mốc cổng phụ huynh (21/10, đo trên main a746fbc trước khi tối ưu): số đợt chờ D1 nối tiếp + số lệnh D1 của 6 lệnh /ph, giờ cao điểm, token có pk. Chỉ hạ. 21/10 (Mức làm 1–4 ở Lịch sử làm câu): ba khoá *-lich-su-lam-cau mốc lệnh D1 +1 so lúc đo gốc (7/6/5 → 8/7/6) vì thêm MỘT lệnh đọc β thật (`omni_beta_cau`) cho các lượt đo bằng đồng hồ mới; số ĐỢT chờ không đổi (4/4/3) — lệnh chạy CÙNG đợt với khối tra phụ; em chưa có lượt nào đo mới thì KHÔNG có lệnh ấy. 21/10 (tờ chiếu: Mức làm 1–4 + hai thẻ đã điểm danh / cả lớp): thêm hai lệnh thầy gv-ai-sai-cau (đo gốc 2 đợt / 2 lệnh; nay 2 / 3: thêm MỘT lệnh đọc β cùng đợt, và lọc lớp `sbds` ngay trong truy vấn) và gv-ho-so-len-bang (đo gốc 29 đợt / 32 lệnh khi mọi khối nối tiếp; nay 14 / 35 — các khối độc lập đọc cùng lúc, chiến dịch và toàn cảnh chạy song song từ đầu; +3 lệnh so với 32 đều nằm CÙNG đợt với khối đọc khác (một lệnh β, hai lệnh Cách làm bài 14 ngày), không thêm vòng chờ; 14 đợt còn lại là chuỗi của hàm dùng chung docHoSo2/gvEmToanCanh). 21/10 (đo lại lượt cũ — thầy: \"phải tìm cách đo lại hết\"): bốn khoá ph/hs/gv-lich-su-lam-cau và gv-ho-so-len-bang mốc lệnh D1 +1 (8/7/6/35 → 9/8/7/36) vì thêm MỘT lệnh `SELECT` bảng tính sẵn `cau_doc_giay` (kích thước đề từng câu) cho các lượt CŨ chưa có số đo mới; số ĐỢT chờ không đổi (lệnh chạy CÙNG đợt với các lượt đọc khác của nơi gọi, theo chỉ mục khoá chính, có đệm 10 phút trong isolate); em chưa có lượt cũ nào cần kích thước thì KHÔNG có lệnh ấy. gv-ho-so-len-bang còn thêm MỘT lô hai lệnh (`giayUocTinhGame`, cùng đợt) CHỈ khi em có lượt game không giây — giống Lịch sử làm câu và tờ chiếu «Ai đã sai?» để ba màn cho cùng một số. 21/10 tối (thầy: \"tối ưu sever tức thì\"): gv-hn-chien-dich-bang 5 → 4 đợt (dòng chiến dịch + ngày bắt đầu + cờ rải đều đọc cùng lúc; kế hoạch huyết chiến đọc cùng các bảng khác), gv-hn-lop 2 → 1 đợt (hoc_sinh và danh_sach đọc song song); số lệnh không đổi."
 }
