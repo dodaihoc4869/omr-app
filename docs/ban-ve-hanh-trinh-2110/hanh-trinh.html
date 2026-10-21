@@ -82,6 +82,8 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .thuoc li[data-tt=dang] button{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
 .thuoc .tt-phu{display:none}
 .thuoc li.tach{display:none}
+.thuoc-ghi{margin:6px 4px 0;font-size:13px;font-weight:600;color:var(--gvm-chu-3)}
+@media (min-width:1180px){.thuoc-ghi{display:none}}
 .vong{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;background:var(--gvm-mat-2);color:var(--gvm-chu-2);flex:none}
 .vong svg.i{width:16px;height:16px;stroke-width:3}
 [data-tt=xong] .vong{background:var(--gvm-xl);color:var(--gvm-tren-dac)}
@@ -223,6 +225,62 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 @media (min-width:900px){.cho-chua{grid-template-columns:32px minmax(0,1fr) auto;align-items:center}.cho-chua .hang-nut{grid-column:auto}}
 
 .cuoi{margin-top:4px}
+
+/* ── khung 4: Hôm nay + hộp Bổ sung bài hôm nay ── */
+body[data-k=bo-sung] .dau{display:none}
+@media (min-width:1024px){.che{inset:-32px -36px -64px}}
+.hn{position:relative;min-height:1180px}
+.hn-dau{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.hn-dau>div{flex:1 1 260px;min-width:0}
+.hn-the{margin-top:20px;display:grid;gap:12px}
+.hn-the .o-vien{height:84px;background:var(--gvm-mat)}
+.che{position:absolute;inset:-20px -16px -48px;background:color-mix(in srgb,var(--gvm-nen) 72%,transparent);backdrop-filter:blur(2px)}
+.hop-bs{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:min(820px,calc(100% - 8px));border-radius:28px;border:1px solid var(--gvm-vien);background:var(--gvm-mat);box-shadow:0 12px 40px rgb(0 0 0 / .25);display:flex;flex-direction:column;min-width:0}
+.hop-dau{display:flex;align-items:flex-start;gap:12px;padding:22px 24px 14px;border-bottom:1px solid var(--gvm-vien)}
+.hop-dau>div{flex:1;min-width:0}
+.hop-dau h2{font-size:22px;font-weight:800;line-height:1.25}
+.hop-dau p{margin-top:2px;font-size:14.5px;color:var(--gvm-chu-2)}
+.hop-than{padding:18px 24px;display:grid;gap:20px;min-width:0}
+.muc{display:grid;gap:10px;min-width:0}
+.muc-ten{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:16px;font-weight:800}
+.muc-ten .vong{width:28px;height:28px;font-size:13px;background:var(--gvm-xd);color:var(--gvm-tren-dac)}
+.muc-ten small{font-size:13.5px;font-weight:500;color:var(--gvm-chu-3)}
+.lop-khoi{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.lop-khoi>span{font-size:13px;font-weight:700;color:var(--gvm-chu-3);min-width:62px}
+.lop{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--gvm-vien);font-weight:700;font-size:15px}
+.lop[aria-checked=true]{background:var(--gvm-xd-nen);border-color:var(--gvm-xd);color:var(--gvm-xd-dam)}
+.lop svg.i{width:16px;height:16px;stroke-width:3}
+.lop small{font-weight:500;font-size:12.5px}
+.lop[aria-disabled=true]{opacity:.55}
+.ds-bai{display:grid;gap:6px}
+.dong-bai{display:grid;grid-template-columns:24px 40px minmax(0,1fr) auto;align-items:center;gap:10px;min-height:56px;padding:6px 12px;border:1px solid var(--gvm-vien);border-radius:14px;min-width:0}
+.dong-bai[data-chon]{border:2px solid var(--gvm-xd);background:color-mix(in srgb,var(--gvm-xd-nen) 45%,var(--gvm-mat))}
+.radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--gvm-chu-3)}
+[data-chon] .radio{border:6px solid var(--gvm-xd)}
+.so-bai{width:40px;height:40px;border-radius:12px;background:var(--gvm-mat-2);display:grid;place-items:center;font-weight:800;color:var(--gvm-chu-2)}
+[data-chon] .so-bai{background:var(--gvm-xd);color:var(--gvm-tren-dac)}
+.dong-bai .ten{min-width:0}
+.dong-bai .ten b{display:block;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dong-bai .ten small{font-size:13px;color:var(--gvm-chu-3)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:8px}
+.kpi>div{padding:12px 14px;border-radius:16px;background:var(--gvm-mat-2);min-width:0}
+.kpi span{display:block;font-size:13px;font-weight:700;color:var(--gvm-chu-2)}
+.kpi strong{display:block;font-size:26px;font-weight:800;line-height:1.2}
+.kpi strong small{font-size:13px;font-weight:600;color:var(--gvm-chu-2);margin-left:4px}
+.kpi em{display:block;font-style:normal;font-size:12.5px;color:var(--gvm-chu-3)}
+.hop-chan{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 24px 20px;border-top:1px solid var(--gvm-vien)}
+.hop-chan .ghi{flex:1 1 240px;font-size:13.5px;color:var(--gvm-chu-2)}
+@media (max-width:600px){
+ .hn{min-height:0}
+ .hn-nen{display:none}
+ .hop-bs{position:static;transform:none;width:auto;margin:-20px -16px 0;border-radius:0;border:0;box-shadow:none}
+ .hop-dau,.hop-than,.hop-chan{padding-left:16px;padding-right:16px}
+ .hop-chan .nut-chinh{width:100%}
+ .kpi{grid-template-columns:1fr 1fr}
+ .dong-bai{grid-template-columns:20px 36px minmax(0,1fr)}
+ .dong-bai .chip{grid-column:3;justify-self:start}
+ .so-bai{width:36px;height:36px}
+}
 </style>
 </head>
 <body>
@@ -257,6 +315,7 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
               <li data-tt="san"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu">Chưa làm</span></span></button></li>
               <li data-tt="san"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so"><span class="hp">12 chỗ</span> cần chữa</span></span></button></li>
             </ol>
+            <p class="thuoc-ghi">Bước 2 · 3 · 4 mở độc lập, cùng dùng danh sách có mặt của bước 1.</p>
           </nav>
 
           <div class="cac-buoc">
@@ -311,6 +370,7 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
               <li data-tt="dang"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu">Đang làm</span></span></button></li>
               <li data-tt="san"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so"><span class="hp">12 chỗ</span> cần chữa</span></span></button></li>
             </ol>
+            <p class="thuoc-ghi">Bước 2 · 3 · 4 mở độc lập, cùng dùng danh sách có mặt của bước 1.</p>
           </nav>
 
           <div class="cac-buoc">
@@ -353,7 +413,7 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 
                 <div class="ngan"></div>
                 <div class="tick">
-                  <div class="chu"><span class="nhan">Cuối phần dạy</span><b>Tick bài vừa dạy</b><span>Tick xong, app tự lập bài cho từng em từ tối nay.</span></div>
+                  <div class="chu"><span class="nhan">Cuối phần dạy</span><b>Tick bài vừa dạy <i class="tag" data-t="doi">mở hộp chọn bài</i></b><span>Mở đúng hộp "Bổ sung bài hôm nay" như ở màn Hôm nay.</span></div>
                   <button class="nut-vien"><svg class="i"><use href="#i-dung"/></svg>Tick bài hôm nay</button>
                 </div>
                 <div class="dong-gap"><p class="chu"><b>Bài đang giao</b> <span class="so">· 3 lớp · hạn nộp và tiến độ từng lớp</span></p><button class="nut-chu">Xem<svg class="i"><use href="#i-phai"/></svg></button></div>
@@ -382,6 +442,7 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
               <li data-tt="san"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu">Chưa làm</span></span></button></li>
               <li data-tt="dang"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so">Đang làm · 12 chỗ</span></span></button></li>
             </ol>
+            <p class="thuoc-ghi">Bước 2 · 3 · 4 mở độc lập, cùng dùng danh sách có mặt của bước 1.</p>
           </nav>
 
           <div class="cac-buoc">
@@ -429,6 +490,49 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
           </div>
         </div>
       </section>
+
+      <!-- ════════ KHUNG 4 · HÔM NAY › HỘP BỔ SUNG BÀI HÔM NAY ════════ -->
+      <section class="khung" id="bo-sung">
+        <div class="hn">
+          <div class="hn-nen">
+            <div class="hn-dau"><div><h1 class="h1">Hôm nay của thầy</h1><p class="phu so">Thứ Tư 21/10/2026 · 262 em đang học · cập nhật 18:40</p></div><button class="nut-chinh">Bổ sung bài hôm nay</button></div>
+            <div class="hn-the"><div class="o-vien"></div><div class="o-vien"></div><div class="o-vien"></div></div>
+            <div class="che"></div>
+          </div>
+          <div class="hop-bs" role="dialog" aria-modal="true" aria-labelledby="bs-tieu-de">
+            <div class="hop-dau"><div><h2 id="bs-tieu-de">Bổ sung bài hôm nay <i class="tag" data-t="moi">hộp riêng · không sang Hành trình</i></h2><p>Tick bài vừa dạy — app tự giao luyện theo bài cho lớp thầy chọn.</p></div><button class="nut-tron" aria-label="Đóng"><svg class="i"><use href="#i-dong"/></svg></button></div>
+            <div class="hop-than">
+              <div class="muc">
+                <div class="muc-ten"><span class="vong">1</span>Lớp nhận bài <small>chọn được nhiều lớp cùng khối</small></div>
+                <div class="lop-khoi"><span>Khối 12</span><button class="lop" role="checkbox" aria-checked="true"><svg class="i"><use href="#i-dung"/></svg>12A1 <small>· buổi đang mở</small></button><button class="lop" role="checkbox" aria-checked="false">12A2</button><button class="lop" role="checkbox" aria-checked="false">12A3</button></div>
+                <div class="lop-khoi"><span>Khối 11</span><button class="lop" role="checkbox" aria-checked="false" aria-disabled="true">11B1</button><button class="lop" role="checkbox" aria-checked="false" aria-disabled="true">11B2</button></div>
+                <div class="lop-khoi"><span>Giao cho</span><button class="lop" role="radio" aria-checked="false">Cả lớp <small class="so">· 24 em</small></button><button class="lop" role="radio" aria-checked="true"><svg class="i"><use href="#i-dung"/></svg>Theo điểm danh <small class="so">· 22 em có mặt</small></button><button class="lop" role="radio" aria-checked="false">Chọn từng em</button></div>
+              </div>
+              <div class="muc">
+                <div class="muc-ten"><span class="vong">2</span>Bài vừa dạy <small>cây Dạy học · Khối 12</small></div>
+                <div class="ds-bai">
+                  <div class="dong-bai"><span class="radio"></span><span class="so-bai so">10</span><span class="ten"><b>Ester — lipid</b><small class="so">46 câu · Đã giao 24 em</small></span><span class="chip" data-m="xl">Đã dạy</span></div>
+                  <div class="dong-bai"><span class="radio"></span><span class="so-bai so">11</span><span class="ten"><b>Carbohydrate</b><small class="so">52 câu · Đã giao 24 em</small></span><span class="chip" data-m="xl">Đã dạy</span></div>
+                  <div class="dong-bai"><span class="radio"></span><span class="so-bai so">12</span><span class="ten"><b>Amine</b><small class="so">38 câu · Đã giao 24 em</small></span><span class="chip" data-m="xl">Đã dạy</span></div>
+                  <div class="dong-bai" data-chon><span class="radio"></span><span class="so-bai so">13</span><span class="ten"><b>Amino acid — peptide</b><small class="so">41 câu</small></span><span class="chip" data-m="xd">Bài hôm nay</span></div>
+                  <div class="dong-bai"><span class="radio"></span><span class="so-bai so">14</span><span class="ten"><b>Protein — enzyme</b><small class="so">29 câu</small></span><span class="chip">Chưa dạy</span></div>
+                </div>
+              </div>
+              <div class="muc">
+                <div class="muc-ten"><span class="vong">3</span>Xác nhận trước khi giao <small>Bài 13 · 12A1 · 22 em</small></div>
+                <div class="kpi so">
+                  <div><span>Câu rút được</span><strong>38<small>câu</small></strong><em>đã bỏ 3 câu tự luận</em></div>
+                  <div><span>Hạn nộp tự tính</span><strong>7<small>ngày</small></strong><em>hết 23:59 · Thứ Tư 28/10</em></div>
+                  <div><span>Lượt cần / sức chứa</span><strong>210<small>/ 343 lượt</small></strong><em>em ở giữa lớp · 61% sức chứa</em></div>
+                  <div><span>Số lượt mỗi ngày</span><strong>49<small>lượt/ngày</small></strong><em>mặc định của lớp</em></div>
+                  <div><span>Đủ lượt để luyện hết</span><strong>20<small>/ 22 em</small></strong><em>em được giao · lớp có 24 em</em></div>
+                </div>
+              </div>
+            </div>
+            <div class="hop-chan"><p class="ghi">Bài 10–12 đứng trước là bài cũ, app tự đưa vào ôn lại.</p><button class="nut-chu nhat">Hủy</button><button class="nut-chinh">Giao Bài 13 cho 12A1</button></div>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -447,6 +551,7 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
   <symbol id="i-den" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></symbol>
   <symbol id="i-phai" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
   <symbol id="i-lich" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-dong" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
   <symbol id="i-lam-moi" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
 </svg>
 <script>
@@ -455,6 +560,13 @@ const q = new URLSearchParams(location.hash.slice(1))
 if (q.get('toi')) document.documentElement.setAttribute('data-toi', '')
 const k = q.get('k') || 'day-hoc'
 document.getElementById(k)?.setAttribute('data-mo', '')
+document.body.dataset.k = k
+if (k === 'bo-sung') {
+  const ds = document.querySelectorAll('.ben a')
+  ds.forEach((a) => a.removeAttribute('aria-current'))
+  ds[0]?.setAttribute('aria-current', 'page')
+  document.querySelector('.tren b').textContent = 'Hôm nay'
+}
 // Mã QR giả (chỉ là hình minh hoạ): ba ô định vị + điểm giả ngẫu nhiên cố định
 const qr = document.getElementById('qr1')
 if (qr) {

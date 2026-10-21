@@ -23,7 +23,7 @@ const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium'
 const trinh = await chromium.launch({ executablePath: existsSync(exe) && statSync(exe).isFile() ? exe : undefined })
 const soat = []
 
-const KHUNG = ['diem-danh', 'day-hoc', 'chua-cau']
+const KHUNG = ['diem-danh', 'day-hoc', 'chua-cau', 'bo-sung']
 const KHO = [['doc', 390, 844, 1.5], ['ngang', 844, 390, 1], ['may-tinh', 1440, 900, 1]]
 let stt = 0
 for (const k of KHUNG) {
@@ -47,7 +47,7 @@ for (const k of KHUNG) {
       if (kq.tran) soat.push(`${ten}: TRÀN NGANG`)
       if (kq.nho.length) soat.push(`${ten}: đích chạm nhỏ ${kq.nho.join(' | ')}`)
       let q = 82, buf
-      for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q, fullPage: true }); if (buf.length <= 150_000 || q <= 30) break; q -= 6 }
+      for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q, fullPage: true }); if (buf.length <= 150_000 || q <= 22) break; q -= 4 }
       writeFileSync(join(RA, `${ten}.jpg`), buf)
       console.log(`${ten}.jpg ${Math.round(buf.length / 1024)} KB (q${q})`)
       await ctx.close()
