@@ -60,13 +60,19 @@ describe('lõi chọn em phân tầng', () => {
     expect(xepEmPhanTang(cauBac(1), { boQua: bo }).get('Q1')!.sbd).toBe('E05')
   })
 
-  it('đổi em một câu: các câu khác giữ nguyên em (coDinh), câu đổi ra em khác', () => {
-    const goc = xepEmPhanTang(cauBac(6), { hatGiong: 'D' })
-    const coDinh = new Map([...goc].filter(([q]) => q !== 'Q3').map(([q, k]) => [q, k.sbd]))
-    const moi = xepEmPhanTang(cauBac(6), { hatGiong: 'D', coDinh, boQua: new Map([['Q3', new Set([goc.get('Q3')!.sbd])]]) })
-    for (const [q, s] of coDinh) expect(moi.get(q)!.sbd).toBe(s)
-    expect(moi.get('Q3')!.sbd).not.toBe(goc.get('Q3')!.sbd)
-    expect(new Set([...moi.values()].map((k) => k.sbd)).size).toBe(6)
+  it('đổi em một câu (50 hạt giống): câu khác giữ em; câu đổi ra em khác, không trùng em đang giữ ở câu sau, không liền nhau', () => {
+    for (let h = 0; h < 50; h++) {
+      const goc = xepEmPhanTang(cauBac(12), { hatGiong: `D${h}` })
+      for (const doi of ['Q1', 'Q5', 'Q11']) {
+        const coDinh = new Map([...goc].filter(([q]) => q !== doi).map(([q, k]) => [q, k.sbd]))
+        const moi = xepEmPhanTang(cauBac(12), { hatGiong: `D${h}`, coDinh, boQua: new Map([[doi, new Set([goc.get(doi)!.sbd])]]) })
+        for (const [q, s] of coDinh) expect(moi.get(q)!.sbd).toBe(s)
+        expect(moi.get(doi)!.sbd).not.toBe(goc.get(doi)!.sbd)
+        const kq = ds(moi, 12)
+        expect(new Set(kq.map((k) => k.sbd)).size, `hạt D${h} đổi ${doi}`).toBe(12)
+        expect(phanBoGoi(kq).lienNhau).toBe(false)
+      }
+    }
   })
 
   it('chữa câu: vai lên bảng là em ĐÃ SAI, vai giảng lại là em ĐÃ ĐÚNG, khác em; 3 câu ⇒ 6 em khác nhau', () => {

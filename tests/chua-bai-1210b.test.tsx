@@ -286,7 +286,7 @@ describe('giao diện hai khối + nút "Chiếu lên bảng"', () => {
     expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('75% lớp sai3/4 em sai')
     expect(dong()[2]!.querySelector('.gvv2-ttc-goi')!.textContent).toBe('Chưa đủ dữ liệu chọn em — thầy chữa cho cả lớp')
     expect(dong()[3]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('chưa em nào làm')
-    expect([...document.querySelectorAll('.gvv2-ttc-o-so')].map((o) => o.textContent)).toEqual(['5 câu sẽ chiếu', '2 câu Đúng–sai', '3 câu có tính toán', '2 câu lớp sai từ 30%'])
+    expect([...document.querySelectorAll('.gvv2-ttc-o-so')].map((o) => o.textContent)).toEqual(['5 câu sẽ chiếu', '2 câu Đúng–sai', '3 câu có tính toán', '1 câu khó', '2 câu lớp sai từ 30%'])
     expect(screen.getByText('Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Gọi em đã tự làm đúng; nếu chưa có, chọn em dự kiến làm được.')).toBeTruthy()
     expect(g.goi.mock.calls.filter(([dd]) => dd === '/gv/ai-sai-nhieu-cau')).toHaveLength(1)
 

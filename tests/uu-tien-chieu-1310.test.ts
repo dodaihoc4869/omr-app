@@ -41,3 +41,33 @@ it('Kiểm tra đầu giờ giữ người gọi và cầu ghi cũ; Dạy học 
  const chung=await dungToChieuDayHoc([c],old,'Dạy học','buoi',false,['new'])
  expect(chung.o.size).toBe(0);expect(chung.html).toContain('Chất nào là ester?');expect(chung.html).toContain('Cả lớp')
 })
+it('21/10: máy thầy thêm em chưa có số đo (bảng em) vào từng câu, gắn số lần sai + sổ lên bảng; chữa câu gọi em ĐÃ SAI, kèm em giảng lại', async () => {
+ api.mockResolvedValue({ok:true,du:{cau:{q1:[{sbd:'A',ten:'An',loai:'da_dung',p:0.9,luc:'x'}]},soSai:{q1:{B:2}},em:{A:{ten:'An',soLan14:1,lanCuoiLenBang:null},B:{ten:'Bình',soLan14:0,lanCuoiLenBang:null}}}})
+ const { napEmChieu, chonEmChieu } = await import('../src/lib/ung-vien-chieu')
+ const nap = (await napEmChieu(['q1'], ['A', 'B']))!
+ expect(nap.ds.get('q1')!.map((e) => [e.sbd, e.loai, e.soSai, e.soLan14])).toEqual([['A', 'da_dung', 0, 1], ['B', 'chua_co', 2, 0]])
+ const c = chonEmChieu(nap, ['q1'], undefined, { capChua: true, hatGiong: 'c' }).get('q1')![0]!
+ expect(c.sbd).toBe('B'); expect(c.giangLai?.sbd).toBe('A')
+ // tải một lần, chọn lại không gọi mạng
+ api.mockClear(); chonEmChieu(nap, ['q1'], undefined, { hatGiong: 'k' }); expect(api).not.toHaveBeenCalled()
+})
+it('21/10: tờ chiếu KHÔNG bao giờ ghi tầng; em giữ (coDinh) theo thứ tự khác vẫn ra đúng em đã hiện ở xem trước', async () => {
+ const c:CauDayHoc={khoa:'k',qid:'DH-12-C1-B1-I-1',phan:'I',q:{id:'k',text:'Chất nào là ester?',choices:['A','B','C','D'],correct:'B',chuyenDe:'Ester'} as CauDayHoc['q'],maDe:'DH-12-C1-B1',tenDe:'Ester',chuyenDe:'Ester',maDang:null,tenDang:null,mucDo:'biet',tuLuan:false}
+ const em=['a','b','c','d','e','f'].map((s,i)=>({sbd:s,ten:`Em ${s}`,loai:'du_bao',p:0.1+i*0.15}))
+ api.mockResolvedValue({ok:true,du:{cau:{[c.qid]:em}}})
+ const day=await dungToChieuDayHoc([c],new Map(),'Dạy học','buoi',false,em.map(e=>e.sbd))
+ const e0=[...day.emGoi.values()][0]!
+ expect(e0.tang).toBeTruthy();expect(e0.lyDo).toMatch(/Cần kèm|Trung bình|Khá/)
+ // ("Trung bình"/"Khá" có sẵn trong bảng mức L1–L4 của tờ — không phải tầng) ⇒ dò chữ riêng của tầng và dòng lý do.
+ expect(day.html).not.toMatch(/Cần kèm|lên bảng 14 ngày|ngày chưa lên bảng|Câu dễ →|Câu khó →/)
+ expect(day.html).not.toContain(e0.lyDo!)
+ for(const t of [1,2,3] as const)expect(JSON.stringify(nhanEmChieu({...e0,tang:t,lyDo:'Câu dễ → em Cần kèm'}))).not.toMatch(/Cần kèm|Trung bình|Khá/)
+ // xem trước theo thứ tự A, tờ chiếu theo thứ tự B + coDinh ⇒ cùng em từng câu
+ const { napEmChieu, chonEmChieu } = await import('../src/lib/ung-vien-chieu')
+ const q=['q1','q2','q3','q4','q5','q6']
+ api.mockResolvedValue({ok:true,du:{cau:Object.fromEntries(q.map(x=>[x,em]))}})
+ const nap=(await napEmChieu(q,em.map(e=>e.sbd)))!
+ const xem=chonEmChieu(nap,q,undefined,{hatGiong:'h'}),coDinh=new Map([...xem].map(([k,l])=>[k,l[0]!.sbd]))
+ const chieu=chonEmChieu(nap,[...q].reverse(),undefined,{hatGiong:'h',coDinh})
+ for(const x of q)expect(chieu.get(x)![0]!.sbd).toBe(xem.get(x)![0]!.sbd)
+})

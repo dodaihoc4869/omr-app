@@ -43,7 +43,7 @@ import {
   type PhanCau,
 } from '../../lib/thay-tu-chua'
 import { docCoMatHomNay, laySaiNhieuCau, ngayVnCua, xepUngVien, type KetQuaSai } from '../../lib/ung-vien-chua-cau'
-import { layEmChieu,nhanEmChieu,type EmChieu } from '../../lib/ung-vien-chieu'
+import { chonEmChieu,napEmChieu,nhanEmChieu,type EmChieu,type NapEmChieu } from '../../lib/ung-vien-chieu'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { useAppStore } from '../../store/appStore'
 import { ghiMotO, thayChuaQuaMayChu, useGhiToChieu } from './ghi-to-chieu'
@@ -364,8 +364,10 @@ export default function ThayTuChua() {
     (u: TrangThaiUv) => (u.trang === 'co' ? xepUngVien(xep.map((c) => c.qid), u.kq.cau, coMat ?? null) : null),
     [xep, coMat],
   )
-  const [duGoi,setDuGoi]=useState<{khoa:string;map:Map<string,EmChieu[]>}|null>(null)
-  useEffect(()=>{let huy=false;if(khoaTk&&sbdLop)void layEmChieu(qidKey.split('|'),sbdLop,coMat,undefined,undefined,{kenh:'tu-chua'}).then(map=>{if(!huy)setDuGoi({khoa:khoaTk,map})}).catch(()=>{if(!huy)setDuGoi({khoa:khoaTk,map:new Map()})});return()=>{huy=true}},[khoaTk,sbdLop,qidKey,coMat])
+  // Tải ứng viên MỘT lần theo (lớp · bộ câu); chọn em chạy trên máy theo ĐÚNG thứ tự đang hiện ⇒ xem trước và tờ chiếu cùng một em mỗi câu.
+  const [napGoi,setNapGoi]=useState<{khoa:string;nap:NapEmChieu|null}|null>(null)
+  useEffect(()=>{let huy=false;if(khoaTk&&sbdLop)void napEmChieu(qidKey.split('|'),sbdLop,coMat).then(nap=>{if(!huy)setNapGoi({khoa:khoaTk,nap})}).catch(()=>{if(!huy)setNapGoi({khoa:khoaTk,nap:null})});return()=>{huy=true}},[khoaTk,sbdLop,qidKey,coMat])
+  const duGoi=useMemo<{khoa:string;map:Map<string,EmChieu[]>}|null>(()=>napGoi?{khoa:napGoi.khoa,map:napGoi.nap?chonEmChieu(napGoi.nap,xep.map(c=>c.qid),undefined,{kenh:'tu-chua'}):new Map()}:null,[napGoi,xep])
   const dongXem: DongXem[] = useMemo(
     () =>
       xep.map((c) => {
@@ -424,6 +426,7 @@ export default function ThayTuChua() {
         ungVien: theoCau,
         soLop,
         sbdLop:sbdLop??[],coMat,
+        ...(napGoi?.khoa===khoaTk&&napGoi.nap&&duGoi?{napEm:napGoi.nap,coDinh:new Map([...duGoi.map].flatMap(([q,l])=>l[0]?[[q,l[0].sbd] as const]:[]))}:{}),
       })
       const bo = chuBoCauKhacKhoi(kq.soBoKhoi)
       if (kq.soBoKhoi >= xep.length) {

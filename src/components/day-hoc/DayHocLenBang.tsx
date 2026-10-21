@@ -258,18 +258,10 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
 
   const chieuLenBang = async () => {
     if (!coMat.length || !cauChieu.length) return
-    setDangChieu(true)
-    const sh = await napSucHoc()
-    const kq = xepEmChoDanhSach(cauChieu.map(cauChon), coMat, sh)
-    const moi: NhoBuoi['giao'] = {}
-    cauChieu.forEach((c, i) => {
-      const k = kq[i]
-      if (k) moi[c.khoa] = { sbd: k.sbd, hoTen: k.hoTen, xacSuat: k.xacSuat, uocLuong: k.uocLuong, lyDo: k.lyDo, boQua: [] }
-    })
-    setGiao(moi)
+    // 21/10: một lượt mạng — bộ chọn phân tầng trong `moTo` chọn em cho cả tờ (bỏ vòng đọc sức học + chọn kiểu cũ chạy trước rồi bị thay).
     const luot = luotRut + 1
     setLuotRut(luot)
-    await moTo(true, moi, { luot, giu: false })
+    await moTo(true, {}, { luot, giu: false })
   }
 
   const doiCheDo = (v: CheDoChonEm) => {
@@ -280,6 +272,15 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
 
   const doiEm = async (c: CauDayHoc) => {
     const cu = giao[c.khoa]
+    if (html && cu) {
+      // Tờ đang mở: rút lại riêng câu này trong bộ chọn phân tầng (một lượt mạng), trừ các em đã bỏ qua; hết em ⇒ quay vòng, chỉ trừ em đang đứng.
+      let bo = [...new Set([...cu.boQua, cu.sbd])]
+      if (coMat.every((e) => bo.includes(e.sbd))) bo = [cu.sbd]
+      const moi = { ...giao, [c.khoa]: { ...cu, boQua: bo } }
+      setGiao(moi)
+      await moTo(true, moi, { doi: c.khoa })
+      return
+    }
     const sh = Object.keys(sucHoc).length ? sucHoc : await napSucHoc()
     const daGoi: Record<string, number> = {}
     for (const x of cauChieu) if (x.khoa !== c.khoa && giao[x.khoa]) daGoi[giao[x.khoa]!.sbd] = (daGoi[giao[x.khoa]!.sbd] ?? 0) + 1
@@ -297,8 +298,6 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
     }
     const moi = { ...giao, [c.khoa]: { sbd: k.sbd, hoTen: k.hoTen, xacSuat: k.xacSuat, uocLuong: k.uocLuong, lyDo: k.lyDo, boQua: [...boQua] } }
     setGiao(moi)
-    // Có tờ đang mở: bộ chọn phân tầng rút lại riêng câu này (trừ em đã bỏ qua), các câu khác giữ em.
-    if (html) await moTo(true, moi, { doi: c.khoa })
   }
 
   const ghiKq = async (c: CauDayHoc, dat: boolean) => {

@@ -151,19 +151,38 @@ export function xepEmPhanTang(cau: readonly CauCanGoi[], tuy: TuyChonChon = {}):
   const dungTang = new Map<Tang, number>([[1, 0], [2, 0], [3, 0]])
   const ra = new Map<string, KetQuaGoi>()
   let truoc = ''
+  const uvCua = (c: CauCanGoi) => { const bo = tuy.boQua?.get(c.qid); return c.ungVien.filter((e) => e.sbd && !bo?.has(e.sbd)) }
+  // Em GIỮ (coDinh) tính trước vào "mỗi em một lần" + hạn mức tầng cho CẢ lượt — câu đứng trước em giữ cũng không rút trùng em ấy.
+  const giuCua = new Map<string, { e: UngVienEm; t: Tang }>()
   for (const c of cau) {
-    const bo = tuy.boQua?.get(c.qid)
-    const uv = c.ungVien.filter((e) => e.sbd && !bo?.has(e.sbd))
-    if (!uv.length) continue
+    const s = tuy.coDinh?.get(c.qid)
+    if (!s) continue
+    const uv = uvCua(c), e = uv.find((x) => x.sbd === s)
+    if (!e) continue
+    const t = chiaTang(uv).get(e.sbd) ?? 2
+    giuCua.set(c.qid, { e, t })
+    daLen.set(e.sbd, (daLen.get(e.sbd) ?? 0) + 1)
+    dungTang.set(t, (dungTang.get(t) ?? 0) + 1)
+  }
+  cau.forEach((c, i) => {
+    const uv = uvCua(c)
+    if (!uv.length) return
     const tang = chiaTang(uv)
-    const giu = tuy.coDinh?.get(c.qid)
-    let chon: UngVienEm | undefined = giu ? uv.find((e) => e.sbd === giu) : undefined
-    if (chon) { /* giữ em thầy đã thấy */ } else if (cheDo === 'chac') chon = chonChac(uv, goiLuot)
+    const giu = giuCua.get(c.qid)
+    if (giu) {
+      goiLuot.set(giu.e.sbd, (goiLuot.get(giu.e.sbd) ?? 0) + 1)
+      truoc = giu.e.sbd
+      ra.set(c.qid, { qid: c.qid, sbd: giu.e.sbd, ten: giu.e.ten, tang: giu.t, lyDo: chuLyDo(c.bac, giu.t, giu.e, nowMs, cheDo, daLen.get(giu.e.sbd) ?? 1), lan: daLen.get(giu.e.sbd) ?? 1 })
+      return
+    }
+    const sau = giuCua.get(cau[i + 1]?.qid ?? '')?.e.sbd
+    let chon: UngVienEm | undefined
+    if (cheDo === 'chac') chon = chonChac(uv, goiLuot)
     else {
-      // Luật "mỗi em một lần": chỉ xét em có số lần lên ít nhất trong số ứng viên câu này; tránh em vừa lên câu liền trước nếu còn em khác.
+      // Luật "mỗi em một lần": chỉ xét em có số lần lên ít nhất trong số ứng viên câu này; tránh em ở câu liền trước / liền sau (em giữ) nếu còn em khác.
       const it = Math.min(...uv.map((e) => daLen.get(e.sbd) ?? 0))
       let du = uv.filter((e) => (daLen.get(e.sbd) ?? 0) === it)
-      if (du.length > 1) du = du.filter((e) => e.sbd !== truoc)
+      if (du.length > 1) { const k = du.filter((e) => e.sbd !== truoc && e.sbd !== sau); if (k.length) du = k }
       if (cheDo === 'ngau') chon = rutTrongSo(du, rng)
       else {
         const thuTu = THU_TU_TANG[c.bac]
@@ -172,7 +191,7 @@ export function xepEmPhanTang(cau: readonly CauCanGoi[], tuy: TuyChonChon = {}):
         if (t1) chon = rutTrongSo(coEm(t1), rng)
       }
     }
-    if (!chon) continue
+    if (!chon) return
     const t = tang.get(chon.sbd) ?? 2
     const lan = (daLen.get(chon.sbd) ?? 0) + 1
     daLen.set(chon.sbd, lan)
@@ -180,7 +199,7 @@ export function xepEmPhanTang(cau: readonly CauCanGoi[], tuy: TuyChonChon = {}):
     dungTang.set(t, (dungTang.get(t) ?? 0) + 1)
     truoc = chon.sbd
     ra.set(c.qid, { qid: c.qid, sbd: chon.sbd, ten: chon.ten, tang: t, lyDo: chuLyDo(c.bac, t, chon, nowMs, cheDo, lan), lan })
-  }
+  })
   return ra
 }
 
