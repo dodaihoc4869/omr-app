@@ -7,7 +7,9 @@ import { suaChenPhay, suaDoiDau } from '../src/lib/nhap-dap-so'
 
 const C = (o: Partial<CauLuyen>): CauLuyen =>
   ({ phan: 'I', id: 'x', maDe: 'X', chuyenDe: 'Este – lipit', dang: 'chua_ro', sao: 0, mucDo: 'hieu', text: 'Đề', luaChon: ['a', 'b', 'c', 'd'], dapAn: 'A', chot: 'c', lyDo: null, buoc: null, ketQua: '', ...o }) as CauLuyen
-const CAU = [C({ id: 'q1', phan: 'I', dapAn: 'C' }), C({ id: 'q3', phan: 'III', luaChon: null, dapAn: '12,5' })]
+// 21/10 (thầy: bảng nhập số ở mọi chỗ trả lời ngắn): câu có đáp số bàn phím số GÕ ĐƯỢC ("12,5") nay hiện BẢNG NHẬP SỐ (khoá ở tests/bang-nhap-so-2110.test.tsx).
+// Tệp này khoá Ô NHẬP TỰ DO + hai nút "−" "," — vẫn dùng cho câu bàn phím số không gõ được (số dài hơn 8 kí tự) và phiếu chưa có đáp án ⇒ câu mẫu dùng đáp án ấy.
+const CAU = [C({ id: 'q1', phan: 'I', dapAn: 'C' }), C({ id: 'q3', phan: 'III', luaChon: null, dapAn: '1.237.500.000' })]
 const TT: ThongTinPhieu = { hoTen: 'Đỗ Minh', sbd: '12121212', ngay: new Date(2026, 8, 19), tenChuyenDe: 'Este', ketQua: '', hienDapAn: true }
 const NOP = { ma: 'abcd1234ef', sbd: '12121212', url: 'https://may-chu.thu/exec' }
 
