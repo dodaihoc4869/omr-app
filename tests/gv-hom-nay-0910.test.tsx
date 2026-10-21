@@ -372,6 +372,23 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     expect(container.querySelector('.gvhn-the-ds[role="status"]')).toBeNull()
   })
 
+  it('(21/10 "không vào được") Nhịp học (lệnh nặng nhất) chỉ được hỏi SAU khi phần việc về xong — không chạy cùng lúc làm các lệnh nhẹ xếp hàng sau nó; quá 5 giây thì hỏi luôn', async () => {
+    m.danhSachCa.mockResolvedValue([ca('DH-12-C2-B6')])
+    mayChu()
+    const goc = m.goi.getMockImplementation()!
+    let mo: () => void = () => {}
+    const cho = new Promise<void>((r) => (mo = r))
+    m.goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
+      if (duong === '/gv/chien-dich' && b.action === 'bang') await cho // phần việc còn đang chờ bảng chiến dịch
+      return goc(duong, b)
+    })
+    render(<GvHomNayScreen />)
+    await screen.findByRole('region', { name: 'Việc cần thầy' })
+    await waitFor(() => expect(m.goi.mock.calls.some(([d, b]) => d === '/gv/chien-dich' && (b as { action?: string }).action === 'bang')).toBe(true))
+    expect(m.goi.mock.calls.filter(([d]) => d === '/gv/nhip-hoc')).toHaveLength(0) // phần việc chưa xong ⇒ chưa hỏi Nhịp học
+    mo()
+    await waitFor(() => expect(m.goi.mock.calls.filter(([d]) => d === '/gv/nhip-hoc')).toHaveLength(1)) // xong ⇒ hỏi đúng MỘT lần
+  })
   it('(21/10 "load chậm") bản lần trước vẽ NGAY (số + giờ cập nhật), máy chủ chưa trả lời; đọc mới xong thì thay; lỗi / quá 3 giờ thì không giữ', async () => {
     m.danhSachCa.mockResolvedValue([ca('DH-12-C2-B6')])
     mayChu()

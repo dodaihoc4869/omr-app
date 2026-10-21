@@ -3346,7 +3346,7 @@ const boXuLy = {
       // B2 (15/10): dựng lại bảng siêu dữ liệu câu tính sẵn cho tờ vừa lập chỉ mục (cau-meta.ts). Thường ngày không tờ nào lệch ⇒ một câu đọc nhẹ.
       await import('./cau-meta').then(m=>m.dongBoCauMeta(env,laGioCaoDiemVn(Date.now())?5:40)).catch(e=>console.error('[cau-meta] đồng bộ',e))
       // ĐO LẠI LƯỢT CŨ (21/10): lấp dần bảng kích thước đề từng câu (`cau_doc_giay`) — cao điểm chỉ 20 câu/phút, ngoài cao điểm 120; xong hết thì một câu đọc nhẹ.
-      await import('./cau-doc-giay').then(m=>m.dongBoCauDocGiay(env,laGioCaoDiemVn(Date.now())?20:250)).catch(e=>console.error('[cau-doc-giay] đồng bộ',e))
+      await import('./cau-doc-giay').then(m=>m.dongBoCauDocGiay(env,laGioCaoDiemVn(Date.now())?10:120)).catch(e=>console.error('[cau-doc-giay] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
       if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)
@@ -3782,7 +3782,7 @@ const boXuLy = {
       if (p === '/gv/ho-so-thai-do') return ra(await import('./bai-hang-ngay').then((m) => m.gvHoSoThaiDo(envDoc, b)))
       // NHỊP HỌC trên Hôm nay của thầy (thầy 12/10 duyệt bản vẽ, server/src/nhip-hoc.ts; hợp đồng nhip-hoc-kieu.ts): CHỈ ĐỌC — mọi em: ngày vào,
       // mức/đã làm từng ngày từ 01/10 (cùng phép tính Bài hằng ngày), cờ đối phó tính theo lô. MỘT lần gọi cho cả màn.
-      if (p === '/gv/nhip-hoc') return ra(await import('./nhip-hoc').then((m) => m.gvNhipHoc(envDoc, b)))
+      if (p === '/gv/nhip-hoc') return ra(await import('./nhip-hoc').then((m) => m.gvNhipHocCoDem(envDoc, b)))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
       if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
       // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.
