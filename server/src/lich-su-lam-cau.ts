@@ -4,7 +4,7 @@
 // `POST /gv/lich-su-lam-cau {sbd, gioiHan?}` — LỆNH THẦY, CHỈ ĐỌC (sau cổng `laThay`, chạy trên `envDoc`). Không ghi gì.
 //   · Đọc sổ `su_kien_hoc` của MỘT em (lọc `sbd` ⇒ chỉ mục `idx_skh_em_ngay`), mọi nguồn, tối đa 5000 lượt gần nhất (`catBot` khi vượt);
 //     bỏ sự kiện "đọc lời giải" (`purpose = 'xem_loi_giai'`) và sự kiện còn giấu (`visibility = 'embargoed'`). D1 cũ thiếu cột chuẩn ⇒ lùi câu cột gốc.
-//   · `lan`: `gioiHan` lượt mới nhất (mặc định 1000, trần 2000). `tong` + `cauSai` tính trên MỌI lượt đã đọc.
+//   · `lan`: `gioiHan` lượt mới nhất (mặc định 1000, trần 5000 = đúng cửa sổ đọc). `tong` + `cauSai` tính trên MỌI lượt đã đọc.
 //   · SỐ GIÂY (không bịa): cột `giay` (> 0) ⇒ `raw_json.ms` (> 0, làm tròn, ≥ 1) ⇒ 'do'; ca thi còn thiếu ⇒ `chi_tiet_cau.giay` ⇒ 'do';
 //     game còn thiếu ⇒ ƯỚC TÍNH từ mốc trả lời (`giayUocTinhGame`, ai-sai-cau.ts) ⇒ 'uoc'; còn lại null.
 //   · ĐÁP ÁN CHỌN (như `gvHoSoLenBang`): `raw_json.chon`/`traLoi` ⇒ `game_v2_attempt` (`traLoiGoc`/`traLoi`) ⇒ `chi_tiet_cau.dap_an_chon` (ca thi).
@@ -21,7 +21,9 @@ import type { CauEmSai, LanLamCau, NguonGiay, TraLoiLichSuLamCau } from './lich-
 import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame, noiCuaCa } from './ai-sai-cau'
 import { loaiGameCua } from './dau-gio'
 import { tachSongSinh } from './loi-hoc-luat'
-import { docCauKho, tenCuaDang } from './omni-d1'
+import { docBetaCau, docCauKho, tenCuaDang } from './omni-d1'
+import { tongMucLam, type MucLamLuot } from './muc-lam'
+import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong, type DoMucLuot } from './muc-lam-so'
 import { tenLopCuaEm } from './ten-lop'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
@@ -32,7 +34,8 @@ const str = (x: unknown): string => (x === null || x === undefined ? '' : String
 /** Số lượt gần nhất máy chủ đọc tối đa cho một em (vượt ⇒ `catBot`). */
 export const TOI_DA_LUOT_DOC_LICH_SU = 5000
 export const GIOI_HAN_LAN_MAC_DINH = 1000
-export const TRAN_GIOI_HAN_LAN = 2000
+// Trần = đúng cửa sổ đọc (21/10, số đo thật: 267 em, 108 em vượt 1000 dòng, 3 em vượt 2000, nhiều nhất 2544 ⇒ trần cũ 2000 giấu lượt cũ nhất của 3 em). Mặc định VẪN 1000: đường mở tấm không nặng thêm.
+export const TRAN_GIOI_HAN_LAN = TOI_DA_LUOT_DOC_LICH_SU
 
 async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | null> {
   try {
@@ -42,16 +45,7 @@ async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | n
   }
 }
 
-/** Mức độ theo hợp đồng: 'biet' | 'hieu' | 'VD' | 'VDC' | ''. Nhận cả cách viết có dấu / viết tắt / `van_dung`. */
-export function chuanMucDo(v: unknown): string {
-  const k = str(v).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/[_\s]+/g, ' ').trim()
-  if (!k) return ''
-  if (k === 'biet' || k === 'nhan biet' || k === 'nb') return 'biet'
-  if (k === 'hieu' || k === 'thong hieu' || k === 'th') return 'hieu'
-  if (k === 'vdc' || k === 'van dung cao') return 'VDC'
-  if (k === 'vd' || k === 'van dung') return 'VD'
-  return ''
-}
+export { chuanMucDo } // nơi gốc: muc-lam-so.ts (cùng bộ chuẩn hoá cho Lịch sử làm câu, "Ai đã sai?", hồ sơ em lên bảng)
 
 /** Tiêu đề câu: "Câu 25 · <tên dạng>" (số câu theo mã `<mã tờ>-<phần>-<số>` của câu gốc); mã khác quy ước ⇒ chỉ tên dạng; không tên dạng ⇒ ''. */
 export function tieuDeCau(qid: string, tenDang: string): string {
@@ -106,6 +100,8 @@ interface Dong {
   giayCot: unknown
   raw: Row | null
   tenCa: string
+  /** Kích thước đề + đồng hồ MỚI của lượt (`raw_json.doc` với `dh = 1`); null ⇒ lượt chưa có số đo để xếp Mức làm. */
+  doMuc: DoMucLuot | null
 }
 
 /** AI ĐỌC SỔ (12/10F — học sinh xem hồ sơ của chính mình): 'thay' = lệnh thầy, như trước; 'hoc-sinh' = lệnh em (`/hs/lich-su-lam-cau`,
@@ -176,6 +172,7 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
       giayCot: x.giay,
       raw,
       tenCa: str(x.ten_ca),
+      doMuc: docDoMuc(raw),
     }
   })
   // Mới trước theo `luc` (sắp ổn định — phòng dòng có ngày VN lệch giờ).
@@ -189,7 +186,9 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   const idGameCanChon = [...new Set(game.filter((d) => chonTuGiaTri(d.raw?.chon ?? d.raw?.traLoi) === null).map((d) => d.attemptId || `${d.maNguon}|${d.qid}`))]
   const caThi = [...new Set(dong.filter((d) => d.nguon === 'thi').map((d) => d.maNguon))]
   type KhoGon = { tenDang: string | null; mucDo: string | null }
-  const [kho, loai, rAtt, uoc, ct] = await Promise.all([
+  // Mức làm 1–4: CHỈ lượt có số đo mới (đồng hồ mới + kích thước đề) cần β của câu ⇒ tập này nhỏ (0 lượt trước khi máy em nạp bản mới); đọc CÙNG đợt với các khối dưới (0 vòng chờ nối tiếp thêm).
+  const gocMuc = gocCanBeta(dong.map((d, i) => ({ doMuc: d.doMuc, giayDo: doThat[i] ?? null, goc: d.goc })))
+  const [kho, loai, rAtt, uoc, ct, beta] = await Promise.all([
     docCauKho(env, goc).catch(() => new Map<string, KhoGon>()) as Promise<Map<string, KhoGon>>,
     loaiGameCua(env, game.map((d) => d.maNguon)).catch(() => new Map<string, 'doan' | 'bia' | 'dao'>()),
     idGameCanChon.length
@@ -197,6 +196,7 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
       : Promise.resolve([] as Row[]),
     giayUocTinhGame(env, gameThieuGiay).catch(() => new Map<string, number>()),
     chiTietCauCuaLuot(env, caThi, [sbd]).catch(() => new Map<string, { chon: string | null; giay: number | null }>()),
+    gocMuc.length ? docBetaCau(env, gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
   ])
   const traLoiGame = new Map((rAtt ?? []).map((x) => [str(x.id), chonTuGiaTri(x.tra_loi)]))
   // Tên dạng: kho trước; câu không có trong kho (vd câu ca kiểm tra) ⇒ mã dạng của sổ (một truy vấn, đệm) — không có tên thì để rỗng (không lộ mã).
@@ -210,6 +210,11 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
     const k = `${d.maNguon}|${sbd}|${d.qid}`
     return ct.get(`${k}|${d.lanThu}`) ?? ct.get(`${k}|*`)
   }
+  // Mức làm của từng lượt (thuần, muc-lam.ts). Thời gian thường CHỈ khi β thật (τ của OMNI chưa nối ⇒ τ = 0, hệ số đọc 1,0 — đặc tả mục 3). Bản học sinh/phụ huynh: lượt ĐÚNG ở Mức 1–2 không mang mức
+  // (chỉ số giây) và KHÔNG tính vào tổng — tổng khớp đúng những gì em thấy.
+  const mucTho: (MucLamLuot | null)[] = dong.map((d, i) =>
+    mucLamTuDong({ doMuc: d.doMuc, giayDo: doThat[i] ?? null, goc: d.goc, mucDo: d.mucDo, dung: d.ketQua === null ? null : d.ketQua === 1 }, beta))
+  const anMuc = (i: number): boolean => nguoiDoc === 'hoc-sinh' && !!mucTho[i] && dong[i]!.ketQua === 1 && mucTho[i]!.ma <= 2
   const tatCa: LanLamCau[] = dong.map((d, i) => {
     let giay: number | null = doThat[i] ?? null
     let nguonGiay: NguonGiay = giay === null ? null : 'do'
@@ -236,6 +241,7 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
       giay,
       nguonGiay,
       coGoiY: d.coGoiY,
+      ...(mucTho[i] && !anMuc(i) ? { mucLam: mucTho[i]! } : {}),
     }
   })
 
@@ -275,6 +281,8 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
       giayTb: coGiay.length ? Math.round(tongGiay / coGiay.length) : null,
       tongGiay,
     },
+    // Gộp Mức làm trên đúng tập lượt được xem — trường riêng ngang hàng `tong` (hình dạng `tong` được test ghim, không đụng).
+    mucLam: tongMucLam(tatCa.filter((_, i) => !anMuc(i))),
     lan: tatCa.slice(0, gioiHan),
     cauSai,
     conNua: tatCa.length > gioiHan,

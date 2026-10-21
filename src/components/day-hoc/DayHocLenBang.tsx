@@ -199,7 +199,9 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   const [sucHoc, setSucHoc] = useState<Record<string, SucHocEm>>({})
   // Nút "Thầy chữa" trên tờ (thầy 05/10): nhãn "Thầy đã chữa" + mốc dạy lại, nguồn day_hoc theo buổi.
   const thayChuaO = useCallback((o: { sbd: string; qid: string }) => thayChuaQuaMayChu(o, 'day_hoc', idBuoi || 'day-hoc'), [idBuoi])
-  const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `day-hoc|${idBuoi}` : '', undefined, thayChuaO)
+  // Nút X, hai thẻ (thầy 21/10): em của lớp buổi này + em đã điểm danh (chưa tải danh sách lớp ⇒ một thẻ cả lớp như cũ).
+  const lopAiSai = useCallback(() => (tt?.lopEm?.length ? { sbdLop: tt.lopEm.map((e) => e.sbd), coMat: coMat.length ? new Set(coMat.map((e) => e.sbd)) : null } : null), [tt?.lopEm, coMat])
+  const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `day-hoc|${idBuoi}` : '', undefined, thayChuaO, undefined, lopAiSai)
 
   const [xemLoiGiai, setXemLoiGiai] = useState<Set<string>>(new Set())
 

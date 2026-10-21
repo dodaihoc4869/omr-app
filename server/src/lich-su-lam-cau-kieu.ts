@@ -3,6 +3,10 @@
 // Lệnh thầy `POST /gv/lich-su-lam-cau {sbd, gioiHan?}` — CHỈ ĐỌC sổ `su_kien_hoc` (mọi nguồn: ca thi, Đảo, Đoàn, Bi-a, Lên bảng,
 // Đầu giờ, Ôn lại, BTVN…), bỏ sự kiện "đọc lời giải" và sự kiện còn giấu (`visibility = 'embargoed'`). Chỉ thầy (mã bí mật).
 // Dùng chung cho máy chủ (`server/src/lich-su-lam-cau.ts`) và app thầy (`src/lib/lich-su-lam-cau-api.ts`).
+// 21/10: THÊM (chỉ-thêm, trường tuỳ chọn) `mucLam` từng lượt + `tong.mucLam` — Mức làm 1–4 (server/src/muc-lam.ts, docs/dac-ta-muc-lam-bai-2010.md).
+import type { MucLamLuot, TongMucLam } from './muc-lam'
+
+export type { MucLamLuot, TongMucLam }
 
 /** Nguồn đo số giây: `do` = đo thật (cột `giay` của sổ, hoặc `raw_json.ms` máy em gửi); `uoc` = ƯỚC TÍNH (lượt game cũ,
  *  khoảng cách từ lần trả lời trước); `null` = không đo được (không đoán). */
@@ -30,6 +34,8 @@ export interface LanLamCau {
   nguonGiay: NguonGiay
   /** Em đã dùng gợi ý / được hỗ trợ ở lần này. */
   coGoiY: boolean
+  /** Mức làm 1–4 của lượt. VẮNG ⇒ "Chưa có số đo" (giây cũ / chưa đo / thiếu kích thước đề; bản học sinh/phụ huynh: cả lượt ĐÚNG ở Mức 1–2 — chỉ hiện số giây). */
+  mucLam?: MucLamLuot
 }
 
 /** Một câu em từng làm SAI (ít nhất một lần). */
@@ -70,8 +76,10 @@ export interface KetQuaLichSuLamCau {
   ok: true
   em: { sbd: string; hoTen: string; lop: string }
   tong: TongLichSuLamCau
-  /** Mới trước; tối đa `gioiHan` (mặc định 1000, trần 2000). */
+  /** Mới trước; tối đa `gioiHan` (mặc định 1000, trần 5000). */
   lan: LanLamCau[]
+  /** Gộp Mức làm 1–4 trên đúng tập lượt được xem (cùng cửa sổ với `tong`; bản học sinh/phụ huynh bỏ lượt đúng ở Mức 1–2). Máy chủ cũ: vắng. */
+  mucLam?: TongMucLam
   /** Câu từng sai: CHƯA đúng lại trước, rồi nhiều lần sai trước, rồi gần đây trước. */
   cauSai: CauEmSai[]
   /** Còn lượt cũ hơn chưa trả trong `lan` (vượt `gioiHan`). */

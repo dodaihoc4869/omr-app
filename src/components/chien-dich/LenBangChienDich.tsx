@@ -252,7 +252,9 @@ export default function LenBangChienDich({ chienDichId, chiChua = false }: { chi
     },
     [bang, buoi],
   )
-  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId, undefined, thayChuaO, aiSaiQids)
+  // Nút X, hai thẻ (thầy 21/10): lớp = em của chiến dịch; đã điểm danh = SBD máy chủ xác nhận có mặt (chưa chốt ⇒ thẻ báo "chưa điểm danh").
+  const lopAiSai = useCallback(() => (bang?.em.length ? { sbdLop: bang.em.map((e) => e.sbd), coMat: coMat?.length ? new Set(coMat) : null } : null), [bang, coMat])
+  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId, undefined, thayChuaO, aiSaiQids, lopAiSai)
   const moChieu = async (dsO: OChieu[], tenBuoi: string): Promise<boolean> => {
     if (!dsO.length) {
       showToast('Chưa có câu nào để chiếu lên bảng', 'warn')

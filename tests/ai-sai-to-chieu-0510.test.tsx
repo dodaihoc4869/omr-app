@@ -46,6 +46,8 @@ describe('tờ dựng: nút X', () => {
   })
 })
 
+/** Mỗi làn: "đầu làn|thẻ tên·giây thẻ tên·giây…" (nối chuỗi, không khoảng trắng) — để so sánh gọn. */
+const chuLan = (panel: Element) => [...panel.querySelectorAll('.mc-ln')].map((l) => `${l.querySelector('header')!.textContent}|${[...l.querySelectorAll('.mc-pl')].map((p) => p.textContent).join(' ')}`)
 function moTo(tuy: Parameters<typeof taoHtmlMayChieu>[1] = { cauNoi: { maPhien: MA } }) {
   const cha = new JSDOM('<!doctype html><body></body>', { url: `${GOC}/` }).window as unknown as Window & { postMessage: (m: unknown, o?: string) => void }
   const gui: Record<string, unknown>[] = []
@@ -89,20 +91,14 @@ describe('tờ chạy thật — nút X', () => {
         { sbd: 'S2', ten: 'Lê Bình', luc: '2026-10-01T02:06:00Z', noi: 'Ca Kiểm tra tuần 3', giay: null },
       ],
     })
-    // 4 ô số: em · lượt · trung bình (có ước tính ⇒ "≈") · nơi sai nhiều nhất
-    // (40 + 95) / 2 = 67,5 ⇒ 68 giây
-    expect([...panel.querySelectorAll('.mc-sai-o b')].map((b) => b.textContent)).toEqual(['2', '3', '≈ 1 phút 8 giây', 'Ca kiểm tra'] /* 12/10: nhóm "Ca" hiện đủ tên */)
-    // thanh theo nơi: "Ca Kiểm tra tuần 3" gộp vào nhóm "Ca"; xếp nhiều trước
-    expect([...panel.querySelectorAll('.mc-sai-thanh')].map((x) => [x.querySelector('span')!.textContent, x.querySelector('em')!.textContent])).toEqual([['Ca kiểm tra', '2'], ['Lên bảng', '1']]) /* 12/10: tên nhóm hiện đủ */
-    // cột theo ngày, tăng dần
-    expect([...panel.querySelectorAll('.mc-sai-ngay span')].map((x) => x.textContent)).toEqual(['01/10', '03/10'])
-    // thẻ từng em: em sai nhiều trước; dòng tên có trung bình giây của em (chỉ lượt có số giây; có ước tính ⇒ "≈") — thầy 09/10;
-    // mỗi lượt một chip giờ (VN) · nơi · thời gian (ước tính có "≈"); không đo được ⇒ "chưa đo giờ" (không bỏ trống)
-    const em = [...panel.querySelectorAll('.mc-sai-em')]
-    expect(em.map((x) => x.querySelector('.mc-sai-ten')!.textContent)).toEqual(['Trần An2 lần sai · trung bình ≈ 1 phút 8 giây', 'Lê Bình1 lần sai'])
-    expect([...em[0]!.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual(['10:00 · 03/10 · Lên bảng · ≈ 40 giây', '09:05 · 01/10 · Ca Kiểm tra tuần 3 · 1 phút 35 giây'])
-    expect([...em[1]!.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual(['09:06 · 01/10 · Ca Kiểm tra tuần 3 · chưa đo giờ'])
-    expect(panel.textContent).toContain('thời gian ước tính')
+    // 21/10 (thầy: "hiển thị đầy đủ các mức 1 tới 4"): một thẻ khi app chưa nói lớp; lượt không có `mucLam` ⇒ làn "Chưa có số đo" (giữ số giây cũ, "≈" khi ước tính, "chưa đo giờ" khi không đo)
+    const the = panel.querySelector('.mc-ai-the')!
+    expect(panel.querySelectorAll('.mc-ai-the')).toHaveLength(1)
+    expect([...the.querySelectorAll('.mc-ai-so b')].map((b) => b.textContent)).toEqual(['2', '3']) // em · lượt
+    expect(the.querySelector('.mc-ln-chua header em')!.textContent).toBe('3 lượt')
+    expect([...the.querySelectorAll('.mc-ln-chua .mc-pl')].map((x) => x.textContent)).toEqual(['Trần An≈ 40 giây', 'Trần An95 giây', 'Lê Bìnhchưa đo giờ'])
+    expect(the.querySelector('.mc-pl')!.getAttribute('title')).toBe('10:00 · 03/10 · Lên bảng') // nơi + giờ VN nằm ở chú thích của thẻ tên
+    expect(panel.textContent).toContain('≈ là số giây ước tính') // chú thích chỉ khi có lượt ước tính
     t.phim('Escape')
     expect(panel.classList.contains('mc-mo')).toBe(false)
   })
@@ -120,15 +116,111 @@ describe('tờ chạy thật — nút X', () => {
       ],
     })
     const panel = t.doc.querySelector('.mc-aisai')!
-    const em = panel.querySelector('.mc-sai-em')!
-    // (18 + 64) / 2 = 41 — lượt "chưa đo giờ" không kéo trung bình
-    expect(em.querySelector('.mc-sai-ten small')!.textContent).toBe('3 lần sai · trung bình 41 giây')
-    expect([...em.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual([
-      '10:00 · 03/10 · Học theo kế hoạch · 18 giây' /* 12/10: tờ hiện tên nguồn mới (bỏ Đảo/Đoàn/Bi-a) */, '10:00 · 02/10 · Lên bảng · chưa đo giờ', '09:05 · 01/10 · Ca Kiểm tra tuần 3 · 1 phút 4 giây',
+    // không lượt nào có `mucLam` (lượt cũ) ⇒ ba lượt đều ở làn "Chưa có số đo"; số giây thật không "≈", "chưa đo giờ" cho lượt không đo; không chú thích ước tính
+    expect([...panel.querySelectorAll('.mc-ln-chua .mc-pl u')].map((x) => x.textContent)).toEqual(['18 giây', '64 giây', 'chưa đo giờ'])
+    expect(panel.textContent).not.toContain('≈')
+    expect(panel.querySelector('.mc-ai-chan')!.textContent).toContain('Mức làm có từ khi máy em dùng đồng hồ mới')
+  })
+  it('(thầy 21/10) Mức làm 1–4: làn theo mức với khoảng giây lấy từ ranh giới máy chủ gửi; thẻ tên + giây; thanh 4 mức; câu chưa đủ mẫu ⇒ không Mức làm 4', () => {
+    const t = moTo()
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
+    t.phim('x')
+    const m = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    const muc = (ma: number, giay: number, o: Record<string, unknown> = {}) => ({ ma, giay, giayDoc: 24, sanNghi: 6, ranh2: 24, ranh3: 30, ...o })
+    t.tuCha({
+      type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id, conNua: true,
+      ds: [
+        { sbd: 'S1', ten: 'Nguyễn Đức Anh', luc: '2026-10-26T11:48:00Z', noi: 'BTVN', giay: 9, mucLam: muc(1, 9) },
+        { sbd: 'S2', ten: 'Lê Thu Hà', luc: '2026-10-26T11:50:00Z', noi: 'BTVN', giay: 26, mucLam: muc(2, 26) },
+        { sbd: 'S3', ten: 'Vũ Minh Quân', luc: '2026-10-26T11:52:00Z', noi: 'BTVN', giay: 40, mucLam: muc(3, 40) },
+        { sbd: 'S4', ten: 'Đỗ Khánh Linh', luc: '2026-10-25T11:52:00Z', noi: 'Tự sửa lỗi', giay: 12, uocTinh: true },
+      ],
+    })
+    const panel = t.doc.querySelector('.mc-aisai')!
+    expect(chuLan(panel)).toEqual([
+      'Mức làm 1Chưa đọc hết đề · dưới 24 giây1 lượt|Nguyễn Đức Anh9 giây', // jsdom không đo bố cục ⇒ giữ tên đầy đủ; bản viết tắt nằm ở data-t
+      'Mức làm 2Đọc xong, chưa kịp nghĩ · 24–29 giây1 lượt|Lê Thu Hà26 giây',
+      'Mức làm 3Có nghĩ · từ 30 giây1 lượt|Vũ Minh Quân40 giây', // không ranh4 ⇒ Mức làm 3 mở tới hết thước
+      'Mức làm 4Lớp chưa đủ mẫu của câu này để xếp Mức làm 4|',
+      'Chưa có số đoLượt làm trước khi máy em dùng đồng hồ mới1 lượt|Đỗ Khánh Linh≈ 12 giây',
     ])
-    // số đo nổi bật (thẻ <u>), "chưa đo giờ" là chữ thường của chip — không thêm màu
-    expect([...em.querySelectorAll('.mc-sai-chip > span u')].map((x) => x.textContent)).toEqual(['18 giây', '1 phút 4 giây'])
-    expect(panel.textContent).not.toContain('thời gian ước tính')
+    expect(panel.querySelector('.mc-pl b')!.getAttribute('data-t')).toBe('Nguyễn Đ. Anh') // tên viết tắt chữ đệm khi thẻ hẹp
+    expect([...panel.querySelectorAll('.mc-ai-tn > i')].map((i) => [i.getAttribute('data-m'), i.textContent])).toEqual([['1', '1'], ['2', '1'], ['3', '1'], ['0', '1']])
+    expect(panel.querySelector('.mc-ai-thuoc')!.textContent).toBe('Đọc hết đề cần24 giâyNghĩ từ 30 giây')
+    const chan = panel.querySelector('.mc-ai-chan')!.textContent!
+    expect(chan).toContain('thời gian đọc hết đề (24 giây) và sàn nghĩ (6 giây)')
+    expect(chan).toContain('300 lượt gần nhất')
+    expect(chan).toContain('≈ là số giây ước tính')
+    // có ranh4 ⇒ Mức làm 3 có khoảng đóng, Mức làm 4 "từ N giây"
+    t.phim('x')
+    const m2 = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    t.tuCha({ type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m2[1]!.id, ds: [{ sbd: 'S9', ten: 'Em Chín', luc: '2026-10-26T11:48:00Z', noi: 'BTVN', giay: 70, mucLam: muc(4, 70, { ranh4: 60 }) }] })
+    expect(chuLan(t.doc.querySelector('.mc-aisai')!).slice(2)).toEqual(['Mức làm 3Có nghĩ · 30–59 giây', 'Mức làm 4Làm kỹ · từ 60 giây1 lượt|Em Chín70 giây'].map((x, i) => (i === 0 ? x + '|' : x)))
+  })
+  it('(thầy 21/10) hai mã gốc cùng một câu chiếu: lượt đầu thuộc mã chưa có β (không ranh4), lượt sau xếp Mức làm 4 ⇒ làn Mức làm 4 vẫn hiện TÊN em (không báo "chưa đủ mẫu")', () => {
+    const t = moTo()
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
+    t.phim('x')
+    const m = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    const muc = (ma: number, giay: number, o: Record<string, unknown> = {}) => ({ ma, giay, giayDoc: 24, sanNghi: 6, ranh2: 24, ranh3: 30, ...o })
+    t.tuCha({
+      type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id,
+      ds: [
+        { sbd: 'S1', ten: 'Nguyễn Đức Anh', luc: '2026-10-26T11:48:00Z', noi: 'BTVN', giay: 9, mucLam: muc(1, 9) },
+        { sbd: 'S2', ten: 'Lê Thu Hà', luc: '2026-10-26T11:50:00Z', noi: 'BTVN', giay: 70, mucLam: muc(4, 70, { ranh4: 60 }) },
+      ],
+    })
+    const lan = chuLan(t.doc.querySelector('.mc-aisai')!)
+    expect(lan.some((x) => x.startsWith('Mức làm 4') && x.includes('Lê Thu Hà70 giây'))).toBe(true)
+    expect(lan.some((x) => x.includes('chưa đủ mẫu'))).toBe(false)
+  })
+  it('(thầy 21/10) HAI THẺ: đã điểm danh (em có mặt) · cả lớp (mọi em của lớp, vắng đánh dấu vòng tròn rỗng) — số em / sĩ số, thanh 4 mức riêng từng thẻ', () => {
+    const t = moTo()
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
+    t.phim('x')
+    const m = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    const muc = (ma: number, giay: number) => ({ ma, giay, giayDoc: 24, sanNghi: 6, ranh2: 24, ranh3: 30, ranh4: 60 })
+    t.tuCha({
+      type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id,
+      lop: { soLop: 34, soCoMat: 28, coMat: ['S1', 'S2'] },
+      ds: [
+        { sbd: 'S1', ten: 'Nguyễn Đức Anh', luc: '2026-10-26T11:48:00Z', noi: 'BTVN', giay: 9, mucLam: muc(1, 9) },
+        { sbd: 'S2', ten: 'Lê Thu Hà', luc: '2026-10-26T11:50:00Z', noi: 'BTVN', giay: 66, mucLam: muc(4, 66) },
+        { sbd: 'S2', ten: 'Lê Thu Hà', luc: '2026-10-25T11:50:00Z', noi: 'BTVN', giay: 20, mucLam: muc(1, 20) },
+        { sbd: 'S7', ten: 'Vũ Minh Quân', luc: '2026-10-26T11:52:00Z', noi: 'BTVN', giay: 15, mucLam: muc(1, 15) },
+      ],
+    })
+    const panel = t.doc.querySelector('.mc-aisai')!
+    const the = [...panel.querySelectorAll('.mc-ai-the')]
+    expect(the.map((x) => x.getAttribute('data-k'))).toEqual(['dd', 'lop'])
+    expect(the.map((x) => [...x.querySelectorAll('.mc-ai-so p')].map((p) => p.textContent))).toEqual([
+      ['2/ 28 em có mặt làm sai', '3lượt sai'],
+      ['3/ 34 em của lớp làm sai', '4lượt sai'],
+    ])
+    expect(the[0]!.querySelector('.mc-ai-ky')!.textContent).toBe('ĐÃ ĐIỂM DANH')
+    expect(the[1]!.querySelector('.mc-ai-ky')!.textContent).toBe('CẢ LỚP')
+    expect(the[0]!.querySelectorAll('.mc-vg')).toHaveLength(0)
+    // thẻ cả lớp: em vắng (S7 không có trong coMat) có vòng tròn rỗng; em có mặt thì không
+    const vang = [...the[1]!.querySelectorAll('.mc-pl')].filter((x) => x.querySelector('.mc-vg')).map((x) => x.querySelector('b')!.textContent)
+    expect(vang).toEqual(['Vũ Minh Quân'])
+    expect(the[1]!.querySelector('.mc-ai-ph')!.textContent).toContain('em vắng buổi này')
+    expect([...the[0]!.querySelectorAll('.mc-ai-tn > i')].map((i) => [i.getAttribute('data-m'), i.textContent])).toEqual([['1', '2'], ['4', '1']])
+    expect([...the[1]!.querySelectorAll('.mc-ai-tn > i')].map((i) => [i.getAttribute('data-m'), i.textContent])).toEqual([['1', '3'], ['4', '1']])
+  })
+  it('(thầy 21/10) buổi chưa điểm danh: thẻ "Đã điểm danh" báo rõ (không để trống), thẻ cả lớp vẫn đủ; lớp trả về không có em sai ⇒ câu riêng của lớp', () => {
+    const t = moTo()
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
+    t.phim('x')
+    const m = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    t.tuCha({ type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id, lop: { soLop: 34, soCoMat: null, coMat: null }, ds: [{ sbd: 'S1', ten: 'Em Một', luc: '2026-10-26T11:48:00Z', noi: 'BTVN', giay: 9 }] })
+    const panel = t.doc.querySelector('.mc-aisai')!
+    expect(panel.querySelector('.mc-ai-the[data-k="dd"] .mc-ai-rong b')!.textContent).toBe('Buổi này chưa điểm danh')
+    expect(panel.querySelector('.mc-ai-the[data-k="lop"] .mc-ai-so b')!.textContent).toBe('1')
+    expect(panel.querySelectorAll('.mc-vg').length).toBe(0) // chưa điểm danh ⇒ không biết ai vắng ⇒ không đánh dấu vòng tròn
+    t.phim('x')
+    const m2 = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    t.tuCha({ type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m2[1]!.id, lop: { soLop: 34, soCoMat: 28, coMat: ['S1'] }, ds: [] })
+    expect(t.doc.querySelector('.mc-sai-tt')!.textContent).toBe('Chưa em nào của lớp làm sai câu này.')
   })
   it('phím x mở; app báo lỗi ⇒ nói chưa tải được; danh sách rỗng ⇒ "Chưa em nào làm sai câu này."', () => {
     const t = moTo()

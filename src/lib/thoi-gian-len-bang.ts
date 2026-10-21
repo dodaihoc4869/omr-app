@@ -132,6 +132,14 @@ export function noiDungTuCauGoc(phan: PhanCau, q: unknown): NoiDungCau {
   return { soTu, coHinh, soBuoc }
 }
 
+/**
+ * THỜI GIAN ĐỌC HẾT ĐỀ (giây, CHƯA làm tròn) = nền + 0,35 × số từ + 10 nếu có hình/bảng (`THOI_GIAN_LEN_BANG`). MỘT hàm cho thời gian lên bảng VÀ Mức làm bài
+ * (`server/src/muc-lam.ts`, đặc tả docs/dac-ta-muc-lam-bai-2010.md mục 3) — không chỗ nào chép lại ba hằng số này.
+ */
+export function thoiGianDoc(soTu: number, coHinh: boolean, tg: typeof TG = TG): number {
+  return tg.DOC_NEN_GIAY + tg.DOC_GIAY_MOI_TU * soTu + (coHinh ? tg.DOC_HINH_GIAY : 0)
+}
+
 /** THỜI GIAN MỘT EM LÊN BẢNG CHỮA MỘT CÂU. Xem đầu tệp và `THOI_GIAN_LEN_BANG`. */
 export function thoiGianCau(d: DauVaoThoiGian, ch: CauHinhLenBang = CAU_HINH_LEN_BANG_MAC_DINH, tg: typeof TG = TG): ThoiGianCau {
   if (!d.noiDung) {
@@ -142,7 +150,7 @@ export function thoiGianCau(d: DauVaoThoiGian, ch: CauHinhLenBang = CAU_HINH_LEN
   const lopSai = kep(d.tiLeLopSai ?? 0, 0, 1)
   const bac = d.bacEm ? tg.HE_SO_BAC[d.bacEm] : 1
 
-  const doc = tg.DOC_NEN_GIAY + tg.DOC_GIAY_MOI_TU * d.noiDung.soTu + (d.noiDung.coHinh ? tg.DOC_HINH_GIAY : 0)
+  const doc = thoiGianDoc(d.noiDung.soTu, d.noiDung.coHinh, tg)
   const lam = tg.LAM_NEN_GIAY[d.phan] * tg.HE_SO_SAO[sao] * (1 + tg.HE_SO_LOP_SAI * lopSai) * bac
   // Câu 0 sao ("đọc đáp án là đủ") chữa tối đa CHUA_BUOC_TOI_DA_SAO_0 bước: câu dễ không cần chữa 6 bước trên bảng.
   const tranBuoc = sao === 0 ? Math.min(tg.CHUA_BUOC_TOI_DA, tg.CHUA_BUOC_TOI_DA_SAO_0) : tg.CHUA_BUOC_TOI_DA

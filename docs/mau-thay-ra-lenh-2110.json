@@ -1,0 +1,45 @@
+{
+ "lenh": [
+  "21/10/2026 thầy: \"phần những ai làm sai hiển thị máy chiếu trên bảng khi tôi bấm làm lại có 2 thẻ … thiết kế lại phần đó siêu đẹp trực quan, khoa học, hiện thị đầy đủ các mức 1 tới 4 chi tiết rõ ràng\"",
+  "21/10/2026 thầy: \"Phần chi tiết học sinh đã gọi lên bảng cũng vậy thiết kế lại hiển thị đầy đủ mức 1 tới 4\"",
+  "20/10/2026 thầy duyệt dải xanh Mức làm 1→4 (rgb 65,83,112 · 87,114,151 · 110,148,195 · 134,182,239)"
+ ],
+ "ghiChu": "Thiết kế LẠI hai bảng của tờ chiếu (Ai đã sai? phím X · chi tiết em gọi lên bảng) ⇒ các khai báo màu của bản cũ không còn. `cu` = khai báo màu CŨ được phép biến mất (đúng tệp · khai báo → SỐ LẦN được giảm; giảm quá số này là vi phạm); `moi` = khai báo màu thô MỚI được phép có — CHỈ chín biến gốc của hai bảng, mọi màu khác trong hai bảng là var()/color-mix() từ chín biến này và từ biến tờ chiếu có sẵn. Thêm dòng mới ở đây phải có lệnh thầy kèm theo.",
+ "cu": {
+  "src/lib/len-bang-moi-to-chieu.ts · background: rgba(255,255,255,.08)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · color: rgb(27,26,23)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · border: 1px solid rgba(255,255,255,.1)": 2,
+  "src/lib/len-bang-moi-to-chieu.ts · background: rgb(230,103,103)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · box-shadow: 0 0 0 .3em rgba(230,103,103,.25)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · background: linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03))": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · border: 1px solid rgba(255,255,255,.12)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · background: var(--mc-sai-c,rgb(57,135,229))": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · color: rgba(255,255,255,.7)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · background: rgba(255,255,255,.05)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · color: rgba(255,255,255,.86)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · background: var(--mc-sai-c)": 2,
+  "src/lib/len-bang-moi-to-chieu.ts · border-bottom: 1px solid rgba(255,255,255,.18)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · background: linear-gradient(180deg,rgb(57,135,229),rgba(57,135,229,.55))": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · background: rgb(120,175,240)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · background: linear-gradient(140deg,rgba(255,210,122,.95),rgba(230,103,103,.9))": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · color: rgba(255,255,255,.92)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · color: rgba(255,255,255,.55)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · border-left: .35em solid var(--c,rgb(107,114,128))": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · --c: rgb(76,179,95)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · --c: rgb(229,83,75)": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-sai-c: rgb(230,103,103)\"><b>' + thuTu.length + '</b><span>em làm sai</span></div>'": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-sai-c: rgb(255,210,122)\"><b>' + ds.length + '</b><span>lượt làm sai' + (conNua ? ' (300 lượt gần nhất)' : '') + '</span></div>'": 1,
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-sai-c: rgb(57,135,229)\"><b>' + (tb == null ? '—' : (coUoc ? '≈ ' : '') + saiThoiLuong(tb)) + '</b><span>trung bình mỗi lượt</span></div>'": 1
+ },
+ "moi": [
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-b: rgb(255,255,255)",
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-nen: rgb(15,18,30)",
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-s: rgb(229,83,75)",
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-d: rgb(76,179,95)",
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-xam: rgb(120,126,142)",
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-m1: rgb(65,83,112)",
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-m2: rgb(87,114,151)",
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-m3: rgb(110,148,195)",
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-m4: rgb(134,182,239)"
+ ]
+}

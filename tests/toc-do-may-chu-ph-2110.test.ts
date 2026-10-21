@@ -90,27 +90,35 @@ async function kho() {
   await dongBoGoi7(k.env, NOW)
   const bo = boDemDot(k.env.DB)
   const env = { ...k.env, DB: bo.db } as Env
-  return { env, bo, token: await gameToken(k.env, 'S1'), pass: await parentPass(k.env, 'S1') }
+  return { env, bo, d: k.d, qids: b8, token: await gameToken(k.env, 'S1'), pass: await parentPass(k.env, 'S1') }
 }
 
-async function goiRaw(k: Awaited<ReturnType<typeof kho>>, duong: string, than: Record<string, unknown>) {
+async function goiRaw(k: Awaited<ReturnType<typeof kho>>, duong: string, than: Record<string, unknown>, tieuDe: Record<string, string> = {}) {
   if (process.env.IN_SQL_DOT) console.info(`>>> ${duong}`)
   const viecPhu: Promise<unknown>[] = []
   const ctx = { waitUntil: (p: Promise<unknown>) => { viecPhu.push(p) }, passThroughOnException() {} }
   return k.bo.chay(async () => {
-    const res = await worker.fetch(new Request(`https://test${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(than) }), k.env, ctx as never)
+    const res = await worker.fetch(new Request(`https://test${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', ...tieuDe }, body: JSON.stringify(than) }), k.env, ctx as never)
     return (await res.json()) as Record<string, unknown>
   }, viecPhu)
 }
 
 const MOC = path.resolve(__dirname, '../docs/moc-toc-do.json')
-const LENH_PH: [string, string][] = [
-  ['ph-tat-ca-ve-con', '/ph/tat-ca-ve-con'],
-  ['ph-hoc-2', '/ph/hoc-2'],
-  ['ph-con-tong-quan', '/ph/con-tong-quan'],
-  ['ph-loi-thay', '/ph/loi-thay'],
-  ['ph-nhip-hoc', '/ph/nhip-hoc'],
-  ['ph-xac-dinh', '/ph/xac-dinh'],
+type LenhDo = { ten: string; duong: string; than: (k: Awaited<ReturnType<typeof kho>>) => Record<string, unknown>; tieuDe?: Record<string, string> }
+const LENH_PH: LenhDo[] = [
+  { ten: 'ph-tat-ca-ve-con', duong: '/ph/tat-ca-ve-con', than: (k) => ({ pass: k.pass }) },
+  { ten: 'ph-hoc-2', duong: '/ph/hoc-2', than: (k) => ({ pass: k.pass }) },
+  { ten: 'ph-con-tong-quan', duong: '/ph/con-tong-quan', than: (k) => ({ pass: k.pass }) },
+  { ten: 'ph-loi-thay', duong: '/ph/loi-thay', than: (k) => ({ pass: k.pass }) },
+  { ten: 'ph-nhip-hoc', duong: '/ph/nhip-hoc', than: (k) => ({ pass: k.pass }) },
+  { ten: 'ph-xac-dinh', duong: '/ph/xac-dinh', than: (k) => ({ pass: k.pass }) },
+  // Lịch sử làm câu của tấm Hồ sơ làm bài (21/10, thêm Mức làm 1–4 từng lượt): ba cửa vào cùng một lõi — phụ huynh, học sinh, thầy.
+  { ten: 'ph-lich-su-lam-cau', duong: '/ph/lich-su-lam-cau', than: (k) => ({ pass: k.pass }) },
+  { ten: 'hs-lich-su-lam-cau', duong: '/hs/lich-su-lam-cau', than: (k) => ({ token: k.token }) },
+  { ten: 'gv-lich-su-lam-cau', duong: '/gv/lich-su-lam-cau', than: () => ({ sbd: 'S1' }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  // Tờ chiếu cho cả lớp (21/10, Mức làm 1–4 + hai thẻ đã điểm danh / cả lớp): "Ai đã sai?" (phím X) và bảng chi tiết em lên bảng.
+  { ten: 'gv-ai-sai-cau', duong: '/gv/ai-sai-cau', than: (k) => ({ qids: [k.qids[1]!], sbds: ['S1'] }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  { ten: 'gv-ho-so-len-bang', duong: '/gv/ho-so-len-bang', than: (k) => ({ sbd: 'S1', qid: k.qids[1]! }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
 ]
 
 it('lệnh mở app phụ huynh: số đợt chờ D1 không vượt mốc bản trước', async () => {
@@ -123,9 +131,16 @@ it('lệnh mở app phụ huynh: số đợt chờ D1 không vượt mốc bản
   await dem('answer', { session: s.id, qid: cau.qid, answer: cau.phan === 'I' ? 'A' : cau.phan === 'II' ? 'DSDD' : '4', assisted: false, msLam: 30_000 })
   vi.setSystemTime(NOW + 3_600_000)
 
+  // Em đã có 40 lượt đo bằng đồng hồ MỚI + kích thước đề (raw_json.doc, dh:1) — đúng loại dòng mà Mức làm 1–4 xếp được; trộn đúng/sai, nhiều khoảng giây.
+  const ghi = k.d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, raw_json) VALUES (?, 'S1', ?, 'game', 'sess-do', 1, ?, ?, ?, ?, ?)")
+  const GIAY = [3, 9, 14, 22, 27, 35, 41, 52, 66, 80]
+  for (let i = 0; i < 40; i++) {
+    const luc = new Date(NOW + 3_000_000 + i * 20_000).toISOString()
+    ghi.run(`do|${i}`, k.qids[i % k.qids.length]!, i % 3 === 0 ? 1 : 0, GIAY[i % GIAY.length]!, luc, luc.slice(0, 10), JSON.stringify({ doc: { t: 12 + (i % 7) * 9, h: i % 5 === 0 ? 1 : 0, p: 'I', dh: 1 } }))
+  }
   const do_: Record<string, { dot: number; lenh: number }> = {}
-  for (const [ten, duong] of LENH_PH) {
-    const r = await goiRaw(k, duong, { pass: k.pass })
+  for (const { ten, duong, than, tieuDe } of LENH_PH) {
+    const r = await goiRaw(k, duong, than(k), tieuDe)
     expect(r.kq.ok, `${ten}: ${JSON.stringify(r.kq).slice(0, 240)}`).toBe(true)
     do_[ten] = { dot: r.dot, lenh: r.lenh }
   }

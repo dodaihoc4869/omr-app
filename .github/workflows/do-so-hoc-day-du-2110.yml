@@ -1,0 +1,39 @@
+# ĐO SỔ HỌC CÓ ĐẦY ĐỦ KHÔNG (CHỈ ĐỌC) — thầy 21/10: "đồng bộ tất cả các câu học sinh đã làm hiển thị chi tiết lên hồ sơ làm bài của học sinh".
+# Hai câu hỏi, chỉ in SỐ ĐẾM GỘP (không mã em, không tên em, không mã câu — repo công khai, nhật ký chạy ai cũng đọc được):
+#   (1) Bao nhiêu em có từ 1000 / 2000 / 5000 dòng trong sổ `su_kien_hoc`? Tấm Hồ sơ làm bài hiện tối đa 2000 lượt gần nhất (đọc 5000) ⇒ biết trần ấy chặn bao nhiêu em.
+#   (2) Nguồn nào có hoạt động ở BẢNG CŨ trong 14 ngày mà CHƯA có dòng trong sổ? (game ⇄ `game_v2_attempt`, thi ⇄ `chi_tiet_cau`, lên bảng ⇄ `len_bang`) ⇒ biết có phải nạp lại sổ không.
+# Chạy trên PR (không cần gộp) hoặc bấm tay. Mỗi truy vấn tách riêng: một truy vấn lỗi không làm mất các truy vấn khác.
+name: Đo sổ học có đầy đủ không (chỉ đọc)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['.github/workflows/do-so-hoc-day-du-2110.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-so-day-du-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results // .' || echo "(truy vấn lỗi)"; }
+          q "1 sổ: số em · từ 1000 · từ 2000 · từ 5000 dòng · lớn nhất (bỏ dòng đọc lời giải và dòng còn giấu — như tấm Hồ sơ)" "SELECT COUNT(*) em, SUM(n>=1000) tu_1000, SUM(n>=2000) tu_2000, SUM(n>=5000) tu_5000, MAX(n) lon_nhat FROM (SELECT sbd, COUNT(*) n FROM su_kien_hoc WHERE COALESCE(purpose,'')<>'xem_loi_giai' AND COALESCE(visibility,'')<>'embargoed' GROUP BY sbd)"
+          q "2 sổ: tổng dòng theo nguồn (mọi thời gian) và theo 14 ngày" "SELECT nguon, COUNT(*) tong, SUM(ngay_vn >= date('now','+7 hours','-14 days')) trong_14_ngay FROM su_kien_hoc GROUP BY nguon ORDER BY tong DESC"
+          q "3 game: lượt tự làm 14 ngày ở bảng cũ · chưa có dòng trong sổ (không tính lượt có trợ giúp)" "SELECT COUNT(*) bang_cu, SUM(NOT EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.khoa = 'game|' || a.session || '|' || a.sbd || '|' || a.qid || '|1')) chua_vao_so FROM game_v2_attempt a WHERE a.created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days') AND COALESCE(json_extract(a.json,'\$.attempt.assisted'),0)=0"
+          q "4 lên bảng: dòng 14 ngày ở bảng cũ · chưa có dòng trong sổ" "SELECT COUNT(*) bang_cu, SUM(NOT EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.khoa = 'len_bang|lb|' || b.sbd || '|' || b.qid || '|' || b.id)) chua_vao_so FROM len_bang b WHERE b.luc >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days') AND b.qid IS NOT NULL AND b.qid <> ''"
+          q "5 thi: dòng chi tiết đã chấm 14 ngày ở bảng cũ · chưa có dòng trong sổ" "SELECT COUNT(*) bang_cu, SUM(NOT EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.khoa = 'thi|' || c.ma_ca || '|' || c.sbd || '|' || c.qid || '|' || c.lan_thu)) chua_vao_so FROM chi_tiet_cau c WHERE c.cap_nhat_luc >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days') AND c.qid <> '' AND c.dung_sai IS NOT NULL"
+          q "6 sổ: số em có dòng 14 ngày qua và số em có hoạt động game 14 ngày ở bảng cũ" "SELECT (SELECT COUNT(DISTINCT sbd) FROM su_kien_hoc WHERE ngay_vn >= date('now','+7 hours','-14 days')) em_trong_so, (SELECT COUNT(DISTINCT sbd) FROM game_v2_attempt WHERE created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days')) em_game_bang_cu"

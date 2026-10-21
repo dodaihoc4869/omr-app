@@ -56,7 +56,7 @@ export async function layHoSoThaiDoEm(token: string): Promise<KetQuaLenh<KetQuaH
   return kq ? { ok: true, du: kq } : thoat('khong_doc_duoc', 'Máy chủ trả hồ sơ không đúng dạng.')
 }
 
-/** Lịch sử làm câu (mọi lượt đã được xem kết quả · câu từng sai · số giây) của CHÍNH em. `gioiHan` như lệnh thầy (trần 2000). */
+/** Lịch sử làm câu (mọi lượt đã được xem kết quả · câu từng sai · số giây) của CHÍNH em. `gioiHan` như lệnh thầy (trần 5000). */
 export async function layLichSuLamCauEm(token: string, gioiHan?: number): Promise<KetQuaLenh<KetQuaLichSuLamCau>> {
   if (!token) return thoat('tu_choi', 'Em đăng nhập lại để xem hồ sơ làm bài.')
   const body: Record<string, unknown> = { token }

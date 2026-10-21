@@ -120,6 +120,8 @@ export default function CauCanChuaTrenLop({ gon = false, chonDau }: { gon?: bool
     },
     [tai],
   )
+  // Nút X, hai thẻ (thầy 21/10): em của lớp buổi này + em đã điểm danh (chưa tải danh sách lớp ⇒ một thẻ cả lớp như cũ).
+  const lopAiSai = useCallback(() => (dd.tt?.lopEm?.length ? { sbdLop: dd.tt.lopEm.map((e) => e.sbd), coMat: dd.coMat.length ? new Set(dd.coMat.map((e) => e.sbd)) : null } : null), [dd.tt?.lopEm, dd.coMat])
   const { moPhien, ganO, dongPhien } = useGhiToChieu(
     `chua-cuoi:${dd.idBuoi}`,
     async () => ({
@@ -127,6 +129,8 @@ export default function CauCanChuaTrenLop({ gon = false, chonDau }: { gon?: bool
       chu: 'Bước này chỉ ghi Thầy chữa; học sinh sẽ tự kiểm trên app.',
     }),
     thayChua,
+    undefined,
+    lopAiSai,
   )
   const chieu = async (nhom: NhomChuaTrenLop[]) => {
     setBan(true)

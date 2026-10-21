@@ -41,7 +41,7 @@ export const CSS_LEN_BANG_MOI = `
 :root{--mc-ll-nen:rgb(254 243 199);--mc-ll-vien:rgb(253 230 138);--mc-ll-nhan:rgb(120 53 15);--mc-ll-chu:var(--mc-chu,rgb(34 38 43));--mc-ll-chot:rgb(255 251 235);--mc-ll-chon:rgb(16 185 129 / .16);--mc-ll-dung:rgb(4 120 87);--mc-ll-sai:rgb(190 18 60)}
 :root[data-projector="dark"],:root[data-projector="matte-dark"]{--mc-ll-nen:rgb(58 42 20);--mc-ll-vien:rgb(120 53 15);--mc-ll-nhan:rgb(252 211 77);--mc-ll-chu:var(--mc-chu,rgb(244 239 228));--mc-ll-chot:rgb(43 33 24);--mc-ll-chon:rgb(52 211 153 / .18);--mc-ll-dung:rgb(110 231 183);--mc-ll-sai:rgb(253 164 175)}
 /* ═══ LÊN BẢNG — BẢN VẼ MỚI 28/09 ═══ */
-:root{--u:min(1vw,1.777778vh);--mc-den:rgb(0,0,0);--mc-vang-noi:rgb(255,210,122);--mc-thanh2:rgb(27,26,23)}
+:root{--u:min(1vw,1.777778vh);--mc-den:rgb(0,0,0);--mc-vang-noi:rgb(255,210,122);--mc-thanh2:rgb(27,26,23);--mc-b:rgb(255,255,255);--mc-nen:rgb(15,18,30);--mc-s:rgb(229,83,75);--mc-d:rgb(76,179,95);--mc-xam:rgb(120,126,142);--mc-m1:rgb(65,83,112);--mc-m2:rgb(87,114,151);--mc-m3:rgb(110,148,195);--mc-m4:rgb(134,182,239)}
 /* 1 · CHỮ CỐ ĐỊNH: đề = phương án = lời giải = --mc-co (không co, không bậc chữ) cho cả dạy học, đầu giờ và chiến dịch */
 body.mc-bc .mc-vung-de .mc-de,body.mc .mc-de{font-size:var(--mc-co,28px)!important;line-height:1.6!important}
 body.mc-bc .mc-vung-de .mc-pa,body.mc-bc .mc-vung-de .mc-pa-chu{font-size:var(--mc-co,28px)}
@@ -252,51 +252,74 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 /* 9 · BẢNG CHI TIẾT HỌC SINH (kính, trượt từ phải) */
 .mc-ct-mo{position:fixed;inset:0;z-index:80;background:rgba(10,12,18,.35);opacity:0;pointer-events:none;transition:opacity .3s}
 .mc-ct-mo.mc-mo{opacity:1;pointer-events:auto}
-.mc-ct{position:fixed;top:0;right:0;bottom:0;width:68%;z-index:81;transform:translateX(104%);transition:transform .45s cubic-bezier(.2,.9,.2,1);background:rgba(19,23,36,.9);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-left:1px solid rgba(255,255,255,.12);
+.mc-ct{position:fixed;top:0;right:0;bottom:0;width:88%;z-index:81;transform:translateX(104%);transition:transform .45s cubic-bezier(.2,.9,.2,1);background:rgba(19,23,36,.9);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-left:1px solid rgba(255,255,255,.12);
   color:rgb(238,241,248);font:500 max(12px,calc(var(--u)*.85))/1.4 var(--mc-sans);display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto 1fr auto;padding:calc(var(--u)*1) calc(var(--u)*1.3) calc(var(--u)*.6);gap:calc(var(--u)*.75);overflow:hidden}
 .mc-ct.mc-mo{transform:none}
-.mc-aisai{position:fixed;top:0;right:0;bottom:0;width:78%;z-index:81;transform:translateX(104%);transition:transform .5s cubic-bezier(.2,.9,.2,1);background:radial-gradient(120% 70% at 100% 0%,rgba(57,135,229,.22),transparent 60%),radial-gradient(90% 60% at 0% 100%,rgba(213,81,129,.16),transparent 60%),rgb(15,18,30);border-left:1px solid rgba(255,255,255,.14);color:rgb(255,255,255);font-family:var(--mc-sans);padding:calc(var(--u)*1.8) calc(var(--u)*2.2) calc(var(--u)*2.4);overflow-y:auto;box-sizing:border-box;box-shadow:-2em 0 4em rgba(0,0,0,.45)}
+/* ── X · AI ĐÃ SAI? (thầy 21/10): HAI THẺ — em ĐÃ ĐIỂM DANH làm sai · CẢ LỚP làm sai — mỗi thẻ chia theo Mức làm 1–4 (làn + thẻ tên + giây). Bản vẽ: docs/ban-ve-chieu-muc-lam-2110/. ── */
+.mc-aisai{position:fixed;top:0;right:0;bottom:0;width:94%;z-index:81;transform:translateX(104%);transition:transform .5s cubic-bezier(.2,.9,.2,1);background:radial-gradient(120% 70% at 100% 0%,rgba(57,135,229,.22),transparent 60%),radial-gradient(90% 60% at 0% 100%,rgba(213,81,129,.16),transparent 60%),rgb(15,18,30);border-left:1px solid rgba(255,255,255,.14);color:var(--mc-b);font-family:var(--mc-sans);padding:calc(var(--u)*1.5) calc(var(--u)*2) calc(var(--u)*1.1);box-sizing:border-box;box-shadow:-2em 0 4em rgba(0,0,0,.45);display:flex;flex-direction:column;gap:calc(var(--u)*1);overflow:hidden}
 .mc-aisai.mc-mo{transform:none}
 .mc-aisai button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
-.mc-aisai .mc-ct-dong{position:absolute;top:calc(var(--u)*1);right:calc(var(--u)*1.1);width:calc(var(--u)*2.6);height:calc(var(--u)*2.6);min-width:34px;min-height:34px;border-radius:50%;background:rgba(255,255,255,.1);font-size:calc(var(--u)*1.4)}
+.mc-aisai .mc-ct-dong{position:absolute;top:calc(var(--u)*1.2);right:calc(var(--u)*1.3);width:calc(var(--u)*2.8);height:calc(var(--u)*2.8);min-width:44px;min-height:44px;border-radius:50%;background:color-mix(in srgb,var(--mc-b) 10%,transparent);font-size:calc(var(--u)*1.5)}
+.mc-ai-dau{display:flex;align-items:flex-end;justify-content:space-between;gap:calc(var(--u)*2);padding-right:calc(var(--u)*3.6)}
 .mc-sai-ke{display:inline-flex;align-items:center;gap:.5em;font:800 max(12px,calc(var(--u)*.85)) var(--mc-sans);letter-spacing:.14em;text-transform:uppercase;color:rgb(255,210,122)}
-.mc-sai-ke::before{content:"";width:.6em;height:.6em;border-radius:50%;background:rgb(230,103,103);box-shadow:0 0 0 .3em rgba(230,103,103,.25)}
-.mc-aisai h2{margin:.25em calc(var(--u)*3.4) calc(var(--u)*1.2) 0;font:900 max(22px,calc(var(--u)*2.3))/1.1 var(--mc-sans);background:linear-gradient(90deg,rgb(255,255,255),rgb(195,194,183));-webkit-background-clip:text;background-clip:text;color:transparent}
+.mc-sai-ke::before{content:"";width:.6em;height:.6em;border-radius:50%;background:var(--mc-s);box-shadow:0 0 0 .3em color-mix(in srgb,var(--mc-s) 25%,transparent)}
+.mc-aisai h2{margin:.15em 0 0;font:900 max(22px,calc(var(--u)*2.3))/1.1 var(--mc-sans);background:linear-gradient(90deg,rgb(255,255,255),rgb(195,194,183));-webkit-background-clip:text;background-clip:text;color:transparent}
 .mc-aisai .mc-sai-tt{margin:0;color:rgba(255,255,255,.72);font:600 max(14px,calc(var(--u)*1.1)) var(--mc-sans)}
-.mc-sai-o4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u)*.9);margin-bottom:calc(var(--u)*1.4)}
-.mc-sai-o{position:relative;overflow:hidden;padding:calc(var(--u)*1) calc(var(--u)*1.2);border-radius:calc(var(--u)*1.1);background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12)}
-.mc-sai-o::after{content:"";position:absolute;left:0;top:0;bottom:0;width:.32em;background:var(--mc-sai-c,rgb(57,135,229))}
-.mc-sai-o b{display:block;font:900 max(26px,calc(var(--u)*2.8))/1.05 var(--mc-sans);font-variant-numeric:tabular-nums;color:rgb(255,255,255)}
-.mc-sai-o span{display:block;margin-top:.35em;font:700 max(12px,calc(var(--u)*.92)) var(--mc-sans);color:rgba(255,255,255,.7)}
-.mc-sai-hai{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:calc(var(--u)*1);margin-bottom:calc(var(--u)*1.4)}
-.mc-sai-the{padding:calc(var(--u)*1.1) calc(var(--u)*1.3);border-radius:calc(var(--u)*1.1);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
-.mc-sai-the h3{margin:0 0 calc(var(--u)*.8);font:800 max(13px,calc(var(--u)*1.02)) var(--mc-sans);color:rgba(255,255,255,.86)}
-.mc-sai-thanh{display:grid;grid-template-columns:minmax(5em,auto) minmax(0,1fr) 2.6em;align-items:center;gap:.6em;margin:.45em 0;font:700 max(13px,calc(var(--u)*1)) var(--mc-sans)}
-.mc-sai-thanh i{display:block;height:calc(var(--u)*1.25);min-height:12px;border-radius:0 4px 4px 0;background:var(--mc-sai-c);width:0;transition:width .9s cubic-bezier(.2,.9,.2,1)}
-.mc-sai-thanh em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums;color:rgb(255,255,255)}
-.mc-sai-cot{display:flex;align-items:flex-end;gap:2px;height:calc(var(--u)*9);min-height:90px;border-bottom:1px solid rgba(255,255,255,.18)}
-.mc-sai-cot div{position:relative;flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
-.mc-sai-cot i{display:block;width:72%;max-width:3.2em;border-radius:4px 4px 0 0;background:linear-gradient(180deg,rgb(57,135,229),rgba(57,135,229,.55));height:0;transition:height .9s cubic-bezier(.2,.9,.2,1)}
-.mc-sai-cot div:hover i{background:rgb(120,175,240)}
-.mc-sai-cot b{margin-bottom:.3em;font:800 max(11px,calc(var(--u)*.85)) var(--mc-sans);color:rgb(255,255,255);font-variant-numeric:tabular-nums}
-.mc-sai-ngay{display:flex;gap:2px;margin-top:.4em}
-.mc-sai-ngay span{flex:1;text-align:center;font:600 max(10px,calc(var(--u)*.72)) var(--mc-sans);color:rgba(255,255,255,.6)}
-.mc-sai-luoi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--u)*.8)}
-.mc-sai-em{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.2em calc(var(--u)*.9);padding:calc(var(--u)*.9) calc(var(--u)*1.1);border-radius:calc(var(--u)*1);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
-.mc-sai-anh{grid-row:span 2;width:calc(var(--u)*3.2);height:calc(var(--u)*3.2);min-width:38px;min-height:38px;border-radius:30%;display:grid;place-items:center;font:900 max(14px,calc(var(--u)*1.2)) var(--mc-sans);background:linear-gradient(140deg,rgba(255,210,122,.95),rgba(230,103,103,.9));color:rgb(27,26,23)}
-.mc-sai-ten{font:800 max(15px,calc(var(--u)*1.2)) var(--mc-sans);display:flex;align-items:baseline;gap:.5em;flex-wrap:wrap}
-.mc-sai-ten small{font:700 .72em var(--mc-sans);color:rgb(255,210,122)}
-.mc-sai-chip{display:flex;flex-wrap:wrap;gap:.35em}
-.mc-sai-chip span{display:inline-flex;align-items:center;gap:.4em;padding:.25em .65em;border-radius:999px;background:rgba(255,255,255,.08);font:600 max(12px,calc(var(--u)*.88)) var(--mc-sans);color:rgba(255,255,255,.92);font-variant-numeric:tabular-nums}
-.mc-sai-chip span::before{content:"";width:.55em;height:.55em;border-radius:50%;background:var(--mc-sai-c)}
-.mc-sai-chip span u{text-decoration:none;color:rgb(255,210,122);font-weight:800}
-.mc-sai-chu{margin:calc(var(--u)*.8) 0 0;font:600 max(11px,calc(var(--u)*.8)) var(--mc-sans);color:rgba(255,255,255,.55)}
-@media(max-width:900px){.mc-aisai{width:100%}.mc-sai-o4{grid-template-columns:repeat(2,minmax(0,1fr))}.mc-sai-hai,.mc-sai-luoi{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.mc-aisai,.mc-sai-thanh i,.mc-sai-cot i{transition:none}}
+.mc-ai-thuoc{display:flex;align-items:baseline;gap:.7em;font:600 max(12px,calc(var(--u)*.95)) var(--mc-sans);color:color-mix(in srgb,var(--mc-b) 76%,transparent)}
+.mc-ai-thuoc b{font-size:max(20px,calc(var(--u)*2));color:var(--mc-b);font-variant-numeric:tabular-nums}
+.mc-ai-hai{flex:1;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--u)*1)}
+.mc-ai-hai.mc-ai-1{grid-template-columns:minmax(0,1fr)}
+.mc-ai-the{min-height:0;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:calc(var(--u)*.7);padding:calc(var(--u)*.9) calc(var(--u)*1.1);border-radius:calc(var(--u)*1.1);background:color-mix(in srgb,var(--mc-b) 5.5%,transparent);border:1px solid color-mix(in srgb,var(--mc-b) 13%,transparent)}
+.mc-ai-the::-webkit-scrollbar{display:none}
+.mc-ai-the[data-k=dd]{border-color:color-mix(in srgb,var(--mc-vang-noi) 55%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--mc-vang-noi) 9%,transparent),color-mix(in srgb,var(--mc-b) 4%,transparent))}
+.mc-ai-th{display:flex;align-items:baseline;justify-content:space-between;gap:1em}
+.mc-ai-ky{display:inline-flex;align-items:center;gap:.5em;font:900 max(13px,calc(var(--u)*1)) var(--mc-sans);letter-spacing:.1em}
+.mc-ai-the[data-k=dd] .mc-ai-ky{color:var(--mc-vang-noi)}
+.mc-ai-ph{font:600 max(11px,calc(var(--u)*.82)) var(--mc-sans);color:color-mix(in srgb,var(--mc-b) 68%,transparent);text-align:right}
+.mc-ai-so{display:flex;align-items:baseline;gap:calc(var(--u)*1.6)}
+.mc-ai-so p{display:flex;align-items:baseline;gap:.4em;margin:0}
+.mc-ai-so b{font:900 max(28px,calc(var(--u)*3))/1 var(--mc-sans);font-variant-numeric:tabular-nums}
+.mc-ai-so span{font:700 max(12px,calc(var(--u)*.95)) var(--mc-sans);color:color-mix(in srgb,var(--mc-b) 78%,transparent)}
+.mc-ai-luot{margin-left:auto}
+.mc-ai-luot b{font-size:max(22px,calc(var(--u)*2.2));color:var(--mc-vang-noi)}
+.mc-pip{display:inline-flex;align-items:flex-end;gap:.14em;height:1em;width:1.1em;flex:none}
+.mc-pip i{flex:1;border-radius:1px;background:color-mix(in srgb,var(--mc-b) 30%,transparent)}
+.mc-pip i:nth-child(1){height:30%}.mc-pip i:nth-child(2){height:52%}.mc-pip i:nth-child(3){height:76%}.mc-pip i:nth-child(4){height:100%}
+.mc-pip i.b{background:currentColor}
+.mc-ai-tn{display:flex;gap:3px;height:max(calc(var(--u)*1.7),20px)}
+.mc-ai-tn>i{display:flex;align-items:center;justify-content:center;gap:.35em;min-width:3.4em;border-radius:99px;background:var(--mc-m1);color:rgb(255,255,255);font-style:normal}
+.mc-ai-tn>i[data-m="2"]{background:var(--mc-m2)}.mc-ai-tn>i[data-m="3"]{background:var(--mc-m3);color:var(--mc-nen)}.mc-ai-tn>i[data-m="4"]{background:var(--mc-m4);color:var(--mc-nen)}
+.mc-ai-tn>i[data-m="0"]{background:transparent;border:2px dashed var(--mc-xam);color:color-mix(in srgb,var(--mc-b) 85%,transparent)}
+.mc-ai-tn .mc-pip{font-size:calc(var(--u)*.95)}
+.mc-ai-tn b{font:800 max(12px,calc(var(--u)*.9)) var(--mc-sans);font-variant-numeric:tabular-nums}
+.mc-ai-lan{display:flex;flex-direction:column;gap:calc(var(--u)*.45)}
+.mc-ln{display:flex;flex-direction:column;gap:calc(var(--u)*.35);padding:calc(var(--u)*.45) calc(var(--u)*.7) calc(var(--u)*.5);border-radius:calc(var(--u)*.8);background:color-mix(in srgb,var(--mc-den) 22%,transparent);border-left:calc(var(--u)*.3) solid var(--mm,var(--mc-xam))}
+.mc-ln[data-m="1"]{--mm:var(--mc-m1)}.mc-ln[data-m="2"]{--mm:var(--mc-m2)}.mc-ln[data-m="3"]{--mm:var(--mc-m3)}.mc-ln[data-m="4"]{--mm:var(--mc-m4)}
+.mc-ln header{display:flex;align-items:center;gap:.6em;font:500 max(12px,calc(var(--u)*.9)) var(--mc-sans)}
+.mc-ln header .mc-pip{font-size:calc(var(--u)*1.1);color:color-mix(in srgb,var(--mc-b) 78%,transparent)}
+.mc-ln header b{font-weight:900}.mc-ln header span{color:color-mix(in srgb,var(--mc-b) 72%,transparent);font-weight:600}.mc-ln header em{margin-left:auto;font-style:normal;font-weight:800;font-variant-numeric:tabular-nums}
+.mc-ln-rong{padding-block:calc(var(--u)*.35);opacity:.6}.mc-ln-rong header em{display:none}
+.mc-ln-chua{border-left:calc(var(--u)*.3) dashed var(--mc-xam);background:transparent;border-top:1px dashed color-mix(in srgb,var(--mc-b) 20%,transparent);border-right:1px dashed color-mix(in srgb,var(--mc-b) 20%,transparent);border-bottom:1px dashed color-mix(in srgb,var(--mc-b) 20%,transparent)}
+.mc-pls{display:grid;grid-template-columns:repeat(var(--mc-cot,3),minmax(0,1fr));gap:calc(var(--u)*.35);margin:0;padding:0;list-style:none}
+.mc-pl{display:flex;align-items:center;gap:.5em;min-width:0;padding:calc(var(--u)*.3) calc(var(--u)*.7);border-radius:99px;background:rgba(255,255,255,.1);border:1px solid color-mix(in srgb,var(--mc-b) 35%,transparent);font:500 max(12px,calc(var(--u)*.92)) var(--mc-sans)}
+.mc-ln[data-m="1"] .mc-pl{background:color-mix(in srgb,var(--mc-m1) 50%,transparent);border-color:var(--mc-m1)}.mc-ln[data-m="2"] .mc-pl{background:color-mix(in srgb,var(--mc-m2) 45%,transparent);border-color:var(--mc-m2)}.mc-ln[data-m="3"] .mc-pl{background:color-mix(in srgb,var(--mc-m3) 35%,transparent);border-color:var(--mc-m3)}.mc-ln[data-m="4"] .mc-pl{background:color-mix(in srgb,var(--mc-m4) 30%,transparent);border-color:var(--mc-m4)}
+.mc-ln-chua .mc-pl{background:transparent;border-style:dashed}
+.mc-pl b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.mc-pl u{text-decoration:none;font-weight:800;color:var(--mc-vang-noi);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mc-vg{flex:none;width:.62em;height:.62em;margin-left:-.15em;border:2px solid color-mix(in srgb,var(--mc-b) 80%,transparent);border-radius:50%;box-sizing:border-box}
+.mc-vg-g{display:inline-block;margin:0 .2em;vertical-align:baseline}
+.mc-ai-dense .mc-pl{font-size:max(11.5px,calc(var(--u)*.82));padding-inline:calc(var(--u)*.5);gap:.35em}
+.mc-ai-rong{display:grid;place-content:center;text-align:center;gap:.5em;flex:1;padding:calc(var(--u)*2);border:2px dashed color-mix(in srgb,var(--mc-b) 22%,transparent);border-radius:calc(var(--u)*1);color:color-mix(in srgb,var(--mc-b) 80%,transparent)}
+.mc-ai-rong b{font:800 max(16px,calc(var(--u)*1.4)) var(--mc-sans);color:rgb(255,210,122)}.mc-ai-rong p{max-width:24em;margin:0 auto;font:600 max(12px,calc(var(--u)*.95))/1.5 var(--mc-sans)}
+.mc-ai-chan{display:flex;justify-content:space-between;gap:2em;margin:0;font:600 max(11px,calc(var(--u)*.8)) var(--mc-sans);color:color-mix(in srgb,var(--mc-b) 60%,transparent)}
+.mc-ai-chan kbd{display:inline-grid;place-items:center;min-width:1.7em;padding:0 .4em;border-radius:.4em;background:color-mix(in srgb,var(--mc-b) 14%,transparent);font:inherit;font-weight:800}
+@media(max-width:900px){.mc-aisai{width:100%}.mc-ai-hai{grid-template-columns:1fr;overflow-y:auto}.mc-ai-the{overflow:visible}.mc-ai-dau{flex-wrap:wrap}}
+@media(max-height:800px){.mc-ai-so b{font-size:24px}.mc-ai-luot b{font-size:20px}.mc-ai-the{gap:calc(var(--u)*.45);padding-block:calc(var(--u)*.6)}.mc-ln{padding-block:calc(var(--u)*.3)}.mc-pls{gap:calc(var(--u)*.25)}.mc-ai-lan{gap:calc(var(--u)*.3)}.mc-pl{padding-block:2px}.mc-ai-tn{height:18px}}
+@media(prefers-reduced-motion:reduce){.mc-aisai{transition:none}}
 .mc-ct button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
-.mc-ct .mc-ct-dong{position:absolute;top:calc(var(--u)*.9);right:calc(var(--u)*1);width:calc(var(--u)*2.4);height:calc(var(--u)*2.4);min-width:32px;min-height:32px;border-radius:50%;background:rgba(255,255,255,.1);font-size:calc(var(--u)*1.3);line-height:1}
-.mc-ct-dau{display:grid;grid-template-columns:calc(var(--u)*6.6) minmax(0,1fr);gap:calc(var(--u)*1.2);align-items:center;padding-right:calc(var(--u)*3)}
-.mc-ct-anh{width:calc(var(--u)*6.6);height:calc(var(--u)*6.6);border-radius:28%;background:radial-gradient(circle at 50% 38%,rgba(255,220,150,.45),rgba(255,255,255,.04) 70%);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;overflow:hidden}
+.mc-ct .mc-ct-dong{position:absolute;top:calc(var(--u)*.9);right:calc(var(--u)*1);width:calc(var(--u)*2.4);height:calc(var(--u)*2.4);min-width:44px;min-height:44px;border-radius:50%;background:rgba(255,255,255,.1);font-size:calc(var(--u)*1.3);line-height:1}
+.mc-ct-dau{display:grid;grid-template-columns:calc(var(--u)*4.8) minmax(0,1fr);gap:calc(var(--u)*1.2);align-items:center;padding-right:calc(var(--u)*3)}
+.mc-ct-anh{width:calc(var(--u)*4.8);height:calc(var(--u)*4.8);border-radius:28%;background:radial-gradient(circle at 50% 38%,rgba(255,220,150,.45),rgba(255,255,255,.04) 70%);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;overflow:hidden}
 .mc-ct-anh img{width:88%;height:88%;object-fit:contain}
 .mc-ct-dau h2{margin:0;font-size:calc(var(--u)*1.9);font-weight:800;line-height:1.1}
 .mc-ct-chips{display:flex;flex-wrap:wrap;gap:.5em;margin:.35em 0 0;font-size:.95em;color:rgb(201,208,224)}
@@ -310,30 +333,59 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-chip.mc-vuot{background:rgba(76,179,95,.25);border-color:rgba(76,179,95,.6)}
 .mc-chip.mc-dung{background:rgba(53,182,164,.22);border-color:rgba(53,182,164,.5)}
 .mc-chip.mc-tre12,.mc-chip.mc-tre3{background:rgba(240,165,58,.22);border-color:rgba(240,165,58,.55)}
-.mc-cau-nay{background:linear-gradient(135deg,rgba(255,210,122,.14),rgba(255,255,255,.05));border:1px solid rgba(255,210,122,.35);border-radius:calc(var(--u)*.9);padding:calc(var(--u)*.7) calc(var(--u)*.9);display:grid;grid-template-columns:calc(var(--u)*13) minmax(0,1fr);gap:calc(var(--u)*1.2)}
-.mc-cau-nay h4,.mc-the-ct h4{grid-column:1/-1;margin:0 0 .4em;font-size:.82em;letter-spacing:.05em;text-transform:uppercase;font-weight:800}
-.mc-cau-nay h4{color:var(--mc-vang-noi)}
-.mc-tong .mc-ct-lan{font-size:calc(var(--u)*2.3);font-weight:800;line-height:1}
-.mc-tong .mc-ct-lan small{font-size:.45em;color:rgb(170,178,197);font-weight:600}
-.mc-tong .mc-ds{display:flex;gap:.4em;margin:.35em 0}
-.mc-tong .mc-gan{font-size:.92em;color:rgb(201,208,224)}
+.mc-ct-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:calc(var(--u)*.8);min-height:0}
+.mc-cau-nay{background:linear-gradient(135deg,rgba(255,210,122,.14),rgba(255,255,255,.05));border:1px solid rgba(255,210,122,.35);border-radius:calc(var(--u)*.9);padding:calc(var(--u)*.7) calc(var(--u)*.9);display:flex;flex-direction:column;gap:calc(var(--u)*.45);min-height:0;overflow:hidden}
+.mc-cau-nay h4,.mc-the-ct h4{margin:0 0 .4em;font-size:.82em;letter-spacing:.05em;text-transform:uppercase;font-weight:800}
+.mc-cau-nay h4{color:var(--mc-vang-noi);margin:0}
+.mc-kpi{display:flex;gap:calc(var(--u)*1.6);align-items:baseline}.mc-kpi p{display:flex;align-items:baseline;gap:.35em;margin:0}
+.mc-kpi b{font-size:calc(var(--u)*2.1);line-height:1;font-weight:800;font-variant-numeric:tabular-nums}.mc-kpi span{color:color-mix(in srgb,var(--mc-b) 66%,transparent);font-weight:600}
+.mc-kpi .mc-k-d b{color:rgb(155,227,168)}.mc-kpi .mc-k-s b{color:color-mix(in srgb,var(--mc-s) 55%,var(--mc-b))}
+.mc-gan{display:flex;flex-direction:column;gap:calc(var(--u)*.4)}.mc-gan p{margin:0}
+.mc-gan-t{font-weight:700;color:color-mix(in srgb,var(--mc-b) 80%,transparent)}
+.mc-gan-so{display:flex;align-items:baseline;gap:.45em;flex-wrap:wrap}.mc-gan-so b{font-size:calc(var(--u)*1.9);line-height:1;font-weight:800;font-variant-numeric:tabular-nums}.mc-gan-so span{color:color-mix(in srgb,var(--mc-b) 66%,transparent)}.mc-gan-so i{width:1px;height:1.6em;background:color-mix(in srgb,var(--mc-b) 25%,transparent);margin:0 .6em;align-self:center}
+.mc-gan-gt{color:color-mix(in srgb,var(--mc-b) 84%,transparent)}
 .mc-kq{font-weight:800;font-size:.85em;border-radius:1em;padding:.05em .6em;white-space:nowrap}
 .mc-kq.mc-dat{background:rgba(76,179,95,.3);color:rgb(184,240,194)}.mc-kq.mc-kd{background:rgba(229,83,75,.3);color:rgb(255,196,191)}
-.mc-dtg{display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(var(--u)*10),1fr));gap:calc(var(--u)*.6);align-content:start;max-height:calc(var(--u)*14);overflow:auto}
-.mc-lanlam{position:relative;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-left:.35em solid var(--c,rgb(107,114,128));border-radius:calc(var(--u)*.6);padding:.45em .6em;line-height:1.4;font-size:.92em}
-.mc-lanlam.mc-dung{--c:rgb(76,179,95)}.mc-lanlam.mc-sai{--c:rgb(229,83,75)}
-.mc-lanlam .mc-gio{font-weight:700}
-.mc-lanlam .mc-kq2{font-weight:800}.mc-lanlam.mc-dung .mc-kq2{color:rgb(155,227,168)}.mc-lanlam.mc-sai .mc-kq2{color:rgb(255,170,163)}
-.mc-lanlam .mc-ph{color:rgb(170,178,197)}
-.mc-lanlam .mc-ng{display:inline-block;margin-top:.25em;font-size:.85em;font-weight:700;border-radius:1em;padding:0 .55em;background:rgba(142,202,230,.2);border:1px solid rgba(142,202,230,.4)}
+.mc-pip{display:inline-flex;align-items:flex-end;gap:.14em;height:1em;width:1.1em;flex:none}
+.mc-pip i{flex:1;border-radius:1px;background:color-mix(in srgb,var(--mc-b) 30%,transparent)}
+.mc-pip i:nth-child(1){height:30%}.mc-pip i:nth-child(2){height:52%}.mc-pip i:nth-child(3){height:76%}.mc-pip i:nth-child(4){height:100%}
+.mc-pip i.b{background:currentColor}
+.mc-chm{display:inline-flex;align-items:center;gap:.45em;padding:.15em .7em .15em .5em;border-radius:99px;background:color-mix(in srgb,var(--mc-m2) 40%,transparent);border:1px solid var(--mc-m2);font-weight:800;white-space:nowrap;font-size:.95em;color:rgb(255,255,255);margin-left:auto}
+.mc-chm[data-m="1"]{background:color-mix(in srgb,var(--mc-m1) 50%,transparent);border-color:var(--mc-m1)}.mc-chm[data-m="2"]{background:color-mix(in srgb,var(--mc-m2) 45%,transparent);border-color:var(--mc-m2)}.mc-chm[data-m="3"]{background:color-mix(in srgb,var(--mc-m3) 40%,transparent);border-color:var(--mc-m3)}.mc-chm[data-m="4"]{background:color-mix(in srgb,var(--mc-m4) 35%,transparent);border-color:var(--mc-m4)}
+.mc-chm .mc-pip{font-size:1.05em;color:color-mix(in srgb,var(--mc-b) 78%,transparent)}
+.mc-chm-chua{background:transparent;border:1px dashed color-mix(in srgb,var(--mc-b) 45%,transparent);padding-left:.8em;color:color-mix(in srgb,var(--mc-b) 88%,transparent)}
+.mc-chm-lon{font-size:calc(var(--u)*1.15);padding:.25em .9em .25em .6em;margin-left:0}.mc-chm-lon>span:last-child{font-weight:600;opacity:.9}
+.mc-th{position:relative;padding-top:.2em}
+.mc-th-z{position:relative;height:calc(var(--u)*1.1)}
+.mc-th-z i{position:absolute;top:0;bottom:0;background:var(--mc-m1)}
+.mc-th-z i[data-m="1"]{background:var(--mc-m1);border-radius:99px 0 0 99px}.mc-th-z i[data-m="2"]{background:var(--mc-m2)}.mc-th-z i[data-m="3"]{background:var(--mc-m3)}.mc-th-z i[data-m="4"]{background:var(--mc-m4);border-radius:0 99px 99px 0}
+.mc-th-z u{position:absolute;top:-.3em;bottom:-.3em;width:3px;margin-left:-1.5px;background:var(--mc-b);border-radius:2px}
+.mc-th-z b{position:absolute;top:50%;width:calc(var(--u)*1.5);height:calc(var(--u)*1.5);margin:calc(var(--u)*-.75) 0 0 calc(var(--u)*-.75);border-radius:50%;background:var(--mc-b);border:3px solid var(--mc-nen);box-shadow:0 0 0 2px var(--mc-b)}
+.mc-th-moc{position:relative;height:1.5em;margin-top:.35em;font-size:.85em;color:color-mix(in srgb,var(--mc-b) 66%,transparent);font-variant-numeric:tabular-nums}.mc-th-moc span{position:absolute;transform:translateX(-50%);white-space:nowrap}.mc-th-moc .mc-th-cuoi{transform:translateX(-100%)}
+.mc-th-nho{margin-block:.1em}.mc-th-nho .mc-th-z{height:calc(var(--u)*.7)}.mc-th-nho .mc-th-z b{width:calc(var(--u)*1);height:calc(var(--u)*1);margin:calc(var(--u)*-.5) 0 0 calc(var(--u)*-.5);border-width:2px}
+.mc-cg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.25em .9em;margin:0;padding:0;list-style:none;color:color-mix(in srgb,var(--mc-b) 80%,transparent);font-size:.92em}.mc-cg li{display:flex;align-items:center;gap:.5em}.mc-cg i{width:.8em;height:.8em;border-radius:50%;background:var(--mc-xam);flex:none}
+.mc-cg li[data-m="1"] i{background:var(--mc-m1)}.mc-cg li[data-m="2"] i{background:var(--mc-m2)}.mc-cg li[data-m="3"] i{background:var(--mc-m3)}.mc-cg li[data-m="4"] i{background:var(--mc-m4)}
+.mc-lan-ds{display:flex;flex-direction:column;gap:calc(var(--u)*.4);overflow:auto;scrollbar-width:none;margin:0;padding:0;list-style:none}
+.mc-lanl{padding:calc(var(--u)*.45) calc(var(--u)*.7);border-radius:calc(var(--u)*.6);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-left:.35em solid var(--mc-s);display:flex;flex-direction:column;gap:.15em}.mc-lanl.mc-d{border-left-color:var(--mc-d)}
+.mc-lanl-t{display:flex;align-items:center;gap:.55em;flex-wrap:wrap}.mc-lanl-t>b{font-weight:700}
+.mc-lanl .mc-kq2{font-weight:800;padding:0 .6em;border-radius:1em;font-size:.9em}.mc-lanl.mc-d .mc-kq2{background:color-mix(in srgb,var(--mc-d) 30%,transparent);color:color-mix(in srgb,var(--mc-d) 40%,var(--mc-b))}.mc-lanl.mc-s .mc-kq2{background:color-mix(in srgb,var(--mc-s) 30%,transparent);color:color-mix(in srgb,var(--mc-s) 35%,var(--mc-b))}
+.mc-lanl .mc-ng{font-size:.85em;font-weight:700;border-radius:1em;padding:0 .55em;background:rgba(142,202,230,.2);border:1px solid rgba(142,202,230,.4)}.mc-lanl .mc-chon{color:rgb(170,178,197)}.mc-lanl .mc-chon b{color:rgb(255,255,255)}.mc-lanl .mc-goiy{font-size:.85em;color:rgb(170,178,197)}
+.mc-lanl-gt{margin:0;color:color-mix(in srgb,var(--mc-b) 76%,transparent);font-size:.9em}
+.mc-do{margin:0;color:rgb(201,208,224)}.mc-do b{color:rgb(255,255,255)}
+.mc-tn-s{height:18px}
+.mc-cheo{display:flex;flex-direction:column;margin:0;padding:0;list-style:none;font-variant-numeric:tabular-nums}.mc-cheo li{display:grid;grid-template-columns:minmax(0,1fr) 3.2em 3.2em;align-items:center;gap:.3em;padding:.3em .2em;border-top:1px solid color-mix(in srgb,var(--mc-b) 10%,transparent)}
+.mc-cheo li>span{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:.5em;align-items:center}.mc-cheo li>span .mc-pip{grid-row:span 2;font-size:1.1em;color:color-mix(in srgb,var(--mc-b) 78%,transparent)}.mc-cheo li>span b{font-weight:800;white-space:nowrap}.mc-cheo small{color:color-mix(in srgb,var(--mc-b) 62%,transparent);font-size:.85em;line-height:1.2}
+.mc-cheo i{font-style:normal;text-align:right;font-weight:800}.mc-cheo .mc-sai-so{color:rgb(255,170,163)}.mc-cheo-d{border-top:0!important;color:rgba(255,255,255,.6);font-weight:700}.mc-cheo-t{font-weight:800;background:rgba(255,255,255,.05);border-radius:.5em}
+.mc-ket{margin:0;color:color-mix(in srgb,var(--mc-b) 88%,transparent);line-height:1.45}.mc-ket b{color:rgb(255,210,122)}
 .mc-ct-luoi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:calc(var(--u)*.8);min-height:0}
+.mc-ct-luoi.mc-ct-4{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}.mc-ct-4>.mc-cach{grid-row:span 2}
 .mc-the-ct{background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.12);border-radius:calc(var(--u)*.9);padding:calc(var(--u)*.7) calc(var(--u)*.9);min-height:0;overflow:auto;display:flex;flex-direction:column}
 .mc-the-ct h4{color:rgb(170,178,197)}
 .mc-rong{color:rgb(142,151,171)}
-.mc-vong-so{position:relative;width:calc(var(--u)*5.6);height:calc(var(--u)*5.6)}
+.mc-vong-so{position:relative;width:calc(var(--u)*4.6);height:calc(var(--u)*4.6)}
 .mc-vong-so svg{width:100%;height:100%;transform:rotate(-90deg)}
 .mc-vong-so div{position:absolute;inset:0;display:grid;place-content:center;text-align:center;line-height:1.1}
-.mc-vong-so b{font-size:calc(var(--u)*1.25)}
+.mc-vong-so b{font-size:calc(var(--u)*1.1)}
 .mc-vong-so span{font-size:.72em;color:rgb(170,178,197)}
 .mc-cd{display:flex;gap:calc(var(--u)*1);align-items:center}
 .mc-bd{width:100%;flex:1;min-height:calc(var(--u)*6)}
@@ -341,7 +393,7 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-chu-giai i{display:inline-block;width:.8em;height:.8em;border-radius:.2em;margin-right:.3em;vertical-align:-.05em}
 .mc-nhiet{display:grid;gap:.28em}
 .mc-nhiet .mc-d{display:grid;grid-template-columns:minmax(0,8em) minmax(0,1fr) 2.8em 6.4em;gap:.6em;align-items:center;font-size:.95em}
-.mc-nhiet .mc-th{height:1.05em;border-radius:.3em;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.mc-nhiet .mc-th{padding-top:0;height:1.05em;border-radius:.3em;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
 .mc-nhiet .mc-th i{position:absolute;left:0;top:0;bottom:0;border-radius:.3em}
 .mc-nhiet .mc-moc{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.35)}
 .mc-nhiet b{text-align:right}
@@ -357,6 +409,8 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
   .mc-goi *,.mc-ct,.mc-ct-mo,body.mc-bc .mc-vung-de>*,body.mc .mc-giai .sol-box>*,.mc-em.mc-pop{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}
 }
 @media print{.mc-phim-nhom,.mc-tiep-bar,.mc-trang-so,.mc-con-nua,canvas.mc-but,.mc-but-cu,.mc-phu-lop,.mc-ct,.mc-ct-mo,.mc-goi,.mc-bao{display:none!important}}
+/* màn thấp (≤ 800 px cao, vd 1280×720): gọn lại bảng chi tiết em — đặt CUỐI để thắng các luật cùng độ ưu tiên ở trên */
+@media(max-height:800px){.mc-ct{width:90%}.mc-lanl{padding-block:calc(var(--u)*.3)}.mc-lan-ds{gap:calc(var(--u)*.25)}.mc-the-ct .mc-chip+.mc-rong{display:none}.mc-vong-so{width:44px;height:44px}.mc-vong-so b{font-size:12px}.mc-the-ct{padding-block:calc(var(--u)*.5)}.mc-bd{max-height:calc(var(--u)*3.2)}.mc-the-ct h4{margin-bottom:.2em}.mc-cheo small,.mc-cg,.mc-gan-gt{display:none}.mc-cheo li{padding-block:.15em}.mc-cach .mc-do,.mc-cach .mc-ket{font-size:.9em;line-height:1.3}.mc-tn-s{height:16px}}
 `
 
 // ───────────────────────── JS TRONG TỜ ─────────────────────────
@@ -732,6 +786,43 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     var p = Math.max(0, Math.min(100, Math.round(t.exp / t.moc * 100)));
     return '<div class="mc-exp-cap" aria-label="Cấp ' + t.cap + ': ' + t.exp + ' trên ' + t.moc + ' EXP để lên cấp ' + (t.cap + 1) + '"><div class="mc-exp-dong"><b>Cấp ' + t.cap + '</b><span>' + t.exp.toLocaleString('vi-VN') + ' / ' + t.moc.toLocaleString('vi-VN') + ' EXP · lên cấp ' + (t.cap + 1) + '</span></div><div class="mc-exp-ray"><i style="width:' + p + '%"></i></div></div>';
   }
+  // ── Mức làm 1–4 trong bảng chi tiết em (thầy 21/10: "bấm vào chi tiết là phải hiện đủ trên màn chiếu"): máy chủ gửi mucLam từng lần làm (ma · giay · giayDoc · sanNghi · ranh2/3/4 …) và cachLam14 (đếm 14 ngày); tờ chỉ vẽ lại. ──
+  var TEN_MUC_CT = [null, 'Chưa đọc hết đề', 'Đọc xong, chưa kịp nghĩ', 'Có nghĩ', 'Làm kỹ'];
+  function pipCt(n) { var q = '<span class="mc-pip" aria-hidden="true">'; for (var k = 1; k <= 4; k++) q += '<i' + (k <= n ? ' class="b"' : '') + '></i>'; return q + '</span>'; }
+  /** Chip "Mức làm N" (lon = kèm tên mức); ma = 0 ⇒ "Chưa có số đo" nét đứt. */
+  function chipCt(ma, lon) { return ma ? '<span class="mc-chm' + (lon ? ' mc-chm-lon' : '') + '" data-m="' + ma + '">' + pipCt(ma) + '<b>Mức làm ' + ma + '</b>' + (lon ? ' <span>' + TEN_MUC_CT[ma] + '</span>' : '') + '</span>' : '<span class="mc-chm mc-chm-chua' + (lon ? ' mc-chm-lon' : '') + '"><b>Chưa có số đo</b></span>'; }
+  /** Thước giây: bốn đoạn theo ranh giới máy chủ gửi, vạch = đọc hết đề, chấm = giây của em; nho = bản gọn (không nhãn số). */
+  function thuocCt(m, nho) {
+    var r4 = typeof m.ranh4 === 'number' ? m.ranh4 : null, ket3 = r4 === null ? 0 : Math.max(m.ranh3, r4), cao = r4 === null ? m.ranh3 : ket3;
+    var max = Math.max(40, Math.ceil(Math.max(m.giay * 1.12, cao * 1.45) / 10) * 10), p = function (x) { return Math.min(100, Math.max(0, 100 * x / max)); };
+    var doan = [[1, 0, m.ranh2], [2, m.ranh2, m.ranh3], [3, m.ranh3, r4 === null ? max : ket3]]; if (r4 !== null) doan.push([4, ket3, max]);
+    var q = '<div class="mc-th' + (nho ? ' mc-th-nho' : '') + '" role="img" aria-label="Làm ' + m.giay + ' giây; đọc hết đề cần ' + (m.xapXi ? 'khoảng ' : '') + m.giayDoc + ' giây; có thời gian nghĩ từ ' + m.ranh3 + ' giây' + (r4 !== null ? '; làm kỹ từ ' + r4 + ' giây' : '') + '"><div class="mc-th-z">';
+    doan.forEach(function (d) { q += '<i data-m="' + d[0] + '" style="left:' + p(d[1]).toFixed(2) + '%;width:' + Math.max(0, p(d[2]) - p(d[1])).toFixed(2) + '%"></i>'; });
+    q += '<u style="left:' + p(m.giayDoc).toFixed(2) + '%"></u><b style="left:' + p(m.giay).toFixed(2) + '%"></b></div>';
+    if (!nho) { q += '<div class="mc-th-moc"><span style="left:0">0</span><span style="left:' + p(m.ranh2).toFixed(2) + '%">' + m.ranh2 + '</span><span style="left:' + p(m.ranh3).toFixed(2) + '%">' + m.ranh3 + '</span>' + (r4 !== null ? '<span style="left:' + p(r4).toFixed(2) + '%">' + r4 + '</span>' : '') + '<span class="mc-th-cuoi" style="left:100%">' + max + ' giây</span></div>'; }
+    return q + '</div>';
+  }
+  function chuGiaiCt(m) {
+    var r4 = typeof m.ranh4 === 'number' ? m.ranh4 : null;
+    return '<ul class="mc-cg"><li data-m="1"><i></i>Dưới ' + m.ranh2 + ' giây: chưa đọc hết đề</li><li data-m="2"><i></i>' + m.ranh2 + '–' + (m.ranh3 - 1) + ' giây: đọc xong, chưa kịp nghĩ</li><li data-m="3"><i></i>' + (r4 === null ? 'Từ ' + m.ranh3 + ' giây: có nghĩ' : r4 > m.ranh3 ? m.ranh3 + '–' + (r4 - 1) + ' giây: có nghĩ' : 'Có nghĩ: không có khoảng riêng') + '</li><li data-m="4"><i></i>' + (r4 === null ? 'Lớp chưa đủ mẫu để xếp Mức làm 4' : 'Từ ' + Math.max(r4, m.ranh3) + ' giây: làm kỹ') + '</li></ul>';
+  }
+  /** Một lần làm câu: đúng/sai · giờ · nơi · chọn · chip Mức làm + thước + lời; lần chưa có mức ⇒ nhãn nét đứt + số giây cũ. */
+  function dongLanCt(x) {
+    var g = gioVn(x.luc), m = x.mucLam, q = '<li class="mc-lanl ' + (x.dung ? 'mc-d' : 'mc-s') + '"><div class="mc-lanl-t"><span class="mc-kq2">' + (x.dung ? 'Đúng' : 'Sai') + '</span><b>' + g.ngan + ' · ' + g.gio + '</b><span class="mc-ng">' + thoat(tenNguon(x.nguon)) + '</span><span class="mc-chon">chọn <b>' + thoat(x.chon || '—') + '</b></span>' + (x.coGoiY ? '<span class="mc-goiy">có gợi ý</span>' : '') + chipCt(m ? m.ma : 0, false) + '</div>';
+    if (m) q += thuocCt(m, true);
+    q += '<p class="mc-lanl-gt">' + (m ? (m.ghiChu === 'dung_truoc_doc' ? 'Đúng · nộp sau ' + m.giay + ' giây, trước khi đọc hết đề (' + m.giayDoc + ' giây).' : TEN_MUC_CT[m.ma] + ' · ' + m.giay + ' giây, đọc hết đề cần ' + (m.xapXi ? '≈ ' : '') + m.giayDoc + ' giây.') : (x.giay != null ? 'Làm bằng đồng hồ cũ: ' + x.giay + ' giây — chưa xếp mức.' : 'Chưa đo giờ — chưa xếp mức.')) + '</p></li>';
+    return q;
+  }
+  /** Cách làm bài 14 ngày (tổng Mức làm máy chủ đã gộp): đo được N/M · thanh 4 mức · bảng đúng/sai · làm vội / đã nghĩ. */
+  function cachLamCt(t) {
+    var tong = t.soDo + t.chuaCoSoDo, q = '<section class="mc-the-ct mc-cach"><h4>Cách làm bài 14 ngày</h4>';
+    if (!tong) return q + '<p class="mc-rong">Em chưa làm câu nào trong 14 ngày.</p></section>';
+    q += '<p class="mc-do">Đo được <b>' + t.soDo + '</b>/<b>' + tong + '</b> lượt' + (t.chuaCoSoDo ? ' · ' + t.chuaCoSoDo + ' lượt chưa có số đo' : '') + '.</p>';
+    if (!t.soDo) return q + '<p class="mc-rong">Chưa lượt nào của em có số đo Mức làm. Từ khi máy em nạp bản mới, mức hiện ở đây.</p></section>';
+    q += '<div class="mc-ai-tn mc-tn-s" role="img" aria-label="Lượt theo Mức làm">' + t.theoMuc.map(function (r) { var n = r.dung + r.sai; return n ? '<i data-m="' + r.ma + '" style="flex:' + n + '">' + pipCt(r.ma) + '<b>' + n + '</b></i>' : ''; }).join('') + '</div>';
+    q += '<ul class="mc-cheo"><li class="mc-cheo-d"><span></span><i>Đúng</i><i>Sai</i></li>' + t.theoMuc.map(function (r) { return '<li data-m="' + r.ma + '"><span>' + pipCt(r.ma) + '<b>Mức làm ' + r.ma + '</b><small>' + TEN_MUC_CT[r.ma] + '</small></span><i>' + r.dung + '</i><i class="mc-sai-so">' + r.sai + '</i></li>'; }).join('') + '<li class="mc-cheo-t"><span>Cộng</span><i>' + t.theoMuc.reduce(function (a, r) { return a + r.dung; }, 0) + '</i><i class="mc-sai-so">' + t.theoMuc.reduce(function (a, r) { return a + r.sai; }, 0) + '</i></li></ul>';
+    return q + '<p class="mc-ket"><b>' + t.saiLamVoi + '</b> lượt sai khi làm vội (Mức làm 1–2) · <b>' + t.saiDuNghi + '</b> lượt sai dù đã nghĩ (Mức làm 3–4)</p></section>';
+  }
   function veCt(nua, hs, loi) {
     var anh = nua.querySelector('img.mc-thu-anh'), ten = nua.querySelector('.mc-ten'), thuTen = nua.querySelector('.mc-thu-ten'), cap = nua.querySelector('.mc-thu-cap b'), cauSo = nua.querySelector('.mc-cau-so');
     var the = nua.querySelector('.mc-em'), em = (hs && hs.em) || {}, lop = (the && the.getAttribute('data-lop')) || em.tenLop || em.lop || '';
@@ -742,15 +833,18 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     if (!hs) {
       h += '<section class="mc-cau-nay"><h4>Câu này</h4><div class="mc-rong" style="grid-column:1/-1">' + thoat(loi === 'khong_noi' ? 'Chỉ xem được khi mở tờ chiếu từ app thầy (tờ đang mở riêng).' : loi === 'dang' ? 'Đang lấy số liệu từ máy chủ…' : 'Chưa lấy được số liệu từ máy chủ.') + '</div></section><div></div>';
     } else {
-      var c = hs.cauNay;
-      h += '<section class="mc-cau-nay"><h4>Câu này · ' + thoat(cauSo ? cauSo.textContent : '') + '</h4>';
-      if (!c || !c.soLan) h += '<div class="mc-tong"><div class="mc-ct-lan">0 <small>lần làm</small></div></div><div class="mc-rong">Em chưa làm câu này lần nào.</div>';
+      var c = hs.cauNay, lans = c && c.lan ? c.lan : [], cuoiL = lans.length ? lans[lans.length - 1] : null, cn = hs.cachLam14;
+      h += '<div class="mc-ct-hero"><section class="mc-cau-nay"><h4>Em làm câu này thế nào · ' + thoat(cauSo ? cauSo.textContent : '') + '</h4>';
+      if (!c || !c.soLan) h += '<div class="mc-kpi"><p><b>0</b><span>lần làm</span></p></div><div class="mc-rong">Em chưa làm câu này lần nào.</div>';
       else {
-        var cuoi = c.lan[c.lan.length - 1], gc = gioVn(cuoi.luc);
-        h += '<div class="mc-tong"><div class="mc-ct-lan">' + c.soLan + ' <small>lần làm</small></div><div class="mc-ds"><span class="mc-kq mc-dat">Đúng ' + c.soDung + '</span><span class="mc-kq mc-kd">Sai ' + c.soSai + '</span></div><div class="mc-gan">Gần nhất: <b>' + (cuoi.dung ? 'đúng' : 'sai') + '</b> lúc ' + gc.gio + ' ' + gc.ngay + '</div></div><div class="mc-dtg">' +
-          c.lan.map(function (x) { var g = gioVn(x.luc); return '<div class="mc-lanlam ' + (x.dung ? 'mc-dung' : 'mc-sai') + '"><div class="mc-gio">' + g.ngay + ' · ' + g.gio + '</div><div><span class="mc-kq2">' + (x.dung ? 'Đúng' : 'Sai') + '</span> · chọn <b>' + thoat(x.chon || '—') + '</b></div><div class="mc-ph">' + (x.coGoiY ? 'Có gợi ý' : 'Không gợi ý') + (x.giay != null ? ' · ' + x.giay + ' giây' : '') + '</div><span class="mc-ng">' + thoat(tenNguon(x.nguon)) + '</span></div>'; }).join('') + '</div>';
+        var gc = gioVn(cuoiL.luc), mc = cuoiL.mucLam;
+        h += '<div class="mc-kpi"><p><b>' + c.soLan + '</b><span>lần làm</span></p><p class="mc-k-d"><b>' + c.soDung + '</b><span>đúng</span></p><p class="mc-k-s"><b>' + c.soSai + '</b><span>sai</span></p></div><div class="mc-gan"><p class="mc-gan-t">Lần gần nhất · ' + gc.ngan + ' ' + gc.gio + ' · ' + (cuoiL.dung ? 'đúng' : 'sai') + '</p>';
+        if (mc) h += '<p class="mc-gan-so"><b>' + mc.giay + '</b><span>giây em làm</span><i></i><b>' + (mc.xapXi ? '≈ ' : '') + mc.giayDoc + '</b><span>giây đọc hết đề cần</span></p>' + thuocCt(mc, false) + '<p class="mc-gan-nhan">' + chipCt(mc.ma, true) + '</p><p class="mc-gan-gt">Đọc hết đề cần ' + mc.giayDoc + ' giây, rồi cần thêm ít nhất ' + mc.sanNghi + ' giây để nghĩ' + (typeof mc.thuong === 'number' ? ' · thời gian thường của lớp ở câu này: ' + mc.thuong + ' giây.' : ' · lớp chưa đủ mẫu của câu này nên chưa có thời gian thường.') + '</p>' + chuGiaiCt(mc);
+        else h += '<p class="mc-gan-chua">' + chipCt(0, true) + '</p><p class="mc-gan-gt">Lượt này làm trước khi máy em dùng đồng hồ mới nên chưa xếp được Mức làm. Từ lần làm tới, mức hiện ở đây.</p>';
+        h += '</div>';
       }
-      h += '</section><div class="mc-ct-luoi">';
+      h += '</section><section class="mc-the-ct mc-lan-the"><h4>Các lần làm câu này</h4>' + (lans.length ? '<ul class="mc-lan-ds">' + lans.slice().reverse().map(dongLanCt).join('') + '</ul>' : RONG) + '</section></div><div class="mc-ct-luoi' + (cn ? ' mc-ct-4' : '') + '">';
+      if (cn) h += cachLamCt(cn);
       var cd = hs.chienDich, NHIP = { vuot: ['Vượt nhịp', 'đã làm hơn mức cần'], dung: ['Đúng nhịp', 'làm đủ mức cần mỗi ngày'], tre12: ['Trễ 1–2 ngày', 'nên nhắc em làm bù'], tre3: ['Trễ từ 3 ngày', 'cần nhắc em ngay'] };
       h += '<section class="mc-the-ct"><h4>Chiến dịch đang theo</h4>' + (cd ? '<div style="font-weight:700;margin-bottom:.4em">' + thoat(cd.ten) + ' <span class="mc-rong">· hạn nộp ' + thoat(String(cd.hanNop).slice(8, 10) + '/' + String(cd.hanNop).slice(5, 7)) + '</span></div><div class="mc-cd">' + vongSo(cd.coXat, 'rgb(142,202,230)', 'cọ xát') + vongSo(cd.thanhThao, 'rgb(76,179,95)', 'thành thạo') + '</div><div style="margin-top:.5em"><span class="mc-chip mc-' + thoat(cd.nhip) + '">' + (NHIP[cd.nhip] || [cd.nhip])[0] + '</span> <span class="mc-rong">' + ((NHIP[cd.nhip] || [])[1] || '') + '</span></div>' : '<div class="mc-rong">Em không có chiến dịch đang chạy.</div>') + '</section>';
       var n14 = hs.ngay14;
@@ -803,74 +897,95 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function saiHai(n) { return (n < 10 ? '0' : '') + n; }
   function saiGio(iso) { var t = Date.parse(iso); if (!isFinite(t)) return ''; var d = new Date(t + 7 * 3600000); return saiHai(d.getUTCHours()) + ':' + saiHai(d.getUTCMinutes()) + ' · ' + saiHai(d.getUTCDate()) + '/' + saiHai(d.getUTCMonth() + 1); }
   function saiThoiLuong(g) { if (g == null || !isFinite(g)) return '—'; var m = Math.floor(g / 60), x = g % 60; return m ? m + ' phút' + (x ? ' ' + x + ' giây' : '') : x + ' giây'; }
-  // Màu theo NƠI làm (gắn cố định với nơi, không theo thứ hạng; bộ màu đã qua kiểm mù màu trên nền tối).
-  var MAU_NOI = [['Ca', 'rgb(57,135,229)'], ['Đoàn', 'rgb(217,89,38)'], ['Đảo', 'rgb(25,158,112)'], ['Lên bảng', 'rgb(201,133,0)'], ['Bi-a', 'rgb(213,81,129)'], ['Đầu giờ', 'rgb(144,133,233)']];
-  function nhomNoi(noi) { var n = String(noi || ''); for (var i = 0; i < MAU_NOI.length; i++) if (n === MAU_NOI[i][0] || n.indexOf(MAU_NOI[i][0] + ' ') === 0) return MAU_NOI[i][0]; return 'Khác'; }
-  function mauNoi(noi) { var g = nhomNoi(noi); for (var i = 0; i < MAU_NOI.length; i++) if (MAU_NOI[i][0] === g) return MAU_NOI[i][1]; return 'rgb(0,131,0)'; }
-  function saiNgay(iso) { var t = Date.parse(iso); if (!isFinite(t)) return ''; var d = new Date(t + 7 * 3600000); return saiHai(d.getUTCDate()) + '/' + saiHai(d.getUTCMonth() + 1); }
-  function chuCai(ten) { var p = String(ten || '?').trim().split(/ +/); return (p[p.length - 1] || '?').charAt(0).toUpperCase(); }
-  function veAiSai(ds, conNua) {
-    var theoEm = {}, thuTu = [], theoNoi = {}, theoNgay = {}, tongGiay = 0, soGiay = 0, coUoc = false;
+  // Tên viết tắt chữ đệm khi thẻ không đủ chỗ ("Nguyễn Đức Anh" ⇒ "Nguyễn Đ. Anh"): họ và tên luôn đủ chữ.
+  function tenNgan(ten) { var w = String(ten || '').trim().split(/ +/); if (w.length < 3) return w.join(' '); return [w[0]].concat(w.slice(1, -1).map(function (x) { return x.charAt(0) + '.'; })).concat([w[w.length - 1]]).join(' '); }
+  function giayChu(g) { return g < 600 ? g + ' giây' : saiThoiLuong(g); }
+  function pipHtml(n) { var h = '<span class="mc-pip" aria-hidden="true">'; for (var k = 1; k <= 4; k++) h += '<i' + (k <= n ? ' class="b"' : '') + '></i>'; return h + '</span>'; }
+  var TEN_MUC = [null, 'Chưa đọc hết đề', 'Đọc xong, chưa kịp nghĩ', 'Có nghĩ', 'Làm kỹ'];
+  // Mức làm (thầy 21/10): MÁY CHỦ xếp từng lượt (mucLam = ma · giay · giayDoc · sanNghi · ranh2/3/4) — tờ chỉ vẽ lại, KHÔNG biết tỉ lệ nào. Khoảng giây ghi ở đầu mỗi làn lấy từ lượt "đại diện" (cách tính phổ biến nhất của câu).
+  function ranhDaiDien(ds) {
+    var dem = {}, tot = null, max = 0;
     ds.forEach(function (x) {
-      if (!theoEm[x.sbd]) { theoEm[x.sbd] = { ten: x.ten || x.sbd, ds: [] }; thuTu.push(x.sbd); }
-      theoEm[x.sbd].ds.push(x);
-      var g = nhomNoi(x.noi); theoNoi[g] = (theoNoi[g] || 0) + 1;
-      var ng = String(x.luc || '').slice(0, 10); if (ng) theoNgay[ng] = (theoNgay[ng] || 0) + 1;
-      if (x.giay != null && isFinite(x.giay)) { tongGiay += x.giay; soGiay++; if (x.uocTinh) coUoc = true; }
+      var m = x.mucLam; if (!m || typeof m.ranh2 !== 'number' || typeof m.ranh3 !== 'number') return;
+      var k = m.ranh2 + '|' + m.ranh3 + '|' + (typeof m.ranh4 === 'number' ? m.ranh4 : '');
+      dem[k] = (dem[k] || 0) + 1; if (dem[k] > max) { max = dem[k]; tot = m; }
     });
-    thuTu.sort(function (a, b) { return theoEm[b].ds.length - theoEm[a].ds.length || theoEm[a].ten.localeCompare(theoEm[b].ten, 'vi'); });
-    var noiXep = Object.keys(theoNoi).sort(function (a, b) { return theoNoi[b] - theoNoi[a]; });
-    var maxNoi = theoNoi[noiXep[0]] || 1;
-    var tb = soGiay ? Math.round(tongGiay / soGiay) : null;
-    var h = '<div class="mc-sai-o4">'
-      + '<div class="mc-sai-o" style="--mc-sai-c:rgb(230,103,103)"><b>' + thuTu.length + '</b><span>em làm sai</span></div>'
-      + '<div class="mc-sai-o" style="--mc-sai-c:rgb(255,210,122)"><b>' + ds.length + '</b><span>lượt làm sai' + (conNua ? ' (300 lượt gần nhất)' : '') + '</span></div>'
-      + '<div class="mc-sai-o" style="--mc-sai-c:rgb(57,135,229)"><b>' + (tb == null ? '—' : (coUoc ? '≈ ' : '') + saiThoiLuong(tb)) + '</b><span>trung bình mỗi lượt</span></div>'
-      + '<div class="mc-sai-o" style="--mc-sai-c:' + mauNoi(noiXep[0]) + '"><b>' + thoat(tenNguon(noiXep[0]) || '—') + '</b><span>sai nhiều nhất (' + (theoNoi[noiXep[0]] || 0) + ' lượt)</span></div>'
-      + '</div><div class="mc-sai-hai"><section class="mc-sai-the" aria-label="Lượt sai theo nơi làm"><h3>Lượt sai theo nơi làm</h3>';
-    noiXep.forEach(function (g) {
-      h += '<div class="mc-sai-thanh" title="' + thoat(tenNguon(g)) + ': ' + theoNoi[g] + ' lượt"><span>' + thoat(tenNguon(g)) + '</span><i style="--mc-sai-c:' + mauNoi(g) + '" data-w="' + Math.max(4, Math.round(theoNoi[g] / maxNoi * 100)) + '"></i><em>' + theoNoi[g] + '</em></div>';
-    });
-    h += '</section><section class="mc-sai-the" aria-label="Lượt sai theo ngày"><h3>Lượt sai theo ngày</h3>';
-    var ngay = Object.keys(theoNgay).sort().slice(-10), maxNg = 1;
-    ngay.forEach(function (n) { if (theoNgay[n] > maxNg) maxNg = theoNgay[n]; });
-    h += '<div class="mc-sai-cot">';
-    ngay.forEach(function (n) { h += '<div title="' + n.slice(8, 10) + '/' + n.slice(5, 7) + ': ' + theoNgay[n] + ' lượt"><b>' + theoNgay[n] + '</b><i data-h="' + Math.max(3, Math.round(theoNgay[n] / maxNg * 82)) + '"></i></div>'; });
-    h += '</div><div class="mc-sai-ngay">';
-    ngay.forEach(function (n) { h += '<span>' + n.slice(8, 10) + '/' + n.slice(5, 7) + '</span>'; });
-    h += '</div></section></div><section aria-label="Từng em"><h3 class="mc-sai-tt" style="margin-bottom:.6em">Từng em</h3><div class="mc-sai-luoi">';
-    thuTu.forEach(function (sbd) {
-      var e = theoEm[sbd];
-      // Thầy 09/10: "phần ai sai … hiển thị cả số giây từng làm câu đó" — dòng tên có "trung bình <x> giây" của em (chỉ lượt có số giây; có ước tính ⇒ "≈"; viết đủ chữ, không "TB" — chuẩn từ ngữ mục 4),
-      // mỗi chip lượt LUÔN có phần giây: đo được ⇒ số giây, không đo được ⇒ "chưa đo giờ" (không bỏ trống, không đoán).
-      var tgEm = 0, nEm = 0, uocEm = false;
-      e.ds.forEach(function (x) { if (x.giay != null && isFinite(x.giay)) { tgEm += x.giay; nEm++; if (x.uocTinh) uocEm = true; } });
-      var tbEm = nEm ? ' · trung bình ' + (uocEm ? '≈ ' : '') + saiThoiLuong(Math.round(tgEm / nEm)) : '';
-      h += '<article class="mc-sai-em"><span class="mc-sai-anh" aria-hidden="true">' + thoat(chuCai(e.ten)) + '</span><span class="mc-sai-ten">' + thoat(e.ten) + '<small>' + e.ds.length + ' lần sai' + thoat(tbEm) + '</small></span><span class="mc-sai-chip">';
-      e.ds.forEach(function (x) {
-        h += '<span style="--mc-sai-c:' + mauNoi(x.noi) + '">' + thoat(saiGio(x.luc)) + ' · ' + thoat(tenNguon(x.noi || '')) + (x.giay != null && isFinite(x.giay) ? ' · <u>' + (x.uocTinh ? '≈ ' : '') + thoat(saiThoiLuong(x.giay)) + '</u>' : ' · chưa đo giờ') + '</span>';
-      });
-      h += '</span></article>';
-    });
-    h += '</div></section>' + (coUoc ? '<p class="mc-sai-chu">≈ : lượt cũ chưa đo giờ — thời gian ước tính từ lúc trả lời câu trước tới câu này.</p>' : '');
+    return tot;
+  }
+  function khoangMuc(r, ma) {
+    if (!r) return '';
+    var r4 = typeof r.ranh4 === 'number' ? r.ranh4 : null;
+    if (ma === 1) return 'dưới ' + r.ranh2 + ' giây';
+    if (ma === 2) return r.ranh2 + '–' + (r.ranh3 - 1) + ' giây';
+    if (ma === 3) return r4 === null ? 'từ ' + r.ranh3 + ' giây' : (r4 > r.ranh3 ? r.ranh3 + '–' + (r4 - 1) + ' giây' : '');
+    return r4 === null ? '' : 'từ ' + Math.max(r4, r.ranh3) + ' giây';
+  }
+  /** Một thẻ: số em · thanh bốn mức (ký hiệu + số lượt) · năm làn (Mức làm 1–4 + "Chưa có số đo") với thẻ tên từng lượt. kieu: dd = đã điểm danh · lop = cả lớp · tat = chưa biết lớp. */
+  function theAiSai(kieu, ds, soEm, r, cot, coMatSet) {
+    var tieu = kieu === 'dd' ? 'ĐÃ ĐIỂM DANH' : kieu === 'lop' ? 'CẢ LỚP' : 'EM LÀM SAI';
+    var phu = kieu === 'dd' ? 'Em có mặt buổi này, làm sai câu này' : kieu === 'lop' ? 'Mọi em của lớp làm sai câu này' + (coMatSet ? ' · <i class="mc-vg mc-vg-g"></i> em vắng buổi này' : '') : 'Mọi em đã làm sai câu này';
+    var bt = kieu === 'dd' ? '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.2 4.2 1.7 4.5 4.3"/></svg>';
+    var theo = [[], [], [], [], []], emSet = {}, nEm = 0;
+    ds.forEach(function (x) { var ma = x.mucLam && x.mucLam.ma >= 1 && x.mucLam.ma <= 4 ? x.mucLam.ma : 0; theo[ma].push(x); if (!emSet[x.sbd]) { emSet[x.sbd] = 1; nEm++; } });
+    var h = '<article class="mc-ai-the' + (cot > 3 ? ' mc-ai-dense' : '') + '" data-k="' + kieu + '"><header class="mc-ai-th"><span class="mc-ai-ky">' + bt + tieu + '</span><span class="mc-ai-ph">' + phu + '</span></header>'
+      + '<div class="mc-ai-so"><p><b>' + nEm + '</b><span>' + (soEm != null ? '/ ' + soEm + ' em ' + (kieu === 'dd' ? 'có mặt' : 'của lớp') + ' làm sai' : 'em làm sai') + '</span></p><p class="mc-ai-luot"><b>' + ds.length + '</b><span>lượt sai</span></p></div>';
+    var bar = '';
+    for (var m = 1; m <= 4; m++) if (theo[m].length) bar += '<i data-m="' + m + '" style="flex:' + theo[m].length + '">' + pipHtml(m) + '<b>' + theo[m].length + '</b></i>';
+    if (theo[0].length) bar += '<i data-m="0" style="flex:' + theo[0].length + '"><b>' + theo[0].length + '</b></i>';
+    if (bar) h += '<div class="mc-ai-tn" role="img" aria-label="' + [1, 2, 3, 4].map(function (k) { return 'Mức làm ' + k + ': ' + theo[k].length + ' lượt'; }).join('; ') + (theo[0].length ? '; chưa có số đo: ' + theo[0].length + ' lượt' : '') + '">' + bar + '</div>';
+    function the(x, chua) {
+      var vang = coMatSet && kieu === 'lop' && !coMatSet[x.sbd];
+      var g = x.giay != null && isFinite(x.giay) ? (chua && x.uocTinh ? '≈ ' : '') + giayChu(x.giay) : 'chưa đo giờ';
+      return '<li class="mc-pl" title="' + thoat(saiGio(x.luc) + ' · ' + tenNguon(x.noi || '')) + '">' + (vang ? '<i class="mc-vg" title="vắng"></i>' : '') + '<b data-t="' + thoat(tenNgan(x.ten || x.sbd)) + '">' + thoat(x.ten || x.sbd) + '</b><u>' + thoat(g) + '</u></li>';
+    }
+    function sapXep(a) { return a.slice().sort(function (p, q) { var gp = p.giay == null ? 1e9 : p.giay, gq = q.giay == null ? 1e9 : q.giay; return gp - gq || String(p.ten).localeCompare(String(q.ten), 'vi'); }); }
+    h += '<div class="mc-ai-lan">';
+    for (var k = 1; k <= 4; k++) {
+      var kh = khoangMuc(r, k), tenM = TEN_MUC[k];
+      if (k === 4 && r && typeof r.ranh4 !== 'number' && !theo[4].length) { h += '<section class="mc-ln mc-ln-rong" data-m="4"><header>' + pipHtml(4) + '<b>Mức làm 4</b><span>Lớp chưa đủ mẫu của câu này để xếp Mức làm 4</span></header></section>'; continue; }
+      if (!theo[k].length) { h += '<section class="mc-ln mc-ln-rong" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '</span></header></section>'; continue; }
+      h += '<section class="mc-ln" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '</span><em>' + theo[k].length + ' lượt</em></header><ul class="mc-pls" style="--mc-cot:' + cot + '">' + sapXep(theo[k]).map(function (x) { return the(x, false); }).join('') + '</ul></section>';
+    }
+    if (theo[0].length) h += '<section class="mc-ln mc-ln-chua"><header><b>Chưa có số đo</b><span>Lượt làm trước khi máy em dùng đồng hồ mới</span><em>' + theo[0].length + ' lượt</em></header><ul class="mc-pls" style="--mc-cot:' + cot + '">' + sapXep(theo[0]).map(function (x) { return the(x, true); }).join('') + '</ul></section>';
+    return h + '</div></article>';
+  }
+  function veAiSai(ds, conNua, lop) {
+    var r = ranhDaiDien(ds), coUoc = ds.some(function (x) { return x.uocTinh; });
+    var coMatSet = null;
+    if (lop && Array.isArray(lop.coMat)) { coMatSet = {}; lop.coMat.forEach(function (s) { coMatSet[s] = 1; }); }
+    var cot = ds.length > 28 ? 4 : 3, h = '';
+    if (r) sai.querySelector('.mc-ai-dau').insertAdjacentHTML('beforeend', '<p class="mc-ai-thuoc"><span>Đọc hết đề cần</span><b>' + r.giayDoc + ' giây</b><span>Nghĩ từ ' + r.ranh3 + ' giây</span></p>');
+    if (lop && lop.soLop > 0) {
+      h += '<div class="mc-ai-hai">';
+      if (coMatSet) {
+        var dd = ds.filter(function (x) { return coMatSet[x.sbd]; });
+        h += theAiSai('dd', dd, lop.soCoMat, r, cot, null);
+      } else {
+        h += '<article class="mc-ai-the" data-k="dd"><header class="mc-ai-th"><span class="mc-ai-ky"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>ĐÃ ĐIỂM DANH</span></header><div class="mc-ai-rong"><b>Buổi này chưa điểm danh</b><p>Thẻ này chỉ hiện những em đã có mặt. Điểm danh bằng mã hoặc ghi tay ở bước Điểm danh, rồi bấm X lần nữa.</p></div></article>';
+      }
+      h += theAiSai('lop', ds, lop.soLop, r, cot, coMatSet) + '</div>';
+    } else {
+      h += '<div class="mc-ai-hai mc-ai-1">' + theAiSai('tat', ds, null, r, cot, null) + '</div>';
+    }
+    h += '<p class="mc-ai-chan"><span>' + (r ? 'Mức làm xếp theo số giây làm của từng lượt so với thời gian đọc hết đề (' + r.giayDoc + ' giây) và sàn nghĩ (' + r.sanNghi + ' giây).' : 'Mức làm có từ khi máy em dùng đồng hồ mới. Lượt làm trước đó chưa có số đo — không đoán mức.') + (conNua ? ' · 300 lượt gần nhất.' : '') + (coUoc ? ' ≈ là số giây ước tính từ lúc trả lời câu trước.' : '') + '</span><span><kbd>Esc</kbd> đóng</span></p>';
     sai.insertAdjacentHTML('beforeend', h);
-    // Thanh / cột mọc lên sau một nhịp (tắt khi giảm chuyển động — CSS lo).
-    requestAnimationFrame(function () {
-      $$(sai, '.mc-sai-thanh i').forEach(function (x) { x.style.width = x.getAttribute('data-w') + '%'; });
-      $$(sai, '.mc-sai-cot i').forEach(function (x) { x.style.height = x.getAttribute('data-h') + '%'; });
+    // Tên không đủ chỗ ⇒ viết tắt chữ đệm (đo sau khi vẽ xong).
+    $$(sai, '.mc-pl b').forEach(function (b) {
+      if (b.scrollWidth > b.clientWidth + 1) b.textContent = b.getAttribute('data-t');
+      if (b.scrollWidth > b.clientWidth + 1) { var w = String(b.textContent).split(' '); if (w.length > 2) b.textContent = w[0] + ' ' + w[w.length - 1]; } // vẫn dài: bỏ hẳn chữ đệm (họ + tên)
     });
   }
   function moAiSai() {
     if (!coAiSai()) { baoNhanh(coNutAiSai() ? (body.classList.contains('mc-noi') ? 'Câu này không tra được danh sách làm sai' : 'Tờ chưa nối với app thầy') : 'Tờ này không có danh sách làm sai'); return; }
     var d = dot(), cs = d && d.querySelector('.mc-cau-so'), soCau = cs ? String(cs.textContent || '').split('·')[0].trim() : '';
-    sai.innerHTML = '<button type="button" class="mc-ct-dong" aria-label="Đóng">×</button><span class="mc-sai-ke">' + thoat(soCau ? soCau + ' · ai đã sai?' : 'Ai đã sai?') + '</span><h2>Học sinh làm sai câu này</h2><p class="mc-sai-tt">Đang tải…</p>';
+    sai.innerHTML = '<button type="button" class="mc-ct-dong" aria-label="Đóng">×</button><header class="mc-ai-dau"><div><span class="mc-sai-ke">' + thoat(soCau ? soCau + ' · ai đã sai?' : 'Ai đã sai?') + '</span><h2>Học sinh làm sai câu này</h2></div></header><p class="mc-sai-tt">Đang tải…</p>';
     sai.classList.add('mc-mo'); saiMo.classList.add('mc-mo');
-    window.__mcHoiAiSai(khoaDot(), function (ds, loi, conNua) {
+    window.__mcHoiAiSai(khoaDot(), function (ds, loi, conNua, lop) {
       var tt = sai.querySelector('.mc-sai-tt');
       if (!ds) { if (tt) tt.textContent = 'Chưa tải được danh sách' + (loi === 'het_gio' ? ' — app thầy trả lời chậm, bấm X lần nữa.' : '.'); return; }
-      if (!ds.length) { if (tt) tt.textContent = 'Chưa em nào làm sai câu này.'; return; }
+      if (!ds.length) { if (tt) tt.textContent = lop && lop.soLop > 0 ? 'Chưa em nào của lớp làm sai câu này.' : 'Chưa em nào làm sai câu này.'; return; }
       if (tt) tt.remove();
-      veAiSai(ds, conNua);
+      veAiSai(ds, conNua, lop);
     });
   }
 

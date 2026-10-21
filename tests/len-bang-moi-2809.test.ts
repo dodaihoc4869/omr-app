@@ -222,12 +222,14 @@ describe('D/K + nhãn trên thẻ tên + bảng chi tiết em (cầu nối)', ()
     const txt = ct.textContent!
     expect(ct.querySelector('.mc-cau-nay')).toBeTruthy()
     expect(ct.querySelector('section')!.classList.contains('mc-cau-nay')).toBe(true) // khối "Câu này" LÊN ĐẦU
-    expect(txt).toContain('2 lần làm')
-    expect(txt).toContain('Chủ Nhật 27/09 · 20:05') // giờ Việt Nam
+    expect(ct.querySelector('.mc-kpi')!.textContent).toBe('2lần làm1đúng1sai')
+    expect(txt).toContain('27/09 · 20:05') // giờ Việt Nam
     expect(txt).toContain('chọn C')
     expect(txt).toContain('chọn —') // sổ chưa có đáp án em chọn
-    expect(txt).toContain('Có gợi ý · 31 giây')
-    expect(txt).toMatch(/Học theo kế hoạch[\s\S]*Ôn theo kế hoạch/) // 12/10: tên nguồn mới thay Đảo/Đoàn (cả lớp nhìn tờ)
+    expect(txt).toContain('có gợi ý')
+    expect(txt).toContain('Làm bằng đồng hồ cũ: 31 giây — chưa xếp mức.') // 21/10: lượt chưa có số đo ⇒ nhãn nét đứt + số giây cũ, không đoán mức
+    expect(ct.querySelectorAll('.mc-chm-chua')).toHaveLength(3) // 2 lần ở danh sách + lần gần nhất
+    expect(txt).toMatch(/Ôn theo kế hoạch[\s\S]*Học theo kế hoạch/) // 12/10: tên nguồn mới thay Đảo/Đoàn (cả lớp nhìn tờ); 21/10: lần mới nhất đứng trước
     expect(txt).not.toMatch(/Đảo|Đoàn|Bi-a/)
     expect(txt).toContain('Vượt nhịp')
     expect(txt).toContain('L3 Khá')
@@ -241,6 +243,45 @@ describe('D/K + nhãn trên thẻ tên + bảng chi tiết em (cầu nối)', ()
     expect((exp.querySelector('.mc-exp-ray i') as HTMLElement).style.width).toBe('25%')
     t.phim('Escape')
     expect(ct.classList.contains('mc-mo')).toBe(false)
+  })
+
+  it('(thầy 21/10) bảng chi tiết hiện ĐỦ Mức làm 1–4 trên màn chiếu: lần gần nhất có thước + chip + lời; từng lần có chip + thước (đúng-trước-khi-đọc ghi trung tính); Cách làm bài 14 ngày có bảng đúng/sai; không câu "chỉ thầy thấy"', () => {
+    const t = moTo([o('A', 'Lê Thu Hà')], { cauNoi: true })
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI })
+    t.phim('l')
+    ;(t.doc.querySelector('.mc-em[id]') as HTMLElement).click()
+    const xin = t.guiLen.find((m) => m.type === TIN_TO_CHIEU.HO_SO)!
+    const muc = (ma: number, giay: number, o: Record<string, unknown> = {}) => ({ ma, giay, giayDoc: 24, sanNghi: 6, ranh2: 24, ranh3: 30, ranh4: 60, thuong: 75, ...o })
+    t.tuCha({ type: TIN_TO_CHIEU.HO_SO_TRA, id: xin.id, hoSo: {
+      em: { hoTen: 'Lê Thu Hà' },
+      cauNay: { soLan: 3, soDung: 1, soSai: 2, lan: [
+        { luc: '2026-10-24T13:12:00Z', dung: false, coGoiY: false, nguon: 'Luyện theo dạng', giay: 22, chon: 'B' },
+        { luc: '2026-10-25T12:08:00Z', dung: true, coGoiY: false, nguon: 'Tự sửa lỗi', giay: 18, chon: 'A', mucLam: muc(1, 18, { ghiChu: 'dung_truoc_doc' }) },
+        { luc: '2026-10-26T11:48:00Z', dung: false, coGoiY: false, nguon: 'BTVN', giay: 41, chon: 'C', mucLam: muc(3, 41) },
+      ] },
+      cachLam14: { soDo: 58, chuaCoSoDo: 13, theoMuc: [{ ma: 1, luot: 6, dung: 1, sai: 5 }, { ma: 2, luot: 9, dung: 3, sai: 6 }, { ma: 3, luot: 31, dung: 26, sai: 5 }, { ma: 4, luot: 12, dung: 10, sai: 2 }], saiLamVoi: 11, saiDuNghi: 7, dungTruocDoc: 1, coBetaThat: true },
+    } })
+    const ct = t.doc.querySelector('.mc-ct')!
+    const gan = ct.querySelector('.mc-gan')!
+    expect(gan.querySelector('.mc-gan-so')!.textContent).toBe('41giây em làm24giây đọc hết đề cần')
+    expect(gan.querySelector('.mc-chm-lon')!.textContent).toBe('Mức làm 3 Có nghĩ')
+    expect(gan.querySelector('.mc-th')!.getAttribute('aria-label')).toBe('Làm 41 giây; đọc hết đề cần 24 giây; có thời gian nghĩ từ 30 giây; làm kỹ từ 60 giây')
+    expect(gan.querySelectorAll('.mc-th-z i')).toHaveLength(4)
+    expect(gan.querySelector('.mc-gan-gt')!.textContent).toBe('Đọc hết đề cần 24 giây, rồi cần thêm ít nhất 6 giây để nghĩ · thời gian thường của lớp ở câu này: 75 giây.')
+    expect([...gan.querySelectorAll('.mc-cg li')].map((x) => x.textContent)).toEqual(['Dưới 24 giây: chưa đọc hết đề', '24–29 giây: đọc xong, chưa kịp nghĩ', '30–59 giây: có nghĩ', 'Từ 60 giây: làm kỹ'])
+    const lan = [...ct.querySelectorAll('.mc-lanl')]
+    expect(lan.map((l) => l.querySelector('.mc-chm')!.textContent)).toEqual(['Mức làm 3', 'Mức làm 1', 'Chưa có số đo']) // mới trước
+    expect(lan[1]!.querySelector('.mc-lanl-gt')!.textContent).toBe('Đúng · nộp sau 18 giây, trước khi đọc hết đề (24 giây).') // đủ trên màn chiếu, lời trung tính
+    expect(lan[1]!.querySelector('.mc-th-nho')).not.toBeNull()
+    expect(lan[2]!.querySelector('.mc-th')).toBeNull()
+    const cach = ct.querySelector('.mc-cach')!
+    expect(cach.querySelector('.mc-do')!.textContent).toBe('Đo được 58/71 lượt · 13 lượt chưa có số đo.')
+    expect([...cach.querySelectorAll('.mc-cheo li[data-m]')].map((l) => [...l.querySelectorAll(':scope > i')].map((i) => i.textContent).join('/'))).toEqual(['1/5', '3/6', '26/5', '10/2'])
+    expect(cach.querySelector('.mc-ket')!.textContent).toBe('11 lượt sai khi làm vội (Mức làm 1–2) · 7 lượt sai dù đã nghĩ (Mức làm 3–4)')
+    expect(ct.querySelector('.mc-ct-luoi')!.classList.contains('mc-ct-4')).toBe(true)
+    expect(ct.textContent).not.toMatch(/chỉ thầy|không hiện lên (bản )?chiếu/i)
+    // máy chủ cũ (không có cachLam14): không vẽ thẻ Cách làm bài, lưới như trước
+    t.phim('Escape')
   })
 
   it('tờ mở riêng (không có app cha) ⇒ bảng chi tiết nói rõ không lấy được số, không bịa', () => {

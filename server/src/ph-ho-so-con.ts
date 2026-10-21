@@ -41,7 +41,7 @@ export async function phHoSoThaiDo(envGoc: Env, b: Row, nowMs: number = Date.now
   return hoSoThaiDoBanHocSinh(envDoc, sbd, nowMs, LOI_HO_SO_CON)
 }
 
-/** `POST /ph/lich-su-lam-cau {pass|sbd, gioiHan?}` — xem đầu tệp. `gioiHan` như bản em (mặc định 1000, trần 2000). */
+/** `POST /ph/lich-su-lam-cau {pass|sbd, gioiHan?}` — xem đầu tệp. `gioiHan` như bản em (mặc định 1000, trần 5000). */
 export async function phLichSuLamCau(envGoc: Env, b: Row, envDoc: Env = envGoc, ctx?: ExecutionContext): Promise<TraLoiLichSuLamCau> {
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-lich-su-lam-cau', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
   return lichSuLamCauBanHocSinh(envDoc, sbd, b.gioiHan, LOI_LICH_SU_CON)

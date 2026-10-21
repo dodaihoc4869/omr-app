@@ -89,7 +89,7 @@ export async function layHoSoThaiDoCon(sbd: string): Promise<KetQuaLenh<KetQuaHo
   return kq ? { ok: true, du: kq } : thoat('khong_doc_duoc', 'Máy chủ trả hồ sơ không đúng dạng.')
 }
 
-/** Lịch sử làm câu (lượt đã được xem kết quả · câu từng sai · số giây) của con. `gioiHan` như lệnh thầy (trần 2000). */
+/** Lịch sử làm câu (lượt đã được xem kết quả · câu từng sai · số giây) của con. `gioiHan` như lệnh thầy (trần 5000). */
 export async function layLichSuLamCauCon(sbd: string, gioiHan?: number): Promise<KetQuaLenh<KetQuaLichSuLamCau>> {
   const them: Record<string, unknown> = {}
   if (gioiHan) them.gioiHan = Math.min(TRAN_GIOI_HAN, Math.max(1, Math.round(gioiHan)))

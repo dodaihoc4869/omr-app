@@ -60,7 +60,27 @@
   "ph-xac-dinh": {
    "dot": 1,
    "lenh": 1
+  },
+  "ph-lich-su-lam-cau": {
+   "dot": 4,
+   "lenh": 8
+  },
+  "hs-lich-su-lam-cau": {
+   "dot": 4,
+   "lenh": 7
+  },
+  "gv-lich-su-lam-cau": {
+   "dot": 3,
+   "lenh": 6
+  },
+  "gv-ai-sai-cau": {
+   "dot": 2,
+   "lenh": 3
+  },
+  "gv-ho-so-len-bang": {
+   "dot": 14,
+   "lenh": 35
   }
  },
- "ghiChuPh": "Mốc cổng phụ huynh (21/10, đo trên main a746fbc trước khi tối ưu): số đợt chờ D1 nối tiếp + số lệnh D1 của 6 lệnh /ph, giờ cao điểm, token có pk. Chỉ hạ."
+ "ghiChuPh": "Mốc cổng phụ huynh (21/10, đo trên main a746fbc trước khi tối ưu): số đợt chờ D1 nối tiếp + số lệnh D1 của 6 lệnh /ph, giờ cao điểm, token có pk. Chỉ hạ. 21/10 (Mức làm 1–4 ở Lịch sử làm câu): ba khoá *-lich-su-lam-cau mốc lệnh D1 +1 so lúc đo gốc (7/6/5 → 8/7/6) vì thêm MỘT lệnh đọc β thật (`omni_beta_cau`) cho các lượt đo bằng đồng hồ mới; số ĐỢT chờ không đổi (4/4/3) — lệnh chạy CÙNG đợt với khối tra phụ; em chưa có lượt nào đo mới thì KHÔNG có lệnh ấy. 21/10 (tờ chiếu: Mức làm 1–4 + hai thẻ đã điểm danh / cả lớp): thêm hai lệnh thầy gv-ai-sai-cau (đo gốc 2 đợt / 2 lệnh; nay 2 / 3: thêm MỘT lệnh đọc β cùng đợt, và lọc lớp `sbds` ngay trong truy vấn) và gv-ho-so-len-bang (đo gốc 29 đợt / 32 lệnh khi mọi khối nối tiếp; nay 14 / 35 — các khối độc lập đọc cùng lúc, chiến dịch và toàn cảnh chạy song song từ đầu; +3 lệnh so với 32 đều nằm CÙNG đợt với khối đọc khác (một lệnh β, hai lệnh Cách làm bài 14 ngày), không thêm vòng chờ; 14 đợt còn lại là chuỗi của hàm dùng chung docHoSo2/gvEmToanCanh)."
 }

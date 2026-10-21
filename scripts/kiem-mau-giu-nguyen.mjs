@@ -194,10 +194,15 @@ const GAME_DA_GO = new Map(JSON.parse(readFileSync(new URL('../docs/don-game-141
 // MÀU THẦY RA LỆNH THÊM — ngoại lệ ĐÓNG (09/10/2026, thầy: "Quét bảng màu từ Bảng G (ngà voi #FFFEF6, xanh ngọc #10B981, xanh navy #0F3D3A,
 // vàng #F7A800) cập nhật vào tailwind…", rồi "Build rồi đẩy luôn"). Đúng BA khai báo gốc ở tokens.css (xanh ngọc trùng --xanh có sẵn nên không cần);
 // mọi sắc dẫn xuất phải pha color-mix từ ba biến này. Liệt kê đủ tệp · khai báo, KHÔNG glob; thêm dòng mới phải có lệnh thầy kèm theo.
+// 21/10: thầy ra lệnh THIẾT KẾ LẠI hai bảng của tờ chiếu (Ai đã sai? · chi tiết em gọi lên bảng) — danh sách đóng, kèm lời thầy, ở docs/mau-thay-ra-lenh-2110.json:
+// `cu` = khai báo màu của bản cũ được phép biến mất (khoá → số lần được giảm); `moi` = chín biến màu gốc được phép khai thô (mọi màu khác trong hai bảng phải là var()/color-mix()).
+const LENH_2110 = JSON.parse(readFileSync(new URL('../docs/mau-thay-ra-lenh-2110.json', import.meta.url), 'utf8'))
+const MAU_CU_THAY_RA_LENH = LENH_2110.cu // khoá → số lần khai báo được phép GIẢM (đúng con số đo lúc thầy ra lệnh; giảm thêm là vi phạm)
 const MAU_THAY_RA_LENH = new Set([
   'src/styles/tokens.css · --v2-nga-voi: #fffef6',
   'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',
   'src/styles/tokens.css · --v2-vang: #f7a800',
+  ...LENH_2110.moi,
 ])
 
 const loi = []
@@ -224,7 +229,10 @@ for (const [trangThai, f, f2] of doi) {
   if (theCu && createHash('sha256').update(theCu).digest('hex') === HASH_THE_CHIEN_DICH_CU && hashCaiDat(moi) === HASH_CAI_DAT_SAU_GO) {
     for (const [k, n] of dem(khaiBaoMau(theCu))) a.set(k, Math.max(0, (a.get(k) ?? 0) - n))
   }
-  for (const [k, n] of a) if ((b.get(k) ?? 0) < n) loi.push(`ĐỔI/XOÁ màu đang có · ${ten} · ${k}`)
+  for (const [k, n] of a) {
+    const roi = n - (b.get(k) ?? 0)
+    if (roi > 0 && roi > (MAU_CU_THAY_RA_LENH[`${ten} · ${k}`] ?? 0)) loi.push(`ĐỔI/XOÁ màu đang có · ${ten} · ${k} · giảm ${roi}`)
+  }
   for (const [k, n] of b) {
     if ((a.get(k) ?? 0) >= n) continue
     const gt = k.slice(k.indexOf(':') + 1)
