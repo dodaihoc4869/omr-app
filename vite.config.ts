@@ -138,8 +138,16 @@ function dongTinhCua(ten: string): Set<string> {
   dongTinh.set(ten, ra)
   return ra
 }
+/** Tệp index.html nạp ở MỌI đường: mảnh vào (`isEntry`) + đóng tĩnh + CSS của chúng — tính từ đồ thị thật, không đoán theo tên tệp. */
+let luonCoCache: Set<string> | null = null
+function dongTinhVao(): Set<string> {
+  if (luonCoCache) return luonCoCache
+  const ra = new Set<string>()
+  for (const [ten, m] of Object.entries(goiVuaDung)) if (m.type === 'chunk' && (m as { isEntry?: boolean }).isEntry) { ra.add(ten); for (const t of dongTinhCua(ten)) ra.add(t) }
+  return (luonCoCache = ra)
+}
 function giuGoiVuaDung(): Plugin {
-  return { name: 'giu-goi-vua-dung', apply: 'build', enforce: 'pre', generateBundle: { order: 'pre', handler(_o, goi) { goiVuaDung = goi as unknown as typeof goiVuaDung; dongTinh.clear() } } }
+  return { name: 'giu-goi-vua-dung', apply: 'build', enforce: 'pre', generateBundle: { order: 'pre', handler(_o, goi) { goiVuaDung = goi as unknown as typeof goiVuaDung; dongTinh.clear(); luonCoCache = null } } }
 }
 
 export default defineConfig({
@@ -403,13 +411,14 @@ export default defineConfig({
   ],
   build: {
     // 21/10 (luật tốc độ: mọi đường chỉ nhanh hơn): danh sách mảnh con mà mỗi lượt `import()` ghi kèm (`__vite__mapDeps`) BỎ các tệp index.html
-    // ĐÃ nạp ở MỌI đường trước khi mã nào chạy — mảnh vào `index`, `react`, `bieu-tuong`, `rolldown-runtime` + tờ `index.css`. Nạp trước lại một
+    // ĐÃ nạp ở MỌI đường trước khi mã nào chạy — mảnh vào (`isEntry`) + đóng tĩnh + CSS của nó, tính từ đồ thị gói (không đoán theo tên tệp). Nạp trước lại một
     // tệp đã có là việc thừa (trình duyệt bỏ qua), nhưng tên tệp lặp trong danh sách của mọi mảnh làm các mảnh nặng thêm.
     modulePreload: {
       resolveDependencies: (_url, deps, { hostId }) => {
         // Thêm: tệp mà CHÍNH mảnh đang gọi đã `import` tĩnh (trực tiếp hay gián tiếp) — chắc chắn đã chạy xong trước khi mã của mảnh ấy chạy.
         const tinh = dongTinhCua(hostId)
-        return deps.filter((d) => !/(?:^|\/)(?:index|react|bieu-tuong|rolldown-runtime)-[\w-]{8}\.(?:js|css)$/.test(d) && !tinh.has(d))
+        const luonCo = dongTinhVao()
+        return deps.filter((d) => !luonCo.has(d) && !tinh.has(d))
       },
     },
     target: ['es2020', 'safari14', 'ios14'],
