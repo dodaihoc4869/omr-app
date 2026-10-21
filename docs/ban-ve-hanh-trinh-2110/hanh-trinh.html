@@ -81,11 +81,11 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .thuoc li button{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;min-height:64px;padding:6px 2px;border-radius:12px;color:var(--gvm-chu-2);font-size:12.5px;font-weight:700;line-height:1.2;text-align:center}
 .thuoc li[data-tt=dang] button{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
 .thuoc .tt-phu{display:none}
+.thuoc li.tach{display:none}
 .vong{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;background:var(--gvm-mat-2);color:var(--gvm-chu-2);flex:none}
 .vong svg.i{width:16px;height:16px;stroke-width:3}
 [data-tt=xong] .vong{background:var(--gvm-xl);color:var(--gvm-tren-dac)}
 [data-tt=dang] .vong{background:var(--gvm-xd);color:var(--gvm-tren-dac)}
-[data-tt=tudo] .vong{background:var(--gvm-hp-nen);color:var(--gvm-hp-dam)}
 @media (min-width:1180px){
  .thuoc{top:24px;margin:0;padding:18px;border:1px solid var(--gvm-vien);border-radius:24px;background:var(--gvm-mat);box-shadow:var(--gvm-bong)}
  .thuoc-buoi{display:block;padding-bottom:14px;margin-bottom:10px;border-bottom:1px solid var(--gvm-vien)}
@@ -94,15 +94,14 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
  .thuoc-buoi span{font-size:14px;color:var(--gvm-chu-2)}
  .thuoc ol{display:block;padding:0;border:0;background:none}
  .thuoc li{position:relative}
- .thuoc li:not(:last-child)::after{content:'';position:absolute;left:24px;top:52px;bottom:-6px;width:2px;border-radius:2px;background:var(--gvm-vien)}
- .thuoc li[data-tt=xong]:not(:last-child)::after{background:var(--gvm-xl)}
+ .thuoc li.tach{display:block;margin:10px 0 4px;padding:10px 10px 0;border-top:1px dashed var(--gvm-vien);font-size:12.5px;font-weight:700;line-height:1.4;color:var(--gvm-chu-3)}
  .thuoc li button{flex-direction:row;align-items:flex-start;gap:12px;min-height:72px;padding:10px;text-align:left;font-size:15px}
  .thuoc li+li{margin-top:6px}
  .thuoc .tt-ten{display:grid;gap:2px;padding-top:4px}
  .thuoc .tt-phu{display:block;font-size:13px;font-weight:500;color:var(--gvm-chu-3)}
  .thuoc li[data-tt=dang] .tt-phu{color:var(--gvm-xd-dam)}
  .thuoc li[data-tt=xong] .tt-phu{color:var(--gvm-xl)}
- .thuoc li[data-tt=tudo] .tt-phu{color:var(--gvm-hp)}
+ .thuoc .tt-phu .hp{color:var(--gvm-hp);font-weight:700}
  .thuoc .ten-dai{display:inline}.thuoc .ten-ngan{display:none}
 }
 .ten-dai{display:none}
@@ -243,19 +242,20 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
     <main class="noi">
       <header class="dau">
         <h1 class="h1">Hành trình giỏi Hóa</h1>
-        <p class="phu">Một buổi dạy, đi từ trên xuống: điểm danh → gọi lên bảng đầu giờ → dạy học → chữa câu khó.</p>
+        <p class="phu">Điểm danh trước — bước 2, 3, 4 dùng chung danh sách có mặt, thầy mở bước nào tuỳ việc.</p>
       </header>
 
       <!-- ════════ KHUNG 1 · ĐANG ĐIỂM DANH ════════ -->
       <section class="khung" id="diem-danh">
         <div class="bo-cuc">
           <nav class="thuoc" aria-label="Tiến trình buổi dạy">
-            <div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · Thứ Tư 21/10</span></div>
+            <div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · <b class="so" style="display:inline;font-size:14px">18/24 em có mặt</b></span></div>
             <ol>
               <li data-tt="dang"><button><span class="vong">1</span><span class="tt-ten"><span>Điểm danh</span><span class="tt-phu so">Đang làm · 18/24 em</span></span></button></li>
-              <li data-tt="cho"><button><span class="vong">2</span><span class="tt-ten"><span class="ten-dai">Gọi lên bảng đầu giờ</span><span class="ten-ngan">Đầu giờ</span><span class="tt-phu">Chưa tới</span></span></button></li>
-              <li data-tt="cho"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu">Chưa tới</span></span></button></li>
-              <li data-tt="tudo"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so">Mở lúc nào cũng được · 12 chỗ</span></span></button></li>
+              <li class="tach">Bước 2 · 3 · 4 dùng danh sách có mặt — mở bước nào tuỳ việc <i class="tag" data-t="moi">độc lập</i></li>
+              <li data-tt="san"><button><span class="vong">2</span><span class="tt-ten"><span class="ten-dai">Gọi lên bảng đầu giờ</span><span class="ten-ngan">Đầu giờ</span><span class="tt-phu">Chưa làm</span></span></button></li>
+              <li data-tt="san"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu">Chưa làm</span></span></button></li>
+              <li data-tt="san"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so"><span class="hp">12 chỗ</span> cần chữa</span></span></button></li>
             </ol>
           </nav>
 
@@ -283,14 +283,14 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
               </div>
             </section>
 
-            <section class="buoc" data-tt="cho">
-              <div class="buoc-dau"><span class="vong">2</span><div class="buoc-ten"><h2>Gọi lên bảng đầu giờ</h2><p>Mở sau khi điểm danh — app chỉ gọi em có mặt.</p></div></div>
+            <section class="buoc" data-tt="san">
+              <div class="buoc-dau"><span class="vong">2</span><div class="buoc-ten"><h2>Gọi lên bảng đầu giờ</h2><p class="so">Gọi trong 18 em có mặt · Đạt / Chưa đạt ghi sổ</p></div><button class="nut-vien">Mở</button></div>
             </section>
-            <section class="buoc" data-tt="cho">
-              <div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học <i class="tag" data-t="doi">gộp bước 3 + 4 cũ</i></h2><p class="so">Bài: Amine — tính base — tính khối lượng · 23 câu sẵn sàng</p></div></div>
+            <section class="buoc" data-tt="san">
+              <div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học <i class="tag" data-t="doi">gộp bước 3 + 4 cũ</i></h2><p class="so">Bài: Amine — tính base — tính khối lượng · 23 câu · gọi em có mặt</p></div><button class="nut-vien">Mở</button></div>
             </section>
-            <section class="buoc" data-tt="tudo">
-              <div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán <i class="tag" data-t="doi">thay thẻ Chữa bài</i></h2><p class="so"><b style="color:var(--gvm-hp)">12 chỗ</b> học sinh cần chữa · mở lúc nào cũng được</p></div><button class="nut-vien">Mở</button></div>
+            <section class="buoc" data-tt="san">
+              <div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán <i class="tag" data-t="doi">thay thẻ Chữa bài</i></h2><p class="so"><b style="color:var(--gvm-hp)">12 chỗ</b> học sinh cần chữa · gọi em có mặt làm sai lên chữa</p></div><button class="nut-vien">Mở</button></div>
             </section>
             <section class="buoc cuoi" data-tt="cho">
               <div class="buoc-dau"><span class="vong" aria-hidden="true"><svg class="i"><use href="#i-lich"/></svg></span><div class="buoc-ten"><h2>Kiểm tra ôn tập <i class="tag" data-t="giu">giữ · dời xuống cuối</i></h2><p>Ngoài buổi dạy · lịch và đề dành riêng cho từng em</p></div><button class="nut-chu">Xem</button></div>
@@ -303,12 +303,13 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
       <section class="khung" id="day-hoc">
         <div class="bo-cuc">
           <nav class="thuoc" aria-label="Tiến trình buổi dạy">
-            <div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · Thứ Tư 21/10</span></div>
+            <div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · <b class="so" style="display:inline;font-size:14px">22/24 em có mặt</b></span></div>
             <ol>
               <li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span>Điểm danh</span><span class="tt-phu so">Xong · 22/24 em</span></span></button></li>
+              <li class="tach">Bước 2 · 3 · 4 dùng danh sách có mặt — mở bước nào tuỳ việc <i class="tag" data-t="moi">độc lập</i></li>
               <li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span class="ten-dai">Gọi lên bảng đầu giờ</span><span class="ten-ngan">Đầu giờ</span><span class="tt-phu so">Xong · Đạt 3/4</span></span></button></li>
               <li data-tt="dang"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu">Đang làm</span></span></button></li>
-              <li data-tt="tudo"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so">Mở lúc nào cũng được · 12 chỗ</span></span></button></li>
+              <li data-tt="san"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so"><span class="hp">12 chỗ</span> cần chữa</span></span></button></li>
             </ol>
           </nav>
 
@@ -359,8 +360,8 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
               </div>
             </section>
 
-            <section class="buoc" data-tt="tudo">
-              <div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán</h2><p class="so"><b style="color:var(--gvm-hp)">12 chỗ</b> học sinh cần chữa · mở lúc nào cũng được</p></div><button class="nut-vien">Mở</button></div>
+            <section class="buoc" data-tt="san">
+              <div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán</h2><p class="so"><b style="color:var(--gvm-hp)">12 chỗ</b> học sinh cần chữa · gọi em có mặt làm sai lên chữa</p></div><button class="nut-vien">Mở</button></div>
             </section>
             <section class="buoc cuoi" data-tt="cho">
               <div class="buoc-dau"><span class="vong" aria-hidden="true"><svg class="i"><use href="#i-lich"/></svg></span><div class="buoc-ten"><h2>Kiểm tra ôn tập</h2><p>Ngoài buổi dạy · lịch và đề dành riêng cho từng em</p></div><button class="nut-chu">Xem</button></div>
@@ -373,11 +374,12 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
       <section class="khung" id="chua-cau">
         <div class="bo-cuc">
           <nav class="thuoc" aria-label="Tiến trình buổi dạy">
-            <div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · Thứ Tư 21/10</span></div>
+            <div class="thuoc-buoi"><small>Buổi dạy hôm nay</small><b>Lớp 12A1</b><span>Mở lúc 18:02 · <b class="so" style="display:inline;font-size:14px">22/24 em có mặt</b></span></div>
             <ol>
               <li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span>Điểm danh</span><span class="tt-phu so">Xong · 22/24 em</span></span></button></li>
+              <li class="tach">Bước 2 · 3 · 4 dùng danh sách có mặt — mở bước nào tuỳ việc <i class="tag" data-t="moi">độc lập</i></li>
               <li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span class="ten-dai">Gọi lên bảng đầu giờ</span><span class="ten-ngan">Đầu giờ</span><span class="tt-phu so">Xong · Đạt 3/4</span></span></button></li>
-              <li data-tt="xong"><button><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu">Xong · đã tick bài</span></span></button></li>
+              <li data-tt="san"><button><span class="vong">3</span><span class="tt-ten"><span>Dạy học</span><span class="tt-phu">Chưa làm</span></span></button></li>
               <li data-tt="dang"><button><span class="vong">4</span><span class="tt-ten"><span class="ten-dai">Chữa câu khó &amp; tính toán</span><span class="ten-ngan">Chữa câu</span><span class="tt-phu so">Đang làm · 12 chỗ</span></span></button></li>
             </ol>
           </nav>
@@ -389,12 +391,12 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
             <section class="buoc" data-tt="xong">
               <div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Gọi lên bảng đầu giờ</h2><p class="so"><b>Đã gọi 4 em</b> · Đạt 3 · Chưa đạt 1</p></div><button class="nut-chu">Mở lại</button></div>
             </section>
-            <section class="buoc" data-tt="xong">
-              <div class="buoc-dau"><span class="vong"><svg class="i"><use href="#i-dung"/></svg></span><div class="buoc-ten"><h2>Dạy học</h2><p><b>Đã chiếu câu · đã tick bài hôm nay</b></p></div><button class="nut-chu">Mở lại</button></div>
+            <section class="buoc" data-tt="san">
+              <div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học</h2><p class="so">Chưa làm · bài Amine — tính base — tính khối lượng · 23 câu</p></div><button class="nut-vien">Mở</button></div>
             </section>
 
             <section class="buoc" data-tt="dang">
-              <div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán</h2><p>Chiếu lên bảng · mỗi câu gọi một em làm sai lên chữa.</p></div></div>
+              <div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán</h2><p class="so">Chiếu lên bảng · mỗi câu gọi một em <b>có mặt</b> đã làm sai lên chữa.</p></div></div>
               <div class="buoc-than">
                 <div class="khoi4">
                   <div class="khoi4-dau"><h3>Câu khó &amp; tính toán<small>Thầy chọn bài trong kho Dạy học</small></h3></div>

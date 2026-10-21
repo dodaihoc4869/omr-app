@@ -6,20 +6,21 @@ Bản vẽ: `docs/ban-ve-hanh-trinh-2110/` (đọc `GHI-CHU.md`). **Chưa sửa 
 
 ## 1. Mục tiêu + ai dùng
 - Người dùng: thầy, trên lớp, máy tính nối máy chiếu (có lúc cầm điện thoại).
-- Mở màn là biết ngay buổi đang ở bước nào, việc tiếp theo là gì. Không còn phải chọn giữa hai thẻ.
-- Thứ tự đúng nhịp một buổi dạy: **1 Điểm danh → 2 Gọi lên bảng đầu giờ → 3 Dạy học → 4 Chữa câu khó & tính toán**.
+- Mở màn là biết ngay buổi đã làm gì, còn gì chưa làm. Không còn phải chọn giữa hai thẻ.
+- Bốn bước xếp theo nhịp quen của một buổi dạy: **1 Điểm danh · 2 Gọi lên bảng đầu giờ · 3 Dạy học · 4 Chữa câu khó & tính toán**.
+- **Thầy bổ sung 21/10:** bước 1 là nền. Bước 2, 3, 4 **dùng chung danh sách có mặt của bước 1** nhưng **độc lập với nhau**: thầy mở bước nào tuỳ việc, không khoá theo thứ tự.
 
 ## 2. Bố cục
 - **Bỏ** hai nút thẻ "Dạy học & đầu giờ" và "Chữa bài". **Bỏ** thanh chip bốn bước cũ nằm ngang trên đầu.
 - **Thước tiến trình** là MỘT điều khiển duy nhất cho cả màn:
-  - Máy tính (≥ 1180 px): cột trái dính khi cuộn. Trên cùng là ô "Buổi dạy hôm nay" (lớp, giờ mở). Dưới là 4 bước dọc nối bằng đường kẻ; đoạn đã xong tô xanh lá. Mỗi bước có một dòng trạng thái ("Xong · 22/24 em", "Đang làm", "Chưa tới").
+  - Máy tính (≥ 1180 px): cột trái dính khi cuộn. Trên cùng là ô "Buổi dạy hôm nay" (lớp, giờ mở, **số em có mặt**). Dưới là bước 1, một vạch tách "Bước 2 · 3 · 4 dùng danh sách có mặt — mở bước nào tuỳ việc", rồi đến bước 2, 3, 4. Không vẽ đường nối giữa các bước, để không gợi ý phải làm lần lượt. Mỗi bước có một dòng trạng thái: "Xong · 22/24 em", "Đang làm", "Chưa làm" (chữ trung tính, không có "Chưa tới").
   - Điện thoại và màn ngang: một hàng 4 ô dính trên đầu, tên ngắn: Điểm danh · Đầu giờ · Dạy học · Chữa câu.
   - Bấm một bước trên thước thì cuộn tới bước ấy và mở nó ra.
 - **Thẻ bước**, xếp dọc từ trên xuống:
   - Bước **đang làm**: mở rộng, viền xanh lam 2 px. Chỉ bước này có **nút chính** tô màu.
   - Bước **đã xong**: thu thành một dòng (dấu tích xanh, tên bước, tóm tắt) kèm nút chữ "Mở lại".
-  - Bước **chưa tới**: một dòng xám, nói cần làm gì trước.
-  - Bước 4 **mở lúc nào cũng được**: số tròn màu hổ phách, kèm "12 chỗ học sinh cần chữa" và nút viền "Mở". Bước này không phụ thuộc điểm danh.
+  - Bước **chưa làm** (2, 3, 4): một dòng kèm nút viền "Mở", luôn bấm được. Dòng phụ ghi rõ bước ấy dùng danh sách có mặt ("Gọi trong 18 em có mặt"; bước 4 thêm "12 chỗ học sinh cần chữa").
+  - Mở một bước thì bước ấy thành bước đang làm (viền xanh lam, nút chính). Bước đang mở trước đó thu lại nhưng **vẫn giữ nguyên trạng thái bên trong** (thành phần không bị gỡ, chỉ ẩn), nên quay lại vẫn thấy đúng câu đang chiếu, em đang gọi.
 - **Bước 3 "Dạy học"** gộp bước 3 và 4 cũ, trên xuống dưới gồm:
   - bài đang dạy, nút "Đổi bài", "Hiện lời giải tất cả";
   - dải em được gọi lên bảng;
@@ -33,7 +34,12 @@ Bản vẽ: `docs/ban-ve-hanh-trinh-2110/` (đọc `GHI-CHU.md`). **Chưa sửa 
 - **Kiểm tra ôn tập**: giữ lại, dời xuống cuối màn thành một dòng gập "Xem". Không thuộc buổi dạy nên không đánh số.
 
 ## 3. Trạng thái
-- **Tiến trình:** bước 1 xong khi buổi đã mở và có em có mặt (luật cũ). Bước 2 xong khi `onXong` báo. Bước 3 xong khi đã chiếu **và** đã tick bài (`onTrangThai` cũ: `day && tick`). Bước 4 không có trạng thái "xong" bắt buộc; về 0 chỗ thì ghi "Không còn chỗ cần chữa".
+- **Mỗi bước tự có trạng thái**, không suy từ bước trước: bước 1 xong khi buổi đã mở và có em có mặt (luật cũ). Bước 2 xong khi `onXong` báo. Bước 3 xong khi đã chiếu **và** đã tick bài (`onTrangThai` cũ: `day && tick`). Bước 4 không có trạng thái "xong" bắt buộc; về 0 chỗ thì ghi "Không còn chỗ cần chữa". Bỏ hàm `trangThaiBuoc`, tức bỏ luật "bước chưa xong đầu tiên là bước đang làm".
+- **Bước mở mặc định khi vào màn:** chưa có em có mặt thì mở bước 1. Đã có thì mở bước thầy mở lần trước trong buổi này (nhớ trên máy). Lần đầu thì mở bước 2.
+- **Chưa điểm danh mà mở bước 2, 3, 4:**
+  - Bước 2 cần danh sách có mặt. Bước hiện dòng "Chưa có danh sách có mặt — điểm danh ở bước 1 trước" kèm nút "Về bước 1".
+  - Bước 3 vẫn chiếu đề được (nút "Chiếu đề (chưa gọi em)"). Gọi em lên bảng thì chờ có danh sách.
+  - Bước 4 vẫn chiếu được. Em được gọi chọn theo số lần sai và kèm dòng sẵn có: "Hôm nay chưa có buổi điểm danh đang mở — gọi theo số lần sai, chưa biết em nào có mặt."
 - **Chưa mở buổi:** bước 1 mở, có ô "Lớp học hôm nay" và nút chính "Điểm danh". Thước ghi "Chưa mở buổi".
 - **Nhiều buổi đang mở:** ô "Buổi dạy hôm nay" trên thước thành ô chọn buổi.
 - **Đang tải:** mỗi bước có khung xương đúng hình (`.tt-xuong`), không chữ "Đang mở…".
@@ -51,7 +57,8 @@ Bản vẽ: `docs/ban-ve-hanh-trinh-2110/` (đọc `GHI-CHU.md`). **Chưa sửa 
 - **"Bổ sung bài"** (`boSungBai`): cuộn tới phần "Tick bài vừa dạy" trong bước 3.
 - **Phím → trên bản chiếu Nhịp học** (`sangDauGio`): mở bước 2 trước, rồi mới bấm nút "Chiếu lên bảng" của bước đó.
 - **Đổi chữ:** dòng chân "Câu nhiều em sai … nằm ở mục Chữa bài ›" trong Bài đang giao đổi thành "… ở bước 4 Chữa câu khó ›" và cuộn tới bước 4.
-- Thầy bấm "Mở lại" một bước đã xong: bước ấy mở ra, bước đang làm vẫn giữ viền xanh lam. Hai bước mở cùng lúc được.
+- Thầy bấm "Mở lại" một bước đã xong, hoặc "Mở" một bước khác: chỉ bước ấy mở, bước kia thu lại nhưng giữ trạng thái bên trong. Mỗi lúc chỉ có một bước mở, một nút chính.
+- Điểm danh thêm em giữa buổi ("Thêm em tay"): bước 2, 3, 4 nhận danh sách mới ngay, vì cả ba cùng đọc một `dd` dùng chung.
 - Tên bài, đề hoá học dài: cắt 2 dòng (`line-clamp`), bấm để xem đủ. Có `min-width: 0` khắp nơi.
 - Bấm lặp nút chiếu: nút khoá trong lúc dựng tờ chiếu (giữ như cũ).
 
@@ -64,7 +71,7 @@ Bản vẽ: `docs/ban-ve-hanh-trinh-2110/` (đọc `GHI-CHU.md`). **Chưa sửa 
 ## 7. Nghiệm thu đo bằng máy
 - Test vitest:
   - sửa các test đang dò hai thẻ `gvv2-muc-nut` (tìm bằng `grep -rl "gvv2-muc\|THE_HANH_TRINH" tests`);
-  - thêm `tests/hanh-trinh-mot-trang-2110.test.ts`: đủ 4 bước theo đúng thứ tự; không còn `role="tab"`; chỉ một `.nut-chinh` ở bước đang làm; khoá `can-chua` mở bước 4; bước 4 không nạp mảnh khi chưa mở.
+  - thêm `tests/hanh-trinh-mot-trang-2110.test.ts`: đủ 4 bước theo đúng thứ tự; không còn `role="tab"`; chỉ một `.nut-chinh` ở bước đang mở; khi chưa có ai điểm danh vẫn mở được bước 3 và bước 4 (không khoá); bước 2, 3, 4 nhận đúng một `dd` dùng chung; đổi bước không gỡ thành phần bước cũ; khoá `can-chua` mở bước 4; bước 4 không nạp mảnh khi chưa mở.
 - `npx tsc --noEmit` sạch. `npm run build && npm run kiem:toc-do` 0 đỏ. `npm run kiem:mau-giu` 0. `node scripts/kiem-sw.mjs` đạt.
 - Ảnh Chromium màn thật 390 / 844 / 1440, sáng và tối: 0 lỗi trang, 0 tràn ngang, 0 đích bấm < 44 px.
 
