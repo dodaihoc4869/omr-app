@@ -443,6 +443,8 @@ export default defineConfig({
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
             // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng
             // (+2,4 KB nén cho app học sinh vì mỗi tệp nén riêng) ⇒ gom lại vào CÙNG mảnh DesignSystem (học sinh / thầy đều nạp sẵn).
+            // 22/10: giữ khung xem phiếu là MẢNH RIÊNG như trước (không để Rolldown gộp vào DesignSystem — gộp làm mảnh cổng phụ huynh nặng +1,5 KB).
+            { name: 'KhungXemPhieu', test: /src[\\/]components[\\/]KhungXemPhieu\.tsx$/, includeDependenciesRecursively: false },
             { name: 'KhoiLoiGiaiChuan', test: /src[\\/](?:components[\\/](?:loi-giai[\\/]KhoiLoiGiaiChuan|ExperimentDemo)\.tsx|lib[\\/](?:experiments[\\/]nhe|loi-giai-api|chuan-hoa-loi-giai|chu-la-pdf)\.ts)$/ },
           ],
         },
