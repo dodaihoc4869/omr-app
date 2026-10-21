@@ -26,7 +26,7 @@ vi.mock('../src/components/KhungXemPhieu', () => ({ default: ({ html, ten }: { h
 vi.mock('../src/lib/chua-cau-sai-thay-api', () => ({ goiChuaThay: async () => ({ ok: true, bat: false, ds: [], conNua: false }) }))
 vi.mock('../src/lib/nut-that-api', () => ({ gvDsNutThat: async () => ({ ok: true, nhom: [], kemRieng: [] }), gvGoNutThat: vi.fn() }))
 
-import { CUM_TINH_LY_THUYET, MAU_TINH_TOAN_GOI_7, cauCuaDe, hangCau, laCauKhacKhoi, laCauTinhToan, tiLeSaiLop, xepThuTuChua } from '../src/lib/thay-tu-chua'
+import { CUM_TINH_LY_THUYET, MAU_TINH_TOAN_GOI_7, MAU_TINH_TOAN_LOC, cauCuaDe, hangCau, laCauKhacKhoi, laCauTinhToan, tiLeSaiLop, xepThuTuChua } from '../src/lib/thay-tu-chua'
 import { cauKhacKhoiLop } from '../src/components/chien-dich/to-chieu'
 import { dungToThayTuChua } from '../src/components/chien-dich/thay-tu-chua-to'
 import { TIN_TO_CHIEU } from '../src/lib/to-chieu-cau-noi'
@@ -148,8 +148,9 @@ describe('nhận diện "có tính toán"', () => {
     const mayChu = readFileSync(resolve(__dirname, '../server/src/goi-bai-7.ts'), 'utf8')
     expect(mayChu).toContain(`tinhToan: q.phan === 'III' || /${MAU_TINH_TOAN_GOI_7.source}/i.test(`)
   })
-  it('Phần III ⇒ có; nhãn kho `kieu` thắng mặt chữ; câu tính có số kèm đơn vị ⇒ có; "Tính chất…", "tính base", "lưỡng tính" KHÔNG phải tính toán', () => {
-    expect(laCauTinhToan({ phan: 'III', text: 'Giá trị của x là bao nhiêu?' })).toBe(true)
+  it('nhãn kho `kieu` thắng mặt chữ; câu tính có số kèm đơn vị ⇒ có; "Tính chất…", "tính base", "lưỡng tính" KHÔNG phải tính toán', () => {
+    // 22/10 (thầy: "bộ lọc câu khó và tính toán chưa hoạt động à, tôi tick vào vẫn y nguyên"): Phần III KHÔNG còn mặc nhiên là tính toán — xem test dưới.
+    expect(laCauTinhToan({ phan: 'III', text: 'Giá trị của x là bao nhiêu?' })).toBe(false)
     expect(laCauTinhToan({ phan: 'I', text: 'Chất nào sau đây là ester?', kieu: 'bai_tap' })).toBe(true)
     expect(laCauTinhToan({ phan: 'I', text: 'Cho 8,8 gam ethyl acetate…', kieu: 'ly_thuyet' })).toBe(false)
     expect(laCauTinhToan({ phan: 'I', text: 'Cho 3,36 lít khí ammonia (đkc) tác dụng với HCl. Khối lượng muối là', mucDo: 'hieu' })).toBe(true)
@@ -160,6 +161,27 @@ describe('nhận diện "có tính toán"', () => {
     // tự luận Phần III: "Giải thích…" không mặc nhiên là tính toán
     expect(laCauTinhToan({ phan: 'III', text: 'Giải thích vì sao ammonia tan nhiều trong nước.' }, true)).toBe(false)
     expect(laCauTinhToan({ phan: 'III', text: 'Tính thể tích khí thu được (lít) khi nung 10,7 gam muối.' }, true)).toBe(true)
+  })
+  it('TRẢ LỜI NGẮN xét theo nội dung (thầy 22/10): câu đếm / lý thuyết KHÔNG, câu có phép tính CÓ; nhãn kho thắng; "pH" không khớp "phân"/"phát"', () => {
+    const khong = [
+      'Mùi tanh của cá chủ yếu do amine gây ra, trong đó có trimethylamine. Số nguyên tử hydrogen có trong trimethylamine là bao nhiêu?',
+      'Có bao nhiêu amine bậc một có công thức phân tử C4H11N?',
+      'Cho các chất: methylamine, aniline, ammonia, dimethylamine. Có bao nhiêu chất làm quỳ tím ẩm hoá xanh?',
+      'Tính chất hoá học đặc trưng của amine là gì? Có bao nhiêu phát biểu đúng?',
+    ]
+    for (const text of khong) expect(laCauTinhToan({ phan: 'III', text }), text).toBe(false)
+    const co = [
+      'Đốt cháy hoàn toàn 4,5 gam một amine đơn chức X thu được 2,24 lít khí N2 (đkc). Số nguyên tử carbon trong X là?',
+      'Cho 9,3 gam aniline tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là bao nhiêu gam?',
+      'Phần trăm khối lượng nitrogen trong methylamine là bao nhiêu?',
+      'Hợp chất hữu cơ X có thành phần trăm các nguyên tố về khối lượng: %C = 53,33%; %H = 15,56%; %N = 31,11%. Phân tử khối của X là',
+      'Dung dịch HCl 0,01 M có pH bằng bao nhiêu?',
+    ]
+    for (const text of co) expect(laCauTinhToan({ phan: 'III', text }), text).toBe(true)
+    expect(laCauTinhToan({ phan: 'III', text: 'Có bao nhiêu chất?', kieu: 'bai_tap' })).toBe(true)
+    expect(laCauTinhToan({ phan: 'III', text: 'Cho 9,3 gam aniline…', kieu: 'ly_thuyet' })).toBe(false)
+    expect(MAU_TINH_TOAN_LOC.test('Chất nào sau đây là phân bón?')).toBe(false)
+    expect(MAU_TINH_TOAN_LOC.test('pH của dung dịch')).toBe(true)
   })
   it('luật khác khối của xem trước TRÙNG luật `cauKhacKhoiLop` của tờ chiếu', () => {
     for (const qid of ['DH-11-C2-B6-I-1', 'DH-10-C1-B1-I-4', 'DH-12-C1-B1-I-1', '11-C2-B6-I-1', 'Q-LA-9', 'DH-11-C2-B6-II-2'])
