@@ -199,3 +199,19 @@ Bảng màu: Mức làm 1→4 là MỘT dải màu theo độ đậm (không đ�
 - Không UPDATE bù dòng cũ (quyết định 21/10): dòng cũ không có giây đo thật để bù; kích thước đề của dòng có giây (thi, chữa lỗi) sẽ TÍNH LÚC ĐỌC từ nội dung câu khi làm Đợt 2, không ghi đè dữ liệu thật.
 - Công cụ: `.github/workflows/do-phu-giay-2110.yml` có thêm cột `dong_ho_moi`, phân bố theo `dh`, và truy vấn 4 (so lượt ≥ 600 s giữa hai đồng hồ — nếu đồng hồ cũ nhiễm tab ẩn thì tỉ lệ ≥ 600 s của nhóm không `dh` cao hơn rõ).
 
+
+## 11. Tờ chiếu: "Ai đã sai?" hai thẻ và chi tiết em gọi lên bảng (thầy 21/10) — chờ thầy duyệt ảnh
+
+**Thầy dặn (21/10):** (a) Ai đã sai? (phím X) khi bấm hiện HAI thẻ — thẻ 1 là em **đã điểm danh** làm sai câu đó, thẻ 2 là **cả lớp** làm sai câu đó — thiết kế lại "siêu đẹp, trực quan, khoa học", hiện đủ Mức làm 1–4; (b) chi tiết em được gọi lên bảng cũng hiện đủ Mức làm 1–4; (c) **bỏ câu "chỉ thầy nhìn, không hiện lên màn chiếu"** — bấm chi tiết là hiện đủ trên màn chiếu. Quyết định này **thay** ghi chú ở khung 06 và 11 của bản duyệt 20/10 ("Chỉ thầy thấy", "mức chỉ để thầy nhìn", mặc định tắt chấm Mức).
+
+**Hiện trạng (đã đọc mã):** tờ X hiện có MỘT danh sách chung (`veAiSai` trong `src/lib/len-bang-moi-to-chieu.ts`; dữ liệu `/gv/ai-sai-cau`) — chưa có hai thẻ. Bản mới tách hai thẻ; nếu thầy muốn "hai thẻ" ở màn khác thì thầy chỉ giúp.
+
+**1 · Mục đích.** Thầy nhìn một màn biết ngay: trong số em có mặt, ai làm sai và sai theo kiểu nào (nộp vội hay đã nghĩ), rồi cả lớp thế nào. Chữa đúng chỗ: Mức làm 1–2 = đọc chưa kỹ; Mức làm 3–4 = đã nghĩ vẫn sai (hổng kiến thức).
+**2 · Dữ liệu.** `/gv/ai-sai-cau {qids, sbds}` mỗi lượt sai có `mucLam` (`ma`, `giay`, `giayDoc`, `sanNghi`, `thuong?`, `xapXi?`); `sbds` = danh sách em của lớp, lọc ngay trong truy vấn (trước khi cắt 300 lượt). App thầy gắn thêm: em nào đã điểm danh (có mặt) và sĩ số. `/gv/ho-so-len-bang` mỗi lần làm câu có `mucLam`; thêm khối "Cách làm bài 14 ngày" (đếm theo Mức, đúng/sai). Mức xếp bằng MỘT đường (`server/src/muc-lam-so.ts`): chỉ lượt có giây ĐO THẬT bằng đồng hồ mới; còn lại "Chưa có số đo".
+**3 · Trạng thái.** Có số đo · lớp đông (4 cột, có thể cuộn) · những ngày đầu (gần hết lượt "Chưa có số đo", chưa có β nên không xếp Mức làm 4) · chưa điểm danh (thẻ 1 báo "Buổi này chưa điểm danh", không để trống) · đang tải / lỗi (như cũ).
+**4 · Chữ.** "Đã điểm danh", "Cả lớp", "Mức làm 1–4" kèm tên ("Chưa đọc hết đề", "Đọc xong, chưa kịp nghĩ", "Có nghĩ", "Làm kỹ"), "Chưa có số đo". Mỗi làn ghi khoảng giây ("dưới 24 giây", "24–29 giây"…). Em vắng đánh dấu vòng tròn rỗng (có chú giải ở đầu thẻ). Tên dài tự viết tắt chữ đệm ("Nguyễn Đ. Anh").
+**5 · Luật hiển thị (theo thầy 21/10).** Hiện ĐỦ trên màn chiếu, kể cả tên và Mức của từng lượt; lượt ĐÚNG ở Mức 1 ghi trung tính "Đúng · nộp sau N giây, trước khi đọc hết đề". Không có phím ẩn riêng; nếu thầy muốn che tên khi chiếu thì thêm sau.
+**6 · Hiệu năng.** `/gv/ai-sai-cau`: 2 đợt D1 như cũ, thêm MỘT lệnh β cùng đợt (0 lệnh khi chưa lượt nào có số đo mới). `/gv/ho-so-len-bang`: các khối đọc song song — 29 đợt → 14 đợt (đo trên cổng `tests/toc-do-may-chu-ph-2110.test.ts`).
+**7 · Nghiệm thu.** Ảnh Chromium thật ở `docs/ban-ve-chieu-muc-lam-2110/anh/` (1920×1080 và 1280×720, nền tối): 12a có số đo · 12b lớp đông · 12c những ngày đầu · 12d chưa điểm danh · 13a chi tiết em · 13b chi tiết em chưa có số đo. Soát: 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ · 0 khung bị cắt. Dựng lại: `node scripts/dung-ban-ve-chieu-muc-lam-2110.mjs && node scripts/chup-ban-ve-chieu-muc-lam-2110.mjs`.
+
+**Giả định đã dùng (thầy sửa được):** (1) "bấm làm lại" ở tin nhắn thầy = bấm X trên tờ chiếu của câu đang chiếu; (2) "đã điểm danh" lấy từ bước Điểm danh của buổi đang chiếu, "cả lớp" = danh sách em của lớp đó; (3) số liệu trong ảnh là số giả (tên giả, ngưỡng 24 / 6 / 60 giây).
