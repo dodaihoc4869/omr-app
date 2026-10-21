@@ -4,11 +4,15 @@
 // `dangLam`: em đang làm câu, chưa nộp ⇒ một dòng báo Thầy chỉ gợi hướng; không có lối sang lời giải.
 // Vẽ qua portal vào <body>: thẻ câu trong game/màn cuộn có transform ⇒ `position: fixed` lệch khỏi màn nếu nằm trong thẻ.
 // `cau = null` (tốc độ, thầy 13/10): hộp mở NGAY lúc em bấm, đề câu đang tới ⇒ ba vạch chờ; ô nhắn dùng `qid` của nút (gõ trước được).
+// `em` (thầy 21/10, docs/ban-ve-hoi-thay-em-2110): dữ liệu THÔ của thẻ «Em và câu này» (về CÙNG lượt với đề; vắng / sai khuôn ⇒ thẻ ẩn).
+// Đề và thẻ là hai ngăn loại trừ nhau; Thầy trả lời câu đầu ⇒ cả hai gập. Điện thoại ngang: hai ngăn thành cột trái (`.lg-hh-trai`), hội thoại cột phải.
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { BookOpenText, MessageCircleQuestion, X } from 'lucide-react'
 import type { CauChoKhung } from '../../lib/loi-giai-api'
 import HoiThemThay from './HoiThemThay'
+import TheEmVaCau from './TheEmVaCau'
+import { docEmVaCau } from '../../lib/em-va-cau'
 import { ChemText } from '../../lib/chem-format'
 import { chuHoa } from './TraLoiThay'
 import './loi-giai.css'
@@ -38,7 +42,7 @@ function tachDe(html: string): { chu: string; con: string } | null {
 }
 const LOAI_CAU = { tn: 'Trắc nghiệm', ds: 'Đúng / Sai', tln: 'Trả lời ngắn' } as const
 
-export default function HopHoiThay({ cau, qid = '', luotId, nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false, dapAnEm }: { cau: CauChoKhung | null; qid?: string; luotId?: string; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean; dapAnEm?: string }) {
+export default function HopHoiThay({ cau, qid = '', luotId, nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false, dapAnEm, em = null }: { cau: CauChoKhung | null; qid?: string; luotId?: string; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean; dapAnEm?: string; em?: unknown }) {
   const id = useId()
   const dongRef = useRef(onDong)
   dongRef.current = onDong
@@ -55,7 +59,12 @@ export default function HopHoiThay({ cau, qid = '', luotId, nguon, onDong, onTra
   const ngan = loai === 'tn' && yChu.every(([, t]) => t.length <= 24)
   // Đề mở sẵn lúc em chưa hỏi; Thầy trả lời câu đầu ⇒ gập thành một dòng nhường chỗ cho lời giải (chạm để mở lại).
   const [deMo, setDeMo] = useState(true)
-  const [dangKiem, setDangKiem] = useState(false)
+  // Dữ liệu thô từ máy chủ ⇒ kiểm khuôn tại đây (sai khuôn / vắng ⇒ null: thẻ ẩn).
+  const emDoc = useMemo(() => (em == null ? null : docEmVaCau(em)), [em])
+  const [emMo, setEmMo] = useState(false)
+  // Câu hỏi nhanh từ thẻ: tăng `n` mỗi lần chạm ⇒ HoiThemThay gửi đúng một lần.
+  const [hoiNhanh, setHoiNhanh] = useState<{ n: number; cau: string } | null>(null)
+  const [dangGuiHoi, setDangGuiHoi] = useState(false)
   return createPortal(
     <div className="lg-hh-nen m3">
       <div className="lg-hh" role="dialog" aria-modal="true" aria-labelledby={`${id}-t`}>
@@ -67,7 +76,8 @@ export default function HopHoiThay({ cau, qid = '', luotId, nguon, onDong, onTra
           </div>
           <button type="button" className="lg-hh-dong" onClick={onDong} aria-label="Đóng"><X size={20} strokeWidth={2.2} aria-hidden="true" /></button>
         </header>
-        <details className="lg-hh-de" open={deMo} onToggle={(e) => setDeMo(e.currentTarget.open)}>
+        <div className="lg-hh-trai">
+        <details className="lg-hh-de" open={deMo} onToggle={(e) => { const o = e.currentTarget.open; setDeMo(o); if (o) setEmMo(false) }}>
           <summary>
             Đề câu
             {!deMo && de && <span className="lg-de-tom">{de.chu.replace(/\s+/g, ' ')}</span>}
@@ -93,13 +103,18 @@ export default function HopHoiThay({ cau, qid = '', luotId, nguon, onDong, onTra
           </div>
         </details>
         {dangLam && <p className="lg-hh-goi">Em đang làm câu này nên Thầy gợi hướng, chưa nói đáp án.</p>}
-        {onMoLoiGiai && !dangLam && !dangKiem && (
+        {onMoLoiGiai && !dangLam && (
           <button type="button" className="lg-nut-loi-giai lg-hh-sang-giai" onClick={onMoLoiGiai}>
             <BookOpenText aria-hidden="true" size={18} strokeWidth={2} />
             <span>Xem lời giải từng bước</span>
           </button>
         )}
-        <HoiThemThay qid={cau?.qid ?? qid} luotId={luotId} qidTrongLuot={luotId ? qid : undefined} nguon={nguon} hop dangLam={dangLam} dapAnEm={dapAnEm} choDe={!cau} onDangKiem={setDangKiem} onTraLoi={() => { setDeMo(false); onTraLoi?.() }} />
+        <TheEmVaCau key={cau?.qid ?? qid} em={cau ? emDoc : undefined} dangLam={dangLam} mo={emMo} khoa={dangGuiHoi}
+          onMo={(o) => { setEmMo(o); if (o) setDeMo(false) }}
+          onHoi={(c) => { setEmMo(false); setDeMo(false); setHoiNhanh((h) => ({ n: (h?.n ?? 0) + 1, cau: c })) }} />
+        </div>
+        <HoiThemThay qid={cau?.qid ?? qid} luotId={luotId} qidTrongLuot={luotId ? qid : undefined} nguon={nguon} hop dangLam={dangLam} dapAnEm={dapAnEm} choDe={!cau}
+          hoiNhanh={hoiNhanh} onDangGui={setDangGuiHoi} onTraLoi={() => { setDeMo(false); setEmMo(false); onTraLoi?.() }} />
       </div>
     </div>,
     document.body,

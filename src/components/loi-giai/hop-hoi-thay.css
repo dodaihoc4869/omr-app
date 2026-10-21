@@ -120,3 +120,91 @@
 .lg-hh-cho-de > i:nth-of-type(3) { width: 58%; animation-delay: .24s; }
 @keyframes lg-hh-nhay { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .lg-hh-cho-de > i { animation: none; } }
+
+/* ================= THẺ «EM VÀ CÂU NÀY» (thầy 21/10, bản vẽ docs/ban-ve-hoi-thay-em-2110; chỉ biến màu có sẵn) ================= */
+/* Cột trái của hộp (Đề câu + thẻ): bình thường không tạo hộp riêng; điện thoại ngang thành cột tự cuộn. */
+.lg-hh-trai{display:contents}
+/* Ngăn gập giống ô "Đề câu": cùng nền, cùng bo, cùng mũi tên ⇒ em thấy ngay đây là một ngăn mở ra được. Co lại được (flex-shrink)
+   nhưng không thấp hơn 48 px; phần thân tự cuộn ⇒ ô nhắn không bị đẩy khỏi hộp. */
+.lg-ev{container-type:inline-size;flex:0 1 auto;min-height:48px;display:flex;flex-direction:column;overflow:hidden;margin:8px 16px 0;border-radius:18px;
+  background:var(--m3-surface-container-low);border:1px solid var(--m3-outline-variant,transparent);box-sizing:border-box}
+.lg-ev-dau,.lg-ev > summary{flex:none;list-style:none;min-height:48px;box-sizing:border-box;padding:8px 14px;border-radius:18px;
+  display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--m3-primary)}
+.lg-ev > summary{cursor:pointer;touch-action:manipulation}
+.lg-ev > summary::-webkit-details-marker{display:none}
+.lg-ev > summary::after{content:'';flex:none;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .16s ease}
+.lg-ev[open] > summary::after{transform:rotate(-135deg) translateY(-2px)}
+.lg-ev > summary:focus-visible{outline:3px solid var(--m3-primary);outline-offset:-3px}
+.lg-ev-hinh{flex:none;display:grid;place-items:center}
+.lg-ev-ten{flex:none;white-space:nowrap}
+.lg-ev-tom{margin-left:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:2px 10px;border-radius:999px;
+  font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;background:var(--m3-secondary-container);color:var(--m3-on-secondary-container)}
+.lg-ev-tom b{font-weight:800}
+/* Đang tải: giữ ĐÚNG chiều cao dòng có dữ liệu (48 px) ⇒ không xô ô nhắn khi số liệu về */
+.lg-ev-vach{margin-left:auto;width:118px;max-width:40%;height:14px;border-radius:7px;background:var(--m3-surface-container-high);animation:lg-ev-nhay 1.2s ease-in-out infinite}
+@keyframes lg-ev-nhay{0%,100%{opacity:.5}50%{opacity:1}}
+/* Lần đầu: không có gì để mở ⇒ không mũi tên; một dòng phụ nói rõ + vẫn hỏi được */
+.lg-ev--moi .lg-ev-dau{flex-wrap:wrap;row-gap:2px;padding:10px 14px}
+.lg-ev-phu{flex-basis:100%;margin:0;padding-left:30px;font-size:15px;font-weight:500;line-height:1.45;color:var(--m3-on-surface-variant)}
+
+.lg-ev-than{flex:0 1 auto;min-height:0;max-height:42dvh;overflow:auto;overscroll-behavior:contain;padding:2px 14px 14px;
+  display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.5;color:var(--m3-on-surface)}
+.lg-ev-mo-dau{margin:0;font-size:14px;line-height:1.45;color:var(--m3-on-surface-variant)}
+.lg-ev-muc-tieu{margin:0 0 6px;font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--m3-on-surface-variant)}
+
+/* — Câu này: con số lớn (điểm nhấn duy nhất của thẻ) + dải các lần làm, cũ → mới — */
+.lg-ev-cau{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--m3-surface);border:1px solid var(--m3-surface-container-high)}
+.lg-ev-so{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0}
+.lg-ev-so b{font-size:24px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--m3-on-surface)}
+.lg-ev-so span{font-size:15px;font-weight:600}
+.lg-ev-gan{margin:0;font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums;color:var(--m3-on-surface-variant)}
+.lg-ev-gan strong{color:var(--m3-on-surface)}
+.lg-ev-lan{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 10px}
+.lg-ev-lan li{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:44px;font-size:12px;line-height:1.2;font-variant-numeric:tabular-nums;color:var(--m3-on-surface-variant)}
+.lg-ev-cham{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;box-sizing:border-box}
+.lg-ev-lan [data-kq="dung"] .lg-ev-cham{background:var(--m3-tertiary-container);color:var(--m3-on-tertiary-container)}
+.lg-ev-lan [data-kq="sai"] .lg-ev-cham{background:var(--m3-error-container);color:var(--m3-on-error-container)}
+.lg-ev-lan [data-tro] .lg-ev-cham{background:transparent;border:2px dashed var(--m3-outline);color:var(--m3-on-surface-variant)}
+.lg-ev-lan li:last-child{font-weight:700;color:var(--m3-on-surface)}
+.lg-ev-chu-giai{margin:0;font-size:12.5px;line-height:1.45;color:var(--m3-on-surface-variant)}
+
+/* — Hai nhóm kiến thức: đã vững (xanh lá, dấu ✓) · đang luyện thêm (hổ phách, dấu mũi tên lên). Không dùng đỏ cho trạng thái học. — */
+.lg-ev-hai{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+@container (min-width:520px){.lg-ev-hai{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.lg-ev-nhom-dau{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;padding:3px 10px 3px 6px;border-radius:999px;font-size:13.5px;font-weight:800}
+.lg-ev-nhom[data-loai="vung"] .lg-ev-nhom-dau{background:var(--m3-tertiary-container);color:var(--m3-on-tertiary-container)}
+.lg-ev-nhom[data-loai="luyen"] .lg-ev-nhom-dau{background:var(--m3-canh-bao-nen);color:var(--m3-canh-bao-chu)}
+.lg-ev-ds{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lg-ev-ds li{padding:8px 12px;border-radius:12px;background:var(--m3-surface);border:1px solid var(--m3-surface-container-high);display:flex;flex-direction:column;gap:2px}
+.lg-ev-nhom[data-loai="vung"] .lg-ev-ds li{box-shadow:inset 3px 0 0 var(--m3-tertiary)}
+.lg-ev-nhom[data-loai="luyen"] .lg-ev-ds li{box-shadow:inset 3px 0 0 var(--m3-canh-bao-chu)}
+.lg-ev-ds .ten{font-size:15px;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
+.lg-ev-ds .phu{font-size:13px;line-height:1.4;font-variant-numeric:tabular-nums;color:var(--m3-on-surface-variant)}
+.lg-ev-the{display:inline-block;margin-left:4px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--m3-outline);color:var(--m3-on-surface-variant);white-space:nowrap}
+.lg-ev-chua{margin:0;font-size:14px;line-height:1.5;color:var(--m3-on-surface-variant)}
+.lg-ev-chua b{color:var(--m3-on-surface);font-weight:600}
+
+/* — Hỏi nhanh: nút viền (không tranh nút chính "Gửi"), chạm là gửi đúng câu đó cho Thầy — */
+.lg-ev-hoi{display:flex;flex-wrap:wrap;gap:8px}
+.lg-ev-hoi button{min-height:48px;max-width:100%;box-sizing:border-box;padding:8px 16px 8px 12px;border-radius:999px;border:1px solid var(--m3-outline);
+  background:var(--m3-surface);color:var(--m3-primary);font:inherit;font-size:14.5px;font-weight:700;line-height:1.3;text-align:left;
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;touch-action:manipulation;transition:background-color .16s ease}
+.lg-ev-hoi button:hover{background:var(--m3-surface-container-high)}
+.lg-ev-hoi button:focus-visible{outline:3px solid var(--m3-primary);outline-offset:2px}
+.lg-ev-hoi svg{flex:none}
+.lg-ev sub{line-height:0}
+.lg-ev-chan{margin:0;font-size:12.5px;line-height:1.45;font-variant-numeric:tabular-nums;color:var(--m3-on-surface-variant)}
+/* — ĐIỆN THOẠI NGANG (thấp ≤ 500 px, rộng ≥ 640 px): hộp chỉ cao ~340 px ⇒ HAI CỘT. Trái: Đề câu + Em và câu này (tự cuộn);
+     phải: hội thoại + ô nhắn luôn thấy trọn. (Bản hiện tại một cột đã cắt nút Gửi ở khổ này — đo 21/10: đáy nút 375 > đáy hộp 367.) — */
+@media (max-height:500px) and (min-width:640px){
+  .lg-hh-nen{padding:8px}
+  .lg-hh{width:min(880px,100%);max-height:calc(100dvh - 16px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-rows:auto minmax(0,1fr);column-gap:4px}
+  .lg-hh-dau{grid-column:1/-1;padding-top:10px;padding-bottom:8px}
+  .lg-hh-trai{grid-column:1;grid-row:2;min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;padding-bottom:12px}
+  .lg-hh-trai .lg-hh-de-than{max-height:max(96px,calc(100dvh - 250px))}
+  .lg-hh-trai .lg-ev-than{max-height:none;overflow:visible}
+  .lg-hh-trai .lg-ev{flex:none}
+  .lg-ht--hop{grid-column:2;grid-row:2;min-height:0;padding-top:0;padding-left:8px}
+}
+@media (prefers-reduced-motion:reduce){.lg-ev-vach{animation:none}.lg-ev > summary::after,.lg-ev-hoi button{transition:none}}

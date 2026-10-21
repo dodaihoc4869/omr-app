@@ -11,8 +11,8 @@
 // NHẬN DIỆN "CÓ TÍNH TOÁN" (`laCauTinhToan`): gói bài 7 ngày ghi lý do "Có tính toán" bằng một biểu thức viết liền trong máy chủ (`server/src/goi-bai-7.ts`,
 // không có hàm xuất) — `Phần III ∨ /tính|khối lượng|số mol|…|số kèm đơn vị/`. Biểu thức ấy bắt cả "tính chất", "tính base" (câu lý thuyết) nên KHÔNG dùng
 // một mình: trước hết dùng luật lý thuyết / bài tập MỘT NGUỒN của app (`dangCua`, src/lib/dang-cau.ts — nhãn `kieu` của kho trước, Phần III luôn là
-// bài tập, rồi điểm mặt chữ đã đo trên 2.520 câu); chỉ câu `dangCua` còn "chưa rõ" mới dùng đúng biểu thức của gói 7 (`MAU_TINH_TOAN_GOI_7`, test khoá
-// chữ biểu thức trùng với máy chủ). Trước khi chấm mặt chữ, bỏ các cụm LÝ THUYẾT có chữ "tính" ("tính chất", "tính base", "lưỡng tính"…
+// bài tập, rồi điểm mặt chữ đã đo trên 2.520 câu); chỉ câu `dangCua` còn "chưa rõ" mới dùng biểu thức của gói 7 (`MAU_TINH_TOAN_GOI_7`, test khoá
+// chữ biểu thức trùng với máy chủ) — bản `MAU_TINH_TOAN_LOC` đã chặn "pH" khớp "phân/phát" (22/10). TRẢ LỜI NGẮN (22/10) xét riêng, xem hàm. Trước khi chấm mặt chữ, bỏ các cụm LÝ THUYẾT có chữ "tính" ("tính chất", "tính base", "lưỡng tính"…
 // — `CUM_TINH_LY_THUYET`) để "Tính chất hoá học của ammonia là" không thành câu tính toán.
 // TỰ LUẬN: thầy TỰ CHỌN đề ⇒ câu tự luận có trong tờ vẫn hiện, ghi nhãn "Tự luận" (luật CLAUDE.md "riêng Gọi lên bảng thầy chọn gì hiện đúng thế" —
 // cùng cách bảng Dạy học `cauTuDeChon`). Đây KHÔNG phải kênh rút đề tự động.
@@ -33,6 +33,14 @@ export const TEN_LOAI_CAU: Record<PhanCau, string> = { I: 'Trắc nghiệm', II:
 /** Biểu thức "Có tính toán" của gói bài 7 ngày — CHÉP NGUYÊN từ `server/src/goi-bai-7.ts` (`cauTuTick7`, trường `tinhToan`). Test so chữ với máy chủ. */
 export const MAU_TINH_TOAN_GOI_7 = /(?:tính|khối lượng|số mol|thể tích|nồng độ|hiệu suất|phần trăm|pH|\d+[.,]?\d*\s*(?:mol|gam|g\b|lít|mL|kJ|%))/i
 
+/** Bản dùng cho BỘ LỌC "câu khó & tính toán" (22/10): như `MAU_TINH_TOAN_GOI_7` nhưng "pH" phải đứng riêng — cờ /i làm "pH" khớp cả "PHân tử",
+ *  "PHát biểu", "PHân bón", biến câu đếm / lý thuyết thành câu tính. Biểu thức gói 7 giữ nguyên (test khoá trùng máy chủ). */
+export const MAU_TINH_TOAN_LOC = new RegExp(MAU_TINH_TOAN_GOI_7.source.replace('|pH|', '|pH(?![a-zà-ỹ])|'), 'i')
+
+/** CÂU ĐẾM LÝ THUYẾT của Phần III: đáp số là một con số nhưng là ĐẾM (phát biểu / chất / nguyên tử… đúng), không phải tính.
+ *  "bao nhiêu gam / lít / mol" là câu tính — không khớp vì danh từ sau "bao nhiêu" không thuộc danh sách. */
+export const MAU_DEM_LY_THUYET = /bao\s+nhiêu\s+(?:chất|phát\s*biểu|nhận\s*định|ý|thí\s*nghiệm|trường\s*hợp|đồng\s*phân|công\s*thức|phản\s*ứng|polymer|polime|tơ|dung\s*dịch|kim\s*loại|ester|este|amine|amin|hợp\s*chất|loại|phân\s*tử|nguyên\s*tử|liên\s*kết|nhóm|ion|muối|ống\s*nghiệm|cặp)|(?:^|[^\p{L}])số\s+(?:phát\s*biểu|nhận\s*định|chất|thí\s*nghiệm|trường\s*hợp|đồng\s*phân|phản\s*ứng|ý|polymer|tơ|dung\s*dịch|kim\s*loại|ester|este|ống\s*nghiệm|nguyên\s*tử|liên\s*kết|nhóm|ion|công\s*thức|cặp)(?![\p{L}])/iu
+
 /** Cụm từ LÝ THUYẾT mang chữ "tính" (không phải phép tính) — bỏ khỏi mặt chữ trước khi chấm, nếu không cả `dangCua` (động từ hỏi "tính …")
  *  lẫn biểu thức gói 7 đều nhận nhầm. */
 export const CUM_TINH_LY_THUYET = /lưỡng\s+tính|tính\s+(?:chất|base|bazơ|bazo|acid|axit|khử|oxi\s*h(?:oá|óa|oa)|oxy\s*h(?:oá|óa|oa)|kim\s*loại|phi\s*kim|tan|dẻo|cứng|dẫn|thơm|đặc\s*trưng)/giu
@@ -44,12 +52,28 @@ export function laCauTinhToan(
   c: { phan: PhanCau; text?: string; luaChon?: readonly (string | undefined)[]; dapAn?: string; mucDo?: string; kieu?: string; tenDang?: string },
   tuLuan = false,
 ): boolean {
-  if (c.phan === 'III' && !tuLuan) return true
   const text = boCumLyThuyet(c.text)
+  // TRẢ LỜI NGẮN (thầy 22/10, kèm ảnh: "bộ lọc câu khó và tính toán chưa hoạt động à, tôi tick vào vẫn y nguyên"): trước đây MỌI câu Phần III mặc
+  // nhiên "có tính toán" ⇒ đề Trả lời ngắn lọc ra 40/40, câu đếm ("Số nguyên tử hydrogen trong trimethylamine…") cũng mang nhãn tính toán.
+  // Nay: nhãn kho `kieu` thắng; còn lại là câu tính khi có dấu hiệu phép tính (biểu thức gói 7: khối lượng, số mol, số kèm đơn vị, %…) HOẶC
+  // `dangCua` chấm mặt chữ ra bài tập (không truyền phần / đáp số — Phần III luôn "bài tập" và đáp số luôn là số). Câu đếm / lý thuyết ⇒ không.
+  if (c.phan === 'III' && !tuLuan) {
+    // Thứ tự (22/10, gộp): nhãn kho "lý thuyết" ⇒ không; đề CÓ dấu hiệu phép tính ⇒ có; đề là câu ĐẾM lý thuyết (MAU_DEM_LY_THUYET) ⇒ không, KỂ CẢ khi kho
+    // gắn "bài tập" (công cụ gán nhãn có thể coi mọi đáp số là bài tập — chưa đo được trên kho thật); còn lại theo nhãn kho / tên dạng / `dangCua`.
+    // Nhãn kho "bài tập" KHÔNG dùng ở Phần III: kho gắn nó cho MỌI câu Phần III (sao lưu docs/ra-soat-hien-thi-de-2809: 5/5; dang-cau.ts: 578/578) ⇒ không mang thông tin.
+    // Tên dạng thật có đuôi việc làm ("— tính khối lượng", "— đếm đồng phân") ⇒ tín hiệu tốt, xét sau nội dung đề.
+    if (c.kieu === 'ly_thuyet') return false
+    if (MAU_TINH_TOAN_LOC.test(text) || /giá\s*trị\s+(?:của\s+)?[a-zA-Z](?:[₀-₉0-9])?(?![\p{L}])/iu.test(text)) return true
+    if (MAU_DEM_LY_THUYET.test(text)) return false
+    const dang = boCumLyThuyet(c.tenDang)
+    if (/(?:^|[^\p{L}])đếm(?![\p{L}])/iu.test(dang)) return false
+    if (MAU_TINH_TOAN_LOC.test(dang)) return true
+    return dangCua({ text, luaChon: [], dapAn: '', mucDo: c.mucDo }) === 'bai_tap'
+  }
   const luaChon = (c.luaChon ?? []).map((x) => boCumLyThuyet(x))
   const dang = dangCua({ phan: tuLuan ? undefined : c.phan, text, luaChon, dapAn: tuLuan ? '' : (c.dapAn ?? ''), mucDo: c.mucDo, kieu: c.kieu })
   if (dang !== 'chua_ro') return dang === 'bai_tap'
-  return MAU_TINH_TOAN_GOI_7.test(`${text} ${boCumLyThuyet(c.tenDang)}`)
+  return MAU_TINH_TOAN_LOC.test(`${text} ${boCumLyThuyet(c.tenDang)}`)
 }
 
 /** CÂU KHÓ (thầy chốt 21/10): mức Vận dụng (kho đã gộp VDC vào `van_dung` lúc nạp — `chuanHoaMucDo`) HOẶC câu 2 sao cần chữa (`canChua.sao`, đọc qua `soSao`).

@@ -99,7 +99,7 @@ describe('nút Hỏi thầy + Lời giải từng bước', () => {
     expect(screen.getByLabelText('Chỗ em thắc mắc về câu này')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Em còn chỗ chưa hiểu? Nhắn hỏi Thầy' })).toBeNull() // trong hộp: mở sẵn ô nhắn
     expect(document.querySelector('iframe')).toBeNull()
-    expect(goi.find((g) => g.url.endsWith('/hs/hoi-thay'))!.body).toEqual({ token: 'tok-em', qid: 'DE-I-1', nguon: 'luyen_de' })
+    expect(goi.find((g) => g.url.endsWith('/hs/hoi-thay'))!.body).toEqual({ token: 'tok-em', qid: 'DE-I-1', nguon: 'luyen_de', emVaCau: true }) // hộp Hỏi Thầy xin thêm thẻ «Em và câu này» (21/10)
     fireEvent.keyDown(window, { key: 'Escape' })
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Hỏi Thầy' })).toBeNull())
   })
@@ -161,7 +161,7 @@ describe('nút Hỏi thầy + Lời giải từng bước', () => {
     expect(screen.queryByRole('button', { name: 'Lời giải từng bước' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Hỏi thầy' }))
     const hop = await screen.findByRole('dialog', { name: 'Hỏi Thầy' })
-    expect(goi.find((g) => g.url.endsWith('/hs/hoi-thay'))!.body).toEqual({ token: 'tok-em', qid: 'DE-I-1', nguon: 'dao', chiHoi: true })
+    expect(goi.find((g) => g.url.endsWith('/hs/hoi-thay'))!.body).toEqual({ token: 'tok-em', qid: 'DE-I-1', nguon: 'dao', chiHoi: true, emVaCau: true })
     expect(hop.textContent).toContain('Em đang làm câu này nên Thầy gợi hướng, chưa nói đáp án.')
     expect(screen.queryByRole('button', { name: 'Xem lời giải từng bước' })).toBeNull()
     fireEvent.change(o(), { target: { value: 'Câu này làm sao ạ?' } })

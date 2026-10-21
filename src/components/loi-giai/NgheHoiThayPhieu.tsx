@@ -6,7 +6,7 @@ import HopHoiThay from './HopHoiThay'
 import KhungLoiGiai from './KhungLoiGiai'
 import './loi-giai.css'
 
-type Hoi = { cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; hoiThem: boolean; dangLam: boolean }
+type Hoi = { cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; hoiThem: boolean; dangLam: boolean; em: unknown }
 
 export default function NgheHoiThayPhieu({ khung }: { khung: RefObject<HTMLIFrameElement | null> }) {
   const [hoi, setHoi] = useState<Hoi | null>(null)
@@ -15,10 +15,10 @@ export default function NgheHoiThayPhieu({ khung }: { khung: RefObject<HTMLIFram
     const nghe = (e: MessageEvent) => {
       if (e.data?.type !== 'ddh-hoi-thay' || !e.data.qid || e.source !== khung.current?.contentWindow) return
       const dangLam = e.data.dangLam === true
-      void hoiThay(String(e.data.qid), 'phieu', dangLam).then((r) => {
+      void hoiThay(String(e.data.qid), 'phieu', dangLam, undefined, true).then((r) => {
         if (!r.ok) setLoi(r.loi)
         else if (dangLam && !r.hoiThem) setLoi(CHU_LAM_XONG)
-        else setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined, hoiThem: r.hoiThem === true, dangLam })
+        else setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined, hoiThem: r.hoiThem === true, dangLam, em: r.emVaCau ?? null })
       })
     }
     window.addEventListener('message', nghe)
@@ -27,7 +27,7 @@ export default function NgheHoiThayPhieu({ khung }: { khung: RefObject<HTMLIFram
   return (
     <>
       {hoi && (hoi.hoiThem
-        ? <HopHoiThay cau={hoi.cau} nguon="phieu" dangLam={hoi.dangLam} onDong={() => setHoi(null)} onMoLoiGiai={hoi.dangLam ? undefined : () => setHoi({ ...hoi, hoiThem: false })} />
+        ? <HopHoiThay cau={hoi.cau} em={hoi.em} nguon="phieu" dangLam={hoi.dangLam} onDong={() => setHoi(null)} onMoLoiGiai={hoi.dangLam ? undefined : () => setHoi({ ...hoi, hoiThem: false })} />
         : <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} kiem={hoi.kiem} nguon="phieu" onDong={() => setHoi(null)} />)}
       {loi && (
         <div className="lg-bao-loi m3" role="alert">

@@ -35,16 +35,13 @@ export function chuGoc(sbd: string, hoTen: string): string {
   return [sbd, hoTen].filter(Boolean).join(' · ')
 }
 
-/** Giờ:phút hiện tại — CÙNG kết quả `toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })` nhưng dùng lại MỘT bộ định dạng
- * (máy yếu 29/09: dựng bộ định dạng Intl mỗi lần vẽ tốn ~10 ms trên máy chậm, mà màn thi vẽ lại mỗi lần em chọn đáp án). */
-let dinhDangGio: Intl.DateTimeFormat | null = null
+/** Giờ:phút hiện tại — CÙNG kết quả `toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })` ("HH:mm", 00–23 giờ;
+ * so đủ 1440 phút trong test). TỰ GHÉP, không dùng Intl (đo máy yếu 22/10: lần đầu dựng bộ định dạng 'vi-VN' nạp dữ liệu ngôn ngữ mất ~150 ms
+ * ngay lúc em vào đề; trước đó 29/09 đã bỏ việc dựng lại mỗi lần vẽ). */
 export function gioPhutNay(luc: Date = new Date()): string {
-  try {
-    dinhDangGio ??= new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
-    return dinhDangGio.format(luc)
-  } catch {
-    return luc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
-  }
+  const h = luc.getHours()
+  const m = luc.getMinutes()
+  return `${h < 10 ? '0' : ''}${h}:${m < 10 ? '0' : ''}${m}`
 }
 
 export default function VanTay({ sbd, hoTen, maCa, gio }: VanTayProps) {

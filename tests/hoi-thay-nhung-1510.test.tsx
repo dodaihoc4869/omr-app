@@ -111,7 +111,7 @@ describe('màn /hoi-thay trong iframe trang mẹ', () => {
     await waitFor(() => expect(screen.getByRole('dialog').textContent).toContain('Câu 1'))
     expect(screen.getByText(/Thầy gợi hướng, chưa nói đáp án/)).toBeTruthy()
     const hoi = goi.find((x) => x.url === 'https://may.test/hs/hoi-thay')
-    expect(hoi!.body).toEqual({ token: t, qid: 'DH-10-C2-B5-I-1', nguon: 'trang_html', chiHoi: true })
+    expect(hoi!.body).toEqual({ token: t, qid: 'DH-10-C2-B5-I-1', nguon: 'trang_html', chiHoi: true, emVaCau: true }) // + thẻ «Em và câu này» (21/10)
     expect(me.postMessage.mock.calls.some(([tin]) => tin?.type === 'ddh-hs-token')).toBe(false)
     // Đóng ⇒ báo trang mẹ, chỉ tới đúng gốc
     fireEvent.click(screen.getByRole('button', { name: 'Đóng' }))
@@ -126,7 +126,7 @@ describe('màn /hoi-thay trong iframe trang mẹ', () => {
     await waitFor(() => expect(screen.getByRole('dialog').textContent).toContain('Câu 1'))
     expect(me.postMessage).toHaveBeenCalledWith({ type: 'ddh-hs-token', token: 'tok-luu' }, ME_ORIGIN)
     expect(me.postMessage.mock.calls.every(([, goc]) => goc === ME_ORIGIN)).toBe(true)
-    expect(goi.find((x) => x.url === 'https://may.test/hs/hoi-thay')!.body).toEqual({ token: 'tok-luu', qid: 'DH-10-C2-B5-I-1', nguon: 'trang_html' })
+    expect(goi.find((x) => x.url === 'https://may.test/hs/hoi-thay')!.body).toEqual({ token: 'tok-luu', qid: 'DH-10-C2-B5-I-1', nguon: 'trang_html', emVaCau: true })
     expect(screen.getByRole('button', { name: /Xem lời giải từng bước/ })).toBeTruthy()
   })
 

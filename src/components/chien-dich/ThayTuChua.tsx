@@ -163,7 +163,8 @@ function DongCau({ d, stt }: { d: DongXem; stt: number }) {
   const loai = c.tuLuan ? 'Tự luận' : TEN_LOAI_CAU[c.phan]
   const tom = c.thieuNoiDung ? '' : tomTatCau(c.q)
   const cao = !!so && so.phanTram >= NGUONG_LOP_SAI
-  const goi = uv && uv.length ? `Gọi lên bảng: ${uv[0]!.ten} · ${nhanEmChieu(uv[0]!).chu}${uv.length>1?` · còn ${uv.length-1} em phù hợp`:''}` : ''
+  const g = uv?.[0]?.giangLai
+  const goi = uv && uv.length ? `Gọi lên bảng: ${uv[0]!.ten} · ${nhanEmChieu(uv[0]!).chu}${g ? ` · Giảng lại: ${g.ten} (đã làm đúng)` : ''}${uv.length>1?` · còn ${uv.length-1} em phù hợp`:''}` : ''
   return (
     <li className="gvv2-ttc-dong" data-phan={c.phan} data-qid={c.qid}>
       <span className="gvv2-ttc-stt gvv2-so">{stt}</span>
@@ -367,7 +368,7 @@ export default function ThayTuChua() {
   // Tải ứng viên MỘT lần theo (lớp · bộ câu); chọn em chạy trên máy theo ĐÚNG thứ tự đang hiện ⇒ xem trước và tờ chiếu cùng một em mỗi câu.
   const [napGoi,setNapGoi]=useState<{khoa:string;nap:NapEmChieu|null}|null>(null)
   useEffect(()=>{let huy=false;if(khoaTk&&sbdLop)void napEmChieu(qidKey.split('|'),sbdLop,coMat).then(nap=>{if(!huy)setNapGoi({khoa:khoaTk,nap})}).catch(()=>{if(!huy)setNapGoi({khoa:khoaTk,nap:null})});return()=>{huy=true}},[khoaTk,sbdLop,qidKey,coMat])
-  const duGoi=useMemo<{khoa:string;map:Map<string,EmChieu[]>}|null>(()=>napGoi?{khoa:napGoi.khoa,map:napGoi.nap?chonEmChieu(napGoi.nap,xep.map(c=>c.qid),undefined,{kenh:'tu-chua'}):new Map()}:null,[napGoi,xep])
+  const duGoi=useMemo<{khoa:string;map:Map<string,EmChieu[]>}|null>(()=>napGoi?{khoa:napGoi.khoa,map:napGoi.nap?chonEmChieu(napGoi.nap,xep.map(c=>c.qid),undefined,{kenh:'tu-chua',capChua:true}):new Map()}:null,[napGoi,xep])
   const dongXem: DongXem[] = useMemo(
     () =>
       xep.map((c) => {
@@ -455,7 +456,7 @@ export default function ThayTuChua() {
           Chữa câu khó &amp; tính toán
         </h2>
         <p className="gvv2-ttc-phu">
-          Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Em lên bảng chia đều Khá · Trung bình · Cần kèm: câu dễ gọi em Cần kèm, câu khó gọi em Khá, mỗi em một lần.
+          Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Mỗi câu gọi một em có mặt ĐÃ LÀM SAI câu ấy lên chữa (chia đều Khá · Trung bình · Cần kèm, mỗi em một lần) và một em đã làm đúng giảng lại.
         </p>
       </div>
 

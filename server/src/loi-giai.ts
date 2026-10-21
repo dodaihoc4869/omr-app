@@ -16,6 +16,7 @@
 //   · hàng phát CÂU EM ĐÃ SAI chưa có bản khác trước (nâng `loi_giai_viec` + việc "chỉ học liệu" ở `may_soan_viec`), rồi thứ tự cũ;
 //   · cờ đáp án: máy TỰ XỬ (giải lại độc lập) — còn lệch ⇒ câu vào `cau_nghi_dap_an`, danh sách sửa kho tách riêng `nghiTuXu` (không báo thầy).
 import type { Env } from './kieu'
+import { docHoSoHoiThay, tomTatEmVaCau } from './hoi-thay-ca-nhan'
 import { gameIdentity, gameIdentityHaiBuoc } from './game-v2-auth'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { coCaDangMo } from './ca-dang-mo'
@@ -592,6 +593,9 @@ export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: str
   if (!qid) { await Promise.all([bang, xong]); return { ok: false, error: 'Thiếu câu cần hỏi.' } }
   const nay = Date.now()
   const hoiThemP = tuyChon.hoiThem ? tuyChon.hoiThem(sbd).catch(() => false) : undefined
+  // THẺ «EM VÀ CÂU NÀY» (thầy 21/10, bản vẽ docs/ban-ve-hoi-thay-em-2110): CHỈ khi máy em mở hộp Hỏi Thầy (`emVaCau: true`); 3 lệnh đọc chạy
+  // CÙNG đợt đầu với ca mở / tập bảo vệ (không thêm vòng chờ nối tiếp); lỗi ⇒ không có trường, hộp chạy như cũ.
+  const hoSoEmP = b.emVaCau === true ? docHoSoHoiThay(env, sbd, qid, nay).catch(() => null) : null
   const [, , caMo, baoVe, ht] = await Promise.all([
     bang, xong, coCaDangMo(env, sbd, nay),
     Promise.all([qid, ...(cauTrongLuot?.baoVe ?? [])].map((q) => cauDangBaoVe(env, q))).then((ds) => ds.some(Boolean)),
@@ -651,6 +655,9 @@ export async function hsHoiThay(env: Env, b: Obj, tuyChon: { hoiThem?: (sbd: str
     return { ok: true, coLoiGiai: false, cau, loiGiaiChu: loiChu }
   })()
   if (kq.ok === true && hoiThemP) kq.hoiThem = await hoiThemP
+  // Chỉ gắn vào phản hồi MỞ ĐƯỢC (không gắn khi khoá ca, câu chưa công bố, không tìm thấy). Em đang làm ⇒ chỉ số lần, không đúng/sai.
+  const hoSoEm = kq.ok === true && hoSoEmP ? await hoSoEmP : null
+  if (hoSoEm) kq.emVaCau = tomTatEmVaCau(hoSoEm, { dangLam: kq.chiHoi === true })
   return kq
 }
 

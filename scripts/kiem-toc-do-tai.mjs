@@ -61,7 +61,10 @@ for (const [app, s] of Object.entries(so)) {
 }
 // ĐƯỜNG VÀO (21/10, thầy: "tất cả mọi chỗ mọi app phải tức thì hơn hiện tại", không chỗ nào chậm hơn): byte phải tải khi mở TỪNG ĐƯỜNG =
 // index.html + nhóm mảnh index.html nạp trước theo đường (đoạn mã `nap-truoc-man-em`: app · phieu · ph · thi · hsVo · hs) + đóng tĩnh. Bắt được
-// thứ thước ba app ở trên bỏ sót (vd màn đăng nhập học sinh `hsVo`, link phiếu `/p`, màn thi `/t/<mã>`). DUNG SAI 0: chỉ được bằng hoặc nhẹ hơn mốc.
+// thứ thước ba app ở trên bỏ sót (vd màn đăng nhập học sinh `hsVo`, link phiếu `/p`, màn thi `/t/<mã>`). DUNG SAI 64 BYTE (22/10): chỉ để nuốt NHIỄU
+// của tên tệp có mã băm (mỗi lần mã đổi, tên ~8 ký tự ngẫu nhiên nén chênh vài–vài chục byte; đo 22/10: main f7991856 tự dựng đã lệch +5…+35 byte so mốc
+// ghi tay) — 64 byte ≈ 0,02 ms trên 4G, không phải chậm thật. Mọi thay đổi thật (một hàm, một dòng chữ) đều vượt ngưỡng này.
+const DUNG_SAI_DUONG = 64
 const DUONG = { 'thay /gv': ['app'], 'phieu /p': ['app', 'phieu'], 'phu-huynh /ph': ['app', 'ph'], 'thi /t': ['app', 'thi'], 'dang-nhap-hs /hs': ['hsVo'], 'cong-hs /hs (đã đăng nhập)': ['hsVo', 'hs'] }
 const bangNap = (() => { const m = /var b=(\{.*?\});var v=/s.exec(html); return m ? JSON.parse(m[1]) : null })()
 const mocDuong = JSON.parse(readFileSync(resolve(GOC, 'docs/moc-toc-do.json'), 'utf8')).taiDuong ?? {}
@@ -72,7 +75,7 @@ else for (const [duong, nhom] of Object.entries(DUONG)) {
   if (process.argv.includes('--in-duong')) { console.log(duong, g); continue }
   if (!m) { console.error(`✗ thiếu mốc taiDuong["${duong}"] trong docs/moc-toc-do.json`); do_++; continue }
   const lech = g - m.gzip, dong1 = `đường ${duong}: ${kb(g)} nén (mốc ${kb(m.gzip)}, ${lech >= 0 ? '+' : ''}${(lech / 1024).toFixed(1)} KB)`
-  if (lech > 0) { console.error(`✗ CHẬM HƠN — ${dong1}`); do_++ } else console.log(`${lech < 0 ? '✓ nhanh hơn' : '✓ bằng mốc'} — ${dong1}`)
+  if (lech > DUNG_SAI_DUONG) { console.error(`✗ CHẬM HƠN — ${dong1}`); do_++ } else console.log(`${lech < 0 ? '✓ nhanh hơn' : '✓ bằng mốc'} — ${dong1}`)
 }
 if (do_) { console.error('Tải app CHẬM HƠN bản trước — làm nhẹ lại (tách khối nạp khi bấm, bỏ phần thừa) rồi mới đẩy.'); process.exit(1) }
 if (Object.entries(so).some(([a, s]) => moc[a] && s.gzip < moc[a].gzip - DUNG_SAI)) console.log('Gợi ý: hạ mốc taiApp trong docs/moc-toc-do.json bằng số trên.')

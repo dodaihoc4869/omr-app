@@ -71,3 +71,13 @@ it('21/10: tờ chiếu KHÔNG bao giờ ghi tầng; em giữ (coDinh) theo th�
  const chieu=chonEmChieu(nap,[...q].reverse(),undefined,{hatGiong:'h',coDinh})
  for(const x of q)expect(chieu.get(x)![0]!.sbd).toBe(xem.get(x)![0]!.sbd)
 })
+it('22/10 Chữa câu khó (tu-chua, capChua): gọi em ĐÃ SAI câu ấy, nhãn nói thật "Đã sai câu này N lần", kèm em đã đúng giảng lại', async () => {
+ api.mockResolvedValue({ok:true,du:{cau:{q1:[{sbd:'D',ten:'Dũng',loai:'da_dung',p:0.9,luc:'x'},{sbd:'S',ten:'Sơn',loai:'du_bao',p:0.8,luc:null}]},soSai:{q1:{S:2}},em:{D:{ten:'Dũng',soLan14:0,lanCuoiLenBang:null},S:{ten:'Sơn',soLan14:0,lanCuoiLenBang:null},K:{ten:'Kha',soLan14:0,lanCuoiLenBang:null}}}})
+ const { napEmChieu, chonEmChieu } = await import('../src/lib/ung-vien-chieu')
+ const nap = (await napEmChieu(['q1'], ['D', 'S', 'K']))!
+ const e = chonEmChieu(nap, ['q1'], undefined, { kenh: 'tu-chua', capChua: true, hatGiong: 'x' }).get('q1')![0]!
+ expect(e.sbd).toBe('S'); expect(e.giangLai?.sbd).toBe('D')
+ expect(nhanEmChieu(e)).toEqual({ kieu: 'sai', chu: 'Đã sai câu này 2 lần' })
+ // em đã làm đúng (kể cả từng sai trước đó) vẫn là "Đã tự làm đúng câu này"
+ expect(nhanEmChieu({ sbd: 'D', ten: 'Dũng', loai: 'da_dung', p: 0.9, luc: 'x', soSai: 1 }).chu).toBe('Đã tự làm đúng câu này')
+})

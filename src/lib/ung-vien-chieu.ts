@@ -4,7 +4,8 @@ import { useAppStore } from '../store/appStore'
 import { bacCuaMucDo, docCheDo, phanBoGoi, xepCapChua, xepEmPhanTang, type CheDoChonEm, type KetQuaGoi, type PhanBoGoi, type Tang } from './chon-em-phan-tang'
 /** loai 'chua_co' = em có mặt nhưng chưa có số đo câu này. tang/lyDo/giangLai chỉ ở em được chọn — KHÔNG đưa lên bản chiếu. */
 export interface EmChieu {sbd:string;ten:string;loai:'da_dung'|'du_bao'|'chua_co';p:number|null;luc:string|null;soSai?:number;soLan14?:number;lanCuoiLenBang?:string|null;tang?:Tang;lyDo?:string;giangLai?:{sbd:string;ten:string;tang:Tang;lyDo:string}}
-export function nhanEmChieu(e:EmChieu):NhanLichSuCau{return e.loai==='da_dung'?{kieu:'dung',chu:'Đã tự làm đúng câu này'}:e.loai==='du_bao'?{kieu:'chua_ket_qua',chu:'Dự kiến làm được câu này',phu:'Ước lượng từ kỹ năng, chưa phải kết quả làm câu này'}:{kieu:'chua_ket_qua',chu:'Chưa có số đo câu này'}}
+/** Nhãn lịch sử câu dưới tên em (màn thầy + tờ chiếu). Em chưa làm đúng mà ĐÃ SAI câu này (kênh chữa câu gọi đúng em ấy) ⇒ nói thật "Đã sai câu này N lần", không ghi "Dự kiến làm được". */
+export function nhanEmChieu(e:EmChieu):NhanLichSuCau{return e.loai!=='da_dung'&&(e.soSai??0)>0?{kieu:'sai',chu:`Đã sai câu này ${e.soSai} lần`}:e.loai==='da_dung'?{kieu:'dung',chu:'Đã tự làm đúng câu này'}:e.loai==='du_bao'?{kieu:'chua_ket_qua',chu:'Dự kiến làm được câu này',phu:'Ước lượng từ kỹ năng, chưa phải kết quả làm câu này'}:{kieu:'chua_ket_qua',chu:'Chưa có số đo câu này'}}
 export interface TuyChonEmChieu {
  /** Kênh gọi (nhớ chế độ thầy chọn theo kênh): 'day-hoc' | 'chua-cau' | 'tu-chua' | 'to-chieu' | 'goi-len-bang'. */
  kenh?:string

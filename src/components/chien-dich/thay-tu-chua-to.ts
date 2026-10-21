@@ -80,7 +80,7 @@ export async function dungToThayTuChua(
   const tra = dungBangTra(toCoNoiDung(dsTo, new Set(ds.filter((c) => c.thieuNoiDung).map((c) => c.khoa))))
   const soGop = tuy.soGop ?? null
   const dong = oChieuTuChua(ds, tuy.ungVien, tuy.soLop)
-  if(tuy.sbdLop){const {layEmChieu,chonEmChieu,nhanEmChieu}=await import('../../lib/ung-vien-chieu');const tc={kenh:'tu-chua',coDinh:tuy.coDinh},uv=tuy.napEm?chonEmChieu(tuy.napEm,ds.map(c=>c.qid),undefined,tc):await layEmChieu(ds.map(c=>c.qid),tuy.sbdLop,tuy.coMat,undefined,undefined,tc);for(const o of dong){const list=uv.get(o.qid)??[],e=list[0];o.sbd=e?.sbd??'';o.ten=e?.ten??'Cả lớp';o.lichSu=e?nhanEmChieu(e):undefined;o.ungVien=list.map(e=>({sbd:e.sbd,ten:e.ten,lichSu:nhanEmChieu(e)}))}}
+  if(tuy.sbdLop){const {layEmChieu,chonEmChieu,nhanEmChieu}=await import('../../lib/ung-vien-chieu');const tc={kenh:'tu-chua',capChua:true,coDinh:tuy.coDinh},uv=tuy.napEm?chonEmChieu(tuy.napEm,ds.map(c=>c.qid),undefined,tc):await layEmChieu(ds.map(c=>c.qid),tuy.sbdLop,tuy.coMat,undefined,undefined,tc);for(const o of dong){const list=uv.get(o.qid)??[],e=list[0];o.sbd=e?.sbd??'';o.ten=e?.ten??'Cả lớp';o.lichSu=e?nhanEmChieu(e):undefined;o.ungVien=list.map(e=>({sbd:e.sbd,ten:e.ten,lichSu:nhanEmChieu(e)}))}}
   const kq = await dungToChieu(dong, tuy.tenBuoi, tra, tuy.maPhien, {
     khoiDich: tuy.khoi ? [tuy.khoi] : [],
     giuTuLuan: true,
