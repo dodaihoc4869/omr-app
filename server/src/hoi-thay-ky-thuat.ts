@@ -4,8 +4,22 @@
 //  2) KĨ THUẬT + BÀI MẪU Thầy đã giảng (skill `giai-bai-phong-cach-thay`, 314 video, `hoi-thay-ky-thuat-du-lieu.ts`) — chọn ≤ 6 mục khớp đề
 //     bằng cụm hai âm tiết + công thức hoá học, cụm càng hiếm càng nặng (cụm chung như "khối lượng" nhẹ). Khớp yếu ⇒ không gửi gì.
 // Không đọc D1, không gọi mạng; chỉ mục dựng một lần mỗi isolate.
+// TỐC ĐỘ: mục lục ~430 KB nạp LƯỜI (`napKyThuat`, import động) ⇒ mọi lệnh khác của Worker không phải dịch mảng này lúc khởi động;
+// lệnh Hỏi Thầy nạp + dựng chỉ mục trong lúc các lượt đọc D1 đang bay.
 import { BO_CHIA_KHOA } from '../../src/lib/loi-giai-bo'
-import { CHUONG_BAI_GIANG, KY_THUAT_THAY } from './hoi-thay-ky-thuat-du-lieu'
+
+type Muc = readonly [number, 'k' | 'b', string]
+let duLieu: { CHUONG_BAI_GIANG: readonly string[]; KY_THUAT_THAY: Muc[] } | null = null
+let dangNap: Promise<void> | null = null
+/** Nạp mục lục + dựng chỉ mục (một lần mỗi isolate). Lỗi ⇒ lần sau thử lại; chưa nạp xong thì `chonKyThuat` trả rỗng. */
+export function napKyThuat(): Promise<void> {
+  dangNap ??= import('./hoi-thay-ky-thuat-du-lieu').then((m) => {
+    const KY_THUAT_THAY = m.KY_THUAT_THO.split('\n').map((d) => { const [c, l, t] = d.split('\t'); return [Number(c), l === 'b' ? 'b' : 'k', t ?? ''] as const })
+    duLieu = { CHUONG_BAI_GIANG: m.CHUONG_BAI_GIANG, KY_THUAT_THAY }
+    docChiMuc()
+  }).catch((e) => { dangNap = null; throw e })
+  return dangNap
+}
 
 /** CÁCH GIẢI CỦA THẦY — cô đọng `references/phong-cach-giai.md` của skill (lời dặn hệ thống, cố định cho mọi lượt). */
 export const CACH_GIAI_THAY = `CÁCH GIẢI CỦA THẦY (chắt từ 314 video bài giảng của Thầy; cách nghĩ phải giống Thầy nhất)
@@ -28,14 +42,15 @@ export function dacTrung(chu: string): Set<string> {
   const ra = new Set<string>()
   for (const m of s.match(RE_CONG_THUC) ?? []) if (/\d/.test(m)) ra.add(`ct:${m}`)
   // Bỏ dấu thanh (giữ ơ, ư, â…): "thuỷ" và "thủy" là một âm tiết.
-  const am = s.toLowerCase().normalize('NFD').replace(/[̣̀́̃̉]/g, '').normalize('NFC').split(/[^\p{L}\p{M}\d]+/u).filter(Boolean)
+  const am = s.toLowerCase().normalize('NFD').replace(/[\u0300\u0301\u0303\u0309\u0323]/g, '').normalize('NFC').split(/[^\p{L}\p{M}\d]+/u).filter(Boolean)
   for (let i = 0; i + 1 < am.length; i++) ra.add(`${am[i]} ${am[i + 1]}`)
   return ra
 }
 
 let chiMuc: { dt: Set<string>[]; idf: Map<string, number> } | null = null
 function docChiMuc() {
-  if (chiMuc) return chiMuc
+  if (chiMuc || !duLieu) return chiMuc
+  const { CHUONG_BAI_GIANG, KY_THUAT_THAY } = duLieu
   const dt = KY_THUAT_THAY.map(([c, , t]) => { const d = dacTrung(t); for (const x of dacTrung(CHUONG_BAI_GIANG[c] ?? '')) d.add(`ch:${x}`); return d })
   const df = new Map<string, number>()
   for (const d of dt) for (const x of d) df.set(x, (df.get(x) ?? 0) + 1)
@@ -52,7 +67,10 @@ export interface MucKyThuat { loai: 'k' | 'b'; chu: string; baiGiang: string; di
 
 /** ≤ `toiDa` mục khớp đề nhất (tối đa 2 bài mẫu), mỗi mục ≥ 2 cụm chung và tổng điểm ≥ ngưỡng. */
 export function chonKyThuat(de: string, chuong = '', toiDa = 6): MucKyThuat[] {
-  const { dt, idf } = docChiMuc()
+  const cm = docChiMuc()
+  if (!cm || !duLieu) return []
+  const { dt, idf } = cm
+  const { CHUONG_BAI_GIANG, KY_THUAT_THAY } = duLieu
   const hoi = dacTrung(de)
   for (const x of dacTrung(chuong)) hoi.add(`ch:${x}`)
   const ung: MucKyThuat[] = []

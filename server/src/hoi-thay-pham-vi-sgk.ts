@@ -20,9 +20,12 @@ const BAC_CAO = '(?:bậc\\s*(?:hai|ba|II|III|2|3)|R2NH|R3N|secondary|tertiary)'
 const NGOAI_SGK: [RegExp, RegExp][] = [
   [/nitroso|N\s*[–-]\s*N\s*=\s*O/i, /nitroso/i],
   [/carbocation|cacbocation|cacbocation/i, /carbocation|cacbocation/i],
-  [/(?<![\p{L}\d])S\s?N\s?[12](?![\p{L}\d])|trạng thái chuyển tiếp/iu, /(?<![\p{L}\d])SN[12](?![\p{L}\d])|trạng thái chuyển tiếp/iu],
+  // SN1/SN2 PHÂN BIỆT HOA THƯỜNG: "Sn2+" (ion thiếc, dãy điện hoá) là kiến thức SGK.
+  [/(?<![\p{L}\d])SN\s?[12](?![\p{L}\d+])/u, /(?<![\p{L}\d])SN[12](?![\p{L}\d+])/u],
+  [/trạng thái chuyển tiếp/iu, /trạng thái chuyển tiếp/iu],
   [/gốc tự do trung gian/i, /gốc tự do/i],
-  [/cơ chế/i, /cơ chế/i],
+  // Chỉ cơ chế PHẢN ỨNG hữu cơ; "cơ chế giặt rửa của xà phòng", "cơ chế ăn mòn điện hoá" là chữ SGK ⇒ giữ.
+  [/cơ chế\s+(?:của\s+)?(?:phản ứng|thế|cộng|tách|gốc|electrophin|nucleophin|ái điện|ái nhân|SN|E[12])/iu, /cơ chế\s+(?:của\s+)?(?:phản ứng|thế|cộng|tách|gốc)/iu],
   [/diazoni(?:um)?[^.;\n]{0,60}phân hu[ỷy]|phân hu[ỷy][^.;\n]{0,30}diazoni/iu, /phân hu[ỷy][^.;\n]{0,30}diazoni|diazoni(?:um)?[^.;\n]{0,60}phân hu[ỷy]/iu],
   [/chất (?:lỏng )?dạng dầu|chất (?:lỏng )?màu vàng[^.;\n]{0,20}(?:dầu|nitro)/i, /dạng dầu/i],
 ]

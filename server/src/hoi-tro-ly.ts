@@ -12,7 +12,7 @@ import { quaTram } from './tram-gemini'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 import { CHI_DAN_KHUON, SCHEMA_TRA_LOI, SCHEMA_TRA_LOI_CU, chonKhuon, chuPhang, lamSachCauTruc, schemaChoKhuon, tachCauTruc, type CauTrucTraLoi, type Khuon } from './hoi-tro-ly-cau-truc'
 import { CAU_NGOAI_SGK, PHAM_VI_SGK, chanNgoaiSgk } from './hoi-thay-pham-vi-sgk'
-import { CACH_GIAI_THAY, chonKyThuat, chuBoChiaKhoa, chuKyThuat } from './hoi-thay-ky-thuat'
+import { CACH_GIAI_THAY, chuBoChiaKhoa, chuKyThuat, napKyThuat } from './hoi-thay-ky-thuat'
 import { baiNhapHoiThay, chanQuyKetHoiThay, docHoSoHoiThay, noiDungHoSoHoiThay, trangThaiHoiThay, type HoSoHoiThay } from './hoi-thay-ca-nhan'
 
 type Obj = Record<string, unknown>
@@ -392,7 +392,8 @@ async function goiMotModel(key: string, cfg: CauHinhHoiThem, model: string, noiD
 /** Chữ đề + lời giải của Thầy (kho, từng bước) cho chốt chặn PHẠM VI SGK; ảnh nhúng bỏ, cắt 60.000 ký tự. */
 function nguonPhamVi(nc: NguCanhCau): string {
   const jsonNhe = (v: unknown) => { try { return JSON.stringify(v ?? '', (_k, x) => (typeof x === 'string' && x.startsWith('data:') ? '' : x)) } catch { return '' } }
-  return [nc.cau.de, ...Object.values(nc.cau.pa ?? {}), ...Object.values(nc.cau.y ?? {}), jsonNhe(nc.cau.loiGiai), jsonNhe(nc.hoSo)].join(' ').slice(0, 60_000)
+  // Gồm cả bộ chìa khoá chương (Thầy duyệt) để chữ mô hình chép từ bộ không bị bỏ nhầm.
+  return [nc.cau.de, ...Object.values(nc.cau.pa ?? {}), ...Object.values(nc.cau.y ?? {}), chuBoChiaKhoa(str(nc.cau.dangMa), str(nc.cau.chuong)), jsonNhe(nc.cau.loiGiai), jsonNhe(nc.hoSo)].join(' ').slice(0, 60_000)
 }
 
 export const CAU_NGOAI_PHAM_VI = 'Ở đây Thầy chỉ trả lời về câu em đang xem. Em hỏi về đề, cách giải hay chỗ em sai ở câu này nhé.'
@@ -577,8 +578,8 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
     .catch(() => env.DB.prepare('SELECT ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid = ? ORDER BY luc DESC LIMIT 1').bind(sbd, q).first<Obj>().catch(() => null))
   const demP = docDem(qidDoan), lsP = docLs(qidDoan), kq0P = docKq0(qidDoan)
   for (const p of [duocP, ncP, demP, ddl, trangThaiP]) p.catch(() => {})
-  // Chỉ mục kĩ thuật của Thầy (~0,1 s CPU lần đầu mỗi isolate) dựng NGAY lúc các lượt đọc D1 đang bay ⇒ không cộng vào thời gian chờ của em.
-  try { chonKyThuat('') } catch { /* chỉ là làm nóng */ }
+  // Mục lục kĩ thuật của Thầy (nạp lười + ~0,1 s CPU lần đầu mỗi isolate) chạy lúc các lượt đọc D1 đang bay ⇒ không cộng vào thời gian chờ của em.
+  const kyThuatP = napKyThuat().catch(() => { /* thiếu mục lục ⇒ trả lời như cũ */ })
   const [, cfg] = await Promise.all([phu.xong, cfgP])
   if (!key || !(await duocP)) return { ok: false, ma: 'chua_bat', error: 'Phần hỏi thêm Thầy chưa mở cho em.' }
   if (cauHoi.length < 2) return { ok: false, ma: 'trong', error: 'Em nhắn chỗ em thắc mắc trước nhé.' }
@@ -603,6 +604,7 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
   const dapAnEm = str(b.dapAnEm).replace(/\s+/g, ' ').trim().slice(0, 40)
   const baiNhap = baiNhapHoiThay(b.baiNhap, cauHoi)
   // v3: máy chủ chọn KHUÔN trả lời từ dữ liệu đã có (không đọc thêm), gửi lược đồ riêng của khuôn.
+  await kyThuatP
   const khuon = chonKhuon({ dangLam, phan: nc.cau.phan, ketQua: ketQuaGanNhat, cauHoi, de: nc.cau.de, dapAnEm, baiNhap })
   const noiDung = { ...dungNoiDung(nc, lichSu, cauHoi, { ketQuaGanNhat, dapAnEm, dangLam, khuon, baiNhap, hoSo }), luocDo: schemaChoKhuon(khuon) }
   const bd = Date.now()

@@ -2,15 +2,16 @@
 // Thầy 21/10 (ảnh Câu 33 C4H11N): Hỏi Thầy chỉ trả lời trong SGK Hoá 10–11–12 Kết nối tri thức; amine bậc hai, bậc ba coi là không phản ứng với
 // HNO2; bỏ câu tương đương; nạp skill "giai-bai-phong-cach-thay" (cách giải + kĩ thuật Thầy đã giảng) và bộ chìa khoá chương.
 // SQL chạy trên SQLite trong bộ nhớ; mô hình là hàm giả — không đo chất lượng mô hình thật.
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { CAU_NGOAI_SGK, PHAM_VI_SGK, chanNgoaiSgk, ngoaiSgk } from '../server/src/hoi-thay-pham-vi-sgk'
-import { CACH_GIAI_THAY, chonKyThuat, chuBoChiaKhoa, chuKyThuat } from '../server/src/hoi-thay-ky-thuat'
+import { CACH_GIAI_THAY, chonKyThuat, chuBoChiaKhoa, chuKyThuat, napKyThuat } from '../server/src/hoi-thay-ky-thuat'
 import { lamSachCauTruc, type BoiCanhKhuon } from '../server/src/hoi-tro-ly-cau-truc'
 import { CHI_DAN_THAY, CAU_NGOAI_PHAM_VI, dungNoiDung, traLoiHoiThem, type NguCanhCau, type NoiDungGemini } from '../server/src/hoi-tro-ly'
 import { damBaoBangLoiGiai } from '../server/src/loi-giai'
 import { taoD1That } from './_d1-that'
 
 afterEach(() => vi.restoreAllMocks())
+beforeAll(() => napKyThuat())
 const DE = 'Ứng với công thức phân tử C4H11N có bao nhiêu amine phản ứng với HNO2 ở nhiệt độ thường giải phóng khí N2?'
 // Nguyên văn câu trả lời trong ảnh thầy gửi 21/10 (nấc gợi ý ngoài SGK).
 const ANH = {
@@ -34,6 +35,17 @@ describe('chốt chặn PHẠM VI SGK (máy chủ)', () => {
     expect(ngoaiSgk('Alkylamine bậc một gặp HNO2 ở nhiệt độ thường tạo alcohol và giải phóng N2.')).toBe(false)
     expect(ngoaiSgk('Aniline gặp HNO2 ở 0–5 °C tạo muối diazonium.')).toBe(false)
     expect(ngoaiSgk(ANH.nac[2]!.chu)).toBe(false)
+    // Chữ SGK có từ giống thuật ngữ cấm: không được bỏ nhầm.
+    expect(ngoaiSgk('Sn2+ bị khử thành Sn; cặp Sn2+/Sn đứng trước Pb2+/Pb.')).toBe(false)
+    expect(ngoaiSgk('Cơ chế giặt rửa: đầu ưa nước quay ra nước, đuôi kị nước bám vết dầu.')).toBe(false)
+    expect(ngoaiSgk('Cơ chế ăn mòn điện hoá: kim loại mạnh hơn là cực âm.')).toBe(false)
+    expect(ngoaiSgk('Cơ chế phản ứng thế ở đây là SN1.')).toBe(true)
+  })
+  it('dữ liệu kĩ thuật của Thầy không đổi nhầm "oxi hoá" thành "oxygen hoá", không có "phức chất tạp"', async () => {
+    const { KY_THUAT_THO: chu } = await import('../server/src/hoi-thay-ky-thuat-du-lieu')
+    expect(chu).not.toMatch(/oxygen\s*h[oó]/i)
+    expect(chu).not.toContain('phức chất tạp')
+    expect(chu).toMatch(/số oxi h[oó]a/)
   })
   it('thuật ngữ đã có trong đề / lời giải của Thầy thì không chặn', () => {
     expect(ngoaiSgk('Sản phẩm là hợp chất nitroso.', 'Đề: … tạo hợp chất nitroso …')).toBe(false)
