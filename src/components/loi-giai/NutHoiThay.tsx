@@ -48,7 +48,7 @@ function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, d
   const [dangTai, setDangTai] = useState<'' | 'hoi' | 'giai'>('')
   const [loi, setLoi] = useState('')
   const [mo, setMo] = useState<{ cau: CauChoKhung; hoSo: HoSoLoiGiai; kiem?: KiemKhung } | null>(null)
-  const [hop, setHop] = useState<{ cau: CauChoKhung | null; dangLam: boolean } | null>(null)
+  const [hop, setHop] = useState<{ cau: CauChoKhung | null; dangLam: boolean; em?: unknown } | null>(null)
   const luot = useRef(0) // lượt bấm hiện tại: em đóng hộp trong lúc chờ ⇒ phản hồi đến muộn không mở lại hộp
   useEffect(() => () => { luot.current++ }, [])
   const coPhien = !!qid && !!docTokenHs()
@@ -62,12 +62,13 @@ function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, d
     setDangTai(kieu)
     setLoi('')
     if (kieu === 'hoi') setHop({ cau: null, dangLam })
-    const [r] = await Promise.all([hoiThay(qid, nguon, dangLam, luotId), (kieu === 'hoi' ? napHop() : napKhung()).catch(() => null)])
+    // Thẻ «Em và câu này» chỉ xin khi mở hộp Hỏi Thầy (bấm Lời giải từng bước không đọc thêm gì).
+    const [r] = await Promise.all([hoiThay(qid, nguon, dangLam, luotId, kieu === 'hoi'), (kieu === 'hoi' ? napHop() : napKhung()).catch(() => null)])
     if (so !== luot.current) return
     setDangTai('')
     if (!r.ok) { setHop(null); setLoi(r.loi); return }
     if (soCau) r.cau = { ...r.cau, so: `Câu ${soCau}` }
-    if (kieu === 'hoi' && r.hoiThem) { setHop({ cau: r.cau, dangLam }); return }
+    if (kieu === 'hoi' && r.hoiThem) { setHop({ cau: r.cau, dangLam, em: r.emVaCau ?? null }); return }
     setHop(null)
     if (dangLam || 'chiHoi' in r) { setLoi(CHU_LAM_XONG); return }
     // Thầy chốt 29/09: câu CHƯA có lời giải từng bước ⇒ KHÔNG hiện lời giải ngắn của kho, chỉ báo đang soạn (không tính "có trợ giúp").
@@ -93,7 +94,7 @@ function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, d
       {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={luotId ? qid.replace(/~\d+$/, '') : qid} /></Suspense>}
       {loi && <span className="lg-loi" role="status">{loi}</span>}
       <Suspense fallback={null}>
-        {hop && <HopHoiThay cau={hop.cau} qid={qid} luotId={luotId} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
+        {hop && <HopHoiThay cau={hop.cau} em={hop.em} qid={qid} luotId={luotId} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
         {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
       </Suspense>
     </div>

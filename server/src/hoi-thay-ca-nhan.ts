@@ -8,12 +8,14 @@ export const TOI_DA_KY_NANG_HOI = 8
 export const TOI_DA_LAN_LAM_HOI = 8
 
 export const TOI_DA_CUNG_DANG = 3
+export interface MucCungDang { ten: string; p: number; tuLam: number; ngay: number; capNhat: string }
 export interface HoSoHoiThay {
-  kyNang: { ten: string; p: number | null; tuLam: number; ngay: number; capNhat: string; chuaChac: boolean }[]
+  /** `trangThai`: luật SPRT của OMNI (`omni-kieu.ts`: vung | chua_vung | chua_du) — CÙNG luật với "Dạng vững", không ngưỡng mới. */
+  kyNang: { ten: string; p: number | null; tuLam: number; ngay: number; capNhat: string; chuaChac: boolean; trangThai: string }[]
   lanLam: { ketQua: 0 | 1; troGiup: boolean; luc: string }[]
   /** Thầy 21/10 ("mọi dữ liệu của học sinh khi bấm vào mục hỏi thầy để hỗ trợ tốt nhất"): kiến thức KHÁC của cùng dạng mà em đã tự làm ≥ 2 lần —
-   *  chỗ còn yếu (p < 0,6, thấp nhất trước) và chỗ đã vững (p ≥ 0,8), mỗi bên ≤ 3. Vắng / lỗi ⇒ mảng rỗng. */
-  cungDang?: { canOn: { ten: string; p: number; tuLam: number }[]; vung: { ten: string; p: number; tuLam: number }[] }
+   *  đang luyện thêm (trang_thai chua_vung, p thấp nhất trước) và đã vững (trang_thai vung), mỗi bên ≤ 3. Vắng / lỗi ⇒ không có trường. */
+  cungDang?: { canOn: MucCungDang[]; vung: MucCungDang[] }
 }
 
 /** Hai lượt đọc bắt đầu đồng thời; dữ liệu phụ trợ lỗi/vắng thì dùng cách hướng dẫn cũ.
@@ -23,7 +25,7 @@ export async function docHoSoHoiThay(env: Env, sbd: string, qid: string, nowMs: 
     env.DB.prepare(`WITH ids AS (
       SELECT DISTINCT j.value id FROM omni_q q, json_each(q.vkn_json) j
       WHERE q.qid=? AND typeof(j.value)='text' ORDER BY j.value LIMIT ${TOI_DA_KY_NANG_HOI}
-    ) SELECT v.ten,p.p,p.n_tu_lam,p.n_ngay,p.cap_nhat_luc
+    ) SELECT v.ten,p.p,p.n_tu_lam,p.n_ngay,p.cap_nhat_luc,p.trang_thai
       FROM ids LEFT JOIN omni_vkn v ON v.id=ids.id
       LEFT JOIN omni_p_vkn p ON p.vkn_id=ids.id AND p.sbd=?`)
       .bind(qid, sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
@@ -37,14 +39,17 @@ export async function docHoSoHoiThay(env: Env, sbd: string, qid: string, nowMs: 
     env.DB.prepare(`WITH ids AS (
       SELECT DISTINCT j.value id FROM omni_q q, json_each(q.vkn_json) j WHERE q.qid=? AND typeof(j.value)='text' LIMIT ${TOI_DA_KY_NANG_HOI}
     ), dang AS (SELECT DISTINCT v.ma_dang FROM ids JOIN omni_vkn v ON v.id=ids.id)
-    SELECT * FROM (SELECT 'yeu' nhom,v.ten,p.p,p.n_tu_lam FROM omni_p_vkn p JOIN omni_vkn v ON v.id=p.vkn_id
-      WHERE p.sbd=? AND v.ma_dang IN(SELECT ma_dang FROM dang) AND p.vkn_id NOT IN(SELECT id FROM ids) AND p.n_tu_lam>=2 AND p.p<0.6 ORDER BY p.p LIMIT ${TOI_DA_CUNG_DANG})
-    UNION ALL SELECT * FROM (SELECT 'vung' nhom,v.ten,p.p,p.n_tu_lam FROM omni_p_vkn p JOIN omni_vkn v ON v.id=p.vkn_id
-      WHERE p.sbd=? AND v.ma_dang IN(SELECT ma_dang FROM dang) AND p.vkn_id NOT IN(SELECT id FROM ids) AND p.n_tu_lam>=2 AND p.p>=0.8 ORDER BY p.p DESC LIMIT ${TOI_DA_CUNG_DANG})`)
+    SELECT * FROM (SELECT 'yeu' nhom,v.ten,p.p,p.n_tu_lam,p.n_ngay,p.cap_nhat_luc FROM omni_p_vkn p JOIN omni_vkn v ON v.id=p.vkn_id
+      WHERE p.sbd=? AND v.ma_dang IN(SELECT ma_dang FROM dang) AND p.vkn_id NOT IN(SELECT id FROM ids) AND p.n_tu_lam>=2 AND p.trang_thai='chua_vung' ORDER BY p.p LIMIT ${TOI_DA_CUNG_DANG})
+    UNION ALL SELECT * FROM (SELECT 'vung' nhom,v.ten,p.p,p.n_tu_lam,p.n_ngay,p.cap_nhat_luc FROM omni_p_vkn p JOIN omni_vkn v ON v.id=p.vkn_id
+      WHERE p.sbd=? AND v.ma_dang IN(SELECT ma_dang FROM dang) AND p.vkn_id NOT IN(SELECT id FROM ids) AND p.n_tu_lam>=2 AND p.trang_thai='vung' ORDER BY p.p DESC LIMIT ${TOI_DA_CUNG_DANG})`)
       .bind(qid, sbd, sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
   ])
   const mucCd = (nhom: string) => cd.results.filter(r => r.nhom === nhom && Number.isFinite(Number(r.p))).slice(0, TOI_DA_CUNG_DANG)
-    .map(r => ({ ten: chu(r.ten).replace(/<[^>]*>/g, '').slice(0, 100), p: Math.round(Math.max(0, Math.min(1, Number(r.p))) * 100) / 100, tuLam: Math.max(0, Number(r.n_tu_lam) || 0) }))
+    .map(r => ({ ten: chu(r.ten).replace(/<[^>]*>/g, '').slice(0, 100), p: Math.round(Math.max(0, Math.min(1, Number(r.p))) * 100) / 100, tuLam: Math.max(0, Number(r.n_tu_lam) || 0),
+      ngay: Math.max(0, Number(r.n_ngay) || 0), capNhat: chu(r.cap_nhat_luc) }))
+    // Ảnh chụp cũ hơn 14 ngày (em không vào việc đêm) ⇒ không đủ căn cứ để nói vững / đang luyện.
+    .filter(k => { const moc = Date.parse(k.capNhat); return Number.isFinite(moc) && moc <= nowMs && nowMs - moc <= 14 * 86_400_000 })
   const canOn = mucCd('yeu'), vung = mucCd('vung')
   return {
     ...(canOn.length || vung.length ? { cungDang: { canOn, vung } } : {}),
@@ -52,12 +57,39 @@ export async function docHoSoHoiThay(env: Env, sbd: string, qid: string, nowMs: 
       const p = r.p == null || !Number.isFinite(Number(r.p)) ? null : Math.max(0, Math.min(1, Number(r.p)))
       const tuLam = Math.max(0, Number(r.n_tu_lam) || 0), capNhat = chu(r.cap_nhat_luc)
       const moc = Date.parse(capNhat)
-      return { ten: chu(r.ten).replace(/<[^>]*>/g, '').slice(0, 100), p, tuLam, ngay: Math.max(0, Number(r.n_ngay) || 0), capNhat,
+      return { ten: chu(r.ten).replace(/<[^>]*>/g, '').slice(0, 100), p, tuLam, ngay: Math.max(0, Number(r.n_ngay) || 0), capNhat, trangThai: chu(r.trang_thai),
         chuaChac: p === null || tuLam < 3 || !Number.isFinite(moc) || moc > nowMs || nowMs - moc > 14 * 86_400_000 }
     }),
     lanLam: ls.results.slice(0, TOI_DA_LAN_LAM_HOI).filter(r => Number(r.ket_qua) === 0 || Number(r.ket_qua) === 1)
       .map(r => ({ ketQua: Number(r.ket_qua) as 0 | 1, troGiup: r.assistance != null && r.assistance !== '' && r.assistance !== 'none', luc: chu(r.luc) })),
   }
+}
+
+// ---------------------------------------------------------------- thẻ «Em và câu này» (bản vẽ docs/ban-ve-hoi-thay-em-2110, thầy 21/10 "Tự tối ưu")
+export type MucEm = 'vung' | 'luyen_them' | 'chua_du'
+export interface EmVaCau {
+  /** Vắng ⇒ em chưa làm câu này lần nào. Em ĐANG LÀM ⇒ CHỈ tổng số lần (không đúng/sai từng lần: cắt ở máy chủ). */
+  cauNay?: { tuLam: number; tuLamDung: number; coTroGiup: number; lan: { ketQua: 0 | 1; troGiup: boolean; luc: string }[] } | { soLan: number }
+  kienThuc: { ten: string; muc: MucEm; tuLam: number; ngay: number; trongCau: boolean }[]
+  /** ≤ 2 tên kiến thức CỦA CÂU NÀY chưa vững (đang luyện thêm trước) cho nút hỏi nhanh. */
+  hoiNhanh: string[]
+  /** Mốc ảnh chụp kiến thức (việc đêm OMNI). */
+  mocKienThuc?: string
+}
+/** Hồ sơ ⇒ phần em được xem. KHÔNG có p thô, mã kiến thức, qid, phương án hay đáp án. */
+export function tomTatEmVaCau(h: HoSoHoiThay, x: { dangLam: boolean }): EmVaCau {
+  const lan = [...h.lanLam].reverse()
+  const tu = lan.filter(l => !l.troGiup)
+  const cauNay: EmVaCau['cauNay'] = !lan.length ? undefined : x.dangLam ? { soLan: lan.length }
+    : { tuLam: tu.length, tuLamDung: tu.filter(l => l.ketQua === 1).length, coTroGiup: lan.length - tu.length, lan }
+  const mucCua = (k: HoSoHoiThay['kyNang'][number]): MucEm => k.chuaChac ? 'chua_du' : k.trangThai === 'vung' ? 'vung' : k.trangThai === 'chua_vung' ? 'luyen_them' : 'chua_du'
+  // Kiến thức em chưa tự làm lần nào (chưa bật OMNI / chưa gặp) không liệt kê hàng loạt.
+  const trong = h.kyNang.filter(k => k.tuLam > 0 && k.ten).map(k => ({ ten: k.ten, muc: mucCua(k), tuLam: k.tuLam, ngay: k.ngay, trongCau: true }))
+  const ngoai = [...(h.cungDang?.vung ?? []).map(k => ({ ...k, muc: 'vung' as const })), ...(h.cungDang?.canOn ?? []).map(k => ({ ...k, muc: 'luyen_them' as const }))]
+    .filter(k => k.ten && !trong.some(t => t.ten === k.ten)).map(k => ({ ten: k.ten, muc: k.muc, tuLam: k.tuLam, ngay: k.ngay, trongCau: false }))
+  const hoiNhanh = [...trong.filter(k => k.muc === 'luyen_them'), ...trong.filter(k => k.muc === 'chua_du')].slice(0, 2).map(k => k.ten)
+  const moc = h.kyNang.map(k => k.capNhat).filter(c => Number.isFinite(Date.parse(c))).sort().at(-1)
+  return { ...(cauNay ? { cauNay } : {}), kienThuc: [...trong, ...ngoai], hoiNhanh, ...(moc && trong.length ? { mocKienThuc: moc } : {}) }
 }
 
 /** Không có tên, SBD, mã kỹ năng hay bài khác trong gói gửi mô hình. */

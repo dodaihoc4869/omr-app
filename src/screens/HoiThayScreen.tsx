@@ -73,8 +73,8 @@ const TU_HASH = (() => {
 })()
 const NHUNG = trongIframe()
 if (NHUNG) document.documentElement.setAttribute('data-hoi-thay-nhung', '')
-type Hoi = { cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; hoiThem: boolean }
-let huaDau: Promise<KetQuaHoiThay> | null = THAM_SO.qid && docTokenHs() ? hoiThay(THAM_SO.qid, THAM_SO.nguon, THAM_SO.dangLam) : null
+type Hoi = { cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; hoiThem: boolean; em?: unknown }
+let huaDau: Promise<KetQuaHoiThay> | null = THAM_SO.qid && docTokenHs() ? hoiThay(THAM_SO.qid, THAM_SO.nguon, THAM_SO.dangLam, undefined, true) : null
 
 /** Mốc KaTeX của main.tsx (`GocApp.huaManEmSom`): hộp có công thức ngay ⇒ main.tsx tải KaTeX liền, không cần chờ gì. */
 export function huaManEmSom(): Promise<unknown> | null {
@@ -109,7 +109,7 @@ function ManHoiThay() {
   useEffect(() => {
     if (!token || !qid || tt.k !== 'cho') return
     let con = true
-    const hua = huaDau ?? hoiThay(qid, nguon, dangLam)
+    const hua = huaDau ?? hoiThay(qid, nguon, dangLam, undefined, true)
     huaDau = null
     void hua.then((r) => {
       if (!con) return
@@ -124,7 +124,7 @@ function ManHoiThay() {
         return
       }
       if (dangLam && !r.hoiThem) { setTt({ k: 'loi', loi: CHU_LAM_XONG }); return }
-      const hoi: Hoi = { cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined, hoiThem: r.hoiThem === true }
+      const hoi: Hoi = { cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined, hoiThem: r.hoiThem === true, em: r.emVaCau ?? null }
       setTt(hoi.hoiThem ? { k: 'hop', hoi } : { k: 'khung', hoi })
     })
     return () => { con = false }
@@ -180,6 +180,7 @@ function ManHoiThay() {
   return (
     <HopHoiThay
       cau={hoi?.cau ?? null}
+      em={hoi?.em ?? null}
       qid={qid}
       nguon={nguon}
       dangLam={dangLam}
