@@ -27,7 +27,7 @@
 .cem-ly{display:block;font-size:13px;color:var(--gvm-chu-3);margin-top:2px}
 .cem-vai{display:grid;gap:2px;margin-top:6px;font-size:13.5px;color:var(--gvm-chu-2)}
 .cem-nen{position:fixed;inset:0;z-index:60;background:color-mix(in srgb,var(--gvm-chu) 40%,transparent)}
-.cem-hop{position:fixed;z-index:61;inset:auto 0 0 0;max-height:94dvh;overflow:auto;border-radius:24px 24px 0 0;background:var(--gvm-mat);color:var(--gvm-chu);padding:20px 18px 24px;display:grid;gap:14px;box-shadow:0 -10px 40px rgb(0 0 0 / .25)}
+.cem-hop{position:fixed;z-index:61;inset:auto 0 0 0;max-height:94dvh;overflow:auto;border-radius:24px 24px 0 0;background:var(--gvm-mat);color:var(--gvm-chu);padding:20px 18px 24px;display:grid;gap:14px;box-shadow:var(--gvm-bong)}
 @media (min-width:900px){.cem-hop{inset:5vh auto auto 50%;transform:translateX(-50%);width:min(760px,92vw);border-radius:28px;max-height:90vh;padding:26px 28px}}
 .cem-hop .dau{display:flex;align-items:center;gap:12px}
 .cem-hop h2{flex:1;font-size:20px;font-weight:800;margin:0}
