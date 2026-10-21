@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản vẽ Em và câu này</title>
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-500-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-600-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-800-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Noto Serif';font-weight:400;src:url(../../node_modules/@fontsource/noto-serif/files/noto-serif-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Noto Serif';font-weight:400;src:url(../../node_modules/@fontsource/noto-serif/files/noto-serif-latin-400-normal.woff2) format('woff2')}
+</style>
+<!-- BẢN VẼ «EM VÀ CÂU NÀY» trong hộp Hỏi Thầy (21/10) — thầy: "thiết kế thân thiện hiểu rõ được điểm mạnh điểm yếu, mọi dữ liệu của học sinh khi bấm
+     vào mục hỏi thầy để hỗ trợ tốt nhất làm cho học sinh được thấu hiểu nhất". CHỈ là bản vẽ (bước 2 quy trình 4 bước): dữ liệu giả, CHƯA sửa src/.
+     Nạp ĐÚNG CSS thật của app; khối mới `.lg-ev-*` chỉ dùng biến màu có sẵn (M3 + --m3-canh-bao-*). Đặc tả: DAC-TA.md cùng thư mục.
+     Trạng thái: ?t=tai | moi | gap | mo | loi | dl | da-hoi -->
+<link rel="stylesheet" href="../../src/styles/tokens.css">
+<link rel="stylesheet" href="../../src/components/bang-nhiem-vu/m3-theme.css">
+<link rel="stylesheet" href="../../src/components/loi-giai/loi-giai.css">
+<link rel="stylesheet" href="../../src/components/loi-giai/hop-hoi-thay.css">
+<style>
+body{margin:0;font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--m3-surface-container-low)}
+.trang{min-height:100dvh;padding:16px;box-sizing:border-box}
+.trang-dau{display:flex;align-items:center;gap:12px;font-weight:700;font-size:20px;color:var(--m3-on-surface)}
+.trang-dau small{display:block;font-weight:400;font-size:14px;color:var(--m3-on-surface-variant)}
+.lg-hh-trai{display:contents}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ================= KHỐI MỚI · THẺ «EM VÀ CÂU NÀY» (chỉ biến màu có sẵn) ================= */
+/* Ngăn gập giống ô "Đề câu": cùng nền, cùng bo, cùng mũi tên ⇒ em thấy ngay đây là một ngăn mở ra được. Co lại được (flex-shrink)
+   nhưng không thấp hơn 48 px; phần thân tự cuộn ⇒ ô nhắn không bị đẩy khỏi hộp. */
+.lg-ev{container-type:inline-size;flex:0 1 auto;min-height:48px;display:flex;flex-direction:column;overflow:hidden;margin:8px 16px 0;border-radius:18px;
+  background:var(--m3-surface-container-low);border:1px solid var(--m3-outline-variant,transparent);box-sizing:border-box}
+.lg-ev-dau,.lg-ev > summary{flex:none;list-style:none;min-height:48px;box-sizing:border-box;padding:8px 14px;border-radius:18px;
+  display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--m3-primary)}
+.lg-ev > summary{cursor:pointer;touch-action:manipulation}
+.lg-ev > summary::-webkit-details-marker{display:none}
+.lg-ev > summary::after{content:'';flex:none;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .16s ease}
+.lg-ev[open] > summary::after{transform:rotate(-135deg) translateY(-2px)}
+.lg-ev > summary:focus-visible{outline:3px solid var(--m3-primary);outline-offset:-3px}
+.lg-ev-hinh{flex:none;display:grid;place-items:center}
+.lg-ev-ten{flex:none;white-space:nowrap}
+.lg-ev-tom{margin-left:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:2px 10px;border-radius:999px;
+  font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;background:var(--m3-secondary-container);color:var(--m3-on-secondary-container)}
+.lg-ev-tom b{font-weight:800}
+/* Đang tải: giữ ĐÚNG chiều cao dòng có dữ liệu (48 px) ⇒ không xô ô nhắn khi số liệu về */
+.lg-ev-vach{margin-left:auto;width:118px;max-width:40%;height:14px;border-radius:7px;background:var(--m3-surface-container-high);animation:lg-ev-nhay 1.2s ease-in-out infinite}
+@keyframes lg-ev-nhay{0%,100%{opacity:.5}50%{opacity:1}}
+/* Lần đầu: không có gì để mở ⇒ không mũi tên; một dòng phụ nói rõ + vẫn hỏi được */
+.lg-ev--moi .lg-ev-dau{flex-wrap:wrap;row-gap:2px;padding:10px 14px}
+.lg-ev-phu{flex-basis:100%;margin:0;padding-left:30px;font-size:15px;font-weight:500;line-height:1.45;color:var(--m3-on-surface-variant)}
+
+.lg-ev-than{flex:0 1 auto;min-height:0;max-height:42dvh;overflow:auto;overscroll-behavior:contain;padding:2px 14px 14px;
+  display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.5;color:var(--m3-on-surface)}
+.lg-ev-mo-dau{margin:0;font-size:14px;line-height:1.45;color:var(--m3-on-surface-variant)}
+.lg-ev-muc-tieu{margin:0 0 6px;font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--m3-on-surface-variant)}
+
+/* — Câu này: con số lớn (điểm nhấn duy nhất của thẻ) + dải các lần làm, cũ → mới — */
+.lg-ev-cau{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--m3-surface);border:1px solid var(--m3-surface-container-high)}
+.lg-ev-so{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0}
+.lg-ev-so b{font-size:24px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--m3-on-surface)}
+.lg-ev-so span{font-size:15px;font-weight:600}
+.lg-ev-gan{margin:0;font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums;color:var(--m3-on-surface-variant)}
+.lg-ev-gan strong{color:var(--m3-on-surface)}
+.lg-ev-lan{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 10px}
+.lg-ev-lan li{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:44px;font-size:12px;line-height:1.2;font-variant-numeric:tabular-nums;color:var(--m3-on-surface-variant)}
+.lg-ev-cham{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;box-sizing:border-box}
+.lg-ev-lan [data-kq="dung"] .lg-ev-cham{background:var(--m3-tertiary-container);color:var(--m3-on-tertiary-container)}
+.lg-ev-lan [data-kq="sai"] .lg-ev-cham{background:var(--m3-error-container);color:var(--m3-on-error-container)}
+.lg-ev-lan [data-tro] .lg-ev-cham{background:transparent;border:2px dashed var(--m3-outline);color:var(--m3-on-surface-variant)}
+.lg-ev-lan li:last-child{font-weight:700;color:var(--m3-on-surface)}
+.lg-ev-chu-giai{margin:0;font-size:12.5px;line-height:1.45;color:var(--m3-on-surface-variant)}
+
+/* — Hai nhóm kiến thức: đã vững (xanh lá, dấu ✓) · đang luyện thêm (hổ phách, dấu mũi tên lên). Không dùng đỏ cho trạng thái học. — */
+.lg-ev-hai{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+@container (min-width:520px){.lg-ev-hai{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.lg-ev-nhom-dau{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;padding:3px 10px 3px 6px;border-radius:999px;font-size:13.5px;font-weight:800}
+.lg-ev-nhom[data-loai="vung"] .lg-ev-nhom-dau{background:var(--m3-tertiary-container);color:var(--m3-on-tertiary-container)}
+.lg-ev-nhom[data-loai="luyen"] .lg-ev-nhom-dau{background:var(--m3-canh-bao-nen);color:var(--m3-canh-bao-chu)}
+.lg-ev-ds{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lg-ev-ds li{padding:8px 12px;border-radius:12px;background:var(--m3-surface);border:1px solid var(--m3-surface-container-high);display:flex;flex-direction:column;gap:2px}
+.lg-ev-nhom[data-loai="vung"] .lg-ev-ds li{box-shadow:inset 3px 0 0 var(--m3-tertiary)}
+.lg-ev-nhom[data-loai="luyen"] .lg-ev-ds li{box-shadow:inset 3px 0 0 var(--m3-canh-bao-chu)}
+.lg-ev-ds .ten{font-size:15px;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
+.lg-ev-ds .phu{font-size:13px;line-height:1.4;font-variant-numeric:tabular-nums;color:var(--m3-on-surface-variant)}
+.lg-ev-the{display:inline-block;margin-left:4px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--m3-outline);color:var(--m3-on-surface-variant);white-space:nowrap}
+.lg-ev-chua{margin:0;font-size:14px;line-height:1.5;color:var(--m3-on-surface-variant)}
+.lg-ev-chua b{color:var(--m3-on-surface);font-weight:600}
+
+/* — Hỏi nhanh: nút viền (không tranh nút chính "Gửi"), chạm là gửi đúng câu đó cho Thầy — */
+.lg-ev-hoi{display:flex;flex-wrap:wrap;gap:8px}
+.lg-ev-hoi button{min-height:48px;max-width:100%;box-sizing:border-box;padding:8px 16px 8px 12px;border-radius:999px;border:1px solid var(--m3-outline);
+  background:var(--m3-surface);color:var(--m3-primary);font:inherit;font-size:14.5px;font-weight:700;line-height:1.3;text-align:left;
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;touch-action:manipulation;transition:background-color .16s ease}
+.lg-ev-hoi button:hover{background:var(--m3-surface-container-high)}
+.lg-ev-hoi button:focus-visible{outline:3px solid var(--m3-primary);outline-offset:2px}
+.lg-ev-hoi svg{flex:none}
+.lg-ev sub{line-height:0}
+.lg-ev-chan{margin:0;font-size:12.5px;line-height:1.45;font-variant-numeric:tabular-nums;color:var(--m3-on-surface-variant)}
+/* — ĐIỆN THOẠI NGANG (thấp ≤ 500 px, rộng ≥ 640 px): hộp chỉ cao ~340 px ⇒ HAI CỘT. Trái: Đề câu + Em và câu này (tự cuộn);
+     phải: hội thoại + ô nhắn luôn thấy trọn. (Bản hiện tại một cột đã cắt nút Gửi ở khổ này — đo 21/10: đáy nút 375 > đáy hộp 367.) — */
+@media (max-height:500px) and (min-width:640px){
+  .lg-hh-nen{padding:8px}
+  .lg-hh{width:min(880px,100%);max-height:calc(100dvh - 16px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-rows:auto minmax(0,1fr);column-gap:4px}
+  .lg-hh-dau{grid-column:1/-1;padding-top:10px;padding-bottom:8px}
+  .lg-hh-trai{grid-column:1;grid-row:2;min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;padding-bottom:12px}
+  .lg-hh-trai .lg-hh-de-than{max-height:max(96px,calc(100dvh - 250px))}
+  .lg-hh-trai .lg-ev-than{max-height:none;overflow:visible}
+  .lg-hh-trai .lg-ev{flex:none}
+  .lg-ht--hop{grid-column:2;grid-row:2;min-height:0;padding-top:0;padding-left:8px}
+}
+@media (prefers-reduced-motion:reduce){.lg-ev-vach{animation:none}.lg-ev > summary::after,.lg-ev-hoi button{transition:none}}
+</style>
+</head>
+<body class="m3">
+<div class="trang" aria-hidden="true">
+  <div class="trang-dau"><span>‹</span><div>Chặng 2 · Câu 33/40<small>Bài tập về nhà · Hợp chất chứa nitrogen</small></div></div>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-hoi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-gui" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.7 3.7 21 12 3.7 20.3 6 12Z"/><path d="M6 12h15"/></symbol>
+  <symbol id="i-em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4.5"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-dung" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-sai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-tro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/></symbol>
+  <symbol id="i-len" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+  <symbol id="i-hoi-nhanh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h8"/><path d="m13 9 3 3-3 3"/></symbol>
+</svg>
+
+<!-- Ô nhắn: y như app (HoiThemThay, thầy chốt 13/10) -->
+<template id="o-nhan">
+  <form class="lg-nh">
+    <div class="lg-nh-khung">
+      <label class="sr-only" for="o">Chỗ em thắc mắc về câu này</label>
+      <textarea id="o" class="lg-nh-o" rows="1" placeholder="Nhắn chỗ em còn thắc mắc…"></textarea>
+      <div class="lg-nh-chan"><span class="lg-nh-con">Còn 11 câu hỏi hôm nay</span><span class="lg-nh-dem">0/500</span><button type="button" class="lg-nh-gui" aria-label="Gửi" disabled><svg width="19" height="19"><use href="#i-gui"/></svg></button></div>
+    </div>
+    <p class="lg-nh-khau">KIÊN TRÌ là vũ khí tối thượng để chiến thắng mọi thứ</p>
+  </form>
+</template>
+
+<!-- Đề câu: chỉ đề + phương án, KHÔNG đáp án -->
+<template id="de-cau">
+  <details class="lg-hh-de" data-de>
+    <summary>Đề câu <span class="lg-de-tom" data-tom>Ứng với công thức phân tử C<sub>4</sub>H<sub>11</sub>N…</span><span class="lg-de-loai">Trắc nghiệm</span></summary>
+    <div class="lg-hh-de-than lg-de-chuan">
+      <p class="lg-de-chu"><b>Câu 33.</b> Ứng với công thức phân tử C<sub>4</sub>H<sub>11</sub>N có bao nhiêu amine bậc một tác dụng với HNO<sub>2</sub> ở nhiệt độ thường, giải phóng khí N<sub>2</sub>?</p>
+      <ul class="lg-de-pa" data-ngan><li><span class="lg-de-chu-cai">A</span><span>2</span></li><li><span class="lg-de-chu-cai">B</span><span>3</span></li><li><span class="lg-de-chu-cai">C</span><span>4</span></li><li><span class="lg-de-chu-cai">D</span><span>8</span></li></ul>
+    </div>
+  </details>
+</template>
+
+<!-- ========== THẺ: CÓ DỮ LIỆU (em đã nộp câu) ========== -->
+<template id="the-co">
+  <details class="lg-ev" data-ev>
+    <summary>
+      <span class="lg-ev-hinh" aria-hidden="true"><svg width="20" height="20"><use href="#i-em"/></svg></span>
+      <span class="lg-ev-ten">Em và câu này</span>
+      <span class="lg-ev-tom">Tự làm đúng <b>1/3</b> lần</span>
+    </summary>
+    <div class="lg-ev-than">
+      <p class="lg-ev-mo-dau">Thầy xem những điều này trước khi trả lời, để giảng đúng chỗ em cần.</p>
+
+      <section class="lg-ev-cau" aria-label="Các lần em làm câu này">
+        <p class="lg-ev-so"><b>1/3</b><span>lần em tự làm đúng câu này</span></p>
+        <p class="lg-ev-gan">Lần gần nhất: <strong>Sai</strong> · 14:05 · Thứ Tư 21/10/2026</p>
+        <ol class="lg-ev-lan" aria-label="Từng lần làm, từ cũ tới mới">
+          <li data-kq="sai"><span class="lg-ev-cham"><svg width="14" height="14" aria-hidden="true"><use href="#i-sai"/></svg></span>16/10<span class="sr-only">: Sai</span></li>
+          <li data-kq="dung"><span class="lg-ev-cham"><svg width="14" height="14" aria-hidden="true"><use href="#i-dung"/></svg></span>18/10<span class="sr-only">: Đúng</span></li>
+          <li data-kq="dung" data-tro><span class="lg-ev-cham"><svg width="15" height="15" aria-hidden="true"><use href="#i-tro"/></svg></span>20/10<span class="sr-only">: Đúng, có trợ giúp</span></li>
+          <li data-kq="sai"><span class="lg-ev-cham"><svg width="14" height="14" aria-hidden="true"><use href="#i-sai"/></svg></span>21/10<span class="sr-only">: Sai, lần gần nhất</span></li>
+        </ol>
+        <p class="lg-ev-chu-giai">Vòng nét đứt: lần có trợ giúp (xem gợi ý hoặc lời giải) — không tính vào số lần tự làm.</p>
+      </section>
+
+      <div class="lg-ev-hai">
+        <section class="lg-ev-nhom" data-loai="vung" aria-label="Phần em đã vững">
+          <p class="lg-ev-nhom-dau"><svg width="16" height="16" aria-hidden="true"><use href="#i-dung"/></svg>Phần em đã vững</p>
+          <ul class="lg-ev-ds">
+            <li><span class="ten">Đếm đồng phân amine</span><span class="phu">Có trong câu này · tự làm 7 lần trong 5 ngày</span></li>
+            <li><span class="ten">Gọi tên amine theo danh pháp thay thế</span><span class="phu">Tự làm 5 lần trong 4 ngày <span class="lg-ev-the">Cùng dạng</span></span></li>
+          </ul>
+        </section>
+        <section class="lg-ev-nhom" data-loai="luyen" aria-label="Phần em đang luyện thêm">
+          <p class="lg-ev-nhom-dau"><svg width="16" height="16" aria-hidden="true"><use href="#i-len"/></svg>Phần em đang luyện thêm</p>
+          <ul class="lg-ev-ds">
+            <li><span class="ten">Bậc amine</span><span class="phu">Có trong câu này · tự làm 4 lần trong 3 ngày</span></li>
+            <li><span class="ten">So sánh lực base của amine, ammonia và aniline trong dung dịch nước</span><span class="phu">Tự làm 3 lần trong 2 ngày <span class="lg-ev-the">Cùng dạng</span></span></li>
+          </ul>
+        </section>
+      </div>
+      <p class="lg-ev-chua">Chưa đủ lượt để biết: <b>Amine gặp HNO<sub>2</sub></b> (em mới tự làm 1 lần).</p>
+
+      <div>
+        <p class="lg-ev-muc-tieu">Chạm để hỏi Thầy ngay</p>
+        <div class="lg-ev-hoi" role="group" aria-label="Hỏi nhanh">
+          <button type="button" data-hoi="Thầy giải thích lại giúp em phần Bậc amine trong câu này."><svg width="18" height="18" aria-hidden="true"><use href="#i-hoi-nhanh"/></svg><span>Giải thích lại: Bậc amine</span></button>
+          <button type="button" data-hoi="Thầy cho em một ví dụ về amine gặp HNO2 trong câu này."><svg width="18" height="18" aria-hidden="true"><use href="#i-hoi-nhanh"/></svg><span>Cho ví dụ: Amine gặp HNO<sub>2</sub></span></button>
+        </div>
+      </div>
+      <p class="lg-ev-chan">Phần kiến thức tính tới 00:00 · Thứ Tư 21/10/2026. Không tính điểm.</p>
+    </div>
+  </details>
+</template>
+
+<!-- ========== THẺ: EM ĐANG LÀM CÂU (chưa nộp) — không hiện Đúng/Sai từng lần ========== -->
+<template id="the-dl">
+  <details class="lg-ev" data-ev>
+    <summary>
+      <span class="lg-ev-hinh" aria-hidden="true"><svg width="20" height="20"><use href="#i-em"/></svg></span>
+      <span class="lg-ev-ten">Em và câu này</span>
+      <span class="lg-ev-tom">Đã làm <b>4</b> lần</span>
+    </summary>
+    <div class="lg-ev-than">
+      <p class="lg-ev-mo-dau">Thầy xem những điều này trước khi gợi hướng, để gợi đúng chỗ em cần.</p>
+      <section class="lg-ev-cau" aria-label="Các lần em làm câu này">
+        <p class="lg-ev-so"><b>4</b><span>lần em đã làm câu này trước đây</span></p>
+        <p class="lg-ev-gan">Kết quả từng lần hiện lại sau khi em trả lời câu này.</p>
+      </section>
+      <div class="lg-ev-hai">
+        <section class="lg-ev-nhom" data-loai="vung" aria-label="Phần em đã vững">
+          <p class="lg-ev-nhom-dau"><svg width="16" height="16" aria-hidden="true"><use href="#i-dung"/></svg>Phần em đã vững</p>
+          <ul class="lg-ev-ds"><li><span class="ten">Đếm đồng phân amine</span><span class="phu">Có trong câu này · tự làm 7 lần trong 5 ngày</span></li></ul>
+        </section>
+        <section class="lg-ev-nhom" data-loai="luyen" aria-label="Phần em đang luyện thêm">
+          <p class="lg-ev-nhom-dau"><svg width="16" height="16" aria-hidden="true"><use href="#i-len"/></svg>Phần em đang luyện thêm</p>
+          <ul class="lg-ev-ds"><li><span class="ten">Bậc amine</span><span class="phu">Có trong câu này · tự làm 4 lần trong 3 ngày</span></li></ul>
+        </section>
+      </div>
+      <p class="lg-ev-chua">Chưa đủ lượt để biết: <b>Amine gặp HNO<sub>2</sub></b> (em mới tự làm 1 lần).</p>
+      <div>
+        <p class="lg-ev-muc-tieu">Chạm để Thầy gợi hướng (chưa nói đáp án)</p>
+        <div class="lg-ev-hoi" role="group" aria-label="Hỏi nhanh">
+          <button type="button" data-hoi="Thầy gợi hướng giúp em phần Bậc amine trong câu này."><svg width="18" height="18" aria-hidden="true"><use href="#i-hoi-nhanh"/></svg><span>Gợi hướng: Bậc amine</span></button>
+          <button type="button" data-hoi="Thầy gợi hướng giúp em phần amine gặp HNO2 trong câu này."><svg width="18" height="18" aria-hidden="true"><use href="#i-hoi-nhanh"/></svg><span>Gợi hướng: Amine gặp HNO<sub>2</sub></span></button>
+        </div>
+      </div>
+      <p class="lg-ev-chan">Phần kiến thức tính tới 00:00 · Thứ Tư 21/10/2026. Không tính điểm.</p>
+    </div>
+  </details>
+</template>
+
+<!-- ========== THẺ: ĐANG TẢI (giữ chỗ 48 px) ========== -->
+<template id="the-tai">
+  <div class="lg-ev" role="status" aria-busy="true">
+    <div class="lg-ev-dau"><span class="lg-ev-hinh" aria-hidden="true"><svg width="20" height="20"><use href="#i-em"/></svg></span><span class="lg-ev-ten">Em và câu này</span><span class="lg-ev-vach" aria-hidden="true"></span><span class="sr-only">Đang lấy các lần em làm câu này</span></div>
+  </div>
+</template>
+
+<!-- ========== THẺ: LẦN ĐẦU (chưa có dữ liệu) ========== -->
+<template id="the-moi">
+  <div class="lg-ev lg-ev--moi">
+    <div class="lg-ev-dau"><span class="lg-ev-hinh" aria-hidden="true"><svg width="20" height="20"><use href="#i-em"/></svg></span><span class="lg-ev-ten">Em và câu này</span>
+      <p class="lg-ev-phu">Đây là lần đầu em làm câu này. Em cứ hỏi, Thầy giảng từ đầu.</p></div>
+  </div>
+</template>
+
+<div class="lg-hh-nen m3"><div class="lg-hh" role="dialog" aria-label="Hỏi Thầy">
+  <header class="lg-hh-dau">
+    <span class="lg-hh-hinh" aria-hidden="true"><svg width="22" height="22"><use href="#i-hoi"/></svg></span>
+    <div class="lg-hh-ten"><h2 class="lg-hh-tieu-de">Hỏi Thầy</h2><p class="lg-hh-phu">Câu 33 · Hợp chất chứa nitrogen</p></div>
+    <button type="button" class="lg-hh-dong" aria-label="Đóng"><svg width="20" height="20"><use href="#i-x"/></svg></button>
+  </header>
+  <div class="lg-hh-trai"><!-- cột trái khi điện thoại ngang; một cột thì display:contents -->
+    <div data-cho-de></div>
+    <div data-cho-the></div>
+  </div>
+  <section class="lg-ht lg-ht--hop" aria-label="Hỏi Thầy về câu này">
+    <div class="lg-ht-log" role="log" aria-live="polite"><div class="lg-ht-tin" data-tin></div></div>
+    <div data-o-nhan></div>
+  </section>
+</div></div>
+
+<script>
+const q = new URLSearchParams(location.search)
+const t = q.get('t') || 'gap'
+const lay = (id) => document.getElementById(id).content.cloneNode(true)
+document.querySelector('[data-cho-de]').replaceWith(lay('de-cau'))
+document.querySelector('[data-o-nhan]').replaceWith(lay('o-nhan'))
+const MAU = { tai: 'the-tai', moi: 'the-moi', gap: 'the-co', mo: 'the-co', dl: 'the-dl', 'da-hoi': 'the-co' }
+const cho = document.querySelector('[data-cho-the]')
+if (MAU[t]) cho.replaceWith(lay(MAU[t])); else cho.remove() // loi: lỗi / mất mạng ⇒ KHÔNG vẽ thẻ, hỏi vẫn chạy
+const de = document.querySelector('[data-de]'), the = document.querySelector('[data-ev]')
+// Đề mở sẵn khi em chưa hỏi (như app). Hai ngăn "Đề câu" và "Em và câu này": mở ngăn này thì ngăn kia gập (không đẩy ô nhắn xuống).
+de.open = !['mo', 'dl', 'da-hoi'].includes(t) && q.get('de') !== '0'
+if (the && ['mo', 'dl'].includes(t)) the.open = true
+de.addEventListener('toggle', () => { if (de.open && the) the.open = false })
+the?.addEventListener('toggle', () => { if (the.open) de.open = false })
+// Hỏi nhanh: chạm ⇒ gửi đúng câu đó, thẻ gập, Thầy trả lời bên dưới
+const tin = document.querySelector('[data-tin]')
+function hoi(cau) {
+  tin.replaceChildren()
+  const em = document.createElement('p'); em.className = 'lg-ht-em'; em.textContent = cau; tin.append(em)
+  const thay = document.createElement('div'); thay.className = 'lg-ht-thay'
+  thay.innerHTML = '<span class="lg-ht-nhan">Thầy Đỗ Đại Học</span><span class="lg-ht-ai">Trợ giảng AI của thầy Học</span>'
+    + '<p>Bậc amine đếm theo số gốc hydrocarbon gắn vào nguyên tử N: một gốc là bậc một (R–NH<sub>2</sub>), hai gốc là bậc hai, ba gốc là bậc ba.</p>'
+    + '<p>Khác bậc alcohol (tính theo carbon mang nhóm –OH). Phần đếm đồng phân em đã vững, nên em chỉ cần lọc thêm theo bậc.</p>'
+    + '<p>Em thử: CH<sub>3</sub>–NH–C<sub>3</sub>H<sub>7</sub> là amine bậc mấy?</p>'
+  tin.append(thay)
+  if (the) the.open = false
+  de.open = false
+}
+for (const b of document.querySelectorAll('[data-hoi]')) b.addEventListener('click', () => hoi(b.dataset.hoi))
+if (t === 'da-hoi') hoi('Thầy giải thích lại giúp em phần Bậc amine trong câu này.')
+</script>
+</body>
+</html>
