@@ -41,7 +41,10 @@ describe('chọn khuôn (máy chủ, không đọc D1 thêm)', () => {
     }
     const gy = Object.keys(schemaChoKhuon('goi-y').properties)
     for (const cam of ['soSanh', 'kiemLai', 'tinh', 'phuongTrinh', 'lyDoY', 'buocThu', 'xepHang']) expect(gy).not.toContain(cam)
-    expect(Object.keys(schemaChoKhuon('cho-sai').properties)).toEqual(expect.arrayContaining(['soSanh', 'bay', 'kiemLai', 'chuaHieu']))
+    expect(Object.keys(schemaChoKhuon('cho-sai').properties)).toEqual(expect.arrayContaining(['soSanh', 'bay', 'chuaHieu']))
+    // Thầy 21/10 "bỏ phần làm câu tương đương đi": không khuôn nào còn câu hỏi lại, chỉ dẫn không còn chữ kiemLai.
+    for (const k of KHUON) { expect(Object.keys(schemaChoKhuon(k).properties)).not.toContain('kiemLai'); expect(CHI_DAN_KHUON[k]).not.toContain('kiemLai') }
+    expect(CHI_DAN_THAY).not.toContain('kiemLai')
     expect(Object.keys(schemaChoKhuon('tung-y').properties)).toContain('lyDoY')
     expect(Object.keys(schemaChoKhuon('tinh').properties)).toEqual(expect.arrayContaining(['buocThu', 'tinh']))
     for (const h of HINH_DUNG) expect(CHI_DAN_THAY).toContain(h)
@@ -62,7 +65,7 @@ describe('làm sạch phần v3', () => {
     chuaHieu: ['Chỗ lệch', 'Chỗ lệch', 'Vì sao M = 82?', 'Một chỗ dài quá hai mươi bốn ký tự luôn'],
     nac: [{ ten: 'Đọc đề', chu: 'Gợi ý một.' }, { ten: 'Cách làm', chu: 'Gợi ý hai.', khoi: 'thiNghiem' }],
   }
-  it('em đã nộp: so bài giữ đúng MỘT dòng lệch; thang + ngưỡng; đối chiếu; em thử (số chuẩn hoá); câu hỏi lại; chạm "chưa hiểu" gọn', () => {
+  it('em đã nộp: so bài giữ đúng MỘT dòng lệch; thang + ngưỡng; đối chiếu; em thử (số chuẩn hoá); câu hỏi lại mô hình lỡ gửi bị bỏ; chạm "chưa hiểu" gọn', () => {
     const c = lamSachCauTruc(MO, false, undefined, BO)!
     expect(c.khuon).toBe('cho-sai')
     expect(c.soSanh!.map((r) => r.lech)).toEqual([false, true, false])
@@ -70,27 +73,22 @@ describe('làm sạch phần v3', () => {
     expect(c.doiChieu).toEqual({ a: 'Methylamine', b: 'Aniline', dong: [{ tieuChi: 'Gốc gắn N', a: 'CH3– đẩy e', b: 'C6H5– hút e' }] })
     expect(c.hinhDung).toBe('cap-e-amine')
     expect(c.buocThu).toEqual({ buoc: 2, hoi: 'Mol CO2?', dap: '0,16', goiYSai: 'Nhân 2 rồi nhân 80%.' })
-    expect(c.kiemLai).toEqual({ hoi: 'Thuỷ phân methyl propionate trong NaOH, muối là?', lua: ['CH3COONa', 'C2H5COONa', 'CH3ONa'], dung: 1, vi: 'Muối giữ gốc acid.', goiYSai: 'Gốc acid đọc sau.' })
+    expect('kiemLai' in c).toBe(false)
     expect(c.chuaHieu).toEqual(['Chỗ lệch', 'Vì sao M = 82?', 'Một chỗ dài quá hai…']) // cắt 24 ký tự, bỏ chữ dở
     expect(c.nac!.map((n) => n.khoi)).toEqual(['', 'thiNghiem'])
   })
 
-  it('bỏ phần hỏng: em thử ngoài số bước / đáp số không phải số; câu hỏi lại lặp chính đề, thiếu hay trùng lựa chọn (chung chất với phương án thì GIỮ)', () => {
-    const tron = lamSachCauTruc({ ...MO, buocThu: { buoc: 9, hoi: 'x?', dap: '1' }, kiemLai: { ...MO.kiemLai, lua: ['CH3COONa', 'ch3coona', 'Y'] } }, false, undefined, BO)!
+  it('bỏ phần hỏng: em thử ngoài số bước / đáp số không phải số', () => {
+    const tron = lamSachCauTruc({ ...MO, buocThu: { buoc: 9, hoi: 'x?', dap: '1' } }, false, undefined, BO)!
     expect(tron.buocThu).toBeUndefined()
-    expect(tron.kiemLai).toBeUndefined() // hai lựa chọn như nhau
-    expect(lamSachCauTruc(MO, false, undefined, BO)!.kiemLai!.lua).toContain('C2H5COONa') // B của câu đang hỏi — vẫn giữ
-    const c2 = lamSachCauTruc({ ...MO, buocThu: { buoc: 2, hoi: 'x?', dap: 'khoảng 0,16' }, kiemLai: { ...MO.kiemLai, lua: ['A', 'B'] } }, false, undefined, { ...BO, pa: null })!
+    const c2 = lamSachCauTruc({ ...MO, buocThu: { buoc: 2, hoi: 'x?', dap: 'khoảng 0,16' } }, false, undefined, { ...BO, pa: null })!
     expect(c2.buocThu).toBeUndefined()
-    expect(c2.kiemLai).toBeUndefined()
-    const trungDe = lamSachCauTruc({ ...MO, kiemLai: { ...MO.kiemLai, hoi: 'Thuỷ phân 8,8 gam ethyl acetate trong NaOH dư. Muối thu được là' } }, false, undefined, BO)!
-    expect(trungDe.kiemLai).toBeUndefined()
   })
 
   it('ĐO 15/10 (bay, xepHang, doiChieu, buocThu 0 lượt): khối dạng object luôn khai required; Chỉ chỗ sai bắt buộc bay; đáp số em thử kèm đơn vị chữ vẫn nhận', () => {
     for (const k of KHUON) {
       const p = schemaChoKhuon(k).properties as Record<string, { type?: string; required?: string[] }>
-      for (const ten of ['bay', 'xepHang', 'doiChieu', 'buocThu', 'kiemLai']) if (p[ten]) expect(p[ten]!.required?.length, `${k}.${ten}`).toBeGreaterThan(0)
+      for (const ten of ['bay', 'xepHang', 'doiChieu', 'buocThu']) if (p[ten]) expect(p[ten]!.required?.length, `${k}.${ten}`).toBeGreaterThan(0)
     }
     expect(schemaChoKhuon('cho-sai').required).toEqual(['lienQuan', 'yChinh', 'bay'])
     for (const k of KHUON.filter((x) => x !== 'cho-sai')) expect(schemaChoKhuon(k).required).toEqual(['lienQuan', 'yChinh'])
@@ -123,7 +121,8 @@ describe('làm sạch phần v3', () => {
 
   it('chữ phẳng có chữ các phần v3 (ghi sổ, gửi lại làm lịch sử)', () => {
     const p = chuPhang(lamSachCauTruc(MO, false, undefined, BO)!)
-    for (const x of ['So bài: em C2H5COONa | đúng CH3COONa (chỗ lệch)', 'Gợi ý 2: Cách làm: Gợi ý hai.', 'Xếp hạng (Tính base): (CH3)2NH > CH3NH2 > NH3 > C6H5NH2', 'Đối chiếu Gốc gắn N: Methylamine CH3– đẩy e | Aniline C6H5– hút e', 'Em thử bước 2: Mol CO2? (0,16)', 'Thầy hỏi lại: Thuỷ phân methyl propionate trong NaOH, muối là? → C2H5COONa']) expect(p).toContain(x)
+    expect(p).not.toContain('Thầy hỏi lại')
+    for (const x of ['So bài: em C2H5COONa | đúng CH3COONa (chỗ lệch)', 'Gợi ý 2: Cách làm: Gợi ý hai.', 'Xếp hạng (Tính base): (CH3)2NH > CH3NH2 > NH3 > C6H5NH2', 'Đối chiếu Gốc gắn N: Methylamine CH3– đẩy e | Aniline C6H5– hút e', 'Em thử bước 2: Mol CO2? (0,16)']) expect(p).toContain(x)
   })
 })
 

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { DatabaseSync } from 'node:sqlite'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Env } from '../server/src/kieu'
@@ -36,7 +37,8 @@ beforeEach(() => { quyen.sbd = 'EM-A'; quyen.bat = true; quyen.ca = false })
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(); xoaNhoTuSua() })
 
 describe('Tự sửa lỗi · tổng thật và phân trang', () => {
-  it('câu chưa có lỗi vẫn có lịch tự kiểm riêng: đúng em/nguồn hiện tại, không trùng đợt mở và không phát đáp án', async () => {
+  // Thầy 21/10 "bỏ phần làm câu tương đương đi": lịch tự làm lại câu tương đương sau Hỏi Thầy không còn phát xuống máy em, dù sổ còn phiên cũ.
+  it('phiên câu tương đương cũ trong sổ KHÔNG còn sinh lịch tự kiểm; đếm đợt chữa giữ nguyên, một đợt D1', async () => {
     vi.useFakeTimers(); vi.setSystemTime(NOW)
     const d = dbThu()
     d.sql.exec("INSERT INTO de_kho VALUES('DE',0,7); INSERT INTO game_v2_index VALUES('DE',7);")
@@ -50,10 +52,8 @@ describe('Tự sửa lỗi · tổng thật và phân trang', () => {
     htk('K5', 'Q-KHAC', 'dang_lam', NOW - 1, 'EM-B'); htk('K6', 'Q-CHUA-DUYET', 'dang_lam')
     d.sql.prepare('INSERT INTO chua_loi_dot(id,sbd,qid_chuan,trang_thai_day,lan_gap_lai,den_han,giao_luc) VALUES(?,?,?,?,?,?,?)').run('DOT', 'EM-A', 'Q-DOT', 'can_thay', 1, '', 100)
     const j = await (await danhSach(d.env, {})).json() as { kiemLaiHoiThay: { qid: string; trangThai: string; denHan: string }[]; dem: { can: number } }
-    expect(j.kiemLaiHoiThay.map(x => [x.qid, x.trangThai])).toEqual([['Q-MOI', 'den_han'], ['Q-CHO', 'cho_kiem_lai']])
-    expect(j.kiemLaiHoiThay[1].denHan).toBe(new Date(NOW + 86400000).toISOString())
+    expect(j.kiemLaiHoiThay).toEqual([])
     expect(j.dem.can).toBe(1)
-    expect(JSON.stringify(j.kiemLaiHoiThay)).not.toMatch(/ĐÁP ÁN|LỜI GIẢI|correct|solution|snapshot|answer/)
     expect(d.soLo()).toBe(1); d.sql.close()
   })
   it('đường kiểm lại Hỏi thầy chỉ có khi đúng em và câu đã có phiên kiểm, không thêm lượt đọc', async () => {

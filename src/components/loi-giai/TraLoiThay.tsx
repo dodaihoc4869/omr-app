@@ -11,7 +11,7 @@ import { useState, type ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
 import { chiSoRo } from '../../lib/chi-so-ro'
 import { Bay, NhanBiet, PhuongTrinh, SoDo, ThiNghiem, TinhNhanh, docKhoi, type KhoiHinh } from './KhoiTraLoi'
-import { ChuaHieu, DoiChieuKhoi, EmThu, GoiYNac, Gon, HinhDungKhoi, KiemLaiKhoi, NHAN_KHUON, Net, SoSanh, TungY, XepHangKhoi, docKhuon, type PhanKhuon } from './KhuonTraLoi'
+import { ChuaHieu, DoiChieuKhoi, EmThu, GoiYNac, Gon, HinhDungKhoi, NHAN_KHUON, Net, SoSanh, TungY, XepHangKhoi, docKhuon, type PhanKhuon } from './KhuonTraLoi'
 import './tra-loi-thay.css'
 
 export interface CauTrucTraLoi extends KhoiHinh, PhanKhuon {
@@ -231,7 +231,6 @@ export default function TraLoiThay({ ct, dangLam = false, onHoi, khoa = false }:
         </>
       )}
       {onHoi && ct.chuaHieu && ct.chuaHieu.length > 0 && <ChuaHieu ds={ct.chuaHieu} onHoi={onHoi} khoa={khoa} />}
-      {ct.kiemLai && <KiemLaiKhoi k={ct.kiemLai} />}
       {onHoi && hoi.length > 0 && (
         <div className="lg-tl-hoi" role="group" aria-label="Hỏi tiếp">
           {hoi.map((q) => <button key={q} type="button" disabled={khoa} onClick={() => onHoi(q)}><ChemText text={chuHoa(q)} /></button>)}

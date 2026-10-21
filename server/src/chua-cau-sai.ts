@@ -25,7 +25,6 @@ import { lenhGhiSuKienNguyenTu, ngayVn } from './su-kien-hoc'
 import { emCoGhi } from './dem-ke-hoach'
 import type { ItemCongKhai, ProbeRef } from './chua-cau-sai-kieu'
 import { khopPhanIII } from '../../src/lib/cham-so'
-import { SQL_LICH_KIEM_HOI_THAY, lichKiemHoiThayCongKhai } from './hoi-thay-kiem-chung-metadata'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
@@ -913,7 +912,6 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
   const thuTu = `CASE WHEN trang_thai_day='cho_gap_lai_2' AND julianday(den_han)<=julianday(?) THEN 0 WHEN trang_thai_day='da_tu_sua' THEN 2 ELSE 1 END`
   // Cùng luật nhomMucChua: hạn thiếu/sai hoặc còn ở tương lai vẫn là chờ; đúng giờ hạn thì cần sửa.
   const nhom = `CASE WHEN trang_thai_day='da_tu_sua' THEN 'xong' WHEN trang_thai_day='cho_gap_lai_2' AND (julianday(den_han) IS NULL OR julianday(den_han)>julianday(?)) THEN 'cho' ELSE 'can' END`
-  const lichSql = SQL_LICH_KIEM_HOI_THAY.replace(/\?1\b/g, '?3').replace(/\?2\b/g, '?4')
   const r = await env.DB.batch([
     env.DB.prepare(`WITH muc AS (SELECT id AS dotId,qid_chuan AS qid,trang_thai_day AS trangThai,
       lan_gap_lai AS lanGapLai,den_han AS denHan,giao_luc AS giaoLuc,${thuTu} AS hang FROM chua_loi_dot WHERE sbd=?)
@@ -923,19 +921,16 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
       .bind(nay, sbd, sbd, c ? 1 : 0, c ? num(c.hang) : 0, c ? num(c.hang) : 0,
         c ? num(c.giaoLuc) : 0, c ? num(c.giaoLuc) : 0, c ? str(c.dotId) : ''),
     env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom FROM chua_loi_dot WHERE sbd=?)
-      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,
-      (SELECT json_group_array(json_object('qid',qid,'ten',ten,'phan',phan,'trangThai',trangThai,'denHan',denHan))
-        FROM (${lichSql}) lich) AS lichHoiThay FROM muc`)
-      .bind(nay, sbd, sbd, Date.now()),
+      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong FROM muc`)
+      .bind(nay, sbd),
   ])
   const rows = (r[0]?.results ?? []) as Obj[], ds = rows.slice(0, 100), cuoi = ds.at(-1)
   const d = r[1]?.results?.[0] as Obj | undefined
-  let lich: Obj[] = []
-  try { const j: unknown = JSON.parse(str(d?.lichHoiThay)); if (Array.isArray(j)) lich = j.filter(x => x && typeof x === 'object') as Obj[] } catch { /* Không phát trường riêng nếu metadata chưa đọc được. */ }
   return Response.json({ ok: true,
     ds: ds.map(({ hang: _hang, giaoLuc: _giao, ...m }) => ({ ...m, kiemHoiThay: num(m.kiemHoiThay) === 1 })),
     dem: { tong: num(d?.tong), can: num(d?.can), cho: num(d?.cho), xong: num(d?.xong) },
-    kiemLaiHoiThay: lichKiemHoiThayCongKhai(lich),
+    // Thầy 21/10 "bỏ phần làm câu tương đương đi": không còn lịch tự làm lại câu tương đương sau Hỏi Thầy (giữ trường rỗng cho máy em bản cũ).
+    kiemLaiHoiThay: [],
     ...(rows.length > 100 && cuoi ? { sau: { hang: num(cuoi.hang), giaoLuc: num(cuoi.giaoLuc), dotId: str(cuoi.dotId), nay } } : {}),
   })
 }

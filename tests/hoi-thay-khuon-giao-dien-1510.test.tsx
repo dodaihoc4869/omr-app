@@ -94,17 +94,11 @@ describe('năm khuôn', () => {
 })
 
 describe('phần chung', () => {
-  it('Thầy hỏi lại 1 câu: chọn sai ⇒ đỏ + gợi ý, chọn lại đúng ⇒ xanh + vì sao', () => {
+  // Thầy 21/10 "bỏ phần làm câu tương đương đi": câu trả lời cũ còn kiemLai cũng không vẽ khối Thầy hỏi lại.
+  it('không vẽ khối "Thầy hỏi lại" dù câu trả lời có kiemLai', () => {
     const { container } = ve({ khuon: 'giai-thich', yChinh: 'x', kiemLai: { hoi: 'Chất nào làm quỳ hoá xanh?', lua: ['Aniline', 'Ethylamine', 'Phenol'], dung: 1, vi: 'Gốc ethyl đẩy e.', goiYSai: 'Xem gốc gắn N.' } })
-    const nut = [...container.querySelectorAll('.lg-kiem-lua button')]
-    fireEvent.click(nut[0]!)
-    expect(nut[0]!.getAttribute('data-chon')).toBe('sai')
-    expect(container.querySelector('.lg-kiem-kq')!.textContent).toBe('Chưa đúng. Xem gốc gắn N.')
-    fireEvent.click(nut[1]!)
-    expect(nut[0]!.hasAttribute('data-chon')).toBe(false)
-    expect(nut[1]!.getAttribute('data-chon')).toBe('dung')
-    expect(nut[1]!.getAttribute('aria-pressed')).toBe('true')
-    expect(container.querySelector('.lg-kiem-kq')!.textContent).toBe('Đúng. Gốc ethyl đẩy e.')
+    expect(container.querySelector('.lg-kiem, .lg-kiem-lua')).toBeNull()
+    expect(container.textContent).not.toContain('Chất nào làm quỳ hoá xanh?')
   })
 
   it('"Em chưa hiểu chỗ nào?" chạm là hỏi đúng chỗ; có khuôn thì luôn có "Giải thích dễ hơn"; câu trả lời cũ (không khuôn) không có', () => {

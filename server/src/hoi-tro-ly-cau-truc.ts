@@ -12,6 +12,7 @@
 // Đúng/Sai từng ý (`yDS`) do MÁY CHỦ điền từ đáp án kho + bài em; mô hình chỉ viết lý do. Em đang làm ⇒ chỉ gợi ý từng nấc + khối không lộ đáp án.
 
 import { chanQuyKetHoiThay } from './hoi-thay-ca-nhan'
+import { chanNgoaiSgk } from './hoi-thay-pham-vi-sgk'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown): string => (typeof v === 'string' ? v : v === null || v === undefined ? '' : String(v))
@@ -41,7 +42,6 @@ export interface CauTrucTraLoi {
   doiChieu?: { a: string; b: string; dong: { tieuChi: string; a: string; b: string }[] }
   yDS?: { y: string; noi: string; em: '' | 'D' | 'S'; dapAn: 'D' | 'S'; lyDo: string }[]
   buocThu?: { buoc: number; hoi: string; dap: string; goiYSai: string }
-  kiemLai?: { hoi: string; lua: string[]; dung: number; vi: string; goiYSai: string }
   chuaHieu?: string[]
 }
 
@@ -101,16 +101,16 @@ const PHAN_MOI: Obj = {
   doiChieu: { type: 'OBJECT', properties: { a: S, b: S, dong: { type: 'ARRAY', items: { type: 'OBJECT', properties: { tieuChi: S, a: S, b: S }, required: ['tieuChi', 'a', 'b'] } } }, required: ['a', 'b', 'dong'] },
   lyDoY: { type: 'ARRAY', items: { type: 'OBJECT', properties: { y: { type: 'STRING', format: 'enum', enum: ['a', 'b', 'c', 'd'] }, lyDo: S }, required: ['y', 'lyDo'] } },
   buocThu: { type: 'OBJECT', properties: { buoc: INT, hoi: S, dap: S, goiYSai: S }, required: ['buoc', 'hoi', 'dap'] },
-  kiemLai: { type: 'OBJECT', properties: { hoi: S, lua: DS, dung: INT, vi: S, goiYSai: S }, required: ['hoi', 'lua', 'dung'] },
   chuaHieu: DS,
 }
 /** Phần của từng khuôn, đúng thứ tự mô hình viết (ý chính trước, phần chính của khuôn ngay sau). */
 const PHAN_KHUON: Record<Khuon, string[]> = {
-  'cho-sai': ['soSanh', 'bay', 'phuongTrinh', 'tinh', 'buoc', 'ghiNho', 'chuaHieu', 'kiemLai', 'hoiTiep'],
+// Thầy 21/10 "bỏ phần làm câu tương đương đi" ⇒ không khuôn nào còn kiemLai (câu trắc nghiệm hỏi lại cùng kiến thức với chất / số khác).
+  'cho-sai': ['soSanh', 'bay', 'phuongTrinh', 'tinh', 'buoc', 'ghiNho', 'chuaHieu', 'hoiTiep'],
   'goi-y': ['nac', 'thiNghiem', 'nhanBiet', 'soDo', 'bay', 'chuaHieu', 'hoiTiep'],
-  'giai-thich': ['xepHang', 'hinhDung', 'thiNghiem', 'soDo', 'nhanBiet', 'phuongTrinh', 'doiChieu', 'bay', 'buoc', 'ghiNho', 'chuaHieu', 'kiemLai', 'hoiTiep'],
-  'tung-y': ['lyDoY', 'bay', 'thiNghiem', 'ghiNho', 'chuaHieu', 'kiemLai', 'hoiTiep'],
-  tinh: ['phuongTrinh', 'buoc', 'buocThu', 'tinh', 'bay', 'ghiNho', 'chuaHieu', 'kiemLai', 'hoiTiep'],
+  'giai-thich': ['xepHang', 'hinhDung', 'thiNghiem', 'soDo', 'nhanBiet', 'phuongTrinh', 'doiChieu', 'bay', 'buoc', 'ghiNho', 'chuaHieu', 'hoiTiep'],
+  'tung-y': ['lyDoY', 'bay', 'thiNghiem', 'ghiNho', 'chuaHieu', 'hoiTiep'],
+  tinh: ['phuongTrinh', 'buoc', 'buocThu', 'tinh', 'bay', 'ghiNho', 'chuaHieu', 'hoiTiep'],
 }
 /** Lược đồ RIÊNG của một khuôn: chỉ phần khuôn cần ⇒ nhỏ hơn lược đồ v2, mô hình không lạc sang phần khác. */
 export function schemaChoKhuon(k: Khuon) {
@@ -122,10 +122,10 @@ export function schemaChoKhuon(k: Khuon) {
 }
 /** Dòng gửi kèm DỮ LIỆU CÂU: khuôn máy chủ đã chọn + phần BẮT BUỘC của khuôn đó. */
 export const CHI_DAN_KHUON: Record<Khuon, string> = {
-  'cho-sai': 'KHUÔN TRẢ LỜI "Chỉ chỗ sai". BẮT BUỘC: chỉ đối chiếu các bước em THỰC SỰ cung cấp trong BÀI NHÁP, không dựng bước từ đáp số cuối. soSanh chỉ gồm các dòng có bằng chứng, em trích đúng bài nháp, dung là bước đúng; đánh dấu dòng lệch đầu tiên nếu xác định được. bay nêu điều kiểm chứng được, chưa chắc thì hỏi MỘT câu phân biệt. kiemLai 1 câu cùng kiến thức nhưng với chất hay số khác, chỉ là luyện chưa xác minh. Có tính toán thì thêm phuongTrinh, tinh. chuaHieu 2–3 chỗ.',
+  'cho-sai': 'KHUÔN TRẢ LỜI "Chỉ chỗ sai". BẮT BUỘC: chỉ đối chiếu các bước em THỰC SỰ cung cấp trong BÀI NHÁP, không dựng bước từ đáp số cuối. soSanh chỉ gồm các dòng có bằng chứng, em trích đúng bài nháp, dung là bước đúng; đánh dấu dòng lệch đầu tiên nếu xác định được. bay nêu điều kiểm chứng được, chưa chắc thì hỏi MỘT câu phân biệt. Có tính toán thì thêm phuongTrinh, tinh. chuaHieu 2–3 chỗ.',
   'goi-y': 'KHUÔN TRẢ LỜI "Gợi ý từng nấc" (em ĐANG LÀM). BẮT BUỘC nac đúng 3 nấc từ nhẹ tới sâu: nấc 1 gợi kiến thức cần dùng, nấc 2 gợi cách làm (câu có hiện tượng / thuốc thử / sơ đồ thì khoi = thiNghiem / nhanBiet / soDo và điền khối đó), nấc 3 gợi bước cuối để em TỰ kết luận. KHÔNG nấc nào nêu đáp án, phương án đúng, đúng/sai từng ý hay kết quả số. chuaHieu 2 chỗ.',
-  'giai-thich': 'KHUÔN TRẢ LỜI "Giải thích". yChinh MỘT câu trả lời thẳng. Câu có so sánh, thứ tự, mạnh/yếu ⇒ BẮT BUỘC xepHang. Có hình vẽ sẵn hợp ⇒ hinhDung. So hai chất ⇒ doiChieu. BẮT BUỘC kiemLai 1 câu về đúng kiến thức vừa giải thích. chuaHieu 2–3 chỗ.',
-  'tung-y': 'KHUÔN TRẢ LỜI "Từng ý a–d". BẮT BUỘC lyDoY đủ 4 ý a, b, c, d, mỗi ý MỘT câu lý do (KHÔNG mở đầu bằng chữ Đúng hay Sai: máy em tự ghi theo đáp án). yChinh nói em sai ý nào và gốc chung nếu có. kiemLai 1 câu về kiến thức của ý em sai. chuaHieu ghi "Ý b", "Ý c"… cho ý em sai.',
+  'giai-thich': 'KHUÔN TRẢ LỜI "Giải thích". yChinh MỘT câu trả lời thẳng. Câu có so sánh, thứ tự, mạnh/yếu ⇒ BẮT BUỘC xepHang. Có hình vẽ sẵn hợp ⇒ hinhDung. So hai chất ⇒ doiChieu. chuaHieu 2–3 chỗ.',
+  'tung-y': 'KHUÔN TRẢ LỜI "Từng ý a–d". BẮT BUỘC lyDoY đủ 4 ý a, b, c, d, mỗi ý MỘT câu lý do (KHÔNG mở đầu bằng chữ Đúng hay Sai: máy em tự ghi theo đáp án). yChinh nói em sai ý nào và gốc chung nếu có. chuaHieu ghi "Ý b", "Ý c"… cho ý em sai.',
   tinh: 'KHUÔN TRẢ LỜI "Tính từng bước". BẮT BUỘC buoc 2–4 bước có phép tính và kết quả kèm đơn vị; buocThu chọn MỘT bước giữa cho em tự tính (buoc = số thứ tự bước đó, hoi = câu hỏi ngắn, dap = kết quả số của bước đó chỉ gồm số và dấu phẩy, goiYSai = gợi ý khi em tính sai); tinh có dapSo; phuongTrinh nếu có phản ứng. chuaHieu 2 chỗ.',
 }
 
@@ -144,7 +144,8 @@ export function chonKhuon(x: { dangLam: boolean; phan: string; ketQua: 'dung' | 
   return 'giai-thich'
 }
 /** Bối cảnh máy chủ biết để làm sạch phần v3 (khuôn đã chọn, câu, đáp án, bài em). */
-export interface BoiCanhKhuon { khuon: Khuon; phan: string; de: string; pa: Record<string, string> | null; y: Record<string, string> | null; dapAn: string; dapAnEm: string; baiNhap?: string }
+/** `nguon`: chữ đề + lời giải của Thầy — thuật ngữ đã có ở đây thì chốt chặn PHẠM VI SGK không bỏ (hoi-thay-pham-vi-sgk.ts). */
+export interface BoiCanhKhuon { khuon: Khuon; phan: string; de: string; pa: Record<string, string> | null; y: Record<string, string> | null; dapAn: string; dapAnEm: string; baiNhap?: string; nguon?: string }
 
 /** Đầu ra JSON có `yChinh` hoặc `buoc` ⇒ khuôn mới; khác ⇒ null (nơi gọi đọc khuôn cũ `{lienQuan, traLoi}`). */
 export function tachCauTruc(chu: string): { lienQuan: boolean; o: Obj } | null {
@@ -182,12 +183,14 @@ export function lamSachCauTruc(o: Obj, dangLam: boolean, chan?: (t: string) => s
   const loc = (t: string) => {
     // THẦY 19/10 ("gợi ý tới bước ba bị lỗi hiển thị kí tự"): chặn lộ đáp án bỏ CÂU — câu bị bỏ có thể chứa nửa cặp **…** ⇒ cân dấu lại SAU khi lọc.
     const sach = t && chan ? boDauLe(chan(t), ['**', '==', '!!', '++']) : t
-    // Mô hình vẫn có thể bỏ qua chỉ dẫn: chặn lời quy kết bước làm chưa được em cung cấp.
-    return bo ? chanQuyKetHoiThay(sach, bo.baiNhap ?? '') : sach
+    // Mô hình vẫn có thể bỏ qua chỉ dẫn: chặn lời quy kết bước làm chưa được em cung cấp; bỏ câu ngoài SGK (thầy 21/10) — đang làm hay đã nộp đều lọc.
+    return bo ? chanQuyKetHoiThay(boDauLe(chanNgoaiSgk(sach, bo.nguon ?? bo.de), ['**', '==', '!!', '++']), bo.baiNhap ?? '') : sach
   }
+  /** Tên bước / nấc ("Cơ chế phản ứng"…): ngoài SGK thì bỏ tên, giữ phần chữ đã lọc. */
+  const ten = (t: string) => (bo && t && !chanNgoaiSgk(t, bo.nguon ?? bo.de) ? '' : t)
   const yChinh = loc(sachO(o.yChinh, 220))
   const buoc = (Array.isArray(o.buoc) ? o.buoc : []).slice(0, 4)
-    .map((b) => { const x = (b && typeof b === 'object' ? b : {}) as Obj; return { ten: boDau(sachO(x.ten, 48)), chu: loc(sachO(x.chu, 320)) } })
+    .map((b) => { const x = (b && typeof b === 'object' ? b : {}) as Obj; return { ten: ten(boDau(sachO(x.ten, 48))), chu: loc(sachO(x.chu, 320)) } })
     .filter((b) => b.chu)
   let bang: CauTrucTraLoi['bang'] = null
   const b = o.bang && typeof o.bang === 'object' ? (o.bang as Obj) : null
@@ -203,7 +206,7 @@ export function lamSachCauTruc(o: Obj, dangLam: boolean, chan?: (t: string) => s
   const ghiNho = loc(sachO(o.ghiNho, 200))
   const hoiTiep = (Array.isArray(o.hoiTiep) ? o.hoiTiep : []).slice(0, 2).map((x) => loc(boDau(sachO(x, 80)))).filter((x) => x.length >= 4)
   const khoi = lamSachKhoi(o, dangLam, loc)
-  const v3 = lamSachV3(o, dangLam, loc, buoc.length, bo)
+  const v3 = lamSachV3(o, dangLam, loc, buoc.length, bo, ten)
   if (!yChinh && !buoc.length && !khoi.so && !v3.so) return null
   // Tô đậm tối đa 4 cụm cả câu trả lời (đặc tả mục 4); làm nổi tối đa 1 cụm và CHỈ ở ý chính; em đang làm ⇒ không làm nổi gì.
   // ++đúng++ / !!sai!!: tối đa 2 cụm mỗi loại, chỉ ở ý chính và ô bẫy; em đang làm ⇒ không tô "đúng".
@@ -239,14 +242,14 @@ const chuanSo = (t: string) => t.replace(/\s+/g, '').replace('.', ',')
 const soThu = (t: string) => { const s = chuanSo(t).replace(/^[≈~=]/, ''); const m = /^(-?\d+(?:,\d+)?)[\p{L}%°/]*$/u.exec(s); return m ? m[1]! : s }
 const gon = (t: string) => t.toLowerCase().replace(/<[^>]*>/g, '').replace(/[^\p{L}\p{N}]+/gu, '')
 /** Làm sạch phần v3; `so` = số phần có được. Em đang làm ⇒ chỉ chuaHieu, nac, hinhDung (không phần nào chứa đáp án / so với đáp án). */
-function lamSachV3(o: Obj, dangLam: boolean, loc: (t: string) => string, soBuoc: number, bo?: BoiCanhKhuon) {
+function lamSachV3(o: Obj, dangLam: boolean, loc: (t: string) => string, soBuoc: number, bo?: BoiCanhKhuon, ten: (t: string) => string = (t) => t) {
   const k: Omit<Partial<CauTrucTraLoi>, 'khuon'> & { so: number } = { so: 0 }
   const o1 = (v: unknown, n: number) => loc(boDau(sachO(v, n)))
   const giu = (v: unknown, n: number) => loc(boDungSai(sachO(v, n).replace(/==(.+?)==/g, '$1')))
   // Bỏ trùng TRƯỚC rồi mới cắt 3 (mô hình hay lặp một chỗ).
   const ch = [...new Set((Array.isArray(o.chuaHieu) ? o.chuaHieu : []).slice(0, 6).map((x) => o1(x, 24)).filter((x) => x.length >= 2))].slice(0, 3)
   if (ch.length) k.chuaHieu = ch
-  const nac = mang(o.nac, 3).map((x) => ({ ten: o1(x.ten, 40), chu: giu(x.chu, 260), khoi: (['thiNghiem', 'nhanBiet', 'soDo'].includes(str(x.khoi)) ? str(x.khoi) : '') as '' | 'thiNghiem' | 'nhanBiet' | 'soDo' })).filter((x) => x.chu)
+  const nac = mang(o.nac, 3).map((x, i) => ({ ten: ten(o1(x.ten, 40)) || `Gợi ý ${i + 1}`, chu: giu(x.chu, 260), khoi: (['thiNghiem', 'nhanBiet', 'soDo'].includes(str(x.khoi)) ? str(x.khoi) : '') as '' | 'thiNghiem' | 'nhanBiet' | 'soDo' })).filter((x) => x.chu)
   if (nac.length >= 2) { k.nac = nac; k.so++ }
   if ((HINH_DUNG as readonly string[]).includes(str(o.hinhDung))) { k.hinhDung = str(o.hinhDung) as HinhDung; k.so++ }
   if (dangLam) return k
@@ -288,18 +291,7 @@ function lamSachV3(o: Obj, dangLam: boolean, loc: (t: string) => string, soBuoc:
     k.buocThu = { buoc: Number(bt.buoc), hoi: o1(bt.hoi, 120), dap: btDap, goiYSai: o1(bt.goiYSai, 140) }
     k.so++
   }
-  // THẦY HỎI LẠI 1 CÂU: 3 lựa chọn khác nhau; bỏ nếu câu hỏi LẶP CHÍNH ĐỀ này (vô ích). Lựa chọn trùng chất với phương án thì giữ: cùng chủ đề hay
-  // có chung chất (CH3COONa…), và câu hỏi lại chỉ có khi em đã nộp nên không còn gì để lộ.
-  const kl = o.kiemLai && typeof o.kiemLai === 'object' ? (o.kiemLai as Obj) : null
-  if (kl) {
-    const hoi = o1(kl.hoi, 160), lua = (Array.isArray(kl.lua) ? kl.lua : []).slice(0, 3).map((x) => o1(x, 60)), dung = Number(kl.dung)
-    const deGon = gon(str(bo?.de))
-    const trung = hoi.length >= 20 && deGon.includes(gon(hoi))
-    if (hoi && lua.length === 3 && lua.every(Boolean) && new Set(lua.map(gon)).size === 3 && [0, 1, 2].includes(dung) && !trung) {
-      k.kiemLai = { hoi, lua, dung, vi: o1(kl.vi, 160), goiYSai: o1(kl.goiYSai, 160) }
-      k.so++
-    }
-  }
+  // Câu hỏi lại (kiemLai) đã bỏ theo lệnh thầy 21/10 — mô hình lỡ gửi thì máy chủ không chuyển xuống máy em.
   return k
 }
 
@@ -383,7 +375,6 @@ export function chuPhang(c: CauTrucTraLoi): string {
   if (c.doiChieu) for (const r of c.doiChieu.dong) d.push(`Đối chiếu ${r.tieuChi}: ${c.doiChieu.a} ${r.a} | ${c.doiChieu.b} ${r.b}`)
   for (const y of c.yDS ?? []) d.push(`Ý ${y.y} (${y.dapAn === 'D' ? 'Đúng' : 'Sai'})${y.lyDo ? `: ${boDau(y.lyDo)}` : ''}`)
   if (c.buocThu) d.push(`Em thử bước ${c.buocThu.buoc}: ${c.buocThu.hoi} (${c.buocThu.dap})`)
-  if (c.kiemLai) d.push(`Thầy hỏi lại: ${c.kiemLai.hoi} → ${c.kiemLai.lua[c.kiemLai.dung]}`)
   c.buoc.forEach((b, i) => {
     d.push(`${i + 1}. ${b.ten ? `${b.ten}: ` : ''}${boDau(b.chu)}`)
     if (c.bang?.sauBuoc === i + 1) d.push(...bang)
