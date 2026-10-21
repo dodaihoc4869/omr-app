@@ -60,6 +60,18 @@
   "ph-xac-dinh": {
    "dot": 1,
    "lenh": 1
+  },
+  "ph-lich-su-lam-cau": {
+   "dot": 4,
+   "lenh": 7
+  },
+  "hs-lich-su-lam-cau": {
+   "dot": 4,
+   "lenh": 6
+  },
+  "gv-lich-su-lam-cau": {
+   "dot": 3,
+   "lenh": 5
   }
  },
  "ghiChuPh": "Mốc cổng phụ huynh (21/10, đo trên main a746fbc trước khi tối ưu): số đợt chờ D1 nối tiếp + số lệnh D1 của 6 lệnh /ph, giờ cao điểm, token có pk. Chỉ hạ."
