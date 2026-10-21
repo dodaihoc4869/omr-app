@@ -27,7 +27,7 @@ import { docHoSo2, ngayVnCua } from './srs2-d1'
 import { tiLeChienDich, soNgayGiua } from './srs2-loi'
 import { mocNhip, nhipEm } from './srs2-gv'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
-import { giayDoCuaLuot } from './ai-sai-cau'
+import { giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { docBetaCau } from './omni-d1'
 import { tachSongSinh } from './loi-hoc-luat'
 import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong } from './muc-lam-so'
@@ -125,9 +125,9 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     hoi(env, "SELECT l.tong, l.ma_ca, l.nop_luc, COALESCE(c.ten_ca, '') AS ten_ca FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca WHERE l.sbd = ? AND l.nop_luc IS NOT NULL AND l.tong IS NOT NULL AND l.ma_ca NOT LIKE 'BTVN%' ORDER BY l.nop_luc DESC LIMIT 2", sbd),
     hoi(env, 'SELECT json FROM game_v2_profile WHERE sbd = ?', sbd),
     // Cách làm bài 14 ngày (Mức làm 1–4, thầy 21/10): các lượt CÓ kết quả mà máy đo bằng đồng hồ mới (`doc.dh = 1`) — hiện 0 dòng trước khi máy em nạp bản mới; tổng số lượt có kết quả đếm riêng (mẫu số "đo được N/M").
-    hoi(env, `SELECT qid, ket_qua, giay, muc_do, json_extract(raw_json, '$.ms') AS ms, json_extract(raw_json, '$.doc') AS doc, json_extract(raw_json, '$.tc') AS tc FROM su_kien_hoc
+    hoi(env, `SELECT qid, ket_qua, giay, muc_do, nguon, ma_nguon, luc, json_extract(raw_json, '$.ms') AS ms, json_extract(raw_json, '$.doc') AS doc, json_extract(raw_json, '$.tc') AS tc FROM su_kien_hoc
        WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(visibility, '') <> 'embargoed'
-         AND json_valid(raw_json) AND (json_extract(raw_json, '$.doc.dh') = 1 OR giay > 0 OR json_extract(raw_json, '$.ms') > 0) ORDER BY luc DESC LIMIT 800`, sbd, d13, homNay),
+         AND json_valid(raw_json) AND (json_extract(raw_json, '$.doc.dh') = 1 OR giay > 0 OR json_extract(raw_json, '$.ms') > 0 OR nguon = 'game') ORDER BY luc DESC LIMIT 800`, sbd, d13, homNay),
     hoi(env, "SELECT COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(visibility, '') <> 'embargoed'", sbd, d13, homNay),
   ])
   const tenLop = str(rTenLop?.[0]?.ten_lop).trim()
@@ -147,19 +147,22 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     goc: tachSongSinh(str(raws[i]?.tc) || qid).goc,
     mucDo: chuanMucDo(x.muc_do),
     dung: num(x.ket_qua) === 1,
+    nguon: str(x.nguon), maNguon: str(x.ma_nguon), luc: str(x.luc),
   }))
   // 14 ngày: mỗi dòng đã lọc đồng hồ mới ở SQL; còn cần giây ĐO THẬT (cột sổ ⇒ raw ms) để xếp mức.
   const dong14 = (r14Muc ?? []).map((x) => {
     const doc = docRawLuot(x.doc)
-    return { doMuc: docDoMuc(doc ? { doc } : null), giayDo: giayDoCuaLuot(x.giay, x.ms), goc: tachSongSinh(str(x.tc) || str(x.qid)).goc, mucDo: chuanMucDo(x.muc_do), dung: num(x.ket_qua) === 1 }
+    return { doMuc: docDoMuc(doc ? { doc } : null), giayDo: giayDoCuaLuot(x.giay, x.ms), goc: tachSongSinh(str(x.tc) || str(x.qid)).goc, mucDo: chuanMucDo(x.muc_do), dung: num(x.ket_qua) === 1, nguon: str(x.nguon), maNguon: str(x.ma_nguon), luc: str(x.luc) }
   })
   const gocMuc = gocCanBeta([...dongMuc, ...dong14])
   // ĐO LẠI LƯỢT CŨ (21/10): lượt không có `doc` mới mà có giây cũ (cột `giay` / `raw_json.ms`) ⇒ Mức làm "≈" — cần kích thước đề của câu (bảng tính sẵn, MỘT lệnh đọc CÙNG đợt).
-  const gocCanKichThuoc = [...new Set([...dongMuc, ...dong14].filter((d) => !d.doMuc && d.giayDo !== null && d.goc).map((d) => d.goc))]
+  // Lượt game không giây nào: ƯỚC TÍNH từ mốc trả lời của lượt chơi (`giayUocTinhGame`, như Lịch sử làm câu và tờ chiếu «Ai đã sai?» — ba màn một số). Không nạp được ⇒ Map rỗng ⇒ "chưa có số đo".
+  const gameThieu = [...dongMuc, ...dong14].filter((d) => !d.doMuc && d.giayDo === null && d.nguon === 'game' && d.maNguon)
+  const gocCanKichThuoc = [...new Set([...dongMuc, ...dong14].filter((d) => !d.doMuc && (d.giayDo !== null || (d.nguon === 'game' && d.maNguon)) && d.goc).map((d) => d.goc))]
   const idGame = (lan ?? []).filter((x) => str(x.nguon) === 'game').map((x) => str(x.attempt_id) || `${str(x.ma_nguon)}|${qid}`)
   const phien = [...new Set((lan ?? []).filter((x) => str(x.nguon) === 'game').map((x) => str(x.ma_nguon)))]
   const caThi = [...new Set((lan ?? []).filter((x) => str(x.nguon) === 'thi').map((x) => str(x.ma_nguon)))]
-  const [rAtt, rPhien, rCt, beta, rTen, kichThuoc] = await Promise.all([
+  const [rAtt, rPhien, rCt, beta, rTen, kichThuoc, uoc] = await Promise.all([
     // 05/10: lượt BẢN XÁO (cau-anh-em.ts) lưu thêm `traLoiGoc` = đáp án em chọn quy về khung gốc — tờ chiếu so với câu gốc nên đọc khoá ấy trước.
     idGame.length ? hoi(env, "SELECT id, COALESCE(json_extract(json, '$.traLoiGoc'), json_extract(json, '$.traLoi')) AS tra_loi FROM game_v2_attempt WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(idGame)) : Promise.resolve([] as Row[] | null),
     phien.length ? hoi(env, "SELECT id, json_extract(json, '$.doan') IS NOT NULL AS doan, COALESCE(json_extract(json, '$.bia'), 0) AS bia FROM game_v2_session WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(phien)) : Promise.resolve([] as Row[] | null),
@@ -167,7 +170,15 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     gocMuc.length ? docBetaCau(env, gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
     maDang.length ? hoi(env, "SELECT dang AS ma, MIN(json_extract(json, '$.tenDang')) AS ten FROM game_v2_question WHERE dang IN (SELECT value FROM json_each(?)) GROUP BY dang", JSON.stringify(maDang)) : Promise.resolve([] as Row[] | null),
     gocCanKichThuoc.length ? docKichThuocCau(env, gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
+    gameThieu.length ? giayUocTinhGame(env, gameThieu.map((d) => ({ sbd, phien: d.maNguon }))).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
   ])
+  /** Dòng đưa vào xếp Mức làm: có đồng hồ MỚI ⇒ như cũ; không thì giây CŨ (cột `giay` / `raw_json.ms`) ⇒ 'cu'; lượt game không giây có mốc trả lời ⇒ 'uoc'; còn lại không giây (không đoán). */
+  const dongCu = <T extends { doMuc: ReturnType<typeof docDoMuc>; giayDo: number | null; nguon: string; maNguon: string; luc: string }>(d: T) => {
+    if (d.doMuc) return d
+    if (d.giayDo !== null) return { ...d, giayCu: d.giayDo, loaiCu: 'cu' as const }
+    const u = d.nguon === 'game' ? uoc.get(`${d.maNguon}|${Date.parse(d.luc)}`) : undefined
+    return u !== undefined ? { ...d, giayCu: u, loaiCu: 'uoc' as const } : d
+  }
   // 1 · đầu thẻ (tái dùng toàn cảnh em — đã có tên, lớp, thần thú, EXP, chuỗi, ca gần nhất) — chuỗi đợt riêng của hàm dùng chung, đã chạy từ đầu.
   const tc = await tcDang
   if (tc && tc.ok === false && str(tc.error) === 'Không tìm thấy học sinh') return { ok: false, error: 'Không tìm thấy học sinh' }
@@ -184,7 +195,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
         (nguon === 'game' ? traLoi.get(str(x.attempt_id) || `${str(x.ma_nguon)}|${qid}`) || null : null) ??
         (nguon === 'thi' ? chonCa.get(str(x.ma_nguon)) || null : null)
       // Mức làm 1–4 (thầy 21/10): chỉ lượt có giây ĐO THẬT bằng đồng hồ mới; hiện ĐỦ trên tờ chiếu (kể cả lượt đúng) — vắng ⇒ "chưa có số đo".
-      const muc = mucLamTuDong(dongMuc[i]!.doMuc || dongMuc[i]!.giayDo === null ? dongMuc[i]! : { ...dongMuc[i]!, giayCu: dongMuc[i]!.giayDo, loaiCu: 'cu' }, beta, kichThuoc)
+      const muc = mucLamTuDong(dongCu(dongMuc[i]!), beta, kichThuoc)
       return {
         luc: str(x.luc),
         dung: num(x.ket_qua) === 1,
@@ -230,7 +241,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
   // Cách làm bài 14 ngày: đếm theo Mức làm (cùng `tongMucLam` của Lịch sử làm câu); khoá vắng khi hai truy vấn lỗi (D1 cũ thiếu cột) — không bịa số.
   let cachLam14: ReturnType<typeof tongMucLam> | null = null
   if (r14Muc && r14Tong) {
-    const co = dong14.map((d) => ({ mucLam: mucLamTuDong(d.doMuc || d.giayDo === null ? d : { ...d, giayCu: d.giayDo, loaiCu: 'cu' as const }, beta, kichThuoc), dung: d.dung as boolean | null })).filter((d) => d.mucLam)
+    const co = dong14.map((d) => ({ mucLam: mucLamTuDong(dongCu(d), beta, kichThuoc), dung: d.dung as boolean | null })).filter((d) => d.mucLam)
     const t = tongMucLam(co)
     cachLam14 = { ...t, chuaCoSoDo: Math.max(0, num(r14Tong[0]?.n) - t.soDo) }
   }

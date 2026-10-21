@@ -90,26 +90,41 @@ function damBaoBang(env: Env): Promise<void> {
   return p
 }
 
+/** Đã lấp đầy (không còn câu nào thiếu dòng) lúc nào, theo từng D1 — cron nghỉ `NGHI_KHI_DAY_MS` rồi mới quét lại (câu mới thêm vào kho chờ tối đa chừng ấy). */
+const daDay = new WeakMap<object, number>()
+const NGHI_KHI_DAY_MS = 30 * 60_000
+
 /**
  * Cron mỗi phút: tính tối đa `toiDa` câu CHƯA có dòng trong `cau_doc_giay` (lấp dần, ngoài cao điểm). Câu không tính được vẫn ghi dòng DẤU (`phan = '?'`) để không tính lại mãi.
  * Chỉ THÊM dòng (INSERT OR IGNORE) — không sửa dòng đã có. Lỗi ⇒ ném cho nơi gọi ghi log (cron đã bắt).
+ * NHẸ CHO D1 (đơn luồng, dùng chung với lệnh của em): bước 1 chỉ đi trên chỉ mục `game_v2_question_qid` (không đụng cột `json` nặng tới 290.000 ký tự) và dừng ngay khi đủ `toiDa + 1` mã;
+ * bước 2 đọc câu rút gọn của đúng các mã ấy; ghi bằng MỘT lệnh (`json_each`). Khi đã đủ hết ⇒ nghỉ 30 phút (không quét cả bảng mỗi phút).
  */
 export async function dongBoCauDocGiay(env: Env, toiDa: number): Promise<{ them: number; conNua: boolean }> {
+  const db = env.DB as unknown as object
+  const nghi = daDay.get(db)
+  if (nghi !== undefined && Date.now() - nghi < NGHI_KHI_DAY_MS) return { them: 0, conNua: false }
   await damBaoBang(env)
+  const thieu = await env.DB.prepare('SELECT DISTINCT qid FROM game_v2_question WHERE qid NOT IN (SELECT qid FROM cau_doc_giay) LIMIT ?1').bind(toiDa + 1).all<Row>()
+  const ids = (thieu.results ?? []).map((x) => str(x.qid)).filter(Boolean)
+  if (!ids.length) { daDay.set(db, Date.now()); return { them: 0, conNua: false } }
+  const lam = ids.slice(0, toiDa)
   const r = await env.DB.prepare(
     `SELECT game_v2_question.qid AS qid, ${COT_THEM}, ${SQL_CAU_GON}
        FROM game_v2_question
-      WHERE json_valid(game_v2_question.json) AND NOT EXISTS (SELECT 1 FROM cau_doc_giay c WHERE c.qid = game_v2_question.qid)
-      LIMIT ?1`,
-  ).bind(toiDa + 1).all<Row>()
-  const dong = r.results ?? []
-  const them = new Map<string, KichThuocCau | null>()
-  for (const x of dong.slice(0, toiDa)) {
+      WHERE game_v2_question.qid IN (SELECT value FROM json_each(?1)) AND json_valid(game_v2_question.json)`,
+  ).bind(JSON.stringify(lam)).all<Row>()
+  const them = new Map<string, KichThuocCau | null>(lam.map((q) => [q, null]))
+  for (const x of r.results ?? []) {
     const q = str(x.qid)
-    if (q && !them.has(q)) them.set(q, kichThuocTuDong(x))
+    if (them.get(q) !== null) continue // đã tính được từ một dòng khác của cùng mã (cùng câu ở nhiều đề)
+    const v = kichThuocTuDong(x)
+    if (v) them.set(q, v)
   }
-  if (!them.size) return { them: 0, conNua: false }
-  const luc = new Date().toISOString()
-  await env.DB.batch([...them].map(([q, v]) => env.DB.prepare('INSERT OR IGNORE INTO cau_doc_giay(qid, so_tu, co_hinh, phan, tinh_luc) VALUES (?1, ?2, ?3, ?4, ?5)').bind(q, v?.soTu ?? 0, v?.coHinh ? 1 : 0, v?.phan ?? '?', luc)))
-  return { them: them.size, conNua: dong.length > toiDa }
+  const dong = [...them].map(([q, v]) => [q, v?.soTu ?? 0, v?.coHinh ? 1 : 0, v?.phan ?? '?'])
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO cau_doc_giay(qid, so_tu, co_hinh, phan, tinh_luc)
+     SELECT json_extract(value,'$[0]'), json_extract(value,'$[1]'), json_extract(value,'$[2]'), json_extract(value,'$[3]'), ?2 FROM json_each(?1)`,
+  ).bind(JSON.stringify(dong), new Date().toISOString()).run()
+  return { them: dong.length, conNua: ids.length > toiDa }
 }

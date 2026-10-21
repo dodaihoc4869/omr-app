@@ -1,0 +1,34 @@
+# ĐO TIẾN ĐỘ "ĐO LẠI LƯỢT CŨ" (CHỈ ĐỌC) — thầy 21/10: "phải tìm cách đo lại hết" (docs/dac-ta-muc-lam-bai-2010.md mục 12).
+# Bảng dẫn xuất `cau_doc_giay` (kích thước đề từng câu) được cron lấp dần: đếm đã lấp bao nhiêu, còn thiếu bao nhiêu mã câu, và theo từng nguồn có bao nhiêu lượt CŨ (chưa có số đo mới)
+# thực sự xếp được Mức làm (có giây cũ + kích thước đề · hoặc game có mốc trả lời + kích thước đề) so với số lượt còn thiếu kích thước đề.
+# CHỈ SELECT gộp: không mã em, không tên em, không mã câu (repo công khai). Bấm tay (workflow_dispatch).
+name: Đo tiến độ đo lại lượt cũ (chỉ đọc)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: do-lai-cau-doc-giay-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "1 bảng cau_doc_giay: số dòng · dòng dấu (không tính được) · theo phần" "SELECT COUNT(*) n, SUM(phan='?') dau, SUM(phan='I') phan_i, SUM(phan='II') phan_ii, SUM(phan='III') phan_iii FROM cau_doc_giay"
+          q "2 kho câu: số mã câu khác nhau · còn thiếu dòng trong cau_doc_giay" "SELECT COUNT(DISTINCT qid) ma_cau, COUNT(DISTINCT CASE WHEN qid NOT IN (SELECT qid FROM cau_doc_giay) THEN qid END) con_thieu FROM game_v2_question"
+          q "3 mỗi nguồn — lượt CŨ (chưa có số đo mới) có kết quả: tổng · có giây cũ · XẾP ĐƯỢC từ giây cũ (có kích thước đề) · game chỉ có mốc trả lời và XẾP ĐƯỢC · còn thiếu kích thước đề" "WITH t AS (SELECT s.nguon nguon, (s.giay>0 OR json_extract(s.raw_json,'\$.ms')>0) co_giay, CASE WHEN s.nguon='game' THEN EXISTS(SELECT 1 FROM game_v2_attempt a WHERE a.session=s.ma_nguon) ELSE 0 END co_phien, (SELECT 1 FROM cau_doc_giay c WHERE c.qid = CASE WHEN instr(s.qid,'~')>0 THEN substr(s.qid,1,instr(s.qid,'~')-1) WHEN instr(s.qid,'#')>0 THEN substr(s.qid,1,instr(s.qid,'#')-1) ELSE s.qid END AND c.phan<>'?') co_size FROM su_kien_hoc s WHERE s.ket_qua IS NOT NULL AND COALESCE(json_extract(s.raw_json,'\$.doc.dh'),0) <> 1) SELECT nguon, COUNT(*) n, SUM(co_giay) co_giay_cu, SUM(co_giay AND co_size) xep_duoc_tu_giay_cu, SUM(NOT co_giay AND co_phien AND co_size) xep_duoc_tu_moc_tra_loi, SUM(co_size IS NULL) thieu_kich_thuoc FROM t GROUP BY nguon ORDER BY n DESC"
+          q "4 tổng: lượt CŨ có kết quả · xếp được Mức làm (giây cũ hoặc mốc trả lời game, có kích thước đề)" "WITH t AS (SELECT (s.giay>0 OR json_extract(s.raw_json,'\$.ms')>0) co_giay, CASE WHEN s.nguon='game' THEN EXISTS(SELECT 1 FROM game_v2_attempt a WHERE a.session=s.ma_nguon) ELSE 0 END co_phien, (SELECT 1 FROM cau_doc_giay c WHERE c.qid = CASE WHEN instr(s.qid,'~')>0 THEN substr(s.qid,1,instr(s.qid,'~')-1) WHEN instr(s.qid,'#')>0 THEN substr(s.qid,1,instr(s.qid,'#')-1) ELSE s.qid END AND c.phan<>'?') co_size FROM su_kien_hoc s WHERE s.ket_qua IS NOT NULL AND COALESCE(json_extract(s.raw_json,'\$.doc.dh'),0) <> 1) SELECT COUNT(*) luot_cu, SUM((co_giay OR co_phien) AND co_size) xep_duoc FROM t"

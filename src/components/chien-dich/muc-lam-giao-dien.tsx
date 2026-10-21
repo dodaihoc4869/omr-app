@@ -73,8 +73,10 @@ export const tenMucLam = (ma: MaMuc, cheDo: CheDoMuc): string => (cheDo === 'tha
 export const CHU_CHUA_CO_SO_DO = 'Chưa có số đo'
 const GIAI_THICH_CHUA_CO_SO_DO = 'Lượt không có số giây đáng tin (nộp cả lô, chưa từng bấm giờ) hoặc câu chưa tính kích thước đề — chưa xếp Mức làm, không đoán.'
 /** Giải thích dấu "≈": số giây lấy từ đồng hồ cũ / ước tính, chỉ có thể DƯ (không thể thiếu) ⇒ mức có thể thấp hơn, không bao giờ Mức làm 4. */
-export const GIAI_THICH_UOC_TINH = 'Số giây từ đồng hồ cũ hoặc ước tính từ khoảng cách giữa hai lần trả lời — có thể cao hơn thật, nên mức chỉ là ước tính và không xếp Mức làm 4.'
-const NHAN_UOC_TINH: Readonly<Record<'cu' | 'uoc', string>> = { cu: 'Giây đo bằng đồng hồ cũ, có thể dư.', uoc: 'Giây ước tính từ khoảng cách hai lần trả lời liên tiếp, có thể dư.' }
+export const GIAI_THICH_UOC_TINH = 'Số giây từ đồng hồ cũ hoặc ước tính từ mốc trả lời của lượt chơi — có thể cao hơn thật, nên mức chỉ là ước tính và không xếp Mức làm 4.'
+/** Bản học sinh / phụ huynh: không nói "đồng hồ cũ" (chữ nội bộ) — chỉ nói số giây là ước tính. */
+const GIAI_THICH_UOC_TINH_EM = 'Số giây của lượt này là ước tính, có thể cao hơn thật.'
+const NHAN_UOC_TINH: Readonly<Record<'cu' | 'uoc', string>> = { cu: 'Giây đo bằng đồng hồ cũ, có thể dư.', uoc: 'Giây ước tính từ mốc trả lời trước trong lượt chơi, có thể dư.' }
 
 /** Ranh giới bốn mức trên thước (giây) + độ dài thước. RANH GIỚI do máy chủ gửi (`ranh2/3/4` — một nguồn với cách xếp mức); ở đây chỉ chọn độ dài thước. Thuần. */
 export function mocThuoc(m: Pick<MucLamLuot, 'giay' | 'ranh2' | 'ranh3' | 'ranh4'>): { bien1: number; bien2: number; bien4: number | null; ketMuc3: number; toiDa: number } {
@@ -100,7 +102,7 @@ export function PipMuc({ n }: { n: MaMuc }) {
 /** Chip "Mức làm N" (+ tên mức khi `dai`). `uoc` = mức xếp từ giây cũ / ước tính ⇒ "≈ Mức làm N" (dấu ≈ là chữ, không dựa vào màu). */
 export function ChipMuc({ ma, cheDo, dai = false, uoc = false }: { ma: MaMuc; cheDo: CheDoMuc; dai?: boolean; uoc?: boolean }) {
   return (
-    <span className="hslc-chip-m" data-m={ma} {...(uoc ? { 'data-uoc': '', title: GIAI_THICH_UOC_TINH } : {})}>
+    <span className="hslc-chip-m" data-m={ma} {...(uoc ? { 'data-uoc': '', title: cheDo === 'thay' ? GIAI_THICH_UOC_TINH : GIAI_THICH_UOC_TINH_EM } : {})}>
       <PipMuc n={ma} />
       <b>
         {uoc ? '≈ ' : ''}Mức làm {ma}
@@ -197,7 +199,7 @@ export function CachTinhMuc() {
       <summary className="tt-nhan">Cách tính Mức làm</summary>
       <p>
         Thời gian đọc hết đề tính theo độ dài câu: 8 giây + 0,35 giây mỗi từ + 10 giây nếu có hình. Mức làm 1: giây làm ít hơn thời gian đọc hết đề. Mức làm 2: đã đọc xong nhưng chưa đủ thời gian nghĩ (sàn nghĩ theo phần: phần I 6 giây,
-        phần II 12 giây, phần III 15 giây). Mức làm 3: có thời gian nghĩ. Mức làm 4: làm từ 0,8 lần thời gian thường của lớp ở câu ấy — chỉ xếp khi lớp đã đủ mẫu của câu. Lượt đo bằng đồng hồ mới cho mức chắc chắn. Lượt cũ có số giây từ đồng hồ cũ, hoặc ước tính từ khoảng cách giữa hai lần trả lời liên tiếp, xếp kèm dấu ≈ (số giây chỉ có thể dư, nên tối đa Mức làm 3). Lượt nộp cả lô hoặc chưa từng bấm giờ ghi “Chưa có số đo”, không đoán.
+        phần II 12 giây, phần III 15 giây). Mức làm 3: có thời gian nghĩ. Mức làm 4: làm từ 0,8 lần thời gian thường của lớp ở câu ấy — chỉ xếp khi lớp đã đủ mẫu của câu. Lượt đo bằng đồng hồ mới cho mức chắc chắn. Lượt cũ có số giây từ đồng hồ cũ, hoặc ước tính từ mốc trả lời trong lượt chơi game, xếp kèm dấu ≈ (số giây chỉ có thể dư, nên tối đa Mức làm 3). Lượt nộp cả lô hoặc chưa từng bấm giờ ghi “Chưa có số đo”, không đoán.
       </p>
     </details>
   )
@@ -336,7 +338,7 @@ export function KhoiCachLamBai({ tong, cheDo, ngoi, soSaiTong }: PropsCachLamBai
         <p className="hslc-ghi">
           Đo được {soSaiCoMuc}/{mau} lượt sai.{mau > soSaiCoMuc ? ` ${mau - soSaiCoMuc} lượt sai chưa có số đo (chưa có số giây đáng tin để xếp).` : ''}
         </p>
-        {tong.soUocTinh > 0 && <p className="hslc-ghi" data-uoc="">Lượt có dấu ≈ lấy số giây từ đồng hồ cũ hoặc ước tính, có thể cao hơn thật.</p>}
+        {tong.soUocTinh > 0 && <p className="hslc-ghi" data-uoc="">Lượt có dấu ≈ có số giây là ước tính, có thể cao hơn thật.</p>}
       </>
     )
   }

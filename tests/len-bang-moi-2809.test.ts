@@ -307,7 +307,7 @@ describe('D/K + nhãn trên thẻ tên + bảng chi tiết em (cầu nối)', ()
     expect(gan.querySelector('.mc-gan-gt')!.textContent).toContain('số giây chỉ là ước tính nên không xếp Mức làm 4')
     const lan = [...ct.querySelectorAll('.mc-lanl')]
     expect(lan.map((l) => l.querySelector('.mc-chm')!.textContent)).toEqual(['≈ Mức làm 3', '≈ Mức làm 1'])
-    expect(lan[1]!.querySelector('.mc-lanl-gt')!.textContent).toBe('Chưa đọc hết đề · ≈ 12 giây, đọc hết đề cần 24 giây. Giây ước tính từ khoảng cách hai lần trả lời, có thể dư.')
+    expect(lan[1]!.querySelector('.mc-lanl-gt')!.textContent).toBe('Chưa đọc hết đề · ≈ 12 giây, đọc hết đề cần 24 giây. Giây ước tính từ mốc trả lời trước trong lượt chơi, có thể dư.')
     expect(lan[0]!.querySelector('.mc-lanl-gt')!.textContent).toContain('Giây đo bằng đồng hồ cũ, có thể dư.')
     const cach = ct.querySelector('.mc-cach')!
     expect(cach.querySelector('.mc-rong')!.textContent).toBe('2 lượt xếp từ số giây đồng hồ cũ hoặc ước tính (≈): có thể cao hơn thật nên mức chỉ là ước tính, không xếp Mức làm 4.')

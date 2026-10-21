@@ -24,7 +24,7 @@ import { tachSongSinh } from './loi-hoc-luat'
 import { docBetaCau, docCauKho, tenCuaDang } from './omni-d1'
 import { docKichThuocCau } from './cau-doc-giay'
 import { tongMucLam, type MucLamLuot } from './muc-lam'
-import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong, type DoMucLuot, giayTuKhoangCach } from './muc-lam-so'
+import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong, type DoMucLuot } from './muc-lam-so'
 import { tenLopCuaEm } from './ten-lop'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
@@ -216,13 +216,11 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   }
   // Mức làm của từng lượt (thuần, muc-lam.ts). Thời gian thường CHỈ khi β thật (τ của OMNI chưa nối ⇒ τ = 0, hệ số đọc 1,0 — đặc tả mục 3). Bản học sinh/phụ huynh: lượt ĐÚNG ở Mức 1–2 không mang mức
   // (chỉ số giây) và KHÔNG tính vào tổng — tổng khớp đúng những gì em thấy.
-  // GIÂY MỖI LƯỢT + LOẠI: 'do' = số đo (đồng hồ mới có `doc`) · 'cu' = đồng hồ cũ (cột `giay` / `raw_json.ms` / ca thi) · 'uoc' = ƯỚC TÍNH (mốc trả lời game, khoảng cách hai lần trả lời). 'cu' và 'uoc' chỉ có thể DƯ.
-  const khoangCach = giayTuKhoangCach(dong)
+  // GIÂY MỖI LƯỢT + LOẠI: 'do' = số đo (đồng hồ mới có `doc`) · 'cu' = đồng hồ cũ (cột `giay` / `raw_json.ms` / ca thi) · 'uoc' = ƯỚC TÍNH (mốc trả lời game). 'cu' và 'uoc' chỉ có thể DƯ. KHÔNG ước tính từ khoảng cách giữa các dòng sổ: ôn lại / tự luyện / BTVN lỡ nộp cả lô cùng lúc nên khoảng cách không phải thời gian làm câu.
   const giaySo = dong.map((d, i): { g: number | null; loai: 'do' | 'cu' | 'uoc' | null } => {
     if (doThat[i] != null) return { g: doThat[i]!, loai: d.doMuc ? 'do' : 'cu' }
     if (d.nguon === 'thi') { const g = ctCua(d)?.giay ?? null; if (g !== null) return { g, loai: 'cu' } }
     if (d.nguon === 'game') { const u = uoc.get(`${d.maNguon}|${Date.parse(d.luc)}`); if (u !== undefined) return { g: u, loai: 'uoc' } }
-    if (khoangCach[i] != null) return { g: khoangCach[i]!, loai: 'uoc' }
     return { g: null, loai: null }
   })
   const mucTho: (MucLamLuot | null)[] = dong.map((d, i) =>

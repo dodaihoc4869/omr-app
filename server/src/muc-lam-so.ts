@@ -51,7 +51,7 @@ export interface DongMucTho {
   mucDo: string
   /** true = đúng · false = sai · null = bỏ trống / chưa chấm. */
   dung: boolean | null
-  /** ĐO LẠI LƯỢT CŨ (21/10): giây của đồng hồ CŨ ('cu': cột `giay` / `raw_json.ms` của lượt không có `doc.dh`) hoặc ƯỚC TÍNH ('uoc': khoảng cách giữa hai lần trả lời) — dùng khi lượt KHÔNG có số đo mới. */
+  /** ĐO LẠI LƯỢT CŨ (21/10): giây của đồng hồ CŨ ('cu': cột `giay` / `raw_json.ms` của lượt không có `doc.dh`) hoặc ƯỚC TÍNH ('uoc': mốc trả lời trước trong phiên game — `giayUocTinhGame`) — dùng khi lượt KHÔNG có số đo mới. */
   giayCu?: number | null
   loaiCu?: 'cu' | 'uoc'
 }
@@ -80,33 +80,4 @@ export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>, k
     dung: d.dung,
     thuongGiay: b === undefined ? null : msKyVong(b, 0, d.doMuc.phan, d.mucDo || null) / 1000,
   })
-}
-
-/** Khoảng cách tối đa (giây) còn coi là "đang làm câu kế tiếp" — quá ngưỡng là em nghỉ giữa chừng, không ước tính. */
-export const TRAN_KHOANG_CACH_GIAY = 900
-
-/**
- * GIÂY ƯỚC TÍNH TỪ KHOẢNG CÁCH GIỮA HAI LẦN TRẢ LỜI LIÊN TIẾP (21/10, "đo lại hết"): với mỗi lượt, giây ≈ `luc` của lượt này − `luc` của lượt LIỀN TRƯỚC trong cùng nhóm (nguồn + mã nguồn: một phiên game, một lượt ôn lại,
- * một đợt tự luyện…), nếu nằm trong 1..900 giây. Khoảng cách 0 (nộp cả lô cùng lúc: BTVN phiếu, ca thi, mở bài…) hay lượt đầu nhóm ⇒ null (không ước tính được, KHÔNG đoán). Con số gồm cả lúc em xem kết quả / lời giải ⇒ chỉ có thể DƯ.
- * Trả mảng cùng thứ tự đầu vào. Thuần.
- */
-export function giayTuKhoangCach(dong: readonly { nguon: string; maNguon: string; luc: string }[]): (number | null)[] {
-  const ra: (number | null)[] = dong.map(() => null)
-  const theoNhom = new Map<string, { i: number; t: number }[]>()
-  dong.forEach((d, i) => {
-    const t = Date.parse(d.luc)
-    if (!Number.isFinite(t) || !d.maNguon) return
-    const k = `${d.nguon}|${d.maNguon}`
-    const ds = theoNhom.get(k)
-    if (ds) ds.push({ i, t })
-    else theoNhom.set(k, [{ i, t }])
-  })
-  for (const ds of theoNhom.values()) {
-    ds.sort((a, b) => a.t - b.t || a.i - b.i)
-    for (let j = 1; j < ds.length; j++) {
-      const g = Math.round((ds[j]!.t - ds[j - 1]!.t) / 1000)
-      if (g >= 1 && g <= TRAN_KHOANG_CACH_GIAY) ra[ds[j]!.i] = g
-    }
-  }
-  return ra
 }

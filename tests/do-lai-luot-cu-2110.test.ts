@@ -1,8 +1,8 @@
 // @vitest-environment node
 // ĐO LẠI LƯỢT CŨ (thầy 21/10: "phải tìm cách đo lại hết") — D1 THẬT (SQLite, lược đồ repo). Lượt không có `raw_json.doc` (trước khi máy em nạp đồng hồ mới) vẫn xếp được Mức làm khi
-//   · có giây CŨ (cột `giay`, `raw_json.ms`, ca thi) ⇒ `uocTinh: 'cu'`; hoặc giây ƯỚC TÍNH (khoảng cách giữa hai lần trả lời liên tiếp cùng nhóm, mốc trả lời game) ⇒ `uocTinh: 'uoc'`;
+//   · có giây CŨ (cột `giay`, `raw_json.ms`, ca thi) ⇒ `uocTinh: 'cu'`; hoặc giây ƯỚC TÍNH (mốc trả lời của lượt chơi game — `giayUocTinhGame`) ⇒ `uocTinh: 'uoc'`. KHÔNG ước tính từ khoảng cách giữa các dòng sổ (ôn lại / tự luyện / BTVN lỡ nộp cả lô cùng lúc);
 //   · VÀ câu có kích thước đề trong bảng tính sẵn `cau_doc_giay` (cron `dongBoCauDocGiay`, tính bằng đúng `noiDungTuCauGoc` trên câu rút gọn).
-// Luật: không bao giờ Mức làm 4 (giây cũ chỉ có thể dư); khoảng cách 0 (nộp cả lô) ⇒ không ước tính; thiếu bảng / câu chưa tính ⇒ "Chưa có số đo" như trước; bản học sinh ẩn mức lượt ĐÚNG ở Mức 1–2.
+// Luật: không bao giờ Mức làm 4 (giây cũ chỉ có thể dư); lượt nộp cả lô không giây ⇒ không mức; thiếu bảng / câu chưa tính ⇒ "Chưa có số đo" như trước; bản học sinh ẩn mức lượt ĐÚNG ở Mức 1–2.
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
@@ -11,7 +11,6 @@ import { lichSuLamCauCuaEm } from '../server/src/lich-su-lam-cau'
 import { aiSaiCau } from '../server/src/ai-sai-cau'
 import { gvHoSoLenBang } from '../server/src/ho-so-em-chieu'
 import { dongBoCauDocGiay, kichThuocTuDong, xoaDemKichThuocCau } from '../server/src/cau-doc-giay'
-import { giayTuKhoangCach } from '../server/src/muc-lam-so'
 import { mucLamCuaLuot } from '../server/src/muc-lam'
 
 type D = ReturnType<typeof taoD1That>
@@ -39,18 +38,6 @@ const env = (d: D) => d.env as unknown as Env
 const lichSu = async (e: Env, nguoi: 'thay' | 'hoc-sinh' = 'thay') => (await lichSuLamCauCuaEm(e, 'S1', undefined, nguoi)) as KetQuaLichSuLamCau
 const mucCua = (r: KetQuaLichSuLamCau, qid: string) => r.lan.find((x) => x.qid === qid)?.mucLam
 
-describe('giayTuKhoangCach — giây ước tính từ khoảng cách hai lần trả lời liên tiếp', () => {
-  const d = (nguon: string, maNguon: string, giayThu: number) => ({ nguon, maNguon, luc: new Date(T0 + giayThu * 1000).toISOString() })
-  it('lượt kế tiếp cùng nhóm: giây = hiệu hai mốc nếu 1–900; lượt đầu nhóm, khoảng cách 0 (nộp cả lô) và > 900 giây (nghỉ) ⇒ null; nhóm khác nhau không lẫn', () => {
-    const ds = [d('on_lai', 'A', 0), d('on_lai', 'A', 12), d('on_lai', 'A', 12), d('on_lai', 'A', 2000), d('tu_luyen', 'A', 5), d('tu_luyen', 'A', 20)]
-    expect(giayTuKhoangCach(ds)).toEqual([null, 12, null, null, null, 15])
-  })
-  it('thứ tự đầu vào bất kỳ (mới trước) vẫn tính đúng theo thời gian; mốc hỏng / thiếu mã nguồn ⇒ null', () => {
-    const ds = [d('game', 'S', 30), d('game', 'S', 10), d('game', 'S', 0), { nguon: 'game', maNguon: '', luc: new Date(T0).toISOString() }, { nguon: 'game', maNguon: 'S', luc: 'hỏng' }]
-    expect(giayTuKhoangCach(ds)).toEqual([20, 10, null, null, null])
-  })
-})
-
 describe('cau_doc_giay — kích thước đề tính sẵn', () => {
   it('cron tính bằng ĐÚNG noiDungTuCauGoc trên câu rút gọn: số từ + có hình + phần; câu lạ ghi dòng DẤU (không tính lại); chạy lại không thêm gì', async () => {
     xoaDemKichThuocCau()
@@ -75,6 +62,17 @@ describe('cau_doc_giay — kích thước đề tính sẵn', () => {
     expect(await dongBoCauDocGiay(env(d), 3)).toEqual({ them: 3, conNua: true })
     expect(await dongBoCauDocGiay(env(d), 3)).toEqual({ them: 2, conNua: false })
   })
+  it('đã lấp đầy ⇒ nghỉ 30 phút (không quét cả bảng mỗi phút); câu mới thêm sau đó chờ hết nghỉ; mã nhiều đề chỉ một dòng', async () => {
+    const d = dung()
+    cau(d, 'D-1')
+    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DH-Y', 'D-1', 'v1', 'g-d1', 'DH-Y.D0', JSON.stringify({ qid: 'D-1', phan: 'I', text: 'a b', choices: ['a', 'b', 'c', 'd'] }))
+    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 1, conNua: false })
+    expect(d.sql.prepare('SELECT COUNT(*) n FROM cau_doc_giay').get()).toMatchObject({ n: 1 })
+    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 0, conNua: false }) // quét lại: hết câu thiếu ⇒ ghi nhớ "đầy"
+    cau(d, 'D-2')
+    expect(await dongBoCauDocGiay(env(d), 50)).toEqual({ them: 0, conNua: false }) // đang nghỉ
+    expect(d.sql.prepare('SELECT COUNT(*) n FROM cau_doc_giay').get()).toMatchObject({ n: 1 })
+  })
 })
 
 describe('Lịch sử làm câu — đo lại lượt cũ', () => {
@@ -91,9 +89,16 @@ describe('Lịch sử làm câu — đo lại lượt cũ', () => {
     d.sql.prepare("INSERT INTO omni_beta_cau (qid, beta, n, cap_nhat_luc) VALUES ('C-4', ?, 12, 'x')").run(Math.log(30_000))
     // ca thi cũ: cột giay
     sk(d, { qid: 'C-5', kq: 0, giay: 25, nguon: 'thi', ma: 'CA1' })  // Mức 3 ≈ (đồng hồ cũ)
-    // ôn lại: hai lượt cách nhau 12 s trong CÙNG nhóm ⇒ lượt sau ≈ 12 s ⇒ Mức 1 (uoc); lượt đầu nhóm không ước tính
+    // ôn lại: hai dòng cách nhau 12 s NHƯNG sổ ghi theo từng lần nộp lô ⇒ khoảng cách không phải thời gian làm câu ⇒ KHÔNG ước tính (không bịa)
     sk(d, { qid: 'C-6', kq: 0, nguon: 'on_lai', ma: 'OL1', luc: new Date(T0 + 3_600_000).toISOString() })
     sk(d, { qid: 'C-7', kq: 0, nguon: 'on_lai', ma: 'OL1', luc: new Date(T0 + 3_600_000 + 12_000).toISOString() })
+    // game: mốc trả lời của lượt chơi (game_v2_attempt) ⇒ giây ước tính 12 (câu đầu lượt: tính từ lúc mở lượt)
+    const tg = Date.parse('2026-10-20T10:00:00Z')
+    d.sql.prepare('INSERT INTO game_v2_session (id, sbd, json, created_at) VALUES (?,?,?,?)').run('PG', 'S1', JSON.stringify({ created: tg, doan: { ma: 'D1' } }), new Date(tg).toISOString())
+    d.sql.prepare('INSERT INTO game_v2_attempt (id, sbd, session, qid, content_group, json, created_at) VALUES (?,?,?,?,?,?,?)').run('PG|C-3B', 'S1', 'PG', 'C-3B', 'g', JSON.stringify({ attempt: { at: tg + 12_000, qid: 'C-3B' }, traLoi: 'B', correct: false }), new Date(tg + 12_000).toISOString())
+    cau(d, 'C-3B')
+    await dongBoCauDocGiay(env(d), 50)
+    sk(d, { qid: 'C-3B', kq: 0, nguon: 'game', ma: 'PG', luc: new Date(tg + 12_000).toISOString() })
     // câu chưa tính kích thước + lượt khoảng cách 0 (nộp lô) + lượt không có gì
     sk(d, { qid: 'C-KHONG', kq: 0, raw: { ms: 10_000 } })
     sk(d, { qid: 'C-8', kq: 0, nguon: 'btvn', ma: 'B1', luc: new Date(T0 + 7_200_000).toISOString() })
@@ -110,9 +115,11 @@ describe('Lịch sử làm câu — đo lại lượt cũ', () => {
     expect(mucCua(r, 'C-4')!.ranh4).toBeUndefined()
     expect(mucCua(r, 'C-4')!.thuong).toBeUndefined()
     expect(mucCua(r, 'C-5')).toMatchObject({ ma: 3, uocTinh: 'cu', giay: 25 })
-    expect(mucCua(r, 'C-7')).toMatchObject({ ma: 1, uocTinh: 'uoc', giay: 12 })
-    expect(r.lan.find((x) => x.qid === 'C-7')).toMatchObject({ giay: 12, nguonGiay: 'uoc' })
-    expect(mucCua(r, 'C-6')).toBeUndefined()                                  // đầu nhóm: không ước tính
+    expect(mucCua(r, 'C-3B')).toMatchObject({ ma: 1, uocTinh: 'uoc', giay: 12 })
+    expect(r.lan.find((x) => x.qid === 'C-3B')).toMatchObject({ giay: 12, nguonGiay: 'uoc' })
+    expect(mucCua(r, 'C-6')).toBeUndefined()                                  // ôn lại nộp lô: không có giây, không mức
+    expect(mucCua(r, 'C-7')).toBeUndefined()
+    expect(r.lan.find((x) => x.qid === 'C-7')?.giay ?? null).toBeNull()
     expect(mucCua(r, 'C-KHONG')).toBeUndefined()                              // câu chưa có kích thước đề
     expect(mucCua(r, 'C-8')).toBeUndefined()                                  // btvn nộp lô (khoảng cách 0): không giây, không mức
     expect(mucCua(r, 'C-9')).toBeUndefined()
@@ -183,9 +190,15 @@ describe('tờ chiếu — đo lại lượt cũ', () => {
     sk(d, { qid: 'H-1', kq: 0, raw: { ms: 10_000 }, luc: luc(1) })
     sk(d, { qid: 'H-1', kq: 1, raw: { ms: 30_000 }, luc: luc(2) })
     sk(d, { qid: 'H-1', kq: 0, luc: luc(3) })                       // không giây ⇒ chưa có số đo
+    // game không giây nhưng có mốc trả lời của lượt chơi ⇒ giây ước tính 9 (như Lịch sử làm câu và tờ chiếu «Ai đã sai?»)
+    const tg = Date.parse('2026-10-20T10:00:00Z')
+    d.sql.prepare('INSERT INTO game_v2_session (id, sbd, json, created_at) VALUES (?,?,?,?)').run('PH', 'S1', JSON.stringify({ created: tg, doan: { ma: 'D1' } }), new Date(tg).toISOString())
+    d.sql.prepare('INSERT INTO game_v2_attempt (id, sbd, session, qid, content_group, json, created_at) VALUES (?,?,?,?,?,?,?)').run('PH|H-1', 'S1', 'PH', 'H-1', 'g', JSON.stringify({ attempt: { at: tg + 9_000, qid: 'H-1' }, traLoi: 'B', correct: false }), new Date(tg + 9_000).toISOString())
+    sk(d, { qid: 'H-1', kq: 0, nguon: 'game', ma: 'PH', luc: new Date(tg + 9_000).toISOString() })
     const r = (await gvHoSoLenBang(env(d), { sbd: 'S1', qid: 'H-1' }, T0 + 3_600_000)) as { ok: boolean; cauNay: { lan: { dung: boolean; mucLam?: { ma: number; uocTinh?: string } }[] }; cachLam14: { soDo: number; chuaCoSoDo: number; soUocTinh: number } }
     expect(r.ok).toBe(true)
-    expect(r.cauNay.lan.map((x) => x.mucLam && [x.mucLam.ma, x.mucLam.uocTinh])).toEqual([[1, 'cu'], [3, 'cu'], undefined])
-    expect(r.cachLam14).toMatchObject({ soDo: 2, soUocTinh: 2, chuaCoSoDo: 1 })
+    // cũ → mới: game ước tính (20/10) · hai lượt đồng hồ cũ · lượt không giây
+    expect(r.cauNay.lan.map((x) => x.mucLam && [x.mucLam.ma, x.mucLam.uocTinh])).toEqual([[1, 'uoc'], [1, 'cu'], [3, 'cu'], undefined])
+    expect(r.cachLam14).toMatchObject({ soDo: 3, soUocTinh: 3, chuaCoSoDo: 1 })
   })
 })

@@ -41,7 +41,7 @@ export interface MucLamLuot {
   ranh3: number
   ranh4?: number
   /** ĐO LẠI LƯỢT CŨ (thầy 21/10: "phải tìm cách đo lại hết"): vắng ⇒ giây đo bằng đồng hồ MỚI (chắc). 'cu' = giây của đồng hồ CŨ (máy em cũ đo bằng đồng hồ tường, ca thi cũ) — chỉ có thể DƯ
-   *  (kể cả lúc tab ẩn), không bao giờ thiếu; 'uoc' = giây ƯỚC TÍNH từ khoảng cách giữa hai lần trả lời liên tiếp (gồm cả lúc đọc lời giải / nghỉ) — cũng chỉ có thể DƯ. Mức xếp từ hai loại này
+   *  (kể cả lúc tab ẩn), không bao giờ thiếu; 'uoc' = giây ƯỚC TÍNH từ mốc trả lời trước trong phiên game (gồm cả lúc xem kết quả / nghỉ) — cũng chỉ có thể DƯ. Mức xếp từ hai loại này
    *  hiện kèm dấu "≈" và KHÔNG BAO GIỜ là Mức làm 4 (Mức 4 cần giây đo thật + thời gian thường của lớp). Mức làm 1 từ giây dư vẫn chắc (giây thật chỉ nhỏ hơn). */
   uocTinh?: 'cu' | 'uoc'
 }
