@@ -35,6 +35,11 @@ export interface MucLamLuot {
   xapXi?: true
   /** Chỉ cho thầy: lượt ĐÚNG nộp trước T_đọc (có thể đã biết bài, có thể đoán trúng) — ghi chú, KHÔNG tính là vội. */
   ghiChu?: 'dung_truoc_doc'
+  /** RANH GIỚI vào Mức làm 2 / 3 / 4 (giây nguyên; giây làm ≥ ranh thì thuộc mức ấy; Mức làm 1 bắt đầu từ 0). Màn hình vẽ thước và ghi khoảng giây từ ĐÂY — không màn nào biết các tỉ lệ
+   *  (0,5 của câu ảnh, 0,8 của thời gian thường). `ranh4` vắng ⇒ lớp chưa đủ mẫu, không có Mức làm 4. `ranh4` có thể ≤ `ranh3` (thường nhỏ): Mức làm 3 khi ấy rỗng. */
+  ranh2: number
+  ranh3: number
+  ranh4?: number
 }
 
 export interface DauVaoMucLam {
@@ -65,18 +70,23 @@ export function mucLamCuaLuot(d: DauVaoMucLam): MucLamLuot | null {
   const xapXi = d.soTu === SO_TU_CAU_ANH && d.coHinh
   const thuong = typeof d.thuongGiay === 'number' && Number.isFinite(d.thuongGiay) && d.thuongGiay > 0 ? Math.round(d.thuongGiay) : null
   const giay = Math.round(d.giay)
-  // Câu ảnh: ranh giới Mức 1 | Mức 2 hạ về 0,5 × T_đọc (T_đọc chỉ là ước lượng).
-  const bienMuc1 = xapXi ? doc * TI_LE_MUC_1_CAU_ANH : doc
+  // Câu ảnh: ranh giới Mức 1 | Mức 2 hạ về 0,5 × T_đọc (T_đọc chỉ là ước lượng). Giây nguyên ⇒ "giây < x" ⇔ "giây < ceil(x)", "giây ≥ x" ⇔ "giây ≥ ceil(x)".
+  const ranh2 = Math.ceil(xapXi ? doc * TI_LE_MUC_1_CAU_ANH : doc)
+  const ranh3 = doc + san
+  const ranh4 = thuong !== null ? Math.ceil(TI_LE_LAM_KY * thuong) : undefined
   let ma: MaMucLam
-  if (giay < bienMuc1) ma = 1
-  else if (giay < doc + san) ma = 2
-  else if (thuong !== null && giay >= TI_LE_LAM_KY * thuong) ma = 4
+  if (giay < ranh2) ma = 1
+  else if (giay < ranh3) ma = 2
+  else if (ranh4 !== undefined && giay >= ranh4) ma = 4
   else ma = 3
   return {
     ma,
     giay,
     giayDoc: doc,
     sanNghi: san,
+    ranh2,
+    ranh3,
+    ...(ranh4 !== undefined ? { ranh4 } : {}),
     ...(thuong !== null ? { thuong } : {}),
     ...(xapXi ? { xapXi: true as const } : {}),
     ...(ma === 1 && d.dung === true ? { ghiChu: 'dung_truoc_doc' as const } : {}),

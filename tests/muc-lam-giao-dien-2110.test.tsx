@@ -3,9 +3,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import HoSoLamCauEm, { type NguonHoSo } from '../src/components/chien-dich/HoSoLamCauEm'
-import { chuanHoaMucLam, docMucLam, docTongMucLam, mocThuoc, TEN_MUC_EM, TEN_MUC_THAY, TI_LE_VE_LAM_KY, TI_LE_VE_MUC_1_CAU_ANH } from '../src/components/chien-dich/muc-lam-giao-dien'
+import { chuanHoaMucLam, docMucLam, docTongMucLam, mocThuoc, TEN_MUC_EM, TEN_MUC_THAY } from '../src/components/chien-dich/muc-lam-giao-dien'
 import { docLichSuLamCau } from '../src/lib/lich-su-lam-cau-api'
-import { TI_LE_LAM_KY, TI_LE_MUC_1_CAU_ANH } from '../server/src/muc-lam'
 import { hoSoThaiDoGia } from '../scripts/chup-v2/gia/bai-hang-ngay'
 import { lichSuMucGia, type TuyChonGia } from '../scripts/chup-v2/gia/lich-su-muc-lam'
 
@@ -30,20 +29,14 @@ const moLichSu = (tam: HTMLElement) => fireEvent.click(within(tam).getByRole('ta
 const chu = (e: Element | null) => (e?.textContent ?? '').replace(/\s+/g, ' ').trim()
 
 describe('phép thuần', () => {
-  it('ranh giới thước: T_đọc · T_đọc + sàn nghĩ · 0,8 × thường; câu ảnh hạ ranh Mức làm 1 về một nửa; không β ⇒ không Mức làm 4', () => {
-    const k = mocThuoc({ giay: 14, giayDoc: 23, sanNghi: 6, thuong: 75 })
-    expect([k.bien1, k.bien2, k.bien4, k.ketMuc3]).toEqual([23, 29, 60, 60])
+  it('ranh giới thước LẤY từ máy chủ (ranh2/3/4): không biết tỉ lệ nào; không β ⇒ không Mức làm 4; thường nhỏ ⇒ đoạn Mức làm 3 co về 0', () => {
+    const k = mocThuoc({ giay: 14, ranh2: 24, ranh3: 30, ranh4: 60 })
+    expect([k.bien1, k.bien2, k.bien4, k.ketMuc3]).toEqual([24, 30, 60, 60])
     expect(k.toiDa).toBe(90)
-    expect(mocThuoc({ giay: 12, giayDoc: 32, sanNghi: 6, xapXi: true }).bien1).toBe(16)
-    const khongBeta = mocThuoc({ giay: 50, giayDoc: 20, sanNghi: 6 })
+    const khongBeta = mocThuoc({ giay: 50, ranh2: 20, ranh3: 26 })
     expect(khongBeta.bien4).toBeNull()
     expect(khongBeta.toiDa).toBeGreaterThanOrEqual(56) // chấm luôn nằm trong thước
-    // thường nhỏ hơn T_đọc + sàn: đoạn Mức làm 3 co về 0, Mức làm 4 bắt đầu ngay sau Mức làm 2
-    expect(mocThuoc({ giay: 30, giayDoc: 20, sanNghi: 6, thuong: 20 }).ketMuc3).toBe(26)
-  })
-  it('hai tỉ lệ VẼ ranh giới trùng hai tỉ lệ XẾP mức của máy chủ (một nơi đổi thì test đỏ)', () => {
-    expect(TI_LE_VE_MUC_1_CAU_ANH).toBe(TI_LE_MUC_1_CAU_ANH)
-    expect(TI_LE_VE_LAM_KY).toBe(TI_LE_LAM_KY)
+    expect(mocThuoc({ giay: 30, ranh2: 20, ranh3: 26, ranh4: 16 }).ketMuc3).toBe(26)
   })
   it('tên mức: thầy "Chưa đọc hết đề…"; học sinh / phụ huynh tả việc đã làm, không nhãn năng lực', () => {
     expect(Object.values(TEN_MUC_THAY)).toEqual(['Chưa đọc hết đề', 'Đọc xong, chưa kịp nghĩ', 'Có nghĩ', 'Làm kỹ'])
@@ -56,7 +49,7 @@ describe('đọc hợp đồng máy chủ', () => {
     const du = JSON.parse(JSON.stringify(lichSuMucGia(SBD, 'Em A', { cheDo: 'thay' }))) as Record<string, unknown>
     const kq = chuanHoaMucLam(docLichSuLamCau(du)!) // đọc chuyển tiếp ở lớp nối, kiểm khung ở tấm
     expect(kq.lan.filter((l) => l.mucLam)).toHaveLength(7)
-    expect(kq.lan[0]!.mucLam).toMatchObject({ ma: 1, giay: 14, giayDoc: 24, sanNghi: 6, thuong: 75 })
+    expect(kq.lan[0]!.mucLam).toMatchObject({ ma: 1, giay: 14, giayDoc: 24, sanNghi: 6, thuong: 75, ranh2: 24, ranh3: 30, ranh4: 60 })
     expect(kq.mucLam).toMatchObject({ soDo: 7, chuaCoSoDo: 4, saiLamVoi: 4, saiDuNghi: 1, dungTruocDoc: 1, coBetaThat: true })
     // máy chủ cũ (không có trường) ⇒ không `mucLam`
     const cu = JSON.parse(JSON.stringify(du)) as Record<string, unknown>
@@ -77,12 +70,13 @@ describe('đọc hợp đồng máy chủ', () => {
     expect(kq.mucLam).toBeUndefined()
   })
   it('mức sai khung bị bỏ: mã ngoài 1–4, giây không dương, thiếu giayDoc; tổng thiếu bốn dòng ⇒ bỏ', () => {
-    expect(docMucLam({ ma: 5, giay: 10, giayDoc: 20, sanNghi: 6 })).toBeUndefined()
-    expect(docMucLam({ ma: 1, giay: 0, giayDoc: 20, sanNghi: 6 })).toBeUndefined()
-    expect(docMucLam({ ma: 1, giay: 10, sanNghi: 6 })).toBeUndefined()
+    expect(docMucLam({ ma: 5, giay: 10, giayDoc: 20, sanNghi: 6, ranh2: 20, ranh3: 26 })).toBeUndefined()
+    expect(docMucLam({ ma: 1, giay: 0, giayDoc: 20, sanNghi: 6, ranh2: 20, ranh3: 26 })).toBeUndefined()
+    expect(docMucLam({ ma: 1, giay: 10, sanNghi: 6, ranh2: 20, ranh3: 26 })).toBeUndefined()
+    expect(docMucLam({ ma: 1, giay: 10, giayDoc: 20, sanNghi: 6 })).toBeUndefined() // thiếu ranh giới ⇒ không vẽ được thước ⇒ không mức
     expect(docMucLam('x')).toBeUndefined()
-    expect(docMucLam({ ma: 3, giay: 40, giayDoc: 20, sanNghi: 6, thuong: -5, ghiChu: 'khac' })).toEqual({ ma: 3, giay: 40, giayDoc: 20, sanNghi: 6 })
-    expect(docMucLam({ ma: 1, giay: 8, giayDoc: 25, sanNghi: 6, xapXi: true, ghiChu: 'dung_truoc_doc' })).toEqual({ ma: 1, giay: 8, giayDoc: 25, sanNghi: 6, xapXi: true, ghiChu: 'dung_truoc_doc' })
+    expect(docMucLam({ ma: 3, giay: 40, giayDoc: 20, sanNghi: 6, ranh2: 20, ranh3: 26, thuong: -5, ghiChu: 'khac' })).toEqual({ ma: 3, giay: 40, giayDoc: 20, sanNghi: 6, ranh2: 20, ranh3: 26 })
+    expect(docMucLam({ ma: 1, giay: 8, giayDoc: 25, sanNghi: 6, ranh2: 13, ranh3: 31, xapXi: true, ghiChu: 'dung_truoc_doc' })).toEqual({ ma: 1, giay: 8, giayDoc: 25, sanNghi: 6, ranh2: 13, ranh3: 31, xapXi: true, ghiChu: 'dung_truoc_doc' })
     expect(docTongMucLam({ soDo: 1, chuaCoSoDo: 0, theoMuc: [], saiLamVoi: 0, saiDuNghi: 0, dungTruocDoc: 0, coBetaThat: false })).toBeUndefined()
   })
 })

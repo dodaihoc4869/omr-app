@@ -108,4 +108,19 @@ describe('tongMucLam — gộp theo mức', () => {
     expect(tongMucLam([])).toMatchObject({ soDo: 0, chuaCoSoDo: 0, saiLamVoi: 0, saiDuNghi: 0, coBetaThat: false })
     expect(tongMucLam([{ dung: true }, { dung: false }])).toMatchObject({ soDo: 0, chuaCoSoDo: 2 })
   })
+  it('ranh giới vào từng mức (ranh2 · ranh3 · ranh4) khớp đúng cách xếp: giây ≥ ranh ⇒ thuộc mức ấy; thường lẻ làm tròn LÊN (0,8 × 123 = 98,4 ⇒ ranh 99)', () => {
+    const co = (giay: number, thuongGiay: number | null) => mucLamCuaLuot({ giay, soTu: 20, coHinh: false, phan: 'I', dung: false, thuongGiay })!
+    const m = co(50, 123)
+    expect([m.ranh2, m.ranh3, m.ranh4]).toEqual([15, 21, 99]) // T_đọc(20 từ) = 15, sàn nghĩ phần I = 6
+    expect(co(98, 123).ma).toBe(3)
+    expect(co(99, 123).ma).toBe(4)
+    expect(co(14, null).ma).toBe(1)
+    expect(co(15, null).ma).toBe(2)
+    expect(co(21, null).ma).toBe(3)
+    expect(co(50, null).ranh4).toBeUndefined()
+    // câu chỉ ảnh: ranh Mức làm 2 = ceil(0,5 × T_đọc)
+    const a = mucLamCuaLuot({ giay: 16, soTu: 40, coHinh: true, phan: 'I', dung: false })!
+    expect([a.giayDoc, a.ranh2, a.ma]).toEqual([32, 16, 2])
+    expect(mucLamCuaLuot({ giay: 15, soTu: 40, coHinh: true, phan: 'I', dung: false })!.ma).toBe(1)
+  })
 })

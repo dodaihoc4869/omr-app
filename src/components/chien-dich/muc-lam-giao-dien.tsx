@@ -15,13 +15,16 @@ const so = (x: unknown): number | null => (typeof x === 'number' && Number.isFin
 export function docMucLam(x: unknown): MucLamLuot | undefined {
   if (!x || typeof x !== 'object') return undefined
   const o = x as Record<string, unknown>
-  const ma = so(o.ma), giay = so(o.giay), giayDoc = so(o.giayDoc), sanNghi = so(o.sanNghi), thuong = so(o.thuong)
-  if (ma === null || ![1, 2, 3, 4].includes(ma) || giay === null || giay < 1 || giayDoc === null || giayDoc < 0 || sanNghi === null || sanNghi < 0) return undefined
+  const ma = so(o.ma), giay = so(o.giay), giayDoc = so(o.giayDoc), sanNghi = so(o.sanNghi), thuong = so(o.thuong), ranh2 = so(o.ranh2), ranh3 = so(o.ranh3), ranh4 = so(o.ranh4)
+  if (ma === null || ![1, 2, 3, 4].includes(ma) || giay === null || giay < 1 || giayDoc === null || giayDoc < 0 || sanNghi === null || sanNghi < 0 || ranh2 === null || ranh2 < 0 || ranh3 === null || ranh3 < ranh2) return undefined
   return {
     ma: ma as MucLamLuot['ma'],
     giay,
     giayDoc,
     sanNghi,
+    ranh2,
+    ranh3,
+    ...(ranh4 !== null && ranh4 >= 0 ? { ranh4 } : {}),
     ...(thuong !== null && thuong > 0 ? { thuong } : {}),
     ...(o.xapXi === true ? { xapXi: true as const } : {}),
     ...(o.ghiChu === 'dung_truoc_doc' ? { ghiChu: 'dung_truoc_doc' as const } : {}),
@@ -66,22 +69,16 @@ export const TEN_MUC_THAY: Readonly<Record<MaMuc, string>> = { 1: 'Chưa đọc 
 export const TEN_MUC_EM: Readonly<Record<MaMuc, string>> = { 1: 'Nộp trước khi đọc hết đề', 2: 'Đọc xong thì nộp ngay', 3: 'Có thời gian nghĩ', 4: 'Làm kỹ, đúng nhịp lớp' }
 export const tenMucLam = (ma: MaMuc, cheDo: CheDoMuc): string => (cheDo === 'thay' ? TEN_MUC_THAY[ma] : TEN_MUC_EM[ma])
 
-/** Hai tỉ lệ dùng để VẼ ranh giới trên thước — đúng `TI_LE_MUC_1_CAU_ANH` / `TI_LE_LAM_KY` của server/src/muc-lam.ts (test `tests/muc-lam-giao-dien-2110.test.tsx` khớp hai nơi). */
-export const TI_LE_VE_MUC_1_CAU_ANH = 0.5
-export const TI_LE_VE_LAM_KY = 0.8
-
 export const CHU_CHUA_CO_SO_DO = 'Chưa có số đo'
 const GIAI_THICH_CHUA_CO_SO_DO = 'Lượt làm trước khi máy dùng đồng hồ mới, hoặc chưa ghi kích thước đề — chưa xếp Mức làm, không đoán.'
 
-/** Ranh giới bốn mức trên thước (giây) + độ dài thước. Thuần. */
-export function mocThuoc(m: Pick<MucLamLuot, 'giay' | 'giayDoc' | 'sanNghi' | 'thuong' | 'xapXi'>): { bien1: number; bien2: number; bien4: number | null; ketMuc3: number; toiDa: number } {
-  const bien1 = m.xapXi ? m.giayDoc * TI_LE_VE_MUC_1_CAU_ANH : m.giayDoc
-  const bien2 = m.giayDoc + m.sanNghi
-  const bien4 = m.thuong !== undefined ? Math.round(TI_LE_VE_LAM_KY * m.thuong) : null
-  const ketMuc3 = bien4 === null ? 0 : Math.max(bien2, bien4)
-  const cao = bien4 === null ? bien2 : ketMuc3
+/** Ranh giới bốn mức trên thước (giây) + độ dài thước. RANH GIỚI do máy chủ gửi (`ranh2/3/4` — một nguồn với cách xếp mức); ở đây chỉ chọn độ dài thước. Thuần. */
+export function mocThuoc(m: Pick<MucLamLuot, 'giay' | 'ranh2' | 'ranh3' | 'ranh4'>): { bien1: number; bien2: number; bien4: number | null; ketMuc3: number; toiDa: number } {
+  const bien4 = m.ranh4 ?? null
+  const ketMuc3 = bien4 === null ? 0 : Math.max(m.ranh3, bien4)
+  const cao = bien4 === null ? m.ranh3 : ketMuc3
   const toiDa = Math.max(40, Math.ceil(Math.max(m.giay * 1.12, cao * 1.45) / 10) * 10)
-  return { bien1, bien2, bien4, ketMuc3, toiDa }
+  return { bien1: m.ranh2, bien2: m.ranh3, bien4, ketMuc3, toiDa }
 }
 
 /** Ký hiệu bốn vạch (n vạch tô) — dùng được cả khi không phân biệt màu. */

@@ -98,6 +98,22 @@ describe('/gv/ho-so-len-bang — Mức làm từng lần làm câu đang chiếu
     expect(lan[2]!.mucLam!.thuong).toBeUndefined()
   })
 
+  it('Cách làm bài 14 ngày: đếm theo Mức làm (đúng/sai), mẫu số là mọi lượt có kết quả trong 14 ngày; lượt ngoài 14 ngày / đồng hồ cũ không vào mức', async () => {
+    const d = dung()
+    d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Trần An','12','x')")
+    sk(d, 'S1', 'Q1', 0, 10, DOC(20), '2026-10-20T01:00:00Z')               // sai, Mức 1
+    sk(d, 'S1', 'Q2', 1, 8, DOC(20), '2026-10-20T02:00:00Z')                // đúng, Mức 1 (đúng trước khi đọc)
+    sk(d, 'S1', 'Q3', 0, 18, DOC(20), '2026-10-20T03:00:00Z')               // sai, Mức 2
+    sk(d, 'S1', 'Q4', 0, 40, DOC(20), '2026-10-20T04:00:00Z')               // sai, Mức 3
+    sk(d, 'S1', 'Q5', 1, 50, { t: 20, h: 0, p: 'I' }, '2026-10-20T05:00:00Z') // đồng hồ cũ ⇒ chưa có số đo
+    sk(d, 'S1', 'Q6', 0, 12, null, '2026-10-20T06:00:00Z', {})              // không có doc ⇒ chưa có số đo
+    sk(d, 'S1', 'Q7', 0, 10, DOC(20), '2026-08-01T01:00:00Z')               // quá 14 ngày ⇒ không tính
+    const r = await gvHoSoLenBang(d.env as unknown as Env, { sbd: 'S1', qid: 'Q1' }, T0)
+    const c = r.cachLam14 as { soDo: number; chuaCoSoDo: number; theoMuc: { ma: number; luot: number; dung: number; sai: number }[]; saiLamVoi: number; saiDuNghi: number; dungTruocDoc: number; coBetaThat: boolean }
+    expect(c).toMatchObject({ soDo: 4, chuaCoSoDo: 2, saiLamVoi: 2, saiDuNghi: 1, dungTruocDoc: 1, coBetaThat: false })
+    expect(c.theoMuc.map((x) => [x.ma, x.luot, x.dung, x.sai])).toEqual([[1, 2, 1, 1], [2, 1, 0, 1], [3, 1, 0, 1], [4, 0, 0, 0]])
+  })
+
   it('β thật của câu ⇒ Mức 4 + thời gian thường; truy vấn β đúng một lần, và 0 lần khi không lượt nào đủ điều kiện', async () => {
     const d = dung()
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Trần An','12','x')")
