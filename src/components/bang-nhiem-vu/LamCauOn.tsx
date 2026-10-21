@@ -11,6 +11,8 @@ import { LoiGiaiCauSai } from '../KhoiCauSai'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { HinhTaiViTri } from '../QuestionMedia'
 import OSoTraLoi from '../OSoTraLoi'
+import BangNhapSo from '../BangNhapSo'
+import { soOHopLe } from '../../lib/so-o-tra-loi-ngan'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
@@ -520,7 +522,12 @@ function TheCauOn({
           {/* Nhãn NGOÀI khối nhập (không bọc nút trong <label>: bấm chữ nhãn sẽ kích nút "±"). Hai nút "±" và "," (trong ô) cho bàn phím số không có hai dấu ấy. */}
           <div className="lco-nhap">
             <label className="lco-nhap-nhan" htmlFor="lco-dap-an">Đáp án của em (số)</label>
-            <OSoTraLoi id="lco-dap-an" value={dapAn} onChange={onChon} disabled={khoaO} placeholder="Ví dụ 12,5" />
+            {/* Bảng nhập số (thầy 21/10) khi máy chủ gửi số ô; thiếu ⇒ ô nhập tự do như trước. */}
+            {soOHopLe(c.soO) !== null ? (
+              <BangNhapSo id="lco-dap-an" value={dapAn} onChange={onChon} disabled={khoaO} soO={soOHopLe(c.soO)!} />
+            ) : (
+              <OSoTraLoi id="lco-dap-an" value={dapAn} onChange={onChon} disabled={khoaO} placeholder="Ví dụ 12,5" />
+            )}
           </div>
           {/* CẨN THẬN (b): cùng kiểu hàng chọn `lco-lua` (nền/viền M3 sẵn có) — một chạm, KHÔNG bắt buộc; chỉ trước khi nộp. */}
           {onSoat && !daCham && (

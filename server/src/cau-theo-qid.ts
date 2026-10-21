@@ -11,6 +11,7 @@
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { gameIdentity } from './game-v2-auth'
+import { soOPhanIII } from '../../src/lib/so-o-tra-loi-ngan'
 import { protectedQuestions } from './game-v2-bank'
 import { docKhoDeGiaoCuaEm } from './kho-de-giao'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
@@ -127,6 +128,8 @@ export function cauCongKhai(q: PrivateQuestion) {
     mucDo: q.mucDo,
     sao: q.sao,
     kienThuc: q.kienThuc ?? [],
+    // Trả lời ngắn: số ô bảng nhập số (thầy 21/10) — CHỈ con số kí tự, không đáp án. Đáp án bàn phím không gõ được ⇒ không gắn ⇒ ô nhập tự do.
+    ...(() => { const so = q.phan === 'III' ? soOPhanIII(q.correct) : null; return so === null ? {} : { soO: so } })(),
   }
 }
 

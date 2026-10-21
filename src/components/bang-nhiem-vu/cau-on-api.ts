@@ -28,6 +28,8 @@ export interface CauOn {
   mucDo?: 'biet' | 'hieu' | 'van_dung' | null
   sao?: 0 | 1 | 2 | null
   kienThuc?: string[]
+  /** Trả lời ngắn: số ô bảng nhập số (thầy 21/10). Thiếu ⇒ ô nhập tự do. */
+  soO?: number
 }
 
 export interface KetQuaCauOn {

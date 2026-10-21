@@ -100,6 +100,8 @@ import { napDong } from '../lib/nap-manh'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import NutNopBtvn from '../components/NutNopBtvn'
 import OSoTraLoi from '../components/OSoTraLoi'
+import BangNhapSo from '../components/BangNhapSo'
+import { soOHopLe } from '../lib/so-o-tra-loi-ngan'
 import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
 // Mảnh bố cục NGANG (01/10, thầy: "xoay ngang không hoạt động"): trước đây nạp lười NGOÀI precache, nạp hỏng một lần (mạng yếu, hay máy còn
@@ -3580,6 +3582,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 hinhAnh={item.question.hinhAnh}
                 selected={attempt.answers.phanIII[item.qid] ?? null}
                 onChange={(t) => setPhanIII(item.qid, t)}
+                soO={(item.question as { soO?: number }).soO}
                 onZoom={setZoomSrc}
               />,
             )
@@ -3794,7 +3797,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             const f = flat[n - 1]
             if (f?.phan === 'III') setPhanIII(assignment.phanIII[f.i].qid, text)
           }}
-          oDapSo={(o) => <OSoTraLoi chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />}
+          oDapSo={(o) => {
+            // BẢNG NHẬP SỐ (thầy 21/10): câu có số ô trong gói đề ⇒ bảng nhập số; gói ca cũ / đáp án bàn phím không gõ được ⇒ ô tự do như trước.
+            const f = flat[o.stt - 1]
+            const soO = f?.phan === 'III' ? soOHopLe((assignment.phanIII[f.i].question as { soO?: unknown }).soO) : null
+            return soO !== null ? <BangNhapSo value={o.value} onChange={o.onChange} soO={soO} ariaLabel={o.ariaLabel} /> : <OSoTraLoi chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />
+          }}
           onDoiDau={(n) => {
             const f = flat[n - 1]
             if (f) doiDauCau(dsItem(f).qid)

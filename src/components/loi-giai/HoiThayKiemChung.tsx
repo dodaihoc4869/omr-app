@@ -24,7 +24,7 @@ function TheKiem({ cau, gia, khoa, doi }: { cau: CauKiemChung; gia: string; khoa
   const chung = { cheDo: 'thi' as const, stt: 1, tieuDe: 'Câu tương đương', text: cau.text, table: cau.table, hinhAnh: cau.hinhAnh, thanCauImg: cau.thanCauImg, imageDataUrl: cau.imageDataUrl }
   if (cau.phan === 'I') return <TheCau {...chung} phan="I" choices={cau.choices!} choiceImgs={cau.choiceImgs} choicePerm={[0, 1, 2, 3]} selected={gia ? gia as 'A' | 'B' | 'C' | 'D' : null} onSelect={khoa ? undefined : doi} />
   if (cau.phan === 'II') return <TheCau {...chung} phan="II" ideas={cau.ideas!} ideaImgs={cau.ideaImgs} selected={[0, 1, 2, 3].map((i) => gia[i] === 'D' || gia[i] === 'S' ? gia[i] as 'D' | 'S' : null)} onSelect={khoa ? undefined : (i, v) => { const ds = [...(gia || '____')]; ds[i] = v; doi(ds.join('')) }} />
-  return <TheCau {...chung} phan="III" selected={gia} onChange={doi} khoaO={khoa} />
+  return <TheCau {...chung} phan="III" soO={(cau as { soO?: number }).soO} selected={gia} onChange={doi} khoaO={khoa} />
 }
 function cauHopLe(r: Extract<MoKiemChung, { trangThai: 'co_cau' }>): boolean {
   const c = r.cau

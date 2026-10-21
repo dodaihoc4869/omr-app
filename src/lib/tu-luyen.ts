@@ -11,6 +11,7 @@
 import type { LoiGiaiCauTruc } from '../data/examContent'
 import type { CauLuyen, HinhCau } from './bai-tap-pdf'
 import { khopPhanIII } from './cham-so'
+import { soOPhanIII } from './so-o-tra-loi-ngan'
 
 export type CheDoTuLuyen = 1 | 2 | 3 | 4
 export type PhanCau = 'I' | 'II' | 'III'
@@ -48,6 +49,8 @@ export interface CauCongKhai {
   saiGoc?: string
   /** Chế độ 1 (ôn cách quãng v3): "Còn 1 lần đúng nữa là khắc phục" khi câu đã đúng lần 1. */
   conMotLan?: string
+  /** Trả lời ngắn: số ô bảng nhập số (thầy 21/10) — chỉ con số, không đáp án. Thiếu ⇒ ô nhập tự do. */
+  soO?: number
 }
 
 /** Phần RIÊNG của câu — chỉ nằm trên máy chủ tới lúc em nộp. */
@@ -137,6 +140,10 @@ export function cauCongKhaiTu(c: CauLuyen, tenDang: string): CauCongKhai {
   if (c.anhLuaChon && c.anhLuaChon.some(Boolean)) ra.anhLuaChon = [...c.anhLuaChon]
   if (c.hinh && c.hinh.length) ra.hinh = c.hinh.map((h) => ({ src: h.src, viTri: h.viTri, ...(h.alt ? { alt: h.alt } : {}) }))
   if (c.bang && c.bang.length) ra.bang = c.bang
+  if (c.phan === 'III') {
+    const soO = soOPhanIII(c.dapAn)
+    if (soO !== null) ra.soO = soO
+  }
   return ra
 }
 

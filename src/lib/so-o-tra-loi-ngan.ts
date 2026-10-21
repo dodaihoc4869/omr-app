@@ -44,6 +44,13 @@ export function soOPhanIII(correct: unknown): number | null {
   return x === null || x.length > TRAN_O ? null : x.length
 }
 
+/** Số ô HỢP LỆ máy chủ / gói đề gửi kèm (số nguyên 1..TRAN_O) — thiếu hoặc lạ ⇒ null. Khác `soOCuaCau`: KHÔNG tự về 4, vì ở màn kiểm tra
+ *  (gói ca mở trước bản có trường này, hoặc câu bàn phím số không gõ được) phải giữ ô nhập tự do — về 4 là lặp lỗi "10000 ⇒ 1000" (15/10). */
+export function soOHopLe(v: unknown): number | null {
+  const n = typeof v === 'number' || typeof v === 'string' ? Number(v) : NaN
+  return Number.isInteger(n) && n >= 1 && n <= TRAN_O ? n : null
+}
+
 /** Số ô máy học sinh dùng: số máy chủ gửi kèm câu (số nguyên 1..TRAN_O) hoặc 4 như phiếu khi thiếu. Giá trị lạ ⇒ 4. */
 export function soOCuaCau(q: { soO?: unknown } | null | undefined): number {
   const v = q?.soO

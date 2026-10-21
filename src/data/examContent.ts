@@ -1,4 +1,5 @@
 import type { NhanKhoHanhTrinh } from '../lib/hanh-trinh-nhan'
+import { soOPhanIII } from '../lib/so-o-tra-loi-ngan'
 // Ngân hàng câu hỏi: thầy tải lên BAO NHIÊU đề tuỳ ý (mỗi đề có thể nhiều câu
 // hơn mức cần dùng), app GỘP lại thành 1 ngân hàng rồi RANDOM CHỌN + xáo thứ
 // tự cho từng học sinh — mỗi em nhận một tập câu khác nhau hoàn toàn, không
@@ -164,6 +165,9 @@ export interface ShortAnswerQuestion extends QuestionMedia {
   id: string
   text: string
   thanCauImg?: string
+  /** SỐ Ô của bảng nhập số (thầy 21/10: "mọi chỗ trả lời ngắn, kể cả màn kiểm tra … tuỳ theo đáp số mà hiện số ô"): đúng số kí tự đáp số gõ chuẩn
+   *  (`soOPhanIII`). CHỈ con số, không đáp án. Thiếu (gói ca cũ / đáp án bàn phím số không gõ được) ⇒ màn giữ ô nhập tự do. */
+  soO?: number
 }
 export interface TeacherShortAnswerQuestion extends ShortAnswerQuestion, LoiGiaiMeta {
   correct: string
@@ -271,7 +275,13 @@ export function mergeAndStrip(sources: TeacherExamSource[], soCau?: SoCauMoiPhan
     phanII: sources.flatMap((s) =>
       s.phanII.map(({ id, text, ideas, table, imageDataUrl, hinhAnh, thanCauImg, ideaImgs, canXem }) => ({ id, text, ideas, table, imageDataUrl, hinhAnh, thanCauImg, ideaImgs, canXem })),
     ),
-    phanIII: sources.flatMap((s) => s.phanIII.map(({ id, text, table, imageDataUrl, hinhAnh, thanCauImg, canXem }) => ({ id, text, table, imageDataUrl, hinhAnh, thanCauImg, canXem }))),
+    phanIII: sources.flatMap((s) =>
+      s.phanIII.map(({ id, text, table, imageDataUrl, hinhAnh, thanCauImg, canXem, correct }) => {
+        // Số ô bảng nhập số: chỉ con số (thầy 21/10), đáp án vẫn bị xoá. Đáp án bàn phím không gõ được ⇒ không gắn ⇒ ô nhập tự do.
+        const soO = soOPhanIII(correct)
+        return { id, text, table, imageDataUrl, hinhAnh, thanCauImg, canXem, ...(soO === null ? {} : { soO }) }
+      }),
+    ),
   }
 }
 
