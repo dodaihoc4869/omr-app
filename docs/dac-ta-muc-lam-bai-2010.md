@@ -194,9 +194,9 @@ Bảng màu: Mức làm 1→4 là MỘT dải màu theo độ đậm (không đ�
 
 ### 10b. Cờ nguồn đồng hồ `doc.dh` (21/10, PR 4) — đọc trước khi tính Mức làm từ dữ liệu thật
 - Phát hành Đợt 1 (Worker `2c7ff01`, 21/10 ≈ 01:33 VN) ghi `giay` cho game từ MỘT trong hai nguồn mà chưa đánh dấu: (a) cụm `doGiay.g` của đồng hồ MỚI (dừng khi tab ẩn, 180 s không chạm); (b) `msLam` của máy em bản CŨ (đồng hồ tường, chạy cả khi tab ẩn, trần 900 s). Máy em chỉ nạp bản mới khi mở lại app, nên hai nguồn lẫn nhau trong cùng cột.
-- PR 4 thêm `raw_json.doc.dh = 1` CHỈ khi giây đến từ `doGiay` hợp lệ; giây suy từ `msLam` thì KHÔNG có `dh`. Quy tắc đọc: `doc.dh = 1` ⇒ đồng hồ mới (dùng được cho Mức làm); dòng game có `giay` mà không `dh` ⇒ đồng hồ cũ hoặc không rõ — KHÔNG xếp Mức 1–2 từ giây này (dễ nhiễm tab ẩn), chỉ dùng làm chặn trên thô.
+- PR 4 thêm `raw_json.doc.dh = 1` CHỈ khi giây đến từ `doGiay` hợp lệ; giây suy từ `msLam` thì KHÔNG có `dh`. Quy tắc đọc: `doc.dh = 1` ⇒ đồng hồ mới (dùng được cho Mức làm); dòng game có `giay` mà không `dh` ⇒ đồng hồ cũ hoặc không rõ. Đồng hồ cũ (tường) chỉ có thể ĐO DƯ (cộng cả lúc tab ẩn), không bao giờ đo thiếu ⇒ giây cũ nhỏ hơn thời gian đọc hết đề thì Mức làm 1 vẫn CHẮC; Mức làm 2–3 chỉ là ước tính (thật có thể thấp hơn); không bao giờ Mức làm 4. Cách hiện: xem §12.
 - Dòng ghi giữa 01:33 VN (Worker `2c7ff01`) và 06:44:15 VN 21/10 (Worker PR 4, main `299a873`, Actions `39516150163`) không có `dh` kể cả khi từ đồng hồ mới ⇒ coi là "không rõ".
-- Không UPDATE bù dòng cũ (quyết định 21/10): dòng cũ không có giây đo thật để bù; kích thước đề của dòng có giây (thi, chữa lỗi) sẽ TÍNH LÚC ĐỌC từ nội dung câu khi làm Đợt 2, không ghi đè dữ liệu thật.
+- Không UPDATE bù dòng cũ (quyết định 21/10): dòng cũ không có giây đo thật để bù; kích thước đề của dòng cũ không ghi đè vào dữ liệu thật mà nằm ở bảng dẫn xuất `cau_doc_giay` (§12).
 - Công cụ: `.github/workflows/do-phu-giay-2110.yml` có thêm cột `dong_ho_moi`, phân bố theo `dh`, và truy vấn 4 (so lượt ≥ 600 s giữa hai đồng hồ — nếu đồng hồ cũ nhiễm tab ẩn thì tỉ lệ ≥ 600 s của nhóm không `dh` cao hơn rõ).
 
 
@@ -220,3 +220,17 @@ Khác bản vẽ: biểu đồ cột "nơi sai / ngày sai" của bản vẽ kh�
 **Màu:** dải xanh Mức làm 1→4 đúng bản thầy duyệt 20/10; chín biến gốc của hai bảng khai MỘT chỗ, mọi màu MỚI còn lại là `var()`/`color-mix()` (màu thô cũ giữ nguyên đúng số lần; thêm dùng thô là cổng bắt); khai báo màu của bản cũ biến mất theo lệnh thầy 21/10 (danh sách đóng `docs/mau-thay-ra-lenh-2110.json`, đọc bởi `scripts/kiem-mau-giu-nguyen.mjs`).
 
 **Giả định đã dùng (thầy sửa được):** (1) "bấm làm lại" ở tin nhắn thầy = bấm X trên tờ chiếu của câu đang chiếu; (2) "đã điểm danh" lấy từ bước Điểm danh của buổi đang chiếu, "cả lớp" = danh sách em của lớp đó; (3) số liệu trong ảnh là số giả (tên giả, ngưỡng 24 / 6 / 60 giây).
+
+## 12. Đo lại lượt cũ (thầy 21/10: "phải đo hết tất cả lượt hs đã làm", "phải tìm cách đo lại hết") — ĐÃ XÂY
+
+**Nguyên tắc:** không bịa số. Chỉ xếp Mức làm cho lượt cũ khi có MỘT số giây có căn cứ + kích thước đề của câu; số giây này luôn kèm dấu **≈** và chỉ có thể **dư** (không thể thiếu), nên mức chỉ có thể bị xếp CAO hơn thật, không bao giờ Mức làm 4.
+
+**Hai loại giây cũ (`mucLam.uocTinh`):**
+- `cu` — đồng hồ cũ đã ghi sẵn: cột `giay` của ca thi cũ, `raw_json.ms` của lượt game/lượt làm bài cũ, cột `giay` của lượt có `giay` mà không có `doc.dh`. Đồng hồ tường: dư khi tab ẩn.
+- `uoc` — chưa từng bấm giờ nhưng có mốc trả lời: giây = khoảng cách từ lần trả lời liền trước CÙNG nhóm (`nguon` + `ma_nguon`: cùng phiên ôn lại, tự luyện, game…), chỉ nhận 1–900 giây. Khoảng cách 0 (nộp cả lô), lượt đầu nhóm, khoảng cách > 900 giây (nghỉ giữa chừng) ⇒ KHÔNG ước tính. Khoảng cách luôn ≥ thời gian làm câu ⇒ dư.
+
+**Kích thước đề (`cau_doc_giay`):** bảng dẫn xuất `qid → số từ, có hình, phần`, tính bằng đúng `noiDungTuCauGoc` (một định nghĩa với đường ghi `doc` và màn lên bảng) trên câu rút gọn (không đọc ảnh / lời giải — sự cố 14/10). Cron mỗi phút lấp dần mỗi lượt 20 câu (giờ cao điểm) / 120 câu; câu không tính được ghi dòng dấu `phan = '?'`. Migration chỉ-thêm: `server/migration-z-2110-cau-doc-giay.sql`. Bảng chưa có / câu chưa tính ⇒ lượt cũ vẫn "Chưa có số đo" như trước, hồ sơ không bao giờ lỗi vì bảng này. Đường đọc thêm MỘT lệnh `SELECT` cùng đợt (mốc tốc độ +1 lệnh, số đợt không đổi).
+
+**Hiện ở đâu:** Hồ sơ làm bài (thầy · học sinh · phụ huynh): chip "≈ Mức làm N", dòng "≈ 12 giây · đọc hết đề cần 24 giây", ghi chú loại giây (thầy), tổng "Đo được N/M" kèm số lượt ≈ · tờ chiếu "Ai đã sai?": thẻ tên "≈ 26 giây" nằm đúng làn Mức làm · chi tiết em lên bảng: lần gần nhất + từng lần + "Cách làm bài 14 ngày". Bản học sinh vẫn ẩn lượt ĐÚNG ở Mức làm 1–2.
+
+**Con số thật (đo trên D1 thật, workflow `do-phu-giay-lich-su-2110.yml`, 21/10):** khoảng 240 nghìn lượt có kết quả; xếp lại được khoảng 158 nghìn (≈ 66%); khoảng 82 nghìn (≈ 34%) KHÔNG đo lại được vì nộp cả lô (BTVN, ôn lại/tự luyện/BTVN lỡ nộp một lúc), mở bài, luyện đề, khắc phục — không có giây, không có khoảng cách: không bịa. Từ khi máy em nạp bản mới, các nguồn có đồng hồ mới sẽ có số đo chắc (không ≈).

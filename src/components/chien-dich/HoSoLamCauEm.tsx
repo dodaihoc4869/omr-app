@@ -301,7 +301,7 @@ function OCauSai({ c, lan, onChua, cheDo }: { c: CauEmSai; lan: readonly LanLamC
       {mucGanNhat && (
         <span className="hslc-o-muc">
           <span className="hslc-giay-nhan">Lần gần nhất:</span>{' '}
-          <ChipMuc ma={mucGanNhat.ma} cheDo={cheDo} dai />
+          <ChipMuc ma={mucGanNhat.ma} cheDo={cheDo} dai uoc={!!mucGanNhat.uocTinh} />
         </span>
       )}
       {onChua && (

@@ -11,6 +11,7 @@ import { loaiGameCua } from './dau-gio'
 import { cacQidSongSinh, tachSongSinh } from './loi-hoc-luat'
 import { docBetaCau } from './omni-d1'
 import type { MucLamLuot } from './muc-lam'
+import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
 import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong } from './muc-lam-so'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
 
@@ -133,28 +134,35 @@ export async function aiSaiCau(env: Env, b: Row): Promise<Row> {
     return { doMuc: docDoMuc(doc ? { doc } : null), giayDo: doThat[i] ?? null, goc: tachSongSinh(str(x.tc) || str(x.qid)).goc, mucDo: chuanMucDo(x.muc_do), dung: false as boolean | null }
   })
   const gocMuc = gocCanBeta(dongMuc)
-  const [loai, uoc, ct, beta] = await Promise.all([
+  // ĐO LẠI LƯỢT CŨ (21/10): kích thước đề (bảng tính sẵn) của các câu mà lượt chưa có `doc` — MỘT lệnh đọc CÙNG đợt; lỗi / bảng chưa có ⇒ rỗng (lượt cũ vẫn "Chưa có số đo").
+  const gocCanKichThuoc = [...new Set(dongMuc.filter((d) => !d.doMuc && d.goc).map((d) => d.goc))]
+  const [loai, uoc, ct, beta, kichThuoc] = await Promise.all([
     loaiGameCua(env, dongGame.map((x) => x.phien)).catch(() => new Map<string, 'doan' | 'bia' | 'dao'>()),
     giayUocTinhGame(env, gameThieu).catch(() => new Map<string, number>()),
     chiTietCauCuaLuot(env, thiThieu.map((x) => str(x.ma_nguon)), thiThieu.map((x) => str(x.sbd)), thiThieu.map((x) => str(x.qid))).catch(() => new Map<string, { chon: string | null; giay: number | null }>()),
     gocMuc.length ? docBetaCau(env, gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    gocCanKichThuoc.length ? docKichThuocCau(env, gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
   ])
   const ds: LuotSai[] = rows.map((x, i) => {
     const nguon = str(x.nguon)
     const noi = nguon === 'thi' ? noiCuaCa(str(x.ten_ca)) : tenNguonNgan(nguon, nguon === 'game' ? (loai.get(str(x.ma_nguon)) ?? 'dao') : null)
     const chung = { sbd: str(x.sbd), ten: str(x.ten) || str(x.sbd), luc: str(x.luc), noi }
     const g = doThat[i]
+    // Lượt có `doc` mới ⇒ số đo chắc; không có ⇒ giây CŨ ('cu') hoặc ƯỚC TÍNH ('uoc') + kích thước đề tính sẵn ⇒ Mức làm với cờ `uocTinh` (không Mức 4) — `mucLamTuDong`.
+    const cu = (giay: number, loaiCu: 'cu' | 'uoc') => mucLamTuDong({ ...dongMuc[i]!, giayCu: giay, loaiCu }, beta, kichThuoc)
     if (g !== null && g !== undefined) {
-      const muc = mucLamTuDong(dongMuc[i]!, beta)
+      const muc = dongMuc[i]!.doMuc ? mucLamTuDong(dongMuc[i]!, beta) : cu(g, 'cu')
       return { ...chung, giay: g, ...(muc ? { mucLam: muc } : {}) }
     }
     if (nguon === 'thi') {
       const k = `${str(x.ma_nguon)}|${str(x.sbd)}|${str(x.qid)}`
       const c = ct.get(`${k}|${Number(x.lan) || 1}`) ?? ct.get(`${k}|*`)
-      return { ...chung, giay: c?.giay ?? null }
+      const muc = c?.giay != null ? cu(c.giay, 'cu') : null
+      return { ...chung, giay: c?.giay ?? null, ...(muc ? { mucLam: muc } : {}) }
     }
     const u = nguon === 'game' ? uoc.get(`${str(x.ma_nguon)}|${Date.parse(str(x.luc))}`) : undefined
-    return { ...chung, giay: u ?? null, ...(u !== undefined ? { uocTinh: true } : {}) }
+    const muc = u !== undefined ? cu(u, 'uoc') : null
+    return { ...chung, giay: u ?? null, ...(u !== undefined ? { uocTinh: true } : {}), ...(muc ? { mucLam: muc } : {}) }
   })
   ds.sort((a, b2) => a.ten.localeCompare(b2.ten, 'vi') || (a.luc < b2.luc ? 1 : a.luc > b2.luc ? -1 : 0))
   return { ok: true, ds, soEm: new Set(ds.map((x) => x.sbd)).size, conNua }

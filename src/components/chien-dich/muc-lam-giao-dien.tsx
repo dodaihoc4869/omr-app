@@ -27,6 +27,7 @@ export function docMucLam(x: unknown): MucLamLuot | undefined {
     ...(ranh4 !== null && ranh4 >= 0 ? { ranh4 } : {}),
     ...(thuong !== null && thuong > 0 ? { thuong } : {}),
     ...(o.xapXi === true ? { xapXi: true as const } : {}),
+    ...(o.uocTinh === 'cu' || o.uocTinh === 'uoc' ? { uocTinh: o.uocTinh } : {}),
     ...(o.ghiChu === 'dung_truoc_doc' ? { ghiChu: 'dung_truoc_doc' as const } : {}),
   }
 }
@@ -44,7 +45,7 @@ export function docTongMucLam(x: unknown): TongMucLam | undefined {
   })
   const soDo = so(o.soDo), chuaCoSoDo = so(o.chuaCoSoDo), saiLamVoi = so(o.saiLamVoi), saiDuNghi = so(o.saiDuNghi), dungTruocDoc = so(o.dungTruocDoc)
   if (dong.some((d) => d === null) || soDo === null || chuaCoSoDo === null || saiLamVoi === null || saiDuNghi === null || dungTruocDoc === null) return undefined
-  return { soDo, chuaCoSoDo, theoMuc: dong as TongMucLam['theoMuc'], saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat: o.coBetaThat === true }
+  return { soDo, chuaCoSoDo, theoMuc: dong as TongMucLam['theoMuc'], saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat: o.coBetaThat === true, soUocTinh: Math.min(soDo, Math.max(0, so(o.soUocTinh) ?? 0)) }
 }
 
 /** Kiểm khung `mucLam` của cả kết quả lịch sử: lượt / tổng sai khung ⇒ bỏ (không bịa). Không có mức ở đâu ⇒ trả NGUYÊN đối tượng. */
@@ -70,7 +71,10 @@ export const TEN_MUC_EM: Readonly<Record<MaMuc, string>> = { 1: 'Nộp trước 
 export const tenMucLam = (ma: MaMuc, cheDo: CheDoMuc): string => (cheDo === 'thay' ? TEN_MUC_THAY[ma] : TEN_MUC_EM[ma])
 
 export const CHU_CHUA_CO_SO_DO = 'Chưa có số đo'
-const GIAI_THICH_CHUA_CO_SO_DO = 'Lượt làm trước khi máy dùng đồng hồ mới, hoặc chưa ghi kích thước đề — chưa xếp Mức làm, không đoán.'
+const GIAI_THICH_CHUA_CO_SO_DO = 'Lượt không có số giây đáng tin (nộp cả lô, chưa từng bấm giờ) hoặc câu chưa tính kích thước đề — chưa xếp Mức làm, không đoán.'
+/** Giải thích dấu "≈": số giây lấy từ đồng hồ cũ / ước tính, chỉ có thể DƯ (không thể thiếu) ⇒ mức có thể thấp hơn, không bao giờ Mức làm 4. */
+export const GIAI_THICH_UOC_TINH = 'Số giây từ đồng hồ cũ hoặc ước tính từ khoảng cách giữa hai lần trả lời — có thể cao hơn thật, nên mức chỉ là ước tính và không xếp Mức làm 4.'
+const NHAN_UOC_TINH: Readonly<Record<'cu' | 'uoc', string>> = { cu: 'Giây đo bằng đồng hồ cũ, có thể dư.', uoc: 'Giây ước tính từ khoảng cách hai lần trả lời liên tiếp, có thể dư.' }
 
 /** Ranh giới bốn mức trên thước (giây) + độ dài thước. RANH GIỚI do máy chủ gửi (`ranh2/3/4` — một nguồn với cách xếp mức); ở đây chỉ chọn độ dài thước. Thuần. */
 export function mocThuoc(m: Pick<MucLamLuot, 'giay' | 'ranh2' | 'ranh3' | 'ranh4'>): { bien1: number; bien2: number; bien4: number | null; ketMuc3: number; toiDa: number } {
@@ -93,12 +97,14 @@ export function PipMuc({ n }: { n: MaMuc }) {
   )
 }
 
-/** Chip "Mức làm N" (+ tên mức khi `dai`). */
-export function ChipMuc({ ma, cheDo, dai = false }: { ma: MaMuc; cheDo: CheDoMuc; dai?: boolean }) {
+/** Chip "Mức làm N" (+ tên mức khi `dai`). `uoc` = mức xếp từ giây cũ / ước tính ⇒ "≈ Mức làm N" (dấu ≈ là chữ, không dựa vào màu). */
+export function ChipMuc({ ma, cheDo, dai = false, uoc = false }: { ma: MaMuc; cheDo: CheDoMuc; dai?: boolean; uoc?: boolean }) {
   return (
-    <span className="hslc-chip-m" data-m={ma}>
+    <span className="hslc-chip-m" data-m={ma} {...(uoc ? { 'data-uoc': '', title: GIAI_THICH_UOC_TINH } : {})}>
       <PipMuc n={ma} />
-      <b>Mức làm {ma}</b>
+      <b>
+        {uoc ? '≈ ' : ''}Mức làm {ma}
+      </b>
       {dai && (
         <>
           {' '}
@@ -128,7 +134,7 @@ export function ThuocMuc({ m }: { m: MucLamLuot }) {
     [3, k.bien2, k.bien4 === null ? k.toiDa : k.ketMuc3],
     ...(k.bien4 === null ? [] : ([[4, k.ketMuc3, k.toiDa]] as [MaMuc, number, number][])),
   ]
-  const ten = `Làm ${m.giay} giây; đọc hết đề cần ${m.xapXi ? 'khoảng ' : ''}${m.giayDoc} giây; có thời gian nghĩ từ ${k.bien2} giây${k.bien4 !== null ? `; làm kỹ từ ${k.bien4} giây` : ''}`
+  const ten = `Làm ${m.uocTinh ? 'khoảng ' : ''}${m.giay} giây; đọc hết đề cần ${m.xapXi ? 'khoảng ' : ''}${m.giayDoc} giây; có thời gian nghĩ từ ${k.bien2} giây${k.bien4 !== null ? `; làm kỹ từ ${k.bien4} giây` : ''}`
   return (
     <span className="hslc-thuoc-m" role="img" aria-label={ten}>
       <span className="hslc-thuoc-m-z">
@@ -142,9 +148,9 @@ export function ThuocMuc({ m }: { m: MucLamLuot }) {
   )
 }
 
-/** Dòng chữ dưới chip: "14 giây · đọc hết đề cần 23 giây" (câu chỉ ảnh: "≈"). */
-export function chuGiayVaDoc(m: Pick<MucLamLuot, 'giay' | 'giayDoc' | 'xapXi'>): string {
-  return `${m.giay} giây · đọc hết đề cần ${m.xapXi ? '≈ ' : ''}${m.giayDoc} giây`
+/** Dòng chữ dưới chip: "14 giây · đọc hết đề cần 23 giây" (câu chỉ ảnh: "≈"; giây cũ / ước tính: "≈ 14 giây"). */
+export function chuGiayVaDoc(m: Pick<MucLamLuot, 'giay' | 'giayDoc' | 'xapXi' | 'uocTinh'>): string {
+  return `${m.uocTinh ? '≈ ' : ''}${m.giay} giây · đọc hết đề cần ${m.xapXi ? '≈ ' : ''}${m.giayDoc} giây`
 }
 
 /** Phần Mức làm của MỘT dòng lịch sử: dòng giây + thước (+ ghi chú đúng-trước-khi-đọc, chỉ thầy — máy chủ không gửi cho em / phụ huynh). */
@@ -152,10 +158,11 @@ export function MucCuaLuot({ m, cheDo }: { m: MucLamLuot; cheDo: CheDoMuc }) {
   return (
     <span className="hslc-muc-luot">
       <span className="hslc-muc-luot-dong">
-        <ChipMuc ma={m.ma} cheDo={cheDo} dai />{' '}
+        <ChipMuc ma={m.ma} cheDo={cheDo} dai uoc={!!m.uocTinh} />{' '}
         <span className="hslc-muc-luot-so gvv2-so">{chuGiayVaDoc(m)}</span>
       </span>
       <ThuocMuc m={m} />
+      {cheDo === 'thay' && m.uocTinh && <span className="hslc-muc-luot-ghi">{NHAN_UOC_TINH[m.uocTinh]}</span>}
       {cheDo === 'thay' && m.ghiChu === 'dung_truoc_doc' && <span className="hslc-muc-luot-ghi">Đúng trước khi đọc hết đề: ghi chú riêng, không tính là vội.</span>}
     </span>
   )
@@ -190,7 +197,7 @@ export function CachTinhMuc() {
       <summary className="tt-nhan">Cách tính Mức làm</summary>
       <p>
         Thời gian đọc hết đề tính theo độ dài câu: 8 giây + 0,35 giây mỗi từ + 10 giây nếu có hình. Mức làm 1: giây làm ít hơn thời gian đọc hết đề. Mức làm 2: đã đọc xong nhưng chưa đủ thời gian nghĩ (sàn nghĩ theo phần: phần I 6 giây,
-        phần II 12 giây, phần III 15 giây). Mức làm 3: có thời gian nghĩ. Mức làm 4: làm từ 0,8 lần thời gian thường của lớp ở câu ấy — chỉ xếp khi lớp đã đủ mẫu của câu. Chỉ lượt đo bằng đồng hồ mới có mức; lượt cũ ghi “Chưa có số đo”, không đoán.
+        phần II 12 giây, phần III 15 giây). Mức làm 3: có thời gian nghĩ. Mức làm 4: làm từ 0,8 lần thời gian thường của lớp ở câu ấy — chỉ xếp khi lớp đã đủ mẫu của câu. Lượt đo bằng đồng hồ mới cho mức chắc chắn. Lượt cũ có số giây từ đồng hồ cũ, hoặc ước tính từ khoảng cách giữa hai lần trả lời liên tiếp, xếp kèm dấu ≈ (số giây chỉ có thể dư, nên tối đa Mức làm 3). Lượt nộp cả lô hoặc chưa từng bấm giờ ghi “Chưa có số đo”, không đoán.
       </p>
     </details>
   )
@@ -298,6 +305,11 @@ export function KhoiCachLamBai({ tong, cheDo, ngoi, soSaiTong }: PropsCachLamBai
             </span>
           </p>
         </div>
+        {tong.soUocTinh > 0 && (
+          <p className="hslc-ghi" data-uoc="">
+            {tong.soUocTinh} lượt xếp từ số giây đồng hồ cũ hoặc ước tính (≈): số giây có thể cao hơn thật nên mức chỉ là ước tính, không xếp Mức làm 4.
+          </p>
+        )}
         {tong.dungTruocDoc > 0 && <p className="hslc-ghi">{tong.dungTruocDoc} lượt đúng nộp trước khi đọc hết đề. Chỉ ghi chú, không tính là vội.</p>}
         {!tong.coBetaThat && <p className="hslc-ghi">Lớp chưa đủ mẫu của các câu này để xếp Mức làm 4.</p>}
         <CachTinhMuc />
@@ -322,8 +334,9 @@ export function KhoiCachLamBai({ tong, cheDo, ngoi, soSaiTong }: PropsCachLamBai
           ))}
         </ul>
         <p className="hslc-ghi">
-          Đo được {soSaiCoMuc}/{mau} lượt sai.{mau > soSaiCoMuc ? ` ${mau - soSaiCoMuc} lượt sai chưa có số đo (làm trước khi máy dùng đồng hồ mới).` : ''}
+          Đo được {soSaiCoMuc}/{mau} lượt sai.{mau > soSaiCoMuc ? ` ${mau - soSaiCoMuc} lượt sai chưa có số đo (chưa có số giây đáng tin để xếp).` : ''}
         </p>
+        {tong.soUocTinh > 0 && <p className="hslc-ghi" data-uoc="">Lượt có dấu ≈ lấy số giây từ đồng hồ cũ hoặc ước tính, có thể cao hơn thật.</p>}
       </>
     )
   }
