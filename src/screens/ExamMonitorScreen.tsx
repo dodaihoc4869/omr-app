@@ -19,7 +19,7 @@ import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
 import { dongSoCauHoiLai } from '../lib/dem-cau-hoi-lai'
 import { maCaLay, vaBienBanCu } from '../lib/va-bien-ban-cu'
-import { sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
+import { khoChiVuaMotBo, sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { loiKhongTimThayCa } from '../lib/cau-chu-ca'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
@@ -1266,7 +1266,9 @@ export default function ExamMonitorScreen() {
         const dsCho = (chiTiet.dsCho ?? []).map((x) => x.sbd).filter(Boolean)
         const kho = teacherBank ?? []
         const sc = soCauCa
-        if (dsCho.length >= 2 && kho.length > 0 && sc && sc.I + sc.II + sc.III > 0) {
+        // Kho chỉ vừa một bộ (ca Cả lớp cùng một đề) ⇒ KHÔNG dựng bản đồ: ai cũng nhận đủ kho, còn bản đồ
+        // thì tắt đảo thứ tự câu. Không bản đồ ⇒ máy em đảo thứ tự câu + A–D theo `maCa:sbd` (sửa 21/10).
+        if (dsCho.length >= 2 && kho.length > 0 && sc && sc.I + sc.II + sc.III > 0 && !khoChiVuaMotBo(kho, sc)) {
           try {
             const ra = sinhBoTheoEm(kho, dsCho, sc, chiTiet.ca.maCa)
             if (Object.keys(ra.boTheoEm).length > 0) {

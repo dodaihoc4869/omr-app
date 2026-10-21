@@ -18,6 +18,15 @@ import { doTrung, lechTanSuat, sinhBoMotO } from './de-rieng-tran-trung'
 
 export type TenPhan = 'I' | 'II' | 'III'
 
+/** KHO CHỈ VỪA MỘT BỘ: mỗi phần có không quá số câu mỗi em làm ⇒ em nào cũng nhận ĐỦ cả kho,
+ * chia bản đồ chặn trùng là vô nghĩa (trùng luôn 100%) mà còn TẮT đảo thứ tự câu — có bản đồ thì
+ * máy em giữ thứ tự kho (exam-assign.ts). Ca "Cả lớp cùng một đề" từ 21/10 luôn rơi vào đây, nên
+ * màn Theo dõi bỏ qua bản đồ để mỗi em được đảo thứ tự câu theo `maCa:sbd` như ca không phòng chờ. */
+export function khoChiVuaMotBo(nguon: TeacherExamSource[], soCau: SoCauMoiPhan): boolean {
+  const dem = (lay: (s: TeacherExamSource) => { id: string }[]) => new Set(nguon.flatMap((s) => lay(s).map((q) => q.id))).size
+  return dem((s) => s.phanI) <= soCau.I && dem((s) => s.phanII) <= soCau.II && dem((s) => s.phanIII) <= soCau.III
+}
+
 export interface OBlueprint {
   /** Khoá ô, dùng làm seed và để báo cáo: `I|Ester – lipid|hieu`. */
   khoa: string

@@ -401,11 +401,11 @@ describe('HAI NÚT PHẠM VI + BẢN ĐỒ SAI DỰNG SẴN', () => {
   const KHOI = doc('src/components/KhoiRutDe.tsx')
 
   // 29/09 (đặc tả mục C): thêm nút thứ ba "Không rút câu sai" — hai nút cũ giữ nguyên, mặc định vẫn ca gần nhất.
-  it('màn Mở ca có hai nút cũ + "Không rút câu sai", mặc định là ca gần nhất', () => {
-    expect(KHOI).toContain('MOI_PHAM_VI_HOI_LAI.map')
-    // ĐỔI CÓ CHỦ Ý 02/10 (thầy: gộp "Ca gần nhất" + "3 ca ngẫu nhiên" — rút đề v2 lấy câu sai từ hàng chữa lỗi chung, hai nút cho cùng kết quả)
-    expect(doc('src/lib/cau-hinh-de-rieng.ts')).toContain("MOI_PHAM_VI_HOI_LAI: readonly PhamViHoiLai[] = ['gan_nhat', 'khong']")
-    expect(KHOI).toContain('TEN_PHAM_VI_HOI_LAI[v]')
+  // ĐỔI CÓ CHỦ Ý 21/10 (thầy chốt): hai nút phạm vi thành MỘT công tắc "Có câu chữa lỗi" — bật = gan_nhat (mặc định), tắt = khong.
+  it('màn Mở ca có công tắc "Có câu chữa lỗi", mặc định bật = ca gần nhất', () => {
+    expect(KHOI).toContain('aria-label="Có câu chữa lỗi"')
+    expect(KHOI).toContain("deRieng && !coCauChuaLoi ? 'khong' : 'gan_nhat'")
+    expect(doc('src/screens/ExamSetupScreen.tsx')).toContain('const [coCauChuaLoi, setCoCauChuaLoi] = useState(true)')
     expect(doc('src/lib/cau-hinh-de-rieng.ts')).toContain("PHAM_VI_HOI_LAI: 'gan_nhat',")
   })
 

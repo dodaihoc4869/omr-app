@@ -19,7 +19,7 @@ const THAN = MAN.slice(MAN.indexOf('const batDauCaNay = async () => {'), MAN.ind
 
 describe('chỗ nối nằm đúng ở nút Bắt đầu', () => {
   it('gọi thuật toán trong `batDauCaNay`, không phải lúc mở ca', () => {
-    expect(MAN).toContain("import { sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'")
+    expect(MAN).toContain("import { khoChiVuaMotBo, sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'")
     expect(THAN).toContain('sinhBoTheoEm(kho, dsCho, sc, chiTiet.ca.maCa)')
     // Màn MỞ ca không được đụng vào — lúc đó chưa biết em nào tới.
     const moCa = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamSetupScreen.tsx'), 'utf8')
@@ -47,8 +47,9 @@ describe('CHỐT AN TOÀN — chỗ này sai là chấm sai cả lớp', () => {
     expect(THAN.indexOf('if (caCanDeRieng) {')).toBeLessThan(dau)
   })
 
-  it('đòi đủ ba thứ mới chạy: ≥ 2 em · có kho · có số câu', () => {
-    expect(THAN).toContain('if (dsCho.length >= 2 && kho.length > 0 && sc && sc.I + sc.II + sc.III > 0) {')
+  it('đòi đủ ba thứ mới chạy: ≥ 2 em · có kho · có số câu — VÀ kho phải rộng hơn một bộ (21/10)', () => {
+    // Kho chỉ vừa một bộ (ca Cả lớp cùng một đề) ⇒ bản đồ vô nghĩa mà còn tắt đảo thứ tự câu ⇒ bỏ qua.
+    expect(THAN).toContain('if (dsCho.length >= 2 && kho.length > 0 && sc && sc.I + sc.II + sc.III > 0 && !khoChiVuaMotBo(kho, sc)) {')
   })
 
   it('CHỈ gán bản đồ khi nó thật sự có em — không gán bảng rỗng', () => {
