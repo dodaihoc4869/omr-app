@@ -194,7 +194,7 @@ export async function gvDauGio(env: Env, b: Row, nowMs: number = Date.now()): Pr
       cauDaDung(env, em),
       daHoiCua(env, em),
       em.length ? env.DB.prepare('SELECT sbd,AVG(p) p FROM omni_p_vkn WHERE sbd IN(SELECT value FROM json_each(?)) AND p BETWEEN 0 AND 1 GROUP BY sbd').bind(J).all<Row>() : { results: [] as Row[] },
-      em.length ? env.DB.prepare("SELECT sbd,SUM(julianday(luc)>=julianday('now')-14) n,MAX(luc) cuoi FROM len_bang WHERE sbd IN(SELECT value FROM json_each(?)) GROUP BY sbd").bind(J).all<Row>() : { results: [] as Row[] },
+      em.length ? env.DB.prepare('SELECT sbd,SUM(luc>=?) n,MAX(luc) cuoi FROM len_bang WHERE sbd IN(SELECT value FROM json_each(?)) AND luc>=? GROUP BY sbd').bind(new Date(nowMs - 14 * 864e5).toISOString(), J, new Date(nowMs - 60 * 864e5).toISOString()).all<Row>() : { results: [] as Row[] },
     ])
     const pEm = new Map(pTb.results.map((r) => [String(r.sbd), Number(r.p)]))
     const lbEm = new Map(lb.results.map((r) => [String(r.sbd), { soLan14: Number(r.n) || 0, lanCuoiLenBang: r.cuoi == null ? null : String(r.cuoi) }]))
