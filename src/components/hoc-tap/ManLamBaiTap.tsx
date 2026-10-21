@@ -89,7 +89,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const khoa = q ? `hoc-tap:nhap:${sbd}:${q.qid}:${q.version}` : ''
   useEffect(() => {
     let huy = false
-    setTai(true); setLoi(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); soLuotDem.current++
+    setTai(true); setLoi(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); soLuotDem.current++
     // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi như cũ.
     void (layChangMoTruoc(token) ?? goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)).then(r => {
       if (huy) return
