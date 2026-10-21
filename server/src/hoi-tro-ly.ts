@@ -12,7 +12,7 @@ import { quaTram } from './tram-gemini'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 import { CHI_DAN_KHUON, SCHEMA_TRA_LOI, SCHEMA_TRA_LOI_CU, chonKhuon, chuPhang, lamSachCauTruc, schemaChoKhuon, tachCauTruc, type CauTrucTraLoi, type Khuon } from './hoi-tro-ly-cau-truc'
 import { CAU_NGOAI_SGK, PHAM_VI_SGK, chanNgoaiSgk } from './hoi-thay-pham-vi-sgk'
-import { CACH_GIAI_THAY, chuBoChiaKhoa, chuKyThuat } from './hoi-thay-ky-thuat'
+import { CACH_GIAI_THAY, chonKyThuat, chuBoChiaKhoa, chuKyThuat } from './hoi-thay-ky-thuat'
 import { baiNhapHoiThay, chanQuyKetHoiThay, docHoSoHoiThay, noiDungHoSoHoiThay, trangThaiHoiThay, type HoSoHoiThay } from './hoi-thay-ca-nhan'
 
 type Obj = Record<string, unknown>
@@ -577,6 +577,8 @@ export async function traLoiHoiThem(env: Env, sbd: string, b: Obj, phu: PhuThuoc
     .catch(() => env.DB.prepare('SELECT ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid = ? ORDER BY luc DESC LIMIT 1').bind(sbd, q).first<Obj>().catch(() => null))
   const demP = docDem(qidDoan), lsP = docLs(qidDoan), kq0P = docKq0(qidDoan)
   for (const p of [duocP, ncP, demP, ddl, trangThaiP]) p.catch(() => {})
+  // Chỉ mục kĩ thuật của Thầy (~0,1 s CPU lần đầu mỗi isolate) dựng NGAY lúc các lượt đọc D1 đang bay ⇒ không cộng vào thời gian chờ của em.
+  try { chonKyThuat('') } catch { /* chỉ là làm nóng */ }
   const [, cfg] = await Promise.all([phu.xong, cfgP])
   if (!key || !(await duocP)) return { ok: false, ma: 'chua_bat', error: 'Phần hỏi thêm Thầy chưa mở cho em.' }
   if (cauHoi.length < 2) return { ok: false, ma: 'trong', error: 'Em nhắn chỗ em thắc mắc trước nhé.' }
