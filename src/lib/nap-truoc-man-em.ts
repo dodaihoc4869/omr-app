@@ -28,6 +28,8 @@ export interface BangNapTruoc {
   hs: string[]
   /** Mảnh cổng phụ huynh (`/ph`, `/phu-huynh`, `?vai=phuhuynh`). */
   ph: string[]
+  /** Mảnh màn Phiếu (`/p`, `?vai=phieu`) — 21/10 màn Phiếu nạp muộn trong App.tsx; thiếu nhóm ⇒ như cũ. */
+  phieu?: string[]
   /** Mảnh App.tsx (vỏ app thầy / phiếu / màn thi / cổng phụ huynh) — mọi đường trừ cổng học sinh. */
   app?: string[]
   /** Vỏ cổng học sinh + màn đăng nhập. */
@@ -58,13 +60,14 @@ export const LENH_HOI_SOM: [string, 'token' | 'sbd'][] = [
 ]
 
 /** Đường vào nào cần mảnh nào — CÙNG luật `docDuongVao` (vai-tro.ts), viết lại cho đoạn mã nội tuyến. */
-export function chonMangNapTruoc(duongDan: string, truyVan: string): 'thi' | 'hs' | 'ph' | null {
+export function chonMangNapTruoc(duongDan: string, truyVan: string): 'thi' | 'hs' | 'ph' | 'phieu' | null {
   const q = truyVan || ''
   const p = duongDan || ''
   // Tham số thắng đường dẫn (docDuongVao đọc tham số trước).
   const vai = /[?&]vai=([^&#]*)/.exec(q)
   const v = vai ? decodeURIComponent(vai[1]).trim().toLowerCase() : ''
-  if (v === 'gv' || v === 'giaovien' || v === 'phieu') return null
+  if (v === 'phieu') return 'phieu'
+  if (v === 'gv' || v === 'giaovien') return null
   if (v === 'phuhuynh') return 'ph'
   if (v === 'diem') return 'thi'
   if (v === 'hocsinh') return 'hs'
@@ -72,6 +75,7 @@ export function chonMangNapTruoc(duongDan: string, truyVan: string): 'thi' | 'hs
   if (/(?:^|\/)[td]\/\d{4,8}\/?$/.test(p)) return 'thi'
   if (/(?:^|\/)(?:hoc-sinh|hocsinh|hs)\/?$/.test(p)) return 'hs'
   if (/(?:^|\/)(?:phu-huynh|phuhuynh|ph)\/?$/.test(p)) return 'ph'
+  if (/(?:^|\/)p\/?$/.test(p)) return 'phieu'
   return null
 }
 

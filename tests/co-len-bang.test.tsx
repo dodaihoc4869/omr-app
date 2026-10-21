@@ -29,8 +29,9 @@ const KHO_DAY: TeacherExamSource[] = [
     phanIII: [],
   } as unknown as TeacherExamSource,
 ]
-/** Kho NHỎ (20 câu): chip "Lấy trọn kho (N câu)" chỉ hiện khi kho ≤ 28 câu. */
-const KHO_NHO: TeacherExamSource[] = [{ ...(KHO_DAY[0] as unknown as Record<string, unknown>), phanI: (KHO_DAY[0].phanI as unknown[]).slice(0, 20) } as unknown as TeacherExamSource]
+/** Kho NHỎ (18 câu Phần I): chip "Trọn đề (N câu)" chỉ hiện khi kho vừa MỘT đề — mỗi phần ≤ 18/4/6 (thầy chốt 21/10;
+ * trước là tổng ≤ 28 câu, nhưng 20 câu Phần I thì mỗi em bốc ngẫu nhiên 18 câu khác nhau ⇒ không còn "cả lớp cùng một đề"). */
+const KHO_NHO: TeacherExamSource[] = [{ ...(KHO_DAY[0] as unknown as Record<string, unknown>), phanI: (KHO_DAY[0].phanI as unknown[]).slice(0, 18) } as unknown as TeacherExamSource]
 
 const khoHienTai = vi.hoisted(() => ({ ds: [] as unknown[] }))
 const publishSession = vi.fn(async () => ({ batDau: '', hetHanVao: '' }))
@@ -70,8 +71,12 @@ vi.mock('../src/store/appStore', () => ({
 const { default: ExamSetupScreen } = await import('../src/screens/ExamSetupScreen')
 
 type CachLay = 'rut' | 'tron' | 'lenbang'
-// Nhãn hiện tại của khối Bộ câu ra đề: "Rút đề thông minh" (trước là "Rút bộ câu"); "Lấy trọn kho (N câu)" CHỈ hiện khi kho ≤ 28 câu.
-const TEN_CHIP: Record<CachLay, RegExp> = { rut: /^Rút đề thông minh$/, tron: /^Lấy trọn kho/, lenbang: /^Kiểm tra điểm yếu$/ }
+// MÀN MỞ CA 21/10: cách ra đề là BỐN THẺ (radio) ngay trong bước Đề, không còn hộp nổi Rút đề.
+//   rut     = thẻ "Cả lớp cùng một đề", kho lớn ⇒ tự rút thông minh (chip "14 câu (9 · 2 · 3)" tích sẵn)
+//   tron    = thẻ "Cả lớp cùng một đề", kho vừa một đề ⇒ chip "Trọn đề (N câu)" tích sẵn
+//   lenbang = thẻ "Kiểm tra điểm yếu"
+const THE: Record<CachLay, RegExp> = { rut: /^Cả lớp cùng một đề/, tron: /^Cả lớp cùng một đề/, lenbang: /^Kiểm tra điểm yếu/ }
+const CHIP: Record<CachLay, RegExp | null> = { rut: /^14 câu \(9 · 2 · 3\)$/, tron: /^Trọn đề \(\d+ câu\)$/, lenbang: null }
 
 /** Soạn đủ một ca hợp lệ theo cách lấy câu đã chọn rồi bấm Mở ca. */
 /** HẠN CHO CẢ PHÉP KIỂM, không chỉ cho từng lượt chờ bên trong.
@@ -113,37 +118,20 @@ async function moCa(cach: CachLay) {
   publishSession.mockClear()
   saveSessionTeacherBank.mockClear()
   const r = render(<ExamSetupScreen />)
-  // MÀN MỞ CA THIẾT KẾ LẠI (M3): khối "Bộ câu ra đề" nay nằm trong tấm "Rút đề theo số câu & dạng bài" — mở bằng nút "Rút câu"
-  // (hoặc "Rút N câu" khi đã có bộ rút), chọn cách lấy câu rồi bấm "Xong". Phần luật của cờ lên bảng KHÔNG đổi: chọn "Kiểm tra điểm yếu" ⇒ đẩy sang màn Gọi lên bảng.
-  await waitFor(() => expect(nutRutCau(r)).toBeTruthy(), { timeout: 20000 })
-  fireEvent.click(nutRutCau(r)!)
-  // CHỜ RỘNG, KHÔNG PHẢI NỚI ĐIỀU KIỆN KIỂM. Màn Mở ca dựng xong mới gọi
-  // publishSession; chạy cả bộ 78 tệp song song thì bước dựng có lúc quá mốc
-  // 1 giây mặc định và phép kiểm đỏ ngẫu nhiên. Điều kiện kiểm giữ nguyên,
-  // chỉ cho nó đủ thời gian chạy.
+  // CHỜ RỘNG, KHÔNG PHẢI NỚI ĐIỀU KIỆN KIỂM: màn dựng xong (đề tự tích khi kho chỉ có 1 đề) mới có bốn thẻ.
   await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
-  // BẤM LẠI TRÊN NÚT VỪA TRUY VẤN, mỗi vòng chờ một lần.
-  //
-  // NGUYÊN NHÂN GỐC, tìm ra 10/09 sau khi CI đỏ ở đây còn máy tôi chạy 8 lượt
-  // đều xanh: bấm MỘT lần rồi chờ 20 giây là sai kiểu. Màn Mở ca còn vài hiệu
-  // ứng chạy sau khi chữ "Bộ câu ra đề" hiện ra; một trong số đó dựng lại khối
-  // chip, THAY nút cũ bằng nút mới. Cú bấm rơi vào nút đã rời khỏi cây DOM thì
-  // mất hẳn — `aria-checked` không bao giờ đổi, và chờ bao lâu cũng vô ích. Máy
-  // nhanh thì hai việc ấy không chen vào nhau nên không ai thấy.
-  //
-  // Nay mỗi vòng chờ TRUY VẤN LẠI rồi mới bấm, nên cú bấm luôn rơi vào nút đang
-  // sống. Bấm lại một chip đã tích KHÔNG bỏ tích (nó là radio-kiểu-chip), nên
-  // lặp là an toàn. ĐIỀU KIỆN KIỂM GIỮ NGUYÊN: chip phải `aria-checked=true`;
-  // chip không bao giờ tích được thì vẫn đỏ đúng như trước.
+  // BẤM LẠI TRÊN NÚT VỪA TRUY VẤN, mỗi vòng chờ một lần (nguyên nhân gốc 10/09: hiệu ứng dựng lại thay nút cũ bằng nút mới,
+  // cú bấm rơi vào nút đã rời DOM thì mất). Bấm lại thẻ đã chọn không bỏ chọn nên lặp là an toàn. ĐIỀU KIỆN KIỂM GIỮ NGUYÊN.
   await waitFor(
     () => {
-      const o = r.getByRole('checkbox', { name: TEN_CHIP[cach] })
+      const o = r.getByRole('radio', { name: THE[cach] })
       if (o.getAttribute('aria-checked') !== 'true') fireEvent.click(o)
-      expect(r.getByRole('checkbox', { name: TEN_CHIP[cach] }).getAttribute('aria-checked')).toBe('true')
+      expect(r.getByRole('radio', { name: THE[cach] }).getAttribute('aria-checked')).toBe('true')
+      const chip = CHIP[cach]
+      if (chip) expect(r.getByRole('checkbox', { name: chip }).getAttribute('aria-checked')).toBe('true')
     },
     { timeout: 20000 },
   )
-  fireEvent.click(r.getByRole('button', { name: 'Xong' })) // đóng tấm Rút đề; bộ rút đã lưu ở màn Mở ca
   fireEvent.change(r.getByLabelText('Lớp của ca kiểm tra'), { target: { value: '12A1' } })
   // Tiêu đề màn cũng có chữ "Mở ca kiểm tra" — lấy đúng cái NÚT "Mở ca kiểm tra ngay".
   fireEvent.click(r.getAllByRole('button').find((e) => /Mở ca kiểm tra ngay/.test(e.textContent ?? ''))!)
@@ -152,8 +140,6 @@ async function moCa(cach: CachLay) {
 }
 
 const co = (goi: unknown[]) => (goi[7] as { lenBang?: boolean }).lenBang
-/** Nút mở tấm Rút đề trên màn Mở ca ("Rút câu" hoặc "Rút N câu"). */
-const nutRutCau = (r: ReturnType<typeof render>) => r.queryAllByRole('button').find((e) => /^Rút( \d+)? câu$/.test((e.textContent ?? '').trim()))
 
 describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
   it('KHÔNG còn nút gạt LÊN BẢNG riêng trên màn Mở ca', async () => {
@@ -163,16 +149,14 @@ describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
     // Màn thiết kế lại (M3) nên danh sách công tắc đổi; điều thật sự phải khoá thì không đổi: KHÔNG có công tắc/nút bật-tắt nào cho việc lên bảng.
     khoHienTai.ds = KHO_DAY
     const r = render(<ExamSetupScreen />)
-    await waitFor(() => expect(nutRutCau(r)).toBeTruthy(), { timeout: 20000 })
+    await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
     for (const n of [...r.queryAllByRole('switch'), ...r.queryAllByRole('checkbox'), ...r.container.querySelectorAll('[aria-pressed]')]) {
       const nhan = `${n.getAttribute('aria-label') ?? ''} ${(n.textContent ?? '').slice(0, 80)}`
       expect(nhan, 'công tắc/nút bật-tắt trên màn Mở ca').not.toMatch(/lên bảng|Gọi lên bảng/i)
     }
     expect(r.container.textContent).not.toContain('Ca này dùng làm gì')
-    // và cờ vẫn chỉ nằm trong khối Bộ câu ra đề (mở bằng "Rút câu")
-    fireEvent.click(nutRutCau(r)!)
-    await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
-    expect(r.container.textContent).toContain('Kiểm tra điểm yếu')
+    // và cờ vẫn chỉ nằm ở thẻ cách ra đề "Kiểm tra điểm yếu"
+    expect(r.getByRole('radio', { name: /^Kiểm tra điểm yếu/ })).toBeTruthy()
   }, HAN_PHEP_KIEM)
 
   it('chọn "Kiểm tra điểm yếu" → ca đẩy dữ liệu sang màn Gọi lên bảng', async () => {
@@ -180,12 +164,12 @@ describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
     expect(co(goi)).toBe(true)
   }, HAN_PHEP_KIEM)
 
-  it('chọn "Rút đề thông minh" → không đẩy', async () => {
+  it('chọn "Cả lớp cùng một đề" (kho lớn ⇒ rút thông minh) → không đẩy', async () => {
     const { goi } = await moCa('rut')
     expect(co(goi)).toBe(false)
   }, HAN_PHEP_KIEM)
 
-  it('chọn "Lấy trọn kho" → không đẩy', async () => {
+  it('chọn "Cả lớp cùng một đề" (kho vừa một đề ⇒ trọn đề) → không đẩy', async () => {
     const { goi } = await moCa('tron')
     expect(co(goi)).toBe(false)
   }, HAN_PHEP_KIEM)

@@ -246,7 +246,7 @@ export async function dungToChieu(
 ): Promise<{ html: string; soThieu: number; soBoKhoi: number; o: Map<string, OGhiToChieu> }> {
   if(tuyChon.sbdLop?.length||tuyChon.lop){
     const {layEmChieu,nhanEmChieu}=await import('../../lib/ung-vien-chieu')
-    const uv=await layEmChieu(ds.map(o=>o.qid),tuyChon.sbdLop??[],null,tuyChon.lop)
+    const uv=await layEmChieu(ds.map(o=>o.qid),tuyChon.sbdLop??[],null,tuyChon.lop,undefined,{kenh:'to-chieu'})
     ds=ds.map(o=>{const list=uv.get(o.qid)??[],e=list[0];return {...o,sbd:e?.sbd??'',ten:e?.ten??'Cả lớp',lichSu:e?nhanEmChieu(e):undefined,ungVien:list.map(e=>({sbd:e.sbd,ten:e.ten,lichSu:nhanEmChieu(e)}))}})
   }
   const bang = tra ?? (await napBangTra())

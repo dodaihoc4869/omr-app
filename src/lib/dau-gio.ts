@@ -5,6 +5,8 @@
 //   · `chuLichSuCau`      — dòng lịch sử một câu của em cho thẻ tên: "Sai 20/09 (Ca) · Đúng 22/09 (Đoàn) · Đúng 25/09 (Bi-a)".
 // Không đọc đồng hồ, không gọi mạng: `nowMs` và `rng` do nơi gọi truyền (test khoá được).
 
+import { chiaTang, trongSoLenBang, type CheDoChonEm, type Tang } from './chon-em-phan-tang'
+
 export const TOI_DA_EM_MOI_LUOT = 6
 /** Số câu ứng viên máy chủ trả cho MỖI em (đã xếp theo điểm) — đủ rộng để app lọc câu không có trong kho mà vẫn còn câu. */
 export const TOI_DA_UNG_VIEN_MOI_EM = 40
@@ -41,11 +43,17 @@ export interface EmUngVien {
   hoTen: string
   /** Câu em đã làm đúng và CHƯA từng được hỏi ở đầu giờ (máy chủ đã lọc) — đã xếp theo điểm. */
   cau: UngVienCau[]
+  /** Phân tầng (21/10): khả năng trung bình theo kỹ năng (null = chưa có số đo) + sổ lên bảng 14 ngày. Máy chủ cũ không gửi ⇒ coi như chưa có. */
+  pTb?: number | null
+  soLan14?: number
+  lanCuoiLenBang?: string | null
 }
 export interface GoiDauGio {
   sbd: string
   hoTen: string
   qid: string
+  /** Chỉ màn thầy (không lên bản chiếu). */
+  tang?: Tang
 }
 
 /** Xáo Fisher–Yates bằng `rng` ∈ [0,1). */
@@ -58,6 +66,19 @@ function xao<T>(ds: readonly T[], rng: () => number): T[] {
   return a
 }
 
+/** Xáo có trọng số (Efraimidis–Spirakis): em trọng số cao dễ đứng trước. */
+function xaoTrongSo<T extends { soLan14?: number }>(ds: readonly T[], rng: () => number): T[] {
+  return ds.map((e) => ({ e, k: Math.pow(Math.max(rng(), 1e-12), 1 / trongSoLenBang(e.soLan14)) })).sort((a, b) => b.k - a.k).map((x) => x.e)
+}
+/** Thứ tự xét em theo phân tầng: xen kẽ Khá · Trung bình · Cần kèm, trong tầng ưu tiên em lâu chưa lên bảng ⇒ lượt 6 em ≈ 2/2/2. */
+function thuTuPhanTang(em: readonly EmUngVien[], rng: () => number): { e: EmUngVien; t: Tang }[] {
+  const tang = chiaTang(em.map((e) => ({ sbd: e.sbd, p: e.pTb ?? null, daDung: false })))
+  const nhom = ([3, 2, 1] as const).map((t) => xaoTrongSo(em.filter((e) => (tang.get(e.sbd) ?? 2) === t), rng).map((e) => ({ e, t })))
+  const ra: { e: EmUngVien; t: Tang }[] = []
+  for (let i = 0; nhom.some((g) => i < g.length); i++) for (const g of nhom) if (g[i]) ra.push(g[i]!)
+  return ra
+}
+
 /**
  * MỘT LƯỢT GỌI (nút "Chiếu lên bảng" hay "Gọi thêm"). Em được xáo ngẫu nhiên; từng em lấy một câu trong `CUA_SO_NGAU_NHIEN` câu điểm cao nhất còn
  * chưa bị em khác trong lượt giữ. Em nằm trong `daGoi` (đã gọi trong buổi) bị bỏ; em không còn câu ⇒ bỏ qua em ấy (lượt vẫn chạy tiếp các em khác).
@@ -65,7 +86,7 @@ function xao<T>(ds: readonly T[], rng: () => number): T[] {
  */
 export function chonLuotDauGio(
   em: readonly EmUngVien[],
-  tuy: { toiDa?: number; daGoi?: ReadonlySet<string>; cauDaDung?: ReadonlySet<string>; rng?: () => number; nowMs?: number; khoaNoiDung?: (qid: string) => string | undefined } = {},
+  tuy: { toiDa?: number; daGoi?: ReadonlySet<string>; cauDaDung?: ReadonlySet<string>; rng?: () => number; nowMs?: number; khoaNoiDung?: (qid: string) => string | undefined; cheDo?: CheDoChonEm } = {},
 ): GoiDauGio[] {
   const toiDa = Math.max(0, Math.min(TOI_DA_EM_MOI_LUOT, tuy.toiDa ?? TOI_DA_EM_MOI_LUOT))
   const rng = tuy.rng ?? Math.random
@@ -77,7 +98,9 @@ export function chonLuotDauGio(
   for (const q of tuy.cauDaDung ?? []) { const k = nd(q); if (k) dung.add(`nd:${k}`) }
   const daCo = new Set<string>()
   const ra: GoiDauGio[] = []
-  for (const e of xao(em, rng)) {
+  // 'tron' (mặc định 21/10): xen kẽ ba tầng; 'chac' / 'ngau': xáo đều như cũ.
+  const thuTu = (tuy.cheDo ?? 'tron') === 'tron' ? thuTuPhanTang(em, rng) : xao(em, rng).map((e) => ({ e, t: undefined }))
+  for (const { e, t } of thuTu) {
     if (ra.length >= toiDa) break
     if (!e.sbd || daGoi.has(e.sbd) || daCo.has(e.sbd)) continue
     const con = xepUngVien(
@@ -90,7 +113,7 @@ export function chonLuotDauGio(
     const kc = nd(c.qid)
     if (kc) dung.add(`nd:${kc}`)
     daCo.add(e.sbd)
-    ra.push({ sbd: e.sbd, hoTen: e.hoTen, qid: c.qid })
+    ra.push({ sbd: e.sbd, hoTen: e.hoTen, qid: c.qid, ...(t ? { tang: t } : {}) })
   }
   return ra
 }

@@ -7,8 +7,9 @@
 //   1. Lớp (ô chọn theo khối, `/gv/lop` — lệnh chỉ đọc sẵn có; lỗi ⇒ chọn theo khối, không có số liệu lớp, không gọi em)
 //   2. Bài trong Dạy học (đúng cây DẠY HỌC của Hành trình › Dạy học: `khoDayHoc` → `dsBaiCuaKhoi`)
 //   3. Đề: chip Trắc nghiệm · Đúng–sai · Trả lời ngắn (kèm số câu) — chọn bài thì bật đủ (cả đề của bài); bấm để giữ một tờ.
-//   4. BỐN Ô SỐ: câu sẽ chiếu · câu Đúng–sai · câu có tính toán · câu lớp sai từ 30%.
-//   5. Danh sách câu ĐÃ XẾP (Đúng–sai có tính toán → Đúng–sai → có tính toán → còn lại — `xepThuTuChua`): số thứ tự chiếu · Câu N · loại · "Có tính toán"
+//   4. Ô SỐ: câu sẽ chiếu · câu Đúng–sai · câu có tính toán · câu khó (Vận dụng / 2 sao, 21/10) · câu lớp sai từ 30%.
+//      Công tắc "Chỉ hiện câu khó & tính toán" (21/10, nhớ trên máy): bật ⇒ xem trước và tờ chiếu chỉ còn câu khó hoặc có tính toán.
+//   5. Danh sách câu ĐÃ XẾP (`xepThuTuChua`: nhóm câu tính toán · câu khó · lớp sai nhiều trộn lên đầu, còn lại theo đề): số thứ tự chiếu · Câu N · loại · "Có tính toán"
 //      · tóm tắt đề · "Gọi lên bảng: <em> (có mặt, làm sai câu này) · còn N em sai khác" · % lớp sai + "x/y em sai" + thanh.
 //   6. Nút chính "Chiếu lên bảng" ⇒ tờ CHUẨN Chiếu lên bảng (`thay-tu-chua-to.ts` → `dungToChieu` → `KhungXemPhieu`): mỗi câu một đợt, phím L / nút "Lên bảng"
 //      gọi em đầu danh sách, "Gọi em khác" gọi em kế, cột 1/3 đen + thẻ tên "Tên · Sai câu này N lần · gần nhất dd/mm · số giây", Đạt / Chưa đạt ghi sổ
@@ -33,6 +34,7 @@ import {
   cauCuaDe,
   demTuChua,
   laCauKhacKhoi,
+  laCauKhoHoacTinh,
   soLieuLopCau,
   tenBuoiTuChua,
   tomTatCau,
@@ -41,7 +43,7 @@ import {
   type PhanCau,
 } from '../../lib/thay-tu-chua'
 import { docCoMatHomNay, laySaiNhieuCau, ngayVnCua, xepUngVien, type KetQuaSai } from '../../lib/ung-vien-chua-cau'
-import { layEmChieu,nhanEmChieu,type EmChieu } from '../../lib/ung-vien-chieu'
+import { chonEmChieu,napEmChieu,nhanEmChieu,type EmChieu,type NapEmChieu } from '../../lib/ung-vien-chieu'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { useAppStore } from '../../store/appStore'
 import { ghiMotO, thayChuaQuaMayChu, useGhiToChieu } from './ghi-to-chieu'
@@ -58,6 +60,10 @@ export const SO_CAU_XEM_TRUOC = 8
 /** Trần lệnh `/gv/thong-ke-lop-cau` (máy chủ: 200 em · 120 câu). */
 const TRAN_EM_TK = 200
 const TRAN_CAU_TK = 120
+/** Công tắc "Chỉ hiện câu khó & tính toán" (thầy 21/10): nhớ trên máy; lỗi / chặn lưu ⇒ tắt. */
+const KHOA_CHI_KHO = 'omr-ttc-chi-kho'
+const docChiKho = () => { try { return localStorage.getItem(KHOA_CHI_KHO) === '1' } catch { return false } }
+const ghiChiKho = (v: boolean) => { try { localStorage.setItem(KHOA_CHI_KHO, v ? '1' : '0') } catch { /* máy không cho lưu */ } }
 const KHOA_NHO = 'ddh.thayTuChua'
 
 /** Đối tượng chữa: một lớp (có danh sách SBD ⇒ có số liệu lớp + gọi em) hoặc cả khối (khi chưa đọc được danh sách lớp). */
@@ -170,6 +176,11 @@ function DongCau({ d, stt }: { d: DongXem; stt: number }) {
           {c.tinhToan && (
             <span className="gvv2-ttc-the" data-loai="tinh">
               Có tính toán
+            </span>
+          )}
+          {c.kho && (
+            <span className="gvv2-ttc-the" data-loai="kho">
+              Câu khó
             </span>
           )}
           {c.thieuNoiDung && (
@@ -316,7 +327,10 @@ export default function ThayTuChua() {
   const tk: TrangThaiTk = !khoaTk ? { trang: 'khong-ap' } : tkKq?.khoa === khoaTk ? tkKq.tk : { trang: 'cho' }
   const [uvKq, setUvKq] = useState<{ khoa: string; uv: TrangThaiUv } | null>(null)
   const uvTrang: TrangThaiUv = !khoaTk ? { trang: 'khong-ap' } : uvKq?.khoa === khoaTk ? uvKq.uv : { trang: 'cho' }
-  const xep=useMemo(()=>{const so=new Map<string,{sai:number;lam:number}>();for(const c of tatCa){const v=soLieuLopCau(uvTrang.trang==='co'?uvTrang.kq.cau[c.qid]:undefined,tk.trang==='co'?tk.soGop[c.qid]:undefined);if(v)so.set(c.qid,v)}return xepThuTuChua(tatCa.filter(c=>!laCauKhacKhoi(c.qid,khoiDt)),so,seedChieu)},[tatCa,khoiDt,uvTrang,tk,seedChieu])
+  const [chiKho,setChiKho]=useState(docChiKho)
+  const xepDu=useMemo(()=>{const so=new Map<string,{sai:number;lam:number}>();for(const c of tatCa){const v=soLieuLopCau(uvTrang.trang==='co'?uvTrang.kq.cau[c.qid]:undefined,tk.trang==='co'?tk.soGop[c.qid]:undefined);if(v)so.set(c.qid,v)}return xepThuTuChua(tatCa.filter(c=>!laCauKhacKhoi(c.qid,khoiDt)),so,seedChieu)},[tatCa,khoiDt,uvTrang,tk,seedChieu])
+  // Bật công tắc ⇒ xem trước VÀ tờ chiếu chỉ còn câu khó (Vận dụng / 2 sao) hoặc có tính toán.
+  const xep=useMemo(()=>chiKho?xepDu.filter(laCauKhoHoacTinh):xepDu,[xepDu,chiKho])
   const dem=demTuChua(xep)
   /** Lượt đọc em làm sai đang chạy (nút Chiếu bấm sớm thì chờ đúng lượt này, không chiếu "cả lớp" nhầm). */
   const uvHua = useRef<{ khoa: string; hua: Promise<TrangThaiUv> } | null>(null)
@@ -350,8 +364,10 @@ export default function ThayTuChua() {
     (u: TrangThaiUv) => (u.trang === 'co' ? xepUngVien(xep.map((c) => c.qid), u.kq.cau, coMat ?? null) : null),
     [xep, coMat],
   )
-  const [duGoi,setDuGoi]=useState<{khoa:string;map:Map<string,EmChieu[]>}|null>(null)
-  useEffect(()=>{let huy=false;if(khoaTk&&sbdLop)void layEmChieu(qidKey.split('|'),sbdLop,coMat).then(map=>{if(!huy)setDuGoi({khoa:khoaTk,map})}).catch(()=>{if(!huy)setDuGoi({khoa:khoaTk,map:new Map()})});return()=>{huy=true}},[khoaTk,sbdLop,qidKey,coMat])
+  // Tải ứng viên MỘT lần theo (lớp · bộ câu); chọn em chạy trên máy theo ĐÚNG thứ tự đang hiện ⇒ xem trước và tờ chiếu cùng một em mỗi câu.
+  const [napGoi,setNapGoi]=useState<{khoa:string;nap:NapEmChieu|null}|null>(null)
+  useEffect(()=>{let huy=false;if(khoaTk&&sbdLop)void napEmChieu(qidKey.split('|'),sbdLop,coMat).then(nap=>{if(!huy)setNapGoi({khoa:khoaTk,nap})}).catch(()=>{if(!huy)setNapGoi({khoa:khoaTk,nap:null})});return()=>{huy=true}},[khoaTk,sbdLop,qidKey,coMat])
+  const duGoi=useMemo<{khoa:string;map:Map<string,EmChieu[]>}|null>(()=>napGoi?{khoa:napGoi.khoa,map:napGoi.nap?chonEmChieu(napGoi.nap,xep.map(c=>c.qid),undefined,{kenh:'tu-chua'}):new Map()}:null,[napGoi,xep])
   const dongXem: DongXem[] = useMemo(
     () =>
       xep.map((c) => {
@@ -410,6 +426,7 @@ export default function ThayTuChua() {
         ungVien: theoCau,
         soLop,
         sbdLop:sbdLop??[],coMat,
+        ...(napGoi?.khoa===khoaTk&&napGoi.nap&&duGoi?{napEm:napGoi.nap,coDinh:new Map([...duGoi.map].flatMap(([q,l])=>l[0]?[[q,l[0].sbd] as const]:[]))}:{}),
       })
       const bo = chuBoCauKhacKhoi(kq.soBoKhoi)
       if (kq.soBoKhoi >= xep.length) {
@@ -438,7 +455,7 @@ export default function ThayTuChua() {
           Chữa câu khó &amp; tính toán
         </h2>
         <p className="gvv2-ttc-phu">
-          Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Gọi em đã tự làm đúng; nếu chưa có, chọn em dự kiến làm được.
+          Câu tính toán, câu khó và câu nhiều em sai được trộn trong nhóm ưu tiên. Em lên bảng chia đều Khá · Trung bình · Cần kèm: câu dễ gọi em Cần kèm, câu khó gọi em Khá, mỗi em một lần.
         </p>
       </div>
 
@@ -520,10 +537,17 @@ export default function ThayTuChua() {
               </p>
             )}
 
+            {bai && xepDu.length > 0 && (
+              <label className="gvv2-ttc-loc">
+                <input type="checkbox" role="switch" checked={chiKho} onChange={(e) => { setChiKho(e.target.checked); ghiChiKho(e.target.checked) }} />
+                <span>Chỉ hiện câu khó &amp; tính toán</span>
+                <small>{chiKho ? `${xep.length}/${xepDu.length} câu` : 'Đang hiện cả đề, câu khó & tính toán xếp lên đầu'}</small>
+              </label>
+            )}
             {!bai ? (
               <p className="gvv2-ttc-trong-chu">Chọn một bài để xem các câu sẽ chiếu.</p>
             ) : xep.length === 0 ? (
-              <p className="gvv2-ttc-trong-chu">Bật ít nhất một tờ đề ở trên để chiếu.</p>
+              <p className="gvv2-ttc-trong-chu">{xepDu.length ? 'Các tờ đang bật không có câu khó hay câu tính toán — tắt công tắc để chiếu cả đề.' : 'Bật ít nhất một tờ đề ở trên để chiếu.'}</p>
             ) : (
               <>
                 <div className="gvv2-ttc-so4" aria-live="polite">
@@ -535,6 +559,9 @@ export default function ThayTuChua() {
                   </span>
                   <span className="gvv2-ttc-o-so" data-mau="xd">
                     <b className="gvv2-so">{dem.tinhToan}</b> câu có tính toán
+                  </span>
+                  <span className="gvv2-ttc-o-so" data-mau="xl">
+                    <b className="gvv2-so">{dem.kho}</b> câu khó
                   </span>
                   {coSoLop && (
                     <span className="gvv2-ttc-o-so" data-mau="ho">

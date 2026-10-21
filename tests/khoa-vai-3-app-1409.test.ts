@@ -204,8 +204,10 @@ describe('Tốc độ — mảnh mã chính không cõng thứ người khác kh
     expect(APP).not.toMatch(/^import ParentPortalScreen from/m)
   })
 
-  it('MÀN PHIẾU vẫn nạp SỚM; MÀN LÀM BÀI tách mảnh nhưng ngày thi không đánh cược', () => {
-    expect(APP).toMatch(/^import PhieuScreen from/m)
+  it('MÀN PHIẾU nạp muộn nhưng tải NGAY theo đường (21/10, app thầy nhẹ ~18 KB); MÀN LÀM BÀI tách mảnh nhưng ngày thi không đánh cược', () => {
+    expect(APP).not.toMatch(/^import PhieuScreen from/m)
+    expect(APP).toContain("const napPhieu = thuLaiMotLan(() => import('./screens/PhieuScreen'))")
+    expect(APP).toContain("else if (dv.vai === 'phieu') huaPhieu ??= napPhieu()")
     // 28/09: màn thi + cổng học sinh ra khỏi mảnh chính (máy thầy/phụ huynh không tải kèm)…
     expect(APP).not.toMatch(/^import ExamTakeScreen from/m)
     expect(APP).not.toMatch(/^import StudentPortalScreen from/m)

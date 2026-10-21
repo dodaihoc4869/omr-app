@@ -19,7 +19,6 @@ import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
 import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
-import PhieuScreen from './screens/PhieuScreen'
 
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
@@ -60,6 +59,12 @@ const napManThi = thuLaiMotLan(() => import('./screens/ExamTakeScreen'))
 const napCongHocSinh = thuLaiMotLan(() => import('./screens/StudentPortalScreen'))
 let huaManThi: ReturnType<typeof napManThi> | null = null
 let huaCongHocSinh: ReturnType<typeof napCongHocSinh> | null = null
+// MÀN PHIẾU — NẠP MUỘN (21/10, thầy: "tối ưu tốc độ app tức thì"): trước đây nạp sớm, kéo ~85 KB nén (PhieuScreen + khung xem phiếu +
+// DesignSystem + lời giải…) vào MỖI lần mở app thầy. Nay tách mảnh; link phiếu của phụ huynh KHÔNG chờ thêm vòng mạng: index.html nạp trước
+// đúng mảnh phiếu theo đường (`phieu` trong src/lib/nap-truoc-man-em.ts) và `napSomTheoDuong` bắt đầu tải ngay khi App.tsx chạy.
+const napPhieu = thuLaiMotLan(() => import('./screens/PhieuScreen'))
+let huaPhieu: ReturnType<typeof napPhieu> | null = null
+const PhieuScreen = lazy(() => (huaPhieu ??= napPhieu()))
 const ExamTakeScreen = lazy(() => (huaManThi ??= napManThi()))
 const StudentPortalScreen = lazy(() => (huaCongHocSinh ??= napCongHocSinh()))
 function napSomTheoDuong() {
@@ -67,6 +72,7 @@ function napSomTheoDuong() {
   const dv = docDuongVao(location.search, location.pathname)
   if (dv.maCa || dv.vai === 'diem') huaManThi ??= napManThi()
   else if (dv.vai === 'hocsinh') huaCongHocSinh ??= napCongHocSinh()
+  else if (dv.vai === 'phieu') huaPhieu ??= napPhieu()
 }
 napSomTheoDuong()
 /** Lượt tải mảnh màn em đã bắt đầu từ đường vào (màn thi / cổng học sinh) — null nếu đường vào không phải của em.
@@ -337,7 +343,7 @@ function App() {
   if (laPhieu) {
     return (
       <ChanLoi o="Phiếu kết quả">
-        <BatLinhShell vai="ph"><PhieuScreen /></BatLinhShell>
+        <BatLinhShell vai="ph"><Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--nen)' }} />}><PhieuScreen /></Suspense></BatLinhShell>
       </ChanLoi>
     )
   }

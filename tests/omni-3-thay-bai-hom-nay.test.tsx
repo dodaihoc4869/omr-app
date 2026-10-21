@@ -19,6 +19,7 @@ vi.mock('../src/lib/exam-db', async (goc) => ({
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 
 import DayHocLenBang from '../src/components/day-hoc/DayHocLenBang'
+import HopBoSungBai from '../src/components/day-hoc/HopBoSungBai'
 import { dungCay } from '../src/lib/cay-chon-de'
 import { locDeDayHoc } from '../src/lib/day-hoc-len-bang'
 import { tachNhieuTheoPhan } from '../src/lib/tach-phan-de'
@@ -652,40 +653,39 @@ beforeEach(() => {
 })
 
 // Khóa lỗi 13/10: co-doc thất bại không được ẩn Tick mãi; kho đọc lỗi phải khác kho rỗng.
+// SỬA CÓ CHỦ ĐÍCH 21/10 — thầy: "bỏ cái phần tick bài vừa dạy khỏi hành trình đi" + "nút này làm riêng bấm vào popup lên để chọn luôn": Tick bài nay
+// ở hộp "Bổ sung bài hôm nay" (`HopBoSungBai`) và bảng Lên bảng đầy đủ — bước Dạy học nhúng ở Hành trình không còn khối Tick. Cùng hành vi lỗi / thử lại.
 describe('Tick bài tải lỗi và thử lại tại màn đang mở', () => {
-  const ddGia = () => ({ idBuoi: BUOI.id, dsLop: [{ tenLop: '12A1', khoi: '12', soEm: 44, sbd: [] }], tt: { buoi: BUOI, coMat: [], siSo: 44, lopEm: [] }, coMat: [], lopCuaEm: new Map() }) as unknown as import('../src/components/day-hoc/DiemDanhBuoi').DiemDanhBuoi
-  it('lỗi đọc công tắc hiện lý do + Thử lại, phục hồi Tick trong cùng màn', async () => {
+  it('lỗi đọc công tắc hiện lý do + Thử lại, phục hồi Tick trong cùng hộp', async () => {
     const goc = goi.getMockImplementation()!
     let loi = true
     goi.mockImplementation(async (d, b) => d === '/gv/omni' && b.action === 'co-doc' && loi ? { ok: false, chu: 'Không nối được máy chủ.' } : goc(d, b))
-    render(<DayHocLenBang dd={ddGia()} />)
-    expect((await screen.findByRole('alert')).textContent).toContain('Chưa tải được phần Tick bài')
-    expect(screen.queryByRole('button', { name: 'Tick bài hôm nay' })).toBeNull()
+    render(<HopBoSungBai onDong={() => {}} />)
+    const hop = screen.getByRole('dialog', { name: 'Bổ sung bài hôm nay' })
+    expect((await within(hop).findByRole('alert')).textContent).toContain('Chưa tải được phần Tick bài')
     loi = false
-    fireEvent.click(screen.getByRole('button', { name: 'Thử tải Tick bài lại' }))
-    expect(await screen.findByRole('button', { name: 'Tick bài hôm nay' })).toBeTruthy()
-    expect(screen.queryByRole('alert')).toBeNull()
+    fireEvent.click(within(hop).getByRole('button', { name: 'Thử tải Tick bài lại' }))
+    expect(await within(hop).findByText('Bài 3. Xà phòng và chất giặt rửa')).toBeTruthy()
+    expect(within(hop).queryByRole('alert')).toBeNull()
     expect(goi.mock.calls.filter(([d, b]) => d === '/gv/omni' && b.action === 'co-doc')).toHaveLength(2)
   })
-  it('lỗi IndexedDB không biến thành kho trống vĩnh viễn; Thử lại thật sự đọc và giữ cùng màn/bài', async () => {
+  it('lỗi IndexedDB không biến thành kho trống vĩnh viễn; Thử lại thật sự đọc và giữ cùng hộp/bài', async () => {
     khoGia.loiLan = 1
-    const { container } = render(<DayHocLenBang dd={ddGia()} />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Tick bài hôm nay' }))
-    expect((await screen.findByRole('alert')).textContent).toContain('Chưa đọc được kho đề')
-    expect(screen.queryByText(/Kho chưa có bài Dạy học/)).toBeNull()
-    const buoc = container.querySelector('[data-khoi="buoc-tick-bai"]')
-    fireEvent.click(screen.getByRole('button', { name: 'Thử tải kho lại' }))
-    expect(await screen.findByText('Bài 3. Xà phòng và chất giặt rửa')).toBeTruthy()
-    expect(screen.queryByRole('alert')).toBeNull()
-    expect(container.querySelector('[data-khoi="buoc-tick-bai"]')).toBe(buoc)
+    render(<HopBoSungBai onDong={() => {}} />)
+    const hop = screen.getByRole('dialog', { name: 'Bổ sung bài hôm nay' })
+    expect((await within(hop).findByRole('alert')).textContent).toContain('Chưa đọc được kho đề')
+    expect(within(hop).queryByText(/Kho chưa có bài Dạy học/)).toBeNull()
+    const buoc = hop.querySelector('[data-khoi="bai-hom-nay"]')
+    fireEvent.click(within(hop).getByRole('button', { name: 'Thử tải kho lại' }))
+    expect(await within(hop).findByText('Bài 3. Xà phòng và chất giặt rửa')).toBeTruthy()
+    expect(within(hop).queryByRole('alert')).toBeNull()
+    expect(hop.querySelector('[data-khoi="bai-hom-nay"]')).toBe(buoc)
     expect(khoGia.docLan).toBe(2)
   })
-  it('mở Tick và hộp chiếu cùng lúc chỉ đọc/dựng một lượt kho đang chờ', async () => {
-    render(<DayHocLenBang dd={ddGia()} />)
-    const tick = await screen.findByRole('button', { name: 'Tick bài hôm nay' })
-    fireEvent.click(tick)
-    fireEvent.click(screen.getByRole('button', { name: 'Chọn câu để chiếu' }))
-    expect(await screen.findByText('Bài 3. Xà phòng và chất giặt rửa')).toBeTruthy()
+  it('bảng Lên bảng đầy đủ: Tick bài và hộp chiếu cùng lúc chỉ đọc/dựng một lượt kho đang chờ', async () => {
+    render(<DayHocLenBang />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Chọn bài trong kho Dạy học' }))
+    expect((await screen.findAllByText('Bài 3. Xà phòng và chất giặt rửa')).length).toBeGreaterThan(0)
     expect(khoGia.docLan).toBe(1)
   })
 })

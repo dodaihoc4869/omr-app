@@ -20,6 +20,7 @@ import { soNgayConLai, tiLeChienDich } from './srs2-loi'
 import { ganBanBu,laBanBu } from './hanh-trinh-nguon-cau'
 import { tienDoHanhTrinh,type TangHanhTrinh } from './hanh-trinh-ngay'
 import { coGoi7, docGoiCuaEm7, homNayGoi7 } from './goi-bai-7'
+import { docCauHinhDem } from './cau-hinh-dem'
 
 type Row = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -70,10 +71,18 @@ export async function phLoiThay(envGoc: Env, b: Row, _nowMs: number = Date.now()
 // ---------------------------------------------------------------- /ph/hoc-2 ----------------------------------------------------------------
 export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), envDoc: Env = envGoc, ctx?: ExecutionContext): Promise<Row> {
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-hoc-2', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
-  const kt=await import('./kiem-tra-ca-nhan'), kiem=await kt.docKtCn(envDoc,sbd,nowMs,true)
+  // 21/10 (thầy: "mọi app phải tức thì hơn"): MỘT câu đọc nhóm cờ cấu hình (kiểm tra riêng · gói 7 ngày · Hoá 2.0 — cùng nhóm `cau-hinh-dem`) cùng
+  // lúc nạp mô-đun, rồi ba lượt đọc độc lập — kiểm tra cá nhân, gói 7 ngày, chế độ 2.0 — chạy SONG SONG (trước: nối tiếp). Cờ đã ấm ⇒ không thêm lệnh D1.
+  // Ngày kiểm tra trả sớm như cũ; lỗi vẫn ném đúng chỗ cũ.
+  const ktP=import('./kiem-tra-ca-nhan')
+  await docCauHinhDem(envDoc,'kiem_tra_ca_nhan_v1')
+  const kiemP=ktP.then(m=>m.docKtCn(envDoc,sbd,nowMs,true))
+  const goiP=coGoi7(envDoc).then(c=>c.bat?docGoiCuaEm7(envDoc,sbd,nowMs,true):[]), che2P=cheDo2(envDoc, sbd)
+  goiP.catch(()=>{}); che2P.catch(()=>{})
+  const [kt,kiem]=await Promise.all([ktP,kiemP])
   if(kt.laNgayKt(kiem,nowMs)&&!kt.coHocNgayKt(kiem)){const tt=kt.tomTatKt(kiem!,nowMs);return {ok:true,cheDo2:true,serverNow:nowMs,ngay:tt.ngay,kiemTraCaNhan:tt,homNay:{tong:tt.tong,daLam:tt.daTra}}}
-  const goiPh7=(await coGoi7(envDoc)).bat?await docGoiCuaEm7(envDoc,sbd,nowMs,true):[]
-  if (!(await cheDo2(envDoc, sbd))) return goiPh7.length?{ok:true,cheDo2:true,serverNow:nowMs,goi7:goiPh7.map(g=>({ten:g.ten,han:g.han,tong:g.cau.length,daGap:g.daGap.size,con:g.cau.length-g.daGap.size,nguonDayDu:g.nguonDayDu})),homNay:homNayGoi7(goiPh7)}:{ ok: true, cheDo2: false }
+  const goiPh7=await goiP
+  if (!(await che2P)) return goiPh7.length?{ok:true,cheDo2:true,serverNow:nowMs,goi7:goiPh7.map(g=>({ten:g.ten,han:g.han,tong:g.cau.length,daGap:g.daGap.size,con:g.cau.length-g.daGap.size,nguonDayDu:g.nguonDayDu})),homNay:homNayGoi7(goiPh7)}:{ ok: true, cheDo2: false }
   const ngay = ngayVnCua(nowMs)
   // Tối ưu 05/10: lệnh CHỈ ĐỌC ⇒ khối OMNI (cờ + phần đọc không phụ thuộc hồ sơ srs2) bắt đầu CÙNG lúc phần chính, chỉ chờ hồ sơ srs2 ở chỗ cần (số câu cắt tỉa)
   // — trước: chờ phần chính xong mới hỏi cờ rồi đọc (≈ 9 đợt nối tiếp). Lời hỏi cờ dùng chung cho hồ sơ srs2 (cùng hàm `omniBat`). Kết quả và khoá phản hồi

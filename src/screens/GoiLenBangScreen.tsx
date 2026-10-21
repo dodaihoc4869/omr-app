@@ -1253,7 +1253,7 @@ function GoiLenBangCu() {
       // CẦU NỐI GHI KẾT QUẢ NGAY TRÊN TỜ CHIẾU: mã phiên ngẫu nhiên mỗi lần mở, chỉ nằm trong HTML của tờ này.
       const maPhien = taoMaPhienChieu()
       const {layEmChieu,nhanEmChieu}=await import('../lib/ung-vien-chieu')
-      const uvDung=await layEmChieu(dsO.map(o=>qidMayChuCuaIdCau(o.qid??'')??o.qid??''),dsEmCa.filter(e=>e.coMat).map(e=>e.sbd))
+      const uvDung=await layEmChieu(dsO.map(o=>qidMayChuCuaIdCau(o.qid??'')??o.qid??''),dsEmCa.filter(e=>e.coMat).map(e=>e.sbd),undefined,undefined,undefined,{kenh:'goi-len-bang'})
       const cauTheoId=new Map([...oTrenTo.values()].map(o=>[o.cau.id,o.cau]))
       oTrenTo.clear()
       for(const o of dsO){const qid=qidMayChuCuaIdCau(o.qid??'')??o.qid??'',e=uvDung.get(qid)?.[0],c=cauTheoId.get(o.qid??'');o.sbd=e?.sbd??'';o.hoTen=e?.ten??'Cả lớp';o.lichSuCau=e?nhanEmChieu(e):undefined;o.lanLenBang=undefined;if(e&&c)oTrenTo.set(khoaToChieu(e.sbd,c.id),{sbd:e.sbd,hoTen:e.ten,cau:c})}

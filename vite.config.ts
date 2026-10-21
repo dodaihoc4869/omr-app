@@ -95,6 +95,7 @@ function napTruocManEm(): Plugin {
           thi: ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
           hs: ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo),
           ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), app),
+          phieu: ngoai(dsCua('/src/screens/PhieuScreen.tsx'), app),
           app,
           hsVo,
           phongHs,
@@ -120,6 +121,35 @@ function boGhiChuHtml(): Plugin {
   }
 }
 
+// Gói vừa dựng (giữ để `modulePreload.resolveDependencies` tra đóng tĩnh của mảnh đang gọi). Hook chạy TRƯỚC bước Vite ghi danh sách mảnh con.
+let goiVuaDung: Record<string, { type: string; imports?: string[]; viteMetadata?: { importedCss: Set<string> } }> = {}
+const dongTinh = new Map<string, Set<string>>()
+function dongTinhCua(ten: string): Set<string> {
+  const co = dongTinh.get(ten)
+  if (co) return co
+  const ra = new Set<string>(), hang = [ten]
+  while (hang.length) {
+    const t = hang.pop()!
+    const m = goiVuaDung[t]
+    if (!m || m.type !== 'chunk') continue
+    for (const c of m.viteMetadata?.importedCss ?? []) ra.add(c)
+    for (const con of m.imports ?? []) if (!ra.has(con)) { ra.add(con); hang.push(con) }
+  }
+  dongTinh.set(ten, ra)
+  return ra
+}
+/** Tệp index.html nạp ở MỌI đường: mảnh vào (`isEntry`) + đóng tĩnh + CSS của chúng — tính từ đồ thị thật, không đoán theo tên tệp. */
+let luonCoCache: Set<string> | null = null
+function dongTinhVao(): Set<string> {
+  if (luonCoCache) return luonCoCache
+  const ra = new Set<string>()
+  for (const [ten, m] of Object.entries(goiVuaDung)) if (m.type === 'chunk' && (m as { isEntry?: boolean }).isEntry) { ra.add(ten); for (const t of dongTinhCua(ten)) ra.add(t) }
+  return (luonCoCache = ra)
+}
+function giuGoiVuaDung(): Plugin {
+  return { name: 'giu-goi-vua-dung', apply: 'build', enforce: 'pre', generateBundle: { order: 'pre', handler(_o, goi) { goiVuaDung = goi as unknown as typeof goiVuaDung; dongTinh.clear(); luonCoCache = null } } }
+}
+
 export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? REPO_BASE : '/',
   define: {
@@ -130,6 +160,7 @@ export default defineConfig({
   plugins: [
     react(),
     napTruocManEm(),
+    giuGoiVuaDung(),
     boGhiChuHtml(),
     VitePWA({
       // SERVICE WORKER VIẾT TAY (`src/sw.ts`), KHÔNG dùng bản tự sinh nữa.
@@ -290,13 +321,18 @@ export default defineConfig({
           '**/{nut-that-api,omni-bang}-*.{js,css}',
           // Gộp main 09/10 tối: hai mảnh CHUNG mới tách ra giữa các màn chiếu/chữa của thầy (LenBangChienDich, DayHocLenBang, KiemTraDauGio,
           // CauCanChuaTrenLop, GoiLenBangScreen, html-may-chieu — đều đã ngoài precache) ⇒ cũng không cất sẵn (+42 KB đưa precache vượt trần).
-          '**/{ghi-to-chieu,thoi-gian-len-bang}-*.{js,css}',
+          // 21/10: mảnh chung của bộ chọn em lên bảng phân tầng (chon-em-phan-tang + ung-vien-chieu + dau-gio) — CHỈ màn thầy nhập (đã soát: Dạy học,
+          // Kiểm tra đầu giờ, Chữa câu, Thầy tự chữa, Gọi lên bảng, Lên bảng chiến dịch, Hôm nay) ⇒ kho chạy-lúc như hai mảnh trên.
+          '**/{ghi-to-chieu,thoi-gian-len-bang,chon-em-phan-tang}-*.{js,css}',
           // Bản vẽ tối giản app thầy (09/10): màn "Hôm nay" của thầy + hai thẻ ghép màn sẵn có của Hành trình (Cần thầy chữa, Bài đã dạy) nạp LƯỜI.
           // Các thẻ ấy nhập động Dạy học / Kiểm tra đầu giờ / Bước cuối trên lớp (trước nằm trong mảnh Gọi lên bảng) ⇒ Rollup tách thành mảnh riêng,
           // kèm `TheCauHienThi` (chỉ hai màn ấy dùng), `gv-v2` (khung + phép tính nhịp của Hành trình/Hôm nay), `HopChonDe` + `cay-chon-de` (hộp chọn
           // đề / cây đề — chỉ màn thầy nhập: Giao/Sửa chiến dịch, Dạy học, Mở ca, Gọi lên bảng, Bài hôm nay, cây mục đích). Đồ thị nhập đã soát: CHỈ màn
           // thầy nhập ⇒ kho chạy-lúc; máy em / phụ huynh / màn thi không bao giờ tải. Giữ precache vỏ không lớn hơn trước (≈ 2990 KB, trần 3000 KB).
           '**/{GvHomNayScreen,TheCanThayChua,TheBaiDaDay,DayHocLenBang,KiemTraDauGio,CauCanChuaTrenLop,TheCauHienThi,gv-v2,HopChonDe,cay-chon-de}-*.{js,css}',
+          // 21/10 (Hành trình một trang 4 bước + hộp Bổ sung bài hôm nay): hộp + bước Bài hôm nay tách mảnh riêng (Hôm nay và Lên bảng cùng nạp), kéo theo
+          // kiểu dáng day-hoc và khoá tờ chiếu thành mảnh riêng — CHỈ máy thầy (các màn nhập đều ngoài precache) ⇒ kho chạy-lúc, precache giữ 170 tệp.
+          '**/{BaiHomNay,HopBoSungBai,day-hoc,to-chieu-cau-noi}-*.{js,css}',
           // Hành trình › Nhịp học + tấm Lịch sử làm câu của một em (thầy 09/10 khuya): CHỈ màn thầy nạp lười (thẻ Nhịp học ⇒ bấm một em), lệnh
           // `/gv/lich-su-lam-cau` cần mạng ⇒ kho chạy-lúc, không cất sẵn.
           '**/{TheNhipHoc,HoSoLamCauEm,nhip-hanh-trinh}-*.{js,css}',
@@ -374,6 +410,17 @@ export default defineConfig({
     }),
   ],
   build: {
+    // 21/10 (luật tốc độ: mọi đường chỉ nhanh hơn): danh sách mảnh con mà mỗi lượt `import()` ghi kèm (`__vite__mapDeps`) BỎ các tệp index.html
+    // ĐÃ nạp ở MỌI đường trước khi mã nào chạy — mảnh vào (`isEntry`) + đóng tĩnh + CSS của nó, tính từ đồ thị gói (không đoán theo tên tệp). Nạp trước lại một
+    // tệp đã có là việc thừa (trình duyệt bỏ qua), nhưng tên tệp lặp trong danh sách của mọi mảnh làm các mảnh nặng thêm.
+    modulePreload: {
+      resolveDependencies: (_url, deps, { hostId }) => {
+        // Thêm: tệp mà CHÍNH mảnh đang gọi đã `import` tĩnh (trực tiếp hay gián tiếp) — chắc chắn đã chạy xong trước khi mã của mảnh ấy chạy.
+        const tinh = dongTinhCua(hostId)
+        const luonCo = dongTinhVao()
+        return deps.filter((d) => !luonCo.has(d) && !tinh.has(d))
+      },
+    },
     target: ['es2020', 'safari14', 'ios14'],
     cssTarget: ['safari14', 'ios14'],
     rolldownOptions: {
@@ -394,6 +441,9 @@ export default defineConfig({
             { name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/ },
             // fflate (nạp động trong day-ca-may-chu-moi.ts) — đặt tên mảnh rõ để globIgnores ở trên bắt đúng nó (tên tự sinh là `browser-*`, quá chung).
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
+            // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng
+            // (+2,4 KB nén cho app học sinh vì mỗi tệp nén riêng) ⇒ gom lại vào CÙNG mảnh DesignSystem (học sinh / thầy đều nạp sẵn).
+            { name: 'KhoiLoiGiaiChuan', test: /src[\\/](?:components[\\/](?:loi-giai[\\/]KhoiLoiGiaiChuan|ExperimentDemo)\.tsx|lib[\\/](?:experiments[\\/]nhe|loi-giai-api|chuan-hoa-loi-giai|chu-la-pdf)\.ts)$/ },
           ],
         },
       },

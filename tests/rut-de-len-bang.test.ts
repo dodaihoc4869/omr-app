@@ -173,8 +173,10 @@ describe('khối Bộ câu ra đề — chế độ thứ ba', () => {
   // RÚT ĐỀ v2 (02/10, thầy chốt): "Kiểm tra điểm yếu" ⇒ BỘ RIÊNG TỪNG EM (thay luật cũ "cả lớp cùng một đề").
   it('có chip "Kiểm tra điểm yếu" và chuyển ca sang đề riêng từng em, đủ số câu chẩn đoán', async () => {
     const ma = (await import('../src/components/KhoiRutDe.tsx?raw')).default
-    expect(ma).toContain('Kiểm tra điểm yếu')
-    expect(ma).toContain("setCheDo('lenbang')")
+    // Từ 21/10 chế độ là THẺ ở màn Mở ca; khối nhận `cheDo === 'diem_yeu'`.
+    expect(ma).toContain("const lenBang = cheDo === 'diem_yeu'")
+    const man = (await import('../src/screens/ExamSetupScreen.tsx?raw')).default
+    expect(man).toContain("{ id: 'diem_yeu', ten: 'Kiểm tra điểm yếu'")
     // soCau báo lên = ĐÚNG cỡ bộ chẩn đoán; cờ đề riêng bật ⇒ lúc Bắt đầu mỗi em một bộ theo lỗi của chính em
     expect(ma).toContain('onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua), deRieng: true, phamViHoiLai })')
     expect(ma).not.toContain('Cả lớp làm CÙNG một đề')
@@ -269,18 +271,11 @@ describe('kho chữa cho bốn lượt gọi', () => {
   })
 })
 
-// Thầy bấm chip "Phân công lên bảng" thì ô thời lượng ca tự về 15 phút — để ô
-// giờ không nói một đằng bộ câu một nẻo (thầy chốt 05/09 chiều, kèm ảnh màn).
+// Thầy bấm thẻ "Kiểm tra điểm yếu" thì ô thời lượng ca tự về 15 phút — để ô
+// giờ không nói một đằng bộ câu một nẻo (thầy chốt 05/09 chiều; thẻ từ 21/10).
 describe('chọn chế độ thì ô thời lượng ca tự đổi', () => {
-  it('chip gọi onDoiPhutLamBai với đúng trần 15 phút', async () => {
-    const ma = (await import('../src/components/KhoiRutDe.tsx?raw')).default
-    expect(ma).toContain('onDoiPhutLamBai?.(PHUT_TOI_DA_LEN_BANG)')
-    // chỉ đổi khi đang khác 15, không ghi đè liên tục
-    expect(ma).toContain('if (phutLamBai !== PHUT_TOI_DA_LEN_BANG) onDoiPhutLamBai?.(PHUT_TOI_DA_LEN_BANG)')
-  })
-
-  it('màn Mở ca nối thẳng vào ô số phút', async () => {
+  it('thẻ Kiểm tra điểm yếu đặt đúng trần 15 phút, chỉ khi đang khác 15', async () => {
     const ma = (await import('../src/screens/ExamSetupScreen.tsx?raw')).default
-    expect(ma).toContain('onDoiPhutLamBai={setThoiGianPhut}')
+    expect(ma).toContain("if (t.id === 'diem_yeu' && thoiGianPhut !== PHUT_TOI_DA_LEN_BANG) setThoiGianPhut(PHUT_TOI_DA_LEN_BANG)")
   })
 })

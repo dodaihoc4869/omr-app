@@ -2,7 +2,8 @@
  "lenh": [
   "21/10/2026 thầy: \"phần những ai làm sai hiển thị máy chiếu trên bảng khi tôi bấm làm lại có 2 thẻ … thiết kế lại phần đó siêu đẹp trực quan, khoa học, hiện thị đầy đủ các mức 1 tới 4 chi tiết rõ ràng\"",
   "21/10/2026 thầy: \"Phần chi tiết học sinh đã gọi lên bảng cũng vậy thiết kế lại hiển thị đầy đủ mức 1 tới 4\"",
-  "20/10/2026 thầy duyệt dải xanh Mức làm 1→4 (rgb 65,83,112 · 87,114,151 · 110,148,195 · 134,182,239)"
+  "20/10/2026 thầy duyệt dải xanh Mức làm 1→4 (rgb 65,83,112 · 87,114,151 · 110,148,195 · 134,182,239)",
+  "21/10/2026 thầy (Mở ca kiểm tra): \"chốt mọi thứ bạn làm luôn đi\" — duyệt đề xuất bỏ hộp nổi Rút đề + 3 chip ngoài, gộp nút cấu trúc nhanh. Các khai báo màu trong `cu` thuộc ĐÚNG những phần tử bị gỡ (hai nút \"Chuẩn 14 câu\"/\"Đề THPT 28 câu\" cũ ở KhoiRutDe.tsx, nút \"Xong\" của hộp nổi Rút đề ở ExamSetupScreen.tsx) — không đổi màu phần tử nào còn lại; chip mới dùng lại Chip có sẵn."
  ],
  "ghiChu": "Thiết kế LẠI hai bảng của tờ chiếu (Ai đã sai? phím X · chi tiết em gọi lên bảng) ⇒ các khai báo màu của bản cũ không còn. `cu` = khai báo màu CŨ được phép biến mất (đúng tệp · khai báo → SỐ LẦN được giảm; giảm quá số này là vi phạm); `moi` = khai báo màu thô MỚI được phép có — CHỈ chín biến gốc của hai bảng, mọi màu khác trong hai bảng là var()/color-mix() từ chín biến này và từ biến tờ chiếu có sẵn. Thêm dòng mới ở đây phải có lệnh thầy kèm theo.",
  "cu": {
@@ -29,7 +30,12 @@
   "src/lib/len-bang-moi-to-chieu.ts · --c: rgb(229,83,75)": 1,
   "src/lib/len-bang-moi-to-chieu.ts · --mc-sai-c: rgb(230,103,103)\"><b>' + thuTu.length + '</b><span>em làm sai</span></div>'": 1,
   "src/lib/len-bang-moi-to-chieu.ts · --mc-sai-c: rgb(255,210,122)\"><b>' + ds.length + '</b><span>lượt làm sai' + (conNua ? ' (300 lượt gần nhất)' : '') + '</span></div>'": 1,
-  "src/lib/len-bang-moi-to-chieu.ts · --mc-sai-c: rgb(57,135,229)\"><b>' + (tb == null ? '—' : (coUoc ? '≈ ' : '') + saiThoiLuong(tb)) + '</b><span>trung bình mỗi lượt</span></div>'": 1
+  "src/lib/len-bang-moi-to-chieu.ts · --mc-sai-c: rgb(57,135,229)\"><b>' + (tb == null ? '—' : (coUoc ? '≈ ' : '') + saiThoiLuong(tb)) + '</b><span>trung bình mỗi lượt</span></div>'": 1,
+  "src/components/KhoiRutDe.tsx · background: soCau.I === 9 && soCau.II === 2 && soCau.III === 3 ? 'var(--tim-nen)' : 'var(--the-2)',": 1,
+  "src/components/KhoiRutDe.tsx · color: soCau.I === 9 && soCau.II === 2 && soCau.III === 3 ? 'var(--tim)' : 'var(--muc)',": 1,
+  "src/components/KhoiRutDe.tsx · background: soCau.I === 18 && soCau.II === 4 && soCau.III === 6 ? 'var(--tim-nen)' : 'var(--the-2)',": 1,
+  "src/components/KhoiRutDe.tsx · color: soCau.I === 18 && soCau.II === 4 && soCau.III === 6 ? 'var(--tim)' : 'var(--muc)',": 1,
+  "src/screens/ExamSetupScreen.tsx · color: var(--m3-primary)] text-[color:var(--m3-on-primary)] font-bold text-xs cursor-pointer shadow-xs active:scale-95\"": 1
  },
  "moi": [
   "src/lib/len-bang-moi-to-chieu.ts · --mc-b: rgb(255,255,255)",

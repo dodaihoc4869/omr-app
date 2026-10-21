@@ -139,12 +139,13 @@ describe('phép thuần + lớp nối', () => {
 describe('thẻ Bài hằng ngày', () => {
   // SỬA CÓ CHỦ ĐÍCH — thầy 12/10: Hành trình còn 2 mục (Dạy học & đầu giờ · Chữa bài); thẻ Bài hằng ngày chuyển sang màn Hôm nay (làn Hôm nay).
   // `TheBaiHangNgay` giữ nguyên (các test dưới); khoá cũ `{ the: 'bai-hang-ngay' }` không gãy: mở mục Dạy học & đầu giờ, không gọi lệnh bảng nhiệt.
-  it('khoá cũ { the: bai-hang-ngay } ⇒ Hành trình mở mục Dạy học & đầu giờ (không còn thẻ Bài hằng ngày), xoá yêu cầu', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 21/10 (thầy duyệt bản vẽ docs/ban-ve-hanh-trinh-2110): Hành trình là MỘT trang 4 bước, không còn thẻ / mục.
+  it('khoá cũ { the: bai-hang-ngay } ⇒ Hành trình mở trang 4 bước (không còn thẻ Bài hằng ngày), xoá yêu cầu', async () => {
     mayChu()
     useSoDemGv.getState().datMoHanhTrinh({ the: 'bai-hang-ngay' })
     render(<ChienDichScreen />)
-    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học & đầu giờ', 'Chữa bài'])
-    expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.queryAllByRole('tab')).toHaveLength(0)
+    expect(screen.queryByText('Bài hằng ngày')).toBeNull()
     expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
     await waitFor(() => expect(useSoDemGv.getState().moHanhTrinh).toBeNull())
     expect(m.goi.mock.calls.filter(([d]) => d === '/gv/bai-hang-ngay')).toHaveLength(0)

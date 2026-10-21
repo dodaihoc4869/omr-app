@@ -457,6 +457,8 @@ export default function TheCanThayChua({ onDem }: { onDem?: (n: number) => void 
         />
       )}
       <div className="gvv2-cb-hai" hidden={!!mo}>
+        {/* 21/10 (Hành trình một trang, bước 4 "Chữa câu khó & tính toán"): khối câu khó thầy tự chọn đứng TRƯỚC, câu học sinh cần chữa sau. */}
+        <ThayTuChua />
         <section ref={goc} className="gvv2-the gvv2-cc gvv2-cb-a" aria-labelledby="gvv2-cb-a-tieu">
           <div className="gvv2-cb-a-dau">
             <div className="gvv2-cb-a-chu">
@@ -552,7 +554,6 @@ export default function TheCanThayChua({ onDem }: { onDem?: (n: number) => void 
             </ul>
           )}
         </section>
-        <ThayTuChua />
       </div>
     </div>
   )

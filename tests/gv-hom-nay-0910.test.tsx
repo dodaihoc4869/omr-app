@@ -49,6 +49,16 @@ vi.mock('../src/lib/chua-cau-sai-thay-api', () => ({ goiChuaThay: (...a: unknown
 vi.mock('../src/lib/nut-that-api', () => ({ gvDsNutThat: () => nguon.gvDsNutThat(), gvGoNutThat: vi.fn() }))
 vi.mock('../src/components/day-hoc/DayHocLenBang', () => ({ default: () => <section data-khoi="bai-hom-nay">Giả: Bài hôm nay</section> }))
 vi.mock('../src/components/day-hoc/KiemTraDauGio', () => ({ default: () => <p>Giả: Kiểm tra đầu giờ</p> }))
+// 21/10: "Bổ sung bài hôm nay" mở hộp ngay tại Hôm nay (hộp có test riêng: tests/hop-bo-sung-bai-2110.test.tsx).
+vi.mock('../src/components/day-hoc/HopBoSungBai', () => ({
+  default: (p: { onDong: (daGiao: boolean) => void }) => (
+    <div role="dialog" aria-label="Bổ sung bài hôm nay">
+      <button type="button" onClick={() => p.onDong(false)}>
+        Giả: đóng hộp
+      </button>
+    </div>
+  ),
+}))
 
 import ThanhBenTrai from '../src/components/ThanhBenTrai'
 import BottomNav from '../src/components/BottomNav'
@@ -271,8 +281,12 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     fireEvent.click(await screen.findByRole('button', { name: /^Cần thầy chữa · 8 chỗ.*Chữa bài$/ }))
     expect(useAppStore.getState().screen).toBe('chiendich')
     expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'can-chua' })
+    // SỬA CÓ CHỦ ĐÍCH 21/10 (thầy: "nút này làm riêng bấm vào popup lên để chọn luôn"): "Bổ sung bài" mở hộp tại chỗ, không đặt lối vào Hành trình.
     fireEvent.click(screen.getByRole('button', { name: /^12A2: 3 ngày chưa có bài mới.*Bổ sung bài$/ }))
-    expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'day-hoc', boSungBai: true })
+    expect(await screen.findByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeTruthy()
+    expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'can-chua' })
+    fireEvent.click(screen.getByRole('button', { name: 'Giả: đóng hộp' }))
+    expect(screen.queryByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeNull()
     useSoDemGv.getState().datMoHanhTrinh(null)
     useAppStore.getState().setScreen('tongquan')
     expect(screen.queryByRole('button', { name: /^Xem danh sách/ })).toBeNull()
@@ -310,8 +324,10 @@ describe('màn Hôm nay của thầy — số từ API', () => {
       // thanh bên: Học sinh hỏi thuộc mục Hôm nay
       render(<ThanhBenTrai />)
       expect(screen.getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
+      // SỬA CÓ CHỦ ĐÍCH 21/10: nút chính mở hộp Bổ sung bài ngay tại chỗ, không chuyển màn.
       fireEvent.click(screen.getByRole('button', { name: 'Bổ sung bài hôm nay' }))
-      expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'day-hoc', boSungBai: true })
+      expect(await screen.findByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeTruthy()
+      expect(useSoDemGv.getState().moHanhTrinh).toBeNull()
     } finally {
       BANG['ht-12'] = bang(HT12, { hanhTrinhNgay: { em: [em('4', 36, 40), em('5', 36, 0), em('6', null, 0)] }, canDayLai: [{ qid: 'q9', stt: 9, dang: 'Ester', soEm: 4 } as BangChienDich['canDayLai'][number]] })
     }
@@ -431,67 +447,58 @@ describe('màn Hôm nay của thầy — số từ API', () => {
 // câu khó tính toán và câu học sinh cần chữa … thu gọn tối giản hết lại thành 2 mục"): "Dạy học & đầu giờ" (một buổi dạy 4 bước) · "Chữa bài"
 // (số cần chữa cạnh tên). Bỏ thẻ Bài mới trong 7 ngày · Nhịp học · Bài hằng ngày · Kiểm tra đầu giờ (gộp vào mục 1). Nút chính "Tick bài hôm nay" /
 // "Bổ sung bài" nay ở bước 4 của mục 1 (không còn nút ở đầu màn) — kiểm ở tests/hanh-trinh-2-muc-1210.test.tsx.
-describe('Hành trình: hai mục Dạy học & đầu giờ · Chữa bài', () => {
-  it('mặc định Dạy học & đầu giờ; đúng 2 mục; không nút chính ở đầu màn; không còn Nhịp hôm nay / Chiến dịch đã giao / ba thẻ khối', async () => {
+// SỬA CÓ CHỦ ĐÍCH 21/10 — thầy (bản vẽ docs/ban-ve-hanh-trinh-2110 đã duyệt): bỏ hai mục; Hành trình là MỘT trang 4 bước (Điểm danh · Gọi lên bảng đầu
+// giờ · Dạy học · Chữa câu khó & tính toán); Tick bài rời Hành trình thành hộp "Bổ sung bài hôm nay" — kiểm chi tiết ở tests/hanh-trinh-2-muc-1210.test.tsx.
+describe('Hành trình: một trang 4 bước', () => {
+  it('không còn mục; không nút chính ở đầu màn; không còn Nhịp hôm nay / Chiến dịch đã giao / ba thẻ khối; bước 4 mở ra là danh sách Học sinh cần chữa', async () => {
     mayChu()
     useSoDemGv.getState().datSo({ canThayChua: 7 })
     const { container } = render(<HanhTrinhV2 />)
-    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học & đầu giờ', 'Chữa bài · 7 chỗ cần chữa'])
-    expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
+    const thuoc = await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })
+    expect(screen.queryAllByRole('tab')).toHaveLength(0)
     expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
-    expect(screen.queryByRole('tab', { name: /Nhịp|Chiến dịch đã giao|Bài đã dạy|Tổng quan|Bài mới trong 7 ngày|Bài hằng ngày|Kiểm tra đầu giờ|Cần thầy chữa/ })).toBeNull()
     expect(screen.queryByRole('region', { name: 'Chỉ số hôm nay' })).toBeNull()
     expect(screen.queryByRole('radiogroup', { name: 'Chọn khối' })).toBeNull()
     expect(container.querySelector('.gvv2-khoi-nut, .gvv2-kpi, .gvv2-bang')).toBeNull()
     expect(container.querySelector('.gvv2-dau .gvv2-nut-chinh, .gvv2-dau button')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Giao theo bài' })).toBeNull()
-    // mục Dạy học không đọc bảng/nhịp chiến dịch nào của máy chủ
+    // trang không đọc bảng/nhịp chiến dịch nào của máy chủ khi bước 4 chưa mở
     expect(m.goi.mock.calls.some(([d]) => d === '/gv/chien-dich')).toBe(false)
+    expect(within(thuoc).getByText('7 chỗ')).toBeTruthy()
 
-    fireEvent.click(screen.getByRole('tab', { name: /^Chữa bài/ }))
-    // SỬA CÓ CHỦ ĐÍCH 12/10B (bản vẽ duyệt): thẻ "Chữa bài" (Hành trình còn 2 mục) — khối danh sách mang tiêu đề "Học sinh cần chữa".
+    fireEvent.click(within(thuoc).getByRole('button', { name: /^Chữa câu khó & tính toán/ }))
     expect(await screen.findByRole('region', { name: 'Học sinh cần chữa' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Bổ sung bài' })).toBeNull()
-    // danh sách đọc xong (8 chỗ: gồm cả bước cuối, thẻ nút thắt, kèm riêng) ⇒ số cạnh tên mục khớp số trong mục
-    await waitFor(() => expect(screen.getByRole('tab', { name: /^Chữa bài/ }).textContent).toBe('Chữa bài · 8 chỗ cần chữa'))
-    // không còn ba thẻ con cũ
-    expect(screen.queryByRole('tab', { name: /Buổi chữa|Bước cuối trên lớp|Gỡ nút thắt/ })).toBeNull()
+    // danh sách đọc xong (8 chỗ: gồm cả bước cuối, thẻ nút thắt, kèm riêng) ⇒ số trên thước và thanh bên khớp số trong danh sách
+    await waitFor(() => expect(within(thuoc).getByText('8 chỗ')).toBeTruthy())
+    expect(useSoDemGv.getState().canThayChua).toBe(8)
   })
 
-  it('"Bổ sung bài" từ Hôm nay (boSungBai) cuộn tới bước Tick bài vừa dạy của mục Dạy học — chỉ khi có yêu cầu', async () => {
-    const cuon = vi.fn()
-    const goc = Element.prototype.scrollIntoView
-    Element.prototype.scrollIntoView = cuon
-    try {
-      const { unmount } = render(<TheBaiDaDay />)
-      await screen.findByText('Giả: Bài hôm nay')
-      expect(cuon).not.toHaveBeenCalled()
-      unmount()
-      render(<HanhTrinhV2 boSungBai />)
-      await screen.findByText('Giả: Bài hôm nay')
-      await waitFor(() => expect(cuon).toHaveBeenCalledTimes(1))
-    } finally {
-      Element.prototype.scrollIntoView = goc
-    }
+  it('lối cũ boSungBai ⇒ mở hộp Bổ sung bài hôm nay ngay trên màn; không yêu cầu ⇒ không hộp', async () => {
+    const { unmount } = render(<HanhTrinhV2 />)
+    await screen.findByText('Giả: Bài hôm nay')
+    expect(screen.queryByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeNull()
+    unmount()
+    render(<HanhTrinhV2 boSungBai />)
+    expect(await screen.findByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Giả: đóng hộp' }))
+    expect(screen.queryByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeNull()
   })
 
-  it('ChienDichScreen: Hôm nay đặt khoá cũ can-chua ⇒ mở Chữa bài rồi xoá yêu cầu; không yêu cầu ⇒ Dạy học & đầu giờ; khoá chiến dịch cũ về Dạy học & đầu giờ', async () => {
+  it('ChienDichScreen: Hôm nay đặt khoá cũ can-chua ⇒ mở bước 4 rồi xoá yêu cầu; khoá chiến dịch cũ về trang 4 bước', async () => {
     mayChu()
     useSoDemGv.getState().datMoHanhTrinh({ the: 'can-chua' })
-    const { unmount } = render(<ChienDichScreen />)
-    expect(screen.getByRole('tab', { name: /^Chữa bài/ }).getAttribute('aria-selected')).toBe('true')
+    const { unmount, container } = render(<ChienDichScreen />)
+    expect(await screen.findByRole('region', { name: 'Học sinh cần chữa' })).toBeTruthy()
+    expect(container.querySelector('[data-buoc-ht="4"]')!.getAttribute('data-mo')).toBe('true')
     await waitFor(() => expect(useSoDemGv.getState().moHanhTrinh).toBeNull())
     unmount()
-
-    const lan2 = render(<ChienDichScreen />)
-    expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
-    lan2.unmount()
 
     // SỬA CÓ CHỦ ĐÍCH 14/10: đã gỡ trang quản lý cũ; khoá điều hướng tồn đọng vẫn mở Hành trình.
     useSoDemGv.getState().datMoHanhTrinh({ the: 'chien-dich' })
     useSoDemGv.getState().datGiaoTuCa({ maCa: 'ca-cu', lop: '12A1', ten: 'Ca cũ' })
     render(<ChienDichScreen />)
-    expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
+    expect(await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })).toBeTruthy()
     expect(screen.queryByRole('heading', { name: 'Chiến dịch đã giao' })).toBeNull()
     await waitFor(() => expect(useSoDemGv.getState()).toMatchObject({ moHanhTrinh: null, giaoTuCa: null }))
 

@@ -302,3 +302,24 @@ describe('đầu cuối với Sổ nợ (phatLaiCau / kế hoạch ngày)', () =
     expect((await layKeHoachHomNay(env, 'S3', TA + NGAY, hs)).kh.doan).toContain('Q3')
   })
 })
+
+describe('phân tầng Kiểm tra đầu giờ (21/10)', () => {
+  it('ứng viên kèm khả năng trung bình (null khi chưa có số đo) + số lần lên bảng 14 ngày (đọc 60 ngày)', async () => {
+    const { d, env, buoiId } = await fixture(3)
+    d.sql.prepare("INSERT INTO omni_p_vkn(sbd,vkn_id,p,n_tu_lam,n_ngay,trang_thai,phien_ban,cap_nhat_luc) VALUES(?,?,?,3,2,'vung','v1','x')").run('S1', 'k:a', 0.4)
+    d.sql.prepare("INSERT INTO omni_p_vkn(sbd,vkn_id,p,n_tu_lam,n_ngay,trang_thai,phien_ban,cap_nhat_luc) VALUES(?,?,?,3,2,'vung','v1','x')").run('S1', 'k:b', 0.8)
+    for (const luc of [ngayTruoc(2), ngayTruoc(20), ngayTruoc(90)]) d.sql.prepare('INSERT INTO len_bang(sbd,chuyen_de,qid,dat,luc) VALUES(?,?,?,?,?)').run('S2', 'x', 'Q1', 1, luc)
+    const r = await g(env, { action: 'ung-vien', buoiId })
+    const e = new Map(r.em.map((x: any) => [x.sbd, x]))
+    expect((e.get('S1') as any).pTb).toBeCloseTo(0.6)
+    expect(e.get('S2')).toMatchObject({ pTb: null, soLan14: 1, lanCuoiLenBang: ngayTruoc(2) })
+    expect(e.get('S3')).toMatchObject({ pTb: null, soLan14: 0, lanCuoiLenBang: null })
+  })
+  it('lượt 6 em ở chế độ Trộn: xen kẽ ba tầng (2/2/2) khi lớp đủ em mỗi tầng; chế độ Chắc đúng giữ cách xáo cũ', () => {
+    const em: EmUngVien[] = Array.from({ length: 12 }, (_, i) => ({ sbd: `E${i}`, hoTen: `Em ${i}`, pTb: i / 12, cau: [{ qid: `C${i}`, soLan: 1, dungLanDau: true, lanCuoi: ngayTruoc(10) }] }))
+    const luot = chonLuotDauGio(em, { rng: rngCo(3), nowMs: T0 })
+    expect(luot).toHaveLength(6)
+    expect([1, 2, 3].map((t) => luot.filter((x) => x.tang === t).length)).toEqual([2, 2, 2])
+    expect(chonLuotDauGio(em, { rng: rngCo(3), nowMs: T0, cheDo: 'chac' }).every((x) => x.tang === undefined)).toBe(true)
+  })
+})

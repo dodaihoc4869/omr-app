@@ -41,30 +41,40 @@ const ds = (id: string) => ({ id, text: `Cho các phát biểu về ${id}`, idea
 const tln = (id: string) => ({ id, text: `Tính thể tích khí ${id} (lít)`, correct: '2,24', chuyenDe: 'Ester', mucDo: 'van_dung' })
 const NGUON = [{ maDe: 'D', phanI: Array.from({ length: 60 }, (_, i) => mcq(`D-I-${i}`)), phanII: Array.from({ length: 20 }, (_, i) => ds(`D-II-${i}`)), phanIII: Array.from({ length: 20 }, (_, i) => tln(`D-III-${i}`)) }]
 
-describe('khối Bộ câu ra đề — cờ "riêng" theo lựa chọn của thầy', () => {
+describe('khối Bộ câu ra đề — cờ "riêng" theo thẻ thầy chọn (thẻ ở màn Mở ca từ 21/10)', () => {
+  type CheDo = 'ca_lop' | 'rieng' | 'diem_yeu' | 'da_dung'
   it('"Cả lớp cùng một đề" (mặc định) ⇒ kho ca ĐÚNG bằng số câu mỗi em (9·2·3), không nhân 3', () => {
     const onDoi = vi.fn()
-    render(<KhoiRutDe nguon={NGUON as never} qidCaTruoc={[]} phutLamBai={45} onDoi={onDoi} />)
+    const ve = (cheDo: CheDo) => <KhoiRutDe nguon={NGUON as never} qidCaTruoc={[]} phutLamBai={45} onDoi={onDoi} cheDo={cheDo} coCauChuaLoi />
+    const { rerender } = render(ve('ca_lop'))
     const cuoi = () => onDoi.mock.calls.at(-1)?.[0] as { ids: Set<string>; soCau: { I: number; II: number; III: number }; deRieng?: boolean }
     expect(cuoi().deRieng).toBe(false)
     expect(cuoi().soCau).toEqual({ I: 9, II: 2, III: 3 })
     expect(cuoi().ids.size).toBe(14)
-    fireEvent.click(screen.getByText(/Đề riêng từng em/))
+    rerender(ve('rieng'))
     expect(cuoi().deRieng).toBe(true)
     expect(cuoi().ids.size).toBe(100) // đề riêng: đẩy kho rộng để lúc Bắt đầu rút từng em
-    fireEvent.click(screen.getByText(/Cả lớp cùng một đề/))
+    rerender(ve('ca_lop'))
     expect(cuoi().ids.size).toBe(14)
   })
 
   it('"Kiểm tra điểm yếu" ⇒ ca đề riêng từng em (cờ đề riêng + lên bảng), đủ số câu chẩn đoán theo thời lượng', () => {
     const onDoi = vi.fn()
-    render(<KhoiRutDe nguon={NGUON as never} qidCaTruoc={[]} phutLamBai={15} onDoi={onDoi} />)
-    fireEvent.click(screen.getByText('Kiểm tra điểm yếu'))
+    render(<KhoiRutDe nguon={NGUON as never} qidCaTruoc={[]} phutLamBai={15} onDoi={onDoi} cheDo="diem_yeu" coCauChuaLoi />)
     const k = onDoi.mock.calls.at(-1)?.[0] as { lenBang: boolean; deRieng?: boolean; soCau: unknown }
     expect(k.lenBang).toBe(true)
     expect(k.deRieng).toBe(true)
     expect(k.soCau).toEqual(soCauLenBang(dungUngVien(NGUON as never), 15))
     expect(screen.getByText(/Mỗi em một bộ câu riêng/)).toBeTruthy()
+  })
+
+  it('SỬA LỖI 21/10: "Kiểm tra điểm yếu" KHÔNG kế thừa "tắt câu chữa lỗi" của thẻ Đề riêng ⇒ luôn gan_nhat (đi rút đề v2)', () => {
+    const onDoi = vi.fn()
+    const ve = (cheDo: CheDo) => <KhoiRutDe nguon={NGUON as never} qidCaTruoc={[]} phutLamBai={15} onDoi={onDoi} cheDo={cheDo} coCauChuaLoi={false} />
+    const { rerender } = render(ve('rieng'))
+    expect(onDoi.mock.calls.at(-1)?.[0]?.phamViHoiLai).toBe('khong')
+    rerender(ve('diem_yeu'))
+    expect(onDoi.mock.calls.at(-1)?.[0]).toMatchObject({ lenBang: true, phamViHoiLai: 'gan_nhat' })
   })
 })
 
