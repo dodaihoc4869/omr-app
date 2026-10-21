@@ -96,12 +96,14 @@ export interface DuLieuHomNay {
   /** Em hỏi bài chờ thầy chữa (màn Học sinh hỏi): `chuaChua` lượt hỏi ở `soCa` ca, `caMoi` = tên ca có lượt mới nhất. null = chưa đọc được. */
   hoi: { chuaChua: number; soCa: number; caMoi: string } | null
   loiHoi: string
+  /** CÒN CHỜ (21/10, "app gv load chậm"): phần đầu (ca + chiến dịch) đã về nhưng bảng chiến dịch / lớp chờ / em hỏi chưa đủ ⇒ màn vẽ ngay phần đã có và để một khung xương cho phần còn lại. Vắng = đã đủ. */
+  conCho?: true
 }
 
 /** Lý do dễ hiểu (câu tiếng Việt sẵn có giữ nguyên; lỗi kỹ thuật thô ⇒ "Mạng có thể đang chập chờn."). */
 const loiChu = (e: unknown) => lyDoDeHieu(e)
 
-export async function taiHomNay(): Promise<DuLieuHomNay> {
+export async function taiHomNay(onPhan?: (d: DuLieuHomNay) => void): Promise<DuLieuHomNay> {
   const cauHinh = (async () => {
     const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
     if (!url.trim() || !mat.trim()) throw new Error('Chưa kết nối máy chủ — vào Cài đặt › Công cụ kỹ thuật › Kết nối máy chủ')
@@ -152,27 +154,18 @@ export async function taiHomNay(): Promise<DuLieuHomNay> {
     .catch(() => null)
   const [{ ca, loiCa }, { cd, loiCd }, co] = await Promise.all([taiCa(), taiCd(), taiCoOmni()])
 
-  const chay = (cd ?? []).filter((c) => c.trangThai === 'dang_chay')
-  const bang: (BangChienDich | null)[] = await taiGioiHan(chay, async (c) => {
-    try {
-      const r = await docBang(c.id)
-      return r.ok ? r.du : null
-    } catch {
-      return null
-    }
-  })
+  // PHÁT PHẦN ĐẦU NGAY (21/10): ca + chiến dịch về là màn đã có việc để hiện (Ca đang mở · lỗi) — không chờ bảng chiến dịch, OMNI, lớp chờ. Em hỏi bài về lúc nào thì phát thêm lúc ấy.
+  let hoiSom: { hoi: DuLieuHomNay['hoi']; loiHoi: string } | null = null
+  let xongHet = false
+  const phatPhanDau = () => {
+    if (xongHet) return
+    onPhan?.({ ca, loiCa, cd, loiCd, canThayChua: null, choBaiMoi: [], hoi: hoiSom?.hoi ?? null, loiHoi: hoiSom?.loiHoi ?? '', conCho: true })
+  }
+  phatPhanDau()
+  if (onPhan) void huaHoi.then((r) => { hoiSom = r; phatPhanDau() })
 
-  // Bảng bài OMNI (ba nhóm Cần thầy chữa): như Lên bảng chiến dịch — chỉ chiến dịch còn chạy, không phải Hành trình; OMNI tắt ⇒ không hỏi.
-  const canOmni = chay.map((c, i) => ({ c, b: bang[i] })).filter((x) => co?.bat && x.b && !x.b.hanhTrinhNgay && !x.b.hetHan)
-  const taiOmni = taiGioiHan(canOmni, async ({ c }) => {
-    try {
-      const r = await docBangOmniCua(c.id)
-      return r.ok && (!r.du.chienDich.id || r.du.chienDich.id === c.id) ? r.du.canThayChua : []
-    } catch {
-      return [] as CanThayChua[]
-    }
-  })
-  // Lớp chờ bài mới (OMNI): lớp OMNI áp (danh sách lớp của công tắc; bật cả trung tâm ⇒ mọi lớp của thầy), mỗi lớp một lệnh `danh-sach`.
+  const chay = (cd ?? []).filter((c) => c.trangThai === 'dang_chay')
+  // Lớp chờ bài mới (OMNI) KHÔNG phụ thuộc bảng chiến dịch (chỉ cần công tắc OMNI + danh sách lớp) ⇒ chạy NGAY, song song với đọc bảng (trước đây chờ bảng xong mới bắt đầu).
   const taiCho = (async () => {
     if (!co?.bat) return []
     try {
@@ -194,6 +187,25 @@ export async function taiHomNay(): Promise<DuLieuHomNay> {
       return []
     }
   })()
+  const bang: (BangChienDich | null)[] = await taiGioiHan(chay, async (c) => {
+    try {
+      const r = await docBang(c.id)
+      return r.ok ? r.du : null
+    } catch {
+      return null
+    }
+  })
+
+  // Bảng bài OMNI (ba nhóm Cần thầy chữa): như Lên bảng chiến dịch — chỉ chiến dịch còn chạy, không phải Hành trình; OMNI tắt ⇒ không hỏi.
+  const canOmni = chay.map((c, i) => ({ c, b: bang[i] })).filter((x) => co?.bat && x.b && !x.b.hanhTrinhNgay && !x.b.hetHan)
+  const taiOmni = taiGioiHan(canOmni, async ({ c }) => {
+    try {
+      const r = await docBangOmniCua(c.id)
+      return r.ok && (!r.du.chienDich.id || r.du.chienDich.id === c.id) ? r.du.canThayChua : []
+    } catch {
+      return [] as CanThayChua[]
+    }
+  })
   const [omni, choBaiMoi, { hoi, loiHoi }, phu] = await Promise.all([taiOmni, taiCho, huaHoi, huaPhu])
   const omniCua = new Map(canOmni.map((x, i) => [x.c.id, omni[i] ?? []] as const))
 
@@ -207,8 +219,42 @@ export async function taiHomNay(): Promise<DuLieuHomNay> {
     canThayChua.tong = dong.length
   }
 
+  xongHet = true
   return { ca, loiCa, cd, loiCd, canThayChua, choBaiMoi, hoi, loiHoi }
 }
+
+// ------------------------------------------------------------------ BẢN LẦN TRƯỚC (vẽ NGAY, rồi đọc mới)
+
+/** Bản đọc xong lần trước, cất trong máy (21/10, thầy: "app gv load chậm … tức thì"): mở Hôm nay là vẽ ngay số lần trước + giờ "cập nhật", rồi đọc mới thay vào.
+ * Chỉ giữ bản ĐỦ và KHÔNG lỗi, tối đa 3 giờ (ca đang mở lọc theo giờ thật nên không lên thẻ ca đã đóng). Đọc/ghi hỏng ⇒ như chưa có. */
+const KHOA_DEM_DU = 'ddh.gvhn.du.v1'
+const KHOA_DEM_NHIP = 'ddh.gvhn.nhip.v1'
+const HAN_DEM_MS = 3 * 3_600_000
+const TOI_DA_DEM_KY_TU = 450_000
+function docDem<T>(khoa: string, hopLe: (du: unknown) => boolean): { luc: number; du: T } | null {
+  try {
+    const t = localStorage.getItem(khoa)
+    if (!t) return null
+    const o = JSON.parse(t) as { luc?: unknown; du?: unknown }
+    if (typeof o.luc !== 'number' || !Number.isFinite(o.luc) || Math.abs(gioMayChu() - o.luc) > HAN_DEM_MS || !hopLe(o.du)) return null
+    return { luc: o.luc, du: o.du as T }
+  } catch {
+    return null
+  }
+}
+function ghiDem(khoa: string, du: unknown): void {
+  try {
+    const t = JSON.stringify({ luc: gioMayChu(), du })
+    if (t.length <= TOI_DA_DEM_KY_TU) localStorage.setItem(khoa, t)
+  } catch {
+    /* bộ nhớ đầy / bị chặn: bỏ qua */
+  }
+}
+const laDuHomNay = (d: unknown): boolean => {
+  const o = d as Partial<DuLieuHomNay> | null
+  return !!o && typeof o === 'object' && Array.isArray(o.choBaiMoi) && (o.ca === null || Array.isArray(o.ca)) && !o.conCho && !o.loiCa && !o.loiCd && !o.loiHoi && !!o.canThayChua
+}
+const laDuNhip = (d: unknown): boolean => !!d && typeof d === 'object' && (d as { ok?: unknown }).ok === true && !!(d as { kq?: unknown }).kq
 
 // ------------------------------------------------------------------ MÀN
 
@@ -237,10 +283,10 @@ const gioPhut = (ms: number): string => {
 }
 
 /** Khung xương đúng hình hàng thẻ việc. */
-function XuongViec() {
+function XuongViec({ mot = false }: { mot?: boolean }) {
   return (
-    <div className="gvhn-the-ds" role="status" aria-label="Đang tải việc hôm nay">
-      {[0, 1, 2].map((i) => (
+    <div className="gvhn-the-ds" role="status" aria-label={mot ? 'Đang kiểm tra phần còn lại' : 'Đang tải việc hôm nay'}>
+      {(mot ? [0] : [0, 1, 2]).map((i) => (
         <span key={i} className="gvhn-the-viec gvhn-xuong-the">
           <span className="gv-xuong-khoi tt-xuong" style={{ width: 44, height: 44, borderRadius: 12 }} />
           <span className="gvhn-xuong-chu">
@@ -258,21 +304,25 @@ export default function GvHomNayScreen() {
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const datSo = useSoDemGv((s) => s.datSo)
   const datMoHanhTrinh = useSoDemGv((s) => s.datMoHanhTrinh)
-  const [du, setDu] = useState<DuLieuHomNay | null>(null)
+  const [demDu] = useState(() => docDem<DuLieuHomNay>(KHOA_DEM_DU, laDuHomNay))
+  const [demNhip] = useState(() => docDem<DuNhip>(KHOA_DEM_NHIP, laDuNhip))
+  const [du, setDu] = useState<DuLieuHomNay | null>(demDu?.du ?? null)
   const [dangTai, setDangTai] = useState(false)
-  const [nhip, setNhip] = useState<DuNhip | null>(null)
+  const [nhip, setNhip] = useState<DuNhip | null>(demNhip?.du ?? null)
   const [dangTaiNhip, setDangTaiNhip] = useState(false)
-  const [capNhat, setCapNhat] = useState<number | null>(null)
+  const [capNhat, setCapNhat] = useState<number | null>(demNhip?.luc ?? demDu?.luc ?? null)
 
   const lanTai = useRef(0)
   const tai = useCallback(async () => {
     const lan = ++lanTai.current
     setDangTai(true)
-    const kq = await taiHomNay()
+    // Đã có bản lần trước trên màn ⇒ KHÔNG thay bằng phần đầu (sẽ mất số "Cần thầy chữa" tới khi đọc đủ); chưa có ⇒ vẽ từng phần ngay khi về.
+    const kq = await taiHomNay(demDu ? undefined : (phan) => { if (lan === lanTai.current) setDu(phan) })
     if (lan !== lanTai.current) return
     setDu(kq)
     setDangTai(false)
-  }, [])
+    if (laDuHomNay(kq)) ghiDem(KHOA_DEM_DU, kq)
+  }, [demDu])
   // Nhịp học: MỘT lệnh, song song với phần việc; lỗi chỉ ảnh hưởng khối Nhịp học (Thử lại riêng).
   const lanNhip = useRef(0)
   const taiNhip = useCallback(async () => {
@@ -287,7 +337,10 @@ export default function GvHomNayScreen() {
     }
     if (lan !== lanNhip.current) return
     setNhip(kq)
-    if (kq.ok) setCapNhat(gioMayChu())
+    if (kq.ok) {
+      setCapNhat(gioMayChu())
+      ghiDem(KHOA_DEM_NHIP, kq)
+    }
     setDangTaiNhip(false)
   }, [])
   useEffect(() => {
@@ -304,7 +357,8 @@ export default function GvHomNayScreen() {
 
   useEffect(() => {
     if (!du) return
-    datSo({ caMo: du.ca ? caMo.length : null, canThayChua: du.canThayChua ? du.canThayChua.tong : null })
+    // Phần đầu (còn chờ) chưa biết "Cần thầy chữa" ⇒ không ghi đè số cũ bằng "chưa biết".
+    datSo({ caMo: du.ca ? caMo.length : null, ...(du.conCho ? {} : { canThayChua: du.canThayChua ? du.canThayChua.tong : null }) })
   }, [du, caMo.length, datSo])
 
   const moHanhTrinh = (m: MoHanhTrinh) => {
@@ -417,7 +471,7 @@ export default function GvHomNayScreen() {
       </header>
 
       <section className="gvhn-viec-khoi" aria-label="Việc cần thầy">
-        {!du ? (
+        {!du || (viec.length === 0 && du.conCho) ? (
           <XuongViec />
         ) : viec.length === 0 ? (
           <p className="gvv2-trong gvhn-viec-trong">Không có việc cần thầy lúc này. Màn tự đọc lại số mỗi lần thầy mở.</p>
@@ -459,6 +513,7 @@ export default function GvHomNayScreen() {
             })}
           </ul>
         )}
+        {du?.conCho && viec.length > 0 && <XuongViec mot />}
       </section>
 
       <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} />

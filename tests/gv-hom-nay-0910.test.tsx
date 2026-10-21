@@ -349,6 +349,53 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     expect(container.textContent).not.toMatch(/Cannot read|undefined|TypeError/)
   })
 
+  it('(21/10 "load chậm") phần đầu hiện NGAY khi ca + chiến dịch về — không chờ bảng chiến dịch; còn một khung xương cho phần còn lại; đủ rồi thì khung xương mất', async () => {
+    m.danhSachCa.mockResolvedValue([ca('DH-12-C2-B6')])
+    mayChu()
+    const goc = m.goi.getMockImplementation()!
+    let mo: () => void = () => {}
+    const cho = new Promise<void>((r) => (mo = r))
+    m.goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
+      if (duong === '/gv/chien-dich' && b.action === 'bang') await cho // bảng chiến dịch về chậm
+      return goc(duong, b)
+    })
+    const { container } = render(<GvHomNayScreen />)
+    const viec = await screen.findByRole('region', { name: 'Việc cần thầy' })
+    // ca đang mở đã vẽ khi bảng chiến dịch còn đang chờ; có khung xương "đang kiểm tra phần còn lại"; chưa có dòng "Cần thầy chữa" (không bịa số)
+    await waitFor(() => expect([...viec.querySelectorAll('li')].map((d) => d.querySelector('b')?.textContent)).toEqual(['Ca đang mở']))
+    expect(screen.getByRole('status', { name: 'Đang kiểm tra phần còn lại' })).toBeTruthy()
+    expect(viec.textContent).not.toMatch(/Cần thầy chữa/)
+    expect(useSoDemGv.getState().canThayChua).toBeNull() // phần đầu không ghi đè số bằng "chưa biết"
+    mo()
+    await waitFor(() => expect(screen.queryByRole('status', { name: 'Đang kiểm tra phần còn lại' })).toBeNull())
+    expect([...viec.querySelectorAll('li')].map((d) => d.querySelector('b')?.textContent)).toEqual(['Ca đang mở', 'Cần thầy chữa · 8 chỗ', '12A2: 3 ngày chưa có bài mới'])
+    expect(container.querySelector('.gvhn-the-ds[role="status"]')).toBeNull()
+  })
+
+  it('(21/10 "load chậm") bản lần trước vẽ NGAY (số + giờ cập nhật), máy chủ chưa trả lời; đọc mới xong thì thay; lỗi / quá 3 giờ thì không giữ', async () => {
+    m.danhSachCa.mockResolvedValue([ca('DH-12-C2-B6')])
+    mayChu()
+    const lan1 = render(<GvHomNayScreen />)
+    await waitFor(() => expect(lan1.container.querySelectorAll('[data-viec]').length).toBe(3))
+    await waitFor(() => expect(localStorage.getItem('ddh.gvhn.du.v1')).toBeTruthy())
+    await waitFor(() => expect(localStorage.getItem('ddh.gvhn.nhip.v1')).toBeTruthy())
+    lan1.unmount()
+    // mở lại: máy chủ KHÔNG trả lời (treo) — vẫn thấy ngay ba việc + "cập nhật 10:00" của bản trước
+    m.goi.mockImplementation(() => new Promise(() => {}))
+    m.danhSachCa.mockReturnValue(new Promise(() => {}))
+    const lan2 = render(<GvHomNayScreen />)
+    expect([...lan2.container.querySelectorAll('[data-viec]')].map((d) => d.getAttribute('data-viec'))).toEqual(['ca-DH-12-C2-B6', 'can-chua', 'bai-moi'])
+    expect(lan2.container.querySelector('.gvhn-dau .gvv2-phu')?.textContent).toContain('cập nhật 10:00')
+    expect(lan2.container.querySelector('.gvhn-dau .gvv2-phu')?.textContent).toContain('6 em') // Nhịp học cũng vẽ từ bản lần trước
+    lan2.unmount()
+    // bản quá 3 giờ ⇒ bỏ (khung xương)
+    const o = JSON.parse(localStorage.getItem('ddh.gvhn.du.v1')!) as { luc: number }
+    localStorage.setItem('ddh.gvhn.du.v1', JSON.stringify({ ...o, luc: o.luc - 4 * 3_600_000 }))
+    const lan3 = render(<GvHomNayScreen />)
+    expect(lan3.container.querySelectorAll('[data-viec]').length).toBe(0)
+    expect(screen.getByRole('status', { name: 'Đang tải việc hôm nay' })).toBeTruthy()
+  })
+
   it('phép tính thuần: Cần thầy chữa đếm đúng ba nhóm', () => {
     const d = demCanThayChua([{ canDayLai: [], omni: OMNI_CDA as never }, { canDayLai: [{ qid: 'q', stt: 1, dang: 'Ester', soEm: 2 } as never], omni: [] }])
     expect(d).toEqual({ catTia: 3, nutThat: 1, soY: 1, tong: 5 })

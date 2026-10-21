@@ -110,6 +110,16 @@ function napTruocManEm(): Plugin {
   }
 }
 
+// BỎ GHI CHÚ HTML KHI DỰNG (21/10, "tức thì"): index.html là tệp đầu tiên MỌI app phải tải; 8 khối ghi chú dành cho người đọc mã (~2,2 KB, ~1,4 KB nén) không có
+// tác dụng ở máy người dùng. Chỉ bỏ ghi chú `<!-- … -->` ở HTML dựng ra (nguồn index.html giữ nguyên); không đụng script / style / thẻ nào.
+function boGhiChuHtml(): Plugin {
+  return {
+    name: 'bo-ghi-chu-html',
+    apply: 'build',
+    transformIndexHtml: { order: 'post', handler: (html: string) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/\n[ \t]*\n(?:[ \t]*\n)+/g, '\n') },
+  }
+}
+
 export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? REPO_BASE : '/',
   define: {
@@ -120,6 +130,7 @@ export default defineConfig({
   plugins: [
     react(),
     napTruocManEm(),
+    boGhiChuHtml(),
     VitePWA({
       // SERVICE WORKER VIẾT TAY (`src/sw.ts`), KHÔNG dùng bản tự sinh nữa.
       //

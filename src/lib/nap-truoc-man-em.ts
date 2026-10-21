@@ -114,6 +114,17 @@ export function hoiSomSanh(w: any, goc: string, phien: any, ds: [string, string]
   }
 }
 
+/**
+ * MỞ CHẶNG SỚM (21/10, ảnh thầy: "Chặng học của em — Đang chuẩn bị những câu phù hợp với em…" — "bình thường vào tức thì"): ngay khi đọc HTML, máy đã đăng nhập mà bản Sảnh ĐỆM
+ * của HÔM NAY nói em CÒN VIỆC (`theLuc.con > 0`, không phải ngày kiểm tra riêng) thì gửi luôn lệnh mở chặng (`hoc-tap-start`, thân `{token}` — đúng thân `goiHoa2` gửi),
+ * SONG SONG với Sảnh và với lúc tải mã (chỉ chờ lệnh hỏi sớm `/hs/ca-dang-mo` báo KHÔNG có ca đang mở — đúng điều kiện `!coCa` của màn), thay vì chờ mã dựng + Sảnh về mới gọi (mo-chang-truoc.ts). Màn Hôm nay / màn làm bài nhận phản hồi ấy đúng cơ chế hỏi sớm (nhận MỘT lần;
+ * hạn dùng 10 phút như `TUOI_MO_TRUOC_MS`). KHÔNG có bản đệm hôm nay hoặc đệm nói hết việc ⇒ không gửi (lệnh sẽ rơi vào nhánh "học thêm" của máy chủ ⇒ không tạo phiên thừa).
+ * Máy chủ tự dùng lại phiên chưa làm xong (2 giờ) và không tính suất khi mở trước ⇒ kết quả như gọi lúc bấm. Mã ES5 tự chứa, chèn nguyên văn vào index.html.
+ */
+const HOI_SOM_MO_CHANG =
+  `try{var q=String(p.sbd||''),h=JSON.parse(localStorage.getItem('omr_hoa2_sanh_dem:'+q)||localStorage.getItem('omr_hoa2_sanh_dem:'+q.trim())||'null'),s=h&&h.cheDo2&&h.sanh&&h.sanh.ngay===new Date(Date.now()+25200000).toISOString().slice(0,10)?h.sanh:null,k=s&&s.kiemTraCaNhan,c=window.__ddhHoiSom&&window.__ddhHoiSom['/hs/ca-dang-mo'];` +
+  `if(c&&c.hua&&s&&s.theLuc&&s.theLuc.con>0&&!(k&&k.homNay===true&&!k.baiNgayToiThieu))c.hua.then(function(x){try{if(x&&x.ok&&JSON.parse(x.text).coCaMo===false){H(window,g,p,[['/game-v2/hoc-tap-start','token']],true);var m=window.__ddhHoiSom['/game-v2/hoc-tap-start'];if(m)m.het=Date.now()+6e5}}catch(e){}})}catch(e){}`
+
 /** Mã JS (ES5, tự gọi) chèn vào <head>: chọn mảng theo đường dẫn rồi thêm thẻ link tải sớm (+ hỏi Sảnh sớm khi máy em đã đăng nhập). */
 export function taoMaNapTruoc(bang: BangNapTruoc): string {
   // Link riêng CŨ (`laLinkAppCu` của vai-tro.ts: `?vai=hs|ph`, `/hs/<token>`): app dựng màn "link đã ngừng dùng" của App.tsx ⇒ không coi là cổng
@@ -124,7 +135,7 @@ export function taoMaNapTruoc(bang: BangNapTruoc): string {
     `var nap=function(ds,thap){if(!ds)return;for(var i=0;i<ds.length;i++){var l=document.createElement('link');if(/\\.css$/.test(ds[i])){l.rel='preload';l.as='style'}else if(/\\.woff2$/.test(ds[i])){l.rel='preload';l.as='font';l.type='font/woff2'}else{l.rel='modulepreload'}if(thap)l.fetchPriority='low';l.crossOrigin='';l.href=ds[i];document.head.appendChild(l)}};` +
     `if(c==='hs'&&b.hsVo){var p=null;try{p=JSON.parse(localStorage.getItem(${JSON.stringify(KHOA_PHIEN_HS)})||'null')}catch(e){}nap(b.hsVo);` +
     `if(p){nap(b.hs);var g='';try{g=localStorage.getItem(${JSON.stringify(KHOA_DIA_CHI_HS)})||''}catch(e){}` +
-    `if(/^https:\\/\\/[^\\/]+$/.test(g)&&typeof fetch==='function'){try{(${hoiSomSanh.toString()})(window,g,p,${JSON.stringify(LENH_HOI_SOM)},true)}catch(e){}}` +
+    `if(/^https:\\/\\/[^\\/]+$/.test(g)&&typeof fetch==='function'){try{var H=(${hoiSomSanh.toString()});H(window,g,p,${JSON.stringify(LENH_HOI_SOM)},true);${HOI_SOM_MO_CHANG}}catch(e){}}` +
     `if(navigator.serviceWorker&&navigator.serviceWorker.controller)nap(b.phongHs)}else{if(b.anhDangNhapHs){var a=document.createElement('link');a.rel='preload';a.as='image';a.href=b.anhDangNhapHs;document.head.appendChild(a)}` +
     `document.addEventListener('DOMContentLoaded',function(){nap(b.hs,1)})}return}` +
     `if(b.app&&c!=='hs')nap(b.app);nap(c&&b[c])}catch(e){}})()`

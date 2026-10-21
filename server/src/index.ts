@@ -1200,7 +1200,9 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
   // TỐI ƯU 28/09: (1) phần đếm CHỈ quét `luot` của các ca đang liệt kê (trước: GROUP BY TOÀN BỘ `luot`, kể cả ca đã xoá) — lọc bằng
   // `ma_ca IN (...)` đi theo chỉ mục idx_luot_em(ma_ca, sbd, lan_thu); (2) hai câu chạy trong MỘT `DB.batch` (một vòng D1 thay vì hai nối tiếp).
   const locCa = daXoa ? `trang_thai = 'da_xoa'` : `trang_thai <> 'da_xoa' AND ma_ca <> 'DOTAI'`
-  const [rCa, rDem] = await env.DB.batch([
+  // 21/10 ("app gv load chậm"): dấu đồng bộ `ca_day_du` và số dòng lượt thật (đọc ở cuối hàm) là hai lệnh ĐỌC ĐỘC LẬP — trước đây nối tiếp sau lô này (3 vòng D1 chờ nhau
+  // trên lệnh ĐẦU TIÊN màn Hôm nay của thầy gọi); nay cùng MỘT lô (1 vòng). Cùng câu SQL, cùng kết quả.
+  const [rCa, rDem, rDau, rDong] = await env.DB.batch([
     env.DB.prepare(`SELECT * FROM ca WHERE ${locCa}`),
     env.DB.prepare(
       `WITH moi AS (
@@ -1216,7 +1218,9 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
             SUM(CASE WHEN trang_thai = 'khoa' OR so_lan_roi_man > 0 THEN 1 ELSE 0 END) AS canh_bao
      FROM moi GROUP BY ma_ca`,
     ),
-  ]) as [D1Result<Record<string, unknown>>, D1Result<{ ma_ca: string; da_vao: number; da_nop: number; canh_bao: number }>]
+    env.DB.prepare('SELECT * FROM dong_bo WHERE ma = ?').bind('ca_day_du'),
+    env.DB.prepare(`SELECT COUNT(*) AS n FROM luot WHERE ma_ca <> 'DOTAI'`),
+  ]) as [D1Result<Record<string, unknown>>, D1Result<{ ma_ca: string; da_vao: number; da_nop: number; canh_bao: number }>, D1Result<Record<string, unknown>>, D1Result<{ n: number }>]
 
   const dem: Record<string, { da_vao: number; da_nop: number; canh_bao: number }> = {}
   for (const d of rDem.results ?? []) dem[String(d.ma_ca)] = d
@@ -1262,12 +1266,11 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
   })
   items.sort((a, b) => mocMs(b.moLuc || b.batDau) - mocMs(a.moLuc || a.batDau))
 
-  const dau = await env.DB.prepare('SELECT * FROM dong_bo WHERE ma = ?').bind('ca_day_du').first<Record<string, unknown>>()
+  const dau = rDau.results?.[0] ?? null
   // SỐ DÒNG LƯỢT THẬT — để app đối chiếu CHÍNH XÁC với số dòng đọc từ Sheet.
   // `daVao` không dùng được cho việc này: nó đếm lần thử cao nhất mỗi em, còn
   // em thi lại có nhiều dòng.
-  const rDong = await env.DB.prepare(`SELECT COUNT(*) AS n FROM luot WHERE ma_ca <> 'DOTAI'`).first<{ n: number }>()
-  return ra({ ok: true, items, dauDongBo: dau ?? null, soDongLuot: Number(rDong?.n) || 0, serverNow: Date.now() })
+  return ra({ ok: true, items, dauDongBo: dau ?? null, soDongLuot: Number(rDong.results?.[0]?.n) || 0, serverNow: Date.now() })
 }
 
 /** SỬA MỘT Ô CỦA DÒNG CA — dùng cho mọi thao tác THẦY làm trên một ca đã có:

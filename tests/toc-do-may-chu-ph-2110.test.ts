@@ -90,7 +90,7 @@ async function kho() {
   await dongBoGoi7(k.env, NOW)
   const bo = boDemDot(k.env.DB)
   const env = { ...k.env, DB: bo.db } as Env
-  return { env, bo, d: k.d, qids: b8, token: await gameToken(k.env, 'S1'), pass: await parentPass(k.env, 'S1') }
+  return { env, envGoc: k.env as Env, bo, d: k.d, qids: b8, token: await gameToken(k.env, 'S1'), pass: await parentPass(k.env, 'S1') }
 }
 
 async function goiRaw(k: Awaited<ReturnType<typeof kho>>, duong: string, than: Record<string, unknown>, tieuDe: Record<string, string> = {}) {
@@ -119,6 +119,13 @@ const LENH_PH: LenhDo[] = [
   // Tờ chiếu cho cả lớp (21/10, Mức làm 1–4 + hai thẻ đã điểm danh / cả lớp): "Ai đã sai?" (phím X) và bảng chi tiết em lên bảng.
   { ten: 'gv-ai-sai-cau', duong: '/gv/ai-sai-cau', than: (k) => ({ qids: [k.qids[1]!], sbds: ['S1'] }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
   { ten: 'gv-ho-so-len-bang', duong: '/gv/ho-so-len-bang', than: (k) => ({ sbd: 'S1', qid: k.qids[1]! }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  // Màn Hôm nay của thầy (21/10, "app gv load chậm"): các lệnh nó gọi lúc mở.
+  { ten: 'gv-hn-ca-danh-sach', duong: '/ca/danh-sach', than: () => ({ daXoa: false }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  { ten: 'gv-hn-chien-dich-danh-sach', duong: '/gv/chien-dich', than: () => ({ action: 'danh-sach' }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  { ten: 'gv-hn-chien-dich-bang', duong: '/gv/chien-dich', than: () => ({ action: 'bang', id: 'hanh-trinh-v3-khoi-12' }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  { ten: 'gv-hn-omni-co', duong: '/gv/omni', than: () => ({ action: 'co-doc' }), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  { ten: 'gv-hn-nhip-hoc', duong: '/gv/nhip-hoc', than: () => ({}), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
+  { ten: 'gv-hn-lop', duong: '/gv/lop', than: () => ({}), tieuDe: { 'x-ma-bi-mat': 'bi-mat-thu' } },
 ]
 
 it('lệnh mở app phụ huynh: số đợt chờ D1 không vượt mốc bản trước', async () => {
@@ -157,4 +164,23 @@ it('lệnh mở app phụ huynh: số đợt chờ D1 không vượt mốc bản
   if (thieuMoc.length) console.info(`Chưa có mốc — thêm vào docs/moc-toc-do.json mục mayChuPh:\n  ${thieuMoc.join('\n  ')}`)
   if (ha.length) console.info(`Nhanh hơn mốc — hạ mốc trong docs/moc-toc-do.json:\n  ${ha.join('\n  ')}`)
   expect(vuot, 'CHẬM HƠN bản trước — làm lại cho nhanh bằng/hơn rồi mới đẩy').toEqual([])
+})
+
+// MỞ CHẶNG SỚM (21/10, đoạn mã nội tuyến index.html gửi `hoc-tap-start` NGAY lúc đọc HTML khi đệm Sảnh hôm nay nói em còn việc): từ nay Sảnh và mở chặng của CÙNG một em có thể
+// chạy ĐỒNG THỜI (trước: mở chặng chạy SAU Sảnh và dùng lại kế hoạch Sảnh vừa nhớ). Phải an toàn khi hai lượt cùng lập kế hoạch / cùng ghi.
+it('mở chặng sớm: Sảnh và hoc-tap-start của cùng một em chạy ĐỒNG THỜI ⇒ cả hai ok; lượt mở chặng kế tiếp trả CÙNG phiên và CÙNG bộ câu', async () => {
+  const k = await kho()
+  const viecPhu: Promise<unknown>[] = []
+  const ctx = { waitUntil: (p: Promise<unknown>) => { viecPhu.push(p) }, passThroughOnException() {} }
+  const goi = async (lenh: string) => (await (await worker.fetch(new Request(`https://test/game-v2/${lenh}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: k.token }) }), k.envGoc, ctx as never)).json()) as Record<string, unknown>
+  const [sanh, mo] = await Promise.all([goi('hoc-tap-sanh'), goi('hoc-tap-start')])
+  expect(sanh.ok, JSON.stringify(sanh).slice(0, 240)).toBe(true)
+  expect(mo.ok, JSON.stringify(mo).slice(0, 240)).toBe(true)
+  const lai = await goi('hoc-tap-start')
+  expect(lai.ok, JSON.stringify(lai).slice(0, 240)).toBe(true)
+  const qids = (r: Record<string, unknown>) => (r.questions as { qid: string }[]).map((q) => q.qid)
+  expect(lai.id).toBe(mo.id)
+  expect(qids(lai)).toEqual(qids(mo))
+  expect(qids(mo).length).toBeGreaterThan(0)
+  await Promise.allSettled(viecPhu)
 })
