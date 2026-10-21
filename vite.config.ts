@@ -95,6 +95,7 @@ function napTruocManEm(): Plugin {
           thi: ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
           hs: ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo),
           ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), app),
+          phieu: ngoai(dsCua('/src/screens/PhieuScreen.tsx'), app),
           app,
           hsVo,
           phongHs,
@@ -290,7 +291,9 @@ export default defineConfig({
           '**/{nut-that-api,omni-bang}-*.{js,css}',
           // Gộp main 09/10 tối: hai mảnh CHUNG mới tách ra giữa các màn chiếu/chữa của thầy (LenBangChienDich, DayHocLenBang, KiemTraDauGio,
           // CauCanChuaTrenLop, GoiLenBangScreen, html-may-chieu — đều đã ngoài precache) ⇒ cũng không cất sẵn (+42 KB đưa precache vượt trần).
-          '**/{ghi-to-chieu,thoi-gian-len-bang}-*.{js,css}',
+          // 21/10: mảnh chung của bộ chọn em lên bảng phân tầng (chon-em-phan-tang + ung-vien-chieu + dau-gio) — CHỈ màn thầy nhập (đã soát: Dạy học,
+          // Kiểm tra đầu giờ, Chữa câu, Thầy tự chữa, Gọi lên bảng, Lên bảng chiến dịch, Hôm nay) ⇒ kho chạy-lúc như hai mảnh trên.
+          '**/{ghi-to-chieu,thoi-gian-len-bang,chon-em-phan-tang}-*.{js,css}',
           // Bản vẽ tối giản app thầy (09/10): màn "Hôm nay" của thầy + hai thẻ ghép màn sẵn có của Hành trình (Cần thầy chữa, Bài đã dạy) nạp LƯỜI.
           // Các thẻ ấy nhập động Dạy học / Kiểm tra đầu giờ / Bước cuối trên lớp (trước nằm trong mảnh Gọi lên bảng) ⇒ Rollup tách thành mảnh riêng,
           // kèm `TheCauHienThi` (chỉ hai màn ấy dùng), `gv-v2` (khung + phép tính nhịp của Hành trình/Hôm nay), `HopChonDe` + `cay-chon-de` (hộp chọn
@@ -394,6 +397,9 @@ export default defineConfig({
             { name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/ },
             // fflate (nạp động trong day-ca-may-chu-moi.ts) — đặt tên mảnh rõ để globIgnores ở trên bắt đúng nó (tên tự sinh là `browser-*`, quá chung).
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
+            // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng
+            // (+2,4 KB nén cho app học sinh vì mỗi tệp nén riêng) ⇒ gom lại vào CÙNG mảnh DesignSystem (học sinh / thầy đều nạp sẵn).
+            { name: 'KhoiLoiGiaiChuan', test: /src[\\/](?:components[\\/](?:loi-giai[\\/]KhoiLoiGiaiChuan|ExperimentDemo)\.tsx|lib[\\/](?:experiments[\\/]nhe|loi-giai-api|chuan-hoa-loi-giai|chu-la-pdf)\.ts)$/ },
           ],
         },
       },
