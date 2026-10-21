@@ -186,10 +186,6 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .cau .nut-chu{align-self:center}
 @media (max-width:600px){.cau{grid-template-columns:44px minmax(0,1fr)}.cau .nut-chu{grid-column:2;justify-self:start;margin-left:-12px}}
 .ngan{height:1px;background:var(--gvm-vien)}
-.tick{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
-.tick .chu{flex:1 1 260px;min-width:0}
-.tick .chu b{display:block;font-size:16.5px}
-.tick .chu span{font-size:14px;color:var(--gvm-chu-2)}
 .dong-gap{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 6px 6px 16px;border:1px solid var(--gvm-vien);border-radius:16px}
 .dong-gap .chu{flex:1;min-width:0;font-size:15px}
 .dong-gap .chu b{font-weight:700}
@@ -347,7 +343,7 @@ body[data-k=bo-sung] .dau{display:none}
               <div class="buoc-dau"><span class="vong">2</span><div class="buoc-ten"><h2>Gọi lên bảng đầu giờ</h2><p class="so">Gọi trong 18 em có mặt · Đạt / Chưa đạt ghi sổ</p></div><button class="nut-vien">Mở</button></div>
             </section>
             <section class="buoc" data-tt="san">
-              <div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học <i class="tag" data-t="doi">gộp bước 3 + 4 cũ</i></h2><p class="so">Bài: Amine — tính base — tính khối lượng · 23 câu · gọi em có mặt</p></div><button class="nut-vien">Mở</button></div>
+              <div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học <i class="tag" data-t="doi">bỏ phần Tick bài vừa dạy</i></h2><p class="so">Bài: Amine — tính base — tính khối lượng · 23 câu · gọi em có mặt</p></div><button class="nut-vien">Mở</button></div>
             </section>
             <section class="buoc" data-tt="san">
               <div class="buoc-dau"><span class="vong">4</span><div class="buoc-ten"><h2>Chữa câu khó &amp; tính toán <i class="tag" data-t="doi">thay thẻ Chữa bài</i></h2><p class="so"><b style="color:var(--gvm-hp)">12 chỗ</b> học sinh cần chữa · gọi em có mặt làm sai lên chữa</p></div><button class="nut-vien">Mở</button></div>
@@ -383,7 +379,7 @@ body[data-k=bo-sung] .dau{display:none}
             </section>
 
             <section class="buoc" data-tt="dang">
-              <div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học <i class="tag" data-t="doi">gộp bước 3 + 4 cũ</i></h2><p>Chiếu câu, gọi em lên làm, xong thì tick bài vừa dạy.</p></div></div>
+              <div class="buoc-dau"><span class="vong">3</span><div class="buoc-ten"><h2>Dạy học <i class="tag" data-t="doi">bỏ phần Tick bài vừa dạy</i></h2><p>Chiếu câu, gọi em có mặt lên làm.</p></div></div>
               <div class="buoc-than">
                 <div class="bai">
                   <div class="bai-ten"><span class="nhan">Bài đang dạy</span><b>Amine — tính base — tính khối lượng</b><span class="so">23 câu · Trắc nghiệm 13 · Đúng–sai 3 · Trả lời ngắn 7 · trong đó 3 câu tự luận</span></div>
@@ -412,11 +408,6 @@ body[data-k=bo-sung] .dau{display:none}
                   <button class="nut-vien">Chiếu đề (chưa gọi em)</button>
                 </div>
 
-                <div class="ngan"></div>
-                <div class="tick">
-                  <div class="chu"><span class="nhan">Cuối phần dạy</span><b>Tick bài vừa dạy <i class="tag" data-t="doi">mở hộp chọn bài</i></b><span>Mở đúng hộp "Bổ sung bài hôm nay" như ở màn Hôm nay.</span></div>
-                  <button class="nut-vien"><svg class="i"><use href="#i-dung"/></svg>Tick bài hôm nay</button>
-                </div>
                 <div class="dong-gap"><p class="chu"><b>Bài đang giao</b> <span class="so">· 3 lớp · hạn nộp và tiến độ từng lớp</span></p><button class="nut-chu">Xem<svg class="i"><use href="#i-phai"/></svg></button></div>
               </div>
             </section>

@@ -13,7 +13,7 @@ Bản vẽ nằm ở `hanh-trinh.html`. Ảnh Chromium thật nằm ở `anh/`, 
 | Khung | Tệp ảnh bắt đầu bằng | Lúc nào |
 |---|---|---|
 | 1 | `01-diem-danh-` | Đầu buổi: bước 1 đang mở (mã, QR, có mặt 18/24, nhóm Chăm/Lười, em vắng). Bước 2, 3, 4 mỗi bước một nút "Mở". |
-| 2 | `02-day-hoc-` | Giữa buổi: bước 1 và 2 đã thu thành dòng tóm tắt. Bước 3 Dạy học mở: chiếu câu, gọi em, tick bài vừa dạy, Bài đang giao. |
+| 2 | `02-day-hoc-` | Giữa buổi: bước 1 và 2 đã thu thành dòng tóm tắt. Bước 3 Dạy học mở: chiếu câu, gọi em, Bài đang giao. Đã bỏ phần Tick bài vừa dạy (thầy chốt 21/10: chọn bài chỉ ở hộp Bổ sung bài, khung 4). |
 | 3 | `03-chua-cau-` | Thầy sang thẳng bước 4 khi bước 3 chưa làm. Bước 4 mở với hai khối: Câu khó & tính toán, và Câu học sinh cần chữa. |
 | 4 | `04-bo-sung-` | Màn Hôm nay: bấm "Bổ sung bài hôm nay" thì hộp mở ngay tại chỗ (chọn lớp → chọn bài vừa dạy → xác nhận → Giao). Không sang Hành trình. |
 
