@@ -66,11 +66,14 @@ it('trong bước Dạy học thật và form cha: lưu/Enter không submit ho�
     if (d === '/gv/omni') return { ok: true, du: { co: { bat: false, lop: [], sbd: [] } } }
     return { ok: false, chu: 'Chưa có dữ liệu.' }
   })
-  const { container } = render(<div onClick={bamCha}><form onSubmit={e => { e.preventDefault(); submit() }}><TheBaiDaDay onMoChuaBai={chuyen} /></form></div>)
+  const { container } = render(<div onClick={bamCha}><form onSubmit={e => { e.preventDefault(); submit() }}><TheBaiDaDay /></form></div>)
+  // SỬA CÓ CHỦ ĐÍCH 21/10 (Hành trình một trang 4 bước): Bài đang giao nằm cuối bước 3 "Dạy học" — chưa ai điểm danh thì trang mở bước 1, thầy mở bước 3.
+  fireEvent.click(await screen.findByRole('button', { name: 'Mở bước 3 · Dạy học' }))
   const o = await sua(), table = container.querySelector('table')
+  const buoc4 = () => container.querySelector('[data-buoc-ht="4"]')!.getAttribute('data-mo')
   bamCha.mockClear()
   fireEvent.keyDown(o, { key: 'Enter' })
-  expect(submit).not.toHaveBeenCalled(); expect(bamCha).not.toHaveBeenCalled(); expect(chuyen).not.toHaveBeenCalled()
+  expect(submit).not.toHaveBeenCalled(); expect(bamCha).not.toHaveBeenCalled(); expect(chuyen).not.toHaveBeenCalled(); expect(buoc4()).toBe('false')
   expect(screen.getByRole('button', { name: 'Đang lưu…' }).hasAttribute('disabled')).toBe(true)
   expect(screen.queryByText(/Đã lưu hạn mới/)).toBeNull()
   await act(async () => { cho.tra(xacNhan({ goiId: 'g2', han: '2026-10-20' })) })

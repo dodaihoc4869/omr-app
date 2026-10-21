@@ -321,7 +321,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
       ) : !du ? null : !du.bat ? (
         <p className="dh-phu">Máy chủ chưa bật giao bài 7 ngày — bảng này hiện khi app bắt đầu giao bài theo bài thầy tick.</p>
       ) : dong.length === 0 ? (
-        <p className="dh-phu">Chưa lớp nào đang có bài giao. Tick bài vừa dạy ở trên: app giao bài đó cho lớp trong 7 ngày.</p>
+        <p className="dh-phu">Chưa lớp nào đang có bài giao. Bấm “Bổ sung bài hôm nay” ở màn Hôm nay: app giao bài vừa dạy cho lớp trong 7 ngày.</p>
       ) : (
         <>
           <div className="gvv2-bdg-cuon">
@@ -393,7 +393,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
           {conNua > 0 && <p className="dh-phu">Còn {conNua} bài đang giao khác (bảng hiện {TOI_DA_DONG_GIAO} bài hạn nộp gần nhất).</p>}
           {onMoChuaBai && (
             <button type="button" className="gvv2-nut-chu gvv2-bdg-sang" onClick={onMoChuaBai}>
-              Câu nhiều em sai của các bài này nằm ở mục Chữa bài ›
+              Câu nhiều em sai của các bài này nằm ở bước 4 Chữa câu khó ›
             </button>
           )}
         </>

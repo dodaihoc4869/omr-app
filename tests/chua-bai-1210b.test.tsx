@@ -299,7 +299,8 @@ describe('giao diện hai khối + nút "Chiếu lên bảng"', () => {
     expect(g.toast).toHaveBeenCalledWith('1 câu chưa có chuyên đề — trên tờ các câu ấy không có nút Đạt / Chưa đạt (chưa ghi sổ được)', 'warn')
   })
 
-  it('mục Chữa bài: (A) số thứ tự trong ô màu theo loại + thanh số em + nút ≥ 48; (B) mở sẵn ngay sau; mở một dòng ⇒ hai khối ẩn (không gỡ)', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 21/10 (Hành trình một trang, bước 4 "Chữa câu khó & tính toán" — bản vẽ docs/ban-ve-hanh-trinh-2110): khối câu khó (B) đứng TRƯỚC.
+  it('mục Chữa bài: (A) số thứ tự trong ô màu theo loại + thanh số em + nút ≥ 48; (B) mở sẵn, đứng trước; mở một dòng ⇒ hai khối ẩn (không gỡ)', async () => {
     g.goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
       if (duong === '/gv/lop') return { ok: true, du: { lop: LOP } }
       if (duong === '/gv/chien-dich' && b.action === 'danh-sach') return { ok: true, du: { homNay: '2026-10-12', chienDich: [] } }
@@ -308,7 +309,7 @@ describe('giao diện hai khối + nút "Chiếu lên bảng"', () => {
     const { container } = render(<TheCanThayChua />)
     const a = screen.getByRole('region', { name: 'Học sinh cần chữa' })
     const b = screen.getByRole('region', { name: 'Chữa câu khó & tính toán' })
-    expect(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(within(a).getByRole('button', { name: 'Làm mới' })).toBeTruthy()
     expect(await screen.findByText('Chưa có câu nào cần thầy chữa.')).toBeTruthy()
     // CSS: ô số thứ tự 48, thanh số em, nút ≥ 48 (thang chung), khối B chỉ biến --gvm-*

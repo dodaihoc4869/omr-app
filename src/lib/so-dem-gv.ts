@@ -30,7 +30,7 @@ export function mucHanhTrinh(k: TheHanhTrinh | string | null | undefined): MucHa
 /** Màn Hôm nay bấm một việc ⇒ Hành trình mở sẵn đúng thẻ (đọc một lần rồi xoá — như `giaoTuCa`). */
 export interface MoHanhTrinh {
   the: TheHanhTrinh
-  /** "Bổ sung bài": mở và cuộn tới bước "Tick bài vừa dạy" trong mục Dạy học & đầu giờ. */
+  /** Lối cũ "Bổ sung bài" (21/10: nút ở Hôm nay mở hộp ngay tại chỗ) ⇒ Hành trình mở hộp "Bổ sung bài hôm nay". */
   boSungBai?: boolean
   /** Khối chọn sẵn (lối vào cũ của thẻ Nhịp học / Bài hằng ngày — hai thẻ ấy nay ở màn Hôm nay; Hành trình bỏ qua trường này). */
   khoi?: number

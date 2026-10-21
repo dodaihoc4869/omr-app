@@ -270,11 +270,12 @@ describe('chọn đề ⇒ tờ chiếu đủ mọi câu, đúng mã, câu khác
 // thẻ "Thầy tự chữa" gập ở ĐẦU ⇒ khối (B) "Chữa câu khó & tính toán" MỞ SẴN, đứng SAU khối (A) "Học sinh cần chữa"; nút "Chiếu lên máy chiếu" ⇒ "Chiếu
 // lên bảng"; dòng tóm tắt ⇒ bốn ô số; tỉ lệ sai ⇒ "% lớp sai" + "x/y em sai" + thanh. Phần gọi em lên bảng kiểm ở tests/chua-bai-1210b.test.tsx.
 describe('giao diện: khối "Chữa câu khó & tính toán" trong mục Chữa bài', () => {
-  it('Chữa bài = hai khối: (A) Học sinh cần chữa trước, (B) Chữa câu khó & tính toán MỞ SẴN sau — (B) đọc kho + lớp ngay, danh sách cần chữa vẫn tải như cũ', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 21/10 (Hành trình một trang, bước 4 "Chữa câu khó & tính toán" — bản vẽ docs/ban-ve-hanh-trinh-2110): (B) đứng TRƯỚC (A).
+  it('Chữa bài = hai khối: (B) Chữa câu khó & tính toán MỞ SẴN trước, (A) Học sinh cần chữa sau — (B) đọc kho + lớp ngay, danh sách cần chữa vẫn tải như cũ', async () => {
     render(<TheCanThayChua />)
     const a = screen.getByRole('region', { name: 'Học sinh cần chữa' })
     const b = screen.getByRole('region', { name: 'Chữa câu khó & tính toán' })
-    expect(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(within(a).getByRole('heading', { level: 2, name: 'Học sinh cần chữa' })).toBeTruthy()
     expect(within(b).getByRole('heading', { level: 2, name: 'Chữa câu khó & tính toán' })).toBeTruthy()
     expect(within(b).queryByRole('button', { name: 'Chọn đề' })).toBeNull()
