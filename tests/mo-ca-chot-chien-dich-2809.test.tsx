@@ -83,7 +83,10 @@ describe('màn Mở ca kiểm tra đọc gói ca chốt', () => {
     const { container } = render(<ExamSetupScreen />)
     await waitFor(() => expect(container.textContent).toContain('2 đề đã chọn · 3 câu'))
     expect(screen.getByText(/^Đang mở ca chốt cho chiến dịch Ester tuần 39 · đã chọn sẵn 3\/5 câu/)).toBeTruthy()
-    expect(container.textContent).toContain('Chế độ rút: 2 câu I · 1 câu II · 0 câu III')
+    // Dòng cách ra đề (21/10) thay "Chế độ rút: …" — cùng số câu từng phần của bộ ca chốt.
+    expect(container.textContent).toContain('Cả lớp cùng một đề · bộ câu ca chốt · 2 · 1 · 0 câu')
+    // Bộ ca chốt đứng riêng: khối Bộ câu ra đề KHÔNG được dựng đè lên (bản trước chỉ thoát nhờ hộp nổi chưa mở).
+    expect(container.querySelector('[data-khoi="bo-ca-chot"]')).toBeTruthy()
     expect(sessionStorage.getItem(KHOA_CA_CHOT)).toBeNull()
     expect((screen.getByDisplayValue('Ca chốt · Ester tuần 39') as HTMLInputElement).value).toBe('Ca chốt · Ester tuần 39')
   })
