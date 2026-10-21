@@ -90,15 +90,21 @@ describe('hộp Bổ sung bài hôm nay', () => {
     expect(await screen.findByRole('radio', { name: /Bài 1\. Ester/ }, { timeout: 4000 })).toBeTruthy()
   })
 
-  it('bước Dạy học của Hành trình ghi phần nhớ KHÔNG xoá lớp + bài hộp đã chọn; Hành trình không đọc cờ OMNI', async () => {
-    const baiChon = { khoaBai: 'DH-12-C1-B2', khoi: '12', tenBai: 'Bài 2. Lipid' }
-    localStorage.setItem('ddh.dayHoc.BH-9', JSON.stringify({ maChon: [], boCau: [], giao: {}, lopNhan: ['12A1'], baiChon }))
+  it('bước Dạy học của Hành trình ghi phần nhớ KHÔNG đè lớp + bài hộp vừa chọn (lỗi Đợt 16); Hành trình không đọc cờ OMNI', async () => {
+    const baiA = { khoaBai: 'DH-12-C1-B1', khoi: '12', tenBai: 'Bài 1. Ester' }
+    const baiB = { khoaBai: 'DH-12-C1-B2', khoi: '12', tenBai: 'Bài 2. Lipid' }
+    localStorage.setItem('ddh.dayHoc.BH-9', JSON.stringify({ maChon: ['DH-12-C1-B1'], boCau: [], giao: {}, lopNhan: ['12A1'], baiChon: baiA }))
     localStorage.setItem('ddh.hanhTrinh.buoc.BH-9', '3')
     const { container } = render(<TheBaiDaDay />)
     await waitFor(() => expect(container.querySelector('[data-buoc-ht="3"]')!.getAttribute('data-mo')).toBe('true'))
-    await screen.findByRole('heading', { level: 2, name: 'Dạy học' })
-    await new Promise((r) => setTimeout(r, 50))
-    expect(JSON.parse(localStorage.getItem('ddh.dayHoc.BH-9')!)).toMatchObject({ lopNhan: ['12A1'], baiChon })
+    const tich = await screen.findAllByRole('checkbox', { name: /^Chiếu câu/ }, { timeout: 4000 })
+    // hộp Bổ sung bài (mở cùng lúc) vừa chọn bài B
+    const nho = JSON.parse(localStorage.getItem('ddh.dayHoc.BH-9')!)
+    localStorage.setItem('ddh.dayHoc.BH-9', JSON.stringify({ ...nho, baiChon: baiB }))
+    // thầy bỏ một câu ở bước 3 ⇒ bảng Dạy học ghi phần nhớ của mình
+    fireEvent.click(tich[0]!)
+    await waitFor(() => expect(JSON.parse(localStorage.getItem('ddh.dayHoc.BH-9')!).boCau).toHaveLength(1))
+    expect(JSON.parse(localStorage.getItem('ddh.dayHoc.BH-9')!)).toMatchObject({ lopNhan: ['12A1'], baiChon: baiB })
     expect(lenh('/gv/omni', 'co-doc')).toHaveLength(0)
   })
 })

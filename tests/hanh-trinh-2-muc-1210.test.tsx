@@ -21,7 +21,7 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 // Mục Chữa bài có test riêng (làn Chữa bài) — ở đây chỉ kiểm đường nối.
 vi.mock('../src/components/chien-dich/TheCanThayChua', () => ({ default: () => <p>Giả: mục Chữa bài</p> }))
 
-import { mucHanhTrinh, useSoDemGv, type TheHanhTrinh } from '../src/lib/so-dem-gv'
+import { useSoDemGv, type TheHanhTrinh } from '../src/lib/so-dem-gv'
 import { buocMacDinh, chuBuoi, chuDemGiao, dongBaiDangGiao, goiDangGiao, trangThaiBuoc } from '../src/components/chien-dich/buoi-day-ui'
 import { emVangBuoi } from '../src/components/day-hoc/DiemDanhBuoi'
 import { kyTuTen } from '../src/components/day-hoc/KiemTraDauGio'
@@ -112,7 +112,6 @@ describe('một trang 4 bước + khoá cũ', () => {
       ['day-hoc', null], ['chua-bai', 4], ['can-chua', 4], ['dau-gio', 2], ['goi-7', null], ['nhip', null], ['bai-hang-ngay', null], ['chien-dich', null], ['la', null],
     ]
     for (const [k, so] of bang) expect(buocHanhTrinh(k), k).toBe(so)
-    expect(mucHanhTrinh('can-chua')).toBe('chua-bai')
     const r = render(<HanhTrinhV2 theDau="can-chua" />)
     expect(await screen.findByText('Giả: mục Chữa bài')).toBeTruthy()
     expect(dangMo(r.container, 4)).toBe(true)

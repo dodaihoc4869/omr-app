@@ -9,7 +9,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { goiLenh } from '../src/lib/goi-lenh-thay'
-import { mucHanhTrinh, useSoDemGv } from '../src/lib/so-dem-gv'
+import { useSoDemGv } from '../src/lib/so-dem-gv'
 import { buocHanhTrinh } from '../src/components/chien-dich/HanhTrinhV2'
 import ChienDichScreen from '../src/screens/ChienDichScreen'
 
@@ -35,7 +35,6 @@ it('Hành trình không còn thẻ "Bài mới trong 7 ngày"; mở màn không 
 })
 
 it('khoá cũ { the: goi-7 } từ màn khác ⇒ trang 4 bước (bước theo điểm danh), yêu cầu được tiêu thụ một lần', async () => {
-  expect(mucHanhTrinh('goi-7')).toBe('day-hoc')
   expect(buocHanhTrinh('goi-7')).toBeNull()
   useSoDemGv.getState().datMoHanhTrinh({ the: 'goi-7' })
   render(<ChienDichScreen />)
