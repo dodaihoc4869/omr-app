@@ -5,7 +5,7 @@ Bước 2 của quy trình 4 bước (`docs/quy-trinh-4-buoc-1310.md`). Thầy d
 Thầy yêu cầu (21/10): "thiết kế thân thiện hiểu rõ được điểm mạnh điểm yếu, mọi dữ liệu của học sinh khi bấm vào mục hỏi thầy để hỗ trợ tốt nhất làm cho học sinh được thấu hiểu nhất".
 
 - Bản vẽ: `hoi-thay-em.html?t=tai|moi|gap|mo|loi|dl|da-hoi`
-- Ảnh: `anh/` (18 ảnh)
+- Ảnh: `anh/` (19 ảnh)
 - Lệnh chụp + soát: `node scripts/chup-ban-ve-hoi-thay-em-2110.mjs`
 
 ## 1. Mục tiêu sư phạm, ai dùng
@@ -32,7 +32,7 @@ Thầy yêu cầu (21/10): "thiết kế thân thiện hiểu rõ được đi�
   - Không dùng màu đỏ cho trạng thái học. Đỏ chỉ dùng cho chấm "Sai" và luôn kèm chữ.
 - Dòng **"Chưa đủ lượt để biết: … (em mới tự làm 1 lần)"**.
 - **Hỏi nhanh:** "Chạm để hỏi Thầy ngay" với các nút viền 48 px. Không tô màu, vì nút chính của hộp vẫn là Gửi.
-- Chân thẻ: "Phần kiến thức tính tới 00:00 · Thứ Tư 21/10/2026. Không tính điểm."
+- Chân thẻ: "Phần kiến thức tính tới 00:00 · Thứ Tư 21/10/2026. Không tính điểm." Giờ và ngày lấy từ `cap_nhat_luc` thật của ảnh chụp, không viết cứng. Hiện chỉ việc đêm (`chupHoSoTho`, `omni-d1.ts`) ghi bảng này nên giờ luôn là 00:00.
 
 **Luật chung:**
 - Mặc định gập.
@@ -44,8 +44,8 @@ Thầy yêu cầu (21/10): "thiết kế thân thiện hiểu rõ được đi�
 | Khổ | Bố cục |
 |---|---|
 | Điện thoại dọc (360, 390) | Một cột, hộp sát đáy như hiện nay. Thẻ gập chỉ thêm 56 px. |
-| Điện thoại ngang (844 × 390) | **HAI CỘT** (đề xuất mới). Trái: Đề câu + thẻ, tự cuộn. Phải: hội thoại + ô nhắn. Lý do: hộp chỉ cao khoảng 340 px. Bản đang chạy MỘT cột đã cắt nút Gửi ở khổ này (đo 21/10: đáy nút 375 px > đáy hộp 367 px). Mã: bọc Đề + thẻ (+ dòng `lg-hh-goi`, nút lời giải) trong `.lg-hh-trai`; một cột thì `display: contents`; chỉ bật trong `@media (max-height: 500px) and (min-width: 640px)`. |
-| Máy tính 1440 | Hộp 560 px giữa màn như cũ. Màn rộng ≥ 600 px thì hai nhóm kiến thức nằm hai cột. |
+| Điện thoại ngang (844 × 390) | **HAI CỘT** (đề xuất mới; đổi bố cục hộp đang có nên cần thầy duyệt riêng). Trái: Đề câu + thẻ, tự cuộn (ảnh 19 là cột trái đã cuộn xuống). Phải: hội thoại + ô nhắn. Lý do: hộp chỉ cao khoảng 340 px. Bố cục MỘT cột hiện nay đã cắt nút Gửi ở khổ này (đo 21/10 trên bản vẽ dùng đúng CSS của app: đáy nút 375 px > đáy hộp 367 px). Mã: bọc Đề + thẻ (+ dòng `lg-hh-goi`, nút lời giải) trong `.lg-hh-trai`; một cột thì `display: contents`; chỉ bật trong `@media (max-height: 500px) and (min-width: 640px)`. |
+| Máy tính 1440 | Hộp 560 px giữa màn như cũ. Hai nhóm kiến thức nằm hai cột khi CHÍNH THẺ rộng ≥ 520 px (`@container`). Vì vậy cột trái hẹp của điện thoại ngang vẫn để một cột. |
 
 ## 3. Trạng thái
 | Trạng thái | Hiện gì | Ảnh |
@@ -53,11 +53,12 @@ Thầy yêu cầu (21/10): "thiết kế thân thiện hiểu rõ được đi�
 | Đang tải | Dòng 48 px có chữ "Em và câu này" + vạch chờ. Giữ đúng chiều cao để ô nhắn không nhảy. Dữ liệu về CÙNG lượt với đề câu. | 06 |
 | Lần đầu (chưa có lần làm, chưa có kiến thức đủ lượt) | Không mở được. Ghi một dòng: "Đây là lần đầu em làm câu này. Em cứ hỏi, Thầy giảng từ đầu." Ô nhắn dùng bình thường. | 07, 18 |
 | Có dữ liệu · gập | Dòng tóm tắt. | 01, 02, 12, 13, 16 |
-| Có dữ liệu · mở | Đủ khối như mục 2. | 03, 04, 05, 11, 14, 15 |
+| Có dữ liệu · mở | Đủ khối như mục 2. | 03, 04, 05, 11, 14, 15, 19 |
 | Em ĐANG LÀM câu (chưa nộp) | Chỉ ghi "Đã làm 4 lần"; KHÔNG hiện Đúng/Sai từng lần (sợ em đoán lại phương án). Ghi thêm "Kết quả từng lần hiện lại sau khi em trả lời câu này." Nút hỏi nhanh đổi thành "Gợi hướng: …". | 09 |
 | Sau khi chạm hỏi nhanh | Câu hỏi hiện như em tự gõ. Thẻ + đề gập. Thầy trả lời bên dưới. | 10, 17 |
 | Lỗi / mất mạng / máy chủ cũ không có trường | ẨN thẻ hoàn toàn. Hộp và ô nhắn chạy như cũ. Không hiện báo lỗi riêng cho thẻ (không doạ, không thêm việc cho em). | 08 |
-| Có lần làm nhưng không có kiến thức (em chưa bật OMNI) | Chỉ khối "Câu này" + hỏi nhanh chung ("Giải thích lại câu này"). | — |
+| Có lần làm nhưng không có kiến thức (em chưa bật OMNI: mọi `p` rỗng, `tuLam` = 0) | ẨN các dòng kiến thức ấy (không liệt kê hàng loạt dưới "Chưa đủ lượt"). Chỉ hiện khối "Câu này" + MỘT nút hỏi nhanh chung "Giải thích lại câu này". | — |
+| Có kiến thức nhưng chưa có lần làm câu này | Nhãn tóm tắt: "Lần đầu làm câu này · 2 phần đã vững". Không bao giờ hiện "0/0". Khối "Câu này" thay bằng một dòng "Đây là lần đầu em làm câu này." | — |
 | Ca kiểm tra đang mở / câu chưa công bố | Hộp đã khoá như hiện nay; máy chủ KHÔNG gửi trường. | — |
 
 ## 4. Dữ liệu
@@ -78,10 +79,12 @@ Hiện các trường này chỉ đi vào lời nhắc cho AI.
 - **Kiểu trả về** (hàm thuần, ví dụ `tomTatEmVaCau(hoSo, { dangLam })` trong `hoi-thay-ca-nhan.ts`):
   ```ts
   emVaCau?: {
-    cauNay: { tuLam: number; tuLamDung: number; coTroGiup: number;      // tuLam = số lần KHÔNG trợ giúp
-              lan: { ketQua?: 0 | 1; troGiup: boolean; luc: string }[] } // cũ → mới, ≤ 8; dangLam ⇒ bỏ ketQua và troGiup, chỉ còn số lần
+    cauNay:                                                              // vắng khi chưa có lần làm nào
+      | { tuLam: number; tuLamDung: number; coTroGiup: number;          // tuLam = số lần KHÔNG trợ giúp
+          lan: { ketQua: 0 | 1; troGiup: boolean; luc: string }[] }     // cũ → mới, ≤ 8
+      | { soLan: number }                                               // dangLam: CHỈ tổng số lần, không gì khác
     kienThuc: { ten: string; muc: 'vung' | 'luyen_them' | 'chua_du'; tuLam: number; ngay: number; trongCau: boolean }[] // ≤ 8 + 6
-    hoiNhanh: string[]   // ≤ 2 tên kiến thức TRONG câu, muc ≠ 'vung', luyen_them trước
+    hoiNhanh: string[]   // ≤ 2 tên kiến thức TRONG câu, muc ≠ 'vung', luyen_them trước; rỗng ⇒ máy em hiện một nút chung "Giải thích lại câu này"
     mocKienThuc?: string // cap_nhat_luc của ảnh chụp (00:00 VN)
   }
   ```
@@ -123,7 +126,7 @@ Hiện các trường này chỉ đi vào lời nhắc cho AI.
 - **Mỗi lần mở hộp:** thêm **3 lệnh đọc D1, 0 lệnh ghi, 0 đợt chờ nối tiếp.** Cả 3 lệnh chạy chung đợt 1 của `hsHoiThay`, có LIMIT, đọc theo khoá `(sbd, vkn_id)` / `(sbd, qid)`.
 - **Lần gửi câu hỏi:** không đổi. `hoi-tro-ly` vẫn tự đọc. Gộp với lần mở hộp là việc tối ưu sau, không thuộc đợt này.
 - **Phản hồi:** dài thêm khoảng ≤ 1,5 KB JSON.
-- **Đáp án:** không có. Lúc em đang làm, máy chủ bỏ hẳn Đúng/Sai từng lần (cắt ở máy chủ, không trông vào máy em ẩn đi).
+- **Đáp án:** không có. Lúc em đang làm, máy chủ chỉ gửi `{ soLan }`: không `tuLamDung`, không `coTroGiup`, không `lan[]`. Một lần làm duy nhất cũng không lộ kết quả. Cắt ở máy chủ, không trông vào máy em ẩn đi.
 - **Mã máy em:** thẻ nằm trong mảnh nạp lười của hộp Hỏi thầy (`hop-hoi-thay.css` + `HopHoiThay`). Byte tải mở app (`taiApp`) KHÔNG tăng.
 
 ## 7. Nghiệm thu đo bằng máy
@@ -132,7 +135,7 @@ Hiện các trường này chỉ đi vào lời nhắc cho AI.
 - `tests/hoi-thay-em-va-cau-2110.test.ts` (máy chủ):
   - trường `emVaCau` có ở hai nhánh `ok`, vắng ở `dang_kiem_tra` / `ca_chua_cong_bo` / không tìm thấy;
   - không có khoá `p`, `qid`, mã vkn, đáp án;
-  - `dangLam` thì `lan[]` không có `ketQua`;
+  - `dangLam` thì `cauNay` chỉ có `soLan`: không có `tuLamDung`, `coTroGiup`, `lan`, `ketQua` ở bất cứ đâu;
   - `muc` theo `trang_thai`;
   - `tuLam` bỏ lần trợ giúp.
 - `tests/the-em-va-cau-2110.test.tsx` (giao diện):
@@ -152,7 +155,8 @@ Hiện các trường này chỉ đi vào lời nhắc cho AI.
   - 0 lỗi trang, 0 tràn ngang;
   - 0 đích chạm < 44 px (khối mới < 48 px);
   - **ô nhắn + nút Gửi thấy trọn** ở mọi ảnh không chụp toàn bộ.
-  - Kết quả bản vẽ 21/10: **18 ảnh, 0 vấn đề.**
+  - đếm tương phản chữ trong thẻ ≥ 4,5:1 (chữ lớn ≥ 3:1) ở cả sáng và tối (CHUẨN B10).
+  - Kết quả bản vẽ 21/10: **19 ảnh, 0 vấn đề.** Đo tương phản trên 18 ảnh có thẻ; ảnh thẻ mở đo 37 dòng chữ, thấp nhất 6,05:1 (sáng), 7,2:1 (tối).
 
 ## Ba điều cần thầy chốt
 1. **Tên gọi.**
@@ -163,4 +167,5 @@ Hiện các trường này chỉ đi vào lời nhắc cho AI.
 3. **Gập hay mở sẵn.**
    - Đề xuất: luôn gập (dòng tóm tắt đã nói "Tự làm đúng 1/3 lần"), ô nhắn không bị đẩy xuống.
    - Phương án khác: tự mở ở lần đầu em mở hộp trong ngày nếu có phần "đang luyện thêm".
-   - Kèm theo: điện thoại ngang chuyển sang hai cột (sửa luôn lỗi cắt nút Gửi đang có).
+
+**Cần thầy duyệt riêng (ngoài thẻ):** điện thoại ngang chuyển hộp Hỏi Thầy sang hai cột (ảnh 13, 14, 18, 19). Việc này đổi bố cục hộp đang có, đồng thời sửa lỗi cắt nút Gửi ở khổ ngang.
