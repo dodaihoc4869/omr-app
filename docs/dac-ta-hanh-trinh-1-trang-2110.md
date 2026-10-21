@@ -42,6 +42,11 @@ Thầy dặn: "nút này làm riêng bấm vào popup lên để chọn luôn ch
 - Chân hộp dính đáy: "Hủy" và nút chính "Giao Bài N cho <lớp>". Giao xong thì hộp báo kết quả thật theo máy chủ rồi tự đóng; Bài đang giao và các số đếm cập nhật.
 - Ở Hành trình, nút "Tick bài hôm nay" của bước 3 mở **cùng hộp này**, để có một chỗ chọn bài duy nhất.
 - Tách thành phần: `HopBoSungBai.tsx` (vỏ hộp) + `BuocBaiHomNay` (thân). Hộp chỉ nạp lười khi bấm nút.
+- **Điểm danh (`dd`) của hộp:** `useBaiHomNay(dd, …)` cần `dd`.
+  - Mở từ Hôm nay: hộp tự gọi `useDiemDanhBuoi()`, và chỉ gọi khi hộp mở.
+  - Mở từ Hành trình bước 3: dùng đúng `dd` dùng chung của trang, không tạo bản thứ hai.
+- **Nhớ lựa chọn:** lớp tự chọn và bài đang chọn (`lopTay`, `chonNho`, `datNho`, sửa ở Đợt 16) chuyển lên chỗ sống lâu hơn hộp, tức kho chung theo buổi. Đóng hộp rồi mở lại, từ lối nào cũng vậy, vẫn còn đúng lớp và bài đã chọn.
+- **Công tắc OMNI tắt** hoặc máy chủ chưa có lệnh: **ẩn** nút "Bổ sung bài hôm nay" ở Hôm nay, nút chính trở về việc gấp kế tiếp. Ẩn luôn nút "Tick bài hôm nay" ở bước 3, như hiện nay bước Bài hôm nay chỉ hiện khi OMNI bật.
 - Bỏ đường `moHanhTrinh({ boSungBai: true })` cùng tham số `boSungBai` / `lanBoSung` (cuộn tới bước Tick). Lối cũ nào còn gọi `boSungBai` thì mở hộp.
 
 ## 2c. Phần còn lại
@@ -69,6 +74,7 @@ Thầy dặn: "nút này làm riêng bấm vào popup lên để chọn luôn ch
 ## 5. Ngoại lệ
 - **Lối vào cũ không gãy:** khoá `can-chua` (Hôm nay › Cần thầy chữa) cuộn tới bước 4 và mở nó. Các khoá `dau-gio`, `goi-7`, `nhip`, `bai-hang-ngay` vào bước tương ứng.
 - **"Bổ sung bài"**: mở hộp (mục 2b), không cuộn.
+- Đóng hộp rồi mở lại (từ Hôm nay hay từ Hành trình): vẫn đúng lớp và bài đã chọn (lỗi Đợt 16 không được quay lại).
 - Đang giao mà bấm đóng hộp: hỏi lại trước khi đóng. Mất mạng giữa lúc giao: báo đúng những lớp đã giao xong và những lớp chưa (máy chủ giao lần lượt từng lớp).
 - **Phím → trên bản chiếu Nhịp học** (`sangDauGio`): mở bước 2 trước, rồi mới bấm nút "Chiếu lên bảng" của bước đó.
 - **Đổi chữ:** dòng chân "Câu nhiều em sai … nằm ở mục Chữa bài ›" trong Bài đang giao đổi thành "… ở bước 4 Chữa câu khó ›" và cuộn tới bước 4.
@@ -80,7 +86,7 @@ Thầy dặn: "nút này làm riêng bấm vào popup lên để chọn luôn ch
 ## 6. Chi phí máy chủ + tốc độ
 - **0 lệnh máy chủ mới, 0 vòng chờ D1 thêm.**
 - Bước 4 **không tải lúc mở màn**. Phần thân (`TheCanThayChua` + `ThayTuChua`) chỉ nạp lười khi thầy bấm mở bước 4, hoặc bấm "Chữa câu" trên thước, hoặc vào bằng khoá `can-chua`. Như vậy số byte và số lượt đọc lúc mở màn **không tăng** so với mục mặc định "Dạy học & đầu giờ" hiện nay.
-- Hộp Bổ sung bài: thêm 0 lệnh. Kho chỉ tải khi mở hộp, như bước Bài hôm nay hiện nay. Màn Hôm nay mở ra **không nạp** thêm byte nào.
+- Hộp Bổ sung bài: **0 lệnh máy chủ mới**. Kho chỉ tải khi mở hộp, như bước Bài hôm nay hiện nay. Màn Hôm nay mở ra không nạp thêm byte nào. Riêng khi mở hộp từ Hôm nay có thêm một lượt tìm buổi đang mở (`useDiemDanhBuoi`), chạy **song song** với lúc tải kho, không nối tiếp.
 - Kiểm tra ôn tập (`BangKiemTraCaNhan`) đang tải ngay lúc mở; sau này chỉ tải khi bấm "Xem", nên giảm được một lượt đọc lúc mở màn.
 - Đáp án không đổi đường đi. Lời giải chỉ hiện trên máy thầy như cũ.
 
@@ -88,7 +94,7 @@ Thầy dặn: "nút này làm riêng bấm vào popup lên để chọn luôn ch
 - Test vitest:
   - sửa các test đang dò hai thẻ `gvv2-muc-nut` (tìm bằng `grep -rl "gvv2-muc\|THE_HANH_TRINH" tests`);
   - thêm `tests/hanh-trinh-mot-trang-2110.test.ts`: đủ 4 bước theo đúng thứ tự; không còn `role="tab"`; chỉ một `.nut-chinh` ở bước đang mở; khi chưa có ai điểm danh vẫn mở được bước 3 và bước 4 (không khoá); bước 2, 3, 4 nhận đúng một `dd` dùng chung; đổi bước không gỡ thành phần bước cũ; khoá `can-chua` mở bước 4; bước 4 không nạp mảnh khi chưa mở.
-  - thêm `tests/hop-bo-sung-bai-2110.test.ts`: bấm "Bổ sung bài hôm nay" ở Hôm nay thì mở hộp (`role="dialog"`) và không đổi màn; Esc đóng hộp; nút "Tick bài hôm nay" ở bước 3 mở cùng hộp; hộp có một nút chính "Giao Bài …".
+  - thêm `tests/hop-bo-sung-bai-2110.test.ts`: bấm "Bổ sung bài hôm nay" ở Hôm nay thì mở hộp (`role="dialog"`) và không đổi màn; Esc đóng hộp; nút "Tick bài hôm nay" ở bước 3 mở cùng hộp; hộp có một nút chính "Giao Bài …"; đóng rồi mở lại vẫn giữ lớp và bài đã chọn; OMNI tắt thì không có nút; mở từ bước 3 dùng chung `dd` của trang.
 - `npx tsc --noEmit` sạch. `npm run build && npm run kiem:toc-do` 0 đỏ. `npm run kiem:mau-giu` 0. `node scripts/kiem-sw.mjs` đạt.
 - Ảnh Chromium màn thật 390 / 844 / 1440, sáng và tối: 0 lỗi trang, 0 tràn ngang, 0 đích bấm < 44 px.
 
