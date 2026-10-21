@@ -1,0 +1,36 @@
+# PHỦ CÂU MỚI / CÂU CŨ TỚI HẾT 25/10 (thầy 21/10) — chạy ĐÚNG mã máy chủ trên D1 thật, CHỈ ĐỌC (lớp mỏng chỉ gửi SELECT), CHỈ IN SỐ ĐẾM GỘP (repo công khai: không số báo danh / tên / mã câu).
+name: Phủ câu mới / câu cũ tới 25/10 (chỉ đọc, chỉ đếm)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/do-phu-25-10-2110.yml', 'scripts/do-phu-25-10-2110.ts']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: do-phu-25-10-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cài gói (để gói bộ đo bằng esbuild)
+        run: npm ci --ignore-scripts
+      - name: "Đo: câu mới còn lại, sửa lỗi, ôn, kiểm tra cá nhân tới mốc (chỉ đọc)"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          export OMR_D1_ID=$(grep -m1 '^database_id' server/wrangler.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          npx esbuild scripts/do-phu-25-10-2110.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-phu.mjs --log-level=warning
+          OMR_SONG_SONG=2 OMR_GIOI_HAN_MS=1500000 timeout 1620 node --no-warnings /tmp/do-phu.mjs | grep -v '^\[chan-khac-khoi\]' || echo "(thoát mã $?)"
