@@ -70,6 +70,21 @@
 .dd1-vua-dong:hover { background: var(--gvm-mat-2); }
 .dd1-vua-gio { font-size: 13px; color: var(--gvm-chu-3); font-variant-numeric: tabular-nums; }
 .dd1-vua-ten { min-width: 0; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* THANH MỨC LÀM (bản vẽ 03, thầy 20/10): cột thứ tư của dòng "Vừa điểm danh". Màu chỉ từ biến --gvm-* (cùng công thức bốn mức của Hồ sơ làm bài). */
+.dd1-ml-giai { margin: 0 0 6px; font-size: 13px; color: var(--gvm-chu-3); line-height: 1.5; }
+.dd1-vua-ds[data-co-muc] .dd1-vua-dong { grid-template-columns: 52px minmax(0, 1fr) auto minmax(168px, 240px); }
+.dd1-ml { display: grid; gap: 4px; min-width: 0; padding: 6px 0; }
+.dd1-ml-thanh { display: flex; gap: 2px; height: 6px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--gvm-chu-3) 14%, transparent); }
+.dd1-ml-thanh i { display: block; flex-basis: 0; min-width: 4px; }
+.dd1-ml-thanh i[data-m='1'] { background: color-mix(in srgb, var(--gvm-xd) 24%, var(--gvm-mat-2)); }
+.dd1-ml-thanh i[data-m='2'] { background: color-mix(in srgb, var(--gvm-xd) 46%, var(--gvm-mat-2)); }
+.dd1-ml-thanh i[data-m='3'] { background: color-mix(in srgb, var(--gvm-xd) 72%, var(--gvm-mat-2)); }
+.dd1-ml-thanh i[data-m='4'] { background: var(--gvm-xd); }
+.dd1-ml-chu { font-size: 12px; line-height: 1.35; color: var(--gvm-chu-3); font-variant-numeric: tabular-nums; }
+.dd1-ml-chu b { color: var(--gvm-chu); font-weight: 800; }
+.dd1-ml-chu small { display: block; font-size: 12px; }
+.dd1-ml:not([data-co-so]) .dd1-ml-chu { font-style: italic; }
+.dd1-ml--cho .dd1-ml-thanh { opacity: 0.5; }
 .dd1-o--xong .dd1-phu { font-size: 14px; color: var(--gvm-chu-2); line-height: 1.6; }
 .dd1-o--xong .dd1-phu b { color: var(--gvm-chu); }
 .dd1 .dd1-nut-chinh { margin-top: auto; width: 100%; min-height: 56px; justify-content: center; border-radius: 16px; font-size: 17px; font-weight: 800; white-space: normal; text-align: center; }
@@ -80,4 +95,6 @@
   .dd1-o { padding: 16px; }
   .dd1-ma { font-size: 38px; }
   .dd1-vua-dong { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; }
+  .dd1-vua-ds[data-co-muc] .dd1-vua-dong { grid-template-columns: 44px minmax(0, 1fr) auto; }
+  .dd1-vua-ds[data-co-muc] .dd1-ml { grid-column: 2 / -1; padding-top: 0; }
 }

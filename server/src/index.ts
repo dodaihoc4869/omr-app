@@ -3776,6 +3776,8 @@ const boXuLy = {
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
       // LỊCH SỬ LÀM CÂU CỦA MỘT EM (thầy 09/10 khuya, server/src/lich-su-lam-cau.ts; hợp đồng lich-su-lam-cau-kieu.ts): CHỈ ĐỌC sổ — mọi lượt · câu sai · số giây.
       if (p === '/gv/lich-su-lam-cau') return ra(await gvLichSuLamCau(envDoc, b))
+      // MỨC LÀM THEO LÔ EM CÓ MẶT (thầy 20/10, bản vẽ 03 bảng điểm danh; server/src/muc-lam-lo.ts): CHỈ ĐỌC sổ của ≤ 40 em đang hiện trên bảng, 14 ngày. Không đụng `/gv/nhip-hoc`.
+      if (p === '/gv/muc-lam-lo') return ra(await import('./muc-lam-lo').then((m) => m.gvMucLamLo(envDoc, b)))
       // BÀI HẰNG NGÀY + HỒ SƠ THÁI ĐỘ LÀM BÀI (thầy 12/10, server/src/bai-hang-ngay.ts; hợp đồng bai-hang-ngay-kieu.ts): CHỈ ĐỌC sổ — mức/đã làm/thiếu
       // từng ngày từ 12/10 của mọi em; một em: lịch hoạt động, tín hiệu có ngưỡng, kết luận theo luật.
       if (p === '/gv/bai-hang-ngay') return ra(await import('./bai-hang-ngay').then((m) => m.gvBaiHangNgay(envDoc, b)))

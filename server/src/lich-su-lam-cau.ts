@@ -18,13 +18,14 @@
 // nào lỗi thì để trống phần ấy (chon/giây/tiêu đề = null/rỗng), không làm hỏng cả lệnh.
 import type { Env } from './kieu'
 import type { CauEmSai, LanLamCau, NguonGiay, TraLoiLichSuLamCau } from './lich-su-lam-cau-kieu'
-import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame, noiCuaCa } from './ai-sai-cau'
+import { chiTietCauCuaLuot, giayUocTinhGame, noiCuaCa } from './ai-sai-cau'
 import { loaiGameCua } from './dau-gio'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docBetaCau, docCauKho, tenCuaDang } from './omni-d1'
 import { docKichThuocCau } from './cau-doc-giay'
 import { tongMucLam, type MucLamLuot } from './muc-lam'
-import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong, type DoMucLuot } from './muc-lam-so'
+import { chuanMucDo, docDoMuc, type DoMucLuot } from './muc-lam-so'
+import { doThatCacDong, giaySoLuot, mucLamCuaDong, tapCanTraMucLam } from './muc-lam-lo'
 import { tenLopCuaEm } from './ten-lop'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
@@ -85,6 +86,10 @@ const ngayVnTuLuc = (luc: string): string => {
 
 /** Dòng sổ đã đọc (nội bộ). */
 interface Dong {
+  /** Em của dòng (để dùng chung hàm Mức làm với lệnh theo lô — `muc-lam-lo.ts`). */
+  sbd: string
+  /** `raw_json.ms` (giây đo thật, mili giây). */
+  ms: unknown
   qid: string
   goc: string
   nguon: string
@@ -158,6 +163,8 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
     const kq = x.ket_qua === null || x.ket_qua === undefined || x.ket_qua === '' ? null : Number(x.ket_qua)
     const luc = str(x.luc)
     return {
+      sbd,
+      ms: raw?.ms,
       qid,
       goc: str(raw?.tc) ? tachSongSinh(str(raw?.tc)).goc : tachSongSinh(qid).goc,
       nguon: str(x.nguon),
@@ -180,18 +187,16 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   dong.sort((a, c) => (a.luc < c.luc ? 1 : a.luc > c.luc ? -1 : 0))
 
   // 3 · tra phụ (song song): kho câu, loại game, đáp án lượt game, ước tính giây game (chỉ lượt chưa có số đo), chi tiết ca thi.
-  const doThat = dong.map((d) => giayDoCuaLuot(d.giayCot, d.raw?.ms))
+  const doThat = doThatCacDong(dong)
   const goc = [...new Set(dong.map((d) => d.goc).filter(Boolean))]
   const game = dong.filter((d) => d.nguon === 'game')
-  const gameThieuGiay = dong.filter((d, i) => d.nguon === 'game' && doThat[i] === null).map((d) => ({ sbd, phien: d.maNguon }))
   const idGameCanChon = [...new Set(game.filter((d) => chonTuGiaTri(d.raw?.chon ?? d.raw?.traLoi) === null).map((d) => d.attemptId || `${d.maNguon}|${d.qid}`))]
   const caThi = [...new Set(dong.filter((d) => d.nguon === 'thi').map((d) => d.maNguon))]
   type KhoGon = { tenDang: string | null; mucDo: string | null }
   // Mức làm 1–4: CHỈ lượt có số đo mới (đồng hồ mới + kích thước đề) cần β của câu ⇒ tập này nhỏ (0 lượt trước khi máy em nạp bản mới); đọc CÙNG đợt với các khối dưới (0 vòng chờ nối tiếp thêm).
-  const gocMuc = gocCanBeta(dong.map((d, i) => ({ doMuc: d.doMuc, giayDo: doThat[i] ?? null, goc: d.goc })))
+  const { gocMuc, gocCanKichThuoc, gameThieuGiay } = tapCanTraMucLam(dong, doThat)
   // ĐO LẠI LƯỢT CŨ (21/10): kích thước đề (bảng tính sẵn) của các câu mà lượt chưa có `doc` — MỘT lệnh đọc CÙNG đợt, lỗi / bảng chưa có ⇒ rỗng (lượt cũ vẫn "Chưa có số đo").
   // CA THI KHÔNG ĐO LẠI: giây ca thi cũ chỉ cộng cho MỘT câu hiện nhiều nhất và bỏ qua lúc tab ẩn ⇒ có thể THIẾU (không phải chặn trên) — xếp mức từ đó sẽ sai chiều. Chỉ xin cho lượt CÓ THỂ có giây (cột/ms hoặc game có mốc trả lời).
-  const gocCanKichThuoc = [...new Set(dong.filter((d, i) => !d.doMuc && d.goc && d.nguon !== 'thi' && (doThat[i] != null || d.nguon === 'game')).map((d) => d.goc))]
   const [kho, loai, rAtt, uoc, ct, beta, kichThuoc] = await Promise.all([
     docCauKho(env, goc).catch(() => new Map<string, KhoGon>()) as Promise<Map<string, KhoGon>>,
     loaiGameCua(env, game.map((d) => d.maNguon)).catch(() => new Map<string, 'doan' | 'bia' | 'dao'>()),
@@ -218,17 +223,9 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   // Mức làm của từng lượt (thuần, muc-lam.ts). Thời gian thường CHỈ khi β thật (τ của OMNI chưa nối ⇒ τ = 0, hệ số đọc 1,0 — đặc tả mục 3). Bản học sinh/phụ huynh: lượt ĐÚNG ở Mức 1–2 không mang mức
   // (chỉ số giây) và KHÔNG tính vào tổng — tổng khớp đúng những gì em thấy.
   // GIÂY MỖI LƯỢT + LOẠI: 'do' = số đo (đồng hồ mới có `doc`) · 'cu' = đồng hồ cũ (cột `giay` / `raw_json.ms` / ca thi) · 'uoc' = ƯỚC TÍNH (mốc trả lời game). 'cu' và 'uoc' chỉ có thể DƯ. KHÔNG ước tính từ khoảng cách giữa các dòng sổ: ôn lại / tự luyện / BTVN lỡ nộp cả lô cùng lúc nên khoảng cách không phải thời gian làm câu.
-  const giaySo = dong.map((d, i): { g: number | null; loai: 'do' | 'cu' | 'uoc' | null } => {
-    if (doThat[i] != null) return { g: doThat[i]!, loai: d.doMuc ? 'do' : 'cu' }
-    if (d.nguon === 'thi') { const g = ctCua(d)?.giay ?? null; if (g !== null) return { g, loai: 'cu' } }
-    if (d.nguon === 'game') { const u = uoc.get(`${d.maNguon}|${Date.parse(d.luc)}`); if (u !== undefined) return { g: u, loai: 'uoc' } }
-    return { g: null, loai: null }
-  })
-  const mucTho: (MucLamLuot | null)[] = dong.map((d, i) =>
-    mucLamTuDong({
-      doMuc: d.doMuc, giayDo: doThat[i] ?? null, goc: d.goc, mucDo: d.mucDo, dung: d.ketQua === null ? null : d.ketQua === 1,
-      ...((giaySo[i]!.loai === 'cu' || giaySo[i]!.loai === 'uoc') && d.nguon !== 'thi' ? { giayCu: giaySo[i]!.g, loaiCu: giaySo[i]!.loai as 'cu' | 'uoc' } : {}),
-    }, beta, kichThuoc))
+  // Hai hàm thuần `giaySoLuot` · `mucLamCuaDong` nằm ở `muc-lam-lo.ts` — DÙNG CHUNG với lệnh theo lô của bảng điểm danh (`/gv/muc-lam-lo`): một định nghĩa Mức làm.
+  const giaySo = dong.map((d, i) => giaySoLuot(d, doThat[i] ?? null, uoc, d.nguon === 'thi' ? (ctCua(d)?.giay ?? null) : null))
+  const mucTho: (MucLamLuot | null)[] = dong.map((d, i) => mucLamCuaDong(d, doThat[i] ?? null, giaySo[i]!, beta, kichThuoc))
   const anMuc = (i: number): boolean => nguoiDoc === 'hoc-sinh' && !!mucTho[i] && dong[i]!.ketQua === 1 && mucTho[i]!.ma <= 2
   const tatCa: LanLamCau[] = dong.map((d, i) => {
     const giay: number | null = giaySo[i]!.g

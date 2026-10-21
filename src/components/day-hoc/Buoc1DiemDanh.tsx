@@ -7,6 +7,9 @@
 // Mọi chức năng cũ giữ nguyên: mở buổi (`khoiMo`), mã + QR, tự làm mới 5 giây (nhịp của `useDiemDanhBuoi` — vẫn chạy khi bản chiếu mở), thêm em tay
 // (`khoiThem`), bớt em nhầm (`dsCoMat` gập sẵn), kết thúc buổi. Nhóm từng em: MỘT lệnh CHỈ ĐỌC `/gv/nhip-hoc` cho cả khối/lớp, lọc theo lớp của buổi
 // (src/lib/diem-danh-nhip.ts); không có số ⇒ tên vẫn hiện, không màu nhóm. Màu chỉ biến --gvm-* (diem-danh-buoc1.css).
+// THANH MỨC LÀM (bản vẽ 03, thầy 20/10): mỗi dòng "Vừa điểm danh" thêm thanh nhỏ số lượt 14 ngày theo Mức làm 1 → 4 + "Mức làm 1–2: x/y lượt". Một lệnh CHỈ ĐỌC `/gv/muc-lam-lo` cho
+// ĐÚNG các em đang hiện trên dòng (mặc định 6, mở hết ≤ 40) — KHÔNG đụng `/gv/nhip-hoc`; hỏi SAU khi danh sách đã vẽ (chờ 1,5 giây cho danh sách ổn định), lỗi ⇒ dòng vẫn như cũ, không chặn điểm danh.
+// Chỉ màn của thầy; KHÔNG đưa lên bản chiếu (tên em kèm mức trước lớp).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { MonitorPlay, Plus, RefreshCw } from 'lucide-react'
@@ -14,6 +17,7 @@ import { linkDiemDanh } from '../../lib/buoi-hoc-api'
 import { dinhDangMa } from '../../lib/them-phut-api'
 import { duongQr, taoQr } from '../../lib/ma-qr'
 import { layNhipHoc } from '../../lib/nhip-hoc-thay'
+import { chuMucLamEm, layMucLamLo, TOI_DA_EM_MUC_LAM_LO, type MucLamEm } from '../../lib/muc-lam-lo-api'
 import { chuChip, chuNutEm, gioDd, khoaNhom, khoiEm, ngayNganDd, nhipTheoSbd, soNhom, TEN_NHOM, thongKeBuoi, THU_TU_NHOM, type CheDoChieu, type EmBuoi, type TrangThaiNhip } from '../../lib/diem-danh-nhip'
 import type { EmHoSo } from '../chien-dich/HoSoLamCauEm'
 import type { DiemDanhBuoi } from './DiemDanhBuoi'
@@ -56,6 +60,92 @@ export function useNhipBuoi(bat: boolean): TrangThaiNhip & { tai: () => Promise<
 }
 
 export const emHoSoTu = (e: EmBuoi): EmHoSo => ({ sbd: e.sbd, ten: e.hoTen || `SBD ${e.sbd}`, khoi: khoiEm(e), lop: e.lop })
+
+/** Chờ cho danh sách ổn định (danh sách tự làm mới 5 giây, em mới vào liên tục) rồi mới hỏi Mức làm — không chồng lệnh. */
+export const CHO_HOI_MUC_LAM_MS = 1500
+
+/**
+ * Mức làm 14 ngày của các em đang hiện (`khoaSbd` = SBD nối bằng dấu phẩy, đã ổn định để effect không chạy lại vô ích). Chỉ hỏi em CHƯA có số và chưa đang hỏi;
+ * lượt đang bay không bị huỷ khi danh sách đổi (chỉ bỏ khi màn đóng). Lỗi ⇒ `loi`, KHÔNG tự hỏi lại (không dồn thêm tải khi máy chủ đang chậm).
+ */
+export function useMucLamLo(khoaSbd: string, bat: boolean): { theoEm: ReadonlyMap<string, MucLamEm>; dang: boolean; loi: boolean } {
+  const [theoEm, setTheoEm] = useState<ReadonlyMap<string, MucLamEm>>(() => new Map())
+  const [dang, setDang] = useState(false)
+  const [loi, setLoi] = useState(false)
+  const daHoi = useRef(new Set<string>())
+  const song = useRef(true)
+  const ngayDem = useRef('')
+  useEffect(() => {
+    song.current = true
+    return () => {
+      song.current = false
+    }
+  }, [])
+  useEffect(() => {
+    if (!bat) return
+    // Qua ngày mới (màn mở xuyên đêm) ⇒ bỏ số cũ, hỏi lại.
+    const homNay = new Date().toDateString()
+    if (ngayDem.current && ngayDem.current !== homNay) {
+      daHoi.current.clear()
+      setTheoEm(new Map())
+      setLoi(false)
+    }
+    ngayDem.current = homNay
+    const can = khoaSbd.split(',').filter((x) => x && !daHoi.current.has(x)).slice(0, TOI_DA_EM_MUC_LAM_LO)
+    if (!can.length) return
+    const hen = setTimeout(() => {
+      for (const x of can) daHoi.current.add(x)
+      setDang(true)
+      void layMucLamLo(can).then((r) => {
+        if (!song.current) return
+        setDang(false)
+        if (!r.ok) {
+          setLoi(true)
+          return
+        }
+        setTheoEm((c) => new Map([...c, ...r.du.em]))
+      })
+    }, CHO_HOI_MUC_LAM_MS)
+    return () => clearTimeout(hen)
+  }, [khoaSbd, bat])
+  return { theoEm, dang, loi }
+}
+
+const GIAI_THICH_UOC = 'Gồm lượt xếp từ giây đồng hồ cũ hoặc ước tính từ mốc trả lời — số giây có thể cao hơn thật nên mức thật có thể thấp hơn.'
+
+/** Thanh nhỏ 14 ngày: bốn đoạn Mức làm 1 → 4 theo số lượt (đậm dần, không dựa vào màu: có chữ "Mức làm 1–2: x/y lượt"). `d` vắng ⇒ đang đo (hoặc để trống khi lỗi). Chỉ để nhìn — nhãn đọc màn hình nằm ở nút của dòng. */
+export function ThanhMucLam({ d, cho }: { d: MucLamEm | undefined; cho: boolean }) {
+  if (!d) {
+    return cho ? (
+      <span className="dd1-ml dd1-ml--cho" aria-hidden="true">
+        <span className="dd1-ml-thanh" />
+        <span className="dd1-ml-chu">Đang đo…</span>
+      </span>
+    ) : (
+      <span className="dd1-ml" aria-hidden="true" />
+    )
+  }
+  const x = d.m[0] + d.m[1]
+  return (
+    <span className="dd1-ml" data-co-so={d.soDo > 0 ? '' : undefined} aria-hidden="true">
+      <span className="dd1-ml-thanh">
+        {d.soDo > 0 && d.m.map((n, i) => (n > 0 ? <i key={i} data-m={i + 1} style={{ flexGrow: n }} /> : null))}
+      </span>
+      <span className="dd1-ml-chu" {...(d.soUocTinh > 0 ? { title: GIAI_THICH_UOC } : {})}>
+        {d.soDo > 0 ? (
+          <>
+            {d.soUocTinh > 0 ? '≈ ' : ''}Mức làm 1–2: <b>{x}/{d.soDo}</b> lượt
+            {d.chuaCoSoDo > 0 ? <small>{d.chuaCoSoDo} lượt chưa có số đo</small> : null}
+          </>
+        ) : d.chuaCoSoDo > 0 ? (
+          `Chưa có số đo (${d.chuaCoSoDo} lượt)`
+        ) : (
+          'Chưa có lượt 14 ngày qua'
+        )}
+      </span>
+    </span>
+  )
+}
 
 /** Tấm Hồ sơ làm bài sẵn có của app thầy (khung `.m3.m3-thay.vo-thay` như Hôm nay › Nhịp học); `trenChieu` ⇒ phóng to theo khổ máy chiếu. */
 export function TamHoSoEm({ em, trenChieu, onDong }: { em: EmHoSo; trenChieu: boolean; onDong: () => void }) {
@@ -150,6 +240,9 @@ export default function Buoc1DiemDanh({
   const dem = tk.demCoMat
   const siSo = tt?.siSo ?? null
   const vua = moVua ? tk.coMat : tk.coMat.slice(0, SO_VUA_DIEM_DANH)
+  const khoaVua = vua.map((e) => e.sbd).join(',')
+  const mucLo = useMucLamLo(khoaVua, !!tt)
+  const coCotMuc = mucLo.theoEm.size > 0 || mucLo.dang
   const soHienVang = tk.vangLuoi > 0 ? Math.min(tk.vangLuoi, TOI_DA_TEN_VANG) : Math.min(3, tk.vang.length)
   const vangHien = moVang ? tk.vang : tk.vang.slice(0, soHienVang)
   const conVang = tk.vang.length - soHienVang
@@ -287,10 +380,15 @@ export default function Buoc1DiemDanh({
                 <h3 className="dd1-tieu">
                   Vừa điểm danh <small>· bấm em ⇒ hồ sơ làm bài</small>
                 </h3>
+                {coCotMuc && tk.coMat.length > 0 && (
+                  <p className="dd1-phu dd1-ml-giai">
+                    Thanh bên phải: số lượt làm 14 ngày theo Mức làm 1 → 4 (đoạn càng đậm, mức càng cao). Chỉ tính lượt đã đo giờ làm; màn riêng của thầy, không hiện lên bản chiếu.
+                  </p>
+                )}
                 {tk.coMat.length === 0 ? (
                   <p className="dd1-phu">Chưa em nào điểm danh.</p>
                 ) : (
-                  <ul className="dd1-vua-ds" aria-label="Em vừa điểm danh — bấm để mở hồ sơ làm bài">
+                  <ul className="dd1-vua-ds" aria-label="Em vừa điểm danh — bấm để mở hồ sơ làm bài" data-co-muc={coCotMuc ? '' : undefined}>
                     {vua.map((e) => {
                       const k = khoaNhom(e)
                       const chipNhom = (
@@ -300,7 +398,7 @@ export default function Buoc1DiemDanh({
                       )
                       return (
                         <li key={e.sbd}>
-                          <button type="button" className="dd1-vua-dong" onClick={(ev) => moEm(e, ev.currentTarget)} aria-label={`${chuNutEm(e, e.bacCham ? chuBacSo(e.bacCham.bac) : undefined)} (điểm danh ${gioDd(e.luc)}${e.cach === 'thay' ? ', thầy thêm' : ''})`}>
+                          <button type="button" className="dd1-vua-dong" onClick={(ev) => moEm(e, ev.currentTarget)} aria-label={`${chuNutEm(e, e.bacCham ? chuBacSo(e.bacCham.bac) : undefined)} (điểm danh ${gioDd(e.luc)}${e.cach === 'thay' ? ', thầy thêm' : ''})${mucLo.theoEm.get(e.sbd) ? `. ${chuMucLamEm(mucLo.theoEm.get(e.sbd)!)}` : ''}`}>
                             <span className="dd1-vua-gio">{gioDd(e.luc)}</span>
                             <b className="dd1-vua-ten">{e.hoTen || `SBD ${e.sbd}`}</b>
                             {e.bacCham ? (
@@ -312,6 +410,7 @@ export default function Buoc1DiemDanh({
                             ) : (
                               chipNhom
                             )}
+                            {coCotMuc && <ThanhMucLam d={mucLo.theoEm.get(e.sbd)} cho={mucLo.dang} />}
                           </button>
                         </li>
                       )

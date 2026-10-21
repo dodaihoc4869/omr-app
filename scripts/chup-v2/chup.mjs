@@ -103,6 +103,9 @@ const DS_DD12C = [
   ['83-dd12c-chieu-ho-so-em-1920', DD12C, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:ho-so'],
   ['83-dd12c-chieu-ho-so-em-1920-toi', DD12C, 1920, 1080, 'dark', false, /Hành trình giỏi Hóa/, 'dd12c:ho-so'],
   ['84-dd12c-buoc1-ho-so-em-may-tinh', DD12C, 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:vua'],
+  // THANH MỨC LÀM Ở BẢNG ĐIỂM DANH (thầy 20/10, bản vẽ 03; cảnh `&mlo=1` — máy giả trả Mức làm 14 ngày): máy tính + điện thoại, sáng + tối; cột 1 danh sách mở hết em.
+  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+    [`85-dd12c-muc-lam-${kho}${nen === 'dark' ? '-toi' : ''}`, `${DD12C}&mlo=1`, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:muc'])),
 ]
 // ═══════════ hết LÀN ĐIỂM DANH 12/10C ═══════════
 // ═══════════ LÀN HÔM NAY 12/10B: Hôm nay của thầy theo bản vẽ thầy duyệt 12/10 — hàng thẻ Việc cần thầy + khối Nhịp học (262 em × 12 ngày, ═══════════
@@ -493,6 +496,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         await t.locator('.ddc-cot[data-nhom="chua-deu"] .ddc-dong-em').first().click()
         await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
       }
+      if (v === 'muc') await t.locator('.dd1-ml-chu').nth(2).waitFor({ timeout: 20000 }) // thanh Mức làm hỏi sau 1,5 giây
       if (v === 'vua') {
         await t.locator('.dd1-vua-dong').first().click()
         await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
