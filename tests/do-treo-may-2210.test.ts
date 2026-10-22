@@ -236,3 +236,71 @@ describe('máy em chuyển cụm đo lên máy chủ (nopChangCaNhan)', () => {
     expect(than.doGiay).toEqual({ q1: { g: 12, v: 700, a: 7200, l: 0, n: 3, w: 1 }, q2: { v: 30, a: 0, l: 30, n: 0, w: 0 } })
   })
 })
+
+describe('ca thi — bộ đếm treo máy (do-treo-may-thi.ts) + cụm gửi', async () => {
+  const { taoDoTreoMay, doGiayThi } = await import('../src/lib/do-treo-may-thi')
+  let gio = 0
+  const tao = (dau?: Parameters<typeof taoDoTreoMay>[0]) => taoDoTreoMay(dau, () => gio)
+  const nhip = (d: ReturnType<typeof tao>, q: string | null, s: number, giuSang = false) => { for (let i = 0; i < s; i++) { gio += 1000; d.nhip(q, giuSang) } }
+
+  it('10 phút không chạm ⇒ l ≥ 600', () => {
+    gio = 0
+    const d = tao()
+    d.cham()
+    nhip(d, 'c1', 600)
+    expect(d.bang().c1!.l).toBeGreaterThanOrEqual(600)
+  })
+  it('ẩn 3 phút ⇒ a = 180 cho câu đang làm lúc ẩn; tải lại giữa lúc ẩn ⇒ không cộng', () => {
+    gio = 0
+    const d = tao()
+    nhip(d, 'c2', 5)
+    d.an()
+    gio += 180_000
+    d.hien()
+    expect(d.bang().c2!.a).toBe(180)
+    d.an() // ẩn rồi trang bị tải lại: bộ mới chỉ nạp bảng đã lưu, không biết lúc ẩn
+    const lai = tao(d.bang())
+    gio += 3_600_000
+    lai.hien()
+    expect(lai.bang().c2!.a).toBe(180)
+  })
+  it('3 lần lặng 150 giây rồi chạm ⇒ n = 3; lặng ≥ 180 không tính n', () => {
+    gio = 0
+    const d = tao()
+    for (let k = 0; k < 3; k++) { nhip(d, 'c1', 150); d.cham() }
+    nhip(d, 'c1', 200)
+    d.cham()
+    expect(d.bang().c1).toMatchObject({ n: 3, l: 200 })
+  })
+  it('tính nháp 4 phút chạm mỗi 100 giây ⇒ l < 300, n = 0', () => {
+    gio = 0
+    const d = tao()
+    for (let k = 0; k < 4; k++) { nhip(d, 'c1', 60); d.cham() }
+    expect(d.bang().c1!.l).toBeLessThan(300)
+    expect(d.bang().c1!.n ?? 0).toBe(0)
+  })
+  it('không câu nào hiện đủ ⇒ lặng cộng cho câu vừa đếm', () => {
+    gio = 0
+    const d = tao()
+    nhip(d, 'c1', 3)
+    nhip(d, null, 7)
+    expect(d.bang().c1!.l).toBe(10)
+  })
+  it('cụm gửi: v = giayCau (định nghĩa ca thi hiện hành); w = 1 chỉ khi mọi giây đều giữ màn sáng; câu chỉ có giây ẩn vẫn gửi; không gì ⇒ null', () => {
+    gio = 0
+    const d = tao()
+    nhip(d, 'c1', 4, true)
+    nhip(d, 'c2', 2, false)
+    d.an()
+    gio += 30_000
+    d.hien()
+    expect(doGiayThi({ c1: 4, c2: 2 }, d.bang())).toEqual({ c1: { v: 4, a: 0, l: 4, n: 0, w: 1 }, c2: { v: 2, a: 30, l: 6, n: 0, w: 0 } })
+    expect(doGiayThi({}, { c3: { a: 12 } })).toEqual({ c3: { v: 0, a: 12, l: 0, n: 0, w: 0 } })
+    expect(doGiayThi({}, {})).toBeNull()
+    expect(doGiayThi(null, null)).toBeNull()
+  })
+  it('nạp bảng lưu: kẹp khoảng, bỏ rác', () => {
+    const d = taoDoTreoMay({ c1: { a: 9e9, l: -1, n: 70.4, wh: 1 }, c2: null as never })
+    expect(d.bang()).toEqual({ c1: { a: 7200, n: 60, wh: 1 } })
+  })
+})

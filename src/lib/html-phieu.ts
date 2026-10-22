@@ -1247,6 +1247,16 @@ body.chi-de .tf-badge.lam-o[aria-checked="true"] { background: #2f3e46 !importan
  * nên phiếu vẫn đúng hình khi mất mạng. */
 const MUI_TEN = '<svg class="q-mui" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
 
+/** Phím của bảng nhập số trên phiếu — cùng hàng phím màn luyện / màn kiểm tra (BangNhapSo): 1–9, xoá, 4–6, phẩy, 7–9, trừ, 0, xoá hết. */
+const LBNS_PHIM = [
+  ['1', '1'], ['2', '2'], ['3', '3'], ['xoa', '⌫', 'Xoá một kí tự'],
+  ['4', '4'], ['5', '5'], ['6', '6'], [',', ',', 'Dấu phẩy'],
+  ['7', '7'], ['8', '8'], ['9', '9'], ['-', '−', 'Dấu trừ'],
+  ['0', '0'], ['xoa-het', 'Xoá hết', 'Xoá hết'],
+]
+  .map(([k, chu, ten]) => `<button type="button" class="lbns-nut" data-phim="${k}"${ten ? ` aria-label="${ten}"` : ''}${k === '0' || k === 'xoa-het' ? ' data-rong="1"' : ''}${/^\d$/.test(k) ? '' : ' data-chuc="1"'}>${chu}</button>`)
+  .join('')
+
 /** Một thẻ câu: đề bài + phương án + ô lời giải gập sẵn.
  *
  * `stt` là số thứ tự liên tục trên cả phiếu.
@@ -1754,16 +1764,6 @@ export function khoiChuaGiHtml(cau: CauLuyen[], thieu: { soCau: number; phan?: '
  *
  * `soCau` là số câu CÓ LỜI GIẢI, không phải tổng số câu — câu chưa có đáp án
  * thì không mở được, đếm nó vào mẫu số là mãi mãi không bao giờ đủ. */
-/** Phím của bảng nhập số trên phiếu — cùng hàng phím màn luyện / màn kiểm tra (BangNhapSo): 1–9, xoá, 4–6, phẩy, 7–9, trừ, 0, xoá hết. */
-const LBNS_PHIM = [
-  ['1', '1'], ['2', '2'], ['3', '3'], ['xoa', '⌫', 'Xoá một kí tự'],
-  ['4', '4'], ['5', '5'], ['6', '6'], [',', ',', 'Dấu phẩy'],
-  ['7', '7'], ['8', '8'], ['9', '9'], ['-', '−', 'Dấu trừ'],
-  ['0', '0'], ['xoa-het', 'Xoá hết', 'Xoá hết'],
-]
-  .map(([k, chu, ten]) => `<button type="button" class="lbns-nut" data-phim="${k}"${ten ? ` aria-label="${ten}"` : ''}${k === '0' || k === 'xoa-het' ? ' data-rong="1"' : ''}${/^\d$/.test(k) ? '' : ' data-chuc="1"'}>${chu}</button>`)
-  .join('')
-
 export function thanhHtml(soCau: number, anGiai = false): string {
   if (anGiai) {
     return `<div class="thanh">

@@ -102,6 +102,7 @@ import NutNopBtvn from '../components/NutNopBtvn'
 import OSoTraLoi from '../components/OSoTraLoi'
 import BangNhapSo from '../components/BangNhapSo'
 import { soOHopLe } from '../lib/so-o-tra-loi-ngan'
+import { taoDoTreoMay, type BoDoTreoMay } from '../lib/do-treo-may-thi'
 import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
 // Mảnh bố cục NGANG (01/10, thầy: "xoay ngang không hoạt động"): trước đây nạp lười NGOÀI precache, nạp hỏng một lần (mạng yếu, hay máy còn
@@ -181,6 +182,8 @@ const formatClock = dinhDangDongHo
  * chỉ gọi setState dạng hàm + ref + hàm nhập — hành vi không phụ thuộc lần vẽ. Dữ liệu (đề, `selected`, nhãn) vẫn so đủ. */
 const TheCauThi = memo(TheCau, bangPropsBoQuaHam)
 /** DỰNG ĐỀ DẦN (bố cục dọc): số thẻ dựng ngay khi vào đề, rồi mỗi lượt máy rảnh thêm bấy nhiêu thẻ. */
+/** Giữ màn sáng khi đang làm (đo treo máy 22/10, đặc tả mục 5): TẮT tới khi thầy duyệt — bật chỉ cần đổi hằng này. */
+const GIU_MAN_SANG = false
 const SO_THE_DAU = 3
 const BUOC_THE = 2
 
@@ -1674,11 +1677,33 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   // nhiều màn hình nhất (IntersectionObserver trên thẻ câu). Không đếm khi màn
   // bị ẩn. Lưu vào attempt mỗi 10 giây + lúc nộp — mở lại vẫn cộng tiếp.
   const giayCauRef = useRef<Record<string, number>>({})
+  /** ĐO TREO MÁY (thầy 22/10, src/lib/do-treo-may-thi.ts): giây ẩn / lặng / chạm giữ từng câu — chạy cùng nhịp 1 giây dưới, không setState. */
+  const doTreoRef = useRef<BoDoTreoMay | null>(null)
   /** Bộ quan sát thẻ câu đang chạy — thẻ dựng dần (xem "DỰNG ĐỀ DẦN") được gắn thêm vào đây, KHÔNG dựng lại bộ đếm giây. */
   const ioCauRef = useRef<IntersectionObserver | null>(null)
   useEffect(() => {
     if (phase !== 'exam' || !assignment || flat.length === 0) return
     giayCauRef.current = { ...(attemptRef.current?.giayCau ?? {}) }
+    const doTreo = taoDoTreoMay(attemptRef.current?.doCau)
+    doTreoRef.current = doTreo
+    // Giữ màn sáng (Screen Wake Lock) lúc đang làm — đặc tả mục 5 chờ thầy duyệt ⇒ GIU_MAN_SANG TẮT: không xin, w = 0.
+    let khoaSang: { released?: boolean; release?: () => Promise<void> } | null = null
+    const xinSang = () => {
+      if (!GIU_MAN_SANG || khoaSang) return
+      const wl = (navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<{ released?: boolean; release?: () => Promise<void>; addEventListener?: (t: string, f: () => void) => void }> } }).wakeLock
+      if (!wl) return
+      wl.request('screen').then((k) => { khoaSang = k; k.addEventListener?.('release', () => { khoaSang = null }) }, () => { khoaSang = null })
+    }
+    const dangGiuSang = () => !!khoaSang && !khoaSang.released
+    xinSang()
+    const chamMan = () => doTreo.cham()
+    const SU_KIEN_CHAM = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel'] as const
+    for (const t of SU_KIEN_CHAM) document.addEventListener(t, chamMan, { capture: true, passive: true })
+    const anHien = () => {
+      if (document.hidden) doTreo.an()
+      else { doTreo.hien(); xinSang() }
+    }
+    document.addEventListener('visibilitychange', anHien)
     const qidCua = (stt: number): string | null => {
       const f = flat[stt - 1]
       if (!f) return null
@@ -1710,8 +1735,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           bestStt = stt
         }
       })
-      if (!bestStt) return
-      const qid = qidCua(bestStt)
+      const qid = bestStt ? qidCua(bestStt) : null
+      doTreo.nhip(qid, dangGiuSang())
       if (!qid) return
       giayCauRef.current[qid] = (giayCauRef.current[qid] ?? 0) + 1
     }, 1000)
@@ -1719,9 +1744,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const cur = attemptRef.current
       if (!cur || cur.submitted) return
       cur.giayCau = { ...giayCauRef.current }
+      cur.doCau = doTreo.bang()
       luuNen(cur)
     }, 10000)
     return () => {
+      for (const t of SU_KIEN_CHAM) document.removeEventListener(t, chamMan, { capture: true })
+      document.removeEventListener('visibilitychange', anHien)
+      khoaSang?.release?.().catch(() => {})
+      khoaSang = null
       io.disconnect()
       if (ioCauRef.current === io) ioCauRef.current = null
       clearInterval(tick)
@@ -2381,7 +2411,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       clearTimeout(henLuuIdbRef.current)
       henLuuIdbRef.current = null
     }
-    const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
+    const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, ...(doTreoRef.current ? { doCau: doTreoRef.current.bang() } : {}), submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
     nhapNopRef.current = updated
     attemptRef.current = updated
     setAttempt(updated)
@@ -2717,7 +2747,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // React có thể chạy updater sau khi hàm đã trả về. Lấy nháp hiện hành từ ref để lưu ngay cùng đáp án vừa chọn.
     const cur = attemptRef.current
     if (!cur || cur.submitted) return
-    const next = { ...mutate(cur), giayCau: { ...giayCauRef.current } }
+    const next = { ...mutate(cur), giayCau: { ...giayCauRef.current }, ...(doTreoRef.current ? { doCau: doTreoRef.current.bang() } : {}) }
     attemptRef.current = next
     setAttempt(next)
     luuAttemptIdb(next, ngay)
