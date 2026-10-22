@@ -142,6 +142,12 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
   useEffect(() => {
     if (daDoiBuoc.current) tieuDeRef.current?.focus()
   }, [buoc])
+  // Việc hôm nay (22/10, em 10044 «2 câu trên bị lỗi ko tải đc thì làm tiếp chặng kiểu gì»): câu chỉ có lối câu gốc chỉ tính xong khi em tự làm lại; câu gốc không tải được
+  // (máy chủ không trả câu / giữ đáp án) thì không có nút nào ghi ⇒ chặng kẹt mãi. Em đã thấy lời báo ⇒ tính xong phần hôm nay để sang câu kế (câu vẫn ở danh sách Tự sửa lỗi).
+  const khongLamDuoc = cg?.trangThai === 'khong_co' || cg?.trangThai === 'khoa'
+  useEffect(() => {
+    if (khongLamDuoc && ph.dotId) ghiXongHomNay(ph.dotId)
+  }, [khongLamDuoc, ph.dotId])
 
   const doiBuoc = (b: 1 | 2 | 3) => {
     daDoiBuoc.current = true

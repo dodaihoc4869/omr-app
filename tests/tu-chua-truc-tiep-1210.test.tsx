@@ -172,6 +172,32 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     chuaLoDapAn()
   })
 
+  // 22/10 (em SBD 10044: «2 câu trên bị lỗi ko tải đc thì làm tiếp chặng kiểu gì»): câu chỉ có lối câu gốc chỉ tính «xong phần hôm nay» khi em bấm «Kiểm tra lại» /
+  // «Em đã giải xong». Câu gốc không tải được (máy chủ không trả câu / giữ đáp án) thì không còn nút nào ghi ⇒ chặng không bao giờ xong, em không sang chặng sau.
+  describe('câu gốc không tải được không giữ chặng lại (Việc hôm nay)', () => {
+    const xongHomNay = () => (JSON.parse(localStorage.getItem('omr_tu_sua_hom_nay_10044') || '{"x":[]}') as { x: string[] }).x
+    beforeEach(() => localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: '10044', token: 't' })))
+    it('máy chủ không trả câu (khong_co) ⇒ câu tính xong phần hôm nay', async () => {
+      mayChu({ ok: true, cau: [] })
+      render(<Man token="t" qid="Q" onVe={() => {}} />)
+      expect(await screen.findByText(/Chưa tải được câu gốc ở đây/)).toBeTruthy()
+      expect(xongHomNay()).toEqual(['D1'])
+    })
+    it('câu đang giữ đáp án (khoa) ⇒ cũng tính xong phần hôm nay', async () => {
+      mayChu({ ok: true, cau: [], khoa: ['Q'] })
+      api.apiPhatItem.mockResolvedValue({ ...DOT, cauGoc: { phan: 'I', text: DE, choices: ['8,2 gam.', '6,8 gam.', '9,6 gam.', '4,1 gam.'] } })
+      render(<Man token="t" qid="Q" onVe={() => {}} />)
+      expect(await screen.findByText(/Câu này chưa được mở đáp án, thầy sẽ chữa/)).toBeTruthy()
+      expect(xongHomNay()).toEqual(['D1'])
+    })
+    it('câu tải được bình thường ⇒ CHƯA tính xong tới khi em tự làm lại', async () => {
+      mayChu({ ok: true, cau: [CT] })
+      render(<Man token="t" qid="Q" onVe={() => {}} />)
+      expect(await screen.findByText(/etyl axetat/)).toBeTruthy()
+      expect(xongHomNay()).toEqual([])
+    })
+  })
+
   it('em đang có ca kiểm tra mở (vòng chữa từ chối) ⇒ không hỏi đề / đáp án câu gốc', async () => {
     mayChu({ ok: true, cau: [CT] })
     api.apiMoDot.mockResolvedValue({ ok: false, ma: 'DANG_KIEM_TRA', loi: 'Em hoàn thành ca kiểm tra trước khi chữa câu.' })
