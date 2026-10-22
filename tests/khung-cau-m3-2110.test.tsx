@@ -24,3 +24,12 @@ describe('KhungCauM3 — góc memo gọi hàm mới nhất', () => {
     expect(boc.querySelector('.thi-cau-dau')?.getAttribute('aria-pressed')).toBe('true')
   })
 })
+
+describe('khung thẻ màn thi: contain bố cục (đo máy yếu 22/10)', () => {
+  it('.thi-cau-boc có contain: layout style; màn thi truyền onZoom cho thẻ câu (ảnh phóng to không nằm trong khung bị contain)', async () => {
+    const { readFileSync } = await import('node:fs')
+    expect(readFileSync('src/screens/man-thi-m3.css', 'utf8')).toMatch(/\.m3 \.thi-cau-boc \{ position: relative; contain: layout style; \}/)
+    const man = readFileSync('src/screens/ExamTakeScreen.tsx', 'utf8')
+    expect((man.match(/onZoom=\{setZoomSrc\}/g) ?? []).length).toBeGreaterThanOrEqual(3)
+  })
+})
