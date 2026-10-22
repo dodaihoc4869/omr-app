@@ -60,7 +60,7 @@
 .dd1-o--vua, .dd1-o--xong { gap: 8px; padding: 16px 18px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); }
 .dd1-tieu { margin: 0 0 4px; font-size: 16px; font-weight: 800; color: var(--gvm-chu); }
 .dd1-tieu small { font-size: 13px; font-weight: 500; color: var(--gvm-chu-3); }
-.dd1-vua-ds { list-style: none; margin: 0; padding: 0; display: grid; min-width: 0; }
+.dd1-vua-ds { list-style: none; margin: 0; padding: 0; display: grid; min-width: 0; container-type: inline-size; }
 .dd1-vua-ds:has(> li:nth-child(13)) { max-height: 572px; overflow-y: auto; overscroll-behavior: contain; }
 .dd1-vua-dong {
   display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 0 6px;
@@ -72,7 +72,12 @@
 .dd1-vua-ten { min-width: 0; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* THANH MỨC LÀM (bản vẽ 03, thầy 20/10): cột thứ tư của dòng "Vừa điểm danh". Màu chỉ từ biến --gvm-* (cùng công thức bốn mức của Hồ sơ làm bài). */
 .dd1-ml-giai { margin: 0 0 6px; font-size: 13px; color: var(--gvm-chu-3); line-height: 1.5; }
-.dd1-vua-ds[data-co-muc] .dd1-vua-dong { grid-template-columns: 52px minmax(0, 1fr) auto minmax(168px, 240px); }
+/* 22/10 sửa lỗi: cột "Vừa điểm danh" chỉ ~440 px trên máy tính ⇒ bốn cột ép tên em về 0 (chỉ còn "Đ…"). Theo bề ngang CHÍNH danh sách: hẹp ⇒ thanh xuống hàng dưới tên; ≥ 600 px mới bốn cột. */
+.dd1-vua-ds[data-co-muc] .dd1-ml { grid-column: 2 / -1; padding-top: 0; }
+@container (min-width: 600px) {
+  .dd1-vua-ds[data-co-muc] .dd1-vua-dong { grid-template-columns: 52px minmax(0, 1fr) auto minmax(168px, 240px); }
+  .dd1-vua-ds[data-co-muc] .dd1-ml { grid-column: auto; padding-top: 6px; }
+}
 .dd1-ml { display: grid; gap: 4px; min-width: 0; padding: 6px 0; }
 .dd1-ml-thanh { display: flex; gap: 2px; height: 6px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--gvm-chu-3) 14%, transparent); }
 .dd1-ml-thanh i { display: block; flex-basis: 0; min-width: 4px; }
