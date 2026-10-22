@@ -15,9 +15,11 @@ const fonts = readFileSync(join(GOC, 'docs/ban-ve-tu-sua-2010/tu-sua.html'), 'ut
 const e = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
 
 // ═════════════════════════ NGƯỠNG TẠM (đặc tả chung mục 4 + phần này mục 4) ═════════════════════════
-/** Dấu hiệu "Hay làm vội" chỉ khi em có ít nhất ngần này lượt KHÔNG treo có số đo (ít hơn ⇒ "Ít lượt đo — chưa kết luận"). */
-const MAU_TOI_THIEU = 8
-/** Tỉ lệ Mức làm 1–2 trong lượt không treo để gắn "Hay làm vội". */
+/** Dấu hiệu "Sai khi làm vội" chỉ khi em có ít nhất ngần này lượt SAI có Mức làm 1–4 (ít hơn ⇒ "Ít lượt sai có số đo — chưa kết luận").
+ *  Mức làm chỉ GIẢI THÍCH lượt SAI (lõi server/src/muc-lam.ts): lượt đúng ở Mức 1 là ghi chú riêng, không phải vội ⇒ dấu hiệu tính trên `saiLamVoi / (saiLamVoi + saiDuNghi)`
+ *  — CÙNG số "x/y lượt sai là lúc làm vội" của hồ sơ em 14 ngày (`cachLam14`). */
+const MAU_TOI_THIEU = 5
+/** Tỉ lệ lượt sai ở Mức 1–2 trong lượt sai có Mức làm 1–4 để gắn "Sai khi làm vội". */
 const TI_LE_VOI = 0.5
 /** Số lượt Treo máy (Mức 5 + 6) trong 14 ngày để gắn chip "Treo máy" (1 lượt có thể là em nghe điện thoại — chỉ hiện ở dòng số, không gắn chip). */
 const TREO_GAN_CHIP = 2
@@ -29,20 +31,21 @@ function dauHieu(d) {
   const ra = []
   if (d.coTinh > 0) ra.push({ k: 'co-tinh', chu: `Cố tình treo máy · ${d.ngayCoTinh} ngày` })
   else if (d.treo >= TREO_GAN_CHIP) ra.push({ k: 'treo', chu: `Treo máy · ${d.treo} lượt` })
-  const khong = d.m[0] + d.m[1] + d.m[2] + d.m[3]
-  const voi = d.m[0] + d.m[1]
-  if (khong >= MAU_TOI_THIEU && voi / khong >= TI_LE_VOI) ra.push({ k: 'voi', chu: `Hay làm vội · ${voi}/${khong}` })
+  const sai = d.saiVoi + d.saiNghi
+  if (sai >= MAU_TOI_THIEU && d.saiVoi / sai >= TI_LE_VOI) ra.push({ k: 'voi', chu: `Sai khi làm vội · ${d.saiVoi}/${sai}` })
   return ra
 }
 
 // ═════════════════════════ DỮ LIỆU GIẢ — 12 Nhóm 10 điểm, có mặt 30/38 ═════════════════════════
 // [giờ, tên, nhóm, chữ chip nhóm, mức {m:[1..4], treo, coTinh (lượt), ngayCoTinh, chuaDoTreo, chuaCoSoDo, uoc}]
 // `m` = lượt Mức làm 1–4 KHÔNG treo; `treo` = Mức 5; `coTinh` = Mức 6; `chuaDoTreo` = trong `m`, số lượt làm trước khi máy em đo treo máy (hợp đồng đề xuất, DAC-TA mục 4).
-const M = (m, treo = 0, coTinh = 0, ngayCoTinh = 0, chuaDoTreo = 0, chuaCoSoDo = 0, uoc = 0) => ({ m, treo, coTinh, ngayCoTinh, chuaDoTreo, chuaCoSoDo, uoc })
+// `saiVoi` / `saiNghi` = lượt SAI ở Mức 1–2 / Mức 3–4 (≤ số lượt của các mức ấy) — mặc định ~45% lượt Mức 1–2 và ~30% lượt Mức 3–4 là sai.
+const M = (m, treo = 0, coTinh = 0, ngayCoTinh = 0, chuaDoTreo = 0, chuaCoSoDo = 0, uoc = 0, sai = null) => ({ m, treo, coTinh, ngayCoTinh, chuaDoTreo, chuaCoSoDo, uoc,
+  saiVoi: sai ? sai[0] : Math.round((m[0] + m[1]) * 0.45), saiNghi: sai ? sai[1] : Math.round((m[2] + m[3]) * 0.3) })
 const DONG_DAU = [
   ['18:03', 'Đỗ Mai Anh', 'moi', 'Mới', M([5, 9, 28, 6], 1, 0, 0, 0, 3)],
-  ['18:02', 'Trần Gia Anh', 'luoi', 'Lười · 3/11', M([7, 5, 3, 0], 1, 3, 1)],
-  ['18:02', 'Phan Quang Huy', 'chua-deu', 'Chưa đều · 7/11', M([9, 8, 12, 2], 2, 0, 0, 0, 5)],
+  ['18:02', 'Trần Gia Anh', 'luoi', 'Lười · 3/11', M([7, 5, 3, 0], 1, 3, 1, 0, 0, 0, [9, 1])],
+  ['18:02', 'Phan Quang Huy', 'chua-deu', 'Chưa đều · 7/11', M([9, 8, 12, 2], 2, 0, 0, 0, 5, 0, [10, 4])],
   ['18:02', 'Phạm Minh Hà', 'cham', 'Chăm · 11/11', M([0, 0, 0, 0])],
   ['18:01', 'Vũ Thanh Long', 'cham', 'Chăm · 10/11', M([1, 2, 10, 3], 0, 0, 0, 6, 0, 4)],
   ['18:01', 'Chu Hải Vy', 'cham', 'Chăm · 11/11', M([1, 1, 2, 0])],
@@ -63,7 +66,7 @@ const DONG_SAU = Array.from({ length: 24 }, (_, i) => {
   return [`17:${String(59 - i * 2).padStart(2, '0')}`, `${HO[(i * 7 + 3) % HO.length]} ${LOT[(i * 5 + 1) % LOT.length]} ${TEN[(i * 3 + 2) % TEN.length]}`, nhom, `${tenNhom} · ${du}/11`, M([m1, m2, m3, m4], treo, 0, 0, ngau(4) === 0 ? ngau(5) : 0, ngau(3))]
 })
 // Đặt thêm vài em vội rõ (để dòng tổng có số thật từ bảng)
-;[1, 7, 15].forEach((i) => { const d = DONG_SAU[i][4]; d.m = [9 + i % 3, 6, 4, 1] })
+;[1, 7, 15].forEach((i) => { const d = DONG_SAU[i][4]; d.m = [9 + i % 3, 6, 4, 1]; d.saiVoi = 8 + i % 3; d.saiNghi = 2 })
 const CA_LOP = [...DONG_DAU, ...DONG_SAU]
 const SI_SO = 38
 
@@ -79,6 +82,9 @@ const SVG = {
   tat: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.2 4.2 1.7 4.5 4.3"/></svg>',
 }
 
+/** Bộ lọc của dòng tổng: "Treo máy" = em có ≥ 1 lượt treo (Mức 5 hoặc 6, kể cả em chỉ 1 lượt chưa gắn chip); "Cố tình" = có Mức 6; "Sai khi làm vội" = có dấu hiệu ấy. */
+const coDau = (d, k) => (k === 'treo' ? d.treo + d.coTinh > 0 : k === 'co-tinh' ? d.coTinh > 0 : dauHieu(d).some((x) => x.k === k))
+
 function thanh(d) {
   if (soDo(d) === 0) return '<span class="ml-thanh ml-thanh--rong"></span>'
   const doan = [...d.m.map((n, i) => [i + 1, n]), [5, d.treo], [6, d.coTinh]].filter(([, n]) => n > 0)
@@ -93,7 +99,7 @@ function chuDong(d, ngayDauBan) {
   if (d.treo) phan.push(`Treo máy: <b>${d.treo}</b> lượt`)
   if (d.coTinh) phan.push(`Cố tình treo máy: <b>${d.coTinh}</b> lượt`)
   const phu = []
-  if (khong < MAU_TOI_THIEU) phu.push(`Ít lượt đo (${khong}) — chưa kết luận`)
+  if (d.saiVoi + d.saiNghi < MAU_TOI_THIEU) phu.push(`Ít lượt sai có số đo (${d.saiVoi + d.saiNghi}) — chưa kết luận`)
   // Mọi lượt của em chưa đo treo máy: chip nét đứt — TRỪ những ngày đầu (cả lớp như nhau, dòng tổng đã nói một lần: không lặp trên từng dòng)
   if (d.chuaDoTreo >= sd && sd > 0) { if (!ngayDauBan) phu.push('<span class="ml-chua-treo">Chưa đo treo máy</span>') }
   else if (d.chuaDoTreo > 0) phu.push(`${d.chuaDoTreo} lượt chưa đo treo máy`)
@@ -115,15 +121,13 @@ function dong([gio, ten, nhom, chip, d], { dang = false, ngayDauBan = false } = 
 
 function dongTong(ds, { loc = null, ngayDauBan = false } = {}) {
   const dem = { voi: 0, treo: 0, 'co-tinh': 0 }
-  for (const r of ds) for (const x of dauHieu(r[4])) dem[x.k === 'co-tinh' ? 'co-tinh' : x.k]++
-  // "Treo máy" đếm cả em cố tình (Mức 6 là treo lặp lại); chip Cố tình đếm riêng.
-  dem.treo += dem['co-tinh']
+  for (const r of ds) { if (coDau(r[4], 'voi')) dem.voi++; if (coDau(r[4], 'treo')) dem.treo++; if (coDau(r[4], 'co-tinh')) dem['co-tinh']++ }
   const nut = (k, chu, so, tat = false) => `<button type="button" class="tong-nut" data-k="${k}" aria-pressed="${loc === k}"${tat ? ' disabled' : ''}>${SVG[k]}<span>${chu}</span>${so !== null ? `<b>${so}</b>` : ''}</button>`
   return `<div class="tong" role="group" aria-label="Lọc em có mặt theo cách làm bài 14 ngày">
     <p class="tong-chu">14 ngày qua, trong <b>${ds.length}</b> em có mặt:</p>
     <div class="tong-nuts">
       ${nut('tat', 'Tất cả', ds.length)}
-      ${nut('voi', 'Hay làm vội', dem.voi)}
+      ${nut('voi', 'Sai khi làm vội', dem.voi)}
       ${ngayDauBan ? `<span class="tong-cho">${SVG.treo}Treo máy: đo từ lượt làm sau ${NGAY_DO_TREO}</span>` : `${nut('treo', 'Treo máy', dem.treo)}${nut('co-tinh', 'Cố tình treo máy', dem['co-tinh'])}`}
     </div>
   </div>`
@@ -142,7 +146,7 @@ const DAU_BUOC = `<header class="b1-dau"><span class="b1-so">1</span><div><h2>Đ
   <div class="giu" data-nhan="Giữ nguyên"><div class="giu-o"><span class="nhan-nho">Mã buổi</span><b class="ma">482 915</b></div><div class="giu-o"><b class="so-lon">30</b><span>/${SI_SO} em có mặt</span></div><div class="giu-o giu-vang"><b>Vắng 8 em — 3 em đang Lười</b></div></div>`
 
 function khungDiemDanh({ id, ds, hien = 6, loc = null, ngayDauBan = false, loi = false, dangSau = 0 }) {
-  const loc_ = loc && loc !== 'tat' ? ds.filter((r) => dauHieu(r[4]).some((x) => x.k === loc || (loc === 'treo' && x.k === 'co-tinh'))) : ds
+  const loc_ = loc && loc !== 'tat' ? ds.filter((r) => coDau(r[4], loc)) : ds
   const dsHien = loc_.slice(0, loc ? loc_.length : hien)
   return `<section class="kh" id="k-${id}" hidden><div class="trang">
   <article class="b1">${DAU_BUOC}
@@ -150,7 +154,7 @@ function khungDiemDanh({ id, ds, hien = 6, loc = null, ngayDauBan = false, loi =
       <h3 class="vua-tieu">Vừa điểm danh <small>· bấm em ⇒ hồ sơ làm bài</small></h3>
       ${dongTong(ds, { loc, ngayDauBan })}
       ${loi ? '<p class="loi" role="alert">Chưa tải được Mức làm 14 ngày của 1 em: Không nối được máy chủ. Các dòng khác và danh sách điểm danh vẫn đúng. <button type="button" class="nut-chu">Thử tải lại</button></p>' : ''}
-      ${loc && loc !== 'tat' ? `<p class="loc-dong"><b>${loc_.length} em</b> ${loc === 'voi' ? 'hay làm vội' : loc === 'treo' ? 'có treo máy' : 'cố tình treo máy'} trong 14 ngày · <button type="button" class="nut-chu">Bỏ lọc</button></p>` : ''}
+      ${loc && loc !== 'tat' ? `<p class="loc-dong"><b>${loc_.length} em</b> ${loc === 'voi' ? 'sai khi làm vội' : loc === 'treo' ? 'có treo máy' : 'cố tình treo máy'} trong 14 ngày · <button type="button" class="nut-chu">Bỏ lọc</button></p>` : ''}
       ${CHU_GIAI}
       <ul class="vua-ds">${dsHien.map((r, i) => dong(r, { dang: loi && i === dsHien.length - 1 ? 'loi' : i >= dsHien.length - dangSau, ngayDauBan })).join('')}</ul>
       ${!loc && ds.length > hien ? `<button type="button" class="nut-chu">Xem cả ${ds.length} em có mặt ›</button>` : ''}
@@ -421,6 +425,6 @@ writeFileSync(join(THU_MUC, 'chieu.html'), htmlC)
 
 // Kiểm: tờ chiếu KHÔNG được có chữ "Cố tình" (Mức 6 chỉ màn thầy)
 if (/Cố tình|co_tinh|coTinh/.test(htmlC.replace(/_coTinhBiHa/g, ''))) throw new Error('Tờ chiếu lộ chữ Cố tình')
-const tongDd = (ds) => { const d = { voi: 0, treo: 0, coTinh: 0 }; ds.forEach((r) => dauHieu(r[4]).forEach((x) => { if (x.k === 'voi') d.voi++; else if (x.k === 'treo') d.treo++; else d.coTinh++ })); return d }
+const tongDd = (ds) => ({ voi: ds.filter((r) => coDau(r[4], 'voi')).length, treo: ds.filter((r) => coDau(r[4], 'treo')).length, coTinh: ds.filter((r) => coDau(r[4], 'co-tinh')).length })
 console.log(`ĐÃ DỰNG docs/ban-ve-muc-lam-6-muc-2210/ · diem-danh.html ${(htmlDd.length / 1024).toFixed(0)} KB (${KHUNG_DD.length} khung) · chieu.html ${(htmlC.length / 1024).toFixed(0)} KB (${KHUNG_C.length} khung)`)
 console.log('Dấu hiệu 30 em có mặt:', JSON.stringify(tongDd(CA_LOP)), '· 6 dòng đầu:', DONG_DAU.map((r) => `${r[1]}=[${dauHieu(r[4]).map((x) => x.chu).join(' | ')}]`).join('; '))

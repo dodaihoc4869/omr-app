@@ -15,7 +15,7 @@
 |---|---|---|
 | 01 | `anh/01-diem-danh-6-muc-*` | Sau khi Đợt 1 lên bản thật: dòng tổng có 4 nút lọc, mỗi dòng em 2 tầng với dấu hiệu và thanh 6 đoạn |
 | 02 | `anh/02-ngay-dau-chua-do-treo-*` | **Tuần đầu (trạng thái chính):** chưa lượt nào đo treo máy. Dòng tổng ghi "Treo máy: đo từ lượt làm sau 23/10" |
-| 03 | `anh/03-loc-treo-may-*` | Thầy bấm "Treo máy": danh sách chỉ còn 4 em, có cả em cố tình |
+| 03 | `anh/03-loc-treo-may-*` | Thầy bấm "Treo máy": danh sách chỉ còn 6 em có ít nhất 1 lượt treo, gồm cả em cố tình và em chỉ treo 1 lượt (em ấy chưa gắn chip) |
 | 04 | `anh/04-dang-do-va-loi-*` | Một dòng đang đo, một dòng không tải được và có nút Thử tải lại. Các dòng khác vẫn đúng |
 
 **Tờ chiếu** chỉ có nền tối, vì tờ chiếu thật luôn nền tối nên không có ảnh sáng. Có 3 khổ máy chiếu: 1920×1080, 1280×720 và 1024×768 (máy 4:3).
