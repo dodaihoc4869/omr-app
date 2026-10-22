@@ -37,3 +37,15 @@
 0 lỗi trang · 0 tràn ngang · 0 ô chồng nhau trong dòng em · 0 đích chạm < 44 px · 0 chữ < 12 px · 0 tương phản < 4,5:1 · 0 thẻ chiếu bị cắt · 0 tên "…" · 0 chữ "Cố tình" trên tờ chiếu.
 
 Nhãn viền đứt "Giữ nguyên / Đổi / Đổi chỗ" chỉ để thầy đọc bản vẽ, app không có các nhãn này.
+
+## Ảnh MÀN THẬT sau khi build (thầy duyệt 22/10) — `anh-that/`
+Chụp bằng component thật và máy chủ giả. Số và tên em trong ảnh là số giả.
+- **Điểm danh:** `npx vite build --config scripts/chup-v2/vite.config.mjs --outDir <tạm> && node scripts/chup-v2/chup.mjs <tạm> docs/ban-ve-muc-lam-6-muc-2210/anh-that 85-dd12c-muc-lam-may-tinh,…`.
+  - `85-…`: có số, 3 khổ (`may-tinh` 1440 · `ngang` 844 · `dien-thoai` 390) × sáng/tối.
+  - `86-…`: những ngày đầu, chưa đo treo máy.
+  - `87-…`: đang lọc «Treo máy».
+- **Tờ chiếu:** `npx vite build --config scripts/chup-muc-lam-2110/vite.config.mjs --outDir <tạm> && node scripts/chup-muc-lam-2110/chup-chieu.mjs <tạm> docs/ban-ve-muc-lam-6-muc-2210/anh-that`. Gồm 6 cảnh: `ai-sai`, `ai-sai-dong-em`, `ai-sai-ngay-dau`, `ai-sai-chua-diem-danh`, `chi-tiet-em`, `chi-tiet-em-chua-do`. Mỗi cảnh chụp ở 1920, 1280 và 1024.
+- **Soát:** 0 lỗi trang · 0 tràn ngang · 0 đích chạm < 44 px · 0 thẻ chiếu bị cắt · 0 tên bị cắt. Lớp đông ở khổ 1280 không còn tên nào bị "…"; bản đang chạy trên app còn 7 tên.
+- **Hai chỗ khác bản vẽ, đều có lý do:**
+  1. Phím chuyển thẻ trên máy chiếu 4:3 là **S**, không phải L. Phím L của tờ chiếu đã dùng cho lệnh "gọi lên bảng".
+  2. Ô "những ngày đầu" ghi «Treo máy: đo từ các lượt làm mới, lượt cũ chưa đo» thay cho một ngày cụ thể. App không biết chắc ngày phát hành, nên không đoán ngày.
