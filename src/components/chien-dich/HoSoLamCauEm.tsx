@@ -53,7 +53,7 @@ import { LUAT_NHOM_NHIP } from '../../../server/src/nhip-hoc-kieu'
 import { TEN_NHOM_NHIP as TEN_NHOM_NHIP_HOC } from '../../../server/src/nhip-hoc-luat'
 import { NutBac } from '../bac-cham-chi/ChipBac'
 import { chuanHoaMucLam, ChipChuaCoSoDo, ChipMuc, ChuGiaiThuoc } from './muc-lam-giao-dien'
-import { chuaDoTreoHet, chuKhoang7, HinhCoTinh, HinhMatMang, KhoiCachLamEm6, KhoiSauMucThay, KhoiTheoNgay, locLuot, maHien, MucLuot6, ThanhSau, type LoaiLoc, type LocLuot } from './ho-so-6-muc'
+import { chuaDoTreoHet, chuKhoang7, HinhCoTinh, HinhMatMang, KhoiCachLamEm6, KhoiSauMucThay, KhoiTheoNgay, locLuot, maHien, MucLuot6, NutMoBaiTap, ThanhSau, type LoaiLoc, type LocLuot } from './ho-so-6-muc'
 import './bai-hang-ngay.css'
 import './ho-so-lam-cau-em.css'
 
@@ -1003,6 +1003,7 @@ export default function HoSoLamCauEm({
   onChuaCau,
   coTheChua,
   soCauCanSua,
+  onMoBaiTap,
 }: {
   em: EmHoSo
   nhom?: LoaiNhomNhip
@@ -1018,11 +1019,14 @@ export default function HoSoLamCauEm({
   coTheChua?: ReadonlySet<string>
   /** Tổng thật từ Tự sửa lỗi; tập khoá trên chỉ quyết định nút ở những câu đã tải. */
   soCauCanSua?: number
+  /** 6 mức (22/10) — CHỈ chế độ học sinh: trạng thái rỗng có nút "Mở Bài tập về nhà" (cổng học sinh nối). Vắng ⇒ không nút. */
+  onMoBaiTap?: () => void
 }) {
   const laThay = cheDo === 'thay'
   const chuCd = CHU_CHE_DO[cheDo]
   const ngoi = chuCd.ngoi
   const onChua = cheDo === 'hoc-sinh' ? onChuaCau : undefined
+  const onBaiTap = cheDo === 'hoc-sinh' ? onMoBaiTap : undefined
   const khoaDem = `${cheDo}|${em.sbd}`
   const [dem0] = useState(() => layDemTam(khoaDem))
   const [kq, setKq] = useState<KetQuaLichSuLamCau | null>(dem0?.kq ?? null)
@@ -1299,6 +1303,7 @@ export default function HoSoLamCauEm({
                       <p>
                         Sổ chưa ghi lượt làm câu nào của {ngoi}. Khi {ngoi} làm bài hằng ngày, ca kiểm tra hay Ôn lại, lượt sẽ hiện ở đây.
                       </p>
+                      {onBaiTap && <NutMoBaiTap onMo={onBaiTap} />}
                     </div>
                   ) : (
                     <>
@@ -1306,7 +1311,7 @@ export default function HoSoLamCauEm({
                         (laThay ? (
                           <KhoiSauMucThay tong={tongMuc} m6={m6} onXemTreo={xemTreo} />
                         ) : (
-                          <KhoiCachLamEm6 tong={tongMuc} m6={m6} cheDo={cheDo} soSaiTong={lam7 ? lam7.soSai + lam7.soBoTrong : m6 ? undefined : t!.soSai + t!.soBoTrong} />
+                          <KhoiCachLamEm6 tong={tongMuc} m6={m6} cheDo={cheDo} onMoBaiTap={onBaiTap} soSaiTong={lam7 ? lam7.soSai + lam7.soBoTrong : m6 ? undefined : t!.soSai + t!.soBoTrong} />
                         ))}
                       <section ref={tungLuot} className="hsv-khoi" aria-labelledby="hsv-lan">
                         <h3 id="hsv-lan">

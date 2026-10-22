@@ -2,7 +2,7 @@
 // thầy thấy chip đầu tấm + thẻ bằng chứng Mức 6 + nút lọc; học sinh / phụ huynh có dữ liệu treo mà DOM, title, aria-label KHÔNG có "Cố tình", "Mức làm 6", "co_tinh";
 // học sinh thấy "Câu này máy để treo X phút"; phụ huynh không có chữ "phút" ở lượt treo, chỉ chip + một dòng tổng.
 // Dữ liệu: scripts/chup-v2/gia/lich-su-6-muc.ts (Mức 1–4 do hàm máy chủ `mucLamCuaLuot`, tổng do hàm thuần `mucLam6`).
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import HoSoLamCauEm, { type CheDoHoSo, type NguonHoSo } from '../src/components/chien-dich/HoSoLamCauEm'
 import { hoSoThaiDoGia } from '../scripts/chup-v2/gia/bai-hang-ngay'
@@ -81,6 +81,25 @@ describe('thầy: đủ 6 mức, Mức 6 ở ba chỗ (chip đầu tấm · th�
     expect([...tam.querySelectorAll('.hsv-o[data-chua]')].map((li) => chu(li))).toEqual(['Mức làm 5 Treo máy Chưa đo treo máy', 'Mức làm 6 Cố tình treo máy Chưa đo treo máy'])
     expect(chu(tam.querySelector('.hslc-cl'))).toContain('chưa xếp được Mức làm 5–6 (không đoán)')
     expect(within(tam).queryByRole('tab', { name: /^Treo máy/ })).toBeNull()
+  })
+})
+
+describe('học sinh: trạng thái rỗng có việc làm tiếp', () => {
+  it('sổ rỗng ⇒ "Mở Bài tập về nhà" gọi đường của cổng học sinh; thầy / phụ huynh không có nút dù truyền đường', async () => {
+    const rong = { ...lichSu6MucGia(SBD, TD.em.hoTen, 'hoc-sinh'), lan: [], cauSai: [], mucLam: undefined, mucLam6: undefined, tong: { soLuot: 0, soDung: 0, soSai: 0, soBoTrong: 0, soCau: 0, soCauSai: 0, giayTb: null, tongGiay: 0 } }
+    for (const cheDo of ['hoc-sinh', 'thay', 'phu-huynh'] as const) {
+      const onMoBaiTap = vi.fn()
+      const nguon: NguonHoSo = { hoSoThaiDo: async () => ({ ok: true, du: TD }), lichSu: async () => ({ ok: true, du: rong }) }
+      render(<HoSoLamCauEm em={{ sbd: SBD, ten: TD.em.hoTen, khoi: '12' }} onDong={() => {}} nguon={nguon} cheDo={cheDo} onMoBaiTap={onMoBaiTap} />)
+      const tam = await screen.findByRole('dialog')
+      await choTamXong(tam)
+      const nut = within(tam).queryByRole('button', { name: 'Mở Bài tập về nhà' })
+      if (cheDo === 'hoc-sinh') {
+        fireEvent.click(nut!)
+        expect(onMoBaiTap).toHaveBeenCalledTimes(1)
+      } else expect(nut).toBeNull()
+      cleanup()
+    }
   })
 })
 
