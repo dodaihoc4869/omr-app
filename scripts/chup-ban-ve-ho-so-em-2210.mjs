@@ -53,14 +53,29 @@ function doTrongTrang({ goc, kiemLo, kiemChu }) {
   if (kiemLo) {
     const chu = [document.body.innerText, ...[...document.querySelectorAll('[title],[aria-label]')].map((e) => `${e.getAttribute('title') ?? ''} ${e.getAttribute('aria-label') ?? ''}`)].join('\n')
     lo = ['Cố tình', 'cố tình', 'Mức làm 6', 'co_tinh', 'Mức 6'].filter((t) => chu.includes(t))
-    if (document.querySelector('[data-m="6"]')) lo.push('phần tử data-m=6')
+    if (document.querySelector('[data-m="6"], [data-t="6"]')) lo.push('phần tử mức 6')
   }
   return { tran, nho, nhoChu, tp: tp.slice(0, 5), lo }
 }
 
 async function luuAnh(t, duong, soat, ten, toanBo = false) {
+  // Ảnh "toàn bộ" cao ⇒ cắt thành từng phần cao ≤ 1800 px (mỗi phần ≤ 150 KB mà chữ vẫn nét), tên ...-phan-1, -phan-2…
+  if (toanBo) {
+    const cao = await t.evaluate(() => document.documentElement.scrollHeight)
+    const rong = t.viewportSize().width
+    const so = Math.ceil(cao / 1800)
+    for (let i = 0; i < so; i++) {
+      const clip = { x: 0, y: i * 1800, width: rong, height: Math.min(1800, cao - i * 1800) }
+      let q = 82, buf
+      for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q, fullPage: true, clip }); if (buf.length <= 150_000 || q <= 34) break; q -= 6 }
+      if (buf.length > 150_000) soat.push(`${ten}-phan-${i + 1}: ảnh ${Math.round(buf.length / 1024)} KB > 150 KB`)
+      writeFileSync(duong.replace(/\.jpg$/, `-phan-${i + 1}.jpg`), buf)
+      console.log(`${ten}-phan-${i + 1}.jpg ${Math.round(buf.length / 1024)} KB (q${q})`)
+    }
+    return
+  }
   let q = 82, buf
-  for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q, fullPage: toanBo }); if (buf.length <= 150_000 || q <= 34) break; q -= 6 }
+  for (;;) { buf = await t.screenshot({ type: 'jpeg', quality: q }); if (buf.length <= 150_000 || q <= 34) break; q -= 6 }
   if (buf.length > 150_000) soat.push(`${ten}: ảnh ${Math.round(buf.length / 1024)} KB > 150 KB`)
   writeFileSync(duong, buf)
   console.log(`${ten}.jpg ${Math.round(buf.length / 1024)} KB (q${q})`)
@@ -184,7 +199,7 @@ async function banVe() {
         const t = await ctx.newPage()
         t.on('pageerror', (e) => soat.push(`${ten}: lỗi trang ${e.message}`))
         t.on('response', (r) => { if (r.status() >= 400) soat.push(`${ten}: ${r.status()} ${r.url()}`) })
-        await t.goto(`${URL_VE}?${qs}`)
+        await t.goto(`${URL_VE}?${qs}${toanBo ? '&toan=1' : ''}`)
         await t.evaluate(() => document.fonts.ready)
         await t.waitForTimeout(200)
         if (qs.includes('mo=luot')) await t.evaluate(() => document.querySelector('[data-treo]')?.scrollIntoView({ block: 'center' }))
