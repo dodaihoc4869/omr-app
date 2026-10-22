@@ -77,7 +77,9 @@
 .m3 .thi-dau-phan-mo-ta { overflow: hidden; font-size: 12px; color: var(--m3-on-surface-variant); text-overflow: ellipsis; white-space: nowrap; }
 
 /* ── GÓC PHẢI TRÊN THẺ CÂU: nhãn "Mới x/4 ý" (Phần II làm dở) + nút "Xem lại sau" (KhungCauM3). Khung bọc LUÔN có mặt để thẻ không bị dựng lại khi em bấm ── */
-.m3 .thi-cau-boc { position: relative; }
+/* contain (đo máy yếu 22/10, 2 × 7 cặp): mỗi đợt DỰNG ĐỀ DẦN thêm 2 thẻ, trình duyệt bố cục lại cả trang (2 000+ đối tượng). Khoá bố cục + kiểu trong
+   từng thẻ ⇒ thẻ mới không kéo thẻ cũ tính lại; vào đề 1,07 s so 2,12 s. Trong thẻ KHÔNG có phần tử position:fixed (ảnh phóng to đi onZoom ở cấp màn). */
+.m3 .thi-cau-boc { position: relative; contain: layout style; }
 .m3 .thi-cau-goc { position: absolute; top: 12px; right: 10px; display: flex; align-items: center; gap: 6px; }
 /* 07/10 (thầy: "xem lại sau và ghi chú câu thay đang bị chèn nhau"): nút cao 36 px thẳng hàng với chip số câu (đầu thẻ cao 48 px) — trước đây 48 px thò xuống 8 px đè ô ghi chú; vùng chạm vẫn 48 px nhờ ::after.
  * `min-height: 0` là BẮT BUỘC: luật chung `.m3 button { min-height: 48px }` (m3.css) ép mọi nút cao ≥ 48 px, `height: 36px` đứng một mình không có tác dụng (đo bằng trình duyệt thật). */
