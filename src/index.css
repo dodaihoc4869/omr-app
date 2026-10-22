@@ -4,6 +4,8 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../index.html";
+/* Bảo hiểm cho HTML đến dạng dữ liệu (đề/lời giải từ kho): lớp định dạng chữ. */
+@source inline("line-through lowercase text-wrap whitespace-normal");
 
 :root {
   color-scheme: light dark;
