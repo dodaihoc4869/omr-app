@@ -10,14 +10,16 @@
 // THANH MỨC LÀM (bản vẽ 03, thầy 20/10): mỗi dòng "Vừa điểm danh" thêm thanh nhỏ số lượt 14 ngày theo Mức làm 1 → 4 + "Mức làm 1–2: x/y lượt". Một lệnh CHỈ ĐỌC `/gv/muc-lam-lo` cho
 // ĐÚNG các em đang hiện trên dòng (mặc định 6, mở hết ≤ 40) — KHÔNG đụng `/gv/nhip-hoc`; hỏi SAU khi danh sách đã vẽ (chờ 1,5 giây cho danh sách ổn định), lỗi ⇒ dòng vẫn như cũ, không chặn điểm danh.
 // Chỉ màn của thầy; KHÔNG đưa lên bản chiếu (tên em kèm mức trước lớp).
+// 6 MỨC (thầy duyệt 22/10, bản vẽ docs/ban-ve-muc-lam-6-muc-2210): hỏi cho MỌI em có mặt (≤ 40); dòng tổng lọc «Sai vì vội nhiều · Treo máy · Cố tình treo máy»; mỗi dòng
+// cột thẳng hàng Em (cờ Cố tình) · Sai vì vội (% lượt sai) · Cách làm 14 ngày (Vội · Có nghĩ · Treo) · Treo máy; chú thích chung dưới danh sách; "Xong điểm danh" một hàng dưới.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { MonitorPlay, Plus, RefreshCw } from 'lucide-react'
+import { Flag, MonitorPlay, Pause, Plus, RefreshCw, Users, Zap } from 'lucide-react'
 import { linkDiemDanh } from '../../lib/buoi-hoc-api'
 import { dinhDangMa } from '../../lib/them-phut-api'
 import { duongQr, taoQr } from '../../lib/ma-qr'
 import { layNhipHoc } from '../../lib/nhip-hoc-thay'
-import { chuMucLamEm, layMucLamLo, TOI_DA_EM_MUC_LAM_LO, type MucLamEm } from '../../lib/muc-lam-lo-api'
+import { chuMucLamEm, coDauHieu, layMucLamLo, tiLeSaiVoi, TOI_DA_EM_MUC_LAM_LO, TREO_TO, type LocMucLam, type MucLamEm } from '../../lib/muc-lam-lo-api'
 import { chuChip, chuNutEm, gioDd, khoaNhom, khoiEm, ngayNganDd, nhipTheoSbd, soNhom, TEN_NHOM, thongKeBuoi, THU_TU_NHOM, type CheDoChieu, type EmBuoi, type TrangThaiNhip } from '../../lib/diem-danh-nhip'
 import type { EmHoSo } from '../chien-dich/HoSoLamCauEm'
 import type { DiemDanhBuoi } from './DiemDanhBuoi'
@@ -113,39 +115,102 @@ export function useMucLamLo(khoaSbd: string, bat: boolean): { theoEm: ReadonlyMa
 
 const GIAI_THICH_UOC = 'Gồm lượt xếp từ giây đồng hồ cũ hoặc ước tính từ mốc trả lời — số giây có thể cao hơn thật nên mức thật có thể thấp hơn.'
 
-/** Thanh nhỏ 14 ngày: bốn đoạn Mức làm 1 → 4 theo số lượt (đậm dần, không dựa vào màu: có chữ "Mức làm 1–2: x/y lượt"). `d` vắng ⇒ đang đo (hoặc để trống khi lỗi). Chỉ để nhìn — nhãn đọc màn hình nằm ở nút của dòng. */
-export function ThanhMucLam({ d, cho }: { d: MucLamEm | undefined; cho: boolean }) {
-  if (!d) {
-    return cho ? (
-      <span className="dd1-ml dd1-ml--cho" aria-hidden="true">
-        <span className="dd1-ml-thanh" />
-        <span className="dd1-ml-chu">Đang đo…</span>
+// ── 6 MỨC (bản vẽ docs/ban-ve-muc-lam-6-muc-2210, thầy duyệt 22/10): mỗi dòng em là CỘT THẲNG HÀNG — Em (tên + cờ Cố tình + nhịp) · Sai vì vội (% lớn) ·
+// Cách làm 14 ngày (thanh 3 nhóm màu có nghĩa: Vội 1–2 hổ phách · Có nghĩ 3–4 lục · Treo hồng sọc · Cố tình hồng đậm) · Treo máy. Chỉ để nhìn — nhãn đọc màn hình ở nút dòng.
+
+/** Ô «Sai vì vội»: % lớn (tô hổ phách khi vào bộ lọc) + "x/y lượt sai"; ít lượt sai ⇒ "—" + lý do; máy chủ cũ / chưa có số ⇒ "—". */
+export function OSaiVoi({ d, cho }: { d: MucLamEm | undefined; cho: boolean }) {
+  const t = d && d.soDo > 0 ? tiLeSaiVoi(d) : null
+  if (!t) return <span className="dd1-ov dd1-ov--trong" aria-hidden="true">{cho && !d ? '…' : '—'}</span>
+  if (!('phanTram' in t))
+    return (
+      <span className="dd1-ov dd1-ov--it" aria-hidden="true">
+        <b>—</b>
+        <small>ít lượt sai ({t.it})</small>
       </span>
-    ) : (
-      <span className="dd1-ml" aria-hidden="true" />
     )
-  }
-  const x = d.m[0] + d.m[1]
   return (
-    <span className="dd1-ml" data-co-so={d.soDo > 0 ? '' : undefined} aria-hidden="true">
-      <span className="dd1-ml-thanh">
-        {d.soDo > 0 && d.m.map((n, i) => (n > 0 ? <i key={i} data-m={i + 1} style={{ flexGrow: n }} /> : null))}
-      </span>
-      <span className="dd1-ml-chu" {...(d.soUocTinh > 0 ? { title: GIAI_THICH_UOC } : {})}>
-        {d.soDo > 0 ? (
-          <>
-            {d.soUocTinh > 0 ? '≈ ' : ''}Mức làm 1–2: <b>{x}/{d.soDo}</b> lượt
-            {d.chuaCoSoDo > 0 ? <small>{d.chuaCoSoDo} lượt chưa có số đo</small> : null}
-          </>
-        ) : d.chuaCoSoDo > 0 ? (
-          `Chưa có số đo (${d.chuaCoSoDo} lượt)`
-        ) : (
-          'Chưa có lượt 14 ngày qua'
-        )}
-      </span>
+    <span className="dd1-ov" data-nhieu={coDauHieu(d, 'voi') ? '' : undefined} aria-hidden="true">
+      <b>{t.phanTram}%</b>
+      <small>
+        {t.voi}/{t.sai} lượt sai
+      </small>
     </span>
   )
 }
+
+/** Ô «Cách làm 14 ngày»: thanh 3 nhóm theo MỌI lượt có số đo + chữ nhỏ "Vội · Có nghĩ · Treo". `d` vắng ⇒ đang đo / chưa tải được. */
+export function OThanhMuc({ d, cho, loi }: { d: MucLamEm | undefined; cho: boolean; loi: boolean }) {
+  if (!d)
+    return (
+      <span className="dd1-ot" aria-hidden="true">
+        <span className={`dd1-ot-thanh${cho ? ' dd1-ot-thanh--cho' : ''}`} />
+        <small className="dd1-ot-nghieng">{cho ? 'Đang đo…' : loi ? 'Chưa tải được' : ''}</small>
+      </span>
+    )
+  if (d.soDo === 0)
+    return (
+      <span className="dd1-ot" aria-hidden="true">
+        <span className="dd1-ot-thanh" />
+        <small className="dd1-ot-nghieng">{d.chuaCoSoDo > 0 ? 'Chưa có số đo' : 'Chưa có lượt 14 ngày qua'}</small>
+      </span>
+    )
+  const voi = d.m[0] + d.m[1], nghi = d.m[2] + d.m[3], treo = d.soTreo + d.soCoTinh
+  const doan: [string, number][] = [['voi', voi], ['nghi', nghi], ['treo', d.soTreo], ['co-tinh', d.soCoTinh]]
+  return (
+    <span className="dd1-ot" aria-hidden="true">
+      <span className="dd1-ot-thanh">{doan.map(([k, n]) => (n > 0 ? <i key={k} data-g={k} style={{ flexGrow: n }} /> : null))}</span>
+      <small {...(d.soUocTinh > 0 ? { title: GIAI_THICH_UOC } : {})}>
+        {d.soUocTinh > 0 ? '≈ ' : ''}Vội <b>{voi}</b> · Có nghĩ <b>{nghi}</b>
+        {treo ? (
+          <>
+            {' '}
+            · Treo <b>{treo}</b>
+          </>
+        ) : null}{' '}
+        lượt
+      </small>
+    </span>
+  )
+}
+
+/** Ô «Treo máy»: số lượt treo 14 ngày (tô hồng khi ≥ 2); những ngày đầu (chưa lượt nào đo treo) ⇒ "—". */
+export function OTreo({ d, chuaDo }: { d: MucLamEm | undefined; chuaDo: boolean }) {
+  if (!d || chuaDo || d.soDo === 0)
+    return (
+      <span className="dd1-otr dd1-otr--trong" aria-hidden="true">
+        —
+      </span>
+    )
+  const n = d.soTreo + d.soCoTinh
+  return (
+    <span className="dd1-otr" data-nhieu={n >= TREO_TO ? '' : undefined} data-khong={n === 0 ? '' : undefined} aria-hidden="true">
+      {n > 0 && <Pause size={13} aria-hidden="true" />}
+      <b>{n}</b>
+      {n > 0 ? ' lượt' : ''}
+    </span>
+  )
+}
+
+/** Số thống kê của các em đang có số (dòng tổng + chú thích chung). `chuaDoTreo` = CHƯA lượt nào của cả danh sách đo treo máy (những ngày đầu). Thuần. */
+export function tongDiemDanhMuc(ds: readonly { sbd: string }[], theoEm: ReadonlyMap<string, MucLamEm>) {
+  let voi = 0, treo = 0, coTinh = 0, coSo = 0, daDoTreo = 0, chuaCo = 0, chuaTreo = 0, uoc = false
+  for (const e of ds) {
+    const d = theoEm.get(e.sbd)
+    if (!d) continue
+    coSo++
+    if (coDauHieu(d, 'voi')) voi++
+    if (coDauHieu(d, 'treo')) treo++
+    if (coDauHieu(d, 'co-tinh')) coTinh++
+    daDoTreo += d.soDo - d.soChuaDoTreo
+    chuaCo += d.chuaCoSoDo
+    chuaTreo += d.soChuaDoTreo
+    if (d.soUocTinh > 0) uoc = true
+  }
+  return { voi, treo, coTinh, coSo, chuaDoTreo: coSo > 0 && daDoTreo === 0, chuaCo, chuaTreo, uoc }
+}
+
+const TEN_LOC: Readonly<Record<LocMucLam, string>> = { voi: 'sai vì vội nhiều', treo: 'có treo máy', 'co-tinh': 'cố tình treo máy' }
 
 /** Tấm Hồ sơ làm bài sẵn có của app thầy (khung `.m3.m3-thay.vo-thay` như Hôm nay › Nhịp học); `trenChieu` ⇒ phóng to theo khổ máy chiếu. */
 export function TamHoSoEm({ em, trenChieu, onDong }: { em: EmHoSo; trenChieu: boolean; onDong: () => void }) {
@@ -239,10 +304,15 @@ export default function Buoc1DiemDanh({
   const tu = nhip.kq ? ngayNganDd(nhip.kq.tu) : ''
   const dem = tk.demCoMat
   const siSo = tt?.siSo ?? null
-  const vua = moVua ? tk.coMat : tk.coMat.slice(0, SO_VUA_DIEM_DANH)
-  const khoaVua = vua.map((e) => e.sbd).join(',')
-  const mucLo = useMucLamLo(khoaVua, !!tt)
+  // 6 mức (22/10, Boss duyệt): hỏi Mức làm cho MỌI em có mặt (≤ 40) — dòng tổng + bộ lọc cần số cả lớp; vẫn MỘT lệnh, em mới vào chỉ hỏi thêm em ấy.
+  const khoaMuc = tk.coMat.slice(0, TOI_DA_EM_MUC_LAM_LO).map((e) => e.sbd).join(',')
+  const mucLo = useMucLamLo(khoaMuc, !!tt)
   const coCotMuc = mucLo.theoEm.size > 0 || mucLo.dang
+  const [loc, setLoc] = useState<LocMucLam | null>(null)
+  const tongMuc = useMemo(() => tongDiemDanhMuc(tk.coMat.slice(0, TOI_DA_EM_MUC_LAM_LO), mucLo.theoEm), [tk.coMat, mucLo.theoEm])
+  const dsLoc = loc ? tk.coMat.filter((e) => coDauHieu(mucLo.theoEm.get(e.sbd), loc)) : null
+  const vua = dsLoc ?? (moVua ? tk.coMat : tk.coMat.slice(0, SO_VUA_DIEM_DANH))
+  const tongHien = useMemo(() => tongDiemDanhMuc(vua, mucLo.theoEm), [vua, mucLo.theoEm])
   const soHienVang = tk.vangLuoi > 0 ? Math.min(tk.vangLuoi, TOI_DA_TEN_VANG) : Math.min(3, tk.vang.length)
   const vangHien = moVang ? tk.vang : tk.vang.slice(0, soHienVang)
   const conVang = tk.vang.length - soHienVang
@@ -375,49 +445,163 @@ export default function Buoc1DiemDanh({
               </div>
             </div>
 
-            <div className="dd1-o2">
+            {/* 6 mức (bản vẽ 22/10): "Vừa điểm danh" chiếm cả bề ngang (sửa luôn lỗi cột hẹp ép mất tên); "Xong điểm danh" thành MỘT hàng bên dưới. */}
+            <div className="dd1-o2 dd1-o2--doc">
               <div className="dd1-o dd1-o--vua" data-khoi="vua-diem-danh">
                 <h3 className="dd1-tieu">
                   Vừa điểm danh <small>· bấm em ⇒ hồ sơ làm bài</small>
                 </h3>
+                {coCotMuc && tongMuc.coSo > 0 && (
+                  <div className="dd1-tong" role="group" aria-label="Lọc em có mặt theo cách làm bài 14 ngày">
+                    <p className="dd1-tong-chu">
+                      14 ngày qua, trong <b>{Math.min(tk.coMat.length, TOI_DA_EM_MUC_LAM_LO)}</b> em {tk.coMat.length > TOI_DA_EM_MUC_LAM_LO ? 'có mặt đầu tiên' : 'có mặt'}:
+                    </p>
+                    <div className="dd1-tong-nuts">
+                      <button type="button" className="dd1-tong-nut" data-k="tat" aria-pressed={loc === null} onClick={() => setLoc(null)}>
+                        <Users size={18} aria-hidden="true" />
+                        <span>Tất cả</span>
+                        <b>{tk.coMat.length}</b>
+                      </button>
+                      <button type="button" className="dd1-tong-nut" data-k="voi" aria-pressed={loc === 'voi'} onClick={() => setLoc((c) => (c === 'voi' ? null : 'voi'))}>
+                        <Zap size={18} aria-hidden="true" />
+                        <span>Sai vì vội nhiều</span>
+                        <b>{tongMuc.voi}</b>
+                      </button>
+                      {tongMuc.chuaDoTreo ? (
+                        <span className="dd1-tong-cho">
+                          <Pause size={16} aria-hidden="true" />
+                          Treo máy: đo từ các lượt làm mới, lượt cũ chưa đo
+                        </span>
+                      ) : (
+                        <>
+                          <button type="button" className="dd1-tong-nut" data-k="treo" aria-pressed={loc === 'treo'} onClick={() => setLoc((c) => (c === 'treo' ? null : 'treo'))}>
+                            <Pause size={18} aria-hidden="true" />
+                            <span>Treo máy</span>
+                            <b>{tongMuc.treo}</b>
+                          </button>
+                          <button type="button" className="dd1-tong-nut" data-k="co-tinh" aria-pressed={loc === 'co-tinh'} onClick={() => setLoc((c) => (c === 'co-tinh' ? null : 'co-tinh'))}>
+                            <Flag size={18} aria-hidden="true" />
+                            <span>Cố tình treo máy</span>
+                            <b>{tongMuc.coTinh}</b>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {mucLo.loi && (
+                  <p className="dd1-ml-loi" role="status">
+                    Chưa tải được Mức làm 14 ngày của các em. Danh sách điểm danh vẫn đúng.
+                  </p>
+                )}
+                {loc && (
+                  <p className="dd1-loc-dong">
+                    <b>{vua.length} em</b> {TEN_LOC[loc]} trong 14 ngày ·{' '}
+                    <button type="button" className="dd1-nut-chu" onClick={() => setLoc(null)}>
+                      Bỏ lọc
+                    </button>
+                  </p>
+                )}
                 {coCotMuc && tk.coMat.length > 0 && (
-                  <p className="dd1-phu dd1-ml-giai">
-                    Thanh bên phải: số lượt làm 14 ngày theo Mức làm 1 → 4 (đoạn càng đậm, mức càng cao). Chỉ tính lượt đã đo giờ làm; màn riêng của thầy, không hiện lên bản chiếu.
+                  <p className="dd1-chu-giai" aria-label="Chú giải thanh 14 ngày">
+                    <span>
+                      <i data-g="voi" aria-hidden="true" />
+                      Vội (Mức làm 1–2)
+                    </span>
+                    <span>
+                      <i data-g="nghi" aria-hidden="true" />
+                      Có nghĩ (3–4)
+                    </span>
+                    <span>
+                      <i data-g="treo" aria-hidden="true" />
+                      Treo máy
+                    </span>
+                    <span>
+                      <i data-g="co-tinh" aria-hidden="true" />
+                      Cố tình treo máy
+                    </span>
+                    <span className="dd1-cg-rieng">Màn riêng của thầy, không lên bản chiếu</span>
                   </p>
                 )}
                 {tk.coMat.length === 0 ? (
                   <p className="dd1-phu">Chưa em nào điểm danh.</p>
                 ) : (
-                  <ul className="dd1-vua-ds" aria-label="Em vừa điểm danh — bấm để mở hồ sơ làm bài" data-co-muc={coCotMuc ? '' : undefined}>
-                    {vua.map((e) => {
-                      const k = khoaNhom(e)
-                      const chipNhom = (
-                        <span className="dd1-chip" data-nhom={k}>
-                          {chuChip(e)}
+                  <>
+                    {coCotMuc && (
+                      <div className="dd1-dau-cot" aria-hidden="true">
+                        <span />
+                        <span>Em</span>
+                        <span>
+                          Sai vì vội<small>% lượt sai</small>
                         </span>
-                      )
-                      return (
-                        <li key={e.sbd}>
-                          <button type="button" className="dd1-vua-dong" onClick={(ev) => moEm(e, ev.currentTarget)} aria-label={`${chuNutEm(e, e.bacCham ? chuBacSo(e.bacCham.bac) : undefined)} (điểm danh ${gioDd(e.luc)}${e.cach === 'thay' ? ', thầy thêm' : ''})${mucLo.theoEm.get(e.sbd) ? `. ${chuMucLamEm(mucLo.theoEm.get(e.sbd)!)}` : ''}`}>
-                            <span className="dd1-vua-gio">{gioDd(e.luc)}</span>
-                            <b className="dd1-vua-ten">{e.hoTen || `SBD ${e.sbd}`}</b>
-                            {e.bacCham ? (
-                              // 13/10: có bậc ⇒ chip bậc nhỏ (biểu tượng + số bậc, tên đầy đủ trong title) ngay cạnh chip nhóm
-                              <span className="bcc-hang">
-                                {chipNhom}
-                                <ChipBac bac={e.bacCham.bac} nho />
+                        <span>
+                          Cách làm 14 ngày<small>mọi lượt</small>
+                        </span>
+                        <span>
+                          Treo máy<small>{tongMuc.chuaDoTreo ? 'chưa đo' : '14 ngày'}</small>
+                        </span>
+                      </div>
+                    )}
+                    <ul className="dd1-vua-ds" aria-label="Em vừa điểm danh — bấm để mở hồ sơ làm bài" data-co-muc={coCotMuc ? '' : undefined}>
+                      {vua.map((e) => {
+                        const k = khoaNhom(e)
+                        const d = mucLo.theoEm.get(e.sbd)
+                        const chipNhom = (
+                          <span className="dd1-chip" data-nhom={k}>
+                            {chuChip(e)}
+                          </span>
+                        )
+                        return (
+                          <li key={e.sbd}>
+                            <button type="button" className="dd1-vua-dong" onClick={(ev) => moEm(e, ev.currentTarget)} aria-label={`${chuNutEm(e, e.bacCham ? chuBacSo(e.bacCham.bac) : undefined)} (điểm danh ${gioDd(e.luc)}${e.cach === 'thay' ? ', thầy thêm' : ''})${d ? `. ${chuMucLamEm(d)}` : ''}`}>
+                              <span className="dd1-vua-gio">{gioDd(e.luc)}</span>
+                              <span className="dd1-vua-em">
+                                <span className="dd1-vua-ten-hang">
+                                  <b className="dd1-vua-ten">{e.hoTen || `SBD ${e.sbd}`}</b>
+                                  {d && d.soCoTinh > 0 && (
+                                    <span className="dd1-co-tinh">
+                                      <Flag size={13} aria-hidden="true" />
+                                      Cố tình treo máy
+                                    </span>
+                                  )}
+                                </span>
+                                {e.bacCham ? (
+                                  // 13/10: có bậc ⇒ chip bậc nhỏ (biểu tượng + số bậc, tên đầy đủ trong title) ngay cạnh chip nhóm
+                                  <span className="bcc-hang">
+                                    {chipNhom}
+                                    <ChipBac bac={e.bacCham.bac} nho />
+                                  </span>
+                                ) : (
+                                  chipNhom
+                                )}
                               </span>
-                            ) : (
-                              chipNhom
-                            )}
-                            {coCotMuc && <ThanhMucLam d={mucLo.theoEm.get(e.sbd)} cho={mucLo.dang} />}
-                          </button>
-                        </li>
-                      )
-                    })}
-                  </ul>
+                              {coCotMuc && (
+                                <>
+                                  <OSaiVoi d={d} cho={mucLo.dang} />
+                                  <OThanhMuc d={d} cho={mucLo.dang} loi={mucLo.loi} />
+                                  <OTreo d={d} chuaDo={tongMuc.chuaDoTreo} />
+                                </>
+                              )}
+                            </button>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                    {coCotMuc && tongHien.coSo > 0 && (
+                      <p className="dd1-chu-chung">
+                        % và thanh chỉ tính lượt đã đo giờ làm. {vua.length} em đang hiện: <b>{tongHien.chuaCo}</b> lượt chưa có số đo
+                        {!tongHien.chuaDoTreo && tongHien.chuaTreo > 0 ? (
+                          <>
+                            {' '}
+                            · <b>{tongHien.chuaTreo}</b> lượt làm trước khi đo treo máy (nằm trong nhóm Vội / Có nghĩ)
+                          </>
+                        ) : null}
+                        {tongHien.uoc ? ' · ≈ = có lượt giây ước tính' : ''}.
+                      </p>
+                    )}
+                  </>
                 )}
-                {tk.coMat.length > SO_VUA_DIEM_DANH && (
+                {!loc && tk.coMat.length > SO_VUA_DIEM_DANH && (
                   <button type="button" className="dd1-nut-chu" aria-expanded={moVua} onClick={() => setMoVua((v) => !v)}>
                     {moVua ? 'Thu gọn' : `Xem cả ${tk.coMat.length} em có mặt ›`}
                   </button>
@@ -425,10 +609,9 @@ export default function Buoc1DiemDanh({
               </div>
 
               <div className="dd1-o dd1-o--xong">
-                <h3 className="dd1-tieu">Xong điểm danh thì làm gì?</h3>
                 <p className="dd1-phu">
-                  Bấm nút dưới: bản chiếu chuyển sang <b>Nhịp học của lớp</b> — ba cột Chăm · Chưa đều · Lười, em vắng làm mờ. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm
-                  Lười nếu thầy không muốn nêu tên trước lớp.
+                  Xong điểm danh: chiếu <b>Nhịp học của lớp</b> — ba cột Chăm · Chưa đều · Lười, em vắng làm mờ. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười nếu thầy không
+                  muốn nêu tên trước lớp.
                 </p>
                 <button type="button" className="m3-nut-chinh dh-nut dd1-nut-chinh" onClick={chieuNhip}>
                   Xong điểm danh · chiếu Nhịp học của lớp
