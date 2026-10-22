@@ -16,6 +16,14 @@ import type { CauLuyen } from '../src/lib/bai-tap-pdf'
 import { DO_GIAY_PHIEU, JS_PHIEU, boLoiGiai, dungPhieu, taoBoDoGiay, theCauHtml, type ThongTinPhieu } from '../src/lib/html-phieu'
 
 // ───────────────────────────────────────── công cụ dùng chung ─────────────────────────────────────────
+/** 22/10 (đo treo máy, docs/dac-ta-muc-lam-6-muc-2210.md): cụm mỗi câu nay có thêm v a l n w. Các test dưới KHOÁ ĐỊNH NGHĨA g (giữ nguyên)
+ *  ⇒ chiếu riêng phần g; câu không có g thì bỏ (như trước: "không gửi 0"). Trường mới có test riêng: tests/do-treo-may-2210.test.ts. */
+const chiG = (x: unknown): Record<string, { g: number }> | null => {
+  if (!x || typeof x !== 'object') return null
+  const ra: Record<string, { g: number }> = {}
+  for (const [q, v] of Object.entries(x as Record<string, { g?: number }>)) if (typeof v?.g === 'number') ra[q] = { g: v.g }
+  return Object.keys(ra).length ? ra : null
+}
 let dongHo = 0 // ms, do test điều khiển (thay Date.now của bộ đo)
 let tabHien = 'visible'
 const bo: Array<{ dung: () => void }> = []
@@ -111,7 +119,7 @@ describe('(a) phiếu: nhúng hàm đo, KHÔNG phát thuộc tính đo từ', ()
     bamCau(1)
     w.nhip[0]()
     w.nhip[0]()
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 2 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 2 } })
   })
 })
 
@@ -124,21 +132,21 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     baoHien(io(), [[1, 1, 300], [2, 1, 300], [3, 1, 200]])
     bamCau(2)
     nhip(5)
-    expect(b.layDoGiay(null)).toEqual({ q2: { g: 5 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q2: { g: 5 } })
     bamCau(1)
     nhip(3)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 3 }, q2: { g: 5 } })
-    expect(Object.keys(b.layDoGiay(null)!.q1)).toEqual(['g']) // máy em CHỈ gửi giây — không t / h / p
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 3 }, q2: { g: 5 } })
+    expect(Object.keys(b.layDoGiay(null)!.q1).sort()).toEqual(['a', 'g', 'l', 'n', 'v', 'w']) // máy em gửi giây + đo treo máy (22/10) — không t / h / p
   })
 
   it('chưa tương tác: câu hiện lớn nhất (≥ 50%) nhận giây; câu chỉ hiện một góc thì không', () => {
     const { nhip, io, b } = taoDo()
     baoHien(io(), [[1, 0.3, 240], [2, 0.9, 700], [3, 0.6, 300]])
     nhip(4)
-    expect(b.layDoGiay(null)).toEqual({ q2: { g: 4 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q2: { g: 4 } })
     baoHien(io(), [[1, 0.9, 500], [2, 0.2, 100], [3, 0, 0]])
     nhip(2)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 2 }, q2: { g: 4 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 2 }, q2: { g: 4 } })
     const hai = taoDo()
     baoHien(hai.io(), [[1, 0.4, 300]]) // 40% câu, 300/800 màn: chưa đủ
     hai.nhip(5)
@@ -149,7 +157,7 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     const { nhip, io, b } = taoDo()
     baoHien(io(), [[1, 0.3, 500]]) // 500 ≥ 400 = nửa màn 800
     nhip(3)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 3 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 3 } })
   })
 
   it('câu em chạm lần cuối mà đã cuộn ra khỏi màn thì NHƯỜNG: thời gian đọc câu mới không bị cộng nhầm vào câu cũ', () => {
@@ -159,7 +167,7 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     nhip(2)
     baoHien(io(), [[1, 0, 0], [2, 0.8, 600]])
     nhip(3)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 2 }, q2: { g: 3 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 2 }, q2: { g: 3 } })
   })
 
   it('tab ẩn thì dừng; hiện lại thì chạy tiếp (không cần chạm)', () => {
@@ -171,7 +179,7 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     nhip(5)
     tabHien = 'visible'
     nhip(1)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 3 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 3 } })
   })
 
   it('180 giây không chạm thì dừng; chạm lại thì chạy tiếp; 179,9 giây vẫn tính', () => {
@@ -181,13 +189,13 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     nhip(2)
     dongHo += 179_900
     nhip(1)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 3 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 3 } })
     dongHo += 100 // đủ 180 giây từ lần chạm cuối
     nhip(5)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 3 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 3 } })
     bamCau(1)
     nhip(1)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 4 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 4 } })
   })
 
   it('cuộn trang / bàn phím chỉ giữ "em còn ở đó" (kéo dài 180 giây), không đổi câu đang làm; chạm vào ô chọn của câu khác mới đổi', () => {
@@ -198,13 +206,13 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     document.dispatchEvent(new Event('scroll'))
     dongHo += 170_000 // 340 giây từ lần chạm đầu, 170 giây từ lần cuộn
     nhip(1)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 1 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 1 } })
     cauDom(2).querySelector('.q-text')!.dispatchEvent(new Event('pointerdown', { bubbles: true })) // chạm vào chữ đề: chỉ "có mặt"
     nhip(1)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 2 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 2 } })
     cauDom(2).querySelector('.lam-o')!.dispatchEvent(new Event('pointerdown', { bubbles: true })) // ô chọn (cú chạm di động không phát click)
     nhip(1)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 2 }, q2: { g: 1 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 2 }, q2: { g: 1 } })
   })
 
   it('KHÔNG gửi 0: câu chưa có nhịp nào không có mặt; không câu nào ⇒ null (phiếu bỏ khoá doGiay)', () => {
@@ -214,7 +222,7 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     bamCau(1)
     nhip(3)
     expect(b.layDoGiay(['q2', 'q3'])).toBeNull()
-    expect(b.layDoGiay(['q1', 'q2'])).toEqual({ q1: { g: 3 } })
+    expect(chiG(b.layDoGiay(['q1', 'q2']))).toEqual({ q1: { g: 3 } })
   })
 
   it('trần 900 giây mỗi câu', () => {
@@ -222,7 +230,7 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     baoHien(io(), [[1, 1, 300]])
     bamCau(1)
     nhip(1000)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 900 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 900 } })
   })
 
   it('thẻ đã chấm (da-cham) không đo', () => {
@@ -240,7 +248,7 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     expect(b.layDoGiay(null)).toBeNull()
     bamCau(3, '.lam-nhap')
     nhip(2)
-    expect(b.layDoGiay(null)).toEqual({ q3: { g: 2 } })
+    expect(chiG(b.layDoGiay(null))).toEqual({ q3: { g: 2 } })
   })
 
   it('khôi phục: giây đã lưu cộng dồn; câu đã có đáp án mà KHÔNG có đồng hồ cũ thì không đo (giây ngắn sai = "chưa đọc hết đề" oan)', () => {
@@ -253,7 +261,7 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     nhip(2)
     bamCau(3)
     nhip(2)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 42 } }) // q2, q3 có đáp án sẵn mà không có đồng hồ ⇒ bỏ; q9 không phải thẻ ⇒ bỏ
+    expect(chiG(b.layDoGiay(null))).toEqual({ q1: { g: 42 } }) // q2, q3 có đáp án sẵn mà không có đồng hồ ⇒ bỏ; q9 không phải thẻ ⇒ bỏ
   })
 
   it('lưu giây qua tuy.luu mỗi 10 nhịp và khi tab ẩn; datLai xoá câu đã nộp và lưu lại', () => {
@@ -264,13 +272,17 @@ describe('(b) bộ đo giây: MỘT câu mỗi nhịp', () => {
     nhip(9)
     expect(luu).not.toHaveBeenCalled()
     nhip(1)
-    expect(luu).toHaveBeenLastCalledWith({ q1: 10 })
+    // bảng lưu: {qid: g} như cũ + khoá __do (đo treo máy 22/10) — so phần g riêng, phần đo thêm ở tests/do-treo-may-2210.test.ts
+    const boDo = (x: Record<string, unknown>) => { const { __do, ...g } = x; void __do; return g }
+    expect(boDo(luu.mock.lastCall![0])).toEqual({ q1: 10 })
+    expect(luu.mock.lastCall![0].__do.v).toEqual({ q1: 10 })
     nhip(2)
     tabHien = 'hidden'
     document.dispatchEvent(new Event('visibilitychange'))
-    expect(luu).toHaveBeenLastCalledWith({ q1: 12 })
+    expect(boDo(luu.mock.lastCall![0])).toEqual({ q1: 12 })
     b.datLai(['q1'])
-    expect(luu).toHaveBeenLastCalledWith({})
+    expect(boDo(luu.mock.lastCall![0])).toEqual({})
+    expect(luu.mock.lastCall![0].__do.v).toEqual({})
     expect(b.layDoGiay(null)).toBeNull()
   })
 
@@ -363,7 +375,8 @@ describe('(b) chạy thật trong phiếu: gui() (btvn / khắc phục) gửi do
     $('#nut-nop').click()
     await cho()
     expect(fetchSpy).toHaveBeenCalledTimes(1)
-    expect(thanGui(fetchSpy)).toEqual({
+    const than = thanGui(fetchSpy)
+    expect({ ...than, doGiay: chiG(than.doGiay) }).toEqual({
       action: 'nopKhacPhuc',
       ma: 'BTVN-abc',
       sbd: '12121212',
@@ -392,14 +405,15 @@ describe('(b) chạy thật trong phiếu: gui() (btvn / khắc phục) gửi do
     nhips(2)
     go('q3', '') // chạm vào ô nhưng bỏ trống
     nhips(6)
-    expect(boHienTai!.layDoGiay(['q1', 'q2', 'q3'])).toEqual({ q1: { g: 5 }, q2: { g: 2 }, q3: { g: 6 } }) // bộ đo có số của cả ba…
+    expect(chiG(boHienTai!.layDoGiay(['q1', 'q2', 'q3']))).toEqual({ q1: { g: 5 }, q2: { g: 2 }, q3: { g: 6 } }) // bộ đo có số của cả ba…
     // …nhưng phiếu chỉ gửi các câu đã trả lời: ép nộp bằng nút "Nộp luôn" của hộp hỏi
     $('#nut-nop').click()
     await cho()
     document.querySelector<HTMLElement>('.gd-hop .gd-hop-ok')!.click() // hộp hỏi của phiếu: "Còn N câu chưa làm… Nộp luôn?"
     await vi.waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1))
     const goi = thanGui(fetchSpy)
-    expect(goi.doGiay).toEqual({ q1: { g: 5 }, q2: { g: 2 } })
+    expect(chiG(goi.doGiay)).toEqual({ q1: { g: 5 }, q2: { g: 2 } })
+    expect(Object.keys(goi.doGiay)).toEqual(['q1', 'q2']) // câu bỏ trống KHÔNG có cụm nào (kể cả v / l)
   })
 
   it('đáp án có sẵn từ bản nháp (banNhap) mà không có đồng hồ cũ ⇒ câu ấy KHÔNG có giây dù em chạm lại', async () => {
@@ -412,7 +426,8 @@ describe('(b) chạy thật trong phiếu: gui() (btvn / khắc phục) gửi do
     nhips(3)
     $('#nut-nop').click()
     await cho()
-    expect(thanGui(fetchSpy).doGiay).toEqual({ q2: { g: 2 }, q3: { g: 3 } })
+    expect(chiG(thanGui(fetchSpy).doGiay)).toEqual({ q2: { g: 2 }, q3: { g: 3 } })
+    expect(thanGui(fetchSpy).doGiay).not.toHaveProperty('q1') // câu có đáp án sẵn mà không có đồng hồ cũ: không cụm nào
   })
 
   it('mở lại phiếu: giây cộng dồn qua lần mở (lưu cạnh bản nháp); mất đồng hồ cũ thì câu đã trả lời bị bỏ', () => {
@@ -421,11 +436,13 @@ describe('(b) chạy thật trong phiếu: gui() (btvn / khắc phục) gửi do
     chonPa('q1', 1)
     nhips(12) // lưu ở nhịp thứ 10
     const khoa = Object.keys(localStorage).find((k) => k.endsWith('.giay'))!
-    expect(JSON.parse(localStorage.getItem(khoa)!)).toEqual({ q1: 10 })
+    const { __do: phanDo, ...phanG } = JSON.parse(localStorage.getItem(khoa)!)
+    expect(phanG).toEqual({ q1: 10 })
+    expect(phanDo.v.q1).toBeGreaterThanOrEqual(10)
     moPhieu(html) // mở lại: đáp án q1 và giây đều được khôi phục
     chonPa('q1', 2)
     nhips(3)
-    expect(boHienTai!.layDoGiay(null)).toEqual({ q1: { g: 13 } })
+    expect(chiG(boHienTai!.layDoGiay(null))).toEqual({ q1: { g: 13 } })
     localStorage.removeItem(khoa)
     moPhieu(html) // mất đồng hồ, đáp án còn
     chonPa('q1', 3)
@@ -479,7 +496,8 @@ describe('(b) chạy thật trong phiếu: nộp chặng (bài ca_nhan) và th�
     go('q3', '7')
     nhips(2)
     $('#nut-nop').click()
-    expect(nopChangMsg()).toEqual([{ type: 'ddh-btvn-nop-chang', ma: 'BTVN-abc', sbd: '12121212', chiSo: 0, dapAn: { q1: 'C', q2: 'DSDS', q3: '7' }, doGiay: { q1: { g: 8 }, q2: { g: 5 }, q3: { g: 2 } } }])
+    const tin = nopChangMsg()
+    expect(tin.map((t: Record<string, unknown>) => ({ ...t, doGiay: chiG(t.doGiay) }))).toEqual([{ type: 'ddh-btvn-nop-chang', ma: 'BTVN-abc', sbd: '12121212', chiSo: 0, dapAn: { q1: 'C', q2: 'DSDS', q3: '7' }, doGiay: { q1: { g: 8 }, q2: { g: 5 }, q3: { g: 2 } } }])
     hostTraLoi({ type: 'ddh-btvn-nop-chang-ket', ok: true })
     expect(boHienTai!.layDoGiay(null)).toBeNull()
   })
@@ -491,10 +509,10 @@ describe('(b) chạy thật trong phiếu: nộp chặng (bài ca_nhan) và th�
     chonY('q2', 'DSDS')
     go('q3', '7')
     $('#nut-nop').click()
-    expect(nopChangMsg()[0].doGiay).toEqual({ q1: { g: 3 } })
+    expect(chiG(nopChangMsg()[0].doGiay)).toEqual({ q1: { g: 3 } })
     expect(nopChangMsg()[0]).not.toHaveProperty('doGiay.q2')
     hostTraLoi({ type: 'ddh-btvn-nop-chang-ket', ok: false, error: 'Máy chủ đang bận', ban: true })
-    expect(boHienTai!.layDoGiay(null)).toEqual({ q1: { g: 3 } })
+    expect(chiG(boHienTai!.layDoGiay(null))).toEqual({ q1: { g: 3 } })
   })
 
   it('không nhịp nào ⇒ tin nộp chặng không có khoá doGiay', () => {

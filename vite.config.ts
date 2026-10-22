@@ -308,6 +308,8 @@ export default defineConfig({
           // (2) 9 phông KaTeX mà đề Hoá không dùng — Caligraphic (\mathcal), Fraktur (\mathfrak), Script (\mathscr), SansSerif (\mathsf), Typewriter
           // (\mathtt) — ~94 KB. Công thức hoá (\ce) và toán thường dùng Main / Math / AMS / Size1–4 (vẫn cất sẵn). Lỡ gặp khi mất mạng ⇒ phông hệ thống.
           '**/DsTheoBac-*.{js,css}',
+          // Đo treo máy ở ca thi (22/10): mảnh NẠP LƯỜI sau khi em vào đề — chỉ là số đo, mất mạng không nạp được thì bài thi vẫn chạy ⇒ kho chạy-lúc.
+          '**/do-treo-may-thi-*.js',
           // PR258 (kiểm tra cá nhân) gộp cùng đợt 19: bảng kiểm tra cá nhân của màn Chiến dịch (HanhTrinhV2 ← ChienDichScreen) và bộ chọn câu ưu tiên
           // trên màn chiếu chữa (ThayTuChua, Gọi lên bảng, Cần thầy chữa…) — CHỈ máy thầy, các màn nhập đều đã ngoài precache ⇒ kho chạy-lúc.
           '**/{BangKiemTraCaNhan,ung-vien-chieu}-*.{js,css}',
@@ -481,6 +483,9 @@ export default defineConfig({
             { name: 'bieu-tuong-them', test: /node_modules[\\/]lucide-react[\\/]/ },
             // fflate (nạp động trong day-ca-may-chu-moi.ts) — đặt tên mảnh rõ để globIgnores ở trên bắt đúng nó (tên tự sinh là `browser-*`, quá chung).
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
+            // 22/10 (màn thi nạp lười Phiếu của em): các mô-đun nhỏ (+ zustand của appStore) CHỈ đi cùng App (đường /gv /p /ph /t, không đường học sinh) bị Rolldown tách
+            // thành nhiều tệp ⇒ gom MỘT mảnh: cùng tập đường nên không đường nào tải thêm byte, bớt tệp precache và phần đầu nén từng tệp.
+            { name: 'app-nho', test: /src[\\/](?:store[\\/]appStore|lib[\\/](?:bo-cau-chuan|bo-cau-tu-bai-lam|cau-hinh-chua|chi-tiet-cau|classlist-db|exam-assign|exam-shuffle|nhan-xet-theo-ca)|components[\\/]NutPhieuHtml)\.tsx?$|node_modules[\\/]zustand[\\/]/, includeDependenciesRecursively: false },
             // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng
             // (+2,4 KB nén cho app học sinh vì mỗi tệp nén riêng) ⇒ gom lại vào CÙNG mảnh DesignSystem (học sinh / thầy đều nạp sẵn).
             // 22/10: giữ khung xem phiếu là MẢNH RIÊNG như trước (không để Rolldown gộp vào DesignSystem — gộp làm mảnh cổng phụ huynh nặng +1,5 KB).

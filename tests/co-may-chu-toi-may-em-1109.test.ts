@@ -183,7 +183,7 @@ describe('MỌI LỆNH ĐI WORKER ĐỀU ĐỌC CẤU HÌNH TRƯỚC', () => {
     ['vaoThiQuaMayChuMoi', 'vaoThiMoi(ch, maCa, sbd, idThietBi, danhTinh)'],
     ['trangThaiPhongCho', 'phongChoMoi(chMoi, maCa)'],
     // 06/10: thêm tham số `khoaLuot` (gửi nốt bài của lượt CŨ phải khoá đúng lượt, không đè lượt thi lại).
-    ['submitAnswers', 'nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau, khoaLuot)'],
+    ['submitAnswers', 'nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau, khoaLuot'],
     ['luuTam', 'luuTamMoi(chMoi, maCa, sbd, dapAn, giayCau)'],
     ['pushExamStatus', 'trangThaiMoi(chMoi, status)'],
     ['layPhieu', 'layPhieuMoi(chMoi, ma)'],

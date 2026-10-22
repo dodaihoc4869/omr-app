@@ -589,6 +589,10 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
 
   const maCa = String(b.maCa ?? '').trim()
   const kiemGio = !!maCa && !integrity.blocked
+  // ĐO TREO MÁY (thầy 22/10, migration-2210-do-giay-luot.sql): cụm `doGiay` máy em gửi, làm sạch từng câu bằng `lamSachDo`; CHỈ giữ câu có cụm treo
+  // (có g hợp lệ). Ghi chung câu UPDATE sẵn có — không thêm vòng D1. Không gửi / rác ⇒ NULL, nộp bài y như trước.
+  const doGiaySach = Object.fromEntries([...docDoGiayNhieu(b)].filter(([, d]) => d.treo))
+  const doGiayLuot = Object.keys(doGiaySach).length > 0 ? JSON.stringify(doGiaySach) : null
 
   // KHOÁ CHỐNG TRÙNG nằm ngay trong mệnh đề WHERE: lượt đã nộp thì câu này
   // không đổi dòng nào, nên máy em thử lại bao nhiêu lần cũng an toàn.
@@ -598,7 +602,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
   // (`NOT EXISTS …`), rồi mới xét hạn và ghi ở vòng thứ hai — ca không bật luật (gần như mọi ca) xong trong một vòng.
   const capNhat = (chan: boolean): D1PreparedStatement =>
     env.DB.prepare(
-      `UPDATE luot SET nop_luc = ?, trang_thai = ?, dap_an_json = ?, giay_cau_json = ?,
+      `UPDATE luot SET nop_luc = ?, trang_thai = ?, dap_an_json = ?, giay_cau_json = ?, do_giay_json = ?,
               integrity_json = ?, so_lan_roi_man = ?, tong_giay_roi_man = ?, cap_nhat_luc = ?, da_day_sheet = 0
        WHERE ${dk.sql} AND trang_thai = 'dang_lam'${chan ? " AND NOT EXISTS (SELECT 1 FROM ca WHERE ma_ca = ? AND COALESCE(chi_nop_3_phut_cuoi, 0) NOT IN (0, '0', ''))" : ''}`,
     ).bind(
@@ -606,6 +610,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
       trangThai,
       JSON.stringify(b.dapAn ?? {}),
       b.giayCau ? JSON.stringify(b.giayCau) : null,
+      doGiayLuot,
       JSON.stringify(integrity),
       Number(integrity.leaveCount ?? 0),
       Math.round(Number(integrity.totalHiddenMs ?? 0) / 1000),

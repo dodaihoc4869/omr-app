@@ -1245,6 +1245,33 @@ export async function fetchSession(scriptUrl: string, maCa: string): Promise<Ses
   return postJson(scriptUrl, { action: 'session', maCa })
 }
 
+/** Một câu ca thi gửi máy chủ — cùng khuôn `doGiay` máy chủ nhận (`lamSachDo`: cụm treo máy chỉ nhận khi có g). */
+export interface DoGiayThiCau {
+  /** Giây ca thi theo định nghĩa hiện hành (= giayCau, trần 900); vắng khi câu chưa có giây nào. */
+  g?: number
+  v: number
+  a: number
+  l: number
+  n: number
+  w: 0 | 1
+}
+
+/** ĐO TREO MÁY CA THI (thầy 22/10, docs/dac-ta-muc-lam-6-muc-2210.md mục 3): dựng cụm `doGiay` từ `giayCau` (= v, cũng là g) và `doCau` (a / l / n / wc
+ *  do src/lib/do-treo-may-thi.ts đếm). CHỈ câu có g ≥ 1 (máy chủ bỏ cụm không có g). Không câu nào ⇒ null (thân gửi y như trước). */
+export function doGiayThi(
+  giayCau: Record<string, number> | null | undefined,
+  doCau: Record<string, { a?: number; l?: number; n?: number; wc?: 1 }> | null | undefined,
+): Record<string, DoGiayThiCau> | null {
+  const ra: Record<string, DoGiayThiCau> = {}
+  for (const [q, so] of Object.entries(giayCau ?? {})) {
+    const v = Math.min(7200, Math.max(0, Math.round(Number(so) || 0)))
+    if (v < 1) continue
+    const m = doCau?.[q] ?? {}
+    ra[q] = { g: Math.min(900, v), v, a: Math.min(7200, m.a ?? 0), l: Math.min(m.l ?? 0, v), n: m.n ?? 0, w: m.wc === 1 ? 1 : 0 }
+  }
+  return Object.keys(ra).length > 0 ? ra : null
+}
+
 export async function submitAnswers(
   scriptUrl: string,
   maCa: string,
@@ -1257,6 +1284,8 @@ export async function submitAnswers(
   giayCau?: Record<string, number>,
   /** Chỉ khi gửi nốt bài của lượt CŨ sau khi máy chủ đã mở lượt mới (thầy cho thi lại): khoá đúng lượt cũ để bài cũ không đè lượt mới. */
   khoaLuot?: string,
+  /** Đo treo máy từng câu của lượt (ExamAttempt.doCau) — gửi cùng `giayCau` dưới khoá `doGiay` (doGiayThi). */
+  doCau?: Record<string, { a?: number; l?: number; n?: number; wc?: 1 }>,
 ): Promise<{ keyBank: KeyBank | null; congBo: CongBoDiem; boSung?: number }> {
   // THỬ LẠI ĐƯỢC (T5) — và CHỈ vì T4 đã có khoá chống trùng `maCa|sbd|lanThu`.
   // Trước T4, một lượt nộp hết hạn ở máy em nhưng đã tới nơi ở máy chủ sẽ bị ghi
@@ -1271,7 +1300,7 @@ export async function submitAnswers(
   //
   // Vẫn gọi Apps Script sau: điểm và đáp án công bố ngay do bên đó tính.
   const chMoi = await layCauHinhMayChu()
-  const daCat = await nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau, khoaLuot)
+  const daCat = await nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau, khoaLuot, doGiayThi(giayCau, doCau))
 
   // MÁY CHỦ MỚI ĐÃ TRẢ LỜI ĐỦ ⇒ THÔI GỌI APPS SCRIPT.
   //
