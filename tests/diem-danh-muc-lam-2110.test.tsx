@@ -170,18 +170,25 @@ describe('bảng điểm danh — Mức làm 6 mức (bản vẽ 22/10)', () => 
     expect(document.querySelector('.dd1-chu-chung')?.textContent).not.toContain('trước khi đo treo máy')
   })
 
-  it('máy chủ chưa có lệnh / lỗi ⇒ dòng như cũ (không cột, không dòng tổng) + một câu nói thật; bấm em vẫn mở hồ sơ; KHÔNG tự hỏi lại', async () => {
+  it('máy chủ chưa có lệnh / lỗi ⇒ dòng như cũ (không cột, không dòng tổng) + LÝ DO THẬT + nút «Thử tải lại» (bản vẽ khung 04); bấm em vẫn mở hồ sơ; KHÔNG tự hỏi lại; bấm Thử tải lại ⇒ hỏi lại đúng một lần', async () => {
     chet = true
     render(<Khung />)
     await waitFor(() => expect(lenh('/gv/muc-lam-lo')).toHaveLength(1), { timeout: CHO_HOI_MUC_LAM_MS + 2500 })
-    expect(await screen.findByText(/Chưa tải được Mức làm 14 ngày của các em/)).toBeTruthy()
+    expect((await screen.findByText(/Chưa tải được Mức làm 14 ngày/)).textContent).toContain('Chưa tải được Mức làm 14 ngày: chưa có lệnh. Danh sách điểm danh vẫn đúng.')
     expect(document.querySelectorAll('.dd1-ot, .dd1-ov, .dd1-tong')).toHaveLength(0)
     expect(dongVua()).toHaveLength(6)
     fireEvent.click(dongVua()[0]!)
     expect(await screen.findByRole('dialog', { name: 'Hồ sơ làm bài' })).toBeTruthy() // bấm em vẫn mở hồ sơ
     await new Promise((ok) => setTimeout(ok, CHO_HOI_MUC_LAM_MS + 500))
     expect(lenh('/gv/muc-lam-lo')).toHaveLength(1)
-  })
+    // thầy bấm Thử tải lại (máy chủ đã có lệnh) ⇒ hỏi lại các em hỏng, có số ⇒ cột hiện, câu lỗi biến mất
+    chet = false
+    fireEvent.click(screen.getByRole('button', { name: 'Thử tải lại' }))
+    await waitFor(() => expect(lenh('/gv/muc-lam-lo')).toHaveLength(2), { timeout: CHO_HOI_MUC_LAM_MS + 2500 })
+    expect((lenh('/gv/muc-lam-lo')[1]![1] as { sbds: string[] }).sbds).toHaveLength(8)
+    await waitFor(() => expect(document.querySelectorAll('.dd1-ov b').length).toBeGreaterThan(0))
+    expect(screen.queryByText(/Chưa tải được Mức làm 14 ngày/)).toBeNull()
+  }, 15_000)
 
   it('bản chiếu điểm danh KHÔNG có Mức làm / Treo / Cố tình (tên em kèm mức trước lớp là điều cần tránh)', async () => {
     render(<Khung />)

@@ -44,6 +44,7 @@ Chụp bằng component thật và máy chủ giả. Số và tên em trong ản
   - `85-…`: có số, 3 khổ (`may-tinh` 1440 · `ngang` 844 · `dien-thoai` 390) × sáng/tối.
   - `86-…`: những ngày đầu, chưa đo treo máy.
   - `87-…`: đang lọc «Treo máy».
+  - `88-…`: lệnh lô hỏng (bản vẽ khung 04), có lý do thật và nút «Thử tải lại», 3 khổ × sáng/tối. Ảnh chụp với `&mlo=loi`.
 - **Tờ chiếu:** `npx vite build --config scripts/chup-muc-lam-2110/vite.config.mjs --outDir <tạm> && node scripts/chup-muc-lam-2110/chup-chieu.mjs <tạm> docs/ban-ve-muc-lam-6-muc-2210/anh-that`. Gồm 6 cảnh: `ai-sai`, `ai-sai-dong-em`, `ai-sai-ngay-dau`, `ai-sai-chua-diem-danh`, `chi-tiet-em`, `chi-tiet-em-chua-do`. Mỗi cảnh chụp ở 1920, 1280 và 1024.
 - **Soát:** 0 lỗi trang · 0 tràn ngang · 0 đích chạm < 44 px · 0 thẻ chiếu bị cắt · 0 tên bị cắt. Lớp đông ở khổ 1280 không còn tên nào bị "…"; bản đang chạy trên app còn 7 tên.
 - **Hai chỗ khác bản vẽ, đều có lý do:**

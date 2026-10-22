@@ -123,7 +123,8 @@
 .dd1-tong-nut:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; }
 .dd1-tong-cho { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px 0 10px; border: 1.5px dashed var(--gvm-vien); border-radius: 999px; font-size: 13px; font-style: italic; color: var(--gvm-chu-3); }
 .dd1-loc-dong { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; color: var(--gvm-chu-2); } .dd1-loc-dong b { color: var(--gvm-chu); }
-.dd1-ml-loi { margin: 0; padding: 8px 12px; border-radius: 14px; background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-size: 14px; }
+.dd1-ml-loi { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; padding: 4px 12px; border-radius: 14px; background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-size: 14px; }
+.dd1-ml-loi .dd1-ml-thu { color: inherit; text-decoration: underline; }
 /* chú giải + màu ba nhóm */
 .dd1-chu-giai { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 12px; color: var(--gvm-chu-3); }
 .dd1-chu-giai > span { display: inline-flex; align-items: center; gap: 5px; }

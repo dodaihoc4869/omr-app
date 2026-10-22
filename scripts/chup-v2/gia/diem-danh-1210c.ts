@@ -10,7 +10,7 @@ import { hoSoTuNhip, nhipHocGia, tenEmNhip } from './nhip-hoc'
 export const LA_DD12C = new URLSearchParams(globalThis.location?.search ?? '').get('dd12c') === '1'
 
 /** Thanh Mức làm ở bảng điểm danh (thầy 20/10, bản vẽ 03): chỉ khi `&mlo=1` — ảnh cũ của cảnh dd12c KHÔNG đổi. */
-export const LA_MLO = LA_DD12C && ['1', 'dau'].includes(new URLSearchParams(globalThis.location?.search ?? '').get('mlo') ?? '')
+export const LA_MLO = LA_DD12C && ['1', 'dau', 'loi'].includes(new URLSearchParams(globalThis.location?.search ?? '').get('mlo') ?? '')
 /** 6 mức (22/10): `treo`/`coTinh` = Mức 5/6 (KHÔNG nằm trong `m`), `chuaTreo` = lượt chưa đo treo máy, `sv`/`sn` = lượt sai Mức 1–2 / 3–4. */
 const MAU_MUC: { m: [number, number, number, number]; chua: number; uoc: number; treo: number; coTinh: number; chuaTreo: number; sv: number; sn: number }[] = [
   { m: [6, 9, 30, 7], chua: 3, uoc: 0, treo: 1, coTinh: 0, chuaTreo: 0, sv: 6, sn: 10 },
@@ -63,6 +63,8 @@ export function traLoiDd12c(duong: string, b: Record<string, unknown>): KQ | nul
     if (b.action === 'gan-day') return null
     return du(trangThai())
   }
+  // `&mlo=loi` (bản vẽ khung 04): lệnh lô hỏng ⇒ màn nói lý do + nút Thử tải lại
+  if (duong === '/gv/muc-lam-lo' && LA_MLO && new URLSearchParams(globalThis.location?.search ?? '').get('mlo') === 'loi') return { ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' }
   if (duong === '/gv/muc-lam-lo' && LA_MLO) return du({ tu: '2026-09-29', den: '2026-10-12', em: Object.fromEntries((Array.isArray(b.sbds) ? (b.sbds as string[]) : []).map((x) => [x, mucLamGia(String(x))])) })
   if (duong === '/gv/dau-gio') return b.action === 'xem' ? du({ daKetThuc: false, luot: [] }) : du({ ketQua: [] })
   const sbd = String(b.sbd ?? '')
