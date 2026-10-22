@@ -165,6 +165,8 @@ describe('thẻ Kiểm tra đầu giờ', () => {
     await waitFor(() => expect(document.querySelector('.lop-xem-phieu iframe')).toBeTruthy())
     expect((await screen.findAllByText(/Sai 20\/09 \(Ca\) · Đúng 22\/09 \(Đoàn\) · Đúng 25\/09 \(Bi-a\)/)).length).toBe(3)
     expect(screen.getByRole('heading', { name: 'Lượt 1' })).toBeTruthy()
+    // Nhãn nhóm Khá · Trung bình · Cần kèm (thầy 22/10) trên thẻ chấm của thầy — mỗi em được gọi một nhãn
+    expect(document.querySelectorAll('.gvv2-dg-the .cem-tang, .dg-dong .cem-tang')).toHaveLength(3)
   })
 
   it('Đạt / Chưa đạt đi qua /gv/dau-gio (KHÔNG ghiLenBang); Thầy đã chữa ⇒ da-chua; Kết thúc hỏi lại, em chưa chấm không ghi', async () => {

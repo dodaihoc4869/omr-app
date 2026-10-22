@@ -70,14 +70,54 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // 20/10 đo giây (thầy: mọi câu đều đo được): giây câu đang hiện, CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900; gửi cùng lượt nộp
   // (`doGiay: {g}`; số từ/hình/phần do máy chủ tự đo). `msLam` cũ giữ nguyên cho OMNI. Viết nội tuyến (không tệp chung): thêm một tệp dùng chung làm tăng
   // tải mở cả ba app (cổng `kiem:toc-do`) hoặc thêm một chunk (cổng `kiem-sw` đang 170/170). Cùng định nghĩa với màn ôn lại (LamCauOn).
+  // 22/10 ĐO TREO MÁY (thầy: thêm Mức làm 5 "Treo máy", 6 "Cố tình treo máy"; docs/dac-ta-muc-lam-6-muc-2210.md mục 3): `g` GIỮ NGUYÊN; thêm v (giây câu mở khi tab
+  // hiện, không cắt 180) · a (giây câu mở khi tab ẩn / tắt màn) · l (khoảng lặng dài nhất giữa hai lần chạm, khi tab hiện) · n (số khoảng lặng 120–179 giây) ·
+  // w (1 = xin được giữ màn sáng: màn ẩn lúc ấy là em tự rời app/tắt màn, không phải màn tự tắt). Gửi cùng cụm `doGiay`.
   const dhMs = useRef(0), dhCham = useRef(Date.now())
-  useEffect(() => { dhMs.current = 0; dhCham.current = Date.now() }, [q?.qid])
+  const dhT = useRef({ v: 0, a: 0, l: 0, n: 0, lang: 0 }), dhW = useRef(false)
+  useEffect(() => { dhMs.current = 0; dhCham.current = Date.now(); dhT.current = { v: 0, a: 0, l: 0, n: 0, lang: 0 } }, [q?.qid])
   useEffect(() => {
-    const id = window.setInterval(() => { if (document.visibilityState === 'visible' && Date.now() - dhCham.current <= 180_000) dhMs.current = Math.min(900_000, dhMs.current + 1000) }, 1000)
-    const cham = () => { dhCham.current = Date.now() }
+    const id = window.setInterval(() => {
+      const t = dhT.current
+      if (document.visibilityState !== 'visible') return // `a` tính theo MỐC lúc ẩn → lúc hiện (trình duyệt hãm/đóng băng nhịp ở tab ẩn: đếm nhịp sẽ hụt)
+      t.v = Math.min(7200, t.v + 1); t.lang++
+      if (Date.now() - dhCham.current <= 180_000) dhMs.current = Math.min(900_000, dhMs.current + 1000)
+      if (khoaMan && Date.now() - dhCham.current > 600_000) { void khoaMan.release().catch(() => {}); khoaMan = null } // 10 phút không chạm ⇒ nhả giữ màn sáng (máy bỏ quên không sáng mãi)
+    }, 1000)
+    const cham = () => {
+      const t = dhT.current
+      if (t.lang >= 120 && t.lang < 180) t.n++
+      t.l = Math.max(t.l, t.lang); t.lang = 0
+      dhCham.current = Date.now()
+      if (!khoaMan) xin() // chạm lại sau khi đã nhả ⇒ giữ màn sáng lại
+    }
     const ev = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel']
     for (const e of ev) window.addEventListener(e, cham, { passive: true, capture: true })
-    return () => { window.clearInterval(id); for (const e of ev) window.removeEventListener(e, cham, { capture: true }) }
+    // Giữ màn sáng khi đang làm câu (tự nhả khi rời màn; trình duyệt tự nhả khi tab ẩn ⇒ xin lại khi hiện lại). Không hỗ trợ / bị từ chối ⇒ w = 0, không báo lỗi.
+    type Khoa = { release: () => Promise<void> }
+    const wl = (navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<Khoa> } }).wakeLock
+    let khoaMan: Khoa | null = null, het = false, dangXin = false
+    const xin = () => {
+      if (!wl || het || khoaMan || dangXin || document.visibilityState !== 'visible') return
+      dangXin = true
+      wl.request('screen').then((k) => { dangXin = false; if (het) void k.release().catch(() => {}); else { khoaMan = k; dhW.current = true } }, () => { dangXin = false; dhW.current = false })
+    }
+    let anTu = document.visibilityState === 'visible' ? 0 : Date.now()
+    const doiHien = () => {
+      if (document.visibilityState === 'visible') {
+        if (anTu) { const t = dhT.current; t.a = Math.min(7200, t.a + Math.round((Date.now() - anTu) / 1000)); anTu = 0 }
+        xin()
+      } else { if (!anTu) anTu = Date.now(); khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
+    }
+    xin()
+    document.addEventListener('visibilitychange', doiHien)
+    return () => {
+      het = true
+      window.clearInterval(id)
+      for (const e of ev) window.removeEventListener(e, cham, { capture: true })
+      document.removeEventListener('visibilitychange', doiHien)
+      void khoaMan?.release().catch(() => {})
+    }
   }, [])
   // 15/10 (em Lê Công: đáp án 10000 chỉ nhập được 1000; thầy: "hiển thị đúng số ô cần điền"): số ô của câu Trả lời ngắn = đúng số kí tự đáp số, máy
   // chủ gửi kèm; thiếu ⇒ 4.
@@ -150,7 +190,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     const msLam = Math.max(0, Date.now() - batDau.current)
     const assisted = !!q.goiY || daHoiThay.current === q.qid
     try {
-      const r = await guiLaiKhiKetMang(() => goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted, msLam, doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000) } : undefined }, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
+      const r = await guiLaiKhiKetMang(() => goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted, msLam, doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam }))
       // CHẤM THEO ĐÚNG ĐÁP ÁN MÁY CHỦ ĐÃ CHẤM (khẩn 12/10 23h — thầy: "hs làm đúng cả 4 ý nhưng app lại báo sai"): mỗi câu của một đợt chỉ chấm MỘT lần

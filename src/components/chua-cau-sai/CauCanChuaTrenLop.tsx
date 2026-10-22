@@ -8,6 +8,8 @@ import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { BuocDiemDanh, useDiemDanhBuoi } from '../day-hoc/DiemDanhBuoi'
 import { useGhiToChieu } from '../chien-dich/ghi-to-chieu'
 import KhungXemPhieu from '../KhungXemPhieu'
+import { ChipTang } from '../goi-len-bang/ChonEm'
+import type { EmChieu } from '../../lib/ung-vien-chieu'
 import './chua-cau-sai.css'
 
 /** `gon` (Hành trình › Cần thầy chữa, trung tu 09/10 tối): bỏ tiêu đề + đoạn giải thích (dòng của danh sách cần chữa đã nói việc);
@@ -20,6 +22,7 @@ export default function CauCanChuaTrenLop({ gon = false, chonDau }: { gon?: bool
     [loi, setLoi] = useState(''),
     [bao, setBao] = useState(''),
     [html, setHtml] = useState(''),
+    [daGoi, setDaGoi] = useState<Record<string, EmChieu>>({}),
     [conNua, setConNua] = useState(false),
     [buoc, setBuoc] = useState<Record<string, string>>({})
   const phien = useRef<
@@ -153,7 +156,9 @@ export default function CauCanChuaTrenLop({ gon = false, chonDau }: { gon?: bool
         o = phien.current.map((p, i) => oChuaCuoi(p.nhom, i + 1))
       const {layEmChieu,nhanEmChieu}=await import('../../lib/ung-vien-chieu')
       const uv=await layEmChieu(phien.current.map(p=>p.nhom.qid),dd.coMat.map(e=>e.sbd),coMat,undefined,undefined,{kenh:'chua-cau',capChua:true})
-      for(let i=0;i<o.length;i++){const e=uv.get(phien.current[i]!.nhom.qid)?.[0];o[i]!.sbd=e?.sbd??'';o[i]!.hoTen=e?.ten??'Cả lớp';o[i]!.lichSuCau=e?nhanEmChieu(e):undefined}
+      const goiMoi: Record<string, EmChieu> = {}
+      for(let i=0;i<o.length;i++){const e=uv.get(phien.current[i]!.nhom.qid)?.[0];o[i]!.sbd=e?.sbd??'';o[i]!.hoTen=e?.ten??'Cả lớp';o[i]!.lichSuCau=e?nhanEmChieu(e):undefined;if(e)goiMoi[phien.current[i]!.nhom.id]=e}
+      setDaGoi((cu) => ({ ...cu, ...goiMoi }))
       const { taoHtmlMayChieu } = await import('../../lib/html-may-chieu')
       const h = taoHtmlMayChieu(o, {
         tenBuoi: 'Câu cần chữa · Cùng gỡ bước cuối',
@@ -240,6 +245,18 @@ export default function CauCanChuaTrenLop({ gon = false, chonDau }: { gon?: bool
               <h3>
                 {g.lop} · {g.tieuDe} · {g.em.length} em
               </h3>
+              {daGoi[g.id] && (
+                // Nhãn nhóm (thầy 22/10) — CHỈ màn thầy; tờ chiếu chỉ ghi tên em lên bảng.
+                <p>
+                  Đã gọi lên bảng: <b>{daGoi[g.id]!.ten}</b>
+                  {daGoi[g.id]!.tang && <> <ChipTang tang={daGoi[g.id]!.tang!} /></>}
+                  {daGoi[g.id]!.giangLai && (
+                    <>
+                      {' '}· Giảng lại: <b>{daGoi[g.id]!.giangLai!.ten}</b> <ChipTang tang={daGoi[g.id]!.giangLai!.tang} /> (đã làm đúng)
+                    </>
+                  )}
+                </p>
+              )}
               <p>
                 <ChemText text={g.diemVuong} />
               </p>

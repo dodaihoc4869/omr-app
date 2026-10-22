@@ -281,8 +281,8 @@ describe('giao diện hai khối + nút "Chiếu lên bảng"', () => {
     const ds = screen.getByRole('list', { name: 'Thứ tự câu sẽ chiếu' })
     const dong = () => [...ds.querySelectorAll<HTMLElement>('li[data-qid]')]
     expect(dong().map((l) => l.dataset.qid)).toEqual(THU_TU)
-    await waitFor(() => expect(dong()[0]!.querySelector('.gvv2-ttc-goi')?.textContent).toBe('Gọi lên bảng: Chu Hương Cúc · Đã tự làm đúng câu này'))
-    expect(dong()[4]!.querySelector('.gvv2-ttc-goi')!.textContent).toBe('Gọi lên bảng: Trần Gia Bảo · Dự kiến làm được câu này')
+    await waitFor(() => expect(dong()[0]!.querySelector('.gvv2-ttc-goi')?.textContent).toBe('Gọi lên bảng: Chu Hương Cúc Trung bình · Đã tự làm đúng câu này')) // nhãn nhóm cạnh tên (thầy 22/10, chỉ màn thầy)
+    expect(dong()[4]!.querySelector('.gvv2-ttc-goi')!.textContent).toBe('Gọi lên bảng: Trần Gia Bảo Trung bình · Dự kiến làm được câu này')
     expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('75% lớp sai3/4 em sai')
     expect(dong()[2]!.querySelector('.gvv2-ttc-goi')!.textContent).toBe('Chưa đủ dữ liệu chọn em — thầy chữa cho cả lớp')
     expect(dong()[3]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('chưa em nào làm')

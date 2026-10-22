@@ -22,6 +22,8 @@ import { chamCau, chotLuot, ghiDaChua, ketThucDauGio, layLichSuHoi, layUngVien, 
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { BuocDiemDanh, tenNgan, useDiemDanhBuoi, type DiemDanhBuoi } from './DiemDanhBuoi'
 import TheCauHienThi from './TheCauHienThi'
+import { ChipTang } from '../goi-len-bang/ChonEm'
+import type { Tang } from '../../lib/chon-em-phan-tang'
 import './day-hoc.css'
 import './dau-gio.css'
 
@@ -65,6 +67,18 @@ function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong, onTomTat }: { dd: Di
   const [lichSu, setLichSu] = useState<Record<string, LichSuHoi>>({})
   const [dangTaiLuot, setDangTaiLuot] = useState(false)
   const [loiLuot, setLoiLuot] = useState('')
+  // NHÃN NHÓM (thầy 22/10: "làm nốt nhãn nhóm cho Kiểm tra đầu giờ"): bộ chọn tính nhóm Khá · Trung bình · Cần kèm lúc gọi; máy chủ chốt lượt không lưu nhóm
+  // ⇒ giữ theo khoá em|câu trong phiên trình duyệt của buổi (mở lại tab vẫn còn). Chỉ màn thầy — tờ chiếu không bao giờ ghi nhóm.
+  const khoaTang = idBuoi ? `omr-dg-tang|${idBuoi}` : ''
+  const [tangCua, setTangCua] = useState<Record<string, Tang>>({})
+  useEffect(() => {
+    let cu: Record<string, Tang> = {}
+    try {
+      const o: unknown = khoaTang ? JSON.parse(sessionStorage.getItem(khoaTang) || '{}') : {}
+      if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) if (v === 1 || v === 2 || v === 3) cu[k] = v
+    } catch { cu = {} }
+    setTangCua(cu)
+  }, [khoaTang])
 
   const napLichSu = useCallback(async (ds: { sbd: string; qid: string }[]) => {
     const can = ds.filter((x) => x.sbd && x.qid)
@@ -192,6 +206,13 @@ function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong, onTomTat }: { dd: Di
         return
       }
       setLuot(c.du.ds)
+      const them: Record<string, Tang> = {}
+      for (const x of chon) if (x.tang) them[khoa(x)] = x.tang
+      setTangCua((cu) => {
+        const moiTang = { ...cu, ...them }
+        try { if (khoaTang) sessionStorage.setItem(khoaTang, JSON.stringify(moiTang)) } catch { /* trình duyệt chặn lưu: nhãn vẫn hiện tới khi tải lại */ }
+        return moiTang
+      })
       const moi = c.du.ds.filter((x) => x.luot === c.du.luot)
       if (!moi.length) {
         showToast('Máy chủ không nhận lượt này (danh sách có mặt vừa đổi) — bấm lại.', 'warn')
@@ -400,6 +421,7 @@ function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong, onTomTat }: { dd: Di
                           </span>
                           <p className="gvv2-dg-ten">
                             <b title={ten}>{ten}</b>
+                            {tangCua[khoa(x)] && <span style={{ justifySelf: 'start' }}><ChipTang tang={tangCua[khoa(x)]!} /></span>}
                             <small>{c ? `${TEN_PHAN[c.phan]} · ${c.tenDang || x.chuyenDe || 'Câu đã làm đúng'}` : x.chuyenDe || 'Câu đã làm đúng'}</small>
                           </p>
                         </div>
@@ -594,6 +616,7 @@ function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong, onTomTat }: { dd: Di
                         <div className="dh-cau-than" style={{ width: '100%' }}>
                           <p className="dg-ten">
                             <b title={x.hoTen || x.sbd}>{x.hoTen || x.sbd}</b>
+                            {tangCua[khoa(x)] && <ChipTang tang={tangCua[khoa(x)]!} />}
                             <small>SBD {x.sbd}</small>
                           </p>
                           <p className="dh-cau-nhan">

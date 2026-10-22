@@ -9,10 +9,17 @@
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
 import { docBaiCaNhan, doiLuotLam, luuKetQuaChang, type KetQuaChang } from './btvn-ca-nhan-em'
 
-/** GIÂY MỘT CÂU do phiếu đo (thầy 20/10, docs/dac-ta-muc-lam-bai-2010.md mục 4): `g` giây (1–900). Máy em CHỈ gửi giây; số từ / hình / phần của đề do máy chủ
- * tự đo từ câu nó chấm (không tin máy em), nên không có thêm trường nào ở đây. Máy chủ làm sạch lại (`docDoGiayNhieu`). */
+/** GIÂY MỘT CÂU do phiếu đo (thầy 20/10, docs/dac-ta-muc-lam-bai-2010.md mục 4): `g` giây (1–900). Số từ / hình / phần của đề do máy chủ
+ * tự đo từ câu nó chấm (không tin máy em). Máy chủ làm sạch lại (`docDoGiayNhieu`).
+ * ĐO TREO MÁY (thầy 22/10, docs/dac-ta-muc-lam-6-muc-2210.md mục 3): thêm v (giây mở khi tab hiện), a (giây ẩn), l (lặng dài nhất), n (số lần lặng
+ * 120–179 giây), w (giữ màn sáng 0/1). Câu chỉ có v / a (chưa đủ điều kiện g) vẫn gửi — máy chủ quyết dùng hay bỏ. */
 export interface DoGiayCau {
-  g: number
+  g?: number
+  v?: number
+  a?: number
+  l?: number
+  n?: number
+  w?: 0 | 1
 }
 
 export interface TinNopChang {
@@ -58,13 +65,25 @@ export function loiChoEm(ket: Pick<KetQuaChang, 'lyDo' | 'error'>): string {
   return ket.error && ket.error.trim() ? ket.error : LOI_CHUNG
 }
 
-/** ĐO GIÂY: giữ từng câu có giây là số hữu hạn (`{g}` — bỏ mọi trường khác phiếu lỡ gửi), tối đa 200 câu. Không còn câu nào ⇒ undefined (thân nộp bỏ khoá `doGiay`). */
+/** ĐO GIÂY: giữ từng câu các trường g v a l n w là số hữu hạn — làm tròn, kẹp khoảng (g giữ nguyên số phiếu gửi như trước; máy chủ kẹp lại), bỏ mọi
+ *  trường khác phiếu lỡ gửi; tối đa 200 câu. Câu không còn trường nào ⇒ bỏ; không còn câu nào ⇒ undefined (thân nộp bỏ khoá `doGiay`). */
 function lamSachDoGiay(x: unknown): Record<string, DoGiayCau> | undefined {
   if (!x || typeof x !== 'object' || Array.isArray(x)) return undefined
   const ra: Record<string, DoGiayCau> = {}
+  const so = (o: Record<string, unknown>, k: string) => (typeof o[k] === 'number' && Number.isFinite(o[k] as number) ? (o[k] as number) : null)
+  const kep = (n: number, tran: number) => Math.min(tran, Math.max(0, Math.round(n)))
   for (const [q, v] of Object.entries(x as Record<string, unknown>).slice(0, 200)) {
-    const g = (v as { g?: unknown } | null)?.g
-    if (typeof g === 'number' && Number.isFinite(g)) ra[q] = { g }
+    if (!v || typeof v !== 'object') continue
+    const o = v as Record<string, unknown>
+    const muc: DoGiayCau = {}
+    const g = so(o, 'g')
+    if (g !== null) muc.g = g
+    for (const [k, tran] of [['v', 7200], ['a', 7200], ['l', 7200], ['n', 60]] as const) {
+      const n = so(o, k)
+      if (n !== null) muc[k] = kep(n, tran)
+    }
+    if (o.w === 1 || o.w === 0) muc.w = o.w
+    if (Object.keys(muc).length > 0) ra[q] = muc
   }
   return Object.keys(ra).length > 0 ? ra : undefined
 }

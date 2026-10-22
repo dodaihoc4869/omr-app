@@ -16,7 +16,7 @@ import { giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docBetaCau } from './omni-d1'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
-import { tongMucLam, type MucLamLuot } from './muc-lam'
+import { nangCoTinhTheoNgay, tongMucLam, type MucLamLuot } from './muc-lam'
 import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong, type DoMucLuot } from './muc-lam-so'
 import { congNgay7, ngayVn7 } from './goi-bai-7-loi'
 
@@ -29,6 +29,8 @@ const str = (x: unknown): string => (x === null || x === undefined ? '' : String
 export interface DongMucSo {
   sbd: string
   nguon: string
+  /** Ngày VN của lượt (`ngay_vn`) — luật Mức 6 theo ngày. */
+  ngay?: string
   /** Mã phiên game / mã ca thi (`ma_nguon`). */
   maNguon: string
   luc: string
@@ -90,6 +92,10 @@ export interface MucLamEmLo {
   m: [number, number, number, number]
   /** Trong `soDo`: số lượt xếp từ giây cũ / ước tính (hiện "≈"). */
   soUocTinh: number
+  /** (22/10, 6 mức) Trong `soDo`: lượt Mức 5 · Treo máy / Mức 6 · Cố tình treo máy (bảng điểm danh là màn thầy) / chưa có số đo treo máy. Lượt treo VẪN đếm trong `m` (4 mức) cho tới khi giao diện 6 mức bật. */
+  soTreo: number
+  soCoTinh: number
+  soChuaDoTreo: number
 }
 export type TraLoiMucLamLo = { ok: true; tu: string; den: string; em: Record<string, MucLamEmLo> } | { ok: false; error: string }
 
@@ -113,7 +119,7 @@ export function xoaDemMucLamLo(): void { dem.clear() }
 /** Tính mức làm của các em (đã lọc, đã bỏ trùng) trong `[tu, den]`. Mỗi em một dòng kết quả (em không có lượt ⇒ toàn 0). Ném lỗi nếu không đọc được sổ. */
 export async function mucLamCacEm(env: Env, sbds: readonly string[], tu: string, den: string): Promise<Map<string, MucLamEmLo>> {
   const r = await env.DB.prepare(
-    `SELECT s.sbd, s.qid, s.nguon, s.ma_nguon, s.ket_qua, s.giay, s.luc, s.muc_do,
+    `SELECT s.sbd, s.qid, s.nguon, s.ma_nguon, s.ket_qua, s.giay, s.luc, s.muc_do, s.ngay_vn,
        CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.ms') END AS ms,
        CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.tc') END AS tc,
        CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.doc') END AS doc
@@ -128,6 +134,7 @@ export async function mucLamCacEm(env: Env, sbds: readonly string[], tu: string,
     return {
       sbd: str(x.sbd),
       nguon: str(x.nguon),
+      ngay: str(x.ngay_vn),
       maNguon: str(x.ma_nguon),
       luc: str(x.luc),
       goc: tc ? tachSongSinh(tc).goc : tachSongSinh(qid).goc,
@@ -147,15 +154,16 @@ export async function mucLamCacEm(env: Env, sbds: readonly string[], tu: string,
     can.gocMuc.length ? docBetaCau(env, can.gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
     can.gocCanKichThuoc.length ? docKichThuocCau(env, can.gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
   ])
-  const theoEm = new Map<string, { mucLam?: MucLamLuot | null; dung: boolean | null }[]>(sbds.map((s) => [s, []]))
+  const theoEm = new Map<string, { mucLam?: MucLamLuot | null; dung: boolean | null; ngay: string }[]>(sbds.map((s) => [s, []]))
   dong.forEach((d, i) => {
     const gs = giaySoLuot(d, doThat[i] ?? null, uoc)
-    theoEm.get(d.sbd)?.push({ mucLam: mucLamCuaDong(d, doThat[i] ?? null, gs, beta, kichThuoc), dung: d.ketQua === null ? null : d.ketQua === 1 })
+    theoEm.get(d.sbd)?.push({ mucLam: mucLamCuaDong(d, doThat[i] ?? null, gs, beta, kichThuoc), dung: d.ketQua === null ? null : d.ketQua === 1, ngay: d.ngay ?? '' })
   })
   const ra = new Map<string, MucLamEmLo>()
   for (const [s, luot] of theoEm) {
-    const t = tongMucLam(luot)
-    ra.set(s, { soDo: t.soDo, chuaCoSoDo: t.chuaCoSoDo, m: [t.theoMuc[0].luot, t.theoMuc[1].luot, t.theoMuc[2].luot, t.theoMuc[3].luot], soUocTinh: t.soUocTinh })
+    // Mức 6 theo ngày (≥ 3 lượt treo cùng ngày) — danh sách đã là của MỘT em.
+    const t = tongMucLam(nangCoTinhTheoNgay(luot))
+    ra.set(s, { soDo: t.soDo, chuaCoSoDo: t.chuaCoSoDo, m: [t.theoMuc[0].luot, t.theoMuc[1].luot, t.theoMuc[2].luot, t.theoMuc[3].luot], soUocTinh: t.soUocTinh, soTreo: t.soTreo, soCoTinh: t.soCoTinh, soChuaDoTreo: t.soChuaDoTreo })
   }
   return ra
 }

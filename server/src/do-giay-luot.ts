@@ -20,6 +20,21 @@ export interface DoLuot {
   phan: PhanDo | null
   /** 1 = giây đến từ ĐỒNG HỒ MỚI của máy em (cụm `doGiay`: dừng khi tab ẩn / 180 giây không chạm). Vắng = suy từ `msLam` cũ (đồng hồ tường, chạy cả khi tab ẩn) hoặc không rõ. */
   dh?: 1
+  /** ĐO TREO MÁY (22/10, docs/dac-ta-muc-lam-6-muc-2210.md mục 3): vắng = máy em chưa có đồng hồ mới ⇒ "Chưa đo treo máy". */
+  treo?: DoTreo
+}
+
+/** Số đo treo máy của MỘT lượt (giây nguyên). v: mở khi tab hiện · a: mở khi tab ẩn/màn tắt · l: khoảng lặng dài nhất · n: số khoảng lặng 120–179 giây · w: 1 = màn giữ sáng suốt lượt. */
+export interface DoTreo { v: number; a: number; l: number; n: number; w: 0 | 1 }
+export const GIAY_MO_TOI_DA = 7200
+export const SO_LANG_TOI_DA = 60
+
+/** Cụm treo máy trong `doGiay`: đủ ba trường `v`, `a`, `l` hợp lệ mới nhận (thiếu ⇒ coi như chưa đo, không đoán); `n`, `w` vắng ⇒ 0. */
+function lamSachTreo(x: Record<string, unknown>): DoTreo | null {
+  const so = (k: string, tran: number): number | null => (laSo(x[k]) && x[k] >= 0 ? Math.min(tran, Math.round(x[k])) : null)
+  const v = so('v', GIAY_MO_TOI_DA), a = so('a', GIAY_MO_TOI_DA), l = so('l', GIAY_MO_TOI_DA)
+  if (v === null || a === null || l === null) return null
+  return { v, a, l: Math.min(l, v), n: so('n', SO_LANG_TOI_DA) ?? 0, w: x.w === 1 || x.w === true ? 1 : 0 }
 }
 
 const laObj = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x)
@@ -35,7 +50,8 @@ export function lamSachDo(x: unknown): DoLuot | null {
   const hinh = x.h === 1 || x.h === true ? 1 : x.h === 0 || x.h === false ? 0 : null
   const phan = x.p === 'I' || x.p === 'II' || x.p === 'III' ? x.p : null
   if (giay === null && tu === null) return null
-  return { giay, tu, hinh, phan, ...(giay !== null ? { dh: 1 as const } : {}) }
+  const treo = giay !== null ? lamSachTreo(x) : null
+  return { giay, tu, hinh, phan, ...(giay !== null ? { dh: 1 as const } : {}), ...(treo ? { treo } : {}) }
 }
 
 /**
@@ -68,7 +84,7 @@ export function docDoGiayNhieu(body: unknown): Map<string, DoLuot> {
 export function ghepDocVaoRaw(raw: unknown, d: DoLuot | null | undefined): unknown {
   if (!d || d.tu === null) return raw
   const goc = laObj(raw) ? { ...raw } : {}
-  goc.doc = { t: d.tu, ...(d.hinh !== null ? { h: d.hinh } : {}), ...(d.phan ? { p: d.phan } : {}), ...(d.dh ? { dh: 1 } : {}) }
+  goc.doc = { t: d.tu, ...(d.hinh !== null ? { h: d.hinh } : {}), ...(d.phan ? { p: d.phan } : {}), ...(d.dh ? { dh: 1 } : {}), ...(d.dh && d.treo ? d.treo : {}) }
   return goc
 }
 
