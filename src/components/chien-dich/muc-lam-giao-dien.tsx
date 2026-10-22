@@ -45,7 +45,7 @@ export function docTongMucLam(x: unknown): TongMucLam | undefined {
   })
   const soDo = so(o.soDo), chuaCoSoDo = so(o.chuaCoSoDo), saiLamVoi = so(o.saiLamVoi), saiDuNghi = so(o.saiDuNghi), dungTruocDoc = so(o.dungTruocDoc)
   if (dong.some((d) => d === null) || soDo === null || chuaCoSoDo === null || saiLamVoi === null || saiDuNghi === null || dungTruocDoc === null) return undefined
-  return { soDo, chuaCoSoDo, theoMuc: dong as TongMucLam['theoMuc'], saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat: o.coBetaThat === true, soUocTinh: Math.min(soDo, Math.max(0, so(o.soUocTinh) ?? 0)) }
+  return { soDo, chuaCoSoDo, theoMuc: dong as TongMucLam['theoMuc'], saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat: o.coBetaThat === true, soUocTinh: Math.min(soDo, Math.max(0, so(o.soUocTinh) ?? 0)), soTreo: Math.min(soDo, Math.max(0, so(o.soTreo) ?? 0)), soCoTinh: Math.min(soDo, Math.max(0, so(o.soCoTinh) ?? 0)), soChuaDoTreo: Math.min(soDo, Math.max(0, so(o.soChuaDoTreo) ?? 0)) }
 }
 
 /** Kiểm khung `mucLam` của cả kết quả lịch sử: lượt / tổng sai khung ⇒ bỏ (không bịa). Không có mức ở đâu ⇒ trả NGUYÊN đối tượng. */

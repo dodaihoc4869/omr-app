@@ -360,7 +360,8 @@ export default defineConfig({
           // CauCanChuaTrenLop, GoiLenBangScreen, html-may-chieu — đều đã ngoài precache) ⇒ cũng không cất sẵn (+42 KB đưa precache vượt trần).
           // 21/10: mảnh chung của bộ chọn em lên bảng phân tầng (chon-em-phan-tang + ung-vien-chieu + dau-gio) — CHỈ màn thầy nhập (đã soát: Dạy học,
           // Kiểm tra đầu giờ, Chữa câu, Thầy tự chữa, Gọi lên bảng, Lên bảng chiến dịch, Hôm nay) ⇒ kho chạy-lúc như hai mảnh trên.
-          '**/{ghi-to-chieu,thoi-gian-len-bang,chon-em-phan-tang,khu-trung-cau}-*.{js,css}',
+          // 22/10: nhãn nhóm ở Kiểm tra đầu giờ / Chữa câu ⇒ mảnh `ChonEm` (lõi chọn em + chip nhóm) dùng chung, tên mảnh đổi theo; mọi nơi nhập đều đã ngoài precache.
+          '**/{ghi-to-chieu,thoi-gian-len-bang,chon-em-phan-tang,khu-trung-cau,ChonEm}-*.{js,css}',
           // 22/10: nhịp máy chủ của màn thầy (Hôm nay, Theo dõi ca, Điểm danh, bảng tin sàn — chỉ chạy khi có mạng) ⇒ kho chạy-lúc, bù tệp
           // `bieu-tuong-them` mới tách (precache giữ 169/170).
           '**/nhip-may-thay-*.{js,css}',
