@@ -31,7 +31,7 @@ Trạng thái: **bản vẽ chờ thầy duyệt**. Chưa sửa `src/`, chưa s�
   - Câu này thay đoạn giải thích 3 dòng đang có.
 - **Mỗi dòng em: hai tầng.**
   - Tầng 1: giờ · **tên đủ** (không cắt; dòng hẹp thì xuống dòng) · chip nhóm/bậc (giữ nguyên) · bên phải tối đa **2 dấu hiệu**:
-    - "Cố tình treo máy · N ngày": tím đặc.
+    - "Cố tình treo máy · N lượt": tím đặc.
     - Nếu không có dấu trên thì xét "Treo máy · N lượt": tím nhạt.
     - "Sai khi làm vội · x/y": viền hồng. x/y là **lượt SAI**: x lượt sai ở Mức 1–2 trên y lượt sai có Mức làm 1–4. Đây là CÙNG số "x/y lượt sai là lúc làm vội" của hồ sơ em 14 ngày. Mức làm chỉ giải thích lượt sai; lượt đúng nộp nhanh không phải vội.
   - Tầng 2: thanh 14 ngày gồm **6 đoạn** theo số lượt.
@@ -65,44 +65,42 @@ Trạng thái: **bản vẽ chờ thầy duyệt**. Chưa sửa `src/`, chưa s�
 | Ít lượt | "Ít lượt sai có số đo (2) — chưa kết luận". Không gắn dấu "Sai khi làm vội". | — |
 | Có số ước tính | Giữ dấu "≈" như hiện nay. | Giữ như hiện nay. |
 
-## 4. Dữ liệu (CẦN BOSS CHỐT — đã nhắn Boss 22/10)
+## 4. Dữ liệu — theo lõi Boss (nhánh `claude/stoic-einstein-7jkysb` @e7e4760c, 22/10)
 
 ### 4a. Lệnh `/gv/muc-lam-lo`
-Kiểu `MucLamEmLo` (server/src/muc-lam-lo.ts; bên app đọc ở src/lib/muc-lam-lo-api.ts):
+Kiểu `MucLamEmLo` (server/src/muc-lam-lo.ts; bên app đọc ở src/lib/muc-lam-lo-api.ts).
 
-| Trường | Nghĩa |
-|---|---|
-| `m` | `[Mức 1, 2, 3, 4]` — **CHỈ lượt KHÔNG treo** |
-| `saiLamVoi`, `saiDuNghi` | Lượt SAI ở Mức 1–2 / Mức 3–4. `tongMucLam` đã tính sẵn, chỉ cần trả ra. Hai số này phải bằng `cachLam14` (test `muc-lam-lo-2110` đang ghim lô = `cachLam14`) |
-| `treo` | Số lượt Mức 5 (treo, không cố tình) |
-| `coTinh` | Số lượt Mức 6 |
-| `ngayCoTinh` | Số NGÀY trong 14 ngày có Mức 6. Mức 6 định nghĩa theo ngày nên chip ghi "N ngày" |
-| `chuaDoTreo` | Số lượt trong `m` thiếu trường `v/a/l` |
-| `soDo` | `= Σm + treo + coTinh` |
+**Đã có trên nhánh Boss:** `soTreo`, `soCoTinh`, `soChuaDoTreo` cho mỗi em.
 
-- Bộ đọc `docMucLamEm` đổi trong **cùng lượt phát hành**. Hiện nay bộ đọc bỏ hẳn em nào có Σm ≠ soDo. Nếu máy chủ gửi khuôn mới mà app chưa đổi thì cả dòng em mất thanh.
-- Bản app cũ đọc khuôn mới: các trường thêm bị bỏ qua, còn Σm ≠ soDo ⇒ em hiện "không có số". Lỗi này chỉ hỏng phần hiển thị, không sai số.
-- **Lệnh phải trả cho đủ em có mặt (≤ 40), không chỉ 6 em đang hiện**, vì dòng tổng và nút lọc cần số của cả lớp.
-  - Chi phí: xem mục 6.
+**Bật khi build giao diện 6 mức:** gọi `tongMucLam(luot, { tachTreo: true })`. Khi đó `m` = Mức 1–4 CHỈ của lượt không treo, và `soDo = Σm + soTreo + soCoTinh`.
+- Bộ đọc `docMucLamEm` đổi trong **cùng lượt phát hành**. Hiện nay nó bỏ em nào có Σm ≠ soDo.
+- Nếu máy chủ bật `tachTreo` trước khi app đổi bộ đọc, thanh của em có lượt treo sẽ mất (chỉ hỏng phần hiện, không sai số).
 
-### 4b. `MucLamLuot` và `TongMucLam` (lõi Boss)
-- `MucLamLuot` thêm `treo?: 'treo' | 'co_tinh'` và **`phutTreo?: number`**.
-  - `phutTreo` = làm tròn của max(`l`, `a`) / 60, dùng cho thẻ "12 phút" trên tờ chiếu.
-- `TongMucLam` thêm `soTreo`, `soCoTinh` và **`chuaDoTreo`**.
-  - Không có `chuaDoTreo` thì không màn nào nói được "Chưa đo treo máy".
+**CÒN XIN THÊM:** `saiLamVoi`, `saiDuNghi` mỗi em. `tongMucLam` đã tính sẵn, chỉ cần trả ra.
+- Chip «Sai khi làm vội» tính trên lượt sai, cùng số với «Cách làm bài 14 ngày» (`cachLam14`).
+- Test `muc-lam-lo-2110` ghim lô = `cachLam14`, nên phải cập nhật cùng lượt.
 
-### 4c. Hạ Mức 6 trước khi lên tờ chiếu
-- Hạ ở **app**, tại chỗ dựng tin `AI_SAI_TRA` (`src/components/chien-dich/ghi-to-chieu.ts`): `co_tinh` ⇒ `treo`, và bỏ mọi trường chỉ dành cho thầy.
-- **Đường thứ hai lên máy chiếu:** bấm thẻ tên trên tờ ⇒ tin `HO_SO_TRA` mang hồ sơ em, trong đó có "Cách làm bài 14 ngày" (`cachLam14`). Khi `TongMucLam` có `soCoTinh`, phải hạ cả ở đây: cộng vào `soTreo`, bỏ `soCoTinh`. Cùng hàm hạ, cùng tệp `ghi-to-chieu.ts`.
-- Tin gửi vào iframe và HTML tờ chiếu **không chứa** chữ "Cố tình", `co_tinh`, `coTinh` hay `soCoTinh` (có test, mục 7).
+**Bỏ `ngayCoTinh`.** Chip ghi «Cố tình treo máy · N lượt» (số lượt Mức 6, `soCoTinh`).
+
+**Lô hỏi MỌI em có mặt (≤ 40), không chỉ 6 em đang hiện.** Dòng tổng và nút lọc cần số của cả lớp (chi phí: mục 6).
+
+### 4b. `MucLamLuot` và `TongMucLam` (đã có trên nhánh Boss)
+- `MucLamLuot.treo?: 'treo' | 'co_tinh'` · `giayTreo?` · `chuaDoTreo?: true`.
+  - Thẻ trên tờ chiếu ghi số phút = làm tròn `giayTreo / 60`, tối thiểu 1.
+- `TongMucLam.soTreo` · `soCoTinh` · `soChuaDoTreo`.
+
+### 4c. Mức 6 không lên máy chiếu
+- **Máy chủ đã hạ Mức 6 về Mức 5** cho tờ «Ai đã sai?» và hồ sơ em lên bảng (công khai).
+- App vẫn hạ thêm một lần ở `src/components/chien-dich/ghi-to-chieu.ts` (tin `AI_SAI_TRA` và `HO_SO_TRA`): `co_tinh` ⇒ `treo`, `soCoTinh` cộng vào `soTreo`. Lớp này để phòng máy chủ cũ.
+- Tin gửi vào iframe và HTML tờ chiếu **không chứa** «Cố tình», `co_tinh`, `coTinh` hay `soCoTinh` (có test, mục 7).
 
 ### 4d. Dấu hiệu từng dòng — hàm thuần, ngưỡng TẠM
-Đặt ở `src/lib/muc-lam-lo-api.ts`, tên `dauHieuEm`. Trả tối đa 2 dấu. Bộ lọc dùng hàm riêng `coDauHieu` (lọc "Treo máy" = `treo + coTinh ≥ 1`).
+Đặt ở `src/lib/muc-lam-lo-api.ts`, tên `dauHieuEm`. Trả tối đa 2 dấu. Bộ lọc dùng hàm riêng `coDauHieu` (lọc "Treo máy" = `soTreo + soCoTinh ≥ 1`).
 
 | Dấu | Điều kiện |
 |---|---|
-| "Cố tình treo máy · N ngày" | `coTinh > 0` |
-| "Treo máy · N lượt" | (không có dấu trên) và `treo + coTinh ≥ 2`. Một lượt treo có thể chỉ là em nghe điện thoại, nên chỉ hiện ở dòng số. |
+| "Cố tình treo máy · N lượt" | `soCoTinh > 0` |
+| "Treo máy · N lượt" | (không có dấu trên) và `soTreo + soCoTinh ≥ 2`. Một lượt treo có thể chỉ là em nghe điện thoại, nên chỉ hiện ở dòng số. |
 | "Sai khi làm vội · x/y" | `saiLamVoi + saiDuNghi` ≥ **5** lượt sai và `saiLamVoi` / (`saiLamVoi + saiDuNghi`) ≥ **50%** |
 
 ## 5. Ngoại lệ và việc cần thầy quyết
@@ -131,7 +129,7 @@ Kiểu `MucLamEmLo` (server/src/muc-lam-lo.ts; bên app đọc ở src/lib/muc-l
     - Bộ đọc nhận khuôn mới.
     - Σm + treo + coTinh = soDo.
     - Thiếu trường mới ⇒ đọc như cũ, không mất em.
-    - `dauHieuEm` đúng ngưỡng: tính trên lượt SAI (lượt đúng ở Mức 1 không làm thành vội); 4 vs 5 lượt sai; treo 1 vs 2; cố tình theo ngày.
+    - `dauHieuEm` đúng ngưỡng: tính trên lượt SAI (lượt đúng ở Mức 1 không làm thành vội); 4 vs 5 lượt sai; treo 1 vs 2; cố tình có lượt.
     - Số `saiLamVoi/saiDuNghi` của lô = `cachLam14` của cùng em, cùng ngày.
   - `tests/diem-danh-6-muc-2210.test.tsx`:
     - Đủ tên em ở khổ 1440, không bị ép về 0.

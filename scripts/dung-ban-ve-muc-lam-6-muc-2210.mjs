@@ -29,7 +29,7 @@ const NGAY_DO_TREO = '23/10'
 function dauHieu(d) {
   if (!d || d.soDo === 0) return []
   const ra = []
-  if (d.coTinh > 0) ra.push({ k: 'co-tinh', chu: `Cố tình treo máy · ${d.ngayCoTinh} ngày` })
+  if (d.coTinh > 0) ra.push({ k: 'co-tinh', chu: `Cố tình treo máy · ${d.coTinh} lượt` })
   else if (d.treo >= TREO_GAN_CHIP) ra.push({ k: 'treo', chu: `Treo máy · ${d.treo} lượt` })
   const sai = d.saiVoi + d.saiNghi
   if (sai >= MAU_TOI_THIEU && d.saiVoi / sai >= TI_LE_VOI) ra.push({ k: 'voi', chu: `Sai khi làm vội · ${d.saiVoi}/${sai}` })
