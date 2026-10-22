@@ -32,7 +32,7 @@ import { docBetaCau } from './omni-d1'
 import { tachSongSinh } from './loi-hoc-luat'
 import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong } from './muc-lam-so'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
-import { tongMucLam } from './muc-lam'
+import { mucCongKhai, tongCongKhai, tongMucLam } from './muc-lam'
 
 /** Tiến độ EXP trong cấp hiện tại từ JSON hồ sơ game (`game_v2_profile.json`). Chưa chọn thú / JSON hỏng ⇒ null. */
 export function tienDoCapTuHoSo(json: unknown): { cap: number; exp: number; moc: number | null; toiDa: boolean } | null {
@@ -197,7 +197,8 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
         (nguon === 'game' ? traLoi.get(str(x.attempt_id) || `${str(x.ma_nguon)}|${qid}`) || null : null) ??
         (nguon === 'thi' ? chonCa.get(str(x.ma_nguon)) || null : null)
       // Mức làm 1–4 (thầy 21/10): chỉ lượt có giây ĐO THẬT bằng đồng hồ mới; hiện ĐỦ trên tờ chiếu (kể cả lượt đúng) — vắng ⇒ "chưa có số đo".
-      const muc = mucLamTuDong(dongCu(dongMuc[i]!), beta, kichThuoc)
+      // Tờ chiếu trước cả lớp ⇒ bản CÔNG KHAI (Mức 6 hạ về Mức 5).
+      const muc = mucCongKhai(mucLamTuDong(dongCu(dongMuc[i]!), beta, kichThuoc))
       return {
         luc: str(x.luc),
         dung: num(x.ket_qua) === 1,
@@ -244,7 +245,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
   let cachLam14: ReturnType<typeof tongMucLam> | null = null
   if (r14Muc && r14Tong && r14Muc.length < TOI_DA_LUOT_14) {
     const co = dong14.map((d) => ({ mucLam: mucLamTuDong(dongCu(d), beta, kichThuoc), dung: d.dung as boolean | null })).filter((d) => d.mucLam)
-    const t = tongMucLam(co)
+    const t = tongCongKhai(tongMucLam(co))
     cachLam14 = { ...t, chuaCoSoDo: Math.max(0, num(r14Tong[0]?.n) - t.soDo) }
   }
 

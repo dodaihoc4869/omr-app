@@ -1,6 +1,6 @@
 # Đặc tả Mức làm 6 mức — thêm "Treo máy" và "Cố tình treo máy", đo lại cho chính xác — 22/10/2026
 
-Trạng thái: **ĐỢT 1 (đo) đang làm, chưa đổi giao diện. ĐỢT 2 (giao diện 6 mức) CHỜ THẦY DUYỆT ẢNH.** Tiếp nối `docs/dac-ta-muc-lam-bai-2010.md` (Mức làm 1–4, mục 3–4 giữ nguyên).
+Trạng thái: **LÕI đã xong (`server/src/muc-lam.ts`: `treoCuaLuot`, `nangCoTinhTheoNgay`, `mucCongKhai`, `tongMucLam(…, {tachTreo})`; test `tests/muc-lam-6-muc-2210.test.ts`). ĐỢT 1 (đồng hồ ở máy em) đang làm, chưa đổi giao diện. ĐỢT 2 (giao diện 6 mức) CHỜ THẦY DUYỆT ẢNH.** Tiếp nối `docs/dac-ta-muc-lam-bai-2010.md` (Mức làm 1–4, mục 3–4 giữ nguyên).
 
 ## 1. Thầy yêu cầu (22/10)
 "Xem bảng điểm danh hiện tại như thế nào, phần đánh giá mức 1 chưa đọc xong đề đến mức 4 (tôi muốn bạn thêm 2 mức nữa là treo máy, cố tình treo máy) bạn dùng trí thông minh của mình tối ưu lại phần đo này cho chính xác và hiệu quả nhất, giao diện hồ sơ của học sinh … chia việc tối ưu cả giao diện cho đầy đủ trực quan dễ nhìn thân thiện hơn nữa, giao cho mỗi code làm 1 phần."
@@ -32,7 +32,7 @@ Mức làm 1–4 GIỮ NGUYÊN công thức. Hai mức mới **đè lên** mức
 | Mức | Điều kiện | Chữ cho thầy |
 |---|---|---|
 | **Mức làm 5 · Treo máy** (một lượt) | khoảng lặng dài nhất `l` ≥ **300 giây** (5 phút không chạm khi màn đang sáng); HOẶC rời app `a` ≥ **180 giây** khi màn được giữ sáng (`w = 1`); HOẶC `a` ≥ **600 giây** khi không giữ được màn sáng | Treo máy |
-| **Mức làm 6 · Cố tình treo máy** (mẫu lặp) | trong CÙNG một ngày của em: ≥ **3 lượt** Mức làm 5; HOẶC một lượt có `n` ≥ **3** (ba lần lặng 2–3 phút rồi chạm đúng trước ngưỡng cắt — chạm giữ cho đồng hồ chạy); HOẶC ≥ **2 lượt** Mức làm 5 mà sau khi quay lại em nộp trong < T_đọc và sai | Cố tình treo máy |
+| **Mức làm 6 · Cố tình treo máy** (mẫu lặp) | trong CÙNG một ngày của em: ≥ **3 lượt** Mức làm 5; HOẶC một lượt có `n` ≥ **3** (ba lần lặng 2–3 phút rồi chạm đúng trước ngưỡng cắt — chạm giữ cho đồng hồ chạy). (Bỏ luật "quay lại rồi nộp vội": đồng hồ không đo được lúc em quay lại ⇒ không kết luận.) Luật theo ngày chỉ áp ở danh sách lượt của MỘT em (hồ sơ, lịch sử, điểm danh); "Ai đã sai?" chỉ có luật một lượt | Cố tình treo máy |
 
 Vì sao 300 giây: dài hơn tính nháp Phần III hợp lý (đo trên lượt thật sẽ chỉnh); thấp hơn thì em tính nháp chăm chỉ bị gọi oan.
 

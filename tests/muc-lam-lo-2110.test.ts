@@ -79,6 +79,10 @@ async function cachLam14(env: Env, sbd: string, qid: string): Promise<MucLamEm14
 }
 type MucLamEm14 = MucLamEmLo
 
+
+/** Bốn khoá Mức làm 1–4 (khuôn cũ). Khoá treo máy 22/10 (`soTreo`/`soCoTinh`/`soChuaDoTreo`) kiểm riêng ở test cuối. */
+const bon = (x: { soDo: number; chuaCoSoDo: number; m: number[]; soUocTinh: number } | undefined) => x && { soDo: x.soDo, chuaCoSoDo: x.chuaCoSoDo, m: x.m, soUocTinh: x.soUocTinh }
+
 describe('mức làm theo lô em (bảng điểm danh)', () => {
   it('CÙNG SỐ với «Cách làm bài 14 ngày» của tờ chiếu (chi tiết em lên bảng) — kể cả khi em có lượt BỎ TRỐNG có giây (cả hai KHÔNG đếm)', async () => {
     const d = dungDuLieu()
@@ -87,9 +91,9 @@ describe('mức làm theo lô em (bảng điểm danh)', () => {
     const kq = await gvMucLamLo(env, { sbds: ['S1', 'S2'] }, BAY_GIO)
     expect(kq.ok).toBe(true)
     if (!kq.ok) return
-    expect(kq.em.S1).toEqual(await cachLam14(env, 'S1', 'V-I-1'))
-    expect(kq.em.S2).toEqual(await cachLam14(env, 'S2', 'V-I-3'))
-    expect(kq.em.S1).toEqual({ soDo: 6, chuaCoSoDo: 3, m: [3, 1, 1, 1], soUocTinh: 1 }) // lượt bỏ trống không làm đổi số
+    expect(bon(kq.em.S1)).toEqual(await cachLam14(env, 'S1', 'V-I-1'))
+    expect(bon(kq.em.S2)).toEqual(await cachLam14(env, 'S2', 'V-I-3'))
+    expect(bon(kq.em.S1)).toEqual({ soDo: 6, chuaCoSoDo: 3, m: [3, 1, 1, 1], soUocTinh: 1 }) // lượt bỏ trống không làm đổi số
   })
 
   it('CÙNG HÀM MỨC LÀM với Hồ sơ làm bài: em không có lượt bỏ trống ⇒ số của lô = số tính từ `lichSuLamCauCuaEm` trong cùng cửa sổ (kể cả lượt ≈ giây cũ, ca thi, lượt bị loại)', async () => {
@@ -100,10 +104,10 @@ describe('mức làm theo lô em (bảng điểm danh)', () => {
     if (!kq.ok) return
     expect(kq.den).toBe('2026-10-21')
     expect(kq.tu).toBe('2026-10-08') // 14 ngày: 08/10 → 21/10
-    for (const s of ['S1', 'S2']) expect(kq.em[s], s).toEqual(await soTuHoSo(env, s, kq.tu, kq.den))
+    for (const s of ['S1', 'S2']) expect(bon(kq.em[s]), s).toEqual(await soTuHoSo(env, s, kq.tu, kq.den))
     // Chốt cả số cụ thể (không chỉ khớp nhau): S1 có Mức 1 ×3 (gồm 1 lượt ≈), 2 ×1, 3 ×1, 4 ×1; 3 lượt chưa có số đo (không giây · không kích thước · ca thi)
-    expect(kq.em.S1).toEqual({ soDo: 6, chuaCoSoDo: 3, m: [3, 1, 1, 1], soUocTinh: 1 })
-    expect(kq.em.S2).toEqual({ soDo: 2, chuaCoSoDo: 0, m: [0, 1, 1, 0], soUocTinh: 0 })
+    expect(bon(kq.em.S1)).toEqual({ soDo: 6, chuaCoSoDo: 3, m: [3, 1, 1, 1], soUocTinh: 1 })
+    expect(bon(kq.em.S2)).toEqual({ soDo: 2, chuaCoSoDo: 0, m: [0, 1, 1, 0], soUocTinh: 0 })
   })
 
   it('em không có lượt trong cửa sổ ⇒ toàn 0 (vẫn có mặt trong kết quả); `den` quá hạn / sai ⇒ về hôm nay; trùng SBD gộp một', async () => {
@@ -112,11 +116,13 @@ describe('mức làm theo lô em (bảng điểm danh)', () => {
     const env = d.env as unknown as Env
     const a = await gvMucLamLo(env, { sbds: ['S3', 'S3', ' ', 'S1'], den: '2099-01-01' }, BAY_GIO)
     expect(a.ok && a.den).toBe('2026-10-21')
-    expect(a.ok && a.em.S3).toEqual({ soDo: 0, chuaCoSoDo: 0, m: [0, 0, 0, 0], soUocTinh: 0 })
+    expect(bon(a.ok ? a.em.S3 : undefined)).toEqual({ soDo: 0, chuaCoSoDo: 0, m: [0, 0, 0, 0], soUocTinh: 0 })
     // cửa sổ lùi về 10/10 (tới 10/10 chỉ còn lượt 01/10 ngoài khung ⇒ S1 rỗng)
     const b = await gvMucLamLo(env, { sbds: ['S1'], den: '2026-10-10' }, BAY_GIO)
     expect(b.ok && b.tu).toBe('2026-09-27')
-    expect(b.ok && b.em.S1).toEqual({ soDo: 1, chuaCoSoDo: 0, m: [1, 0, 0, 0], soUocTinh: 0 })
+    expect(bon(b.ok ? b.em.S1 : undefined)).toEqual({ soDo: 1, chuaCoSoDo: 0, m: [1, 0, 0, 0], soUocTinh: 0 })
+    // Treo máy (22/10): dữ liệu mẫu chưa có số đo treo ⇒ 0 treo, mọi lượt có mức đều "chưa đo treo máy"
+    expect(b.ok && [b.em.S1!.soTreo, b.em.S1!.soCoTinh, b.em.S1!.soChuaDoTreo]).toEqual([0, 0, 1])
   })
 
   it('thiếu danh sách em ⇒ lỗi nói thật; quá 40 em ⇒ chỉ lấy 40 đầu', async () => {
