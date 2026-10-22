@@ -1,4 +1,11 @@
-@import "tailwindcss";
+/* Chỉ quét lớp trong src/ + index.html (22/10): trước Tailwind quét cả repo —
+ * .dist-old-*, docs, tests, sổ việc — sinh ~430 lớp không màn nào dùng
+ * (≈ 45 KB CSS mọi app phải tải). Lớp ghép động không có trong src. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../index.html";
+/* Bảo hiểm cho HTML đến dạng dữ liệu (đề/lời giải từ kho): lớp định dạng chữ. */
+@source inline("line-through lowercase text-wrap whitespace-normal");
 
 :root {
   color-scheme: light dark;

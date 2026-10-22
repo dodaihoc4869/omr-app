@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
@@ -150,6 +150,40 @@ function giuGoiVuaDung(): Plugin {
   return { name: 'giu-goi-vua-dung', apply: 'build', enforce: 'pre', generateBundle: { order: 'pre', handler(_o, goi) { goiVuaDung = goi as unknown as typeof goiVuaDung; dongTinh.clear(); luonCoCache = null } } }
 }
 
+// BIỂU TƯỢNG HAI NHÓM (22/10, "tức thì"): trước MỌI biểu tượng lucide (≈ 143 cái, 23 KB nén) gom một mảnh mà mọi đường phải tải — kể cả màn đăng
+// nhập học sinh chỉ dùng vài cái. Nay nhóm `bieu-tuong` chỉ giữ biểu tượng mà vỏ + cổng học sinh nạp TĨNH (tính lúc dựng từ đồ thị mô-đun thật:
+// đi từ main / AppHocSinh / StudentPortalScreen qua lệnh import tĩnh trong src, đọc tên biểu tượng ở `import { … } from 'lucide-react'`, tra tệp
+// qua barrel của lucide — không ghi tay danh sách). Biểu tượng còn lại vào `bieu-tuong-them` (app thầy / màn nạp sau) — vẫn precache như cũ.
+const BIEU_TUONG_VO = new Set<string>()
+const chuanId = (id: string) => id.split('?')[0]!.split('\\').join('/')
+function bieuTuongVo(): Plugin {
+  return {
+    name: 'bieu-tuong-vo',
+    apply: 'build',
+    buildEnd() {
+      BIEU_TUONG_VO.clear()
+      const ten = new Set<string>()
+      const goc = [...this.getModuleIds()].filter((id) => /\/src\/(?:main|AppHocSinh|screens\/StudentPortalScreen)\.tsx$/.test(chuanId(id)))
+      const da = new Set<string>(), hang = [...goc]
+      while (hang.length) {
+        const id = hang.pop()!
+        const c = chuanId(id)
+        if (da.has(c) || !c.includes('/src/') || c.includes('/node_modules/')) continue
+        da.add(c)
+        try {
+          for (const m of readFileSync(c, 'utf8').matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]lucide-react['"]/g))
+            for (const x of m[1]!.split(',')) { const t = x.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0]!.trim(); if (t) ten.add(t) }
+        } catch { /* mô-đun ảo */ }
+        for (const con of this.getModuleInfo(id)?.importedIds ?? []) hang.push(con)
+      }
+      const barrel = resolve(__dirname, 'node_modules/lucide-react/dist/esm/lucide-react.mjs')
+      for (const m of readFileSync(barrel, 'utf8').matchAll(/export \{([^}]*)\} from '\.\/icons\/([\w-]+)\.mjs'/g))
+        if ([...m[1]!.matchAll(/default as (\w+)/g)].some((x) => ten.has(x[1]!))) BIEU_TUONG_VO.add(`/lucide-react/dist/esm/icons/${m[2]}.mjs`)
+    },
+  }
+}
+const laBieuTuongVo = (id: string) => { const c = chuanId(id); const i = c.indexOf('/lucide-react/'); return i >= 0 && (!c.includes('/esm/icons/') || BIEU_TUONG_VO.has(c.slice(i))) }
+
 export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? REPO_BASE : '/',
   define: {
@@ -161,6 +195,7 @@ export default defineConfig({
     react(),
     napTruocManEm(),
     giuGoiVuaDung(),
+    bieuTuongVo(),
     boGhiChuHtml(),
     VitePWA({
       // SERVICE WORKER VIẾT TAY (`src/sw.ts`), KHÔNG dùng bản tự sinh nữa.
@@ -324,6 +359,9 @@ export default defineConfig({
           // 21/10: mảnh chung của bộ chọn em lên bảng phân tầng (chon-em-phan-tang + ung-vien-chieu + dau-gio) — CHỈ màn thầy nhập (đã soát: Dạy học,
           // Kiểm tra đầu giờ, Chữa câu, Thầy tự chữa, Gọi lên bảng, Lên bảng chiến dịch, Hôm nay) ⇒ kho chạy-lúc như hai mảnh trên.
           '**/{ghi-to-chieu,thoi-gian-len-bang,chon-em-phan-tang,khu-trung-cau}-*.{js,css}',
+          // 22/10: nhịp máy chủ của màn thầy (Hôm nay, Theo dõi ca, Điểm danh, bảng tin sàn — chỉ chạy khi có mạng) ⇒ kho chạy-lúc, bù tệp
+          // `bieu-tuong-them` mới tách (precache giữ 169/170).
+          '**/nhip-may-thay-*.{js,css}',
           // Bản vẽ tối giản app thầy (09/10): màn "Hôm nay" của thầy + hai thẻ ghép màn sẵn có của Hành trình (Cần thầy chữa, Bài đã dạy) nạp LƯỜI.
           // Các thẻ ấy nhập động Dạy học / Kiểm tra đầu giờ / Bước cuối trên lớp (trước nằm trong mảnh Gọi lên bảng) ⇒ Rollup tách thành mảnh riêng,
           // kèm `TheCauHienThi` (chỉ hai màn ấy dùng), `gv-v2` (khung + phép tính nhịp của Hành trình/Hôm nay), `HopChonDe` + `cay-chon-de` (hộp chọn
@@ -438,7 +476,8 @@ export default defineConfig({
           // giành mô-đun trước nhóm `bieu-tuong` (nhóm đó kéo theo phụ thuộc — trước đây kéo luôn `react` vào). index.html vẫn nạp tĩnh (modulepreload).
           groups: [
             { name: 'react', test: /node_modules[\\/](?:react|react-dom|scheduler)[\\/]/ },
-            { name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/ },
+            { name: 'bieu-tuong', test: (id: string) => laBieuTuongVo(id) || /src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/.test(id) },
+            { name: 'bieu-tuong-them', test: /node_modules[\\/]lucide-react[\\/]/ },
             // fflate (nạp động trong day-ca-may-chu-moi.ts) — đặt tên mảnh rõ để globIgnores ở trên bắt đúng nó (tên tự sinh là `browser-*`, quá chung).
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
             // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng
