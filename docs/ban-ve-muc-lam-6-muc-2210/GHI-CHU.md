@@ -22,7 +22,7 @@
 
 | Khung | Tệp | Lúc nào |
 |---|---|---|
-| 11 | `anh/11-ai-sai-co-treo-may-*` | Có làn "Treo máy". Dữ liệu giả có 2 lượt cố tình: trên tờ cả hai hiện là "Treo máy" |
+| 11 | `anh/11-ai-sai-co-treo-may-*` | Có làn "Treo máy". Trên tờ chiếu mọi lượt treo đều hiện là "Treo máy", máy chủ đã hạ Mức 6 trước khi gửi. Hai lượt đánh dấu cố tình trong dữ liệu giả chỉ để thử phép hạ; theo lõi 71520b89, một lượt đơn lẻ không bao giờ là Mức 6 |
 | 12 | `anh/12-ai-sai-ca-lop-dong-*` | Lớp đông (27 em sai, khoảng 40 lượt). Tờ tự chọn số cột thẻ tên. Khổ 1024 hiện một thẻ, phím L để chuyển thẻ |
 | 13 | `anh/13-ai-sai-chua-do-treo-*` | Tuần đầu: làn Treo máy nét đứt, ghi "Chưa đo" |
 

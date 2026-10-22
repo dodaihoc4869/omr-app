@@ -70,7 +70,7 @@ Trạng thái: **bản vẽ chờ thầy duyệt**. Chưa sửa `src/`, chưa s�
 | Ít lượt | Ô "Sai vì vội" ghi "—" và "ít lượt sai (2)". Không tô, không vào bộ lọc. | — |
 | Có số ước tính | Giữ dấu "≈" như hiện nay. | Giữ như hiện nay. |
 
-## 4. Dữ liệu — theo lõi Boss (nhánh `claude/stoic-einstein-7jkysb` @e7e4760c, 22/10)
+## 4. Dữ liệu — theo lõi Boss (nhánh `claude/stoic-einstein-7jkysb` @e7e4760c, sửa 71520b89, 22/10)
 
 ### 4a. Lệnh `/gv/muc-lam-lo`
 Kiểu `MucLamEmLo` (server/src/muc-lam-lo.ts; bên app đọc ở src/lib/muc-lam-lo-api.ts).
@@ -90,7 +90,7 @@ Kiểu `MucLamEmLo` (server/src/muc-lam-lo.ts; bên app đọc ở src/lib/muc-l
 **Lô hỏi MỌI em có mặt (≤ 40), không chỉ 6 em đang hiện.** Dòng tổng và nút lọc cần số của cả lớp (chi phí: mục 6).
 
 ### 4b. `MucLamLuot` và `TongMucLam` (đã có trên nhánh Boss)
-- `MucLamLuot.treo?: 'treo' | 'co_tinh'` · `giayTreo?` · `chuaDoTreo?: true`.
+- `MucLamLuot.treo?: 'treo' | 'co_tinh'` · `giayTreo?` · `daDoTreo?: true` (lõi 71520b89: lượt đã đo mà không treo). Vắng cả `treo` lẫn `daDoTreo` ⇒ «Chưa đo treo máy». Mức 6 `co_tinh` CHỈ khi có ≥ 3 lượt treo trong cùng một ngày; một lượt treo đơn lẻ không bao giờ là Mức 6.
   - Thẻ trên tờ chiếu ghi số phút = làm tròn `giayTreo / 60`, tối thiểu 1.
 - `TongMucLam.soTreo` · `soCoTinh` · `soChuaDoTreo`.
 
