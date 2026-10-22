@@ -95,7 +95,9 @@ export async function aiSaiQuaMayChu(qids: readonly string[], sbdLop?: readonly 
     const j = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; ds?: LuotSaiToChieu[]; conNua?: boolean }
     if (!(j.ok === true && Array.isArray(j.ds))) return { ok: false, chu: j.error || 'Không đọc được danh sách làm sai.' }
     const lop = sbdLop?.length ? new Set(sbdLop) : null
-    return { ok: true, ds: lop ? j.ds.filter((x) => lop.has(x.sbd)) : j.ds, conNua: j.conNua === true }
+    // 6 mức (thầy duyệt 22/10): tờ chiếu là màn công khai ⇒ Mức 6 «Cố tình treo máy» hạ về «Treo máy» (máy chủ đã hạ; lớp phòng máy chủ cũ).
+    const ds = (lop ? j.ds.filter((x) => lop.has(x.sbd)) : j.ds).map((x) => (x.mucLam?.treo === 'co_tinh' ? { ...x, mucLam: { ...x.mucLam, treo: 'treo' as const } } : x))
+    return { ok: true, ds, conNua: j.conNua === true }
   } catch {
     return { ok: false, chu: 'Không nối được máy chủ.' }
   }

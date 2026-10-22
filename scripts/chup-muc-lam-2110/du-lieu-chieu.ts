@@ -6,7 +6,15 @@ type L = { sbd: string; ten: string; luc: string; noi: string; giay: number | nu
 export type KichBan = 'thuong' | 'dong' | 'ngay-dau' | 'chua-diem-danh'
 
 const SO_TU = 46
-const mucCua = (giay: number, dung: boolean, thuong: number | null) => mucLamCuaLuot({ giay, soTu: SO_TU, coHinh: false, phan: 'I', dung, thuongGiay: thuong })!
+// 6 mức (22/10): `treo` = số đo treo máy của lượt (v · a · l · n · w); vắng ⇒ "chưa đo treo máy" (lượt cũ / những ngày đầu).
+type DoTreoGia = { v: number; a: number; l: number; n: number; w: 0 | 1 }
+const mucCua = (giay: number, dung: boolean, thuong: number | null, treo?: DoTreoGia) => mucLamCuaLuot({ giay, soTu: SO_TU, coHinh: false, phan: 'I', dung, thuongGiay: thuong, ...(treo ? { treo } : {}) })!
+/** Lượt treo GIẢ (tên · thứ tự lượt ⇒ khoảng lặng dài nhất, giây). Lượt khác đã đo mà không treo. */
+const TREO_GIA: Record<string, number> = { 'Tô Gia Hân|0': 420, 'Trần Bảo Châu|0': 720, 'Đặng Thu Trang|0': 540, 'Phan Diệp Chi|0': 900 }
+const doTreo = (ten: string, k: number, giay: number, dong: boolean): DoTreoGia => {
+  const l = TREO_GIA[`${ten}|${k}`] ?? (dong && (ten.length + k * 3) % 9 === 0 ? 360 + ((ten.length * 37) % 600) : Math.min(giay, 25))
+  return { v: giay + l, a: 0, l, n: 0, w: 1 }
+}
 
 // [tên, có mặt, [giây, nơi, ngày, giờ, cũ?, ước?]…]; "cũ" = đồng hồ cũ ⇒ chưa có số đo
 type Em = [string, boolean, [number, string, string, string, number?, number?][]]
@@ -57,7 +65,7 @@ export function luotSaiGia(kb: KichBan): { ds: L[]; lop: { soLop: number; soCoMa
     const sbd = `S${i + 1}`
     ls.forEach(([giay, noi, ngay, gio, cu, uoc], k) => {
       const choCu = kb === 'ngay-dau' ? !(k === 0 && ['Phạm Quốc Huy', 'Lê Thu Hà', 'Bùi Tuấn Kiệt'].includes(ten)) : !!cu
-      ds.push({ sbd, ten, luc: isoTu(ngay, gio), noi, giay, ...(uoc ? { uocTinh: true } : {}), ...(choCu ? {} : { mucLam: mucCua(giay, false, thuong) }) })
+      ds.push({ sbd, ten, luc: isoTu(ngay, gio), noi, giay, ...(uoc ? { uocTinh: true } : {}), ...(choCu ? {} : { mucLam: mucCua(giay, false, thuong, kb === 'ngay-dau' ? undefined : doTreo(ten, k, giay, kb === 'dong')) }) })
     })
   })
   ds.sort((a, b) => (a.luc < b.luc ? 1 : -1))

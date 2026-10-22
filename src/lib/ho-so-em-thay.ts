@@ -171,5 +171,20 @@ export async function layThongKeLopCau(sbd: string[], qid: string[]): Promise<Re
 /** HỒ SƠ EM CHO TỜ CHIẾU (bản vẽ Lên bảng 28/09): `/gv/ho-so-len-bang {sbd, qid}` — lệnh thầy CHỈ ĐỌC. Lỗi / chưa có ⇒ `null`
  * (tờ chiếu hiện "chưa lấy được số liệu", không bịa). `qid` là mã câu của MÁY CHỦ (`qidMayChuCuaIdCau`). */
 export async function layHoSoLenBang(sbd: string, qid: string): Promise<Record<string, unknown> | null> {
-  return goi('/gv/ho-so-len-bang', { sbd, qid }, true)
+  const hs = await goi('/gv/ho-so-len-bang', { sbd, qid }, true)
+  return hs ? haCoTinhHoSo(hs) : hs
+}
+
+/** 6 MỨC (thầy duyệt 22/10): hồ sơ này lên TỜ CHIẾU (màn công khai) ⇒ Mức 6 «Cố tình treo máy» hạ về Mức 5 «Treo máy» — từng lần làm (`cauNay.lan[].mucLam`)
+ *  và tổng 14 ngày (`cachLam14`: soCoTinh cộng vào soTreo). Máy chủ đã hạ (`mucCongKhai`/`tongCongKhai`); đây là lớp phòng máy chủ cũ. Thuần, không sửa đầu vào. */
+export function haCoTinhHoSo(hs: Record<string, unknown>): Record<string, unknown> {
+  const dt = (x: unknown): Record<string, unknown> | null => (x && typeof x === 'object' && !Array.isArray(x) ? (x as Record<string, unknown>) : null)
+  const ha = (m: unknown) => { const o = dt(m); return o && o.treo === 'co_tinh' ? { ...o, treo: 'treo' } : m }
+  let ra = hs
+  const cau = dt(hs.cauNay)
+  if (cau && Array.isArray(cau.lan) && cau.lan.some((l) => dt(dt(l)?.mucLam)?.treo === 'co_tinh'))
+    ra = { ...ra, cauNay: { ...cau, lan: cau.lan.map((l) => { const o = dt(l); return o && o.mucLam ? { ...o, mucLam: ha(o.mucLam) } : l }) } }
+  const c = dt(hs.cachLam14)
+  if (c && typeof c.soCoTinh === 'number' && c.soCoTinh > 0) ra = { ...ra, cachLam14: { ...c, soTreo: (typeof c.soTreo === 'number' ? c.soTreo : 0) + c.soCoTinh, soCoTinh: 0 } }
+  return ra
 }
