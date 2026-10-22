@@ -25,7 +25,8 @@ async function mo(tuy: TuyChonGia, cheDo: 'thay' | 'hoc-sinh' | 'phu-huynh') {
   await waitFor(() => expect(tam.querySelector('.hslc-cl')).not.toBeNull())
   return tam
 }
-const moLichSu = (tam: HTMLElement) => fireEvent.click(within(tam).getByRole('tab', { name: /^Toàn bộ lịch sử/ }))
+// 22/10 (6 mức): "Từng lượt" luôn hiện (không còn thẻ "Toàn bộ lịch sử"); khối Mức làm là «Cách làm bài · 6 mức» (thầy) / «Em làm bài thế nào» / «Cách con làm bài».
+// Dữ liệu giả ở đây là máy chủ KHÔNG có `mucLam6` ⇒ khối dùng tổng `mucLam` cả sổ, Mức làm 5–6 "Chưa đo treo máy" (không đoán).
 const chu = (e: Element | null) => (e?.textContent ?? '').replace(/\s+/g, ' ').trim()
 
 describe('phép thuần', () => {
@@ -82,21 +83,23 @@ describe('đọc hợp đồng máy chủ', () => {
 })
 
 describe('thầy bấm vào em: đủ Mức làm 1–4', () => {
-  it('khối "Cách làm bài": đo được 7/11 lượt, thanh 4 mức, bảng đúng/sai theo mức, hai số làm vội / đã nghĩ, ghi chú đúng-trước-khi-đọc, cách tính', async () => {
+  it('khối "Cách làm bài · 6 mức": đo được 7/11 lượt, thanh 6 mức + đoạn chưa có số đo, 6 ô đúng/sai (Mức 5–6 chưa đo treo máy), ô làm vội / đã nghĩ, ghi chú, cách tính', async () => {
     const tam = await mo({ cheDo: 'thay' }, 'thay')
     const khoi = tam.querySelector('.hslc-cl')!
-    expect(chu(khoi.querySelector('.hslc-cl-do'))).toBe('Đo được 7/11 lượt · 4 lượt chưa có số đo.')
-    expect([...khoi.querySelectorAll('.hslc-tm i')].map((i) => [i.getAttribute('data-m'), chu(i)])).toEqual([['1', '4'], ['2', '1'], ['3', '1'], ['4', '1']])
-    const dong = [...khoi.querySelectorAll('.hslc-cl-cheo li[data-m]')].map((li) => chu(li))
-    expect(dong).toEqual([
-      'Mức làm 1 Chưa đọc hết đề Đúng 1 Sai 3',
-      'Mức làm 2 Đọc xong, chưa kịp nghĩ Đúng 0 Sai 1',
-      'Mức làm 3 Có nghĩ Đúng 0 Sai 1',
-      'Mức làm 4 Làm kỹ Đúng 1 Sai 0',
+    expect(chu(khoi.querySelector('.hsv-phu'))).toBe('Đo được 7/11 lượt · 4 lượt chưa có số đo · 7 lượt chưa đo treo máy.')
+    expect([...khoi.querySelectorAll('.hsv-thanh i')].map((i) => [i.getAttribute('data-m') ?? (i.hasAttribute('data-chua') ? 'chua' : ''), chu(i)])).toEqual([['1', '4'], ['2', '1'], ['3', '1'], ['4', '1'], ['chua', '4']])
+    const o = [...khoi.querySelectorAll('.hsv-o')].map((li) => chu(li))
+    expect(o).toEqual([
+      'Mức làm 1 Chưa đọc hết đề 4 lượt đúng 1 · sai 3',
+      'Mức làm 2 Đọc xong, chưa kịp nghĩ 1 lượt đúng 0 · sai 1',
+      'Mức làm 3 Có nghĩ 1 lượt đúng 0 · sai 1',
+      'Mức làm 4 Làm kỹ 1 lượt đúng 1 · sai 0',
+      'Mức làm 5 Treo máy Chưa đo treo máy',
+      'Mức làm 6 Cố tình treo máy Chưa đo treo máy',
     ])
-    expect(chu(khoi.querySelector('.hslc-cl-cheo-t'))).toBe('Cộng 2 5')
-    const hai = [...khoi.querySelectorAll('.hslc-cl-hai p')].map((p) => chu(p))
-    expect(hai).toEqual(['4/5 lượt sai là lúc làm vội (Mức làm 1–2), 80%', '1/5 lượt sai dù đã nghĩ (Mức làm 3–4), 20%'])
+    const hai = [...khoi.querySelectorAll('.hsv-ba p')].map((p) => chu(p))
+    expect(hai).toEqual(['4/5 lượt sai là lúc làm vội (Mức làm 1–2)', '1/5 lượt sai dù đã nghĩ (Mức làm 3–4)'])
+    expect(chu(khoi)).toContain('chưa xếp được Mức làm 5–6 (không đoán)')
     expect(chu(khoi)).toContain('1 lượt đúng nộp trước khi đọc hết đề. Chỉ ghi chú, không tính là vội.')
     expect(chu(khoi)).not.toContain('chưa đủ mẫu') // có β thật ⇒ Mức làm 4 xếp được
     expect(within(khoi as HTMLElement).getByText('Cách tính Mức làm')).toBeTruthy()
@@ -104,12 +107,11 @@ describe('thầy bấm vào em: đủ Mức làm 1–4', () => {
 
   it('lịch sử: mỗi lượt có mức ⇒ chip "Mức làm N" + tên + dòng giây · đọc hết đề + thước (chấm, vạch); lượt chưa có số đo ⇒ nhãn nét đứt, giữ số giây cũ; câu chỉ ảnh ghi "≈"', async () => {
     const tam = await mo({ cheDo: 'thay' }, 'thay')
-    moLichSu(tam)
     const luot = [...tam.querySelectorAll('.hslc-lan')]
     expect(luot).toHaveLength(11)
     const co = luot.filter((l) => l.querySelector('.hslc-muc-luot'))
     expect(co).toHaveLength(7)
-    expect(chu(co[0]!.querySelector('.hslc-muc-luot-dong'))).toBe('Mức làm 1 Chưa đọc hết đề 14 giây · đọc hết đề cần 24 giây')
+    expect(chu(co[0]!.querySelector('.hslc-muc-luot-dong'))).toBe('Mức làm 1 Chưa đọc hết đề 14 giây · đọc hết đề cần 24 giây Chưa đo treo máy') // lượt cũ: nhãn nhỏ cho thầy
     expect(co[0]!.querySelector('.hslc-thuoc-m[role="img"]')!.getAttribute('aria-label')).toBe('Làm 14 giây; đọc hết đề cần 24 giây; có thời gian nghĩ từ 30 giây; làm kỹ từ 60 giây')
     expect(co[0]!.querySelector('.hslc-thuoc-m-z u')).not.toBeNull()
     expect(co[0]!.querySelector('.hslc-thuoc-m-z b')).not.toBeNull()
@@ -142,8 +144,7 @@ describe('thầy bấm vào em: đủ Mức làm 1–4', () => {
     const khoi = tam.querySelector('.hslc-cl')!
     expect(khoi.querySelector('.hslc-cl-trong')).not.toBeNull()
     expect(chu(khoi)).toContain('Chưa lượt nào của em có số đo Mức làm (11 lượt chưa có số đo)')
-    expect(khoi.querySelector('.hslc-cl-cheo')).toBeNull()
-    moLichSu(tam)
+    expect(khoi.querySelector('.hsv-o-luoi')).toBeNull()
     expect(tam.querySelectorAll('.hslc-muc-luot')).toHaveLength(0)
     expect(tam.querySelectorAll('.hslc-lan .hslc-chip-m--chua')).toHaveLength(11)
   })
@@ -151,7 +152,7 @@ describe('thầy bấm vào em: đủ Mức làm 1–4', () => {
   it('lớp chưa đủ mẫu (không β thật): ghi chú một dòng, vẫn xếp Mức làm 1–3', async () => {
     const tam = await mo({ cheDo: 'thay', khongBeta: true }, 'thay')
     expect(chu(tam.querySelector('.hslc-cl'))).toContain('Lớp chưa đủ mẫu của các câu này để xếp Mức làm 4.')
-    expect(tam.querySelectorAll('.hslc-tm i[data-m="4"]')).toHaveLength(0)
+    expect(tam.querySelectorAll('.hsv-thanh i[data-m="4"]')).toHaveLength(0)
   })
 })
 
@@ -159,17 +160,20 @@ describe('học sinh và phụ huynh: cùng tấm, chỉ lượt SAI, chữ nh�
   it('học sinh: không cột Đúng, không ghi chú riêng của thầy; lượt đúng Mức làm 1 không có mức (chỉ số giây); tên mức tả việc đã làm', async () => {
     const tam = await mo({ cheDo: 'em' }, 'hoc-sinh')
     const khoi = tam.querySelector('.hslc-cl')!
-    expect(khoi.querySelector('.hslc-cl-cheo')).toBeNull()
-    expect(chu(khoi.querySelector('.hslc-cl-do'))).toBe('Trong 5 lượt sai có số đo, 4 lượt em nộp trước khi kịp nghĩ (nộp khi chưa đọc hết đề hoặc vừa đọc xong). 1 lượt sai còn lại em đã dành thời gian nghĩ.')
+    expect(khoi.querySelector('.hsv-o-luoi')).toBeNull()
+    expect(chu(khoi.querySelector('.hsv-phu'))).toBe('Trong 5 lượt sai có số đo: 4 lượt em nộp trước khi kịp nghĩ, 1 lượt em đã dành thời gian nghĩ.')
     expect([...khoi.querySelectorAll('.hslc-cl-em li')].map((li) => chu(li))).toEqual([
       'Mức làm 1 Nộp trước khi đọc hết đề 3 lượt sai',
       'Mức làm 2 Đọc xong thì nộp ngay 1 lượt sai',
       'Mức làm 3 Có thời gian nghĩ 1 lượt sai',
       'Mức làm 4 Làm kỹ, đúng nhịp lớp 0 lượt sai',
     ])
-    expect(chu(khoi.querySelector('.hslc-ghi'))).toBe('Đo được 5/8 lượt sai. 3 lượt sai chưa có số đo (chưa có số giây đáng tin để xếp).')
+    expect([...khoi.querySelectorAll('.hsv-ghi')].map((p) => chu(p))).toEqual([
+      '3 lượt sai chưa có số đo (chưa có số giây đáng tin để xếp).',
+      'Các lượt này làm trước khi máy em có đồng hồ mới, nên chưa đo được máy để treo.', // một dòng ghi chú, không nhãn từng lượt
+    ])
     expect(chu(khoi)).not.toMatch(/Chỉ ghi chú|đúng trước|Cách tính Mức làm|Lớp chưa đủ mẫu/i)
-    moLichSu(tam)
+    expect(tam.textContent).not.toMatch(/Chưa đo treo máy|Treo máy|Mức làm 6/)
     expect(tam.querySelectorAll('.hslc-muc-luot-ghi')).toHaveLength(0)
     expect(chu(tam.querySelector('.hslc-chu-giai-m'))).toBe('') // không chú giải của thầy
     const dongDung = [...tam.querySelectorAll('.hslc-lan')].find((l) => chu(l).includes('Câu 9'))!
@@ -183,10 +187,10 @@ describe('học sinh và phụ huynh: cùng tấm, chỉ lượt SAI, chữ nh�
   it('phụ huynh: ngôi "con"; cùng quy tắc; không chữ "em" trong khối mức', async () => {
     const tam = await mo({ cheDo: 'em' }, 'phu-huynh')
     const khoi = tam.querySelector('.hslc-cl')!
-    expect(chu(khoi.querySelector('.hslc-tieu-nho'))).toBe('Cách làm bài · Mức làm 1–4 từng lượt của con')
-    expect(chu(khoi.querySelector('.hslc-cl-do'))).toContain('4 lượt con nộp trước khi kịp nghĩ')
-    expect(chu(khoi.querySelector('.hslc-cl-do'))).not.toMatch(/\bem\b/)
-    expect(khoi.querySelector('.hslc-cl-cheo')).toBeNull()
+    expect(chu(khoi.querySelector('h3'))).toBe('Cách con làm bài · lượt sai có số đo · toàn bộ sổ') // máy chủ chưa có `mucLam6` ⇒ tổng cả sổ, ghi rõ
+    expect(chu(khoi.querySelector('.hsv-phu'))).toContain('4 lượt con nộp trước khi kịp nghĩ')
+    expect(chu(khoi)).not.toMatch(/\bem\b/)
+    expect(khoi.querySelector('.hsv-o-luoi')).toBeNull()
   })
 
   it('học sinh, những ngày đầu: một câu nhẹ, không đoán', async () => {

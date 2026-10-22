@@ -44,5 +44,12 @@ export async function phHoSoThaiDo(envGoc: Env, b: Row, nowMs: number = Date.now
 /** `POST /ph/lich-su-lam-cau {pass|sbd, gioiHan?}` — xem đầu tệp. `gioiHan` như bản em (mặc định 1000, trần 5000). */
 export async function phLichSuLamCau(envGoc: Env, b: Row, envDoc: Env = envGoc, ctx?: ExecutionContext): Promise<TraLoiLichSuLamCau> {
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-lich-su-lam-cau', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
-  return lichSuLamCauBanHocSinh(envDoc, sbd, b.gioiHan, LOI_LICH_SU_CON)
+  return banPhuHuynhLichSu(await lichSuLamCauBanHocSinh(envDoc, sbd, b.gioiHan, LOI_LICH_SU_CON))
+}
+
+/** Hồ sơ 6 mức (thầy chốt 22/10, điểm 1): phụ huynh thấy lượt treo là "Máy để treo" nhưng KHÔNG số phút ⇒ bỏ `giayTreo` từng lượt.
+ *  GIỮ `treo: 'treo'` — bỏ cả `treo` thì lượt treo 10 phút lại hiện thành "Có thời gian nghĩ". (Mức 6 đã hạ ở lõi bản học sinh.) */
+export function banPhuHuynhLichSu(r: TraLoiLichSuLamCau): TraLoiLichSuLamCau {
+  if (!r.ok) return r
+  return { ...r, lan: r.lan.map((l) => (l.mucLam?.giayTreo === undefined ? l : { ...l, mucLam: (({ giayTreo: _g, ...m }) => m)(l.mucLam) })) }
 }

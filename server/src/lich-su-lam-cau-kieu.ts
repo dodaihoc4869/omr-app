@@ -80,12 +80,64 @@ export interface KetQuaLichSuLamCau {
   lan: LanLamCau[]
   /** Gộp Mức làm 1–4 trên đúng tập lượt được xem (cùng cửa sổ với `tong`; bản học sinh/phụ huynh bỏ lượt đúng ở Mức 1–2). Máy chủ cũ: vắng. */
   mucLam?: TongMucLam
+  /** Hồ sơ 6 mức (22/10) — xem `MucLam6`. Máy chủ cũ: vắng. */
+  mucLam6?: MucLam6
   /** Câu từng sai: CHƯA đúng lại trước, rồi nhiều lần sai trước, rồi gần đây trước. */
   cauSai: CauEmSai[]
   /** Còn lượt cũ hơn chưa trả trong `lan` (vượt `gioiHan`). */
   conNua: boolean
   /** Sổ của em vượt 5000 lượt ⇒ `tong`/`cauSai` chỉ tính 5000 lượt gần nhất. */
   catBot: boolean
+}
+
+/** Một ngày trong khối "Theo ngày" (6 mức): `dem[i]` = số lượt Mức làm i+1 (lượt treo đếm ở ô 5 / 6, KHÔNG ở ô 1–4). */
+export interface NgayMucLam {
+  ngay: string
+  dem: [number, number, number, number, number, number]
+  /** Lượt không có Mức làm (giây cũ / chưa đo / thiếu kích thước đề). */
+  chuaCoSoDo: number
+  /** Lượt có Mức làm 1–4 nhưng chưa có số đo treo máy (máy em chưa có đồng hồ 22/10). */
+  soChuaDoTreo: number
+}
+export interface DemDungSai { dung: number; sai: number }
+/** Số đếm 7 ngày trên MỌI lượt em được xem (kể cả lượt bản học sinh ẩn mức) — ô "Làm bài 7 ngày" (thầy) / điểm nhấn (học sinh, phụ huynh). */
+export interface Lam7 {
+  soLuot: number
+  soCau: number
+  soDung: number
+  /** `dung === false` (không gồm bỏ trống). */
+  soSai: number
+  soBoTrong: number
+  /** Giây trung bình của lượt CÓ số giây và KHÔNG treo máy (lượt treo không kéo giây lên). null = chưa lượt nào. */
+  giayTb: number | null
+  soLuotCoGiay: number
+  /** Lượt Mức 5–6 (đã bỏ khỏi giây trung bình). */
+  soTreo: number
+}
+/** Bằng chứng Mức làm 6 của MỘT ngày (CHỈ bản thầy): các lượt treo của ngày ấy. */
+/** `so` = tổng lượt Mức 6 của ngày; `luot` chỉ tối đa `TOI_DA_LUOT_BANG_CHUNG` lượt (cũ → mới). */
+export interface NgayCoTinh { ngay: string; so: number; luot: { luc: string; giayTreo: number; tieuDe: string }[] }
+
+/**
+ * HỒ SƠ 6 MỨC (thầy duyệt bản vẽ docs/ban-ve-ho-so-em-2210, 22/10) — trường MỚI, tuỳ chọn; `mucLam` cũ GIỮ NGUYÊN (bốn dòng cộng = soDo) cho máy PWA cũ.
+ * Mọi số trên CÙNG tập lượt em được xem (bản học sinh/phụ huynh: Mức 6 đã hạ về 5, lượt đúng Mức 1–2 không mang mức).
+ */
+export interface MucLam6 {
+  /** Khoảng "7 ngày gần nhất" theo ngày Việt Nam (YYYY-MM-DD, gồm cả hai đầu). */
+  tu: string
+  den: string
+  /** 7 ngày, `tongMucLam(…, { tachTreo: true })`: bốn dòng Mức 1–4 KHÔNG gồm lượt treo. */
+  bay: TongMucLam
+  /** Toàn bộ sổ máy chủ đọc, cũng tách treo — cho khối gập "Toàn bộ sổ". */
+  toanBo: TongMucLam
+  /** Đúng / sai của lượt Mức 5 (`treo`) và Mức 6 (`coTinh`) trong 7 ngày. */
+  treoDungSai: { treo: DemDungSai; coTinh: DemDungSai }
+  /** 7 hàng, cũ → mới. */
+  theoNgay: NgayMucLam[]
+  /** Số đếm 7 ngày trên mọi lượt (xem `Lam7`). */
+  lam7?: Lam7
+  /** CHỈ bản thầy: các ngày có Mức làm 6 trong 7 ngày (mới trước). */
+  ngayCoTinh?: NgayCoTinh[]
 }
 
 export type TraLoiLichSuLamCau = KetQuaLichSuLamCau | { ok: false; error: string }

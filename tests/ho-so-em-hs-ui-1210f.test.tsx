@@ -8,6 +8,7 @@
 // Số từ bộ giả của trang chụp ảnh (scripts/chup-v2/gia), bản em đi qua ĐÚNG hàm lọc của máy chủ (server/src/ho-so-em-hs-loc.ts). Tên em là tên giả.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { choTamXong, moGap } from './_ho-so-6-muc'
 import { useState } from 'react'
 
 const m = vi.hoisted(() => ({ goi: vi.fn() }))
@@ -74,7 +75,8 @@ async function moTam(onDong?: () => void) {
   nut.focus()
   fireEvent.click(nut)
   const tam = await screen.findByRole('dialog')
-  await within(tam).findByText('Số lượt làm câu')
+  await choTamXong(tam)
+  moGap(tam) // 6 mức: khối cũ nằm trong ngăn gập
   await within(tam).findByText(/^Làm bài từ/)
   return { nut, tam }
 }
@@ -83,22 +85,24 @@ describe('HoSoCuaEmHs — em xem ĐỦ hồ sơ của chính mình', () => {
   it('đủ mọi phần số liệu như thầy thấy; tiêu đề + dòng "Thầy cũng xem hồ sơ này."; không đường của thầy', async () => {
     const { tam } = await moTam()
     expect(tam.parentElement?.parentElement).toBe(document.body) // vẽ qua cổng vào <body>
-    expect(within(tam).getByRole('heading', { level: 2 }).textContent).toBe('Hồ sơ làm bài của em · từ 01/10')
-    expect(within(tam).getByText('Thầy cũng xem hồ sơ này.')).toBeTruthy()
+    expect(within(tam).getByRole('heading', { level: 2 }).textContent).toBe('Hồ sơ làm bài của em')
+    expect(within(tam).getByText(/Thầy cũng xem hồ sơ này\.$/)).toBeTruthy()
     expect(tam.querySelector('.gvv2-hs-mat')?.textContent).toBe(`${TD.em.hoTen} · Lớp ${TD.em.lop}`) // tên + lớp của em (máy chủ), không SBD
     // đầu tấm: nhóm Nhịp học (nhãn chính) + lý do bằng số; chữ của em ("Nhịp học của em"), không "Thái độ làm bài"
     expect(within(tam).getByText(/^Nhịp học của em ·/)).toBeTruthy()
     expect(tam.textContent).not.toMatch(/Thái độ làm bài/)
     expect(within(tam).getByRole('list', { name: 'Lý do' })).toBeTruthy()
-    // Hôm nay · năm ô số · lịch · độ đúng · số giây · sáu tín hiệu
-    expect(tam.querySelector('.gvv2-hs-hn')).toBeTruthy()
+    // điểm nhấn số lượt (thay ô Hôm nay của thầy) · năm ô số · lịch · độ đúng · số giây · sáu tín hiệu (trong ngăn gập)
+    expect(tam.querySelector('.hsv-nhan')?.textContent).toMatch(/lượt làm câu · đúng \d+ lượt/)
+    expect(tam.querySelector('.gvv2-hs-hn')).toBeNull()
     for (const nhan of ['Đã làm', 'Đúng', 'Sai', 'Đã ôn', 'Giây trung bình']) expect(within(tam).getAllByText(nhan, { selector: 'dt' }).length).toBeGreaterThan(0)
-    for (const tieu of [/^Lịch làm bài theo ngày/, /^Độ đúng theo ngày/, /^Số giây mỗi lượt/, /^Sáu tín hiệu và ngưỡng/, /^Toàn bộ sổ của em/])
+    for (const tieu of [/^Lịch làm bài theo ngày/, /^Độ đúng theo ngày/, /^Số giây mỗi lượt/, /^Sáu tín hiệu và ngưỡng/, /^Từng lượt/, /^Câu từng sai/])
       expect(within(tam).getByRole('heading', { name: tieu })).toBeTruthy()
+    expect([...tam.querySelectorAll('.hsv-gap summary')].map((x) => x.firstChild?.textContent)).toEqual(['Lịch làm bài 14 ngày', 'Sáu tín hiệu và ngưỡng', 'Số giây theo mức độ câu', 'Câu đúng · Câu đã ôn', 'Toàn bộ sổ của em'])
     expect(within(tam).getByRole('list', { name: 'Lịch làm bài theo ngày' }).children.length).toBe(TD.ngay.length)
     expect(tam.querySelectorAll('.gvv2-tdo-th-o')).toHaveLength(6)
-    // bốn thẻ câu
-    for (const the of [/^Câu sai/, /^Câu đúng/, /^Câu đã ôn/, /^Toàn bộ lịch sử/]) expect(within(tam).getByRole('tab', { name: the })).toBeTruthy()
+    // thẻ câu đúng / đã ôn (ngăn gập) + nút lọc lượt
+    for (const the of [/^Câu đúng/, /^Câu đã ôn/, /^Tất cả/, /^Lượt sai/]) expect(within(tam).getByRole('tab', { name: the })).toBeTruthy()
     // KHÔNG đường của thầy
     expect(within(tam).queryByRole('button', { name: /Mở hồ sơ đầy đủ/ })).toBeNull()
     expect(tam.textContent).not.toMatch(/SBD|Kho thiếu|Kiến thức cần bổ sung|Ca kiểm tra, EXP, phụ huynh/)
@@ -108,7 +112,6 @@ describe('HoSoCuaEmHs — em xem ĐỦ hồ sơ của chính mình', () => {
 
   it('không đáp án em chọn, không mã câu nội bộ trên màn; lệnh gửi token, KHÔNG SBD', async () => {
     const { tam } = await moTam()
-    fireEvent.click(within(tam).getByRole('tab', { name: /^Toàn bộ lịch sử/ }))
     await within(tam).findAllByText(/lượt$/, { selector: '.gvv2-hs-ngay-tieu span' })
     expect(LS.lan.some((l) => l.chon)).toBe(true) // bản thầy có "Chọn …"
     expect(tam.textContent).not.toMatch(/Chọn [A-D]/)
@@ -143,9 +146,11 @@ describe('HoSoCuaEmHs — em xem ĐỦ hồ sơ của chính mình', () => {
     render(<VoMo />)
     fireEvent.click(screen.getByRole('button', { name: 'Xem hồ sơ làm bài' }))
     const tam = await screen.findByRole('dialog')
+    expect(await within(tam).findByText(/Chưa tải được hồ sơ làm bài của em/)).toBeTruthy()
+    await waitFor(() => expect(tam.querySelector('.hsv-gap summary small')?.textContent).toBe('Chưa tải được')) // lỗi nhịp học hiện ngay trên ngăn gập
+    moGap(tam)
     expect(await within(tam).findByText(/Chưa tải được nhịp học của em\. Máy chủ chưa có hồ sơ làm bài cho học sinh/)).toBeTruthy()
     expect(within(tam).getByRole('button', { name: 'Tải lại nhịp học' })).toBeTruthy()
-    expect(await within(tam).findByText(/Chưa tải được lịch sử làm câu của em/)).toBeTruthy()
   })
 })
 
@@ -156,7 +161,8 @@ describe('HoSoLamCauEm — chế độ thầy (mặc định) giữ nguyên', ()
     )
     render(<HoSoLamCauEm em={{ sbd: SBD, ten: TD.em.hoTen, khoi: '12' }} onDong={() => {}} />)
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
+    moGap(tam, /^Nhịp học/)
     await within(tam).findByText(/^Thái độ làm bài ·/)
     expect(within(tam).getByRole('heading', { level: 2 }).textContent).toBe(TD.em.hoTen)
     expect(within(tam).getByText(new RegExp(`^SBD ${SBD} · Lớp `))).toBeTruthy()
@@ -165,8 +171,7 @@ describe('HoSoLamCauEm — chế độ thầy (mặc định) giữ nguyên', ()
     expect(m.goi).toHaveBeenCalledWith('/gv/ho-so-thai-do', { sbd: SBD })
     expect(m.goi).toHaveBeenCalledWith('/gv/lich-su-lam-cau', { sbd: SBD, gioiHan: GIOI_HAN_KHUNG_DAU })
     expect(goiFetch).toEqual([])
-    // bản thầy có đáp án em chọn ở Toàn bộ lịch sử
-    fireEvent.click(within(tam).getByRole('tab', { name: /^Toàn bộ lịch sử/ }))
+    // bản thầy có đáp án em chọn ở Từng lượt
     expect(tam.textContent).toMatch(/Chọn [A-D]/)
   })
 })

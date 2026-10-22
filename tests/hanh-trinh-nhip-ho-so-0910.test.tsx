@@ -8,6 +8,7 @@
 // SỐ TỪ MÁY CHỦ GIẢ (không số bịa); tên em là tên giả.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { choTamXong, moGap } from './_ho-so-6-muc'
 import type { BangChienDich, ChienDichTom } from '../src/components/chien-dich/api'
 import type { KetQuaLichSuLamCau, LanLamCau } from '../src/lib/lich-su-lam-cau-api'
 
@@ -229,14 +230,16 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     expect(tam.querySelector('.gvv2-hs-hn')?.textContent).toContain('Hôm nay3/36 câu')
     expect(tam.querySelector('.gvv2-hs-hn')?.textContent).toContain('Chưa đủ mức')
     expect(tam.textContent).toContain('Kiến thức cần bổ sung')
+    await choTamXong(tam)
+    moGap(tam, /^Toàn bộ sổ/) // 6 mức: bốn ô số cả sổ nằm trong ngăn gập "Toàn bộ sổ của em"
     expect([...tam.querySelectorAll('.gvv2-hs-o')].map((o) => o.textContent)).toEqual([
       'Số lượt làm câu74 câu khác nhau',
       'Tỉ lệ đúng43%3 đúng · 3 sai · 1 bỏ trống',
       'Câu từng sai21 câu chưa sửa được',
       'Trung bình mỗi câu52 giâylượt đo được, gồm ước tính',
     ])
-    // thẻ con mặc định: Câu sai
-    expect(within(tam).getByRole('tab', { name: /Câu sai/ }).getAttribute('aria-selected')).toBe('true')
+    // khối "Câu từng sai" luôn hiện (không còn thẻ con)
+    expect(within(tam).getByRole('heading', { name: 'Câu từng sai' })).toBeTruthy()
     const cau = [...tam.querySelectorAll('.gvv2-hs-cau')]
     expect(cau).toHaveLength(2)
     expect(cau[0]!.textContent).toContain('Câu 25 · Hiệu suất ester hoá')
@@ -269,7 +272,7 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     render(<TheNhipHoc />)
     fireEvent.click(await screen.findByRole('button', { name: /^Bùi Khoa, SBD 8/ }))
     const tam = await screen.findByRole('dialog')
-    fireEvent.click(await within(tam).findByRole('tab', { name: /Toàn bộ lịch sử/ }))
+    await choTamXong(tam) // 6 mức: "Từng lượt" luôn hiện
     expect([...tam.querySelectorAll('.gvv2-hs-ngay-tieu')].map((h) => h.textContent)).toEqual(['Thứ Sáu 09/10/2026 · 2 lượt', 'Thứ Năm 08/10/2026 · 2 lượt'])
     const lan = [...tam.querySelectorAll('.gvv2-hs-lan')].map((l) => l.textContent)
     // SỬA CÓ CHỦ Ý — đợt 16: số giây thành cột riêng bên phải (dưới kết quả) ở MỌI lượt; không đo được ⇒ "—" (+ chữ ẩn cho trình đọc màn hình).
@@ -279,11 +282,11 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
       '10:00Câu q31Đoàn · Thông hiểu · Chọn AĐúng45 giây',
       '09:00Câu 40 · Bảo toàn khối lượngLên bảng · có dùng gợi ýBỏ trống46 giây',
     ])
-    const loc = within(tam).getByRole('button', { name: 'Chỉ lần sai' })
+    const loc = within(tam).getByRole('tab', { name: /^Lượt sai/ })
     fireEvent.click(loc)
-    expect(loc.getAttribute('aria-pressed')).toBe('true')
+    expect(loc.getAttribute('aria-selected')).toBe('true')
     expect(tam.querySelectorAll('.gvv2-hs-lan')).toHaveLength(2)
-    expect(tam.textContent).toContain('Đang hiện 2/2 lần sai')
+    expect(tam.textContent).toContain('Đang hiện 2/2 lượt sai')
 
     fireEvent.click(within(tam).getByRole('button', { name: 'Mở hồ sơ đầy đủ' }))
     expect(useAppStore.getState()).toMatchObject({ screen: 'hocsinh', sbdDangXem: '8' })
@@ -295,7 +298,7 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     render(<TheNhipHoc />)
     fireEvent.click(await screen.findByRole('button', { name: /^Bùi Khoa, SBD 8/ }))
     let tam = await screen.findByRole('dialog')
-    fireEvent.click(await within(tam).findByRole('tab', { name: /Toàn bộ lịch sử/ }))
+    await choTamXong(tam)
     expect(tam.querySelectorAll('.gvv2-hs-lan')).toHaveLength(100)
     fireEvent.click(within(tam).getByRole('button', { name: 'Xem thêm 50 lượt (còn 50)' }))
     expect(tam.querySelectorAll('.gvv2-hs-lan')).toHaveLength(150)
@@ -309,11 +312,11 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Bùi Khoa, SBD 8/ }))
     tam = await screen.findByRole('dialog')
     const loi = await within(tam).findByRole('alert')
-    expect(loi.textContent).toBe('Chưa tải được lịch sử làm câu của em. Mạng có thể đang chập chờn.Thử lại')
+    expect(loi.textContent).toBe('Chưa tải được hồ sơ làm bài của em. Mạng có thể đang chập chờn.Thử lại')
     // vẫn mở được hồ sơ đầy đủ khi lệnh lỗi
     expect(within(tam).getByRole('button', { name: 'Mở hồ sơ đầy đủ' })).toBeTruthy()
     fireEvent.click(within(loi).getByRole('button', { name: 'Thử lại' }))
-    expect(await within(tam).findByText('Câu 25 · Hiệu suất ester hoá')).toBeTruthy()
+    expect((await within(tam).findAllByText('Câu 25 · Hiệu suất ester hoá')).length).toBeGreaterThan(0)
     expect(lan).toBe(2)
   })
 
