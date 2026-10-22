@@ -309,10 +309,21 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-vg{flex:none;width:.62em;height:.62em;margin-left:-.15em;border:2px solid color-mix(in srgb,var(--mc-b) 80%,transparent);border-radius:50%;box-sizing:border-box}
 .mc-vg-g{display:inline-block;margin:0 .2em;vertical-align:baseline}
 .mc-ai-dense .mc-pl{font-size:max(11.5px,calc(var(--u)*.82));padding-inline:calc(var(--u)*.5);gap:.35em}
+.mc-pl u s{text-decoration:none}.mc-ai-dense .mc-pl u s{display:none}.mc-dv{display:none;font-style:normal}.mc-ai-dense .mc-dv{display:inline}
+.mc-ic-treo{width:1em;height:1em;flex:none;fill:currentColor}
+.mc-ai-tn>i[data-m="5"]{background:repeating-linear-gradient(135deg,var(--mc-xam) 0 6px,color-mix(in srgb,var(--mc-xam) 55%,var(--mc-nen)) 6px 12px);color:var(--mc-b)}
+.mc-ln-treo{--mm:var(--mc-xam);background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--mc-b) 3%,transparent) 0 10px,transparent 10px 20px),color-mix(in srgb,var(--mc-den) 22%,transparent)}
+.mc-ln-treo header .mc-ic-treo{font-size:calc(var(--u)*1.1);color:color-mix(in srgb,var(--mc-b) 78%,transparent)}
+.mc-ln-treo .mc-pl-treo{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--mc-xam) 30%,transparent) 0 6px,transparent 6px 12px);border-color:var(--mc-xam)}
+.mc-ln-treo-chua{border-left-style:dashed;background:transparent;border-top:1px dashed color-mix(in srgb,var(--mc-b) 20%,transparent);border-right:1px dashed color-mix(in srgb,var(--mc-b) 20%,transparent);border-bottom:1px dashed color-mix(in srgb,var(--mc-b) 20%,transparent);opacity:.75}
+.mc-chm-treo{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--mc-xam) 40%,transparent) 0 6px,transparent 6px 12px);border-color:var(--mc-xam)}
+.mc-ket-treo{display:flex;align-items:center;gap:.4em}
+.mc-ai-tab{display:none}
 .mc-ai-rong{display:grid;place-content:center;text-align:center;gap:.5em;flex:1;padding:calc(var(--u)*2);border:2px dashed color-mix(in srgb,var(--mc-b) 22%,transparent);border-radius:calc(var(--u)*1);color:color-mix(in srgb,var(--mc-b) 80%,transparent)}
 .mc-ai-rong b{font:800 max(16px,calc(var(--u)*1.4)) var(--mc-sans);color:rgb(255,210,122)}.mc-ai-rong p{max-width:24em;margin:0 auto;font:600 max(12px,calc(var(--u)*.95))/1.5 var(--mc-sans)}
 .mc-ai-chan{display:flex;justify-content:space-between;gap:2em;margin:0;font:600 max(11px,calc(var(--u)*.8)) var(--mc-sans);color:color-mix(in srgb,var(--mc-b) 60%,transparent)}
 .mc-ai-chan kbd{display:inline-grid;place-items:center;min-width:1.7em;padding:0 .4em;border-radius:.4em;background:color-mix(in srgb,var(--mc-b) 14%,transparent);font:inherit;font-weight:800}
+@media(min-width:901px) and (max-width:1100px){.mc-ai-tab{display:flex;gap:8px}.mc-ai-tab button{min-height:44px;padding:0 16px;border-radius:99px;border:1px solid color-mix(in srgb,var(--mc-b) 25%,transparent);background:transparent;color:var(--mc-b);font:800 15px var(--mc-sans);cursor:pointer}.mc-ai-tab button[aria-selected=true]{background:var(--mc-vang-noi);border-color:var(--mc-vang-noi);color:var(--mc-nen)}.mc-ai-tab kbd{margin-left:.4em}.mc-ai-hai[data-tab]{grid-template-columns:minmax(0,1fr)}.mc-ai-hai[data-tab=dd] .mc-ai-the[data-k=lop],.mc-ai-hai[data-tab=lop] .mc-ai-the[data-k=dd]{display:none}}
 @media(max-width:900px){.mc-aisai{width:100%}.mc-ai-hai{grid-template-columns:1fr;overflow-y:auto}.mc-ai-the{overflow:visible}.mc-ai-dau{flex-wrap:wrap}}
 @media(max-height:800px){.mc-ai-so b{font-size:24px}.mc-ai-luot b{font-size:20px}.mc-ai-the{gap:calc(var(--u)*.45);padding-block:calc(var(--u)*.6)}.mc-ln{padding-block:calc(var(--u)*.3)}.mc-pls{gap:calc(var(--u)*.25)}.mc-ai-lan{gap:calc(var(--u)*.3)}.mc-pl{padding-block:2px}.mc-ai-tn{height:18px}}
 @media(prefers-reduced-motion:reduce){.mc-aisai{transition:none}}
@@ -790,6 +801,10 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   var TEN_MUC_CT = [null, 'Chưa đọc hết đề', 'Đọc xong, chưa kịp nghĩ', 'Có nghĩ', 'Làm kỹ'];
   function pipCt(n) { var q = '<span class="mc-pip" aria-hidden="true">'; for (var k = 1; k <= 4; k++) q += '<i' + (k <= n ? ' class="b"' : '') + '></i>'; return q + '</span>'; }
   /** Chip "Mức làm N" (lon = kèm tên mức); ma = 0 ⇒ "Chưa có số đo" nét đứt; uoc ⇒ "≈ Mức làm N" (xếp từ giây đồng hồ cũ / ước tính). */
+  // 6 MỨC (thầy duyệt 22/10): lượt TREO MÁY (Mức 5; Mức 6 đã hạ về 5 trước khi lên tờ — tờ chiếu không bao giờ có chữ "cố tình") ⇒ chip "Treo máy · N phút", không xếp Mức 1–4.
+  var IC_TREO = '<svg class="mc-ic-treo" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+  function phutTreo(m) { return m && typeof m.giayTreo === 'number' && isFinite(m.giayTreo) ? Math.max(1, Math.round(m.giayTreo / 60)) : null; }
+  function chipTreo(m, lon) { var p = phutTreo(m); return '<span class="mc-chm mc-chm-treo' + (lon ? ' mc-chm-lon' : '') + '">' + IC_TREO + '<b>Treo máy</b>' + (p != null ? ' <span>' + p + ' phút</span>' : '') + '</span>'; }
   function chipCt(ma, lon, uoc) { return ma ? '<span class="mc-chm' + (lon ? ' mc-chm-lon' : '') + '" data-m="' + ma + '">' + pipCt(ma) + '<b>' + (uoc ? '≈ ' : '') + 'Mức làm ' + ma + '</b>' + (lon ? ' <span>' + TEN_MUC_CT[ma] + '</span>' : '') + '</span>' : '<span class="mc-chm mc-chm-chua' + (lon ? ' mc-chm-lon' : '') + '"><b>Chưa có số đo</b></span>'; }
   /** Thước giây: bốn đoạn theo ranh giới máy chủ gửi, vạch = đọc hết đề, chấm = giây của em; nho = bản gọn (không nhãn số). */
   function thuocCt(m, nho) {
@@ -808,9 +823,9 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   }
   /** Một lần làm câu: đúng/sai · giờ · nơi · chọn · chip Mức làm + thước + lời; lần chưa có mức ⇒ nhãn nét đứt + số giây cũ. */
   function dongLanCt(x) {
-    var g = gioVn(x.luc), m = x.mucLam, q = '<li class="mc-lanl ' + (x.dung ? 'mc-d' : 'mc-s') + '"><div class="mc-lanl-t"><span class="mc-kq2">' + (x.dung ? 'Đúng' : 'Sai') + '</span><b>' + g.ngan + ' · ' + g.gio + '</b><span class="mc-ng">' + thoat(tenNguon(x.nguon)) + '</span><span class="mc-chon">chọn <b>' + thoat(x.chon || '—') + '</b></span>' + (x.coGoiY ? '<span class="mc-goiy">có gợi ý</span>' : '') + chipCt(m ? m.ma : 0, false, m && m.uocTinh) + '</div>';
-    if (m) q += thuocCt(m, true);
-    q += '<p class="mc-lanl-gt">' + (m ? (m.ghiChu === 'dung_truoc_doc' ? 'Đúng · nộp sau ' + (m.uocTinh ? '≈ ' : '') + m.giay + ' giây, trước khi đọc hết đề (' + m.giayDoc + ' giây).' : TEN_MUC_CT[m.ma] + ' · ' + (m.uocTinh ? '≈ ' : '') + m.giay + ' giây, đọc hết đề cần ' + (m.xapXi ? '≈ ' : '') + m.giayDoc + ' giây.') + (m.uocTinh ? (m.uocTinh === 'uoc' ? ' Giây ước tính từ mốc trả lời trước trong lượt chơi, có thể dư.' : ' Giây đo bằng đồng hồ cũ, có thể dư.') : '') : (x.giay != null ? 'Làm bằng đồng hồ cũ: ' + x.giay + ' giây — chưa xếp mức.' : 'Chưa đo giờ — chưa xếp mức.')) + '</p></li>';
+    var g = gioVn(x.luc), m = x.mucLam, q = '<li class="mc-lanl ' + (x.dung ? 'mc-d' : 'mc-s') + '"><div class="mc-lanl-t"><span class="mc-kq2">' + (x.dung ? 'Đúng' : 'Sai') + '</span><b>' + g.ngan + ' · ' + g.gio + '</b><span class="mc-ng">' + thoat(tenNguon(x.nguon)) + '</span><span class="mc-chon">chọn <b>' + thoat(x.chon || '—') + '</b></span>' + (x.coGoiY ? '<span class="mc-goiy">có gợi ý</span>' : '') + (m && m.treo ? chipTreo(m, false) : chipCt(m ? m.ma : 0, false, m && m.uocTinh)) + '</div>';
+    if (m && !m.treo) q += thuocCt(m, true);
+    q += '<p class="mc-lanl-gt">' + (m && m.treo ? 'Máy để treo ' + (phutTreo(m) != null ? 'khoảng ' + phutTreo(m) + ' phút ' : '') + 'rồi mới nộp — không xếp Mức làm 1–4 (số giây không nói em đã nghĩ bao lâu).' : m ? (m.ghiChu === 'dung_truoc_doc' ? 'Đúng · nộp sau ' + (m.uocTinh ? '≈ ' : '') + m.giay + ' giây, trước khi đọc hết đề (' + m.giayDoc + ' giây).' : TEN_MUC_CT[m.ma] + ' · ' + (m.uocTinh ? '≈ ' : '') + m.giay + ' giây, đọc hết đề cần ' + (m.xapXi ? '≈ ' : '') + m.giayDoc + ' giây.') + (m.uocTinh ? (m.uocTinh === 'uoc' ? ' Giây ước tính từ mốc trả lời trước trong lượt chơi, có thể dư.' : ' Giây đo bằng đồng hồ cũ, có thể dư.') : '') : (x.giay != null ? 'Làm bằng đồng hồ cũ: ' + x.giay + ' giây — chưa xếp mức.' : 'Chưa đo giờ — chưa xếp mức.')) + '</p></li>';
     return q;
   }
   /** Cách làm bài 14 ngày (tổng Mức làm máy chủ đã gộp): đo được N/M · thanh 4 mức · bảng đúng/sai · làm vội / đã nghĩ. */
@@ -819,8 +834,11 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     if (!tong) return q + '<p class="mc-rong">Em chưa làm câu nào trong 14 ngày.</p></section>';
     q += '<p class="mc-do">Đo được <b>' + t.soDo + '</b>/<b>' + tong + '</b> lượt' + (t.chuaCoSoDo ? ' · ' + t.chuaCoSoDo + ' lượt chưa có số đo' : '') + '.</p>' + (t.soUocTinh ? '<p class="mc-rong">' + t.soUocTinh + ' lượt xếp từ số giây đồng hồ cũ hoặc ước tính (≈): có thể cao hơn thật nên mức chỉ là ước tính, không xếp Mức làm 4.</p>' : '');
     if (!t.soDo) return q + '<p class="mc-rong">Chưa lượt nào của em có số đo Mức làm. Từ khi máy em nạp bản mới, mức hiện ở đây.</p></section>';
-    q += '<div class="mc-ai-tn mc-tn-s" role="img" aria-label="Lượt theo Mức làm">' + t.theoMuc.map(function (r) { var n = r.dung + r.sai; return n ? '<i data-m="' + r.ma + '" style="flex:' + n + '">' + pipCt(r.ma) + '<b>' + n + '</b></i>' : ''; }).join('') + '</div>';
+    q += '<div class="mc-ai-tn mc-tn-s" role="img" aria-label="Lượt theo Mức làm">' + t.theoMuc.map(function (r) { var n = r.dung + r.sai; return n ? '<i data-m="' + r.ma + '" style="flex:' + n + '">' + pipCt(r.ma) + '<b>' + n + '</b></i>' : ''; }).join('') + ((t.soTreo || 0) + (t.soCoTinh || 0) ? '<i data-m="5" style="flex:' + ((t.soTreo || 0) + (t.soCoTinh || 0)) + '">' + IC_TREO + '<b>' + ((t.soTreo || 0) + (t.soCoTinh || 0)) + '</b></i>' : '') + '</div>';
     q += '<ul class="mc-cheo"><li class="mc-cheo-d"><span></span><i>Đúng</i><i>Sai</i></li>' + t.theoMuc.map(function (r) { return '<li data-m="' + r.ma + '"><span>' + pipCt(r.ma) + '<b>Mức làm ' + r.ma + '</b><small>' + TEN_MUC_CT[r.ma] + '</small></span><i>' + r.dung + '</i><i class="mc-sai-so">' + r.sai + '</i></li>'; }).join('') + '<li class="mc-cheo-t"><span>Cộng</span><i>' + t.theoMuc.reduce(function (a, r) { return a + r.dung; }, 0) + '</i><i class="mc-sai-so">' + t.theoMuc.reduce(function (a, r) { return a + r.sai; }, 0) + '</i></li></ul>';
+    // 6 mức: lượt treo không nằm trong bốn dòng (máy chủ tachTreo) ⇒ dòng riêng để bốn dòng + Treo máy = số đo được (Mức 6 đã gộp vào đây trước khi lên tờ).
+    var treo = (t.soTreo || 0) + (t.soCoTinh || 0);
+    if (treo) q += '<p class="mc-ket mc-ket-treo">' + IC_TREO + '<b>' + treo + '</b> lượt treo máy (để máy treo rồi mới nộp — không xếp Mức làm 1–4)</p>';
     return q + '<p class="mc-ket"><b>' + t.saiLamVoi + '</b> lượt sai khi làm vội (Mức làm 1–2) · <b>' + t.saiDuNghi + '</b> lượt sai dù đã nghĩ (Mức làm 3–4)</p></section>';
   }
   function veCt(nua, hs, loi) {
@@ -839,7 +857,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       else {
         var gc = gioVn(cuoiL.luc), mc = cuoiL.mucLam;
         h += '<div class="mc-kpi"><p><b>' + c.soLan + '</b><span>lần làm</span></p><p class="mc-k-d"><b>' + c.soDung + '</b><span>đúng</span></p><p class="mc-k-s"><b>' + c.soSai + '</b><span>sai</span></p></div><div class="mc-gan"><p class="mc-gan-t">Lần gần nhất · ' + gc.ngan + ' ' + gc.gio + ' · ' + (cuoiL.dung ? 'đúng' : 'sai') + '</p>';
-        if (mc) h += '<p class="mc-gan-so"><b>' + (mc.uocTinh ? '≈ ' : '') + mc.giay + '</b><span>giây em làm</span><i></i><b>' + (mc.xapXi ? '≈ ' : '') + mc.giayDoc + '</b><span>giây đọc hết đề cần</span></p>' + thuocCt(mc, false) + '<p class="mc-gan-nhan">' + chipCt(mc.ma, true, mc.uocTinh) + '</p><p class="mc-gan-gt">Đọc hết đề cần ' + mc.giayDoc + ' giây, rồi cần thêm ít nhất ' + mc.sanNghi + ' giây để nghĩ' + (typeof mc.thuong === 'number' ? ' · thời gian thường của lớp ở câu này: ' + mc.thuong + ' giây.' : mc.uocTinh ? ' · số giây chỉ là ước tính nên không xếp Mức làm 4.' : ' · lớp chưa đủ mẫu của câu này nên chưa có thời gian thường.') + '</p>' + chuGiaiCt(mc);
+        if (mc) h += '<p class="mc-gan-so"><b>' + (mc.uocTinh ? '≈ ' : '') + mc.giay + '</b><span>giây em làm</span><i></i><b>' + (mc.xapXi ? '≈ ' : '') + mc.giayDoc + '</b><span>giây đọc hết đề cần</span></p>' + thuocCt(mc, false) + '<p class="mc-gan-nhan">' + (mc.treo ? chipTreo(mc, true) : chipCt(mc.ma, true, mc.uocTinh)) + '</p><p class="mc-gan-gt">Đọc hết đề cần ' + mc.giayDoc + ' giây, rồi cần thêm ít nhất ' + mc.sanNghi + ' giây để nghĩ' + (typeof mc.thuong === 'number' ? ' · thời gian thường của lớp ở câu này: ' + mc.thuong + ' giây.' : mc.uocTinh ? ' · số giây chỉ là ước tính nên không xếp Mức làm 4.' : ' · lớp chưa đủ mẫu của câu này nên chưa có thời gian thường.') + '</p>' + chuGiaiCt(mc);
         else h += '<p class="mc-gan-chua">' + chipCt(0, true) + '</p><p class="mc-gan-gt">Lượt này chưa có số giây đáng tin (nộp cả lô, chưa từng bấm giờ, ca thi cũ) hoặc câu chưa tính kích thước đề nên chưa xếp được Mức làm. Từ lần làm tới, mức hiện ở đây.</p>';
         h += '</div>';
       }
@@ -920,23 +938,31 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     if (ma === 3) return r4 === null ? 'từ ' + r.ranh3 + ' giây' : (r4 > r.ranh3 ? r.ranh3 + '–' + (r4 - 1) + ' giây' : '');
     return r4 === null ? '' : 'từ ' + Math.max(r4, r.ranh3) + ' giây';
   }
-  /** Một thẻ: số em · thanh bốn mức (ký hiệu + số lượt) · năm làn (Mức làm 1–4 + "Chưa có số đo") với thẻ tên từng lượt. kieu: dd = đã điểm danh · lop = cả lớp · tat = chưa biết lớp. */
+  /** Một thẻ: số em · thanh (Mức 1–4 + Treo + chưa có số đo) · sáu làn (Mức làm 1–4 + Treo máy + "Chưa có số đo") với thẻ tên từng lượt. kieu: dd = đã điểm danh · lop = cả lớp · tat = chưa biết lớp.
+   *  6 MỨC (thầy duyệt 22/10): lượt TREO (mucLam.treo, kể cả 'co_tinh' nếu lọt tới đây) RỜI làn Mức 1–4 sang làn "Treo máy" (thẻ tên ghi số phút treo) — không đếm hai lần. */
   function theAiSai(kieu, ds, soEm, r, cot, coMatSet) {
     var tieu = kieu === 'dd' ? 'ĐÃ ĐIỂM DANH' : kieu === 'lop' ? 'CẢ LỚP' : 'EM LÀM SAI';
     var phu = kieu === 'dd' ? 'Em có mặt buổi này, làm sai câu này' : kieu === 'lop' ? 'Mọi em của lớp làm sai câu này' + (coMatSet ? ' · <i class="mc-vg mc-vg-g"></i> em vắng buổi này' : '') : 'Mọi em đã làm sai câu này';
     var bt = kieu === 'dd' ? '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.2 4.2 1.7 4.5 4.3"/></svg>';
-    var theo = [[], [], [], [], []], emSet = {}, nEm = 0;
-    ds.forEach(function (x) { var ma = x.mucLam && x.mucLam.ma >= 1 && x.mucLam.ma <= 4 ? x.mucLam.ma : 0; theo[ma].push(x); if (!emSet[x.sbd]) { emSet[x.sbd] = 1; nEm++; } });
+    var theo = [[], [], [], [], [], []], emSet = {}, nEm = 0, daDo = 0;
+    ds.forEach(function (x) { var ml = x.mucLam, ma = ml && ml.treo ? 5 : ml && ml.ma >= 1 && ml.ma <= 4 ? ml.ma : 0; if (ml && (ml.treo || ml.daDoTreo)) daDo++; theo[ma].push(x); if (!emSet[x.sbd]) { emSet[x.sbd] = 1; nEm++; } });
     var h = '<article class="mc-ai-the' + (cot > 3 ? ' mc-ai-dense' : '') + '" data-k="' + kieu + '"><header class="mc-ai-th"><span class="mc-ai-ky">' + bt + tieu + '</span><span class="mc-ai-ph">' + phu + '</span></header>'
       + '<div class="mc-ai-so"><p><b>' + nEm + '</b><span>' + (soEm != null ? '/ ' + soEm + ' em ' + (kieu === 'dd' ? 'có mặt' : 'của lớp') + ' làm sai' : 'em làm sai') + '</span></p><p class="mc-ai-luot"><b>' + ds.length + '</b><span>lượt sai</span></p></div>';
     var bar = '';
     for (var m = 1; m <= 4; m++) if (theo[m].length) bar += '<i data-m="' + m + '" style="flex:' + theo[m].length + '">' + pipHtml(m) + '<b>' + theo[m].length + '</b></i>';
+    if (theo[5].length) bar += '<i data-m="5" style="flex:' + theo[5].length + '">' + IC_TREO + '<b>' + theo[5].length + '</b></i>';
     if (theo[0].length) bar += '<i data-m="0" style="flex:' + theo[0].length + '"><b>' + theo[0].length + '</b></i>';
-    if (bar) h += '<div class="mc-ai-tn" role="img" aria-label="' + [1, 2, 3, 4].map(function (k) { return 'Mức làm ' + k + ': ' + theo[k].length + ' lượt'; }).join('; ') + (theo[0].length ? '; chưa có số đo: ' + theo[0].length + ' lượt' : '') + '">' + bar + '</div>';
+    if (bar) h += '<div class="mc-ai-tn" role="img" aria-label="' + [1, 2, 3, 4].map(function (k) { return 'Mức làm ' + k + ': ' + theo[k].length + ' lượt'; }).join('; ') + (theo[5].length ? '; treo máy: ' + theo[5].length + ' lượt' : '') + (theo[0].length ? '; chưa có số đo: ' + theo[0].length + ' lượt' : '') + '">' + bar + '</div>';
     function the(x, chua) {
       var vang = coMatSet && kieu === 'lop' && !coMatSet[x.sbd];
-      var g = x.giay != null && isFinite(x.giay) ? ((chua && x.uocTinh) || (x.mucLam && x.mucLam.uocTinh) ? '≈ ' : '') + giayChu(x.giay) : 'chưa đo giờ';
-      return '<li class="mc-pl" title="' + thoat(saiGio(x.luc) + ' · ' + tenNguon(x.noi || '')) + '">' + (vang ? '<i class="mc-vg" title="vắng"></i>' : '') + '<b data-t="' + thoat(tenNgan(x.ten || x.sbd)) + '">' + thoat(x.ten || x.sbd) + '</b><u>' + thoat(g) + '</u></li>';
+      var co = x.giay != null && isFinite(x.giay), uoc = (chua && x.uocTinh) || (x.mucLam && x.mucLam.uocTinh) ? '≈ ' : '';
+      // Đơn vị trong <s>: thẻ đông (4 cột) ẩn chữ "giây" để đủ chỗ cho tên — đầu làn ghi "số = giây làm".
+      var g = !co ? thoat('chưa đo giờ') : x.giay < 600 ? uoc + x.giay + '<s> giây</s>' : thoat(uoc + giayChu(x.giay));
+      return '<li class="mc-pl" title="' + thoat(saiGio(x.luc) + ' · ' + tenNguon(x.noi || '')) + '">' + (vang ? '<i class="mc-vg" title="vắng"></i>' : '') + '<b data-t="' + thoat(tenNgan(x.ten || x.sbd)) + '" data-f="' + thoat(x.ten || x.sbd) + '">' + thoat(x.ten || x.sbd) + '</b><u>' + g + '</u></li>';
+    }
+    function theTreo(x) {
+      var vang = coMatSet && kieu === 'lop' && !coMatSet[x.sbd], p = phutTreo(x.mucLam);
+      return '<li class="mc-pl mc-pl-treo" title="' + thoat(saiGio(x.luc) + ' · ' + tenNguon(x.noi || '')) + '">' + (vang ? '<i class="mc-vg" title="vắng"></i>' : '') + '<b data-t="' + thoat(tenNgan(x.ten || x.sbd)) + '" data-f="' + thoat(x.ten || x.sbd) + '">' + thoat(x.ten || x.sbd) + '</b><u>' + (p != null ? p + '<s> phút</s>' : '—') + '</u></li>';
     }
     function sapXep(a) { return a.slice().sort(function (p, q) { var gp = p.giay == null ? 1e9 : p.giay, gq = q.giay == null ? 1e9 : q.giay; return gp - gq || String(p.ten).localeCompare(String(q.ten), 'vi'); }); }
     h += '<div class="mc-ai-lan">';
@@ -944,8 +970,12 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       var kh = khoangMuc(r, k), tenM = TEN_MUC[k];
       if (k === 4 && r && typeof r.ranh4 !== 'number' && !theo[4].length) { h += '<section class="mc-ln mc-ln-rong" data-m="4"><header>' + pipHtml(4) + '<b>Mức làm 4</b><span>Lớp chưa đủ mẫu của câu này, hoặc số giây là ước tính, nên chưa xếp Mức làm 4</span></header></section>'; continue; }
       if (!theo[k].length) { h += '<section class="mc-ln mc-ln-rong" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '</span></header></section>'; continue; }
-      h += '<section class="mc-ln" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '</span><em>' + theo[k].length + ' lượt</em></header><ul class="mc-pls" style="--mc-cot:' + cot + '">' + sapXep(theo[k]).map(function (x) { return the(x, false); }).join('') + '</ul></section>';
+      h += '<section class="mc-ln" data-m="' + k + '"><header>' + pipHtml(k) + '<b>Mức làm ' + k + '</b><span>' + tenM + (kh ? ' · ' + kh : '') + '<i class="mc-dv"> · số = giây làm</i></span><em>' + theo[k].length + ' lượt</em></header><ul class="mc-pls" style="--mc-cot:' + cot + '">' + sapXep(theo[k]).map(function (x) { return the(x, false); }).join('') + '</ul></section>';
     }
+    // Làn Treo máy: có lượt ⇒ thẻ tên + số phút; không lượt nào nhưng đã có lượt đo ⇒ làn mờ "0 lượt"; CHƯA lượt nào đo treo (những ngày đầu) ⇒ làn nét đứt nói thật.
+    if (theo[5].length) h += '<section class="mc-ln mc-ln-treo"><header>' + IC_TREO + '<b>Treo máy</b><span>máy để treo lâu rồi mới nộp<i class="mc-dv"> · số = phút treo</i></span><em>' + theo[5].length + ' lượt</em></header><ul class="mc-pls" style="--mc-cot:' + cot + '">' + theo[5].slice().sort(function (p, q) { return ((q.mucLam && q.mucLam.giayTreo) || 0) - ((p.mucLam && p.mucLam.giayTreo) || 0) || String(p.ten).localeCompare(String(q.ten), 'vi'); }).map(theTreo).join('') + '</ul></section>';
+    else if (daDo) h += '<section class="mc-ln mc-ln-treo mc-ln-rong"><header>' + IC_TREO + '<b>Treo máy</b><span>Không lượt nào để máy treo</span></header></section>';
+    else if (ds.length) h += '<section class="mc-ln mc-ln-treo mc-ln-treo-chua"><header>' + IC_TREO + '<b>Treo máy</b><span>Chưa đo — lượt làm trước khi máy em cập nhật chưa ghi khoảng treo máy</span></header></section>';
     if (theo[0].length) h += '<section class="mc-ln mc-ln-chua"><header><b>Chưa có số đo</b><span>Lượt chưa có số giây đáng tin để xếp mức</span><em>' + theo[0].length + ' lượt</em></header><ul class="mc-pls" style="--mc-cot:' + cot + '">' + sapXep(theo[0]).map(function (x) { return the(x, true); }).join('') + '</ul></section>';
     return h + '</div></article>';
   }
@@ -955,8 +985,13 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     if (lop && Array.isArray(lop.coMat)) { coMatSet = {}; lop.coMat.forEach(function (s) { coMatSet[s] = 1; }); }
     var cot = ds.length > 28 ? 4 : 3, h = '';
     if (r) sai.querySelector('.mc-ai-dau').insertAdjacentHTML('beforeend', '<p class="mc-ai-thuoc"><span>Đọc hết đề cần</span><b>' + r.giayDoc + ' giây</b><span>Nghĩ từ ' + r.ranh3 + ' giây</span></p>');
+    var coTreo = ds.some(function (x) { return x.mucLam && x.mucLam.treo; });
     if (lop && lop.soLop > 0) {
-      h += '<div class="mc-ai-hai">';
+      // Máy chiếu 4:3 (≤ 1100 px ngang): hai thẻ cạnh nhau quá hẹp cho thẻ tên ⇒ MỘT thẻ rộng + hai nút chuyển (phím S; L đã là "gọi lên bảng").
+      var soDd = coMatSet ? Object.keys(ds.filter(function (x) { return coMatSet[x.sbd]; }).reduce(function (a, x) { a[x.sbd] = 1; return a; }, {})).length : 0;
+      var soCa = Object.keys(ds.reduce(function (a, x) { a[x.sbd] = 1; return a; }, {})).length;
+      h += '<div class="mc-ai-tab" role="tablist" aria-label="Chọn thẻ"><button type="button" role="tab" data-tab="dd" aria-selected="true">Đã điểm danh · ' + soDd + ' em</button><button type="button" role="tab" data-tab="lop" aria-selected="false">Cả lớp · ' + soCa + ' em <kbd>S</kbd></button></div>';
+      h += '<div class="mc-ai-hai" data-tab="dd">';
       if (coMatSet) {
         var dd = ds.filter(function (x) { return coMatSet[x.sbd]; });
         h += theAiSai('dd', dd, lop.soCoMat, r, cot, null);
@@ -967,13 +1002,41 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     } else {
       h += '<div class="mc-ai-hai mc-ai-1">' + theAiSai('tat', ds, null, r, cot, null) + '</div>';
     }
-    h += '<p class="mc-ai-chan"><span>' + (r ? 'Mức làm xếp theo số giây làm của từng lượt so với thời gian đọc hết đề (' + r.giayDoc + ' giây) và sàn nghĩ (' + r.sanNghi + ' giây).' : 'Mức làm có từ khi máy em dùng đồng hồ mới. Lượt làm trước đó chưa có số đo — không đoán mức.') + (conNua ? ' · 300 lượt gần nhất.' : '') + (coUoc ? ' ≈ là số giây ước tính hoặc đo bằng đồng hồ cũ (có thể dư): mức chỉ là ước tính, không xếp Mức làm 4.' : '') + '</span><span><kbd>Esc</kbd> đóng</span></p>';
+    h += '<p class="mc-ai-chan"><span>' + (r ? 'Mức làm xếp theo số giây làm của từng lượt so với thời gian đọc hết đề (' + r.giayDoc + ' giây) và sàn nghĩ (' + r.sanNghi + ' giây).' : 'Mức làm có từ khi máy em dùng đồng hồ mới. Lượt làm trước đó chưa có số đo — không đoán mức.') + (coTreo ? ' Lượt treo máy không xếp Mức làm 1–4: số giây của lượt ấy không nói em đã nghĩ bao lâu.' : '') + (conNua ? ' · 300 lượt gần nhất.' : '') + (coUoc ? ' ≈ là số giây ước tính hoặc đo bằng đồng hồ cũ (có thể dư): mức chỉ là ước tính, không xếp Mức làm 4.' : '') + '</span><span><kbd>Esc</kbd> đóng</span></p>';
     sai.insertAdjacentHTML('beforeend', h);
-    // Tên không đủ chỗ ⇒ viết tắt chữ đệm (đo sau khi vẽ xong).
+    chonCotAiSai();
+    $$(sai, '.mc-ai-tab button').forEach(function (b) { b.addEventListener('click', function () { doiTheAiSai(b.getAttribute('data-tab')); }); });
+  }
+  // Tên không đủ chỗ ⇒ viết tắt chữ đệm (đo sau khi vẽ xong); vẫn dài ⇒ bỏ hẳn chữ đệm (họ + tên). Đặt lại tên đủ trước mỗi lần đo.
+  function vuaTenAiSai() {
     $$(sai, '.mc-pl b').forEach(function (b) {
+      var f = b.getAttribute('data-f'); if (f != null) b.textContent = f;
       if (b.scrollWidth > b.clientWidth + 1) b.textContent = b.getAttribute('data-t');
-      if (b.scrollWidth > b.clientWidth + 1) { var w = String(b.textContent).split(' '); if (w.length > 2) b.textContent = w[0] + ' ' + w[w.length - 1]; } // vẫn dài: bỏ hẳn chữ đệm (họ + tên)
+      if (b.scrollWidth > b.clientWidth + 1) { var w = String(b.textContent).split(' '); if (w.length > 2) b.textContent = w[0] + ' ' + w[w.length - 1]; }
     });
+  }
+  /** Số cột thẻ tên (bản vẽ 22/10): thử 2 → 3 → 4, chọn ÍT cột nhất mà thẻ KHÔNG tràn và ít tên phải cắt "…" nhất (tràn nặng hơn cắt tên); 4 cột ⇒ thẻ đông (ẩn chữ đơn vị). */
+  function chonCotAiSai() {
+    var pls = $$(sai, '.mc-pls'), the = $$(sai, '.mc-ai-the');
+    if (!pls.length) { vuaTenAiSai(); return; }
+    var tot = null;
+    [2, 3, 4].forEach(function (c) {
+      pls.forEach(function (p) { p.style.setProperty('--mc-cot', c); }); the.forEach(function (t) { t.classList.toggle('mc-ai-dense', c > 3); });
+      vuaTenAiSai();
+      var tran = the.some(function (t) { return t.offsetParent !== null && t.scrollHeight > t.clientHeight + 1; });
+      var cat = $$(sai, '.mc-pl b').filter(function (b) { return b.offsetParent !== null && b.scrollWidth > b.clientWidth + 1; }).length;
+      var diem = (tran ? 1000 : 0) + cat;
+      if (!tot || diem < tot.diem) tot = { c: c, diem: diem };
+    });
+    pls.forEach(function (p) { p.style.setProperty('--mc-cot', tot.c); }); the.forEach(function (t) { t.classList.toggle('mc-ai-dense', tot.c > 3); });
+    vuaTenAiSai();
+  }
+  function doiTheAiSai(k) {
+    var hai = sai.querySelector('.mc-ai-hai[data-tab]'); if (!hai) return;
+    if (k !== 'dd' && k !== 'lop') k = hai.getAttribute('data-tab') === 'dd' ? 'lop' : 'dd';
+    hai.setAttribute('data-tab', k);
+    $$(sai, '.mc-ai-tab button').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-tab') === k ? 'true' : 'false'); });
+    chonCotAiSai();
   }
   function moAiSai() {
     if (!coAiSai()) { baoNhanh(coNutAiSai() ? (body.classList.contains('mc-noi') ? 'Câu này không tra được danh sách làm sai' : 'Tờ chưa nối với app thầy') : 'Tờ này không có danh sách làm sai'); return; }
@@ -1044,6 +1107,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       if (S.but) { batBut(); return; }
       return;
     }
+    if ((k === 's' || k === 'S') && sai.classList.contains('mc-mo')) { var tab = sai.querySelector('.mc-ai-tab'); if (tab && tab.offsetParent !== null) { e.preventDefault(); doiTheAiSai(); return; } }
     if (/^[0-9]$/.test(k)) { S.soGo = (S.soGo + k).slice(-3); baoNhanh('Tới đợt: ' + S.soGo + '  ↵ Enter', 0); return; }
     if (k === 'Backspace' && S.soGo) { S.soGo = S.soGo.slice(0, -1); baoNhanh(S.soGo ? 'Tới đợt: ' + S.soGo + '  ↵ Enter' : '', 0); return; }
     if (k === 'Enter' && S.soGo) { var n = +S.soGo; S.soGo = ''; luoi.classList.remove('mc-mo'); e.preventDefault(); toiDot(n - 1); return; }
