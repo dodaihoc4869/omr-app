@@ -41,7 +41,10 @@ describe('Làm câu ôn: đồng hồ đo giây', () => {
     const c1 = nop.find((x) => x.qid === 'on1')!
     expect(c1.doGiay!.g).toBeGreaterThanOrEqual(1)
     expect(c1.doGiay!.g).toBeLessThanOrEqual(3)
-    expect(Object.keys(c1.doGiay!)).toEqual(['g']) // máy em chỉ gửi giây; số từ/hình/phần do máy chủ tự đo
+    expect(Object.keys(c1.doGiay!)).toEqual(['g', 'v', 'a', 'l', 'n', 'w']) // giây + khuôn treo máy 22/10; số từ/hình/phần do máy chủ tự đo
+    const t1 = c1.doGiay as unknown as { g: number; v: number; a: number; n: number; w: number }
+    expect(t1.v).toBeGreaterThanOrEqual(t1.g)
+    expect([t1.a, t1.n, t1.w]).toEqual([0, 0, 0])
     expect(nop.find((x) => x.qid === 'on4')!.doGiay).toBeUndefined() // em không chạm câu 2 ⇒ không có giây của câu 2
   }, 15000)
 })

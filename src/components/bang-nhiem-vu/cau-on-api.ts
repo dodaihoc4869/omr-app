@@ -119,7 +119,7 @@ export interface MucTraLoi {
   dapAn: string
   giay?: number
   /** 20/10 đo giây: giây đo thật của máy em (src/lib/dong-ho-cau.ts). Kích thước đề do máy chủ tự đo từ câu nó chấm. */
-  doGiay?: { g: number }
+  doGiay?: { g: number; v?: number; a?: number; l?: number; n?: number; w?: 0 | 1 }
 }
 
 /** `POST /hs/on-lai/nop` — BẮT BUỘC token học sinh. Đáp án/lời giải chỉ có trong phản hồi `ok:true`. */

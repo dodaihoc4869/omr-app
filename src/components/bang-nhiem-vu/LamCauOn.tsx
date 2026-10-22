@@ -150,8 +150,11 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
   // 20/10 đo giây (cùng định nghĩa với màn Làm bài tập): CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900 giây một câu.
   // Nhiều câu cùng hiện ⇒ chỉ cộng cho MỘT câu em đang làm: câu em chạm gần nhất nếu nó còn hiện ≥ 50% trên màn, không thì câu hiện lớn nhất.
   // Viết nội tuyến (không tệp chung) để không tăng tải mở app và không thêm chunk (cổng `kiem:toc-do`, `kiem-sw`). Chỉ gửi giây; số từ/hình/phần do máy chủ đo.
+  // 22/10 ĐO TREO MÁY (docs/dac-ta-muc-lam-6-muc-2210.md mục 3, cùng khuôn với màn Làm bài tập): `g` GIỮ NGUYÊN; v · a · l · n theo CÂU ĐANG LÀM (cùng cách chọn câu như `g`;
+  // lúc tab ẩn cộng `a` cho câu đang làm cuối cùng); w = xin được giữ màn sáng trong lúc làm.
   const dsRef = useRef<HTMLOListElement>(null)
   const dhMs = useRef<Record<string, number>>({})
+  const dhT = useRef<Record<string, { v: number; a: number; l: number; n: number; lang: number }>>({}), dhW = useRef(false)
   const lamCau = pha === 'lam'
   useEffect(() => {
     const goc = dsRef.current
@@ -163,23 +166,50 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
       : null
     const xem = () => { if (io) goc.querySelectorAll<HTMLElement>('[data-qid]').forEach((c) => io.observe(c)) }
     xem()
+    let qCuoi = ''
+    const treo = (q: string) => (dhT.current[q] ??= { v: 0, a: 0, l: 0, n: 0, lang: 0 })
     const id = window.setInterval(() => {
       xem()
-      if (document.visibilityState !== 'visible' || Date.now() - cham > 180_000) return
+      if (document.visibilityState !== 'visible') { if (qCuoi) { const t = treo(qCuoi); t.a = Math.min(7200, t.a + 1) } return }
       let q = chamQid && (tiLe[chamQid] ?? 0) >= 0.5 ? chamQid : ''
       if (!q) { let max = 0; for (const k of Object.keys(tiLe)) if (tiLe[k]! > max) { max = tiLe[k]!; q = k } }
-      if (q) dhMs.current[q] = Math.min(900_000, (dhMs.current[q] ?? 0) + 1000)
+      if (!q) return
+      qCuoi = q
+      const t = treo(q)
+      t.v = Math.min(7200, t.v + 1); t.lang++
+      if (Date.now() - cham <= 180_000) dhMs.current[q] = Math.min(900_000, (dhMs.current[q] ?? 0) + 1000)
     }, 1000)
     const chamTay = (e: Event) => {
+      for (const t of Object.values(dhT.current)) { if (t.lang >= 120 && t.lang < 180) t.n++; t.l = Math.max(t.l, t.lang); t.lang = 0 }
       cham = Date.now()
       const c = (e.target as HTMLElement | null)?.closest?.('[data-qid]') as HTMLElement | null
       if (c?.dataset.qid && goc.contains(c)) chamQid = c.dataset.qid
     }
     const ev = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel']
     for (const e of ev) window.addEventListener(e, chamTay, { passive: true, capture: true })
-    return () => { window.clearInterval(id); io?.disconnect(); for (const e of ev) window.removeEventListener(e, chamTay, { capture: true }) }
+    // Giữ màn sáng khi đang làm (trình duyệt tự nhả khi tab ẩn ⇒ xin lại khi hiện lại). Không hỗ trợ / bị từ chối ⇒ w = 0.
+    type Khoa = { release: () => Promise<void> }
+    const wl = (navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<Khoa> } }).wakeLock
+    let khoaMan: Khoa | null = null, het = false
+    const xin = () => {
+      if (!wl || het || document.visibilityState !== 'visible') return
+      wl.request('screen').then((k) => { if (het) void k.release().catch(() => {}); else { khoaMan = k; dhW.current = true } }, () => { dhW.current = false })
+    }
+    const doiHien = () => { if (document.visibilityState === 'visible') xin() }
+    xin()
+    document.addEventListener('visibilitychange', doiHien)
+    return () => {
+      het = true
+      window.clearInterval(id); io?.disconnect()
+      for (const e of ev) window.removeEventListener(e, chamTay, { capture: true })
+      document.removeEventListener('visibilitychange', doiHien)
+      void khoaMan?.release().catch(() => {})
+    }
   }, [lamCau])
-  const giayCua = (qid: string) => { const m = dhMs.current[qid] ?? 0; return m >= 1000 ? { g: Math.round(m / 1000) } : undefined }
+  const giayCua = (qid: string) => {
+    const m = dhMs.current[qid] ?? 0, t = dhT.current[qid]
+    return m >= 1000 ? { g: Math.round(m / 1000), ...(t ? { v: t.v, a: t.a, l: Math.max(t.l, t.lang), n: t.n, w: (dhW.current ? 1 : 0) as 0 | 1 } : {}) } : undefined
+  }
   const dsChuaCham = useMemo(() => cau.filter((c) => !ketQua[c.qid]), [cau, ketQua])
   const soDaTraLoi = useMemo(() => dsChuaCham.filter((c) => daTraLoi(c, traLoi[c.qid])).length, [dsChuaCham, traLoi])
   const soChuaTraLoi = dsChuaCham.length - soDaTraLoi
