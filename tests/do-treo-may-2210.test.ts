@@ -156,11 +156,11 @@ describe('phiếu — đo treo máy (v a l n w)', () => {
 
   it('mở lại phiếu: v a l n cộng dồn từ bảng lưu (khoá __do); câu có đáp án sẵn mà không có đồng hồ cũ ⇒ không đo gì', () => {
     const { b, chiHien, giay } = taoDo()
-    b.khoiPhuc({ q1: 20, __do: { v: { q1: 50, q2: 9 }, a: { q1: 7 }, l: { q1: 40 }, n: { q1: 2 }, wh: { q1: 1 } } }, ['q2'])
+    b.khoiPhuc({ q1: 20, __do: { v: { q1: 50, q2: 9 }, a: { q1: 7 }, l: { q1: 40 }, n: { q1: 2 }, wc: { q1: 1 } } }, ['q2'])
     chiHien(1)
     cham(1)
     giay(5)
-    expect(b.layDoGiay(null)).toEqual({ q1: { g: 25, v: 55, a: 7, l: 40, n: 2, w: 0 } })
+    expect(b.layDoGiay(null)).toEqual({ q1: { g: 25, v: 55, a: 7, l: 40, n: 2, w: 1 } }) // w: lần mở trước đã giữ được màn sáng
   })
 
   it('datLai xoá cả phần đo thêm của câu đã nộp', () => {
@@ -172,9 +172,22 @@ describe('phiếu — đo treo máy (v a l n w)', () => {
     expect(b.layDoGiay(null)).toBeNull()
   })
 
-  it('giữ màn sáng: TẮT mặc định ⇒ không xin wakeLock, w = 0', () => {
-    const request = vi.fn(() => Promise.resolve({ released: false, addEventListener() {}, release() {} }))
-    const { b, chiHien, giay } = taoDo({}, { wakeLock: { request } })
+  /** Khoá màn sáng giả: `nha()` = hệ điều hành / trình duyệt tự nhả. */
+  const taoKhoa = () => {
+    const ds: Array<{ released: boolean; nha: () => void; release: ReturnType<typeof vi.fn> }> = []
+    const request = vi.fn(() => {
+      let f: () => void = () => {}
+      const k = { released: false, addEventListener: (_t: string, g: () => void) => { f = g }, release: vi.fn(() => { k.released = true; f(); return Promise.resolve() }), nha: () => { k.released = true; f() } }
+      ds.push(k)
+      return Promise.resolve(k)
+    })
+    return { request, ds }
+  }
+  const vong = () => new Promise((r) => setTimeout(r, 0))
+
+  it('giữ màn sáng TẮT (tuy.giuManSang = false) ⇒ không xin, w = 0', () => {
+    const { request } = taoKhoa()
+    const { b, chiHien, giay } = taoDo({ giuManSang: false }, { wakeLock: { request } })
     chiHien(1)
     cham(1)
     giay(3)
@@ -182,37 +195,48 @@ describe('phiếu — đo treo máy (v a l n w)', () => {
     expect(b.layDoGiay(null)!.q1.w).toBe(0)
   })
 
-  it('giữ màn sáng BẬT (tuy.giuManSang) và máy hỗ trợ ⇒ w = 1; khoá bị nhả giữa chừng ⇒ w = 0; hiện lại thì xin lại', async () => {
-    let nha: (() => void) | null = null
-    const khoa = () => {
-      const k = { released: false, addEventListener: (_t: string, f: () => void) => { nha = () => { k.released = true; f() } }, release() {} }
-      return k
-    }
-    const request = vi.fn(() => Promise.resolve(khoa()))
-    const { b, chiHien, giay } = taoDo({ giuManSang: true }, { wakeLock: { request } })
-    await Promise.resolve()
+  it('giữ màn sáng MẶC ĐỊNH BẬT: xin khi mở ⇒ w = 1; tab ẩn (trình duyệt tự nhả) KHÔNG hạ w; hiện lại thì xin lại; không xin chồng', async () => {
+    const { request, ds } = taoKhoa()
+    const { b, chiHien, giay } = taoDo({}, { wakeLock: { request } })
+    cham(1) // chạm ngay lúc đang xin ⇒ cờ đang-xin chặn lần xin thứ hai
+    expect(request).toHaveBeenCalledTimes(1)
+    await vong()
     chiHien(1)
     cham(1)
     giay(3)
     expect(request).toHaveBeenCalledWith('screen')
     expect(b.layDoGiay(null)!.q1.w).toBe(1)
-    nha!() // hệ điều hành nhả khoá
-    giay(1)
-    expect(b.layDoGiay(null)!.q1.w).toBe(0)
     an()
+    ds[0]!.nha()
     hien()
+    expect(request).toHaveBeenCalledTimes(2)
+    giay(1)
+    expect(b.layDoGiay(null)!.q1.w).toBe(1)
+  })
+
+  it('10 phút không chạm ⇒ NHẢ giữ màn sáng (máy bỏ quên không sáng mãi); chạm lại ⇒ xin lại', async () => {
+    const { request, ds } = taoKhoa()
+    const { chiHien, giay } = taoDo({}, { wakeLock: { request } })
+    await vong()
+    chiHien(1)
+    cham(1)
+    giay(599)
+    expect(ds[0]!.release).not.toHaveBeenCalled()
+    giay(2)
+    expect(ds[0]!.release).toHaveBeenCalledTimes(1)
+    cham(1)
     expect(request).toHaveBeenCalledTimes(2)
   })
 
-  it('giữ màn sáng BẬT nhưng máy KHÔNG hỗ trợ (iOS cũ) / xin bị từ chối ⇒ w = 0, không lỗi', async () => {
-    const mot = taoDo({ giuManSang: true }, {})
+  it('máy KHÔNG hỗ trợ (iOS cũ) / xin bị từ chối ⇒ w = 0, không lỗi', async () => {
+    const mot = taoDo({}, {})
     mot.chiHien(1)
     cham(1)
     mot.giay(2)
     expect(mot.b.layDoGiay(null)!.q1.w).toBe(0)
     mot.b.dung()
-    const tuChoi = taoDo({ giuManSang: true }, { wakeLock: { request: () => Promise.reject(new Error('NotAllowedError')) } })
-    await Promise.resolve()
+    const tuChoi = taoDo({}, { wakeLock: { request: () => Promise.reject(new Error('NotAllowedError')) } })
+    await vong()
     tuChoi.chiHien(1)
     cham(1)
     tuChoi.giay(2)
@@ -300,8 +324,8 @@ describe('ca thi — bộ đếm treo máy (do-treo-may-thi.ts) + cụm gửi', 
     expect(doGiayThi(null, null)).toBeNull()
   })
   it('nạp bảng lưu: kẹp khoảng, bỏ rác', () => {
-    const d = taoDoTreoMay({ c1: { a: 9e9, l: -1, n: 70.4, wh: 1 }, c2: null as never })
-    expect(d.bang()).toEqual({ c1: { a: 7200, n: 60, wh: 1 } })
+    const d = taoDoTreoMay({ c1: { a: 9e9, l: -1, n: 70.4, wc: 1 }, c2: null as never })
+    expect(d.bang()).toEqual({ c1: { a: 7200, n: 60, wc: 1 } })
   })
 })
 
@@ -313,7 +337,8 @@ describe('ca thi — batDoTreoMay trên trang (nạp lười từ màn thi)', as
     for (let i = 0; i < 150; i++) d.nhip('c1')
     document.dispatchEvent(new Event('pointerdown'))
     d.nhip('c1')
-    expect(luot.current!.doCau).toMatchObject({ c1: { n: 1, l: 150, wh: 1 } })
+    expect(luot.current!.doCau).toMatchObject({ c1: { n: 1, l: 150 } })
+    expect(luot.current!.doCau!.c1).not.toHaveProperty('wc') // giữ màn sáng tắt ⇒ chưa từng giữ được
     d.dung()
     for (let i = 0; i < 150; i++) d.nhip('c1')
     document.dispatchEvent(new Event('pointerdown')) // đã gỡ ⇒ không đếm thêm lần lặng
@@ -321,5 +346,35 @@ describe('ca thi — batDoTreoMay trên trang (nạp lười từ màn thi)', as
     const truoc = JSON.stringify(luot.current!.doCau)
     d.nhip('c1')
     expect(JSON.stringify(luot.current!.doCau)).toBe(truoc)
+  })
+})
+
+describe('ca thi — giữ màn sáng (luật Boss 22/10)', async () => {
+  const { batDoTreoMay, doGiayThi } = await import('../src/lib/do-treo-may-thi')
+  it('xin khi vào đề, không xin chồng; w = 1 kể cả sau khi tab ẩn tự nhả; 10 phút không chạm ⇒ nhả; chạm ⇒ xin lại; dung() nhả', async () => {
+    let gio = 0
+    const khoa: Array<{ released: boolean; release: ReturnType<typeof vi.fn> }> = []
+    const request = vi.fn(() => { const k = { released: false, addEventListener() {}, release: vi.fn(() => { k.released = true; return Promise.resolve() }) }; khoa.push(k); return Promise.resolve(k) })
+    Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: { request } })
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => tabHien !== 'visible' })
+    const luot: { current: { doCau?: Record<string, { wc?: 1 }>; submitted?: boolean } | null } = { current: {} }
+    const d = batDoTreoMay(luot as never, true, () => gio)
+    document.dispatchEvent(new Event('pointerdown')) // đang xin ⇒ không xin chồng
+    expect(request).toHaveBeenCalledTimes(1)
+    await new Promise((r) => setTimeout(r, 0))
+    gio += 1000; d.nhip('c1')
+    expect(luot.current!.doCau!.c1!.wc).toBe(1)
+    an(); hien() // trình duyệt tự nhả khi ẩn ⇒ hiện lại xin lại
+    expect(request).toHaveBeenCalledTimes(2)
+    await new Promise((r) => setTimeout(r, 0))
+    for (let i = 0; i < 601; i++) { gio += 1000; d.nhip('c1') }
+    expect(khoa[1]!.release).toHaveBeenCalledTimes(1)
+    document.dispatchEvent(new Event('keydown'))
+    expect(request).toHaveBeenCalledTimes(3)
+    await new Promise((r) => setTimeout(r, 0))
+    expect(doGiayThi({ c1: 602 }, luot.current!.doCau as never)!.c1!.w).toBe(1)
+    d.dung()
+    expect(khoa[2]!.release).toHaveBeenCalledTimes(1)
+    delete (navigator as unknown as Record<string, unknown>).wakeLock
   })
 })

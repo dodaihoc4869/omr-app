@@ -1811,14 +1811,17 @@ export function thanhHtml(soCau: number, anGiai = false): string {
  *   a = giây câu mở khi tab ẩn / màn tắt — CHỈ khoảng ẩn khép lại trong cùng một lần mở trang (đóng tối mở sáng ⇒ không cộng, tránh "treo" oan), trần 7200;
  *   l = khoảng lặng dài nhất (giây tab hiện kể từ lần chạm trước), tính cả khoảng từ lần chạm cuối tới lúc nộp, trần 7200;
  *   n = số khoảng lặng 120–179 giây kết thúc bằng một lần chạm (chạm giữ cho đồng hồ chạy), trần 60;
- *   w = 1 nếu màn được giữ sáng (Screen Wake Lock) suốt mọi giây câu mở; không giữ / không hỗ trợ ⇒ 0.
- * Giữ màn sáng: cờ GIU_MAN_SANG (TẮT tới khi thầy duyệt — đặc tả mục 5); tuy.giuManSang ghi đè cho test.
+ *   w = 1 nếu đã xin được giữ màn sáng (Screen Wake Lock) trong lúc câu mở — màn ẩn lúc ấy là em tự rời app / tắt màn, không phải màn tự tắt;
+ *       trình duyệt tự nhả khi tab ẩn KHÔNG hạ về 0 (luật Boss 22/10, cùng ManLamBaiTap). Không hỗ trợ / bị từ chối ⇒ 0.
+ * Giữ màn sáng (GIU_MAN_SANG, tuy.giuManSang ghi đè cho test): xin khi mở; NHẢ sau 10 phút không chạm (máy bỏ quên không sáng mãi), chạm lại thì xin lại;
+ * tab ẩn ⇒ trình duyệt tự nhả, hiện lại thì xin lại; cờ đang-xin chống xin chồng.
  */
 export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
   var CHAM_MS = 180000
   var TRAN = 900
   var TRAN_DO = 7200
-  var GIU_MAN_SANG = false
+  var GIU_MAN_SANG = true
+  var NHA_SANG_MS = 600000
   var cfg = tuy || {}
   var bayGio = typeof cfg.bayGio === 'function' ? cfg.bayGio : function () { return Date.now() }
   var co = function (o: any, k: any) { return Object.prototype.hasOwnProperty.call(o, k) }
@@ -1835,13 +1838,15 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
   var aa: any = {}
   var ll: any = {}
   var nn: any = {}
-  var wHong: any = {}
+  var wCo: any = {}
   var lang = 0
   var cauDem: any = null
   var tAn: any = null
   var qAn: any = null
   var giuSang = cfg.giuManSang != null ? !!cfg.giuManSang : GIU_MAN_SANG
   var khoaSang: any = null
+  var dangXin = false
+  var daDung = false
   var coIO = false
   var i: number
   var ds = doc.querySelectorAll('.q-card[data-qid]')
@@ -1862,7 +1867,7 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
     if (typeof cfg.luu === 'function') {
       try {
         var bang = JSON.parse(JSON.stringify(dem))
-        bang.__do = JSON.parse(JSON.stringify({ v: vv, a: aa, l: ll, n: nn, wh: wHong }))
+        bang.__do = JSON.parse(JSON.stringify({ v: vv, a: aa, l: ll, n: nn, wc: wCo }))
         cfg.luu(bang)
       } catch (e) { /* không lưu được thì thôi: đồng hồ vẫn chạy trong phiên này */ }
     }
@@ -1878,6 +1883,7 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
       if (!co(boQua, qn)) { nn[qn] = Math.min(60, (nn[qn] || 0) + 1); thayDoi++ }
     }
     lang = 0
+    if (!khoaSang) xinSang()
   }
   var theCua = function (t: any) { return t && t.closest ? t.closest('.q-card[data-qid]') : null }
   var tuongTac = function (e: any) {
@@ -1901,21 +1907,25 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
   for (i = 0; i < ev.length; i++) gan(doc, ev[i], chamNut, { capture: true, passive: true })
   ev = ['keydown', 'wheel', 'scroll']
   for (i = 0; i < ev.length; i++) gan(doc, ev[i], chiCham, { capture: true, passive: true })
-  var xinSang = function () {
-    if (!giuSang || khoaSang) return
+  function xinSang() {
+    if (!giuSang || daDung || khoaSang || dangXin || doc.visibilityState !== 'visible') return
     try {
       var nav = win.navigator
       if (nav && nav.wakeLock && typeof nav.wakeLock.request === 'function') {
+        dangXin = true
         nav.wakeLock.request('screen').then(function (k: any) {
+          dangXin = false
+          if (daDung) { try { k.release() } catch (e2) { /* bỏ qua */ } return }
           khoaSang = k
-          if (k && typeof k.addEventListener === 'function') k.addEventListener('release', function () { khoaSang = null })
-        }, function () { khoaSang = null })
+          if (k && typeof k.addEventListener === 'function') k.addEventListener('release', function () { if (khoaSang === k) khoaSang = null })
+        }, function () { dangXin = false; khoaSang = null })
       }
-    } catch (e) { khoaSang = null }
+    } catch (e) { dangXin = false; khoaSang = null }
   }
   var dangGiuSang = function () { return !!khoaSang && !khoaSang.released }
   gan(doc, 'visibilitychange', function () {
     if (doc.visibilityState !== 'visible') {
+      khoaSang = null // trình duyệt tự nhả khi ẩn
       tAn = bayGio()
       qAn = cauDem ? cauDem.getAttribute('data-qid') : null
       luuNgay()
@@ -1977,8 +1987,12 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
     if (!co(boQua, qd)) {
       vv[qd] = Math.min(TRAN_DO, (vv[qd] || 0) + 1)
       if (lang > (ll[qd] || 0)) ll[qd] = Math.min(TRAN_DO, lang)
-      if (!dangGiuSang()) wHong[qd] = 1
+      if (dangGiuSang()) wCo[qd] = 1
       doi = true
+    }
+    if (khoaSang && bayGio() - cuoiCham > NHA_SANG_MS) {
+      try { khoaSang.release() } catch (e) { /* bỏ qua */ }
+      khoaSang = null
     }
     // g: GIỮ NGUYÊN định nghĩa cũ (câu hiện đủ, chạm trong 180 giây, trần 900).
     if (c && bayGio() - cuoiCham < CHAM_MS) {
@@ -2020,7 +2034,7 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
         napSo(luuDo.a, aa, TRAN_DO)
         napSo(luuDo.l, ll, TRAN_DO)
         napSo(luuDo.n, nn, 60)
-        napSo(luuDo.wh, wHong, 1)
+        napSo(luuDo.wc, wCo, 1)
       }
     },
     /** `{qid: {g}}` cho các câu trong `dsQid` (mặc định: mọi câu) có giây đo thật; không câu nào ⇒ null (đừng gửi khoá `doGiay`). */
@@ -2040,7 +2054,7 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
         var v = vv[q] || 0
         var a = aa[q] || 0
         if (!(g > 0) && !(v > 0) && !(a > 0)) continue
-        var muc: any = { v: v, a: a, l: ll[q] || 0, n: nn[q] || 0, w: v > 0 && !wHong[q] ? 1 : 0 }
+        var muc: any = { v: v, a: a, l: Math.max(ll[q] || 0, cauDem && cauDem.getAttribute('data-qid') === q ? Math.min(TRAN_DO, lang) : 0), n: nn[q] || 0, w: wCo[q] ? 1 : 0 }
         if (g > 0) muc.g = g
         ra[q] = muc
         nhieu++
@@ -2054,7 +2068,7 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
       for (var j = 0; j < dsq.length; j++) {
         var qx = dsq[j]
         if (co(dem, qx)) delete dem[qx]
-        delete vv[qx]; delete aa[qx]; delete ll[qx]; delete nn[qx]; delete wHong[qx]
+        delete vv[qx]; delete aa[qx]; delete ll[qx]; delete nn[qx]; delete wCo[qx]
         thayDoi++
       }
       lang = 0
@@ -2063,6 +2077,7 @@ export function taoBoDoGiay(win: any, doc: any, tuy?: any) {
     /** Dừng đồng hồ và gỡ mọi bộ nghe (dùng trong test). */
     dung: function () {
       win.clearInterval(hen)
+      daDung = true
       try { if (khoaSang && typeof khoaSang.release === 'function') khoaSang.release() } catch (e) { /* bỏ qua */ }
       khoaSang = null
       for (var j = 0; j < daGan.length; j++) daGan[j][0].removeEventListener(daGan[j][1], daGan[j][2], daGan[j][3])

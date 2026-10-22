@@ -4,7 +4,7 @@
 //   a = giây ẩn tab / màn tắt, cộng cho câu đang làm lúc ẩn — CHỈ khoảng ẩn khép lại trong cùng một lần mở trang;
 //   l = khoảng lặng dài nhất (giây tab hiện kể từ lần chạm trước), tính cả khoảng từ lần chạm cuối tới lúc nộp;
 //   n = số khoảng lặng 120–179 giây kết thúc bằng một lần chạm (chạm giữ cho đồng hồ chạy);
-//   w = 1 nếu màn được giữ sáng suốt mọi giây câu mở (bảng lưu ghi điều ngược lại: `wh` = 1 khi có giây KHÔNG giữ được).
+//   w = 1 nếu đã xin được giữ màn sáng trong lúc câu mở (bảng lưu: `wc` = 1); trình duyệt tự nhả khi tab ẩn KHÔNG hạ về 0 (luật Boss 22/10).
 // ExamTakeScreen NẠP LƯỜI mô-đun này sau khi vào đề (cổng tốc độ: đường /t không mang thêm byte); mảnh nằm ở kho chạy-lúc (vite.config globIgnores),
 // mất mạng không nạp được thì chỉ thiếu số đo, bài thi không ảnh hưởng. Không setState: màn thi gọi `nhip` trong nhịp 1 giây sẵn có.
 
@@ -13,8 +13,8 @@ export interface DoTreoCau {
   a?: number
   l?: number
   n?: number
-  /** 1 = có ít nhất một giây câu mở mà màn KHÔNG được giữ sáng. */
-  wh?: 1
+  /** 1 = đã giữ được màn sáng (Screen Wake Lock) ít nhất một giây lúc câu mở. */
+  wc?: 1
 }
 
 /** Cụm gửi máy chủ cho một câu ca thi. */
@@ -50,7 +50,7 @@ export function taoDoTreoMay(dau?: Record<string, DoTreoCau> | null, bayGio: () 
         const x = Math.round(Number(m[k]))
         if (x > 0) sach[k] = Math.min(tran, x)
       }
-      if (m.wh === 1) sach.wh = 1
+      if (m.wc === 1) sach.wc = 1
       bang[q] = sach
     }
   }
@@ -67,7 +67,7 @@ export function taoDoTreoMay(dau?: Record<string, DoTreoCau> | null, bayGio: () 
       if (!q) return
       const m = cua(q)
       if (lang > (m.l ?? 0)) m.l = Math.min(TRAN_DO, lang)
-      if (!giuSang) m.wh = 1
+      if (giuSang) m.wc = 1
     },
     cham() {
       if (lang >= 120 && lang < 180 && qLang) {
@@ -104,29 +104,43 @@ export function doGiayThi(giayCau: Record<string, number> | null | undefined, do
     const m = doCau?.[q] ?? {}
     const a = m.a ?? 0
     if (!(v > 0) && !(a > 0)) continue
-    ra[q] = { v, a, l: m.l ?? 0, n: m.n ?? 0, w: v > 0 && m.wh !== 1 ? 1 : 0 }
+    ra[q] = { v, a, l: m.l ?? 0, n: m.n ?? 0, w: m.wc === 1 ? 1 : 0 }
   }
   return Object.keys(ra).length > 0 ? ra : null
 }
 
-/** Giữ màn sáng khi đang làm (đặc tả mục 5): TẮT tới khi thầy duyệt — bật chỉ cần đổi hằng này. */
-export const GIU_MAN_SANG = false
+/** Giữ màn sáng khi đang làm (đặc tả mục 5; luật Boss 22/10 cùng ManLamBaiTap): xin khi vào đề, nhả sau 10 phút không chạm, chạm thì xin lại. */
+export const GIU_MAN_SANG = true
+const NHA_SANG_MS = 600_000
 
 type KhoaSang = { released?: boolean; release?: () => Promise<void>; addEventListener?: (t: string, f: () => void) => void }
 
 /** Bật bộ đo trên trang thi: nghe chạm (pointerdown / keydown / input / touchstart / wheel), ẩn / hiện tab, giữ màn sáng (theo cờ).
  *  Màn thi gọi `nhip(qid)` mỗi giây lúc tab hiện và `dung()` khi rời màn. Mỗi nhịp bộ đo TỰ ghi bảng vào lượt làm hiện hành (`luot.current.doCau`,
  *  như màn thi tự ghi `giayCau`) ⇒ lưu IndexedDB / nộp cứ mang theo lượt làm là có, màn thi không phải ghép thêm (đường /t không thêm byte). */
-export function batDoTreoMay(luot: { current: { doCau?: Record<string, DoTreoCau>; submitted?: boolean } | null }, giuSang: boolean = GIU_MAN_SANG) {
-  const bo = taoDoTreoMay(luot.current?.doCau)
+export function batDoTreoMay(luot: { current: { doCau?: Record<string, DoTreoCau>; submitted?: boolean } | null }, giuSang: boolean = GIU_MAN_SANG, bayGio: () => number = () => Date.now()) {
+  const bo = taoDoTreoMay(luot.current?.doCau, bayGio)
   let khoa: KhoaSang | null = null
+  let dangXin = false
+  let het = false
+  let chamCuoi = bayGio()
   const xinSang = () => {
-    if (!giuSang || khoa) return
+    if (!giuSang || het || khoa || dangXin || document.hidden) return
     const wl = (navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<KhoaSang> } }).wakeLock
-    wl?.request('screen').then((k) => { khoa = k; k.addEventListener?.('release', () => { khoa = null }) }, () => { khoa = null })
+    if (!wl) return
+    dangXin = true
+    wl.request('screen').then(
+      (k) => {
+        dangXin = false
+        if (het) { k.release?.().catch(() => {}); return }
+        khoa = k
+        k.addEventListener?.('release', () => { if (khoa === k) khoa = null })
+      },
+      () => { dangXin = false; khoa = null },
+    )
   }
-  const cham = () => bo.cham()
-  const anHien = () => { if (document.hidden) bo.an(); else { bo.hien(); xinSang() } }
+  const cham = () => { bo.cham(); chamCuoi = bayGio(); if (!khoa) xinSang() }
+  const anHien = () => { if (document.hidden) { khoa = null; bo.an() } else { bo.hien(); xinSang() } }
   const SU_KIEN = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel']
   for (const t of SU_KIEN) document.addEventListener(t, cham, { capture: true, passive: true })
   document.addEventListener('visibilitychange', anHien)
@@ -134,11 +148,13 @@ export function batDoTreoMay(luot: { current: { doCau?: Record<string, DoTreoCau
   return {
     nhip: (qid: string | null) => {
       bo.nhip(qid, !!khoa && !khoa.released)
+      if (khoa && bayGio() - chamCuoi > NHA_SANG_MS) { khoa.release?.().catch(() => {}); khoa = null } // máy bỏ quên không sáng mãi
       const cur = luot.current
       if (cur && !cur.submitted) cur.doCau = bo.bang()
     },
     bang: bo.bang,
     dung: () => {
+      het = true
       for (const t of SU_KIEN) document.removeEventListener(t, cham, { capture: true })
       document.removeEventListener('visibilitychange', anHien)
       khoa?.release?.().catch(() => {})
