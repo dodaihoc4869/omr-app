@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản vẽ Hồ sơ học sinh</title>
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:400;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-500-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-600-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-800-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(../../node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Noto Serif';font-weight:400;src:url(../../node_modules/@fontsource/noto-serif/files/noto-serif-vietnamese-400-normal.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Noto Serif';font-weight:400;src:url(../../node_modules/@fontsource/noto-serif/files/noto-serif-latin-400-normal.woff2) format('woff2')}
+</style>
+</style>
+<!-- BẢN VẼ «HỒ SƠ HỌC SINH Ở BA GÓC NHÌN» — Đợt 2 Mức làm 6 mức (22/10). CHỈ là bản vẽ (bước 2 quy trình 4 bước): số liệu MINH HOẠ, CHƯA sửa src/.
+     Nạp ĐÚNG CSS thật của tấm "Hồ sơ làm bài" (tokens · gv-v2 · ho-so-lam-cau-em · vỏ học sinh/phụ huynh). Khối mới `.hsv-*` CHỈ dùng biến màu có sẵn (--gvm-*, --phu).
+     Truy vấn: ?app=thay|hs|ph · &t=dl (mặc định) | tai | rong | loi | mang | cu · &mo=luot (cuộn tới lượt treo) · &toan=1 (trải cả tấm để chụp toàn bộ).
+     Đặc tả: DAC-TA.md cùng thư mục. Hợp đồng dữ liệu: server/src/muc-lam.ts nhánh claude/stoic-einstein-7jkysb (treo · giayTreo · chuaDoTreo · soTreo · soCoTinh · soChuaDoTreo). -->
+<link rel="stylesheet" href="../../src/styles/tokens.css">
+<link rel="stylesheet" href="../../src/components/chien-dich/gv-v2.css">
+<link rel="stylesheet" href="../../src/components/chien-dich/bai-hang-ngay.css">
+<link rel="stylesheet" href="../../src/components/chien-dich/ho-so-lam-cau-em.css">
+<link rel="stylesheet" href="../../src/components/hoc-tap/ho-so-cua-em-hs.css">
+<link rel="stylesheet" href="../../src/components/ph-v3/ho-so-con.css">
+<style>
+body{margin:0;font-family:var(--sans);background:var(--gvm-nen);color:var(--gvm-chu)}
+.vo-thay-ve{--m3-man-che:var(--phu)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hsv-minh-hoa{display:inline-block;margin-left:4px;padding:0 8px;border-radius:999px;background:var(--gvm-mat-2);color:var(--gvm-chu-2);font-size:12px;font-weight:700;white-space:nowrap}
+/* trang nền phía sau tấm (chỉ để thấy tấm là tấm phủ) */
+.nen-sau{padding:24px;display:grid;gap:12px}
+.nen-sau i{display:block;height:56px;border-radius:16px;background:var(--gvm-mat)}
+
+/* ================= KHỐI MỚI `.hsv-*` (chỉ biến màu có sẵn) ================= */
+.hsv{
+  /* Mức 5 · Treo máy = họ hổ phách; Mức 6 · Cố tình treo máy = họ hồng (CHỈ app thầy). Khác HỌ với dải xanh Mức 1–4 ⇒ không đọc nhầm là "mức cao hơn". */
+  --hsv-5:var(--gvm-hp);--hsv-5-nen:var(--gvm-hp-nen);--hsv-5-dam:var(--gvm-hp-dam);
+  --hsv-6:var(--gvm-ho);--hsv-6-nen:var(--gvm-ho-nen);--hsv-6-dam:var(--gvm-ho-dam);
+}
+.hsv [data-t='5']{--hslc-c:var(--hsv-5)}
+.hsv [data-t='6']{--hslc-c:var(--hsv-6)}
+.hsv-dau-chip{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.hsv-ico{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* chip mức 5 / 6 / chưa đo treo */
+.hsv .hslc-chip-m[data-t='5']{background:var(--hsv-5-nen);color:var(--hsv-5-dam);box-shadow:inset 0 0 0 1.5px var(--hsv-5)}
+.hsv .hslc-chip-m[data-t='6']{background:var(--hsv-6-nen);color:var(--hsv-6-dam);box-shadow:inset 0 0 0 1.5px var(--hsv-6)}
+.hsv .hslc-chip-m[data-t] .hslc-chip-m-ten{color:inherit}
+.hsv-chua-treo{display:inline-flex;align-items:center;min-height:24px;padding:0 10px;border-radius:999px;border:1.5px dashed var(--gvm-chu-3);font-size:12px;font-weight:700;color:var(--gvm-chu-2);white-space:nowrap}
+.hsv-chip-dau{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:800;line-height:1.35;white-space:normal;max-width:100%;box-sizing:border-box}
+/* Cột chữ đầu tấm được co (min-width 0) ⇒ chip dài tự xuống dòng, không chui dưới nút Đóng. */
+.gvv2-hs-dau-chu{min-width:0}
+.hsv-chip-dau[data-t='6']{background:var(--hsv-6-nen);color:var(--hsv-6-dam)}
+.hsv-chip-dau[data-t='5']{background:var(--hsv-5-nen);color:var(--hsv-5-dam)}
+.hsv-chip-dau[data-l]{background:var(--gvm-hp-nen);color:var(--gvm-hp-dam)}
+
+/* lưới thân: một cột; tấm rộng ≥ 880 px ⇒ hai cột (trái: cách làm bài + từng lượt · phải: số liệu, theo ngày, câu cần sửa) */
+.hsv-luoi{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-content:start;min-width:0}
+.hsv-cot{display:grid;gap:20px;align-content:start;min-width:0}
+@container hslc (min-width:880px){.hsv-luoi{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:24px}}
+.hsv-khoi{display:grid;gap:12px;min-width:0;padding:16px;border-radius:var(--r-vua,16px);background:var(--gvm-mat);border:1px solid var(--gvm-vien)}
+.hsv-khoi > h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin:0;font-size:17px;font-weight:800;color:var(--gvm-chu)}
+.hsv-khoi > h3 small{font-size:13px;font-weight:600;color:var(--gvm-chu-2)}
+.hsv-phu{margin:0;font-size:14px;line-height:1.5;color:var(--gvm-chu-2)}
+.hsv-phu b{color:var(--gvm-chu);font-weight:800}
+.hsv-ghi{margin:0;font-size:13px;line-height:1.45;color:var(--gvm-chu-2)}
+
+/* ĐIỂM NHẤN (học sinh / phụ huynh): con số lớn + nhịp học */
+.hsv-nhan{display:grid;gap:8px;padding:20px;border-radius:var(--r-vua,16px);background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
+.hsv-nhan small{font-size:13px;font-weight:700}
+.hsv-nhan-so{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.hsv-nhan-so b{font-size:40px;line-height:1;font-weight:800;font-variant-numeric:tabular-nums}
+.hsv-nhan-so span{font-size:16px;font-weight:700}
+.hsv-nhan p{margin:0;font-size:15px;line-height:1.5}
+
+/* bốn ô số (thầy) */
+.hsv-so{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
+.hsv-so div{display:grid;gap:2px;padding:12px;border-radius:var(--r-nho,12px);background:var(--gvm-mat-2);min-width:0}
+.hsv-so dt{font-size:12px;font-weight:700;color:var(--gvm-chu-2)}
+.hsv-so dd{margin:0;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--gvm-chu)}
+.hsv-so dd small{display:block;font-size:12px;font-weight:600;color:var(--gvm-chu-2)}
+
+/* thanh chồng 6 mức + đoạn chưa có số đo */
+.hsv-thanh{display:flex;gap:3px;height:32px}
+/* Đoạn ít lượt vẫn đủ rộng chứa nhãn số (≥ 44 px) — không để số tràn khỏi đoạn. */
+.hsv-thanh i{display:grid;place-items:center;min-width:44px;border-radius:999px;background:var(--hslc-c);font-style:normal}
+.hsv-thanh i[data-t='5']{background:repeating-linear-gradient(135deg,var(--hsv-5) 0 6px,var(--hsv-5-nen) 6px 10px)}
+.hsv-thanh i[data-t='6']{background:repeating-linear-gradient(45deg,var(--hsv-6) 0 5px,var(--hsv-6-nen) 5px 8px),var(--hsv-6)}
+.hsv-thanh i[data-chua]{background:transparent;border:1.5px dashed var(--gvm-chu-3)}
+.hsv-thanh b{min-width:20px;padding:0 6px;border-radius:999px;background:var(--gvm-mat);color:var(--gvm-chu);font-size:13px;font-weight:800;line-height:20px;text-align:center;font-variant-numeric:tabular-nums}
+
+/* sáu ô mức */
+.hsv-o-luoi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}
+@container hslc (min-width:560px){.hsv-o-luoi{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.hsv-o{display:grid;gap:4px;align-content:start;min-width:0;padding:12px;border-radius:var(--r-nho,12px);background:var(--gvm-mat-2);box-shadow:inset 4px 0 0 var(--hslc-c)}
+.hsv-o[data-t='5']{background:var(--hsv-5-nen);color:var(--hsv-5-dam)}
+.hsv-o[data-t='6']{background:var(--hsv-6-nen);color:var(--hsv-6-dam)}
+.hsv-o-dau{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800}
+.hsv-o-ten{font-size:13px;line-height:1.35;font-weight:600;color:var(--gvm-chu-2)}
+.hsv-o[data-t] .hsv-o-ten{color:inherit}
+.hsv-o-so{font-size:22px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
+.hsv-o-so small{font-size:13px;font-weight:700}
+.hsv-o-ds{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--gvm-chu-2)}
+.hsv-o[data-t] .hsv-o-ds{color:inherit}
+.hsv-o[data-chua]{background:transparent;box-shadow:none;border:1.5px dashed var(--gvm-chu-3);color:var(--gvm-chu-2)}
+
+/* ba ô "lượt sai rơi vào đâu" */
+.hsv-ba{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+@container hslc (min-width:560px){.hsv-ba{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.hsv-ba p{display:grid;gap:2px;margin:0;padding:12px 14px;border-radius:var(--r-nho,12px);background:var(--gvm-xd-nen);color:var(--gvm-xd-dam)}
+.hsv-ba p[data-t='5']{background:var(--hsv-5-nen);color:var(--hsv-5-dam)}
+.hsv-ba b{font-size:24px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.hsv-ba span{font-size:14px;line-height:1.4}
+
+/* cảnh báo Mức 6 (chỉ thầy): bằng chứng, không nhãn năng lực */
+.hsv-canh{display:grid;gap:8px;padding:14px 16px;border-radius:var(--r-nho,12px);background:var(--hsv-6-nen);color:var(--hsv-6-dam);border:1.5px solid var(--hsv-6)}
+.hsv-canh-dau{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800}
+.hsv-canh ol{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.hsv-canh li{padding:2px 10px;border-radius:999px;background:var(--gvm-mat);color:var(--gvm-chu);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.hsv-canh p{margin:0;font-size:14px;line-height:1.45}
+.hsv-canh .gvv2-nut-vien{justify-self:start;background:var(--gvm-mat);color:var(--gvm-chu)}
+
+/* nhẹ nhàng (học sinh): lượt máy để treo */
+.hsv-nhe{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r-nho,12px);background:var(--hsv-5-nen);color:var(--hsv-5-dam);font-size:14px;line-height:1.5}
+.hsv-nhe p{margin:0}
+
+/* theo ngày */
+.hsv-ngay{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.hsv-ngay li{display:grid;grid-template-columns:88px minmax(0,1fr) 64px;align-items:center;gap:8px;min-width:0}
+.hsv-ngay-ten{font-size:13px;font-weight:700;color:var(--gvm-chu)}
+.hsv-ngay-ten small{display:block;font-size:12px;font-weight:600;color:var(--gvm-chu-2)}
+.hsv-ngay-thanh{display:flex;gap:2px;height:14px;min-width:0}
+.hsv-ngay-thanh i{min-width:4px;border-radius:3px;background:var(--hslc-c)}
+.hsv-ngay-thanh i[data-t='5']{background:repeating-linear-gradient(135deg,var(--hsv-5) 0 4px,var(--hsv-5-nen) 4px 7px)}
+.hsv-ngay-thanh i[data-t='6']{background:var(--hsv-6)}
+.hsv-ngay-thanh i[data-chua]{background:transparent;border:1.5px dashed var(--gvm-chu-3)}
+.hsv-ngay-so{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--gvm-chu-2)}
+.hsv-ngay li[data-co-tinh] .hsv-ngay-ten{color:var(--hsv-6-dam)}
+.hsv-chu-giai{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;font-size:12px;font-weight:600;color:var(--gvm-chu-2)}
+.hsv-chu-giai span{display:inline-flex;align-items:center;gap:6px}
+.hsv-chu-giai i{width:12px;height:12px;border-radius:3px;background:var(--hslc-c)}
+.hsv-chu-giai i[data-t='5']{background:repeating-linear-gradient(135deg,var(--hsv-5) 0 3px,var(--hsv-5-nen) 3px 5px)}
+.hsv-chu-giai i[data-chua]{background:transparent;border:1.5px dashed var(--gvm-chu-3)}
+
+/* từng lượt */
+.hsv-loc{display:flex;flex-wrap:wrap;gap:6px}
+.hsv-loc button{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--gvm-vien);background:var(--gvm-mat);color:var(--gvm-chu-2);font:inherit;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation}
+.hsv-loc button[aria-selected='true']{background:var(--gvm-xd-nen);color:var(--gvm-xd-dam);border-color:var(--gvm-xd)}
+.hsv-loc button:focus-visible{outline:3px solid var(--gvm-xd);outline-offset:2px}
+.hsv-ngay-tieu{margin:4px 0 0;font-size:14px;font-weight:800;color:var(--gvm-chu)}
+.hsv-ngay-tieu small{font-size:13px;font-weight:600;color:var(--gvm-chu-2)}
+.hsv-lan-ds{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.hsv-lan{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:12px;border-radius:var(--r-nho,12px);background:var(--gvm-mat);border:1px solid var(--gvm-vien);min-width:0}
+.hsv-lan[data-treo]{border-color:var(--hslc-c);box-shadow:inset 4px 0 0 var(--hslc-c)}
+.hsv-lan-gio{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--gvm-chu)}
+.hsv-lan-giua{display:grid;gap:4px;min-width:0}
+.hsv-lan-giua > b{font-size:15px;font-weight:800;overflow-wrap:anywhere}
+.hsv-lan-giua > small{font-size:13px;color:var(--gvm-chu-2)}
+.hsv-kq{justify-self:end;min-height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:800;line-height:26px;white-space:nowrap}
+.hsv-kq[data-kq='dung']{background:var(--gvm-xl-nen);color:var(--gvm-xl-dam)}
+.hsv-kq[data-kq='sai']{background:var(--gvm-ho-nen);color:var(--gvm-ho-dam)}
+.hsv-muc{grid-column:2/-1;display:grid;gap:4px;min-width:0}
+.hsv-muc-dong{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;min-width:0}
+.hsv-muc-so{font-size:13px;font-weight:700;color:var(--gvm-chu)}
+.hsv-phut{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:14px;font-weight:700;color:var(--hsv-5-dam)}
+.hsv-lan[data-t='6'] .hsv-phut{color:var(--hsv-6-dam)}
+.hsv-phut-thanh{display:block;flex:1 1 140px;min-width:120px;height:10px;border-radius:999px;background:var(--gvm-mat-2);position:relative;overflow:hidden}
+.hsv-phut-thanh i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:repeating-linear-gradient(135deg,var(--hslc-c) 0 6px,var(--gvm-mat-2) 6px 9px)}
+.hsv-lan .hslc-thuoc-m{padding:6px 8px 4px}
+.hsv-them{justify-self:start}
+
+/* câu cần sửa */
+.hsv-sua{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.hsv-sua li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:var(--r-nho,12px);background:var(--gvm-mat-2);min-width:0}
+.hsv-sua li > span{display:grid;min-width:0;font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.hsv-sua li > span small{font-size:13px;font-weight:600;color:var(--gvm-chu-2)}
+
+/* khối cũ, gập (giữ nguyên nội dung, chỉ dời xuống) */
+.hsv-gap{display:grid;gap:8px}
+.hsv-gap details{border-radius:var(--r-nho,12px);background:var(--gvm-mat);border:1px solid var(--gvm-vien)}
+.hsv-gap summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:0 16px;font-size:15px;font-weight:700;cursor:pointer;list-style:none;touch-action:manipulation}
+.hsv-gap summary::-webkit-details-marker{display:none}
+.hsv-gap summary::after{content:'';flex:none;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+.hsv-gap summary small{margin-left:auto;font-size:13px;font-weight:600;color:var(--gvm-chu-2)}
+.hsv-gap summary:focus-visible{outline:3px solid var(--gvm-xd);outline-offset:-3px}
+
+/* cách tính */
+.hsv .hslc-cach summary{min-height:44px;display:flex;align-items:center}
+.hsv-cach p{margin:0;font-size:14px;line-height:1.55;color:var(--gvm-chu-2)}
+
+/* trạng thái */
+.hsv-xuong{display:grid;gap:12px}
+.hsv-xuong i{display:block;border-radius:16px;background:var(--gvm-mat-2);animation:hsv-nhay 1.2s ease-in-out infinite}
+@keyframes hsv-nhay{0%,100%{opacity:.55}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.hsv-xuong i{animation:none}}
+.hsv-trong{display:grid;gap:10px;justify-items:start;padding:20px;border-radius:var(--r-vua,16px);border:1.5px dashed var(--gvm-chu-3);background:var(--gvm-mat)}
+.hsv-trong p{margin:0;font-size:15px;line-height:1.5;color:var(--gvm-chu-2)}
+.hsv-trong b{font-size:17px;color:var(--gvm-chu)}
+.hsv-loi{display:grid;gap:10px;justify-items:start;padding:16px;border-radius:var(--r-vua,16px);background:var(--gvm-ho-nen);color:var(--gvm-ho-dam)}
+.hsv-loi p{margin:0;font-size:15px;line-height:1.5}
+.hsv-mang{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 14px;border-radius:var(--r-nho,12px);background:var(--gvm-hp-nen);color:var(--gvm-hp-dam);font-size:14px;line-height:1.45}
+.hsv-mang p{flex:1 1 220px;margin:0}
+
+/* trải cả tấm để chụp toàn bộ (chỉ ảnh "toàn bộ") */
+.toan-bo .gvv2-hs-che{display:none}
+.toan-bo .gvv2-hs{position:relative;inset:auto;width:100%;height:auto;min-height:100dvh;animation:none}
+.toan-bo .gvv2-hs-than{overflow:visible}
+.toan-bo .nen-sau{display:none}
+</style>
+</head>
+<body>
+<div id="goc"></div>
+<script>
+const Q = new URLSearchParams(location.search)
+const APP = Q.get('app') || 'thay'          // thay | hs | ph
+const T = Q.get('t') || 'dl'                // dl | tai | rong | loi | mang | cu
+const LA_THAY = APP === 'thay', NGOI = APP === 'ph' ? 'con' : 'em', HOA = APP === 'ph' ? 'Con' : 'Em'
+if (Q.get('toan') === '1') document.documentElement.classList.add('toan-bo')
+
+// ---------- biểu tượng (nét lucide, vẽ tay bằng SVG — không thư viện) ----------
+const ICO = {
+  treo: '<svg class="hsv-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>',
+  coTinh: '<svg class="hsv-ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  dong: '<svg class="hsv-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  mang: '<svg class="hsv-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5.17-2.8M19 13a10 10 0 0 0-2.2-1.6M12 20h.01"/></svg>',
+  sua: '<svg class="hsv-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+}
+const pip = (n) => `<span class="hslc-pip" data-n="${n}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>`
+
+// ---------- tên mức (một nguồn; HỌC SINH/PHỤ HUYNH KHÔNG có Mức 6 — máy chủ đã hạ về 5) ----------
+const TEN_THAY = { 1: 'Chưa đọc hết đề', 2: 'Đọc xong, chưa kịp nghĩ', 3: 'Có nghĩ', 4: 'Làm kỹ', 5: 'Treo máy', 6: 'Cố tình treo máy' }
+const TEN_EM = { 1: 'Nộp trước khi đọc hết đề', 2: 'Đọc xong thì nộp ngay', 3: 'Có thời gian nghĩ', 4: 'Làm kỹ, đúng nhịp lớp', 5: 'Máy để treo' }
+const ten = (m) => (LA_THAY ? TEN_THAY : TEN_EM)[m]
+const thuocTinh = (m) => (m <= 4 ? `data-m="${m}"` : `data-t="${m}"`)
+const bieuTuong = (m) => (m <= 4 ? pip(m) : m === 5 ? ICO.treo : ICO.coTinh)
+const chip = (m, dai = true) => `<span class="hslc-chip-m" ${thuocTinh(m)}>${bieuTuong(m)}<b>Mức làm ${m}</b>${dai ? ` <span class="hslc-chip-m-ten">${ten(m)}</span>` : ''}</span>`
+const phut = (g) => { const p = Math.floor(g / 60), s = g % 60; return s ? `${p} phút ${s} giây` : `${p} phút` }
+const phutTron = (g) => `${Math.round(g / 60)} phút`
+
+// ---------- SỐ LIỆU MINH HOẠ (một bảng; khớp hợp đồng tongMucLam(..., { tachTreo: true })) ----------
+// 7 ngày 16/10–22/10/2026. Lượt từ 20/10 có số đo treo máy; 16–19/10 "Chưa đo treo máy". Thứ Tư 21/10: 4 lượt treo cùng ngày ⇒ Mức 6 (bản thầy).
+const TONG = { soLuot: 64, soCau: 38, soDung: 35, soSai: 29, soDo: 52, chuaCoSoDo: 12, soChuaDoTreo: 30, soTreo: 4, soCoTinh: 4,
+  theoMuc: [{ ma: 1, luot: 9, dung: 2, sai: 7 }, { ma: 2, luot: 8, dung: 3, sai: 5 }, { ma: 3, luot: 17, dung: 12, sai: 5 }, { ma: 4, luot: 10, dung: 9, sai: 1 }],
+  treoDS: { 5: { dung: 1, sai: 3 }, 6: { dung: 0, sai: 4 } }, giayTb: 48 }
+const NGAY = [ // [nhãn, ngày, mỗi mức số lượt 1..6, chưa có số đo, chưa đo treo?]
+  ['Thứ Sáu', '16/10', [2, 1, 3, 2, 0, 0], 3, true], ['Thứ Bảy', '17/10', [1, 2, 2, 1, 0, 0], 2, true], ['Chủ Nhật', '18/10', [1, 1, 3, 1, 0, 0], 1, true],
+  ['Thứ Hai', '19/10', [2, 1, 2, 1, 0, 0], 2, true], ['Thứ Ba', '20/10', [1, 1, 3, 2, 2, 0], 2, false], ['Thứ Tư', '21/10', [1, 1, 2, 1, 0, 4], 1, false],
+  ['Thứ Năm', '22/10', [1, 1, 2, 2, 2, 0], 1, false],
+]
+// Lượt hiện trong danh sách (mới → cũ). giay = giây làm (đồng hồ mới); giayTreo = giây em không ở với câu (chỉ khi treo).
+const LAN = [
+  { ngay: 'Thứ Năm 22/10/2026', gio: '20:41', cau: 'Câu 7 · Điện phân', noi: 'Bài tập về nhà · Chặng 2', md: 'Vận dụng', kq: 'sai', m: 5, giayTreo: 434 },
+  { ngay: 'Thứ Năm 22/10/2026', gio: '20:30', cau: 'Câu 12 · Pin điện hoá', noi: 'Bài tập về nhà · Chặng 2', md: 'Thông hiểu', kq: 'sai', m: 1, giay: 14, doc: 24, r2: 24, r3: 30, r4: 60 },
+  { ngay: 'Thứ Năm 22/10/2026', gio: '19:58', cau: 'Câu 15 · Ăn mòn điện hoá', noi: 'Bát Linh Đảo', md: 'Vận dụng', kq: 'dung', m: 4, giay: 96, doc: 36, r2: 36, r3: 42, r4: 80 },
+  { ngay: 'Thứ Tư 21/10/2026', gio: '15:02', cau: 'Câu 21 · Điện phân dung dịch', noi: 'Ôn lại', md: 'Vận dụng', kq: 'sai', m: 6, giayTreo: 660 },
+  { ngay: 'Thứ Tư 21/10/2026', gio: '14:40', cau: 'Câu 9 · Pin điện hoá', noi: 'Ôn lại', md: 'Nhận biết', kq: 'sai', m: 6, giayTreo: 420 },
+  { ngay: 'Thứ Tư 21/10/2026', gio: '14:21', cau: 'Câu 30 · Sơ đồ pin Zn–Cu', noi: 'Ôn lại', md: 'Thông hiểu', kq: 'sai', m: 6, giayTreo: 480 },
+  { ngay: 'Thứ Tư 21/10/2026', gio: '14:05', cau: 'Câu 3 · Đại cương kim loại', noi: 'Ôn lại', md: 'Nhận biết', kq: 'sai', m: 6, giayTreo: 372 },
+  { ngay: 'Thứ Hai 19/10/2026', gio: '21:14', cau: 'Câu 18 · Ăn mòn kim loại', noi: 'Bài tập về nhà · Chặng 1', md: 'Thông hiểu', kq: 'sai', m: 3, giay: 58, doc: 30, r2: 30, r3: 36, r4: 88, chuaDoTreo: true },
+]
+// Bản HỌC SINH / PHỤ HUYNH: máy chủ đã hạ Mức 6 ⇒ 5 (mucCongKhai / tongCongKhai). Ở đây làm đúng phép ấy, KHÔNG để chữ "6" nào sống sót.
+const lanApp = LA_THAY ? LAN : LAN.map((l) => (l.m === 6 ? { ...l, m: 5 } : l))
+const soTreoApp = LA_THAY ? TONG.soTreo : TONG.soTreo + TONG.soCoTinh
+const CU = T === 'cu' // mọi lượt làm trước khi máy em có đồng hồ treo máy
+
+// ---------- khối dựng ----------
+function dau() {
+  const chipDau = LA_THAY && !CU && T === 'dl' || LA_THAY && T === 'mang'
+    ? `<div class="hsv-dau-chip"><span class="hsv-chip-dau" data-t="6">${ICO.coTinh}Cố tình treo máy · 1 ngày trong 7 ngày</span><span class="hsv-chip-dau" data-l>Có dấu hiệu đối phó</span><span class="hsv-chip-dau" data-l>Nhịp học: Chưa đều</span></div>` : ''
+  const chu = LA_THAY
+    ? `<small class="gvv2-hs-mat">Hồ sơ làm bài <span class="hsv-minh-hoa">Bản vẽ · số liệu minh hoạ</span></small><h2 id="hsv-ten" class="gvv2-h2">Lý Quang Minh</h2><p id="hsv-phu" class="gvv2-so">SBD 11010 · Lớp 12A1 · 7 ngày gần nhất (16/10 – 22/10)</p>${chipDau}`
+    : `<small class="gvv2-hs-mat">Lý Quang Minh · Lớp 12A1 <span class="hsv-minh-hoa">Bản vẽ · số liệu minh hoạ</span></small><h2 id="hsv-ten" class="gvv2-h2">Hồ sơ làm bài của ${NGOI}</h2><p id="hsv-phu">7 ngày gần nhất (16/10 – 22/10) · Thầy cũng xem hồ sơ này.</p>`
+  return `<header class="gvv2-hs-dau hslc-dau"><span class="gvv2-avatar" aria-hidden="true">QM</span><div class="gvv2-hs-dau-chu">${chu}</div>
+    <button type="button" class="gvv2-nut-chu gvv2-hs-dong">${ICO.dong}Đóng</button></header>`
+}
+
+function thanhChong(dem, chua) {
+  const tong = dem.reduce((a, b) => a + b, 0) + chua
+  const nhan = dem.map((n, i) => n ? `Mức làm ${i + 1} (${ten(i + 1)}): ${n} lượt` : '').filter(Boolean)
+  if (chua) nhan.push(`Chưa có số đo: ${chua} lượt`)
+  return `<div class="hsv-thanh" role="img" aria-label="${nhan.join('; ')}">${dem.map((n, i) => n ? `<i ${thuocTinh(i + 1)} style="flex:${n}"><b>${n}</b></i>` : '').join('')}${chua ? `<i data-chua style="flex:${chua}"><b>${chua}</b></i>` : ''}</div>`
+}
+
+function oMuc(m, so, ds, chuaTreo) {
+  if (chuaTreo) return `<li class="hsv-o" data-chua>${'<span class="hsv-o-dau">' + bieuTuong(m) + 'Mức làm ' + m + '</span>'}<span class="hsv-o-ten">${ten(m)}</span><span class="hsv-o-ds">Chưa đo treo máy</span></li>`
+  return `<li class="hsv-o" ${thuocTinh(m)}><span class="hsv-o-dau">${bieuTuong(m)}Mức làm ${m}</span><span class="hsv-o-ten">${ten(m)}</span><span class="hsv-o-so">${so} <small>lượt</small></span><span class="hsv-o-ds">${ds}</span></li>`
+}
+
+function khoiCachLamThay() {
+  const tm = TONG.theoMuc
+  const dem = CU ? [...tm.map((r) => r.luot), 0, 0] : [...tm.map((r) => r.luot), TONG.soTreo, TONG.soCoTinh]
+  // Bản «chưa đo treo»: không có lượt Mức 5–6 ⇒ chỉ Mức 1–4 có số đo (44), phần còn lại là chưa có số đo.
+  const soDo = CU ? tm.reduce((a, r) => a + r.luot, 0) : TONG.soDo, chua = TONG.soLuot - soDo
+  const saiVoi = tm[0].sai + tm[1].sai, saiNghi = tm[2].sai + tm[3].sai, saiTreo = CU ? 0 : TONG.treoDS[5].sai + TONG.treoDS[6].sai, saiCo = saiVoi + saiNghi + saiTreo
+  const o = [...tm.map((r) => oMuc(r.ma, r.luot, `đúng ${r.dung} · sai ${r.sai}`)),
+    oMuc(5, TONG.soTreo, `đúng ${TONG.treoDS[5].dung} · sai ${TONG.treoDS[5].sai}`, CU), oMuc(6, TONG.soCoTinh, `đúng ${TONG.treoDS[6].dung} · sai ${TONG.treoDS[6].sai}`, CU)].join('')
+  const canh = CU ? '' : `<div class="hsv-canh" role="note"><span class="hsv-canh-dau">${ICO.coTinh}Mức làm 6 · Cố tình treo máy · Thứ Tư 21/10/2026</span>
+      <p>4 lượt treo máy trong cùng một ngày (từ 3 lượt trở lên là Mức làm 6). Thời gian em không ở với câu:</p>
+      <ol aria-label="Các lượt treo máy ngày 21/10"><li>14:05 · 6 phút</li><li>14:21 · 8 phút</li><li>14:40 · 7 phút</li><li>15:02 · 11 phút</li></ol>
+      <p>Chỉ thầy thấy mức này. Học sinh và phụ huynh thấy "Máy để treo".</p>
+      <button type="button" class="gvv2-nut-vien tt-nhan">Xem 4 lượt này</button></div>`
+  return `<section class="hsv-khoi" aria-labelledby="hsv-cl"><h3 id="hsv-cl">Cách làm bài <small>· 6 mức từng lượt</small></h3>
+    <p class="hsv-phu gvv2-so">Đo được <b>${soDo}</b>/<b>${TONG.soLuot}</b> lượt · <b>${chua}</b> lượt chưa có số đo · <b>${CU ? soDo : TONG.soChuaDoTreo}</b> lượt chưa đo treo máy${CU ? '' : ' (làm trước 20/10)'}.</p>
+    ${thanhChong(dem, chua)}
+    ${canh}
+    <ul class="hsv-o-luoi" aria-label="Sáu mức làm">${o}</ul>
+    <div class="hsv-ba gvv2-so">
+      <p><b>${saiVoi}/${saiCo}</b><span>lượt sai là lúc làm vội (Mức làm 1–2)</span></p>
+      <p><b>${saiNghi}/${saiCo}</b><span>lượt sai dù đã nghĩ (Mức làm 3–4)</span></p>
+      ${CU ? '' : `<p data-t="5"><b>${saiTreo}/${saiCo}</b><span>lượt sai sau khi máy để treo (Mức làm 5–6)</span></p>`}
+    </div>
+    ${CU ? `<p class="hsv-ghi">Mọi lượt trong 7 ngày làm trước khi máy em có đồng hồ đo treo máy, nên chưa xếp được Mức làm 5–6 (không đoán). Lượt làm từ khi máy em nạp bản mới sẽ có số đo.</p>` : ''}
+    <details class="hslc-cach hsv-cach"><summary class="tt-nhan">Cách tính Mức làm</summary><p>Mức làm 1–4 theo số giây so với thời gian đọc hết đề (giữ như cũ). Mức làm 5 · Treo máy: không chạm màn từ 5 phút khi màn đang sáng, hoặc rời app từ 3 phút khi màn được giữ sáng (10 phút khi máy không giữ được màn sáng). Mức làm 6 · Cố tình treo máy: cùng một ngày có từ 3 lượt treo máy, hoặc một lượt có 3 lần lặng 2–3 phút rồi chạm ngay trước ngưỡng cắt của đồng hồ. Lượt treo không tính vào giây trung bình. Ngưỡng là tạm, chỉnh sau một tuần số thật.</p></details>
+  </section>`
+}
+
+function khoiCachLamEm() {
+  const tm = TONG.theoMuc
+  const saiVoi = tm[0].sai + tm[1].sai, saiNghi = tm[2].sai + tm[3].sai, saiTreo = TONG.treoDS[5].sai + TONG.treoDS[6].sai, saiCo = saiVoi + saiNghi + saiTreo
+  const dem = [...tm.map((r) => r.sai), CU ? 0 : soTreoApp]
+  const dong = tm.map((r) => `<li data-m="${r.ma}">${chip(r.ma, false)} <span class="hslc-cl-em-ten">${TEN_EM[r.ma]}</span> <b class="hslc-cl-em-luot">${r.sai} lượt sai</b></li>`).join('')
+  if (APP === 'ph') {
+    return `<section class="hsv-khoi" aria-labelledby="hsv-cl"><h3 id="hsv-cl">Cách con làm bài <small>· lượt sai có số đo</small></h3>
+      <p class="hsv-phu gvv2-so">Trong <b>${saiVoi + saiNghi}</b> lượt sai có số đo, <b>${saiVoi}</b> lượt con nộp trước khi kịp nghĩ. <b>${saiNghi}</b> lượt con đã dành thời gian nghĩ.</p>
+      ${thanhChong(tm.map((r) => r.sai), 0)}
+      <ul class="hslc-cl-em gvv2-so">${dong}</ul>
+      ${CU ? `<p class="hsv-ghi">Chưa đo được lượt máy để treo: các lượt này làm trước khi máy của con có đồng hồ mới.</p>` : `<p class="hsv-nhe gvv2-so" data-t="5">${ICO.treo}<span>Máy để treo: <b>${soTreoApp} lượt</b> trong 7 ngày.</span></p>`}
+    </section>`
+  }
+  return `<section class="hsv-khoi" aria-labelledby="hsv-cl"><h3 id="hsv-cl">Em làm bài thế nào <small>· lượt sai có số đo</small></h3>
+    <p class="hsv-phu gvv2-so">Trong <b>${saiCo}</b> lượt sai có số đo: <b>${saiVoi}</b> lượt em nộp trước khi kịp nghĩ, <b>${saiNghi}</b> lượt em đã dành thời gian nghĩ${CU ? '' : `, <b>${saiTreo}</b> lượt máy để treo`}.</p>
+    ${thanhChong(CU ? tm.map((r) => r.sai) : [...tm.map((r) => r.sai), saiTreo], 0)}
+    <ul class="hslc-cl-em gvv2-so">${dong}${CU ? '' : `<li data-t="5">${chip(5, false)} <span class="hslc-cl-em-ten">${TEN_EM[5]}</span> <b class="hslc-cl-em-luot">${saiTreo} lượt sai</b></li>`}</ul>
+    ${CU ? `<p class="hsv-ghi">Các lượt này làm trước khi máy em có đồng hồ mới, nên chưa đo được máy để treo.</p>` : `<div class="hsv-nhe" data-t="5">${ICO.treo}<p>Có <b>${soTreoApp} lượt</b> máy để treo. Thời gian treo không tính vào số giây làm bài của em.</p></div>`}
+  </section>`
+}
+
+function khoiTong() {
+  if (LA_THAY) return `<div class="gvv2-hs-hn" data-nhom="chua-deu"><span class="gvv2-hs-hn-chu"><small>Hôm nay</small><b class="gvv2-so">24/30 câu</b></span><span class="gvv2-hs-hn-chu"><small>Tầng hiện tại</small><b>Tầng 2</b></span><small class="gvv2-hs-hn-phu gvv2-so">Còn 6 câu tới mức tối thiểu · Kho thiếu 2 câu phù hợp cho em hôm nay</small></div><section class="hsv-khoi" aria-labelledby="hsv-tong"><h3 id="hsv-tong">Làm bài 7 ngày</h3><dl class="hsv-so">
+      <div><dt>Đã làm</dt><dd>${TONG.soLuot} lượt<small>${TONG.soCau} câu khác nhau</small></dd></div>
+      <div><dt>Đúng</dt><dd>${TONG.soDung} lượt<small>55% lượt có kết quả</small></dd></div>
+      <div><dt>Sai</dt><dd>${TONG.soSai} lượt<small>gồm 3 lượt bỏ trống</small></dd></div>
+      <div><dt>Giây trung bình</dt><dd>${TONG.giayTb} giây<small>${CU ? 'chưa đo treo máy' : `không tính ${TONG.soTreo + TONG.soCoTinh} lượt treo máy`}</small></dd></div></dl></section>`
+  return `<section class="hsv-nhan" aria-labelledby="hsv-nhan"><small id="hsv-nhan">7 ngày gần nhất của ${NGOI}</small>
+    <div class="hsv-nhan-so gvv2-so"><b>${TONG.soLuot}</b><span>lượt làm câu · đúng ${TONG.soDung} lượt</span></div>
+    <p>Nhịp học: Chưa đều · đủ mức 4/7 ngày. ${HOA} còn 6 câu tới mức tối thiểu hôm nay.</p></section>`
+}
+
+function khoiNgay() {
+  const dong = NGAY.map(([thu, ng, d, chua, cuTreo]) => {
+    const dd = APP === 'thay' ? d : [d[0], d[1], d[2], d[3], d[4] + d[5], 0]
+    const tong = dd.reduce((a, b) => a + b, 0) + chua
+    const coTinh = LA_THAY && d[5] > 0 && !CU
+    const i = dd.map((n, k) => n ? `<i ${thuocTinh(k + 1)} style="flex:${n}"></i>` : '').join('') + (chua ? `<i data-chua style="flex:${chua}"></i>` : '')
+    return `<li${coTinh ? ' data-co-tinh' : ''}><span class="hsv-ngay-ten">${thu}<small>${ng}${(cuTreo || CU) ? ' *' : ''}</small></span><span class="hsv-ngay-thanh" role="img" aria-label="${thu} ${ng}: ${tong} lượt">${i}</span><span class="hsv-ngay-so gvv2-so">${tong} lượt</span></li>`
+  }).join('')
+  const giai = [1, 2, 3, 4].map((m) => `<span><i data-m="${m}"></i>${m === 1 ? 'Mức làm 1' : m}</span>`).join('') + (CU ? '' : `<span><i data-t="5"></i>${LA_THAY ? 'Treo máy' : 'Máy để treo'}</span>`) + (LA_THAY && !CU ? '<span><i data-t="6"></i>Cố tình treo máy</span>' : '') + '<span><i data-chua></i>Chưa có số đo</span>'
+  return `<section class="hsv-khoi" aria-labelledby="hsv-ngay"><h3 id="hsv-ngay">Theo ngày <small>· số lượt mỗi mức</small></h3>
+    <ol class="hsv-ngay">${dong}</ol><p class="hsv-chu-giai">${giai}</p><p class="hsv-ghi">* ${CU ? 'Cả 7 ngày' : '16/10 – 19/10'}: chưa đo treo máy (máy ${NGOI} chưa có đồng hồ mới).</p></section>`
+}
+
+function dongLan(l) {
+  const kq = l.kq === 'dung' ? 'Đúng' : 'Sai'
+  let muc
+  if (l.m >= 5 && !CU && APP === 'ph') {
+    muc = `<span class="hsv-muc"><span class="hsv-muc-dong">${chip(l.m)}</span></span>`
+  } else if (l.m >= 5 && !CU) {
+    const cau = LA_THAY
+      ? `${l.m === 6 ? 'Cùng ngày có 4 lượt treo máy. ' : ''}Em không ở với câu ${phut(l.giayTreo)} (không chạm màn hoặc rời app).`
+      : `Câu này máy để treo ${phutTron(l.giayTreo)}.`
+    muc = `<span class="hsv-muc"><span class="hsv-muc-dong">${chip(l.m)}</span>
+      <span class="hsv-phut"><span>${cau}</span><span class="hsv-phut-thanh" aria-hidden="true"><i style="width:${Math.min(100, l.giayTreo / 7.2)}%"></i></span></span></span>`
+  } else if (l.m >= 5) {
+    muc = `<span class="hsv-muc"><span class="hsv-muc-dong"><span class="hslc-chip-m hslc-chip-m--chua"><b>Chưa có số đo</b></span></span></span>`
+  } else {
+    const toi = Math.max(40, Math.ceil(Math.max(l.giay * 1.12, (l.r4 || l.r3) * 1.45) / 10) * 10), p = (x) => Math.min(100, (100 * x) / toi)
+    const doan = [[1, 0, l.r2], [2, l.r2, l.r3], [3, l.r3, l.r4], [4, l.r4, toi]]
+    muc = `<span class="hsv-muc"><span class="hsv-muc-dong">${chip(l.m)} <span class="hsv-muc-so gvv2-so">${l.giay} giây · đọc hết đề cần ${l.doc} giây</span>${(l.chuaDoTreo || CU) && LA_THAY ? ' <span class="hsv-chua-treo">Chưa đo treo máy</span>' : ''}</span>
+      <span class="hslc-thuoc-m" role="img" aria-label="Làm ${l.giay} giây; đọc hết đề cần ${l.doc} giây"><span class="hslc-thuoc-m-z">${doan.map(([m, a, b]) => `<i data-m="${m}" style="left:${p(a)}%;width:${p(b) - p(a)}%"></i>`).join('')}<u style="left:${p(l.doc)}%"></u><b style="left:${p(l.giay)}%"></b></span></span></span>`
+  }
+  return `<li class="hsv-lan" ${l.m >= 5 && !CU ? `data-treo ${thuocTinh(l.m)}` : ''}><span class="hsv-lan-gio">${l.gio}</span><span class="hsv-lan-giua"><b>${l.cau}</b><small>${l.noi} · ${l.md}</small></span><span class="hsv-kq" data-kq="${l.kq}">${kq}</span>${muc}</li>`
+}
+
+function khoiLan() {
+  let ds = lanApp
+  if (APP === 'ph') ds = ds.filter((l) => l.kq === 'sai').slice(0, 3)    // phụ huynh: lượt treo mang chip "Máy để treo", KHÔNG số phút (máy chủ bỏ `giayTreo`)
+  const nhom = []
+  for (const l of ds) { const g = nhom.find((x) => x.ngay === l.ngay); g ? g.lan.push(l) : nhom.push({ ngay: l.ngay, lan: [l] }) }
+  const loc = APP === 'ph' ? '' : `<div class="hsv-loc" role="tablist" aria-label="Lọc lượt"><button type="button" role="tab" aria-selected="true">Tất cả · ${TONG.soLuot}</button><button type="button" role="tab" aria-selected="false">Lượt sai · ${TONG.soSai}</button>${CU ? '' : `<button type="button" role="tab" aria-selected="false">${LA_THAY ? 'Treo máy' : 'Máy để treo'} · ${LA_THAY ? TONG.soTreo + TONG.soCoTinh : soTreoApp}</button>`}${LA_THAY ? `<button type="button" role="tab" aria-selected="false">Chưa có số đo · ${TONG.chuaCoSoDo}</button>` : ''}</div>`
+  return `<section class="hsv-khoi" aria-labelledby="hsv-lan"><h3 id="hsv-lan">${APP === 'ph' ? 'Lượt sai gần đây' : 'Từng lượt'} <small>· mới nhất trên cùng</small></h3>${loc}
+    ${nhom.map((g) => `<h4 class="hsv-ngay-tieu">${g.ngay} <small>· ${g.lan.length} lượt</small></h4><ol class="hsv-lan-ds">${g.lan.map(dongLan).join('')}</ol>`).join('')}
+    <button type="button" class="gvv2-nut-vien tt-nhan hsv-them">${APP === 'ph' ? 'Xem mọi lượt của con' : 'Xem thêm lượt cũ hơn'}</button></section>`
+}
+
+function khoiSua() {
+  const nut = APP === 'hs' ? `<button type="button" class="gvv2-nut-vien tt-nhan">${ICO.sua}Sửa câu này</button>` : ''
+  return `<section class="hsv-khoi" aria-labelledby="hsv-sua"><h3 id="hsv-sua">${APP === 'hs' ? '3 câu đang chờ em tự sửa' : `Câu chưa sửa được <small>· 3 câu</small>`}</h3><ul class="hsv-sua">
+    <li><span>Câu 7 · Điện phân<small>Sai 3 lần · lần cuối 22/10</small></span>${nut}</li>
+    <li><span>Câu 12 · Pin điện hoá<small>Sai 2 lần · lần cuối 22/10</small></span>${nut}</li>
+    <li><span>Câu 30 · Sơ đồ pin Zn–Cu<small>Sai 2 lần · lần cuối 21/10</small></span>${nut}</li></ul></section>`
+}
+
+function khoiGap() {
+  const muc = LA_THAY ? [['Nhịp học và 14 ngày gần nhất', 'Chưa đều'], ['Sáu tín hiệu và ngưỡng', '2 vượt ngưỡng'], ['Số giây theo mức độ câu', '4 mức độ'], ['Câu đúng · Câu đã ôn', '21 · 9 câu']]
+    : [['Lịch làm bài 14 ngày', 'đủ mức 4/7 ngày'], ['Câu đúng', '21 câu'], ['Câu đã ôn', '9 câu']]
+  return `<div class="hsv-gap">${muc.map(([a, b]) => `<details><summary>${a}<small>${b}</small></summary></details>`).join('')}</div>`
+}
+
+function than() {
+  if (T === 'tai') return `<div class="hsv-xuong" role="status" aria-label="Đang tải hồ sơ làm bài"><i style="height:120px"></i><i style="height:32px"></i><i style="height:180px"></i><i style="height:220px"></i><p class="hsv-ghi">Đang tải hồ sơ làm bài…</p></div>`
+  if (T === 'rong') return `<div class="hsv-trong"><b>Chưa có lượt làm câu nào trong 7 ngày</b><p>${APP === 'ph' ? 'Con chưa làm câu nào từ 16/10.' : `${HOA} chưa làm câu nào từ 16/10.`} Khi ${NGOI} làm Bài tập về nhà, Bát Linh Đảo hay Ôn lại, từng lượt và mức làm sẽ hiện ở đây.</p>${APP === 'hs' ? '<button type="button" class="gvv2-nut-vien tt-nhan">Mở Bài tập về nhà</button>' : ''}</div>`
+  if (T === 'loi') return `<div class="hsv-loi" role="alert"><p>Chưa tải được hồ sơ làm bài của ${NGOI}. Máy chủ trả lời chậm — thử lại sau ít phút.</p><button type="button" class="gvv2-nut-vien tt-nhan">Thử lại</button></div>`
+  const mang = T === 'mang' ? `<div class="hsv-mang" role="status">${ICO.mang}<p>Mất mạng. Đang xem bản đã tải lúc 14:05 · Thứ Năm 22/10/2026.</p><button type="button" class="gvv2-nut-vien tt-nhan">Tải lại</button></div>` : ''
+  if (LA_THAY) return `${mang}<div class="hsv-luoi"><div class="hsv-cot">${khoiCachLamThay()}${khoiLan()}</div><div class="hsv-cot">${khoiTong()}${khoiNgay()}${khoiSua()}${khoiGap()}</div></div>`
+  if (APP === 'hs') return `${mang}<div class="hsv-luoi"><div class="hsv-cot">${khoiTong()}${khoiCachLamEm()}${khoiLan()}</div><div class="hsv-cot">${khoiSua()}${khoiNgay()}${khoiGap()}</div></div>`
+  return `${mang}<div class="hsv-luoi"><div class="hsv-cot">${khoiTong()}${khoiCachLamEm()}${khoiLan()}</div><div class="hsv-cot">${khoiSua()}${khoiGap()}</div></div>`
+}
+
+const tam = `<div class="gvv2-hs-che" aria-hidden="true"></div>
+  <section class="gvv2-hs gvv2-hs--rong hslc hsv" data-che-do="${APP}" role="dialog" aria-modal="true" aria-labelledby="hsv-ten" aria-describedby="hsv-phu">
+    ${dau()}<div class="gvv2-hs-than hslc-than">${than()}</div>
+    ${LA_THAY ? '<footer class="gvv2-hs-chan"><button type="button" class="gvv2-nut-vien tt-nhan">Mở hồ sơ đầy đủ</button><small>Ca kiểm tra, EXP, phụ huynh của em</small></footer>' : ''}
+  </section>`
+const vo = LA_THAY ? 'vo-thay-ve' : APP === 'hs' ? 'hs-ho-so-em' : 'ph-ho-so-con'
+document.getElementById('goc').innerHTML = `<div class="nen-sau" aria-hidden="true"><i></i><i></i><i></i></div><div class="${vo}" data-che-do="${APP}">${tam}</div>`
+</script>
+</body>
+</html>
