@@ -35,16 +35,17 @@ describe('Chỉ còn một app trong repo này', () => {
     expect(manifest.start_url.startsWith('./')).toBe(true)
   })
 
-  it('vai học sinh và phụ huynh KHÔNG còn được nhận', () => {
-    for (const v of ['hs', 'ph', 'admin']) {
-      expect(docDuongVao(`?vai=${v}`).vai).toBe(null)
-    }
+  // 22/10 (thầy: "phụ huynh bấm vào chỉ cần nhập sbd luôn"): mã vai cũ và link riêng cũ vào thẳng cổng của vai — không bao giờ là app thầy.
+  it('vai cũ ?vai=hs / ?vai=ph ⇒ cổng của vai; vai lạ vẫn không nhận', () => {
+    expect(docDuongVao('?vai=hs').vai).toBe('hocsinh')
+    expect(docDuongVao('?vai=ph').vai).toBe('phuhuynh')
+    expect(docDuongVao('?vai=admin').vai).toBe(null)
   })
 
-  it('đường /hs/… và /ph/… không còn ý nghĩa gì trong app này', () => {
+  it('đường /hs/<token> và /ph/<token> cũ ⇒ cổng của vai', () => {
     const t = 'a'.repeat(32)
-    expect(docVaiTuDuongDan(`/omr-app/hs/${t}`).vai).toBe(null)
-    expect(docVaiTuDuongDan(`/omr-app/ph/${t}`).vai).toBe(null)
+    expect(docVaiTuDuongDan(`/omr-app/hs/${t}`).vai).toBe('hocsinh')
+    expect(docVaiTuDuongDan(`/omr-app/ph/${t}`).vai).toBe('phuhuynh')
   })
 })
 

@@ -41,7 +41,7 @@
 //   (15/09 thầy bỏ màn chọn app từng đứng ở bước 3 này: "có thể học sinh dùng
 //   2 máy chọn 2 app khác nhau" — và bắt người dùng chọn thì giảm trải nghiệm.
 //   Ba link riêng biệt là đủ.)
-import { docDuongVao, laLinkAppCu } from './vai-tro'
+import { docDuongVao } from './vai-tro'
 
 export type VaiApp = 'gv' | 'hs' | 'ph'
 
@@ -83,7 +83,6 @@ export function chuanHoaUrlTheoVai(
   search: string,
   hash: string,
 ): string {
-  if (laLinkAppCu(search, duongDan)) return ''
   const vai = vaiCuaDuong(search, duongDan)
   if (!vai) return ''
 

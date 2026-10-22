@@ -66,7 +66,7 @@ for (const [app, s] of Object.entries(so)) {
 // ghi tay) — 64 byte ≈ 0,02 ms trên 4G, không phải chậm thật. Mọi thay đổi thật (một hàm, một dòng chữ) đều vượt ngưỡng này.
 const DUNG_SAI_DUONG = 64
 const DUONG = { 'thay /gv': ['app'], 'phieu /p': ['app', 'phieu'], 'phu-huynh /ph': ['app', 'ph'], 'thi /t': ['app', 'thi'], 'dang-nhap-hs /hs': ['hsVo'], 'cong-hs /hs (đã đăng nhập)': ['hsVo', 'hs'] }
-const bangNap = (() => { const m = /var b=(\{.*?\});var v=/s.exec(html); return m ? JSON.parse(m[1]) : null })()
+const bangNap = (() => { const m = /var b=(\{.*?\});var (?:v|nap)=/s.exec(html); return m ? JSON.parse(m[1]) : null })()
 const mocDuong = JSON.parse(readFileSync(resolve(GOC, 'docs/moc-toc-do.json'), 'utf8')).taiDuong ?? {}
 if (!bangNap) { console.error('✗ không đọc được bảng nạp trước theo đường trong dist/index.html'); do_++ }
 else for (const [duong, nhom] of Object.entries(DUONG)) {

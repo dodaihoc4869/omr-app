@@ -54,7 +54,7 @@ import './styles/gv-mau.css'
 import './styles/teacher-modern.css'
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
 
-import { chuanHoaDuongDan, docDuongVao, laLinkAppCu, nhoVaiDaDung } from './lib/vai-tro'
+import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
 import { khoaVaiVaoUrl } from './lib/khoa-vai'
 import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, daySangBanMoi, tuTaiLaiKhiDoiBan } from './lib/cap-nhat-app'
@@ -106,9 +106,8 @@ khoaVaiVaoUrl(import.meta.env.BASE_URL)
 // thì thử lại một lần; thiếu mảnh vì đang mở bản cũ thì `batLoiThieuManh()` (dưới) tự tải lại trang.
 type GocApp = { default: ComponentType; huaManEmSom: () => Promise<unknown> | null }
 const thuLai = <T,>(nap: () => Promise<T>): Promise<T> => nap().catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(nap))
-// Link riêng CŨ (`/hs/<token>?vai=hocsinh`…) App.tsx chặn bằng màn "link đã ngừng dùng" TRƯỚC nhánh cổng ⇒ đi App.tsx như cũ.
 const dvMo = docDuongVao(location.search, location.pathname)
-const laCongHocSinh = dvMo.vai === 'hocsinh' && !laLinkAppCu(location.search, location.pathname)
+const laCongHocSinh = dvMo.vai === 'hocsinh'
 // ĐƯỜNG /hoi-thay (15/10, HoiThayScreen.tsx): trang bài làm văn phòng nhúng hộp Hỏi Thầy trong iframe ⇒ gốc RIÊNG, nhẹ (không App.tsx).
 // Nhận thẳng ở đây, không thêm vai vào vai-tro.ts (mã nằm trong gói mở cả ba app; vai-tro trả null cho đường này nên không đổi gì khác).
 const laHoiThay = /^\/hoi-thay\/?$/.test(location.pathname)

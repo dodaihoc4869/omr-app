@@ -41,7 +41,7 @@ const RE_HOCSINH_TREN_DUONG = /(?:^|\/)(?:hoc-sinh|hocsinh|hs)\/?$/
 const RE_PHUHUYNH_TREN_DUONG = /(?:^|\/)(?:phu-huynh|phuhuynh|ph)\/?$/
 const RE_CA_TREN_DUONG = /(?:^|\/)t\/(\d{4,8})\/?$/
 const RE_DIEM_TREN_DUONG = /(?:^|\/)d\/(\d{4,8})\/?$/
-const RE_APP_CU = /(?:^|\/)(?:hs|ph)\/[0-9a-zA-Z]{8,}\/?$/
+const RE_APP_CU = /(?:^|\/)(hs|ph)\/[0-9a-z]{8,}\/?$/i
 
 /** Link riêng CŨ của em hoặc phụ huynh (`/hs/<token>`, `/ph/<token>`), hoặc
  * app cũ đã cài trên máy các em (`?vai=hs`, `?vai=ph`). */
@@ -51,8 +51,20 @@ export function laLinkAppCu(search: string, duongDan = ''): boolean {
   return RE_APP_CU.test(duongDan)
 }
 
+/** Đường dẫn gõ/chép lệch (thầy 22/10: phụ huynh bấm link mà rơi vào màn khoá của thầy): `/PH`, `/ph.`, `/ph)`, `/ph%20`
+ * ⇒ giải mã, chữ thường, bỏ dấu câu/khoảng trắng dính đuôi. Vẫn so KHỚP TRỌN đường như cũ, không so tiền tố (`/p`, `/phieu` giữ vai riêng). */
+function duongChuan(duongDan: string): string {
+  let d = duongDan
+  try { d = decodeURIComponent(d) } catch { /* đường hỏng mã hoá — giữ nguyên */ }
+  return d.toLowerCase().replace(/[\s.,;:!?)\]}>"'`]+$/, '')
+}
+
 /** Đọc vai và mã ca TRỰC TIẾP TỪ ĐƯỜNG DẪN. */
-export function docVaiTuDuongDan(duongDan: string): DuongVao {
+export function docVaiTuDuongDan(duongGoc: string): DuongVao {
+  const duongDan = duongChuan(duongGoc)
+  // Link riêng CŨ `/hs/<token>`, `/ph/<token>` (thầy 22/10: "phụ huynh bấm vào chỉ cần nhập sbd luôn") ⇒ vào thẳng cổng, không còn biển "đã ngừng dùng".
+  const cu = duongDan.match(RE_APP_CU)
+  if (cu) return { vai: cu[1] === 'ph' ? 'phuhuynh' : 'hocsinh', maCa: '' }
   if (RE_GV_TREN_DUONG.test(duongDan)) return { vai: 'gv', maCa: '' }
   if (RE_PHIEU_TREN_DUONG.test(duongDan)) return { vai: 'phieu', maCa: '' }
   if (RE_HOCSINH_TREN_DUONG.test(duongDan)) return { vai: 'hocsinh', maCa: '' }
@@ -95,8 +107,8 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
   if (vaiQ === 'gv' || vaiQ === 'giaovien') return { vai: 'gv', maCa }
   if (vaiQ === 'phieu') return { vai: 'phieu', maCa: '' }
   if (vaiQ === 'diem') return { vai: 'diem', maCa }
-  if (vaiQ === 'hocsinh') return { vai: 'hocsinh', maCa: '' }
-  if (vaiQ === 'phuhuynh') return { vai: 'phuhuynh', maCa: '' }
+  if (vaiQ === 'hocsinh' || vaiQ === 'hs') return { vai: 'hocsinh', maCa: '' }
+  if (vaiQ === 'phuhuynh' || vaiQ === 'ph') return { vai: 'phuhuynh', maCa: '' }
   if (vaiQ === 'remote' || q.get('remote')) return { vai: 'remote', maCa: '' }
   if (duongDan.startsWith('/remote')) return { vai: 'remote', maCa: '' }
 
@@ -136,7 +148,6 @@ export function dangChayTuManHinhChinh(): boolean {
 /** Tham số thứ ba giữ lại cho các phép kiểm cũ gọi tới; từ 15/09 hàm này
  * KHÔNG còn hỏi "app đã cài hay chưa" nữa, vì vai chỉ đến từ đường link. */
 export function laManThayQuanLy(search: string, duongDan = '', _daCai = dangChayTuManHinhChinh): boolean {
-  if (laLinkAppCu(search, duongDan)) return false
   const d = docDuongVao(search, duongDan)
   if (d.vai === 'phieu' || d.vai === 'diem' || d.vai === 'hocsinh' || d.vai === 'phuhuynh' || d.vai === 'remote') return false
   if (d.maCa) return false

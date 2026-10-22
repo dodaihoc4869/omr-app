@@ -15,10 +15,9 @@ import { datMaBiMatPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
 import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
-import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
+import { docDuongVao, laManThayQuanLy } from './lib/vai-tro'
 import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
-import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
@@ -36,9 +35,6 @@ import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 //     nhất lại phải chờ thêm một vòng mạng.
 //   · (`ExamTakeScreen` từng nạp sớm ở đây; 28/09 chuyển sang mảnh riêng VẪN
 //     precache + tải ngay theo đường vào — xem khối "MÀN LÀM BÀI" dưới.)
-//   · `AppDaChuyenScreen` — tấm biển "link này đã ngừng dùng". Nạp muộn thì em
-//     bấm link cũ thấy một khoảnh trắng rồi mới thấy chữ; màn này nhỏ xíu nên
-//     tách ra chẳng được bao nhiêu. Phép kiểm `link-cu-hs-ph` bắt đúng chỗ này.
 //
 // Mảnh nạp muộn hỏng vì thầy đang mở bản cũ đã được `batLoiThieuManh()` trong
 // `main.tsx` lo: bắt đúng lỗi thiếu mảnh rồi tự tải lại một lần.
@@ -163,9 +159,7 @@ const KhungXuongMan = () => (
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 
 function App() {
-  // LINK CŨ CỦA EM / PHỤ HUYNH: chặn ngay trước khi dựng app thầy. Tính một
-  // lần lúc nạp — sau đó app không đổi đường nữa.
-  const [linkCu] = useState(() => laLinkAppCu(location.search, location.pathname))
+  // LINK CŨ CỦA EM / PHỤ HUYNH (`/ph/<token>`, `?vai=ph`): từ 22/10 vai-tro.ts đưa thẳng vào cổng (phụ huynh chỉ nhập SBD), không còn biển "đã ngừng dùng".
   // LINK PHIẾU của phụ huynh (`/p#…`): trả về đúng một trang phiếu, KHÔNG dựng
   // app quản lý. Tính một lần lúc nạp, trước mọi hiệu ứng — máy phụ huynh
   // không được chạm vào IndexedDB, danh sách lớp hay hộp thư của thầy.
@@ -215,7 +209,7 @@ function App() {
   // Chỉ đọc cờ ở app thầy ĐÃ MỞ KHOÁ — máy em, phụ huynh, link thi/phiếu không gọi lệnh thầy. Cờ tắt ⇒ app như cũ.
   const hoa2 = useCoHoa2(chonBat)
   const docCoHoa2 = useCoHoa2((s) => s.doc)
-  const laVoThay = canHoi && !linkCu && !laPhieu && !laXemDiem && !laHocSinh && !laPhuHuynh && khoa === 'da_mo'
+  const laVoThay = canHoi && !laPhieu && !laXemDiem && !laHocSinh && !laPhuHuynh && khoa === 'da_mo'
   useEffect(() => {
     if (laVoThay) void docCoHoa2()
   }, [laVoThay, docCoHoa2])
@@ -307,38 +301,38 @@ function App() {
   // Điều kiện `canHoi` là quan trọng: màn vào thi của em, báo cáo phụ huynh và
   // link cũ đều KHÔNG được có cầu nối — những máy đó không phải máy thầy.
   useEffect(() => {
-    if (!canHoi || linkCu || laPhieu || laXemDiem || laHocSinh || khoa !== 'da_mo') {
+    if (!canHoi || laPhieu || laXemDiem || laHocSinh || khoa !== 'da_mo') {
       goCauNoi()
       return
     }
     ganCauNoi()
     return () => goCauNoi()
-  }, [canHoi, linkCu, laPhieu, laXemDiem, laHocSinh, khoa])
+  }, [canHoi, laPhieu, laXemDiem, laHocSinh, khoa])
 
   // Máy em / phụ huynh cầm link cũ thì KHÔNG đọc gì của thầy — không mở
   // IndexedDB danh sách lớp, không dựng màn nào của app quản lý. Chưa mở khoá
   // cũng vậy: không đọc danh sách lớp trước khi thầy nhập đúng mật khẩu.
   useEffect(() => {
-    if (linkCu || laPhieu || laXemDiem || laHocSinh || laPhuHuynh || khoa !== 'da_mo') return
+    if (laPhieu || laXemDiem || laHocSinh || laPhuHuynh || khoa !== 'da_mo') return
     loadClassList().then((list) => {
       if (list.length > 0) setClassList(list)
     })
-  }, [linkCu, laPhieu, laXemDiem, laHocSinh, laPhuHuynh, khoa, setClassList])
+  }, [laPhieu, laXemDiem, laHocSinh, laPhuHuynh, khoa, setClassList])
 
   // Lời giải từng bước (29/09): `#duyet-loi-giai` hoặc `#duyet-loi-giai=<mã đề>` mở thẳng màn Duyệt lời giải (màn tự đọc mã đề).
   useEffect(() => {
-    if (linkCu || laPhieu || laHocSinh || laPhuHuynh) return
+    if (laPhieu || laHocSinh || laPhuHuynh) return
     if (location.hash.startsWith('#duyet-loi-giai')) setScreen('duyetloigiai')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [linkCu, laPhieu, laHocSinh, laPhuHuynh])
+  }, [laPhieu, laHocSinh, laPhuHuynh])
 
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
-    if (linkCu || laPhieu || laHocSinh || laPhuHuynh) return
+    if (laPhieu || laHocSinh || laPhuHuynh) return
     const { maCa } = docDuongVao(location.search, location.pathname)
     if (maCa) setScreen('examtake')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [linkCu, laPhieu, laHocSinh, laPhuHuynh])
+  }, [laPhieu, laHocSinh, laPhuHuynh])
 
   if (laPhieu) {
     return (
@@ -347,7 +341,6 @@ function App() {
       </ChanLoi>
     )
   }
-  if (linkCu) return <AppDaChuyenScreen />
   if (laHocSinh) {
     return (
       <ChanLoi o="Cổng học sinh">

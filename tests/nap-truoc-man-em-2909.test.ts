@@ -23,7 +23,12 @@ describe('chọn mảnh nạp trước theo đường vào', () => {
     ['/', '?vai=phieu', 'phieu'],
     ['/', '?vai=gv', null],
     ['/', '?vai=gv&examCode=123456', null],
-    ['/hs/abcdefgh1234', '', null],
+    // 22/10: link riêng cũ và đường lệch vào thẳng cổng của vai
+    ['/hs/abcdefgh1234', '', 'hs'],
+    ['/ph/abcdefgh1234', '', 'ph'],
+    ['/', '?vai=ph', 'ph'],
+    ['/PH.', '', 'ph'],
+    ['/ph%20', '', 'ph'],
   ]
   it.each(ca)('%s%s ⇒ %s', (duong, q, mong) => {
     expect(chonMangNapTruoc(duong, q)).toBe(mong)

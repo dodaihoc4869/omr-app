@@ -276,10 +276,10 @@ describe('Đường dẫn ngắn /hs và /ph vào đúng cổng', () => {
     }
   })
 
-  it('KHÔNG cướp link riêng cũ /hs/<token> — nó còn đoạn token phía sau', async () => {
+  it('link riêng cũ /hs/<token> vẫn nhận ra là link cũ, và từ 22/10 vào thẳng cổng học sinh', async () => {
     const { docVaiTuDuongDan, laLinkAppCu } = await import('../src/lib/vai-tro')
     const cu = '/hs/abc12345xyz'
-    expect(docVaiTuDuongDan(cu).vai).toBeNull()
+    expect(docVaiTuDuongDan(cu).vai).toBe('hocsinh')
     expect(laLinkAppCu('', cu)).toBe(true)
   })
 
