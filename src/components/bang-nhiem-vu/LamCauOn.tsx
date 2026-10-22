@@ -170,6 +170,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     const treo = (q: string) => (dhT.current[q] ??= { v: 0, a: 0, l: 0, n: 0, lang: 0 })
     const id = window.setInterval(() => {
       xem()
+      if (khoaMan && Date.now() - cham > 600_000) { void khoaMan.release().catch(() => {}); khoaMan = null } // 10 phút không chạm ⇒ nhả giữ màn sáng (máy bỏ quên không sáng mãi)
       if (document.visibilityState !== 'visible') { if (qCuoi) { const t = treo(qCuoi); t.a = Math.min(7200, t.a + 1) } return }
       let q = chamQid && (tiLe[chamQid] ?? 0) >= 0.5 ? chamQid : ''
       if (!q) { let max = 0; for (const k of Object.keys(tiLe)) if (tiLe[k]! > max) { max = tiLe[k]!; q = k } }
@@ -182,6 +183,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     const chamTay = (e: Event) => {
       for (const t of Object.values(dhT.current)) { if (t.lang >= 120 && t.lang < 180) t.n++; t.l = Math.max(t.l, t.lang); t.lang = 0 }
       cham = Date.now()
+      if (!khoaMan) xin() // chạm lại sau khi đã nhả ⇒ giữ màn sáng lại
       const c = (e.target as HTMLElement | null)?.closest?.('[data-qid]') as HTMLElement | null
       if (c?.dataset.qid && goc.contains(c)) chamQid = c.dataset.qid
     }
@@ -190,12 +192,13 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     // Giữ màn sáng khi đang làm (trình duyệt tự nhả khi tab ẩn ⇒ xin lại khi hiện lại). Không hỗ trợ / bị từ chối ⇒ w = 0.
     type Khoa = { release: () => Promise<void> }
     const wl = (navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<Khoa> } }).wakeLock
-    let khoaMan: Khoa | null = null, het = false
+    let khoaMan: Khoa | null = null, het = false, dangXin = false
     const xin = () => {
-      if (!wl || het || document.visibilityState !== 'visible') return
-      wl.request('screen').then((k) => { if (het) void k.release().catch(() => {}); else { khoaMan = k; dhW.current = true } }, () => { dhW.current = false })
+      if (!wl || het || khoaMan || dangXin || document.visibilityState !== 'visible') return
+      dangXin = true
+      wl.request('screen').then((k) => { dangXin = false; if (het) void k.release().catch(() => {}); else { khoaMan = k; dhW.current = true } }, () => { dangXin = false; dhW.current = false })
     }
-    const doiHien = () => { if (document.visibilityState === 'visible') xin() }
+    const doiHien = () => { if (document.visibilityState === 'visible') xin(); else khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
     xin()
     document.addEventListener('visibilitychange', doiHien)
     return () => {

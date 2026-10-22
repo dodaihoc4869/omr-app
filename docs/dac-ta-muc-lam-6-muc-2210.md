@@ -1,6 +1,6 @@
 # Đặc tả Mức làm 6 mức — thêm "Treo máy" và "Cố tình treo máy", đo lại cho chính xác — 22/10/2026
 
-Trạng thái: **LÕI đã xong (`server/src/muc-lam.ts`: `treoCuaLuot`, `nangCoTinhTheoNgay`, `mucCongKhai`, `tongMucLam(…, {tachTreo})`; test `tests/muc-lam-6-muc-2210.test.ts`). ĐỢT 1 (đồng hồ ở máy em) đang làm, chưa đổi giao diện. ĐỢT 2 (giao diện 6 mức) CHỜ THẦY DUYỆT ẢNH.** Tiếp nối `docs/dac-ta-muc-lam-bai-2010.md` (Mức làm 1–4, mục 3–4 giữ nguyên).
+Trạng thái: **LÕI đã xong (`server/src/muc-lam.ts`: `treoCuaLuot` (chỉ Mức 5), `nangCoTinhTheoNgay` (Mức 6), `mucCongKhai`, `tongMucLam(…, {tachTreo})`; lượt đã đo mà không treo mang `daDoTreo`, vắng cả hai ⇒ chưa đo; test `tests/muc-lam-6-muc-2210.test.ts`). ĐỢT 1 (đồng hồ ở máy em) đang làm, chưa đổi giao diện. ĐỢT 2 (giao diện 6 mức) CHỜ THẦY DUYỆT ẢNH.** Tiếp nối `docs/dac-ta-muc-lam-bai-2010.md` (Mức làm 1–4, mục 3–4 giữ nguyên).
 
 ## 1. Thầy yêu cầu (22/10)
 "Xem bảng điểm danh hiện tại như thế nào, phần đánh giá mức 1 chưa đọc xong đề đến mức 4 (tôi muốn bạn thêm 2 mức nữa là treo máy, cố tình treo máy) bạn dùng trí thông minh của mình tối ưu lại phần đo này cho chính xác và hiệu quả nhất, giao diện hồ sơ của học sinh … chia việc tối ưu cả giao diện cho đầy đủ trực quan dễ nhìn thân thiện hơn nữa, giao cho mỗi code làm 1 phần."
@@ -22,7 +22,7 @@ Giữ NGUYÊN `g` (giây làm như hôm nay) để Mức làm 1–4 so được 
 | `a` | tổng giây câu mở **khi tab ẩn / màn tắt** | 0–7200 |
 | `l` | khoảng lặng dài nhất (giây giữa hai lần chạm liên tiếp, hoặc từ lần chạm cuối tới lúc nộp) khi tab hiện | 0–7200 |
 | `n` | số khoảng lặng 120–179 giây (ngay dưới ngưỡng cắt — dấu hiệu chạm giữ máy) | 0–60 |
-| `w` | 1 nếu màn được giữ sáng suốt lúc câu mở (wakeLock thành công) | 0/1 |
+| `w` | 1 nếu đã xin được giữ màn sáng trong lúc câu mở (màn ẩn lúc ấy là em tự rời app / tắt màn) | 0/1 |
 
 "Chạm" = `pointerdown`, `keydown`, `input`, `touchstart`, `wheel` (như đồng hồ hiện nay). Mọi nơi đo (7 chỗ: game/học tập `ManLamBaiTap`, ôn `LamCauOn`, mở bài `StudentPortalScreen`, phiếu BTVN/khắc phục `html-phieu` + `KhungXemPhieu`/`btvn-nop-chang-em`, ca thi `ExamTakeScreen`, kiểm tra cá nhân `ManKiemTraCaNhan`) gửi CÙNG khuôn này. Máy chủ: `lamSachDo` (server/src/do-giay-luot.ts) nhận, kẹp khoảng, bỏ giá trị sai khuôn; thiếu trường ⇒ lượt ấy "Chưa đo treo máy".
 
@@ -31,8 +31,8 @@ Mức làm 1–4 GIỮ NGUYÊN công thức. Hai mức mới **đè lên** mức
 
 | Mức | Điều kiện | Chữ cho thầy |
 |---|---|---|
-| **Mức làm 5 · Treo máy** (một lượt) | khoảng lặng dài nhất `l` ≥ **300 giây** (5 phút không chạm khi màn đang sáng); HOẶC rời app `a` ≥ **180 giây** khi màn được giữ sáng (`w = 1`); HOẶC `a` ≥ **600 giây** khi không giữ được màn sáng | Treo máy |
-| **Mức làm 6 · Cố tình treo máy** (mẫu lặp) | trong CÙNG một ngày của em: ≥ **3 lượt** Mức làm 5; HOẶC một lượt có `n` ≥ **3** (ba lần lặng 2–3 phút rồi chạm đúng trước ngưỡng cắt — chạm giữ cho đồng hồ chạy). (Bỏ luật "quay lại rồi nộp vội": đồng hồ không đo được lúc em quay lại ⇒ không kết luận.) Luật theo ngày chỉ áp ở danh sách lượt của MỘT em (hồ sơ, lịch sử, điểm danh); "Ai đã sai?" chỉ có luật một lượt | Cố tình treo máy |
+| **Mức làm 5 · Treo máy** (một lượt) | khoảng lặng dài nhất `l` ≥ **300 giây** (5 phút không chạm khi màn đang sáng); HOẶC rời app `a` ≥ **180 giây** khi màn được giữ sáng (`w = 1`); HOẶC `a` ≥ **600 giây** khi không giữ được màn sáng; HOẶC `n` ≥ **3** (ba quãng lặng 2–3 phút rồi chạm ngay trước ngưỡng cắt) | Treo máy |
+| **Mức làm 6 · Cố tình treo máy** (mẫu lặp) | CHỈ từ mẫu trong CÙNG một ngày của em: ≥ **3 lượt** Mức làm 5. Một lượt đơn lẻ KHÔNG BAO GIỜ là Mức 6 (kể cả `n` ≥ 3: em làm Phần III khó có thể tính nháp ba quãng 2–3 phút, chạm/cuộn giữa các quãng). Luật theo ngày chỉ áp ở danh sách lượt của MỘT em (hồ sơ, lịch sử, điểm danh); "Ai đã sai?" không có Mức 6 | Cố tình treo máy |
 
 Vì sao 300 giây: dài hơn tính nháp Phần III hợp lý (đo trên lượt thật sẽ chỉnh); thấp hơn thì em tính nháp chăm chỉ bị gọi oan.
 
@@ -42,7 +42,7 @@ Hệ quả đo lường (chính xác hơn):
 - Nối τ OMNI vào hệ số đọc (kẹp 0,75–1,5) khi em có τ — T_đọc riêng từng em (Đợt 2, cần soát động cơ OMNI).
 
 ## 5. Đề xuất cần thầy quyết (ở bước duyệt ảnh)
-- **Giữ màn sáng khi đang làm câu** (Screen Wake Lock; tự nhả khi nộp/thoát/ẩn): cần để biết em rời app hay chỉ màn tự tắt. Tốn pin thêm một chút khi đang làm. Máy không hỗ trợ (iOS < 16.4) ⇒ `w = 0`, dùng ngưỡng 600 giây.
+- **Giữ màn sáng khi đang làm câu — ĐÃ BẬT ở Đợt 1 (thầy muốn tắt thì báo).** Screen Wake Lock: xin khi màn làm câu mở, tự nhả khi rời màn; **nhả sau 10 phút không chạm** (máy bỏ quên trên bàn không sáng mãi), chạm lại thì xin lại; trình duyệt tự nhả khi tab ẩn ⇒ xin lại khi hiện lại. Cần để biết em rời app hay chỉ màn tự tắt. Máy không hỗ trợ / từ chối ⇒ `w = 0`, dùng ngưỡng 600 giây. Tuần chỉnh ngưỡng: tách số liệu theo `w` và loại máy (iOS cài ra màn hình chính chưa chắc giữ được màn) trước khi tin nhánh 180 giây.
 - **Ai thấy gì:** Mức 5 "Treo máy" — thầy + học sinh ("Câu này máy để treo X phút") + phụ huynh (chỉ số lượt, không chi tiết). Mức 6 "Cố tình treo máy" — **CHỈ THẦY** cho tới khi thầy cho mở.
 
 ## 6. Chia việc

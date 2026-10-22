@@ -82,24 +82,27 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       if (document.visibilityState !== 'visible') { t.a = Math.min(7200, t.a + 1); return }
       t.v = Math.min(7200, t.v + 1); t.lang++
       if (Date.now() - dhCham.current <= 180_000) dhMs.current = Math.min(900_000, dhMs.current + 1000)
+      if (khoaMan && Date.now() - dhCham.current > 600_000) { void khoaMan.release().catch(() => {}); khoaMan = null } // 10 phút không chạm ⇒ nhả giữ màn sáng (máy bỏ quên không sáng mãi)
     }, 1000)
     const cham = () => {
       const t = dhT.current
       if (t.lang >= 120 && t.lang < 180) t.n++
       t.l = Math.max(t.l, t.lang); t.lang = 0
       dhCham.current = Date.now()
+      if (!khoaMan) xin() // chạm lại sau khi đã nhả ⇒ giữ màn sáng lại
     }
     const ev = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel']
     for (const e of ev) window.addEventListener(e, cham, { passive: true, capture: true })
     // Giữ màn sáng khi đang làm câu (tự nhả khi rời màn; trình duyệt tự nhả khi tab ẩn ⇒ xin lại khi hiện lại). Không hỗ trợ / bị từ chối ⇒ w = 0, không báo lỗi.
     type Khoa = { release: () => Promise<void> }
     const wl = (navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<Khoa> } }).wakeLock
-    let khoaMan: Khoa | null = null, het = false
+    let khoaMan: Khoa | null = null, het = false, dangXin = false
     const xin = () => {
-      if (!wl || het || document.visibilityState !== 'visible') return
-      wl.request('screen').then((k) => { if (het) void k.release().catch(() => {}); else { khoaMan = k; dhW.current = true } }, () => { dhW.current = false })
+      if (!wl || het || khoaMan || dangXin || document.visibilityState !== 'visible') return
+      dangXin = true
+      wl.request('screen').then((k) => { dangXin = false; if (het) void k.release().catch(() => {}); else { khoaMan = k; dhW.current = true } }, () => { dangXin = false; dhW.current = false })
     }
-    const doiHien = () => { if (document.visibilityState === 'visible') xin() }
+    const doiHien = () => { if (document.visibilityState === 'visible') xin(); else khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
     xin()
     document.addEventListener('visibilitychange', doiHien)
     return () => {

@@ -89,3 +89,33 @@ describe('Làm bài tập: đo treo máy', () => {
     expect(d.l).toBeLessThan(180)
   }, 20000)
 })
+
+describe('Làm bài tập: giữ màn sáng khi đang làm câu (22/10)', () => {
+  it('xin khi mở; 10 phút không chạm ⇒ nhả; chạm lại ⇒ xin lại; nộp gửi w = 1', async () => {
+    const xin = vi.fn(), nha = vi.fn(async () => {})
+    xin.mockImplementation(async () => ({ release: nha }))
+    Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: { request: xin } })
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    try {
+      vi.mocked(goiHoa2).mockImplementation(async (hanh: string) => (hanh === 'answer' ? { ok: true, correct: true, answer: 'B' } : { ok: true, id: 'p1', questions: [TN] }) as never)
+      render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 0, muc: 12, chang: 1, soChang: 3 }} />)
+      await screen.findByText(TN.text)
+      await waitFor(() => expect(xin).toHaveBeenCalledTimes(1))
+      expect(xin).toHaveBeenCalledWith('screen')
+      fireEvent.pointerDown(window)
+      expect(xin).toHaveBeenCalledTimes(1) // đang giữ ⇒ không xin chồng
+      await vi.advanceTimersByTimeAsync(602_000)
+      expect(nha).toHaveBeenCalledTimes(1)
+      fireEvent.pointerDown(window)
+      await waitFor(() => expect(xin).toHaveBeenCalledTimes(2))
+      fireEvent.click(screen.getAllByRole('radio')[1]!)
+      fireEvent.click(screen.getByRole('button', { name: /^Nộp|^Kiểm tra|Nộp/ }))
+      await waitFor(() => expect(vi.mocked(goiHoa2).mock.calls.some((c) => c[0] === 'answer')).toBe(true))
+      const dg = (vi.mocked(goiHoa2).mock.calls.find((c) => c[0] === 'answer')![2] as { doGiay: { w: number } }).doGiay
+      expect(dg.w).toBe(1)
+    } finally {
+      vi.useRealTimers()
+      delete (navigator as unknown as Record<string, unknown>).wakeLock
+    }
+  }, 20000)
+})

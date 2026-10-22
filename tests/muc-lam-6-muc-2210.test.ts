@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest'
 import { ghepDocVaoRaw, lamSachDo } from '../server/src/do-giay-luot'
 import { docDoMuc } from '../server/src/muc-lam-so'
-import { mucCongKhai, mucLamCuaLuot, nangCoTinhTheoNgay, tongCongKhai, tongMucLam, treoCuaLuot, type DauVaoMucLam } from '../server/src/muc-lam'
+import { mucCongKhai, mucLamCuaLuot, nangCoTinhTheoNgay, tongCongKhai, tongMucLam, treoCuaLuot, type DauVaoMucLam, type MucLamLuot } from '../server/src/muc-lam'
 
 const goc: DauVaoMucLam = { giay: 185, soTu: 40, coHinh: false, phan: 'III', dung: false }
 const treo = (v: number, a: number, l: number, n = 0, w: 0 | 1 = 0) => ({ v, a, l, n, w })
@@ -33,7 +33,8 @@ describe('lõi: Mức làm 5 · Treo máy, Mức làm 6 · Cố tình treo máy'
     expect(m.ma).toBe(3)
     expect(m.treo).toBe('treo')
     expect(m.giayTreo).toBe(600)
-    expect(m.chuaDoTreo).toBeUndefined()
+    expect(m.daDoTreo).toBeUndefined()
+    expect(mucLamCuaLuot({ ...goc, treo: treo(200, 0, 60) })!.daDoTreo).toBe(true)
   })
 
   it('tính nháp 4 phút có chạm (lặng dài nhất 100 giây) ⇒ KHÔNG treo; lặng 299 giây ⇒ không; 300 ⇒ treo', () => {
@@ -48,13 +49,14 @@ describe('lõi: Mức làm 5 · Treo máy, Mức làm 6 · Cố tình treo máy'
     expect(treoCuaLuot(treo(60, 650, 30, 0, 0))).toBe('treo')
   })
 
-  it('ba lần lặng 2–3 phút rồi chạm trước ngưỡng cắt (n = 3) ⇒ Cố tình treo máy; n = 2 ⇒ chưa', () => {
-    expect(treoCuaLuot(treo(500, 0, 170, 3))).toBe('co_tinh')
+  it('ba lần lặng 2–3 phút rồi chạm (n = 3) ⇒ CHỈ Treo máy (một lượt không bao giờ là Mức 6 — em tính nháp Phần III cũng có thể như vậy); n = 2 ⇒ không', () => {
+    expect(treoCuaLuot(treo(500, 0, 170, 3))).toBe('treo')
     expect(treoCuaLuot(treo(500, 0, 170, 2))).toBeNull()
   })
 
-  it('lượt chưa có số đo treo (máy em cũ) ⇒ chuaDoTreo, không đoán; giây cũ/ước tính không bao giờ có treo', () => {
-    expect(mucLamCuaLuot(goc)!.chuaDoTreo).toBe(true)
+  it('lượt chưa có số đo treo (máy em cũ) ⇒ không treo, không daDoTreo (giao diện hiện «Chưa đo treo máy»); giây cũ/ước tính không bao giờ có treo', () => {
+    const cu = mucLamCuaLuot(goc)!
+    expect([cu.treo, cu.daDoTreo]).toEqual([undefined, undefined])
     expect(mucLamCuaLuot({ ...goc, uocTinh: 'cu', treo: treo(640, 0, 600) })!.treo).toBeUndefined()
   })
 
@@ -67,7 +69,7 @@ describe('lõi: Mức làm 5 · Treo máy, Mức làm 6 · Cố tình treo máy'
   })
 
   it('bản công khai (máy chiếu, học sinh, phụ huynh): Mức 6 hạ về Mức 5', () => {
-    const c = mucLamCuaLuot({ ...goc, treo: treo(500, 0, 170, 3) })!
+    const c: MucLamLuot = { ...mucLamCuaLuot({ ...goc, treo: treo(640, 0, 600) })!, treo: 'co_tinh' }
     expect(mucCongKhai(c).treo).toBe('treo')
     expect(mucCongKhai(null)).toBeNull()
     const tong = tongMucLam([{ mucLam: c, dung: false }])

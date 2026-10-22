@@ -30,17 +30,17 @@ export const TREO_LANG_GIAY = 300
 export const TREO_ROI_GIAY_GIU_SANG = 180
 /** Tab ẩn khi KHÔNG giữ được màn sáng (màn có thể tự tắt lúc em tính nháp) — ngưỡng rộng hơn. */
 export const TREO_ROI_GIAY = 600
-/** Một lượt có từng ấy khoảng lặng 120–179 giây (chạm ngay trước ngưỡng cắt 180 giây của đồng hồ) ⇒ Cố tình treo máy. */
-export const CO_TINH_SO_LANG = 3
+/** Một lượt có từng ấy khoảng lặng 120–179 giây (chạm ngay trước ngưỡng cắt 180 giây của đồng hồ) ⇒ Treo máy (Mức 5). KHÔNG đủ cho Mức 6 một mình:
+ *  em làm Phần III khó có thể tính nháp ba quãng 2–3 phút, chạm/cuộn giữa các quãng — đúng dấu hiệu này mà không gian lận. */
+export const TREO_SO_LANG = 3
 /** Cùng một ngày của em có từng ấy lượt Treo máy ⇒ các lượt treo ấy thành Cố tình treo máy (`nangCoTinhTheoNgay`). */
 export const CO_TINH_SO_TREO_NGAY = 3
 /** 'treo' = Mức làm 5 · Treo máy; 'co_tinh' = Mức làm 6 · Cố tình treo máy (CHỈ màn thầy). */
 export type MucTreo = 'treo' | 'co_tinh'
 
-/** Treo máy của MỘT lượt từ số đo đồng hồ mới; null = không treo. Thuần. */
-export function treoCuaLuot(t: DoTreo): MucTreo | null {
-  if (t.n >= CO_TINH_SO_LANG) return 'co_tinh'
-  if (t.l >= TREO_LANG_GIAY || t.a >= TREO_ROI_GIAY || (t.w === 1 && t.a >= TREO_ROI_GIAY_GIU_SANG)) return 'treo'
+/** Treo máy của MỘT lượt từ số đo đồng hồ mới; null = không treo. Một lượt chỉ cho Mức 5 — Mức 6 CHỈ từ mẫu lặp trong ngày (`nangCoTinhTheoNgay`). Thuần. */
+export function treoCuaLuot(t: DoTreo): 'treo' | null {
+  if (t.l >= TREO_LANG_GIAY || t.a >= TREO_ROI_GIAY || (t.w === 1 && t.a >= TREO_ROI_GIAY_GIU_SANG) || t.n >= TREO_SO_LANG) return 'treo'
   return null
 }
 
@@ -71,8 +71,9 @@ export interface MucLamLuot {
   treo?: MucTreo
   /** Giây em không ở với câu = max(khoảng lặng dài nhất, giây rời app) — để màn hiện "treo X phút". Chỉ có khi `treo`. */
   giayTreo?: number
-  /** Lượt này không có số đo treo máy (máy em chưa có đồng hồ 22/10, hoặc lượt cũ) ⇒ "Chưa đo treo máy", không đoán. */
-  chuaDoTreo?: true
+  /** Lượt CÓ số đo treo máy mà không treo. Vắng cả `treo` lẫn `daDoTreo` ⇒ lượt cũ / máy em chưa có đồng hồ 22/10 ⇒ "Chưa đo treo máy", không đoán.
+   *  (Cờ đặt ở lượt ĐÃ đo — không gắn thêm khoá vào mọi lượt cũ của lịch sử.) */
+  daDoTreo?: true
 }
 
 export interface DauVaoMucLam {
@@ -131,8 +132,7 @@ export function mucLamCuaLuot(d: DauVaoMucLam): MucLamLuot | null {
     ...(xapXi ? { xapXi: true as const } : {}),
     ...(ma === 1 && d.dung === true ? { ghiChu: 'dung_truoc_doc' as const } : {}),
     ...(d.uocTinh ? { uocTinh: d.uocTinh } : {}),
-    ...(treo && so ? { treo, giayTreo: Math.max(so.l, so.a) } : {}),
-    ...(so ? {} : { chuaDoTreo: true as const }),
+    ...(treo && so ? { treo, giayTreo: Math.max(so.l, so.a) } : so ? { daDoTreo: true as const } : {}),
   }
 }
 
@@ -207,7 +207,7 @@ export function tongMucLam(luot: readonly { mucLam?: MucLamLuot | null; dung: bo
     soDo++
     if (m.treo === 'co_tinh') soCoTinh++
     else if (m.treo === 'treo') soTreo++
-    if (m.chuaDoTreo) soChuaDoTreo++
+    if (!m.treo && !m.daDoTreo) soChuaDoTreo++
     if (m.uocTinh) soUocTinh++
     if (m.thuong !== undefined) coBetaThat = true
     if (m.treo && tuy.tachTreo) continue
