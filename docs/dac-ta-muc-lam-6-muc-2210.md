@@ -19,7 +19,7 @@ Giữ NGUYÊN `g` (giây làm như hôm nay) để Mức làm 1–4 so được 
 |---|---|---|
 | `g` | (giữ nguyên) giây câu hiện, tab hiện, ≤ 180 giây từ lần chạm cuối | 1–900 |
 | `v` | tổng giây câu mở **khi tab hiện** (không cắt 180 giây) | 0–7200 |
-| `a` | tổng giây câu mở **khi tab ẩn / màn tắt** | 0–7200 |
+| `a` | tổng giây câu mở **khi tab ẩn / màn tắt** — tính theo mốc thời gian lúc ẩn → lúc hiện (trình duyệt hãm/đóng băng nhịp tab ẩn), chỉ khoảng ẩn khép lại trong cùng một lần mở trang | 0–7200 |
 | `l` | khoảng lặng dài nhất (giây giữa hai lần chạm liên tiếp, hoặc từ lần chạm cuối tới lúc nộp) khi tab hiện | 0–7200 |
 | `n` | số khoảng lặng 120–179 giây (ngay dưới ngưỡng cắt — dấu hiệu chạm giữ máy) | 0–60 |
 | `w` | 1 nếu đã xin được giữ màn sáng trong lúc câu mở (màn ẩn lúc ấy là em tự rời app / tắt màn) | 0/1 |

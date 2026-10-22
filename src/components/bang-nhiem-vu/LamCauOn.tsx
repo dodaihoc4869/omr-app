@@ -171,7 +171,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     const id = window.setInterval(() => {
       xem()
       if (khoaMan && Date.now() - cham > 600_000) { void khoaMan.release().catch(() => {}); khoaMan = null } // 10 phút không chạm ⇒ nhả giữ màn sáng (máy bỏ quên không sáng mãi)
-      if (document.visibilityState !== 'visible') { if (qCuoi) { const t = treo(qCuoi); t.a = Math.min(7200, t.a + 1) } return }
+      if (document.visibilityState !== 'visible') return // `a` tính theo MỐC lúc ẩn → lúc hiện (nhịp tab ẩn bị hãm)
       let q = chamQid && (tiLe[chamQid] ?? 0) >= 0.5 ? chamQid : ''
       if (!q) { let max = 0; for (const k of Object.keys(tiLe)) if (tiLe[k]! > max) { max = tiLe[k]!; q = k } }
       if (!q) return
@@ -198,7 +198,14 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
       dangXin = true
       wl.request('screen').then((k) => { dangXin = false; if (het) void k.release().catch(() => {}); else { khoaMan = k; dhW.current = true } }, () => { dangXin = false; dhW.current = false })
     }
-    const doiHien = () => { if (document.visibilityState === 'visible') xin(); else khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
+    let anTu = document.visibilityState === 'visible' ? 0 : Date.now()
+    const doiHien = () => {
+      if (document.visibilityState === 'visible') {
+        if (anTu && qCuoi) { const t = treo(qCuoi); t.a = Math.min(7200, t.a + Math.round((Date.now() - anTu) / 1000)) }
+        anTu = 0
+        xin()
+      } else { if (!anTu) anTu = Date.now(); khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
+    }
     xin()
     document.addEventListener('visibilitychange', doiHien)
     return () => {

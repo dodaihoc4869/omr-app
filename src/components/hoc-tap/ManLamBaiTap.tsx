@@ -79,7 +79,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   useEffect(() => {
     const id = window.setInterval(() => {
       const t = dhT.current
-      if (document.visibilityState !== 'visible') { t.a = Math.min(7200, t.a + 1); return }
+      if (document.visibilityState !== 'visible') return // `a` tính theo MỐC lúc ẩn → lúc hiện (trình duyệt hãm/đóng băng nhịp ở tab ẩn: đếm nhịp sẽ hụt)
       t.v = Math.min(7200, t.v + 1); t.lang++
       if (Date.now() - dhCham.current <= 180_000) dhMs.current = Math.min(900_000, dhMs.current + 1000)
       if (khoaMan && Date.now() - dhCham.current > 600_000) { void khoaMan.release().catch(() => {}); khoaMan = null } // 10 phút không chạm ⇒ nhả giữ màn sáng (máy bỏ quên không sáng mãi)
@@ -102,7 +102,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       dangXin = true
       wl.request('screen').then((k) => { dangXin = false; if (het) void k.release().catch(() => {}); else { khoaMan = k; dhW.current = true } }, () => { dangXin = false; dhW.current = false })
     }
-    const doiHien = () => { if (document.visibilityState === 'visible') xin(); else khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
+    let anTu = document.visibilityState === 'visible' ? 0 : Date.now()
+    const doiHien = () => {
+      if (document.visibilityState === 'visible') {
+        if (anTu) { const t = dhT.current; t.a = Math.min(7200, t.a + Math.round((Date.now() - anTu) / 1000)); anTu = 0 }
+        xin()
+      } else { if (!anTu) anTu = Date.now(); khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
+    }
     xin()
     document.addEventListener('visibilitychange', doiHien)
     return () => {

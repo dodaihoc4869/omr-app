@@ -63,7 +63,7 @@ describe('Làm bài tập: đo treo máy', () => {
       vi.useRealTimers()
     }
   }
-  const datHien = (hien: boolean) => Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (hien ? 'visible' : 'hidden') })
+  const datHien = (hien: boolean) => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (hien ? 'visible' : 'hidden') }); document.dispatchEvent(new Event('visibilitychange')) }
   afterEach(() => datHien(true))
 
   it('10 phút không chạm ⇒ l ≥ 600, v ≈ 600; giây làm g vẫn cắt ở 180 (như cũ)', async () => {
@@ -74,7 +74,7 @@ describe('Làm bài tập: đo treo máy', () => {
     expect(d.n).toBe(0)
   }, 20000)
 
-  it('rời app 3 phút (tab ẩn) ⇒ a ≈ 180, không cộng vào v / g', async () => {
+  it('rời app 3 phút (tab ẩn) ⇒ a ≈ 180 tính theo mốc lúc ẩn → hiện (không phụ thuộc nhịp bị hãm), không cộng vào v / g', async () => {
     const d = await kichBan(async (tien) => { await tien(5); datHien(false); await tien(180); datHien(true); await tien(2) })
     expect(d.a).toBeGreaterThanOrEqual(178)
     expect(d.a).toBeLessThanOrEqual(182)
