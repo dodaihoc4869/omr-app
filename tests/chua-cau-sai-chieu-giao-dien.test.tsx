@@ -14,7 +14,10 @@ const m = vi.hoisted(() => ({
     tt: { buoi: { lop: '12A1' } },
   },
   gan: vi.fn(),
+  /** Kết quả bộ chọn em (`layEmChieu`) — mặc định rỗng như khi không gọi được máy chủ. */
+  uv: new Map<string, any[]>(),
 }))
+vi.mock('../src/lib/ung-vien-chieu', async (goc) => ({ ...(await goc<typeof import('../src/lib/ung-vien-chieu')>()), layEmChieu: async () => m.uv }))
 vi.mock('../src/lib/chua-cau-sai-thay-api', () => ({ goiChuaThay: m.goi }))
 vi.mock('../src/components/day-hoc/DiemDanhBuoi', () => ({
   useDiemDanhBuoi: () => m.dd,
@@ -168,5 +171,19 @@ describe('Màn chiếu bước cuối', () => {
     await waitFor(() =>
       expect(screen.getByText(/Đã ghi buổi chữa cho 7 em có mặt/)).toBeTruthy(),
     )
+  })
+
+  it('nhãn nhóm (thầy 22/10): sau khi chiếu, thẻ câu của thầy ghi em lên bảng + nhóm, em giảng lại + nhóm; tờ chiếu KHÔNG có nhóm', async () => {
+    m.uv = new Map([['Q', [{ sbd: 'HS1', ten: 'Lê Chi', loai: 'da_dung', p: 0.3, luc: null, soSai: 2, tang: 1, giangLai: { sbd: 'HS2', ten: 'Đỗ Minh', tang: 3, lyDo: '' } }]]])
+    try {
+      render(<CauCanChua />)
+      fireEvent.click(await screen.findByText('Chiếu bước này để chữa chung'))
+      const to = await screen.findByTestId('to-chieu')
+      const dong = await screen.findByText(/Đã gọi lên bảng:/)
+      expect(dong.textContent).toBe('Đã gọi lên bảng: Lê Chi Cần kèm · Giảng lại: Đỗ Minh Khá (đã làm đúng)')
+      expect(to.textContent).not.toMatch(/Cần kèm|cem-tang/) // tờ chiếu không có nhãn nhóm (chữ «Trung bình/Khá» của thang học lực có sẵn trong mã tờ)
+    } finally {
+      m.uv = new Map()
+    }
   })
 })
