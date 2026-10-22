@@ -3,6 +3,8 @@
 //   node scripts/chup-ban-ve-ho-so-em-2210.mjs            ⇒ chụp cả hai phần
 //   node scripts/chup-ban-ve-ho-so-em-2210.mjs hien-trang ⇒ chỉ HIỆN TRẠNG (linh kiện thật qua vite dev, dữ liệu giả) → docs/ban-ve-ho-so-em-2210/hien-trang/
 //   node scripts/chup-ban-ve-ho-so-em-2210.mjs ban-ve     ⇒ chỉ BẢN VẼ MỚI (HTML tĩnh ho-so-em.html, CSS thật của app) → docs/ban-ve-ho-so-em-2210/anh/
+//   node scripts/chup-ban-ve-ho-so-em-2210.mjs that       ⇒ (bước 4) MÀN BUILD THẬT 6 mức (linh kiện thật, dữ liệu giả 6 mức) → docs/ban-ve-ho-so-em-2210/that-anh/
+//     soát như bản vẽ (0 vấn đề, sai ⇒ mã thoát 1) + chip đầu tấm không chồng nút Đóng.
 // Sáng/tối = colorScheme; reducedMotion; mọi yêu cầu ra ngoài 127.0.0.1 bị chặn. JPG tự hạ chất lượng tới ≤ 150 KB.
 // SOÁT mỗi ảnh: lỗi trang · tràn ngang (bỏ chữ ẩn cho trình đọc) · đích chạm < 44 px · (bản vẽ) chữ < 12 px · tương phản chữ < 4,5:1 (chữ lớn < 3:1)
 //   · (bản vẽ, app học sinh / phụ huynh) LỘ MỨC 6: chữ + title + aria-label không được chứa "Cố tình", "Mức làm 6", "co_tinh".
@@ -153,6 +155,71 @@ async function hienTrang() {
   console.log(soat.length ? `HIỆN TRẠNG (chỉ báo, không chặn): ${soat.length} vấn đề\n- ${soat.join('\n- ')}` : `HIỆN TRẠNG ${KHUNG.length} ảnh: 0 lỗi trang · 0 tràn ngang · 0 đích chạm nhỏ`)
 }
 
+// ------------------------------------------------------------ PHẦN 3 · MÀN BUILD THẬT 6 MỨC (bước 4 quy trình: so với bản vẽ đã duyệt)
+async function manThat() {
+  const { createServer } = await import('vite')
+  const react = (await import('@vitejs/plugin-react')).default
+  const vite = await createServer({
+    configFile: false, root: GOC, logLevel: 'error', plugins: [react()],
+    define: { __PHIEN_BAN__: JSON.stringify('chup-ho-so-2210'), __SW_BUILT_AT__: 0 },
+    server: { port: 0, host: '127.0.0.1', watch: null, hmr: false },
+    optimizeDeps: { entries: ['docs/ban-ve-ho-so-em-2210/that/trang.tsx'] },
+  })
+  await vite.listen()
+  const goc = vite.resolvedUrls.local[0].replace(/\/$/, '')
+  const RA = join(THU_MUC, 'that-anh')
+  mkdirSync(RA, { recursive: true })
+  const soat = []
+  const KHO = [['390', 390, 844], ['844-ngang', 844, 390], ['1440', 1440, 900]]
+  // [tên, che, trạng thái t, khổ, tối, cuộn tới lượt treo?]
+  const CANH = []
+  for (const [k, che] of [['thay', 'thay'], ['hs', 'hoc-sinh'], ['ph', 'phu-huynh']])
+    for (const ki of [0, 1, 2]) for (const toi of [false, true]) CANH.push([`${k}-${KHO[ki][0]}-${toi ? 'toi' : 'sang'}`, che, 'dl', ki, toi, false])
+  CANH.push(['thay-luot-treo-390-sang', 'thay', 'dl', 0, false, true], ['hs-luot-treo-390-toi', 'hoc-sinh', 'dl', 0, true, true], ['ph-luot-treo-390-sang', 'phu-huynh', 'dl', 0, false, true])
+  CANH.push(['thay-dang-tai-390-sang', 'thay', 'tai', 0, false, false], ['hs-rong-390-toi', 'hoc-sinh', 'rong', 0, true, false], ['ph-loi-390-sang', 'phu-huynh', 'loi', 0, false, false])
+  CANH.push(['thay-mat-mang-1440-toi', 'thay', 'mang', 2, true, false], ['thay-chua-do-treo-390-sang', 'thay', 'cu', 0, false, false], ['thay-chua-do-treo-1440-sang', 'thay', 'cu', 2, false, false])
+  for (const [ten, che, tt, ki, toi, cuonTreo] of CANH) {
+    const [, w, h] = KHO[ki]
+    const ctx = await trinh.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: w > 1000 ? 1 : 2, colorScheme: toi ? 'dark' : 'light', reducedMotion: 'reduce', locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh', hasTouch: w < 900, isMobile: w < 500 })
+    await ctx.route((u) => !u.href.startsWith('http://127.0.0.1'), (r) => r.abort())
+    const t = await ctx.newPage()
+    t.setDefaultTimeout(20000)
+    t.on('pageerror', (e) => soat.push(`${ten}: lỗi trang ${e.message}`))
+    await t.goto(`${goc}/docs/ban-ve-ho-so-em-2210/that/index.html?man=ho-so&che=${che}&du=6muc&t=${tt}`)
+    await t.locator(tt === 'tai' ? '.hsv-xuong' : tt === 'loi' ? '.hsv-loi' : tt === 'rong' ? '.hsv-trong' : tt === 'mang' ? '.hsv-mang' : '#hsv-lan').first().waitFor()
+    await t.evaluate(() => document.fonts.ready)
+    await t.waitForTimeout(300)
+    if (cuonTreo) {
+      await t.evaluate(() => {
+        const el = document.querySelector('.hslc-lan[data-treo]')
+        const than = el?.closest('.gvv2-hs-than')
+        if (el && than) than.scrollTop += el.getBoundingClientRect().top - than.getBoundingClientRect().top - 80
+      })
+      await t.waitForTimeout(150)
+    }
+    const kq = await t.evaluate(doTrongTrang, { goc: '.gvv2-hs', kiemLo: che !== 'thay', kiemChu: true })
+    // chip đầu tấm (thầy) không chồng nút Đóng
+    const chong = await t.evaluate(() => {
+      const d = document.querySelector('.gvv2-hs-dong')?.getBoundingClientRect()
+      if (!d) return []
+      return [...document.querySelectorAll('.hsv-chip-dau')].filter((c) => { const r = c.getBoundingClientRect(); return r.left < d.right && r.right > d.left && r.top < d.bottom && r.bottom > d.top }).map((c) => c.textContent)
+    })
+    if (kq.tran) soat.push(`${ten}: TRÀN NGANG`)
+    if (kq.nho.length) soat.push(`${ten}: đích chạm nhỏ ${[...new Set(kq.nho)].slice(0, 4).join(' | ')}`)
+    if (kq.nhoChu) soat.push(`${ten}: ${kq.nhoChu} chữ < 12 px`)
+    if (kq.tp.length) soat.push(`${ten}: tương phản thấp ${kq.tp.join(' | ')}`)
+    if (kq.lo.length) soat.push(`${ten}: LỘ MỨC 6 ở app học sinh/phụ huynh: ${kq.lo.join(', ')}`)
+    if (chong.length) soat.push(`${ten}: chip đầu tấm chồng nút Đóng: ${chong.join(' | ')}`)
+    await t.addStyleTag({ content: '#minh-hoa{position:fixed;left:8px;bottom:8px;z-index:99999;padding:4px 10px;border-radius:999px;font:700 12px/1.4 system-ui,sans-serif;background:var(--gvm-chu);color:var(--gvm-mat);opacity:.9;pointer-events:none}' })
+    await t.evaluate(() => { const d = document.createElement('div'); d.id = 'minh-hoa'; d.textContent = 'MÀN THẬT · số liệu minh hoạ'; document.body.append(d) })
+    await luuAnh(t, join(RA, `${ten}.jpg`), soat, ten)
+    await ctx.close()
+  }
+  await vite.close()
+  console.log(soat.length ? `MÀN THẬT: ${soat.length} vấn đề\n- ${soat.join('\n- ')}` : `MÀN THẬT ${CANH.length} ảnh: 0 lỗi trang · 0 tràn ngang · 0 đích chạm < 44 px · 0 chữ < 12 px · 0 tương phản thấp · 0 lộ Mức 6 ở app học sinh/phụ huynh · 0 chip chồng nút Đóng`)
+  return soat.length
+}
+
 // ------------------------------------------------------------ PHẦN 2 · BẢN VẼ MỚI (HTML tĩnh, CSS thật)
 async function banVe() {
   const LOAI = { '.html': 'text/html; charset=utf-8', '.woff2': 'font/woff2', '.css': 'text/css', '.svg': 'image/svg+xml' }
@@ -221,7 +288,10 @@ async function banVe() {
 }
 
 let loi = 0
-if (PHAN !== 'ban-ve') await hienTrang()
-if (PHAN !== 'hien-trang') loi = await banVe()
+if (PHAN === 'that') loi = await manThat()
+else {
+  if (PHAN !== 'ban-ve') await hienTrang()
+  if (PHAN !== 'hien-trang') loi = await banVe()
+}
 await trinh.close()
 process.exit(loi ? 1 : 0)

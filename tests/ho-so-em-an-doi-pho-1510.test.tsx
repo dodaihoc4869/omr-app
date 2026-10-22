@@ -2,7 +2,8 @@
 // A4 (quét 15/10): tấm hồ sơ mở trong app HỌC SINH hiện chip "Có dấu hiệu đối phó" — nhãn chấm thái độ, chuẩn A1.7 không cho hiện với em.
 // Luật: chế độ 'hoc-sinh' ẩn chip; thầy và phụ huynh giữ nguyên (phụ huynh đọc CHUNG bản dữ liệu của em nên KHÔNG lọc ở máy chủ).
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { choTamXong, moGap } from './_ho-so-6-muc'
 import type { KetQuaLichSuLamCau } from '../server/src/lich-su-lam-cau-kieu'
 import { hoSoThaiDoGia } from '../scripts/chup-v2/gia/bai-hang-ngay'
 
@@ -26,7 +27,10 @@ afterEach(cleanup)
 async function chip(cheDo: 'hoc-sinh' | 'thay' | 'phu-huynh') {
   render(<HoSoLamCauEm em={{ sbd: '11010', ten: 'Em', khoi: null }} nguon={nguon as never} cheDo={cheDo} onDong={() => {}} />)
   const tam = await screen.findByRole('dialog')
-  await within(tam).findByText('Số lượt làm câu')
+  await choTamXong(tam)
+  moGap(tam, /^(Nhịp học|Lịch làm bài)/) // 6 mức: đầu tấm Thái độ dời vào ngăn gập
+  await waitFor(() => expect(tam.querySelector('#gvv2-tdo-nhan')).not.toBeNull())
+  if (cheDo === 'hoc-sinh') expect(tam.textContent).not.toMatch(/đối phó/)
   return tam.querySelector('.gvv2-tdo-co-doi-pho')
 }
 

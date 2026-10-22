@@ -25,7 +25,7 @@
 //     câu "Bấm một câu…"); chế độ thầy GIỮ NGUYÊN mọi chi tiết.
 // Esc / Đóng / bấm nền che ⇒ đóng; Tab giữ trong tấm; đóng xong focus về đúng nút đã bấm (nơi mở lo). Lệnh nào lỗi ⇒ một câu nói thật + nút tải lại,
 // phần còn lại vẫn đủ. Mảnh riêng nạp LƯỜI (ngoài precache, vite.config.ts). Biểu đồ bằng CSS, không thư viện.
-import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Activity, Check, ChevronRight, ExternalLink, Hourglass, PenLine, RotateCcw, ShieldCheck, TriangleAlert, X } from 'lucide-react'
 import { gioPhutVN, ngayThuChu, ngayVN } from '../../lib/em-toan-canh'
 import { lyDoDeHieu } from '../../lib/loi-de-hieu'
@@ -52,7 +52,8 @@ import { chuCanThem, chuDoTinCay, NGUONG_TIN_CAY } from '../../lib/nhip-hoc-em'
 import { LUAT_NHOM_NHIP } from '../../../server/src/nhip-hoc-kieu'
 import { TEN_NHOM_NHIP as TEN_NHOM_NHIP_HOC } from '../../../server/src/nhip-hoc-luat'
 import { NutBac } from '../bac-cham-chi/ChipBac'
-import { chuanHoaMucLam, ChipChuaCoSoDo, ChipMuc, ChuGiaiThuoc, KhoiCachLamBai, MucCuaLuot } from './muc-lam-giao-dien'
+import { chuanHoaMucLam, ChipChuaCoSoDo, ChipMuc, ChuGiaiThuoc } from './muc-lam-giao-dien'
+import { chuaDoTreoHet, chuKhoang7, HinhCoTinh, HinhMatMang, KhoiCachLamEm6, KhoiSauMucThay, KhoiTheoNgay, locLuot, maHien, MucLuot6, ThanhSau, type LoaiLoc, type LocLuot } from './ho-so-6-muc'
 import './bai-hang-ngay.css'
 import './ho-so-lam-cau-em.css'
 
@@ -242,17 +243,14 @@ function GiayO({ giay, nguon }: { giay: number | null; nguon: NguonGiay | 'khong
   )
 }
 
+/** Khung xương giữ chiều cao (đặc tả mục 3): khối mức 120 · thanh 32 · ô mức 180 · danh sách. Tắt nhấp nháy khi giảm chuyển động (CSS). */
 function XuongTam() {
   return (
-    <div className="gvv2-hs-xuong" role="status" aria-label="Đang tải lịch sử làm câu">
-      <div className="gvv2-hs-so">
-        {[0, 1, 2, 3].map((i) => (
-          <span key={i} className="gvv2-cc-xuong-khoi tt-xuong" style={{ height: 76, borderRadius: 16 }} />
-        ))}
-      </div>
-      {[0, 1, 2].map((i) => (
-        <span key={i} className="gvv2-cc-xuong-khoi tt-xuong" style={{ width: '100%', height: 64, borderRadius: 12 }} />
+    <div className="hsv-xuong" role="status" aria-label="Đang tải hồ sơ làm bài">
+      {[120, 32, 180, 220].map((h, i) => (
+        <i key={i} style={{ height: h }} />
       ))}
+      <p className="hsv-ghi">Đang tải hồ sơ làm bài…</p>
     </div>
   )
 }
@@ -413,36 +411,104 @@ function DsCauSai({
   )
 }
 
-function LichSu({ kq, onTaiThem, dangTai, ngoi, laThay, cheDo }: { kq: KetQuaLichSuLamCau; onTaiThem: () => void; dangTai: boolean; ngoi: Ngoi; laThay: boolean; cheDo: CheDoHoSo }) {
-  const [chiSai, setChiSai] = useState(false)
+/** Một dòng lượt (giờ · câu · nơi làm · kết quả · Mức làm). Lượt treo: chip Mức 5/6 + số phút thay cho số giây / thước giây. */
+function DongLuot({ l, laThay, cheDo, coMuc, soCungNgay }: { l: LanLamCau; laThay: boolean; cheDo: CheDoHoSo; coMuc: boolean; soCungNgay?: number }) {
+  const muc = tenMucDo(l.mucDo)
+  const phu = [l.noi, muc, l.chon ? `Chọn ${l.chon}` : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join(' · ')
+  const k = l.dung === true ? 'dung' : l.dung === false ? 'sai' : 'trong'
+  const m = l.mucLam
+  return (
+    <li className="gvv2-hs-lan hslc-lan" data-kq={k} data-m={m && !m.treo ? m.ma : undefined} data-t={m?.treo ? maHien(m, laThay) : undefined} data-treo={m?.treo ? '' : undefined}>
+      <time className="gvv2-so" dateTime={l.luc}>
+        {gioPhutVN(l.luc)}
+      </time>
+      <span className="gvv2-hs-lan-chu">
+        <b>{tieuDeCau(l)}</b>
+        <small className="gvv2-so">{phu}</small>
+      </span>
+      <span className="hslc-lan-phai">
+        <span className="gvv2-hs-kq" data-kq={k}>
+          {chuKetQua(l.dung)}
+        </span>
+        {!m && (
+          <>
+            <GiayO giay={l.giay} nguon={l.nguonGiay} />
+            {laThay && coMuc && <ChipChuaCoSoDo />}
+          </>
+        )}
+      </span>
+      {m && <MucLuot6 m={m} cheDo={cheDo} soCungNgay={soCungNgay} />}
+    </li>
+  )
+}
+
+const CHU_LOC: Record<LoaiLoc, { nut: string; trong: string; dem: string }> = {
+  'tat-ca': { nut: 'Tất cả', trong: 'Chưa có lượt nào.', dem: 'lượt' },
+  sai: { nut: 'Lượt sai', trong: 'chưa có lượt sai nào trong các lượt đã tải.', dem: 'lượt sai' },
+  treo: { nut: 'Treo máy', trong: 'Không có lượt treo máy nào trong các lượt đã tải.', dem: 'lượt treo máy' },
+  'chua-so-do': { nut: 'Chưa có số đo', trong: 'Lượt nào đã tải cũng có số đo Mức làm.', dem: 'lượt chưa có số đo' },
+}
+
+/** «Từng lượt»: nút lọc 44 px (role=tab) Tất cả · Lượt sai · Treo máy (học sinh: Máy để treo) · Chưa có số đo (chỉ thầy), lượt gom theo ngày, đợt 100. */
+function LichSu({
+  kq,
+  onTaiThem,
+  dangTai,
+  ngoi,
+  laThay,
+  cheDo,
+  loc,
+  datLoc,
+  coDoTreo,
+}: {
+  kq: KetQuaLichSuLamCau
+  onTaiThem: () => void
+  dangTai: boolean
+  ngoi: Ngoi
+  laThay: boolean
+  cheDo: CheDoHoSo
+  loc: LocLuot
+  datLoc: (l: LocLuot) => void
+  coDoTreo: boolean
+}) {
   const [soHien, setSoHien] = useState(MOI_DOT)
-  const loc = useMemo(() => (chiSai ? kq.lan.filter((l) => l.dung === false) : kq.lan), [kq.lan, chiSai])
-  const ngay = useMemo(() => gomTheoNgay(loc.slice(0, soHien)), [loc, soHien])
-  const con = loc.length - Math.min(soHien, loc.length)
+  const ds = useMemo(() => locLuot(kq.lan, loc), [kq.lan, loc])
+  const ngay = useMemo(() => gomTheoNgay(ds.slice(0, soHien)), [ds, soHien])
+  const soCungNgay = useMemo(() => new Map((kq.mucLam6?.ngayCoTinh ?? []).map((n) => [n.ngay, n.so])), [kq.mucLam6])
+  const con = ds.length - Math.min(soHien, ds.length)
+  const coMuc = !!kq.mucLam || !!kq.mucLam6
+  const nut: LoaiLoc[] = ['tat-ca', 'sai', ...(coDoTreo ? (['treo'] as const) : []), ...(laThay && coMuc ? (['chua-so-do'] as const) : [])]
+  const chu = (x: LoaiLoc) => (x === 'treo' && !laThay ? 'Máy để treo' : CHU_LOC[x].nut)
+  const dem = (x: LoaiLoc) => (x === loc.loai && loc.ngay ? ds.length : locLuot(kq.lan, { loai: x }).length)
   return (
     <div className="gvv2-hs-ls">
-      <div className="gvv2-hs-ls-dau">
-        <p className="gvv2-so" aria-live="polite">
-          Đang hiện <b>{Math.min(soHien, loc.length)}</b>/{loc.length} {chiSai ? 'lần sai' : 'lượt'}
-          {kq.conNua ? ` · ${kq.lan.length} lượt gần nhất` : ''}
-        </p>
-        <button
-          type="button"
-          className="gvv2-nut-vien tt-nhan gvv2-hs-loc"
-          aria-pressed={chiSai}
-          onClick={() => {
-            setChiSai((x) => !x)
-            setSoHien(MOI_DOT)
-          }}
-        >
-          {chiSai ? <Check size={16} aria-hidden="true" /> : null}
-          Chỉ lần sai
-        </button>
+      <div className="hsv-loc" role="tablist" aria-label="Lọc lượt">
+        {nut.map((x) => (
+          <button
+            key={x}
+            type="button"
+            role="tab"
+            aria-selected={loc.loai === x}
+            className="tt-nhan"
+            onClick={() => {
+              datLoc({ loai: x })
+              setSoHien(MOI_DOT)
+            }}
+          >
+            {chu(x)}
+            <span className="gvv2-so"> · {dem(x)}</span>
+          </button>
+        ))}
       </div>
+      <p className="gvv2-so hsv-ghi" aria-live="polite">
+        Đang hiện <b>{Math.min(soHien, ds.length)}</b>/{ds.length} {loc.loai === 'treo' && !laThay ? 'lượt máy để treo' : CHU_LOC[loc.loai].dem}
+        {loc.ngay ? ` ngày ${ngayNgan(loc.ngay)}` : ''}
+        {kq.conNua ? ` · trong ${kq.lan.length} lượt gần nhất` : ''}
+      </p>
       {laThay && <p className="hslc-ls-ghi">Mỗi lượt: giờ · câu · nơi làm · mức độ · kết quả · số giây (≈ là ước tính, — là chưa đo được).</p>}
-      {laThay && kq.mucLam && <ChuGiaiThuoc />} {/* máy chủ chưa có Mức làm (không có `mucLam`) ⇒ không vẽ chú giải / nhãn "Chưa có số đo" */}
-      {loc.length === 0 ? (
-        <p className="gvv2-trong">{chiSai ? `${hoa(ngoi)} chưa có lần sai nào trong các lượt đã tải.` : 'Chưa có lượt nào.'}</p>
+      {laThay && coMuc && <ChuGiaiThuoc />} {/* máy chủ chưa có Mức làm (không có `mucLam`) ⇒ không vẽ chú giải / nhãn "Chưa có số đo" */}
+      {ds.length === 0 ? (
+        <p className="gvv2-trong">{loc.loai === 'sai' ? `${hoa(ngoi)} ${CHU_LOC.sai.trong}` : loc.loai === 'treo' && !laThay ? 'Không có lượt máy để treo nào trong các lượt đã tải.' : CHU_LOC[loc.loai].trong}</p>
       ) : (
         ngay.map((n) => (
           <section key={n.ngay} className="gvv2-hs-ngay" aria-label={ngayThuChu(n.ngay) || n.ngay}>
@@ -451,41 +517,16 @@ function LichSu({ kq, onTaiThem, dangTai, ngoi, laThay, cheDo }: { kq: KetQuaLic
               <span className="gvv2-so"> · {n.lan.length} lượt</span>
             </h4>
             <ol className="gvv2-hs-lan-ds">
-              {n.lan.map((l, i) => {
-                const muc = tenMucDo(l.mucDo)
-                const phu = [l.noi, muc, l.chon ? `Chọn ${l.chon}` : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join(' · ')
-                const k = l.dung === true ? 'dung' : l.dung === false ? 'sai' : 'trong'
-                return (
-                  <li key={`${l.luc}-${l.qid}-${i}`} className="gvv2-hs-lan hslc-lan" data-kq={k} data-m={l.mucLam?.ma}>
-                    <time className="gvv2-so" dateTime={l.luc}>
-                      {gioPhutVN(l.luc)}
-                    </time>
-                    <span className="gvv2-hs-lan-chu">
-                      <b>{tieuDeCau(l)}</b>
-                      <small className="gvv2-so">{phu}</small>
-                    </span>
-                    <span className="hslc-lan-phai">
-                      <span className="gvv2-hs-kq" data-kq={k}>
-                        {chuKetQua(l.dung)}
-                      </span>
-                      {!l.mucLam && (
-                        <>
-                          <GiayO giay={l.giay} nguon={l.nguonGiay} />
-                          {laThay && kq.mucLam && <ChipChuaCoSoDo />}
-                        </>
-                      )}
-                    </span>
-                    {l.mucLam && <MucCuaLuot m={l.mucLam} cheDo={cheDo} />}
-                  </li>
-                )
-              })}
+              {n.lan.map((l, i) => (
+                <DongLuot key={`${l.luc}-${l.qid}-${i}`} l={l} laThay={laThay} cheDo={cheDo} coMuc={coMuc} soCungNgay={soCungNgay.get(l.ngay)} />
+              ))}
             </ol>
           </section>
         ))
       )}
       {con > 0 && (
         <button type="button" className="gvv2-nut-vien tt-nhan gvv2-hs-them" onClick={() => setSoHien((s) => s + MOI_DOT)}>
-          Xem thêm {Math.min(MOI_DOT, con)} {chiSai ? 'lần sai' : 'lượt'} (còn {con})
+          Xem thêm {Math.min(MOI_DOT, con)} {CHU_LOC[loc.loai].dem} (còn {con})
         </button>
       )}
       {con === 0 && kq.conNua && kq.lan.length < TRAN_GIOI_HAN && (
@@ -494,6 +535,30 @@ function LichSu({ kq, onTaiThem, dangTai, ngoi, laThay, cheDo }: { kq: KetQuaLic
         </button>
       )}
       {con === 0 && kq.conNua && kq.lan.length >= TRAN_GIOI_HAN && <p className="gvv2-hs-ghi">Máy chủ gửi tối đa {TRAN_GIOI_HAN} lượt gần nhất; lượt cũ hơn không hiện ở đây.</p>}
+    </div>
+  )
+}
+
+/** Phụ huynh: «Lượt sai gần đây» — 3 lượt sai mới nhất (lượt treo mang chip "Mức làm 5 · Máy để treo", không số phút). */
+function LuotSaiGanDay({ kq }: { kq: KetQuaLichSuLamCau }) {
+  const ds = useMemo(() => kq.lan.filter((l) => l.dung === false).slice(0, 3), [kq.lan])
+  const ngay = useMemo(() => gomTheoNgay(ds), [ds])
+  if (ds.length === 0) return <p className="gvv2-trong">Con chưa có lượt sai nào trong các lượt đã tải.</p>
+  return (
+    <div className="gvv2-hs-ls">
+      {ngay.map((n) => (
+        <section key={n.ngay} className="gvv2-hs-ngay" aria-label={ngayThuChu(n.ngay) || n.ngay}>
+          <h4 className="gvv2-hs-ngay-tieu">
+            {ngayThuChu(n.ngay) || n.ngay}
+            <span className="gvv2-so"> · {n.lan.length} lượt</span>
+          </h4>
+          <ol className="gvv2-hs-lan-ds">
+            {n.lan.map((l, i) => (
+              <DongLuot key={`${l.luc}-${l.qid}-${i}`} l={l} laThay={false} cheDo="phu-huynh" coMuc={!!kq.mucLam} />
+            ))}
+          </ol>
+        </section>
+      ))}
     </div>
   )
 }
@@ -901,7 +966,32 @@ function DsCauTomTat({ cau, loai, lan, ngoi }: { cau: readonly CauTomTat[]; loai
   )
 }
 
-type TheCon = 'cau-sai' | 'cau-dung' | 'da-on' | 'lich-su'
+/** Khối cũ GẬP (đặc tả 6 mức mục 2: không bỏ khối nào, chỉ dời và gập). Thân chỉ vẽ khi mở (lần đầu mở mới dựng — tấm mở nhanh hơn). */
+function Gap({ ten, phu, children }: { ten: string; phu?: string; children: ReactNode }) {
+  const [mo, setMo] = useState(false)
+  return (
+    <details open={mo} onToggle={(e) => setMo(e.currentTarget.open)}>
+      <summary className="tt-nhan">
+        {ten}
+        {phu && <small className="gvv2-so">{phu}</small>}
+      </summary>
+      {mo && <div className="hsv-gap-than">{children}</div>}
+    </details>
+  )
+}
+
+/** Một ô "Làm bài 7 ngày" (thầy). */
+function OSo7({ nhan, so, phu }: { nhan: string; so: string; phu: string }) {
+  return (
+    <div>
+      <dt>{nhan}</dt>
+      <dd className="gvv2-so">
+        {so}
+        <small>{phu}</small>
+      </dd>
+    </div>
+  )
+}
 
 export default function HoSoLamCauEm({
   em,
@@ -940,7 +1030,14 @@ export default function HoSoLamCauEm({
   const [td, setTd] = useState<KetQuaHoSoThaiDo | null>(dem0?.td ?? null)
   const [loiTd, setLoiTd] = useState('')
   const [dangTaiTd, setDangTaiTd] = useState(!dem0?.td)
-  const [the, setThe] = useState<TheCon>('cau-sai')
+  const [theGap, setTheGap] = useState<'cau-dung' | 'da-on'>('cau-dung')
+  const [loc, setLoc] = useState<LocLuot>({ loai: 'tat-ca' })
+  const [phMoHet, setPhMoHet] = useState(false)
+  /** Mất mạng khi làm mới NỀN: lúc (ms) của bản đang hiện (bộ nhớ tạm 5 phút) — dải hổ phách "Đang xem bản đã tải lúc …". */
+  const [matMang, setMatMang] = useState<number | null>(null)
+  const [dangTaiLai, setDangTaiLai] = useState(false)
+  const lucBan = useRef<number>(dem0?.luc ?? 0)
+  const tungLuot = useRef<HTMLElement>(null)
   const tam = useRef<HTMLElement>(null)
   const nutDong = useRef<HTMLButtonElement>(null)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
@@ -963,16 +1060,19 @@ export default function HoSoLamCauEm({
       if (l !== lan.current) return null
       let ra: KetQuaLichSuLamCau | null = null
       if (r.ok) {
-        ra = chuanHoaMucLam(r.du)
+        ra = chuanHoaMucLam(r.du, cheDo === 'thay')
         setKq(ra)
+        lucBan.current = Date.now()
+        setMatMang(null)
         // Chỉ cất bản ĐỦ (không bị cắt ở khung đầu) — khung đầu ngắn không được thay bản đủ trong đệm.
         if (!(gioiHan && gioiHan <= GIOI_HAN_KHUNG_DAU && ra.conNua)) ghiDemTam(khoaDem, { kq: ra })
         else ghiDemTam(khoaDem, {})
       } else if (!nen) setLoi(r.loai === 'chua_co_lenh' ? r.chu : lyDoDeHieu(r.chu))
+      else if (r.loai === 'mang' && lucBan.current > 0) setMatMang(lucBan.current)
       if (!nen || r.ok) setDangTai(false)
       return ra
     },
-    [em.sbd, nguon, khoaDem],
+    [em.sbd, nguon, khoaDem, cheDo],
   )
   const lanTd = useRef(0)
   const taiTd = useCallback(async () => {
@@ -1058,19 +1158,35 @@ export default function HoSoLamCauEm({
   const d = td?.dem
   const coKq = d ? d.soDung + d.soSai : 0
   const tuSuaSai = (td as KetQuaHoSoThaiDoApp | null)?.tuSuaSai
-  const the4: [TheCon, string, number | null][] = [
-    ['cau-sai', 'Câu sai', kq ? kq.cauSai.length : null],
-    ['cau-dung', 'Câu đúng', td ? td.cauDung.length : null],
-    ['da-on', 'Câu đã ôn', td ? td.cauDaOn.length : null],
-    ['lich-su', 'Toàn bộ lịch sử', t ? t.soLuot : null],
-  ]
+  // 6 MỨC: khối Mức làm + "Theo ngày" mặc định 7 ngày gần nhất (`mucLam6`); máy chủ cũ ⇒ tổng cả sổ `mucLam`, Mức 5–6 "Chưa đo treo máy".
+  const m6 = kq?.mucLam6
+  const tongMuc = m6?.bay ?? kq?.mucLam
+  const coDoTreo = !chuaDoTreoHet(tongMuc, !!m6)
+  const lam7 = m6?.lam7
+  const soNgayCoTinh = laThay ? (m6?.ngayCoTinh?.length ?? 0) : 0
+  const xemTreo = useCallback((ngay?: string) => {
+    setLoc({ loai: 'treo', ...(ngay ? { ngay } : {}) })
+    const giam = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    tungLuot.current?.scrollIntoView?.({ block: 'start', behavior: giam ? 'auto' : 'smooth' })
+  }, [])
+  const taiLai = async () => {
+    setDangTaiLai(true)
+    await tai(kq ? Math.min(TRAN_GIOI_HAN, Math.max(GIOI_HAN_KHUNG_DAU, kq.lan.length)) : GIOI_HAN_KHUNG_DAU, !!kq)
+    setDangTaiLai(false)
+  }
+  const nhomTd = td?.nhomNhip
+  // Nhịp 7 ngày cho điểm nhấn học sinh / phụ huynh: ngày ĐÃ QUA đủ mức (hôm nay chưa hết, không tính).
+  const bayNgay = td ? td.ngay.slice(-7).filter((n) => !n.homNay) : []
+  const chuNhip = td
+    ? `${nhomTd ? `Nhịp học: ${TEN_NHOM_NHIP_HOC[nhomTd]} · ` : ''}đủ mức ${bayNgay.filter((n) => n.datMuc).length}/${bayNgay.length} ngày đã qua.${hn && hn.con > 0 ? ` ${hoa(ngoi)} còn ${hn.con} câu tới mức tối thiểu hôm nay.` : ''}`
+    : ''
 
   return (
     <>
       <div className="gvv2-hs-che" aria-hidden="true" onClick={onDong} />
       <section
         ref={tam}
-        className="gvv2-hs gvv2-hs--rong hslc"
+        className="gvv2-hs gvv2-hs--rong hslc hsv"
         data-che-do={cheDo}
         role="dialog"
         aria-modal="true"
@@ -1089,7 +1205,28 @@ export default function HoSoLamCauEm({
               </h2>
               <p id="gvv2-hs-phu" className="gvv2-so">
                 SBD {em.sbd} · {lop}
+                {m6 ? ` · ${chuKhoang7(m6)}` : ''}
               </p>
+              {(soNgayCoTinh > 0 || td?.coDoiPho || nhomTd) && (
+                <div className="hsv-dau-chip">
+                  {soNgayCoTinh > 0 && (
+                    <span className="hsv-chip-dau" data-t="6">
+                      <HinhCoTinh />
+                      Cố tình treo máy · {soNgayCoTinh} ngày trong 7 ngày
+                    </span>
+                  )}
+                  {td?.coDoiPho && nhomTd && (
+                    <span className="hsv-chip-dau" data-l="">
+                      Có dấu hiệu đối phó
+                    </span>
+                  )}
+                  {nhomTd && (
+                    <span className="hsv-chip-dau" data-l={nhomTd === 'cham' ? undefined : ''} data-nhom={nhomTd}>
+                      Nhịp học: {TEN_NHOM_NHIP_HOC[nhomTd]}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="gvv2-hs-dau-chu">
@@ -1098,9 +1235,11 @@ export default function HoSoLamCauEm({
                 {tenLop ? ` · Lớp ${tenLop}` : ''}
               </small>
               <h2 id="gvv2-hs-ten" className="gvv2-h2 gvv2-so">
-                Hồ sơ làm bài của {ngoi} · từ {ngayNgan(td?.tu ?? NGAY_BAT_DAU_BAI_HANG_NGAY)}
+                Hồ sơ làm bài của {ngoi}
               </h2>
-              <p id="gvv2-hs-phu">Thầy cũng xem hồ sơ này.</p>
+              <p id="gvv2-hs-phu" className="gvv2-so">
+                {m6 ? `${chuKhoang7(m6)} · ` : `Từ ${ngayNgan(td?.tu ?? NGAY_BAT_DAU_BAI_HANG_NGAY)} · `}Thầy cũng xem hồ sơ này.
+              </p>
             </div>
           )}
           <button ref={nutDong} type="button" className="gvv2-nut-chu tt-nhan gvv2-hs-dong" onClick={onDong}>
@@ -1110,117 +1249,34 @@ export default function HoSoLamCauEm({
         </header>
 
         <div className="gvv2-hs-than hslc-than">
-          <div className="hslc-luoi">
-            {/* 1 · Thái độ / Nhịp học — điểm nhấn của tấm (nhãn · lý do · độ tin cậy · dải 14 ngày) */}
-            {td ? (
-              <DauThaiDo td={td} matDau={chuCd.matDau} ngoi={ngoi} laThay={laThay} laHocSinh={cheDo === 'hoc-sinh'} />
-            ) : dangTaiTd ? (
-              <XuongThaiDo chu={chuCd.dangTai} />
-            ) : (
-              <div className="gvv2-tdo-loi" role="status">
-                <p>
-                  {chuCd.loi} {loiTd}
-                </p>
-                <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void taiTd()} disabled={dangTaiTd}>
-                  {chuCd.nutTai}
-                </button>
-              </div>
-            )}
-
-            {/* 2 · Hôm nay */}
-            {hn && (
-              <div className="gvv2-hs-hn" data-nhom={hn.nhom}>
-                <span className="gvv2-hs-hn-chu">
-                  <small>Hôm nay</small>
-                  <b className="gvv2-so">{hn.chu}</b>
-                </span>
-                <span className="gvv2-hs-hn-chu">
-                  <small>Tầng hiện tại</small>
-                  <b>{hn.tang}</b>
-                </span>
-                <span className="gvv2-hs-nhom" data-nhom={hn.nhom}>
-                  {TEN_NHOM_NHIP[hn.nhom]}
-                </span>
-                {hn.nhom !== 'du' && hn.con > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Còn {hn.con} câu tới mức tối thiểu</small>}
-                {laThay && !!em.conThieu && em.conThieu > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Kho thiếu {em.conThieu} câu phù hợp cho em hôm nay</small>}
-              </div>
-            )}
-            {laThay && !!em.canBoSung?.length && (
-              <div className="gvv2-hs-bo-sung">
-                <b>Kiến thức cần bổ sung</b>
-                <ul>
-                  {em.canBoSung.map((c, i) => (
-                    <li key={i}>
-                      {c.ten} · {c.lyDo === 'can_sua_nen' ? 'Cần câu củng cố nền' : 'Cần thêm câu đã duyệt'}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* 3 · Từ mốc 01/10 (khoảng máy chủ trả): số · lịch · biểu đồ · tín hiệu */}
-            {td && d && (
-              <>
-                <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-so-tieu">
-                  <h3 id="gvv2-tdo-so-tieu" className="gvv2-tdo-tieu">
-                    Làm bài {chuTuDen(td.tu, td.den)}
-                  </h3>
-                  <dl className="gvv2-tdo-so">
-                    <OSoTd nhan="Đã làm" so={`${d.soLuot} lượt`} phu={`${d.soCau} câu khác nhau`} />
-                    <OSoTd nhan="Đúng" so={`${d.soDung} lượt`} phu={phan(d.soDung, coKq) === null ? 'chưa có lượt có kết quả' : `${phan(d.soDung, coKq)}% lượt có kết quả`} />
-                    <OSoTd nhan="Sai" so={`${d.soSai} lượt`} phu={`${d.soBoTrong} lượt bỏ trống`} />
-                    <OSoTd nhan="Đã ôn" so={`${d.soCauOn} câu`} phu={`${d.soLuotOn} lượt ôn`} />
-                    <OSoTd
-                      nhan="Giây trung bình"
-                      so={d.giayTb !== null && d.giayTb > 0 ? doiGiay(d.giayTb) : 'Chưa đo'}
-                      phu={d.giayTrungVi !== null ? `trung vị ${doiGiay(d.giayTrungVi)} · ${d.soLuotCoGiay} lượt có số giây` : 'chưa có lượt có số giây'}
-                    />
-                    {tuSuaSai && tuSuaSai.soCauSai > 0 && <OSoTd nhan="Tự sửa được" so={`${tuSuaSai.soCauDaSua}/${tuSuaSai.soCauSai} câu`} phu={tuSuaSai.chu} />}
-                  </dl>
+          {matMang !== null && kq && (
+            <div className="hsv-mang" role="status">
+              <HinhMatMang />
+              <p>Mất mạng. Đang xem bản đã tải lúc {ngayGio(new Date(matMang).toISOString())}.</p>
+              <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void taiLai()} disabled={dangTaiLai || dangTai}>
+                Tải lại
+              </button>
+            </div>
+          )}
+          <div className="hsv-luoi">
+            {/* CỘT TRÁI: thầy = Cách làm bài 6 mức + Từng lượt · học sinh / phụ huynh = điểm nhấn + cách làm bài + từng lượt */}
+            <div className="hsv-cot">
+              {!laThay && (lam7 || td) && (
+                <section className="hsv-nhan" aria-labelledby="hsv-nhan">
+                  <small id="hsv-nhan">{lam7 ? `7 ngày gần nhất của ${ngoi}` : `Từ ${ngayNgan(td!.tu)} tới nay`}</small>
+                  <div className="hsv-nhan-so gvv2-so">
+                    <b>{lam7 ? lam7.soLuot : td!.dem.soLuot}</b>{' '}
+                    <span>lượt làm câu · đúng {lam7 ? lam7.soDung : td!.dem.soDung} lượt</span>
+                  </div>
+                  {chuNhip && <p>{chuNhip}</p>}
                 </section>
-                <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-lich-tieu">
-                  <h3 id="gvv2-tdo-lich-tieu" className="gvv2-tdo-tieu">
-                    Lịch làm bài theo ngày <small>· đã làm/mức tối thiểu</small>
-                  </h3>
-                  <LichNgay ngay={td.ngay} />
-                </section>
-                <section className="gvv2-tdo-khoi hslc-khoi hslc-nua" aria-labelledby="gvv2-tdo-dung-tieu">
-                  <h3 id="gvv2-tdo-dung-tieu" className="gvv2-tdo-tieu">
-                    Độ đúng theo ngày <small>· % lượt đúng trên lượt có kết quả</small>
-                  </h3>
-                  <CotDoDung ngay={td.ngay} />
-                </section>
-                <section className="gvv2-tdo-khoi hslc-khoi hslc-nua" aria-labelledby="gvv2-tdo-giay-tieu">
-                  <h3 id="gvv2-tdo-giay-tieu" className="gvv2-tdo-tieu">
-                    Số giây mỗi lượt
-                  </h3>
-                  <PhanBoGiay td={td} laThay={laThay} />
-                </section>
-                <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-th-tieu">
-                  <h3 id="gvv2-tdo-th-tieu" className="gvv2-tdo-tieu">
-                    Sáu tín hiệu và ngưỡng{laThay && <small> · số đo, vạch ngưỡng, mức</small>}
-                  </h3>
-                  <TinHieu td={td} laThay={laThay} />
-                </section>
-                {td.canhBao.map((c) => (
-                  <p key={c} className="gvv2-hs-ghi">
-                    {c}
-                  </p>
-                ))}
-              </>
-            )}
-
-            {/* 4 · Toàn bộ sổ: bốn ô số + số giây theo mức độ + bốn thẻ con */}
-            <section className="hslc-so" aria-labelledby="hslc-so-tieu">
-              <h3 id="hslc-so-tieu" className="gvv2-tdo-tieu gvv2-tdo-tieu--so">
-                Toàn bộ sổ của {ngoi}
-              </h3>
+              )}
               {kq === null && dangTai ? (
                 <XuongTam />
               ) : kq === null ? (
-                <div className="gvv2-loi gvv2-cc-loi" role="alert">
+                <div className="hsv-loi" role="alert">
                   <p>
-                    Chưa tải được lịch sử làm câu của {ngoi}. {loi}
+                    Chưa tải được hồ sơ làm bài của {ngoi}. {loi}
                   </p>
                   <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTai}>
                     Thử lại
@@ -1229,67 +1285,239 @@ export default function HoSoLamCauEm({
               ) : (
                 <>
                   {loi && (
-                    <div className="gvv2-loi gvv2-cc-loi" role="alert">
+                    <div className="hsv-loi" role="alert">
                       <p>Chưa tải thêm được lượt cũ hơn. {loi}</p>
                       <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai(TRAN_GIOI_HAN)} disabled={dangTai}>
                         Thử lại
                       </button>
                     </div>
                   )}
-                  <dl className="gvv2-hs-so">
-                    <OSo nhan="Số lượt làm câu" so={String(t!.soLuot)} phu={`${t!.soCau} câu khác nhau`} />
-                    <OSo nhan="Tỉ lệ đúng" so={tiLe} phu={`${t!.soDung} đúng · ${t!.soSai} sai · ${t!.soBoTrong} bỏ trống`} />
-                    <OSo nhan="Câu từng sai" so={String(t!.soCauSai)} phu={`${chuaSua} câu chưa sửa được`} />
-                    <OSo nhan="Trung bình mỗi câu" so={t!.giayTb !== null && t!.giayTb > 0 ? doiGiay(t!.giayTb) : 'Chưa đo'} phu="lượt đo được, gồm ước tính" />
-                  </dl>
-                  {kq.catBot && <p className="gvv2-hs-ghi">Số liệu tính trên 5000 lượt gần nhất của {ngoi}.</p>}
-
                   {t!.soLuot === 0 ? (
-                    <p className="gvv2-trong">
-                      Sổ chưa ghi lượt làm câu nào của {ngoi}. Khi {ngoi} làm bài hằng ngày, ca kiểm tra hay Ôn lại, lượt sẽ hiện ở đây.
-                    </p>
+                    <div className="hsv-trong">
+                      <b>Chưa có lượt làm câu nào</b>
+                      <p>
+                        Sổ chưa ghi lượt làm câu nào của {ngoi}. Khi {ngoi} làm bài hằng ngày, ca kiểm tra hay Ôn lại, lượt sẽ hiện ở đây.
+                      </p>
+                    </div>
                   ) : (
                     <>
-                      {kq.mucLam && <KhoiCachLamBai tong={kq.mucLam} cheDo={cheDo} ngoi={ngoi} soSaiTong={t!.soSai + t!.soBoTrong} />}
-                      <GiayMucDo lan={kq.lan} laThay={laThay} />
-                      <div className="gvv2-con hslc-the-con" data-so="4" role="tablist" aria-label={`Toàn bộ sổ của ${ngoi}`}>
-                        {the4.map(([k, nhan, so]) => (
-                          <button
-                            key={k}
-                            type="button"
-                            role="tab"
-                            id={`gvv2-hs-the-${k}`}
-                            aria-controls={`gvv2-hs-o-${k}`}
-                            aria-selected={the === k}
-                            className="gvv2-con-nut tt-nhan"
-                            onClick={() => setThe(k)}
-                          >
-                            {nhan} {so !== null && <span className="gvv2-so">· {so}</span>}
-                          </button>
-                        ))}
-                      </div>
-                      <div role="tabpanel" id={`gvv2-hs-o-${the}`} aria-labelledby={`gvv2-hs-the-${the}`} className="gvv2-hs-o-the">
-                        {the === 'cau-sai' ? (
-                          <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} soCauCanSua={soCauCanSua} ngoi={ngoi} cheDo={cheDo} />
-                        ) : the === 'lich-su' ? (
-                          <LichSu kq={kq} dangTai={dangTai} onTaiThem={() => void tai(TRAN_GIOI_HAN)} ngoi={ngoi} laThay={laThay} cheDo={cheDo} />
-                        ) : td ? (
-                          <DsCauTomTat
-                            key={the}
-                            cau={the === 'cau-dung' ? td.cauDung : td.cauDaOn}
-                            loai={the === 'cau-dung' ? 'dung' : 'on'}
-                            lan={kq.lan}
-                            ngoi={ngoi}
-                          />
+                      {tongMuc &&
+                        (laThay ? (
+                          <KhoiSauMucThay tong={tongMuc} m6={m6} onXemTreo={xemTreo} />
                         ) : (
-                          <p className="gvv2-trong">{dangTaiTd ? 'Đang tải danh sách…' : `Chưa tải được danh sách này. Bấm "${chuCd.nutTai}" ở đầu tấm.`}</p>
+                          <KhoiCachLamEm6 tong={tongMuc} m6={m6} cheDo={cheDo} soSaiTong={lam7 ? lam7.soSai + lam7.soBoTrong : m6 ? undefined : t!.soSai + t!.soBoTrong} />
+                        ))}
+                      <section ref={tungLuot} className="hsv-khoi" aria-labelledby="hsv-lan">
+                        <h3 id="hsv-lan">
+                          {cheDo === 'phu-huynh' && !phMoHet ? 'Lượt sai gần đây' : 'Từng lượt'} <small>· mới nhất trên cùng</small>
+                        </h3>
+                        {cheDo === 'phu-huynh' && !phMoHet ? (
+                          <>
+                            <LuotSaiGanDay kq={kq} />
+                            <button type="button" className="gvv2-nut-vien tt-nhan hsv-them" onClick={() => setPhMoHet(true)}>
+                              Xem mọi lượt của con
+                            </button>
+                          </>
+                        ) : (
+                          <LichSu kq={kq} dangTai={dangTai} onTaiThem={() => void tai(TRAN_GIOI_HAN)} ngoi={ngoi} laThay={laThay} cheDo={cheDo} loc={loc} datLoc={setLoc} coDoTreo={coDoTreo} />
                         )}
-                      </div>
+                      </section>
                     </>
                   )}
                 </>
               )}
-            </section>
+            </div>
+
+            {/* CỘT PHẢI: thầy = Hôm nay · Làm bài 7 ngày · Theo ngày · Câu chưa sửa · khối gập; học sinh = câu chờ sửa lên đầu */}
+            <div className="hsv-cot">
+              {laThay && hn && (
+                <div className="gvv2-hs-hn" data-nhom={hn.nhom}>
+                  <span className="gvv2-hs-hn-chu">
+                    <small>Hôm nay</small>
+                    <b className="gvv2-so">{hn.chu}</b>
+                  </span>
+                  <span className="gvv2-hs-hn-chu">
+                    <small>Tầng hiện tại</small>
+                    <b>{hn.tang}</b>
+                  </span>
+                  <span className="gvv2-hs-nhom" data-nhom={hn.nhom}>
+                    {TEN_NHOM_NHIP[hn.nhom]}
+                  </span>
+                  {hn.nhom !== 'du' && hn.con > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Còn {hn.con} câu tới mức tối thiểu</small>}
+                  {!!em.conThieu && em.conThieu > 0 && <small className="gvv2-hs-hn-phu gvv2-so">Kho thiếu {em.conThieu} câu phù hợp cho em hôm nay</small>}
+                </div>
+              )}
+              {laThay && !!em.canBoSung?.length && (
+                <div className="gvv2-hs-bo-sung">
+                  <b>Kiến thức cần bổ sung</b>
+                  <ul>
+                    {em.canBoSung.map((c, i) => (
+                      <li key={i}>
+                        {c.ten} · {c.lyDo === 'can_sua_nen' ? 'Cần câu củng cố nền' : 'Cần thêm câu đã duyệt'}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {laThay && lam7 && (
+                <section className="hsv-khoi" aria-labelledby="hsv-tong">
+                  <h3 id="hsv-tong">Làm bài 7 ngày</h3>
+                  <dl className="hsv-so">
+                    <OSo7 nhan="Đã làm" so={`${lam7.soLuot} lượt`} phu={`${lam7.soCau} câu khác nhau`} />
+                    <OSo7 nhan="Đúng" so={`${lam7.soDung} lượt`} phu={lam7.soLuot > 0 ? `${Math.round((100 * lam7.soDung) / lam7.soLuot)}% số lượt` : 'chưa có lượt'} />
+                    <OSo7 nhan="Sai" so={`${lam7.soSai + lam7.soBoTrong} lượt`} phu={`gồm ${lam7.soBoTrong} lượt bỏ trống`} />
+                    <OSo7
+                      nhan="Giây trung bình"
+                      so={lam7.giayTb !== null && lam7.giayTb > 0 ? doiGiay(lam7.giayTb) : 'Chưa đo'}
+                      phu={lam7.soTreo > 0 ? `không tính ${lam7.soTreo} lượt treo máy` : coDoTreo ? `${lam7.soLuotCoGiay} lượt có số giây` : 'chưa đo treo máy'}
+                    />
+                  </dl>
+                </section>
+              )}
+              {cheDo !== 'thay' && kq && kq.cauSai.length > 0 && (
+                <section className="hsv-khoi" aria-labelledby="hsv-sua">
+                  <h3 id="hsv-sua">Câu chưa sửa được</h3>
+                  <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} soCauCanSua={soCauCanSua} ngoi={ngoi} cheDo={cheDo} />
+                </section>
+              )}
+              {cheDo !== 'phu-huynh' && m6 && m6.theoNgay.length === 7 && <KhoiTheoNgay theoNgay={m6.theoNgay} cheDo={cheDo} />}
+              {laThay && kq && kq.cauSai.length > 0 && (
+                <section className="hsv-khoi" aria-labelledby="hsv-sua">
+                  <h3 id="hsv-sua">Câu chưa sửa được</h3>
+                  <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} soCauCanSua={soCauCanSua} ngoi={ngoi} cheDo={cheDo} />
+                </section>
+              )}
+
+              {/* KHỐI CŨ, GẬP: nội dung giữ nguyên, chỉ dời xuống (đặc tả mục 2 — không bỏ khối nào). Vẽ khi mở lần đầu. */}
+              <div className="hsv-gap">
+                <Gap ten={laThay ? 'Nhịp học và 14 ngày gần nhất' : 'Lịch làm bài 14 ngày'} phu={nhomTd ? TEN_NHOM_NHIP_HOC[nhomTd] : !td && !dangTaiTd ? 'Chưa tải được' : undefined}>
+                  {td ? (
+                    <DauThaiDo td={td} matDau={chuCd.matDau} ngoi={ngoi} laThay={laThay} laHocSinh={cheDo === 'hoc-sinh'} />
+                  ) : dangTaiTd ? (
+                    <XuongThaiDo chu={chuCd.dangTai} />
+                  ) : (
+                    <div className="gvv2-tdo-loi" role="status">
+                      <p>
+                        {chuCd.loi} {loiTd}
+                      </p>
+                      <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void taiTd()} disabled={dangTaiTd}>
+                        {chuCd.nutTai}
+                      </button>
+                    </div>
+                  )}
+                  {td && d && (
+                    <>
+                      <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-so-tieu">
+                        <h3 id="gvv2-tdo-so-tieu" className="gvv2-tdo-tieu">
+                          Làm bài {chuTuDen(td.tu, td.den)}
+                        </h3>
+                        <dl className="gvv2-tdo-so">
+                          <OSoTd nhan="Đã làm" so={`${d.soLuot} lượt`} phu={`${d.soCau} câu khác nhau`} />
+                          <OSoTd nhan="Đúng" so={`${d.soDung} lượt`} phu={phan(d.soDung, coKq) === null ? 'chưa có lượt có kết quả' : `${phan(d.soDung, coKq)}% lượt có kết quả`} />
+                          <OSoTd nhan="Sai" so={`${d.soSai} lượt`} phu={`${d.soBoTrong} lượt bỏ trống`} />
+                          <OSoTd nhan="Đã ôn" so={`${d.soCauOn} câu`} phu={`${d.soLuotOn} lượt ôn`} />
+                          <OSoTd
+                            nhan="Giây trung bình"
+                            so={d.giayTb !== null && d.giayTb > 0 ? doiGiay(d.giayTb) : 'Chưa đo'}
+                            phu={d.giayTrungVi !== null ? `trung vị ${doiGiay(d.giayTrungVi)} · ${d.soLuotCoGiay} lượt có số giây` : 'chưa có lượt có số giây'}
+                          />
+                          {tuSuaSai && tuSuaSai.soCauSai > 0 && <OSoTd nhan="Tự sửa được" so={`${tuSuaSai.soCauDaSua}/${tuSuaSai.soCauSai} câu`} phu={tuSuaSai.chu} />}
+                        </dl>
+                      </section>
+                      <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-lich-tieu">
+                        <h3 id="gvv2-tdo-lich-tieu" className="gvv2-tdo-tieu">
+                          Lịch làm bài theo ngày <small>· đã làm/mức tối thiểu</small>
+                        </h3>
+                        <LichNgay ngay={td.ngay} />
+                      </section>
+                      <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-dung-tieu">
+                        <h3 id="gvv2-tdo-dung-tieu" className="gvv2-tdo-tieu">
+                          Độ đúng theo ngày <small>· % lượt đúng trên lượt có kết quả</small>
+                        </h3>
+                        <CotDoDung ngay={td.ngay} />
+                      </section>
+                      <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-giay-tieu">
+                        <h3 id="gvv2-tdo-giay-tieu" className="gvv2-tdo-tieu">
+                          Số giây mỗi lượt
+                        </h3>
+                        <PhanBoGiay td={td} laThay={laThay} />
+                      </section>
+                      {td.canhBao.map((c) => (
+                        <p key={c} className="gvv2-hs-ghi">
+                          {c}
+                        </p>
+                      ))}
+                    </>
+                  )}
+                </Gap>
+                {td && (
+                  <Gap ten="Sáu tín hiệu và ngưỡng" phu={laThay ? 'số đo, vạch ngưỡng, mức' : undefined}>
+                    <section className="gvv2-tdo-khoi hslc-khoi" aria-labelledby="gvv2-tdo-th-tieu">
+                      <h3 id="gvv2-tdo-th-tieu" className="gvv2-tdo-tieu gvv2-an-chu">
+                        Sáu tín hiệu và ngưỡng
+                      </h3>
+                      <TinHieu td={td} laThay={laThay} />
+                    </section>
+                  </Gap>
+                )}
+                {kq && kq.lan.length > 0 && (
+                  <Gap ten="Số giây theo mức độ câu" phu="dễ → khó">
+                    <GiayMucDo lan={kq.lan} laThay={laThay} />
+                  </Gap>
+                )}
+                {td && (
+                  <Gap ten="Câu đúng · Câu đã ôn" phu={`${td.cauDung.length} · ${td.cauDaOn.length} câu`}>
+                    <div className="gvv2-con hslc-the-con" data-so="2" role="tablist" aria-label="Câu đúng và câu đã ôn">
+                      {(
+                        [
+                          ['cau-dung', 'Câu đúng', td.cauDung.length],
+                          ['da-on', 'Câu đã ôn', td.cauDaOn.length],
+                        ] as const
+                      ).map(([k, nhan, so]) => (
+                        <button
+                          key={k}
+                          type="button"
+                          role="tab"
+                          id={`gvv2-hs-the-${k}`}
+                          aria-controls={`gvv2-hs-o-${k}`}
+                          aria-selected={theGap === k}
+                          className="gvv2-con-nut tt-nhan"
+                          onClick={() => setTheGap(k)}
+                        >
+                          {nhan} <span className="gvv2-so">· {so}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <div role="tabpanel" id={`gvv2-hs-o-${theGap}`} aria-labelledby={`gvv2-hs-the-${theGap}`} className="gvv2-hs-o-the">
+                      <DsCauTomTat key={theGap} cau={theGap === 'cau-dung' ? td.cauDung : td.cauDaOn} loai={theGap === 'cau-dung' ? 'dung' : 'on'} lan={kq?.lan ?? null} ngoi={ngoi} />
+                    </div>
+                  </Gap>
+                )}
+                {kq && t && t.soLuot > 0 && (
+                  <Gap ten={`Toàn bộ sổ của ${ngoi}`} phu={`${t.soLuot} lượt`}>
+                    <dl className="gvv2-hs-so">
+                      <OSo nhan="Số lượt làm câu" so={String(t.soLuot)} phu={`${t.soCau} câu khác nhau`} />
+                      <OSo nhan="Tỉ lệ đúng" so={tiLe} phu={`${t.soDung} đúng · ${t.soSai} sai · ${t.soBoTrong} bỏ trống`} />
+                      <OSo nhan="Câu từng sai" so={String(t.soCauSai)} phu={`${chuaSua} câu chưa sửa được`} />
+                      <OSo nhan="Trung bình mỗi câu" so={t.giayTb !== null && t.giayTb > 0 ? doiGiay(t.giayTb) : 'Chưa đo'} phu="lượt đo được, gồm ước tính" />
+                    </dl>
+                    {kq.catBot && <p className="gvv2-hs-ghi">Số liệu tính trên 5000 lượt gần nhất của {ngoi}.</p>}
+                    {m6 && m6.toanBo.soDo + m6.toanBo.chuaCoSoDo > 0 && (
+                      <>
+                        <p className="hsv-phu gvv2-so">
+                          Mức làm cả sổ: đo được <b>{m6.toanBo.soDo}</b>/<b>{m6.toanBo.soDo + m6.toanBo.chuaCoSoDo}</b> lượt.
+                        </p>
+                        <ThanhSau
+                          dem={[...m6.toanBo.theoMuc.map((r) => r.luot), m6.toanBo.soTreo, m6.toanBo.soCoTinh].slice(0, laThay ? 6 : 5)}
+                          chua={m6.toanBo.chuaCoSoDo}
+                          cheDo={cheDo}
+                        />
+                      </>
+                    )}
+                  </Gap>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

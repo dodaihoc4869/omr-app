@@ -5,6 +5,7 @@
 // đọc nặng cả cửa sổ trên D1) — chỉ khi thầy bấm «Tải thêm lượt cũ hơn»; (4) mở lại em vừa xem trong 5 phút ⇒ vẽ NGAY bản trong bộ nhớ rồi đọc mới nền (lỗi nền bỏ qua).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { moGap } from './_ho-so-6-muc'
 
 const m = vi.hoisted(() => ({ goi: vi.fn() }))
 vi.mock('../src/lib/exam-db', () => ({ loadScriptUrl: async () => 'https://gia/exec', loadTeacherSecret: async () => 'mat', loadExamSources: async () => [] }))
@@ -41,7 +42,7 @@ describe('HoSoLamCauEm — tải tức thì', () => {
     await waitFor(() => expect(goiLichSu()).toEqual([{ sbd: SBD, gioiHan: GIOI_HAN_KHUNG_DAU }]))
     expect(goiThaiDo()).toHaveLength(0) // khung đầu chưa về ⇒ chưa hỏi Thái độ
     traKhungDau({ ok: true, du: { ...LS, conNua: true } })
-    await screen.findByText('Số lượt làm câu') // khung đầu đã vẽ
+    await screen.findByRole('heading', { name: /^Từng lượt/ }) // khung đầu đã vẽ
     await waitFor(() => expect(goiThaiDo()).toHaveLength(1))
     await new Promise((r) => setTimeout(r, 50))
     expect(goiLichSu()).toEqual([{ sbd: SBD, gioiHan: GIOI_HAN_KHUNG_DAU }]) // còn lượt cũ nhưng KHÔNG tự xin thêm
@@ -49,21 +50,22 @@ describe('HoSoLamCauEm — tải tức thì', () => {
   it('khung đầu đã đủ (không còn lượt cũ) ⇒ KHÔNG xin thêm lần nào', async () => {
     m.goi.mockImplementation(async (duong: string) => (duong === '/gv/ho-so-thai-do' ? { ok: true, du: TD } : duong === '/gv/lich-su-lam-cau' ? { ok: true, du: { ...LS, conNua: false } } : { ok: false, loai: 'chua_co_lenh', chu: 'x' }))
     render(<HoSoLamCauEm em={em} onDong={() => {}} />)
-    await screen.findByText('Số lượt làm câu')
+    await screen.findByRole('heading', { name: /^Từng lượt/ })
     await waitFor(() => expect(goiThaiDo()).toHaveLength(1))
     expect(goiLichSu()).toHaveLength(1)
   })
   it('mở lại em vừa xem (≤ 5 phút) ⇒ vẽ NGAY bản trong bộ nhớ (không khung xương), đọc mới nền; lỗi nền KHÔNG hiện thông báo lỗi', async () => {
     m.goi.mockImplementation(async (duong: string) => (duong === '/gv/ho-so-thai-do' ? { ok: true, du: TD } : duong === '/gv/lich-su-lam-cau' ? { ok: true, du: { ...LS, conNua: false } } : { ok: false, loai: 'chua_co_lenh', chu: 'x' }))
     const lan1 = render(<HoSoLamCauEm em={em} onDong={() => {}} />)
-    await screen.findByText('Số lượt làm câu')
+    await screen.findByRole('heading', { name: /^Từng lượt/ })
     await waitFor(() => expect(goiThaiDo()).toHaveLength(1))
     lan1.unmount()
     m.goi.mockReset()
     m.goi.mockImplementation(() => new Promise(() => {})) // máy chủ không trả lời nữa
     render(<HoSoLamCauEm em={em} onDong={() => {}} />)
     const tam = await screen.findByRole('dialog')
-    expect(within(tam).getByText('Số lượt làm câu')).toBeTruthy() // vẽ ngay từ bộ nhớ, đồng bộ
+    expect(within(tam).getByRole('heading', { name: /^Từng lượt/ })).toBeTruthy() // vẽ ngay từ bộ nhớ, đồng bộ
+    moGap(tam, /^Nhịp học/) // thái độ trong bộ nhớ: mở ngăn gập là có ngay, không chờ lệnh
     expect(within(tam).getByText(/^Thái độ làm bài ·/)).toBeTruthy()
     await waitFor(() => expect(goiLichSu()).toEqual([{ sbd: SBD, gioiHan: Math.max(GIOI_HAN_KHUNG_DAU, LS.lan.length) }])) // đọc mới nền, đúng số dòng đang hiện (không rút ngắn)
     expect(within(tam).queryByRole('alert')).toBeNull()
@@ -71,19 +73,19 @@ describe('HoSoLamCauEm — tải tức thì', () => {
   it('em khác không dùng bản của em này; sau 5 phút bản bộ nhớ hết hạn', async () => {
     m.goi.mockImplementation(async (duong: string) => (duong === '/gv/ho-so-thai-do' ? { ok: true, du: TD } : duong === '/gv/lich-su-lam-cau' ? { ok: true, du: { ...LS, conNua: false } } : { ok: false, loai: 'chua_co_lenh', chu: 'x' }))
     const lan1 = render(<HoSoLamCauEm em={em} onDong={() => {}} />)
-    await screen.findByText('Số lượt làm câu')
+    await screen.findByRole('heading', { name: /^Từng lượt/ })
     lan1.unmount()
     m.goi.mockReset()
     m.goi.mockImplementation(() => new Promise(() => {}))
     render(<HoSoLamCauEm em={{ ...em, sbd: '99999' }} onDong={() => {}} />)
     const tam = await screen.findByRole('dialog')
-    expect(within(tam).queryByText('Số lượt làm câu')).toBeNull() // em khác: chưa có gì ⇒ khung xương
+    expect(within(tam).queryByRole('heading', { name: /^Từng lượt/ })).toBeNull() // em khác: chưa có gì ⇒ khung xương
     cleanup()
     const t0 = Date.now()
     vi.spyOn(Date, 'now').mockReturnValue(t0 + 6 * 60_000)
     render(<HoSoLamCauEm em={em} onDong={() => {}} />)
     const tam2 = await screen.findByRole('dialog')
-    expect(within(tam2).queryByText('Số lượt làm câu')).toBeNull() // quá 5 phút ⇒ hết hạn
+    expect(within(tam2).queryByRole('heading', { name: /^Từng lượt/ })).toBeNull() // quá 5 phút ⇒ hết hạn
     vi.restoreAllMocks()
   })
 })

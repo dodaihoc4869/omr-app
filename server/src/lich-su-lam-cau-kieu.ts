@@ -100,6 +100,20 @@ export interface NgayMucLam {
   soChuaDoTreo: number
 }
 export interface DemDungSai { dung: number; sai: number }
+/** Số đếm 7 ngày trên MỌI lượt em được xem (kể cả lượt bản học sinh ẩn mức) — ô "Làm bài 7 ngày" (thầy) / điểm nhấn (học sinh, phụ huynh). */
+export interface Lam7 {
+  soLuot: number
+  soCau: number
+  soDung: number
+  /** `dung === false` (không gồm bỏ trống). */
+  soSai: number
+  soBoTrong: number
+  /** Giây trung bình của lượt CÓ số giây và KHÔNG treo máy (lượt treo không kéo giây lên). null = chưa lượt nào. */
+  giayTb: number | null
+  soLuotCoGiay: number
+  /** Lượt Mức 5–6 (đã bỏ khỏi giây trung bình). */
+  soTreo: number
+}
 /** Bằng chứng Mức làm 6 của MỘT ngày (CHỈ bản thầy): các lượt treo của ngày ấy. */
 /** `so` = tổng lượt Mức 6 của ngày; `luot` chỉ tối đa `TOI_DA_LUOT_BANG_CHUNG` lượt (cũ → mới). */
 export interface NgayCoTinh { ngay: string; so: number; luot: { luc: string; giayTreo: number; tieuDe: string }[] }
@@ -120,6 +134,8 @@ export interface MucLam6 {
   treoDungSai: { treo: DemDungSai; coTinh: DemDungSai }
   /** 7 hàng, cũ → mới. */
   theoNgay: NgayMucLam[]
+  /** Số đếm 7 ngày trên mọi lượt (xem `Lam7`). */
+  lam7?: Lam7
   /** CHỈ bản thầy: các ngày có Mức làm 6 trong 7 ngày (mới trước). */
   ngayCoTinh?: NgayCoTinh[]
 }

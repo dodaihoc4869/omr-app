@@ -61,6 +61,8 @@ describe('mucLam6 — thầy', () => {
     expect(m.ngayCoTinh![0]).toMatchObject({ ngay: '2026-10-20', so: 3 })
     expect(m.ngayCoTinh![0]!.luot.map((l) => l.giayTreo)).toEqual([600, 600, 600])
     expect(m.ngayCoTinh![0]!.luot[0]!.luc < m.ngayCoTinh![0]!.luot[2]!.luc).toBe(true) // cũ → mới trong ngày
+    // 6 lượt trong 7 ngày: 2 đúng · 4 sai; giây trung bình CHỈ lượt không treo (18 và 10 giây) ⇒ 14
+    expect(m.lam7).toEqual({ soLuot: 6, soCau: 6, soDung: 2, soSai: 4, soBoTrong: 0, giayTb: 14, soLuotCoGiay: 2, soTreo: 4 })
   })
   it('`mucLam` CŨ giữ nguyên (không tách treo — bốn dòng cộng = soDo) cho máy PWA chưa cập nhật', async () => {
     const r = (await lichSuLamCauCuaEm(duLieu().env as unknown as Env, 'S1', undefined, 'thay', NOW)) as KetQuaLichSuLamCau
@@ -77,6 +79,7 @@ describe('học sinh / phụ huynh — không bao giờ có Mức 6; phụ huynh
     const dungTreo = r.lan.filter((l) => l.dung === true && l.mucLam?.treo === 'treo')
     expect(dungTreo.length).toBe(2) // T-I-3 (20/10) và T-I-4 (21/10, Mức 1 theo giây)
     expect(dungTreo.every((l) => typeof l.mucLam!.giayTreo === 'number')).toBe(true) // học sinh có số phút
+    expect(r.mucLam6!.lam7).toMatchObject({ soLuot: 6, soDung: 2, soTreo: 4 }) // đếm cả lượt bản học sinh ẩn mức
   })
   it('phụ huynh: bỏ `giayTreo` từng lượt, GIỮ `treo: "treo"` (không rơi về Mức 1–4)', async () => {
     const r = banPhuHuynhLichSu(await lichSuLamCauBanHocSinh(duLieu().env as unknown as Env, 'S1', undefined)) as KetQuaLichSuLamCau

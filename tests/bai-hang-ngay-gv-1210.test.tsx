@@ -9,6 +9,7 @@
 // SỐ TỪ MÁY CHỦ GIẢ (không số bịa); tên em là tên giả.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { choTamXong, choVaMoGap, moGap } from './_ho-so-6-muc'
 import type { EmBaiHangNgay, KetQuaBaiHangNgay, KetQuaHoSoThaiDo, NgayBaiEm } from '../src/lib/bai-hang-ngay-api'
 import type { KetQuaLichSuLamCau } from '../src/lib/lich-su-lam-cau-api'
 
@@ -232,6 +233,7 @@ describe('bấm em ⇒ tấm Hồ sơ làm bài (trùng tu)', () => {
     const tam = await screen.findByRole('dialog', { name: 'Lê Bình' })
     expect(m.goi.mock.calls.filter(([d]) => d === '/gv/ho-so-thai-do').map(([, b]) => b)).toEqual([{ sbd: '12' }])
     expect(m.goi.mock.calls.filter(([d]) => d === '/gv/lich-su-lam-cau').map(([, b]) => b)).toEqual([{ sbd: '12', gioiHan: GIOI_HAN_KHUNG_DAU }])
+    await choVaMoGap(tam) // 6 mức: đầu tấm Thái độ + năm khối số liệu dời vào ngăn gập
     const dau = await within(tam).findByRole('region', { name: 'Có dấu hiệu đối phó' })
     expect(dau.getAttribute('data-nhan')).toBe('doi-pho')
     expect(dau.textContent).toContain('Thái độ làm bài · 12/10 – 14/10')
@@ -256,17 +258,18 @@ describe('bấm em ⇒ tấm Hồ sơ làm bài (trùng tu)', () => {
       ['ngay-du-muc', 'Chưa đủ dữ liệu'], ['qua-nhanh', 'Vượt ngưỡng'], ['don-bai', 'Trong ngưỡng'], ['goi-y', 'Trong ngưỡng'], ['chon-lap', 'Cần để mắt'], ['xu-huong', 'Chưa đủ dữ liệu'],
     ])
     expect(tam.textContent).toContain('Ngưỡng: Đáng lo khi từ 30%.')
-    // bốn thẻ con, mặc định Câu sai
-    expect(within(tam).getAllByRole('tab').map((t) => t.textContent)).toEqual(['Câu sai · 1', 'Câu đúng · 2', 'Câu đã ôn · 1', 'Toàn bộ lịch sử · 2'])
-    expect(within(tam).getByRole('tab', { name: /Câu sai/ }).getAttribute('aria-selected')).toBe('true')
-    fireEvent.click(within(tam).getByRole('tab', { name: /Câu đúng/ }))
-    const dung = [...tam.querySelectorAll('.gvv2-hs-cau')].map((x) => x.textContent)
+    // 6 mức: nút lọc "Từng lượt" + khối "Câu chưa sửa được" luôn hiện; Câu đúng · Câu đã ôn trong ngăn gập (mặc định Câu đúng)
+    expect([...tam.querySelectorAll('.hsv-loc [role="tab"]')].map((t) => t.textContent)).toEqual(['Tất cả · 2', 'Lượt sai · 1'])
+    expect(within(tam).getByRole('heading', { name: 'Câu chưa sửa được' })).toBeTruthy()
+    expect([...tam.querySelectorAll('.hslc-the-con [role="tab"]')].map((t) => t.textContent)).toEqual(['Câu đúng · 2', 'Câu đã ôn · 1'])
+    expect(within(tam).getByRole('tab', { name: /Câu đúng/ }).getAttribute('aria-selected')).toBe('true')
+    const dung = [...tam.querySelectorAll('.gvv2-hs-o-the .gvv2-hs-cau')].map((x) => x.textContent)
     expect(dung[0]).toContain('Câu 7 · Thuỷ phân ester')
     expect(dung[0]).toContain('Đúng sau 2 lần sai')
     expect(dung[1]).toContain('Câu Q8')
     expect(dung[1]).toContain('Đúng ngay lần đầu')
     fireEvent.click(within(tam).getByRole('tab', { name: /Câu đã ôn/ }))
-    const on = tam.querySelector('.gvv2-hs-cau')!
+    const on = tam.querySelector('.gvv2-hs-o-the .gvv2-hs-cau')!
     expect(on.textContent).toContain('Chưa sửa được')
     expect(on.textContent).toContain('Vận dụng · ôn 1 lần · làm 2 lần · đúng 0 · sai 2')
     // vẫn giữ Mở hồ sơ đầy đủ
@@ -281,10 +284,13 @@ describe('bấm em ⇒ tấm Hồ sơ làm bài (trùng tu)', () => {
     render(<TheBaiHangNgay />)
     fireEvent.click(await screen.findByRole('button', { name: /^Lê Bình, SBD 12/ }))
     const tam = await screen.findByRole('dialog')
+    await choTamXong(tam)
+    await waitFor(() => expect(tam.querySelector('.hsv-gap summary small')?.textContent).toBe('Chưa tải được')) // lỗi hiện ngay trên ngăn gập
+    moGap(tam)
     expect((await within(tam).findByText(/Chưa tải được hồ sơ thái độ làm bài của em/)).textContent).toContain('cần đẩy bản máy chủ mới')
     expect(within(tam).queryByRole('alert')).toBeNull()
-    expect(await within(tam).findByText('Số lượt làm câu')).toBeTruthy()
-    expect(within(tam).getAllByRole('tab').map((t) => t.textContent)).toEqual(['Câu sai · 1', 'Câu đúng ', 'Câu đã ôn ', 'Toàn bộ lịch sử · 2'])
+    expect(within(tam).getByText('Số lượt làm câu')).toBeTruthy()
+    expect([...tam.querySelectorAll('.hsv-loc [role="tab"]')].map((t) => t.textContent)).toEqual(['Tất cả · 2', 'Lượt sai · 1'])
     mayChu()
     fireEvent.click(within(tam).getByRole('button', { name: 'Tải lại hồ sơ thái độ' }))
     expect(await within(tam).findByRole('region', { name: 'Có dấu hiệu đối phó' })).toBeTruthy()
@@ -304,6 +310,7 @@ describe('tấm Hồ sơ làm bài — nhóm Nhịp học + cờ đối phó (12
     render(<TheBaiHangNgay />)
     fireEvent.click(await screen.findByRole('button', { name: /^Lê Bình, SBD 12/ }))
     const tam = await screen.findByRole('dialog', { name: 'Lê Bình' })
+    await choVaMoGap(tam)
     const dau = await within(tam).findByRole('region', { name: 'Lười' })
     expect(dau.getAttribute('data-nhan')).toBe('luoi')
     expect(dau.querySelector('.gvv2-tdo-co-doi-pho')!.textContent).toBe('Có dấu hiệu đối phó')
@@ -316,6 +323,7 @@ describe('tấm Hồ sơ làm bài — nhóm Nhịp học + cờ đối phó (12
     render(<TheBaiHangNgay />)
     fireEvent.click(await screen.findByRole('button', { name: /^Lê Bình, SBD 12/ }))
     const tam = await screen.findByRole('dialog', { name: 'Lê Bình' })
+    await choVaMoGap(tam)
     const dau = await within(tam).findByRole('region', { name: 'Chăm' })
     expect(dau.getAttribute('data-nhan')).toBe('cham-chi')
     expect(dau.querySelector('.gvv2-tdo-co-doi-pho')).toBeNull()
@@ -351,6 +359,7 @@ describe('mốc 01/10 — chữ ba app khớp một hằng', () => {
     render(<TheBaiHangNgay />)
     fireEvent.click(await screen.findByRole('button', { name: /^Lê Bình, SBD 12/ }))
     const tam = await screen.findByRole('dialog', { name: 'Lê Bình' })
+    await choVaMoGap(tam)
     expect(await within(tam).findByRole('heading', { name: 'Làm bài từ 12/10 đến 14/10' })).toBeTruthy()
   })
 })
