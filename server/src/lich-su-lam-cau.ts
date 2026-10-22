@@ -23,7 +23,7 @@ import { loaiGameCua } from './dau-gio'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docBetaCau, docCauKho, tenCuaDang } from './omni-d1'
 import { docKichThuocCau } from './cau-doc-giay'
-import { tongMucLam, type MucLamLuot } from './muc-lam'
+import { mucCongKhai, nangCoTinhTheoNgay, tongMucLam, type MucLamLuot } from './muc-lam'
 import { chuanMucDo, docDoMuc, type DoMucLuot } from './muc-lam-so'
 import { doThatCacDong, giaySoLuot, mucLamCuaDong, tapCanTraMucLam } from './muc-lam-lo'
 import { tenLopCuaEm } from './ten-lop'
@@ -225,7 +225,9 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   // GIÂY MỖI LƯỢT + LOẠI: 'do' = số đo (đồng hồ mới có `doc`) · 'cu' = đồng hồ cũ (cột `giay` / `raw_json.ms` / ca thi) · 'uoc' = ƯỚC TÍNH (mốc trả lời game). 'cu' và 'uoc' chỉ có thể DƯ. KHÔNG ước tính từ khoảng cách giữa các dòng sổ: ôn lại / tự luyện / BTVN lỡ nộp cả lô cùng lúc nên khoảng cách không phải thời gian làm câu.
   // Hai hàm thuần `giaySoLuot` · `mucLamCuaDong` nằm ở `muc-lam-lo.ts` — DÙNG CHUNG với lệnh theo lô của bảng điểm danh (`/gv/muc-lam-lo`): một định nghĩa Mức làm.
   const giaySo = dong.map((d, i) => giaySoLuot(d, doThat[i] ?? null, uoc, d.nguon === 'thi' ? (ctCua(d)?.giay ?? null) : null))
-  const mucTho: (MucLamLuot | null)[] = dong.map((d, i) => mucLamCuaDong(d, doThat[i] ?? null, giaySo[i]!, beta, kichThuoc))
+  // Mức làm 6 (22/10): ≥ 3 lượt treo trong cùng một ngày của em ⇒ "Cố tình treo máy". Bản học sinh/phụ huynh KHÔNG BAO GIỜ thấy Mức 6 (đặc tả 6 mức, mục 5): hạ về Mức 5 "Treo máy".
+  const mucTho: (MucLamLuot | null)[] = nangCoTinhTheoNgay(dong.map((d, i) => ({ ngay: d.ngay, mucLam: mucLamCuaDong(d, doThat[i] ?? null, giaySo[i]!, beta, kichThuoc) })))
+    .map(({ mucLam: m }) => (nguoiDoc === 'thay' ? m ?? null : mucCongKhai(m)))
   const anMuc = (i: number): boolean => nguoiDoc === 'hoc-sinh' && !!mucTho[i] && dong[i]!.ketQua === 1 && mucTho[i]!.ma <= 2
   const tatCa: LanLamCau[] = dong.map((d, i) => {
     const giay: number | null = giaySo[i]!.g

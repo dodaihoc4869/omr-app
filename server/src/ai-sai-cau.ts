@@ -13,6 +13,7 @@ import { docBetaCau } from './omni-d1'
 import type { MucLamLuot } from './muc-lam'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
 import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong } from './muc-lam-so'
+import { mucCongKhai } from './muc-lam'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
 
 type Row = Record<string, unknown>
@@ -152,7 +153,9 @@ export async function aiSaiCau(env: Env, b: Row): Promise<Row> {
     // Lượt có `doc` mới ⇒ số đo chắc; không có ⇒ giây CŨ ('cu') hoặc ƯỚC TÍNH ('uoc') + kích thước đề tính sẵn ⇒ Mức làm với cờ `uocTinh` (không Mức 4) — `mucLamTuDong`.
     const cu = (giay: number, loaiCu: 'cu' | 'uoc') => mucLamTuDong({ ...dongMuc[i]!, giayCu: giay, loaiCu }, beta, kichThuoc)
     if (g !== null && g !== undefined) {
-      const muc = dongMuc[i]!.doMuc ? mucLamTuDong(dongMuc[i]!, beta) : nguon === 'thi' ? null : cu(g, 'cu')
+      const m0 = dongMuc[i]!.doMuc ? mucLamTuDong(dongMuc[i]!, beta) : nguon === 'thi' ? null : cu(g, 'cu')
+      // Tờ chiếu "Ai đã sai?" hiện trước cả lớp ⇒ Mức 6 "Cố tình treo máy" KHÔNG lên đây (đặc tả 6 mức mục 5): hạ về Mức 5.
+      const muc = mucCongKhai(m0)
       return { ...chung, giay: g, ...(muc ? { mucLam: muc } : {}) }
     }
     if (nguon === 'thi') {

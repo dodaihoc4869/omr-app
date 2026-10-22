@@ -44,6 +44,7 @@ import {
 } from '../../lib/thay-tu-chua'
 import { docCoMatHomNay, laySaiNhieuCau, ngayVnCua, xepUngVien, type KetQuaSai } from '../../lib/ung-vien-chua-cau'
 import { chonEmChieu,napEmChieu,nhanEmChieu,type EmChieu,type NapEmChieu } from '../../lib/ung-vien-chieu'
+import { ChipTang } from '../goi-len-bang/ChonEm'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { useAppStore } from '../../store/appStore'
 import { ghiMotO, thayChuaQuaMayChu, useGhiToChieu } from './ghi-to-chieu'
@@ -163,8 +164,17 @@ function DongCau({ d, stt }: { d: DongXem; stt: number }) {
   const loai = c.tuLuan ? 'Tự luận' : TEN_LOAI_CAU[c.phan]
   const tom = c.thieuNoiDung ? '' : tomTatCau(c.q)
   const cao = !!so && so.phanTram >= NGUONG_LOP_SAI
-  const g = uv?.[0]?.giangLai
-  const goi = uv && uv.length ? `Gọi lên bảng: ${uv[0]!.ten} · ${nhanEmChieu(uv[0]!).chu}${g ? ` · Giảng lại: ${g.ten} (đã làm đúng)` : ''}${uv.length>1?` · còn ${uv.length-1} em phù hợp`:''}` : ''
+  const e0 = uv?.[0]
+  const g = e0?.giangLai
+  // Nhãn nhóm Khá · Trung bình · Cần kèm (thầy 22/10) cạnh tên — CHỈ màn thầy, tờ chiếu không ghi nhóm.
+  const goi = e0 ? (
+    <>
+      Gọi lên bảng: {e0.ten}
+      {e0.tang && <> <ChipTang tang={e0.tang} /></>} · {nhanEmChieu(e0).chu}
+      {g && <> · Giảng lại: {g.ten} <ChipTang tang={g.tang} /> (đã làm đúng)</>}
+      {uv!.length > 1 ? ` · còn ${uv!.length - 1} em phù hợp` : ''}
+    </>
+  ) : null
   return (
     <li className="gvv2-ttc-dong" data-phan={c.phan} data-qid={c.qid}>
       <span className="gvv2-ttc-stt gvv2-so">{stt}</span>

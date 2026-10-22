@@ -83,6 +83,8 @@ export interface ExamAttempt {
   idThietBi?: string
   /** Giây em dừng ở từng câu (qid → giây, cộng dồn theo thẻ câu đang chiếm màn) — QUANLYCATHI mục 5. */
   giayCau?: Record<string, number>
+  /** Đo treo máy từng câu (thầy 22/10, docs/dac-ta-muc-lam-6-muc-2210.md mục 3): giây ẩn / lặng dài nhất / số lần lặng 120–179 / đã giữ được màn sáng — src/lib/do-treo-may-thi.ts. */
+  doCau?: Record<string, { a?: number; l?: number; n?: number; wc?: 1 }>
   /** Ngưỡng chống gian lận của ca (máy chủ trả lúc vào thi) — mục 6. */
   nguong?: { lan: number; giay: number }
   /** BÀI TẬP VỀ NHÀ (BA-APP đợt 3): không đồng hồ đếm ngược, không tự nộp khi

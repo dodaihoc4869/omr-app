@@ -7,6 +7,7 @@
 import { msKyVong } from './omni-toc-do'
 import { mucLamCuaLuot, type MucLamLuot, type PhanMucLam } from './muc-lam'
 import type { KichThuocCau } from './cau-doc-giay'
+import type { DoTreo } from './do-giay-luot'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -27,6 +28,8 @@ export interface DoMucLuot {
   soTu: number
   coHinh: boolean
   phan: PhanMucLam
+  /** Số đo treo máy (22/10); vắng = máy em chưa gửi ⇒ "Chưa đo treo máy". */
+  treo?: DoTreo
 }
 
 /** `raw_json.doc` → đầu vào Mức làm: CHỈ khi giây đến từ đồng hồ MỚI (`dh = 1`) và có số từ + phần hợp lệ. Còn lại ⇒ null. */
@@ -37,7 +40,10 @@ export function docDoMuc(raw: Row | null): DoMucLuot | null {
   const t = typeof o.t === 'number' && Number.isFinite(o.t) && o.t >= 0 ? o.t : null
   const phan = o.p === 'I' || o.p === 'II' || o.p === 'III' ? o.p : null
   if (o.dh !== 1 || t === null || phan === null) return null
-  return { soTu: t, coHinh: o.h === 1, phan }
+  const so = (k: string) => (typeof o[k] === 'number' && Number.isFinite(o[k]) && (o[k] as number) >= 0 ? (o[k] as number) : null)
+  const v = so('v'), a = so('a'), l = so('l')
+  const treo = v !== null && a !== null && l !== null ? { v, a, l, n: so('n') ?? 0, w: o.w === 1 ? (1 as const) : (0 as const) } : null
+  return { soTu: t, coHinh: o.h === 1, phan, ...(treo ? { treo } : {}) }
 }
 
 /** Một lượt đã đọc xong các trường cần cho Mức làm. */
@@ -79,5 +85,6 @@ export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>, k
     phan: d.doMuc.phan,
     dung: d.dung,
     thuongGiay: b === undefined ? null : msKyVong(b, 0, d.doMuc.phan, d.mucDo || null) / 1000,
+    treo: d.doMuc.treo ?? null,
   })
 }

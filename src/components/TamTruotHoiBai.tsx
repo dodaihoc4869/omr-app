@@ -15,10 +15,13 @@
 // Hiện sớm là lộ đáp án cho cả lớp — em nào nộp trước mở tấm trượt ra là biết
 // đáp án rồi nhắn cho bạn chưa nộp. Đây là điều cấm số 3, và nó được cắt ngay
 // từ DỮ LIỆU (`anLoiGiai`), không giấu bằng CSS.
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { Loader2, X } from 'lucide-react'
 import { NutChinh, OThongBao } from './DesignSystem'
-import TheCauChiTiet, { CSS_THE_CAU } from './TheCauChiTiet'
+// Thẻ câu của báo cáo lấy QUA mảnh Phiếu của em (22/10): màn thi nạp lười tấm này; tấm mà nhập thẳng thẻ (tĩnh hay `import()`) thì Rolldown tách thẻ
+// thành tệp riêng ⇒ đường /p thêm một tệp. Lấy qua `PhieuScreen` (xuất lại) giữ thẻ trong mảnh Phiếu; mảnh nằm trong precache ⇒ mở tấm lấy ngay từ máy.
+const napThe = () => import('../screens/PhieuScreen')
+const TheCauChiTiet = lazy(() => napThe().then((m) => ({ default: m.TheCauChiTietXuat })))
 import { TOI_DA_GHI_CHU, loiNhacTickNhieu } from '../lib/hoi-bai'
 import type { CauSaiChiTiet } from '../lib/phieu-du-lieu'
 import { laManThi } from './m3'
@@ -64,10 +67,16 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
     [cau, daCongBo],
   )
   const nhac = loiNhacTickNhieu(chon.size, cau.length)
+  const [cssThe, setCssThe] = useState('')
+  useEffect(() => {
+    let con = true
+    void napThe().then((m) => { if (con) setCssThe(m.CSS_THE_CAU_XUAT) }, () => {})
+    return () => { con = false }
+  }, [])
 
   const tam = (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'var(--phu)' }}>
-      <style>{CSS_THE_CAU}</style>
+      <style>{cssThe}</style>
       <div
         className="w-full flex flex-col m3-tam-truot"
         style={{ maxWidth: 520, maxHeight: '92vh', background: 'var(--the)', borderRadius: 'var(--bo-3) var(--bo-3) 0 0', boxShadow: 'var(--bong-2)' }}
@@ -97,15 +106,17 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
           )}
 
           <div className="m3-giay">
-            {cau.map((c, i) => (
-              <TheCauChiTiet
-                key={c.qid}
-                c={c.chiTiet}
-                stt={i + 1}
-                anLoiGiai={!daCongBo}
-                tick={{ chon: chon.has(c.qid), bat: () => bat(c.qid), nhan: `Hỏi ${c.chiTiet.phan === 'I' ? 'Phần I' : c.chiTiet.phan === 'II' ? 'Phần II' : 'Phần III'} câu ${c.chiTiet.soCau}` }}
-              />
-            ))}
+            <Suspense fallback={<Loader2 size={20} className="animate-spin" aria-label="Đang mở các câu" />}>
+              {cau.map((c, i) => (
+                <TheCauChiTiet
+                  key={c.qid}
+                  c={c.chiTiet}
+                  stt={i + 1}
+                  anLoiGiai={!daCongBo}
+                  tick={{ chon: chon.has(c.qid), bat: () => bat(c.qid), nhan: `Hỏi ${c.chiTiet.phan === 'I' ? 'Phần I' : c.chiTiet.phan === 'II' ? 'Phần II' : 'Phần III'} câu ${c.chiTiet.soCau}` }}
+                />
+              ))}
+            </Suspense>
           </div>
 
           <div style={{ marginTop: 'var(--k4)' }}>
