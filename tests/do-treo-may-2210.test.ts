@@ -310,7 +310,7 @@ describe('ca thi — bộ đếm treo máy (do-treo-may-thi.ts) + cụm gửi', 
     nhip(d, null, 7)
     expect(d.bang().c1!.l).toBe(10)
   })
-  it('cụm gửi: v = giayCau (định nghĩa ca thi hiện hành); w = 1 chỉ khi mọi giây đều giữ màn sáng; câu chỉ có giây ẩn vẫn gửi; không gì ⇒ null', () => {
+  it('cụm gửi: g = v = giayCau (định nghĩa ca thi hiện hành); w = 1 khi đã giữ được màn sáng; câu không có g không gửi; không gì ⇒ null', () => {
     gio = 0
     const d = tao()
     nhip(d, 'c1', 4, true)
@@ -320,7 +320,7 @@ describe('ca thi — bộ đếm treo máy (do-treo-may-thi.ts) + cụm gửi', 
     d.hien()
     // g = giayCau (định nghĩa ca thi, trần 900); l kẹp ≤ v như máy chủ (lamSachTreo)
     expect(doGiayThi({ c1: 4, c2: 2 }, d.bang())).toEqual({ c1: { g: 4, v: 4, a: 0, l: 4, n: 0, w: 1 }, c2: { g: 2, v: 2, a: 30, l: 2, n: 0, w: 0 } })
-    expect(doGiayThi({}, { c3: { a: 12 } })).toEqual({ c3: { v: 0, a: 12, l: 0, n: 0, w: 0 } })
+    expect(doGiayThi({}, { c3: { a: 12 } })).toBeNull() // câu không có g: máy chủ bỏ cụm treo (lamSachDo) ⇒ không gửi
     expect(doGiayThi({ c4: 1500 }, {})!.c4).toMatchObject({ g: 900, v: 1500 })
     expect(doGiayThi({}, {})).toBeNull()
     expect(doGiayThi(null, null)).toBeNull()

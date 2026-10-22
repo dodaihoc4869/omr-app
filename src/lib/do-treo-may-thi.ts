@@ -17,17 +17,6 @@ export interface DoTreoCau {
   wc?: 1
 }
 
-/** Cụm gửi máy chủ cho một câu ca thi — cùng khuôn `doGiay` máy chủ nhận (`lamSachDo`: cụm treo máy chỉ nhận khi có g). */
-export interface DoGiayThiCau {
-  /** Giây ca thi theo định nghĩa hiện hành (= giayCau); vắng khi câu chưa có giây nào. */
-  g?: number
-  v: number
-  a: number
-  l: number
-  n: number
-  w: 0 | 1
-}
-
 export const TRAN_DO = 7200
 const TRAN_N = 60
 
@@ -97,19 +86,8 @@ export function taoDoTreoMay(dau?: Record<string, DoTreoCau> | null, bayGio: () 
   }
 }
 
-/** Cụm `doGiay` của lượt thi: mọi câu có giây (`giayCau`, = v) hoặc có giây ẩn. Không câu nào ⇒ null (đừng gửi khoá). */
-export function doGiayThi(giayCau: Record<string, number> | null | undefined, doCau: Record<string, DoTreoCau> | null | undefined): Record<string, DoGiayThiCau> | null {
-  const ra: Record<string, DoGiayThiCau> = {}
-  const qids = new Set([...Object.keys(giayCau ?? {}), ...Object.keys(doCau ?? {})])
-  for (const q of qids) {
-    const v = Math.min(TRAN_DO, Math.max(0, Math.round(Number(giayCau?.[q]) || 0)))
-    const m = doCau?.[q] ?? {}
-    const a = m.a ?? 0
-    if (!(v > 0) && !(a > 0)) continue
-    ra[q] = { ...(v >= 1 ? { g: Math.min(900, v) } : {}), v, a, l: Math.min(m.l ?? 0, v), n: m.n ?? 0, w: m.wc === 1 ? 1 : 0 }
-  }
-  return Object.keys(ra).length > 0 ? ra : null
-}
+/** Cụm `doGiay` gửi máy chủ dựng ở tầng gửi bài (exam-api.ts, cùng mảnh màn thi — màn thi không phải nạp tĩnh mô-đun đo này). */
+export { doGiayThi, type DoGiayThiCau } from './exam-api'
 
 /** Giữ màn sáng khi đang làm (đặc tả mục 5; luật Boss 22/10 cùng ManLamBaiTap): xin khi vào đề, nhả sau 10 phút không chạm, chạm thì xin lại. */
 export const GIU_MAN_SANG = true

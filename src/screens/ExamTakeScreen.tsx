@@ -637,7 +637,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
         const dang = attemptRef.current
         if (dang && dang.maCa === bai.maCa && dang.sbd === bai.sbd) continue
         try {
-          await submitAnswers(url, bai.maCa, bai.sbd, bai.maDe, bai.answers, bai.integrity, bai.lanThu ?? 1, bai.idThietBi ?? layIdThietBi(), bai.giayCau)
+          await submitAnswers(url, bai.maCa, bai.sbd, bai.maDe, bai.answers, bai.integrity, bai.lanThu ?? 1, bai.idThietBi ?? layIdThietBi(), bai.giayCau, undefined, bai.doCau)
           await saveAttempt({ ...bai, pendingSubmit: false })
           showToast(`Đã gửi nốt bài ca ${bai.maCa} còn tồn trên máy`, 'success')
         } catch (e) {
@@ -1460,7 +1460,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           // ngay phần đó lên. Máy chủ so với bài đã chốt: có câu mới thì cất làm BÀI BỔ SUNG chờ thầy duyệt (điểm không tự đổi).
           const conBai = existing && !existing.submitted && (existing.lanThu ?? 1) === (kq.lanThu ?? 1)
           if (conBai && existing) {
-            void submitAnswers(url, existing.maCa, existing.sbd, existing.maDe, existing.answers, existing.integrity, existing.lanThu ?? 1, existing.idThietBi ?? layIdThietBi(), existing.giayCau)
+            void submitAnswers(url, existing.maCa, existing.sbd, existing.maDe, existing.answers, existing.integrity, existing.lanThu ?? 1, existing.idThietBi ?? layIdThietBi(), existing.giayCau, undefined, existing.doCau)
               .then((r) => setDaNopRoi((d) => (d ? { ...d, boSung: r.boSung ?? 0 } : d)))
               .catch(() => setDaNopRoi((d) => (d ? { ...d, boSung: 'loi' } : d)))
           }
@@ -1538,7 +1538,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         try {
           // KHOÁ ĐÚNG LƯỢT CŨ: máy chủ vừa mở lượt mới cho em; không có khoá thì `/nop` nhận lượt MỚI NHẤT và bài cũ ĐÈ lên lượt mới (đóng nó bằng đáp án cũ).
           // Có khoá: lượt cũ còn mở thì nhận bài; đã đóng thì máy chủ cất làm BÀI BỔ SUNG chờ thầy duyệt (không mất, không đè).
-          await submitAnswers(url, existing.maCa, existing.sbd, existing.maDe, existing.answers, existing.integrity, existing.lanThu ?? 1, existing.idThietBi ?? idTb, existing.giayCau, `${existing.maCa}|${existing.sbd}|${existing.lanThu ?? 1}`)
+          await submitAnswers(url, existing.maCa, existing.sbd, existing.maDe, existing.answers, existing.integrity, existing.lanThu ?? 1, existing.idThietBi ?? idTb, existing.giayCau, `${existing.maCa}|${existing.sbd}|${existing.lanThu ?? 1}`, existing.doCau)
         } catch {
           // vẫn mở lượt mới — máy chủ đã ghi trạng thái lượt cũ theo cách của nó
         }
@@ -2552,7 +2552,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     setSoLanThuGui((n) => n + 1)
     try {
       if (!scriptUrl.trim()) throw new Error('no-script-url')
-      const { keyBank, congBo: cb } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity, a.lanThu ?? 1, a.idThietBi ?? layIdThietBi(), a.giayCau)
+      const { keyBank, congBo: cb } = await submitAnswers(scriptUrl.trim(), a.maCa, a.sbd, a.maDe, a.answers, a.integrity, a.lanThu ?? 1, a.idThietBi ?? layIdThietBi(), a.giayCau, undefined, a.doCau)
       const done = { ...a, pendingSubmit: false }
       attemptRef.current = done
       setAttempt(done)
