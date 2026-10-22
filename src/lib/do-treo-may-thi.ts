@@ -17,8 +17,10 @@ export interface DoTreoCau {
   wc?: 1
 }
 
-/** Cụm gửi máy chủ cho một câu ca thi. */
+/** Cụm gửi máy chủ cho một câu ca thi — cùng khuôn `doGiay` máy chủ nhận (`lamSachDo`: cụm treo máy chỉ nhận khi có g). */
 export interface DoGiayThiCau {
+  /** Giây ca thi theo định nghĩa hiện hành (= giayCau); vắng khi câu chưa có giây nào. */
+  g?: number
   v: number
   a: number
   l: number
@@ -104,7 +106,7 @@ export function doGiayThi(giayCau: Record<string, number> | null | undefined, do
     const m = doCau?.[q] ?? {}
     const a = m.a ?? 0
     if (!(v > 0) && !(a > 0)) continue
-    ra[q] = { v, a, l: m.l ?? 0, n: m.n ?? 0, w: m.wc === 1 ? 1 : 0 }
+    ra[q] = { ...(v >= 1 ? { g: Math.min(900, v) } : {}), v, a, l: Math.min(m.l ?? 0, v), n: m.n ?? 0, w: m.wc === 1 ? 1 : 0 }
   }
   return Object.keys(ra).length > 0 ? ra : null
 }
