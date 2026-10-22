@@ -5,7 +5,7 @@
 ## Dựng lại
 `node scripts/dung-ban-ve-muc-lam-6-muc-2210.mjs && node scripts/chup-ban-ve-muc-lam-6-muc-2210.mjs`
 - Mọi con số trên bản vẽ đều tính từ bảng dữ liệu ở đầu script dựng, không gõ tay.
-- Bảng điểm danh nạp thẳng tệp màu thật `src/styles/tokens.css` và chỉ dùng biến `--gvm-*`. Màu mới thêm chỉ có tím cho Treo máy: `--gvm-tim`, `--gvm-tim-nen`, `--gvm-tim-dam`, đều là biến đã có.
+- Bảng điểm danh nạp thẳng tệp màu thật `src/styles/tokens.css` và chỉ dùng biến `--gvm-*`. Bản 2 dùng 3 nhóm màu có nghĩa, đều là biến đã có: Vội `--gvm-hp`, Có nghĩ `--gvm-xl`, Treo máy `--gvm-ho` có sọc, Cố tình treo máy `--gvm-ho-dam`.
 - Tờ chiếu dùng lại nguyên CSS của bản vẽ 21/10 đã duyệt, rồi thêm phần Treo máy bằng màu xám `--m0` có sọc, đều là màu đã có của tờ.
 
 ## Ảnh
