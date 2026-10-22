@@ -111,6 +111,9 @@ const DS_DD12C = [
     [`86-dd12c-ngay-dau-${kho}${nen === 'dark' ? '-toi' : ''}`, `${DD12C}&mlo=dau`, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:muc'],
     [`87-dd12c-loc-treo-${kho}${nen === 'dark' ? '-toi' : ''}`, `${DD12C}&mlo=1`, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:muc-treo'],
   ])),
+  // lệnh lô hỏng (bản vẽ khung 04): lý do thật + Thử tải lại, dòng điểm danh vẫn đủ — 3 khổ × sáng/tối
+  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [844, 390, 'ngang'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+    [`88-dd12c-loi-${kho}${nen === 'dark' ? '-toi' : ''}`, `${DD12C}&mlo=loi`, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:muc-loi'])),
 ]
 // ═══════════ hết LÀN ĐIỂM DANH 12/10C ═══════════
 // ═══════════ LÀN HÔM NAY 12/10B: Hôm nay của thầy theo bản vẽ thầy duyệt 12/10 — hàng thẻ Việc cần thầy + khối Nhịp học (262 em × 12 ngày, ═══════════
@@ -507,6 +510,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       }
       if (v === 'muc' || v === 'muc-treo') await t.locator('.dd1-ot small').nth(2).waitFor({ timeout: 20000 }) // thanh Mức làm hỏi sau 1,5 giây
       if (v === 'muc-treo') await t.locator('.dd1-tong-nut[data-k="treo"]').click()
+      if (v === 'muc-loi') await t.locator('.dd1-ml-loi').waitFor({ timeout: 20000 })
       if (v === 'vua') {
         await t.locator('.dd1-vua-dong').first().click()
         await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })

@@ -70,10 +70,13 @@ export const CHO_HOI_MUC_LAM_MS = 1500
  * Mức làm 14 ngày của các em đang hiện (`khoaSbd` = SBD nối bằng dấu phẩy, đã ổn định để effect không chạy lại vô ích). Chỉ hỏi em CHƯA có số và chưa đang hỏi;
  * lượt đang bay không bị huỷ khi danh sách đổi (chỉ bỏ khi màn đóng). Lỗi ⇒ `loi`, KHÔNG tự hỏi lại (không dồn thêm tải khi máy chủ đang chậm).
  */
-export function useMucLamLo(khoaSbd: string, bat: boolean): { theoEm: ReadonlyMap<string, MucLamEm>; dang: boolean; loi: boolean } {
+export function useMucLamLo(khoaSbd: string, bat: boolean): { theoEm: ReadonlyMap<string, MucLamEm>; dang: boolean; loi: boolean; loiChu: string; thuLai: () => void } {
   const [theoEm, setTheoEm] = useState<ReadonlyMap<string, MucLamEm>>(() => new Map())
   const [dang, setDang] = useState(false)
-  const [loi, setLoi] = useState(false)
+  const [loiChu, setLoiChu] = useState('')
+  // 6 mức (bản vẽ khung 04): lỗi ⇒ lý do thật + nút "Thử tải lại" (thầy bấm mới hỏi lại các em hỏng — vẫn KHÔNG tự hỏi lại).
+  const [lan, setLan] = useState(0)
+  const hong = useRef<string[]>([])
   const daHoi = useRef(new Set<string>())
   const song = useRef(true)
   const ngayDem = useRef('')
@@ -89,8 +92,9 @@ export function useMucLamLo(khoaSbd: string, bat: boolean): { theoEm: ReadonlyMa
     const homNay = new Date().toDateString()
     if (ngayDem.current && ngayDem.current !== homNay) {
       daHoi.current.clear()
+      hong.current = []
       setTheoEm(new Map())
-      setLoi(false)
+      setLoiChu('')
     }
     ngayDem.current = homNay
     const can = khoaSbd.split(',').filter((x) => x && !daHoi.current.has(x)).slice(0, TOI_DA_EM_MUC_LAM_LO)
@@ -102,15 +106,22 @@ export function useMucLamLo(khoaSbd: string, bat: boolean): { theoEm: ReadonlyMa
         if (!song.current) return
         setDang(false)
         if (!r.ok) {
-          setLoi(true)
+          hong.current = [...hong.current, ...can]
+          setLoiChu(r.chu || 'Không nối được máy chủ.')
           return
         }
         setTheoEm((c) => new Map([...c, ...r.du.em]))
       })
     }, CHO_HOI_MUC_LAM_MS)
     return () => clearTimeout(hen)
-  }, [khoaSbd, bat])
-  return { theoEm, dang, loi }
+  }, [khoaSbd, bat, lan])
+  const thuLai = useCallback(() => {
+    for (const x of hong.current) daHoi.current.delete(x)
+    hong.current = []
+    setLoiChu('')
+    setLan((n) => n + 1)
+  }, [])
+  return { theoEm, dang, loi: !!loiChu, loiChu, thuLai }
 }
 
 const GIAI_THICH_UOC = 'Gồm lượt xếp từ giây đồng hồ cũ hoặc ước tính từ mốc trả lời — số giây có thể cao hơn thật nên mức thật có thể thấp hơn.'
@@ -491,7 +502,10 @@ export default function Buoc1DiemDanh({
                 )}
                 {mucLo.loi && (
                   <p className="dd1-ml-loi" role="status">
-                    Chưa tải được Mức làm 14 ngày của các em. Danh sách điểm danh vẫn đúng.
+                    Chưa tải được Mức làm 14 ngày: {mucLo.loiChu.replace(/[.\s]+$/, '')}. Danh sách điểm danh vẫn đúng.{' '}
+                    <button type="button" className="dd1-nut-chu dd1-ml-thu" onClick={mucLo.thuLai} disabled={mucLo.dang}>
+                      <RefreshCw size={14} aria-hidden="true" /> Thử tải lại
+                    </button>
                   </p>
                 )}
                 {loc && (
