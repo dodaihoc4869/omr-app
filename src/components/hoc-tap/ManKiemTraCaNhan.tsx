@@ -4,7 +4,7 @@ import { goiHoa2 } from '../hoa2/api'
 import { docKiemTra, type TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { Question } from '../../game/than-thu-v2/core'
 import TheCau from '../TheCau'
-import { propsCauHoc } from './ManLamBaiTap'
+import { duTraLoi, propsCauHoc } from './ManLamBaiTap'
 import TheKiemTraCaNhan from './TheKiemTraCaNhan'
 import BieuTuongKiemTra from './BieuTuongKiemTra'
 import { conLai, diemChu, dongHo, gioHan, gioVn, thuNgay } from './kiem-tra-chu'
@@ -26,6 +26,8 @@ function VongDem({phan,nhan,lop,an=false,children}:{phan:number;nhan?:string;lop
   <span>{children}</span>
  </div>
 }
+/** "Đã trả lời" đúng luật đếm của máy chủ (`duTraKt`): Phần II phải đủ 4 ý — chuỗi thiếu ý như "D-SD" CHƯA tính (22/10, em 12086: màn đếm 28/28 mà thẻ bài hiện 27/28). */
+const daTraDu=(c:Pick<Question,'phan'>,v:string|undefined)=>duTraLoi(c.phan,v??'')
 /** Chỉ các nút lá nghe từng giây; cây câu hỏi và công thức không dựng lại theo nhịp giờ. */
 function DongHoChang({kho,giay,vong=false}:{kho:KhoGio|null;giay:number;vong?:boolean}){
  const sec=Math.max(0,Math.ceil(useGiayConLai(kho)??0)),gap=sec<=60
@@ -82,7 +84,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  const chot=async(auto=false)=>{if(stt===null||tuNop.current)return
   const lan=lanPhien.current
   // Nộp tay khi còn câu trống ⇒ hỏi lại bằng hộp app (đợt 20). Hết giờ tự chốt thì không hỏi; hộp đang mở mà hết giờ ⇒ lượt tự chốt đi trước.
-  if(!auto){const trong=cs.flatMap((c,i)=>traRef.current[c.qid]?[]:[i+1]);if(trong.length&&!await hoiXacNhan({tieuDe:`Nộp chặng ${stt+1}?`,noiDung:`Chặng này còn ${trong.length} câu chưa trả lời (câu ${trong.join(', ')}). Nộp chặng sẽ chốt các câu đã lưu, không sửa lại được.`,nhanDongY:`Nộp chặng ${stt+1}`,nhanKhong:'Làm tiếp',vo:'m3'}))return;if(tuNop.current)return}
+  if(!auto){const trong=cs.flatMap((c,i)=>daTraDu(c,traRef.current[c.qid])?[]:[i+1]);if(trong.length&&!await hoiXacNhan({tieuDe:`Nộp chặng ${stt+1}?`,noiDung:`Chặng này còn ${trong.length} câu chưa trả lời (câu ${trong.join(', ')}). Nộp chặng sẽ chốt các câu đã lưu, không sửa lại được.`,nhanDongY:`Nộp chặng ${stt+1}`,nhanKhong:'Làm tiếp',vo:'m3'}))return;if(tuNop.current)return}
   if(!conPhien(lan))return
   huyHenThuLai();tuNop.current=true;setBusy(true);setLoi('')
   try{await save(true);if(!conPhien(lan))return;setCs([]);setStt(null);await tai();if(conPhien(lan))onCapNhat()}
@@ -108,8 +110,8 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  const dangChay=chang.find(c=>!c.daChot&&c.han!==null&&c.han>nowMay)
  const soChot=chang.filter(c=>c.daChot).length,xongHet=chang.length>0&&soChot===chang.length
  const dau=chang.find(c=>!c.daChot)
- const daTraChang=cs.filter(c=>!!tra[c.qid]).length
- const dsCau=(nho:boolean)=><div className={nho?'ktcn-nav ktcn-nav-dt':'ktcn-nav'} role="group" aria-label="Các câu trong chặng">{cs.map((c,i)=><button type="button" key={c.qid} aria-current={viTri===i||undefined} data-co={tra[c.qid]?'':undefined} aria-label={`Câu ${i+1}${tra[c.qid]?' · đã trả lời':''}`} onClick={()=>setViTri(i)}>{i+1}</button>)}</div>
+ const daTraChang=cs.filter(c=>daTraDu(c,tra[c.qid])).length
+ const dsCau=(nho:boolean)=><div className={nho?'ktcn-nav ktcn-nav-dt':'ktcn-nav'} role="group" aria-label="Các câu trong chặng">{cs.map((c,i)=><button type="button" key={c.qid} aria-current={viTri===i||undefined} data-co={daTraDu(c,tra[c.qid])?'':undefined} aria-label={`Câu ${i+1}${daTraDu(c,tra[c.qid])?' · đã trả lời':''}`} onClick={()=>setViTri(i)}>{i+1}</button>)}</div>
  const tieuDe=stt!==null?<><b>Chặng {stt+1}/{chang.length||stt+1}</b><small>Câu {viTri+1}/{cs.length}</small></>:<><b>Kiểm tra ôn tập</b>{tt&&<small>{thuNgay(tt.ngay)}</small>}</>
  const kq=ket?{dung:ket.cau.filter(c=>c.dung).length,trong:ket.cau.filter(c=>!c.tra).length,on:ket.cau.filter(c=>c.tra&&!c.dung).length}:null
  const cauLoc=ket?ket.cau.map((c,i)=>({c,i})).filter(({c})=>loc==='tat-ca'||(loc==='dung'?c.dung:loc==='trong'?!c.tra:!!c.tra&&!c.dung)):[]
