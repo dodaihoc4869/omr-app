@@ -22,7 +22,7 @@
 <!-- BẢN VẼ «HỒ SƠ HỌC SINH Ở BA GÓC NHÌN» — Đợt 2 Mức làm 6 mức (22/10). CHỈ là bản vẽ (bước 2 quy trình 4 bước): số liệu MINH HOẠ, CHƯA sửa src/.
      Nạp ĐÚNG CSS thật của tấm "Hồ sơ làm bài" (tokens · gv-v2 · ho-so-lam-cau-em · vỏ học sinh/phụ huynh). Khối mới `.hsv-*` CHỈ dùng biến màu có sẵn (--gvm-*, --phu).
      Truy vấn: ?app=thay|hs|ph · &t=dl (mặc định) | tai | rong | loi | mang | cu · &mo=luot (cuộn tới lượt treo) · &toan=1 (trải cả tấm để chụp toàn bộ).
-     Đặc tả: DAC-TA.md cùng thư mục. Hợp đồng dữ liệu: server/src/muc-lam.ts nhánh claude/stoic-einstein-7jkysb (treo · giayTreo · chuaDoTreo · soTreo · soCoTinh · soChuaDoTreo). -->
+     Đặc tả: DAC-TA.md cùng thư mục. Hợp đồng dữ liệu: server/src/muc-lam.ts nhánh claude/stoic-einstein-7jkysb (treo · giayTreo · daDoTreo (@71520b89; vắng cả hai ⇒ chưa đo treo) · soTreo · soCoTinh · soChuaDoTreo). -->
 <link rel="stylesheet" href="../../src/styles/tokens.css">
 <link rel="stylesheet" href="../../src/components/chien-dich/gv-v2.css">
 <link rel="stylesheet" href="../../src/components/chien-dich/bai-hang-ngay.css">
@@ -316,7 +316,7 @@ function khoiCachLamThay() {
       ${CU ? '' : `<p data-t="5"><b>${saiTreo}/${saiCo}</b><span>lượt sai sau khi máy để treo (Mức làm 5–6)</span></p>`}
     </div>
     ${CU ? `<p class="hsv-ghi">Mọi lượt trong 7 ngày làm trước khi máy em có đồng hồ đo treo máy, nên chưa xếp được Mức làm 5–6 (không đoán). Lượt làm từ khi máy em nạp bản mới sẽ có số đo.</p>` : ''}
-    <details class="hslc-cach hsv-cach"><summary class="tt-nhan">Cách tính Mức làm</summary><p>Mức làm 1–4 theo số giây so với thời gian đọc hết đề (giữ như cũ). Mức làm 5 · Treo máy: không chạm màn từ 5 phút khi màn đang sáng, hoặc rời app từ 3 phút khi màn được giữ sáng (10 phút khi máy không giữ được màn sáng). Mức làm 6 · Cố tình treo máy: cùng một ngày có từ 3 lượt treo máy, hoặc một lượt có 3 lần lặng 2–3 phút rồi chạm ngay trước ngưỡng cắt của đồng hồ. Lượt treo không tính vào giây trung bình. Ngưỡng là tạm, chỉnh sau một tuần số thật.</p></details>
+    <details class="hslc-cach hsv-cach"><summary class="tt-nhan">Cách tính Mức làm</summary><p>Mức làm 1–4 theo số giây so với thời gian đọc hết đề (giữ như cũ). Mức làm 5 · Treo máy: không chạm màn từ 5 phút khi màn đang sáng, hoặc rời app từ 3 phút khi màn được giữ sáng (10 phút khi máy không giữ được màn sáng). Mức làm 6 · Cố tình treo máy: cùng một ngày có từ 3 lượt treo máy. Lượt treo không tính vào giây trung bình. Ngưỡng là tạm, chỉnh sau một tuần số thật.</p></details>
   </section>`
 }
 

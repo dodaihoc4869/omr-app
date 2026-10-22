@@ -150,12 +150,14 @@ Không bỏ khối nào; chỉ dời và gập.
 - Học sinh: `POST /hs/lich-su-lam-cau {token}` và `/hs/ho-so-thai-do`. Máy chủ lấy SBD từ token, lọc bằng `banHocSinhLichSu`.
 - Phụ huynh: `POST /ph/lich-su-lam-cau` và `/ph/ho-so-thai-do`. Dùng đúng lõi bản học sinh.
 
-**Trường mỗi lượt** (`MucLamLuot`, hợp đồng lõi @e7e4760c):
+**Trường mỗi lượt** (`MucLamLuot`, hợp đồng lõi @71520b89 — Boss sửa 22/10, thay bản @e7e4760c):
 - Giữ nguyên các trường cũ: `ma` 1–4, `giay`, `giayDoc`, `ranh2/3/4`.
 - Thêm:
   - `treo?: 'treo' | 'co_tinh'`. Có thì hiện Mức 5 hoặc 6, đè lên `ma`;
   - `giayTreo?`: giây em không ở với câu, bằng max(khoảng lặng dài nhất, giây rời app). Dùng cho câu "máy để treo X phút". Học sinh làm tròn tới phút;
-  - `chuaDoTreo?: true`: hiện "Chưa đo treo máy".
+  - `daDoTreo?: true`: lượt ĐÃ đo mà không treo (giữ Mức 1–4 theo `ma`).
+  - Vắng CẢ `treo` lẫn `daDoTreo` ⇒ lượt làm trước khi có đồng hồ mới ⇒ hiện "Chưa đo treo máy" (không còn trường `chuaDoTreo`).
+- Mức 6 `'co_tinh'` CHỈ đến từ mẫu ≥ 3 lượt treo trong cùng một ngày của em (lõi @71520b89).
 
 **Trường tổng** (`TongMucLam`):
 - Thêm `soTreo`, `soCoTinh`, `soChuaDoTreo`.
@@ -170,9 +172,8 @@ Không bỏ khối nào; chỉ dời và gập.
 
 **Cần thêm ở MÁY CHỦ (chỉ thêm, JSON, không đổi schema D1):**
 1. `TongMucLam.treoDungSai?: { treo: {dung, sai}, coTinh: {dung, sai} }`, dùng cho dòng "đúng x · sai y" của ô 5, ô 6 và ô "sai sau khi máy để treo". Nếu vắng: ô chỉ ghi số lượt.
-2. `mucTheoNgay?: { ngay, dem: [6 số], chuaCoSoDo, chuaDoTreo }[]` (7 ngày gần nhất), dùng cho khối "Theo ngày". Tính trong **cùng vòng lặp** đang dựng `tongMucLam`. Bản học sinh/phụ huynh cộng dồn ô 6 vào ô 5. Nếu vắng: ẩn khối.
-3. Chỉ bản thầy: `ngayCoTinh?: { ngay, lyDo: 'ba_luot_ngay' | 'cham_giu', luot: {luc, giayTreo}[] }[]`, dùng cho thẻ bằng chứng.
-   - `cham_giu` là trường hợp một lượt có `n ≥ 3`. Lõi hiện chỉ trả `'co_tinh'`, không nói lý do nào. Nên thêm `lyDoCoTinh` vào `MucLamLuot` bản thầy.
+2. `mucTheoNgay?: { ngay, dem: [6 số], chuaCoSoDo, soChuaDoTreo }[]` (7 ngày gần nhất), dùng cho khối "Theo ngày". Tính trong **cùng vòng lặp** đang dựng `tongMucLam`. Bản học sinh/phụ huynh cộng dồn ô 6 vào ô 5. Nếu vắng: ẩn khối.
+3. Chỉ bản thầy: `ngayCoTinh?: { ngay, luot: {luc, giayTreo}[] }[]`, dùng cho thẻ bằng chứng (lõi @71520b89 chỉ còn MỘT lý do: ≥ 3 lượt treo trong ngày ⇒ không cần trường lý do).
    - Nếu vắng: thẻ dựng từ các lượt `'co_tinh'` đã tải, cùng ngày.
 4. **Phụ huynh**: lọc thêm, **chỉ bỏ `giayTreo`** ở từng lượt. **Giữ `treo: 'treo'`**: nếu bỏ cả `treo` thì lượt treo 10 phút lại hiện thành "Mức làm 3–4 · Có thời gian nghĩ", đúng cái lỗi mà 6 mức sinh ra để sửa.
 5. **Hồ sơ thái độ**: `dem.giayTb`, `giayTrungVi`, `phanBoGiay` bỏ các lượt `treo`. Nếu không, một lượt treo 10 phút vẫn kéo giây trung bình lên khoảng 185 giây.
@@ -213,7 +214,7 @@ Không bỏ khối nào; chỉ dời và gập.
   - `tests/ho-so-6-muc-doc-2210.test.ts`:
     - `docTongMucLam` đọc `soTreo/soCoTinh/soChuaDoTreo` và giữ 4 dòng `theoMuc`;
     - máy chủ cũ thiếu trường thì hiện "Chưa đo treo máy", không vỡ khối;
-    - `docMucLam` giữ `treo/giayTreo/chuaDoTreo`.
+    - `docMucLam` giữ `treo/giayTreo/daDoTreo`; vắng cả `treo` lẫn `daDoTreo` ⇒ "Chưa đo treo máy".
   - `tests/ho-so-6-muc-giao-dien-2210.test.tsx`:
     - chế độ học sinh/phụ huynh có dữ liệu treo thì DOM, `title`, `aria-label` không có "Cố tình", "Mức làm 6", "co_tinh";
     - phụ huynh không có chữ "phút" ở lượt treo;
