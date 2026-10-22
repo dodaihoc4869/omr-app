@@ -23,7 +23,9 @@ import { napDong } from '../lib/nap-manh'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { BAN_PHIEU_DOC_DUOC, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import PhieuV3 from './PhieuV3'
-import TheCauChiTiet from '../components/TheCauChiTiet'
+import TheCauChiTiet, { CSS_THE_CAU } from '../components/TheCauChiTiet'
+/** Xuất lại cho tấm "Hỏi bài Thầy" của màn thi (nạp lười qua mảnh này — xem TamTruotHoiBai.tsx): thẻ câu ở yên trong mảnh Phiếu, đường /p không thêm tệp. */
+export { TheCauChiTiet as TheCauChiTietXuat, CSS_THE_CAU as CSS_THE_CAU_XUAT }
 import NutTaiBaiTap from '../components/KhoiBaiLuyen'
 import type { ThongTinPhieu } from '../lib/html-phieu'
 import type { CauLuyen } from '../lib/bai-tap-pdf'

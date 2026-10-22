@@ -304,3 +304,22 @@ describe('ca thi — bộ đếm treo máy (do-treo-may-thi.ts) + cụm gửi', 
     expect(d.bang()).toEqual({ c1: { a: 7200, n: 60, wh: 1 } })
   })
 })
+
+describe('ca thi — batDoTreoMay trên trang (nạp lười từ màn thi)', async () => {
+  const { batDoTreoMay } = await import('../src/lib/do-treo-may-thi')
+  it('nghe chạm thật trên document; mỗi nhịp tự ghi doCau vào lượt làm (chưa nộp); dung() gỡ bộ nghe; lượt đã nộp thì không ghi', () => {
+    const luot: { current: { doCau?: Record<string, unknown>; submitted?: boolean } | null } = { current: {} }
+    const d = batDoTreoMay(luot as never, false)
+    for (let i = 0; i < 150; i++) d.nhip('c1')
+    document.dispatchEvent(new Event('pointerdown'))
+    d.nhip('c1')
+    expect(luot.current!.doCau).toMatchObject({ c1: { n: 1, l: 150, wh: 1 } })
+    d.dung()
+    for (let i = 0; i < 150; i++) d.nhip('c1')
+    document.dispatchEvent(new Event('pointerdown')) // đã gỡ ⇒ không đếm thêm lần lặng
+    luot.current!.submitted = true
+    const truoc = JSON.stringify(luot.current!.doCau)
+    d.nhip('c1')
+    expect(JSON.stringify(luot.current!.doCau)).toBe(truoc)
+  })
+})

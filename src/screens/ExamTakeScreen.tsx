@@ -8,11 +8,10 @@ import { taoLinkPhieu } from '../lib/phieu-link'
 import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, layCauGocQuaMayChu, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi, type ChiTietCauRow, type BaiDaNopCuaEm } from '../lib/exam-api'
 import { CongNhip, NHIP_TIM_LUU_TAM_GIAY } from '../lib/nhip-gui'
 import { goiCauHoi } from '../lib/hoi-bai'
-import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
+import type { CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { chuyenDeXinKho, dungCauSai, dungPhieuMayEm, SO_CAU_BAI_TAP_KEM, type DiemMotCa, type PhieuDayDu } from '../lib/phieu-du-lieu'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../lib/exam-kho-de-import'
-import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { dinhDangDongHo, taoKhoGio, useGiayConLai, useMocGio, type KhoGio } from '../lib/dong-ho-thi'
 import { layIdThietBi } from '../lib/thiet-bi'
@@ -53,7 +52,7 @@ import { thuTinHieu } from '../lib/thu-tin-hieu'
 import { TEN_LY_DO_KHOA } from '../lib/man-thi-sach'
 import ManChan from '../components/ManChan'
 import ManGiuDeDoc from '../components/ManGiuDeDoc'
-import VanTay from '../components/VanTay'
+import VanTay, { gioPhutNay } from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import { bangPropsBoQuaHam } from '../lib/so-sanh-props'
 import { gocCuaCauThay } from '../lib/nhan-da-dung'
@@ -102,7 +101,7 @@ import NutNopBtvn from '../components/NutNopBtvn'
 import OSoTraLoi from '../components/OSoTraLoi'
 import BangNhapSo from '../components/BangNhapSo'
 import { soOHopLe } from '../lib/so-o-tra-loi-ngan'
-import { taoDoTreoMay, type BoDoTreoMay } from '../lib/do-treo-may-thi'
+import type { BoDoTreoMayTrang } from '../lib/do-treo-may-thi'
 import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
 // Mảnh bố cục NGANG (01/10, thầy: "xoay ngang không hoạt động"): trước đây nạp lười NGOÀI precache, nạp hỏng một lần (mạng yếu, hay máy còn
@@ -115,6 +114,11 @@ function lamMoiManhNgang() {
 }
 // BÁO CÁO CHI TIẾT CA bản mới (BaoCaoChiTiet chế độ em, 28/09) — mảnh lazy ngoài precache.
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
+// Phiếu của em chỉ mở SAU khi nộp ⇒ nạp lười (22/10): trước đây nhập tĩnh làm đường vào thi /t tải thêm ~18 KB nén mà em đang thi không dùng.
+// Mảnh vẫn nằm trong precache (cổng học sinh / app thầy cũng dùng) ⇒ mở lúc mất mạng vẫn được.
+const PhieuScreen = lazy(() => import('./PhieuScreen'))
+// Tấm "Hỏi bài Thầy" chỉ mở khi em bấm SAU khi nộp ⇒ nạp lười (22/10, cùng lý do Phiếu của em; mảnh trong precache).
+const TamTruotHoiBai = lazy(() => import('../components/TamTruotHoiBai'))
 
 /** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
 function dangToanManHinh(): boolean {
@@ -182,8 +186,6 @@ const formatClock = dinhDangDongHo
  * chỉ gọi setState dạng hàm + ref + hàm nhập — hành vi không phụ thuộc lần vẽ. Dữ liệu (đề, `selected`, nhãn) vẫn so đủ. */
 const TheCauThi = memo(TheCau, bangPropsBoQuaHam)
 /** DỰNG ĐỀ DẦN (bố cục dọc): số thẻ dựng ngay khi vào đề, rồi mỗi lượt máy rảnh thêm bấy nhiêu thẻ. */
-/** Giữ màn sáng khi đang làm (đo treo máy 22/10, đặc tả mục 5): TẮT tới khi thầy duyệt — bật chỉ cần đổi hằng này. */
-const GIU_MAN_SANG = false
 const SO_THE_DAU = 3
 const BUOC_THE = 2
 
@@ -1677,33 +1679,17 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   // nhiều màn hình nhất (IntersectionObserver trên thẻ câu). Không đếm khi màn
   // bị ẩn. Lưu vào attempt mỗi 10 giây + lúc nộp — mở lại vẫn cộng tiếp.
   const giayCauRef = useRef<Record<string, number>>({})
-  /** ĐO TREO MÁY (thầy 22/10, src/lib/do-treo-may-thi.ts): giây ẩn / lặng / chạm giữ từng câu — chạy cùng nhịp 1 giây dưới, không setState. */
-  const doTreoRef = useRef<BoDoTreoMay | null>(null)
+  /** ĐO TREO MÁY (thầy 22/10, src/lib/do-treo-may-thi.ts — NẠP LƯỜI sau khi vào đề): giây ẩn / lặng / chạm giữ từng câu, chạy cùng nhịp 1 giây dưới, không setState. */
+  const doTreoRef = useRef<BoDoTreoMayTrang | null>(null)
   /** Bộ quan sát thẻ câu đang chạy — thẻ dựng dần (xem "DỰNG ĐỀ DẦN") được gắn thêm vào đây, KHÔNG dựng lại bộ đếm giây. */
   const ioCauRef = useRef<IntersectionObserver | null>(null)
   useEffect(() => {
     if (phase !== 'exam' || !assignment || flat.length === 0) return
     giayCauRef.current = { ...(attemptRef.current?.giayCau ?? {}) }
-    const doTreo = taoDoTreoMay(attemptRef.current?.doCau)
-    doTreoRef.current = doTreo
-    // Giữ màn sáng (Screen Wake Lock) lúc đang làm — đặc tả mục 5 chờ thầy duyệt ⇒ GIU_MAN_SANG TẮT: không xin, w = 0.
-    let khoaSang: { released?: boolean; release?: () => Promise<void> } | null = null
-    const xinSang = () => {
-      if (!GIU_MAN_SANG || khoaSang) return
-      const wl = (navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<{ released?: boolean; release?: () => Promise<void>; addEventListener?: (t: string, f: () => void) => void }> } }).wakeLock
-      if (!wl) return
-      wl.request('screen').then((k) => { khoaSang = k; k.addEventListener?.('release', () => { khoaSang = null }) }, () => { khoaSang = null })
-    }
-    const dangGiuSang = () => !!khoaSang && !khoaSang.released
-    xinSang()
-    const chamMan = () => doTreo.cham()
-    const SU_KIEN_CHAM = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel'] as const
-    for (const t of SU_KIEN_CHAM) document.addEventListener(t, chamMan, { capture: true, passive: true })
-    const anHien = () => {
-      if (document.hidden) doTreo.an()
-      else { doTreo.hien(); xinSang() }
-    }
-    document.addEventListener('visibilitychange', anHien)
+    let roiMan = false
+    void import('../lib/do-treo-may-thi').then(({ batDoTreoMay }) => {
+      if (!roiMan) doTreoRef.current = batDoTreoMay(attemptRef)
+    }, () => {})
     const qidCua = (stt: number): string | null => {
       const f = flat[stt - 1]
       if (!f) return null
@@ -1736,7 +1722,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         }
       })
       const qid = bestStt ? qidCua(bestStt) : null
-      doTreo.nhip(qid, dangGiuSang())
+      doTreoRef.current?.nhip(qid)
       if (!qid) return
       giayCauRef.current[qid] = (giayCauRef.current[qid] ?? 0) + 1
     }, 1000)
@@ -1744,14 +1730,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const cur = attemptRef.current
       if (!cur || cur.submitted) return
       cur.giayCau = { ...giayCauRef.current }
-      cur.doCau = doTreo.bang()
       luuNen(cur)
     }, 10000)
     return () => {
-      for (const t of SU_KIEN_CHAM) document.removeEventListener(t, chamMan, { capture: true })
-      document.removeEventListener('visibilitychange', anHien)
-      khoaSang?.release?.().catch(() => {})
-      khoaSang = null
+      roiMan = true
+      doTreoRef.current?.dung()
+      doTreoRef.current = null
       io.disconnect()
       if (ioCauRef.current === io) ioCauRef.current = null
       clearInterval(tick)
@@ -2327,7 +2311,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   const baoThayGianLan = (a: ExamAttempt) => {
     const url = scriptUrlRef.current.trim()
     if (!url) return
-    const luc = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
+    const luc = gioPhutNay() // = toLocaleTimeString vi-VN HH:mm, không dựng Intl (VanTay.tsx)
     const lyDo = laLyDoMoi(a.integrity.lyDoKhoa)
       ? `${TEN_LY_DO_KHOA[a.integrity.lyDoKhoa as LyDoKhoaMoi]}${a.integrity.kenhBao ? ` (${a.integrity.kenhBao})` : ''}`
       : a.integrity.lyDoKhoa === 'roi_qua_lau'
@@ -2411,7 +2395,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       clearTimeout(henLuuIdbRef.current)
       henLuuIdbRef.current = null
     }
-    const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, ...(doTreoRef.current ? { doCau: doTreoRef.current.bang() } : {}), submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
+    const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
     nhapNopRef.current = updated
     attemptRef.current = updated
     setAttempt(updated)
@@ -2747,7 +2731,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // React có thể chạy updater sau khi hàm đã trả về. Lấy nháp hiện hành từ ref để lưu ngay cùng đáp án vừa chọn.
     const cur = attemptRef.current
     if (!cur || cur.submitted) return
-    const next = { ...mutate(cur), giayCau: { ...giayCauRef.current }, ...(doTreoRef.current ? { doCau: doTreoRef.current.bang() } : {}) }
+    const next = { ...mutate(cur), giayCau: { ...giayCauRef.current } }
     attemptRef.current = next
     setAttempt(next)
     luuAttemptIdb(next, ngay)
@@ -3081,7 +3065,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         >
           <ArrowLeft size={16} /> Quay lại
         </button>
-        <PhieuScreen duCoSan={phieuCuaEmCoLink} laCuaEm xinLink={xinLinkBaiTap} />
+        <Suspense fallback={null}>
+          <PhieuScreen duCoSan={phieuCuaEmCoLink} laCuaEm xinLink={xinLinkBaiTap} />
+        </Suspense>
       </div>
     )
   }
@@ -3241,7 +3227,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       )
     }
     const soDaLam = attempt && assignment ? flat.filter((f) => daTraLoiEntry(attempt, assignment, f)).length : null
-    const gioNop = attempt?.submittedAt ? new Date(attempt.submittedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }) : ''
+    const gioNop = attempt?.submittedAt ? gioPhutNay(new Date(attempt.submittedAt)) : ''
     // Số liệu cho màn kết quả sau nộp (lib/ket-qua-sau-nop.ts): chỉ đọc điểm ĐÃ chấm bằng luật chính thức; lịch sử chưa về ⇒ ẩn chip "so với lần trước".
     const phanKq = graded ? phanTuDiem(graded.score) : []
     const dungTong = tongDungTong(phanKq)
@@ -3363,16 +3349,18 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         </div>
 
         {moHoiBai && (
-          <TamTruotHoiBai
-            cau={cauHoiBai}
-            daCongBo={Boolean(graded)}
-            daHoi={daGuiHoi?.qids ?? []}
-            ghiChuCu={daGuiHoi?.ghiChu ?? ''}
-            dang={dangGuiHoi}
-            loi={loiHoiBai}
-            dong={() => setMoHoiBai(false)}
-            gui={(q, g) => void guiHoiBai(q, g)}
-          />
+          <Suspense fallback={null}>
+            <TamTruotHoiBai
+              cau={cauHoiBai}
+              daCongBo={Boolean(graded)}
+              daHoi={daGuiHoi?.qids ?? []}
+              ghiChuCu={daGuiHoi?.ghiChu ?? ''}
+              dang={dangGuiHoi}
+              loi={loiHoiBai}
+              dong={() => setMoHoiBai(false)}
+              gui={(q, g) => void guiHoiBai(q, g)}
+            />
+          </Suspense>
         )}
 
         {htmlDe && <KhungXemPhieu html={htmlDe} ten="Đề của em kèm lời giải" dong={() => setHtmlDe('')} />}

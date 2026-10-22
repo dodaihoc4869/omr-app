@@ -5,7 +5,8 @@
 //   l = khoảng lặng dài nhất (giây tab hiện kể từ lần chạm trước), tính cả khoảng từ lần chạm cuối tới lúc nộp;
 //   n = số khoảng lặng 120–179 giây kết thúc bằng một lần chạm (chạm giữ cho đồng hồ chạy);
 //   w = 1 nếu màn được giữ sáng suốt mọi giây câu mở (bảng lưu ghi điều ngược lại: `wh` = 1 khi có giây KHÔNG giữ được).
-// Chỉ ExamTakeScreen nhập mô-đun này (đi chung mảnh màn thi, không thêm tệp nạp). Không setState: màn thi gọi trong nhịp 1 giây sẵn có.
+// ExamTakeScreen NẠP LƯỜI mô-đun này sau khi vào đề (cổng tốc độ: đường /t không mang thêm byte); mảnh nằm ở kho chạy-lúc (vite.config globIgnores),
+// mất mạng không nạp được thì chỉ thiếu số đo, bài thi không ảnh hưởng. Không setState: màn thi gọi `nhip` trong nhịp 1 giây sẵn có.
 
 /** Phần đo thêm của một câu, lưu cùng lượt làm (IndexedDB) để mở lại vẫn cộng dồn. */
 export interface DoTreoCau {
@@ -107,3 +108,42 @@ export function doGiayThi(giayCau: Record<string, number> | null | undefined, do
   }
   return Object.keys(ra).length > 0 ? ra : null
 }
+
+/** Giữ màn sáng khi đang làm (đặc tả mục 5): TẮT tới khi thầy duyệt — bật chỉ cần đổi hằng này. */
+export const GIU_MAN_SANG = false
+
+type KhoaSang = { released?: boolean; release?: () => Promise<void>; addEventListener?: (t: string, f: () => void) => void }
+
+/** Bật bộ đo trên trang thi: nghe chạm (pointerdown / keydown / input / touchstart / wheel), ẩn / hiện tab, giữ màn sáng (theo cờ).
+ *  Màn thi gọi `nhip(qid)` mỗi giây lúc tab hiện và `dung()` khi rời màn. Mỗi nhịp bộ đo TỰ ghi bảng vào lượt làm hiện hành (`luot.current.doCau`,
+ *  như màn thi tự ghi `giayCau`) ⇒ lưu IndexedDB / nộp cứ mang theo lượt làm là có, màn thi không phải ghép thêm (đường /t không thêm byte). */
+export function batDoTreoMay(luot: { current: { doCau?: Record<string, DoTreoCau>; submitted?: boolean } | null }, giuSang: boolean = GIU_MAN_SANG) {
+  const bo = taoDoTreoMay(luot.current?.doCau)
+  let khoa: KhoaSang | null = null
+  const xinSang = () => {
+    if (!giuSang || khoa) return
+    const wl = (navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<KhoaSang> } }).wakeLock
+    wl?.request('screen').then((k) => { khoa = k; k.addEventListener?.('release', () => { khoa = null }) }, () => { khoa = null })
+  }
+  const cham = () => bo.cham()
+  const anHien = () => { if (document.hidden) bo.an(); else { bo.hien(); xinSang() } }
+  const SU_KIEN = ['pointerdown', 'keydown', 'input', 'touchstart', 'wheel']
+  for (const t of SU_KIEN) document.addEventListener(t, cham, { capture: true, passive: true })
+  document.addEventListener('visibilitychange', anHien)
+  xinSang()
+  return {
+    nhip: (qid: string | null) => {
+      bo.nhip(qid, !!khoa && !khoa.released)
+      const cur = luot.current
+      if (cur && !cur.submitted) cur.doCau = bo.bang()
+    },
+    bang: bo.bang,
+    dung: () => {
+      for (const t of SU_KIEN) document.removeEventListener(t, cham, { capture: true })
+      document.removeEventListener('visibilitychange', anHien)
+      khoa?.release?.().catch(() => {})
+      khoa = null
+    },
+  }
+}
+export type BoDoTreoMayTrang = ReturnType<typeof batDoTreoMay>
