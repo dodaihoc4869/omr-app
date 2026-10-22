@@ -96,7 +96,7 @@ describe('HoSoCuaEmHs — em xem ĐỦ hồ sơ của chính mình', () => {
     expect(tam.querySelector('.hsv-nhan')?.textContent).toMatch(/lượt làm câu · đúng \d+ lượt/)
     expect(tam.querySelector('.gvv2-hs-hn')).toBeNull()
     for (const nhan of ['Đã làm', 'Đúng', 'Sai', 'Đã ôn', 'Giây trung bình']) expect(within(tam).getAllByText(nhan, { selector: 'dt' }).length).toBeGreaterThan(0)
-    for (const tieu of [/^Lịch làm bài theo ngày/, /^Độ đúng theo ngày/, /^Số giây mỗi lượt/, /^Sáu tín hiệu và ngưỡng/, /^Từng lượt/, /^Câu chưa sửa được/])
+    for (const tieu of [/^Lịch làm bài theo ngày/, /^Độ đúng theo ngày/, /^Số giây mỗi lượt/, /^Sáu tín hiệu và ngưỡng/, /^Từng lượt/, /^Câu từng sai/])
       expect(within(tam).getByRole('heading', { name: tieu })).toBeTruthy()
     expect([...tam.querySelectorAll('.hsv-gap summary')].map((x) => x.firstChild?.textContent)).toEqual(['Lịch làm bài 14 ngày', 'Sáu tín hiệu và ngưỡng', 'Số giây theo mức độ câu', 'Câu đúng · Câu đã ôn', 'Toàn bộ sổ của em'])
     expect(within(tam).getByRole('list', { name: 'Lịch làm bài theo ngày' }).children.length).toBe(TD.ngay.length)

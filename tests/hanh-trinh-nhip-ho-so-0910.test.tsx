@@ -238,8 +238,8 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
       'Câu từng sai21 câu chưa sửa được',
       'Trung bình mỗi câu52 giâylượt đo được, gồm ước tính',
     ])
-    // khối "Câu chưa sửa được" luôn hiện (không còn thẻ con)
-    expect(within(tam).getByRole('heading', { name: 'Câu chưa sửa được' })).toBeTruthy()
+    // khối "Câu từng sai" luôn hiện (không còn thẻ con)
+    expect(within(tam).getByRole('heading', { name: 'Câu từng sai' })).toBeTruthy()
     const cau = [...tam.querySelectorAll('.gvv2-hs-cau')]
     expect(cau).toHaveLength(2)
     expect(cau[0]!.textContent).toContain('Câu 25 · Hiệu suất ester hoá')

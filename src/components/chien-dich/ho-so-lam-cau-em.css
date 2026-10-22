@@ -321,7 +321,8 @@
 
 /* lưới thân: một cột; tấm rộng ≥ 880 px ⇒ hai cột 1,55 : 1 */
 .hsv-luoi { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-content: start; min-width: 0; }
-.hsv-cot { display: grid; gap: 20px; align-content: start; min-width: 0; }
+/* Mỗi cột là container `hslc` riêng: khối bên trong (ô mức, khối cũ trong ngăn gập ở cột phải ~430 px) xếp theo bề rộng CỘT, không theo cả tấm. */
+.hsv-cot { display: grid; gap: 20px; align-content: start; min-width: 0; container: hslc / inline-size; }
 @container hslc (min-width: 880px) { .hsv-luoi { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 24px; } }
 .hsv-khoi { display: grid; gap: 12px; min-width: 0; padding: 16px; border-radius: var(--r-vua, 16px); background: var(--gvm-mat); border: 1px solid var(--gvm-vien); }
 .hsv-khoi > h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0; font-size: 17px; font-weight: 800; color: var(--gvm-chu); }

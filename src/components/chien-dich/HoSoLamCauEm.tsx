@@ -224,7 +224,8 @@ const ngayGio = (iso: string) => {
 
 // ------------------------------------------------------------------ GIAO DIỆN
 
-const CHON_FOCUS = 'button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+// `summary`: ngăn gập (6 mức) phải vào được vòng Tab — bản học sinh / phụ huynh không có nút chân tấm sau các ngăn.
+const CHON_FOCUS = 'button:not([disabled]), [href], input:not([disabled]), select, textarea, summary, [tabindex]:not([tabindex="-1"])'
 const GIAI_THICH_CHUA_DO = 'Lượt này chưa đo được số giây (lượt cũ, hoặc máy chưa ghi giờ) — không ước đoán.'
 const GIAI_THICH_UOC = 'Số giây ước tính: tính từ lúc trả lời câu liền trước (lượt cũ chưa đo giờ).'
 
@@ -1376,14 +1377,14 @@ export default function HoSoLamCauEm({
               )}
               {cheDo !== 'thay' && kq && kq.cauSai.length > 0 && (
                 <section className="hsv-khoi" aria-labelledby="hsv-sua">
-                  <h3 id="hsv-sua">Câu chưa sửa được</h3>
+                  <h3 id="hsv-sua">Câu từng sai</h3>
                   <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} soCauCanSua={soCauCanSua} ngoi={ngoi} cheDo={cheDo} />
                 </section>
               )}
               {cheDo !== 'phu-huynh' && m6 && m6.theoNgay.length === 7 && <KhoiTheoNgay theoNgay={m6.theoNgay} cheDo={cheDo} />}
               {laThay && kq && kq.cauSai.length > 0 && (
                 <section className="hsv-khoi" aria-labelledby="hsv-sua">
-                  <h3 id="hsv-sua">Câu chưa sửa được</h3>
+                  <h3 id="hsv-sua">Câu từng sai</h3>
                   <DsCauSai cauSai={kq.cauSai} lan={kq.lan} onChuaCau={onChua} coTheChua={coTheChua} soCauCanSua={soCauCanSua} ngoi={ngoi} cheDo={cheDo} />
                 </section>
               )}

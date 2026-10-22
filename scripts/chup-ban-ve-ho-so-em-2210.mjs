@@ -169,10 +169,15 @@ async function manThat() {
   const goc = vite.resolvedUrls.local[0].replace(/\/$/, '')
   const RA = join(THU_MUC, 'that-anh')
   mkdirSync(RA, { recursive: true })
+  // Ảnh soát "mở hết ngăn gập" (nhiều trang mỗi khung) KHÔNG vào kho: ghi ra RA_GAP (mặc định thư mục tạm của máy) — chỉ chép vài trang tiêu biểu vào that-anh.
+  const RA_GAP = process.env.RA_GAP || join(process.env.TMPDIR || '/tmp', 'ho-so-6-muc-mo-gap')
+  mkdirSync(RA_GAP, { recursive: true })
   const soat = []
   const KHO = [['390', 390, 844], ['844-ngang', 844, 390], ['1440', 1440, 900]]
-  // [tên, che, trạng thái t, khổ, tối, cuộn tới lượt treo?]
+  // [tên, che, trạng thái t, khổ, tối, cuộn tới lượt treo? | 'gap' = mở MỌI ngăn gập + chụp TOÀN TẤM (soát cả nửa dưới, khối cũ trong ngăn)]
   const CANH = []
+  for (const [k, che] of [['thay', 'thay'], ['hs', 'hoc-sinh'], ['ph', 'phu-huynh']])
+    for (const ki of [0, 2]) for (const toi of [false, true]) CANH.push([`${k}-mo-gap-toan-bo-${KHO[ki][0]}-${toi ? 'toi' : 'sang'}`, che, 'dl', ki, toi, 'gap'])
   for (const [k, che] of [['thay', 'thay'], ['hs', 'hoc-sinh'], ['ph', 'phu-huynh']])
     for (const ki of [0, 1, 2]) for (const toi of [false, true]) CANH.push([`${k}-${KHO[ki][0]}-${toi ? 'toi' : 'sang'}`, che, 'dl', ki, toi, false])
   CANH.push(['thay-luot-treo-390-sang', 'thay', 'dl', 0, false, true], ['hs-luot-treo-390-toi', 'hoc-sinh', 'dl', 0, true, true], ['ph-luot-treo-390-sang', 'phu-huynh', 'dl', 0, false, true])
@@ -189,7 +194,12 @@ async function manThat() {
     await t.locator(tt === 'tai' ? '.hsv-xuong' : tt === 'loi' ? '.hsv-loi' : tt === 'rong' ? '.hsv-trong' : tt === 'mang' ? '.hsv-mang' : '#hsv-lan').first().waitFor()
     await t.evaluate(() => document.fonts.ready)
     await t.waitForTimeout(300)
-    if (cuonTreo) {
+    if (cuonTreo === 'gap') {
+      // Mở mọi ngăn gập (bấm thật — thân chỉ dựng khi mở), rồi trải tấm phủ thành trang thường để chụp toàn bộ.
+      for (const s of await t.locator('.hsv-gap summary').all()) await s.click()
+      await t.waitForTimeout(250)
+    }
+    if (cuonTreo === true) {
       await t.evaluate(() => {
         const el = document.querySelector('.hslc-lan[data-treo]')
         const than = el?.closest('.gvv2-hs-than')
@@ -212,6 +222,25 @@ async function manThat() {
     if (chong.length) soat.push(`${ten}: chip đầu tấm chồng nút Đóng: ${chong.join(' | ')}`)
     await t.addStyleTag({ content: '#minh-hoa{position:fixed;left:8px;bottom:8px;z-index:99999;padding:4px 10px;border-radius:999px;font:700 12px/1.4 system-ui,sans-serif;background:var(--gvm-chu);color:var(--gvm-mat);opacity:.9;pointer-events:none}' })
     await t.evaluate(() => { const d = document.createElement('div'); d.id = 'minh-hoa'; d.textContent = 'MÀN THẬT · số liệu minh hoạ'; document.body.append(d) })
+    if (cuonTreo === 'gap') {
+      // Mở hết ngăn: CUỘN thân tấm từng trang (bố cục thật, không trải CSS) — soát tràn / chạm / chữ / tương phản / lộ Mức 6 ở MỖI trang.
+      const { cao, nhin } = await t.evaluate(() => { const th = document.querySelector('.gvv2-hs-than'); return { cao: th.scrollHeight, nhin: th.clientHeight } })
+      const buoc = Math.max(200, nhin - 60)
+      const so = Math.ceil(Math.max(1, cao - nhin) / buoc) + 1
+      for (let i = 0; i < so; i++) {
+        await t.evaluate((y) => { document.querySelector('.gvv2-hs-than').scrollTop = y }, i * buoc)
+        await t.waitForTimeout(120)
+        const k = await t.evaluate(doTrongTrang, { goc: '.gvv2-hs', kiemLo: che !== 'thay', kiemChu: true })
+        if (k.tran) soat.push(`${ten}-phan-${i + 1}: TRÀN NGANG`)
+        if (k.nho.length) soat.push(`${ten}-phan-${i + 1}: đích chạm nhỏ ${[...new Set(k.nho)].slice(0, 4).join(' | ')}`)
+        if (k.nhoChu) soat.push(`${ten}-phan-${i + 1}: ${k.nhoChu} chữ < 12 px`)
+        if (k.tp.length) soat.push(`${ten}-phan-${i + 1}: tương phản thấp ${k.tp.join(' | ')}`)
+        if (k.lo.length) soat.push(`${ten}-phan-${i + 1}: LỘ MỨC 6: ${k.lo.join(', ')}`)
+        await luuAnh(t, join(RA_GAP, `${ten}-phan-${i + 1}.jpg`), soat, `${ten}-phan-${i + 1}`)
+      }
+      await ctx.close()
+      continue
+    }
     await luuAnh(t, join(RA, `${ten}.jpg`), soat, ten)
     await ctx.close()
   }

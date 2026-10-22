@@ -258,9 +258,9 @@ describe('bấm em ⇒ tấm Hồ sơ làm bài (trùng tu)', () => {
       ['ngay-du-muc', 'Chưa đủ dữ liệu'], ['qua-nhanh', 'Vượt ngưỡng'], ['don-bai', 'Trong ngưỡng'], ['goi-y', 'Trong ngưỡng'], ['chon-lap', 'Cần để mắt'], ['xu-huong', 'Chưa đủ dữ liệu'],
     ])
     expect(tam.textContent).toContain('Ngưỡng: Đáng lo khi từ 30%.')
-    // 6 mức: nút lọc "Từng lượt" + khối "Câu chưa sửa được" luôn hiện; Câu đúng · Câu đã ôn trong ngăn gập (mặc định Câu đúng)
+    // 6 mức: nút lọc "Từng lượt" + khối "Câu từng sai" luôn hiện; Câu đúng · Câu đã ôn trong ngăn gập (mặc định Câu đúng)
     expect([...tam.querySelectorAll('.hsv-loc [role="tab"]')].map((t) => t.textContent)).toEqual(['Tất cả · 2', 'Lượt sai · 1'])
-    expect(within(tam).getByRole('heading', { name: 'Câu chưa sửa được' })).toBeTruthy()
+    expect(within(tam).getByRole('heading', { name: 'Câu từng sai' })).toBeTruthy()
     expect([...tam.querySelectorAll('.hslc-the-con [role="tab"]')].map((t) => t.textContent)).toEqual(['Câu đúng · 2', 'Câu đã ôn · 1'])
     expect(within(tam).getByRole('tab', { name: /Câu đúng/ }).getAttribute('aria-selected')).toBe('true')
     const dung = [...tam.querySelectorAll('.gvv2-hs-o-the .gvv2-hs-cau')].map((x) => x.textContent)

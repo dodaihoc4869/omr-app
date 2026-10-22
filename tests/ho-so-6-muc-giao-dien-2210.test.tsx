@@ -84,6 +84,21 @@ describe('thầy: đủ 6 mức, Mức 6 ở ba chỗ (chip đầu tấm · th�
   })
 })
 
+describe('bàn phím: ngăn gập nằm trong vòng Tab của tấm', () => {
+  it('học sinh (không có nút chân tấm): Tab từ ngăn gập cuối về nút Đóng; Shift+Tab từ Đóng tới ngăn gập cuối', async () => {
+    const tam = await mo('hoc-sinh')
+    const gap = [...tam.querySelectorAll<HTMLElement>('.hsv-gap summary')]
+    expect(gap.length).toBeGreaterThan(0)
+    const cuoi = gap[gap.length - 1]!
+    const dong = within(tam).getByRole('button', { name: 'Đóng' })
+    dong.focus()
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(cuoi)
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(document.activeElement).toBe(dong)
+  })
+})
+
 describe('học sinh / phụ huynh: không bao giờ thấy Mức 6', () => {
   const sach = (tam: HTMLElement) => expect(tam.outerHTML).not.toMatch(/Cố tình|Mức làm 6|co_tinh|data-t="6"/)
 
