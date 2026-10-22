@@ -481,6 +481,10 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     } else if (viec?.startsWith('dd12c:')) {
       // LÀN ĐIỂM DANH 12/10C: chờ ô em vắng có nhóm Lười (Nhịp học đã về) rồi làm đúng một việc.
       const [, v, phim] = viec.split(':')
+      // 21/10 Hành trình một trang 4 bước: bước 1 có thể đang gập (đã có em điểm danh ⇒ mở sẵn bước 2) — mở lại bước 1 trước.
+      const moB1 = t.getByRole('button', { name: /^Mở (lại )?bước 1 · Điểm danh$/ })
+      await moB1.or(t.getByText(/em đang Lười/).first()).first().waitFor({ timeout: 20000 })
+      if (await moB1.isVisible()) await moB1.click()
       await t.getByText(/em đang Lười/).first().waitFor({ timeout: 20000 })
       if (v === 'chieu') {
         await t.getByRole('button', { name: 'Chiếu điểm danh', exact: true }).click()
