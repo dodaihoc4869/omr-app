@@ -1,6 +1,6 @@
 # Đặc tả · Hồ sơ học sinh ở 3 góc nhìn, Mức làm 6 mức (Đợt 2, 22/10/2026)
 
-Đây là bước 2 của quy trình 4 bước (`docs/quy-trinh-4-buoc-1310.md`). Thầy duyệt ảnh xong mới build. Làn: Code app 4 (đặc tả 6 mức, mục 6).
+Đây là bước 2 của quy trình 4 bước (`docs/quy-trinh-4-buoc-1310.md`). **THẦY ĐÃ DUYỆT 22/10 ~10:50 (bản @7f3bc31f): "duyệt bản vẽ, chốt 4 điểm như đề xuất, làm luôn nhé" — 4 điểm chốt cuối tệp lấy đúng phương án đề xuất.** Làn: Code app 4 (đặc tả 6 mức, mục 6).
 
 **Thầy yêu cầu (22/10):**
 - "giao diện hồ sơ của học sinh … tối ưu cả giao diện cho đầy đủ trực quan dễ nhìn thân thiện hơn nữa";
@@ -90,7 +90,7 @@ Lưới bên trong theo bề rộng **chính tấm** (`@container hslc`):
 
 **Học sinh** (`anh/hs-*`):
 - **Điểm nhấn**: số lớn "64 lượt làm câu · đúng 35 lượt" và một câu về nhịp học. Thay cho nhãn "Có dấu hiệu đối phó" to nhất màn của hiện trạng. Nhãn thái độ vẫn còn trong khối gập "Lịch làm bài".
-- **Em làm bài thế nào**: một câu tóm tắt, thanh chồng 5 mức của lượt sai, danh sách 5 dòng, rồi ô nhẹ màu hổ phách "Có 8 lượt máy để treo. Thời gian treo không tính vào số giây làm bài của em." (Không ghi ngưỡng phút: rời app 3 phút khi màn giữ sáng cũng là treo.)
+- **Em làm bài thế nào**: một câu tóm tắt, thanh chồng 5 mức của lượt sai, danh sách 5 dòng, rồi ô nhẹ màu hồng nhạt (`--gvm-ho-nen`) "Có 8 lượt máy để treo. Thời gian treo không tính vào số giây làm bài của em." (Không ghi ngưỡng phút: rời app 3 phút khi màn giữ sáng cũng là treo.)
 - **Từng lượt**: lọc Tất cả · Lượt sai · Máy để treo. Không có lọc "Chưa có số đo", vì đó là chữ nội bộ.
 - **3 câu đang chờ em tự sửa**: mỗi câu một nút viền "Sửa câu này", 44 px. Trên máy tính, khối này nằm ở cột phải, lên đầu.
 - Theo ngày, rồi các khối gập.
@@ -122,8 +122,8 @@ Không bỏ khối nào; chỉ dời và gập.
 **Thống nhất 6 mức (cả 3 app):**
 - Mỗi mức luôn có **chữ "Mức làm N" + tên + biểu tượng**:
   - Mức 1–4: ký hiệu bốn vạch, dải xanh `--hslc-m1..4` (giữ nguyên);
-  - Mức 5: vòng tròn "tạm dừng", họ hổ phách `--gvm-hp*`, sọc chéo trên thanh;
-  - Mức 6: bát giác cảnh báo, họ hồng `--gvm-ho*`, sọc dày.
+  - Mức 5: vòng tròn "tạm dừng", họ hồng `--gvm-ho*`, sọc chéo trên thanh (thầy duyệt bản @7f3bc31f; ĐỒNG BỘ bảng điểm danh — hổ phách `--gvm-hp*` là «Vội» Mức 1–2 bên đó nên treo máy không dùng);
+  - Mức 6: bát giác cảnh báo, hồng đậm `--gvm-ho-dam` ĐẶC, chữ sáng `--gvm-ho-nen`; thẻ bằng chứng nền hồng nhạt, chữ + viền hồng đậm.
 - 5 và 6 khác **họ màu** với 1–4, để không bị đọc là "mức cao hơn của làm kỹ".
 - Màu không bao giờ là kênh duy nhất: ô thanh nào cũng có số, chip nào cũng có chữ.
 - Không thêm màu mới. Chỉ dùng `--gvm-*` và `color-mix` / `repeating-linear-gradient` trên các biến ấy (`kiem:mau-giu` 0).
