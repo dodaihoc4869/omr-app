@@ -19,28 +19,33 @@ Trạng thái: **bản vẽ chờ thầy duyệt**. Chưa sửa `src/`, chưa s�
   - Dòng 1 chỉ còn "Đ…", năm dòng sau mất hẳn tên.
   - Nguyên nhân: lưới `52px 1fr auto minmax(168px,240px)` nằm trong cột hẹp chừng 440 px.
   - Cách sửa: "Vừa điểm danh" chiếm **cả bề ngang** bước 1. Ô "Xong điểm danh thì làm gì?" chuyển xuống dưới thành **một hàng** gồm lời dặn và nút chính. Nút chính vẫn là nút duy nhất của bước.
-- **Dòng tổng (mới), ngay dưới tiêu đề:** "14 ngày qua, trong 30 em có mặt:" kèm 4 nút lọc (cao ≥ 44 px, có `aria-pressed`):
-  - **Tất cả · 30**
-  - **Sai khi làm vội · 9** (viền hồng)
-  - **Treo máy · 6** (tím nhạt). Đếm **mọi em có ≥ 1 lượt treo** (Mức 5 hoặc 6), kể cả em chỉ 1 lượt chưa gắn chip.
-  - **Cố tình treo máy · 1** (tím đậm)
-  - Bấm một nút ⇒ danh sách chỉ còn các em ấy, hiện hết không cắt 6 dòng, kèm dòng "N em có treo máy trong 14 ngày · Bỏ lọc" (khung 03).
-- **Chú giải một dòng:**
-  - "Thanh 14 ngày: ▮▮▮▮ Mức làm 1 → 4 · ▨ Treo máy · ▮ Cố tình treo máy".
-  - Kèm câu "Màn riêng của thầy, không lên bản chiếu".
-  - Câu này thay đoạn giải thích 3 dòng đang có.
-- **Mỗi dòng em: hai tầng.**
-  - Tầng 1: giờ · **tên đủ** (không cắt; dòng hẹp thì xuống dòng) · chip nhóm/bậc (giữ nguyên) · bên phải tối đa **2 dấu hiệu**:
-    - "Cố tình treo máy · N lượt": tím đặc.
-    - Nếu không có dấu trên thì xét "Treo máy · N lượt": tím nhạt.
-    - "Sai khi làm vội · x/y": viền hồng. x/y là **lượt SAI**: x lượt sai ở Mức 1–2 trên y lượt sai có Mức làm 1–4. Đây là CÙNG số "x/y lượt sai là lúc làm vội" của hồ sơ em 14 ngày. Mức làm chỉ giải thích lượt sai; lượt đúng nộp nhanh không phải vội.
-  - Tầng 2: thanh 14 ngày gồm **6 đoạn** theo số lượt.
-    - Mức 1→4 giữ đúng 4 sắc xanh đang có.
-    - Mức 5 tím có sọc, Mức 6 tím đậm.
-    - Bên cạnh thanh là dòng số: "Mức làm 1–2: 12/15 lượt · Treo máy: 1 lượt · Cố tình treo máy: 3 lượt". Dòng phụ: "N lượt chưa đo treo máy · N lượt chưa có số đo".
-- **Theo khổ màn:**
-  - Điện thoại dọc (390): dấu hiệu xuống dưới tên; nút lọc xếp 2 cột.
-  - Điện thoại ngang (844) và máy tính (1440): dấu hiệu nằm cùng hàng với tên, căn phải.
+> **Bản 2 (22/10), làm theo góp ý của Boss sau khi soát ảnh:**
+> - 4 sắc xanh không phân biệt được vội với có nghĩ khi liếc.
+> - Dòng "chưa có số đo" lặp lại ở mọi dòng.
+> - Mức 6 phải là cờ trên tên em.
+> - Chip nhịp tranh chỗ với thanh.
+
+- **Dòng tổng (mới), ngay dưới tiêu đề:** "14 ngày qua, trong 30 em có mặt:" kèm 4 nút lọc (cao ≥ 44 px, `aria-pressed`):
+  - **Tất cả**
+  - **Sai vì vội nhiều** (nền hổ phách)
+  - **Treo máy**: em có ≥ 1 lượt treo (Mức 5 hoặc 6)
+  - **Cố tình treo máy** (nền hồng)
+  - Bấm một nút thì danh sách chỉ còn các em ấy và hiện hết, kèm dòng "N em … · Bỏ lọc" (khung 03).
+- **Chú giải một dòng:** Vội (Mức làm 1–2) · Có nghĩ (3–4) · Treo máy · Cố tình treo máy · "Màn riêng của thầy, không lên bản chiếu".
+- **Cột thẳng hàng (máy tính và điện thoại ngang), có đầu cột:**
+
+| Cột | Nội dung |
+|---|---|
+| Giờ | Giờ điểm danh |
+| **Em** | Tên đầy đủ, không cắt. Mức 6 là **cờ nổi ngay sau tên**: "⚑ Cố tình treo máy" trên nền hồng đặc, chỉ màn thầy. Chip nhịp (Chăm/Chưa đều/Lười) nằm **nhỏ ngay dưới tên**, không tranh chỗ với thanh nữa |
+| **Sai vì vội** | **Số % lớn** = lượt sai ở Mức 1–2 trên lượt sai có Mức làm 1–4, chữ nhỏ "9/10 lượt sai". Từ ngưỡng trở lên thì số tô hổ phách. Ít hơn 5 lượt sai ⇒ "—" và "ít lượt sai (2)" |
+| **Cách làm 14 ngày** | Thanh **3 nhóm màu có nghĩa**, đều là biến sẵn có: Vội (Mức 1–2) **hổ phách** `--gvm-hp` · Có nghĩ (3–4) **xanh lục** `--gvm-xl` · Treo **hồng sọc** `--gvm-ho` · Cố tình **hồng đậm** `--gvm-ho-dam`. Chữ nhỏ dưới thanh: "Vội 12 · Có nghĩ 3 · Treo 4 lượt" |
+| **Treo máy** | Số lượt treo 14 ngày. Từ 2 lượt trở lên thì ô nền hồng |
+
+- **Điện thoại dọc (390 px):** mỗi em 3 hàng. Hàng 1: giờ · tên · cờ · nhịp. Hàng 2: "Sai vì vội 90%" · "Treo 4 lượt". Hàng 3: thanh và chữ nhỏ, kéo hết bề ngang. Đầu cột ẩn, vì chú giải đã nói nghĩa màu.
+- **Chú thích CHUNG dưới danh sách** (thay dòng phụ lặp ở từng dòng): "% và thanh chỉ tính lượt đã đo giờ làm. 6 em đang hiện: 8 lượt chưa có số đo · 6 lượt làm trước khi đo treo máy … · ≈ = có lượt giây ước tính."
+- **Màu và luật giữ màu.** Thanh Mức làm của bảng điểm danh đổi từ 4 sắc xanh sang 3 nhóm. Phải thay quy tắc màu `.dd1-ml-thanh i[data-m]` đang có trong `diem-danh-buoc1.css`, mà `kiem:mau-giu` coi đó là đổi màu đang có. Cần một trong hai: Boss duyệt ngoại lệ có ghi lại; hoặc giữ nguyên quy tắc cũ (không còn dùng) và thêm lớp mới `data-g`. Đề xuất cách thứ hai: không đụng màu cũ, `mau-giu` vẫn 0.
+- **Hồ sơ em và tờ chiếu GIỮ 4 sắc xanh Mức 1–4,** vì ở đó cần đủ 4 mức. Bảng điểm danh chỉ cần trả lời nhanh "vội hay có nghĩ".
 - **Phần giữ nguyên.** Ô mã, ô có mặt, ô vắng, thêm em tay, bớt em nhầm. Trên bản vẽ các phần này tô mờ và gắn nhãn "Giữ nguyên".
 
 ### 2b. Tờ chiếu «Ai đã sai?» (khung 11–13; tờ chiếu chỉ có nền tối)
@@ -60,9 +65,9 @@ Trạng thái: **bản vẽ chờ thầy duyệt**. Chưa sửa `src/`, chưa s�
 | Đang tải | Dòng em vẫn hiện ngay. Thanh mờ kèm "Đang đo…". Lệnh được hỏi sau khi danh sách ổn định, như hiện nay (khung 04). | Giữ như hiện nay. |
 | Lỗi / mất mạng | Dải hồng: "Chưa tải được Mức làm 14 ngày…: lý do · **Thử tải lại**". Dòng lỗi ghi "Chưa tải được Mức làm". Điểm danh không bị chặn (khung 04). | Giữ như hiện nay. |
 | Trống | "Chưa có lượt 14 ngày qua" · "Chưa có số đo (N lượt)". | Không có lượt treo ⇒ làn Treo máy mờ, ghi "0 lượt". |
-| **Những ngày đầu: chưa đo treo máy** (trạng thái chính tuần đầu) | Dòng tổng thay hai nút Treo bằng ô nét đứt "Treo máy: đo từ lượt làm sau 23/10". Từng dòng vẫn có Mức 1–4 và dấu "Sai khi làm vội". Chip "Chưa đo treo máy" **không lặp** ở từng dòng (khung 02). | Làn "Treo máy" nét đứt, ghi "Chưa đo — lượt làm trước 23/10 chưa ghi khoảng treo máy" (khung 13). |
-| Một số lượt chưa đo | Dòng phụ "6 lượt chưa đo treo máy". Nếu cả 14 ngày của em đều chưa đo (máy em chưa nạp bản mới) ⇒ chip nét đứt "Chưa đo treo máy". | Lượt chưa đo nằm trong làn Mức 1–4 như cũ. |
-| Ít lượt | "Ít lượt sai có số đo (2) — chưa kết luận". Không gắn dấu "Sai khi làm vội". | — |
+| **Những ngày đầu: chưa đo treo máy** (trạng thái chính tuần đầu) | Dòng tổng thay hai nút Treo bằng ô nét đứt "Treo máy: đo từ lượt làm sau 23/10". Cột Treo máy ghi "—", đầu cột ghi "đo từ 23/10". Ô "Sai vì vội" và thanh Vội/Có nghĩ vẫn đủ (khung 02). | Làn "Treo máy" nét đứt, ghi "Chưa đo — lượt làm trước 23/10 chưa ghi khoảng treo máy" (khung 13). |
+| Một số lượt chưa đo | Gom vào **chú thích chung** dưới danh sách ("N lượt làm trước khi đo treo máy"), không lặp ở từng dòng. | Lượt chưa đo nằm trong làn Mức 1–4 như cũ. |
+| Ít lượt | Ô "Sai vì vội" ghi "—" và "ít lượt sai (2)". Không tô, không vào bộ lọc. | — |
 | Có số ước tính | Giữ dấu "≈" như hiện nay. | Giữ như hiện nay. |
 
 ## 4. Dữ liệu — theo lõi Boss (nhánh `claude/stoic-einstein-7jkysb` @e7e4760c, 22/10)
@@ -94,14 +99,16 @@ Kiểu `MucLamEmLo` (server/src/muc-lam-lo.ts; bên app đọc ở src/lib/muc-l
 - App vẫn hạ thêm một lần ở `src/components/chien-dich/ghi-to-chieu.ts` (tin `AI_SAI_TRA` và `HO_SO_TRA`): `co_tinh` ⇒ `treo`, `soCoTinh` cộng vào `soTreo`. Lớp này để phòng máy chủ cũ.
 - Tin gửi vào iframe và HTML tờ chiếu **không chứa** «Cố tình», `co_tinh`, `coTinh` hay `soCoTinh` (có test, mục 7).
 
-### 4d. Dấu hiệu từng dòng — hàm thuần, ngưỡng TẠM
-Đặt ở `src/lib/muc-lam-lo-api.ts`, tên `dauHieuEm`. Trả tối đa 2 dấu. Bộ lọc dùng hàm riêng `coDauHieu` (lọc "Treo máy" = `soTreo + soCoTinh ≥ 1`).
+### 4d. Hàm thuần, ngưỡng TẠM
+Đặt ở `src/lib/muc-lam-lo-api.ts`.
 
-| Dấu | Điều kiện |
+| Hàm / ô | Điều kiện |
 |---|---|
-| "Cố tình treo máy · N lượt" | `soCoTinh > 0` |
-| "Treo máy · N lượt" | (không có dấu trên) và `soTreo + soCoTinh ≥ 2`. Một lượt treo có thể chỉ là em nghe điện thoại, nên chỉ hiện ở dòng số. |
-| "Sai khi làm vội · x/y" | `saiLamVoi + saiDuNghi` ≥ **5** lượt sai và `saiLamVoi` / (`saiLamVoi + saiDuNghi`) ≥ **50%** |
+| `tiLeSaiVoi(em)` | `saiLamVoi / (saiLamVoi + saiDuNghi)` khi tổng ≥ **5**; dưới 5 ⇒ null ("ít lượt sai") |
+| Lọc "Sai vì vội nhiều" · tô % hổ phách | `tiLeSaiVoi ≥ 50%` |
+| Lọc "Treo máy" | `soTreo + soCoTinh ≥ 1` |
+| Ô Treo máy tô hồng | `soTreo + soCoTinh ≥ 2` (1 lượt có thể chỉ là em nghe điện thoại) |
+| Cờ "Cố tình treo máy" | `soCoTinh > 0` |
 
 ## 5. Ngoại lệ và việc cần thầy quyết
 - **Màn Hành trình hay được chiếu lên máy chiếu lớp.** Bản vẽ hiện "Cố tình treo máy" bằng chữ rõ trên dòng, đúng ý "chỉ thầy thấy" của đặc tả chung. Nếu thầy hay chiếu màn này, có hai cách:
@@ -109,7 +116,7 @@ Kiểu `MucLamEmLo` (server/src/muc-lam-lo.ts; bên app đọc ở src/lib/muc-l
   - (b) Dòng chỉ hiện "Treo máy"; chữ "Cố tình" chỉ hiện trong hồ sơ em (bấm em mới thấy).
   - **Thầy chọn (a) hay (b).** Không chọn thì làm theo (a).
 - **Lọc khi danh sách > 40 em có mặt.** Chỉ hỏi 40 em đầu. Dòng tổng ghi "trong 40 em đầu" để không nói sai.
-- **Tên dài (30 ký tự).** Tầng 1 tự xuống dòng, không cắt.
+- **Tên dài (30 ký tự).** Cột Em tự xuống dòng, không cắt; cờ Cố tình xuống theo.
 - **Bấm lặp nút lọc** ⇒ bật/tắt. Đổi bộ lọc không gọi lại máy chủ.
 - **Đổi tab rồi quay lại.** Số được đệm 5 phút ở máy chủ, như hiện nay.
 - **Máy yếu.** Thanh là CSS thuần, không có hoạt ảnh.
@@ -141,5 +148,5 @@ Kiểu `MucLamEmLo` (server/src/muc-lam-lo.ts; bên app đọc ở src/lib/muc-l
     - Tin `AI_SAI_TRA`, tin `HO_SO_TRA` và HTML tờ **không** có "Cố tình", `co_tinh`, `coTinh`, `soCoTinh`.
     - Khổ ≤ 1100 px chỉ một thẻ, có phím L.
 - **Cổng:** `npm run kiem:toc-do` 0 đỏ · `npm run kiem:mau-giu` 0 · precache ≤ 169.
-- **Ảnh Chromium** (bản vẽ đã soát bằng máy, 33 ảnh): 0 lỗi trang · 0 tràn ngang · 0 đích chạm < 44 px · 0 chữ < 12 px · 0 tương phản < 4,5:1 (sáng và tối) · 0 thẻ chiếu bị cắt · 0 tên "…" · 0 chữ "Cố tình" trên tờ chiếu.
+- **Ảnh Chromium** (bản vẽ đã soát bằng máy, 33 ảnh): 0 lỗi trang · 0 tràn ngang · 0 ô chồng nhau trong dòng em · 0 đích chạm < 44 px · 0 chữ < 12 px · 0 tương phản < 4,5:1 (sáng và tối) · 0 thẻ chiếu bị cắt · 0 tên "…" · 0 chữ "Cố tình" trên tờ chiếu.
 - Khi build xong: chụp lại bằng bộ chụp màn thật `scripts/chup-v2` (cảnh `dd12c:muc`, đã sửa để mở bước 1) và `scripts/chup-muc-lam-2110/chup-chieu.mjs`, rồi so với bản vẽ đã duyệt.

@@ -13,7 +13,7 @@
 
 | Khung | Tệp | Lúc nào |
 |---|---|---|
-| 01 | `anh/01-diem-danh-6-muc-*` | Sau khi Đợt 1 lên bản thật: dòng tổng có 4 nút lọc, mỗi dòng em 2 tầng với dấu hiệu và thanh 6 đoạn |
+| 01 | `anh/01-diem-danh-6-muc-*` | Sau khi Đợt 1 lên bản thật (bản 2, theo góp ý của Boss): dòng tổng có 4 nút lọc; cột thẳng hàng gồm Em (cờ Cố tình nằm trên tên) · **% Sai vì vội** (số lớn) · thanh 3 nhóm Vội / Có nghĩ / Treo · Treo máy; dưới danh sách là chú thích chung |
 | 02 | `anh/02-ngay-dau-chua-do-treo-*` | **Tuần đầu (trạng thái chính):** chưa lượt nào đo treo máy. Dòng tổng ghi "Treo máy: đo từ lượt làm sau 23/10" |
 | 03 | `anh/03-loc-treo-may-*` | Thầy bấm "Treo máy": danh sách chỉ còn 6 em có ít nhất 1 lượt treo, gồm cả em cố tình và em chỉ treo 1 lượt (em ấy chưa gắn chip) |
 | 04 | `anh/04-dang-do-va-loi-*` | Một dòng đang đo, một dòng không tải được và có nút Thử tải lại. Các dòng khác vẫn đúng |
@@ -34,6 +34,6 @@
   - Tờ chiếu: `scripts/chup-muc-lam-2110/chup-chieu.mjs`.
 
 ## Kết quả soát bằng máy (33 ảnh bản vẽ)
-0 lỗi trang · 0 tràn ngang · 0 đích chạm < 44 px · 0 chữ < 12 px · 0 tương phản < 4,5:1 · 0 thẻ chiếu bị cắt · 0 tên "…" · 0 chữ "Cố tình" trên tờ chiếu.
+0 lỗi trang · 0 tràn ngang · 0 ô chồng nhau trong dòng em · 0 đích chạm < 44 px · 0 chữ < 12 px · 0 tương phản < 4,5:1 · 0 thẻ chiếu bị cắt · 0 tên "…" · 0 chữ "Cố tình" trên tờ chiếu.
 
 Nhãn viền đứt "Giữ nguyên / Đổi / Đổi chỗ" chỉ để thầy đọc bản vẽ, app không có các nhãn này.

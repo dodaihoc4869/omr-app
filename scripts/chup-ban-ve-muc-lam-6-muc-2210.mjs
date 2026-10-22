@@ -50,7 +50,13 @@ const SOAT_TRANG = (laChieu) => {
   const cat = laChieu ? [...goc.querySelectorAll('.the-ai, .ai')].filter((x) => x.scrollHeight > x.clientHeight + 1).map((x) => `${x.className.split(' ')[0]} ${x.scrollHeight}>${x.clientHeight}`) : []
   const bachan = laChieu ? [...goc.querySelectorAll('.pl b')].filter((b) => b.scrollWidth > b.clientWidth + 1).length : 0
   const coTinh = laChieu && /Cố tình/i.test(goc.innerText)
-  return { tran, nho, chuNho, tuongPhan: [...new Set(tuongPhan)].slice(0, 6), cat, bachan, coTinh }
+  // CHỒNG CHỮ: các ô con trực tiếp của một dòng em không được đè lên nhau (lỗi 390 px đã gặp 22/10)
+  let chong = 0
+  for (const d of goc.querySelectorAll('.dd-dong')) {
+    const o = [...d.children].filter(hien).map((x) => x.getBoundingClientRect())
+    for (let i = 0; i < o.length; i++) for (let j = i + 1; j < o.length; j++) { const a = o[i], b = o[j]; if (a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1) chong++ }
+  }
+  return { tran, nho, chuNho, tuongPhan: [...new Set(tuongPhan)].slice(0, 6), cat, bachan, coTinh, chong }
 }
 
 async function chup(t, ten, toanTrang) {
@@ -75,6 +81,7 @@ for (const [k, ten] of KHUNG_DD) for (const [tk, w, h, dpr] of KHO_DD) for (cons
   if (kq.tran) soat.push(`${nhan}: TRÀN NGANG`)
   if (kq.nho) soat.push(`${nhan}: ${kq.nho} đích chạm < 44 px`)
   if (kq.chuNho) soat.push(`${nhan}: ${kq.chuNho} chữ < 12 px`)
+  if (kq.chong) soat.push(`${nhan}: ${kq.chong} cặp ô chồng nhau trong dòng em`)
   if (kq.tuongPhan.length) soat.push(`${nhan}: tương phản thấp ${kq.tuongPhan.join(', ')}`)
   await chup(t, nhan, true)
   await ctx.close()
@@ -101,4 +108,4 @@ for (const [k, ten] of KHUNG_C) for (const [tk, w, h] of KHO_C) {
   await ctx.close()
 }
 await trinh.close(); may.close()
-console.log(soat.length ? `SOÁT: ${soat.length} vấn đề\n- ${soat.join('\n- ')}` : 'SOÁT: 0 lỗi trang · 0 tràn ngang · 0 đích chạm < 44 px · 0 chữ < 12 px · 0 tương phản thấp · 0 thẻ chiếu bị cắt · 0 tên "…" · 0 chữ Cố tình trên tờ chiếu')
+console.log(soat.length ? `SOÁT: ${soat.length} vấn đề\n- ${soat.join('\n- ')}` : 'SOÁT: 0 lỗi trang · 0 tràn ngang · 0 ô chồng nhau · 0 đích chạm < 44 px · 0 chữ < 12 px · 0 tương phản thấp · 0 thẻ chiếu bị cắt · 0 tên "…" · 0 chữ Cố tình trên tờ chiếu')

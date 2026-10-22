@@ -41,9 +41,9 @@ button { font: inherit; color: inherit; }
 .tong-nut svg { width: 18px; height: 18px; fill: currentColor; flex: none; }
 .tong-nut[data-k='tat'] svg { fill: none; stroke: currentColor; stroke-width: 2; }
 .tong-nut b { min-width: 24px; padding: 1px 7px; border-radius: 999px; background: var(--gvm-mat-2); font-variant-numeric: tabular-nums; text-align: center; }
-.tong-nut[data-k='voi'] { color: var(--gvm-ho); border-color: color-mix(in srgb, var(--gvm-ho) 45%, var(--gvm-vien)); }
-.tong-nut[data-k='treo'] { color: var(--gvm-tim); border-color: color-mix(in srgb, var(--gvm-tim) 45%, var(--gvm-vien)); }
-.tong-nut[data-k='co-tinh'] { color: var(--gvm-tim-dam); border-color: var(--gvm-tim); }
+.tong-nut[data-k='voi'] { color: var(--gvm-hp-dam); border-color: var(--gvm-hp); background: var(--gvm-hp-nen); }
+.tong-nut[data-k='treo'] { color: var(--gvm-ho); border-color: color-mix(in srgb, var(--gvm-ho) 45%, var(--gvm-vien)); }
+.tong-nut[data-k='co-tinh'] { color: var(--gvm-ho-dam); border-color: var(--gvm-ho); background: var(--gvm-ho-nen); }
 .tong-nut[aria-pressed='true'] { background: var(--gvm-xd); border-color: var(--gvm-xd); color: var(--gvm-tren-dac); }
 .tong-nut[aria-pressed='true'] b { background: color-mix(in srgb, var(--gvm-tren-dac) 22%, transparent); }
 .tong-nut:focus-visible, .dd-dong:focus-visible, .nut-chu:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; }
@@ -52,56 +52,67 @@ button { font: inherit; color: inherit; }
 .loc-dong { font-size: 14px; color: var(--gvm-chu-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .loc-dong b { color: var(--gvm-chu); }
 .loi { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 8px 12px; border-radius: 14px; background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-size: 14px; }
 .loi .nut-chu { color: inherit; text-decoration: underline; }
-/* chú giải */
+/* chú giải + màu 3 nhóm (biến có nghĩa sẵn có: hổ phách = cảnh báo, lục = tốt, hồng = lỗi) */
 .chu-giai { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 12px; color: var(--gvm-chu-3); }
-.chu-giai > span { display: inline-flex; align-items: center; gap: 4px; } .cg-tieu { font-weight: 700; color: var(--gvm-chu-2); } .cg-rieng { margin-left: auto; font-style: italic; }
-.chu-giai i { display: inline-block; width: 14px; height: 8px; border-radius: 2px; }
-/* sáu đoạn — cùng công thức màu Mức làm 1–4 đang có (diem-danh-buoc1.css); 5 = tím sọc, 6 = tím đặc */
-[data-m='1'] { --mm: color-mix(in srgb, var(--gvm-xd) 24%, var(--gvm-mat-2)); } [data-m='2'] { --mm: color-mix(in srgb, var(--gvm-xd) 46%, var(--gvm-mat-2)); }
-[data-m='3'] { --mm: color-mix(in srgb, var(--gvm-xd) 72%, var(--gvm-mat-2)); } [data-m='4'] { --mm: var(--gvm-xd); }
-.chu-giai i[data-m], .ml-thanh i[data-m] { background: var(--mm); }
-.chu-giai i[data-m='5'], .ml-thanh i[data-m='5'] { background: repeating-linear-gradient(135deg, var(--gvm-tim) 0 3px, var(--gvm-tim-nen) 3px 6px); }
-.chu-giai i[data-m='6'], .ml-thanh i[data-m='6'] { background: var(--gvm-tim-dam); }
-/* danh sách */
+.chu-giai > span { display: inline-flex; align-items: center; gap: 5px; } .cg-rieng { margin-left: auto; font-style: italic; }
+.chu-giai i { display: inline-block; width: 16px; height: 9px; border-radius: 3px; }
+[data-g='voi'] { background: var(--gvm-hp); } [data-g='nghi'] { background: var(--gvm-xl); }
+[data-g='treo'] { background: repeating-linear-gradient(135deg, var(--gvm-ho) 0 3px, var(--gvm-ho-nen) 3px 6px); } [data-g='co-tinh'] { background: var(--gvm-ho-dam); }
+/* CỘT THẲNG HÀNG: giờ · em · % sai vì vội · thanh · treo máy */
+.dau-cot, .dd-dong { display: grid; grid-template-columns: 48px minmax(150px, 1.15fr) 104px minmax(180px, 1.5fr) 92px; align-items: center; column-gap: 16px; }
+.dau-cot { padding: 0 8px 6px; border-bottom: 1px solid var(--gvm-vien); font-size: 12px; font-weight: 800; color: var(--gvm-chu-2); }
+.dau-cot small { display: block; font-weight: 500; color: var(--gvm-chu-3); }
 .vua-ds { display: grid; }
-.dd-dong { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: start; gap: 12px; width: 100%; min-height: 64px; padding: 10px 8px; border: 0; border-top: 1px solid var(--gvm-mat-2); background: none; text-align: left; cursor: pointer; touch-action: manipulation; }
+.dd-dong { width: 100%; min-height: 64px; padding: 10px 8px; border: 0; border-bottom: 1px solid var(--gvm-mat-2); background: none; text-align: left; cursor: pointer; touch-action: manipulation; }
 .dd-dong:hover { background: var(--gvm-mat-2); }
-.dd-gio { padding-top: 3px; font-size: 13px; color: var(--gvm-chu-3); font-variant-numeric: tabular-nums; }
-.dd-than { display: grid; gap: 6px; min-width: 0; }
-.dd-h1 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
-.dd-ten { font-size: 16px; font-weight: 800; min-width: 0; overflow-wrap: anywhere; }
-.dd-chip { padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; background: var(--gvm-mat-2); color: var(--gvm-chu-2); white-space: nowrap; }
+.dd-gio { font-size: 13px; color: var(--gvm-chu-3); font-variant-numeric: tabular-nums; }
+.o-em { display: grid; gap: 4px; min-width: 0; justify-items: start; }
+.o-ten { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.dd-ten { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+.co-tinh { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px 2px 7px; border-radius: 6px; background: var(--gvm-ho); color: var(--gvm-tren-dac); font-size: 12px; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 0 var(--gvm-ho-dam); }
+.co-tinh svg { width: 13px; height: 13px; fill: currentColor; }
+.dd-chip { padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--gvm-mat-2); color: var(--gvm-chu-2); white-space: nowrap; }
 .dd-chip[data-nhom='cham'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); } .dd-chip[data-nhom='chua-deu'] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); } .dd-chip[data-nhom='luoi'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
-.dd-dh { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
-.dh { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 8px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; border: 1.5px solid; font-variant-numeric: tabular-nums; }
-.dh svg { width: 14px; height: 14px; fill: currentColor; flex: none; }
-.dh[data-k='voi'] { color: var(--gvm-ho); border-color: var(--gvm-ho); background: var(--gvm-mat); }
-.dh[data-k='treo'] { color: var(--gvm-tim-dam); border-color: var(--gvm-tim); background: var(--gvm-tim-nen); }
-.dh[data-k='co-tinh'] { color: var(--gvm-tren-dac); border-color: var(--gvm-tim-dam); background: var(--gvm-tim-dam); }
-.dd-h2 { display: grid; grid-template-columns: minmax(140px, 300px) minmax(0, 1fr); align-items: center; gap: 4px 14px; }
-.ml-thanh { display: flex; gap: 2px; height: 10px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--gvm-chu-3) 14%, transparent); }
-.ml-thanh i { display: block; flex-basis: 0; min-width: 5px; }
+.o-voi { display: grid; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.o-voi b { font-size: 26px; font-weight: 900; color: var(--gvm-chu-2); }
+.o-voi[data-nhieu] b { color: var(--gvm-hp); }
+.o-voi small { font-size: 12px; color: var(--gvm-chu-3); }
+.o-voi--trong, .o-treo--trong { font-size: 18px; color: var(--gvm-chu-3); }
+.o-voi--it b { font-size: 20px; color: var(--gvm-chu-3); }
+.o-thanh { display: grid; gap: 5px; min-width: 0; }
+.o-thanh small { font-size: 12px; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; } .o-thanh small b { color: var(--gvm-chu); }
+.o-thanh small.nghieng { font-style: italic; color: var(--gvm-chu-3); }
+.ml-thanh { display: flex; gap: 2px; height: 12px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--gvm-chu-3) 14%, transparent); }
+.ml-thanh i { display: block; flex-basis: 0; min-width: 6px; }
 .ml-thanh--cho { opacity: .5; }
-.ml-chu { font-size: 13px; line-height: 1.4; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; } .ml-chu b { color: var(--gvm-chu); font-weight: 800; }
-.ml-chu small { display: block; font-size: 12px; color: var(--gvm-chu-3); }
-.ml-chu--nghieng { font-style: italic; color: var(--gvm-chu-3); }
-.ml-chua-treo { display: inline-block; padding: 0 8px; border: 1px dashed var(--gvm-chu-3); border-radius: 999px; font-style: italic; }
+.o-treo { display: inline-flex; align-items: center; gap: 5px; justify-self: start; padding: 3px 10px 3px 8px; border-radius: 999px; font-size: 13px; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; }
+.o-treo svg { width: 13px; height: 13px; fill: currentColor; } .o-treo b { font-size: 16px; }
+.o-treo[data-nhieu='1'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-weight: 700; }
+.chu-chung { font-size: 12px; line-height: 1.5; color: var(--gvm-chu-3); } .chu-chung b { color: var(--gvm-chu-2); }
 .nut-chu { min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--gvm-xd); font-size: 14px; font-weight: 700; cursor: pointer; justify-self: start; }
 .xong { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 18px; border-radius: 22px; background: var(--gvm-mat-2); }
 .xong p { flex: 1 1 320px; font-size: 14px; line-height: 1.6; color: var(--gvm-chu-2); } .xong p b { color: var(--gvm-chu); }
 .nut-chinh { min-height: 52px; padding: 0 22px; border: 0; border-radius: 16px; background: var(--gvm-xd); color: var(--gvm-tren-dac); font-size: 16px; font-weight: 800; box-shadow: var(--gvm-bong-nut); cursor: pointer; }
 @media (max-width: 860px) {
-  .trang { padding: 12px 12px 32px; } .b1 { padding: 16px; border-radius: 24px; gap: 16px; }
+  .trang { padding: 34px 12px 32px; } .b1 { padding: 16px; border-radius: 24px; gap: 16px; }
   .giu { grid-template-columns: 1fr 1fr; } .giu-vang { grid-column: 1 / -1; }
   .vua { padding: 14px; }
-  .dd-h2 { grid-template-columns: minmax(0, 1fr); }
-  .cg-rieng { margin-left: 0; width: 100%; }
+  .dau-cot, .dd-dong { grid-template-columns: 44px minmax(120px, 1fr) 84px minmax(140px, 1.2fr) 70px; column-gap: 10px; }
+  .o-voi b { font-size: 22px; }
 }
+/* ĐIỆN THOẠI DỌC: không đủ 5 cột ⇒ mỗi em 3 hàng: (giờ · tên · cờ) / (nhịp · % · treo) / thanh cả bề ngang; đầu cột ẩn (chú giải đã nói nghĩa màu) */
 @media (max-width: 600px) {
-  .dd-dong { grid-template-columns: 40px minmax(0, 1fr); gap: 8px; padding-inline: 4px; }
-  .dd-dh { margin-left: 0; width: 100%; }
+  .dau-cot { display: none; }
+  .dd-dong { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: 'gio em em' '. voi treo' '. thanh thanh'; row-gap: 6px; column-gap: 8px; padding-inline: 4px; }
+  .dd-gio { grid-area: gio; align-self: start; padding-top: 3px; } .o-em { grid-area: em; grid-template-columns: auto; } .o-voi { grid-area: voi; } .o-treo { grid-area: treo; justify-self: end; } .o-thanh { grid-area: thanh; }
+  .o-em { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+  .o-voi { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; min-width: 0; } .o-voi b { font-size: 22px; }
+  .o-voi::before { content: 'Sai vì vội'; font-size: 12px; color: var(--gvm-chu-3); white-space: nowrap; } .o-voi small { white-space: nowrap; }
+  .o-treo::before { content: 'Treo'; font-size: 12px; font-weight: 500; color: var(--gvm-chu-3); white-space: nowrap; } .o-treo[data-nhieu='1']::before { color: inherit; }
+  .o-treo--trong { font-size: 14px; }
+  .o-voi--trong::before { content: none; }
   .tong-nuts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; } .tong-nut { padding-inline: 8px 10px; font-size: 13px; gap: 5px; } .tong-nut span { min-width: 0; } .tong-nut b { margin-left: auto; }
-  .tong-cho { grid-column: span 2; } .trang { padding-top: 34px; } .nut-chinh { width: 100%; }
+  .tong-cho { grid-column: span 2; } .cg-rieng { margin-left: 0; width: 100%; } .nut-chinh { width: 100%; }
 }
 
 </style></head><body>
@@ -115,56 +126,42 @@ button { font: inherit; color: inherit; }
     <p class="tong-chu">14 ngày qua, trong <b>30</b> em có mặt:</p>
     <div class="tong-nuts">
       <button type="button" class="tong-nut" data-k="tat" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.2 4.2 1.7 4.5 4.3"/></svg><span>Tất cả</span><b>30</b></button>
-      <button type="button" class="tong-nut" data-k="voi" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Sai khi làm vội</span><b>9</b></button>
+      <button type="button" class="tong-nut" data-k="voi" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Sai vì vội nhiều</span><b>9</b></button>
       <button type="button" class="tong-nut" data-k="treo" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span>Treo máy</span><b>6</b></button><button type="button" class="tong-nut" data-k="co-tinh" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg><span>Cố tình treo máy</span><b>1</b></button>
     </div>
   </div>
       
       
       <p class="chu-giai" aria-label="Chú giải thanh 14 ngày">
-  <span class="cg-tieu">Thanh 14 ngày:</span>
-  <span><i data-m="1"></i><i data-m="2"></i><i data-m="3"></i><i data-m="4"></i>Mức làm 1 → 4</span>
-  <span><i data-m="5"></i>Treo máy</span>
-  <span><i data-m="6"></i>Cố tình treo máy</span>
-  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span>
-</p>
-      <ul class="vua-ds"><li><button type="button" class="dd-dong" aria-label="Đỗ Mai Anh, Mới (điểm danh 18:03)">
+  <span><i data-g="voi"></i>Vội (Mức làm 1–2)</span><span><i data-g="nghi"></i>Có nghĩ (3–4)</span><span><i data-g="treo"></i>Treo máy</span><span><i data-g="co-tinh"></i>Cố tình treo máy</span>
+  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span></p>
+      <div class="dau-cot" aria-hidden="true"><span></span><span>Em</span><span>Sai vì vội<small>% lượt sai</small></span><span>Cách làm 14 ngày<small>mọi lượt</small></span><span>Treo máy<small>14 ngày</small></span></div>
+      <ul class="vua-ds"><li><button type="button" class="dd-dong" aria-label="Đỗ Mai Anh, Mới. Sai vì vội 38%, 6 trên 16 lượt sai. Treo máy 1 lượt (điểm danh 18:03)">
     <span class="dd-gio">18:03</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Đỗ Mai Anh</b><span class="dd-chip" data-nhom="moi">Mới</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:5"></i><i data-m="2" style="flex-grow:9"></i><i data-m="3" style="flex-grow:28"></i><i data-m="4" style="flex-grow:6"></i><i data-m="5" style="flex-grow:1"></i></span><span class="ml-chu">Mức làm 1–2: <b>14/48</b> lượt · Treo máy: <b>1</b> lượt<small>3 lượt chưa có số đo</small></span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Gia Anh, Lười 3/11. Cố tình treo máy · 3 lượt. Sai khi làm vội · 9/10 (điểm danh 18:02)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Đỗ Mai Anh</b></span><span class="dd-chip" data-nhom="moi">Mới</span></span>
+    <span class="o-voi"><b>38%</b><small>6/16 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:14"></i><i data-g="nghi" style="flex-grow:34"></i><i data-g="treo" style="flex-grow:1"></i></span><small>Vội <b>14</b> · Có nghĩ <b>34</b> · Treo <b>1</b> lượt</small></span><span class="o-treo" data-nhieu="0"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>1</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Gia Anh, Lười 3/11. Cố tình treo máy 3 lượt. Sai vì vội 90%, 9 trên 10 lượt sai. Treo máy 4 lượt (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Trần Gia Anh</b><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span><span class="dd-dh"><span class="dh" data-k="co-tinh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg>Cố tình treo máy · 3 lượt</span><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 9/10</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:7"></i><i data-m="2" style="flex-grow:5"></i><i data-m="3" style="flex-grow:3"></i><i data-m="5" style="flex-grow:1"></i><i data-m="6" style="flex-grow:3"></i></span><span class="ml-chu">Mức làm 1–2: <b>12/15</b> lượt · Treo máy: <b>1</b> lượt · Cố tình treo máy: <b>3</b> lượt</span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Phan Quang Huy, Chưa đều 7/11. Treo máy · 2 lượt. Sai khi làm vội · 10/14 (điểm danh 18:02)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Trần Gia Anh</b><span class="co-tinh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg>Cố tình treo máy</span></span><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span></span>
+    <span class="o-voi" data-nhieu><b>90%</b><small>9/10 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:12"></i><i data-g="nghi" style="flex-grow:3"></i><i data-g="treo" style="flex-grow:1"></i><i data-g="co-tinh" style="flex-grow:3"></i></span><small>Vội <b>12</b> · Có nghĩ <b>3</b> · Treo <b>4</b> lượt</small></span><span class="o-treo" data-nhieu="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>4</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Phan Quang Huy, Chưa đều 7/11. Sai vì vội 71%, 10 trên 14 lượt sai. Treo máy 2 lượt (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Phan Quang Huy</b><span class="dd-chip" data-nhom="chua-deu">Chưa đều · 7/11</span><span class="dd-dh"><span class="dh" data-k="treo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Treo máy · 2 lượt</span><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 10/14</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:9"></i><i data-m="2" style="flex-grow:8"></i><i data-m="3" style="flex-grow:12"></i><i data-m="4" style="flex-grow:2"></i><i data-m="5" style="flex-grow:2"></i></span><span class="ml-chu">Mức làm 1–2: <b>17/31</b> lượt · Treo máy: <b>2</b> lượt<small>5 lượt chưa có số đo</small></span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Phan Quang Huy</b></span><span class="dd-chip" data-nhom="chua-deu">Chưa đều · 7/11</span></span>
+    <span class="o-voi" data-nhieu><b>71%</b><small>10/14 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:17"></i><i data-g="nghi" style="flex-grow:14"></i><i data-g="treo" style="flex-grow:2"></i></span><small>Vội <b>17</b> · Có nghĩ <b>14</b> · Treo <b>2</b> lượt</small></span><span class="o-treo" data-nhieu="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>2</b> lượt</span>
   </button></li><li><button type="button" class="dd-dong" aria-label="Phạm Minh Hà, Chăm 11/11 (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Phạm Minh Hà</b><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh ml-thanh--rong"></span><span class="ml-chu ml-chu--nghieng">Chưa có lượt 14 ngày qua</span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Vũ Thanh Long, Chăm 10/11 (điểm danh 18:01)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Phạm Minh Hà</b></span><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
+    <span class="o-voi o-voi--trong">—</span><span class="o-thanh"><span class="ml-thanh ml-thanh--rong"></span><small class="nghieng">Chưa có lượt 14 ngày qua</small></span><span class="o-treo o-treo--trong">0</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Vũ Thanh Long, Chăm 10/11. Sai vì vội 20%, 1 trên 5 lượt sai (điểm danh 18:01)">
     <span class="dd-gio">18:01</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Vũ Thanh Long</b><span class="dd-chip" data-nhom="cham">Chăm · 10/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:1"></i><i data-m="2" style="flex-grow:2"></i><i data-m="3" style="flex-grow:10"></i><i data-m="4" style="flex-grow:3"></i></span><span class="ml-chu">≈ Mức làm 1–2: <b>3/16</b> lượt<small>6 lượt chưa đo treo máy</small></span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Vũ Thanh Long</b></span><span class="dd-chip" data-nhom="cham">Chăm · 10/11</span></span>
+    <span class="o-voi"><b>20%</b><small>1/5 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:3"></i><i data-g="nghi" style="flex-grow:13"></i></span><small>≈ Vội <b>3</b> · Có nghĩ <b>13</b> lượt</small></span><span class="o-treo o-treo--trong">0</span>
   </button></li><li><button type="button" class="dd-dong" aria-label="Chu Hải Vy, Chăm 11/11 (điểm danh 18:01)">
     <span class="dd-gio">18:01</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Chu Hải Vy</b><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:1"></i><i data-m="2" style="flex-grow:1"></i><i data-m="3" style="flex-grow:2"></i></span><span class="ml-chu">Mức làm 1–2: <b>2/4</b> lượt<small>Ít lượt sai có số đo (2) — chưa kết luận</small></span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Chu Hải Vy</b></span><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
+    <span class="o-voi o-voi--it"><b>—</b><small>ít lượt sai (2)</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:2"></i><i data-g="nghi" style="flex-grow:2"></i></span><small>Vội <b>2</b> · Có nghĩ <b>2</b> lượt</small></span><span class="o-treo o-treo--trong">0</span>
   </button></li></ul>
+      <p class="chu-chung">% và thanh chỉ tính lượt đã đo giờ làm. 6 em đang hiện: <b>8</b> lượt chưa có số đo · <b>6</b> lượt làm trước khi đo treo máy (nằm trong nhóm Vội / Có nghĩ) · ≈ = có lượt giây ước tính.</p>
       <button type="button" class="nut-chu">Xem cả 30 em có mặt ›</button>
     </div>
     <div class="xong" data-nhan="Đổi chỗ"><p>Xong điểm danh: chiếu Nhịp học của lớp — ba cột Chăm · Chưa đều · Lười. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười.</p><button type="button" class="nut-chinh">Xong điểm danh · chiếu Nhịp học của lớp</button></div>
@@ -178,56 +175,42 @@ button { font: inherit; color: inherit; }
     <p class="tong-chu">14 ngày qua, trong <b>30</b> em có mặt:</p>
     <div class="tong-nuts">
       <button type="button" class="tong-nut" data-k="tat" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.2 4.2 1.7 4.5 4.3"/></svg><span>Tất cả</span><b>30</b></button>
-      <button type="button" class="tong-nut" data-k="voi" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Sai khi làm vội</span><b>9</b></button>
+      <button type="button" class="tong-nut" data-k="voi" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Sai vì vội nhiều</span><b>9</b></button>
       <span class="tong-cho"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Treo máy: đo từ lượt làm sau 23/10</span>
     </div>
   </div>
       
       
       <p class="chu-giai" aria-label="Chú giải thanh 14 ngày">
-  <span class="cg-tieu">Thanh 14 ngày:</span>
-  <span><i data-m="1"></i><i data-m="2"></i><i data-m="3"></i><i data-m="4"></i>Mức làm 1 → 4</span>
-  <span><i data-m="5"></i>Treo máy</span>
-  <span><i data-m="6"></i>Cố tình treo máy</span>
-  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span>
-</p>
-      <ul class="vua-ds"><li><button type="button" class="dd-dong" aria-label="Đỗ Mai Anh, Mới (điểm danh 18:03)">
+  <span><i data-g="voi"></i>Vội (Mức làm 1–2)</span><span><i data-g="nghi"></i>Có nghĩ (3–4)</span><span><i data-g="treo"></i>Treo máy</span><span><i data-g="co-tinh"></i>Cố tình treo máy</span>
+  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span></p>
+      <div class="dau-cot" aria-hidden="true"><span></span><span>Em</span><span>Sai vì vội<small>% lượt sai</small></span><span>Cách làm 14 ngày<small>mọi lượt</small></span><span>Treo máy<small>đo từ 23/10</small></span></div>
+      <ul class="vua-ds"><li><button type="button" class="dd-dong" aria-label="Đỗ Mai Anh, Mới. Sai vì vội 38%, 6 trên 16 lượt sai (điểm danh 18:03)">
     <span class="dd-gio">18:03</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Đỗ Mai Anh</b><span class="dd-chip" data-nhom="moi">Mới</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:5"></i><i data-m="2" style="flex-grow:9"></i><i data-m="3" style="flex-grow:29"></i><i data-m="4" style="flex-grow:6"></i></span><span class="ml-chu">Mức làm 1–2: <b>14/49</b> lượt<small>45 lượt chưa đo treo máy · 3 lượt chưa có số đo</small></span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Gia Anh, Lười 3/11. Sai khi làm vội · 9/10 (điểm danh 18:02)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Đỗ Mai Anh</b></span><span class="dd-chip" data-nhom="moi">Mới</span></span>
+    <span class="o-voi"><b>38%</b><small>6/16 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:14"></i><i data-g="nghi" style="flex-grow:35"></i></span><small>Vội <b>14</b> · Có nghĩ <b>35</b> lượt</small></span><span class="o-treo o-treo--trong">—</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Gia Anh, Lười 3/11. Sai vì vội 90%, 9 trên 10 lượt sai (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Trần Gia Anh</b><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span><span class="dd-dh"><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 9/10</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:7"></i><i data-m="2" style="flex-grow:5"></i><i data-m="3" style="flex-grow:7"></i></span><span class="ml-chu">Mức làm 1–2: <b>12/19</b> lượt</span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Phan Quang Huy, Chưa đều 7/11. Sai khi làm vội · 10/14 (điểm danh 18:02)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Trần Gia Anh</b></span><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span></span>
+    <span class="o-voi" data-nhieu><b>90%</b><small>9/10 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:12"></i><i data-g="nghi" style="flex-grow:7"></i></span><small>Vội <b>12</b> · Có nghĩ <b>7</b> lượt</small></span><span class="o-treo o-treo--trong">—</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Phan Quang Huy, Chưa đều 7/11. Sai vì vội 71%, 10 trên 14 lượt sai (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Phan Quang Huy</b><span class="dd-chip" data-nhom="chua-deu">Chưa đều · 7/11</span><span class="dd-dh"><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 10/14</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:9"></i><i data-m="2" style="flex-grow:8"></i><i data-m="3" style="flex-grow:14"></i><i data-m="4" style="flex-grow:2"></i></span><span class="ml-chu">Mức làm 1–2: <b>17/33</b> lượt<small>5 lượt chưa có số đo</small></span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Phan Quang Huy</b></span><span class="dd-chip" data-nhom="chua-deu">Chưa đều · 7/11</span></span>
+    <span class="o-voi" data-nhieu><b>71%</b><small>10/14 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:17"></i><i data-g="nghi" style="flex-grow:16"></i></span><small>Vội <b>17</b> · Có nghĩ <b>16</b> lượt</small></span><span class="o-treo o-treo--trong">—</span>
   </button></li><li><button type="button" class="dd-dong" aria-label="Phạm Minh Hà, Chăm 11/11 (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Phạm Minh Hà</b><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh ml-thanh--rong"></span><span class="ml-chu ml-chu--nghieng">Chưa có lượt 14 ngày qua</span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Vũ Thanh Long, Chăm 10/11 (điểm danh 18:01)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Phạm Minh Hà</b></span><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
+    <span class="o-voi o-voi--trong">—</span><span class="o-thanh"><span class="ml-thanh ml-thanh--rong"></span><small class="nghieng">Chưa có lượt 14 ngày qua</small></span><span class="o-treo o-treo--trong">—</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Vũ Thanh Long, Chăm 10/11. Sai vì vội 20%, 1 trên 5 lượt sai (điểm danh 18:01)">
     <span class="dd-gio">18:01</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Vũ Thanh Long</b><span class="dd-chip" data-nhom="cham">Chăm · 10/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:1"></i><i data-m="2" style="flex-grow:2"></i><i data-m="3" style="flex-grow:10"></i><i data-m="4" style="flex-grow:3"></i></span><span class="ml-chu">≈ Mức làm 1–2: <b>3/16</b> lượt</span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Vũ Thanh Long</b></span><span class="dd-chip" data-nhom="cham">Chăm · 10/11</span></span>
+    <span class="o-voi"><b>20%</b><small>1/5 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:3"></i><i data-g="nghi" style="flex-grow:13"></i></span><small>≈ Vội <b>3</b> · Có nghĩ <b>13</b> lượt</small></span><span class="o-treo o-treo--trong">—</span>
   </button></li><li><button type="button" class="dd-dong" aria-label="Chu Hải Vy, Chăm 11/11 (điểm danh 18:01)">
     <span class="dd-gio">18:01</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Chu Hải Vy</b><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:1"></i><i data-m="2" style="flex-grow:1"></i><i data-m="3" style="flex-grow:2"></i></span><span class="ml-chu">Mức làm 1–2: <b>2/4</b> lượt<small>Ít lượt sai có số đo (2) — chưa kết luận</small></span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Chu Hải Vy</b></span><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
+    <span class="o-voi o-voi--it"><b>—</b><small>ít lượt sai (2)</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:2"></i><i data-g="nghi" style="flex-grow:2"></i></span><small>Vội <b>2</b> · Có nghĩ <b>2</b> lượt</small></span><span class="o-treo o-treo--trong">—</span>
   </button></li></ul>
+      <p class="chu-chung">% và thanh chỉ tính lượt đã đo giờ làm. 6 em đang hiện: <b>8</b> lượt chưa có số đo · ≈ = có lượt giây ước tính.</p>
       <button type="button" class="nut-chu">Xem cả 30 em có mặt ›</button>
     </div>
     <div class="xong" data-nhan="Đổi chỗ"><p>Xong điểm danh: chiếu Nhịp học của lớp — ba cột Chăm · Chưa đều · Lười. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười.</p><button type="button" class="nut-chinh">Xong điểm danh · chiếu Nhịp học của lớp</button></div>
@@ -241,56 +224,42 @@ button { font: inherit; color: inherit; }
     <p class="tong-chu">14 ngày qua, trong <b>30</b> em có mặt:</p>
     <div class="tong-nuts">
       <button type="button" class="tong-nut" data-k="tat" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.2 4.2 1.7 4.5 4.3"/></svg><span>Tất cả</span><b>30</b></button>
-      <button type="button" class="tong-nut" data-k="voi" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Sai khi làm vội</span><b>9</b></button>
+      <button type="button" class="tong-nut" data-k="voi" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Sai vì vội nhiều</span><b>9</b></button>
       <button type="button" class="tong-nut" data-k="treo" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span>Treo máy</span><b>6</b></button><button type="button" class="tong-nut" data-k="co-tinh" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg><span>Cố tình treo máy</span><b>1</b></button>
     </div>
   </div>
       
       <p class="loc-dong"><b>6 em</b> có treo máy trong 14 ngày · <button type="button" class="nut-chu">Bỏ lọc</button></p>
       <p class="chu-giai" aria-label="Chú giải thanh 14 ngày">
-  <span class="cg-tieu">Thanh 14 ngày:</span>
-  <span><i data-m="1"></i><i data-m="2"></i><i data-m="3"></i><i data-m="4"></i>Mức làm 1 → 4</span>
-  <span><i data-m="5"></i>Treo máy</span>
-  <span><i data-m="6"></i>Cố tình treo máy</span>
-  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span>
-</p>
-      <ul class="vua-ds"><li><button type="button" class="dd-dong" aria-label="Đỗ Mai Anh, Mới (điểm danh 18:03)">
+  <span><i data-g="voi"></i>Vội (Mức làm 1–2)</span><span><i data-g="nghi"></i>Có nghĩ (3–4)</span><span><i data-g="treo"></i>Treo máy</span><span><i data-g="co-tinh"></i>Cố tình treo máy</span>
+  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span></p>
+      <div class="dau-cot" aria-hidden="true"><span></span><span>Em</span><span>Sai vì vội<small>% lượt sai</small></span><span>Cách làm 14 ngày<small>mọi lượt</small></span><span>Treo máy<small>14 ngày</small></span></div>
+      <ul class="vua-ds"><li><button type="button" class="dd-dong" aria-label="Đỗ Mai Anh, Mới. Sai vì vội 38%, 6 trên 16 lượt sai. Treo máy 1 lượt (điểm danh 18:03)">
     <span class="dd-gio">18:03</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Đỗ Mai Anh</b><span class="dd-chip" data-nhom="moi">Mới</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:5"></i><i data-m="2" style="flex-grow:9"></i><i data-m="3" style="flex-grow:28"></i><i data-m="4" style="flex-grow:6"></i><i data-m="5" style="flex-grow:1"></i></span><span class="ml-chu">Mức làm 1–2: <b>14/48</b> lượt · Treo máy: <b>1</b> lượt<small>3 lượt chưa có số đo</small></span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Gia Anh, Lười 3/11. Cố tình treo máy · 3 lượt. Sai khi làm vội · 9/10 (điểm danh 18:02)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Đỗ Mai Anh</b></span><span class="dd-chip" data-nhom="moi">Mới</span></span>
+    <span class="o-voi"><b>38%</b><small>6/16 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:14"></i><i data-g="nghi" style="flex-grow:34"></i><i data-g="treo" style="flex-grow:1"></i></span><small>Vội <b>14</b> · Có nghĩ <b>34</b> · Treo <b>1</b> lượt</small></span><span class="o-treo" data-nhieu="0"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>1</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Gia Anh, Lười 3/11. Cố tình treo máy 3 lượt. Sai vì vội 90%, 9 trên 10 lượt sai. Treo máy 4 lượt (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Trần Gia Anh</b><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span><span class="dd-dh"><span class="dh" data-k="co-tinh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg>Cố tình treo máy · 3 lượt</span><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 9/10</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:7"></i><i data-m="2" style="flex-grow:5"></i><i data-m="3" style="flex-grow:3"></i><i data-m="5" style="flex-grow:1"></i><i data-m="6" style="flex-grow:3"></i></span><span class="ml-chu">Mức làm 1–2: <b>12/15</b> lượt · Treo máy: <b>1</b> lượt · Cố tình treo máy: <b>3</b> lượt</span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Phan Quang Huy, Chưa đều 7/11. Treo máy · 2 lượt. Sai khi làm vội · 10/14 (điểm danh 18:02)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Trần Gia Anh</b><span class="co-tinh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg>Cố tình treo máy</span></span><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span></span>
+    <span class="o-voi" data-nhieu><b>90%</b><small>9/10 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:12"></i><i data-g="nghi" style="flex-grow:3"></i><i data-g="treo" style="flex-grow:1"></i><i data-g="co-tinh" style="flex-grow:3"></i></span><small>Vội <b>12</b> · Có nghĩ <b>3</b> · Treo <b>4</b> lượt</small></span><span class="o-treo" data-nhieu="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>4</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Phan Quang Huy, Chưa đều 7/11. Sai vì vội 71%, 10 trên 14 lượt sai. Treo máy 2 lượt (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Phan Quang Huy</b><span class="dd-chip" data-nhom="chua-deu">Chưa đều · 7/11</span><span class="dd-dh"><span class="dh" data-k="treo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Treo máy · 2 lượt</span><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 10/14</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:9"></i><i data-m="2" style="flex-grow:8"></i><i data-m="3" style="flex-grow:12"></i><i data-m="4" style="flex-grow:2"></i><i data-m="5" style="flex-grow:2"></i></span><span class="ml-chu">Mức làm 1–2: <b>17/31</b> lượt · Treo máy: <b>2</b> lượt<small>5 lượt chưa có số đo</small></span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Hải Uyên, Chăm 9/11. Treo máy · 2 lượt. Sai khi làm vội · 3/5 (điểm danh 17:51)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Phan Quang Huy</b></span><span class="dd-chip" data-nhom="chua-deu">Chưa đều · 7/11</span></span>
+    <span class="o-voi" data-nhieu><b>71%</b><small>10/14 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:17"></i><i data-g="nghi" style="flex-grow:14"></i><i data-g="treo" style="flex-grow:2"></i></span><small>Vội <b>17</b> · Có nghĩ <b>14</b> · Treo <b>2</b> lượt</small></span><span class="o-treo" data-nhieu="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>2</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Hải Uyên, Chăm 9/11. Sai vì vội 60%, 3 trên 5 lượt sai. Treo máy 2 lượt (điểm danh 17:51)">
     <span class="dd-gio">17:51</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Trần Hải Uyên</b><span class="dd-chip" data-nhom="cham">Chăm · 9/11</span><span class="dd-dh"><span class="dh" data-k="treo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Treo máy · 2 lượt</span><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 3/5</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:2"></i><i data-m="2" style="flex-grow:4"></i><i data-m="3" style="flex-grow:8"></i><i data-m="5" style="flex-grow:2"></i></span><span class="ml-chu">Mức làm 1–2: <b>6/14</b> lượt · Treo máy: <b>2</b> lượt<small>4 lượt chưa đo treo máy</small></span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Đỗ Công Long, Lười 3/11 (điểm danh 17:49)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Trần Hải Uyên</b></span><span class="dd-chip" data-nhom="cham">Chăm · 9/11</span></span>
+    <span class="o-voi" data-nhieu><b>60%</b><small>3/5 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:6"></i><i data-g="nghi" style="flex-grow:8"></i><i data-g="treo" style="flex-grow:2"></i></span><small>Vội <b>6</b> · Có nghĩ <b>8</b> · Treo <b>2</b> lượt</small></span><span class="o-treo" data-nhieu="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>2</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Đỗ Công Long, Lười 3/11. Treo máy 1 lượt (điểm danh 17:49)">
     <span class="dd-gio">17:49</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Đỗ Công Long</b><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="3" style="flex-grow:6"></i><i data-m="5" style="flex-grow:1"></i></span><span class="ml-chu">Mức làm 1–2: <b>0/6</b> lượt · Treo máy: <b>1</b> lượt<small>Ít lượt sai có số đo (2) — chưa kết luận · 3 lượt chưa đo treo máy · 1 lượt chưa có số đo</small></span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Hoàng Tuệ Dũng, Chăm 11/11. Treo máy · 2 lượt (điểm danh 17:33)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Đỗ Công Long</b></span><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span></span>
+    <span class="o-voi o-voi--it"><b>—</b><small>ít lượt sai (2)</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="nghi" style="flex-grow:6"></i><i data-g="treo" style="flex-grow:1"></i></span><small>Vội <b>0</b> · Có nghĩ <b>6</b> · Treo <b>1</b> lượt</small></span><span class="o-treo" data-nhieu="0"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>1</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Hoàng Tuệ Dũng, Chăm 11/11. Sai vì vội 13%, 1 trên 8 lượt sai. Treo máy 2 lượt (điểm danh 17:33)">
     <span class="dd-gio">17:33</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Hoàng Tuệ Dũng</b><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span><span class="dd-dh"><span class="dh" data-k="treo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Treo máy · 2 lượt</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:2"></i><i data-m="3" style="flex-grow:24"></i><i data-m="5" style="flex-grow:2"></i></span><span class="ml-chu">Mức làm 1–2: <b>2/26</b> lượt · Treo máy: <b>2</b> lượt<small>2 lượt chưa có số đo</small></span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Hoàng Tuệ Dũng</b></span><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
+    <span class="o-voi"><b>13%</b><small>1/8 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:2"></i><i data-g="nghi" style="flex-grow:24"></i><i data-g="treo" style="flex-grow:2"></i></span><small>Vội <b>2</b> · Có nghĩ <b>24</b> · Treo <b>2</b> lượt</small></span><span class="o-treo" data-nhieu="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>2</b> lượt</span>
   </button></li></ul>
+      <p class="chu-chung">% và thanh chỉ tính lượt đã đo giờ làm. 6 em đang hiện: <b>11</b> lượt chưa có số đo · <b>7</b> lượt làm trước khi đo treo máy (nằm trong nhóm Vội / Có nghĩ).</p>
       
     </div>
     <div class="xong" data-nhan="Đổi chỗ"><p>Xong điểm danh: chiếu Nhịp học của lớp — ba cột Chăm · Chưa đều · Lười. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười.</p><button type="button" class="nut-chinh">Xong điểm danh · chiếu Nhịp học của lớp</button></div>
@@ -304,56 +273,42 @@ button { font: inherit; color: inherit; }
     <p class="tong-chu">14 ngày qua, trong <b>30</b> em có mặt:</p>
     <div class="tong-nuts">
       <button type="button" class="tong-nut" data-k="tat" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.2 4.2 1.7 4.5 4.3"/></svg><span>Tất cả</span><b>30</b></button>
-      <button type="button" class="tong-nut" data-k="voi" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Sai khi làm vội</span><b>9</b></button>
+      <button type="button" class="tong-nut" data-k="voi" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Sai vì vội nhiều</span><b>9</b></button>
       <button type="button" class="tong-nut" data-k="treo" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span>Treo máy</span><b>6</b></button><button type="button" class="tong-nut" data-k="co-tinh" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg><span>Cố tình treo máy</span><b>1</b></button>
     </div>
   </div>
       <p class="loi" role="alert">Chưa tải được Mức làm 14 ngày của 1 em: Không nối được máy chủ. Các dòng khác và danh sách điểm danh vẫn đúng. <button type="button" class="nut-chu">Thử tải lại</button></p>
       
       <p class="chu-giai" aria-label="Chú giải thanh 14 ngày">
-  <span class="cg-tieu">Thanh 14 ngày:</span>
-  <span><i data-m="1"></i><i data-m="2"></i><i data-m="3"></i><i data-m="4"></i>Mức làm 1 → 4</span>
-  <span><i data-m="5"></i>Treo máy</span>
-  <span><i data-m="6"></i>Cố tình treo máy</span>
-  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span>
-</p>
-      <ul class="vua-ds"><li><button type="button" class="dd-dong" aria-label="Đỗ Mai Anh, Mới (điểm danh 18:03)">
+  <span><i data-g="voi"></i>Vội (Mức làm 1–2)</span><span><i data-g="nghi"></i>Có nghĩ (3–4)</span><span><i data-g="treo"></i>Treo máy</span><span><i data-g="co-tinh"></i>Cố tình treo máy</span>
+  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span></p>
+      <div class="dau-cot" aria-hidden="true"><span></span><span>Em</span><span>Sai vì vội<small>% lượt sai</small></span><span>Cách làm 14 ngày<small>mọi lượt</small></span><span>Treo máy<small>14 ngày</small></span></div>
+      <ul class="vua-ds"><li><button type="button" class="dd-dong" aria-label="Đỗ Mai Anh, Mới. Sai vì vội 38%, 6 trên 16 lượt sai. Treo máy 1 lượt (điểm danh 18:03)">
     <span class="dd-gio">18:03</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Đỗ Mai Anh</b><span class="dd-chip" data-nhom="moi">Mới</span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:5"></i><i data-m="2" style="flex-grow:9"></i><i data-m="3" style="flex-grow:28"></i><i data-m="4" style="flex-grow:6"></i><i data-m="5" style="flex-grow:1"></i></span><span class="ml-chu">Mức làm 1–2: <b>14/48</b> lượt · Treo máy: <b>1</b> lượt<small>3 lượt chưa có số đo</small></span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Gia Anh, Lười 3/11. Cố tình treo máy · 3 lượt. Sai khi làm vội · 9/10 (điểm danh 18:02)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Đỗ Mai Anh</b></span><span class="dd-chip" data-nhom="moi">Mới</span></span>
+    <span class="o-voi"><b>38%</b><small>6/16 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:14"></i><i data-g="nghi" style="flex-grow:34"></i><i data-g="treo" style="flex-grow:1"></i></span><small>Vội <b>14</b> · Có nghĩ <b>34</b> · Treo <b>1</b> lượt</small></span><span class="o-treo" data-nhieu="0"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>1</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Trần Gia Anh, Lười 3/11. Cố tình treo máy 3 lượt. Sai vì vội 90%, 9 trên 10 lượt sai. Treo máy 4 lượt (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Trần Gia Anh</b><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span><span class="dd-dh"><span class="dh" data-k="co-tinh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg>Cố tình treo máy · 3 lượt</span><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 9/10</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:7"></i><i data-m="2" style="flex-grow:5"></i><i data-m="3" style="flex-grow:3"></i><i data-m="5" style="flex-grow:1"></i><i data-m="6" style="flex-grow:3"></i></span><span class="ml-chu">Mức làm 1–2: <b>12/15</b> lượt · Treo máy: <b>1</b> lượt · Cố tình treo máy: <b>3</b> lượt</span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Phan Quang Huy, Chưa đều 7/11. Treo máy · 2 lượt. Sai khi làm vội · 10/14 (điểm danh 18:02)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Trần Gia Anh</b><span class="co-tinh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg>Cố tình treo máy</span></span><span class="dd-chip" data-nhom="luoi">Lười · 3/11</span></span>
+    <span class="o-voi" data-nhieu><b>90%</b><small>9/10 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:12"></i><i data-g="nghi" style="flex-grow:3"></i><i data-g="treo" style="flex-grow:1"></i><i data-g="co-tinh" style="flex-grow:3"></i></span><small>Vội <b>12</b> · Có nghĩ <b>3</b> · Treo <b>4</b> lượt</small></span><span class="o-treo" data-nhieu="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>4</b> lượt</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Phan Quang Huy, Chưa đều 7/11. Sai vì vội 71%, 10 trên 14 lượt sai. Treo máy 2 lượt (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Phan Quang Huy</b><span class="dd-chip" data-nhom="chua-deu">Chưa đều · 7/11</span><span class="dd-dh"><span class="dh" data-k="treo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Treo máy · 2 lượt</span><span class="dh" data-k="voi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Sai khi làm vội · 10/14</span></span></span>
-      <span class="dd-h2"><span class="ml-thanh"><i data-m="1" style="flex-grow:9"></i><i data-m="2" style="flex-grow:8"></i><i data-m="3" style="flex-grow:12"></i><i data-m="4" style="flex-grow:2"></i><i data-m="5" style="flex-grow:2"></i></span><span class="ml-chu">Mức làm 1–2: <b>17/31</b> lượt · Treo máy: <b>2</b> lượt<small>5 lượt chưa có số đo</small></span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Phan Quang Huy</b></span><span class="dd-chip" data-nhom="chua-deu">Chưa đều · 7/11</span></span>
+    <span class="o-voi" data-nhieu><b>71%</b><small>10/14 lượt sai</small></span><span class="o-thanh"><span class="ml-thanh"><i data-g="voi" style="flex-grow:17"></i><i data-g="nghi" style="flex-grow:14"></i><i data-g="treo" style="flex-grow:2"></i></span><small>Vội <b>17</b> · Có nghĩ <b>14</b> · Treo <b>2</b> lượt</small></span><span class="o-treo" data-nhieu="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><b>2</b> lượt</span>
   </button></li><li><button type="button" class="dd-dong" aria-label="Phạm Minh Hà, Chăm 11/11 (điểm danh 18:02)">
     <span class="dd-gio">18:02</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Phạm Minh Hà</b><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh ml-thanh--rong"></span><span class="ml-chu ml-chu--nghieng">Chưa có lượt 14 ngày qua</span></span>
-    </span>
-  </button></li><li><button type="button" class="dd-dong" aria-label="Vũ Thanh Long, Chăm 10/11 (điểm danh 18:01)">
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Phạm Minh Hà</b></span><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
+    <span class="o-voi o-voi--trong">—</span><span class="o-thanh"><span class="ml-thanh ml-thanh--rong"></span><small class="nghieng">Chưa có lượt 14 ngày qua</small></span><span class="o-treo o-treo--trong">0</span>
+  </button></li><li><button type="button" class="dd-dong" aria-label="Vũ Thanh Long, Chăm 10/11. Sai vì vội 20%, 1 trên 5 lượt sai (điểm danh 18:01)">
     <span class="dd-gio">18:01</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Vũ Thanh Long</b><span class="dd-chip" data-nhom="cham">Chăm · 10/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh ml-thanh--cho"></span><span class="ml-chu ml-chu--nghieng">Đang đo…</span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Vũ Thanh Long</b></span><span class="dd-chip" data-nhom="cham">Chăm · 10/11</span></span>
+    <span class="o-voi o-voi--trong">…</span><span class="o-thanh"><span class="ml-thanh ml-thanh--cho"></span><small class="nghieng">Đang đo…</small></span><span class="o-treo o-treo--trong">—</span>
   </button></li><li><button type="button" class="dd-dong" aria-label="Chu Hải Vy, Chăm 11/11 (điểm danh 18:01)">
     <span class="dd-gio">18:01</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">Chu Hải Vy</b><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
-      <span class="dd-h2"><span class="ml-thanh ml-thanh--rong"></span><span class="ml-chu ml-chu--nghieng">Chưa tải được Mức làm</span></span>
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">Chu Hải Vy</b></span><span class="dd-chip" data-nhom="cham">Chăm · 11/11</span></span>
+    <span class="o-voi o-voi--trong">—</span><span class="o-thanh"><span class="ml-thanh ml-thanh--rong"></span><small class="nghieng">Chưa tải được</small></span><span class="o-treo o-treo--trong">—</span>
   </button></li></ul>
+      <p class="chu-chung">% và thanh chỉ tính lượt đã đo giờ làm. 6 em đang hiện: <b>8</b> lượt chưa có số đo · <b>6</b> lượt làm trước khi đo treo máy (nằm trong nhóm Vội / Có nghĩ) · ≈ = có lượt giây ước tính.</p>
       <button type="button" class="nut-chu">Xem cả 30 em có mặt ›</button>
     </div>
     <div class="xong" data-nhan="Đổi chỗ"><p>Xong điểm danh: chiếu Nhịp học của lớp — ba cột Chăm · Chưa đều · Lười. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười.</p><button type="button" class="nut-chinh">Xong điểm danh · chiếu Nhịp học của lớp</button></div>

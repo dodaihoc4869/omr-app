@@ -21,19 +21,16 @@ const e = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
 const MAU_TOI_THIEU = 5
 /** Tỉ lệ lượt sai ở Mức 1–2 trong lượt sai có Mức làm 1–4 để gắn "Sai khi làm vội". */
 const TI_LE_VOI = 0.5
-/** Số lượt Treo máy (Mức 5 + 6) trong 14 ngày để gắn chip "Treo máy" (1 lượt có thể là em nghe điện thoại — chỉ hiện ở dòng số, không gắn chip). */
+/** Số lượt Treo máy (Mức 5 + 6) trong 14 ngày để tô ô cột Treo máy (1 lượt có thể là em nghe điện thoại — chỉ hiện số, không tô). */
 const TREO_GAN_CHIP = 2
 const NGAY_DO_TREO = '23/10'
 
-/** Dấu hiệu của một em (THUẦN — bản build đặt ở src/lib/muc-lam-lo-api.ts, test riêng). Trả tối đa hai dấu: cố tình/treo trước, vội sau. */
+/** "Sai vì vội nhiều" (THUẦN — bản build đặt ở src/lib/muc-lam-lo-api.ts, test riêng): ≥ MAU_TOI_THIEU lượt sai có Mức làm 1–4 và tỉ lệ sai ở Mức 1–2 ≥ TI_LE_VOI.
+ *  Treo / cố tình không phải "dấu hiệu" nữa: có CỘT riêng (Treo máy) và CỜ trên tên (Cố tình). */
 function dauHieu(d) {
   if (!d || d.soDo === 0) return []
-  const ra = []
-  if (d.coTinh > 0) ra.push({ k: 'co-tinh', chu: `Cố tình treo máy · ${d.coTinh} lượt` })
-  else if (d.treo >= TREO_GAN_CHIP) ra.push({ k: 'treo', chu: `Treo máy · ${d.treo} lượt` })
   const sai = d.saiVoi + d.saiNghi
-  if (sai >= MAU_TOI_THIEU && d.saiVoi / sai >= TI_LE_VOI) ra.push({ k: 'voi', chu: `Sai khi làm vội · ${d.saiVoi}/${sai}` })
-  return ra
+  return sai >= MAU_TOI_THIEU && d.saiVoi / sai >= TI_LE_VOI ? [{ k: 'voi' }] : []
 }
 
 // ═════════════════════════ DỮ LIỆU GIẢ — 12 Nhóm 10 điểm, có mặt 30/38 ═════════════════════════
@@ -74,72 +71,83 @@ const SI_SO = 38
 const ngayDau = (ds) => ds.map(([g, t, n, c, d]) => [g, t, n, c, { ...d, m: d.m.map((x, k) => x + (k === 2 ? d.treo + d.coTinh : 0)), treo: 0, coTinh: 0, ngayCoTinh: 0, chuaDoTreo: d.m.reduce((a, b) => a + b, 0) + d.treo + d.coTinh - (t === 'Đỗ Mai Anh' ? 4 : 0) }])
 const soDo = (d) => d.m.reduce((a, b) => a + b, 0) + d.treo + d.coTinh
 
-// ═════════════════════════ BẢNG ĐIỂM DANH (app thầy) ═════════════════════════
+// ═════════════════════════ BẢNG ĐIỂM DANH (app thầy) — bản 2 theo góp ý Boss 22/10 ═════════════════════════
+// Góp ý: (1) 4 sắc xanh không phân biệt nổi vội với có nghĩ khi liếc ⇒ thanh 3 NHÓM màu có nghĩa (Vội 1–2 = hổ phách cảnh báo · Có nghĩ 3–4 = xanh lục ·
+// Treo 5–6 = hồng lỗi) + SỐ % LỚN; (2) dòng phụ "chưa có số đo" lặp mọi dòng ⇒ gom MỘT chú thích dưới danh sách; (3) Mức 6 = CỜ nổi ngay sau tên em (chỉ màn thầy);
+// (4) nhãn nhịp và thanh tranh chỗ ⇒ CỘT THẲNG HÀNG: Em (tên + cờ, nhãn nhịp nhỏ dưới) · Sai vì vội (% lớn) · Cách làm 14 ngày (thanh) · Treo máy.
 const SVG = {
   voi: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
   treo: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
   'co-tinh': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg>',
   tat: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.2 4.2 1.7 4.5 4.3"/></svg>',
 }
-
-/** Bộ lọc của dòng tổng: "Treo máy" = em có ≥ 1 lượt treo (Mức 5 hoặc 6, kể cả em chỉ 1 lượt chưa gắn chip); "Cố tình" = có Mức 6; "Sai khi làm vội" = có dấu hiệu ấy. */
+/** Bộ lọc dòng tổng: "Treo máy" = ≥ 1 lượt treo (Mức 5 hoặc 6); "Cố tình" = có Mức 6; "voi" = tỉ lệ sai vì vội đạt ngưỡng. */
 const coDau = (d, k) => (k === 'treo' ? d.treo + d.coTinh > 0 : k === 'co-tinh' ? d.coTinh > 0 : dauHieu(d).some((x) => x.k === k))
+const pt = (a, b) => Math.round((100 * a) / b)
 
+/** Thanh 3 nhóm theo MỌI lượt 14 ngày: Vội (Mức 1–2) · Có nghĩ (3–4) · Treo (5) · Cố tình (6, đặc). */
 function thanh(d) {
   if (soDo(d) === 0) return '<span class="ml-thanh ml-thanh--rong"></span>'
-  const doan = [...d.m.map((n, i) => [i + 1, n]), [5, d.treo], [6, d.coTinh]].filter(([, n]) => n > 0)
-  return `<span class="ml-thanh">${doan.map(([k, n]) => `<i data-m="${k}" style="flex-grow:${n}"></i>`).join('')}</span>`
-}
-
-function chuDong(d, ngayDauBan) {
-  const sd = soDo(d)
-  if (sd === 0) return d.chuaCoSoDo > 0 ? `<span class="ml-chu ml-chu--nghieng">Chưa có số đo (${d.chuaCoSoDo} lượt)</span>` : '<span class="ml-chu ml-chu--nghieng">Chưa có lượt 14 ngày qua</span>'
-  const khong = d.m.reduce((a, b) => a + b, 0)
-  const phan = [`${d.uoc ? '≈ ' : ''}Mức làm 1–2: <b>${d.m[0] + d.m[1]}/${khong}</b> lượt`]
-  if (d.treo) phan.push(`Treo máy: <b>${d.treo}</b> lượt`)
-  if (d.coTinh) phan.push(`Cố tình treo máy: <b>${d.coTinh}</b> lượt`)
-  const phu = []
-  if (d.saiVoi + d.saiNghi < MAU_TOI_THIEU) phu.push(`Ít lượt sai có số đo (${d.saiVoi + d.saiNghi}) — chưa kết luận`)
-  // Mọi lượt của em chưa đo treo máy: chip nét đứt — TRỪ những ngày đầu (cả lớp như nhau, dòng tổng đã nói một lần: không lặp trên từng dòng)
-  if (d.chuaDoTreo >= sd && sd > 0) { if (!ngayDauBan) phu.push('<span class="ml-chua-treo">Chưa đo treo máy</span>') }
-  else if (d.chuaDoTreo > 0) phu.push(`${d.chuaDoTreo} lượt chưa đo treo máy`)
-  if (d.chuaCoSoDo > 0) phu.push(`${d.chuaCoSoDo} lượt chưa có số đo`)
-  return `<span class="ml-chu">${phan.join(' · ')}${phu.length ? `<small>${phu.join(' · ')}</small>` : ''}</span>`
+  const doan = [['voi', d.m[0] + d.m[1]], ['nghi', d.m[2] + d.m[3]], ['treo', d.treo], ['co-tinh', d.coTinh]].filter(([, n]) => n > 0)
+  return `<span class="ml-thanh">${doan.map(([k, n]) => `<i data-g="${k}" style="flex-grow:${n}"></i>`).join('')}</span>`
 }
 
 function dong([gio, ten, nhom, chip, d], { dang = false, ngayDauBan = false } = {}) {
-  const dh = dang ? [] : dauHieu(d)
-  const nhan = `${ten}, ${chip.replace(' · ', ' ')}${dh.length ? `. ${dh.map((x) => x.chu).join('. ')}` : ''}`
+  const sai = d.saiVoi + d.saiNghi
+  const du = sai >= MAU_TOI_THIEU
+  const voiNhieu = dauHieu(d).some((x) => x.k === 'voi')
+  const co = d.coTinh > 0
+  const tongTreo = d.treo + d.coTinh
+  const nhan = `${ten}, ${chip.replace(' · ', ' ')}${co ? `. Cố tình treo máy ${d.coTinh} lượt` : ''}${du ? `. Sai vì vội ${pt(d.saiVoi, sai)}%, ${d.saiVoi} trên ${sai} lượt sai` : ''}${tongTreo ? `. Treo máy ${tongTreo} lượt` : ''}`
+  const oVoi = dang === 'loi' ? '<span class="o-voi o-voi--trong">—</span>'
+    : dang ? '<span class="o-voi o-voi--trong">…</span>'
+      : soDo(d) === 0 ? '<span class="o-voi o-voi--trong">—</span>'
+        : du ? `<span class="o-voi"${voiNhieu ? ' data-nhieu' : ''}><b>${pt(d.saiVoi, sai)}%</b><small>${d.saiVoi}/${sai} lượt sai</small></span>`
+          : `<span class="o-voi o-voi--it"><b>—</b><small>ít lượt sai (${sai})</small></span>`
+  const oThanh = dang === 'loi' ? '<span class="o-thanh"><span class="ml-thanh ml-thanh--rong"></span><small class="nghieng">Chưa tải được</small></span>'
+    : dang ? '<span class="o-thanh"><span class="ml-thanh ml-thanh--cho"></span><small class="nghieng">Đang đo…</small></span>'
+      : soDo(d) === 0 ? `<span class="o-thanh"><span class="ml-thanh ml-thanh--rong"></span><small class="nghieng">${d.chuaCoSoDo ? 'Chưa có số đo' : 'Chưa có lượt 14 ngày qua'}</small></span>`
+        : `<span class="o-thanh">${thanh(d)}<small>${d.uoc ? '≈ ' : ''}Vội <b>${d.m[0] + d.m[1]}</b> · Có nghĩ <b>${d.m[2] + d.m[3]}</b>${tongTreo ? ` · Treo <b>${tongTreo}</b>` : ''} lượt</small></span>`
+  const oTreo = ngayDauBan || dang ? '<span class="o-treo o-treo--trong">—</span>'
+    : tongTreo ? `<span class="o-treo" data-nhieu="${tongTreo >= TREO_GAN_CHIP ? '1' : '0'}">${SVG.treo}<b>${tongTreo}</b> lượt</span>`
+      : '<span class="o-treo o-treo--trong">0</span>'
   return `<li><button type="button" class="dd-dong" aria-label="${e(nhan)} (điểm danh ${gio})">
     <span class="dd-gio">${gio}</span>
-    <span class="dd-than">
-      <span class="dd-h1"><b class="dd-ten">${e(ten)}</b><span class="dd-chip" data-nhom="${nhom}">${chip}</span>${dh.length ? `<span class="dd-dh">${dh.map((x) => `<span class="dh" data-k="${x.k}">${SVG[x.k]}${x.chu}</span>`).join('')}</span>` : ''}</span>
-      ${dang === 'loi' ? '<span class="dd-h2"><span class="ml-thanh ml-thanh--rong"></span><span class="ml-chu ml-chu--nghieng">Chưa tải được Mức làm</span></span>' : dang ? '<span class="dd-h2"><span class="ml-thanh ml-thanh--cho"></span><span class="ml-chu ml-chu--nghieng">Đang đo…</span></span>' : `<span class="dd-h2">${thanh(d)}${chuDong(d, ngayDauBan)}</span>`}
-    </span>
+    <span class="o-em"><span class="o-ten"><b class="dd-ten">${e(ten)}</b>${co ? `<span class="co-tinh">${SVG['co-tinh']}Cố tình treo máy</span>` : ''}</span><span class="dd-chip" data-nhom="${nhom}">${chip}</span></span>
+    ${oVoi}${oThanh}${oTreo}
   </button></li>`
 }
 
 function dongTong(ds, { loc = null, ngayDauBan = false } = {}) {
   const dem = { voi: 0, treo: 0, 'co-tinh': 0 }
   for (const r of ds) { if (coDau(r[4], 'voi')) dem.voi++; if (coDau(r[4], 'treo')) dem.treo++; if (coDau(r[4], 'co-tinh')) dem['co-tinh']++ }
-  const nut = (k, chu, so, tat = false) => `<button type="button" class="tong-nut" data-k="${k}" aria-pressed="${loc === k}"${tat ? ' disabled' : ''}>${SVG[k]}<span>${chu}</span>${so !== null ? `<b>${so}</b>` : ''}</button>`
+  const nut = (k, chu, so) => `<button type="button" class="tong-nut" data-k="${k}" aria-pressed="${loc === k}">${SVG[k]}<span>${chu}</span><b>${so}</b></button>`
   return `<div class="tong" role="group" aria-label="Lọc em có mặt theo cách làm bài 14 ngày">
     <p class="tong-chu">14 ngày qua, trong <b>${ds.length}</b> em có mặt:</p>
     <div class="tong-nuts">
       ${nut('tat', 'Tất cả', ds.length)}
-      ${nut('voi', 'Sai khi làm vội', dem.voi)}
+      ${nut('voi', 'Sai vì vội nhiều', dem.voi)}
       ${ngayDauBan ? `<span class="tong-cho">${SVG.treo}Treo máy: đo từ lượt làm sau ${NGAY_DO_TREO}</span>` : `${nut('treo', 'Treo máy', dem.treo)}${nut('co-tinh', 'Cố tình treo máy', dem['co-tinh'])}`}
     </div>
   </div>`
 }
 
+/** Đầu cột (máy tính / ngang) — điện thoại ẩn, thay bằng chú giải. */
+const DAU_COT = (ngayDauBan) => `<div class="dau-cot" aria-hidden="true"><span></span><span>Em</span><span>Sai vì vội<small>% lượt sai</small></span><span>Cách làm 14 ngày<small>mọi lượt</small></span><span>Treo máy${ngayDauBan ? `<small>đo từ ${NGAY_DO_TREO}</small>` : '<small>14 ngày</small>'}</span></div>`
 const CHU_GIAI = `<p class="chu-giai" aria-label="Chú giải thanh 14 ngày">
-  <span class="cg-tieu">Thanh 14 ngày:</span>
-  <span><i data-m="1"></i><i data-m="2"></i><i data-m="3"></i><i data-m="4"></i>Mức làm 1 → 4</span>
-  <span><i data-m="5"></i>Treo máy</span>
-  <span><i data-m="6"></i>Cố tình treo máy</span>
-  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span>
-</p>`
+  <span><i data-g="voi"></i>Vội (Mức làm 1–2)</span><span><i data-g="nghi"></i>Có nghĩ (3–4)</span><span><i data-g="treo"></i>Treo máy</span><span><i data-g="co-tinh"></i>Cố tình treo máy</span>
+  <span class="cg-rieng">Màn riêng của thầy, không lên bản chiếu</span></p>`
+
+/** Chú thích CHUNG dưới danh sách (thay dòng phụ lặp ở từng dòng). */
+function chuThichChung(dsHien, ngayDauBan) {
+  const chua = dsHien.reduce((a, r) => a + r[4].chuaCoSoDo, 0)
+  const chuaTreo = dsHien.reduce((a, r) => a + Math.min(r[4].chuaDoTreo, soDo(r[4])), 0)
+  const uoc = dsHien.some((r) => r[4].uoc)
+  const phan = [`% và thanh chỉ tính lượt đã đo giờ làm. ${dsHien.length} em đang hiện: <b>${chua}</b> lượt chưa có số đo`]
+  if (!ngayDauBan && chuaTreo) phan.push(`<b>${chuaTreo}</b> lượt làm trước khi đo treo máy (nằm trong nhóm Vội / Có nghĩ)`)
+  if (uoc) phan.push('≈ = có lượt giây ước tính')
+  return `<p class="chu-chung">${phan.join(' · ')}.</p>`
+}
 
 /** Phần đầu bước 1 GIỮ NGUYÊN (mã · có mặt · vắng) — vẽ gọn, nhãn "Giữ". */
 const DAU_BUOC = `<header class="b1-dau"><span class="b1-so">1</span><div><h2>Điểm danh — việc đầu tiên của buổi</h2><p>Buổi học 22/10 · 12 Nhóm 10 điểm · em gõ mã hoặc quét QR</p></div></header>
@@ -154,9 +162,11 @@ function khungDiemDanh({ id, ds, hien = 6, loc = null, ngayDauBan = false, loi =
       <h3 class="vua-tieu">Vừa điểm danh <small>· bấm em ⇒ hồ sơ làm bài</small></h3>
       ${dongTong(ds, { loc, ngayDauBan })}
       ${loi ? '<p class="loi" role="alert">Chưa tải được Mức làm 14 ngày của 1 em: Không nối được máy chủ. Các dòng khác và danh sách điểm danh vẫn đúng. <button type="button" class="nut-chu">Thử tải lại</button></p>' : ''}
-      ${loc && loc !== 'tat' ? `<p class="loc-dong"><b>${loc_.length} em</b> ${loc === 'voi' ? 'sai khi làm vội' : loc === 'treo' ? 'có treo máy' : 'cố tình treo máy'} trong 14 ngày · <button type="button" class="nut-chu">Bỏ lọc</button></p>` : ''}
+      ${loc && loc !== 'tat' ? `<p class="loc-dong"><b>${loc_.length} em</b> ${loc === 'voi' ? 'sai vì vội nhiều' : loc === 'treo' ? 'có treo máy' : 'cố tình treo máy'} trong 14 ngày · <button type="button" class="nut-chu">Bỏ lọc</button></p>` : ''}
       ${CHU_GIAI}
+      ${DAU_COT(ngayDauBan)}
       <ul class="vua-ds">${dsHien.map((r, i) => dong(r, { dang: loi && i === dsHien.length - 1 ? 'loi' : i >= dsHien.length - dangSau, ngayDauBan })).join('')}</ul>
+      ${chuThichChung(dsHien, ngayDauBan)}
       ${!loc && ds.length > hien ? `<button type="button" class="nut-chu">Xem cả ${ds.length} em có mặt ›</button>` : ''}
     </div>
     <div class="xong" data-nhan="Đổi chỗ"><p>Xong điểm danh: chiếu Nhịp học của lớp — ba cột Chăm · Chưa đều · Lười. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười.</p><button type="button" class="nut-chinh">Xong điểm danh · chiếu Nhịp học của lớp</button></div>
@@ -190,9 +200,9 @@ button { font: inherit; color: inherit; }
 .tong-nut svg { width: 18px; height: 18px; fill: currentColor; flex: none; }
 .tong-nut[data-k='tat'] svg { fill: none; stroke: currentColor; stroke-width: 2; }
 .tong-nut b { min-width: 24px; padding: 1px 7px; border-radius: 999px; background: var(--gvm-mat-2); font-variant-numeric: tabular-nums; text-align: center; }
-.tong-nut[data-k='voi'] { color: var(--gvm-ho); border-color: color-mix(in srgb, var(--gvm-ho) 45%, var(--gvm-vien)); }
-.tong-nut[data-k='treo'] { color: var(--gvm-tim); border-color: color-mix(in srgb, var(--gvm-tim) 45%, var(--gvm-vien)); }
-.tong-nut[data-k='co-tinh'] { color: var(--gvm-tim-dam); border-color: var(--gvm-tim); }
+.tong-nut[data-k='voi'] { color: var(--gvm-hp-dam); border-color: var(--gvm-hp); background: var(--gvm-hp-nen); }
+.tong-nut[data-k='treo'] { color: var(--gvm-ho); border-color: color-mix(in srgb, var(--gvm-ho) 45%, var(--gvm-vien)); }
+.tong-nut[data-k='co-tinh'] { color: var(--gvm-ho-dam); border-color: var(--gvm-ho); background: var(--gvm-ho-nen); }
 .tong-nut[aria-pressed='true'] { background: var(--gvm-xd); border-color: var(--gvm-xd); color: var(--gvm-tren-dac); }
 .tong-nut[aria-pressed='true'] b { background: color-mix(in srgb, var(--gvm-tren-dac) 22%, transparent); }
 .tong-nut:focus-visible, .dd-dong:focus-visible, .nut-chu:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; }
@@ -201,56 +211,67 @@ button { font: inherit; color: inherit; }
 .loc-dong { font-size: 14px; color: var(--gvm-chu-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .loc-dong b { color: var(--gvm-chu); }
 .loi { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 8px 12px; border-radius: 14px; background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-size: 14px; }
 .loi .nut-chu { color: inherit; text-decoration: underline; }
-/* chú giải */
+/* chú giải + màu 3 nhóm (biến có nghĩa sẵn có: hổ phách = cảnh báo, lục = tốt, hồng = lỗi) */
 .chu-giai { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 12px; color: var(--gvm-chu-3); }
-.chu-giai > span { display: inline-flex; align-items: center; gap: 4px; } .cg-tieu { font-weight: 700; color: var(--gvm-chu-2); } .cg-rieng { margin-left: auto; font-style: italic; }
-.chu-giai i { display: inline-block; width: 14px; height: 8px; border-radius: 2px; }
-/* sáu đoạn — cùng công thức màu Mức làm 1–4 đang có (diem-danh-buoc1.css); 5 = tím sọc, 6 = tím đặc */
-[data-m='1'] { --mm: color-mix(in srgb, var(--gvm-xd) 24%, var(--gvm-mat-2)); } [data-m='2'] { --mm: color-mix(in srgb, var(--gvm-xd) 46%, var(--gvm-mat-2)); }
-[data-m='3'] { --mm: color-mix(in srgb, var(--gvm-xd) 72%, var(--gvm-mat-2)); } [data-m='4'] { --mm: var(--gvm-xd); }
-.chu-giai i[data-m], .ml-thanh i[data-m] { background: var(--mm); }
-.chu-giai i[data-m='5'], .ml-thanh i[data-m='5'] { background: repeating-linear-gradient(135deg, var(--gvm-tim) 0 3px, var(--gvm-tim-nen) 3px 6px); }
-.chu-giai i[data-m='6'], .ml-thanh i[data-m='6'] { background: var(--gvm-tim-dam); }
-/* danh sách */
+.chu-giai > span { display: inline-flex; align-items: center; gap: 5px; } .cg-rieng { margin-left: auto; font-style: italic; }
+.chu-giai i { display: inline-block; width: 16px; height: 9px; border-radius: 3px; }
+[data-g='voi'] { background: var(--gvm-hp); } [data-g='nghi'] { background: var(--gvm-xl); }
+[data-g='treo'] { background: repeating-linear-gradient(135deg, var(--gvm-ho) 0 3px, var(--gvm-ho-nen) 3px 6px); } [data-g='co-tinh'] { background: var(--gvm-ho-dam); }
+/* CỘT THẲNG HÀNG: giờ · em · % sai vì vội · thanh · treo máy */
+.dau-cot, .dd-dong { display: grid; grid-template-columns: 48px minmax(150px, 1.15fr) 104px minmax(180px, 1.5fr) 92px; align-items: center; column-gap: 16px; }
+.dau-cot { padding: 0 8px 6px; border-bottom: 1px solid var(--gvm-vien); font-size: 12px; font-weight: 800; color: var(--gvm-chu-2); }
+.dau-cot small { display: block; font-weight: 500; color: var(--gvm-chu-3); }
 .vua-ds { display: grid; }
-.dd-dong { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: start; gap: 12px; width: 100%; min-height: 64px; padding: 10px 8px; border: 0; border-top: 1px solid var(--gvm-mat-2); background: none; text-align: left; cursor: pointer; touch-action: manipulation; }
+.dd-dong { width: 100%; min-height: 64px; padding: 10px 8px; border: 0; border-bottom: 1px solid var(--gvm-mat-2); background: none; text-align: left; cursor: pointer; touch-action: manipulation; }
 .dd-dong:hover { background: var(--gvm-mat-2); }
-.dd-gio { padding-top: 3px; font-size: 13px; color: var(--gvm-chu-3); font-variant-numeric: tabular-nums; }
-.dd-than { display: grid; gap: 6px; min-width: 0; }
-.dd-h1 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
-.dd-ten { font-size: 16px; font-weight: 800; min-width: 0; overflow-wrap: anywhere; }
-.dd-chip { padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; background: var(--gvm-mat-2); color: var(--gvm-chu-2); white-space: nowrap; }
+.dd-gio { font-size: 13px; color: var(--gvm-chu-3); font-variant-numeric: tabular-nums; }
+.o-em { display: grid; gap: 4px; min-width: 0; justify-items: start; }
+.o-ten { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.dd-ten { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+.co-tinh { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px 2px 7px; border-radius: 6px; background: var(--gvm-ho); color: var(--gvm-tren-dac); font-size: 12px; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 0 var(--gvm-ho-dam); }
+.co-tinh svg { width: 13px; height: 13px; fill: currentColor; }
+.dd-chip { padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--gvm-mat-2); color: var(--gvm-chu-2); white-space: nowrap; }
 .dd-chip[data-nhom='cham'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); } .dd-chip[data-nhom='chua-deu'] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); } .dd-chip[data-nhom='luoi'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
-.dd-dh { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
-.dh { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 8px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; border: 1.5px solid; font-variant-numeric: tabular-nums; }
-.dh svg { width: 14px; height: 14px; fill: currentColor; flex: none; }
-.dh[data-k='voi'] { color: var(--gvm-ho); border-color: var(--gvm-ho); background: var(--gvm-mat); }
-.dh[data-k='treo'] { color: var(--gvm-tim-dam); border-color: var(--gvm-tim); background: var(--gvm-tim-nen); }
-.dh[data-k='co-tinh'] { color: var(--gvm-tren-dac); border-color: var(--gvm-tim-dam); background: var(--gvm-tim-dam); }
-.dd-h2 { display: grid; grid-template-columns: minmax(140px, 300px) minmax(0, 1fr); align-items: center; gap: 4px 14px; }
-.ml-thanh { display: flex; gap: 2px; height: 10px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--gvm-chu-3) 14%, transparent); }
-.ml-thanh i { display: block; flex-basis: 0; min-width: 5px; }
+.o-voi { display: grid; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.o-voi b { font-size: 26px; font-weight: 900; color: var(--gvm-chu-2); }
+.o-voi[data-nhieu] b { color: var(--gvm-hp); }
+.o-voi small { font-size: 12px; color: var(--gvm-chu-3); }
+.o-voi--trong, .o-treo--trong { font-size: 18px; color: var(--gvm-chu-3); }
+.o-voi--it b { font-size: 20px; color: var(--gvm-chu-3); }
+.o-thanh { display: grid; gap: 5px; min-width: 0; }
+.o-thanh small { font-size: 12px; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; } .o-thanh small b { color: var(--gvm-chu); }
+.o-thanh small.nghieng { font-style: italic; color: var(--gvm-chu-3); }
+.ml-thanh { display: flex; gap: 2px; height: 12px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--gvm-chu-3) 14%, transparent); }
+.ml-thanh i { display: block; flex-basis: 0; min-width: 6px; }
 .ml-thanh--cho { opacity: .5; }
-.ml-chu { font-size: 13px; line-height: 1.4; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; } .ml-chu b { color: var(--gvm-chu); font-weight: 800; }
-.ml-chu small { display: block; font-size: 12px; color: var(--gvm-chu-3); }
-.ml-chu--nghieng { font-style: italic; color: var(--gvm-chu-3); }
-.ml-chua-treo { display: inline-block; padding: 0 8px; border: 1px dashed var(--gvm-chu-3); border-radius: 999px; font-style: italic; }
+.o-treo { display: inline-flex; align-items: center; gap: 5px; justify-self: start; padding: 3px 10px 3px 8px; border-radius: 999px; font-size: 13px; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; }
+.o-treo svg { width: 13px; height: 13px; fill: currentColor; } .o-treo b { font-size: 16px; }
+.o-treo[data-nhieu='1'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-weight: 700; }
+.chu-chung { font-size: 12px; line-height: 1.5; color: var(--gvm-chu-3); } .chu-chung b { color: var(--gvm-chu-2); }
 .nut-chu { min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--gvm-xd); font-size: 14px; font-weight: 700; cursor: pointer; justify-self: start; }
 .xong { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 18px; border-radius: 22px; background: var(--gvm-mat-2); }
 .xong p { flex: 1 1 320px; font-size: 14px; line-height: 1.6; color: var(--gvm-chu-2); } .xong p b { color: var(--gvm-chu); }
 .nut-chinh { min-height: 52px; padding: 0 22px; border: 0; border-radius: 16px; background: var(--gvm-xd); color: var(--gvm-tren-dac); font-size: 16px; font-weight: 800; box-shadow: var(--gvm-bong-nut); cursor: pointer; }
 @media (max-width: 860px) {
-  .trang { padding: 12px 12px 32px; } .b1 { padding: 16px; border-radius: 24px; gap: 16px; }
+  .trang { padding: 34px 12px 32px; } .b1 { padding: 16px; border-radius: 24px; gap: 16px; }
   .giu { grid-template-columns: 1fr 1fr; } .giu-vang { grid-column: 1 / -1; }
   .vua { padding: 14px; }
-  .dd-h2 { grid-template-columns: minmax(0, 1fr); }
-  .cg-rieng { margin-left: 0; width: 100%; }
+  .dau-cot, .dd-dong { grid-template-columns: 44px minmax(120px, 1fr) 84px minmax(140px, 1.2fr) 70px; column-gap: 10px; }
+  .o-voi b { font-size: 22px; }
 }
+/* ĐIỆN THOẠI DỌC: không đủ 5 cột ⇒ mỗi em 3 hàng: (giờ · tên · cờ) / (nhịp · % · treo) / thanh cả bề ngang; đầu cột ẩn (chú giải đã nói nghĩa màu) */
 @media (max-width: 600px) {
-  .dd-dong { grid-template-columns: 40px minmax(0, 1fr); gap: 8px; padding-inline: 4px; }
-  .dd-dh { margin-left: 0; width: 100%; }
+  .dau-cot { display: none; }
+  .dd-dong { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: 'gio em em' '. voi treo' '. thanh thanh'; row-gap: 6px; column-gap: 8px; padding-inline: 4px; }
+  .dd-gio { grid-area: gio; align-self: start; padding-top: 3px; } .o-em { grid-area: em; grid-template-columns: auto; } .o-voi { grid-area: voi; } .o-treo { grid-area: treo; justify-self: end; } .o-thanh { grid-area: thanh; }
+  .o-em { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+  .o-voi { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; min-width: 0; } .o-voi b { font-size: 22px; }
+  .o-voi::before { content: 'Sai vì vội'; font-size: 12px; color: var(--gvm-chu-3); white-space: nowrap; } .o-voi small { white-space: nowrap; }
+  .o-treo::before { content: 'Treo'; font-size: 12px; font-weight: 500; color: var(--gvm-chu-3); white-space: nowrap; } .o-treo[data-nhieu='1']::before { color: inherit; }
+  .o-treo--trong { font-size: 14px; }
+  .o-voi--trong::before { content: none; }
   .tong-nuts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; } .tong-nut { padding-inline: 8px 10px; font-size: 13px; gap: 5px; } .tong-nut span { min-width: 0; } .tong-nut b { margin-left: auto; }
-  .tong-cho { grid-column: span 2; } .trang { padding-top: 34px; } .nut-chinh { width: 100%; }
+  .tong-cho { grid-column: span 2; } .cg-rieng { margin-left: 0; width: 100%; } .nut-chinh { width: 100%; }
 }
 `
 
@@ -427,4 +448,4 @@ writeFileSync(join(THU_MUC, 'chieu.html'), htmlC)
 if (/Cố tình|co_tinh|coTinh/.test(htmlC.replace(/_coTinhBiHa/g, ''))) throw new Error('Tờ chiếu lộ chữ Cố tình')
 const tongDd = (ds) => ({ voi: ds.filter((r) => coDau(r[4], 'voi')).length, treo: ds.filter((r) => coDau(r[4], 'treo')).length, coTinh: ds.filter((r) => coDau(r[4], 'co-tinh')).length })
 console.log(`ĐÃ DỰNG docs/ban-ve-muc-lam-6-muc-2210/ · diem-danh.html ${(htmlDd.length / 1024).toFixed(0)} KB (${KHUNG_DD.length} khung) · chieu.html ${(htmlC.length / 1024).toFixed(0)} KB (${KHUNG_C.length} khung)`)
-console.log('Dấu hiệu 30 em có mặt:', JSON.stringify(tongDd(CA_LOP)), '· 6 dòng đầu:', DONG_DAU.map((r) => `${r[1]}=[${dauHieu(r[4]).map((x) => x.chu).join(' | ')}]`).join('; '))
+console.log('Lọc 30 em có mặt:', JSON.stringify(tongDd(CA_LOP)), '· 6 dòng đầu (sai vì vội):', DONG_DAU.map((r) => { const d = r[4]; const n = d.saiVoi + d.saiNghi; return `${r[1]}=${n >= MAU_TOI_THIEU ? `${pt(d.saiVoi, n)}% (${d.saiVoi}/${n})` : `ít (${n})`} treo ${d.treo + d.coTinh}` }).join('; '))
