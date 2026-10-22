@@ -33,6 +33,8 @@ export interface HoSoCuaEmHsProps {
   /** Đợt 16: bấm một hộp "Chưa sửa được" ⇒ mở Tự sửa lỗi đúng câu ấy (đợt 18: chỉ hộp của câu đang ở Tự sửa lỗi và còn cần sửa). `qid` = khoá câu của lệnh `/hs/lich-su-lam-cau` (bản học sinh: "c1", "c2"…
    *  theo hợp đồng lọc server/src/ho-so-em-hs-loc.ts). Cổng học sinh (StudentPortalScreen) nối. Vắng ⇒ hộp không bấm được. */
   onChuaCau?: (qid: string) => void
+  /** 6 mức (22/10): hồ sơ trống ⇒ nút "Mở Bài tập về nhà" (cổng học sinh đóng tấm rồi mở màn làm bài). Vắng ⇒ không nút. */
+  onMoBaiTap?: () => void
 }
 
 /** Bản nhớ danh sách Tự sửa lỗi còn dùng được cho hồ sơ (mở hồ sơ ngay sau khi sửa ở màn Tự sửa lỗi thì bản nhớ đã mới). */
@@ -45,7 +47,7 @@ export function khoaCanSua(kq: KetQuaDanhSachChua | null | undefined, nayMs: num
 
 const RONG: ReadonlySet<string> = new Set()
 
-export default function HoSoCuaEmHs({ token, tenEm, lop, onDong, onChuaCau }: HoSoCuaEmHsProps) {
+export default function HoSoCuaEmHs({ token, tenEm, lop, onDong, onChuaCau, onMoBaiTap }: HoSoCuaEmHsProps) {
   useKhoaCuonTrang(true)
   const nguon = useMemo(() => taoNguonHoSoEm(token), [token])
   const coDuong = !!onChuaCau
@@ -74,7 +76,7 @@ export default function HoSoCuaEmHs({ token, tenEm, lop, onDong, onChuaCau }: Ho
   )
   return createPortal(
     <div className="hs-ho-so-em" data-che-do="hoc-sinh">
-      <HoSoLamCauEm em={em} nguon={nguon} cheDo="hoc-sinh" onDong={onDong} onChuaCau={onChuaCau} coTheChua={coTheChua} soCauCanSua={soCanSua ?? undefined} />
+      <HoSoLamCauEm em={em} nguon={nguon} cheDo="hoc-sinh" onDong={onDong} onChuaCau={onChuaCau} coTheChua={coTheChua} soCauCanSua={soCanSua ?? undefined} onMoBaiTap={onMoBaiTap} />
     </div>,
     document.body,
   )

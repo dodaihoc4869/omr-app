@@ -315,7 +315,7 @@ export function KhoiSauMucThay({ tong, m6, onXemTreo }: PropsSauMuc) {
 
 // ------------------------------------------------------------------ KHỐI CÁCH LÀM BÀI (HỌC SINH / PHỤ HUYNH)
 /** Học sinh: «Em làm bài thế nào» — 5 mức của lượt SAI + ô hồng nhạt số lượt máy để treo. Phụ huynh: «Cách con làm bài» — 4 mức + một dòng "Máy để treo". */
-export function KhoiCachLamEm6({ tong, m6, cheDo, soSaiTong }: { tong: TongMucLam; m6?: MucLam6; cheDo: 'hoc-sinh' | 'phu-huynh'; soSaiTong?: number }) {
+export function KhoiCachLamEm6({ tong, m6, cheDo, soSaiTong, onMoBaiTap }: { tong: TongMucLam; m6?: MucLam6; cheDo: 'hoc-sinh' | 'phu-huynh'; soSaiTong?: number; onMoBaiTap?: () => void }) {
   const laPh = cheDo === 'phu-huynh'
   const ngoi = laPh ? 'con' : 'em'
   const chuaTreo = chuaDoTreoHet(tong, !!m6)
@@ -331,6 +331,7 @@ export function KhoiCachLamEm6({ tong, m6, cheDo, soSaiTong }: { tong: TongMucLa
       <div className="hsv-trong">
         <b>Chưa có lượt làm câu nào trong 7 ngày</b>
         <p>Khi {ngoi} làm Bài tập về nhà, Bát Linh Đảo hay Ôn lại, từng lượt và Mức làm sẽ hiện ở đây.</p>
+        {!laPh && onMoBaiTap && <NutMoBaiTap onMo={onMoBaiTap} />}
       </div>
     )
   } else if (tong.soDo === 0) {
@@ -401,6 +402,15 @@ export function KhoiCachLamEm6({ tong, m6, cheDo, soSaiTong }: { tong: TongMucLa
       {than}
       {tong.soDo + tong.chuaCoSoDo > 0 && dongTreo}
     </section>
+  )
+}
+
+/** Học sinh, trạng thái rỗng (đặc tả mục 3): việc làm tiếp — mở Bài tập về nhà (cổng học sinh nối, đóng tấm rồi mở màn làm bài). */
+export function NutMoBaiTap({ onMo }: { onMo: () => void }) {
+  return (
+    <button type="button" className="gvv2-nut-vien tt-nhan" onClick={onMo}>
+      Mở Bài tập về nhà
+    </button>
   )
 }
 
