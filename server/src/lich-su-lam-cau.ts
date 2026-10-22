@@ -18,6 +18,8 @@
 // nào lỗi thì để trống phần ấy (chon/giây/tiêu đề = null/rỗng), không làm hỏng cả lệnh.
 import type { Env } from './kieu'
 import type { CauEmSai, LanLamCau, NguonGiay, TraLoiLichSuLamCau } from './lich-su-lam-cau-kieu'
+import { mucLam6 } from './lich-su-6-muc'
+export { mucLam6, TOI_DA_LUOT_BANG_CHUNG } from './lich-su-6-muc' // hàm thuần ở tệp riêng (trang chụp / test giao diện nhập được, không kéo D1)
 import { chiTietCauCuaLuot, giayUocTinhGame, noiCuaCa } from './ai-sai-cau'
 import { loaiGameCua } from './dau-gio'
 import { tachSongSinh } from './loi-hoc-luat'
@@ -128,7 +130,7 @@ export async function gvLichSuLamCau(env: Env, b: Row): Promise<TraLoiLichSuLamC
 }
 
 /** LÕI lịch sử làm câu của MỘT em (`sbd` đã kiểm ở nơi gọi: thầy ⇒ thân lệnh; em ⇒ token). Xem đầu tệp; `nguoiDoc` xem `NguoiDocSo`. */
-export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unknown, nguoiDoc: NguoiDocSo): Promise<TraLoiLichSuLamCau> {
+export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unknown, nguoiDoc: NguoiDocSo, nowMs: number = Date.now()): Promise<TraLoiLichSuLamCau> {
   const gx = Math.floor(Number(gioiHanThan))
   const gioiHan = Number.isFinite(gx) && gx > 0 ? Math.min(TRAN_GIOI_HAN_LAN, gx) : GIOI_HAN_LAN_MAC_DINH
 
@@ -228,7 +230,8 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   // Mức làm 6 (22/10): ≥ 3 lượt treo trong cùng một ngày của em ⇒ "Cố tình treo máy". Bản học sinh/phụ huynh KHÔNG BAO GIỜ thấy Mức 6 (đặc tả 6 mức, mục 5): hạ về Mức 5 "Treo máy".
   const mucTho: (MucLamLuot | null)[] = nangCoTinhTheoNgay(dong.map((d, i) => ({ ngay: d.ngay, mucLam: mucLamCuaDong(d, doThat[i] ?? null, giaySo[i]!, beta, kichThuoc) })))
     .map(({ mucLam: m }) => (nguoiDoc === 'thay' ? m ?? null : mucCongKhai(m)))
-  const anMuc = (i: number): boolean => nguoiDoc === 'hoc-sinh' && !!mucTho[i] && dong[i]!.ketQua === 1 && mucTho[i]!.ma <= 2
+  // Lượt TREO luôn mang mức (22/10): lượt vừa treo vừa đúng ở Mức 1–2 vẫn là "Máy để treo" với học sinh/phụ huynh (đặc tả hồ sơ 6 mức, mục 5) — không ẩn.
+  const anMuc = (i: number): boolean => nguoiDoc === 'hoc-sinh' && !!mucTho[i] && !mucTho[i]!.treo && dong[i]!.ketQua === 1 && mucTho[i]!.ma <= 2
   const tatCa: LanLamCau[] = dong.map((d, i) => {
     const giay: number | null = giaySo[i]!.g
     const nguonGiay: NguonGiay = giay === null ? null : giaySo[i]!.loai === 'uoc' ? 'uoc' : 'do'
@@ -289,6 +292,8 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
     },
     // Gộp Mức làm trên đúng tập lượt được xem — trường riêng ngang hàng `tong` (hình dạng `tong` được test ghim, không đụng).
     mucLam: tongMucLam(tatCa.filter((_, i) => !anMuc(i))),
+    // HỒ SƠ 6 MỨC (22/10): trường MỚI; `mucLam` trên giữ nguyên cho máy PWA cũ. Tính trên mảng đã có (0 lệnh D1).
+    mucLam6: mucLam6(tatCa.filter((_, i) => !anMuc(i)), nowMs, nguoiDoc === 'thay', tatCa),
     lan: tatCa.slice(0, gioiHan),
     cauSai,
     conNua: tatCa.length > gioiHan,

@@ -32,6 +32,8 @@ import { tenLopCuaEm } from './ten-lop'
 import { SBD_THU } from './gv-bang-tin'
 import { chiTietCauCuaLuot, giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { chonTuGiaTri, chuanMucDo, sqlLuotCaDaCongBo, tieuDeCau, type NguoiDocSo } from './lich-su-lam-cau'
+import { docDoMuc } from './muc-lam-so'
+import { treoCuaLuot } from './muc-lam'
 import { docCauKho, tenCuaDang } from './omni-d1'
 import { chuoiDuGanNhat, laLuoiTheoTiLe, tomTatNhip } from './nhip-hoc-luat'
 import { CACH_TINH_TIN_CAY, doTinCayTinHieu, tinCayKetLuan, tinCayNhomNhip, type SoLieuThaiDo } from './thai-do-tin-cay'
@@ -410,6 +412,9 @@ export interface LuotThaiDo {
   /** 'tu-tinh' = Phần III (trả lời ngắn) · 'trac-nghiem' = còn lại. */
   loai: 'trac-nghiem' | 'tu-tinh'
   chon: string | null
+  /** Lượt Treo máy (Mức làm 5–6, đồng hồ mới 22/10): giây của lượt không còn nói em đã nghĩ bao lâu ⇒ KHÔNG tính vào giây trung bình / trung vị / phân bố giây.
+   *  Tín hiệu và kết luận thái độ GIỮ NGUYÊN (luật thầy đã chốt). */
+  treo?: true
 }
 
 const phanTram = (tu: number, mau: number): number | null => (mau > 0 ? Math.round((100 * tu) / mau) : null)
@@ -706,7 +711,9 @@ export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: numb
     let chon = chonTuGiaTri(d.raw?.chon ?? d.raw?.traLoi)
     if (chon === null && d.nguon === 'game') chon = traLoiGame.get(d.attemptId || `${d.maNguon}|${d.qid}`) ?? null
     if (chon === null && d.nguon === 'thi') chon = ctCua(d)?.chon ?? null
-    return { luc: d.luc, ngay: d.ngay, goc: d.goc, dung: d.ketQua === null ? null : d.ketQua === 1, giay, loai: phanCua(d) === 'III' ? 'tu-tinh' : 'trac-nghiem', chon }
+    const doTreo = docDoMuc(d.raw)?.treo
+    return { luc: d.luc, ngay: d.ngay, goc: d.goc, dung: d.ketQua === null ? null : d.ketQua === 1, giay, loai: phanCua(d) === 'III' ? 'tu-tinh' : 'trac-nghiem', chon,
+      ...(doTreo && treoCuaLuot(doTreo) ? { treo: true as const } : {}) }
   })
 
   // 4 · ôn: lượt Ôn lại / Khắc phục, hoặc làm lại câu (gốc) đã từng sai TRƯỚC lượt ấy — xét trên mọi lượt đã đọc (cũ → mới).
@@ -723,7 +730,9 @@ export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: numb
     ...dong.filter((d) => trong(d) && (d.hoTro || d.purpose === 'xem_loi_giai')).map((d) => d.goc),
     ...(rHoi ?? []).map((x) => tachSongSinh(str(x.qid)).goc),
   ])
-  const giayCo = luot.map((l) => l.giay).filter((g): g is number => g !== null).sort((x, y) => x - y)
+  // Hồ sơ 6 mức (22/10): bỏ lượt treo khỏi số giây (một lượt treo 10 phút kéo giây trung bình lên ~185 giây).
+  const luotGiay = luot.filter((l) => !l.treo)
+  const giayCo = luotGiay.map((l) => l.giay).filter((g): g is number => g !== null).sort((x, y) => x - y)
   const dem: DemThaiDo = {
     soLuot: luot.length,
     soCau: cauDaLam.size,
@@ -794,7 +803,7 @@ export async function hoSoThaiDoCuaEm(env: Env, sbd: string, b: Row, nowMs: numb
     : catBot ? `Sổ của em vượt ${soLuotChu} lượt — danh sách câu tính trên ${soLuotChu} lượt gần nhất.` : ''
   if (chuCat) canhBao.push(chuCat)
   return {
-    ok: true, em, tu, den, homNay, ketLuan, tinHieu, dem, ngay, phanBoGiay: phanBoGiay(luot), cauDung, cauDaOn, catBot,
+    ok: true, em, tu, den, homNay, ketLuan, tinHieu, dem, ngay, phanBoGiay: phanBoGiay(luotGiay), cauDung, cauDaOn, catBot,
     // Bản học sinh: bỏ ghi chú nội bộ của thầy (Gói 7 chưa đọc được, khoảng ngày bị nắn, sổ Hành trình…), chỉ giữ dòng "sổ bị cắt" nói với em.
     canhBao: nguoiDoc === 'hoc-sinh' ? (chuCat ? [chuCat] : []) : canhBao,
     nhomNhip: nhip.nhom, coDoiPho: ketLuan.nhan === 'doi-pho', chuoiDuGanNhat: nhip.chuoiDuGanNhat,

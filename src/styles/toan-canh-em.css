@@ -16,6 +16,8 @@
 }
 .tc-tim {
   flex: 1 1 320px;
+  /* Co được nhỏ hơn bề rộng tự nhiên của ô nhập + chữ «Enter · mở toàn cảnh» (392 px) — trước đây tràn ngang ở 360/390 px (Boss 22/10). */
+  min-width: 0;
   max-width: 560px;
 }
 .tc-phu {

@@ -62,20 +62,26 @@ export const LENH_HOI_SOM: [string, 'token' | 'sbd'][] = [
 /** Đường vào nào cần mảnh nào — CÙNG luật `docDuongVao` (vai-tro.ts), viết lại cho đoạn mã nội tuyến. */
 export function chonMangNapTruoc(duongDan: string, truyVan: string): 'thi' | 'hs' | 'ph' | 'phieu' | null {
   const q = truyVan || ''
-  const p = duongDan || ''
+  // Cùng chuẩn hoá với `duongChuan` của vai-tro.ts (22/10: `/PH`, `/ph.`, `/ph%20` vẫn là cổng phụ huynh).
+  let p = duongDan || ''
+  try { p = decodeURIComponent(p) } catch (e) { /* giữ nguyên */ }
+  p = p.toLowerCase().replace(/[\s.,;:!?)\]}>"'`]+$/, '')
   // Tham số thắng đường dẫn (docDuongVao đọc tham số trước).
   const vai = /[?&]vai=([^&#]*)/.exec(q)
   const v = vai ? decodeURIComponent(vai[1]).trim().toLowerCase() : ''
   if (v === 'phieu') return 'phieu'
   if (v === 'gv' || v === 'giaovien') return null
-  if (v === 'phuhuynh') return 'ph'
+  if (v === 'phuhuynh' || v === 'ph') return 'ph'
   if (v === 'diem') return 'thi'
-  if (v === 'hocsinh') return 'hs'
+  if (v === 'hocsinh' || v === 'hs') return 'hs'
   if (/[?&]examCode=\d/.test(q)) return 'thi'
   if (/(?:^|\/)[td]\/\d{4,8}\/?$/.test(p)) return 'thi'
   if (/(?:^|\/)(?:hoc-sinh|hocsinh|hs)\/?$/.test(p)) return 'hs'
   if (/(?:^|\/)(?:phu-huynh|phuhuynh|ph)\/?$/.test(p)) return 'ph'
   if (/(?:^|\/)p\/?$/.test(p)) return 'phieu'
+  // Link riêng cũ `/hs/<token>`, `/ph/<token>` ⇒ cổng của vai (vai-tro.ts `RE_APP_CU`).
+  const cu = /(?:^|\/)(hs|ph)\/[0-9a-z]{8,}\/?$/.exec(p)
+  if (cu) return cu[1] === 'ph' ? 'ph' : 'hs'
   return null
 }
 
@@ -131,11 +137,7 @@ const HOI_SOM_MO_CHANG =
 
 /** Mã JS (ES5, tự gọi) chèn vào <head>: chọn mảng theo đường dẫn rồi thêm thẻ link tải sớm (+ hỏi Sảnh sớm khi máy em đã đăng nhập). */
 export function taoMaNapTruoc(bang: BangNapTruoc): string {
-  // Link riêng CŨ (`laLinkAppCu` của vai-tro.ts: `?vai=hs|ph`, `/hs/<token>`): app dựng màn "link đã ngừng dùng" của App.tsx ⇒ không coi là cổng
-  // (không hỏi sớm, không nạp vỏ học sinh) — cùng kết luận với main.tsx.
   return `(function(){try{var c=(${chonMangNapTruoc.toString()})(location.pathname,location.search);var b=${JSON.stringify(bang)};` +
-    `var v='';try{v=(new URLSearchParams(location.search).get('vai')||'').trim()}catch(e){}` +
-    `if(v==='hs'||v==='ph'||/(?:^|\\/)(?:hs|ph)\\/[0-9a-zA-Z]{8,}\\/?$/.test(location.pathname))c=null;` +
     `var nap=function(ds,thap){if(!ds)return;for(var i=0;i<ds.length;i++){var l=document.createElement('link');if(/\\.css$/.test(ds[i])){l.rel='preload';l.as='style'}else if(/\\.woff2$/.test(ds[i])){l.rel='preload';l.as='font';l.type='font/woff2'}else{l.rel='modulepreload'}if(thap)l.fetchPriority='low';l.crossOrigin='';l.href=ds[i];document.head.appendChild(l)}};` +
     `if(c==='hs'&&b.hsVo){var p=null;try{p=JSON.parse(localStorage.getItem(${JSON.stringify(KHOA_PHIEN_HS)})||'null')}catch(e){}nap(b.hsVo);` +
     `if(p){nap(b.hs);var g='';try{g=localStorage.getItem(${JSON.stringify(KHOA_DIA_CHI_HS)})||''}catch(e){}` +

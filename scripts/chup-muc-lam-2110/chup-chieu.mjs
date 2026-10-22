@@ -32,7 +32,7 @@ const KICH = [
   ['chi-tiet-em', 'EM', 'em', ''],
   ['chi-tiet-em-chua-do', 'EM', 'em-chua-do', ''],
 ]
-const KHO = [['1920', 1920, 1080], ['1280', 1280, 720]]
+const KHO = [['1920', 1920, 1080], ['1280', 1280, 720], ['1024', 1024, 768]] // 1024×768: máy chiếu 4:3 (6 mức, 22/10)
 for (const [ten, loai, kich] of KICH) {
   for (const [kho, w, h] of KHO) {
     const nhan = `${ten}-${kho}`

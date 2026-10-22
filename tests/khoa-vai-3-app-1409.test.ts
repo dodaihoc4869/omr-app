@@ -130,11 +130,11 @@ describe('Viết lại địa chỉ về đường chuẩn', () => {
     expect(ch('/')).toBe('')
   })
 
-  it('KHÔNG đụng link riêng CŨ `/hs/<token>` — chúng có màn báo riêng', () => {
-    expect(ch('/hs/abcd1234efgh')).toBe('')
-    expect(ch('/ph/abcd1234efgh')).toBe('')
-    expect(ch('/', '?vai=hs')).toBe('')
-    expect(ch('/', '?vai=ph')).toBe('')
+  it('link riêng CŨ `/hs/<token>`, `?vai=ph` (22/10) ⇒ về đường chuẩn của vai, vào thẳng cổng', () => {
+    expect(ch('/hs/abcd1234efgh')).toBe('/hs')
+    expect(ch('/ph/abcd1234efgh')).toBe('/ph')
+    expect(ch('/', '?vai=hs')).toBe('/hs')
+    expect(ch('/', '?vai=ph')).toBe('/ph')
   })
 
   it('chạy hai lần ra cùng một chỗ — không có vòng viết lại vô tận', () => {

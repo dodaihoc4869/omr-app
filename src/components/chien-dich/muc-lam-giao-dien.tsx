@@ -7,6 +7,7 @@
 // MÀU: Mức làm 1 → 4 là MỘT dải xanh theo độ đậm (CSS: --hslc-m1..4 từ --gvm-xd). Không màu nào là kênh duy nhất: luôn có chữ "Mức làm N" + ký hiệu bốn vạch.
 import type { ReactNode } from 'react'
 import type { KetQuaLichSuLamCau, MucLamLuot, TongMucLam } from '../../lib/lich-su-lam-cau-api'
+import type { Lam7, MucLam6, NgayCoTinh, NgayMucLam } from '../../../server/src/lich-su-lam-cau-kieu'
 
 // ------------------------------------------------------------------ KIỂM KHUNG DỮ LIỆU (chạy một lần khi tấm nạp xong lịch sử)
 const so = (x: unknown): number | null => (typeof x === 'number' && Number.isFinite(x) ? x : null)
@@ -15,7 +16,7 @@ const so = (x: unknown): number | null => (typeof x === 'number' && Number.isFin
 export function docMucLam(x: unknown): MucLamLuot | undefined {
   if (!x || typeof x !== 'object') return undefined
   const o = x as Record<string, unknown>
-  const ma = so(o.ma), giay = so(o.giay), giayDoc = so(o.giayDoc), sanNghi = so(o.sanNghi), thuong = so(o.thuong), ranh2 = so(o.ranh2), ranh3 = so(o.ranh3), ranh4 = so(o.ranh4)
+  const ma = so(o.ma), giay = so(o.giay), giayDoc = so(o.giayDoc), sanNghi = so(o.sanNghi), thuong = so(o.thuong), ranh2 = so(o.ranh2), ranh3 = so(o.ranh3), ranh4 = so(o.ranh4), giayTreo = so(o.giayTreo)
   if (ma === null || ![1, 2, 3, 4].includes(ma) || giay === null || giay < 1 || giayDoc === null || giayDoc < 0 || sanNghi === null || sanNghi < 0 || ranh2 === null || ranh2 < 0 || ranh3 === null || ranh3 < ranh2) return undefined
   return {
     ma: ma as MucLamLuot['ma'],
@@ -29,6 +30,10 @@ export function docMucLam(x: unknown): MucLamLuot | undefined {
     ...(o.xapXi === true ? { xapXi: true as const } : {}),
     ...(o.uocTinh === 'cu' || o.uocTinh === 'uoc' ? { uocTinh: o.uocTinh } : {}),
     ...(o.ghiChu === 'dung_truoc_doc' ? { ghiChu: 'dung_truoc_doc' as const } : {}),
+    // 6 mức (22/10): treo ĐÈ lên `ma` khi hiện; vắng cả `treo` lẫn `daDoTreo` ⇒ "Chưa đo treo máy" (không đoán).
+    ...(o.treo === 'treo' || o.treo === 'co_tinh' ? { treo: o.treo } : {}),
+    ...((o.treo === 'treo' || o.treo === 'co_tinh') && giayTreo !== null && giayTreo >= 0 ? { giayTreo } : {}),
+    ...(o.daDoTreo === true && o.treo === undefined ? { daDoTreo: true as const } : {}),
   }
 }
 
@@ -48,17 +53,82 @@ export function docTongMucLam(x: unknown): TongMucLam | undefined {
   return { soDo, chuaCoSoDo, theoMuc: dong as TongMucLam['theoMuc'], saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat: o.coBetaThat === true, soUocTinh: Math.min(soDo, Math.max(0, so(o.soUocTinh) ?? 0)), soTreo: Math.min(soDo, Math.max(0, so(o.soTreo) ?? 0)), soCoTinh: Math.min(soDo, Math.max(0, so(o.soCoTinh) ?? 0)), soChuaDoTreo: Math.min(soDo, Math.max(0, so(o.soChuaDoTreo) ?? 0)) }
 }
 
-/** Kiểm khung `mucLam` của cả kết quả lịch sử: lượt / tổng sai khung ⇒ bỏ (không bịa). Không có mức ở đâu ⇒ trả NGUYÊN đối tượng. */
-export function chuanHoaMucLam(kq: KetQuaLichSuLamCau): KetQuaLichSuLamCau {
-  const { mucLam: tho, ...con } = kq
+const soKhong = (x: unknown): number => Math.max(0, so(x) ?? 0)
+const ngayDung = (x: unknown): x is string => typeof x === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x)
+const docDungSai = (x: unknown) => {
+  const o = x && typeof x === 'object' ? (x as Record<string, unknown>) : {}
+  return { dung: soKhong(o.dung), sai: soKhong(o.sai) }
+}
+
+/** Hồ sơ 6 mức (máy chủ đã gộp, 22/10). Thiếu `bay` / ngày sai khung ⇒ undefined (giao diện coi như máy chủ cũ: "Chưa đo treo máy"). */
+export function docMucLam6(x: unknown): MucLam6 | undefined {
+  if (!x || typeof x !== 'object') return undefined
+  const o = x as Record<string, unknown>
+  const bay = docTongMucLam(o.bay)
+  if (!bay || !ngayDung(o.tu) || !ngayDung(o.den)) return undefined
+  const toanBo = docTongMucLam(o.toanBo)
+  const td = o.treoDungSai && typeof o.treoDungSai === 'object' ? (o.treoDungSai as Record<string, unknown>) : {}
+  const theoNgay: NgayMucLam[] = (Array.isArray(o.theoNgay) ? o.theoNgay : []).flatMap((r): NgayMucLam[] => {
+    const q = r && typeof r === 'object' ? (r as Record<string, unknown>) : {}
+    if (!ngayDung(q.ngay) || !Array.isArray(q.dem) || q.dem.length !== 6) return []
+    return [{ ngay: q.ngay, dem: q.dem.map(soKhong) as NgayMucLam['dem'], chuaCoSoDo: soKhong(q.chuaCoSoDo), soChuaDoTreo: soKhong(q.soChuaDoTreo) }]
+  })
+  const l7 = o.lam7 && typeof o.lam7 === 'object' ? (o.lam7 as Record<string, unknown>) : null
+  const lam7: Lam7 | undefined = l7
+    ? { soLuot: soKhong(l7.soLuot), soCau: soKhong(l7.soCau), soDung: soKhong(l7.soDung), soSai: soKhong(l7.soSai), soBoTrong: soKhong(l7.soBoTrong), giayTb: so(l7.giayTb), soLuotCoGiay: soKhong(l7.soLuotCoGiay), soTreo: soKhong(l7.soTreo) }
+    : undefined
+  const ngayCoTinh: NgayCoTinh[] | undefined = Array.isArray(o.ngayCoTinh)
+    ? o.ngayCoTinh.flatMap((r): NgayCoTinh[] => {
+        const q = r && typeof r === 'object' ? (r as Record<string, unknown>) : {}
+        if (!ngayDung(q.ngay) || !Array.isArray(q.luot)) return []
+        const luot = q.luot.flatMap((v) => {
+          const w = v && typeof v === 'object' ? (v as Record<string, unknown>) : {}
+          return typeof w.luc === 'string' ? [{ luc: w.luc, giayTreo: soKhong(w.giayTreo), tieuDe: typeof w.tieuDe === 'string' ? w.tieuDe : '' }] : []
+        })
+        return [{ ngay: q.ngay, so: Math.max(luot.length, soKhong(q.so)), luot }]
+      })
+    : undefined
+  return {
+    tu: o.tu,
+    den: o.den,
+    bay,
+    toanBo: toanBo ?? bay,
+    treoDungSai: { treo: docDungSai(td.treo), coTinh: docDungSai(td.coTinh) },
+    theoNgay: theoNgay.length === 7 ? theoNgay : [],
+    ...(lam7 ? { lam7 } : {}),
+    ...(ngayCoTinh?.length ? { ngayCoTinh } : {}),
+  } as MucLam6
+}
+
+/** Bản học sinh / phụ huynh KHÔNG BAO GIỜ có Mức 6 (máy chủ đã hạ về 5) — máy khách chặn thêm một lớp: 'co_tinh' ⇒ 'treo', bỏ bằng chứng. Thuần. */
+function haMuc6(m: MucLam6): MucLam6 {
+  const { ngayCoTinh: _bo, ...con } = m
+  const ha = (t: TongMucLam): TongMucLam => ({ ...t, soTreo: t.soTreo + t.soCoTinh, soCoTinh: 0 })
+  const { treo, coTinh } = m.treoDungSai
+  return {
+    ...con,
+    bay: ha(m.bay),
+    toanBo: ha(m.toanBo),
+    treoDungSai: { treo: { dung: treo.dung + coTinh.dung, sai: treo.sai + coTinh.sai }, coTinh: { dung: 0, sai: 0 } },
+    theoNgay: m.theoNgay.map((n) => ({ ...n, dem: [n.dem[0], n.dem[1], n.dem[2], n.dem[3], n.dem[4] + n.dem[5], 0] })),
+  }
+}
+
+/** Kiểm khung `mucLam` / `mucLam6` của cả kết quả lịch sử: lượt / tổng sai khung ⇒ bỏ (không bịa). Không có mức ở đâu ⇒ trả NGUYÊN đối tượng.
+ *  `laThay = false` (học sinh / phụ huynh): Mức 6 hạ về 5 ở mọi chỗ (máy chủ đã làm; đây là lớp chặn thứ hai). */
+export function chuanHoaMucLam(kq: KetQuaLichSuLamCau, laThay = true): KetQuaLichSuLamCau {
+  const { mucLam: tho, mucLam6: tho6, ...con } = kq
   const tong = docTongMucLam(tho)
+  const sau0 = docMucLam6(tho6)
+  const sau = sau0 && !laThay ? haMuc6(sau0) : sau0
   const lan = kq.lan.map((l) => {
     if (l.mucLam === undefined) return l
     const { mucLam: m, ...phan } = l
     const muc = docMucLam(m)
+    if (muc && !laThay && muc.treo === 'co_tinh') muc.treo = 'treo'
     return muc ? { ...phan, mucLam: muc } : phan
   })
-  return { ...con, lan, ...(tong ? { mucLam: tong } : {}) }
+  return { ...con, lan, ...(tong ? { mucLam: tong } : {}), ...(sau ? { mucLam6: sau } : {}) }
 }
 
 export type MaMuc = 1 | 2 | 3 | 4
@@ -156,12 +226,20 @@ export function chuGiayVaDoc(m: Pick<MucLamLuot, 'giay' | 'giayDoc' | 'xapXi' | 
 }
 
 /** Phần Mức làm của MỘT dòng lịch sử: dòng giây + thước (+ ghi chú đúng-trước-khi-đọc, chỉ thầy — máy chủ không gửi cho em / phụ huynh). */
-export function MucCuaLuot({ m, cheDo }: { m: MucLamLuot; cheDo: CheDoMuc }) {
+export function MucCuaLuot({ m, cheDo, chuaDoTreo = false }: { m: MucLamLuot; cheDo: CheDoMuc; chuaDoTreo?: boolean }) {
   return (
     <span className="hslc-muc-luot">
       <span className="hslc-muc-luot-dong">
         <ChipMuc ma={m.ma} cheDo={cheDo} dai uoc={!!m.uocTinh} />{' '}
         <span className="hslc-muc-luot-so gvv2-so">{chuGiayVaDoc(m)}</span>
+        {chuaDoTreo && (
+          <>
+            {' '}
+            <span className="hsv-chua-treo" title="Lượt làm trước khi máy em có đồng hồ đo treo máy — chưa xếp được Mức làm 5–6, không đoán.">
+              Chưa đo treo máy
+            </span>
+          </>
+        )}
       </span>
       <ThuocMuc m={m} />
       {cheDo === 'thay' && m.uocTinh && <span className="hslc-muc-luot-ghi">{NHAN_UOC_TINH[m.uocTinh]}</span>}
@@ -193,10 +271,15 @@ export function ChuGiaiThuoc() {
 }
 
 /** Cách tính (thầy, mở/đóng — "i" của bản vẽ). Số sàn nghĩ là TẠM (đặc tả mục 3): đổi ở server/src/muc-lam.ts thì đổi chữ ở đây. */
-export function CachTinhMuc() {
+export function CachTinhMuc({ coTreo = false }: { coTreo?: boolean }) {
   return (
     <details className="hslc-cach">
       <summary className="tt-nhan">Cách tính Mức làm</summary>
+      {coTreo && (
+        <p>
+          Mức làm 5 · Treo máy: trong lượt có một quãng không chạm màn từ 5 phút khi màn đang sáng, hoặc rời app từ 3 phút khi màn được giữ sáng (10 phút khi máy không giữ được màn sáng), hoặc có từ 3 quãng lặng 2–3 phút. Mức làm 6 · Cố tình treo máy: cùng một ngày có từ 3 lượt treo máy. Lượt treo đè lên Mức làm 1–4 và không tính vào số giây trung bình. Lượt làm trước khi máy em có đồng hồ đo treo máy ghi “Chưa đo treo máy”, không đoán. Ngưỡng là tạm, chỉnh sau một tuần số thật.
+        </p>
+      )}
       <p>
         Thời gian đọc hết đề tính theo độ dài câu: 8 giây + 0,35 giây mỗi từ + 10 giây nếu có hình. Mức làm 1: giây làm ít hơn thời gian đọc hết đề. Mức làm 2: đã đọc xong nhưng chưa đủ thời gian nghĩ (sàn nghĩ theo phần: phần I 6 giây,
         phần II 12 giây, phần III 15 giây). Mức làm 3: có thời gian nghĩ. Mức làm 4: làm từ 0,8 lần thời gian thường của lớp ở câu ấy — chỉ xếp khi lớp đã đủ mẫu của câu. Lượt đo bằng đồng hồ mới cho mức chắc chắn. Lượt cũ có số giây từ đồng hồ cũ, hoặc ước tính từ mốc trả lời trong lượt chơi game, xếp kèm dấu ≈ (số giây chỉ có thể dư, nên tối đa Mức làm 3). Lượt nộp cả lô hoặc chưa từng bấm giờ ghi “Chưa có số đo”, không đoán.

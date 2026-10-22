@@ -1,7 +1,8 @@
 // TOÀN CẢNH MỘT EM — trang riêng của thầy (Hôm nay v2, bước 5; đề bài prompt-hom-nay-gv-v2.md, bản vẽ docs/ban-ve-hom-nay-v2-2109/3-toan-canh-mot-em-1440.jpg).
 // Mở từ ô tra cứu / bấm tên em ở các ô của màn Hôm nay. Nguồn: lệnh thầy CHỈ ĐỌC `/gv/em-toan-canh` (Code 3) qua `lib/em-toan-canh.ts`. Thiếu trường ⇒ ẩn, KHÔNG bịa; chưa có lệnh ⇒ nói thật
 // và vẫn hiện tên em từ danh sách lớp + các nút dùng được. Chữ theo docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md.
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ArrowLeft, Clock, Eye, Flame, Info, Shield } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
@@ -12,6 +13,10 @@ import type { KetQuaLenh } from '../lib/goi-lenh-thay'
 import '../styles/hom-nay.css' // thẻ số `.hn-so` dùng chung với màn Hôm nay
 import '../styles/hom-nay-v2.css'
 import '../styles/toan-canh-em.css'
+import '../components/chien-dich/gv-v2.css' // khung tấm "Hồ sơ làm bài" (.gvv2-hs) — vào thẳng Toàn cảnh thì chưa màn nào nạp
+
+// Tấm "Hồ sơ làm bài" 6 mức (đặc tả docs/ban-ve-ho-so-em-2210 §2, đường vào từ Toàn cảnh): nạp LƯỜI — cùng mảnh với Nhịp học / Điểm danh / Bài hằng ngày.
+const HoSoLamCauEm = lazy(() => import('../components/chien-dich/HoSoLamCauEm'))
 
 const soThap = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',')
 
@@ -24,6 +29,12 @@ export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHo
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
+  const [moHoSoLam, setMoHoSoLam] = useState(false)
+  const nutHoSoLam = useRef<HTMLButtonElement>(null)
+  const dongHoSoLam = useCallback(() => {
+    setMoHoSoLam(false)
+    nutHoSoLam.current?.focus()
+  }, [])
 
   const [ket, setKet] = useState<KetQuaLenh<ToanCanh> | undefined>(undefined)
   const [dong, setDong] = useState<SuKienEm[]>([])
@@ -178,6 +189,9 @@ export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHo
           <button type="button" className="hn2-nut hn2-nut--vien" onClick={() => moHoSoEm(sbd)}>
             Xem hồ sơ học sinh
           </button>
+          <button ref={nutHoSoLam} type="button" className="hn2-nut hn2-nut--vien" onClick={() => setMoHoSoLam(true)}>
+            Hồ sơ làm bài
+          </button>
         </div>
       </header>
 
@@ -218,6 +232,23 @@ export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHo
           </div>
         </div>
       )}
+
+      {moHoSoLam &&
+        createPortal(
+          <div className="m3 m3-thay vo-thay" data-hoa2="" data-vo-cong="ho-so-lam-cau" style={{ display: 'contents' }}>
+            <Suspense
+              fallback={
+                <>
+                  <div className="gvv2-hs-che" aria-hidden="true" />
+                  <div className="gvv2-hs gvv2-hs--cho" role="status" aria-label="Đang mở hồ sơ làm bài" />
+                </>
+              }
+            >
+              <HoSoLamCauEm em={{ sbd, ten: hoTen, khoi: null, ...(lop ? { lop } : {}) }} onDong={dongHoSoLam} />
+            </Suspense>
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }

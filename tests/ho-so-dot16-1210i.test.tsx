@@ -9,6 +9,7 @@
 // Số từ bộ giả của trang chụp ảnh (scripts/chup-v2/gia). Tên em là tên giả.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { choTamXong, choVaMoGap, moGap } from './_ho-so-6-muc'
 
 const m = vi.hoisted(() => ({ goi: vi.fn() }))
 vi.mock('../src/lib/exam-db', () => ({ loadScriptUrl: async () => 'https://gia/exec', loadTeacherSecret: async () => 'mat', loadExamSources: async () => [] }))
@@ -94,7 +95,8 @@ describe('số giây ở MỌI lượt — câu dễ lẫn câu khó, đúng l�
   it('thầy: hộp câu ghi số giây cả lần ĐÚNG ("Đúng 12 giây"); lần không đo được ghi "—" có chú thích; lịch sử có cột số giây ở lượt đúng câu dễ', async () => {
     thayMo()
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
+    moGap(tam, /^Số giây theo mức độ câu/)
     const hop = [...tam.querySelectorAll('.gvv2-hs-cau')]
     expect(hop).toHaveLength(2)
     expect(hop[0]!.querySelector('.gvv2-hs-cau-giay')!.textContent).toBe('Số giây từng lần (cũ → mới):Sai — chưa đo số giây')
@@ -106,7 +108,6 @@ describe('số giây ở MỌI lượt — câu dễ lẫn câu khó, đúng l�
       'Nhận biết10 giâytrung bình mỗi lượt · 2/2 lượt có số giây · đúng 1/2',
       'Vận dụng cao—chưa đo được số giây · 0/1 lượt có số giây · đúng 0/1',
     ])
-    fireEvent.click(within(tam).getByRole('tab', { name: /^Toàn bộ lịch sử/ }))
     const dong = [...tam.querySelectorAll('.gvv2-hs-lan')].map((l) => l.textContent)
     expect(dong[0]).toBe('10:00Câu 5 · Gọi tên esterĐảo · Nhận biết · Chọn AĐúng12 giây')
     expect(dong[2]).toBe('09:00Câu 40 · Hiệu suất ester hoáCa Kiểm tra 15 phút · Vận dụng cao · Chọn CSai— chưa đo số giây')
@@ -130,7 +131,7 @@ describe('hộp "Chưa sửa được"', () => {
     const onChuaCau = vi.fn()
     render(<HoSoCuaEmHs token="tk-em" tenEm="Nguyễn Minh Anh" lop="12A1" onDong={() => {}} onChuaCau={onChuaCau} />)
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
     const banEm = banHocSinhLichSu(LS)
     const chua = banEm.cauSai.filter((c) => !c.lanCuoiDung)
     const nut = await within(tam).findAllByRole('button', { name: /^Sửa câu này: / })
@@ -156,7 +157,7 @@ describe('hộp "Chưa sửa được"', () => {
     const onChuaCau = vi.fn()
     render(<HoSoLamCauEm em={{ sbd: SBD, ten: TD.em.hoTen, khoi: '12' }} onDong={() => {}} onChuaCau={onChuaCau} />)
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
     const hop = tam.querySelector('.hslc-cs-nhom[data-loai="chua"] .hslc-o')!
     expect(hop.querySelector('button')).toBeNull()
     expect(hop.querySelector('.hslc-o-than')).toBeTruthy()
@@ -189,10 +190,13 @@ describe('app phụ huynh — thẻ "Nhịp học của con" + CÙNG tấm hồ 
     expect(goiFetch.find((g) => g.duong === '/ph/nhip-hoc')!.body).toEqual({ sbd: '12121212' })
     fireEvent.click(within(the).getByRole('button', { name: 'Xem hồ sơ làm bài của con' }))
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
-    expect(within(tam).getByRole('heading', { level: 2 }).textContent).toBe('Hồ sơ làm bài của con · từ 01/10')
+    await choTamXong(tam)
+    await choVaMoGap(tam)
+    expect(within(tam).getByRole('heading', { level: 2 }).textContent).toBe('Hồ sơ làm bài của con')
     expect(within(tam).getByText(/^Nhịp học của con ·/)).toBeTruthy()
-    expect(within(tam).getByRole('heading', { name: 'Toàn bộ sổ của con' })).toBeTruthy()
+    expect([...tam.querySelectorAll('.hsv-gap summary')].map((x) => x.firstChild?.textContent)).toContain('Toàn bộ sổ của con')
+    expect(within(tam).getByRole('heading', { name: /^Lượt sai gần đây/ })).toBeTruthy()
+    expect(within(tam).getByRole('button', { name: 'Xem mọi lượt của con' })).toBeTruthy()
     expect(within(tam).queryByRole('button', { name: /Mở hồ sơ đầy đủ|^Tự chữa/ })).toBeNull()
     expect(tam.textContent).not.toMatch(/SBD|Kho thiếu|Kiến thức cần bổ sung/)
     expect(goiFetch.map((g) => g.duong).filter((d) => d !== '/ph/nhip-hoc').sort()).toEqual(['/ph/ho-so-thai-do', '/ph/lich-su-lam-cau'])
@@ -247,7 +251,8 @@ describe('độ tin cậy trên tấm (trường tuỳ chọn của máy chủ)'
     }
     thayMo(td)
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
+    await choVaMoGap(tam)
     const dau = await waitFor(() => {
       const x = tam.querySelector('.hslc-hero')
       expect(x).toBeTruthy()
@@ -268,12 +273,14 @@ describe('độ tin cậy trên tấm (trường tuỳ chọn của máy chủ)'
     const td = { ...TD, nhomNhip: 'luoi', chuoiDuGanNhat: 1, ketLuan: { ...TD.ketLuan, doTinCay: 61, canThem: 'ít nhất 5 ngày làm bài nữa.' }, tinCayNhom: { doTinCay: 93 } }
     thayMo(td)
     const tam = await screen.findByRole('dialog')
+    await choVaMoGap(tam)
     const dau = await waitFor(() => { const x = tam.querySelector('.hslc-hero'); expect(x).toBeTruthy(); return x as HTMLElement })
     expect(dau.querySelector('.hslc-tin')!.textContent).toBe('Độ tin cậy 93%')
     expect(dau.querySelector('.hslc-tam')).toBeNull()
     cleanup()
     thayMo({ ...td, tinCayNhom: undefined })
     const tam2 = await screen.findByRole('dialog')
+    await choVaMoGap(tam2)
     const dau2 = await waitFor(() => { const x = tam2.querySelector('.hslc-hero'); expect(x).toBeTruthy(); return x as HTMLElement })
     expect(dau2.querySelector('.hslc-tin')).toBeNull()
     expect(dau2.textContent).not.toContain('61%')
@@ -282,7 +289,8 @@ describe('độ tin cậy trên tấm (trường tuỳ chọn của máy chủ)'
   it('vắng ⇒ không chip, không "đang theo dõi" (máy chủ cũ y như trước); chữ độ tin không bao giờ 100%', async () => {
     thayMo()
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
+    await choVaMoGap(tam)
     await waitFor(() => expect(tam.querySelector('.hslc-hero')).toBeTruthy())
     expect(tam.querySelector('.hslc-tin, .hslc-tam, .hslc-cach')).toBeNull()
     expect(chuDoTinCay(100)).toBe('Độ tin cậy 99%')

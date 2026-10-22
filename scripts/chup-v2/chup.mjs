@@ -104,8 +104,16 @@ const DS_DD12C = [
   ['83-dd12c-chieu-ho-so-em-1920-toi', DD12C, 1920, 1080, 'dark', false, /Hành trình giỏi Hóa/, 'dd12c:ho-so'],
   ['84-dd12c-buoc1-ho-so-em-may-tinh', DD12C, 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'dd12c:vua'],
   // THANH MỨC LÀM Ở BẢNG ĐIỂM DANH (thầy 20/10, bản vẽ 03; cảnh `&mlo=1` — máy giả trả Mức làm 14 ngày): máy tính + điện thoại, sáng + tối; cột 1 danh sách mở hết em.
-  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [844, 390, 'ngang'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
     [`85-dd12c-muc-lam-${kho}${nen === 'dark' ? '-toi' : ''}`, `${DD12C}&mlo=1`, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:muc'])),
+  // 6 MỨC (22/10): những ngày đầu (`mlo=dau`, chưa lượt nào đo treo máy) + lọc «Treo máy» (`dd12c:muc-treo`).
+  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].flatMap(([w, hh, kho]) => [
+    [`86-dd12c-ngay-dau-${kho}${nen === 'dark' ? '-toi' : ''}`, `${DD12C}&mlo=dau`, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:muc'],
+    [`87-dd12c-loc-treo-${kho}${nen === 'dark' ? '-toi' : ''}`, `${DD12C}&mlo=1`, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:muc-treo'],
+  ])),
+  // lệnh lô hỏng (bản vẽ khung 04): lý do thật + Thử tải lại, dòng điểm danh vẫn đủ — 3 khổ × sáng/tối
+  ...['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [844, 390, 'ngang'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
+    [`88-dd12c-loi-${kho}${nen === 'dark' ? '-toi' : ''}`, `${DD12C}&mlo=loi`, w, hh, nen, true, /Hành trình giỏi Hóa/, 'dd12c:muc-loi'])),
 ]
 // ═══════════ hết LÀN ĐIỂM DANH 12/10C ═══════════
 // ═══════════ LÀN HÔM NAY 12/10B: Hôm nay của thầy theo bản vẽ thầy duyệt 12/10 — hàng thẻ Việc cần thầy + khối Nhịp học (262 em × 12 ngày, ═══════════
@@ -481,6 +489,10 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     } else if (viec?.startsWith('dd12c:')) {
       // LÀN ĐIỂM DANH 12/10C: chờ ô em vắng có nhóm Lười (Nhịp học đã về) rồi làm đúng một việc.
       const [, v, phim] = viec.split(':')
+      // 21/10 Hành trình một trang 4 bước: bước 1 có thể đang gập (đã có em điểm danh ⇒ mở sẵn bước 2) — mở lại bước 1 trước.
+      const moB1 = t.getByRole('button', { name: /^Mở (lại )?bước 1 · Điểm danh$/ })
+      await moB1.or(t.getByText(/em đang Lười/).first()).first().waitFor({ timeout: 20000 })
+      if (await moB1.isVisible()) await moB1.click()
       await t.getByText(/em đang Lười/).first().waitFor({ timeout: 20000 })
       if (v === 'chieu') {
         await t.getByRole('button', { name: 'Chiếu điểm danh', exact: true }).click()
@@ -496,7 +508,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         await t.locator('.ddc-cot[data-nhom="chua-deu"] .ddc-dong-em').first().click()
         await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
       }
-      if (v === 'muc') await t.locator('.dd1-ml-chu').nth(2).waitFor({ timeout: 20000 }) // thanh Mức làm hỏi sau 1,5 giây
+      if (v === 'muc' || v === 'muc-treo') await t.locator('.dd1-ot small').nth(2).waitFor({ timeout: 20000 }) // thanh Mức làm hỏi sau 1,5 giây
+      if (v === 'muc-treo') await t.locator('.dd1-tong-nut[data-k="treo"]').click()
+      if (v === 'muc-loi') await t.locator('.dd1-ml-loi').waitFor({ timeout: 20000 })
       if (v === 'vua') {
         await t.locator('.dd1-vua-dong').first().click()
         await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })

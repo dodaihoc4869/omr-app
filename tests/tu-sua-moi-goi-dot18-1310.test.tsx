@@ -9,6 +9,7 @@
 //   · luật nhóm MỘT chỗ (`nhomMucChua`) + bản nhớ trong phiên (`taiTuSuaLoi`): lần sau dùng lại, `moi` hỏi lại và báo người nghe, lỗi không ghi nhớ.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { choTamXong, moGap } from './_ho-so-6-muc'
 
 const api = vi.hoisted(() => ({ apiDanhSachTuChua: vi.fn() }))
 vi.mock('../src/lib/chua-cau-sai-api', async (goc) => ({ ...(await goc<typeof import('../src/lib/chua-cau-sai-api')>()), apiDanhSachTuChua: api.apiDanhSachTuChua }))
@@ -67,7 +68,7 @@ async function moTamEm(coTheChua?: ReadonlySet<string>, cheDo: 'hoc-sinh' | 'tha
   const onChuaCau = vi.fn()
   render(<HoSoLamCauEm em={{ sbd: '', ten: 'Em', khoi: null }} nguon={nguon} cheDo={cheDo} onDong={() => {}} onChuaCau={onChuaCau} coTheChua={coTheChua} />)
   const tam = await screen.findByRole('dialog')
-  await within(tam).findByText('Số lượt làm câu')
+  await choTamXong(tam)
   return { tam, onChuaCau }
 }
 const nutSua = (tam: HTMLElement) => within(tam).queryAllByRole('button', { name: /^Sửa câu này: / })
@@ -115,11 +116,10 @@ describe('Hồ sơ của em: "Sửa câu này" chỉ ở câu đang có trong T�
 
   it('học sinh / phụ huynh: bỏ chữ hướng dẫn và cách tính; thầy giữ', async () => {
     const { tam } = await moTamEm(new Set())
-    fireEvent.click(within(tam).getByRole('tab', { name: /^Toàn bộ lịch sử/ }))
+    moGap(tam)
     expect(tam.textContent).not.toMatch(/Mỗi lượt: giờ|Vạch: |Cách tính độ tin cậy/)
     cleanup()
     const thay = await moTamEm(undefined, 'thay')
-    fireEvent.click(within(thay.tam).getByRole('tab', { name: /^Toàn bộ lịch sử/ }))
     expect(thay.tam.textContent).toMatch(/Mỗi lượt: giờ/)
   })
 })
@@ -148,7 +148,7 @@ describe('HoSoCuaEmHs dựng tập từ danh sách Tự sửa lỗi', () => {
     api.apiDanhSachTuChua.mockResolvedValue(kq)
     vo()
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
     await waitFor(() => expect(api.apiDanhSachTuChua).toHaveBeenCalled())
     expect(nutSua(tam)).toHaveLength(0)
     expect(tam.querySelectorAll('.hslc-cs-nhom[data-loai="chua"] .hslc-o')).toHaveLength(3)
@@ -158,7 +158,7 @@ describe('HoSoCuaEmHs dựng tập từ danh sách Tự sửa lỗi', () => {
     api.apiDanhSachTuChua.mockRejectedValue(new Error('mất mạng'))
     vo()
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
     await waitFor(() => expect(api.apiDanhSachTuChua).toHaveBeenCalled())
     expect(nutSua(tam)).toHaveLength(0)
   })
@@ -166,7 +166,7 @@ describe('HoSoCuaEmHs dựng tập từ danh sách Tự sửa lỗi', () => {
   it('không có đường mở (onChuaCau vắng) ⇒ không hỏi danh sách', async () => {
     render(<HoSoCuaEmHs token="tk" tenEm="Em" onDong={() => {}} />)
     const tam = await screen.findByRole('dialog')
-    await within(tam).findByText('Số lượt làm câu')
+    await choTamXong(tam)
     expect(api.apiDanhSachTuChua).not.toHaveBeenCalled()
     expect(nutSua(tam)).toHaveLength(0)
   })

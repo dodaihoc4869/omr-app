@@ -297,3 +297,150 @@
 /* chưa lượt nào có số đo — viền nét đứt, MỘT câu lý do */
 .hslc-cl-trong { display: grid; justify-items: start; gap: 8px; padding: 14px 16px; border: 1.5px dashed var(--gvm-chu-3); border-radius: var(--r-vua, 16px); }
 .hslc-cl-trong p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--gvm-chu-2); }
+
+/* ================= HỒ SƠ 6 MỨC (thầy duyệt bản vẽ docs/ban-ve-ho-so-em-2210, 22/10) — khối `.hsv-*`, CHỈ biến màu có sẵn =================
+   Mức 5 Treo máy = hồng (--gvm-ho) sọc; Mức 6 Cố tình treo máy = hồng đậm (--gvm-ho-dam) đặc, chữ sáng (CHỈ app thầy). Khác HỌ với dải xanh Mức 1–4;
+   ĐỒNG BỘ bảng điểm danh: hổ phách (--gvm-hp) là «Vội» Mức 1–2 bên đó nên treo máy không dùng hổ phách. */
+.hsv {
+  --hsv-5: var(--gvm-ho); --hsv-5-nen: var(--gvm-ho-nen); --hsv-5-dam: var(--gvm-ho-dam);
+  --hsv-6: var(--gvm-ho-dam); --hsv-6-nen: var(--gvm-ho-nen); --hsv-6-dam: var(--gvm-ho-dam);
+}
+.hsv [data-t='5'] { --hslc-c: var(--hsv-5); }
+.hsv [data-t='6'] { --hslc-c: var(--hsv-6); }
+.hsv .gvv2-hs-dau-chu { min-width: 0; }
+.hsv-dau-chip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.hsv-ico { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.hsv .hslc-chip-m[data-t='5'] { background: var(--hsv-5-nen); color: var(--hsv-5-dam); box-shadow: inset 0 0 0 1.5px var(--hsv-5); }
+.hsv .hslc-chip-m[data-t='6'] { background: var(--gvm-ho-dam); color: var(--gvm-ho-nen); box-shadow: none; }
+.hsv .hslc-chip-m[data-t] .hslc-chip-m-ten { color: inherit; }
+.hsv-chua-treo { display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 999px; border: 1.5px dashed var(--gvm-chu-3); font-size: 12px; font-weight: 700; color: var(--gvm-chu-2); white-space: nowrap; }
+.hsv-chip-dau { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 800; line-height: 1.35; max-width: 100%; box-sizing: border-box; background: var(--gvm-mat-2); color: var(--gvm-chu); }
+.hsv-chip-dau[data-t='6'] { background: var(--gvm-ho-dam); color: var(--gvm-ho-nen); }
+.hsv-chip-dau[data-l] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); }
+.hsv-chip-dau[data-nhom='cham'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+
+/* lưới thân: một cột; tấm rộng ≥ 880 px ⇒ hai cột 1,55 : 1 */
+.hsv-luoi { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-content: start; min-width: 0; }
+/* Mỗi cột là container `hslc` riêng: khối bên trong (ô mức, khối cũ trong ngăn gập ở cột phải ~430 px) xếp theo bề rộng CỘT, không theo cả tấm. */
+.hsv-cot { display: grid; gap: 20px; align-content: start; min-width: 0; container: hslc / inline-size; }
+@container hslc (min-width: 880px) { .hsv-luoi { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 24px; } }
+.hsv-khoi { display: grid; gap: 12px; min-width: 0; padding: 16px; border-radius: var(--r-vua, 16px); background: var(--gvm-mat); border: 1px solid var(--gvm-vien); }
+.hsv-khoi > h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0; font-size: 17px; font-weight: 800; color: var(--gvm-chu); }
+.hsv-khoi > h3 small { font-size: 13px; font-weight: 600; color: var(--gvm-chu-2); }
+.hsv-phu { margin: 0; font-size: 14px; line-height: 1.5; color: var(--gvm-chu-2); }
+.hsv-phu b { color: var(--gvm-chu); font-weight: 800; }
+.hsv-ghi { margin: 0; font-size: 13px; line-height: 1.45; color: var(--gvm-chu-2); }
+
+/* điểm nhấn (học sinh / phụ huynh) */
+.hsv-nhan { display: grid; gap: 8px; padding: 20px; border-radius: var(--r-vua, 16px); background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }
+.hsv-nhan small { font-size: 13px; font-weight: 700; }
+.hsv-nhan-so { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.hsv-nhan-so b { font-size: 40px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; }
+.hsv-nhan-so span { font-size: 16px; font-weight: 700; }
+.hsv-nhan p { margin: 0; font-size: 15px; line-height: 1.5; }
+
+/* bốn ô số (thầy) */
+.hsv-so { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.hsv-so div { display: grid; gap: 2px; padding: 12px; border-radius: var(--r-nho, 12px); background: var(--gvm-mat-2); min-width: 0; }
+.hsv-so dt { font-size: 12px; font-weight: 700; color: var(--gvm-chu-2); }
+.hsv-so dd { margin: 0; font-size: 22px; font-weight: 800; color: var(--gvm-chu); }
+.hsv-so dd small { display: block; font-size: 12px; font-weight: 600; color: var(--gvm-chu-2); }
+
+/* thanh chồng 6 mức + đoạn chưa có số đo (đoạn ít lượt vẫn đủ rộng chứa số) */
+.hsv-thanh { display: flex; gap: 3px; height: 32px; }
+.hsv-thanh i { display: grid; place-items: center; min-width: 44px; border-radius: 999px; background: var(--hslc-c); font-style: normal; }
+.hsv-thanh i[data-t='5'] { background: repeating-linear-gradient(135deg, var(--hsv-5) 0 6px, var(--hsv-5-nen) 6px 10px); }
+.hsv-thanh i[data-t='6'] { background: repeating-linear-gradient(45deg, var(--hsv-6) 0 5px, var(--hsv-6-nen) 5px 8px), var(--hsv-6); }
+.hsv-thanh i[data-chua] { background: transparent; border: 1.5px dashed var(--gvm-chu-3); }
+.hsv-thanh b { min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--gvm-mat); color: var(--gvm-chu); font-size: 13px; font-weight: 800; line-height: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* sáu ô mức */
+.hsv-o-luoi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+@container hslc (min-width: 560px) { .hsv-o-luoi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.hsv-o { display: grid; gap: 4px; align-content: start; min-width: 0; padding: 12px; border-radius: var(--r-nho, 12px); background: var(--gvm-mat-2); box-shadow: inset 4px 0 0 var(--hslc-c); }
+.hsv-o[data-t='5'] { background: var(--hsv-5-nen); color: var(--hsv-5-dam); }
+.hsv-o[data-t='6'] { background: var(--gvm-ho-dam); color: var(--gvm-ho-nen); }
+.hsv-o-dau { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; }
+.hsv-o-ten { font-size: 13px; line-height: 1.35; font-weight: 600; color: var(--gvm-chu-2); overflow-wrap: anywhere; }
+.hsv-o[data-t] .hsv-o-ten { color: inherit; }
+.hsv-o-so { font-size: 22px; font-weight: 800; line-height: 1.15; }
+.hsv-o-so small { font-size: 13px; font-weight: 700; }
+.hsv-o-ds { font-size: 13px; font-weight: 600; color: var(--gvm-chu-2); }
+.hsv-o[data-t] .hsv-o-ds { color: inherit; }
+.hsv-o[data-chua] { background: transparent; box-shadow: none; border: 1.5px dashed var(--gvm-chu-3); color: var(--gvm-chu-2); }
+
+/* ba ô "lượt sai rơi vào đâu" */
+.hsv-ba { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+@container hslc (min-width: 560px) { .hsv-ba { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.hsv-ba p { display: grid; gap: 2px; margin: 0; padding: 12px 14px; border-radius: var(--r-nho, 12px); background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }
+.hsv-ba p[data-t='5'] { background: var(--hsv-5-nen); color: var(--hsv-5-dam); }
+.hsv-ba b { font-size: 24px; font-weight: 800; line-height: 1.1; }
+.hsv-ba span { font-size: 14px; line-height: 1.4; }
+
+/* thẻ bằng chứng Mức 6 (chỉ thầy): nền hồng nhạt, chữ + viền hồng đậm */
+.hsv-canh { display: grid; gap: 8px; padding: 14px 16px; border-radius: var(--r-nho, 12px); background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); border: 1.5px solid var(--gvm-ho-dam); }
+.hsv-canh-dau { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; }
+.hsv-canh ol { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.hsv-canh li { padding: 2px 10px; border-radius: 999px; background: var(--gvm-mat); color: var(--gvm-chu); font-size: 13px; font-weight: 700; }
+.hsv-canh p { margin: 0; font-size: 14px; line-height: 1.45; }
+.hsv-canh .gvv2-nut-vien { justify-self: start; background: var(--gvm-mat); color: var(--gvm-chu); }
+
+/* nhẹ nhàng (học sinh / phụ huynh): lượt máy để treo */
+.hsv-nhe { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 12px 14px; border-radius: var(--r-nho, 12px); background: var(--hsv-5-nen); color: var(--hsv-5-dam); font-size: 14px; line-height: 1.5; }
+.hsv-nhe p { margin: 0; }
+.hsv-nhe .hsv-ico { margin-top: 3px; }
+
+/* theo ngày */
+.hsv-ngay { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.hsv-ngay li { display: grid; grid-template-columns: 88px minmax(0, 1fr) 64px; align-items: center; gap: 8px; min-width: 0; }
+.hsv-ngay-ten { font-size: 13px; font-weight: 700; color: var(--gvm-chu); }
+.hsv-ngay-ten small { display: block; font-size: 12px; font-weight: 600; color: var(--gvm-chu-2); }
+.hsv-ngay-thanh { display: flex; gap: 2px; height: 14px; min-width: 0; }
+.hsv-ngay-thanh i { min-width: 4px; border-radius: 3px; background: var(--hslc-c); }
+.hsv-ngay-thanh i[data-t='5'] { background: repeating-linear-gradient(135deg, var(--hsv-5) 0 4px, var(--hsv-5-nen) 4px 7px); }
+.hsv-ngay-thanh i[data-t='6'] { background: var(--hsv-6); }
+.hsv-ngay-thanh i[data-chua] { background: transparent; border: 1.5px dashed var(--gvm-chu-3); }
+.hsv-ngay-so { font-size: 13px; font-weight: 700; text-align: right; color: var(--gvm-chu-2); }
+.hsv-ngay li[data-co-tinh] .hsv-ngay-ten { color: var(--hsv-6-dam); }
+.hsv-chu-giai { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; font-size: 12px; font-weight: 600; color: var(--gvm-chu-2); }
+.hsv-chu-giai span { display: inline-flex; align-items: center; gap: 6px; }
+.hsv-chu-giai i { width: 12px; height: 12px; border-radius: 3px; background: var(--hslc-c); }
+.hsv-chu-giai i[data-t='5'] { background: repeating-linear-gradient(135deg, var(--hsv-5) 0 3px, var(--hsv-5-nen) 3px 5px); }
+.hsv-chu-giai i[data-chua] { background: transparent; border: 1.5px dashed var(--gvm-chu-3); }
+
+/* từng lượt: nút lọc 44 px, lượt treo có viền + sọc trái, thanh phút có sọc */
+.hsv-loc { display: flex; flex-wrap: wrap; gap: 6px; }
+.hsv-loc button { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); color: var(--gvm-chu-2); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.hsv-loc button[aria-selected='true'] { background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); border-color: var(--gvm-xd); }
+.hsv-loc button:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; }
+.hsv .hslc-lan[data-treo] { border-color: var(--hslc-c); box-shadow: inset 4px 0 0 var(--hslc-c); }
+.hsv-phut { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 14px; font-weight: 700; color: var(--hsv-5-dam); }
+.hslc-lan[data-t='6'] .hsv-phut { color: var(--hsv-6-dam); }
+.hsv-phut-thanh { display: block; flex: 1 1 140px; min-width: 120px; height: 10px; border-radius: 999px; background: var(--gvm-mat-2); position: relative; overflow: hidden; }
+.hsv-phut-thanh i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: repeating-linear-gradient(135deg, var(--hslc-c) 0 6px, var(--gvm-mat-2) 6px 9px); }
+.hsv-them { justify-self: start; }
+
+/* khối cũ, gập (giữ nguyên nội dung, chỉ dời xuống) */
+.hsv-gap { display: grid; gap: 8px; min-width: 0; }
+.hsv-gap details { min-width: 0; border-radius: var(--r-nho, 12px); background: var(--gvm-mat); border: 1px solid var(--gvm-vien); }
+.hsv-gap summary { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; font-size: 15px; font-weight: 700; color: var(--gvm-chu); cursor: pointer; list-style: none; touch-action: manipulation; }
+.hsv-gap summary::-webkit-details-marker { display: none; }
+.hsv-gap summary::after { content: ''; flex: none; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); }
+.hsv-gap details[open] > summary::after { transform: rotate(-135deg); }
+.hsv-gap summary small { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--gvm-chu-2); }
+.hsv-gap summary:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: -3px; }
+.hsv-gap-than { display: grid; gap: 16px; min-width: 0; padding: 4px 12px 16px; }
+.hsv .hslc-cach summary { min-height: 44px; display: flex; align-items: center; }
+
+/* trạng thái */
+.hsv-xuong { display: grid; gap: 12px; }
+.hsv-xuong i { display: block; border-radius: 16px; background: var(--gvm-mat-2); animation: hsv-nhay 1.2s ease-in-out infinite; }
+@keyframes hsv-nhay { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .hsv-xuong i { animation: none; } }
+.hsv-trong { display: grid; gap: 10px; justify-items: start; padding: 20px; border-radius: var(--r-vua, 16px); border: 1.5px dashed var(--gvm-chu-3); background: var(--gvm-mat); }
+.hsv-trong p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--gvm-chu-2); }
+.hsv-trong b { font-size: 17px; color: var(--gvm-chu); }
+.hsv-loi { display: grid; gap: 10px; justify-items: start; padding: 16px; border-radius: var(--r-vua, 16px); background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.hsv-loi p { margin: 0; font-size: 15px; line-height: 1.5; }
+.hsv-mang { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 16px; padding: 10px 14px; border-radius: var(--r-nho, 12px); background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); font-size: 14px; line-height: 1.45; }
+.hsv-mang p { flex: 1 1 220px; margin: 0; }

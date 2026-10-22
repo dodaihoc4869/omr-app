@@ -10,21 +10,28 @@ import { hoSoTuNhip, nhipHocGia, tenEmNhip } from './nhip-hoc'
 export const LA_DD12C = new URLSearchParams(globalThis.location?.search ?? '').get('dd12c') === '1'
 
 /** Thanh Mức làm ở bảng điểm danh (thầy 20/10, bản vẽ 03): chỉ khi `&mlo=1` — ảnh cũ của cảnh dd12c KHÔNG đổi. */
-export const LA_MLO = LA_DD12C && new URLSearchParams(globalThis.location?.search ?? '').get('mlo') === '1'
-const MAU_MUC: { m: [number, number, number, number]; chua: number; uoc: number }[] = [
-  { m: [6, 9, 30, 7], chua: 3, uoc: 0 },
-  { m: [2, 2, 10, 2], chua: 0, uoc: 4 },
-  { m: [0, 0, 0, 0], chua: 40, uoc: 0 },
-  { m: [0, 0, 0, 0], chua: 0, uoc: 0 },
-  { m: [8, 12, 14, 0], chua: 5, uoc: 0 },
-  { m: [1, 3, 9, 4], chua: 0, uoc: 0 },
+export const LA_MLO = LA_DD12C && ['1', 'dau', 'loi'].includes(new URLSearchParams(globalThis.location?.search ?? '').get('mlo') ?? '')
+/** 6 mức (22/10): `treo`/`coTinh` = Mức 5/6 (KHÔNG nằm trong `m`), `chuaTreo` = lượt chưa đo treo máy, `sv`/`sn` = lượt sai Mức 1–2 / 3–4. */
+const MAU_MUC: { m: [number, number, number, number]; chua: number; uoc: number; treo: number; coTinh: number; chuaTreo: number; sv: number; sn: number }[] = [
+  { m: [6, 9, 30, 7], chua: 3, uoc: 0, treo: 1, coTinh: 0, chuaTreo: 0, sv: 6, sn: 10 },
+  { m: [2, 2, 10, 2], chua: 0, uoc: 4, treo: 0, coTinh: 0, chuaTreo: 6, sv: 1, sn: 4 },
+  { m: [0, 0, 0, 0], chua: 40, uoc: 0, treo: 0, coTinh: 0, chuaTreo: 0, sv: 0, sn: 0 },
+  { m: [0, 0, 0, 0], chua: 0, uoc: 0, treo: 0, coTinh: 0, chuaTreo: 0, sv: 0, sn: 0 },
+  { m: [8, 12, 14, 0], chua: 5, uoc: 0, treo: 2, coTinh: 0, chuaTreo: 4, sv: 10, sn: 4 },
+  { m: [7, 5, 3, 0], chua: 0, uoc: 0, treo: 1, coTinh: 3, chuaTreo: 0, sv: 9, sn: 1 },
+  { m: [1, 3, 9, 4], chua: 0, uoc: 0, treo: 0, coTinh: 0, chuaTreo: 0, sv: 1, sn: 1 },
 ]
-/** Mức làm 14 ngày GIẢ của một em (xác định theo SBD): đủ các trạng thái — có đo, ≈ ước tính, toàn chưa có số đo, không lượt nào. */
+/** `&mlo=dau`: những ngày đầu — chưa lượt nào đo treo máy (lượt treo của mẫu tính vào Mức 3). */
+const NGAY_DAU = new URLSearchParams(globalThis.location?.search ?? '').get('mlo') === 'dau'
+/** Mức làm 14 ngày GIẢ của một em (xác định theo SBD): đủ các trạng thái — có đo, ≈ ước tính, toàn chưa có số đo, không lượt nào, treo, cố tình, ít lượt sai. */
 function mucLamGia(sbd: string) {
   let h = 0
   for (const c of sbd) h = (h * 31 + c.charCodeAt(0)) >>> 0
   const x = MAU_MUC[h % MAU_MUC.length]!
-  return { soDo: x.m[0] + x.m[1] + x.m[2] + x.m[3], chuaCoSoDo: x.chua, m: x.m, soUocTinh: x.uoc }
+  const m: [number, number, number, number] = NGAY_DAU ? [x.m[0], x.m[1], x.m[2] + x.treo + x.coTinh, x.m[3]] : x.m
+  const treo = NGAY_DAU ? 0 : x.treo, coTinh = NGAY_DAU ? 0 : x.coTinh
+  const soDo = m[0] + m[1] + m[2] + m[3] + treo + coTinh
+  return { soDo, chuaCoSoDo: x.chua, m, soUocTinh: x.uoc, soTreo: treo, soCoTinh: coTinh, soChuaDoTreo: NGAY_DAU ? soDo : x.chuaTreo, saiLamVoi: x.sv, saiDuNghi: x.sn }
 }
 
 const LOP = '12 Nhóm 10 điểm'
@@ -56,6 +63,8 @@ export function traLoiDd12c(duong: string, b: Record<string, unknown>): KQ | nul
     if (b.action === 'gan-day') return null
     return du(trangThai())
   }
+  // `&mlo=loi` (bản vẽ khung 04): lệnh lô hỏng ⇒ màn nói lý do + nút Thử tải lại
+  if (duong === '/gv/muc-lam-lo' && LA_MLO && new URLSearchParams(globalThis.location?.search ?? '').get('mlo') === 'loi') return { ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' }
   if (duong === '/gv/muc-lam-lo' && LA_MLO) return du({ tu: '2026-09-29', den: '2026-10-12', em: Object.fromEntries((Array.isArray(b.sbds) ? (b.sbds as string[]) : []).map((x) => [x, mucLamGia(String(x))])) })
   if (duong === '/gv/dau-gio') return b.action === 'xem' ? du({ daKetThuc: false, luot: [] }) : du({ ketQua: [] })
   const sbd = String(b.sbd ?? '')

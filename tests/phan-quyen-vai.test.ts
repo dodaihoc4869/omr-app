@@ -96,9 +96,9 @@ describe('App — đường link chỉ còn vai thầy', () => {
     expect(docDuongVao('').vai).toBeNull()
   })
 
-  it('vai hs và ph KHÔNG còn được app này nhận', () => {
-    expect(docDuongVao(`?vai=hs&token=${'c'.repeat(32)}`).vai).toBeNull()
-    expect(docDuongVao(`?vai=ph&token=${'d'.repeat(32)}`).vai).toBeNull()
+  it('vai cũ hs / ph (22/10) ⇒ cổng học sinh / phụ huynh, không phải vai thầy', () => {
+    expect(docDuongVao(`?vai=hs&token=${'c'.repeat(32)}`).vai).toBe('hocsinh')
+    expect(docDuongVao(`?vai=ph&token=${'d'.repeat(32)}`).vai).toBe('phuhuynh')
   })
 
   it('link mời làm bài vẫn được giữ để mở màn thi', () => {

@@ -245,7 +245,8 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
   let cachLam14: ReturnType<typeof tongMucLam> | null = null
   if (r14Muc && r14Tong && r14Muc.length < TOI_DA_LUOT_14) {
     const co = dong14.map((d) => ({ mucLam: mucLamTuDong(dongCu(d), beta, kichThuoc), dung: d.dung as boolean | null })).filter((d) => d.mucLam)
-    const t = tongCongKhai(tongMucLam(co))
+    // 6 mức (Đợt 2): lượt treo không đếm vào bốn dòng Mức 1–4 — CÙNG cách tính với dòng bảng điểm danh (`/gv/muc-lam-lo`); tờ chiếu có dòng «Treo máy» riêng.
+    const t = tongCongKhai(tongMucLam(co, { tachTreo: true }))
     cachLam14 = { ...t, chuaCoSoDo: Math.max(0, num(r14Tong[0]?.n) - t.soDo) }
   }
 

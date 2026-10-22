@@ -217,10 +217,9 @@ describe('Cầu nối gắn ĐÚNG CHỖ trong App', () => {
     const i = app.indexOf('ganCauNoi()')
     expect(i).toBeGreaterThan(0)
     const hieuUng = app.slice(app.lastIndexOf('useEffect', i), app.indexOf('}, [canHoi', i))
-    // Bốn điều kiện: phải là màn thầy, không phải link cũ, không phải trang
-    // phiếu phụ huynh, và app phải đang mở khoá.
+    // Điều kiện: phải là màn thầy, không phải trang phiếu phụ huynh, và app phải đang mở khoá.
+    // (Link cũ `/ph/<token>`, `?vai=hs` từ 22/10 vào thẳng cổng của vai ⇒ `canHoi` false, `!canHoi` đã chặn.)
     expect(hieuUng).toContain('!canHoi')
-    expect(hieuUng).toContain('linkCu')
     expect(hieuUng).toContain('laPhieu')
     expect(hieuUng).toContain("khoa !== 'da_mo'")
     expect(hieuUng).toContain('goCauNoi()')

@@ -167,4 +167,35 @@ describe('mức làm theo lô em (bảng điểm danh)', () => {
     expect(await gvMucLamLo(env, { sbds: ['S1'] }, BAY_GIO)).toEqual({ ok: false, error: 'Không đọc được sổ học của các em.' })
     await expect(mucLamCacEm(env, ['S1'], '2026-10-08', '2026-10-21')).rejects.toThrow()
   })
+  it('6 MỨC (thầy duyệt 22/10): lượt treo KHÔNG đếm trong `m` ⇒ soDo = Σm + soTreo + soCoTinh; saiLamVoi/saiDuNghi bỏ lượt treo; ≥ 3 lượt treo một ngày ⇒ Mức 6; CÙNG SỐ với `cachLam14` (tờ chiếu gộp Mức 6 vào Treo)', async () => {
+    const d = dungDuLieu()
+    em(d, 'S4'); em(d, 'S5')
+    const env = d.env as unknown as Env
+    const DO = (l: number, a = 0) => ({ ...DOC(20), v: 60, a, l, n: 0, w: 0 })
+    // S4: Mức 1 sai (đã đo, không treo) · Mức 3 sai (đã đo) · MỘT lượt treo sai (giây 40 ⇒ lẽ ra Mức 3) · Mức 2 sai chưa đo treo (DOC thường)
+    dong(d, 'S4', 'V-I-1', 0, 10, DO(5))
+    dong(d, 'S4', 'V-I-5', 0, 40, DO(20))
+    dong(d, 'S4', 'V-I-3', 0, 40, DO(620))
+    dong(d, 'S4', 'V-I-3', 0, 18, DOC(20))
+    // S5: BA lượt treo cùng ngày ⇒ cả ba Mức 6 (màn thầy); một lượt Mức 1 đúng
+    dong(d, 'S5', 'V-I-1', 0, 30, DO(400))
+    dong(d, 'S5', 'V-I-3', 0, 30, DO(500))
+    dong(d, 'S5', 'V-I-5', 1, 30, DO(0, 700))
+    dong(d, 'S5', 'V-I-1', 1, 8, DO(3))
+    const kq = await gvMucLamLo(env, { sbds: ['S4', 'S5'] }, BAY_GIO)
+    expect(kq.ok).toBe(true)
+    if (!kq.ok) return
+    const a = kq.em.S4!, b = kq.em.S5!
+    expect(a).toMatchObject({ soDo: 4, m: [1, 1, 1, 0], soTreo: 1, soCoTinh: 0, soChuaDoTreo: 1, saiLamVoi: 2, saiDuNghi: 1 })
+    expect(b).toMatchObject({ soDo: 4, m: [1, 0, 0, 0], soTreo: 0, soCoTinh: 3, soChuaDoTreo: 0, saiLamVoi: 0, saiDuNghi: 0 })
+    for (const x of [a, b]) expect(x.m.reduce((p, q) => p + q, 0) + x.soTreo + x.soCoTinh).toBe(x.soDo)
+    // Cùng số với «Cách làm bài 14 ngày» của chi tiết em lên bảng: bốn dòng + sai vội/dù nghĩ bằng nhau; treo của lô (5 + 6) = treo công khai của tờ
+    for (const [sbd, x] of [['S4', a], ['S5', b]] as const) {
+      const r = (await gvHoSoLenBang(env, { sbd, qid: 'V-I-1' }, BAY_GIO)) as unknown as { cachLam14: { soDo: number; theoMuc: { luot: number }[]; saiLamVoi: number; saiDuNghi: number; soTreo: number; soCoTinh: number } }
+      const c = r.cachLam14
+      expect(c.theoMuc.map((t) => t.luot), sbd).toEqual(x.m)
+      expect([c.saiLamVoi, c.saiDuNghi, c.soDo], sbd).toEqual([x.saiLamVoi, x.saiDuNghi, x.soDo])
+      expect([c.soTreo, c.soCoTinh], sbd).toEqual([x.soTreo + x.soCoTinh, 0])
+    }
+  })
 })

@@ -92,10 +92,14 @@ export interface MucLamEmLo {
   m: [number, number, number, number]
   /** Trong `soDo`: số lượt xếp từ giây cũ / ước tính (hiện "≈"). */
   soUocTinh: number
-  /** (22/10, 6 mức) Trong `soDo`: lượt Mức 5 · Treo máy / Mức 6 · Cố tình treo máy (bảng điểm danh là màn thầy) / chưa có số đo treo máy. Lượt treo VẪN đếm trong `m` (4 mức) cho tới khi giao diện 6 mức bật. */
+  /** (22/10, 6 mức) Trong `soDo`: lượt Mức 5 · Treo máy / Mức 6 · Cố tình treo máy (bảng điểm danh là màn thầy) / chưa có số đo treo máy.
+   *  Giao diện 6 mức (Đợt 2, thầy duyệt 22/10) ⇒ `tachTreo`: lượt treo KHÔNG đếm trong `m` ⇒ `soDo = Σm + soTreo + soCoTinh`. */
   soTreo: number
   soCoTinh: number
   soChuaDoTreo: number
+  /** Lượt SAI ở Mức 1–2 / Mức 3–4 (không kể lượt treo) — «Sai vì vội» của bảng điểm danh; CÙNG số với `cachLam14` (chi tiết em lên bảng). */
+  saiLamVoi: number
+  saiDuNghi: number
 }
 export type TraLoiMucLamLo = { ok: true; tu: string; den: string; em: Record<string, MucLamEmLo> } | { ok: false; error: string }
 
@@ -162,8 +166,8 @@ export async function mucLamCacEm(env: Env, sbds: readonly string[], tu: string,
   const ra = new Map<string, MucLamEmLo>()
   for (const [s, luot] of theoEm) {
     // Mức 6 theo ngày (≥ 3 lượt treo cùng ngày) — danh sách đã là của MỘT em.
-    const t = tongMucLam(nangCoTinhTheoNgay(luot))
-    ra.set(s, { soDo: t.soDo, chuaCoSoDo: t.chuaCoSoDo, m: [t.theoMuc[0].luot, t.theoMuc[1].luot, t.theoMuc[2].luot, t.theoMuc[3].luot], soUocTinh: t.soUocTinh, soTreo: t.soTreo, soCoTinh: t.soCoTinh, soChuaDoTreo: t.soChuaDoTreo })
+    const t = tongMucLam(nangCoTinhTheoNgay(luot), { tachTreo: true })
+    ra.set(s, { soDo: t.soDo, chuaCoSoDo: t.chuaCoSoDo, m: [t.theoMuc[0].luot, t.theoMuc[1].luot, t.theoMuc[2].luot, t.theoMuc[3].luot], soUocTinh: t.soUocTinh, soTreo: t.soTreo, soCoTinh: t.soCoTinh, soChuaDoTreo: t.soChuaDoTreo, saiLamVoi: t.saiLamVoi, saiDuNghi: t.saiDuNghi })
   }
   return ra
 }

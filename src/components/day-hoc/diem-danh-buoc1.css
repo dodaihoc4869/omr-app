@@ -60,7 +60,7 @@
 .dd1-o--vua, .dd1-o--xong { gap: 8px; padding: 16px 18px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); }
 .dd1-tieu { margin: 0 0 4px; font-size: 16px; font-weight: 800; color: var(--gvm-chu); }
 .dd1-tieu small { font-size: 13px; font-weight: 500; color: var(--gvm-chu-3); }
-.dd1-vua-ds { list-style: none; margin: 0; padding: 0; display: grid; min-width: 0; container-type: inline-size; }
+.dd1-vua-ds { list-style: none; margin: 0; padding: 0; display: grid; min-width: 0; }
 .dd1-vua-ds:has(> li:nth-child(13)) { max-height: 572px; overflow-y: auto; overscroll-behavior: contain; }
 .dd1-vua-dong {
   display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 0 6px;
@@ -72,12 +72,7 @@
 .dd1-vua-ten { min-width: 0; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* THANH MỨC LÀM (bản vẽ 03, thầy 20/10): cột thứ tư của dòng "Vừa điểm danh". Màu chỉ từ biến --gvm-* (cùng công thức bốn mức của Hồ sơ làm bài). */
 .dd1-ml-giai { margin: 0 0 6px; font-size: 13px; color: var(--gvm-chu-3); line-height: 1.5; }
-/* 22/10 sửa lỗi: cột "Vừa điểm danh" chỉ ~440 px trên máy tính ⇒ bốn cột ép tên em về 0 (chỉ còn "Đ…"). Theo bề ngang CHÍNH danh sách: hẹp ⇒ thanh xuống hàng dưới tên; ≥ 600 px mới bốn cột. */
-.dd1-vua-ds[data-co-muc] .dd1-ml { grid-column: 2 / -1; padding-top: 0; }
-@container (min-width: 600px) {
-  .dd1-vua-ds[data-co-muc] .dd1-vua-dong { grid-template-columns: 52px minmax(0, 1fr) auto minmax(168px, 240px); }
-  .dd1-vua-ds[data-co-muc] .dd1-ml { grid-column: auto; padding-top: 6px; }
-}
+
 .dd1-ml { display: grid; gap: 4px; min-width: 0; padding: 6px 0; }
 .dd1-ml-thanh { display: flex; gap: 2px; height: 6px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--gvm-chu-3) 14%, transparent); }
 .dd1-ml-thanh i { display: block; flex-basis: 0; min-width: 4px; }
@@ -100,6 +95,91 @@
   .dd1-o { padding: 16px; }
   .dd1-ma { font-size: 38px; }
   .dd1-vua-dong { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; }
-  .dd1-vua-ds[data-co-muc] .dd1-vua-dong { grid-template-columns: 44px minmax(0, 1fr) auto; }
-  .dd1-vua-ds[data-co-muc] .dd1-ml { grid-column: 2 / -1; padding-top: 0; }
 }
+
+/* ═════ 6 MỨC (bản vẽ docs/ban-ve-muc-lam-6-muc-2210, thầy duyệt 22/10) ═════
+ * "Vừa điểm danh" cả bề ngang + "Xong điểm danh" một hàng dưới; dòng tổng lọc; CỘT THẲNG HÀNG Em · Sai vì vội · Cách làm 14 ngày · Treo máy.
+ * Màu: CHỈ biến --gvm-* có nghĩa sẵn có (hổ phách = cảnh báo/vội · lục = có nghĩ · hồng = treo/lỗi). Các luật .dd1-ml* cũ giữ nguyên (không dùng nữa). */
+.dd1-o2--doc { grid-template-columns: minmax(0, 1fr); }
+.dd1-o--vua { container-type: inline-size; }
+.dd1-o2--doc .dd1-o--xong { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px 20px; background: var(--gvm-mat-2); border-color: transparent; }
+.dd1-o2--doc .dd1-o--xong .dd1-phu { flex: 1 1 320px; }
+.dd1 .dd1-o2--doc .dd1-nut-chinh { flex: 0 1 auto; width: auto; margin-top: 0; padding-inline: 22px; }
+/* dòng tổng + nút lọc */
+.dd1-tong { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border-radius: 18px; background: var(--gvm-mat-2); }
+.dd1-tong-chu { margin: 0; font-size: 14px; color: var(--gvm-chu-2); } .dd1-tong-chu b { color: var(--gvm-chu); font-variant-numeric: tabular-nums; }
+.dd1-tong-nuts { display: flex; flex-wrap: wrap; gap: 8px; }
+.dd1-tong-nut {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px 0 10px; border: 1.5px solid var(--gvm-vien); border-radius: 999px; background: var(--gvm-mat);
+  color: var(--gvm-chu); font: inherit; font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation;
+}
+.dd1-tong-nut svg { flex: none; }
+.dd1-tong-nut b { min-width: 24px; padding: 1px 7px; border-radius: 999px; background: var(--gvm-mat-2); text-align: center; font-variant-numeric: tabular-nums; }
+.dd1-tong-nut[data-k='voi'] { color: var(--gvm-hp-dam); border-color: var(--gvm-hp); background: var(--gvm-hp-nen); }
+.dd1-tong-nut[data-k='treo'] { color: var(--gvm-ho); border-color: color-mix(in srgb, var(--gvm-ho) 45%, var(--gvm-vien)); }
+.dd1-tong-nut[data-k='co-tinh'] { color: var(--gvm-ho-dam); border-color: var(--gvm-ho); background: var(--gvm-ho-nen); }
+.dd1-tong-nut[aria-pressed='true'] { background: var(--gvm-xd); border-color: var(--gvm-xd); color: var(--gvm-tren-dac); }
+.dd1-tong-nut[aria-pressed='true'] b { background: color-mix(in srgb, var(--gvm-tren-dac) 22%, transparent); }
+.dd1-tong-nut:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; }
+.dd1-tong-cho { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px 0 10px; border: 1.5px dashed var(--gvm-vien); border-radius: 999px; font-size: 13px; font-style: italic; color: var(--gvm-chu-3); }
+.dd1-loc-dong { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; color: var(--gvm-chu-2); } .dd1-loc-dong b { color: var(--gvm-chu); }
+.dd1-ml-loi { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; padding: 4px 12px; border-radius: 14px; background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-size: 14px; }
+.dd1-ml-loi .dd1-ml-thu { color: inherit; text-decoration: underline; }
+/* chú giải + màu ba nhóm */
+.dd1-chu-giai { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 12px; color: var(--gvm-chu-3); }
+.dd1-chu-giai > span { display: inline-flex; align-items: center; gap: 5px; }
+.dd1-chu-giai i { display: inline-block; width: 16px; height: 9px; border-radius: 3px; }
+.dd1-cg-rieng { margin-left: auto; font-style: italic; }
+.dd1-o--vua [data-g='voi'] { background: var(--gvm-hp); }
+.dd1-o--vua [data-g='nghi'] { background: var(--gvm-xl); }
+.dd1-o--vua [data-g='treo'] { background: repeating-linear-gradient(135deg, var(--gvm-ho) 0 3px, var(--gvm-ho-nen) 3px 6px); }
+.dd1-o--vua [data-g='co-tinh'] { background: var(--gvm-ho-dam); }
+/* cột thẳng hàng */
+.dd1-dau-cot, .dd1-vua-ds[data-co-muc] .dd1-vua-dong { grid-template-columns: 48px minmax(150px, 1.15fr) 104px minmax(160px, 1.5fr) 88px; column-gap: 16px; }
+.dd1-dau-cot { display: grid; align-items: end; padding: 0 6px 6px; border-bottom: 1px solid var(--gvm-vien); font-size: 12px; font-weight: 800; color: var(--gvm-chu-2); }
+.dd1-dau-cot small { display: block; font-weight: 500; color: var(--gvm-chu-3); }
+.dd1-vua-ds[data-co-muc] .dd1-vua-dong { min-height: 64px; padding-block: 10px; }
+.dd1-vua-em { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.dd1-vua-ten-hang { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.dd1-vua-ds[data-co-muc] .dd1-vua-em { flex-direction: column; align-items: flex-start; }
+.dd1-vua-ds[data-co-muc] .dd1-vua-ten { white-space: normal; overflow-wrap: anywhere; font-size: 16px; font-weight: 800; }
+.dd1-co-tinh { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px 2px 7px; border-radius: 6px; background: var(--gvm-ho); color: var(--gvm-tren-dac); font-size: 12px; font-weight: 800; white-space: nowrap; }
+.dd1-ov { display: grid; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.dd1-ov b { font-size: 26px; font-weight: 900; color: var(--gvm-chu-2); }
+.dd1-ov[data-nhieu] b { color: var(--gvm-hp); }
+.dd1-ov small { font-size: 12px; color: var(--gvm-chu-3); }
+.dd1-ov--trong { font-size: 18px; color: var(--gvm-chu-3); }
+.dd1-ov--it b { font-size: 20px; color: var(--gvm-chu-3); }
+.dd1-ot { display: grid; gap: 5px; min-width: 0; }
+.dd1-ot small { font-size: 12px; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; } .dd1-ot small b { color: var(--gvm-chu); }
+.dd1-ot .dd1-ot-nghieng { font-style: italic; color: var(--gvm-chu-3); }
+.dd1-ot-thanh { display: flex; gap: 2px; height: 12px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--gvm-chu-3) 14%, transparent); }
+.dd1-ot-thanh i { display: block; flex-basis: 0; min-width: 6px; }
+.dd1-ot-thanh--cho { opacity: 0.5; }
+.dd1-otr { display: inline-flex; align-items: center; gap: 5px; justify-self: start; padding: 3px 10px 3px 8px; border-radius: 999px; font-size: 13px; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; }
+.dd1-otr b { font-size: 16px; }
+.dd1-otr[data-nhieu] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); font-weight: 700; }
+.dd1-otr--trong, .dd1-otr[data-khong] { font-size: 14px; color: var(--gvm-chu-3); }
+.dd1-chu-chung { margin: 0; font-size: 12px; line-height: 1.5; color: var(--gvm-chu-3); } .dd1-chu-chung b { color: var(--gvm-chu-2); }
+/* khối hẹp (điện thoại, cửa sổ hẹp): không đủ 5 cột ⇒ mỗi em 3 hàng (giờ · tên · cờ · nhịp) / (Sai vì vội · Treo) / thanh cả bề ngang; đầu cột ẩn */
+@container (max-width: 700px) {
+  .dd1-dau-cot { display: none; }
+  .dd1-vua-ds[data-co-muc] .dd1-vua-dong { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: 'gio em em' '. ov otr' '. ot ot'; row-gap: 6px; column-gap: 8px; }
+  .dd1-vua-ds[data-co-muc] .dd1-vua-gio { grid-area: gio; align-self: start; padding-top: 3px; }
+  .dd1-vua-ds[data-co-muc] .dd1-vua-em { grid-area: em; flex-direction: row; align-items: center; }
+  .dd1-vua-ds[data-co-muc] .dd1-ov { grid-area: ov; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; min-width: 0; }
+  .dd1-vua-ds[data-co-muc] .dd1-ov b { font-size: 22px; }
+  .dd1-vua-ds[data-co-muc] .dd1-ov::before { content: 'Sai vì vội'; font-size: 12px; color: var(--gvm-chu-3); white-space: nowrap; }
+  .dd1-vua-ds[data-co-muc] .dd1-ov small { white-space: nowrap; }
+  .dd1-vua-ds[data-co-muc] .dd1-otr { grid-area: otr; justify-self: end; }
+  .dd1-vua-ds[data-co-muc] .dd1-otr::before { content: 'Treo'; font-size: 12px; font-weight: 500; color: var(--gvm-chu-3); }
+  .dd1-vua-ds[data-co-muc] .dd1-otr[data-nhieu]::before { color: inherit; }
+  .dd1-vua-ds[data-co-muc] .dd1-ot { grid-area: ot; }
+  .dd1-tong-nuts { gap: 6px; }
+  .dd1-tong-nut { padding-inline: 8px 10px; font-size: 13px; gap: 5px; }
+  .dd1-cg-rieng { margin-left: 0; width: 100%; }
+}
+@media (max-width: 600px) {
+  .dd1 .dd1-o2--doc .dd1-nut-chinh { width: 100%; }
+}
+

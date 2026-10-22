@@ -8,7 +8,7 @@
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import App from '../src/App'
-import { laLinkAppCu } from '../src/lib/vai-tro'
+import { docDuongVao, laLinkAppCu, laManThayQuanLy } from '../src/lib/vai-tro'
 import ma404 from '../public/404.html?raw'
 
 const TOKEN = 'a'.repeat(32)
@@ -35,10 +35,15 @@ describe('Nhận diện link cũ', () => {
 })
 
 describe('App dựng gì khi gặp link cũ', () => {
-  it('hiện màn báo tin, KHÔNG hiện màn quản lý của thầy', () => {
-    history.replaceState(null, '', `/omr-app/?vai=hs&token=${TOKEN}`)
+  // Từ 22/10 (thầy: "phụ huynh bấm vào chỉ cần nhập sbd luôn") link cũ vào thẳng cổng của đúng vai — vẫn KHÔNG bao giờ là app thầy.
+  it('vào cổng của vai, KHÔNG hiện màn quản lý / màn khoá của thầy', () => {
+    for (const [s, p, vai] of [['?vai=ph&nguon=pwa', '/', 'phuhuynh'], ['', `/ph/${TOKEN}`, 'phuhuynh'], ['?vai=hs', '/', 'hocsinh'], ['', `/omr-app/hs/${TOKEN}/`, 'hocsinh']] as const) {
+      expect(docDuongVao(s, p).vai, s + p).toBe(vai)
+      expect(laManThayQuanLy(s, p), s + p).toBe(false)
+    }
+    history.replaceState(null, '', `/omr-app/?vai=ph&token=${TOKEN}`)
     render(<App />)
-    expect(screen.getByText(/Link này đã ngừng dùng/)).toBeTruthy()
+    expect(screen.queryByText(/Máy này chưa được cấp quyền/)).toBeNull()
     expect(screen.queryByText('Kiểm tra tại lớp')).toBeNull()
     expect(screen.queryByText('Quản lý đăng ký')).toBeNull()
   })

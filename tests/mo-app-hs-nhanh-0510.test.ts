@@ -154,12 +154,15 @@ describe('đoạn mã nội tuyến — cổng học sinh', () => {
     expect(chay('/hs', '', { phien: { sbd: '1' }, diaChi: GOC }).goi.map((g) => g.url)).toEqual([GOC + '/hs/lich-su'])
   })
 
-  it('link riêng CŨ (?vai=hs, /hs/<token>) không phải cổng: nạp App.tsx, không vỏ học sinh, không hỏi sớm (cùng kết luận main.tsx)', () => {
-    for (const [d, q] of [['/hs', '?vai=hs'], ['/hs/abcdefgh1234', '?vai=hocsinh'], ['/', '?vai=ph']]) {
-      const { them, goi } = chay(d, q, { phien: { sbd: '1', token: 't' }, diaChi: GOC })
-      expect(them.map((t) => t.href)).toEqual(['/assets/App-e.js'])
-      expect(goi).toEqual([])
+  it('link riêng CŨ (?vai=hs, /hs/<token>, ?vai=ph) từ 22/10 là cổng của vai: nạp y như /hs, /ph (cùng kết luận main.tsx)', () => {
+    const o = { phien: { sbd: '1', token: 't' }, diaChi: GOC }
+    const hs = chay('/hs', '', o)
+    for (const [d, q] of [['/hs', '?vai=hs'], ['/hs/abcdefgh1234', '?vai=hocsinh'], ['/hs/abcdefgh1234', '']]) {
+      const r = chay(d, q, o)
+      expect(r.them.map((t) => t.href), d + q).toEqual(hs.them.map((t) => t.href))
+      expect(r.goi.map((g) => g.url), d + q).toEqual(hs.goi.map((g) => g.url))
     }
+    expect(chay('/', '?vai=ph', o).them.map((t) => t.href)).toEqual(chay('/ph', '', o).them.map((t) => t.href))
   })
 
   it('đường khác giữ nguyên: thi/phụ huynh nạp App.tsx + mảnh của mình; app thầy, phiếu, `/` trần chỉ nạp App.tsx', () => {

@@ -221,6 +221,20 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
     }
   })
 
+  it('22/10 (Hồ sơ 6 mức, đặc tả §2): nút viền "Hồ sơ làm bài" mở ĐÚNG tấm hồ sơ của em; Esc đóng, focus về nút', async () => {
+    await chay()
+    const nut = screen.getByRole('button', { name: 'Hồ sơ làm bài' })
+    expect(nut.className).toContain('hn2-nut--vien') // nút phụ, nút chính giữ nguyên
+    nut.focus()
+    fireEvent.click(nut)
+    const tam = await screen.findByRole('dialog', { name: 'Trần Thu Hà' }, { timeout: 5000 })
+    await waitFor(() => expect(goi.mock.calls.some(([d, b]) => d === '/gv/lich-su-lam-cau' && (b as { sbd?: string }).sbd === '12121007')).toBe(true))
+    expect(tam.closest('[data-vo-cong="ho-so-lam-cau"]')).not.toBeNull()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(document.activeElement).toBe(nut)
+  })
+
   it('"Cho thi lại" CHỈ hiện khi biết ca (không đoán mã ca)', async () => {
     await chay(() => ({ json: day({ em: { ...EM, diemCaGanNhat: undefined }, dong: [DONG_1[0], DONG_1[1]] }) }))
     expect(screen.queryByRole('button', { name: 'Cho thi lại' })).toBeNull()

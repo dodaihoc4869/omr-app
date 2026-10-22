@@ -157,10 +157,13 @@ describe('tờ chạy thật — nút X', () => {
     })
     const panel = t.doc.querySelector('.mc-aisai')!
     expect(chuLan(panel)).toEqual([
-      'Mức làm 1Chưa đọc hết đề · dưới 24 giây1 lượt|Nguyễn Đức Anh9 giây', // jsdom không đo bố cục ⇒ giữ tên đầy đủ; bản viết tắt nằm ở data-t
-      'Mức làm 2Đọc xong, chưa kịp nghĩ · 24–29 giây1 lượt|Lê Thu Hà26 giây',
-      'Mức làm 3Có nghĩ · từ 30 giây1 lượt|Vũ Minh Quân40 giây', // không ranh4 ⇒ Mức làm 3 mở tới hết thước
+      // " · số = giây làm" chỉ HIỆN khi thẻ đông (4 cột, ẩn chữ "giây" trên thẻ tên) — jsdom không chạy CSS nên textContent luôn có
+      'Mức làm 1Chưa đọc hết đề · dưới 24 giây · số = giây làm1 lượt|Nguyễn Đức Anh9 giây', // jsdom không đo bố cục ⇒ giữ tên đầy đủ; bản viết tắt nằm ở data-t
+      'Mức làm 2Đọc xong, chưa kịp nghĩ · 24–29 giây · số = giây làm1 lượt|Lê Thu Hà26 giây',
+      'Mức làm 3Có nghĩ · từ 30 giây · số = giây làm1 lượt|Vũ Minh Quân40 giây', // không ranh4 ⇒ Mức làm 3 mở tới hết thước
       'Mức làm 4Lớp chưa đủ mẫu của câu này, hoặc số giây là ước tính, nên chưa xếp Mức làm 4|',
+      // 6 mức (22/10): chưa lượt nào có số đo treo máy (lượt cũ) ⇒ làn Treo máy nét đứt nói thật, không đoán
+      'Treo máyChưa đo — lượt làm trước khi máy em cập nhật chưa ghi khoảng treo máy|',
       'Chưa có số đoLượt chưa có số giây đáng tin để xếp mức1 lượt|Đỗ Khánh Linh≈ 12 giây',
     ])
     expect(panel.querySelector('.mc-pl b')!.getAttribute('data-t')).toBe('Nguyễn Đ. Anh') // tên viết tắt chữ đệm khi thẻ hẹp
@@ -174,7 +177,7 @@ describe('tờ chạy thật — nút X', () => {
     t.phim('x')
     const m2 = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
     t.tuCha({ type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m2[1]!.id, ds: [{ sbd: 'S9', ten: 'Em Chín', luc: '2026-10-26T11:48:00Z', noi: 'BTVN', giay: 70, mucLam: muc(4, 70, { ranh4: 60 }) }] })
-    expect(chuLan(t.doc.querySelector('.mc-aisai')!).slice(2)).toEqual(['Mức làm 3Có nghĩ · 30–59 giây', 'Mức làm 4Làm kỹ · từ 60 giây1 lượt|Em Chín70 giây'].map((x, i) => (i === 0 ? x + '|' : x)))
+    expect(chuLan(t.doc.querySelector('.mc-aisai')!).slice(2)).toEqual(['Mức làm 3Có nghĩ · 30–59 giây', 'Mức làm 4Làm kỹ · từ 60 giây · số = giây làm1 lượt|Em Chín70 giây', 'Treo máyChưa đo — lượt làm trước khi máy em cập nhật chưa ghi khoảng treo máy|'].map((x, i) => (i === 0 ? x + '|' : x)))
   })
   it('(thầy 21/10) hai mã gốc cùng một câu chiếu: lượt đầu thuộc mã chưa có β (không ranh4), lượt sau xếp Mức làm 4 ⇒ làn Mức làm 4 vẫn hiện TÊN em (không báo "chưa đủ mẫu")', () => {
     const t = moTo()
