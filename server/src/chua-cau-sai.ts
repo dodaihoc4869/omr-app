@@ -239,6 +239,32 @@ export async function moDot(env: Env, b: Obj): Promise<Response> {
   const ph = await phatItemCuaEm(env, sbd, { dotId: j.dotId })
   return Response.json({ ...j, phat: await ph.json() })
 }
+/** 24/10 (em 10044 «Vẫn lỗi»): danh sách mời theo hàng đợt chữa còn mở, mở đợt dựng lại lỗi từ sổ học sống ⇒ sổ đã đóng lỗi mà hàng đợt chưa đóng thì
+ *  em bấm vào chỉ thấy «Chưa mở được câu này» mãi, chặng kẹt. Sổ ĐÃ đóng (`daThay`: có lần sai trong sổ, nay đã đủ lần đúng) ⇒ đóng luôn hàng đợt
+ *  (da_tu_sua, khoá revision — như hàng sinh ra đã đóng ở `trangThaiDayBanDau`). Sổ không thấy lần sai nào (chưa công bố…) ⇒ KHÔNG đóng, vì lần sai có thể hiện
+ *  lại. Cả hai trường hợp trả kèm `dotId` để máy em tính «xong phần hôm nay» thay vì dừng ở lỗi. Đường lỗi: thêm một lượt đọc, không đụng đường thường. */
+async function chuaCoLoi(env: Env, sbd: string, qid: string, daThay: boolean): Promise<Response> {
+  const mo = await env.DB.prepare(
+    `SELECT id,revision FROM chua_loi_dot WHERE sbd=? AND dong_luc IS NULL AND (qid_chuan=? OR (content_group<>'' AND content_group=(SELECT content_group FROM game_v2_question WHERE qid=? LIMIT 1))) ORDER BY giao_luc ASC,id ASC LIMIT 4`,
+  )
+    .bind(sbd, qid, qid)
+    .all<{ id: string; revision: number }>()
+  const ds = mo.results ?? []
+  if (daThay && ds.length) {
+    const now = Date.now()
+    await env.DB.batch(
+      ds.map((x) =>
+        env.DB.prepare(
+          "UPDATE chua_loi_dot SET trang_thai_day='da_tu_sua',dong_luc=?,revision=revision+1,cap_nhat_luc=? WHERE id=? AND sbd=? AND revision=? AND dong_luc IS NULL",
+        ).bind(now, now, x.id, sbd, num(x.revision)),
+      ),
+    )
+  }
+  return Response.json(
+    { ok: false, ma: 'CHUA_CO_LOI', mo: 'Câu này chưa có lỗi đang mở đã công bố.', ...(ds[0] ? { dotId: ds[0].id, daDong: daThay } : {}) },
+    { status: 404 },
+  )
+}
 export async function giaoDotCuaEm(
   env: Env,
   sbd: string,
@@ -254,7 +280,7 @@ export async function giaoDotCuaEm(
   for (const p of [cfgSom, hSom, qSom]) p.catch(() => {})
   const dau = await dauSom
   if (!dau || ['dong', 'khong_loi'].includes(dau.loiHoc.trangThai))
-    return loi('CHUA_CO_LOI', 'Câu này chưa có lỗi đang mở đã công bố.', 404)
+    return chuaCoLoi(env, sbd, qid, !!dau)
   const [cfg, h, q] = await Promise.all([cfgSom, hSom, qSom]),
     now = Date.now()
   const cu = await env.DB.prepare(

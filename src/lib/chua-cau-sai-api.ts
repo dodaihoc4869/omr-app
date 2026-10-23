@@ -165,7 +165,8 @@ export async function apiMoDot(
     ...(nguonSai ? { nguonSai } : {}),
     ...(phat ? { phat: true } : {}),
   })
-  if (!j?.ok) return { ok: false, loi: loiCua(j), ma: chu(j?.ma) }
+  // 24/10: «chưa có lỗi đang mở» kèm mã đợt = sổ học đã đóng lỗi (máy chủ đã đóng đợt) ⇒ màn chữa tính xong phần thay vì dừng ở lỗi.
+  if (!j?.ok) return { ok: false, loi: loiCua(j), ma: chu(j?.ma), ...(j?.dotId ? { dotId: chu(j.dotId) } : {}) }
   return j as unknown as KetQuaDot & { phat?: unknown }
 }
 

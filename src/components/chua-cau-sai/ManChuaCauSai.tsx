@@ -189,6 +189,7 @@ export default function ManChuaCauSai({
 }: PropsChuaCauSai) {
   const [ph, setPh] = useState<KetQuaDot | null>(null),
     [tai, setTai] = useState(true),
+    [daXongSo, setDaXongSo] = useState(false),
     [loi, setLoi] = useState(''),
     [tra, setTra] = useState(''),
     [hoi, setHoi] = useState<KetQuaNop | null>(null),
@@ -235,9 +236,17 @@ export default function ManChuaCauSai({
     const n = ++goiRef.current
     ;(async () => {
       // 13/10 (thầy: "chỗ này mở câu quá lâu"): mở đợt + phát bước đầu MỘT lượt đi-về; máy chủ cũ không trả `phat` ⇒ gọi phat-item như trước.
+      setDaXongSo(false)
       const r = await apiMoDot(token, qid)
       const phat = docPhatKem(r.phat)
       if (huy || n !== goiRef.current) return
+      // 24/10: sổ học đã đóng lỗi câu này (máy chủ trả «chưa có lỗi đang mở» kèm mã đợt) ⇒ tính xong phần hôm nay, không để chặng kẹt ở khung lỗi.
+      if (!r.ok && r.ma === 'CHUA_CO_LOI' && r.dotId) {
+        ghiXongHomNay(r.dotId)
+        setDaXongSo(true)
+        setTai(false)
+        return
+      }
       if (!r.ok || !r.dotId) {
         if (khongMoRef.current) {
           khongMoRef.current(r.loi ?? 'Chưa mở được câu chữa.')
@@ -404,6 +413,19 @@ export default function ManChuaCauSai({
             }
           />
         ) : !ph ? (
+          daXongSo ? (
+            <section className="ccs-khu-lam ccs-khu-loi" aria-label="Câu đã sửa xong">
+              <div className="ccs-trang-thai">
+                <h2 ref={buocRef} tabIndex={-1}>Câu này em sửa xong rồi</h2>
+                <p role="status">Em đã tự làm lại đúng câu này nên không cần sửa thêm. Thầy tính xong phần của em.</p>
+              </div>
+              <div className="ccs-hang-nut ccs-day">
+                <button type="button" className="ccs-nut-chinh" onClick={onVe}>
+                  {nhanVe}
+                </button>
+              </div>
+            </section>
+          ) : (
           <section className="ccs-khu-lam ccs-khu-loi" aria-label="Chưa mở được câu chữa">
             <div className="ccs-trang-thai">
               <h2 ref={buocRef} tabIndex={-1}>Chưa mở được câu này</h2>
@@ -418,6 +440,7 @@ export default function ManChuaCauSai({
               </button>
             </div>
           </section>
+          )
         ) : (
           <div className="ccs-bo-cuc" data-tuyen="tung-buoc">
             <aside className="ccs-cot-phu" aria-label="Tiến độ và đề gốc">

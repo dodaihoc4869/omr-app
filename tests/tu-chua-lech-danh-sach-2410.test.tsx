@@ -1,0 +1,42 @@
+// 24/10 (em SBD 10044 «Vẫn lỗi»): máy chủ trả «chưa có lỗi đang mở» KÈM mã đợt (sổ học đã đóng lỗi, đợt vừa được đóng) ⇒ màn chữa tính xong phần
+// hôm nay và báo «Câu này em sửa xong rồi» (không còn khung «Chưa mở được câu này» làm kẹt chặng). Không kèm mã đợt ⇒ khung lỗi cũ y nguyên.
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+
+const api = vi.hoisted(() => ({
+  apiMoDot: vi.fn(),
+  apiPhatItem: vi.fn(),
+  apiNopItem: vi.fn(),
+  apiXinGoiY: vi.fn(),
+  apiCoChua: vi.fn(),
+}))
+const ghi = vi.hoisted(() => vi.fn())
+vi.mock('../src/lib/chua-cau-sai-api', () => api)
+vi.mock('../src/lib/tu-sua-viec-hom-nay', () => ({ ghiXongHomNay: ghi }))
+vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
+vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }), xongNapDiaChi: async () => {} }))
+
+import Man from '../src/components/chua-cau-sai/ManChuaCauSai'
+
+beforeEach(() => { vi.clearAllMocks() })
+afterEach(cleanup)
+
+describe('Sổ học đã đóng lỗi, hàng đợt vừa đóng', () => {
+  it('«chưa có lỗi đang mở» kèm mã đợt ⇒ ghi xong phần hôm nay + màn «sửa xong rồi», không khung lỗi', async () => {
+    api.apiMoDot.mockResolvedValue({ ok: false, loi: 'Câu này chưa có lỗi đang mở đã công bố.', ma: 'CHUA_CO_LOI', dotId: 'D9' })
+    const onVe = vi.fn()
+    render(<Man token="t" qid="Q" tenCau="Cấu trúc bảng tuần hoàn" onVe={onVe} />)
+    expect(await screen.findByRole('heading', { name: 'Câu này em sửa xong rồi' })).toBeTruthy()
+    expect(ghi).toHaveBeenCalledWith('D9')
+    expect(screen.queryByRole('heading', { name: 'Chưa mở được câu này' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Thử lại' })).toBeNull()
+    screen.getByRole('button', { name: 'Sang câu khác' }).click()
+    expect(onVe).toHaveBeenCalled()
+  })
+  it('«chưa có lỗi đang mở» KHÔNG kèm mã đợt ⇒ khung lỗi cũ, không ghi xong phần', async () => {
+    api.apiMoDot.mockResolvedValue({ ok: false, loi: 'Câu này chưa có lỗi đang mở đã công bố.', ma: 'CHUA_CO_LOI' })
+    render(<Man token="t" qid="Q" onVe={() => {}} />)
+    expect(await screen.findByRole('heading', { name: 'Chưa mở được câu này' })).toBeTruthy()
+    expect(ghi).not.toHaveBeenCalled()
+  })
+})
