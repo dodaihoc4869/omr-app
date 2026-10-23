@@ -4,6 +4,11 @@
 name: Đo phủ số đo treo máy (chỉ đọc)
 on:
   workflow_dispatch:
+    inputs:
+      sbd:
+        description: 'SBD một em (chỉ số) — bản nhánh: tra trạng thái của em, chỉ in trạng thái + số đếm'
+        required: false
+        default: ''
 permissions:
   contents: read
 concurrency:
@@ -21,13 +26,30 @@ jobs:
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
       - name: Đếm (chỉ SELECT gộp)
+        if: ${{ github.event.inputs.sbd == '' }}
         working-directory: server
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: echo "Ban nhanh - chi chay phan tra mot em (nhap sbd)"
+      # TRA MỘT EM (thầy 23/10 báo "3 câu app không cho làm"): CHỈ SELECT, chỉ in trạng thái + số đếm — không tên, không mã câu, không nội dung đề.
+      - name: Tra một em (chỉ SELECT, chỉ trạng thái + số đếm)
+        if: ${{ github.event.inputs.sbd != '' }}
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          SBD_VAO: ${{ github.event.inputs.sbd }}
         run: |
+          SBD=$(printf '1792602000000' "$SBD_VAO" | tr -cd '0-9'); [ -n "$SBD" ] && [ ${#SBD} -le 8 ] || { echo "SBD không hợp lệ"; exit 1; }
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
-          W="luc >= '2026-10-22T05:49:00Z'"
-          q "1 lượt từ lúc phát hành 6 mức, theo nguồn: tổng · có giây · có số đo treo · đạt luật Treo máy · số em" "SELECT nguon, COUNT(*) luot, SUM(giay IS NOT NULL) co_giay, SUM(json_extract(raw_json,'\$.doc.v') IS NOT NULL) co_do_treo, SUM(COALESCE(json_extract(raw_json,'\$.doc.l'),0) >= 300 OR COALESCE(json_extract(raw_json,'\$.doc.a'),0) >= 600 OR (COALESCE(json_extract(raw_json,'\$.doc.w'),0) = 1 AND COALESCE(json_extract(raw_json,'\$.doc.a'),0) >= 180) OR COALESCE(json_extract(raw_json,'\$.doc.n'),0) >= 3) dat_treo, COUNT(DISTINCT sbd) so_em FROM su_kien_hoc WHERE $W GROUP BY nguon ORDER BY luot DESC"
-          q "2 theo giờ VN: tổng lượt · có số đo treo" "SELECT strftime('%Y-%m-%d %H', luc, '+7 hours') gio, COUNT(*) luot, SUM(json_extract(raw_json,'\$.doc.v') IS NOT NULL) co_do_treo FROM su_kien_hoc WHERE $W GROUP BY 1 ORDER BY 1"
-          q "3 ca thi: lượt nộp từ lúc phát hành · có do_giay_json" "SELECT COUNT(*) luot, SUM(do_giay_json IS NOT NULL) co_do FROM luot WHERE nop_luc >= '2026-10-22T05:49:00Z'"
+          T="luc >= '2026-10-22T00:00:00Z'"
+          q "1 lượt làm câu theo giờ VN từ 22/10 · nguồn · đúng/sai/trống · có giây" "SELECT strftime('%d %H', luc, '+7 hours') gio, nguon, COUNT(*) n, SUM(ket_qua='dung') dung, SUM(ket_qua='sai') sai, SUM(ket_qua IS NULL) trong, SUM(giay IS NOT NULL) co_giay FROM su_kien_hoc WHERE sbd='$SBD' AND $T GROUP BY 1,2 ORDER BY 1,2"
+          q "2 Tự sửa lỗi: đợt còn mở theo trạng thái" "SELECT trang_thai_day, COUNT(*) n FROM chua_loi_dot WHERE sbd='$SBD' AND dong_luc IS NULL GROUP BY 1"
+          q "3 Tự sửa lỗi: phiên từ 22/10 theo trạng thái (giờ VN bắt đầu)" "SELECT strftime('%d %H:%M', bat_dau_luc/1000, 'unixepoch', '+7 hours') bat_dau, trang_thai, so_luot, lan_gap_lai FROM chua_loi_phien WHERE sbd='$SBD' AND bat_dau_luc >= 1792602000000 ORDER BY bat_dau_luc"
+          q "4 Tự sửa lỗi: mục từ 22/10 theo loại · trạng thái" "SELECT i.loai, i.trang_thai, COUNT(*) n FROM chua_loi_item i JOIN chua_loi_phien p ON p.id=i.phien_id WHERE i.sbd='$SBD' AND p.bat_dau_luc >= 1792602000000 GROUP BY 1,2"
+          q "5 Kiểm tra ôn tập: bài từ 20/10 · trạng thái · số chặng · chặng đã chốt" "SELECT k.ngay, k.trang_thai, strftime('%d %H:%M', k.mo_luc/1000,'unixepoch','+7 hours') mo, strftime('%d %H:%M', k.han_luc/1000,'unixepoch','+7 hours') han, (SELECT COUNT(*) FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=k.id) so_chang, (SELECT COUNT(*) FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=k.id AND c.chot_luc IS NOT NULL) da_chot, json_array_length(json_extract(k.json,'\$.cau')) so_cau FROM kiem_tra_ca_nhan k WHERE k.sbd='$SBD' AND k.ngay >= '2026-10-20' ORDER BY k.ngay"
+          q "6 Kế hoạch ngày 22–23/10: số câu đã làm · số việc · kết quả" "SELECT ngay, phien_ban, so_cau_da_lam, json_array_length(viec_json) so_viec, ket_qua IS NOT NULL co_ket_qua, la_ngay_nghi FROM ke_hoach_ngay WHERE sbd='$SBD' AND ngay >= '2026-10-22' ORDER BY ngay"
+          q "7 Gói bài (Bài hôm nay): mức ngày 22–23/10" "SELECT ngay, tang, toi_thieu_tang, quota FROM goi_bai_7_muc_ngay WHERE sbd='$SBD' AND ngay >= '2026-10-22'"
+          q "8 Gói bài: số câu đã gặp theo ngày VN" "SELECT substr(luc,1,13) gio_utc, kieu, COUNT(*) n FROM goi_bai_7_gap WHERE sbd='$SBD' AND luc >= '2026-10-21' GROUP BY 1,2" || true
+          q "9 nhật ký máy nhắc tới em từ 22/10 (nguồn · mức · số dòng, không in chữ)" "SELECT nguon, muc, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhat_ky_may WHERE $T AND chu LIKE '%$SBD%' GROUP BY 1,2"
