@@ -29,8 +29,6 @@ export function demThang(coMat: readonly EmBuoi[]): DemThang {
   return { bac: demTheoBac(coMat), nhom: demNhom(coMat), chuaXep: coMat.filter((e) => !e.bacCham).length }
 }
 
-/** Bệ của bậc thềm (đơn vị --u): bậc càng cao bệ càng cao — bản vẽ: 4 + bậc × 2,6. Ô Mới: 4. */
-export const caoBe = (bac: number): number => Math.round((4 + bac * 2.6) * 10) / 10
 
 export interface DauLop {
   dau: EmBuoi
@@ -54,12 +52,6 @@ export function emVuaVao(coMat: readonly EmBuoi[], so = 3): Set<string> {
   )
 }
 
-/** Cỡ lưới thẻ: ≤ 30 em ⇒ 5 cột thẻ ĐỦ (≤ 6 hàng, đúng bản vẽ) · 31–48 em ⇒ 6 cột thẻ GỌN · nhiều hơn ⇒ 7 cột thẻ gọn; quá 8 hàng ⇒ lưới tự cuộn. */
-export function coLuoiThe(n: number): { cot: number; hang: number; kieu: 'du' | 'gon' | 'cuon' } {
-  const cot = n <= 30 ? 5 : n <= 48 ? 6 : 7
-  const hang = Math.max(1, Math.ceil(n / cot))
-  return { cot, hang, kieu: cot === 5 ? 'du' : hang <= 8 ? 'gon' : 'cuon' }
-}
 
 /** Số trên thẻ một em: chuỗi đủ mức hoặc "Thoát Lười k/6" (em nhóm Lười); Mới ⇒ "Đã có số k/3 ngày". */
 export interface SoThe {

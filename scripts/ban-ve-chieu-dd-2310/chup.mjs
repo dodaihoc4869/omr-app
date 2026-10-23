@@ -19,7 +19,8 @@ const may = createServer((req, res) => {
   res.writeHead(200, { 'content-type': LOAI[extname(p)] ?? 'application/octet-stream' }); res.end(readFileSync(p))
 }).listen(0)
 await new Promise((r) => may.once('listening', r))
-const GOC = `http://127.0.0.1:${may.address().port}/scripts/ban-ve-chieu-dd-2310/trang.html`
+const TRANG = process.argv[4] === 'that' ? 'that' : 'trang' // 'that' = chụp component THẬT đang phát hành
+const GOC = `http://127.0.0.1:${may.address().port}/scripts/ban-ve-chieu-dd-2310/${TRANG}.html`
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium'
 const trinh = await chromium.launch({ executablePath: existsSync(exe) && statSync(exe).isFile() ? exe : undefined })
 
@@ -41,7 +42,7 @@ for (const [k, ten] of CANH) for (const [tk, w, h] of KHO) {
   const kq = await t.evaluate(() => {
     const W = innerWidth, H = innerHeight
     const tran = document.documentElement.scrollWidth > W + 1
-    const ngoai = [...document.querySelectorAll('.ddv *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > W + 1 || r.bottom > H + 1) }).length
+    const ngoai = [...document.querySelectorAll('.ddv *')].filter((e) => !e.closest('.sr-only')).filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > W + 1 || r.bottom > H + 1) }).length
     // tên bị che: phần tử tên nằm (một phần) ngoài khung cha gần nhất có overflow hidden
     const biChe = []
     for (const e of document.querySelectorAll('.ddv-the-ten, .ddv-dong-ten, .ddv-moi-chu b, .ddv-chao-ten, .ddv-treo-dong-ten b')) {
@@ -60,6 +61,11 @@ for (const [k, ten] of CANH) for (const [tk, w, h] of KHO) {
     for (const so of document.querySelectorAll('.ddv-dong-so')) {
       const a = so.getBoundingClientRect(), th = so.parentElement?.querySelector('.ddv-ngay, .ddv-dong-muc')?.getBoundingClientRect()
       if (a.width && th && th.width && a.left < th.right - 1 && a.right > th.left + 1 && a.top < th.bottom - 1 && a.bottom > th.top + 1) biChe.push(`số đè thanh ${so.parentElement?.querySelector('.ddv-dong-ten')?.textContent?.slice(0, 20)}`)
+    }
+    // dòng em trong cột / lưới làn phải nằm TRỌN trong khung danh sách (không bị cắt nửa dòng ở đáy cột)
+    for (const li of document.querySelectorAll('.ddv-cot-ds > li, .ddv-treo-ds > li, .ddv-lan-the > *')) {
+      const a = li.getBoundingClientRect(), k = li.parentElement?.getBoundingClientRect()
+      if (a.height && k && (a.bottom > k.bottom + 1 || a.right > k.right + 1)) biChe.push(`dòng bị cắt ${li.textContent?.slice(0, 20)}`)
     }
     const nho = [...document.querySelectorAll('.ddv button')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 44 || r.width < 44) }).map((e) => e.textContent?.trim().slice(0, 24))
     const coChu = (s) => document.body.innerText.includes(s)

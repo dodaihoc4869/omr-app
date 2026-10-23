@@ -16,9 +16,9 @@
 // Phím: Esc đóng · → (A ⇒ B, B ⇒ sang Gọi lên bảng đầu giờ) · ← (B ⇒ A) · H (B: ẩn / hiện tên nhóm Lười, mặc định HIỆN). Tấm hồ sơ đang mở ⇒ bản chiếu
 // không nghe phím (Esc của tấm chỉ đóng tấm). Cỡ theo khổ: mọi số đo tính bằng --u = 1/1920 chiều ngang (hoặc 1/1080 chiều cao) của khung
 // `.ca-chieu.cm.km` sẵn có (chieu-ma-kiem-tra.css) — cùng bộ màu tờ chiếu mã: nền --km-*, nhóm pha từ biến sẵn có, bậc = --bac (ban-chieu-diem-danh.css).
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowLeft, ArrowRight, Eye, EyeOff, RefreshCw, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CloudOff, Crown, Eye, EyeOff, Lightbulb, Pause, QrCode, RefreshCw, Sparkles, X, Zap } from 'lucide-react'
 import { linkDiemDanh, type TrangThaiBuoi } from '../../lib/buoi-hoc-api'
 import { dinhDangMa } from '../../lib/them-phut-api'
 import { duongQr, taoQr } from '../../lib/ma-qr'
@@ -35,8 +35,8 @@ import {
   ngayNganDd,
   phanTramDd,
   soNgayBo,
-  soNhom,
   TEN_NHOM,
+  THU_TU_NHOM,
   type CheDoChieu,
   type EmBuoi,
   type KhoaNhom,
@@ -44,32 +44,16 @@ import {
   type TrangThaiNhip,
 } from '../../lib/diem-danh-nhip'
 import { chuBuoi } from '../chien-dich/buoi-day-ui'
-import { demTheoBac } from '../../lib/nhip-hoc-thay'
-import ChipBac from '../bac-cham-chi/ChipBac'
-import DaiDemBac from '../bac-cham-chi/DaiDemBac'
 import HuyHieuBac from '../bac-cham-chi/HuyHieuBac'
 import { BAC_CHAM_CHI, chuBac, chuBacSo, motBac, SO_BAC } from '../bac-cham-chi/bac'
-import { caoBe, chuVuaVao, coBacBuoi, coLuoiThe, dauLop, demThang, emVuaVao, lenBac, soThe, type DauLop, type DemThang } from './chieu-bac'
+import { chuVuaVao, coBacBuoi, dauLop, demThang, emVuaVao, lenBac, soThe, type DemThang } from './chieu-bac'
+import { cachEm, dsTreoMay, phutTreo, tongCachLop, type TongCachLop } from './chieu-treo'
+import type { MucLamEm } from '../../lib/muc-lam-lo-api'
+import { apDungGiaoDien, docGiaoDien } from '../../lib/giao-dien-thay'
 import '../chieu-ma.css'
 import '../chieu-ma-kiem-tra.css'
 import './ban-chieu-diem-danh.css'
-
-/** Mỗi cột bản chiếu B chứa tối đa ngần này dòng trước khi tách đôi: dòng cao max(46/1080 khung, 44 px) — vừa khung 1920×1080 là 12 dòng,
- *  1280×720 là 8 dòng. Quá hai cột con ⇒ cột tự cuộn (không tràn). Thuần. */
-export function dongMotCot(rong: number, cao: number): number {
-  const u = Math.min(rong / 1920, cao / 1080)
-  return Math.max(4, Math.floor((640 * u) / (Math.max(46 * u, 44) + 6 * u)))
-}
-function useDongMotCot(): number {
-  const tinh = () => (typeof window === 'undefined' ? 12 : dongMotCot(window.innerWidth || 1920, window.innerHeight || 1080))
-  const [n, setN] = useState(tinh)
-  useEffect(() => {
-    const doi = () => setN(tinh())
-    window.addEventListener('resize', doi)
-    return () => window.removeEventListener('resize', doi)
-  }, [])
-  return n
-}
+import './ban-chieu-sang.css'
 
 export interface PropsBanChieu {
   cheDo: CheDoChieu
@@ -86,15 +70,26 @@ export interface PropsBanChieu {
   onThuLaiNhip: () => void
   /** Có ⇒ nút / phím → trên bản chiếu B sang bước Gọi lên bảng đầu giờ. */
   onSangDauGio?: () => void
+  /** (23/10) Mức làm 14 ngày của em có mặt (`/gv/muc-lam-lo`, bảng điểm danh đã hỏi) — Cách cả lớp làm bài, cột Treo máy, dấu ⏸ trên thẻ. */
+  mucLam?: ReadonlyMap<string, MucLamEm>
+  mucLamDang?: boolean
+  mucLamLoi?: string
 }
 
 export default function BanChieuDiemDanh(p: PropsBanChieu) {
   const { cheDo, tt, hoSoMo, onDong, onDoiCheDo, onSangDauGio } = p
   const nutDong = useRef<HTMLButtonElement>(null)
   const [anLuoi, setAnLuoi] = useState(false)
+  const [mucTung, setMucTung] = useState(false)
   const hoSoRef = useRef(hoSoMo)
   hoSoRef.current = hoSoMo
 
+  // NỀN SÁNG (thầy 23/10): màn chiếu luôn sáng kể cả khi app thầy đang để Tối / theo máy tối — ép bằng đúng đường của Cài đặt → Giao diện
+  // (không lưu lựa chọn); đóng màn ⇒ trả lại lựa chọn của thầy.
+  useEffect(() => {
+    apDungGiaoDien('sang')
+    return () => apDungGiaoDien(docGiaoDien())
+  }, [])
   // Mở ⇒ focus nút Đóng; đóng ⇒ focus về chỗ cũ.
   useEffect(() => {
     const truoc = document.activeElement as HTMLElement | null
@@ -114,6 +109,9 @@ export default function BanChieuDiemDanh(p: PropsBanChieu) {
       if (cheDo === 'nhip-lop' && (ev.key === 'h' || ev.key === 'H')) {
         ev.preventDefault()
         setAnLuoi((v) => !v)
+      } else if (cheDo === 'nhip-lop' && (ev.key === 'm' || ev.key === 'M')) {
+        ev.preventDefault()
+        setMucTung((v) => !v)
       } else if (ev.key === 'ArrowRight') {
         if (cheDo === 'diem-danh') {
           ev.preventDefault()
@@ -132,13 +130,13 @@ export default function BanChieuDiemDanh(p: PropsBanChieu) {
   }, [cheDo, onDong, onDoiCheDo, onSangDauGio])
 
   const nutDongJsx = (
-    <button ref={nutDong} type="button" className="ddc-dong" onClick={onDong}>
-      <X size={22} aria-hidden="true" /> Đóng <small>(Esc)</small>
+    <button ref={nutDong} type="button" className="ddv-dong" onClick={onDong}>
+      <X aria-hidden="true" /> Đóng <kbd>Esc</kbd>
     </button>
   )
   return createPortal(
-    <div className="ca-chieu cm km ddc" role="dialog" aria-modal="true" aria-label={cheDo === 'diem-danh' ? 'Bản chiếu điểm danh' : `Bản chiếu nhịp học của lớp ${tt.buoi.lop}`} data-che-do={cheDo}>
-      {cheDo === 'diem-danh' ? <ChieuDiemDanh {...p} nutDong={nutDongJsx} /> : <ChieuNhipLop {...p} nutDong={nutDongJsx} anLuoi={anLuoi} onDoiAn={() => setAnLuoi((v) => !v)} />}
+    <div className="ca-chieu cm km ddc ddv" role="dialog" aria-modal="true" aria-label={cheDo === 'diem-danh' ? 'Bản chiếu điểm danh' : `Bản chiếu nhịp học của lớp ${tt.buoi.lop}`} data-che-do={cheDo}>
+      {cheDo === 'diem-danh' ? <ChieuDiemDanh {...p} nutDong={nutDongJsx} /> : <ChieuNhipLop {...p} nutDong={nutDongJsx} anLuoi={anLuoi} onDoiAn={() => setAnLuoi((v) => !v)} mucTung={mucTung} onDoiMuc={() => setMucTung((v) => !v)} />}
     </div>,
     document.body,
   )
@@ -146,24 +144,6 @@ export default function BanChieuDiemDanh(p: PropsBanChieu) {
 
 /** Câu đọc màn hình của nút em, kèm bậc + điểm chăm khi có. */
 const nhanEm = (e: EmBuoi): string => chuNutEm(e, e.bacCham ? `${chuBacSo(e.bacCham.bac)}, điểm chăm ${e.bacCham.diem}` : undefined)
-
-/** Dải chú giải 12 bậc (số em mỗi bậc của `ds`); không em nào có bậc ⇒ không vẽ. */
-function DaiBacChieu({ ds, coTen = false }: { ds: readonly EmBuoi[]; coTen?: boolean }) {
-  const dem = useMemo(() => demTheoBac(ds), [ds])
-  return dem.some((n) => n > 0) ? (
-    <div className="ddc-bac" role="group" aria-label="12 bậc từ Lười đến Chăm">
-      <DaiDemBac dem={dem} coTen={coTen} />
-    </div>
-  ) : null
-}
-
-function MatKetNoi({ mat }: { mat: boolean }) {
-  return mat ? (
-    <span className="ddc-mat" role="status" title="Mất kết nối — đang thử lại, danh sách giữ như lần đọc cuối">
-      <i aria-hidden="true" /> mất kết nối
-    </span>
-  ) : null
-}
 
 /** Huy hiệu "chưa xếp bậc" (vòng nét đứt + mầm cây) — em Mới / chưa có số nhịp học. Chỉ để nhìn. */
 function HuyHieuMoi() {
@@ -312,226 +292,259 @@ function TheNoiVua({ e, pha, dich, coBac, gocRef }: { e: EmBuoi; pha: TheNoi['ph
   )
 }
 
-// ------------------------------------------------------------------ THANG 12 BẬC · VINH DANH · THẺ EM
-const NHOM_THANG: readonly { n: string; k: KhoaNhom; ten: string; khoang: string }[] = [
-  { n: 'luoi', k: 'luoi', ten: 'Lười', khoang: 'bậc 1–5' },
-  { n: 'deu', k: 'chua-deu', ten: 'Chưa đều', khoang: '6–7' },
-  { n: 'cham', k: 'cham', ten: 'Chăm', khoang: 'bậc 8–12' },
-]
-function ThangBacChieu({ dem }: { dem: DemThang }) {
+// ------------------------------------------------------------------ NỀN SÁNG 23/10 — BỘ PHẬN CHUNG
+const KHOANG_BAC: Partial<Record<KhoaNhom, string>> = { cham: 'bậc 8–12', 'chua-deu': 'bậc 6–7', luoi: 'bậc 1–5' }
+const khoangNhom = (k: KhoaNhom, coBac: boolean): string =>
+  coBac && KHOANG_BAC[k] ? KHOANG_BAC[k]! : k === 'moi' ? `chưa đủ ${LUAT_NHOM_NHIP.soNgayToiThieu} ngày` : k === 'chua-co' ? 'chưa có số nhịp học' : ''
+
+/** Đo lại khi đổi khổ màn (toàn màn hình, xoay máy chiếu) và khi phông chữ nạp xong (chữ đổi cao ⇒ số dòng vừa khung đổi). */
+function useDoKhoLai(setKho: (f: (n: number) => number) => void): void {
+  useEffect(() => {
+    let song = true
+    const doi = () => song && setKho((n) => n + 1)
+    window.addEventListener('resize', doi)
+    void document.fonts?.ready.then(doi)
+    return () => {
+      song = false
+      window.removeEventListener('resize', doi)
+    }
+  }, [setKho])
+}
+
+/**
+ * TỰ CO THEO ĐO THẬT (không đoán theo khổ): còn tràn ⇒ lên một nấc, tới `toiDa`. Danh sách đổi (`khoa`) hoặc đổi khổ màn ⇒ về nấc 0 rồi đo lại —
+ * màn sống làm mới 5 giây / bật toàn màn hình không giữ nấc cũ. Không bao giờ cắt tên: nấc chỉ bớt trang trí.
+ */
+function useNacTuCo(ref: RefObject<HTMLElement | null>, khoa: string, toiDa: number): number {
+  const [nac, setNac] = useState(0)
+  const [kho, setKho] = useState(0)
+  useDoKhoLai(setKho)
+  useLayoutEffect(() => setNac(0), [khoa, kho])
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (el && nac < toiDa && el.scrollHeight > el.clientHeight + 1) setNac(nac + 1)
+  })
+  return nac
+}
+
+/** Một cột danh sách: vừa một cột ⇒ giữ; không vừa ⇒ hai cột con; vẫn không vừa ⇒ bớt từng em tới khi vừa (kể cả dòng "+N em nữa"). Đo lại khi danh sách / khổ đổi. */
+function DsVuaKhung({ ds, khoa, hai = true, lop, render }: { ds: readonly EmBuoi[]; khoa: string; hai?: boolean; lop: string; render: (e: EmBuoi) => ReactNode }) {
+  const ref = useRef<HTMLOListElement>(null)
+  const [kieu, setKieu] = useState<'dong' | 'luoi'>('dong')
+  const [hien, setHien] = useState(ds.length)
+  const [kho, setKho] = useState(0)
+  useDoKhoLai(setKho)
+  useLayoutEffect(() => {
+    setKieu('dong')
+    setHien(ds.length)
+  }, [khoa, kho, ds.length])
+  useLayoutEffect(() => {
+    const ol = ref.current
+    if (!ol) return
+    // So mép THẬT của từng dòng với khung (scrollHeight làm tròn số nguyên ⇒ có thể sót nửa điểm ảnh của dòng cuối)
+    const k = ol.getBoundingClientRect()
+    const tran = [...ol.children].some((li) => {
+      const r = li.getBoundingClientRect()
+      return r.bottom > k.bottom + 0.5 || r.right > k.right + 0.5
+    })
+    if (!tran) return
+    if (hai && kieu === 'dong') setKieu('luoi')
+    else if (hien > 1) setHien(hien - 1)
+  })
   return (
-    <div className="ddc-thang" role="group" aria-label="Số em có mặt ở mỗi bậc, từ Lười đến Chăm">
-      {NHOM_THANG.map((g) => (
-        <span key={g.n} className="ddc-thang-nhom" data-n={g.n}>
-          {g.ten}{' '}
-          <small>
-            {g.khoang} · {soNhom(dem.nhom, g.k)} em
-          </small>
-        </span>
-      ))}
-      <span className="ddc-thang-nhom" data-n="moi">
-        Mới
-      </span>
-      {BAC_CHAM_CHI.map((b, i) => {
-        const n = dem.bac[i] ?? 0
-        return (
-          <div key={b.so} className="ddc-bac-cot bcc" data-bac={b.so} data-khong={n ? undefined : ''} style={{ '--be': caoBe(b.so) } as CSSProperties} title={`${chuBac(b)}: ${n} em`}>
-            <span className="ddc-bac-o">
-              <HuyHieuBac bac={b.so} co={44} />
-              <span className="ddc-bac-chu">
-                <small>Bậc {b.so}</small>
-                <b>
-                  {n} <small>em</small>
-                </b>
-              </span>
-              <span className="sr-only"> ở {chuBac(b)}</span>
-            </span>
-            <i className="ddc-bac-be" aria-hidden="true" />
-          </div>
-        )
-      })}
-      <div className="ddc-bac-cot" data-moi="" data-khong={dem.chuaXep ? undefined : ''} style={{ '--be': caoBe(0) } as CSSProperties} title={`Chưa xếp bậc: ${dem.chuaXep} em`}>
-        <span className="ddc-bac-o">
-          <HuyHieuMoi />
-          <span className="ddc-bac-chu">
-            <small>Mới</small>
-            <b>
-              {dem.chuaXep} <small>em</small>
-            </b>
-          </span>
-          <span className="sr-only"> chưa xếp bậc</span>
-        </span>
-        <i className="ddc-bac-be" aria-hidden="true" />
+    <>
+      <ol ref={ref} className={lop} data-kieu={kieu}>
+        {ds.slice(0, hien).map(render)}
+      </ol>
+      {hien < ds.length && <p className="ddv-cot-them">+{ds.length - hien} em nữa · xem đủ trên máy thầy</p>}
+    </>
+  )
+}
+
+function Dau({ nhan, tieuDe, phai, mat, nutDong }: { nhan: string; tieuDe: string; phai: ReactNode; mat: boolean; nutDong: ReactNode }) {
+  return (
+    <>
+      <header className="ddv-dau">
+        <span className="ddv-nhan">{nhan}</span>
+        <h1 className="ddv-lop">{tieuDe}</h1>
+        <div className="ddv-dau-phai">{phai}</div>
+        {nutDong}
+      </header>
+      {mat && (
+        <div className="ddv-bao" role="status" aria-label="Mất kết nối với máy chủ">
+          <CloudOff aria-hidden="true" />
+          Mất kết nối với máy chủ — danh sách giữ như lần đọc cuối, màn đang thử lại và tự cập nhật khi có mạng.
+        </div>
+      )}
+    </>
+  )
+}
+
+function VongCoMat({ co, tong }: { co: number; tong: number | null }) {
+  const p = tong ? Math.min(1, co / tong) : 0
+  const r = 44
+  const c = 2 * Math.PI * r
+  return (
+    <div className="ddv-vong" role="status" aria-label={`Có mặt ${co}${tong ? ` trên ${tong}` : ''} em`}>
+      {tong ? (
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r={r} className="ddv-vong-nen" />
+          <circle cx="50" cy="50" r={r} className="ddv-vong-day" strokeDasharray={`${c * p} ${c}`} transform="rotate(-90 50 50)" />
+        </svg>
+      ) : null}
+      <div className="ddv-vong-so">
+        <b>{co}</b>
+        {tong ? <span>/{tong}</span> : null}
+      </div>
+      <div className="ddv-vong-chu">
+        em có mặt
+        {tong ? <small>{tong - co > 0 ? `còn ${tong - co} em chưa điểm danh` : 'đủ cả lớp'}</small> : null}
       </div>
     </div>
   )
 }
 
-function VinhDanh({ d }: { d: DauLop | null }) {
-  const b = d?.dau.bacCham
-  const m = b ? motBac(b.bac) : null
-  if (!d || !b || !m)
-    return (
-      <section className="ddc-vinh" data-trong="" aria-label="Bậc cao nhất lớp">
-        <span className="ddc-vinh-nhan">Bậc cao nhất lớp</span>
-        <p className="ddc-vinh-cho">Em đã xếp bậc vào điểm danh là tên hiện ở đây.</p>
-      </section>
-    )
-  const s = soThe(d.dau)
+/** "Mã đổi sau m:ss" — chỉ ô này đếm từng giây (không làm cả màn vẽ lại). */
+function MaDoiSau({ luc, xong }: { luc: number | null; xong: boolean }) {
+  const [bay, setBay] = useState(() => Date.now())
+  useEffect(() => {
+    if (xong || !luc) return
+    const t = window.setInterval(() => setBay(Date.now()), 1000)
+    return () => window.clearInterval(t)
+  }, [luc, xong])
+  if (xong) return <p className="ddv-ma-phu">Buổi đã kết thúc — mã hết hiệu lực</p>
+  const con = luc ? Math.max(0, luc - bay) : null
   return (
-    <section className="ddc-vinh" aria-label="Bậc cao nhất lớp">
-      <span className="ddc-vinh-nhan">Bậc cao nhất lớp</span>
-      <span className="ddc-vinh-hh bcc" data-bac={m.so} aria-hidden="true">
-        <HuyHieuBac bac={m.so} co={112} />
-      </span>
-      <b className="ddc-vinh-ten">{d.dau.hoTen || `SBD ${d.dau.sbd}`}</b>
-      <span className="ddc-vinh-bac">{chuBac(m)}</span>
-      <dl className="ddc-vinh-so">
-        <div>
-          <dt>Điểm chăm</dt>
-          <dd>
-            {b.diem}
-            <small>/100</small>
-          </dd>
-        </div>
-        <div>
-          <dt>Chuỗi ngày</dt>
-          <dd>{s?.chuoi ?? 0}</dd>
-        </div>
-        <div>
-          <dt>Ngày đủ mức</dt>
-          <dd>{s?.du ?? '—'}</dd>
-        </div>
-      </dl>
-      {d.sau.length > 0 && (
-        <div className="ddc-vinh-sau">
-          <span className="ddc-vinh-sau-nhan">Theo sát phía sau</span>
-          <ol>
-            {d.sau.map((e) => (
-              <li key={e.sbd}>
-                <HuyHieuBac bac={e.bacCham!.bac} co={32} />
-                <b>{e.hoTen || `SBD ${e.sbd}`}</b>
-                <span>
-                  Bậc {e.bacCham!.bac} · điểm chăm {e.bacCham!.diem}
-                </span>
-              </li>
-            ))}
-          </ol>
+    <>
+      {con !== null && (
+        <div className="ddv-ma-doi" aria-hidden="true">
+          <span style={{ width: `${Math.min(100, (100 * con) / 60_000)}%` }} />
         </div>
       )}
-    </section>
+      <p className="ddv-ma-phu">
+        {con !== null ? (
+          <>
+            Mã đổi sau{' '}
+            <b>
+              {Math.floor(con / 60_000)}:{String(Math.floor((con % 60_000) / 1000)).padStart(2, '0')}
+            </b>
+          </>
+        ) : (
+          'Mã đổi mỗi phút'
+        )}{' '}
+        · mỗi em chỉ điểm danh cho chính mình
+      </p>
+    </>
   )
 }
 
-function TheEm({ e, vua, noi, coBac, coNhip, onMoEm }: { e: EmBuoi; vua: boolean; noi: boolean; coBac: boolean; coNhip: boolean; onMoEm: PropsBanChieu['onMoEm'] }) {
-  const k = khoaNhom(e)
-  const b = e.bacCham
-  const m = b ? motBac(b.bac) : null
-  const s = soThe(e)
+/** Dải 12 bậc: số em có mặt ở mỗi bậc + ô Mới (ẩn khi lớp đông — nấc ≥ 2). */
+function ThangBac({ dem }: { dem: DemThang }) {
+  return (
+    <div className="ddv-thang" role="group" aria-label="Số em có mặt ở mỗi bậc, từ Lười đến Chăm">
+      {BAC_CHAM_CHI.map((b, i) => {
+        const n = dem.bac[i] ?? 0
+        return (
+          <span key={b.so} className="ddv-thang-o bcc" data-bac={b.so} data-nhom={b.nhom} data-rong={n === 0 || undefined} title={`${chuBac(b)}: ${n} em`}>
+            <HuyHieuBac bac={b.so} co={30} />
+            <b>{n}</b>
+            <span className="sr-only"> em ở {chuBac(b)}</span>
+          </span>
+        )
+      })}
+      <span className="ddv-thang-o ddv-thang-o--moi" data-rong={dem.chuaXep === 0 || undefined} title={`Chưa xếp bậc: ${dem.chuaXep} em`}>
+        <span className="ddv-thang-moi">Mới</span>
+        <b>{dem.chuaXep}</b>
+        <span className="sr-only"> em chưa xếp bậc</span>
+      </span>
+    </div>
+  )
+}
+
+/** Huy hiệu tròn chữ cái nhóm — em chưa có bậc (Mới / chưa có số / máy chủ cũ không gửi bậc). */
+const HuyHieuNhom = ({ k }: { k: KhoaNhom }) => (
+  <span className="ddv-the-hh-trong" data-nhom={k} aria-hidden="true">
+    {TEN_NHOM[k].slice(0, 1)}
+  </span>
+)
+
+/** Dấu «⏸ N» — em có N lượt Treo máy trong 14 ngày (Cố tình gộp vào, bản công khai). */
+const ChipTreo = ({ m }: { m: MucLamEm | undefined }) => {
+  const n = m ? m.soTreo + m.soCoTinh : 0
+  return n > 0 ? (
+    <span className="ddv-treo-chip" title={`Treo máy ${n} lượt trong 14 ngày`}>
+      <Pause aria-hidden="true" />
+      {n}
+    </span>
+  ) : null
+}
+
+/** Chú thích khi rê chuột: số chi tiết đã bỏ khỏi thẻ (chữ nhỏ không đọc được từ cuối lớp). */
+function chuChiTiet(e: EmBuoi): string {
   const ten = e.hoTen || `SBD ${e.sbd}`
+  const s = soThe(e)
   const gio = gioDd(e.luc)
-  const thoat = s && s.thoatLuoi !== null ? (
-    <span className="ddc-the-thoat">
-      Thoát Lười{' '}
-      <b>
-        {s.thoatLuoi}/{NGAY_LIEN_THOAT_LUOI}
-      </b>
-    </span>
-  ) : s ? (
-    <span>
-      Chuỗi <b>{s.chuoi}</b> ngày
-    </span>
-  ) : null
-  const du = s ? (
-    <span>
-      Đủ mức <b>{s.du}</b> ngày
-    </span>
-  ) : null
+  const phan = [ten, gio ? `điểm danh lúc ${gio}` : '']
+  if (e.bacCham) phan.push(`điểm chăm ${e.bacCham.diem}/100`)
+  if (khoaNhom(e) === 'moi' && e.nhip) phan.push(`đã có số ${e.nhip.soNgayQua}/${LUAT_NHOM_NHIP.soNgayToiThieu} ngày`)
+  else if (s) phan.push(`đủ mức ${s.du} ngày`, s.thoatLuoi !== null ? `thoát Lười ${s.thoatLuoi}/${NGAY_LIEN_THOAT_LUOI} ngày liền` : `chuỗi ${s.chuoi} ngày liền`)
+  return phan.filter(Boolean).join(' · ')
+}
+
+// ------------------------------------------------------------------ A · ĐIỂM DANH ĐẦU GIỜ (nền sáng)
+function TheEm({ e, vua, dau, noi, coBac, mucLam, onMoEm }: { e: EmBuoi; vua: boolean; dau: boolean; noi: boolean; coBac: boolean; mucLam: MucLamEm | undefined; onMoEm: PropsBanChieu['onMoEm'] }) {
+  const k = khoaNhom(e)
+  const m = e.bacCham ? motBac(e.bacCham.bac) : null
+  const ten = e.hoTen || `SBD ${e.sbd}`
   return (
     <button
       type="button"
-      className={`ddc-em${m ? ' bcc' : ''}`}
+      className={`ddv-the${m ? ' bcc' : ''}`}
       data-bac={m?.so}
       data-nhom={k}
-      data-moi={vua ? '' : undefined}
-      data-noi={noi ? '' : undefined}
       data-sbd={e.sbd}
-      title={`${ten}${gio ? ` · điểm danh lúc ${gio}` : ''}`}
+      data-vua={vua ? '' : undefined}
+      data-moi={vua ? '' : undefined}
+      data-dau={dau ? '' : undefined}
+      data-noi={noi ? '' : undefined}
+      title={chuChiTiet(e)}
       onClick={(ev) => onMoEm(e, ev.currentTarget)}
       aria-label={nhanEm(e)}
     >
-      <span className="ddc-the-hh" aria-hidden="true">
+      <span className="ddv-the-hh" aria-hidden="true">
         {m ? (
           <>
-            <HuyHieuBac bac={m.so} co={64} />
-            <span className="ddc-the-so">{m.so}</span>
+            <HuyHieuBac bac={m.so} co={56} />
+            <b className="ddv-the-so">{m.so}</b>
           </>
-        ) : k === 'moi' || k === 'chua-co' ? (
-          <HuyHieuMoi />
         ) : (
-          <span className="ddc-cham" />
+          <HuyHieuNhom k={k} />
         )}
       </span>
-      <span className="ddc-em-chu">
-        <b data-dai={ten.length > 14 ? '' : undefined}>{ten}</b>
-        <span className="ddc-the-bac" data-dai={m && m.ten.length > 20 ? '' : undefined}>
-          {m ? m.ten : k === 'moi' ? (coBac ? 'Chưa xếp bậc' : 'Mới vào lớp') : k === 'chua-co' ? `Điểm danh ${gio}` : `Nhóm ${TEN_NHOM[k]}`}
-        </span>
-        {m && b ? (
-          <>
-            <span className="ddc-the-dong ddc-the-dong--2">
-              <span>
-                Điểm chăm <b>{b.diem}</b>
-              </span>
-              {thoat}
-            </span>
-            <span className="ddc-the-dong">{du}</span>
-          </>
-        ) : k === 'moi' && e.nhip ? (
-          <>
-            <span className="ddc-the-dong">
-              <span>
-                Đã có số{' '}
-                <b>
-                  {e.nhip.soNgayQua}/{LUAT_NHOM_NHIP.soNgayToiThieu}
-                </b>{' '}
-                ngày
-              </span>
-            </span>
-            <span className="ddc-the-dong">
-              <span>
-                Đủ {LUAT_NHOM_NHIP.soNgayToiThieu} ngày sẽ {coBac ? 'có bậc' : 'xếp nhóm'}
-              </span>
-            </span>
-          </>
-        ) : k === 'chua-co' ? (
-          coNhip ? (
-            <span className="ddc-the-dong">
-              <span>Chưa có số nhịp học</span>
-            </span>
-          ) : null
-        ) : (
-          <>
-            <span className="ddc-the-dong">{du}</span>
-            <span className="ddc-the-dong">{thoat}</span>
-          </>
-        )}
+      <span className="ddv-the-chu">
+        <b className="ddv-the-ten">
+          {ten}
+          <ChipTreo m={mucLam} />
+        </b>
+        <span className="ddv-the-bac">{m ? m.ten : k === 'moi' ? (coBac ? 'Chưa xếp bậc' : 'Mới vào lớp') : TEN_NHOM[k]}</span>
       </span>
-      {b && (
-        <span className="ddc-the-diem" aria-hidden="true">
-          <i style={{ transform: `scaleX(${Math.max(0, Math.min(100, b.diem)) / 100})` }} />
+      {vua && (
+        <span className="ddv-the-vua" aria-hidden="true">
+          <Sparkles aria-hidden="true" />
+          Vừa vào {gioDd(e.luc)}
         </span>
       )}
-      {vua && (
-        <span className="ddc-the-vua" aria-hidden="true">
-          Vừa vào
+      {dau && (
+        <span className="ddv-the-dau" aria-hidden="true">
+          <Crown aria-hidden="true" />
+          Dẫn đầu lớp
         </span>
       )}
     </button>
   )
 }
 
-function ChieuDiemDanh({ tt, tk, nhip, goc, matKetNoi, onMoEm, onDoiCheDo, onThuLaiNhip, nutDong }: PropsBanChieu & { nutDong: ReactNode }) {
+function ChieuDiemDanh({ tt, tk, nhip, goc, matKetNoi, mucLam, onMoEm, onDoiCheDo, onThuLaiNhip, nutDong }: PropsBanChieu & { nutDong: ReactNode }) {
   const ma = tt.ma ?? ''
   const xong = !tt.buoi.dangMo
   const ve = useMemo(() => {
@@ -544,248 +557,319 @@ function ChieuDiemDanh({ tt, tk, nhip, goc, matKetNoi, onMoEm, onDoiCheDo, onThu
   const coNhip = !!nhip.kq
   const coBac = useMemo(() => coNhip && coBacBuoi(tk.ds), [coNhip, tk.ds])
   const thang = useMemo(() => demThang(tk.coMat), [tk.coMat])
-  const dau = useMemo(() => (coBac ? dauLop(luoi) : null), [coBac, luoi])
-  const luoiRef = useRef<HTMLUListElement>(null)
+  const dau = useMemo(() => (coBac ? (dauLop(luoi)?.dau ?? null) : null), [coBac, luoi])
+  const moiNhat = useMemo(() => [...tk.coMat].sort((a, b) => (b.luc ?? '').localeCompare(a.luc ?? '')).slice(0, 3), [tk.coMat])
+  const nhomCo = THU_TU_NHOM.filter((n) => luoi.some((e) => khoaNhom(e) === n))
+  const lanRef = useRef<HTMLDivElement>(null)
   const noiRef = useRef<HTMLDivElement>(null)
-  const noi = useTheNoi(tk.coMat, luoiRef, noiRef)
+  const noi = useTheNoi(tk.coMat, lanRef, noiRef)
   const emNoi = noi ? (tk.coMat.find((e) => e.sbd === noi.sbd) ?? null) : null
-  const siSo = tt.siSo
+  const nac = useNacTuCo(lanRef, `${luoi.map((e) => e.sbd).join('|')}#${coBac ? 1 : 0}`, 5)
   const soCoMat = tk.coMat.length
-  const co = coLuoiThe(luoi.length)
-  const dem = tk.demCoMat
-  const conLai = siSo ? Math.max(0, siSo - soCoMat) : null
-  const L = LUAT_NHOM_NHIP
   const diaChi = `${(goc || '').replace(/^https?:\/\//, '')}/hs`
+  const L = LUAT_NHOM_NHIP
   return (
-    <>
-      <header className="ddc-dau">
-        <div className="ddc-dau-trai">
-          <span className="ddc-nhan">ĐIỂM DANH ĐẦU GIỜ</span>
-          <b className="ddc-ten-buoi">{chuBuoi(tt.buoi)}</b>
-          <MatKetNoi mat={matKetNoi} />
-        </div>
-        <div className="ddc-dau-phai">
-          <span className="ddc-co-mat">
-            <span className="ddc-nhan-so">Có mặt</span>
-            <b className="ddc-so-lon" role="status" aria-label={`Có mặt ${soCoMat}${siSo ? ` trên ${siSo}` : ''} em`}>
-              {soCoMat}
-              {siSo ? <small>/{siSo}</small> : <small> em</small>}
-            </b>
-            {siSo ? (
-              <span className="ddc-co-mat-phai">
-                <span className="ddc-vach" aria-hidden="true">
-                  <i style={{ width: `${Math.min(100, (100 * soCoMat) / siSo)}%` }} />
-                </span>
-                <span className="ddc-con-lai">{conLai ? `còn ${conLai} em chưa điểm danh` : 'đủ cả lớp'}</span>
-              </span>
-            ) : null}
-          </span>
-          {nutDong}
-        </div>
-      </header>
-
-      <div className="ddc-than-a" data-co-bac={coBac ? '' : undefined}>
-        <div className="ddc-trai">
-          <section className="ddc-ma-khung" aria-label="Mã điểm danh">
-            <span className="ddc-ma-huong">Mở app học sinh › Điểm danh</span>
-            <span className="ddc-ma-nho">{ve ? 'Gõ mã buổi hoặc quét mã QR' : 'Gõ mã buổi'}</span>
-            <b className="ddc-ma" aria-label={`Mã điểm danh ${ma}`} aria-live="polite">
+    <div className="ddv-man" data-nac={nac}>
+      <Dau nhan="Điểm danh đầu giờ" tieuDe={chuBuoi(tt.buoi)} phai={<VongCoMat co={soCoMat} tong={tt.siSo} />} mat={matKetNoi} nutDong={nutDong} />
+      <main className="ddv-than" data-co-bac={coBac ? '' : undefined}>
+        <aside className="ddv-vao">
+          <section className="ddv-ma" aria-label="Mã điểm danh">
+            <p className="ddv-ma-buoc">
+              <QrCode aria-hidden="true" />
+              <span>Mở app học sinh ›</span> <b>Điểm danh</b>
+            </p>
+            <b className="ddv-ma-so" aria-label={`Mã điểm danh ${ma}`} aria-live="polite">
               {xong ? '— — —' : ma ? dinhDangMa(ma) : '……'}
             </b>
-            <span className="ddc-ma-nho">{xong ? 'Buổi đã kết thúc — mã hết hiệu lực' : 'Mã đổi mỗi phút · mỗi em chỉ điểm danh cho chính mình'}</span>
             {ve && (
-              <>
-                <svg className="ddc-qr" viewBox={`0 0 ${ve.canh} ${ve.canh}`} role="img" aria-label="Mã QR điểm danh" shapeRendering="crispEdges">
-                  <rect width={ve.canh} height={ve.canh} className="ddc-qr-nen" />
-                  <path d={ve.d} className="ddc-qr-o" />
+              <div className="ddv-ma-qr">
+                <svg className="" viewBox={`0 0 ${ve.canh} ${ve.canh}`} role="img" aria-label="Mã QR điểm danh" shapeRendering="crispEdges">
+                  <rect width={ve.canh} height={ve.canh} className="ddv-qr-nen" />
+                  <path d={ve.d} />
                 </svg>
-              </>
-            )}
-            <p className="ddc-ma-ghi">
-              App học sinh: <b>{diaChi}</b>
-            </p>
-          </section>
-          {coBac && <VinhDanh d={dau} />}
-        </div>
-
-        <section className="ddc-phai" aria-label="Em đã điểm danh" data-noi={emNoi ? '' : undefined}>
-          {coBac ? (
-            <ThangBacChieu dem={thang} />
-          ) : coNhip ? (
-            <div className="ddc-ds-dau">
-              <h2 className="ddc-h2">
-                Đã điểm danh · {soCoMat} em
-                {conLai !== null && conLai > 0 && <small> · còn {conLai} em chưa điểm danh</small>}
-              </h2>
-              <div className="ddc-chip-ds">
-                {(['cham', 'chua-deu', 'luoi', 'moi'] as const).map((k) => (
-                  <span key={k} className="ddc-chip" data-nhom={k}>
-                    {TEN_NHOM[k]} {soNhom(dem, k)}
-                  </span>
-                ))}
-                {dem.chuaCo > 0 && (
-                  <span className="ddc-chip" data-nhom="chua-co">
-                    Chưa có số {dem.chuaCo}
-                  </span>
-                )}
               </div>
+            )}
+            <MaDoiSau luc={tt.doiMaLuc} xong={xong} />
+            <p className="ddv-ma-link">{diaChi}</p>
+          </section>
+          {moiNhat.length > 0 && (
+            <section className="ddv-moi-vao" aria-label="Vừa vào lớp">
+              <p className="ddv-muc-tieu">
+                <Sparkles aria-hidden="true" />
+                Vừa vào lớp
+              </p>
+              {moiNhat.map((e, i) => {
+                const m = e.bacCham ? motBac(e.bacCham.bac) : null
+                return (
+                  <button key={e.sbd} type="button" className="ddv-moi-dong" data-dau={i === 0 || undefined} onClick={(ev) => onMoEm(e, ev.currentTarget)} aria-label={`${nhanEm(e)}, vừa vào lúc ${gioDd(e.luc)}`}>
+                    <span className="ddv-moi-hh" aria-hidden="true">
+                      {m ? <HuyHieuBac bac={m.so} co={i === 0 ? 52 : 40} /> : <HuyHieuNhom k={khoaNhom(e)} />}
+                    </span>
+                    <span className="ddv-moi-chu">
+                      <b>{e.hoTen || `SBD ${e.sbd}`}</b>
+                      <span>{m ? `Bậc ${m.so} · ${m.ten}` : TEN_NHOM[khoaNhom(e)]}</span>
+                    </span>
+                    <time>{gioDd(e.luc)}</time>
+                  </button>
+                )
+              })}
+            </section>
+          )}
+        </aside>
+
+        <section className="ddv-lop-hn" aria-label="Em đã điểm danh" data-noi={emNoi ? '' : undefined}>
+          {!coNhip && <NhipChuaCo nhip={nhip} onThuLai={onThuLaiNhip} />}
+          {soCoMat === 0 ? (
+            <div className="ddv-trong">
+              {coBac && <div className="ddv-trong-hh">{[12, 9, 6, 3].map((b) => <HuyHieuBac key={b} bac={b} co={88} />)}</div>}
+              <p className="ddv-trong-to">Chưa em nào điểm danh</p>
+              <p className="ddv-trong-phu">
+                Em mở app học sinh, chọn <b>Điểm danh</b>, gõ mã {ma && !xong ? <b>{dinhDangMa(ma)}</b> : 'buổi'} hoặc quét mã QR bên trái. Màn tự cập nhật mỗi 5 giây.
+              </p>
             </div>
           ) : (
-            <NhipChuaCo nhip={nhip} onThuLai={onThuLaiNhip} />
-          )}
-          {soCoMat === 0 ? (
-            <p className="ddc-rong">Chưa em nào điểm danh. Màn tự cập nhật mỗi 5 giây.</p>
-          ) : (
-            <ul
-              ref={luoiRef}
-              className="ddc-luoi"
-              data-kieu={co.kieu}
-              data-cot={co.cot}
-              style={{ '--cot': co.cot, '--hang': co.hang } as CSSProperties}
-              aria-label="Bấm tên em để mở hồ sơ làm bài"
-            >
-              {luoi.map((e) => (
-                <li key={e.sbd} className="ddc-luoi-o">
-                  <TheEm e={e} vua={vua.has(e.sbd)} noi={emNoi?.sbd === e.sbd} coBac={coBac} coNhip={coNhip} onMoEm={onMoEm} />
-                </li>
-              ))}
-            </ul>
+            <>
+              {coBac && <ThangBac dem={thang} />}
+              <div className="ddv-lan-ds" ref={lanRef} role="group" aria-label="Bấm tên em để mở hồ sơ làm bài">
+                {nhomCo.map((n) => {
+                  const ds = luoi.filter((e) => khoaNhom(e) === n)
+                  return (
+                    <div key={n} className="ddv-lan" data-nhom={n}>
+                      <div className="ddv-lan-nhan">
+                        <b>{TEN_NHOM[n]}</b>
+                        <span>{ds.length} em</span>
+                        <small>{khoangNhom(n, coBac)}</small>
+                      </div>
+                      <div className="ddv-lan-the">
+                        {ds.map((e) => (
+                          <TheEm key={e.sbd} e={e} vua={vua.has(e.sbd)} dau={e === dau} noi={emNoi?.sbd === e.sbd} coBac={coBac} mucLam={mucLam?.get(e.sbd)} onMoEm={onMoEm} />
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
           )}
           {emNoi && noi && <TheNoiVua e={emNoi} pha={noi.pha} dich={noi.dich} coBac={coBac} gocRef={noiRef} />}
         </section>
-      </div>
-
-      <footer className="ddc-chan">
-        {coBac ? (
-          <p className="ddc-chan-luat">
-            <b>Điểm chăm 0–100</b> tính từ số ngày đủ mức (ngày gần tính nặng hơn), số câu đã làm so với mức và chuỗi ngày · Lười bậc 1–5 (thoát khi đủ mức{' '}
-            {NGAY_LIEN_THOAT_LUOI} ngày liền) · Chưa đều 6–7 · Chăm 8–{SO_BAC} · Bậc {SO_BAC} cần chuỗi đủ mức từ 7 ngày
-          </p>
-        ) : (
-          <>
-            <span className="ddc-chu-giai" data-nhom="cham">
-              <i aria-hidden="true" />
-              Chăm: đủ mức ≥ {L.chamTu}% số ngày
-            </span>
-            <span className="ddc-chu-giai" data-nhom="chua-deu">
-              <i aria-hidden="true" />
-              Chưa đều: ở giữa
-            </span>
-            <span className="ddc-chu-giai" data-nhom="luoi">
-              <i aria-hidden="true" />
-              Lười: ≤ {L.luoiDen}% hoặc bỏ {L.ngayLienKhongLam} ngày liền · thoát khi đủ mức {NGAY_LIEN_THOAT_LUOI} ngày liền
-            </span>
-            <span className="ddc-chu-giai" data-nhom="moi">
-              <i aria-hidden="true" />
-              Mới: chưa đủ {L.soNgayToiThieu} ngày
-            </span>
-          </>
-        )}
-        <button type="button" className="ddc-nut ddc-nut--chinh" onClick={() => onDoiCheDo('nhip-lop')}>
-          Chiếu Nhịp học của lớp <ArrowRight size={20} aria-hidden="true" />
+      </main>
+      <footer className="ddv-chan">
+        <p className="ddv-chu-giai">
+          {coBac
+            ? `Bậc 1–${SO_BAC} tính từ số ngày làm đủ mức và chuỗi ngày liền · Lười 1–5 thoát khi đủ mức ${NGAY_LIEN_THOAT_LUOI} ngày liền · Chưa đều 6–7 · Chăm 8–${SO_BAC}`
+            : `Chăm: đủ mức ≥ ${L.chamTu}% số ngày · Lười: ≤ ${L.luoiDen}% hoặc bỏ ${L.ngayLienKhongLam} ngày liền, thoát khi đủ mức ${NGAY_LIEN_THOAT_LUOI} ngày liền · Mới: chưa đủ ${L.soNgayToiThieu} ngày`}
+          {mucLam && mucLam.size > 0 ? (
+            <>
+              {' · '}
+              <span className="ddv-chu-giai-treo">
+                <Pause aria-hidden="true" className="ddv-chu-giai-ic" /> N = số lượt treo máy 14 ngày
+              </span>
+            </>
+          ) : null}
+        </p>
+        <button type="button" className="ddv-nut-chinh" onClick={() => onDoiCheDo('nhip-lop')}>
+          Chiếu Nhịp học của lớp <ArrowRight aria-hidden="true" /> <kbd>→</kbd>
         </button>
       </footer>
-    </>
+    </div>
   )
 }
 
 function NhipChuaCo({ nhip, onThuLai }: { nhip: TrangThaiNhip; onThuLai?: () => void }) {
   if (nhip.kq) return null
   return nhip.loi ? (
-    <p className="ddc-rong ddc-rong--nho" role="status">
+    <p className="ddv-cach-cho" role="status">
       Chưa có nhóm Chăm / Lười: {nhip.loi}
       {onThuLai && (
-        <button type="button" className="ddc-nut" onClick={onThuLai} disabled={nhip.dangTai}>
-          <RefreshCw size={18} aria-hidden="true" /> Thử lại
+        <button type="button" className="ddv-nut" onClick={onThuLai} disabled={nhip.dangTai}>
+          <RefreshCw aria-hidden="true" /> Thử lại
         </button>
       )}
     </p>
   ) : (
-    <p className="ddc-rong ddc-rong--nho" aria-busy="true">
+    <p className="ddv-cach-cho" aria-busy="true">
       Đang tải nhịp học của lớp…
     </p>
   )
 }
 
-const TIEU_DE_COT: Record<'cham' | 'chua-deu' | 'luoi', string> = { cham: 'Chăm · đáng khen', 'chua-deu': 'Chưa đều', luoi: 'Lười · cần cố gắng' }
+// ------------------------------------------------------------------ B · NHỊP HỌC CỦA LỚP (nền sáng + Cách làm bài + cột Treo máy)
+function DaiNgay({ e }: { e: EmBuoi }) {
+  const o = (e.nhip?.o ?? []).filter((x) => !x.homNay)
+  return (
+    <span className="ddv-ngay" aria-hidden="true">
+      {o.map((x) => (
+        <i key={x.ngay} data-loai={x.loai} />
+      ))}
+    </span>
+  )
+}
 
-function ChieuNhipLop({ tt, tk, nhip, matKetNoi, onMoEm, onDoiCheDo, onSangDauGio, onThuLaiNhip, nutDong, anLuoi, onDoiAn }: PropsBanChieu & { nutDong: ReactNode; anLuoi: boolean; onDoiAn: () => void }) {
+function CotTreo({ ds, khoa, tong, mucLam, dang, loi, onMoEm }: { ds: readonly EmBuoi[]; khoa: string; tong: TongCachLop; mucLam: ReadonlyMap<string, MucLamEm>; dang: boolean; loi: string; onMoEm: PropsBanChieu['onMoEm'] }) {
+  const dong = useMemo(() => dsTreoMay(ds, mucLam), [ds, mucLam])
+  const theoSbd = useMemo(() => new Map(dong.map((d) => [d.em.sbd, d])), [dong])
+  const emTreo = useMemo(() => dong.map((d) => d.em), [dong])
+  return (
+    <section className="ddv-cot" data-nhom="treo" aria-labelledby="ddv-cot-treo">
+      <h2 id="ddv-cot-treo">
+        <b>Treo máy</b>
+        <span>{dong.length} em</span>
+        <small>14 ngày · rời câu lâu không làm</small>
+      </h2>
+      {tong.soEmCoSo === 0 ? (
+        <p className="ddv-treo-khong">{dang ? 'Đang tải số treo máy…' : loi ? `Chưa tải được: ${loi}` : 'Chưa có số Mức làm của lớp'}</p>
+      ) : (
+        <>
+          <div className="ddv-treo-tong">
+            <p>
+              <b>{tong.treo}</b>
+              <small>lượt treo</small>
+            </p>
+            <p>
+              <b>{tong.giayTreo === null ? '—' : phutTreo(tong.giayTreo)}</b>
+              <small>phút treo</small>
+            </p>
+            <p>
+              <b>{tong.soEmTreo}</b>
+              <small>em có treo</small>
+            </p>
+          </div>
+          {dong.length === 0 ? (
+            <p className="ddv-treo-khong">{tong.chuaDoTreo >= tong.soDo && tong.soDo > 0 ? 'Đang đo từ các lượt làm mới — lượt cũ chưa đo treo máy' : 'Không em nào treo máy trong 14 ngày'}</p>
+          ) : (
+            <DsVuaKhung
+              ds={emTreo}
+              khoa={khoa}
+              hai={false}
+              lop="ddv-treo-ds"
+              render={(e) => {
+                const d = theoSbd.get(e.sbd)!
+                return (
+                  <li key={e.sbd}>
+                    <button type="button" className="ddv-treo-dong" onClick={(ev) => onMoEm(e, ev.currentTarget)} aria-label={`${nhanEm(e)}, treo máy ${d.treo} lượt${d.phut !== null ? `, ${d.phut} phút` : ''}${d.soNgay !== null ? `, ${d.soNgay} ngày` : ''}`}>
+                      <span className="ddv-dong-hh" aria-hidden="true">
+                        {e.bacCham ? <HuyHieuBac bac={e.bacCham.bac} co={30} /> : null}
+                      </span>
+                      <span className="ddv-treo-dong-ten">
+                        <b>{e.hoTen || `SBD ${e.sbd}`}</b>
+                        <small>
+                          {d.soNgay !== null ? `${d.soNgay} ngày` : '— ngày'} · {d.phut !== null ? `${d.phut} phút` : '— phút'}
+                        </small>
+                      </span>
+                      <span className="ddv-treo-dong-so">
+                        <b>{d.treo}</b>
+                        <small>lượt</small>
+                      </span>
+                    </button>
+                  </li>
+                )
+              }}
+            />
+          )}
+          {tong.chuaDoTreo > 0 && <p className="ddv-treo-chua">{tong.chuaDoTreo} lượt chưa đo treo máy</p>}
+        </>
+      )}
+    </section>
+  )
+}
+
+function ChieuNhipLop({ tt, tk, nhip, matKetNoi, mucLam, mucLamDang, mucLamLoi, onMoEm, onDoiCheDo, onSangDauGio, onThuLaiNhip, nutDong, anLuoi, onDoiAn, mucTung, onDoiMuc }: PropsBanChieu & { nutDong: ReactNode; anLuoi: boolean; onDoiAn: () => void; mucTung: boolean; onDoiMuc: () => void }) {
   const kq = nhip.kq
   const k = khoangNhip(kq)
-  const dongVua = useDongMotCot()
   const cot = useMemo(() => cotNhipLop(tk.ds), [tk.ds])
   const hn = useMemo(() => homQuaHomNay(tk.ds, kq), [tk.ds, kq])
+  const ml = mucLam ?? KHONG_MUC
+  const sbdCoMat = useMemo(() => tk.coMat.map((e) => e.sbd), [tk.coMat])
+  const tong = useMemo(() => tongCachLop(sbdCoMat, ml), [sbdCoMat, ml])
   const dl = tk.demLop
-  const tong = dl.tong
+  const tongEm = dl.tong
   const n = k?.soNgayQua ?? 0
   const g = nguongNgay(n)
   const lop = tt.buoi.lop.trim() || 'mọi lớp'
   const soVang = tk.vang.length
   const khac = dl.moi + dl.chuaCo
-  const doan: { k: KhoaNhom | 'khac'; so: number; chu: string }[] = [
-    { k: 'cham', so: dl.cham, chu: `Chăm ${dl.cham} em · ${phanTramDd(dl.cham, tong)}%` },
-    { k: 'chua-deu', so: dl.chuaDeu, chu: `Chưa đều ${dl.chuaDeu} · ${phanTramDd(dl.chuaDeu, tong)}%` },
-    { k: 'luoi', so: dl.luoi, chu: `Lười ${dl.luoi} em · ${phanTramDd(dl.luoi, tong)}%` },
-    { k: 'khac', so: khac, chu: `Mới ${khac}` },
-  ]
   const dieuKien: Record<'cham' | 'chua-deu' | 'luoi', string> =
     n >= LUAT_NHOM_NHIP.soNgayToiThieu
       ? { cham: `đủ mức ≥ ${g.cham}/${n} ngày`, 'chua-deu': `đủ mức ${g.luoi + 1}–${g.cham - 1}/${n} ngày`, luoi: `thoát khi đủ mức ${NGAY_LIEN_THOAT_LUOI} ngày liền` }
       : { cham: `đủ mức ≥ ${LUAT_NHOM_NHIP.chamTu}% số ngày`, 'chua-deu': 'ở giữa', luoi: `thoát khi đủ mức ${NGAY_LIEN_THOAT_LUOI} ngày liền` }
+  const khoaDs = `${tk.ds.map((e) => `${e.sbd}${e.coMat ? 1 : 0}`).join('|')}#${mucTung ? 1 : 0}#${ml.size}`
 
-  const cotJsx = (khoa: 'cham' | 'chua-deu' | 'luoi', ds: EmBuoi[]) => {
-    const soCot = ds.length > dongVua ? 2 : 1
-    const soHang = Math.max(1, Math.ceil(ds.length / soCot))
+  const cotJsx = (khoa: 'cham' | 'chua-deu' | 'luoi', ten: string, ds: EmBuoi[]) => {
     const an = khoa === 'luoi' && anLuoi
     return (
-      <section key={khoa} className="ddc-cot" data-nhom={khoa} aria-labelledby={`ddc-cot-${khoa}`}>
-        <div className="ddc-cot-dau">
-          <h2 id={`ddc-cot-${khoa}`} className="ddc-cot-ten">
-            {TIEU_DE_COT[khoa]} <span className="ddc-cot-so">· {ds.length} em</span>
-          </h2>
-          <span className="ddc-cot-dk">{dieuKien[khoa]}</span>
-        </div>
+      <section key={khoa} className="ddv-cot" data-nhom={khoa} aria-labelledby={`ddc-cot-${khoa}`}>
+        <h2 id={`ddc-cot-${khoa}`}>
+          <b>{ten}</b>
+          <span>{ds.length} em</span>
+          <small>{dieuKien[khoa]}</small>
+        </h2>
         {an ? (
-          <p className="ddc-an" data-khoi="luoi-da-an">
-            Đã ẩn tên {ds.length} em — bấm <kbd>H</kbd> để hiện
-          </p>
+          <div className="ddv-an" data-khoi="luoi-da-an">
+            <EyeOff aria-hidden="true" />
+            <p>Đã ẩn tên {ds.length} em nhóm Lười</p>
+            <small>
+              Bấm <kbd>H</kbd> để hiện lại · thầy vẫn xem đủ trên máy thầy
+            </small>
+          </div>
         ) : ds.length === 0 ? (
-          <p className="ddc-an">Chưa có em nào.</p>
+          <p className="ddv-treo-khong">Chưa có em nào.</p>
         ) : (
-          <ul className="ddc-cot-ds" data-hai-cot={soCot === 2 ? '' : undefined} style={{ '--cot': soCot, '--hang': soHang } as CSSProperties}>
-            {ds.map((e) => {
+          <DsVuaKhung
+            ds={ds}
+            khoa={khoaDs}
+            lop="ddv-cot-ds"
+            render={(e) => {
+              const vang = !e.coMat
               const bo = khoa === 'luoi' ? soNgayBo(e.nhip) : 0
-              const so = `${e.nhip?.soNgayDu ?? 0}/${e.nhip?.soNgayQua ?? 0}`
+              const m = vang ? undefined : ml.get(e.sbd)
+              const c = m ? cachEm(m) : null
               return (
-                <li key={e.sbd}>
-                  <button type="button" className="ddc-dong-em" data-vang={e.coMat ? undefined : ''} onClick={(ev) => onMoEm(e, ev.currentTarget)} aria-label={nhanEm(e) + (bo ? `, bỏ ${bo} ngày liền` : '')}>
-                    {e.bacCham && <ChipBac bac={e.bacCham.bac} nho />}
-                    <span className="ddc-dong-ten">{e.hoTen || `SBD ${e.sbd}`}</span>
-                    {!e.coMat && <small className="ddc-vang-chu">vắng</small>}
-                    <b className="ddc-dong-so">
-                      {so}
-                      {bo ? <span> · bỏ {bo} ngày{soCot === 1 ? ' liền' : ''}</span> : null}
-                    </b>
+                <li key={e.sbd} data-vang={vang || undefined}>
+                  <button type="button" className="ddv-dong-em" data-vang={vang ? '' : undefined} onClick={(ev) => onMoEm(e, ev.currentTarget)} aria-label={nhanEm(e) + (bo ? `, bỏ ${bo} ngày liền` : '') + (c ? `, vội ${c.voi}, có nghĩ ${c.nghi}, treo máy ${c.treo} lượt` : '')}>
+                    <span className="ddv-dong-hh" aria-hidden="true">
+                      {e.bacCham ? <HuyHieuBac bac={e.bacCham.bac} co={34} /> : null}
+                    </span>
+                    <span className="ddv-dong-ten">
+                      {e.hoTen || `SBD ${e.sbd}`}
+                      {vang && <em className="">vắng</em>}
+                    </span>
+                    {mucTung && c && c.voi + c.nghi + c.treo > 0 ? (
+                      <span className="ddv-dong-muc" aria-hidden="true">
+                        <i data-k="voi" style={{ flexGrow: c.voi }} />
+                        <i data-k="nghi" style={{ flexGrow: c.nghi }} />
+                        {c.treo > 0 && <i data-k="treo" style={{ flexGrow: c.treo }} />}
+                      </span>
+                    ) : (
+                      <DaiNgay e={e} />
+                    )}
+                    <span className="ddv-dong-so">
+                      {bo > 0 ? (
+                        <em>bỏ {bo} ngày</em>
+                      ) : (
+                        <>
+                          {e.nhip?.soNgayDu ?? 0}
+                          <small>/{e.nhip?.soNgayQua ?? 0}</small>
+                        </>
+                      )}
+                    </span>
                   </button>
                 </li>
               )
-            })}
-          </ul>
+            }}
+          />
         )}
       </section>
     )
   }
 
   return (
-    <>
-      <header className="ddc-dau">
-        <div className="ddc-dau-trai">
-          <span className="ddc-nhan">NHỊP HỌC {lop.toLocaleUpperCase('vi')}</span>
-          <b className="ddc-ten-buoi">{k ? `Từ ${ngayNganDd(k.tu)}${k.homQua ? ` đến ${ngayNganDd(k.homQua)}` : ''} · ${n} ngày đã qua` : 'Nhịp học của lớp'}</b>
-          <MatKetNoi mat={matKetNoi} />
-        </div>
-        <div className="ddc-dau-phai">
-          <span className="ddc-nhan-so">
+    <div className="ddv-man">
+      <Dau
+        nhan={`Nhịp học · ${lop}`}
+        tieuDe={k ? `Từ ${ngayNganDd(k.tu)}${k.homQua ? ` đến ${ngayNganDd(k.homQua)}` : ''} · ${n} ngày đã qua` : 'Nhịp học của lớp'}
+        phai={
+          <p className="ddv-dau-so">
             Có mặt <b>{tk.coMat.length}</b>
             {tt.siSo ? `/${tt.siSo}` : ''}
             {tt.buoi.lop.trim() && tt.lopEm ? (
@@ -794,84 +878,189 @@ function ChieuNhipLop({ tt, tk, nhip, matKetNoi, onMoEm, onDoiCheDo, onSangDauGi
                 · Vắng <b>{soVang}</b>
               </>
             ) : null}
-          </span>
-          {nutDong}
-        </div>
-      </header>
+          </p>
+        }
+        mat={matKetNoi}
+        nutDong={nutDong}
+      />
 
       {!kq ? (
-        <div className="ddc-than-cho">
+        <main className="ddv-loi">
           {nhip.loi ? (
-            <p className="ddc-rong" role="status">
-              Chưa tải được nhịp học của lớp: {nhip.loi}
-              <button type="button" className="ddc-nut" onClick={onThuLaiNhip} disabled={nhip.dangTai} aria-busy={nhip.dangTai}>
-                <RefreshCw size={20} aria-hidden="true" /> Thử lại
+            <>
+              <RefreshCw aria-hidden="true" />
+              <p className="ddv-trong-to" role="status">
+                Chưa tải được nhịp học của lớp: {nhip.loi}
+              </p>
+              <button type="button" className="ddv-nut-chinh" onClick={onThuLaiNhip} disabled={nhip.dangTai} aria-busy={nhip.dangTai}>
+                <RefreshCw aria-hidden="true" /> Thử lại
               </button>
-            </p>
+            </>
           ) : (
-            <p className="ddc-rong" aria-busy="true">
+            <p className="ddv-trong-to" aria-busy="true">
               Đang tải nhịp học của lớp…
             </p>
           )}
-        </div>
-      ) : tong === 0 || dl.chuaCo === tong ? (
-        <div className="ddc-than-cho">
-          <p className="ddc-rong">Chưa có số nhịp học của lớp này — các em chưa nhận bài hằng ngày (chưa có Hành trình khối hay Gói bài 7 ngày nào đang chạy).</p>
-        </div>
+        </main>
+      ) : tongEm === 0 || dl.chuaCo === tongEm ? (
+        <main className="ddv-loi">
+          <p className="ddv-trong-phu">Chưa có số nhịp học của lớp này — các em chưa nhận bài hằng ngày (chưa có Hành trình khối hay Gói bài 7 ngày nào đang chạy).</p>
+        </main>
       ) : (
-        <>
-          <div className="ddc-thanh-nhom" role="img" aria-label={doan.map((d) => (d.k === 'khac' ? `${d.so} em mới vào lớp hoặc chưa có số` : d.chu)).join(' · ')}>
-            {doan.map((d) =>
-              d.so > 0 ? (
-                <span key={d.k} data-nhom={d.k} style={{ width: `${(100 * d.so) / tong}%` }} title={d.chu}>
-                  {(100 * d.so) / tong >= 14 ? d.chu : d.so}
+        <main className="ddv-nhip">
+          <div className="ddv-tong">
+            <div className="ddv-tong-thanh" role="img" aria-label={`Chăm ${dl.cham} em, Chưa đều ${dl.chuaDeu} em, Lười ${dl.luoi} em${khac ? `, ${khac} em mới vào lớp hoặc chưa có số` : ''}`}>
+              {dl.cham > 0 && (
+                <span data-nhom="cham" style={{ flexGrow: dl.cham }}>
+                  <b>{dl.cham}</b> Chăm · {phanTramDd(dl.cham, tongEm)}%
                 </span>
-              ) : null,
+              )}
+              {dl.chuaDeu > 0 && (
+                <span data-nhom="chua-deu" style={{ flexGrow: dl.chuaDeu }}>
+                  <b>{dl.chuaDeu}</b> Chưa đều · {phanTramDd(dl.chuaDeu, tongEm)}%
+                </span>
+              )}
+              {dl.luoi > 0 && (
+                <span data-nhom="luoi" style={{ flexGrow: dl.luoi }}>
+                  <b>{dl.luoi}</b> Lười · {phanTramDd(dl.luoi, tongEm)}%
+                </span>
+              )}
+              {khac > 0 && (
+                <span data-nhom="moi" style={{ flexGrow: Math.max(khac, 2) }}>
+                  <b>{khac}</b> Mới
+                </span>
+              )}
+            </div>
+            <div className="ddv-so-to">
+              {hn.homQua ? (
+                <p>
+                  <b>{hn.homQua.du}</b>
+                  <span>/{hn.homQua.tong}</span>
+                  <small>em đủ mức hôm qua</small>
+                </p>
+              ) : (
+                <p>
+                  <small>Chưa có số hôm qua</small>
+                </p>
+              )}
+              {hn.homNayDu !== null && (
+                <p data-phu="">
+                  <b>{hn.homNayDu}</b>
+                  <small>em đã đủ mức hôm nay</small>
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="ddv-cach" aria-label="Cách cả lớp làm bài 14 ngày qua">
+            <p className="ddv-cach-tieu">
+              Cách cả lớp làm bài
+              <small>
+                14 ngày qua · {tong.soEmCoSo < tong.soEm ? `số của ${tong.soEmCoSo}/${tong.soEm} em có mặt` : `${tong.soEm} em có mặt`} · {tong.soDo} lượt đã đo giờ
+              </small>
+            </p>
+            {tong.soDo > 0 ? (
+              <>
+                <div className="ddv-cach-thanh" role="img" aria-label={`Vội ${tong.voi} lượt, có nghĩ ${tong.nghi} lượt, treo máy ${tong.treo} lượt`}>
+                  {tong.voi > 0 && (
+                    <span data-k="voi" style={{ flexGrow: tong.voi }}>
+                      <Zap aria-hidden="true" />
+                      <b>Vội</b> {tong.voi} lượt · {phanTramDd(tong.voi, tong.soDo)}%
+                    </span>
+                  )}
+                  {tong.nghi > 0 && (
+                    <span data-k="nghi" style={{ flexGrow: tong.nghi }}>
+                      <Lightbulb aria-hidden="true" />
+                      <b>Có nghĩ</b> {tong.nghi} lượt · {phanTramDd(tong.nghi, tong.soDo)}%
+                    </span>
+                  )}
+                  {tong.treo > 0 && (
+                    <span data-k="treo" style={{ flexGrow: Math.max(tong.treo, tong.soDo * 0.06) }}>
+                      <Pause aria-hidden="true" />
+                      <b>Treo máy</b> {tong.treo} lượt{tong.giayTreo !== null ? ` · ${phutTreo(tong.giayTreo)} phút` : ''}
+                    </span>
+                  )}
+                </div>
+                {tong.sai !== null && tong.saiVoi !== null && tong.sai > 0 && (
+                  <p className="ddv-cach-cau">
+                    <b>
+                      {tong.saiVoi}/{tong.sai}
+                    </b>{' '}
+                    lượt sai ({phanTramDd(tong.saiVoi, tong.sai)}%) là nộp khi chưa kịp đọc hết đề
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="ddv-cach-cho">{mucLamDang ? 'Đang tải cách làm bài của lớp…' : mucLamLoi ? `Chưa tải được cách làm bài: ${mucLamLoi}` : 'Chưa có lượt nào đo giờ trong 14 ngày.'}</p>
             )}
           </div>
-          <DaiBacChieu ds={tk.ds} coTen />
-          <div className="ddc-ba-cot">
-            {cotJsx('cham', cot.cham)}
-            {cotJsx('chua-deu', cot.chuaDeu)}
-            {cotJsx('luoi', cot.luoi)}
+
+          <div className="ddv-ba-cot">
+            {cotJsx('cham', 'Chăm', cot.cham)}
+            {cotJsx('chua-deu', 'Chưa đều', cot.chuaDeu)}
+            {cotJsx('luoi', 'Lười', cot.luoi)}
+            <CotTreo ds={tk.coMat} khoa={khoaDs} tong={tong} mucLam={ml} dang={!!mucLamDang} loi={mucLamLoi ?? ''} onMoEm={onMoEm} />
           </div>
-        </>
+          <p className="ddv-chu-giai ddv-chu-giai--o">
+            <span>
+              <i data-loai="du" />
+              Đủ mức
+            </span>
+            <span>
+              <i data-loai="thieu-it" />
+              Thiếu ít
+            </span>
+            <span>
+              <i data-loai="thieu-nhieu" />
+              Thiếu nhiều
+            </span>
+            <span>
+              <i data-loai="khong-lam" />
+              Không làm
+            </span>
+            {mucTung && (
+              <>
+                <span>
+                  <i data-k="voi" />
+                  Vội (Mức làm 1–2)
+                </span>
+                <span>
+                  <i data-k="nghi" />
+                  Có nghĩ (3–4)
+                </span>
+              </>
+            )}
+            <span>
+              <i data-k="treo" />
+              Treo máy
+            </span>
+            <span className="ddv-chu-giai-phai">
+              Mỗi ô là một ngày · bấm tên em ⇒ <b>hồ sơ làm bài</b>
+            </span>
+          </p>
+        </main>
       )}
 
-      <footer className="ddc-chan">
-        <span className="ddc-chan-so">
-          {hn.homQua ? (
-            <>
-              Hôm qua cả lớp <b>{hn.homQua.du}/{hn.homQua.tong}</b> em đủ mức
-            </>
-          ) : (
-            'Chưa có số hôm qua'
-          )}
-          {hn.homNayDu !== null && (
-            <>
-              {' '}
-              · hôm nay đã có <b>{hn.homNayDu}</b> em đủ mức
-            </>
-          )}
-        </span>
-        <span className="ddc-chan-goi-y">
-          Bấm tên em ⇒ <b>hồ sơ làm bài</b>
-        </span>
-        <span className="ddc-chan-nut">
-          <button type="button" className="ddc-nut" onClick={() => onDoiCheDo('diem-danh')}>
-            <ArrowLeft size={20} aria-hidden="true" /> Điểm danh
+      <footer className="ddv-chan">
+        <button type="button" className="ddv-nut" onClick={() => onDoiCheDo('diem-danh')}>
+          <ArrowLeft aria-hidden="true" /> Điểm danh <kbd>←</kbd>
+        </button>
+        <button type="button" className="ddv-nut" aria-pressed={anLuoi} onClick={onDoiAn}>
+          {anLuoi ? <Eye aria-hidden="true" /> : <EyeOff aria-hidden="true" />}
+          {anLuoi ? 'Hiện tên nhóm Lười' : 'Ẩn tên nhóm Lười'} <kbd>H</kbd>
+        </button>
+        <button type="button" className="ddv-nut" aria-pressed={mucTung} onClick={onDoiMuc}>
+          <Zap aria-hidden="true" />
+          Cách làm từng em: {mucTung ? 'Bật' : 'Tắt'} <kbd>M</kbd>
+        </button>
+        {onSangDauGio && (
+          <button type="button" className="ddv-nut-chinh" onClick={onSangDauGio}>
+            Sang Gọi lên bảng đầu giờ <ArrowRight aria-hidden="true" /> <kbd>→</kbd>
           </button>
-          <button type="button" className="ddc-nut" aria-pressed={anLuoi} onClick={onDoiAn}>
-            {anLuoi ? <Eye size={20} aria-hidden="true" /> : <EyeOff size={20} aria-hidden="true" />}
-            <kbd>H</kbd> {anLuoi ? 'Hiện tên nhóm Lười' : 'Ẩn tên nhóm Lười'}
-          </button>
-          {onSangDauGio && (
-            <button type="button" className="ddc-nut ddc-nut--chinh" onClick={onSangDauGio}>
-              <kbd>→</kbd> Sang Gọi lên bảng đầu giờ
-            </button>
-          )}
-        </span>
+        )}
       </footer>
-    </>
+    </div>
   )
 }
+
+const KHONG_MUC: ReadonlyMap<string, MucLamEm> = new Map()

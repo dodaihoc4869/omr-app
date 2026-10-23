@@ -50,6 +50,7 @@ import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
 import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
 import { ganCaChot } from '../components/chien-dich/api-omni'
+import { emDiemDanhHomNay } from '../lib/chon-em-diem-danh'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
@@ -278,7 +279,7 @@ export default function ExamSetupScreen() {
     if (dangTaiDd) return
     setDangTaiDd(true)
     try {
-      const [{ buoiGanDay }, { emDiemDanhHomNay }] = await Promise.all([import('../lib/buoi-hoc-api'), import('../lib/chon-em-diem-danh')])
+      const { buoiGanDay } = await import('../lib/buoi-hoc-api')
       const r = await buoiGanDay('', 1)
       if (!r.ok) return showToast(r.chu || 'Chưa tải được danh sách điểm danh', 'error')
       const kq = emDiemDanhHomNay(r.du, lop)

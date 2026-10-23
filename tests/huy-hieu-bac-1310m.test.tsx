@@ -165,11 +165,12 @@ describe('không còn emoji ở mọi chỗ hiện bậc', () => {
           onDoiCheDo={() => {}} onDong={() => {}} onMoEm={() => {}} onThuLaiNhip={() => {}} />,
       )
       // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q): bản A nay là thẻ em (huy hiệu lớn) + thang 12 bậc `.ddc-thang` thay chip nhỏ + dải `.bcc-dem`
-      const phan = [...document.querySelectorAll('.bcc-chip, .bcc-dem, .ddc-em, .ddc-thang')]
+      // SỬA CÓ CHỦ ĐÍCH 23/10 (bản nền sáng, thầy chốt): A = thẻ `.ddv-the` + dải 12 bậc `.ddv-thang`; B = huy hiệu đầu mỗi dòng em (không còn dải chú giải 12 bậc)
+      const phan = [...document.querySelectorAll('.ddv-the, .ddv-thang, .ddv-dong-em')]
       expect(phan.length).toBeGreaterThan(1)
       expect(EMOJI.test(phan.map((x) => x.textContent).join(''))).toBe(false)
-      expect(document.querySelectorAll('.bcc-chip svg.bcc-hh').length).toBe(document.querySelectorAll('.bcc-chip').length)
-      expect(document.querySelectorAll(cheDo === 'diem-danh' ? '.ddc-thang svg.bcc-hh' : '.bcc-dem svg.bcc-hh')).toHaveLength(12)
+      if (cheDo === 'diem-danh') expect(document.querySelectorAll('.ddv-thang svg.bcc-hh')).toHaveLength(12)
+      else expect(document.querySelectorAll('.ddv-dong-em .ddv-dong-hh svg.bcc-hh').length).toBeGreaterThan(0)
       expect(document.querySelector('.bcc-dem-nut, .bcc-nut')).toBeNull()
       unmount()
     }
