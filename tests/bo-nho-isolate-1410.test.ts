@@ -50,3 +50,26 @@ it('trần tổng số câu đệm danh mục trong một isolate là hữu hạ
   expect(TRAN_CAU_DEM_DANH_MUC).toBeGreaterThan(0)
   expect(TRAN_CAU_DEM_DANH_MUC).toBeLessThanOrEqual(40_000)
 })
+
+// 22/10 22:25–23:20 VN: 116 lỗi exceededMemory (8 đêm trước 0) — danh mục ~34.000 câu, nhiều lớp dựng song song. Mỗi isolate dựng MỘT danh mục một lúc.
+it('danh mục hai khoá khác nhau dựng NỐI TIẾP trong một isolate (không song song), lượt treo không khoá cổng quá CHO_CONG_DUNG_MS', async () => {
+  const { CHO_CONG_DUNG_MS } = await import('../server/src/hanh-trinh-v5-d1')
+  expect(CHO_CONG_DUNG_MS).toBeGreaterThan(0)
+  expect(CHO_CONG_DUNG_MS).toBeLessThanOrEqual(30_000)
+  const nguon = (await import('node:fs')).readFileSync(new URL('../server/src/hanh-trinh-v5-d1.ts', import.meta.url), 'utf8')
+  expect(nguon).toMatch(/congDung\.get\(khoaDb\)/)
+  expect(nguon).toMatch(/Promise\.race\(\[truoc,new Promise\(r=>setTimeout\(r,CHO_CONG_DUNG_MS\)\)\]\)/)
+  expect(nguon.indexOf('dem.delete(key)\n    let tong')).toBeLessThan(nguon.indexOf('return dungDanhMuc(env,ids,mas)'))
+})
+
+it('hai danh mục khác khoá gọi cùng lúc: cả hai dựng xong đúng (cổng nối tiếp không làm mất / lẫn kết quả)', async () => {
+  const k = kho()
+  const hsA = { chienDich: null, phamVi: { maDe: new Set(['DH-B8']) }, cau: k.qids('DH-B8').slice(0, 10).map((qid) => ({ qid })) } as unknown as Parameters<typeof danhMuc>[1]
+  const hsB = { chienDich: null, phamVi: { maDe: new Set(['DH-B8']) }, cau: k.qids('DH-B8').slice(10, 25).map((qid) => ({ qid })) } as unknown as Parameters<typeof danhMuc>[1]
+  const [a, b] = await Promise.all([danhMuc(k.env, hsA, SANG), danhMuc(k.env, hsB, SANG)])
+  expect(a.length).toBeGreaterThan(0)
+  expect(b.length).toBeGreaterThan(0)
+  expect(k.dem.kho).toBe(2)
+  expect(await danhMuc(k.env, hsA, SANG + 1000)).toBe(a)
+  expect(await danhMuc(k.env, hsB, SANG + 1000)).toBe(b)
+})

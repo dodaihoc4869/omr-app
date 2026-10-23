@@ -31,6 +31,11 @@ export const TRAN_CAU_DEM_DANH_MUC=40_000
 /** MỘT LƯỢT DỰNG cho mỗi khoá trong isolate: các yêu cầu đến cùng lúc (giờ cao điểm) dùng chung lượt đang dựng thay vì mỗi yêu cầu tự đọc ~24.000 dòng
  *  và dựng một bản riêng (gấp N lần bộ nhớ + D1). Cùng câu SQL, cùng kết quả; lỗi tới mọi bên chờ như khi tự đọc. */
 const dangDung=new WeakMap<object,Map<string,Promise<CauDanhMuc[]>>>()
+/** BỘ NHỚ ISOLATE (đo 22/10 22:25–23:20 VN: 116 lỗi `exceededMemory`, 8 đêm trước 0; danh mục nay ~34.000 câu/lần dựng): MỖI ISOLATE DỰNG MỘT DANH
+ *  MỤC MỘT LÚC — nhiều lớp (nhiều chiến dịch, khoá khác nhau) hết hạn cùng giờ không còn dựng song song N bản (mỗi bản = hàng D1 thô + QCau mới). */
+const congDung=new WeakMap<object,Promise<unknown>>()
+/** Chờ lượt dựng trước tối đa ngần này (lượt ấy treo — yêu cầu bị huỷ giữa chừng — thì không khoá mãi cổng của isolate). */
+export const CHO_CONG_DUNG_MS=15_000
 /** Đợt 22: tuổi tối đa của một danh mục trong đệm dù dấu kho không đổi (bằng mức nhớ giờ cao điểm đã chốt 12/10). */
 export const HAN_TOI_DA_DANH_MUC=600_000
 type DongChienDichDay={qid_json:string;ma_de_json:string}
@@ -57,13 +62,22 @@ export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau
   if(cu&&Math.abs(now-cu.luc)<HAN_TOI_DA_DANH_MUC){const d=await dauKhoCau(env);if(d&&(cu.dau?d===cu.dau:dauTruocLucDoc(d,cu.luc))){cu.dau=d;cu.kiem=now;return cu.ds}}
   const bay=dangDung.get(khoaDb)??new Map<string,Promise<CauDanhMuc[]>>();dangDung.set(khoaDb,bay)
   const dangCo=bay.get(key);if(dangCo)return dangCo
-  const p=dungDanhMuc(env,ids,mas).then(ds=>{
+  const canCu=cu?.ds.length??0
+  const truoc=congDung.get(khoaDb)
+  const p=(truoc?Promise.race([truoc,new Promise(r=>setTimeout(r,CHO_CONG_DUNG_MS))]):Promise.resolve()).then(()=>{
+    // Nhường chỗ TRƯỚC khi dựng (trước: bản cũ của khoá này + các danh mục khác vẫn nằm đệm trong lúc dựng bản mới ⇒ đỉnh bộ nhớ gấp đôi).
+    dem.delete(key)
+    let tong=0;for(const v of dem.values())tong+=v.ds.length
+    for(const k of dem.keys()){if(tong+canCu<=TRAN_CAU_DEM_DANH_MUC)break;tong-=dem.get(k)!.ds.length;dem.delete(k)}
+    return dungDanhMuc(env,ids,mas)
+  }).then(ds=>{
     dem.delete(key);dem.set(key,{luc:now,kiem:now,dau:'',ds})
     let tong=0;for(const v of dem.values())tong+=v.ds.length
     for(const k of dem.keys()){if(tong<=TRAN_CAU_DEM_DANH_MUC||k===key)break;tong-=dem.get(k)!.ds.length;dem.delete(k)}
     return ds
   }).finally(()=>{if(bay.get(key)===p)bay.delete(key)})
   bay.set(key,p)
+  congDung.set(khoaDb,p.catch(()=>undefined))
   return p
 }
 async function dungDanhMuc(env:Env,ids:readonly string[],mas:readonly string[]):Promise<CauDanhMuc[]>{
