@@ -1,9 +1,41 @@
 /* BẢN VẼ «MÀN CHIẾU ĐIỂM DANH» 23/10 — chỉ dùng biến màu sẵn có của màn chiếu (--km-* của chieu-ma-kiem-tra.css, --ddc-* của ban-chieu-diem-danh.css).
- * Mọi cỡ theo --u = 1/1920 ngang (hoặc 1/1080 dọc), chữ có sàn px để khổ 1024×768 vẫn đọc được. Treo máy = xám sọc (đúng tờ «Ai đã sai?»). */
+ * Mọi cỡ theo --u = 1/1920 ngang (hoặc 1/1080 dọc), chữ có sàn px để khổ 1024×768 vẫn đọc được. Treo máy = hồng sọc (đúng bảng điểm danh + Hồ sơ làm bài). */
 .ca-chieu.cm.km.ddc.ddv {
-  --ddv-treo: color-mix(in srgb, var(--km-chu-phu) 70%, var(--km-khung));
-  --ddv-o: color-mix(in srgb, var(--km-chu) 8%, var(--km-khung));
-  --ddv-vien: color-mix(in srgb, var(--km-chu) 14%, transparent);
+  /* NỀN SÁNG (thầy 23/10: «thay nền sáng, đẹp hơn»): ánh xạ biến màn chiếu sang bảng màu SÁNG app thầy (--gvm-*, tokens.css).
+   * Nghĩa màu đồng bộ bảng điểm danh: lục = Chăm / Có nghĩ · hổ phách = Chưa đều / Vội · hồng = Lười / Treo máy (sọc). */
+  --km-nen: var(--gvm-nen);
+  --km-khung: var(--gvm-mat);
+  --km-vien: var(--gvm-vien);
+  --km-chu: var(--gvm-chu);
+  --km-chu-phu: var(--gvm-chu-2);
+  --km-dung: var(--gvm-xl);
+  --bt-dang-lam: var(--gvm-hp);
+  --bts-ai-do: var(--gvm-ho);
+  --ddc-vang: var(--gvm-hp);
+  --ddc-cham: var(--gvm-xl);
+  --ddc-deu: var(--gvm-hp);
+  --ddc-luoi: var(--gvm-ho);
+  --ddc-moi: var(--gvm-chu-3);
+  --ddc-cham-nen: color-mix(in srgb, var(--gvm-xl-nen) 55%, var(--gvm-mat));
+  --ddc-deu-nen: color-mix(in srgb, var(--gvm-hp-nen) 55%, var(--gvm-mat));
+  --ddc-luoi-nen: color-mix(in srgb, var(--gvm-ho-nen) 55%, var(--gvm-mat));
+  --ddc-moi-nen: var(--gvm-mat-2);
+  --ddc-cham-cot: color-mix(in srgb, var(--gvm-xl-nen) 30%, var(--gvm-mat));
+  --ddc-deu-cot: color-mix(in srgb, var(--gvm-hp-nen) 30%, var(--gvm-mat));
+  --ddc-luoi-cot: color-mix(in srgb, var(--gvm-ho-nen) 30%, var(--gvm-mat));
+  --ddc-cham-chu: var(--gvm-xl-dam);
+  --ddc-deu-chu: var(--gvm-hp-dam);
+  --ddc-luoi-chu: var(--gvm-ho-dam);
+  --ddc-giay: var(--gvm-mat);
+  --ddc-muc: var(--gvm-chu);
+  --ddc-muc-phu: var(--gvm-chu-2);
+  --ddc-nut-nen: var(--gvm-mat);
+  --ddc-vien: var(--gvm-vien);
+  --ddv-treo: var(--gvm-ho);
+  --ddv-treo-nen: var(--gvm-ho-nen);
+  --ddv-o: var(--gvm-mat-2);
+  --ddv-vien: var(--gvm-vien);
+  --ddv-bong: var(--gvm-bong);
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
@@ -45,7 +77,7 @@
 /* ── THÂN · ĐIỂM DANH */
 .ddv-than { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 30fr) minmax(0, 70fr); gap: calc(20 * var(--u)); }
 .ddv-vao { min-height: 0; display: flex; flex-direction: column; gap: calc(16 * var(--u)); }
-.ddv-ma { flex: none; display: flex; flex-direction: column; align-items: center; gap: calc(10 * var(--u)); padding: calc(22 * var(--u)) calc(20 * var(--u)); border-radius: calc(28 * var(--u)); background: var(--km-chu); color: var(--km-nen); text-align: center; }
+.ddv-ma { flex: none; display: flex; flex-direction: column; align-items: center; gap: calc(10 * var(--u)); padding: calc(22 * var(--u)) calc(20 * var(--u)); border-radius: calc(28 * var(--u)); background: var(--gvm-mat); color: var(--gvm-xd-dam); border: 2px solid var(--gvm-xd-nen); text-align: center; }
 .ddv-ma-buoc { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; column-gap: 8px; row-gap: 0; font-size: var(--f22); font-weight: 600; }
 .ddv-ma-buoc svg { width: 1.2em; height: 1.2em; }
 .ddv-ma-buoc > span, .ddv-ma-buoc > b { white-space: nowrap; }
@@ -53,11 +85,11 @@
 .ddv-ma-so span { display: inline-block; width: 0.3em; }
 .ddv-ma-qr { width: max(calc(220 * var(--u)), 112px); aspect-ratio: 1; }
 .ddv-ma-qr svg { width: 100%; height: 100%; display: block; }
-.ddv-ma-qr path { fill: var(--km-nen); }
-.ddv-ma-doi { width: 80%; height: max(calc(8 * var(--u)), 5px); border-radius: 999px; background: color-mix(in srgb, var(--km-nen) 14%, transparent); overflow: hidden; }
+.ddv-ma-qr path { fill: var(--gvm-chu); }
+.ddv-ma-doi { width: 80%; height: max(calc(8 * var(--u)), 5px); border-radius: 999px; background: var(--gvm-mat-2); overflow: hidden; }
 .ddv-ma-doi span { display: block; height: 100%; background: var(--ddc-cham); border-radius: inherit; }
-.ddv-ma-phu { margin: 0; font-size: max(calc(19 * var(--u)), 12px); color: color-mix(in srgb, var(--km-nen) 70%, var(--km-chu)); }
-.ddv-ma-link { margin: 0; font-size: max(calc(18 * var(--u)), 11px); font-weight: 700; color: color-mix(in srgb, var(--km-nen) 78%, var(--km-chu)); }
+.ddv-ma-phu { margin: 0; font-size: max(calc(19 * var(--u)), 12px); color: var(--gvm-chu-2); }
+.ddv-ma-link { margin: 0; font-size: max(calc(18 * var(--u)), 11px); font-weight: 700; color: var(--gvm-xd); }
 
 .ddv-moi-vao { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: calc(10 * var(--u)); padding: calc(18 * var(--u)); border-radius: calc(24 * var(--u)); background: var(--km-khung); border: 1px solid var(--ddv-vien); overflow: hidden; }
 .ddv-muc-tieu { margin: 0; display: inline-flex; align-items: center; gap: 8px; color: var(--ddc-vang); font-weight: 800; font-size: var(--f22); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -182,32 +214,32 @@
 .ddv-nhip { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: calc(14 * var(--u)); }
 .ddv-tong { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: calc(20 * var(--u)); align-items: stretch; }
 .ddv-tong-thanh { display: flex; gap: calc(6 * var(--u)); min-height: max(calc(84 * var(--u)), 48px); }
-.ddv-tong-thanh > span { min-width: max(calc(150 * var(--u)), 84px); display: flex; align-items: center; gap: 0.4em; padding: 0 calc(18 * var(--u)); border-radius: calc(18 * var(--u)); color: var(--km-nen); font-weight: 700; font-size: max(calc(24 * var(--u)), 13px); white-space: nowrap; overflow: hidden; }
+.ddv-tong-thanh > span { min-width: max(calc(150 * var(--u)), 84px); display: flex; align-items: center; gap: 0.4em; padding: 0 calc(18 * var(--u)); border-radius: calc(18 * var(--u)); color: var(--gvm-tren-dac); font-weight: 700; font-size: max(calc(24 * var(--u)), 13px); white-space: nowrap; overflow: hidden; }
 .ddv-tong-thanh > span b { font-size: 1.5em; }
 .ddv-tong-thanh > span[data-nhom='cham'] { background: var(--ddc-cham); }
 .ddv-tong-thanh > span[data-nhom='chua-deu'] { background: var(--ddc-deu); }
 .ddv-tong-thanh > span[data-nhom='luoi'] { background: var(--ddc-luoi); }
 .ddv-tong-thanh > span[data-nhom='moi'] { background: var(--ddc-moi); min-width: max(calc(110 * var(--u)), 64px); }
 .ddv-so-to { display: flex; gap: calc(14 * var(--u)); }
-.ddv-so-to p { margin: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 calc(22 * var(--u)); border-radius: calc(18 * var(--u)); background: var(--km-khung); border: 1px solid var(--ddv-vien); line-height: 1.05; font-variant-numeric: tabular-nums; }
+.ddv-so-to p { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; align-content: center; column-gap: 2px; padding: 0 calc(22 * var(--u)); border-radius: calc(18 * var(--u)); background: var(--km-khung); border: 1px solid var(--ddv-vien); line-height: 1.05; font-variant-numeric: tabular-nums; }
 .ddv-so-to p b { font-size: max(calc(46 * var(--u)), 24px); color: var(--ddc-cham-chu); }
 .ddv-so-to p span { font-size: max(calc(22 * var(--u)), 13px); color: var(--km-chu-phu); }
-.ddv-so-to p small { font-size: max(calc(17 * var(--u)), 11px); color: var(--km-chu-phu); }
+.ddv-so-to p small { flex-basis: 100%; font-size: max(calc(17 * var(--u)), 11px); color: var(--km-chu-phu); }
 .ddv-so-to p[data-phu] b { color: var(--km-chu); }
 
 .ddv-cach { flex: none; display: grid; grid-template-columns: max(calc(360 * var(--u)), 190px) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: calc(18 * var(--u)); row-gap: calc(6 * var(--u)); align-items: center; padding: calc(14 * var(--u)) calc(18 * var(--u)); border-radius: calc(20 * var(--u)); background: var(--km-khung); border: 1px solid var(--ddv-vien); }
 .ddv-cach-tieu { margin: 0; grid-row: 1 / span 2; font-size: max(calc(26 * var(--u)), 14px); font-weight: 800; }
 .ddv-cach-tieu small { display: block; font-size: max(calc(16 * var(--u)), 10px); font-weight: 600; color: var(--km-chu-phu); }
 .ddv-cach-thanh { display: flex; gap: calc(5 * var(--u)); min-height: max(calc(46 * var(--u)), 30px); }
-.ddv-cach-thanh > span { min-width: max(calc(130 * var(--u)), 80px); display: flex; align-items: center; gap: 0.35em; padding: 0 calc(14 * var(--u)); border-radius: calc(12 * var(--u)); font-size: max(calc(19 * var(--u)), 11px); color: var(--km-nen); white-space: nowrap; overflow: hidden; }
+.ddv-cach-thanh > span { min-width: max(calc(130 * var(--u)), 80px); display: flex; align-items: center; gap: 0.35em; padding: 0 calc(14 * var(--u)); border-radius: calc(12 * var(--u)); font-size: max(calc(19 * var(--u)), 11px); color: var(--gvm-tren-dac); white-space: nowrap; overflow: hidden; }
 .ddv-cach-thanh > span svg { width: 1.1em; height: 1.1em; }
 .ddv-cach-thanh > span[data-k='voi'] { background: var(--ddc-deu); }
 .ddv-cach-thanh > span[data-k='nghi'] { background: var(--ddc-cham); }
-.ddv-cach-thanh > span[data-k='treo'] { background: repeating-linear-gradient(135deg, var(--ddv-treo) 0 8px, color-mix(in srgb, var(--ddv-treo) 60%, var(--km-khung)) 8px 16px); color: var(--km-nen); }
+.ddv-cach-thanh > span[data-k='treo'] { background: repeating-linear-gradient(135deg, var(--ddv-treo-nen) 0 8px, color-mix(in srgb, var(--ddv-treo) 28%, var(--ddv-treo-nen)) 8px 16px); color: var(--gvm-ho-dam); box-shadow: inset 0 0 0 2px var(--ddv-treo); }
 .ddv-cach-cau { margin: 0; font-size: max(calc(19 * var(--u)), 11px); color: var(--km-chu-phu); }
 .ddv-cach-cau b { color: var(--ddc-deu-chu); }
 
-.ddv-ba-cot { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(14 * var(--u)); }
+.ddv-ba-cot { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.78fr); gap: calc(14 * var(--u)); }
 .ddv-cot { min-height: 0; display: flex; flex-direction: column; gap: calc(8 * var(--u)); padding: calc(14 * var(--u)); border-radius: calc(22 * var(--u)); background: var(--ddc-cham-cot); border-top: max(calc(6 * var(--u)), 4px) solid var(--ddc-cham); overflow: hidden; }
 .ddv-cot[data-nhom='chua-deu'] { background: var(--ddc-deu-cot); border-top-color: var(--ddc-deu); }
 .ddv-cot[data-nhom='luoi'] { background: var(--ddc-luoi-cot); border-top-color: var(--ddc-luoi); }
@@ -224,6 +256,7 @@
 .ddv-cot-ds[data-kieu='luoi'] .ddv-dong-ten { grid-column: 2 / span 2; font-size: max(calc(20 * var(--u)), 12px); }
 .ddv-cot-ds[data-kieu='luoi'] .ddv-ngay, .ddv-cot-ds[data-kieu='luoi'] .ddv-dong-muc { grid-column: 2; grid-row: 2; }
 .ddv-cot-ds[data-kieu='luoi'] .ddv-dong-so { grid-column: 3; grid-row: 2; min-width: 0; font-size: max(calc(18 * var(--u)), 11px); }
+.ddv-cot-ds[data-kieu='luoi'] .ddv-dong-muc { width: auto; min-width: 0; }
 .ddv-cot-ds[data-kieu='luoi'] .ddv-ngay i { width: max(calc(8 * var(--u)), 5px); height: max(calc(14 * var(--u)), 9px); }
 .ddv-cot-them { flex: none; margin: 0; font-size: max(calc(17 * var(--u)), 11px); font-weight: 700; color: var(--km-chu-phu); text-align: center; }
 .ddv-dong-em { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: calc(10 * var(--u)); min-height: max(calc(48 * var(--u)), 44px); padding: calc(4 * var(--u)) calc(10 * var(--u)); border-radius: calc(12 * var(--u)); background: color-mix(in srgb, var(--km-nen) 35%, transparent); text-align: left; }
@@ -247,7 +280,7 @@
 .ddv-dong-muc i { border-radius: 3px; min-width: 3px; }
 .ddv-dong-muc i[data-k='voi'] { background: var(--ddc-deu); }
 .ddv-dong-muc i[data-k='nghi'] { background: var(--ddc-cham); }
-.ddv-dong-muc i[data-k='treo'] { background: repeating-linear-gradient(135deg, var(--ddv-treo) 0 4px, color-mix(in srgb, var(--ddv-treo) 50%, var(--km-khung)) 4px 8px); }
+.ddv-dong-muc i[data-k='treo'] { background: repeating-linear-gradient(135deg, var(--ddv-treo) 0 3px, var(--ddv-treo-nen) 3px 6px); }
 .ddv-an { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; border-radius: calc(16 * var(--u)); border: 2px dashed var(--ddv-vien); }
 .ddv-an svg { width: max(calc(48 * var(--u)), 28px); height: max(calc(48 * var(--u)), 28px); color: var(--km-chu-phu); }
 .ddv-an p { margin: 0; font-size: max(calc(26 * var(--u)), 15px); font-weight: 800; }
@@ -261,7 +294,7 @@
 .ddv-chu-giai--o i[data-loai='khong-lam'] { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ddc-luoi); }
 .ddv-chu-giai--o i[data-k='voi'] { background: var(--ddc-deu); width: 1.6em; }
 .ddv-chu-giai--o i[data-k='nghi'] { background: var(--ddc-cham); width: 1.6em; }
-.ddv-chu-giai--o i[data-k='treo'] { background: repeating-linear-gradient(135deg, var(--ddv-treo) 0 4px, color-mix(in srgb, var(--ddv-treo) 50%, var(--km-khung)) 4px 8px); width: 1.6em; }
+.ddv-chu-giai--o i[data-k='treo'] { background: repeating-linear-gradient(135deg, var(--ddv-treo) 0 3px, var(--ddv-treo-nen) 3px 6px); width: 1.6em; }
 .ddv-chu-giai-phai { margin-left: auto; }
 
 /* ── MÁY CHIẾU 4:3 */
@@ -280,3 +313,26 @@
 /* Thẻ có nhãn «Vừa vào»/«Dẫn đầu» (nhãn nằm trên mép thẻ): chừa chỗ để nhãn không bao giờ đè lên tên */
 .ddv.ddv .ddv-the:is([data-vua], [data-dau]) { padding-top: max(calc(18 * var(--u)), 11px); }
 .ddv.ddv:is([data-nac='3'], [data-nac='4'], [data-nac='5']) .ddv-the:is([data-vua], [data-dau]) { padding-top: 2px; }
+/* Nền sáng: thẻ trắng nổi nhẹ trên nền làn (bóng chuẩn app thầy) */
+.ddv :is(.ddv-the, .ddv-ma, .ddv-moi-vao, .ddv-cot, .ddv-cach, .ddv-lan, .ddv-vong) { box-shadow: var(--ddv-bong); }
+
+/* ── TREO MÁY ĐẦY ĐỦ (thầy 23/10: «hiển thị đủ thông tin treo máy»). Hồng sọc = Treo máy, đồng bộ bảng điểm danh. Mức 6 đã hạ về Treo máy (bản công khai). */
+.ddv-treo-chip { display: inline-flex; align-items: center; gap: 2px; margin-left: 0.4em; padding: 0 0.45em; border-radius: 999px; background: var(--ddv-treo-nen); color: var(--gvm-ho-dam); box-shadow: inset 0 0 0 1.5px var(--ddv-treo); font-size: 0.72em; font-weight: 800; white-space: nowrap; vertical-align: 0.1em; }
+.ddv-treo-chip svg { width: 0.95em; height: 0.95em; }
+.ddv-cot[data-nhom='treo'] { background: repeating-linear-gradient(135deg, var(--gvm-mat) 0 14px, color-mix(in srgb, var(--ddv-treo-nen) 45%, var(--gvm-mat)) 14px 28px); border-top-color: var(--ddv-treo); }
+.ddv-cot[data-nhom='treo'] h2 b { color: var(--gvm-ho-dam); }
+.ddv-treo-tong { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(6 * var(--u)); flex: none; }
+.ddv-treo-tong p { margin: 0; padding: calc(8 * var(--u)) calc(10 * var(--u)); border-radius: calc(14 * var(--u)); background: var(--gvm-mat); box-shadow: inset 0 0 0 1.5px var(--ddv-treo-nen); display: flex; flex-direction: column; }
+.ddv-treo-tong b { font-size: max(calc(34 * var(--u)), 17px); line-height: 1.05; color: var(--gvm-ho-dam); font-variant-numeric: tabular-nums; }
+.ddv-treo-tong small { font-size: max(calc(15 * var(--u)), 10px); color: var(--gvm-chu-2); font-weight: 600; }
+.ddv-treo-ds { margin: 0; padding: 0; list-style: none; flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: calc(6 * var(--u)); }
+.ddv-treo-dong { display: grid; grid-template-columns: max(calc(34 * var(--u)), 22px) minmax(0, 1fr) auto; align-items: center; gap: calc(8 * var(--u)); padding: calc(5 * var(--u)) calc(10 * var(--u)); border-radius: calc(12 * var(--u)); background: var(--gvm-mat); box-shadow: var(--ddv-bong); }
+.ddv-treo-dong-ten { min-width: 0; display: flex; flex-direction: column; }
+.ddv-treo-dong-ten b { font-size: max(calc(20 * var(--u)), 12px); color: var(--gvm-chu); overflow-wrap: anywhere; }
+.ddv-treo-dong-ten small { font-size: max(calc(15 * var(--u)), 10px); color: var(--gvm-chu-2); font-weight: 600; }
+.ddv-treo-dong-so { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.05; }
+.ddv-treo-dong-so b { font-size: max(calc(26 * var(--u)), 14px); color: var(--gvm-ho-dam); font-variant-numeric: tabular-nums; }
+.ddv-treo-dong-so small { font-size: max(calc(13 * var(--u)), 9px); color: var(--gvm-chu-2); font-weight: 700; }
+.ddv-treo-chua { margin: 0; font-size: max(calc(15 * var(--u)), 10px); color: var(--gvm-chu-2); }
+.ddv-treo-khong { margin: auto 0; text-align: center; color: var(--gvm-chu-2); font-size: max(calc(19 * var(--u)), 12px); }
+.ddv-so-to, .ddv-tong-thanh > span { box-shadow: var(--ddv-bong); }

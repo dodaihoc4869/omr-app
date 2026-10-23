@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // CHỤP BẢN VẼ «MÀN CHIẾU ĐIỂM DANH» 23/10 bằng Chromium THẬT (dữ liệu giả, component thật).
 //   npx vite build --config scripts/ban-ve-chieu-dd-2310/vite.config.mjs --outDir <tạm> && node scripts/ban-ve-chieu-dd-2310/chup.mjs <tạm> [ra]
-// Khổ máy chiếu: 1920×1080 · 1280×720 · 1024×768 (4:3), luôn nền tối. JPG ≤ 150 KB.
+// Khổ máy chiếu: 1920×1080 · 1280×720 · 1024×768 (4:3), nền sáng (thầy 23/10). JPG ≤ 150 KB.
 // SOÁT mỗi khung: lỗi trang · tràn ngang · phần tử lọt ngoài khung · TÊN EM bị cắt/che (nằm ngoài khung cha có overflow) · nút < 44 px. Có lỗi ⇒ mã thoát 1.
 import { createServer } from 'node:http'
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
@@ -30,7 +30,7 @@ const CANH = [
 const KHO = [['1920', 1920, 1080], ['1280', 1280, 720], ['1024', 1024, 768]]
 const soat = []
 for (const [k, ten] of CANH) for (const [tk, w, h] of KHO) {
-  const ctx = await trinh.newContext({ viewport: { width: w, height: h }, colorScheme: 'dark', reducedMotion: 'reduce', locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh' })
+  const ctx = await trinh.newContext({ viewport: { width: w, height: h }, colorScheme: 'light', reducedMotion: 'reduce', locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh' })
   const t = await ctx.newPage()
   const nhan = `${k}-${ten}-${tk}`
   t.on('pageerror', (e) => soat.push(`${nhan}: lỗi trang ${e.message}`))
@@ -44,7 +44,7 @@ for (const [k, ten] of CANH) for (const [tk, w, h] of KHO) {
     const ngoai = [...document.querySelectorAll('.ddv *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > W + 1 || r.bottom > H + 1) }).length
     // tên bị che: phần tử tên nằm (một phần) ngoài khung cha gần nhất có overflow hidden
     const biChe = []
-    for (const e of document.querySelectorAll('.ddv-the-ten, .ddv-dong-ten, .ddv-moi-chu b, .ddv-chao-ten')) {
+    for (const e of document.querySelectorAll('.ddv-the-ten, .ddv-dong-ten, .ddv-moi-chu b, .ddv-chao-ten, .ddv-treo-dong-ten b')) {
       const r = e.getBoundingClientRect(); if (!r.width) continue
       let p = e.parentElement
       while (p && getComputedStyle(p).overflow === 'visible') p = p.parentElement
@@ -55,6 +55,11 @@ for (const [k, ten] of CANH) for (const [tk, w, h] of KHO) {
     for (const n of document.querySelectorAll('.ddv-the-vua, .ddv-the-dau')) {
       const a = n.getBoundingClientRect(), tn = n.closest('.ddv-the')?.querySelector('.ddv-the-ten')?.getBoundingClientRect()
       if (a.width && tn && a.bottom > tn.top + 1 && a.top < tn.bottom - 1 && a.right > tn.left + 1 && a.left < tn.right - 1) biChe.push(`nhãn đè tên ${n.closest('.ddv-the')?.querySelector('.ddv-the-ten')?.textContent?.slice(0, 20)}`)
+    }
+    // số cuối dòng (8/11, bỏ N ngày) không được đè lên thanh ngày / thanh cách làm
+    for (const so of document.querySelectorAll('.ddv-dong-so')) {
+      const a = so.getBoundingClientRect(), th = so.parentElement?.querySelector('.ddv-ngay, .ddv-dong-muc')?.getBoundingClientRect()
+      if (a.width && th && th.width && a.left < th.right - 1 && a.right > th.left + 1 && a.top < th.bottom - 1 && a.bottom > th.top + 1) biChe.push(`số đè thanh ${so.parentElement?.querySelector('.ddv-dong-ten')?.textContent?.slice(0, 20)}`)
     }
     const nho = [...document.querySelectorAll('.ddv button')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 44 || r.width < 44) }).map((e) => e.textContent?.trim().slice(0, 24))
     const coChu = (s) => document.body.innerText.includes(s)
