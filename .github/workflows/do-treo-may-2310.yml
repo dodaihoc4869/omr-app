@@ -41,7 +41,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
           SBD_VAO: ${{ github.event.inputs.sbd }}
         run: |
-          SBD=$(printf '1792602000000' "$SBD_VAO" | tr -cd '0-9'); [ -n "$SBD" ] && [ ${#SBD} -le 8 ] || { echo "SBD không hợp lệ"; exit 1; }
+          SBD=$(printf '%s' "$SBD_VAO" | tr -cd '0-9'); [ -n "$SBD" ] && [ ${#SBD} -le 8 ] || { echo "SBD không hợp lệ"; exit 1; }
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
           T="luc >= '2026-10-22T00:00:00Z'"
           q "1 lượt làm câu theo giờ VN từ 22/10 · nguồn · đúng/sai/trống · có giây" "SELECT strftime('%d %H', luc, '+7 hours') gio, nguon, COUNT(*) n, SUM(ket_qua='dung') dung, SUM(ket_qua='sai') sai, SUM(ket_qua IS NULL) trong, SUM(giay IS NOT NULL) co_giay FROM su_kien_hoc WHERE sbd='$SBD' AND $T GROUP BY 1,2 ORDER BY 1,2"
