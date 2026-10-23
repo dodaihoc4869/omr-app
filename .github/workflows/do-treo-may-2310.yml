@@ -1,0 +1,33 @@
+# ĐO PHỦ SỐ ĐO TREO MÁY (CHỈ ĐỌC) — sau phát hành 6 mức (main 87ad2764, 22/10 12:49 VN): lượt nào đã có số đo treo (`raw_json.doc.v`), bao nhiêu lượt đạt luật Treo máy.
+# Luật Treo máy (server/src/muc-lam.ts treoCuaLuot): l ≥ 300 || a ≥ 600 || (w = 1 && a ≥ 180) || n ≥ 3.
+# CHỈ SELECT gộp: không mã em, không tên em, không mã câu (repo công khai). Bấm tay (workflow_dispatch).
+name: Đo phủ số đo treo máy (chỉ đọc)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: do-treo-may-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          W="luc >= '2026-10-22T05:49:00Z'"
+          q "1 lượt từ lúc phát hành 6 mức, theo nguồn: tổng · có giây · có số đo treo · đạt luật Treo máy · số em" "SELECT nguon, COUNT(*) luot, SUM(giay IS NOT NULL) co_giay, SUM(json_extract(raw_json,'\$.doc.v') IS NOT NULL) co_do_treo, SUM(COALESCE(json_extract(raw_json,'\$.doc.l'),0) >= 300 OR COALESCE(json_extract(raw_json,'\$.doc.a'),0) >= 600 OR (COALESCE(json_extract(raw_json,'\$.doc.w'),0) = 1 AND COALESCE(json_extract(raw_json,'\$.doc.a'),0) >= 180) OR COALESCE(json_extract(raw_json,'\$.doc.n'),0) >= 3) dat_treo, COUNT(DISTINCT sbd) so_em FROM su_kien_hoc WHERE $W GROUP BY nguon ORDER BY luot DESC"
+          q "2 theo giờ VN: tổng lượt · có số đo treo" "SELECT strftime('%Y-%m-%d %H', luc, '+7 hours') gio, COUNT(*) luot, SUM(json_extract(raw_json,'\$.doc.v') IS NOT NULL) co_do_treo FROM su_kien_hoc WHERE $W GROUP BY 1 ORDER BY 1"
+          q "3 ca thi: lượt nộp từ lúc phát hành · có do_giay_json" "SELECT COUNT(*) luot, SUM(do_giay_json IS NOT NULL) co_do FROM luot WHERE nop_luc >= '2026-10-22T05:49:00Z'"
