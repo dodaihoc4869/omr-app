@@ -517,3 +517,5 @@ Luật: vòng nền của app HS/PH ≥ 180 giây ± 30 giây lệch ngẫu nhi�
 - 05/10 · OMNI 3 (phiên cloud `claude/gracious-heisenberg-hoe97n`, làn app học sinh) · xếp loại vòng `setInterval` mới vào bảng `KHONG_GOI_MAY_CHU` (`tests/nhip-bang-2109.test.ts`), KHÔNG gọi máy chủ: `src/game/than-thu-v2/dao2/DeThu.tsx` 1 s — vẽ lại đồng hồ đếm ngược đề thử theo `hetLuc` máy chủ; hết giờ tự nộp MỘT lần (không vòng hỏi).
 
 - 13/10 · Codex · Bảng nhịp kiểm tra cá nhân: ManKiemTraCaNhan.tsx có 1 setInterval 1000 ms chỉ cập nhật giờ cục bộ. Không gọi D1 định kỳ; hết hạn gọi chot(true) một lần, khoá tuNop và dọn đồng hồ khi rời màn. Đã xếp vào KHONG_GOI_MAY_CHU ở tests/nhip-bang-2109.test.ts.
+
+- 23/10 · Claude (Boss) · Màn chiếu Điểm danh nền sáng: `BanChieuDiemDanh.tsx` có 1 setInterval 1000 ms (ô «Mã đổi sau m:ss», chỉ vẽ lại ô mã, tắt khi buổi đã kết thúc). Không gọi máy chủ. Xếp vào `LAN_APP_THAY` (`tests/nhip-bang-2109.test.ts`).

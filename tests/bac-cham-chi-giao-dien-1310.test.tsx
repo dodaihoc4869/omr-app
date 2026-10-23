@@ -310,38 +310,37 @@ describe('tờ chiếu điểm danh (thầy 13/10: "Hiện bậc trên màn chi�
     )
   // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q — bản A thành lưới THẺ em theo bậc, bản vẽ thầy duyệt): chip nhỏ trong ô ⇒ huy hiệu lớn + số bậc của thẻ;
   // dải chú giải 12 ô ⇒ thang 12 bậc dạng bậc thềm (`.ddc-thang`); câu đọc màn hình thêm điểm chăm sau bậc. Test đầy đủ: tests/man-chieu-dot19-1310q.
-  it('bản A: mỗi thẻ em có huy hiệu đúng bậc (em mới vào không huy hiệu bậc); thang 12 bậc đếm đúng số em có mặt mỗi bậc', () => {
+  // SỬA CÓ CHỦ ĐÍCH 23/10 (bản nền sáng docs/ban-ve-chieu-diem-danh-2310, thầy chốt): thẻ `.ddv-the`, dải 12 bậc `.ddv-thang`; bản B mỗi dòng em có HUY HIỆU
+  // (không còn dải chú giải 12 bậc trên bản B — số em mỗi bậc đã ở bản A).
+  it('bản A: mỗi thẻ em có huy hiệu đúng bậc (em mới vào không huy hiệu bậc); dải 12 bậc đếm đúng số em có mặt mỗi bậc', () => {
     ve('diem-danh')
-    const o = [...document.querySelectorAll<HTMLButtonElement>('.ddc-em')]
+    const o = [...document.querySelectorAll<HTMLButtonElement>('.ddv-the')]
     expect(o).toHaveLength(4)
     for (const nut of o) {
       const e = DS_EM.find((x) => nut.textContent!.includes(x.hoTen))!
       const hh = nut.querySelector('svg.bcc-hh')
       if (e.bacCham) {
         expect(hh!.getAttribute('data-bac')).toBe(String(e.bacCham.bac))
-        expect(nut.querySelector('.ddc-the-so')!.textContent).toBe(`${e.bacCham.bac}`)
+        expect(nut.querySelector('.ddv-the-so')!.textContent).toBe(`${e.bacCham.bac}`)
         expect(nut.getAttribute('aria-label')).toContain(`, Bậc ${e.bacCham.bac}/12 · ${BAC_CHAM_CHI[e.bacCham.bac - 1]!.ten}, điểm chăm ${e.bacCham.diem} — mở hồ sơ làm bài`)
       } else expect(hh).toBeNull()
     }
     const dai = screen.getByRole('group', { name: 'Số em có mặt ở mỗi bậc, từ Lười đến Chăm' })
     const dem = demTheoBac(DS_EM.filter((e) => CO_MAT.some((c) => c.sbd === e.sbd)).map((e) => ({ bacCham: e.bacCham })))
-    expect([...dai.querySelectorAll('.ddc-bac-cot.bcc .ddc-bac-chu b')].map((b) => Number(b.textContent!.replace(/\D/g, '')))).toEqual(dem)
+    expect([...dai.querySelectorAll('.ddv-thang-o.bcc > b')].map((b) => Number(b.textContent))).toEqual(dem)
     expect(dem.reduce((a, b) => a + b, 0)).toBe(3)
   })
-  it('bản B: dòng em có chip, dải chú giải cả lớp kèm tên bậc', () => {
+  it('bản B: dòng em có huy hiệu đúng bậc', () => {
     ve('nhip-lop')
-    const dai = screen.getByRole('group', { name: '12 bậc từ Lười đến Chăm' })
-    expect([...dai.querySelectorAll('.bcc-dem-ten')].map((x) => x.textContent)).toEqual(BAC_CHAM_CHI.map((b) => b.ten))
-    expect([...dai.querySelectorAll('.bcc-dem-o b')].map((b) => Number(b.textContent!.replace(/\D/g, '')))).toEqual(demTheoBac(DS_EM.map((e) => ({ bacCham: e.bacCham }))))
-    const dongA4 = [...document.querySelectorAll('.ddc-dong-em')].find((x) => x.textContent!.includes('Duy Khang'))!
-    expect(dongA4.querySelector('.bcc-chip')!.getAttribute('data-bac')).toBe(String(DS_EM[3]!.bacCham!.bac))
+    const dongA4 = [...document.querySelectorAll('.ddv-dong-em')].find((x) => x.textContent!.includes('Duy Khang'))!
+    expect(dongA4.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe(String(DS_EM[3]!.bacCham!.bac))
   })
-  it('máy chủ cũ ⇒ không chip, không dải; câu đọc màn hình y như trước', () => {
+  it('máy chủ cũ ⇒ không huy hiệu, không dải; câu đọc màn hình y như trước', () => {
     const cu = { ...KQ, em: DS_EM.map(boBac) }
     ve('diem-danh', cu)
-    expect(document.querySelector('.bcc-chip, .ddc-bac, .ddc-thang, .ddc-vinh, svg.bcc-hh')).toBeNull()
+    expect(document.querySelector('.bcc-chip, .ddv-thang, .ddv-the-dau, svg.bcc-hh')).toBeNull()
     const tk = thongKeBuoi(TT, nhipTheoSbd(cu))
-    const nut = [...document.querySelectorAll('.ddc-em')][0]!
+    const nut = [...document.querySelectorAll('.ddv-the')][0]!
     expect(nut.getAttribute('aria-label')).toBe(chuNutEm(tk.coMat.find((e) => nut.textContent!.includes(e.hoTen))!))
   })
 })

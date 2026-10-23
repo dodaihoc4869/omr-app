@@ -97,21 +97,26 @@ export function useMucLamLo(khoaSbd: string, bat: boolean): { theoEm: ReadonlyMa
       setLoiChu('')
     }
     ngayDem.current = homNay
-    const can = khoaSbd.split(',').filter((x) => x && !daHoi.current.has(x)).slice(0, TOI_DA_EM_MUC_LAM_LO)
+    const can = khoaSbd.split(',').filter((x) => x && !daHoi.current.has(x))
     if (!can.length) return
     const hen = setTimeout(() => {
       for (const x of can) daHoi.current.add(x)
+      // Lớp > 40 em (23/10, màn chiếu cần số CẢ lớp có mặt): chia lô 40 em, các lô hỏi SONG SONG (không thêm vòng chờ nối tiếp).
+      const lo: string[][] = []
+      for (let i = 0; i < can.length; i += TOI_DA_EM_MUC_LAM_LO) lo.push(can.slice(i, i + TOI_DA_EM_MUC_LAM_LO))
       setDang(true)
-      void layMucLamLo(can).then((r) => {
-        if (!song.current) return
-        setDang(false)
-        if (!r.ok) {
-          hong.current = [...hong.current, ...can]
-          setLoiChu(r.chu || 'Không nối được máy chủ.')
-          return
-        }
-        setTheoEm((c) => new Map([...c, ...r.du.em]))
-      })
+      let con = lo.length
+      for (const mot of lo)
+        void layMucLamLo(mot).then((r) => {
+          if (!song.current) return
+          if (--con === 0) setDang(false)
+          if (!r.ok) {
+            hong.current = [...hong.current, ...mot]
+            setLoiChu(r.chu || 'Không nối được máy chủ.')
+            return
+          }
+          setTheoEm((c) => new Map([...c, ...r.du.em]))
+        })
     }, CHO_HOI_MUC_LAM_MS)
     return () => clearTimeout(hen)
   }, [khoaSbd, bat, lan])
@@ -316,7 +321,8 @@ export default function Buoc1DiemDanh({
   const dem = tk.demCoMat
   const siSo = tt?.siSo ?? null
   // 6 mức (22/10, Boss duyệt): hỏi Mức làm cho MỌI em có mặt (≤ 40) — dòng tổng + bộ lọc cần số cả lớp; vẫn MỘT lệnh, em mới vào chỉ hỏi thêm em ấy.
-  const khoaMuc = tk.coMat.slice(0, TOI_DA_EM_MUC_LAM_LO).map((e) => e.sbd).join(',')
+  // 23/10: hỏi đủ MỌI em có mặt (chia lô 40 song song trong `useMucLamLo`) — màn chiếu Nhịp học cần số cả lớp; bảng vẫn chỉ tính dòng tổng trên ≤ 40 em như cũ.
+  const khoaMuc = tk.coMat.map((e) => e.sbd).join(',')
   const mucLo = useMucLamLo(khoaMuc, !!tt)
   const coCotMuc = mucLo.theoEm.size > 0 || mucLo.dang
   const [loc, setLoc] = useState<LocMucLam | null>(null)
@@ -661,6 +667,9 @@ export default function Buoc1DiemDanh({
             onMoEm={moEm}
             onThuLaiNhip={() => void nhip.tai()}
             onSangDauGio={sangDauGio}
+            mucLam={mucLo.theoEm}
+            mucLamDang={mucLo.dang}
+            mucLamLoi={mucLo.loiChu}
           />
         </Suspense>
       )}

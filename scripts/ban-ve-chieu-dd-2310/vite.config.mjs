@@ -9,5 +9,5 @@ export default defineConfig({
   root: goc,
   plugins: [react()],
   define: { __PHIEN_BAN__: JSON.stringify('ban-ve-chieu-dd-2310'), __SW_BUILT_AT__: 0 },
-  build: { emptyOutDir: true, rolldownOptions: { input: { ve: resolve(goc, 'scripts/ban-ve-chieu-dd-2310/trang.html') } } },
+  build: { emptyOutDir: true, rolldownOptions: { input: { ve: resolve(goc, 'scripts/ban-ve-chieu-dd-2310/trang.html'), that: resolve(goc, 'scripts/ban-ve-chieu-dd-2310/that.html') } } },
 })

@@ -50,6 +50,7 @@ import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
 import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
 import { ganCaChot } from '../components/chien-dich/api-omni'
+import { emDiemDanhHomNay } from '../lib/chon-em-diem-danh'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
@@ -267,9 +268,34 @@ export default function ExamSetupScreen() {
     // Sheet) chứ không riêng API, mà ô sheet vẫn có thể là số.
     const nguon = (classList.length > 0 ? classList : (dsDangKy ?? [])).map((r) => ({ sbd: chuoi(r.sbd), hoTen: chuoi(r.hoTen), lop: chuoi(r.lop) }))
     const q = timTen.trim().toLowerCase()
-    const loc = nguon.filter((r) => r.sbd && (!lop.trim() || !r.lop || r.lop.trim() === lop.trim()) && (!q || r.hoTen.toLowerCase().includes(q) || r.sbd.toLowerCase().includes(q)))
+    // Em ĐANG được tích luôn hiện (kể cả khác lớp — vd tích theo điểm danh hôm nay) để thầy thấy và bỏ tích được.
+    const loc = nguon.filter((r) => r.sbd && (chonSbd.has(r.sbd) || !lop.trim() || !r.lop || r.lop.trim() === lop.trim()) && (!q || r.hoTen.toLowerCase().includes(q) || r.sbd.toLowerCase().includes(q)))
     return loc.sort((a, b) => a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd, 'vi'))
-  }, [classList, dsDangKy, timTen, lop])
+  }, [classList, dsDangKy, timTen, lop, chonSbd])
+  // «Em đã điểm danh hôm nay» (thầy 23/10): tích sẵn đúng các em có mặt buổi học hôm nay rồi mở hộp chọn em để thầy chỉnh tiếp.
+  const [ddHomNay, setDdHomNay] = useState<string[] | null>(null)
+  const [dangTaiDd, setDangTaiDd] = useState(false)
+  const chonEmDaDiemDanh = async () => {
+    if (dangTaiDd) return
+    setDangTaiDd(true)
+    try {
+      const { buoiGanDay } = await import('../lib/buoi-hoc-api')
+      const r = await buoiGanDay('', 1)
+      if (!r.ok) return showToast(r.chu || 'Chưa tải được danh sách điểm danh', 'error')
+      const kq = emDiemDanhHomNay(r.du, lop)
+      if (kq.sbd.length === 0) return showToast('Hôm nay chưa có em nào điểm danh', 'error')
+      setDdHomNay(kq.sbd)
+      setChonSbd(new Set(kq.sbd))
+      setPhamVi('chon')
+      setHienChonEm(true)
+      showToast(`Đã chọn ${kq.sbd.length} em đã điểm danh hôm nay${kq.dungLop ? ` · lớp ${lop.trim()}` : kq.soBuoi > 1 ? ` · gộp ${kq.soBuoi} buổi` : ''}`, 'success')
+    } catch {
+      showToast('Chưa tải được danh sách điểm danh', 'error')
+    } finally {
+      setDangTaiDd(false)
+    }
+  }
+  const theoDiemDanh = phamVi === 'chon' && !!ddHomNay && ddHomNay.length === chonSbd.size && ddHomNay.every((s) => chonSbd.has(s))
   const toggleSbd = (sbd: string) =>
     setChonSbd((prev) => {
       const next = new Set(prev)
@@ -718,13 +744,13 @@ export default function ExamSetupScreen() {
                   {[
                     { id: 'tu_do', label: 'Mọi em có link' },
                     { id: 'sbd', label: 'Chỉ em trong danh sách lớp' },
-                    { id: 'chon', label: `Chọn từng em…${chonSbd.size > 0 ? ` (${chonSbd.size})` : ''}` },
+                    { id: 'chon', label: `Chọn từng em…${chonSbd.size > 0 && !theoDiemDanh ? ` (${chonSbd.size})` : ''}` },
                   ].map((p) => (
                     <button
                       key={p.id}
                       type="button"
                       className="ct-chip"
-                      aria-pressed={phamVi === p.id}
+                      aria-pressed={phamVi === p.id && !(p.id === 'chon' && theoDiemDanh)}
                       onClick={() => {
                         setPhamVi(p.id as PhamViCa)
                         if (p.id === 'chon') setHienChonEm(true)
@@ -733,6 +759,9 @@ export default function ExamSetupScreen() {
                       {p.label}
                     </button>
                   ))}
+                  <button type="button" className="ct-chip" aria-pressed={theoDiemDanh} aria-busy={dangTaiDd} disabled={dangTaiDd} onClick={() => void chonEmDaDiemDanh()}>
+                    {dangTaiDd ? 'Đang tải điểm danh…' : `Em đã điểm danh hôm nay${theoDiemDanh ? ` (${chonSbd.size})` : ''}`}
+                  </button>
                 </div>
               </div>
             </div>
@@ -1011,6 +1040,9 @@ export default function ExamSetupScreen() {
 
               <div className="flex items-center justify-between text-xs text-slate-500">
                 <span>{dsEmChon.length} học sinh phù hợp</span>
+                <button type="button" onClick={() => void chonEmDaDiemDanh()} disabled={dangTaiDd} className="text-[color:var(--m3-primary)] font-bold hover:underline">
+                  {dangTaiDd ? 'Đang tải…' : 'Chọn em đã điểm danh hôm nay'}
+                </button>
                 {chonSbd.size > 0 && (
                   <button
                     type="button"

@@ -29,8 +29,6 @@ vi.mock('../src/components/chien-dich/HoSoLamCauEm', () => ({
 import { BuocDiemDanh, useDiemDanhBuoi } from '../src/components/day-hoc/DiemDanhBuoi'
 import { cotNhipLop, demNhom, homQuaHomNay, khoaNhom, luoiDiemDanh, nhipTheoSbd, soNgayBo, thongKeBuoi, type EmBuoi } from '../src/lib/diem-danh-nhip'
 import { gioDd } from '../src/lib/diem-danh-nhip'
-import { dongMotCot } from '../src/components/day-hoc/BanChieuDiemDanh'
-import { coLuoiThe } from '../src/components/day-hoc/chieu-bac'
 import type { TrangThaiBuoi } from '../src/lib/buoi-hoc-api'
 import type { KetQuaNhipHoc } from '../src/lib/nhip-hoc-thay'
 
@@ -105,10 +103,9 @@ describe('phép thuần: nhóm em có mặt / vắng', () => {
     expect(c.luoi.map((e) => soNgayBo(e.nhip))).toEqual([11, 3, 4])
     expect(ten(c.khac)).toEqual(['S8', 'S10', 'S9'])
   })
-  it('co giãn theo khổ: lưới tên A thêm cột khi đông em; cột B tách đôi khi quá số dòng cao ≥ 44 px vừa khung; giờ điểm danh theo giờ Việt Nam', () => {
-    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q — lưới THẺ em theo bậc): ≤ 30 em 5 cột thẻ đủ · 31–48 em 6 cột thẻ gọn · nhiều hơn 7 cột
-    expect([30, 31, 48, 49, 60].map((n) => coLuoiThe(n).cot)).toEqual([5, 6, 6, 7, 7])
-    expect([dongMotCot(1920, 1080), dongMotCot(1280, 720), dongMotCot(3840, 2160)]).toEqual([12, 8, 12])
+  it('giờ điểm danh theo giờ Việt Nam', () => {
+    // SỬA CÓ CHỦ ĐÍCH 23/10 (bản nền sáng): cỡ lưới / số dòng một cột không còn đoán theo khổ (coLuoiThe, dongMotCot đã bỏ) — màn ĐO THẬT sau khi vẽ
+    // và tự co (nghiệm thu bằng Chromium thật: scripts/ban-ve-chieu-dd-2310/chup.mjs … that, 0 tên bị cắt ở 3 khổ).
     expect(gioDd('2026-10-12T10:58:00Z')).toBe('17:58')
     expect(gioDd('hỏng')).toBe('')
   })
@@ -232,25 +229,28 @@ describe('bản chiếu A — đang điểm danh', () => {
     await veBuoc1()
     fireEvent.click(screen.getByRole('button', { name: 'Chiếu điểm danh' }))
     const chieu = await screen.findByRole('dialog', { name: 'Bản chiếu điểm danh' })
-    expect(within(chieu).getByText('ĐIỂM DANH ĐẦU GIỜ')).toBeTruthy()
+    expect(within(chieu).getByText('Điểm danh đầu giờ')).toBeTruthy() // chữ hoa bằng CSS (bản nền sáng 23/10)
     expect(within(chieu).getByRole('status', { name: 'Có mặt 6 trên 9 em' })).toBeTruthy()
     expect(within(chieu).getByRole('img', { name: 'Mã QR điểm danh' })).toBeTruthy()
-    const o = within(within(chieu).getByRole('list', { name: 'Bấm tên em để mở hồ sơ làm bài' })).getAllByRole('button')
+    const o = within(within(chieu).getByRole('group', { name: 'Bấm tên em để mở hồ sơ làm bài' })).getAllByRole('button')
+    // SỬA CÓ CHỦ ĐÍCH 23/10 (bản nền sáng, thầy chốt): thẻ chỉ tên + tên nhóm/bậc; "Đủ mức x/y ngày" chuyển vào chú thích (title) — cuối lớp không đọc được chữ nhỏ.
     // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q — ô tên ⇒ THẺ em: dòng nhóm + "Đủ mức x/y ngày" riêng; máy chủ này chưa gửi bậc nên thẻ tô theo nhóm
     // như cũ; nhãn "Vừa vào" + viền vàng cho BA em vào muộn nhất theo bản vẽ thầy duyệt, không còn một em)
     expect(
-      o.map((b) => [b.querySelector('b')?.textContent, b.getAttribute('data-nhom'), b.querySelector('.ddc-em-chu span')?.textContent, b.querySelector('.ddc-the-dong')?.textContent ?? null]),
+      o.map((b) => [b.querySelector('.ddv-the-ten')?.textContent, b.getAttribute('data-nhom'), b.querySelector('.ddv-the-bac')?.textContent, (b.getAttribute('title') ?? '').split(' · ').slice(2).join(' · ')]),
     ).toEqual([
-      ['Nguyễn Minh Anh', 'cham', 'Nhóm Chăm', 'Đủ mức 11/11 ngày'],
-      ['Trần Gia Bảo', 'cham', 'Nhóm Chăm', 'Đủ mức 10/11 ngày'],
-      ['Đỗ Mai Phương', 'chua-deu', 'Nhóm Chưa đều', 'Đủ mức 6/11 ngày'],
-      ['Hoàng Đức Huy', 'luoi', 'Nhóm Lười', 'Đủ mức 0/11 ngày'],
-      ['Quách Gia Linh', 'moi', 'Mới vào lớp', 'Đã có số 1/3 ngày'],
-      ['Phạm Hà', 'chua-co', `Điểm danh ${gioDd(luc(56))}`, 'Chưa có số nhịp học'],
+      ['Nguyễn Minh Anh', 'cham', 'Chăm', 'đủ mức 11/11 ngày · chuỗi 12 ngày liền'],
+      ['Trần Gia Bảo', 'cham', 'Chăm', expect.stringMatching(/^đủ mức 10\/11 ngày/)],
+      ['Đỗ Mai Phương', 'chua-deu', 'Chưa đều', expect.stringMatching(/^đủ mức 6\/11 ngày/)],
+      ['Hoàng Đức Huy', 'luoi', 'Lười', 'đủ mức 0/11 ngày · thoát Lười 0/6 ngày liền'],
+      ['Quách Gia Linh', 'moi', 'Mới vào lớp', 'đã có số 1/3 ngày'],
+      ['Phạm Hà', 'chua-co', 'Chưa có số', ''],
     ])
-    expect(o.filter((b) => b.hasAttribute('data-moi')).map((b) => b.querySelector('b')?.textContent)).toEqual(['Hoàng Đức Huy', 'Quách Gia Linh', 'Phạm Hà'])
-    expect([...chieu.querySelectorAll('.ddc-chip')].map((x) => x.textContent)).toEqual(['Chăm 2', 'Chưa đều 1', 'Lười 1', 'Mới 1', 'Chưa có số 1'])
-    expect(chieu.querySelector('.ddc-chan')?.textContent).toContain('thoát khi đủ mức 6 ngày liền')
+    expect(o[5]!.getAttribute('title')).toBe(`Phạm Hà · điểm danh lúc ${gioDd(luc(56))}`)
+    expect(o.filter((b) => b.hasAttribute('data-moi')).map((b) => b.querySelector('.ddv-the-ten')?.textContent)).toEqual(['Hoàng Đức Huy', 'Quách Gia Linh', 'Phạm Hà'])
+    expect([...chieu.querySelectorAll('.ddv-lan-nhan')].map((x) => x.querySelector('b')!.textContent + ' ' + x.querySelector('span')!.textContent)).toEqual(['Chăm 2 em', 'Chưa đều 1 em', 'Lười 1 em', 'Mới 1 em', 'Chưa có số 1 em'])
+    expect(chieu.querySelector('.ddv-chan')?.textContent).toContain('thoát khi đủ mức 6 ngày liền')
+    // «Vừa vào lớp» (thay khối Bậc cao nhất lớp): bấm dòng em ⇒ hồ sơ như bấm thẻ — đã kiểm ở tests/man-chieu-dot19-1310q
     fireEvent.click(o[3]!)
     const ho = await screen.findByRole('dialog', { name: 'Hồ sơ làm bài' })
     expect(ho.textContent).toContain('S4')
@@ -276,25 +276,27 @@ describe('bản chiếu B — Nhịp học của lớp', () => {
     await veBuoc1()
     fireEvent.click(screen.getByRole('button', { name: 'Xong điểm danh · chiếu Nhịp học của lớp' }))
     const chieu = await screen.findByRole('dialog', { name: 'Bản chiếu nhịp học của lớp 12A1' })
-    expect(within(chieu).getByText('NHỊP HỌC 12A1')).toBeTruthy()
+    expect(within(chieu).getByText('Nhịp học · 12A1')).toBeTruthy()
     expect(within(chieu).getByText('Từ 01/10 đến 11/10 · 11 ngày đã qua')).toBeTruthy()
-    expect(within(chieu).getByRole('img', { name: 'Chăm 3 em · 30% · Chưa đều 1 · 10% · Lười 3 em · 30% · 3 em mới vào lớp hoặc chưa có số' })).toBeTruthy()
-    const cot = (k: string) => [...chieu.querySelectorAll(`.ddc-cot[data-nhom="${k}"] .ddc-dong-em`)]
-    const chu = (k: string) => cot(k).map((b) => [b.querySelector('.ddc-dong-ten')?.textContent, b.querySelector('.ddc-dong-so')?.textContent, b.hasAttribute('data-vang')])
+    expect(within(chieu).getByRole('img', { name: 'Chăm 3 em, Chưa đều 1 em, Lười 3 em, 3 em mới vào lớp hoặc chưa có số' })).toBeTruthy()
+    expect([...chieu.querySelectorAll('.ddv-tong-thanh > span')].map((x) => x.textContent)).toEqual(['3 Chăm · 30%', '1 Chưa đều · 10%', '3 Lười · 30%', '3 Mới'])
+    const cot = (k: string) => [...chieu.querySelectorAll(`.ddv-cot[data-nhom="${k}"] .ddv-dong-em`)]
+    const chu = (k: string) => cot(k).map((b) => [b.querySelector('.ddv-dong-ten')?.firstChild?.textContent, b.querySelector('.ddv-dong-so')?.textContent, b.hasAttribute('data-vang')])
     expect(chu('cham')).toEqual([
       ['Lê Khánh Vy', '11/11', true],
       ['Nguyễn Minh Anh', '11/11', false],
       ['Trần Gia Bảo', '10/11', false],
     ])
     expect(chu('chua-deu')).toEqual([['Đỗ Mai Phương', '6/11', false]])
+    // bản nền sáng: em Lười bỏ liền ⇒ cột số ghi "bỏ N ngày" (số ngày đủ vẫn ở câu đọc màn hình + dải ô ngày)
     expect(chu('luoi')).toEqual([
-      ['Hoàng Đức Huy', '0/11 · bỏ 11 ngày liền', false],
-      ['Trịnh Bảo Ngọc', '2/11 · bỏ 3 ngày liền', true],
-      ['Bùi Quang Minh', '3/11 · bỏ 4 ngày liền', true],
+      ['Hoàng Đức Huy', 'bỏ 11 ngày', false],
+      ['Trịnh Bảo Ngọc', 'bỏ 3 ngày', true],
+      ['Bùi Quang Minh', 'bỏ 4 ngày', true],
     ])
-    expect(cot('cham')[0]!.querySelector('.ddc-vang-chu')?.textContent).toBe('vắng')
-    expect(chieu.querySelector('.ddc-cot[data-nhom="cham"] .ddc-cot-dk')?.textContent).toBe('đủ mức ≥ 9/11 ngày')
-    expect(chieu.querySelector('.ddc-chan-so')?.textContent).toBe('Hôm qua cả lớp 6/8 em đủ mức · hôm nay đã có 4 em đủ mức')
+    expect(cot('cham')[0]!.querySelector('.ddv-dong-ten em')?.textContent).toBe('vắng')
+    expect(chieu.querySelector('.ddv-cot[data-nhom="cham"] h2 small')?.textContent).toBe('đủ mức ≥ 9/11 ngày')
+    expect([...chieu.querySelectorAll('.ddv-so-to > p')].map((x) => x.textContent)).toEqual(['6/8em đủ mức hôm qua', '4em đã đủ mức hôm nay'])
   })
 
   it('bấm tên (kể cả em vắng) ⇒ hồ sơ đúng SBD; phím H ẩn / hiện tên nhóm Lười (mặc định hiện); → sang Gọi lên bảng đầu giờ; Esc đóng', async () => {
@@ -312,7 +314,7 @@ describe('bản chiếu B — Nhịp học của lớp', () => {
     act(() => {
       fireEvent.keyDown(window, { key: 'h' })
     })
-    expect(chieu.querySelector('[data-khoi="luoi-da-an"]')?.textContent).toBe('Đã ẩn tên 3 em — bấm H để hiện')
+    expect(chieu.querySelector('[data-khoi="luoi-da-an"] p')?.textContent).toBe('Đã ẩn tên 3 em nhóm Lười')
     expect(within(chieu).queryByText('Bùi Quang Minh')).toBeNull()
     expect(within(chieu).getByRole('button', { name: /Hiện tên nhóm Lười/ }).getAttribute('aria-pressed')).toBe('true')
     fireEvent.keyDown(window, { key: 'H' })
@@ -340,7 +342,7 @@ describe('bản chiếu B — Nhịp học của lớp', () => {
     expect(screen.getByText('Vắng 4 em')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Chiếu điểm danh' }))
     const a = await screen.findByRole('dialog', { name: 'Bản chiếu điểm danh' })
-    const o = within(within(a).getByRole('list', { name: 'Bấm tên em để mở hồ sơ làm bài' })).getAllByRole('button')
+    const o = within(within(a).getByRole('group', { name: 'Bấm tên em để mở hồ sơ làm bài' })).getAllByRole('button')
     expect(o).toHaveLength(6)
     expect(o.every((b) => b.getAttribute('data-nhom') === 'chua-co')).toBe(true)
     fireEvent.keyDown(window, { key: 'ArrowRight' })

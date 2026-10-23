@@ -100,6 +100,10 @@ export interface MucLamEmLo {
   /** Lượt SAI ở Mức 1–2 / Mức 3–4 (không kể lượt treo) — «Sai vì vội» của bảng điểm danh; CÙNG số với `cachLam14` (chi tiết em lên bảng). */
   saiLamVoi: number
   saiDuNghi: number
+  /** (23/10, màn chiếu Nhịp học — thầy: «hiển thị đủ thông tin treo máy») Tổng giây treo (Σ max(khoảng lặng, giây rời app)) và số ngày có treo
+   *  của các lượt Treo máy + Cố tình treo máy trong cửa sổ. Tính trong vòng lặp lượt sẵn có — không thêm câu đọc. */
+  giayTreo: number
+  soNgayTreo: number
 }
 export type TraLoiMucLamLo = { ok: true; tu: string; den: string; em: Record<string, MucLamEmLo> } | { ok: false; error: string }
 
@@ -167,9 +171,23 @@ export async function mucLamCacEm(env: Env, sbds: readonly string[], tu: string,
   for (const [s, luot] of theoEm) {
     // Mức 6 theo ngày (≥ 3 lượt treo cùng ngày) — danh sách đã là của MỘT em.
     const t = tongMucLam(nangCoTinhTheoNgay(luot), { tachTreo: true })
-    ra.set(s, { soDo: t.soDo, chuaCoSoDo: t.chuaCoSoDo, m: [t.theoMuc[0].luot, t.theoMuc[1].luot, t.theoMuc[2].luot, t.theoMuc[3].luot], soUocTinh: t.soUocTinh, soTreo: t.soTreo, soCoTinh: t.soCoTinh, soChuaDoTreo: t.soChuaDoTreo, saiLamVoi: t.saiLamVoi, saiDuNghi: t.saiDuNghi })
+    const treo = tongTreoMay(luot)
+    ra.set(s, { soDo: t.soDo, chuaCoSoDo: t.chuaCoSoDo, m: [t.theoMuc[0].luot, t.theoMuc[1].luot, t.theoMuc[2].luot, t.theoMuc[3].luot], soUocTinh: t.soUocTinh, soTreo: t.soTreo, soCoTinh: t.soCoTinh, soChuaDoTreo: t.soChuaDoTreo, saiLamVoi: t.saiLamVoi, saiDuNghi: t.saiDuNghi, giayTreo: treo.giay, soNgayTreo: treo.soNgay })
   }
   return ra
+}
+
+/** Tổng giây treo + số ngày có treo của các lượt MỘT em (lượt 'treo' lẫn 'co_tinh' — nâng Cố tình không đổi `giayTreo`). Thuần. */
+export function tongTreoMay(luot: readonly { mucLam?: MucLamLuot | null; ngay?: string | null }[]): { giay: number; soNgay: number } {
+  let giay = 0
+  const ngay = new Set<string>()
+  for (const l of luot) {
+    if (!l.mucLam?.treo) continue
+    const g = l.mucLam.giayTreo
+    if (typeof g === 'number' && Number.isFinite(g) && g > 0) giay += g
+    if (l.ngay) ngay.add(l.ngay)
+  }
+  return { giay: Math.round(giay), soNgay: ngay.size }
 }
 
 /** `POST /gv/muc-lam-lo` — xem đầu tệp. */

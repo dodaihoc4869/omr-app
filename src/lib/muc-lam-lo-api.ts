@@ -24,6 +24,9 @@ export interface MucLamEm {
   /** Lượt SAI ở Mức 1–2 / Mức 3–4 (không kể lượt treo). Máy chủ cũ không gửi ⇒ vắng (ô «Sai vì vội» ghi "—"). */
   saiLamVoi?: number
   saiDuNghi?: number
+  /** (23/10) Tổng giây treo + số ngày có treo (lượt Treo máy + Cố tình). Máy chủ cũ / đệm 5 phút cũ không gửi ⇒ vắng ⇒ màn ghi "—", không ghi 0. */
+  giayTreo?: number
+  soNgayTreo?: number
 }
 
 type O = Record<string, unknown>
@@ -47,7 +50,9 @@ export function docMucLamEm(x: unknown): MucLamEm | null {
   if (mm[0] + mm[1] + mm[2] + mm[3] + treo + coTinh !== soDo || uoc > soDo || chuaTreo > soDo) return null
   const sv = soNguyen(o.saiLamVoi), sn = soNguyen(o.saiDuNghi)
   const coSai = sv !== null && sn !== null && sv <= mm[0] + mm[1] && sn <= mm[2] + mm[3]
-  return { soDo, chuaCoSoDo: chua, m: mm, soUocTinh: uoc, soTreo: treo, soCoTinh: coTinh, soChuaDoTreo: chuaTreo, ...(coSai ? { saiLamVoi: sv, saiDuNghi: sn } : {}) }
+  const gt = soNguyen(o.giayTreo), nt = soNguyen(o.soNgayTreo)
+  const coTreo = gt !== null && nt !== null && (treo + coTinh > 0 || (gt === 0 && nt === 0))
+  return { soDo, chuaCoSoDo: chua, m: mm, soUocTinh: uoc, soTreo: treo, soCoTinh: coTinh, soChuaDoTreo: chuaTreo, ...(coSai ? { saiLamVoi: sv, saiDuNghi: sn } : {}), ...(coTreo ? { giayTreo: gt, soNgayTreo: nt } : {}) }
 }
 
 // ───────────── DẤU HIỆU 2 GIÂY (bản vẽ docs/ban-ve-muc-lam-6-muc-2210, thầy duyệt 22/10). Ngưỡng TẠM — chỉnh sau ~1 tuần dữ liệu thật. ─────────────

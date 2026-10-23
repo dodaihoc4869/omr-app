@@ -2,6 +2,7 @@
 // CHƯA build vào app: trang này chỉ để chụp ảnh. Dữ liệu GIẢ (cùng lớp giả của ảnh hiện trạng: 12 Nhóm 10 điểm, 30/38 có mặt), mọi số TÍNH bằng đúng
 // phép thật của app/máy chủ (nhóm, bậc, ô ngày, Vừa vào, lên bậc). Huy hiệu = component thật `HuyHieuBac`. Tên em là tên giả. Đặc tả: docs/ban-ve-chieu-diem-danh-2310/DAC-TA.md.
 //   ?k=A1 … A5 (Điểm danh đầu giờ) · B1 … B5 (Nhịp học của lớp)
+import { useLayoutEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ArrowLeft, ArrowRight, Crown, EyeOff, Pause, QrCode, Sparkles, WifiOff, X, Zap, Brain, RefreshCw } from 'lucide-react'
 import '@fontsource/be-vietnam-pro/vietnamese-400.css'
@@ -18,6 +19,7 @@ import '../../src/styles/gv-mau.css'
 import '../../src/components/chieu-ma.css'
 import '../../src/components/chieu-ma-kiem-tra.css'
 import '../../src/components/day-hoc/ban-chieu-diem-danh.css'
+import '../../src/components/bac-cham-chi/bac-cham-chi.css'
 import './ve.css'
 import HuyHieuBac from '../../src/components/bac-cham-chi/HuyHieuBac'
 import { BAC_CHAM_CHI, motBac } from '../../src/components/bac-cham-chi/bac'
@@ -80,7 +82,11 @@ function mucGia(e: EmBuoi) {
   const nghi = Math.max(0, soDo - voi - treo)
   const sai = Math.round(voi * 0.7 + nghi * 0.2)
   const saiVoi = Math.min(sai, Math.round(voi * 0.7))
-  return { soDo, voi, nghi, treo, sai, saiVoi }
+  // Treo máy đầy đủ (thầy 23/10): tổng giây treo + số ngày có treo + lượt chưa đo (máy chủ cần thêm `giayTreo`, `soNgayTreo` vào /gv/muc-lam-lo).
+  const giayTreo = treo * (150 + (s % 7) * 55)
+  const soNgayTreo = treo === 0 ? 0 : Math.min(treo, 1 + (s % 3))
+  const chuaDo = k === 'B4' ? soDo : Math.round(soDo * 0.08)
+  return { soDo, voi, nghi, treo, sai, saiVoi, giayTreo, soNgayTreo, chuaDo }
 }
 
 // ───────────── BỘ PHẬN CHUNG
@@ -128,6 +134,7 @@ function DaiNgay({ e, nho }: { e: EmBuoi; nho?: boolean }) {
 function TheEm({ e, vua, dau }: { e: EmBuoi; vua: boolean; dau: boolean }) {
   const b = e.bacCham ? motBac(e.bacCham.bac) : null
   const nh = khoaNhom(e)
+  const treo = mucGia(e).treo
   const phu = !e.nhip ? 'Chưa có số nhịp học'
     : nh === 'moi' ? `Đã có số ${e.nhip.soNgayQua}/3 ngày`
     : nh === 'luoi' ? `Đủ mức ${e.nhip.chuoiDuGanNhat}/6 ngày liền để thoát Lười`
@@ -136,9 +143,8 @@ function TheEm({ e, vua, dau }: { e: EmBuoi; vua: boolean; dau: boolean }) {
     <button type="button" className="ddv-the" data-nhom={nh} data-vua={vua || undefined} data-dau={dau || undefined} aria-label={`${e.hoTen}${b ? `, bậc ${b.so} ${b.ten}` : ''}, mở hồ sơ làm bài`}>
       <span className="ddv-the-hh">{b ? <HuyHieuBac bac={b.so} co={56} /> : <span className="ddv-the-hh-trong" data-nhom={nh}>{TEN_NHOM_CHIEU[nh].slice(0, 1)}</span>}{b && <b className="ddv-the-so">{b.so}</b>}</span>
       <span className="ddv-the-chu">
-        <b className="ddv-the-ten">{e.hoTen}</b>
-        <span className="ddv-the-bac">{b ? b.ten : TEN_NHOM_CHIEU[nh]}</span>
-        <span className="ddv-the-phu">{phu}</span>
+        <b className="ddv-the-ten">{e.hoTen}{treo > 0 && <span className="ddv-treo-chip" aria-label={`treo máy ${treo} lượt trong 14 ngày`}><Pause aria-hidden />{treo}</span>}</b>
+        <span className="ddv-the-bac" title={phu}>{b ? b.ten : TEN_NHOM_CHIEU[nh]}</span>
       </span>
       {vua && <span className="ddv-the-vua"><Sparkles aria-hidden />Vừa vào {gio(e.luc)}</span>}
       {dau && <span className="ddv-the-dau"><Crown aria-hidden />Dẫn đầu lớp</span>}
@@ -174,15 +180,18 @@ function ChieuDiemDanh() {
   const moiNhat = coMat[0]
   const linkHs = 'omr-app-b3u.pages.dev/hs'
   const qr = duongQr(taoQr(linkDiemDanh('https://omr-app-b3u.pages.dev', '482915'))!)
-  const dong = coMat.length > 40
+  // Tự co theo ĐO THẬT sau khi vẽ (không đoán theo khổ) — nấc 0…5 trong ve.css. Không bao giờ cắt tên.
+  const lanRef = useRef<HTMLDivElement>(null)
+  const [nac, setNac] = useState(0)
+  useLayoutEffect(() => { const el = lanRef.current; if (el && nac < 5 && el.scrollHeight > el.clientHeight + 1) setNac(nac + 1) }, [nac])
   return (
-    <div className="ca-chieu cm km ddc ddv" data-che-do="dd" data-dong={dong || undefined}>
+    <div className="ca-chieu cm km ddc ddv" data-che-do="dd" data-nac={nac}>
       <Dau tieuDe="Điểm danh đầu giờ" phu={`${LOP} · Thứ Hai 12/10 · 17:52`} phai={<VongCoMat co={coMat.length} tong={TT.siSo} />} />
       {k === 'A3' && <div className="ddv-bao" role="status"><WifiOff aria-hidden />Mất kết nối với máy chủ — danh sách dừng ở 17:51. Em vẫn điểm danh được; màn tự cập nhật khi có mạng.</div>}
       <main className="ddv-than">
         <aside className="ddv-vao">
           <div className="ddv-ma">
-            <p className="ddv-ma-buoc"><QrCode aria-hidden />Mở app học sinh › <b>Điểm danh</b></p>
+            <p className="ddv-ma-buoc"><QrCode aria-hidden /><span>Mở app học sinh ›</span> <b>Điểm danh</b></p>
             <div className="ddv-ma-so" aria-label="Mã buổi 482 915">482<span /> 915</div>
             <div className="ddv-ma-qr"><svg viewBox={`0 0 ${qr.canh} ${qr.canh}`} shapeRendering="crispEdges" aria-label="Mã QR điểm danh"><rect width={qr.canh} height={qr.canh} fill="white" /><path d={qr.d} /></svg></div>
             <div className="ddv-ma-doi"><span style={{ width: '64%' }} /></div>
@@ -196,7 +205,7 @@ function ChieuDiemDanh() {
                 const b = e.bacCham ? motBac(e.bacCham.bac) : null
                 return (
                   <div key={e.sbd} className="ddv-moi-dong" data-dau={i === 0 || undefined}>
-                    <span className="ddv-moi-hh">{b ? <HuyHieuBac bac={b.so} co={i === 0 ? 52 : 40} /> : null}</span>
+                    <span className="ddv-moi-hh">{b ? <HuyHieuBac bac={b.so} co={i === 0 ? 52 : 40} /> : <span className="ddv-the-hh-trong" data-nhom={khoaNhom(e)}>{TEN_NHOM_CHIEU[khoaNhom(e)].slice(0, 1)}</span>}</span>
                     <span className="ddv-moi-chu"><b>{e.hoTen}</b><span>{b ? `Bậc ${b.so} · ${b.ten}` : TEN_NHOM_CHIEU[khoaNhom(e)]}</span></span>
                     <time>{gio(e.luc)}</time>
                   </div>
@@ -215,7 +224,7 @@ function ChieuDiemDanh() {
           ) : (
             <>
               <ThangBac coMat={coMat} />
-              <div className="ddv-lan-ds">
+              <div className="ddv-lan-ds" ref={lanRef}>
                 {nhomCo.map((n) => {
                   const ds = luoi.filter((e) => khoaNhom(e) === n)
                   return (
@@ -256,6 +265,43 @@ function ChaoEm({ e }: { e: EmBuoi }) {
 }
 
 // ───────────── CHẾ ĐỘ B · NHỊP HỌC CỦA LỚP
+/** Danh sách một cột: vừa một cột (dòng ngang) ⇒ giữ; không vừa ⇒ hai cột con, mỗi em là thẻ hai dòng (tên · dải ngày); vẫn không vừa ⇒ hiện số em vừa khung
+ *  + dòng "+N em — xem đủ trên máy thầy". Đo thật sau khi vẽ (không đoán theo khổ), không bao giờ cắt tên. */
+function DsCot({ ds, render }: { ds: EmBuoi[]; render: (e: EmBuoi) => React.ReactNode }) {
+  const ref = useRef<HTMLOListElement>(null)
+  const [kieu, setKieu] = useState<'dong' | 'luoi'>('dong')
+  const [hien, setHien] = useState(ds.length)
+  useLayoutEffect(() => {
+    const ol = ref.current
+    if (!ol) return
+    const tran = () => ol.scrollHeight > ol.clientHeight + 1 || ol.scrollWidth > ol.clientWidth + 1
+    if (!tran()) return
+    if (kieu === 'dong') { setKieu('luoi'); return }
+    if (hien > 1) setHien(hien - 1) // bớt từng em tới khi vừa (kể cả dòng "+N em nữa") — không bỏ trống khung
+  }, [kieu, hien])
+  return (
+    <>
+      <ol ref={ref} className="ddv-cot-ds" data-kieu={kieu}>{ds.slice(0, hien).map(render)}</ol>
+      {hien < ds.length && <p className="ddv-cot-them">+{ds.length - hien} em nữa · xem đủ trên máy thầy</p>}
+    </>
+  )
+}
+/** Danh sách Treo máy: không vừa khung ⇒ hiện số em vừa + "+N em nữa" (đo thật, không cắt tên). Xếp nhiều lượt treo trước. */
+function DsTreo({ ds, render }: { ds: EmBuoi[]; render: (e: EmBuoi) => React.ReactNode }) {
+  const ref = useRef<HTMLOListElement>(null)
+  const [hien, setHien] = useState(ds.length)
+  useLayoutEffect(() => {
+    const ol = ref.current
+    if (!ol || ol.scrollHeight <= ol.clientHeight + 1) return
+    if (hien > 1) setHien(hien - 1)
+  }, [hien])
+  return (
+    <>
+      <ol ref={ref} className="ddv-treo-ds">{ds.slice(0, hien).map(render)}</ol>
+      {hien < ds.length && <p className="ddv-cot-them">+{ds.length - hien} em nữa · xem đủ trên máy thầy</p>}
+    </>
+  )
+}
 function ChieuNhipLop() {
   const anLuoi = k === 'B2'
   const mucTung = k === 'B3'
@@ -271,14 +317,15 @@ function ChieuNhipLop() {
   const sum = (f: (m: ReturnType<typeof mucGia>) => number) => muc.reduce((t, m) => t + f(m), 0)
   const voi = sum((m) => m.voi), nghi = sum((m) => m.nghi), treo = sum((m) => m.treo), soDo = voi + nghi + treo, sai = sum((m) => m.sai), saiVoi = sum((m) => m.saiVoi)
   const mucCua = new Map(coMat.map((e, i) => [e.sbd, muc[i]!]))
+  const giayTreoLop = sum((m) => m.giayTreo), chuaDoLop = sum((m) => m.chuaDo)
+  const dsTreo = coMat.filter((e) => (mucCua.get(e.sbd)?.treo ?? 0) > 0).sort((a, b) => mucCua.get(b.sbd)!.treo - mucCua.get(a.sbd)!.treo || mucCua.get(b.sbd)!.giayTreo - mucCua.get(a.sbd)!.giayTreo)
   const Cot = ({ ten, ds, nhom, chu }: { ten: string; ds: EmBuoi[]; nhom: KhoaNhom; chu: string }) => (
     <section className="ddv-cot" data-nhom={nhom} aria-label={`${ten} ${ds.length} em`}>
       <h2><b>{ten}</b><span>{ds.length} em</span><small>{chu}</small></h2>
       {anLuoi && nhom === 'luoi' ? (
         <div className="ddv-an"><EyeOff aria-hidden /><p>Đã ẩn tên {ds.length} em nhóm Lười</p><small>Bấm H để hiện lại · thầy vẫn xem đủ trên máy thầy</small></div>
       ) : (
-        <ol className="ddv-cot-ds">
-          {ds.map((e) => {
+        <DsCot ds={ds} render={(e) => {
             const vang = !e.coMat
             const bo = soNgayBo(e.nhip)
             const m = mucCua.get(e.sbd)
@@ -296,8 +343,7 @@ function ChieuNhipLop() {
                 </button>
               </li>
             )
-          })}
-        </ol>
+          }} />
       )}
     </section>
   )
@@ -330,7 +376,7 @@ function ChieuNhipLop() {
             <div className="ddv-cach-thanh">
               <span data-k="voi" style={{ flexGrow: voi }}><Zap aria-hidden /><b>Vội</b> {voi} lượt · {phanTramDd(voi, soDo)}%</span>
               <span data-k="nghi" style={{ flexGrow: nghi }}><Brain aria-hidden /><b>Có nghĩ</b> {nghi} lượt · {phanTramDd(nghi, soDo)}%</span>
-              {treo > 0 && <span data-k="treo" style={{ flexGrow: Math.max(treo, soDo * 0.06) }}><Pause aria-hidden /><b>Treo máy</b> {treo}</span>}
+              {treo > 0 && <span data-k="treo" style={{ flexGrow: Math.max(treo, soDo * 0.06) }}><Pause aria-hidden /><b>Treo máy</b> {treo} lượt · {Math.round(giayTreoLop / 60)} phút</span>}
             </div>
             <p className="ddv-cach-cau">{treo === 0 && k === 'B4' ? <>Treo máy: đang đo từ các lượt làm mới, lượt cũ chưa đo. · </> : null}<b>{saiVoi}/{sai}</b> lượt sai ({phanTramDd(saiVoi, sai)}%) là nộp khi chưa kịp đọc hết đề</p>
           </div>
@@ -338,10 +384,33 @@ function ChieuNhipLop() {
             <Cot ten="Chăm" ds={cot.cham} nhom="cham" chu="đủ mức từ 80% số ngày" />
             <Cot ten="Chưa đều" ds={cot.chuaDeu} nhom="chua-deu" chu="đủ mức 50–79% số ngày" />
             <Cot ten="Lười" ds={cot.luoi} nhom="luoi" chu="thoát khi đủ mức 6 ngày liền" />
+            <section className="ddv-cot" data-nhom="treo" aria-label={`Treo máy ${dsTreo.length} em`}>
+              <h2><b>Treo máy</b><span>{dsTreo.length} em</span><small>14 ngày · rời câu lâu không làm</small></h2>
+              <div className="ddv-treo-tong">
+                <p><b>{treo}</b><small>lượt treo</small></p>
+                <p><b>{Math.round(giayTreoLop / 60)}</b><small>phút treo</small></p>
+                <p><b>{dsTreo.length}</b><small>em có treo</small></p>
+              </div>
+              {dsTreo.length === 0 ? (
+                <p className="ddv-treo-khong">{k === 'B4' ? 'Đang đo từ các lượt làm mới — lượt cũ chưa đo' : 'Không em nào treo máy trong 14 ngày'}</p>
+              ) : (
+                <DsTreo ds={dsTreo} render={(e) => {
+                  const m = mucCua.get(e.sbd)!
+                  return (
+                    <li key={e.sbd} className="ddv-treo-dong">
+                      <span className="ddv-dong-hh">{e.bacCham ? <HuyHieuBac bac={e.bacCham.bac} co={30} /> : null}</span>
+                      <span className="ddv-treo-dong-ten"><b>{e.hoTen}</b><small>{m.soNgayTreo} ngày · {Math.round(m.giayTreo / 60)} phút</small></span>
+                      <span className="ddv-treo-dong-so"><b>{m.treo}</b><small>lượt</small></span>
+                    </li>
+                  )
+                }} />
+              )}
+              <p className="ddv-treo-chua">{chuaDoLop} lượt chưa đo treo máy</p>
+            </section>
           </div>
           <p className="ddv-chu-giai ddv-chu-giai--o">
             <span><i data-loai="du" />Đủ mức</span><span><i data-loai="thieu-it" />Thiếu ít</span><span><i data-loai="thieu-nhieu" />Thiếu nhiều</span><span><i data-loai="khong-lam" />Không làm</span>
-            {mucTung && <><span><i data-k="voi" />Vội (Mức làm 1–2)</span><span><i data-k="nghi" />Có nghĩ (3–4)</span><span><i data-k="treo" />Treo máy</span></>}
+            {mucTung && <><span><i data-k="voi" />Vội (Mức làm 1–2)</span><span><i data-k="nghi" />Có nghĩ (3–4)</span></>}<span><i data-k="treo" />Treo máy</span>
             <span className="ddv-chu-giai-phai">Mỗi ô là một ngày · bấm tên em ⇒ hồ sơ làm bài</span>
           </p>
         </main>
