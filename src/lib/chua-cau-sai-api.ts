@@ -49,6 +49,8 @@ export interface TienDoChua {
 export interface KetQuaDot {
   ok: boolean
   dotId?: string
+  /** Lệnh mở đợt báo «chưa có lỗi đang mở»: máy chủ có đóng đợt vì sổ học đã đóng lỗi không (không đóng = sổ chưa thấy lần sai nào). */
+  daDong?: boolean
   trangThai?: TrangThaiChua
   lyDoThieu?: string
   coHocLieu?: boolean
@@ -166,7 +168,7 @@ export async function apiMoDot(
     ...(phat ? { phat: true } : {}),
   })
   // 24/10: «chưa có lỗi đang mở» kèm mã đợt = sổ học đã đóng lỗi (máy chủ đã đóng đợt) ⇒ màn chữa tính xong phần thay vì dừng ở lỗi.
-  if (!j?.ok) return { ok: false, loi: loiCua(j), ma: chu(j?.ma), ...(j?.dotId ? { dotId: chu(j.dotId) } : {}) }
+  if (!j?.ok) return { ok: false, loi: loiCua(j), ma: chu(j?.ma), ...(j?.dotId ? { dotId: chu(j.dotId), daDong: j.daDong === true } : {}) }
   return j as unknown as KetQuaDot & { phat?: unknown }
 }
 

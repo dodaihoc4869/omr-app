@@ -6,7 +6,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { seedChua, Q } from './_chua-cau-sai-fixture'
-import { moDot, danhSach } from '../server/src/chua-cau-sai'
+import { moDot, danhSach, giaoDotCuaEm } from '../server/src/chua-cau-sai'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 
 const T = Date.parse('2026-10-07T03:00:00Z')
@@ -38,12 +38,24 @@ describe('Danh sách mời mà mở đợt báo «chưa có lỗi»', () => {
     const j = (await r.json()) as Record<string, unknown>
     expect(j.ma).toBe('CHUA_CO_LOI')
     expect(j.dotId).toBe(truoc!.id)
+    expect(j.daDong).toBe(true)
     const sau = await dot(d)
     expect(sau?.trang_thai_day).toBe('da_tu_sua')
     expect(sau?.dong_luc).not.toBeNull()
     const ds = (await (await danhSach(d.env, { token })).json()) as { dem: { can: number; xong: number } }
     expect(ds.dem.can).toBe(0)
     expect(ds.dem.xong).toBe(1)
+  })
+  it('lô giao của thầy (giaoDotCuaEm không cờ) ⇒ KHÔNG đóng hàng đợt', async () => {
+    const d = taoD1That()
+    await seedChua(d.env)
+    await d.env.DB.batch([
+      d.env.DB.prepare(dung('d1', Q, '2026-10-02')),
+      d.env.DB.prepare(dung('d2', `${Q}~ss0`, '2026-10-03')),
+    ])
+    const r = await giaoDotCuaEm(d.env, 'HS1', Q)
+    expect(((await r.json()) as Record<string, unknown>).ma).toBe('CHUA_CO_LOI')
+    expect((await dot(d))?.dong_luc).toBeNull()
   })
   it('sổ học không thấy lần sai nào (vd lần sai chưa công bố) ⇒ giữ nguyên hàng đợt, vẫn báo mã đợt', async () => {
     const d = taoD1That()

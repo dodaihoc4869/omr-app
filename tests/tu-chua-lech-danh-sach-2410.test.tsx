@@ -1,5 +1,5 @@
 // 24/10 (em SBD 10044 «Vẫn lỗi»): máy chủ trả «chưa có lỗi đang mở» KÈM mã đợt (sổ học đã đóng lỗi, đợt vừa được đóng) ⇒ màn chữa tính xong phần
-// hôm nay và báo «Câu này em sửa xong rồi» (không còn khung «Chưa mở được câu này» làm kẹt chặng). Không kèm mã đợt ⇒ khung lỗi cũ y nguyên.
+// hôm nay và báo «Câu này không cần sửa nữa» (không còn khung «Chưa mở được câu này» làm kẹt chặng). Không kèm mã đợt ⇒ khung lỗi cũ y nguyên.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 
@@ -23,15 +23,22 @@ afterEach(cleanup)
 
 describe('Sổ học đã đóng lỗi, hàng đợt vừa đóng', () => {
   it('«chưa có lỗi đang mở» kèm mã đợt ⇒ ghi xong phần hôm nay + màn «sửa xong rồi», không khung lỗi', async () => {
-    api.apiMoDot.mockResolvedValue({ ok: false, loi: 'Câu này chưa có lỗi đang mở đã công bố.', ma: 'CHUA_CO_LOI', dotId: 'D9' })
+    api.apiMoDot.mockResolvedValue({ ok: false, loi: 'Câu này chưa có lỗi đang mở đã công bố.', ma: 'CHUA_CO_LOI', dotId: 'D9', daDong: true })
     const onVe = vi.fn()
     render(<Man token="t" qid="Q" tenCau="Cấu trúc bảng tuần hoàn" onVe={onVe} />)
-    expect(await screen.findByRole('heading', { name: 'Câu này em sửa xong rồi' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Câu này không cần sửa nữa' })).toBeTruthy()
     expect(ghi).toHaveBeenCalledWith('D9')
     expect(screen.queryByRole('heading', { name: 'Chưa mở được câu này' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Thử lại' })).toBeNull()
     screen.getByRole('button', { name: 'Sang câu khác' }).click()
     expect(onVe).toHaveBeenCalled()
+  })
+  it('sổ chưa thấy lần sai nào (daDong = false) ⇒ vẫn tính xong phần, chữ không khẳng định em đã làm đúng', async () => {
+    api.apiMoDot.mockResolvedValue({ ok: false, loi: 'Câu này chưa có lỗi đang mở đã công bố.', ma: 'CHUA_CO_LOI', dotId: 'D9', daDong: false })
+    render(<Man token="t" qid="Q" onVe={() => {}} />)
+    expect(await screen.findByRole('heading', { name: 'Câu này tạm chưa cần sửa' })).toBeTruthy()
+    expect(ghi).toHaveBeenCalledWith('D9')
+    expect(screen.getByRole('status').textContent).not.toMatch(/làm lại đúng|sửa xong rồi/)
   })
   it('«chưa có lỗi đang mở» KHÔNG kèm mã đợt ⇒ khung lỗi cũ, không ghi xong phần', async () => {
     api.apiMoDot.mockResolvedValue({ ok: false, loi: 'Câu này chưa có lỗi đang mở đã công bố.', ma: 'CHUA_CO_LOI' })

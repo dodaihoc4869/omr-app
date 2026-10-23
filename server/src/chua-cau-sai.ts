@@ -231,7 +231,7 @@ async function traPhien(
 export async function moDot(env: Env, b: Obj): Promise<Response> {
   const sbd = await quyen(env, b)
   if (sbd instanceof Response) return sbd
-  const r = await giaoDotCuaEm(env, sbd, str(b.qid))
+  const r = await giaoDotCuaEm(env, sbd, str(b.qid), true)
   // 13/10 (thầy: "chỗ này mở câu quá lâu"): máy em mở câu = mo-dot RỒI phat-item (hai lượt đi-về mạng, hai lần kiểm quyền). `phat: true` ⇒ phát luôn
   // bước đầu trong CÙNG lượt, kết quả phát (kể cả lỗi) nằm trong khoá `phat` — máy em xử lý y như khi tự gọi phat-item. Máy em bản cũ không gửi cờ ⇒ như cũ.
   if (b.phat !== true || !r.ok) return r
@@ -240,17 +240,17 @@ export async function moDot(env: Env, b: Obj): Promise<Response> {
   return Response.json({ ...j, phat: await ph.json() })
 }
 /** 24/10 (em 10044 «Vẫn lỗi»): danh sách mời theo hàng đợt chữa còn mở, mở đợt dựng lại lỗi từ sổ học sống ⇒ sổ đã đóng lỗi mà hàng đợt chưa đóng thì
- *  em bấm vào chỉ thấy «Chưa mở được câu này» mãi, chặng kẹt. Sổ ĐÃ đóng (`daThay`: có lần sai trong sổ, nay đã đủ lần đúng) ⇒ đóng luôn hàng đợt
+ *  em bấm vào chỉ thấy «Chưa mở được câu này» mãi, chặng kẹt. Sổ ĐÃ đóng (`dong`: có lần sai trong sổ, nay đã đủ lần đúng, và đang ở lệnh mở của em) ⇒ đóng luôn hàng đợt
  *  (da_tu_sua, khoá revision — như hàng sinh ra đã đóng ở `trangThaiDayBanDau`). Sổ không thấy lần sai nào (chưa công bố…) ⇒ KHÔNG đóng, vì lần sai có thể hiện
  *  lại. Cả hai trường hợp trả kèm `dotId` để máy em tính «xong phần hôm nay» thay vì dừng ở lỗi. Đường lỗi: thêm một lượt đọc, không đụng đường thường. */
-async function chuaCoLoi(env: Env, sbd: string, qid: string, daThay: boolean): Promise<Response> {
+async function chuaCoLoi(env: Env, sbd: string, qid: string, dong: boolean): Promise<Response> {
   const mo = await env.DB.prepare(
     `SELECT id,revision FROM chua_loi_dot WHERE sbd=? AND dong_luc IS NULL AND (qid_chuan=? OR (content_group<>'' AND content_group=(SELECT content_group FROM game_v2_question WHERE qid=? LIMIT 1))) ORDER BY giao_luc ASC,id ASC LIMIT 4`,
   )
     .bind(sbd, qid, qid)
     .all<{ id: string; revision: number }>()
   const ds = mo.results ?? []
-  if (daThay && ds.length) {
+  if (dong && ds.length) {
     const now = Date.now()
     await env.DB.batch(
       ds.map((x) =>
@@ -261,7 +261,7 @@ async function chuaCoLoi(env: Env, sbd: string, qid: string, daThay: boolean): P
     )
   }
   return Response.json(
-    { ok: false, ma: 'CHUA_CO_LOI', mo: 'Câu này chưa có lỗi đang mở đã công bố.', ...(ds[0] ? { dotId: ds[0].id, daDong: daThay } : {}) },
+    { ok: false, ma: 'CHUA_CO_LOI', mo: 'Câu này chưa có lỗi đang mở đã công bố.', ...(ds[0] ? { dotId: ds[0].id, daDong: dong } : {}) },
     { status: 404 },
   )
 }
@@ -269,6 +269,8 @@ export async function giaoDotCuaEm(
   env: Env,
   sbd: string,
   qidVao: string,
+  /** CHỈ máy em mở câu (`moDot`) mới được đóng đợt lệch sổ; lô giao của thầy (chua-cau-sai-thay) giữ nguyên, không ghi thêm. */
+  choDongDotLech = false,
 ): Promise<Response> {
   const qid = qidChuan(qidVao)
   if (!qid || qid.length > 120)
@@ -280,7 +282,7 @@ export async function giaoDotCuaEm(
   for (const p of [cfgSom, hSom, qSom]) p.catch(() => {})
   const dau = await dauSom
   if (!dau || ['dong', 'khong_loi'].includes(dau.loiHoc.trangThai))
-    return chuaCoLoi(env, sbd, qid, !!dau)
+    return chuaCoLoi(env, sbd, qid, !!dau && choDongDotLech)
   const [cfg, h, q] = await Promise.all([cfgSom, hSom, qSom]),
     now = Date.now()
   const cu = await env.DB.prepare(
@@ -289,7 +291,7 @@ export async function giaoDotCuaEm(
     .bind(sbd, qid, q?.group ?? '')
     .first<Obj>()
   if (cu && cu.qid_chuan !== qid)
-    return giaoDotCuaEm(env, sbd, str(cu.qid_chuan))
+    return giaoDotCuaEm(env, sbd, str(cu.qid_chuan), choDongDotLech)
   const id = cu
     ? str(cu.id)
     : 'cl-' + (await bam([sbd, q?.group || qid, dau.moLuc])).slice(0, 40)
@@ -333,7 +335,7 @@ export async function giaoDotCuaEm(
     )
       .bind(sbd, qid, q?.group ?? '')
       .first<{ qid_chuan: string }>()
-    if (winner) return giaoDotCuaEm(env, sbd, winner.qid_chuan)
+    if (winner) return giaoDotCuaEm(env, sbd, winner.qid_chuan, choDongDotLech)
     return loi('LOI_MAY_CHU', 'Chưa lưu được đợt chữa.', 503)
   }
   // Học liệu được duyệt sau khi giao: mở lại đợt cũ, giữ mẫu số và cửa sổ đo.
