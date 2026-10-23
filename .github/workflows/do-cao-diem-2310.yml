@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 10
     env:
       GIO: '4.5'
-      DEN: '2026-10-22T16:30:00Z'
+      DEN: '2026-10-21T16:30:00Z'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
@@ -71,7 +71,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
-          W="luc >= '2026-10-22T12:00:00Z' AND luc < '2026-10-22T16:30:00Z'"
+          W="luc >= '2026-10-21T12:00:00Z' AND luc < '2026-10-21T16:30:00Z'"
           q "1 nhat_ky_may trong khung, theo nguồn · mức" "SELECT nguon, muc, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhat_ky_may WHERE $W GROUP BY 1,2 ORDER BY n DESC LIMIT 40"
           q "2 lượt làm câu theo 15 phút (giờ VN) · số em" "SELECT strftime('%H:', luc, '+7 hours') || printf('%02d', (CAST(strftime('%M', luc) AS INTEGER)/15)*15) k, COUNT(*) luot, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE $W GROUP BY 1 ORDER BY 1"
           q "3 lượt theo nguồn trong khung" "SELECT nguon, COUNT(*) luot, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE $W GROUP BY 1 ORDER BY 2 DESC"
