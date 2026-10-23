@@ -14,7 +14,7 @@ vi.mock('../src/lib/muc-lam-lo-api', async (goc) => ({ ...(await goc<typeof impo
 import type { EmNhipHoc } from '../server/src/nhip-hoc-kieu'
 import type { KetQuaBac } from '../server/src/bac-cham-chi'
 import { tongTreoMay } from '../server/src/muc-lam-lo'
-import BanChieuDiemDanh, { type PropsBanChieu } from '../src/components/day-hoc/BanChieuDiemDanh'
+import BanChieuDiemDanh, { chuMaDoi, type PropsBanChieu } from '../src/components/day-hoc/BanChieuDiemDanh'
 import { CHO_HOI_MUC_LAM_MS, useMucLamLo } from '../src/components/day-hoc/Buoc1DiemDanh'
 import { cachEm, dsTreoMay, phutTreo, tongCachLop } from '../src/components/day-hoc/chieu-treo'
 import { docMucLamEm, type MucLamEm } from '../src/lib/muc-lam-lo-api'
@@ -36,7 +36,20 @@ describe('phép thuần: Cách làm bài + Treo máy', () => {
   it('Vội = Mức 1–2 · Có nghĩ = 3–4 · Treo = Treo + Cố tình; tổng chỉ cộng em có số, nêu rõ số em có số', () => {
     expect(cachEm(M.get('A')!)).toEqual({ voi: 4, nghi: 6, treo: 3 })
     const t = tongCachLop(['A', 'B', 'C', 'D'], M)
-    expect(t).toMatchObject({ soEm: 4, soEmCoSo: 3, voi: 6, nghi: 18, treo: 6, soDo: 30, sai: 9, saiVoi: 6, giayTreo: 1300, soEmTreo: 2, chuaDoTreo: 3 })
+    expect(t).toMatchObject({ soEm: 4, soEmCoSo: 3, voi: 6, nghi: 18, treo: 6, soDo: 30, sai: 9, saiVoi: 6, giayTreo: 1300, phutTreo: 22, soEmTreo: 2, chuaDoTreo: 3 })
+  })
+  it('phút treo cả lớp = TỔNG phút từng em như màn hiện (3 em × 89 giây ⇒ 1 + 1 + 1 = 3 phút, không phải 4)', () => {
+    const M3 = new Map(['X', 'Y', 'Z'].map((s) => [s, ml([1, 0, 0, 0], 1, 0, { giayTreo: 89, soNgayTreo: 1 })] as const))
+    const t = tongCachLop(['X', 'Y', 'Z'], M3)
+    expect([t.giayTreo, t.phutTreo]).toEqual([267, 3])
+    expect(dsTreoMay(['X', 'Y', 'Z'].map((sbd) => ({ sbd, hoTen: sbd })), M3).reduce((a, d) => a + d.phut!, 0)).toBe(t.phutTreo)
+  })
+  it('«Mã đổi sau»: chỉ đếm khi khớp lý; về 0 ⇒ «Đang đổi mã…»; giờ máy thầy lệch xa ⇒ không đếm (chữ "Mã đổi mỗi phút")', () => {
+    expect(chuMaDoi(100_000, 62_000)).toEqual({ con: 38_000, dangDoi: false })
+    expect(chuMaDoi(100_000, 100_500)).toEqual({ con: 0, dangDoi: true })
+    expect(chuMaDoi(100_000, 20_000)).toEqual({ con: null, dangDoi: false }) // còn 80 s > một chu kỳ ⇒ máy thầy chậm giờ
+    expect(chuMaDoi(100_000, 200_000)).toEqual({ con: null, dangDoi: false }) // quá 15 s sau mốc ⇒ máy thầy nhanh giờ
+    expect(chuMaDoi(null, 1)).toEqual({ con: null, dangDoi: false })
   })
   it('em treo mà máy chủ chưa gửi giây treo ⇒ phút cả lớp null (màn ghi "—"), không cộng thiếu', () => {
     const M2 = new Map(M)
@@ -115,7 +128,7 @@ describe('bản B — Cách cả lớp làm bài + cột Treo máy', () => {
     const p = props()
     render(<BanChieuDiemDanh {...p} />)
     const cot = screen.getByRole('region', { name: /^Treo máy/ })
-    expect(cot.querySelector('h2')!.textContent).toBe('Treo máy2 em14 ngày · rời câu lâu không làm')
+    expect(cot.querySelector('h2')!.textContent).toBe('Treo máy2 em14 ngày · em có mặt · rời câu lâu không làm')
     expect([...cot.querySelectorAll('.ddv-treo-tong p')].map((x) => x.textContent)).toEqual(['6lượt treo', '29phút treo', '2em có treo'])
     const dong = [...cot.querySelectorAll<HTMLButtonElement>('.ddv-treo-dong')]
     expect(dong.map((d) => d.textContent)).toEqual(['Hoàng Đức Duy3 ngày · 25 phút5lượt', 'Chu Hải Chi1 ngày · 4 phút1lượt'])

@@ -47,7 +47,7 @@ import { chuBuoi } from '../chien-dich/buoi-day-ui'
 import HuyHieuBac from '../bac-cham-chi/HuyHieuBac'
 import { BAC_CHAM_CHI, chuBac, chuBacSo, motBac, SO_BAC } from '../bac-cham-chi/bac'
 import { chuVuaVao, coBacBuoi, dauLop, demThang, emVuaVao, lenBac, soThe, type DemThang } from './chieu-bac'
-import { cachEm, dsTreoMay, phutTreo, tongCachLop, type TongCachLop } from './chieu-treo'
+import { cachEm, dsTreoMay, tongCachLop, type TongCachLop } from './chieu-treo'
 import type { MucLamEm } from '../../lib/muc-lam-lo-api'
 import { apDungGiaoDien, docGiaoDien } from '../../lib/giao-dien-thay'
 import '../chieu-ma.css'
@@ -410,25 +410,39 @@ function VongCoMat({ co, tong }: { co: number; tong: number | null }) {
   )
 }
 
-/** "Mã đổi sau m:ss" — chỉ ô này đếm từng giây (không làm cả màn vẽ lại). */
+/**
+ * "Mã đổi sau m:ss" — chỉ ô này đếm từng giây (không làm cả màn vẽ lại). Mốc `doiMaLuc` là giờ MÁY CHỦ; lệnh buổi học không gửi giờ máy chủ nên
+ * đếm theo giờ máy thầy, và CHỈ đếm khi khớp lý (0 < còn ≤ một chu kỳ mã 60 s). Giờ máy lệch ⇒ chữ "Mã đổi mỗi phút" như trước (không đếm sai);
+ * về 0 mà lượt làm mới 5 giây chưa mang mã mới ⇒ "Đang đổi mã…" (không đứng ở 0:00).
+ */
+export const CHU_KY_MA_CHIEU_MS = 60_000
+export function chuMaDoi(luc: number | null, bay: number): { con: number | null; dangDoi: boolean } {
+  if (!luc) return { con: null, dangDoi: false }
+  const con = luc - bay
+  if (con > CHU_KY_MA_CHIEU_MS + 2_000 || con < -15_000) return { con: null, dangDoi: false } // giờ máy thầy lệch xa ⇒ không đếm
+  return con <= 0 ? { con: 0, dangDoi: true } : { con: Math.min(con, CHU_KY_MA_CHIEU_MS), dangDoi: false }
+}
 function MaDoiSau({ luc, xong }: { luc: number | null; xong: boolean }) {
   const [bay, setBay] = useState(() => Date.now())
   useEffect(() => {
     if (xong || !luc) return
+    setBay(Date.now())
     const t = window.setInterval(() => setBay(Date.now()), 1000)
     return () => window.clearInterval(t)
   }, [luc, xong])
   if (xong) return <p className="ddv-ma-phu">Buổi đã kết thúc — mã hết hiệu lực</p>
-  const con = luc ? Math.max(0, luc - bay) : null
+  const { con, dangDoi } = chuMaDoi(luc, bay)
   return (
     <>
       {con !== null && (
         <div className="ddv-ma-doi" aria-hidden="true">
-          <span style={{ width: `${Math.min(100, (100 * con) / 60_000)}%` }} />
+          <span style={{ width: `${(100 * con) / CHU_KY_MA_CHIEU_MS}%` }} />
         </div>
       )}
       <p className="ddv-ma-phu">
-        {con !== null ? (
+        {dangDoi ? (
+          'Đang đổi mã…'
+        ) : con !== null ? (
           <>
             Mã đổi sau{' '}
             <b>
@@ -721,7 +735,7 @@ function CotTreo({ ds, khoa, tong, mucLam, dang, loi, onMoEm }: { ds: readonly E
       <h2 id="ddv-cot-treo">
         <b>Treo máy</b>
         <span>{dong.length} em</span>
-        <small>14 ngày · rời câu lâu không làm</small>
+        <small>14 ngày · em có mặt · rời câu lâu không làm</small>
       </h2>
       {tong.soEmCoSo === 0 ? (
         <p className="ddv-treo-khong">{dang ? 'Đang tải số treo máy…' : loi ? `Chưa tải được: ${loi}` : 'Chưa có số Mức làm của lớp'}</p>
@@ -733,7 +747,7 @@ function CotTreo({ ds, khoa, tong, mucLam, dang, loi, onMoEm }: { ds: readonly E
               <small>lượt treo</small>
             </p>
             <p>
-              <b>{tong.giayTreo === null ? '—' : phutTreo(tong.giayTreo)}</b>
+              <b>{tong.phutTreo === null ? '—' : tong.phutTreo}</b>
               <small>phút treo</small>
             </p>
             <p>
@@ -983,7 +997,7 @@ function ChieuNhipLop({ tt, tk, nhip, matKetNoi, mucLam, mucLamDang, mucLamLoi, 
                   {tong.treo > 0 && (
                     <span data-k="treo" style={{ flexGrow: Math.max(tong.treo, tong.soDo * 0.06) }}>
                       <Pause aria-hidden="true" />
-                      <b>Treo máy</b> {tong.treo} lượt{tong.giayTreo !== null ? ` · ${phutTreo(tong.giayTreo)} phút` : ''}
+                      <b>Treo máy</b> {tong.treo} lượt{tong.phutTreo !== null ? ` · ${tong.phutTreo} phút` : ''}
                     </span>
                   )}
                 </div>

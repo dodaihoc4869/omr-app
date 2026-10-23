@@ -21,12 +21,14 @@ export interface TongCachLop extends CachEm {
   saiVoi: number | null
   /** Tổng giây treo — null khi có em treo mà thiếu `giayTreo`. */
   giayTreo: number | null
+  /** Phút treo cả lớp = TỔNG phút từng em đúng như màn hiện (mỗi em làm tròn riêng) — thầy cộng tay cột Treo máy phải khớp ô tổng. null như `giayTreo`. */
+  phutTreo: number | null
   soEmTreo: number
   chuaDoTreo: number
 }
 
 export function tongCachLop(sbds: readonly string[], ml: ReadonlyMap<string, MucLamEm>): TongCachLop {
-  const t: TongCachLop = { soEm: sbds.length, soEmCoSo: 0, voi: 0, nghi: 0, treo: 0, soDo: 0, sai: 0, saiVoi: 0, giayTreo: 0, soEmTreo: 0, chuaDoTreo: 0 }
+  const t: TongCachLop = { soEm: sbds.length, soEmCoSo: 0, voi: 0, nghi: 0, treo: 0, soDo: 0, sai: 0, saiVoi: 0, giayTreo: 0, phutTreo: 0, soEmTreo: 0, chuaDoTreo: 0 }
   for (const s of new Set(sbds)) {
     const m = ml.get(s)
     if (!m) continue
@@ -44,8 +46,11 @@ export function tongCachLop(sbds: readonly string[], ml: ReadonlyMap<string, Muc
     }
     if (c.treo > 0) {
       t.soEmTreo++
-      if (m.giayTreo === undefined) t.giayTreo = null
-      else if (t.giayTreo !== null) t.giayTreo += m.giayTreo
+      if (m.giayTreo === undefined) t.giayTreo = t.phutTreo = null
+      else if (t.giayTreo !== null && t.phutTreo !== null) {
+        t.giayTreo += m.giayTreo
+        t.phutTreo += phutTreo(m.giayTreo)
+      }
     }
   }
   return t
