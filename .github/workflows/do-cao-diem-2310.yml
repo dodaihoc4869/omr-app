@@ -1,0 +1,77 @@
+# ĐO GIỜ CAO ĐIỂM TỐI 22/10 (CHỈ ĐỌC) — thầy 23/10: "app hs hôm qua kêu lag … Tối ưu triệt để tốc độ app giờ cao điểm phải tức thì hơn nữa". Bản sao của do-may-chu-2110 cho khung 19:00–23:30 VN 22/10 + đếm gộp nhat_ky_may / số lượt theo 15 phút.
+# Hỏi: D1 truy vấn nào tốn thời gian nhất 2 giờ qua · Worker omr số yêu cầu / lỗi / thời gian p50–p99 theo 5 phút (có trùng lúc phát hành 10:48 · 11:20 · 11:50 VN không?). Chỉ in số đếm + SQL rút gọn.
+name: Đo giờ cao điểm tối 22/10 (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-cao-diem-2310.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-cao-diem-2310-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GIO: '4.5'
+      DEN: '2026-10-22T16:30:00Z'
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: GraphQL D1 + Worker (chỉ đọc)
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC, GIO, DB_ID, DEN } = process.env
+          const den = DEN ? new Date(DEN) : new Date(), tu = new Date(den.getTime() - Number(GIO) * 3600_000)
+          const hoi = async (query, variables) => {
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ query, variables }) })
+            const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
+          }
+          const v = { acc: ACC, db: DB_ID, tu: tu.toISOString(), den: den.toISOString() }
+          console.log(`Khung: ${v.tu} → ${v.den} (${GIO} giờ)`)
+          const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1QueriesAdaptiveGroups(limit:50,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
+              count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`, v)
+          const ds = d1?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+          const tong = ds.reduce((n, x) => n + x.sum.queryDurationMs, 0)
+          console.log(`=== D1: ${ds.length} nhóm truy vấn đầu · tổng ${Math.round(tong / 1000)} s thời gian truy vấn ===`)
+          for (const x of ds) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 420)].join(' '))
+          const w = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:5,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den}){
+              sum{requests errors subrequests} quantiles{cpuTimeP50 cpuTimeP90 cpuTimeP99 durationP50 durationP90 durationP99}}}}}`, v)
+          console.log('=== Worker omr ===')
+          for (const x of w?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(JSON.stringify(x))
+          // Lỗi theo loại kết quả (exception / exceededCpu / exceededResources / …) — lỗi thật hay quá tải.
+          const wo = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:20,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den}){dimensions{status} sum{requests errors}}}}}`, v)
+          console.log('=== Worker omr theo trạng thái ===')
+          for (const x of wo?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(JSON.stringify(x))
+          // Theo từng 5 phút: lag có trùng lúc phát hành (bộ đệm trong máy Worker nguội) hay rải đều?
+          const w5 = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:60,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
+              dimensions{datetimeFiveMinutes} sum{requests errors} quantiles{durationP50 durationP90 durationP99 cpuTimeP99}}}}}`, v)
+          console.log('=== Worker omr theo 5 phút (UTC) ===')
+          for (const x of w5?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log([x.dimensions.datetimeFiveMinutes.slice(11, 16), `yc=${x.sum.requests}`, `loi=${x.sum.errors}`, `p50=${Math.round(x.quantiles.durationP50)}`, `p90=${Math.round(x.quantiles.durationP90)}`, `p99=${Math.round(x.quantiles.durationP99)}`, `cpu99=${Math.round(x.quantiles.cpuTimeP99)}`].join(' '))
+          JS
+      - name: D1 đếm gộp (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          W="luc >= '2026-10-22T12:00:00Z' AND luc < '2026-10-22T16:30:00Z'"
+          q "1 nhat_ky_may trong khung, theo nguồn · mức" "SELECT nguon, muc, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhat_ky_may WHERE $W GROUP BY 1,2 ORDER BY n DESC LIMIT 40"
+          q "2 lượt làm câu theo 15 phút (giờ VN) · số em" "SELECT strftime('%H:', luc, '+7 hours') || printf('%02d', (CAST(strftime('%M', luc) AS INTEGER)/15)*15) k, COUNT(*) luot, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE $W GROUP BY 1 ORDER BY 1"
+          q "3 lượt theo nguồn trong khung" "SELECT nguon, COUNT(*) luot, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE $W GROUP BY 1 ORDER BY 2 DESC"
