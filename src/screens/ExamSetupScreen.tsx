@@ -267,9 +267,10 @@ export default function ExamSetupScreen() {
     // Sheet) chứ không riêng API, mà ô sheet vẫn có thể là số.
     const nguon = (classList.length > 0 ? classList : (dsDangKy ?? [])).map((r) => ({ sbd: chuoi(r.sbd), hoTen: chuoi(r.hoTen), lop: chuoi(r.lop) }))
     const q = timTen.trim().toLowerCase()
-    const loc = nguon.filter((r) => r.sbd && (!lop.trim() || !r.lop || r.lop.trim() === lop.trim()) && (!q || r.hoTen.toLowerCase().includes(q) || r.sbd.toLowerCase().includes(q)))
+    // Em ĐANG được tích luôn hiện (kể cả khác lớp — vd tích theo điểm danh hôm nay) để thầy thấy và bỏ tích được.
+    const loc = nguon.filter((r) => r.sbd && (chonSbd.has(r.sbd) || !lop.trim() || !r.lop || r.lop.trim() === lop.trim()) && (!q || r.hoTen.toLowerCase().includes(q) || r.sbd.toLowerCase().includes(q)))
     return loc.sort((a, b) => a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd, 'vi'))
-  }, [classList, dsDangKy, timTen, lop])
+  }, [classList, dsDangKy, timTen, lop, chonSbd])
   // «Em đã điểm danh hôm nay» (thầy 23/10): tích sẵn đúng các em có mặt buổi học hôm nay rồi mở hộp chọn em để thầy chỉnh tiếp.
   const [ddHomNay, setDdHomNay] = useState<string[] | null>(null)
   const [dangTaiDd, setDangTaiDd] = useState(false)
