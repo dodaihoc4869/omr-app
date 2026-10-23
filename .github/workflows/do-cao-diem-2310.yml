@@ -26,35 +26,45 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
-      - name: GraphQL D1 hai khung (chỉ đọc)
+      - name: Tràn bộ nhớ theo giờ 13–22/10 + yêu cầu chết lúc lỗi (chỉ đọc)
         env:
           TOKEN: ${{ env.CF_TOKEN_SACH }}
           ACC: ${{ env.CF_ACC_SACH }}
         run: |
           node - <<'JS'
-          const { TOKEN, ACC, DB_ID } = process.env
+          const { TOKEN, ACC } = process.env
+          const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
           const hoi = async (query, variables) => {
-            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ query, variables }) })
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }) })
             const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
           }
-          for (const [ten, tu, den] of [['TRƯỚC LỖI 21:00–22:20 VN', '2026-10-22T14:00:00Z', '2026-10-22T15:20:00Z'], ['ĐANG LỖI 22:25–23:20 VN', '2026-10-22T15:25:00Z', '2026-10-22T16:20:00Z']]) {
-            for (const [sx, nhan] of [['sum_rowsRead_DESC', 'nhiều dòng đọc nhất'], ['sum_queryDurationMs_DESC', 'tốn thời gian nhất']]) {
-              const d = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
-                d1QueriesAdaptiveGroups(limit:15,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[${sx}]){
-                  count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`, { acc: ACC, db: DB_ID, tu, den })
-              console.log(`=== ${ten} · ${nhan} ===`)
-              for (const x of d?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []) console.log([`lan=${x.count}`, `docTong=${x.sum.rowsRead}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`].join(' ') + ' | ' + x.dimensions.query.replace(/\s+/g, ' ').slice(0, 260))
-            }
+          // 1 · Tràn bộ nhớ theo giờ (giờ VN) — mỗi ngày một lượt hỏi
+          console.log('=== exceededMemory / exceededCpu theo giờ VN (chỉ in giờ có lỗi) ===')
+          for (let d = 13; d <= 22; d++) {
+            const tu = new Date(Date.UTC(2026, 9, d - 1, 17)).toISOString(), den = new Date(Date.UTC(2026, 9, d, 17)).toISOString()
+            const x = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+              workersInvocationsAdaptive(limit:200,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den,status_in:["exceededMemory","exceededCpu","exceededResources"]}){dimensions{status datetimeHour} sum{requests}}}}}`, { acc: ACC, tu, den })
+            const ds = x?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []
+            const tong = ds.reduce((n, r) => n + r.sum.requests, 0)
+            const gio = ds.map((r) => `${String((new Date(r.dimensions.datetimeHour).getUTCHours() + 7) % 24).padStart(2, '0')}h:${r.dimensions.status.replace('exceeded', '')}=${r.sum.requests}`).sort()
+            console.log(`${d}/10 tổng=${tong} ${gio.join(' ')}`)
           }
+          // 2 · Workers Logs (observability): yêu cầu chết vì bộ nhớ 22:25–23:20 VN — đường dẫn / cron (không in thân, không in tham số)
+          const tu = Date.parse('2026-10-22T15:20:00Z'), den = Date.parse('2026-10-22T16:25:00Z')
+          const body = { queryId: 'tran-bo-nho-2210', timeframe: { from: tu, to: den }, view: 'events', limit: 100,
+            parameters: { datasets: ['cloudflare-workers'], filters: [{ key: '$metadata.service', operation: 'eq', type: 'string', value: 'omr' }, { key: '$workers.outcome', operation: 'eq', type: 'string', value: 'exceededMemory' }] } }
+          const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/workers/observability/telemetry/query`, { method: 'POST', headers: H, body: JSON.stringify(body) })
+          const j = await r.json().catch(() => null)
+          console.log('=== Workers Logs: HTTP', r.status, 'success', j?.success, JSON.stringify(j?.errors ?? []).slice(0, 400))
+          const ev = j?.result?.events?.events ?? []
+          const dem = new Map()
+          for (const e of ev) {
+            const w = e?.$workers ?? {}, m = e?.$metadata ?? {}
+            const duong = w?.event?.request?.path ?? (w?.eventType === 'scheduled' ? `cron ${w?.event?.cron ?? ''}` : (m.trigger ?? w?.eventType ?? '?'))
+            const k = `${w?.eventType ?? '?'} ${String(duong).replace(/\d{4,}/g, '#')}`
+            dem.set(k, (dem.get(k) ?? 0) + 1)
+          }
+          console.log('số sự kiện', ev.length)
+          for (const [k, n] of [...dem].sort((a, b) => b[1] - a[1])) console.log(n, k)
+          if (!ev.length && j?.result) console.log('KHÓA kết quả:', Object.keys(j.result).join(','), JSON.stringify(j.result).slice(0, 600))
           JS
-      - name: D1 đếm gộp (chỉ SELECT)
-        working-directory: server
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
-        run: |
-          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
-          W="luc >= '2026-10-21T12:00:00Z' AND luc < '2026-10-21T16:30:00Z'"
-          q "1 nhat_ky_may trong khung, theo nguồn · mức" "SELECT nguon, muc, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhat_ky_may WHERE $W GROUP BY 1,2 ORDER BY n DESC LIMIT 40"
-          q "2 lượt làm câu theo 15 phút (giờ VN) · số em" "SELECT strftime('%H:', luc, '+7 hours') || printf('%02d', (CAST(strftime('%M', luc) AS INTEGER)/15)*15) k, COUNT(*) luot, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE $W GROUP BY 1 ORDER BY 1"
-          q "3 lượt theo nguồn trong khung" "SELECT nguon, COUNT(*) luot, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE $W GROUP BY 1 ORDER BY 2 DESC"
