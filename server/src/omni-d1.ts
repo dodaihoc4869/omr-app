@@ -467,7 +467,8 @@ interface DemSo { n: number; r: number }
  */
 /** 14/10 (giờ cao điểm 13/10: 135 yêu cầu chết vì isolate vượt 128 MB): đo heap — 50.000 dòng sổ (17 cột, raw_json TB 73 ký tự) ≈ 47 MB, gần NỬA trần isolate.
  *  Hạ trần còn 15.000 dòng (≈ 14 MB, ~19 em × 775 dòng TB): em ngoài đệm đọc lại cả sổ (~11 ms) thay vì cả isolate bị giết. */
-export const TRAN_DONG_DEM_SO = 15_000
+// 22/10 (116 lỗi exceededMemory giờ cao điểm): dòng sổ mang `raw_json` + `subitem_json`, không đo byte ⇒ hạ trần 15.000 → 6.000 dòng mỗi isolate.
+export const TRAN_DONG_DEM_SO = 6_000
 const demSo = new DemTTL<{ rows: Row[] } & DemSo>(5 * 60_000, 100, TRAN_DONG_DEM_SO)
 const maxNhan = (rows: readonly Row[]): number => rows.reduce((m, x) => Math.max(m, Number(x.received_at) || 0), 0)
 async function docDongSoTho(env: Env, sbds: readonly string[], tuNhan?: number): Promise<Row[]> {

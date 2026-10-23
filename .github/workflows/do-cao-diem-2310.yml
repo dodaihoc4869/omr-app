@@ -1,0 +1,70 @@
+# ĐO GIỜ CAO ĐIỂM TỐI 22/10 (CHỈ ĐỌC) — thầy 23/10: "app hs hôm qua kêu lag … Tối ưu triệt để tốc độ app giờ cao điểm phải tức thì hơn nữa". Bản sao của do-may-chu-2110 cho khung 19:00–23:30 VN 22/10 + đếm gộp nhat_ky_may / số lượt theo 15 phút.
+# Hỏi: D1 truy vấn nào tốn thời gian nhất 2 giờ qua · Worker omr số yêu cầu / lỗi / thời gian p50–p99 theo 5 phút (có trùng lúc phát hành 10:48 · 11:20 · 11:50 VN không?). Chỉ in số đếm + SQL rút gọn.
+name: Đo giờ cao điểm tối 22/10 (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-cao-diem-2310.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-cao-diem-2310-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GIO: '4.5'
+      DEN: '2026-10-21T16:30:00Z'
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Tràn bộ nhớ theo giờ 13–22/10 + yêu cầu chết lúc lỗi (chỉ đọc)
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC } = process.env
+          const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
+          const hoi = async (query, variables) => {
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }) })
+            const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
+          }
+          // 1 · Tràn bộ nhớ theo giờ (giờ VN) — mỗi ngày một lượt hỏi
+          console.log('=== exceededMemory / exceededCpu theo giờ VN (chỉ in giờ có lỗi) ===')
+          for (let d = 13; d <= 22; d++) {
+            const tu = new Date(Date.UTC(2026, 9, d - 1, 17)).toISOString(), den = new Date(Date.UTC(2026, 9, d, 17)).toISOString()
+            const x = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+              workersInvocationsAdaptive(limit:200,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den,status_in:["exceededMemory","exceededCpu","exceededResources"]}){dimensions{status datetimeHour} sum{requests}}}}}`, { acc: ACC, tu, den })
+            const ds = x?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []
+            const tong = ds.reduce((n, r) => n + r.sum.requests, 0)
+            const gio = ds.map((r) => `${String((new Date(r.dimensions.datetimeHour).getUTCHours() + 7) % 24).padStart(2, '0')}h:${r.dimensions.status.replace('exceeded', '')}=${r.sum.requests}`).sort()
+            console.log(`${d}/10 tổng=${tong} ${gio.join(' ')}`)
+          }
+          // 2 · Workers Logs (observability): yêu cầu chết vì bộ nhớ 22:25–23:20 VN — đường dẫn / cron (không in thân, không in tham số)
+          const tu = Date.parse('2026-10-22T15:20:00Z'), den = Date.parse('2026-10-22T16:25:00Z')
+          const body = { queryId: 'tran-bo-nho-2210', timeframe: { from: tu, to: den }, view: 'events', limit: 100,
+            parameters: { datasets: ['cloudflare-workers'], filters: [{ key: '$metadata.service', operation: 'eq', type: 'string', value: 'omr' }, { key: '$workers.outcome', operation: 'eq', type: 'string', value: 'exceededMemory' }] } }
+          const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/workers/observability/telemetry/query`, { method: 'POST', headers: H, body: JSON.stringify(body) })
+          const j = await r.json().catch(() => null)
+          console.log('=== Workers Logs: HTTP', r.status, 'success', j?.success, JSON.stringify(j?.errors ?? []).slice(0, 400))
+          const ev = j?.result?.events?.events ?? []
+          const dem = new Map()
+          for (const e of ev) {
+            const w = e?.$workers ?? {}, m = e?.$metadata ?? {}
+            const duong = w?.event?.request?.path ?? (w?.eventType === 'scheduled' ? `cron ${w?.event?.cron ?? ''}` : (m.trigger ?? w?.eventType ?? '?'))
+            const k = `${w?.eventType ?? '?'} ${String(duong).replace(/\d{4,}/g, '#')}`
+            dem.set(k, (dem.get(k) ?? 0) + 1)
+          }
+          console.log('số sự kiện', ev.length)
+          for (const [k, n] of [...dem].sort((a, b) => b[1] - a[1])) console.log(n, k)
+          if (!ev.length && j?.result) console.log('KHÓA kết quả:', Object.keys(j.result).join(','), JSON.stringify(j.result).slice(0, 600))
+          JS
