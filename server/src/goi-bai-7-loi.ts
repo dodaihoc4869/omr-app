@@ -32,6 +32,9 @@ export function chonGoi7(a: {
   chiTrongMuc?: boolean
   /** Khi bật kiểm tra riêng: giữ chỗ thực cho ôn đến lịch, không để chữa/sửa ăn hết. */
   giuOn?: number
+  /** ÔN SỚM (thầy 23/10, em báo «3 câu chờ thầy bổ sung» ở 27/30): câu em ĐÃ làm, chưa tới lịch ôn — tầng CUỐI, chỉ lấp phần mức còn thiếu khi
+   *  câu mới / chữa / sửa / ôn đến lịch đã hết. Vai 'on' (phát như câu ôn). Vắng ⇒ hành vi cũ. */
+  onSom?: readonly string[]
 }): { viec: ViecGoi7[]; thieuPhu: number; tuLam: number; tiepCan: number } {
   const viec: ViecGoi7[] = [], used = new Set<string>()
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
@@ -63,6 +66,7 @@ export function chonGoi7(a: {
   them(a.on, 'on', Math.max(0,muc-viec.length))
   them(moi.map(q=>q.qid), 'moi', Math.max(0,muc-viec.length))
   for(const q of moi){if(viec.length>=muc)break;if(used.has(q.qid))continue;const huongDan=!a.sanSang.has(q.qid);viec.push({qid:q.qid,vai:huongDan?'tiep_can':'moi',huongDan});used.add(q.qid)}
+  them(a.onSom ?? [], 'on', Math.max(0, muc - viec.length))
   return { viec, thieuPhu, tuLam: viec.filter(x => !x.huongDan).length, tiepCan: viec.filter(x => x.huongDan).length }
 }
 
