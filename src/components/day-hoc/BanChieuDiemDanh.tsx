@@ -297,16 +297,22 @@ const KHOANG_BAC: Partial<Record<KhoaNhom, string>> = { cham: 'bậc 8–12', 'c
 const khoangNhom = (k: KhoaNhom, coBac: boolean): string =>
   coBac && KHOANG_BAC[k] ? KHOANG_BAC[k]! : k === 'moi' ? `chưa đủ ${LUAT_NHOM_NHIP.soNgayToiThieu} ngày` : k === 'chua-co' ? 'chưa có số nhịp học' : ''
 
-/** Đo lại khi đổi khổ màn (toàn màn hình, xoay máy chiếu) và khi phông chữ nạp xong (chữ đổi cao ⇒ số dòng vừa khung đổi). */
+/**
+ * Đo lại khi đổi khổ màn (toàn màn hình, xoay máy chiếu) và MỖI đợt phông chữ nạp xong (chữ đổi cao ⇒ số dòng vừa khung đổi). Phông nạp nhiều
+ * đợt (mỗi độ đậm một tệp, nạp khi chữ cần) — `fonts.ready` chỉ báo đợt đang chờ lúc gọi, nên nghe thêm `loadingdone` cho các đợt sau.
+ */
 function useDoKhoLai(setKho: (f: (n: number) => number) => void): void {
   useEffect(() => {
     let song = true
     const doi = () => song && setKho((n) => n + 1)
+    const ff = typeof document !== 'undefined' ? document.fonts : undefined
     window.addEventListener('resize', doi)
-    void document.fonts?.ready.then(doi)
+    ff?.addEventListener?.('loadingdone', doi)
+    void ff?.ready.then(doi)
     return () => {
       song = false
       window.removeEventListener('resize', doi)
+      ff?.removeEventListener?.('loadingdone', doi)
     }
   }, [setKho])
 }

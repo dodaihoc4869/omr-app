@@ -76,7 +76,7 @@
 .ddv-bao svg { width: 1.3em; height: 1.3em; color: var(--ddc-luoi-chu); }
 
 /* ── THÂN · ĐIỂM DANH */
-.ddv-than { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 30fr) minmax(0, 70fr); gap: calc(20 * var(--u)); }
+.ddv-than { flex: 1; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 30fr) minmax(0, 70fr); gap: calc(20 * var(--u)); }
 .ddv-vao { min-height: 0; display: flex; flex-direction: column; gap: calc(16 * var(--u)); }
 .ddv-ma { flex: none; display: flex; flex-direction: column; align-items: center; gap: calc(10 * var(--u)); padding: calc(22 * var(--u)) calc(20 * var(--u)); border-radius: calc(28 * var(--u)); background: var(--gvm-mat); color: var(--gvm-xd-dam); border: 2px solid var(--gvm-xd-nen); text-align: center; }
 .ddv-ma-buoc { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; column-gap: 8px; row-gap: 0; font-size: var(--f22); font-weight: 600; }
@@ -230,7 +230,7 @@
 .ddv-cach-cau { margin: 0; font-size: max(calc(19 * var(--u)), 11px); color: var(--km-chu-phu); }
 .ddv-cach-cau b { color: var(--ddc-deu-chu); }
 
-.ddv-ba-cot { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.78fr); gap: calc(14 * var(--u)); }
+.ddv-ba-cot { flex: 1; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.78fr); gap: calc(14 * var(--u)); }
 .ddv-cot { min-height: 0; display: flex; flex-direction: column; gap: calc(8 * var(--u)); padding: calc(14 * var(--u)); border-radius: calc(22 * var(--u)); background: var(--ddc-cham-cot); border-top: max(calc(6 * var(--u)), 4px) solid var(--ddc-cham); overflow: hidden; }
 .ddv-cot[data-nhom='chua-deu'] { background: var(--ddc-deu-cot); border-top-color: var(--ddc-deu); }
 .ddv-cot[data-nhom='luoi'] { background: var(--ddc-luoi-cot); border-top-color: var(--ddc-luoi); }
