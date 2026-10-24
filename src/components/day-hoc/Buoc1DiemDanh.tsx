@@ -394,6 +394,8 @@ export default function Buoc1DiemDanh({
           )}
         </div>
 
+        {/* «Thêm em tay» mở NGAY DƯỚI nút (24/10, thầy: "thêm em tay ko bấm đc" — khung cũ nằm cuối trang, dưới lưới tên dài, bấm xong không thấy gì) */}
+        {khoiThem}
         {dangTaiBuoi ? (
           <p className="dh-phu" aria-busy="true">
             Đang tìm buổi học đang mở…
@@ -647,7 +649,6 @@ export default function Buoc1DiemDanh({
                 {dsCoMat}
               </details>
             )}
-            {khoiThem}
           </>
         )}
       </section>

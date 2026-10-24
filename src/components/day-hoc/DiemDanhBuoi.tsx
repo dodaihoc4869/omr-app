@@ -295,10 +295,18 @@ export function BuocDiemDanh({
         </button>
       </div>
     ) : null
-  // Thầy thêm em quên điện thoại / không quét được mã (ghi "thầy thêm").
+  // Thầy thêm em quên điện thoại / không quét được mã (ghi "thầy thêm"). Mở ⇒ cuộn khung vào tầm mắt + đặt con trỏ vào ô tìm (24/10).
+  const khungThem = useRef<HTMLDivElement>(null)
+  const coKhungThem = themMo && !buoiXong && !!tt
+  useEffect(() => {
+    if (!coKhungThem) return
+    const k = khungThem.current
+    k?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' })
+    k?.querySelector<HTMLInputElement>('input.dh-tim')?.focus({ preventScroll: true })
+  }, [coKhungThem])
   const khoiThem: ReactNode =
-    themMo && !buoiXong && tt ? (
-      <div className="dh-them" role="group" aria-labelledby="dh-them-ten">
+    coKhungThem && tt ? (
+      <div ref={khungThem} className="dh-them" role="group" aria-labelledby="dh-them-ten">
         <div className="dh-them-dau">
           <h3 id="dh-them-ten">Thêm em chưa điểm danh được</h3>
           <button type="button" className="m3-nut-chu dh-nut" onClick={() => setThemMo(false)}>
