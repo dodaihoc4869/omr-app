@@ -8,5 +8,7 @@ export { default as ModalKhacPhucCauSai } from './ModalKhacPhucCauSai'
 export { default as KhoiKhacPhuc3CheDo } from './KhoiKhacPhuc3CheDo'
 export { default as BtvnM3 } from './bang-nhiem-vu/BtvnM3'
 export { MomDanhSachM3, MomLamBaiM3 } from './bang-nhiem-vu/MomM3'
+// 25/10 (tức thì hơn nữa): tab «Xem điểm» (LichSuCaM3) cũng chỉ hiện khi em BẤM ⇒ vào mảnh này, lượt mở /hs bớt mã của nó.
+export { default as LichSuCaM3 } from './bang-nhiem-vu/LichSuCaM3'
 // Bong bóng A.I Đỗ Đại Học (24/10): cửa nạp nằm Ở ĐÂY (không ở StudentPortalScreen) ⇒ danh sách mảnh kèm của import() không vào lượt mở /hs; bong bóng vẫn là mảnh riêng ngoài precache.
 export const napBong = () => import('./ai-ddh/BongBongAiDdh')

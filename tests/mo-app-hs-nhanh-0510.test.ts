@@ -1,6 +1,7 @@
 // MỞ APP HỌC SINH NHANH (05/10, thầy: "nhanh gấp 2 lần", giữ nguyên giao diện): đoạn mã nội tuyến index.html chọn đúng nhóm mảnh theo đường
 // vào + phiên, chỉ HỎI SỚM lệnh Sảnh khi máy em đã đăng nhập và đã biết máy chủ; lệnh hỏi sớm chỉ được NHẬN đúng một lần, đúng địa chỉ + thân.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { readFileSync } from 'node:fs'
 import { KHOA_DIA_CHI_HS, KHOA_PHIEN_HS, LENH_HOI_SOM, taoMaNapTruoc, type BangNapTruoc } from '../src/lib/nap-truoc-man-em'
 import { batDauHoiSom, danhDauDaNhan, ghiDiaChiDaDung, layHoiSom, xemHoiSomDaVe } from '../src/lib/hoi-som'
 import { ghiNhoKetQuaSanh, type KetQuaSanh } from '../src/components/hoa2/api'
@@ -163,6 +164,30 @@ describe('đoạn mã nội tuyến — cổng học sinh', () => {
       expect(r.goi.map((g) => g.url), d + q).toEqual(hs.goi.map((g) => g.url))
     }
     expect(chay('/', '?vai=ph', o).them.map((t) => t.href)).toEqual(chay('/ph', '', o).them.map((t) => t.href))
+  })
+
+  // 25/10 (tức thì hơn nữa): cổng phụ huynh có gốc riêng `AppPhuHuynh` ⇒ bảng có `phVo` thì đường phụ huynh nạp vỏ + mảnh cổng, KHÔNG nạp App.tsx.
+  it('có nhóm phVo: /ph, /phu-huynh, ?vai=ph nạp vỏ phụ huynh + mảnh cổng, không App.tsx; đường khác không đổi', () => {
+    const B2: BangNapTruoc = { ...BANG, phVo: ['/assets/AppPhuHuynh-p.js'] }
+    const chay2 = (duong: string, q: string) => {
+      const them: The[] = []
+      const document = { head: { appendChild: (l: The) => them.push(l) }, createElement: () => ({ rel: '', href: '', crossOrigin: null }) as The, addEventListener: () => {} }
+      new Function('document', 'location', 'localStorage', 'navigator', 'window', 'fetch', taoMaNapTruoc(B2))(document, { pathname: duong, search: q }, { getItem: () => null }, { serviceWorker: { controller: null } }, {}, () => new Promise(() => {}))
+      return them.map((t) => t.href)
+    }
+    for (const [d, q] of [['/ph', ''], ['/phu-huynh', ''], ['/', '?vai=ph'], ['/ph/abcdefgh1234', '']]) expect(chay2(d, q), d + q).toEqual(['/assets/AppPhuHuynh-p.js', '/assets/ParentPortalScreen-d.js'])
+    expect(chay2('/t/123456', '')).toEqual(['/assets/App-e.js', '/assets/ExamTakeScreen-a.js'])
+    for (const d of ['/gv', '/p', '/']) expect(chay2(d, '')).toEqual(['/assets/App-e.js'])
+  })
+  it('main.tsx dựng gốc AppPhuHuynh cho cổng phụ huynh; gốc ấy cùng cây ChanLoi → Suspense → BatLinhShell vai="ph" → ParentPortalScreen như App.tsx', () => {
+    const ma = readFileSync('src/main.tsx', 'utf8')
+    expect(ma).toContain("import('./AppPhuHuynh')")
+    expect(ma).toMatch(/laCongPhuHuynh = dvMo\.vai === 'phuhuynh'/)
+    const vo = readFileSync('src/AppPhuHuynh.tsx', 'utf8')
+    expect(vo).toContain('<ChanLoi o="Cổng phụ huynh">')
+    expect(vo).toContain('<BatLinhShell vai="ph"><ParentPortalScreen /></BatLinhShell>')
+    expect(vo).not.toMatch(/from '\.\/App'/)
+    expect(readFileSync('src/App.tsx', 'utf8')).toContain('<BatLinhShell vai="ph"><ParentPortalScreen /></BatLinhShell>')
   })
 
   it('đường khác giữ nguyên: thi/phụ huynh nạp App.tsx + mảnh của mình; app thầy, phiếu, `/` trần chỉ nạp App.tsx', () => {
