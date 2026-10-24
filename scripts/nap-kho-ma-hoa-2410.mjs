@@ -1,6 +1,8 @@
 // NẠP ĐỀ LÊN KHO TỪ PHIÊN ĐÁM MÂY (thầy 24/10: «Đẩy lớp 10 luôn cho tôi đi»). Phiên đám mây không có mã bí mật ghi kho,
 // repo lại công khai ⇒ gói đề (có đáp án) KHÔNG được nằm trần trên git. Cách làm:
-//   · Khoá X25519 của máy chạy suy TẤT ĐỊNH từ secret OMR_MA_BI_MAT (băm SHA-256 kèm nhãn) ⇒ chỉ máy có secret mới giải được.
+//   · Khoá X25519 của máy chạy suy TẤT ĐỊNH từ secret khoá Cloudflare (KHOA_HAT, băm SHA-256 kèm nhãn) ⇒ chỉ máy có secret mới giải được.
+//   · Repo không có secret mã bí mật kho ⇒ (thầy cho phép 24/10) workflow chạy CHÍNH mã Worker của nhánh main bằng `wrangler dev`
+//     nối THẲNG D1/R2 thật (remote bindings), mã bí mật là chuỗi ngẫu nhiên của riêng lượt chạy. Đường ghi vẫn là luuDe → dayDeKho.
 //   · Không có tệp .nap-kho/*.enc ⇒ chỉ in KHOÁ CÔNG KHAI + nhãn `nhom` của vài tờ mẫu (không in đề/đáp án).
 //   · Có tệp ⇒ giải mã → cổng kiểm gói (tệp TS đóng gói sẵn) → CHỈ THÊM mã đề chưa có trong kho → `luuDe` (đúng đường nút
 //     «Đẩy file JSON» của app thầy) → dựng chỉ mục → đọc lại số câu. Log chỉ in mã đề và con số.
@@ -10,9 +12,10 @@ import { gunzipSync } from 'node:zlib'
 
 const MAY_CHU = (process.env.OMR_MAY_CHU || 'https://omr.ttadodaihoc.workers.dev').replace(/\/$/, '')
 const SECRET = (process.env.OMR_MA_BI_MAT || '').trim()
-if (!SECRET) { console.error('Thiếu OMR_MA_BI_MAT'); process.exit(2) }
+const HAT = (process.env.KHOA_HAT || '').trim()
+if (!SECRET || !HAT) { console.error('Thiếu OMR_MA_BI_MAT hoặc KHOA_HAT'); process.exit(2) }
 
-const hat = createHash('sha256').update('nap-kho-ma-hoa-2410|' + SECRET).digest()
+const hat = createHash('sha256').update('nap-kho-ma-hoa-2410|' + HAT).digest()
 const khoaRieng = createPrivateKey({ key: Buffer.concat([Buffer.from('302e020100300506032b656e04220420', 'hex'), hat]), format: 'der', type: 'pkcs8' })
 const congKhai = createPublicKey(khoaRieng).export({ type: 'spki', format: 'der' }).toString('base64')
 console.log('KHOA_CONG_KHAI ' + congKhai)

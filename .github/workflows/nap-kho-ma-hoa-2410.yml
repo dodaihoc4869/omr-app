@@ -1,5 +1,6 @@
-# NẠP ĐỀ MỚI LÊN KHO TỪ GÓI MÃ HOÁ (thầy 24/10). Gói đề có đáp án chỉ nằm trên git dưới dạng MÃ HOÁ (.nap-kho/*.enc),
-# khoá giải suy từ secret OMR_MA_BI_MAT ngay trên máy chạy. Log chỉ in mã đề + con số. CHỈ THÊM mã đề chưa có.
+# NẠP ĐỀ MỚI LÊN KHO TỪ GÓI MÃ HOÁ (thầy 24/10, thầy cho phép dùng khoá Cloudflare). Gói đề có đáp án chỉ nằm trên git dưới dạng
+# MÃ HOÁ (.nap-kho/*.enc), khoá giải suy từ secret khoá Cloudflare ngay trên máy chạy. Ghi bằng CHÍNH mã Worker của main
+# (wrangler dev + D1/R2 thật), mã bí mật ngẫu nhiên của riêng lượt chạy. Log chỉ in mã đề + con số. CHỈ THÊM mã đề chưa có.
 name: Nạp đề mới lên kho (gói mã hoá)
 on:
   workflow_dispatch:
@@ -14,18 +15,49 @@ concurrency:
 jobs:
   nap:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Mã máy chủ đang sống (main)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: srv
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: npm ci --ignore-scripts
+        working-directory: srv
       - name: Đóng gói cổng kiểm
         run: npx esbuild scripts/nap-kho-kiem-2410.ts --bundle --platform=node --format=esm --outfile=/tmp/nap-kho-kiem.mjs --log-level=warning
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chạy Worker main nối D1/R2 thật
+        working-directory: srv/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          MB=$(openssl rand -hex 24); echo "::add-mask::$MB"; echo "MB_LUOT=$MB" >> "$GITHUB_ENV"
+          # Cấu hình riêng lượt: DB và DE nối thật (remote = true), bỏ khối cron.
+          awk '/^\[triggers\]/{skip=1;next} /^\[/{skip=0} !skip{print} /^binding = "DB"$/||/^binding = "DE"$/{print "remote = true"}' wrangler.toml > wrangler.nap.toml
+          echo "Số binding nối thật: $(grep -c '^remote = true' wrangler.nap.toml)"
+          nohup npx -y wrangler@4 dev -c wrangler.nap.toml --ip 127.0.0.1 --port 8787 --var "MA_BI_MAT:$MB" > /tmp/wrangler-dev.log 2>&1 &
+          for i in $(seq 1 90); do curl -s -o /dev/null http://127.0.0.1:8787/ && break; sleep 2; done
+          curl -s -o /dev/null -w 'Worker cục bộ: %{http_code}\n' http://127.0.0.1:8787/
+          grep -iE 'remote|ready|error' /tmp/wrangler-dev.log | head -20 || true
       - name: Giải mã, kiểm, nạp
         env:
-          OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
+          OMR_MAY_CHU: http://127.0.0.1:8787
+          OMR_MA_BI_MAT: ${{ env.MB_LUOT }}
+          KHOA_HAT: ${{ env.CF_TOKEN_SACH }}
           KIEM_MJS: /tmp/nap-kho-kiem.mjs
         run: node scripts/nap-kho-ma-hoa-2410.mjs
+      - name: Nhật ký Worker cục bộ (dòng lỗi)
+        if: always()
+        run: grep -iE 'error|exception|✘' /tmp/wrangler-dev.log | head -30 || true
