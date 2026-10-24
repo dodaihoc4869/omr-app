@@ -3623,6 +3623,10 @@ const boXuLy = {
       // BẢNG "NHỊP HỌC CỦA EM" (thầy 12/10 duyệt bản vẽ, server/src/nhip-hoc-em.ts; hợp đồng nhip-hoc-kieu.ts): CHỈ ĐỌC, token của em, chỉ số của chính em.
       if (p === '/hs/nhip-hoc') return ra(await import('./nhip-hoc-em').then((m) => m.hsNhipHoc(envDoc, b)))
       if (p === '/hs/danh-gia') return ra(await import('./danh-gia-hoc-that-d1').then((m) => m.hsDanhGia(env, b)))
+      // BONG BÓNG A.I ĐỖ ĐẠI HỌC (thầy 24/10, server/src/ai-ddh.ts): em hỏi bài → hàng chờ văn phòng; token của em, máy chủ không tự giải.
+      if (p === '/hs/ai-ddh/mo') return ra(await import('./ai-ddh').then((m) => m.hsMoAiDdh(env, b)))
+      if (p === '/hs/ai-ddh/tin') return ra(await import('./ai-ddh').then((m) => m.hsTinAiDdh(env, b)))
+      if (p === '/hs/ai-ddh/gui') return ra(await import('./ai-ddh').then((m) => m.hsGuiAiDdh(env, b)))
       // HỒ SƠ LÀM BÀI CỦA EM (thầy 12/10 "cho hs bấm vào bảng lười chăm", server/src/ho-so-em-hs.ts): CHỈ ĐỌC, token của em, cùng lõi với hai lệnh thầy.
       if (p === '/hs/ho-so-thai-do') return ra(await import('./ho-so-em-hs').then((m) => m.hsHoSoThaiDo(envDoc, b)))
       if (p === '/hs/lich-su-lam-cau') return ra(await import('./ho-so-em-hs').then((m) => m.hsLichSuLamCau(envDoc, b)))
@@ -3789,6 +3793,17 @@ const boXuLy = {
       // MỨC LÀM THEO LÔ EM CÓ MẶT (thầy 20/10, bản vẽ 03 bảng điểm danh; server/src/muc-lam-lo.ts): CHỈ ĐỌC sổ của ≤ 40 em đang hiện trên bảng, 14 ngày. Không đụng `/gv/nhip-hoc`.
       if (p === '/gv/muc-lam-lo') return ra(await import('./muc-lam-lo').then((m) => m.gvMucLamLo(envDoc, b)))
       // XẾP HỌC SINH Học thật · Đối phó · Không dạy nổi · ĐUỔI (24/10, chưa phát hành — công tắc mặc định «chạy ngầm»; danh-gia-hoc-that-d1.ts).
+      // BONG BÓNG A.I ĐỖ ĐẠI HỌC — lệnh của VĂN PHÒNG (mã GV): hàng chờ, ảnh, kiểm câu chỉ gợi ý, câu cần tránh khi rút đề, trả lời; công tắc của thầy.
+      if (p.startsWith('/gv/ai-ddh/')) {
+        const m = await import('./ai-ddh')
+        const vi = p.slice('/gv/ai-ddh/'.length)
+        if (vi === 'hang-cho') return ra(await m.gvHangChoAiDdh(env, b))
+        if (vi === 'anh') return ra(await m.gvAnhAiDdh(env, b))
+        if (vi === 'kiem-cau') return ra(await m.gvKiemCauAiDdh(env, b))
+        if (vi === 'tranh') return ra(await m.gvTranhAiDdh(env, b))
+        if (vi === 'tra-loi') return ra(await m.gvTraLoiAiDdh(env, b))
+        if (vi === 'che-do') return ra(await m.gvCheDoAiDdh(env, b))
+      }
       if (p.startsWith('/gv/danh-gia/')) {
         const m = await import('./danh-gia-hoc-that-d1')
         const vi = p.slice('/gv/danh-gia/'.length)
