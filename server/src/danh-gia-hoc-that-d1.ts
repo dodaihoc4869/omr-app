@@ -80,9 +80,10 @@ export interface KetQuaEm {
 }
 
 /** Tính MỘT lô em (≤ LO_EM) cho tuần chứa `nowMs`, cửa sổ 14 ngày tới hôm nay. Không ghi gì. Ném lỗi khi không đọc được sổ. */
-export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number): Promise<KetQuaEm[]> {
+export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number, tuy: { chiDoc?: boolean } = {}): Promise<KetQuaEm[]> {
   if (!sbds.length) return []
-  await damBaoBangDanhGia(env)
+  // `chiDoc` (xem thử / đo trên dữ liệu thật trước khi phát hành): KHÔNG tạo bảng; bảng mới chưa có ⇒ các lượt đọc ấy trả rỗng (đã `.catch`).
+  if (!tuy.chiDoc) await damBaoBangDanhGia(env)
   const den = ngayVn7(nowMs), tu = congNgay7(den, -(SO_NGAY_CUA_SO - 1)), tuan = thuHaiCua(den)
   const tuIso = new Date(Date.parse(tu + 'T00:00:00Z') - 7 * 3600_000).toISOString()
   const ds = JSON.stringify(sbds)
@@ -288,6 +289,27 @@ export async function gvDanhGiaEm(env: Env, b: Row, nowMs = Date.now()): Promise
     lichSu: ls.map(banChupRa),
     canThiep: ct.map((x) => ({ id: str(x.id), loai: str(x.loai), noiDung: json(x.noi_dung, str(x.noi_dung) as unknown), tuan: str(x.tuan), guiLuc: str(x.gui_luc), emXem: str(x.em_xem_luc) || null, phXem: str(x.ph_xem_luc) || null, taoBoi: str(x.tao_boi) })),
   }
+}
+
+/** `POST /gv/danh-gia/thu {sau?}` — XEM THỬ CHỈ ĐỌC trên ≤ 25 em kế tiếp: chỉ trả SỐ ĐẾM gộp (không tên, không SBD), không tạo bảng, không ghi. Dùng để kiểm
+ *  ngưỡng trên dữ liệu thật trước khi bật (workflow do-danh-gia-thu-2410.yml). */
+export async function gvDanhGiaThu(env: Env, b: Row, nowMs = Date.now()): Promise<Row> {
+  const sau = str(b.sau)
+  const sbds = (await hoi(env, "SELECT sbd FROM hoc_sinh WHERE sbd > ?1 AND COALESCE(trang_thai, '') <> 'khoa' ORDER BY sbd LIMIT ?2", sau, LO_EM)).map((x) => str(x.sbd))
+  if (!sbds.length) return { ok: true, xong: true, soEm: 0 }
+  const ds = await tinhLoEm(env, sbds, nowMs, { chiDoc: true })
+  const dem: Record<string, number> = {}
+  const cong = (k: string, n = 1) => { dem[k] = (dem[k] ?? 0) + n }
+  for (const x of ds) {
+    cong(`bac_${x.bac.bac}`)
+    cong(`bacTuan_${x.kq.bacTuan}`)
+    cong(`diem_${x.kq.diem >= 90 ? '90+' : x.kq.diem >= 75 ? '75-89' : x.kq.diem >= 60 ? '60-74' : x.kq.diem >= 40 ? '40-59' : '<40'}`)
+    if (!x.kq.duDuLieu) cong('chuaDuDuLieu')
+    for (const p of x.kq.phat) { cong(`phat_${p.ma}`); if (p.xau) cong(`xau_${p.ma}`); if (p.coDo) cong(`coDo_${p.ma}`) }
+    cong('luot', x.kq.soLieu.soLuot); cong('luotDo', x.kq.soLieu.soDo); cong('thuoc', x.kq.soLieu.soThuoc); cong('bamVoi', x.kq.soLieu.soBamVoi)
+    cong('treo', x.kq.soLieu.soTreo); cong('coTinh', x.kq.soLieu.soCoTinh)
+  }
+  return { ok: true, soEm: ds.length, sau: sbds[sbds.length - 1], xong: sbds.length < LO_EM, dem }
 }
 
 /** `POST /gv/danh-gia/tinh-lai {sbds?}` — tính + lưu bản chụp tuần NGAY cho ≤ 25 em (vắng ⇒ lô kế tiếp theo con trỏ riêng). Màn hiệu chỉnh gọi lặp. KHÔNG làm việc tự động. */

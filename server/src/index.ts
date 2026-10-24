@@ -3794,6 +3794,7 @@ const boXuLy = {
         if (vi === 'lop') return ra(await m.gvDanhGiaLop(env))
         if (vi === 'em') return ra(await m.gvDanhGiaEm(env, b))
         if (vi === 'tinh-lai') return ra(await m.gvDanhGiaTinhLai(env, b))
+        if (vi === 'thu') return ra(await m.gvDanhGiaThu(envDoc, b))
         if (vi === 'can-thiep') return ra(await m.gvDanhGiaCanThiep(env, b))
         if (vi === 'nhan-mu') return ra(await m.gvDanhGiaNhanMu(env, b))
         if (vi === 'che-do') return ra(await m.gvDanhGiaCheDo(env, b))
