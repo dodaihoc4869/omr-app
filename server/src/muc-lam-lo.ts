@@ -14,7 +14,7 @@
 import type { Env } from './kieu'
 import { giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { tachSongSinh } from './loi-hoc-luat'
-import { docBetaCau, docTauEm } from './omni-d1'
+import { docBetaVaTau } from './omni-d1'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
 import { nangCoTinhTheoNgay, tongMucLam, type LapLai, type MucLamLuot } from './muc-lam'
 import { chuanMucDo, docDoMuc, gocCanBeta, lapLaiCacLuot, mucLamTuDong, type DoMucLuot } from './muc-lam-so'
@@ -162,12 +162,14 @@ export async function mucLamCacEm(env: Env, sbds: readonly string[], tu: string,
   const doThat = doThatCacDong(dong)
   const can = tapCanTraMucLam(dong, doThat)
   // MỘT đợt song song (β · kích thước đề · ước tính game) — như Lịch sử làm câu; lỗi từng khối ⇒ rỗng (lượt ấy vẫn "chưa có số đo", không hỏng cả lệnh).
+  // β + τ trong MỘT lệnh D1 (luật tốc độ).
+  const bt = can.gocMuc.length ? docBetaVaTau(env, can.gocMuc, sbds).catch(() => [new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>]) : Promise.resolve([new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>])
   const [uoc, beta, kichThuoc, tau] = await Promise.all([
     can.gameThieuGiay.length ? giayUocTinhGame(env, can.gameThieuGiay).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
-    can.gocMuc.length ? docBetaCau(env, can.gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    bt.then((x) => x[0]),
     can.gocCanKichThuoc.length ? docKichThuocCau(env, can.gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
     // τ riêng (ranh Mức 4) — CÙNG đợt, không thêm vòng chờ.
-    can.gocMuc.length ? docTauEm(env, sbds).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    bt.then((x) => x[1]),
   ])
   const lap = lapLaiCacLuot(dong.map((d) => ({ sbd: d.sbd, qid: d.qid ?? d.goc, tc: d.tc ?? null, luc: d.luc })))
   const theoEm = new Map<string, { mucLam?: MucLamLuot | null; dung: boolean | null; ngay: string }[]>(sbds.map((s) => [s, []]))

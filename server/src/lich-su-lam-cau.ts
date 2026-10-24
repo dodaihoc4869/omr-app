@@ -23,7 +23,7 @@ export { mucLam6, TOI_DA_LUOT_BANG_CHUNG } from './lich-su-6-muc' // hàm thuầ
 import { chiTietCauCuaLuot, giayUocTinhGame, noiCuaCa } from './ai-sai-cau'
 import { loaiGameCua } from './dau-gio'
 import { tachSongSinh } from './loi-hoc-luat'
-import { docBetaCau, docCauKho, docTauEm, tenCuaDang } from './omni-d1'
+import { docBetaVaTau, docCauKho, tenCuaDang } from './omni-d1'
 import { docKichThuocCau } from './cau-doc-giay'
 import { mucCongKhai, nangCoTinhTheoNgay, tongMucLam, type MucLamLuot } from './muc-lam'
 import { chuanMucDo, docDoMuc, lapLaiCacLuot, type DoMucLuot } from './muc-lam-so'
@@ -199,6 +199,8 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
   const { gocMuc, gocCanKichThuoc, gameThieuGiay } = tapCanTraMucLam(dong, doThat)
   // ĐO LẠI LƯỢT CŨ (21/10): kích thước đề (bảng tính sẵn) của các câu mà lượt chưa có `doc` — MỘT lệnh đọc CÙNG đợt, lỗi / bảng chưa có ⇒ rỗng (lượt cũ vẫn "Chưa có số đo").
   // CA THI KHÔNG ĐO LẠI: giây ca thi cũ chỉ cộng cho MỘT câu hiện nhiều nhất và bỏ qua lúc tab ẩn ⇒ có thể THIẾU (không phải chặn trên) — xếp mức từ đó sẽ sai chiều. Chỉ xin cho lượt CÓ THỂ có giây (cột/ms hoặc game có mốc trả lời).
+  // β + τ trong MỘT lệnh D1 (luật tốc độ).
+  const bt = gocMuc.length ? docBetaVaTau(env, gocMuc, [sbd]).catch(() => [new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>]) : Promise.resolve([new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>])
   const [kho, loai, rAtt, uoc, ct, beta, kichThuoc, tau] = await Promise.all([
     docCauKho(env, goc).catch(() => new Map<string, KhoGon>()) as Promise<Map<string, KhoGon>>,
     loaiGameCua(env, game.map((d) => d.maNguon)).catch(() => new Map<string, 'doan' | 'bia' | 'dao'>()),
@@ -207,10 +209,10 @@ export async function lichSuLamCauCuaEm(env: Env, sbd: string, gioiHanThan: unkn
       : Promise.resolve([] as Row[]),
     giayUocTinhGame(env, gameThieuGiay).catch(() => new Map<string, number>()),
     chiTietCauCuaLuot(env, caThi, [sbd]).catch(() => new Map<string, { chon: string | null; giay: number | null }>()),
-    gocMuc.length ? docBetaCau(env, gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    bt.then((x) => x[0]),
     gocCanKichThuoc.length ? docKichThuocCau(env, gocCanKichThuoc).catch(() => new Map<string, import('./cau-doc-giay').KichThuocCau>()) : Promise.resolve(new Map<string, import('./cau-doc-giay').KichThuocCau>()),
     // τ riêng (ranh Mức 4, 24/10) — CÙNG đợt.
-    gocMuc.length ? docTauEm(env, [sbd]).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    bt.then((x) => x[1]),
   ])
   const traLoiGame = new Map((rAtt ?? []).map((x) => [str(x.id), chonTuGiaTri(x.tra_loi)]))
   // Tên dạng: kho trước; câu không có trong kho (vd câu ca kiểm tra) ⇒ mã dạng của sổ (một truy vấn, đệm) — không có tên thì để rỗng (không lộ mã).

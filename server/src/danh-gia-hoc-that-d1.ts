@@ -14,7 +14,7 @@ import { sbdCuaPhuHuynh } from './ph-truy-cap'
 import { CHI_NHAN_TOKEN } from './ph-tat-ca-ve-con'
 import { giayUocTinhGame } from './ai-sai-cau'
 import { tachSongSinh } from './loi-hoc-luat'
-import { docBetaCau, docTauEm } from './omni-d1'
+import { docBetaVaTau } from './omni-d1'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
 import { nangCoTinhTheoNgay, type MucLamLuot } from './muc-lam'
 import { chuanMucDo, docDoMuc, lapLaiCacLuot } from './muc-lam-so'
@@ -139,11 +139,13 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
   const can = tapCanTraMucLam(dong, doThat)
   const tuanCau = str(rCauTuan[0]?.t)
   const qids = [...new Set(dong.map((d) => d.qid ?? ''))].filter(Boolean)
+  // β + τ trong MỘT lệnh D1 (luật tốc độ).
+  const bt = true ? docBetaVaTau(env, can.gocMuc, sbds).catch(() => [new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>]) : Promise.resolve([new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>])
   const [uoc, beta, kichThuoc, tau, rP] = await Promise.all([
     can.gameThieuGiay.length ? giayUocTinhGame(env, can.gameThieuGiay).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
-    can.gocMuc.length ? docBetaCau(env, can.gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    bt.then((x) => x[0]),
     can.gocCanKichThuoc.length ? docKichThuocCau(env, can.gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
-    docTauEm(env, sbds).catch(() => new Map<string, number>()),
+    bt.then((x) => x[1]),
     tuanCau && qids.length ? hoi(env, 'SELECT qid, n, dung FROM danh_gia_cau_tuan WHERE tuan = ?1 AND qid IN (SELECT value FROM json_each(?2))', tuanCau, JSON.stringify(qids)).catch(() => [] as Row[]) : Promise.resolve([] as Row[]),
   ])
   const pLop = new Map(rP.filter((x) => num(x.n) >= 5).map((x) => [str(x.qid), num(x.dung) / num(x.n)]))

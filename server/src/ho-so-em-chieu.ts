@@ -28,7 +28,7 @@ import { tiLeChienDich, soNgayGiua } from './srs2-loi'
 import { mocNhip, nhipEm } from './srs2-gv'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
-import { docBetaCau, docTauEm } from './omni-d1'
+import { docBetaVaTau } from './omni-d1'
 import { tachSongSinh } from './loi-hoc-luat'
 import { chuanMucDo, docDoMuc, gocCanBeta, lapLaiCacLuot, mucLamTuDong } from './muc-lam-so'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
@@ -169,16 +169,18 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
   const idGame = (lan ?? []).filter((x) => str(x.nguon) === 'game').map((x) => str(x.attempt_id) || `${str(x.ma_nguon)}|${qid}`)
   const phien = [...new Set((lan ?? []).filter((x) => str(x.nguon) === 'game').map((x) => str(x.ma_nguon)))]
   const caThi = [...new Set((lan ?? []).filter((x) => str(x.nguon) === 'thi').map((x) => str(x.ma_nguon)))]
+  // β + τ trong MỘT lệnh D1 (luật tốc độ).
+  const bt = gocMuc.length ? docBetaVaTau(env, gocMuc, [sbd]).catch(() => [new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>]) : Promise.resolve([new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>])
   const [rAtt, rPhien, rCt, beta, rTen, kichThuoc, uoc, tau] = await Promise.all([
     // 05/10: lượt BẢN XÁO (cau-anh-em.ts) lưu thêm `traLoiGoc` = đáp án em chọn quy về khung gốc — tờ chiếu so với câu gốc nên đọc khoá ấy trước.
     idGame.length ? hoi(env, "SELECT id, COALESCE(json_extract(json, '$.traLoiGoc'), json_extract(json, '$.traLoi')) AS tra_loi FROM game_v2_attempt WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(idGame)) : Promise.resolve([] as Row[] | null),
     phien.length ? hoi(env, "SELECT id, json_extract(json, '$.doan') IS NOT NULL AS doan, COALESCE(json_extract(json, '$.bia'), 0) AS bia FROM game_v2_session WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(phien)) : Promise.resolve([] as Row[] | null),
     caThi.length ? hoi(env, 'SELECT ma_ca, lan_thu, dap_an_chon FROM chi_tiet_cau WHERE sbd = ? AND qid = ? AND ma_ca IN (SELECT value FROM json_each(?))', sbd, qid, JSON.stringify(caThi)) : Promise.resolve([] as Row[] | null),
-    gocMuc.length ? docBetaCau(env, gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    bt.then((x) => x[0]),
     maDang.length ? hoi(env, "SELECT dang AS ma, MIN(json_extract(json, '$.tenDang')) AS ten FROM game_v2_question WHERE dang IN (SELECT value FROM json_each(?)) GROUP BY dang", JSON.stringify(maDang)) : Promise.resolve([] as Row[] | null),
     gocCanKichThuoc.length ? docKichThuocCau(env, gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
     gameThieu.length ? giayUocTinhGame(env, gameThieu.map((d) => ({ sbd, phien: d.maNguon }))).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
-    gocMuc.length ? docTauEm(env, [sbd]).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    bt.then((x) => x[1]),
   ])
   const tauEm = tau.get(sbd) ?? null
   for (const d of [...dongMuc, ...dong14]) Object.assign(d, { tau: tauEm })

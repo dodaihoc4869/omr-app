@@ -679,6 +679,21 @@ async function docBeta(env: Env, qids: readonly string[]): Promise<Map<string, n
     return ra
   }, ['omni_beta_cau'])
 }
+/** β của câu + τ của em trong MỘT lệnh D1 (UNION ALL) — luật tốc độ 13/10: ranh Mức làm 4 cần cả hai, đọc riêng thì mỗi lệnh lịch sử thêm một lệnh D1.
+ *  Lỗi (D1 cũ thiếu `omni_em`) ⇒ lùi đọc β riêng, τ rỗng. Nơi gọi không sửa Map trả về. */
+export async function docBetaVaTau(env: Env, qids: readonly string[], sbds: readonly string[]): Promise<[Map<string, number>, Map<string, number>]> {
+  if (!sbds.length) return [await docBeta(env, qids), new Map<string, number>()]
+  if (!qids.length) return [new Map<string, number>(), await docTauEm(env, sbds)]
+  const dq = dsJson(qids), de = dsJson(sbds)
+  return nhoTheoLuot(env.DB, `omni_beta_tau|${dq}|${de}`, async () => {
+    const r = await env.DB.prepare(`SELECT 'b' AS k, qid AS id, beta AS v FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?1))
+      UNION ALL SELECT 't', sbd, tau FROM omni_em WHERE n_tau >= 5 AND sbd IN (SELECT value FROM json_each(?2))`).bind(dq, de).all<Row>().catch(() => null)
+    if (!r) return [await docBeta(env, qids), new Map<string, number>()] as [Map<string, number>, Map<string, number>]
+    const beta = new Map<string, number>(), tau = new Map<string, number>()
+    for (const x of r.results ?? []) if (x.v != null && Number.isFinite(Number(x.v))) (str(x.k) === 'b' ? beta : tau).set(str(x.id), Number(x.v))
+    return [beta, tau] as [Map<string, number>, Map<string, number>]
+  }, ['omni_beta_cau', 'omni_em'])
+}
 /** τ OMNI của các em (đủ mẫu: `n_tau ≥ 5`) — ranh Mức làm 4 «Làm kỹ» theo thời gian thường RIÊNG của em (24/10: trước đó τ = 0 cho mọi em). Lỗi ⇒ rỗng. */
 export async function docTauEm(env: Env, sbds: readonly string[]): Promise<Map<string, number>> {
   if (!sbds.length) return new Map<string, number>()

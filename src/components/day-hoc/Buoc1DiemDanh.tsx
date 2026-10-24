@@ -264,7 +264,8 @@ export default function Buoc1DiemDanh({
   khoiThem: ReactNode
   onSangDauGio?: () => void
 }) {
-  const { tt, dangTaiBuoi, coMat, buoiXong, goc, themMo, setThemMo, moThem, ketThuc, chieuMa, setChieuMa, napLopEm } = dd
+  const { tt, dangTaiBuoi, coMat, buoiXong, goc, themMo, setThemMo, moThem, ketThuc, chieuMa, setChieuMa, napLopEm, doiCoPhep } = dd
+  const coPhep = useMemo(() => new Set(tt?.coPhep ?? []), [tt])
   const nhip = useNhipBuoi(!!tt)
   const bang = useMemo(() => nhipTheoSbd(nhip.kq), [nhip.kq])
   const tk = useMemo(() => thongKeBuoi(tt, bang), [tt, bang])
@@ -453,7 +454,18 @@ export default function Buoc1DiemDanh({
                     <p className="dd1-vang-tieu">
                       Vắng {tk.vang.length} em{nhip.kq ? ` — ${tk.vangLuoi} em đang Lười` : ''}
                     </p>
-                    <p className="dd1-vang-ten">{vangHien.map((e) => e.hoTen || `SBD ${e.sbd}`).join(' · ')}</p>
+                    {/* (24/10) Bấm tên em vắng ⇒ bật / gỡ «có phép» (vắng không phép mới tính vào xếp Học thật · Đối phó). */}
+                    <p className="dd1-vang-ten">
+                      {vangHien.map((e, i) => (
+                        <span key={e.sbd}>
+                          {i > 0 && ' · '}
+                          <button type="button" className="dd1-nut-chu" aria-pressed={coPhep.has(e.sbd)} title={coPhep.has(e.sbd) ? 'Bấm để gỡ có phép' : 'Bấm để đánh dấu vắng có phép'} onClick={() => void doiCoPhep(e.sbd, !coPhep.has(e.sbd))}>
+                            {e.hoTen || `SBD ${e.sbd}`}{coPhep.has(e.sbd) ? ' (có phép)' : ''}
+                          </button>
+                        </span>
+                      ))}
+                    </p>
+                    <p className="dd1-phu">Bấm tên em vắng để đánh dấu có phép.{coPhep.size ? ` Có phép ${[...coPhep].filter((s) => tk.vang.some((e) => e.sbd === s)).length} em.` : ''}</p>
                     {conVang > 0 && (
                       <button type="button" className="dd1-nut-chu" aria-expanded={moVang} onClick={() => setMoVang((v) => !v)}>
                         {moVang ? 'Thu gọn danh sách vắng' : `Xem ${conVang} em vắng còn lại ›`}

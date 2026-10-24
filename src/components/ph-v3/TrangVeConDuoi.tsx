@@ -20,6 +20,7 @@ import { BtBang, BtBut, BtChuY, BtDiLen, BtDiXuong, BtDongHo, BtLichSu, BtLop, B
 import type { Mau } from './dung-chung'
 import { diemCacCa, lienKetCa, TEN_PHAN } from './tien-ich'
 import { DamSo, DauThe, idPhan, LoiThe, type IdPhan, type TaiHoSo } from './TrangVeCon'
+import { layBaoCaoTuanCon, type BaoCaoTuanCon } from '../../lib/bao-cao-tuan-ph-api'
 import './trang-con-duoi.css'
 
 const HoSoCuaConPh = lazy(() => import('./HoSoCuaConPh'))
@@ -179,6 +180,7 @@ export default function PhanDuoi(p: PhanDuoiProps) {
   const nowMs = p.tq?.serverNow ?? p.pm.serverNow ?? Date.now()
   return (
     <>
+      <BaoCaoTuan sbd={p.sbd} />
       <ThaiDo hoSo={p.hoSo} napHoSo={p.napHoSo} />
       <CauSai hoSo={p.hoSo} tq={p.tq} pm={p.pm} moc={moc} napHoSo={p.napHoSo} moHoSo={() => setMoHoSo(true)} />
       <ThoiGian hoSo={p.hoSo} tq={p.tq} pm={p.pm} hoc2={p.hoc2} moc={moc} />
@@ -205,6 +207,50 @@ function The({ id, cot, children, vung }: { id: IdPhan; cot: string; children: R
 const Cho = ({ dong = 3 }: { dong?: number }) => (
   <div className="tvc-cho-dong" aria-hidden="true">{Array.from({ length: dong }, (_, i) => <span key={i} className="tt-xuong" />)}</div>
 )
+
+// ---------------------------------------------------------------- Báo cáo tuần (thầy 24/10) ----------------------------------------------------------------
+// 7 ngày tới hôm nay, mọi số do máy chủ đếm (server/src/bao-cao-tuan.ts); số nào không có thì không hiện. Nhận định chỉ khi thầy đã bật và tuần đó đã báo phụ huynh.
+export function BaoCaoTuan({ sbd }: { sbd: string }) {
+  const [bc, setBc] = useState<BaoCaoTuanCon | null>(null)
+  const [loi, setLoi] = useState('')
+  const tai = () => { setLoi(''); void layBaoCaoTuanCon(sbd).then((r) => (r.ok ? setBc(r.du) : setLoi(r.chu))) }
+  useEffect(tai, [sbd])
+  const pt = (a: number, b: number) => `${Math.round((100 * a) / b)}%`
+  const tongKt = bc ? bc.ktcn.nop + bc.ktcn.hetHan.length : 0
+  const tbKt = bc?.ktcn.diem.length ? bc.ktcn.diem.reduce((s, x) => s + x, 0) / bc.ktcn.diem.length : null
+  return (
+    <section id="phan-bao-cao-tuan" data-phan="bao-cao-tuan" className="tvc-the" data-cot="12" aria-labelledby="tvc-bao-cao-tuan" data-vung="bao-cao-tuan">
+      <DauThe id="tvc-bao-cao-tuan" bt={<BtLichSu co={20} />} mau="xd" tieuDe="Báo cáo tuần" phu={bc ? `${bc.tu} đến ${bc.den} · 7 ngày gần nhất` : 'Đang tổng hợp 7 ngày gần nhất…'} />
+      {!bc ? (
+        loi ? <LoiThe chu={`Chưa tải được báo cáo tuần. ${loi}`} thuLai={tai} nut="Tải lại báo cáo tuần" /> : <div role="status" aria-label="Đang tải báo cáo tuần"><Cho dong={3} /></div>
+      ) : (
+        <>
+          {bc.nhan && <p className="tvc-ket-luan" data-nhan={bc.nhan === 'Đối phó' ? 'doi-pho' : 'hoc-that'}><b>{bc.nhan}</b>{bc.lyDo[0] ? `: ${bc.lyDo[0]}.` : ''}</p>}
+          <dl className="tvc-luoi-so">
+            {bc.buoi && bc.buoi.tong > 0 && <div><dt>Đi học</dt><dd>{bc.buoi.coMat}/{bc.buoi.tong} <small>buổi{bc.buoi.coPhep ? `, có phép ${bc.buoi.coPhep}` : ''}</small></dd></div>}
+            <div><dt>Ngày có làm bài</dt><dd>{bc.ngayCoLam}/{bc.soNgay} <small>ngày</small></dd></div>
+            <div><dt>Câu đã làm</dt><dd>{bc.soCau} <small>{bc.soCau ? `câu, đúng ${pt(bc.soDung, bc.soCau)}` : 'câu'}</small></dd></div>
+            {tongKt > 0 && <div><dt>Kiểm tra cá nhân</dt><dd>{bc.ktcn.nop}/{tongKt} <small>bài nộp{tbKt !== null ? `, trung bình ${(Math.round(tbKt * 10) / 10).toString().replace('.', ',')}` : ''}</small></dd></div>}
+            {bc.banKhac && bc.banKhac.lam >= 5 && <div><dt>Câu bản khác của câu đã làm</dt><dd>{pt(bc.banKhac.dung, bc.banKhac.lam)} <small>đúng{bc.banKhacTruoc && bc.banKhacTruoc.lam >= 5 ? `, tuần trước ${pt(bc.banKhacTruoc.dung, bc.banKhacTruoc.lam)}` : ''}</small></dd></div>}
+          </dl>
+          {bc.mucLam && bc.mucLam.doDuoc > 0 && (
+            <>
+              <h3 className="tvc-tieu-nho">Cách làm bài · {bc.mucLam.doDuoc} câu đo được giờ làm</h3>
+              <dl className="tvc-luoi-so">
+                <div><dt>Làm nhanh vì đã thuộc</dt><dd>{bc.mucLam.thuoc} <small>câu</small></dd></div>
+                <div><dt>Bấm vội mà sai</dt><dd>{bc.mucLam.bamVoi} <small>câu</small></dd></div>
+                <div><dt>Để máy treo</dt><dd>{bc.mucLam.treo} <small>lần</small></dd></div>
+              </dl>
+            </>
+          )}
+          {bc.ngayKhongLam.length > 0 && <p className="tvc-phu">Ngày không làm câu nào: {bc.ngayKhongLam.join(', ')}.</p>}
+          {bc.ktcn.hetHan.length > 0 && <p className="tvc-phu">Kiểm tra cá nhân để hết hạn: {bc.ktcn.hetHan.join(', ')}.</p>}
+          {bc.chuyenDeYeu.length > 0 && <p className="tvc-phu">Chuyên đề sai nhiều: {bc.chuyenDeYeu.map((c) => `${c.ten} (sai ${c.sai}/${c.lam})`).join(', ')}.</p>}
+        </>
+      )}
+    </section>
+  )
+}
 
 // ---------------------------------------------------------------- 5 · Thái độ làm bài ----------------------------------------------------------------
 function ThaiDo({ hoSo, napHoSo }: { hoSo: TaiHoSo; napHoSo: () => void }) {

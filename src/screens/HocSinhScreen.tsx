@@ -67,9 +67,14 @@ export const TEN_MUC_HO_SO: Record<MucHoSo, string> = {
 }
 
 const ToanCanhHocTap = lazy(() => import('./ToanCanhEmScreen'))
+// Xếp học sinh Học thật · Đối phó (thầy 24/10): tải lười khi thầy mở mục, không gọi lệnh lúc mở màn.
+const BangHocThat = lazy(() => import('../components/hoc-that/BangHocThat'))
+const HoSoHocThatEm = lazy(() => import('../components/hoc-that/HoSoHocThatEm'))
 
 export default function HocSinhScreen() {
   const [moHocTap, setMoHocTap] = useState(false)
+  const [moHocThat, setMoHocThat] = useState(false)
+  const [moBangHocThat, setMoBangHocThat] = useState(false)
   const sbdDangXem = useAppStore((s) => s.sbdDangXem)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
   const [mucHoSo, setMucHoSo] = useState<MucHoSo>('tong-quan')
@@ -489,6 +494,7 @@ export default function HocSinhScreen() {
             </div>
 
             {hoa2 && <details className="hs-hoc-tap" onToggle={e => setMoHocTap(e.currentTarget.open)}><summary>Nhịp học, kiến thức và dòng thời gian</summary>{moHocTap && <Suspense fallback={<p role="status">Đang mở báo cáo học tập…</p>}><ToanCanhHocTap key={hoSo.em.sbd} sbdHoSo={hoSo.em.sbd} trongHoSo /></Suspense>}</details>}
+            <details className="hs-hoc-tap" onToggle={e => setMoHocThat(e.currentTarget.open)}><summary>Học thật và can thiệp</summary>{moHocThat && <Suspense fallback={<p role="status">Đang mở…</p>}><HoSoHocThatEm key={hoSo.em.sbd} sbd={hoSo.em.sbd} /></Suspense>}</details>
             {/* Các báo cáo kiểm tra trong cùng hồ sơ */}
             <div className="gv-student-actions grid grid-cols-1 sm:grid-cols-2 gap-2" role="tablist" aria-label="Mục hồ sơ">
               {(['bao-cao', 'lich-su'] as const).map((m) => {
@@ -716,6 +722,8 @@ export default function HocSinhScreen() {
           />
         </div>
       </div>
+
+      <details className="hs-hoc-tap" onToggle={e => setMoBangHocThat(e.currentTarget.open)}><summary>Xếp học sinh: Học thật · Đối phó</summary>{moBangHocThat && <Suspense fallback={<p role="status">Đang mở…</p>}><BangHocThat onMoEm={(sbd) => moHoSo(sbd)} /></Suspense>}</details>
 
       <TongHocPhi tong={tongHp} phamVi={phamViHp} loc={locHocPhi} onLoc={setLocHocPhi} loi={loiHocPhi || undefined} />
 
