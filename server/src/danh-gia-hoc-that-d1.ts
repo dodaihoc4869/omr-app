@@ -20,8 +20,9 @@ import { nangCoTinhTheoNgay, type MucLamLuot } from './muc-lam'
 import { chuanMucDo, docDoMuc, lapLaiCacLuot } from './muc-lam-so'
 import { doThatCacDong, giaySoLuot, mucLamCuaDong, tapCanTraMucLam, type DongMucSo } from './muc-lam-lo'
 import { congNgay7, ngayVn7 } from './goi-bai-7-loi'
+import { tenLopCuaEm } from './ten-lop'
 import {
-  bacCongKhai, bacTheoLichSu, danhGiaEm, TEN_BAC,
+  bacCongKhai, bacTheoLichSu, capTrungLoiSai, danhGiaEm, TEN_BAC,
   type BacDanhGia, type CanThiep, type KetLuanBac, type KetQuaDanhGia, type LoaiCanThiep, type LuotDanhGia, type TuanDaTinh,
 } from './danh-gia-hoc-that'
 
@@ -87,7 +88,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
   const den = ngayVn7(nowMs), tu = congNgay7(den, -(SO_NGAY_CUA_SO - 1)), tuan = thuHaiCua(den)
   const tuIso = new Date(Date.parse(tu + 'T00:00:00Z') - 7 * 3600_000).toISOString()
   const ds = JSON.stringify(sbds)
-  const [rSo, rKt, rThi, rHs, rBuoi, rDd, rLs, rCt, rCauTuan] = await Promise.all([
+  const [rSo, rKt, rThi, rHs, rBuoi, rDd, rLs, rCt, rCauTuan, rMoiLop, rSiSo] = await Promise.all([
     hoi(env, `SELECT s.sbd, s.qid, s.nguon, s.ma_nguon, s.ket_qua, s.giay, s.luc, s.muc_do, s.ngay_vn, s.assistance,
         CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.ms') END AS ms,
         CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.tc') END AS tc,
@@ -97,13 +98,29 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
         AND COALESCE(s.purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan', 'chua_buoc') AND COALESCE(s.visibility, '') <> 'embargoed'`, ds, tu, den),
     hoi(env, 'SELECT sbd, trang_thai, diem, ngay FROM kiem_tra_ca_nhan WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3 ORDER BY ngay', ds, tu, den).catch(() => [] as Row[]),
     hoi(env, 'SELECT sbd, so_lan_roi_man, tong_giay_roi_man FROM luot WHERE sbd IN (SELECT value FROM json_each(?1)) AND vao_luc >= ?2', ds, tuIso).catch(() => [] as Row[]),
-    hoi(env, 'SELECT sbd, lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?1))', ds).catch(() => [] as Row[]),
-    hoi(env, "SELECT id, lop FROM buoi_hoc WHERE mo_luc >= ?1 AND COALESCE(lop, '') <> ''", tuIso).catch(() => [] as Row[]),
+    // Buổi học lưu TÊN LỚP (`tenLopCuaEm`: cột `ten_lop` nếu có, không thì lớp mặc định theo khối) — so đúng tên ấy, như buoi-hoc.ts.
+    hoi(env, 'SELECT sbd, lop, ten_lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?1))', ds).catch(() => hoi(env, 'SELECT sbd, lop, NULL AS ten_lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?1))', ds)).catch(() => [] as Row[]),
+    hoi(env, 'SELECT id, lop FROM buoi_hoc WHERE mo_luc >= ?1', tuIso).catch(() => [] as Row[]),
     hoi(env, 'SELECT buoi_id, sbd, trang_thai FROM buoi_hoc_diem_danh WHERE sbd IN (SELECT value FROM json_each(?1))', ds).catch(() => [] as Row[]),
     hoi(env, 'SELECT * FROM danh_gia_em_tuan WHERE sbd IN (SELECT value FROM json_each(?1)) AND tuan < ?2 ORDER BY tuan DESC', ds, tuan).catch(() => [] as Row[]),
     hoi(env, 'SELECT sbd, loai, gui_luc, em_xem_luc, ph_xem_luc FROM can_thiep_em WHERE sbd IN (SELECT value FROM json_each(?1)) AND gui_luc >= ?2', ds, new Date(nowMs - 70 * 86_400_000).toISOString()).catch(() => [] as Row[]),
     hoi(env, 'SELECT MAX(tuan) AS t FROM danh_gia_cau_tuan').catch(() => [] as Row[]),
+    // Buổi «mọi lớp» (thầy không chọn lớp — 19/19 buổi tới 24/10): SUY lớp từ ai đã có mặt (mục dưới). MỘT câu gộp, cùng đợt.
+    hoi(env, `SELECT d.buoi_id, h.lop, h.ten_lop, COUNT(*) AS n FROM buoi_hoc_diem_danh d JOIN hoc_sinh h ON h.sbd = d.sbd
+      WHERE d.trang_thai = 'co_mat' AND d.buoi_id IN (SELECT id FROM buoi_hoc WHERE mo_luc >= ?1 AND COALESCE(lop, '') = '') GROUP BY d.buoi_id, h.lop, h.ten_lop`, tuIso).catch(() => [] as Row[]),
+    hoi(env, "SELECT lop, ten_lop, COUNT(*) AS n FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa' GROUP BY lop, ten_lop").catch(() => [] as Row[]),
   ])
+  // Buổi của lớp L = buổi gắn đúng lớp L, CỘNG buổi «mọi lớp» có ≥ max(3, 30% sĩ số L) em lớp L có mặt (lớp ấy thật sự học buổi đó).
+  const siSo = new Map<string, number>()
+  for (const x of rSiSo) { const l = tenLopCuaEm(x.lop, x.ten_lop); siSo.set(l, (siSo.get(l) ?? 0) + num(x.n)) }
+  const coMatLop = new Map<string, number>()
+  for (const x of rMoiLop) { const k = `${str(x.buoi_id)}|${tenLopCuaEm(x.lop, x.ten_lop)}`; coMatLop.set(k, (coMatLop.get(k) ?? 0) + num(x.n)) }
+  const buoiCuaLop = (lop: string): string[] => rBuoi.filter((x) => {
+    const l = str(x.lop)
+    if (l) return l === lop
+    const n = coMatLop.get(`${str(x.id)}|${lop}`) ?? 0
+    return n >= Math.max(3, 0.3 * (siSo.get(lop) ?? 0))
+  }).map((x) => str(x.id))
   // Lượt → Mức làm (CÙNG đường với Lịch sử làm câu / bảng điểm danh: hệ số lặp, τ riêng, β, đo lại lượt cũ).
   const dong: (DongMucSo & { chon: string; coGoiY: boolean })[] = rSo.map((x) => {
     const qid = str(x.qid), tc = str(x.tc)
@@ -134,7 +151,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
     luotEm.get(d.sbd)?.push({ m: mucLamCuaDong(d, doThat[i] ?? null, gs, beta, kichThuoc, { lap: lap[i] ?? null, tau: tau.get(d.sbd) ?? null }), d })
   })
   const ngayCuaSo = Array.from({ length: SO_NGAY_CUA_SO }, (_, i) => congNgay7(tu, i))
-  const lopEm = new Map(rHs.map((x) => [str(x.sbd), str(x.lop)]))
+  const lopEm = new Map(rHs.map((x) => [str(x.sbd), tenLopCuaEm(x.lop, x.ten_lop)]))
   const ra: KetQuaEm[] = []
   for (const sbd of sbds) {
     const ls = luotEm.get(sbd) ?? []
@@ -159,7 +176,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
     })
     const kt = rKt.filter((x) => str(x.sbd) === sbd)
     const lop = lopEm.get(sbd) ?? ''
-    const buoiLop = lop ? rBuoi.filter((x) => str(x.lop) === lop).map((x) => str(x.id)) : []
+    const buoiLop = lop ? buoiCuaLop(lop) : []
     const dd = rDd.filter((x) => str(x.sbd) === sbd && buoiLop.includes(str(x.buoi_id)))
     const ct: CanThiep[] = rCt.filter((x) => str(x.sbd) === sbd).map((x) => ({ loai: str(x.loai) as LoaiCanThiep, luc: str(x.gui_luc), emXem: str(x.em_xem_luc) || null, phXem: str(x.ph_xem_luc) || null }))
     const gianLan = ct.filter((c) => c.loai === 'gian_lan_xac_nhan' && c.luc >= tuIso).length
@@ -343,6 +360,19 @@ export async function gvDanhGiaCanThiep(env: Env, b: Row, nowMs = Date.now()): P
   await env.DB.prepare(`INSERT INTO can_thiep_em (id, sbd, loai, noi_dung, tuan, gui_luc, tao_boi) VALUES (?, ?, ?, ?, ?, ?, 'thay')`)
     .bind(id, sbd, loai, str(b.noiDung).slice(0, 2000) || null, thuHaiCua(ngayVn7(nowMs)), nay).run()
   return { ok: true, id }
+}
+
+/** `POST /gv/danh-gia/trung-loi {maCa}` — cặp em cùng ca thi chọn CÙNG đáp án SAI ở nhiều câu (đề nghị, chưa kết luận). Thầy xác nhận từng em qua `can-thiep`. */
+export async function gvDanhGiaTrungLoi(env: Env, b: Row): Promise<Row> {
+  const maCa = str(b.maCa)
+  if (!maCa) return { ok: false, error: 'Thiếu mã ca.' }
+  const [rows, hs] = await Promise.all([
+    hoi(env, 'SELECT sbd, phan, so_cau, qid, dap_an_chon, dung_sai FROM chi_tiet_cau WHERE ma_ca = ? AND lan_thu = 1', maCa),
+    hoi(env, 'SELECT sbd, ho_ten FROM hoc_sinh WHERE sbd IN (SELECT DISTINCT sbd FROM chi_tiet_cau WHERE ma_ca = ?)', maCa),
+  ])
+  const ten = new Map(hs.map((x) => [str(x.sbd), str(x.ho_ten)]))
+  const cap = capTrungLoiSai(rows.map((x) => ({ sbd: str(x.sbd), cau: str(x.qid) || `${str(x.phan)}-${num(x.so_cau)}`, chon: str(x.dap_an_chon), dung: x.dung_sai === null || x.dung_sai === undefined ? null : num(x.dung_sai) === 1 })))
+  return { ok: true, maCa, cap: cap.map((c) => ({ ...c, tenA: ten.get(c.a) ?? c.a, tenB: ten.get(c.b) ?? c.b })) }
 }
 
 const NHAN_MU = ['hoc_that', 'doi_pho', 'khong_day_noi'] as const

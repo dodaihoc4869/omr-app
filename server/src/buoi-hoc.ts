@@ -5,7 +5,8 @@
 //
 // BẢNG (chỉ-thêm, tạo lúc chạy — CI không tự chạy migration; y hệt `server/migration-2809-buoi-hoc.sql`):
 //   buoi_hoc            (id, ten, lop, bi_mat, mo_luc, het_han, dong_luc, cap_nhat_luc)
-//   buoi_hoc_diem_danh  (buoi_id, sbd, luc, cach 'ma'|'thay', trang_thai 'co_mat'|'bo', cap_nhat_luc) — "bớt em" chỉ đổi trạng thái, không xoá dòng.
+//   buoi_hoc_diem_danh  (buoi_id, sbd, luc, cach 'ma'|'thay', trang_thai 'co_mat'|'bo'|'co_phep', cap_nhat_luc) — "bớt em" chỉ đổi trạng thái, không xoá dòng;
+//                       'co_phep' (24/10) = thầy ghi em vắng có phép (mọi chỗ đếm có mặt đều lọc 'co_mat' nên không lẫn).
 //
 // CHỐNG ĐIỂM DANH HỘ (tối thiểu, thầy chốt): (1) em chỉ điểm danh cho CHÍNH MÌNH — SBD lấy từ token (`gameIdentity`), không nhận `sbd` trong thân;
 // (2) mã ĐỔI MỖI 60 GIÂY (HMAC của bí mật riêng từng buổi × số phút), nhận mã phút này + phút trước (≤ 2 phút) — chụp mã gửi bạn ở nhà là hết hạn;
@@ -176,6 +177,21 @@ export async function gvBuoiHoc(env: Env, b: Row, nowMs: number = Date.now()): P
     return xemBuoi(env, id, nowMs, false)
   }
 
+  // VẮNG CÓ PHÉP (24/10, xếp học sinh — «vắng không phép» chỉ tính phần còn lại): thầy đánh dấu em vắng có phép. Em ĐANG có mặt thì giữ có mặt.
+  // `bo-co-phep` gỡ đúng dấu ấy (chỉ xoá dòng 'co_phep', không đụng có mặt / bớt em).
+  if (action === 'co-phep' || action === 'bo-co-phep') {
+    const sbd = str(b.sbd)
+    if (!sbd || sbd.length > 40) return { ok: false, error: 'Chưa chọn em.' }
+    if (action === 'co-phep') {
+      await env.DB.prepare(
+        "INSERT INTO buoi_hoc_diem_danh (buoi_id, sbd, luc, cach, trang_thai, cap_nhat_luc) VALUES (?,?,?,'thay','co_phep',?) ON CONFLICT(buoi_id, sbd) DO UPDATE SET trang_thai = CASE WHEN buoi_hoc_diem_danh.trang_thai = 'co_mat' THEN 'co_mat' ELSE 'co_phep' END, cap_nhat_luc = excluded.cap_nhat_luc",
+      ).bind(id, sbd, nay, nay).run()
+    } else {
+      await env.DB.prepare("DELETE FROM buoi_hoc_diem_danh WHERE buoi_id = ? AND sbd = ? AND trang_thai = 'co_phep'").bind(id, sbd).run()
+    }
+    return xemBuoi(env, id, nowMs, b.kemLop === true)
+  }
+
   if (action === 'bot-em') {
     const sbd = str(b.sbd)
     if (!sbd) return { ok: false, error: 'Chưa chọn em.' }
@@ -328,5 +344,8 @@ export async function hsDiemDanh(env: Env, b: Row, nowMs: number = Date.now()): 
     await env.DB.prepare("INSERT INTO buoi_hoc_diem_danh (buoi_id, sbd, luc, cach, trang_thai, cap_nhat_luc) VALUES (?,?,?,'ma','co_mat',?) ON CONFLICT(buoi_id, sbd) DO NOTHING")
       .bind(id, sbd, nay, nay)
       .run()
+  // Thầy đã ghi «vắng có phép» mà em vẫn tới quét mã ⇒ có mặt (24/10).
+  else if (str(cu.trang_thai) === 'co_phep')
+    await env.DB.prepare("UPDATE buoi_hoc_diem_danh SET trang_thai = 'co_mat', cach = 'ma', luc = ?, cap_nhat_luc = ? WHERE buoi_id = ? AND sbd = ? AND trang_thai = 'co_phep'").bind(nay, nay, id, sbd).run()
   return { ok: true, buoi: { id, ten: str(buoi.ten), lop: str(buoi.lop), daDiemDanh: true } }
 }

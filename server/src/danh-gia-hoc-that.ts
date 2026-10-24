@@ -351,3 +351,32 @@ export function bacTheoLichSu(tuanNay: TuanDaTinh, truoc: readonly TuanDaTinh[],
   if (tuanNay.bacTuan === 3) return ket(3, [], truoc[0]?.bacTuan === 3 ? 'bao_ph' : 'nhac_em')
   return ket(tuanNay.bacTuan, [], null)
 }
+
+// ───────────────────────── TRÙNG LỖI SAI GIỮA HAI EM CÙNG CA THI (B7) ─────────────────────────
+// Cùng chọn MỘT phương án SAI ở cùng câu là dấu hiệu chép nhau mạnh nhất (đúng giống nhau thì không nói lên gì). Máy chỉ ĐỀ NGHỊ cặp nghi;
+// thầy xem rồi mới xác nhận (`can_thiep_em.loai = 'gian_lan_xac_nhan'`) — chưa xác nhận thì không tính vào Điểm Thật.
+export const NGUONG_TRUNG_LOI = { toiThieu: 5, tiLe: 0.6 } as const
+export interface CauCaThi { sbd: string; cau: string; chon: string; dung: boolean | null }
+export interface CapTrungLoi { a: string; b: string; trung: number; saiA: number; saiB: number; tiLe: number }
+/** Cặp em cùng ca có ≥ 5 câu chọn CÙNG đáp án SAI và số ấy ≥ 60% số câu sai của em ít sai hơn. Thuần. */
+export function capTrungLoiSai(ds: readonly CauCaThi[]): CapTrungLoi[] {
+  const saiCua = new Map<string, Map<string, string>>()
+  for (const x of ds) {
+    if (x.dung !== false || !x.chon.trim()) continue
+    const m = saiCua.get(x.sbd) ?? new Map<string, string>()
+    m.set(x.cau, x.chon.trim().toUpperCase())
+    saiCua.set(x.sbd, m)
+  }
+  const em = [...saiCua.keys()].sort()
+  const ra: CapTrungLoi[] = []
+  for (let i = 0; i < em.length; i++) {
+    for (let j = i + 1; j < em.length; j++) {
+      const A = saiCua.get(em[i]!)!, B = saiCua.get(em[j]!)!
+      let trung = 0
+      for (const [c, chon] of A) if (B.get(c) === chon) trung++
+      const tiLe = trung / Math.max(1, Math.min(A.size, B.size))
+      if (trung >= NGUONG_TRUNG_LOI.toiThieu && tiLe >= NGUONG_TRUNG_LOI.tiLe) ra.push({ a: em[i]!, b: em[j]!, trung, saiA: A.size, saiB: B.size, tiLe: Math.round(tiLe * 100) / 100 })
+    }
+  }
+  return ra.sort((x, y) => y.trung - x.trung)
+}

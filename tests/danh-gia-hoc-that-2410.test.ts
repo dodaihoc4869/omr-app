@@ -108,3 +108,15 @@ describe('Thang 5 bậc', () => {
     expect([1, 2, 3, 4, 5].map((b) => bacCongKhai(b as 1))).toEqual([1, 1, 3, 3, 3])
   })
 })
+
+describe('trùng lỗi sai cùng ca thi', () => {
+  it('≥ 5 câu chọn CÙNG đáp án sai ⇒ cặp nghi; đúng giống nhau / sai khác đáp án không tính', async () => {
+    const { capTrungLoiSai } = await import('../server/src/danh-gia-hoc-that')
+    const ds = [] as { sbd: string; cau: string; chon: string; dung: boolean | null }[]
+    for (let i = 0; i < 8; i++) {
+      ds.push({ sbd: 'A', cau: `Q${i}`, chon: 'B', dung: false }, { sbd: 'B', cau: `Q${i}`, chon: 'B', dung: false }, { sbd: 'C', cau: `Q${i}`, chon: i % 2 ? 'C' : 'D', dung: false })
+      ds.push({ sbd: 'A', cau: `R${i}`, chon: 'A', dung: true }, { sbd: 'C', cau: `R${i}`, chon: 'A', dung: true })
+    }
+    expect(capTrungLoiSai(ds)).toEqual([{ a: 'A', b: 'B', trung: 8, saiA: 8, saiB: 8, tiLe: 1 }])
+  })
+})

@@ -3798,6 +3798,7 @@ const boXuLy = {
         if (vi === 'can-thiep') return ra(await m.gvDanhGiaCanThiep(env, b))
         if (vi === 'nhan-mu') return ra(await m.gvDanhGiaNhanMu(env, b))
         if (vi === 'che-do') return ra(await m.gvDanhGiaCheDo(env, b))
+        if (vi === 'trung-loi') return ra(await m.gvDanhGiaTrungLoi(envDoc, b))
       }
       // BÀI HẰNG NGÀY + HỒ SƠ THÁI ĐỘ LÀM BÀI (thầy 12/10, server/src/bai-hang-ngay.ts; hợp đồng bai-hang-ngay-kieu.ts): CHỈ ĐỌC sổ — mức/đã làm/thiếu
       // từng ngày từ 12/10 của mọi em; một em: lịch hoạt động, tín hiệu có ngưỡng, kết luận theo luật.
