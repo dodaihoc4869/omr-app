@@ -14,10 +14,10 @@
 import type { Env } from './kieu'
 import { giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
 import { tachSongSinh } from './loi-hoc-luat'
-import { docBetaCau } from './omni-d1'
+import { docBetaCau, docTauEm } from './omni-d1'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
-import { nangCoTinhTheoNgay, tongMucLam, type MucLamLuot } from './muc-lam'
-import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong, type DoMucLuot } from './muc-lam-so'
+import { nangCoTinhTheoNgay, tongMucLam, type LapLai, type MucLamLuot } from './muc-lam'
+import { chuanMucDo, docDoMuc, gocCanBeta, lapLaiCacLuot, mucLamTuDong, type DoMucLuot } from './muc-lam-so'
 import { congNgay7, ngayVn7 } from './goi-bai-7-loi'
 
 type Row = Record<string, unknown>
@@ -44,6 +44,9 @@ export interface DongMucSo {
   /** Chỉ cần `ms` (giây đo thật) ở đây; dòng đầy đủ do nơi gọi giữ. */
   ms: unknown
   doMuc: DoMucLuot | null
+  /** (24/10) Mã câu ĐÚNG như sổ + mã câu gốc của bản song sinh (`raw_json.tc`) — để đếm lặp lại (`lapLaiCacLuot`). */
+  qid?: string
+  tc?: string
 }
 
 /** Giây ĐO THẬT từng dòng (`giayDoCuaLuot`: cột sổ ⇒ `raw_json.ms`). */
@@ -72,9 +75,9 @@ export function giaySoLuot(d: Pick<DongMucSo, 'nguon' | 'maNguon' | 'luc' | 'doM
 }
 
 /** Mức làm của một lượt (thuần). Giây cũ / ước tính chỉ dùng cho lượt KHÔNG phải ca thi. */
-export function mucLamCuaDong(d: DongMucSo, doThatI: number | null, gs: { g: number | null; loai: 'do' | 'cu' | 'uoc' | null }, beta: ReadonlyMap<string, number>, kichThuoc: ReadonlyMap<string, KichThuocCau>): MucLamLuot | null {
+export function mucLamCuaDong(d: DongMucSo, doThatI: number | null, gs: { g: number | null; loai: 'do' | 'cu' | 'uoc' | null }, beta: ReadonlyMap<string, number>, kichThuoc: ReadonlyMap<string, KichThuocCau>, them: { lap?: LapLai | null; tau?: number | null } = {}): MucLamLuot | null {
   return mucLamTuDong({
-    doMuc: d.doMuc, giayDo: doThatI, goc: d.goc, mucDo: d.mucDo, dung: d.ketQua === null ? null : d.ketQua === 1,
+    doMuc: d.doMuc, giayDo: doThatI, goc: d.goc, mucDo: d.mucDo, dung: d.ketQua === null ? null : d.ketQua === 1, lap: them.lap ?? null, tau: them.tau ?? null,
     ...((gs.loai === 'cu' || gs.loai === 'uoc') && d.nguon !== 'thi' ? { giayCu: gs.g, loaiCu: gs.loai as 'cu' | 'uoc' } : {}),
   }, beta, kichThuoc)
 }
@@ -152,20 +155,25 @@ export async function mucLamCacEm(env: Env, sbds: readonly string[], tu: string,
       ms: x.ms,
       // `doc` là chuỗi JSON của đối tượng `raw_json.doc` (json_extract trả văn bản); `docDoMuc` đọc như `raw.doc`.
       doMuc: docDoMuc({ doc: docDoc(x.doc) }),
+      qid,
+      tc,
     }
   })
   const doThat = doThatCacDong(dong)
   const can = tapCanTraMucLam(dong, doThat)
   // MỘT đợt song song (β · kích thước đề · ước tính game) — như Lịch sử làm câu; lỗi từng khối ⇒ rỗng (lượt ấy vẫn "chưa có số đo", không hỏng cả lệnh).
-  const [uoc, beta, kichThuoc] = await Promise.all([
+  const [uoc, beta, kichThuoc, tau] = await Promise.all([
     can.gameThieuGiay.length ? giayUocTinhGame(env, can.gameThieuGiay).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
     can.gocMuc.length ? docBetaCau(env, can.gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
     can.gocCanKichThuoc.length ? docKichThuocCau(env, can.gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
+    // τ riêng (ranh Mức 4) — CÙNG đợt, không thêm vòng chờ.
+    can.gocMuc.length ? docTauEm(env, sbds).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
   ])
+  const lap = lapLaiCacLuot(dong.map((d) => ({ sbd: d.sbd, qid: d.qid ?? d.goc, tc: d.tc ?? null, luc: d.luc })))
   const theoEm = new Map<string, { mucLam?: MucLamLuot | null; dung: boolean | null; ngay: string }[]>(sbds.map((s) => [s, []]))
   dong.forEach((d, i) => {
     const gs = giaySoLuot(d, doThat[i] ?? null, uoc)
-    theoEm.get(d.sbd)?.push({ mucLam: mucLamCuaDong(d, doThat[i] ?? null, gs, beta, kichThuoc), dung: d.ketQua === null ? null : d.ketQua === 1, ngay: d.ngay ?? '' })
+    theoEm.get(d.sbd)?.push({ mucLam: mucLamCuaDong(d, doThat[i] ?? null, gs, beta, kichThuoc, { lap: lap[i] ?? null, tau: tau.get(d.sbd) ?? null }), dung: d.ketQua === null ? null : d.ketQua === 1, ngay: d.ngay ?? '' })
   })
   const ra = new Map<string, MucLamEmLo>()
   for (const [s, luot] of theoEm) {

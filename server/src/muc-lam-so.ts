@@ -2,10 +2,10 @@
 // (Lịch sử làm câu, "Ai đã sai?" trên tờ chiếu, hồ sơ em lên bảng): cùng điều kiện xếp mức, cùng thời gian thường, không màn nào tự tính lại.
 //   · CHỈ xếp mức cho lượt có giây ĐO THẬT (cột `giay` / `raw_json.ms`) bằng đồng hồ MỚI (`raw_json.doc.dh = 1`) và có kích thước đề (`doc.t`, phần `doc.p`).
 //     Giây ước tính (game cũ), giây của ca thi cũ (`chi_tiet_cau`), giây đồng hồ cũ ⇒ KHÔNG có mức ("Chưa có số đo", không đoán).
-//   · Thời gian thường của em = e^(β)/1000 CHỈ khi câu có β thật (`omni_beta_cau`, τ = 0 — τ của OMNI chưa nối). Không β ⇒ không có Mức 4.
+//   · Thời gian thường của em = e^(β − τ)/1000 CHỈ khi câu có β thật (`omni_beta_cau`); τ riêng của em (`docTauEm`, 24/10), vắng ⇒ 0. Không β ⇒ không có Mức 4.
 // Không đọc D1 ở đây: nơi gọi tự đọc β (`docBetaCau`) trong CÙNG đợt `Promise.all` với các lượt đọc khác của mình (không thêm vòng chờ nối tiếp).
 import { msKyVong } from './omni-toc-do'
-import { mucLamCuaLuot, type MucLamLuot, type PhanMucLam } from './muc-lam'
+import { mucLamCuaLuot, type LapLai, type MucLamLuot, type PhanMucLam } from './muc-lam'
 import type { KichThuocCau } from './cau-doc-giay'
 import type { DoTreo } from './do-giay-luot'
 
@@ -60,6 +60,29 @@ export interface DongMucTho {
   /** ĐO LẠI LƯỢT CŨ (21/10): giây của đồng hồ CŨ ('cu': cột `giay` / `raw_json.ms` của lượt không có `doc.dh`) hoặc ƯỚC TÍNH ('uoc': mốc trả lời trước trong phiên game — `giayUocTinhGame`) — dùng khi lượt KHÔNG có số đo mới. */
   giayCu?: number | null
   loaiCu?: 'cu' | 'uoc'
+  /** (24/10) Câu em đã gặp (`lapLaiCacLuot`) ⇒ T_đọc ngắn lại. Vắng ⇒ câu mới. */
+  lap?: LapLai | null
+  /** (24/10) τ OMNI của em (`docTauEm`) ⇒ thời gian thường RIÊNG cho ranh Mức 4. Vắng ⇒ τ = 0 (số của lớp). */
+  tau?: number | null
+}
+
+/**
+ * LẶP LẠI từng lượt (24/10) — đếm trong CHÍNH danh sách lượt nơi gọi đã đọc (không thêm câu đọc): số lượt TRƯỚC đó của cùng em, cùng mã câu;
+ * `songSinh` = lượt là bản khác của câu từng sai (`raw_json.tc`); `ngayCach` = số ngày từ lượt trước gần nhất. Danh sách chỉ là cửa sổ (vd 14 ngày) thì
+ * lượt đầu trong cửa sổ được coi là lần đầu (T_đọc dài hơn ⇒ chỉ có thể KHÓ gắn «Bấm vội» hơn, không oan em). Thuần.
+ */
+export function lapLaiCacLuot(luot: readonly { sbd: string; qid: string; tc?: string | null; luc: string }[]): LapLai[] {
+  const thuTu = luot.map((l, i) => ({ i, t: Date.parse(l.luc) })).sort((a, b) => (a.t || 0) - (b.t || 0) || a.i - b.i)
+  const truoc = new Map<string, { n: number; t: number }>()
+  const ra: LapLai[] = new Array(luot.length)
+  for (const { i, t } of thuTu) {
+    const l = luot[i]!
+    const k = `${l.sbd}|${l.qid}`
+    const p = truoc.get(k)
+    ra[i] = { lan: p?.n ?? 0, songSinh: !!(l.tc && String(l.tc).trim()), ngayCach: p && Number.isFinite(t) && Number.isFinite(p.t) ? Math.max(0, (t - p.t) / 86_400_000) : null }
+    truoc.set(k, { n: (p?.n ?? 0) + 1, t })
+  }
+  return ra
 }
 
 /** Các mã câu gốc cần β: chỉ lượt ĐỦ điều kiện xếp mức ⇒ tập nhỏ (rỗng khi chưa máy nào nạp bản mới). */
@@ -75,7 +98,7 @@ export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>, k
   if (!d.doMuc || d.giayDo === null) {
     const kt = !d.doMuc && d.giayCu !== null && d.giayCu !== undefined && d.loaiCu ? kichThuoc?.get(d.goc) : undefined
     if (!kt || d.giayCu === null || d.giayCu === undefined) return null
-    return mucLamCuaLuot({ giay: d.giayCu, soTu: kt.soTu, coHinh: kt.coHinh, phan: kt.phan, dung: d.dung, thuongGiay: null, uocTinh: d.loaiCu })
+    return mucLamCuaLuot({ giay: d.giayCu, soTu: kt.soTu, coHinh: kt.coHinh, phan: kt.phan, dung: d.dung, thuongGiay: null, uocTinh: d.loaiCu, lap: d.lap ?? null })
   }
   const b = beta.get(d.goc)
   return mucLamCuaLuot({
@@ -84,7 +107,8 @@ export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>, k
     coHinh: d.doMuc.coHinh,
     phan: d.doMuc.phan,
     dung: d.dung,
-    thuongGiay: b === undefined ? null : msKyVong(b, 0, d.doMuc.phan, d.mucDo || null) / 1000,
+    thuongGiay: b === undefined ? null : msKyVong(b, typeof d.tau === 'number' && Number.isFinite(d.tau) ? d.tau : 0, d.doMuc.phan, d.mucDo || null) / 1000,
     treo: d.doMuc.treo ?? null,
+    lap: d.lap ?? null,
   })
 }

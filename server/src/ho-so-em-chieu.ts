@@ -28,9 +28,9 @@ import { tiLeChienDich, soNgayGiua } from './srs2-loi'
 import { mocNhip, nhipEm } from './srs2-gv'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { giayDoCuaLuot, giayUocTinhGame } from './ai-sai-cau'
-import { docBetaCau } from './omni-d1'
+import { docBetaCau, docTauEm } from './omni-d1'
 import { tachSongSinh } from './loi-hoc-luat'
-import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong } from './muc-lam-so'
+import { chuanMucDo, docDoMuc, gocCanBeta, lapLaiCacLuot, mucLamTuDong } from './muc-lam-so'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
 import { mucCongKhai, tongCongKhai, tongMucLam } from './muc-lam'
 
@@ -156,6 +156,11 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     const doc = docRawLuot(x.doc)
     return { doMuc: docDoMuc(doc ? { doc } : null), giayDo: giayDoCuaLuot(x.giay, x.ms), goc: tachSongSinh(str(x.tc) || str(x.qid)).goc, mucDo: chuanMucDo(x.muc_do), dung: num(x.ket_qua) === 1, nguon: str(x.nguon), maNguon: str(x.ma_nguon), luc: str(x.luc) }
   })
+  // Lặp lại (24/10): «câu này» = mọi lần em làm câu ⇒ đúng; 14 ngày = trong cửa sổ (lần đầu trong cửa sổ coi như mới — chỉ có thể KHÓ gắn «Bấm vội» hơn).
+  const lapCau = lapLaiCacLuot((lan ?? []).map((x, i) => ({ sbd, qid, tc: str(raws[i]?.tc) || null, luc: str(x.luc) })))
+  dongMuc.forEach((d, i) => Object.assign(d, { lap: lapCau[i] ?? null }))
+  const lap14 = lapLaiCacLuot((r14Muc ?? []).map((x) => ({ sbd, qid: str(x.qid), tc: str(x.tc) || null, luc: str(x.luc) })))
+  dong14.forEach((d, i) => Object.assign(d, { lap: lap14[i] ?? null }))
   const gocMuc = gocCanBeta([...dongMuc, ...dong14])
   // ĐO LẠI LƯỢT CŨ (21/10): lượt không có `doc` mới mà có giây cũ (cột `giay` / `raw_json.ms`) ⇒ Mức làm "≈" — cần kích thước đề của câu (bảng tính sẵn, MỘT lệnh đọc CÙNG đợt).
   // Lượt game không giây nào: ƯỚC TÍNH từ mốc trả lời của lượt chơi (`giayUocTinhGame`, như Lịch sử làm câu và tờ chiếu «Ai đã sai?» — ba màn một số). Không nạp được ⇒ Map rỗng ⇒ "chưa có số đo".
@@ -164,7 +169,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
   const idGame = (lan ?? []).filter((x) => str(x.nguon) === 'game').map((x) => str(x.attempt_id) || `${str(x.ma_nguon)}|${qid}`)
   const phien = [...new Set((lan ?? []).filter((x) => str(x.nguon) === 'game').map((x) => str(x.ma_nguon)))]
   const caThi = [...new Set((lan ?? []).filter((x) => str(x.nguon) === 'thi').map((x) => str(x.ma_nguon)))]
-  const [rAtt, rPhien, rCt, beta, rTen, kichThuoc, uoc] = await Promise.all([
+  const [rAtt, rPhien, rCt, beta, rTen, kichThuoc, uoc, tau] = await Promise.all([
     // 05/10: lượt BẢN XÁO (cau-anh-em.ts) lưu thêm `traLoiGoc` = đáp án em chọn quy về khung gốc — tờ chiếu so với câu gốc nên đọc khoá ấy trước.
     idGame.length ? hoi(env, "SELECT id, COALESCE(json_extract(json, '$.traLoiGoc'), json_extract(json, '$.traLoi')) AS tra_loi FROM game_v2_attempt WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(idGame)) : Promise.resolve([] as Row[] | null),
     phien.length ? hoi(env, "SELECT id, json_extract(json, '$.doan') IS NOT NULL AS doan, COALESCE(json_extract(json, '$.bia'), 0) AS bia FROM game_v2_session WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(phien)) : Promise.resolve([] as Row[] | null),
@@ -173,7 +178,10 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     maDang.length ? hoi(env, "SELECT dang AS ma, MIN(json_extract(json, '$.tenDang')) AS ten FROM game_v2_question WHERE dang IN (SELECT value FROM json_each(?)) GROUP BY dang", JSON.stringify(maDang)) : Promise.resolve([] as Row[] | null),
     gocCanKichThuoc.length ? docKichThuocCau(env, gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
     gameThieu.length ? giayUocTinhGame(env, gameThieu.map((d) => ({ sbd, phien: d.maNguon }))).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    gocMuc.length ? docTauEm(env, [sbd]).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
   ])
+  const tauEm = tau.get(sbd) ?? null
+  for (const d of [...dongMuc, ...dong14]) Object.assign(d, { tau: tauEm })
   /** Dòng đưa vào xếp Mức làm: có đồng hồ MỚI ⇒ như cũ; không thì giây CŨ (cột `giay` / `raw_json.ms`) ⇒ 'cu'; lượt game không giây có mốc trả lời ⇒ 'uoc'; còn lại không giây (không đoán). */
   const dongCu = <T extends { doMuc: ReturnType<typeof docDoMuc>; giayDo: number | null; nguon: string; maNguon: string; luc: string }>(d: T) => {
     if (d.doMuc || d.nguon === 'thi') return d // ca thi cũ: giây có thể THIẾU ⇒ không xếp mức

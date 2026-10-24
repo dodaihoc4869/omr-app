@@ -679,6 +679,17 @@ async function docBeta(env: Env, qids: readonly string[]): Promise<Map<string, n
     return ra
   }, ['omni_beta_cau'])
 }
+/** τ OMNI của các em (đủ mẫu: `n_tau ≥ 5`) — ranh Mức làm 4 «Làm kỹ» theo thời gian thường RIÊNG của em (24/10: trước đó τ = 0 cho mọi em). Lỗi ⇒ rỗng. */
+export async function docTauEm(env: Env, sbds: readonly string[]): Promise<Map<string, number>> {
+  if (!sbds.length) return new Map<string, number>()
+  const ds = dsJson(sbds)
+  return nhoTheoLuot(env.DB, `omni_tau|${ds}`, async () => {
+    const ra = new Map<string, number>()
+    const r = await env.DB.prepare('SELECT sbd, tau FROM omni_em WHERE n_tau >= 5 AND sbd IN (SELECT value FROM json_each(?))').bind(ds).all<Row>().catch(() => ({ results: [] as Row[] }))
+    for (const x of r.results ?? []) if (x.tau != null && Number.isFinite(Number(x.tau))) ra.set(str(x.sbd), Number(x.tau))
+    return ra
+  }, ['omni_em'])
+}
 async function docXacNhan(env: Env, sbds: readonly string[]): Promise<Map<string, XacNhanThay[]>> {
   const ra = new Map<string, XacNhanThay[]>()
   if (!sbds.length) return ra
