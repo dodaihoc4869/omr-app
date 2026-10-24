@@ -80,3 +80,19 @@ describe('τ riêng vào ranh Mức 4', () => {
     expect(nhanh.thuong).toBe(Math.round(40 * Math.exp(-0.5)))
   })
 })
+
+describe('hệ số đọc riêng từ τ (số đo 24/10: r giảm theo τ)', () => {
+  it('em đọc nhanh (τ 0,5) có T_đọc ngắn hơn, em chậm (τ −0,5) dài hơn; kẹp 0,6–1,6', async () => {
+    const { heSoDocTuTau, HE_SO_DOC_MAX } = await import('../server/src/muc-lam')
+    const d = { doMuc: { soTu: 20, coHinh: false, phan: 'I' as const }, giayDo: 12, goc: 'Q1', mucDo: '', dung: false }
+    const chung = mucLamTuDong(d, new Map())!
+    const nhanh = mucLamTuDong({ ...d, tau: 0.5 }, new Map())!
+    const cham = mucLamTuDong({ ...d, tau: -0.5 }, new Map())!
+    expect(chung.giayDoc).toBe(15)
+    expect(nhanh.giayDoc).toBe(Math.round(15 * Math.exp(-0.35)))
+    expect(cham.giayDoc).toBe(Math.round(15 * Math.exp(0.35)))
+    expect(chung.ma).toBe(1)
+    expect(nhanh.ma).toBeGreaterThan(1)
+    expect(Math.min(HE_SO_DOC_MAX, heSoDocTuTau(-5)!)).toBe(HE_SO_DOC_MAX)
+  })
+})

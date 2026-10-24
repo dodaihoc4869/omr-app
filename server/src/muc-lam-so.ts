@@ -5,7 +5,7 @@
 //   · Thời gian thường của em = e^(β − τ)/1000 CHỈ khi câu có β thật (`omni_beta_cau`); τ riêng của em (`docTauEm`, 24/10), vắng ⇒ 0. Không β ⇒ không có Mức 4.
 // Không đọc D1 ở đây: nơi gọi tự đọc β (`docBetaCau`) trong CÙNG đợt `Promise.all` với các lượt đọc khác của mình (không thêm vòng chờ nối tiếp).
 import { msKyVong } from './omni-toc-do'
-import { mucLamCuaLuot, type LapLai, type MucLamLuot, type PhanMucLam } from './muc-lam'
+import { heSoDocTuTau, mucLamCuaLuot, type LapLai, type MucLamLuot, type PhanMucLam } from './muc-lam'
 import type { KichThuocCau } from './cau-doc-giay'
 import type { DoTreo } from './do-giay-luot'
 
@@ -98,7 +98,7 @@ export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>, k
   if (!d.doMuc || d.giayDo === null) {
     const kt = !d.doMuc && d.giayCu !== null && d.giayCu !== undefined && d.loaiCu ? kichThuoc?.get(d.goc) : undefined
     if (!kt || d.giayCu === null || d.giayCu === undefined) return null
-    return mucLamCuaLuot({ giay: d.giayCu, soTu: kt.soTu, coHinh: kt.coHinh, phan: kt.phan, dung: d.dung, thuongGiay: null, uocTinh: d.loaiCu, lap: d.lap ?? null })
+    return mucLamCuaLuot({ giay: d.giayCu, soTu: kt.soTu, coHinh: kt.coHinh, phan: kt.phan, dung: d.dung, thuongGiay: null, uocTinh: d.loaiCu, lap: d.lap ?? null, heSoDoc: heSoDocTuTau(d.tau) })
   }
   const b = beta.get(d.goc)
   return mucLamCuaLuot({
@@ -110,5 +110,6 @@ export function mucLamTuDong(d: DongMucTho, beta: ReadonlyMap<string, number>, k
     thuongGiay: b === undefined ? null : msKyVong(b, typeof d.tau === 'number' && Number.isFinite(d.tau) ? d.tau : 0, d.doMuc.phan, d.mucDo || null) / 1000,
     treo: d.doMuc.treo ?? null,
     lap: d.lap ?? null,
+    heSoDoc: heSoDocTuTau(d.tau),
   })
 }

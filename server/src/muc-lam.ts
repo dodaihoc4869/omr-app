@@ -1,7 +1,7 @@
 // MỨC LÀM BÀI — Mức làm 1–4 của MỘT lượt làm câu (thầy 20–21/10: "từng câu học sinh làm phải hiển thị chi tiết 4 mức"). Đặc tả docs/dac-ta-muc-lam-bai-2010.md mục 3.
 // LÕI THUẦN, một nguồn duy nhất cho mọi màn (Hồ sơ làm bài của thầy · học sinh · phụ huynh; sau này điểm danh, "Ai đã sai", bản chiếu). Không đọc D1.
 //
-//   T_đọc  = `thoiGianDoc` (8 + 0,35 × số từ + 10 nếu có hình) × hệ số đọc của em. Hệ số đọc = 1,0 (đặc tả mục 3: "em chưa có τ ⇒ 1,0"; τ của OMNI CHƯA nối vào đây — xem `heSoDoc`).
+//   T_đọc  = `thoiGianDoc` (8 + 0,35 × số từ + 10 nếu có hình) × hệ số đọc của em (`heSoDocTuTau`: e^(−0,7·τ), số đo 24/10; em chưa có τ ⇒ 1,0).
 //   Mức 1  giây < T_đọc                                   "Bấm vội" khi SAI; khi ĐÚNG ⇒ «Thuộc» (`thuoc`, 24/10)
 //   T_đọc riêng từng lượt × hệ số lặp (`HE_SO_LAP`: câu đã gặp / song sinh đọc nhanh hơn — số đo thật 24/10)
 //   Mức 2  T_đọc ≤ giây < T_đọc + sàn nghĩ                "Đọc xong, chưa kịp nghĩ"
@@ -40,6 +40,12 @@ export interface LapLai {
   songSinh: boolean
   ngayCach: number | null
 }
+/** HỆ SỐ ĐỌC RIÊNG = e^(−0,7·τ) (24/10, run 40093318187): trên câu MỚI THẬT, r = giây/T_đọc theo nhóm τ OMNI: τ −0,56 ⇒ r 2,33 · τ −0,13 ⇒ 1,84 ·
+ *  τ 0,16 ⇒ 1,50 · τ 0,47 ⇒ 1,15 — ln(2,33/1,15) / 1,03 ≈ 0,7. Kẹp 0,6–1,6 (em τ cực trị không kéo T_đọc quá xa). */
+export const HE_SO_TAU_DOC = 0.7
+export const HE_SO_DOC_MIN = 0.6
+export const HE_SO_DOC_MAX = 1.6
+export const heSoDocTuTau = (tau: number | null | undefined): number | undefined => (typeof tau === 'number' && Number.isFinite(tau) ? Math.exp(-HE_SO_TAU_DOC * tau) : undefined)
 /** Hệ số nhân T_đọc vì câu đã gặp (1 = câu mới thật). Thuần. */
 export function heSoLap(phan: PhanMucLam, lap: LapLai | null | undefined): number {
   if (!lap) return 1
@@ -121,7 +127,7 @@ export interface DauVaoMucLam {
   dung: boolean | null
   /** Thời gian thường của em (giây) = e^(β − τ)/1000 khi β thật; null/vắng = chưa có. */
   thuongGiay?: number | null
-  /** Hệ số đọc của em (e^(−τ) kẹp 0,75–1,5); vắng ⇒ 1,0. */
+  /** Hệ số đọc của em (`heSoDocTuTau`: e^(−0,7·τ) kẹp 0,6–1,6); vắng ⇒ 1,0. */
   heSoDoc?: number
   /** Giây không phải số đo đồng hồ mới (xem `MucLamLuot.uocTinh`). */
   uocTinh?: 'cu' | 'uoc'
@@ -139,7 +145,7 @@ export function mucLamCuaLuot(d: DauVaoMucLam): MucLamLuot | null {
   if (!Number.isFinite(d.soTu) || d.soTu < 0) return null
   const san = SAN_NGHI_GIAY[d.phan]
   if (san === undefined) return null
-  const he = typeof d.heSoDoc === 'number' && Number.isFinite(d.heSoDoc) ? kep(d.heSoDoc, 0.75, 1.5) : 1
+  const he = typeof d.heSoDoc === 'number' && Number.isFinite(d.heSoDoc) ? kep(d.heSoDoc, HE_SO_DOC_MIN, HE_SO_DOC_MAX) : 1
   const lap = heSoLap(d.phan, d.lap)
   const doc = Math.max(1, Math.round(thoiGianDoc(d.soTu, d.coHinh) * he * lap))
   const xapXi = d.soTu === SO_TU_CAU_ANH && d.coHinh

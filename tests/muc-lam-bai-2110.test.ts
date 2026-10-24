@@ -62,9 +62,9 @@ describe('mucLamCuaLuot — ranh giới', () => {
     // 40 từ KHÔNG hình: câu chữ bình thường
     expect(mucLamCuaLuot({ ...goc, soTu: 40, coHinh: false, giay: 20 })!.xapXi).toBeUndefined()
   })
-  it('hệ số đọc của em kẹp 0,75–1,5 (vắng ⇒ 1,0)', () => {
-    expect(mucLamCuaLuot({ ...goc, heSoDoc: 2, giay: 22 })).toMatchObject({ giayDoc: 23 }) // 15 × 1,5
-    expect(mucLamCuaLuot({ ...goc, heSoDoc: 0.1, giay: 12 })).toMatchObject({ giayDoc: 11 }) // 15 × 0,75
+  it('hệ số đọc của em kẹp 0,6–1,6 (24/10, theo số đo τ thật; vắng ⇒ 1,0)', () => {
+    expect(mucLamCuaLuot({ ...goc, heSoDoc: 2, giay: 22 })).toMatchObject({ giayDoc: 24 }) // 15 × 1,6
+    expect(mucLamCuaLuot({ ...goc, heSoDoc: 0.1, giay: 12 })).toMatchObject({ giayDoc: 9 }) // 15 × 0,6
     expect(mucLamCuaLuot({ ...goc, giay: 12 })).toMatchObject({ giayDoc: 15 })
   })
   it('lượt ĐÚNG ở Mức 1 chỉ mang ghi chú "đúng trước khi đọc hết đề"; lượt sai / Mức khác không có ghi chú', () => {
