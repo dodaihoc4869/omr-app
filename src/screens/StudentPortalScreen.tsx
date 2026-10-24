@@ -74,6 +74,8 @@ const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
 const ManKiemTraCaNhan = lazy(() => import('../components/hoc-tap/ManKiemTraCaNhan'))
 // Hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé") — nạp lười, ngoài precache.
 const HoSoCuaEmHs = lazy(() => import('../components/hoc-tap/HoSoCuaEmHs'))
+// Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; tải lười, ngoài precache; ẩn ở mọi màn làm bài / kiểm tra / game.
+const BongBongAiDdh = lazy(() => import('../components/ai-ddh/BongBongAiDdh'))
 const ManTuChua = lazy(() => import('../components/hoc-tap/ManTuChua'))
 
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
@@ -903,6 +905,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
           onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')}
         /></div>
       )}
+      {auth.token && !manThi && !moHoSoEm && (tab === null || tab === 'caudalam' || tab === 'lichsuca' || tab === 'diem' || tab === 'bantin') && <Suspense fallback={null}><BongBongAiDdh token={auth.token} sbd={auth.sbd} ten={auth.hoTen ? auth.hoTen.trim().split(/\s+/).pop() : undefined} /></Suspense>}
       {moHoSoEm && auth.token && tab === null && !manThi && <Suspense fallback={null}><HoSoCuaEmHs token={auth.token} tenEm={auth.hoTen ?? ''} lop={auth.lop ?? undefined} onDong={() => setMoHoSoEm(false)} onChuaCau={(qid) => { setMoHoSoEm(false); setQidChua(qid); setTab('tuchua') }} onMoBaiTap={() => { setMoHoSoEm(false); setTab('hoctap') }} /></Suspense>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
       {tab === 'kiemtra' && auth.token && !manThi && hoa2.ketQua?.cheDo2 && 'sanh' in hoa2.ketQua && hoa2.ketQua.sanh.kiemTraCaNhan && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManKiemTraCaNhan token={auth.token} sbd={auth.sbd} id={hoa2.ketQua.sanh.kiemTraCaNhan.id} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}
