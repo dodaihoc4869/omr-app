@@ -17,7 +17,7 @@ import { viecPhu } from './viec-phu'
 
 export type KieuTruyCap = 'token' | 'sbd_tran'
 export type DuongPh = 'parent-news' | 'mom' | 'ph-ke-hoach' | 'ph-thoi-gian-hoc' | 'ph-xac-dinh' | 'ph-canh-bao-xem' | 'ph-giao-them' | 'ph-tat-ca-ve-con' | 'ph-chi-tiet-cau-ve-con' | 'ph-bao-cao-ca' | 'ph-loi-thay' | 'ph-hoc-2' | 'ph-con-tong-quan'
-  | 'ph-nhip-hoc' | 'ph-ho-so-thai-do' | 'ph-lich-su-lam-cau' | 'ph-danh-gia'
+  | 'ph-nhip-hoc' | 'ph-ho-so-thai-do' | 'ph-lich-su-lam-cau' | 'ph-danh-gia' | 'ph-bao-cao-tuan'
 
 /** Địa chỉ app (Pages). Liên kết phát cho phụ huynh: `<APP>/ph?ph=<pass>`; cổng phụ huynh lưu `pass` rồi gửi `{pass}` ở mọi lệnh. */
 export const DIA_CHI_APP = 'https://omr-app-b3u.pages.dev'

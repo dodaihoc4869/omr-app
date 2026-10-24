@@ -3587,6 +3587,7 @@ const boXuLy = {
       // ĐỢT 16 (12/10): hồ sơ của con CÙNG hợp đồng ba lệnh học sinh (nhịp học Lười/Chăm, hồ sơ thái độ, lịch sử làm câu) — ĐỌC-CHỈ, cùng xác thực (ph-ho-so-con.ts).
       if (p === '/ph/nhip-hoc') return ra(await import('./ph-ho-so-con').then((m) => m.phNhipHoc(env, b, Date.now(), envDoc, ctx)))
       if (p === '/ph/danh-gia') return ra(await import('./danh-gia-hoc-that-d1').then((m) => m.phDanhGia(env, b, Date.now(), ctx)))
+      if (p === '/ph/bao-cao-tuan') return ra(await import('./bao-cao-tuan').then((m) => m.phBaoCaoTuan(env, b, Date.now(), ctx)))
       if (p === '/ph/ho-so-thai-do') return ra(await import('./ph-ho-so-con').then((m) => m.phHoSoThaiDo(env, b, Date.now(), envDoc, ctx)))
       if (p === '/ph/lich-su-lam-cau') return ra(await import('./ph-ho-so-con').then((m) => m.phLichSuLamCau(env, b, envDoc, ctx)))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
@@ -3799,6 +3800,7 @@ const boXuLy = {
         if (vi === 'nhan-mu') return ra(await m.gvDanhGiaNhanMu(env, b))
         if (vi === 'che-do') return ra(await m.gvDanhGiaCheDo(env, b))
         if (vi === 'trung-loi') return ra(await m.gvDanhGiaTrungLoi(envDoc, b))
+        if (vi === 'bao-cao-tuan') return ra(await import('./bao-cao-tuan').then((x) => x.gvBaoCaoTuan(envDoc, b)))
       }
       // BÀI HẰNG NGÀY + HỒ SƠ THÁI ĐỘ LÀM BÀI (thầy 12/10, server/src/bai-hang-ngay.ts; hợp đồng bai-hang-ngay-kieu.ts): CHỈ ĐỌC sổ — mức/đã làm/thiếu
       // từng ngày từ 12/10 của mọi em; một em: lịch hoạt động, tín hiệu có ngưỡng, kết luận theo luật.

@@ -78,14 +78,17 @@ export interface KetQuaEm {
   kq: KetQuaDanhGia
   bac: KetLuanBac
   coDoNang: NonNullable<TuanDaTinh['coDoNang']>
+  /** Buổi của lớp em trong cửa sổ (đã suy cho buổi «mọi lớp»); null = chưa xác định được lớp nào học buổi nào. */
+  buoi: { tong: number; coMat: number; coPhep: number } | null
 }
 
 /** Tính MỘT lô em (≤ LO_EM) cho tuần chứa `nowMs`, cửa sổ 14 ngày tới hôm nay. Không ghi gì. Ném lỗi khi không đọc được sổ. */
-export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number, tuy: { chiDoc?: boolean } = {}): Promise<KetQuaEm[]> {
+export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number, tuy: { chiDoc?: boolean; soNgay?: number } = {}): Promise<KetQuaEm[]> {
   if (!sbds.length) return []
   // `chiDoc` (xem thử / đo trên dữ liệu thật trước khi phát hành): KHÔNG tạo bảng; bảng mới chưa có ⇒ các lượt đọc ấy trả rỗng (đã `.catch`).
   if (!tuy.chiDoc) await damBaoBangDanhGia(env)
-  const den = ngayVn7(nowMs), tu = congNgay7(den, -(SO_NGAY_CUA_SO - 1)), tuan = thuHaiCua(den)
+  const soNgay = tuy.soNgay && tuy.soNgay > 0 && tuy.soNgay <= 28 ? Math.floor(tuy.soNgay) : SO_NGAY_CUA_SO
+  const den = ngayVn7(nowMs), tu = congNgay7(den, -(soNgay - 1)), tuan = thuHaiCua(den)
   const tuIso = new Date(Date.parse(tu + 'T00:00:00Z') - 7 * 3600_000).toISOString()
   const ds = JSON.stringify(sbds)
   const [rSo, rKt, rThi, rHs, rBuoi, rDd, rLs, rCt, rCauTuan, rMoiLop, rSiSo] = await Promise.all([
@@ -150,7 +153,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
     const gs = giaySoLuot(d, doThat[i] ?? null, uoc)
     luotEm.get(d.sbd)?.push({ m: mucLamCuaDong(d, doThat[i] ?? null, gs, beta, kichThuoc, { lap: lap[i] ?? null, tau: tau.get(d.sbd) ?? null }), d })
   })
-  const ngayCuaSo = Array.from({ length: SO_NGAY_CUA_SO }, (_, i) => congNgay7(tu, i))
+  const ngayCuaSo = Array.from({ length: soNgay }, (_, i) => congNgay7(tu, i))
   const lopEm = new Map(rHs.map((x) => [str(x.sbd), tenLopCuaEm(x.lop, x.ten_lop)]))
   const ra: KetQuaEm[] = []
   for (const sbd of sbds) {
@@ -198,7 +201,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
       coDoNang: json(x.co_do_nang_json, undefined as TuanDaTinh['coDoNang']),
     }))
     const bac = bacTheoLichSu(tuanNay, truoc, ct, kq.tienBo, new Date(nowMs).toISOString())
-    ra.push({ sbd, tuan, kq, bac, coDoNang: tuanNay.coDoNang! })
+    ra.push({ sbd, tuan, kq, bac, coDoNang: tuanNay.coDoNang!, buoi: buoiLop.length ? { tong: buoiLop.length, coMat: dd.filter((x) => str(x.trang_thai) === 'co_mat').length, coPhep: dd.filter((x) => str(x.trang_thai) === 'co_phep').length } : null })
   }
   return ra
 }
