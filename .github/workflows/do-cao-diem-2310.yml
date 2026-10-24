@@ -1,6 +1,7 @@
-# ĐO GIỜ CAO ĐIỂM TỐI 22/10 (CHỈ ĐỌC) — thầy 23/10: "app hs hôm qua kêu lag … Tối ưu triệt để tốc độ app giờ cao điểm phải tức thì hơn nữa". Bản sao của do-may-chu-2110 cho khung 19:00–23:30 VN 22/10 + đếm gộp nhat_ky_may / số lượt theo 15 phút.
-# Hỏi: D1 truy vấn nào tốn thời gian nhất 2 giờ qua · Worker omr số yêu cầu / lỗi / thời gian p50–p99 theo 5 phút (có trùng lúc phát hành 10:48 · 11:20 · 11:50 VN không?). Chỉ in số đếm + SQL rút gọn.
-name: Đo giờ cao điểm tối 22/10 (chỉ đọc)
+# ĐO GIỜ CAO ĐIỂM TỐI 23/10 (CHỈ ĐỌC) — kiểm bản sửa tràn bộ nhớ #358 (0cd79a26) + lệnh Mức làm theo lô song song của PR #360 (69291726).
+# In: exceededMemory theo giờ 13→23/10 · Worker omr theo 5 phút 12:00–16:40Z 23/10 (yêu cầu / lỗi / p50–p99) · D1 nhóm truy vấn nặng nhất khung đó
+# + riêng câu đọc /gv/muc-lam-lo (su_kien_hoc theo lô em). Chỉ số đếm + SQL rút gọn, không tham số, không tên / SBD.
+name: Đo giờ cao điểm tối 23/10 (chỉ đọc)
 on:
   workflow_dispatch:
   push:
@@ -16,8 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      GIO: '4.5'
-      DEN: '2026-10-21T16:30:00Z'
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
@@ -26,21 +25,20 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
-      - name: Tràn bộ nhớ theo giờ 13–22/10 + yêu cầu chết lúc lỗi (chỉ đọc)
+      - name: Tràn bộ nhớ + Worker 5 phút + D1 (chỉ đọc)
         env:
           TOKEN: ${{ env.CF_TOKEN_SACH }}
           ACC: ${{ env.CF_ACC_SACH }}
         run: |
           node - <<'JS'
-          const { TOKEN, ACC } = process.env
+          const { TOKEN, ACC, DB_ID } = process.env
           const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
           const hoi = async (query, variables) => {
             const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }) })
             const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
           }
-          // 1 · Tràn bộ nhớ theo giờ (giờ VN) — mỗi ngày một lượt hỏi
           console.log('=== exceededMemory / exceededCpu theo giờ VN (chỉ in giờ có lỗi) ===')
-          for (let d = 13; d <= 22; d++) {
+          for (let d = 13; d <= 23; d++) {
             const tu = new Date(Date.UTC(2026, 9, d - 1, 17)).toISOString(), den = new Date(Date.UTC(2026, 9, d, 17)).toISOString()
             const x = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
               workersInvocationsAdaptive(limit:200,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den,status_in:["exceededMemory","exceededCpu","exceededResources"]}){dimensions{status datetimeHour} sum{requests}}}}}`, { acc: ACC, tu, den })
@@ -49,22 +47,28 @@ jobs:
             const gio = ds.map((r) => `${String((new Date(r.dimensions.datetimeHour).getUTCHours() + 7) % 24).padStart(2, '0')}h:${r.dimensions.status.replace('exceeded', '')}=${r.sum.requests}`).sort()
             console.log(`${d}/10 tổng=${tong} ${gio.join(' ')}`)
           }
-          // 2 · Workers Logs (observability): yêu cầu chết vì bộ nhớ 22:25–23:20 VN — đường dẫn / cron (không in thân, không in tham số)
-          const tu = Date.parse('2026-10-22T15:20:00Z'), den = Date.parse('2026-10-22T16:25:00Z')
-          const body = { queryId: 'tran-bo-nho-2210', timeframe: { from: tu, to: den }, view: 'events', limit: 100,
-            parameters: { datasets: ['cloudflare-workers'], filters: [{ key: '$metadata.service', operation: 'eq', type: 'string', value: 'omr' }, { key: '$workers.outcome', operation: 'eq', type: 'string', value: 'exceededMemory' }] } }
-          const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/workers/observability/telemetry/query`, { method: 'POST', headers: H, body: JSON.stringify(body) })
-          const j = await r.json().catch(() => null)
-          console.log('=== Workers Logs: HTTP', r.status, 'success', j?.success, JSON.stringify(j?.errors ?? []).slice(0, 400))
-          const ev = j?.result?.events?.events ?? []
-          const dem = new Map()
-          for (const e of ev) {
-            const w = e?.$workers ?? {}, m = e?.$metadata ?? {}
-            const duong = w?.event?.request?.path ?? (w?.eventType === 'scheduled' ? `cron ${w?.event?.cron ?? ''}` : (m.trigger ?? w?.eventType ?? '?'))
-            const k = `${w?.eventType ?? '?'} ${String(duong).replace(/\d{4,}/g, '#')}`
-            dem.set(k, (dem.get(k) ?? 0) + 1)
+          const v = { acc: ACC, db: DB_ID, tu: '2026-10-23T12:00:00Z', den: '2026-10-23T16:40:00Z' }
+          console.log(`=== Worker omr theo 5 phút ${v.tu} → ${v.den} (giờ UTC; VN = +7) ===`)
+          let tongYc = 0, tongLoi = 0, p99Max = 0
+          for (const [a, b] of [['12:00', '14:20'], ['14:20', '16:40']]) {
+            const w5 = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+              workersInvocationsAdaptive(limit:40,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
+              dimensions{datetimeFiveMinutes} sum{requests errors} quantiles{durationP50 durationP90 durationP99 cpuTimeP99}}}}}`, { acc: ACC, tu: `2026-10-23T${a}:00Z`, den: `2026-10-23T${b}:00Z` })
+            for (const x of w5?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) {
+              tongYc += x.sum.requests; tongLoi += x.sum.errors; p99Max = Math.max(p99Max, x.quantiles.durationP99)
+              console.log([x.dimensions.datetimeFiveMinutes.slice(11, 16), `yc=${x.sum.requests}`, `loi=${x.sum.errors}`, `p50=${Math.round(x.quantiles.durationP50)}`, `p90=${Math.round(x.quantiles.durationP90)}`, `p99=${Math.round(x.quantiles.durationP99)}`, `cpu99=${Math.round(x.quantiles.cpuTimeP99)}`].join(' '))
+            }
           }
-          console.log('số sự kiện', ev.length)
-          for (const [k, n] of [...dem].sort((a, b) => b[1] - a[1])) console.log(n, k)
-          if (!ev.length && j?.result) console.log('KHÓA kết quả:', Object.keys(j.result).join(','), JSON.stringify(j.result).slice(0, 600))
+          console.log(`TỔNG khung: yc=${tongYc} loi=${tongLoi} p99 lớn nhất=${Math.round(p99Max)} ms`)
+          const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1QueriesAdaptiveGroups(limit:60,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
+              count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`, v)
+          const ds = d1?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+          const dong = (x) => [`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 300)].join(' ')
+          console.log(`=== D1: ${ds.length} nhóm nặng nhất · tổng ${Math.round(ds.reduce((n, x) => n + x.sum.queryDurationMs, 0) / 1000)} s ===`)
+          for (const x of ds.slice(0, 12)) console.log(dong(x))
+          console.log('=== D1: câu đọc /gv/muc-lam-lo (su_kien_hoc theo lô em, có ma_nguon + $.doc) ===')
+          const ml = ds.filter((x) => /FROM su_kien_hoc s/.test(x.dimensions.query) && /\$\.doc/.test(x.dimensions.query))
+          for (const x of ml) console.log(dong(x))
+          if (!ml.length) console.log('(không thấy trong 60 nhóm nặng nhất ⇒ nhẹ hơn các nhóm trên)')
           JS
