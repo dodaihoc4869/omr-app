@@ -7,6 +7,92 @@ Số liệu thật dùng để đặt ngưỡng: workflow chỉ đọc `.github/
 
 ---
 
+## 0. SOÁT LẠI MỨC LÀM 1–4 TRƯỚC KHI CHỐT (thầy 24/10: «quét lại… đo giây đọc đề cá nhân hoá chính xác cho từng hs chưa?», «tính thêm các câu hs lặp lại thì được đọc nhanh hơn bao nhiêu»)
+
+Nguồn: `.github/workflows/do-giay-doc-ca-nhan-2410.yml` (run 40083002666), 14 ngày, 17.476 lượt có đồng hồ mới, bỏ lượt treo.
+
+### 0.1 Mã hiện tại: CHƯA cá nhân hoá
+1. `muc-lam.ts` có chỗ nhân «hệ số đọc của em» (`heSoDoc`), nhưng **không nơi nào truyền vào** ⇒ mọi em = 1,0.
+2. «Thời gian thường» (ranh Mức 4) gọi `msKyVong(β, 0, …)` với **τ = 0** (`muc-lam-so.ts:87`) ⇒ là số của cả lớp. τ riêng đã có cho 265 em nhưng không dùng.
+3. **Không phân biệt câu mới với câu đã gặp, cũng không phân biệt câu song sinh.** Toàn bộ lượt có đồng hồ là câu ôn (`maintenance`); 74% là câu đã gặp hoặc song sinh.
+
+### 0.2 Câu lặp lại nhanh hơn bao nhiêu (giây TB của lượt ĐÚNG)
+| Loại câu | Phần I | Phần II | Phần III | Đúng (Phần I) |
+|---|---|---|---|---|
+| Mới thật (chưa gặp, không song sinh) | 38,3 s | 78,1 s | 58,0 s | 75% |
+| Song sinh (bản khác của câu từng sai) | 19,7 s (×0,51) | 50,1 s (×0,64) | 24,4 s (×0,42) | 76% |
+| Gặp lần 2 | 14,7 s (×0,38) | 50,4 s (×0,65) | 20,3 s (×0,35) | 86% |
+| Gặp lần 3 | 11,3 s (×0,30) | 37,1 s (×0,48) | 14,3 s (×0,25) | 90% |
+| Gặp lần 4 trở lên | 8,6 s (×0,22) | 19,2 s (×0,25) | 10,5 s (×0,18) | 96% |
+
+Theo khoảng cách từ lần gặp trước (Phần I, đúng):
+
+| Khoảng cách | Giây TB | Đúng |
+|---|---|---|
+| < 1 giờ | 8,7 s | 98% |
+| Cùng ngày | 8,9 s | 97% |
+| 1–3 ngày | 9,3 s | 95% |
+| 4–7 ngày | 10,6 s | 91% |
+| > 7 ngày | 15,0 s | 84% |
+
+Sau 1 tuần em bắt đầu quên: chậm hơn khoảng 1,6 lần và sai nhiều hơn.
+
+Theo từng em (116 em đủ mẫu): câu đã gặp mất trung bình **0,41** lần thời gian câu mới.
+- 52 em dưới 0,3 lần (thuộc rất nhanh).
+- 7 em **không nhanh hơn** khi gặp lại (chưa thuộc gì).
+
+### 0.3 Phát hiện quyết định: trên dữ liệu game, NHANH không đi kèm SAI
+Chỉ xét câu mới thật, Phần I:
+
+| Tỉ lệ giây / T_đọc | Đúng |
+|---|---|
+| Dưới 0,25 lần T_đọc | 88% |
+| 0,25–1 lần | 74–75% |
+| 1–2,5 lần | 74–77% |
+| Trên 2,5 lần (chậm nhất) | 72% |
+
+Theo giây tuyệt đối: ≤ 3 giây đúng 95%; 4–6 giây đúng 87%.
+
+Thử «sàn đọc riêng từng em» (học trên nửa lượt, thử trên nửa còn lại, 63 em):
+- Lượt dưới sàn riêng đúng 73–81%.
+- Lượt trên sàn đúng 81%.
+- ⇒ Chỉ cá nhân hoá thời gian đọc **vẫn không bắt được** em bấm bừa.
+
+Lý do khả dĩ:
+- Câu game ngắn (TB 18–34 từ).
+- Nhiều câu ở các tờ khác nhau trùng nội dung nhưng khác mã, nên «mới thật» theo mã thực ra em đã gặp.
+
+⇒ Mức 1 «Chưa đọc xong đề» chỉ dựa vào giây đang **gắn oan cho em đã thuộc**.
+
+### 0.4 Cách đo mới (đề xuất, thay Mức làm 1–4 hiện tại)
+1. **«Đã gặp» tính theo NỘI DUNG câu** (`bamCau`, đã có ở `src/lib/loi-giai-kiem`) cộng quan hệ song sinh (`raw_json.tc`), không theo mã câu.
+2. **T_đọc riêng = T_đọc chung × hệ số lặp × hệ số em.**
+   - Hệ số lặp lấy theo bảng 0.2 (theo phần, số lần gặp, khoảng cách; > 7 ngày nhân thêm 1,6).
+   - Hệ số em = e^(−τ), kẹp 0,6–1,6, từ τ OMNI đã có. Em chưa có τ thì lấy 1,0.
+   - Ranh Mức 3/4 dùng τ thật (sửa `msKyVong(β, τ_em)`).
+3. **Mức làm theo cả GIÂY lẫn KẾT QUẢ**, vì số liệu cho thấy giây một mình không đủ:
+
+   | Mức mới | Điều kiện | Nghĩa |
+   |---|---|---|
+   | **Thuộc** | dưới T_đọc riêng VÀ đúng | tốt, không phạt |
+   | **Mức 1 · Bấm vội** | dưới T_đọc riêng VÀ sai | dấu hiệu đối phó |
+   | Mức 2 · Đọc vội | dưới T_đọc + sàn nghĩ | trung tính |
+   | Mức 3 · Có nghĩ | như cũ, ranh theo τ riêng | |
+   | Mức 4 · Làm kỹ | như cũ, ranh theo τ riêng | |
+   | Mức 5–6 | giữ nguyên | |
+
+4. **Đối phó vì tốc độ = so em với CHÍNH EM:** tỉ lệ đúng ở 30% lượt nhanh nhất của em, so với các lượt còn lại của em (cận dưới Wilson). Gắn cờ khi:
+   - lượt nhanh đúng < 45%, VÀ
+   - thấp hơn lượt chậm của chính em ≥ 20 điểm %.
+
+   Em giỏi làm nhanh mà vẫn đúng thì không bao giờ bị gắn.
+5. **Kiểm sau khi build:**
+   - Lượt «Mức 1 · Bấm vội» phải có tỉ lệ đúng = 0 (theo định nghĩa).
+   - Số em bị cờ «tốc độ không đi kèm hiểu» phải nhỏ (dự kiến < 5%).
+   - Đối chiếu với nhãn mù 30 em của thầy.
+
+---
+
 ## 1. Mục tiêu + ai dùng
 
 - **Mục tiêu:** tách em **làm thật** (kể cả em yếu) khỏi em **làm cho có**, và chỉ ra em **đã can thiệp nhiều lần mà không đổi** để thầy quyết cho nghỉ. Mỗi nhãn phải kèm **lý do bằng số** («14 câu trả lời trước khi đọc xong đề, sai 11»), không phán chung chung.
