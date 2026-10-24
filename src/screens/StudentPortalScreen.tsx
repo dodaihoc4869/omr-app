@@ -23,7 +23,6 @@ import '../components/TheCau'
 import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
-import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
 import TheCanhBaoThay from '../components/bang-nhiem-vu/TheCanhBaoThay'
 import { useHopThoai } from '../components/HopThoaiCong'
 import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
@@ -107,7 +106,7 @@ const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.Mo
 // mã ba khối ấy cùng cửa nạp kho đề, thuật toán rút câu sai, phiếu luyện mà chỉ chúng dùng). Mảnh được nạp trước lúc rảnh ở Hôm nay (cùng nhịp nạp trước màn thi, dưới) ⇒ lúc em bấm, khối đã có thì VẼ THẲNG (veNgayKhiCo,
 // không treo Suspense, không màn chờ); chưa có (2G / tiết kiệm dữ liệu / bấm quá sớm) ⇒ React.lazy, chỗ chờ giữ khung như các khối lười khác.
 type KhoiPhu = typeof import('../components/cong-hs-nap-luoi')
-function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3'>(ten: K) {
+function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3'>(ten: K) {
   const bo: BoNap<{ default: KhoiPhu[K] }> = Object.assign(() => napKhoiPhu().then((m) => ({ default: m[ten] })), {
     san: () => {
       const m = napKhoiPhu.san()
@@ -120,6 +119,7 @@ const KhoiKhacPhuc3CheDo = khoiPhu('KhoiKhacPhuc3CheDo')
 const BtvnM3 = khoiPhu('BtvnM3')
 const MomDanhSachM3 = khoiPhu('MomDanhSachM3')
 const MomLamBaiM3 = khoiPhu('MomLamBaiM3')
+const LichSuCaM3 = khoiPhu('LichSuCaM3') // tab «Xem điểm» (25/10: nạp lười cùng mảnh trên)
 // Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; chỉ ở Hôm nay; mảnh riêng ngoài precache, cửa nạp qua cong-hs-nap-luoi.
 const BongBongAiDdh = lazy(() => napKhoiPhu().then((m) => m.napBong()))
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
@@ -1039,6 +1039,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
 
           {/* TAB 1: XEM ĐIỂM */}
           {tab === 'diem' && vaoM3 && (
+            <Suspense fallback={<ChoKhoiPhu />}>
             <LichSuCaM3
               dangTai={dangTaiLichSu}
               ds={dsLichSu}
@@ -1048,6 +1049,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
               onXemBaoCao={(item) => setCaXemBaoCaoModal(item as any)}
               onXemDe={(maCa) => void moDeVaLoiGiai(maCa)}
             />
+            </Suspense>
           )}
           {tab === 'diem' && !vaoM3 && (
           <div className="space-y-4 animate-google-fade">

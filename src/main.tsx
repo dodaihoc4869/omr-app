@@ -108,14 +108,18 @@ type GocApp = { default: ComponentType; huaManEmSom: () => Promise<unknown> | nu
 const thuLai = <T,>(nap: () => Promise<T>): Promise<T> => nap().catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(nap))
 const dvMo = docDuongVao(location.search, location.pathname)
 const laCongHocSinh = dvMo.vai === 'hocsinh'
+// CỔNG PHỤ HUYNH (25/10, "tức thì hơn nữa"): gốc RIÊNG `AppPhuHuynh` — không kéo vỏ app thầy (~45 KB nén). Cùng kết luận vai với App.tsx.
+const laCongPhuHuynh = dvMo.vai === 'phuhuynh'
 // ĐƯỜNG /hoi-thay (15/10, HoiThayScreen.tsx): trang bài làm văn phòng nhúng hộp Hỏi Thầy trong iframe ⇒ gốc RIÊNG, nhẹ (không App.tsx).
 // Nhận thẳng ở đây, không thêm vai vào vai-tro.ts (mã nằm trong gói mở cả ba app; vai-tro trả null cho đường này nên không đổi gì khác).
 const laHoiThay = /^\/hoi-thay\/?$/.test(location.pathname)
 const napGoc: Promise<GocApp> = laCongHocSinh
   ? thuLai(() => import('./AppHocSinh'))
-  : laHoiThay
-    ? thuLai(() => import('./screens/hoi-thay-goc').then((m) => m.napHoiThay()))
-    : thuLai(() => import('./App'))
+  : laCongPhuHuynh
+    ? thuLai(() => import('./AppPhuHuynh'))
+    : laHoiThay
+      ? thuLai(() => import('./screens/hoi-thay-goc').then((m) => m.napHoiThay()))
+      : thuLai(() => import('./App'))
 /** Lượt tải mảnh màn em (màn thi / cổng học sinh) của gốc vừa chọn — KaTeX tải NỐI SAU nó. */
 const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
 

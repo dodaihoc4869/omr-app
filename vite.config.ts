@@ -82,7 +82,9 @@ function napTruocManEm(): Plugin {
         // khi trang do service worker phục vụ. Luật chọn nhóm: src/lib/nap-truoc-man-em.ts.
         const app = dsCua('/src/App.tsx')
         const hsVo = dsCua('/src/AppHocSinh.tsx')
-        const ngoai = (ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
+        // 25/10: cổng phụ huynh có gốc riêng `AppPhuHuynh` (không App.tsx) ⇒ `phVo` = vỏ đó; `ph` = phần mảnh cổng NGOÀI vỏ.
+        const phVo = dsCua('/src/AppPhuHuynh.tsx')
+        const ngoai =(ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
         const phongHs = Object.values(goi)
           .map((x) => (x as { fileName: string }).fileName)
           .filter((f) => /^assets\/(?:be-vietnam-pro-(?:latin|vietnamese)-(?:400|600|700)|noto-serif-(?:latin|vietnamese)-700|baloo-2-(?:latin|vietnamese)-(?:700|800))-normal-[\w-]+\.woff2$/.test(f))
@@ -94,10 +96,11 @@ function napTruocManEm(): Plugin {
           anhDangNhapHs: '/than-thu-v2/nho/thu-1-3.webp',
           thi: ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
           hs: ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo),
-          ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), app),
+          ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), phVo.length ? phVo : app),
           phieu: ngoai(dsCua('/src/screens/PhieuScreen.tsx'), app),
           app,
           hsVo,
+          ...(phVo.length ? { phVo } : {}),
           phongHs,
         }
         if (bang.thi.length + bang.hs.length + bang.ph.length + app.length + hsVo.length === 0) return html
@@ -493,6 +496,12 @@ export default defineConfig({
             // 22/10: giữ khung xem phiếu là MẢNH RIÊNG như trước (không để Rolldown gộp vào DesignSystem — gộp làm mảnh cổng phụ huynh nặng +1,5 KB).
             { name: 'KhungXemPhieu', test: /src[\\/]components[\\/]KhungXemPhieu\.tsx$/, includeDependenciesRecursively: false },
             { name: 'KhoiLoiGiaiChuan', test: /src[\\/](?:components[\\/](?:loi-giai[\\/]KhoiLoiGiaiChuan|ExperimentDemo)\.tsx|lib[\\/](?:experiments[\\/]nhe|loi-giai-api|chuan-hoa-loi-giai|chu-la-pdf)\.ts)$/ },
+            // 25/10 (gốc riêng cổng phụ huynh `AppPhuHuynh`): đồ thị nhập đổi ⇒ Rolldown xẻ DesignSystem / ChanLoi / exam-grade thành nhiều tệp nhỏ (+1,1 KB nén ở MỌI
+            // đường khác, precache 171 > trần 170). Gom lại ĐÚNG ranh mảnh trước đó (danh sách mô-đun đọc từ sourcemap bản 1158a832) ⇒ các đường khác không đổi byte.
+            // + trợ hàm trường lớp mà trình dịch chèn cho class component (ChanLoi…): `\0@oxc-project+runtime@…/helpers/` — mọi đường đều nạp ChanLoi (bản trước nằm sẵn trong mảnh này).
+            { name: 'ChanLoi', test: /src[\\/](?:components[\\/](?:ChanLoi|LogoVai|bat-linh[\\/]BatLinhShell)\.tsx|lib[\\/](?:fetch-co-han|hs-dang-nhap-api)\.ts)$|@oxc-project\+runtime@[^\\/]+[\\/]helpers[\\/]/, includeDependenciesRecursively: false },
+            { name: 'DesignSystem', test: /src[\\/](?:components[\\/](?:DesignSystem|m3[\\/](?:NutTron|ThanhTren|index))\.tsx?|engine[\\/]score\.ts|lib[\\/](?:doc-so-phan-iii|cham-so-policy|cham-so|goi-lenh-thay|gio-may-chu|ten-ca|de-rieng-goi|gui-ca-trinh-duyet|anh-len-may-chu|day-ca-may-chu-moi|phieu-may-chu-moi|don-moc-reset-giao-vien|man-ca-may-chu-moi|cau-hinh-de-rieng|nhan-da-dung|cau-goc|exam-api|so-o-tra-loi-ngan|cau-tu-luan)\.ts)$/, includeDependenciesRecursively: false },
+            { name: 'exam-grade', test: /src[\\/]lib[\\/](?:phan-tich-lam-bai|loai-cau-chua-dung|rut-de-chua|phan-cau-len-bang|chan-doan-cau-hinh|chan-doan|chan-doan-phieu|chong-gian-lan|phieu-du-lieu|phieu-link|exam-grade)\.ts$/, includeDependenciesRecursively: false },
           ],
         },
       },

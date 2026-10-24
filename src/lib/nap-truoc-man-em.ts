@@ -34,6 +34,8 @@ export interface BangNapTruoc {
   app?: string[]
   /** Vỏ cổng học sinh + màn đăng nhập. */
   hsVo?: string[]
+  /** (25/10) Vỏ cổng phụ huynh `AppPhuHuynh` — có nhóm này thì đường phụ huynh nạp vỏ + `ph`, KHÔNG nạp `app` (main.tsx không dựng App.tsx). */
+  phVo?: string[]
   /** Phông Sảnh (chỉ nạp khi trang đã do service worker phục vụ). */
   phongHs?: string[]
   /** Mảnh KaTeX (`katex-goi` + CSS). 13/10: KHÔNG nạp trước ở cổng học sinh nữa (main.tsx tải lúc rảnh sau khi trang tải xong — máy yếu). */
@@ -144,5 +146,5 @@ export function taoMaNapTruoc(bang: BangNapTruoc): string {
     `if(/^https:\\/\\/[^\\/]+$/.test(g)&&typeof fetch==='function'){try{var H=(${hoiSomSanh.toString()});H(window,g,p,${JSON.stringify(LENH_HOI_SOM)},true);${HOI_SOM_MO_CHANG}}catch(e){}}` +
     `if(navigator.serviceWorker&&navigator.serviceWorker.controller)nap(b.phongHs)}else{if(b.anhDangNhapHs){var a=document.createElement('link');a.rel='preload';a.as='image';a.href=b.anhDangNhapHs;document.head.appendChild(a)}` +
     `document.addEventListener('DOMContentLoaded',function(){nap(b.hs,1)})}return}` +
-    `if(b.app&&c!=='hs')nap(b.app);nap(c&&b[c])}catch(e){}})()`
+    `if(c==='ph'&&b.phVo){nap(b.phVo);nap(b.ph);return}if(b.app&&c!=='hs')nap(b.app);nap(c&&b[c])}catch(e){}})()`
 }
