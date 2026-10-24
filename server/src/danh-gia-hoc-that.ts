@@ -93,7 +93,9 @@ export interface PhatDanhGia {
   diem: number
   /** Lý do bằng số cho thầy (và em nếu công khai). */
   chu: string
-  /** Cờ đỏ (đủ để vào Đối phó dù điểm cao). */
+  /** Tín hiệu XẤU (đặc tả mục 4: có ≥ 1 tín hiệu xấu ⇒ Đối phó dù Điểm Thật còn ≥ 60). */
+  xau?: boolean
+  /** Cờ đỏ nặng (gian lận xác nhận, cố tình treo ≥ 2 ngày) — cũng ⇒ Đối phó, và tính vào đường tắt ĐUỔI. */
   coDo?: boolean
 }
 
@@ -129,9 +131,9 @@ const pt = (x: number) => `${Math.round(x * 100)}%`
 export function danhGiaEm(v: DauVaoDanhGia): KetQuaDanhGia {
   const NG = NGUONG_DANH_GIA
   const phat: PhatDanhGia[] = []
-  const them = (ma: MaPhat, diem: number, chu: string, coDo = false) => {
+  const them = (ma: MaPhat, diem: number, chu: string, coDo = false, xau = false) => {
     const d = Math.min(TRAN_PHAT[ma], Math.max(0, Math.round(diem * 10) / 10))
-    if (d > 0 || coDo) phat.push({ ma, diem: d, chu, ...(coDo ? { coDo: true } : {}) })
+    if (d > 0 || coDo || xau) phat.push({ ma, diem: d, chu, ...(xau || coDo ? { xau: true } : {}), ...(coDo ? { coDo: true } : {}) })
   }
   const lam = v.luot.filter((l) => l.dung !== null)
   const doLuot = lam.filter((l) => l.ma !== null && !l.treo)
@@ -150,7 +152,7 @@ export function danhGiaEm(v: DauVaoDanhGia): KetQuaDanhGia {
   const soBamVoi = doLuot.filter((l) => l.ma === 1 && l.dung === false).length
   if (doLuot.length >= NG.luotToiThieu && trongSoBam > 0) {
     const lb = canDuoiWilson(Math.min(trongSoBam, doLuot.length), doLuot.length)
-    them('nhanMaSai', 100 * lb, `${soBamVoi}/${doLuot.length} lượt trả lời trước khi đọc xong đề mà sai`)
+    them('nhanMaSai', 100 * lb, `${soBamVoi}/${doLuot.length} lượt trả lời trước khi đọc xong đề mà sai`, false, lb >= 0.3)
   }
   // B1' · So em với chính em: 30% lượt nhanh nhất (theo giây/T_đọc riêng) đúng < 45% VÀ kém lượt còn lại ≥ 20 điểm %.
   const coR = doLuot.filter((l) => l.r !== null).sort((a, b) => (a.r ?? 0) - (b.r ?? 0))
@@ -162,7 +164,7 @@ export function danhGiaEm(v: DauVaoDanhGia): KetQuaDanhGia {
     chamDung = tiLe(cham.filter((l) => l.dung === true).length, cham.length)
     const caoNhan = 1 - canDuoiWilson(nhan.filter((l) => l.dung !== true).length, nhan.length)
     if (nhanDung !== null && chamDung !== null && caoNhan < NG.nhanDungDuoi && chamDung - nhanDung >= NG.nhanThuaChamTu) {
-      them('nhanMaSai', 20, `lượt làm nhanh nhất chỉ đúng ${pt(nhanDung)}, lượt làm chậm đúng ${pt(chamDung)}: tốc độ không đi kèm hiểu bài`)
+      them('nhanMaSai', 20, `lượt làm nhanh nhất chỉ đúng ${pt(nhanDung)}, lượt làm chậm đúng ${pt(chamDung)}: tốc độ không đi kèm hiểu bài`, false, true)
     }
   }
   // B2 · Bấm lặp: chuỗi ≥ 6 lượt liền cùng chữ (Phần I, theo thời gian).
@@ -172,32 +174,32 @@ export function danhGiaEm(v: DauVaoDanhGia): KetQuaDanhGia {
     dai = i > 0 && tn[i]!.chon === tn[i - 1]!.chon && tn[i]!.ngay === tn[i - 1]!.ngay ? dai + 1 : 1
     if (dai === NG.chuoiLap) soChuoi++
   }
-  if (soChuoi) them('bamLap', 10 * soChuoi, `${soChuoi} lần bấm liền ≥ ${NG.chuoiLap} câu cùng một đáp án`)
+  if (soChuoi) them('bamLap', 10 * soChuoi, `${soChuoi} lần bấm liền ≥ ${NG.chuoiLap} câu cùng một đáp án`, false, soChuoi >= 2)
   // B3 · Treo máy: cận dưới Wilson tỉ lệ treo; +10 mỗi ngày Cố tình treo máy (Mức 6). ≥ 2 ngày Mức 6 ⇒ cờ đỏ.
   const soTreoTong = treoLuot.length
   if (soTreoTong && lam.length) {
     const lb = canDuoiWilson(soTreoTong, doLuot.length + soTreoTong)
-    them('treo', 100 * lb + 10 * ngayCoTinh, `${soTreoTong} lượt treo máy${ngayCoTinh ? `, ${ngayCoTinh} ngày cố tình treo máy` : ''}`, ngayCoTinh >= 2)
+    them('treo', 100 * lb + 10 * ngayCoTinh, `${soTreoTong} lượt treo máy${ngayCoTinh ? `, ${ngayCoTinh} ngày cố tình treo máy` : ''}`, ngayCoTinh >= 2, lb >= 0.15)
   }
   // B4 · Xem gợi ý / lời giải trước khi thử.
   const soGoiY = lam.filter((l) => l.coGoiY).length
-  if (lam.length >= NG.luotToiThieu && canDuoiWilson(soGoiY, lam.length) >= NG.goiYXau) them('goiY', 10, `${soGoiY}/${lam.length} lượt xem gợi ý trước khi tự làm`)
+  if (lam.length >= NG.luotToiThieu && canDuoiWilson(soGoiY, lam.length) >= NG.goiYXau) them('goiY', 10, `${soGoiY}/${lam.length} lượt xem gợi ý trước khi tự làm`, false, true)
   // B5 · Thuộc mà không hiểu: đúng câu gốc − đúng bản song sinh.
   const goc = lam.filter((l) => !l.songSinh), ss = lam.filter((l) => l.songSinh)
   const dungGoc = tiLe(goc.filter((l) => l.dung === true).length, goc.length)
   const dungSongSinh = tiLe(ss.filter((l) => l.dung === true).length, ss.length)
   if (ss.length >= NG.songSinhToiThieu && dungGoc !== null && dungSongSinh !== null) {
     const chenh = Math.round((dungGoc - dungSongSinh) * 100) - NG.chenhThuocTru
-    if (chenh > 0) them('thuocKhongHieu', chenh, `đúng câu gốc ${pt(dungGoc)} nhưng bản khác của câu từng sai chỉ đúng ${pt(dungSongSinh)}: thuộc đáp án, chưa hiểu`)
+    if (chenh > 0) them('thuocKhongHieu', chenh, `đúng câu gốc ${pt(dungGoc)} nhưng bản khác của câu từng sai chỉ đúng ${pt(dungSongSinh)}: thuộc đáp án, chưa hiểu`, false, chenh >= 10)
   }
   // B6–B7 · Thi / KTCN: rời màn; trùng lỗi sai thầy đã xác nhận (cờ đỏ).
   const baiRoi = v.thi.filter((t) => t.roiLan >= NG.roiManLan || t.roiGiay >= NG.roiManGiay).length
-  if (baiRoi >= 2) them('thi', 10 * baiRoi, `${baiRoi} bài thi rời màn hình ≥ ${NG.roiManLan} lần hoặc ≥ ${NG.roiManGiay} giây`)
+  if (baiRoi >= 2) them('thi', 10 * baiRoi, `${baiRoi} bài thi rời màn hình ≥ ${NG.roiManLan} lần hoặc ≥ ${NG.roiManGiay} giây`, false, true)
   if (v.gianLanXacNhan > 0) them('thi', 40 * v.gianLanXacNhan, `${v.gianLanXacNhan} lần thầy xác nhận trùng lỗi sai với bạn khi thi`, true)
   // A1 · Bỏ KTCN.
   const tongKt = v.ktcn.daNop + v.ktcn.boHan
   const boKtcn = tiLe(v.ktcn.boHan, tongKt)
-  if (tongKt >= 4 && boKtcn !== null && boKtcn > 0) them('boKtcn', 40 * boKtcn, `bỏ ${v.ktcn.boHan}/${tongKt} bài kiểm tra cá nhân`)
+  if (tongKt >= 4 && boKtcn !== null && boKtcn > 0) them('boKtcn', 40 * boKtcn, `bỏ ${v.ktcn.boHan}/${tongKt} bài kiểm tra cá nhân`, false, boKtcn >= 0.5)
   // A3 · Vắng không phép (chỉ khi buổi đã gắn lớp).
   if (v.buoi && v.buoi.tong > 0) {
     const khongPhep = Math.max(0, v.buoi.tong - v.buoi.coMat - v.buoi.coPhep)
@@ -207,13 +209,14 @@ export function danhGiaEm(v: DauVaoDanhGia): KetQuaDanhGia {
   const coLam = new Set(lam.map((l) => l.ngay))
   let lien = 0, lienMax = 0
   for (const n of v.ngayCuaSo) { lien = coLam.has(n) ? 0 : lien + 1; lienMax = Math.max(lienMax, lien) }
-  if (lienMax >= NG.ngayLienKhongLam) them('khongLam', 5 * lienMax, `${lienMax} ngày liền không làm câu nào`)
+  if (lienMax >= NG.ngayLienKhongLam) them('khongLam', 5 * lienMax, `${lienMax} ngày liền không làm câu nào`, false, true)
 
   const tong = phat.reduce((s, p) => s + p.diem, 0)
   const diem = Math.max(0, Math.round((100 - tong) * 10) / 10)
   const coDo = phat.some((p) => p.coDo)
+  const xau = phat.some((p) => p.xau)
   const duDuLieu = doLuot.length + treoLuot.length >= NG.luotToiThieu || v.thi.length + tongKt >= NG.baiToiThieu
-  const bacTuan: 1 | 2 | 3 = coDo || diem < NG.diemTheoDoi ? 3 : diem < NG.diemHocThat ? 2 : 1
+  const bacTuan: 1 | 2 | 3 = xau || diem < NG.diemTheoDoi ? 3 : diem < NG.diemHocThat ? 2 : 1
 
   // Tiến bộ thật: đúng bản khác của câu từng sai; xu hướng điểm KTCN (nửa sau − nửa đầu).
   const d = v.ktcn.diem
@@ -223,7 +226,8 @@ export function danhGiaEm(v: DauVaoDanhGia): KetQuaDanhGia {
   return {
     duDuLieu,
     diem,
-    bacTuan: duDuLieu ? bacTuan : coDo ? 3 : 1,
+    // Chưa đủ dữ liệu ⇒ chỉ cờ đỏ nặng (gian lận / cố tình treo) mới gắn Đối phó; «không làm» vẫn tính (không làm thì làm gì có lượt).
+    bacTuan: duDuLieu ? bacTuan : coDo || phat.some((p) => p.ma === 'khongLam' || p.ma === 'boKtcn') ? (bacTuan === 1 ? 2 : bacTuan) : 1,
     phat,
     coDo,
     soLieu: { soLuot: lam.length, soDo: doLuot.length, soThuoc: thuoc.length, soBamVoi, soTreo: soTreoTong - soCoTinh, soCoTinh, ngayCoTinh, nhanDung, chamDung, dungGoc, dungSongSinh, boKtcn },

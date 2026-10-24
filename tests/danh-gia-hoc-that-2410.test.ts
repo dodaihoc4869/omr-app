@@ -54,9 +54,14 @@ describe('Điểm Thật một tuần', () => {
     expect(danhGiaEm(vao(l)).phat.find((p) => p.ma === 'thuocKhongHieu')).toBeTruthy()
   })
   it('ít lượt ⇒ chưa đủ dữ liệu, không gắn Đối phó vì vài lượt', () => {
-    const k = danhGiaEm(vao(luot(6, () => ({ ma: 1, dung: false, r: 0.1 }))))
+    const k = danhGiaEm(vao(luot(6, (i) => ({ ma: 1, dung: false, r: 0.1, ngay: NGAY[[0, 3, 6, 9, 12, 13][i]!]! }))))
     expect(k.duDuLieu).toBe(false)
     expect(k.bacTuan).toBe(1)
+  })
+  it('KHÔNG LÀM: ≥ 3 ngày liền không làm câu nào ⇒ Đối phó (loại «không làm») dù ít lượt', () => {
+    const k = danhGiaEm(vao(luot(6, (i) => ({ ngay: NGAY[i]! }))))
+    expect(k.phat.find((p) => p.ma === 'khongLam')).toMatchObject({ xau: true })
+    expect(k.bacTuan).toBe(3)
   })
 })
 
