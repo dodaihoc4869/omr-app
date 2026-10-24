@@ -4,7 +4,7 @@
 // HỎI MÁY CHỦ: lúc mở app 0 lệnh (cờ lớp em có bật giữ trên máy 6 giờ; cờ cũ ⇒ hỏi một lần khi máy rảnh). Tấm mở: 1 lệnh mở; đang chờ trả lời: 3 giây/lần;
 // tấm mở mà không chờ: 20 giây/lần; tấm đóng mà còn câu chờ: 60 giây/lần; xong là dừng.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AlertTriangle, ArrowRight, BookOpen, Camera, CheckCircle2, ChevronDown, ClipboardPaste, Clock, Image as Anh, Lightbulb, Lock, MoonStar, Send, ShieldCheck, Sparkles, WifiOff, Zap } from 'lucide-react'
+import { AlertTriangle, Anh, ArrowRight, BookOpen, Camera, CheckCircle2, ChevronDown, ClipboardPaste, Clock, Lightbulb, Lock, MoonStar, Send, ShieldCheck, Sparkles, WifiOff, Zap } from './bieu-tuong-ai'
 import { AnhLogo } from '../LogoVai'
 import { CO_CU_MS, docCoBat, ghiCoBat, guiAiDdh, moAiDdh, nenAnh, taoMaTin, tinMoiAiDdh, type MoAiDdh, type TinAiDdh } from '../../lib/ai-ddh-api'
 import { chuNguon, tachKhoi, type Khuc } from '../../lib/ai-ddh-dinh-dang'
@@ -72,7 +72,9 @@ function TinVanPhong({ t }: { t: TinAiDdh }) {
 
 interface TinCho { maTin: string; chu: string; anh: string[]; loi: string }
 
-export default function BongBongAiDdh({ token, sbd, ten }: { token: string; sbd: string; ten?: string }) {
+export default function BongBongAiDdh({ auth }: { auth: { token?: string | null; sbd: string; hoTen?: string | null } }) {
+  const token = auth.token ?? '', sbd = auth.sbd, hoTen = auth.hoTen
+  const ten = hoTen?.trim().split(/\s+/).pop()
   const co = docCoBat(sbd)
   const [bat, setBat] = useState<boolean>(co?.bat === true)
   const [mo, setMo] = useState(false)

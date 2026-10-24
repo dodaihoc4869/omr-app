@@ -38,15 +38,17 @@ describe('vẽ tin văn phòng', () => {
 })
 
 describe('nơi gắn bong bóng', () => {
-  it('chỉ ở màn Hôm nay / Câu đã làm / Lịch sử ca / Điểm / Bảng tin; không ở màn thi, kiểm tra, làm bài, game', () => {
+  it('chỉ ở màn Hôm nay (tab trống); không ở màn thi, kiểm tra, làm bài, game, hồ sơ', () => {
     const s = readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')
     const dong = s.split('\n').find((d) => d.includes('<BongBongAiDdh'))!
     expect(dong).toContain('!manThi')
-    expect(dong).toMatch(/tab === null \|\| tab === 'caudalam' \|\| tab === 'lichsuca' \|\| tab === 'diem' \|\| tab === 'bantin'/)
+    expect(dong).toContain('tab === null')
+    expect(dong).toContain('!moHoSoEm')
     expect(dong).not.toMatch(/'kiemtra'|'vaothi'|'hoctap'|'thanthu'|'bia'/)
   })
   it('bong bóng tải lười, ngoài precache', () => {
-    expect(readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')).toContain("lazy(() => import('../components/ai-ddh/BongBongAiDdh'))")
+    expect(readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')).toContain('lazy(() => napKhoiPhu().then((m) => m.napBong()))')
+    expect(readFileSync('src/components/cong-hs-nap-luoi.ts', 'utf8')).toContain("import('./ai-ddh/BongBongAiDdh')")
     expect(readFileSync('vite.config.ts', 'utf8')).toContain('BongBongAiDdh,ai-ddh-api,ai-ddh-dinh-dang')
   })
 })

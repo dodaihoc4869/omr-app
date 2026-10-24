@@ -44,8 +44,8 @@ export interface TrangThaiBuoi {
   coMat: EmDiemDanh[]
   siSo: number | null
   lopEm: EmLop[] | null
-  /** (24/10) SBD em vắng CÓ PHÉP của buổi. Máy chủ cũ không gửi ⇒ rỗng. */
-  coPhep: string[]
+  /** (24/10) SBD em vắng CÓ PHÉP (máy chủ gửi mảng; máy chủ cũ không gửi). Đọc bằng `dsCoPhep` ở app thầy. */
+  coPhep?: unknown
 }
 
 const chu = (v: unknown): string => (typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
@@ -76,8 +76,7 @@ export function docTrangThai(j: Record<string, unknown>): TrangThaiBuoi | null {
     .filter((x) => chu(x.sbd))
     .map((x) => ({ sbd: chu(x.sbd), hoTen: chu(x.hoTen), luc: chu(x.luc), cach: x.cach === 'thay' ? ('thay' as const) : ('ma' as const) }))
   const lopEm = Array.isArray(j.lopEm) ? j.lopEm.map(doiTuong).filter((x) => chu(x.sbd)).map((x) => ({ sbd: chu(x.sbd), hoTen: chu(x.hoTen), tenLop: chu(x.tenLop) })) : null
-  const coPhep = (Array.isArray(j.coPhep) ? j.coPhep : []).map(chu).filter(Boolean)
-  return { buoi, ma: /^\d{6}$/.test(chu(j.ma)) ? chu(j.ma) : null, doiMaLuc: so(j.doiMaLuc), coMat, siSo: so(j.siSo), lopEm, coPhep }
+  return { buoi, ma: /^\d{6}$/.test(chu(j.ma)) ? chu(j.ma) : null, doiMaLuc: so(j.doiMaLuc), coMat, siSo: so(j.siSo), lopEm, coPhep: j.coPhep }
 }
 
 const KHONG_CO_LENH = 'Máy chủ chưa có lệnh Điểm danh buổi học — cần đẩy bản máy chủ mới.'
@@ -94,8 +93,6 @@ export const xemBuoiHoc = (id: string, kemLop = false) => lenhBuoi({ action: 'xe
 export const themEmBuoi = (id: string, sbd: string[]) => lenhBuoi({ action: 'them-em', id, sbd })
 export const botEmBuoi = (id: string, sbd: string) => lenhBuoi({ action: 'bot-em', id, sbd })
 export const dongBuoiHoc = (id: string) => lenhBuoi({ action: 'dong', id })
-/** (24/10) Vắng có phép: bật / gỡ dấu cho một em vắng (em đang có mặt thì máy chủ giữ có mặt). */
-export const datCoPhep = (id: string, sbd: string, coPhep: boolean) => lenhBuoi({ action: coPhep ? 'co-phep' : 'bo-co-phep', id, sbd, kemLop: true })
 
 export async function buoiDangMo(): Promise<KetQuaLenh<BuoiHoc[]>> {
   const r = await goiLenh('/gv/buoi-hoc', { action: 'dang-mo' }, KHONG_CO_LENH)

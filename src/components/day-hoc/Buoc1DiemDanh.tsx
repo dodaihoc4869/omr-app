@@ -265,7 +265,7 @@ export default function Buoc1DiemDanh({
   onSangDauGio?: () => void
 }) {
   const { tt, dangTaiBuoi, coMat, buoiXong, goc, themMo, setThemMo, moThem, ketThuc, chieuMa, setChieuMa, napLopEm, doiCoPhep } = dd
-  const coPhep = useMemo(() => new Set(tt?.coPhep ?? []), [tt])
+  const coPhep = useMemo(() => new Set(Array.isArray(tt?.coPhep) ? tt.coPhep.map(String) : []), [tt])
   const nhip = useNhipBuoi(!!tt)
   const bang = useMemo(() => nhipTheoSbd(nhip.kq), [nhip.kq])
   const tk = useMemo(() => thongKeBuoi(tt, bang), [tt, bang])

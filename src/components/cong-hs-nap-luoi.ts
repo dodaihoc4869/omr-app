@@ -8,3 +8,5 @@ export { default as ModalKhacPhucCauSai } from './ModalKhacPhucCauSai'
 export { default as KhoiKhacPhuc3CheDo } from './KhoiKhacPhuc3CheDo'
 export { default as BtvnM3 } from './bang-nhiem-vu/BtvnM3'
 export { MomDanhSachM3, MomLamBaiM3 } from './bang-nhiem-vu/MomM3'
+// Bong bóng A.I Đỗ Đại Học (24/10): cửa nạp nằm Ở ĐÂY (không ở StudentPortalScreen) ⇒ danh sách mảnh kèm của import() không vào lượt mở /hs; bong bóng vẫn là mảnh riêng ngoài precache.
+export const napBong = () => import('./ai-ddh/BongBongAiDdh')

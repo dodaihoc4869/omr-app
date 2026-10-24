@@ -74,8 +74,6 @@ const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
 const ManKiemTraCaNhan = lazy(() => import('../components/hoc-tap/ManKiemTraCaNhan'))
 // Hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé") — nạp lười, ngoài precache.
 const HoSoCuaEmHs = lazy(() => import('../components/hoc-tap/HoSoCuaEmHs'))
-// Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; tải lười, ngoài precache; ẩn ở mọi màn làm bài / kiểm tra / game.
-const BongBongAiDdh = lazy(() => import('../components/ai-ddh/BongBongAiDdh'))
 const ManTuChua = lazy(() => import('../components/hoc-tap/ManTuChua'))
 
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
@@ -122,6 +120,8 @@ const KhoiKhacPhuc3CheDo = khoiPhu('KhoiKhacPhuc3CheDo')
 const BtvnM3 = khoiPhu('BtvnM3')
 const MomDanhSachM3 = khoiPhu('MomDanhSachM3')
 const MomLamBaiM3 = khoiPhu('MomLamBaiM3')
+// Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; chỉ ở Hôm nay; mảnh riêng ngoài precache, cửa nạp qua cong-hs-nap-luoi.
+const BongBongAiDdh = lazy(() => napKhoiPhu().then((m) => m.napBong()))
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import OSoTraLoi from '../components/OSoTraLoi'
@@ -893,7 +893,8 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {hop}
       {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
-      {auth.token && !manThi && tab === null && <TheDiemDanhHs token={auth.token} />}
+      {/* + bong bóng A.I Đỗ Đại Học (24/10): chỉ ở Hôm nay, không khi đang thi / mở hồ sơ. */}
+      {auth.token && !manThi && tab === null && <><TheDiemDanhHs token={auth.token} />{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} /></Suspense>}</>}
       {auth.token && !manThi && (
         <div inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
@@ -905,7 +906,6 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
           onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')}
         /></div>
       )}
-      {auth.token && !manThi && !moHoSoEm && (tab === null || tab === 'caudalam' || tab === 'lichsuca' || tab === 'diem' || tab === 'bantin') && <Suspense fallback={null}><BongBongAiDdh token={auth.token} sbd={auth.sbd} ten={auth.hoTen ? auth.hoTen.trim().split(/\s+/).pop() : undefined} /></Suspense>}
       {moHoSoEm && auth.token && tab === null && !manThi && <Suspense fallback={null}><HoSoCuaEmHs token={auth.token} tenEm={auth.hoTen ?? ''} lop={auth.lop ?? undefined} onDong={() => setMoHoSoEm(false)} onChuaCau={(qid) => { setMoHoSoEm(false); setQidChua(qid); setTab('tuchua') }} onMoBaiTap={() => { setMoHoSoEm(false); setTab('hoctap') }} /></Suspense>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
       {tab === 'kiemtra' && auth.token && !manThi && hoa2.ketQua?.cheDo2 && 'sanh' in hoa2.ketQua && hoa2.ketQua.sanh.kiemTraCaNhan && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManKiemTraCaNhan token={auth.token} sbd={auth.sbd} id={hoa2.ketQua.sanh.kiemTraCaNhan.id} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}

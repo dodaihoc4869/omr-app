@@ -172,7 +172,9 @@ export async function gvHangChoAiDdh(env: Env, b: Row, nowMs = Date.now()): Prom
   await damBaoAiDdh(env)
   const toiDa = Math.max(1, Math.min(20, num(b.toiDa) || 10))
   await env.DB.batch([
-    env.DB.prepare(SQL_GHI_CH).bind(KHOA_VP, String(nowMs), new Date(nowMs).toISOString()),
+    // Mốc «văn phòng trực» ghi lại tối đa 30 giây/lần (văn phòng hỏi vài giây một lần ⇒ không ghi D1 mỗi lượt).
+    env.DB.prepare(`INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?1, ?2, ?3) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc
+      WHERE CAST(cau_hinh.gia_tri AS INTEGER) < ?4`).bind(KHOA_VP, String(nowMs), new Date(nowMs).toISOString(), nowMs - 30_000),
     env.DB.prepare("UPDATE ai_ddh_tin SET trang_thai = 'cho' WHERE trang_thai = 'dang' AND lay_luc < ?").bind(nowMs - LAY_LAI_SAU_MS),
   ])
   const cho = (await env.DB.prepare("SELECT * FROM ai_ddh_tin WHERE trang_thai = 'cho' ORDER BY luc LIMIT ?").bind(toiDa).all<Row>()).results ?? []

@@ -15,7 +15,8 @@ import TamPhuChieuMa, { type ChuTamPhu, type PhongChoChieu } from '../TamPhuChie
 import { hoiXacNhan } from '../hop-thoai'
 import { NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../../lib/nhip-may-thay'
 import { layLopThay, type LopThay } from '../../lib/ten-lop-thay'
-import { botEmBuoi, buoiDangMo, datCoPhep, dongBuoiHoc, linkDiemDanh, moBuoiHoc, themEmBuoi, xemBuoiHoc, locEmThem, type BuoiHoc, type TrangThaiBuoi } from '../../lib/buoi-hoc-api'
+import { goiLenh } from '../../lib/goi-lenh-thay'
+import { botEmBuoi, buoiDangMo, dongBuoiHoc, linkDiemDanh, moBuoiHoc, themEmBuoi, xemBuoiHoc, locEmThem, type BuoiHoc, type TrangThaiBuoi } from '../../lib/buoi-hoc-api'
 import { emVangBuoi } from '../../lib/diem-danh-nhip'
 import Buoc1DiemDanh from './Buoc1DiemDanh'
 import './day-hoc.css'
@@ -179,9 +180,11 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
   /** (24/10) Bật / gỡ «vắng có phép» cho một em vắng — vắng không phép mới tính vào xếp Học thật · Đối phó. */
   const doiCoPhep = async (sbd: string, bat: boolean) => {
     if (!idBuoi) return
-    const r = await datCoPhep(idBuoi, sbd, bat)
-    if (!r.ok) showToast(r.chu, 'error')
-    else capNhat(r.du)
+    // Lệnh ghi trả lại trạng thái buổi; đọc lại bằng `xemBuoiHoc` để lớp nối dùng chung của cổng học sinh không phải mang thêm hàm chỉ thầy dùng.
+    const g = await goiLenh('/gv/buoi-hoc', { action: bat ? 'co-phep' : 'bo-co-phep', id: idBuoi, sbd }, 'Máy chủ chưa có lệnh vắng có phép — cần đẩy bản máy chủ mới.')
+    if (!g.ok) { showToast(g.chu, 'error'); return }
+    const r = await xemBuoiHoc(idBuoi, true)
+    if (r.ok) capNhat(r.du)
   }
   const themEm = async () => {
     if (!idBuoi || !emThem.size || dangThem) return
