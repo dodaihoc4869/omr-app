@@ -324,6 +324,8 @@ export default defineConfig({
           // Màn Tu luyện (30/09, bố cục ngang + máy tính): cả mảnh ManTuLuyen nạp LƯỜI khi em bấm cửa Tu luyện ở Sảnh — mọi việc của nó đều cần máy chủ
           // (tải nguồn, rút, chấm), mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc. Không ép vào precache vỏ (trần 3000 KB).
           '**/{ManTuLuyen,LuyenDeCauTruc}-*.{js,css}',
+          // Bong bóng A.I Đỗ Đại Học (24/10) + màn xếp học sinh của thầy: tải lười khi cần ⇒ kho chạy-lúc, precache không phình.
+          '**/{BongBongAiDdh,ai-ddh-api,ai-ddh-dinh-dang,BangHocThat,HoSoHocThatEm,hoc-that-api}-*.{js,css}',
           // Vòng chữa chỉ phát/chấm câu qua máy chủ: tải khung khi em mở, rồi giữ bằng kho chạy-lúc.
           // rut-de-chua được App nhập tĩnh: phải cất sẵn để GV/PH khởi động khi mất mạng.
           '**/{ManChuaCauSai,chua-cau-sai-thay-api,ThanhSoCauChua}-*.{js,css}',

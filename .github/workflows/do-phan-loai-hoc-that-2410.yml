@@ -1,0 +1,56 @@
+# ĐO NỀN CHO ĐỀ XUẤT «Học thật · Đối phó · Không dạy nổi» (CHỈ ĐỌC, 24/10) — số liệu thật để đặt ngưỡng, không bịa.
+# CHỈ SELECT gộp: in SỐ ĐẾM theo khoảng, không mã em, không tên em, không mã câu (repo công khai). Cửa sổ: 14 ngày gần nhất (giờ VN).
+# Mức làm 1 ước theo T_đọc = 8 + 0,35 × số từ + 10 nếu có hình (server/src/muc-lam.ts, hệ số đọc 1,0; câu ảnh lấy xấp xỉ).
+# Treo (Mức 5) theo treoCuaLuot: l ≥ 300 || a ≥ 600 || (w = 1 && a ≥ 180) || n ≥ 3.
+name: Đo nền phân loại học thật (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-phan-loai-hoc-that-2410.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-phan-loai-hoc-that
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          W="ngay_vn >= date('now','+7 hours','-14 days')"
+          LAM="COALESCE(purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc')"
+          DH="json_extract(raw_json,'\$.doc.dh')=1"
+          M1="($DH AND giay < CAST(8 + 0.35*COALESCE(json_extract(raw_json,'\$.doc.t'),0) + 10*COALESCE(json_extract(raw_json,'\$.doc.h'),0) AS INTEGER))"
+          M5="($DH AND (COALESCE(json_extract(raw_json,'\$.doc.l'),0)>=300 OR COALESCE(json_extract(raw_json,'\$.doc.a'),0)>=600 OR (json_extract(raw_json,'\$.doc.w')=1 AND COALESCE(json_extract(raw_json,'\$.doc.a'),0)>=180) OR COALESCE(json_extract(raw_json,'\$.doc.n'),0)>=3))"
+          E="WITH e AS (SELECT sbd, COUNT(*) n, SUM($DH) ndh, SUM($M1) m1, SUM($M5) m5, COUNT(DISTINCT ngay_vn) ngay, SUM(ket_qua=1) dung FROM su_kien_hoc WHERE $W AND $LAM GROUP BY sbd)"
+          q "0 Học sinh đã duyệt / tổng" "SELECT SUM(trang_thai='da_duyet') da_duyet, COUNT(*) tong FROM hoc_sinh"
+          q "1 Lượt làm câu 14 ngày: tổng, có đồng hồ mới, theo nguồn" "SELECT nguon, COUNT(*) n, SUM($DH) ndh, COUNT(DISTINCT sbd) so_em FROM su_kien_hoc WHERE $W AND $LAM GROUP BY nguon ORDER BY n DESC"
+          q "2 Số em theo số lượt đo được (dh=1) trong 14 ngày" "$E SELECT COUNT(*) em_co_lam, SUM(ndh=0) dh0, SUM(ndh BETWEEN 1 AND 19) dh1_19, SUM(ndh BETWEEN 20 AND 29) dh20_29, SUM(ndh BETWEEN 30 AND 59) dh30_59, SUM(ndh BETWEEN 60 AND 149) dh60_149, SUM(ndh>=150) dh150 FROM e"
+          q "3 Số em (≥30 lượt đo) theo tỉ lệ Mức làm 1 (chưa đọc xong đề)" "$E SELECT SUM(ndh>=30) mau, SUM(ndh>=30 AND m1*100<10*ndh) duoi10, SUM(ndh>=30 AND m1*100>=10*ndh AND m1*100<25*ndh) t10_25, SUM(ndh>=30 AND m1*100>=25*ndh AND m1*100<40*ndh) t25_40, SUM(ndh>=30 AND m1*100>=40*ndh AND m1*100<60*ndh) t40_60, SUM(ndh>=30 AND m1*100>=60*ndh) tu60 FROM e"
+          q "4 Số em (≥30 lượt đo) theo tỉ lệ lượt Treo máy" "$E SELECT SUM(ndh>=30) mau, SUM(ndh>=30 AND m5=0) khong, SUM(ndh>=30 AND m5>0 AND m5*100<5*ndh) duoi5, SUM(ndh>=30 AND m5*100>=5*ndh AND m5*100<15*ndh) t5_15, SUM(ndh>=30 AND m5*100>=15*ndh) tu15 FROM e"
+          q "5 Số em theo số ngày có làm trong 14 ngày" "$E SELECT SUM(ngay<=2) d0_2, SUM(ngay BETWEEN 3 AND 6) d3_6, SUM(ngay BETWEEN 7 AND 10) d7_10, SUM(ngay>=11) d11_14 FROM e"
+          q "6 Ghép Mức 1 × đúng: em ≥30 lượt đo, Mức 1 ≥ 40% — tỉ lệ đúng chung" "$E SELECT SUM(ndh>=30 AND m1*100>=40*ndh AND dung*100<50*n) m1cao_dung_thap, SUM(ndh>=30 AND m1*100>=40*ndh AND dung*100>=50*n) m1cao_dung_cao FROM e"
+          q "7 Buổi học 14 ngày (theo lớp: số buổi)" "SELECT COUNT(*) so_buoi, COUNT(DISTINCT lop) so_lop FROM buoi_hoc WHERE mo_luc >= datetime('now','-14 days')"
+          q "8 Số em theo số buổi có mặt trong 14 ngày" "WITH d AS (SELECT dd.sbd, COUNT(*) c FROM buoi_hoc_diem_danh dd JOIN buoi_hoc b ON b.id=dd.buoi_id WHERE b.mo_luc >= datetime('now','-14 days') AND dd.trang_thai='co_mat' GROUP BY dd.sbd) SELECT COUNT(*) em_co_mat_it_nhat_1, SUM(c=1) b1, SUM(c BETWEEN 2 AND 3) b2_3, SUM(c BETWEEN 4 AND 6) b4_6, SUM(c>=7) b7 FROM d"
+          q "9 Đi muộn: phút từ mở buổi tới lúc em điểm danh (lượt)" "SELECT COUNT(*) n, SUM(p<5) duoi5, SUM(p>=5 AND p<15) p5_15, SUM(p>=15 AND p<30) p15_30, SUM(p>=30) tu30 FROM (SELECT (julianday(dd.luc)-julianday(b.mo_luc))*1440 p FROM buoi_hoc_diem_danh dd JOIN buoi_hoc b ON b.id=dd.buoi_id WHERE b.mo_luc >= datetime('now','-14 days') AND dd.cach='ma')"
+          q "10 KTCN 14 ngày theo trạng thái" "SELECT trang_thai, COUNT(*) n, COUNT(DISTINCT sbd) so_em, ROUND(AVG(diem),2) diem_tb FROM kiem_tra_ca_nhan WHERE ngay >= date('now','+7 hours','-14 days') GROUP BY 1"
+          q "11 Cảnh báo thầy từ 10/10: số, em đã xem, PH đã xem, theo mốc" "SELECT moc, COUNT(*) n, SUM(em_xem_luc IS NOT NULL) em_xem, SUM(ph_xem_luc IS NOT NULL) ph_xem, COUNT(DISTINCT sbd) so_em FROM canh_bao_thay WHERE ngay >= '2026-10-10' GROUP BY 1"
+          q "12 Làm lại bản khác của câu từng sai (raw_json.tc) 14 ngày" "SELECT COUNT(*) n, SUM(ket_qua=1) dung, COUNT(DISTINCT sbd) so_em FROM su_kien_hoc WHERE $W AND json_extract(raw_json,'\$.tc') IS NOT NULL"
+          q "13 Giá trị ket_qua (14 ngày)" "SELECT typeof(ket_qua) kieu, ket_qua, COUNT(*) n FROM su_kien_hoc WHERE $W GROUP BY 1,2 ORDER BY n DESC LIMIT 6"
+          q "14 Lượt đo (dh=1) theo purpose · phần: số lượt, Mức 1, đúng" "SELECT COALESCE(purpose,'') purpose, json_extract(raw_json,'\$.doc.p') phan, COUNT(*) n, SUM($M1) m1, SUM(ket_qua=1) dung FROM su_kien_hoc WHERE $W AND $LAM AND $DH GROUP BY 1,2 ORDER BY n DESC LIMIT 15"
+          q "15 Lượt đo Phần I: giây so với T_đọc (tỉ lệ giây/T_đọc)" "SELECT SUM(r<0.25) duoi_025, SUM(r>=0.25 AND r<0.5) r025_05, SUM(r>=0.5 AND r<1) r05_1, SUM(r>=1 AND r<2) r1_2, SUM(r>=2) tu2, ROUND(AVG(td),1) t_doc_tb FROM (SELECT giay*1.0/(8 + 0.35*COALESCE(json_extract(raw_json,'\$.doc.t'),0) + 10*COALESCE(json_extract(raw_json,'\$.doc.h'),0)) r, 8 + 0.35*COALESCE(json_extract(raw_json,'\$.doc.t'),0) + 10*COALESCE(json_extract(raw_json,'\$.doc.h'),0) td FROM su_kien_hoc WHERE $W AND $LAM AND $DH AND json_extract(raw_json,'\$.doc.p')='I')"
+          q "16 Đúng theo Mức 1 / không Mức 1 (lượt đo)" "SELECT $M1 la_m1, COUNT(*) n, SUM(ket_qua=1) dung FROM su_kien_hoc WHERE $W AND $LAM AND $DH GROUP BY 1"

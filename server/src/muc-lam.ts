@@ -1,8 +1,9 @@
 // MỨC LÀM BÀI — Mức làm 1–4 của MỘT lượt làm câu (thầy 20–21/10: "từng câu học sinh làm phải hiển thị chi tiết 4 mức"). Đặc tả docs/dac-ta-muc-lam-bai-2010.md mục 3.
 // LÕI THUẦN, một nguồn duy nhất cho mọi màn (Hồ sơ làm bài của thầy · học sinh · phụ huynh; sau này điểm danh, "Ai đã sai", bản chiếu). Không đọc D1.
 //
-//   T_đọc  = `thoiGianDoc` (8 + 0,35 × số từ + 10 nếu có hình) × hệ số đọc của em. Hệ số đọc = 1,0 (đặc tả mục 3: "em chưa có τ ⇒ 1,0"; τ của OMNI CHƯA nối vào đây — xem `heSoDoc`).
-//   Mức 1  giây < T_đọc                                   "Chưa đọc hết đề"
+//   T_đọc  = `thoiGianDoc` (8 + 0,35 × số từ + 10 nếu có hình) × hệ số đọc của em (`heSoDocTuTau`: e^(−0,7·τ), số đo 24/10; em chưa có τ ⇒ 1,0).
+//   Mức 1  giây < T_đọc                                   "Bấm vội" khi SAI; khi ĐÚNG ⇒ «Thuộc» (`thuoc`, 24/10)
+//   T_đọc riêng từng lượt × hệ số lặp (`HE_SO_LAP`: câu đã gặp / song sinh đọc nhanh hơn — số đo thật 24/10)
 //   Mức 2  T_đọc ≤ giây < T_đọc + sàn nghĩ                "Đọc xong, chưa kịp nghĩ"
 //   Mức 3  giây ≥ T_đọc + sàn nghĩ, và (chưa có thời gian thường thật, hoặc giây < 0,8 × thường)   "Có nghĩ"
 //   Mức 4  giây ≥ 0,8 × thời gian thường của em, CHỈ khi β thật (lớp đủ mẫu, `docBetaCau`)       "Làm kỹ"
@@ -21,6 +22,41 @@ export const TI_LE_LAM_KY = 0.8
 /** Câu CHỈ LÀ ẢNH: `noiDungTuCauGoc` tính 40 từ mặc định + có hình ⇒ T_đọc chỉ là "≈"; Mức làm 1 chỉ khi giây < 0,5 × T_đọc (TẠM, đặc tả mục 3). */
 export const SO_TU_CAU_ANH = 40
 export const TI_LE_MUC_1_CAU_ANH = 0.5
+
+// CÂU LẶP LẠI (thầy 24/10: «tính thêm các câu hs lặp lại thì được đọc nhanh hơn bao nhiêu»). Số đo thật 14 ngày, lượt ĐÚNG, giây TB so với câu mới thật
+// (workflow do-giay-doc-ca-nhan-2410, run 40083002666; docs/DE-XUAT-HOC-THAT-DOI-PHO-2410.md mục 0.2). T_đọc của lượt = T_đọc chung × hệ số lặp này.
+//   chỉ số mảng: 0 = song sinh (bản khác của câu từng sai, chưa gặp chính câu này) · 1 = gặp lần 2 · 2 = gặp lần 3 · 3 = gặp lần 4 trở lên.
+export const HE_SO_LAP: Readonly<Record<PhanMucLam, readonly [number, number, number, number]>> = {
+  I: [0.51, 0.38, 0.3, 0.22],
+  II: [0.64, 0.65, 0.48, 0.25],
+  III: [0.42, 0.35, 0.25, 0.18],
+}
+/** Quên dần: lần gặp trước cách > 7 ngày ⇒ chậm hơn ~1,6 lần (15,0 s so với 9,3 s); 4–7 ngày ⇒ ~1,15 lần. Hệ số lặp sau khi nhân không vượt 1. */
+export const HE_SO_QUEN_TREN_7_NGAY = 1.6
+export const HE_SO_QUEN_4_7_NGAY = 1.15
+/** Lặp lại của MỘT lượt: số lần em đã làm câu này trước đó, đúng hay sai (0 = lần đầu), có phải bản song sinh, cách lần gặp trước bao nhiêu ngày. */
+export interface LapLai {
+  lan: number
+  songSinh: boolean
+  ngayCach: number | null
+}
+/** HỆ SỐ ĐỌC RIÊNG = e^(−0,7·τ) (24/10, run 40093318187): trên câu MỚI THẬT, r = giây/T_đọc theo nhóm τ OMNI: τ −0,56 ⇒ r 2,33 · τ −0,13 ⇒ 1,84 ·
+ *  τ 0,16 ⇒ 1,50 · τ 0,47 ⇒ 1,15 — ln(2,33/1,15) / 1,03 ≈ 0,7. Kẹp 0,6–1,6 (em τ cực trị không kéo T_đọc quá xa). */
+export const HE_SO_TAU_DOC = 0.7
+export const HE_SO_DOC_MIN = 0.6
+export const HE_SO_DOC_MAX = 1.6
+export const heSoDocTuTau = (tau: number | null | undefined): number | undefined => (typeof tau === 'number' && Number.isFinite(tau) ? Math.exp(-HE_SO_TAU_DOC * tau) : undefined)
+/** Hệ số nhân T_đọc vì câu đã gặp (1 = câu mới thật). Thuần. */
+export function heSoLap(phan: PhanMucLam, lap: LapLai | null | undefined): number {
+  if (!lap) return 1
+  const bang = HE_SO_LAP[phan]
+  if (!bang) return 1
+  const lan = Number.isFinite(lap.lan) ? Math.max(0, Math.floor(lap.lan)) : 0
+  if (lan === 0 && !lap.songSinh) return 1
+  const goc = lan === 0 ? bang[0] : bang[Math.min(3, lan)]
+  const quen = lap.ngayCach === null || !Number.isFinite(lap.ngayCach) ? 1 : lap.ngayCach > 7 ? HE_SO_QUEN_TREN_7_NGAY : lap.ngayCach >= 4 ? HE_SO_QUEN_4_7_NGAY : 1
+  return Math.min(1, goc * quen)
+}
 
 // TREO MÁY (thầy 22/10: thêm "treo máy", "cố tình treo máy"; đặc tả docs/dac-ta-muc-lam-6-muc-2210.md mục 4). Ngưỡng TẠM — chỉnh sau ~1 tuần dữ liệu thật.
 // Hai mức mới ĐÈ lên Mức làm 1–4 khi xảy ra (lượt treo thì giây không còn nói em đã nghĩ bao lâu); `ma` 1–4 vẫn tính như cũ để so được dữ liệu cũ.
@@ -58,6 +94,10 @@ export interface MucLamLuot {
   xapXi?: true
   /** Chỉ cho thầy: lượt ĐÚNG nộp trước T_đọc (có thể đã biết bài, có thể đoán trúng) — ghi chú, KHÔNG tính là vội. */
   ghiChu?: 'dung_truoc_doc'
+  /** (24/10) «Thuộc»: lượt ĐÚNG nhanh hơn T_đọc (cùng điều kiện với `ghiChu`). Mức làm 1 từ nay chỉ còn nghĩa «Bấm vội» = nhanh MÀ SAI. */
+  thuoc?: true
+  /** (24/10) Hệ số lặp đã nhân vào T_đọc (< 1 ⇒ câu em đã gặp / song sinh). Vắng ⇒ câu mới. */
+  heSoLap?: number
   /** RANH GIỚI vào Mức làm 2 / 3 / 4 (giây nguyên; giây làm ≥ ranh thì thuộc mức ấy; Mức làm 1 bắt đầu từ 0). Màn hình vẽ thước và ghi khoảng giây từ ĐÂY — không màn nào biết các tỉ lệ
    *  (0,5 của câu ảnh, 0,8 của thời gian thường). `ranh4` vắng ⇒ lớp chưa đủ mẫu, không có Mức làm 4. `ranh4` có thể ≤ `ranh3` (thường nhỏ): Mức làm 3 khi ấy rỗng. */
   ranh2: number
@@ -87,12 +127,14 @@ export interface DauVaoMucLam {
   dung: boolean | null
   /** Thời gian thường của em (giây) = e^(β − τ)/1000 khi β thật; null/vắng = chưa có. */
   thuongGiay?: number | null
-  /** Hệ số đọc của em (e^(−τ) kẹp 0,75–1,5); vắng ⇒ 1,0. */
+  /** Hệ số đọc của em (`heSoDocTuTau`: e^(−0,7·τ) kẹp 0,6–1,6); vắng ⇒ 1,0. */
   heSoDoc?: number
   /** Giây không phải số đo đồng hồ mới (xem `MucLamLuot.uocTinh`). */
   uocTinh?: 'cu' | 'uoc'
   /** Số đo treo máy (`raw_json.doc` v/a/l/n/w); vắng/null ⇒ `chuaDoTreo`. Giây cũ / ước tính không bao giờ có. */
   treo?: DoTreo | null
+  /** (24/10) Câu em đã gặp ⇒ T_đọc ngắn lại theo `HE_SO_LAP`; vắng ⇒ coi như câu mới. */
+  lap?: LapLai | null
 }
 
 const kep = (x: number, thap: number, cao: number): number => Math.min(cao, Math.max(thap, x))
@@ -103,8 +145,9 @@ export function mucLamCuaLuot(d: DauVaoMucLam): MucLamLuot | null {
   if (!Number.isFinite(d.soTu) || d.soTu < 0) return null
   const san = SAN_NGHI_GIAY[d.phan]
   if (san === undefined) return null
-  const he = typeof d.heSoDoc === 'number' && Number.isFinite(d.heSoDoc) ? kep(d.heSoDoc, 0.75, 1.5) : 1
-  const doc = Math.round(thoiGianDoc(d.soTu, d.coHinh) * he)
+  const he = typeof d.heSoDoc === 'number' && Number.isFinite(d.heSoDoc) ? kep(d.heSoDoc, HE_SO_DOC_MIN, HE_SO_DOC_MAX) : 1
+  const lap = heSoLap(d.phan, d.lap)
+  const doc = Math.max(1, Math.round(thoiGianDoc(d.soTu, d.coHinh) * he * lap))
   const xapXi = d.soTu === SO_TU_CAU_ANH && d.coHinh
   // Giây cũ / ước tính chỉ có thể dư ⇒ không đủ chắc để xếp "làm kỹ": bỏ thời gian thường (không có Mức làm 4).
   const thuong = !d.uocTinh && typeof d.thuongGiay === 'number' && Number.isFinite(d.thuongGiay) && d.thuongGiay > 0 ? Math.round(d.thuongGiay) : null
@@ -130,7 +173,8 @@ export function mucLamCuaLuot(d: DauVaoMucLam): MucLamLuot | null {
     ...(ranh4 !== undefined ? { ranh4 } : {}),
     ...(thuong !== null ? { thuong } : {}),
     ...(xapXi ? { xapXi: true as const } : {}),
-    ...(ma === 1 && d.dung === true ? { ghiChu: 'dung_truoc_doc' as const } : {}),
+    ...(ma === 1 && d.dung === true ? { ghiChu: 'dung_truoc_doc' as const, thuoc: true as const } : {}),
+    ...(lap < 1 ? { heSoLap: Math.round(lap * 100) / 100 } : {}),
     ...(d.uocTinh ? { uocTinh: d.uocTinh } : {}),
     ...(treo && so ? { treo, giayTreo: Math.max(so.l, so.a) } : so ? { daDoTreo: true as const } : {}),
   }
@@ -192,15 +236,17 @@ export interface TongMucLam {
   soCoTinh: number
   /** Trong `soDo`: lượt chưa có số đo treo máy (lượt cũ / máy em chưa có đồng hồ 22/10). */
   soChuaDoTreo: number
+  /** (24/10) Trong `soDo`: lượt «Thuộc» (Mức 1 mà ĐÚNG, không treo). `tachThuoc` ⇒ không đếm trong dòng Mức 1. */
+  soThuoc: number
 }
 
 /**
  * `tachTreo` (giao diện 6 mức, Đợt 2): lượt treo KHÔNG đếm vào bốn dòng Mức 1–4 / vội / dù nghĩ (chỉ vào `soTreo`/`soCoTinh`). Mặc định false = bốn dòng như cũ
  * (giao diện 4 mức đang chạy cộng bốn dòng = `soDo`) — màn nào làm xong 6 mức mới bật.
  */
-export function tongMucLam(luot: readonly { mucLam?: MucLamLuot | null; dung: boolean | null }[], tuy: { tachTreo?: boolean } = {}): TongMucLam {
+export function tongMucLam(luot: readonly { mucLam?: MucLamLuot | null; dung: boolean | null }[], tuy: { tachTreo?: boolean; tachThuoc?: boolean } = {}): TongMucLam {
   const theoMuc: TongMucLam['theoMuc'] = [1, 2, 3, 4].map((ma) => ({ ma: ma as MaMucLam, luot: 0, dung: 0, sai: 0 })) as TongMucLam['theoMuc']
-  let soDo = 0, chuaCoSoDo = 0, saiLamVoi = 0, saiDuNghi = 0, dungTruocDoc = 0, coBetaThat = false, soUocTinh = 0, soTreo = 0, soCoTinh = 0, soChuaDoTreo = 0
+  let soDo = 0, chuaCoSoDo = 0, saiLamVoi = 0, saiDuNghi = 0, dungTruocDoc = 0, coBetaThat = false, soUocTinh = 0, soTreo = 0, soCoTinh = 0, soChuaDoTreo = 0, soThuoc = 0
   for (const l of luot) {
     const m = l.mucLam
     if (!m) { chuaCoSoDo++; continue }
@@ -211,6 +257,9 @@ export function tongMucLam(luot: readonly { mucLam?: MucLamLuot | null; dung: bo
     if (m.uocTinh) soUocTinh++
     if (m.thuong !== undefined) coBetaThat = true
     if (m.treo && tuy.tachTreo) continue
+    const laThuoc = !m.treo && m.ma === 1 && l.dung === true
+    if (laThuoc) soThuoc++
+    if (laThuoc && tuy.tachThuoc) { dungTruocDoc++; continue }
     const dong = theoMuc[m.ma - 1]!
     dong.luot++
     if (l.dung === true) dong.dung++
@@ -218,5 +267,5 @@ export function tongMucLam(luot: readonly { mucLam?: MucLamLuot | null; dung: bo
     if (l.dung !== true) { if (m.ma <= 2) saiLamVoi++; else saiDuNghi++ }
     if (m.ghiChu === 'dung_truoc_doc') dungTruocDoc++
   }
-  return { soDo, chuaCoSoDo, theoMuc, saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat, soUocTinh, soTreo, soCoTinh, soChuaDoTreo }
+  return { soDo, chuaCoSoDo, theoMuc, saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat, soUocTinh, soTreo, soCoTinh, soChuaDoTreo, soThuoc }
 }

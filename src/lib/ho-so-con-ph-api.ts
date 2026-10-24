@@ -31,7 +31,7 @@ export function danhTinhPhuHuynh(sbd: string): { pass: string } | { sbd: string 
 }
 
 /** Gọi một lệnh phụ huynh (POST JSON). 404 ⇒ máy chủ cũ; quá hạn ⇒ chậm; mất mạng; máy chủ từ chối ⇒ giữ lời máy chủ (đã viết cho người đọc). */
-async function goiLenhCon(duong: string, sbd: string, them: Record<string, unknown> = {}): Promise<KetQuaLenh<Record<string, unknown>>> {
+export async function goiLenhCon(duong: string, sbd: string, them: Record<string, unknown> = {}): Promise<KetQuaLenh<Record<string, unknown>>> {
   const danhTinh = danhTinhPhuHuynh(sbd)
   if (!danhTinh) return thoat('tu_choi', 'Anh/chị mở lại liên kết riêng thầy gửi hoặc nhập số báo danh của con.')
   let url: string
@@ -103,3 +103,4 @@ export async function layLichSuLamCauCon(sbd: string, gioiHan?: number): Promise
 export function taoNguonHoSoCon(sbd: string): { hoSoThaiDo(): Promise<KetQuaLenh<KetQuaHoSoThaiDo>>; lichSu(gioiHan?: number): Promise<KetQuaLenh<KetQuaLichSuLamCau>> } {
   return { hoSoThaiDo: () => layHoSoThaiDoCon(sbd), lichSu: (gioiHan) => layLichSuLamCauCon(sbd, gioiHan) }
 }
+

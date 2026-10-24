@@ -17,7 +17,7 @@ type Thoat = Extract<KetQuaLenh<never>, { ok: false }>
 const thoat = (loai: Thoat['loai'], chu: string): Thoat => ({ ok: false, loai, chu })
 
 /** Gọi một lệnh học sinh (POST JSON có token). 404 ⇒ máy chủ cũ; quá hạn ⇒ chậm; mất mạng; máy chủ từ chối ⇒ giữ NGUYÊN lời máy chủ (đã viết cho em). */
-async function goiLenhEm(duong: string, body: Record<string, unknown>): Promise<KetQuaLenh<Record<string, unknown>>> {
+export async function goiLenhEm(duong: string, body: Record<string, unknown>): Promise<KetQuaLenh<Record<string, unknown>>> {
   let url: string
   try {
     url = await layDiaChiMayChu()
@@ -71,3 +71,4 @@ export async function layLichSuLamCauEm(token: string, gioiHan?: number): Promis
 export function taoNguonHoSoEm(token: string): { hoSoThaiDo(): Promise<KetQuaLenh<KetQuaHoSoThaiDo>>; lichSu(gioiHan?: number): Promise<KetQuaLenh<KetQuaLichSuLamCau>> } {
   return { hoSoThaiDo: () => layHoSoThaiDoEm(token), lichSu: (gioiHan) => layLichSuLamCauEm(token, gioiHan) }
 }
+

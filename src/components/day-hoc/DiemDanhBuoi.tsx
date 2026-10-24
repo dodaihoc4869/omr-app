@@ -15,6 +15,7 @@ import TamPhuChieuMa, { type ChuTamPhu, type PhongChoChieu } from '../TamPhuChie
 import { hoiXacNhan } from '../hop-thoai'
 import { NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../../lib/nhip-may-thay'
 import { layLopThay, type LopThay } from '../../lib/ten-lop-thay'
+import { goiLenh } from '../../lib/goi-lenh-thay'
 import { botEmBuoi, buoiDangMo, dongBuoiHoc, linkDiemDanh, moBuoiHoc, themEmBuoi, xemBuoiHoc, locEmThem, type BuoiHoc, type TrangThaiBuoi } from '../../lib/buoi-hoc-api'
 import { emVangBuoi } from '../../lib/diem-danh-nhip'
 import Buoc1DiemDanh from './Buoc1DiemDanh'
@@ -176,6 +177,15 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
     if (!r.ok) showToast(r.chu, 'error')
     else capNhat(r.du)
   }
+  /** (24/10) Bật / gỡ «vắng có phép» cho một em vắng — vắng không phép mới tính vào xếp Học thật · Đối phó. */
+  const doiCoPhep = async (sbd: string, bat: boolean) => {
+    if (!idBuoi) return
+    // Lệnh ghi trả lại trạng thái buổi; đọc lại bằng `xemBuoiHoc` để lớp nối dùng chung của cổng học sinh không phải mang thêm hàm chỉ thầy dùng.
+    const g = await goiLenh('/gv/buoi-hoc', { action: bat ? 'co-phep' : 'bo-co-phep', id: idBuoi, sbd }, 'Máy chủ chưa có lệnh vắng có phép — cần đẩy bản máy chủ mới.')
+    if (!g.ok) { showToast(g.chu, 'error'); return }
+    const r = await xemBuoiHoc(idBuoi, true)
+    if (r.ok) capNhat(r.du)
+  }
   const themEm = async () => {
     if (!idBuoi || !emThem.size || dangThem) return
     setDangThem(true)
@@ -229,7 +239,7 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
     },
     [idBuoi, showToast],
   )
-  return { dsBuoiMo, chonBuoi, dangChonBuoi, dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, lopThem, setLopThem, dangThem, goc, idBuoi, capNhat, lamMoi, loiLamMoi, napLopEm, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, lopCuaEm, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong }
+  return { dsBuoiMo, chonBuoi, dangChonBuoi, dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, lopThem, setLopThem, dangThem, goc, idBuoi, capNhat, lamMoi, loiLamMoi, napLopEm, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, doiCoPhep, themEm, moThem, coMat, lopCuaEm, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong }
 }
 export type DiemDanhBuoi = ReturnType<typeof useDiemDanhBuoi>
 

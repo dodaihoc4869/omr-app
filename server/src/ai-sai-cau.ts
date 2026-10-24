@@ -9,10 +9,10 @@
 import type { Env } from './kieu'
 import { loaiGameCua } from './dau-gio'
 import { cacQidSongSinh, tachSongSinh } from './loi-hoc-luat'
-import { docBetaCau } from './omni-d1'
+import { docBetaVaTau } from './omni-d1'
 import type { MucLamLuot } from './muc-lam'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
-import { chuanMucDo, docDoMuc, gocCanBeta, mucLamTuDong } from './muc-lam-so'
+import { chuanMucDo, docDoMuc, gocCanBeta, lapLaiCacLuot, mucLamTuDong } from './muc-lam-so'
 import { mucCongKhai } from './muc-lam'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
 
@@ -134,17 +134,24 @@ export async function aiSaiCau(env: Env, b: Row): Promise<Row> {
     try { if (x.doc) { const j = JSON.parse(String(x.doc)) as unknown; if (j && typeof j === 'object' && !Array.isArray(j)) doc = j as Row } } catch { /* doc hỏng ⇒ chưa có số đo */ }
     return { doMuc: docDoMuc(doc ? { doc } : null), giayDo: doThat[i] ?? null, goc: tachSongSinh(str(x.tc) || str(x.qid)).goc, mucDo: chuanMucDo(x.muc_do), dung: false as boolean | null }
   })
+  // Lặp lại (24/10): đếm trong chính các lượt sai đã đọc của câu này (gần đúng — lượt đúng không có ở đây ⇒ chỉ có thể đếm THIẾU, T_đọc dài hơn, không oan em).
+  const lap = lapLaiCacLuot(rows.map((x) => ({ sbd: str(x.sbd), qid: str(x.qid), tc: str(x.tc) || null, luc: str(x.luc) })))
+  dongMuc.forEach((d, i) => Object.assign(d, { lap: lap[i] ?? null }))
   const gocMuc = gocCanBeta(dongMuc)
   // ĐO LẠI LƯỢT CŨ (21/10): kích thước đề (bảng tính sẵn) của các câu mà lượt chưa có `doc` — MỘT lệnh đọc CÙNG đợt; lỗi / bảng chưa có ⇒ rỗng (lượt cũ vẫn "Chưa có số đo").
   // CA THI KHÔNG ĐO LẠI (giây ca thi cũ có thể THIẾU: chỉ cộng cho một câu hiện nhiều nhất, bỏ qua lúc tab ẩn) — chỉ xin kích thước cho lượt game / lượt có giây cột-ms.
   const gocCanKichThuoc = [...new Set(dongMuc.filter((d, i) => !d.doMuc && d.goc && str(rows[i]?.nguon) !== 'thi').map((d) => d.goc))]
-  const [loai, uoc, ct, beta, kichThuoc] = await Promise.all([
+  // β + τ trong MỘT lệnh D1 (luật tốc độ).
+  const bt = gocMuc.length ? docBetaVaTau(env, gocMuc, [...new Set(rows.map((x) => str(x.sbd)))]).catch(() => [new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>]) : Promise.resolve([new Map<string, number>(), new Map<string, number>()] as [Map<string, number>, Map<string, number>])
+  const [loai, uoc, ct, beta, kichThuoc, tau] = await Promise.all([
     loaiGameCua(env, dongGame.map((x) => x.phien)).catch(() => new Map<string, 'doan' | 'bia' | 'dao'>()),
     giayUocTinhGame(env, gameThieu).catch(() => new Map<string, number>()),
     chiTietCauCuaLuot(env, thiThieu.map((x) => str(x.ma_nguon)), thiThieu.map((x) => str(x.sbd)), thiThieu.map((x) => str(x.qid))).catch(() => new Map<string, { chon: string | null; giay: number | null }>()),
-    gocMuc.length ? docBetaCau(env, gocMuc).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
+    bt.then((x) => x[0]),
     gocCanKichThuoc.length ? docKichThuocCau(env, gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
+    bt.then((x) => x[1]),
   ])
+  dongMuc.forEach((d, i) => Object.assign(d, { tau: tau.get(str(rows[i]?.sbd)) ?? null }))
   const ds: LuotSai[] = rows.map((x, i) => {
     const nguon = str(x.nguon)
     const noi = nguon === 'thi' ? noiCuaCa(str(x.ten_ca)) : tenNguonNgan(nguon, nguon === 'game' ? (loai.get(str(x.ma_nguon)) ?? 'dao') : null)

@@ -120,6 +120,8 @@ const KhoiKhacPhuc3CheDo = khoiPhu('KhoiKhacPhuc3CheDo')
 const BtvnM3 = khoiPhu('BtvnM3')
 const MomDanhSachM3 = khoiPhu('MomDanhSachM3')
 const MomLamBaiM3 = khoiPhu('MomLamBaiM3')
+// Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; chỉ ở Hôm nay; mảnh riêng ngoài precache, cửa nạp qua cong-hs-nap-luoi.
+const BongBongAiDdh = lazy(() => napKhoiPhu().then((m) => m.napBong()))
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import OSoTraLoi from '../components/OSoTraLoi'
@@ -891,7 +893,8 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {hop}
       {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
-      {auth.token && !manThi && tab === null && <TheDiemDanhHs token={auth.token} />}
+      {/* + bong bóng A.I Đỗ Đại Học (24/10): chỉ ở Hôm nay, không khi đang thi / mở hồ sơ. */}
+      {auth.token && !manThi && tab === null && <><TheDiemDanhHs token={auth.token} />{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} /></Suspense>}</>}
       {auth.token && !manThi && (
         <div inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}

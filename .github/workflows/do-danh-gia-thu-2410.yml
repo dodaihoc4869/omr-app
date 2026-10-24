@@ -1,0 +1,61 @@
+# XEM THỬ XẾP HỌC SINH TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 24/10 — chưa phát hành). Chạy mã máy chủ của NHÁNH NÀY bằng `wrangler dev` nối D1 thật
+# (thầy cho phép dùng khoá Cloudflare 24/10), gọi `/gv/danh-gia/thu` theo lô 25 em: lệnh CHỈ ĐỌC (không tạo bảng, không ghi), chỉ trả số đếm gộp.
+# Log chỉ in tổng số đếm — không tên, không SBD (repo công khai).
+name: Xem thử xếp học sinh (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-danh-gia-thu-2410.yml', 'server/src/danh-gia-hoc-that.ts']
+permissions:
+  contents: read
+concurrency:
+  group: do-danh-gia-thu
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chạy Worker của nhánh, D1 thật (chỉ đọc qua lệnh xem thử)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          MB=$(openssl rand -hex 24); echo "::add-mask::$MB"; echo "MB_LUOT=$MB" >> "$GITHUB_ENV"
+          awk '/^\[triggers\]/{skip=1;next} /^\[/{skip=0} !skip{print} /^binding = "DB"$/||/^binding = "DE"$/{print "remote = true"}' wrangler.toml > wrangler.thu.toml
+          nohup npx -y wrangler@4 dev -c wrangler.thu.toml --ip 127.0.0.1 --port 8787 --var "MA_BI_MAT:$MB" > /tmp/wrangler-dev.log 2>&1 &
+          for i in $(seq 1 90); do curl -s -o /dev/null http://127.0.0.1:8787/ && break; sleep 2; done
+          grep -iE 'remote|ready' /tmp/wrangler-dev.log | head -5 || true
+      - name: Xem thử theo lô, gộp số đếm
+        run: |
+          node -e '
+          const MB = process.env.MB_LUOT; let sau = "", tong = {}, soEm = 0
+          ;(async () => {
+            for (let i = 0; i < 40; i++) {
+              const r = await fetch("http://127.0.0.1:8787/gv/danh-gia/thu", { method: "POST", headers: { "content-type": "application/json", "x-ma-bi-mat": MB }, body: JSON.stringify({ sau }) })
+              const j = await r.json()
+              if (!j.ok) { console.log("LOI", r.status, String(j.error || "").slice(0, 160)); process.exit(1) }
+              soEm += j.soEm || 0
+              for (const [k, v] of Object.entries(j.dem || {})) tong[k] = (tong[k] || 0) + v
+              if (j.xong) break
+              sau = j.sau
+            }
+            console.log("SO_EM", soEm)
+            for (const k of Object.keys(tong).sort()) console.log(k.padEnd(22), tong[k])
+          })()'
+      - name: Nhật ký Worker (dòng lỗi)
+        if: always()
+        run: grep -iE 'error|exception|✘' /tmp/wrangler-dev.log | head -30 || true

@@ -1,0 +1,279 @@
+// BONG BÓNG CHAT «A.I ĐỖ ĐẠI HỌC» (thầy 24/10 duyệt bản vẽ 3 — docs/ban-ve-ai-ddh-2410/, đặc tả docs/DAC-TA-AI-DDH-APP-HS-2410.md).
+// Một kênh hỏi bài nữa của VĂN PHÒNG (y như Hộp thư Zalo): em gửi chữ / ảnh ⇒ hàng chờ ⇒ văn phòng giải đúng luồng của mình ⇒ trả lời hiện ở đây.
+// Tải lười, ngoài precache; nơi gắn (StudentPortalScreen) ẩn hẳn ở màn kiểm tra / làm bài / game. Máy chủ còn khoá thêm khi em có bài kiểm tra mở.
+// HỎI MÁY CHỦ: lúc mở app 0 lệnh (cờ lớp em có bật giữ trên máy 6 giờ; cờ cũ ⇒ hỏi một lần khi máy rảnh). Tấm mở: 1 lệnh mở; đang chờ trả lời: 3 giây/lần;
+// tấm mở mà không chờ: 20 giây/lần; tấm đóng mà còn câu chờ: 60 giây/lần; xong là dừng.
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AlertTriangle, Anh, ArrowRight, BookOpen, Camera, CheckCircle2, ChevronDown, ClipboardPaste, Clock, Lightbulb, Lock, MoonStar, Send, ShieldCheck, Sparkles, WifiOff, Zap } from './bieu-tuong-ai'
+import { AnhLogo } from '../LogoVai'
+import { batNhipBenVung } from '../../lib/nhip-ben-vung'
+import { CO_CU_MS, docCoBat, ghiCoBat, guiAiDdh, moAiDdh, nenAnh, taoMaTin, tinMoiAiDdh, type MoAiDdh, type TinAiDdh } from '../../lib/ai-ddh-api'
+import { chuNguon, tachKhoi, type Khuc } from '../../lib/ai-ddh-dinh-dang'
+import './ai-ddh.css'
+
+const Mat = ({ co = 40, on = false }: { co?: number; on?: boolean }) => (
+  <span className="aid-mat" data-on={on ? '' : undefined} style={{ width: co, height: co }}><AnhLogo vai="hs" size={Math.round(co * 0.82)} /></span>
+)
+const gio = (ms: number) => new Date(ms + 7 * 3600_000).toISOString().slice(11, 16)
+
+function Chu({ khuc }: { khuc: Khuc[] }) {
+  return <>{khuc.map((k, i) => (k.chu === '\n' ? <br key={i} /> : <span key={i} className={k.kieu.map((x) => `aid-kieu-${x}`).join(' ') || undefined}>{k.chu}</span>))}</>
+}
+
+/** Một tin văn phòng: tách khối từ đánh dấu Zalo ⇒ dải đáp án, bước có số, khung phương trình, ô chỗ hay nhầm. */
+function TinVanPhong({ t }: { t: TinAiDdh }) {
+  const khoi = useMemo(() => tachKhoi(t.chu), [t.chu])
+  const coKhoi = khoi.some((k) => k.loai !== 'doan')
+  const nguon = chuNguon(t.nguon, t.chiGoiY)
+  const nhanNguon = nguon ? (
+    <span className="aid-nguon" data-l={t.chiGoiY ? 'goi-y' : t.nguon === 'kho' || t.nguon === 'de' ? 'kho' : 'hai'}>
+      {t.chiGoiY ? <Lightbulb size={14} /> : t.nguon === 'kho' || t.nguon === 'de' ? <ShieldCheck size={14} /> : <Sparkles size={14} />}{nguon}
+    </span>
+  ) : null
+  const buoc = khoi.filter((k) => k.loai === 'buoc')
+  return (
+    <>
+      {t.chu.trim() && (
+        <div className="aid-bt">
+          {coKhoi ? (
+            <div className="aid-giai">
+              {khoi.map((k, i) => {
+                if (k.loai === 'dap') return <div key={i} className="aid-dap"><span className="aid-dap-icon"><CheckCircle2 size={20} /></span><span><small>Đáp án</small><b><Chu khuc={k.khuc} /></b></span></div>
+                if (k.loai === 'pt') return <div key={i} className="aid-pt"><Chu khuc={k.khuc} /></div>
+                if (k.loai === 'nham') return <div key={i} className="aid-nham"><AlertTriangle size={18} /><span><small>Chỗ hay nhầm</small><Chu khuc={k.khuc} /></span></div>
+                if (k.loai === 'buoc') {
+                  if (k !== buoc[0]) return null
+                  return <ol key={i} className="aid-buoc">{buoc.map((b, j) => <li key={j}><p><Chu khuc={b.khuc} /></p></li>)}</ol>
+                }
+                return <p key={i} style={{ margin: 0 }}><Chu khuc={k.khuc} /></p>
+              })}
+              {nhanNguon}
+            </div>
+          ) : (
+            <div className="aid-chu">{khoi.map((k, i) => <p key={i}><Chu khuc={k.khuc} /></p>)}{nhanNguon}</div>
+          )}
+        </div>
+      )}
+      {t.trangUrl && !t.boDe && (
+        <a className="aid-trang" href={t.trangUrl} target="_blank" rel="noopener noreferrer">
+          <span className="aid-trang-anh"><BookOpen size={26} /></span>
+          <span><b>Lời giải từng bước</b><small>Thử chọn đáp án trước, rồi bấm «Bước tiếp» xem từng bước và mẹo của Thầy.</small></span>
+          <span className="aid-trang-nut">Mở lời giải<ArrowRight size={18} /></span>
+        </a>
+      )}
+      {t.boDe && (t.boDe.link || t.trangUrl) && (
+        <a className="aid-bo-de" href={t.boDe.link || t.trangUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="aid-bo-de-dau"><span className="aid-trang-anh"><BookOpen size={24} /></span><span><b>{t.boDe.ten || 'Bộ đề của em'}</b><small>{t.boDe.moTa || 'Câu lấy nguyên văn từ kho đề của Thầy, có lời giải từng câu'}</small></span></div>
+          <span className="aid-trang-nut">Mở bộ đề{t.boDe.soDe ? ` · ${t.boDe.soDe} đề` : ''}<ArrowRight size={18} /></span>
+        </a>
+      )}
+    </>
+  )
+}
+
+interface TinCho { maTin: string; chu: string; anh: string[]; loi: string }
+
+export default function BongBongAiDdh({ auth }: { auth: { token?: string | null; sbd: string; hoTen?: string | null } }) {
+  const token = auth.token ?? '', sbd = auth.sbd, hoTen = auth.hoTen
+  const ten = hoTen?.trim().split(/\s+/).pop()
+  const co = docCoBat(sbd)
+  const [bat, setBat] = useState<boolean>(co?.bat === true)
+  const [mo, setMo] = useState(false)
+  const [du, setDu] = useState<MoAiDdh | null>(null)
+  const [loi, setLoi] = useState('')
+  const [tin, setTin] = useState<TinAiDdh[]>([])
+  const [cho, setCho] = useState<TinCho[]>([])
+  const [chu, setChu] = useState('')
+  const [anh, setAnh] = useState<string[]>([])
+  const [dangGui, setDangGui] = useState(false)
+  const [moiChua, setMoiChua] = useState(0)
+  const [truc, setTruc] = useState(true)
+  const than = useRef<HTMLDivElement>(null)
+  const tepChup = useRef<HTMLInputElement>(null)
+  const tepChon = useRef<HTMLInputElement>(null)
+  const sau = useMemo(() => tin.reduce((m, x) => Math.max(m, x.luc), 0), [tin])
+  const dangCho = tin.some((x) => x.ben === 'em' && (x.trangThai === 'cho' || x.trangThai === 'dang'))
+
+  // Cờ lớp em có bật: cũ ⇒ hỏi một lần khi máy rảnh (không chặn lúc mở app).
+  useEffect(() => {
+    if (co && Date.now() - co.luc < (co.bat ? CO_CU_MS : CO_CU_MS / 6)) return
+    const chay = () => void moAiDdh(token).then((r) => { if (r.ok) { ghiCoBat(sbd, r.du.bat); setBat(r.du.bat) } })
+    const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
+    const h = w.requestIdleCallback ? w.requestIdleCallback(chay, { timeout: 8000 }) : window.setTimeout(chay, 5000)
+    return () => { if (!w.requestIdleCallback) clearTimeout(h) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, sbd])
+
+  const taiMo = useCallback(async () => {
+    setLoi('')
+    const r = await moAiDdh(token)
+    if (!r.ok) { setLoi(r.chu); return }
+    ghiCoBat(sbd, r.du.bat)
+    setBat(r.du.bat); setDu(r.du); setTin(r.du.tin); setTruc(r.du.vanPhongTruc); setMoiChua(0)
+  }, [token, sbd])
+  useEffect(() => { if (mo) void taiMo() }, [mo, taiMo])
+
+  // Hỏi tin mới: đang chờ 3 giây; tấm mở 20 giây; tấm đóng mà còn chờ 60 giây.
+  // Vòng NỐI TIẾP (`batNhipBenVung`, đã có sẵn trong khung HS ⇒ không thêm byte): lượt sau chỉ hẹn khi lượt trước xong, tab ẩn không gọi, lỗi ⇒ thưa dần.
+  const sauRef = useRef(sau)
+  sauRef.current = sau
+  useEffect(() => {
+    if (!du?.bat) return
+    const ms = mo ? (dangCho ? 3000 : 20_000) : dangCho ? 60_000 : 0
+    if (!ms) return
+    const v = batNhipBenVung(async () => {
+      const r = await tinMoiAiDdh(token, sauRef.current)
+      if (!r.ok) return false
+      setTruc(r.du.vanPhongTruc)
+      if (!r.du.tin.length) return
+      setTin((cu) => { const co = new Set(cu.map((x) => x.id)); return [...cu.map((x) => r.du.tin.find((y) => y.id === x.id) ?? x), ...r.du.tin.filter((x) => !co.has(x.id))] })
+      if (!mo) setMoiChua((n) => n + r.du.tin.filter((x) => x.ben === 'vp').length)
+    }, { coSoMs: ms, lechMs: ms / 6, chayNgay: false, luiDanMs: [ms * 2, ms * 4, Math.max(ms * 8, 30_000)] })
+    return () => v.dung()
+  }, [du?.bat, mo, dangCho, token])
+
+  useEffect(() => { const t = than.current; if (t && mo) t.scrollTop = t.scrollHeight }, [tin.length, cho.length, mo])
+
+  const gui = async (lai?: TinCho) => {
+    const t: TinCho = lai ?? { maTin: taoMaTin(), chu: chu.trim(), anh, loi: '' }
+    if (!t.chu && !t.anh.length) return
+    if (!lai) { setChu(''); setAnh([]) }
+    setCho((c) => [...c.filter((x) => x.maTin !== t.maTin), { ...t, loi: '' }])
+    setDangGui(true)
+    const r = await guiAiDdh(token, t.maTin, t.chu, t.anh)
+    setDangGui(false)
+    if (r.ok) {
+      setCho((c) => c.filter((x) => x.maTin !== t.maTin))
+      if (r.du) setTin((cu) => (cu.some((x) => x.id === r.du!.id) ? cu : [...cu, r.du!]))
+      setDu((d) => (d ? { ...d, conLuot: Math.max(0, d.conLuot - 1) } : d))
+    } else {
+      if (r.khoa === 'kiem_tra') setDu((d) => (d ? { ...d, khoa: 'kiem_tra' } : d))
+      setCho((c) => c.map((x) => (x.maTin === t.maTin ? { ...x, loi: r.chu } : x)))
+    }
+  }
+  // Có mạng lại ⇒ tự gửi các tin còn giữ.
+  useEffect(() => {
+    const on = () => cho.filter((x) => x.loi).forEach((x) => void gui(x))
+    window.addEventListener('online', on)
+    return () => window.removeEventListener('online', on)
+  })
+
+  const themAnh = async (ds: FileList | null) => {
+    if (!ds) return
+    const ra: string[] = []
+    for (const f of Array.from(ds).slice(0, 8 - anh.length)) { const b = await nenAnh(f); if (b) ra.push(b) }
+    setAnh((a) => [...a, ...ra].slice(0, 8))
+  }
+  const dan = async () => {
+    try { const s = await navigator.clipboard.readText(); if (s) setChu((c) => (c ? c + '\n' : '') + s) } catch { /* máy chặn đọc bộ nhớ tạm */ }
+  }
+
+  if (!bat) return null
+  return (
+    <div className="aid-goc">
+      {!mo && (
+        <div className="aid-bong">
+          <button type="button" className="aid-bong-nut" aria-label="Mở A.I Đỗ Đại Học" onClick={() => setMo(true)}>
+            <Mat co={56} />
+            {moiChua ? <span className="aid-cham">{moiChua}</span> : null}
+          </button>
+        </div>
+      )}
+      {mo && (
+        <>
+          <div className="aid-che" onClick={() => setMo(false)} />
+          <section className="aid-tam" role="dialog" aria-modal="true" aria-label="A.I Đỗ Đại Học">
+            <header className="aid-dau">
+              <span className="aid-tay" aria-hidden="true" />
+              <Mat co={46} on={truc} />
+              <div className="aid-dau-chu">
+                <b>A.I Đỗ Đại Học</b>
+                <span className="aid-trang-thai"><span className="aid-den" data-on={truc ? '' : undefined} />{truc ? 'Văn phòng Thầy đang trực' : 'Văn phòng Thầy đang nghỉ'}</span>
+              </div>
+              <button type="button" className="aid-nut-tron" aria-label="Thu nhỏ" onClick={() => setMo(false)}><ChevronDown size={22} /></button>
+            </header>
+            <div className="aid-than" ref={than} aria-live="polite">
+              {!du ? (
+                <div className="aid-tai">{loi ? <><WifiOff size={28} /><span>{loi}</span><button type="button" className="aid-trang-nut" onClick={() => void taiMo()}>Thử lại</button></> : <span className="aid-cho"><i /><i /><i /></span>}</div>
+              ) : du.khoa === 'kiem_tra' ? (
+                <div className="aid-khoa"><span className="aid-khoa-icon"><Lock size={40} /></span><b>Em đang có bài kiểm tra mở</b><p>A.I Đỗ Đại Học tạm khoá tới khi em nộp bài. Trong màn làm bài kiểm tra, bong bóng cũng ẩn hẳn.</p></div>
+              ) : (
+                <>
+                  {!tin.length && !cho.length && (
+                    <div className="aid-chao">
+                      <div className="aid-chao-anh"><Mat co={64} on={truc} /></div>
+                      <div className="aid-chao-than">
+                        <h2>{ten ? `${ten}, kẹt bài nào, gửi Thầy.` : 'Kẹt bài nào, gửi Thầy.'}</h2>
+                        <p>Chụp đề hoặc gõ đề, Thầy trả lời ngay trong này, giống hệt khi em hỏi Thầy qua Zalo.</p>
+                        <div className="aid-o-chon">
+                          <button type="button" onClick={() => tepChup.current?.click()}><i><Camera size={22} /></i>Chụp ảnh đề</button>
+                          <button type="button" onClick={() => tepChon.current?.click()}><i><Anh size={22} /></i>Chọn ảnh có sẵn</button>
+                          <button type="button" onClick={() => void dan()}><i><ClipboardPaste size={22} /></i>Dán đề bài</button>
+                        </div>
+                        <div className="aid-tin-cay">
+                          <span><ShieldCheck size={16} />Câu có trong kho đề: Thầy dùng đúng đáp án và lời giải của kho.</span>
+                          <span><Zap size={16} />Câu mới: Thầy giải hai lượt độc lập, khớp nhau mới gửi em.</span>
+                        </div>
+                        <span className="aid-luot"><Clock size={14} />Hôm nay em còn {du.conLuot}/{du.tranLuot} câu</span>
+                      </div>
+                    </div>
+                  )}
+                  {tin.map((t, i) => {
+                    const truoc = tin[i - 1]
+                    if (t.ben === 'em') return (
+                      <div key={t.id} className="aid-em">
+                        {t.anh > 0 && <div className="aid-bt"><span className="aid-anh-em"><Camera size={16} />{t.anh} ảnh đề</span></div>}
+                        {t.chu && <div className="aid-bt">{t.chu}</div>}
+                        <span className="aid-gio">{gio(t.luc)}</span>
+                      </div>
+                    )
+                    return (
+                      <div key={t.id} className="aid-nhom">
+                        <Mat co={32} />
+                        {truoc?.ben !== 'vp' && <span className="aid-ten">A.I Đỗ Đại Học</span>}
+                        <TinVanPhong t={t} />
+                        <span className="aid-gio">{gio(t.luc)}</span>
+                      </div>
+                    )
+                  })}
+                  {cho.map((t) => (
+                    <div key={t.maTin} className="aid-em">
+                      {t.anh.length > 0 && <div className="aid-go-anh">{t.anh.map((a, i) => <span key={i}><img src={`data:image/jpeg;base64,${a}`} alt="Ảnh đề" /></span>)}</div>}
+                      {t.chu && <div className="aid-bt">{t.chu}</div>}
+                      {t.loi ? <span className="aid-loi-gui"><WifiOff size={14} />{t.loi}<button type="button" onClick={() => void gui(t)}>Gửi lại</button></span> : <span className="aid-gio">Đang gửi…</span>}
+                    </div>
+                  ))}
+                  {dangCho && truc && (
+                    <div className="aid-nhom"><Mat co={32} /><div className="aid-bt"><span className="aid-soan"><span className="aid-cho"><i /><i /><i /></span>Thầy đang soạn</span></div></div>
+                  )}
+                  {dangCho && !truc && (
+                    <div className="aid-he"><MoonStar size={18} /><span><b>Văn phòng Thầy đang nghỉ.</b> Câu em đã được giữ lại. Văn phòng mở là Thầy trả lời, bong bóng hiện chấm đỏ báo tin mới.</span></div>
+                  )}
+                  {du.conLuot <= 0 && <div className="aid-he"><Clock size={18} />Hôm nay em đã hỏi đủ {du.tranLuot} câu. 0 giờ đêm nay hỏi tiếp được.</div>}
+                </>
+              )}
+            </div>
+            <div className="aid-go-vo">
+              {du && !du.khoa && (
+                <>
+                  {anh.length > 0 && <div className="aid-go-anh">{anh.map((a, i) => <span key={i}><img src={`data:image/jpeg;base64,${a}`} alt={`Ảnh đề ${i + 1}`} /><button type="button" aria-label="Bỏ ảnh" onClick={() => setAnh((x) => x.filter((_, j) => j !== i))}>×</button></span>)}</div>}
+                  <div className="aid-go">
+                    <button type="button" className="aid-nut-tron" aria-label="Chụp ảnh đề" onClick={() => tepChup.current?.click()}><Camera size={22} /></button>
+                    <button type="button" className="aid-nut-tron" aria-label="Chọn ảnh có sẵn" onClick={() => tepChon.current?.click()}><Anh size={22} /></button>
+                    <textarea className="aid-go-o" rows={1} placeholder="Gõ hoặc dán đề bài…" value={chu} maxLength={4000} aria-label="Nội dung hỏi" onChange={(e) => setChu(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.innerWidth >= 720) { e.preventDefault(); void gui() } }} />
+                    <button type="button" className="aid-nut-tron" data-gui="" aria-label="Gửi" disabled={dangGui || (!chu.trim() && !anh.length) || du.conLuot <= 0} onClick={() => void gui()}><Send size={20} /></button>
+                  </div>
+                </>
+              )}
+              <div className="aid-chan"><Lock size={12} />{du?.khoa ? 'Nộp bài kiểm tra xong, A.I Đỗ Đại Học mở lại.' : 'Tự khoá khi em đang làm bài kiểm tra.'}</div>
+              <input ref={tepChup} className="aid-an" type="file" accept="image/*" capture="environment" onChange={(e) => { void themAnh(e.target.files); e.target.value = '' }} />
+              <input ref={tepChon} className="aid-an" type="file" accept="image/*" multiple onChange={(e) => { void themAnh(e.target.files); e.target.value = '' }} />
+            </div>
+          </section>
+        </>
+      )}
+    </div>
+  )
+}
+

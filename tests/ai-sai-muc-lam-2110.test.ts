@@ -87,13 +87,15 @@ describe('/gv/ho-so-len-bang — Mức làm từng lần làm câu đang chiếu
     const d = dung()
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Trần An','12','x')")
     sk(d, 'S1', 'Q1', 0, 10, DOC(20), '2026-10-20T01:00:00Z')            // sai, Mức 1
-    sk(d, 'S1', 'Q1', 1, 8, DOC(20), '2026-10-20T02:00:00Z')             // ĐÚNG, Mức 1 ⇒ ghiChu
+    sk(d, 'S1', 'Q1', 1, 3, DOC(20), '2026-10-20T02:00:00Z')             // ĐÚNG, gặp lần 2 (24/10: T_đọc × 0,38 = 6 s) ⇒ Mức 1 đúng = «Thuộc»
     sk(d, 'S1', 'Q1', 0, 40, DOC(20), '2026-10-20T03:00:00Z')            // sai, Mức 3 (chưa có β)
     sk(d, 'S1', 'Q1', 0, 50, { t: 20, h: 0, p: 'I' }, '2026-10-20T04:00:00Z') // đồng hồ cũ ⇒ không mức
     const r = await gvHoSoLenBang(d.env as unknown as Env, { sbd: 'S1', qid: 'Q1' }, T0)
     const lan = (r.cauNay as { lan: { dung: boolean; giay: number | null; mucLam?: Record<string, unknown> }[] }).lan
     expect(lan.map((x) => x.mucLam?.ma)).toEqual([1, 1, 3, undefined])
-    expect(lan[1]!.mucLam).toMatchObject({ ghiChu: 'dung_truoc_doc', giayDoc: 15 })
+    expect(lan[1]!.mucLam).toMatchObject({ ghiChu: 'dung_truoc_doc', thuoc: true, giayDoc: 6, heSoLap: 0.38 })
+    expect(lan[0]!.mucLam).toMatchObject({ giayDoc: 15 })
+    expect(lan[0]!.mucLam!.heSoLap).toBeUndefined()
     expect(lan[0]!.mucLam!.ghiChu).toBeUndefined()
     expect(lan[2]!.mucLam!.thuong).toBeUndefined()
   })

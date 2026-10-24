@@ -5,7 +5,8 @@
 //
 // BẢNG (chỉ-thêm, tạo lúc chạy — CI không tự chạy migration; y hệt `server/migration-2809-buoi-hoc.sql`):
 //   buoi_hoc            (id, ten, lop, bi_mat, mo_luc, het_han, dong_luc, cap_nhat_luc)
-//   buoi_hoc_diem_danh  (buoi_id, sbd, luc, cach 'ma'|'thay', trang_thai 'co_mat'|'bo', cap_nhat_luc) — "bớt em" chỉ đổi trạng thái, không xoá dòng.
+//   buoi_hoc_diem_danh  (buoi_id, sbd, luc, cach 'ma'|'thay', trang_thai 'co_mat'|'bo'|'co_phep', cap_nhat_luc) — "bớt em" chỉ đổi trạng thái, không xoá dòng;
+//                       'co_phep' (24/10) = thầy ghi em vắng có phép (mọi chỗ đếm có mặt đều lọc 'co_mat' nên không lẫn).
 //
 // CHỐNG ĐIỂM DANH HỘ (tối thiểu, thầy chốt): (1) em chỉ điểm danh cho CHÍNH MÌNH — SBD lấy từ token (`gameIdentity`), không nhận `sbd` trong thân;
 // (2) mã ĐỔI MỖI 60 GIÂY (HMAC của bí mật riêng từng buổi × số phút), nhận mã phút này + phút trước (≤ 2 phút) — chụp mã gửi bạn ở nhà là hết hạn;
@@ -176,6 +177,21 @@ export async function gvBuoiHoc(env: Env, b: Row, nowMs: number = Date.now()): P
     return xemBuoi(env, id, nowMs, false)
   }
 
+  // VẮNG CÓ PHÉP (24/10, xếp học sinh — «vắng không phép» chỉ tính phần còn lại): thầy đánh dấu em vắng có phép. Em ĐANG có mặt thì giữ có mặt.
+  // `bo-co-phep` gỡ đúng dấu ấy (chỉ xoá dòng 'co_phep', không đụng có mặt / bớt em).
+  if (action === 'co-phep' || action === 'bo-co-phep') {
+    const sbd = str(b.sbd)
+    if (!sbd || sbd.length > 40) return { ok: false, error: 'Chưa chọn em.' }
+    if (action === 'co-phep') {
+      await env.DB.prepare(
+        "INSERT INTO buoi_hoc_diem_danh (buoi_id, sbd, luc, cach, trang_thai, cap_nhat_luc) VALUES (?,?,?,'thay','co_phep',?) ON CONFLICT(buoi_id, sbd) DO UPDATE SET trang_thai = CASE WHEN buoi_hoc_diem_danh.trang_thai = 'co_mat' THEN 'co_mat' ELSE 'co_phep' END, cap_nhat_luc = excluded.cap_nhat_luc",
+      ).bind(id, sbd, nay, nay).run()
+    } else {
+      await env.DB.prepare("DELETE FROM buoi_hoc_diem_danh WHERE buoi_id = ? AND sbd = ? AND trang_thai = 'co_phep'").bind(id, sbd).run()
+    }
+    return xemBuoi(env, id, nowMs, b.kemLop === true)
+  }
+
   if (action === 'bot-em') {
     const sbd = str(b.sbd)
     if (!sbd) return { ok: false, error: 'Chưa chọn em.' }
@@ -196,14 +212,13 @@ async function xemBuoi(env: Env, id: string, nowMs: number, kemLop: boolean): Pr
   const r = await docBuoi(env, id)
   if (!r) return { ok: false, error: 'Không tìm thấy buổi học này.' }
   const buoi = buoiRa(r, nowMs)
-  const rCo =
-    (await hoi(
-      env,
-      "SELECT d.sbd, d.luc, d.cach, h.ho_ten FROM buoi_hoc_diem_danh d LEFT JOIN hoc_sinh h ON h.sbd = d.sbd WHERE d.buoi_id = ? AND d.trang_thai = 'co_mat' ORDER BY d.luc, d.sbd",
-      id,
-    )) ?? []
-  // Cả trường (em chưa khoá) — app thầy lọc theo lớp thầy chọn ở khối "Thêm em chưa điểm danh được" (em học ghép lớp khác vẫn thêm được).
-  const moiEm = await emCuaLop(env, '')
+  // Một đợt chờ: dòng điểm danh (có mặt + vắng có phép, 24/10) song song với danh sách cả trường.
+  const [rDd, moiEm] = await Promise.all([
+    hoi(env, "SELECT d.sbd, d.luc, d.cach, d.trang_thai, h.ho_ten FROM buoi_hoc_diem_danh d LEFT JOIN hoc_sinh h ON h.sbd = d.sbd WHERE d.buoi_id = ? AND d.trang_thai IN ('co_mat', 'co_phep') ORDER BY d.luc, d.sbd", id).then((x) => x ?? []),
+    // Cả trường (em chưa khoá) — app thầy lọc theo lớp thầy chọn ở khối "Thêm em chưa điểm danh được" (em học ghép lớp khác vẫn thêm được).
+    emCuaLop(env, ''),
+  ])
+  const rCo = rDd.filter((x) => str(x.trang_thai) === 'co_mat')
   const lop = buoi.lop ? moiEm.filter((e) => e.tenLop === buoi.lop) : moiEm
   const w = cuaSoCua(nowMs)
   return {
@@ -211,6 +226,7 @@ async function xemBuoi(env: Env, id: string, nowMs: number, kemLop: boolean): Pr
     buoi,
     ...(buoi.dangMo ? { ma: await maCuaBuoi(str(r.bi_mat), w), doiMaLuc: (w + 1) * CHU_KY_MA_MS } : {}),
     coMat: rCo.map((x) => ({ sbd: str(x.sbd), hoTen: str(x.ho_ten), luc: str(x.luc), cach: str(x.cach) === 'thay' ? 'thay' : 'ma' })),
+    coPhep: rDd.filter((x) => str(x.trang_thai) === 'co_phep').map((x) => str(x.sbd)),
     siSo: buoi.lop ? lop.length : null,
     ...(kemLop ? { lopEm: moiEm.slice(0, 600) } : {}),
   }
@@ -328,5 +344,8 @@ export async function hsDiemDanh(env: Env, b: Row, nowMs: number = Date.now()): 
     await env.DB.prepare("INSERT INTO buoi_hoc_diem_danh (buoi_id, sbd, luc, cach, trang_thai, cap_nhat_luc) VALUES (?,?,?,'ma','co_mat',?) ON CONFLICT(buoi_id, sbd) DO NOTHING")
       .bind(id, sbd, nay, nay)
       .run()
+  // Thầy đã ghi «vắng có phép» mà em vẫn tới quét mã ⇒ có mặt (24/10).
+  else if (str(cu.trang_thai) === 'co_phep')
+    await env.DB.prepare("UPDATE buoi_hoc_diem_danh SET trang_thai = 'co_mat', cach = 'ma', luc = ?, cap_nhat_luc = ? WHERE buoi_id = ? AND sbd = ? AND trang_thai = 'co_phep'").bind(nay, nay, id, sbd).run()
   return { ok: true, buoi: { id, ten: str(buoi.ten), lop: str(buoi.lop), daDiemDanh: true } }
 }

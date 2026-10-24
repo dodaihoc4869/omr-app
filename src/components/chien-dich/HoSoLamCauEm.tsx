@@ -1004,8 +1004,11 @@ export default function HoSoLamCauEm({
   coTheChua,
   soCauCanSua,
   onMoBaiTap,
+  dauThan,
 }: {
   em: EmHoSo
+  /** (24/10) Khối thêm ở đầu thân tấm — app học sinh đặt thẻ Học thật · Đối phó (chỉ khi thầy bật). */
+  dauThan?: ReactNode
   nhom?: LoaiNhomNhip
   onDong: () => void
   /** 12/10F: nguồn dữ liệu riêng (app học sinh / phụ huynh) — xem `NguonHoSo`. */
@@ -1254,6 +1257,7 @@ export default function HoSoLamCauEm({
         </header>
 
         <div className="gvv2-hs-than hslc-than">
+          {dauThan}
           {matMang !== null && kq && (
             <div className="hsv-mang" role="status">
               <HinhMatMang />

@@ -50,7 +50,7 @@ export function docTongMucLam(x: unknown): TongMucLam | undefined {
   })
   const soDo = so(o.soDo), chuaCoSoDo = so(o.chuaCoSoDo), saiLamVoi = so(o.saiLamVoi), saiDuNghi = so(o.saiDuNghi), dungTruocDoc = so(o.dungTruocDoc)
   if (dong.some((d) => d === null) || soDo === null || chuaCoSoDo === null || saiLamVoi === null || saiDuNghi === null || dungTruocDoc === null) return undefined
-  return { soDo, chuaCoSoDo, theoMuc: dong as TongMucLam['theoMuc'], saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat: o.coBetaThat === true, soUocTinh: Math.min(soDo, Math.max(0, so(o.soUocTinh) ?? 0)), soTreo: Math.min(soDo, Math.max(0, so(o.soTreo) ?? 0)), soCoTinh: Math.min(soDo, Math.max(0, so(o.soCoTinh) ?? 0)), soChuaDoTreo: Math.min(soDo, Math.max(0, so(o.soChuaDoTreo) ?? 0)) }
+  return { soDo, chuaCoSoDo, theoMuc: dong as TongMucLam['theoMuc'], saiLamVoi, saiDuNghi, dungTruocDoc, coBetaThat: o.coBetaThat === true, soUocTinh: Math.min(soDo, Math.max(0, so(o.soUocTinh) ?? 0)), soThuoc: Math.min(soDo, Math.max(0, so(o.soThuoc) ?? 0)), soTreo: Math.min(soDo, Math.max(0, so(o.soTreo) ?? 0)), soCoTinh: Math.min(soDo, Math.max(0, so(o.soCoTinh) ?? 0)), soChuaDoTreo: Math.min(soDo, Math.max(0, so(o.soChuaDoTreo) ?? 0)) }
 }
 
 const soKhong = (x: unknown): number => Math.max(0, so(x) ?? 0)
@@ -390,6 +390,12 @@ export function KhoiCachLamBai({ tong, cheDo, ngoi, soSaiTong }: PropsCachLamBai
             </span>
           </p>
         </div>
+        {/* Thầy 24/10: Mức làm 1 tách hai — nhanh mà ĐÚNG = «Thuộc» (không phạt), nhanh mà SAI = «Bấm vội». */}
+        {tong.theoMuc[0].luot > 0 && (
+          <p className="hslc-ghi gvv2-so" data-thuoc="">
+            Mức làm 1: <b>{tong.theoMuc[0].dung}</b> lượt Thuộc (nhanh mà đúng) · <b>{tong.theoMuc[0].sai}</b> lượt Bấm vội (nhanh mà sai).
+          </p>
+        )}
         {tong.soUocTinh > 0 && (
           <p className="hslc-ghi" data-uoc="">
             {tong.soUocTinh} lượt xếp từ số giây đồng hồ cũ hoặc ước tính (≈): số giây có thể cao hơn thật nên mức chỉ là ước tính, không xếp Mức làm 4.

@@ -176,12 +176,12 @@ describe('mức làm theo lô em (bảng điểm danh)', () => {
     dong(d, 'S4', 'V-I-1', 0, 10, DO(5))
     dong(d, 'S4', 'V-I-5', 0, 40, DO(20))
     dong(d, 'S4', 'V-I-3', 0, 40, DO(620))
-    dong(d, 'S4', 'V-I-3', 0, 18, DOC(20))
+    dong(d, 'S4', 'V-I-9', 0, 18, DOC(20))
     // S5: BA lượt treo cùng ngày ⇒ cả ba Mức 6 (màn thầy); một lượt Mức 1 đúng
     dong(d, 'S5', 'V-I-1', 0, 30, DO(400))
     dong(d, 'S5', 'V-I-3', 0, 30, DO(500))
     dong(d, 'S5', 'V-I-5', 1, 30, DO(0, 700))
-    dong(d, 'S5', 'V-I-1', 1, 8, DO(3))
+    dong(d, 'S5', 'V-I-8', 1, 8, DO(3))
     const kq = await gvMucLamLo(env, { sbds: ['S4', 'S5'] }, BAY_GIO)
     expect(kq.ok).toBe(true)
     if (!kq.ok) return

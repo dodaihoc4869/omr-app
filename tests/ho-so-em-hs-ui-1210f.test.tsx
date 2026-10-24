@@ -119,7 +119,8 @@ describe('HoSoCuaEmHs — em xem ĐỦ hồ sơ của chính mình', () => {
     fireEvent.click(within(tam).getByRole('tab', { name: /^Câu đúng/ }))
     expect(tam.textContent).not.toMatch(/DH-12-/)
     const duong = goiFetch.map((g) => g.duong).sort()
-    expect(duong).toEqual(['/hs/ho-so-thai-do', '/hs/lich-su-lam-cau'])
+    // SỬA CÓ CHỦ ĐÍCH 24/10: thẻ «Học thật» đầu hồ sơ nạp lệnh CHỈ ĐỌC `/hs/danh-gia` (gửi token, không SBD — vòng dưới kiểm).
+    expect(duong).toEqual(['/hs/danh-gia', '/hs/ho-so-thai-do', '/hs/lich-su-lam-cau'])
     for (const g of goiFetch) {
       expect(g.body.token).toBe('tk-em')
       expect(g.body).not.toHaveProperty('sbd')

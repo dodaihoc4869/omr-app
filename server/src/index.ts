@@ -3408,6 +3408,8 @@ const boXuLy = {
         if(ph%5===0&&(await docCoOmni(env).catch(()=>({bat:false}))).bat)await chayGanVknDem(env,Date.now()).then(r=>{if(r.soGhi)console.log('[omni] gắn vi kỹ năng (tiếp)',JSON.stringify(r))}).catch(async e=>{console.error('[omni] gắn vi kỹ năng lỗi:',e);await ghiLoiMay(env,'omni_gan_vkn')})
       }}
       // SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy: tính lại mỗi 10 phút vào bản đệm `cau_hinh.sai_nhanh_gv` (bản còn mới ⇒ chỉ 1 truy vấn đọc); lỗi chỉ ghi log.
+      // XẾP HỌC SINH (24/10): thứ Hai 01:00–06:00 giờ VN tính bản chụp tuần, ≤ 25 em/phút; công tắc «tắt» ⇒ một câu đọc rồi về; ngoài giờ ⇒ không truy vấn.
+      await import('./danh-gia-hoc-that-d1').then(m=>m.cronDanhGiaTuan(env,Date.now())).then(r=>{if(r.chay)console.log('[danh-gia] tuần',JSON.stringify(r))}).catch(e=>console.error('[danh-gia] cron lỗi:',e))
       await capNhatSaiNhanhNeuCu(env,Date.now())
       // GAME HÓA 2.0 bật cả trung tâm ⇒ BTVN đã bỏ: không nhắc nộp BTVN.
       if(!await docCoHoa2(env).then(c=>c.bat&&!c.lop.length&&!c.sbd.length).catch(()=>false))await nhacTuDong(env,Date.now()).then(async r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r));if(r.lyDo==='loi')await ghiLoiMay(env,'nhac_nop_bai')}).catch(async e=>{console.error('[nhac-tu-dong] cron lỗi:',e);await ghiLoiMay(env,'nhac_nop_bai')})
@@ -3584,6 +3586,8 @@ const boXuLy = {
       if (p === '/ph/con-tong-quan') return ra(await phConTongQuan(env, b, Date.now(), envDoc, ctx))
       // ĐỢT 16 (12/10): hồ sơ của con CÙNG hợp đồng ba lệnh học sinh (nhịp học Lười/Chăm, hồ sơ thái độ, lịch sử làm câu) — ĐỌC-CHỈ, cùng xác thực (ph-ho-so-con.ts).
       if (p === '/ph/nhip-hoc') return ra(await import('./ph-ho-so-con').then((m) => m.phNhipHoc(env, b, Date.now(), envDoc, ctx)))
+      if (p === '/ph/danh-gia') return ra(await import('./danh-gia-hoc-that-d1').then((m) => m.phDanhGia(env, b, Date.now(), ctx)))
+      if (p === '/ph/bao-cao-tuan') return ra(await import('./bao-cao-tuan').then((m) => m.phBaoCaoTuan(env, b, Date.now(), ctx)))
       if (p === '/ph/ho-so-thai-do') return ra(await import('./ph-ho-so-con').then((m) => m.phHoSoThaiDo(env, b, Date.now(), envDoc, ctx)))
       if (p === '/ph/lich-su-lam-cau') return ra(await import('./ph-ho-so-con').then((m) => m.phLichSuLamCau(env, b, envDoc, ctx)))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
@@ -3618,6 +3622,11 @@ const boXuLy = {
       if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(envDoc, b))
       // BẢNG "NHỊP HỌC CỦA EM" (thầy 12/10 duyệt bản vẽ, server/src/nhip-hoc-em.ts; hợp đồng nhip-hoc-kieu.ts): CHỈ ĐỌC, token của em, chỉ số của chính em.
       if (p === '/hs/nhip-hoc') return ra(await import('./nhip-hoc-em').then((m) => m.hsNhipHoc(envDoc, b)))
+      if (p === '/hs/danh-gia') return ra(await import('./danh-gia-hoc-that-d1').then((m) => m.hsDanhGia(env, b)))
+      // BONG BÓNG A.I ĐỖ ĐẠI HỌC (thầy 24/10, server/src/ai-ddh.ts): em hỏi bài → hàng chờ văn phòng; token của em, máy chủ không tự giải.
+      if (p === '/hs/ai-ddh/mo') return ra(await import('./ai-ddh').then((m) => m.hsMoAiDdh(env, b)))
+      if (p === '/hs/ai-ddh/tin') return ra(await import('./ai-ddh').then((m) => m.hsTinAiDdh(env, b)))
+      if (p === '/hs/ai-ddh/gui') return ra(await import('./ai-ddh').then((m) => m.hsGuiAiDdh(env, b)))
       // HỒ SƠ LÀM BÀI CỦA EM (thầy 12/10 "cho hs bấm vào bảng lười chăm", server/src/ho-so-em-hs.ts): CHỈ ĐỌC, token của em, cùng lõi với hai lệnh thầy.
       if (p === '/hs/ho-so-thai-do') return ra(await import('./ho-so-em-hs').then((m) => m.hsHoSoThaiDo(envDoc, b)))
       if (p === '/hs/lich-su-lam-cau') return ra(await import('./ho-so-em-hs').then((m) => m.hsLichSuLamCau(envDoc, b)))
@@ -3783,6 +3792,31 @@ const boXuLy = {
       if (p === '/gv/lich-su-lam-cau') return ra(await gvLichSuLamCau(envDoc, b))
       // MỨC LÀM THEO LÔ EM CÓ MẶT (thầy 20/10, bản vẽ 03 bảng điểm danh; server/src/muc-lam-lo.ts): CHỈ ĐỌC sổ của ≤ 40 em đang hiện trên bảng, 14 ngày. Không đụng `/gv/nhip-hoc`.
       if (p === '/gv/muc-lam-lo') return ra(await import('./muc-lam-lo').then((m) => m.gvMucLamLo(envDoc, b)))
+      // XẾP HỌC SINH Học thật · Đối phó · Không dạy nổi · ĐUỔI (24/10, chưa phát hành — công tắc mặc định «chạy ngầm»; danh-gia-hoc-that-d1.ts).
+      // BONG BÓNG A.I ĐỖ ĐẠI HỌC — lệnh của VĂN PHÒNG (mã GV): hàng chờ, ảnh, kiểm câu chỉ gợi ý, câu cần tránh khi rút đề, trả lời; công tắc của thầy.
+      if (p.startsWith('/gv/ai-ddh/')) {
+        const m = await import('./ai-ddh')
+        const vi = p.slice('/gv/ai-ddh/'.length)
+        if (vi === 'hang-cho') return ra(await m.gvHangChoAiDdh(env, b))
+        if (vi === 'anh') return ra(await m.gvAnhAiDdh(env, b))
+        if (vi === 'kiem-cau') return ra(await m.gvKiemCauAiDdh(env, b))
+        if (vi === 'tranh') return ra(await m.gvTranhAiDdh(env, b))
+        if (vi === 'tra-loi') return ra(await m.gvTraLoiAiDdh(env, b))
+        if (vi === 'che-do') return ra(await m.gvCheDoAiDdh(env, b))
+      }
+      if (p.startsWith('/gv/danh-gia/')) {
+        const m = await import('./danh-gia-hoc-that-d1')
+        const vi = p.slice('/gv/danh-gia/'.length)
+        if (vi === 'lop') return ra(await m.gvDanhGiaLop(env))
+        if (vi === 'em') return ra(await m.gvDanhGiaEm(env, b))
+        if (vi === 'tinh-lai') return ra(await m.gvDanhGiaTinhLai(env, b))
+        if (vi === 'thu') return ra(await m.gvDanhGiaThu(envDoc, b))
+        if (vi === 'can-thiep') return ra(await m.gvDanhGiaCanThiep(env, b))
+        if (vi === 'nhan-mu') return ra(await m.gvDanhGiaNhanMu(env, b))
+        if (vi === 'che-do') return ra(await m.gvDanhGiaCheDo(env, b))
+        if (vi === 'trung-loi') return ra(await m.gvDanhGiaTrungLoi(envDoc, b))
+        if (vi === 'bao-cao-tuan') return ra(await import('./bao-cao-tuan').then((x) => x.gvBaoCaoTuan(envDoc, b)))
+      }
       // BÀI HẰNG NGÀY + HỒ SƠ THÁI ĐỘ LÀM BÀI (thầy 12/10, server/src/bai-hang-ngay.ts; hợp đồng bai-hang-ngay-kieu.ts): CHỈ ĐỌC sổ — mức/đã làm/thiếu
       // từng ngày từ 12/10 của mọi em; một em: lịch hoạt động, tín hiệu có ngưỡng, kết luận theo luật.
       if (p === '/gv/bai-hang-ngay') return ra(await import('./bai-hang-ngay').then((m) => m.gvBaiHangNgay(envDoc, b)))

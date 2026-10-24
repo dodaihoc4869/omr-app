@@ -14,6 +14,7 @@ import { TheNoiDung } from '../components/DesignSystem'
 import CongTacHoa2 from '../components/chien-dich/CongTacHoa2'
 import CongTacHoiThay from '../components/chien-dich/CongTacHoiThay'
 import CongTacOmni from '../components/chien-dich/CongTacOmni'
+import CongTacAiDdh from '../components/ai-ddh/CongTacAiDdh'
 import KhoiKetNoiKhoDe from '../components/KhoiKetNoiKhoDe'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
@@ -90,6 +91,8 @@ export default function CaiDatScreen() {
       <CongTacOmni />
       {/* HỎI THẦY (AI) (13/10) — trần lượt, đặt lại lượt hôm nay của một em, SBD thử không giới hạn lượt (`/gv/hoi-tro-ly/*`). */}
       <CongTacHoiThay />
+      {/* A.I ĐỖ ĐẠI HỌC (24/10) — bong bóng hỏi bài của văn phòng trong app học sinh: tắt / thử theo lớp / bật (`/gv/ai-ddh/che-do`). */}
+      <CongTacAiDdh />
 
       {hoa2 ? (
         <section aria-labelledby="cai-dat-ky-thuat">

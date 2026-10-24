@@ -99,12 +99,13 @@ describe('một trang đủ mọi phần, theo bản vẽ', () => {
     expect(c.querySelector('.tvc-chao h1')!.textContent).toBe('Hôm nay của Khôi')
     expect(c.querySelector('.tvc-chao p')!.textContent).toBe('Cập nhật 21:05 · Thứ Tư 14/10/2026 · mọi số đo từ 01/10')
     const tieuDe = [...c.querySelectorAll('.tvc-luoi h2')].map((h) => h.textContent)
+    // SỬA CÓ CHỦ ĐÍCH 24/10: thêm thẻ «Báo cáo tuần» (7 ngày gần nhất) ngay trên «Thái độ làm bài».
     expect(tieuDe).toEqual([
-      'Nhịp học 14 ngày', 'Cần nhắc con', 'Nhận xét của thầy', 'Thái độ làm bài', 'Câu sai và tự sửa', 'Thời gian làm bài', 'Kiểm tra và tiến bộ', 'Bài tập về nhà', 'Buổi học trên lớp', 'Lịch sử từng ngày',
+      'Nhịp học 14 ngày', 'Cần nhắc con', 'Nhận xét của thầy', 'Báo cáo tuần', 'Thái độ làm bài', 'Câu sai và tự sửa', 'Thời gian làm bài', 'Kiểm tra và tiến bộ', 'Bài tập về nhà', 'Buổi học trên lớp', 'Lịch sử từng ngày',
     ])
     expect(c.querySelector('#tvc-hn')!.textContent).toBe('Hôm nay · Thứ Tư 14/10')
     const phan = [...c.querySelectorAll('.tvc-luoi [data-phan]')].map((x) => x.getAttribute('data-phan'))
-    expect(phan).toEqual(['hom-nay', 'nhip', 'thai-do', 'cau-sai', 'thoi-gian', 'kiem-tra', 'btvn', 'buoi-hoc', 'lich-su'])
+    expect(phan).toEqual(['hom-nay', 'nhip', 'bao-cao-tuan', 'thai-do', 'cau-sai', 'thoi-gian', 'kiem-tra', 'btvn', 'buoi-hoc', 'lich-su'])
     expect([...c.querySelectorAll('.tvc-muc-luc a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Nhịp học', 'Thái độ', 'Câu sai', 'Thời gian', 'Kiểm tra', 'Bài tập về nhà', 'Buổi học', 'Lịch sử'])
     expect([...c.querySelectorAll('nav.tvc-ben a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Nhịp học', 'Thái độ', 'Câu sai', 'Thời gian', 'Kiểm tra', 'Bài tập về nhà', 'Buổi học', 'Lịch sử'])
     expect(c.querySelector('.tvc-chan')!.textContent).toContain('Mọi con số trên trang là số app đo được')

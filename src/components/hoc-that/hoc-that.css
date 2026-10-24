@@ -1,0 +1,47 @@
+/* XẾP HỌC SINH «HỌC THẬT · ĐỐI PHÓ» — app thầy (thầy 24/10). Chỉ biến màu sẵn có của app thầy (--muc --mo --vien --the --nen --xanh --cam --do và nền nhạt). */
+.ht-khung { display: flex; flex-direction: column; gap: var(--k3); }
+.ht-hang { display: flex; flex-wrap: wrap; align-items: center; gap: var(--k2); }
+.ht-giai { color: var(--mo); font-size: var(--cx-1); line-height: 1.45; margin: 0; }
+.ht-nut { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--vien); background: var(--the); color: var(--muc); font-weight: 600; cursor: pointer; }
+.ht-nut:disabled { opacity: .55; cursor: not-allowed; }
+.ht-nut--chon { border-color: var(--muc); background: var(--muc); color: var(--the); }
+.ht-nut--nguy { border-color: var(--do); color: var(--do); }
+.ht-the { border: 1px solid var(--vien); border-radius: 16px; background: var(--the); padding: var(--k3); }
+.ht-tieu { font-weight: 700; font-size: var(--cx-2); margin: 0 0 var(--k2); }
+.ht-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-weight: 700; font-size: var(--cx-1); white-space: nowrap; border: 1px solid transparent; }
+.ht-chip--1 { background: var(--xanh-nen); color: var(--xanh); }
+.ht-chip--2 { background: var(--nen); color: var(--muc); border-color: var(--vien); }
+.ht-chip--3 { background: var(--cam-nen); color: var(--cam); }
+.ht-chip--4 { background: var(--do-nen); color: var(--do); }
+.ht-chip--5 { background: var(--do); color: var(--the); }
+.ht-dem { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: var(--k2); }
+.ht-dem button { text-align: left; border: 1px solid var(--vien); border-radius: 14px; background: var(--the); padding: 10px 12px; cursor: pointer; color: var(--muc); }
+.ht-dem button[aria-pressed='true'] { border-color: var(--muc); box-shadow: inset 0 0 0 1px var(--muc); }
+.ht-dem b { display: block; font-size: var(--cx-4); line-height: 1.1; }
+.ht-ds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ht-dong { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 4px; border-top: 1px solid var(--vien); cursor: pointer; background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; color: var(--muc); width: 100%; }
+.ht-dong:first-child { border-top: 0; }
+.ht-dong-ten { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ht-dong-ly { grid-column: 1 / -1; color: var(--mo); font-size: var(--cx-1); }
+.ht-dong-phai { display: flex; align-items: center; gap: var(--k2); }
+.ht-diem { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 3ch; text-align: right; }
+.ht-luoi { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--k2); }
+.ht-o { border: 1px solid var(--vien); border-radius: 12px; padding: 8px 10px; }
+.ht-o span { display: block; color: var(--mo); font-size: var(--cx-1); }
+.ht-o b { font-size: var(--cx-3); font-variant-numeric: tabular-nums; }
+.ht-phat { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ht-phat li { display: flex; justify-content: space-between; gap: var(--k2); line-height: 1.4; }
+.ht-phat .ht-tru { color: var(--do); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ht-bang { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.ht-bang th, .ht-bang td { text-align: left; padding: 6px 8px; border-top: 1px solid var(--vien); }
+.ht-bang th { color: var(--mo); font-weight: 600; font-size: var(--cx-1); border-top: 0; }
+.ht-canh { border: 1px solid var(--do); background: var(--do-nen); color: var(--muc); border-radius: 14px; padding: var(--k3); }
+.ht-tin { width: 100%; min-height: 120px; resize: vertical; border: 1px solid var(--vien); border-radius: 12px; padding: 10px 12px; background: var(--nen); color: var(--muc); font: inherit; line-height: 1.5; }
+.ht-tin--thieu { border-color: var(--cam); }
+.ht-dem-chu { color: var(--mo); font-size: var(--cx-1); }
+.ht-dem-chu--qua { color: var(--do); font-weight: 700; }
+.ht-mu { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--k2); align-items: center; padding: 8px 0; border-top: 1px solid var(--vien); }
+@media (max-width: 520px) {
+  .ht-mu { grid-template-columns: 1fr; }
+  .ht-dong-phai .ht-diem { display: none; }
+}

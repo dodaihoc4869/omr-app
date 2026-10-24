@@ -1,0 +1,72 @@
+# SOÁT MỨC LÀM 1–4 CÓ CÁ NHÂN HOÁ GIÂY ĐỌC ĐỀ CHƯA (CHỈ ĐỌC, 24/10). Chỉ in SỐ ĐẾM GỘP: không mã em, không tên, không mã câu (repo công khai).
+# Lượt đo = su_kien_hoc có raw_json.doc.dh = 1, 14 ngày gần nhất, không phải lượt xem lời giải/lướt; bỏ lượt treo (Mức 5).
+# T_đọc chung (muc-lam.ts) = 8 + 0,35 × số từ + 10 nếu có hình. r = giây / T_đọc. «Đã gặp» = em đã có lượt cùng câu trước đó.
+name: Đo giây đọc đề cá nhân (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-giay-doc-ca-nhan-2410.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-giay-doc-ca-nhan
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          J() { echo "json_extract(s.raw_json,'\$.doc.$1')"; }
+          TD="(8 + 0.35*COALESCE($(J t),0) + 10*COALESCE($(J h),0))"
+          TREO="(COALESCE($(J l),0)>=300 OR COALESCE($(J a),0)>=600 OR ($(J w)=1 AND COALESCE($(J a),0)>=180) OR COALESCE($(J n),0)>=3)"
+          GAP="EXISTS (SELECT 1 FROM su_kien_hoc s2 WHERE s2.sbd=s.sbd AND s2.qid=s.qid AND s2.luc < s.luc)"
+          B="SELECT s.sbd, s.qid, s.giay g, s.ket_qua kq, $(J p) phan, $(J t) tu, COALESCE($(J h),0) hinh, $TD td, s.giay*1.0/$TD r, CASE WHEN $GAP THEN 1 ELSE 0 END gap FROM su_kien_hoc s WHERE s.ngay_vn >= date('now','+7 hours','-14 days') AND COALESCE(s.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc') AND $(J dh)=1 AND s.giay IS NOT NULL AND NOT $TREO"
+          q "1 Lượt đo theo đã gặp · phần: số lượt, đúng, giây TB, T_đọc TB, số lượt dưới T_đọc" "WITH x AS ($B) SELECT gap, phan, COUNT(*) n, SUM(kq=1) dung, ROUND(AVG(g),1) giay_tb, ROUND(AVG(td),1) td_tb, SUM(r<1) duoi_td FROM x GROUP BY 1,2 ORDER BY 1,2"
+          q "2 Phần I, lượt ĐÚNG: phân bố r theo đã gặp" "WITH x AS ($B) SELECT gap, COUNT(*) n, SUM(r<0.25) a025, SUM(r>=0.25 AND r<0.5) a05, SUM(r>=0.5 AND r<0.75) a075, SUM(r>=0.75 AND r<1) a1, SUM(r>=1 AND r<1.5) a15, SUM(r>=1.5 AND r<2) a2, SUM(r>=2) tu2 FROM x WHERE phan='I' AND kq=1 GROUP BY 1"
+          q "3 Phần I, lượt SAI: phân bố r theo đã gặp" "WITH x AS ($B) SELECT gap, COUNT(*) n, SUM(r<0.25) a025, SUM(r>=0.25 AND r<0.5) a05, SUM(r>=0.5 AND r<0.75) a075, SUM(r>=0.75 AND r<1) a1, SUM(r>=1 AND r<1.5) a15, SUM(r>=1.5) tu15 FROM x WHERE phan='I' AND kq=0 GROUP BY 1"
+          q "4 Câu LẦN ĐẦU, Phần I đúng: giây TB theo số từ (ước giây/từ)" "WITH x AS ($B) SELECT CASE WHEN tu<25 THEN 'a<25' WHEN tu<50 THEN 'b25-49' WHEN tu<80 THEN 'c50-79' WHEN tu<120 THEN 'd80-119' ELSE 'e120+' END nhom, hinh, COUNT(*) n, ROUND(AVG(tu),1) tu_tb, ROUND(AVG(g),1) giay_tb, ROUND(AVG(td),1) td_tb FROM x WHERE gap=0 AND phan='I' AND kq=1 GROUP BY 1,2 ORDER BY 1,2"
+          q "5 Mỗi em (≥ 8 lượt lần đầu Phần I đúng): số em theo r trung bình riêng" "WITH x AS ($B), e AS (SELECT sbd, COUNT(*) n, AVG(r) rr FROM x WHERE gap=0 AND phan='I' AND kq=1 GROUP BY sbd HAVING COUNT(*)>=8) SELECT COUNT(*) so_em, SUM(rr<0.5) duoi05, SUM(rr>=0.5 AND rr<0.75) r05_075, SUM(rr>=0.75 AND rr<1) r075_1, SUM(rr>=1 AND rr<1.5) r1_15, SUM(rr>=1.5 AND rr<2) r15_2, SUM(rr>=2) tu2 FROM e"
+          q "6 Mỗi em (≥ 8 lượt ĐÃ GẶP Phần I đúng): số em theo r trung bình riêng" "WITH x AS ($B), e AS (SELECT sbd, COUNT(*) n, AVG(r) rr FROM x WHERE gap=1 AND phan='I' AND kq=1 GROUP BY sbd HAVING COUNT(*)>=8) SELECT COUNT(*) so_em, SUM(rr<0.25) duoi025, SUM(rr>=0.25 AND rr<0.5) r025_05, SUM(rr>=0.5 AND rr<0.75) r05_075, SUM(rr>=0.75 AND rr<1) r075_1, SUM(rr>=1 AND rr<1.5) r1_15, SUM(rr>=1.5) tu15 FROM e"
+          q "7 Em có đủ cả hai loại: tỉ số r(đã gặp)/r(lần đầu) theo em" "WITH x AS ($B), a AS (SELECT sbd, AVG(r) r0 FROM x WHERE gap=0 AND phan='I' AND kq=1 GROUP BY sbd HAVING COUNT(*)>=8), b AS (SELECT sbd, AVG(r) r1 FROM x WHERE gap=1 AND phan='I' AND kq=1 GROUP BY sbd HAVING COUNT(*)>=8) SELECT COUNT(*) so_em, SUM(r1/r0<0.4) duoi04, SUM(r1/r0>=0.4 AND r1/r0<0.6) t04_06, SUM(r1/r0>=0.6 AND r1/r0<0.8) t06_08, SUM(r1/r0>=0.8 AND r1/r0<1) t08_1, SUM(r1/r0>=1) tu1 FROM a JOIN b USING(sbd)"
+          q "8 Độ ổn định: mỗi em chia đôi lượt lần đầu (chẵn/lẻ theo thời gian) — số em có r hai nửa lệch < 25%" "WITH x AS ($B), y AS (SELECT sbd, r, ROW_NUMBER() OVER (PARTITION BY sbd ORDER BY qid) k FROM x WHERE gap=0 AND phan='I' AND kq=1), e AS (SELECT sbd, AVG(CASE WHEN k%2=0 THEN r END) ra, AVG(CASE WHEN k%2=1 THEN r END) rb, COUNT(*) n FROM y GROUP BY sbd HAVING COUNT(*)>=12) SELECT COUNT(*) so_em, SUM(ABS(ra-rb)/((ra+rb)/2)<0.25) on_dinh, SUM(ABS(ra-rb)/((ra+rb)/2)>=0.5) lech_nhieu FROM e"
+          q "9 OMNI τ: số em có τ (n_tau ≥ 5) và phân bố" "SELECT COUNT(*) co_tau, SUM(tau<-0.3) tau_cham, SUM(tau>=-0.3 AND tau<0.3) tau_vua, SUM(tau>=0.3) tau_nhanh FROM omni_em WHERE n_tau>=5"
+          q "10 Câu có β thật (omni_beta_cau n ≥ 8) trong các câu đã đo" "WITH x AS ($B) SELECT COUNT(DISTINCT x.qid) so_cau, COUNT(DISTINCT CASE WHEN b.n>=8 THEN x.qid END) co_beta FROM x LEFT JOIN omni_beta_cau b ON b.qid=x.qid"
+          # ---- Kiểm chéo cách cá nhân hoá: sàn đọc riêng = phân vị thấp của r trên lượt LẦN ĐẦU, ĐÚNG, Phần I (nửa chẵn) → thử trên nửa lẻ.
+          Y="y AS (SELECT sbd, r, kq, gap, ROW_NUMBER() OVER (PARTITION BY sbd, gap ORDER BY qid) k FROM x WHERE phan='I')"
+          TR() { echo "t$1 AS (SELECT sbd, r, ROW_NUMBER() OVER (PARTITION BY sbd ORDER BY r) rn, COUNT(*) OVER (PARTITION BY sbd) c FROM y WHERE gap=$2 AND kq=1 AND k%2=$3), q$1 AS (SELECT sbd, MAX(CASE WHEN rn=CAST(c*0.1 AS INT)+1 THEN r END) q10, MAX(CASE WHEN rn=CAST(c*0.25 AS INT)+1 THEN r END) q25, MAX(CASE WHEN rn=CAST(c*0.5 AS INT)+1 THEN r END) q50, MAX(c) c FROM t$1 GROUP BY sbd HAVING MAX(c)>=6)"; }
+          q "11 Ổn định của sàn riêng (lần đầu, đúng): số em có q10 / q25 / q50 hai nửa lệch < 25%" "WITH x AS ($B), $Y, $(TR a 0 0), $(TR b 0 1) SELECT COUNT(*) so_em, SUM(ABS(qa.q10-qb.q10)/((qa.q10+qb.q10)/2)<0.25) q10_on, SUM(ABS(qa.q25-qb.q25)/((qa.q25+qb.q25)/2)<0.25) q25_on, SUM(ABS(qa.q50-qb.q50)/((qa.q50+qb.q50)/2)<0.25) q50_on FROM qa JOIN qb USING(sbd)"
+          q "12 Phân bố sàn riêng q25 (lần đầu, đúng, nửa chẵn) theo em" "WITH x AS ($B), $Y, $(TR a 0 0) SELECT COUNT(*) so_em, SUM(q25<0.3) duoi03, SUM(q25>=0.3 AND q25<0.5) s03_05, SUM(q25>=0.5 AND q25<0.7) s05_07, SUM(q25>=0.7 AND q25<1) s07_1, SUM(q25>=1) tu1 FROM qa"
+          q "13 Thử trên nửa lẻ (LẦN ĐẦU): đúng của lượt dưới 0,8×q10 riêng / dưới q25 riêng / dưới T_đọc chung" "WITH x AS ($B), $Y, $(TR a 0 0), v AS (SELECT y.r, y.kq, qa.q10, qa.q25 FROM y JOIN qa USING(sbd) WHERE y.gap=0 AND y.k%2=1) SELECT COUNT(*) n, SUM(r<0.8*q10) n_duoi_san, SUM(r<0.8*q10 AND kq=1) dung_duoi_san, SUM(r<q25) n_duoi_q25, SUM(r<q25 AND kq=1) dung_duoi_q25, SUM(r>=q25) n_tren, SUM(r>=q25 AND kq=1) dung_tren, SUM(r<1) n_duoi_chung, SUM(r<1 AND kq=1) dung_duoi_chung FROM v"
+          q "14 Thử trên nửa lẻ (ĐÃ GẶP), sàn học từ lượt đã gặp nửa chẵn" "WITH x AS ($B), $Y, $(TR c 1 0), v AS (SELECT y.r, y.kq, qc.q10, qc.q25 FROM y JOIN qc USING(sbd) WHERE y.gap=1 AND y.k%2=1) SELECT COUNT(*) n, SUM(r<0.8*q10) n_duoi_san, SUM(r<0.8*q10 AND kq=1) dung_duoi_san, SUM(r<q25) n_duoi_q25, SUM(r<q25 AND kq=1) dung_duoi_q25, SUM(r>=q25) n_tren, SUM(r>=q25 AND kq=1) dung_tren FROM v"
+          q "15 Lần đầu Phần I: đúng theo r rất nhỏ (tất cả em)" "WITH x AS ($B) SELECT SUM(r<0.15) n015, SUM(r<0.15 AND kq=1) d015, SUM(r>=0.15 AND r<0.25) n025, SUM(r>=0.15 AND r<0.25 AND kq=1) d025, SUM(g<=4) n_le4giay, SUM(g<=4 AND kq=1) d_le4giay FROM x WHERE gap=0 AND phan='I'"
+          # ---- Câu LẶP LẠI nhanh hơn bao nhiêu (thầy 24/10): theo số lần đã gặp, theo khoảng cách lần trước, tách câu SONG SINH (raw_json.tc = bản khác của câu từng sai).
+          PC="(SELECT COUNT(*) FROM su_kien_hoc s2 WHERE s2.sbd=s.sbd AND s2.qid=s.qid AND s2.luc < s.luc)"
+          LT="(SELECT MAX(s2.luc) FROM su_kien_hoc s2 WHERE s2.sbd=s.sbd AND s2.qid=s.qid AND s2.luc < s.luc)"
+          B2="SELECT s.sbd, s.giay g, s.ket_qua kq, $(J p) phan, s.giay*1.0/$TD r, $PC pc, julianday(s.luc)-julianday($LT) cach, CASE WHEN json_extract(s.raw_json,'\$.tc') IS NOT NULL THEN 1 ELSE 0 END ss FROM su_kien_hoc s WHERE s.ngay_vn >= date('now','+7 hours','-14 days') AND COALESCE(s.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc') AND $(J dh)=1 AND s.giay IS NOT NULL AND NOT $TREO"
+          LOAI="CASE WHEN pc=0 AND ss=0 THEN '1 moi that' WHEN pc=0 AND ss=1 THEN '2 song sinh' WHEN pc=1 THEN '3 gap lan 2' WHEN pc=2 THEN '4 gap lan 3' ELSE '5 gap lan 4+' END"
+          q "16 Phần I theo loại: số lượt, đúng, giây TB, giây TB khi đúng, r TB khi đúng, % lượt ≤ 4 giây" "WITH x AS ($B2) SELECT $LOAI loai, COUNT(*) n, SUM(kq=1) dung, ROUND(AVG(g),1) giay_tb, ROUND(AVG(CASE WHEN kq=1 THEN g END),1) giay_dung, ROUND(AVG(CASE WHEN kq=1 THEN r END),2) r_dung, ROUND(100.0*SUM(g<=4)/COUNT(*),1) pt_le4 FROM x WHERE phan='I' GROUP BY 1 ORDER BY 1"
+          q "17 Phần II, III theo loại: số lượt, đúng, giây TB khi đúng" "WITH x AS ($B2) SELECT phan, $LOAI loai, COUNT(*) n, SUM(kq=1) dung, ROUND(AVG(CASE WHEN kq=1 THEN g END),1) giay_dung FROM x WHERE phan IN ('II','III') GROUP BY 1,2 ORDER BY 1,2"
+          q "18 Phần I đã gặp lại: theo khoảng cách từ lần trước" "WITH x AS ($B2) SELECT CASE WHEN cach<1.0/24 THEN 'a <1 gio' WHEN cach<1 THEN 'b cung ngay' WHEN cach<4 THEN 'c 1-3 ngay' WHEN cach<8 THEN 'd 4-7 ngay' ELSE 'e >7 ngay' END khoang, COUNT(*) n, SUM(kq=1) dung, ROUND(AVG(CASE WHEN kq=1 THEN g END),1) giay_dung, ROUND(AVG(CASE WHEN kq=1 THEN r END),2) r_dung FROM x WHERE phan='I' AND pc>=1 GROUP BY 1 ORDER BY 1"
+          q "19 Mỗi em: giây TB khi đúng (đã gặp) ÷ (mới thật), Phần I, cần ≥ 6 lượt mỗi loại" "WITH x AS ($B2), a AS (SELECT sbd, AVG(g) g0 FROM x WHERE phan='I' AND kq=1 AND pc=0 AND ss=0 GROUP BY sbd HAVING COUNT(*)>=6), b AS (SELECT sbd, AVG(g) g1 FROM x WHERE phan='I' AND kq=1 AND pc>=1 GROUP BY sbd HAVING COUNT(*)>=6) SELECT COUNT(*) so_em, SUM(g1/g0<0.3) duoi03, SUM(g1/g0>=0.3 AND g1/g0<0.5) t03_05, SUM(g1/g0>=0.5 AND g1/g0<0.7) t05_07, SUM(g1/g0>=0.7 AND g1/g0<1) t07_1, SUM(g1/g0>=1) tu1, ROUND(AVG(g1/g0),2) tb FROM a JOIN b USING(sbd)"
+          # ---- Chỉ câu MỚI THẬT (chưa gặp, không song sinh): đúng theo r — tìm chỗ tỉ lệ đúng tụt về mức đoán (Phần I 25%).
+          M="m AS (SELECT * FROM ($B2) WHERE pc=0 AND ss=0)"
+          q "20 Mới thật · Phần I: đúng theo r (giây/T_đọc chung)" "WITH $M SELECT CASE WHEN r<0.25 THEN 'a <0.25' WHEN r<0.5 THEN 'b 0.25-0.5' WHEN r<0.75 THEN 'c 0.5-0.75' WHEN r<1 THEN 'd 0.75-1' WHEN r<1.5 THEN 'e 1-1.5' WHEN r<2.5 THEN 'f 1.5-2.5' ELSE 'g >=2.5' END kh, COUNT(*) n, SUM(kq=1) dung, ROUND(AVG(g),1) giay_tb FROM m WHERE phan='I' GROUP BY 1 ORDER BY 1"
+          q "21 Mới thật · Phần I: đúng theo giây tuyệt đối" "WITH $M SELECT CASE WHEN g<=3 THEN 'a <=3' WHEN g<=6 THEN 'b 4-6' WHEN g<=10 THEN 'c 7-10' WHEN g<=15 THEN 'd 11-15' WHEN g<=25 THEN 'e 16-25' WHEN g<=45 THEN 'f 26-45' ELSE 'g >45' END kh, COUNT(*) n, SUM(kq=1) dung FROM m WHERE phan='I' GROUP BY 1 ORDER BY 1"
+          q "22 Mới thật · Phần I: sàn riêng q10/q25 (nửa chẵn, đúng) thử trên nửa lẻ" "WITH $M, y AS (SELECT sbd, r, kq, ROW_NUMBER() OVER (PARTITION BY sbd ORDER BY g, r) k FROM m WHERE phan='I'), t AS (SELECT sbd, r, ROW_NUMBER() OVER (PARTITION BY sbd ORDER BY r) rn, COUNT(*) OVER (PARTITION BY sbd) c FROM y WHERE kq=1 AND k%2=0), q AS (SELECT sbd, MAX(CASE WHEN rn=CAST(c*0.1 AS INT)+1 THEN r END) q10, MAX(CASE WHEN rn=CAST(c*0.25 AS INT)+1 THEN r END) q25, MAX(CASE WHEN rn=CAST(c*0.5 AS INT)+1 THEN r END) q50 FROM t GROUP BY sbd HAVING MAX(c)>=5), v AS (SELECT y.r, y.kq, q.q10, q.q25 FROM y JOIN q USING(sbd) WHERE y.k%2=1) SELECT COUNT(*) n, (SELECT COUNT(*) FROM q) so_em, SUM(r<0.8*q10) n_san, SUM(r<0.8*q10 AND kq=1) d_san, SUM(r<q25) n_q25, SUM(r<q25 AND kq=1) d_q25, SUM(r>=q25) n_tren, SUM(r>=q25 AND kq=1) d_tren FROM v"
+          q "23 Mới thật · Phần I: số em theo sàn riêng q25 (đúng, ≥ 5 lượt)" "WITH $M, t AS (SELECT sbd, r, ROW_NUMBER() OVER (PARTITION BY sbd ORDER BY r) rn, COUNT(*) OVER (PARTITION BY sbd) c FROM m WHERE phan='I' AND kq=1), q AS (SELECT sbd, MAX(CASE WHEN rn=CAST(c*0.25 AS INT)+1 THEN r END) q25, MAX(c) c FROM t GROUP BY sbd HAVING MAX(c)>=5) SELECT COUNT(*) so_em, SUM(q25<0.4) duoi04, SUM(q25>=0.4 AND q25<0.6) s04_06, SUM(q25>=0.6 AND q25<0.8) s06_08, SUM(q25>=0.8 AND q25<1.1) s08_11, SUM(q25>=1.1) tu11, ROUND(AVG(c),1) luot_tb FROM q"
+          # ---- τ OMNI có dùng làm hệ số đọc được không: theo nhóm τ, r TB / giây TB của em trên câu MỚI THẬT, Phần I, đúng (≥ 5 lượt/em).
+          q "24 τ (omni_em, n_tau ≥ 5) × r riêng trên câu mới thật" "WITH $M, e AS (SELECT sbd, AVG(r) rr, AVG(g) gg, COUNT(*) c FROM m WHERE phan='I' AND kq=1 GROUP BY sbd HAVING COUNT(*)>=5) SELECT CASE WHEN o.tau<-0.3 THEN 'a cham' WHEN o.tau<0 THEN 'b hoi cham' WHEN o.tau<0.3 THEN 'c hoi nhanh' ELSE 'd nhanh' END nhom_tau, COUNT(*) so_em, ROUND(AVG(o.tau),2) tau_tb, ROUND(AVG(e.rr),2) r_tb, ROUND(AVG(e.gg),1) giay_tb FROM e JOIN omni_em o ON o.sbd=e.sbd AND o.n_tau>=5 GROUP BY 1 ORDER BY 1"
