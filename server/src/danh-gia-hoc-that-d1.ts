@@ -433,7 +433,14 @@ async function banCongKhai(env: Env, sbd: string, ai: 'em' | 'ph', nowMs: number
   const loaiCua = ai === 'em' ? ['nhac_em'] : ['bao_ph', 'xac_nhan_nghi']
   const chuaXem = ct.filter((x) => loaiCua.includes(str(x.loai)) && !str(x[cot]))
   if (chuaXem.length) await env.DB.batch(chuaXem.map((x) => env.DB.prepare(`UPDATE can_thiep_em SET ${cot} = ? WHERE id = ? AND ${cot} IS NULL`).bind(new Date(nowMs).toISOString(), str(x.id)))).catch(() => undefined)
-  if (!moi) return { ok: true, bat: true, coDanhGia: false }
+  // PHỤ HUYNH chỉ thấy «Đối phó» của tuần mà máy/thầy ĐÃ báo phụ huynh (tuần Đối phó thứ hai liền ⇒ `bao_ph`, hoặc thầy xác nhận cho nghỉ).
+  // Tuần Đối phó đầu tiên chỉ nhắc em ⇒ phụ huynh chưa thấy nhãn (mặc định 2 thầy chốt 24/10). Học sinh thấy ngay để tự sửa.
+  const daBaoPh = (tuan: string) => {
+    const tu = Date.parse(tuan + 'T00:00:00Z') - 7 * 3600_000
+    return ct.some((x) => ['bao_ph', 'xac_nhan_nghi'].includes(str(x.loai)) && Date.parse(str(x.gui_luc)) >= tu && Date.parse(str(x.gui_luc)) < tu + 7 * 86400_000)
+  }
+  const thay = (x: Row) => ai === 'em' || bacCongKhai(num(x.bac) as BacDanhGia) === 1 || daBaoPh(str(x.tuan))
+  if (!moi || !thay(moi)) return { ok: true, bat: true, coDanhGia: false }
   const bac = bacCongKhai(num(moi.bac) as BacDanhGia)
   return {
     ok: true,
@@ -445,7 +452,7 @@ async function banCongKhai(env: Env, sbd: string, ai: 'em' | 'ph', nowMs: number
     lyDo: bac === 3 ? json(moi.phat_json, [] as { chu: string }[]).map((p) => p.chu) : [],
     soLieu: json(moi.so_lieu_json, {}),
     tienBo: json(moi.tien_bo_json, {}),
-    lichSu: ls.map((x) => ({ tuan: str(x.tuan), nhan: bacCongKhai(num(x.bac) as BacDanhGia) === 1 ? 'Học thật' : 'Đối phó' })),
+    lichSu: ls.filter(thay).map((x) => ({ tuan: str(x.tuan), nhan: bacCongKhai(num(x.bac) as BacDanhGia) === 1 ? 'Học thật' : 'Đối phó' })),
     tin: ct.filter((x) => loaiCua.includes(str(x.loai))).map((x) => ({ loai: str(x.loai) === 'xac_nhan_nghi' ? 'thong_bao_nghi' : str(x.loai), noiDung: json(x.noi_dung, str(x.noi_dung) as unknown), guiLuc: str(x.gui_luc) })),
   }
 }
