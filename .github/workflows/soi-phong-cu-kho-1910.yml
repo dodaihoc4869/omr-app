@@ -1,0 +1,32 @@
+# SOI KHO ĐỀ tìm chữ phông cũ / công thức vỡ (thầy 19/10). CHỈ ĐỌC D1 `game_v2_question` (khoá của Actions không đọc được R2: 401/403).
+# Repo công khai ⇒ chỉ in SỐ ĐẾM + token lỗi + mã câu; không in cả đề, không có dữ liệu học sinh.
+# Bấm tay (workflow_dispatch) hoặc tự chạy khi đẩy nhánh KHÁC main có sửa 3 tệp dưới.
+name: Soi kho đề — chữ phông cũ (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/soi-phong-cu-kho-1910.yml', 'scripts/soi-phong-cu-kho.mjs', 'src/lib/phong-cu.ts']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: soi-phong-cu-kho-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  soi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Soi chỉ mục câu trong D1 (chỉ SELECT)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node --experimental-strip-types scripts/soi-phong-cu-kho.mjs
