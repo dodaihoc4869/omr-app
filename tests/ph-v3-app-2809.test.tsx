@@ -116,7 +116,8 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     // SỬA CÓ CHỦ Ý — LÀN PHỤ HUYNH 12/10: thêm lệnh CHỈ ĐỌC `/ph/con-tong-quan` (đúng/sai, số giây, gợi ý nhắc) — cùng thân {sbd}, không ghi gì.
     // SỬA CÓ CHỦ Ý — đợt 16: thêm lệnh CHỈ ĐỌC `/ph/nhip-hoc` (thẻ "Nhịp học của con" — Lười / Chăm như app học sinh), cùng thân danh tính.
     // SỬA CÓ CHỦ ĐÍCH 13/10 — đợt 19: phần dưới trang nạp hai lệnh CHỈ ĐỌC `/ph/ho-so-thai-do`, `/ph/lich-su-lam-cau` (+ `gioiHan` số lượt) khi sắp cuộn tới.
-    for (const d of duong) expect(['/ph/tat-ca-ve-con', '/ph/hoc-2', '/ph/loi-thay', '/ph/con-tong-quan', '/ph/nhip-hoc', '/ph/ho-so-thai-do', '/ph/lich-su-lam-cau']).toContain(d)
+    // SỬA CÓ CHỦ ĐÍCH 24/10: thẻ «Báo cáo tuần» nạp lệnh CHỈ ĐỌC `/ph/bao-cao-tuan` (cùng thân danh tính, máy chủ đệm 3 giờ).
+    for (const d of duong) expect(['/ph/tat-ca-ve-con', '/ph/hoc-2', '/ph/loi-thay', '/ph/con-tong-quan', '/ph/nhip-hoc', '/ph/ho-so-thai-do', '/ph/lich-su-lam-cau', '/ph/bao-cao-tuan']).toContain(d)
     expect(duong.has('/ph/giao-them')).toBe(false)
     expect(duong.has('/hoa2/ph-ngung')).toBe(false)
     for (const g of goi) {

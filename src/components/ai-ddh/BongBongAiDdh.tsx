@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Anh, ArrowRight, BookOpen, Camera, CheckCircle2, ChevronDown, ClipboardPaste, Clock, Lightbulb, Lock, MoonStar, Send, ShieldCheck, Sparkles, WifiOff, Zap } from './bieu-tuong-ai'
 import { AnhLogo } from '../LogoVai'
+import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 import { CO_CU_MS, docCoBat, ghiCoBat, guiAiDdh, moAiDdh, nenAnh, taoMaTin, tinMoiAiDdh, type MoAiDdh, type TinAiDdh } from '../../lib/ai-ddh-api'
 import { chuNguon, tachKhoi, type Khuc } from '../../lib/ai-ddh-dinh-dang'
 import './ai-ddh.css'
@@ -113,22 +114,23 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
   useEffect(() => { if (mo) void taiMo() }, [mo, taiMo])
 
   // Hỏi tin mới: đang chờ 3 giây; tấm mở 20 giây; tấm đóng mà còn chờ 60 giây.
+  // Vòng NỐI TIẾP (`batNhipBenVung`, đã có sẵn trong khung HS ⇒ không thêm byte): lượt sau chỉ hẹn khi lượt trước xong, tab ẩn không gọi, lỗi ⇒ thưa dần.
+  const sauRef = useRef(sau)
+  sauRef.current = sau
   useEffect(() => {
     if (!du?.bat) return
     const ms = mo ? (dangCho ? 3000 : 20_000) : dangCho ? 60_000 : 0
     if (!ms) return
-    const h = window.setInterval(() => {
-      if (document.visibilityState === 'hidden') return
-      void tinMoiAiDdh(token, sau).then((r) => {
-        if (!r.ok) return
-        setTruc(r.du.vanPhongTruc)
-        if (!r.du.tin.length) return
-        setTin((cu) => { const co = new Set(cu.map((x) => x.id)); return [...cu.map((x) => r.du.tin.find((y) => y.id === x.id) ?? x), ...r.du.tin.filter((x) => !co.has(x.id))] })
-        if (!mo) setMoiChua((n) => n + r.du.tin.filter((x) => x.ben === 'vp').length)
-      })
-    }, ms)
-    return () => clearInterval(h)
-  }, [du?.bat, mo, dangCho, token, sau])
+    const v = batNhipBenVung(async () => {
+      const r = await tinMoiAiDdh(token, sauRef.current)
+      if (!r.ok) return false
+      setTruc(r.du.vanPhongTruc)
+      if (!r.du.tin.length) return
+      setTin((cu) => { const co = new Set(cu.map((x) => x.id)); return [...cu.map((x) => r.du.tin.find((y) => y.id === x.id) ?? x), ...r.du.tin.filter((x) => !co.has(x.id))] })
+      if (!mo) setMoiChua((n) => n + r.du.tin.filter((x) => x.ben === 'vp').length)
+    }, { coSoMs: ms, lechMs: ms / 6, chayNgay: false, luiDanMs: [ms * 2, ms * 4, Math.max(ms * 8, 30_000)] })
+    return () => v.dung()
+  }, [du?.bat, mo, dangCho, token])
 
   useEffect(() => { const t = than.current; if (t && mo) t.scrollTop = t.scrollHeight }, [tin.length, cho.length, mo])
 

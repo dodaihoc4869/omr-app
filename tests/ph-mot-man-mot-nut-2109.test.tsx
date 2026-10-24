@@ -66,7 +66,8 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     // SỬA CÓ CHỦ Ý — đợt 16: thẻ "Nhịp học của con" chỉ có nút XEM (mở hồ sơ làm bài của con) / TẢI LẠI khi lỗi — không nút giao bài nào.
     // SỬA CÓ CHỦ ĐÍCH 13/10 — đợt 19 (trang "Hôm nay của con"): thêm các nút CHỈ XEM / TẢI LẠI của trang — khối bậc (mở tấm 12 bậc), "Xem đủ … câu"
     // và "Xem tất cả … lượt" (mở hồ sơ làm bài), tải lại phần thái độ / câu sai khi lỗi. Không nút giao bài nào.
-    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Đã xem cảnh báo|Đổi số báo danh|Xem hồ sơ làm bài của con|Tải lại nhịp học|Tải lại thái độ làm bài|Tải lại câu sai|Bậc \d+\/12 · .+, xem đủ 12 bậc|Xem đủ \d+ câu chưa sửa và \d+ câu đã sửa|Xem tất cả \d+ lượt)$/
+    // SỬA CÓ CHỦ ĐÍCH 24/10: thẻ «Báo cáo tuần» (chỉ đọc) có nút «Tải lại báo cáo tuần» khi chưa tải được.
+    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Đã xem cảnh báo|Đổi số báo danh|Xem hồ sơ làm bài của con|Tải lại nhịp học|Tải lại thái độ làm bài|Tải lại câu sai|Tải lại báo cáo tuần|Bậc \d+\/12 · .+, xem đủ 12 bậc|Xem đủ \d+ câu chưa sửa và \d+ câu đã sửa|Xem tất cả \d+ lượt)$/
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
     expect(ten()).not.toContain('Đổi số báo danh') // menu chưa mở ⇒ không có ở đâu khác
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))

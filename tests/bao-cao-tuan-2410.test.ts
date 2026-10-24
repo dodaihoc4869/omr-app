@@ -84,7 +84,10 @@ describe('báo cáo tuần — D1', () => {
   }
   it('thầy xem được hai tin; số liệu đếm đúng; phần cách làm là tập con số câu', async () => {
     const d = duLieu()
-    const r = await goiWorker(worker, d.env as unknown as Env, '/gv/danh-gia/bao-cao-tuan', { sbd: 'A1' }, true)
+    expect((await goiWorker(worker, d.env as unknown as Env, '/gv/danh-gia/bao-cao-tuan', { sbd: 'A1' }, true)).ok).toBe(true)
+    // Số liệu theo giờ CỐ ĐỊNH (không theo đồng hồ máy chạy test: qua 0 giờ Việt Nam là sang tuần khác).
+    const { gvBaoCaoTuan } = await import('../server/src/bao-cao-tuan')
+    const r = await gvBaoCaoTuan(d.env as unknown as Env, { sbd: 'A1' }, NOW) as Record<string, any>
     expect(r.ok).toBe(true)
     expect(r.duLieu).toMatchObject({ tu: '18/10', den: '24/10', ngayKiem: '31/10', ngayCoLam: 2, soCau: 16, soDung: 13 })
     expect(r.duLieu.ngayKhongLam).toEqual(['18/10', '19/10', '21/10', '23/10', '24/10'])

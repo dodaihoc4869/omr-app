@@ -211,7 +211,8 @@ describe('tờ chiếu — đo lại lượt cũ', () => {
     const r = (await gvHoSoLenBang(env(d), { sbd: 'S1', qid: 'H-1' }, T0 + 3_600_000)) as { ok: boolean; cauNay: { lan: { dung: boolean; mucLam?: { ma: number; uocTinh?: string } }[] }; cachLam14: { soDo: number; chuaCoSoDo: number; soUocTinh: number } }
     expect(r.ok).toBe(true)
     // cũ → mới: game ước tính (20/10) · hai lượt đồng hồ cũ · lượt không giây
-    expect(r.cauNay.lan.map((x) => x.mucLam && [x.mucLam.ma, x.mucLam.uocTinh])).toEqual([[1, 'uoc'], [1, 'cu'], [3, 'cu'], undefined])
+    // SỬA CÓ CHỦ ĐÍCH 24/10 (hệ số câu lặp lại `HE_SO_LAP`): lượt 10 s là lần GẶP THỨ HAI câu H-1 ⇒ T_đọc ngắn lại, 10 s đã qua sàn đọc ⇒ Mức 2 (trước là 1).
+    expect(r.cauNay.lan.map((x) => x.mucLam && [x.mucLam.ma, x.mucLam.uocTinh])).toEqual([[1, 'uoc'], [2, 'cu'], [3, 'cu'], undefined])
     expect(r.cachLam14).toMatchObject({ soDo: 3, soUocTinh: 3, chuaCoSoDo: 1 })
   })
 })
