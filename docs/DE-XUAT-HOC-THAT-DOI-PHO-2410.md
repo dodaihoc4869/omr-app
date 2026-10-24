@@ -95,6 +95,48 @@ Mọi ngưỡng dưới đây là **TẠM**, chỉnh theo nhãn mù của thầy
 - `chua-du-du-lieu` → giữ.
 - Bậc chăm chỉ 12 bậc và nhóm Nhịp học giữ nguyên cho game và màn Hôm nay, không trùng chữ với nhãn mới.
 
+## 4b. BẢN SỬA 24/10 — THANG 5 BẬC CÓ MỨC ĐUỔI (thầy: «Phải có cả mức ĐUỔI… tính toán mọi thứ đề xuất thông minh nhất»)
+
+Bản này thay mục 4 ở chỗ nào hai bên khác nhau.
+
+### Điểm Thật tuần (0–100), tính mỗi sáng thứ Hai trên 14 ngày gần nhất
+`Điểm Thật = 100 − Σ phạt`, mỗi phạt có trần. Trọng số là TẠM, chỉnh theo nhãn mù của thầy.
+
+| Phạt | Tính | Tối đa |
+|---|---|---|
+| Nhanh mà sai (B1) | 100 × cận dưới Wilson 90% của tỉ lệ «Mức 1 VÀ sai» × hệ số độ dễ. Sai câu dễ (lớp đúng ≥ 80%) nặng gấp 1,5; sai câu khó (lớp đúng < 40%) không tính | 30 |
+| Bấm lặp (B2) | 10 × số chuỗi xấu | 20 |
+| Treo máy (B3) | 100 × cận dưới Wilson tỉ lệ Mức 5; +10 mỗi ngày có Mức 6 | 25 |
+| Xem lời giải trước khi thử (B4) | theo luật `goi-y` cũ: xấu = 10 | 10 |
+| Thuộc mà không hiểu (B5) | (đúng câu gốc − đúng bản khác) − 20, đơn vị điểm %, nếu dương | 15 |
+| Rời màn / trùng lỗi sai khi thi (B6, B7) | 10 mỗi bài vượt ngưỡng; trùng lỗi sai thầy đã xác nhận = 40 | 40 |
+| Bỏ KTCN (A1) | 40 × tỉ lệ bỏ | 20 |
+| Vắng không phép (A3) | 30 × tỉ lệ vắng không phép | 15 |
+
+Vì sao «thông minh» hơn đếm thẳng:
+1. **Cận dưới Wilson:** em ít lượt không bị phạt oan vì 2–3 lần trượt tay. Ví dụ 3/5 lượt xấu cho cận dưới khoảng 27%, còn 30/50 lượt xấu cho khoảng 48%.
+2. **Hệ số độ dễ:** sai câu dễ mới là dấu hiệu đối phó. Sai câu khó là chuyện bình thường.
+3. **Nhanh mà ĐÚNG ở câu ôn không bao giờ bị phạt.** Số liệu thật: lượt nhanh đúng 85%, cao hơn lượt chậm.
+4. **So với chính em:** hồ sơ hiện thêm «tuần này so với trung bình 4 tuần trước của em». Bậc chỉ đổi khi điểm lệch rõ, không nhảy vì một ngày.
+5. **Câu có đáp án «cần xem»** không tính sai.
+
+### Thang 5 bậc
+| Bậc | Điều kiện vào | Máy tự làm | Ai thấy |
+|---|---|---|---|
+| **1 · Học thật** | Điểm Thật ≥ 75, không cờ đỏ | — | thầy · em · PH |
+| **2 · Cần theo dõi** | 60–74 | — | chỉ thầy |
+| **3 · Đối phó** | < 60, HOẶC có 1 cờ đỏ (gian lận thi xác nhận, Mức 6) | Tuần đầu: **tự nhắc em** kèm lý do bằng số. Tuần thứ 2 liền: **tự nhắn PH**. Mỗi lần nhắc ghi vào nhật ký can thiệp | thầy · em · PH |
+| **4 · Không dạy nổi** | Đối phó ≥ 3 trong 4 tuần, VÀ ≥ 2 lần can thiệp em/PH đã xem, VÀ trong 7 ngày sau mỗi lần Điểm Thật không tăng ≥ 10, VÀ không tiến bộ thật (đúng bản khác < 40%, KTCN không tăng) | Báo thầy: **«Gọi PH, mở 14 ngày cam kết»**. Thầy bấm ⇒ ghi mốc cam kết | chỉ thầy (PH chỉ nhận lời thầy) |
+| **5 · ĐUỔI** | **Đường thường:** hết 14 ngày cam kết mà Điểm Thật TB < 60 hoặc thấp hơn trước cam kết. **Đường tắt (cờ đỏ nặng):** gian lận thi thầy xác nhận ≥ 2 lần trong 4 tuần; HOẶC Mức 6 (cố tình treo máy) ở ≥ 3 trong 4 tuần; HOẶC bỏ ≥ 75% KTCN VÀ vắng không phép ≥ 50% suốt 4 tuần | Máy **kết luận ĐUỔI** + dựng hồ sơ bằng chứng (từng tuần, từng lần nhắc, số đo trước/sau, câu gian lận). Soạn sẵn tin cho PH | chỉ thầy. **Tin cho PH chỉ gửi khi thầy bấm «Xác nhận cho nghỉ»** |
+
+**Đi xuống bậc:** 2 tuần liền Điểm Thật ≥ 75 thì xuống một bậc. Không bao giờ nhảy thẳng từ ĐUỔI về Học thật.
+
+**Vì sao ĐUỔI vẫn cần thầy bấm một lần:** đây là việc không rút lại được, gửi ra ngoài cho phụ huynh, và có thể sai vì lỗi đo (mạng, máy yếu). Máy kết luận và soạn sẵn hết, thầy chỉ đọc hồ sơ rồi bấm.
+
+**Mốc sớm nhất:**
+- Đường thường: 4 tuần để lên Không dạy nổi, cộng 14 ngày cam kết. Nếu nhật ký can thiệp chạy từ 27/10 thì ĐUỔI sớm nhất khoảng **08/12**.
+- Đường tắt (gian lận ×2): ngay khi đủ bằng chứng.
+
 ## 5. Phải đo thêm (không có thì không chính xác được)
 
 | # | Thiếu | Làm gì | Ảnh hưởng nếu không làm |
