@@ -1,0 +1,30 @@
+# DANH SÁCH ĐỀ ĐANG CÓ TRONG KHO (CHỈ ĐỌC) — thầy 24/10: "quét thư mục dạy học trên google drive … đẩy lên kho đề những đề mới".
+# Để các phiên nạp đề biết đề nào ĐÃ có (khỏi đẩy trùng). Chỉ in mã đề / tên đề / lớp / chuyên đề / số câu / ngày — không đáp án, không học sinh.
+name: Danh sách đề trong kho (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-kho-de-hien-co-2410.yml']
+permissions:
+  contents: read
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đề trong kho (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          SQL="SELECT d.ma_de, d.ten_de, d.lop, d.chuyen_de, d.so_cau, d.ngay_nap, substr(d.cap_nhat_luc,1,10) AS cap_nhat, t.thu_muc FROM de_kho d LEFT JOIN de_kho_thu_muc t ON t.ma_de = d.ma_de WHERE COALESCE(d.da_xoa,0) = 0 ORDER BY d.lop, t.thu_muc, d.ten_de"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL" > /tmp/kho.json
+          node -e "const j=JSON.parse(require('fs').readFileSync('/tmp/kho.json','utf8'));const r=(Array.isArray(j)?j[0]:j).results||[];console.log('SỐ ĐỀ:',r.length);for(const x of r)console.log([x.lop,x.thu_muc||'',x.chuyen_de||'',x.ten_de||'',x.so_cau,x.ma_de,x.ngay_nap||'',x.cap_nhat].join(' | '))"
