@@ -53,6 +53,8 @@ const ca = await goi('/ca/danh-sach', {})
 console.log('CA_DANG_MO', Array.isArray(ca.j?.items) ? ca.j.items.filter((c) => c.trangThai === 'mo').length : '?', '(đề mới mã mới, không đụng ca đang mở)')
 const ds = await goi('/kho/danh-sach', { keCaDaXoa: true })
 const coSan = new Set((ds.j?.items || ds.j?.de || []).map((d) => String(d.maDe ?? d.ma_de ?? '')))
+const ngayNapKho = new Map((ds.j?.items || []).map((d) => [String(d.maDe ?? ''), String(d.ngayNap ?? '')]))
+const choGhiLai = new Set(existsSync(`${THU_MUC}/ghi-lai.txt`) ? readFileSync(`${THU_MUC}/ghi-lai.txt`, 'utf8').split(/\s+/).filter(Boolean) : [])
 console.log('KHO_DANG_CO', coSan.size, 'đề')
 if (coSan.size < 100) { console.error('Không đọc được danh sách kho đầy đủ — dừng cho an toàn'); process.exit(1) }
 
@@ -69,7 +71,9 @@ for (const f of tep) {
   const maDe = String(de.ma_de || '')
   const kq = kiem(raw)
   if (!kq.sach) { console.log('LOI_CONG', maDe, JSON.stringify(kq.tom)); loi++; continue }
-  if (coSan.has(maDe)) { console.log('BO_QUA_DA_CO', maDe, '(chỉ thêm, không ghi đè)'); continue }
+  // Ghi lại CHỈ mã có tên trong .nap-kho/ghi-lai.txt VÀ do chính đường này nạp (ngày nạp trong kho = ngày nạp của gói mới).
+  if (coSan.has(maDe) && !(choGhiLai.has(maDe) && ngayNapKho.get(maDe) === String(de.ngay_nap || ''))) { console.log('BO_QUA_DA_CO', maDe, '(chỉ thêm, không ghi đè)'); continue }
+  if (coSan.has(maDe)) console.log('GHI_LAI', maDe, '(đề do đường này nạp cùng ngày)')
   const r = await goi('/goi', { action: 'luuDe', secret: SECRET, de })
   if (r.ma !== 200 || r.j?.ok !== true) { console.log('LOI_DAY', maDe, r.ma, String(r.j?.error || '').slice(0, 200)); loi++; continue }
   const lai = await goi('/kho/lay', { maDe })
