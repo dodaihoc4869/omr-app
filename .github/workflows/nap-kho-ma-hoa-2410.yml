@@ -1,0 +1,31 @@
+# NẠP ĐỀ MỚI LÊN KHO TỪ GÓI MÃ HOÁ (thầy 24/10). Gói đề có đáp án chỉ nằm trên git dưới dạng MÃ HOÁ (.nap-kho/*.enc),
+# khoá giải suy từ secret OMR_MA_BI_MAT ngay trên máy chạy. Log chỉ in mã đề + con số. CHỈ THÊM mã đề chưa có.
+name: Nạp đề mới lên kho (gói mã hoá)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.nap-kho/**', 'scripts/nap-kho-ma-hoa-2410.mjs', 'scripts/nap-kho-kiem-2410.ts', '.github/workflows/nap-kho-ma-hoa-2410.yml']
+permissions:
+  contents: read
+concurrency:
+  group: nap-kho-ma-hoa
+  cancel-in-progress: false
+jobs:
+  nap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Đóng gói cổng kiểm
+        run: npx esbuild scripts/nap-kho-kiem-2410.ts --bundle --platform=node --format=esm --outfile=/tmp/nap-kho-kiem.mjs --log-level=warning
+      - name: Giải mã, kiểm, nạp
+        env:
+          OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
+          KIEM_MJS: /tmp/nap-kho-kiem.mjs
+        run: node scripts/nap-kho-ma-hoa-2410.mjs
