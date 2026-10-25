@@ -93,3 +93,17 @@ describe('goMaDeTachRa', () => {
     }
   })
 })
+
+// 25/10 (thầy: "thư mục Tự Luyện mục đề chuẩn cấu trúc không chia thành trắc nghiệm đúng sai nữa, khôi phục về hiển thị từng đề một").
+describe('đề chuẩn cấu trúc hiện nguyên từng đề', () => {
+  it('nhóm có «chuẩn cấu trúc» (có dấu hay không) ⇒ một mục, đủ ba phần, mã giữ nguyên; nhóm thường vẫn tách', () => {
+    for (const nhom of ['Tự Luyện · Đề chuẩn cấu trúc', '12 · Bộ đề chuẩn cấu trúc', 'tu luyen · de chuan cau truc', 'TỰ LUYỆN · ĐỀ CHUẨN CẤU TRÚC']) {
+      const ra = tachTheoPhan({ ...de('DB-12-07', 18, 4, 6), nhom })
+      expect(ra, nhom).toHaveLength(1)
+      expect(ra[0].maDe).toBe('DB-12-07')
+      expect([ra[0].phanI.length, ra[0].phanII.length, ra[0].phanIII.length]).toEqual([18, 4, 6])
+    }
+    expect(tachNhieuTheoPhan([{ ...de('DB-12-07', 18, 4, 6), nhom: 'Tự Luyện · Đề chuẩn cấu trúc' }, de('12-C1-B2', 5, 2, 1)]).map((s) => s.maDe))
+      .toEqual(['DB-12-07', '12-C1-B2-TN', '12-C1-B2-DS', '12-C1-B2-TLN'])
+  })
+})
