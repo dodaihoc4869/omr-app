@@ -84,6 +84,9 @@ function napTruocManEm(): Plugin {
         const hsVo = dsCua('/src/AppHocSinh.tsx')
         // 25/10: cổng phụ huynh có gốc riêng `AppPhuHuynh` (không App.tsx) ⇒ `phVo` = vỏ đó; `ph` = phần mảnh cổng NGOÀI vỏ.
         const phVo = dsCua('/src/AppPhuHuynh.tsx')
+        // 25/10 (tức thì hơn nữa): màn thi có gốc riêng `AppThi` (không App.tsx) ⇒ nhóm `thi` = vỏ đó + mảnh màn thi (một danh sách, không lặp tên tệp
+        // trong bảng nội tuyến của index.html) và cờ `thiRieng` ⇒ đường màn thi KHÔNG nạp nhóm `app`.
+        const thiVo = dsCua('/src/AppThi.tsx')
         const ngoai =(ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
         const phongHs = Object.values(goi)
           .map((x) => (x as { fileName: string }).fileName)
@@ -94,13 +97,14 @@ function napTruocManEm(): Plugin {
           katex: dsCua('/src/lib/katex-goi.ts'),
           // Ảnh lớn nhất của màn đăng nhập học sinh (LoiChao: `anhThu(1, 50)`) — nạp trước khi máy chưa đăng nhập (tests/may-yeu-mo-app-1310 khoá đúng đường).
           anhDangNhapHs: '/than-thu-v2/nho/thu-1-3.webp',
-          thi: ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
+          thi: thiVo.length ? [...new Set([...thiVo, ...dsCua('/src/screens/ExamTakeScreen.tsx')])] : ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
           hs: ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo),
           ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), phVo.length ? phVo : app),
           phieu: ngoai(dsCua('/src/screens/PhieuScreen.tsx'), app),
           app,
           hsVo,
           ...(phVo.length ? { phVo } : {}),
+          ...(thiVo.length ? { thiRieng: 1 as const } : {}),
           phongHs,
         }
         if (bang.thi.length + bang.hs.length + bang.ph.length + app.length + hsVo.length === 0) return html
@@ -484,7 +488,9 @@ export default defineConfig({
           // giành mô-đun trước nhóm `bieu-tuong` (nhóm đó kéo theo phụ thuộc — trước đây kéo luôn `react` vào). index.html vẫn nạp tĩnh (modulepreload).
           groups: [
             { name: 'react', test: /node_modules[\\/](?:react|react-dom|scheduler)[\\/]/ },
-            { name: 'bieu-tuong', test: (id: string) => laBieuTuongVo(id) || /src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/.test(id) },
+            // 25/10 (báo "đang mở app" nạp lười sau khi trang tải xong): `nhip-ben-vung` rời mảnh vào ⇒ gom vào mảnh này (mọi đường đều nạp sẵn) thay vì
+            // để Rolldown tách tệp riêng (+1 tệp, +~0,1 KB nén ở cổng học sinh / phụ huynh vốn nhập tĩnh nó).
+            { name: 'bieu-tuong', test: (id: string) => laBieuTuongVo(id) || /src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc|nhip-ben-vung)\.ts$/.test(id) },
             { name: 'bieu-tuong-them', test: /node_modules[\\/]lucide-react[\\/]/ },
             // fflate (nạp động trong day-ca-may-chu-moi.ts) — đặt tên mảnh rõ để globIgnores ở trên bắt đúng nó (tên tự sinh là `browser-*`, quá chung).
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },

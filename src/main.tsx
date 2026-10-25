@@ -1,4 +1,3 @@
-import {startAppPresence} from './lib/app-presence'
 import { batDocNhipDeNghi } from './lib/nhip-de-nghi'
 import { StrictMode, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -113,13 +112,20 @@ const laCongPhuHuynh = dvMo.vai === 'phuhuynh'
 // ĐƯỜNG /hoi-thay (15/10, HoiThayScreen.tsx): trang bài làm văn phòng nhúng hộp Hỏi Thầy trong iframe ⇒ gốc RIÊNG, nhẹ (không App.tsx).
 // Nhận thẳng ở đây, không thêm vai vào vai-tro.ts (mã nằm trong gói mở cả ba app; vai-tro trả null cho đường này nên không đổi gì khác).
 const laHoiThay = /^\/hoi-thay\/?$/.test(location.pathname)
+// MÀN THI / XEM ĐIỂM (25/10, "tiếp tục tối ưu tốc độ app tức thì hơn nữa"): gốc RIÊNG `AppThi` — không kéo vỏ app thầy (~173 KB nén: App.tsx, DesignSystem,
+// bộ chấm, PDF bài tập…). Cùng kết luận với App.tsx: link thi KHÔNG phải app thầy (`laManThayQuanLy` = false) ⇒ App.tsx dựng thẳng nhánh màn thi. Riêng
+// link thi kèm `?vai=gv` (hiếm — máy thầy thử link) vẫn dựng App.tsx như cũ (App.tsx cũng ra màn thi) để khớp bảng nạp trước: `vai=gv` chỉ nạp nhóm `app`.
+const laDiem = dvMo.vai === 'diem'
+const laManThi = laDiem || (!!dvMo.maCa && dvMo.vai !== 'gv')
 const napGoc: Promise<GocApp> = laCongHocSinh
   ? thuLai(() => import('./AppHocSinh'))
   : laCongPhuHuynh
     ? thuLai(() => import('./AppPhuHuynh'))
     : laHoiThay
       ? thuLai(() => import('./screens/hoi-thay-goc').then((m) => m.napHoiThay()))
-      : thuLai(() => import('./App'))
+      : laManThi
+        ? thuLai(() => import('./AppThi'))
+        : thuLai(() => import('./App'))
 /** Lượt tải mảnh màn em (màn thi / cổng học sinh) của gốc vừa chọn — KaTeX tải NỐI SAU nó. */
 const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
 
@@ -128,7 +134,8 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
 // thi thay vì màn quản lý của thầy. Xem ghi chú dài ở `laManThayQuanLy`.
 // Chỉ ghi khi đường vào NÓI RÕ vai; `/` trần không tự ghi gì.
 {
-  const dv = docDuongVao(location.search, location.pathname)
+  // Cùng kết quả `dvMo` (đã đọc SAU chuẩn hoá + khoá vai) — dùng lại, không đọc đường lần hai (mảnh vào nhẹ hơn: mọi đường tải mảnh này).
+  const dv = dvMo
   if (dv.vai === 'gv') nhoVaiDaDung('gv')
   else if (dv.maCa || dv.vai === 'diem') nhoVaiDaDung('hs')
   else if (dv.vai === 'hocsinh') nhoVaiDaDung('hs')
@@ -241,4 +248,16 @@ void napGoc.then(({ default: App }) =>
 )
 
 // /hoi-thay: không đếm vào "đang online" (app-presence coi đường lạ là máy thầy).
-if (!laHoiThay) startAppPresence()
+// BÁO "ĐANG MỞ APP" (presence) — 25/10 ("tốc độ app tức thì hơn nữa"): mảnh RIÊNG, chỉ tải + gửi lệnh đầu SAU KHI trang tải xong, lúc rảnh. Trước đây
+// mã nằm trong mảnh vào (mọi đường tải trước màn đầu) và lệnh `/presence` đầu tiên giành đường truyền với mã + ảnh của màn đầu trên mạng chậm. Máy chủ tính
+// "đang online" trong 90 giây (nhịp 60 s) ⇒ chậm vài giây không đổi gì trên bảng của thầy.
+if (!laHoiThay) {
+  const batPresence = () => void import('./lib/app-presence').then((m) => m.startAppPresence()).catch(() => {})
+  const khiRanh = () => {
+    const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void }
+    if (w.requestIdleCallback) w.requestIdleCallback(batPresence, { timeout: 4000 })
+    else setTimeout(batPresence, 1500)
+  }
+  if (document.readyState === 'complete') khiRanh()
+  else window.addEventListener('load', khiRanh, { once: true })
+}
