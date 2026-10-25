@@ -25,7 +25,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          SQL="SELECT e.id, e.anh_json a, e.luc l, e.trang_thai t, (SELECT GROUP_CONCAT(v.nguon) FROM ai_ddh_tin v WHERE v.tra_loi_cho = e.id) ng FROM ai_ddh_tin e WHERE e.ben = 'em' AND e.anh_json <> '[]' ORDER BY e.luc DESC LIMIT 20"
+          SQL="SELECT e.id, e.anh_json a, e.luc l, e.trang_thai t, (SELECT GROUP_CONCAT(v.nguon) FROM ai_ddh_tin v WHERE v.tra_loi_cho = e.id) ng FROM ai_ddh_tin e WHERE e.ben = 'em' AND e.anh_json <> '[]' ORDER BY e.luc DESC LIMIT 6"
           npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL" > /tmp/t.json
           python3 - <<'PY' > /tmp/khoa.txt
           import json, datetime
@@ -39,7 +39,9 @@ jobs:
             n=$((n+1)); ra="#$n $gio trạng thái=$t trả lời=$ng ảnh:"
             IFS='|' read -ra K <<< "$ks"
             for k in "${K[@]}"; do
-              c=$(npx -y wrangler@4 r2 object get "omr-de/$k" --remote --pipe 2>/dev/null | wc -c)
+              npx -y wrangler@4 r2 object get "omr-de/$k" --remote --file /tmp/o.bin > /tmp/o.log 2>&1 || true
+              if [ -s /tmp/o.bin ]; then c="$(wc -c < /tmp/o.bin) đầu=$(head -c 3 /tmp/o.bin | xxd -p)"; else c="0 lỗi=$(grep -m1 -iE 'error|không|not' /tmp/o.log | head -c 160)"; fi
+              rm -f /tmp/o.bin
               duoi=$(echo "$k" | grep -oE -- '-[0-9]+\.jpg$')
               hop=$(echo "$k" | grep -qE -- '-[0-9]\.jpg$' && echo khớp || echo LỆCH)
               ra="$ra [$duoi ${c}B khoá=$hop]"
