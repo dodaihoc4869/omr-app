@@ -10,6 +10,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import type { BaiCay } from '../../lib/bai-hom-nay'
 import type { TheHanhTrinh } from '../../lib/so-dem-gv'
 import './gv-v2.css'
+import '../../styles/khoi-dam-quan-ly.css' // «Khối đậm» 25/10: trình bày màn quản lý app thầy
 
 // Phép tính nhịp (khối, bốn chỉ số) ở `nhip-hanh-trinh.ts` (màn Hôm nay dùng) — xuất lại ở đây cho mọi lối nhập cũ.
 export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'

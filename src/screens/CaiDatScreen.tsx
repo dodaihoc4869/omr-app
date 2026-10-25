@@ -21,6 +21,7 @@ import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
 import NutCapNhatApp from '../components/NutCapNhatApp'
 import { useAppStore } from '../store/appStore'
 import { useGiaoDien, type GiaoDien } from '../lib/giao-dien-thay'
+import '../styles/khoi-dam-quan-ly.css' // «Khối đậm» 25/10: trình bày màn quản lý app thầy
 
 const LUA_CHON: { v: GiaoDien; ten: string; icon: typeof Sun }[] = [
   { v: 'sang', ten: 'Sáng', icon: Sun },
