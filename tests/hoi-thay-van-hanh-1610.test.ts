@@ -31,6 +31,22 @@ describe('schema Hỏi thầy: cổng trước khi đổi bản sống', () => {
       expect(q).toHaveBeenCalledTimes(1)
     }
   })
+  it('25/10: đang chờ mà D1 báo 429 ⇒ chờ thêm rồi hỏi lại; lần hỏi đầu lỗi ⇒ dừng ngay', async () => {
+    let t = 0
+    const ngu = vi.fn(async (ms: number) => { t += ms })
+    const bayGio = () => t
+    const tra: Array<unknown> = [[{ n: 1 }], new Error('Không kiểm được D1 (429).'), [{ n: 0 }]]
+    const query = vi.fn(async (sql: string) => {
+      if (!String(sql).includes('kiem_tra_ca_nhan_chang')) return []
+      const x = tra.shift()
+      if (x instanceof Error) throw x
+      return x as unknown[]
+    })
+    expect(await apSchemaHoiThay(query, sqls, { choMs: 600_000, nhipMs: 45_000, ngu, bayGio })).toMatchObject({ schemaHoiThay: true, daChoGiay: 180 })
+    const loiDau = vi.fn(async () => { throw new Error('Không kiểm được D1 (429).') })
+    await expect(apSchemaHoiThay(loiDau, sqls, { choMs: 600_000, ngu, bayGio })).rejects.toThrow('429')
+    expect(loiDau).toHaveBeenCalledTimes(1)
+  })
   it('ca cá nhân đang làm hoặc không đọc được thì không chạy DDL nào', async () => {
     for (const r of [[{ n: 1 }], [], [{ n: 'khong_ro' }]]) {
       const query = vi.fn(async () => r)

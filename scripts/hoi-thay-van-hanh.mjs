@@ -17,13 +17,22 @@ const SQL_CHANG_MO = `SELECT COUNT(*) AS n FROM kiem_tra_ca_nhan_chang c JOIN ki
 /** `choMs` > 0 (25/10, thầy: "đẩy mọi thứ lên luôn"): còn chặng ĐANG LÀM thì CHỜ (hỏi lại mỗi `nhipMs`) tới khi hết rồi đi tiếp NGAY — tối các em mở
  *  chặng ngắn (~15 phút) nối nhau, dừng hẳn ở phút thứ 7 của lượt thì gần như không bao giờ gặp khe trống. Vẫn KHÔNG BAO GIỜ đổi bản khi còn chặng mở;
  *  hết `choMs` mà còn chặng ⇒ dừng như cũ. Không đọc được (rỗng / không phải số / D1 lỗi) ⇒ dừng ngay, không chờ. Mặc định 0 = hành vi cũ. */
-export async function apSchemaHoiThay(query, ds, { choMs = 0, nhipMs = 20_000, ngu = (ms) => new Promise((r) => setTimeout(r, ms)), bayGio = () => Date.now() } = {}) {
+export async function apSchemaHoiThay(query, ds, { choMs = 0, nhipMs = 45_000, ngu = (ms) => new Promise((r) => setTimeout(r, ms)), bayGio = () => Date.now() } = {}) {
   kiemDdlHoiThay(ds)
   // Ca thường đã qua kiem-phat-hanh-chua; cả chặng kiểm tra cá nhân đang chạy cũng chặn DDL/đổi bản.
   const het = bayGio() + choMs
   let daCho = 0
   for (;;) {
-    const r = await query(SQL_CHANG_MO)
+    let r
+    try {
+      r = await query(SQL_CHANG_MO)
+    } catch (e) {
+      // ĐANG CHỜ mà Cloudflare báo hỏi dồn (429, 25/10 run 40197075043) ⇒ chờ thêm một nhịp dài rồi hỏi lại; lần hỏi ĐẦU lỗi hay lỗi khác ⇒ dừng như cũ.
+      if (!daCho || !/\(429\)/.test(String(e?.message)) || bayGio() + 3 * nhipMs > het) throw e
+      await ngu(3 * nhipMs)
+      daCho += 3 * nhipMs
+      continue
+    }
     const n = r.length ? Number(r[0].n) : NaN
     if (n === 0) break
     if (!Number.isInteger(n) || n < 0 || bayGio() + nhipMs > het) throw new Error('Có chặng kiểm tra cá nhân đang làm hoặc chưa kiểm được: dừng phát hành.')
