@@ -81,18 +81,18 @@ const tinRa = (x: Row) => ({
 
 /**
  * TRẢ LỜI NGAY (25/10, thầy: "tốc độ nhắn chậm quá, tối ưu tức thì"): chào hỏi / cảm ơn / «ok, dạ» không cần văn phòng (văn phòng phải lấy hàng chờ rồi
- * hỏi não ~1 phút) ⇒ máy chủ trả luôn, đúng giọng văn phòng trên Zalo. Chỉ khi KHÔNG ảnh, ngắn, không số (câu có số là đề). Thuần — test được.
+ * hỏi não ~1 phút) ⇒ máy chủ trả luôn. Giọng BẠN BÈ (25/10 thầy: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự"): mình / bạn. Chỉ khi KHÔNG ảnh, ngắn, không số (câu có số là đề). Thuần — test được.
  */
 export function traLoiNgay(chu: string, soAnh: number): string | null {
   if (soAnh > 0) return null
   const s = chu.normalize('NFC').toLowerCase().replace(/[!?.,~:;…"'()*\-_/\\]+/g, ' ').replace(/[^\p{L}\s]/gu, ' ').replace(/\s+/g, ' ').trim()
   if (!s || s.length > 40 || /\d/.test(chu)) return null
-  if (/^(?:(?:em|e)\s+)?(?:xin\s+)?ch[aà]o(?:\s+(?:thầy|thay|ạ|a|ad|anh|chị|bạn|mọi người))*$|^(?:hi|hello|helo|hey|alo|a lô)(?:\s+(?:thầy|thay|ạ|a))*$/.test(s))
-    return 'Chào e. E chụp ảnh hoặc gõ đề gửi thầy, thầy giải liền. Cần đề luyện thì nhắn «soạn đề» kèm chương nha.'
-  if (/^(?:(?:em|e)\s+)?(?:(?:xin\s+)?c[ảáa]m\s+[ơo]n|thanks?|thank you|tks|thx)(?:\s+(?:thầy|thay|ạ|a|nhiều|nhieu|nha|nhé|nhe))*$/.test(s))
-    return 'Ok e. Còn câu nào kẹt cứ gửi thầy nha.'
-  if (/^(?:ok|oke|okay|okela|ừ|ừm|uhm|dạ|da|vâng|vang|em hiểu rồi|e hiểu rồi|hiểu rồi)(?:\s+(?:thầy|thay|ạ|a|ạ thầy|nha|nhé|rồi))*$/.test(s))
-    return 'Ok e. Có câu nào cứ gửi thầy nha.'
+  if (/^(?:(?:em|e)\s+)?(?:xin\s+)?ch[aà]o(?:\s+(?:thầy|thay|ạ|a|ad|anh|chị|bạn|cậu|mọi người))*$|^(?:hi|hello|helo|hey|alo|a lô)(?:\s+(?:thầy|thay|ạ|a|bạn|cậu))*$/.test(s))
+    return 'Chào bạn! Có gì cứ nhắn mình nha: hỏi bài, xin đề, xin vài câu luyện, hay tâm sự cũng được.'
+  if (/^(?:(?:em|e)\s+)?(?:(?:xin\s+)?c[ảáa]m\s+[ơo]n|thanks?|thank you|tks|thx)(?:\s+(?:thầy|thay|bạn|cậu|ạ|a|nhiều|nhieu|nha|nhé|nhe))*$/.test(s))
+    return 'Không có gì nha. Còn gì cứ nhắn mình.'
+  if (/^(?:ok|oke|okay|okela|ừ|ừm|uhm|dạ|da|vâng|vang|em hiểu rồi|e hiểu rồi|hiểu rồi)(?:\s+(?:thầy|thay|bạn|cậu|ạ|a|ạ thầy|nha|nhé|rồi))*$/.test(s))
+    return 'Ok nha. Có gì cứ nhắn mình.'
   return null
 }
 
@@ -150,7 +150,7 @@ export async function hsGuiAiDdh(env: Env, b: Row, nowMs = Date.now()): Promise<
   const sbd = await emCua(env, b)
   if (!sbd) return { ok: false, error: 'Em cần đăng nhập lại.' }
   const maTin = str(b.maTin).slice(0, 60)
-  if (!/^[A-Za-z0-9_-]{8,60}$/.test(maTin)) return { ok: false, error: 'Tin không hợp lệ, em gửi lại nhé.' }
+  if (!/^[A-Za-z0-9_-]{8,60}$/.test(maTin)) return { ok: false, error: 'Tin không hợp lệ, bạn gửi lại nhé.' }
   const chu = str(b.chu).trim().slice(0, TOI_DA_CHU)
   const anhVao = (Array.isArray(b.anh) ? b.anh : []).map(str).filter(Boolean).slice(0, TOI_DA_ANH)
   if (!chu && !anhVao.length) return { ok: false, error: 'Em gõ đề hoặc gửi ảnh đề nhé.' }
@@ -165,14 +165,14 @@ export async function hsGuiAiDdh(env: Env, b: Row, nowMs = Date.now()): Promise<
     env.DB.prepare('SELECT * FROM ai_ddh_tin WHERE id = ?').bind(id).first<Row>(),
   ])
   if (cu) return { ok: true, tin: tinRa(cu) }
-  if (!choEm(ch, str(hs?.lop), str(hs?.ten_lop))) return { ok: false, error: 'Thầy chưa mở A.I Đỗ Đại Học cho lớp em.' }
+  if (!choEm(ch, str(hs?.lop), str(hs?.ten_lop))) return { ok: false, error: 'Thầy chưa mở A.I Đỗ Đại Học cho lớp bạn.' }
   if (caMo || ktcn) return { ok: false, khoa: 'kiem_tra', error: 'Em đang có bài kiểm tra mở. Nộp bài xong, A.I Đỗ Đại Học mở lại.' }
-  if (num(dem?.n) >= TRAN_TIN_NGAY) return { ok: false, khoa: 'het_luot', error: `Hôm nay em đã hỏi đủ ${TRAN_TIN_NGAY} câu. 0 giờ đêm nay hỏi tiếp được.` }
+  if (num(dem?.n) >= TRAN_TIN_NGAY) return { ok: false, khoa: 'het_luot', error: `Hôm nay bạn đã nhắn đủ ${TRAN_TIN_NGAY} lượt. 0 giờ đêm nay nhắn tiếp được.` }
   const khoaAnh: string[] = []
   for (let i = 0; i < anhVao.length; i++) {
     const u = b64(anhVao[i]!)
-    if (!u || !u.length) return { ok: false, error: 'Ảnh hỏng, em chụp lại nhé.' }
-    if (u.length > TOI_DA_BYTE_ANH) return { ok: false, error: 'Ảnh quá lớn, em chụp lại gần hơn nhé.' }
+    if (!u || !u.length) return { ok: false, error: 'Ảnh hỏng, bạn chụp lại nhé.' }
+    if (u.length > TOI_DA_BYTE_ANH) return { ok: false, error: 'Ảnh quá lớn, bạn chụp lại gần hơn nhé.' }
     const k = `ai-ddh/${sbd}/${maTin}-${i}.jpg`
     await env.DE.put(k, u, { httpMetadata: { contentType: 'image/jpeg' } })
     khoaAnh.push(k)

@@ -38,6 +38,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Lịch làm lại câu sai (màn HS/PH) | **đến lịch ôn lại** · **chuyển sang lịch ôn xa hơn** | hạn ôn, lên bậc ôn, tụt bậc (chỉ app thầy) |
 | Tác giả mọi mục NHẬN XÉT / lời gửi em, phụ huynh (báo cáo, phiếu, PDF, kết quả, tin nhắn) | **Thầy Đỗ Đại Học** — thầy lệnh 28/09: gỡ chức năng "Bộ não A.I Đỗ Đại Học", nhận xét ghi "Thầy Đỗ Đại Học" | Bộ não A.I, A.I Đỗ Đại Học, Trợ lý AI, máy nhận xét, HLV, AI coach |
 | Chế độ chưa tác động học sinh | **Chạy thử** | chạy bóng, shadow |
+| Xưng hô trong bong bóng chat **A.I Đỗ Đại Học** (app học sinh) — thầy 25/10: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự". Riêng bong bóng này; mọi màn khác của app học sinh vẫn gọi **em** | A.I xưng **mình**, gọi học sinh là **bạn**; nhắc thầy thì gọi **Thầy** như người thứ ba. Trạng thái: **Đang trực, nhắn gì cũng được** · **Đang nghỉ, tin vẫn được giữ**; chờ trả lời: **Đang soạn** | Văn phòng Thầy đang trực, Thầy đang soạn, gọi «em»/«e» trong bong bóng |
 | Thầy nhắc em chưa nộp | **Cảnh báo của thầy** | push, notice |
 | Câu từng sai nay đã đúng lại đủ lịch | **Đã khắc phục** (trạng thái) — hoạt động làm lại gọi là **Ôn lại** | fixed, done |
 | Công tắc chia câu theo từng em (app thầy) | **Cá nhân hoá** (chữ của thầy, giữ) | — |

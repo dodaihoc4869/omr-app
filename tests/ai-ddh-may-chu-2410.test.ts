@@ -19,7 +19,7 @@ const gv = (env: Env, duong: string, body: Record<string, unknown> = {}) => goiW
 
 describe('trả lời ngay (25/10: "tốc độ nhắn chậm quá")', () => {
   it('chào hỏi / cảm ơn / ok ⇒ trả ngay; câu có số, câu dài, có ảnh ⇒ không (vào hàng chờ văn phòng)', () => {
-    for (const c of ['Xin chào', 'chào thầy ạ', 'e chào thầy', 'hello', 'Alo', 'cảm ơn thầy ạ', 'cam on thay', 'thanks', 'ok', 'Dạ', 'em hiểu rồi ạ', 'Chào thầy!!'])
+    for (const c of ['Xin chào', 'chào thầy ạ', 'e chào thầy', 'hello', 'Alo', 'cảm ơn thầy ạ', 'cam on thay', 'thanks', 'ok', 'Dạ', 'em hiểu rồi ạ', 'Chào thầy!!', 'chào bạn', 'hi cậu', 'cảm ơn bạn nha'])
       expect(traLoiNgay(c, 0), c).toBeTruthy()
     for (const c of ['chào thầy, câu 3 làm sao ạ', 'cho e xin đề chương 3', 'giải giúp e câu này', 'ok thầy ơi câu 12 e ra 8,2', 'este là gì ạ'])
       expect(traLoiNgay(c, 0), c).toBeNull()
@@ -34,7 +34,7 @@ describe('trả lời ngay (25/10: "tốc độ nhắn chậm quá")', () => {
     const them = g.them as { ben: string; chu: string; traLoiCho: string }[]
     expect(them).toHaveLength(1)
     expect(them[0]).toMatchObject({ ben: 'vp', traLoiCho: (g.tin as { id: string }).id })
-    expect(them[0]!.chu).toContain('Chào e')
+    expect(them[0]!.chu).toContain('Chào bạn')
     expect((await gv(env, '/gv/ai-ddh/hang-cho')).tin).toHaveLength(0)
     const de = await hsGuiAiDdh(env, { token, maTin: 'de-000001', chu: 'Đun 8,8 g etyl axetat với NaOH, tìm m' }, NOW + 5)
     expect(de).toMatchObject({ tin: { trangThai: 'cho' }, them: [] })
@@ -113,5 +113,16 @@ describe('bong bóng A.I Đỗ Đại Học — máy chủ', () => {
     const { env } = moi()
     expect((await goiWorker(worker, env, '/gv/ai-ddh/hang-cho', {}, false)).ok).toBe(false)
     expect((await gv(env, '/gv/ai-ddh/anh', { khoa: '../kho/goc.json' })).ok).toBe(false)
+  })
+})
+
+// 25/10 (thầy: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự"): trả lời tức thì xưng mình / bạn, không xưng thầy, không gọi e.
+describe('giọng bạn bè', () => {
+  it('trả lời tức thì: mình / bạn', () => {
+    for (const c of ['xin chào', 'cảm ơn thầy', 'ok']) {
+      const r = traLoiNgay(c, 0)!
+      expect(r, c).toMatch(/mình/)
+      expect(r, c).not.toMatch(/(?<![\p{L}])(thầy|e|em)(?![\p{L}])/iu)
+    }
   })
 })

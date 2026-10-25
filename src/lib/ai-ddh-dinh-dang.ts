@@ -68,10 +68,10 @@ export function tachKhoi(tin: string): Khoi[] {
 
 /** Nhãn nguồn dưới tin (máy chủ / văn phòng ghi). */
 export function chuNguon(nguon: string, chiGoiY: boolean): string {
-  if (chiGoiY) return 'Chỉ gợi ý: câu trong bài em chưa nộp'
+  if (chiGoiY) return 'Chỉ gợi ý: câu trong bài bạn chưa nộp'
   if (nguon === 'kho') return 'Lời giải từ kho đề của Thầy'
-  if (nguon === 'hai-luot') return 'Thầy giải hai lượt độc lập, khớp nhau'
-  if (nguon === 'phan-xu') return 'Thầy giải lại kĩ, đã kiểm'
+  if (nguon === 'hai-luot') return 'Giải hai lượt độc lập, khớp nhau'
+  if (nguon === 'phan-xu') return 'Giải lại kĩ, đã kiểm'
   if (nguon === 'de') return 'Câu lấy nguyên văn từ kho đề của Thầy'
   return ''
 }
