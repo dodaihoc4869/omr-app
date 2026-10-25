@@ -1,4 +1,3 @@
-import {startAppPresence} from './lib/app-presence'
 import { batDocNhipDeNghi } from './lib/nhip-de-nghi'
 import { StrictMode, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -113,13 +112,20 @@ const laCongPhuHuynh = dvMo.vai === 'phuhuynh'
 // ĐƯỜNG /hoi-thay (15/10, HoiThayScreen.tsx): trang bài làm văn phòng nhúng hộp Hỏi Thầy trong iframe ⇒ gốc RIÊNG, nhẹ (không App.tsx).
 // Nhận thẳng ở đây, không thêm vai vào vai-tro.ts (mã nằm trong gói mở cả ba app; vai-tro trả null cho đường này nên không đổi gì khác).
 const laHoiThay = /^\/hoi-thay\/?$/.test(location.pathname)
+// MÀN THI / XEM ĐIỂM (25/10, "tiếp tục tối ưu tốc độ app tức thì hơn nữa"): gốc RIÊNG `AppThi` — không kéo vỏ app thầy (~173 KB nén: App.tsx, DesignSystem,
+// bộ chấm, PDF bài tập…). Cùng kết luận với App.tsx: link thi KHÔNG phải app thầy (`laManThayQuanLy` = false) ⇒ App.tsx dựng thẳng nhánh màn thi. Riêng
+// link thi kèm `?vai=gv` (hiếm — máy thầy thử link) vẫn dựng App.tsx như cũ (App.tsx cũng ra màn thi) để khớp bảng nạp trước: `vai=gv` chỉ nạp nhóm `app`.
+const laDiem = dvMo.vai === 'diem'
+const laManThi = laDiem || (!!dvMo.maCa && dvMo.vai !== 'gv')
 const napGoc: Promise<GocApp> = laCongHocSinh
   ? thuLai(() => import('./AppHocSinh'))
   : laCongPhuHuynh
     ? thuLai(() => import('./AppPhuHuynh'))
     : laHoiThay
       ? thuLai(() => import('./screens/hoi-thay-goc').then((m) => m.napHoiThay()))
-      : thuLai(() => import('./App'))
+      : laManThi
+        ? thuLai(() => import('./AppThi'))
+        : thuLai(() => import('./App'))
 /** Lượt tải mảnh màn em (màn thi / cổng học sinh) của gốc vừa chọn — KaTeX tải NỐI SAU nó. */
 const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
 
@@ -128,21 +134,22 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
 // thi thay vì màn quản lý của thầy. Xem ghi chú dài ở `laManThayQuanLy`.
 // Chỉ ghi khi đường vào NÓI RÕ vai; `/` trần không tự ghi gì.
 {
-  const dv = docDuongVao(location.search, location.pathname)
+  // Cùng kết quả `dvMo` (đã đọc SAU chuẩn hoá + khoá vai) — dùng lại, không đọc đường lần hai (mảnh vào nhẹ hơn: mọi đường tải mảnh này).
+  const dv = dvMo
   if (dv.vai === 'gv') nhoVaiDaDung('gv')
-  else if (dv.maCa || dv.vai === 'diem') nhoVaiDaDung('hs')
-  else if (dv.vai === 'hocsinh') nhoVaiDaDung('hs')
-  else if (dv.vai === 'phuhuynh') nhoVaiDaDung('ph')
+  else if (dv.maCa || laDiem || laCongHocSinh) nhoVaiDaDung('hs')
+  else if (laCongPhuHuynh) nhoVaiDaDung('ph')
   // CHẾ ĐỘ MÁY YẾU (thầy 29/09): máy em / phụ huynh ít RAM, ít lõi, xin giảm chuyển động hay tiết kiệm dữ liệu ⇒ gắn lớp
   // `may-yeu` lên <html> TRƯỚC khi React dựng (tắt kính mờ, bớt hoạt ảnh trang trí, bớt hạt/thị sai). Máy thầy không đụng.
-  if (dv.vai === 'hocsinh' || dv.vai === 'phuhuynh' || dv.vai === 'diem' || dv.vai === 'phieu' || laHoiThay || !!dv.maCa) batCheDoMayYeu()
+  const laPhieu = dv.vai === 'phieu'
+  if (laCongHocSinh || laCongPhuHuynh || laDiem || laPhieu || laHoiThay || dv.maCa) batCheDoMayYeu()
   // KaTeX: đường vào có công thức ngay (màn thi, xem điểm, cổng học sinh, phiếu, hỏi thầy) ⇒ tải NGAY, song song với
   // mảnh màn; đường khác (màn khoá thầy, cổng phụ huynh) ⇒ tải lúc rảnh sau khi trang đã hiện.
-  const canCongThucNgay = !!dv.maCa || dv.vai === 'diem' || dv.vai === 'hocsinh' || dv.vai === 'phieu' || laHoiThay
+  const canCongThucNgay = dv.maCa || laDiem || laCongHocSinh || laPhieu || laHoiThay
   // MÁY YẾU / 3G (29/09): vào thi (`/t/<mã ca>`) và cổng học sinh thì màn ĐẦU (ô số báo danh, đăng nhập) không có công thức ⇒
   // KaTeX (~83 KB gzip) tải NGAY SAU mảnh màn thay vì giành đường truyền với nó (đo Fast 3G: màn đầu hiện sớm hơn). Xem điểm /
   // phiếu có công thức ngay ⇒ vẫn tải liền như cũ.
-  const noiSauManEm = (!!dv.maCa && dv.vai !== 'diem') || dv.vai === 'hocsinh'
+  const noiSauManEm = (dv.maCa && !laDiem) || laCongHocSinh
   const huaMan = noiSauManEm ? huaManEmSom() : null
   /** Tải KaTeX lúc RẢNH sau khi trang tải xong (không giành đường truyền / CPU với màn đầu). */
   const napKhiRanh = () => {
@@ -157,11 +164,11 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
   // MÁY YẾU (13/10, đo Chromium CPU chậm 6× + mạng 1,6 Mbps): cổng học sinh — màn đầu (đăng nhập / Hôm nay) không có công thức; KaTeX (~83 KB nén,
   // ~270 KB mã phải dịch) tải ngay sau mảnh màn giành đường truyền với ảnh + phông của màn đầu và chặn luồng chính trên máy yếu. Nay: chờ mảnh màn
   // VÀ trang tải xong + lúc rảnh (chậm nhất ~4 giây). Câu có công thức mở trước khi KaTeX về ⇒ hiện chữ một nhịp rồi tự vẽ lại (như cũ).
-  if (huaMan && dv.vai === 'hocsinh') void huaMan.then(napKhiRanh, napKhiRanh).catch(() => {})
+  if (huaMan && laCongHocSinh) void huaMan.then(napKhiRanh, napKhiRanh).catch(() => {})
   else if (huaMan) void huaMan.then(napKatex, napKatex).catch(() => {})
   else if (canCongThucNgay) void napKatex().catch(() => {})
   // CỔNG PHỤ HUYNH (21/10): chỉ màn Chi tiết ca kiểm tra vẽ công thức và nó TỰ tải KaTeX lúc mở (`ManChiTietCa`) ⇒ không tải nền khi mở app: bớt ~83 KB nén + ~270 KB mã phải dịch trên điện thoại phụ huynh mỗi lần mở.
-  else if (dv.vai === 'phuhuynh') { /* không tải KaTeX nền */ }
+  else if (laCongPhuHuynh) { /* không tải KaTeX nền */ }
   else napKhiRanh()
 }
 
@@ -241,4 +248,16 @@ void napGoc.then(({ default: App }) =>
 )
 
 // /hoi-thay: không đếm vào "đang online" (app-presence coi đường lạ là máy thầy).
-if (!laHoiThay) startAppPresence()
+// BÁO "ĐANG MỞ APP" (presence) — 25/10 ("tốc độ app tức thì hơn nữa"): mảnh RIÊNG, chỉ tải + gửi lệnh đầu SAU KHI trang tải xong, lúc rảnh. Trước đây
+// mã nằm trong mảnh vào (mọi đường tải trước màn đầu) và lệnh `/presence` đầu tiên giành đường truyền với mã + ảnh của màn đầu trên mạng chậm. Máy chủ tính
+// "đang online" trong 90 giây (nhịp 60 s) ⇒ chậm vài giây không đổi gì trên bảng của thầy.
+if (!laHoiThay) {
+  const batPresence = () => void import('./lib/app-presence').then((m) => m.startAppPresence()).catch(() => {})
+  const khiRanh = () => {
+    const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void }
+    if (w.requestIdleCallback) w.requestIdleCallback(batPresence, { timeout: 4000 })
+    else setTimeout(batPresence, 1500)
+  }
+  if (document.readyState === 'complete') khiRanh()
+  else window.addEventListener('load', khiRanh, { once: true })
+}

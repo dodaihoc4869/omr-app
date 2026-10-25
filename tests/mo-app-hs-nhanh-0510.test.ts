@@ -190,6 +190,33 @@ describe('đoạn mã nội tuyến — cổng học sinh', () => {
     expect(readFileSync('src/App.tsx', 'utf8')).toContain('<BatLinhShell vai="ph"><ParentPortalScreen /></BatLinhShell>')
   })
 
+  // 25/10 (tiếp tục tức thì hơn nữa): màn thi có gốc riêng `AppThi` ⇒ bảng có cờ `thiRieng` thì đường màn thi chỉ nạp nhóm `thi` (đã gồm vỏ), KHÔNG nạp App.tsx.
+  it('có cờ thiRieng: /t/<mã>, /d/<mã>, ?examCode=, ?vai=diem chỉ nạp nhóm thi (vỏ AppThi + màn thi), không App.tsx; ?vai=gv&examCode= vẫn là app thầy; đường khác không đổi', () => {
+    const B3: BangNapTruoc = { ...BANG, thi: ['/assets/AppThi-t.js', '/assets/ExamTakeScreen-a.js'], thiRieng: 1 }
+    const chay3 = (duong: string, q: string) => {
+      const them: The[] = []
+      const document = { head: { appendChild: (l: The) => them.push(l) }, createElement: () => ({ rel: '', href: '', crossOrigin: null }) as The, addEventListener: () => {} }
+      new Function('document', 'location', 'localStorage', 'navigator', 'window', 'fetch', taoMaNapTruoc(B3))(document, { pathname: duong, search: q }, { getItem: () => null }, { serviceWorker: { controller: null } }, {}, () => new Promise(() => {}))
+      return them.map((t) => t.href)
+    }
+    for (const [d, q] of [['/t/123456', ''], ['/d/123456', ''], ['/', '?examCode=123456'], ['/', '?vai=diem&examCode=123456']]) expect(chay3(d, q), d + q).toEqual(['/assets/AppThi-t.js', '/assets/ExamTakeScreen-a.js'])
+    expect(chay3('/', '?vai=gv&examCode=123456')).toEqual(['/assets/App-e.js'])
+    for (const d of ['/gv', '/p', '/']) expect(chay3(d, '')).toEqual(['/assets/App-e.js'])
+    expect(chay3('/ph', '')).toEqual(['/assets/App-e.js', '/assets/ParentPortalScreen-d.js'])
+  })
+  it('main.tsx dựng gốc AppThi cho màn thi / xem điểm (trừ link kèm ?vai=gv); gốc ấy cùng cây ChanLoi (tải lại link) → Suspense → BatLinhShell vai="hs" → ExamTakeScreen như App.tsx', () => {
+    const ma = readFileSync('src/main.tsx', 'utf8')
+    expect(ma).toContain("import('./AppThi')")
+    expect(ma).toMatch(/const laManThi = laDiem \|\| \(!!dvMo\.maCa && dvMo\.vai !== 'gv'\)/)
+    const vo = readFileSync('src/AppThi.tsx', 'utf8')
+    expect(vo).toContain('<ChanLoi o="Làm bài" veManChinh={() => location.reload()}>')
+    expect(vo).toContain('<BatLinhShell vai="hs"><ExamTakeScreen /></BatLinhShell>')
+    expect(vo).not.toMatch(/from '\.\/App'/)
+    const app = readFileSync('src/App.tsx', 'utf8')
+    expect(app).toContain('<ChanLoi o="Làm bài" veManChinh={() => location.reload()}>')
+    expect(app).toContain('<BatLinhShell vai="hs"><ExamTakeScreen /></BatLinhShell>')
+  })
+
   it('đường khác giữ nguyên: thi/phụ huynh nạp App.tsx + mảnh của mình; app thầy, phiếu, `/` trần chỉ nạp App.tsx', () => {
     expect(chay('/t/123456', '').them.map((t) => t.href)).toEqual(['/assets/App-e.js', '/assets/ExamTakeScreen-a.js'])
     expect(chay('/ph', '').them.map((t) => t.href)).toEqual(['/assets/App-e.js', '/assets/ParentPortalScreen-d.js'])

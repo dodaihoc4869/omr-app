@@ -20,7 +20,9 @@ describe('định tuyến /hoi-thay', () => {
     expect(ma).toContain("const laHoiThay = /^\\/hoi-thay\\/?$/.test(location.pathname)")
     expect(ma).toContain("import('./screens/hoi-thay-goc')")
     expect(ma).toContain('else if (!laHoiThay) dangKySW()')
-    expect(ma).toContain('if (!laHoiThay) startAppPresence()')
+    // 25/10: báo online nạp lười sau khi trang tải xong — vẫn KHÔNG chạy ở trang nhúng /hoi-thay
+    expect(ma).toMatch(/if \(!laHoiThay\) \{\n  const batPresence = \(\) => void import\('\.\/lib\/app-presence'\)/)
+    expect(ma).not.toMatch(/^import \{\s*startAppPresence/m)
     expect(/^\/hoi-thay\/?$/.test('/hoi-thay')).toBe(true)
     expect(/^\/hoi-thay\/?$/.test('/hs')).toBe(false)
   })
