@@ -137,19 +137,19 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
   // Cùng kết quả `dvMo` (đã đọc SAU chuẩn hoá + khoá vai) — dùng lại, không đọc đường lần hai (mảnh vào nhẹ hơn: mọi đường tải mảnh này).
   const dv = dvMo
   if (dv.vai === 'gv') nhoVaiDaDung('gv')
-  else if (dv.maCa || laDiem || laCongHocSinh) nhoVaiDaDung('hs')
-  else if (laCongPhuHuynh) nhoVaiDaDung('ph')
+  else if (dv.maCa || dv.vai === 'diem') nhoVaiDaDung('hs')
+  else if (dv.vai === 'hocsinh') nhoVaiDaDung('hs')
+  else if (dv.vai === 'phuhuynh') nhoVaiDaDung('ph')
   // CHẾ ĐỘ MÁY YẾU (thầy 29/09): máy em / phụ huynh ít RAM, ít lõi, xin giảm chuyển động hay tiết kiệm dữ liệu ⇒ gắn lớp
   // `may-yeu` lên <html> TRƯỚC khi React dựng (tắt kính mờ, bớt hoạt ảnh trang trí, bớt hạt/thị sai). Máy thầy không đụng.
-  const laPhieu = dv.vai === 'phieu'
-  if (laCongHocSinh || laCongPhuHuynh || laDiem || laPhieu || laHoiThay || dv.maCa) batCheDoMayYeu()
+  if (dv.vai === 'hocsinh' || dv.vai === 'phuhuynh' || dv.vai === 'diem' || dv.vai === 'phieu' || laHoiThay || !!dv.maCa) batCheDoMayYeu()
   // KaTeX: đường vào có công thức ngay (màn thi, xem điểm, cổng học sinh, phiếu, hỏi thầy) ⇒ tải NGAY, song song với
   // mảnh màn; đường khác (màn khoá thầy, cổng phụ huynh) ⇒ tải lúc rảnh sau khi trang đã hiện.
-  const canCongThucNgay = dv.maCa || laDiem || laCongHocSinh || laPhieu || laHoiThay
+  const canCongThucNgay = !!dv.maCa || dv.vai === 'diem' || dv.vai === 'hocsinh' || dv.vai === 'phieu' || laHoiThay
   // MÁY YẾU / 3G (29/09): vào thi (`/t/<mã ca>`) và cổng học sinh thì màn ĐẦU (ô số báo danh, đăng nhập) không có công thức ⇒
   // KaTeX (~83 KB gzip) tải NGAY SAU mảnh màn thay vì giành đường truyền với nó (đo Fast 3G: màn đầu hiện sớm hơn). Xem điểm /
   // phiếu có công thức ngay ⇒ vẫn tải liền như cũ.
-  const noiSauManEm = (dv.maCa && !laDiem) || laCongHocSinh
+  const noiSauManEm = (!!dv.maCa && dv.vai !== 'diem') || dv.vai === 'hocsinh'
   const huaMan = noiSauManEm ? huaManEmSom() : null
   /** Tải KaTeX lúc RẢNH sau khi trang tải xong (không giành đường truyền / CPU với màn đầu). */
   const napKhiRanh = () => {
@@ -164,11 +164,11 @@ const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
   // MÁY YẾU (13/10, đo Chromium CPU chậm 6× + mạng 1,6 Mbps): cổng học sinh — màn đầu (đăng nhập / Hôm nay) không có công thức; KaTeX (~83 KB nén,
   // ~270 KB mã phải dịch) tải ngay sau mảnh màn giành đường truyền với ảnh + phông của màn đầu và chặn luồng chính trên máy yếu. Nay: chờ mảnh màn
   // VÀ trang tải xong + lúc rảnh (chậm nhất ~4 giây). Câu có công thức mở trước khi KaTeX về ⇒ hiện chữ một nhịp rồi tự vẽ lại (như cũ).
-  if (huaMan && laCongHocSinh) void huaMan.then(napKhiRanh, napKhiRanh).catch(() => {})
+  if (huaMan && dv.vai === 'hocsinh') void huaMan.then(napKhiRanh, napKhiRanh).catch(() => {})
   else if (huaMan) void huaMan.then(napKatex, napKatex).catch(() => {})
   else if (canCongThucNgay) void napKatex().catch(() => {})
   // CỔNG PHỤ HUYNH (21/10): chỉ màn Chi tiết ca kiểm tra vẽ công thức và nó TỰ tải KaTeX lúc mở (`ManChiTietCa`) ⇒ không tải nền khi mở app: bớt ~83 KB nén + ~270 KB mã phải dịch trên điện thoại phụ huynh mỗi lần mở.
-  else if (laCongPhuHuynh) { /* không tải KaTeX nền */ }
+  else if (dv.vai === 'phuhuynh') { /* không tải KaTeX nền */ }
   else napKhiRanh()
 }
 
