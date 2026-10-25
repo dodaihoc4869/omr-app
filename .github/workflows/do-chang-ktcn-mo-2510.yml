@@ -1,0 +1,32 @@
+# ĐẾM CHẶNG KIỂM TRA CÁ NHÂN ĐANG CHẶN PHÁT HÀNH (chỉ đọc, 25/10). Chỉ in số gộp: không mã em, không tên.
+name: Đếm chặng KTCN đang mở (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-chang-ktcn-mo-2510.yml']
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          NOW="CAST((julianday('now')-2440587.5)*86400000 AS INTEGER)"
+          W="k.nop_luc IS NULL AND c.chot_luc IS NULL AND c.bat_dau<=$NOW AND c.han>$NOW"
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "1 chặng mở: số chặng, số em, số bài; giờ tới hạn sớm nhất / muộn nhất; đã mở bao lâu (giờ)" "SELECT COUNT(*) n, COUNT(DISTINCT k.sbd) em, COUNT(DISTINCT k.id) bai, ROUND(MIN(c.han-$NOW)/3600000.0,1) han_som_h, ROUND(MAX(c.han-$NOW)/3600000.0,1) han_muon_h, ROUND(MAX($NOW-c.bat_dau)/3600000.0,1) mo_lau_nhat_h FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE $W"
+          q "2 theo giờ tới hạn" "SELECT CASE WHEN c.han-$NOW<3600000 THEN 'a <1h' WHEN c.han-$NOW<6*3600000 THEN 'b 1-6h' WHEN c.han-$NOW<24*3600000 THEN 'c 6-24h' ELSE 'd >24h' END kh, COUNT(*) n FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE $W GROUP BY 1 ORDER BY 1"
+          q "3 có lượt làm trong 30 phút qua (em thật sự đang làm)" "SELECT COUNT(DISTINCT s.sbd) em_dang_lam FROM su_kien_hoc s WHERE s.luc >= datetime('now','-30 minutes') AND s.sbd IN (SELECT k.sbd FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE $W)"
