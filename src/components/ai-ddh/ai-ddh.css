@@ -14,15 +14,17 @@
 .aid-mat img { width: 82%; height: 82%; }
 .aid-mat[data-on]::after { content: ''; position: absolute; right: 0; bottom: 0; width: 28%; height: 28%; border-radius: 50%; background: var(--gvm-xl); box-shadow: 0 0 0 2px var(--bl-paper); }
 
-/* ---------- bong bóng (đóng) ---------- */
-.aid-bong { position: fixed; right: 16px; bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 20; display: flex; align-items: flex-end; gap: 10px; }
-.aid-bong-nut { position: relative; width: 64px; height: 64px; border-radius: 50%; border: 0; cursor: pointer; padding: 0; display: grid; place-items: center; touch-action: manipulation;
+/* ---------- bong bóng (đóng) — 25/10 thầy: nhỏ lại (48 px), kéo đi khắp màn hình (vị trí đặt bằng left/top trong BongBongAiDdh) ---------- */
+/* z 59: kéo tới đâu cũng nổi trên nội dung, thanh menu (30), thanh bên (40); vẫn dưới hộp / tấm phủ của app (60) và tấm chat (70). */
+.aid-bong { position: fixed; right: 16px; bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 59; display: flex; align-items: flex-end; gap: 10px; }
+.aid-bong-nut { position: relative; width: 48px; height: 48px; border-radius: 50%; border: 0; cursor: grab; padding: 0; display: grid; place-items: center; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
   background: conic-gradient(from 210deg, var(--bl-teal), var(--gvm-xl), var(--bl-gold), var(--bl-teal)); box-shadow: var(--bl-shadow); }
-.aid-bong-nut > .aid-mat { width: 56px; height: 56px; box-shadow: none; }
-.aid-bong-nut::before { content: ''; position: absolute; inset: -7px; border-radius: 50%; border: 2px solid var(--bl-teal); opacity: .3; animation: aid-tho 2.8s ease-in-out infinite; }
+.aid-bong-nut > .aid-mat { width: 42px; height: 42px; box-shadow: none; }
+.aid-bong-nut:active { cursor: grabbing; }
+.aid-bong-nut::before { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--bl-teal); opacity: .3; animation: aid-tho 2.8s ease-in-out infinite; }
 @keyframes aid-tho { 50% { transform: scale(1.1); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .aid-bong-nut::before { animation: none; } }
-.aid-cham { position: absolute; top: -3px; right: -3px; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 99px; background: var(--gvm-ho); color: var(--gvm-tren-dac); font: 800 12px/24px var(--sans, system-ui); box-shadow: 0 0 0 3px var(--bl-paper); }
+.aid-cham { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--gvm-ho); color: var(--gvm-tren-dac); font: 800 11px/18px var(--sans, system-ui); box-shadow: 0 0 0 3px var(--bl-paper); }
 .aid-moi { position: relative; margin-bottom: 8px; background: var(--bl-paper); color: var(--bl-ink); border: 1px solid var(--bl-line); border-radius: 20px 20px 6px 20px; padding: 12px 14px; box-shadow: var(--bl-shadow); font-size: 14px; line-height: 1.4; max-width: 230px; }
 .aid-moi b { display: block; color: var(--bl-teal); font-size: 15px; margin-bottom: 2px; }
 

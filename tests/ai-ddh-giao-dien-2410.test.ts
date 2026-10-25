@@ -33,7 +33,7 @@ describe('vẽ tin văn phòng', () => {
   it('tin thường (không đáp án) ⇒ đoạn chữ; nhãn nguồn', () => {
     expect(tachKhoi('ok e, thầy xem kĩ câu này rồi trả lời e liền').map((x) => x.loai)).toEqual(['doan'])
     expect(chuNguon('kho', false)).toBe('Lời giải từ kho đề của Thầy')
-    expect(chuNguon('kho', true)).toBe('Chỉ gợi ý: câu trong bài em chưa nộp')
+    expect(chuNguon('kho', true)).toBe('Chỉ gợi ý: câu trong bài bạn chưa nộp')
   })
 })
 
@@ -80,5 +80,33 @@ describe('trả lời ngay + gộp tin + khoá cuộn nền', () => {
     expect(s).toContain('window.scrollTo(0, y)')
     expect(s).toContain('dangCho ? 1500')
     expect(readFileSync('src/components/ai-ddh/ai-ddh.css', 'utf8')).toMatch(/\.aid-che \{[^}]*touch-action: none/)
+  })
+})
+
+// 25/10 (thầy: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự"): chữ trong bong bóng xưng mình, gọi bạn.
+describe('bong bóng giọng bạn bè', () => {
+  it('không còn «Văn phòng Thầy», «Thầy đang soạn», «em» trong chữ hiện ra; ô nhập mời tâm sự', () => {
+    const s = readFileSync('src/components/ai-ddh/BongBongAiDdh.tsx', 'utf8')
+    const ma = s.split('\n').filter((d) => !d.trim().startsWith('//')).join('\n')
+    expect(ma).not.toMatch(/Văn phòng Thầy|Thầy đang soạn|gửi Thầy|em còn|của em'|lớp em|Em đang có|khi em|em nộp|em đã/)
+    for (const [, c] of ma.matchAll(/'([^'\n]*\p{L}[^'\n]*)'/gu)) if (/\s/.test(c!)) expect(c).not.toMatch(/(?<![\p{L}])(em|e)(?![\p{L}])/u)
+    expect(s).toContain('placeholder="Nhắn gì cũng được…"')
+    expect(s).toContain('Đang soạn')
+  })
+})
+
+// 25/10 (thầy: "cho nút a.i nhỏ lại, di chuyển được khắp màn hình").
+describe('nút bong bóng nhỏ, kéo được', () => {
+  it('nút 48 px; kéo không cuộn trang; chạm nhẹ vẫn mở; vị trí nhớ trên máy, luôn giữ trong màn', async () => {
+    const css = readFileSync('src/components/ai-ddh/ai-ddh.css', 'utf8')
+    expect(css).toMatch(/\.aid-bong-nut \{[^}]*width: 48px; height: 48px;[^}]*touch-action: none/)
+    const s = readFileSync('src/components/ai-ddh/BongBongAiDdh.tsx', 'utf8')
+    expect(s).toContain('setPointerCapture')
+    const z = Number(/\.aid-bong \{[^}]*z-index: (\d+)/.exec(css)?.[1])
+    expect(z).toBeGreaterThan(40)
+    expect(z).toBeLessThan(60)
+    expect(s).toContain("if (vuaKeo.current) { vuaKeo.current = false; return } setMo(true)")
+    expect(s).toContain("localStorage.setItem(VI_TRI, JSON.stringify(p))")
+    expect(s).toContain("window.addEventListener('resize', on)")
   })
 })
