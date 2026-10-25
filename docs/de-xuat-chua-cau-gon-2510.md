@@ -4,7 +4,7 @@ Trạng thái: **ĐẶC TẢ (bước 2 quy trình 4 bước). Chưa build.** B�
 Thầy (25/10): "tôi muốn bạn đề xuất lại việc chữa câu đơn giản và hiệu quả nhất có thể, để học sinh thấy được ghi nhận ngay khi sửa xong, hiện tại đang quá phức tạp".
 Tiếp nối và THAY phần luồng của `docs/dac-ta-tu-sua-y-nghia-2010.md` (quyết định A về 12 câu/ngày giữ nguyên).
 
-## 0. Nói thẳng trước (số đo thật, D1 bản sống 25/10, chỉ đọc gộp — run 40171633930, 40172089822, 40172160844, 40172232917)
+## 0. Nói thẳng trước (số đo thật, D1 bản sống 25/10, chỉ đọc gộp — run 40171633930, 40172089822, 40172160844, 40172232917, 40172531297)
 
 | Điều đo | Số thật |
 |---|---|
@@ -106,7 +106,7 @@ Các trạng thái chung: đang tải (khung xám đúng chỗ câu), rỗng ("H
 - `tests/chua-gon-ngay-2510.test.ts`: 12 câu, 3 chặng; thứ tự đúng; câu > 14 ngày không vào ngày; câu tự luận không vào.
 - `tests/chua-gon-dong-bo-game-2510.test.ts`: đúng lại trong game qua luật tự làm ⇒ đóng đợt; đúng ngay sau khi xem lời giải / cùng ngày trên câu gốc ⇒ không đóng.
 - `npm run build && npm run kiem:toc-do` 0 đỏ; `npm run kiem:mau-giu` 0; `check:mau`; precache ≤ 169.
-- Đo lại sau 7 ngày (cùng workflow `do-phu-chua-cau-2510.yml`, truy vấn 19 và 20): tỉ lệ đợt 14 ngày thành "Đã tự sửa" — mục tiêu từ 0,4% lên ≥ 30%; tỉ lệ "Đã tự sửa" bị lượt kiểm lại bắt sai (nếu > 40% ⇒ siết luật, ví dụ bỏ tính "có gợi ý").
+- Đo lại sau 7 ngày (cùng workflow `do-phu-chua-cau-2510.yml`, truy vấn 19 và 20): tỉ lệ đợt sai trong 14 ngày đã thành "Đã tự sửa" — mốc đo 25/10: 42 / 12 281 = **0,3%** (run 40172531297), mục tiêu ≥ 30%; tỉ lệ "Đã tự sửa" bị lượt kiểm lại bắt sai (nếu > 40% ⇒ siết luật, ví dụ bỏ tính "có gợi ý").
 
 ## 8. Cần thầy / Boss quyết
 1. **EXP:** giữ "không EXP" (20/10) — tôi đề nghị giữ. Muốn cộng thì thầy nói rõ là đổi quyết định 20/10.
