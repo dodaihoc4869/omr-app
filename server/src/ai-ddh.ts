@@ -269,7 +269,8 @@ export async function gvHangChoAiDdh(env: Env, b: Row, nowMs = Date.now()): Prom
 /** `POST /gv/ai-ddh/anh {khoa}` — văn phòng tải một ảnh em gửi (base64). Chỉ khoá `ai-ddh/…`. */
 export async function gvAnhAiDdh(env: Env, b: Row): Promise<Row> {
   const k = str(b.khoa)
-  if (!/^ai-ddh\/[^/]{1,40}\/[A-Za-z0-9_-]{8,60}-\d\.jpg$/.test(k)) return { ok: false, error: 'Khoá ảnh không hợp lệ.' }
+  // Số thứ tự ảnh 0–15 (tải trước) và 16–23 (đường cũ kèm thân) ⇒ HAI chữ số (25/10 tối, thầy: «nó không đọc được ảnh» — luật cũ `-\d` chặn mọi ảnh số ≥ 10).
+  if (!/^ai-ddh\/[^/]{1,40}\/[A-Za-z0-9_-]{8,60}-\d{1,2}\.jpg$/.test(k)) return { ok: false, error: 'Khoá ảnh không hợp lệ.' }
   const o = await env.DE.get(k)
   if (!o) return { ok: false, error: 'Không thấy ảnh.' }
   const u = new Uint8Array(await new Response(o.body).arrayBuffer())
