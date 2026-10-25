@@ -17,6 +17,8 @@ interface Props {
   /** Đã tự sửa / tổng số đợt (`dem` của máy chủ). */
   soXong: number
   tong: number
+  /** Số câu ĐÃ TỰ SỬA hôm nay (máy chủ đếm; chữa câu gọn 25/10). */
+  xongHomNay?: number
   nayMs: number
   onChon: (m: MucChua, i: number) => void
   onThem: () => void
@@ -40,12 +42,12 @@ export function chuTrangThaiViec(x: ViecMuc, goc: string, nayMs: number): string
       return h ? `Đã ghép xong · bản mới mở ${h.luc}` : 'Đã ghép xong · chờ bản mới'
     }
     if (x.m.trangThai === 'can_thay') return 'Đã làm phần của em · chờ chữa trên lớp'
-    return x.loai === 'goc' ? 'Đã tự làm lại hôm nay' : 'Xong phần hôm nay'
+    return 'Xong phần hôm nay'
   }
   return x.loai === 'gan' ? 'Chỉ còn làm bản mới là xong' : goc
 }
 
-export default function ViecHomNay({ viec, thongTin, soXong, tong, nayMs, onChon, onThem, onVe }: Props) {
+export default function ViecHomNay({ viec, thongTin, soXong, tong, xongHomNay = 0, nayMs, onChon, onThem, onVe }: Props) {
   const nChang = viec.chang.length
   const xongCa = !viec.tiep
   const k = Math.min(viec.changHienTai, nChang - 1)
@@ -63,6 +65,7 @@ export default function ViecHomNay({ viec, thongTin, soXong, tong, nayMs, onChon
           <div>
             <h1 id="vh-tieu">{xongCa ? `Hôm nay em đã xong phần của ${viec.tong} câu` : `Việc hôm nay: ${viec.tong} câu`}</h1>
             <p className="vh-phu">{phu}</p>
+            {xongHomNay > 0 && <p className="vh-phu"><b>Đã tự sửa hôm nay: {xongHomNay} câu</b></p>}
           </div>
         </div>
         <div className="vh-hang">

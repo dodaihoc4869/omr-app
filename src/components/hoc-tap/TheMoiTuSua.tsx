@@ -32,13 +32,15 @@ export function noiDungThe(v: ViecHomNay): { kieu: KieuThe; tieuDe: string; so: 
   const nChang = v.chang.length
   const k = Math.min(v.changHienTai + 1, nChang)
   const ngaySau = v.conNgaySau > 0 ? `Còn ${v.conNgaySau} câu cho các ngày sau.` : ''
-  if (!v.tiep) return { kieu: 'xong', tieuDe: 'Hôm nay em đã xong phần của ', so: v.tong, phu: ngaySau, nut: 'Sửa thêm 1 chặng' }
+  // Chữa câu gọn (25/10): em thấy NGAY số câu đã tự sửa hôm nay (máy chủ đếm).
+  const tuSua = (v.xongHomNay ?? 0) > 0 ? `Đã tự sửa hôm nay: ${v.xongHomNay} câu.` : ''
+  if (!v.tiep) return { kieu: 'xong', tieuDe: 'Hôm nay em đã xong phần của ', so: v.tong, phu: [tuSua, ngaySau].filter(Boolean).join(' '), nut: 'Sửa thêm 1 chặng' }
   if (v.xong > 0) {
-    return { kieu: 'dang', tieuDe: 'Hôm nay em đã xong phần của ', so: v.xong, phu: `Tự sửa lỗi · Chặng ${k}/${nChang} · còn ${v.chang[v.changHienTai]!.filter((x) => !x.xong).length} câu`, nut: `Sửa tiếp · chặng ${k}/${nChang}` }
+    return { kieu: 'dang', tieuDe: 'Hôm nay em đã xong phần của ', so: v.xong, phu: [tuSua, `Tự sửa lỗi · Chặng ${k}/${nChang} · còn ${v.chang[v.changHienTai]!.filter((x) => !x.xong).length} câu`].filter(Boolean).join(' '), nut: `Sửa tiếp · chặng ${k}/${nChang}` }
   }
   const gan = v.chang[0]!.filter((x) => x.loai === 'gan').length
   if (gan > 0) return { kieu: 'gan', tieuDe: ' câu chỉ còn làm bản mới là xong', so: gan, phu: 'Bản mới đã mở. Em tự làm, không xem gợi ý hay lời giải.', nut: 'Làm bản mới' }
-  return { kieu: 'moi', tieuDe: 'Hôm nay sửa ', so: v.tong, phu: [`${nChang} chặng${nChang > 1 ? ', mỗi chặng 4 câu' : ''}.`, ngaySau].filter(Boolean).join(' '), nut: 'Bắt đầu sửa' }
+  return { kieu: 'moi', tieuDe: 'Hôm nay sửa ', so: v.tong, phu: [tuSua, `${nChang} chặng${nChang > 1 ? ', mỗi chặng 4 câu' : ''}.`, ngaySau].filter(Boolean).join(' '), nut: 'Bắt đầu sửa' }
 }
 
 export default function TheMoiTuSua({ so, token, onChua }: Props) {

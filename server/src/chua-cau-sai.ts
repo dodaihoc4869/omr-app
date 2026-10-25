@@ -25,12 +25,13 @@ import { lenhGhiSuKienNguyenTu, ngayVn } from './su-kien-hoc'
 import { emCoGhi } from './dem-ke-hoach'
 import type { ItemCongKhai, ProbeRef } from './chua-cau-sai-kieu'
 import { khopPhanIII } from '../../src/lib/cham-so'
+import { dauNgayVnMs, NGAY_CUA_SO_GON, SQL_DONG_DA_DUNG_LAI } from './chua-gon'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
 const loi = (ma: string, mo: string, status = 400) =>
   Response.json({ ok: false, ma, mo }, { status })
-async function quyen(env: Env, b: Obj): Promise<string | Response> {
+export async function quyen(env: Env, b: Obj): Promise<string | Response> {
   const sbd = await gameIdentity(env, b).catch(() => '')
   if (!sbd) return loi('CAN_DANG_NHAP', 'Em đăng nhập lại để tiếp tục.', 401)
   // 13/10 (thầy: "chỗ này mở câu quá lâu"): hai lượt ĐỌC độc lập (cờ tính năng, ca đang mở) chạy CÙNG đợt — trước: nối tiếp. Thứ tự xét + lời giữ nguyên.
@@ -91,7 +92,7 @@ function docAnh(ph: Obj): AnhPhien | null {
     return null
   }
 }
-async function cauDuoc(env: Env, sbd: string, qid: string) {
+export async function cauDuoc(env: Env, sbd: string, qid: string) {
   // Chỉ gọi sau bằng chứng lỗi đã công bố hoặc đợt máy chủ đã giao; alias cùng nhóm nội dung được phép phục vụ.
   const r = await layCauChoEm(env, sbd, [qid], new Set([qid]))
   if (r.loi || !r.cau[0] || r.nghi?.has(qid)) return null
@@ -303,7 +304,8 @@ export async function giaoDotCuaEm(
         ? 'cau_thay_doi'
         : 'can_chan_doan'
   // Giao và chốt cửa sổ đo một lần; không kéo dài cửa sổ khi em quay lại hay sai tiếp.
-  const [, dongDotMoi] = await env.DB.batch([env.DB.prepare(
+  const idMoLai = 'cl-' + (await bam([sbd, q?.group || qid, dau.saiCuoiLuc ?? now, 'mo-lai'])).slice(0, 40)
+  const [, , dongDotMoi] = await env.DB.batch([env.DB.prepare(
     `INSERT OR IGNORE INTO chua_loi_dot(id,sbd,qid_chuan,content_group,cohort_id,nguon_sai,phien_ban_cau,mo_luc,sai_cuoi_luc,trang_thai_day,ly_do_thieu,policy_snapshot,giao_luc,chot_do_luc,tao_luc,cap_nhat_luc)
     SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL)`,
   )
@@ -327,7 +329,18 @@ export async function giaoDotCuaEm(
       sbd,
       qid,
       q?.group ?? '',
-    ), sqlDot(env, sbd, id)]) // 13/10: đọc lại đợt CÙNG lô ghi (bớt một đợt D1)
+    ),
+  // MỞ LẠI SAU KHI ĐÃ ĐÓNG (chữa câu gọn 25/10): mã đợt băm theo lần sai ĐẦU (`moLuc` cố định suốt cửa sổ sổ học) ⇒ em sai lại sau khi đợt đã đóng thì
+  // INSERT OR IGNORE trên đụng đúng dòng cũ và trả "Đã tự sửa" mãi. Có lần sai SAU lúc đóng muộn nhất của họ câu ⇒ thêm đợt MỚI (mã theo lần sai cuối) — chỉ thêm dòng.
+  env.DB.prepare(
+    `INSERT OR IGNORE INTO chua_loi_dot(id,sbd,qid_chuan,content_group,cohort_id,nguon_sai,phien_ban_cau,mo_luc,sai_cuoi_luc,trang_thai_day,ly_do_thieu,policy_snapshot,giao_luc,chot_do_luc,tao_luc,cap_nhat_luc)
+    SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND (dong_luc IS NULL OR dong_luc>=?))`,
+  ).bind(
+    idMoLai, sbd, qid, q?.group ?? '', cfg.cohortId, dau.loiHoc.nguonSai, q?.version ?? '', dau.saiCuoiLuc ?? now, dau.saiCuoiLuc ?? now, tt, h.lyDo,
+    JSON.stringify(cfg), now, now + cfg.cuaSoDoNgay * 86400000, now, now, sbd, qid, q?.group ?? '', dau.saiCuoiLuc ?? now,
+  ),
+  env.DB.prepare('SELECT * FROM chua_loi_dot WHERE sbd=? AND id IN (?,?) ORDER BY (dong_luc IS NULL) DESC,tao_luc DESC LIMIT 1').bind(sbd, id, idMoLai),
+  ]) // 13/10: đọc lại đợt CÙNG lô ghi (bớt một đợt D1)
   let dot = dongDau(dongDotMoi)
   if (!dot) {
     const winner = await env.DB.prepare(
@@ -349,7 +362,7 @@ export async function giaoDotCuaEm(
     const [, dongMoLai] = await env.DB.batch([env.DB.prepare(
       `UPDATE chua_loi_dot SET trang_thai_day='can_chan_doan',content_group=?,phien_ban_cau=?,ly_do_thieu='',revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=? AND NOT EXISTS(SELECT 1 FROM chua_loi_phien WHERE dot_id=?)`,
     )
-      .bind(q.group, q.version, now, id, num(dot.revision), id), sqlDot(env, sbd, id)])
+      .bind(q.group, q.version, now, str(dot.id), num(dot.revision), str(dot.id)), sqlDot(env, sbd, str(dot.id))])
     dot = dongDau(dongMoLai)!
   }
   return Response.json({
@@ -940,23 +953,29 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
   const thuTu = `CASE WHEN trang_thai_day='cho_gap_lai_2' AND julianday(den_han)<=julianday(?) THEN 0 WHEN trang_thai_day='da_tu_sua' THEN 2 ELSE 1 END`
   // Cùng luật nhomMucChua: hạn thiếu/sai hoặc còn ở tương lai vẫn là chờ; đúng giờ hạn thì cần sửa.
   const nhom = `CASE WHEN trang_thai_day='da_tu_sua' THEN 'xong' WHEN trang_thai_day='cho_gap_lai_2' AND (julianday(den_han) IS NULL OR julianday(den_han)>julianday(?)) THEN 'cho' ELSE 'can' END`
-  const r = await env.DB.batch([
+  // Chữa câu gọn (thầy 25/10, chua-gon.ts): trang đầu ĐÓNG TRƯỚC các đợt em đã làm đúng lại qua luật tự làm — chạy đầu CÙNG lô (không thêm vòng chờ D1).
+  const nowMs = Date.now()
+  const dong = c ? [] : [env.DB.prepare(SQL_DONG_DA_DUNG_LAI).bind(nowMs, sbd, nowMs - NGAY_CUA_SO_GON * 86_400_000)]
+  const r0 = await env.DB.batch([
+    ...dong,
     env.DB.prepare(`WITH muc AS (SELECT id AS dotId,qid_chuan AS qid,trang_thai_day AS trangThai,
-      lan_gap_lai AS lanGapLai,den_han AS denHan,giao_luc AS giaoLuc,${thuTu} AS hang FROM chua_loi_dot WHERE sbd=?)
+      lan_gap_lai AS lanGapLai,den_han AS denHan,giao_luc AS giaoLuc,COALESCE(sai_cuoi_luc,mo_luc) AS saiLuc,dong_luc AS dongLuc,${thuTu} AS hang FROM chua_loi_dot WHERE sbd=?)
       SELECT *,EXISTS(SELECT 1 FROM hoi_thay_kiem k WHERE k.sbd=? AND k.qid_goc=muc.qid) AS kiemHoiThay
       FROM muc WHERE (?=0 OR hang>? OR (hang=? AND (giaoLuc<? OR (giaoLuc=? AND dotId>?))))
       ORDER BY hang,giaoLuc DESC,dotId LIMIT 101`)
       .bind(nay, sbd, sbd, c ? 1 : 0, c ? num(c.hang) : 0, c ? num(c.hang) : 0,
         c ? num(c.giaoLuc) : 0, c ? num(c.giaoLuc) : 0, c ? str(c.dotId) : ''),
-    env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom FROM chua_loi_dot WHERE sbd=?)
-      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong FROM muc`)
-      .bind(nay, sbd),
+    env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom,dong_luc FROM chua_loi_dot WHERE sbd=?)
+      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,SUM(nhom='xong' AND dong_luc>=?) AS xongHomNay FROM muc`)
+      .bind(nay, sbd, dauNgayVnMs(nowMs)),
   ])
+  const r = r0.slice(dong.length)
   const rows = (r[0]?.results ?? []) as Obj[], ds = rows.slice(0, 100), cuoi = ds.at(-1)
   const d = r[1]?.results?.[0] as Obj | undefined
   return Response.json({ ok: true,
-    ds: ds.map(({ hang: _hang, giaoLuc: _giao, ...m }) => ({ ...m, kiemHoiThay: num(m.kiemHoiThay) === 1 })),
-    dem: { tong: num(d?.tong), can: num(d?.can), cho: num(d?.cho), xong: num(d?.xong) },
+    ds: ds.map(({ hang: _hang, giaoLuc: _giao, saiLuc, dongLuc, ...m }) => ({ ...m, kiemHoiThay: num(m.kiemHoiThay) === 1,
+      ...(num(saiLuc) > 0 ? { saiLuc: num(saiLuc) } : {}), ...(num(dongLuc) > 0 ? { dongLuc: num(dongLuc) } : {}) })),
+    dem: { tong: num(d?.tong), can: num(d?.can), cho: num(d?.cho), xong: num(d?.xong), xongHomNay: num(d?.xongHomNay) },
     // Thầy 21/10 "bỏ phần làm câu tương đương đi": không còn lịch tự làm lại câu tương đương sau Hỏi Thầy (giữ trường rỗng cho máy em bản cũ).
     kiemLaiHoiThay: [],
     ...(rows.length > 100 && cuoi ? { sau: { hang: num(cuoi.hang), giaoLuc: num(cuoi.giaoLuc), dotId: str(cuoi.dotId), nay } } : {}),

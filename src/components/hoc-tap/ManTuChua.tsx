@@ -35,15 +35,16 @@ export { default as TheMoiTuSua } from './TheMoiTuSua'
 
 /** Trạng thái đợt chữa ⇒ chữ em đọc được (bảng từ chuẩn: không mã nội bộ). */
 export const CHU_TRANG_THAI_CHUA: Record<string, string> = {
-  can_chan_doan: 'Chưa bắt đầu',
-  dang_chua_buoc: 'Đang sửa từng bước',
-  dang_ghep_bai: 'Đang ghép lại cả bài',
-  dang_kiem_chung: 'Lần gặp lại 2 · tự làm bản mới',
-  cho_gap_lai_2: 'Chờ lần gặp lại 2',
-  can_thay: 'Chờ chữa trên lớp · em sửa trước được',
-  thieu_hoc_lieu: 'Sửa trên câu gốc',
-  cau_thay_doi: 'Câu vừa cập nhật · sửa trên câu gốc',
-  tam_khoa: 'Tạm khoá · tiến độ được giữ',
+  // Chữa câu gọn (thầy 25/10): em chỉ thấy HAI trạng thái — mọi câu chưa xong là "Cần sửa" (một đường sửa cho mọi câu, ChuaGon).
+  can_chan_doan: 'Cần sửa',
+  dang_chua_buoc: 'Cần sửa',
+  dang_ghep_bai: 'Cần sửa',
+  dang_kiem_chung: 'Cần sửa',
+  cho_gap_lai_2: 'Cần sửa',
+  can_thay: 'Cần sửa · đã báo thầy',
+  thieu_hoc_lieu: 'Cần sửa',
+  cau_thay_doi: 'Cần sửa',
+  tam_khoa: 'Cần sửa',
   da_tu_sua: 'Đã tự sửa',
 }
 const TEN_PHAN: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
@@ -74,12 +75,9 @@ export function dungDong(m: MucChua, i: number, cdl: ReadonlyMap<string, CauDaLa
     c ? TEN_PHAN[c.phan] : '',
     saiCuoi ? `sai lần gần nhất ${ngayNgan(saiCuoi.ngay)}${saiCuoi.nguon ? ` · ${NHAN_NGUON_LAN[saiCuoi.nguon]}` : ''}` : '',
   ].filter(Boolean).join(' · ')
-  const hen = m.trangThai === 'cho_gap_lai_2' ? henGapLai(m.denHan, nayMs) : null
   const nhom: Nhom = nhomMucChua(m, nayMs)
-  const trangThai = m.trangThai === 'cho_gap_lai_2'
-    ? hen?.daToi ? 'Đã tới lần gặp lại 2 · tự làm bản mới' : hen ? `Lần gặp lại 2 mở lúc ${hen.luc}` : CHU_TRANG_THAI_CHUA.cho_gap_lai_2
-    : CHU_TRANG_THAI_CHUA[m.trangThai] ?? 'Đang tự sửa'
-  const lam = nhom === 'xong' ? 'Xem lại' : nhom === 'cho' ? 'Xem' : DANG_LAM.has(m.trangThai) ? 'Sửa tiếp' : m.kiemHoiThay ? m.trangThai === 'can_thay' ? 'Xem' : 'Kiểm lại' : 'Sửa'
+  const trangThai = CHU_TRANG_THAI_CHUA[m.trangThai] ?? 'Cần sửa'
+  const lam = nhom === 'xong' ? 'Xem lại' : m.kiemHoiThay && m.trangThai !== 'can_thay' ? 'Kiểm lại' : 'Sửa'
   return { m, ten: c?.tenDang || `Câu sai số ${i + 1}`, phu, trangThai, nhom, lam }
 }
 
@@ -239,6 +237,13 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
             qid={chon.qid}
             tenCau={ten}
             onVe={veDanhSach}
+            onTiep={viec ? () => {
+              // Chữa câu gọn (25/10): câu vừa khép đã ghi "xong phần" trên máy ⇒ dựng lại việc hôm nay và mở THẲNG câu kế; hết câu ⇒ về danh sách.
+              const v = dungViecHomNay(kq, Date.now(), sbd).viec
+              const t = v?.muc.find((x) => !x.xong && goc(x.m.qid) !== goc(chon.qid))
+              if (!t) { veDanhSach(); return }
+              lang.current = true; setLan((n) => n + 1); setChon({ qid: t.m.qid, kiemHoiThay: t.m.kiemHoiThay })
+            } : undefined}
             onKhongMo={chon.thu ? (loi) => { setChon(null); setBao({ qid: chon.qid, loi }) } : undefined}
           />
         </Suspense>
@@ -332,7 +337,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
           <div className="tcl-bo-cuc">
             {viec && viec.tong > 0
               ? <div className="vh-cot"><ViecHomNay
-                  viec={viec} soXong={soXong} tong={tong} nayMs={Date.now()}
+                  viec={viec} soXong={soXong} tong={tong} xongHomNay={dem?.xongHomNay} nayMs={Date.now()}
                   thongTin={(m, i) => { const d = dungDong(m, i, cdl, Date.now()); return { ten: d.ten, phu: d.phu, trangThai: d.trangThai } }}
                   onChon={(m, i) => moCau(dungDong(m, i, cdl, Date.now()))}
                   onThem={() => { themMotChang(kq); setLanThem((n) => n + 1) }}

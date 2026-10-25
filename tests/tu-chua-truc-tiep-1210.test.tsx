@@ -18,6 +18,8 @@ const api = vi.hoisted(() => ({
   apiNopItem: vi.fn(),
   apiXinGoiY: vi.fn(),
   apiCoChua: vi.fn(),
+  // Chữa câu gọn (25/10): máy chủ CHƯA có lệnh gọn (mất nối / bản cũ) ⇒ màn đi lối cũ — tệp này kiểm lối lùi ấy.
+  apiGonMo: vi.fn(async () => ({ ok: false, loi: 'Chưa nối được máy chủ.' })),
 }))
 vi.mock('../src/lib/chua-cau-sai-api', () => api)
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))

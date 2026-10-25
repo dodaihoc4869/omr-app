@@ -42,15 +42,19 @@ describe('Thẻ ở Hôm nay', () => {
     return { onChua, ...render(<TheMoiTuSua so={bat(ds).dem.can} token="tk" onChua={onChua} />) }
   }
 
-  it('có câu gần xong ⇒ "2 câu chỉ còn làm bản mới là xong", nút "Làm bản mới" mở THẲNG câu đó', async () => {
+  // Chữa câu gọn (thầy 25/10): một đường cho mọi câu (không còn "chỉ còn làm bản mới"); em thấy NGAY số câu đã tự sửa hôm nay (máy chủ đếm).
+  it('thẻ báo "Đã tự sửa hôm nay: N câu" (máy chủ đếm); nút "Bắt đầu sửa" mở THẲNG câu đầu', async () => {
     dangNhap()
-    const { onChua } = await ve(DANH_SACH)
-    const the = await screen.findByRole('region', { name: /câu chỉ còn làm bản mới là xong/ })
-    expect(the.textContent).toContain('2 câu chỉ còn làm bản mới là xong')
+    const onChua = vi.fn()
+    api.apiDanhSachTuChua.mockResolvedValue({ ...bat(DANH_SACH), dem: { ...bat(DANH_SACH).dem, xongHomNay: 3 } })
+    await taiTuSuaLoi('tk', { moi: true })
+    render(<TheMoiTuSua so={bat(DANH_SACH).dem.can} token="tk" onChua={onChua} />)
+    const the = await screen.findByRole('region', { name: /Hôm nay sửa 12 câu/ })
+    expect(the.textContent).toContain('Đã tự sửa hôm nay: 3 câu.')
     expect(the.textContent).toContain('0/12 câu')
     expect(the.querySelectorAll('.vh-nhom')).toHaveLength(3)
-    fireEvent.click(within(the).getByRole('button', { name: /Làm bản mới/ }))
-    expect(onChua).toHaveBeenCalledWith('x0')
+    fireEvent.click(within(the).getByRole('button', { name: /Bắt đầu sửa/ }))
+    expect(onChua).toHaveBeenCalledWith('g0')
   })
 
   it('chưa có câu gần xong ⇒ "Hôm nay sửa 12 câu", 3 chặng; còn bao nhiêu câu cho các ngày sau; "Bắt đầu sửa"', async () => {
@@ -100,7 +104,7 @@ describe('Thẻ ở Hôm nay', () => {
 })
 
 describe('Màn Tự sửa lỗi: Việc hôm nay', () => {
-  it('một chặng 4 câu (gần xong trước), chặng sau gọn một dòng, danh sách đầy đủ gập lại, nút chính mở câu kế tiếp', async () => {
+  it('một chặng 4 câu (một đường gọn: mọi câu "Cần sửa"), chặng sau gọn một dòng, danh sách đầy đủ gập lại, nút chính mở câu kế tiếp', async () => {
     dangNhap()
     api.apiDanhSachTuChua.mockResolvedValue(bat(DANH_SACH))
     const { container } = render(<ManTuChua token="tk" onVe={() => {}} />)
@@ -108,8 +112,9 @@ describe('Màn Tự sửa lỗi: Việc hôm nay', () => {
     expect(screen.getByRole('heading', { name: 'Chặng 1/3' })).toBeTruthy()
     const hang = [...container.querySelectorAll<HTMLElement>('.vh-cau')]
     expect(hang).toHaveLength(4)
-    expect(hang[0]!.textContent).toContain('Chỉ còn làm bản mới là xong')
-    expect(hang[2]!.textContent).toContain('Đang sửa từng bước')
+    expect(hang[0]!.textContent).toContain('Cần sửa')
+    expect(hang[2]!.textContent).toContain('Cần sửa')
+    expect(container.textContent).not.toMatch(/bản mới|từng bước|gặp lại 2/)
     expect(container.querySelector('.vh-sau')!.textContent).toContain('Chặng 2/3 · 4 câu')
     expect(container.querySelector('.vh-sau')!.textContent).toContain('Chặng 3/3 · 4 câu')
     // danh sách đầy đủ gập lại: không còn tường cả trăm câu
@@ -118,13 +123,19 @@ describe('Màn Tự sửa lỗi: Việc hôm nay', () => {
     expect(gap.querySelector('summary')!.textContent).toContain('Tất cả câu cần sửa')
     expect(container.textContent).toContain('Còn 6 câu cho các ngày sau. Em không cần sửa hết hôm nay.')
     fireEvent.click(screen.getByRole('button', { name: /Bắt đầu sửa/ }))
-    expect(await screen.findByText('Đang chữa x0')).toBeTruthy()
+    expect(await screen.findByText('Đang chữa g0')).toBeTruthy()
   })
 
   it('xong chặng 1 ⇒ "Đã xong chặng 1/3" và nút "Sửa tiếp · chặng 2/3"; xong cả ngày ⇒ Về Hôm nay + Sửa thêm 1 chặng', async () => {
     dangNhap()
     api.apiDanhSachTuChua.mockResolvedValue(bat(DANH_SACH))
-    for (const k of ['x-d0', 'x-d1', 'k-d0', 'k-d1']) ghiXongHomNay(k)
+    // Dựng (và lưu) việc hôm nay TRƯỚC, rồi mới ghi xong 4 câu đầu — như em làm thật (ghi trước khi dựng thì câu vừa làm bị xoay xuống sau).
+    const dau = render(<ManTuChua token="tk" onVe={() => {}} />)
+    await screen.findByRole('heading', { name: 'Việc hôm nay: 12 câu' })
+    const bon = [...dau.container.querySelectorAll<HTMLElement>('.vh-cau')].map((x) => x.dataset.khoa!)
+    expect(bon).toEqual(['g-d0', 'g-d1', 'g-d2', 'g-d3'])
+    dau.unmount()
+    for (const k of bon) ghiXongHomNay(k)
     const { container, unmount } = render(<ManTuChua token="tk" onVe={() => {}} />)
     expect(await screen.findByText('Đã xong chặng 1/3. Nghỉ một chút cũng được.')).toBeTruthy()
     expect(screen.getByRole('button', { name: /Sửa tiếp · chặng 2\/3/ })).toBeTruthy()
