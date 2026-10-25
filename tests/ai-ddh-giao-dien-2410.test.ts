@@ -92,7 +92,28 @@ describe('bong bóng giọng bạn bè', () => {
     expect(ma).not.toMatch(/Văn phòng Thầy|Thầy đang soạn|gửi Thầy|em còn|của em'|lớp em|Em đang có|khi em|em nộp|em đã/)
     for (const [, c] of ma.matchAll(/'([^'\n]*\p{L}[^'\n]*)'/gu)) if (/\s/.test(c!)) expect(c).not.toMatch(/(?<![\p{L}])(em|e)(?![\p{L}])/u)
     expect(s).toContain('placeholder="Nhắn gì cũng được…"')
-    expect(s).toContain('Đang soạn')
+    expect(s).toContain('chuDangCho(tinCho, lau)')
+    expect(s).not.toMatch(/>Đang soạn</)
+  })
+})
+
+// 25/10 (thầy: "gửi ảnh lên a.i quá chậm, tối ưu tốc độ tức thì"; "bỏ chữ đang soạn, tuỳ ngữ cảnh thì hiện đang soạn, đang nghĩ hay chờ tý").
+describe('dòng chờ theo tình huống + ảnh tải trước', () => {
+  it('ảnh ⇒ đang xem ảnh; xin đề ⇒ đang soạn đề; tâm sự ⇒ đang nghe; còn lại ⇒ đang nghĩ; quá lâu ⇒ chờ tý', async () => {
+    const { chuDangCho } = await import('../src/components/ai-ddh/BongBongAiDdh')
+    expect(chuDangCho({ chu: '', anh: 1 }, false)).toBe('Đang xem ảnh…')
+    expect(chuDangCho({ chu: 'cho mình xin đề chương 3', anh: 0 }, false)).toBe('Đang soạn đề…')
+    expect(chuDangCho({ chu: 'cho 5 câu amine luyện thêm', anh: 0 }, false)).toBe('Đang soạn đề…')
+    expect(chuDangCho({ chu: 'dạo này mệt quá, áp lực thi', anh: 0 }, false)).toBe('Mình đang nghe đây…')
+    expect(chuDangCho({ chu: 'este là gì', anh: 0 }, false)).toBe('Đang nghĩ…')
+    expect(chuDangCho({ chu: 'đề bài khó', anh: 2 }, true)).toBe('Chờ tý nhé, câu này hơi dài…')
+  })
+  it('chọn ảnh là tải lên ngay; bấm Gửi chỉ gửi số ảnh; ảnh nén ≤ 1280 px', () => {
+    const s = readFileSync('src/components/ai-ddh/BongBongAiDdh.tsx', 'utf8')
+    const api = readFileSync('src/lib/ai-ddh-api.ts', 'utf8')
+    expect(s).toContain('daTai.current.set(`${ma}-${n}`, taiAnhAiDdh(token, ma, n, b))')
+    expect(api).toContain("anhSo.length ? { token, maTin, chu, anhSo }")
+    expect(api).toContain('const CANH_ANH = 1280')
   })
 })
 

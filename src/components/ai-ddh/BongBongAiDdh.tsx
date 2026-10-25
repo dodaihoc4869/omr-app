@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Anh, ArrowRight, BookOpen, Camera, CheckCircle2, ChevronDown, ClipboardPaste, Clock, Lightbulb, Lock, MoonStar, Send, ShieldCheck, Sparkles, WifiOff, Zap } from './bieu-tuong-ai'
 import { AnhLogo } from '../LogoVai'
 import { batNhipBenVung } from '../../lib/nhip-ben-vung'
-import { CO_CU_MS, docCoBat, ghiCoBat, gopTin, guiAiDdh, moAiDdh, nenAnh, taoMaTin, tinMoiAiDdh, type MoAiDdh, type TinAiDdh } from '../../lib/ai-ddh-api'
+import { CO_CU_MS, docCoBat, ghiCoBat, gopTin, guiAiDdh, moAiDdh, nenAnh, taiAnhAiDdh, taoMaTin, tinMoiAiDdh, type MoAiDdh, type TinAiDdh } from '../../lib/ai-ddh-api'
 import { chuNguon, tachKhoi, type Khuc } from '../../lib/ai-ddh-dinh-dang'
 import './ai-ddh.css'
 
@@ -74,7 +74,21 @@ function TinVanPhong({ t }: { t: TinAiDdh }) {
   )
 }
 
-interface TinCho { maTin: string; chu: string; anh: string[]; loi: string }
+interface TinCho { maTin: string; chu: string; anh: string[]; so: number[]; loi: string }
+
+// Dòng chờ trả lời đúng tình huống (25/10, thầy: "bỏ chữ đang soạn, tuỳ ngữ cảnh thì hiện đang soạn, đang nghĩ hay chờ tý").
+const TAM_SU = /buồn|mệt|chán|áp lực|stress|lo lắng|sợ|khóc|tâm sự|cô đơn|nản/i
+const XIN_DE = /(?:^|[^\p{L}])(?:đề|de)(?![\p{L}])|vài câu|mấy câu|câu luyện|luyện thêm/iu
+export function chuDangCho(t: { chu: string; anh: number } | undefined, lau: boolean): string {
+  if (lau) return 'Chờ tý nhé, câu này hơi dài…'
+  if (!t) return 'Đang nghĩ…'
+  if (t.anh > 0) return 'Đang xem ảnh…'
+  if (TAM_SU.test(t.chu)) return 'Mình đang nghe đây…'
+  if (XIN_DE.test(t.chu)) return 'Đang soạn đề…'
+  return 'Đang nghĩ…'
+}
+/** Chờ quá ngần này ⇒ «Chờ tý nhé…». */
+const LAU_MS = 25_000
 
 // 25/10 (thầy: "cho nút a.i nhỏ lại, di chuyển được khắp màn hình"): kéo nút đi đâu cũng được, nhớ vị trí trên máy; chạm nhẹ (< 6 px) vẫn là mở.
 const VI_TRI = 'aid-vi-tri'
@@ -98,6 +112,11 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
   const [cho, setCho] = useState<TinCho[]>([])
   const [chu, setChu] = useState('')
   const [anh, setAnh] = useState<string[]>([])
+  // Ảnh TẢI TRƯỚC ngay lúc chọn (25/10 «gửi ảnh tức thì»): mỗi ảnh một số thứ tự trong tin nháp; bấm Gửi chỉ còn gửi chữ + số.
+  const [anhSo, setAnhSo] = useState<number[]>([])
+  const maNhap = useRef(taoMaTin())
+  const demSo = useRef(0)
+  const daTai = useRef(new Map<string, Promise<boolean>>())
   const [dangGui, setDangGui] = useState(false)
   const [moiChua, setMoiChua] = useState(0)
   const [truc, setTruc] = useState(true)
@@ -110,6 +129,14 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
   const [viTri, setViTri] = useState(docViTri)
   const sau = useMemo(() => tin.reduce((m, x) => Math.max(m, x.luc), 0), [tin])
   const dangCho = tin.some((x) => x.ben === 'em' && (x.trangThai === 'cho' || x.trangThai === 'dang'))
+  const tinCho = dangCho ? [...tin].reverse().find((x) => x.ben === 'em' && (x.trangThai === 'cho' || x.trangThai === 'dang')) : undefined
+  const [lau, setLau] = useState(false)
+  useEffect(() => {
+    setLau(false)
+    if (!tinCho) return
+    const h = window.setTimeout(() => setLau(true), LAU_MS)
+    return () => clearTimeout(h)
+  }, [tinCho?.id])
   // ĐUÔI NHANH (25/10 thầy: "tối ưu tốc độ trả lời của a.i tức thì hơn nữa"): văn phòng gửi lời giải chữ TRƯỚC, trang HTML / link gửi tiếp sau
   // (đăng trang 15–60 giây). Nhận tin trả lời xong vẫn hỏi 1,5 giây/lần thêm DUOI_NHANH_MS để link tới ngay, rồi mới thưa về 20 giây.
   const [nhanhDen, setNhanhDen] = useState(0)
@@ -176,12 +203,21 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
   }, [mo])
 
   const gui = async (lai?: TinCho) => {
-    const t: TinCho = lai ?? { maTin: taoMaTin(), chu: chu.trim(), anh, loi: '' }
+    const t: TinCho = lai ?? { maTin: maNhap.current, chu: chu.trim(), anh, so: anhSo, loi: '' }
     if (!t.chu && !t.anh.length) return
-    if (!lai) { setChu(''); setAnh([]) }
+    if (!lai) { setChu(''); setAnh([]); setAnhSo([]); maNhap.current = taoMaTin(); demSo.current = 0 }
     setCho((c) => [...c.filter((x) => x.maTin !== t.maTin), { ...t, loi: '' }])
     setDangGui(true)
-    const r = await guiAiDdh(token, t.maTin, t.chu, t.anh)
+    // Ảnh đã tải trước (thường xong từ lúc em gõ chữ) ⇒ chỉ gửi số; ảnh nào hỏng thì tải lại một lần; vẫn hỏng ⇒ gửi kèm ảnh như cũ.
+    const xong = await Promise.all(t.so.map(async (n, i) => {
+      const k = `${t.maTin}-${n}`
+      if (await (daTai.current.get(k) ?? Promise.resolve(false))) return true
+      const p = taiAnhAiDdh(token, t.maTin, n, t.anh[i]!)
+      daTai.current.set(k, p)
+      return p
+    }))
+    const so = t.so.length && xong.every(Boolean) ? t.so : []
+    const r = await guiAiDdh(token, t.maTin, t.chu, so.length ? [] : t.anh, so)
     setDangGui(false)
     if (r.ok) {
       setCho((c) => c.filter((x) => x.maTin !== t.maTin))
@@ -202,9 +238,13 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
 
   const themAnh = async (ds: FileList | null) => {
     if (!ds) return
-    const ra: string[] = []
-    for (const f of Array.from(ds).slice(0, 8 - anh.length)) { const b = await nenAnh(f); if (b) ra.push(b) }
-    setAnh((a) => [...a, ...ra].slice(0, 8))
+    for (const f of Array.from(ds).slice(0, 8 - anh.length)) {
+      const b = await nenAnh(f)
+      if (!b || demSo.current >= 16) continue
+      const n = demSo.current++, ma = maNhap.current
+      daTai.current.set(`${ma}-${n}`, taiAnhAiDdh(token, ma, n, b))
+      setAnh((a) => [...a, b].slice(0, 8)); setAnhSo((x) => [...x, n].slice(0, 8))
+    }
   }
   const dan = async () => {
     try { const s = await navigator.clipboard.readText(); if (s) setChu((c) => (c ? c + '\n' : '') + s) } catch { /* máy chặn đọc bộ nhớ tạm */ }
@@ -319,11 +359,11 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
                     <div key={t.maTin} className="aid-em">
                       {t.anh.length > 0 && <div className="aid-go-anh">{t.anh.map((a, i) => <span key={i}><img src={`data:image/jpeg;base64,${a}`} alt="Ảnh đề" /></span>)}</div>}
                       {t.chu && <div className="aid-bt">{t.chu}</div>}
-                      {t.loi ? <span className="aid-loi-gui"><WifiOff size={14} />{t.loi}<button type="button" onClick={() => void gui(t)}>Gửi lại</button></span> : <span className="aid-gio">Đang gửi…</span>}
+                      {t.loi ? <span className="aid-loi-gui"><WifiOff size={14} />{t.loi}<button type="button" onClick={() => void gui(t)}>Gửi lại</button></span> : <span className="aid-gio">{t.anh.length ? 'Đang gửi ảnh…' : 'Đang gửi…'}</span>}
                     </div>
                   ))}
                   {dangCho && truc && (
-                    <div className="aid-nhom"><Mat co={32} /><div className="aid-bt"><span className="aid-soan"><span className="aid-cho"><i /><i /><i /></span>Đang soạn</span></div></div>
+                    <div className="aid-nhom"><Mat co={32} /><div className="aid-bt"><span className="aid-soan"><span className="aid-cho"><i /><i /><i /></span>{chuDangCho(tinCho, lau)}</span></div></div>
                   )}
                   {dangCho && !truc && (
                     <div className="aid-he"><MoonStar size={18} /><span><b>Mình đang nghỉ.</b> Tin của bạn đã được giữ lại. Mở lại là mình trả lời ngay, bong bóng hiện chấm đỏ báo tin mới.</span></div>
@@ -335,7 +375,7 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
             <div className="aid-go-vo">
               {du && !du.khoa && (
                 <>
-                  {anh.length > 0 && <div className="aid-go-anh">{anh.map((a, i) => <span key={i}><img src={`data:image/jpeg;base64,${a}`} alt={`Ảnh đề ${i + 1}`} /><button type="button" aria-label="Bỏ ảnh" onClick={() => setAnh((x) => x.filter((_, j) => j !== i))}>×</button></span>)}</div>}
+                  {anh.length > 0 && <div className="aid-go-anh">{anh.map((a, i) => <span key={i}><img src={`data:image/jpeg;base64,${a}`} alt={`Ảnh đề ${i + 1}`} /><button type="button" aria-label="Bỏ ảnh" onClick={() => { setAnh((x) => x.filter((_, j) => j !== i)); setAnhSo((x) => x.filter((_, j) => j !== i)) }}>×</button></span>)}</div>}
                   <div className="aid-go">
                     <button type="button" className="aid-nut-tron" aria-label="Chụp ảnh đề" onClick={() => tepChup.current?.click()}><Camera size={22} /></button>
                     <button type="button" className="aid-nut-tron" aria-label="Chọn ảnh có sẵn" onClick={() => tepChon.current?.click()}><Anh size={22} /></button>

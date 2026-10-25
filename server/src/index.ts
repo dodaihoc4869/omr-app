@@ -3628,6 +3628,7 @@ const boXuLy = {
       if (p === '/hs/ai-ddh/mo') return ra(await import('./ai-ddh').then((m) => m.hsMoAiDdh(env, b)))
       if (p === '/hs/ai-ddh/tin') return ra(await import('./ai-ddh').then((m) => m.hsTinAiDdh(env, b)))
       if (p === '/hs/ai-ddh/gui') return ra(await import('./ai-ddh').then((m) => m.hsGuiAiDdh(env, b)))
+      if (p === '/hs/ai-ddh/anh') return ra(await import('./ai-ddh').then((m) => m.hsAnhAiDdh(env, b)))
       // HỒ SƠ LÀM BÀI CỦA EM (thầy 12/10 "cho hs bấm vào bảng lười chăm", server/src/ho-so-em-hs.ts): CHỈ ĐỌC, token của em, cùng lõi với hai lệnh thầy.
       if (p === '/hs/ho-so-thai-do') return ra(await import('./ho-so-em-hs').then((m) => m.hsHoSoThaiDo(envDoc, b)))
       if (p === '/hs/lich-su-lam-cau') return ra(await import('./ho-so-em-hs').then((m) => m.hsLichSuLamCau(envDoc, b)))

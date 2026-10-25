@@ -20,12 +20,12 @@ export interface MoAiDdh { bat: boolean; khoa: 'kiem_tra' | null; vanPhongTruc: 
 type KQ<T> = { ok: true; du: T } | { ok: false; chu: string; khoa?: string }
 
 const HAN_MS = 25_000
-async function goi(duong: string, than: Record<string, unknown>): Promise<KQ<Record<string, unknown>>> {
+async function goi(duong: string, than: Record<string, unknown>, hanMs = HAN_MS): Promise<KQ<Record<string, unknown>>> {
   let url = ''
   try { url = String(await layDiaChiMayChu()).replace(/\/+$/, '') } catch { return { ok: false, chu: 'Chưa đọc được cấu hình máy chủ.' } }
   if (!url) return { ok: false, chu: 'Chưa kết nối được máy chủ.' }
   const dk = new AbortController()
-  const hen = setTimeout(() => dk.abort(), HAN_MS)
+  const hen = setTimeout(() => dk.abort(), hanMs)
   try {
     const r = await fetch(url + duong, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(than), signal: dk.signal })
     if (r.status === 404) return { ok: false, chu: 'Máy chủ chưa có A.I Đỗ Đại Học — thầy cần cập nhật máy chủ.' }
@@ -33,7 +33,7 @@ async function goi(duong: string, than: Record<string, unknown>): Promise<KQ<Rec
     if (j.ok !== true) return { ok: false, chu: String(j.error || 'Máy chủ không nhận tin.'), ...(typeof j.khoa === 'string' ? { khoa: j.khoa } : {}) }
     return { ok: true, du: j }
   } catch (e) {
-    return { ok: false, chu: (e as { name?: string })?.name === 'AbortError' ? 'Mạng chậm, em thử lại nhé.' : 'Mất mạng.' }
+    return { ok: false, chu: (e as { name?: string })?.name === 'AbortError' ? 'Mạng chậm, bạn thử lại nhé.' : 'Mất mạng.' }
   } finally {
     clearTimeout(hen)
   }
@@ -61,9 +61,10 @@ export async function tinMoiAiDdh(token: string, sau: number): Promise<KQ<{ vanP
   const r = await goi('/hs/ai-ddh/tin', { token, sau })
   return r.ok ? { ok: true, du: { vanPhongTruc: r.du.vanPhongTruc === true, tin: dsTin(r.du.tin) } } : r
 }
-/** Gửi một tin; `them` = trả lời máy chủ trả NGAY (chào hỏi, cảm ơn — không chờ văn phòng). */
-export async function guiAiDdh(token: string, maTin: string, chu: string, anh: string[]): Promise<KQ<{ tin: TinAiDdh | null; them: TinAiDdh[] }>> {
-  const r = await goi('/hs/ai-ddh/gui', { token, maTin, chu, anh })
+/** Gửi một tin; `them` = trả lời máy chủ trả NGAY (chào hỏi, cảm ơn — không chờ văn phòng).
+ *  `anhSo` = số thứ tự các ảnh ĐÃ tải trước (`taiAnhAiDdh`) ⇒ thân gói chỉ còn chữ; `anh` (base64) = đường dự phòng khi tải trước hỏng. */
+export async function guiAiDdh(token: string, maTin: string, chu: string, anh: string[], anhSo: number[] = []): Promise<KQ<{ tin: TinAiDdh | null; them: TinAiDdh[] }>> {
+  const r = await goi('/hs/ai-ddh/gui', anhSo.length ? { token, maTin, chu, anhSo } : { token, maTin, chu, anh }, anh.length && !anhSo.length ? 60_000 : HAN_MS)
   return r.ok ? { ok: true, du: { tin: docTin(r.du.tin), them: dsTin(r.du.them) } } : r
 }
 
@@ -79,16 +80,28 @@ export function gopTin(cu: TinAiDdh[], moi: TinAiDdh[]): TinAiDdh[] {
 /** Mã tin do máy em tạo (bấm lặp / gửi lại khi có mạng ⇒ cùng một tin). */
 export const taoMaTin = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
 
-/** Ảnh đề ⇒ JPEG ≤ 1600 px cạnh dài (base64, không tiền tố). Ảnh lỗi ⇒ null. */
+/** TẢI TRƯỚC một ảnh (25/10, thầy: "gửi ảnh lên a.i quá chậm, tối ưu tốc độ tức thì"): chạy ngay lúc em chọn ảnh, bấm Gửi chỉ còn gửi chữ. */
+export async function taiAnhAiDdh(token: string, maTin: string, so: number, anh: string): Promise<boolean> {
+  return (await goi('/hs/ai-ddh/anh', { token, maTin, so, anh }, 60_000)).ok
+}
+
+/** Ảnh đề ⇒ JPEG ≤ 1280 px cạnh dài, ≤ ~260 KB (base64, không tiền tố) — đủ đọc chữ đề, nhẹ hơn 2–4 lần bản 1600 px cũ. Ảnh lỗi ⇒ null. */
+const CANH_ANH = 1280
+const TRAN_B64 = 350_000
 export async function nenAnh(tep: File): Promise<string | null> {
   try {
     const bm = await createImageBitmap(tep)
-    const ti = Math.min(1, 1600 / Math.max(bm.width, bm.height))
     const c = document.createElement('canvas')
-    c.width = Math.round(bm.width * ti); c.height = Math.round(bm.height * ti)
-    c.getContext('2d')!.drawImage(bm, 0, 0, c.width, c.height)
+    let ra = ''
+    for (const [canh, cl] of [[CANH_ANH, 0.72], [CANH_ANH, 0.55], [1024, 0.55]] as const) {
+      const ti = Math.min(1, canh / Math.max(bm.width, bm.height))
+      c.width = Math.round(bm.width * ti); c.height = Math.round(bm.height * ti)
+      c.getContext('2d')!.drawImage(bm, 0, 0, c.width, c.height)
+      ra = c.toDataURL('image/jpeg', cl).split(',')[1] ?? ''
+      if (ra.length <= TRAN_B64) break
+    }
     bm.close?.()
-    return c.toDataURL('image/jpeg', 0.82).split(',')[1] ?? null
+    return ra || null
   } catch { return null }
 }
 
