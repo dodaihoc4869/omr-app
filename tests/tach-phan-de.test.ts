@@ -108,30 +108,36 @@ describe('đề chuẩn cấu trúc hiện nguyên từng đề', () => {
   })
 })
 
-// 25/10 (thầy: "quét lại để dựng đúng cây thư mục"): đề VIP 2027 dựng đúng cây Drive, hiện nguyên từng đề.
-describe('cây thư mục lồng của đề VIP', async () => {
+// 25/10 (thầy: "quét lại để dựng đúng cây thư mục"; "bấm vào liên chương thì vào đề luôn, không có thư mục con bên trong nữa, bộ đề trường và chuyên đề khó cũng vậy").
+describe('cây kiểu ổ đĩa của đề VIP', async () => {
   const { dungCay } = await import('../src/lib/cay-chon-de')
   const vip = (ma: string, nhom: string, nguon: string) => ({ ...de(ma, 18, 4, 6), nhom, nguon })
-  it('VIP 2027 › 1.LIÊN CHƯƠNG › chương › bài; tầng trùng tên gộp; không chen khối; mỗi đề một lá «Cả đề»', () => {
+  it('VIP 2027 ▸ 1.LIÊN CHƯƠNG ▸ từng đề (mục chọn luôn); không tầng khối, không thư mục con; đề thường giữ cây cũ', () => {
     const ds = tachNhieuTheoPhan([
-      vip('VIP27-C2-B4', '12 · VIP 2027 › 1.LIÊN CHƯƠNG/Kiểm Tra Theo Bài + Liên Bài Chương 2', 'Bài 4. KT giới thiệu carbohydrate'),
-      vip('VIP27-C1-B1-ESTER', '12 · VIP 2027 › 1.LIÊN CHƯƠNG/Kiểm Tra Theo Bài + Liên Bài Chương 1', 'Bài 1. KT ester'),
-      vip('VIP27-CDK-OXHK', '12 · VIP 2027 › 3.CHUYÊN ĐỀ KHÓ › 3.CHUYÊN ĐỀ KHÓ/Chuyên Đề 9+ mùa thi 2026 - 2027', 'Chuyên Đề Chuẩn Độ Oxy Hóa Khử Nâng Cao 2027'),
+      vip('VIP27-C2-B4', '12 · VIP 2027 ›/1.LIÊN CHƯƠNG', 'Bài 4. KT giới thiệu carbohydrate'),
+      vip('VIP27-C1-B10', '12 · VIP 2027 ›/1.LIÊN CHƯƠNG', 'Bài 10. KT Protein - Enzyme'),
+      vip('VIP27-C1-B1-ESTER', '12 · VIP 2027 ›/1.LIÊN CHƯƠNG', 'Bài 1. KT ester'),
+      vip('VIP27-CDK-OXHK', '12 · VIP 2027 ›/3.CHUYÊN ĐỀ KHÓ', 'Chuyên Đề Chuẩn Độ Oxy Hóa Khử Nâng Cao 2027'),
+      vip('VIP27-BDT-L1-507', '12 · VIP 2027 ›/2.BỘ ĐỀ TRƯỜNG', '[2026-2027]_Hoa_Lan1'),
       de('12-C1-B2', 5, 2, 1),
     ])
-    expect(ds.map((s) => s.maDe)).toEqual(['VIP27-C2-B4', 'VIP27-C1-B1-ESTER', 'VIP27-CDK-OXHK', '12-C1-B2-TN', '12-C1-B2-DS', '12-C1-B2-TLN'])
+    expect(ds.filter((s) => s.maDe.startsWith('VIP')).map((s) => s.maDe)).toEqual(['VIP27-C2-B4', 'VIP27-C1-B10', 'VIP27-C1-B1-ESTER', 'VIP27-CDK-OXHK', 'VIP27-BDT-L1-507'])
     const cay = dungCay(ds)
     const goc = cay.find((n) => n.nhan === 'VIP 2027')!
     expect(goc.tang).toBe('thumuc')
-    expect(goc.con.map((n) => n.nhan)).toEqual(['1.LIÊN CHƯƠNG', '3.CHUYÊN ĐỀ KHÓ'])
+    expect(goc.con.map((n) => n.nhan)).toEqual(['1.LIÊN CHƯƠNG', '2.BỘ ĐỀ TRƯỜNG', '3.CHUYÊN ĐỀ KHÓ'])
     const lc = goc.con[0]!
-    expect(lc.con.map((n) => [n.tang, n.nhan])).toEqual([['chuong', 'Kiểm Tra Theo Bài + Liên Bài Chương 1'], ['chuong', 'Kiểm Tra Theo Bài + Liên Bài Chương 2']])
-    expect(lc.con[0]!.con[0]!.nhan).toBe('Bài 1. KT ester')
-    expect(lc.con[0]!.con[0]!.con.map((n) => [n.nhan, n.maDe])).toEqual([['Cả đề', 'VIP27-C1-B1-ESTER']])
-    const cdk = goc.con[1]!
-    expect(cdk.con.map((n) => n.nhan)).toEqual(['Chuyên Đề 9+ mùa thi 2026 - 2027'])          // tầng lồng chính nó (3.CHUYÊN ĐỀ KHÓ › 3.CHUYÊN ĐỀ KHÓ): gộp
-    expect(cdk.con[0]!.tang).toBe('chuong')
+    expect(lc.con.map((n) => [n.tang, n.nhan, n.maDe])).toEqual([
+      ['dang', 'Bài 1. KT ester', 'VIP27-C1-B1-ESTER'], ['dang', 'Bài 4. KT giới thiệu carbohydrate', 'VIP27-C2-B4'], ['dang', 'Bài 10. KT Protein - Enzyme', 'VIP27-C1-B10'],
+    ])
+    expect(goc.con[1]!.con.map((n) => [n.tang, n.nhan])).toEqual([['dang', '[2026-2027]_Hoa_Lan1']])
+    expect(goc.soCau).toEqual({ I: 90, II: 20, III: 30 })
     expect(cay.some((n) => n.nhan === 'Khối 12')).toBe(true)                                  // đề thường giữ cây khối như cũ
-    expect(goc.soCau).toEqual({ I: 54, II: 12, III: 18 })
+  })
+  it('nhiều tầng « › » vẫn lồng đúng, tầng trùng tên gộp', () => {
+    const cay = dungCay([vip('X1', '12 · VIP 2027 › 3.CHUYÊN ĐỀ KHÓ › 3.CHUYÊN ĐỀ KHÓ/Chuyên Đề 9+', 'Đề A')])
+    expect(cay[0]!.nhan).toBe('VIP 2027')
+    expect(cay[0]!.con.map((n) => n.nhan)).toEqual(['3.CHUYÊN ĐỀ KHÓ'])
+    expect(cay[0]!.con[0]!.con.map((n) => [n.tang, n.nhan])).toEqual([['chuong', 'Chuyên Đề 9+']])
   })
 })
