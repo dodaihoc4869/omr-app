@@ -83,7 +83,7 @@ export function chuDangCho(t: { chu: string; anh: number } | undefined, lau: boo
   if (lau) return 'Chờ tý nhé, câu này hơi dài…'
   if (!t) return 'Đang nghĩ…'
   if (t.anh > 0) return 'Đang xem ảnh…'
-  if (TAM_SU.test(t.chu)) return 'Mình đang nghe đây…'
+  if (TAM_SU.test(t.chu)) return 'Tôi đang nghe đây…'
   if (XIN_DE.test(t.chu)) return 'Đang soạn đề…'
   return 'Đang nghĩ…'
 }
@@ -315,23 +315,23 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
               {!du ? (
                 <div className="aid-tai">{loi ? <><WifiOff size={28} /><span>{loi}</span><button type="button" className="aid-trang-nut" onClick={() => void taiMo()}>Thử lại</button></> : <span className="aid-cho"><i /><i /><i /></span>}</div>
               ) : du.khoa === 'kiem_tra' ? (
-                <div className="aid-khoa"><span className="aid-khoa-icon"><Lock size={40} /></span><b>Bạn đang có bài kiểm tra mở</b><p>Mình tạm khoá tới khi bạn nộp bài. Trong màn làm bài kiểm tra, bong bóng cũng ẩn hẳn.</p></div>
+                <div className="aid-khoa"><span className="aid-khoa-icon"><Lock size={40} /></span><b>Bạn đang có bài kiểm tra mở</b><p>Tôi tạm khoá tới khi bạn nộp bài. Trong màn làm bài kiểm tra, bong bóng cũng ẩn hẳn.</p></div>
               ) : (
                 <>
                   {!tin.length && !cho.length && (
                     <div className="aid-chao">
                       <div className="aid-chao-anh"><Mat co={64} on={truc} /></div>
                       <div className="aid-chao-than">
-                        <h2>{ten ? `Chào ${ten}! Có gì cứ nói với mình nha.` : 'Chào bạn! Có gì cứ nói với mình nha.'}</h2>
-                        <p>Hỏi bài, xin đề, xin vài câu luyện, hay chỉ muốn tâm sự cũng được. Mình trả lời ngay trong này.</p>
+                        <h2>{ten ? `Chào ${ten}! Có gì cứ quăng đây, tôi cân hết.` : 'Chào bạn! Có gì cứ quăng đây, tôi cân hết.'}</h2>
+                        <p>Hỏi bài, xin đề, xin vài câu luyện, hay chỉ muốn tâm sự cũng được. Tôi trả lời ngay trong này.</p>
                         <div className="aid-o-chon">
                           <button type="button" onClick={() => tepChup.current?.click()}><i><Camera size={22} /></i>Chụp ảnh đề</button>
                           <button type="button" onClick={() => tepChon.current?.click()}><i><Anh size={22} /></i>Chọn ảnh có sẵn</button>
                           <button type="button" onClick={() => void dan()}><i><ClipboardPaste size={22} /></i>Dán đề bài</button>
                         </div>
                         <div className="aid-tin-cay">
-                          <span><ShieldCheck size={16} />Câu có trong kho đề của Thầy: mình dùng đúng đáp án và lời giải của kho.</span>
-                          <span><Zap size={16} />Câu mới: mình giải hai lượt độc lập, khớp nhau mới gửi bạn.</span>
+                          <span><ShieldCheck size={16} />Câu có trong kho đề của Thầy: tôi dùng đúng đáp án và lời giải của kho.</span>
+                          <span><Zap size={16} />Câu mới: tôi giải hai lượt độc lập, khớp nhau mới gửi bạn.</span>
                         </div>
                         <span className="aid-luot"><Clock size={14} />Hôm nay bạn còn {du.conLuot}/{du.tranLuot} lượt nhắn</span>
                       </div>
@@ -366,7 +366,7 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
                     <div className="aid-nhom"><Mat co={32} /><div className="aid-bt"><span className="aid-soan"><span className="aid-cho"><i /><i /><i /></span>{chuDangCho(tinCho, lau)}</span></div></div>
                   )}
                   {dangCho && !truc && (
-                    <div className="aid-he"><MoonStar size={18} /><span><b>Mình đang nghỉ.</b> Tin của bạn đã được giữ lại. Mở lại là mình trả lời ngay, bong bóng hiện chấm đỏ báo tin mới.</span></div>
+                    <div className="aid-he"><MoonStar size={18} /><span><b>Tôi đang nghỉ.</b> Tin của bạn đã được giữ lại. Mở lại là tôi trả lời ngay, bong bóng hiện chấm đỏ báo tin mới.</span></div>
                   )}
                   {du.conLuot <= 0 && <div className="aid-he"><Clock size={18} />Hôm nay bạn đã nhắn đủ {du.tranLuot} lượt. 0 giờ đêm nay nhắn tiếp được.</div>}
                 </>

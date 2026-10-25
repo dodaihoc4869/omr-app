@@ -104,7 +104,7 @@ describe('dòng chờ theo tình huống + ảnh tải trước', () => {
     expect(chuDangCho({ chu: '', anh: 1 }, false)).toBe('Đang xem ảnh…')
     expect(chuDangCho({ chu: 'cho mình xin đề chương 3', anh: 0 }, false)).toBe('Đang soạn đề…')
     expect(chuDangCho({ chu: 'cho 5 câu amine luyện thêm', anh: 0 }, false)).toBe('Đang soạn đề…')
-    expect(chuDangCho({ chu: 'dạo này mệt quá, áp lực thi', anh: 0 }, false)).toBe('Mình đang nghe đây…')
+    expect(chuDangCho({ chu: 'dạo này mệt quá, áp lực thi', anh: 0 }, false)).toBe('Tôi đang nghe đây…')
     expect(chuDangCho({ chu: 'este là gì', anh: 0 }, false)).toBe('Đang nghĩ…')
     expect(chuDangCho({ chu: 'đề bài khó', anh: 2 }, true)).toBe('Chờ tý nhé, câu này hơi dài…')
   })

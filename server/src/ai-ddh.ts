@@ -83,18 +83,18 @@ const tinRa = (x: Row) => ({
 
 /**
  * TRẢ LỜI NGAY (25/10, thầy: "tốc độ nhắn chậm quá, tối ưu tức thì"): chào hỏi / cảm ơn / «ok, dạ» không cần văn phòng (văn phòng phải lấy hàng chờ rồi
- * hỏi não ~1 phút) ⇒ máy chủ trả luôn. Giọng BẠN BÈ (25/10 thầy: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự"): mình / bạn; văn phong Thầy nhắn Zalo (25/10: "nhắn tin theo văn phong của tôi"): ngắn, thẳng, bớt nhé / nha, teencode ko / đc. Chỉ khi KHÔNG ảnh, ngắn, không số (câu có số là đề). Thuần — test được.
+ * hỏi não ~1 phút) ⇒ máy chủ trả luôn. Giọng BẠN BÈ (25/10 thầy: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự"; 25/10 tối: "xưng tôi và bạn"): tôi / bạn; văn phong Thầy nhắn Zalo (25/10: "nhắn tin theo văn phong của tôi"): ngắn, thẳng, bớt nhé / nha, teencode ko / đc. Chỉ khi KHÔNG ảnh, ngắn, không số (câu có số là đề). Thuần — test được.
  */
 export function traLoiNgay(chu: string, soAnh: number): string | null {
   if (soAnh > 0) return null
   const s = chu.normalize('NFC').toLowerCase().replace(/[!?.,~:;…"'()*\-_/\\]+/g, ' ').replace(/[^\p{L}\s]/gu, ' ').replace(/\s+/g, ' ').trim()
   if (!s || s.length > 40 || /\d/.test(chu)) return null
   if (/^(?:(?:em|e)\s+)?(?:xin\s+)?ch[aà]o(?:\s+(?:thầy|thay|ạ|a|ad|anh|chị|bạn|cậu|mọi người))*$|^(?:hi|hello|helo|hey|alo|a lô)(?:\s+(?:thầy|thay|ạ|a|bạn|cậu))*$/.test(s))
-    return 'Chào bạn:)) cần gì cứ nhắn mình: hỏi bài, xin đề, xin câu luyện, tâm sự cũng đc'
+    return 'Chào bạn:)) cần gì cứ quăng đây, tôi cân hết: hỏi bài, xin đề, xin câu luyện, tâm sự cũng đc'
   if (/^(?:(?:em|e)\s+)?(?:(?:xin\s+)?c[ảáa]m\s+[ơo]n|thanks?|thank you|tks|thx)(?:\s+(?:thầy|thay|bạn|cậu|ạ|a|nhiều|nhieu|nha|nhé|nhe))*$/.test(s))
-    return 'Ko có gì:)) còn gì cứ nhắn mình'
+    return 'Ko có gì:)) còn gì cứ nhắn tôi'
   if (/^(?:ok|oke|okay|okela|ừ|ừm|uhm|dạ|da|vâng|vang|em hiểu rồi|e hiểu rồi|hiểu rồi)(?:\s+(?:thầy|thay|bạn|cậu|ạ|a|ạ thầy|nha|nhé|rồi))*$/.test(s))
-    return 'Ok, có gì nhắn mình'
+    return 'Ok, có gì nhắn tôi'
   return null
 }
 
