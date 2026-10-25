@@ -148,6 +148,23 @@ describe('ảnh tải trước', () => {
     expect(g).toMatchObject({ ok: true, tin: { anh: 2 } })
     expect(JSON.parse(String((d.sql.prepare('SELECT anh_json FROM ai_ddh_tin').get() as { anh_json: string }).anh_json))).toEqual(['ai-ddh/A1/anh-00001-0.jpg', 'ai-ddh/A1/anh-00001-2.jpg'])
   })
+
+  // 25/10 tối (thầy: «nó không đọc được ảnh»): văn phòng phải tải được MỌI ảnh em gửi — số ≥ 10 (tải trước) và đường cũ kèm thân (số 16+).
+  it('văn phòng tải được ảnh số hai chữ số: tải trước số 12 và đường cũ kèm thân', async () => {
+    const d = taoD1That()
+    d.sql.prepare('INSERT INTO hoc_sinh (sbd, ho_ten, lop, mat_khau, cap_nhat_luc) VALUES (?,?,?,?,?)').run('A1', 'Nguyễn Văn An', '12', 'mk123456', 'x')
+    const env = d.env as unknown as Env
+    await gv(env, '/gv/ai-ddh/che-do', { cheDo: 'bat' })
+    const token = await gameToken(env, 'A1')
+    const anh = btoa('JPEGDATA')
+    expect(await hsAnhAiDdh(env, { token, maTin: 'anh-00002', so: 12, anh })).toEqual({ ok: true })
+    expect(await hsGuiAiDdh(env, { token, maTin: 'anh-00002', chu: '', anhSo: [12] }, NOW)).toMatchObject({ ok: true })
+    expect(await hsGuiAiDdh(env, { token, maTin: 'anh-00003', chu: '', anh: [anh] }, NOW + 1)).toMatchObject({ ok: true })
+    const khoa = (d.sql.prepare('SELECT anh_json FROM ai_ddh_tin ORDER BY luc').all() as { anh_json: string }[]).flatMap((x) => JSON.parse(x.anh_json) as string[])
+    expect(khoa).toEqual(['ai-ddh/A1/anh-00002-12.jpg', 'ai-ddh/A1/anh-00003-16.jpg'])
+    for (const k of khoa) { const r = await gv(env, '/gv/ai-ddh/anh', { khoa: k }); expect(r.ok).toBe(true); expect(String(r.base64).length).toBeGreaterThan(0) }
+    expect((await gv(env, '/gv/ai-ddh/anh', { khoa: 'ai-ddh/A1/anh-00002-123.jpg' })).ok).toBe(false)
+  })
 })
 
 // 25/10 tối (thầy: "tối ưu chuyên sâu tốc độ tức thì cho a.i trên app hs"): chữ hiện dần + giữ đường.

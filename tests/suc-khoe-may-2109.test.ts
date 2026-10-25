@@ -44,6 +44,11 @@ describe('mức sức khoẻ', () => {
     expect(s.soLuot).toBe(15); expect(s.theoLenh.map((x) => x.duong)).toEqual(['/a', '/b']); expect(s.theoLenh[1]).toMatchObject({ soLuot: 5, p50Ms: 900 })
     xoaSucKhoe(); for (let i = 0; i < 12; i++) dat(i + 1, 10, `/l${i}`, T + i * 100); expect(sucKhoeMay(T + 5000).theoLenh).toHaveLength(8)
   })
+  it('lệnh GIỮ ĐƯỜNG của A.I (cố ý chờ tới 10 giây) không kéo máy chủ thành «nghẽn»', () => {
+    dat(25, 80, '/hs/home'); dat(10, 10_000, '/hs/ai-ddh/tin', T + 10); dat(5, 8_000, '/gv/ai-ddh/hang-cho', T + 20)
+    const s = sucKhoeMay(T + 100)
+    expect(s.soLuot).toBe(25); expect(s.muc).toBe('tot'); expect(nhipDeNghi(T + 100).heSo).toBe(1)
+  })
   it('tenLenh: giữ tên hành động game, gộp mã dài của phiếu/đề', () => {
     expect(tenLenh('/game-v2/answer')).toBe('/game-v2/answer'); expect(tenLenh('/hs/ke-hoach-ngay/')).toBe('/hs/ke-hoach-ngay'); expect(tenLenh('/phieu/ABC123')).toBe('/phieu/*'); expect(tenLenh('/de/DH-12-C1')).toBe('/de/*')
     expect(tenLenh('/' + 'x'.repeat(200)).length).toBeLessThanOrEqual(60)

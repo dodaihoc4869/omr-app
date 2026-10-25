@@ -10,7 +10,9 @@ export const TOI_DA_MAU = 800
 export const NGUONG_BAN_MS = 1500
 export const NGUONG_NGHEN_MS = 3500
 export const TOI_THIEU_MAU = 20
-const DUONG_KHONG_DO = new Set(['/gv/suc-khoe-may-chu', '/khoe', '/do-tai'])
+// Lệnh GIỮ ĐƯỜNG (A.I Đỗ Đại Học 25/10): máy chủ cố ý chờ tới 10 giây khi chưa có tin ⇒ thời gian đó KHÔNG phải chậm. Đo vào p95 thì một isolate báo «nghẽn»
+// và MỌI máy em giãn nhịp hỏi nền ×4 (đo bản sống 25/10 22:25: 5/40 phản hồi báo bận/nghẽn) ⇒ không đo hai lệnh này.
+const DUONG_KHONG_DO = new Set(['/gv/suc-khoe-may-chu', '/khoe', '/do-tai', '/hs/ai-ddh/tin', '/gv/ai-ddh/hang-cho'])
 
 interface Mau { at: number; ms: number; duong: string }
 let vong: Mau[] = []

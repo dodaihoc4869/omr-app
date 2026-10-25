@@ -47,7 +47,7 @@ describe('Chữa câu gọn — màn em', () => {
     fireEvent.click(kiem)
     expect(await screen.findByRole('heading', { name: 'Em đã tự sửa xong câu này' })).toBeTruthy()
     expect(api.apiGonNop).toHaveBeenCalledWith('t', 'D1', 'Q', 'A', expect.any(String))
-    expect(xong()).toEqual(['D1'])
+    expect(xong()).toEqual(['D1', 'Q']) // mã đợt + mã câu (25/10: mục ngày có thể mang mã đợt khác)
     fireEvent.click(screen.getByRole('button', { name: 'Câu tiếp theo' }))
     expect(onTiep).toHaveBeenCalledOnce()
     // Lời giải chỉ mở khi em bấm.
@@ -75,7 +75,7 @@ describe('Chữa câu gọn — màn em', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
     expect(await screen.findByRole('heading', { name: 'Chưa đúng · xem đáp án và lời giải' })).toBeTruthy()
     expect(screen.getByText('Đáp án đúng')).toBeTruthy()
-    expect(xong()).toEqual(['D1'])
+    expect(xong()).toEqual(['D1', 'Q']) // mã đợt + mã câu (25/10: mục ngày có thể mang mã đợt khác)
   })
 
   it('đúng mà chưa qua luật tự làm (vừa sai hôm nay) ⇒ "xong phần hôm nay" + lý do thật, không gọi là đã tự sửa', async () => {
@@ -88,14 +88,14 @@ describe('Chữa câu gọn — màn em', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
     expect(await screen.findByRole('heading', { name: 'Đúng rồi · xong phần hôm nay' })).toBeTruthy()
     expect(screen.queryByText('Em đã tự sửa xong câu này')).toBeNull()
-    expect(xong()).toEqual(['D1'])
+    expect(xong()).toEqual(['D1', 'Q']) // mã đợt + mã câu (25/10: mục ngày có thể mang mã đợt khác)
   })
 
   it('không mở được câu ⇒ báo thật + Hỏi thầy; vẫn tính xong phần hôm nay (không kẹt chặng)', async () => {
     api.apiGonMo.mockResolvedValue({ ok: false, ma: 'KHONG_MO_DUOC_CAU', loi: 'Chưa mở được câu này ở đây. Em bấm Hỏi thầy nhé.' })
     render(<Man token="t" qid="Q" onVe={() => {}} />)
     expect(await screen.findByRole('heading', { name: 'Chưa mở được câu này ở đây' })).toBeTruthy()
-    expect(xong()).toEqual(['D1'])
+    expect(xong()).toEqual(['D1', 'Q']) // mã đợt + mã câu (25/10: mục ngày có thể mang mã đợt khác)
     expect(api.apiPhatItem).not.toHaveBeenCalled()
   })
 

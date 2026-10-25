@@ -255,6 +255,7 @@ export default function ManChuaCauSai({
       // 24/10: sổ học đã đóng lỗi câu này (máy chủ trả «chưa có lỗi đang mở» kèm mã đợt) ⇒ tính xong phần hôm nay, không để chặng kẹt ở khung lỗi.
       if (!r.ok && r.ma === 'CHUA_CO_LOI' && r.dotId) {
         ghiXongHomNay(r.dotId)
+        ghiXongHomNay(qid)
         setDaXongSo(r.daDong ? 'dong' : 'chua_thay')
         setTai(false)
         return
