@@ -123,3 +123,17 @@ Các trạng thái chung: đang tải (khung xám đúng chỗ câu), rỗng ("H
 | Lệnh `chua-gon-nop`, lọc 14 ngày trong lệnh danh sách, đồng bộ với game | **chưa có làn rõ — báo Boss** (Codex PR318 đã chạm đường đọc) | `server/src/chua-cau-sai*.ts`, chỗ ghi sổ game |
 | Dòng phụ huynh | làn phụ huynh (Boss chỉ định) | `ph-v3` |
 | Thống nhất luật "đã vững", đóng đợt cũ | Boss | — |
+
+## 10. Đã build (thầy 25/10: "BẠN SỬA THEO ĐỀ XUẤT LUÔN RỒI ĐẨY LÊN APP LUÔN")
+Thầy cho build thẳng, bỏ bước duyệt ảnh. Các câu ở mục 8 chốt theo mặc định: không EXP; đúng sau gợi ý chưa tính "Đã tự sửa"; ẩn đường cũ khỏi màn em (dữ liệu giữ nguyên).
+- **Máy chủ** `server/src/chua-gon.ts` (luật) + `server/src/chua-gon-lenh.ts` (lệnh `gon-mo`, `gon-nop`), migration chỉ-thêm `migration-2510-chua-gon.sql` (bảng `chua_gon_lan`).
+- **Đóng đợt em đã làm đúng lại**: chạy đầu lô đọc của lệnh danh sách, theo từng em, khi em mở Tự sửa lỗi (không chạy một lượt cho cả trung tâm). Đếm `xongHomNay`.
+- **Sửa lỗi mở lại**: đợt đã đóng mà em sai lại ⇒ thêm đợt mới (trước: kẹt "Đã tự sửa").
+- **Màn em**: `src/components/chua-cau-sai/ChuaGon.tsx`; nhãn Cần sửa / Đã tự sửa; Việc hôm nay xếp câu sai trước hôm nay lên đầu; thẻ Hôm nay có "Đã tự sửa hôm nay: N câu"; nút "Câu tiếp theo".
+- Máy chủ chưa có lệnh gọn (mất nối) ⇒ màn tự đi lối cũ.
+
+**Chưa làm (cắt có chủ ý):**
+1. Câu anh em (cùng dạng, khác nội dung) chưa vào bậc bản làm lại; xáo phương án câu gốc chưa làm ⇒ câu gốc chỉ tính "Đã tự sửa" khi làm ở ngày khác ngày sai.
+2. Đóng tự động chưa xét lượt làm trên câu anh em (`raw_json.tc`).
+3. Gợi ý: bước 1 của bài luyện từng bước nếu có (4,7% đợt), còn lại là gợi ý chung theo phần (I/II/III) + tên dạng — chưa phải gợi ý riêng từng câu.
+4. Dòng phụ huynh "Tuần này con tự sửa N câu" (làn phụ huynh) chưa làm.
