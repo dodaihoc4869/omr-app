@@ -13,6 +13,24 @@ describe('schema Hỏi thầy: cổng trước khi đổi bản sống', () => {
     expect(String(query.mock.calls[0][0])).toContain('kiem_tra_ca_nhan_chang')
     expect(query.mock.calls.slice(1).map(x => x[0])).toEqual(sqls)
   })
+  it('25/10: có chờ ⇒ còn chặng thì chờ, hết chặng là chạy ngay; quá hạn chờ vẫn dừng; không đọc được thì dừng ngay', async () => {
+    let t = 0
+    const ngu = vi.fn(async (ms: number) => { t += ms })
+    const bayGio = () => t
+    const tra = [[{ n: 2 }], [{ n: 1 }], [{ n: 0 }]]
+    const query = vi.fn(async (sql: string) => (String(sql).includes('kiem_tra_ca_nhan_chang') ? tra.shift()! : []))
+    expect(await apSchemaHoiThay(query, sqls, { choMs: 60_000, nhipMs: 20_000, ngu, bayGio })).toMatchObject({ schemaHoiThay: true, daChoGiay: 40 })
+    expect(ngu).toHaveBeenCalledTimes(2)
+    t = 0
+    const conMai = vi.fn(async (sql: string) => (String(sql).includes('kiem_tra_ca_nhan_chang') ? [{ n: 1 }] : []))
+    await expect(apSchemaHoiThay(conMai, sqls, { choMs: 60_000, nhipMs: 20_000, ngu, bayGio })).rejects.toThrow('dừng phát hành')
+    expect(conMai.mock.calls.every((c) => String(c[0]).includes('kiem_tra_ca_nhan_chang'))).toBe(true)
+    for (const r of [[], [{ n: 'khong_ro' }]]) {
+      const q = vi.fn(async () => r)
+      await expect(apSchemaHoiThay(q, sqls, { choMs: 60_000, ngu, bayGio })).rejects.toThrow('dừng phát hành')
+      expect(q).toHaveBeenCalledTimes(1)
+    }
+  })
   it('ca cá nhân đang làm hoặc không đọc được thì không chạy DDL nào', async () => {
     for (const r of [[{ n: 1 }], [], [{ n: 'khong_ro' }]]) {
       const query = vi.fn(async () => r)
