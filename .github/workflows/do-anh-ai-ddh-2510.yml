@@ -1,0 +1,48 @@
+# KIỂM ẢNH A.I ĐỖ ĐẠI HỌC (chỉ đọc, 25/10 tối, thầy: «nó không đọc được ảnh»). 20 tin có ảnh gần nhất: dạng khoá (đuôi số), ảnh có trên R2 không (cỡ byte),
+# văn phòng trả lời bằng nguồn nào. Không in mã em, không chữ tin, không khoá đầy đủ (repo công khai).
+name: Kiểm ảnh A.I Đỗ Đại Học (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-anh-ai-ddh-2510.yml']
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiểm
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          SQL="SELECT e.id, e.anh_json a, e.luc l, e.trang_thai t, (SELECT GROUP_CONCAT(v.nguon) FROM ai_ddh_tin v WHERE v.tra_loi_cho = e.id) ng FROM ai_ddh_tin e WHERE e.ben = 'em' AND e.anh_json <> '[]' ORDER BY e.luc DESC LIMIT 20"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL" > /tmp/t.json
+          python3 - <<'PY' > /tmp/khoa.txt
+          import json, datetime
+          for r in json.load(open('/tmp/t.json'))[0]['results']:
+              ks = json.loads(r['a'] or '[]')
+              gio = datetime.datetime.utcfromtimestamp(r['l']/1000 + 7*3600).strftime('%d/%m %H:%M')
+              print(gio, r['t'], r['ng'] or '-', '|'.join(ks))
+          PY
+          n=0
+          while read -r gio t ng ks; do
+            n=$((n+1)); ra="#$n $gio trạng thái=$t trả lời=$ng ảnh:"
+            IFS='|' read -ra K <<< "$ks"
+            for k in "${K[@]}"; do
+              c=$(npx -y wrangler@4 r2 object get "omr-de/$k" --remote --pipe 2>/dev/null | wc -c)
+              duoi=$(echo "$k" | grep -oE -- '-[0-9]+\.jpg$')
+              hop=$(echo "$k" | grep -qE -- '-[0-9]\.jpg$' && echo khớp || echo LỆCH)
+              ra="$ra [$duoi ${c}B khoá=$hop]"
+            done
+            echo "$ra"
+          done < /tmp/khoa.txt
