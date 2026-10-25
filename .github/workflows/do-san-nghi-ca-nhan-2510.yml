@@ -1,0 +1,104 @@
+# ĐO SÀN NGHĨ RIÊNG TỪNG EM (CHỈ ĐỌC, 25/10 — thầy: «Làm luôn đi» cá nhân hoá sàn nghĩ Mức làm 2→3). Chỉ in SỐ GỘP: không mã em, không tên, không mã câu (repo công khai).
+# Lượt = su_kien_hoc có raw_json.doc.dh = 1, 21 ngày, không xem lời giải/lướt, bỏ lượt treo; CHỈ câu MỚI THẬT (chưa gặp, không song sinh) ⇒ hệ số lặp = 1.
+# nghĩ = giây − T_đọc của em; T_đọc của em = (8 + 0,35 × số từ + 10 nếu có hình) × e^(−0,7·τ) kẹp 0,6–1,6 (muc-lam.ts). Em chỉ hiện bằng số thứ tự ẩn danh, không in ra.
+name: Đo sàn nghĩ cá nhân (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-san-nghi-ca-nhan-2510.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-san-nghi-ca-nhan
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Lấy lượt ẩn danh (chỉ SELECT) rồi tính gộp
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          J() { echo "json_extract(s.raw_json,'\$.doc.$1')"; }
+          TD="(8 + 0.35*COALESCE($(J t),0) + 10*COALESCE($(J h),0))"
+          TREO="(COALESCE($(J l),0)>=300 OR COALESCE($(J a),0)>=600 OR ($(J w)=1 AND COALESCE($(J a),0)>=180) OR COALESCE($(J n),0)>=3)"
+          GAP="EXISTS (SELECT 1 FROM su_kien_hoc s2 WHERE s2.sbd=s.sbd AND s2.qid=s.qid AND s2.luc < s.luc)"
+          SQL="SELECT DENSE_RANK() OVER (ORDER BY s.sbd) e, $(J p) p, s.giay g, s.ket_qua k, $TD td, (SELECT o.tau FROM omni_em o WHERE o.sbd=s.sbd AND o.n_tau>=5) tau, s.luc l FROM su_kien_hoc s WHERE s.ngay_vn >= date('now','+7 hours','-21 days') AND COALESCE(s.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc') AND $(J dh)=1 AND s.giay IS NOT NULL AND s.ket_qua IN (0,1) AND json_extract(s.raw_json,'\$.tc') IS NULL AND NOT $TREO AND NOT $GAP"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL" > /tmp/luot.json
+          python3 - <<'PY'
+          import json, math, statistics as st
+          rows = json.load(open('/tmp/luot.json'))[0]['results']
+          print('LUOT', len(rows), 'EM', len({r['e'] for r in rows}), 'CO_TAU', len({r['e'] for r in rows if r['tau'] is not None}))
+          def f(t): return 1.0 if t is None else min(1.6, max(0.6, math.exp(-0.7 * t)))
+          SAN = {'I': 6, 'II': 12, 'III': 15}
+          for r in rows: r['ng'] = r['g'] - r['td'] * f(r['tau'])
+          for p in ('I', 'II', 'III'):
+              x = [r for r in rows if r['p'] == p]
+              if not x: continue
+              print(f'\n=== PHẦN {p}: {len(x)} lượt, đúng {sum(r["k"] for r in x)}')
+              # 1. Đúng theo giây NGHĨ (sau khi đọc xong) — tìm chỗ tỉ lệ đúng tụt về mức đoán.
+              bins = [(-1e9, 0), (0, 2), (2, 4), (4, 6), (6, 9), (9, 12), (12, 16), (16, 22), (22, 30), (30, 45), (45, 1e9)]
+              print('1 nghĩ(giây) n đúng%:', ' | '.join(f'{a if a>-1e8 else "<"}–{b if b<1e8 else "+"}: {len(z)} {round(100*sum(r["k"] for r in z)/len(z))}%' for a, b in bins for z in [[r for r in x if a <= r['ng'] < b]] if z))
+              # 2. τ có kéo theo tốc độ NGHĨ không: trung vị giây nghĩ của lượt ĐÚNG (nghĩ > 0) theo nhóm τ, mỗi em ≥ 5 lượt.
+              em = {}
+              for r in x:
+                  if r['k'] == 1 and r['ng'] > 0: em.setdefault(r['e'], []).append(r)
+              nh = {}
+              for e, z in em.items():
+                  if len(z) < 5: continue
+                  t = z[0]['tau']; k = 'chưa τ' if t is None else ('a <-0.3' if t < -0.3 else 'b -0.3–0' if t < 0 else 'c 0–0.3' if t < 0.3 else 'd ≥0.3')
+                  nh.setdefault(k, []).append((t, st.median(r['ng'] for r in z)))
+              print('2 τ → trung vị nghĩ (đúng):', ' | '.join(f'{k}: {len(v)} em, τ {round(st.mean(a for a,_ in v if a is not None),2) if k!="chưa τ" else "-"}, nghĩ {round(st.median(b for _,b in v),1)}s' for k, v in sorted(nh.items())))
+              # 3. Hồi quy log(trung vị nghĩ) theo τ ⇒ hệ số k của e^(−k·τ).
+              pts = [(t, math.log(m)) for v in nh.values() for t, m in v if t is not None and m > 0]
+              if len(pts) >= 8:
+                  mt = st.mean(a for a, _ in pts); my = st.mean(b for _, b in pts)
+                  sxx = sum((a - mt) ** 2 for a, _ in pts); sxy = sum((a - mt) * (b - my) for a, b in pts)
+                  k = -sxy / sxx if sxx else 0
+                  r2 = (sxy ** 2 / (sxx * sum((b - my) ** 2 for _, b in pts))) if sxx else 0
+                  print(f'3 hồi quy: {len(pts)} em, k = {k:.2f} (nghĩ ∝ e^(−k·τ)), R² = {r2:.2f}')
+              # 4. Sàn RIÊNG từng em theo số đo của chính em (q25 nghĩ lượt đúng), ổn định hai nửa (chẵn/lẻ theo thời gian)?
+              on = lech = tong = 0
+              for e, z in em.items():
+                  z = sorted(z, key=lambda r: r['l'])
+                  a = [r['ng'] for i, r in enumerate(z) if i % 2 == 0]; b = [r['ng'] for i, r in enumerate(z) if i % 2 == 1]
+                  if len(a) < 6 or len(b) < 6: continue
+                  qa = st.quantiles(a, n=4)[0]; qb = st.quantiles(b, n=4)[0]; tong += 1
+                  d = abs(qa - qb) / max(0.5, (qa + qb) / 2); on += d < 0.25; lech += d >= 0.5
+              print(f'4 q25 nghĩ riêng ổn định hai nửa: {tong} em, lệch <25%: {on}, lệch ≥50%: {lech}')
+              # 5. So cách đặt sàn: lượt trong vùng Mức 2 (0 ≤ nghĩ < sàn) phải đúng THẤP, trên sàn đúng CAO. Thử trên NỬA LẺ, sàn học từ nửa chẵn.
+              def thu(ten, san_cua):
+                  d2 = n2 = d3 = n3 = 0
+                  for r in x:
+                      if r['ng'] < 0: continue
+                      s = san_cua(r)
+                      if s is None: continue
+                      if r['ng'] < s: n2 += 1; d2 += r['k']
+                      else: n3 += 1; d3 += r['k']
+                  print(f'5 {ten}: Mức 2 {n2} lượt đúng {round(100*d2/max(1,n2))}% · trên sàn {n3} lượt đúng {round(100*d3/max(1,n3))}%')
+              thu('sàn chung hiện tại', lambda r: SAN[p])
+              for kk in (0.35, 0.7, 1.0):
+                  thu(f'sàn chung × e^(−{kk}τ)', lambda r, kk=kk: SAN[p] * (1.0 if r['tau'] is None else min(1.6, max(0.6, math.exp(-kk * r['tau'])))))
+              # Sàn riêng thực nghiệm: q25 nghĩ lượt đúng của nửa chẵn, co về sàn chung theo số lượt (n/(n+10)); thử trên nửa lẻ.
+              rieng = {}
+              for e, z in em.items():
+                  z = sorted(z, key=lambda r: r['l']); a = [r['ng'] for i, r in enumerate(z) if i % 2 == 0]
+                  if len(a) >= 4: w = len(a) / (len(a) + 10); rieng[e] = w * st.quantiles(a, n=4)[0] + (1 - w) * SAN[p]
+              le = {id(r) for e, z in em.items() for i, r in enumerate(sorted(z, key=lambda r: r['l'])) if i % 2 == 1}
+              sai_hay_le = [r for r in x if r['k'] == 0 or id(r) in le]
+              x0 = x; x = sai_hay_le
+              thu('sàn chung (cùng tập thử)', lambda r: SAN[p] if r['e'] in rieng else None)
+              thu('sàn riêng q25 co về chung', lambda r: rieng.get(r['e']))
+              x = x0
+              print(f'   số em có sàn riêng: {len(rieng)}; sàn riêng: ' + ' / '.join(f'{q:.1f}' for q in st.quantiles(sorted(rieng.values()), n=10)) if len(rieng) >= 10 else '')
+          PY
