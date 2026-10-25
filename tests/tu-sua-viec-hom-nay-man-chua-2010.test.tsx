@@ -4,7 +4,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
-const api = vi.hoisted(() => ({ apiMoDot: vi.fn(), apiPhatItem: vi.fn(), apiNopItem: vi.fn(), apiXinGoiY: vi.fn(), apiCoChua: vi.fn() }))
+const api = vi.hoisted(() => ({ apiMoDot: vi.fn(), apiPhatItem: vi.fn(), apiNopItem: vi.fn(), apiXinGoiY: vi.fn(), apiCoChua: vi.fn(),
+  // Chữa câu gọn (25/10): máy chủ CHƯA có lệnh gọn (mất nối / bản cũ) ⇒ màn đi lối cũ — tệp này kiểm lối lùi ấy.
+  apiGonMo: vi.fn(async () => ({ ok: false, loi: 'Chưa nối được máy chủ.' })) }))
 vi.mock('../src/lib/chua-cau-sai-api', () => api)
 import Man from '../src/components/chua-cau-sai/ManChuaCauSai'
 import { LUAT_BAN_MOI } from '../src/lib/chua-truc-tiep'

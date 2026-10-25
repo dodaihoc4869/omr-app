@@ -10,6 +10,8 @@ import {
   apiPhatItem,
   apiNopItem,
   apiXinGoiY,
+  apiGonMo,
+  type KetQuaGon,
   type KetQuaDot,
   type KetQuaNop,
   type ItemCongKhai,
@@ -21,6 +23,7 @@ import { khopPhanIII } from '../../lib/cham-so'
 import TheCau from '../TheCau'
 import { BangSoLieu, ZoomableImage } from '../QuestionMedia'
 import ChuaTrucTiep, { propsCauLam } from './ChuaTrucTiep'
+import ChuaGon from './ChuaGon'
 import { TrongManChua } from './trong-man-chua'
 import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
@@ -36,7 +39,11 @@ export interface PropsChuaCauSai {
   /** Đợt 16 (12/10): câu mở thẳng KHÔNG có trong danh sách Tự chữa — lệnh mở đợt (`mo-dot`, y như cũ) không mở được thì giao lời báo cho màn
    *  gọi (về danh sách kèm lời báo thật) thay cho khung "Chưa mở được câu này". Vắng ⇒ như cũ. */
   onKhongMo?: (loi: string) => void
+  /** Chữa câu gọn (25/10): sang câu kế của Việc hôm nay sau khi câu này khép. Vắng ⇒ nút về như cũ. */
+  onTiep?: () => void
 }
+/** Mã lỗi của lệnh gọn (máy chủ ĐÃ có đường gọn) ⇒ vẫn ở đường gọn để báo thật; mã khác / mất mạng ⇒ lối cũ. */
+const MA_GON = new Set(['KHONG_MO_DUOC_CAU', 'KHONG_CO_DOT'])
 function IconVe() {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -186,6 +193,7 @@ export default function ManChuaCauSai({
   onVe,
   nhanVe = 'Sang câu khác',
   onKhongMo,
+  onTiep,
 }: PropsChuaCauSai) {
   const [ph, setPh] = useState<KetQuaDot | null>(null),
     [tai, setTai] = useState(true),
@@ -196,7 +204,9 @@ export default function ManChuaCauSai({
     [goi, setGoi] = useState(''),
     [ban, setBan] = useState(false),
     [cho, setCho] = useState<LanNop | null>(null),
-    [lanTai, setLanTai] = useState(0)
+    [lanTai, setLanTai] = useState(0),
+    /** Chữa câu gọn (25/10): đợt mở được ⇒ một đường cho mọi câu (ChuaGon); máy chủ chưa có lệnh gọn ⇒ lối cũ như trước. */
+    [gon, setGon] = useState<{ dotId: string; dau: KetQuaGon } | null>(null)
   const mucGoi = useRef(0)
   const khongMoRef = useRef(onKhongMo)
   khongMoRef.current = onKhongMo
@@ -237,7 +247,9 @@ export default function ManChuaCauSai({
     ;(async () => {
       // 13/10 (thầy: "chỗ này mở câu quá lâu"): mở đợt + phát bước đầu MỘT lượt đi-về; máy chủ cũ không trả `phat` ⇒ gọi phat-item như trước.
       setDaXongSo('')
-      const r = await apiMoDot(token, qid)
+      setGon(null)
+      // Chữa câu gọn (thầy 25/10): mở đợt KHÔNG phát bước đầu (đường gọn không dùng phiên từng bước) rồi xin bản làm lại.
+      const r = await apiMoDot(token, qid, undefined, false)
       const phat = docPhatKem(r.phat)
       if (huy || n !== goiRef.current) return
       // 24/10: sổ học đã đóng lỗi câu này (máy chủ trả «chưa có lỗi đang mở» kèm mã đợt) ⇒ tính xong phần hôm nay, không để chặng kẹt ở khung lỗi.
@@ -253,6 +265,13 @@ export default function ManChuaCauSai({
           return
         }
         setLoi(r.loi ?? 'Chưa mở được câu chữa.')
+        setTai(false)
+        return
+      }
+      const g = await apiGonMo(token, r.dotId)
+      if (huy || n !== goiRef.current) return
+      if (g.ok || (g.ma && MA_GON.has(g.ma))) {
+        setGon({ dotId: r.dotId, dau: g })
         setTai(false)
         return
       }
@@ -358,7 +377,7 @@ export default function ManChuaCauSai({
       : null
   return (
     <TrongManChua.Provider value={true}>
-    <div className="tlu ccs" data-tuyen={trucTiep ? 'truc-tiep' : 'tung-buoc'} aria-label="Chữa câu sai">
+    <div className="tlu ccs" data-tuyen={gon ? 'gon' : trucTiep ? 'truc-tiep' : 'tung-buoc'} aria-label="Chữa câu sai">
       <header className="ccs-dau">
         <button
           className="ccs-ve"
@@ -373,10 +392,10 @@ export default function ManChuaCauSai({
         <div className="ccs-dau-giua">
           <h1 className="ccs-tieu">{tenCau ?? 'Sửa câu này'}</h1>
           <span className="ccs-nhan-trang-thai">
-            {trucTiep ? 'Sửa trên câu gốc' : 'Sửa từng bước'}
+            {gon ? 'Sửa câu sai' : trucTiep ? 'Sửa trên câu gốc' : 'Sửa từng bước'}
           </span>
         </div>
-        {soBuoc > 0 && !trucTiep && (
+        {soBuoc > 0 && !trucTiep && !gon && (
           <div
             className="ccs-dau-tien-do"
             aria-label={`Đã hiểu ${soBuocDaQua} trong ${soBuoc} bước`}
@@ -392,6 +411,8 @@ export default function ManChuaCauSai({
             <span className="ccs-dang-tai-vong" aria-hidden="true" />
             <strong>Đang mở câu…</strong>
           </div>
+        ) : gon ? (
+          <ChuaGon key={gon.dotId} token={token} qid={qid} dotId={gon.dotId} dau={gon.dau} nhanVe={nhanVe} onVe={onVe} onTiep={onTiep} />
         ) : trucTiep && ph ? (
           <ChuaTrucTiep
             token={token}

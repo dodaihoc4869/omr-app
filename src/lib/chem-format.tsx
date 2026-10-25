@@ -338,8 +338,10 @@ export function cumCauHinhElectron(day: string): { lop: string; soE: string }[] 
   return ra.length > 0 ? ra : null
 }
 
-/** Ký tự được phép nằm trong một dãy cấu hình electron. */
-const KY_TU_CAU_HINH = /[0-9spdf]/
+/** Ký tự được phép nằm trong một dãy cấu hình electron. `^ { }`: dạng có dấu mũ `1s^22s^2`, `[Ar]3d^{10}4s^2` (thầy chụp 25/10/2026:
+ * luật `^` + dãy số là luật THAM nên `1s^22s^22p^6` từng hiện 1s²²s²²p⁶) — bỏ dấu mũ rồi tách như dạng viết liền. */
+const KY_TU_CAU_HINH = /[0-9spdf^{}]/
+
 
 /** Ký tự đứng SÁT trước hoặc sau dãy mà làm dãy đó không còn là cấu hình.
  *
@@ -512,7 +514,7 @@ function parseChemTextDon(text: string): ChemPart[] {
       let cuoi = i
       while (cuoi < text.length && KY_TU_CAU_HINH.test(text[cuoi])) cuoi++
       if (!chanCauHinh(text[cuoi])) {
-        const cum = cumCauHinhElectron(text.slice(i, cuoi))
+        const cum = cumCauHinhElectron(text.slice(i, cuoi).replace(/[\^{}]/g, ''))
         if (cum) {
           for (const c of cum) {
             pushText(c.lop)

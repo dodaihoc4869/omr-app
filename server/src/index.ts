@@ -91,6 +91,7 @@ import { tuLuyen } from './tu-luyen'
 import { tinhNangBat as tinhNangChuaBat } from './chua-cau-sai-cau-hinh'
 import { hangChieu, daChuaTrenLop } from './chua-cau-sai-chieu'
 import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, danhSach as chuaDanhSach } from './chua-cau-sai'
+import { gonMo as chuaGonMo, gonNop as chuaGonNop } from './chua-gon-lenh'
 import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
@@ -3689,6 +3690,9 @@ const boXuLy = {
       if (p === '/hs/chua-cau-sai/phat-item') return raChua(await chuaPhatItem(env, b))
       if (p === '/hs/chua-cau-sai/nop-item') return raChua(await chuaNopItem(env, b))
       if (p === '/hs/chua-cau-sai/xin-goi-y') return raChua(await chuaXinGoiY(env, b))
+      // CHỮA CÂU GỌN (thầy 25/10, server/src/chua-gon-lenh.ts): mở bản làm lại (không đáp án) · nộp (máy chủ chấm, đúng lần 1 qua luật tự làm ⇒ Đã tự sửa ngay).
+      if (p === '/hs/chua-cau-sai/gon-mo') return raChua(await chuaGonMo(env, b))
+      if (p === '/hs/chua-cau-sai/gon-nop') return raChua(await chuaGonNop(env, b))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.
