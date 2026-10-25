@@ -12,6 +12,8 @@ export interface TinAiDdh {
   trangUrl: string
   boDe: { ten?: string; moTa?: string; link?: string; soDe?: number } | null
   trangThai: string
+  /** Tin văn phòng: mã tin em nó trả lời (25/10) — có ⇒ tin em ấy đã xong. */
+  traLoiCho: string
   luc: number
 }
 export interface MoAiDdh { bat: boolean; khoa: 'kiem_tra' | null; vanPhongTruc: boolean; conLuot: number; tranLuot: number; tin: TinAiDdh[] }
@@ -44,7 +46,7 @@ const docTin = (x: unknown): TinAiDdh | null => {
   return {
     id: o.id, ben: o.ben, chu: typeof o.chu === 'string' ? o.chu : '', anh: Number(o.anh) || 0, nguon: typeof o.nguon === 'string' ? o.nguon : '',
     chiGoiY: o.chiGoiY === true, trangUrl: typeof o.trangUrl === 'string' && /^https:\/\//.test(o.trangUrl) ? o.trangUrl : '', boDe: bd,
-    trangThai: typeof o.trangThai === 'string' ? o.trangThai : '', luc: Number(o.luc) || 0,
+    trangThai: typeof o.trangThai === 'string' ? o.trangThai : '', traLoiCho: typeof o.traLoiCho === 'string' ? o.traLoiCho : '', luc: Number(o.luc) || 0,
   }
 }
 const dsTin = (x: unknown) => (Array.isArray(x) ? x.map(docTin).filter((t): t is TinAiDdh => !!t) : [])
@@ -59,9 +61,19 @@ export async function tinMoiAiDdh(token: string, sau: number): Promise<KQ<{ vanP
   const r = await goi('/hs/ai-ddh/tin', { token, sau })
   return r.ok ? { ok: true, du: { vanPhongTruc: r.du.vanPhongTruc === true, tin: dsTin(r.du.tin) } } : r
 }
-export async function guiAiDdh(token: string, maTin: string, chu: string, anh: string[]): Promise<KQ<TinAiDdh | null>> {
+/** Gửi một tin; `them` = trả lời máy chủ trả NGAY (chào hỏi, cảm ơn — không chờ văn phòng). */
+export async function guiAiDdh(token: string, maTin: string, chu: string, anh: string[]): Promise<KQ<{ tin: TinAiDdh | null; them: TinAiDdh[] }>> {
   const r = await goi('/hs/ai-ddh/gui', { token, maTin, chu, anh })
-  return r.ok ? { ok: true, du: docTin(r.du.tin) } : r
+  return r.ok ? { ok: true, du: { tin: docTin(r.du.tin), them: dsTin(r.du.them) } } : r
+}
+
+/** Gộp tin mới vào danh sách: tin đã có thì thay, tin mới thì nối; tin văn phòng trả lời tin nào ⇒ tin em ấy chuyển «xong» (tắt «Thầy đang soạn»). */
+export function gopTin(cu: TinAiDdh[], moi: TinAiDdh[]): TinAiDdh[] {
+  if (!moi.length) return cu
+  const xong = new Set(moi.filter((x) => x.ben === 'vp' && x.traLoiCho).map((x) => x.traLoiCho))
+  const theoId = new Map(moi.map((x) => [x.id, x]))
+  const co = new Set(cu.map((x) => x.id))
+  return [...cu.map((x) => theoId.get(x.id) ?? x), ...moi.filter((x) => !co.has(x.id))].map((x) => (x.ben === 'em' && xong.has(x.id) && x.trangThai !== 'xong' ? { ...x, trangThai: 'xong' } : x))
 }
 
 /** Mã tin do máy em tạo (bấm lặp / gửi lại khi có mạng ⇒ cùng một tin). */

@@ -63,3 +63,22 @@ describe('nơi gắn bong bóng', () => {
     expect(readFileSync('vite.config.ts', 'utf8')).toContain('BongBongAiDdh,ai-ddh-api,ai-ddh-dinh-dang')
   })
 })
+
+// 25/10 (thầy: "tốc độ nhắn chậm quá … khi vuốt nền ở dưới không chạy theo nữa").
+describe('trả lời ngay + gộp tin + khoá cuộn nền', () => {
+  it('văn phòng trả lời tin nào ⇒ tin em ấy hết «Thầy đang soạn»; tin cũ được thay, tin mới nối', async () => {
+    const { gopTin } = await import('../src/lib/ai-ddh-api')
+    const em = { id: 'e1', ben: 'em' as const, chu: 'Xin chào', anh: 0, nguon: '', chiGoiY: false, trangUrl: '', boDe: null, trangThai: 'dang', traLoiCho: '', luc: 1 }
+    const vp = { ...em, id: 'e1~0', ben: 'vp' as const, chu: 'Chào e', trangThai: 'xong', traLoiCho: 'e1', luc: 2 }
+    const ra = gopTin([em], [vp])
+    expect(ra.map((x) => [x.id, x.trangThai])).toEqual([['e1', 'xong'], ['e1~0', 'xong']])
+    expect(gopTin(ra, [])).toBe(ra)
+  })
+  it('tấm mở ghim body cố định (Safari iPhone), lớp phủ chặn kéo; nhịp chờ 1,5 giây', () => {
+    const s = readFileSync('src/components/ai-ddh/BongBongAiDdh.tsx', 'utf8')
+    expect(s).toMatch(/position: 'fixed', top: `-\$\{y\}px`/)
+    expect(s).toContain('window.scrollTo(0, y)')
+    expect(s).toContain('dangCho ? 1500')
+    expect(readFileSync('src/components/ai-ddh/ai-ddh.css', 'utf8')).toMatch(/\.aid-che \{[^}]*touch-action: none/)
+  })
+})
