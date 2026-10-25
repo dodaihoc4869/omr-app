@@ -37,7 +37,7 @@ function TinVanPhong({ t }: { t: TinAiDdh }) {
   return (
     <>
       {t.chu.trim() && (
-        <div className="aid-bt">
+        <div className={t.trangThai === 'viet' ? 'aid-bt aid-dang-viet' : 'aid-bt'}>
           {coKhoi ? (
             <div className="aid-giai">
               {khoi.map((k, i) => {
@@ -166,17 +166,20 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
   }, [token, sbd])
   useEffect(() => { if (mo) void taiMo() }, [mo, taiMo])
 
-  // Hỏi tin mới: đang chờ 1,5 giây (25/10 "tối ưu tức thì"); tấm mở 20 giây; tấm đóng mà còn chờ 60 giây.
+  // Hỏi tin mới: đang chờ 1 giây (25/10 "tối ưu tức thì"; tối: "tức thì hơn nữa" — trước 1,5 giây); tấm mở 20 giây; tấm đóng mà còn chờ 60 giây.
   // Vòng NỐI TIẾP (`batNhipBenVung`, đã có sẵn trong khung HS ⇒ không thêm byte): lượt sau chỉ hẹn khi lượt trước xong, tab ẩn không gọi, lỗi ⇒ thưa dần.
   const sauRef = useRef(sau)
   sauRef.current = sau
   useEffect(() => {
     if (!du?.bat) return
-    const ms = mo ? (dangCho || duoiNhanh ? 1500 : 20_000) : dangCho ? 60_000 : 0
+    // Đang chờ (tấm mở): GIỮ ĐƯỜNG — máy chủ chờ sẵn tới 10 giây, có tin là trả liền, rồi hỏi ngay lượt sau (chữ hiện dần tới từng nhịp ~0,7 giây).
+    const giuDuong = mo && (dangCho || duoiNhanh)
+    const ms = giuDuong ? 120 : mo ? 20_000 : dangCho ? 60_000 : 0
     if (!ms) return
     const v = batNhipBenVung(async () => {
-      const r = await tinMoiAiDdh(token, sauRef.current)
+      const r = await tinMoiAiDdh(token, sauRef.current, giuDuong ? 10_000 : 0)
       if (!r.ok) return false
+      if (giuDuong && !r.du.giu) await new Promise((x) => setTimeout(x, 900))     // máy chủ cũ chưa giữ đường: giữ nhịp 1 giây như trước
       setTruc(r.du.vanPhongTruc)
       if (!r.du.tin.length) return
       setTin((cu) => gopTin(cu, r.du.tin))
