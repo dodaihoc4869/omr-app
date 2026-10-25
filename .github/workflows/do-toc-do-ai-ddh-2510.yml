@@ -1,0 +1,54 @@
+# ĐO ĐỘ TRỄ A.I ĐỖ ĐẠI HỌC (chỉ đọc, 25/10, thầy: "con a.i trong app hs tức thì hơn nữa"). Chỉ in số gộp: không mã em, không chữ tin.
+# Mỗi tin em (7 ngày) ⇒ chờ hàng (lay_luc − luc) và xử lý (tin trả lời đầu tiên − lay_luc), theo loại trả lời (nguon) và có ảnh hay không.
+name: Đo độ trễ A.I Đỗ Đại Học (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-toc-do-ai-ddh-2510.yml']
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          SQL="SELECT e.luc l, e.lay_luc ll, (e.anh_json <> '[]') co_anh, LENGTH(e.chu) dai, (SELECT MIN(v.luc) FROM ai_ddh_tin v WHERE v.tra_loi_cho = e.id) tl, (SELECT v.nguon FROM ai_ddh_tin v WHERE v.tra_loi_cho = e.id ORDER BY v.luc LIMIT 1) ng, (SELECT COUNT(*) FROM ai_ddh_tin v WHERE v.tra_loi_cho = e.id) so_tl FROM ai_ddh_tin e WHERE e.ben = 'em' AND e.luc >= (CAST((julianday('now')-2440587.5)*86400000 AS INTEGER) - 7*86400000)"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL" > /tmp/t.json
+          python3 - <<'PY'
+          import json, statistics as st
+          rows = json.load(open('/tmp/t.json'))[0]['results']
+          print('TIN_EM', len(rows), 'CO_TRA_LOI', sum(1 for r in rows if r['tl']))
+          def q(xs):
+              xs = sorted(xs)
+              if not xs: return '-'
+              p = lambda f: xs[min(len(xs)-1, int(f*len(xs)))]
+              return f"n={len(xs)} trung vị {p(.5)/1000:.1f}s · p80 {p(.8)/1000:.1f}s · p95 {p(.95)/1000:.1f}s · max {xs[-1]/1000:.1f}s"
+          nhom = {}
+          for r in rows:
+              if not r['tl']: continue
+              k = ('ảnh' if r['co_anh'] else 'chữ') + ' · ' + (r['ng'] or '?')
+              nhom.setdefault(k, []).append(r)
+          for k, ds in sorted(nhom.items(), key=lambda x: -len(x[1])):
+              cho = [r['ll'] - r['l'] for r in ds if r['ll']]
+              xl = [r['tl'] - r['ll'] for r in ds if r['ll']]
+              tong = [r['tl'] - r['l'] for r in ds]
+              print(f'== {k}')
+              print('   tổng (em gửi → thấy trả lời):', q(tong))
+              print('   chờ hàng (gửi → văn phòng lấy):', q(cho))
+              print('   văn phòng xử lý (lấy → trả lời):', q(xl))
+          chua = [r for r in rows if not r['tl']]
+          print('CHƯA TRẢ LỜI', len(chua))
+          PY
