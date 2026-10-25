@@ -125,6 +125,10 @@ const DS_HN = [
     return [
       [`60-hn-may-tinh${t}`, 'gv-hom-nay&nh=1', 1440, 900, nen, true, /Hôm nay của thầy/, 'hn:cho'],
       [`61-hn-dien-thoai${t}`, 'gv-hom-nay&nh=1', 390, 844, nen, true, /Hôm nay của thầy/, 'hn:cho'],
+      // «Khối đậm» 25/10: có bậc (dải 12 cột) — 3 khổ
+      [`68-hn-kd-bac-may-tinh${t}`, 'gv-hom-nay&nh=1&bac=1', 1440, 900, nen, true, /Hôm nay của thầy/, 'hn:cho'],
+      [`68-hn-kd-bac-ngang${t}`, 'gv-hom-nay&nh=1&bac=1', 844, 390, nen, false, /Hôm nay của thầy/, 'hn:cho'],
+      [`68-hn-kd-bac-dien-thoai${t}`, 'gv-hom-nay&nh=1&bac=1', 390, 844, nen, true, /Hôm nay của thầy/, 'hn:cho'],
     ]
   }),
   ['62-hn-xem-du-luoi-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:xem-du-luoi'],

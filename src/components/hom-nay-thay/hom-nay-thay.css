@@ -254,3 +254,103 @@ button.gvhn-the-nut:hover:not(:disabled) { border-color: color-mix(in srgb, var(
   .nht-bac-xep { width: 100%; }
   .nht-tab[data-so='2'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ═════ «KHỐI ĐẬM» 25/10 — khối Nhịp học theo bản vẽ thầy duyệt (docs/ban-ve-khoi-dam-2510/gv-hom-nay.html): thẻ viền mực + bóng khối lệch,
+ * công tắc lọc viên thuốc (mục đang chọn tô vàng), dải 12 bậc thành 12 CỘT khối cao theo số em (biến --bcc-ti do DaiDemBac gắn), nút chữ thành nút khối.
+ * Mọi luật dưới [data-kd]; màu CHỈ var(--kd-*) hoặc biến sẵn có (--bac của từng bậc, --gvm-* của từng nhóm — giữ nguyên màu nhóm). ═════ */
+[data-kd] .gvhn-1210 .gvv2-the {
+  background: var(--kd-mat); border: var(--kd-day) solid var(--kd-muc); border-radius: var(--kd-bo); box-shadow: var(--kd-lech) var(--kd-lech) 0 var(--kd-bong);
+}
+[data-kd] .gvhn-1210 .gvv2-the.nht-the { border-radius: var(--kd-bo); }
+[data-kd] .gvhn-1210 .gvv2-the.nht-cot { border-radius: var(--kd-bo); }
+[data-kd] .gvhn-1210 :is(.nht-h2, .nht-cot-dau h3) { font-family: var(--kd-f-to); font-weight: 600; letter-spacing: -0.01em; }
+[data-kd] .gvhn-1210 .nht-h2 { color: var(--kd-muc); }
+[data-kd] .gvhn-1210 :is(.nht-dau-chu p, .nht-ghi, .nht-ghi-nho, .nht-cot-dau span, .nht-chu-giai, .nht-o-dk, .nht-hom-nay-so) { font-family: var(--kd-f-may); letter-spacing: .01em; }
+
+/* công tắc lọc kiểu viên thuốc */
+[data-kd] .gvhn-1210 .nht-khoi {
+  gap: 2px; padding: 3px; border: var(--kd-day) solid var(--kd-muc); border-radius: 999px; background: var(--kd-mat); box-shadow: 3px 3px 0 var(--kd-bong);
+}
+[data-kd] .gvhn-1210 .nht-khoi-nut {
+  min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: var(--kd-muc); box-shadow: none;
+  font: 500 13px/1 var(--kd-f-may); letter-spacing: .02em;
+}
+[data-kd] .gvhn-1210 .nht-khoi-nut[aria-checked='true'] {
+  background: var(--kd-vang); color: var(--kd-tren-mau); border-color: transparent; box-shadow: inset 0 0 0 2px var(--kd-muc); font-weight: 600;
+}
+[data-kd] .gvhn-1210 .nht-khoi-nut:focus-visible { outline: 3px solid var(--kd-xanh); outline-offset: 2px; }
+[data-kd] .gvhn-1210 .nht-lop-chon { font-family: var(--kd-f-may); color: var(--kd-muc-2); }
+[data-kd] .gvhn-1210 .nht-lop-chon select {
+  border: var(--kd-day) solid var(--kd-muc); border-radius: 12px; background-color: var(--kd-mat); color: var(--kd-muc); box-shadow: 3px 3px 0 var(--kd-bong);
+  font: 600 13px var(--kd-f-may);
+}
+
+/* thanh chia nhóm, bốn ô nhóm, dòng Hôm nay: viền mực (màu nhóm giữ nguyên) */
+[data-kd] .gvhn-1210 .nht-thanh { border: 2px solid var(--kd-muc); }
+[data-kd] .gvhn-1210 .nht-thanh > * + * { border-left: 2px solid var(--kd-muc); }
+[data-kd] .gvhn-1210 .nht-thanh-chu { font-family: var(--kd-f-may); }
+[data-kd] .gvhn-1210 .nht-o-nhom { border: 2px solid var(--kd-muc); border-radius: 14px; }
+[data-kd] .gvhn-1210 .nht-o-nhan { font-family: var(--kd-f-may); font-weight: 600; }
+[data-kd] .gvhn-1210 .nht-o-so { font-family: var(--kd-f-to); font-weight: 600; letter-spacing: -0.02em; }
+[data-kd] .gvhn-1210 .nht-o-so small { font-family: var(--kd-f-may); font-weight: 500; }
+[data-kd] .gvhn-1210 .nht-hom-nay { border: 2px solid var(--kd-muc); border-radius: 14px; background: var(--kd-mat-2); }
+[data-kd] .gvhn-1210 .nht-hom-nay-nhan { font-family: var(--kd-f-to); font-weight: 600; }
+[data-kd] .gvhn-1210 .nht-thanh-hn { border: 2px solid var(--kd-muc); background: var(--kd-mat); }
+
+/* nút chữ ⇒ nút khối (Xem bảng từng ngày · Làm mới · Xem đủ … · Xem thêm) */
+[data-kd] .gvhn-1210 .nht-chan { justify-content: flex-start; gap: 12px; margin: 0; }
+[data-kd] .gvhn-1210 :is(.nht-chan .gvv2-nut-chu, .nht-xem-du, .nht-them, .nht-loi .gvv2-nut-vien) {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin: 6px 0 0; padding: 0 14px;
+  border: var(--kd-day) solid var(--kd-muc); border-radius: 12px; background: var(--kd-mat); color: var(--kd-muc); box-shadow: 3px 3px 0 var(--kd-bong);
+  font: 600 13px/1 var(--kd-f-may); letter-spacing: .02em;
+}
+[data-kd] .gvhn-1210 :is(.nht-chan .gvv2-nut-chu, .nht-xem-du, .nht-them):active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--kd-bong); }
+
+/* dòng em: kẻ đứt, ảnh đại diện viền mực */
+[data-kd] .gvhn-1210 .nht-em { border-top: 2px dashed var(--kd-ke); }
+[data-kd] .gvhn-1210 .nht-em-ds > li:first-child .nht-em { border-top: 0; }
+[data-kd] .gvhn-1210 .nht-av { border: 2px solid var(--kd-muc); font-family: var(--kd-f-to); font-weight: 600; }
+[data-kd] .gvhn-1210 .nht-ten small, [data-kd] .gvhn-1210 .nht-so small { font-family: var(--kd-f-may); }
+[data-kd] .gvhn-1210 .nht-tin { border: 1.5px solid var(--kd-muc); font-family: var(--kd-f-may); font-weight: 600; }
+[data-kd] .gvhn-1210 .nht-em:focus-visible { outline-color: var(--kd-xanh); }
+
+/* thẻ phân đoạn (điện thoại): viên thuốc, mục đang chọn tô vàng */
+[data-kd] .gvhn-1210 .nht-tab { padding: 3px; border: var(--kd-day) solid var(--kd-muc); border-radius: 999px; background: var(--kd-mat); }
+[data-kd] .gvhn-1210 .nht-tab-nut { border-radius: 999px; color: var(--kd-muc); font: 500 13px var(--kd-f-may); }
+[data-kd] .gvhn-1210 .nht-tab-nut[aria-selected='true'] { background: var(--kd-vang); color: var(--kd-tren-mau); box-shadow: inset 0 0 0 2px var(--kd-muc); font-weight: 600; }
+
+/* 12 bậc: 12 CỘT khối, phần tô cao theo số em (màu bậc giữ nguyên), số em trên nhãn trắng viền mực */
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem { gap: 4px; }
+[data-kd] .gvhn-1210 .nht-bac .bcc.bcc-dem-o {
+  position: relative; justify-content: flex-end; height: 104px; padding: 0 2px 6px; overflow: hidden;
+  border: 2px solid var(--kd-muc); border-radius: 8px; background: var(--kd-mat-2); box-shadow: none; color: var(--kd-muc);
+}
+[data-kd] .gvhn-1210 .nht-bac .bcc.bcc-dem-o[data-nut] { padding: 0; }
+[data-kd] .gvhn-1210 .nht-bac .bcc.bcc-dem-o::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--bcc-ti, 0) * 100%); background: var(--bac); border-top: 2px solid var(--kd-muc);
+}
+[data-kd] .gvhn-1210 .nht-bac .bcc.bcc-dem-o[data-khong]::before { display: none; }
+/* cột tô theo NHÓM như bản vẽ (Lười 1–5 san hô · Chưa đều 6–7 vàng · Chăm 8–12 lá — đúng khoảng bậc của app); huy hiệu giữ màu bậc */
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-o:is([data-bac='1'], [data-bac='2'], [data-bac='3'], [data-bac='4'], [data-bac='5'])::before { background: var(--kd-san-ho); }
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-o:is([data-bac='6'], [data-bac='7'])::before { background: var(--kd-vang); }
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-o:is([data-bac='8'], [data-bac='9'], [data-bac='10'], [data-bac='11'], [data-bac='12'])::before { background: var(--kd-len); }
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-nut { position: relative; justify-content: flex-end; height: 100%; padding: 4px 2px 6px; }
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-o > :is(.bcc-hh, b) { position: relative; }
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-o b {
+  padding: 2px 5px; border: 1.5px solid var(--kd-muc); border-radius: 6px; background: var(--kd-mat); color: var(--kd-muc);
+  font: 600 13px/1.1 var(--kd-f-may);
+}
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-o b small { font-size: .78em; font-weight: 500; }
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-nut:hover { background: transparent; }
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-nut:hover b { background: var(--kd-vang); color: var(--kd-tren-mau); }
+[data-kd] .gvhn-1210 .nht-bac .bcc-dem-nut:focus-visible { outline: 3px solid var(--kd-xanh); outline-offset: 2px; }
+
+@media (max-width: 600px) {
+  [data-kd] .gvhn-1210 .nht-khoi { width: 100%; padding: 3px; gap: 2px; overflow-x: auto; }
+  [data-kd] .gvhn-1210 .nht-khoi-nut { flex: 1 0 auto; padding: 0 6px; border: 0; background: none; font-size: 11.5px; letter-spacing: 0; }
+  [data-kd] .gvhn-1210 .nht-khoi-nut[aria-checked='true'] { background: var(--kd-vang); }
+  [data-kd] .gvhn-1210 .nht-tab-khung { padding: 12px 12px 8px; }
+  [data-kd] .gvhn-1210 .nht-tab-khung .gvv2-the.nht-cot { border: 0; box-shadow: none; background: none; }
+  [data-kd] .gvhn-1210 .nht-bac .bcc.bcc-dem-o { height: 76px; }
+  [data-kd] .gvhn-1210 .nht-bac .bcc-dem-o b { padding: 1px 3px; font-size: 11.5px; }
+}
