@@ -68,6 +68,15 @@ export function thuMucCuaDe(c: Pick<TeacherExamSource, 'nhom'>): string {
   return i >= 0 ? s.slice(0, i).trim() : ''
 }
 
+/** THƯ MỤC LỒNG NHIỀU TẦNG (25/10, thầy: "quét lại để dựng đúng cây thư mục" — đề VIP 2027 nằm 3 tầng thư mục trên Drive): các tầng của thư mục
+ * nối bằng « › », vd nhóm "12 · VIP 2027 › 1.LIÊN CHƯƠNG/Kiểm Tra Theo Bài + Liên Bài Chương 1". Thư mục một tầng (DẠY HỌC) giữ nguyên như cũ.
+ * Hai tầng liền nhau trùng tên (thư mục giải nén lồng chính nó trên Drive) gộp làm một. */
+export const NOI_TANG_THU_MUC = ' › '
+export function cacTangThuMuc(tm: string): string[] {
+  const ra: string[] = []
+  for (const t of tm.split('›').map((x) => x.trim()).filter(Boolean)) if (ra[ra.length - 1] !== t) ra.push(t)
+  return ra
+}
 /** CHƯƠNG lấy từ `nhom` dạng "12 · C1 - Ester lipid" — bỏ phần khối phía trước
  * dấu chấm giữa, và bỏ luôn phần thư mục phía trước dấu "/". Nhóm rỗng thì gom
  * vào "Chưa xếp chương". */
@@ -176,8 +185,11 @@ function nutCha(khoa: string, nhan: string, tang: Tang, con: Nut[]): Nut {
  */
 export function dungCay(ds: TeacherExamSource[]): Nut[] {
   // Dựng các nút CHƯƠNG của một danh sách đề, dưới một tiền tố khoá cho trước.
-  const dungChuong = (dsX: TeacherExamSource[], tienTo: string): Nut[] =>
-    xepTheoSo(gom(dsX, chuongCuaDe), (x) => x.khoa, soChuong).map(({ khoa: ch, ds: dsC }) => {
+  // `tuNhien`: cây thư mục lồng (đề VIP…) — tên chương / bài là tên thư mục, tệp của thầy ⇒ sắp theo thứ tự tự nhiên của tên ("Chương 2" trước "Chương 10").
+  const xep = <T,>(dsX: T[], layTen: (x: T) => string, laySo: (ten: string) => number | null, tuNhien: boolean): T[] =>
+    tuNhien ? [...dsX].sort((a, b) => soTenTuNhien.compare(layTen(a), layTen(b))) : xepTheoSo(dsX, layTen, laySo)
+  const dungChuong = (dsX: TeacherExamSource[], tienTo: string, tuNhien = false): Nut[] =>
+    xep(gom(dsX, chuongCuaDe), (x) => x.khoa, soChuong, tuNhien).map(({ khoa: ch, ds: dsC }) => {
       // Bản đồ mã gốc bài -> tên bài chuẩn trong chương để các mục đặc biệt (VD/DT) luôn cùng nhóm với bài chính
       const tenChuanTheoGoc = new Map<string, string>()
       for (const c of dsC) {
@@ -193,7 +205,7 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
       }
 
       // GOM THEO TÊN BÀI, không theo mã đề.
-      const bai = xepTheoSo(gom(dsC, layTenBai), (x) => x.khoa, soBai).map(({ khoa: b, ds: dsB }) => {
+      const bai = xep(gom(dsC, layTenBai), (x) => x.khoa, soBai, tuNhien).map(({ khoa: b, ds: dsB }) => {
         // Bài có nhiều mã gốc thì lá phải nói rõ mã nào, không thì thầy thấy
         // hai dòng "Trắc nghiệm" y hệt nhau mà không biết khác gì.
         const nhieuMa = new Set(dsB.filter(c => !tenMucDayHoc(c)).map((c) => goMaDeTachRa(c.maDe).goc)).size > 1
@@ -202,7 +214,9 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
           const sc = soCauCua(c)
           const tuCau: PhanDe | null = phan ?? (sc.I > 0 ? 'I' : sc.II > 0 ? 'II' : sc.III > 0 ? 'III' : null)
           const muc = tenMucDayHoc(c)
-          const ten = tuCau ? TEN_PHAN_TACH[tuCau] : c.maDe
+          // Đề KHÔNG tách mà có từ hai phần trở lên (đề chuẩn cấu trúc, đề VIP: hiện nguyên từng đề) ⇒ "Cả đề", không ghi nhầm "Trắc nghiệm".
+          const caDe = !phan && [sc.I, sc.II, sc.III].filter((x) => x > 0).length > 1
+          const ten = caDe ? 'Cả đề' : tuCau ? TEN_PHAN_TACH[tuCau] : c.maDe
           return {
             khoa: `${tienTo}/${ch}/${b}/${c.maDe}`,
             nhan: muc || (nhieuMa ? `${ten} · ${duoiPhanBiet(goc)}` : ten),
@@ -239,9 +253,34 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
   //
   // Nhóm không ghi dấu "/" thì khối của nó vẫn nằm ở tầng ngoài cùng như cũ,
   // không sinh thêm tầng rỗng.
-  return gom(ds, thuMucCuaDe).flatMap(({ khoa: tm, ds: dsT }) =>
-    tm ? [nutCha(tm, tm, 'thumuc', dungKhoi(dsT, tm))] : dungKhoi(dsT, ''),
-  )
+  //
+  // Thư mục LỒNG (≥ 2 tầng, xem `cacTangThuMuc`) dựng y hệt cây trên Drive: tầng ▸ tầng ▸ … ▸ chương ▸ bài, KHÔNG chen tầng khối
+  // (thư mục gốc không chia theo khối). Các nhóm cùng tầng đầu gom về một nút, đặt ở chỗ nhóm đầu tiên xuất hiện.
+  const dungLong = (ds2: { tang: string[]; ds: TeacherExamSource[] }[], tienTo: string, sau: number): Nut[] => {
+    const ra: Nut[] = []
+    const het = ds2.filter((x) => x.tang.length === sau)
+    if (het.length) ra.push(...dungChuong(het.flatMap((x) => x.ds), tienTo, true))
+    const con = gom(ds2.filter((x) => x.tang.length > sau), (x) => x.tang[sau]!)
+    for (const { khoa: ten, ds: ds3 } of [...con].sort((a, b) => soTenTuNhien.compare(a.khoa, b.khoa))) {
+      const k = `${tienTo}›${ten}`
+      ra.push(nutCha(k, ten, 'thumuc', dungLong(ds3, k, sau + 1)))
+    }
+    return ra
+  }
+  const ra: Nut[] = []
+  const daLong = new Set<string>()
+  const nhom = gom(ds, thuMucCuaDe)
+  for (const { khoa: tm, ds: dsT } of nhom) {
+    const tang = cacTangThuMuc(tm)
+    if (tang.length >= 2) {
+      if (daLong.has(tang[0]!)) continue
+      daLong.add(tang[0]!)
+      const cung = nhom.filter((g) => cacTangThuMuc(g.khoa).length >= 2 && cacTangThuMuc(g.khoa)[0] === tang[0]).map((g) => ({ tang: cacTangThuMuc(g.khoa), ds: g.ds }))
+      ra.push(nutCha(`›${tang[0]}`, tang[0]!, 'thumuc', dungLong(cung, `›${tang[0]}`, 1)))
+    } else if (tm) ra.push(nutCha(tm, tm, 'thumuc', dungKhoi(dsT, tm)))
+    else ra.push(...dungKhoi(dsT, ''))
+  }
+  return ra
 }
 
 export type TrangThaiTich = 'trong' | 'day' | 'nua'

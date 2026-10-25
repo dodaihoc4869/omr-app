@@ -68,12 +68,11 @@ export function laMucDayHocDacBiet(s: Pick<TeacherExamSource, 'maDe' | 'nhom' | 
   return false
 }
 
-/** ĐỀ CHUẨN CẤU TRÚC (18 · 4 · 6) — thầy 25/10: "thư mục Tự Luyện mục đề chuẩn cấu trúc không chia thành trắc nghiệm
- * đúng sai nữa, khôi phục về hiển thị từng đề một". Nhận theo tên nhóm (vd "12 · Bộ đề chuẩn cấu trúc"), bỏ dấu để
- * "chuẩn"/"chuan", "cấu trúc"/"cau truc" gõ kiểu nào cũng khớp. */
+/** ĐỀ HIỆN NGUYÊN TỪNG ĐỀ, không tách Trắc nghiệm / Đúng sai / Trả lời ngắn — thầy 25/10: "thư mục Tự Luyện mục đề chuẩn cấu trúc không chia
+ * thành trắc nghiệm đúng sai nữa, khôi phục về hiển thị từng đề một"; đề VIP (thư mục «VIP 2027 › …», "quét lại để dựng đúng cây thư mục") cũng vậy.
+ * Nhận theo tên nhóm, bỏ dấu: «chuẩn cấu trúc» ở bất kì đâu, hoặc thư mục bắt đầu bằng «VIP». */
 export function laDeChuanCauTruc(s: Pick<TeacherExamSource, 'nhom'>): boolean {
-  const nhom = (s.nhom || '').normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/gi, 'd').toLowerCase()
-  return /chuan\s*cau\s*truc/.test(nhom)
+  return /chuan\s*cau\s*truc|(^|·)\s*vip\b/.test((s.nhom || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase())
 }
 
 /** Ba mã con của một đề. Phần rỗng thì KHÔNG sinh mã — thầy không phải nhìn
