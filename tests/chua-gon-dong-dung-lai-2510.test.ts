@@ -31,7 +31,7 @@ async function ds(d: Awaited<ReturnType<typeof dung>>) {
 }
 
 describe('Chữa câu gọn — đóng đợt em đã làm đúng lại (luật tự làm)', () => {
-  it('đúng câu gốc ở NGÀY KHÁC ngày sai, không gợi ý, không đọc lời giải ⇒ Đã tự sửa ngay khi mở danh sách; đếm "hôm nay"', async () => {
+  it('đúng câu gốc ở NGÀY KHÁC ngày sai, không gợi ý, không đọc lời giải ⇒ Đã tự sửa ngay khi mở danh sách; không tính vào "hôm nay"', async () => {
     const d = await dung()
     lam(d, Q, 1, '2026-10-06T02:00:00.000Z')
     const r = await ds(d)
@@ -39,7 +39,7 @@ describe('Chữa câu gọn — đóng đợt em đã làm đúng lại (luật 
     expect(dot(d).trang_thai_day).toBe('da_tu_sua')
     expect(dot(d).dong_luc).toBe(T)
     expect(r.ds.find((m) => m.dotId === d.dotId)?.trangThai).toBe('da_tu_sua')
-    expect(r.dem.xongHomNay).toBe(1)
+    expect(r.dem.xongHomNay).toBe(0) // sửa từ hôm trước (trong game), hôm nay mới đóng ⇒ KHÔNG tính «tự sửa hôm nay»
     expect(r.ds[0]!.saiLuc).toBeGreaterThan(0)
   })
   it('đúng câu gốc CÙNG NGÀY sai ⇒ chưa tính (có thể vừa thấy lời giải trong game)', async () => {

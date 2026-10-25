@@ -19,6 +19,7 @@ function dbThu() {
   sql.exec(`CREATE TABLE chua_loi_dot(id TEXT PRIMARY KEY,sbd TEXT,qid_chuan TEXT,trang_thai_day TEXT,lan_gap_lai INTEGER,den_han TEXT,giao_luc INTEGER,dong_luc INTEGER,content_group TEXT DEFAULT '',revision INTEGER DEFAULT 0,cap_nhat_luc INTEGER,mo_luc INTEGER,sai_cuoi_luc INTEGER);
     CREATE TABLE su_kien_hoc(sbd TEXT,qid TEXT,ket_qua INTEGER,luc TEXT,ngay_vn TEXT,assistance TEXT,visibility TEXT,purpose TEXT);
     CREATE TABLE loi_giai_hoi(sbd TEXT,qid TEXT,luc TEXT);
+    CREATE TABLE chua_gon_lan(khoa TEXT,dot_id TEXT,sbd TEXT,ngay_vn TEXT,ket TEXT);
     CREATE INDEX idx_sbd ON chua_loi_dot(sbd,trang_thai_day,den_han);
     CREATE TABLE hoi_thay_kiem(id TEXT PRIMARY KEY,sbd TEXT,qid_goc TEXT,version_goc TEXT DEFAULT 'v1',nhom_goc TEXT DEFAULT 'G',trang_thai TEXT DEFAULT 'da_nop',het_han_luc INTEGER DEFAULT 0,phat_luc INTEGER DEFAULT 0,den_han INTEGER);
     CREATE INDEX htk_em_goc ON hoi_thay_kiem(sbd,qid_goc);
