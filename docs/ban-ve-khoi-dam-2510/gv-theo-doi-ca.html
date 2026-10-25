@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Theo dõi ca</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .chip.xanh { background: var(--xanh); color: var(--mat); }
+  .chip.la, .chip.do { color: var(--mat); }
+  .chip.xam { background: var(--mat-2); color: var(--mo); border-style: dashed; }
+  .song { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--xuong); border: 2px solid var(--muc); box-shadow: 0 0 0 4px color-mix(in srgb, var(--xuong) 25%, transparent); }
+  .ca-lop { padding: 16px 22px; margin-top: 24px; }
+  .thanh-lop { display: flex; height: 24px; border: var(--day) solid var(--muc); border-radius: 999px; overflow: hidden; background: var(--mat-2); }
+  .thanh-lop i { display: block; height: 100%; border-right: 2px solid var(--muc); }
+  .thanh-lop i:last-child { border-right: 0; }
+  .m-nop { background: var(--la); } .m-lam { background: var(--xanh); } .m-canh { background: var(--san-ho); } .m-chua { background: var(--mat-2); }
+  .chu-thich { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; font: 500 12.5px var(--f-may); color: var(--mo); }
+  .chu-thich span { display: inline-flex; align-items: center; gap: 6px; }
+  .chu-thich i { width: 14px; height: 14px; border: 2px solid var(--muc); border-radius: 4px; display: inline-block; }
+  .loc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .loc .chip { min-height: 40px; }
+  .loc .chip.on { background: var(--vang); color: #1b1b1f; box-shadow: 2px 2px 0 var(--bong); font-weight: 600; }
+  .bang td .ten-em { font: 600 15.5px/1.25 var(--f-chu); white-space: nowrap; }
+  .bang td .thanh { min-width: 80px; height: 12px; }
+  .bang tr.canh td { background: color-mix(in srgb, var(--xuong) 9%, var(--mat)); }
+  .cb { display: flex; gap: 12px; padding: 14px; border: 2px solid var(--muc); border-radius: 14px; margin-top: 12px; background: var(--mat); }
+  .cb:first-of-type { margin-top: 0; }
+  .cb .bt-cb { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: 2px solid var(--muc); border-radius: 12px; font: 700 18px var(--f-may); }
+  .cb.khoa { background: color-mix(in srgb, var(--xuong) 12%, var(--mat)); } .cb.khoa .bt-cb { background: var(--xuong); color: var(--mat); }
+  .cb.roi { background: color-mix(in srgb, var(--san-ho) 16%, var(--mat)); } .cb.roi .bt-cb { background: var(--san-ho); color: #1b1b1f; }
+  .cb.chua .bt-cb { background: var(--mat-2); }
+  .cb b { display: block; font: 600 16px/1.3 var(--f-chu); }
+  .cb p { font: 400 14px/1.4 var(--f-chu); color: var(--muc-2); margin: 2px 0 10px; }
+  .cb > div { min-width: 0; }
+  .viec { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .viec .nut { white-space: normal; text-align: center; line-height: 1.25; }
+  .so-cb { display: inline-grid; place-items: center; min-width: 30px; height: 30px; border: 2px solid var(--muc); border-radius: 999px; background: var(--xuong); color: var(--mat); font: 600 14px var(--f-may); padding: 0 8px; }
+  @media (max-width: 900px) { .luoi-2 > .cot { order: -1; } } /* hẹp: việc cần xử lý lên trước bảng */
+  @media (max-width: 520px) { .viec { grid-template-columns: 1fr; } .bang td { padding: 12px 6px; } }
+</style>
+</head>
+<body data-app="gv" data-tab="ca-kiem-tra" data-khung="man-con" data-ve="Ca kiểm tra" data-tieu="Kiểm tra 15 phút · 12A1" data-phu="Đang mở · còn 08:42" data-nut-dau='<span class="nut an-hep">Chiếu mã vào thi</span><span class="nut do an-dt">Kết thúc ca</span>'>
+<main class="khung">
+  <div class="chips">
+    <span class="chip"><span class="song"></span> Ca đang mở · tự làm mới mỗi 20 giây</span>
+    <span class="chip">Mở lúc 19:30 · Hết giờ vào 19:40 · 15 phút</span>
+    <span class="chip">Công bố điểm: Khi cả lớp nộp xong</span>
+    <span class="nut">↻ Làm mới</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Còn</span> <span class="danh-dau">08:42</span> <span class="mo">·</span> 12/40 em đã nộp</h1>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so">21</span><span class="nhan">Đang làm · trung bình đã làm 11/20 câu</span></div>
+    <div><span class="so-vua">12</span><span class="nhan">Đã nộp · 12 em đã có điểm</span></div>
+    <div><span class="so-vua">6</span><span class="nhan">Chưa vào · hết giờ vào 19:40</span></div>
+    <div><span class="so-vua" style="color:var(--xuong)">3</span><span class="nhan">Cảnh báo · 1 em bị khoá · 2 em rời màn</span></div>
+  </section>
+
+  <section class="the ca-lop">
+    <div class="thanh-lop" role="img" aria-label="Cả lớp 40 em: 12 đã nộp, 19 đang làm, 3 cảnh báo, 6 chưa vào">
+      <i class="m-nop" style="width:30%"></i><i class="m-lam" style="width:47.5%"></i><i class="m-canh" style="width:7.5%"></i><i class="m-chua" style="width:15%"></i>
+    </div>
+    <div class="chu-thich"><span><i class="m-nop"></i>Đã nộp 12</span><span><i class="m-lam"></i>Đang làm 19</span><span><i class="m-canh"></i>Cảnh báo 3</span><span><i class="m-chua"></i>Chưa vào 6</span><span style="margin-left:auto">Cả lớp 40 em</span></div>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Từng em</h2><span class="nhan">Ester – Lipid · 20 câu</span></div>
+      <div class="loc" role="group" aria-label="Lọc em">
+        <span class="chip on">Tất cả 40</span><span class="chip">Đang làm 21</span><span class="chip">Cảnh báo 3</span><span class="chip">Chưa vào 6</span><span class="chip">Đã nộp 12</span>
+      </div>
+      <div class="cuon-ngang">
+        <table class="bang">
+          <thead><tr><th>HỌC SINH</th><th>TRẠNG THÁI</th><th class="an-dt">TIẾN ĐỘ</th><th>ĐIỂM</th></tr></thead>
+          <tbody>
+            <tr class="canh"><td><div class="ten-em">Trịnh Quốc Huy</div><span class="nhan">SBD 120118</span></td><td><span class="chip do nho">Bị khoá</span></td><td class="an-dt"><div class="nhan">9/20 câu</div><div class="thanh"><i style="width:45%"></i></div></td><td><span class="nhan">—</span></td></tr>
+            <tr class="canh"><td><div class="ten-em">Trần Minh Hiếu</div><span class="nhan">SBD 120115</span></td><td><span class="chip san-ho nho">Rời màn 2 lần</span></td><td class="an-dt"><div class="nhan">12/20 câu</div><div class="thanh"><i style="width:60%"></i></div></td><td><span class="nhan">—</span></td></tr>
+            <tr class="canh"><td><div class="ten-em">Ninh Thị Mai</div><span class="nhan">SBD 120127</span></td><td><span class="chip san-ho nho">Rời màn 1 lần</span></td><td class="an-dt"><div class="nhan">8/20 câu</div><div class="thanh"><i style="width:40%"></i></div></td><td><span class="nhan">—</span></td></tr>
+            <tr><td><div class="ten-em">Lê Hà My</div><span class="nhan">SBD 120104</span></td><td><span class="chip la nho">Đã nộp</span></td><td class="an-dt"><div class="nhan">20/20 câu</div><div class="thanh la"><i style="width:100%"></i></div></td><td><span class="so-nho">9,5</span></td></tr>
+            <tr><td><div class="ten-em">Phan Gia Bảo</div><span class="nhan">SBD 120102</span></td><td><span class="chip la nho">Đã nộp</span></td><td class="an-dt"><div class="nhan">20/20 câu</div><div class="thanh la"><i style="width:100%"></i></div></td><td><span class="so-nho">8,5</span></td></tr>
+            <tr><td><div class="ten-em">Ngô Minh Châu</div><span class="nhan">SBD 120109</span></td><td><span class="chip la nho">Đã nộp</span></td><td class="an-dt"><div class="nhan">20/20 câu</div><div class="thanh la"><i style="width:100%"></i></div></td><td><span class="so-nho">9,0</span></td></tr>
+            <tr><td><div class="ten-em">Bùi Thanh Tâm</div><span class="nhan">SBD 120103</span></td><td><span class="chip xanh nho">Đang làm</span></td><td class="an-dt"><div class="nhan">15/20 câu</div><div class="thanh"><i style="width:75%"></i></div></td><td><span class="nhan">—</span></td></tr>
+            <tr><td><div class="ten-em">Hoàng Yến Nhi</div><span class="nhan">SBD 120111</span></td><td><span class="chip xanh nho">Đang làm</span></td><td class="an-dt"><div class="nhan">13/20 câu</div><div class="thanh"><i style="width:65%"></i></div></td><td><span class="nhan">—</span></td></tr>
+            <tr><td><div class="ten-em">Phạm Tuấn Kiệt</div><span class="nhan">SBD 120129</span></td><td><span class="chip xanh nho">Đang làm</span></td><td class="an-dt"><div class="nhan">10/20 câu</div><div class="thanh"><i style="width:50%"></i></div></td><td><span class="nhan">—</span></td></tr>
+            <tr><td><div class="ten-em">Đỗ Khánh Linh</div><span class="nhan">SBD 120107</span></td><td><span class="chip xam nho">Chưa vào</span></td><td class="an-dt"><span class="nhan">—</span></td><td><span class="nhan">—</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="nhan" style="margin-top:12px">Hiện 10/40 em. Chạm thẻ em để mở hồ sơ: cho thi lại, mở khoá, cho vào bằng máy khác nằm ở đó.</p>
+    </section>
+
+    <div class="cot">
+      <section class="the pad">
+        <div class="tieu"><h2>Cần thầy xử lý</h2><span class="so-cb">4</span></div>
+        <div class="cb khoa"><span class="bt-cb">!</span><div><b>Trịnh Quốc Huy bị khoá bài</b><p>Rời màn 3 lần, tổng 41 giây · đã làm 9/20 câu.</p><span class="nut">Mở khoá cho em</span></div></div>
+        <div class="cb roi"><span class="bt-cb">!</span><div><b>Trần Minh Hiếu rời màn 2 lần</b><p>Thêm 1 lần nữa là khoá bài.</p><span class="nut">Xem hồ sơ em</span></div></div>
+        <div class="cb roi"><span class="bt-cb">!</span><div><b>Ninh Thị Mai rời màn 1 lần</b><p>Khoá bài khi rời màn 3 lần.</p><span class="nut">Xem hồ sơ em</span></div></div>
+        <div class="cb chua"><span class="bt-cb">☺</span><div><b>6 em chưa vào</b><p>Hết giờ vào lúc 19:40.</p><span class="nut">Xem 6 em</span></div></div>
+      </section>
+      <section class="the pad">
+        <div class="tieu"><h2>Việc nhanh</h2></div>
+        <div class="viec">
+          <span class="nut dang">Chiếu mã vào thi</span>
+          <span class="nut">Đóng cửa vào</span>
+          <span class="nut">Link vào thi</span>
+          <span class="nut">Link xem điểm</span>
+        </div>
+        <span class="nut do rong-het" style="margin-top:12px">Kết thúc ca</span>
+        <p class="nhan" style="margin-top:10px">Kết thúc ca: em đang làm bị nộp theo phần đã làm (21 em), em chưa vào không vào được nữa. Máy hỏi lại trước khi làm.</p>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

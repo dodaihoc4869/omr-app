@@ -40,6 +40,8 @@ import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import '../../src/styles/vo-thay.css'
 import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
+import '../../src/styles/khoi-dam-phong.css' // giao diện «Khối đậm» 25/10 (main.tsx / App / AppHocSinh / AppThi nạp y như vậy)
+import '../../src/styles/khoi-dam.css'
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import AppPhuHuynh from '../../src/components/ph-v3/AppPhuHuynh'
@@ -90,6 +92,8 @@ import { NHIP_EM_CHAM, NHIP_EM_CHUA_DEU, NHIP_EM_LUOI } from './gia/nhip-hoc-em'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
+// Như main.tsx: «Khối đậm» bật cho app thầy, cổng học sinh, màn thi — không cho cổng phụ huynh.
+if (man !== 'ph') document.documentElement.dataset.kd = ''
 const now = Date.now()
 const noop = () => {}
 

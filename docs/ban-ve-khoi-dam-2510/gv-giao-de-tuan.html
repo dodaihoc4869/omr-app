@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Giao đề theo tuần</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .o-tick { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border: 2px solid var(--muc); border-radius: 8px; background: var(--mat); font: 700 15px/1 var(--f-may); color: transparent; }
+  .o-tick.on { background: var(--vang); color: #1b1b1f; }
+  .o-tick.mot-phan { background: var(--vang-nhat); color: var(--muc); }
+  .hang-tick { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 0; border-top: 2px dashed var(--ke); }
+  .hang-tick:first-of-type, .tieu + .hang-tick, .tim-nho + .luoi-em .hang-tick:first-child { border-top: 0; }
+  .hang-tick .ten { font: 600 16px/1.3 var(--f-chu); }
+  .hang-tick .phai { margin-left: auto; text-align: right; flex: none; }
+  .hang-tick.bo .ten { color: var(--mo); }
+  .luoi-em { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+  .luoi-em .hang-tick:nth-of-type(2) { border-top: 0; }
+  .tim-nho { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; border: var(--day) solid var(--muc); border-radius: 12px; background: var(--mat); color: var(--mo); margin-bottom: 8px; }
+  .chon-khoi .chip { min-height: 44px; padding: 4px 18px; font-size: 14px; }
+  .chon-khoi .chip.vang { box-shadow: 3px 3px 0 var(--bong); font-weight: 600; }
+  .bat { display: flex; align-items: center; gap: 12px; }
+  .bat .cong-tac span { min-width: 54px; }
+  @media (max-width: 520px) { .luoi-em { grid-template-columns: 1fr; } .luoi-em .hang-tick:nth-of-type(2) { border-top: 2px dashed var(--ke); } }
+</style>
+</head>
+<body data-app="gv" data-tab="giao-tuan" data-nut-dau='<span class="nut san-ho">Lưu lại</span>'>
+<main class="khung">
+  <div class="chips chon-khoi">
+    <span class="chip">Khối 10</span>
+    <span class="chip">Khối 11</span>
+    <span class="chip vang">Khối 12</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Giao đề</span> <span class="danh-dau">theo tuần</span></h1>
+  <div class="hang" style="margin-top:12px">
+    <div class="bat"><div class="cong-tac"><span class="on">Bật</span><span>Tắt</span></div><span style="font:600 15px var(--f-chu)">Bật việc giao đề</span></div>
+  </div>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so">72</span><span class="nhan">em khối 12 đã tick</span></div>
+    <div><span class="so-vua">2/3</span><span class="nhan">lớp khối 12 được chọn</span></div>
+    <div><span class="so-vua">5</span><span class="nhan">nguồn đề khối 12 đã tick</span></div>
+    <div><span class="so-vua">02/11</span><span class="nhan">hạn nộp, 7 ngày kể từ hôm nay 26/10</span></div>
+  </section>
+
+  <div class="luoi-2">
+    <div class="cot">
+      <section class="the pad">
+        <div class="tieu"><h2>Lớp (khối 12)</h2><span class="nut">Tất cả</span></div>
+        <div class="hang-tick"><span class="o-tick on">✓</span><span class="lop">12A1</span><div class="ten">40 em</div><div class="phai nhan">38 đã tick</div></div>
+        <div class="hang-tick"><span class="o-tick on">✓</span><span class="lop">12A2</span><div class="ten">36 em</div><div class="phai nhan">34 đã tick</div></div>
+        <div class="hang-tick bo"><span class="o-tick">✓</span><span class="lop">12A3</span><div class="ten">30 em</div><div class="phai nhan">chưa chọn</div></div>
+      </section>
+      <section class="the pad">
+        <div class="tieu"><h2>Em khối 12 (72 đã tick)</h2><span class="nut">Tất cả</span></div>
+        <div class="tim-nho"><span>⌕</span><span>Tìm tên hoặc số báo danh…</span></div>
+        <div class="luoi-em">
+          <div class="hang-tick"><span class="o-tick on">✓</span><div class="ten">Nguyễn Minh Anh <span class="nhan">12A1</span></div></div>
+          <div class="hang-tick"><span class="o-tick on">✓</span><div class="ten">Trần Gia Bảo <span class="nhan">12A2</span></div></div>
+          <div class="hang-tick"><span class="o-tick on">✓</span><div class="ten">Lê Khánh Vy <span class="nhan">12A1</span></div></div>
+          <div class="hang-tick bo"><span class="o-tick">✓</span><div class="ten">Bùi Thanh Tùng <span class="nhan">12A1 · nghỉ học</span></div></div>
+          <div class="hang-tick"><span class="o-tick on">✓</span><div class="ten">Đỗ Thu Hà <span class="nhan">12A2</span></div></div>
+          <div class="hang-tick bo"><span class="o-tick">✓</span><div class="ten">Mai Phương Thảo <span class="nhan">12A2 · nghỉ học</span></div></div>
+        </div>
+        <p class="nhan" style="margin-top:8px">Bỏ tick 4 em: 2 em 12A1, 2 em 12A2</p>
+      </section>
+    </div>
+
+    <div class="cot">
+      <section class="the pad">
+        <div class="tieu"><h2>Nguồn đề khối 12 (5 đã tick)</h2><span class="nut">Tất cả</span></div>
+        <div class="hang-tick"><span class="o-tick on">✓</span><div><div class="ten">Chương 1 · Ester – lipid</div><div class="nhan">3 tờ đề · 72 câu</div></div></div>
+        <div class="hang-tick"><span class="o-tick on">✓</span><div><div class="ten">Chương 2 · Carbohydrate</div><div class="nhan">2 tờ đề · 48 câu</div></div></div>
+        <div class="hang-tick bo"><span class="o-tick">✓</span><div><div class="ten">Chương 3 · Hợp chất chứa nitrogen</div><div class="nhan">2 tờ đề · 48 câu · chưa dạy</div></div></div>
+        <div class="hang-tick"><span class="o-tick on">✓</span><div><div class="ten">Đề ôn giữa kì I · cấu trúc 2026</div><div class="nhan">28 câu · Phần I, II, III</div></div></div>
+        <div class="hang-tick"><span class="o-tick on">✓</span><div><div class="ten">Ôn lớp 11 · Hydrocarbon</div><div class="nhan">24 câu</div></div></div>
+        <div class="hang-tick"><span class="o-tick on">✓</span><div><div class="ten">Ôn lớp 11 · Alcohol – phenol</div><div class="nhan">24 câu</div></div></div>
+      </section>
+      <section class="the pad">
+        <div class="tieu"><h2>Hạn nộp</h2></div>
+        <span class="nhan-o" style="margin-top:0">Hạn nộp (tối thiểu 7 ngày kể từ lúc giao):</span>
+        <div class="o-nhap">23:59 · Thứ Hai 02/11/2026</div>
+        <p class="ghi-chu" style="margin-top:14px">72 em khối 12 nhận đề từ <b>5 nguồn</b>, nộp trước <span class="danh-dau">23:59 02/11</span>.</p>
+        <div style="margin-top:16px"><span class="nut san-ho to-hon rong-het">Lưu lại</span></div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

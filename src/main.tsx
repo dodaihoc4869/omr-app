@@ -23,12 +23,6 @@ import '@fontsource/noto-serif/latin-400-italic.css'
 import '@fontsource/noto-serif/vietnamese-400.css'
 import '@fontsource/noto-serif/vietnamese-700.css'
 import '@fontsource/noto-serif/vietnamese-400-italic.css'
-import '@fontsource/be-vietnam-pro/latin-400.css'
-import '@fontsource/be-vietnam-pro/latin-600.css'
-import '@fontsource/be-vietnam-pro/latin-700.css'
-import '@fontsource/be-vietnam-pro/vietnamese-400.css'
-import '@fontsource/be-vietnam-pro/vietnamese-600.css'
-import '@fontsource/be-vietnam-pro/vietnamese-700.css'
 import './styles/tokens.css'
 import './styles/thang.css'
 import './index.css'
@@ -51,6 +45,8 @@ import './components/thanh-ben-gv2.css'
 import './components/m3/phieu-screen.css'
 import './styles/gv-mau.css'
 import './styles/teacher-modern.css'
+// Giao diện «Khối đậm» (thầy duyệt 25/10): phông tự lưu (cả ba app). Lớp da `khoi-dam.css` nạp ở gốc App / AppHocSinh / AppThi — cổng phụ huynh không tải.
+import './styles/khoi-dam-phong.css'
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
 
 import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
@@ -117,6 +113,9 @@ const laHoiThay = /^\/hoi-thay\/?$/.test(location.pathname)
 // link thi kèm `?vai=gv` (hiếm — máy thầy thử link) vẫn dựng App.tsx như cũ (App.tsx cũng ra màn thi) để khớp bảng nạp trước: `vai=gv` chỉ nạp nhóm `app`.
 const laDiem = dvMo.vai === 'diem'
 const laManThi = laDiem || (!!dvMo.maCa && dvMo.vai !== 'gv')
+// GIAO DIỆN «KHỐI ĐẬM» (thầy duyệt 25/10): bật cho app thầy, cổng học sinh và màn thi — không cho cổng phụ huynh / trang Hỏi Thầy nhúng.
+// Luật nằm ở styles/khoi-dam.css, mọi bộ chọn bắt đầu bằng `[data-kd]`. Lùi nhanh: localStorage `ddh.kd` = 'tat'.
+try { if (!laCongPhuHuynh && !laHoiThay && localStorage.getItem('ddh.kd') !== 'tat') document.documentElement.dataset.kd = '' } catch { document.documentElement.dataset.kd = '' }
 const napGoc: Promise<GocApp> = laCongHocSinh
   ? thuLai(() => import('./AppHocSinh'))
   : laCongPhuHuynh

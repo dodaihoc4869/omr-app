@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Kho đề</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .tong { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 22px; padding: 24px 26px; }
+  .tong .so { font-size: clamp(48px, 7vw, 88px); }
+  .tong .so small { font: 600 .45em var(--f-to); color: var(--mo); margin: 0 .12em; }
+  .tong .ben-phai { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .chip.to { min-height: 44px; font-size: 14px; padding: 6px 16px; box-shadow: 3px 3px 0 var(--bong); }
+  .phan { display: flex; height: 18px; border: 2px solid var(--muc); border-radius: 999px; overflow: hidden; width: 100%; margin-top: 4px; }
+  .phan i { border-right: 2px solid var(--muc); } .phan i:last-child { border-right: 0; }
+  .chu-giai { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 12.5px var(--f-may); color: var(--muc-2); width: 100%; }
+  .chu-giai span { display: inline-flex; align-items: center; gap: 7px; }
+  .chu-giai b { width: 12px; height: 12px; border: 2px solid var(--muc); border-radius: 4px; display: inline-block; }
+  /* ba thẻ hành động */
+  .hanh-dong { display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; min-height: 112px; }
+  .hanh-dong .bt { flex: none; width: 52px; height: 52px; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 14px; background: var(--mat-2); font: 600 24px var(--f-to); box-shadow: 2px 2px 0 var(--bong); color: var(--muc); }
+  .hanh-dong h3 { font-size: 21px; line-height: 1.2; }
+  .hanh-dong p { font: 400 14.5px/1.45 var(--f-chu); color: var(--muc-2); margin-top: 4px; }
+  .hanh-dong.chinh { background: var(--san-ho); color: #1b1b1f; } .hanh-dong.chinh p { color: #1b1b1f; } .hanh-dong.chinh .bt { background: var(--mat); color: var(--muc); }
+  .hanh-dong.cam { background: var(--vang-nhat); } .hanh-dong.cam .bt { background: var(--vang); color: #1b1b1f; }
+  .mo-rong { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 6px 20px; font: 600 15px var(--f-chu); }
+  .mo-rong .nhan { margin-left: auto; }
+  .mo-rong + .mo-rong { margin-top: 12px; }
+  /* thẻ đề */
+  .loc { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 18px; }
+  .loc .o-nhap { flex: 1 1 240px; min-width: 0; }
+  .chon { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; border: var(--day) solid var(--muc); border-radius: 12px; background: var(--mat); box-shadow: 3px 3px 0 var(--bong); font: 600 13.5px var(--f-may); white-space: nowrap; }
+  .chon small { font: 500 11.5px var(--f-may); color: var(--mo); }
+  .luoi-de { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+  .the-de { position: relative; padding: 16px 16px 14px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .the-de::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--la); border-right: 2px solid var(--muc); }
+  .the-de.nghi::before { background: var(--cam); }
+  .the-de .dau-de { display: flex; gap: 12px; align-items: flex-start; }
+  .the-de .stt { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border: 2px solid var(--muc); border-radius: 50%; background: var(--mat-2); font: 600 16px var(--f-to); }
+  .the-de .ten { font: 600 17px/1.3 var(--f-chu); }
+  .the-de .ma { font: 400 12px var(--f-may); color: var(--mo); margin-top: 3px; }
+  .the-de .ba-o { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .the-de .ba-o div { border: 2px solid var(--muc); border-radius: 10px; padding: 6px 8px; background: var(--mat-2); min-width: 0; }
+  .the-de .ba-o b { display: block; font: 600 22px/1 var(--f-to); }
+  .the-de .ba-o span { font: 400 11px/1.3 var(--f-may); color: var(--mo); }
+  .the-de .chan { display: flex; align-items: center; gap: 10px; padding-top: 10px; border-top: 2px dashed var(--ke); }
+  .the-de .chan .nut { min-height: 44px; }
+  .the-de .chan .xoa { margin-left: auto; width: 44px; padding: 0; color: var(--xuong); font-size: 16px; }
+  .chip.cam { background: var(--vang); color: #1b1b1f; }
+  @media (max-width: 520px) { .tong .ben-phai { margin-left: 0; align-items: flex-start; } .luoi-de { grid-template-columns: 1fr; } .chon { flex: 1 1 auto; } }
+</style>
+</head>
+<body data-app="gv" data-tab="kho-de" data-nut-dau='<span class="nut dang">✓ Duyệt lời giải</span>'>
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Đồng bộ lần cuối · 07:12 hôm nay</span>
+    <span class="chip">Khối 10 · 11 · 12</span>
+    <span class="chip">Chuẩn cấu trúc 2026</span>
+  </div>
+  <h1 class="tieu-de"><span class="danh-dau">Kho đề</span> <span class="mo">của trung tâm</span></h1>
+
+  <section class="the tong mt">
+    <span class="so">38<small>đề</small>·<small> </small>1.426<small>câu</small></span>
+    <div class="ben-phai">
+      <span class="chip do to">! 17 câu cần thầy quyết</span>
+      <span class="nhan">trong 5 đề · 33 đề đáp án đủ</span>
+    </div>
+    <div class="phan" role="img" aria-label="Trắc nghiệm 912 câu, Đúng–sai 228 câu, Trả lời ngắn 286 câu">
+      <i style="flex:912;background:var(--xanh)"></i><i style="flex:228;background:var(--vang)"></i><i style="flex:286;background:var(--san-ho)"></i>
+    </div>
+    <div class="chu-giai">
+      <span><b style="background:var(--xanh)"></b>Trắc nghiệm · 912 câu</span>
+      <span><b style="background:var(--vang)"></b>Đúng–sai · 228 câu</span>
+      <span><b style="background:var(--san-ho)"></b>Trả lời ngắn · 286 câu</span>
+    </div>
+  </section>
+
+  <div class="luoi-3">
+    <div class="the hanh-dong chinh"><span class="bt">↻</span><div><h3>Đồng bộ ngay</h3><p>Kéo đề mới từ kho về máy này</p></div></div>
+    <div class="the hanh-dong"><span class="bt">↑</span><div><h3>Đẩy file JSON</h3><p>Từ kho-de/xong lên kho, khi máy pipeline bị chặn mạng</p></div></div>
+    <div class="the hanh-dong cam"><span class="bt">✓</span><div><h3>Duyệt hết 17 câu</h3><p>Hạ cờ đỏ cả kho, giữ nguyên đáp án đang chấm</p></div></div>
+  </div>
+
+  <div class="mt">
+    <div class="the mo-rong"><span>›</span>Em báo lỗi câu</div>
+    <div class="the mo-rong"><span>›</span>Công cụ kỹ thuật · Mã dạng, thống kê và kiểm tra</div>
+  </div>
+
+  <section class="the pad mt">
+    <div class="tieu"><h2>Danh sách đề</h2><span class="nhan">38 đề</span></div>
+    <div class="loc">
+      <div class="o-nhap trong">⌕&nbsp; Tìm bài hoặc đề</div>
+      <span class="chon"><small>Khối</small>Tất cả khối ▾</span>
+    </div>
+    <div class="luoi-de" id="luoi"></div>
+    <div style="margin-top:18px; display:flex; flex-wrap:wrap; gap:12px; align-items:center"><span class="nut">Xem thêm 29 đề</span><span class="nhan">đang hiện 9/38 đề · mới nạp trên cùng</span></div>
+  </section>
+</main>
+<script src="khung.js"></script>
+<script>
+  // [tên (nguồn), mã đề, ngày nạp, Trắc nghiệm, Đúng–sai, Trả lời ngắn, số câu chờ quyết]
+  // 5 đề còn câu chờ quyết: 6 + 4 + 3 + 2 + 2 = 17 (khớp «17 câu cần thầy quyết»).
+  const de = [
+    ['Đề thi thử TN THPT 2026 · số 07', '12-TT-2026-07', '25/10/2026', 18, 4, 6, 6],
+    ['Kiểm tra chương 1 · Ester – lipid', '12-KT-C1-D4', '24/10/2026', 18, 4, 6, 4],
+    ['Kiểm tra chương 5 · Pin điện và điện phân', '12-KT-C5-D1', '22/10/2026', 18, 4, 6, 0],
+    ['Kiểm tra chương 3 · Hợp chất chứa nitrogen', '12-KT-C3-D2', '20/10/2026', 24, 4, 8, 3],
+    ['Hoá 11 · Chương 2 · Nitrogen và sulfur', '11-KT-C2-D3', '18/10/2026', 18, 4, 6, 0],
+    ['Hoá 11 · Chương 4 · Hydrocarbon', '11-KT-C4-D1', '16/10/2026', 18, 4, 6, 2],
+    ['Hoá 10 · Chương 4 · Phản ứng oxi hoá – khử', '10-KT-C4-D2', '15/10/2026', 18, 4, 6, 0],
+    ['Hoá 10 · Chương 2 · Bảng tuần hoàn các nguyên tố hoá học', '10-KT-C2-D1', '12/10/2026', 24, 4, 8, 2],
+    ['Kiểm tra chương 2 · Carbohydrate', '12-KT-C2-D2', '10/10/2026', 18, 4, 6, 0],
+  ]
+  document.getElementById('luoi').innerHTML = de.map(([ten, ma, ngay, tn, ds, tln, nghi], i) => `
+    <article class="the the-de${nghi ? ' nghi' : ''}">
+      <div class="dau-de"><span class="stt">${i + 1}</span><div style="min-width:0;flex:1"><div class="ten">${ten}</div><div class="ma">${ma} · nạp ${ngay}</div></div></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="so-nho">${tn + ds + tln} câu</span>${nghi ? `<span class="chip cam" style="margin-left:auto">${nghi} chờ quyết</span>` : '<span class="chip la" style="margin-left:auto">✓ đáp án đủ</span>'}</div>
+      <div class="ba-o"><div><b>${tn}</b><span>Trắc nghiệm</span></div><div><b>${ds}</b><span>Đúng–sai</span></div><div><b>${tln}</b><span>Trả lời ngắn</span></div></div>
+      <div class="chan"><span class="nut">Chi tiết đề ›</span><span class="nut xoa" title="Xoá đề" aria-label="Xoá đề">✕</span></div>
+    </article>`).join('')
+</script>
+</body></html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Ai đã sai</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  body { min-height: 100vh; }
+  .to-chieu { max-width: 1600px; margin: 0 auto; padding: clamp(16px, 2.4vw, 36px); display: grid; gap: clamp(16px, 2vw, 26px); }
+  .to-chieu > *, .dau-to > div { min-width: 0; }
+  .dau-to { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .dau-to .so-cau { min-width: 92px; height: 92px; font-size: 44px; border-radius: 20px; box-shadow: var(--lech) var(--lech) 0 var(--bong); }
+  .dau-to .so-cau small { display: block; font: 600 13px var(--f-may); margin-bottom: -4px; }
+  .dau-to h1 { font: 600 clamp(44px, 6.4vw, 92px)/1 var(--f-to); }
+  .dau-to .lop-chieu { font: 500 clamp(16px, 1.4vw, 20px) var(--f-may); color: var(--mo); margin-top: 12px; }
+  .hai-the { margin-left: auto; display: flex; gap: 14px; }
+  .the-dem { padding: 12px 20px; min-width: 190px; border: var(--day) solid var(--muc); border-radius: var(--bo); background: var(--mat); }
+  .the-dem.on { background: var(--vang); color: #1b1b1f; box-shadow: var(--lech) var(--lech) 0 var(--bong); }
+  .the-dem .nhan { font-size: 14px; font-weight: 600; color: inherit; letter-spacing: .06em; }
+  .the-dem .so { font-size: clamp(40px, 4vw, 58px); display: block; margin-top: 4px; }
+  .the-dem .so small { font: 500 18px var(--f-may); }
+  .de-chieu { padding: 18px 24px; font: 400 clamp(20px, 1.9vw, 28px)/1.45 var(--f-chu); }
+  .de-chieu .pa { display: flex; flex-wrap: wrap; gap: 10px 34px; margin-top: 10px; font-weight: 600; }
+  .bon-lan { display: grid; grid-template-columns: 1fr .62fr 1fr 1fr; gap: clamp(12px, 1.6vw, 22px); align-items: start; }
+  .lan { padding: 0; overflow: hidden; }
+  .lan .dau-lan { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: var(--day) solid var(--muc); background: var(--mat-2); }
+  .lan .chu { width: 60px; height: 60px; flex: none; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 14px; background: var(--xuong); color: #fff; font: 600 34px/1 var(--f-to); }
+  .lan .dau-lan .so { font-size: 40px; }
+  .lan .dau-lan .nhan { font-size: 14px; }
+  .lan.dung .dau-lan { background: color-mix(in srgb, var(--la) 18%, var(--mat)); }
+  .lan.dung .chu { background: var(--la); }
+  .lan .ds { padding: 6px 18px 12px; }
+  .ten-chieu { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 2px dashed var(--ke); font: 600 clamp(22px, 1.75vw, 28px)/1.15 var(--f-chu); }
+  .ten-chieu:first-child { border-top: 0; }
+  .muc-lam { margin-left: auto; display: flex; gap: 4px; flex: none; }
+  .muc-lam i { width: 14px; height: 14px; border: 2px solid var(--muc); border-radius: 50%; background: var(--mat-2); }
+  .m1 i:nth-child(-n+1) { background: var(--xuong); } .m2 i:nth-child(-n+2) { background: var(--cam); }
+  .m3 i:nth-child(-n+3) { background: var(--vang); } .m4 i:nth-child(-n+4) { background: var(--la); }
+  .lan.dung .ds p { font: 400 clamp(18px, 1.5vw, 22px)/1.45 var(--f-chu); color: var(--muc-2); padding: 12px 0; }
+  .chu-giai { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; font: 500 15px var(--f-may); color: var(--mo); }
+  .chu-giai .muc-lam { margin-left: 6px; }
+  .chu-giai span { display: inline-flex; align-items: center; gap: 4px; }
+  .chu-giai kbd { font: 600 13px var(--f-may); border: 2px solid var(--muc); border-radius: 6px; padding: 2px 7px; color: var(--muc); background: var(--mat); }
+  .chu-giai .phai { margin-left: auto; display: flex; gap: 14px; flex-wrap: wrap; }
+  @media (max-width: 1100px) { .bon-lan { grid-template-columns: 1fr 1fr; } .hai-the { margin-left: 0; width: 100%; } .the-dem { flex: 1; min-width: 0; } }
+  @media (max-width: 560px) { .dau-to { gap: 14px; } .hai-the { gap: 10px; } .the-dem .so small { font-size: 14px; } .bon-lan { grid-template-columns: 1fr; } .dau-to .so-cau { min-width: 72px; height: 72px; font-size: 34px; } .the-dem { padding: 10px 14px; } .chu-giai .phai { margin-left: 0; } }
+  :root[data-theme="dark"] .lan .chu { color: var(--giay); }
+</style>
+</head>
+<body data-app="gv" data-khung="khong">
+<main class="to-chieu">
+  <header class="dau-to">
+    <span class="so-cau"><span><small>CÂU</small>7</span></span>
+    <div>
+      <h1><span class="danh-dau">Ai đã sai?</span></h1>
+      <div class="lop-chieu">Học sinh làm sai câu này · Lớp 12A1 · Ester – lipid</div>
+    </div>
+    <div class="hai-the">
+      <div class="the-dem on"><span class="nhan">ĐÃ ĐIỂM DANH</span><span class="so">11 <small>/ 36 em sai</small></span></div>
+      <div class="the-dem"><span class="nhan">CẢ LỚP</span><span class="so">14 <small>/ 40 em sai</small></span></div>
+    </div>
+  </header>
+
+  <section class="the de-chieu">
+    Xà phòng hoá hoàn toàn 8,9 g tristearin bằng dung dịch NaOH vừa đủ, thu được m g glycerol. Giá trị của m là
+    <div class="pa"><span>A. 0,46</span><span>B. 0,92</span><span>C. 1,84</span><span>D. 2,76</span></div>
+  </section>
+
+  <div class="bon-lan">
+    <section class="the lan">
+      <div class="dau-lan"><span class="chu">A</span><div><span class="so">4</span><div class="nhan">em chọn A</div></div></div>
+      <div class="ds">
+        <div class="ten-chieu">Phạm Quang Nam<span class="muc-lam m1"><i></i><i></i><i></i><i></i></span></div>
+        <div class="ten-chieu">Lý Minh Khoa<span class="muc-lam m2"><i></i><i></i><i></i><i></i></span></div>
+        <div class="ten-chieu">Ngô Thảo Linh<span class="muc-lam m3"><i></i><i></i><i></i><i></i></span></div>
+        <div class="ten-chieu">Hồ Gia Huy<span class="muc-lam m1"><i></i><i></i><i></i><i></i></span></div>
+      </div>
+    </section>
+    <section class="the lan dung">
+      <div class="dau-lan"><span class="chu">B</span><div><span class="so">25</span><div class="nhan">em chọn B · đáp án đúng</div></div></div>
+      <div class="ds"><p>Đáp án đúng · 25/36 em có mặt chọn B.</p></div>
+    </section>
+    <section class="the lan">
+      <div class="dau-lan"><span class="chu">C</span><div><span class="so">5</span><div class="nhan">em chọn C</div></div></div>
+      <div class="ds">
+        <div class="ten-chieu">Hoàng Bảo Ngọc<span class="muc-lam m4"><i></i><i></i><i></i><i></i></span></div>
+        <div class="ten-chieu">Vũ Đức Huy<span class="muc-lam m3"><i></i><i></i><i></i><i></i></span></div>
+        <div class="ten-chieu">Đặng Hoài Phương<span class="muc-lam m2"><i></i><i></i><i></i><i></i></span></div>
+        <div class="ten-chieu">Trịnh Khánh Linh<span class="muc-lam m4"><i></i><i></i><i></i><i></i></span></div>
+        <div class="ten-chieu">Cao Minh Tuấn<span class="muc-lam m2"><i></i><i></i><i></i><i></i></span></div>
+      </div>
+    </section>
+    <section class="the lan">
+      <div class="dau-lan"><span class="chu">D</span><div><span class="so">2</span><div class="nhan">em chọn D</div></div></div>
+      <div class="ds">
+        <div class="ten-chieu">Lê Thu Trang<span class="muc-lam m1"><i></i><i></i><i></i><i></i></span></div>
+        <div class="ten-chieu">Mai Anh Thư<span class="muc-lam m3"><i></i><i></i><i></i><i></i></span></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="chu-giai">
+    <span>Mức làm 1–4</span>
+    <span><span class="muc-lam m1"><i></i><i></i><i></i><i></i></span> 1</span>
+    <span><span class="muc-lam m2"><i></i><i></i><i></i><i></i></span> 2</span>
+    <span><span class="muc-lam m3"><i></i><i></i><i></i><i></i></span> 3</span>
+    <span><span class="muc-lam m4"><i></i><i></i><i></i><i></i></span> 4</span>
+    <div class="phai"><span><kbd>←</kbd><kbd>→</kbd> đợt</span><span><kbd>X</kbd> đóng</span></div>
+  </footer>
+</main>
+<script src="khung.js"></script>
+</body></html>

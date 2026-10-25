@@ -18,6 +18,9 @@ import { createHash } from 'node:crypto'
 import ts from 'typescript'
 
 const MOC = process.argv[2] || 'origin/main'
+// BẢNG MÀU THẦY ĐÃ DUYỆT (ngoại lệ ĐÓNG, liệt kê đủ đường dẫn): giao diện «Khối đậm» — thầy 25/10/2026 «CHỐT BUILD TOÀN BỘ GIAO DIỆN … Duyệt tất»,
+// bản vẽ docs/ban-ve-khoi-dam-2510. Tệp này là NƠI DUY NHẤT định nghĩa bảng màu mới (--kd-*) rồi đè lên biến sẵn có; màu cũ ở mọi tệp khác giữ nguyên.
+const BANG_MAU_THAY_DUYET = new Set(['src/styles/khoi-dam.css'])
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
 
 const THUOC_TINH_MAU = /^(?:color|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?|outline(?:-color)?|fill|stroke|stop-color|box-shadow|text-shadow|caret-color|accent-color|column-rule(?:-color)?|text-decoration(?:-color)?|--[\w-]+)$/i
@@ -236,7 +239,7 @@ for (const [trangThai, f, f2] of doi) {
   for (const [k, n] of b) {
     if ((a.get(k) ?? 0) >= n) continue
     const gt = k.slice(k.indexOf(':') + 1)
-    if (MAU_THO.test(vanMau(gt)) && !MAU_THAY_RA_LENH.has(`${ten} · ${k}`)) loi.push(`MÀU THÔ mới (phải dùng biến chuẩn) · ${ten} · ${k}`)
+    if (MAU_THO.test(vanMau(gt)) && !MAU_THAY_RA_LENH.has(`${ten} · ${k}`) && !BANG_MAU_THAY_DUYET.has(ten)) loi.push(`MÀU THÔ mới (phải dùng biến chuẩn) · ${ten} · ${k}`)
     for (const m of gt.matchAll(/var\(\s*(--[\w-]+)/g)) if (!dinh.has(m[1])) loi.push(`BIẾN MÀU chưa định nghĩa · ${ten} · ${k}`)
   }
 }

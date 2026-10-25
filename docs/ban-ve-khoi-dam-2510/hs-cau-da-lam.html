@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Câu đã làm</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .chong { display: flex; height: 22px; margin-top: 14px; border: 2px solid var(--muc); border-radius: 999px; overflow: hidden; background: var(--mat-2); }
+  .chong i { display: block; height: 100%; border-right: 2px solid var(--muc); }
+  .chong i:last-child { border-right: 0; }
+  .o-so .nhan i { display: inline-block; width: 11px; height: 11px; border: 2px solid var(--muc); border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .loc { margin-top: 24px; }
+  .loc .cuon-ngang { padding: 2px 6px 8px 2px; margin: -2px -6px -8px -2px; max-width: 100%; }
+  .loc .cong-tac span b { margin-left: 6px; font: 600 11px/1 var(--f-may); padding: 3px 6px; border-radius: 999px; border: 2px solid currentColor; }
+  .chon-bai { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border: var(--day) solid var(--muc); border-radius: 12px; background: var(--mat); box-shadow: 3px 3px 0 var(--bong); font: 500 14px var(--f-chu); white-space: nowrap; }
+  .chon-bai::after { content: '▾'; font: 600 14px var(--f-may); margin-left: 4px; }
+  @media (min-width: 901px) { .luoi-2 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 900px) { .luoi-2 { grid-template-columns: 1fr !important; } }
+  .muc-cau { display: block; padding: 16px 14px; margin: 0 -14px; border-top: 2px dashed var(--ke); border-radius: 0; }
+  .tieu + .muc-cau { border-top: 0; }
+  .muc-cau.dang-xem { background: var(--vang-nhat); border: var(--day) solid var(--muc); border-radius: 14px; box-shadow: 4px 4px 0 var(--bong); margin: 4px -6px 8px; padding: 14px 12px; }
+  .muc-cau.dang-xem + .muc-cau { border-top: 0; }
+  .muc-dau { display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+  .muc-cau .de-gon { font: 400 16px/1.5 var(--f-chu); margin: 8px 0 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .em { font: 500 13.5px/1.5 var(--f-may); }
+  .em .sai { color: var(--xuong); font-weight: 700; } .em .dung { color: var(--len); font-weight: 700; }
+  .muc-duoi { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin-top: 8px; flex-wrap: wrap; }
+  .tt { display: inline-block; font: 600 11.5px/1.35 var(--f-may); padding: 3px 8px; border: 2px solid var(--muc); border-radius: 8px; background: var(--vang-nhat); }
+  .tt.do { background: color-mix(in srgb, var(--xuong) 20%, var(--mat)); }
+  .tt.la { background: color-mix(in srgb, var(--la) 24%, var(--mat)); }
+  .ben-phai { position: sticky; top: 92px; }
+  .ben-phai .de { font: 400 17px/1.6 var(--f-chu); }
+  .ben-phai .lua-chon > div { min-height: 50px; font-size: 16px; }
+  .ben-phai .lua-chon > div.dung::after, .ben-phai .lua-chon > div.sai::after { margin-left: auto; font: 600 11.5px/1 var(--f-may); border: 2px solid var(--muc); border-radius: 7px; padding: 4px 7px; white-space: nowrap; background: var(--mat); }
+  .ben-phai .lua-chon > div.dung::after { content: 'Đáp án'; }
+  .ben-phai .lua-chon > div.sai::after { content: 'Em chọn'; }
+  .lich-su { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .lich-su span { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 4px 11px 4px 5px; border: 2px solid var(--muc); border-radius: 999px; font: 500 12.5px/1 var(--f-may); background: var(--mat); }
+  .lich-su .dau-tick { width: 24px; height: 24px; font-size: 12px; }
+  .ben-phai h3 { font-size: 17px; margin-top: 20px; }
+  @media (max-width: 520px) {
+    .loc .phai { width: 100%; }
+    .loc .phai .chon-bai { flex: 1; }
+    .muc-dau .nhan { font-size: 12px; }
+  }
+  /* chừa chỗ cho nút A.I nổi để không đè nội dung cuối trang */
+  body main.khung { padding-bottom: 110px; }
+  @media (max-width: 1100px) { body.co-duoi main.khung { padding-bottom: 180px; } }
+</style>
+</head>
+<body data-app="hs" data-khung="man-con" data-ve="Hôm nay" data-tieu="Câu đã làm" data-phu="Lời giải và lịch ôn từng câu">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Ca kiểm tra gần nhất: 7,25 điểm · 26/09</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Câu</span> <span class="danh-dau">đã làm</span></h1>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so">312</span><span class="nhan">câu đã làm · Tất cả các bài</span>
+      <div class="chong" role="img" aria-label="187 Thành thạo, 118 Cần ôn, 7 Cần thầy dạy lại"><i style="width:59.9%;background:var(--la)"></i><i style="width:37.8%;background:var(--vang)"></i><i style="width:2.3%;background:var(--xuong)"></i></div>
+    </div>
+    <div><span class="so-vua">187 <span class="len">60%</span></span><span class="nhan"><i style="background:var(--la)"></i>Thành thạo</span></div>
+    <div><span class="so-vua">118</span><span class="nhan"><i style="background:var(--vang)"></i>Cần ôn</span></div>
+    <div><span class="so-vua">7</span><span class="nhan"><i style="background:var(--xuong)"></i>Cần thầy dạy lại</span></div>
+  </section>
+
+  <div class="hang loc">
+    <div class="cuon-ngang"><div class="cong-tac" aria-label="Lọc câu"><span>Tất cả<b>312</b></span><span class="on">Sai lần gần nhất<b>64</b></span><span>Cần ôn<b>118</b></span><span>Thành thạo<b>187</b></span><span>Cần thầy dạy lại<b>7</b></span></div></div>
+    <div class="phai"><span class="chon-bai">Tất cả các bài</span><span class="nut dang an-dt">Tải PDF · 64 câu</span><span class="nut an-hep">Tải đề làm lại</span></div>
+  </div>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Danh sách câu</h2><span class="nhan">Sai lần gần nhất · 64 câu</span></div>
+
+      <article class="muc-cau dang-xem">
+        <div class="muc-dau"><span class="nhan">Câu 14 · Trắc nghiệm · Vận dụng</span><span class="tt">Đang ôn</span></div>
+        <p class="de-gon">Cho các dung dịch có cùng nồng độ 0,1 M: HCl, NH<sub>3</sub>, NaOH, CH<sub>3</sub>COOH. Dãy xếp theo pH tăng dần là…</p>
+        <div class="em">Em chọn: <span class="sai">B</span> · Đáp án: <span class="dung">A</span></div>
+        <div class="muc-duoi"><span class="nhan">Đến lịch ôn lại: Thứ Tư 28/10</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <article class="muc-cau">
+        <div class="muc-dau"><span class="nhan">Câu 9 · Đúng–sai · Thông hiểu</span><span class="tt">Đang ôn</span></div>
+        <p class="de-gon">Điện phân dung dịch CuSO<sub>4</sub> với điện cực trơ, cường độ dòng điện không đổi. Xét các phát biểu sau…</p>
+        <div class="em">Em chọn: <span class="sai">Đ S Đ Đ</span> · Đáp án: <span class="dung">Đ S S Đ</span></div>
+        <div class="muc-duoi"><span class="nhan">Đến lịch ôn lại: Thứ Tư 28/10</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <article class="muc-cau">
+        <div class="muc-dau"><span class="nhan">Câu 21 · Trả lời ngắn · Vận dụng</span><span class="tt">Đang ôn</span></div>
+        <p class="de-gon">Hoà tan 0,02 mol NaOH vào nước được 200 mL dung dịch X. Giá trị pH của dung dịch X là bao nhiêu?</p>
+        <div class="em">Em trả lời: <span class="sai">12</span> · Đáp án: <span class="dung">13</span></div>
+        <div class="muc-duoi"><span class="nhan">Đến lịch ôn lại: Thứ Năm 29/10</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <article class="muc-cau">
+        <div class="muc-dau"><span class="nhan">Câu 3 · Trắc nghiệm · Nhận biết</span><span class="tt do">Cần thầy dạy lại</span></div>
+        <p class="de-gon">Ester nào sau đây có mùi chuối chín?</p>
+        <div class="em">Em chọn: <span class="sai">C</span> · Đáp án: <span class="dung">A</span></div>
+        <div class="muc-duoi"><span class="nhan">Thầy chữa câu này trên lớp. Chữa xong, câu quay lại kế hoạch ôn từ hôm sau.</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <article class="muc-cau">
+        <div class="muc-dau"><span class="nhan">Câu 6 · Trắc nghiệm · Thông hiểu</span><span class="tt">Đang ôn</span></div>
+        <p class="de-gon">Trong phòng thí nghiệm, khí ammonia được điều chế bằng cách đun nóng hỗn hợp nào sau đây?</p>
+        <div class="em">Em chọn: <span class="sai">B</span> · Đáp án: <span class="dung">D</span></div>
+        <div class="muc-duoi"><span class="nhan">Đến lịch ôn lại: Thứ Sáu 30/10</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <div style="margin-top:12px"><span class="nut rong-het">Xem thêm 20 câu</span></div>
+    </section>
+
+    <aside class="the pad ben-phai an-hep">
+      <div class="tieu"><h2>Chi tiết câu</h2><span class="tt">Đang ôn</span></div>
+      <div class="nhan" style="margin-bottom:8px">Câu 14 · Trắc nghiệm · Vận dụng</div>
+      <p class="de">Cho các dung dịch có cùng nồng độ 0,1 M: (1) HCl, (2) NH<sub>3</sub>, (3) NaOH, (4) CH<sub>3</sub>COOH. Dãy xếp theo <b>pH tăng dần</b> là</p>
+      <div class="lua-chon">
+        <div class="dung"><b>A</b>(1) &lt; (4) &lt; (2) &lt; (3)</div>
+        <div class="sai"><b>B</b>(4) &lt; (1) &lt; (2) &lt; (3)</div>
+        <div><b>C</b>(1) &lt; (4) &lt; (3) &lt; (2)</div>
+        <div><b>D</b>(3) &lt; (2) &lt; (4) &lt; (1)</div>
+      </div>
+      <div style="margin-top:18px"><span class="nut san-ho to-hon rong-het">Xem lời giải →</span></div>
+      <h3>Lịch sử làm câu này</h3>
+      <div class="lich-su"><span><b class="dau-tick">✓</b>Đúng 05/10 · Bài hằng ngày</span><span><b class="dau-tick sai">✗</b>Sai 24/10 · Kiểm tra ôn tập</span></div>
+      <p class="nhan" style="margin-top:12px">Đến lịch ôn lại: Thứ Tư 28/10</p>
+    </aside>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

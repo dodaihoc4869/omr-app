@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Hành trình</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  /* Thước «Buổi dạy hôm nay»: 4 khối bước nối nhau. */
+  .thuoc { margin-top: 20px; padding: 18px 22px 20px; }
+  .thuoc-dau { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 16px; }
+  .chon-buoi { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border: var(--day) solid var(--muc); border-radius: 12px; background: var(--mat); box-shadow: 3px 3px 0 var(--bong); font: 600 13.5px var(--f-may); white-space: nowrap; }
+  .thuoc-dau .co-mat { margin-left: auto; font: 600 22px/1 var(--f-to); white-space: nowrap; }
+  .thuoc-dau .co-mat small { font: 400 12.5px var(--f-may); color: var(--mo); margin-left: 6px; }
+  .day-buoc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; align-items: stretch; }
+  .bk { position: relative; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 16px 16px 14px; border: var(--day) solid var(--muc); background: var(--mat); margin-right: -2.5px; }
+  .bk:first-child { border-radius: 14px 0 0 14px; } .bk:last-child { border-radius: 0 14px 14px 0; margin-right: 0; }
+  .bk .vong { width: 52px; height: 52px; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 50%; font: 600 24px/1 var(--f-to); background: var(--mat-2); box-shadow: 3px 3px 0 var(--bong); }
+  .bk .ten { font: 600 19px/1.2 var(--f-to); }
+  .bk .bk-phu { font: 500 12.5px/1.35 var(--f-may); color: var(--mo); }
+  .bk .tt { align-self: flex-start; margin-top: auto; }
+  .bk.xong { background: color-mix(in srgb, var(--la) 12%, var(--mat)); }
+  .bk.xong .vong { background: var(--la); color: var(--mat); }
+  .bk.dang { background: var(--vang); color: #1b1b1f; z-index: 1; box-shadow: 0 0 0 0 var(--bong), 5px 5px 0 var(--bong); transform: translateY(-6px); border-radius: 14px; }
+  .bk.dang .vong { background: var(--mat); color: var(--muc); }
+  .bk.dang .bk-phu { color: #1b1b1f; opacity: .8; }
+  .bk.chua { background: var(--mat-2); }
+  .bk.chua .vong { border-style: dashed; color: var(--mo); box-shadow: none; }
+  .ghi-thuoc { margin-top: 14px; font: 400 12.5px/1.4 var(--f-may); color: var(--mo); }
+  .ghi-thuoc b { color: var(--muc); }
+  /* Dòng bước (thu gọn) */
+  .dong-buoc { display: flex; align-items: center; gap: 14px; padding: 16px 20px; margin-top: 16px; }
+  .dong-buoc .vong { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 50%; font: 600 18px/1 var(--f-to); background: var(--mat-2); }
+  .dong-buoc .vong.xong { background: var(--la); color: var(--mat); }
+  .dong-buoc .vong.dang { background: var(--vang); color: #1b1b1f; }
+  .dong-buoc h3 { font-size: 19px; }
+  .dong-buoc .nut { margin-left: auto; }
+  .dong-buoc .chu { min-width: 0; }
+  .hp { background: var(--san-ho); color: #1b1b1f; border: 2px solid var(--muc); border-radius: 7px; padding: 0 6px; font-weight: 600; }
+  /* Bước đang mở: Dạy học */
+  .mo-buoc { margin-top: 16px; padding: 0; overflow: hidden; }
+  .mo-buoc > .dau-mo { display: flex; align-items: center; gap: 14px; padding: 18px 22px; background: var(--vang); color: #1b1b1f; border-bottom: var(--day) solid var(--muc); }
+  .mo-buoc > .dau-mo .vong { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 50%; font: 600 18px/1 var(--f-to); background: var(--mat); color: var(--muc); }
+  .mo-buoc > .dau-mo p { font: 400 14px/1.45 var(--f-chu); color: #1b1b1f; opacity: .8; }
+  .mo-buoc .than { padding: 18px 22px 22px; }
+  .cau-chieu { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 2px dashed var(--ke); }
+  .cau-chieu:first-of-type { border-top: 0; }
+  .cau-chieu .so-cau { min-width: 40px; height: 40px; font-size: 17px; flex: none; }
+  .cau-chieu .noi { flex: 1; min-width: 0; }
+  .cau-chieu .noi > div:first-child { font: 400 16px/1.45 var(--f-chu); }
+  .cau-chieu .goi { flex: none; text-align: right; }
+  .cau-chieu .goi .so-nho { display: block; }
+  .ot { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; margin-top: 18px; }
+  .ot .thanh { min-width: 0; }
+  @media (max-width: 1100px) { .day-buoc { grid-template-columns: 1fr 1fr; gap: 14px; } .bk, .bk:first-child, .bk:last-child { border-radius: 14px; margin-right: 0; box-shadow: 3px 3px 0 var(--bong); } .bk.dang { transform: none; } }
+  @media (max-width: 520px) {
+    .thuoc { padding: 16px; }
+    .day-buoc { gap: 10px; }
+    .bk { padding: 12px; gap: 8px; } .bk .vong { width: 40px; height: 40px; font-size: 19px; } .bk .ten { font-size: 16px; }
+    .thuoc-dau .co-mat { margin-left: 0; }
+    .dong-buoc { padding: 14px 16px; flex-wrap: wrap; } .dong-buoc .chu { flex: 1; }
+    .mo-buoc > .dau-mo, .mo-buoc .than { padding-left: 16px; padding-right: 16px; }
+    .cau-chieu { flex-wrap: wrap; } .cau-chieu .goi { text-align: left; width: 100%; padding-left: 54px; }
+    .ot { grid-template-columns: 1fr; }
+  }
+  .chip.la { color: var(--mat); } /* chữ trên nền lá đọc rõ cả sáng lẫn tối */
+</style>
+</head>
+<body data-app="gv" data-tab="hanh-trinh">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10</span>
+    <span class="chip">Buổi tối · 18:00–21:00</span>
+    <span class="chip">12A1 · 40 em</span>
+    <span class="chip vang">Bước 3 đang mở</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Hành trình</span> <span class="danh-dau">giỏi Hóa</span></h1>
+  <p class="mo-ta">Điểm danh trước — bước 2, 3, 4 dùng chung danh sách có mặt, thầy mở bước nào tuỳ việc.</p>
+
+  <nav class="the thuoc" aria-label="Các bước của buổi dạy">
+    <div class="thuoc-dau">
+      <span class="nhan">Buổi dạy hôm nay</span>
+      <span class="chon-buoi">Buổi tối 26/10 · 12A1 <span aria-hidden="true">▾</span></span>
+      <span class="co-mat">34/40<small>em có mặt</small></span>
+    </div>
+    <div class="day-buoc">
+      <div class="bk xong"><span class="vong">✓</span><div class="ten">Điểm danh</div><div class="bk-phu">Xong · 34/40 em có mặt</div><span class="chip la nho tt">Đã xong</span></div>
+      <div class="bk xong"><span class="vong">✓</span><div class="ten">Gọi lên bảng đầu giờ</div><div class="bk-phu">Xong · Đạt 5/6</div><span class="chip la nho tt">Đã xong</span></div>
+      <div class="bk dang"><span class="vong">3</span><div class="ten">Dạy học</div><div class="bk-phu">Đang mở · đã chiếu 4/6 câu</div><span class="chip nho tt">Đang mở</span></div>
+      <div class="bk chua"><span class="vong">4</span><div class="ten">Chữa câu khó &amp; tính toán</div><div class="bk-phu"><span class="hp">7 chỗ</span> cần chữa</div><span class="chip nho tt">Chưa làm</span></div>
+    </div>
+    <p class="ghi-thuoc">Bước 2 · 3 · 4 mở độc lập, cùng dùng danh sách có mặt của <b>bước 1</b>.</p>
+  </nav>
+
+  <section class="the dong-buoc">
+    <span class="vong xong">✓</span>
+    <div class="chu"><h3>Điểm danh</h3><div class="nhan">Xong · 34/40 em có mặt · Vắng: Đỗ Khánh Linh, Vũ Đức Anh và 4 em</div></div>
+    <span class="nut">Mở lại</span>
+  </section>
+  <section class="the dong-buoc">
+    <span class="vong xong">✓</span>
+    <div class="chu"><h3>Gọi lên bảng đầu giờ</h3><div class="nhan">Xong · Đạt 5/6 · đã gọi 6 em</div></div>
+    <span class="nut">Mở lại</span>
+  </section>
+
+  <section class="the mo-buoc">
+    <div class="dau-mo">
+      <span class="vong">3</span>
+      <div><h2 style="font-size:22px">Dạy học</h2><p>Điểm danh lấy danh sách em học hôm nay → chọn câu trong kho Dạy học → chiếu lên máy chiếu. App gọi em có mặt có khả năng làm đúng câu cao nhất.</p></div>
+    </div>
+    <div class="than">
+      <div class="tieu"><h3>Chọn câu</h3><span class="chip nho">Bài 1. Ester – Lipid</span><span class="nhan">6 câu · đã chiếu 4</span></div>
+      <div class="cau-chieu"><span class="so-cau">1</span><div class="noi"><div>Thuỷ phân ethyl acetate trong dung dịch NaOH đun nóng, thu được muối nào?</div><div class="nhan">Trắc nghiệm · Đã chiếu câu</div></div><div class="goi"><span class="so-nho">91%</span><span class="nhan">Ước lượng · Lê Hà My</span></div></div>
+      <div class="cau-chieu"><span class="so-cau">2</span><div class="noi"><div>Chất béo là triester của glycerol với acid béo. Chất nào sau đây là chất béo?</div><div class="nhan">Trắc nghiệm · Đã chiếu câu</div></div><div class="goi"><span class="so-nho">84%</span><span class="nhan">Ước lượng · Phan Gia Bảo</span></div></div>
+      <div class="cau-chieu"><span class="so-cau">3</span><div class="noi"><div>Xét 4 ý về tristearin: chất rắn ở nhiệt độ thường; thuỷ phân trong NaOH tạo sodium stearate…</div><div class="nhan">Đúng/Sai · Đã chiếu câu</div></div><div class="goi"><span class="so-nho">77%</span><span class="nhan">Ước lượng · Ngô Minh Châu</span></div></div>
+      <div class="cau-chieu"><span class="so-cau">4</span><div class="noi"><div>Xà phòng hoá hoàn toàn 8,9 gam tristearin bằng NaOH vừa đủ. Tính khối lượng glycerol thu được (gam).</div><div class="nhan">Trả lời ngắn · Đã chiếu câu</div></div><div class="goi"><span class="so-nho">68%</span><span class="nhan">Ước lượng · Trịnh Quốc Huy</span></div></div>
+      <div class="cau-chieu"><span class="so-cau">5</span><div class="noi"><div>Viết phương trình thuỷ phân methyl formate trong môi trường acid và gọi tên sản phẩm.</div><div class="nhan">Tự luận · chưa chiếu</div></div><div class="goi"><span class="so-nho">61%</span><span class="nhan">Ước lượng · Bùi Thanh Tâm</span></div></div>
+      <div class="cau-chieu"><span class="so-cau">6</span><div class="noi"><div>Vì sao dầu thực vật (chứa gốc acid béo không no) ở thể lỏng còn mỡ động vật ở thể rắn?</div><div class="nhan">Tự luận · chưa chiếu</div></div><div class="goi"><span class="so-nho">57%</span><span class="nhan">Ước lượng · Hoàng Yến Nhi</span></div></div>
+      <div class="ot">
+        <div><div class="nhan" style="margin-bottom:6px">Đã chiếu 4/6 câu</div><div class="thanh vang"><i style="width:67%"></i></div></div>
+        <span class="nut san-ho to-hon">Chiếu lên bảng · câu 5 →</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="the dong-buoc">
+    <span class="vong">4</span>
+    <div class="chu"><h3>Chữa câu khó &amp; tính toán</h3><div class="nhan"><span class="hp">7 chỗ</span> cần chữa · Câu khó · câu em sai</div></div>
+    <span class="nut">Mở</span>
+  </section>
+
+  <section class="the pad mt">
+    <div class="tieu"><h2>Kiểm tra ôn tập</h2><span class="chip nho">3 lịch chờ bổ sung</span><span class="nut">Cập nhật</span></div>
+    <p class="nhan" style="margin:-6px 0 12px">Ngoài buổi dạy · lịch và đề dành riêng cho từng em</p>
+    <div class="cuon-ngang">
+      <table class="bang">
+        <thead><tr><th>Học sinh</th><th>Lịch riêng</th><th class="an-hep">Bài kiểm tra</th><th>Tiến độ</th></tr></thead>
+        <tbody>
+          <tr><td><b>Lê Hà My</b> <span class="lop">12A1</span></td><td>Thứ Ba 27/10</td><td class="an-hep">Ester – Lipid · 28 câu</td><td><div class="thanh la" style="min-width:90px"><i style="width:100%"></i></div></td></tr>
+          <tr><td><b>Trịnh Quốc Huy</b> <span class="lop">12A1</span></td><td>Thứ Tư 28/10</td><td class="an-hep">Xà phòng và chất giặt rửa · 20 câu</td><td><div class="thanh vang" style="min-width:90px"><i style="width:45%"></i></div></td></tr>
+          <tr><td><b>Phạm Quang Nam</b> <span class="lop">10C3</span></td><td>Thứ Năm 29/10</td><td class="an-hep">Nguyên tử · 24 câu</td><td><div class="thanh" style="min-width:90px"><i style="width:0"></i></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+</body></html>

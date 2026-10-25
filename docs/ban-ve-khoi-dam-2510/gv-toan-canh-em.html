@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Toàn cảnh em</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .ten-em { font: 600 clamp(40px, 7vw, 84px)/1.05 var(--f-to); letter-spacing: -0.02em; margin-top: 4px; }
+  .hoa { text-transform: uppercase; letter-spacing: .05em; }
+  .hang-nut { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+  svg.cot30 { width: 100%; height: 220px; display: block; margin-top: 6px; }
+  .chu-giai { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 12.5px var(--f-may); color: var(--muc-2); margin-top: 8px; }
+  .chu-giai span { display: inline-flex; align-items: center; gap: 7px; }
+  .chu-giai b { width: 12px; height: 12px; border: 2px solid var(--muc); border-radius: 4px; display: inline-block; }
+  /* Bản đồ dạng: mỗi ô một dạng, màu theo tỉ lệ sai trên số câu đã gặp */
+  .ban-do { display: grid; grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); gap: 12px; }
+  .o-dang { border: 2px solid var(--muc); border-radius: 14px; padding: 12px 12px 10px; box-shadow: 3px 3px 0 var(--bong); min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .o-dang .td { font: 600 15px/1.25 var(--f-chu); }
+  .o-dang .tl { font: 600 30px/1 var(--f-to); }
+  .o-dang .tl small { font: 500 12px var(--f-may); color: var(--muc-2); margin-left: 4px; }
+  .o-dang .ct { font: 400 12px/1.35 var(--f-may); color: var(--muc-2); }
+  .o-dang .xh { font: 600 12px var(--f-may); }
+  .m0 { background: color-mix(in srgb, var(--la) 26%, var(--mat)); }
+  .m1 { background: color-mix(in srgb, var(--vang) 38%, var(--mat)); }
+  .m2 { background: color-mix(in srgb, var(--san-ho) 45%, var(--mat)); }
+  .m3 { background: color-mix(in srgb, var(--xuong) 62%, var(--mat)); }
+  /* Dòng thời gian */
+  .loc-loai { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .ngay-nhom { font: 600 12px var(--f-may); color: var(--mo); text-transform: uppercase; letter-spacing: .06em; margin: 16px 0 2px; }
+  .su { display: grid; grid-template-columns: 50px 1fr; gap: 12px; padding: 10px 0; border-top: 2px dashed var(--ke); }
+  .ngay-nhom + .su { border-top: 0; }
+  .su .gio { font: 600 13px var(--f-may); padding-top: 3px; }
+  .su .ten { font: 600 15.5px/1.35 var(--f-chu); }
+  .su .loai { font: 500 11.5px var(--f-may); color: var(--mo); letter-spacing: .03em; }
+  .su .chips-nho { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  @media (max-width: 520px) { .o-dang .tl { font-size: 26px; } .o-dang { padding: 10px; } }
+  .tom-nhip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+  .tom-nhip > div { border: 2px solid var(--muc); border-radius: 12px; padding: 10px 12px; background: var(--mat-2); }
+  .tom-nhip .so { font-size: 26px; }
+</style>
+</head>
+<body data-app="gv" data-tab="hoc-sinh" data-khung="man-con" data-tieu="Toàn cảnh em" data-phu="12A2 · SBD 122307" data-ve="Học sinh">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">#122307</span>
+    <span class="chip">Lớp 12A2</span>
+    <span class="chip"><span class="tim-do">♥</span> Chuỗi 4 ngày</span>
+    <span class="chip">Hoạt động cuối · 19:42 hôm nay</span>
+    <span class="chip">Phụ huynh xem app · 23/10</span>
+  </div>
+  <h1 class="ten-em"><span class="danh-dau">Trần Minh Hiếu</span></h1>
+  <div class="hang-nut">
+    <span class="nut">Cho thi lại</span>
+    <span class="nut">Xem hồ sơ học sinh</span>
+    <span class="nut san-ho">Hồ sơ làm bài →</span>
+  </div>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so">6,25</span><span class="nhan hoa">Điểm ca kiểm tra gần nhất · /10 · Kiểm tra 15 phút 24/10</span></div>
+    <div><span class="so-vua">+85</span><span class="nhan hoa">EXP hôm nay</span></div>
+    <div><span class="so-vua">18/24</span><span class="nhan">câu đã làm hôm nay</span></div>
+    <div><span class="so-vua">17/30 <span class="xuong">−4</span></span><span class="nhan">ngày có học trong 30 ngày, so với 30 ngày trước</span></div>
+  </section>
+
+  <section class="the bieu">
+    <div class="tieu"><h2>Nhịp học 30 ngày</h2><span class="nhan">học 17/30 ngày · câu làm mỗi ngày</span></div>
+    <svg class="cot30" id="nhip" aria-label="Số câu em làm mỗi ngày trong 30 ngày, 27/09 đến 26/10"></svg>
+    <div class="chu-giai">
+      <span><b style="background:var(--la)"></b>đủ mức tối thiểu · 9 ngày</span>
+      <span><b style="background:var(--vang)"></b>chưa đủ mức · 8 ngày</span>
+      <span><b style="background:var(--mat-2)"></b>không học · 13 ngày</span>
+    </div>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Bản đồ dạng</h2><span class="nhan">12 dạng đã gặp · % câu sai</span></div>
+      <div class="ban-do" id="ban-do"></div>
+      <div class="chu-giai" style="margin-top:14px">
+        <span><b class="m0"></b>sai dưới 20%</span><span><b class="m1"></b>20–39%</span><span><b class="m2"></b>40–59%</span><span><b class="m3"></b>từ 60%</span>
+      </div>
+    </section>
+
+    <section class="the pad">
+      <div class="tieu"><h2>Dòng thời gian · mọi việc em đã làm</h2><span class="nhan">mới nhất trên cùng</span></div>
+      <div class="loc-loai">
+        <span class="chip vang">Tất cả</span><span class="chip">Ca kiểm tra</span><span class="chip">Bài tập về nhà</span><span class="chip">Ôn lại</span>
+        <span class="chip an-dt">Gọi lên bảng</span><span class="chip an-dt">Game</span><span class="chip an-dt">EXP</span><span class="chip an-dt">Cảnh báo của thầy</span>
+      </div>
+
+      <div class="ngay-nhom">Hôm nay · Thứ Hai 26/10</div>
+      <div class="su"><span class="gio">19:42</span><div><div class="loai">ÔN LẠI</div><div class="ten">Ôn lại 6 câu sai · Peptide và protein</div><div class="chips-nho"><span class="chip la">đúng 4/6</span></div></div></div>
+      <div class="su"><span class="gio">19:05</span><div><div class="loai">EXP</div><div class="ten">+85 EXP · 18 câu Hành trình hôm nay</div></div></div>
+      <div class="su"><span class="gio">18:31</span><div><div class="loai">GAME</div><div class="ten">Đoàn Hộ Tống · chặng 3</div><div class="chips-nho"><span class="chip">đúng 9/12</span></div></div></div>
+
+      <div class="ngay-nhom">Hôm qua · Chủ nhật 25/10</div>
+      <div class="su"><span class="gio">21:50</span><div><div class="loai">CẢNH BÁO CỦA THẦY</div><div class="ten">Thầy nhắc: đọc hết đề rồi mới chọn</div></div></div>
+      <div class="su"><span class="gio">21:47</span><div><div class="loai">BÀI TẬP VỀ NHÀ</div><div class="ten">Amino acid và peptide · 12 câu</div><div class="chips-nho"><span class="chip san-ho">bấm vội 9/12 câu</span><span class="chip">đúng 5/12</span></div></div></div>
+
+      <div class="ngay-nhom">Thứ Bảy 24/10</div>
+      <div class="su"><span class="gio">18:20</span><div><div class="loai">CA KIỂM TRA</div><div class="ten">Kiểm tra 15 phút · 12A2 · Ester – lipid</div><div class="chips-nho"><span class="chip vang">6,25/10 điểm</span><span class="chip">rời màn 1 lần</span></div></div></div>
+      <div class="su"><span class="gio">18:05</span><div><div class="loai">GỌI LÊN BẢNG</div><div class="ten">Câu 14 · Thế điện cực chuẩn</div><div class="chips-nho"><span class="chip la">làm đúng</span></div></div></div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // 30 ngày 27/09 → 26/10. Mức tối thiểu 24 câu/ngày. 0 = không học. Chuỗi 4 ngày = 23→26/10.
+  const cau = [24, 26, 0, 24, 12, 0, 0, 24, 30, 0, 18, 0, 0, 0, 24, 9, 0, 0, 24, 0, 20, 0, 15, 0, 6, 0, 24, 30, 12, 18]
+  // kiểm: ngày học 17, đủ mức 9, chưa đủ 8, không học 13
+  const nhan = cau.map((_, i) => { const d = new Date(2026, 8, 27 + i); return (i % 5 === 4 || i === 0) ? `${d.getDate()}/${d.getMonth() + 1}` : '' })
+  const b = (k) => getComputedStyle(document.documentElement).getPropertyValue(k).trim()
+  veCot('nhip', cau.map((v, i) => [nhan[i], v, v >= 24 ? b('--la') : v > 0 ? b('--vang') : b('--mat-2')]), { max: 32, donVi: '' })
+
+  // [dạng, gặp, sai, đã khắc phục, bậc, xu hướng]
+  const dang = [
+    ['Ester – phản ứng xà phòng hoá', 24, 4, 3, 'Hiểu', 'đang giảm'],
+    ['Chất béo – chỉ số và glycerol', 18, 9, 2, 'Vận dụng', 'giữ nguyên'],
+    ['Glucose và fructose', 16, 3, 2, 'Biết', 'đang giảm'],
+    ['Saccharose và maltose', 10, 4, 1, 'Hiểu', 'giữ nguyên'],
+    ['Tinh bột và cellulose', 12, 2, 2, 'Biết', 'đang giảm'],
+    ['Amine – tính base', 20, 9, 3, 'Hiểu', 'đang lên'],
+    ['Amino acid – tính lưỡng tính', 22, 14, 2, 'Vận dụng', 'đang lên'],
+    ['Peptide và protein', 15, 10, 1, 'Vận dụng', 'đang lên'],
+    ['Polymer – trùng hợp, trùng ngưng', 14, 5, 2, 'Hiểu', 'giữ nguyên'],
+    ['Thế điện cực chuẩn', 11, 3, 2, 'Hiểu', 'đang giảm'],
+    ['Pin Galvani', 9, 4, 1, 'Vận dụng', 'giữ nguyên'],
+    ['Điện phân dung dịch', 8, 5, 0, 'Vận dụng', 'đang lên'],
+  ]
+  document.getElementById('ban-do').innerHTML = dang.map(([t, g, s, k, bac, xh]) => {
+    const p = Math.round((100 * s) / g), m = p < 20 ? 0 : p < 40 ? 1 : p < 60 ? 2 : 3
+    const mau = xh === 'đang lên' ? 'var(--xuong)' : xh === 'đang giảm' ? 'var(--len)' : 'var(--muc-2)'
+    return `<div class="o-dang m${m}"><div class="td">${t}</div><div class="tl">${p}%<small>sai</small></div>
+      <div class="ct">gặp ${g} · sai ${s} · đã khắc phục ${k}<br>bậc ${bac}</div><div class="xh" style="color:${mau}">${xh === 'đang lên' ? '↗ sai ' : xh === 'đang giảm' ? '↘ sai ' : '→ '}${xh}</div></div>`
+  }).join('')
+</script>
+</body></html>

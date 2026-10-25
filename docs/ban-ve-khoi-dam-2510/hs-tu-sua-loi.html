@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Tự sửa lỗi</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .o-so .chinh-so { background: var(--vang); color: var(--bong); }
+  .o-so .chinh-so .nhan { color: var(--bong); font-weight: 600; }
+  .o-so .ten-nhom { font: 600 13px/1.2 var(--f-may); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .o-so .ten-nhom::before { content: ''; width: 14px; height: 14px; border: 2px solid var(--muc); border-radius: 4px; background: var(--mat-2); flex: none; }
+  .o-so .ten-nhom.cho::before { background: var(--vang); } .o-so .ten-nhom.xong::before { background: var(--la); }
+  .thanh-hai { display: flex; height: 18px; border: 2px solid var(--muc); border-radius: 999px; background: var(--mat-2); overflow: hidden; }
+  .thanh-hai i { display: block; height: 100%; border-right: 2px solid var(--muc); }
+  .thanh-hai i.xong { background: var(--la); } .thanh-hai i.cho { background: var(--vang); }
+  .tien-do { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .chu-giai { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; }
+  .chu-giai span { display: inline-flex; align-items: center; gap: 7px; font: 400 12.5px/1.3 var(--f-may); color: var(--mo); }
+  .chu-giai span::before { content: ''; width: 12px; height: 12px; border: 2px solid var(--muc); border-radius: 4px; background: var(--la); }
+  .chu-giai span.cho::before { background: var(--vang); }
+  .bat-dau { margin: 18px 0 6px; }
+  .bat-dau .nhan { margin-top: 10px; }
+  .dong { align-items: flex-start; }
+  .dong > div { flex: 1; min-width: 0; }
+  .dong > .nut { flex: none; margin-top: 2px; }
+  .dong .dau-tick { margin-top: 2px; font-size: 14px; }
+  .dau-tick.can { background: var(--xanh); color: var(--mat); }
+  .tt { display: inline-block; margin-top: 7px; font: 600 11.5px/1.35 var(--f-may); padding: 3px 8px; border: 2px solid var(--muc); border-radius: 8px; background: var(--mat-2); }
+  .tt.vang { background: var(--vang); color: var(--bong); }
+  .tt.la { background: color-mix(in srgb, var(--la) 24%, var(--mat)); }
+  .tt.xanh { background: var(--xanh-nhat); }
+  .tt.khoa { background: repeating-linear-gradient(-45deg, var(--mat-2) 0 6px, var(--mat) 6px 12px); color: var(--mo); border-style: dashed; }
+  .xem-tiep { margin-top: 6px; }
+  .the .tieu .nhan b { color: var(--muc); }
+  .hoi-thay { background: var(--vang-nhat); }
+  @media (max-width: 520px) {
+    .dong > .nut { padding: 8px 12px; }
+    .o-so .ten-nhom { font-size: 12px; }
+  }
+  /* chừa chỗ cho nút A.I nổi để không đè nội dung cuối trang */
+  body main.khung { padding-bottom: 110px; }
+  @media (max-width: 1100px) { body.co-duoi main.khung { padding-bottom: 180px; } }
+</style>
+</head>
+<body data-app="hs" data-khung="man-con" data-ve="Hôm nay" data-tieu="Tự sửa lỗi" data-phu="Đã tự sửa: 29/145 câu">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10</span>
+    <span class="chip">Chờ lần gặp lại: 9 câu</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Sửa lại câu</span> <span class="danh-dau">em làm sai</span></h1>
+
+  <section class="the o-so ba">
+    <div class="chinh-so"><span class="so">107</span><span class="nhan">câu cần sửa</span></div>
+    <div><span class="ten-nhom cho">Đang chờ lần gặp lại</span><span class="so-vua">9</span><span class="nhan">câu, tự mở lại khi tới hẹn</span></div>
+    <div><span class="ten-nhom xong">Đã tự sửa</span><span class="so-vua">29<span style="color:var(--mo)">/145</span></span><span class="nhan">câu · <span class="len">+4 hôm nay</span></span></div>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Cần sửa</h2><span class="nhan">Tất cả câu cần sửa · <b>107 câu</b></span></div>
+      <div class="tien-do"><span class="nhan">Đã tự sửa</span><span class="so-nho">29/145 câu</span></div>
+      <div class="thanh-hai" role="img" aria-label="Đã tự sửa 29 trong 145 câu, 9 câu chờ lần gặp lại"><i class="xong" style="width:20%"></i><i class="cho" style="width:6.2%"></i></div>
+      <div class="chu-giai"><span>Đã tự sửa</span><span class="cho">Chờ lần gặp lại: 9 câu</span></div>
+      <div class="bat-dau"><span class="nut san-ho to-hon rong-het">Sửa tiếp →</span></div>
+
+      <div class="dong"><span class="dau-tick can">✎</span><div><div class="ten">Nitric acid – tính oxi hoá với kim loại</div><div class="nhan">Trắc nghiệm · sai lần gần nhất 24/10</div><span class="tt vang">Đang sửa từng bước</span></div><span class="nut dang">Sửa tiếp</span></div>
+      <div class="dong"><span class="dau-tick can">✎</span><div><div class="ten">Điện phân dung dịch – thứ tự khử ở cathode</div><div class="nhan">Đúng–sai · sai lần gần nhất 23/10</div><span class="tt">Chưa bắt đầu</span></div><span class="nut">Sửa</span></div>
+      <div class="dong"><span class="dau-tick can">✎</span><div><div class="ten">pH của dung dịch acid, base mạnh</div><div class="nhan">Trả lời ngắn · sai lần gần nhất 22/10</div><span class="tt xanh">Sửa trên câu gốc</span></div><span class="nut">Sửa</span></div>
+      <div class="dong"><span class="dau-tick can">✎</span><div><div class="ten">Ester – phản ứng thuỷ phân trong môi trường kiềm</div><div class="nhan">Trắc nghiệm · sai lần gần nhất 21/10</div><span class="tt">Chờ chữa trên lớp · em sửa trước được</span></div><span class="nut">Sửa</span></div>
+      <div class="dong"><span class="dau-tick trong">✎</span><div><div class="ten">Ammonia – tính base và tính khử</div><div class="nhan">Trắc nghiệm · sai lần gần nhất 20/10</div><span class="tt khoa">Tạm khoá · tiến độ được giữ</span></div><span class="nut">Sửa</span></div>
+      <div class="xem-tiep"><span class="nut rong-het">Xem tiếp các câu</span></div>
+    </section>
+
+    <div class="cot">
+      <section class="the pad">
+        <div class="tieu"><h2>Đang chờ lần gặp lại</h2><span class="nhan"><b>9 câu</b></span></div>
+        <div class="dong"><span class="dau-tick cho">◷</span><div><div class="ten">Muối nitrate – phản ứng nhiệt phân</div><div class="nhan">Trắc nghiệm · sai lần gần nhất 18/10</div><span class="tt vang">Lần gặp lại 2 mở lúc 07:00 28/10</span></div><span class="nut">Xem</span></div>
+        <div class="dong"><span class="dau-tick cho">◷</span><div><div class="ten">Sulfur dioxide – tính khử</div><div class="nhan">Đúng–sai · sai lần gần nhất 17/10</div><span class="tt vang">Chờ lần gặp lại 2</span></div><span class="nut">Xem</span></div>
+        <div class="xem-tiep"><span class="nut rong-het">Xem tiếp các câu</span></div>
+      </section>
+      <section class="the pad">
+        <div class="tieu"><h2>Đã tự sửa</h2><span class="nhan"><b>29 câu</b></span></div>
+        <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Nitrogen – cấu tạo phân tử N<sub>2</sub></div><div class="nhan">Trắc nghiệm · sai lần gần nhất 15/10</div><span class="tt la">Đã tự sửa</span></div><span class="nut">Xem lại</span></div>
+        <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Nhận biết ion NH<sub>4</sub><sup>+</sup> trong muối ammonium</div><div class="nhan">Trả lời ngắn · sai lần gần nhất 14/10</div><span class="tt la">Đã tự sửa</span></div><span class="nut">Xem lại</span></div>
+        <div class="xem-tiep"><span class="nut rong-het">Xem tiếp các câu</span></div>
+      </section>
+      <section class="the pad hoi-thay">
+        <div class="tieu"><h2>Kiểm lại sau Hỏi thầy</h2><span class="nhan"><b>1 câu</b></span></div>
+        <div class="dong"><span class="dau-tick cho">?</span><div><div class="ten">Ester – gọi tên theo danh pháp thay thế</div><div class="nhan">Câu kiểm lại</div><span class="tt vang">Đến lịch kiểm lại</span></div><span class="nut san-ho">Kiểm lại</span></div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

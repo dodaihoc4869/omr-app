@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Kết quả</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .loi { display: flex; flex-direction: column; }
+  .loi .dau-loi { display: flex; align-items: center; gap: 14px; }
+  .loi .bieu-tuong { width: 52px; height: 52px; flex: none; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 14px; background: var(--vang); color: var(--bong);
+    font: 600 24px/1 var(--f-to); box-shadow: 3px 3px 0 var(--bong); }
+  .loi .bieu-tuong.san-ho { background: var(--san-ho); }
+  .loi h2 { font-size: 24px; }
+  .loi .dong .diem { margin-left: auto; text-align: right; flex: none; }
+  .loi .dong > div:nth-child(2) { min-width: 0; }
+  .loi .nut { margin-top: 14px; }
+  .chu-truc { display: flex; justify-content: space-between; padding: 0 30px 0 50px; font: 500 11.5px var(--f-may); color: var(--mo); }
+</style>
+</head>
+<body data-app="hs" data-tab="ket-qua">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10</span>
+    <span class="chip">Lớp 12A1</span>
+    <span class="chip vang">12 ca đã công bố</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Điểm</span> <span class="danh-dau">thầy đã công bố</span></h1>
+  <p class="mo-ta">Điểm, lời giải và báo cáo của các ca kiểm tra và bài em đã nộp.</p>
+
+  <section class="the o-so ba">
+    <div class="chinh-so"><span class="so" id="gan">–</span><span class="nhan">điểm ca gần nhất · Kiểm tra tuần 12 · 24/10</span></div>
+    <div><span class="so-vua"><span id="tb">–</span> <span class="len" id="tang">–</span></span><span class="nhan">điểm trung bình 12 ca, so với 6 ca đầu</span></div>
+    <div><span class="so-vua" id="soca">–</span><span class="nhan">ca kiểm tra đã làm từ 08/08</span></div>
+  </section>
+
+  <section class="the bieu">
+    <div class="hang">
+      <h2 style="font-size:20px">Điểm các ca gần đây</h2>
+      <div class="phai"><div class="cong-tac"><span>6 ca</span><span class="on">12 ca</span><span>Cả năm</span></div></div>
+    </div>
+    <svg class="duong" id="bieu" aria-label="Điểm 12 ca kiểm tra gần đây, thang 10"></svg>
+    <div class="chu-truc"><span>08/08<span class="an-dt"> · ca đầu</span></span><span>24/10<span class="an-dt"> · ca mới nhất</span></span></div>
+  </section>
+
+  <div class="luoi-2 deu">
+    <section class="the pad loi">
+      <div class="dau-loi"><span class="bieu-tuong">◷</span><div><h2>Ca kiểm tra</h2><div class="nhan">Điểm và lời giải ca đã công bố</div></div></div>
+      <div class="mt">
+        <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Kiểm tra tuần 12 · Polymer</div><div class="nhan">Thứ Bảy 24/10 · 28 câu</div></div><div class="diem"><span class="so-nho">8,50</span><div class="nhan">/10</div></div></div>
+        <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Kiểm tra tuần 11 · Amino acid và peptide</div><div class="nhan">Thứ Bảy 17/10 · 28 câu</div></div><div class="diem"><span class="so-nho">8,25</span><div class="nhan">/10</div></div></div>
+        <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Kiểm tra tuần 10 · Amine</div><div class="nhan">Thứ Bảy 10/10 · 28 câu</div></div><div class="diem"><span class="so-nho">7,75</span><div class="nhan">/10</div></div></div>
+      </div>
+      <span class="nut san-ho to-hon rong-het">Xem Điểm &amp; Lịch Sử Ca Kiểm Tra →</span>
+    </section>
+
+    <section class="the pad loi">
+      <div class="dau-loi"><span class="bieu-tuong san-ho">✎</span><div><h2>Kết quả bài đã nộp</h2><div class="nhan">Điểm và báo cáo đã công bố</div></div></div>
+      <div class="mt">
+        <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Bài tập về nhà · Amino acid và peptide</div><div class="nhan">Nộp 22/10 · 25 câu</div></div><div class="diem"><span class="so-nho">8,40</span><div class="nhan">/10</div></div></div>
+        <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Bài gia đình giao · Đề ôn chương Carbohydrate</div><div class="nhan">Nộp 18/10 · 28 câu</div></div><div class="diem"><span class="so-nho">7,85</span><div class="nhan">/10</div></div></div>
+        <div class="dong"><span class="dau-tick cho">!</span><div><div class="ten">Bài tập về nhà · Polymer</div><div class="nhan">Nộp 25/10 · thầy chưa công bố</div></div><div class="diem"><span class="chip nho">Chờ công bố</span></div></div>
+      </div>
+      <span class="nut to-hon rong-het">Xem kết quả bài đã nộp →</span>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // 12 ca kiểm tra, mỗi Thứ Bảy từ 08/08 đến 24/10 (thang 10). 6 ca cuối khớp màn «Lịch sử ca kiểm tra».
+  const diem = [5.75, 6.25, 6.5, 6.0, 7.0, 7.25, 6.75, 7.5, 8.0, 7.75, 8.25, 8.5]
+  const so = (v, k = 2) => v.toFixed(k).replace('.', ','), tbc = (a) => a.reduce((x, y) => x + y, 0) / a.length
+  const tb = tbc(diem), tbDau = tbc(diem.slice(0, 6))
+  document.getElementById('gan').textContent = so(diem.at(-1))
+  document.getElementById('tb').textContent = so(tb)
+  document.getElementById('tang').textContent = '+' + so(tb - tbDau)
+  document.getElementById('soca').textContent = diem.length
+  veDuong('bieu', diem, { max: 10, buoc: 2, dinhDang: (v) => String(v), moc: [[7, 'Lần đầu 7 điểm'], [8, 'Lần đầu 8 điểm']], nhanCuoi: '8,50' })
+</script>
+</body></html>

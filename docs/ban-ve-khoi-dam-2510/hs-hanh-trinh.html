@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Hành trình</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .thang-the { margin-top: 20px; padding: 22px 22px 24px; }
+  .thang-dau { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 20px; }
+  .thang-dau h2 { font-size: clamp(24px, 3vw, 32px); line-height: 1.15; }
+  .thang-dau .nut { margin-left: auto; }
+  .thang { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: end; margin-top: 46px; }
+  .bac { position: relative; border: var(--day) solid var(--muc); border-radius: 16px; box-shadow: var(--lech) var(--lech) 0 var(--bong); padding: 14px 16px;
+    display: flex; flex-direction: column; justify-content: space-between; background: var(--mat); min-width: 0; }
+  .bac:nth-child(1) { height: 130px; } .bac:nth-child(2) { height: 180px; } .bac:nth-child(3) { height: 230px; } .bac:nth-child(4) { height: 280px; }
+  .bac .so-bac { font: 600 44px/1 var(--f-to); }
+  .bac strong { display: block; font: 600 24px/1.1 var(--f-to); }
+  .bac small { display: block; margin-top: 6px; font: 600 12px/1.3 var(--f-may); }
+  .bac.vung { background: color-mix(in srgb, var(--la) 24%, var(--mat)); }
+  .bac.vung .so-bac::after { content: '✓'; float: right; width: 30px; height: 30px; display: grid; place-items: center; border: 2px solid var(--muc); border-radius: 50%; background: var(--la); color: var(--mat); font: 700 15px/1 var(--f-may); }
+  .bac.dang { background: var(--vang); color: var(--bong); box-shadow: 8px 8px 0 var(--bong); }
+  .bac.dang .moc { position: absolute; left: 50%; top: -36px; transform: translateX(-50%); white-space: nowrap; background: var(--san-ho); }
+  .bac.khoa { background: repeating-linear-gradient(-45deg, var(--mat-2) 0 9px, var(--mat) 9px 18px); color: var(--mo); border-style: dashed; box-shadow: none; }
+  .nen-thang { height: 0; border-top: var(--day) solid var(--muc); margin-top: 12px; }
+
+  .bai-tieu { display: flex; align-items: baseline; gap: 10px; margin: 34px 0 0; font-size: 26px; }
+  .bai-tieu .nhan { font-size: 13px; }
+  .luoi-2.deu { margin-top: 16px; gap: 20px; }
+  .bai { display: flex; flex-direction: column; gap: 12px; }
+  .bai-dau { display: flex; gap: 14px; align-items: flex-start; }
+  .o-tang { flex: none; width: 48px; height: 48px; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 12px; background: var(--vang); color: var(--bong);
+    font: 600 24px/1 var(--f-to); box-shadow: 3px 3px 0 var(--bong); transform: rotate(-4deg); }
+  .bai h3 { font: 600 18px/1.3 var(--f-chu); }
+  .bai .chang { margin: 0; }
+  .hang-so { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .han { align-self: flex-start; }
+  .tt { display: inline-block; font: 600 12px/1.3 var(--f-may); padding: 4px 9px; border: 2px solid var(--muc); border-radius: 8px; background: var(--mat-2); }
+  .tt.do { background: color-mix(in srgb, var(--xuong) 18%, var(--mat)); }
+  .tt.vang { background: var(--vang-nhat); }
+
+  @media (max-width: 900px) {
+    .thang { gap: 10px; }
+    .bac { padding: 10px; border-radius: 12px; }
+    .bac:nth-child(1) { height: 100px; } .bac:nth-child(2) { height: 135px; } .bac:nth-child(3) { height: 170px; } .bac:nth-child(4) { height: 205px; }
+    .bac .so-bac { font-size: 30px; }
+    .bac strong { font-size: 17px; }
+    .bac small { font-size: 10.5px; }
+    .bac.vung .so-bac::after { width: 22px; height: 22px; font-size: 12px; }
+    .bac.dang { box-shadow: 5px 5px 0 var(--bong); }
+    .thang-dau .nut { margin-left: 0; width: 100%; order: 3; }
+  }
+  @media (max-width: 520px) {
+    .thang-the { padding: 18px 14px 20px; }
+    .thang-dau h2 { font-size: 19px; }
+    .thang { gap: 7px; }
+    .bac { padding: 8px 7px; }
+    .bac strong { font-size: 15px; }
+    .bac .moc { font-size: 10.5px; }
+  }
+  @media (max-width: 1100px) and (orientation: landscape) and (max-height: 500px) {
+    .thang-dau .nut { width: auto; margin-left: auto; order: 0; }
+  }
+  /* chừa chỗ cho nút A.I nổi để không đè nội dung cuối trang */
+  body main.khung { padding-bottom: 110px; }
+  @media (max-width: 1100px) { body.co-duoi main.khung { padding-bottom: 180px; } }
+</style>
+</head>
+<body data-app="hs" data-tab="hanh-trinh">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10</span>
+    <span class="chip">Lớp 12A1</span>
+    <span class="chip">Bài đang luyện · 4 bài</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Em đang luyện tầng</span> <span class="danh-dau" style="white-space:nowrap">Vận dụng</span></h1>
+
+  <section class="the thang-the">
+    <div class="thang-dau">
+      <div><div class="nhan">Thang 4 tầng của mỗi bài</div><h2>Nền · Hiểu · Vận dụng · Tổng hợp</h2></div>
+      <span class="nut san-ho to-hon">Học tiếp · 8 câu →</span>
+    </div>
+    <ol class="thang" style="list-style:none;padding:0" aria-label="Tầng đang luyện: Vận dụng">
+      <li class="bac vung"><span class="so-bac">1</span><div><strong>Nền</strong><small>Đã vững</small></div></li>
+      <li class="bac vung"><span class="so-bac">2</span><div><strong>Hiểu</strong><small>Đã vững</small></div></li>
+      <li class="bac dang"><span class="moc">Đang luyện</span><span class="so-bac">3</span><div><strong>Vận dụng</strong></div></li>
+      <li class="bac khoa"><span class="so-bac">4</span><div><strong>Tổng hợp</strong><small>Còn khoá</small></div></li>
+    </ol>
+    <div class="nen-thang"></div>
+  </section>
+
+  <h2 class="bai-tieu">Bài đang luyện <span class="nhan">· 4 bài</span></h2>
+  <div class="luoi-2 deu">
+    <section class="the pad bai">
+      <div class="bai-dau"><span class="o-tang">3</span><div><h3>Bài 4. Nitrogen</h3><div class="nhan">Đang luyện tầng Vận dụng</div></div></div>
+      <div class="chang"><i class="xong"></i><i class="xong"></i><i class="dang"></i><i></i></div>
+      <div class="hang-so"><span class="nhan">Gặp câu gốc</span><span class="so-nho">84/84 câu</span></div>
+      <div class="thanh la"><i style="width:100%"></i></div>
+      <span class="tt han">Hạn 01/11</span>
+    </section>
+    <section class="the pad bai">
+      <div class="bai-dau"><span class="o-tang">3</span><div><h3>Bài 5. Ammonia. Muối ammonium</h3><div class="nhan">Đang luyện tầng Vận dụng</div></div></div>
+      <div class="chang"><i class="xong"></i><i class="xong"></i><i class="dang"></i><i></i></div>
+      <div class="hang-so"><span class="nhan">Gặp câu gốc</span><span class="so-nho">76/90 câu</span></div>
+      <div class="thanh"><i style="width:84%"></i></div>
+      <span class="tt han">Hạn 30/10</span>
+    </section>
+    <section class="the pad bai">
+      <div class="bai-dau"><span class="o-tang">3</span><div><h3>Bài 6. Một số hợp chất của nitrogen với oxygen</h3><div class="nhan">Đang luyện tầng Vận dụng</div></div></div>
+      <div class="chang"><i class="xong"></i><i class="xong"></i><i class="dang"></i><i></i></div>
+      <div class="hang-so"><span class="nhan">Gặp câu gốc</span><span class="so-nho">97/99 câu</span></div>
+      <div class="thanh"><i style="width:98%"></i></div>
+      <span class="tt do han">Đã qua hạn 25/10</span>
+    </section>
+    <section class="the pad bai">
+      <div class="bai-dau"><span class="o-tang">3</span><div><h3>Bài 7. Sulfur và sulfur dioxide</h3><div class="nhan">Đang luyện tầng Vận dụng</div></div></div>
+      <div class="chang"><i class="xong"></i><i class="xong"></i><i class="dang"></i><i></i></div>
+      <div class="hang-so"><span class="nhan">Gặp câu gốc</span><span class="so-nho">18/72 câu</span></div>
+      <div class="thanh vang"><i style="width:25%"></i></div>
+      <span class="tt vang han">Bộ bài đang chờ đủ nguồn</span>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

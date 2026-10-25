@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Vào ca kiểm tra</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .o-nhap .mat { letter-spacing: .3em; }
+  .o-nhap .con-tro { width: 2px; height: 24px; background: var(--muc); margin-left: 2px; }
+  .ve-thi { position: relative; overflow: hidden; }
+  .ve-thi .so { font-size: clamp(52px, 7vw, 80px); display: block; margin-top: 6px; }
+  .ve-thi .huy-hieu { position: absolute; right: 20px; top: 20px; }
+  .ve-thi .rang { border-top: 2px dashed var(--muc); margin: 18px -22px; }
+  .nhac { display: grid; gap: 10px; }
+  .nhac .dong { padding: 10px 0; }
+  @media (max-width: 520px) { .ve-thi .rang { margin: 18px -16px; } .ve-thi .huy-hieu { width: 52px; height: 52px; font-size: 20px; } }
+  main.khung { padding-bottom: 110px; }
+</style>
+</head>
+<body data-app="hs" data-khung="man-con" data-ve="Hôm nay" data-tieu="Vào ca kiểm tra">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10</span>
+    <span class="chip">Lớp 12A1</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Vào</span> <span class="danh-dau">Phòng Thi</span> Trực Tuyến</h1>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Mã và mật khẩu ca</h2></div>
+      <label class="nhan-o">Mã ca kiểm tra</label>
+      <div class="o-nhap">KT1210</div>
+      <label class="nhan-o">Mật khẩu ca kiểm tra</label>
+      <div class="o-nhap"><span class="mat">••••</span><span class="con-tro"></span></div>
+      <div style="margin-top:22px"><span class="nut san-ho to-hon rong-het">Vào ca kiểm tra →</span></div>
+      <div style="margin-top:12px"><span class="nut rong-het">Đóng phòng thi, về cổng học sinh</span></div>
+    </section>
+
+    <div class="cot">
+      <section class="the pad ve-thi">
+        <span class="huy-hieu">KT</span>
+        <span class="nhan">Số báo danh</span>
+        <span class="so">110234</span>
+        <div style="font: 600 20px/1.2 var(--f-to); margin-top:10px">Nguyễn Văn An</div>
+        <div class="nhan">Lớp 12A1</div>
+        <div class="rang"></div>
+        <div class="tieu" style="margin-bottom:6px"><h3>Trước khi bắt đầu</h3></div>
+        <div class="nhac">
+          <div class="dong"><span class="dau-tick cho">!</span><div><div class="ten">Bật Không làm phiền</div></div></div>
+          <div class="dong"><span class="dau-tick cho">!</span><div><div class="ten">Bật toàn màn hình</div></div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>
