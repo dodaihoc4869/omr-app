@@ -15,6 +15,8 @@ const api = vi.hoisted(() => ({
   apiNopItem: vi.fn(),
   apiXinGoiY: vi.fn(),
   apiCoChua: vi.fn(),
+  // Chữa câu gọn (25/10): máy chủ CHƯA có lệnh gọn ⇒ màn chữa đi lối cũ — tệp này kiểm đường MỞ câu (đúng đợt, đúng tên), không kiểm cách sửa.
+  apiGonMo: vi.fn(async () => ({ ok: false, loi: 'Chưa nối được máy chủ.' })),
 }))
 vi.mock('../src/lib/chua-cau-sai-api', () => api)
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
@@ -63,7 +65,7 @@ describe('Mở thẳng một câu (từ hồ sơ / màn làm câu) ⇒ đúng ch
     render(<ManTuChua token="t" qid="Q2~3" onVe={() => {}} />)
     expect(await screen.findByText('Sửa trên câu gốc')).toBeTruthy()
     expect(api.apiMoDot).toHaveBeenCalledTimes(1)
-    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q2') // mã đợt trong danh sách, không phải mã bản đổi số
+    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q2', undefined, false) // (chữa câu gọn 25/10: mở đợt không phát bước đầu) mã đợt trong danh sách, không phải mã bản đổi số
     expect(await screen.findByRole('heading', { level: 1, name: 'Chất béo' })).toBeTruthy()
     expect(screen.queryByRole('heading', { name: 'Sửa lại câu em làm sai' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Quay lại' }))
@@ -80,7 +82,7 @@ describe('Mở thẳng một câu (từ hồ sơ / màn làm câu) ⇒ đúng ch
     expect(bao.textContent).toContain('Chưa mở được câu em chọn')
     expect(bao.textContent).toContain('Câu này chưa có lỗi đang mở đã công bố.')
     expect(bao.textContent).not.toContain('Em chọn một câu trong danh sách')
-    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'QX')
+    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'QX', undefined, false)
     // danh sách vẫn ở đó, không khung lỗi riêng của màn chữa
     expect(screen.getByRole('heading', { name: 'Sửa lại câu em làm sai' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /Thuỷ phân ester/ })).toBeTruthy()
@@ -95,7 +97,7 @@ describe('Mở thẳng một câu (từ hồ sơ / màn làm câu) ⇒ đúng ch
     api.apiMoDot.mockResolvedValue({ ok: true, dotId: 'D7', trangThai: 'thieu_hoc_lieu' })
     render(<ManTuChua token="t" qid="QX" onVe={() => {}} />)
     expect(await screen.findByText('Sửa trên câu gốc')).toBeTruthy()
-    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'QX')
+    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'QX', undefined, false)
     expect(await screen.findByRole('heading', { level: 1, name: 'Saccharose' })).toBeTruthy()
   })
 
@@ -111,7 +113,7 @@ describe('Mở thẳng một câu (từ hồ sơ / màn làm câu) ⇒ đúng ch
     expect(api.apiMoDot).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
     expect(await screen.findByText('Sửa trên câu gốc')).toBeTruthy()
-    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q1')
+    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q1', undefined, false)
   })
 
   it('khớp mã: bỏ đuôi bản đổi số và tiền tố tc:; có cả đợt đã đóng lẫn đợt đang mở ⇒ lấy đợt đang mở', () => {
@@ -155,7 +157,7 @@ describe('Thẻ tổng: số từ máy chủ, có nhãn, một nút chính theo 
     expect(document.body.textContent ?? '').not.toMatch(/\bQ\d\b|\bD\d\b|thieu_hoc_lieu|cho_gap_lai_2|da_tu_sua|can_thay|qid/)
     fireEvent.click(screen.getByRole('button', { name: 'Bắt đầu sửa' }))
     expect(await screen.findByText('Sửa trên câu gốc')).toBeTruthy()
-    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q2')
+    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q2', undefined, false)
   })
 
   it('chỉ còn câu chờ lần gặp lại ⇒ 0 câu cần chữa, nói thật lúc này chưa có câu cần chữa ngay, nút chính về Hôm nay', async () => {

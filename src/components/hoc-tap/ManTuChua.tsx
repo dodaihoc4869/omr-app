@@ -76,7 +76,9 @@ export function dungDong(m: MucChua, i: number, cdl: ReadonlyMap<string, CauDaLa
     saiCuoi ? `sai lần gần nhất ${ngayNgan(saiCuoi.ngay)}${saiCuoi.nguon ? ` · ${NHAN_NGUON_LAN[saiCuoi.nguon]}` : ''}` : '',
   ].filter(Boolean).join(' · ')
   const nhom: Nhom = nhomMucChua(m, nayMs)
-  const trangThai = CHU_TRANG_THAI_CHUA[m.trangThai] ?? 'Cần sửa'
+  // Đợt cũ còn ở nhóm chờ lần gặp lại (vòng từng bước trước 25/10) ⇒ nói đúng mốc hẹn như nhóm của nó; mọi câu khác: Cần sửa / Đã tự sửa.
+  const hen = nhom === 'cho' ? henGapLai(m.denHan, nayMs) : null
+  const trangThai = hen ? `Lần gặp lại 2 mở lúc ${hen.luc}` : CHU_TRANG_THAI_CHUA[m.trangThai] ?? 'Cần sửa'
   const lam = nhom === 'xong' ? 'Xem lại' : m.kiemHoiThay && m.trangThai !== 'can_thay' ? 'Kiểm lại' : 'Sửa'
   return { m, ten: c?.tenDang || `Câu sai số ${i + 1}`, phu, trangThai, nhom, lam }
 }
