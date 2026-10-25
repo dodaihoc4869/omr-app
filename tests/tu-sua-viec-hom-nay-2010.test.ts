@@ -197,3 +197,17 @@ describe('Xoay vòng câu gốc qua nhiều ngày', () => {
     expect(Object.keys(map)).toHaveLength(400)
   })
 })
+
+// 25/10 (video thầy, em kẹt 11/12): mục của ngày mang mã đợt CŨ, mở câu thì máy chủ trả đợt KHÁC đã tự sửa ⇒ màn chữa ghi thêm mã câu ⇒ mục khép, sang câu kế.
+describe('mục mang mã đợt khác với đợt vừa mở', () => {
+  it('ghi theo mã câu ⇒ mục tính xong phần hôm nay; chỉ ghi mã đợt lạ thì vẫn còn (đúng lỗi cũ)', () => {
+    const d = [{ qid: 'Q1', dotId: 'cu-1', trangThai: 'thieu_hoc_lieu' }, { qid: 'Q2', dotId: 'cu-2', trangThai: 'thieu_hoc_lieu' }] as MucChua[]
+    dungNgay(d)
+    ghiXongHomNay('moi-1', NAY)
+    expect(dungNgay(d)!.tiep?.m.qid).toBe('Q1')
+    ghiXongHomNay('Q1', NAY)
+    const v = dungNgay(d)!
+    expect(v.xong).toBe(1)
+    expect(v.tiep?.m.qid).toBe('Q2')
+  })
+})

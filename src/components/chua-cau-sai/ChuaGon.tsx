@@ -52,7 +52,9 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep }
   const daTuSua = mo.trangThai === 'da_tu_sua' || kq?.ket === 'tu_sua'
   // Câu đã khép (hoặc không mở được) ⇒ xong phần hôm nay của Việc hôm nay.
   const khep = daTuSua || (!!kq?.ket && KHEP.has(kq.ket)) || !mo.ok
-  useEffect(() => { if (khep) ghiXongHomNay(dotId) }, [khep, dotId])
+  // Ghi theo cả mã đợt và mã câu: mục Việc hôm nay có thể mang mã đợt khác với đợt vừa mở (xem daXong) ⇒ thiếu mã câu là kẹt vòng.
+  const ghiXong = () => { ghiXongHomNay(dotId); ghiXongHomNay(qid) }
+  useEffect(() => { if (khep) ghiXong() }, [khep, dotId, qid]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (kq) tieuDe.current?.focus() }, [kq])
 
   const de = mo.de
@@ -75,7 +77,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep }
       return
     }
     khoa.current = ''
-    if (r.ket && KHEP.has(r.ket)) ghiXongHomNay(dotId) // ghi NGAY khi có kết quả (không chờ lượt vẽ sau)
+    if (r.ket && KHEP.has(r.ket)) ghiXong() // ghi NGAY khi có kết quả (không chờ lượt vẽ sau)
     setKq(r)
   }
   const lamLai = async () => {

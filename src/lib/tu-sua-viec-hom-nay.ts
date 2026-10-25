@@ -68,7 +68,9 @@ export function hangSai(m: Pick<MucChua, 'saiLuc'>, nayMs: number): number {
 
 /** Em đã xong phần hôm nay của mục này chưa: có ghi lúc nộp, hoặc trạng thái đã vượt chặng cuối làm được (không áp cho câu chỉ có lối câu gốc). */
 function daXong(m: MucChua, loai: LoaiViec, ghi: ReadonlySet<string>, nayMs: number): boolean {
-  if (ghi.has(khoaMuc(m))) return true
+  // Khớp cả MÃ CÂU (25/10 video thầy: kẹt 11/12): mục của ngày mang mã đợt cũ / chưa có đợt, còn mở câu thì máy chủ trả đợt khác (đã tự sửa) ⇒ ghi theo mã đợt mới
+  // không bao giờ khớp ⇒ "Sửa tiếp" mở lại đúng câu ấy mãi. Màn chữa ghi thêm mã câu (đúng `qid` của mục) ⇒ khép được.
+  if (ghi.has(khoaMuc(m)) || ghi.has(m.qid)) return true
   if (m.trangThai === 'da_tu_sua') return true
   if (loai === 'goc') return false
   if (m.trangThai === 'can_thay') return true
