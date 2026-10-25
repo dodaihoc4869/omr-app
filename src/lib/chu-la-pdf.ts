@@ -14,6 +14,8 @@
 // Nhưng vẫn có ký tự lạ ngoài dải đó, và những chỗ đó thì KHÔNG đoán: cờ hoá
 // để thầy mở ảnh gốc xem, chứ không thay bừa một ký tự nào cho đẹp mắt.
 
+import { suaNhanXenKe } from './phong-cu'
+
 /** Dải Symbol gỡ được: U+F020–U+F0FF. */
 const DAI_SYMBOL = /[\uF020-\uF0FF]/g
 /** Ký tự vùng dùng riêng còn sót lại sau khi đã gỡ dải Symbol. */
@@ -23,6 +25,7 @@ const CON_LA = /[\uE000-\uF8FF]/
 export function goKyTuLa(s: unknown): string {
   const str = String(s ?? '')
   if (!str) return ''
+  // CHỮ TRÊN-DƯỚI MŨI TÊN BỊ XEN KẼ + PHÔNG TCVN3 (thầy chụp 19/10, câu quang hợp): sửa dạng đã đối chiếu, xem `phong-cu.ts`.
   // GỘP DẤU VỀ MỘT KÝ TỰ (NFC) TRƯỚC KHI LÀM GÌ KHÁC.
   //
   // Thầy bắt được 14/09 trên tờ máy chiếu: "Hợp châ ́t", "tiê ́t", "vê ̀ mô ́i",
@@ -34,7 +37,7 @@ export function goKyTuLa(s: unknown): string {
   // Chuẩn hoá NGAY TẠI TẦNG HIỂN THỊ (hàm này nằm trên đường của `chuHtml`),
   // nên mọi ca cũ, mọi link phiếu đã gửi đi đều tự đúng, không phải nạp lại đề.
   // Cửa nạp đề cũng đi qua đây nên đề mới vào kho là đã gộp sẵn.
-  return str.normalize('NFC').replace(DAI_SYMBOL, (c) => String.fromCharCode(c.charCodeAt(0) - 0xf000))
+  return suaNhanXenKe(str.normalize('NFC').replace(DAI_SYMBOL, (c) => String.fromCharCode(c.charCodeAt(0) - 0xf000)))
 }
 
 /** Còn ký tự vùng dùng riêng nào KHÔNG gỡ được không — chỗ này phải cờ hoá. */

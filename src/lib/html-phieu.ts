@@ -30,6 +30,7 @@ import { cauHinhNop, type CauHinhNopKhacPhuc } from './cau-hinh-nop-khac-phuc'
 import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
 import { gomTuCongThuc, tachDongSoDo } from './chem-format-so-do'
 import { goKyTuLa } from './chu-la-pdf'
+import { suaNhanXenKe } from './phong-cu'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
 import { docSoPhanIII } from './doc-so-phan-iii'
 import { soOPhanIII } from './so-o-tra-loi-ngan'
@@ -129,7 +130,7 @@ export function chuHtml(s: unknown): string {
   }
   // Sơ đồ/phương trình dính trong câu chữ được tách ra đứng riêng một dòng
   // (`tachDongSoDo`, cùng luật với ChemText trên màn hình).
-  return tachDongSoDo(goKyTuLa(str))
+  return tachDongSoDo(suaNhanXenKe(goKyTuLa(str)))
     .map((k) => {
       const noi = doanHtmlLien(doanCongThuc(k.v))
       return k.t === 'sodo' ? `<span class="so-do" style="display:block;margin:.25em 0">${noi}</span>` : noi
