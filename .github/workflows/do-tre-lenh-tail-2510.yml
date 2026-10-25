@@ -1,0 +1,61 @@
+# ĐO ĐỘ TRỄ TỪNG LỆNH TRÊN BẢN SỐNG (chỉ đọc, 25/10 tối, thầy: «app hs bị chậm, hs kêu»). `wrangler tail` 150 giây ⇒ gộp theo TÊN LỆNH (bỏ query, gộp mã sau /phieu/ /de/ /t/ /d/).
+# Chỉ in số gộp: không URL đầy đủ, không IP, không thân yêu cầu (repo công khai).
+name: Đo độ trễ từng lệnh (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/do-tre-lenh-tail-2510.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-tre-lenh-tail
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Nghe 150 giây rồi gộp
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          timeout 150 npx -y wrangler@4 tail omr --format json > /tmp/tail.txt 2>/tmp/tail.err || true
+          echo "BYTE $(wc -c < /tmp/tail.txt)"; grep -iE "error|denied|auth" /tmp/tail.err | head -3 || true
+          python3 - <<'PY'
+          import json, re
+          s = open('/tmp/tail.txt').read(); dec = json.JSONDecoder(); i = 0; ev = []
+          while True:
+              j = s.find('{', i)
+              if j < 0: break
+              try: o, i = dec.raw_decode(s, j); ev.append(o)
+              except ValueError: i = j + 1
+          print('SU_KIEN', len(ev))
+          def ten(u):
+              p = re.sub(r'^https?://[^/]+', '', u or '').split('?')[0].rstrip('/') or '/'
+              if re.match(r'^/(phieu|de|t|d)/', p): return '/' + p.split('/')[1] + '/*'
+              return p[:50]
+          g = {}
+          for o in ev:
+              r = ((o.get('event') or {}).get('request') or {})
+              if r.get('method') == 'OPTIONS': continue
+              k = ten(r.get('url'))
+              g.setdefault(k, []).append((o.get('wallTime') or 0, o.get('cpuTime') or 0, o.get('outcome')))
+          def p(xs, f): xs = sorted(xs); return xs[min(len(xs) - 1, int(f * len(xs)))] if xs else 0
+          tat = [w for v in g.values() for w, _, _ in v]
+          print(f'TẤT CẢ n={len(tat)} wall p50 {p(tat,.5)}ms p95 {p(tat,.95)}ms')
+          hang = sorted(g.items(), key=lambda kv: -len(kv[1]))
+          for k, v in hang[:30]:
+              w = [a for a, _, _ in v]; c = [b for _, b, _ in v]; loi = sum(1 for *_, oc in v if oc not in ('ok', None))
+              print(f'{len(v):5d}  wall p50 {p(w,.5):6d} p95 {p(w,.95):6d} max {max(w):6d} · cpu p95 {p(c,.95):4d} · lỗi {loi}  {k}')
+          cham = [(k, v) for k, v in hang[30:] if p([a for a, _, _ in v], .95) > 1500]
+          for k, v in cham: print(f'CHẬM {len(v)} p95 {p([a for a,_,_ in v],.95)} {k}')
+          PY
