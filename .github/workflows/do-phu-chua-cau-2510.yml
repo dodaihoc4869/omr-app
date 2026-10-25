@@ -1,0 +1,45 @@
+# ĐO ĐỘ PHỦ HỌC LIỆU CHO VÒNG CHỮA CÂU GỌN (CHỈ ĐỌC) — thầy 25/10 "đề xuất lại việc chữa câu đơn giản và hiệu quả nhất".
+# Câu hỏi: với các đợt tự sửa còn mở (nhất là sai trong 14 ngày), bao nhiêu câu có lời giải trong kho, có câu song sinh (~ss / ~bt),
+# có đáp án để máy chấm; mỗi em có bao nhiêu câu sai gần đây. CHỈ SELECT gộp — không mã em, tên em, mã câu (repo công khai).
+name: Đo độ phủ chữa câu gọn (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/gifted-mendel-m8etj0]
+    paths: ['.github/workflows/do-phu-chua-cau-2510.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-phu-chua-cau-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results' || echo "LOI"; }
+          MO="dong_luc IS NULL AND trang_thai_day<>'da_tu_sua'"
+          GAN="COALESCE(sai_cuoi_luc,mo_luc) >= (strftime('%s','now')-14*86400)*1000"
+          SS="EXISTS (SELECT 1 FROM game_v2_question s WHERE s.qid > d.qid_chuan||'~' AND s.qid < d.qid_chuan||'~~' AND (substr(s.qid,length(d.qid_chuan)+1,3) IN ('~ss','~bt')))"
+          LG="EXISTS (SELECT 1 FROM game_v2_question g WHERE g.qid=d.qid_chuan AND length(trim(COALESCE(json_extract(g.json,'\$.solution'),'')))>0)"
+          DA="EXISTS (SELECT 1 FROM game_v2_question g WHERE g.qid=d.qid_chuan AND length(trim(COALESCE(json_extract(g.json,'\$.correct'),'')))>0)"
+          q "0 khoá json mẫu của game_v2_question (1 dòng, chỉ tên khoá)" "SELECT group_concat(key) k FROM (SELECT key FROM game_v2_question, json_each(game_v2_question.json) WHERE rowid=(SELECT MIN(rowid) FROM game_v2_question))"
+          q "1 đợt mở: tổng · sai trong 14 ngày · số em" "SELECT COUNT(*) mo, SUM($GAN) mo_14_ngay, COUNT(DISTINCT sbd) so_em FROM chua_loi_dot d WHERE $MO"
+          q "2 đợt mở 14 ngày: có lời giải · có song sinh · có đáp án · cả lời giải lẫn song sinh · không có cả hai" "SELECT COUNT(*) n, SUM($LG) co_loi_giai, SUM($SS) co_song_sinh, SUM($DA) co_dap_an, SUM(($LG) AND ($SS)) ca_hai, SUM(NOT($LG) AND NOT($SS)) khong_co_gi FROM chua_loi_dot d WHERE $MO AND $GAN"
+          q "3 mọi đợt mở: có lời giải · có song sinh · có đáp án" "SELECT COUNT(*) n, SUM($LG) co_loi_giai, SUM($SS) co_song_sinh, SUM($DA) co_dap_an FROM chua_loi_dot d WHERE $MO"
+          q "4 đợt mở 14 ngày theo loại câu" "SELECT COALESCE((SELECT json_extract(g.json,'\$.type') FROM game_v2_question g WHERE g.qid=d.qid_chuan LIMIT 1),'?') loai, COUNT(*) n FROM chua_loi_dot d WHERE $MO AND $GAN GROUP BY loai ORDER BY n DESC"
+          q "5 mỗi em: số câu sai 14 ngày còn mở (phân bố)" "WITH e AS (SELECT sbd, SUM($GAN) gan FROM chua_loi_dot d WHERE $MO GROUP BY sbd) SELECT COUNT(*) so_em, SUM(gan=0) em_0, SUM(gan BETWEEN 1 AND 3) em_1_3, SUM(gan BETWEEN 4 AND 11) em_4_11, SUM(gan BETWEEN 12 AND 30) em_12_30, SUM(gan>30) em_tren_30 FROM e"
+          q "6 đợt mở 14 ngày theo kênh sai" "SELECT nguon_sai, COUNT(*) n FROM chua_loi_dot d WHERE $MO AND $GAN GROUP BY nguon_sai ORDER BY n DESC LIMIT 12"
+          q "7 nhóm nội dung: đợt mở 14 ngày mà ≥5 em cùng sai (số câu, số đợt)" "SELECT COUNT(*) so_cau, SUM(n) so_dot FROM (SELECT qid_chuan, COUNT(DISTINCT sbd) n FROM chua_loi_dot d WHERE $MO AND $GAN GROUP BY qid_chuan HAVING n>=5)"
