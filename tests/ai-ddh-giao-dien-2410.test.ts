@@ -46,6 +46,17 @@ describe('nơi gắn bong bóng', () => {
     expect(dong).toContain('!moHoSoEm')
     expect(dong).not.toMatch(/'kiemtra'|'vaothi'|'hoctap'|'thanthu'|'bia'/)
   })
+  // 25/10 (ảnh thầy: tấm trong suốt, chữ Hôm nay lộ qua, thẻ Điểm danh đè): cổng học sinh dựng `ht-shell` — KHÔNG có biến Bát Linh --bl-*.
+  it('CSS tự ánh xạ --bl-* sang biến của app học sinh; tấm chat nằm trên thẻ Điểm danh (60) và thanh menu (30)', () => {
+    const css = readFileSync('src/components/ai-ddh/ai-ddh.css', 'utf8')
+    const khoi = /\.aid-bong, \.aid-che, \.aid-tam \{([^}]*)\}/.exec(css)?.[1] ?? ''
+    for (const ten of new Set([...css.matchAll(/var\(--bl-([a-z-]+)/g)].map((m) => m[1]))) expect(khoi, `--bl-${ten}`).toMatch(new RegExp(`--bl-${ten}:`))
+    expect(khoi).toContain('--bl-paper: var(--the)')
+    const z = (lop: string) => Number(new RegExp(`\\.${lop} \\{[^}]*z-index: (\\d+)`).exec(css)?.[1])
+    expect(z('aid-tam')).toBeGreaterThan(60)
+    expect(z('aid-che')).toBeGreaterThan(60)
+    expect(readFileSync('src/components/bat-linh/BatLinhShell.tsx', 'utf8')).toContain("vai === 'hs' ? 'ht-shell' : 'bl-app'")
+  })
   it('bong bóng tải lười, ngoài precache', () => {
     expect(readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')).toContain('lazy(() => napKhoiPhu().then((m) => m.napBong()))')
     expect(readFileSync('src/components/cong-hs-nap-luoi.ts', 'utf8')).toContain("import('./ai-ddh/BongBongAiDdh')")

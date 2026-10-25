@@ -1,0 +1,37 @@
+# BẬT CÔNG TẮC (thầy 25/10: "Tự bật hết luôn đi, cho hoạt động tất cả đi"). Phiên Claude trên đám mây không gọi được API Cloudflare (khoá hai dòng)
+# ⇒ ghi qua đây. Chỉ ghi HAI dòng cấu hình trong `cau_hinh` (UPSERT theo khoá) — không đụng dữ liệu học sinh:
+#   · `ai_ddh` = {"cheDo":"bat","lop":[]}      — bong bóng A.I Đỗ Đại Học cho mọi em (server/src/ai-ddh.ts, công tắc Cài đặt ghi đúng dạng này)
+#   · `danh_gia_hoc_that` = "bat"               — xếp Học thật · Đối phó công khai cho em / phụ huynh (server/src/danh-gia-hoc-that-d1.ts ghiCheDo)
+# Đổi lại bất cứ lúc nào ở app thầy: Cài đặt → A.I Đỗ Đại Học / Học sinh › Xếp học sinh. In lại hai giá trị sau khi ghi (không in tên, SBD).
+name: Bật công tắc A.I Đỗ Đại Học + Học thật (25/10)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/bat-cong-tac-2510.yml']
+permissions:
+  contents: read
+concurrency:
+  group: bat-cong-tac-2510
+  cancel-in-progress: false
+jobs:
+  bat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Ghi hai công tắc rồi đọc lại
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          NAY="strftime('%Y-%m-%dT%H:%M:%fZ','now')"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('ai_ddh', '{\"cheDo\":\"bat\",\"lop\":[]}', $NAY) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc; INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('danh_gia_hoc_that', '\"bat\"', $NAY) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc;" > /tmp/ghi.json
+          python3 -c "import json;d=json.load(open('/tmp/ghi.json'));print('ghi:', [x.get('success') for x in d])"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN ('ai_ddh', 'danh_gia_hoc_that', 'ai_ddh_vp_luc')"
