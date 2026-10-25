@@ -132,6 +132,9 @@ export function taoD1That() {
         objects.set(key, typeof value === 'string' ? value : value)
         return {}
       },
+      async head(key: string) {
+        return objects.has(key) ? { key, httpEtag: 'x' } : null
+      },
       async delete(key: string | string[]) {
         for (const k of Array.isArray(key) ? key : [key]) objects.delete(k)
       },

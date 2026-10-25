@@ -30,6 +30,8 @@ export const VP_NGHI_SAU_MS = 60_000
 /** Tin đã lấy mà quá ngần này chưa trả lời ⇒ trả về hàng chờ (văn phòng tắt giữa chừng). */
 const LAY_LAI_SAU_MS = 15 * 60_000
 const TOI_DA_ANH = 8
+/** Số thứ tự ảnh tải trước: 0…15 (em bỏ bớt ảnh rồi chọn thêm ⇒ số không liền nhau). Đường cũ đánh số từ 16. */
+const TOI_DA_SO_ANH = 16
 const TOI_DA_BYTE_ANH = 3 * 1024 * 1024
 const TOI_DA_CHU = 4000
 
@@ -81,18 +83,18 @@ const tinRa = (x: Row) => ({
 
 /**
  * TRẢ LỜI NGAY (25/10, thầy: "tốc độ nhắn chậm quá, tối ưu tức thì"): chào hỏi / cảm ơn / «ok, dạ» không cần văn phòng (văn phòng phải lấy hàng chờ rồi
- * hỏi não ~1 phút) ⇒ máy chủ trả luôn. Giọng BẠN BÈ (25/10 thầy: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự"): mình / bạn. Chỉ khi KHÔNG ảnh, ngắn, không số (câu có số là đề). Thuần — test được.
+ * hỏi não ~1 phút) ⇒ máy chủ trả luôn. Giọng BẠN BÈ (25/10 thầy: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự"): mình / bạn; văn phong Thầy nhắn Zalo (25/10: "nhắn tin theo văn phong của tôi"): ngắn, thẳng, bớt nhé / nha, teencode ko / đc. Chỉ khi KHÔNG ảnh, ngắn, không số (câu có số là đề). Thuần — test được.
  */
 export function traLoiNgay(chu: string, soAnh: number): string | null {
   if (soAnh > 0) return null
   const s = chu.normalize('NFC').toLowerCase().replace(/[!?.,~:;…"'()*\-_/\\]+/g, ' ').replace(/[^\p{L}\s]/gu, ' ').replace(/\s+/g, ' ').trim()
   if (!s || s.length > 40 || /\d/.test(chu)) return null
   if (/^(?:(?:em|e)\s+)?(?:xin\s+)?ch[aà]o(?:\s+(?:thầy|thay|ạ|a|ad|anh|chị|bạn|cậu|mọi người))*$|^(?:hi|hello|helo|hey|alo|a lô)(?:\s+(?:thầy|thay|ạ|a|bạn|cậu))*$/.test(s))
-    return 'Chào bạn! Có gì cứ nhắn mình nha: hỏi bài, xin đề, xin vài câu luyện, hay tâm sự cũng được.'
+    return 'Chào bạn:)) cần gì cứ nhắn mình: hỏi bài, xin đề, xin câu luyện, tâm sự cũng đc'
   if (/^(?:(?:em|e)\s+)?(?:(?:xin\s+)?c[ảáa]m\s+[ơo]n|thanks?|thank you|tks|thx)(?:\s+(?:thầy|thay|bạn|cậu|ạ|a|nhiều|nhieu|nha|nhé|nhe))*$/.test(s))
-    return 'Không có gì nha. Còn gì cứ nhắn mình.'
+    return 'Ko có gì:)) còn gì cứ nhắn mình'
   if (/^(?:ok|oke|okay|okela|ừ|ừm|uhm|dạ|da|vâng|vang|em hiểu rồi|e hiểu rồi|hiểu rồi)(?:\s+(?:thầy|thay|bạn|cậu|ạ|a|ạ thầy|nha|nhé|rồi))*$/.test(s))
-    return 'Ok nha. Có gì cứ nhắn mình.'
+    return 'Ok, có gì nhắn mình'
   return null
 }
 
@@ -145,7 +147,22 @@ const b64 = (s: string): Uint8Array | null => {
   } catch { return null }
 }
 
-/** `POST /hs/ai-ddh/gui {token, maTin, chu?, anh?: base64[]}` — em gửi một tin (chữ và/hoặc ảnh). `maTin` do máy em tạo ⇒ bấm lặp / gửi lại khi có mạng không ra hai tin. */
+/** `POST /hs/ai-ddh/anh {token, maTin, so, anh: base64}` — TẢI ẢNH TRƯỚC (25/10, thầy: "gửi ảnh lên a.i quá chậm, tối ưu tốc độ tức thì"): máy em tải từng ảnh
+ *  ngay lúc chọn, cất R2 `ai-ddh/<sbd>/<maTin>-<so>.jpg`; bấm Gửi chỉ còn gửi chữ + số thứ tự ảnh (`anhSo`). Chưa thành tin — tin chỉ có khi `gui`. */
+export async function hsAnhAiDdh(env: Env, b: Row): Promise<Row> {
+  const sbd = await emCua(env, b)
+  if (!sbd) return { ok: false, error: 'Bạn cần đăng nhập lại.' }
+  const maTin = str(b.maTin).slice(0, 60), so = Number(b.so)
+  if (!/^[A-Za-z0-9_-]{8,60}$/.test(maTin) || !Number.isInteger(so) || so < 0 || so >= TOI_DA_SO_ANH) return { ok: false, error: 'Ảnh không hợp lệ, bạn chọn lại nhé.' }
+  const u = b64(str(b.anh))
+  if (!u || !u.length) return { ok: false, error: 'Ảnh hỏng, bạn chụp lại nhé.' }
+  if (u.length > TOI_DA_BYTE_ANH) return { ok: false, error: 'Ảnh quá lớn, bạn chụp lại gần hơn nhé.' }
+  await env.DE.put(khoaAnh(sbd, maTin, so), u, { httpMetadata: { contentType: 'image/jpeg' } })
+  return { ok: true }
+}
+const khoaAnh = (sbd: string, maTin: string, so: number) => `ai-ddh/${sbd}/${maTin}-${so}.jpg`
+
+/** `POST /hs/ai-ddh/gui {token, maTin, chu?, anhSo?: number[], anh?: base64[]}` — em gửi một tin (chữ và/hoặc ảnh). `anhSo` = ảnh đã tải trước (`/hs/ai-ddh/anh`); `anh` = đường cũ (ảnh kèm thân). `maTin` do máy em tạo ⇒ bấm lặp / gửi lại khi có mạng không ra hai tin. */
 export async function hsGuiAiDdh(env: Env, b: Row, nowMs = Date.now()): Promise<Row> {
   const sbd = await emCua(env, b)
   if (!sbd) return { ok: false, error: 'Em cần đăng nhập lại.' }
@@ -153,33 +170,36 @@ export async function hsGuiAiDdh(env: Env, b: Row, nowMs = Date.now()): Promise<
   if (!/^[A-Za-z0-9_-]{8,60}$/.test(maTin)) return { ok: false, error: 'Tin không hợp lệ, bạn gửi lại nhé.' }
   const chu = str(b.chu).trim().slice(0, TOI_DA_CHU)
   const anhVao = (Array.isArray(b.anh) ? b.anh : []).map(str).filter(Boolean).slice(0, TOI_DA_ANH)
-  if (!chu && !anhVao.length) return { ok: false, error: 'Em gõ đề hoặc gửi ảnh đề nhé.' }
+  const anhSo = [...new Set((Array.isArray(b.anhSo) ? b.anhSo : []).map(Number).filter((n) => Number.isInteger(n) && n >= 0 && n < TOI_DA_SO_ANH))].slice(0, TOI_DA_ANH)
+  if (!chu && !anhVao.length && !anhSo.length) return { ok: false, error: 'Em gõ đề hoặc gửi ảnh đề nhé.' }
   await damBaoAiDdh(env)
   const id = `${sbd}-${maTin}`
-  const [{ ch }, hs, caMo, ktcn, dem, cu] = await Promise.all([
+  const daTai = anhSo.map((n) => khoaAnh(sbd, maTin, n))
+  const [{ ch }, hs, caMo, ktcn, dem, cu, coAnh] = await Promise.all([
     docCauHinh(env),
     env.DB.prepare('SELECT lop, ten_lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<Row>().catch(() => null),
     coCaDangMo(env, sbd, nowMs),
     coChangKtcnMo(env, sbd, nowMs),
     env.DB.prepare("SELECT COUNT(*) AS n FROM ai_ddh_tin WHERE sbd = ? AND ben = 'em' AND luc >= ?").bind(sbd, dauNgayVn(nowMs)).first<Row>(),
     env.DB.prepare('SELECT * FROM ai_ddh_tin WHERE id = ?').bind(id).first<Row>(),
+    // Ảnh đã tải trước: kiểm có thật trên R2 — CÙNG đợt với các lượt đọc D1 (không thêm vòng chờ).
+    Promise.all(daTai.map((k) => (env.DE.head ? env.DE.head(k) : env.DE.get(k)).then((o) => !!o, () => false))),
   ])
   if (cu) return { ok: true, tin: tinRa(cu) }
   if (!choEm(ch, str(hs?.lop), str(hs?.ten_lop))) return { ok: false, error: 'Thầy chưa mở A.I Đỗ Đại Học cho lớp bạn.' }
   if (caMo || ktcn) return { ok: false, khoa: 'kiem_tra', error: 'Em đang có bài kiểm tra mở. Nộp bài xong, A.I Đỗ Đại Học mở lại.' }
   if (num(dem?.n) >= TRAN_TIN_NGAY) return { ok: false, khoa: 'het_luot', error: `Hôm nay bạn đã nhắn đủ ${TRAN_TIN_NGAY} lượt. 0 giờ đêm nay nhắn tiếp được.` }
-  const khoaAnh: string[] = []
-  for (let i = 0; i < anhVao.length; i++) {
-    const u = b64(anhVao[i]!)
-    if (!u || !u.length) return { ok: false, error: 'Ảnh hỏng, bạn chụp lại nhé.' }
-    if (u.length > TOI_DA_BYTE_ANH) return { ok: false, error: 'Ảnh quá lớn, bạn chụp lại gần hơn nhé.' }
-    const k = `ai-ddh/${sbd}/${maTin}-${i}.jpg`
-    await env.DE.put(k, u, { httpMetadata: { contentType: 'image/jpeg' } })
-    khoaAnh.push(k)
-  }
-  const ngay = traLoiNgay(chu, khoaAnh.length)
+  if (coAnh.some((x) => !x)) return { ok: false, error: 'Ảnh chưa tải lên xong, bạn gửi lại nhé.' }
+  // Đường cũ (ảnh kèm thân): giải mã hết rồi cất R2 SONG SONG.
+  const tho = anhVao.map(b64)
+  if (tho.some((u) => !u || !u.length)) return { ok: false, error: 'Ảnh hỏng, bạn chụp lại nhé.' }
+  if (tho.some((u) => u!.length > TOI_DA_BYTE_ANH)) return { ok: false, error: 'Ảnh quá lớn, bạn chụp lại gần hơn nhé.' }
+  const cuMoi = tho.map((_, i) => khoaAnh(sbd, maTin, TOI_DA_SO_ANH + i))
+  await Promise.all(tho.map((u, i) => env.DE.put(cuMoi[i]!, u!, { httpMetadata: { contentType: 'image/jpeg' } })))
+  const dsKhoaAnh = [...daTai, ...cuMoi]
+  const ngay = traLoiNgay(chu, dsKhoaAnh.length)
   const lenh = [env.DB.prepare(`INSERT OR IGNORE INTO ai_ddh_tin (id, sbd, ben, chu, anh_json, trang_thai, luc) VALUES (?, ?, 'em', ?, ?, ?, ?)`)
-    .bind(id, sbd, chu, JSON.stringify(khoaAnh), ngay ? 'xong' : 'cho', nowMs)]
+    .bind(id, sbd, chu, JSON.stringify(dsKhoaAnh), ngay ? 'xong' : 'cho', nowMs)]
   if (ngay) lenh.push(env.DB.prepare(`INSERT OR IGNORE INTO ai_ddh_tin (id, sbd, ben, chu, nguon, trang_thai, tra_loi_cho, luc) VALUES (?, ?, 'vp', ?, 'ngay', 'xong', ?, ?)`)
     .bind(`${id}~0`, sbd, ngay, id, nowMs + 1))
   // Một đợt: ghi (+ trả lời ngay) rồi đọc lại — không thêm vòng chờ nối tiếp.

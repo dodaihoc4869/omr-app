@@ -7,7 +7,7 @@ import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 import { gameToken } from '../server/src/game-v2-auth'
-import { dauNgayVn, hsGuiAiDdh, hsMoAiDdh, traLoiNgay, TRAN_TIN_NGAY } from '../server/src/ai-ddh'
+import { dauNgayVn, hsAnhAiDdh, hsGuiAiDdh, hsMoAiDdh, traLoiNgay, TRAN_TIN_NGAY } from '../server/src/ai-ddh'
 
 const NOW = Date.parse('2026-10-24T13:00:00Z')
 function moi() {
@@ -124,5 +124,28 @@ describe('giọng bạn bè', () => {
       expect(r, c).toMatch(/mình/)
       expect(r, c).not.toMatch(/(?<![\p{L}])(thầy|e|em)(?![\p{L}])/iu)
     }
+  })
+})
+
+// 25/10 (thầy: "gửi ảnh lên a.i quá chậm, tối ưu tốc độ tức thì"): ảnh tải trước lúc chọn, bấm Gửi chỉ gửi số ảnh.
+describe('ảnh tải trước', () => {
+  it('tải ảnh ⇒ R2; gửi bằng anhSo ⇒ tin có ảnh; số ảnh chưa tải ⇒ báo gửi lại, không ghi tin', async () => {
+    const d = taoD1That()
+    d.sql.prepare('INSERT INTO hoc_sinh (sbd, ho_ten, lop, mat_khau, cap_nhat_luc) VALUES (?,?,?,?,?)').run('A1', 'Nguyễn Văn An', '12', 'mk123456', 'x')
+    const env = d.env as unknown as Env
+    await gv(env, '/gv/ai-ddh/che-do', { cheDo: 'bat' })
+    const token = await gameToken(env, 'A1')
+    const anh = btoa('JPEGDATA')
+    expect(await hsAnhAiDdh(env, { token, maTin: 'anh-00001', so: 0, anh })).toEqual({ ok: true })
+    expect(await hsAnhAiDdh(env, { token, maTin: 'anh-00001', so: 2, anh })).toEqual({ ok: true })
+    expect([...d.objects.keys()].filter((k) => k.startsWith('ai-ddh/A1/'))).toEqual(['ai-ddh/A1/anh-00001-0.jpg', 'ai-ddh/A1/anh-00001-2.jpg'])
+    expect((await hsAnhAiDdh(env, { token, maTin: 'anh-00001', so: 99, anh })).ok).toBe(false)
+    expect((await hsAnhAiDdh(env, { maTin: 'anh-00001', so: 0, anh })).ok).toBe(false)
+    const thieu = await hsGuiAiDdh(env, { token, maTin: 'anh-00001', chu: '', anhSo: [0, 1] }, NOW)
+    expect(thieu).toMatchObject({ ok: false })
+    expect(d.dem('ai_ddh_tin')).toBe(0)
+    const g = await hsGuiAiDdh(env, { token, maTin: 'anh-00001', chu: 'câu này sao ạ', anhSo: [0, 2] }, NOW)
+    expect(g).toMatchObject({ ok: true, tin: { anh: 2 } })
+    expect(JSON.parse(String((d.sql.prepare('SELECT anh_json FROM ai_ddh_tin').get() as { anh_json: string }).anh_json))).toEqual(['ai-ddh/A1/anh-00001-0.jpg', 'ai-ddh/A1/anh-00001-2.jpg'])
   })
 })
