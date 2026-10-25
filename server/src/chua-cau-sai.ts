@@ -956,8 +956,7 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
   // Chữa câu gọn (thầy 25/10, chua-gon.ts): trang đầu ĐÓNG TRƯỚC các đợt em đã làm đúng lại qua luật tự làm — chạy đầu CÙNG lô (không thêm vòng chờ D1).
   const nowMs = Date.now()
   const dong = c ? [] : [env.DB.prepare(SQL_DONG_DA_DUNG_LAI).bind(nowMs, sbd, nowMs - NGAY_CUA_SO_GON * 86_400_000)]
-  const r0 = await env.DB.batch([
-    ...dong,
+  const doc = [
     env.DB.prepare(`WITH muc AS (SELECT id AS dotId,qid_chuan AS qid,trang_thai_day AS trangThai,
       lan_gap_lai AS lanGapLai,den_han AS denHan,giao_luc AS giaoLuc,COALESCE(sai_cuoi_luc,mo_luc) AS saiLuc,dong_luc AS dongLuc,${thuTu} AS hang FROM chua_loi_dot WHERE sbd=?)
       SELECT *,EXISTS(SELECT 1 FROM hoi_thay_kiem k WHERE k.sbd=? AND k.qid_goc=muc.qid) AS kiemHoiThay
@@ -968,8 +967,11 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
     env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom,dong_luc FROM chua_loi_dot WHERE sbd=?)
       SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,SUM(nhom='xong' AND dong_luc>=?) AS xongHomNay FROM muc`)
       .bind(nay, sbd, dauNgayVnMs(nowMs)),
-  ])
-  const r = r0.slice(dong.length)
+  ]
+  // Câu đóng tự động KHÔNG được làm hỏng danh sách: lỗi (D1 từ chối / quá giờ) ⇒ đọc lại không có nó (như layCauChoEm).
+  let soDong = dong.length
+  const r0 = await env.DB.batch([...dong, ...doc]).catch(() => { soDong = 0; return env.DB.batch(doc) })
+  const r = r0.slice(soDong)
   const rows = (r[0]?.results ?? []) as Obj[], ds = rows.slice(0, 100), cuoi = ds.at(-1)
   const d = r[1]?.results?.[0] as Obj | undefined
   return Response.json({ ok: true,

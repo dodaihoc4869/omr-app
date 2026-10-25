@@ -19,6 +19,7 @@ import { apSongSinh, qidSongSinh } from './song-sinh-game'
 import { phuQidAoMoi, SO_THU_BIEN_THE } from './ban-khac-ao'
 import { qidBienThe, qidYDsMoi } from './loi-hoc-luat'
 import { GIO_LOI_GIAI_GAN, sqlHoCau } from './chua-gon'
+import { emCoGhi } from './dem-ke-hoach'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
@@ -167,6 +168,7 @@ export async function gonNop(env: Env, b: Obj): Promise<Response> {
   const r = await env.DB.batch(ghi)
   const dong = (r.at(-1)?.results?.[0] ?? null) as { ket: string; luc: number } | null
   if (!dong) return loi('HET_LUOT', 'Hôm nay em đã làm câu này đủ lần. Mai làm lại nhé.', 409)
+  emCoGhi(sbd) // như nopItem: sổ vừa có dòng mới ⇒ bỏ bản đếm kế hoạch / hồ sơ đệm của em
   if (Number(dong.luc) !== nowMs) { try { return Response.json(await kemChiTiet(env, sbd, Q, JSON.parse(dong.ket) as Obj)) } catch { /* rơi xuống */ } }
   return Response.json(await kemChiTiet(env, sbd, Q, kq, ban))
 }

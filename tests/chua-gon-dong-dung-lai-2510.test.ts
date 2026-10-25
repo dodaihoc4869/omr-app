@@ -74,6 +74,15 @@ describe('Chữa câu gọn — đóng đợt em đã làm đúng lại (luật 
     await ds(d)
     expect(dot(d).trang_thai_day).not.toBe('da_tu_sua')
   })
+  it('câu đóng tự động lỗi (D1 từ chối) ⇒ danh sách VẪN trả bình thường, không đóng gì', async () => {
+    const d = await dung()
+    lam(d, Q, 1, '2026-10-06T02:00:00.000Z')
+    d.sql.exec('DROP TABLE loi_giai_hoi')
+    const r = await ds(d)
+    expect(r.ok).toBe(true)
+    expect(r.ds.map((m) => m.dotId)).toContain(d.dotId)
+    expect(dot(d).trang_thai_day).not.toBe('da_tu_sua')
+  })
   it('đợt ĐÃ đóng, em sai lại sau lúc đóng ⇒ mở đợt MỚI (không kẹt "Đã tự sửa"); dòng cũ giữ nguyên', async () => {
     const d = await dung()
     lam(d, Q, 1, '2026-10-06T02:00:00.000Z')
