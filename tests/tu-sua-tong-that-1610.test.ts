@@ -16,7 +16,9 @@ import { docNhoTuSua, ngheTuSua, nhomMucChua, soCauCanSua, taiTuSuaLoi, xoaNhoTu
 const NOW = Date.parse('2026-10-16T10:00:00.000Z')
 function dbThu() {
   const sql = new DatabaseSync(':memory:')
-  sql.exec(`CREATE TABLE chua_loi_dot(id TEXT PRIMARY KEY,sbd TEXT,qid_chuan TEXT,trang_thai_day TEXT,lan_gap_lai INTEGER,den_han TEXT,giao_luc INTEGER,dong_luc INTEGER,content_group TEXT DEFAULT '');
+  sql.exec(`CREATE TABLE chua_loi_dot(id TEXT PRIMARY KEY,sbd TEXT,qid_chuan TEXT,trang_thai_day TEXT,lan_gap_lai INTEGER,den_han TEXT,giao_luc INTEGER,dong_luc INTEGER,content_group TEXT DEFAULT '',revision INTEGER DEFAULT 0,cap_nhat_luc INTEGER,mo_luc INTEGER,sai_cuoi_luc INTEGER);
+    CREATE TABLE su_kien_hoc(sbd TEXT,qid TEXT,ket_qua INTEGER,luc TEXT,ngay_vn TEXT,assistance TEXT,visibility TEXT,purpose TEXT);
+    CREATE TABLE loi_giai_hoi(sbd TEXT,qid TEXT,luc TEXT);
     CREATE INDEX idx_sbd ON chua_loi_dot(sbd,trang_thai_day,den_han);
     CREATE TABLE hoi_thay_kiem(id TEXT PRIMARY KEY,sbd TEXT,qid_goc TEXT,version_goc TEXT DEFAULT 'v1',nhom_goc TEXT DEFAULT 'G',trang_thai TEXT DEFAULT 'da_nop',het_han_luc INTEGER DEFAULT 0,phat_luc INTEGER DEFAULT 0,den_han INTEGER);
     CREATE INDEX htk_em_goc ON hoi_thay_kiem(sbd,qid_goc);
@@ -78,7 +80,7 @@ describe('Tự sửa lỗi · tổng thật và phân trang', () => {
   })
   it('em chưa có đợt lỗi nhận tổng số 0, không cần truy vấn lần nữa', async () => {
     const d = dbThu()
-    expect(await (await danhSach(d.env, {})).json()).toEqual({ ok: true, ds: [], dem: { can: 0, cho: 0, xong: 0, tong: 0 }, kiemLaiHoiThay: [] })
+    expect(await (await danhSach(d.env, {})).json()).toEqual({ ok: true, ds: [], dem: { can: 0, cho: 0, xong: 0, tong: 0, xongHomNay: 0 }, kiemLaiHoiThay: [] })
     expect(d.soLo()).toBe(1); d.sql.close()
   })
   it('101+ mục: tổng can/cho/xong đúng ranh giới hạn, cô lập em; 1 batch/trang và keyset không lặp khi cùng giờ giao', async () => {
@@ -91,7 +93,7 @@ describe('Tự sửa lỗi · tổng thật và phân trang', () => {
     vi.useFakeTimers(); vi.setSystemTime(NOW)
     const a = await (await danhSach(d.env, {})).json() as { ds: { dotId: string; trangThai: string; denHan: string }[]; dem: { can: number; cho: number; xong: number; tong: number }; sau: unknown }
     expect(a.ds).toHaveLength(100)
-    expect(a.dem).toEqual({ can: 108, cho: 3, xong: 1, tong: 112 })
+    expect(a.dem).toEqual({ can: 108, cho: 3, xong: 1, tong: 112, xongHomNay: 0 })
     expect(a.ds.slice(0, 3).every((x) => nhomMucChua(x, NOW) === 'can')).toBe(true)
     expect(d.soLo()).toBe(1)
     const b = await (await danhSach(d.env, { sau: a.sau })).json() as typeof a

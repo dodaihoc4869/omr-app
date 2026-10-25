@@ -43,6 +43,8 @@ export interface ViecHomNay {
   tiep: ViecMuc | null
   /** Số câu nhóm cần sửa không thuộc việc hôm nay. */
   conNgaySau: number
+  /** Số câu ĐÃ TỰ SỬA hôm nay (máy chủ đếm, `dem.xongHomNay`; chữa câu gọn 25/10). */
+  xongHomNay?: number
 }
 export interface MucLuu { q: string; d?: string; t: string; h?: string; l: LoaiViec }
 export interface NhatKy { n: string; m: MucLuu[]; x: string[]; them?: number }
@@ -50,15 +52,18 @@ export interface NhatKy { n: string; m: MucLuu[]; x: string[]; them?: number }
 export const khoaMuc = (m: Pick<MucChua, 'dotId' | 'qid'>) => m.dotId ?? m.qid
 export const ngayVnTuSua = (ms: number) => new Date(ms + 7 * 3600_000).toISOString().slice(0, 10)
 
-/** Loại việc của một mục theo trạng thái hiện tại; mục không còn việc (đã tự sửa, đang chờ chưa tới giờ) ⇒ null. */
+/** Loại việc của một mục; mục không còn việc (đã tự sửa, đang chờ chưa tới giờ) ⇒ null.
+ *  Chữa câu gọn (thầy 25/10): MỘT đường sửa cho mọi câu (ChuaGon) ⇒ mọi câu cần sửa cùng một loại 'goc' (các loại cũ chỉ còn để đọc nhật ký đã lưu). */
 export function loaiViec(m: Pick<MucChua, 'trangThai' | 'denHan'>, nayMs: number): LoaiViec | null {
-  if (nhomMucChua(m, nayMs) !== 'can') return null
-  switch (m.trangThai) {
-    case 'cho_gap_lai_2': case 'dang_kiem_chung': return 'gan'
-    case 'dang_chua_buoc': case 'dang_ghep_bai': return 'dang'
-    case 'can_chan_doan': return 'moi'
-    default: return 'goc'
-  }
+  return nhomMucChua(m, nayMs) === 'can' ? 'goc' : null
+}
+
+/** Thứ tự trong ngày (chữa câu gọn 25/10): câu sai TRƯỚC hôm nay lên đầu (mới nhất trước — làm đúng là "Đã tự sửa" ngay),
+ *  câu vừa sai HÔM NAY xuống cuối (cùng ngày chỉ tính xong phần). Thiếu mốc sai ⇒ đứng giữa. */
+export function hangSai(m: Pick<MucChua, 'saiLuc'>, nayMs: number): number {
+  const dau = Date.parse(`${ngayVnTuSua(nayMs)}T00:00:00+07:00`)
+  if (!m.saiLuc) return 1
+  return m.saiLuc >= dau ? 2 : 0
 }
 
 /** Em đã xong phần hôm nay của mục này chưa: có ghi lúc nộp, hoặc trạng thái đã vượt chặng cuối làm được (không áp cho câu chỉ có lối câu gốc). */
@@ -126,7 +131,7 @@ function chiaChang(muc: ViecMuc[]): ViecMuc[][] {
  * Không đủ 12 câu làm được ⇒ ngày nhỏ hơn, đúng số có. Danh sách lỗi / vòng chữa tắt ⇒ null.
  */
 export function dungViecHomNay(
-  kq: { trangThai: string; ds?: readonly MucChua[]; dem?: { can: number } } | null | undefined,
+  kq: { trangThai: string; ds?: readonly MucChua[]; dem?: { can: number; xongHomNay?: number } } | null | undefined,
   nayMs: number,
   sbd: string,
   them = 0,
@@ -146,7 +151,8 @@ export function dungViecHomNay(
     const ung = ds
       .map((m, i) => ({ m, i, l: loaiViec(m, nayMs) }))
       .filter((x): x is { m: MucChua; i: number; l: LoaiViec } => x.l !== null && !co.has(khoaMuc(x.m)))
-      .sort((a, b) => THU_TU[a.l] - THU_TU[b.l] || (a.l === 'goc' ? truoc(lanCuoi[khoaMuc(a.m)] ?? '', lanCuoi[khoaMuc(b.m)] ?? '') : 0) || a.i - b.i)
+      .sort((a, b) => THU_TU[a.l] - THU_TU[b.l] || hangSai(a.m, nayMs) - hangSai(b.m, nayMs)
+        || (a.l === 'goc' ? truoc(lanCuoi[khoaMuc(a.m)] ?? '', lanCuoi[khoaMuc(b.m)] ?? '') : 0) || (b.m.saiLuc ?? 0) - (a.m.saiLuc ?? 0) || a.i - b.i)
       .slice(0, soMuc - nk.m.length)
     for (const x of ung) them_.push({ q: x.m.qid, ...(x.m.dotId ? { d: x.m.dotId } : {}), t: x.m.trangThai, ...(x.m.denHan ? { h: x.m.denHan } : {}), l: x.l })
   }
@@ -166,6 +172,7 @@ export function dungViecHomNay(
     muc, chang, xong, tong: muc.length, tiep,
     changHienTai: tiep ? chang.findIndex((c) => c.some((x) => x.khoa === tiep.khoa)) : chang.length,
     conNgaySau: Math.max(0, soCan - trongCan),
+    ...(kq.dem?.xongHomNay ? { xongHomNay: kq.dem.xongHomNay } : {}),
   }
   const doi = them_.length > 0 || (them > (nk.them ?? 0))
   return { viec, luu: doi ? { n: nk.n, m: luuMuc, x: nk.x, them: Math.max(them, nk.them ?? 0) } : null }
@@ -188,11 +195,7 @@ export function luuViecHomNay(luu: NhatKy | null): void {
 /** Chữ nhóm chặng cho dòng phụ: "2 câu chỉ còn làm bản mới · 2 câu đang sửa dở". Rỗng khi không có gì đáng nói. */
 export function moTaChang(c: readonly ViecMuc[]): string {
   const dem = (l: LoaiViec) => c.filter((x) => x.loai === l && !x.xong).length
-  const phan = [
-    [dem('gan'), 'chỉ còn làm bản mới'],
-    [dem('dang'), 'đang sửa dở'],
-    [dem('moi'), 'chưa bắt đầu'],
-    [dem('goc'), 'tự làm lại trên câu gốc'],
-  ] as const
-  return phan.filter(([n]) => n > 0).map(([n, t]) => `${n} câu ${t}`).join(' · ')
+  // Chữa câu gọn (25/10): một đường cho mọi câu ⇒ một con số.
+  const n = dem('gan') + dem('dang') + dem('moi') + dem('goc')
+  return n > 0 ? `Còn ${n} câu cần sửa` : ''
 }

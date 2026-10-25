@@ -23,14 +23,11 @@ const dungNgay = (d: MucChua[], sbd = '11010', nay = NAY) => {
 beforeEach(() => { localStorage.clear() })
 
 describe('loại việc', () => {
-  it('gần xong · đang dở · mới · câu gốc; đã tự sửa và câu chờ chưa tới giờ không có việc', () => {
+  // Chữa câu gọn (thầy 25/10 "sửa theo đề xuất"): MỘT đường sửa cho mọi câu ⇒ mọi câu cần sửa cùng một loại.
+  it('mọi câu cần sửa cùng một loại (đường gọn); đã tự sửa và câu chờ chưa tới giờ không có việc', () => {
     const l = (trangThai: string, denHan?: string) => loaiViec({ trangThai, ...(denHan ? { denHan } : {}) }, NAY)
-    expect(l('cho_gap_lai_2', QUA)).toBe('gan')
-    expect(l('dang_kiem_chung')).toBe('gan')
-    expect(l('dang_chua_buoc')).toBe('dang')
-    expect(l('dang_ghep_bai')).toBe('dang')
-    expect(l('can_chan_doan')).toBe('moi')
-    for (const t of ['thieu_hoc_lieu', 'can_thay', 'tam_khoa', 'cau_thay_doi']) expect(l(t)).toBe('goc')
+    expect(l('cho_gap_lai_2', QUA)).toBe('goc')
+    for (const t of ['dang_kiem_chung', 'dang_chua_buoc', 'dang_ghep_bai', 'can_chan_doan', 'thieu_hoc_lieu', 'can_thay', 'tam_khoa', 'cau_thay_doi']) expect(l(t)).toBe('goc')
     expect(l('cho_gap_lai_2', MAI)).toBeNull()
     expect(l('cho_gap_lai_2')).toBeNull()
     expect(l('da_tu_sua')).toBeNull()
@@ -38,13 +35,15 @@ describe('loại việc', () => {
 })
 
 describe('chọn 12 câu, chia chặng', () => {
-  it('tối thiểu 12 câu, 3 chặng × 4, thứ tự gần xong → đang dở → mới → câu gốc', () => {
-    const v = dungNgay(ds(dai(30, 'thieu_hoc_lieu', 'g'), dai(3, 'can_chan_doan', 'm'), dai(2, 'dang_chua_buoc', 'k'), [{ qid: 'x1', dotId: 'x-1', trangThai: 'cho_gap_lai_2', denHan: QUA }]))!
+  it('tối thiểu 12 câu, 3 chặng × 4; câu sai TRƯỚC hôm nay lên đầu (mới nhất trước), câu vừa sai HÔM NAY xuống cuối (chữa câu gọn 25/10)', () => {
+    const homNay = Date.parse('2026-10-20T01:30:00Z'), homQua = Date.parse('2026-10-19T05:00:00Z'), tuanTruoc = Date.parse('2026-10-13T05:00:00Z')
+    const sai = (id: string, saiLuc?: number): MucChua => ({ qid: id, dotId: id, trangThai: 'thieu_hoc_lieu', ...(saiLuc ? { saiLuc } : {}) })
+    const v = dungNgay(ds([sai('nay1', homNay), sai('cu', tuanTruoc), sai('khong-moc'), sai('qua', homQua)], dai(20, 'thieu_hoc_lieu', 'g').map((m) => ({ ...m, saiLuc: homNay }))))!
     expect(SO_CAU_MOI_NGAY).toBe(12)
     expect(v.tong).toBe(12)
     expect(v.chang.map((c) => c.length)).toEqual([4, 4, 4])
-    expect(v.muc.map((x) => x.loai).slice(0, 7)).toEqual(['gan', 'dang', 'dang', 'moi', 'moi', 'moi', 'goc'])
-    expect(v.tiep?.khoa).toBe('x-1')
+    expect(v.muc.slice(0, 3).map((x) => x.khoa)).toEqual(['qua', 'cu', 'khong-moc'])
+    expect(v.tiep?.khoa).toBe('qua')
     expect(v.changHienTai).toBe(0)
   })
   it('không đủ 12 câu làm được ⇒ ngày nhỏ hơn đúng số có; không có việc nào ⇒ null', () => {
@@ -74,16 +73,19 @@ describe('chọn 12 câu, chia chặng', () => {
 })
 
 describe('xong phần hôm nay ≠ đã tự sửa', () => {
-  it('ghép xong (chờ bản mới) · đã tự sửa · hết sức mà vướng đều là xong phần; đang sửa dở thì chưa', () => {
+  // Chữa câu gọn (25/10): câu chỉ "xong phần" khi màn sửa câu đã ghi (câu đã khép) hoặc đã tự sửa — trạng thái cũ của vòng từng bước không còn tự tính.
+  it('đã tự sửa là xong phần; trạng thái cũ (ghép xong, chờ chữa trên lớp, đang dở) không tự tính khi chưa ghi', () => {
     const d = ds([{ qid: 'a', dotId: 'a', trangThai: 'dang_ghep_bai' }, { qid: 'b', dotId: 'b', trangThai: 'cho_gap_lai_2', denHan: QUA }, { qid: 'c', dotId: 'c', trangThai: 'dang_chua_buoc' }, { qid: 'd', dotId: 'd', trangThai: 'can_chan_doan' }])
     const v0 = dungNgay(d)!
     expect(v0.xong).toBe(0)
     // a: ghép xong ⇒ cho_gap_lai_2 chưa tới giờ · b: tự sửa xong · c: vướng ⇒ can_thay · d: mới bắt đầu
     const sau = ds([{ qid: 'a', dotId: 'a', trangThai: 'cho_gap_lai_2', denHan: MAI }, { qid: 'b', dotId: 'b', trangThai: 'da_tu_sua' }, { qid: 'c', dotId: 'c', trangThai: 'can_thay' }, { qid: 'd', dotId: 'd', trangThai: 'dang_chua_buoc' }])
     const v1 = dungViecHomNay(bat(sau), NAY, '11010').viec!
-    expect(v1.muc.map((x) => x.xong)).toEqual([true, true, true, false]) // gan(b) đứng đầu rồi dang(a,c) rồi moi(d): thứ tự lưu giữ nguyên
-    expect(v1.xong).toBe(3)
-    expect(v1.tiep?.khoa).toBe('d')
+    expect(v1.muc.map((x) => x.khoa)).toEqual(['a', 'b', 'c', 'd']) // một loại ⇒ giữ thứ tự máy chủ
+    expect(v1.muc.map((x) => x.xong)).toEqual([false, true, false, false])
+    expect(v1.xong).toBe(1)
+    ghiXongHomNay('a', NAY)
+    expect(dungViecHomNay(bat(sau), NAY, '11010').viec!.tiep?.khoa).toBe('c')
   })
   it('câu chỉ có lối câu gốc chỉ xong khi em đã bấm "Kiểm tra lại" (ghi lúc làm), không xong chỉ vì xem lời giải', () => {
     const d = dai(2, 'thieu_hoc_lieu')
@@ -147,9 +149,11 @@ describe('sửa thêm một chặng và dòng mô tả chặng', () => {
     expect(themMotChang(bat(dai(13, 'can_chan_doan')), NAY)?.tong).toBe(13)
     expect(themMotChang(bat(dai(13, 'can_chan_doan')), NAY)?.tong).toBe(13)
   })
-  it('moTaChang: chỉ nói phần còn việc, theo thứ tự gần xong trước', () => {
+  it('moTaChang: một con số — số câu còn cần sửa của chặng (đường gọn)', () => {
     const v = dungNgay(ds(dai(2, 'can_chan_doan', 'm'), [{ qid: 'x', dotId: 'x', trangThai: 'cho_gap_lai_2', denHan: QUA }], dai(1, 'dang_ghep_bai', 'k')))!
-    expect(moTaChang(v.chang[0]!)).toBe('1 câu chỉ còn làm bản mới · 1 câu đang sửa dở · 2 câu chưa bắt đầu')
+    expect(moTaChang(v.chang[0]!)).toBe('Còn 4 câu cần sửa')
+    ghiXongHomNay('x', NAY)
+    expect(moTaChang(dungViecHomNay(bat([]), NAY, '11010').viec!.chang[0]!)).toBe('Còn 3 câu cần sửa')
     expect(moTaChang([])).toBe('')
   })
 })
@@ -157,17 +161,16 @@ describe('sửa thêm một chặng và dòng mô tả chặng', () => {
 describe('Xoay vòng câu gốc qua nhiều ngày', () => {
   const NGAY2 = NAY + 86_400_000
   const khoaCuaGoc = (v: NonNullable<ReturnType<typeof dungViecHomNay>['viec']>) => v.muc.filter((x) => x.loai === 'goc').map((x) => x.khoa)
-  it('hôm sau ra các câu gốc KHÁC (chưa làm bao giờ trước); các nhóm gần xong / dở / mới giữ nguyên', () => {
+  it('hôm sau ra các câu KHÁC (chưa làm bao giờ trước), câu đã làm hôm qua xuống sau', () => {
     const d = ds(dai(4, 'can_chan_doan', 'm'), dai(16, 'thieu_hoc_lieu', 'g'))
     const v1 = dungNgay(d)!
     const goc1 = khoaCuaGoc(v1)
-    expect(goc1).toHaveLength(8)
-    for (const k of goc1) ghiXongHomNay(k, NAY) // hôm nay em đã tự làm lại 8 câu gốc
+    expect(goc1).toHaveLength(12)
+    for (const k of goc1) ghiXongHomNay(k, NAY) // hôm nay em đã làm 12 câu
     const v2 = dungViecHomNay(bat(d), NGAY2, '11010').viec!
     const goc2 = khoaCuaGoc(v2)
-    expect(goc2).toHaveLength(8)
-    expect(goc2.filter((k) => goc1.includes(k))).toEqual([]) // không lặp
-    expect(v2.muc.filter((x) => x.loai === 'moi').map((x) => x.khoa)).toEqual(v1.muc.filter((x) => x.loai === 'moi').map((x) => x.khoa))
+    expect(goc2).toHaveLength(12)
+    expect(goc2.slice(0, 8).filter((k) => goc1.includes(k))).toEqual([]) // 8 câu chưa làm đứng trước, không lặp
     expect(v2.xong).toBe(0)
   })
   it('chỉ còn câu gốc làm gần đây vẫn lấp đủ ngày (không loại câu nào); câu làm lâu nhất đứng trước', () => {

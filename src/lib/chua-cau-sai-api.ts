@@ -246,8 +246,11 @@ export interface MucChua {
   lanGapLai?: number
   /** Đã có lần tự kiểm sau Hỏi thầy; mở kiểm lại trực tiếp, không cần hỏi AI lại. */
   kiemHoiThay?: boolean
+  /** Lần sai cuối của đợt (ms) — Việc hôm nay xếp câu sai TRƯỚC hôm nay lên đầu (chữa câu gọn 25/10). */
+  saiLuc?: number
 }
-export interface DemDanhSachChua { tong: number; can: number; cho: number; xong: number }
+/** `xongHomNay`: số câu ĐÃ TỰ SỬA hôm nay (giờ VN), máy chủ đếm (chữa câu gọn 25/10). */
+export interface DemDanhSachChua { tong: number; can: number; cho: number; xong: number; xongHomNay?: number }
 export interface MocDanhSachChua { hang: number; giaoLuc: number; dotId: string; nay: string }
 export interface LichKiemLaiHoiThay { qid: string; ten: string; phan: string; trangThai: 'dang_lam' | 'den_han' | 'cho_kiem_lai'; denHan?: string }
 export type KetQuaDanhSachChua =
@@ -272,6 +275,7 @@ export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): P
       ...(typeof x.denHan === 'string' && x.denHan ? { denHan: x.denHan } : {}),
       ...(typeof x.lanGapLai === 'number' ? { lanGapLai: x.lanGapLai } : {}),
       ...(typeof x.kiemHoiThay === 'boolean' || typeof x.kiemHoiThay === 'number' ? { kiemHoiThay: x.kiemHoiThay === true || x.kiemHoiThay === 1 } : {}),
+      ...(Number.isSafeInteger(x.saiLuc) && Number(x.saiLuc) > 0 ? { saiLuc: Number(x.saiLuc) } : {}),
     }))
   const dem = j.dem && typeof j.dem === 'object' ? j.dem as Obj : null
   const moc = j.sau && typeof j.sau === 'object' ? j.sau as Obj : null
@@ -287,8 +291,47 @@ export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): P
   }
   return { trangThai: 'bat', ds,
     ...(Array.isArray(j.kiemLaiHoiThay) ? { kiemLaiHoiThay: [...lich.values()] } : {}),
-    ...(demDung ? { dem: { tong: Number(dem.tong), can: Number(dem.can), cho: Number(dem.cho), xong: Number(dem.xong) } } : {}),
+    ...(demDung ? { dem: { tong: Number(dem.tong), can: Number(dem.can), cho: Number(dem.cho), xong: Number(dem.xong),
+      ...(Number.isSafeInteger(dem.xongHomNay) && Number(dem.xongHomNay) >= 0 ? { xongHomNay: Number(dem.xongHomNay) } : {}) } } : {}),
     ...(moc && [0, 1, 2].includes(Number(moc.hang)) && Number.isSafeInteger(moc.giaoLuc) && typeof moc.dotId === 'string' && typeof moc.nay === 'string'
       ? { sau: { hang: Number(moc.hang), giaoLuc: Number(moc.giaoLuc), dotId: moc.dotId, nay: moc.nay } } : {}),
   }
+}
+
+// ---------------------------------------------------------------------------
+// CHỮA CÂU GỌN (thầy 25/10, server/src/chua-gon-lenh.ts): mở bản làm lại (KHÔNG đáp án) · nộp (máy chủ chấm). Đáp án + lời giải chỉ về SAU khi nộp.
+// ---------------------------------------------------------------------------
+export type KetGon = 'tu_sua' | 'xong_phan' | 'goi_y' | 'loi_giai'
+export interface DeGon {
+  qid: string; phan: 'I' | 'II' | 'III'; text: string; choices?: string[]; ideas?: string[]; table?: string[][]
+  thanCauImg?: string; imageDataUrl?: string; choiceImgs?: (string | undefined)[]; ideaImgs?: (string | undefined)[]
+  hinhAnh?: { src: string; viTri: string; alt?: string }[]; tenDang?: string; soO?: number
+}
+export interface KetQuaGon {
+  ok: boolean
+  ma?: string
+  loi?: string
+  dotId?: string
+  /** Đợt đã tự sửa (mở lại câu đã xong). */
+  trangThai?: string
+  lan?: number
+  ban?: string
+  banKhac?: boolean
+  /** Đúng ở lần này có tính "Đã tự sửa" không (luật tự làm). */
+  tuSuaNeuDung?: boolean
+  de?: DeGon
+  dung?: boolean
+  ket?: KetGon
+  lyDo?: 'co_goi_y' | 'doc_loi_giai' | 'cung_ngay'
+  goiY?: string
+  /** Đề đầy đủ + đáp án + lời giải — chỉ có sau khi nộp (đúng, hoặc đã hết lần thử). Đọc bằng `docChiTiet`. */
+  chiTiet?: unknown
+  daKhepHomNay?: boolean
+}
+const docGon = (j: Obj | null): KetQuaGon => (j?.ok ? (j as unknown as KetQuaGon) : { ok: false, loi: loiCua(j), ...(j?.ma ? { ma: chu(j.ma) } : {}) })
+export async function apiGonMo(token: string, dotId: string): Promise<KetQuaGon> {
+  return docGon(await goi('gon-mo', token, { dotId }))
+}
+export async function apiGonNop(token: string, dotId: string, ban: string, traLoi: string, khoa: string): Promise<KetQuaGon> {
+  return docGon(await goi('gon-nop', token, { dotId, ban, traLoi, khoa }))
 }
