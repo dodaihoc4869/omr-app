@@ -216,6 +216,7 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
             onPointerDown={(e) => {
               const r = bong.current!.getBoundingClientRect()
               keo.current = { dx: e.clientX - r.left, dy: e.clientY - r.top, x0: e.clientX, y0: e.clientY, da: false }
+              e.currentTarget.setPointerCapture(e.pointerId)      // giữ cử chỉ ngay từ đầu: tay rời nút nhanh vẫn kéo được
             }}
             onPointerMove={(e) => {
               const k = keo.current, b = bong.current
@@ -223,7 +224,6 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
               if (!k.da) {
                 if (Math.hypot(e.clientX - k.x0, e.clientY - k.y0) < 6) return
                 k.da = true
-                e.currentTarget.setPointerCapture(e.pointerId)
               }
               const p = kep({ x: e.clientX - k.dx, y: e.clientY - k.dy }, b.offsetWidth, b.offsetHeight)
               Object.assign(b.style, { left: `${p.x}px`, top: `${p.y}px`, right: 'auto', bottom: 'auto' })
@@ -326,7 +326,7 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
                   <div className="aid-go">
                     <button type="button" className="aid-nut-tron" aria-label="Chụp ảnh đề" onClick={() => tepChup.current?.click()}><Camera size={22} /></button>
                     <button type="button" className="aid-nut-tron" aria-label="Chọn ảnh có sẵn" onClick={() => tepChon.current?.click()}><Anh size={22} /></button>
-                    <textarea className="aid-go-o" rows={1} placeholder="Nhắn mình: hỏi bài, xin đề, tâm sự…" value={chu} maxLength={4000} aria-label="Nội dung hỏi" onChange={(e) => setChu(e.target.value)}
+                    <textarea className="aid-go-o" rows={1} placeholder="Nhắn gì cũng được…" value={chu} maxLength={4000} aria-label="Nội dung hỏi" onChange={(e) => setChu(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.innerWidth >= 720) { e.preventDefault(); void gui() } }} />
                     <button type="button" className="aid-nut-tron" data-gui="" aria-label="Gửi" disabled={dangGui || (!chu.trim() && !anh.length) || du.conLuot <= 0} onClick={() => void gui()}><Send size={20} /></button>
                   </div>
