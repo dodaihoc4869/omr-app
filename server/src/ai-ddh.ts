@@ -75,8 +75,26 @@ const tinRa = (x: Row) => ({
   id: str(x.id), ben: str(x.ben), chu: str(x.chu), anh: (() => { try { return (JSON.parse(str(x.anh_json) || '[]') as unknown[]).length } catch { return 0 } })(),
   nguon: str(x.nguon), chiGoiY: num(x.chi_goi_y) === 1, trangUrl: str(x.trang_url),
   boDe: (() => { try { return x.bo_de_json ? JSON.parse(str(x.bo_de_json)) : null } catch { return null } })(),
-  trangThai: str(x.trang_thai), luc: num(x.luc),
+  // 25/10: tin văn phòng mang mã tin em nó trả lời ⇒ máy em tắt «Thầy đang soạn» của đúng tin ấy (lệnh /tin chỉ trả tin MỚI, không trả tin em vừa đổi trạng thái).
+  traLoiCho: str(x.tra_loi_cho), trangThai: str(x.trang_thai), luc: num(x.luc),
 })
+
+/**
+ * TRẢ LỜI NGAY (25/10, thầy: "tốc độ nhắn chậm quá, tối ưu tức thì"): chào hỏi / cảm ơn / «ok, dạ» không cần văn phòng (văn phòng phải lấy hàng chờ rồi
+ * hỏi não ~1 phút) ⇒ máy chủ trả luôn, đúng giọng văn phòng trên Zalo. Chỉ khi KHÔNG ảnh, ngắn, không số (câu có số là đề). Thuần — test được.
+ */
+export function traLoiNgay(chu: string, soAnh: number): string | null {
+  if (soAnh > 0) return null
+  const s = chu.normalize('NFC').toLowerCase().replace(/[!?.,~:;…"'()*\-_/\\]+/g, ' ').replace(/[^\p{L}\s]/gu, ' ').replace(/\s+/g, ' ').trim()
+  if (!s || s.length > 40 || /\d/.test(chu)) return null
+  if (/^(?:(?:em|e)\s+)?(?:xin\s+)?ch[aà]o(?:\s+(?:thầy|thay|ạ|a|ad|anh|chị|bạn|mọi người))*$|^(?:hi|hello|helo|hey|alo|a lô)(?:\s+(?:thầy|thay|ạ|a))*$/.test(s))
+    return 'Chào e. E chụp ảnh hoặc gõ đề gửi thầy, thầy giải liền. Cần đề luyện thì nhắn «soạn đề» kèm chương nha.'
+  if (/^(?:(?:em|e)\s+)?(?:(?:xin\s+)?c[ảáa]m\s+[ơo]n|thanks?|thank you|tks|thx)(?:\s+(?:thầy|thay|ạ|a|nhiều|nhieu|nha|nhé|nhe))*$/.test(s))
+    return 'Ok e. Còn câu nào kẹt cứ gửi thầy nha.'
+  if (/^(?:ok|oke|okay|okela|ừ|ừm|uhm|dạ|da|vâng|vang|em hiểu rồi|e hiểu rồi|hiểu rồi)(?:\s+(?:thầy|thay|ạ|a|ạ thầy|nha|nhé|rồi))*$/.test(s))
+    return 'Ok e. Có câu nào cứ gửi thầy nha.'
+  return null
+}
 
 async function emCua(env: Env, b: Row): Promise<string> {
   try { return await gameIdentity(env, b) } catch { return '' }
@@ -159,10 +177,16 @@ export async function hsGuiAiDdh(env: Env, b: Row, nowMs = Date.now()): Promise<
     await env.DE.put(k, u, { httpMetadata: { contentType: 'image/jpeg' } })
     khoaAnh.push(k)
   }
-  await env.DB.prepare(`INSERT OR IGNORE INTO ai_ddh_tin (id, sbd, ben, chu, anh_json, trang_thai, luc) VALUES (?, ?, 'em', ?, ?, 'cho', ?)`)
-    .bind(id, sbd, chu, JSON.stringify(khoaAnh), nowMs).run()
-  const moi = await env.DB.prepare('SELECT * FROM ai_ddh_tin WHERE id = ?').bind(id).first<Row>()
-  return { ok: true, tin: moi ? tinRa(moi) : null }
+  const ngay = traLoiNgay(chu, khoaAnh.length)
+  const lenh = [env.DB.prepare(`INSERT OR IGNORE INTO ai_ddh_tin (id, sbd, ben, chu, anh_json, trang_thai, luc) VALUES (?, ?, 'em', ?, ?, ?, ?)`)
+    .bind(id, sbd, chu, JSON.stringify(khoaAnh), ngay ? 'xong' : 'cho', nowMs)]
+  if (ngay) lenh.push(env.DB.prepare(`INSERT OR IGNORE INTO ai_ddh_tin (id, sbd, ben, chu, nguon, trang_thai, tra_loi_cho, luc) VALUES (?, ?, 'vp', ?, 'ngay', 'xong', ?, ?)`)
+    .bind(`${id}~0`, sbd, ngay, id, nowMs + 1))
+  // Một đợt: ghi (+ trả lời ngay) rồi đọc lại — không thêm vòng chờ nối tiếp.
+  // Đọc theo chỉ mục (sbd, luc) từ mốc tin này — rồi lọc đúng tin em + trả lời của nó (tra_loi_cho không có chỉ mục).
+  const kq = await env.DB.batch([...lenh, env.DB.prepare('SELECT * FROM ai_ddh_tin WHERE sbd = ? AND luc >= ? ORDER BY luc LIMIT 20').bind(sbd, nowMs)])
+  const ds = ((kq[kq.length - 1]?.results ?? []) as Row[]).filter((x) => str(x.id) === id || str(x.tra_loi_cho) === id).map(tinRa)
+  return { ok: true, tin: ds.find((x) => x.id === id) ?? null, them: ds.filter((x) => x.id !== id) }
 }
 
 // ───────────────────────── LỆNH VĂN PHÒNG (mã GV) ─────────────────────────

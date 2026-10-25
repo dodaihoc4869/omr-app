@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Anh, ArrowRight, BookOpen, Camera, CheckCircle2, ChevronDown, ClipboardPaste, Clock, Lightbulb, Lock, MoonStar, Send, ShieldCheck, Sparkles, WifiOff, Zap } from './bieu-tuong-ai'
 import { AnhLogo } from '../LogoVai'
 import { batNhipBenVung } from '../../lib/nhip-ben-vung'
-import { CO_CU_MS, docCoBat, ghiCoBat, guiAiDdh, moAiDdh, nenAnh, taoMaTin, tinMoiAiDdh, type MoAiDdh, type TinAiDdh } from '../../lib/ai-ddh-api'
+import { CO_CU_MS, docCoBat, ghiCoBat, gopTin, guiAiDdh, moAiDdh, nenAnh, taoMaTin, tinMoiAiDdh, type MoAiDdh, type TinAiDdh } from '../../lib/ai-ddh-api'
 import { chuNguon, tachKhoi, type Khuc } from '../../lib/ai-ddh-dinh-dang'
 import './ai-ddh.css'
 
@@ -113,26 +113,40 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
   }, [token, sbd])
   useEffect(() => { if (mo) void taiMo() }, [mo, taiMo])
 
-  // Hỏi tin mới: đang chờ 3 giây; tấm mở 20 giây; tấm đóng mà còn chờ 60 giây.
+  // Hỏi tin mới: đang chờ 1,5 giây (25/10 "tối ưu tức thì"); tấm mở 20 giây; tấm đóng mà còn chờ 60 giây.
   // Vòng NỐI TIẾP (`batNhipBenVung`, đã có sẵn trong khung HS ⇒ không thêm byte): lượt sau chỉ hẹn khi lượt trước xong, tab ẩn không gọi, lỗi ⇒ thưa dần.
   const sauRef = useRef(sau)
   sauRef.current = sau
   useEffect(() => {
     if (!du?.bat) return
-    const ms = mo ? (dangCho ? 3000 : 20_000) : dangCho ? 60_000 : 0
+    const ms = mo ? (dangCho ? 1500 : 20_000) : dangCho ? 60_000 : 0
     if (!ms) return
     const v = batNhipBenVung(async () => {
       const r = await tinMoiAiDdh(token, sauRef.current)
       if (!r.ok) return false
       setTruc(r.du.vanPhongTruc)
       if (!r.du.tin.length) return
-      setTin((cu) => { const co = new Set(cu.map((x) => x.id)); return [...cu.map((x) => r.du.tin.find((y) => y.id === x.id) ?? x), ...r.du.tin.filter((x) => !co.has(x.id))] })
+      setTin((cu) => gopTin(cu, r.du.tin))
       if (!mo) setMoiChua((n) => n + r.du.tin.filter((x) => x.ben === 'vp').length)
     }, { coSoMs: ms, lechMs: ms / 6, chayNgay: false, luiDanMs: [ms * 2, ms * 4, Math.max(ms * 8, 30_000)] })
     return () => v.dung()
   }, [du?.bat, mo, dangCho, token])
 
   useEffect(() => { const t = than.current; if (t && mo) t.scrollTop = t.scrollHeight }, [tin.length, cho.length, mo])
+
+  // Tấm mở ⇒ KHOÁ CUỘN trang Hôm nay phía sau (25/10, thầy: "khi vuốt nền ở dưới không chạy theo nữa"). `overflow: hidden` trên body không đủ ở Safari iPhone
+  // ⇒ ghim body cố định đúng chỗ đang cuộn; đóng tấm thì trả body + vị trí cuộn như cũ.
+  useEffect(() => {
+    if (!mo) return
+    const b = document.body.style
+    const cu = { position: b.position, top: b.top, left: b.left, right: b.right, width: b.width, overflow: b.overflow }
+    const y = window.scrollY
+    Object.assign(b, { position: 'fixed', top: `-${y}px`, left: '0', right: '0', width: '100%', overflow: 'hidden' })
+    return () => {
+      Object.assign(b, cu)
+      window.scrollTo(0, y)
+    }
+  }, [mo])
 
   const gui = async (lai?: TinCho) => {
     const t: TinCho = lai ?? { maTin: taoMaTin(), chu: chu.trim(), anh, loi: '' }
@@ -144,7 +158,8 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
     setDangGui(false)
     if (r.ok) {
       setCho((c) => c.filter((x) => x.maTin !== t.maTin))
-      if (r.du) setTin((cu) => (cu.some((x) => x.id === r.du!.id) ? cu : [...cu, r.du!]))
+      const moi = [...(r.du.tin ? [r.du.tin] : []), ...r.du.them]
+      if (moi.length) setTin((cu) => gopTin(cu, moi))
       setDu((d) => (d ? { ...d, conLuot: Math.max(0, d.conLuot - 1) } : d))
     } else {
       if (r.khoa === 'kiem_tra') setDu((d) => (d ? { ...d, khoa: 'kiem_tra' } : d))

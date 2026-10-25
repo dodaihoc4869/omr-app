@@ -7,7 +7,7 @@ import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 import { gameToken } from '../server/src/game-v2-auth'
-import { dauNgayVn, hsGuiAiDdh, hsMoAiDdh, TRAN_TIN_NGAY } from '../server/src/ai-ddh'
+import { dauNgayVn, hsGuiAiDdh, hsMoAiDdh, traLoiNgay, TRAN_TIN_NGAY } from '../server/src/ai-ddh'
 
 const NOW = Date.parse('2026-10-24T13:00:00Z')
 function moi() {
@@ -16,6 +16,31 @@ function moi() {
   return { d, env: d.env as unknown as Env }
 }
 const gv = (env: Env, duong: string, body: Record<string, unknown> = {}) => goiWorker(worker, env, duong, body, true)
+
+describe('trả lời ngay (25/10: "tốc độ nhắn chậm quá")', () => {
+  it('chào hỏi / cảm ơn / ok ⇒ trả ngay; câu có số, câu dài, có ảnh ⇒ không (vào hàng chờ văn phòng)', () => {
+    for (const c of ['Xin chào', 'chào thầy ạ', 'e chào thầy', 'hello', 'Alo', 'cảm ơn thầy ạ', 'cam on thay', 'thanks', 'ok', 'Dạ', 'em hiểu rồi ạ', 'Chào thầy!!'])
+      expect(traLoiNgay(c, 0), c).toBeTruthy()
+    for (const c of ['chào thầy, câu 3 làm sao ạ', 'cho e xin đề chương 3', 'giải giúp e câu này', 'ok thầy ơi câu 12 e ra 8,2', 'este là gì ạ'])
+      expect(traLoiNgay(c, 0), c).toBeNull()
+    expect(traLoiNgay('xin chào', 1)).toBeNull()
+  })
+  it('máy chủ ghi tin em «xong» + trả lời văn phòng kèm luôn phản hồi gửi (một đợt); văn phòng không thấy trong hàng chờ', async () => {
+    const { env } = moi()
+    await gv(env, '/gv/ai-ddh/che-do', { cheDo: 'bat' })
+    const token = await gameToken(env, 'A1')
+    const g = await hsGuiAiDdh(env, { token, maTin: 'chao-0001', chu: 'Xin chào' }, NOW)
+    expect(g).toMatchObject({ ok: true, tin: { ben: 'em', trangThai: 'xong' } })
+    const them = g.them as { ben: string; chu: string; traLoiCho: string }[]
+    expect(them).toHaveLength(1)
+    expect(them[0]).toMatchObject({ ben: 'vp', traLoiCho: (g.tin as { id: string }).id })
+    expect(them[0]!.chu).toContain('Chào e')
+    expect((await gv(env, '/gv/ai-ddh/hang-cho')).tin).toHaveLength(0)
+    const de = await hsGuiAiDdh(env, { token, maTin: 'de-000001', chu: 'Đun 8,8 g etyl axetat với NaOH, tìm m' }, NOW + 5)
+    expect(de).toMatchObject({ tin: { trangThai: 'cho' }, them: [] })
+    expect((await gv(env, '/gv/ai-ddh/hang-cho')).tin).toHaveLength(1)
+  })
+})
 
 describe('bong bóng A.I Đỗ Đại Học — máy chủ', () => {
   it('mặc định TẮT: em mở thấy bat=false, gửi bị từ chối; «thử» chỉ lớp trong danh sách', async () => {
