@@ -182,3 +182,6 @@
 .aid-kieu-cam { color: var(--gvm-hp); font-weight: 600; } .aid-kieu-vang { color: var(--gvm-hp-dam); background: var(--gvm-hp-nen); border-radius: 4px; padding: 0 3px; }
 .aid-kieu-nghieng { font-style: italic; } .aid-kieu-gach { text-decoration: underline; } .aid-kieu-to { font-size: 1.12em; }
 .aid-tai { margin: auto; color: var(--bl-muted); display: grid; justify-items: center; gap: 10px; }
+
+/* Chữ hiện dần (25/10 tối): tin văn phòng đang viết dở có con trỏ nhấp nháy ở cuối. */
+.aid-dang-viet .aid-chu > p:last-of-type::after, .aid-dang-viet .aid-giai > :last-child::after { content: '▍'; margin-left: 2px; animation: aid-nhay 1s infinite; }

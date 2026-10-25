@@ -7,7 +7,7 @@ import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 import { gameToken } from '../server/src/game-v2-auth'
-import { dauNgayVn, hsAnhAiDdh, hsGuiAiDdh, hsMoAiDdh, traLoiNgay, TRAN_TIN_NGAY } from '../server/src/ai-ddh'
+import { dauNgayVn, gvTraLoiAiDdh, gvVietAiDdh, hsAnhAiDdh, hsGuiAiDdh, hsMoAiDdh, hsTinAiDdh, traLoiNgay, TRAN_TIN_NGAY } from '../server/src/ai-ddh'
 
 const NOW = Date.parse('2026-10-24T13:00:00Z')
 function moi() {
@@ -147,5 +147,42 @@ describe('ảnh tải trước', () => {
     const g = await hsGuiAiDdh(env, { token, maTin: 'anh-00001', chu: 'câu này sao ạ', anhSo: [0, 2] }, NOW)
     expect(g).toMatchObject({ ok: true, tin: { anh: 2 } })
     expect(JSON.parse(String((d.sql.prepare('SELECT anh_json FROM ai_ddh_tin').get() as { anh_json: string }).anh_json))).toEqual(['ai-ddh/A1/anh-00001-0.jpg', 'ai-ddh/A1/anh-00001-2.jpg'])
+  })
+})
+
+// 25/10 tối (thầy: "tối ưu chuyên sâu tốc độ tức thì cho a.i trên app hs"): chữ hiện dần + giữ đường.
+describe('chữ hiện dần và giữ đường', () => {
+  it('viết dở ⇒ tin vp trạng thái viet, luc đẩy lên; bản cuối cùng mã thay chữ và đóng; đã đóng thì viết dở không ghi đè', async () => {
+    const { env, d } = moi()
+    await gv(env, '/gv/ai-ddh/che-do', { cheDo: 'bat' })
+    const token = await gameToken(env, 'A1')
+    await hsGuiAiDdh(env, { token, maTin: 'viet-00001', chu: 'este là gì vậy' }, NOW)
+    const id = 'A1-viet-00001'
+    expect(await gvVietAiDdh(env, { id, ma: 'tl', chu: 'este là' }, NOW + 1000)).toEqual({ ok: true, ghi: true })
+    expect(await gvVietAiDdh(env, { id, ma: 'tl', chu: 'este là hợp chất' }, NOW + 1700)).toEqual({ ok: true, ghi: true })
+    let r = await hsTinAiDdh(env, { token, sau: NOW + 1200 }, NOW + 1800)
+    expect(r.tin).toEqual([expect.objectContaining({ id: `${id}~tl`, ben: 'vp', chu: 'este là hợp chất', trangThai: 'viet', traLoiCho: id, luc: NOW + 1700 })])
+    await gvTraLoiAiDdh(env, { id, tin: [{ chu: 'este là hợp chất RCOOR\'', ma: 'tl' }] }, NOW + 2500)
+    r = await hsTinAiDdh(env, { token, sau: NOW + 1800 }, NOW + 2600)
+    expect(r.tin).toEqual([expect.objectContaining({ id: `${id}~tl`, chu: "este là hợp chất RCOOR'", trangThai: '' })])
+    expect(await gvVietAiDdh(env, { id, ma: 'tl', chu: 'bản cũ' }, NOW + 3000)).toEqual({ ok: true, ghi: false })
+    expect(String((d.sql.prepare(`SELECT chu FROM ai_ddh_tin WHERE id = ?`).get(`${id}~tl`) as { chu: string }).chu)).toBe("este là hợp chất RCOOR'")
+    expect((await gvVietAiDdh(env, { id: 'khong-co', ma: 'tl', chu: 'x' }, NOW)).ghi).toBe(false)
+  })
+  it('giữ đường: có tin thì trả liền, kèm doi; không có tin thì chờ tới hạn rồi trả rỗng', async () => {
+    const { env } = moi()
+    await gv(env, '/gv/ai-ddh/che-do', { cheDo: 'bat' })
+    const token = await gameToken(env, 'A1')
+    await hsGuiAiDdh(env, { token, maTin: 'doi-000001', chu: 'câu này sao ạ' }, NOW)
+    const t0 = Date.now()
+    const co = await hsTinAiDdh(env, { token, sau: 0, doi: 5000 }, NOW)
+    expect(Date.now() - t0).toBeLessThan(1000)
+    expect(co).toMatchObject({ ok: true, doi: 5000 })
+    expect((co.tin as unknown[]).length).toBe(1)
+    const t1 = Date.now()
+    const rong = await hsTinAiDdh(env, { token, sau: NOW + 10, doi: 900 }, NOW)
+    expect(Date.now() - t1).toBeGreaterThanOrEqual(400)
+    expect(rong).toMatchObject({ ok: true, tin: [], doi: 900 })
+    expect((await hsTinAiDdh(env, { token, sau: NOW + 10 }, NOW)).doi).toBeUndefined()
   })
 })

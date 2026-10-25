@@ -3807,6 +3807,7 @@ const boXuLy = {
         if (vi === 'kiem-cau') return ra(await m.gvKiemCauAiDdh(env, b))
         if (vi === 'tranh') return ra(await m.gvTranhAiDdh(env, b))
         if (vi === 'tra-loi') return ra(await m.gvTraLoiAiDdh(env, b))
+        if (vi === 'viet') return ra(await m.gvVietAiDdh(env, b))
         if (vi === 'che-do') return ra(await m.gvCheDoAiDdh(env, b))
       }
       if (p.startsWith('/gv/danh-gia/')) {

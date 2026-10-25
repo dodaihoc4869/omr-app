@@ -131,12 +131,24 @@ export async function hsTinAiDdh(env: Env, b: Row, nowMs = Date.now()): Promise<
   if (!sbd) return { ok: false, error: 'Em cần đăng nhập lại.' }
   await damBaoAiDdh(env)
   const sau = Math.max(0, num(b.sau))
-  const [ds, { vpLuc }] = await Promise.all([
-    env.DB.prepare('SELECT * FROM ai_ddh_tin WHERE sbd = ? AND luc > ? ORDER BY luc LIMIT 40').bind(sbd, sau).all<Row>(),
-    docCauHinh(env),
-  ])
-  return { ok: true, vanPhongTruc: nowMs - vpLuc < VP_NGHI_SAU_MS, tin: (ds.results ?? []).map(tinRa) }
+  // GIỮ ĐƯỜNG (25/10 tối, thầy: "tối ưu chuyên sâu tốc độ tức thì"): `doi` ms ⇒ chưa có tin mới thì chờ ngay tại máy chủ, hỏi lại mỗi 400 ms, có tin là trả liền
+  // (trước: máy em hỏi lại mỗi 1–1,5 giây ⇒ tin trả lời tới trễ thêm trung bình nửa nhịp). Chờ không tốn CPU Worker. Trả kèm `doi` để máy em biết máy chủ có giữ đường.
+  const doi = Math.min(DOI_TOI_DA_MS, Math.max(0, num(b.doi)))
+  const het = Date.now() + doi
+  const doc = () => env.DB.prepare('SELECT * FROM ai_ddh_tin WHERE sbd = ? AND luc > ? ORDER BY luc LIMIT 40').bind(sbd, sau).all<Row>().then((r) => r.results ?? [])
+  const [dau, { vpLuc }] = await Promise.all([doc(), docCauHinh(env)])
+  let ds = dau
+  while (!ds.length && Date.now() + NHIP_DOI_MS < het) {
+    await ngu(NHIP_DOI_MS)
+    ds = await doc()
+  }
+  return { ok: true, vanPhongTruc: nowMs - vpLuc < VP_NGHI_SAU_MS, tin: ds.map(tinRa), ...(doi ? { doi } : {}) }
 }
+
+/** Giữ đường tối đa (máy em và văn phòng đều đặt hạn chờ HTTP dài hơn: 25 giây / 15 giây). */
+const DOI_TOI_DA_MS = 10_000
+const NHIP_DOI_MS = 400
+const ngu = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
 const b64 = (s: string): Uint8Array | null => {
   try {
@@ -221,8 +233,17 @@ export async function gvHangChoAiDdh(env: Env, b: Row, nowMs = Date.now()): Prom
       WHERE CAST(cau_hinh.gia_tri AS INTEGER) < ?4`).bind(KHOA_VP, String(nowMs), new Date(nowMs).toISOString(), nowMs - 30_000),
     env.DB.prepare("UPDATE ai_ddh_tin SET trang_thai = 'cho' WHERE trang_thai = 'dang' AND lay_luc < ?").bind(nowMs - LAY_LAI_SAU_MS),
   ])
-  const cho = (await env.DB.prepare("SELECT * FROM ai_ddh_tin WHERE trang_thai = 'cho' ORDER BY luc LIMIT ?").bind(toiDa).all<Row>()).results ?? []
-  if (!cho.length) return { ok: true, tin: [] }
+  // Giữ đường như /hs/ai-ddh/tin: hàng trống thì chờ tại máy chủ (văn phòng nhận tin ~0,4 giây sau khi em gửi, kể cả lúc vắng).
+  const doi = Math.min(DOI_TOI_DA_MS, Math.max(0, num(b.doi)))
+  const het = Date.now() + doi
+  const docCho = () => env.DB.prepare("SELECT * FROM ai_ddh_tin WHERE trang_thai = 'cho' ORDER BY luc LIMIT ?").bind(toiDa).all<Row>().then((r) => r.results ?? [])
+  let cho = await docCho()
+  while (!cho.length && Date.now() + NHIP_DOI_MS < het) {
+    await ngu(NHIP_DOI_MS)
+    cho = await docCho()
+  }
+  if (!cho.length) return { ok: true, tin: [], ...(doi ? { doi } : {}) }
+  if (doi) nowMs = Math.max(nowMs, Date.now())     // chờ xong mới lấy: mốc lấy tin là lúc lấy thật
   const ids = cho.map((x) => str(x.id)), sbds = [...new Set(cho.map((x) => str(x.sbd)))]
   const [, hs, ngCanh] = await Promise.all([
     env.DB.prepare(`UPDATE ai_ddh_tin SET trang_thai = 'dang', lay_luc = ? WHERE id IN (SELECT value FROM json_each(?)) AND trang_thai = 'cho'`).bind(nowMs, JSON.stringify(ids)).run(),
@@ -297,12 +318,27 @@ export async function gvTraLoiAiDdh(env: Env, b: Row, nowMs = Date.now()): Promi
   const goc = await env.DB.prepare("SELECT sbd FROM ai_ddh_tin WHERE id = ? AND ben = 'em'").bind(id).first<Row>()
   if (!goc) return { ok: false, error: 'Không thấy tin của em.' }
   const ds = (Array.isArray(b.tin) ? b.tin : []).slice(0, 12) as Row[]
-  const lenh = ds.map((t, i) => env.DB.prepare(`INSERT OR IGNORE INTO ai_ddh_tin (id, sbd, ben, chu, nguon, chi_goi_y, trang_url, bo_de_json, tra_loi_cho, luc)
-      VALUES (?, ?, 'vp', ?, ?, ?, ?, ?, ?, ?)`).bind(`${id}~${str(t.ma) || i}`, str(goc.sbd), str(t.chu).slice(0, 6000), str(t.nguon).slice(0, 80), t.chiGoiY === true ? 1 : 0,
+  // Tin trùng mã: bỏ qua (gửi lặp) — TRỪ tin đang viết dở (`viet`, /gv/ai-ddh/viet): bản cuối thay chữ, đóng lại.
+  const lenh = ds.map((t, i) => env.DB.prepare(`INSERT INTO ai_ddh_tin (id, sbd, ben, chu, nguon, chi_goi_y, trang_url, bo_de_json, tra_loi_cho, luc)
+      VALUES (?, ?, 'vp', ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET chu = excluded.chu, nguon = excluded.nguon, chi_goi_y = excluded.chi_goi_y,
+      trang_url = excluded.trang_url, bo_de_json = excluded.bo_de_json, trang_thai = '', luc = excluded.luc WHERE ai_ddh_tin.trang_thai = 'viet'`).bind(`${id}~${str(t.ma) || i}`, str(goc.sbd), str(t.chu).slice(0, 6000), str(t.nguon).slice(0, 80), t.chiGoiY === true ? 1 : 0,
     /^https:\/\//.test(str(t.trangUrl)) ? str(t.trangUrl).slice(0, 500) : '', t.boDe && typeof t.boDe === 'object' ? JSON.stringify(t.boDe).slice(0, 4000) : '', id, nowMs + i))
   if (b.xong !== false) lenh.push(env.DB.prepare("UPDATE ai_ddh_tin SET trang_thai = 'xong' WHERE id = ?").bind(id))
   if (lenh.length) await env.DB.batch(lenh)
   return { ok: true, soTin: ds.length }
+}
+
+/** `POST /gv/ai-ddh/viet {id, ma, chu}` — CHỮ HIỆN DẦN (25/10 tối, thầy: "tối ưu chuyên sâu tốc độ tức thì"): não viết tới đâu văn phòng gửi tới đó
+ *  (~0,7 giây/lần), máy em thấy chữ đầu sau ~1,5–2 giây thay vì chờ trọn lượt. Ghi tin `vp` mã `<id>~<ma>` trạng thái `viet`, đẩy `luc` lên mỗi lần
+ *  (máy em hỏi `luc > sau` nên thấy bản mới). Bản cuối gửi qua /tra-loi CÙNG mã thì thay chữ và đóng. Tin đã đóng (không còn `viet`) thì không ghi đè. */
+export async function gvVietAiDdh(env: Env, b: Row, nowMs = Date.now()): Promise<Row> {
+  await damBaoAiDdh(env)
+  const id = str(b.id), ma = str(b.ma) || 'viet', chu = str(b.chu).slice(0, 6000)
+  if (!id || !chu) return { ok: false, error: 'Thiếu tin.' }
+  const r = await env.DB.prepare(`INSERT INTO ai_ddh_tin (id, sbd, ben, chu, nguon, trang_thai, tra_loi_cho, luc)
+      SELECT ?1, sbd, 'vp', ?2, 'viet', 'viet', id, ?3 FROM ai_ddh_tin WHERE id = ?4 AND ben = 'em'
+      ON CONFLICT(id) DO UPDATE SET chu = excluded.chu, luc = excluded.luc WHERE ai_ddh_tin.trang_thai = 'viet'`).bind(`${id}~${ma}`, chu, nowMs, id).run()
+  return { ok: true, ghi: Number(r.meta?.changes ?? 0) > 0 }
 }
 
 /** `POST /gv/ai-ddh/che-do {cheDo?, lop?[]}` — thầy đọc / đặt công tắc (tắt · thử theo lớp · bật). */

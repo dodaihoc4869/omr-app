@@ -57,9 +57,10 @@ export async function moAiDdh(token: string): Promise<KQ<MoAiDdh>> {
   const j = r.du
   return { ok: true, du: { bat: j.bat === true, khoa: j.khoa === 'kiem_tra' ? 'kiem_tra' : null, vanPhongTruc: j.vanPhongTruc === true, conLuot: Number(j.conLuot) || 0, tranLuot: Number(j.tranLuot) || 50, tin: dsTin(j.tin) } }
 }
-export async function tinMoiAiDdh(token: string, sau: number): Promise<KQ<{ vanPhongTruc: boolean; tin: TinAiDdh[] }>> {
-  const r = await goi('/hs/ai-ddh/tin', { token, sau })
-  return r.ok ? { ok: true, du: { vanPhongTruc: r.du.vanPhongTruc === true, tin: dsTin(r.du.tin) } } : r
+/** `doi` ms > 0 ⇒ máy chủ GIỮ ĐƯỜNG tới khi có tin mới (25/10 tối, "tối ưu chuyên sâu tốc độ tức thì"); `giu` = máy chủ có giữ (bản cũ không trả `doi`). */
+export async function tinMoiAiDdh(token: string, sau: number, doi = 0): Promise<KQ<{ vanPhongTruc: boolean; tin: TinAiDdh[]; giu: boolean }>> {
+  const r = await goi('/hs/ai-ddh/tin', doi ? { token, sau, doi } : { token, sau })
+  return r.ok ? { ok: true, du: { vanPhongTruc: r.du.vanPhongTruc === true, tin: dsTin(r.du.tin), giu: Number(r.du.doi) > 0 } } : r
 }
 /** Gửi một tin; `them` = trả lời máy chủ trả NGAY (chào hỏi, cảm ơn — không chờ văn phòng).
  *  `anhSo` = số thứ tự các ảnh ĐÃ tải trước (`taiAnhAiDdh`) ⇒ thân gói chỉ còn chữ; `anh` (base64) = đường dự phòng khi tải trước hỏng. */
