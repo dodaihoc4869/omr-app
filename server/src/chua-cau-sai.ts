@@ -25,7 +25,7 @@ import { lenhGhiSuKienNguyenTu, ngayVn } from './su-kien-hoc'
 import { emCoGhi } from './dem-ke-hoach'
 import type { ItemCongKhai, ProbeRef } from './chua-cau-sai-kieu'
 import { khopPhanIII } from '../../src/lib/cham-so'
-import { dauNgayVnMs, NGAY_CUA_SO_GON, SQL_DONG_DA_DUNG_LAI } from './chua-gon'
+import { dauNgayVnMs, denLuotDong, NGAY_CUA_SO_GON, SQL_DONG_DA_DUNG_LAI } from './chua-gon'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
@@ -955,7 +955,7 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
   const nhom = `CASE WHEN trang_thai_day='da_tu_sua' THEN 'xong' WHEN trang_thai_day='cho_gap_lai_2' AND (julianday(den_han) IS NULL OR julianday(den_han)>julianday(?)) THEN 'cho' ELSE 'can' END`
   // Chữa câu gọn (thầy 25/10, chua-gon.ts): trang đầu ĐÓNG TRƯỚC các đợt em đã làm đúng lại qua luật tự làm — chạy đầu CÙNG lô (không thêm vòng chờ D1).
   const nowMs = Date.now()
-  const dong = c ? [] : [env.DB.prepare(SQL_DONG_DA_DUNG_LAI).bind(nowMs, sbd, nowMs - NGAY_CUA_SO_GON * 86_400_000)]
+  const dong = c || !denLuotDong(sbd, nowMs) ? [] : [env.DB.prepare(SQL_DONG_DA_DUNG_LAI).bind(nowMs, sbd, nowMs - NGAY_CUA_SO_GON * 86_400_000)]
   const doc = [
     env.DB.prepare(`WITH muc AS (SELECT id AS dotId,qid_chuan AS qid,trang_thai_day AS trangThai,
       lan_gap_lai AS lanGapLai,den_han AS denHan,giao_luc AS giaoLuc,COALESCE(sai_cuoi_luc,mo_luc) AS saiLuc,dong_luc AS dongLuc,${thuTu} AS hang FROM chua_loi_dot WHERE sbd=?)

@@ -5,9 +5,10 @@ import { taoD1That } from './_d1-that'
 import { seedChua, Q } from './_chua-cau-sai-fixture'
 import { danhSach, moDot } from '../server/src/chua-cau-sai'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
+import { xoaLuotDong } from '../server/src/chua-gon'
 
 const T = Date.parse('2026-10-07T03:00:00Z')
-beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T); xoaDemCaBaoVe() })
+beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T); xoaDemCaBaoVe(); xoaLuotDong() })
 afterEach(() => { vi.useRealTimers(); xoaDemCaBaoVe() })
 
 async function dung() {
@@ -73,6 +74,16 @@ describe('Chữa câu gọn — đóng đợt em đã làm đúng lại (luật 
     lam(d, `${Q}0`, 1, '2026-10-06T02:00:00.000Z')
     await ds(d)
     expect(dot(d).trang_thai_day).not.toBe('da_tu_sua')
+  })
+  it('mỗi em tối đa một lần / 10 phút (danh sách mở liên tục không tốn thêm); qua 10 phút thì đóng tiếp', async () => {
+    const d = await dung()
+    await ds(d)
+    lam(d, Q, 1, '2026-10-06T02:00:00.000Z')
+    await ds(d)
+    expect(dot(d).trang_thai_day).not.toBe('da_tu_sua')
+    vi.setSystemTime(T + 11 * 60_000)
+    await ds(d)
+    expect(dot(d).trang_thai_day).toBe('da_tu_sua')
   })
   it('câu đóng tự động lỗi (D1 từ chối) ⇒ danh sách VẪN trả bình thường, không đóng gì', async () => {
     const d = await dung()

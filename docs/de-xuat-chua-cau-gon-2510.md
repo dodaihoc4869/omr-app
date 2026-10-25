@@ -95,10 +95,9 @@ Các trạng thái chung: đang tải (khung xám đúng chỗ câu), rỗng ("H
 - **Đổi tab:** không đếm giờ, không ảnh hưởng.
 
 ## 6. Chi phí máy chủ
-- `chua-gon-nop`: 1 đợt đọc song song (đợt + câu + đáp án + câu bảo vệ, `Promise.all`) → 1 batch ghi = **2 vòng chờ nối tiếp**. Không dài hơn `/nop` của ca thi.
-- Lọc 14 ngày nằm trong câu SELECT sẵn có của lệnh danh sách: **0 vòng chờ thêm**; trả ít dòng hơn (≤ 24 thay vì 100) ⇒ nhẹ hơn.
-- Không lệnh nóng nào thêm vòng chờ (cổng `tests/toc-do-may-chu-lenh-nong-1310.test.ts`).
-- Màn em: bỏ tải đáp án + lời giải lúc mở câu ⇒ byte tải mở câu giảm.
+- **Đã build, đếm thật:** `gon-nop` = đọc đợt + lần nộp (song song, 1 vòng) → nạp câu `layCauChoEm` (3–4 vòng nối tiếp, dùng chung với ôn lại) → bản làm lại (1–2 vòng) → học liệu cho gợi ý (1 vòng, chỉ khi sai lần 1) → 1 lô ghi ⇒ **khoảng 6–8 vòng chờ D1 nối tiếp**. `gon-mo` tương tự, không lô ghi. Không phải lệnh nóng (4 lệnh nóng không đổi, cổng `tests/toc-do-may-chu-lenh-nong-1310.test.ts` xanh). Việc rút còn lại: đọc câu song song với đọc đợt.
+- Danh sách: câu đóng tự động chạy đầu CÙNG lô đọc (0 vòng thêm), tốn ~0,2 giây với em nhiều đợt nhất (đo D1 thật run 40177260871: 86 đợt, 222 ms) ⇒ mỗi em tối đa một lần / 10 phút; lỗi thì danh sách vẫn trả bình thường.
+- Màn em: không tải đáp án + lời giải lúc mở câu nữa.
 
 ## 7. Nghiệm thu đo bằng máy
 - `tests/chua-gon-nop-2510.test.ts`: đúng lần 1 qua luật tự làm ⇒ `da_tu_sua` + `dong_luc`; đúng câu gốc cùng ngày sai / có `loi_giai_hoi` 12 giờ / đúng sau gợi ý ⇒ chỉ "xong phần", đợt vẫn mở; sai lần 1 ⇒ có `goiY`, KHÔNG có `loiGiai`/`dapAn`; sai lần 2 ⇒ `loiGiai`, trạng thái "hẹn lại" 3 ngày; lần 3 bị từ chối; khoá lặp trả kết quả cũ; câu bảo vệ ⇒ khoá.
