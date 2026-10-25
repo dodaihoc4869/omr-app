@@ -118,10 +118,10 @@ describe('bong bóng A.I Đỗ Đại Học — máy chủ', () => {
 
 // 25/10 (thầy: "a.i trong app học sinh xưng hô bạn bè, cho hs thoải mái nói chia sẻ tâm sự"): trả lời tức thì xưng mình / bạn, không xưng thầy, không gọi e.
 describe('giọng bạn bè', () => {
-  it('trả lời tức thì: mình / bạn', () => {
+  it('trả lời tức thì: tôi / bạn (thầy 25/10 tối: "xưng tôi và bạn")', () => {
     for (const c of ['xin chào', 'cảm ơn thầy', 'ok']) {
       const r = traLoiNgay(c, 0)!
-      expect(r, c).toMatch(/mình/)
+      expect(r, c).toMatch(/tôi/)
       expect(r, c).not.toMatch(/(?<![\p{L}])(thầy|e|em)(?![\p{L}])/iu)
     }
   })
