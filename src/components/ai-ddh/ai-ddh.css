@@ -1,4 +1,11 @@
-/* Bong bóng chat A.I Đỗ Đại Học (app học sinh, thầy duyệt bản vẽ 3 ngày 24/10 — docs/ban-ve-ai-ddh-2410/). Chỉ biến màu sẵn có của app học sinh (Bát Linh --bl-*, --gvm-*), tranh --bl-scene. */
+/* Bong bóng chat A.I Đỗ Đại Học (app học sinh, thầy duyệt bản vẽ 3 ngày 24/10 — docs/ban-ve-ai-ddh-2410/). Chỉ biến màu sẵn có của app học sinh, tranh --bl-scene. */
+/* 25/10 (ảnh thầy: tấm trong suốt, chữ Hôm nay lộ qua): cổng học sinh dựng `ht-shell` (bộ màu chung tokens.css), KHÔNG có biến Bát Linh --bl-* (chỉ app phụ huynh có)
+   ⇒ mọi var(--bl-*) rỗng. Ánh xạ tên --bl-* của tệp này sang biến chuẩn của ĐÚNG app học sinh (sáng / tối theo tokens.css), không thêm màu nào. */
+.aid-bong, .aid-che, .aid-tam {
+  --bl-paper: var(--the); --bl-ground: var(--nen); --bl-ink: var(--muc); --bl-muted: var(--nhat); --bl-line: var(--vien);
+  --bl-teal: var(--gvm-xd); --bl-teal-soft: var(--gvm-xd-nen); --bl-gold: var(--vang-diu); --bl-shadow: var(--gvm-bong);
+  --bl-scene: url('/bat-linh/canh-dao-nho.webp');
+}
 .aid-goc, .aid-goc * { box-sizing: border-box; }
 .aid-goc { font-family: var(--sans, 'Be Vietnam Pro', system-ui, sans-serif); -webkit-font-smoothing: antialiased; }
 
@@ -20,12 +27,13 @@
 .aid-moi b { display: block; color: var(--bl-teal); font-size: 15px; margin-bottom: 2px; }
 
 /* ---------- tấm chat ---------- */
-.aid-che { position: fixed; inset: 0; z-index: 25; background: color-mix(in srgb, var(--gvm-xd-dam) 45%, transparent); backdrop-filter: blur(2px); }
-.aid-tam { position: fixed; z-index: 30; display: flex; flex-direction: column; overflow: hidden; color: var(--bl-ink);
-  left: 0; right: 0; bottom: 0; top: 3dvh; border-radius: 28px 28px 0 0; box-shadow: var(--bl-shadow);
+/* Trên MỌI lớp của cổng (thẻ «Điểm danh» ghim mép 60, thanh menu dưới 30) — không gì đè lên chữ hay ô gõ của tấm. */
+.aid-che { position: fixed; inset: 0; z-index: 70; background: color-mix(in srgb, var(--gvm-xd-dam) 45%, transparent); backdrop-filter: blur(2px); }
+.aid-tam { position: fixed; z-index: 71; display: flex; flex-direction: column; overflow: hidden; color: var(--bl-ink);
+  left: 0; right: 0; bottom: 0; top: 3vh; top: 3dvh; border-radius: 28px 28px 0 0; box-shadow: var(--bl-shadow);
   background: radial-gradient(circle at 1px 1px, var(--bl-line) 1px, transparent 1.5px) 0 0 / 22px 22px, var(--bl-ground); }
 @media (min-width: 720px) {
-  .aid-tam { left: auto; top: auto; right: 24px; bottom: 24px; width: 430px; height: min(740px, calc(100dvh - 48px)); border-radius: 28px; box-shadow: var(--bl-shadow); border: 1px solid var(--bl-line); }
+  .aid-tam { left: auto; top: auto; right: 24px; bottom: 24px; width: 430px; height: min(740px, calc(100vh - 48px)); height: min(740px, calc(100dvh - 48px)); border-radius: 28px; box-shadow: var(--bl-shadow); border: 1px solid var(--bl-line); }
   .aid-che { background: transparent; backdrop-filter: none; }
 }
 .aid-dau { position: relative; display: flex; align-items: center; gap: 12px; padding: 16px 12px 16px 16px; color: var(--gvm-tren-dac); isolation: isolate;

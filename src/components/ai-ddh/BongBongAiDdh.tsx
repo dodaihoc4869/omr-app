@@ -45,7 +45,7 @@ function TinVanPhong({ t }: { t: TinAiDdh }) {
                   if (k !== buoc[0]) return null
                   return <ol key={i} className="aid-buoc">{buoc.map((b, j) => <li key={j}><p><Chu khuc={b.khuc} /></p></li>)}</ol>
                 }
-                return <p key={i} style={{ margin: 0 }}><Chu khuc={k.khuc} /></p>
+                return <p key={i}><Chu khuc={k.khuc} /></p>
               })}
               {nhanNguon}
             </div>
