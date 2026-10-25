@@ -43,8 +43,6 @@ export function sqlDaTuSuaDungLai(d: string): string {
 export const SQL_DONG_DA_DUNG_LAI = `UPDATE chua_loi_dot SET trang_thai_day='da_tu_sua',dong_luc=?1,revision=revision+1,cap_nhat_luc=?1
   WHERE sbd=?2 AND dong_luc IS NULL AND trang_thai_day<>'da_tu_sua' AND COALESCE(sai_cuoi_luc,mo_luc)>=?3 AND ${sqlDaTuSuaDungLai('chua_loi_dot')}`
 
-/** Mốc 0 giờ hôm nay theo giờ Việt Nam (ms). */
-export const dauNgayVnMs = (nowMs: number) => Math.floor((nowMs + 7 * 3600_000) / 86_400_000) * 86_400_000 - 7 * 3600_000
 
 /** Câu đóng tự động tốn ~0,2 giây với em nhiều đợt nhất (đo D1 thật 25/10, run 40177260871: 86 đợt mở, 222 ms) ⇒ mỗi em tối đa MỘT lần / 10 phút
  *  trên mỗi isolate (Hôm nay và Tự sửa lỗi cùng gọi danh sách). Câu em sửa ngay trong app đã được đóng lúc nộp (gon-nop), không chờ câu này. */

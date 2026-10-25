@@ -25,7 +25,7 @@ import { lenhGhiSuKienNguyenTu, ngayVn } from './su-kien-hoc'
 import { emCoGhi } from './dem-ke-hoach'
 import type { ItemCongKhai, ProbeRef } from './chua-cau-sai-kieu'
 import { khopPhanIII } from '../../src/lib/cham-so'
-import { dauNgayVnMs, denLuotDong, NGAY_CUA_SO_GON, SQL_DONG_DA_DUNG_LAI } from './chua-gon'
+import { denLuotDong, NGAY_CUA_SO_GON, SQL_DONG_DA_DUNG_LAI } from './chua-gon'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
@@ -964,9 +964,11 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
       ORDER BY hang,giaoLuc DESC,dotId LIMIT 101`)
       .bind(nay, sbd, sbd, c ? 1 : 0, c ? num(c.hang) : 0, c ? num(c.hang) : 0,
         c ? num(c.giaoLuc) : 0, c ? num(c.giaoLuc) : 0, c ? str(c.dotId) : ''),
-    env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom,dong_luc FROM chua_loi_dot WHERE sbd=?)
-      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,SUM(nhom='xong' AND dong_luc>=?) AS xongHomNay FROM muc`)
-      .bind(nay, sbd, dauNgayVnMs(nowMs)),
+    // «Đã tự sửa hôm nay» = câu em TỰ SỬA XONG hôm nay ở màn sửa câu (chua_gon_lan), KHÔNG đếm theo dong_luc: câu đóng tự động hôm nay có thể là câu sửa từ hôm trước.
+    env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom FROM chua_loi_dot WHERE sbd=?)
+      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,
+        (SELECT COUNT(DISTINCT dot_id) FROM chua_gon_lan WHERE sbd=? AND ngay_vn=? AND json_extract(ket,'$.ket')='tu_sua') AS xongHomNay FROM muc`)
+      .bind(nay, sbd, sbd, ngayVn(nowMs)),
   ]
   // Câu đóng tự động KHÔNG được làm hỏng danh sách: lỗi (D1 từ chối / quá giờ) ⇒ đọc lại không có nó (như layCauChoEm).
   let soDong = dong.length
