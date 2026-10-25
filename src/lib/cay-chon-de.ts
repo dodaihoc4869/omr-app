@@ -68,9 +68,9 @@ export function thuMucCuaDe(c: Pick<TeacherExamSource, 'nhom'>): string {
   return i >= 0 ? s.slice(0, i).trim() : ''
 }
 
-/** THƯ MỤC LỒNG NHIỀU TẦNG (25/10, thầy: "quét lại để dựng đúng cây thư mục" — đề VIP 2027 nằm 3 tầng thư mục trên Drive): các tầng của thư mục
- * nối bằng « › », vd nhóm "12 · VIP 2027 › 1.LIÊN CHƯƠNG/Kiểm Tra Theo Bài + Liên Bài Chương 1". Thư mục một tầng (DẠY HỌC) giữ nguyên như cũ.
- * Hai tầng liền nhau trùng tên (thư mục giải nén lồng chính nó trên Drive) gộp làm một. */
+/** THƯ MỤC KIỂU Ổ ĐĨA (25/10, thầy: "quét lại để dựng đúng cây thư mục"; "bấm vào liên chương thì vào đề luôn, không có thư mục con bên trong nữa"):
+ * tên thư mục có « › » (kể cả chỉ ở cuối, vd nhóm "12 · VIP 2027 ›/1.LIÊN CHƯƠNG") ⇒ VIP 2027 ▸ 1.LIÊN CHƯƠNG ▸ từng đề, không chen tầng khối;
+ * nhiều tầng thì nối « › » ("A › B/chương"), hai tầng liền nhau trùng tên gộp làm một. Thư mục không có « › » (DẠY HỌC) giữ nguyên như cũ. */
 export const NOI_TANG_THU_MUC = ' › '
 export function cacTangThuMuc(tm: string): string[] {
   const ra: string[] = []
@@ -232,6 +232,8 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
           const rank = (n: Nut) => n.nhan === 'Ví dụ minh hoạ' ? 0 : n.nhan === 'Các dạng toán trọng tâm' ? 1 : 2
           return rank(a)-rank(b)
         })
+        // Cây kiểu ổ đĩa: bài chỉ có MỘT đề nguyên ⇒ chính đề là mục chọn (bấm thư mục là thấy đề, không thêm tầng «Cả đề»).
+        if (tuNhien && dang.length === 1 && dang[0]!.nhan === 'Cả đề') return { ...dang[0]!, nhan: b }
         return nutCha(`${tienTo}/${ch}/${b}`, b, 'bai', dang)
       })
       return nutCha(`${tienTo}/${ch}`, ch || 'Chưa xếp chương', 'chuong', bai)
@@ -272,10 +274,10 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
   const nhom = gom(ds, thuMucCuaDe)
   for (const { khoa: tm, ds: dsT } of nhom) {
     const tang = cacTangThuMuc(tm)
-    if (tang.length >= 2) {
+    if (tm.includes('›')) {
       if (daLong.has(tang[0]!)) continue
       daLong.add(tang[0]!)
-      const cung = nhom.filter((g) => cacTangThuMuc(g.khoa).length >= 2 && cacTangThuMuc(g.khoa)[0] === tang[0]).map((g) => ({ tang: cacTangThuMuc(g.khoa), ds: g.ds }))
+      const cung = nhom.filter((g) => g.khoa.includes('›') && cacTangThuMuc(g.khoa)[0] === tang[0]).map((g) => ({ tang: cacTangThuMuc(g.khoa), ds: g.ds }))
       ra.push(nutCha(`›${tang[0]}`, tang[0]!, 'thumuc', dungLong(cung, `›${tang[0]}`, 1)))
     } else if (tm) ra.push(nutCha(tm, tm, 'thumuc', dungKhoi(dsT, tm)))
     else ra.push(...dungKhoi(dsT, ''))
