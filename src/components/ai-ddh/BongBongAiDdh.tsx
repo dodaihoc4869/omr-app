@@ -1,8 +1,8 @@
 // BONG BÓNG CHAT «A.I ĐỖ ĐẠI HỌC» (thầy 24/10 duyệt bản vẽ 3 — docs/ban-ve-ai-ddh-2410/, đặc tả docs/DAC-TA-AI-DDH-APP-HS-2410.md).
 // Một kênh hỏi bài nữa của VĂN PHÒNG (y như Hộp thư Zalo): em gửi chữ / ảnh ⇒ hàng chờ ⇒ văn phòng giải đúng luồng của mình ⇒ trả lời hiện ở đây.
 // Tải lười, ngoài precache; nơi gắn (StudentPortalScreen) ẩn hẳn ở màn kiểm tra / làm bài / game. Máy chủ còn khoá thêm khi em có bài kiểm tra mở.
-// HỎI MÁY CHỦ: lúc mở app 0 lệnh (cờ lớp em có bật giữ trên máy 6 giờ; cờ cũ ⇒ hỏi một lần khi máy rảnh). Tấm mở: 1 lệnh mở; đang chờ trả lời: 3 giây/lần;
-// tấm mở mà không chờ: 20 giây/lần; tấm đóng mà còn câu chờ: 60 giây/lần; xong là dừng.
+// HỎI MÁY CHỦ: lúc mở app 0 lệnh (cờ lớp em có bật giữ trên máy 6 giờ; cờ cũ ⇒ hỏi một lần khi máy rảnh). Tấm mở: 1 lệnh mở; đang chờ trả lời: 1,5 giây/lần
+// (và thêm 60 giây sau mỗi tin trả lời — link trang lời giải gửi tiếp); tấm mở mà không chờ: 20 giây/lần; tấm đóng mà còn câu chờ: 60 giây/lần; xong là dừng.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Anh, ArrowRight, BookOpen, Camera, CheckCircle2, ChevronDown, ClipboardPaste, Clock, Lightbulb, Lock, MoonStar, Send, ShieldCheck, Sparkles, WifiOff, Zap } from './bieu-tuong-ai'
 import { AnhLogo } from '../LogoVai'
@@ -10,6 +10,9 @@ import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 import { CO_CU_MS, docCoBat, ghiCoBat, gopTin, guiAiDdh, moAiDdh, nenAnh, taoMaTin, tinMoiAiDdh, type MoAiDdh, type TinAiDdh } from '../../lib/ai-ddh-api'
 import { chuNguon, tachKhoi, type Khuc } from '../../lib/ai-ddh-dinh-dang'
 import './ai-ddh.css'
+
+/** Sau mỗi tin trả lời: còn hỏi nhanh (1,5 giây) chừng này để link trang lời giải gửi tiếp tới ngay. */
+export const DUOI_NHANH_MS = 60_000
 
 const Mat = ({ co = 40, on = false }: { co?: number; on?: boolean }) => (
   <span className="aid-mat" data-on={on ? '' : undefined} style={{ width: co, height: co }}><AnhLogo vai="hs" size={Math.round(co * 0.82)} /></span>
@@ -107,6 +110,15 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
   const [viTri, setViTri] = useState(docViTri)
   const sau = useMemo(() => tin.reduce((m, x) => Math.max(m, x.luc), 0), [tin])
   const dangCho = tin.some((x) => x.ben === 'em' && (x.trangThai === 'cho' || x.trangThai === 'dang'))
+  // ĐUÔI NHANH (25/10 thầy: "tối ưu tốc độ trả lời của a.i tức thì hơn nữa"): văn phòng gửi lời giải chữ TRƯỚC, trang HTML / link gửi tiếp sau
+  // (đăng trang 15–60 giây). Nhận tin trả lời xong vẫn hỏi 1,5 giây/lần thêm DUOI_NHANH_MS để link tới ngay, rồi mới thưa về 20 giây.
+  const [nhanhDen, setNhanhDen] = useState(0)
+  const duoiNhanh = nhanhDen > 0
+  useEffect(() => {
+    if (!nhanhDen) return
+    const h = window.setTimeout(() => setNhanhDen(0), Math.max(0, nhanhDen - Date.now()))
+    return () => clearTimeout(h)
+  }, [nhanhDen])
 
   // Cờ lớp em có bật: cũ ⇒ hỏi một lần khi máy rảnh (không chặn lúc mở app).
   useEffect(() => {
@@ -133,7 +145,7 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
   sauRef.current = sau
   useEffect(() => {
     if (!du?.bat) return
-    const ms = mo ? (dangCho ? 1500 : 20_000) : dangCho ? 60_000 : 0
+    const ms = mo ? (dangCho || duoiNhanh ? 1500 : 20_000) : dangCho ? 60_000 : 0
     if (!ms) return
     const v = batNhipBenVung(async () => {
       const r = await tinMoiAiDdh(token, sauRef.current)
@@ -141,10 +153,11 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
       setTruc(r.du.vanPhongTruc)
       if (!r.du.tin.length) return
       setTin((cu) => gopTin(cu, r.du.tin))
+      if (r.du.tin.some((x) => x.ben === 'vp')) setNhanhDen(Date.now() + DUOI_NHANH_MS)
       if (!mo) setMoiChua((n) => n + r.du.tin.filter((x) => x.ben === 'vp').length)
     }, { coSoMs: ms, lechMs: ms / 6, chayNgay: false, luiDanMs: [ms * 2, ms * 4, Math.max(ms * 8, 30_000)] })
     return () => v.dung()
-  }, [du?.bat, mo, dangCho, token])
+  }, [du?.bat, mo, dangCho, duoiNhanh, token])
 
   useEffect(() => { const t = than.current; if (t && mo) t.scrollTop = t.scrollHeight }, [tin.length, cho.length, mo])
 

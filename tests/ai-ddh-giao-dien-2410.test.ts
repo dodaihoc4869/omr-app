@@ -78,7 +78,8 @@ describe('trả lời ngay + gộp tin + khoá cuộn nền', () => {
     const s = readFileSync('src/components/ai-ddh/BongBongAiDdh.tsx', 'utf8')
     expect(s).toMatch(/position: 'fixed', top: `-\$\{y\}px`/)
     expect(s).toContain('window.scrollTo(0, y)')
-    expect(s).toContain('dangCho ? 1500')
+    expect(s).toContain('dangCho || duoiNhanh ? 1500') // 25/10: đuôi nhanh sau tin trả lời — link trang lời giải gửi tiếp tới ngay
+    expect(s).toContain('DUOI_NHANH_MS = 60_000')
     expect(readFileSync('src/components/ai-ddh/ai-ddh.css', 'utf8')).toMatch(/\.aid-che \{[^}]*touch-action: none/)
   })
 })
