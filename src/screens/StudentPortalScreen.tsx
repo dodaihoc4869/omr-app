@@ -739,6 +739,13 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   // (hoặc NHỚ từ lần trước khi đang chờ, để không nháy Bảng nhiệm vụ cũ). Cờ tắt ⇒ mọi thứ dưới đây chạy như cũ.
   const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang, true)
   const cheDo2 = !!auth?.token && hoa2.cheDo2
+  // Tải lại / Pages đổi bản giữa chặng Kiểm tra ôn tập (26/10, em 12095 «load lại thế là mất chặng 1»): màn kiểm tra là lớp phủ do `tab` giữ trong bộ nhớ nên tải lại là
+  // về trang chủ còn đồng hồ chặng vẫn chạy ở máy chủ. Máy nhớ chặng em mở dở (khoá `ktcn:lam:<sbd>` ghi bởi lib/ktcn-dang-lam, đọc thẳng ở đây cho nhẹ lượt mở app)
+  // ⇒ MỘT lần khi sảnh vừa cho biết bài kiểm tra (đổi `ktSanh.id`), tự mở lại màn kiểm tra; màn ấy mở lại đúng chặng đó (và dọn ghi nhớ đã hết hạn). Em bấm Về / nộp chặng thì ghi nhớ đã xoá.
+  const ktSanh = hoa2.ketQua?.cheDo2 && 'sanh' in hoa2.ketQua ? hoa2.ketQua.sanh.kiemTraCaNhan : undefined
+  useEffect(() => {
+    if (ktSanh && auth && tab === null && localStorage.getItem('ktcn:lam:' + auth.sbd)?.includes(ktSanh.id)) setTab('kiemtra')
+  }, [ktSanh?.id]) // eslint-disable-line react-hooks/exhaustive-deps
   // PHIÊN CŨ KHÔNG CÒN DÙNG ĐƯỢC (07/10: mã bí mật máy chủ đổi ⇒ token cất trong máy bị từ chối "Phiên game không hợp lệ"; nút Thử lại gửi lại đúng token hỏng):
   // máy chủ nói token hỏng / hết hạn / mật khẩu đã đổi ⇒ đăng xuất, màn đăng nhập hiện một dòng giải thích.
   useTuDangXuatKhiPhienHong(!!auth?.token, hoa2.loi, dangXuat)
@@ -913,7 +920,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       )}
       {moHoSoEm && auth.token && tab === null && !manThi && <Suspense fallback={null}><HoSoCuaEmHs token={auth.token} tenEm={auth.hoTen ?? ''} lop={auth.lop ?? undefined} onDong={() => setMoHoSoEm(false)} onChuaCau={(qid) => { setMoHoSoEm(false); setQidChua(qid); setTab('tuchua') }} onMoBaiTap={() => { setMoHoSoEm(false); setTab('hoctap') }} /></Suspense>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
-      {tab === 'kiemtra' && auth.token && !manThi && hoa2.ketQua?.cheDo2 && 'sanh' in hoa2.ketQua && hoa2.ketQua.sanh.kiemTraCaNhan && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManKiemTraCaNhan token={auth.token} sbd={auth.sbd} id={hoa2.ketQua.sanh.kiemTraCaNhan.id} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}
+      {tab === 'kiemtra' && auth.token && !manThi && ktSanh && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManKiemTraCaNhan token={auth.token} sbd={auth.sbd} id={ktSanh.id} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}
       {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} onTuLuyen={() => setTab('tuluyen')} /></Suspense></div>}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
