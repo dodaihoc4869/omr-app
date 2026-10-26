@@ -739,6 +739,10 @@ const manNgang = () => h(FragmentHse, null,
     NG_V === 'kiem' ? h(ManKiemTraCaNhanNg, { token: 'tk', sbd: '12121212', id: 'kt1', onVe: noop, onCapNhat: noop } as never)
     : h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B4-9', tenCau: 'Đồng phân alcohol', onVe: noop })))
 // ═══ hết NGANG HS 26/10
+// ═══ THƯỞNG PHẠT 26/10: `?man=tp&v=…` = giao diện học sinh hệ thưởng phạt (khối riêng gia/thuong.tsx — component THẬT, máy chủ GIẢ tests/_thuong-mau.ts).
+import { canhThuong, capFetchThuong } from './gia/thuong'
+if (man === 'tp') capFetchThuong()
+// ═══ hết THƯỞNG PHẠT 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
 const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-toan-canh':'hocsinh', 'gv-giao-btvn':'giaobtvn', 'gv-giao-tuan':'khodegiao', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
@@ -777,6 +781,7 @@ const con =
   man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-mot' ? manMotTrang() : // MỘT TRANG HS 26/10
   man === 'hs-ng' ? manNgang() : // NGANG HS 26/10
+  man === 'tp' ? canhThuong() : // THƯỞNG PHẠT 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   PH_VAO ? h(BatLinhShell, { vai: 'ph' }, h(ParentPortalScreen)) : // NGANG PH 26/10
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })

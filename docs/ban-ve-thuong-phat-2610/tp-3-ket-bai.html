@@ -1,0 +1,104 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Nguyên tử từng bài» — màn kết bài tách dòng câu đúng · câu khó · chuỗi đúng · hoàn hảo; độ chính xác; thời gian;
+     «Mục tiêu ngày» (vòng x/4 bài, đạt +5 tinh thể); thay đổi thứ hạng «Giải tuần». Câu sai làm nghiêm túc +2.
+     Mặc định (5/6): c1 10 · c2 10 · c3 10+2 · c4 khó 10+5+2 · c5 sai +2 · c6 10 ⇒ 50 + 2 + 5 + 4 = 61.
+     ?bt=hh Hoàn hảo (6/6): 60 + 5 + (2+2+5+5) + 20 = 99; đạt mục tiêu 4/4 ⇒ +5 tinh thể.
+     Hiệu ứng: B1 ba thẻ bật lần lượt + số đếm · B2 tinh thể kết tinh + tia xoay · B3 Bi «mung» + hoa giấy · B4 vòng mục tiêu tô dần, đầy thì nổ hạt. -->
+<title>HS · Thưởng phạt · 3 Kết bài</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.tp-hinh .kt{position:absolute;z-index:1;width:136px;left:50%;top:8px;margin-left:-82px}
+.tp-hinh .kt+.tp-bi{position:absolute;width:76px;right:0;bottom:0}
+[data-bt-dang=hh] .tp-hinh{width:250px;height:196px}
+.tp-hinh .tp-tia{inset:-24px}
+.giai-dong{display:flex;align-items:center;gap:12px}
+.giai-dong .tp-hh{width:46px}
+.giai-dong .giua{flex:1;min-width:0}
+.giai-dong b{display:block;font-size:15.5px}
+.giai-dong span{font-size:13.5px;color:var(--chu-2)}
+.len-hang{display:inline-flex;align-items:center;gap:2px;font-weight:900;color:var(--dung-chu);white-space:nowrap}
+.duo-xong{padding-top:12px}
+</style></head>
+<body class="duo tp" data-app="hs" data-khung="khong" data-ai="khong" data-bt-mac="thuong" data-hu-mac="ket-bai">
+<div class="duo-vo">
+  <main class="tp-man hai-cot">
+    <!-- GỌN HƠN: một màn trả lời cả 3 câu hỏi của em — được bao nhiêu nguyên tử (và vì sao), hôm nay còn mấy bài, đứng thứ mấy trong giải. -->
+    <div class="cot-a">
+      <div class="tp-hinh" data-bt="thuong"><span data-bi="vui" class="nhun" id="bi"></span></div>
+      <div class="tp-hinh" data-bt="hh"><span class="tp-tia quay" data-tia></span><span class="kt tp-hh" id="kt"></span><span data-bi="mung" id="bi"></span></div>
+      <h1 data-bt="thuong">Xong bài!</h1>
+      <h1 data-bt="hh" style="color:var(--sao-chu)">Hoàn hảo!</h1>
+      <p class="tp-phu" data-bt="thuong">Amine · tầng Hiểu · chặng 3 · 6 câu</p>
+      <p class="tp-phu" data-bt="hh">6/6 câu đúng, tự làm · Amine · chặng 3</p>
+      <div class="tp-3o" id="ba">
+        <div class="a"><p>Nguyên tử</p><b><i data-tp="nt"></i><span class="dem" data-bt="thuong" data-tu="0">+61</span><span class="dem" data-bt="hh" data-tu="0">+99</span></b></div>
+        <div class="b"><p>Chính xác</p><b><i data-i="target"></i><span class="dem" data-bt="thuong" data-tu="0" data-duoi="%">83%</span><span class="dem" data-bt="hh" data-tu="0" data-duoi="%">100%</span></b></div>
+        <div class="c"><p>Thời gian</p><b><i data-i="clock"></i><span data-bt="thuong">4:12</span><span data-bt="hh">3:48</span></b></div>
+      </div>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the tp-tach" aria-label="Nguyên tử của bài">
+        <h2>Nguyên tử của bài</h2>
+        <div data-bt="thuong">
+          <div class="hang-t"><span>Câu đúng · 5 câu × 10</span><b>+50</b></div>
+          <div class="hang-t"><span>Câu khó · câu 4</span><b>+5</b></div>
+          <div class="hang-t"><span>Chuỗi đúng · câu 3, 4</span><b>+4</b></div>
+          <div class="hang-t"><span>Câu sai làm kĩ · câu 5</span><b>+2</b></div>
+          <div class="hang-t khong"><span>Hoàn hảo · cần 6/6 câu đúng</span><b>+0</b></div>
+          <div class="hang-t tong"><span>Tổng</span><b>+61 <i data-tp="nt"></i></b></div>
+        </div>
+        <div data-bt="hh">
+          <div class="hang-t"><span>Câu đúng · 6 câu × 10</span><b>+60</b></div>
+          <div class="hang-t"><span>Câu khó · câu 4</span><b>+5</b></div>
+          <div class="hang-t"><span>Chuỗi đúng · câu 3–6</span><b>+14</b></div>
+          <div class="hang-t"><span>Hoàn hảo</span><b style="color:var(--sao-chu)">+20</b></div>
+          <div class="hang-t tong"><span>Tổng</span><b>+99 <i data-tp="nt"></i></b></div>
+        </div>
+      </section>
+      <div class="tp-hai">
+        <section class="tp-the" aria-label="Mục tiêu ngày">
+          <div class="tp-dong">
+            <div class="tp-vong" id="vong" data-bt="thuong" data-p="75" data-tu="50"><svg viewBox="0 0 64 64"><circle class="nen" cx="32" cy="32" r="28"/><circle class="chay" cx="32" cy="32" r="28"/></svg><b>3/4</b></div>
+            <div class="tp-vong dat" id="vong" data-bt="hh" data-p="100" data-tu="75"><svg viewBox="0 0 64 64"><circle class="nen" cx="32" cy="32" r="28"/><circle class="chay" cx="32" cy="32" r="28"/></svg><b>4/4</b></div>
+            <div class="giua" data-bt="thuong"><b>Mục tiêu ngày · 3/4 bài</b><span>Thêm 1 bài nữa là đạt, nhận +5 <i data-tp="tt"></i></span></div>
+            <div class="giua" data-bt="hh"><b>Đạt mục tiêu! · 4/4 bài</b><span class="tp-dat" id="dat">+5 <i data-tp="tt"></i> tinh thể</span></div>
+          </div>
+        </section>
+        <section class="tp-the" aria-label="Giải tuần">
+          <div class="giai-dong"><span data-hh="bac"></span>
+            <div class="giua" data-bt="thuong"><b>Lên hạng 4 trong nhóm Bạc <span class="len-hang">↑2</span></b><span>Top 5 cuối tuần được lên Giải Vàng</span></div>
+            <div class="giua" data-bt="hh"><b>Lên hạng 3 trong nhóm Bạc <span class="len-hang">↑3</span></b><span>Top 5 cuối tuần được lên Giải Vàng</span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <div class="duo-day"><div class="giua"><span class="duo-nut">Tiếp tục</span></div></div>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+const kt = document.getElementById('kt'); if (kt) kt.innerHTML = TP.huyHieu('kc')
+TP.dk('ket-bai', async () => {
+  const hh = TP.bt === 'hh'
+  // B1: ba thẻ bật lên cách nhau 120 ms, số đếm từ 0
+  document.querySelectorAll('#ba>div').forEach((d, i) => TP.a(d, [{ transform: 'translateY(16px) scale(.85)', opacity: 0 }, { transform: 'scale(1.05)', opacity: 1, offset: 0.6 }, { transform: 'none', opacity: 1 }], 420, { delay: 200 + i * 120 }))
+  document.querySelectorAll('#ba .dem').forEach((s) => { const toi = parseInt(s.textContent.replace(/\D/g, '')), duoi = s.dataset.duoi || ''; const dau = s.textContent.startsWith('+') ? '+' : ''; setTimeout(() => TP.dem(s, 0, toi, 800, (v) => dau + v + duoi), 260) })
+  document.querySelectorAll('.tp-tach .hang-t').forEach((r, i) => TP.a(r, [{ transform: 'translateX(-12px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 260, { delay: 500 + i * 90 }))
+  if (hh) {
+    // B2: tinh thể kết tinh từ tâm + tia xoay; B3: Bi mừng nhảy, hoa giấy lục giác
+    TP.phanHoi('hoanHao')
+    TP.a(kt, [{ transform: 'scale(0) rotate(-30deg)', opacity: 0 }, { transform: 'scale(.4) rotate(-10deg)', opacity: 1, offset: 0.3 }, { transform: 'scale(1.12) rotate(4deg)', opacity: 1, offset: 0.8 }, { transform: 'none', opacity: 1 }], 1200)
+    TP.a(document.querySelector('.tp-tia'), [{ opacity: 0, transform: 'scale(.4)' }, { opacity: 1, transform: 'none' }], 900, { delay: 300 })
+    TP.a(document.getElementById('bi'), [{ transform: 'translateY(0)' }, { transform: 'translateY(-26px)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-14px)' }, { transform: 'translateY(0)' }], 1000, { delay: 400 })
+    setTimeout(() => { TP.hat(kt, 0, { n: 12, r: 120, mau: ['var(--kl-kc)', 'var(--tt)', 'var(--sao)'] }); TP.hoaGiay(30, 1200) }, 650)
+  } else {
+    TP.a(document.getElementById('bi'), [{ transform: 'translateY(0)' }, { transform: 'translateY(-18px)' }, { transform: 'translateY(0)' }], 500, { delay: 200 })
+  }
+  // B4: vòng mục tiêu tô dần; đầy thì nổ hạt + «Đạt mục tiêu!»
+  await TP.cho(900)
+  const v = document.getElementById('vong'), c = v.querySelector('.chay'), tu = +v.dataset.tu, toi = +v.dataset.p
+  await new Promise((xong) => { const t0 = performance.now(); const f = (t) => { const p = Math.min(1, (t - t0) / 600), x = tu + (toi - tu) * (1 - Math.pow(1 - p, 3)); c.setAttribute('stroke-dasharray', `${x / 100 * 175.9} 200`); p < 1 ? requestAnimationFrame(f) : xong() }; requestAnimationFrame(f) })
+  if (hh) { TP.phanHoi('mucTieu'); TP.hat(v, 0, { n: 14, r: 70 }); TP.a(document.getElementById('dat'), [{ transform: 'scale(.4)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1 }, { transform: 'none', opacity: 1 }], 360) }
+})
+</script>
+</body></html>

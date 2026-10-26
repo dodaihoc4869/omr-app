@@ -1,0 +1,92 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- TRANG DEMO HIỆU ỨNG thưởng phạt (thuong-phat/HIEU-UNG.md). Mỗi nút mở đúng màn tp-* trong khung điện thoại 390×844 và chạy hiệu ứng (?hu=…). Sáng / Tối đổi cả khung lẫn màn. -->
+<title>Hiệu ứng thưởng phạt</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="tp.css">
+<style>
+body{font-family:'Nunito Variable','Nunito',system-ui,sans-serif;font-weight:600;background:var(--nen)}
+.vo{max-width:1320px;margin:0 auto;padding:24px 16px 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.dau{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dau h1{margin:0;font-size:26px;font-weight:900;flex:1;min-width:0}
+.che{display:inline-grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:12px;background:var(--mat-2)}
+.che button{min-height:44px;min-width:72px;border:0;border-radius:10px;background:none;font:800 14px var(--f,inherit);font-family:inherit;color:var(--chu-3);cursor:pointer}
+.che button.on{background:var(--mat);color:var(--chu);box-shadow:var(--bong-1)}
+.nhom{display:flex;flex-direction:column;gap:8px}
+.nhom h2{margin:6px 0 0;font-size:13px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--chu-3)}
+.nhom .ds-nut{display:flex;flex-wrap:wrap;gap:8px}
+.nhom button{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:6px 14px;border-radius:14px;border:2px solid var(--vien-2);border-bottom-width:4px;background:var(--mat);color:var(--chu);font:800 14px/1.25 inherit;font-family:inherit;text-align:left;cursor:pointer}
+.nhom button b{display:inline-grid;place-items:center;min-width:30px;height:24px;padding:0 6px;border-radius:8px;background:var(--mat-2);font-size:12px;color:var(--chu-2)}
+.nhom button.on{border-color:var(--tt);background:var(--tt-nhat);color:var(--tt-chu)}
+.khung-dt{position:relative;width:414px;max-width:100%;margin:0 auto;padding:12px;border-radius:48px;background:#101828;box-shadow:0 30px 60px -20px rgba(16,24,40,.45)}
+.khung-dt iframe{display:block;width:390px;max-width:100%;height:844px;border:0;border-radius:36px;background:var(--mat)}
+.ten-dang{margin:10px 0 0;text-align:center;font-size:14px;color:var(--chu-2)}
+.ten-dang b{color:var(--chu)}
+.lai{display:flex;justify-content:center;margin-top:10px}
+.lai button{min-height:44px;padding:0 20px;border-radius:14px;border:0;background:var(--dung);color:#fff;font:900 15px inherit;font-family:inherit;letter-spacing:.03em;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+@media (min-width:1000px){.vo{grid-template-columns:minmax(0,1fr) 414px;align-items:start}.trai-dm{order:-1}.giua-dt{position:sticky;top:16px}}
+@media (max-width:460px){.khung-dt{padding:0;border-radius:0;background:none;box-shadow:none}.khung-dt iframe{width:100%;border-radius:20px;border:1px solid var(--vien)}}
+</style></head>
+<body class="tp" data-app="hs">
+<div class="vo">
+  <div class="trai-dm cot" style="gap:14px">
+    <div class="dau"><h1>Hiệu ứng thưởng phạt</h1><span class="che" role="group" aria-label="Sáng tối"><button id="sang" class="on">Sáng</button><button id="toi">Tối</button></span></div>
+    <p class="tp-phu" style="margin:0">Bấm một nút để xem hiệu ứng trong khung điện thoại. Bấm lại để xem lần nữa. Mã A1…H4 theo danh mục HIEU-UNG.md.</p>
+    <div id="ds" class="cot" style="gap:12px"></div>
+  </div>
+  <div class="giua-dt">
+    <div class="khung-dt"><iframe id="may" title="Màn điện thoại" src="about:blank"></iframe></div>
+    <p class="ten-dang" id="ten-dang">Chọn một hiệu ứng</p>
+    <div class="lai"><button id="xem-lai">Xem lại</button></div>
+  </div>
+</div>
+<script>
+const HU = [
+  ['A · Trong lúc làm câu', [
+    ['A4 A6 A7 A8', 'Câu đúng · chuỗi đúng 3 (ống nghiệm phát sáng)', 'tp-1-cau-dung', 'combo', 'dung'],
+    ['A6', 'Phản ứng dây chuyền (chuỗi đúng 5)', 'tp-1-cau-dung', 'day-chuyen', 'dung'],
+    ['A4', 'Câu khó +5', 'tp-1-cau-dung', 'cau-kho', 'dung'],
+    ['H3', 'Câu chưa được tính: phân tử rã', 'tp-2-cau-khong-tinh', '', 'khong-tinh']]],
+  ['B · Kết bài', [
+    ['B1 B4', 'Kết bài: thẻ bật, số đếm, vòng mục tiêu', 'tp-3-ket-bai', 'thuong', 'ket-bai'],
+    ['B2 B3 B4', 'Hoàn hảo: tinh thể kết tinh, hoa giấy', 'tp-3-ket-bai', 'hh', 'ket-bai']]],
+  ['C · Chuỗi ngày', [
+    ['C1', 'Chuỗi tăng: số lật, lửa bùng', 'tp-5-chuoi', '', 'chuoi'],
+    ['C2', 'Mốc 7 ngày: pháo hoa, huy hiệu lật', 'tp-5-chuoi', '', 'moc'],
+    ['C3', 'Bình giữ chuỗi đỡ ngày lỡ', 'tp-18-binh-da-do', 'binh', 'binh'],
+    ['C3', 'Ngày vắng có phép: dấu P', 'tp-18-binh-da-do', 'phep', 'phep'],
+    ['C4', 'Chuỗi tắt: lửa leo lét, đếm ngược', 'tp-6-cuu-chuoi', 'tat', 'tat'],
+    ['C4', 'Cứu chuỗi xong: lửa bùng lại', 'tp-6-cuu-chuoi', 'xong', 'cuu-xong']]],
+  ['D · Phần thưởng', [
+    ['D1', 'Tinh thể bay vào bộ đếm', 'tp-9-nhiem-vu', 'dang', 'o'],
+    ['D2', 'Rương lắc, bật nắp', 'tp-9-nhiem-vu', 'mo', 'ruong'],
+    ['D3', 'Huy hiệu mới lật', 'tp-13-huy-hieu', '', 'lat'],
+    ['D1', 'Mua bình giữ chuỗi', 'tp-10-tinh-the', '', 'mua']]],
+  ['E · Giải tuần', [
+    ['E1', 'Hàng của em trượt lên hạng mới', 'tp-7-giai', '', 'flip'],
+    ['E2', 'Lên hạng: huy hiệu rơi, hoa giấy', 'tp-8-cuoi-tuan', 'len', 'len'],
+    ['E2', 'Giữ hạng', 'tp-8-cuoi-tuan', 'giu', 'giu'],
+    ['E3', 'Rơi hạng: huy hiệu trượt xuống', 'tp-8-cuoi-tuan', 'roi', 'roi']]],
+  ['H · Phạt (vui, không doạ)', [
+    ['H1', 'Thăng hoa: tinh thể bốc hơi', 'tp-11-thang-hoa', '', 'thang-hoa'],
+    ['H2', 'Thử thách Kim cương: ống nghiệm vỡ', 'tp-12-kim-cuong', 'lam', 'vo'],
+    ['H4', 'Cược thua: đồng tinh thể nứt đôi', 'tp-10-tinh-the', '', 'cuoc-thua'],
+    ['D3', 'Đạt Kim cương: huy hiệu lật', 'tp-12-kim-cuong', 'dat', 'dat']]],
+  ['Học cùng bạn', [
+    ['Mới', 'Lửa đôi bùng', 'tp-16-hoc-cung-ban', 'chieu', 'lua-doi'],
+    ['Mới', 'Gõ cửa: nút rung nhẹ', 'tp-16-hoc-cung-ban', 'chieu', 'go-cua'],
+    ['Mới', 'Nhận lời mời học cùng', 'tp-17-moi-ban', 'nhan', 'nhan'],
+    ['Mới', 'Mốc chuỗi đôi 7 ngày', 'tp-17-moi-ban', 'moc', 'moc']]],
+  ['F · Lộ trình', [
+    ['F1', 'Mở app: vòng mục tiêu, nút phồng thở', 'tp-4-thanh-tren', '', 'mo-app']]],
+]
+let toi = new URLSearchParams(location.search).has('toi'), dang = null
+if (toi) document.documentElement.dataset.theme = 'dark'
+const may = document.getElementById('may')
+const mo = (h) => { dang = h; const [ma, ten, tep, bt, hu] = h; may.src = `${tep}.html?hu=${hu}${bt ? '&bt=' + bt : ''}${toi ? '&toi' : ''}&t=${Date.now()}`; document.getElementById('ten-dang').innerHTML = `<b>${ma}</b> · ${ten}`; document.querySelectorAll('.nhom button').forEach((b) => b.classList.toggle('on', b._h === h)) }
+const ds = document.getElementById('ds')
+HU.forEach(([nhom, ls]) => { const n = document.createElement('section'); n.className = 'nhom'; n.innerHTML = `<h2>${nhom}</h2><div class="ds-nut"></div>`; ls.forEach((h) => { const b = document.createElement('button'); b._h = h; b.innerHTML = `<b>${h[0]}</b>${h[1]}`; b.onclick = () => mo(h); n.lastChild.append(b) }); ds.append(n) })
+document.getElementById('xem-lai').onclick = () => dang && mo(dang)
+const doiChe = (t) => { toi = t; document.documentElement.dataset.theme = t ? 'dark' : ''; document.getElementById('sang').classList.toggle('on', !t); document.getElementById('toi').classList.toggle('on', t); if (dang) mo(dang) }
+document.getElementById('sang').onclick = () => doiChe(false); document.getElementById('toi').onclick = () => doiChe(true)
+doiChe(toi); mo(HU[0][1][0])
+</script>
+</body></html>

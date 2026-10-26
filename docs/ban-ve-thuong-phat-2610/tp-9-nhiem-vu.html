@@ -1,0 +1,89 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Nhiệm vụ ngày (3 ô, đổi mỗi ngày)» rút từ bộ mẫu; mỗi ô +5–10 tinh thể; đủ 3 ô mở rương +15; «Mục tiêu ngày» đạt +5.
+     Câu không được tính không cộng vào nhiệm vụ (luật câu). Hôm nay Thứ Sáu 30/10, 16:55 ⇒ nhiệm vụ mới sau 7 giờ 05 phút.
+     ?bt=dang (mặc định): 3/4 · 5/5 xong (+5 đã nhận) · 1/2 — rương khoá 1/3, tinh thể 245.
+     ?bt=mo: 4/4 (+10) · 5/5 (+5) · 2/2 (+10) + mục tiêu ngày 4/4 (+5) + rương (+15) ⇒ 245 + 10 + 10 + 5 + 15 = 285.
+     Hiệu ứng D2 rương lắc 3 nhịp, bật nắp, tinh thể phun ra rồi bay vào bộ đếm (D1) (?hu=ruong, mặc định ở ?bt=mo) · D1 một ô nhiệm vụ xong (?hu=o, mặc định ở ?bt=dang). -->
+<title>HS · Thưởng phạt · 9 Nhiệm vụ ngày</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="mot-trang.css"><link rel="stylesheet" href="duo-app.css"><link rel="stylesheet" href="dm-dep.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.tp-nv{border:1px solid var(--vien);border-radius:20px;background:var(--mat);box-shadow:0 10px 24px -18px color-mix(in srgb,#000 30%,transparent)}
+.tp-nv .thuong{display:inline-flex;align-items:center;gap:4px;min-width:56px;justify-content:flex-end;font-weight:900;color:var(--tt-chu)}
+.tp-nv.xong .thuong{color:var(--dung-chu)}
+.tp-nv .thuong .tp-dv{width:18px;height:18px}
+.ruong-the{display:flex;align-items:center;gap:16px}
+.ruong-the .tp-ruong{width:112px}
+.ruong-the .giua{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ruong-the b{font-size:17px}
+.ba-cham{display:flex;gap:6px}
+.ba-cham i{width:28px;height:10px;border-radius:999px;background:var(--mat-3)}
+.ba-cham i.x{background:var(--dung)}
+.tong-nv{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--chu-2)}
+.tong-nv b{color:var(--tt-chu);display:inline-flex;align-items:center;gap:3px}
+.mau-nv{display:flex;flex-wrap:wrap;gap:6px}
+.mau-nv span{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:999px;background:var(--mat-2);font-size:13px;font-weight:700;color:var(--chu-2)}
+.dau-nv{display:flex;flex-direction:column;gap:2px}
+.dau-nv .tp-tieu{flex:1;min-width:0}
+</style></head>
+<body class="da dm tp" data-app="hs" data-nav="duo" data-tab="luyen-tap" data-menu="phai" data-ai="menu" data-diem-danh="khong" data-bt-mac="dang" data-hu-mac="o" data-hu-mo="ruong">
+<header class="da-tren" data-lua="12" data-nt="147" data-tt="245" data-bai="3/4" data-bt="dang"></header>
+<header class="da-tren" data-lua="12" data-nt="196" data-tt="285" data-bai="4/4" data-bi-tren="mung" data-bt="mo"></header>
+<div class="dm-khung mot">
+<main class="da-vo tp-rong">
+  <!-- GỌN HƠN: thay «nhiệm vụ ngày» đơn bằng 3 ô có thanh tiến độ + rương; mỗi ô ghi rõ thưởng; không chữ thừa. -->
+  <div class="tp-luoi2">
+    <div class="c">
+      <div class="dau-nv"><h1 class="tp-tieu">Nhiệm vụ hôm nay</h1><span class="mo" style="font-size:13.5px">nhiệm vụ mới sau 7 giờ 05 phút</span></div>
+      <div class="tp-nv" data-bt="dang" id="o1"><span class="tp-o sao"><i data-i="book"></i></span><div class="giua"><b>Xong 4 bài</b><div class="hang-nv"><div class="tp-thanh sao"><i style="--p:75%"></i></div><small>3/4</small></div></div><span class="thuong">+10 <i data-tp="tt"></i></span></div>
+      <div class="tp-nv xong" data-bt="mo" id="o1"><span class="tp-o dung"><i data-i="check"></i></span><div class="giua"><b>Xong 4 bài</b><div class="hang-nv"><div class="tp-thanh"><i style="--p:100%"></i></div><small>4/4</small></div></div><span class="thuong">+10 <i data-tp="tt"></i></span></div>
+      <div class="tp-nv xong" id="o2"><span class="tp-o dung"><i data-i="check"></i></span><div class="giua"><b>Chuỗi đúng 5 câu</b><div class="hang-nv"><div class="tp-thanh"><i style="--p:100%"></i></div><small>5/5</small></div></div><span class="thuong">+5 <i data-tp="tt"></i></span></div>
+      <div class="tp-nv" data-bt="dang" id="o3"><span class="tp-o tin"><i data-i="target"></i></span><div class="giua"><b>Đúng 2 câu khó</b><div class="hang-nv"><div class="tp-thanh tin"><i style="--p:50%"></i></div><small>1/2</small></div></div><span class="thuong">+10 <i data-tp="tt"></i></span></div>
+      <div class="tp-nv xong" data-bt="mo" id="o3"><span class="tp-o dung"><i data-i="check"></i></span><div class="giua"><b>Đúng 2 câu khó</b><div class="hang-nv"><div class="tp-thanh"><i style="--p:100%"></i></div><small>2/2</small></div></div><span class="thuong">+10 <i data-tp="tt"></i></span></div>
+      <section class="tp-the" aria-label="Rương ngày">
+        <div class="ruong-the"><span data-ruong="dong" data-bt="dang" id="ruong"></span><span data-ruong="mo" data-bt="mo" id="ruong"></span>
+          <div class="giua" data-bt="dang"><b>Rương ngày</b><span class="mo">Xong cả 3 nhiệm vụ để mở rương · +15 <i data-tp="tt"></i></span><div class="ba-cham" aria-label="Đã xong 1/3 nhiệm vụ"><i class="x"></i><i></i><i></i></div></div>
+          <div class="giua" data-bt="mo"><b style="color:var(--tt-chu)">Rương đã mở · +15 <i data-tp="tt"></i></b><span class="mo">Hẹn em mai với 3 nhiệm vụ mới.</span><div class="ba-cham" aria-label="Đã xong 3/3 nhiệm vụ"><i class="x"></i><i class="x"></i><i class="x"></i></div></div>
+        </div>
+      </section>
+    </div>
+    <div class="c">
+      <section class="tp-the" aria-label="Tinh thể hôm nay">
+        <h2>Tinh thể hôm nay</h2>
+        <div class="tong-nv" data-bt="dang"><span>Đã nhận</span><b>+5 <i data-tp="tt"></i></b><span>· còn có thể nhận</span><b>+40 <i data-tp="tt"></i></b></div>
+        <div class="tong-nv" data-bt="mo"><span>Nhiệm vụ 10 + 5 + 10 · mục tiêu ngày 5 · rương 15 =</span><b>+45 <i data-tp="tt"></i></b></div>
+        <p class="tp-phu" style="font-size:13.5px" data-bt="dang">Còn lại: 2 nhiệm vụ (+20), mục tiêu ngày 4 bài (+5), rương (+15).</p>
+      </section>
+      <section class="tp-the" aria-label="Các nhiệm vụ có thể ra">
+        <h2>Mỗi ngày rút 3 trong 6 kiểu</h2>
+        <div class="mau-nv"><span>Xong N bài</span><span>Chuỗi đúng 5 câu</span><span>Đúng 2 câu khó</span><span>Sửa 2 lỗi cũ</span><span>Bài hoàn hảo</span><span>Học trước 20:00</span></div>
+      </section>
+    </div>
+  </div>
+</main>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('ruong', async () => {
+  // D2: rương lắc 3 nhịp, bật nắp, tinh thể phun ra rồi bay vào bộ đếm (D1)
+  const r = document.getElementById('ruong'), nap = r.querySelector('.nap'), dem = document.getElementById('dem-tt')
+  dem.textContent = '270'
+  TP.phanHoi('ruong')
+  TP.a(r, [{ transform: 'rotate(0)' }, { transform: 'rotate(-9deg)' }, { transform: 'rotate(8deg)' }, { transform: 'rotate(-8deg)' }, { transform: 'rotate(7deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(0)' }], 600)
+  nap.style.transformOrigin = '14px 44px'
+  TP.a(nap, [{ transform: 'none' }, { transform: 'none', offset: 0.55 }, { transform: 'translate(0px,-20px) rotate(-24deg)', offset: 0.8 }, { transform: 'translate(0px,-14px) rotate(-16deg)' }], 1000, { e: 'ease-out' })
+  TP.a(r.querySelector('svg > g'), [{ opacity: 0 }, { opacity: 0, offset: 0.6 }, { opacity: 1 }], 1000)
+  setTimeout(() => TP.hat(r, 0, { n: 16, r: 90, roi: -20, mau: ['var(--tt)', 'var(--sao)', '#fff'] }), 650)
+  await TP.cho(950)
+  TP.bay(r, dem.parentElement, { n: 8, d: 700, dem: (p) => { dem.textContent = Math.round(270 + 15 * p) } })
+})
+TP.dk('o', async () => {
+  // D1: ô «Chuỗi đúng 5 câu» vừa xong — thanh đầy, dấu tick bật, 5 tinh thể bay lên bộ đếm
+  const o = document.getElementById('o2'), dem = document.getElementById('dem-tt')
+  dem.textContent = '240'
+  TP.a(o.querySelector('.tp-thanh i'), [{ transform: 'scaleX(.8)' }, { transform: 'none' }], 400)
+  TP.a(o.querySelector('.tp-o'), [{ transform: 'scale(.5)' }, { transform: 'scale(1.2)' }, { transform: 'none' }], 400, { delay: 300 })
+  await TP.cho(500)
+  TP.bay(o.querySelector('.thuong'), dem.parentElement, { n: 5, dem: (p) => { dem.textContent = Math.round(240 + 5 * p) } })
+})
+</script>
+</body></html>
