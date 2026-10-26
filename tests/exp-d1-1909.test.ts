@@ -108,15 +108,15 @@ describe('EXP câu đúng theo bảng phần × sao (mọi nguồn trừ game)',
     for (const [q, , , exp] of ds) expect(expCua(d, `cau|${q}|${HOM_NAY}`), q).toBe(exp)
     expect(tongExp(d)).toBe(2 + 3 + 5 + 3 + 5 + 8 + 4 + 6 + 10 + 3)
   })
-  it('sai và bỏ trống = 0 EXP; nguồn game không nhận EXP câu; cùng qid hai lần một ngày = một khoản', async () => {
+  it('SỬA CÓ CHỦ Ý 26/10 (thưởng phạt): sai nghiêm túc +2, bỏ trống = 0; nguồn game không nhận EXP câu; cùng qid hai lần một ngày = một khoản', async () => {
     const d = await dung()
     await ghi(d, [
       sk(qid(1), 0, NOW), sk(qid(2), null, NOW), sk(qid(3), 1, NOW, { nguon: 'game', maNguon: 'S' }),
       sk(qid(4), 1, NOW - 2000, { lan: 1 }), sk(qid(4), 1, NOW - 1000, { lan: 2 }),
     ])
     await capNhatExp(d.env, 'S1', NOW)
-    expect(khoaExp(d)).toEqual([`cau|${qid(4)}|${HOM_NAY}`])
-    expect(tongExp(d)).toBe(2)
+    expect(khoaExp(d).sort()).toEqual([`cau|${qid(4)}|${HOM_NAY}`, `sai|${qid(1)}|${HOM_NAY}`].sort())
+    expect(tongExp(d)).toBe(2 + 2)
   })
   // SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT, docs/DE-XUAT-EXP-V5-2909.md): BỎ trần mềm 2 × mục tiêu — mọi câu đúng đủ giá, dù mục tiêu ngày là bao nhiêu.
   it('v5: không còn trần mềm — 18 câu với mục tiêu mặc định 8 đều đủ 2 EXP', async () => {
@@ -307,7 +307,7 @@ describe('thưởng theo việc: lô, nộp bài, mom, ca thi', () => {
     expect(expCua(d, 'mom|m1')).toBe(10)
     expect(expCua(d, 'mom|m2')).toBeUndefined()
   })
-  it('ca thi: điểm × 3 khi ĐÃ công bố; chưa công bố thì KHÔNG có EXP nào (kể cả từng câu); công bố muộn thì trả đủ đúng một lần', async () => {
+  it('ca thi (SỬA CÓ CHỦ Ý 26/10: +30 cố định) khi ĐÃ công bố; chưa công bố thì KHÔNG có EXP nào (kể cả từng câu); công bố muộn thì trả đủ đúng một lần', async () => {
     const d = await dung()
     const ca = (ma: string, congBo: string) => d.sql.prepare("INSERT INTO ca(ma_ca,trang_thai,cong_bo,cap_nhat_luc) VALUES(?,'mo',?,'x')").run(ma, congBo)
     const luot = (ma: string, sbd: string, tt: string, nop: string | null, diem = 0) =>
@@ -322,18 +322,18 @@ describe('thưởng theo việc: lô, nộp bài, mom, ca thi', () => {
       sk('t2', 1, NOW - D + 1000, { nguon: 'thi', maNguon: 'CA2', lan: 1 }),
     ])
     await capNhatExp(d.env, 'S1', NOW)
-    expect(expCua(d, 'diem|CA1|1')).toBe(21)
+    expect(expCua(d, 'diem|CA1|1')).toBe(30) // SỬA CÓ CHỦ Ý 26/10 (thưởng phạt): hoàn thành ca thi +30 cố định
     expect(expCua(d, `cau|t1|${HOM_NAY}`)).toBe(2)
     expect(khoaExp(d).some((k) => k.includes('CA2') || k.includes('|t2|'))).toBe(false)
     // Cả lớp xong CA2 → công bố; lần gọi sau trả điểm và câu của ngày nộp (hôm qua), một lần.
     d.sql.prepare("UPDATE luot SET trang_thai='da_nop', nop_luc=? WHERE ma_ca='CA2' AND sbd='S2'").run(iso(NOW))
     await capNhatExp(d.env, 'S1', NOW)
-    expect(expCua(d, 'diem|CA2|1')).toBe(18)
+    expect(expCua(d, 'diem|CA2|1')).toBe(30)
     expect(expCua(d, 'cau|t2|2026-09-19')).toBe(2)
     const gc = (khoa: string) => dongExp(d).find((x) => x.khoa === `S1|${khoa}`)?.ghi_chu
-    expect(gc('diem|CA2|1')).toMatch(/^Ca CA2 vừa công bố\. Điểm ca thi 6: \+18$/)
+    expect(gc('diem|CA2|1')).toMatch(/^Ca CA2 vừa công bố\. Hoàn thành ca thi: \+30$/)
     expect(gc('cau|t2|2026-09-19')).toMatch(/\(ca CA2 vừa công bố\)$/)
-    expect(gc('diem|CA1|1')).toBe('Điểm ca thi 7: +21')
+    expect(gc('diem|CA1|1')).toBe('Hoàn thành ca thi: +30')
     const truoc = d.chup('exp_so')
     await capNhatExp(d.env, 'S1', NOW)
     expect(d.chup('exp_so')).toBe(truoc)

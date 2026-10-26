@@ -47,6 +47,8 @@ export const BANG_XOA_HOA2: readonly string[] = [
   'vang_so', 'phu_kien_so_huu', 'phu_kien_dang_mac',
   // BI-A PHẢN ỨNG (migration-2809-bi-a.sql): ván, ghế, lời mời, có mặt, Điểm bàn — trạng thái chơi, về 0 như game. Câu đã trả lời nằm ở sổ `su_kien_hoc` (GIỮ).
   'bi_a_ghe', 'bi_a_van', 'bi_a_moi', 'bi_a_co_mat', 'bi_a_diem_ban',
+  // THƯỞNG PHẠT (migration-2610-thuong-phat.sql, 26/10): nhiệm vụ, rương, huy hiệu, cược, Kim cương, thông báo, bài xong — trạng thái chơi đi cùng sổ tinh thể `vang_so` (XOÁ) ⇒ về 0.
+  'nhiem_vu_ngay', 'ruong_ngay', 'huy_hieu_em', 'cuoc_chuoi', 'kim_cuong_phien', 'thong_bao_thuong', 'thuong_bai_xong',
   // MỌI CA THI cũ (thầy 27/09: "xoá toàn bộ các ca thi cũ"). `ca` cuối cùng.
   ...BANG_CA_THI_HOA2,
 ]

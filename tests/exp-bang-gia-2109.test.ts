@@ -62,7 +62,7 @@ describe('thưởng theo việc đổi giá theo NGÀY của khoản', () => {
     expect(theoLoai(r, 'len_bac')[0]!.exp).toBe(6)
     expect(theoLoai(r, 'khac_phuc')[0]!.exp).toBe(30)
     expect(theoLoai(r, 'len_bang')[0]!.exp).toBe(15)
-    expect(theoLoai(r, 'diem_ca')[0]!.exp).toBe(21)
+    expect(theoLoai(r, 'diem_ca')[0]!.exp).toBe(30) // SỬA CÓ CHỦ Ý 26/10 (thưởng phạt): ca thi hoàn thành +30 cố định, không phụ thuộc điểm
   })
   it('mảnh khiên KHÔNG đổi: đạt ngày vẫn +1 mảnh ở cả hai bảng giá', () => {
     for (const ngay of ['2026-09-21', '2026-09-22']) expect(tinhExp(vao({ ngay, datNgay: { chuoi: 1, luc: `${ngay}T06:00:00.000Z` } })).manh.map((m) => [m.loai, m.so])).toEqual([['dat', 1]])
