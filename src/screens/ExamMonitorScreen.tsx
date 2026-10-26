@@ -47,7 +47,6 @@ import { themPhutCa, cauKetQuaThemPhut } from '../lib/them-phut-api'
 import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
-import '../styles/khoi-dam-quan-ly.css' // «Khối đậm» 25/10: trình bày màn quản lý app thầy
 // CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
 import NutThemPhutCa from '../components/ca-thi/NutThemPhutCa'

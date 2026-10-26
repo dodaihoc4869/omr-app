@@ -1,7 +1,6 @@
 import { useEffect, useRef, type ReactNode, type KeyboardEvent } from 'react'
 import { createPortal } from 'react-dom'
 import './chua-cau-sai.css'
-import '../../styles/khoi-dam-lam-bai.css' // «Khối đậm» 25/10: trình bày màn làm bài / làm câu của học sinh
 // Dialog native giữ tiêu điểm trong khung và làm nền bất hoạt khi em đang chữa.
 export default function KhungChua({
   children,

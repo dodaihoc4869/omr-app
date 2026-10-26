@@ -14,7 +14,6 @@ import '../styles/hom-nay.css' // thẻ số `.hn-so` dùng chung với màn Hô
 import '../styles/hom-nay-v2.css'
 import '../styles/toan-canh-em.css'
 import '../components/chien-dich/gv-v2.css' // khung tấm "Hồ sơ làm bài" (.gvv2-hs) — vào thẳng Toàn cảnh thì chưa màn nào nạp
-import '../styles/khoi-dam-quan-ly.css' // «Khối đậm» 25/10: trình bày màn quản lý app thầy
 
 // Tấm "Hồ sơ làm bài" 6 mức (đặc tả docs/ban-ve-ho-so-em-2210 §2, đường vào từ Toàn cảnh): nạp LƯỜI — cùng mảnh với Nhịp học / Điểm danh / Bài hằng ngày.
 const HoSoLamCauEm = lazy(() => import('../components/chien-dich/HoSoLamCauEm'))

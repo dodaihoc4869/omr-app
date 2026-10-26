@@ -12,8 +12,6 @@
 // cổng học sinh (phép kiểm dựng thẳng <App/>) — hai nhánh cùng một cây.
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
 import BatLinhShell from './components/bat-linh/BatLinhShell'
-import './styles/khoi-dam-phong.css' // phông «Khối đậm» tự lưu — chỉ 3 gốc dùng Khối đậm (phụ huynh / Hỏi thầy giữ Be Vietnam Pro)
-import './styles/khoi-dam.css' // Giao diện «Khối đậm» thầy duyệt 25/10
 import ChanLoi from './components/ChanLoi'
 import { LogoDoc } from './components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './screens/DangNhapHocSinh'

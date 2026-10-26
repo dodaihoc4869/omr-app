@@ -29,7 +29,6 @@ import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-ti
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import '../tu-luyen/tu-luyen.css'
 import './chua-cau-sai.css'
-import '../../styles/khoi-dam-lam-bai.css' // «Khối đậm» 25/10: trình bày màn làm bài / làm câu của học sinh
 export interface PropsChuaCauSai {
   token: string
   qid: string
