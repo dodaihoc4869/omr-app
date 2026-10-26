@@ -41,6 +41,7 @@ import '../../src/styles/vo-thay.css'
 import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
 import '../../src/styles/trong.css' // giao diện «Trong» 26/10 (App / AppHocSinh / AppThi nạp y như vậy)
+import '../../src/styles/trong-gv.css' // «Trong» — khung app thầy (App.tsx nạp ngay sau trong.css)
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import AppPhuHuynh from '../../src/components/ph-v3/AppPhuHuynh'

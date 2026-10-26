@@ -37,6 +37,7 @@ import NhipHocThay, { type DuNhip } from '../components/hom-nay-thay/NhipHocThay
 import type { CanThayChua } from '../../server/src/omni-kieu'
 import { caConEmDangLam } from '../lib/ca-dang-chay'
 import './gv-hoa2.css'
+import '../styles/trong-gv-hom-nay.css'
 import '../components/chien-dich/gv-v2.css'
 import './gv-hom-nay.css'
 import '../components/hom-nay-thay/hom-nay-thay.css'
@@ -470,30 +471,17 @@ export default function GvHomNayScreen() {
   const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => setMoBoSung(true) }
   const soEm = nhip?.ok ? nhip.kq.em.length : null
 
-  return (
-    <div className="gv2-trang gvhn gvhn-1210">
-      <header className="gvhn-dau">
-        <div className="gvhn-dau-chu">
-          <h1 className="gvv2-h1">Hôm nay của thầy</h1>
-          {/* điện thoại (bản vẽ): "Thứ Hai 12/10 · 262 em · cập nhật 10:15" — bỏ năm và chữ "đang học" cho vừa một dòng */}
-          <p className="gvv2-phu gvv2-so">
-            <span className="nht-an-hep">{hienNgay(ngayVn(now))}</span>
-            <span className="nht-chi-hep">{hienNgay(ngayVn(now), false)}</span>
-            {soEm !== null && soEm > 0 && (
-              <>
-                {` · ${soEm} em`}
-                <span className="nht-an-hep"> đang học</span>
-              </>
-            )}
-            {capNhat !== null && ` · cập nhật ${gioPhut(capNhat)}`}
-          </p>
-        </div>
-        <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
-          {nutChinh.chu}
-        </button>
-      </header>
-
+  // «Trong» (bản vẽ 26/10): khối Việc cần thầy vào đầu cột trái của Nhịp học (NhipHocThay đặt); không «Trong» ⇒ đúng chỗ cũ.
+  const trong = typeof document !== 'undefined' && document.documentElement.dataset.trong === 'gv'
+  const soViec = viec.filter((v) => v.nut && !v.loi).length
+  const khoiViec = (
       <section className="gvhn-viec-khoi" aria-label="Việc cần thầy">
+        {trong && du && viec.length > 0 && (
+          <div className="gvhn-viec-dau">
+            <h2>Việc cần thầy</h2>
+            {soViec > 0 && <span className="gvv2-so">{soViec} việc</span>}
+          </div>
+        )}
         {!du || (viec.length === 0 && du.conCho) ? (
           <XuongViec />
         ) : viec.length === 0 ? (
@@ -538,8 +526,34 @@ export default function GvHomNayScreen() {
         )}
         {du?.conCho && viec.length > 0 && <XuongViec mot />}
       </section>
+  )
 
-      <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} />
+  return (
+    <div className="gv2-trang gvhn gvhn-1210">
+      <header className="gvhn-dau">
+        <div className="gvhn-dau-chu">
+          <h1 className="gvv2-h1">Hôm nay của thầy</h1>
+          {/* điện thoại (bản vẽ): "Thứ Hai 12/10 · 262 em · cập nhật 10:15" — bỏ năm và chữ "đang học" cho vừa một dòng */}
+          <p className="gvv2-phu gvv2-so">
+            <span className="nht-an-hep">{hienNgay(ngayVn(now))}</span>
+            <span className="nht-chi-hep">{hienNgay(ngayVn(now), false)}</span>
+            {soEm !== null && soEm > 0 && (
+              <>
+                {` · ${soEm} em`}
+                <span className="nht-an-hep"> đang học</span>
+              </>
+            )}
+            {capNhat !== null && ` · cập nhật ${gioPhut(capNhat)}`}
+          </p>
+        </div>
+        <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
+          {nutChinh.chu}
+        </button>
+      </header>
+
+      {!trong && khoiViec}
+
+      <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} viec={trong ? khoiViec : undefined} />
       {moBoSung && (
         <Suspense fallback={null}>
           <HopBoSungBai

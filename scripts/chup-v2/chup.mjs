@@ -218,8 +218,20 @@ const DS_HSE = [
 const tuongPhanThap = []
 // ═══════════ hết LÀN HỒ SƠ EM 12/10F ═══════════
 
+// ═══════════ «TRONG» NHÓM 3 (26/10): khung app thầy + Hôm nay + việc trên lớp — 3 khổ × sáng/tối, cả trang; `-cu` = `&trong=tat` (giao diện cũ). Tiền tố "t3-". ═══════════
+const KHO_T3 = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']]
+const t3 = (ten, man, cho, viec) => [
+  ...['light', 'dark'].flatMap((nen) => KHO_T3.map(([w, hh, kho]) => [`t3-${ten}-${kho}${nen === 'dark' ? '-toi' : ''}`, man, w, hh, nen, true, cho, viec])),
+  [`t3-${ten}-may-tinh-cu`, `${man}&trong=tat`, 1440, 900, 'light', true, cho, viec],
+]
+const DS_T3 = [
+  ...t3('hom-nay', 'gv-hom-nay&nh=1', /Hôm nay của thầy/, 'hn:cho'),
+]
+// ═══════════ hết «TRONG» NHÓM 3 ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_T3, // «TRONG» NHÓM 3
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D

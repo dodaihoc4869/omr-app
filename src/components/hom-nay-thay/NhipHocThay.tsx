@@ -267,8 +267,13 @@ function ChuGiai({ coChuaVao, tu, homNay }: { coChuaVao: boolean; tu: string; ho
   )
 }
 
-export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | null; dangTai: boolean; onThuLai: () => void }) {
+/** Giao diện «Trong» của app thầy (main.tsx gắn `<html data-trong="gv">` lúc mở app, không đổi giữa chừng). */
+const laTrongGv = (): boolean => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'gv'
+
+/** `viec` (chỉ ở «Trong»): khối «Việc cần thầy» của màn Hôm nay — đặt ở đầu cột trái theo bản vẽ 26/10. Không «Trong» ⇒ không truyền, bố cục cũ y nguyên. */
+export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhip | null; dangTai: boolean; onThuLai: () => void; viec?: ReactNode }) {
   const hep = useHep()
+  const trong = laTrongGv()
   const [khoi, setKhoi] = useState<string | null>(null)
   const [lop, setLop] = useState('')
   const [tab, setTab] = useState<Kieu>('luoi')
@@ -319,9 +324,11 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
   }, [mo])
   const dsBac = useMemo(() => (moBac ? theoBac.filter((d) => d.bacCham?.bac === moBac.bac) : []), [moBac, theoBac])
 
-  if (du === null) return <XuongNhip />
+  if (du === null) return viec ? <>{viec}<XuongNhip /></> : <XuongNhip />
   if (!du.ok)
     return (
+      <>
+      {viec}
       <section className="gvv2-the nht-the" aria-labelledby="nht-tieu">
         <h2 id="nht-tieu" className="nht-h2">
           Nhịp học
@@ -334,9 +341,12 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
           </button>
         </div>
       </section>
+      </>
     )
   if (!kq || !t || tatCa.length === 0)
     return (
+      <>
+      {viec}
       <section className="gvv2-the nht-the" aria-labelledby="nht-tieu">
         <h2 id="nht-tieu" className="nht-h2">
           Nhịp học
@@ -345,6 +355,7 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
           Chưa có em nào nhận bài hằng ngày: chưa có Hành trình khối hay Gói bài 7 ngày nào đang chạy. Thầy tick bài vừa dạy ở Hành trình › Dạy học để app bắt đầu xếp bài.
         </p>
       </section>
+      </>
     )
 
   const n = t.soNgayQua
@@ -507,9 +518,8 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
     </section>
   )
 
-  return (
+  const nhtDau = (
     <>
-      <section className="gvv2-the nht-the" aria-labelledby="nht-tieu">
         <div className="nht-dau">
           <div className="nht-dau-chu">
             <h2 id="nht-tieu" className="nht-h2">
@@ -548,7 +558,10 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
             </label>
           </div>
         </div>
-
+    </>
+  )
+  const nhtChia = (
+    <>
         <div className="nht-chia">
           <div className="nht-thanh" role="img" aria-label={`${dem.tong} em: ${tom}`}>
             {nhom.map((x) =>
@@ -566,7 +579,10 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
             {dem.chuaDu > 0 && ` · xám: ${dem.chuaDu} em chưa đủ dữ liệu (dưới ${LUAT_NHOM_NHIP.soNgayToiThieu} ngày đã qua để tính)`}
           </span>
         </div>
-
+    </>
+  )
+  const nhtODs = (
+    <>
         <div className="nht-o-ds">
           {o.map((x) => {
             const Icon = x.icon
@@ -592,7 +608,10 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
             )
           })}
         </div>
-
+    </>
+  )
+  const nhtHomNay = (
+    <>
         {h && (
           <>
             <div className="nht-hom-nay">
@@ -610,11 +629,19 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
             </p>
           </>
         )}
+    </>
+  )
+  const nhtCanhBao = (
+    <>
         {kq.canhBao.map((c) => (
           <p key={c} className="gvv2-bhn-canh-bao" role="status">
             {c}
           </p>
         ))}
+    </>
+  )
+  const nhtChan = (
+    <>
         <div className="nht-chan">
           <button
             ref={nutBang}
@@ -632,8 +659,10 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
             {dangTai ? 'Đang làm mới…' : 'Làm mới'}
           </button>
         </div>
-      </section>
-
+    </>
+  )
+  const nhtBang = (
+    <>
       {moBang && (
         <div id="nht-bang" className="nht-bang">
           <Suspense
@@ -647,6 +676,46 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
           </Suspense>
         </div>
       )}
+    </>
+  )
+  const phuTro = (
+    <>
+      {moBac && (
+        <Suspense fallback={null}>
+          <DsTheoBac bac={moBac.bac} ds={dsBac} traVe={moBac.nut} phu={!!mo} onMoEm={onMoTuBac} onDong={() => setMoBac(null)} />
+        </Suspense>
+      )}
+      {mo &&
+        createPortal(
+          <div className="m3 m3-thay vo-thay" data-hoa2="" data-vo-cong="ho-so-lam-cau" style={{ display: 'contents' }}>
+            <Suspense
+              fallback={
+                <>
+                  <div className="gvv2-hs-che" aria-hidden="true" />
+                  <div className="gvv2-hs gvv2-hs--cho" role="status" aria-label="Đang mở hồ sơ làm bài" />
+                </>
+              }
+            >
+              <HoSoLamCauEm em={mo} onDong={onDong} />
+            </Suspense>
+          </div>,
+          document.body,
+        )}
+    </>
+  )
+  if (!trong)
+    return (
+      <>
+        <section className="gvv2-the nht-the" aria-labelledby="nht-tieu">
+          {nhtDau}
+          {nhtChia}
+          {nhtODs}
+          {nhtHomNay}
+          {nhtCanhBao}
+          {nhtChan}
+        </section>
+
+        {nhtBang}
 
       {hep ? (
         <div className="nht-cot-ds nht-cot-ds--hep">
@@ -686,27 +755,82 @@ export default function NhipHocThay({ du, dangTai, onThuLai }: { du: DuNhip | nu
         </div>
       )}
 
-      {moBac && (
-        <Suspense fallback={null}>
-          <DsTheoBac bac={moBac.bac} ds={dsBac} traVe={moBac.nut} phu={!!mo} onMoEm={onMoTuBac} onDong={() => setMoBac(null)} />
-        </Suspense>
-      )}
-      {mo &&
-        createPortal(
-          <div className="m3 m3-thay vo-thay" data-hoa2="" data-vo-cong="ho-so-lam-cau" style={{ display: 'contents' }}>
-            <Suspense
-              fallback={
-                <>
-                  <div className="gvv2-hs-che" aria-hidden="true" />
-                  <div className="gvv2-hs gvv2-hs--cho" role="status" aria-label="Đang mở hồ sơ làm bài" />
-                </>
-              }
-            >
-              <HoSoLamCauEm em={mo} onDong={onDong} />
-            </Suspense>
-          </div>,
-          document.body,
+        {phuTro}
+      </>
+    )
+
+  // «TRONG» (bản vẽ 26/10): dải 5 số (Đã học hôm nay · Chăm · Chưa đều · Lười · Đối phó) → cột trái Việc cần thầy + Nhịp học (lọc, thanh chia,
+  // theo lớp) + 12 bậc · cột phải danh sách em. Cùng các khối, cùng điều kiện hiện như bố cục cũ — chỉ đổi chỗ đặt.
+  const dsEm = hep ? (
+    <div className="gvv2-the nht-tab-khung">
+      <div className="nht-tab" role="tablist" aria-label="Nhóm em" data-so={dsTab.length}>
+        {dsTab.map(([k, ten, so]) => (
+          <button key={k} type="button" role="tab" id={`nht-tab-${k}`} aria-selected={tabHien === k} aria-controls={`nht-cot-${k}`} data-kieu={k} className="nht-tab-nut tt-nhan" onClick={() => setTab(k)}>
+            {ten} <span className="gvv2-so">{so}</span>
+          </button>
+        ))}
+      </div>
+      {tabHien === 'bac' ? cotBac(true) : tabHien === 'luoi' ? cotLuoi(true) : tabHien === 'cham' ? cotCham(true) : cotDoiPho(true)}
+      {tabHien !== 'doi-pho' && <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />}
+    </div>
+  ) : xepBac ? (
+    <>
+      {cotBac()}
+      <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />
+      {cotDoiPho()}
+    </>
+  ) : (
+    <>
+      {cotLuoi()}
+      <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />
+      {cotCham()}
+      {cotDoiPho()}
+    </>
+  )
+  return (
+    <>
+      <div className="nht-dai-so">
+        {h && (
+          <div className="nht-o-nhom" data-nhom="hom-nay">
+            <span className="nht-o-nhan">Đã học hôm nay</span>
+            <b className="nht-o-so gvv2-so">
+              {h.du + h.dangLam} <small>/{dem.tong} em</small>
+            </b>
+            <span className="nht-thanh-hn" role="img" aria-label={`Hôm nay: ${h.du} em đủ mức, ${h.dangLam} em đang làm, ${h.chuaLam} em chưa làm câu nào, trên ${dem.tong} em`}>
+              {h.du > 0 && <i data-nhom="du" style={{ width: `${(100 * h.du) / dem.tong}%` }} />}
+              {h.dangLam > 0 && <i data-nhom="dang-lam" style={{ width: `${(100 * h.dangLam) / dem.tong}%` }} />}
+            </span>
+            <span className="nht-o-dk gvv2-so">
+              {h.du} đủ mức · {h.dangLam} đang làm
+            </span>
+          </div>
         )}
+        {nhtODs}
+      </div>
+      <div className="nht-hai-cot">
+        <div className="nht-cot-trai">
+          {viec}
+          <section className="gvv2-the nht-the" aria-labelledby="nht-tieu">
+            {nhtDau}
+            {nhtChia}
+            {theoLop}
+            {h && (
+              <p className="nht-ghi nht-ghi-hn">
+                Ngày chưa hết nên số em chưa làm buổi sáng chưa nói lên điều gì; nhóm Chăm · Chưa đều · Lười chỉ tính trên {n} ngày đã qua.
+              </p>
+            )}
+            {nhtCanhBao}
+            {nhtChan}
+          </section>
+          {nhtBang}
+          {/* 12 bậc ở cột rộng: mỗi cột bậc là một nút ≥ 44 px (cột phải hẹp chỉ được ~28 px); hai cột cũng cân hơn */}
+          {theBac}
+        </div>
+        <div className="nht-cot-phai">
+          {dsEm}
+        </div>
+      </div>
+      {phuTro}
     </>
   )
 }
