@@ -51,7 +51,22 @@ const CAU_SO_O: CauGia[] = [
     text: 'Phóng đại nguyên tử Gold lên 1 tỉ lần thì đường kính nguyên tử khoảng 30 cm, đường kính hạt nhân khoảng 0,003 cm. Đường kính nguyên tử lớn gấp bao nhiêu lần đường kính hạt nhân?',
     loiGiai: { chot: '30 : 0,003 = 10000. Nguyên tử lớn gấp khoảng 10000 lần hạt nhân.' } },
 ]
-const ds = kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+// ═══ DUO 26/10: `?man=lam13&lam=duo` = chặng «làm kiểu Duolingo» (bản vẽ docs/ban-ve-duo-2610): trắc nghiệm ngắn (lưới 2×2, có lý do phương án B) ·
+// trắc nghiệm có hình công thức cấu tạo · đúng–sai · trả lời ngắn · trắc nghiệm. Đáp án/lời giải chỉ trả sau `answer` như máy chủ thật.
+const hinhDuo = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="130" viewBox="0 0 320 130"><rect width="320" height="130" fill="white"/><g stroke="black" stroke-width="2" fill="none"><polygon points="50,30 85,10 120,30 120,70 85,90 50,70"/><line x1="120" y1="30" x2="165" y2="10"/><line x1="165" y1="10" x2="205" y2="30"/></g><text x="210" y="40" font-family="sans-serif" font-size="20">NH2</text></svg>')
+const CAU_DUO: CauGia[] = [
+  { ...nen, qid: 'D1', maDe: 'BAI8', phan: 'I', tenDang: 'Hợp chất chứa nitrogen', text: 'Số đồng phân amine có công thức phân tử C4H11N tác dụng với dung dịch HNO2 (ở nhiệt độ thường) tạo ra alcohol là', choices: ['2', '8', '3', '4'], ideas: [], dapAn: 'D',
+    loiGiai: { chot: 'Chỉ amine bậc một cho alcohol với HNO2; C4H11N có 4 đồng phân bậc một.', tung_pa: { A: { dung: false, vi_sao: '2 là số đồng phân bậc ba.' }, B: { dung: false, vi_sao: '8 là tổng số đồng phân amine. Chỉ amine bậc một cho alcohol với HNO2 ⇒ chỉ 4 chất.' }, C: { dung: false, vi_sao: '3 là số đồng phân bậc hai.' }, D: { dung: true, vi_sao: 'Bốn amine bậc một.' } } } },
+  { ...nen, qid: 'D2', maDe: 'BAI8', phan: 'I', tenDang: 'Hợp chất chứa nitrogen', hinhAnh: [{ src: hinhDuo, viTri: 'sau_de', alt: 'Công thức cấu tạo' }], text: 'Hợp chất có công thức cấu tạo như hình dưới đây thuộc loại nào và có bậc mấy?',
+    choices: ['Amine thơm, bậc một', 'Amine béo (no), bậc một', 'Amine béo (no), bậc hai', 'Amide, bậc một'], ideas: [], dapAn: 'B',
+    loiGiai: { chot: 'Nhóm NH2 gắn vào mạch carbon no (không gắn trực tiếp vào vòng benzene) ⇒ amine béo bậc một.' } },
+  { ...CAU[3]!, qid: 'D3' },
+  { ...nen, qid: 'D4', maDe: 'BAI1', phan: 'III', tenDang: 'Ester – Lipid', text: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong dung dịch sodium hydroxide dư, đun nóng. Khối lượng muối thu được là bao nhiêu gam?', choices: [], ideas: [], dapAn: '8,2',
+    loiGiai: { chot: 'n(ester) = 8,8 : 88 = 0,1 mol = n(CH3COONa) ⇒ m = 0,1 × 82 = 8,2 gam.' } },
+  { ...CAU[4]!, qid: 'D5' },
+]
+// ═══ hết DUO 26/10
+const ds = kieu === 'duo' ? CAU_DUO : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
 

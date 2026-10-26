@@ -526,6 +526,8 @@ function ManLam13() {
   const [homNay, datHomNay] = useStateLam13(soHomNayLam13())
   return h('div', { className: 'fixed inset-0 z-50 overflow-y-auto' }, h(ManLamBaiTap, { token: 'tk', sbd: '12121212', onVe: noop, onCapNhat: () => datHomNay(soHomNayLam13()), onChua: noop, homNay }))
 }
+// ═══ DUO 26/10: `lam13&lam=duo` — phiên học sinh giả trên máy (nút Hỏi thầy / Lời giải từng bước chỉ hiện khi có phiên; lệnh hỏi thầy đi bộ giả chung).
+if (LA_LAM13 && thamSo.get('lam') === 'duo') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═════════════════════════════════════════ hết LÀN MÀN LÀM BÀI 12/10D ═════════════════════════════════════════
 // ═════════════════════════════════════════ LÀN HỒ SƠ EM 12/10F ═════════════════════════════════════════
 // Thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé". Cảnh `?man=hs-ho-so[&nhe=luoi|cham]`: Hôm nay

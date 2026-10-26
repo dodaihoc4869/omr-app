@@ -184,21 +184,22 @@ const L13_TOI_CAU4 = 'tn:^A » nut:^Nộp câu » nut:^Câu tiếp theo » tn:^A
 const L13_NOP4 = `${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Nộp câu$`
 const L13_CAU5 = `${L13_NOP4} » nut:^Câu tiếp theo » tn:^B`
 const L13_CAU6 = `${L13_CAU5} » nut:^Nộp câu » nut:^Câu tiếp theo » phim:1,2`
+// DUO 26/10: màn làm chặng có «Trong» nay là kiểu Duolingo (khối DUO 26/10) ⇒ các cảnh dot13 dưới đây chụp giao diện cũ (`&trong=tat`).
 const L13_CANH = [
-  ['1-dung-sai', 'lam13', /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
-  ['2-trac-nghiem', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU5} » dau`],
-  ['3-tra-loi-ngan', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
-  ['4-hoc-huong-dan', 'lam13&lam=g7', /Câu này em chọn làm thế nào/, 'lam13:dau'],
-  ['5-phan-hoi-sai', 'lam13', /Câu 1\/6/, `lam13:${L13_NOP4}`],
-  ['6-phan-hoi-dung', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU5} » nut:^Nộp câu`],
-  ['7-xong-chang', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU6} » nut:^Nộp câu » nut:^Kết thúc chặng`],
+  ['1-dung-sai', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
+  ['2-trac-nghiem', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_CAU5} » dau`],
+  ['3-tra-loi-ngan', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
+  ['4-hoc-huong-dan', 'lam13&lam=g7&trong=tat', /Câu này em chọn làm thế nào/, 'lam13:dau'],
+  ['5-phan-hoi-sai', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_NOP4}`],
+  ['6-phan-hoi-dung', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_CAU5} » nut:^Nộp câu`],
+  ['7-xong-chang', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_CAU6} » nut:^Nộp câu » nut:^Kết thúc chặng`],
 ]
 const DS_LAM13 = [
   ...['light', 'dark'].flatMap((nen) => L13_CANH.map(([t, m, cho, viec]) => [`lam13-${t}-doc${nen === 'dark' ? '-toi' : ''}`, m, 390, 844, nen, false, cho, viec])),
   ...L13_CANH.filter(([t]) => /dung-sai|phan-hoi-sai/.test(t)).map(([t, m, cho, viec]) => [`lam13-${t}-doc-ca-khung`, m, 390, 1180, 'light', false, cho, viec]),
   ...L13_CANH.filter(([t]) => /dung-sai|tra-loi-ngan|hoc-huong-dan|phan-hoi-sai|xong/.test(t)).map(([t, m, cho, viec]) => [`lam13-${t}-may-tinh`, m, 1440, 900, 'light', false, cho, viec]),
-  ['lam13-1-dung-sai-may-tinh-toi', 'lam13', 1440, 900, 'dark', false, /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
-  ['lam13-3-tra-loi-ngan-ngang', 'lam13', 844, 390, 'light', false, /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
+  ['lam13-1-dung-sai-may-tinh-toi', 'lam13&trong=tat', 1440, 900, 'dark', false, /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
+  ['lam13-3-tra-loi-ngan-ngang', 'lam13&trong=tat', 844, 390, 'light', false, /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
 ]
 // ═══════════ hết LÀN MÀN LÀM BÀI 12/10D ═══════════
 
@@ -266,6 +267,21 @@ const MAN_NG = [
 const DS_NG_GV = MAN_NG.flatMap(([ten, man, cho, viec]) => KHO_NG.flatMap(([w, hh, kho]) => (['ngang', 'd700'].includes(kho) ? ['light', 'dark'] : ['light']).map((nen) =>
   [`ng-${ten}-${kho}${nen === 'dark' ? '-toi' : ''}`, man, w, hh, nen, ten !== 'ho-so' && w >= 700 && hh >= 700, cho, viec])))
 // ═══ hết NGANG GV 26/10
+// ═══ DUO 26/10: màn làm chặng kiểu Duolingo (`?man=lam13&lam=duo`, bản vẽ docs/ban-ve-duo-2610) — 6 trạng thái + câu Đúng/Sai + câu có hình + tấm lời giải,
+// điện thoại (390×844, 390×700) / ngang 844×390 / máy tính 1440×900, sáng + tối. Thao tác `lam13:` dùng chung khối LÀN MÀN LÀM BÀI. Tiền tố "duo-".
+const D_Q1 = 'tn:^D » nut:^Kiểm tra$ » nut:^Tiếp tục'
+const D_Q3 = `${D_Q1} » tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const D_Q4 = `${D_Q3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const DUO_CANH = [
+  ['1-cau', ''], ['2-chon', 'lam13:tn:^D'], ['3-dung', 'lam13:tn:^D » nut:^Kiểm tra$'], ['4-sai', 'lam13:tn:^B » nut:^Kiểm tra$'],
+  ['4b-loi-giai', 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Lời giải từng bước'], ['7-hinh', `lam13:${D_Q1}`],
+  ['8-dung-sai', `lam13:${D_Q3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$`], ['5-tln', `lam13:${D_Q4} » phim:8,2`],
+  ['6-xong', `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+]
+const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  DUO_CANH.map(([t, viec]) => [`duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
+// ═══ hết DUO 26/10
+
 // ═══ NGANG HS 26/10: màn con học sinh mở đè Hôm nay (`?man=hs-ng&v=tu-sua|kiem|ai`, khối cùng tên ở trang.tsx) ở điện thoại dọc thấp / ngang / máy tính
 // bảng / máy tính, sáng + tối (ảnh khung nhìn; đo tràn ngang + vùng chạm như mọi cảnh). Tiền tố "ng-hs-".
 const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [740, 360, 'ngang740'], [1024, 768, 'bang'], [1440, 900, 'may-tinh'], [1920, 1080, 'may-tinh-1920']].flatMap(([w, hh, k]) =>
@@ -298,6 +314,7 @@ const DS = [
   ...DS_T3, // «TRONG» NHÓM 3
   ...DS_MG, // MỘT TRANG GV 26/10
   ...DS_NG_HS, // NGANG HS 26/10
+  ...DS_DUO, // DUO 26/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D

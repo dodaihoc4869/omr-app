@@ -1,0 +1,80 @@
+/* LÀM CHẶNG KIỂU DUOLINGO (bản vẽ thầy hỏi 26/10 tối — CHƯA build). Một câu một lúc · phương án to · «Kiểm tra» ở đáy ·
+   kết quả trượt từ đáy (xanh đúng / đỏ sai) · lời giải gói trong tấm kết quả · hết chặng có màn mừng. Không nút phụ chen giữa câu. */
+body.duo{background:var(--mat);min-height:100dvh}
+.duo-vo{max-width:720px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;padding:12px 20px 0}
+.duo-tren{display:flex;align-items:center;gap:14px;min-height:56px}
+.duo-dong{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;color:var(--chu-3);flex:none}
+.duo-dong .i{width:26px;height:26px}
+.duo-thanh{flex:1;height:16px;border-radius:999px;background:var(--mat-3);overflow:hidden;position:relative}
+.duo-thanh i{position:absolute;inset:0 auto 0 0;width:var(--p);border-radius:inherit;background:var(--dung);box-shadow:inset 0 -4px 0 color-mix(in srgb,#000 12%,transparent)}
+.duo-thanh i::after{content:"";position:absolute;left:10px;right:10px;top:4px;height:4px;border-radius:999px;background:color-mix(in srgb,#fff 40%,transparent)}
+.duo-chuoi{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--sao-chu);font-size:16px;flex:none}
+.duo-chuoi .i{width:22px;height:22px}
+.duo-than{flex:1;display:flex;flex-direction:column;gap:18px;padding:18px 0 140px}
+.duo-nhan{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--tin-chu);text-transform:uppercase}
+.duo-nhan .chip{text-transform:none;letter-spacing:0}
+.duo-de{font-size:21px;line-height:1.5;font-weight:600;margin:0}
+.duo-de sub{font-size:.7em;line-height:0}
+.duo-pa{display:grid;gap:12px}
+.duo-pa.luoi{grid-template-columns:1fr 1fr}
+.duo-pa>div{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 16px;border-radius:16px;border:2px solid var(--vien-2);border-bottom-width:4px;background:var(--mat);font-size:19px;font-weight:600}
+.duo-pa>div b{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;border:2px solid var(--vien-2);font-size:15px;color:var(--chu-3);flex:none}
+.duo-pa>div.chon{border-color:var(--tin);background:var(--tin-nhat);color:var(--tin-chu)}
+.duo-pa>div.chon b{border-color:var(--tin);color:var(--tin-chu)}
+.duo-pa>div.dung{border-color:var(--dung);background:var(--dung-nhat);color:var(--dung-chu)}
+.duo-pa>div.dung b{border-color:var(--dung);background:var(--dung);color:#fff}
+.duo-pa>div.sai{border-color:var(--sai);background:var(--sai-nhat);color:var(--sai-chu)}
+.duo-pa>div.sai b{border-color:var(--sai);background:var(--sai);color:#fff}
+.duo-pa>div.mo{opacity:.5}
+/* đáy: nút Kiểm tra / tấm kết quả */
+.duo-day{position:fixed;left:0;right:0;bottom:0;border-top:2px solid var(--vien);background:var(--mat);padding:16px 20px calc(18px + env(safe-area-inset-bottom))}
+.duo-day .giua{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.duo-nut{display:grid;place-items:center;min-height:54px;border-radius:16px;font-size:17px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--dung);color:#fff;box-shadow:inset 0 -4px 0 color-mix(in srgb,#000 18%,transparent)}
+.duo-nut.tat{background:var(--mat-3);color:var(--chu-3);box-shadow:none}
+.duo-nut.do{background:var(--sai)}
+.duo-bo{display:flex;justify-content:center;gap:24px}
+.duo-bo span{display:inline-flex;align-items:center;gap:6px;min-height:44px;font-size:15px;font-weight:700;color:var(--chu-3);text-transform:uppercase;letter-spacing:.03em}
+.duo-day.dung{background:var(--dung-nhat);border-top-color:transparent}
+.duo-day.sai{background:var(--sai-nhat);border-top-color:transparent}
+.duo-kq{display:flex;align-items:flex-start;gap:14px}
+.duo-kq .o{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--mat);flex:none}
+.duo-kq .o .i{width:30px;height:30px}
+.duo-day.dung .duo-kq .o{color:var(--dung)} .duo-day.sai .duo-kq .o{color:var(--sai)}
+.duo-kq h3{margin:0;font-size:22px;font-weight:800}
+.duo-day.dung h3{color:var(--dung-chu)} .duo-day.sai h3{color:var(--sai-chu)}
+.duo-kq p{margin:4px 0 0;font-size:15px;line-height:1.45;color:var(--chu)}
+.duo-kq p.mo{color:var(--chu-2);font-size:14px}
+.duo-them{display:flex;gap:18px;flex-wrap:wrap}
+.duo-them span{display:inline-flex;align-items:center;gap:6px;min-height:40px;font-size:14.5px;font-weight:700}
+.duo-day.dung .duo-them span{color:var(--dung-chu)} .duo-day.sai .duo-them span{color:var(--sai-chu)}
+.duo-them .i{width:18px;height:18px}
+/* ô số + bàn phím (trả lời ngắn) */
+.duo-o{display:flex;align-items:center;justify-content:center;gap:8px;min-height:76px;border-radius:18px;border:2px solid var(--tin);border-bottom-width:4px;background:var(--tin-nhat);font-size:34px;font-weight:800;color:var(--tin-chu)}
+.duo-o small{font-size:18px;font-weight:600;color:var(--chu-3)}
+.duo-o i{width:3px;height:36px;background:var(--tin);border-radius:2px;animation:nhay 1s steps(2) infinite}
+@keyframes nhay{50%{opacity:0}}
+.duo-phim{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.duo-phim span{display:grid;place-items:center;min-height:52px;border-radius:14px;border:2px solid var(--vien-2);border-bottom-width:4px;font-size:22px;font-weight:700;background:var(--mat)}
+/* màn xong chặng */
+.duo-xong{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:24px 0 140px}
+.duo-huy{position:relative;width:148px;height:148px;display:grid;place-items:center}
+.duo-huy::before{content:"";position:absolute;inset:0;border-radius:42px;background:linear-gradient(150deg,var(--sao),var(--chu-y));transform:rotate(8deg);box-shadow:0 14px 30px color-mix(in srgb,var(--sao) 35%,transparent)}
+.duo-huy::after{content:"";position:absolute;inset:14px;border-radius:32px;border:3px dashed color-mix(in srgb,#fff 55%,transparent);transform:rotate(8deg)}
+.duo-huy .i{position:relative;width:70px;height:70px;color:#fff}
+.duo-tia{position:absolute;width:10px;height:10px;border-radius:3px}
+.duo-xong h1{margin:4px 0 0;font-size:30px;font-weight:800;color:var(--sao-chu)}
+.duo-xong>p{margin:0;font-size:16px;color:var(--chu-2)}
+.duo-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:520px}
+.duo-3>div{border-radius:16px;border:2px solid;overflow:hidden;text-align:center}
+.duo-3>div p{margin:0;padding:6px 4px;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.duo-3>div b{display:flex;align-items:center;justify-content:center;gap:6px;min-height:58px;font-size:22px;font-weight:800;background:var(--mat)}
+.duo-3>div b .i{width:20px;height:20px}
+.duo-3 .a{border-color:var(--dung)} .duo-3 .a p{background:var(--dung)} .duo-3 .a b{color:var(--dung-chu)}
+.duo-3 .b{border-color:var(--tin)} .duo-3 .b p{background:var(--tin)} .duo-3 .b b{color:var(--tin-chu)}
+.duo-3 .c{border-color:var(--sao)} .duo-3 .c p{background:var(--sao)} .duo-3 .c b{color:var(--sao-chu)}
+.duo-chang{display:flex;align-items:center;gap:6px}
+.duo-chang i{width:34px;height:10px;border-radius:999px;background:var(--mat-3)}
+.duo-chang i.x{background:var(--dung)}
+.duo-ghi{font-size:14px;color:var(--chu-2);max-width:420px}
+@media (max-width:600px){.duo-vo{padding:8px 16px 0}.duo-de{font-size:19px}.duo-pa>div{font-size:18px;min-height:58px}.duo-xong h1{font-size:26px}}
+@media (min-width:901px){.duo-de{font-size:24px}.duo-pa>div{min-height:72px;font-size:20px}}
