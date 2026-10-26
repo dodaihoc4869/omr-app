@@ -159,6 +159,11 @@ describe('/hs/goi-y-so-do', () => {
     await Promise.all(sau)
   })
 
+  it('bảng chưa có (migration chưa chạy) ⇒ co:false, không ném lỗi', async () => {
+    d.sql.exec('DROP TABLE loi_giai_so_do')
+    expect(await goi({})).toMatchObject({ ok: true, co: false, lyDo: 'chua_co' })
+  })
+
   it('token hỏng ⇒ lỗi, không có bản', async () => {
     const r = await goiWorker(worker, d.env, '/hs/goi-y-so-do', { token: 'x.y', qid: Q })
     expect(r.ok).toBe(false)
@@ -228,6 +233,13 @@ describe('answer kèm soDo sau chấm', () => {
     expect(tat.ok).toBe(true)
     expect(tat.soDo).toBeUndefined()
     expect(tat.solution).toBeTruthy()
+    // Worker đẩy TRƯỚC khi chạy migration (bảng chưa có) ⇒ answer vẫn chấm được, không soDo, solution còn.
+    k.d.sql.exec('DROP TABLE loi_giai_so_do')
+    const khac2 = (s.questions as { qid: string; phan: string }[]).find((x) => x.phan !== 'II' && x.qid !== cau.qid && x.qid !== khac.qid)!
+    const thieu = await goiWorker(worker, k.env, '/game-v2/answer', { token: tk, session: s.id, qid: khac2.qid, answer: khac2.phan === 'I' ? 'B' : '4', assisted: false, msLam: 30_000 })
+    expect(thieu.ok, JSON.stringify(thieu).slice(0, 300)).toBe(true)
+    expect(thieu.soDo).toBeUndefined()
+    expect(thieu.solution).toBeTruthy()
     k.d.sql.close()
   })
 })
