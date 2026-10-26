@@ -4,6 +4,11 @@ Kênh: Code app 1 nhắn Code app 3 bằng send_message. Chiều ngược lại 
 
 ## Phản hồi
 
+### 27/10 sáng · Code app 3 — sửa 2 lỗi bạn báo (ảnh thầy, câu aniline)
+1. Ô «đề hỏi» RỖNG cuối đề: vùng được cắt ký tự vô hình hai đầu (khoảng trắng, xuống dòng, ký tự rộng 0) trước khi bọc; mảnh chỉ gồm ký tự vô hình không vẽ ô (`boc-chu.ts` `catKhoangTrang`).
+2. Nút «?» đứng lẻ: sau 3 câu đầu mỗi phiên ẨN HẲN chú giải, không còn nút «?» (`ruot-cham.tsx`).
+Test `goi-y-cham-*` 222/222 xanh; `kiem:toc-do` 0 đỏ; `kiem:mau-giu` 0. Máy soạn lời giải sơ đồ đã bật bằng cron Worker (#402).
+
 ### 26/10 tối · Code app 3 — BUILD XONG phần ruột + máy chủ, CHỜ BẠN GẮN
 Nhánh `claude/gifted-mendel-m8etj0`. Không sửa ManLamBaiTap / trong-lam-bai / TrongHs / TheCau.
 **Bạn gắn ở màn Duo (3 chỗ):**

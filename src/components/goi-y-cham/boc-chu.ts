@@ -35,6 +35,23 @@ export function chuCuaGoc(goc: HTMLElement): Khoi[] {
   return ds
 }
 
+/** Ký tự không nhìn thấy (khoảng trắng, xuống dòng, ký tự rộng 0) — cụm chỉ gồm chúng thì không vẽ ô. */
+const VO_HINH = /[\s\u00a0\u200b-\u200d\u2060\ufeff]/
+const RE_VO_HINH = /[\s\u00a0\u200b-\u200d\u2060\ufeff]/g
+/** Cắt ký tự vô hình hai đầu mỗi vùng (ảnh thầy 27/10: ô «đề hỏi» RỖNG lẻ ở cuối đề); vùng chỉ còn rỗng ⇒ bỏ. */
+export function catKhoangTrang(ds: unknown, chu: string): unknown {
+  if (!Array.isArray(ds)) return ds
+  const ra: VungCham[] = []
+  for (const v of ds as VungCham[]) {
+    if (!v || typeof v !== 'object' || !Number.isInteger(v.tu) || !Number.isInteger(v.den)) { ra.push(v); continue }
+    let tu = Math.max(0, v.tu), den = Math.min(chu.length, v.den)
+    while (tu < den && VO_HINH.test(chu[tu]!)) tu++
+    while (den > tu && VO_HINH.test(chu[den - 1]!)) den--
+    if (den > tu) ra.push({ ...v, tu, den })
+  }
+  return ra
+}
+
 /** Vùng hợp lệ, xếp theo vị trí, bỏ vùng chồng nhau (giữ vùng đến trước). */
 export function lamSachVung(ds: unknown, dai: number): VungCham[] {
   if (!Array.isArray(ds)) return []
@@ -74,7 +91,7 @@ export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[],
     khoi.forEach((kh, k) => {
       if (!kh.chu.trim()) return
       let ds: VungCham[]
-      try { ds = lamSachVung(phatHien(kh.chu), kh.chu.length) } catch { ds = [] }
+      try { ds = lamSachVung(catKhoangTrang(phatHien(kh.chu), kh.chu), kh.chu.length) } catch { ds = [] }
       for (const v of ds) tim.push({ v, k })
     })
     const giu = new Set(loc(tim.map((x) => x.v)))
@@ -98,7 +115,7 @@ export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[],
           n.parentNode!.insertBefore(giua, n.nextSibling)
         }
         tach.push({ goc: n, moi: giua })
-        if (!giua.data.trim()) continue
+        if (!giua.data.replace(RE_VO_HINH, '')) continue
         const s = document.createElement('span')
         s.className = `gyc-v gyc-${v.loai}`
         s.dataset.vung = String(i)

@@ -152,17 +152,23 @@ describe('an toàn DOM', () => {
 })
 
 describe('chú giải màu: 3 câu đầu mỗi phiên, sau đó thu thành nút «?»', () => {
-  it('câu thứ 4 ⇒ nút «?» 44px mở lại chú giải', async () => {
+  // Code app 1 + ảnh thầy 27/10: nút «?» đứng lẻ một dòng trông lạc ⇒ từ câu thứ 4 ẩn hẳn chú giải, không còn nút «?».
+  it('câu thứ 4 ⇒ ẩn hẳn chú giải, không nút «?» đứng lẻ', async () => {
     for (const qid of ['a', 'b', 'c']) {
       const r = render(<VungChamDe q={{ qid }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER} /></VungChamDe>)
       await screen.findByText('Chạm chữ tô màu để hiểu đề')
       r.unmount()
     }
     render(<VungChamDe q={{ qid: 'd' }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER} /></VungChamDe>)
-    const nut = await screen.findByRole('button', { name: 'Xem chú giải màu' })
+    await screen.findByText('1,5 M', { selector: '.gyc-v' })
     expect(screen.queryByText('Chạm chữ tô màu để hiểu đề')).toBeNull()
-    fireEvent.click(nut)
-    expect(screen.getByText('Chạm chữ tô màu để hiểu đề')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Xem chú giải màu' })).toBeNull()
+  })
+
+  it('vùng «đề hỏi» có khoảng trắng / xuống dòng cuối không vẽ ô rỗng lẻ', async () => {
+    render(<VungChamDe q={{ qid: 'rong' }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER + ' \n'} /></VungChamDe>)
+    await screen.findByText('1,5 M', { selector: '.gyc-v' })
+    for (const s of document.querySelectorAll('.gyc-v')) expect((s.textContent ?? '').replace(/[\s\u200b]/g, '')).not.toBe('')
   })
 })
 
