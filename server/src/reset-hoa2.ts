@@ -59,7 +59,9 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'hoi_thay_kiem', 'hoi_thay_can_giup', 'hoi_thay_ho_tro_receipt',
   'kiem_tra_ca_nhan', 'kiem_tra_ca_nhan_chang', 'kiem_tra_ca_nhan_dieu_phoi',
   // Tài khoản, lớp, phụ huynh (tài khoản giữ để khôi phục được dù bỏ app PH), kho đề, chỉ mục game, cấu hình, cài đặt em, đăng ký đẩy, thống kê dùng app, mã đã dùng.
-  'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_meta', 'cau_meta_to', 'cau_doc_giay', 'cau_hinh', 'game_v2_settings', 'game_v2_scope', // `cau_doc_giay` (21/10): kích thước đề tính sẵn, dẫn xuất từ kho câu ⇒ GIỮ
+  'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_meta', 'cau_meta_to', 'cau_doc_giay', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
+  'dap_an_kho_sua', // 26/10: nhật ký TỰ SỬA ĐÁP ÁN KHO (đáp án cũ ⇒ mới, để lùi) — vận hành kho câu ⇒ GIỮ
+  'loi_giai_so_do', // 26/10: lời giải kiểu sơ đồ của thầy, dẫn xuất từ kho câu (máy soạn + cổng kiểm) ⇒ GIỮ // `cau_doc_giay` (21/10): kích thước đề tính sẵn, dẫn xuất từ kho câu ⇒ GIỮ
   'study_preferences', 'student_push', 'app_presence', 'ma_da_dung', 'khien_truoc_reset_2109', 'ph_truy_cap',
   // SỔ + HỒ SƠ của từng em (thầy 27/09: "giữ lại toàn bộ hồ sơ dữ liệu của từng học sinh"). `su_kien_hoc` là NGUỒN: hồ sơ dựng lại từ sổ.
   'chua_loi_dot', 'chua_loi_phien', 'chua_loi_item', 'chua_loi_nop', 'chua_loi_hoc_lieu', 'chua_loi_thay', 'chua_loi_trai_nghiem', 'chua_loi_tu_receipt', 'chua_loi_chua_lop', 'chua_gon_lan',

@@ -54,6 +54,7 @@ import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQu
 import {TRAN_CAU_DAO_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
 import {expMotCau,expMotCauGame} from './exp-hoc-tap'
+import {chonBanDat,docSoDoDat,luaChonTuChoices,qidTraSoDo,soDoBiTat} from './loi-giai-so-do'
 export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number;ngayNghi?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string;/** Luật v4: EXP chờ mốc cấp 10 (chưa đủ 21 ngày đạt). */choMoc?:number;/** Luật v4: `earned` lúc chuyển sang v4 — vàng chỉ đúc trên EXP kiếm sau mốc. */mocVang?:number;/** Dấu vết trước khi sang v4 (để lùi). */truocSiet4?:TruocSiet4;/** Luật v5: EXP tràn hôm nay + luỹ kế. */tranV5?:TranV5;/** Dấu vết trước khi sang v5 (để lùi). */truocV5?:TruocV5}
 type Row={revision:number;json:string}
 type Session={doan?:number;guardian?:string;guardianRound?:number;mode:Mode;questions:({qid:string;maDe:string;version:string;group:string;novel:boolean;role?:string;hoiThayKiem?:true}&LamLaiRef)[];created:number;/** Game Hóa 2.0 / Bi-a / OMNI 3 (vé thử thách, Trạm hồi phục) — chỉ đọc ở `answer`. */hoa2?:number;bia?:number;ve?:number;tram?:number;/** Huỷ chiến dịch (thầy 06/10, thu-hoi-chien-dich.ts): ISO lúc huỷ SỚM NHẤT ảnh hưởng lượt này — chỉ có khi lượt chứa câu của chiến dịch bị huỷ. */thuHoiLuc?:string}
@@ -262,6 +263,9 @@ function docTruocAnswer(env:Env,sbd:string,b:Record<string,unknown>){
     // Tối ưu 05/10: TỔNG SỔ EXP đọc sẵn CÙNG đợt (exp-d1.ts `docTongSoSom`: một câu, mốc mùa lấy trong SQL) để bước cộng vào hồ sơ của câu đúng đi CÙNG
     // lô chấm (`lenhKhoanExpGameGop`) — trước: một lô riêng ở đợt sau. Câu sai / EXP tắt ⇒ bỏ không dùng, không ghi gì.
     tong:som(docTongSoSom(env,sbd,Date.now())),
+    // LỜI GIẢI KIỂU SƠ ĐỒ (26/10, loi-giai-so-do.ts): bản ĐẠT của câu đọc sẵn CÙNG đợt đầu (một SELECT theo khoá chính, gộp chung lô đọc của lượt) —
+    // kèm vào phản hồi SAU chấm dưới tên `soDo`, không thêm vòng. Công tắc tắt / câu chẩn đoán ⇒ không đọc.
+    soDo:soDoBiTat(env)||laQidChanDoan(qid)?null:som(docSoDoDat(env.DB,qidTraSoDo(qid))),
   }
 }
 /** Câu ĐẦY ĐỦ của câu `qid` trong lượt `id` — như `SQL_THEO_REF` (game-v2-bank.ts) với (ma_de, version) của câu ĐẦU TIÊN mang qid ấy trong JSON phiên. */
@@ -655,8 +659,11 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       const expCau=Math.max(0,Math.floor(Number(reward)||0))+Math.max(0,Math.floor(Number(r?.e)||0))
       return {expCau}
     }
+    // LỜI GIẢI KIỂU SƠ ĐỒ (26/10): bản đạt đọc sẵn từ đầu lượt, KIỂM LẠI với câu đúng như đã phát (`q`: bản xáo / song sinh) — chỉ vào PHẢN HỒI (`soDo`),
+    // không vào bản chấm lưu ở game_v2_attempt. `solution` cũ giữ nguyên để lùi.
+    const soDoKem=async():Promise<{soDo?:unknown}>=>{const rows=truoc.soDo?await truoc.soDo:null;const ban=rows?.length?chonBanDat(rows,qidTraSoDo(qid),()=>({phan:q.phan,dapAn:q.correct,...(q.phan==='I'?{luaChon:luaChonTuChoices(q.choices)}:{})})):null;return ban?{soDo:ban}:{}}
     const previous=await truoc.previous
-    if(previous){const cu=JSON.parse(previous.json);if(cu.thuong&&typeof cu.thuong.nguyenTu==='number')ttCau={thuong:cu.thuong,thuongBai:cu.ketBai?.hoanHao?NT_HOAN_HAO:0};await ghiKetQuaHoc(cu.attempt,typeof cu.traLoi==='string'?cu.traLoi:undefined,undefined,truoc.exp,soOmniTuKetQuaCu(ref.xt?{...cu,traLoi:chonVeGoc(ref,q.phan,String(cu.traLoi??'')),answer:qGoc.correct}:cu,b,qGoc,session));const [moi,ec]=await Promise.all([loadProfile(env,sbd),expCauCuaCau(Number(cu.reward)||0)]);return {ok:true,...cu,...ec,profile:visible(moi.profile),revision:moi.revision,replayed:true}} // 05/10: lượt BẢN XÁO ⇒ phần OMNI từng ý dựng lại theo khung gốc (như lần chấm đầu: qGoc + đáp án quy về gốc)
+    if(previous){const cu=JSON.parse(previous.json);if(cu.thuong&&typeof cu.thuong.nguyenTu==='number')ttCau={thuong:cu.thuong,thuongBai:cu.ketBai?.hoanHao?NT_HOAN_HAO:0};await ghiKetQuaHoc(cu.attempt,typeof cu.traLoi==='string'?cu.traLoi:undefined,undefined,truoc.exp,soOmniTuKetQuaCu(ref.xt?{...cu,traLoi:chonVeGoc(ref,q.phan,String(cu.traLoi??'')),answer:qGoc.correct}:cu,b,qGoc,session));const [moi,ec]=await Promise.all([loadProfile(env,sbd),expCauCuaCau(Number(cu.reward)||0)]);return {ok:true,...cu,...(await soDoKem()),...ec,profile:visible(moi.profile),revision:moi.revision,replayed:true}} // 05/10: lượt BẢN XÁO ⇒ phần OMNI từng ý dựng lại theo khung gốc (như lần chấm đầu: qGoc + đáp án quy về gốc)
     if(session.guardian)throw new Error('Võ đài Linh Tâm đã đóng.')
     // TRẦN CÂU/NGÀY chỉ chặn ở lúc PHÁT câu (`start` / rút: `Math.min(soCau, remaining)`), KHÔNG chặn ở đây (Boss 21/09, P0 "không nộp được bài"): câu ĐÃ PHÁT trong một lượt đang mở thì luôn được trả lời, em không kẹt giữa ải
     // vì trần đổi / đếm lại. Mỗi câu của một lượt chỉ trả lời MỘT lần (`receipt` = lượt|câu là khoá chính; nộp lại ⇒ `replayed`), nên tổng số lượt trong ngày ≤ trần + phần dư của lượt cuối đã phát.
@@ -737,7 +744,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const [f,ec]=await Promise.all([g.bat?(g.hoSo?{profile:JSON.parse(g.hoSo.json) as Profile,revision:g.hoSo.revision}:loadProfile(env,sbd)):null,ecSom??(g.bat&&!g.daGhiTruoc?{expCau:Math.max(0,Math.floor(Number(thuong)||0))+Math.max(0,Math.floor(Number(g.exp)||0))}:!g.bat?{expCau:Math.max(0,Math.floor(Number(thuong)||0))}:expCauCuaCau(thuong))])
     if(f){pOut=f.profile;revOut=f.revision}
     const ketBaiRa=result.ketBai?{ketBai:{...result.ketBai,...(mucTieuNt?{mucTieu:mucTieuNt}:{})}}:{}
-    return {ok:true,...result,...ketBaiRa,...(expThuThach?{expThuThach}:{}),...ec,profile:visible(pOut),revision:revOut}
+    return {ok:true,...result,...ketBaiRa,...(await soDoKem()),...(expThuThach?{expThuThach}:{}),...ec,profile:visible(pOut),revision:revOut}
   }
   if(action==='complete'){
     const truoc=truocComplete??docTruocComplete(env,sbd,b)

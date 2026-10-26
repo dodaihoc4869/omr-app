@@ -23,6 +23,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/bang-nhiem-vu/LamCauOn.tsx': 1, // 20/10 đo giây (thầy: mọi câu đều đo được): 1 s cộng giây câu em đang làm, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
   'src/components/hoc-tap/ManLamBaiTap.tsx': 1, // 20/10 đo giây: 1 s cộng giây câu đang hiện, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
   'src/components/bang-tin-san/hooks.ts': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
+  'src/components/goi-y-cham/so-do-thay.tsx': 1, // 26/10 thí nghiệm ảo (gợi ý bài khó): 0,9 s chuyển khung, tối đa 3 khung rồi tự dừng; chỉ cục bộ, không gọi máy chủ
   'src/components/tu-luyen/ManTuLuyen.tsx': 2, // 30/09 thầy duyệt "Bàn Bi-a mới": bỏ hai nút ◀ ▶ (vòng 45 ms khi GIỮ nút) — thay bằng bánh xe kéo, không hẹn giờ
   'src/hooks/useGioHocTap.ts': 1,
   'src/lib/html-may-chieu.ts': 0,
