@@ -75,8 +75,8 @@ export function dungDong(m: MucChua, i: number, cdl: ReadonlyMap<string, CauDaLa
   const saiCuoi = c ? [...c.lichSu].filter((l) => !l.dung).sort((a, b) => (a.ngay < b.ngay ? 1 : -1))[0] : undefined
   const phu = [
     c ? TEN_PHAN[c.phan] : '',
-    saiCuoi ? `sai lần gần nhất ${ngayNgan(saiCuoi.ngay)}${saiCuoi.nguon ? ` · ${NHAN_NGUON_LAN[saiCuoi.nguon]}` : ''}` : '',
-  ].filter(Boolean).join(' · ')
+    saiCuoi ? `sai lần gần nhất ${ngayNgan(saiCuoi.ngay)}${saiCuoi.nguon ? `\u00a0· ${NHAN_NGUON_LAN[saiCuoi.nguon]}` : ''}` : '',
+  ].filter(Boolean).join('\u00a0· ') // SOÁT 26/10: «·» không mở đầu dòng
   const nhom: Nhom = nhomMucChua(m, nayMs)
   // Đợt cũ còn ở nhóm chờ lần gặp lại (vòng từng bước trước 25/10) ⇒ nói đúng mốc hẹn như nhóm của nó; mọi câu khác: Cần sửa / Đã tự sửa.
   const hen = nhom === 'cho' ? henGapLai(m.denHan, nayMs) : null

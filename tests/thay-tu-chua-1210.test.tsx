@@ -364,7 +364,7 @@ describe('giao diện: khối "Chữa câu khó & tính toán" trong mục Chữ
     expect(dong().map((l) => l.dataset.qid)).toEqual(THU_TU)
 
     // dòng phím trên tờ (bản vẽ): L · Đạt / Chưa đạt · G · T · X · Space
-    expect(document.querySelector('.gvv2-ttc-goi-y')!.textContent).toBe(
+    expect(document.querySelector('.gvv2-ttc-goi-y')!.textContent!.replace(/\u00a0/g, ' ')).toBe( // SOÁT 26/10: dấu cách cứng trước «·»
       'Tờ chiếu chuẩn như Chiếu lên bảng: L gọi em lên bảng · Đạt / Chưa đạt ghi sổ · G lời giải hiện dần · T thống kê lớp · X ai sai, mấy giây · Space lật trang',
     )
     fireEvent.click(screen.getByRole('button', { name: 'Chiếu lên bảng' }))
