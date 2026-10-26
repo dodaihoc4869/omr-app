@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, use, useEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowRight, Atom, BookOpen, ChevronRight, ClipboardCheck, History, Home, LineChart, LogOut, Mail, RefreshCw, Route, Users, X } from 'lucide-react'
 import type { KetQuaSanh } from '../hoa2/api'
 import type { TomTatGoi7 } from '../../lib/goi-bai-7'
@@ -8,6 +8,8 @@ const TheKiemTraCaNhan=lazy(()=>import('./TheKiemTraCaNhan'))
 import TheHomNayEm, { chuNutHoc } from './TheHomNayEm'
 import { soHomNay } from './lam-bai'
 import { useSoCauCanSua } from '../../lib/tu-sua-loi'
+import { napTrongHs, type HuaTrongHs } from './nap-trong-hs'
+void napTrongHs() // «Trong» bật ⇒ nạp mảnh trình bày ngay lúc mô-đun cổng chạy (song song lệnh Sảnh)
 
 // ĐỢT 19 (13/10 — làn N): hai tab Hành trình · Ôn & sửa thiết kế lại và biểu tượng Tự sửa lỗi vẽ riêng (BieuTuongTuSua.tsx — MỘT hình ở thẻ mời, dòng Hôm
 // nay và Ôn & sửa) đều ở khối NẠP LƯỜI (luật tốc độ: không thêm byte tải mở app); nạp trước lúc rảnh sau khi Hôm nay có số ⇒ bấm tab / thẻ mời hiện là có.
@@ -114,6 +116,18 @@ export default function HocTapHomNay(p: Props) {
     return () => { window.removeEventListener('keydown', f); nutCuaEm.current?.focus() }
   }, [moCuaEm])
   const dongTam = (fn: () => void) => () => { setMoCuaEm(false); fn() }
+  // GIAO DIỆN «TRONG» (bản vẽ hs-hom-nay.html, thầy chốt 26/10): logo thật ở thanh trên; Hôm nay chia CỘT CHÍNH (thẻ Hôm nay · Kiểm tra ôn tập · Bài học
+  // 7 ngày) | CỘT PHỤ (Tự sửa lỗi · Nhịp học · Ôn và sửa) — trình bày ở src/styles/trong-hs.css; điện thoại một cột cùng thứ tự. Lùi (ddh.trong = 'tat') ⇒ y cũ.
+  // Nhóm "Ôn và sửa" — MỘT khối JSX cho cả hai giao diện (cũ: cuối màn; «Trong»: cuối cột phụ).
+  const nhomOnSua = <section className="ht2-nhom" aria-label="Ôn và sửa">
+    <h2>Ôn và sửa</h2>
+    {!coMoiSua && <Dong ten={TEN_TU_SUA} chu={soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} hinh={hinhTuSua()} onClick={p.onChua} />}
+    <Dong ten="Câu đã làm" chu="Lời giải và lịch ôn từng câu" icon={History} sac="vang" onClick={p.onXemLai} />
+    {/* Lối DUY NHẤT vào Bài tập về nhà (thầy 13/10 bỏ ở Kết quả): còn bài chưa nộp ⇒ "Thầy đang giao" + số bài; chỉ còn bài đã nộp ⇒ vẫn hiện để em
+        xem điểm / làm lại lượt còn. */}
+    {(!!p.soBaiTap || !!p.coBaiTap) && <Dong ten="Bài tập về nhà" chu={p.soBaiTap ? 'Thầy đang giao' : 'Xem lại bài đã nộp'} icon={BookOpen} sac="muc" so={p.soBaiTap || undefined} donVi="bài" onClick={p.onBaiTap} />}
+  </section>
+  const [oNhip, datONhip] = useState<HTMLDivElement | null>(null)
   // Nạp trước khối Hành trình / Ôn & sửa lúc trình duyệt rảnh, sau khi Hôm nay đã có số (không tranh lượt tải đầu).
   const coSanh = !!sanh
   useEffect(() => {
@@ -124,7 +138,9 @@ export default function HocTapHomNay(p: Props) {
     const id = window.setTimeout(nap, 1500); return () => window.clearTimeout(id)
   }, [coSanh])
 
-  return <div className="ht-app ht2" data-nguon={p.nguon}>
+  // «Trong»: mảnh trình bày nạp lười (nap-trong-hs.ts) — chờ có rồi mới vẽ (không chớp bản thiếu kiểu); không bật / tải hỏng ⇒ bản cũ y nguyên.
+  const huaTrong = napTrongHs()
+  const ve = (trong: boolean) => { return <div className="ht-app ht2" data-nguon={p.nguon}>
     <header className="ht-thanh ht2-thanh">
       <a className="ht-thuong-hieu" href="/hs"><span className="ht2-logo" aria-hidden="true"><Atom size={22} /></span><span>Đỗ Đại Học<small>Học Hoá mỗi ngày</small></span></a>
       <div className="ht2-thanh-phai">
@@ -143,7 +159,23 @@ export default function HocTapHomNay(p: Props) {
         {p.loi && <div className="ht-thong-bao ht2-loi" role="alert"><span>{p.loi}</span><button className="ht-nut-phu" onClick={p.onTaiLai}>Thử lại</button></div>}
         {p.coCa && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
-        {muc === 'hom-nay' && <>
+        {muc === 'hom-nay' && (trong ? <div className="tr-hn-luoi">
+          <div className="tr-hn-cot">
+            {kiem&&kiemHomNay&&<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
+            {!ngayKiem&&<><TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
+              viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
+              onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} noiNhip={oNhip} />
+            {kiem&&!kiemHomNay&&<Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
+            {goi7 && <TheGoi7 du={goi7} />}
+            {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>}
+            {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>}</>}
+          </div>
+          <div className="tr-hn-cot">
+            {!ngayKiem&&<><TheMoiTuSua so={soSua} token={p.token} onChua={p.onChua} />
+            <div ref={datONhip} className="tr-o-nhip" />
+            {nhomOnSua}</>}
+          </div>
+        </div> : <>
           {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
               và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
           {/* Đợt 20 (bản vẽ docs/ban-ve-dot20): ngày kiểm tra ⇒ thẻ kiểm tra là khối CHÍNH; ngày khác (sắp đến / đang chuẩn bị) ⇒ thẻ phụ NẰM SAU khối học.
@@ -158,16 +190,9 @@ export default function HocTapHomNay(p: Props) {
           {goi7 && <TheGoi7 du={goi7} />}
           {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>}
           {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>}
-          <section className="ht2-nhom" aria-label="Ôn và sửa">
-            <h2>Ôn và sửa</h2>
-            {!coMoiSua && <Dong ten={TEN_TU_SUA} chu={soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} hinh={hinhTuSua()} onClick={p.onChua} />}
-            <Dong ten="Câu đã làm" chu="Lời giải và lịch ôn từng câu" icon={History} sac="vang" onClick={p.onXemLai} />
-            {/* Lối DUY NHẤT vào Bài tập về nhà (thầy 13/10 bỏ ở Kết quả): còn bài chưa nộp ⇒ "Thầy đang giao" + số bài; chỉ còn bài đã nộp ⇒ vẫn hiện để em
-                xem điểm / làm lại lượt còn. */}
-            {(!!p.soBaiTap || !!p.coBaiTap) && <Dong ten="Bài tập về nhà" chu={p.soBaiTap ? 'Thầy đang giao' : 'Xem lại bài đã nộp'} icon={BookOpen} sac="muc" so={p.soBaiTap || undefined} donVi="bài" onClick={p.onBaiTap} />}
-          </section>
+          {nhomOnSua}
           </>}
-        </>}
+        </>)}
 
         {(muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" role="status" aria-busy="true" aria-label="Đang mở" />}>
           <HanhTrinhOnSua muc={muc} sanh={sanh} dangTai={p.dangTai} soSua={soSua}
@@ -200,5 +225,12 @@ export default function HocTapHomNay(p: Props) {
         <button className="ht-nut-phu ht2-dang-xuat" onClick={dongTam(p.onDangXuat)}><LogOut size={18} aria-hidden="true" />Đăng xuất</button>
       </div>
     </div>}
-  </div>
+  </div> }
+  if (!huaTrong) return ve(false)
+  return <Suspense fallback={<div className="ht-app ht2" aria-busy="true" />}><CongTrong hua={huaTrong} ve={ve} /></Suspense>
+}
+
+/** Cổng «Trong»: đọc lời hứa nạp mảnh trình bày (React 19 `use` — đã xong thì vẽ ngay); null (tải hỏng) ⇒ bản cũ. */
+function CongTrong({ hua, ve }: { hua: HuaTrongHs; ve: (trong: boolean) => ReactNode }) {
+  return <>{ve(!!use(hua))}</>
 }

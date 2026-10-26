@@ -284,6 +284,8 @@ export default defineConfig({
           '**/{ManKiemTraCaNhan,TheKiemTraCaNhan,TheKiemTraCon}-*.{js,css}',
           '**/kiem-tra-ca-nhan-*.css',
           '**/LuyenDeChuan-*.{js,css}',
+          // Giao diện «Trong» app học sinh (26/10): mảnh trình bày nạp lười (nap-trong-hs.ts) ⇒ kho chạy-lúc; tải hỏng (mất mạng lần đầu) ⇒ app vẽ bản cũ.
+          '**/TrongHs-*.{js,css}',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
         '**/{ChuyenBay,BanNguyenTo}-*.{js,css}',
           '**/404.html',
