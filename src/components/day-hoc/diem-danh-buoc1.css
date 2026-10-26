@@ -187,3 +187,9 @@
 /* SOÁT 26/10: ô «Mã buổi» hẹp (360 px, điện thoại ngang hai cột) — mã 6 số không vừa cạnh QR ⇒ mã xuống dưới QR, không tràn khỏi ô. */
 .dd1-o--ma { flex-wrap: wrap; }
 .dd1-o--ma .dd1-ma-chu { flex: 1 1 auto; min-width: min-content; }
+/* SOÁT 26/10: bốn nút lọc Mức làm xuống hàng ⇒ nút giãn đầy hàng (không còn một nút rơi một mình giữa khoảng trắng) */
+.dd1-tong-nut { flex: 1 1 auto; justify-content: center; }
+/* SOÁT 26/10: khối hẹp — số «Sai vì vội» và dòng nhỏ khi xuống hàng không chạm nhau */
+@container (max-width: 700px) {
+  .dd1-vua-ds[data-co-muc] .dd1-ov { row-gap: 6px; }
+}
