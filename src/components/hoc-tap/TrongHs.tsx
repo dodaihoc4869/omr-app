@@ -386,6 +386,8 @@ function CongTac({ khoa, ten, Icon }: { khoa: 'ddh.am' | 'ddh.rung'; ten: string
     const v = !bat
     setBat(v)
     try { if (v) localStorage.removeItem(khoa); else localStorage.setItem(khoa, 'tat') } catch { /* máy chặn lưu: chỉ đổi trong phiên này */ }
+    // 27/10: bật «Rung» ⇒ rung thử ngay một nhịp để em (và thầy) biết máy rung được.
+    if (v && khoa === 'ddh.rung') try { (navigator as Navigator & { vibrate?: (m: number) => boolean }).vibrate?.(80) } catch { /* máy không rung được */ }
   }}><Icon size={20} aria-hidden="true" />{ten}<span className="tr-cong" data-bat={bat || undefined} aria-hidden="true">{bat ? 'Bật' : 'Tắt'}</span></button>
 }
 /** Ba mục menu kiểu Duolingo (bản vẽ dm-4, thầy chốt 26/10) — cùng id mục của cổng: Lộ trình = Hôm nay (+ Hành trình) · Luyện tập = Ôn & sửa · Thành tích = Kết quả. */

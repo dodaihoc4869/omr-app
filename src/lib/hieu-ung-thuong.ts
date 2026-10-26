@@ -31,7 +31,7 @@ const TIENG: Partial<Record<KieuThuong, [KieuTiengThuong, number?] | 'xong'>> = 
 export function phanHoiThuong(kieu: KieuThuong, bac = 0): void {
   if (duocPhanHoi('ddh.rung')) {
     // chỉ rung sau khi em đã chạm trang (trình duyệt chặn rung trước lần chạm đầu và ghi lỗi ra bảng điều khiển)
-    try { const n = navigator as Navigator & { vibrate?: (m: number[]) => boolean; userActivation?: { hasBeenActive: boolean } }; if (typeof n.vibrate === 'function' && n.userActivation?.hasBeenActive !== false) n.vibrate(RUNG[kieu]) } catch { /* bỏ qua */ }
+    try { const n = navigator as Navigator & { vibrate?: (m: number[]) => boolean; userActivation?: { hasBeenActive: boolean } }; if (typeof n.vibrate === 'function' && n.userActivation?.hasBeenActive !== false) n.vibrate(RUNG[kieu].map((v, i) => (i % 2 ? v : Math.max(v, 35)))) /* 27/10: nhịp bật ≥ 35 ms (máy Android không rung kịp nhịp ngắn) */ } catch { /* bỏ qua */ }
   }
   const t = TIENG[kieu]
   if (t === 'xong') phat('xong')
