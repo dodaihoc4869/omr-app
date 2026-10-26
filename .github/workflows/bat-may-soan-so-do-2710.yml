@@ -1,0 +1,67 @@
+# CÔNG TẮC MÁY SOẠN «LỜI GIẢI KIỂU SƠ ĐỒ» CHẠY BẰNG CRON (27/10; mã server/src/may-soan-cron.ts). Thầy: «Tự làm hết đi», «tôi ko làm gì cả».
+# Ghi MỘT dòng cấu hình `cau_hinh.may_soan_so_do` = {"bat":bool,"gioCaoDiem":bool,"tuSuaDapAn":bool} (UPSERT theo khoá) — không đụng dữ liệu học sinh.
+#   bat        ⇒ cron mỗi phút của Worker soạn tiếp một lô nhỏ (quét hết kho ⇒ vòng sửa câu lệch ⇒ xong) · false ⇒ dừng ngay.
+#   gioCaoDiem ⇒ cho chạy cả 19–24h giờ VN (khi ấy chỉ 1 câu song song).
+#   tuSuaDapAn ⇒ cho máy tự đổi đáp án kho khi 2 lần giải mù cùng ra số khác (MẶC ĐỊNH TẮT: lời giải chữ trong gói vẫn ghi đáp án cũ).
+# Máy chủ đọc cờ qua đệm 15 giây. Sau khi ghi, in lại cờ + trạng thái máy soạn: CHỈ vòng / số đếm / lý do — KHÔNG in đáp án hay nội dung câu (repo công khai).
+name: Công tắc máy soạn lời giải sơ đồ (27/10)
+on:
+  workflow_dispatch:
+    inputs:
+      bat:
+        description: 'Bật máy soạn chạy bằng cron'
+        required: true
+        default: true
+        type: boolean
+      gioCaoDiem:
+        description: 'Cho chạy cả giờ cao điểm 19–24h (chậm lại: 1 câu song song)'
+        required: true
+        default: true
+        type: boolean
+      tuSuaDapAn:
+        description: 'Cho tự sửa đáp án kho (mặc định TẮT)'
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+concurrency:
+  group: bat-may-soan-so-do-2710
+  cancel-in-progress: false
+jobs:
+  bat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Dựng giá trị cờ (lọc ký tự, không chèn chuỗi thô vào SQL)
+        env:
+          BAT: ${{ inputs.bat }}
+          GIO_CAO_DIEM: ${{ inputs.gioCaoDiem }}
+          TU_SUA: ${{ inputs.tuSuaDapAn }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          la = lambda k: os.environ.get(k, '').strip().lower() == 'true'
+          v = json.dumps({'bat': la('BAT'), 'gioCaoDiem': la('GIO_CAO_DIEM'), 'tuSuaDapAn': la('TU_SUA')})
+          open('/tmp/lenh.sql', 'w').write(f"INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('may_soan_so_do', '{v}', strftime('%Y-%m-%dT%H:%M:%fZ','now')) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc;")
+          print('sẽ ghi:', v)
+          PY
+      - name: Ghi cờ rồi đọc lại + trạng thái máy soạn (chỉ số đếm)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx -y wrangler@4 d1 execute omr --remote --json --file /tmp/lenh.sql > /tmp/ghi.json
+          python3 -c "import json;d=json.load(open('/tmp/ghi.json'));print('ghi:', [x.get('success') for x in d])"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa = 'may_soan_so_do'" | jq -c '.[0].results'
+          # Bảng trạng thái do cron tự tạo ở lượt đầu ⇒ lần đầu bật có thể chưa có (báo «chưa chạy lượt nào»).
+          NOW=$(date +%s%3N)
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT vong, so_loi_lien_tiep, CASE WHEN nghi_den > $NOW THEN ROUND((nghi_den - $NOW) / 60000.0, 1) ELSE 0 END AS con_nghi_phut, CASE WHEN dang_chay_den > $NOW THEN 1 ELSE 0 END AS dang_chay, ly_do, dem_json, cap_nhat_luc FROM may_soan_trang_thai WHERE id = 1" 2>/dev/null | jq -c '.[0].results' || echo 'chưa chạy lượt nào (bảng trạng thái chưa có)'
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT cong, COUNT(*) AS so_cau, SUM(nghi_dap_an) AS nghi_dap_an FROM loi_giai_so_do GROUP BY cong ORDER BY cong" 2>/dev/null | jq -c '.[0].results' || echo 'chưa có lời giải sơ đồ nào'
