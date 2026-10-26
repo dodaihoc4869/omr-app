@@ -8,6 +8,7 @@ import ParentPortalScreen from '../src/screens/ParentPortalScreen'
 import BaoCaoCaThiPhuHuynhModal from '../src/components/BaoCaoCaThiPhuHuynhModal'
 import { chuBanApp } from '../src/lib/cap-nhat-app'
 import { PH_OK } from './_ph-moi/du-lieu-mau'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 const goi: string[] = []
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))

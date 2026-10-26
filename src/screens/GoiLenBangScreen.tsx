@@ -67,6 +67,7 @@ import KiemTraDauGio from '../components/day-hoc/KiemTraDauGio'
 import CauCanChuaTrenLop from '../components/chua-cau-sai/CauCanChuaTrenLop'
 import { KHOA_MO_CAU_CAN_CHUA } from '../lib/chua-cau-sai-thay-api'
 import { docMoTheDayHoc } from '../lib/bai-hom-nay'
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -1706,7 +1707,7 @@ function GoiLenBangCu() {
         </div>
 
         {dsCa === null ? (
-          <div className="cho-tre" style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Đang tải danh sách ca…</div>
+          <div className="chu-cho-tre" style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Đang tải danh sách ca…</div>
         ) : dsCaLoc.length === 0 ? (
           <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Chưa có ca nào khớp.</div>
         ) : (

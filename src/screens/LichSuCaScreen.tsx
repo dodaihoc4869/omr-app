@@ -27,6 +27,7 @@ import './gv-hoa2.css'
 import '../styles/trong-quan-ly.css' // «Trong» 26/10: trình bày màn quản lý (chỉ dưới [data-trong='gv'])
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
 import { caConEmDangLam, trangThaiCa } from '../lib/ca-dang-chay'
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 export { caConEmDangLam, trangThaiCa } from '../lib/ca-dang-chay'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -508,7 +509,7 @@ export default function LichSuCaScreen() {
               ))}
             </div>
           ) : (
-            <div className="cho-tre" style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
+            <div className="chu-cho-tre" style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
           )
         ) : dsLoc.length === 0 ? (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>

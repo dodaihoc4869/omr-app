@@ -5,6 +5,7 @@ import AppPhuHuynh from '../src/components/ph-v3/AppPhuHuynh'
 import { NHIP_PH_MOI_MS } from '../src/lib/ph-moi/use-tat-ca-ve-con'
 import { luuPass, xoaPass } from '../src/lib/ph-token'
 import { hoc2Gia, loiThayGia, nhipGia, tatCaGia, tongQuanGia } from '../scripts/chup-ph-dot19/gia'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => diaChi }))
 vi.mock('../src/lib/tai-thong-tin-ph', () => ({ taiThongTinPhuHuynh: async () => ({ canhBao: [] }) }))

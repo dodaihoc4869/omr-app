@@ -18,3 +18,7 @@
 @media (max-width: 600px) {
   [data-trong='gv'] .gv-duyet-day-du .lg-loc { flex-wrap: wrap; width: auto; overflow-x: visible; }
 }
+/* NGANG GV 26/10: màn ngoài menu — thanh trên điện thoại chỉ ghi «Đỗ Đại Học», tiêu đề trang lại chỉ còn cho trình đọc màn hình ⇒ hiện lại tiêu đề */
+@media (max-width: 879px) {
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .gv-duyet-day-du .gv2-tieu-de { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
+}

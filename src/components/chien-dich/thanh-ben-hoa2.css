@@ -1,7 +1,6 @@
 /* THANH BÊN — CHẾ ĐỘ GAME HÓA 2.0 (bản vẽ docs/ban-ve-game-hoa-2-2709/GV-*.dc.html): vạch ngăn + nhóm "Thêm…" gọn hơn mục chính.
  * Chỉ thêm lớp mới (`ben-trai-vach`, `ben-trai-them-nhan`, `ben-trai-muc--phu`); lớp cũ ở src/styles/vo-thay.css giữ nguyên. Màu = token M3. */
-.ben-trai-vach,
-.ben-trai-them-nhan {
+.ben-trai-vach {
   display: none;
 }
 @media (min-width: 880px) {

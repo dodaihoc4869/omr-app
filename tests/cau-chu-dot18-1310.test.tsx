@@ -12,6 +12,7 @@ import BtvnM3 from '../src/components/bang-nhiem-vu/BtvnM3'
 import LichSuCaM3 from '../src/components/bang-nhiem-vu/LichSuCaM3'
 import { PH_OK } from './_ph-moi/du-lieu-mau'
 import { conTongQuanGia } from '../scripts/chup-v2/gia/ph-con-tong-quan'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))

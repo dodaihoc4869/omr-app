@@ -19,6 +19,7 @@ import { gameIdentity } from './game-v2-auth'
 import { hoSoThaiDoCuaEm } from './bai-hang-ngay'
 import { lichSuLamCauCuaEm } from './lich-su-lam-cau'
 import { banHocSinhHoSoThaiDo, banHocSinhLichSu } from './ho-so-em-hs-loc'
+import { hoSoThaiDoChoHs, lichSuChoHs, type TraLoiHoSoThaiDoHs, type TraLoiLichSuLamCauHs } from './an-luoi-hs'
 
 type Row = Record<string, unknown>
 
@@ -37,17 +38,19 @@ async function sbdTuToken(env: Env, b: Row): Promise<string | null> {
 }
 
 /** `POST /hs/ho-so-thai-do {token}` — xem đầu tệp. */
-export async function hsHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promise<TraLoiHoSoThaiDo> {
+export async function hsHoSoThaiDo(env: Env, b: Row, nowMs = Date.now()): Promise<TraLoiHoSoThaiDoHs> {
   const sbd = await sbdTuToken(env, b)
   if (!sbd) return { ok: false, error: CAN_DANG_NHAP_HO_SO }
-  return hoSoThaiDoBanHocSinh(env, sbd, nowMs, LOI_HO_SO_EM)
+  // 26/10: bản EM bỏ nhãn kết luận, sáu tín hiệu, nhóm, cờ đối phó, bậc, số lượt «quá nhanh» (an-luoi-hs.ts). Bản phụ huynh dùng lõi trên, giữ đủ.
+  return hoSoThaiDoChoHs(await hoSoThaiDoBanHocSinh(env, sbd, nowMs, LOI_HO_SO_EM))
 }
 
 /** `POST /hs/lich-su-lam-cau {token, gioiHan?}` — xem đầu tệp. `gioiHan` như lệnh thầy (mặc định 1000, trần 5000). */
-export async function hsLichSuLamCau(env: Env, b: Row): Promise<TraLoiLichSuLamCau> {
+export async function hsLichSuLamCau(env: Env, b: Row): Promise<TraLoiLichSuLamCauHs> {
   const sbd = await sbdTuToken(env, b)
   if (!sbd) return { ok: false, error: CAN_DANG_NHAP_HO_SO }
-  return lichSuLamCauBanHocSinh(env, sbd, b.gioiHan, LOI_LICH_SU_EM)
+  // 26/10: bản EM bỏ Mức làm (Bấm vội / Treo máy…) — chỉ còn Đúng / Sai / gợi ý / số giây (an-luoi-hs.ts). Bản phụ huynh dùng lõi trên, giữ đủ.
+  return lichSuChoHs(await lichSuLamCauBanHocSinh(env, sbd, b.gioiHan, LOI_LICH_SU_EM))
 }
 
 // ---- LÕI BẢN HỌC SINH cho một SBD ĐÃ XÁC THỰC (12/10 đợt 16: tách để `/ph/ho-so-thai-do`, `/ph/lich-su-lam-cau` — ph-ho-so-con.ts — trả ĐÚNG bản

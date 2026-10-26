@@ -16,6 +16,7 @@ import { docConTongQuan } from '../src/lib/ph-v3/con-tong-quan'
 import { docHoSoThaiDo, NGUONG_THAI_DO } from '../src/lib/bai-hang-ngay-api'
 import { docLichSuLamCau } from '../src/lib/lich-su-lam-cau-api'
 import { NAY, hoc2Gia, lichSuGia, loiThayGia, nhipGia, thaiDoGia, tatCaGia, tongQuanGia } from '../scripts/chup-ph-dot19/gia'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/lib/tai-thong-tin-ph', () => ({ taiThongTinPhuHuynh: async () => ({ canhBao: [] }) }))

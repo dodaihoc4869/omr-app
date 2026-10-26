@@ -24,7 +24,7 @@ import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import { BtTrai } from './BieuTuong'
 import { docTuyen, khoaCuon, laManCon, type Tuyen } from './tien-ich'
 import { DangTai } from './dung-chung'
-import TrangVeCon, { HO_SO_TRONG, PHAN, docPhanTuHash, idPhan, phanCo, type IdPhan, type TaiHoSo } from './TrangVeCon'
+import { HO_SO_TRONG, PHAN, docPhanTuHash, idPhan, phanCo, type IdPhan, type TaiHoSo } from './trang-ve-con-chung'
 import { layHoSoThaiDoCon, layLichSuLamCauCon, layNhipHocCon } from '../../lib/ho-so-con-ph-api'
 import type { KetQuaNhipHocApp } from '../../lib/nhip-hoc-em'
 import { gioVn, ngayChuoiNgan, ngayDayDuVn } from '../../lib/ph-moi/dinh-dang'
@@ -45,6 +45,14 @@ const laMotTrang = (): boolean => typeof document !== 'undefined' && document.do
 let huaMot: Promise<ModMot | null> | null = null
 const napMot = (): Promise<ModMot | null> => (huaMot ??= import('./DocPh').catch(() => ((huaMot = null), null)))
 if (laMotTrang()) void napMot()
+// TRANG CŨ «Hôm nay của con» (TrangVeCon + trang-con.css) NẠP LƯỜI (26/10, luật tốc độ: đường /ph chỉ nhẹ đi) — màn «Chỉ đọc» không cần nó; chỉ tải khi
+// vỏ cũ hiện (ddh.trong='tat', màn con mở từ trang, hoặc mảnh chỉ đọc tải hỏng). Tắt giao diện mới ⇒ tải NGAY lúc mô-đun chạy như mảnh chỉ đọc.
+type ModCu = typeof import('./TrangVeCon')
+let huaCu: Promise<ModCu | null> | null = null
+/** Mảnh trang cũ đã về (lần vẽ sau dùng ngay, không qua một lượt chờ). */
+let modCuDaCo: ModCu | undefined
+const napCu = (): Promise<ModCu | null> => (huaCu ??= import('./TrangVeCon').then((m) => (modCuDaCo = m), () => ((huaCu = null), null)))
+if (!laMotTrang()) void napCu()
 /** Số lượt làm câu tối đa tải cho phần "Số giây theo mức độ câu" (câu sai và tổng thì máy chủ tính trên mọi lượt). */
 const GIOI_HAN_LUOT = 600
 
@@ -222,6 +230,16 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   })
   const daDenPhan = useCallback(() => setDenPhan(null), [])
   const manChinh = tuyen.muc === 'hom-nay' && !tuyen.maCa
+  // Vỏ cũ cần mảnh trang cũ (cả CSS của thanh bên) — chờ mảnh về rồi mới vẽ, tránh thanh bên chưa có kiểu; tải hỏng ⇒ ChanLoi báo như mọi mảnh lười.
+  const canCu = !(mot && manChinh)
+  const [modCu, setModCu] = useState<ModCu | null | undefined>(() => modCuDaCo)
+  useEffect(() => {
+    if (!canCu || modCu) return
+    let huy = false
+    void napCu().then((m) => { if (!huy) setModCu(() => m) })
+    return () => { huy = true }
+  }, [canCu, modCu])
+  if (modCu === null) throw new Error('Chưa tải được trang «Hôm nay của con». Anh/chị tải lại trang.')
   const diToiPhan = (id: IdPhan) => {
     setPhanHien(id)
     if (manChinh) setDenPhan({ id, lan: Date.now() })
@@ -259,6 +277,14 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
       </div>
     )
 
+  if (!modCu)
+    return (
+      <div className="ph3 tvc-app" data-app="ph3" data-mot-trang="">
+        <DangTai chu="Đang mở…" />
+        {hopDoiSbd}
+      </div>
+    )
+  const TrangVeCon = modCu.default
   let man: ReactElement
   const choMan = <DangTai chu="Đang mở…" hinh="tien-bo" />
   if (tuyen.maCa) man = <Suspense fallback={<DangTai chu="Đang mở báo cáo ca kiểm tra…" hinh="chi-tiet" />}><ManChiTietCa key={tuyen.maCa} sbd={sbd} maCa={tuyen.maCa} /></Suspense>

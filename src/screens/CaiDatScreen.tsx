@@ -22,6 +22,7 @@ import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
 import NutCapNhatApp from '../components/NutCapNhatApp'
 import { useAppStore } from '../store/appStore'
 import { useGiaoDien, type GiaoDien } from '../lib/giao-dien-thay'
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 const LUA_CHON: { v: GiaoDien; ten: string; icon: typeof Sun }[] = [
   { v: 'sang', ten: 'Sáng', icon: Sun },

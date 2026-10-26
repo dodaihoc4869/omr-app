@@ -15,6 +15,7 @@ import type { TomTatKiemTra } from '../src/lib/kiem-tra-ca-nhan'
 import type { BaoCaoTuanCon } from '../src/lib/bao-cao-tuan-ph-api'
 import type { NgayHoc } from '../src/lib/ph-v3/con-tong-quan'
 import { hoc2Gia, lichSuGia, loiThayGia, nhipGia, thaiDoGia, tatCaGia, tongQuanGia } from '../scripts/chup-ph-dot19/gia'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 const daXem = vi.fn()
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))

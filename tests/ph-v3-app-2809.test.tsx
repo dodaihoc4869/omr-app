@@ -17,6 +17,7 @@ import { dungBieuDo, thuNgan } from '../src/components/ph-v3/ManDiemSo'
 import { muoiBonNgay } from '../src/components/ph-v3/ManTienBo'
 import { chuBanApp } from '../src/lib/cap-nhat-app'
 import { PH_OK, CHI_TIET, NAY } from './_ph-moi/du-lieu-mau'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 const daXem = vi.fn()
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))

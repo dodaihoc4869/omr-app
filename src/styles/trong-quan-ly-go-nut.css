@@ -10,3 +10,7 @@
 [data-trong='gv'] .gv-go-day-du .gv-go-workspace .lg-ds { border: 0; background: none; box-shadow: none; overflow: visible; }
 [data-trong='gv'] .gv-go-day-du .gv-go-workspace .lg-ds > .gv2-the.lg-dong { border: 1px solid var(--tr-vien); border-radius: 20px; box-shadow: var(--tr-bong-1); padding: 20px; }
 [data-trong='gv'] .gv-go-day-du .gv-go-workspace .lg-co { background: var(--tr-mat-2); color: var(--tr-chu-2); }
+/* NGANG GV 26/10: màn mở từ Hành trình — thanh trên điện thoại ghi «Hành trình», tiêu đề trang chỉ còn cho trình đọc màn hình ⇒ hiện lại «Bàn gỡ nút thắt» */
+@media (max-width: 879px) {
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .gv-go-day-du .gv2-tieu-de { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
+}

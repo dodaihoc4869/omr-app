@@ -272,6 +272,8 @@ export default defineConfig({
         // vẫn tải được, tải một lần rồi cất ở kho chạy-lúc (`omr-manh-chay-lan`, xem src/sw.ts). `scripts/kiem-sw.mjs` chặn precache phình to lại.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
         globIgnores: [
+          // NGANG GV 26/10: CSS điện thoại ngang + máy ≥ 1600 của app thầy (mảnh chung các màn thầy nạp lười, tải song song mảnh màn) — kho chạy-lúc.
+          '**/trong-gv-ngang-*.css',
           // Hỏi thêm cần máy chủ và chỉ mở trong lời giải: nạp khi dùng, không cất sẵn.
           '**/{HoiThemThay,hoi-them-thay,hoi-them-thay-api}-*.{js,css}',
           // Kiểm sau hỏi cần máy chủ giữ snapshot/receipt; chỉ tải khi em bấm, dùng kho chạy-lúc.
@@ -290,6 +292,8 @@ export default defineConfig({
           '**/DocPh-*.{js,css}',
           // …và lệnh Báo cáo tuần của con (dùng chung DocPh + phần dưới trang cũ TrangVeConDuoi ⇒ thành mảnh riêng), cũng chỉ nạp lười.
           '**/bao-cao-tuan-ph-api-*.js',
+          // Trang cũ «Hôm nay của con» (TrangVeCon + trang-con.css) nạp lười từ 26/10 (màn «Chỉ đọc» không cần; ddh.trong='tat' / màn con mới tải) ⇒ kho chạy-lúc.
+          '**/TrangVeCon-*.{js,css}',
           // Giao diện «Trong» màn làm bài (26/10): tờ trình bày nạp lười trong màn thi & các màn làm câu (chỉ khi <html data-trong>) ⇒ kho chạy-lúc;
           // tải hỏng ⇒ màn thi vẫn chạy với trình bày cũ (logic không phụ thuộc tờ này).
           '**/trong-lam-bai-*.css',

@@ -47,7 +47,9 @@ describe('đọc trả lời /hs/nhip-hoc (chặt — sai ⇒ null, bảng ẩn)
   it('layNhipHocEm: gửi đúng token tới /hs/nhip-hoc; máy chủ lỗi / 404 / mất mạng / không token ⇒ null', async () => {
     const f = vi.fn(async () => traLoi(NHIP_EM_CHAM))
     vi.stubGlobal('fetch', f)
-    expect(await layNhipHocEm('tk-em')).toEqual(NHIP_EM_CHAM)
+    // SỬA CÓ CHỦ ĐÍCH 26/10 (thầy: nhóm / bậc / tốc độ CHỈ thầy + phụ huynh xem): app em đọc bản EM — máy chủ cũ còn gửi nhóm, việc tiếp, tốc độ… thì bỏ ngay.
+    const { nhom: _n, viecTiep: _v, tocDo: _t, ...banEm } = NHIP_EM_CHAM
+    expect(await layNhipHocEm('tk-em')).toEqual(banEm)
     expect(f).toHaveBeenCalledWith('https://may.test/hs/nhip-hoc', expect.objectContaining({ method: 'POST', body: JSON.stringify({ token: 'tk-em' }) }))
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: false, error: 'Em đăng nhập lại để xem nhịp học.' })))
     expect(await layNhipHocEm('tk-em')).toBeNull()
