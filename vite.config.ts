@@ -286,6 +286,8 @@ export default defineConfig({
           '**/{ManKiemTraCaNhan,TheKiemTraCaNhan,TheKiemTraCon}-*.{js,css}',
           // Tấm giữ chân khi thoát giữa chặng (27/10): màn làm chặng Duo nạp sẵn ngay khi mở (GiuChan.tsx) ⇒ vào kho chạy-lúc, không cất sẵn.
           '**/TamGiuChan-*.{js,css}',
+          // Giám thị theo mức câu (27/10): mảnh lười của màn làm chặng Duo (nạp sẵn lúc mở màn) ⇒ kho chạy-lúc, không cất sẵn.
+          '**/{GiamThi,giam-thi}-*.{js,css}',
           '**/kiem-tra-ca-nhan-*.css',
           '**/LuyenDeChuan-*.{js,css}',
           // Giao diện «Trong» app học sinh (26/10): mảnh trình bày nạp lười (nap-trong-hs.ts) ⇒ kho chạy-lúc; tải hỏng (mất mạng lần đầu) ⇒ app vẽ bản cũ.

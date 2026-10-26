@@ -1,0 +1,95 @@
+/* GIÁM THỊ THEO MỨC CÂU (src/components/giam-thi) — tờ riêng, nạp cùng mảnh lười GiamThi. Màu = biến --tr-* (không màu thô):
+   mức Nhận biết → --tr-dung, Thông hiểu → --tr-tin, Vận dụng → --tr-chu-y, Vận dụng cao → --tr-sai; sáng/tối tự đổi (con ngươi, lông mày luôn tối, lòng mắt luôn sáng).
+   Chuyển động chỉ transform / opacity. Thân thở trên lớp HTML riêng (GPU, không vẽ lại SVG). Giảm chuyển động / máy yếu ⇒ đứng yên. */
+.gtv {
+  --gt-c: var(--tr-dung); --gt-toi: var(--tr-chu); --gt-trang: var(--tr-trang);
+  --gt-sang: color-mix(in srgb, var(--gt-c) 58%, var(--gt-trang)); --gt-dam: color-mix(in srgb, var(--gt-c) 70%, var(--gt-toi)); --gt-kinh: color-mix(in srgb, var(--gt-c) 14%, var(--gt-trang));
+  --nx: 0; --ny: 0; --mi: .1; --duoi: 0; --may: 0deg; --mayY: 0px; --may2: 0px; --lean: 0deg;
+  display: block; width: 100%; height: auto; overflow: visible;
+}
+@media (prefers-color-scheme: dark) { .gtv { --gt-toi: var(--tr-trang); --gt-trang: var(--tr-chu); } }
+.gtv[data-muc='th'] { --gt-c: var(--tr-tin); }
+.gtv[data-muc='vd'] { --gt-c: var(--tr-chu-y); }
+.gtv[data-muc='vdc'] { --gt-c: var(--tr-sai); }
+.gtv .gt-fc { fill: var(--gt-c); } .gtv .gt-fd { fill: var(--gt-dam); } .gtv .gt-fk { fill: var(--gt-kinh); } .gtv .gt-ft { fill: var(--gt-trang); } .gtv .gt-f-toi { fill: var(--gt-toi); }
+.gtv .gt-sc { stroke: var(--gt-c); } .gtv .gt-sd { stroke: var(--gt-dam); } .gtv .gt-ss { stroke: var(--gt-sang); } .gtv .gt-st { stroke: var(--gt-trang); } .gtv .gt-s-toi { stroke: var(--gt-toi); }
+.gtv .gt-f-ma { fill: color-mix(in srgb, var(--tr-sai) 30%, var(--gt-trang)); opacity: .85; }
+.gtv .gt-f-mieng { fill: color-mix(in srgb, var(--tr-sai) 45%, var(--gt-toi)); } .gtv .gt-f-luoi { fill: color-mix(in srgb, var(--tr-sai) 50%, var(--gt-trang)); }
+.gtv .gt-f-ban { fill: color-mix(in srgb, var(--tr-chu-y) 58%, var(--gt-toi)); } .gtv .gt-f-ban2 { fill: color-mix(in srgb, var(--tr-chu-y) 62%, var(--gt-trang)); } .gtv .gt-f-ban3 { fill: color-mix(in srgb, var(--tr-chu-y) 40%, var(--gt-toi)); }
+.gtv .gt-f-xam { fill: color-mix(in srgb, var(--gt-toi) 45%, var(--gt-trang)); } .gtv .gt-f-xam2 { fill: color-mix(in srgb, var(--gt-toi) 22%, var(--gt-trang)); } .gtv .gt-f-xam3 { fill: color-mix(in srgb, var(--gt-toi) 72%, var(--gt-trang)); }
+.gtv .gt-s-xam2 { stroke: color-mix(in srgb, var(--gt-toi) 22%, var(--gt-trang)); } .gtv .gt-s-xam3 { stroke: color-mix(in srgb, var(--gt-toi) 72%, var(--gt-trang)); }
+.gtv .gt-f-vang { fill: var(--tr-sao); } .gtv .gt-f-vang2 { fill: color-mix(in srgb, var(--tr-sao) 60%, var(--gt-trang)); } .gtv .gt-s-vang { stroke: var(--tr-sao); } .gtv .gt-s-vang2 { stroke: color-mix(in srgb, var(--tr-sao) 70%, var(--gt-toi)); }
+.gtv .gt-f-cy { fill: var(--tr-chu-y); } .gtv .gt-s-cy { stroke: var(--tr-chu-y); } .gtv .gt-f-hong { fill: color-mix(in srgb, var(--tr-sai) 40%, var(--gt-trang)); }
+.gtv .gt-f-tin { fill: var(--tr-tin); } .gtv .gt-s-tin, .gtv .gt-s-xanh { stroke: var(--tr-tin); }
+.gtv .gt-f-dung { fill: var(--tr-dung); } .gtv .gt-s-dung { stroke: var(--tr-dung); } .gtv .gt-f-sai { fill: var(--tr-sai); } .gtv .gt-s-sai { stroke: var(--tr-sai); }
+.gtv .gt-f-giot { fill: color-mix(in srgb, var(--tr-tin) 40%, var(--gt-trang)); } .gtv .gt-f-hoi { fill: color-mix(in srgb, var(--gt-toi) 18%, var(--gt-trang)); }
+.gtv .gt-f-bac { fill: color-mix(in srgb, var(--gt-trang) 92%, var(--gt-toi)); } .gtv .gt-s-bac { stroke: color-mix(in srgb, var(--gt-trang) 92%, var(--gt-toi)); }
+.gtv .gt-kinh-o { fill: var(--gt-trang); fill-opacity: .16; stroke: var(--gt-toi); } .gtv .gt-kinh-1 { fill: var(--gt-trang); fill-opacity: .2; stroke: var(--tr-sao); }
+.gtv .gt-bong { fill: color-mix(in srgb, var(--tr-chu) 12%, transparent); }
+@media (prefers-color-scheme: dark) { .gtv .gt-bong { fill: var(--tr-mat-3); } }
+
+/* Lớp chuyển động: tư thế / nét mặt nội suy bằng transition (từ giá trị đang có), mắt do rAF đặt --nx/--ny, động tác một lần do WAAPI. */
+.gtv .gt-nhay, .gtv .gt-lac { transform-origin: 100px 224px; }
+.gtv .gt-nghieng { transform-origin: 100px 224px; transform: rotate(var(--lean)); }
+.gtv .gt-mat { transform: translate(calc(var(--nx) * 2.6px), calc(var(--ny) * 2px)); }
+.gtv .gt-con { transform: translate(calc(var(--nx) * 4.6px), calc(var(--ny) * 4.2px)); }
+.gtv .gt-gat { transform-origin: 100px 150px; }
+.gtv .gt-mi { transform: translateY(calc(var(--mi) * var(--h))); transition: transform .24s ease-in-out; }
+.gtv .gt-mi2 { transform: translateY(calc(var(--duoi) * var(--h) * -1)); transition: transform .24s ease-in-out; }
+.gtv .gt-may-t { transform: translateY(var(--mayY)) rotate(var(--may)); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+.gtv .gt-may-p { transform: translateY(calc(var(--mayY) + var(--may2))) rotate(calc(var(--may) * -1)); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+.gtv .gt-tay > .x { transform: rotate(var(--g, 0deg)); transition: transform .42s cubic-bezier(.34, 1.56, .64, 1); }
+.gtv .gt-nguoc { transform: rotate(calc(var(--g, 0deg) * -1)); transition: transform .42s cubic-bezier(.34, 1.56, .64, 1); }
+.gtv .gt-dongho > g { transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); } .gtv[data-tay='dong-ho'] .gt-dongho > g { transform: scale(1.45); }
+.gtv .gt-so { transform: scale(0); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); } .gtv[data-tay='ghi'] .gt-so { transform: scale(1); }
+.gtv .gt-but { opacity: 0; transition: opacity .2s; } .gtv[data-tay='ghi'] .gt-but { opacity: 1; }
+.gtv [data-m], .gtv .gt-cuoi, .gtv .gt-nham { opacity: 0; transition: opacity .12s; }
+.gtv[data-mieng='thang'] [data-m='thang'], .gtv[data-mieng='mim'] [data-m='mim'], .gtv[data-mieng='cuoi-nhe'] [data-m='cuoi-nhe'], .gtv[data-mieng='cuoi'] [data-m='cuoi'],
+.gtv[data-mieng='nhech'] [data-m='nhech'], .gtv[data-mieng='xi'] [data-m='xi'], .gtv[data-mieng='o'] [data-m='o'], .gtv[data-mieng='noi'] [data-m='thang'] { opacity: 1; }
+.gtv[data-mieng='noi'] [data-m='o'] { animation: gt-noi .34s steps(1) infinite; }
+@keyframes gt-noi { 0% { opacity: 1; } 50% { opacity: 0; } }
+.gtv .gt-mo { transition: opacity .12s; } .gtv:is([data-mat='cuoi'], [data-mat='nham']) .gt-mo { opacity: 0; }
+.gtv[data-mat='cuoi'] .gt-cuoi, .gtv[data-mat='nham'] .gt-nham { opacity: 1; }
+.gtv .gt-hieu > *, .gtv :is(.gt-tick, .gt-cheo) { opacity: 0; }
+
+/* Khung chứa: thân thở trên lớp HTML (transform, lớp GPU riêng). */
+.gt-o { position: relative; }
+.gt-tho-o { transform-origin: 50% 92%; animation: gt-tho 3.4s ease-in-out infinite; will-change: transform; }
+@keyframes gt-tho { 50% { transform: scale(1.012, .982); } }
+.gt-dung .gt-tho-o, .gt-dung .gtv * { animation-play-state: paused !important; }
+.gt-tinh .gt-tho-o { animation: none; will-change: auto; } .gt-tinh * { transition: none !important; }
+.gt-xam .gtv { filter: grayscale(1); } .gt-mo-nhat { opacity: .5; }
+@media (prefers-reduced-motion: reduce) { .gt-tho-o, .gtv * { animation: none !important; transition: none !important; } }
+[data-trong].may-yeu .gt-tho-o { animation: none; }
+
+/* Bong bóng càu nhàu: MỘT dòng, nằm ở hàng trống phía trên giám thị (không che nhãn, đề, phương án). */
+.gt-loi {
+  position: absolute; left: 0; bottom: calc(100% - var(--gt-loi-y, 0px)); z-index: 4; width: max-content; max-width: var(--gt-loi-max, 240px);
+  padding: 6px 11px; border-radius: 14px; border: 2px solid var(--tr-vien-2); background: var(--tr-mat); color: var(--tr-chu);
+  font: 700 13px/1.35 inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 3px 0 var(--tr-vien-2);
+  pointer-events: none; transform-origin: var(--gt-loi-duoi, 40px) 100%;
+}
+.gt-loi::after { content: ''; position: absolute; left: var(--gt-loi-duoi, 40px); top: 100%; width: 10px; height: 10px; margin-top: -4px; background: inherit; border-right: 2px solid var(--tr-vien-2); border-bottom: 2px solid var(--tr-vien-2); border-bottom-right-radius: 3px; transform: rotate(45deg); }
+.gt-loi .an { visibility: hidden; }
+
+/* ── Bố cục màn làm chặng Duo (thầy chốt 27/10): hàng trên dành cho bong bóng càu nhàu · giám thị trái (bóng dưới chân) · đề trong bong bóng lời bên phải,
+   mũi nhọn chỉ vào giám thị. Đề dài / có hình ⇒ giám thị thu nhỏ góc trái trên, bong bóng chảy xuống. */
+[data-trong] .duo-gt-san { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 36px auto; align-items: center; min-width: 0; }
+[data-trong] .duo-gt-nv { grid-column: 1; grid-row: 2; width: 124px; margin-left: -8px; }
+[data-trong] .duo-gt-nv .gt-o { --gt-loi-y: 2px; }
+[data-trong] .duo-gt-bong { grid-column: 2; grid-row: 2; position: relative; min-width: 0; margin-left: 12px; padding: 12px 14px; border: 2px solid var(--tr-vien-2); border-radius: 18px; background: var(--tr-mat); }
+[data-trong] .duo-gt-bong::before { content: ''; position: absolute; left: -9px; top: var(--duoi, 50%); width: 14px; height: 14px; margin-top: -7px; background: var(--tr-mat); border-left: 2px solid var(--tr-vien-2); border-bottom: 2px solid var(--tr-vien-2); border-bottom-left-radius: 4px; transform: rotate(45deg); }
+[data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
+[data-trong] .duo-gt-san[data-nho] { align-items: start; }
+[data-trong] .duo-gt-san[data-nho] .duo-gt-nv { width: 92px; margin-left: -10px; }
+[data-trong] .duo-gt-san[data-nho] .duo-gt-bong { --duoi: 32px; margin-top: 2px; }
+[data-trong] .duo .duo-gt-san[data-nho] .duo-gt-bong .ht2-lam-de-chu { font-size: 17px; }
+@media (max-width: 380px) { [data-trong] .duo-gt-san:not([data-nho]) .duo-gt-nv { width: 108px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 17px; } }
+@media (min-width: 900px) { [data-trong] .duo-gt-san:not([data-nho]) .duo-gt-nv { width: 150px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 21px; } [data-trong] .duo .duo-gt-san[data-nho] .duo-gt-bong .ht2-lam-de-chu { font-size: 19px; } }
+/* Khung thấp xoay ngang: cột đề hẹp ⇒ luôn giám thị nhỏ. */
+@media (orientation: landscape) and (max-height: 500px) {
+  [data-trong] .duo-gt-san { align-items: start; grid-template-rows: 34px auto; }
+  [data-trong] .duo-gt-san .duo-gt-nv { width: 84px; margin-left: -10px; }
+  [data-trong] .duo-gt-san .duo-gt-bong { --duoi: 30px; margin-top: 2px; padding: 10px 12px; }
+  [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 16px; }
+}
