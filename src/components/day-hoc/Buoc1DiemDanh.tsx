@@ -645,7 +645,7 @@ export default function Buoc1DiemDanh({
 
               <div className="dd1-o dd1-o--xong">
                 <p className="dd1-phu">
-                  Xong điểm danh: chiếu <b>Nhịp học của lớp</b> — ba cột Chăm · Chưa đều · Lười, em vắng làm mờ. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười nếu thầy không
+                  Xong điểm danh: chiếu <b>Nhịp học của lớp</b> — ba cột Chăm&nbsp;· Chưa đều&nbsp;· Lười, em vắng làm mờ. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười nếu thầy không
                   muốn nêu tên trước lớp.
                 </p>
                 <button type="button" className="m3-nut-chinh dh-nut dd1-nut-chinh" onClick={chieuNhip}>

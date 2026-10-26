@@ -91,7 +91,7 @@ describe('phần chính: MỘT con số câu hôm nay, khớp Sảnh', () => {
     ve({ g: goi({ toiThieu: 30, daLamHomNay: 31, tuLamCon: 0 }), con: 6, nhip: NHIP_EM_CHAM })
     const t = the()
     expect(t.querySelector('.ht2-hn-so')!.textContent).toBe('Đủ mức hôm nay')
-    expect(t.querySelector('.ht2-hn-da')!.textContent).toContain('Đã làm 31/30 câu hôm nay · em có thể nghỉ.')
+    expect(t.querySelector('.ht2-hn-da')!.textContent!.replace(/\u00a0/g, ' ')).toContain('Đã làm 31/30 câu hôm nay · em có thể nghỉ.') // SOÁT 26/10: cách cứng trước «·»
     expect(t.textContent).not.toMatch(/Còn \d+ câu/)
     expect(nutHoc()[0]!.textContent).toBe('Học thêm')
     expect(nutHoc()[0]!.getAttribute('data-phu')).toBe('true')

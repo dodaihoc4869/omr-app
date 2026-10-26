@@ -193,7 +193,7 @@
 [data-trong='gv'] .gvhn-1210 .mt-luoi .gvhn-the-chu > * { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 [data-trong='gv'] .gvhn-1210 .mt-luoi .gvhn-the-phu { display: block; }
 [data-trong='gv'] .gvhn-1210 .mt-luoi .gvhn-the-hanh { flex: none; min-width: 92px; padding: 0 14px; }
-[data-trong='gv'] .gvhn-1210 .gvhn-viec-dau .gvhn-viec-them { flex: none; margin: -10px -10px -10px 0; padding: 0 10px; background: none; color: var(--tr-chinh-chu); font-size: 13.5px; font-weight: 600; }
+[data-trong='gv'] .gvhn-1210 .gvhn-viec-dau .gvhn-viec-them { flex: none; margin: -10px -10px -2px 0; padding: 0 10px; background: none; color: var(--tr-chinh-chu); font-size: 13.5px; font-weight: 600; }
 [data-trong='gv'] .gvhn-1210 .gvhn-viec-them[aria-expanded='true'] svg { transform: rotate(-90deg); }
 
 /* thẻ chung của ba khối */

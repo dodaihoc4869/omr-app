@@ -220,7 +220,7 @@ export function giayTheoMucDo(lan: readonly LanLamCau[]): DongGiayMuc[] {
 const ngayGio = (iso: string) => {
   const ngay = ngayThuChu(ngayVN(iso))
   const gio = gioPhutVN(iso)
-  return gio && ngay ? `${gio} · ${ngay}` : ''
+  return gio && ngay ? `${gio}\u00a0· ${ngay}` : '' // SOÁT 26/10: dấu cách cứng trước «·» — xuống dòng không mở dòng bằng «·»
 }
 
 // ------------------------------------------------------------------ GIAO DIỆN

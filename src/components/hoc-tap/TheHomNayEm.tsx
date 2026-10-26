@@ -91,7 +91,7 @@ function PhanChinh(p: PropsTheHomNayEm & { chip: ReactNode }) {
             Đủ mức hôm nay
           </p>
           <p className="ht2-hn-da">
-            Đã làm <b>{so.daLam}/{so.muc}</b> câu hôm nay · em có thể nghỉ.
+            Đã làm <b>{so.daLam}/{so.muc}</b> câu hôm nay&nbsp;· em có thể nghỉ.
           </p>
         </>
       ) : so ? (

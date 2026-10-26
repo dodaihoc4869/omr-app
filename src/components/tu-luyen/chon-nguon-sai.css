@@ -154,6 +154,12 @@
   width: 30px;
   height: 30px;
 }
+/* SOÁT 26/10: ngang hẹp (740×360) — ba cột chỉ còn ~50px chữ, «Học theo kế hoạch» vỡ mỗi từ một dòng ⇒ hai cột */
+@media (max-width: 800px) {
+  .tlu-rong[data-bo-cuc='ngang'] .tlu-nguon-sai-luoi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .tlu-the-nguon,
   .tlu-the-nguon-dau {
