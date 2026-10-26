@@ -104,10 +104,13 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  // Tải lại / Pages đổi bản giữa chặng (26/10, em 12095 + 12092 «load lại thế là mất chặng 1»): màn này là lớp phủ do `tab` giữ trong bộ nhớ nên tải lại về trang chủ,
  // đồng hồ chặng vẫn chạy ở máy chủ. Máy nhớ chặng em mở dở (`ktcn-dang-lam`) ⇒ danh sách chặng vừa tải xong thì mở lại ĐÚNG chặng đó (giờ vẫn là giờ đã mở, không đặt lại).
  useEffect(()=>{
-  if(!tuTiep.current||busy||!tt||tt.nopLuc!==null||ket||stt!==null||!chang.length)return
+  if(!tuTiep.current||busy||!tt||stt!==null)return
+  if(tt.nopLuc!==null||tt.trangThai==='het_han'||ket){tuTiep.current=false;xoaKtcnDangLam(sbd);return}
+  if(!chang.length)return
   tuTiep.current=false
   const nho=docKtcnDangLam(sbd,id,Date.now()+offset)
-  if(nho&&chang.some(c=>c.stt===nho.stt&&!c.daChot))void mo(nho.stt)
+  // Chỉ vào lại chặng MÁY CHỦ ĐANG CHẠY (có hạn, chưa chốt): không tự bấm Làm chặng thay em.
+  if(nho&&chang.some(c=>c.stt===nho.stt&&c.han!==null&&!c.daChot))void mo(nho.stt)
  },[chang,busy,tt,ket,stt])
  // Gốc màn chỉ nghe mốc giờ; hết hạn vẫn chốt một lần, đợi đúng hàng lưu/revision hiện hành.
  useEffect(()=>{if(stt!==null&&han&&hetGio&&!busy&&!choThuLai.current)void chot(true)},[hetGio,han,offset,stt,busy,nhipThuLai])

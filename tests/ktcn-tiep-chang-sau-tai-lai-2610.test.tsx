@@ -62,6 +62,26 @@ it('chặng đã chốt hoặc ghi nhớ hết hạn / của bài khác thì kh�
   expect(docKtcnDangLam('S1', 'kt-S1', now)).toBeNull()
 })
 
+it('máy chủ chưa chạy chặng ấy (hàng bị xoá / lập lại) thì không tự bấm Làm chặng thay em', async () => {
+  maychu()
+  ghiKtcnDangLam('S1', 'kt-S1', 0, now + 200000)
+  dung()
+  await screen.findByRole('button', { name: /Làm chặng 1/ })
+  expect(api.mock.calls.some((c) => c[0] === 'hoc-tap-ktcn-start')).toBe(false)
+})
+
+it('bài đã nộp hoặc hết hạn thì ghi nhớ bị dọn, không mở chặng', async () => {
+  const nop = { ...kt, nopLuc: now - 1000, trangThai: 'da_nop', diem: 5 }
+  api.mockImplementation(async (action: string) => {
+    if (action === 'hoc-tap-ktcn-trang-thai') return { ok: true, kiemTra: nop, chang: [{ stt: 0, soCau: 1, giay: 300, han: now + 200000, daChot: false }] }
+    return { ok: true, kiemTra: nop, ketQua: { bai: [], cau: [], chu: '' } }
+  })
+  ghiKtcnDangLam('S1', 'kt-S1', 0, now + 200000)
+  dung()
+  await waitFor(() => expect(localStorage.getItem(khoaKtcnDangLam('S1'))).toBeNull())
+  expect(api.mock.calls.some((c) => c[0] === 'hoc-tap-ktcn-start')).toBe(false)
+})
+
 it('cổng học sinh đọc đúng khoá ghi nhớ và chỉ tự mở khi em đang rảnh (nộp bài thì máy đã xoá ghi nhớ khi chốt chặng cuối)', () => {
   const nguon = readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')
   const dong = nguon.split('\n').find((d) => d.includes("localStorage.getItem('ktcn:lam:'"))!
