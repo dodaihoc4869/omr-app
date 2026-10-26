@@ -24,6 +24,12 @@ Thầy 26/10 tối: «Chữ vẫn bị chèn, giao cho 1 tác tử check lại t
 
 «Trước» = bản đã gộp nhánh `claude/sua-chop-2610` (c4af218b), chưa sửa đợt 3–5 (2 552 lượt; 56 lượt cuối của app thầy chưa kịp chạy trước khi máy dừng lượt). «Sau» = đủ 2 608 lượt trên bản cuối. Còn ghi riêng, không tính lỗi: «a…» ba chấm cố ý ở dòng danh sách (69) và «i» đích bấm < 44 px (52).
 
+## Áp lên nền phát hành mới (claude/soat-ap-2610, nền 2735c17e: app HS kiểu Duolingo + «Chạm để hiểu đề»)
+
+- Soát lại ĐỦ, gồm cả làm chặng / kết chặng (`lam13`), phụ huynh «Chỉ đọc» và các màn HS mới (Lộ trình, Luyện tập, Thành tích, menu): 223 cảnh × 8 khổ × sáng/tối = 3 568 lượt.
+- Trước (sau cherry-pick, chưa sửa đợt 6): 11 dòng lỗi a–j giao diện chính (c 2 · g 3 · f 3 · h 3 — h là một lượt phụ huynh nạp thiếu kiểu khi máy tải nặng, chạy lại sạch) + 4 giao diện cũ. Sau: **0 / 0**.
+- Sửa đã bỏ vì màn HS đã viết lại: «·» ở dòng «em có thể nghỉ» (đợt 1) và ở dòng «Sau đó» + luật ≤ 400 px `.mot-dong/.mot-so-phai` (đợt 4–5) — «Một trang» cũ đã thay bằng Lộ trình.
+
 ## Ảnh trước / sau
 
 | Màn | Trước | Sau |
