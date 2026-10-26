@@ -10,6 +10,7 @@ import BieuTuongKiemTra from './BieuTuongKiemTra'
 import { conLai, diemChu, dongHo, gioHan, gioVn, thuNgay } from './kiem-tra-chu'
 import { hoiXacNhan } from '../hop-thoai'
 import { taoKhoGio, useGiayConLai, type KhoGio } from '../../lib/dong-ho-thi'
+import { docKtcnDangLam, ghiKtcnDangLam, xoaKtcnDangLam } from '../../lib/ktcn-dang-lam'
 import './hoc-tap.css'
 import './kiem-tra-ca-nhan.css'
 import { phanHoi } from '../../lib/phan-hoi'
@@ -55,7 +56,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  const khoBai=useMemo(()=>tt?taoKhoGio(tt.hanLuc,()=>Date.now()+offset):null,[tt?.hanLuc,offset])
  const hetGio=useHetGio(khoChang)
  const traRef=useRef(tra),revision=useRef(0),day=useRef<Promise<unknown>>(Promise.resolve()),tuNop=useRef(false),timer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),mounted=useRef(true)
- const lanPhien=useRef(0),henThuLai=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),choThuLai=useRef(false),lanThuLai=useRef(0)
+ const tuTiep=useRef(true),lanPhien=useRef(0),henThuLai=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),choThuLai=useRef(false),lanThuLai=useRef(0)
  const [nhipThuLai,setNhipThuLai]=useState(0)
  const conPhien=(lan:number)=>mounted.current&&lanPhien.current===lan
  const huyHenThuLai=()=>{if(henThuLai.current)clearTimeout(henThuLai.current);henThuLai.current=undefined;choThuLai.current=false}
@@ -66,7 +67,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
  const tai=async()=>{const lan=lanPhien.current;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id});if(!conPhien(lan))return;const t=nhan(r);setChang(r.chang as Chang[]);if(t.nopLuc!==null||t.trangThai==='het_han'){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id});if(!conPhien(lan))return;nhan(k);setKet(k.ketQua as Ket)}}catch(e){if(conPhien(lan))setLoi(e instanceof Error?e.message:'Chưa tải được bài kiểm tra.')}finally{if(conPhien(lan))setBusy(false)}}
  useEffect(()=>{
-  mounted.current=true;lanPhien.current++;huyHenThuLai();lanThuLai.current=0;tuNop.current=false;revision.current=0;day.current=Promise.resolve();traRef.current={}
+  mounted.current=true;tuTiep.current=true;lanPhien.current++;huyHenThuLai();lanThuLai.current=0;tuNop.current=false;revision.current=0;day.current=Promise.resolve();traRef.current={}
   setTt(undefined);setChang([]);setCs([]);setStt(null);setHan(0);setOffset(0);setTra({});setKet(undefined);setNhapCuu(undefined);setLuu('')
   void tai()
   return()=>{mounted.current=false;lanPhien.current++;huyHenThuLai();if(timer.current)clearTimeout(timer.current)}
@@ -83,7 +84,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
   });day.current=p
   return p
  }
- const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');setNhapCuu(undefined);try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){setCs([]);setStt(null);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setViTri(0);setHan(Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu('Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
+ const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');setNhapCuu(undefined);try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu('Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
   try{const raw=localStorage.getItem(`ktcn:nhap:${sbd}:${id}:${i}`),saved=raw?JSON.parse(raw):null;if(saved&&saved.han===Number(r.hanChang)&&t.serverNow<Number(r.hanChang)&&saved.tra&&typeof saved.tra==='object'){const ids=new Set(questions.map(q=>q.qid));const v=Object.fromEntries(Object.entries(saved.tra).filter(([qid,v])=>ids.has(qid)&&typeof v==='string'&&v.length<=100)) as Record<string,string>;if(Object.entries(v).some(([qid,v])=>a[qid]!==v))setNhapCuu(v)}}catch{/* Bản nháp máy hỏng: vẫn dùng bản chính đã lưu */}
  }catch(e){if(conPhien(lan))setLoi(e instanceof Error?e.message:'Chưa mở được chặng.')}finally{if(conPhien(lan))setBusy(false)}}
  const chot=async(auto=false)=>{if(stt===null||tuNop.current)return
@@ -92,7 +93,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
   if(!auto){const trong=cs.flatMap((c,i)=>daTraDu(c,traRef.current[c.qid])?[]:[i+1]);if(trong.length&&!await hoiXacNhan({tieuDe:`Nộp chặng ${stt+1}?`,noiDung:`Chặng này còn ${trong.length} câu chưa trả lời (câu ${trong.join(', ')}). Nộp chặng sẽ chốt các câu đã lưu, không sửa lại được.`,nhanDongY:`Nộp chặng ${stt+1}`,nhanKhong:'Làm tiếp',vo:'m3'}))return;if(tuNop.current)return}
   if(!conPhien(lan))return
   huyHenThuLai();tuNop.current=true;setBusy(true);setLoi('')
-  try{await save(true);if(!conPhien(lan))return;setCs([]);setStt(null);await tai();if(conPhien(lan))onCapNhat()}
+  try{await save(true);if(!conPhien(lan))return;xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();if(conPhien(lan))onCapNhat()}
   catch(e){
    if(!conPhien(lan))return
    tuNop.current=false;setLoi(e instanceof Error?e.message:'Chưa chốt được chặng.');if(auto)setLuu('Hết giờ; đang giữ bản nháp trên máy để đối chiếu.')
@@ -103,11 +104,22 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
    }
   }finally{if(conPhien(lan))setBusy(false)}
  }
+ // Tải lại / Pages đổi bản giữa chặng (26/10, em 12095 + 12092 «load lại thế là mất chặng 1»): màn này là lớp phủ do `tab` giữ trong bộ nhớ nên tải lại về trang chủ,
+ // đồng hồ chặng vẫn chạy ở máy chủ. Máy nhớ chặng em mở dở (`ktcn-dang-lam`) ⇒ danh sách chặng vừa tải xong thì mở lại ĐÚNG chặng đó (giờ vẫn là giờ đã mở, không đặt lại).
+ useEffect(()=>{
+  if(!tuTiep.current||busy||!tt||stt!==null)return
+  if(tt.nopLuc!==null||tt.trangThai==='het_han'||ket){tuTiep.current=false;xoaKtcnDangLam(sbd);return}
+  if(!chang.length)return
+  tuTiep.current=false
+  const nho=docKtcnDangLam(sbd,id,Date.now()+offset)
+  // Chỉ vào lại chặng MÁY CHỦ ĐANG CHẠY (có hạn, chưa chốt): không tự bấm Làm chặng thay em.
+  if(nho&&chang.some(c=>c.stt===nho.stt&&c.han!==null&&!c.daChot))void mo(nho.stt)
+ },[chang,busy,tt,ket,stt])
  // Gốc màn chỉ nghe mốc giờ; hết hạn vẫn chốt một lần, đợi đúng hàng lưu/revision hiện hành.
  useEffect(()=>{if(stt!==null&&han&&hetGio&&!busy&&!choThuLai.current)void chot(true)},[hetGio,han,offset,stt,busy,nhipThuLai])
  const doi=(qid:string,a:string)=>{phanHoi('chon');const v={...traRef.current,[qid]:a};traRef.current=v;setTra(v);setLuu('Đang lưu…');setNhapCuu(undefined);try{localStorage.setItem(key,JSON.stringify({han,tra:v}))}catch{/* bản nháp máy chủ vẫn là nguồn chính */}if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{void save().catch(e=>{setLoi(e instanceof Error?e.message:'Chưa lưu được bài.');setLuu('Chưa đồng bộ; bản nháp đang ở trên máy')})},400)}
  const phucHoi=()=>{if(!nhapCuu||!khoChang||khoChang.conLaiNgay()<=0)return;traRef.current={...traRef.current,...nhapCuu};setTra(traRef.current);setNhapCuu(undefined);void save().catch(e=>setLoi(e instanceof Error?e.message:'Chưa đồng bộ được bản nháp.'))}
- const ve=async()=>{if(stt!==null){setBusy(true);try{await save();onVe();onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa lưu được bài.')}finally{setBusy(false)}}else{onVe();onCapNhat()}}
+ const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa lưu được bài.')}finally{setBusy(false)}}else{onVe();onCapNhat()}}
  const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa nộp được bài.')}finally{setBusy(false)}}
  const [loc,setLoc]=useState<Loc>('tat-ca')
  const q=cs[viTri]

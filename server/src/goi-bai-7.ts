@@ -3,7 +3,9 @@ import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
 import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
 import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7 } from './goi-bai-7-quyen'
-import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7 } from './goi-bai-7-loi'
+import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7 } from './goi-bai-7-loi'
+import { xepBai6 } from './bai-6-cau'
+import { duolingoChoEm } from './duolingo-bai-co'
 import { tachMaTo } from './srs2-gv'
 import { laMaToKhongGiao, damBaoBangBaiDaDay, phamViLop, lopCuaEm } from './bai-da-day'
 import { TEN_LOP_CHUA_XEP, TEN_LOP_THUONG_12 } from './ten-lop'
@@ -519,7 +521,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
     const q = new Set(g.cau.map(c => c.qid)), ds = hs.cau.filter(c => q.has(c.qid))
     if (ds.some(c => tangCuaCau(c) !== null)) tangGoi.set(g.id, tangCuaEm(ds, hs.tt, nhom7))
   }
-  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:daLamNgay.size, tang, tangGoi, vuaLam, nghi, duPhong, daLamTap: daLamNgay as ReadonlySet<string>, soVua }
+  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:daLamNgay.size, tang, tangGoi, vuaLam, nghi, duPhong, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {} }
 }
 
 type LapGoi7 = NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
@@ -562,6 +564,8 @@ export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
 export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>): Promise<Record<string,unknown> | null> {
   // Đợt 17: khối em + đợt cũ (và câu đã trả lời của nó) đọc SONG SONG với lập kế hoạch — trước đây nối tiếp sau `lapGoi7`. Bảng gói chắc có trước (`damBaoGoi7`).
   const khoiSom = som(docKhoiEm(env,sbd))
+  // Cờ «học kiểu Duolingo» (duolingo-bai-co.ts): đọc qua đệm, bắt đầu cùng đợt đầu — không thêm vòng chờ.
+  const duoSom = som(duolingoChoEm(env,sbd,now))
   const cuSom = som(damBaoGoi7(env).then(async () => {
     const old = await env.DB.prepare(`SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>=? AND json_extract(json,'$.hocTap')=1 ORDER BY created_at DESC LIMIT 1`).bind(sbd,new Date(now-2*3600000).toISOString()).first<Row>()
     const answered = old ? await env.DB.prepare('SELECT qid FROM game_v2_attempt WHERE session=? AND sbd=? UNION SELECT qid FROM goi_bai_7_gap WHERE receipt LIKE ? AND sbd=?').bind(old.id,sbd,`${str(old.id)}|%`,sbd).all<{qid:string}>() : {results:[] as {qid:string}[]}
@@ -594,7 +598,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
     if (!old || !control.enabled) return null
     const saved=json<{goi7?:number;questions:RefGoi7[]}>(old.json)
     if (saved.goi7!==1) return null
-    const done=new Set(answered.results.map(r=>r.qid)),refs=saved.questions.filter(r=>!done.has(r.qid))
+    const done=new Set(answered.results.map(r=>r.qid)),refs=saved.questions.filter(r=>!done.has(r.qid)&&!r.lamLaiCuoi)
     const qs=(await Promise.all(refs.map(r=>currentQuestion(env,r).then(q=>({r,q}),()=>null)))).filter((v):v is NonNullable<typeof v>=>!!v)
     const quaKhoi=new Set(await chanKhacKhoiEm(env,'goi7',{sbd,khoiEm:khoi},qs.map(v=>v.q)))
     const questions=qs.filter(({q})=>quaKhoi.has(q)&&q.reviewed&&!laCauTuLuan(q)&&!baoVe.has(q.qid)&&!baoVe.has(q.group)&&!btvn.has(q.qid)&&!control.blocked.includes(q.qid)&&(!control.types.length||!!q.dang&&control.types.includes(q.dang)))
@@ -606,12 +610,16 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   const vuaLam = lap.vuaLam
   const saved = old ? json<{questions:RefGoi7[]}>(old.json) : null
   const done = new Set(answered.results.map(r => r.qid))
-  const viec = saved ? saved.questions.filter(r => !done.has(r.qid)).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
+  // Câu LÀM LẠI CUỐI CHẶNG (goi-bai-7-lam-lai.ts) chỉ sống trong chặng của nó: em rời giữa vòng làm lại ⇒ không thành chặng mới.
+  const viec = saved ? saved.questions.filter(r => !done.has(r.qid) && !r.lamLaiCuoi).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = []
   const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
   // Đợt cũ còn câu mà không câu nào phát được nữa ⇒ lấy theo kế hoạch hôm nay; kế hoạch đi tiếp qua câu không phát được cho đủ 6 câu (khẩn 12/10 23h).
   // Kế hoạch cũng không phát được câu nào mà em CÒN THIẾU mức ⇒ hàng chờ dự phòng (`lapGoi7` → `duPhong`, lỗi 14/10) — chặng chỉ rỗng khi thật hết câu.
-  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => lap.plan.viec, ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [])]
+  // BÀI 6 CÂU KIỂU DUOLINGO (26/10, bai-6-cau.ts): kế hoạch ngày trộn đều thành chặng 6 câu (câu mới · sửa · ôn), dễ → khó → vừa, quanh ~80% đúng — CÙNG tập câu,
+  // chỉ đổi thứ tự. Ngày sát hạn của một gói còn quota (≤ 1 ngày) ⇒ giữ thứ tự cũ (câu mới trước) để em làm dở ngày vẫn phủ tối đa câu mới.
+  const satHan = !(await duoSom) || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1) // cờ tắt ⇒ giữ thứ tự cũ
+  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [])]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
   // ĐỌC SONG SONG THEO LÔ (đợt 17): trước đây TỪNG câu đọc nối tiếp (đọc câu theo ref ⇒ cổng khối) — 6 câu ≈ 12 lượt D1 chờ nhau ("Đang chuẩn bị những
   // câu…" lâu giờ cao điểm). Nay mỗi lô (đủ chỗ còn thiếu + 2 dự phòng) đọc các câu CÙNG LÚC, cổng khối MỘT lần cho cả lô (từng câu xét độc lập); vẫn
@@ -651,7 +659,9 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
   } catch (e) { await ghiDongCo.catch(() => {}); throw e } // lối ra lỗi giữa chừng: lô ghi của động cơ vẫn xong trước (như thứ tự cũ: ghi trong lúc lập)
 }
-interface RefGoi7 extends LamLaiRef { qid:string; maDe:string; version:string; group:string; novel:boolean; role:string; vai:ViecGoi7['vai']; huongDan:boolean; goiY?:unknown; hoiThayKiem?:true }
+export interface RefGoi7 extends LamLaiRef { qid:string; maDe:string; version:string; group:string; novel:boolean; role:string; vai:ViecGoi7['vai']; huongDan:boolean; goiY?:unknown; hoiThayKiem?:true
+  /** 26/10: câu làm lại cuối chặng (câu anh em của câu em vừa sai) — luôn có hỗ trợ, không tính đóng lỗi, không mở thành chặng mới. */
+  lamLaiCuoi?:true; lamLaiCua?:string }
 
 /** Em chọn "Chưa tự làm được" là nộp yêu cầu học có hỗ trợ, không phải một câu làm đúng/sai. */
 export async function gapHuongDan7(env: Env,sbd: string,b: Row,now: number) {

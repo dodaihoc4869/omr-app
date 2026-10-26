@@ -29,7 +29,9 @@ import { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
 
 const KHONG_CA="NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')"
 export interface DongCoHanhTrinh {
-  v5?:BoChonV5; chan:Set<string>; hen:Map<string,string>; trongSo:Record<string,number>; canThiep?:{qid:string;nhom:string;kn:string;context:string;cach:CachCuu;xacSuat:number}; soQuanSat:number; soHalfLife:number; soCanhHoc:number; p8:number }
+  v5?:BoChonV5; chan:Set<string>; hen:Map<string,string>; trongSo:Record<string,number>; canThiep?:{qid:string;nhom:string;kn:string;context:string;cach:CachCuu;xacSuat:number}; soQuanSat:number; soHalfLife:number; soCanhHoc:number; p8:number
+  /** 26/10 (bài 6 câu kiểu Duolingo, bai-6-cau.ts): xác suất em làm đúng từng câu (OMNI) — để xếp chặng quanh ~80% đúng. Chỉ đọc, không vào lịch. */
+  pDung?:Record<string,number> }
 /** Receipt dùng chỉ từ sự kiện máy chủ. Không thưởng vì chỉ đã đề nghị hoặc đúng câu can thiệp. */
 export function doCanThiep(r:Row,qs:readonly QuanSatHanhTrinh[],firstSeen?:ReadonlyMap<string,number>,used:ReadonlySet<string>=new Set()):{dungLuc:number|null;doLuc:number|null;ketQua:number|null;receipt:string|null} {
   const delivered=qs.find(o=>o.qid===r.qid && o.nhom===r.nhom && o.luc>=Number(r.goi_luc))
@@ -174,13 +176,14 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const [edges,offers,stats,beta,rewards]=await Promise.all([docCanhLop(env,targets,now),t.offers,t.stats,th.beta,t.rewards])
   const learned=canhDangHoc(edges), b=new Map((beta.results??[]).map(r=>[r.qid,r.beta]))
   const omni=phatLaiEm(sbd,{suKien:events,q,beta:b,homNay:new Date(now+7*3600000).toISOString().slice(0,10),xacNhan:xacNhan.results})
-  const out:DongCoHanhTrinh={chan:new Set(chan),hen:new Map(),trongSo:{},soQuanSat:qs.length,soHalfLife:0,soCanhHoc:learned.length,p8:0}
+  const out:DongCoHanhTrinh={chan:new Set(chan),hen:new Map(),trongSo:{},soQuanSat:qs.length,soHalfLife:0,soCanhHoc:learned.length,p8:0,pDung:{}}
   for(const c of hs.cau) {
     const qc=q.get(c.qid)!, kn=vknCaCau(qc), t=tangCuaCau(c)
     if(t===null) out.chan.add(c.qid)
     const due=henHalfLife(memory,kn)
     if(due) {out.hen.set(c.qid,due);out.soHalfLife++}
     const weakest=Math.min(...kn.map(k=>omni.vkn[k]?.p??0.3)), pc=xacSuatDungCau(omni,qc,omni.sEm)
+    out.pDung![c.qid]=pc
     const information=Math.exp(-(((pc-0.8)/0.2)**2))
     const soft=learned.filter(e=>kn.includes(e.den) && omni.vkn[e.tu]?.trangThai!=='vung').length
     const minute=Math.max(0.25,msKyVong(b.get(c.qid)??null,omni.tau,qc.phan,qc.mucDo)/60000)
