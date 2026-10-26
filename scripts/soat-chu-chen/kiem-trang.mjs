@@ -159,7 +159,9 @@ export function kiemTrang() {
   const nuts = [...goc.querySelectorAll(NUT)].filter((e) => thay(e) && !chiDoc(e) && e.getBoundingClientRect().width > 1 && e.getBoundingClientRect().height > 1)
   const muc = []
   for (const c of chu) if (!noi(c.el)) for (const r of c.thay) muc.push({ el: c.el, r, chu: c.t, nut: false })
-  for (const e of nuts) if (!noi(e)) { const r0 = e.getBoundingClientRect(), k = catBoi(e.parentElement || e), r = { left: Math.max(r0.left, k.l), top: Math.max(r0.top, k.t), right: Math.min(r0.right, k.r), bottom: Math.min(r0.bottom, k.b) }; if (r.right - r.left <= 1 || r.bottom - r.top <= 1) continue; muc.push({ el: e, r: { l: r.left, t: r.top, r: r.right, b: r.bottom }, chu: (e.getAttribute('aria-label') || e.textContent || e.tagName).trim(), nut: true }) }
+  // ô nhập: chỉ tính vùng gõ chữ (bỏ phần đệm) — nút nằm TRONG phần đệm của ô (mẫu ô số có nút «±» «,» ở mép phải) là cố ý, không chồng chữ
+  const vungO = (e) => { const r = e.getBoundingClientRect(); if (!/^(INPUT|TEXTAREA)$/.test(e.tagName)) return r; const s = css(e); return { left: r.left + parseFloat(s.paddingLeft), top: r.top, right: r.right - parseFloat(s.paddingRight), bottom: r.bottom } }
+  for (const e of nuts) if (!noi(e)) { const r0 = vungO(e), k = catBoi(e.parentElement || e), r = { left: Math.max(r0.left, k.l), top: Math.max(r0.top, k.t), right: Math.min(r0.right, k.r), bottom: Math.min(r0.bottom, k.b) }; if (r.right - r.left <= 1 || r.bottom - r.top <= 1) continue; muc.push({ el: e, r: { l: r.left, t: r.top, r: r.right, b: r.bottom }, chu: (e.getAttribute('aria-label') || e.textContent || e.tagName).trim(), nut: true }) }
   muc.sort((x, y) => x.r.t - y.r.t)
   const daChong = new Set()
   for (let i = 0; i < muc.length; i++) {

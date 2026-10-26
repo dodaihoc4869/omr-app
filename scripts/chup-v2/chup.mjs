@@ -42,7 +42,7 @@ const DS_HS12 = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']
     // Boss 12/10: thứ tự Xem lại câu gốc → Tự làm lại → Đáp án và lời giải (bước 3 mở sau khi em làm lại / bấm xem lời giải)
     [`41-hs12-chua-truc-tiep-lam-lai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, false, /Câu em đã làm sai/, 'nut:Tự làm lại câu này'],
     [`41-hs12-chua-truc-tiep-loi-giai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, true, /Câu em đã làm sai/, 'nut:Tự làm lại câu này » Em chưa làm được — xem lời giải'],
-    [`42-hs12-tu-chua-${k}${t}`, 'hs12-tu-chua', w, hgt, nen, true, /Câu em cần chữa/],
+    [`42-hs12-tu-chua-${k}${t}`, 'hs12-tu-chua', w, hgt, nen, true, /Tự sửa lỗi/],
     [`43-hs12-tu-luyen-lam-${k}${t}`, 'hs12-tu-luyen-lam', w, hgt, nen, false, /Thuỷ phân hoàn toàn/],
   ]
 })).concat([['41-hs12-chua-gap-lai-doc', 'hs12-chua-gap-lai', 390, 844, 'light', true, /Lần gặp lại 2 mở lúc/]])
@@ -641,16 +641,16 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.getByText(/em đang Lười/).first().waitFor({ timeout: 20000 })
       if (v === 'chieu') {
         await t.getByRole('button', { name: 'Chiếu điểm danh', exact: true }).click()
-        await t.locator('.ddc .ddc-em').first().waitFor({ timeout: 20000 })
+        await t.locator('.ddc :is(.ddc-em, .ddv-the)').first().waitFor({ timeout: 20000 }) // bản chiếu nền sáng 23/10: thẻ em = .ddv-the
       }
       if (v === 'nhip' || v === 'ho-so') {
         await t.getByRole('button', { name: 'Xong điểm danh · chiếu Nhịp học của lớp', exact: true }).click()
-        await t.locator('.ddc .ddc-dong-em').first().waitFor({ timeout: 20000 })
+        await t.locator('.ddc :is(.ddc-dong-em, .ddv-dong-em)').first().waitFor({ timeout: 20000 })
       }
       for (const k of phim ?? '') await t.keyboard.press(k)
       if (v === 'ho-so') {
         // em đầu cột Chưa đều (nhãn thái độ của hồ sơ GIẢ chỉ có Chăm chỉ / Chưa đều / Đối phó — chọn em cùng nhóm để ảnh không tự mâu thuẫn)
-        await t.locator('.ddc-cot[data-nhom="chua-deu"] .ddc-dong-em').first().click()
+        await t.locator(':is(.ddc-cot, .ddv-cot)[data-nhom="chua-deu"] :is(.ddc-dong-em, .ddv-dong-em)').first().click()
         await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
       }
       if (v === 'muc' || v === 'muc-treo') await t.locator('.dd1-ot small').nth(2).waitFor({ timeout: 20000 }) // thanh Mức làm hỏi sau 1,5 giây
