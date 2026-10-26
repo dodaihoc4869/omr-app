@@ -22,8 +22,7 @@ import LogoGiaoVien from './LogoGiaoVien'
 import { AnhLogo } from './LogoVai'
 import { useSoDemGv } from '../lib/so-dem-gv'
 import { useHoa2Bat } from './chien-dich/co-hoa2'
-import './chien-dich/thanh-ben-hoa2.css'
-import './thanh-ben-gv2.css'
+// CSS thanh bên (thanh-ben-hoa2.css · thanh-ben-gv2.css) do App.tsx chèn cùng khối CSS vỏ thầy (26/10) — không nhập ở đây (nhập thường sẽ đẻ tệp CSS riêng sai thứ tự).
 
 export interface MucDieuHuong {
   id: ScreenId

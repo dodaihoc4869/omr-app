@@ -37,20 +37,15 @@ import './styles/the-loc.css'
 import './styles/may-yeu.css'
 // Hiệu ứng "+N EXP" dùng chung (luật v4 29/09): CSS nằm trong gói CSS vỏ để mảnh `ExpCau` (dùng ở bảng nhiệm vụ, BTVN, mọi game) không đẻ thêm một tệp CSS precache.
 import './components/exp-cau/exp-cau.css'
-// Các tờ trước đây đi theo App.tsx (vỏ Bát Linh, khung app thầy, logo, thanh bên, phiếu, bảng màu thầy) — đúng thứ tự cũ, xem đầu tệp.
+// Các tờ trước đây đi theo App.tsx (vỏ Bát Linh, logo, phiếu…) — đúng thứ tự cũ, xem đầu tệp. Sáu tờ CHỈ app thầy dùng (teacher-layout, vo-thay,
+// thanh bên ×2, gv-mau, teacher-modern) nay App.tsx tự chèn đúng chỗ cũ (26/10) — máy em / phụ huynh / màn thi không tải.
 import './components/bat-linh/bat-linh.css'
 import './components/bat-linh/hoc-sinh.css'
 import './components/bat-linh/phu-huynh.css'
 import './components/bat-linh/che-do-toi.css'
-import './styles/teacher-layout.css'
 import './styles/giao-dien-day-du.css'
-import './styles/vo-thay.css'
 import './components/logo-ddh.css'
-import './components/chien-dich/thanh-ben-hoa2.css'
-import './components/thanh-ben-gv2.css'
 import './components/m3/phieu-screen.css'
-import './styles/gv-mau.css'
-import './styles/teacher-modern.css'
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
 
 import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
