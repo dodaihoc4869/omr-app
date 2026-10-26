@@ -134,7 +134,8 @@ function doChu() {
     if (r.width < 43.5 || r.height < 43.5) ra.push({ loai: 'i', ghi: `đích ${Math.round(r.width)}×${Math.round(r.height)} «${(e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 30)}»` })
   }
   // nút chính của màn mới: phải nằm trong khung và không bị phần tử khác che (giữa nút)
-  for (const e of document.querySelectorAll('.duo-nut')) {
+  // (đang mở hộp thoại [aria-modal] — vd «Lời giải từng bước» — nút dưới nền bị che là đúng thiết kế ⇒ bỏ qua)
+  for (const e of document.querySelector('[aria-modal="true"]') ? [] : document.querySelectorAll('.duo-nut')) {
     const r = e.getBoundingClientRect()
     if (!r.width) continue
     if (r.bottom > innerHeight + 1 && getComputedStyle(e.closest('.duo-day') ?? e).position === 'sticky') ra.push({ loai: 'm', ghi: `nút «${e.textContent.trim()}» ghim nhưng ra ngoài khung (${Math.round(r.bottom)}/${innerHeight})` })

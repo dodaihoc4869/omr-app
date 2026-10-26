@@ -495,6 +495,8 @@
 /* màn xong chặng: số lớn («1239/2400» câu hôm nay) bị cắt trong ô 3 số ⇒ cỡ số co theo ô, biểu tượng xuống trên số khi chật */
 [data-trong] .duo-3 > div { container-type: inline-size; }
 [data-trong] .duo-3 b { flex-wrap: wrap; row-gap: 2px; padding: 6px 4px; font-size: clamp(13px, 14cqi, 22px); line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+/* nhãn ô số ≤ 380px: 11px ⇒ dưới chuẩn 12px — giữ 12px, bớt giãn chữ; nhãn dài xuống hai dòng (không cắt) */
+@media (max-width: 380px) { [data-trong] .duo-3 p { font-size: 12px; letter-spacing: 0; line-height: 1.25; } }
 /* tấm kết quả (đáy ghim) cao hơn khung — khung thấp 390×390 (bàn phím, chia đôi màn), phóng chữ 125%, lý do dài: tấm che cả thanh trên và phần đầu tấm
  * («Chưa đúng», đáp án) nằm ngoài khung, không cuộn tới được; 360×640 tấm che 70% màn. Tấm tối đa 58% khung (đề vẫn thấy phía trên); phần chữ cuộn
  * TRONG tấm (không cắt), «Lời giải từng bước» · «Hỏi thầy» · «Tiếp tục» luôn thấy. */
@@ -502,6 +504,8 @@
 [data-trong] .duo-ket > .duo-giua { flex: 0 1 auto; min-height: 0; }
 [data-trong] .duo-ket .duo-kq { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 @media (orientation: landscape) and (max-height: 500px) { [data-trong] .duo-ket { max-height: none; } }
+/* tên bài/dạng ở nhãn đầu câu có công thức (C5H13N, HCl, NaOH): viết HOA làm sai công thức («HCL», «NAOH») ⇒ giữ nguyên hoa/thường, chỉ số dưới đúng */
+[data-trong] .duo-nhan [data-cong-thuc] { text-transform: none; letter-spacing: 0; }
 /* «1 · 3 · 7 ngày» không bẻ dòng giữa chừng (dòng mở đầu bằng «·» ở 360px) */
 [data-trong] .duo-lien-chu { white-space: nowrap; }
 /* NGANG + MÁY TÍNH (thầy 26/10: «chú ý tối ưu cho giao diện xoay ngang và máy tính»). Hai khối móc .duo-cot-de (nhãn · đề · gợi ý) | .duo-cot-tra (chọn
