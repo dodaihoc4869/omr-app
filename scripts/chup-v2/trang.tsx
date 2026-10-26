@@ -205,7 +205,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.endsWith('/gv/chua-cau-sai/hang-chieu')) return tra({ ok: true, bat: true, conNua: false, ds: BUOC_CUOI_GIA })
   if (u.pathname.endsWith('/gv/nut-that/ds')) return tra(NUT_THAT_GIA)
   // «Trong» nhóm 4: Duyệt lời giải mở sẵn đề 12-KT-C1-D4 (28 câu: 15 đã duyệt · 9 chờ duyệt, 5 sạch · 2 máy đang soạn · 2 chờ sửa kho)
-  if (u.pathname.endsWith('/gv/loi-giai/cho-duyet')) return tra({ ok: true, maDe: '12-KT-C1-D4', cau: CAU_DUYET_GIA, tong: { cau: 28, daDuyet: 15, choDuyet: 9, sach: 5, dangSoan: 2, traLai: 0, truot: 2, chuaCoBo: 0 } })
+  if (u.pathname.endsWith('/gv/loi-giai/cho-duyet')) return tra({ ok: true, maDe: '12-KT-C1-D4', cau: cauDuyetGia(), tong: { cau: 28, daDuyet: 15, choDuyet: 9, sach: 5, dangSoan: 2, traLai: 0, truot: 2, chuaCoBo: 0 } })
   // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): `/ph/con-tong-quan` GIẢ — `&tq=loi` ⇒ máy chủ lỗi (khối Gợi ý nhắc con hiện lý do + Thử lại).
   if (u.pathname.endsWith('/ph/con-tong-quan')) return thamSo.get('tq') === 'loi'
     ? new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Anh/chị thử lại sau ít phút.' }), { status: 500, headers: { 'content-type': 'application/json' } })
@@ -549,13 +549,14 @@ if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error
 
 const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-toan-canh':'hocsinh', 'gv-giao-btvn':'giaobtvn', 'gv-giao-tuan':'khodegiao', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 if (man === 'gv-duyet' && thamSo.get('ma')) location.hash = `duyet-loi-giai=${thamSo.get('ma')}`
-const CAU_DUYET_GIA = [
+// Hàm (cẩu lên đầu) vì cảnh giả fetch ở trên gọi tới trước dòng này.
+function cauDuyetGia() { return [
   { qid: 'DH-12-C1-D4-3', bam: 'b3', dang: 'tn', bo: 'C1', trangThai: 'cho_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
   { qid: 'DH-12-C1-D4-7', bam: 'b7', dang: 'tn', bo: 'C1', trangThai: 'cho_duyet', sach: false, co: [{ loai: 'dapAn', ghi: 'số ester ứng với C4H8O2 là 4, kho đang ghi B (3 chất).', chot: 'D', sua: { truong: 'dapAn', truoc: 'B', sau: 'D' } }], ghiChu: '', loiMay: '', soLan: 1 },
   { qid: 'DH-12-C1-D4-12', bam: 'b12', dang: 'ds', bo: 'C1', trangThai: 'cho_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
   { qid: 'DH-12-C1-D4-19', bam: 'b19', dang: 'tln', bo: 'C1', trangThai: 'truot', sach: false, co: [], ghiChu: '', loiMay: 'phương trình ở bước 2 chưa cân bằng số nguyên tử O.', soLan: 2 },
   { qid: 'DH-12-C1-D4-22', bam: 'b22', dang: 'tln', bo: 'C1', trangThai: 'da_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
-]
+] }
 const EM_TD = [
   ['Trịnh Quốc Huy', 'khoa', 9, null, 3, 41], ['Trần Minh Hiếu', 'dang_lam', 12, null, 2, 18], ['Ninh Thị Mai', 'dang_lam', 8, null, 1, 6],
   ['Lê Hà My', 'da_nop', 20, 9.5, 0, 0], ['Phan Gia Bảo', 'da_nop', 20, 8.5, 0, 0], ['Ngô Minh Châu', 'da_nop', 20, 9, 0, 0],
