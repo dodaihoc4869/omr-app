@@ -483,3 +483,16 @@
 [data-trong] .duo-hai .duo-nut { padding: 0 10px; font-size: 15px; letter-spacing: .02em; }
 /* Ô phương án KHÔNG chèn chữ «Em chọn · đáp án» ở mọi khổ (như bản vẽ: màu xanh/đỏ + tấm kết quả «Đáp án: …» đã nói) — chữ chỉ còn cho trình đọc màn hình. */
 [data-trong] .duo .ht2-lam-pa-nhan { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── 10. ẤN LÚN kiểu Duolingo (thầy 26/10: «Các nút chọn phản hồi rung như dolingo» — đi cùng rung `lib/rung.ts`). Nút có gờ đáy: bấm ⇒ dịch xuống, gờ mỏng
+ * lại (bù margin ⇒ không xô bố cục). Các màn luyện: làm chặng (Duo), Kiểm tra ôn tập, Tự sửa lỗi, Tu luyện. Giảm chuyển động ⇒ không dịch (rung vẫn giữ). ── */
+[data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-phim button, .duo-nut, .ht2-lam-y-nut button),
+[data-trong='hs'] :is(.ktcn-man, .ccs, .tlu) .pa-hang { transition: transform .08s ease; }
+[data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-phim button):active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; }
+[data-trong='hs'] .duo .duo-nut:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+[data-trong='hs'] .duo .ht2-lam-y-nut button:active:not(:disabled),
+[data-trong='hs'] :is(.ktcn-man, .ccs, .tlu) .pa-hang:active:not(:disabled) { transform: translateY(2px); }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-phim button, .duo-nut, .ht2-lam-y-nut button):active:not(:disabled),
+  [data-trong='hs'] :is(.ktcn-man, .ccs, .tlu) .pa-hang:active:not(:disabled) { transform: none; transition: none; }
+}

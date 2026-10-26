@@ -14,6 +14,7 @@ import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
 import { chuDanhSachCau, chuDS, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
 import NutHoiThay from '../loi-giai/NutHoiThay'
+import { phanHoi } from '../../lib/phan-hoi'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
 import './hoc-tap.css'
@@ -168,7 +169,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       setDem(v => { const m = Number.isFinite(muc) && muc > 0 ? muc : v?.muc ?? 0; return m > 0 ? { daLam, muc: m } : v })
     }).catch(() => { /* Giữ số cũ; xong chặng / rời màn sẽ nạp lại sảnh. */ })
   }
-  const doiTra = (v: string) => { setTra(v); traRef.current = v; try { localStorage.setItem(khoa, v) } catch { /* Em vẫn làm và nộp được. */ } }
+  const doiTra = (v: string) => { phanHoi('chon'); setTra(v); traRef.current = v; try { localStorage.setItem(khoa, v) } catch { /* Em vẫn làm và nộp được. */ } }
   // Sang câu mới / vừa có kết quả ⇒ đưa màn về đầu (dải kết quả, đề) — em không phải tự vuốt ngược. Trình đọc màn hình: tiêu đề "Câu x/y" và dải
   // kết quả tự đọc (aria-live / role=status); có kết quả thì con trỏ bàn phím sang nút chính "Câu tiếp theo" (Enter = đi tiếp), không vẽ viền khi em chạm.
   const veDau = () => gocRef.current?.scrollIntoView?.({ block: 'start' })
@@ -190,6 +191,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const daHoiThay = useRef('')
   useEffect(() => { if (!q) return; if (daMo.current) veDau(); daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (k) { veDau(); nutTiepRef.current?.focus({ preventScroll: true }) } }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Rung phản hồi kiểu Duolingo (thầy 26/10) — chỉ app học sinh «Trong» (phan-hoi.ts tự kiểm): tấm kết quả đúng / sai, hết chặng.
+  useEffect(() => { if (k && !k.choThay && !k.hocCoHoTro && !k.omni?.luot) phanHoi(k.correct ? 'dung' : 'sai') }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (xong) phanHoi('xong') }, [xong])
   const nopCau = async () => {
     if (!q || !phien || !duTraLoi(q.phan, tra) || gui.current || k) return
     gui.current = true; setNop(true); setLoi('')
@@ -370,7 +374,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           </div>
           <div className="duo-them">{linkGiai}{linkHoi}{/* thầy 26/10 «Bỏ câu sai từng bước»: tấm kết quả không có «Sửa câu này» — chỉ Lời giải từng bước + Hỏi thầy */}</div>
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          <button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' ? 'do' : undefined} onClick={tiep}>Tiếp tục</button>
+          <button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' ? 'do' : undefined} onClick={() => { phanHoi('chon'); tiep() }}>Tiếp tục</button>
         </div></section>
       : choChonCach ? <div className="duo-day"><div className="duo-giua">
           <div className="duo-hai">
@@ -381,7 +385,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></div>
       : <div className="duo-day"><div className="duo-giua">
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          <button type="button" className="duo-nut" onClick={() => void nopCau()} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
+          <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
           <div className="duo-bo">
             {linkHoi}
             {q.goiY && <button type="button" className="duo-lien" aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={18} aria-hidden="true" />{goiY ? 'Thu gợi ý' : 'Gợi ý'}</button>}
