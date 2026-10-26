@@ -496,3 +496,65 @@
   [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-phim button, .duo-nut, .ht2-lam-y-nut button):active:not(:disabled),
   [data-trong='hs'] :is(.ktcn-man, .ccs, .tlu) .pa-hang:active:not(:disabled) { transform: none; transition: none; }
 }
+
+/* ── 11. HIỆU ỨNG ĐÚNG / SAI kiểu Duolingo (thầy 26/10: «Làm đúng có hiệu ứng và làm sai cũng vậy, hiệu ứng đơn giản nhẹ như dolingo»), đi cùng rung/tiếng
+ * (phan-hoi.ts). Chỉ transform/opacity (và nét tick stroke-dashoffset), không đổi bố cục, không chặn bấm (Tiếp tục bấm ngay vẫn đi tiếp).
+ *   ĐÚNG: ô đúng nảy 1 → 1,04 → 1 (260ms) + 8 tia bung ra mờ dần (450ms) · tấm xanh trượt lên 220ms, tick vẽ nét 300ms · thanh tiến độ tăng mượt + vệt sáng.
+ *   SAI : ô em chọn lắc ngang ±6px 3 nhịp (320ms) · ô đáp án đúng hiện dần sau 150ms (đáp án vẫn chỉ có SAU khi chấm) · tấm đỏ trượt lên, thanh không tăng.
+ *   HẾT CHẶNG: hoa giấy lục giác rơi nhẹ 1,2s. Áp cho ABCD, Đúng/Sai (từng ý), Trả lời ngắn (hàng ô), ở làm chặng, Tự sửa lỗi, Tu luyện.
+ *   Giảm chuyển động / máy yếu ⇒ không chuyển động, chỉ đổi màu. ── */
+@keyframes hu-nay { 0% { transform: scale(1); } 45% { transform: scale(1.04); } 100% { transform: scale(1); } }
+@keyframes hu-lac { 0%, 100% { transform: translateX(0); } 16% { transform: translateX(-6px); } 33% { transform: translateX(6px); } 50% { transform: translateX(-6px); } 66% { transform: translateX(6px); } 83% { transform: translateX(-3px); } }
+@keyframes hu-tia { 0% { opacity: 1; transform: scale(.55); } 100% { opacity: 0; transform: scale(1.35); } }
+@keyframes hu-hien { from { opacity: .35; } to { opacity: 1; } }
+@keyframes hu-ve { to { stroke-dashoffset: 0; } }
+@keyframes hu-loe { from { transform: translateX(-120%); } to { transform: translateX(260%); } }
+@keyframes hu-roi { 0% { opacity: 0; transform: translate3d(0, -20px, 0) rotate(0deg); } 12% { opacity: 1; } 100% { opacity: 0; transform: translate3d(var(--lech, 0px), 300px, 0) rotate(260deg); } }
+[data-trong='hs'] .duo .ht2-lam-pa[data-ket], [data-trong='hs'] .duo .ht2-lam-y[data-ket], [data-trong='hs'] .duo .ht2-lam-o-hang[data-ket] { position: relative; }
+/* đúng: ô đúng nảy + tia bung (8 tia vẽ bằng gradient trên phần tử giả) */
+[data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung'],
+[data-trong='hs'] .duo .ht2-lam-y[data-ket='dung'], [data-trong='hs'] .duo .ht2-lam-o-hang[data-ket='dung'],
+[data-trong='hs'] :is(.ccs, .tlu) .pa-hang[data-trang-thai='dung'] { animation: hu-nay 260ms ease-out; }
+[data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung']::after, [data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-o-hang[data-ket='dung']::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px; pointer-events: none; opacity: 0;
+  background:
+    radial-gradient(circle, var(--tr-dung) 0 4px, transparent 5px) 50% 0 / 12px 12px no-repeat,
+    radial-gradient(circle, var(--tr-sao) 0 4px, transparent 5px) 50% 100% / 12px 12px no-repeat,
+    radial-gradient(circle, var(--tr-dung) 0 4px, transparent 5px) 0 50% / 12px 12px no-repeat,
+    radial-gradient(circle, var(--tr-tin) 0 4px, transparent 5px) 100% 50% / 12px 12px no-repeat,
+    radial-gradient(circle, var(--tr-sao) 0 3px, transparent 4px) 15% 15% / 10px 10px no-repeat,
+    radial-gradient(circle, var(--tr-dung) 0 3px, transparent 4px) 85% 15% / 10px 10px no-repeat,
+    radial-gradient(circle, var(--tr-tin) 0 3px, transparent 4px) 15% 85% / 10px 10px no-repeat,
+    radial-gradient(circle, var(--tr-dung) 0 3px, transparent 4px) 85% 85% / 10px 10px no-repeat;
+  animation: hu-tia 450ms ease-out;
+}
+/* sai: ô em chọn lắc; ô đáp án đúng hiện dần sau 150ms */
+[data-trong='hs'] .duo[data-tt='sai'] .ht2-lam-pa[data-ket='sai'], [data-trong='hs'] .duo .ht2-lam-y[data-ket='sai'], [data-trong='hs'] .duo .ht2-lam-o-hang[data-ket='sai'],
+[data-trong='hs'] :is(.ccs, .tlu) .pa-hang[data-trang-thai='sai'] { animation: hu-lac 320ms ease-in-out; }
+[data-trong='hs'] .duo[data-tt='sai'] .ht2-lam-pa[data-ket='dung'] { animation: hu-hien 260ms ease-out 150ms both; }
+/* tấm kết quả: trượt 220ms, tick vẽ nét 300ms */
+[data-trong='hs'] .duo-ket { animation: duo-truot 220ms ease-out; }
+[data-trong='hs'] .duo-ket[data-tt='dung'] .duo-kq-o svg path { stroke-dasharray: 32; stroke-dashoffset: 32; animation: hu-ve 300ms ease-out 120ms forwards; }
+/* thanh tiến độ: tăng mượt 500ms + vệt sáng lướt qua khi đúng */
+[data-trong='hs'] .duo-thanh > i { transition: width 500ms ease-out; overflow: hidden; }
+[data-trong='hs'] .duo-loe { position: absolute; inset: 0 auto 0 0; width: 40%; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--tr-trang) 70%, transparent), transparent); animation: hu-loe 500ms ease-out 120ms both; pointer-events: none; }
+/* hết chặng: hoa giấy lục giác rơi */
+[data-trong='hs'] .duo-xong { position: relative; }
+[data-trong='hs'] .duo-hoa { position: absolute; inset: 0 0 auto; height: 0; overflow: visible; pointer-events: none; }
+[data-trong='hs'] .duo-hoa i {
+  position: absolute; top: 0; left: calc(4% + var(--i) * 6.8%); width: 10px; height: 10px; opacity: 0; clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+  background: var(--tr-dung); animation: hu-roi 1200ms ease-in calc(var(--i) * 45ms) forwards; --lech: calc((var(--i) - 7) * 4px);
+}
+[data-trong='hs'] .duo-hoa i:nth-child(3n) { background: var(--tr-sao); }
+[data-trong='hs'] .duo-hoa i:nth-child(3n + 1) { background: var(--tr-tin); }
+[data-trong='hs'] .duo-hoa i:nth-child(4n) { background: var(--tr-sai); width: 8px; height: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-y, .ht2-lam-o-hang), [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-o-hang)::after,
+  [data-trong='hs'] :is(.ccs, .tlu) .pa-hang, [data-trong='hs'] :is(.duo-ket, .duo-loe, .duo-hoa i, .duo-kq-o svg path) { animation: none !important; }
+  [data-trong='hs'] .duo-ket[data-tt='dung'] .duo-kq-o svg path { stroke-dashoffset: 0; }
+  [data-trong='hs'] .duo-thanh > i { transition: none; }
+  [data-trong='hs'] .duo-hoa { display: none; }
+}
+[data-trong='hs'].may-yeu :is(.duo .ht2-lam-pa, .duo .ht2-lam-y, .duo .ht2-lam-o-hang, .duo-ket, .duo-loe, .duo-hoa i) { animation: none; }
+[data-trong='hs'].may-yeu .duo-ket[data-tt='dung'] .duo-kq-o svg path { animation: none; stroke-dashoffset: 0; }
+[data-trong='hs'] .ht-app.ht2-lam.duo { overflow-x: clip; } /* tia bung ở ô sát mép không sinh cuộn ngang */

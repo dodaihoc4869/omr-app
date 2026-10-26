@@ -86,3 +86,40 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
     expect(screen.queryByRole('button', { name: 'Kiểm tra' })).toBeNull()
   })
 })
+
+describe('hiệu ứng đúng / sai kiểu Duolingo (thầy 26/10)', () => {
+  it('đúng ⇒ màn data-tt=dung, ô đúng data-ket=dung (nảy + tia), vệt sáng trên thanh; sai ⇒ data-tt=sai, ô em chọn data-ket=sai (lắc), thanh không tăng', async () => {
+    mo([C1, C2])
+    await screen.findByText(C1.text)
+    vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: false, answer: 'D', solution: LG1 })
+    fireEvent.click(screen.getByRole('radio', { name: /^B/ }))
+    fireEvent.click(kiemTra())
+    await screen.findByRole('heading', { name: 'Chưa đúng' })
+    const goc = document.querySelector('.ht2-lam.duo')!
+    expect(goc.getAttribute('data-tt')).toBe('sai')
+    expect(goc.querySelector('.ht2-lam-pa[data-ket="sai"]')!.textContent).toContain('8')
+    expect(goc.querySelector('.ht2-lam-pa[data-ket="dung"]')!.textContent).toContain('4')
+    expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('0') // sai: thanh không tăng
+    expect(goc.querySelector('.duo-loe')).toBeNull()
+    expect(goc.querySelector('.duo-kq-bi')).not.toBeNull() // khe linh vật
+    vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'B', solution: {} })
+    fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
+    await screen.findByText(C2.text)
+    expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('1') // sang câu sau mới nhích
+    fireEvent.click(screen.getByRole('radio', { name: /^B/ }))
+    fireEvent.click(kiemTra())
+    await screen.findByRole('heading', { name: 'Chính xác!' })
+    expect(goc.getAttribute('data-tt')).toBe('dung')
+    expect(goc.querySelector('.duo-loe')).not.toBeNull()
+    expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('2')
+  })
+  it('giảm chuyển động / máy yếu ⇒ không animation (chỉ đổi màu)', async () => {
+    const { readFileSync } = await import('node:fs')
+    const css = readFileSync('src/styles/trong-lam-bai.css', 'utf8')
+    const khoi = css.slice(css.indexOf('── 11. HIỆU ỨNG ĐÚNG / SAI'))
+    const giam = khoi.slice(khoi.indexOf('@media (prefers-reduced-motion: reduce)'))
+    expect(giam).toMatch(/\.ht2-lam-pa, \.ht2-lam-y, \.ht2-lam-o-hang\)[^{]*\{ animation: none !important/)
+    expect(giam).toMatch(/\.duo-hoa \{ display: none; \}/)
+    expect(khoi).toMatch(/\.may-yeu[^{]*\{ animation: none; \}/)
+  })
+})

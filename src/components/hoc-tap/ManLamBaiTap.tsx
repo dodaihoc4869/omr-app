@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, Trophy, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import type { TheCauProps } from '../TheCau'
@@ -331,8 +331,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     // một câu kiến thức cốt lõi hoặc lý do của phương án em chọn — lấy từ lời giải sẵn có, không có thì bỏ dòng) + «Lời giải từng bước» (tấm riêng,
     // không chen giữa màn) + «Tiếp tục». Đáp án vẫn chỉ về SAU khi bấm Kiểm tra (nopCau như cũ). Chuỗi đúng liền: số trình bày suy từ kết quả các câu
     // đã chấm trong chặng (sai/có hỗ trợ ⇒ về 0), không gửi máy chủ.
-    const daCham = cau.filter(c => ket[c.qid]).length
-    const pct = cau.length ? Math.round((100 * daCham) / cau.length) : 0
+    // Thanh tiến độ (thầy 26/10 «hiệu ứng như dolingo»): ĐÚNG ⇒ tăng ngay kèm vệt sáng; SAI ⇒ không tăng lúc hiện kết quả, chỉ nhích khi em sang câu sau.
+    const daCham = Math.min(cau.length, viTri + (k?.correct ? 1 : 0)) + (xong ? cau.length : 0)
+    const pct = cau.length ? Math.min(100, Math.round((100 * daCham) / cau.length)) : 0
     let chuoi = 0
     for (const c of cau) { const r = ket[c.qid]; if (!r) break; chuoi = r.correct && !r.assisted && !r.choThay && !r.hocCoHoTro && !r.omni?.luot ? chuoi + 1 : 0 }
     const pa = q?.phan === 'I' ? (q.choices as string[]) : []
@@ -362,6 +363,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       : !q ? null
       : k ? <section className="duo-day duo-ket" data-tt={tt} role="status" aria-live="polite"><div className="duo-giua">
           <div className="duo-kq">
+            <span className="duo-kq-bi" aria-hidden="true" />{/* khe linh vật (Bi) — cắm sau */}
             <span className="duo-kq-o" aria-hidden="true">{tt === 'dung' ? <Check size={30} strokeWidth={3} /> : tt === 'sai' ? <XIcon size={30} strokeWidth={3} /> : <BookOpen size={26} />}</span>
             <div className="duo-kq-chu">
               {tt === 'dung' ? <><h2>Chính xác!</h2>{cotLoi && <p><ChemText text={cotLoi} /></p>}</>
@@ -396,12 +398,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-xong={xong || undefined} data-tt={k ? tt : undefined}>
       {!xong && <header className="duo-tren">
         <button type="button" className="duo-dong" onClick={onVe} disabled={nop} aria-label="Lưu và về Hôm nay"><XIcon size={26} aria-hidden="true" /></button>
-        <div className="duo-thanh" role="progressbar" aria-label={q ? `Câu ${stt}/${cau.length}${chang ? ` của chặng ${chang}` : ''}` : 'Chặng học của em'} aria-valuemin={0} aria-valuemax={cau.length || 1} aria-valuenow={daCham}><i style={{ width: `${pct}%` }} /></div>
+        <div className="duo-thanh" role="progressbar" aria-label={q ? `Câu ${stt}/${cau.length}${chang ? ` của chặng ${chang}` : ''}` : 'Chặng học của em'} aria-valuemin={0} aria-valuemax={cau.length || 1} aria-valuenow={Math.min(daCham, cau.length)}><i style={{ width: `${pct}%` }}>{k?.correct && <span key={q?.qid} className="duo-loe" />}</i></div>
         <span className="duo-chuoi" data-co={chuoi > 0 || undefined} aria-label={`Chuỗi ${chuoi} câu đúng liền`}><Flame size={22} aria-hidden="true" />{chuoi}</span>
       </header>}
       <main className="duo-than" aria-live={xong ? 'polite' : undefined}>
         {tai ? <div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang chuẩn bị những câu phù hợp với em…</span></div>
         : xong ? <section className="duo-xong" aria-label="Kết quả chặng">
+            <div className="duo-hoa" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i } as CSSProperties} />)}</div>
             <div className="duo-huy" aria-hidden="true"><i /><i /><i /><i /><Trophy size={68} strokeWidth={1.8} /></div>
             <h1>{chang ? `Xong chặng ${chang}!` : 'Xong chặng học!'}</h1>
             {tenChuong && <p className="duo-xong-phu">{tenChuong}</p>}
