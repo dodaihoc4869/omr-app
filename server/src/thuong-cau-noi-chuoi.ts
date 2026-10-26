@@ -19,7 +19,7 @@ export const CHUA_TINH_BINH = '*'
 
 export interface CauNoiChuoi {
   /** Chuỗi ngày của em (bắt đầu SỚM, song song lượt đọc khác — không thêm vòng chờ). Cờ tắt / lỗi ⇒ null. Không bao giờ ném. */
-  docChuoiNgay(env: Env, sbd: string, nowMs: number): Promise<ChuoiNgay | null>
+  docChuoiNgay(env: Env, sbd: string, nowMs: number, thang?: boolean): Promise<ChuoiNgay | null>
   /** Cộng 1 bình giữ chuỗi (đã trừ tinh thể ở nơi gọi). `id` chống trùng. */
   congBinh(env: Env, sbd: string, id: string, nowMs: number): Promise<boolean>
   /** Ngày VN CÓ HỌC (định nghĩa B3) của các em trong [tu, den]. */
@@ -47,7 +47,7 @@ function docPhep(env: Env, ds: readonly string[], tu: string, den: string): Prom
 }
 
 const B3: CauNoiChuoi = {
-  docChuoiNgay: (env, sbd, nowMs) => chuoiBaiNeuBat(env, sbd, nowMs),
+  docChuoiNgay: (env, sbd, nowMs, thang) => chuoiBaiNeuBat(env, sbd, nowMs, env, !!thang),
   congBinh: (env, sbd, id, nowMs) => congBinh(env, sbd, 1, 'tinh_the', id, nowMs),
   async docNgayCoHoc(env, ds, tu, den) {
     if (!ds.length) return new Map()

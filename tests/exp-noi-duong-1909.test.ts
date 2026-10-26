@@ -45,12 +45,12 @@ describe('BTVN', () => {
     expect(r).toMatchObject({ ok: true, loDaXong: 1, suKien: 2 })
     // Xong lô trả nhanh; goiWorker đợi ctx.waitUntil, EXP được kiểm ở sổ sau hậu xử lý.
     expect(r.expNhan).toBeUndefined()
-    expect(b.sql.prepare('SELECT loai,exp FROM exp_so ORDER BY loai').all()).toEqual([{loai:'cau',exp:2},{loai:'lo',exp:10}])
-    expect(hoSo(b).earned).toBe(12)
+    expect(b.sql.prepare('SELECT loai,exp FROM exp_so ORDER BY loai').all()).toEqual([{loai:'cau',exp:2},{loai:'cau_sai',exp:2},{loai:'lo',exp:10}]) // thưởng phạt 26/10: sai nghiêm túc +2
+    expect(hoSo(b).earned).toBe(14)
     // Báo lại lô: không cộng thêm.
     const lai = await goiWorker(worker, b.env, '/btvn/xong-lo', { maBtvn: 'B1', sbd: 'S1', chiSo: 0, dapAn: { 'DE1-I-1': 'A', 'DE1-I-2': 'C' } })
     expect(lai.expNhan).toBeUndefined()
-    expect(hoSo(b).earned).toBe(12)
+    expect(hoSo(b).earned).toBe(14)
 
     const t = dung(false)
     seedBtvn(t)
@@ -72,12 +72,12 @@ describe('BTVN', () => {
     const dapAn = { 'DE1-I-1': 'A', 'DE1-I-2': 'C', 'DE1-II-1': 'DSDS', 'DE1-III-1': '0.39' }
     const r = await goiWorker(worker, d.env, '/btvn/nop', { maBtvn: 'B1', sbd: 'S1', dapAn })
     expect(r.ok).toBe(true)
-    expect(loai(r)).toEqual(['btvn', 'cau', 'cau', 'cau'])
-    expect(r.expNhan.reduce((t: number, x: any) => t + x.exp, 0)).toBe(15 + 2 + 3 + 4)
+    expect(loai(r)).toEqual(['btvn', 'cau', 'cau', 'cau', 'cau_sai']) // thưởng phạt 26/10: sai nghiêm túc +2
+    expect(r.expNhan.reduce((t: number, x: any) => t + x.exp, 0)).toBe(15 + 2 + 3 + 4 + 2)
     const lai = await goiWorker(worker, d.env, '/btvn/nop', { maBtvn: 'B1', sbd: 'S1', dapAn })
     expect(lai.daNhan).toBe(true) // đường gửi lại y hệt: trả kết quả cũ, không tính gì thêm
-    expect(d.dem('exp_so')).toBe(4)
-    expect(hoSo(d).earned).toBe(24)
+    expect(d.dem('exp_so')).toBe(5)
+    expect(hoSo(d).earned).toBe(26)
   })
 })
 
@@ -88,7 +88,7 @@ describe('khắc phục, bài Mẹ giao, luyện đề', () => {
       d.objects.set('phieu/PH1.json', { maCa: 'CA1', phieu: { cau: [{ id: 'DE1-I-1', dapAn: 'A', chuyenDe: 'ES', mucDo: '1 sao' }, { id: 'DE1-I-2', dapAn: 'B' }] } })
       const r = await nopKhacPhuc(d.env, { ma: 'PH1', sbd: 'S1', dapAn: { 'DE1-I-1': 'A', 'DE1-I-2': 'C' } })
       expect(r.ok).toBe(true)
-      if (co) expect(loai(r)).toEqual(['cau'])
+      if (co) expect(loai(r)).toEqual(['cau', 'cau_sai']) // thưởng phạt 26/10: sai nghiêm túc +2
       else expect('expNhan' in r).toBe(false)
     }
   })
@@ -100,7 +100,7 @@ describe('khắc phục, bài Mẹ giao, luyện đề', () => {
     await mom(d.env, 'start', { token, id: 'M1' })
     const r = await mom(d.env, 'submit', { token, id: 'M1', answers: { 'DE1-I-1': 'A', 'DE1-I-2': 'C' } })
     expect((r.item as { soCauDung: number }).soCauDung).toBe(1)
-    expect(loai(r)).toEqual(['cau', 'mom'])
+    expect(loai(r)).toEqual(['cau', 'cau_sai', 'mom']) // thưởng phạt 26/10: sai nghiêm túc +2
     await mom(d.env, 'create', { sbd: 'S1', id: 'M2', dsCau }, {noiBo:true})
     await mom(d.env, 'start', { token, id: 'M2' })
     const trong = await mom(d.env, 'submit', { token, id: 'M2', answers: {} })

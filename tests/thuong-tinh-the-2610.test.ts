@@ -74,7 +74,7 @@ describe('/hs/thuong + rương', () => {
     vang('S1', 40)
     d.sql.prepare("INSERT INTO thong_bao_thuong(em,ma,loai,du_lieu,luc) VALUES('S1','thang_hoa|x','thang_hoa','{\"mat\":5}','2026-10-26T00:00:00Z')").run()
     const r = await hsThuong(env, { token: token.S1 }, undefined, NOW)
-    expect(Object.keys(r).sort()).toEqual(['bat', 'chuoiNgay', 'cuoc', 'mucTieu', 'nguyenTuHomNay', 'nhiemVu', 'ok', 'ruong', 'thongBao', 'tinhThe'].sort())
+    expect(Object.keys(r).sort()).toEqual(['bat', 'chuoiNgay', 'cuoc', 'giai', 'mucTieu', 'nguyenTuHomNay', 'nhiemVu', 'ok', 'ruong', 'thongBao', 'tinhThe'].sort()) // giai: gộp đợt 3 (phần B)
     expect(r.bat).toEqual({ giai: true, thangHoa: true, banBe: true, kimCuong: true })
     expect(r.tinhThe).toBe(40)
     expect(r.mucTieu).toEqual({ daXong: 0, can: 1 })

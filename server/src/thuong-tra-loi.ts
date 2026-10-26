@@ -78,6 +78,15 @@ export interface RaThuongTraLoi {
   kimCuong?: { ongCon: number; xong?: boolean; dat?: boolean }
 }
 
+/** Dựng lại các dòng thưởng của một câu đã lưu gọn (đủ để gom nhóm kết bài). */
+function dongTuMuc(x: MucNt): { nhan: string; so: number }[] {
+  if (x.t !== 1) return []
+  if (x.d !== 1) return [{ nhan: 'Làm nghiêm túc', so: x.n }]
+  if (x.l === 1) return [{ nhan: 'Làm lại đúng', so: x.n }]
+  if (x.h === 1) return [{ nhan: 'Đúng có hỗ trợ', so: x.n }]
+  return nguyenTuCau({ dung: true, hoTro: false, khongTinh: false, cauKho: x.k === 1, chuoiTruoc: Math.max(0, x.c - 1) }).dong
+}
+
 /** Hàm thuần: nguyên tử câu này + (nếu là câu cuối) kết bài + trạng thái Kim cương. */
 export function tinhThuongTraLoi(v: VaoThuongTraLoi): RaThuongTraLoi {
   const ref = v.session.questions.find((x) => x.qid === v.qid)
@@ -111,15 +120,6 @@ export function tinhThuongTraLoi(v: VaoThuongTraLoi): RaThuongTraLoi {
   return ra
 }
 
-/** Dựng lại các dòng thưởng của một câu đã lưu gọn (đủ để gom nhóm kết bài). */
-function dongTuMuc(x: MucNt): { nhan: string; so: number }[] {
-  if (x.t !== 1) return []
-  if (x.d !== 1) return [{ nhan: 'Làm nghiêm túc', so: x.n }]
-  if (x.l === 1) return [{ nhan: 'Làm lại đúng', so: x.n }]
-  if (x.h === 1) return [{ nhan: 'Đúng có hỗ trợ', so: x.n }]
-  return nguyenTuCau({ dung: true, hoTro: false, khongTinh: false, cauKho: x.k === 1, chuoiTruoc: Math.max(0, x.c - 1) }).dong
-}
-
 /**
  * Các câu GHI/ĐỌC thêm vào CUỐI lô chấm (mọi câu ghi gác `EXISTS` bản chấm vừa chèn — bản chấm thua CAS thì không ghi gì). Câu CUỐI luôn là câu đọc mục tiêu
  * ngày khi bài vừa xong. Trả cả hàm đọc kết quả.
@@ -143,7 +143,7 @@ export function lenhThuongTraLoi(env: Env, x: { sbd: string; phien: string; rece
         lenh.push(env.DB.prepare(`INSERT OR IGNORE INTO huy_hieu_em(em, ma, ngay, du_lieu, luc) SELECT ?, ?, ?, ?, ? WHERE ${dk}`)
           .bind(sbd, `kc|${x.chuyenDe}`, ngay, JSON.stringify({ chuyenDe: x.chuyenDe }), luc, receipt))
         lenh.push(env.DB.prepare(`INSERT OR IGNORE INTO thong_bao_thuong(em, ma, loai, du_lieu, luc) SELECT ?, ?, 'huy_hieu', ?, ? WHERE ${dk}`)
-          .bind(sbd, `huy_hieu|kc|${x.chuyenDe}`, JSON.stringify({ ma: `kc|${x.chuyenDe}`, tinhThe: TT_KIM_CUONG }), luc, receipt))
+          .bind(sbd, `huy_hieu|kc|${x.chuyenDe}`, JSON.stringify({ ma: `kc|${x.chuyenDe}`, ten: 'Thử thách Kim cương', tinhThe: TT_KIM_CUONG }), luc, receipt))
       }
     } else {
       lenh.push(env.DB.prepare(`UPDATE kim_cuong_phien SET ong_con = ? WHERE id = ? AND em = ? AND ket_qua IS NULL AND ${dk}`).bind(kc.ongCon, phien, sbd, receipt))

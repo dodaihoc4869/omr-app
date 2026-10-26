@@ -22,6 +22,7 @@ import {
   type CongTac, type KhoaCongTac, type MauNhiemVu, type MaNhiemVu, type NhiemVuEm, type SoLieuNgay,
 } from './thuong-luat'
 import { CHUA_TINH_BINH, cauNoiChuoi, congBinhGiuChuoi } from './thuong-cau-noi-chuoi'
+import { tomTatGiaiEm } from './thuong-giai-tuan'
 
 /** Điều kiện SQL (một biểu thức, tham số `?`) AND vào câu ghi — đúng khi câu trước CÙNG lô vừa ghi. */
 export interface DieuKienSql { sql: string; tham: unknown[] }
@@ -147,6 +148,10 @@ function thuongChoTra(d: NgayEm): { khoa: string; so: number; maMon: string }[] 
   if (d.mucTieu.daXong >= d.mucTieu.can && d.mucTieu.daXong > 0 && !d.daTra.has(`tt|${d.ngay}|muc_tieu`)) ra.push({ khoa: `tt|${d.ngay}|muc_tieu`, so: TT_MUC_TIEU_NGAY, maMon: MA_TT.mucTieu })
   return ra
 }
+function lenhSinhNhiemVu(env: Env, sbd: string, ngay: string): D1PreparedStatement[] {
+  return chonNhiemVu(sbd, ngay).map((m, i) => env.DB.prepare('INSERT OR IGNORE INTO nhiem_vu_ngay(em, ngay, ma, thu_tu, ten, can, da, thuong) VALUES (?, ?, ?, ?, ?, ?, 0, ?)')
+    .bind(sbd, ngay, m.ma, i, m.ten, m.can, m.thuong))
+}
 function lenhTraThuongNgay(env: Env, sbd: string, d: NgayEm, luc: string): D1PreparedStatement[] {
   const lenh: D1PreparedStatement[] = thuongChoTra(d).map((k) => lenhCongTinhThe(env, sbd, { ...k, luc }))
   if (!d.daSinh) lenh.push(...lenhSinhNhiemVu(env, sbd, d.ngay))
@@ -155,10 +160,6 @@ function lenhTraThuongNgay(env: Env, sbd: string, d: NgayEm, luc: string): D1Pre
       .bind(n.tien, n.xong ? 1 : 0, luc, sbd, d.ngay, n.ma))
   }
   return lenh
-}
-function lenhSinhNhiemVu(env: Env, sbd: string, ngay: string): D1PreparedStatement[] {
-  return chonNhiemVu(sbd, ngay).map((m, i) => env.DB.prepare('INSERT OR IGNORE INTO nhiem_vu_ngay(em, ngay, ma, thu_tu, ten, can, da, thuong) VALUES (?, ?, ?, ?, ?, ?, 0, ?)')
-    .bind(sbd, ngay, m.ma, i, m.ten, m.can, m.thuong))
 }
 
 /** Đọc số liệu ngày của em (một lô). */
@@ -172,7 +173,9 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
   const { sbd: sbdKy, xong } = await gameIdentityHaiBuoc(env, b)
   const ngay = ngayVnTt(nowMs)
   // Chuỗi ngày (B3, 4 lượt đọc song song + cờ đệm) bắt đầu CÙNG đợt với lô đọc và lượt kiểm mật khẩu — không thêm vòng chờ nối tiếp.
-  const chuoiSom = cauNoiChuoi().docChuoiNgay(env, sbdKy, nowMs).catch(() => null)
+  const chuoiSom = cauNoiChuoi().docChuoiNgay(env, sbdKy, nowMs, true).catch(() => null)
+  // Tóm tắt giải tuần (phần B): MỘT batch riêng chạy CÙNG đợt (không thêm vòng chờ); tách lô để bảng giải chưa có / lỗi không làm hỏng tổng quan (⇒ null).
+  const giaiSom = tomTatGiaiEm(env, sbdKy, nowMs).catch(() => null)
   // MỘT lô đọc: công tắc · số liệu ngày (3 câu) · thông báo chưa xem · cược đang chạy.
   const lo = env.DB.batch([
     lenhDocCongTac(env),
@@ -182,7 +185,7 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
   ])
   lo.catch(() => {})
   const sbd = await xong
-  const [kq, chuoiNgay] = await Promise.all([lo, chuoiSom])
+  const [kq, chuoiNgay, giai] = await Promise.all([lo, chuoiSom, giaiSom])
   const congTac = congTacTuDong((kq[0]?.results ?? []) as Dong[] as { khoa: unknown; gia_tri: unknown }[])
   const d = phanTichNgay(sbd, ngay, kq.slice(1, 4))
   const choTra = thuongChoTra(d)
@@ -201,6 +204,8 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
     chuoiNgay,
     nhiemVu: d.nhiemVu,
     ruong: { mo: d.ruongMo, thuong: TT_RUONG },
+    // Khối `giai` (phần B, tomTatGiaiEm): {hang, thuHang, soNguoi, hetHanGiay} | null (công tắc tắt / em chưa vào bảng tuần này) ⇒ giao diện ẩn thẻ.
+    giai,
     thongBao: ((kq[4]?.results ?? []) as Dong[]).map((r) => ({ ma: chu(r.ma), loai: chu(r.loai), duLieu: docJson<unknown>(r.du_lieu, {}) })),
     // CHỈ-THÊM ngoài hợp đồng §4.4: cược đang chạy (để màn ẩn nút «Cược» khi đã có một lượt).
     cuoc: cuoc ? { dat: so(cuoc.dat), tuNgay: chu(cuoc.tu_ngay), denNgay: chu(cuoc.den_ngay) } : null,

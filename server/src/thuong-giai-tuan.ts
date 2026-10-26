@@ -269,30 +269,6 @@ let daChotTrongIsolate = ''
 export const xoaNhoGiai = (): void => { daChotTrongIsolate = '' }
 const NHOM_MOI_LUOT = 10
 
-/**
- * Cron mỗi phút (nhánh không phải 00:01): (1) chốt tuần trước khi đã qua thứ Hai 00:05 VN và chưa chốt (theo lô 10 nhóm/lượt, idempotent);
- * (2) tuần trước đã chốt ⇒ xếp nhóm cho em đang chờ của tuần này (≤ 200 em/lượt). Công tắc tắt ⇒ một câu đọc rồi về.
- * Trả mô tả để ghi log.
- */
-export async function cronGiaiTuan(env: Env, nowMs: number = Date.now(), caoDiem = false): Promise<Row> {
-  const tuan = tuanCua(nowMs)
-  const tuanTruoc = themNgay(tuan, -7)
-  if (daChotTrongIsolate === tuanTruoc) {
-    if (caoDiem && new Date(nowMs).getUTCMinutes() % 5 !== 0) return { chay: false, lyDo: 'cao_diem' }
-    const [rCt] = await env.DB.batch([sqlCongTac(env)])
-    if (!docCongTacTuDong(rCt?.results as Row[]).giai) return { chay: false, lyDo: 'tat' }
-    return { chay: true, xep: await xepNhomCho(env, tuan) }
-  }
-  const [rCt, rChot] = await env.DB.batch([sqlCongTac(env), env.DB.prepare(SQL_CHOT)])
-  if (!docCongTacTuDong(rCt?.results as Row[]).giai) return { chay: false, lyDo: 'tat' }
-  if (str((rChot?.results as Row[])?.[0]?.gia_tri) >= tuanTruoc) {
-    daChotTrongIsolate = tuanTruoc
-    return { chay: true, xep: await xepNhomCho(env, tuan) }
-  }
-  if (nowMs < batDauTuanMs(tuan) + 5 * 60_000) return { chay: false, lyDo: 'chua_toi_gio' }
-  return { chay: true, chot: await chotTuan(env, tuanTruoc, tuan, nowMs) }
-}
-
 const SQL_NHOM_CHUA_CHOT = "SELECT DISTINCT nhom FROM giai_tuan WHERE tuan = ?1 AND chot_luc IS NULL AND nhom NOT IN ('', '-') ORDER BY nhom LIMIT ?2"
 const SQL_THANH_VIEN_CHOT = `SELECT g.em AS em, g.hang AS hang, g.nhom AS nhom, g.nguyen_tu AS nguyen_tu, g.nguyen_tu_ho_tro AS ho_tro, g.vao_luc AS vao_luc, d.bac AS bac
   FROM giai_tuan g LEFT JOIN danh_gia_em_tuan d ON d.sbd = g.em AND d.tuan = g.tuan
@@ -340,6 +316,30 @@ export async function chotTuan(env: Env, tuanChot: string, tuanMoi: string, nowM
   }
   await ghiBangPhanA(env, phanA, 'cuoi_tuan')
   return { soNhom: theoNhom.size, soLen, soRoi }
+}
+
+/**
+ * Cron mỗi phút (nhánh không phải 00:01): (1) chốt tuần trước khi đã qua thứ Hai 00:05 VN và chưa chốt (theo lô 10 nhóm/lượt, idempotent);
+ * (2) tuần trước đã chốt ⇒ xếp nhóm cho em đang chờ của tuần này (≤ 200 em/lượt). Công tắc tắt ⇒ một câu đọc rồi về.
+ * Trả mô tả để ghi log.
+ */
+export async function cronGiaiTuan(env: Env, nowMs: number = Date.now(), caoDiem = false): Promise<Row> {
+  const tuan = tuanCua(nowMs)
+  const tuanTruoc = themNgay(tuan, -7)
+  if (daChotTrongIsolate === tuanTruoc) {
+    if (caoDiem && new Date(nowMs).getUTCMinutes() % 5 !== 0) return { chay: false, lyDo: 'cao_diem' }
+    const [rCt] = await env.DB.batch([sqlCongTac(env)])
+    if (!docCongTacTuDong(rCt?.results as Row[]).giai) return { chay: false, lyDo: 'tat' }
+    return { chay: true, xep: await xepNhomCho(env, tuan) }
+  }
+  const [rCt, rChot] = await env.DB.batch([sqlCongTac(env), env.DB.prepare(SQL_CHOT)])
+  if (!docCongTacTuDong(rCt?.results as Row[]).giai) return { chay: false, lyDo: 'tat' }
+  if (str((rChot?.results as Row[])?.[0]?.gia_tri) >= tuanTruoc) {
+    daChotTrongIsolate = tuanTruoc
+    return { chay: true, xep: await xepNhomCho(env, tuan) }
+  }
+  if (nowMs < batDauTuanMs(tuan) + 5 * 60_000) return { chay: false, lyDo: 'chua_toi_gio' }
+  return { chay: true, chot: await chotTuan(env, tuanTruoc, tuan, nowMs) }
 }
 
 export { HANG }

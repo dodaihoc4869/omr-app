@@ -181,6 +181,30 @@ async function chuanBiGhi(env: Env, b: Row): Promise<{ loi: Row } | { em: string
   return { em, ban, cap: rCap?.[0] ?? null, demEm: num(rDem?.[0]?.n), demBan: num(rDemBan?.[0]?.n), dongYEm: num(rDy?.[0]?.n), dongYBan: num(rDyBan?.[0]?.n) }
 }
 
+/** `POST /hs/ban/tra-loi {token, ma, dongY}` — trả lời lời mời của bạn `ma`. Chống lặp: chỉ đổi khi cặp đang 'cho' và người mời là bạn. */
+export async function hsBanTraLoi(env: Env, b: Row, nowMs: number = Date.now()): Promise<Row> {
+  const c = await chuanBiGhi(env, b)
+  if ('loi' in c) return c.loi
+  const { em, ban, cap } = c
+  const sbdBan = str(ban.sbd)
+  const [a, bb] = capDoi(em, sbdBan)
+  if (str(cap?.trang_thai) === 'dong_y') return { ok: true, trangThai: 'ban' }
+  if (str(cap?.trang_thai) !== 'cho' || str(cap?.nguoi_moi) !== sbdBan) return { ok: false, error: 'Lời mời này không còn nữa.' }
+  const luc = new Date(nowMs).toISOString()
+  if (b.dongY !== true) {
+    await env.DB.prepare("UPDATE ban_hoc SET trang_thai = 'tu_choi', cap_nhat_luc = ? WHERE em_a = ? AND em_b = ? AND trang_thai = 'cho' AND nguoi_moi = ?").bind(luc, a, bb, sbdBan).run()
+    return { ok: true, trangThai: null }
+  }
+  if (c.dongYEm >= TOI_DA_BAN) return { ok: false, error: `Em đã có đủ ${TOI_DA_BAN} bạn học cùng.` }
+  if (c.dongYBan >= TOI_DA_BAN) return { ok: false, error: 'Bạn ấy đã đủ bạn học cùng rồi.' }
+  const homNay = ngayVn(nowMs)
+  // Chuỗi đôi bắt đầu từ HÔM NAY (ngay_tinh = hôm qua). `moc_da` giữ nguyên: thôi rồi kết bạn lại không nhận lại thưởng mốc cũ.
+  await env.DB.prepare(
+    "UPDATE ban_hoc SET trang_thai = 'dong_y', tu_ngay = ?, chuoi_doi = 0, ngay_tinh = ?, cap_nhat_luc = ? WHERE em_a = ? AND em_b = ? AND trang_thai = 'cho' AND nguoi_moi = ?",
+  ).bind(homNay, themNgay(homNay, -1), luc, a, bb, sbdBan).run()
+  return { ok: true, trangThai: 'ban' }
+}
+
 /** `POST /hs/ban/moi {token, ma}` — mời bạn. Bạn đã mời em trước ⇒ thành bạn luôn. Chống lặp: CAS theo trạng thái cặp. */
 export async function hsBanMoi(env: Env, b: Row, nowMs: number = Date.now()): Promise<Row> {
   const c = await chuanBiGhi(env, b)
@@ -205,30 +229,6 @@ export async function hsBanMoi(env: Env, b: Row, nowMs: number = Date.now()): Pr
     await ghiBangPhanA(env, [cauThongBao(env, `moi_ban|${a}|${bb}|${luc}`, sbdBan, 'moi_ban', { ma: maCongKhai(toi?.rid), ten: tenRutGon(toi?.ho_ten), lop: str(toi?.lop) }, luc)], 'moi_ban')
   }
   return { ok: true, trangThai: 'da_moi' }
-}
-
-/** `POST /hs/ban/tra-loi {token, ma, dongY}` — trả lời lời mời của bạn `ma`. Chống lặp: chỉ đổi khi cặp đang 'cho' và người mời là bạn. */
-export async function hsBanTraLoi(env: Env, b: Row, nowMs: number = Date.now()): Promise<Row> {
-  const c = await chuanBiGhi(env, b)
-  if ('loi' in c) return c.loi
-  const { em, ban, cap } = c
-  const sbdBan = str(ban.sbd)
-  const [a, bb] = capDoi(em, sbdBan)
-  if (str(cap?.trang_thai) === 'dong_y') return { ok: true, trangThai: 'ban' }
-  if (str(cap?.trang_thai) !== 'cho' || str(cap?.nguoi_moi) !== sbdBan) return { ok: false, error: 'Lời mời này không còn nữa.' }
-  const luc = new Date(nowMs).toISOString()
-  if (b.dongY !== true) {
-    await env.DB.prepare("UPDATE ban_hoc SET trang_thai = 'tu_choi', cap_nhat_luc = ? WHERE em_a = ? AND em_b = ? AND trang_thai = 'cho' AND nguoi_moi = ?").bind(luc, a, bb, sbdBan).run()
-    return { ok: true, trangThai: null }
-  }
-  if (c.dongYEm >= TOI_DA_BAN) return { ok: false, error: `Em đã có đủ ${TOI_DA_BAN} bạn học cùng.` }
-  if (c.dongYBan >= TOI_DA_BAN) return { ok: false, error: 'Bạn ấy đã đủ bạn học cùng rồi.' }
-  const homNay = ngayVn(nowMs)
-  // Chuỗi đôi bắt đầu từ HÔM NAY (ngay_tinh = hôm qua). `moc_da` giữ nguyên: thôi rồi kết bạn lại không nhận lại thưởng mốc cũ.
-  await env.DB.prepare(
-    "UPDATE ban_hoc SET trang_thai = 'dong_y', tu_ngay = ?, chuoi_doi = 0, ngay_tinh = ?, cap_nhat_luc = ? WHERE em_a = ? AND em_b = ? AND trang_thai = 'cho' AND nguoi_moi = ?",
-  ).bind(homNay, themNgay(homNay, -1), luc, a, bb, sbdBan).run()
-  return { ok: true, trangThai: 'ban' }
 }
 
 /** `POST /hs/ban/go-cua {token, ma}` — gõ cửa nhắc bạn: 1 lần/ngày/bạn (khoá chính). `moi` = true khi lần gõ này vừa được ghi. */
