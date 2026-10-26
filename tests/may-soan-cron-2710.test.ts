@@ -186,6 +186,15 @@ describe('tự hãm', () => {
       ? tra({ ok: true, xong: false, conTro: '', dem: { loi_goi: 3 }, ketQua: [1, 2, 3].map((i) => ({ qid: `q${i}`, ket: 'loi_goi', lyDo: 'HTTP 429 Resource exhausted', lanThu: 2 })) })
       : tra({ ok: true, xong: false, conTro: 'DE|q9', dem: { dat: 1, loi_goi: 1 }, ketQua: [{ qid: 'a', ket: 'dat', lanThu: 1 }, { qid: 'b', ket: 'loi_goi', lyDo: 'HTTP 429', lanThu: 2 }] }))
     let t = NGOAI_CAO_DIEM
+    // 27/10 TỰ CO GIÃN: quá tải ⇒ chia đôi số câu song song, KHÔNG đếm lỗi, lượt sau chạy ngay (24 → 12 → 6 → 3 → 2)
+    for (const ss of [12, 6, 3, 2]) {
+      t += 60_000
+      await chayMaySoanCron(env, t, { soanLo: s.fn })
+      expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 0, nghi_den: 0 })
+      expect(JSON.parse(String(trangThai().dem_json)).song_song_hien).toBe(ss)
+    }
+    expect(s.goi.map((g) => g.songSong)).toEqual([24, 12, 6, 3])
+    // ở mức thấp nhất mà vẫn quá tải ⇒ mới đếm lỗi như cũ
     for (let i = 1; i <= 2; i++) { t += 60_000; await chayMaySoanCron(env, t, { soanLo: s.fn }); expect(trangThai()).toMatchObject({ so_loi_lien_tiep: i, nghi_den: 0 }) }
     t += 60_000
     expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: true })
@@ -204,6 +213,23 @@ describe('tự hãm', () => {
     kieu = 'tot'
     await chayMaySoanCron(env, t, { soanLo: s.fn })
     expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 0, ly_do: null, con_tro: 'DE|q9' })
+    // lượt êm (không 429) ⇒ tăng dần +4 tới trần 24
+    const em = soanGia(() => tra({ ok: true, xong: false, conTro: 'DE|q9', dem: { dat: 1 }, ketQua: [{ qid: 'a', ket: 'dat', lanThu: 1 }] }))
+    const ds: number[] = []
+    for (let i = 0; i < 7; i++) { t += 60_000; await chayMaySoanCron(env, t, { soanLo: em.fn }); ds.push(JSON.parse(String(trangThai().dem_json)).song_song_hien) }
+    expect(ds).toEqual([6, 10, 14, 18, 22, 24, 24])
+  })
+
+  it('27/10: hết giờ nghỉ cũ (bộ đếm 3, chưa có song_song_hien) mà lượt đầu lại quá tải ⇒ hạ còn 12, KHÔNG nghỉ tiếp', async () => {
+    datCo({ bat: true })
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: {}, ketQua: [] })).fn })
+    d.sql.prepare("UPDATE may_soan_trang_thai SET so_loi_lien_tiep = 3, nghi_den = ?, dem_json = '{\"dat\":37}' WHERE id = 1").run(NGOAI_CAO_DIEM + 60_000)
+    const s = soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: { loi_goi: 2 }, ketQua: [1, 2].map((i) => ({ qid: `q${i}`, ket: 'loi_goi', lyDo: 'HTTP 429', lanThu: 2 })) }))
+    const t = NGOAI_CAO_DIEM + 120_000
+    expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: false })
+    expect(s.goi[0]!.songSong).toBe(24)
+    expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 0 })
+    expect(JSON.parse(String(trangThai().dem_json))).toMatchObject({ dat: 37, song_song_hien: 12 })
   })
 
   it('máy soạn trả 503 (vd chưa có khoá) hoặc ném lỗi ⇒ đếm lỗi, nhả khoá, không ném ra ngoài', async () => {
