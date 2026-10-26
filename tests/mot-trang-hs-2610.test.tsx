@@ -27,8 +27,9 @@ describe('Hôm nay «Một trang»', () => {
     expect(within(viecChinh()).getByText('Còn 18 câu để đủ mức')).toBeTruthy()
     const dong = within(sauDo()!).getAllByRole('button')
     expect(dong).toHaveLength(3)
-    expect(dong[0]!.textContent).toMatch(/^2Tự sửa lỗiCâu em làm sai5 câu/)
-    expect(dong[1]!.textContent).toMatch(/^3Kiểm tra ôn tập/)
+    // Thứ tự thầy 26/10: học → Kiểm tra ôn tập (nếu có) → Tự sửa lỗi → Bài tập về nhà.
+    expect(dong[0]!.textContent).toMatch(/^2Kiểm tra ôn tập/)
+    expect(dong[1]!.textContent).toMatch(/^3Tự sửa lỗiCâu em làm sai5 câu/)
     expect(dong[2]!.textContent).toMatch(/^4Bài tập về nhàThầy đang giao1 bài/)
     expect(within(sauDo()!).getByText('28 câu · khoảng 50 phút · hạn nộp 24:00')).toBeTruthy()
   })
@@ -51,6 +52,15 @@ describe('Hôm nay «Một trang»', () => {
     expect(onChua).toHaveBeenCalledOnce()
     expect(onHoc).toHaveBeenCalledOnce()
     expect(within(sauDo()!).queryByText('Tự sửa lỗi')).toBeNull()
+  })
+
+  it('đủ mức + còn Kiểm tra ôn tập phải làm ⇒ kiểm tra tự lên số 1, Tự sửa lỗi ở dòng 2 (thầy 26/10)', () => {
+    const onKiemTra = vi.fn()
+    render(<MotTrangHs {...goc({ so: { daLam: 30, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'], kiem: { ...KIEM, homNay: true, trangThai: 'can_lam', nopLuc: null }, onKiemTra })} />)
+    expect(within(viecChinh()).getByText('Kiểm tra ôn tập')).toBeTruthy()
+    fireEvent.click(within(viecChinh()).getByRole('button', { name: /bài kiểm tra|Làm tiếp/ }))
+    expect(onKiemTra).toHaveBeenCalledOnce()
+    expect(within(sauDo()!).getAllByRole('button')[0]!.textContent).toMatch(/^2Tự sửa lỗi/)
   })
 
   it('ngày chỉ có Kiểm tra ôn tập ⇒ thẻ kiểm tra là việc số 1, không dòng nào khác', () => {

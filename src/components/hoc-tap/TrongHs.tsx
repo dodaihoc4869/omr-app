@@ -89,10 +89,11 @@ export function MotTrangHs(p: PropsMotTrang) {
     so: p.soBaiTap ? <>{p.soBaiTap}<small> bài</small></> : undefined, hinh: <BookOpen size={20} />, sac: 'chu-y', onClick: p.onBaiTap } : null
 
   // Ngày kiểm tra không kèm học (ngayKiem): như Hôm nay cũ, thẻ kiểm tra thay cả khối học ⇒ nó là việc số 1, không dòng nào khác.
-  const chinh = p.coCa ? 'ca' : p.ngayKiem ? 'kiem' : du && hSua ? 'sua' : du && p.soBaiTap ? 'bt' : 'hoc'
-  const sau = (chinh === 'ca' ? (p.ngayKiem ? [hKiem] : [hHoc, hSua, hKiem, hBt]) : chinh === 'kiem' ? []
-    : chinh === 'sua' ? [hKiem, hBt] : chinh === 'bt' ? [hKiem] : [hSua, hKiem, hBt]).filter((h): h is Hang => !!h).slice(0, 3)
-  const hocThem = (chinh === 'sua' || chinh === 'bt') && !p.khoaHoc
+  // Thứ tự việc (thầy 26/10): học đủ mức ⇒ Kiểm tra ôn tập (nếu đang phải làm) tự lên số 1 ⇒ rồi Tự sửa lỗi ⇒ rồi Bài tập về nhà.
+  const chinh = p.coCa ? 'ca' : p.ngayKiem ? 'kiem' : du && kiemLam ? 'kiem' : du && hSua ? 'sua' : du && p.soBaiTap ? 'bt' : 'hoc'
+  const sau = (chinh === 'ca' ? (p.ngayKiem ? [hKiem] : [hHoc, hKiem, hSua, hBt]) : chinh === 'kiem' ? (p.ngayKiem ? [] : [hSua, hBt])
+    : chinh === 'sua' ? [hKiem, hBt] : chinh === 'bt' ? [hKiem] : [hKiem, hSua, hBt]).filter((h): h is Hang => !!h).slice(0, 3)
+  const hocThem = (chinh === 'sua' || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc
   const vongDu = so && <Vong da={so.daLam} tong={so.muc} nhan="câu hôm nay" du />
   const chipDu = <span className="tr-chip" data-sac="dung"><Check size={14} strokeWidth={3} aria-hidden="true" />Đủ mức hôm nay</span>
   const chipChuoi = chuoi > 0 && <span className="tr-chip" data-sac="sao"><Flame size={14} aria-hidden="true" />Chuỗi {chuoi} ngày</span>
