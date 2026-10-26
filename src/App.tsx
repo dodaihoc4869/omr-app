@@ -1,8 +1,8 @@
 import BatLinhShell from './components/bat-linh/BatLinhShell'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState, type ComponentType } from 'react'
 import { Plus } from 'lucide-react'
 import BottomNav from './components/BottomNav'
-import ThanhBenTrai, { MAN_AN_KHI_HOA2, MAN_CHI_HOA2, MAN_DAU_HOA2 } from './components/ThanhBenTrai'
+import ThanhBenTrai, { MAN_AN_KHI_HOA2, MAN_CHI_HOA2, MAN_DAU_HOA2, MUC_DIEU_HUONG, MUC_HOA2_CHINH, MUC_HOA2_DAY, type MucDieuHuong } from './components/ThanhBenTrai'
 import { chonBat, useCoHoa2 } from './components/chien-dich/co-hoa2'
 import Toast from './components/Toast'
 import { useAppStore } from './store/appStore'
@@ -101,6 +101,12 @@ const ChienDichScreen = lazy(() => import('./screens/ChienDichScreen'))
 const DuyetLoiGiaiScreen = lazy(() => import('./screens/DuyetLoiGiaiScreen'))
 const BanGoNutThatScreen = lazy(() => import('./screens/BanGoNutThatScreen'))
 const ThiDuaTuanScreen = lazy(() => import('./screens/ThiDuaTuanScreen')) // thưởng phạt 26/10
+/** Màn một-thành-phần (không bọc thêm gì) theo mã màn — gộp từ chuỗi `screen === … && <…/>` (26/10, bù byte mục «Thi đua tuần»: cùng màn, ít mã hơn). */
+const MAN_DON: Partial<Record<string, ComponentType>> = {
+  classlist: ClassListScreen, examhub: ExamHubScreen, examsetup: ExamSetupScreen, nganhangde: NganHangDeScreen, examtake: ExamTakeScreen, exammonitor: ExamMonitorScreen,
+  hocsinh: HocSinhScreen, toancanh: ToanCanhEmScreen, giaobtvn: GiaoBtvnScreen, goilenbang: GoiLenBangScreen, cauhoi: CauHoiScreen, caidat: CaiDatScreen,
+  khodegiao: GiaoDeTheoTuanScreen, tongquan: GvHomNayScreen, chiendich: ChienDichScreen, duyetloigiai: DuyetLoiGiaiScreen, bangonutthat: BanGoNutThatScreen, thidua: ThiDuaTuanScreen,
+}
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
@@ -141,6 +147,8 @@ if (typeof document !== 'undefined' && document.documentElement.dataset.trong ==
 // bài tập được trong lúc app học sinh mới chưa xong. Nó không có mục nào trên
 // menu — chỉ mở được bằng đúng link mời.
 /** Tên màn để câu báo lỗi nói đúng chỗ ("Màn Mở ca kiểm tra gặp lỗi"). */
+// 26/10: màn có mục trên thanh bên lấy ĐÚNG tên mục (MUC_DIEU_HUONG / MUC_HOA2_*: Ca kiểm tra, Học sinh, Gọi lên bảng, Giao bài tập về nhà, Học sinh hỏi,
+// Giao đề theo tuần, Cài đặt, Thi đua tuần…) — bảng dưới chỉ giữ màn KHÔNG có mục hoặc mang tên khác tên mục.
 const TEN_MAN: Record<string, string> = {
   classlist: 'Danh sách lớp',
   examhub: 'Kiên trì',
@@ -148,23 +156,18 @@ const TEN_MAN: Record<string, string> = {
   nganhangde: 'Ngân hàng câu hỏi',
   examtake: 'Làm bài',
   exammonitor: 'Theo dõi ca',
-  lichsuca: 'Ca kiểm tra',
-  hocsinh: 'Học sinh',
   toancanh: 'Toàn cảnh một em',
-  goilenbang: 'Gọi lên bảng',
-  giaobtvn: 'Giao bài tập về nhà',
-  cauhoi: 'Học sinh hỏi',
-  khodegiao: 'Giao đề theo tuần',
-  caidat: 'Cài đặt',
   duyetloigiai: 'Duyệt lời giải',
   bangonutthat: 'Bàn gỡ nút thắt',
-  thidua: 'Thi đua tuần',
 }
 
 /** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Ngân hàng" → "Kho đề".
  *  09/10 (bản vẽ tối giản thầy chốt): `tongquan` → "Hôm nay", `chiendich` → "Hành trình".
  *  Trung tu 09/10: mục "Chữa trên lớp" đã gộp vào Hành trình › Cần thầy chữa ⇒ màn `goilenbang` mang tên "Cần thầy chữa" (bảng từ chuẩn). */
-const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Cần thầy chữa', nganhangde: 'Kho đề', tongquan: 'Hôm nay', chiendich: 'Hành trình' }
+const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Cần thầy chữa' }
+const tenMucCua = (ds: readonly MucDieuHuong[], s: string) => ds.find((m) => m.id === s)?.ten
+/** Tên màn cho câu báo lỗi: 2.0 ⇒ tên riêng 2.0 / tên mục 2.0 (Kho đề, Hôm nay, Hành trình…) trước; rồi bảng TEN_MAN; rồi tên mục thanh bên cũ. */
+const tenManLoi = (s: string, hoa2: boolean) => (hoa2 && (TEN_MAN_HOA2[s] || tenMucCua(MUC_HOA2_CHINH, s) || tenMucCua(MUC_HOA2_DAY, s))) || TEN_MAN[s] || tenMucCua(MUC_DIEU_HUONG, s)
 
 /** Chờ mảnh màn (2.0): khung xương đúng hình một màn thầy — tiêu đề + dòng phụ + hai thẻ (thang chung `.tt-xuong`), không chữ "Đang mở…". */
 const KhungXuongMan = () => (
@@ -243,6 +246,7 @@ function App() {
   // Màn đã bỏ khi 2.0 bật (Kiên trì `examhub`, Giao BTVN, Học sinh hỏi, Giao đề theo tuần) ⇒ về màn đầu 2.0 (Hôm nay), không dựng màn cũ lấy một nhịp.
   // Ngược lại: cờ TẮT mà đang ở màn chỉ 2.0 mới có (Hôm nay 2.0 `tongquan`, Hành trình `chiendich`) ⇒ về Hôm nay của app cũ.
   const anKhiHoa2 = laVoThay && ((hoa2 && MAN_AN_KHI_HOA2.includes(screen)) || (!hoa2 && MAN_CHI_HOA2.includes(screen)))
+  const ManDon = MAN_DON[screen]
   useEffect(() => {
     if (anKhiHoa2) setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')
   }, [anKhiHoa2, hoa2, setScreen])
@@ -470,14 +474,9 @@ function App() {
           `screen` để lỗi cũ không dính lại khi thầy sang màn khác.
           GAME HÓA 2.0: màn đã bỏ thì KHÔNG dựng (kể cả một nhịp) — hiệu ứng ở trên đưa về Tổng quan ngay. */}
       {!anKhiHoa2 && (
-      <ChanLoi key={screen} o={(hoa2 && TEN_MAN_HOA2[screen]) || TEN_MAN[screen]} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
+      <ChanLoi key={screen} o={tenManLoi(screen, hoa2)} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
         <Suspense fallback={hoa2 ? <KhungXuongMan /> : <div className="chu-cho-tre" style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
-        {screen === 'classlist' && <ClassListScreen />}
-        {screen === 'examhub' && <ExamHubScreen />}
-        {screen === 'examsetup' && <ExamSetupScreen />}
-        {screen === 'nganhangde' && <NganHangDeScreen />}
-        {screen === 'examtake' && <ExamTakeScreen />}
-        {screen === 'exammonitor' && <ExamMonitorScreen />}
+        {ManDon && <ManDon />}
         {screen === 'lichsuca' &&
           (hoa2 ? (
             // 09/10 (bản vẽ tối giản thầy chốt): thanh bên bỏ nút riêng "Mở ca kiểm tra" — mở ca nằm TRONG màn Ca kiểm tra: nút ở góc phải đầu màn
@@ -492,18 +491,6 @@ function App() {
           ) : (
             <LichSuCaScreen />
           ))}
-        {screen === 'hocsinh' && <HocSinhScreen />}
-        {screen === 'toancanh' && <ToanCanhEmScreen />}
-        {screen === 'giaobtvn' && <GiaoBtvnScreen />}
-        {screen === 'goilenbang' && <GoiLenBangScreen />}
-        {screen === 'cauhoi' && <CauHoiScreen />}
-        {screen === 'caidat' && <CaiDatScreen />}
-        {screen === 'khodegiao' && <GiaoDeTheoTuanScreen />}
-        {screen === 'tongquan' && <GvHomNayScreen />}
-        {screen === 'chiendich' && <ChienDichScreen />}
-        {screen === 'duyetloigiai' && <DuyetLoiGiaiScreen />}
-        {screen === 'bangonutthat' && <BanGoNutThatScreen />}
-        {screen === 'thidua' && <ThiDuaTuanScreen />}
         </Suspense>
       </ChanLoi>
       )}

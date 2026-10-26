@@ -66,6 +66,33 @@ export function lyDoCach(bc: BaoCaoTuanCon): string {
 }
 
 const Cho = ({ cao }: { cao: number }) => <div className="pd-cho tt-xuong" style={{ height: cao }} aria-hidden="true" />
+function TuanNay({ t }: { t: TuanCon }) {
+  const ti = t.tiLeHocThat
+  const o = [
+    t.chuoi !== null && <div key="c"><span>Chuỗi ngày</span><b>{t.chuoi}<small>ngày</small></b></div>,
+    t.soBai !== null && <div key="b"><span>Số bài</span><b>{t.soBai}<small>bài</small></b></div>,
+    t.hang && <div key="g"><span>Giải tuần</span><b><HuyHieuGiai kl={t.hang.kl} co={22} />{t.hang.thuHang ?? TEN_KL[t.hang.kl]}{t.hang.thuHang && t.hang.soNguoi ? <small>/{t.hang.soNguoi}</small> : null}</b></div>,
+  ].filter(Boolean)
+  return (
+    <section className="pd-the g-tuan" aria-label="Tuần này của con" data-vung="tuan-nay">
+      <p className="pd-nhan">Tuần này của con</p>
+      {o.length > 0 && <div className="pd-ba-so" data-n={o.length}>{o}</div>}
+      {t.hang && <p className="pd-ly" data-vung="cau-giai">{cauGiai(t.hang)}</p>}
+      {ti !== null && (
+        <div className="pd-ht" data-vung="ti-le-hoc-that">
+          <p className="pd-ht-so"><b>{Math.round(ti * 100)}%</b><span>nguyên tử tuần này là học thật</span></p>
+          <div className="pd-ht-thanh" role="img" aria-label={`${Math.round(ti * 100)}% học thật, ${100 - Math.round(ti * 100)}% từ câu làm vội, không tính vào giải`}>
+            <i style={{ flex: ti || 0.001 }} /><i style={{ flex: 1 - ti || 0.001 }} />
+          </div>
+          {ti < 1 && <span className="pd-ht-phu">Phần còn lại từ câu làm vội, không tính vào giải.</span>}
+        </div>
+      )}
+      {t.hocCung.length > 0 && (
+        <p className="pd-ban" data-vung="hoc-cung"><span>Đang học cùng:</span>{t.hocCung.map((b, i) => <span key={i} className="pd-ban-1"><span className="pd-av" data-k={i} aria-hidden="true">{chuCai(b.ten)}</span><b>{b.ten}</b>{b.lop && ` ${b.lop}`}</span>)}</p>
+      )}
+    </section>
+  )
+}
 
 export default function DocPh(p: DocPhProps) {
   const { v, sbd } = p
@@ -182,33 +209,6 @@ export function cauGiai(h: NonNullable<TuanCon['hang']>): string {
   return `Đang ở ${ten}${o}.${sau}`
 }
 const chuCai = (ten: string) => ten.replace(/\(.*?\)/g, '').trim().split(/\s+/).slice(-2).map((x) => x[0] ?? '').join('').toUpperCase()
-function TuanNay({ t }: { t: TuanCon }) {
-  const ti = t.tiLeHocThat
-  const o = [
-    t.chuoi !== null && <div key="c"><span>Chuỗi ngày</span><b>{t.chuoi}<small>ngày</small></b></div>,
-    t.soBai !== null && <div key="b"><span>Số bài</span><b>{t.soBai}<small>bài</small></b></div>,
-    t.hang && <div key="g"><span>Giải tuần</span><b><HuyHieuGiai kl={t.hang.kl} co={22} />{t.hang.thuHang ?? TEN_KL[t.hang.kl]}{t.hang.thuHang && t.hang.soNguoi ? <small>/{t.hang.soNguoi}</small> : null}</b></div>,
-  ].filter(Boolean)
-  return (
-    <section className="pd-the g-tuan" aria-label="Tuần này của con" data-vung="tuan-nay">
-      <p className="pd-nhan">Tuần này của con</p>
-      {o.length > 0 && <div className="pd-ba-so" data-n={o.length}>{o}</div>}
-      {t.hang && <p className="pd-ly" data-vung="cau-giai">{cauGiai(t.hang)}</p>}
-      {ti !== null && (
-        <div className="pd-ht" data-vung="ti-le-hoc-that">
-          <p className="pd-ht-so"><b>{Math.round(ti * 100)}%</b><span>nguyên tử tuần này là học thật</span></p>
-          <div className="pd-ht-thanh" role="img" aria-label={`${Math.round(ti * 100)}% học thật, ${100 - Math.round(ti * 100)}% từ câu làm vội, không tính vào giải`}>
-            <i style={{ flex: ti || 0.001 }} /><i style={{ flex: 1 - ti || 0.001 }} />
-          </div>
-          {ti < 1 && <span className="pd-ht-phu">Phần còn lại từ câu làm vội, không tính vào giải.</span>}
-        </div>
-      )}
-      {t.hocCung.length > 0 && (
-        <p className="pd-ban" data-vung="hoc-cung"><span>Đang học cùng:</span>{t.hocCung.map((b, i) => <span key={i} className="pd-ban-1"><span className="pd-av" data-k={i} aria-hidden="true">{chuCai(b.ten)}</span><b>{b.ten}</b>{b.lop && ` ${b.lop}`}</span>)}</p>
-      )}
-    </section>
-  )
-}
 
 // ---------------------------------------------------------------- 2 · 7 ngày qua ----------------------------------------------------------------
 function BayNgay({ p }: PT) {

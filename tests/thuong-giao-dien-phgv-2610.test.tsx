@@ -204,8 +204,11 @@ describe('nối vào app thầy + tờ kiểu', () => {
   it('App: một dòng lazy + TEN_MAN + dựng màn; vite: mảnh ngoài precache', () => {
     const app = doc('src/App.tsx')
     expect(app).toContain("const ThiDuaTuanScreen = lazy(() => import('./screens/ThiDuaTuanScreen'))")
-    expect(app).toContain("thidua: 'Thi đua tuần'")
-    expect(app).toContain("{screen === 'thidua' && <ThiDuaTuanScreen />}")
+    // gộp 26/10 (bù byte /gv): tên màn cho câu báo lỗi lấy từ mục thanh bên (MUC_THI_DUA), màn dựng qua bảng MAN_DON
+    expect(doc('src/components/ThanhBenTrai.tsx')).toContain("id: 'thidua', ten: 'Thi đua tuần'")
+    expect(app).toContain('tenMucCua(MUC_HOA2_DAY, s)')
+    expect(app).toContain('thidua: ThiDuaTuanScreen')
+    expect(app).toContain('{ManDon && <ManDon />}')
     expect(doc('vite.config.ts')).toContain("'**/{ThiDuaTuanScreen,thi-dua-tuan-api,HuyHieuGiai}-*.{js,css}'")
   })
   it('CSS: PH dưới [data-trong=ph] trong doc-ph.css (ph-v3.css không đụng); thầy «Trong» dưới [data-trong=\'gv\']; không mã màu thô', () => {

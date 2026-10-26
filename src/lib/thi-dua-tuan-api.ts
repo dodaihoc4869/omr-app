@@ -110,6 +110,16 @@ async function goi(duong: string, body?: O): Promise<KetQuaLenh<O>> {
   }
 }
 
+// ---- bản gần nhất trên máy (vẽ ngay khi mở màn, rồi cập nhật) ----
+const KHOA_NHO = 'ddh.thuongGv.'
+export function nhoGhi(k: string, v: unknown) {
+  try {
+    globalThis.localStorage?.setItem(KHOA_NHO + k, JSON.stringify(v))
+  } catch {
+    /* máy chặn bộ nhớ: chỉ mất tiện lợi */
+  }
+}
+
 export async function layThiDuaTuan(lop: string): Promise<KetQuaLenh<ThiDuaTuan>> {
   const r = await goi(`/gv/thi-dua-tuan?lop=${encodeURIComponent(lop)}`)
   if (!r.ok) return r
@@ -133,21 +143,11 @@ export async function datCongTac(khoa: KhoaCongTac, bat: boolean, cu: CongTac): 
   nhoGhi('ct', c)
   return { ok: true, du: c }
 }
-
-// ---- bản gần nhất trên máy (vẽ ngay khi mở màn, rồi cập nhật) ----
-const KHOA_NHO = 'ddh.thuongGv.'
 export function nhoDoc<T>(k: string): T | null {
   try {
     const s = globalThis.localStorage?.getItem(KHOA_NHO + k)
     return s ? (JSON.parse(s) as T) : null
   } catch {
     return null
-  }
-}
-export function nhoGhi(k: string, v: unknown) {
-  try {
-    globalThis.localStorage?.setItem(KHOA_NHO + k, JSON.stringify(v))
-  } catch {
-    /* máy chặn bộ nhớ: chỉ mất tiện lợi */
   }
 }
