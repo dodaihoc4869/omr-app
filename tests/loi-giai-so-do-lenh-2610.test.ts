@@ -177,6 +177,9 @@ describe('/quan-tri/soan-so-do-lo', () => {
     expect(thuong.status).toBe(403)
     const thay = await worker.fetch(new Request('https://test/quan-tri/soan-so-do-lo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ secret: 'bi-mat-thu' }) }), d.env)
     expect(thay.status).not.toBe(403) // qua cổng thầy; máy soạn thật (làn D) tự trả lỗi khi thiếu khoá mô hình
+    // Workflow soan-so-do-2610.yml gửi mã ở HEADER `x-ma-bi-mat` (thân không có `secret`) ⇒ cũng qua cổng.
+    const quaHeader = await worker.fetch(new Request('https://test/quan-tri/soan-so-do-lo', { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': 'bi-mat-thu' }, body: JSON.stringify({ thuKhong: true, gioiHan: 1 }) }), d.env)
+    expect(quaHeader.status).not.toBe(403)
   })
 })
 
