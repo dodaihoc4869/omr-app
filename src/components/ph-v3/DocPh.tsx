@@ -5,7 +5,7 @@
 // BẬT khi <html data-trong="ph"> (main.tsx); lùi một máy: localStorage `ddh.trong`='tat' ⇒ AppPhuHuynh vẽ trang cũ, KHÔNG tải tệp này.
 // SỐ — CHỈ lệnh sẵn có, KHÔNG bịa: lúc mở AppPhuHuynh đã nạp /ph/tat-ca-ve-con · /ph/con-tong-quan (7 ngày, đúng/sai hôm nay, câu sai) · /ph/nhip-hoc
 // (nhóm, bậc chăm) · /ph/loi-thay · /ph/hoc-2 · cảnh báo của thầy; tệp này gọi thêm /ph/bao-cao-tuan (Học thật / Đối phó + số câu/lần `mucLam`) SONG SONG
-// lúc mở. Số nào chưa có ⇒ nhãn + «—» hoặc bỏ dòng. Không cắt chữ (thẻ cao theo nội dung, thiếu chỗ thì trang cuộn); ngoại lệ: Lời thầy ≤ 3 dòng ở điện thoại.
+// lúc mở. Số nào chưa có ⇒ nhãn + «—» hoặc bỏ dòng. Không cắt chữ (thẻ cao theo nội dung, thiếu chỗ thì trang cuộn) — kể cả Lời thầy (kiểm định 26/10).
 // MÀU: doc-ph.css (chỉ biến PH sẵn có).
 import { useEffect, useState, type ReactElement, type ReactNode } from 'react'
 import { AnhLogo } from '../LogoVai'

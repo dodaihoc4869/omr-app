@@ -527,6 +527,9 @@ function ManLam13() {
   return h('div', { className: 'fixed inset-0 z-50 overflow-y-auto' }, h(ManLamBaiTap, { token: 'tk', sbd: '12121212', onVe: noop, onCapNhat: () => datHomNay(soHomNayLam13()), onChua: noop, homNay }))
 }
 // ═══ DUO 26/10: `lam13&lam=duo` — phiên học sinh giả trên máy (nút Hỏi thầy / Lời giải từng bước chỉ hiện khi có phiên; lệnh hỏi thầy đi bộ giả chung).
+// ═══ KIỂM GD MỚI 26/10: `lam13&lam=duo-xau` (dữ liệu xấu, gia/lam-bai-1210d.ts) cũng có phiên học sinh giả như `duo`.
+if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
+// ═══ hết KIỂM GD MỚI 26/10
 if (LA_LAM13 && thamSo.get('lam') === 'duo') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ DUO APP 26/10: app thật nạp TrongHs (kèm phông Nunito + hiệu ứng Lộ trình, styles/trong-hs.css) ngay lúc mở cổng ⇒ màn làm chặng luôn có phông ấy;
 // trang chụp mở thẳng màn làm chặng nên nạp tờ đó tại đây cho giống app thật.

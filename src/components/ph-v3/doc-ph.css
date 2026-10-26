@@ -1,7 +1,7 @@
 /* APP PHỤ HUYNH «CHỈ ĐỌC» (thầy chốt bản vẽ 26/10: ve-moi/ph-doc-*.html + ph-doc.css). Chỉ nạp cùng DocPh.tsx (khi <html data-trong="ph">), mọi bộ
  * chọn bắt đầu bằng [data-trong=ph]. MÀU: CHỈ biến sẵn có của app phụ huynh — bảng --ph3-* (nền, mặt, viền, chữ, xanh lá = đủ/đúng, hồng = sai/không
  * làm, hổ phách = chưa đủ) + cam logo phụ huynh --ph-cam / --ph-cam-nen (màu chính: cột Hôm nay) + --ph3-tren-xl (chữ trên nền đậm). KHÔNG nạp trong.css.
- * KHÔNG CẮT CHỮ: thẻ cao theo nội dung, thiếu chỗ thì trang cuộn (ngoại lệ: Lời thầy tối đa 3 dòng ở điện thoại dọc).
+ * KHÔNG CẮT CHỮ (thầy 26/10, không ngoại lệ): thẻ cao theo nội dung, thiếu chỗ thì trang cuộn — Lời thầy hiện đủ ở mọi khổ.
  * Khổ: điện thoại dọc (một cột) · điện thoại ngang ≤ 900 × ≤ 520 (hai cột; bỏ dòng tên và dòng buổi học/hôm qua; Lời thầy + lý do nhận định LUÔN
  * hiện — phiên chính 26/10: phụ huynh luôn phải đọc được lời thầy; trang ngang cuộn nhẹ được) · máy tính ≥ 901 (hai cột). */
 [data-trong=ph] .pd { min-height: 100dvh; background: var(--ph3-nen); color: var(--ph3-chu); }
@@ -55,7 +55,7 @@
 [data-trong=ph] .pd-7 .c[data-tt=khong] i { height: 4px; background: var(--ph3-ho); }
 [data-trong=ph] .pd-7 .c[data-tt=nay] i { min-height: 4px; background: color-mix(in srgb, var(--ph3-xl) 35%, var(--ph3-mat-2)); outline: 2px solid var(--ph-cam); outline-offset: 1px; }
 [data-trong=ph] .pd-7 .c[data-tt=nay][data-khong] i { background: var(--ph3-mat-2); }
-[data-trong=ph] .pd-7 .c small { height: 18px; font-size: 11.5px; line-height: 18px; color: var(--ph3-chu-3); white-space: nowrap; }
+[data-trong=ph] .pd-7 .c small { height: 18px; font-size: 12px; line-height: 18px; color: var(--ph3-chu-3); white-space: nowrap; }
 [data-trong=ph] .pd-7 .c[data-tt=nay] small { color: var(--ph-cam); font-weight: 600; }
 [data-trong=ph] .pd-chu-giai { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; font-size: 12px; color: var(--ph3-chu-3); }
 [data-trong=ph] .pd-chu-giai span { display: inline-flex; align-items: center; gap: 5px; }
@@ -130,23 +130,22 @@
   [data-trong=ph] .pd-dong { gap: 2px 12px; font-size: 13px; }
   [data-trong=ph] .pd-7 { --cao: 52px; }
   [data-trong=ph] .pd-7 .c b { font-size: 12px; }
-  [data-trong=ph] .pd-7 .c small { font-size: 11px; }
   [data-trong=ph] .pd-chu-giai { display: none; }
   [data-trong=ph] .pd-thang span { min-height: 36px; }
   [data-trong=ph] .pd-ly { font-size: 13px; }
   [data-trong=ph] .pd-cach { padding: 8px 10px; }
   [data-trong=ph] .pd-cach b { font-size: 14px; }
   [data-trong=ph] .pd-cach span { font-size: 12.5px; }
-  /* Lời thầy: nhãn và lời trên một hàng; lời tối đa 3 dòng rồi «…» (ngoại lệ duy nhất của luật không cắt chữ) */
+  /* Lời thầy: nhãn và lời trên một hàng; lời hiện ĐỦ (kiểm định 26/10: bỏ cắt 3 dòng — luật mới không cắt chữ) */
   [data-trong=ph] .g-loi { flex-direction: row; align-items: baseline; gap: 10px; }
   [data-trong=ph] .g-loi .pd-nhan { flex: none; }
   [data-trong=ph] .g-loi .pd-phai { display: none; }
   [data-trong=ph] .pd-loi, [data-trong=ph] .pd-rong { font-size: 13.5px; }
-  [data-trong=ph] .pd-loi { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   [data-trong=ph] .pd-loi-canh { display: flex; padding: 6px 10px; }
 }
 /* điện thoại ngang: hai cột gọn, bỏ dòng tên và dòng buổi học/hôm qua; Lời thầy dưới 7 ngày qua, lý do nhận định vẫn hiện */
-@media (max-width: 900px) and (max-height: 520px) {
+/* (min-width 601: khung 390×390 — bàn phím mở / chia đôi màn — là điện thoại DỌC thấp, không phải ngang: hai cột ở 390px ép Lời thầy còn 43px, nhãn chồng nhau) */
+@media (max-width: 900px) and (max-height: 520px) and (min-width: 601px) {
   [data-trong=ph] .pd-dau .pd-khung { min-height: 44px; padding-top: 0; padding-bottom: 0; }
   [data-trong=ph] .pd-khung { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
   [data-trong=ph] .pd-than { gap: 8px; padding-top: 8px; padding-bottom: 8px; }
@@ -169,3 +168,10 @@
 /* thẻ lỗi tải (LoiThe, lớp .tvc-loi) — kiểu của trang cũ nay nạp lười cùng TrangVeCon (26/10) ⇒ màn chỉ đọc tự mang kiểu y như cũ */
 [data-trong=ph] .pd .tvc-loi { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px; border-radius: var(--r-vua); border: 1px solid var(--ph3-vien); }
 [data-trong=ph] .pd .tvc-loi p { flex: 1 1 200px; min-width: 0; font-size: var(--t-than); overflow-wrap: anywhere; }
+/* KIỂM ĐỊNH 26/10: thẻ 7 ngày hẹp (phóng chữ 125% ở 390px = khung 312px, máy 320px): nhãn «Hôm nay» rộng hơn cột ⇒ chồng nhãn ngày bên cạnh. Khung
+ * < 338px (thẻ < 310px): nhãn ngày xuống được hai dòng (hàng nhãn cao 30px cho cả bảy cột; vạch mức tính theo hàng nhãn mới). */
+@media (max-width: 337px) {
+  [data-trong=ph] .pd-7::before { bottom: calc(30px + 4px + var(--cao) * 100 / 115); }
+  [data-trong=ph] .pd-7 .c { height: calc(var(--cao) + 56px); }
+  [data-trong=ph] .pd-7 .c small { display: flex; align-items: flex-start; justify-content: center; height: 30px; line-height: 15px; white-space: normal; text-align: center; }
+}

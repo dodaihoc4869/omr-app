@@ -671,3 +671,45 @@
 }
 [data-trong='hs'].may-yeu :is(.duo :is(.duo-cot-de, .duo-cot-tra) > *, .duo-combo, .duo-phan-tu circle, .duo-thanh > i b, .duo-thanh > i::before, .duo-3 > div, .duo-tinh i, .duo-tinh svg, .duo-hoan-hao, .duo-muc em, .duo-tick path) { animation: none !important; }
 [data-trong='hs'].may-yeu .duo-tick path { stroke-dashoffset: 0; }
+/* ── 15. KIỂM ĐỊNH GIAO DIỆN MỚI 26/10 (gộp sau mục 10–14 của nhánh duo-app) (thầy: «không lỗi đè chữ hay tràn trang … giao diện chuẩn chỉ»; luật: KHÔNG cắt chữ — thẻ cao theo nội dung,
+ * thiếu chỗ thì trang cuộn). Đo bằng scripts/soat-chu-chen + scripts/kiem-gd-moi trên cảnh `kgd-` (dữ liệu xấu) ở 13 khổ × sáng/tối. ── */
+/* lưới 2×2: phương án 9–22 kí tự (công thức C6H5NH3Cl, tên IUPAC) trong khung hẹp bị bẻ giữa chừng «CH3CH2 / CH2CH2C / H2NH2» ⇒ khung hẹp về một cột */
+[data-trong] .duo .duo-tra[data-luoi] { container-type: inline-size; }
+@container (max-width: 559px) { [data-trong] .duo .duo-tra[data-pa] .ht2-lam-tn { grid-template-columns: minmax(0, 1fr); } }
+@container (max-width: 699px) { [data-trong] .duo .duo-tra[data-pa=dai] .ht2-lam-tn { grid-template-columns: minmax(0, 1fr); } }
+/* phương án mờ sau khi kiểm tra: chữ cái A–D đủ tương phản (2,75 ⇒ ≥ 4,5) */
+[data-trong] .duo .ht2-lam-pa[data-ket=mo] .ht2-lam-pa-ma { color: var(--tr-chu-2); }
+/* màn xong chặng: số lớn («1239/2400» câu hôm nay) bị cắt trong ô 3 số ⇒ cỡ số co theo ô, biểu tượng xuống trên số khi chật */
+[data-trong] .duo-3 > div { container-type: inline-size; }
+[data-trong] .duo-3 b { flex-wrap: wrap; row-gap: 2px; padding: 6px 4px; font-size: clamp(13px, 14cqi, 22px); line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+/* nhãn ô số ≤ 380px: 11px ⇒ dưới chuẩn 12px — giữ 12px, bớt giãn chữ; nhãn dài xuống hai dòng (không cắt) */
+@media (max-width: 380px) { [data-trong] .duo-3 p { font-size: 12px; letter-spacing: 0; line-height: 1.25; } }
+/* tấm kết quả (đáy ghim) cao hơn khung — khung thấp 390×390 (bàn phím, chia đôi màn), phóng chữ 125%, lý do dài: tấm che cả thanh trên và phần đầu tấm
+ * («Chưa đúng», đáp án) nằm ngoài khung, không cuộn tới được; 360×640 tấm che 70% màn. Tấm tối đa 58% khung (đề vẫn thấy phía trên); phần chữ cuộn
+ * TRONG tấm (không cắt), «Lời giải từng bước» · «Hỏi thầy» · «Tiếp tục» luôn thấy. */
+[data-trong] .duo-ket { display: flex; flex-direction: column; max-height: 58dvh; }
+[data-trong] .duo-ket > .duo-giua { flex: 0 1 auto; min-height: 0; }
+[data-trong] .duo-ket .duo-kq { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+@media (orientation: landscape) and (max-height: 500px) { [data-trong] .duo-ket { max-height: none; } }
+/* tên bài/dạng ở nhãn đầu câu có công thức (C5H13N, HCl, NaOH): viết HOA làm sai công thức («HCL», «NAOH») ⇒ giữ nguyên hoa/thường, chỉ số dưới đúng */
+[data-trong] .duo-nhan [data-cong-thuc] { text-transform: none; letter-spacing: 0; }
+/* «1 · 3 · 7 ngày» không bẻ dòng giữa chừng (dòng mở đầu bằng «·» ở 360px) */
+[data-trong] .duo-lien-chu { white-space: nowrap; }
+/* NGANG + MÁY TÍNH (thầy 26/10: «chú ý tối ưu cho giao diện xoay ngang và máy tính»). Hai khối móc .duo-cot-de (nhãn · đề · gợi ý) | .duo-cot-tra (chọn
+ * cách · phương án · bàn phím số · hình cuối). Mặc định display:contents ⇒ y như một cột. Điện thoại ngang thấp: LUÔN hai cột (một cột 720px bắt cuộn
+ * qua cả đề mới tới phương án); máy tính ≥ 1100px: hai cột khi đề dài / có hình / có bảng (đề ngắn giữ cột giữa như bản vẽ). Nút «Kiểm tra» / tấm kết
+ * quả nằm thẳng dưới cột trả lời. Ý Đúng/Sai: cặp nút đứng cạnh ý khi cột trả lời rộng ≥ 560px (bớt nửa chiều cao). */
+[data-trong] .duo-cot-de, [data-trong] .duo-cot-tra { display: contents; }
+[data-trong] .duo .duo-tra { container-type: inline-size; }
+@container (min-width: 560px) {
+  [data-trong] .duo .ht2-lam-ds .ht2-lam-y:not([data-ket]) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 20px; }
+  [data-trong] .duo .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut { align-self: center; }
+}
+/* Điện thoại ngang thấp: hai cột đề | trả lời + tấm kết quả cột phải đã có ở mục 13 (lưới trên .ht2-lam.duo, đề ghim cột trái) — không chồng thêm lưới thứ hai. */
+@media (min-width: 1100px) and (min-height: 501px) {
+  [data-trong] .duo:has(.duo-than[data-de-dai]) :is(.duo-tren, .duo-than, .duo-giua) { max-width: 1160px; }
+  [data-trong] .duo-than[data-de-dai]:has(> .duo-cot-de) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: start; align-content: start; }
+  [data-trong] .duo-than[data-de-dai] > :is(.duo-cot-de, .duo-cot-tra) { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  [data-trong] .duo:has(.duo-than[data-de-dai]) .duo-day > .duo-giua { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
+  [data-trong] .duo:has(.duo-than[data-de-dai]) .duo-day > .duo-giua > * { grid-column: 2; }
+}
