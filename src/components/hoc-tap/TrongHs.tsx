@@ -2,7 +2,7 @@
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
-import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
+import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Vibrate, Volume2, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './TheHomNayEm'
 import { chuViecTiep, nhipTheoSanh, TEN_NHOM_NHIP } from '../../lib/nhip-hoc-em'
@@ -249,6 +249,16 @@ function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<
  *  «Một trang» (bản vẽ hs-mot-trang-menu, 26/10): khối Điểm danh đứng đầu (KhoiDiemDanh); buổi đang mở mà em chưa điểm danh ⇒ vạch thò thẻ chàm dọc
  *  «Điểm danh» (bấm ⇒ menu mở, tiêu điểm vào ô mã); mã QR gửi xong / gửi hỏng ⇒ menu tự mở cho em thấy kết quả. Mục «A.I Đỗ Đại Học» dưới 4 mục chính mở
  *  ĐÚNG tấm chat của BongBongAiDdh (sự kiện `ddh:mo-ai`; mục chỉ hiện khi kênh bật — `<html data-ai-ddh>`). */
+/** Công tắc phản hồi ở menu (thầy 26/10): «Âm thanh» / «Rung» Bật–Tắt — chỉ đọc/ghi localStorage ('ddh.am' / 'ddh.rung' = 'tat' khi tắt); tiếng và rung
+ *  ở mảnh màn luyện tự đọc khoá này (không kéo am-thanh / rung vào nhóm mở app). Mặc định bật. */
+function CongTac({ khoa, ten, Icon }: { khoa: 'ddh.am' | 'ddh.rung'; ten: string; Icon: LucideIcon }) {
+  const [bat, setBat] = useState(() => { try { return localStorage.getItem(khoa) !== 'tat' } catch { return true } })
+  return <button type="button" role="switch" aria-checked={bat} className="tr-menu-muc tr-menu-cong" onClick={() => {
+    const v = !bat
+    setBat(v)
+    try { if (v) localStorage.removeItem(khoa); else localStorage.setItem(khoa, 'tat') } catch { /* máy chặn lưu: chỉ đổi trong phiên này */ }
+  }}><Icon size={20} aria-hidden="true" />{ten}<span className="tr-cong" data-bat={bat || undefined} aria-hidden="true">{bat ? 'Bật' : 'Tắt'}</span></button>
+}
 /** Ba mục menu kiểu Duolingo (bản vẽ dm-4, thầy chốt 26/10) — cùng id mục của cổng: Lộ trình = Hôm nay (+ Hành trình) · Luyện tập = Ôn & sửa · Thành tích = Kết quả. */
 const MENU_DUO = [{ id: 'hom-nay', ten: 'Lộ trình', icon: Route }, { id: 'on-lai', ten: 'Luyện tập', icon: Wrench }, { id: 'ket-qua', ten: 'Thành tích', icon: Trophy }] as const
 export function MenuDocTrong(p: {
@@ -287,6 +297,8 @@ export function MenuDocTrong(p: {
       {!p.coCa && <button type="button" className="tr-menu-muc" onClick={() => { dong(true); p.onThi() }}><ClipboardCheck size={20} aria-hidden="true" />Vào ca kiểm tra</button>}
       {p.thongBao && <div className="tr-menu-muc tr-menu-tb" onClickCapture={(e) => { if ((e.target as Element).closest?.('.m3-tb-chuong')) dong(false) }}>{p.thongBao}<span aria-hidden="true">Thông báo</span></div>}
       <button type="button" className="tr-menu-muc" onClick={() => { dong(true); p.onTaiLai() }} disabled={p.dangTai}><RefreshCw size={20} aria-hidden="true" />Cập nhật bài học</button>
+      <CongTac khoa="ddh.am" ten="Âm thanh" Icon={Volume2} />
+      <CongTac khoa="ddh.rung" ten="Rung" Icon={Vibrate} />
       <button ref={p.nutCuaEm} type="button" className="tr-menu-muc" onClick={() => { dong(false); p.onCuaEm() }} aria-haspopup="dialog" aria-expanded={p.moCuaEm}><span className="tr-menu-anh" aria-hidden="true">{p.chuDau}</span>Của em</button>
     </nav>
   </>

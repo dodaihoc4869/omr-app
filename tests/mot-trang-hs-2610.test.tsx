@@ -133,6 +133,20 @@ describe('Menu dọc «Một trang»: Điểm danh đầu menu, A.I Đỗ Đại
     expect(await screen.findByText('Chưa có buổi học nào đang mở')).toBeTruthy()
   })
 
+  it('menu 3 mục Lộ trình · Luyện tập · Thành tích; công tắc «Âm thanh» / «Rung» ghi localStorage ddh.am / ddh.rung (mặc định Bật)', () => {
+    vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
+    menu({ moDiemDanh: false })
+    const nav = screen.getByRole('navigation', { name: 'Điều hướng học sinh' })
+    expect(['Lộ trình', 'Luyện tập', 'Thành tích'].every((t) => within(nav).getByRole('button', { name: t }))).toBe(true)
+    const am = screen.getByRole('switch', { name: /Âm thanh/ }), ru = screen.getByRole('switch', { name: /Rung/ })
+    expect(am.getAttribute('aria-checked')).toBe('true')
+    fireEvent.click(am); fireEvent.click(ru)
+    expect(localStorage.getItem('ddh.am')).toBe('tat'); expect(localStorage.getItem('ddh.rung')).toBe('tat')
+    fireEvent.click(am)
+    expect(localStorage.getItem('ddh.am')).toBeNull()
+    localStorage.clear()
+  })
+
   it('mục A.I Đỗ Đại Học bắn sự kiện mở ĐÚNG tấm chat của BongBongAiDdh', () => {
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
     const nghe = vi.fn()
