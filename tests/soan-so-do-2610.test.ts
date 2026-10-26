@@ -117,7 +117,7 @@ describe('soạn lô', () => {
     expect(mh.fn).toHaveBeenCalledTimes(1)
     expect(cong).toHaveBeenCalledWith(expect.objectContaining({ qid: Q.III }), { phan: 'III', dapAn: '76,8', luaChon: [] })
     const r = dongSoDo(Q.III)!
-    expect(r).toMatchObject({ ket: 'dat', version: `ver-${Q.III}`, ma_de: DE, so_lan: 1 })
+    expect(r).toMatchObject({ cong: 'dat', version: `ver-${Q.III}`, ma_de: DE, so_lan: 1 })
     const ban = JSON.parse(String(r.ban_json)) as BanSoDo
     expect(ban.qid).toBe(Q.III)
     expect(ban.phienBan).toBeGreaterThanOrEqual(1)
@@ -160,14 +160,14 @@ describe('soạn lô', () => {
     expect(thuLai.map((l) => l.vai)).toEqual(['user', 'model', 'user'])
     expect(thuLai[2]!.chu).toContain('tích ra 70 khác 76,8')
     expect(j.dem.lech).toBe(1)
-    expect(dongSoDo(Q.III)).toMatchObject({ ket: 'lech', so_lan: 2, ly_do: 'tích ra 70 khác 76,8', gia_tri: '70' })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lech', so_lan: 2, ly_do: 'tích ra 70 khác 76,8', gia_tri: '70' })
   })
 
   it('lệch rồi thử lại đạt ⇒ lưu `dat`', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia((_b, n) => (n === 1 ? 'lech' : 'dat')) })
     expect(j.dem.dat).toBe(1)
-    expect(dongSoDo(Q.III)).toMatchObject({ ket: 'dat', so_lan: 2 })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat', so_lan: 2 })
   })
 
   it('lộ đáp án ⇒ lưu `lo_dap_an`, không thử lại', async () => {
@@ -175,14 +175,14 @@ describe('soạn lô', () => {
     const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'lo_dap_an') })
     expect(mh.fn).toHaveBeenCalledTimes(1)
     expect(j.dem.lo_dap_an).toBe(1)
-    expect(dongSoDo(Q.III)).toMatchObject({ ket: 'lo_dap_an' })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lo_dap_an' })
   })
 
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III, Q.I], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
     expect(j.dem.dat).toBe(2)
-    expect(coBang()).toBe(false)
+    expect(coBang() ? dongSoDo(Q.III) : undefined).toBeUndefined() // bảng có thể đã có sẵn từ migration; thuKhong không được ghi dòng nào
     expect(sqlChay.some((s) => /^\s*(INSERT|UPDATE|DELETE|REPLACE|CREATE|ALTER|DROP)\b/i.test(s))).toBe(false)
     expect((j.ban as { qid: string }[]).map((b) => b.qid).sort()).toEqual([Q.III, Q.I].sort())
   })
@@ -212,14 +212,14 @@ describe('soạn lô', () => {
     expect(lai.j.dem.bo_qua).toBe(1)
     expect(mh.fn).toHaveBeenCalledTimes(1)
     await goiLo({ qids: [Q.III], lamLai: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'lech') })
-    expect(dongSoDo(Q.III)).toMatchObject({ ket: 'dat' })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat' })
   })
 
   const gieoDong = (qid: string, ket: string, phienBan: number, ban: string) => {
     d.sql.exec(`CREATE TABLE IF NOT EXISTS loi_giai_so_do (qid TEXT PRIMARY KEY, ma_de TEXT NOT NULL, version TEXT NOT NULL, phien_ban INTEGER NOT NULL,
-      ban_json TEXT NOT NULL, ket TEXT NOT NULL, ly_do TEXT, gia_tri TEXT, so_lan INTEGER NOT NULL DEFAULT 1, model TEXT,
+      ban_json TEXT NOT NULL, cong TEXT NOT NULL, ly_do TEXT, gia_tri TEXT, so_lan INTEGER NOT NULL DEFAULT 1, model TEXT,
       token_vao INTEGER NOT NULL DEFAULT 0, token_ra INTEGER NOT NULL DEFAULT 0, tao_luc TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL)`)
-    d.sql.prepare("INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, ket, tao_luc, cap_nhat_luc) VALUES (?, ?, ?, ?, ?, ?, 'cu', 'cu')")
+    d.sql.prepare("INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, cong, tao_luc, cap_nhat_luc) VALUES (?, ?, ?, ?, ?, ?, 'cu', 'cu')")
       .run(qid, DE, `ver-${qid}`, phienBan, ban, ket)
   }
 
@@ -229,7 +229,7 @@ describe('soạn lô', () => {
     const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'lech') })
     expect(mh.fn).toHaveBeenCalledTimes(2) // đã soạn lại (không bị bỏ qua)
     expect(j.dem.lech).toBe(1)
-    expect(dongSoDo(Q.III)).toMatchObject({ ket: 'dat', ban_json: '{"cu":1}', phien_ban: 0, cap_nhat_luc: 'cu' })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat', ban_json: '{"cu":1}', phien_ban: 0, cap_nhat_luc: 'cu' })
   })
 
   it('bản lời dặn mới ⇒ câu `lech` cũ soạn lại đạt thì được thay', async () => {
@@ -237,7 +237,7 @@ describe('soạn lô', () => {
     const mh = moHinhGia((h) => chuMau(h))
     await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
     const r = dongSoDo(Q.III)!
-    expect(r).toMatchObject({ ket: 'dat', tao_luc: 'cu' })
+    expect(r).toMatchObject({ cong: 'dat', tao_luc: 'cu' })
     expect(JSON.parse(String(r.ban_json)).qid).toBe(Q.III)
     expect(Number(r.phien_ban)).toBeGreaterThanOrEqual(1)
   })
@@ -247,7 +247,7 @@ describe('soạn lô', () => {
     d.sql.prepare('UPDATE loi_giai_so_do SET version = ? WHERE qid = ?').run('ver-cu', Q.III)
     const mh = moHinhGia((h) => chuMau(h))
     await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'lech') })
-    expect(dongSoDo(Q.III)).toMatchObject({ ket: 'lech', version: `ver-${Q.III}` })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lech', version: `ver-${Q.III}` })
   })
 
   it('con trỏ: lượt 1 soạn 1 câu, lượt 2 tiếp từ con trỏ, không trùng', async () => {

@@ -28,17 +28,17 @@ const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).tri
 /** Bảng CHỈ-THÊM (tự tạo lúc ghi lần đầu). Cột: xem báo cáo làn D — làn C đọc `ban_json` khi `ket = 'dat'` và `version` khớp câu đang phát. */
 export const SQL_BANG_SO_DO: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS loi_giai_so_do (qid TEXT PRIMARY KEY, ma_de TEXT NOT NULL, version TEXT NOT NULL, phien_ban INTEGER NOT NULL,
-    ban_json TEXT NOT NULL, ket TEXT NOT NULL, ly_do TEXT, gia_tri TEXT, so_lan INTEGER NOT NULL DEFAULT 1, model TEXT,
+    ban_json TEXT NOT NULL, cong TEXT NOT NULL, ly_do TEXT, gia_tri TEXT, so_lan INTEGER NOT NULL DEFAULT 1, model TEXT,
     token_vao INTEGER NOT NULL DEFAULT 0, token_ra INTEGER NOT NULL DEFAULT 0, tao_luc TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL)`,
-  'CREATE INDEX IF NOT EXISTS loi_giai_so_do_ket ON loi_giai_so_do(ket)',
+  'CREATE INDEX IF NOT EXISTS loi_giai_so_do_cong ON loi_giai_so_do(cong)',
 ]
 
-const SQL_GHI = `INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, ket, ly_do, gia_tri, so_lan, model, token_vao, token_ra, tao_luc, cap_nhat_luc)
+const SQL_GHI = `INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, cong, ly_do, gia_tri, so_lan, model, token_vao, token_ra, tao_luc, cap_nhat_luc)
   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   ON CONFLICT(qid) DO UPDATE SET ma_de = excluded.ma_de, version = excluded.version, phien_ban = excluded.phien_ban, ban_json = excluded.ban_json,
-    ket = excluded.ket, ly_do = excluded.ly_do, gia_tri = excluded.gia_tri, so_lan = excluded.so_lan, model = excluded.model,
+    cong = excluded.cong, ly_do = excluded.ly_do, gia_tri = excluded.gia_tri, so_lan = excluded.so_lan, model = excluded.model,
     token_vao = excluded.token_vao, token_ra = excluded.token_ra, cap_nhat_luc = excluded.cap_nhat_luc
-  WHERE excluded.ket = 'dat' OR loi_giai_so_do.ket <> 'dat' OR loi_giai_so_do.version <> excluded.version`
+  WHERE excluded.cong = 'dat' OR loi_giai_so_do.cong <> 'dat' OR loi_giai_so_do.version <> excluded.version`
 
 // ---------------------------------------------------------------- chọn câu
 
@@ -88,7 +88,7 @@ async function docCauTheoQid(env: Env, qids: readonly string[]): Promise<Map<str
 async function docDaSoan(env: Env, qids: readonly string[]): Promise<Map<string, { version: string; phienBan: number; ket: string }>> {
   const ra = new Map<string, { version: string; phienBan: number; ket: string }>()
   for (let i = 0; i < qids.length; i += 90) {
-    const r = await env.DB.prepare('SELECT qid, version, phien_ban, ket FROM loi_giai_so_do WHERE qid IN (SELECT value FROM json_each(?))')
+    const r = await env.DB.prepare('SELECT qid, version, phien_ban, cong AS ket FROM loi_giai_so_do WHERE qid IN (SELECT value FROM json_each(?))')
       .bind(JSON.stringify(qids.slice(i, i + 90))).all<Obj>().catch(() => ({ results: [] as Obj[] }))
     for (const x of r.results ?? []) ra.set(str(x.qid), { version: str(x.version), phienBan: Number(x.phien_ban) || 0, ket: str(x.ket) })
   }

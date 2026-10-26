@@ -38,8 +38,8 @@ function banXuoi(qid = Q): BanSoDo {
 let d: D1That, token: string
 const goi = (than: Record<string, unknown>, env: Env = d.env) => goiWorker(worker, env, '/hs/goi-y-so-do', { token, qid: Q, ...than })
 const themBan = (qid: string, ban: BanSoDo, cong = 'dat') =>
-  d.sql.prepare('INSERT OR REPLACE INTO loi_giai_so_do(qid,phien_ban,ban_json,cong,ly_do,nguon,tao_luc,cap_nhat_luc) VALUES(?,?,?,?,NULL,?,?,?)')
-    .run(qid, 1, JSON.stringify(ban), cong, 'test', NOW, NOW)
+  d.sql.prepare("INSERT OR REPLACE INTO loi_giai_so_do(qid,ma_de,version,phien_ban,ban_json,cong,ly_do,tao_luc,cap_nhat_luc) VALUES(?,'test','v',?,?,?,NULL,?,?)")
+    .run(qid, 1, JSON.stringify(ban), cong, String(NOW), String(NOW))
 const themSoLuyen = (qid = Q) => d.sql.prepare("INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn,assistance,visibility,purpose) VALUES(?,'HS1',?,'game','G1',1,0,?,'2026-10-25','none','released','repair')")
   .run(`k-${qid}`, qid, new Date(NOW - 86_400_000).toISOString())
 const themPhien = (id: string, qids: string[], daNop: string[] = []) => {
@@ -172,11 +172,11 @@ describe('/hs/goi-y-so-do', () => {
 })
 
 describe('/quan-tri/soan-so-do-lo', () => {
-  it('đòi mã bí mật của thầy; tệp tạm trả 501', async () => {
+  it('đòi mã bí mật của thầy', async () => {
     const thuong = await worker.fetch(new Request('https://test/quan-tri/soan-so-do-lo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }), d.env)
     expect(thuong.status).toBe(403)
     const thay = await worker.fetch(new Request('https://test/quan-tri/soan-so-do-lo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ secret: 'bi-mat-thu' }) }), d.env)
-    expect(thay.status).toBe(501)
+    expect(thay.status).not.toBe(403) // qua cổng thầy; máy soạn thật (làn D) tự trả lỗi khi thiếu khoá mô hình
   })
 })
 
@@ -207,7 +207,7 @@ describe('answer kèm soDo sau chấm', () => {
       .run('amine', '12 - Lớp Thường', 'B8', 'Bài 8. Amine', 8, '["DH-B8"]', '2026-10-11T11:00:00Z')
     themChienDich(k.d, { id: 'hanh-trinh-v3-khoi-12', qids: b8, maDe: ['DH-B8'], sbd: ['S1'], hanNop: '9999-12-31', taoLuc: '2026-10-01T00:00:00Z', theLuc: 24, huyetChien: false })
     await dongBoGoi7(k.env, NOW2)
-    const ins = k.d.sql.prepare("INSERT INTO loi_giai_so_do(qid,phien_ban,ban_json,cong,nguon,tao_luc,cap_nhat_luc) VALUES(?,1,?,'dat','test',1,1)")
+    const ins = k.d.sql.prepare("INSERT INTO loi_giai_so_do(qid,ma_de,version,phien_ban,ban_json,cong,tao_luc,cap_nhat_luc) VALUES(?,'test','v',1,?,'dat','1','1')")
     for (const q of b8) ins.run(q, JSON.stringify(banBon(q)))
     const tk = await gameToken(k.env, 'S1')
     vi.setSystemTime(NOW2 + 40_000)
@@ -235,8 +235,8 @@ describe('answer kèm soDo sau chấm', () => {
     expect(tat.solution).toBeTruthy()
     // Worker đẩy TRƯỚC khi chạy migration (bảng chưa có) ⇒ answer vẫn chấm được, không soDo, solution còn.
     k.d.sql.exec('DROP TABLE loi_giai_so_do')
-    const khac2 = (s.questions as { qid: string; phan: string }[]).find((x) => x.phan !== 'II' && x.qid !== cau.qid && x.qid !== khac.qid)!
-    const thieu = await goiWorker(worker, k.env, '/game-v2/answer', { token: tk, session: s.id, qid: khac2.qid, answer: khac2.phan === 'I' ? 'B' : '4', assisted: false, msLam: 30_000 })
+    // Chấm lại câu đầu (lượt có thể chỉ có 2 câu không phải Phần II ⇒ không dựa vào câu thứ ba).
+    const thieu = await goiWorker(worker, k.env, '/game-v2/answer', { token: tk, session: s.id, qid: cau.qid, answer: cau.phan === 'I' ? 'B' : '4', assisted: false, msLam: 30_000 })
     expect(thieu.ok, JSON.stringify(thieu).slice(0, 300)).toBe(true)
     expect(thieu.soDo).toBeUndefined()
     expect(thieu.solution).toBeTruthy()
