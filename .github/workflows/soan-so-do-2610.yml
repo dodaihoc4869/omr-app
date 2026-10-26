@@ -29,6 +29,11 @@ on:
         description: 'Tên mô hình Gemini (để trống = mặc định của máy chủ)'
         required: false
         default: ''
+      choGioCaoDiem:
+        description: 'Cho chạy cả 19–24h giờ VN (thầy 26/10: «Soạn luôn bây giờ, soạn liên tục tới lúc xong»)'
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -61,6 +66,7 @@ jobs:
           IN_THU_KHONG: ${{ inputs.thuKhong }}
           IN_SAI_NHIEU: ${{ inputs.chiCauSaiNhieu }}
           IN_MODEL: ${{ inputs.model }}
+          IN_CAO_DIEM: ${{ inputs.choGioCaoDiem }}
         run: |
           node --input-type=module <<'JS'
           const MAY_CHU = process.env.OMR_MAY_CHU.replace(/\/$/, '')
@@ -70,15 +76,19 @@ jobs:
           const thuKhong = process.env.IN_THU_KHONG !== 'false'
           const chiCauSaiNhieu = !qids.length && process.env.IN_SAI_NHIEU === 'true'
           const model = (process.env.IN_MODEL || '').trim()
+          const choChayGioCaoDiem = process.env.IN_CAO_DIEM === 'true'
           const MOI_LUOT = 8
           const dem = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0 }
           const token = { vao: 0, ra: 0 }
           let conTro = '', daSoan = 0, luot = 0, xong = false
           console.log(`Chế độ: ${thuKhong ? 'CHẠY THỬ (không ghi)' : 'GHI THẬT'} · nguồn: ${qids.length ? qids.length + ' qid' : chiCauSaiNhieu ? 'câu nhiều em sai' : 'quét kho'} · tối đa ${tong} câu`)
           const batDau = Date.now()
+          // Thầy 26/10 «Tự động sửa mọi câu lệch»: soạn hết nguồn (vòng 1) ⇒ tự chạy VÒNG SỬA (chiSuaLoi) cho mọi câu còn lệch / lộ.
+          let vongSua = false
+          for (;;) {
           while (!xong && daSoan < tong && luot < 1500) {
             luot++
-            const body = { gioiHan: Math.min(MOI_LUOT, tong - daSoan), thuKhong, conTro, ...(qids.length ? { qids } : {}), ...(chiCauSaiNhieu ? { chiCauSaiNhieu } : {}), ...(model ? { model } : {}) }
+            const body = { ...(vongSua ? { chiSuaLoi: true } : {}), gioiHan: Math.min(MOI_LUOT, tong - daSoan), thuKhong, conTro, ...(qids.length ? { qids } : {}), ...(chiCauSaiNhieu ? { chiCauSaiNhieu } : {}), ...(model ? { model } : {}), ...(choChayGioCaoDiem ? { choChayGioCaoDiem } : {}) }
             let r, j
             for (let thu = 1; thu <= 3; thu++) {
               try {
@@ -97,6 +107,10 @@ jobs:
             xong = !!j.xong
             conTro = j.conTro || ''
             if (!xong && !conTro) { console.log('DỪNG: máy chủ không trả con trỏ'); process.exit(1) }
+          }
+          if (!xong || vongSua || qids.length || thuKhong) break
+          console.log('\n===== VÒNG SỬA: soạn lại mọi câu còn lệch / lộ đáp án =====')
+          vongSua = true; xong = false; conTro = ''
           }
           const giay = Math.round((Date.now() - batDau) / 1000)
           console.log('\n===== TÓM TẮT =====')

@@ -6,7 +6,7 @@
 //   · Chọn câu TÍNH TOÁN trong kho đang dùng (game_v2_question của tờ chưa xoá, chỉ mục đúng bản): Phần I / Phần III, đề có SỐ + ĐƠN VỊ,
 //     không tự luận; Phần III đáp án phải là một số; Phần I phương án đúng phải có số. Phần II bỏ.
 //   · Gọi Gemini (JSON) với lời dặn cố định server/src/soan-so-do-loi-dan.ts ⇒ kiểm khuôn ⇒ `kiemCong` (server/src/so-do-cong.ts, làn C).
-//     `lech` ⇒ thử lại ĐÚNG 1 lần, kèm lý do lệch. JSON hỏng ⇒ bỏ (không ghi).
+//     TỰ SỬA (thầy 26/10): `lech` / `lo_dap_an` / JSON hỏng ⇒ thử lại tới 4 lượt (từ lượt 3 model mạnh), kèm lý do; còn lệch ⇒ vòng sửa `chiSuaLoi`.
 //   · Ghi bảng CHỈ-THÊM `loi_giai_so_do` (`INSERT … ON CONFLICT(qid) DO UPDATE`), KHÔNG đụng `game_v2_question` / q.json. Bản `dat` đúng phiên
 //     bản câu không bao giờ bị lượt sau ghi đè bằng kết quả kém hơn. Chỉ `dat` mới được hiện (luật đọc của làn C).
 //   · `thuKhong` ⇒ không ghi gì (kể cả không tạo bảng), chỉ trả kết quả + bản soạn.
@@ -18,7 +18,7 @@ import { kiemCong } from './so-do-cong'
 import { quaTram } from './tram-gemini'
 import { docCauEmSai } from './hoc-lieu-may-soan'
 import { laCauTuLuan, laMotSoPhanIII } from '../../src/lib/cau-tu-luan'
-import { PHIEN_BAN_SO_DO, chuCauHoi, chuThuLai, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
+import { PHIEN_BAN_SO_DO, chuCauHoi, chuThuLai, chuThuLaiKhuon, chuThuLaiLo, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -105,6 +105,10 @@ export type GoiMoHinh = (yc: { heThong: string; luot: readonly LuotHoi[]; model:
 export const MODEL_MAC_DINH = 'gemini-flash-latest'
 /** 404/410 (tên model không còn) ⇒ thử lần lượt. `gemini-3.5-flash-lite` đã chạy thật ở Hỏi thầy 13/10. */
 const MODEL_DU_PHONG: readonly string[] = ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest']
+/** TỰ SỬA CÂU LỆCH (thầy 26/10: «Tự động sửa mọi câu lệch, tôi ko phải làm gì»): từ lượt thứ 3 của một câu dùng model mạnh hơn (404 ⇒ lùi về chuỗi dự phòng). */
+export const MODEL_MANH = 'gemini-pro-latest'
+/** Số lượt tối đa cho MỘT câu: lượt sau đọc lý do lệch / lộ / hỏng khuôn của lượt trước. */
+export const SO_LUOT_MOT_CAU = 4
 const RE_CHAN_VI_TRI = /location is not supported/i
 const ngu = (ms: number) => new Promise((ok) => setTimeout(ok, ms))
 
@@ -223,6 +227,8 @@ interface ThamSoDayDu extends ThamSoSoDo {
   nganSachGiay?: number
   soEmToiThieu?: number
   choChayGioCaoDiem?: boolean
+  /** VÒNG SỬA: chỉ soạn lại các câu đang `lech` / `lo_dap_an` trong bảng (tự bật `lamLai`) */
+  chiSuaLoi?: boolean
 }
 type KetCuoi = KetQuaCong | 'hong' | 'loi_goi'
 export interface DongKetQua { qid: string; ket: KetCuoi; lyDo?: string; giaTri?: string; lanThu: number; model?: string }
@@ -254,6 +260,7 @@ function docThamSo(t: unknown): ThamSoDayDu | string {
     ...(qids ? { qids } : {}), gioiHan: kep(o.gioiHan, 10, 1, 50), chiCauSaiNhieu: o.chiCauSaiNhieu === true, thuKhong: o.thuKhong === true,
     conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 8),
     nganSachGiay: kep(o.nganSachGiay, 40, 5, 110), soEmToiThieu: kep(o.soEmToiThieu, SO_EM_SAI_TOI_THIEU, 1, 1000), choChayGioCaoDiem: o.choChayGioCaoDiem === true,
+    chiSuaLoi: o.chiSuaLoi === true, ...(o.chiSuaLoi === true ? { lamLai: true } : {}),
   }
 }
 
@@ -277,6 +284,10 @@ async function gomHang(env: Env, ts: ThamSoDayDu, het: () => boolean): Promise<{
   }
   // Nguồn DANH SÁCH: qid thầy chỉ định, hoặc câu nhiều em sai (≥ soEmToiThieu em, nhiều trước).
   let ds: string[] | null = ts.qids ?? null
+  if (!ds && ts.chiSuaLoi) {
+    const r = await env.DB.prepare("SELECT qid FROM loi_giai_so_do WHERE cong IN ('lech', 'lo_dap_an') ORDER BY qid").all<Obj>().catch(() => ({ results: [] as Obj[] }))
+    ds = (r.results ?? []).map((x) => str(x.qid)).filter(Boolean)
+  }
   if (!ds && ts.chiCauSaiNhieu) {
     const sai = await docCauEmSai(env)
     ds = [...sai.entries()].filter(([, s]) => s.size >= (ts.soEmToiThieu ?? SO_EM_SAI_TOI_THIEU))
@@ -316,35 +327,39 @@ async function gomHang(env: Env, ts: ThamSoDayDu, het: () => boolean): Promise<{
   return { hang, nguonHet }
 }
 
-/** Soạn một câu: gọi mô hình ⇒ kiểm khuôn ⇒ cổng; `lech` ⇒ thử lại 1 lần kèm lý do. */
+/** Soạn một câu: gọi mô hình ⇒ kiểm khuôn ⇒ cổng. TỰ SỬA (thầy 26/10): `lech` / `lo_dap_an` / JSON hỏng ⇒ thử lại tới SO_LUOT_MOT_CAU lượt,
+ *  mỗi lượt kèm lý do của lượt trước; từ lượt 3 dùng MODEL_MANH. Giữ bản tốt nhất: `dat` > `khong_kiem_duoc` > `lo_dap_an` > `lech`. */
 async function soanMotCau(q: CauKho, ts: ThamSoDayDu, goi: GoiMoHinh, cong: KiemCong, heThong: string):
   Promise<{ dong: DongKetQua; ban?: BanSoDo; token: { vao: number; ra: number } }> {
   const token = { vao: 0, ra: 0 }
   const luot: LuotHoi[] = [{ vai: 'user', chu: chuCauHoi(q) }]
   const ctx = { phan: q.phan, dapAn: q.correct, luaChon: q.choices }
-  let truoc: { ban: BanSoDo; ket: KetQuaCong; lyDo?: string; giaTri?: string; model: string } | null = null
-  for (let lan = 1; lan <= 2; lan++) {
-    const kq = await goi({ heThong, luot, model: ts.model ?? MODEL_MAC_DINH })
-    if (!kq.ok) {
-      if (truoc) break
-      return { dong: { qid: q.qid, ket: 'loi_goi', lyDo: kq.loi, lanThu: lan }, token }
-    }
+  const HANG: Record<string, number> = { dat: 3, khong_kiem_duoc: 2, lo_dap_an: 1, lech: 0 }
+  let tot: { ban: BanSoDo; ket: KetQuaCong; lyDo?: string; giaTri?: string; model: string; lan: number } | null = null
+  let loiCuoi: DongKetQua | null = null
+  for (let lan = 1; lan <= SO_LUOT_MOT_CAU; lan++) {
+    const model = lan >= 3 ? MODEL_MANH : ts.model ?? MODEL_MAC_DINH
+    const kq = await goi({ heThong, luot: [...luot], model })
+    if (!kq.ok) { loiCuoi = { qid: q.qid, ket: 'loi_goi', lyDo: kq.loi, lanThu: lan }; if (lan >= 2) break; continue }
     token.vao += kq.vao; token.ra += kq.ra
     const doc = docBanSoDo(kq.chu, q.qid)
     if ('loi' in doc) {
-      if (truoc) break // lượt thử lại hỏng ⇒ giữ kết quả lượt đầu (lech)
-      return { dong: { qid: q.qid, ket: 'hong', lyDo: doc.loi, lanThu: lan, model: kq.model }, token }
+      loiCuoi = { qid: q.qid, ket: 'hong', lyDo: doc.loi, lanThu: lan, model: kq.model }
+      luot.push({ vai: 'model', chu: kq.chu.slice(0, 6000) }, { vai: 'user', chu: chuThuLaiKhuon(doc.loi) })
+      continue
     }
     const c = await cong(doc.ban, ctx)
     const giaTri = c.giaTri === undefined || c.giaTri === null ? undefined : String(c.giaTri).slice(0, 40)
-    truoc = { ban: doc.ban, ket: c.ket, ...(c.lyDo ? { lyDo: str(c.lyDo).slice(0, 300) } : {}), ...(giaTri ? { giaTri } : {}), model: kq.model }
-    if (c.ket !== 'lech' || lan === 2) {
-      return { dong: { qid: q.qid, ket: c.ket, ...(truoc.lyDo ? { lyDo: truoc.lyDo } : {}), ...(giaTri ? { giaTri } : {}), lanThu: lan, model: kq.model }, ban: doc.ban, token }
-    }
-    luot.push({ vai: 'model', chu: kq.chu }, { vai: 'user', chu: chuThuLai(truoc.lyDo ?? 'tích các thừa số không ra đáp án kho', giaTri) })
+    const ban = { ban: doc.ban, ket: c.ket, ...(c.lyDo ? { lyDo: str(c.lyDo).slice(0, 300) } : {}), ...(giaTri ? { giaTri } : {}), model: kq.model, lan }
+    if (!tot || (HANG[ban.ket] ?? -1) > (HANG[tot.ket] ?? -1)) tot = ban
+    if (c.ket === 'dat' || c.ket === 'khong_kiem_duoc') break
+    luot.push({ vai: 'model', chu: kq.chu }, {
+      vai: 'user',
+      chu: c.ket === 'lo_dap_an' ? chuThuLaiLo(ban.lyDo ?? 'phần trước nộp chứa đáp án') : chuThuLai(ban.lyDo ?? 'tích các thừa số không ra đáp án kho', giaTri),
+    })
   }
-  const t = truoc!
-  return { dong: { qid: q.qid, ket: t.ket, ...(t.lyDo ? { lyDo: t.lyDo } : {}), ...(t.giaTri ? { giaTri: t.giaTri } : {}), lanThu: 2, model: t.model }, ban: t.ban, token }
+  if (!tot) return { dong: loiCuoi ?? { qid: q.qid, ket: 'loi_goi', lyDo: 'không gọi được mô hình', lanThu: 1 }, token }
+  return { dong: { qid: q.qid, ket: tot.ket, ...(tot.lyDo ? { lyDo: tot.lyDo } : {}), ...(tot.giaTri ? { giaTri: tot.giaTri } : {}), lanThu: tot.lan, model: tot.model }, ban: tot.ban, token }
 }
 
 /**
