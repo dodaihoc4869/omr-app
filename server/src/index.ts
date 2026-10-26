@@ -3660,6 +3660,9 @@ const boXuLy = {
       // LỜI GIẢI TỪNG BƯỚC (phương án A, 29/09): cổng công bố + hồ sơ đã duyệt + băm khớp đề hiện tại — xem server/src/loi-giai.ts
       if (p === '/hs/loi-giai') return ra(await hsLoiGiai(env, b))
       if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
+      // GỢI Ý 3 TẦNG + LỜI GIẢI KIỂU SƠ ĐỒ (26/10, server/src/loi-giai-so-do.ts): trước nộp cắt mọi kết quả, sau nộp trả đủ; tắt khi ca kiểm tra / KTCN / câu đang bảo vệ.
+      // Một đợt D1; việc ghi «có trợ giúp» vào lượt game chạy sau phản hồi.
+      if (p === '/hs/goi-y-so-do') return ra(await import('./loi-giai-so-do').then((m) => m.hsGoiYSoDo(env, b, { sau: ctx ? (viec) => ctx.waitUntil(viec) : undefined })))
       if (p === '/hs/hoi-thay') {
         // HỎI THÊM THẦY (13/10, hoi-tro-ly.ts): phản hồi mở được lời giải ⇒ kèm `hoiThem` = máy em hiện ô nhắn hỏi Thầy (AI) dưới lời giải.
         // Tốc độ (thầy 13/10): cờ đọc SONG SONG với các lượt kiểm của hsHoiThay; việc ghi sổ chạy sau phản hồi (ctx.waitUntil).
@@ -3939,6 +3942,11 @@ const boXuLy = {
       if (p === '/kho/danh-sach') return danhSachDeKho(env, b)
       if (p === '/kho/lay') return layDeKho(env, String(b.maDe ?? ''))
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
+      // LỜI GIẢI KIỂU SƠ ĐỒ (26/10): máy soạn theo lô (server/src/soan-so-do.ts, làn D) — sau cổng mã bí mật ở trên, như máy soạn /kho/*.
+      // Chuyển NGUYÊN thân lệnh (qids, gioiHan, thuKhong, conTro, lamLai, model…) — trừ `secret` (mã bí mật không đi tiếp vào máy soạn / nhật ký).
+      if (p === '/quan-tri/soan-so-do-lo') { const { secret: _maBiMat, ...thamSo } = b; return raChua(await import('./soan-so-do').then((m) => m.soanSoDoLo(env, thamSo))) }
+      // TỰ SỬA ĐÁP ÁN KHO (26/10, sua-dap-an-kho.ts): lùi MỘT lần sửa theo id dòng `dap_an_kho_sua` — cùng cổng mã bí mật.
+      if (p === '/quan-tri/lui-dap-an-kho') return ra(await import('./sua-dap-an-kho').then((m) => m.luiDapAnKho(env, String(b.id ?? ''))))
       // LỜI GIẢI TỪNG BƯỚC: máy soạn của thầy (lấp kho, nhận lô, nộp hồ sơ) + màn Duyệt lời giải.
       if (p === '/kho/loi-giai/nap-hang') return ra(await napHangTuKho(env, b))
       // Ngân hàng câu kiến thức nền của thang tự gỡ (thang-tu-go.ts): nạp / cập nhật theo id — công cụ thầy chạy tay (đường duy nhất nạp ngân hàng nền).

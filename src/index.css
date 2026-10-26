@@ -931,6 +931,7 @@ input:is([type="date"], [type="datetime-local"], [type="time"])::-webkit-calenda
 
 /* CHỮ CHỜ TRỄ (thầy 26/10: màn chờ «Đang mở…» «hiện một lần rất nhanh nhìn rất xấu»): tải nhanh ⇒ chỉ nền/khung trống đúng bố cục, KHÔNG chớp chữ;
    quá 800ms vẫn chưa xong ⇒ chữ hiện. Thuần CSS (không thêm mảnh mã): ẩn bằng visibility suốt hoạt ảnh 800ms rồi về hiện — chữ luôn giữ chỗ nên không
-   xô bố cục; máy tắt hoạt ảnh (giảm chuyển động) ⇒ chữ hiện ngay như cũ. Không dùng cho màn thi thật. */
-.chu-cho-tre { animation: chu-cho-tre 800ms step-end; }
-@keyframes chu-cho-tre { 0%, 100% { visibility: hidden; } }
+   xô bố cục; máy tắt hoạt ảnh (giảm chuyển động) ⇒ chữ hiện ngay như cũ. Không dùng cho màn thi thật.
+   Viết gọn (26/10, luật tốc độ — tờ này nằm trong lượt mở cả ba app): chỉ khung 0% ẩn, step-end giữ giá trị đầu suốt 800ms rồi về «hiện» của phần tử. */
+.chu-cho-tre { animation: cct .8s step-end; }
+@keyframes cct { 0% { visibility: hidden; } }

@@ -1,5 +1,7 @@
 // Browser thật + API fixture xác định: đo bố cục, bàn phím, dialog và retry mất mạng.
 // API/SQL thật được kiểm riêng trong chua-cau-sai-chat-luong + d1-runtime-chua-cau-sai.
+// 26/10: từ «Chữa câu gọn» (#373) màn em mở đợt rồi gọi `gon-mo` ⇒ 4 khổ đi luồng gọn (Kiểm tra → mất mạng → gửi lại đúng khoá → «Em đã tự sửa xong câu này»);
+// lượt «lối cũ» 360px: Worker chưa có lệnh gọn (404 «Không có đường này») ⇒ rơi về sửa từng bước (phat-item / nop-item) như trước.
 import assert from 'node:assert/strict'
 import { mkdirSync, existsSync } from 'node:fs'
 import { spawn } from 'node:child_process'
@@ -42,6 +44,20 @@ const ph = {
   cauGoc: { phan: 'III', text: 'Tính khối lượng mol LiOH, Li=7, O=16, H=1.' },
   item,
 }
+// Dạng đúng như `gonMo` (server/src/chua-gon-lenh.ts): đề công khai, KHÔNG đáp án.
+const mo = {
+  ok: true,
+  dotId: 'd1',
+  lan: 1,
+  ban: 'Q',
+  banKhac: false,
+  tuSuaNeuDung: true,
+  de: {
+    qid: 'Q',
+    phan: 'III',
+    text: 'Tính khối lượng mol NaOH. Cho Na = 23; O = 16; H = 1.',
+  },
+}
 try {
   for (let i = 0; i < 100; i++) {
     try {
@@ -58,11 +74,12 @@ try {
         ? { executablePath: '/usr/bin/chromium' }
         : {}),
   })
-  for (const { width, height, ten } of [
+  for (const { width, height, ten, loiCu = false } of [
     { width: 360, height: 900, ten: '360' },
     { width: 430, height: 900, ten: '430' },
     { width: 844, height: 390, ten: 'xoay-ngang-844' },
     { width: 1280, height: 900, ten: 'may-tinh-1280' },
+    { width: 360, height: 900, ten: 'loi-cu-360', loiCu: true },
   ]) {
     const page = await browser.newPage({
       viewport: { width, height },
@@ -77,6 +94,31 @@ try {
         b = route.request().postDataJSON()
       if (url.endsWith('/mo-dot'))
         return route.fulfill({ json: { ok: true, dotId: 'd1' } })
+      if (url.endsWith('/gon-mo'))
+        return loiCu
+          ? route.fulfill({
+              status: 404,
+              json: { ok: false, error: 'Không có đường này' },
+            })
+          : route.fulfill({ json: mo })
+      if (url.endsWith('/gon-nop')) {
+        nops.push(b)
+        if (matMang) {
+          matMang = false
+          return route.abort('failed')
+        }
+        return route.fulfill({
+          json: {
+            ok: true,
+            dotId: 'd1',
+            lan: 1,
+            ban: 'Q',
+            dung: true,
+            ket: 'tu_sua',
+            trangThai: 'da_tu_sua',
+          },
+        })
+      }
       if (url.endsWith('/phat-item')) return route.fulfill({ json: ph })
       if (url.endsWith('/nop-item')) {
         nops.push(b)
@@ -101,7 +143,10 @@ try {
     const nut = page.getByRole('button', { name: 'Mở câu cần chữa' })
     await nut.click()
     await page
-      .getByRole('heading', { name: 'Khối lượng mol', exact: true })
+      .getByRole('heading', {
+        name: loiCu ? 'Khối lượng mol' : 'Em tự làm lại câu này',
+        exact: true,
+      })
       .waitFor()
     assert.equal(
       await page.evaluate(
@@ -118,27 +163,49 @@ try {
         'Tiêu điểm thoát khung',
       )
     }
-    await page.getByRole('textbox', { name: 'Câu trả lời của em' }).fill('40')
-    await page.getByRole('button', { name: 'Tự thử lại' }).click()
-    await page.getByRole('alert').waitFor()
-    assert.equal(
+    const phanHoi = loiCu
+      ? page.getByText('Em đã cộng đủ ba nguyên tố.')
+      : page.getByRole('heading', {
+          name: 'Em đã tự sửa xong câu này',
+          exact: true,
+        })
+    if (loiCu) {
+      await page.getByRole('textbox', { name: 'Câu trả lời của em' }).fill('40')
+      await page.getByRole('button', { name: 'Tự thử lại' }).click()
+      await page.getByRole('alert').waitFor()
+      assert.equal(
+        await page
+          .getByRole('textbox', { name: 'Câu trả lời của em' })
+          .isDisabled(),
+        true,
+        'Mất mạng phải giữ câu trả lời đã nộp',
+      )
       await page
-        .getByRole('textbox', { name: 'Câu trả lời của em' })
-        .isDisabled(),
-      true,
-      'Mất mạng phải giữ câu trả lời đã nộp',
-    )
-    await page
-      .getByRole('button', { name: 'Gửi lại câu trả lời đã giữ' })
-      .click()
-    await page.getByText('Em đã cộng đủ ba nguyên tố.').waitFor()
+        .getByRole('button', { name: 'Gửi lại câu trả lời đã giữ' })
+        .click()
+    } else {
+      const o = page.getByRole('textbox', { name: 'Đáp án của em' })
+      await o.fill('40')
+      const kiem = page.getByRole('button', { name: 'Kiểm tra', exact: true })
+      await kiem.click()
+      await page.getByRole('alert').waitFor()
+      assert.equal(
+        await o.inputValue(),
+        '40',
+        'Mất mạng phải giữ đáp án em đã gõ',
+      )
+      assert.equal(await kiem.isEnabled(), true, 'Mất mạng phải cho gửi lại')
+      await kiem.click()
+    }
+    await phanHoi.waitFor()
+    assert.equal(nops.length, 2, 'Phải có đúng một lần gửi lại')
     assert.deepEqual(
       nops[0],
       nops[1],
-      'Retry phải giữ nguyên attemptId và payload',
+      'Retry phải giữ nguyên khoá chống lặp và payload',
     )
     await page.waitForTimeout(1000)
-    await page.getByText('Em đã cộng đủ ba nguyên tố.').waitFor()
+    await phanHoi.waitFor()
     assert.equal(errors.length, 0, errors.join('\n'))
     await page.screenshot({ path: `${out}/chua-${ten}.png`, fullPage: true })
     await page.keyboard.press('Escape')
@@ -179,7 +246,7 @@ try {
     await page.close()
   }
   console.log(
-    'PASS: 360/430/xoay ngang 844/máy tính 1280px; không tràn ngang; Tab giữ trong dialog; Escape trả tiêu điểm; retry nguyên payload; phản hồi được giữ; tờ chữa chung giấu tên/lời gỡ, Thầy chữa ghi qua cầu nối iframe thật.',
+    'PASS: chữa câu gọn 360/430/xoay ngang 844/máy tính 1280px + lối cũ sửa từng bước 360px; không tràn ngang; Tab giữ trong dialog; Escape trả tiêu điểm; retry nguyên khoá + payload; phản hồi được giữ; tờ chữa chung giấu tên/lời gỡ, Thầy chữa ghi qua cầu nối iframe thật.',
   )
 } finally {
   await browser?.close()

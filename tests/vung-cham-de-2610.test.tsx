@@ -1,28 +1,22 @@
 // @vitest-environment jsdom
-// KHE «chạm để hiện giải thích» (chờ thầy duyệt, ruột do phiên Code app 3 thay): VungChamDe trả đề y nguyên (không thêm thẻ DOM),
-// TamGiaiThich là tấm trượt từ đáy cùng kiểu tấm kết quả, đóng được; màn làm chặng bọc thân đề và đặt tấm thế chỗ thanh đáy.
+// «Chạm để hiểu đề» gắn vào màn Duo — 3 chỗ theo hợp đồng docs/hop-dong-doc-de-2610.md (Code app 3 ↔ Code app 1, 26/10). Thay bản khe chờ cũ
+// (VungChamDe trả nguyên đề + TamGiaiThich của màn): nay ruột thật (main #397) tự vẽ thẻ giải nghĩa / gợi ý; hành vi ruột có test riêng goi-y-cham-*.
+//   1. thân đề bọc VungChamDe với token + phiên chặng + onHoTro + nutBatDau (nút vào hàng nút đáy);
+//   2. khung màn chừa cột phải gợi ý: padding-right: var(--gyc-cot-phai, 0px);
+//   3. lời giải sau nộp ở tấm «Lời giải từng bước»: LoiGiaiCauCoSoDo (nạp lười khi mở tấm) với soDo của kết quả `answer`.
 import { readFileSync } from 'node:fs'
-import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
-import { TamGiaiThich, VungChamDe } from '../src/components/goi-y-cham/VungChamDe'
-import type { Question } from '../src/game/than-thu-v2/core'
+import { describe, expect, it } from 'vitest'
 
-describe('VungChamDe', () => {
-  it('trả lại children nguyên vẹn, không bọc thêm thẻ', () => {
-    const { container } = render(<div id="g"><VungChamDe q={{ qid: 'x' } as Question}><p className="de">Đề</p></VungChamDe></div>)
-    expect(container.querySelector('#g')!.innerHTML).toBe('<p class="de">Đề</p>')
+describe('màn Duo gắn «Chạm để hiểu đề»', () => {
+  const s = readFileSync('src/components/hoc-tap/ManLamBaiTap.tsx', 'utf8')
+  it('bọc thân đề bằng VungChamDe (token, phiên, onHoTro, nutBatDau)', () => {
+    expect(s).toMatch(/<VungChamDe q=\{q\} token=\{token\} phien=\{phien\} onHoTro=\{danhDauHoTro\} nutBatDau=\{nutBatDau\}><DeCau q=\{q\} stt=\{stt\} \/><\/VungChamDe>/)
   })
-  it('tấm giải thích: kiểu tấm kết quả (duo-day duo-ket, data-tt=giai), có nút đóng', () => {
-    const dong = vi.fn()
-    const { container } = render(<TamGiaiThich g={{ tieuDe: 'mol', noiDung: 'Lượng chất' }} onDong={dong} />)
-    expect(container.querySelector('section.duo-day.duo-ket[data-tt="giai"]')).not.toBeNull()
-    expect(screen.getByRole('dialog', { name: 'mol' }).textContent).toContain('Lượng chất')
-    fireEvent.click(screen.getByRole('button', { name: 'Đóng giải thích' }))
-    expect(dong).toHaveBeenCalledOnce()
+  it('khung màn chừa cột phải gợi ý', () => {
+    expect(readFileSync('src/styles/trong-lam-bai.css', 'utf8')).toMatch(/\.ht-app\.ht2-lam\.duo \{ padding-right: var\(--gyc-cot-phai, 0px\); \}/)
   })
-  it('màn làm chặng bọc thân đề và đặt tấm giải thích thế chỗ thanh đáy', () => {
-    const s = readFileSync('src/components/hoc-tap/ManLamBaiTap.tsx', 'utf8')
-    expect(s).toMatch(/<VungChamDe q=\{q\} onGiaiThich=\{setGiaiThich\} onHoTro=\{danhDauHoTro\}><DeCau q=\{q\} stt=\{stt\} \/><\/VungChamDe>/)
-    expect(s).toMatch(/giaiThich && q && !xong \? <TamGiaiThich g=\{giaiThich\}[^\n]*\/> : day\}/)
+  it('lời giải từng bước dùng LoiGiaiCauCoSoDo với soDo', () => {
+    expect(s).toMatch(/lazy\(\(\) => import\('..\/goi-y-cham\/LoiGiaiCauCoSoDo'\)\)/)
+    expect(s).toMatch(/<LoiGiaiCauCoSoDo q=\{q\} solution=\{k\.solution\} dapAn=\{k\.answer\} hinhLoiGiai=\{k\.solutionImages\} soDo=\{k\.soDo\} \/>/)
   })
 })
