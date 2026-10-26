@@ -58,8 +58,9 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          npx -y wrangler@4 d1 execute omr --remote --json --file /tmp/lenh.sql > /tmp/ghi.json
-          python3 -c "import json;d=json.load(open('/tmp/ghi.json'));print('ghi:', [x.get('success') for x in d])"
+          set -o pipefail
+          # --file chạy xong in rỗng (27/10 lượt 40414388537) ⇒ ghi bằng --command; câu SQL chỉ chứa 3 giá trị true/false đã lọc.
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/lenh.sql)" | jq -c '[.[] | .success]' | sed 's/^/ghi: /'
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa = 'may_soan_so_do'" | jq -c '.[0].results'
           # Bảng trạng thái do cron tự tạo ở lượt đầu ⇒ lần đầu bật có thể chưa có (báo «chưa chạy lượt nào»).
           NOW=$(date +%s%3N)
