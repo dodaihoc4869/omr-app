@@ -5,7 +5,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { taoD1That, type D1That } from './_d1-that'
 import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
-import { KHOA_MAY_SOAN, NGHI_KHI_LOI_MS, THOI_HAN_KHOA_MS, chayMaySoanCron, docCoMaySoan, type SoanLo } from '../server/src/may-soan-cron'
+import { GIOI_HAN_MOI_LUOT, KHOA_MAY_SOAN, NGHI_KHI_LOI_MS, THOI_HAN_KHOA_MS, chayMaySoanCron, docCoMaySoan, type SoanLo } from '../server/src/may-soan-cron'
 import type { Env } from '../server/src/kieu'
 
 const NGOAI_CAO_DIEM = Date.parse('2026-10-27T03:00:00Z') // 10:00 giờ VN
@@ -58,7 +58,7 @@ describe('cờ', () => {
     datCo({ bat: true })
     const s = soanGia(() => tra({ ok: true, xong: false, conTro: 'DE|q1', dem: { dat: 1 }, ketQua: ketDat(1) }))
     await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: s.fn })
-    expect(s.goi[0]).toMatchObject({ tuSuaDapAn: false, choChayGioCaoDiem: true, gioiHan: 6, nganSachGiay: 25, songSong: 3, conTro: '' })
+    expect(s.goi[0]).toMatchObject({ tuSuaDapAn: false, choChayGioCaoDiem: true, gioiHan: 24, nganSachGiay: 25, songSong: 24, conTro: '' })
     expect(s.goi[0]!.chiSuaLoi).toBeUndefined()
   })
 })
@@ -102,7 +102,10 @@ describe('vòng và con trỏ', () => {
     datCo({ bat: true })
     const ghiLech = (qid: string, cong = 'lech') => d.sql.prepare(`INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, cong, tao_luc, cap_nhat_luc)
       VALUES (?, 'DE', 'v', 1, '{}', ?, 'x', 'x') ON CONFLICT(qid) DO UPDATE SET cong = excluded.cong`).run(qid, cong)
-    for (const q of ['q01', 'q02', 'q03', 'q04', 'q05', 'q06', 'q07', 'q08']) ghiLech(q)
+    // G + 2 câu lệch (G = số câu mỗi lượt): lượt sửa đầu lấy G câu, lượt sau tiếp từ con trỏ
+    const G = GIOI_HAN_MOI_LUOT
+    const ds = Array.from({ length: G + 2 }, (_, i) => `q${String(i + 1).padStart(2, '0')}`)
+    for (const q of ds) ghiLech(q)
     ghiLech('q00', 'dat')
     const s = soanGia((t, lan) => {
       if (lan === 1) return tra({ ok: true, xong: false, conTro: 'DE|q3', dem: { dat: 3, bo_qua: 2 }, ketQua: ketDat(3) })
@@ -123,18 +126,18 @@ describe('vòng và con trỏ', () => {
     expect(s.goi[1]!.conTro).toBe('DE|q3')
     expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: '' })
     await luot()
-    expect(s.goi[2]).toMatchObject({ chiSuaLoi: true, tuSuaDapAn: false, qids: ['q01', 'q02', 'q03', 'q04', 'q05', 'q06'] })
+    expect(s.goi[2]).toMatchObject({ chiSuaLoi: true, tuSuaDapAn: false, qids: ds.slice(0, G) })
     expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: 'q03' })
     await luot()
-    expect(s.goi[3]!.qids).toEqual(['q04', 'q05', 'q06', 'q07', 'q08']) // q04 KHÔNG bị bỏ qua dù q01, q02 đã rời danh sách
-    expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: 'q08' })
+    expect(s.goi[3]!.qids).toEqual(ds.slice(3)) // q04 KHÔNG bị bỏ qua dù q01, q02 đã rời danh sách
+    expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: ds[ds.length - 1] })
     await luot()
-    expect(s.goi).toHaveLength(4) // hết câu lệch sau q08 ⇒ chuyển xong, không gọi
+    expect(s.goi).toHaveLength(4) // hết câu lệch sau câu cuối ⇒ chuyển xong, không gọi
     expect(trangThai().vong).toBe('xong')
     expect(await luot()).toMatchObject({ chay: false, lyDo: 'da_xong' })
     expect(s.goi).toHaveLength(4)
     const dem = JSON.parse(String(trangThai().dem_json)) as Record<string, number>
-    expect(dem).toMatchObject({ luot: 4, dat: 3 + 1 + 2 + 5, lech: 1, bo_qua: 2 })
+    expect(dem).toMatchObject({ luot: 4, dat: 3 + 1 + 2 + ds.slice(3).length, lech: 1, bo_qua: 2 })
     expect(trangThai().dang_chay_den).toBe(0)
   })
 })

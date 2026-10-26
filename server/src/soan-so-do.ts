@@ -272,7 +272,7 @@ function docThamSo(t: unknown): ThamSoDayDu | string {
   if (model && !/^[a-z0-9][a-z0-9.\-]{2,60}$/i.test(model)) return 'model không hợp lệ'
   return {
     ...(qids ? { qids } : {}), gioiHan: kep(o.gioiHan, 10, 1, 50), chiCauSaiNhieu: o.chiCauSaiNhieu === true, thuKhong: o.thuKhong === true,
-    conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 8),
+    conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 24), // trần 8 ⇒ 24 (thầy 27/10 «24 câu luôn»)
     nganSachGiay: kep(o.nganSachGiay, 40, 5, 110), soEmToiThieu: kep(o.soEmToiThieu, SO_EM_SAI_TOI_THIEU, 1, 1000), choChayGioCaoDiem: o.choChayGioCaoDiem === true,
     chiSuaLoi: o.chiSuaLoi === true, ...(o.chiPhan === 'I' || o.chiPhan === 'III' ? { chiPhan: o.chiPhan } : {}), ...(o.chiSuaLoi === true ? { lamLai: true } : {}), tuSuaDapAn: o.tuSuaDapAn !== false,
   }
