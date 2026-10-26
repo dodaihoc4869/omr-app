@@ -172,7 +172,7 @@ async function chay(v) {
       void ra
       for (const l of await t.evaluate(doTran)) kq.loi.push({ loai: 'h*', ghi: `${ms}ms: ${l}` })
     }
-    await t.evaluate(() => { for (const a of document.getAnimations()) a.finish?.() })
+    await t.evaluate(() => { for (const a of document.getAnimations()) { try { a.finish() } catch { a.cancel() } } }) // hoạt ảnh lặp vô hạn (Bi, vòng chờ) không «finish» được ⇒ huỷ
     await t.waitForTimeout(100)
     for (const l of await t.evaluate(doChu)) kq.loi.push(l)
     // cuộn tới đáy rồi đo lại nút chính (đáy ghim / tấm kết quả)
