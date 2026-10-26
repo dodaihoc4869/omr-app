@@ -1,0 +1,77 @@
+/* GIỮ CHÂN KHI THOÁT + ĐỘNG VIÊN GIỮA BÀI (thầy 27/10, ảnh Duolingo). Mảnh NẠP LƯỜI cùng TamGiuChan.tsx (GiuChan.tsx nạp sẵn khi vào màn Duo).
+ * Chỉ biến màu --tr-* sẵn có (styles/trong.css). Chỉ transform / opacity cho hoạt ảnh; giảm chuyển động ⇒ tắt. */
+
+/* ── Tấm đáy: nền mờ + tấm trượt lên (z trên tấm lời giải 70, dưới hộp thông báo hệ thống) ── */
+[data-trong] .giu { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; }
+[data-trong] .giu-nen { position: absolute; inset: 0; background: color-mix(in srgb, var(--tr-chu) 45%, transparent); animation: giu-hien 200ms ease-out both; }
+@media (prefers-color-scheme: dark) { [data-trong] .giu-nen { background: color-mix(in srgb, var(--tr-trang) 72%, transparent); } }
+[data-trong] .giu-tam {
+  position: relative; width: min(560px, 100%); max-height: 100dvh; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 10px 20px calc(20px + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0; background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-3); text-align: center;
+  animation: giu-truot 280ms cubic-bezier(.2, .9, .3, 1) both;
+}
+[data-trong] .giu-keo { width: 44px; height: 5px; margin-bottom: 6px; border-radius: 999px; background: var(--tr-vien-2); }
+/* Bi buồn + hai giọt nước mắt rưng rưng dưới mắt (mắt Bi ở 39 % và 61 % bề ngang, đáy mắt ~65 % chiều cao — bản vẽ 200 × 230) */
+[data-trong] .giu-bi { position: relative; width: 124px; margin-top: 4px; }
+[data-trong] .giu-bi > i {
+  position: absolute; top: 63%; left: calc(39% - 4px); width: 9px; height: 12px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: color-mix(in srgb, var(--tr-tin) 70%, var(--tr-mat)); opacity: 0; transform-origin: top center;
+}
+[data-trong] .giu-bi > i + i { left: calc(61% - 4px); }
+[data-trong] .giu-bi .bi { display: block; width: 100%; height: auto; }
+[data-trong='hs'] .giu-bi > i { animation: giu-le 2.4s ease-in 500ms infinite; }
+[data-trong='hs'] .giu-bi > i + i { animation-delay: 1.3s; }
+[data-trong] .giu-tieu { margin: 4px 0 0; max-width: 30ch; font-size: clamp(20px, 5.4vw, 24px); font-weight: 800; line-height: 1.35; letter-spacing: -.005em; text-wrap: balance; }
+[data-trong] .giu-phu { display: flex; flex-direction: column; gap: 6px; max-width: 40ch; }
+[data-trong] .giu-phu p { margin: 0; color: var(--tr-chu-2); font-size: 15px; font-weight: 600; line-height: 1.45; }
+[data-trong] .giu-nut { display: flex; flex-direction: column; align-items: stretch; gap: 6px; width: 100%; margin-top: 6px; }
+[data-trong] .giu .duo-nut { width: 100%; }
+[data-trong] .giu .duo-nut:active { transform: translateY(3px); box-shadow: none; }
+[data-trong] .giu-thoat {
+  min-height: 48px; padding: 0 16px; border: 0; border-radius: 14px; background: transparent; color: var(--tr-sai-chu);
+  font: inherit; font-size: 16px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+}
+[data-trong] .giu-thoat:hover { background: var(--tr-sai-nhat); }
+[data-trong] .giu-thoat:focus-visible, [data-trong] .giu .duo-nut:focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; }
+/* khung thấp xoay ngang: Bi nhỏ lại, tấm vừa một màn */
+@media (max-height: 500px) {
+  [data-trong] .giu-tam { gap: 8px; padding-top: 6px; }
+  [data-trong] .giu-bi { width: 72px; margin-top: 0; }
+  [data-trong] .giu-tieu { font-size: 19px; }
+  [data-trong] .giu-nut { flex-direction: row-reverse; }
+  [data-trong] .giu-nut > * { flex: 1; }
+}
+@media (max-height: 680px) and (min-height: 501px) { [data-trong] .giu-bi { width: 96px; } }
+/* máy tính: tấm thành hộp giữa màn (không dán đáy cửa sổ rộng) */
+@media (min-width: 900px) and (min-height: 600px) {
+  [data-trong] .giu { align-items: center; }
+  [data-trong] .giu-tam { border-radius: 24px; padding: 18px 28px 24px; animation-name: giu-noi; }
+  [data-trong] .giu-keo { display: none; }
+}
+
+/* ── Băng nhắc nhỏ (mở chặng / còn 1 câu): trượt xuống dưới thanh trên, nằm đè, tự ẩn; cùng vị trí băng combo ── */
+[data-trong] .giu-bang {
+  position: absolute; top: calc(100% + 6px); left: 50%; z-index: 7; max-width: calc(100% - 24px); padding: 7px 16px; border-radius: 999px;
+  background: var(--tr-tin-nhat); color: var(--tr-tin-chu); box-shadow: var(--tr-bong-2); font-size: 15px; font-weight: 800; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; pointer-events: none; transform: translateX(-50%);
+  animation: giu-xuong 500ms cubic-bezier(.2, 1.3, .4, 1) both, giu-hien 300ms ease-in 2.2s reverse forwards;
+}
+@media (orientation: landscape) and (max-height: 500px) { [data-trong] .giu-bang { position: fixed; top: 8px; } }
+
+/* ── Lời Bi động viên sau hai câu sai liền (trong tấm kết quả sai) ── */
+[data-trong] .giu-dong-vien {
+  position: relative; margin: 2px 0 0; padding: 8px 12px; border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu);
+  border: 2px solid color-mix(in srgb, var(--tr-sai) 30%, var(--tr-vien)); font-size: 15px; font-weight: 700; line-height: 1.4;
+}
+
+@keyframes giu-hien { from { opacity: 0; } }
+@keyframes giu-truot { from { transform: translateY(100%); } }
+@keyframes giu-noi { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+@keyframes giu-xuong { from { opacity: 0; transform: translate(-50%, -12px) scale(.96); } }
+@keyframes giu-le { 0% { opacity: 0; transform: translateY(0) scale(.5); } 15% { opacity: .95; transform: translateY(0) scale(1); } 70% { opacity: .9; transform: translateY(14px) scale(1); } 100% { opacity: 0; transform: translateY(22px) scale(.8); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong] :is(.giu-nen, .giu-tam, .giu-bang) { animation: none !important; }
+  [data-trong='hs'] .giu-bi > i { animation: none; opacity: .9; }
+}
+[data-trong].may-yeu :is(.giu-nen, .giu-tam) { animation: none; }
