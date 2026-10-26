@@ -302,6 +302,12 @@ const TPC_CANH = [
 const DS_TPC = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết THƯỞNG PHẠT GỘP 26/10
+// ═══ BI CHUYỂN ĐỘNG 27/10 (tiền tố "bd-"): mọi chỗ có Bi trong app học sinh — Lộ trình (Bi nói), câu đúng (mừng nhảy), câu sai (buồn), kết chặng
+// (nhảy múa), Thành tích, chuỗi ngày (lửa). 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Bi chuyển động nạp lười ⇒ chờ thêm cho mảnh bi-dong.
+const DS_BD = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  TPC_CANH.filter(([t]) => ['lo-trinh', 'thanh-tich', 'chuoi', 'lam-dung', 'lam-sai', 'ket'].includes(t))
+    .map(([t, m, cho, viec]) => [`bd-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết BI CHUYỂN ĐỘNG 27/10
 
 // ═══ NGANG HS 26/10: màn con học sinh mở đè Hôm nay (`?man=hs-ng&v=tu-sua|kiem|ai`, khối cùng tên ở trang.tsx) ở điện thoại dọc thấp / ngang / máy tính
 // bảng / máy tính, sáng + tối (ảnh khung nhìn; đo tràn ngang + vùng chạm như mọi cảnh). Tiền tố "ng-hs-".
@@ -369,6 +375,7 @@ const DS = [
   ...DS_DUO, // DUO 26/10
   ...DS_GIU, // GIỮ CHÂN 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
+  ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D

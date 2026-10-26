@@ -272,6 +272,8 @@ export default defineConfig({
         // vẫn tải được, tải một lần rồi cất ở kho chạy-lúc (`omr-manh-chay-lan`, xem src/sw.ts). `scripts/kiem-sw.mjs` chặn precache phình to lại.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
         globIgnores: [
+          // Bi chuyển động (27/10) chỉ là trang trí: nạp lười, kho chạy-lúc; mất mạng ⇒ giữ Bi tĩnh.
+          '**/bi-dong-*.{js,css}',
           // NGANG GV 26/10: CSS điện thoại ngang + máy ≥ 1600 của app thầy (mảnh chung các màn thầy nạp lười, tải song song mảnh màn) — kho chạy-lúc.
           '**/trong-gv-ngang-*.css',
           // Hỏi thêm cần máy chủ và chỉ mở trong lời giải: nạp khi dùng, không cất sẵn.

@@ -1,0 +1,54 @@
+/* BI CHUYỂN ĐỘNG (src/components/linh-vat/bi-dong.ts) — nạp LƯỜI cùng mảnh bi-dong, chỉ app học sinh «Trong». Màu dùng lại lớp của bi.css
+   (--bi-c, --bi-vien, --bi-trang…) + biến --tr-*; không màu thô. Dung dịch đổi màu theo cảm xúc như chất chỉ thị: data-mau trên svg đặt --bi-c,
+   gradient/tay/mí chuyển màu dần 600 ms. Khung Bi giữ đúng cỡ Bi tĩnh (200:230); svg vẽ rộng hơn (viewBox -40 -30 280 270) cho bọt, hơi, hoa giấy
+   tràn ra ngoài; svg không bắt chạm, chỉ thân bình bắt chạm (không che nút bên cạnh). */
+[data-trong='hs'] .bi-dong { position: relative; -webkit-tap-highlight-color: transparent; }
+[data-trong='hs'] .bi-dong > svg { position: absolute; left: -20%; top: -13.043%; width: 140%; height: 117.391%; overflow: visible; pointer-events: none; }
+[data-trong='hs'] .bi-dong .bd-cham { pointer-events: all; cursor: pointer; touch-action: manipulation; }
+[data-trong='hs'] .bi-dong * { transform-box: view-box; }
+[data-trong='hs'] .bi-dong :is(.bd-hat, .bd-dao) { transform-box: fill-box; transform-origin: center; }
+[data-trong='hs'] .bi-dong .bd-lua-o { transform-origin: 50% 100%; }
+
+/* Màu chất chỉ thị theo cảm xúc */
+[data-trong='hs'] .bi-dong svg[data-mau='dung'] { --bi-c: var(--tr-dung); }
+[data-trong='hs'] .bi-dong svg[data-mau='chanh'] { --bi-c: color-mix(in srgb, var(--tr-dung) 62%, var(--tr-sao)); }
+[data-trong='hs'] .bi-dong svg[data-mau='tin'] { --bi-c: var(--tr-tin); }
+[data-trong='hs'] .bi-dong svg[data-mau='sai'] { --bi-c: var(--tr-sai); }
+[data-trong='hs'] .bi-dong svg[data-mau='do'] { --bi-c: color-mix(in srgb, var(--tr-sai) 78%, var(--tr-chu-y-chu)); }
+[data-trong='hs'] .bi-dong svg[data-mau='lam'] { --bi-c: var(--tr-gv); }
+[data-trong='hs'] .bi-dong svg[data-mau='tim'] { --bi-c: color-mix(in srgb, var(--tr-tin) 55%, var(--tr-sai)); }
+[data-trong='hs'] .bi-dong svg[data-mau='hong'] { --bi-c: color-mix(in srgb, var(--tr-sai) 62%, var(--tr-tin)); }
+[data-trong='hs'] .bi-dong svg[data-mau='sao'] { --bi-c: var(--tr-sao); }
+[data-trong='hs'] .bi-dong svg[data-mau='lua'] { --bi-c: var(--tr-chu-y); }
+[data-trong='hs'] .bi-dong svg[data-mau='xam'] { --bi-c: var(--tr-chu-3); }
+[data-trong='hs'] .bi-dong svg { --bi-sang: color-mix(in srgb, var(--bi-c) 70%, var(--bi-trang)); --bi-dam: color-mix(in srgb, var(--bi-c) 76%, var(--bi-vien)); }
+[data-trong='hs'] .bi-dong :is(.bi-g-sang, .bi-g-chinh, .bi-g-dam) { transition: stop-color 600ms ease; }
+[data-trong='hs'] .bi-dong :is(.bi-f-sang, .bi-f-dam, .bd-mi-f) { transition: fill 600ms ease; }
+[data-trong='hs'] .bi-dong .bi-net-c { transition: stroke 600ms ease; }
+[data-trong='hs'] .bi-dong .bd-mi-f { fill: var(--bi-c); }
+[data-trong='hs'] .bi-dong .bd-f-sai { fill: var(--tr-sai); }
+[data-trong='hs'] .bi-dong .bd-s-sai { stroke: var(--tr-sai); }
+[data-trong='hs'] .bi-dong .bd-f-hong { fill: color-mix(in srgb, var(--tr-sai) 55%, var(--bi-trang)); }
+[data-trong='hs'] .bi-dong .bd-hoi-nuoc { fill: color-mix(in srgb, var(--tr-chu-3) 28%, var(--bi-trang)); }
+[data-trong='hs'] .bi-dong .bd-so { fill: var(--bi-trang); font-weight: 900; font-size: 22px; }
+
+/* Chuyển tư thế mượt: tư thế có nảy nhẹ (bd-t), mực nước/mí êm (bd-m), hiện/ẩn (bd-o), mày, miệng đổi hình */
+[data-trong='hs'] .bi-dong .bd-t { transition: transform 450ms cubic-bezier(.34, 1.56, .64, 1); }
+[data-trong='hs'] .bi-dong .bd-m { transition: transform 500ms cubic-bezier(.4, 0, .2, 1); }
+[data-trong='hs'] .bi-dong .bd-o { transition: opacity 250ms ease, transform 300ms cubic-bezier(.34, 1.56, .64, 1); }
+[data-trong='hs'] .bi-dong .bd-may { transition: transform 400ms cubic-bezier(.34, 1.56, .64, 1), opacity 250ms ease; }
+[data-trong='hs'] .bi-dong .bd-ngoi { transition: transform 180ms ease-out; }
+[data-trong='hs'] .bi-dong .bd-ngoi-co { transition: transform 200ms ease-out; }
+[data-trong='hs'] .bi-dong .bd-mieng { transition: d 90ms ease-out; }
+[data-trong='hs'] .bi-dong .bd-lua { transform-box: fill-box; transform-origin: 50% 100%; animation: bd-lua 800ms ease-in-out infinite; }
+@keyframes bd-lua { 0%, 100% { transform: scale(1, 1) skewX(0deg); } 25% { transform: scale(1.06, .94) skewX(3deg); } 50% { transform: scale(.95, 1.08) skewX(-2deg); } 75% { transform: scale(1.03, .97) skewX(2deg); } }
+
+/* Bong bóng lời (tuỳ chọn bong: true) */
+[data-trong='hs'] .bi-dong .bd-loi { position: absolute; left: 50%; bottom: 96%; z-index: 1; width: max-content; max-width: min(240px, 70vw); padding: 8px 14px; border: 2px solid var(--tr-vien-2); border-radius: 16px;
+  background: var(--tr-mat); color: var(--tr-chu); font-weight: 800; font-size: 15px; line-height: 1.35; opacity: 0; transform: translate(-30%, 6px) scale(.9); transform-origin: 30% 100%;
+  transition: opacity 200ms ease, transform 250ms cubic-bezier(.34, 1.56, .64, 1); pointer-events: none; }
+[data-trong='hs'] .bi-dong .bd-loi.hien { opacity: 1; transform: translate(-30%, 0) scale(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] .bi-dong, [data-trong='hs'] .bi-dong * { animation: none !important; transition: none !important; }
+}
