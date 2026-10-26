@@ -210,16 +210,22 @@ describe('bảng em / phụ huynh', () => {
     expect(bacTheoSanh({ ...k, bacCham: undefined })).toBeNull()
   })
 
-  it('BangNhipHoc có bậc ⇒ thang 12 bậc đầu bảng (khối nạp khi cần); vắng ⇒ không thang', async () => {
+  // 26/10 (thầy: bậc CHỈ thầy + phụ huynh xem): bảng PHỤ HUYNH có thang; bảng EM không bao giờ có thang (kể cả khi lỡ có `bacCham`).
+  it('BangNhipHoc phụ huynh có bậc ⇒ thang 12 bậc đầu bảng (khối nạp khi cần); vắng ⇒ không thang; bảng em không thang', async () => {
     const k = { ...NHIP_EM_CHUA_DEU, bacCham: bacTheoSanh({ ...NHIP_EM_CHUA_DEU, bacCham: { bac: 6, diem: 0, diemLenBac: null } })! }
-    const { container, unmount } = render(<BangNhipHoc k={k} />)
+    const { container, unmount } = render(<BangNhipHoc k={k} ngoi="con" />)
     const thang = await screen.findByRole('img', { name: /^Thang 12 bậc từ Lười đến Chăm: đang ở Bậc [67]\/12/ })
     expect(thang.querySelectorAll('.bcc-o')).toHaveLength(12)
     expect(container.querySelector('.ht2-hn-nhip')!.firstElementChild!.classList.contains('bcc-thang')).toBe(true)
     unmount()
-    const cu = render(<BangNhipHoc k={NHIP_EM_CHUA_DEU} />)
+    const cu = render(<BangNhipHoc k={NHIP_EM_CHUA_DEU} ngoi="con" />)
     await new Promise((r) => setTimeout(r, 20))
     expect(cu.container.querySelector('.bcc-thang, .bcc-chip')).toBeNull()
+    cu.unmount()
+    const em = render(<BangNhipHoc k={k} />)
+    await new Promise((r) => setTimeout(r, 20))
+    expect(em.container.querySelector('.bcc-thang, .bcc-chip')).toBeNull()
+    expect(em.container.textContent).not.toMatch(/bậc|lười|chăm/i)
   })
 
   it('phụ huynh: chip "Bậc N/12 · Tên" cạnh chip nhóm + thang; máy chủ cũ ⇒ thẻ y như trước', async () => {

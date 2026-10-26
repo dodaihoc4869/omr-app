@@ -188,9 +188,10 @@ export async function phBaoCaoTuan(env: Env, b: Row, nowMs = Date.now(), ctx?: E
   if (c) {
     try { const r = await c.match(khoa); if (r) return (await r.json()) as Row } catch { /* đọc thẳng */ }
   }
-  const d = await duLieuTuanCuaEm(env, sbd, nowMs)
+  // Khối `tuan` của thưởng phạt (thuong-gv-ph.ts) đọc SONG SONG với báo cáo tuần ⇒ cùng một đợt chờ D1. Lỗi ⇒ không có khối, thẻ cũ vẫn hiện.
+  const [d, tuan] = await Promise.all([duLieuTuanCuaEm(env, sbd, nowMs), import('./thuong-gv-ph').then((m) => m.tuanThuongPh(env, sbd, nowMs)).catch(() => null)])
   if (!d) return { ok: false, error: 'Chưa tải được báo cáo tuần của con. Anh/chị thử lại sau ít phút.' }
-  const ra: Row = { ok: true, duLieu: { ...d, lyDo: d.nhan === 'Đối phó' ? d.lyDo : undefined }, soLieu: soanTinBaoCaoTuan(d).soLieu }
+  const ra: Row = { ok: true, duLieu: { ...d, lyDo: d.nhan === 'Đối phó' ? d.lyDo : undefined }, soLieu: soanTinBaoCaoTuan(d).soLieu, ...(tuan ? { tuan } : {}) }
   if (c) {
     const ghi = c.put(khoa, new Response(JSON.stringify(ra), { headers: { 'content-type': 'application/json', 'cache-control': `max-age=${PH_CACHE_S}` } })).catch(() => undefined)
     if (ctx) ctx.waitUntil(ghi)

@@ -9,6 +9,7 @@
 // BẢNG CHỈ-THÊM, tạo lúc chạy (IF NOT EXISTS): `danh_gia_em_tuan` (bản chụp tuần, tính lại được từ sổ), `danh_gia_cau_tuan` (tỉ lệ đúng của lớp từng câu),
 // `can_thiep_em` (nhật ký nhắc / báo / cam kết / xác nhận), `nhan_mu_thay` (nhãn mù thầy gán để hiệu chỉnh). Không sửa / xoá dữ liệu cũ nào.
 import type { Env, ExecutionContext } from './kieu'
+import { danhGiaChoHs } from './an-luoi-hs'
 import { gameIdentity } from './game-v2-auth'
 import { sbdCuaPhuHuynh } from './ph-truy-cap'
 import { CHI_NHAN_TOKEN } from './ph-tat-ca-ve-con'
@@ -464,7 +465,8 @@ export async function hsDanhGia(env: Env, b: Row, nowMs = Date.now()): Promise<R
   let sbd = ''
   try { sbd = await gameIdentity(env, b) } catch { return { ok: false, error: 'Em cần đăng nhập lại.' } }
   if (!sbd || sbd.length > 40) return { ok: false, error: 'Em cần đăng nhập lại.' }
-  return banCongKhai(env, sbd, 'em', nowMs)
+  // 26/10 (thầy: Học thật / Đối phó CHỈ thầy + phụ huynh xem): bản em chỉ còn `{ ok: true }` — không nhãn, lý do, số liệu, lịch sử, tin (an-luoi-hs.ts).
+  return danhGiaChoHs(await banCongKhai(env, sbd, 'em', nowMs))
 }
 
 /** `POST /ph/danh-gia {pass|sbd}` */

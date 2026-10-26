@@ -35,8 +35,8 @@ export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Prom
 }
 
 /** Chuỗi theo bài của một em; lỗi đọc sổ ⇒ null. */
-export async function docChuoiNgayBai(env: Env, sbd: string, nowMs: number = Date.now()): Promise<ChuoiNgay | null> {
-  try { return chuoiNgayCuaEm(await docNhatKyChuoi(env, sbd, nowMs), ngayVn(nowMs)) } catch { return null }
+export async function docChuoiNgayBai(env: Env, sbd: string, nowMs: number = Date.now(), thang = false): Promise<ChuoiNgay | null> {
+  try { return chuoiNgayCuaEm(await docNhatKyChuoi(env, sbd, nowMs), ngayVn(nowMs), thang) } catch { return null }
 }
 
 /**
@@ -52,6 +52,7 @@ export async function congBinh(env: Env, sbd: string, so: number, nguon: string,
 }
 
 /** Bắt đầu SỚM (song song lượt đọc khác): cờ `duolingo_bai` bật cho em ⇒ chuỗi theo bài; tắt / lỗi ⇒ null (giữ định nghĩa cũ). Không bao giờ ném. */
-export function chuoiBaiNeuBat(env: Env, sbd: string, nowMs: number = Date.now(), envDoc: Env = env): Promise<ChuoiNgay | null> {
-  return import('./duolingo-bai-co').then((m) => m.duolingoChoEm(env, sbd, nowMs)).then((bat) => (bat ? docChuoiNgayBai(envDoc, sbd, nowMs) : null)).catch(() => null)
+/** `thang` (CHỈ-THÊM 26/10, /hs/thuong): kèm `lich30` + `daiNhat` — cùng nhật ký, không đọc thêm. */
+export function chuoiBaiNeuBat(env: Env, sbd: string, nowMs: number = Date.now(), envDoc: Env = env, thang = false): Promise<ChuoiNgay | null> {
+  return import('./duolingo-bai-co').then((m) => m.duolingoChoEm(env, sbd, nowMs)).then((bat) => (bat ? docChuoiNgayBai(envDoc, sbd, nowMs, thang) : null)).catch(() => null)
 }

@@ -274,7 +274,7 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     const tam = await screen.findByRole('dialog')
     await choTamXong(tam) // 6 mức: "Từng lượt" luôn hiện
     expect([...tam.querySelectorAll('.gvv2-hs-ngay-tieu')].map((h) => h.textContent)).toEqual(['Thứ Sáu 09/10/2026 · 2 lượt', 'Thứ Năm 08/10/2026 · 2 lượt'])
-    const lan = [...tam.querySelectorAll('.gvv2-hs-lan')].map((l) => l.textContent)
+    const lan = [...tam.querySelectorAll('.gvv2-hs-lan')].map((l) => l.textContent!.replace(/\u00a0/g, ' ')) // SOÁT 26/10: dấu cách cứng trước «·»
     // SỬA CÓ CHỦ Ý — đợt 16: số giây thành cột riêng bên phải (dưới kết quả) ở MỌI lượt; không đo được ⇒ "—" (+ chữ ẩn cho trình đọc màn hình).
     expect(lan).toEqual([
       '09:30Câu 25 · Hiệu suất ester hoáĐảo · Vận dụng · Chọn BSai≈ 1 phút 5 giây',

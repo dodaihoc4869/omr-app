@@ -90,3 +90,12 @@
   [data-trong='gv'] .gvv2-ht-thuoc li[data-tt='dang'] button { box-shadow: inset 3px 0 0 var(--tr-chinh); }
   [data-trong='gv'] .gvv2-ht-dong { padding: 14px 16px; }
 }
+/* NGANG GV 26/10: 640–1100 (điện thoại ngang, máy tính bảng) — thước 4 bước một hàng (trước xếp 2×2, ăn ~200 px chiều cao ở khổ ngang) */
+@media (min-width: 640px) and (max-width: 1100px) {
+  [data-trong='gv'] .gvv2-ht-thuoc ol { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  [data-trong='gv'] .gvv2-ht-thuoc li:nth-child(4) { border-left: 1px solid var(--tr-vien); }
+  [data-trong='gv'] .gvv2-ht-thuoc li:nth-child(n + 4) { border-top: 0; }
+}
+@media (min-width: 601px) and (max-height: 520px) {
+  [data-trong='gv'] .gvv2-ht-thuoc li button { min-height: 64px; gap: 4px; padding: 10px 14px; }
+}

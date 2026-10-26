@@ -157,7 +157,7 @@ function DongCau({ sbd, c }: { sbd: string; c: CauXemLai }) {
       </div>
       {mo && (
         <div id={idVung} className="ph3-cau__mo">
-          {ct?.kieu === 'tai' && <p className="ph3-ghi" role="status">Đang mở lời giải…</p>}
+          {ct?.kieu === 'tai' && <p className="ph3-ghi ph3-cho-tre" role="status">Đang mở lời giải…</p>}
           {ct?.kieu === 'ok' && <ChiTiet ct={ct.ct} conChon={c.dapAnChon} />}
           {ct?.kieu === 'loi' && (c.loiGiai ? <LoiGiaiNgan chu={c.loiGiai} dapAn="" /> : <p className="ph3-ghi">Chưa mở được lời giải câu này. Anh/chị thử lại sau ít phút.</p>)}
         </div>

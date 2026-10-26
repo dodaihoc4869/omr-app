@@ -38,3 +38,14 @@
 /* màn nhập mã */
 [data-trong='gv'] .dkc--ket-noi input { min-height: 52px; }
 [data-trong='gv'] .dkc-chinh { min-height: 52px; border-radius: 14px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font-size: 16px; }
+/* NGANG GV 26/10: điện thoại NGANG / máy tính — một cột 576 px giữa màn để trống hai bên và bắt cuộn ở khổ thấp ⇒ ≥ 700 px chia hai cột:
+   trái = thẻ em + các nút điều khiển (tay bấm), phải = thanh thẻ nội dung + lời giải / đề / danh sách (đọc giảng). Dọc giữ một cột. */
+@media (min-width: 700px) {
+  [data-trong='gv'] .dkc .dkc-than {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-rows: auto auto auto auto 1fr; align-items: start;
+    gap: 12px 20px; max-width: 1180px;
+  }
+  [data-trong='gv'] .dkc .dkc-than > * { grid-column: 1; min-width: 0; }
+  [data-trong='gv'] .dkc .dkc-than > .dkc-tab { grid-column: 2; grid-row: 1; margin-top: 0; }
+  [data-trong='gv'] .dkc .dkc-than > .dkc-tab ~ * { grid-column: 2; grid-row: 2 / 6; }
+}

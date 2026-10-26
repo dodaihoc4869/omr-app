@@ -1,0 +1,3 @@
+/* SOÁT 26/10 (giao diện cũ phụ huynh · Tiến bộ, nạp lười cùng ManTienBo): ô tỉ lệ đúng hẹp (360 px) — «75% đúng» không còn thò khỏi ô:
+   chữ «đúng» xuống dòng dưới số khi không đủ chỗ (thầy: không cắt chữ, ô cao theo nội dung). */
+.ph3-so3--ti-le b { white-space: normal; overflow-wrap: anywhere; }

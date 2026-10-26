@@ -4,15 +4,20 @@
 // Tất định: cùng đầu vào → cùng danh sách; thứ tự theo `luc`, hoà thì theo `khoa`. Mọi khoản có KHOÁ idempotent; khoá nằm trong `daCoKhoa` thì
 // KHÔNG sinh lại (gọi lại/nạp lại sổ không cộng trùng).
 import {
-  EXP_CAU, EXP_CAU_GAME, EXP_CHUOI_HE_SO, EXP_CHUOI_TOI_DA, EXP_DIEM_CA_HE_SO, EXP_KHAC_PHUC, EXP_LEN_BAC, EXP_LEN_BANG_CHUA_DAT,
+  EXP_CAU, EXP_CAU_GAME, EXP_CHUOI_HE_SO, EXP_CHUOI_TOI_DA, EXP_KHAC_PHUC, EXP_LEN_BAC, EXP_LEN_BANG_CHUA_DAT,
   EXP_LEN_BANG_DAT, EXP_MOM_XONG, KHIEN_REN_TOI_DA, MANH_CHUOI_BOI_SO, MANH_CHUOI_BOI_SO_THUONG, MANH_DANG_ROI_YEU,
   MANH_DAT_NGAY, MANH_MOI_KHIEN, MANH_TOI_DA, TRO_LAI_CACH_NHAU, TRO_LAI_VANG_TOI_THIEU, bangGiaExp,
+  NGUON_TU_SUA, NT_CAU_KHO, NT_CHUOI_3, NT_CHUOI_5, NT_DUNG_HO_TRO, NT_DUNG_TU_LAM, NT_HOAN_HAO, NT_HOAN_HAO_TOI_THIEU_CAU, NT_HOAN_THANH_KT,
+  NT_LAM_LAI_DUNG, NT_SAI_NGHIEM_TUC, GHI_CHU_DUNG_HO_TRO,
 } from './exp-cau-hinh'
+
+/** Mã nguồn của khoản «hoàn thành kiểm tra cá nhân» (đi chung đường `diemCa` với ca thi). */
+export const TIEN_TO_KTCN = 'ktcn:'
 
 /** Nguồn cho EXP câu: mọi nguồn TRỪ game (game giữ 20/40/40 theo mastery, tránh thưởng đôi) và trừ `len_bang` (có thưởng riêng). */
 export const NGUON_EXP_CAU: readonly string[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'on_lai', 'luyen', 'thu_thach_rieng']
 
-export type LoaiExp = 'cau' | 'lo' | 'btvn' | 'mom' | 'len_bac' | 'khac_phuc' | 'len_bang' | 'diem_ca' | 'dat_ngay' | 'chuoi' | 'dau_ngay' | 'tro_lai'
+export type LoaiExp = 'cau' | 'cau_sai' | 'lo' | 'btvn' | 'mom' | 'len_bac' | 'khac_phuc' | 'len_bang' | 'diem_ca' | 'dat_ngay' | 'chuoi' | 'dau_ngay' | 'tro_lai'
 
 export interface SuKienExp {
   khoa: string
@@ -23,6 +28,10 @@ export interface SuKienExp {
   ketQua: 0 | 1 | null
   /** ISO. */
   luc: string
+  /** (26/10, chỉ-thêm) Lượt có hỗ trợ (`su_kien_hoc.assistance = 'assisted'`). Vắng ⇒ tự làm (như cũ). */
+  hoTro?: boolean
+  /** (26/10, chỉ-thêm) Câu KHÔNG được tính theo Mức làm (Bấm vội / treo máy — `cauKhongDuocTinh`). Vắng ⇒ được tính (như cũ). */
+  khongTinh?: boolean
 }
 
 export interface MetaCauExp {
@@ -131,19 +140,38 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
 
   // 1. Câu ĐÚNG: mỗi qid MỘT lần mỗi ngày VN (lần đúng ĐẦU trong ngày, theo `luc` rồi `khoa`) — luật chống lặp theo khoá sổ.
   //    v5 (thầy chốt 29/09): BỎ trần mềm 25% và trần cứng 3× mục tiêu — MỌI câu đúng đều đủ EXP (chống cày là cổng ngày đạt + EXP tràn giảm dần).
-  const dung = sapXep(v.suKien.filter((e) => e.ketQua === 1 && e.qid && NGUON_EXP_CAU.includes(e.nguon)))
+  //    26/10 (thưởng phạt): câu KHÔNG được tính (Mức làm vội / treo) ⇒ 0; câu đúng CÓ HỖ TRỢ ⇒ +NT_DUNG_HO_TRO (trước: như tự làm).
+  const dung = sapXep(v.suKien.filter((e) => e.ketQua === 1 && e.qid && NGUON_EXP_CAU.includes(e.nguon) && !e.khongTinh))
   const daTinh = new Set<string>()
   for (const e of dung) {
     if (daTinh.has(e.qid)) continue
     daTinh.add(e.qid)
+    if (e.hoTro) {
+      them({ khoa: `cau|${e.qid}|${v.ngay}`, loai: 'cau', exp: NT_DUNG_HO_TRO, ngay: v.ngay, qid: e.qid, maNguon: e.maNguon, luc: e.luc, ghiChu: `${GHI_CHU_DUNG_HO_TRO}: +${NT_DUNG_HO_TRO}` })
+      continue
+    }
     const meta = v.metaCau[e.qid]
     const phan = meta?.phan ?? phanTuQid(e.qid)
     const exp = expMotCau(phan, meta?.sao ?? 0)
     them({ khoa: `cau|${e.qid}|${v.ngay}`, loai: 'cau', exp, ngay: v.ngay, qid: e.qid, maNguon: e.maNguon, luc: e.luc, ghiChu: `Câu đúng Phần ${phan}${meta?.sao ? `, ${meta.sao} sao` : ''}: +${exp}` })
   }
+  // 1a. (26/10) SAI NHƯNG LÀM NGHIÊM TÚC: +NT_SAI_NGHIEM_TUC, một lần mỗi câu mỗi ngày (thưởng công sức để em không né câu khó). Ca thi KHÔNG có (thi có thưởng hoàn thành
+  //     riêng); câu không được tính / bỏ trống ⇒ 0.
+  const daSai = new Set<string>()
+  for (const e of sapXep(v.suKien.filter((x) => x.ketQua === 0 && x.qid && x.nguon !== 'thi' && NGUON_EXP_CAU.includes(x.nguon) && !x.khongTinh))) {
+    if (daSai.has(e.qid)) continue
+    daSai.add(e.qid)
+    them({ khoa: `sai|${e.qid}|${v.ngay}`, loai: 'cau_sai', exp: NT_SAI_NGHIEM_TUC, ngay: v.ngay, qid: e.qid, maNguon: e.maNguon, luc: e.luc, ghiChu: `Làm nghiêm túc: +${NT_SAI_NGHIEM_TUC}` })
+  }
+
+  // (26/10) TỰ SỬA = 0 mọi đường: câu đúng của nguồn tự sửa không mở "câu đúng đầu ngày"; câu mà lần đúng ĐẦU trong ngày đến từ tự sửa không có "lên bậc" / "khắc phục".
+  const laTuSua = (e: SuKienExp) => NGUON_TU_SUA.includes(e.nguon)
+  const dungDauCuaQid = new Map<string, SuKienExp>()
+  for (const e of sapXep(v.suKien.filter((x) => x.ketQua === 1 && x.qid))) if (!dungDauCuaQid.has(e.qid)) dungDauCuaQid.set(e.qid, e)
+  const biChanThuong = (qid: string) => { const e = dungDauCuaQid.get(qid); return !!e && (laTuSua(e) || !!e.khongTinh) }
 
   // 1b. Câu ĐÚNG ĐẦU TIÊN trong ngày (Điều 10): MỌI nguồn kể cả game (khác EXP câu ở trên), một khoản mỗi ngày, không tính vào trần game. Bảng cũ (trước 22/09) giá 0 ⇒ không sinh.
-  const dauTien = gia.dauNgay > 0 ? sapXep(v.suKien.filter((e) => e.ketQua === 1 && e.qid))[0] : undefined
+  const dauTien = gia.dauNgay > 0 ? sapXep(v.suKien.filter((e) => e.ketQua === 1 && e.qid && !laTuSua(e) && !e.khongTinh))[0] : undefined
   if (dauTien) them({ khoa: `dau_ngay|${v.ngay}`, loai: 'dau_ngay', exp: gia.dauNgay, ngay: v.ngay, maNguon: dauTien.maNguon, luc: dauTien.luc, ghiChu: `Câu đúng đầu tiên hôm nay +${gia.dauNgay} EXP` })
 
   // 1c. Mừng em trở lại (Điều 10): ngày đầu có ≥ 1 sự kiện học sau ≥ TRO_LAI_VANG_TOI_THIEU ngày liền không có sự kiện nào; nhiều nhất 1 lần / TRO_LAI_CACH_NHAU ngày; chưa từng học ⇒ không.
@@ -168,12 +196,12 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
   // v5: BỎ trần lên bậc ≤ 10 và khắc phục ≤ 3 mỗi ngày — mỗi khoá một lần (chống lặp theo khoá sổ).
   for (const qid of [...new Set(v.lenBac)].sort()) {
     const khoa = `bac|${qid}|${v.ngay}`
-    if (v.daCoKhoa.has(khoa)) continue
+    if (v.daCoKhoa.has(khoa) || biChanThuong(qid)) continue
     const luc = v.suKien.filter((e) => e.qid === qid && e.ketQua === 1).map((e) => e.luc).sort()[0] ?? `${v.ngay}T00:00:00.000Z`
     them({ khoa, loai: 'len_bac', exp: EXP_LEN_BAC, ngay: v.ngay, qid, luc, ghiChu: `Câu ôn lên bậc: +${EXP_LEN_BAC}` })
   }
   for (const k of sapXep(v.khacPhuc.map((x) => ({ ...x, khoa: `kp|${x.qid}|${x.lan}` })))) {
-    if (v.daCoKhoa.has(k.khoa)) continue
+    if (v.daCoKhoa.has(k.khoa) || biChanThuong(k.qid)) continue
     them({ khoa: k.khoa, loai: 'khac_phuc', exp: EXP_KHAC_PHUC, ngay: v.ngay, qid: k.qid, luc: k.luc, ghiChu: `Khắc phục xong một câu (đúng 3 mốc): +${EXP_KHAC_PHUC}` })
   }
   for (const e of sapXep(v.suKien.filter((x) => x.nguon === 'len_bang' && x.ketQua !== null))) {
@@ -181,9 +209,10 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
     const exp = dat ? EXP_LEN_BANG_DAT : EXP_LEN_BANG_CHUA_DAT
     them({ khoa: `lb|${e.khoa}`, loai: 'len_bang', exp, ngay: v.ngay, qid: e.qid, luc: e.luc, ghiChu: dat ? `Lên bảng, đạt: +${exp}` : `Lên bảng, chưa đạt: +${exp}` })
   }
+  // 26/10 (thưởng phạt §4.1): ca thi hoàn thành = +NT_HOAN_THANH_KT CỐ ĐỊNH, không phụ thuộc điểm (trước: round(điểm) × EXP_DIEM_CA_HE_SO). Khoá giữ nguyên.
   for (const c of v.diemCa) {
-    const exp = Math.round(Math.max(0, Math.min(10, c.diem))) * EXP_DIEM_CA_HE_SO
-    them({ khoa: `diem|${c.maCa}|${c.lanThu}`, loai: 'diem_ca', exp, ngay: v.ngay, maNguon: c.maCa, luc: c.luc, ghiChu: `Điểm ca thi ${c.diem}: +${exp}` })
+    const exp = NT_HOAN_THANH_KT
+    them({ khoa: `diem|${c.maCa}|${c.lanThu}`, loai: 'diem_ca', exp, ngay: v.ngay, maNguon: c.maCa, luc: c.luc, ghiChu: c.maCa.startsWith(TIEN_TO_KTCN) ? `Hoàn thành kiểm tra cá nhân: +${exp}` : `Hoàn thành ca thi: +${exp}` })
   }
 
   // 3. Đạt nhiệm vụ ngày + chuỗi (trao CÙNG LÚC) và mảnh khiên tương ứng.
@@ -203,6 +232,105 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
   }
 
   return { khoan: sapXep(khoan), manh: sapXep(manh) }
+}
+
+// --- Nguyên tử từng câu / từng bài (thưởng phạt 26/10) ------------------------------------------
+
+/** Một dòng thưởng in sẵn cho màn em: nhãn trung tính + số. KHÔNG bao giờ mang nhãn lười. */
+export interface DongThuong { nhan: string; so: number }
+
+/** Trường `thuong` của phản hồi `answer` (hợp đồng §4.1). */
+export interface ThuongCau {
+  /** false = câu không được tính ⇒ giao diện hiện tấm trung tính (không nói lý do). */
+  tinh: boolean
+  nguyenTu: number
+  dong: DongThuong[]
+  /** Chuỗi đúng liền SAU câu này (mang qua các bài trong cùng ngày). */
+  chuoiDung: number
+  cauKho: boolean
+}
+
+export interface VaoNguyenTuCau {
+  dung: boolean
+  hoTro: boolean
+  /** Mức làm Bấm vội / treo máy (`cauKhongDuocTinh`) hoặc lượt lướt không có kết quả. */
+  khongTinh: boolean
+  cauKho: boolean
+  /** Chuỗi đúng liền TRƯỚC câu này. */
+  chuoiTruoc: number
+  /** Câu của vòng Làm lại (A3, Code app 4). */
+  lamLai?: boolean
+}
+
+/**
+ * Nguyên tử MỘT câu của bài học (bảng luật LUAT-THUONG-PHAT.md). Hàm thuần.
+ *   đúng tự làm 10 (+5 câu khó; chuỗi ≥ 3: +2, ≥ 5: +5) · đúng có hỗ trợ 5 (giữ chuỗi, không cộng) · sai nghiêm túc 2 (đứt chuỗi) ·
+ *   vòng làm lại đúng 3 (chuỗi +1, không thưởng thêm) · không được tính 0 (đứt chuỗi).
+ */
+export function nguyenTuCau(v: VaoNguyenTuCau): ThuongCau {
+  const truoc = Math.max(0, Math.floor(Number(v.chuoiTruoc) || 0))
+  if (v.khongTinh) return { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0, cauKho: v.cauKho }
+  const dong: DongThuong[] = []
+  let chuoi = 0
+  if (!v.dung) dong.push({ nhan: 'Làm nghiêm túc', so: NT_SAI_NGHIEM_TUC })
+  else if (v.lamLai) { dong.push({ nhan: 'Làm lại đúng', so: NT_LAM_LAI_DUNG }); chuoi = truoc + 1 }
+  else if (v.hoTro) { dong.push({ nhan: 'Đúng có hỗ trợ', so: NT_DUNG_HO_TRO }); chuoi = truoc }
+  else {
+    chuoi = truoc + 1
+    dong.push({ nhan: 'Đúng', so: NT_DUNG_TU_LAM })
+    if (v.cauKho) dong.push({ nhan: 'Câu khó', so: NT_CAU_KHO })
+    if (chuoi >= 5) dong.push({ nhan: 'Phản ứng dây chuyền!', so: NT_CHUOI_5 })
+    else if (chuoi >= 3) dong.push({ nhan: `Chuỗi đúng ${chuoi}`, so: NT_CHUOI_3 })
+  }
+  return { tinh: true, nguyenTu: dong.reduce((t, d) => t + d.so, 0), dong, chuoiDung: chuoi, cauKho: v.cauKho }
+}
+
+/** Một câu đã chấm của bài, đưa vào `ketBaiNguyenTu`. */
+export interface CauCuaBai { thuong: ThuongCau; dung: boolean; hoTro: boolean }
+
+export interface KetBaiNguyenTu {
+  tong: number
+  dong: DongThuong[]
+  soDung: number
+  soCau: number
+  /** % làm tròn. */
+  chinhXac: number
+  giay: number
+  hoanHao: boolean
+  /** Chuỗi đúng dài nhất trong bài (cho nhiệm vụ / huy hiệu). */
+  chuoiMax: number
+  /** Số câu khó làm đúng tự làm (cho nhiệm vụ). */
+  khoDung: number
+}
+
+/**
+ * Kết bài: gom nguyên tử từng câu theo nhóm (câu đúng · công sức · câu khó · chuỗi đúng · hoàn hảo), độ chính xác, thời gian. Hàm thuần.
+ * Hoàn hảo = mọi câu đúng TỰ LÀM và được tính, bài có ≥ NT_HOAN_HAO_TOI_THIEU_CAU câu ⇒ +NT_HOAN_HAO.
+ */
+export function ketBaiNguyenTu(cau: readonly CauCuaBai[], giay: number): KetBaiNguyenTu {
+  const nhom = new Map<string, number>()
+  const cong = (nhan: string, so: number) => { if (so > 0) nhom.set(nhan, (nhom.get(nhan) ?? 0) + so) }
+  for (const c of cau) {
+    for (const d of c.thuong.dong) {
+      if (d.nhan === 'Câu khó') cong('Câu khó', d.so)
+      else if (d.nhan.startsWith('Chuỗi đúng') || d.nhan === 'Phản ứng dây chuyền!') cong('Chuỗi đúng', d.so)
+      else if (d.nhan === 'Làm nghiêm túc') cong('Công sức', d.so)
+      else cong('Câu đúng', d.so)
+    }
+  }
+  const soCau = cau.length
+  const soDung = cau.filter((c) => c.dung).length
+  const hoanHao = soCau >= NT_HOAN_HAO_TOI_THIEU_CAU && cau.every((c) => c.dung && !c.hoTro && c.thuong.tinh)
+  if (hoanHao) cong('Hoàn hảo', NT_HOAN_HAO)
+  const thuTu = ['Câu đúng', 'Công sức', 'Câu khó', 'Chuỗi đúng', 'Hoàn hảo']
+  const dong = thuTu.filter((n) => nhom.has(n)).map((n) => ({ nhan: n, so: nhom.get(n)! }))
+  return {
+    tong: dong.reduce((t, d) => t + d.so, 0), dong, soDung, soCau,
+    chinhXac: soCau ? Math.round((soDung / soCau) * 100) : 0,
+    giay: Math.max(0, Math.round(Number(giay) || 0)), hoanHao,
+    chuoiMax: cau.reduce((m, c) => Math.max(m, c.thuong.chuoiDung), 0),
+    khoDung: cau.filter((c) => c.dung && !c.hoTro && c.thuong.tinh && c.thuong.cauKho).length,
+  }
 }
 
 // --- Khiên rèn -----------------------------------------------------------------------------------

@@ -16,7 +16,7 @@ import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
 import type { EmNhipHoc, KetQuaNhipHoc, KetQuaNhipHocEm, NgayNhipEm } from '../server/src/nhip-hoc-kieu'
 import { ngayVnCua } from '../server/src/bai-hang-ngay'
 import { gvNhipHoc, tinCayNhomNhip } from '../server/src/nhip-hoc'
-import { hsNhipHoc } from '../server/src/nhip-hoc-em'
+import { hsNhipHoc, nhipHocCuaEm } from '../server/src/nhip-hoc-em'
 import { tomTatNhip } from '../server/src/nhip-hoc-luat'
 import { NGUONG_CHAC } from '../server/src/thai-do-tin-cay'
 import { gameToken } from '../server/src/game-v2-auth'
@@ -83,8 +83,12 @@ describe('(1) /gv/nhip-hoc mỗi dòng em ⇒ CÙNG độ tin cậy với /hs/nh
     const ca: Record<string, { nhom: string; tin?: number; them?: string }> = {}
     for (const sbd of ['L', 'C', 'M', 'U', 'X']) {
       const e = thay.em.find((x) => x.sbd === sbd)!
-      const em = (await hsNhipHoc(env, { token: await gameToken(env, sbd) }, NOW)) as KetQuaNhipHocEm
+      // 26/10: bản EM (`/hs/nhip-hoc`) không còn nhóm / độ tin cậy (thầy: chỉ thầy + phụ huynh xem) ⇒ so với LÕI dùng chung của em và `/ph/nhip-hoc`.
+      const em = (await nhipHocCuaEm(env, sbd, NOW)) as KetQuaNhipHocEm
       expect(em.ok).toBe(true)
+      const banEm = (await hsNhipHoc(env, { token: await gameToken(env, sbd) }, NOW)) as Record<string, unknown>
+      expect(banEm.ok).toBe(true)
+      expect(['nhom', 'doTinCay', 'canThem', 'bacCham'].filter((t) => t in banEm)).toEqual([])
       expect([e.doTinCay, e.canThem]).toEqual([em.doTinCay, em.canThem])
       const viaWorker = qua.em.find((x) => x.sbd === sbd)!
       expect([viaWorker.doTinCay, viaWorker.canThem]).toEqual([em.doTinCay, em.canThem])

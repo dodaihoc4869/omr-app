@@ -16,7 +16,7 @@
 //   2.0 theo lệnh thầy 28/09 "bỏ hẳn BTVN" (docs/ban-ve-gv-2809/RA-SOAT.md mục 8) — tắt 2.0 là hiện lại.
 //   (Lịch sử: 28/09 docs/ban-ve-gv-2809/GV-ThanhBen — "Mở ca kiểm tra" + Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh.)
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
-import { CalendarDays, ClipboardCheck, FileText, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Route, Settings, Users, type LucideIcon } from 'lucide-react'
+import { Award, CalendarDays, ClipboardCheck, FileText, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Route, Settings, Users, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import LogoGiaoVien from './LogoGiaoVien'
 import { AnhLogo } from './LogoVai'
@@ -41,10 +41,15 @@ export interface MucDieuHuong {
  *  Cờ BẬT (09/10, bản vẽ tối giản): vào qua Hành trình › Cần thầy chữa › Gỡ nút thắt (màn `bangonutthat` giữ nguyên). */
 export const MUC_GO_NUT_THAT: MucDieuHuong = { id: 'bangonutthat', ten: 'Gỡ nút thắt', ngan: 'Gỡ nút', icon: LifeBuoy }
 
+/** THI ĐUA TUẦN (thưởng phạt 26/10). Bộ menu cũ: ngay dưới Học sinh (điện thoại: tờ «Thêm»). Bộ 2.0: ĐÁY thanh bên, trên Cài đặt (điện thoại: nút cúp
+ *  cạnh bánh răng trên thanh trên) — thanh đáy 2.0 giữ đủ 5 mục (luật C6). */
+export const MUC_THI_DUA: MucDieuHuong = { id: 'thidua', ten: 'Thi đua tuần', ngan: 'Thi đua', icon: Award }
+
 export const MUC_DIEU_HUONG: MucDieuHuong[] = [
   { id: 'examhub', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home, con: ['toancanh'] },
   // "Danh sách lớp" không có mục riêng (thầy chốt 04-09): danh sách đã nạp lên máy chủ; màn ấy thuộc mục Học sinh.
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist'] },
+  MUC_THI_DUA,
   { id: 'lichsuca', ten: 'Ca kiểm tra', ngan: 'Ca kiểm tra', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
   { id: 'nganhangde', ten: 'Ngân hàng đề', ngan: 'Ngân hàng', icon: Library },
   { id: 'giaobtvn', ten: 'Giao bài tập về nhà', ngan: 'Bài tập', icon: ClipboardCheck },
@@ -63,8 +68,8 @@ export const MUC_HOA2_CHINH: MucDieuHuong[] = [
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist', 'toancanh'] },
   { id: 'nganhangde', ten: 'Kho đề', ngan: 'Kho đề', icon: Library },
 ]
-/** GAME HÓA 2.0 — mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). */
-export const MUC_HOA2_DAY: MucDieuHuong[] = [{ id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true }]
+/** GAME HÓA 2.0 — mục ở ĐÁY thanh bên (điện thoại: nút biểu tượng trên thanh trên — cúp Thi đua tuần, bánh răng Cài đặt). */
+export const MUC_HOA2_DAY: MucDieuHuong[] = [MUC_THI_DUA, { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true }]
 
 /** Màn KHÔNG còn khi Game Hóa 2.0 bật — App chuyển về `MAN_DAU_HOA2`.
  *  09/10 (trung tu): `cauhoi` (Học sinh hỏi) RỜI danh sách này — vào từ Hôm nay › Việc cần thầy (em vẫn hỏi bài sau ca kiểm tra). */

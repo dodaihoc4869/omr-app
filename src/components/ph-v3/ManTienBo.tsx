@@ -18,6 +18,7 @@ import { Chip, DangTai, The, TheLoi, TheTrong } from './dung-chung'
 import { CauSaiGanDay, DungSaiTheoNgay, ThoiGianLamCau } from './ConTongQuan'
 import type { ConTongQuan } from '../../lib/ph-v3/con-tong-quan'
 import { diemCacCa } from './tien-ich'
+import './man-tien-bo.css' // SOÁT 26/10: trình bày riêng màn Tiến bộ (nạp lười)
 
 const hai = (n: number) => String(n).padStart(2, '0')
 /** 14 ngày (cũ → mới) kết thúc ở hôm nay theo giờ VN. */

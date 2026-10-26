@@ -36,6 +36,9 @@ export interface ChuoiNgay {
   lich7: { ngay: string; kieu: KieuNgay }[]
   cuu?: { hetHan: string; daLam: number; can: number; soCu: number }
   binhVuaDo?: string
+  /** (CHỈ-THÊM 26/10, chỉ khi nơi gọi xin `thang`) lịch 30 ngày gần nhất + chuỗi dài nhất trong cửa sổ đọc — cùng vòng lặp, không đọc thêm. */
+  lich30?: { ngay: string; kieu: KieuNgay }[]
+  daiNhat?: number
 }
 
 const NGAY = 86_400_000
@@ -47,11 +50,11 @@ export const thuHaiCua = (ngay: string) => { const d = new Date(ms(ngay)).getUTC
 const laThuHai = (ngay: string) => new Date(ms(ngay)).getUTCDay() === 1
 
 /** Chuỗi của MỘT em tại ngày `homNay` (VN) từ nhật ký. */
-export function chuoiNgayCuaEm(nk: NhatKyChuoi, homNay: string): ChuoiNgay {
+export function chuoiNgayCuaEm(nk: NhatKyChuoi, homNay: string, thang = false): ChuoiNgay {
   const dat = (d: string) => (nk.soCau.get(d) ?? 0) >= CAU_MOT_BAI || nk.tuSua.has(d)
   const coHoatDong = [...nk.soCau.keys(), ...nk.tuSua, ...nk.phep].filter(d => d <= homNay).sort()
   const batDau = coHoatDong.length ? (coHoatDong[0]! > congNgay(homNay, -SO_NGAY_DOC) ? coHoatDong[0]! : congNgay(homNay, -SO_NGAY_DOC)) : homNay
-  let so = 0, binh = 0, sucChua = SUC_CHUA_GOC, binhVuaDo: string | undefined
+  let so = 0, binh = 0, sucChua = SUC_CHUA_GOC, binhVuaDo: string | undefined, daiNhat = 0
   let cuu: ChuoiNgay['cuu']
   const tuanDaCuu = new Set<string>(), lich = new Map<string, KieuNgay>()
   for (let d = batDau; d <= homNay; d = congNgay(d, 1)) {
@@ -60,6 +63,7 @@ export function chuoiNgayCuaEm(nk: NhatKyChuoi, homNay: string): ChuoiNgay {
     if (mua > 0) binh = Math.min(sucChua, binh + mua)
     if (dat(d)) {
       so++
+      if (so > daiNhat) daiNhat = so
       lich.set(d, 'hoc')
       if (so === MOC_TANG_BINH) binh = Math.min(sucChua, binh + 1)
       if (so >= MOC_SUC_CHUA) sucChua = SUC_CHUA_100
@@ -80,6 +84,7 @@ export function chuoiNgayCuaEm(nk: NhatKyChuoi, homNay: string): ChuoiNgay {
     so = 0
     lich.set(d, 'tat')
   }
-  const lich7 = Array.from({ length: 7 }, (_, i) => congNgay(homNay, i - 6)).map(ngay => ({ ngay, kieu: lich.get(ngay) ?? 'tat' as KieuNgay }))
-  return { so, giuChuoi: binh, sucChua, lich7, ...(cuu ? { cuu } : {}), ...(binhVuaDo ? { binhVuaDo } : {}) }
+  const lichN = (n: number) => Array.from({ length: n }, (_, i) => congNgay(homNay, i - n + 1)).map(ngay => ({ ngay, kieu: lich.get(ngay) ?? 'tat' as KieuNgay }))
+  const lich7 = lichN(7)
+  return { so, giuChuoi: binh, sucChua, lich7, ...(cuu ? { cuu } : {}), ...(binhVuaDo ? { binhVuaDo } : {}), ...(thang ? { lich30: lichN(30), daiNhat } : {}) }
 }

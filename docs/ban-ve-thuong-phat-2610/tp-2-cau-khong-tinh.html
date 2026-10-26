@@ -1,0 +1,61 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Câu không được tính (vội / treo)» — 0 nguyên tử, không tính chuỗi đúng, không tính nhiệm vụ.
+     Chữ HS thấy đúng một câu trung tính: «Câu này chưa được tính — đọc kĩ rồi làm nhé». Không nhãn lười, không lộ đúng/sai.
+     Hiệu ứng H3: tấm xám trung tính trượt lên, phân tử combo rã từng nguyên tử rồi rơi (500 ms). Ống nghiệm hết phát sáng. -->
+<title>HS · Thưởng phạt · 2 Câu chưa được tính</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.duo-kq>.giua{flex:1;min-width:0}
+.duo-kq .bi-kq{width:58px;margin-top:-30px}
+.duo-kq h3{font-size:19px!important;line-height:1.3}
+.tp-diem{display:inline-flex;align-items:center;gap:4px;font-weight:900;font-size:16px;color:var(--dung-chu);flex:none;min-width:44px;justify-content:flex-end}
+.tp-diem .tp-dv{width:20px;height:20px}
+.combo-o{display:flex;justify-content:center;min-height:44px}
+.duo-than{gap:16px;padding-top:12px}
+.tp-combo .tp-phan-tu{opacity:0}
+.tp-ct.xam b{color:var(--chu-2)}
+</style></head>
+<body class="duo tp cau-ngang" data-app="hs" data-khung="khong" data-ai="khong" data-hu-mac="khong-tinh">
+<div class="duo-vo">
+  <div class="duo-tren">
+    <span class="duo-dong" aria-label="Thoát, lưu bài"><i data-i="x"></i></span>
+    <div class="tp-ong" id="ong" style="--p:66.7%" role="img" aria-label="Câu 4/6 của bài"><i class="long"><b class="cam"></b><s class="vet"></s><s class="bot" style="left:40%"></s><s class="bot" style="left:75%;animation-delay:.8s"></s></i><span class="bong-tren"></span></div>
+    <span class="tp-diem" aria-label="Nguyên tử của bài này"><i data-tp="nt"></i>32</span>
+  </div>
+  <main class="duo-than">
+    <div class="combo-o"><div class="tp-combo tat" id="combo"><span data-phan-tu="3"></span><span>Chuỗi đúng: 0</span></div></div>
+    <p class="duo-nhan">Câu mới · Amino acid <span class="chip">Câu 4/6</span></p>
+    <p class="duo-de">Cho 0,1 mol glycine tác dụng vừa đủ với dung dịch sodium hydroxide. Khối lượng muối thu được là</p>
+    <div class="duo-pa luoi">
+      <div><b>A</b><span>9,7 g</span></div>
+      <div class="trung"><b>B</b><span>7,5 g</span></div>
+      <div><b>C</b><span>11,1 g</span></div>
+      <div><b>D</b><span>9,4 g</span></div>
+    </div>
+  </main>
+  <div class="duo-day trung" id="tam"><div class="giua">
+    <div class="duo-kq"><span class="o"><i data-i="clock"></i></span>
+      <div class="giua"><h3>Câu này chưa được tính — đọc kĩ rồi làm nhé</h3>
+        <div class="tp-cong"><span class="tp-ct xam"><i data-tp="nt"></i> Nguyên tử <b>0</b></span><span class="tp-ct xam">Chuỗi đúng <b>về 0</b></span></div></div>
+      <span class="bi-kq" data-bi="nghi" id="bi"></span></div>
+    <div class="duo-them"><span style="color:var(--chu-2)"><i data-i="book"></i>Lời giải từng bước</span></div>
+    <span class="duo-nut trung">Tiếp tục</span>
+  </div></div>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('khong-tinh', async () => {
+  const tam = document.getElementById('tam'), ong = document.getElementById('ong'), combo = document.getElementById('combo')
+  TP.phanHoi('khongTinh')
+  TP.a(tam, [{ transform: 'translateY(100%)' }, { transform: 'none' }], 260)
+  // ống nghiệm: hết phát sáng cam
+  TP.a(ong.querySelector('.cam'), [{ opacity: 1 }, { opacity: 0 }], 400, { delay: 100 })
+  // H3: phân tử rã từng nguyên tử rồi rơi
+  const svg = combo.querySelector('.tp-phan-tu')
+  TP.a(svg, [{ opacity: 1 }, { opacity: 1 }], 520)
+  svg.querySelectorAll('.lk').forEach((l, i) => TP.a(l, [{ opacity: 1 }, { opacity: 0 }], 120, { delay: 60 + i * 40 }))
+  svg.querySelectorAll('.ng').forEach((n, i) => { n.style.transformBox = 'fill-box'; n.style.transformOrigin = 'center'; TP.a(n, [{ transform: 'translate(0,0)', opacity: 1 }, { transform: 'translate(0,0)', opacity: 1, offset: 0.2 }, { transform: `translate(${(i - 1) * 10}px,40px) rotate(${(i - 1) * 50}deg)`, opacity: 0 }], 500, { delay: i * 60, e: 'cubic-bezier(.5,0,.9,.6)' }) })
+  TP.a(combo.lastElementChild, [{ opacity: 0 }, { opacity: 1 }], 250, { delay: 420 })
+})
+</script>
+</body></html>

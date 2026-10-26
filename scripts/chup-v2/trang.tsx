@@ -44,7 +44,10 @@ import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen' // LÀN HỌC 
 import ManTuChua from '../../src/components/hoc-tap/ManTuChua' // LÀN HỌC SINH 12/10
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 // Bản màu app thầy (App.tsx nạp ba tệp này, phạm vi `.vo-thay`) — màn thầy bọc đúng khung `.m3.m3-thay.vo-thay` như app thật.
+import '../../src/styles/teacher-layout.css' // ═══ SOÁT 26/10: ba tờ vỏ thầy nay App.tsx chèn bằng chuỗi (main 26/10) — trang chụp nạp thẳng, đúng thứ tự,
 import '../../src/styles/vo-thay.css'
+import '../../src/components/chien-dich/thanh-ben-hoa2.css' // ═══ SOÁT 26/10 (thiếu ⇒ thanh trên điện thoại «tĩnh» rơi xuống cuối trang, ảnh sai)
+import '../../src/components/thanh-ben-gv2.css' // ═══ SOÁT 26/10
 import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
 import '../../src/styles/trong.css' // giao diện «Trong» 26/10 (App / AppHocSinh / AppThi nạp y như vậy)
@@ -74,7 +77,7 @@ import { useSoDemGv, type TheHanhTrinh } from '../../src/lib/so-dem-gv'
 import { lichSuGia } from './gia/lich-su-lam-cau'
 // LÀN PHỤ HUYNH 12/10: tổng quan về con GIẢ (`/ph/con-tong-quan`).
 import { conTongQuanGia } from './gia/ph-con-tong-quan'
-// ═══ MỘT TRANG PH 26/10: bộ số giả đợt 19 (cảnh `ph&mot=1`)
+// ═══ PH CHỈ ĐỌC 26/10: bộ số giả đợt 19 (cảnh `ph&mot=1`)
 import { NAY as NAY_PH19, hoc2Gia as hoc2Ph19, lichSuGia as lichSuPh19, loiThayGia as loiThayPh19, nhipGia as nhipPh19, thaiDoGia as thaiDoPh19, tatCaGia as tatCaPh19, tongQuanGia as tongQuanPh19 } from '../chup-ph-dot19/gia'
 // LÀN GIÁO VIÊN 12/10: `gv-nhip&the=bai-hang-ngay` = Hành trình › Bài hằng ngày (bảng nhiệt), bấm một em ⇒ tấm Hồ sơ làm bài (gia/bai-hang-ngay.ts).
 import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
@@ -114,9 +117,13 @@ const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
 // Như main.tsx: giao diện «Trong» (26/10) — cảnh thầy `gv…` = 'gv', cảnh phụ huynh không bật, còn lại (học sinh, màn thi) = 'hs'. `&trong=tat` ⇒ giao diện cũ.
 if (man !== 'ph' && !man.startsWith('ph-') && thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = man.startsWith('gv') ? 'gv' : 'hs'
-// ═══ MỘT TRANG PH 26/10: `?man=ph&mot=1` = app phụ huynh «Một trang» (bật bằng <html data-trong="ph"> như main.tsx; cảnh `ph` cũ KHÔNG có `mot` ⇒ giữ y
-// như trước, không data-trong). Số = bộ GIẢ đợt 19 (scripts/chup-ph-dot19/gia.ts: 21:05 Thứ Tư 14/10/2026, con «Nguyễn Minh Khôi») + Báo cáo tuần GIẢ
-// + một cảnh báo của thầy (`/ph/ke-hoach`, cần liên kết riêng ⇒ ghi mã giả vào máy). `&cb=0` ⇒ không cảnh báo. Đồng hồ trang = mốc của bộ giả.
+// ═══ PH CHỈ ĐỌC 26/10 (thay khối MỘT TRANG PH): `?man=ph&mot=1` = app phụ huynh «Chỉ đọc» (DocPh.tsx; bật bằng <html data-trong="ph"> như main.tsx;
+// cảnh `ph` cũ KHÔNG có `mot` ⇒ giữ y như trước, không data-trong). Số = bộ GIẢ đợt 19 (scripts/chup-ph-dot19/gia.ts: 21:05 Thứ Tư 14/10/2026, con
+// «Nguyễn Minh Khôi», hôm nay 18/30, nhóm Chưa đều) + Báo cáo tuần GIẢ (Học thật) + một cảnh báo của thầy (`/ph/ke-hoach`). Biến thể (`bienThePh`):
+//   `&hn=chua|dang|du` hôm nay 0 · 18 · 31/30 câu · `&nhom=luoi|cham` · `&dg=doi-pho|hoc-that|khong` (chưa có đánh giá) · `&cb=0` không cảnh báo
+//   · `&lt=0` thầy chưa gửi nhận xét · `&dai=1` dữ liệu dài (tên dài, lời thầy dài, số lớn). Thẻ «Kiểm tra và sửa lỗi»: `&kt=chua|dang|nop|het|cu|sap|khong`
+//   (Kiểm tra ôn tập hôm nay chưa làm · đang làm 10/28 · đã nộp 8 · hết hạn · lần trước 7,5 · bài sắp mở · không có lịch) · `&ss=het|do` (đã sửa hết ·
+//   còn nhiều mà 14 ngày không sửa) · `&bt=du|khong` (Bài tập về nhà đã nộp đủ · không có bài). Đồng hồ trang = mốc của bộ giả.
 const MOT_PH = man === 'ph' && thamSo.get('mot') === '1'
 const traMotPh = (duong: string): unknown => {
   if (duong.endsWith('/ph/nhip-hoc')) return nhipPh19()
@@ -130,13 +137,69 @@ const traMotPh = (duong: string): unknown => {
   if (duong.endsWith('/ph/ke-hoach')) return { ok: true, canhBaoThay: thamSo.get('cb') === '0' ? [] : [{ id: 'cb-mot-ph', maBtvn: 'BT-1', tenBtvn: 'Ester – Lipid buổi 3', guiLuc: '2026-10-14T12:30:00Z', hanNop: '2026-10-15T15:00:00Z', loi: '', trangThaiEm: 'do_chang', chang: { hienTai: 3, tong: 5 } }] }
   return null
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const bienThePh = (duong: string, r: any): unknown => {
+  const hn = thamSo.get('hn'), nhom = thamSo.get('nhom'), dg = thamSo.get('dg'), dai = thamSo.get('dai') === '1'
+  const lam = hn === 'chua' ? 0 : hn === 'du' ? 31 : null
+  if (duong.endsWith('/ph/con-tong-quan')) {
+    const n = r.ngay[r.ngay.length - 1]
+    if (lam !== null) {
+      Object.assign(n, { daLam: lam, soCau: lam, dung: lam ? 24 : 0, sai: lam ? lam - 24 : 0, trangThai: lam ? 'du' : 'khong' })
+      r.dem.homNay = { ...r.dem.homNay, soLuot: lam, soCau: lam, dung: n.dung, sai: n.sai, giayTb: lam ? 41 : null }
+    }
+    if (dai) r.cauSai = { ...r.cauSai, tong: 12456, daSua: 34 }
+  }
+  if (duong.endsWith('/ph/hoc-2') && lam !== null) r.homNay = { ...r.homNay, daLam: lam }
+  const kt = thamSo.get('kt')
+  if (duong.endsWith('/ph/hoc-2') && kt && kt !== 'khong') {
+    const homNay = kt !== 'cu' && kt !== 'sap'
+    const mo = Date.UTC(2026, 9, homNay ? 13 : kt === 'cu' ? 9 : 15, 17) // nửa đêm giờ VN: 14/10 (hôm nay) · 10/10 (lần trước) · 16/10 (sắp mở)
+    const daTra = kt === 'dang' ? 10 : kt === 'nop' || kt === 'cu' ? 28 : 0
+    r.kiemTraCaNhan = {
+      id: `kt-${kt}`, ngay: new Date(mo + 7 * 3_600_000).toISOString().slice(0, 10), moLuc: mo, hanLuc: mo + 86_400_000, serverNow: NAY_PH19,
+      trangThai: kt === 'chua' || kt === 'dang' ? 'can_lam' : kt === 'het' ? 'het_han' : kt === 'sap' ? 'sap_den' : 'da_nop', homNay,
+      tong: 28, daTra, con: 28 - daTra, soChang: 5, phut: 25, soBai: 6, tongKienThuc: 12, phuDe: 0, nguonDayDu: true, lyDo: '', thieuNguon: 0,
+      diem: kt === 'nop' ? 8 : kt === 'cu' ? 7.5 : null, nopLuc: kt === 'nop' ? NAY_PH19 - 3_600_000 : kt === 'cu' ? mo + 20 * 3_600_000 : null,
+    }
+  }
+  if (duong.endsWith('/ph/con-tong-quan') && thamSo.get('ss') === 'het') r.cauSai = { ...r.cauSai, daSua: r.cauSai.tong }
+  if (duong.endsWith('/ph/tat-ca-ve-con') && thamSo.get('ss') === 'do' && r.lichOn) r.lichOn = { ...r.lichOn, daKhacPhuc14Ngay: 0 }
+  if (duong.endsWith('/ph/tat-ca-ve-con') && thamSo.get('bt') && r.baiTapVeNha) {
+    const gan = [{ maBtvn: 'BT-0', ten: 'Ester – Lipid buổi 2', nopLuc: '2026-10-12T13:00:00Z', dungHan: true, diem: 9, nopTreGio: null }]
+    r.baiTapVeNha = { ...r.baiTapVeNha, dangChay: [], gan: thamSo.get('bt') === 'du' ? gan : [] }
+  }
+  if (duong.endsWith('/ph/tat-ca-ve-con') && dai) r.hoTen = 'Nguyễn Hoàng Bảo Ngọc Phương Thảo Khánh Linh'
+  if (duong.endsWith('/ph/nhip-hoc') && (nhom === 'luoi' || nhom === 'cham')) {
+    Object.assign(r, nhom === 'luoi'
+      ? { nhom: 'luoi', soNgayDu: 4, viecTiep: { loai: 'thoat-luoi', coNgay: 0, canNgay: 6, cauConHomNay: 30, homNayDu: false } }
+      : { nhom: 'cham', soNgayDu: 12, viecTiep: { loai: 'giu-chuoi', cauConHomNay: 0, homNayDu: true, chuoiNeuDu: 7 } })
+    r.bacCham = { ...(r.bacCham ?? { diem: 0 }), bac: nhom === 'luoi' ? 3 : 10 }
+  }
+  if (duong.endsWith('/ph/bao-cao-tuan') && dg) {
+    r.duLieu = dg === 'khong' ? { ...r.duLieu, nhan: null }
+      : dg === 'doi-pho' ? { ...r.duLieu, nhan: 'Đối phó', mucLam: { thuoc: 20, bamVoi: 21, treo: 3, doDuoc: 120 }, lyDo: ['x'] }
+      : { ...r.duLieu, nhan: 'Học thật', mucLam: { thuoc: 126, bamVoi: 8, treo: 0, doDuoc: 180 } }
+  }
+  if (duong.endsWith('/ph/loi-thay')) {
+    if (thamSo.get('lt') === '0') r.nhanXet = []
+    else if (dai) r.nhanXet[0].noiDung = 'Bài Ester 25/10 con sai 3/5 câu gọi tên muối. Con nhớ công thức nhưng đọc nhầm gốc acid, nhất là các ester có gốc acid mạch nhánh. Tuần này con làm thêm 10 câu gọi tên ester, thứ Bảy Thầy kiểm tra lại; anh/chị nhắc con làm đủ trước tối thứ Sáu và ghi lại những câu còn nhầm để hỏi Thầy trên lớp.'
+  }
+  return r
+}
 if (MOT_PH) {
   if (thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = 'ph'
   try { localStorage.setItem('omr_ph_pass', 'ma-gia-chup') } catch { /* bỏ qua */ }
   const dau = performance.now()
   Date.now = () => NAY_PH19 + (performance.now() - dau)
 }
-// ═══ hết MỘT TRANG PH 26/10
+// ═══ hết PH CHỈ ĐỌC 26/10
+// ═══ NGANG PH 26/10: `?man=ph-vao` = màn đăng nhập phụ huynh như app thật (<html data-trong="ph">, vỏ BatLinhShell vai ph). `&bl=1` trên cảnh
+// `ph&mot=1` ⇒ giữ body[data-bat-linh="ph"] như app thật (vỏ Bát Linh đổi bảng --ph3-*; cảnh cũ bỏ thuộc tính này).
+import ParentPortalScreen from '../../src/screens/ParentPortalScreen'
+const PH_VAO = man === 'ph-vao'
+if (PH_VAO && thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = 'ph'
+if (man === 'ph' && thamSo.get('bl') === '1') setTimeout(() => document.body.setAttribute('data-bat-linh', 'ph'), 0)
+// ═══ hết NGANG PH 26/10
 const now = Date.now()
 const noop = () => {}
 
@@ -227,6 +290,10 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (b.action === 'danhSachCa' && thamSo.get('mg') === 'dai')
     return tra({ ok: true, items: [...CA_GIA, ...['11A2', '10A1', '12A2'].map((lop, i) => ({ ...CA_GIA[0]!, maCa: `MG-${i}`, tenCa: `Kiểm tra nhanh ${lop}`, lop, daVao: 30 + i, daNop: 5 * i }))] })
   // ═══ hết MỘT TRANG GV 26/10
+  // ═══ NGANG GV 26/10: `&ca=0` = không ca nào đang mở (Hôm nay hiện nút «Bổ sung bài hôm nay») · `&ca=nhieu` = 14 ca, tên dài, mã 6 số (như ảnh thầy chụp)
+  if (b.action === 'danhSachCa' && thamSo.get('ca') === '0') return tra({ ok: true, items: b.daXoa ? [] : CA_GIA.filter((c) => c.trangThai !== 'mo') })
+  if (b.action === 'danhSachCa' && thamSo.get('ca') === 'nhieu') return tra({ ok: true, items: b.daXoa ? [] : [...CA_GIA, ...Array.from({ length: 12 }, (_, i) => ({ ...CA_GIA[1]!, maCa: String(844396 + i), tenCa: i % 3 === 0 ? `LD${i + 3} - Doll · Kiểm tra cuối chương Este – Lipit lớp tăng cường` : `Kiểm tra 15 phút ${i % 2 ? '12A2' : '11B'}`, lop: i % 2 ? '12A2' : '11B', moLuc: phutTruoc(60 * 24 * (i + 1)), batDau: phutTruoc(60 * 24 * (i + 1)), daVao: 28 + i, daNop: 27 + i, canhBao: i % 4 }))] })
+  // ═══ hết NGANG GV 26/10
   if (b.action === 'danhSachCa') return tra({ ok: true, items: b.daXoa ? [] : CA_GIA })
   if (b.action === 'danhSachCauHoi') return tra({ ok: true, items: CAU_HOI_GIA })
   if (u.pathname.endsWith('/gv/hoc-phi/ds')) return tra({ ok: true, items: HOC_PHI_GIA })
@@ -235,7 +302,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.endsWith('/gv/nut-that/ds')) return tra(NUT_THAT_GIA)
   // «Trong» nhóm 4: Duyệt lời giải mở sẵn đề 12-KT-C1-D4 (28 câu: 15 đã duyệt · 9 chờ duyệt, 5 sạch · 2 máy đang soạn · 2 chờ sửa kho)
   if (u.pathname.endsWith('/gv/loi-giai/cho-duyet')) return tra({ ok: true, maDe: '12-KT-C1-D4', cau: cauDuyetGia(), tong: { cau: 28, daDuyet: 15, choDuyet: 9, sach: 5, dangSoan: 2, traLai: 0, truot: 2, chuaCoBo: 0 } })
-  if (MOT_PH) { const r = traMotPh(u.pathname); if (r) return tra(r) } // ═══ MỘT TRANG PH 26/10
+  if (MOT_PH) { const r = traMotPh(u.pathname); if (r) return tra(bienThePh(u.pathname, r)) } // ═══ PH CHỈ ĐỌC 26/10
   // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): `/ph/con-tong-quan` GIẢ — `&tq=loi` ⇒ máy chủ lỗi (khối Gợi ý nhắc con hiện lý do + Thử lại).
   if (u.pathname.endsWith('/ph/con-tong-quan')) return thamSo.get('tq') === 'loi'
     ? new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Anh/chị thử lại sau ít phút.' }), { status: 500, headers: { 'content-type': 'application/json' } })
@@ -462,6 +529,16 @@ function ManLam13() {
   const [homNay, datHomNay] = useStateLam13(soHomNayLam13())
   return h('div', { className: 'fixed inset-0 z-50 overflow-y-auto' }, h(ManLamBaiTap, { token: 'tk', sbd: '12121212', onVe: noop, onCapNhat: () => datHomNay(soHomNayLam13()), onChua: noop, homNay }))
 }
+// ═══ DUO 26/10: `lam13&lam=duo` — phiên học sinh giả trên máy (nút Hỏi thầy / Lời giải từng bước chỉ hiện khi có phiên; lệnh hỏi thầy đi bộ giả chung).
+// ═══ KIỂM GD MỚI 26/10: `lam13&lam=duo-xau` (dữ liệu xấu, gia/lam-bai-1210d.ts) cũng có phiên học sinh giả như `duo`.
+if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
+// ═══ hết KIỂM GD MỚI 26/10
+if (LA_LAM13 && thamSo.get('lam') === 'duo') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
+// ═══ DUO APP 26/10: app thật nạp TrongHs (kèm phông Nunito + hiệu ứng Lộ trình, styles/trong-hs.css) ngay lúc mở cổng ⇒ màn làm chặng luôn có phông ấy;
+// trang chụp mở thẳng màn làm chặng nên nạp tờ đó tại đây cho giống app thật.
+// Phông Nunito chỉ bật khi cổng đã vẽ (:has(.ht2) — app thật luôn gắn Hôm nay dưới màn con) ⇒ trang chụp gắn một .ht2 rỗng ẩn.
+if (LA_LAM13 && thamSo.get('lam') === 'duo' && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>') }
+// ═══ hết DUO APP 26/10
 // ═════════════════════════════════════════ hết LÀN MÀN LÀM BÀI 12/10D ═════════════════════════════════════════
 // ═════════════════════════════════════════ LÀN HỒ SƠ EM 12/10F ═════════════════════════════════════════
 // Thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé". Cảnh `?man=hs-ho-so[&nhe=luoi|cham]`: Hôm nay
@@ -611,6 +688,127 @@ const manMotTrang = () => h(FragmentHse, null,
     onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop }),
   h(BongBongAiDdh, { auth: { token: 'tk', sbd: '12121212', hoTen: 'Nguyễn Minh Anh' }, anBong: true }))
 // ═══ hết MỘT TRANG HS 26/10
+// ═══ NGANG HS 26/10: `?man=hs-ng&v=tu-sua|kiem|lam|ai` = màn con / tấm của cổng học sinh MỞ ĐÈ lên Hôm nay «Một trang» đúng như StudentPortalScreen
+// (Hôm nay trong `<div inert>`, moDiemDanh=false khi có màn con; màn con trong `fixed inset-0 z-50 overflow-y-auto overscroll-contain`).
+//   tu-sua  Tự sửa lỗi · «Em tự làm lại câu này» (chữa câu gọn) — câu có 4 hình công thức cấu tạo (lỗi thầy chỉ 26/10: thanh «Kiểm tra» đè hình 4)
+//   kiem    Kiểm tra ôn tập (ManKiemTraCaNhan, máy giả tối thiểu)  ·  ai = tấm chat A.I Đỗ Đại Học mở sẵn (sự kiện ddh:mo-ai như mục menu)
+//   `&dd=mo` = buổi học đang mở điểm danh (vạch menu thò thẻ «Điểm danh» khi ở Hôm nay).
+import ManKiemTraCaNhanNg from '../../src/components/hoc-tap/ManKiemTraCaNhan'
+const NG_V = thamSo.get('v') ?? 'tu-sua'
+// Màn làm bài / tự sửa / Tu luyện / kiểm tra nạp tờ «Trong» riêng lúc mảnh mã chạy MÀ data-trong đã gắn (main.tsx gắn trước); trang chụp gắn data-trong
+// SAU khi nạp ⇒ nạp thẳng tờ ấy cho các cảnh học sinh này (như app thật sau khi mở màn).
+if (document.documentElement.dataset.trong === 'hs' && (man === 'hs-ng' || man.startsWith('hs12-') || man === 'lam13')) void import('../../src/styles/trong-lam-bai.css')
+const hinhCauTao = (chu: string) => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="150" viewBox="0 0 320 150"><rect width="320" height="150" fill="white"/><g stroke="black" stroke-width="2" fill="none"><polygon points="60,40 95,20 130,40 130,80 95,100 60,80"/><line x1="130" y1="40" x2="175" y2="20"/><line x1="175" y1="20" x2="215" y2="40"/><line x1="215" y1="40" x2="215" y2="80"/></g><text x="222" y="92" font-family="sans-serif" font-size="20">OH</text><text x="20" y="135" font-family="sans-serif" font-size="18">${chu}</text></svg>`)
+if (man === 'hs-ng') {
+  try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
+  const fetchNg = window.fetch
+  const buoiNg = { id: 'b1', ten: 'Buổi học 26/10/2026', lop: '12A1' }
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const duong = new URL(url, location.href).pathname
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (duong.endsWith('/hs/buoi-hoc')) return tra(thamSo.get('dd') === 'mo' ? { ok: true, buoi: { ...buoiNg, daDiemDanh: false } } : { ok: true, buoi: null })
+    if (duong.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
+    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd-ng', trangThai: 'dang_chua_buoc', coHocLieu: false })
+    if (duong.endsWith('/hs/chua-cau-sai/gon-mo')) return tra({ ok: true, dotId: 'd-ng', lan: 1, ban: 'ban-1', tuSuaNeuDung: true, de: { qid: 'DH-12-C1-B4-9', phan: 'I', tenDang: 'Đồng phân alcohol',
+      text: 'Cho bốn chất hữu cơ có công thức cấu tạo như hình dưới. Số chất thuộc loại alcohol bậc một là',
+      choices: ['1.', '2.', '3.', '4.'], hinhAnh: ['(1)', '(2)', '(3)', '(4)'].map((c) => ({ src: hinhCauTao(`Chất ${c}`), viTri: 'sau_de', alt: `Chất ${c}` })) } })
+    if (duong.endsWith('/hs/nhip-hoc')) return tra(nhipEmGia('cham'))
+    if (duong.endsWith('/notifications/list')) return tra({ ok: true, publicKey: '', items: [] })
+    if (duong.endsWith('/hs/ai-ddh/mo')) return tra({ ok: true, bat: true, khoa: null, vanPhongTruc: true, conLuot: 18, tranLuot: 20, tin: [
+      { id: 't1', ben: 'em', chu: 'Cho 5,6 gam Fe tác dụng hết với dung dịch HCl dư, thu được V lít khí H2 (đkc). Giá trị của V là?', anh: 0, trangThai: 'xong', luc: now - 600_000 },
+      { id: 't2', ben: 'vp', chu: 'Fe + 2HCl → FeCl2 + H2; n(H2) = n(Fe) = 0,1 mol ⇒ V = 0,1 × 24,79 = 2,479 lít.', anh: 0, nguon: 'kho', traLoiCho: 't1', luc: now - 540_000 },
+    ] })
+    if (duong.endsWith('/hs/ai-ddh/tin')) return tra({ ok: true, tin: [] })
+    // Kiểm tra ôn tập (ảnh thầy 26/10): 10/28 câu đã trả lời; chặng 1 ĐÃ CHỐT mà bỏ trống cả 6 câu, chặng 2 chốt đủ 8/8, chặng 3 đang 2/7 (khớp: 0 + 8 + 2 = 10);
+    // `start` chặng ⇒ 3 câu mẫu (CAU_HOC), hạn chặng 12 phút.
+    if (duong.endsWith('/game-v2/hoc-tap-ktcn-trang-thai')) return tra({ ok: true, revision: 1, kiemTra: { ...MT_KIEM, daTra: 10, con: 18, serverNow: Date.now() },
+      chang: [{ stt: 0, soCau: 6, giay: 360, han: null, daChot: true, daTra: 0 }, { stt: 1, soCau: 8, giay: 720, han: null, daChot: true, daTra: 8 },
+        { stt: 2, soCau: 7, giay: 720, han: null, daChot: false, daTra: 2 }, { stt: 3, soCau: 7, giay: 720, han: null, daChot: false, daTra: 0 }] })
+    if (duong.endsWith('/game-v2/hoc-tap-ktcn-start')) return tra({ ok: true, revision: 1, kiemTra: { ...MT_KIEM, serverNow: Date.now() }, daChot: false,
+      questions: CAU_HOC, tra: {}, hanChang: Date.now() + 720_000 })
+    if (duong.endsWith('/game-v2/hoc-tap-ktcn-luu')) return tra({ ok: true, revision: 2, kiemTra: { ...MT_KIEM, serverNow: Date.now() }, daLuu: true })
+    return fetchNg(input, init)
+  }
+  if (NG_V === 'ai') setTimeout(() => window.dispatchEvent(new Event('ddh:mo-ai')), 900)
+}
+const manNgang = () => h(FragmentHse, null,
+  h('div', { inert: NG_V !== 'ai', 'aria-hidden': NG_V !== 'ai' || undefined } as never, h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_MT } as never, dangTai: false, loi: '', coCa: false, token: 'tk',
+    moDiemDanh: NG_V === 'ai', onMoHoSo: noop, soBaiTap: 1, coBaiTap: true, onKiemTra: noop,
+    onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })),
+  NG_V === 'ai' ? h(BongBongAiDdh, { auth: { token: 'tk', sbd: '12121212', hoTen: 'Nguyễn Minh Anh' }, anBong: true })
+  : h('div', { className: 'fixed inset-0 z-50 overflow-y-auto overscroll-contain' },
+    NG_V === 'kiem' ? h(ManKiemTraCaNhanNg, { token: 'tk', sbd: '12121212', id: 'kt1', onVe: noop, onCapNhat: noop } as never)
+    : h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B4-9', tenCau: 'Đồng phân alcohol', onVe: noop })))
+// ═══ hết NGANG HS 26/10
+// ═══ SOÁT 26/10: cảnh cho bộ soát chữ chèn (scripts/soat-chu-chen) — các màn thầy chụp ảnh điện thoại 26/10 tối mà bộ chụp chưa có:
+//   `?man=soat-ktcn[&kt=ket]` = màn «Kiểm tra ôn tập của em» THẬT (ManKiemTraCaNhan): 28 câu, đã trả lời 10 (vòng «10/28»), 4 chặng, chặng 2 đang chạy;
+//     `&kt=ket` = đã nộp (kết quả lọc câu). Bấm «Làm tiếp chặng 2» (thao tác `nut:`) ⇒ màn làm chặng.
+//   `&soat=khong-ca` trên cảnh thầy (gv-lich-su-ca, gv-hom-nay) = máy chủ GIẢ không có ca nào đang mở (chỉ ca đã đóng).
+//   `&soat=dai` trên `ph&mot=1` = phụ huynh «Một trang» dữ liệu DÀI (tên con, tên bài, tên dạng dài; danh sách gấp ba).
+import ManKiemTraCaNhan from '../../src/components/hoc-tap/ManKiemTraCaNhan'
+const SOAT = thamSo.get('soat') ?? ''
+const soatNgay = new Date(now + 7 * 3600_000).toISOString().slice(0, 10), soatMo = Date.parse(`${soatNgay}T00:00:00+07:00`)
+const SOAT_KT = { id: 'kt-soat', ngay: soatNgay, moLuc: soatMo, hanLuc: soatMo + 86400_000, serverNow: now, trangThai: thamSo.get('kt') === 'ket' ? 'da_nop' : 'can_lam', homNay: true,
+  baiNgayToiThieu: 12, tong: 28, daTra: thamSo.get('kt') === 'ket' ? 28 : 10, con: thamSo.get('kt') === 'ket' ? 0 : 18, soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true,
+  lyDo: 'Kiểm chứng những phần em đang luyện thêm', thieuNguon: 0, diem: thamSo.get('kt') === 'ket' ? 7.75 : null, nopLuc: thamSo.get('kt') === 'ket' ? now - 3600_000 : null }
+const SOAT_CHANG = [{ stt: 0, soCau: 7, giay: 780, han: now - 1_200_000, daChot: true, daTra: 7 }, { stt: 1, soCau: 7, giay: 780, han: now + 462_000, daChot: false, daTra: 3 },
+  { stt: 2, soCau: 7, giay: 840, han: null, daChot: false, daTra: 0 }, { stt: 3, soCau: 7, giay: 840, han: null, daChot: false, daTra: 0 }]
+const SOAT_CAU = CAU_HOC.filter((c) => c.phan === 'I').concat(Array.from({ length: 6 }, (_, i) => ({ ...CAU_HOC[0]!, qid: `S${i}`, text: `Câu ${i + 2}: Thuỷ phân hoàn toàn ${(i + 2) * 4.4} gam ester đơn chức X bằng dung dịch NaOH vừa đủ, thu được muối và alcohol. Công thức của X là` })))
+const SOAT_KET = { chu: 'Em vững phần Ester – Lipid; phần Amine cần luyện thêm bậc amine và tính base.',
+  bai: [{ ten: 'Bài 6. Ester – Lipid', tong: 10, daKiem: 10, dungLanNay: 8 }, { ten: 'Bài 7. Carbohydrate (glucose, fructose, saccharose, tinh bột và cellulose)', tong: 10, daKiem: 10, dungLanNay: 7 }, { ten: 'Bài 8. Amine', tong: 8, daKiem: 8, dungLanNay: 6 }],
+  cau: Array.from({ length: 28 }, (_, i) => ({ de: SOAT_CAU[i % SOAT_CAU.length]!, tra: i === 9 ? '' : 'A', dung: ![3, 9, 15, 20, 22, 27].includes(i), dapAn: 'A', loiGiai: null })) }
+if (man === 'soat-ktcn') {
+  const fetchKt = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (url.includes('hoc-tap-ktcn-trang-thai')) return tra({ ok: true, kiemTra: SOAT_KT, chang: SOAT_CHANG })
+    if (url.includes('hoc-tap-ktcn-start')) return tra({ ok: true, kiemTra: SOAT_KT, revision: 3, hanChang: now + 462_000, daChot: false, questions: SOAT_CAU.slice(0, 7), tra: { [SOAT_CAU[0]!.qid]: 'A', [SOAT_CAU[1]!.qid]: 'B' } })
+    if (url.includes('hoc-tap-ktcn-ket-qua')) return tra({ ok: true, kiemTra: SOAT_KT, ketQua: SOAT_KET })
+    if (url.includes('hoc-tap-ktcn-')) return tra({ ok: true, kiemTra: SOAT_KT, revision: 4, daLuu: true })
+    return fetchKt(input, init)
+  }
+}
+if (SOAT === 'khong-ca' && man.startsWith('gv-')) {
+  const fetchCa = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    let b: Record<string, unknown> = {}
+    try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
+    if (b.action === 'danhSachCa') return new Response(JSON.stringify({ ok: true, items: b.daXoa ? [] : CA_GIA.filter((c) => c.trangThai !== 'mo') }), { status: 200, headers: { 'content-type': 'application/json' } })
+    return fetchCa(input, init)
+  }
+}
+if (SOAT === 'dai' && MOT_PH) {
+  const fetchPh = window.fetch
+  const DUOI = ' · Thuỷ phân ester và xà phòng hoá chất béo (ôn tập tổng hợp)'
+  const keoDai = (x: unknown, khoa = ''): unknown => {
+    if (Array.isArray(x)) return (['dangChay', 'canhBaoThay', 'bacTheoDang', 'vuaLenBac', 'nhanXet'].includes(khoa) ? [...x, ...x, ...x] : x).map((o, i) => {
+      const v = keoDai(o) as Record<string, unknown>
+      if (i < x.length || !v || typeof v !== 'object') return v
+      return Object.fromEntries(Object.entries(v).map(([k, g]) => [k, ['id', 'ma', 'maBtvn', 'maCa'].includes(k) && typeof g === 'string' ? `${g}-${i}` : g]))
+    })
+    if (!x || typeof x !== 'object') return x
+    return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, typeof v === 'string'
+      ? k === 'hoTen' ? 'Nguyễn Ngọc Minh Khôi Nguyên' : ['ten', 'tenBtvn', 'tenCa', 'tieuDe'].includes(k) ? v + DUOI : k === 'noiDung' ? `${v} ${v}` : v
+      : keoDai(v, k)]))
+  }
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const r = await fetchPh(input, init)
+    if (!new URL(url, location.href).pathname.includes('/ph/')) return r
+    try { return new Response(JSON.stringify(keoDai(await r.clone().json())), { status: r.status, headers: { 'content-type': 'application/json' } }) } catch { return r }
+  }
+}
+// như app thật: màn Kiểm tra ôn tập nạp tờ «Trong» riêng khi <html data-trong> đã gắn (trang chụp gắn SAU khi nạp mã ⇒ nạp thẳng)
+if (man === 'soat-ktcn' && document.documentElement.dataset.trong === 'hs') void import('../../src/styles/trong-lam-bai.css')
+const manSoatKtcn = () => h(ManKiemTraCaNhan, { token: 'tk', sbd: '12121212', id: 'kt-soat', onVe: noop, onCapNhat: noop })
+// ═══ hết SOÁT 26/10
+// ═══ THƯỞNG PHẠT 26/10: `?man=tp&v=…` = giao diện học sinh hệ thưởng phạt (khối riêng gia/thuong.tsx — component THẬT, máy chủ GIẢ tests/_thuong-mau.ts).
+import { canhThuong, capFetchThuong } from './gia/thuong'
+if (man === 'tp' || thamSo.get('tp') === '1') capFetchThuong() // gộp 26/10: `&tp=1` ⇒ Lộ trình / làm chặng THẬT có cắm thưởng phạt
+// ═══ hết THƯỞNG PHẠT 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
 const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-toan-canh':'hocsinh', 'gv-giao-btvn':'giaobtvn', 'gv-giao-tuan':'khodegiao', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
@@ -631,7 +829,11 @@ const EM_TD = [
 const manTheoDoi = () => h('div', { className: 'gv-page', style: { padding: '16px clamp(12px, 3vw, 32px) 64px', maxWidth: 1320, margin: '0 auto' } }, h(TheoDoiCa, { tenCa: 'Kiểm tra 15 phút · 12A1', maCa: 'DH-12-C2-B6', link: 'https://omr-app-b3u.pages.dev/hs?ca=DH-12-C2-B6', daChepLink: false, onChepLink: noop, onChepLinkDiem: noop,
   moLuc: '19:30 · Thứ Hai 26/10/2026', hetHanVao: '19:40', thoiGianPhut: 15, congBoChu: 'Khi cả lớp nộp xong', phamViChu: 'Lớp 12A1', conGiay: 522, em: EM_TD, soChuaVao: 1,
   nguongLan: 3, dangTai: false, dangDuyet: null, onLamMoi: noop, onMoKhoa: noop, onXemEm: noop, onChieuMa: noop, onKetThuc: noop, onDongCuaVao: noop, dangLamNgay: 6 } as never))
+// ═══ NGANG GV 26/10: `gv-lich-su-ca&mo=1` = màn Ca kiểm tra bọc như App.tsx khi cờ 2.0 bật (nút «Mở ca kiểm tra» góc phải đầu màn)
+const manCaHoa2 = () => h('div', { className: 'ca-hoa2-khung' }, h('button', { type: 'button', className: 'ca-hoa2-mo-ca' }, 'Mở ca kiểm tra'), h(LichSuCaScreen))
+// ═══ hết NGANG GV 26/10
 const con =
+  man === 'gv-lich-su-ca' && thamSo.get('mo') === '1' ? manCaHoa2() : // NGANG GV 26/10
   man === 'gv-toan-canh' ? h(ToanCanhEmScreen, { sbdHoSo: '11011' }) : man === 'gv-giao-btvn' ? h(PhanCongScreen) : man === 'gv-giao-tuan' ? h(GiaoDeTheoTuanScreen) :
   man === 'gv-lich-su-ca' ? h(LichSuCaScreen) : man === 'gv-hs-hoi' ? h(CauHoiScreen) : man === 'gv-theo-doi' ? manTheoDoi() : // «Trong» nhóm 4
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
@@ -644,7 +846,11 @@ const con =
   man === 'hs-dang-nhap' ? manDangNhapTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-mot' ? manMotTrang() : // MỘT TRANG HS 26/10
+  man === 'hs-ng' ? manNgang() : // NGANG HS 26/10
+  man === 'soat-ktcn' ? manSoatKtcn() : // ═══ SOÁT 26/10
+  man === 'tp' ? canhThuong() : // THƯỞNG PHẠT 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
+  PH_VAO ? h(BatLinhShell, { vai: 'ph' }, h(ParentPortalScreen)) : // NGANG PH 26/10
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
@@ -674,5 +880,5 @@ if (giao === 'toi' || giao === 'sang') apDungGiaoDien(giao)
 createRoot(document.getElementById('root')!).render(
   manThay
     ? (document.body.removeAttribute('data-bat-linh'), h('div', { className: 'min-h-screen m3 m3-thay vo-thay', 'data-hoa2': '' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con)), h(BottomNav)))
-    : man === 'ph' || man === 'gv-chieu' ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
+    : man === 'ph' || man === 'gv-chieu' || PH_VAO ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
 )

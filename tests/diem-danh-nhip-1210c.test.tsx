@@ -170,9 +170,9 @@ describe('bước 1 Điểm danh (bản vẽ GV-DiemDanh)', () => {
     expect(within(coMat).getByRole('img', { name: 'Có mặt 6 trên 9 em' })).toBeTruthy()
     expect([...coMat.querySelectorAll('.dd1-dem-nhom .dd1-chip')].map((x) => x.textContent)).toEqual(['Chăm 2', 'Chưa đều 1', 'Lười 1', 'Mới 1', 'Chưa có số 1'])
     const vang = container.querySelector<HTMLElement>('[data-khoi="em-vang"]')!
-    expect(vang.querySelector('.dd1-vang-ten')?.textContent).toBe('Trịnh Bảo Ngọc · Bùi Quang Minh')
+    expect(vang.querySelector('.dd1-vang-ten')?.textContent?.replace(/\u00a0/g, ' ')).toBe('Trịnh Bảo Ngọc · Bùi Quang Minh')
     fireEvent.click(within(vang).getByRole('button', { name: 'Xem 2 em vắng còn lại ›' }))
-    expect(vang.querySelector('.dd1-vang-ten')?.textContent).toBe('Trịnh Bảo Ngọc · Bùi Quang Minh · Hà Minh Khang · Lê Khánh Vy')
+    expect(vang.querySelector('.dd1-vang-ten')?.textContent?.replace(/\u00a0/g, ' ')).toBe('Trịnh Bảo Ngọc · Bùi Quang Minh · Hà Minh Khang · Lê Khánh Vy')
     const vua = within(screen.getByRole('list', { name: /Em vừa điểm danh/ })).getAllByRole('button')
     expect(vua.map((b) => b.querySelector('.dd1-vua-ten')?.textContent)).toEqual(['Hoàng Đức Huy', 'Quách Gia Linh', 'Phạm Hà', 'Đỗ Mai Phương', 'Trần Gia Bảo', 'Nguyễn Minh Anh'])
     expect(vua.map((b) => b.querySelector('.dd1-chip')?.textContent)).toEqual(['Lười · 0/11', 'Mới', 'Chưa có số', 'Chưa đều · 6/11', 'Chăm · 10/11', 'Chăm · 11/11'])

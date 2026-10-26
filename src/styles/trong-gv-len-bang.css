@@ -28,3 +28,8 @@
   [data-trong='gv'] .dh-the-ds { overflow-x: auto; }
   [data-trong='gv'] .dh-buoc { padding: 16px; }
 }
+/* NGANG GV 26/10: điện thoại — hàng 4 thẻ (Chiến dịch · Dạy học · Kiểm tra đầu giờ · Câu cần chữa) tràn 7 px, chữ thẻ cuối bị cắt mép ⇒ lưới 2 × 2, đủ chữ */
+@media (max-width: 600px) {
+  [data-trong='gv'] .dh-the-ds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: auto; overflow: visible; }
+  [data-trong='gv'] .dh-the { justify-content: center; min-width: 0; padding: 0 8px; white-space: normal; text-align: center; }
+}

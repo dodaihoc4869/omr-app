@@ -1,10 +1,15 @@
-import { Suspense, useEffect, useState, type ReactNode } from 'react'
-import { Activity, ArrowRight, Check, Hourglass, TriangleAlert } from 'lucide-react'
+import { lazy, Suspense, type ReactNode } from 'react'
+import { ArrowRight, Check, Flame } from 'lucide-react'
 import { CAU_MOI_CHANG, soChangXong, type SoHomNay } from './lam-bai'
-import { layNhipHocEm, nhipTheoSanh, TEN_NHOM_NHIP, type KetQuaNhipHocEm, type NhomNhip } from '../../lib/nhip-hoc-em'
+import { nhipTheoSanh, type NhipHocHs } from '../../lib/nhip-hoc-em'
+// 26/10 (luật tốc độ — «Trong» thay màn Hôm nay cũ): hook + hàm chữ dùng chung tách ra nhip-hom-nay.ts (nằm trong nhóm mở app); thẻ này chỉ giao diện cũ
+// (ddh.trong = 'tat') dùng ⇒ HocTapHomNay nạp LƯỜI, không vào nhóm mở app học sinh. Xuất lại để nơi nhập cũ (test) giữ nguyên.
+import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
+export { chiaChang, chuNutHoc, useNhipHocEm, xoaNhoNhipHocEm } from './nhip-hom-nay'
 // Đợt 16: phần Nhịp học (dải ô ngày, Lười k/6, Việc tiếp, tốc độ) tách thành bảng DÙNG CHUNG với app phụ huynh — markup + chữ của em giữ nguyên.
-import BangNhipHoc from './BangNhipHoc'
-import { ChipBacNhipLuoi, napBacNhip } from '../bac-cham-chi/nap'
+// 26/10 (luật tốc độ — «Trong» thay màn Hôm nay cũ, app em mở thẳng Lộ trình): bảng Nhịp học chỉ hiện SAU khi `/hs/nhip-hoc` về (đã có khung xương chờ)
+// ⇒ nạp LƯỜI cùng lúc, không nằm trong nhóm mở app học sinh (mảnh BangNhipHoc vốn tách riêng, dùng chung phụ huynh / thầy).
+const BangNhipHoc = lazy(() => import('./BangNhipHoc'))
 
 // THẺ "HÔM NAY CỦA EM" — đầu màn Hôm nay của app học sinh (thầy 12/10: "Bạn gộp 2 phần làm bài này vào làm một thôi nhé. Tập trung vào việc nhắc học
 // sinh làm bao nhiêu câu. Thiết kế đẹp, trực quan, khoa học thân thiện nhất với hs nhé"). Thay CẢ khối vòng tròn "Mục tiêu hôm nay" (`.ht2-chinh` cũ) lẫn
@@ -18,56 +23,8 @@ import { ChipBacNhipLuoi, napBacNhip } from '../bac-cham-chi/nap'
 // MỘT CON SỐ: M và đã làm lấy từ Sảnh (`soHomNay`, cập nhật sau mỗi câu); ô hôm nay, chuỗi và câu "còn N câu" của phần Nhịp học tính lại từ CÙNG số ấy
 // (`nhipTheoSanh`). Nhịp học lỗi ⇒ ẩn gọn, phần chính vẫn đủ. Đang tải ⇒ khung xương. Màu + tương phản: hoc-tap.css khối "THẺ HÔM NAY CỦA EM 12/10E".
 
-const ICON_NHOM: Record<NhomNhip, typeof Check> = { cham: Check, 'chua-deu': Activity, luoi: TriangleAlert, 'chua-du': Hourglass }
-
-/** Bản nhớ trong phiên (mỗi token một bản, 60 giây, gắn với `lamMoi`): em chuyển qua lại các mục rồi về Hôm nay thì vẽ ngay, không gọi lại máy
- *  chủ (bớt lượt D1); số câu hôm nay đổi ⇒ khoá khác ⇒ nạp lại. */
-const NHO = new Map<string, { kq: KetQuaNhipHocEm; luc: number; khoa: number | null | undefined }>()
-// Khẩn 12/10 21h (giờ cao điểm): lịch sử ngày không đổi trong ngày — số HÔM NAY lấy từ sảnh ⇒ nhớ 10 phút, KHÔNG nạp lại sau mỗi câu.
-const NHO_MS = 600_000
-/** Chỉ cho test: xoá bản nhớ. */
-export const xoaNhoNhipHocEm = (): void => NHO.clear()
-
-/** Nạp `/hs/nhip-hoc`: 'tai' (đang tải) · 'an' (không token / lỗi lần đầu ⇒ ẩn gọn) · số. Lỗi khi đã có số ⇒ giữ số cũ. */
-export function useNhipHocEm(token: string | undefined, lamMoi: number | null | undefined): KetQuaNhipHocEm | 'tai' | 'an' {
-  // Bản hiện gắn với phiên: đổi em trên máy dùng chung không được giữ nhóm/nhịp của em trước.
-  const [ban, setBan] = useState(() => ({ token, kq: token ? NHO.get(token)?.kq ?? null : null, hong: false }))
-  useEffect(() => {
-    if (!token) return
-    const c = NHO.get(token)
-    if (c && c.khoa === lamMoi && Date.now() - c.luc < NHO_MS) {
-      setBan({ token, kq: c.kq, hong: false })
-      return
-    }
-    let huy = false
-    // 13/10: nạp sẵn khối 12 bậc song song lệnh nhịp học (không thêm lệnh máy chủ) — số về là chip + thang vẽ ngay
-    void napBacNhip()
-    void layNhipHocEm(token).then((r) => {
-      if (huy) return
-      if (r) {
-        NHO.set(token, { kq: r, luc: Date.now(), khoa: lamMoi })
-        setBan({ token, kq: r, hong: false })
-      } else setBan(v => ({ token, kq: v.token === token ? v.kq : null, hong: true }))
-    })
-    return () => {
-      huy = true
-    }
-  }, [token, lamMoi])
-  if (!token) return 'an'
-  return ban.token === token ? ban.kq ?? (ban.hong ? 'an' : 'tai') : NHO.get(token)?.kq ?? 'tai'
-}
-
-/** Các chặng của hôm nay: chặng i gồm câu (6·i, min(6·(i+1), M)] — đúng luật vạch chặng / `soChangXong`; chặng cuối lấy hết phần còn lại tới M. */
-export function chiaChang(so: SoHomNay): { co: number; tt: 'xong' | 'dang' | 'cho'; phan: number }[] {
-  const xong = soChangXong(so)
-  return Array.from({ length: so.soChang }, (_, i) => {
-    const dau = Math.min(i * CAU_MOI_CHANG, so.muc)
-    const cuoi = i === so.soChang - 1 ? so.muc : Math.min((i + 1) * CAU_MOI_CHANG, so.muc)
-    const co = Math.max(1, cuoi - dau)
-    const tt = i < xong ? 'xong' : i === xong ? 'dang' : 'cho'
-    return { co, tt, phan: tt === 'dang' ? Math.max(0, Math.min(100, Math.round((100 * (so.daLam - dau)) / co))) : 0 }
-  })
-}
+// 26/10 (thầy: hệ phát hiện lười CHỈ thầy + phụ huynh xem): app em KHÔNG còn chip nhóm / chip bậc, không tô màu theo nhóm — máy chủ cũng không gửi
+// nhóm, bậc (server/src/an-luoi-hs.ts). Chỗ chip là «Chuỗi N ngày» (số có sẵn, chỉ hiện khi N > 0).
 
 export interface PropsTheHomNayEm {
   /** M + đã làm + số chặng của hôm nay — từ Sảnh (`soHomNay`). null ⇒ chưa có số (đang tải ⇒ khung xương). */
@@ -95,38 +52,13 @@ export interface PropsTheHomNayEm {
   onMoHoSo?: () => void
 }
 
-/** Chữ nút học — MỘT nút cho cả màn (Hôm nay và Hành trình dùng chung).
- *  Gói 7 kho thiếu (khẩn 12/10 21h30): hết việc xếp được mà chưa đủ mức ⇒ "Hôm nay còn N câu chờ thầy bổ sung" (nút khoá); còn việc xếp được nhưng ít
- *  hơn phần còn lại của mức ⇒ nút VẪN BẤM ĐƯỢC, nói đúng số câu sẵn sàng ("Học tiếp · 1 câu sẵn sàng") — số "Còn N câu" phía trên vẫn theo M. */
-export function chuNutHoc(so: SoHomNay | null, hetCau: boolean, kho?: { choBoSung?: number; sanSang?: number }): string {
-  if (hetCau) return kho?.choBoSung ? `Hôm nay còn ${kho.choBoSung} câu chờ thầy bổ sung` : 'Đã làm hết câu được giao'
-  if (!so) return 'Bắt đầu học'
-  const con = Math.max(0, so.muc - so.daLam)
-  if (con === 0) return 'Học thêm'
-  const dau = so.daLam > 0 ? 'Học tiếp' : 'Bắt đầu học'
-  const sanSang = kho?.sanSang
-  return sanSang !== undefined && sanSang > 0 && sanSang < con ? `${dau} · ${sanSang} câu sẵn sàng` : `${dau} · ${con} câu`
-}
-
-function Chip({ nhom }: { nhom: NhomNhip }) {
-  const Icon = ICON_NHOM[nhom]
+/** Chip «Chuỗi N ngày» (N ngày liền đủ mức, cùng số dải ngày); N = 0 ⇒ không chip. */
+export function ChipChuoi({ k }: { k: NhipHocHs }) {
+  if (k.chuoiDuGanNhat <= 0) return null
   return (
-    <span className="ht2-nhe-nhom" data-nhom={nhom}>
-      <Icon size={16} strokeWidth={2.6} aria-hidden="true" />
-      {TEN_NHOM_NHIP[nhom]}
-    </span>
-  )
-}
-
-/** Chip nhóm; máy chủ có bậc (13/10) ⇒ thêm chip "Bậc N/12 · Tên" ngay cạnh (khối nạp khi cần), hai chip xuống hàng khi chật. */
-export function ChipNhom({ k }: { k: KetQuaNhipHocEm }) {
-  if (!k.bacCham) return <Chip nhom={k.nhom} />
-  return (
-    <span className="bcc-hang">
-      <Chip nhom={k.nhom} />
-      <Suspense fallback={null}>
-        <ChipBacNhipLuoi k={k} />
-      </Suspense>
+    <span className="ht2-nhe-nhom">
+      <Flame size={16} strokeWidth={2.6} aria-hidden="true" />
+      Chuỗi {k.chuoiDuGanNhat} ngày
     </span>
   )
 }
@@ -159,7 +91,7 @@ function PhanChinh(p: PropsTheHomNayEm & { chip: ReactNode }) {
             Đủ mức hôm nay
           </p>
           <p className="ht2-hn-da">
-            Đã làm <b>{so.daLam}/{so.muc}</b> câu hôm nay · em có thể nghỉ.
+            Đã làm <b>{so.daLam}/{so.muc}</b> câu hôm nay&nbsp;· em có thể nghỉ.
           </p>
         </>
       ) : so ? (
@@ -230,10 +162,10 @@ export default function TheHomNayEm(p: PropsTheHomNayEm) {
   const coNhip = nhip !== 'an'
   const k = typeof nhip === 'string' ? null : nhip
   return (
-    <section className="ht2-hn" data-nhom={k?.nhom} data-mot={coNhip ? undefined : 'true'} aria-label="Hôm nay của em" aria-busy={(!p.so && p.dangTai) || nhip === 'tai'}>
-      <PhanChinh {...p} chip={k ? <ChipNhom k={k} /> : nhip === 'tai' ? <span className="ht2-hn-chip-xuong" aria-hidden="true" /> : null} />
+    <section className="ht2-hn" data-mot={coNhip ? undefined : 'true'} aria-label="Hôm nay của em" aria-busy={(!p.so && p.dangTai) || nhip === 'tai'}>
+      <PhanChinh {...p} chip={k ? <ChipChuoi k={k} /> : nhip === 'tai' ? <span className="ht2-hn-chip-xuong" aria-hidden="true" /> : null} />
       {k ? (
-        <BangNhipHoc k={k} onMoHoSo={p.onMoHoSo} />
+        <Suspense fallback={<XuongNhip />}><BangNhipHoc k={k} onMoHoSo={p.onMoHoSo} /></Suspense>
       ) : nhip === 'tai' ? (
         <XuongNhip />
       ) : null}

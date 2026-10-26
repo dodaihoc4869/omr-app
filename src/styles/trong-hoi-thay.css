@@ -200,6 +200,18 @@ html.may-yeu[data-trong] .lg-hh-nen { backdrop-filter: none; -webkit-backdrop-fi
   [data-trong] .lg-nh-o { min-height: 52px; padding-top: 14px; padding-bottom: 14px; }
   [data-trong] .lg-nh-gui { margin: 4px 4px 4px 0; }
 }
+/* Điện thoại dọc (thầy 26/10: «hỏi thầy đang bị chèn chữ»): Đề câu / gợi ý / Em và câu này là MỘT vùng cuộn liền — không khối nào bị bóp
+   cắt chữ giữa dòng; hội thoại + ô nhắn + khẩu hiệu luôn hiện trọn ở đáy tấm. */
+@media (max-width: 900px) and (min-height: 501px), (max-width: 639px) {
+  [data-trong] .lg-hh-trai { display: flex; flex-direction: column; flex: 0 1 auto; min-height: 0; max-height: 48dvh; overflow: auto; overscroll-behavior: contain; padding-bottom: 4px; }
+  [data-trong] .lg-hh-trai .lg-hh-de-than { max-height: none; overflow: visible; }
+  [data-trong] .lg-hh-trai .lg-ev { flex: none; overflow: visible; }
+  [data-trong] .lg-hh-trai .lg-ev-than { max-height: none; overflow: visible; }
+  [data-trong] .lg-ht--hop { min-height: 132px; }
+  [data-trong] .lg-nh-o { min-height: 52px; padding-top: 14px; padding-bottom: 14px; }
+  [data-trong] .lg-nh-gui { margin: 4px 4px 4px 0; }
+  [data-trong] .lg-ht--hop .lg-nh { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   [data-trong] .lg-hh, [data-trong] .lg-hh-nen { animation: none; }

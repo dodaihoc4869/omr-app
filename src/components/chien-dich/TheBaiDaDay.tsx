@@ -330,7 +330,7 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
                 <b>Đã gọi {demDauGio.goi} em</b> · Đạt {demDauGio.dat} · Chưa đạt {demDauGio.chuaDat}
               </span>
             ) : coMat ? (
-              <span className="gvv2-so">Gọi trong {coMat} em có mặt · Đạt / Chưa đạt ghi sổ</span>
+              <span className="gvv2-so">Gọi trong {coMat} em có mặt&nbsp;· Đạt / Chưa đạt ghi sổ</span>
             ) : (
               'Cần danh sách có mặt ở bước 1 — app chỉ gọi em có mặt'
             )

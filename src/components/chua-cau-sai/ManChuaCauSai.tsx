@@ -410,7 +410,7 @@ export default function ManChuaCauSai({
       </header>
       <main className="ccs-than">
         {tai ? (
-          <div className="ccs-dang-tai" role="status">
+          <div className="ccs-dang-tai chu-cho-tre" role="status">
             <span className="ccs-dang-tai-vong" aria-hidden="true" />
             <strong>Đang mở câu…</strong>
           </div>

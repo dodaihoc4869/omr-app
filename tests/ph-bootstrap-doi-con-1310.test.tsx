@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
 import { docPass, xoaPass } from '../src/lib/ph-token'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 const api = vi.hoisted(() => ({ xac: vi.fn(), datPass: vi.fn() }))
 vi.mock('../src/lib/exam-db', () => ({ loadScriptUrl: async () => '/test' }))
 vi.mock('../src/lib/exam-api', () => ({ tenTheoSbd: async () => ({ hoTen: 'Con B', lop: '12' }) }))

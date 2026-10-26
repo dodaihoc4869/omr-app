@@ -28,6 +28,7 @@ import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
 import { ngayDayDu } from '../lib/ngay-gio-24'
 import '../styles/trong-quan-ly-kho.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 type CauNghi = {
   phan: 'I' | 'II' | 'III'
@@ -522,7 +523,7 @@ export default function NganHangDeScreen() {
                     tích riêng. Kho vẫn giữ MỘT bản đề: id từng câu không đổi,
                     chấm bài và lịch sử ca cũ không đụng gì. */}
                 <div className="flex flex-wrap gap-2 text-xs text-slate-600 dark:text-slate-300">
-                  <span>{s.phanI.length + s.phanII.length + s.phanIII.length} câu</span><span>· Trắc nghiệm {s.phanI.length}</span><span>· Đúng–sai {s.phanII.length}</span><span>· Trả lời ngắn {s.phanIII.length}</span>
+                  <span>{s.phanI.length + s.phanII.length + s.phanIII.length} câu ·</span><span>Trắc nghiệm {s.phanI.length} ·</span><span>Đúng–sai {s.phanII.length} ·</span><span>Trả lời ngắn {s.phanIII.length}</span>
                 </div>
                 <details><summary className="cursor-pointer text-xs font-semibold text-blue-600">Chi tiết đề</summary>
                 <div className="grid" style={{ gap: 'var(--k2)', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>

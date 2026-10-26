@@ -41,6 +41,7 @@ import TongHopTuLuyen from './TongHopTuLuyen'
 import { taiDieuKienLuyenDe, type DieuKienLuyenDe } from '../luyen-de/dung-luyen-de'
 import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import { taoGoiSom } from '../hoa2/nap-truoc-man'
+import { phanHoi } from '../../lib/phan-hoi'
 import { BanDoKetQua, KhungLamRong, cuonMuot, cuonToiCau, useBoCuc, type BoCuc, type LocXem, type NhomBang } from './bo-cuc'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
@@ -364,6 +365,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
 
   const traLoi = (qid: string, v: string) => {
     cauDangNhin.current = qid
+    phanHoi('chon') // rung phản hồi (chỉ «Trong», thầy 26/10)
     // Câu đã "Kiểm tra" là KHOÁ (máy chủ cũng khoá) — phím tắt / phiếu trả lời không đổi được.
     setBai((b) => (b && !b.daCham?.[qid] ? { ...b, traLoi: { ...b.traLoi, [qid]: v } } : b))
   }
@@ -377,6 +379,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     const r = await chamCau(token, b.luotId, qid, b.traLoi[qid] ?? '')
     setDangCham('')
     if (!r.ok) { setLoi(r.loi); return }
+    if (typeof (r.du as { dung?: unknown }).dung === 'boolean') phanHoi((r.du as { dung: boolean }).dung ? 'dung' : 'sai')
     setBai((x) => (x && x.luotId === b.luotId ? { ...x, daCham: { ...(x.daCham ?? {}), [qid]: r.du } } : x))
   }
   /** "Câu tiếp": cuộn tới câu CHƯA kiểm tra kế sau (hết thì về câu chưa kiểm tra đầu tiên, rồi nút Nộp). */

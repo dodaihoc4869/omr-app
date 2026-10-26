@@ -193,7 +193,7 @@
 [data-trong='gv'] .gvhn-1210 .mt-luoi .gvhn-the-chu > * { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 [data-trong='gv'] .gvhn-1210 .mt-luoi .gvhn-the-phu { display: block; }
 [data-trong='gv'] .gvhn-1210 .mt-luoi .gvhn-the-hanh { flex: none; min-width: 92px; padding: 0 14px; }
-[data-trong='gv'] .gvhn-1210 .gvhn-viec-dau .gvhn-viec-them { flex: none; margin: -10px -10px -10px 0; padding: 0 10px; background: none; color: var(--tr-chinh-chu); font-size: 13.5px; font-weight: 600; }
+[data-trong='gv'] .gvhn-1210 .gvhn-viec-dau .gvhn-viec-them { flex: none; margin: -10px -10px -2px 0; padding: 0 10px; background: none; color: var(--tr-chinh-chu); font-size: 13.5px; font-weight: 600; }
 [data-trong='gv'] .gvhn-1210 .gvhn-viec-them[aria-expanded='true'] svg { transform: rotate(-90deg); }
 
 /* thẻ chung của ba khối */
@@ -332,6 +332,8 @@
   [data-trong='gv'] .gvhn-1210 .mt-mo-dong { min-height: 46px; padding: 1px 12px; }
   [data-trong='gv'] .gvhn-1210 .mt-o { width: 30px; height: 30px; }
 }
+/* điện thoại ngang (≤ 879 × ≤ 520): dải biểu tượng thay thanh trên + thanh đáy — NGANG GV 26/10: nay là luật CHUNG mọi màn thầy (trong-gv.css); khối
+   riêng của Hôm nay dưới đây giữ nguyên (trùng luật chung, không đổi gì) */
 @media (max-width: 879px) and (max-height: 520px) {
   [data-trong='gv'] .m3.vo-thay:has(.gvhn-1210) { display: grid; grid-template-columns: 64px minmax(0, 1fr); }
   [data-trong='gv'] .m3.vo-thay:has(.gvhn-1210) :is(.tren-thay, .day-thay) { display: none; }
@@ -354,3 +356,35 @@
     position: absolute; top: 0; right: 0; display: inline-flex; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; font-size: 10.5px; align-items: center; justify-content: center;
   }
 }
+
+/* ═══ NGANG GV 26/10 — sửa gấp theo ảnh thầy (điện thoại thật, khung 390×700–780): LUẬT «KHÔNG BAO GIỜ cắt chữ để ép vừa khung».
+   Trang CAO THEO NỘI DUNG (tối thiểu bằng khung) — vừa một khung chỉ là mục tiêu khi khung đủ cao, không đủ thì trang cuộn bình thường; không còn
+   chiều cao cố định / overflow:hidden / max-height làm cắt thẻ; hàng lưới tối thiểu bằng nội dung; chữ dài xuống dòng thay vì «…». */
+[data-trong='gv'] .m3.vo-thay .giua-noi-dung > .gv2-trang.gvhn.gvhn-1210 { height: auto; min-height: 100vh; min-height: 100dvh; overflow: visible; }
+[data-trong='gv'] .gvhn-1210 .mt-luoi { flex: 1 0 auto; grid-template-rows: auto 1fr; }
+[data-trong='gv'] .gvhn-1210 .mt-luoi > * { max-height: none; }
+[data-trong='gv'] .gvhn-1210 .mt-luoi > .mt-cho { overflow: visible; }
+[data-trong='gv'] .gvhn-1210 :is(.mt-luoi .nht-dai-so .nht-o-dk, .mt-luoi .gvhn-the-chu > *, .mt-mo-chu > *, .mt-lop .nht-lop-ten, .mt-de-y .nht-ten) {
+  overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: anywhere;
+}
+@media (max-width: 1100px) {
+  [data-trong='gv'] .gvhn-1210 .mt-luoi { grid-template-rows: auto auto 1fr; }
+}
+@media (max-width: 900px) {
+  [data-trong='gv'] .gvhn-1210 .mt-luoi { grid-template-rows: auto auto auto; }
+}
+@media (max-width: 879px) {
+  [data-trong='gv'] .m3.vo-thay .giua-noi-dung > .gv2-trang.gvhn.gvhn-1210 { height: auto; min-height: calc(100vh - 144px); min-height: calc(100dvh - 144px - env(safe-area-inset-bottom)); }
+}
+/* đầu màn điện thoại: tiêu đề chiếm trọn bề rộng; nút chính («Bổ sung bài hôm nay» khi không có ca mở) xuống hàng riêng, rộng hết, ≥ 44 px — không đè, không tràn */
+@media (max-width: 600px) {
+  [data-trong='gv'] .gvhn-1210 > .gvhn-dau { flex-wrap: wrap; align-items: stretch; gap: 10px; }
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau-chu { flex: 1 1 100%; min-width: 0; }
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau > .gvv2-nut-chinh { flex: 1 1 100%; justify-content: center; min-height: 44px; white-space: normal; }
+}
+@media (max-width: 900px) and (max-height: 520px) {
+  [data-trong='gv'] .m3.vo-thay .giua-noi-dung > .gv2-trang.gvhn.gvhn-1210 { height: auto; min-height: 100vh; min-height: 100dvh; }
+  [data-trong='gv'] .gvhn-1210 .mt-luoi { grid-template-rows: auto 1fr; }
+  [data-trong='gv'] .gvhn-1210 > .gvhn-dau { flex-wrap: nowrap; }
+}
+/* ═══ hết NGANG GV 26/10 */

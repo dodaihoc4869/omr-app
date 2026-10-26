@@ -18,7 +18,6 @@ const napHop = () => import('./HopHoiThay')
 const napKhung = () => import('./KhungLoiGiai')
 const HopHoiThay = lazy(napHop)
 const KhungLoiGiai = lazy(napKhung)
-const NutChuaTungBuoc = lazy(() => import('../chua-cau-sai/NutChuaTungBuoc'))
 
 // TỐC ĐỘ (thầy 13/10: "Tốc độ bấm vào hỏi thầy hơi chậm tối ưu lại tốc độ nhanh nhất"):
 //  · mảnh hộp Hỏi Thầy tải sẵn lúc máy RẢNH (một lần cho cả app, sau khi màn đã vẽ xong — không cộng vào lượt mở app);
@@ -91,7 +90,7 @@ function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, d
           <span>{dangTai === 'giai' ? 'Đang mở…' : 'Lời giải từng bước'}</span>
         </button>
       )}
-      {coGiai && <Suspense fallback={null}><NutChuaTungBuoc qid={luotId ? qid.replace(/~\d+$/, '') : qid} /></Suspense>}
+      {/* Thầy 26/10: «Bỏ câu sai từng bước» — gỡ nút «Chữa câu sai từng bước» dưới lời giải (sửa câu sai vẫn ở Tự sửa lỗi). */}
       {loi && <span className="lg-loi" role="status">{loi}</span>}
       <Suspense fallback={null}>
         {hop && <HopHoiThay cau={hop.cau} em={hop.em} qid={qid} luotId={luotId} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}

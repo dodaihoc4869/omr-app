@@ -20,6 +20,7 @@ import { ngayVnCua } from '../server/src/bai-hang-ngay'
 import { gameToken, parentPass } from '../server/src/game-v2-auth'
 import { CHI_NHAN_TOKEN } from '../server/src/ph-tat-ca-ve-con'
 import { LOI_HO_SO_CON, LOI_LICH_SU_CON, phHoSoThaiDo, phLichSuLamCau, phNhipHoc } from '../server/src/ph-ho-so-con'
+import { hoSoThaiDoChoHs, lichSuChoHs, nhipHocChoHs } from '../server/src/an-luoi-hs'
 
 type D = ReturnType<typeof taoD1That>
 type Kq = Record<string, any>
@@ -79,10 +80,11 @@ const goi = async (env: Env, duong: string, body: Record<string, unknown>): Prom
   return r
 }
 const MA_AN = /MO-I-|XOA-I-|GIAU-I-|CA-MO|CA-XOA/
+// SỬA CÓ CHỦ ĐÍCH 26/10 (thầy: hệ phát hiện lười CHỈ thầy + phụ huynh xem): bản /hs = bản /ph TRỪ các trường ẩn ở an-luoi-hs.ts (phụ huynh giữ đủ).
 const BA_LENH = [
-  ['/ph/nhip-hoc', '/hs/nhip-hoc'],
-  ['/ph/ho-so-thai-do', '/hs/ho-so-thai-do'],
-  ['/ph/lich-su-lam-cau', '/hs/lich-su-lam-cau'],
+  ['/ph/nhip-hoc', '/hs/nhip-hoc', nhipHocChoHs],
+  ['/ph/ho-so-thai-do', '/hs/ho-so-thai-do', hoSoThaiDoChoHs],
+  ['/ph/lich-su-lam-cau', '/hs/lich-su-lam-cau', lichSuChoHs],
 ] as const
 const moiKhoa = (x: unknown, ra = new Set<string>()): Set<string> => {
   if (Array.isArray(x)) x.forEach((v) => moiKhoa(v, ra))
@@ -101,11 +103,11 @@ describe('phụ huynh thấy ĐÚNG bản học sinh của con mình (cùng hợ
     const { d, env } = batDau()
     const pass = await parentPass(d.env, sbd)
     const token = await gameToken(env, sbd)
-    for (const [ph, hs] of BA_LENH) {
+    for (const [ph, hs, anLuoi] of BA_LENH) {
       const rPh = await goi(env, ph, { pass })
       const rHs = await goi(env, hs, { token })
       expect(rPh.ok, ph).toBe(true)
-      expect(rPh, ph).toEqual(rHs)
+      expect(anLuoi(rPh as never), ph).toEqual(rHs)
     }
     // Lười / Chăm đầy đủ như app em: nhóm, chuỗi, dải ô; hồ sơ có kết luận + tín hiệu + độ tin cậy mới.
     const nhip = (await goi(env, '/ph/nhip-hoc', { pass })) as KetQuaNhipHocEm
@@ -122,7 +124,7 @@ describe('phụ huynh thấy ĐÚNG bản học sinh của con mình (cùng hợ
     expect(hoSo.tuSuaSai).toMatchObject({ soCauSai: expect.any(Number), soCauDaSua: expect.any(Number) })
     const ls = (await goi(env, '/ph/lich-su-lam-cau', { pass, gioiHan: 5 })) as KetQuaLichSuLamCau
     expect(ls.lan.length).toBeLessThanOrEqual(5)
-    expect(ls).toEqual(await goi(env, '/hs/lich-su-lam-cau', { token, gioiHan: 5 }))
+    expect(lichSuChoHs(ls)).toEqual(await goi(env, '/hs/lich-su-lam-cau', { token, gioiHan: 5 }))
   })
 
   it('A: lượt ẩn với em cũng ẩn với phụ huynh — còn giấu, ca chưa công bố, ca đã xoá; không đáp án chọn, không mã câu thật, không ghi chú nội bộ', async () => {

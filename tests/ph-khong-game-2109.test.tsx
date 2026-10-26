@@ -8,6 +8,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import BangTinPhuHuynh from '../src/components/BangTinPhuHuynh'
 import { boGameChoPhuHuynh, CHU_GAME_PH, khongChuGame, TEN_VIEC_LUYEN_DANG_PH, type DuLieuBangNhiemVu, type TheNhiemVu } from '../src/lib/nhiem-vu-adapter'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 configure({ asyncUtilTimeout: 8000 })
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))

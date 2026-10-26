@@ -1,0 +1,95 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Nguyên tử từng câu» — đúng tự làm 10 · câu khó +5 · chuỗi đúng ≥3 +2/câu · chuỗi đúng ≥5 +5/câu + nhãn «Phản ứng dây chuyền!».
+     Hiệu ứng (HIEU-UNG.md): A4 đúng (tấm trượt, tick, hạt lục giác, Bi nảy) · A6 băng phân tử combo · A7 ống nghiệm dâng + cam phát sáng · A8 «+N ⚛» bay lên.
+     Biến thể: ?bt=combo (mặc định, câu 3/6, chuỗi đúng 3) · ?bt=day-chuyen (câu 5/6, chuỗi đúng 5) · ?bt=cau-kho (câu 4/6, câu khó + chuỗi đúng 4). -->
+<title>HS · Thưởng phạt · 1 Câu đúng</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.duo-kq>.giua{flex:1;min-width:0}
+.duo-kq .bi-kq{width:58px;margin-top:-30px}
+.tp-diem{display:inline-flex;align-items:center;gap:4px;font-weight:900;font-size:16px;color:var(--dung-chu);flex:none;min-width:44px;justify-content:flex-end}
+.tp-diem .tp-dv{width:20px;height:20px}
+.duo-kq .loi{margin:6px 0 0;font-size:14.5px;line-height:1.45;color:var(--chu)}
+.combo-o{display:flex;justify-content:center;min-height:44px}
+.duo-than{gap:16px;padding-top:12px}
+</style></head>
+<body class="duo tp cau-ngang" data-app="hs" data-khung="khong" data-ai="khong" data-bt-mac="combo" data-hu-mac="dung">
+<div class="duo-vo">
+  <div class="duo-tren">
+    <span class="duo-dong" aria-label="Thoát, lưu bài"><i data-i="x"></i></span>
+    <div class="tp-ong" id="ong" role="img"><i class="long"><b class="cam"></b><s class="vet"></s><s class="bot" style="left:30%"></s><s class="bot" style="left:62%;animation-delay:.6s"></s><s class="bot" style="left:84%;animation-delay:1.1s"></s></i><span class="bong-tren"></span></div>
+    <span class="tp-diem" aria-label="Nguyên tử của bài này"><i data-tp="nt"></i><span id="tong-bai"></span></span>
+  </div>
+  <main class="duo-than">
+    <div class="combo-o"><div class="tp-combo" id="combo"></div></div>
+    <p class="duo-nhan" id="nhan"></p>
+    <p class="duo-de" id="de"></p>
+    <div class="duo-pa" id="pa"></div>
+  </main>
+  <div class="duo-day dung" id="tam"><div class="giua" style="position:relative">
+    <span class="tp-bay-so" id="bay" aria-hidden="true"></span>
+    <div class="duo-kq"><span class="o" id="tick"><i data-i="check"></i></span>
+      <div class="giua"><h3>Chính xác!</h3><div class="tp-cong" id="cong"></div><p class="loi" id="loi"></p></div>
+      <span class="bi-kq" data-bi="vui" id="bi"></span></div>
+    <div class="duo-them"><span><i data-i="book"></i>Lời giải từng bước</span><span><i data-i="ask"></i>Hỏi thầy</span></div>
+    <span class="duo-nut">Tiếp tục</span>
+  </div></div>
+</div>
+<script>
+// [nhãn, đề, phương án, đáp án đúng, câu số, chuỗi đúng, câu khó?, tổng nguyên tử của bài trước câu này, lời giải]
+const V = {
+  'combo': { cau: 3, chuoi: 3, kho: false, truoc: 20, nhan: 'Câu mới · Ester – Lipid',
+    de: 'Thuỷ phân ethyl acetate trong dung dịch sodium hydroxide, đun nóng. Muối thu được là', pa: ['sodium formate', 'sodium acetate', 'sodium propanoate', 'sodium ethoxide'], dung: 1,
+    loi: 'CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub> + NaOH → CH<sub>3</sub>COONa + C<sub>2</sub>H<sub>5</sub>OH.' },
+  'day-chuyen': { cau: 5, chuoi: 5, kho: false, truoc: 44, nhan: 'Câu mới · Amine',
+    de: 'Chất nào sau đây là amine bậc hai?', pa: ['CH<sub>3</sub>NH<sub>2</sub>', '(CH<sub>3</sub>)<sub>2</sub>NH', '(CH<sub>3</sub>)<sub>3</sub>N', 'C<sub>6</sub>H<sub>5</sub>NH<sub>2</sub>'], dung: 1,
+    loi: 'Nitrogen liên kết với hai gốc hydrocarbon ⇒ amine bậc hai.' },
+  'cau-kho': { cau: 4, chuoi: 4, kho: true, truoc: 32, nhan: 'Câu mới · Amine',
+    de: 'Số đồng phân amine có công thức phân tử C<sub>4</sub>H<sub>11</sub>N tác dụng với dung dịch HNO<sub>2</sub> (ở nhiệt độ thường) tạo ra alcohol là', pa: ['2', '8', '3', '4'], dung: 3,
+    loi: 'Chỉ amine bậc một cho alcohol với HNO<sub>2</sub>; C<sub>4</sub>H<sub>11</sub>N có 4 đồng phân bậc một.' },
+}
+const v = V[new URLSearchParams(location.search).get('bt') || 'combo'] || V.combo
+const thuongChuoi = v.chuoi >= 5 ? 5 : v.chuoi >= 3 ? 2 : 0, cong = 10 + (v.kho ? 5 : 0) + thuongChuoi
+v.cong = cong
+document.getElementById('ong').style.setProperty('--p', (v.cau / 6 * 100).toFixed(1) + '%')
+document.getElementById('ong').setAttribute('aria-label', `Câu ${v.cau}/6 của bài`)
+if (v.chuoi >= 3) document.getElementById('ong').classList.add('combo')
+document.getElementById('tong-bai').textContent = v.truoc + cong
+const day = v.chuoi >= 5
+document.getElementById('combo').className = 'tp-combo' + (day ? ' day' : '')
+document.getElementById('combo').innerHTML = `<span data-phan-tu="${v.chuoi}"></span><span>${day ? 'Phản ứng dây chuyền!' : 'Chuỗi đúng ' + v.chuoi} <small>· +${thuongChuoi} mỗi câu</small></span>`
+document.getElementById('nhan').innerHTML = v.nhan + (v.kho ? ' <span class="chip kho">Câu khó</span>' : '') + ` <span class="chip">Câu ${v.cau}/6</span>`
+document.getElementById('de').innerHTML = v.de
+document.getElementById('pa').className = 'duo-pa' + (v.pa.every((p) => p.length < 4) ? ' luoi' : '')
+document.getElementById('pa').innerHTML = v.pa.map((p, i) => `<div class="${i === v.dung ? 'dung' : 'mo'}"><b>${'ABCD'[i]}</b><span>${p}</span></div>`).join('')
+document.getElementById('cong').innerHTML = `<span class="tong">+${cong} <i data-tp="nt"></i> nguyên tử</span><span class="tp-ct">Đúng <b>+10</b></span>` + (v.kho ? '<span class="tp-ct kho">Câu khó <b>+5</b></span>' : '') + `<span class="tp-ct cb">Chuỗi đúng ${v.chuoi} <b>+${thuongChuoi}</b></span>`
+document.getElementById('loi').innerHTML = v.loi
+document.getElementById('bay').innerHTML = `+${cong} <i data-tp="nt"></i>`
+</script>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('dung', async () => {
+  const tam = document.getElementById('tam'), ong = document.getElementById('ong'), long = ong.querySelector('.long'), combo = document.getElementById('combo')
+  const truoc = (v.cau - 1) / v.cau
+  TP.phanHoi('dung')
+  TP.a(tam, [{ transform: 'translateY(100%)' }, { transform: 'none' }], 220)
+  TP.a(document.getElementById('tick'), [{ transform: 'scale(0)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], 300, { delay: 140 })
+  TP.a(document.getElementById('bi'), [{ transform: 'translateY(0)' }, { transform: 'translateY(-16px)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-6px)' }, { transform: 'translateY(0)' }], 450, { delay: 200 })
+  setTimeout(() => TP.hat(document.querySelector('.duo-pa .dung'), 0, { n: 8, r: 80 }), 60)
+  // A7 ống nghiệm: chất lỏng dâng, đủ 3 câu liền thì đổi cam phát sáng
+  TP.a(long, [{ transform: `scaleX(${truoc})` }, { transform: 'scaleX(1)' }], 500, { delay: 120 })
+  if (v.chuoi === 3) TP.a(ong.querySelector('.cam'), [{ opacity: 0 }, { opacity: 1 }], 500, { delay: 300 })
+  // A6 băng phân tử trượt xuống, nguyên tử mới mọc thêm
+  TP.a(combo, [{ transform: 'translateY(-40px) scale(.9)', opacity: 0 }, { transform: 'translateY(4px) scale(1.04)', opacity: 1, offset: 0.6 }, { transform: 'none', opacity: 1 }], 600, { delay: 200 })
+  const ng = combo.querySelectorAll('.ng'), lk = combo.querySelectorAll('.lk')
+  const moi = ng[ng.length - 1]; moi.style.transformOrigin = 'center'; moi.style.transformBox = 'fill-box'
+  TP.a(moi, [{ transform: 'scale(0)' }, { transform: 'scale(1.4)' }, { transform: 'scale(1)' }], 380, { delay: 560 })
+  TP.a(lk[lk.length - 1], [{ opacity: 0 }, { opacity: 1 }], 200, { delay: 520 })
+  TP.phanHoi('combo')
+  // A8 «+N ⚛» bay lên rồi tan
+  TP.a(document.getElementById('bay'), [{ transform: 'translateY(10px)', opacity: 0 }, { transform: 'translateY(-14px)', opacity: 1, offset: 0.3 }, { transform: 'translateY(-60px)', opacity: 0 }], 700, { delay: 260, e: 'ease-out' })
+  TP.dem(document.getElementById('tong-bai'), v.truoc, v.truoc + v.cong, 600)
+  if (v.chuoi >= 5) setTimeout(() => TP.hat(combo, 0, { n: 14, r: 110, mau: ['var(--sao)', 'var(--chu-y)', 'var(--sai)'] }), 700)
+})
+</script>
+</body></html>

@@ -78,9 +78,10 @@
 .gvv2-ttc-chip[aria-pressed='true'] b::before { content: '✓ '; }
 .gvv2-ttc-chip:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; }
 
-/* bốn ô số: câu sẽ chiếu · Đúng–sai · có tính toán · lớp sai từ 30% (cùng màu với nhãn tương ứng trong danh sách) */
+/* SOÁT 26/10: ô giãn đầy hàng (flex: 1 1 auto) — ô cuối không rơi xuống hàng một mình để lại khoảng trắng lớn.
+   bốn ô số: câu sẽ chiếu · Đúng–sai · có tính toán · lớp sai từ 30% (cùng màu với nhãn tương ứng trong danh sách) */
 .gvv2-ttc-so4 { display: flex; flex-wrap: wrap; gap: 10px; }
-.gvv2-ttc-o-so { display: inline-flex; align-items: baseline; gap: 6px; padding: 10px 14px; border-radius: 14px; font-size: var(--t-phu, 13px); font-weight: 600; background: var(--gvm-mat-2); color: var(--gvm-chu-2); }
+.gvv2-ttc-o-so { flex: 1 1 auto; display: inline-flex; align-items: baseline; gap: 6px; padding: 10px 14px; border-radius: 14px; font-size: var(--t-phu, 13px); font-weight: 600; background: var(--gvm-mat-2); color: var(--gvm-chu-2); }
 .gvv2-ttc-o-so b { font-size: 18px; font-weight: 800; color: var(--gvm-chu); }
 .gvv2-ttc-o-so[data-mau='tim'] { background: var(--gvm-tim-nen); color: var(--gvm-tim-dam); }
 .gvv2-ttc-o-so[data-mau='xd'] { background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }

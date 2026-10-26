@@ -459,10 +459,14 @@ export default function Buoc1DiemDanh({
                     <p className="dd1-vang-ten">
                       {vangHien.map((e, i) => (
                         <span key={e.sbd}>
-                          {i > 0 && ' · '}
-                          <button type="button" className="dd1-nut-chu" aria-pressed={coPhep.has(e.sbd)} title={coPhep.has(e.sbd) ? 'Bấm để gỡ có phép' : 'Bấm để đánh dấu vắng có phép'} onClick={() => void doiCoPhep(e.sbd, !coPhep.has(e.sbd))}>
-                            {e.hoTen || `SBD ${e.sbd}`}{coPhep.has(e.sbd) ? ' (có phép)' : ''}
-                          </button>
+                          {/* SOÁT 26/10: dấu «·» bám CUỐI tên trước (không xuống dòng giữa tên và dấu) ⇒ dòng không mở đầu bằng «·» */}
+                          <span className="dd1-vang-em">
+                            <button type="button" className="dd1-nut-chu" aria-pressed={coPhep.has(e.sbd)} title={coPhep.has(e.sbd) ? 'Bấm để gỡ có phép' : 'Bấm để đánh dấu vắng có phép'} onClick={() => void doiCoPhep(e.sbd, !coPhep.has(e.sbd))}>
+                              {e.hoTen || `SBD ${e.sbd}`}{coPhep.has(e.sbd) ? ' (có phép)' : ''}
+                            </button>
+                            {i < vangHien.length - 1 && '\u00a0·'}
+                          </span>
+                          {i < vangHien.length - 1 && ' '}
                         </span>
                       ))}
                     </p>
@@ -645,7 +649,7 @@ export default function Buoc1DiemDanh({
 
               <div className="dd1-o dd1-o--xong">
                 <p className="dd1-phu">
-                  Xong điểm danh: chiếu <b>Nhịp học của lớp</b> — ba cột Chăm · Chưa đều · Lười, em vắng làm mờ. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười nếu thầy không
+                  Xong điểm danh: chiếu <b>Nhịp học của lớp</b> — ba cột Chăm&nbsp;· Chưa đều&nbsp;· Lười, em vắng làm mờ. Trên bản chiếu bấm <b>H</b> để ẩn tên nhóm Lười nếu thầy không
                   muốn nêu tên trước lớp.
                 </p>
                 <button type="button" className="m3-nut-chinh dh-nut dd1-nut-chinh" onClick={chieuNhip}>

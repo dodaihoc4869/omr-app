@@ -629,7 +629,8 @@ export default function ThayTuChua() {
                   {dangChieu ? 'Đang dựng tờ chiếu…' : 'Chiếu lên bảng'}
                 </button>
                 <span className="gvv2-ttc-goi-y">
-                  Tờ chiếu chuẩn như Chiếu lên bảng: <b>L</b> gọi em lên bảng · <b>Đạt / Chưa đạt</b> ghi sổ · <b>G</b> lời giải hiện dần · <b>T</b> thống kê lớp ·{' '}
+                  {/* SOÁT 26/10: «·» không mở đầu dòng (dấu cách cứng trước «·») */}
+                  Tờ chiếu chuẩn như Chiếu lên bảng: <b>L</b> gọi em lên bảng&nbsp;· <b>Đạt / Chưa đạt</b> ghi sổ&nbsp;· <b>G</b> lời giải hiện dần&nbsp;· <b>T</b> thống kê lớp&nbsp;·{' '}
                   <b>X</b> ai sai, mấy giây · <b>Space</b> lật trang
                 </span>
               </div>

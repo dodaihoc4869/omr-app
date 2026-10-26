@@ -121,17 +121,15 @@ describe('bàn phím: ngăn gập nằm trong vòng Tab của tấm', () => {
 describe('học sinh / phụ huynh: không bao giờ thấy Mức 6', () => {
   const sach = (tam: HTMLElement) => expect(tam.outerHTML).not.toMatch(/Cố tình|Mức làm 6|co_tinh|data-t="6"/)
 
-  it('học sinh: điểm nhấn số lượt; "Câu này máy để treo X phút" kể cả lượt đúng; ô hồng nhạt số lượt treo; lọc "Máy để treo"', async () => {
+  // 26/10 (thầy: Mức làm Bấm vội / Treo máy… CHỈ thầy + phụ huynh xem): học sinh KHÔNG còn Mức làm, «máy để treo», lọc treo — kể cả khi dữ liệu lỡ có.
+  it('học sinh: không Mức làm, không «treo» (kể cả lượt đúng); điểm nhấn số lượt; lọc chỉ Tất cả · Lượt sai; lượt vẫn có kết quả + số giây', async () => {
     const tam = await mo('hoc-sinh')
     sach(tam)
-    expect(chu(tam.querySelector('.hsv-nhan-so'))).toBe('15 lượt làm câu · đúng 6 lượt')
-    expect(chu(dongCua(tam, 'Câu 7 · Điện phân')[0]!.querySelector('.hsv-phut'))).toBe('Câu này máy để treo 7 phút.')
-    expect(chu(dongCua(tam, 'Câu 21 · Điện phân dung dịch')[0]!.querySelector('.hsv-phut'))).toBe('Câu này máy để treo 11 phút.')
-    expect(chu(dongCua(tam, 'Câu 8 · Điện phân dung dịch')[0]!.querySelector('.hslc-chip-m'))).toBe('Mức làm 5 Máy để treo') // lượt ĐÚNG vẫn là máy để treo
-    expect(chu(tam.querySelector('.hsv-nhe'))).toBe('Có 6 lượt máy để treo. Thời gian treo không tính vào số giây làm bài của em.')
-    expect([...tam.querySelectorAll('.hsv-loc [role="tab"]')].map((t) => chu(t))).toEqual(['Tất cả · 16', 'Lượt sai · 9', 'Máy để treo · 6'])
-    expect(tam.textContent).not.toMatch(/Chưa đo treo máy|Chưa có số đo ·|Treo máy/) // không nhãn từng lượt, không chữ nội bộ
-    expect([...tam.querySelectorAll('.hslc-cl-em li')].map((li) => chu(li))[4]).toMatch(/^Mức làm 5 Máy để treo \d+ lượt sai$/)
+    expect(chu(tam.querySelector('.hsv-nhan-so'))).toMatch(/^\d+ lượt làm câu · đúng \d+ lượt$/)
+    expect(tam.querySelector('.hslc-chip-m, .hsv-phut, .hsv-nhe, .hslc-cl-em, [data-treo], [data-t]')).toBeNull()
+    expect([...tam.querySelectorAll('.hsv-loc [role="tab"]')].map((t) => chu(t))).toEqual(['Tất cả · 16', 'Lượt sai · 9'])
+    expect(tam.textContent).not.toMatch(/treo|Mức làm|vội/i)
+    expect(chu(dongCua(tam, 'Câu 8 · Điện phân dung dịch')[0]!.querySelector('.gvv2-hs-kq'))).toBe('Đúng')
   })
 
   it('phụ huynh: lượt treo chỉ chip "Mức làm 5 · Máy để treo", KHÔNG số phút; một dòng tổng; "Xem mọi lượt của con" giữ đúng luật', async () => {

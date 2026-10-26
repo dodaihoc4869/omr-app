@@ -113,6 +113,8 @@ jobs:
           node /tmp/ktcn-schema.mjs
           npx esbuild scripts/ap-migration-hoi-thay.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/hoi-thay-schema.mjs --log-level=warning
           node /tmp/hoi-thay-schema.mjs
+          # Thưởng phạt 26/10: bảng + trigger chỉ-thêm (nộp câu ghi vào các bảng này) — áp TRƯỚC khi đẩy Worker.
+          node scripts/ap-migration-thuong-2610.mjs
           node scripts/kiem-phat-hanh-chua.mjs --schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}

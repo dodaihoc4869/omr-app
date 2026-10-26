@@ -198,6 +198,9 @@ body.mc .mc-thanh #mc-len-bang:focus-visible{outline:3px solid white;outline-off
 body.mc .mc-thanh #mc-len-bang:disabled{background:var(--mc-bang-nut);color:var(--mc-bang-phu);border-color:transparent;cursor:default}
 body.mc .mc-thanh #mc-len-bang[hidden]{display:none}
 @media(max-width:600px){body.mc .mc-thanh .mc-pha{display:none}body.mc .mc-thanh{gap:6px}body.mc .mc-thanh #mc-len-bang{padding:0 12px;white-space:normal;line-height:1.15;flex-shrink:1}body.mc .mc-thanh #mc-cai-btn{padding:0 8px}}
+/* SOÁT 26/10 — màn hẹp (điện thoại, cửa sổ nhỏ): thanh dưới không vừa một hàng ⇒ thanh tự cuộn ngang trong chính nó (không tràn khỏi màn, không
+   cắt chữ «18/35 em lớp sai câu này», không đè nhau); mọi nút giữ đủ chữ một dòng. Máy chiếu ≥ 901 px giữ nguyên. */
+@media(max-width:900px){body.mc .mc-thanh{height:auto;min-height:46px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none}body.mc .mc-thanh::-webkit-scrollbar{display:none}body.mc .mc-thanh>*,body.mc .mc-thanh .mc-phim-nhom>*{flex-shrink:0}body.mc .mc-thanh .mc-tc-lop-sai,body.mc .mc-thanh .mc-thanh-phu{flex:none;overflow:visible}body.mc .mc-thanh #mc-len-bang{flex-shrink:0;white-space:nowrap}}
 body.mc .mc-thanh-trai{display:none}
 #mc-cai-dat{position:fixed;right:10px;bottom:58px;z-index:45;display:flex;flex-direction:column;gap:10px;min-width:280px;max-width:min(420px,calc(100vw - 20px));padding:14px 16px;border-radius:18px;background:var(--mc-thanh-nen);color:var(--mc-bang-chu);font-family:var(--mc-sans);box-shadow:0 8px 28px rgba(0,0,0,.5)}
 #mc-cai-dat[hidden]{display:none}

@@ -22,7 +22,8 @@ const nguon = (tuy: TuyChonGia): NguonHoSo => ({
 async function mo(tuy: TuyChonGia, cheDo: 'thay' | 'hoc-sinh' | 'phu-huynh') {
   render(<HoSoLamCauEm em={{ sbd: SBD, ten: TD.em.hoTen, khoi: '12' }} onDong={() => {}} nguon={nguon(tuy)} cheDo={cheDo} />)
   const tam = await screen.findByRole('dialog')
-  await waitFor(() => expect(tam.querySelector('.hslc-cl')).not.toBeNull())
+  // 26/10: học sinh không có khối Mức làm ⇒ chờ khối «Từng lượt» (tấm đã vẽ xong lịch sử)
+  await waitFor(() => expect(tam.querySelector(cheDo === 'hoc-sinh' ? '#hsv-lan, .hsv-trong' : '.hslc-cl')).not.toBeNull())
   return tam
 }
 // 22/10 (6 mức): "Từng lượt" luôn hiện (không còn thẻ "Toàn bộ lịch sử"); khối Mức làm là «Cách làm bài · 6 mức» (thầy) / «Em làm bài thế nào» / «Cách con làm bài».
@@ -157,31 +158,18 @@ describe('thầy bấm vào em: đủ Mức làm 1–4', () => {
 })
 
 describe('học sinh và phụ huynh: cùng tấm, chỉ lượt SAI, chữ nhẹ, không nhãn năng lực', () => {
-  it('học sinh: không cột Đúng, không ghi chú riêng của thầy; lượt đúng Mức làm 1 không có mức (chỉ số giây); tên mức tả việc đã làm', async () => {
+  // 26/10 (thầy: Mức làm «Nộp trước khi đọc hết đề», Bấm vội, Treo máy… CHỈ thầy + phụ huynh xem): học sinh KHÔNG có khối Mức làm, chip mức, thước giây
+  // ở bất kỳ lượt nào — chỉ Đúng / Sai / có dùng gợi ý / số giây (kể cả khi dữ liệu lỡ có mức: tấm bỏ ở bước đọc).
+  it('học sinh: không khối Mức làm, không chip / thước mức ở lượt nào; lượt vẫn có kết quả + số giây', async () => {
     const tam = await mo({ cheDo: 'em' }, 'hoc-sinh')
-    const khoi = tam.querySelector('.hslc-cl')!
-    expect(khoi.querySelector('.hsv-o-luoi')).toBeNull()
-    expect(chu(khoi.querySelector('.hsv-phu'))).toBe('Trong 5 lượt sai có số đo: 4 lượt em nộp trước khi kịp nghĩ, 1 lượt em đã dành thời gian nghĩ.')
-    expect([...khoi.querySelectorAll('.hslc-cl-em li')].map((li) => chu(li))).toEqual([
-      'Mức làm 1 Nộp trước khi đọc hết đề 3 lượt sai',
-      'Mức làm 2 Đọc xong thì nộp ngay 1 lượt sai',
-      'Mức làm 3 Có thời gian nghĩ 1 lượt sai',
-      'Mức làm 4 Làm kỹ, đúng nhịp lớp 0 lượt sai',
-    ])
-    expect([...khoi.querySelectorAll('.hsv-ghi')].map((p) => chu(p))).toEqual([
-      '3 lượt sai chưa có số đo (chưa có số giây đáng tin để xếp).',
-      'Các lượt này làm trước khi máy em có đồng hồ mới, nên chưa đo được máy để treo.', // một dòng ghi chú, không nhãn từng lượt
-    ])
-    expect(chu(khoi)).not.toMatch(/Chỉ ghi chú|đúng trước|Cách tính Mức làm|Lớp chưa đủ mẫu/i)
-    expect(tam.textContent).not.toMatch(/Chưa đo treo máy|Treo máy|Mức làm 6/)
-    expect(tam.querySelectorAll('.hslc-muc-luot-ghi')).toHaveLength(0)
-    expect(chu(tam.querySelector('.hslc-chu-giai-m'))).toBe('') // không chú giải của thầy
+    expect(tam.querySelector('.hslc-cl, .hslc-chip-m, .hslc-muc-luot, .hslc-muc-luot-dong, .hslc-thuoc, .hslc-chu-giai-m')).toBeNull()
+    expect(tam.textContent).not.toMatch(/Mức làm|Nộp trước khi đọc hết đề|đọc hết đề cần|treo|vội/i)
     const dongDung = [...tam.querySelectorAll('.hslc-lan')].find((l) => chu(l).includes('Câu 9'))!
-    expect(dongDung.querySelector('.hslc-muc-luot')).toBeNull() // đúng ở Mức làm 1: máy chủ không gửi mức
     expect(chu(dongDung)).toContain('8 giây') // số giây vẫn hiện
-    expect(dongDung.querySelector('.hslc-chip-m--chua')).toBeNull() // học sinh không thấy nhãn "Chưa có số đo" ở từng dòng (không phân biệt được lượt bị ẩn)
+    expect(dongDung.querySelector('.hslc-chip-m--chua')).toBeNull()
     const sai = [...tam.querySelectorAll('.hslc-lan')].find((l) => chu(l).includes('Câu 12 · Pin điện hóa'))!
-    expect(chu(sai.querySelector('.hslc-muc-luot-dong'))).toBe('Mức làm 1 Nộp trước khi đọc hết đề 14 giây · đọc hết đề cần 24 giây')
+    expect(chu(sai.querySelector('.gvv2-hs-kq'))).toBe('Sai')
+    expect(chu(sai)).toContain('14 giây')
   })
 
   it('phụ huynh: ngôi "con"; cùng quy tắc; không chữ "em" trong khối mức', async () => {
@@ -193,8 +181,9 @@ describe('học sinh và phụ huynh: cùng tấm, chỉ lượt SAI, chữ nh�
     expect(khoi.querySelector('.hsv-o-luoi')).toBeNull()
   })
 
-  it('học sinh, những ngày đầu: một câu nhẹ, không đoán', async () => {
+  it('học sinh, những ngày đầu: không khối Mức làm, không chữ «Mức làm» (26/10)', async () => {
     const tam = await mo({ cheDo: 'em', chuaDo: true }, 'hoc-sinh')
-    expect(chu(tam.querySelector('.hslc-cl-trong'))).toBe('Chưa có số đo Chưa có lượt nào có số đo Mức làm. Từ khi máy em nạp bản mới, mức hiện ở đây.')
+    expect(tam.querySelector('.hslc-cl-trong, .hslc-cl')).toBeNull()
+    expect(tam.textContent).not.toMatch(/Mức làm/)
   })
 })

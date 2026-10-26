@@ -78,7 +78,7 @@ function napTruocManEm(): Plugin {
         }
         // 05/10: main.tsx nạp ĐỘNG gốc React ⇒ nhóm `app` (App.tsx, mọi đường trừ cổng học sinh) và `hsVo` (vỏ AppHocSinh + màn đăng nhập);
         // `hs` = phần mảnh cổng NGOÀI vỏ (máy đã đăng nhập: nạp ngay; chưa đăng nhập: nạp ưu tiên thấp sau DOMContentLoaded); `thi` / `ph` bỏ phần
-        // đã có trong `app`. Phông Sảnh (`phongHs`): mặt chữ Be Vietnam Pro / Noto Serif / Baloo 2 mà màn đăng nhập + Sảnh dùng — chỉ nạp trước
+        // đã có trong `app`. Phông Sảnh (`phongHs`): Nunito (app học sinh «Trong», 26/10 thay Be Vietnam Pro / Noto Serif) + Baloo 2 — chỉ nạp trước
         // khi trang do service worker phục vụ. Luật chọn nhóm: src/lib/nap-truoc-man-em.ts.
         const app = dsCua('/src/App.tsx')
         const hsVo = dsCua('/src/AppHocSinh.tsx')
@@ -90,7 +90,7 @@ function napTruocManEm(): Plugin {
         const ngoai =(ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
         const phongHs = Object.values(goi)
           .map((x) => (x as { fileName: string }).fileName)
-          .filter((f) => /^assets\/(?:be-vietnam-pro-(?:latin|vietnamese)-(?:400|600|700)|noto-serif-(?:latin|vietnamese)-700|baloo-2-(?:latin|vietnamese)-(?:700|800))-normal-[\w-]+\.woff2$/.test(f))
+          .filter((f) => /^assets\/(?:nunito-(?:latin|vietnamese)-wght|baloo-2-(?:latin|vietnamese)-(?:700|800))-normal-[\w-]+\.woff2$/.test(f))
           .sort()
           .map((f) => goc + f)
         const bang = {
@@ -272,6 +272,8 @@ export default defineConfig({
         // vẫn tải được, tải một lần rồi cất ở kho chạy-lúc (`omr-manh-chay-lan`, xem src/sw.ts). `scripts/kiem-sw.mjs` chặn precache phình to lại.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
         globIgnores: [
+          // NGANG GV 26/10: CSS điện thoại ngang + máy ≥ 1600 của app thầy (mảnh chung các màn thầy nạp lười, tải song song mảnh màn) — kho chạy-lúc.
+          '**/trong-gv-ngang-*.css',
           // Hỏi thêm cần máy chủ và chỉ mở trong lời giải: nạp khi dùng, không cất sẵn.
           '**/{HoiThemThay,hoi-them-thay,hoi-them-thay-api}-*.{js,css}',
           // Kiểm sau hỏi cần máy chủ giữ snapshot/receipt; chỉ tải khi em bấm, dùng kho chạy-lúc.
@@ -286,14 +288,27 @@ export default defineConfig({
           '**/LuyenDeChuan-*.{js,css}',
           // Giao diện «Trong» app học sinh (26/10): mảnh trình bày nạp lười (nap-trong-hs.ts) ⇒ kho chạy-lúc; tải hỏng (mất mạng lần đầu) ⇒ app vẽ bản cũ.
           '**/TrongHs-*.{js,css}',
-          // «Một trang» app phụ huynh (26/10): mảnh nạp lười khi <html data-trong="ph"> (AppPhuHuynh) ⇒ kho chạy-lúc; tải hỏng ⇒ app vẽ trang cũ.
-          '**/MotTrangPh-*.{js,css}',
+          // App phụ huynh «Chỉ đọc» (26/10, thay «Một trang»): mảnh nạp lười khi <html data-trong="ph"> (AppPhuHuynh) ⇒ kho chạy-lúc; tải hỏng ⇒ app vẽ trang cũ.
+          '**/DocPh-*.{js,css}',
+          // …và lệnh Báo cáo tuần của con (dùng chung DocPh + phần dưới trang cũ TrangVeConDuoi ⇒ thành mảnh riêng), cũng chỉ nạp lười.
+          '**/bao-cao-tuan-ph-api-*.js',
+          // Thưởng phạt 26/10: màn Thi đua tuần của thầy (+ lệnh, tờ kiểu) và huy hiệu kim loại dùng chung với thẻ tuần phụ huynh (DocPh) — chỉ nạp lười ⇒ kho chạy-lúc.
+          '**/{ThiDuaTuanScreen,thi-dua-tuan-api,HuyHieuGiai}-*.{js,css}',
+          // Thưởng phạt học sinh 26/10 (gộp đợt 3): các màn thưởng phạt (ManThuong + tờ trong-thuong.css), màn kết bài (KetBaiThuong) và phần hiện ngay
+          // (thanh trên, tấm thưởng câu — mảnh `thuong-gon`) ⇒ kho chạy-lúc: tải lần đầu cùng lúc mảnh «Trong» / màn làm bài, rồi cache; precache giữ ≤ 170.
+          '**/{ManThuong,KetBaiThuong,thuong-gon,thuong-chung}-*.{js,css}',
+          // Trang cũ «Hôm nay của con» (TrangVeCon + trang-con.css) nạp lười từ 26/10 (màn «Chỉ đọc» không cần; ddh.trong='tat' / màn con mới tải) ⇒ kho chạy-lúc.
+          '**/TrangVeCon-*.{js,css}',
           // Giao diện «Trong» màn làm bài (26/10): tờ trình bày nạp lười trong màn thi & các màn làm câu (chỉ khi <html data-trong>) ⇒ kho chạy-lúc;
           // tải hỏng ⇒ màn thi vẫn chạy với trình bày cũ (logic không phụ thuộc tờ này).
           '**/trong-lam-bai-*.css',
+          // Rung / tiếng phản hồi các màn luyện «Trong» (26/10): mảnh dùng chung của các màn nạp lười (làm chặng, kiểm tra, tự sửa, tu luyện) ⇒ kho chạy-lúc.
+          '**/{rung,phan-hoi,am-thanh,Bi,hieu-ung}-*.{js,css}',
           // «Chạm để hiểu đề» + «Bắt đầu từ đâu?» + lời giải kiểu sơ đồ (26/10): ruột nạp LƯỜI (vỏ VungChamDe nằm trong màn làm chặng) + từ điển
           // của làn A ⇒ kho chạy-lúc, precache giữ 170; tải hỏng (mất mạng lần đầu) ⇒ đề trơn, lời giải cũ.
           '**/{goi-y-cham,tu-dien-cham}-*.{js,css}',
+          // Lời giải kiểu sơ đồ ở màn làm chặng (26/10): nạp lười khi em mở «Lời giải từng bước» ⇒ kho chạy-lúc.
+          '**/LoiGiaiCauCoSoDo-*.{js,css}',
           // Cầu nối Cowork `window.__ddh` (26/10): App.tsx nạp LƯỜI sau khi thầy mở khoá ⇒ kho chạy-lúc; tải hỏng (mất mạng) ⇒ chỉ thiếu cầu nối, app chạy như thường.
           '**/cau-noi-ddh-*.js',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
@@ -423,6 +438,8 @@ export default defineConfig({
           '**/inter-*-wght-normal-*.woff2',
           // Phông tiêu đề Game Hóa 2.0 'Baloo 2' (28/09): chỉ mảnh game/Sảnh 2.0 nạp (src/components/hoa2/phong-baloo.ts) — tải lúc mở game rồi cất ở kho chạy-lúc /assets/*.woff2, không vào precache vỏ.
           '**/baloo-2-*.woff2',
+          // Phông Nunito của app học sinh «Trong» (thầy 26/10, styles/trong-hs.css): máy đã đăng nhập nạp trước (phongHs) rồi cất ở kho chạy-lúc /assets/*.woff2.
+          '**/nunito-*-wght-normal-*.woff2',
           // Bi-a Phản Ứng (28/09): gói lười BiaGame + mảnh dùng chung với Đảo 2.0 (thẻ câu `TrongAi`, `useNgang`) — Rollup tách riêng vì cả hai game
           // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). `chu-het-luot` (1 KB) bị tách theo, chỉ DaoThanThu/DoanHoTong/Game
           // (đều ngoài precache) nhập. Chỉ máy mở game mới tải, cất ở kho chạy-lúc.
@@ -529,6 +546,11 @@ export default defineConfig({
             { name: 'NutDongBoMoiCa', test: /src[\\/](?:components[\\/]NutDongBoMoiCa\.tsx|lib[\\/](?:exam-sync|phieu-ca-ca|link-phieu-ca|phieu-hang-loat|sua-dang|tu-vung-dang)\.ts)$/, includeDependenciesRecursively: false },
             // 26/10: bai-tap-pdf mất điểm neo App ⇒ Rolldown xẻ mảnh này ra nhiều tệp ⇒ gom lại đúng các mô-đun của mảnh cũ (đọc từ sourcemap bản main 7654f0c3).
             { name: 'bai-tap-pdf', test: /src[\\/](?:lib[\\/](?:bai-tap-pdf|dang-cau|goi-len-bang|loc-cau-rut|loc-sao)|data[\\/]examContent)\.ts$/, includeDependenciesRecursively: false },
+            // Thưởng phạt 26/10: phần HIỆN NGAY (thanh trên, tấm thưởng câu, băng chuỗi đúng, lớp gọi lệnh + bản lưu máy, hình, hiệu ứng, tiếng) dùng chung bởi mảnh «Trong»
+            // (Lộ trình) và màn làm bài ⇒ gom MỘT mảnh (+ một tờ CSS) thay vì Rolldown xẻ 4–5 tệp nhỏ.
+            { name: 'thuong-gon', test: /src[\\/](?:components[\\/]thuong[\\/](?:ThanhThuong|TamThuong|SoDem|hinh|dung-thuong|loc-thong-bao)\.tsx?|lib[\\/](?:thuong-api|hieu-ung-thuong|am-thanh-thuong)\.ts|styles[\\/]trong-thuong-gon\.css)$/, includeDependenciesRecursively: false },
+            // …và phần dùng chung của các màn đầy đủ + màn kết bài (chung.tsx + tờ trong-thuong.css) — tên rõ để globIgnores bắt đúng (tên tự sinh `chung-*` quá chung).
+            { name: 'thuong-chung', test: /src[\\/](?:components[\\/]thuong[\\/]chung\.tsx|styles[\\/]trong-thuong\.css)$/, includeDependenciesRecursively: false },
             { name: 'exam-grade', test: /src[\\/]lib[\\/](?:phan-tich-lam-bai|loai-cau-chua-dung|rut-de-chua|phan-cau-len-bang|chan-doan-cau-hinh|chan-doan|chan-doan-phieu|chong-gian-lan|phieu-du-lieu|phieu-link|exam-grade)\.ts$/, includeDependenciesRecursively: false },
           ],
         },
