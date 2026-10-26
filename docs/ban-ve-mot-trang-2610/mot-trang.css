@@ -1,0 +1,122 @@
+/* «MỘT TRANG» (thầy 26/10 chiều): app học sinh mở ra là thấy MỘT việc, cả màn vừa một khung hình — không lướt.
+   1 = việc chính (thẻ lớn, nút chính duy nhất) · 2–4 = việc sau đó (dòng gọn) · mọi thứ khác ở menu dọc phải (Điểm danh đứng đầu menu). */
+body.mot{min-height:100dvh}
+.mot .khung{max-width:1040px;min-height:100dvh;display:flex;flex-direction:column;gap:20px;padding-bottom:32px}
+.mt-dau{display:flex;flex-direction:column;gap:2px}
+.mt-dau h1{margin:0;font-size:24px;line-height:1.25;font-weight:700;letter-spacing:-.01em}
+.mt-luoi{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.mt-luoi>*{min-width:0}
+.so-thu{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--chinh);color:var(--tren-mau);font-size:12px;font-weight:700;flex:none}
+.so-thu.xam{background:var(--mat-3);color:var(--chu-2)}
+.nhan-viec{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--chu-2)}
+
+/* 1 · việc chính */
+.viec{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:18px;padding:22px}
+.viec::before{content:"";position:absolute;inset:-45% -20% auto auto;width:440px;height:440px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--chinh) 13%,transparent),transparent);pointer-events:none}
+.viec>*{position:relative}
+.viec-than{display:flex;align-items:center;gap:20px}
+.viec-chu{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.viec-chu h2{margin:0;font-size:20px;line-height:1.3;font-weight:700}
+.viec .vong{--d:128px;--net:12px}
+.viec .vong .so-lon{font-size:32px}
+.viec .chang{margin-top:6px}
+.viec .nut.lon{min-height:56px;font-size:17px}
+.viec-chan{display:flex;flex-wrap:wrap;gap:8px}
+.viec.ca{background:var(--tin-nhat);border-color:color-mix(in srgb,var(--tin) 28%,var(--vien))}
+.viec.ca::before{display:none}
+.viec.ca .so-thu{background:var(--tin);color:#fff}
+.viec.ca .nut.chinh{background:var(--tin);border-color:var(--tin);color:#fff}
+.viec.ca .o-icon.lon{width:72px;height:72px;border-radius:20px;background:var(--mat);color:var(--tin-chu)}
+.viec.ca .o-icon.lon .i{width:34px;height:34px}
+.dong-gio{font-size:28px;font-weight:700;color:var(--tin-chu);letter-spacing:-.01em}
+
+/* 2–4 · sau đó */
+.sau-do{display:flex;flex-direction:column;gap:10px}
+.ds-gon{display:flex;flex-direction:column;background:var(--mat);border:1px solid var(--vien);border-radius:var(--bo-3);box-shadow:var(--bong-1);overflow:hidden}
+.ds-gon .dong{display:flex;align-items:center;gap:12px;min-height:60px;padding:8px 16px;border-top:1px solid var(--vien)}
+.ds-gon .dong:first-child{border-top:0}
+.ds-gon .o-icon{width:36px;height:36px;border-radius:11px}
+.ds-gon .giua{flex:1;min-width:0}
+.ds-gon .ten{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-gon .mo{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-gon .so-phai{font-weight:700;font-size:15px;color:var(--chu)}
+.ds-gon .so-phai small{font-weight:500;color:var(--chu-3);font-size:12.5px}
+.ds-gon .mui{color:var(--chu-3)}
+.vong.mini{--d:36px;--net:4px}
+.vong.mini::after{display:none}
+.het-viec{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:16px;background:var(--mat-2);color:var(--chu-2);font-size:14px}
+
+/* menu: khối Điểm danh đứng đầu (hiện sẵn) */
+.menu-doc.co-khoi-dd{width:264px;max-height:calc(100dvh - 24px);overflow:auto}
+.dd-menu{margin:2px 4px 8px;padding:12px;border-radius:18px;background:var(--tin-nhat);color:var(--tin-chu);display:flex;flex-direction:column;gap:10px}
+.dd-menu-dau{display:flex;align-items:center;gap:8px;font-size:15px}
+.dd-menu-dau b{color:var(--chu);flex:1;white-space:nowrap}
+.dd-menu-dau .mo{color:var(--tin-chu);font-weight:600;font-size:12.5px}
+.dd-menu-dau .chip{background:var(--mat);font-size:12px}
+.dd-o{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.dd-o span{display:grid;place-items:center;height:42px;border-radius:10px;background:var(--mat);border:1px solid var(--vien-2);font-size:20px;font-weight:700;color:var(--chu)}
+.dd-o span.dang{border-color:var(--tin);box-shadow:0 0 0 3px color-mix(in srgb,var(--tin) 22%,transparent)}
+.dd-nut{display:flex;gap:8px}
+.dd-nut .nut.chinh{flex:1;background:var(--tin);border-color:var(--tin);color:#fff}
+.dd-nut .nut.vuong{background:var(--mat);color:var(--tin-chu);border-color:transparent}
+.dd-phu{margin:0;font-size:12.5px;color:var(--chu-2)}
+.dd-menu.xong{background:var(--dung-nhat);color:var(--dung-chu)}
+.dd-menu.tat{background:var(--mat-2);color:var(--chu-3)}
+.dd-menu.tat .dd-menu-dau b{color:var(--chu-2)}
+
+/* vạch thu gọn: buổi đang mở ⇒ thẻ «Điểm danh» thò ra mép phải */
+.menu-cham.co-dd{height:auto;width:auto;top:50%;padding:0}
+.menu-cham.co-dd i,.menu-cham.co-dd b{display:none}
+.menu-cham.co-dd em{display:flex;flex-direction:row;align-items:center;gap:6px;padding:12px 5px 14px;border-radius:12px 0 0 12px;background:var(--tin);color:#fff;font:600 12.5px/1 var(--f);font-style:normal;writing-mode:vertical-rl;box-shadow:var(--bong-2);width:30px;box-sizing:border-box;min-height:96px}
+.menu-cham.co-dd em .i{writing-mode:horizontal-tb;width:18px;height:18px}
+.menu-cham.co-dd s{display:none}
+.menu-cham.co-dd{width:44px;justify-items:end}
+
+/* máy tính: việc chính | sau đó */
+@media (min-width:901px){
+  .mot .khung{justify-content:center;padding-top:40px}
+  .mt-luoi{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start}
+  .mot .khung{max-width:1120px}
+  .mt-dau h1{font-size:32px}
+  .viec{padding:32px;gap:24px}
+  .viec .vong{--d:200px;--net:16px}
+  .viec .vong .so-lon{font-size:48px}
+  .viec-chu h2{font-size:30px}
+  .viec-chu .phu{font-size:16px}
+  .viec .nut.lon{min-height:60px;font-size:18px}
+  .nhan-viec{font-size:14px}
+  .ds-gon .dong{min-height:76px;padding:10px 20px;gap:14px}
+  .ds-gon .o-icon{width:42px;height:42px}
+  .ds-gon .ten{font-size:16px}
+}
+/* điện thoại ngang / thấp: dồn đầu màn thành một dòng, hai cột */
+@media (max-height:520px) and (min-width:600px){
+  .mot .khung{gap:12px;padding-top:14px;padding-bottom:16px;justify-content:flex-start}
+  .mt-dau{flex-direction:row;align-items:baseline;gap:10px}
+  .mt-dau h1{font-size:19px}
+  .mt-luoi{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;align-items:start}
+  .viec{padding:16px;gap:12px}
+  .viec .vong{--d:104px;--net:10px}
+  .viec .vong .so-lon{font-size:26px}
+  .viec .vong .mo{font-size:10.5px}
+  .viec-chu h2{font-size:17px}
+  .viec .nut.lon{min-height:48px}
+  .viec-chan{display:none}
+  .ds-gon .dong{min-height:52px;padding:6px 14px}
+  .sau-do{gap:6px}
+  .viec.ca .o-icon.lon{width:56px;height:56px}
+}
+@media (max-width:600px){
+  body.mot.co-menu-cham .khung{padding-right:46px}
+  .viec{padding:18px;gap:16px}
+  .viec-than{gap:16px}
+  .viec .vong{--d:112px;--net:11px}
+  .viec .vong .so-lon{font-size:28px}
+  .viec .vong .mo{font-size:11px}
+  .viec-chu h2{font-size:18px}
+}
+
+/* A.I Đỗ Đại Học: mục trong menu thay bong bóng nổi (thầy 26/10) */
+.menu-doc .muc-ai{color:var(--chu);font-weight:600}
+.o-ai{display:grid;place-items:center;width:26px;height:26px;margin:0 -1px;border-radius:8px;background:linear-gradient(135deg,var(--tin),var(--chinh));color:#fff;flex:none}
+.o-ai .i{width:16px;height:16px}

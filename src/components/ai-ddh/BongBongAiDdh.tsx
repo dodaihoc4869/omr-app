@@ -100,7 +100,9 @@ const kep = (p: ViTri, w: number, h: number): ViTri => ({
   x: Math.round(Math.min(Math.max(8, p.x), window.innerWidth - w - 8)), y: Math.round(Math.min(Math.max(8, p.y), window.innerHeight - h - 8)),
 })
 
-export default function BongBongAiDdh({ auth }: { auth: { token?: string | null; sbd: string; hoTen?: string | null } }) {
+/** `anBong` (giao diện «Trong», thầy 26/10 — bản vẽ hs-mot-trang-menu): bỏ nút nổi; lối vào là mục «A.I Đỗ Đại Học» của menu dọc. Khi kênh bật, gắn
+ *  `<html data-ai-ddh>` (menu chỉ hiện mục khi có) và nghe sự kiện `ddh:mo-ai` (menu bấm mục ⇒ mở ĐÚNG tấm chat này). */
+export default function BongBongAiDdh({ auth, anBong = false }: { auth: { token?: string | null; sbd: string; hoTen?: string | null }; anBong?: boolean }) {
   const token = auth.token ?? '', sbd = auth.sbd, hoTen = auth.hoTen
   const ten = hoTen?.trim().split(/\s+/).pop()
   const co = docCoBat(sbd)
@@ -263,10 +265,25 @@ export default function BongBongAiDdh({ auth }: { auth: { token?: string | null;
     return () => window.removeEventListener('resize', on)
   }, [coViTri])
 
+  useEffect(() => {
+    if (!bat) return
+    const r = document.documentElement, moTam = () => setMo(true)
+    r.setAttribute('data-ai-ddh', '')
+    window.addEventListener('ddh:mo-ai', moTam)
+    return () => { r.removeAttribute('data-ai-ddh'); window.removeEventListener('ddh:mo-ai', moTam) }
+  }, [bat])
+  // Tin trả lời chưa đọc khi không còn nút nổi ⇒ chấm đỏ ở mục menu + vạch menu (CSS đọc `data-ai-moi`).
+  useEffect(() => {
+    const r = document.documentElement
+    if (bat && moiChua > 0) r.setAttribute('data-ai-moi', '')
+    else r.removeAttribute('data-ai-moi')
+    return () => r.removeAttribute('data-ai-moi')
+  }, [bat, moiChua])
+
   if (!bat) return null
   return (
     <div className="aid-goc">
-      {!mo && (
+      {!mo && !anBong && (
         <div className="aid-bong" ref={bong} style={viTri ? { left: viTri.x, top: viTri.y, right: 'auto', bottom: 'auto' } : undefined}>
           <button type="button" className="aid-bong-nut" aria-label="Mở A.I Đỗ Đại Học (giữ và kéo để đổi chỗ)"
             onPointerDown={(e) => {

@@ -2,6 +2,7 @@
 import HocTapHomNay from '../components/hoc-tap/HocTapHomNay'
 import { soHomNay } from '../components/hoc-tap/lam-bai' // màn làm bài 12/10D: thanh trên "đã làm/M câu hôm nay" cùng nguồn vòng tròn Hôm nay
 import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
+import { napTrongHs } from '../components/hoc-tap/nap-trong-hs'
 import { useKhoaCuonTrang } from '../lib/khoa-cuon-trang'
 import { canThanTuSanh, useSanhHoa2 } from '../components/hoa2/api'
 import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
@@ -312,6 +313,10 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   const [qidChua, setQidChua] = useState<string | undefined>()
   // Tấm Hồ sơ làm bài của em, mở từ thẻ "Hôm nay của em" (nút Xem hồ sơ làm bài của em).
   const [moHoSoEm, setMoHoSoEm] = useState(false)
+  // «Trong» (bản vẽ hs-mot-trang-menu 26/10): Điểm danh + A.I Đỗ Đại Học vào menu dọc ⇒ không thẻ điểm danh nổi, không nút A.I nổi. Mảnh «Trong» tải hỏng
+  // (HocTapHomNay vẽ bản cũ, không menu) ⇒ hai lối nổi cũ quay lại.
+  const [trongHs, setTrongHs] = useState(() => !!napTrongHs())
+  useEffect(() => { void napTrongHs()?.then((m) => { if (!m) setTrongHs(false) }) }, [])
   // Lịch sử ca mở từ màn Câu đã làm (bản vẽ tối giản 09/10) ⇒ "Về" quay lại Câu đã làm; mở từ chỗ khác ⇒ về màn chính như cũ.
   const [veSauLichSuCa, setVeSauLichSuCa] = useState<TabType | null>(null)
   const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
@@ -894,7 +899,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       {hop}
       {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
       {/* + bong bóng A.I Đỗ Đại Học (24/10): chỉ ở Hôm nay, không khi đang thi / mở hồ sơ. */}
-      {auth.token && !manThi && tab === null && <><TheDiemDanhHs token={auth.token} />{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} /></Suspense>}</>}
+      {auth.token && !manThi && tab === null && <>{!trongHs && <TheDiemDanhHs token={auth.token} />}{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} anBong={trongHs} /></Suspense>}</>}
       {auth.token && !manThi && (
         <div inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
@@ -903,7 +908,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
           onChua={(q) => { setQidChua(typeof q === 'string' ? q : undefined); setTab('tuchua') }} onThi={() => { void boNapExam().catch(() => {}); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
-          onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')}
+          onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')} moDiemDanh={tab === null}
         /></div>
       )}
       {moHoSoEm && auth.token && tab === null && !manThi && <Suspense fallback={null}><HoSoCuaEmHs token={auth.token} tenEm={auth.hoTen ?? ''} lop={auth.lop ?? undefined} onDong={() => setMoHoSoEm(false)} onChuaCau={(qid) => { setMoHoSoEm(false); setQidChua(qid); setTab('tuchua') }} onMoBaiTap={() => { setMoHoSoEm(false); setTab('hoctap') }} /></Suspense>}

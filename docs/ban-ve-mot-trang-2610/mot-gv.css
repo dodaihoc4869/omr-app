@@ -1,0 +1,100 @@
+/* «MỘT TRANG» app thầy · Hôm nay (thầy 26/10 chiều): cả màn vừa một khung hình, không cuộn.
+   Máy tính: dải số + ba cột (Việc cần thầy · Nhịp theo lớp · 12 bậc + Em cần để ý). Điện thoại: dải số gộp một thẻ + Việc cần thầy + ba dòng mở thêm. */
+.mg main.khung{max-width:1240px;padding-top:20px;padding-bottom:20px;display:flex;flex-direction:column;gap:16px}
+.mg-dau{display:flex;align-items:flex-end;gap:16px}
+.mg-dau .giua{flex:1;min-width:0}
+.mg-dau h1{margin:0;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.01em}
+.mg-so{display:grid;grid-template-columns:1.25fr repeat(4,minmax(0,1fr));border:1px solid var(--vien);border-radius:var(--bo-3);background:var(--mat);box-shadow:var(--bong-1);overflow:hidden}
+.mg-so>div{padding:12px 18px;border-left:1px solid var(--vien);display:flex;flex-direction:column;gap:2px;min-width:0}
+.mg-so>div:first-child{border-left:0}
+.mg-so .so{font-size:26px;font-weight:700;line-height:1.15;display:flex;align-items:baseline;gap:5px}
+.mg-so .so small{font-size:13px;font-weight:500;color:var(--chu-3)}
+.mg-so .nhan{display:flex;align-items:center;gap:6px}
+.mg-so .mo{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mg-xep{display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--mat-3);margin-top:4px}
+.mg-xep i{display:block;height:100%}
+.mg-xep .c{background:var(--dung)}.mg-xep .d{background:var(--chu-y)}.mg-xep .l{background:var(--sai)}.mg-xep .f{background:var(--tin)}
+.mg-luoi{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.mg-luoi>*{min-width:0}
+.mg main.khung>*{min-width:0;width:100%}
+.mg .the{padding:16px 18px}
+.mg .the.dem{padding:0}
+.mg .the-dau{margin-bottom:10px}
+.mg .ds .dong{padding:10px 18px;min-height:0;gap:12px}
+.mg .viec .dong{min-height:64px}
+.mg .viec .o-icon{width:36px;height:36px;border-radius:11px}
+.mg .viec .nut{min-width:92px;padding:0 14px}
+.mg .ds .dong .giua{flex:1;min-width:0}
+.mg .ten{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mg .ds .mo{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lop-dong{display:grid;grid-template-columns:92px minmax(0,1fr) 40px;gap:10px;align-items:center;min-height:30px;font-size:14px}
+.lop-dong b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.xep{display:flex;height:9px;border-radius:999px;overflow:hidden;background:var(--mat-3)}
+.xep i{display:block;height:100%}
+.xep .c{background:var(--dung)}.xep .d{background:var(--chu-y)}.xep .l{background:var(--sai)}
+.chu-giai{display:flex;flex-wrap:wrap;gap:4px 12px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--chu-2)}
+.ngay14{display:flex;gap:3px}
+.ngay14 i{width:9px;height:9px;border-radius:3px;background:var(--mat-3)}
+.ngay14 i.d{background:var(--dung)}.ngay14 i.t{background:var(--chu-y)}.ngay14 i.k{background:var(--sai)}
+.mg .tab span{min-height:44px;font-size:13px;padding:0 10px}
+.mg .lien-ket{min-height:44px;font-size:13.5px}
+.mg-chan{padding:0 18px 6px}
+.chi-hep{display:none}
+@media (max-width:1100px){
+  .mg-luoi{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .mg-luoi>.cot-3{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+}
+/* điện thoại: gộp — dải số một thẻ, việc cần thầy, ba dòng mở thêm */
+@media (max-width:900px){
+  .mg main.khung{padding:14px 16px 12px;gap:12px}
+  .mg-dau h1{font-size:22px}
+  .mg-dau .nut{display:none}
+  .mg-so{grid-template-columns:minmax(0,1fr)}
+  .mg-so>div{padding:12px 14px}
+  .mg-so>div:nth-child(n+2){display:none}
+  .mg-chu-giai{display:flex!important;flex-wrap:wrap;gap:4px 10px;margin:8px 0 0;font-size:12.5px;color:var(--chu-2)}
+  .mg-chu-giai span{gap:4px!important}
+  .mg-chu-giai span{display:inline-flex;align-items:center;gap:5px}
+  .mg-chu-giai b{color:var(--chu)}
+  .mg-so .so{font-size:21px}
+  .mg-so .mo{display:none}
+  .mg .chi-hep .dong{min-height:52px}
+  .mg .chi-hep .o-icon{width:34px;height:34px}
+  .mg-luoi{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+  body.mg.co-duoi .app-gv{min-height:calc(100vh - 84px)}
+  .an-mg{display:none!important}
+  .chi-hep{display:block}
+  .mg .viec .dong{min-height:54px;padding:6px 14px}
+  .mg .viec .the-dau{padding:10px 14px 0!important}
+  .mg-dau h1{font-size:20px}
+  .mg .chi-hep .ds .dong{padding:6px 14px}
+  .mg .viec .o-icon{display:none}
+  .mg .viec .nut{min-width:0}
+  .mg .ds .dong{padding:8px 14px}
+}
+/* điện thoại ngang: thanh bên thu thành dải biểu tượng thay thanh đáy; Việc cần thầy trái | số + dòng mở thêm phải */
+@media (max-width:900px) and (max-height:520px){
+  body[data-app=gv].co-duoi{padding-bottom:0}
+  body[data-app=gv].co-duoi .duoi{display:none}
+  body[data-app=gv] .app-gv{grid-template-columns:64px minmax(0,1fr)}
+  body[data-app=gv] .ben{display:flex;padding:8px;gap:0}
+  body[data-app=gv] .ben .thuong-hieu{padding:2px 0 8px;justify-content:center}
+  body[data-app=gv] .ben .thuong-hieu span,body[data-app=gv] .ben .muc .chu,body[data-app=gv] .ben .muc .dem-so{display:none}
+  body[data-app=gv] .ben .muc{justify-content:center;padding:0}
+  body[data-app=gv] .ben .nhom,body[data-app=gv] .ben .muc:nth-of-type(n+6),body[data-app=gv] .ben .cuoi{display:none}
+  .dau>.khung{min-height:50px;padding-top:4px;padding-bottom:4px}
+  .mg main.khung{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-areas:"viec so" "viec xem";align-content:start;padding:8px 16px;gap:8px 12px}
+  .mg-luoi{display:contents}
+  .mg-dau{grid-area:dau}.mg-so{grid-area:so}.mg .viec{grid-area:viec}.mg .chi-hep{grid-area:xem}
+  .mg-dau{display:none}
+  .mg-so>div{padding:8px 12px}
+  .mg-so .so{font-size:19px}
+  .mg-chu-giai{margin-top:6px;font-size:12px}
+  .mg .viec .dong{min-height:48px;padding:3px 12px}
+  .mg .viec .dong .mo{display:none}
+  .mg .viec .the-dau{padding:8px 12px 0!important}
+  .mg .chi-hep .ds .dong{min-height:46px;padding:2px 12px}
+  .mg .chi-hep .ds .dong .mo{display:none}
+  .mg .chi-hep .o-icon{width:30px;height:30px}
+}
