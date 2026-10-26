@@ -361,12 +361,12 @@
 [data-trong] .duo-chip { padding: 2px 10px; border-radius: 999px; background: var(--tr-mat-2); color: var(--tr-chu-2); font-weight: 600; letter-spacing: 0; text-transform: none; }
 /* đề: chữ to, không khung (thanh tiến độ đã nói câu thứ mấy ⇒ ẩn «Câu N.» đứng trước) */
 [data-trong] .duo .ht2-lam-de { padding: 0; border: 0; background: none; box-shadow: none; gap: 12px; }
-[data-trong] .duo .ht2-lam-de-chu { font-size: 21px; font-weight: 600; line-height: 1.5; }
+[data-trong] .duo .ht2-lam-de-chu { font-size: 21px; font-weight: 700; line-height: 1.5; }
 [data-trong] .duo .ht2-lam-de-chu > b:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 /* phương án: ô lớn, viền dày có gờ đáy */
 [data-trong] .duo .ht2-lam-tn { display: grid; gap: 12px; }
 [data-trong] .duo .duo-tra[data-luoi] .ht2-lam-tn { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-[data-trong] .duo .ht2-lam-pa { min-height: 64px; gap: 14px; padding: 12px 16px; border: 2px solid var(--tr-vien-2); border-bottom-width: 4px; border-radius: 16px; background: var(--tr-mat); color: var(--tr-chu); font-size: 19px; font-weight: 600; box-shadow: none; }
+[data-trong] .duo .ht2-lam-pa { min-height: 64px; gap: 14px; padding: 12px 16px; border: 2px solid var(--tr-vien-2); border-bottom-width: 4px; border-radius: 16px; background: var(--tr-mat); color: var(--tr-chu); font-size: 19px; font-weight: 700; box-shadow: none; }
 [data-trong] .duo .ht2-lam-pa-ma { flex: 0 0 34px; width: 34px; height: 34px; border: 2px solid var(--tr-vien-2); border-radius: 10px; background: transparent; color: var(--tr-chu-3); font-size: 15px; }
 [data-trong] .duo .ht2-lam-pa[aria-checked=true] { border-color: var(--tr-tin); background: var(--tr-tin-nhat); color: var(--tr-tin-chu); box-shadow: none; }
 [data-trong] .duo .ht2-lam-pa[aria-checked=true] .ht2-lam-pa-ma { border-color: var(--tr-tin); background: transparent; color: var(--tr-tin-chu); }
@@ -396,14 +396,16 @@
 [data-trong] .duo-nut[data-sac=do] { background: var(--tr-sai); color: var(--tr-trang); }
 [data-trong] .duo-nut[data-sac=vang] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
 [data-trong] .duo-hai { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-[data-trong] .duo-bo, [data-trong] .duo-them { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; }
+[data-trong] .duo-bo, [data-trong] .duo-them { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
 [data-trong] .duo-bo { justify-content: center; }
 [data-trong] .duo :is(.duo-bo, .duo-them) .lg-nut-hang { display: contents; }
 [data-trong] .duo :is(.duo-lien, .duo-bo .lg-nut-hoi-thay, .duo-them .lg-nut-hoi-thay, .duo-them .lg-nut-loi-giai) {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 2px; border: 0; border-radius: 10px; background: transparent !important; box-shadow: none !important;
-  color: var(--tr-chu-3); font-size: 14.5px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase;
+  /* thầy 27/10 «làm cho tinh tế hơn»: viên nút nhỏ bo tròn, chữ thường, nền nhạt theo màu chữ của tấm (xám / xanh khi đúng / đỏ khi sai) — không còn chữ IN HOA trơn */
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px 0 13px; border: 0; border-radius: 999px; background: transparent !important;
+  background: color-mix(in srgb, currentColor 11%, transparent) !important; box-shadow: none !important;
+  color: var(--tr-chu-3); font-size: 15px; font-weight: 700; letter-spacing: 0; text-transform: none; white-space: nowrap;
 }
-[data-trong] .duo :is(.duo-bo, .duo-them) .lg-nut-hoi-thay svg { width: 18px; height: 18px; }
+[data-trong] .duo :is(.duo-lien, .duo-bo .lg-nut-hoi-thay, .duo-them .lg-nut-hoi-thay, .duo-them .lg-nut-loi-giai) svg { width: 17px; height: 17px; flex: none; }
 [data-trong] .duo :is(.duo-bo, .duo-them) .lg-loi { flex-basis: 100%; font-size: 13.5px; color: var(--tr-chu-2); text-align: center; }
 [data-trong] .duo-loi { margin: 0; font-size: 14px; font-weight: 600; color: var(--tr-sai-chu); }
 /* tấm kết quả */
