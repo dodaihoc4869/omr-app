@@ -366,13 +366,6 @@
   [data-trong] .mot-o-lon { width: 56px; height: 56px; }
 }
 
-/* SOÁT 26/10 — điện thoại hẹp (≤ 400 px): dòng «Sau đó» có vòng + số «12/30 câu» bên phải ⇒ tên việc bị ép mỗi từ một dòng. Số xếp hai tầng
-   (12 trên, /30 câu dưới), khe hẹp lại ⇒ tên có đủ chỗ. */
-@media (max-width: 400px) {
-  [data-trong] .mot-dong { gap: 8px; padding-inline: 12px; }
-  [data-trong] .mot-so-phai { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; }
-}
-
 /* Vòng / chip dùng lại ở «Một trang»: đủ mức = xanh «đúng»; chip «Đã hết hạn» xám. */
 [data-trong] .tr-vong[data-du] { background: conic-gradient(var(--tr-dung) calc(var(--p, 0) * 1%), var(--tr-mat-3) 0); }
 [data-trong] .tr-vong span { line-height: 1.3; }
