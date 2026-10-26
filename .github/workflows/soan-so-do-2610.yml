@@ -1,0 +1,109 @@
+# SOẠN «LỜI GIẢI KIỂU SƠ ĐỒ CỦA THẦY» THEO LÔ (làn D, 26/10). Chạy tay. Gọi route quản trị `POST /quan-tri/soan-so-do-lo` của Worker sống
+# (làn C đăng ký, cổng mã bí mật `x-ma-bi-mat` = secret OMR_MA_BI_MAT như nap-song-sinh-0710.yml), lặp theo con trỏ tới khi đủ `gioiHan` câu.
+# Máy chủ tự từ chối trong 19–24h giờ VN (giờ cao điểm).
+# REPO CÔNG KHAI: log CHỈ in số đếm + qid + kết quả cổng + lý do ĐÃ XOÁ SỐ. KHÔNG in bản soạn / đáp án / giá trị, KHÔNG tải artifact bản soạn.
+# Mặc định `thuKhong = true` (không ghi gì). Ghi thật: bỏ chọn thuKhong — chỉ bản `dat` mới hiện cho học sinh (luật đọc làn C).
+name: Soạn lời giải kiểu sơ đồ (theo lô)
+on:
+  workflow_dispatch:
+    inputs:
+      qids:
+        description: 'Danh sách qid (cách nhau bởi dấu phẩy / khoảng trắng). Để trống = quét kho.'
+        required: false
+        default: ''
+      gioiHan:
+        description: 'Tổng số câu soạn trong lần chạy này'
+        required: false
+        default: '20'
+      thuKhong:
+        description: 'Chạy thử, không ghi gì vào D1'
+        type: boolean
+        required: false
+        default: true
+      chiCauSaiNhieu:
+        description: 'Chỉ câu nhiều em sai (từ 5 em) — bỏ qua khi đã nhập qids'
+        type: boolean
+        required: false
+        default: false
+      model:
+        description: 'Tên mô hình Gemini (để trống = mặc định của máy chủ)'
+        required: false
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: soan-so-do-2610
+  cancel-in-progress: false
+jobs:
+  soan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Kiểm secret OMR_MA_BI_MAT
+        env:
+          OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
+        run: |
+          if [ -z "$OMR_MA_BI_MAT" ]; then
+            echo "DỪNG: Secret OMR_MA_BI_MAT chưa được đặt trong repo Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "::add-mask::$OMR_MA_BI_MAT"
+          echo "Secret OMR_MA_BI_MAT: có giá trị ✓"
+      - name: Soạn theo lô, in tóm tắt
+        env:
+          OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
+          OMR_MAY_CHU: https://omr.ttadodaihoc.workers.dev
+          IN_QIDS: ${{ inputs.qids }}
+          IN_GIOI_HAN: ${{ inputs.gioiHan }}
+          IN_THU_KHONG: ${{ inputs.thuKhong }}
+          IN_SAI_NHIEU: ${{ inputs.chiCauSaiNhieu }}
+          IN_MODEL: ${{ inputs.model }}
+        run: |
+          node --input-type=module <<'JS'
+          const MAY_CHU = process.env.OMR_MAY_CHU.replace(/\/$/, '')
+          const MB = process.env.OMR_MA_BI_MAT
+          const qids = (process.env.IN_QIDS || '').split(/[\s,;]+/).map((s) => s.trim()).filter(Boolean)
+          const tong = Math.max(1, Math.min(2000, Number(process.env.IN_GIOI_HAN) || 20))
+          const thuKhong = process.env.IN_THU_KHONG !== 'false'
+          const chiCauSaiNhieu = !qids.length && process.env.IN_SAI_NHIEU === 'true'
+          const model = (process.env.IN_MODEL || '').trim()
+          const MOI_LUOT = 8
+          const dem = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0 }
+          const token = { vao: 0, ra: 0 }
+          let conTro = '', daSoan = 0, luot = 0, xong = false
+          console.log(`Chế độ: ${thuKhong ? 'CHẠY THỬ (không ghi)' : 'GHI THẬT'} · nguồn: ${qids.length ? qids.length + ' qid' : chiCauSaiNhieu ? 'câu nhiều em sai' : 'quét kho'} · tối đa ${tong} câu`)
+          const batDau = Date.now()
+          while (!xong && daSoan < tong && luot < 400) {
+            luot++
+            const body = { gioiHan: Math.min(MOI_LUOT, tong - daSoan), thuKhong, conTro, ...(qids.length ? { qids } : {}), ...(chiCauSaiNhieu ? { chiCauSaiNhieu } : {}), ...(model ? { model } : {}) }
+            let r, j
+            for (let thu = 1; thu <= 3; thu++) {
+              try {
+                r = await fetch(MAY_CHU + '/quan-tri/soan-so-do-lo', { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': MB }, body: JSON.stringify(body), signal: AbortSignal.timeout(300_000) })
+                j = await r.json().catch(() => null)
+                if (r.status < 500 || thu === 3) break
+              } catch (e) { if (thu === 3) { console.log('LỖI MẠNG', String(e).slice(0, 160)); process.exit(1) } }
+              await new Promise((ok) => setTimeout(ok, 5000 * thu))
+            }
+            if (!r.ok || !j?.ok) { console.log('DỪNG', r.status, String(j?.error || j?.ma || '').slice(0, 200)); process.exit(1) }
+            for (const [k, v] of Object.entries(j.dem || {})) dem[k] = (dem[k] || 0) + v
+            token.vao += j.token?.vao || 0; token.ra += j.token?.ra || 0
+            // Lý do cổng có thể chứa đáp án kho (vd «tích ra 70 khác 76,8») ⇒ xoá mọi con số trước khi in (repo công khai).
+            for (const x of j.ketQua || []) console.log(`${String(x.qid).padEnd(34)} ${String(x.ket).padEnd(16)} lần ${x.lanThu}  ${String(x.lyDo || '').replace(/\d+([.,]\d+)*/g, '…').replace(/\s+/g, ' ').slice(0, 100)}`)
+            daSoan += j.daXuLy || 0
+            xong = !!j.xong
+            conTro = j.conTro || ''
+            if (!xong && !conTro) { console.log('DỪNG: máy chủ không trả con trỏ'); process.exit(1) }
+          }
+          const giay = Math.round((Date.now() - batDau) / 1000)
+          console.log('\n===== TÓM TẮT =====')
+          console.log(`đạt ${dem.dat} · lệch ${dem.lech} · không kiểm được ${dem.khong_kiem_duoc} · lộ đáp án ${dem.lo_dap_an} · JSON hỏng ${dem.hong} · lỗi gọi mô hình ${dem.loi_goi} · bỏ qua ${dem.bo_qua}`)
+          console.log(`đã soạn ${daSoan} câu trong ${luot} lượt gọi, ${giay} giây · token vào ${token.vao}, ra ${token.ra}${xong ? ' · đã hết nguồn' : ''}`)
+          if (process.env.GITHUB_STEP_SUMMARY) {
+            const fs = await import('node:fs')
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Soạn lời giải kiểu sơ đồ (${thuKhong ? 'chạy thử' : 'ghi thật'})\n\n| đạt | lệch | không kiểm được | lộ đáp án | JSON hỏng | lỗi gọi | bỏ qua |\n|---|---|---|---|---|---|---|\n| ${dem.dat} | ${dem.lech} | ${dem.khong_kiem_duoc} | ${dem.lo_dap_an} | ${dem.hong} | ${dem.loi_goi} | ${dem.bo_qua} |\n\n${daSoan} câu · ${giay} giây · token vào ${token.vao}, ra ${token.ra}\n`)
+          }
+          JS
