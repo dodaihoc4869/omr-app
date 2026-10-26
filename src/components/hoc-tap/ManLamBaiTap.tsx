@@ -512,7 +512,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
 
     const day = tai ? null
       : xong ? <div className="duo-day" data-xong=""><div className="duo-giua">
-          <button type="button" className="duo-nut" onClick={() => setLan(n => n + 1)}>{chuHocTiep}</button>
+          <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); setLan(n => n + 1) }}>{chuHocTiep}</button>
           <div className="duo-bo"><button type="button" className="duo-lien" onClick={onVe}>Về Hôm nay</button></div>
         </div></div>
       : !q ? null
@@ -537,8 +537,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></section>
       : choChonCach ? <div className="duo-day"><div className="duo-giua">
           <div className="duo-hai">
-            <button type="button" className="duo-nut" data-sac="vang" onClick={() => void hocHuongDan()} disabled={nop}>Học cách giải</button>
-            <button type="button" className="duo-nut" onClick={() => setTuLam(true)} disabled={nop}>Tự làm câu này</button>
+            <button type="button" className="duo-nut" data-sac="vang" onClick={() => { phanHoi('chon'); void hocHuongDan() }} disabled={nop}>Học cách giải</button>
+            <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); setTuLam(true) }} disabled={nop}>Tự làm câu này</button>
           </div>
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
         </div></div>
