@@ -10,6 +10,7 @@
 import { canhBaoChoPh, phXemCanhBao } from './canh-bao-thay'
 import type { Env, ExecutionContext } from './kieu'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
+import { chuoiBaiNeuBat } from './chuoi-ngay-bai-d1'
 import { parentIdentityVoiHang, parentPass } from './game-v2-auth'
 import { PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-so-cau-hinh'
 import { lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
@@ -111,7 +112,9 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>, envDoc: En
   const em = await envDoc.DB.prepare('SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
   const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
   // 01/10: chuỗi ngày học đọc từ sổ `su_kien_hoc` (song song cảnh báo) — `kh.chuoiDat` luôn 0 khi Hoá 2.0 bật (không còn chốt 'dat').
-  const [canhBao, chuoiDat] = await Promise.all([canhBaoChoPh(env, sbd), docChuoiNgayHoc(envDoc, sbd)])
+  // B3 (26/10): cờ duolingo_bai bật cho con ⇒ chuỗi theo bài (cùng số với app học sinh), kèm `chuoiNgay` đầy đủ; tắt ⇒ cách đếm cũ.
+  const [canhBao, chuoiCu, chuoiBai] = await Promise.all([canhBaoChoPh(env, sbd), docChuoiNgayHoc(envDoc, sbd), chuoiBaiNeuBat(env, sbd, Date.now(), envDoc)])
+  const chuoiDat = chuoiBai ? chuoiBai.so : chuoiCu
   return {
     ok: true,
     hoTen: em?.ho_ten ?? '',
@@ -128,6 +131,7 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>, envDoc: En
     quaHan: kh.quaHan.map((q) => ({ loai: q.loai, hanNop: q.hanNop, conLai: q.conLai })),
     tienBo: kh.tienBo,
     chuoiDat,
+    ...(chuoiBai ? { chuoiNgay: chuoiBai } : {}),
     canhBao: kh.canhBao.map((c) => c.loai),
     tonCuTong: kh.tonCuTong,
     // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): lời cho PHỤ HUYNH, ≤ 3, bài của con chưa nộp, gửi trong 72 giờ. Không có ⇒ KHÔNG có khoá.
