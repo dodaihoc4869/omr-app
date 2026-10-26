@@ -29,6 +29,7 @@ const MA_DON_VI = new Map(CACH_VIET_DON_VI)
 
 const RE_DIEN = new RegExp(['điện phân', 'dòng điện', 'cường độ', 'ampe'].map(mau).join('|'), 'u')
 const RE_PT_C = new RegExp(`c%|${mau('nồng độ')}`, 'u')
+const RE_DD = new RegExp(mau('dung dịch'), 'u') // «dung dịch H2SO4 9,8%» ⇒ nồng độ phần trăm
 
 function doSoDonVi(t: string, lc: string, ra: UngVien[]) {
   const coDien = RE_DIEN.test(lc)
@@ -40,7 +41,7 @@ function doSoDonVi(t: string, lc: string, ra: UngVien[]) {
     const tu = m.index!
     if (ma === '%') {
       const truoc = lc.slice(Math.max(0, tu - 40), tu)
-      ma = /hiệu suất/.test(truoc) ? '%H' : RE_PT_C.test(truoc) ? '%C' : /thể tích/.test(truoc) ? '%V' : /khối lượng/.test(truoc) ? '%m' : '%'
+      ma = /hiệu suất/.test(truoc) ? '%H' : RE_PT_C.test(truoc) || RE_DD.test(truoc.slice(-25)) ? '%C' : /thể tích/.test(truoc) ? '%V' : /khối lượng/.test(truoc) ? '%m' : '%'
     }
     ra.push({ loai: 'cho', tu, den: tu + m[0].length, khoa: ma })
   }
@@ -134,6 +135,7 @@ const RE_BAY = new RegExp(`${BIEN_TRAI}(?:${['không đúng', 'không phải', '
 const RE_NAO = new RegExp(`${BIEN_TRAI}nào (?:sau|${mau('dưới')}) ${mau('đây')}${BIEN_PHAI}`, 'u')
 const RE_DAU = new RegExp(`^\\s*(?:${mau('hãy')}\\s+)?(?:${mau('tính')}|${mau('xác định')})${BIEN_PHAI}`, 'u')
 const RE_BAO_NHIEU = new RegExp(`${BIEN_TRAI}bao ${mau('nhiêu')}(?:\\s+[\\p{L}/³]+)?`, 'u')
+const RE_SO_DEM = new RegExp(`^${mau('số')}\\s(?!mol|gam)`, 'u')
 const RE_LA_CUOI = new RegExp(`${BIEN_TRAI}${mau('là')}$`, 'u')
 const RE_DAU_CAU = new RegExp(
   `${BIEN_TRAI}(?:${['giá trị', 'khối lượng', 'thể tích', 'nồng độ', 'số mol', 'số gam', 'phần trăm', 'hiệu suất', 'công thức', 'tên gọi', 'tổng số', 'tổng', 'tỉ lệ', 'tỉ khối', 'nhiệt độ', 'thời gian', 'độ tan', 'số'].map(mau).join('|')})${BIEN_PHAI}`,
@@ -177,7 +179,9 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
     // 1) bẫy phủ định: chỉ tô cụm bẫy (bản vẽ màn 5)
     const bay = [...doan.matchAll(RE_BAY)]
     if (bay.length) {
-      for (const m of bay) ra.push({ loai: 'hoi', tu: s + m.index!, den: s + m.index! + m[0].length, khoa: 'phu-dinh' })
+      // chọn MỘT phương án sai ('phu-dinh') · đếm số ý sai ('phu-dinh-dem') · hỏi chung ('phu-dinh-chung', vd Đ/S)
+      const khoaBay = RE_SO_DEM.test(doan) ? 'phu-dinh-dem' : nao || laCuoi ? 'phu-dinh' : 'phu-dinh-chung'
+      for (const m of bay) ra.push({ loai: 'hoi', tu: s + m.index!, den: s + m.index! + m[0].length, khoa: khoaBay })
       return
     }
     const benTrong = (x: number, y: number) => daCo.filter((v) => (v.loai === 'cho' || v.loai === 'chat') && v.tu >= x && v.den <= y)
@@ -219,7 +223,9 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
       }
     }
     // không nuốt số liệu / chất: tách thành phần đầu (trước vùng 'cho'/'chat' đầu tiên) và phần đuôi (sau vùng cuối)
-    const day = (x: number, y: number) => {
+    const day = (x: number, y: number, laDuoi = false) => {
+      // phần đuôi chỉ giữ khi tự đủ nghĩa («là bao nhiêu kg»), bỏ chữ «là» trơ trọi
+      if (laDuoi && !RE_BAO_NHIEU.test(lc.slice(x, y)) && lc.slice(x, y).replace(new RegExp(`${BIEN_TRAI}${mau('là')}${BIEN_PHAI}`, 'gu'), '').trim().split(/\s+/).filter(Boolean).length < 2) return
       while (y > x && /[\s,.;:]/.test(t[y - 1])) y--
       while (x < y && /[\s,.;:]/.test(t[x])) x++
       if (y > x) ra.push({ loai: 'hoi', tu: x, den: y, khoa })
@@ -228,7 +234,7 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
     if (!trong.length) day(tu, den)
     else {
       day(tu, Math.min(...trong.map((v) => v.tu)))
-      day(Math.max(...trong.map((v) => v.den)), den)
+      day(Math.max(...trong.map((v) => v.den)), den, true)
     }
     return
   }

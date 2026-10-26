@@ -86,6 +86,14 @@ function theDeHoi(v: VungCham): TheGiaiNghiaDu {
       ? { ten: 'Đề hỏi điều KHÔNG phải', nhan: 'Đề hỏi', doan: ['Ba phương án đúng với ý câu hỏi; em tìm phương án KHÔNG phải.', 'Bẫy hay gặp: đọc nhanh rồi chọn phương án đúng đầu tiên.'] }
       : { ten: 'Đề hỏi phát biểu SAI', nhan: 'Đề hỏi', doan: ['Đọc từng phương án và tự hỏi «đúng hay sai?». Phương án sai là đáp án; ba phương án còn lại đều đúng.', 'Bẫy hay gặp: đọc nhanh rồi chọn phương án đúng đầu tiên.'] }
   }
+  if (v.khoa === 'phu-dinh-dem') {
+    return thuong.includes('không phải')
+      ? { ten: 'Đề hỏi đếm cái KHÔNG phải', nhan: 'Đề hỏi', doan: ['Xét lần lượt từng ý (từng chất), đánh dấu cái KHÔNG phải rồi mới đếm.', 'Bẫy hay gặp: đếm nhầm sang những cái đúng.'] }
+      : { ten: 'Đề hỏi đếm ý SAI', nhan: 'Đề hỏi', doan: ['Xét lần lượt từng ý, đánh dấu đúng hay sai rồi đếm số ý sai.', 'Bẫy hay gặp: đếm nhầm sang số ý đúng.'] }
+  }
+  if (v.khoa === 'phu-dinh-chung') {
+    return { ten: 'Đề hỏi điều SAI', nhan: 'Đề hỏi', doan: ['Đọc từng ý và tự hỏi «đúng hay sai?».', 'Bẫy hay gặp: đọc nhanh, bỏ sót chữ «không», «sai».'] }
+  }
   if (v.khoa === 'nao-sau-day') {
     return { ten: 'Đề hỏi chọn một phương án', nhan: 'Đề hỏi', doan: [`«${chu}»: chỉ một phương án hợp với câu hỏi.`, 'Với từng phương án, tự hỏi «có đúng ý đề không?», gạch phương án chắc chắn không hợp.'] }
   }

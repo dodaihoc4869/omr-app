@@ -66,10 +66,40 @@ describe('thẻ Đề hỏi', () => {
   it('bẫy «không phải»', () => {
     expect(cham('Chất nào sau đây không phải là base?', 'không phải')?.ten).toBe('Đề hỏi điều KHÔNG phải')
   })
+  it('bẫy trong câu đếm và câu hỏi chung không nói «ba phương án còn lại đều đúng»', () => {
+    const dem = cham('Cho các phát biểu sau về ester. Số phát biểu sai là', 'sai')!
+    expect(dem.ten).toBe('Đề hỏi đếm ý SAI')
+    expect(JSON.stringify(dem)).not.toMatch(/ba phương án/)
+    const chung = cham('Phát biểu nào đúng, phát biểu nào sai?', 'sai')!
+    expect(chung.ten).toBe('Đề hỏi điều SAI')
+    expect(JSON.stringify(chung)).not.toMatch(/ba phương án/)
+  })
   it('«nào sau đây», «Số … là», «Tính …»', () => {
     expect(cham('Chất nào sau đây là chất điện li mạnh?', 'Chất nào sau đây')?.ten).toBe('Đề hỏi chọn một phương án')
     expect(cham('Cho các phát biểu sau về ester. Số phát biểu đúng là', 'Số phát biểu đúng là')?.ten).toBe('Đề hỏi đếm')
     expect(cham('Cho 0,1 mol glucose lên men. Tính khối lượng ethanol thu được.', 'Tính khối lượng')?.ten).toBe('Đề yêu cầu tính')
+  })
+})
+
+describe('bộ đề mẫu: mọi vùng có thẻ, vùng Đề hỏi có chữ đủ nghĩa', () => {
+  const DE = [
+    DE_ESTER,
+    'Không khí là hỗn hợp khí không màu, không mùi. Phát biểu nào sau đây không đúng?',
+    'Nung 1 tấn quặng pirit chứa 80% FeS₂ để sản xuất H₂SO₄ với hiệu suất 90%. Khối lượng H2SO4 thu được là bao nhiêu kg?',
+    'Hấp thụ hoàn toàn 2,479 lít CO2 (đkc) vào 200 ml dung dịch Ba(OH)2 0,1 M thu được m gam kết tủa. Giá trị gần nhất của m là',
+    'Thể tích dung dịch NaOH 1M cần dùng để trung hoà 100 mL dung dịch HCl 0,5M là',
+    'Cho 3,2 gam kim loại R tác dụng với dung dịch HNO3 đặc, nóng dư thu được 2,2311 lít NO2 (đkc). Xác định kim loại R.',
+    'Điện phân 200 mL dung dịch CuSO4 0,5M với dòng điện 9,65 A trong 2h. Tính khối lượng Cu thu được ở cathode.',
+    'Một loại phân bón chứa 35% K2O. Khối lượng phân cần dùng để cung cấp 47 kg K2O là bao nhiêu (làm tròn đến hàng phần mười)?',
+    'Cho các phát biểu sau về ester. Số phát biểu sai là',
+    'Phát biểu nào đúng, phát biểu nào sau đây sai?',
+    'Cho 200 gam dung dịch H2SO4 9,8% vào 0,2 mol Fe(OH)3, nung đến khối lượng không đổi. Ion SO4^2- và Fe3+ còn lại bao nhiêu mol?',
+  ]
+  it.each(DE)('%s', (de) => {
+    for (const v of phatHien(de)) {
+      expect(theCho(v), `${v.loai}:${v.chu}`).not.toBeNull()
+      if (v.loai === 'hoi' && !v.khoa?.startsWith('phu-dinh')) expect((v.chu.match(/\p{L}/gu) ?? []).length, v.chu).toBeGreaterThanOrEqual(3)
+    }
   })
 })
 

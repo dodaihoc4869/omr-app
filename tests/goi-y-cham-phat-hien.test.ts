@@ -49,6 +49,14 @@ describe('đề lý thuyết: bẫy phủ định', () => {
     expect(theoLoai('Kim loại nào sau đây không phải là kim loại kiềm?', 'hoi')).toEqual(['không phải'])
     expect(theoLoai('Nhận định không chính xác là', 'hoi')).toEqual(['không chính xác'])
   })
+  it('khoá bẫy theo kiểu câu: chọn một · đếm · hỏi chung', () => {
+    const k = (de: string) => phatHien(de).filter((v) => v.loai === 'hoi').map((v) => `${v.chu}|${v.khoa}`)
+    expect(k('Phát biểu nào sau đây không đúng?')).toEqual(['không đúng|phu-dinh'])
+    expect(k('Phát biểu không đúng là')).toEqual(['không đúng|phu-dinh'])
+    expect(k('Cho các phát biểu sau về ester. Số phát biểu sai là')).toEqual(['sai|phu-dinh-dem'])
+    expect(k('Cho các chất sau: NaCl, HCl, C2H5OH. Số chất không phải là chất điện li là')).toEqual(['không phải|phu-dinh-dem'])
+    expect(k('Phát biểu nào đúng, phát biểu nào sai?')).toEqual(['sai|phu-dinh-chung'])
+  })
   it('«không» ngoài câu hỏi không tô', () => {
     for (const de of ['Nitrogen chiếm khoảng 78% thể tích không khí.', 'Ở điều kiện thường, nitrogen là chất khí không màu, không mùi.', 'Chất này không tan trong nước.', 'Kết quả có sai số nhỏ.'])
       expect(theoLoai(de, 'hoi')).toEqual([])
@@ -80,7 +88,7 @@ describe('Đề hỏi', () => {
   })
   it('vùng Đề hỏi không nuốt số liệu và chất ở giữa câu hỏi', () => {
     const de = 'Thể tích dung dịch NaOH 1M cần dùng để trung hoà 100 mL dung dịch HCl 0,5M là'
-    expect(tom(de)).toEqual(['hoi:Thể tích dung dịch', 'chat:NaOH', 'cho:1M', 'khoa:trung hoà', 'cho:100 mL', 'chat:HCl', 'cho:0,5M', 'hoi:là'])
+    expect(tom(de)).toEqual(['hoi:Thể tích dung dịch', 'chat:NaOH', 'cho:1M', 'khoa:trung hoà', 'cho:100 mL', 'chat:HCl', 'cho:0,5M'])
   })
   it('đề không có câu hỏi ⇒ không có vùng Đề hỏi', () => {
     expect(theoLoai('Cho các nhận định sau về nitrogen.', 'hoi')).toEqual([])
@@ -99,7 +107,7 @@ describe('số + đơn vị (Đề cho)', () => {
     ['điện phân với dòng điện 5 A', '5 A', 'A'], ['điện phân trong 1930 giây', '1930 giây', 's'], ['điện phân trong 2h', '2h', 'gio'],
     ['điện phân 30 phút', '30 phút', 'phut'], ['điện phân 1,5 giờ', '1,5 giờ', 'gio'],
     ['có 1,2.10^-3 mol', '1,2.10^-3 mol', 'mol'], ['có 10⁶ g', '10⁶ g', 'g'], ['có 1.000 gam', '1.000 gam', 'g'],
-    ['hiệu suất 80%', '80%', '%H'], ['dung dịch NaCl nồng độ 10%', '10%', '%C'], ['chiếm 20% thể tích', '20%', '%'], ['phần trăm khối lượng là 40 %', '40 %', '%m'],
+    ['hiệu suất 80%', '80%', '%H'], ['dung dịch NaCl nồng độ 10%', '10%', '%C'], ['cho dung dịch H2SO4 9,8%', '9,8%', '%C'], ['lấy dung dịch HCl 7,3%', '7,3%', '%C'], ['chiếm 20% thể tích', '20%', '%'], ['phần trăm khối lượng là 40 %', '40 %', '%m'],
   ])('«%s» ⇒ %s', (de, chu, khoa) => {
     const v = phatHien(de).find((x) => x.loai === 'cho')
     expect(v?.chu).toBe(chu)
