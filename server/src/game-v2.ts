@@ -372,7 +372,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // Làm lại cuối chặng kiểu Duolingo (26/10, goi-bai-7-lam-lai.ts): câu anh em cho câu em vừa sai, có hỗ trợ, không EXP.
       if(action==='hoc-tap-lam-lai')return import('./goi-bai-7-lam-lai').then(m=>m.lamLaiCuoiChang7(env,sbd,b,Date.now()))
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
-      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now());return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+      // B3 chuỗi ngày theo bài (26/10, chuoi-ngay-bai-d1.ts): cờ duolingo_bai bật ⇒ `chuoiNgay` {so, giuChuoi, sucChua, lich7, cuu?, binhVuaDo?}; đọc song song lập kế hoạch.
+      if(action==='hoc-tap-sanh'){const chuoiSom=import('./chuoi-ngay-bai-d1').then(m=>m.chuoiBaiNeuBat(env,sbd,Date.now()),()=>null);const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now()),chuoi7=await chuoiSom;return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 

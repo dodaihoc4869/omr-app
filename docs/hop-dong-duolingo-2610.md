@@ -38,10 +38,40 @@ goiHoa2('hoc-tap-lam-lai', token, { session: <id phiên chặng (r.id của hoc-
 - **Từ chuẩn:** «Làm lại» (khác «Ôn lại» theo lịch). Đã ghi trong `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md`.
 - **Bản giao diện mẫu** (đã gỡ khỏi bản phát hành, Code app 1 chép logic nếu muốn): commit `406dbd17` — `ManLamBaiTap.tsx` (`xinLamLai`, `tiep`, `soGoc`, chặn chạm lặp khi đang xin), test `tests/lam-lai-cuoi-chang-giao-dien-2610.test.tsx`, cảnh chụp `lam-lai` / `ket-chang`.
 
-## 4. B3 — chuỗi ngày theo bài + ngày giữ chuỗi (Code app 4 làm đợt sau, chưa có)
-- Trường dự kiến: `chuoiNgay?: { so: number; giuChuoi?: number }`, trong phản hồi `hoc-tap-sanh` (dữ liệu Hôm nay).
-- Chưa có trường này ⇒ giao diện không hiện số (không bịa).
-- Code app 4 báo tên lệnh chính xác trước khi đẩy. Không đụng `exp-*.ts`; phải đụng thì báo trước.
+## 4. B3 — chuỗi ngày theo bài + bình giữ chuỗi (ĐÃ BUILD 26/10, gác cùng cờ `duolingo_bai`)
+- Hàm thuần `chuoiNgayCuaEm(nhatKy, homNay)` ở `server/src/chuoi-ngay-bai.ts`; phần D1 ở `server/src/chuoi-ngay-bai-d1.ts`.
+- **Trường trả về** (chỉ có khi cờ bật cho em; tắt hoặc lỗi thì vắng, giao diện không hiện số):
+  ```
+  chuoiNgay: { so, giuChuoi, sucChua, lich7: [{ ngay, kieu }], cuu?: { hetHan, daLam, can: 2, soCu }, binhVuaDo? }
+  ```
+  - `kieu` ∈ `'hoc' | 'binh' | 'phep' | 'cuu' | 'tat' | 'cho'`. So với đề nghị, thêm hai giá trị:
+    - `'cuu'`: ngày lỡ đã được cứu bằng 2 bài bù;
+    - `'cho'`: hôm nay chưa xong bài nào; chuỗi giữ tới hôm qua.
+  - `cuu.soCu`: số chuỗi sẽ sống lại nếu em học bù đủ.
+  - `cuu.hetHan`: hết ngày hôm nay (VN), viết ở dạng ISO UTC.
+- **Nơi trả:**
+  - `/hs`: phản hồi `hoc-tap-sanh` khi Gói 7 bật, trường `chuoiNgay` ở cấp ngoài cùng.
+  - `/ph`: lệnh `ph-tat-ca-ve-con` → `tongQuan.chuoiNgay`; trường cũ `tongQuan.chuoiNgayHoc` lấy cùng số `so`.
+  - `/ph/ke-hoach`: trường `chuoiNgay`; trường cũ `chuoiDat` lấy cùng số `so`.
+- **Luật:**
+  - Một ngày được tính khi em xong ≥ 1 bài (≥ 6 câu khác nhau có kết quả trong ngày, mọi nguồn), hoặc tự sửa xong ≥ 1 câu.
+  - Ngày vắng có phép (thầy ghi ở điểm danh) giữ chuỗi, không tốn bình.
+  - Bình giữ chuỗi:
+    - mang tối đa 2; chuỗi chạm 100 ngày thì nâng lên 3;
+    - mỗi thứ Hai tặng 1 bình; chuỗi chạm mốc 30 ngày tặng thêm 1;
+    - lỡ ngày thì tự dùng 1 bình: chuỗi giữ nguyên, không cộng ngày.
+  - Cứu chuỗi:
+    - hết bình mà lỡ ngày thì chuỗi tắt;
+    - NGÀY HÔM SAU em xong ≥ 3 bài (1 bài của ngày + 2 bài bù, tức ≥ 18 câu) thì chuỗi sống lại đúng số cũ; «24 giờ» được hiểu là ngày hôm sau theo lịch VN;
+    - tối đa 1 lần mỗi tuần (tuần tính từ thứ Hai).
+- **Mua bình:** `congBinh(env, sbd, so 1–3, nguon, id)` (`chuoi-ngay-bai-d1.ts`).
+  - Bảng chỉ-thêm `chuoi_binh_mua`, tạo khi gọi lần đầu.
+  - `id` chống trùng (dùng mã giao dịch ví).
+  - Giá và trừ tinh thể thuộc đặc tả điểm thưởng của Code app 1. Hàm này chưa gắn lệnh HTTP: Code app 1 gắn vào lệnh mua của mình.
+- **Tốc độ:**
+  - cờ đọc KÈM nhóm cờ cấu hình (Sảnh) hoặc kèm truy vấn gộp (phụ huynh) ⇒ cờ tắt thì 0 lệnh D1 thêm;
+  - cờ bật ⇒ 4 lượt đọc chạy song song, cùng đợt với các lượt đọc khác.
+- Chưa build: chuỗi đôi «Học cùng bạn» (chờ thầy duyệt). `chuoiNgayCuaEm` là hàm thuần, tính được cho từng em.
 
 ## 5. Ghi chú / phản hồi
 - 26/10 Code app 1 đề nghị, Code app 4 **đồng ý** cho B3: dùng MỘT định nghĩa chuỗi, thay cả `chuoi-ngay-hoc.ts` (≥ 1 câu) lẫn chuỗi «đủ mức» của TrongHs.
