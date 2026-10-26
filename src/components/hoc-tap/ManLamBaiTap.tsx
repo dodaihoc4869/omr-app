@@ -261,7 +261,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   useEffect(() => {
     if (!k) return
     const ngangThap = duo && !!window.matchMedia?.('(orientation: landscape) and (max-height: 500px)').matches
-    if (ngangThap) nutTiepRef.current?.scrollIntoView?.({ block: 'nearest' }); else veDau()
+    if (ngangThap) nutTiepRef.current?.scrollIntoView?.({ block: 'nearest' })
+    else {
+      veDau()
+      // thầy 27/10 (ảnh: tấm kết quả che nửa phương án D): tấm dính đáy ⇒ cuộn thêm cho phương án ĐÚNG nằm trọn trên mép tấm.
+      if (duo) requestAnimationFrame(() => {
+        const pa = gocRef.current?.querySelector<HTMLElement>('.ht2-lam-pa[data-ket=dung]'), tam = nutTiepRef.current?.closest<HTMLElement>('.duo-day')
+        if (!pa || !tam || getComputedStyle(tam).position !== 'sticky') return
+        pa.style.scrollMarginBottom = `${tam.offsetHeight + 12}px`
+        pa.scrollIntoView?.({ block: 'nearest' })
+      })
+    }
     nutTiepRef.current?.focus({ preventScroll: true })
   }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   // Rung phản hồi kiểu Duolingo (thầy 26/10) — chỉ app học sinh «Trong» (phan-hoi.ts tự kiểm): tấm kết quả đúng / sai, hết chặng.

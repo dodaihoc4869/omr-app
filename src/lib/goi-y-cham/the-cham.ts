@@ -78,7 +78,7 @@ const NGHIA_BIEN: Record<string, string> = { m: 'khối lượng (gam)', V: 'th�
 const MUA = 'Bắt đầu từ cuối: muốn tính được thứ đề hỏi thì cần số mol của chất nào?'
 
 /** Thẻ khi chạm vùng ĐỀ HỎI. */
-function theDeHoi(v: VungCham): TheGiaiNghiaDu {
+function theDeHoi(v: VungCham): TheGiaiNghiaDu | null {
   const chu = v.chu.trim()
   const thuong = chu.toLowerCase()
   if (v.khoa === 'phu-dinh') {
@@ -108,7 +108,10 @@ function theDeHoi(v: VungCham): TheGiaiNghiaDu {
   const dem = /^số\s/u.test(thuong) && !/^số (mol|gam)/u.test(thuong)
   if (dem) return { ten: 'Đề hỏi đếm', nhan: 'Đề hỏi', doan: [`«${chu}»: xét lần lượt từng ý, đánh dấu đúng hay sai rồi mới đếm.`] }
   const tinh = v.khoa === 'tinh' || /khối lượng|thể tích|nồng độ|số mol|số gam|hiệu suất|phần trăm|bao nhiêu|giá trị|tính/u.test(thuong)
-  return { ten: v.khoa === 'tinh' ? 'Đề yêu cầu tính' : 'Đề hỏi', nhan: 'Đề hỏi', doan: tinh ? [`«${chu}»: đó là thứ em cần tìm.`, MUA] : [`«${chu}»: đó là điều đề hỏi. Đọc kỹ từng ý rồi mới trả lời.`] }
+  // Thầy 27/10 («Giải thích ngu thế nhỉ» — chạm «là» ra «đó là điều đề hỏi. Đọc kỹ từng ý…»): đề hỏi không phải tính / đếm / phủ định thì KHÔNG có thẻ
+  // (chữ không chạm được) — thẻ không nói thêm gì ngoài chính câu đề thì bỏ.
+  if (!tinh) return null
+  return { ten: v.khoa === 'tinh' ? 'Đề yêu cầu tính' : 'Đề hỏi', nhan: 'Đề hỏi', doan: [`«${chu}»: đó là thứ em cần tìm.`, MUA] }
 }
 
 /**

@@ -41,6 +41,15 @@
 /* viền soi sáng dày 4px: chừa khoảng hai bên để không đè chữ bên cạnh (bản vẽ: .cau.soi .sang{margin:0 4px}) */
 .gyc-soi .gyc-sang:not(.gyc-nhieu){margin-left:4px;margin-right:4px}
 
+/* THẦY 27/10: «Chữ bấm đc chỉ tô màu tím không có khung … để hs đỡ rối mắt» ⇒ mọi chữ trong đề: không nền, không khung, không viền soi sáng;
+   chữ chạm được CHỈ đổi màu tím (--tr-tin-chu, cùng màu «tím» của app) + đậm. Đề hỏi / số liệu không chạm được giữ chữ thường.
+   Hết phân màu theo loại ⇒ nút «?» (chú giải màu) thừa — ẩn. Soi sáng khi xem gợi ý: chữ khác mờ đi, chữ đang nói tới giữ rõ (không khung). */
+.gyc-v.gyc-v,.gyc-v.gyc-v:hover,.gyc-v.gyc-v.gyc-dang,.gyc-soi .gyc-v.gyc-v.gyc-sang{background:none;box-shadow:none}
+.gyc-v,.gyc-soi .gyc-sang:not(.gyc-nhieu),.gyc-chat.gyc-cham:not(.gyc-nhieu),.gyc-dam.gyc-cham:not(.gyc-nhieu){padding:0;margin:0}
+.gyc-cho,.gyc-hoi{color:inherit;font-weight:inherit}
+.gyc-v.gyc-cham{color:var(--tr-tin-chu);font-weight:800}
+.gyc-v.gyc-cham:hover,.gyc-v.gyc-cham.gyc-dang{opacity:.7}
+
 /* nút «Bắt đầu từ đâu?» (nút nhẹ màu chính, bản vẽ) — màn Duo đặt ở hàng nút đáy qua `nutBatDau`, không thì nằm trên đề */
 .gyc-hang-nut{display:flex;justify-content:flex-end;margin:0 0 10px}
 .gyc-nut-bat-dau{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:0;border-radius:12px;background:var(--tr-hs-nhat);color:var(--tr-hs-chu);font:inherit;font-weight:600;font-size:15px;cursor:pointer;touch-action:manipulation}
@@ -257,3 +266,6 @@ html[data-gyc-cot-phai]{--gyc-cot-phai:320px}
   .gyc-v,.gyc-tna-buoc,.gyc-tna-vach i{transition:none}
   .gyc-bong{animation:none!important}
 }
+
+/* thầy 27/10: chữ chạm chỉ một màu tím ⇒ chú giải màu và nút «?» thừa — ẩn (đặt cuối tệp để thắng luật hiển thị phía trên) */
+.gyc-nut-hoi,.gyc-chu-giai{display:none}
