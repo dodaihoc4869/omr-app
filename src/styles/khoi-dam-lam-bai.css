@@ -30,8 +30,10 @@
 [data-kd] .m3 .thi-tien-do { background: var(--kd-ke); }
 [data-kd] .m3 .thi-tien-do-day { background: var(--kd-xanh); }
 @media (max-width: 439px) {
-  [data-kd] .m3 .thi-tren-da-lam { align-self: center; font-size: 13px; }
-  [data-kd] .m3 .thi-vien-thuoc > span { font-size: 22px; }
+  /* điện thoại hẹp: "Đã làm 7/10" phải đọc đủ (bản cũ hiện đủ) ⇒ chip dùng phông chữ thân (hẹp hơn phông số), đồng hồ gọn lại */
+  [data-kd] .m3 .thi-tren-da-lam { align-self: center; flex: none; padding: 1px 7px; font: 700 13px/1.25 var(--kd-f-chu); text-overflow: clip; }
+  [data-kd] .m3 .thi-vien-thuoc { height: 38px; gap: 4px; padding: 0 8px; }
+  [data-kd] .m3 .thi-vien-thuoc > span { font-size: 21px; }
 }
 
 /* ── 2. THÂN MÀN THI DỌC: đầu phần, dải câu chưa làm, lưới số câu, nút Nộp bài, Xem lại sau ─────────────────────────────────────── */
