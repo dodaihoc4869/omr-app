@@ -5,6 +5,7 @@
 //   ?man=lam13&lam=ds-dau đúng–sai đứng đầu (kịch bản vuốt: ý d + nút cuối phải tới được bằng vuốt)
 //   ?man=lam13&lam=so-o   15/10: số ô = đúng số kí tự đáp số (thầy 15/10 ~10:25): câu amine "24" (2 ô) · "6,48" (4 ô) · "10000" (5 ô)
 import { soOPhanIII } from '../../../src/lib/so-o-tra-loi-ngan'
+import { KET_BAI } from '../../../tests/_thuong-mau'
 
 const thamSo = new URLSearchParams(location.search)
 export const LA_LAM13 = thamSo.get('man') === 'lam13'
@@ -111,6 +112,15 @@ export const soHomNayLam13 = () => SO_LON ? { daLam: 1234 + daNop, muc: 2400, ch
 // Như `publicQuestion`: câu Phần III kèm số ô = đúng số kí tự đáp số (chỉ con số), không kèm đáp án.
 const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => { const n = q.phan === 'III' ? soOPhanIII(_d) : null; return n === null ? q : { ...q, soO: n } }
 const so = (v: string) => Number(String(v).replace(',', '.'))
+// THƯỞNG PHẠT (gộp 26/10): `&tp=1` ⇒ lệnh answer trả `thuong` (Đúng +10, chuỗi ≥ 3: +2; sai làm kĩ +2) như máy chủ phần A, câu cuối của chặng thêm `ketBai`.
+const TP = thamSo.get('tp') === '1'
+let chuoiTp = 0
+const daTraTp = new Set<string>()
+const thuongTp = (dung: boolean) => {
+  chuoiTp = dung ? chuoiTp + 1 : 0
+  return dung ? { tinh: true, nguyenTu: 10 + (chuoiTp >= 3 ? 2 : 0), dong: [{ nhan: 'Đúng', so: 10 }, ...(chuoiTp >= 3 ? [{ nhan: `Chuỗi đúng ${chuoiTp}`, so: 2 }] : [])], chuoiDung: chuoiTp, cauKho: false }
+    : { tinh: true, nguyenTu: 2, dong: [{ nhan: 'Làm nghiêm túc', so: 2 }], chuoiDung: 0, cauKho: false }
+}
 /** Trả lời các lệnh `/game-v2/hoc-tap-*` + `answer` của màn làm bài; lệnh khác ⇒ null (bộ giả chung lo). */
 export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<string, unknown> | null {
   if (duong.endsWith('/game-v2/hoc-tap-start') && thamSo.get('loi') === '1') return { ok: false, error: 'Máy chủ đang bận, chưa mở được chặng học của em lúc này. Em kiểm tra kết nối mạng rồi bấm Thử lại sau ít phút nhé.' } // KIỂM GD MỚI 26/10
@@ -121,7 +131,10 @@ export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<s
   if (duong.endsWith('/game-v2/answer')) {
     const tra = String(b.answer ?? '')
     daNop++
-    return { ok: true, correct: q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn, answer: q.dapAn, solution: q.loiGiai, solutionImages: [], ...(q.vaiGoi7 === 'lam_lai' ? { attempt: { assisted: true } } : {}) }
+    const dung = q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn
+    daTraTp.add(q.qid)
+    const tp = TP ? { thuong: thuongTp(dung), ...(ds.every((c) => daTraTp.has(c.qid)) ? { ketBai: KET_BAI } : {}) } : {}
+    return { ok: true, correct: dung, answer: q.dapAn, solution: q.loiGiai, solutionImages: [], ...(q.vaiGoi7 === 'lam_lai' ? { attempt: { assisted: true } } : {}), ...tp }
   }
   if (duong.endsWith('/game-v2/hoc-tap-gap')) { daNop++; return { ok: true, correct: false, hocCoHoTro: true, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] } }
   return null

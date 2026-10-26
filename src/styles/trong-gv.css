@@ -34,8 +34,8 @@
   [data-trong='gv'] .m3.vo-thay .ben-trai .ben-trai-nut-ca {
     width: auto; min-height: 44px; margin: 0 0 12px; border-radius: 12px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); box-shadow: var(--tr-bong-1);
   }
-  /* nhóm «Việc trên lớp» (bộ menu cũ): nhãn là ::after của danh sách, đặt giữa mục 4 và mục 5 bằng `order` */
-  [data-trong='gv'] .m3.vo-thay .ben-trai:not([data-hoa2]) .ben-trai-danh-sach > :nth-child(n + 5) { order: 2; }
+  /* nhóm «Việc trên lớp» (bộ menu cũ): nhãn là ::after của danh sách, đặt giữa mục 5 và mục 6 bằng `order` (Thi đua tuần 26/10 là mục 3) */
+  [data-trong='gv'] .m3.vo-thay .ben-trai:not([data-hoa2]) .ben-trai-danh-sach > :nth-child(n + 6) { order: 2; }
   [data-trong='gv'] .m3.vo-thay .ben-trai:not([data-hoa2]) .ben-trai-danh-sach::after {
     content: 'Việc trên lớp'; order: 1; display: none; padding: 16px 12px 6px; font-size: 12px; font-weight: 600; color: var(--tr-chu-3);
   }

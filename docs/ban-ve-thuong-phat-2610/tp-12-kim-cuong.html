@@ -1,0 +1,151 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Thử thách Kim cương (tự chọn)» — mở khi chuyên đề đạt thành thạo; 10 câu khó; 3 ống nghiệm (mạng); sai mỗi câu vỡ 1 ống, vỡ đủ 3 là trượt;
+     trượt thì làm lại sau 24 giờ; đạt: +40 tinh thể, huy hiệu chuyên đề Kim cương, nút chặng đổi sang lục giác kim cương. Nguyên tử từng câu tính như thường.
+     Biến thể: ?bt=moi (mặc định, màn mời) · ?bt=lam (đang làm câu 7/10, 1 ống vỡ) · ?bt=truot (vỡ đủ 3 ống ở câu 8/10, đúng 5/8) · ?bt=dat (đúng 8/10, vỡ 2/3 ống).
+     Hóa học: tristearin (C17H35COO)3C3H5, M = 890 ⇒ 17,8 g = 0,02 mol ⇒ glycerol 0,02 × 92 = 1,84 g.
+     Hiệu ứng: H2 ống nghiệm vỡ — nứt, mảnh rơi, chất lỏng tràn (?hu=vo, mặc định ở lam) · D3 huy hiệu lật 3D lấp lánh + hoa giấy (?hu=dat) · trượt: Bi buồn, ống rung (?hu=truot) · mời: huy hiệu bật lên (?hu=moi). -->
+<title>HS · Thưởng phạt · 12 Thử thách Kim cương</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.tp-hinh{width:230px;height:190px}
+.tp-hinh .hh-to{position:absolute;left:50%;top:4px;width:150px;margin-left:-75px;z-index:1}
+.tp-hinh .tp-bi{position:absolute;right:-6px;bottom:-4px;width:78px;z-index:2}
+.tp-hinh .tp-tia path{fill:var(--kl-kc-2)}
+.tp-ong.kc{border-color:var(--kl-kc-2)}
+.tp-ong.kc .long{background:linear-gradient(180deg,var(--kl-kc),var(--kl-kc-2))}
+.tp-mang{gap:6px}
+.tp-mang .tp-o3{width:18px;height:32px}
+.luat-kc{display:flex;flex-direction:column;gap:12px}
+.ong-ba{display:inline-flex;gap:2px;vertical-align:middle}
+.ong-ba .tp-o3{width:11px;height:24px}
+.thuong-kc{display:flex;flex-direction:column;gap:10px}
+.nut-kc{display:inline-grid;place-items:center;width:44px;height:40px;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);background:linear-gradient(135deg,var(--kl-kc),var(--kl-kc-2));color:#fff;flex:none}
+.nut-kc .i{width:20px;height:20px}
+.duo-nut.kc{background:var(--kl-kc-2)}
+.mo-lai{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;border-radius:999px;background:var(--chu-y-nhat);color:var(--chu-y-chu);font-weight:900;font-size:14px}
+.mo-lai .i{width:16px;height:16px}
+.duo-nhan.kc{color:var(--kl-kc-2)}
+</style></head>
+<body class="duo tp" data-app="hs" data-khung="khong" data-ai="khong" data-bt-mac="moi" data-hu-mac="moi" data-hu-lam="vo" data-hu-truot="truot" data-hu-dat="dat">
+<script>if (/bt=lam/.test(location.search)) document.body.classList.add('cau-ngang')</script>
+<div class="duo-vo">
+  <div class="duo-tren" data-bt="moi truot dat"><span class="duo-dong" aria-label="Đóng"><i data-i="x"></i></span></div>
+  <div class="duo-tren" data-bt="lam">
+    <span class="duo-dong" aria-label="Thoát thử thách"><i data-i="x"></i></span>
+    <div class="tp-ong kc" style="--p:60%" role="img" aria-label="Đã xong 6/10 câu"><i class="long"><b class="cam"></b><s class="bot" style="left:40%"></s><s class="bot" style="left:72%;animation-delay:.7s"></s></i><span class="bong-tren"></span></div>
+    <span class="tp-mang" aria-label="Còn 2/3 ống nghiệm"><span data-ong3="vo" id="ong1"></span><span data-ong3="day"></span><span data-ong3="day"></span></span>
+  </div>
+
+  <!-- MỜI -->
+  <main class="tp-man hai-cot" data-bt="moi">
+    <div class="cot-a">
+      <div class="tp-hinh"><span class="tp-tia quay" data-tia></span><span class="hh-to" data-hh="kc" id="hh"></span><span data-bi="chao"></span></div>
+      <h1>Thử thách Kim cương</h1>
+      <p class="tp-phu">Ester – Lipid · em đã thành thạo chuyên đề này. Thử sức với 10 câu khó nhất nhé?</p>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the luat-kc" aria-label="Luật thử thách">
+        <h2>Luật</h2>
+        <div class="tp-dong"><span class="tp-o tin"><i data-i="target"></i></span><div class="giua"><b>10 câu khó của Ester – Lipid</b><span>làm liền một lượt</span></div></div>
+        <div class="tp-dong"><span class="tp-o xam" style="background:var(--mat-2)"><span class="ong-ba"><span data-ong3="day"></span><span data-ong3="day"></span><span data-ong3="day"></span></span></span><div class="giua"><b>3 ống nghiệm</b><span>sai một câu vỡ một ống · vỡ đủ 3 ống là dừng</span></div></div>
+        <div class="tp-dong"><span class="tp-o sao"><i data-i="refresh"></i></span><div class="giua"><b>Chưa qua thì làm lại sau 24 giờ</b><span>không mất tinh thể, không mất nguyên tử</span></div></div>
+      </section>
+      <section class="tp-the thuong-kc" aria-label="Thưởng">
+        <h2>Thưởng khi đạt</h2>
+        <div class="tp-dong"><span class="tp-o tt"><i data-tp="tt"></i></span><div class="giua"><b>+40 tinh thể</b></div></div>
+        <div class="tp-dong"><span class="nut-kc"><i data-i="trophy"></i></span><div class="giua"><b>Huy hiệu Kim cương · Ester – Lipid</b><span>nút chặng trên Lộ trình đổi sang lục giác kim cương</span></div></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ĐANG LÀM -->
+  <main class="duo-than" data-bt="lam">
+    <p class="duo-nhan kc">Thử thách Kim cương · Ester – Lipid <span class="chip">Câu 7/10</span></p>
+    <p class="duo-de">Xà phòng hoá hoàn toàn 17,8 gam tristearin bằng dung dịch sodium hydroxide vừa đủ, thu được m gam glycerol. Giá trị của m là</p>
+    <div class="duo-pa luoi">
+      <div><b>A</b><span>1,84</span></div>
+      <div><b>B</b><span>0,92</span></div>
+      <div class="chon"><b>C</b><span>5,52</span></div>
+      <div><b>D</b><span>3,68</span></div>
+    </div>
+  </main>
+
+  <!-- TRƯỢT -->
+  <main class="tp-man hai-cot" data-bt="truot">
+    <div class="cot-a">
+      <div class="tp-hinh"><span class="hh-to tp-hh khoa" data-hh="kc"></span><span data-bi="sai" id="bi"></span></div>
+      <h1>Chưa qua lần này</h1>
+      <p class="tp-phu">Vỡ đủ 3 ống ở câu 8/10 · em đúng 5/8 câu.</p>
+      <span class="tp-mang" id="ba-vo" aria-label="Vỡ 3/3 ống nghiệm"><span data-ong3="vo"></span><span data-ong3="vo"></span><span data-ong3="vo"></span></span>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the" aria-label="Làm lại">
+        <div class="tp-dau"><h2>Làm lại sau 24 giờ</h2><span class="mo-lai"><i data-i="clock"></i>từ 21:40 thứ Bảy 31/10</span></div>
+        <p class="tp-phu" style="font-size:14px">Trượt không mất gì: tinh thể và nguyên tử của các câu đúng vẫn giữ. Ôn lại 3 câu sai rồi thử lại nhé.</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- ĐẠT -->
+  <main class="tp-man hai-cot" data-bt="dat">
+    <div class="cot-a">
+      <div class="tp-hinh"><span class="tp-tia quay" data-tia></span><span class="hh-to" data-hh="kc" id="hh"></span><span data-bi="mung" id="bi"></span></div>
+      <h1 style="color:var(--kl-kc-2)">Đạt Kim cương!</h1>
+      <p class="tp-phu">Ester – Lipid · đúng 8/10 câu, vỡ 2/3 ống nghiệm.</p>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the thuong-kc" aria-label="Thưởng">
+        <div class="tp-dong"><span class="tp-o tt"><i data-tp="tt"></i></span><div class="giua"><b>+40 tinh thể</b><span>thưởng Thử thách Kim cương</span></div></div>
+        <div class="tp-dong"><span class="nut-kc"><i data-i="check"></i></span><div class="giua"><b>Nút chặng Ester – Lipid đã đổi sang lục giác kim cương</b><span>xem trên Lộ trình</span></div></div>
+      </section>
+    </div>
+  </main>
+
+  <div class="duo-day"><div class="giua">
+    <span class="duo-nut kc" data-bt="moi">Bắt đầu thử thách</span><div class="duo-bo" data-bt="moi"><span>Để sau</span></div>
+    <span class="duo-nut" data-bt="lam">Kiểm tra</span>
+    <span class="duo-nut" data-bt="truot">Ôn lại 3 câu sai</span><div class="duo-bo" data-bt="truot"><span>Về Lộ trình</span></div>
+    <span class="duo-nut mau-tt" data-bt="dat">Nhận 40 tinh thể</span>
+  </div></div>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('moi', async () => {
+  const hh = document.getElementById('hh')
+  TP.a(hh, [{ transform: 'translateY(30px) scale(.6)', opacity: 0 }, { transform: 'translateY(-8px) scale(1.06)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], 700)
+  TP.a(document.querySelector('.tp-tia'), [{ opacity: 0 }, { opacity: 1 }], 700, { delay: 300 })
+  setTimeout(() => TP.hat(hh, 0, { n: 10, r: 100, mau: ['var(--kl-kc)', 'var(--kl-kc-2)', '#fff'] }), 500)
+})
+TP.dk('vo', async () => {
+  // H2: ống nghiệm vỡ — nứt, mảnh rơi, chất lỏng tràn (500 ms)
+  TP.phanHoi('vo')
+  const o = document.getElementById('ong1'), r = o.getBoundingClientRect(), L = TP.lop()
+  if (!TP.dong) return
+  const lanh = document.createElement('i'); lanh.className = 'tp-hat gem'; lanh.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;width:${r.width}px;height:${r.height}px;margin:${-r.height / 2}px 0 0 ${-r.width / 2}px`
+  lanh.innerHTML = TP.ong3(false); L.append(lanh)
+  const an = o.animate([{ opacity: 0 }, { opacity: 0 }], { duration: 260, fill: 'backwards' })
+  lanh.animate([{ transform: 'none' }, { transform: 'translateX(-2px) rotate(-6deg)', offset: 0.25 }, { transform: 'translateX(2px) rotate(6deg)', offset: 0.5 }, { transform: 'scale(1.1)', opacity: 1, offset: 0.8 }, { opacity: 0, transform: 'scale(1.2)' }], { duration: 300, fill: 'forwards' }).onfinish = () => lanh.remove()
+  void an
+  setTimeout(() => {
+    for (let i = 0; i < 7; i++) { const m = document.createElement('i'); m.className = 'tp-hat'; m.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height * 0.4}px;width:6px;height:8px;margin:-4px 0 0 -3px;background:var(--chu-3);clip-path:polygon(0 0,100% 30%,40% 100%)`; L.append(m)
+      m.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${(i - 3) * 9}px,${30 + Math.random() * 20}px) rotate(${(i - 3) * 60}deg)`, opacity: 0 }], { duration: 500, easing: 'cubic-bezier(.4,0,.9,.6)' }).onfinish = () => m.remove() }
+    const vung = document.createElement('i'); vung.className = 'tp-hat tron'; vung.style.cssText = `left:${r.left + r.width / 2}px;top:${r.bottom + 2}px;width:40px;height:8px;margin:-4px 0 0 -20px;background:var(--kl-kc-2)`; L.append(vung)
+    vung.animate([{ transform: 'scaleX(.1)', opacity: 0.9 }, { transform: 'scaleX(1)', opacity: 0.8, offset: 0.5 }, { transform: 'scaleX(1.2)', opacity: 0 }], { duration: 900 }).onfinish = () => vung.remove()
+  }, 250)
+})
+TP.dk('truot', async () => {
+  TP.phanHoi('truot')
+  TP.a(document.getElementById('ba-vo'), [{ transform: 'none' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(-4px)' }, { transform: 'none' }], 420, { delay: 200 })
+  TP.a(document.getElementById('bi'), [{ transform: 'translateY(-10px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 500)
+})
+TP.dk('dat', async () => {
+  // D3: huy hiệu lật 3D lộ ra, lấp lánh; hoa giấy; Bi mừng
+  const hh = document.getElementById('hh')
+  TP.phanHoi('huyHieu')
+  TP.a(hh, [{ transform: 'perspective(500px) rotateY(-180deg) scale(.5)', opacity: 0 }, { transform: 'perspective(500px) rotateY(-90deg) scale(.8)', opacity: 1, offset: 0.4 }, { transform: 'perspective(500px) rotateY(20deg) scale(1.1)', offset: 0.8 }, { transform: 'perspective(500px) rotateY(0) scale(1)' }], 800)
+  TP.a(document.querySelector('.tp-tia'), [{ opacity: 0, transform: 'scale(.4)' }, { opacity: 1, transform: 'none' }], 700, { delay: 500 })
+  TP.a(document.getElementById('bi'), [{ transform: 'translateY(0)' }, { transform: 'translateY(-24px)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-10px)' }, { transform: 'translateY(0)' }], 900, { delay: 600 })
+  setTimeout(() => { TP.hat(hh, 0, { n: 14, r: 110, mau: ['var(--kl-kc)', 'var(--kl-kc-2)', 'var(--tt)', '#fff'] }); TP.hoaGiay(28, 1200) }, 650)
+})
+</script>
+</body></html>

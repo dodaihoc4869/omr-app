@@ -870,3 +870,7 @@
 [data-trong] .da-bai > .mot-xuong { flex-basis: 100%; width: auto; height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--tr-trang) 30%, transparent); }
 /* DUYỆT 26/10: Thành tích — số chuỗi ngày 34px giãn dòng 1.05 (phông Nunito) chồng 3px dòng «Chuỗi ngày đủ mức» ngay dưới ⇒ 1.2 */
 [data-trong] .da-lua b { line-height: 1.2; }
+/* THƯỞNG PHẠT (gộp 26/10): một màn thưởng phạt mở trong khung Lộ trình / Thành tích — một cột (màn tự chia 2 cột ở máy tính / ngang). */
+[data-trong] .dm-khung[data-muc='thuong'] { grid-template-columns: minmax(0, 1fr); }
+[data-trong] .tp-cam { min-width: 0; padding: 0 0 24px; }
+[data-trong] .tp-cam-cho { min-height: 60vh; }

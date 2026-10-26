@@ -1,0 +1,74 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Phạt — chuỗi tắt» + «Cứu chuỗi» (bổ sung 26/10): hết bình mà lỡ ngày thì chuỗi tắt; trong 24 giờ học bù 2 bài (ngoài bài của hôm đó)
+     thì chuỗi sống lại đúng số cũ; KHÔNG mất tinh thể; mỗi tuần cứu tối đa 1 lần.
+     Biến thể: ?bt=tat (mặc định: vừa tắt, 0/2, đồng hồ đếm ngược) · ?bt=xong (đã cứu xong 2/2, lửa bùng lại).
+     Hiệu ứng C4: ngọn lửa nhỏ leo lét lắc lư + đồng hồ đếm ngược (?hu=tat) · cứu xong thì lửa bùng lại (?hu=cuu-xong). -->
+<title>HS · Thưởng phạt · 6 Cứu chuỗi</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.tp-hinh .lua-nho{position:absolute;right:26px;top:6px;width:44px;height:44px;z-index:3;transform-origin:50% 90%}
+.tp-hinh .lua-nho .tp-dv{width:100%;height:100%}
+.leo-let{animation:leo 1.1s ease-in-out infinite}
+@keyframes leo{0%,100%{transform:rotate(-7deg) scale(.92)}35%{transform:rotate(6deg) scale(1)}70%{transform:rotate(-3deg) scale(.85)}}
+.cuu .dh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cuu .dh b{font-size:34px;font-weight:900;letter-spacing:.02em;color:var(--chu-y-chu)}
+.cuu .dh span{font-size:14px;color:var(--chu-2)}
+.bu{display:flex;align-items:center;gap:10px}
+.bu .o{display:grid;place-items:center;width:52px;height:46px;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);background:var(--mat-3);color:var(--chu-3);font-weight:900}
+.bu .o.x{background:var(--dung);color:#fff}
+.bu .giua{flex:1;min-width:0}
+.bu .giua b{display:block;font-size:15.5px}
+.bu .giua span{font-size:13.5px;color:var(--chu-2)}
+.ghi{margin:0;font-size:13.5px;color:var(--chu-2);line-height:1.5}
+.ghi b{color:var(--chu)}
+.duo-bo span{color:var(--chu-2)}
+</style></head>
+<body class="duo tp" data-app="hs" data-khung="khong" data-ai="khong" data-bt-mac="tat" data-hu-mac="tat" data-hu-xong="cuu-xong">
+<div class="duo-vo">
+  <div class="duo-tren"><span class="duo-dong" aria-label="Đóng"><i data-i="x"></i></span></div>
+  <main class="tp-man hai-cot">
+    <div class="cot-a">
+      <div class="tp-hinh" data-bt="tat"><span data-bi="sai" id="bi"></span><span class="lua-nho leo-let" id="lua"><i data-tp="lua"></i></span></div>
+      <div class="tp-hinh" data-bt="xong"><span class="tp-tia quay" data-tia></span><span data-bi="lua" id="bi"></span><span class="lua-nho" id="lua" style="width:56px;height:56px;right:14px;top:-6px"><i data-tp="lua"></i></span></div>
+      <h1 data-bt="tat">Chuỗi 12 ngày vừa tắt</h1>
+      <h1 data-bt="xong" style="color:var(--sao-chu)">Chuỗi 12 ngày đã sống lại!</h1>
+      <p class="tp-phu" data-bt="tat">Hôm qua em chưa xong bài nào, và đã hết bình giữ chuỗi.</p>
+      <p class="tp-phu" data-bt="xong">Em học bù đủ 2 bài. Chuỗi giữ nguyên 12 ngày, không mất tinh thể.</p>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the cuu" aria-label="Cứu chuỗi">
+        <div class="tp-dau"><span class="tp-o sao"><i data-i="flame"></i></span><h2>Cứu chuỗi 12 ngày</h2></div>
+        <p class="tp-phu" data-bt="tat" style="color:var(--chu);font-weight:800">Học bù 2 bài trước 21:30 mai</p>
+        <div class="dh" data-bt="tat"><b id="dem-nguoc">23:16:05</b><span>còn lại</span></div>
+        <div class="bu"><span class="o" id="o1" data-bt="tat">1</span><span class="o x" id="o1" data-bt="xong"><i data-i="check"></i></span><span class="o" data-bt="tat">2</span><span class="o x" id="o2" data-bt="xong"><i data-i="check"></i></span>
+          <div class="giua"><b data-bt="tat">Bài bù · 0/2</b><b data-bt="xong">Bài bù · 2/2</b><span>tính ngoài bài của hôm nay</span></div></div>
+        <p class="ghi">Không mất tinh thể. Mỗi tuần cứu được <b>1 lần</b> · <span data-bt="tat">tuần này còn <b>1 lần</b></span><span data-bt="xong">tuần này đã dùng</span>.</p>
+      </section>
+    </div>
+  </main>
+  <div class="duo-day"><div class="giua">
+    <span class="duo-nut cam" data-bt="tat">Học bù ngay</span><div class="duo-bo" data-bt="tat"><span>Để sau</span></div>
+    <span class="duo-nut" data-bt="xong">Tiếp tục</span>
+  </div></div>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('tat', async () => {
+  // C4: lửa leo lét (CSS lặp) + đồng hồ đếm ngược từng giây
+  TP.phanHoi('chuoiTat')
+  TP.a(document.getElementById('bi'), [{ transform: 'translateY(-8px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 500)
+  let s = 23 * 3600 + 16 * 60 + 5; const el = document.getElementById('dem-nguoc'), p = (n) => String(n).padStart(2, '0')
+  setInterval(() => { s--; el.textContent = `${p(Math.floor(s / 3600))}:${p(Math.floor(s / 60) % 60)}:${p(s % 60)}` }, 1000)
+})
+TP.dk('cuu-xong', async () => {
+  // C4 cứu xong: ô bài bù thứ hai tô xanh, ngọn lửa bùng lại, Bi «lua» nhảy
+  TP.phanHoi('chuoi')
+  const o2 = document.getElementById('o2'), lua = document.getElementById('lua')
+  TP.a(o2, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.2)', opacity: 1 }, { transform: 'none', opacity: 1 }], 380)
+  TP.a(lua, [{ transform: 'scale(.4) rotate(-8deg)', opacity: 0.6 }, { transform: 'scale(1.9)', opacity: 1, offset: 0.4 }, { transform: 'scale(.95)', offset: 0.75 }, { transform: 'none', opacity: 1 }], 1200, { delay: 300 })
+  TP.a(document.querySelector('.tp-tia'), [{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'none' }], 800, { delay: 400 })
+  TP.a(document.getElementById('bi'), [{ transform: 'translateY(0)' }, { transform: 'translateY(-22px)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-10px)' }, { transform: 'translateY(0)' }], 900, { delay: 450 })
+  setTimeout(() => TP.hat(lua, 0, { n: 14, r: 90, mau: ['var(--sao)', 'var(--chu-y)', 'var(--sai)'] }), 600)
+})
+</script>
+</body></html>

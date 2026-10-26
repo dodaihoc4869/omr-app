@@ -281,6 +281,17 @@ const DUO_CANH = [
 const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   DUO_CANH.map(([t, viec]) => [`duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết DUO 26/10
+// ═══ THƯỞNG PHẠT GỘP 26/10 (tiền tố "tpc-"): Lộ trình / Thành tích / màn mở từ thanh trên / làm chặng / kết chặng THẬT có cắm thưởng phạt (`&tp=1`:
+// máy chủ giả gia/thuong.tsx + answer trả `thuong`, câu cuối `ketBai`). 390×844 · 844×390 · 1440×900, sáng + tối. Thao tác `menu:<mục>` = chọn mục menu dọc.
+const TPC_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'nut:Chuỗi 12 ngày'],
+  ['nhiem-vu', 'hs-mot&tp=1', /Ester/, 'nut:Nguyên tử hôm nay: 147'], ['cua-hang', 'hs-mot&tp=1', /Ester/, 'nut:Tinh thể: 245'],
+  ['lam-dung', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Kiểm tra$'], ['lam-sai', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+  ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+]
+const DS_TPC = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết THƯỞNG PHẠT GỘP 26/10
 
 // ═══ NGANG HS 26/10: màn con học sinh mở đè Hôm nay (`?man=hs-ng&v=tu-sua|kiem|ai`, khối cùng tên ở trang.tsx) ở điện thoại dọc thấp / ngang / máy tính
 // bảng / máy tính, sáng + tối (ảnh khung nhìn; đo tràn ngang + vùng chạm như mọi cảnh). Tiền tố "ng-hs-".
@@ -346,6 +357,7 @@ const DS = [
   ...DS_MG, // MỘT TRANG GV 26/10
   ...DS_NG_HS, // NGANG HS 26/10
   ...DS_DUO, // DUO 26/10
+  ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D
@@ -520,6 +532,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         if (!(await hien().count())) { await t.getByRole('button', { name: /^Mở menu/ }).locator('visible=true').first().click(); await t.waitForTimeout(500) }
         if (await hien().click({ timeout: 3000 }).then(() => true, () => false)) break
       }
+    } else if (viec?.startsWith('menu:')) {
+      // THƯỞNG PHẠT GỘP 26/10: chọn một mục menu dọc «Trong» (menu luôn gắn trong DOM, ẩn bằng CSS ⇒ bấm bằng DOM, rồi chờ màn mục vẽ).
+      await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), viec.slice(5))
       await t.waitForTimeout(600)
     } else if (viec?.startsWith('ht:')) {
       await t.getByRole('navigation', { name:'Điều hướng học sinh' }).getByRole('button', { name:viec.slice(3), exact:true }).click()

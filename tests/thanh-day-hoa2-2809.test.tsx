@@ -30,7 +30,8 @@ describe('thanh đáy theo cờ Game Hóa 2.0', () => {
     render(<BottomNav />)
     expect(nhanThanh()).toEqual(['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Bài tập', 'Thêm'])
     // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): tờ Thêm có thêm "Gỡ nút thắt".
-    expect(moThem()).toEqual(['Ngân hàng đề', 'Gọi lên bảng', 'Học sinh hỏi', 'Gỡ nút thắt', 'Giao đề theo tuần', 'Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên, trên Cài đặt.
+    expect(moThem()).toEqual(['Thi đua tuần', 'Ngân hàng đề', 'Gọi lên bảng', 'Học sinh hỏi', 'Gỡ nút thắt', 'Giao đề theo tuần', 'Cài đặt'])
     expect(document.querySelector('nav.day-thay')?.hasAttribute('data-hoa2')).toBe(false)
   })
 
@@ -66,7 +67,10 @@ describe('thanh đáy theo cờ Game Hóa 2.0', () => {
     render(<BottomNav />)
     const ca = [...document.querySelectorAll('.day-thay-thanh .day-thay-muc')].find((b) => b.textContent?.includes('Ca kiểm tra'))
     expect(ca?.getAttribute('aria-current')).toBe('page')
-    expect(MUC_HOA2_DAY.map((m) => m.ten)).toEqual(['Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên ⇒ điện thoại: nút cúp cạnh bánh răng.
+    expect(MUC_HOA2_DAY.map((m) => m.ten)).toEqual(['Thi đua tuần', 'Cài đặt'])
+    fireEvent.click(screen.getByRole('button', { name: 'Thi đua tuần' }))
+    expect(useAppStore.getState().screen).toBe('thidua')
     expect(screen.queryByRole('menu')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Cài đặt' }))
     expect(useAppStore.getState().screen).toBe('caidat')
@@ -76,6 +80,7 @@ describe('thanh đáy theo cờ Game Hóa 2.0', () => {
   })
 
   it('cờ TẮT vẫn dùng MUC_DIEU_HUONG (không đụng danh sách cũ)', () => {
-    expect(MUC_DIEU_HUONG.map((m) => m.id)).toEqual(['examhub', 'hocsinh', 'lichsuca', 'nganhangde', 'giaobtvn', 'goilenbang', 'cauhoi', 'bangonutthat', 'khodegiao', 'caidat'])
+    // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên, trên Cài đặt.
+    expect(MUC_DIEU_HUONG.map((m) => m.id)).toEqual(['examhub', 'hocsinh', 'thidua', 'lichsuca', 'nganhangde', 'giaobtvn', 'goilenbang', 'cauhoi', 'bangonutthat', 'khodegiao', 'caidat'])
   })
 })

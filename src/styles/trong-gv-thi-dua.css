@@ -1,0 +1,32 @@
+/* «Trong» — THI ĐUA TUẦN (ThiDuaTuanScreen; thầy chốt bản vẽ 26/10 ve-moi/tp-15-gv-thi-dua.html). Chỉ dưới [data-trong='gv']; tắt «Trong» ⇒ trình bày
+ * của screens/thi-dua-tuan.css (giao diện thầy hiện có). Chỉ đổi bảng biến --td-* sang --tr-* + bo góc 20 / bóng nhẹ / tiêu đề 28 của «Trong». */
+[data-trong='gv'] .tdt {
+  --td-nen: var(--tr-nen); --td-mat: var(--tr-mat); --td-mat-2: var(--tr-mat-2); --td-vien: var(--tr-vien);
+  --td-chu: var(--tr-chu); --td-chu-2: var(--tr-chu-3); --td-chinh: var(--tr-chinh-nut); --td-tren-chinh: var(--tr-tren-chinh);
+  --td-dung: var(--tr-dung); --td-dung-nen: var(--tr-dung-nhat); --td-dung-chu: var(--tr-dung-chu);
+  --td-sai: var(--tr-sai-chu); --td-sai-nen: var(--tr-sai-nhat); --td-sai-chu: var(--tr-sai-chu);
+  --td-cy: var(--tr-chu-y); --td-cy-nen: var(--tr-chu-y-nhat); --td-cy-chu: var(--tr-chu-y-chu);
+  --td-tin-nen: var(--tr-tin-nhat); --td-tin-chu: var(--tr-tin-chu); --td-sao: var(--tr-sao);
+  --td-r: 20px;
+}
+[data-trong='gv'] .tdt .tdt-xep i + i { background: var(--tr-sai); }
+[data-trong='gv'] .tdt .tdt-cong { background: var(--tr-vien-2); }
+[data-trong='gv'] .tdt .tdt-cong[data-on] { background: var(--tr-chinh-nut); }
+[data-trong='gv'] .tdt .tdt-cong::after { background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .tdt :is(.tdt-the, .tdt-kpi, .tdt-chon-lop, .tdt-nut-vien) { box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .tdt :is(.tdt-chon-lop, .tdt-nut-vien, .tdt-xep-chon) { border-color: var(--tr-vien-2); }
+[data-trong='gv'] .tdt .tdt-h1 { font-size: 28px; letter-spacing: -0.02em; }
+[data-trong='gv'] .tdt .tdt-the-dau { padding: 18px 20px 12px; }
+[data-trong='gv'] .tdt .tdt-bang th { padding: 0 8px; }
+[data-trong='gv'] .tdt .tdt-bang td { padding: 12px 16px; }
+[data-trong='gv'] .tdt .tdt-ten { color: var(--tr-chu); }
+@media (max-width: 900px) and (max-height: 520px) {
+  [data-trong='gv'] .tdt .tdt-h1 { font-size: 22px; }
+  [data-trong='gv'] .tdt .tdt-the-dau { padding: 12px 16px 8px; }
+  [data-trong='gv'] .tdt .tdt-bang td { padding: 8px 10px; }
+  [data-trong='gv'] .tdt .tdt-bang th { padding: 0 2px; }
+}
+@media (max-width: 600px) {
+  [data-trong='gv'] .tdt .tdt-h1 { font-size: 22px; }
+  [data-trong='gv'] .tdt .tdt-the-dau { padding: 14px 16px 10px; }
+}

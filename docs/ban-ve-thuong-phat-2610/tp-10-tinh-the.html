@@ -1,0 +1,112 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Tinh thể» (kiếm / tiêu) · «Bình giữ chuỗi» 50 · «Cược chuỗi» 50 → 100, mỗi lúc 1 lượt, đứt chuỗi (kể cả dùng bình) mất 50 ·
+     «Phạt — Thăng hoa» (10%, tối thiểu 5, tối đa 50) · mục «Ghép với hiện trạng»: tinh thể là tiền DUY NHẤT (gộp «vàng» cũ), cửa hàng phụ kiện cho thú vẫn giữ.
+     Số liệu giả lập: số dư 245; đang mang 1/2 bình; cược đặt Thứ Tư 28/10 ⇒ hôm nay Thứ Sáu 30/10 là ngày 3/7.
+     Hiệu ứng: ô ngày cược mới bật (?hu=cuoc, mặc định) · D1 mua bình: 50 tinh thể rời bộ đếm, bình đầy (?hu=mua) · H4 cược thua: đồng xu tinh thể nứt đôi (?hu=cuoc-thua). -->
+<title>HS · Thưởng phạt · 10 Cửa hàng tinh thể</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="mot-trang.css"><link rel="stylesheet" href="duo-app.css"><link rel="stylesheet" href="dm-dep.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.so-du{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:24px;background:linear-gradient(135deg,var(--tt),color-mix(in srgb,var(--tt) 60%,var(--tin)));color:#fff;box-shadow:0 14px 28px -14px color-mix(in srgb,var(--tt) 70%,transparent)}
+.so-du .tp-dv{width:54px;height:54px}
+.so-du .tp-dv .a{fill:#fff;opacity:.95}.so-du .tp-dv .b{fill:var(--tt);opacity:.25}.so-du .tp-dv .c{fill:var(--tt);opacity:.35}
+.so-du b{display:block;font-size:40px;font-weight:900;line-height:1}
+.so-du span{font-size:14.5px;font-weight:700;opacity:.92}
+.mon{display:flex;align-items:flex-start;gap:14px}
+.mon .hinh{width:56px;flex:none;display:grid;place-items:center}
+.mon .hinh .tp-binh{width:46px}
+.mon .giua{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.mon .giua>b{font-size:17px}
+.mon .giua>span{font-size:14px;color:var(--chu-2);line-height:1.45}
+.mon-chan{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cuoc7{display:flex;gap:6px}
+.cuoc7 i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--mat-3);font-size:12px;font-weight:900;font-style:normal;color:var(--chu-3)}
+.cuoc7 i.x{background:var(--chu-y);color:#fff}
+.cuoc7 i.nay{outline:3px solid var(--chu-y);outline-offset:2px}
+.chip-tt{display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:0 10px;border-radius:999px;background:var(--tt-nhat);color:var(--tt-chu);font-size:13px;font-weight:900}
+.thang-hoa{background:linear-gradient(160deg,var(--tin-nhat),var(--mat))}
+.thang-hoa .hang-th{display:flex;gap:12px;align-items:flex-start}
+.thang-hoa .tp-o{background:var(--tin)}
+.kiem{display:flex;flex-direction:column}
+.kiem div{display:flex;align-items:center;gap:10px;min-height:38px;border-top:1px solid var(--vien);font-size:14px}
+.kiem div:first-child{border-top:0}
+.kiem div span{flex:1;min-width:0;color:var(--chu-2)}
+.kiem div b{color:var(--tt-chu);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.xu{position:relative;display:grid;place-items:center;width:56px;height:56px}
+.xu .tp-dv{width:46px;height:46px}
+</style></head>
+<body class="da dm tp" data-app="hs" data-nav="duo" data-tab="luyen-tap" data-menu="phai" data-ai="menu" data-diem-danh="khong" data-hu-mac="cuoc">
+<header class="da-tren" data-lua="12" data-nt="147" data-tt="245" data-bai="3/4"></header>
+<div class="dm-khung mot">
+<main class="da-vo tp-rong">
+  <!-- GỌN HƠN: một đồng tiền duy nhất; cửa hàng còn 3 món (bình, cược, phụ kiện cho thú); luật Thăng hoa và cách kiếm gom bên cột phải. -->
+  <div class="tp-luoi2">
+    <div class="c">
+      <div class="so-du"><i data-tp="tt"></i><div><b id="so-du">245</b><span>tinh thể của em</span></div></div>
+      <section class="tp-the" aria-label="Bình giữ chuỗi">
+        <div class="mon"><span class="hinh"><span data-binh="day" id="binh"></span></span>
+          <div class="giua"><b>Bình giữ chuỗi</b><span>Lỡ một ngày, bình tự đỡ để chuỗi không tắt. Em đang mang 1/2 bình.</span></div></div>
+        <span class="duo-nut mau-tt" id="mua">Mua 1 bình · 50 tinh thể</span>
+      </section>
+      <section class="tp-the" aria-label="Cược chuỗi">
+        <div class="mon"><span class="hinh xu" id="xu"><i data-tp="tt"></i></span>
+          <div class="giua"><div class="mon-chan"><b style="font-size:17px">Cược chuỗi</b><span class="chip-tt">đã đặt 50 <i data-tp="tt"></i></span></div>
+            <span>Đang cược · ngày 3/7. Giữ chuỗi thêm 4 ngày nữa, em nhận về 100 tinh thể.</span>
+            <div class="cuoc7" aria-label="Ngày 3/7"><i class="x">1</i><i class="x">2</i><i class="x nay" id="ngay3">3</i><i>4</i><i>5</i><i>6</i><i>7</i></div>
+            <span style="font-size:13px">Đứt chuỗi trong 7 ngày (kể cả dùng bình) thì mất 50 đã cược. Mỗi lúc chỉ cược 1 lượt.</span></div></div>
+      </section>
+      <section class="tp-the" aria-label="Phụ kiện cho thú">
+        <div class="mon"><span class="hinh"><span class="tp-o sao" style="width:52px;height:52px"><i data-i="sparkles"></i></span></span>
+          <div class="giua"><b>Phụ kiện cho thú</b><span>Mũ, áo, kính cho thú của em ở Đảo thần thú. Vẫn mua bằng tinh thể như trước.</span></div></div>
+        <span class="tp-nut">Xem phụ kiện<i data-i="chevron" class="nho"></i></span>
+      </section>
+    </div>
+    <div class="c">
+      <section class="tp-the thang-hoa" aria-label="Thăng hoa">
+        <div class="hang-th"><span class="tp-o"><i data-i="flask"></i></span><div><h2 style="margin:0 0 4px;font-size:17px;font-weight:900">Thăng hoa là gì?</h2>
+          <p class="tp-phu" style="font-size:14px">Như iodine rắn hoá hơi khi đun: <b>2 ngày liền</b> em không xong bài nào và không có bình giữ chuỗi thì <b>10% tinh thể</b> bay hơi mất (ít nhất 5, nhiều nhất 50).</p></div></div>
+        <p class="tp-phu" style="font-size:13.5px">Mang sẵn 1 bình giữ chuỗi là tinh thể không thăng hoa.</p>
+      </section>
+      <section class="tp-the" aria-label="Cách kiếm tinh thể">
+        <h2>Cách kiếm tinh thể</h2>
+        <div class="kiem">
+          <div><span>Mỗi nhiệm vụ ngày</span><b>+5 – 10 <i data-tp="tt"></i></b></div>
+          <div><span>Rương ngày (đủ 3 nhiệm vụ)</span><b>+15 <i data-tp="tt"></i></b></div>
+          <div><span>Đạt mục tiêu ngày</span><b>+5 <i data-tp="tt"></i></b></div>
+          <div><span>Mốc chuỗi 7 / 30 / 100 ngày</span><b>+10 / 30 / 100 <i data-tp="tt"></i></b></div>
+          <div><span>Lên hạng giải tuần</span><b>+20 – 60 <i data-tp="tt"></i></b></div>
+          <div><span>Thử thách Kim cương</span><b>+40 <i data-tp="tt"></i></b></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('cuoc', async () => {
+  const n = document.getElementById('ngay3')
+  TP.a(n, [{ transform: 'scale(0)' }, { transform: 'scale(1.3)' }, { transform: 'none' }], 450, { delay: 300 })
+  setTimeout(() => TP.hat(n, 0, { n: 8, r: 40, co: 7, mau: ['var(--chu-y)', 'var(--sao)'] }), 600)
+})
+TP.dk('mua', async () => {
+  // D1 ngược: 50 tinh thể rời bộ đếm bay vào bình, bình đầy, số dư giảm
+  const dem = document.getElementById('dem-tt'), sd = document.getElementById('so-du'), binh = document.getElementById('binh')
+  TP.phanHoi('mua')
+  await TP.bay(dem.parentElement, binh, { n: 6, d: 650, dem: (p) => { const v = Math.round(245 - 50 * p); dem.textContent = v; sd.textContent = v } })
+  TP.a(binh, [{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'none' }], 400)
+  TP.hat(binh, 0, { n: 10, r: 50, tron: true, mau: ['var(--bang)', '#fff'] })
+})
+TP.dk('cuoc-thua', async () => {
+  // H4: đồng xu tinh thể nứt đôi, hai nửa rơi tách ra
+  const xu = document.getElementById('xu'), r = xu.getBoundingClientRect(), L = TP.lop()
+  TP.phanHoi('cuocThua')
+  const nua = (trai) => { const d = document.createElement('i'); d.className = 'tp-hat gem'; d.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;width:46px;height:46px;margin:-23px 0 0 -23px;clip-path:inset(0 ${trai ? 50 : 0}% 0 ${trai ? 0 : 50}%)`; d.innerHTML = TP.tt(); L.append(d); return d }
+  const a = nua(true), b = nua(false)
+  const an = TP.a(xu.firstElementChild, [{ opacity: 1 }, { opacity: 0 }], 60, { fill: 'forwards' })
+  const k = (dx, rot) => [{ transform: 'none' }, { transform: `translateX(${dx * 0.1}px) rotate(${rot * 0.1}deg)`, offset: 0.3 }, { transform: `translate(${dx}px,46px) rotate(${rot}deg)`, opacity: 0 }]
+  a.animate(k(-26, -40), { duration: 700, easing: 'cubic-bezier(.5,0,.8,.6)', fill: 'forwards' }).onfinish = () => a.remove()
+  b.animate(k(26, 40), { duration: 700, easing: 'cubic-bezier(.5,0,.8,.6)', fill: 'forwards' }).onfinish = () => { b.remove(); an && an.cancel(); TP.a(xu.firstElementChild, [{ opacity: 0 }, { opacity: 1 }], 300) }
+  setTimeout(() => TP.hat(xu, 0, { n: 6, r: 30, co: 6, mau: ['var(--tt)', 'var(--chu-3)'] }), 200)
+})
+</script>
+</body></html>

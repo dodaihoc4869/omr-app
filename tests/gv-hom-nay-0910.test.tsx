@@ -193,7 +193,8 @@ describe('khung 2.0 · 5 mục (bản vẽ tối giản thầy chốt 09/10)', (
   it('thanh bên: Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + Cài đặt ở đáy; không nút riêng "Mở ca kiểm tra"', () => {
     render(<ThanhBenTrai />)
     expect([...document.querySelectorAll('.ben-trai-danh-sach .ben-trai-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Hôm nay', 'Hành trình', 'Ca kiểm tra', 'Học sinh', 'Kho đề'])
-    expect([...document.querySelectorAll('.ben-trai-cuoi .ben-trai-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên, trên Cài đặt.
+    expect([...document.querySelectorAll('.ben-trai-cuoi .ben-trai-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Thi đua tuần', 'Cài đặt'])
     expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
   })
@@ -205,10 +206,13 @@ describe('khung 2.0 · 5 mục (bản vẽ tối giản thầy chốt 09/10)', (
 
   it('App: mã màn `tongquan` dựng Hôm nay; Ca kiểm tra 2.0 có nút "Mở ca kiểm tra" ở đầu màn; mảnh mới ngoài precache', () => {
     const app = readFileSync(resolve(__dirname, '../src/App.tsx'), 'utf8')
-    expect(app).toContain("screen === 'tongquan' && <GvHomNayScreen />")
+    expect(app).toContain('tongquan: GvHomNayScreen') // gộp 26/10: bảng MAN_DON thay chuỗi `screen === … &&`
+    expect(app).toContain('{ManDon && <ManDon />}')
     expect(app).toContain("lazy(() => import('./screens/GvHomNayScreen'))")
     expect(app).toMatch(/className="ca-hoa2-mo-ca" onClick=\{\(\) => setScreen\('examsetup'\)\}/)
-    expect(app).toContain("tongquan: 'Hôm nay', chiendich: 'Hành trình'")
+    // gộp 26/10: tên màn 2.0 cho câu báo lỗi lấy từ mục thanh bên 2.0 (Hôm nay, Hành trình, Kho đề…)
+    expect(app).toContain('tenMucCua(MUC_HOA2_CHINH, s)')
+    expect(readFileSync(resolve(__dirname, '../src/components/ThanhBenTrai.tsx'), 'utf8')).toMatch(/id: 'tongquan', ten: 'Hôm nay'[\s\S]*id: 'chiendich', ten: 'Hành trình'/)
     const vite = readFileSync(resolve(__dirname, '../vite.config.ts'), 'utf8')
     for (const manh of ['GvHomNayScreen', 'TheCanThayChua', 'TheBaiDaDay']) expect(vite).toContain(manh)
   })

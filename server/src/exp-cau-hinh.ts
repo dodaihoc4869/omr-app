@@ -96,6 +96,32 @@ export const KHIEN_MAT_KHI_VANG_NGAY = 7
 export const KHIEN_BAO_VANG_NGAY = 5
 
 /**
+ * NGUYÊN TỬ (= EXP, hệ thưởng phạt kiểu Duolingo, thầy CHỐT 26/10 — DAC-TA-THUONG-PHAT-2610.md §4.1, LUAT-THUONG-PHAT.md). MỘT nguồn số cho:
+ *   · từng câu của BÀI học (lượt `hocTap` của game-v2: Hành trình / Gói 7) — hàm thuần `nguyenTuCau` (exp-hoc-tap.ts);
+ *   · phần "sai nghiêm túc / có hỗ trợ / không được tính" của câu học tập khác trong `tinhExp`.
+ * Câu KHÔNG được tính (Mức làm Bấm vội / treo máy / cố tình treo máy) = 0 và đứt chuỗi đúng. Tự sửa (nguồn `NGUON_TU_SUA`) = 0, kể cả các khoản
+ * "câu đúng đầu ngày", "lên bậc", "khắc phục" (giữ quyết định 20/10 của thầy).
+ */
+export const NT_DUNG_TU_LAM = 10
+export const NT_DUNG_HO_TRO = 5
+export const NT_SAI_NGHIEM_TUC = 2
+export const NT_CAU_KHO = 5
+/** Chuỗi đúng liền ≥ 3 ⇒ +2 mỗi câu; ≥ 5 ⇒ +5 mỗi câu (thay cho +2, nhãn «Phản ứng dây chuyền!»). */
+export const NT_CHUOI_3 = 2
+export const NT_CHUOI_5 = 5
+/** Vòng Làm lại đúng (A3 của Code app 4: cờ `lamLaiVong` trên ref câu). */
+export const NT_LAM_LAI_DUNG = 3
+/** Bài hoàn hảo: mọi câu đúng tự làm, được tính, bài có ít nhất `NT_HOAN_HAO_TOI_THIEU_CAU` câu. */
+export const NT_HOAN_HAO = 20
+export const NT_HOAN_HAO_TOI_THIEU_CAU = 3
+/** Kiểm tra cá nhân / ca thi hoàn thành: cố định, KHÔNG phụ thuộc điểm. */
+export const NT_HOAN_THANH_KT = 30
+/** Nguồn sổ là TỰ SỬA lỗi (chữa câu gọn, vòng chữa câu sai, Hỏi thầy kiểm chứng): 0 nguyên tử mọi đường. */
+export const NGUON_TU_SUA: readonly string[] = ['chua_loi']
+/** Tiền tố `exp_so.ghi_chu` của khoản câu đúng CÓ HỖ TRỢ (cả câu làm lại) — bảng giải tuần (tác tử B) nhận ra bằng chuỗi này. GIỮ NGUYÊN chữ. */
+export const GHI_CHU_DUNG_HO_TRO = 'Câu đúng có hỗ trợ'
+
+/**
  * Mốc chuyển tiếp: sự kiện có `luc` TRƯỚC mốc này giữ như đã trả theo luật cũ (KHÔNG tính lại EXP quá khứ). Đặt lúc phát hành EXP mới
  * (ISO). `null` = chưa phát hành (không khoản nào được sinh).
  */

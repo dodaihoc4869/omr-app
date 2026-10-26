@@ -91,9 +91,9 @@ describe('thưởng theo việc + khoá idempotent', () => {
     expect(theoLoai(r.khoan, 'len_bac').map((k) => [k.khoa, k.exp]).sort()).toEqual([[`bac|A|${NGAY}`, 6], [`bac|B|${NGAY}`, 6]])
     expect(theoLoai(r.khoan, 'khac_phuc').map((k) => [k.khoa, k.exp])).toEqual([['kp|A|1', 30], ['kp|A|2', 30]])
   })
-  it('ca thi theo điểm: round(điểm) × 3, kẹp 0..10', () => {
+  it('SỬA CÓ CHỦ Ý 26/10 (thưởng phạt): ca thi hoàn thành = +30 cố định, không phụ thuộc điểm', () => {
     const r = tinhExp(vao({ diemCa: [{ maCa: 'C1', lanThu: 1, diem: 7.5, luc: luc(1) }, { maCa: 'C2', lanThu: 1, diem: 12, luc: luc(2) }, { maCa: 'C3', lanThu: 2, diem: -1, luc: luc(3) }, { maCa: 'C4', lanThu: 1, diem: 6.4, luc: luc(4) }] }))
-    expect(r.khoan.map((k) => [k.khoa, k.exp])).toEqual([['diem|C1|1', 24], ['diem|C2|1', 30], ['diem|C4|1', 18]]) // điểm âm ⇒ 0 EXP nên không có khoản
+    expect(r.khoan.map((k) => [k.khoa, k.exp])).toEqual([['diem|C1|1', 30], ['diem|C2|1', 30], ['diem|C3|2', 30], ['diem|C4|1', 30]])
   })
   it('KHOÁ ĐÃ CÓ thì không sinh lại; gọi lần hai với các khoá vừa sinh ⇒ rỗng (nạp lại sổ không cộng trùng)', () => {
     const v = vao({
@@ -213,14 +213,15 @@ describe('MỘT NGÀY MẪU (bảng để 0.Planer đối chiếu với con số
     for (const q of ['S1', 'S2', 'S3']) suKien.push(sk(q, 0)) // 3 câu sai (12 câu làm, 9 đúng)
     return vao({ suKien, metaCau: meta, mucTieuCau: 10, lenBac: ['P1-0', 'P2-0'], loXong: [{ maBtvn: 'B1', chiSo: 0, dungNhip: true, luc: luc(40) }], datNgay: { chuoi: 5, luc: luc(50) } })
   }
-  it('em chăm: 9 câu đúng = 33 + lô đúng nhịp 10 + 2 lên bậc 12 + đạt ngày 20 + chuỗi 5 ngày 10 = 85 EXP, +1 mảnh khiên', () => {
+  it('em chăm: 9 câu đúng = 33 + 3 câu sai nghiêm túc 6 (SỬA CÓ CHỦ Ý 26/10) + lô đúng nhịp 10 + 2 lên bậc 12 + đạt ngày 20 + chuỗi 5 ngày 10 = 91 EXP, +1 mảnh khiên', () => {
     const r = tinhExp(cham())
     expect(tong(theoLoai(r.khoan, 'cau'))).toBe(5 * 3 + 2 * 5 + 2 * 4) // 33
     expect(tong(theoLoai(r.khoan, 'lo'))).toBe(10)
     expect(tong(theoLoai(r.khoan, 'len_bac'))).toBe(12)
     expect(tong(theoLoai(r.khoan, 'dat_ngay'))).toBe(20)
     expect(tong(theoLoai(r.khoan, 'chuoi'))).toBe(10)
-    expect(tong(r.khoan)).toBe(85)
+    expect(tong(theoLoai(r.khoan, 'cau_sai'))).toBe(6)
+    expect(tong(r.khoan)).toBe(91)
     expect(r.manh.map((m) => m.so)).toEqual([1])
   })
   it('em chỉ vào game vài câu: 0 EXP câu theo bảng này (game giữ 20/40/40 theo mastery, vào ví như cũ, không thưởng đôi)', () => {

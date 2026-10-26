@@ -17,7 +17,8 @@ import { BANG_CAU_HINH, docDongMua, nhoTheoLuot } from './doc-d1-theo-luot'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
 import { EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, bangGiaExp } from './exp-cau-hinh'
-import { congManh, NGUON_EXP_CAU, tinhExp, type KhoanExp, type KhoanManh, type MetaCauExp, type VaoTinhExp } from './exp-hoc-tap'
+import { cauKhongDuocTinhTuSo } from './thuong-luat'
+import { congManh, NGUON_EXP_CAU, TIEN_TO_KTCN, tinhExp, type KhoanExp, type KhoanManh, type MetaCauExp, type VaoTinhExp } from './exp-hoc-tap'
 import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung, type DaCong, type HoSoGameExp } from './exp-ho-so-game'
 import { NGAN_SACH_SAN, TOI_THIEU_CAU_SAN } from './ho-so-cau-hinh'
 import type { SuKienDoc } from './ho-so-nam-kt'
@@ -92,12 +93,16 @@ export function mocExpCuaEm(cfg: CauHinhExp, sbd: string, nowMs: number): string
 interface DongSo extends SuKienDoc {
   maNguon: string
   lan: number
+  /** (26/10 thưởng phạt) lượt có hỗ trợ (`assistance = 'assisted'`). */
+  hoTro?: boolean
+  /** (26/10 thưởng phạt) câu KHÔNG được tính theo Mức làm (Bấm vội / treo máy) — từ cột `giay` + `raw_json.doc`. */
+  khongTinh?: boolean
 }
 
 async function docSo(env: Env, sbd: string): Promise<DongSo[]> {
   const r = await an(
     () => env.DB.prepare(
-      `SELECT khoa, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de FROM su_kien_hoc WHERE sbd = ? ORDER BY luc, khoa`,
+      `SELECT khoa, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, assistance, json_extract(raw_json, '$.doc') AS doc FROM su_kien_hoc WHERE sbd = ? ORDER BY luc, khoa`,
     ).bind(sbd).all<Record<string, unknown>>(),
     null,
   )
@@ -106,6 +111,8 @@ async function docSo(env: Env, sbd: string): Promise<DongSo[]> {
     ketQua: x.ket_qua === null || x.ket_qua === undefined ? null : Number(x.ket_qua) === 1 ? 1 : 0,
     giay: x.giay === null || x.giay === undefined ? null : Number(x.giay), luc: String(x.luc), ngayVn: String(x.ngay_vn),
     maDang: x.ma_dang ? String(x.ma_dang) : null, chuyenDe: String(x.chuyen_de ?? ''),
+    ...(x.assistance === 'assisted' ? { hoTro: true } : {}),
+    ...(x.doc && cauKhongDuocTinhTuSo(x.giay, x.doc, x.ket_qua === null || x.ket_qua === undefined ? null : Number(x.ket_qua) === 1) ? { khongTinh: true } : {}),
   }))
 }
 
@@ -365,6 +372,8 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   const cacNgayDau = [homNay]
   const pSo = docSo(env, sbd)
   const pLuot = docLuotCongBo(env, sbd)
+  // THƯỞNG PHẠT 26/10: kiểm tra cá nhân đã nộp sau mốc ⇒ +NT_HOAN_THANH_KT cố định (không phụ thuộc điểm), khoá `diem|ktcn:<id>|1` (loại 'diem_ca' như ca thi).
+  const pKt = an(() => env.DB.prepare('SELECT id, nop_luc FROM kiem_tra_ca_nhan WHERE sbd = ? AND nop_luc IS NOT NULL AND nop_luc >= ?').bind(sbd, ms(tu)).all<{ id: string; nop_luc: number }>(), null)
   const pKhoaCu = an(
     () => env.DB.prepare(
       `SELECT khoa, loai, ngay_vn FROM exp_so WHERE sbd = ? AND (ngay_vn IN (SELECT value FROM json_each(?)) OR loai IN ('lo','btvn','mom','khac_phuc','len_bang','diem_ca'))`,
@@ -513,6 +522,7 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   const momCoTraLoi = new Set(so.filter((e) => e.nguon === 'mom' && e.ketQua !== null).map((e) => e.maNguon))
   const momXong = (momRaw?.results ?? []).filter((x) => momCoTraLoi.has(String(x.id))).map((x) => ({ id: String(x.id), luc: String(x.submitted_at) }))
   const diemCa = luot.filter((l) => l.nopLuc >= tu && Number.isFinite(l.diem)).map((l) => ({ maCa: l.maCa, lanThu: l.lanThu, diem: l.diem, luc: l.nopLuc }))
+  for (const x of (await pKt)?.results ?? []) if (Number.isFinite(Number(x.nop_luc))) diemCa.push({ maCa: `${TIEN_TO_KTCN}${x.id}`, lanThu: 1, diem: 0, luc: new Date(Number(x.nop_luc)).toISOString() })
 
   const tuNgay = tuNgayDoc
   const daTraCu = pDaTraCu ? await pDaTraCu : new Set<string>()
@@ -534,7 +544,7 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   const metaTatCa = await pMeta
   for (const ngay of [...ngayCanTinh].sort()) {
     const chinh = ngay === homNay
-    let suKien = so.filter((e) => e.ngayVn === ngay && e.luc >= tu).map((e) => ({ khoa: e.khoa, nguon: e.nguon, maNguon: e.maNguon, qid: e.qid, lan: e.lan, ketQua: e.ketQua, luc: e.luc }))
+    let suKien = so.filter((e) => e.ngayVn === ngay && e.luc >= tu).map((e) => ({ khoa: e.khoa, nguon: e.nguon, maNguon: e.maNguon, qid: e.qid, lan: e.lan, ketQua: e.ketQua, luc: e.luc, ...(e.hoTro ? { hoTro: true } : {}), ...(e.khongTinh ? { khongTinh: true } : {}) }))
     if (ngay === tuNgay && daTraCu.size > 0) suKien = suKien.filter((e) => !(NGUON_EXP_CAU.includes(e.nguon) && daTraCu.has(e.qid)))
     const ct = chuyenTrangThaiTrongNgay(soDoc, tra, ngay, tu)
     const vao: VaoTinhExp = {
@@ -553,7 +563,7 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   // Ca thi CÔNG BỐ MUỘN (nộp ở ngày trước, công bố hôm nay): khoản trao bù ghi rõ để em hiểu vì sao có EXP của bài cũ.
   const tenCa = new Map(luot.map((l) => [l.maCa, l.tenCa || l.maCa]))
   for (const k of cacKhoan) {
-    if (k.loai === 'diem_ca' && k.maNguon && ngayVn(ms(k.luc)) !== k.ngay) k.ghiChu = `Ca ${tenCa.get(k.maNguon) ?? k.maNguon} vừa công bố. ${k.ghiChu}`
+    if (k.loai === 'diem_ca' && k.maNguon && !k.maNguon.startsWith(TIEN_TO_KTCN) && ngayVn(ms(k.luc)) !== k.ngay) k.ghiChu = `Ca ${tenCa.get(k.maNguon) ?? k.maNguon} vừa công bố. ${k.ghiChu}`
     else if (k.loai === 'cau' && k.ngay !== homNay && k.maNguon && tenCa.has(k.maNguon)) k.ghiChu = `${k.ghiChu} (ca ${tenCa.get(k.maNguon)} vừa công bố)`
   }
 
