@@ -72,7 +72,6 @@ import { dungM3 } from '../components/m3'
 import NutDiuMat from '../components/NutDiuMat'
 import { useDiuMat } from '../lib/diu-mat'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
-import { coGiaoDienTrong, napTrongLamBai } from '../styles/nap-trong-lam-bai' // «Trong» 26/10: tờ trình bày nạp riêng khi giao diện bật
 import { DaiBaoNheM3, DaiCanhBaoRoiM3, KhungKhoaM3 } from './ThongBaoThiM3'
 import { ngheHanMoi } from '../lib/may-chu-moi'
 import { chuBaoThemGio, hanMoiNeuKeoDai, MS_HIEN_BAO_THEM_GIO } from '../lib/them-phut'
@@ -105,6 +104,8 @@ import { soOHopLe } from '../lib/so-o-tra-loi-ngan'
 import type { BoDoTreoMayTrang } from '../lib/do-treo-may-thi'
 import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
+// «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../styles/trong-lam-bai.css').catch(() => {})
 // Mảnh bố cục NGANG (01/10, thầy: "xoay ngang không hoạt động"): trước đây nạp lười NGOÀI precache, nạp hỏng một lần (mạng yếu, hay máy còn
 // bản cũ mà mảnh cũ đã bị thay sau một lượt phát hành) là React.lazy nhớ luôn lỗi ⇒ xoay bao nhiêu cũng ở bố cục dọc. Nay: mảnh có trong precache
 // (vite.config.ts), nạp thử lại một lần, và hỏng thì DỰNG LẠI lazy mới để lần xoay sau thử tiếp.
@@ -4092,7 +4093,6 @@ class BoLuiDoc extends Component<{ duPhong: React.ReactNode; children: React.Rea
 // thứ đọc token — chính màn này, DesignSystem, TheCau (`.m3 .the-cau`) — tự mặc bảng màu M3 sáng/tối; KHÔNG dòng logic nào đổi.
 // Đường `/` (app giáo viên) và vitest mặc định: `dungM3()` = false ⇒ y hệt trước.
 function Trang({ children, className = '', diuMat = false }: { children: React.ReactNode; className?: string; diuMat?: boolean }) {
-  napTrongLamBai()
   return (
     <div className={`min-h-screen ${dungM3() ? 'm3 ' : ''}${className}`} data-diu-mat={diuMat ? 'bat' : undefined} style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
       {children}
@@ -4103,6 +4103,11 @@ function Trang({ children, className = '', diuMat = false }: { children: React.R
 /** Bốn lý do khoá của BAOMATCATHI — tách khỏi hai lý do rời app cũ. */
 function laLyDoMoi(v: string | undefined): boolean {
   return v === 'cua_so_noi' || v === 'thu_nho_man' || v === 'thoat_toan_man' || v === 'dau_vet_chup'
+}
+
+/** Giao diện «Trong» (26/10) đang bật — main.tsx gắn <html data-trong> TRƯỚC khi vẽ, cố định suốt phiên. CHỈ quyết định trình bày. */
+function coGiaoDienTrong(): boolean {
+  return typeof document !== 'undefined' && !!document.documentElement.dataset.trong
 }
 
 function HopThoai({ children }: { children: React.ReactNode }) {

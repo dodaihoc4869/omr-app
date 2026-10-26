@@ -12,6 +12,7 @@
 //   &toi=1                       chế độ tối
 //   npx vite build --config scripts/chup-trong-lam-bai/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/chup-trong-lam-bai/chup.mjs <thư mục tạm> <thư mục ảnh>
+import './bat-trong' // phải đứng ĐẦU: gắn data-trong trước khi mô-đun màn chạy
 import './../../src/components/m3/m3-tuong-thich.css'
 import './../../src/components/bang-nhiem-vu/m3-theme.css'
 import './../../src/components/m3/m3.css'
@@ -58,6 +59,9 @@ import LamCauOn from '../../src/components/bang-nhiem-vu/LamCauOn'
 import LuyenDeChuan from '../../src/components/LuyenDeChuan'
 import LuyenDeCauTruc from '../../src/components/tu-luyen/LuyenDeCauTruc'
 import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen'
+import ManChuaCauSai from '../../src/components/chua-cau-sai/ManChuaCauSai'
+import ManKiemTraCaNhan from '../../src/components/hoc-tap/ManKiemTraCaNhan'
+import type { TomTatKiemTra } from '../../src/lib/kiem-tra-ca-nhan'
 import CauDaLam from '../../src/components/hoa2/CauDaLam'
 import ExamTakeScreen from '../../src/screens/ExamTakeScreen'
 import KetQuaSauNop, { type OCauKq } from '../../src/components/xem-diem/KetQuaSauNop'
@@ -71,7 +75,6 @@ const man = thamSo.get('man') ?? 'lam13'
 const noop = () => {}
 const now = Date.now()
 if (thamSo.get('toi') === '1') document.documentElement.classList.add('dark')
-if (thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = 'hs'
 
 // ───────────────────────────── bộ câu giả dùng chung (Hoá 12, soạn cho ảnh chụp) ─────────────────────────────
 const TN = [
@@ -156,6 +159,58 @@ if (man === 'tuluyen-lam' || man === 'cdl') {
   })
 }
 
+// ───────────────────────────── Sửa câu sai (ManChuaCauSai → ChuaGon, chữa câu gọn 25/10): `?man=chua` (đang làm lại) ─────────────────────────────
+if (man === 'chua') {
+  bocFetch((p) => {
+    if (p.endsWith('/hs/chua-cau-sai/mo-dot')) return { ok: true, dotId: 'd1', trangThai: 'dang_chua', coHocLieu: false, revision: 1, tienDo: { soBuocDaQua: 0, soBuocCanKiem: 0 } }
+    if (p.endsWith('/hs/chua-cau-sai/gon-mo')) return { ok: true, dotId: 'd1', lan: 1, ban: 'b1', tuSuaNeuDung: true, de: { qid: 'H12-1', phan: 'I', text: CT.de.text, choices: CT.de.choices, tenDang: 'Thuỷ phân ester' } }
+    if (p.endsWith('/hs/chua-cau-sai/gon-nop')) return { ok: true, dotId: 'd1', dung: true, ket: 'tu_sua', chiTiet: { ok: true, cau: [CT] } }
+    if (p.endsWith('/hoa2-cau-chi-tiet')) return { ok: true, cau: [CT] }
+    if (p.includes('/hs/chua-cau-sai/')) return { ok: true }
+    return null
+  })
+}
+
+// ───────────────────────────── Kiểm tra ôn tập (ManKiemTraCaNhan) — máy chủ giả chép scripts/chup-ktcn-dot20: `?man=ktcn` · `?man=ktcn-ket` ─────────────
+// Giờ máy chủ giả: 12:00 Thứ Bảy 17/10/2026 (ngày kiểm tra) hoặc Thứ Ba 13/10 (ngày thường).
+const NGAY_KT = Date.parse('2026-10-17T05:00:00Z'), NGAY_THUONG = Date.parse('2026-10-13T05:00:00Z')
+const kt = (o: Partial<TomTatKiemTra> = {}): TomTatKiemTra => {
+  const x = { id: 'kt-gia', ngay: '2026-10-17', moLuc: Date.parse('2026-10-16T17:00:00Z'), serverNow: NGAY_KT, trangThai: 'can_lam', homNay: true, tong: 18, daTra: 5, soChang: 3, phut: 40, soBai: 3, tongKienThuc: 60, phuDe: 60, nguonDayDu: true, lyDo: 'Kiểm chứng những phần em đang luyện thêm', thieuNguon: 0, diem: null, nopLuc: null, ...o } as TomTatKiemTra
+  return { ...x, hanLuc: x.moLuc + 86_400_000, con: x.tong - x.daTra }
+}
+const THE: Record<string, TomTatKiemTra> = {
+  can_lam: kt(),
+  cho_nguon: kt({ trangThai: 'cho_nguon', homNay: false, serverNow: NGAY_THUONG, phuDe: 42, thieuNguon: 18, nguonDayDu: false, daTra: 0 }),
+  sap_den: kt({ trangThai: 'sap_den', homNay: false, serverNow: NGAY_THUONG, daTra: 0 }),
+  da_nop: kt({ trangThai: 'da_nop', daTra: 18, diem: 8.25, nopLuc: Date.parse('2026-10-17T08:42:00Z') }),
+  het_han: kt({ trangThai: 'het_han', daTra: 7, diem: 3.75, nopLuc: Date.parse('2026-10-17T17:00:00Z') }),
+}
+const C = (qid: string, text: string, choices: string[]) => ({ qid, maDe: 'DH-12-C3-B8', version: 'v1', group: qid, phan: 'I', text, choices, ideas: [], hinhAnh: [], dang: null, tenDang: '', mucDo: 'NB', sao: 0, kienThuc: [] })
+const CAU = [
+  C('q1', 'Chất nào sau đây là amine bậc một?', ['CH3NH2', 'CH3NHCH3', '(CH3)3N', 'CH3NHC2H5']),
+  C('q2', 'Dung dịch chất nào sau đây làm quỳ tím hoá xanh?', ['C6H5NH2', 'CH3NH2', 'H2NCH2COOH', 'C2H5OH']),
+  C('q3', 'Chất nào sau đây là amine bậc hai?', ['CH3NH2', 'CH3NHCH3', '(CH3)3N', 'C6H5NH2']),
+  C('q4', 'Aniline phản ứng với nước bromine tạo kết tủa màu gì?', ['Trắng', 'Vàng', 'Xanh lam', 'Đỏ nâu']),
+  C('q5', 'Số đồng phân amine bậc một có công thức C3H9N là', ['1', '2', '3', '4']),
+  C('q6', 'Phát biểu nào sau đây đúng về methylamine?', ['Là chất lỏng ở điều kiện thường', 'Có mùi khai, tan tốt trong nước', 'Không làm đổi màu quỳ tím', 'Là amine thơm']),
+]
+// Máy chủ giả
+const ketQua = { chu: 'Em vững phần Ester – Lipid; phần Amine cần luyện thêm bậc amine và tính base.',
+  bai: [{ ten: 'Bài 6. Ester – Lipid', tong: 8, daKiem: 8, dungLanNay: 7 }, { ten: 'Bài 7. Carbohydrate', tong: 6, daKiem: 6, dungLanNay: 5 }, { ten: 'Bài 8. Amine', tong: 4, daKiem: 4, dungLanNay: 3 }],
+  cau: Array.from({ length: 18 }, (_, i) => ({ de: CAU[i % 6]!, tra: i === 9 ? '' : 'A', dung: ![3, 9, 15].includes(i), dapAn: 'A', loiGiai: null })) }
+const kiemMan = man === 'ktcn-ket' ? THE.da_nop! : kt({ daTra: 8 })
+const hanChay = NGAY_KT + 462_000
+const CHANG = [{ stt: 0, soCau: 6, giay: 780, han: NGAY_KT - 1_200_000, daChot: true, daTra: 6 }, { stt: 1, soCau: 6, giay: 780, han: hanChay, daChot: false, daTra: 2 }, { stt: 2, soCau: 6, giay: 840, han: null, daChot: false, daTra: 0 }]
+const json = (o: unknown) => Promise.resolve(new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } }))
+if (man.startsWith('ktcn')) window.fetch = ((url: RequestInfo | URL) => {
+  const u = String(url)
+  if (u.includes('/game-v2/hoc-tap-ktcn-trang-thai')) return json({ ok: true, kiemTra: kiemMan, chang: CHANG })
+  if (u.includes('/game-v2/hoc-tap-ktcn-start')) return json({ ok: true, kiemTra: kiemMan, revision: 3, hanChang: hanChay, daChot: false, questions: CAU, tra: { q1: 'A', q2: 'B', q3: 'B' } })
+  if (u.includes('/game-v2/hoc-tap-ktcn-ket-qua')) return json({ ok: true, kiemTra: kiemMan, ketQua })
+  if (u.includes('/game-v2/')) return json({ ok: true, kiemTra: kiemMan, revision: 4, daLuu: true })
+  return json({})
+}) as typeof fetch
+
 // ───────────────────────────── Ôn câu hôm nay (LamCauOn) trong tấm phủ M3 của cổng ─────────────────────────────
 const CAU_ON = [
   { qid: 'on1', phan: 'I' as const, text: TN[0].text, choices: TN[0].choices, tenDang: 'Thuỷ phân ester' },
@@ -205,6 +260,8 @@ const con =
   : man === 'tuluyen-lam' ? h('div', KHUNG_CON, h(ManTuLuyen, { token: 'tk', sbd: '12121212', onVe: noop }))
   : man === 'cdl' ? h('div', KHUNG_CON, h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop }))
   : man === 'thi' ? manThi()
+  : man.startsWith('ktcn') ? h('div', KHUNG_CON, h(ManKiemTraCaNhan, { token: 'gia', sbd: 'S-gia', id: 'kt-gia', onVe: noop, onCapNhat: noop }))
+  : man === 'chua' ? h('div', KHUNG_CON, h(ManChuaCauSai, { token: 'tk', qid: 'H12-1', onVe: noop }))
   : man === 'kq' || man === 'kq-cho' ? manKq(man === 'kq')
   : h(ManLam13)
 

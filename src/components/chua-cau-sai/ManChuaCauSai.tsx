@@ -29,6 +29,8 @@ import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-ti
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import '../tu-luyen/tu-luyen.css'
 import './chua-cau-sai.css'
+// «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
 export interface PropsChuaCauSai {
   token: string
   qid: string

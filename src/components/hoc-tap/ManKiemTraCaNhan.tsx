@@ -12,6 +12,8 @@ import { hoiXacNhan } from '../hop-thoai'
 import { taoKhoGio, useGiayConLai, type KhoGio } from '../../lib/dong-ho-thi'
 import './hoc-tap.css'
 import './kiem-tra-ca-nhan.css'
+// «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
 // ĐỢT 20 · MÀN KIỂM TRA ÔN TẬP theo bản vẽ docs/ban-ve-dot20 (thầy duyệt 13/10). Logic lưu/đồng hồ/chốt/khôi phục nháp GIỮ NGUYÊN (hợp đồng Codex
 // docs/hop-dong-kiem-tra-ca-nhan-1310.md); chỉ đổi trình bày: trang bài = lộ trình chặng + tách "hạn nộp cả bài" với "giờ riêng từng chặng";
 // làm chặng = đồng hồ vòng (đỏ --gap khi còn dưới 1 phút), dấu câu đã trả lời, thanh đáy cố định; máy tính có cột phải; kết quả có lọc câu.
