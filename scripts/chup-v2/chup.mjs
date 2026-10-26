@@ -289,6 +289,36 @@ const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], 
     .map(([ten, m, cho]) => [`ng-hs-${ten}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho])))
 // ═══ hết NGANG HS 26/10
 
+// ═══ KIỂM GD MỚI 26/10: dữ liệu XẤU cho màn làm chặng kiểu Duolingo (`lam13&lam=duo-xau`, gia/lam-bai-1210d.ts: đề 6 dòng, phương án 3–4 dòng, công thức
+// dài, lưới 2×2 công thức sát ngưỡng, ý Đúng/Sai dài, trả lời ngắn 6 ô, hình rộng 960px, lý do dài; `&so=lon` số hôm nay lớn; `&loi=1` máy chủ lỗi) + Gói 7
+// «Chọn cách làm» ở giao diện mới + phụ huynh «Chỉ đọc» rỗng / nhiều dữ liệu. Bộ soát scripts/soat-chu-chen + scripts/kiem-gd-moi đọc DS này. Tiền tố "kgd-".
+const K_X1 = 'tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục'
+const K_X2 = `${K_X1} » tn:^C » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const K_X3 = `${K_X2} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const K_X4 = `${K_X3} » phim:-12,75 » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const KGD_DUO = [
+  ['1-cau', ''], ['1-chon', 'lam13:tn:^B'], ['1-sai', 'lam13:tn:^B » nut:^Kiểm tra$'], ['1-dung', 'lam13:tn:^A » nut:^Kiểm tra$'],
+  ['1-loi-giai', 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Lời giải từng bước'], ['2-luoi', `lam13:${K_X1} » tn:^C`], ['2-luoi-sai', `lam13:${K_X1} » tn:^A » nut:^Kiểm tra$`],
+  ['3-ds-dang', `lam13:${K_X2} » ds:a=Đúng`], ['3-ds-sai', `lam13:${K_X2} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$`],
+  ['4-tln', `lam13:${K_X3} » phim:-12,75`], ['4-tln-sai', `lam13:${K_X3} » phim:-12,7 » nut:^Kiểm tra$`],
+  ['5-hinh', `lam13:${K_X4}`], ['5-hinh-dung', `lam13:${K_X4} » tn:^A » nut:^Kiểm tra$`], ['6-xong', `lam13:${K_X4} » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+]
+const KGD_KHO = [[390, 844, 'doc', 'light'], [390, 844, 'doc', 'dark'], [360, 640, 'doc640', 'light'], [844, 390, 'ngang', 'light'], [740, 360, 'ngang740', 'dark'],
+  [1024, 768, 'bang', 'light'], [1366, 768, 'may-tinh-1366', 'light'], [1440, 900, 'may-tinh', 'light'], [1920, 1080, 'may-tinh-1920', 'dark']]
+const DS_KGD = [
+  ...KGD_KHO.flatMap(([w, hh, k, nen]) => KGD_DUO.map(([t, viec]) => [`kgd-duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-xau', w, hh, nen, false, /Cho 12,95 gam/, viec || undefined])),
+  ...KGD_KHO.flatMap(([w, hh, k, nen]) => [
+    [`kgd-duo-so-lon-xong-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-xau&so=lon', w, hh, nen, false, /Cho 12,95 gam/, `lam13:${K_X4} » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+    [`kgd-duo-loi-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-xau&loi=1', w, hh, nen, false, /Máy chủ đang bận/],
+    [`kgd-duo-g7-chon-cach-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=g7', w, hh, nen, false, /Câu này em chọn làm thế nào/],
+    [`kgd-duo-g7-hoc-cach-giai-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=g7', w, hh, nen, false, /Câu này em chọn làm thế nào/, 'lam13:nut:^Học cách giải$'],
+    [`kgd-ph-rong-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph&mot=1&hn=chua&lt=0&cb=0&dg=khong&kt=khong&bt=khong', w, hh, nen, false, /Hôm nay/, 'pd:'],
+    [`kgd-ph-nhieu-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph&mot=1&dai=1&hn=du&nhom=cham&dg=hoc-that&kt=dang&ss=do', w, hh, nen, false, /Hôm nay/, 'pd:'],
+    [`kgd-ph-dai-canh-bao-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph&mot=1&dai=1&dg=doi-pho&nhom=luoi&kt=het', w, hh, nen, false, /Hôm nay/, 'pd:'],
+  ]),
+]
+// ═══ hết KIỂM GD MỚI 26/10
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 // ═══ PH CHỈ ĐỌC 26/10 (thay khối MỘT TRANG PH): app phụ huynh «Chỉ đọc» (`ph&mot=1`, khối cùng tên ở trang.tsx). Ảnh KHUNG NHÌN ở 3 khổ × sáng/tối cho
 // ba trạng thái: chưa làm + Lười + đối phó + thầy chưa nhận xét · đang làm (bộ gốc: Chưa đều, Học thật, cảnh báo thầy) · đủ + Chăm + học thật; thêm khổ
@@ -309,6 +339,7 @@ const DS_PH_DOC = [
   ,['62-ph-doc-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/]
 ]
 const DS = [
+  ...DS_KGD, // KIỂM GD MỚI 26/10
   ...DS_NG_GV, // NGANG GV 26/10
   ...DS_PH_DOC, // PH CHỈ ĐỌC 26/10
   ...DS_T3, // «TRONG» NHÓM 3
