@@ -392,6 +392,8 @@ export function kiemChe(che) {
       if (!f || f.contains(el) || !hopLe(f) || lon(f)) continue
       const rf = f.getBoundingClientRect()
       if (rf.height >= 0.8 * H && rf.width >= 0.25 * W) continue
+      // bỏ: menu/hộp người dùng vừa bấm mở (nút điều khiển aria-expanded="true", role menu/dialog, hoặc data-mo) — che có chủ đích
+      if (f.matches('[role="dialog"], [role="menu"], [aria-modal="true"], [data-mo]') || (f.id && document.querySelector(`[aria-controls="${CSS.escape(f.id)}"][aria-expanded="true"]`))) continue
       const k = danh(f) + '|' + danh(el)
       if (da.has(k)) return
       da.add(k)
