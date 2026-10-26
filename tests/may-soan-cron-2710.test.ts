@@ -58,7 +58,7 @@ describe('cờ', () => {
     datCo({ bat: true })
     const s = soanGia(() => tra({ ok: true, xong: false, conTro: 'DE|q1', dem: { dat: 1 }, ketQua: ketDat(1) }))
     await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: s.fn })
-    expect(s.goi[0]).toMatchObject({ tuSuaDapAn: false, choChayGioCaoDiem: true, gioiHan: 6, nganSachGiay: 25, songSong: 3, conTro: '' })
+    expect(s.goi[0]).toMatchObject({ tuSuaDapAn: false, choChayGioCaoDiem: true, gioiHan: 6, nganSachGiay: 25, songSong: 6, conTro: '' })
     expect(s.goi[0]!.chiSuaLoi).toBeUndefined()
   })
 })
