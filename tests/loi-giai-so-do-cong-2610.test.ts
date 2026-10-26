@@ -20,7 +20,7 @@ function banXuoi(): BanSoDo {
       thuaSo: [
         { so: '10^6', nghia: 'đổi tấn ra gam' },
         { so: '8/100', nghia: 'lấy phần FeS_2 trong quặng' },
-        { so: '1/120', nghia: 'đổi ra tiền nhà FeS_2 (chia M = 120)' },
+        { so: '1/120', nghia: 'số mol FeS_2 (chia M = 120)' },
         { so: '2', nghia: 'bảo toàn S: ra 2 SO_2', denDay: 'tới đây là: số mol SO_2' },
         { so: '64', nghia: 'đổi mol ra gam' },
         { so: '90/100', nghia: 'tính xuôi: nhân H/100' },
