@@ -6,6 +6,7 @@ Thầy (26/10), nguyên văn:
 - «khi chạm vào đơn vị thì được hiển thị giải thích đơn vị này có ý nghĩa gì ngắn gọn, siêu đẹp dễ hiểu để học sinh định hướng, chạm vào câu hỏi thì biết bắt đầu từ đâu, mỗi bài sẽ tô màu đẹp vào chỗ chạm để gợi ý được … giống doligo. vẽ cho tôi xem trước khi duyệt build»
 - «phần gợi ý phải có ý nghĩa thực sự cho bài đó … hiển thị đẹp hơn doligo»
 - «nếu đề cho tên công thức bấm vào hiện tên công thức nữa … tuỳ từng bài in đậm thêm thông tin chỗ nào»
+- «Bài tập hiện tại tôi đang sử dụng tóm tắt sơ đồ tối giản nhất, sử dụng bảo toàn nguyên tố để tính một phép tính duy nhất. Tôi quy ước tính xuôi thì nhân hiệu suất chia 100, tính ngược thì nhân 100 chia hiệu suất. … gợi ý của câu hỏi bạn phải thiết lập sơ đồ này tính toán cho mỗi bài, phép tính học sinh bấm vào số nào thì dãy số phía trước tới số đó hiện là đang bấm gì rõ ràng dễ hiểu» · «áp dụng phương pháp này cho mọi bài tính toán có thể» · «thay sơ đồ tối giản bằng tóm tắt của thầy Đỗ Đại Học»
 
 Bản vẽ:
 - Ảnh: `anh/` (3 khổ × sáng/tối).
@@ -28,11 +29,13 @@ Bốn lớp, từ nhẹ đến nặng:
 |---|---|---|
 | Tô màu sẵn | Số liệu + đơn vị nền chàm (Đề cho). Câu hỏi nền hổ phách (Đề hỏi). Chất gạch chấm xanh. Từ then chốt in đậm. | Không |
 | Chạm một chữ | Thẻ giải nghĩa: đơn vị (nghĩa + công thức chung), chất (tên IUPAC + tên cũ + loại + M), công thức (ngược lại, ra tên), từ then chốt (nghĩa + câu tự hỏi) | Không (như tra từ điển) |
-| «Bắt đầu từ đâu?» gợi ý 1–3 | Gợi ý **viết riêng cho câu này**, mở từng tầng: ① Đề đang nói gì (kèm sơ đồ phản ứng) · ② Chìa khoá của bài · ③ Bước đầu tiên (phép tính đầu với số của bài, không ra kết quả) | **Có** (quyết định B 20/10) |
+| «Bắt đầu từ đâu?» gợi ý 1–3 | Gợi ý **viết riêng cho câu này**, mở từng tầng. **Bài tính toán (cách của thầy):** ① Đề đang nói gì · ② **Tóm tắt của thầy Đỗ Đại Học** (chất đầu + số liệu │ → chất cuối, ghi H và nguyên tố bảo toàn) · ③ **Một phép tính** duy nhất, chạm từng số để thấy «từ đầu tới số này là gì». **Bài cần so sánh / lý thuyết:** ① Đề nói gì · ② Chìa khoá · ③ Bước đầu tiên / câu tự hỏi | **Có** (quyết định B 20/10) |
 | «Học cách giải» | Như hiện nay | Có |
 
+**Nút:** «Bắt đầu từ đâu?» THAY nút «Gợi ý» hiện có của màn «Trong» (cùng kiểu nút nhẹ, cùng màu chính) — không thêm khái niệm gợi ý thứ ba bên cạnh «Gợi ý» và «Học cách giải».
+
 **Đẹp hơn Duolingo ở chỗ «soi sáng»:**
-- Mở gợi ý thì đề mờ đi. Chỉ những chữ mà tầng đang nói tới **sáng lên** (viền vàng).
+- Mở gợi ý thì đề mờ đi. Chỉ những chữ mà tầng đang nói tới **sáng lên**: giữ đúng màu loại của chữ (chàm = đề cho, xanh = chất / từ then chốt) với viền dày. Không dùng vàng (vàng = thành tích ở «Trong»).
 - Em thấy ngay mình cần nhìn vào đâu.
 - Tầng sau khoá, chỉ mở khi em bấm «Gợi ý tiếp».
 
@@ -98,11 +101,13 @@ Các đếm khác trên cả kho:
   - «Giá trị của»: 637;
   - «Tính»: 444.
 
-**Kết luận:** kho chủ yếu là câu lý thuyết; chỉ khoảng 19% câu có số liệu. Vì vậy hai lớp giúp được nhiều câu nhất là **tên chất / công thức** và **từ then chốt**, chứ không phải đơn vị.
+Lưu ý: chỉ quét thân đề (`$.text`), chưa quét các ý Đ/S ⇒ Phần II 21,4% là mức thấp nhất.
+
+**Suy luận (chưa đo):** kho chủ yếu là câu lý thuyết; chỉ khoảng 19% câu có số liệu (2 948/15 359). Nên tên chất / công thức và từ then chốt có lẽ giúp được nhiều câu hơn đơn vị. Độ phủ chất và từ then chốt đo sau build (mục 7).
 
 ### Nguồn từng lớp
 
-- **Tô màu, đơn vị, chất, từ then chốt:**
+- **Tô màu, đơn vị, chất (cả chiều tên → công thức và công thức → tên), từ then chốt:**
   - Hàm thuần chạy trên máy em, chỉ đọc chữ đề (thân câu và các ý Đ/S), không bao giờ đọc đáp án hay lời giải.
   - Từ điển:
     - đơn vị: khoảng 25 mục;
@@ -110,20 +115,26 @@ Các đếm khác trên cả kho:
     - từ then chốt: khoảng 40 cụm, ví dụ «hoàn toàn», «vừa đủ», «dư», «đun nóng», «cô cạn», «khan», «đkc/đktc», «trung hoà», «điện phân», «thu được kết tủa».
   - M tính bằng mã từ công thức và bảng nguyên tử khối SGK, hoặc từ số của đề nếu đề có ghi. Không gõ M bằng tay.
 - **Gợi ý 3 tầng viết riêng cho từng câu:**
-  - Máy soạn từ đề + lời giải đã có (kho có `solution` cho 99,96% câu; hồ sơ lời giải thầy duyệt khi có).
+  - Máy soạn từ đề + lời giải đã có (đo 25/10 trên câu của các đợt sai 14 ngày: 12 234/12 239 có `solution`; trên cả kho chưa đo).
+  - **Bài tính toán:** máy dựng **Tóm tắt của thầy Đỗ Đại Học** + **một phép tính** theo bảo toàn nguyên tố, mỗi thừa số kèm nghĩa «từ đầu tới đây là gì»; hiệu suất theo quy ước thầy: tính xuôi × H/100, tính ngược × 100/H.
+  - **Cổng đúng số (máy tính, không AI):** nhân hết các thừa số phải ra ĐÚNG đáp án của kho (sai số làm tròn ≤ 0,5% đơn vị cuối). Lệch ⇒ không lưu, câu đó dùng gợi ý 3 tầng thường.
+  - Bài không xích được thành một phép tính (phải so chất dư, hỗn hợp nhiều ẩn): dùng ① Đề nói gì · ② Chìa khoá · ③ Bước đầu.
   - Mỗi câu một bản: `{deNoiGi, soDo?, chiaKhoa, buocDau, chuSang[tầng]}`. `chuSang` là chữ trong đề sẽ sáng lên ở mỗi tầng.
   - Lưu ở bảng mới chỉ-thêm `goi_y_cau` theo băm câu.
   - Chỉ tải khi em bấm «Bắt đầu từ đâu?», qua một lệnh mới. Lệnh này ghi luôn «có trợ giúp».
   - Hai cửa kiểm trước khi dùng:
-    - (a) máy chặn bản nào chứa đáp án hoặc kết quả cuối;
+    - (a) máy chặn bản nào chứa: chữ / giá trị của phương án đúng (vd «10,2»); đáp số cuối của Phần III; giá trị trung gian quyết định thẳng đáp án. Phép tính chỉ ghi «= ?», không ghi kết quả;
     - (b) lượt kiểm hoá học thứ hai, rồi thầy duyệt mẫu.
   - Thứ tự soạn:
-    - 543 câu có từ 5 em cùng sai (chiếm 84% đợt sai 14 ngày);
+    - 543 câu có từ 5 em cùng sai (đo 25/10: chiếm 84% đợt sai 14 ngày);
     - câu đang giao;
     - phần còn lại.
   - Câu chưa có bản soạn: dùng gợi ý tự sinh (Đề cho · Đề hỏi · Bước đầu).
 
 ## 5. Ngoại lệ
+
+- **Phép tính một dòng dài** (8 thừa số): xuống dòng theo thừa số, không cắt giữa phân số; mỗi thừa số là một nút ≥ 44px.
+- **Chạm một thừa số:** các thừa số trước sáng (màu chính nhạt), thừa số đang chạm đặc màu chính, các thừa số sau mờ; bảng nghĩa dưới đánh dấu ✓ các bước đã qua.
 
 - **Không bao giờ tô màu phương án A–D.** Lớp này không dùng màu xanh/đỏ, vì trước khi nộp, xanh/đỏ trông như chấm điểm.
 - **«không»:**
@@ -187,3 +198,6 @@ Các đếm khác trên cả kho:
 | Bảng `goi_y_cau` + lệnh đọc gợi ý + máy soạn gợi ý theo lô | Cần Boss chỉ định (gần làn «máy soạn» của Codex) |
 
 **Lưu ý:** Code app 1 (Boss) đang làm lại giao diện «Trong». Bản vẽ này dựng trên đúng bộ khung «Trong» để ghép vào không lệch.
+
+## 10. Từ ngữ
+Đã đối chiếu `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md` (bảng A2 chưa có mục cho khái niệm này, không trùng từ nào đã chốt). Từ mới trên màn học sinh: «Đề cho», «Đề hỏi», «Chất», «Từ then chốt», «Bắt đầu từ đâu?», «Đề đang nói gì», «Chìa khoá của bài», «Tóm tắt của thầy Đỗ Đại Học», «Một phép tính», «Đang xem gợi ý», «Em tự làm tiếp», «Em tự bấm máy tính». Đề nghị Boss đưa vào bảng A2 khi duyệt.
