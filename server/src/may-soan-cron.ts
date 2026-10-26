@@ -211,7 +211,7 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
           if (hanMuc && !caoDiem && ss > SONG_SONG_THAP_NHAT) {
             // Quá tải ⇒ co lại, lượt sau chạy tiếp ngay (không nghỉ 30 phút).
             ss = Math.max(SONG_SONG_THAP_NHAT, Math.floor(ss / 2))
-            if (soDuoc > 0) soLoi = 0
+            soLoi = 0 // còn hạ được ⇒ không phải lỗi; xoá cả bộ đếm cũ (vd 3 từ trước bản co giãn) để không nghỉ 30 phút oan
             lyDo = `Gemini báo quá tải ⇒ hạ còn ${ss} câu song song`
           } else if (soDuoc > 0) {
             soLoi = 0; lyDo = null

@@ -220,6 +220,18 @@ describe('tự hãm', () => {
     expect(ds).toEqual([6, 10, 14, 18, 22, 24, 24])
   })
 
+  it('27/10: hết giờ nghỉ cũ (bộ đếm 3, chưa có song_song_hien) mà lượt đầu lại quá tải ⇒ hạ còn 12, KHÔNG nghỉ tiếp', async () => {
+    datCo({ bat: true })
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: {}, ketQua: [] })).fn })
+    d.sql.prepare("UPDATE may_soan_trang_thai SET so_loi_lien_tiep = 3, nghi_den = ?, dem_json = '{\"dat\":37}' WHERE id = 1").run(NGOAI_CAO_DIEM + 60_000)
+    const s = soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: { loi_goi: 2 }, ketQua: [1, 2].map((i) => ({ qid: `q${i}`, ket: 'loi_goi', lyDo: 'HTTP 429', lanThu: 2 })) }))
+    const t = NGOAI_CAO_DIEM + 120_000
+    expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: false })
+    expect(s.goi[0]!.songSong).toBe(24)
+    expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 0 })
+    expect(JSON.parse(String(trangThai().dem_json))).toMatchObject({ dat: 37, song_song_hien: 12 })
+  })
+
   it('máy soạn trả 503 (vd chưa có khoá) hoặc ném lỗi ⇒ đếm lỗi, nhả khoá, không ném ra ngoài', async () => {
     datCo({ bat: true })
     const s503 = soanGia(() => tra({ ok: false, error: 'Máy chủ chưa có khoá GEMINI_API_KEY.' }, 503))
