@@ -7,6 +7,7 @@ import { layDiaChiMayChu } from './dia-chi-may-chu'
 import type { KetQuaLenh } from './goi-lenh-thay'
 import { docHoSoThaiDo, type KetQuaHoSoThaiDo } from './bai-hang-ngay-api'
 import { docLichSuLamCau, TRAN_GIOI_HAN, type KetQuaLichSuLamCau } from './lich-su-lam-cau-api'
+import { TRUONG_AN_HO_SO_HS, TRUONG_AN_LICH_SU_HS } from '../../server/src/an-luoi-hs'
 
 export const DUONG_HO_SO_THAI_DO_EM = '/hs/ho-so-thai-do'
 export const DUONG_LICH_SU_LAM_CAU_EM = '/hs/lich-su-lam-cau'
@@ -47,12 +48,33 @@ export async function goiLenhEm(duong: string, body: Record<string, unknown>): P
   return { ok: true, du: j }
 }
 
-/** Hồ sơ thái độ (nhịp học, số đếm, lịch, tín hiệu, Câu đúng / Câu đã ôn) của CHÍNH em. */
+// 26/10 (thầy: hệ phát hiện lười CHỈ thầy + phụ huynh xem): máy chủ mới đã bỏ các trường dưới đây khỏi bản em (server/src/an-luoi-hs.ts). Máy chủ CŨ
+// còn gửi ⇒ bỏ ngay ở đây, TRƯỚC khi đọc (không vào bộ nhớ app em). Khung bắt buộc của bộ đọc chung (`ketLuan`, `tinHieu`) điền TRUNG TÍNH: nhãn
+// «Chưa đủ dữ liệu» không lý do, không tín hiệu — tấm chế độ học sinh không vẽ hai phần này.
+const KET_LUAN_TRUNG_TINH = { nhan: 'chua-du-du-lieu', lyDo: [] } as const
+function boKhoa(o: Record<string, unknown>, ds: readonly string[]): Record<string, unknown> {
+  const ra = { ...o }
+  for (const k of ds) delete ra[k]
+  return ra
+}
+/** Thân `/hs/ho-so-thai-do` ⇒ khung bản em (thuần). */
+export function hoSoThaiDoKhungHs(du: Record<string, unknown>): Record<string, unknown> {
+  const r = boKhoa(du, TRUONG_AN_HO_SO_HS)
+  const pb = Array.isArray(du.phanBoGiay) ? du.phanBoGiay.map((g) => (g && typeof g === 'object' ? boKhoa(g as Record<string, unknown>, ['soNhanh']) : g)) : du.phanBoGiay
+  return { ...r, ketLuan: KET_LUAN_TRUNG_TINH, tinHieu: [], phanBoGiay: pb }
+}
+/** Thân `/hs/lich-su-lam-cau` ⇒ khung bản em: không Mức làm ở tổng, 6 mức, từng lượt (thuần). */
+export function lichSuKhungHs(du: Record<string, unknown>): Record<string, unknown> {
+  const r = boKhoa(du, TRUONG_AN_LICH_SU_HS)
+  return Array.isArray(du.lan) ? { ...r, lan: du.lan.map((l) => (l && typeof l === 'object' ? boKhoa(l as Record<string, unknown>, ['mucLam']) : l)) } : r
+}
+
+/** Hồ sơ thái độ (số đếm, lịch, số giây, Câu đúng / Câu đã ôn) của CHÍNH em — bản em, không nhãn / tín hiệu / nhóm / bậc. */
 export async function layHoSoThaiDoEm(token: string): Promise<KetQuaLenh<KetQuaHoSoThaiDo>> {
   if (!token) return thoat('tu_choi', 'Em đăng nhập lại để xem hồ sơ làm bài.')
   const r = await goiLenhEm(DUONG_HO_SO_THAI_DO_EM, { token })
   if (!r.ok) return r
-  const kq = docHoSoThaiDo(r.du)
+  const kq = docHoSoThaiDo(hoSoThaiDoKhungHs(r.du))
   return kq ? { ok: true, du: kq } : thoat('khong_doc_duoc', 'Máy chủ trả hồ sơ không đúng dạng.')
 }
 
@@ -63,7 +85,7 @@ export async function layLichSuLamCauEm(token: string, gioiHan?: number): Promis
   if (gioiHan) body.gioiHan = Math.min(TRAN_GIOI_HAN, Math.max(1, Math.round(gioiHan)))
   const r = await goiLenhEm(DUONG_LICH_SU_LAM_CAU_EM, body)
   if (!r.ok) return r
-  const kq = docLichSuLamCau(r.du)
+  const kq = docLichSuLamCau(lichSuKhungHs(r.du))
   return kq ? { ok: true, du: kq } : thoat('khong_doc_duoc', 'Máy chủ trả lịch sử làm câu không đúng dạng.')
 }
 

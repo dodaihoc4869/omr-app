@@ -1,6 +1,6 @@
 // APP HỌC SINH › "HỒ SƠ LÀM BÀI CỦA EM" (thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé").
 // Thành phần `HoSoCuaEmHs` bọc tấm thầy `HoSoLamCauEm` ở chế độ học sinh, nguồn = hai lệnh `/hs/...` (token, không SBD). Kiểm:
-//   · ĐỦ mọi phần số liệu như thầy thấy (đầu tấm nhóm + lý do, Hôm nay, năm ô số, lịch ngày, độ đúng, số giây, sáu tín hiệu, bốn thẻ câu);
+//   · ĐỦ phần số liệu như thầy thấy (năm ô số, lịch ngày, độ đúng, số giây, bốn thẻ câu) — 26/10: TRỪ nhãn / nhóm / lý do / sáu tín hiệu / Mức làm;
 //   · tiêu đề "Hồ sơ làm bài của em · từ 01/10" + "Thầy cũng xem hồ sơ này."; KHÔNG nút / đường của thầy (Mở hồ sơ đầy đủ, SBD, kho thiếu…);
 //   · không đáp án em chọn, không mã câu nội bộ trên màn; lệnh gửi token, không SBD;
 //   · khoá trang phía sau khi mở, Esc ⇒ đóng, đóng xong focus về đúng nút đã mở, gỡ khoá;
@@ -19,6 +19,7 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 import { hoSoThaiDoGia } from '../scripts/chup-v2/gia/bai-hang-ngay'
 import { lichSuGia } from '../scripts/chup-v2/gia/lich-su-lam-cau'
 import { banHocSinhHoSoThaiDo, banHocSinhLichSu } from '../server/src/ho-so-em-hs-loc'
+import { hoSoThaiDoChoHs, lichSuChoHs } from '../server/src/an-luoi-hs'
 import { THUOC_TINH_KHOA_CUON } from '../src/lib/khoa-cuon-trang'
 const { default: HoSoCuaEmHs } = await import('../src/components/hoc-tap/HoSoCuaEmHs')
 const { default: HoSoLamCauEm, xoaDemHoSoLamCau, GIOI_HAN_KHUNG_DAU } = await import('../src/components/chien-dich/HoSoLamCauEm')
@@ -36,7 +37,8 @@ beforeEach(() => {
     const duong = new URL(url).pathname
     const body = JSON.parse(String(init?.body ?? '{}')) as Record<string, unknown>
     goiFetch.push({ duong, body })
-    const du = duong === '/hs/ho-so-thai-do' ? banHocSinhHoSoThaiDo(TD) : duong === '/hs/lich-su-lam-cau' ? banHocSinhLichSu(LS) : null
+    // 26/10: đi qua ĐÚNG hai bước lọc của lệnh /hs (bản học sinh + ẩn hệ phát hiện lười — an-luoi-hs.ts)
+    const du = duong === '/hs/ho-so-thai-do' ? hoSoThaiDoChoHs(banHocSinhHoSoThaiDo(TD)) : duong === '/hs/lich-su-lam-cau' ? lichSuChoHs(banHocSinhLichSu(LS)) : null
     return new Response(JSON.stringify(du ?? { ok: false, error: 'không có' }), { status: du ? 200 : 404, headers: { 'content-type': 'application/json' } })
   }))
 })
@@ -88,19 +90,22 @@ describe('HoSoCuaEmHs — em xem ĐỦ hồ sơ của chính mình', () => {
     expect(within(tam).getByRole('heading', { level: 2 }).textContent).toBe('Hồ sơ làm bài của em')
     expect(within(tam).getByText(/Thầy cũng xem hồ sơ này\.$/)).toBeTruthy()
     expect(tam.querySelector('.gvv2-hs-mat')?.textContent).toBe(`${TD.em.hoTen} · Lớp ${TD.em.lop}`) // tên + lớp của em (máy chủ), không SBD
-    // đầu tấm: nhóm Nhịp học (nhãn chính) + lý do bằng số; chữ của em ("Nhịp học của em"), không "Thái độ làm bài"
+    // đầu khối: chữ của em ("Nhịp học của em" + khoảng ngày), không "Thái độ làm bài"
     expect(within(tam).getByText(/^Nhịp học của em ·/)).toBeTruthy()
     expect(tam.textContent).not.toMatch(/Thái độ làm bài/)
-    expect(within(tam).getByRole('list', { name: 'Lý do' })).toBeTruthy()
+    // 26/10 (thầy: hệ phát hiện lười CHỈ thầy + phụ huynh xem): không nhãn / nhóm / lý do / sáu tín hiệu / Mức làm
+    expect(within(tam).queryByRole('list', { name: 'Lý do' })).toBeNull()
+    expect(tam.querySelector('#gvv2-tdo-nhan')).toBeNull()
+    expect(tam.textContent).not.toMatch(/lười|đối phó|bấm vội|treo|quá nhanh|Mức làm|chưa đều/i)
     // điểm nhấn số lượt (thay ô Hôm nay của thầy) · năm ô số · lịch · độ đúng · số giây · sáu tín hiệu (trong ngăn gập)
     expect(tam.querySelector('.hsv-nhan')?.textContent).toMatch(/lượt làm câu · đúng \d+ lượt/)
     expect(tam.querySelector('.gvv2-hs-hn')).toBeNull()
     for (const nhan of ['Đã làm', 'Đúng', 'Sai', 'Đã ôn', 'Giây trung bình']) expect(within(tam).getAllByText(nhan, { selector: 'dt' }).length).toBeGreaterThan(0)
-    for (const tieu of [/^Lịch làm bài theo ngày/, /^Độ đúng theo ngày/, /^Số giây mỗi lượt/, /^Sáu tín hiệu và ngưỡng/, /^Từng lượt/, /^Câu từng sai/])
+    for (const tieu of [/^Lịch làm bài theo ngày/, /^Độ đúng theo ngày/, /^Số giây mỗi lượt/, /^Từng lượt/, /^Câu từng sai/])
       expect(within(tam).getByRole('heading', { name: tieu })).toBeTruthy()
-    expect([...tam.querySelectorAll('.hsv-gap summary')].map((x) => x.firstChild?.textContent)).toEqual(['Lịch làm bài 14 ngày', 'Sáu tín hiệu và ngưỡng', 'Số giây theo mức độ câu', 'Câu đúng · Câu đã ôn', 'Toàn bộ sổ của em'])
+    expect([...tam.querySelectorAll('.hsv-gap summary')].map((x) => x.firstChild?.textContent)).toEqual(['Lịch làm bài 14 ngày', 'Số giây theo mức độ câu', 'Câu đúng · Câu đã ôn', 'Toàn bộ sổ của em'])
     expect(within(tam).getByRole('list', { name: 'Lịch làm bài theo ngày' }).children.length).toBe(TD.ngay.length)
-    expect(tam.querySelectorAll('.gvv2-tdo-th-o')).toHaveLength(6)
+    expect(tam.querySelectorAll('.gvv2-tdo-th-o')).toHaveLength(0)
     // thẻ câu đúng / đã ôn (ngăn gập) + nút lọc lượt
     for (const the of [/^Câu đúng/, /^Câu đã ôn/, /^Tất cả/, /^Lượt sai/]) expect(within(tam).getByRole('tab', { name: the })).toBeTruthy()
     // KHÔNG đường của thầy
@@ -119,8 +124,8 @@ describe('HoSoCuaEmHs — em xem ĐỦ hồ sơ của chính mình', () => {
     fireEvent.click(within(tam).getByRole('tab', { name: /^Câu đúng/ }))
     expect(tam.textContent).not.toMatch(/DH-12-/)
     const duong = goiFetch.map((g) => g.duong).sort()
-    // SỬA CÓ CHỦ ĐÍCH 24/10: thẻ «Học thật» đầu hồ sơ nạp lệnh CHỈ ĐỌC `/hs/danh-gia` (gửi token, không SBD — vòng dưới kiểm).
-    expect(duong).toEqual(['/hs/danh-gia', '/hs/ho-so-thai-do', '/hs/lich-su-lam-cau'])
+    // SỬA CÓ CHỦ ĐÍCH 26/10: thẻ «Học thật / Đối phó» đã bỏ khỏi app em (thầy: CHỈ thầy + phụ huynh xem) ⇒ không gọi `/hs/danh-gia`.
+    expect(duong).toEqual(['/hs/ho-so-thai-do', '/hs/lich-su-lam-cau'])
     for (const g of goiFetch) {
       expect(g.body.token).toBe('tk-em')
       expect(g.body).not.toHaveProperty('sbd')

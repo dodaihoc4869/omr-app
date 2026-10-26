@@ -24,7 +24,7 @@ import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { gvBaiHangNgay, gvHoSoThaiDo, ngayBaiCuaMotEm, ngayVnCua } from '../server/src/bai-hang-ngay'
 import { gvNhipHoc } from '../server/src/nhip-hoc'
-import { hsNhipHoc } from '../server/src/nhip-hoc-em'
+import { hsNhipHoc, nhipHocCuaEm } from '../server/src/nhip-hoc-em'
 import { phConTongQuan } from '../server/src/ph-con-tong-quan'
 import { CAU_TOI_THIEU } from '../server/src/hanh-trinh-ngay'
 import type { KetQuaBaiHangNgay, KetQuaHoSoThaiDo, NgayBaiEm } from '../server/src/bai-hang-ngay-kieu'
@@ -325,7 +325,9 @@ describe('ngày Gói 7 cũ chưa chốt ⇒ ước tính uoc-goi7; luật Lườ
     expect(o['2026-10-12']).toEqual([24, 0, 24, false, 'uoc-goi7', 1, 'goi7']) // hôm nay chưa mở bài ⇒ ước tính, có cờ
     expect(h.nhomNhip).toBe('cham') // 6 ngày Gói 7 đủ, chuỗi 6 — trước 12/10 mỗi ngày 24/36 "thiếu 12" ⇒ 0 ngày đủ ⇒ Lười
     expect(h.ketLuan.nhan).not.toBe('luoi')
-    const em = (await hsNhipHoc(env, { token: await gameToken(env, 'L') }, T)) as KetQuaNhipHocEm
+    // 26/10: bản EM (`/hs/nhip-hoc`) không còn nhóm / độ tin cậy (thầy: chỉ thầy + phụ huynh xem) ⇒ nhóm kiểm ở LÕI dùng chung với `/ph/nhip-hoc`.
+    expect(await hsNhipHoc(env, { token: await gameToken(env, 'L') }, T)).toMatchObject({ ok: true, soNgayDu: 6, soNgayQua: 7 })
+    const em = (await nhipHocCuaEm(env, 'L', T)) as KetQuaNhipHocEm
     expect(em).toMatchObject({ ok: true, nhom: 'cham', soNgayDu: 6, soNgayQua: 7 }) // ngày vào 05/10 (dấu vết Hành trình): 6/7 đủ ⇒ Chăm
     const nhip = (await gvNhipHoc(env, { tu: '2026-10-05' }, T)) as KetQuaNhipHoc
     const eL = nhip.em.find((e) => e.sbd === 'L')!

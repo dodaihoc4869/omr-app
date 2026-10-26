@@ -10,8 +10,9 @@ import { LUAT_NHOM_NHIP, type KetQuaNhipHocEm, type NgayNhipEm, type NhomNhip, t
 import { NGUONG_THAI_DO } from '../../server/src/bai-hang-ngay-kieu'
 import { TEN_NHOM_NHIP, tomTatNhip, viecTiepNhip } from '../../server/src/nhip-hoc-luat'
 import { docBacCham } from './bac-cham-chi'
+import type { NhipHocHs } from '../../server/src/an-luoi-hs'
 
-export type { KetQuaNhipHocEm, NgayNhipEm, NhomNhip, TocDoNhipEm, ViecTiepNhip }
+export type { KetQuaNhipHocEm, NgayNhipEm, NhomNhip, NhipHocHs, TocDoNhipEm, ViecTiepNhip }
 /** ĐỢT 16 — làn máy chủ D CHỈ THÊM hai trường TUỲ CHỌN (khai phía app): độ tin cậy của nhóm (0–100, máy chủ kẹp ≤ 99) + câu "cần thêm" khi chưa chắc.
  *  Máy chủ cũ không gửi ⇒ trường vắng, bảng y như trước. */
 export type KetQuaNhipHocApp = KetQuaNhipHocEm & { doTinCay?: number; canThem?: string }
@@ -95,8 +96,40 @@ export function docNhipHocEm(v: unknown): KetQuaNhipHocEm | null {
   }
 }
 
-/** Nhịp học của em — MỘT lệnh. Lỗi gì cũng ⇒ null. */
-export async function layNhipHocEm(token: string): Promise<KetQuaNhipHocEm | null> {
+/**
+ * 26/10 (thầy: hệ phát hiện lười CHỈ thầy + phụ huynh xem): bản EM của `/hs/nhip-hoc` — máy chủ mới không gửi nhóm / bậc / việc tiếp / tốc độ / tin
+ * cậy (server/src/an-luoi-hs.ts). Đọc chặt phần còn lại; máy chủ CŨ còn gửi các trường ấy ⇒ bỏ ngay ở đây (không giữ trong bộ nhớ của app em). Thuần.
+ */
+export function docNhipHocHs(v: unknown): NhipHocHs | null {
+  const du = dt(v)
+  if (!du || du.ok !== true || !laNgay(du.tu) || !laNgay(du.homNay) || !Array.isArray(du.ngay)) return null
+  const ngay: NgayNhipEm[] = []
+  for (const x of du.ngay) {
+    const o = dt(x)
+    if (!o || !laNgay(o.ngay) || so(o.muc) === null || so(o.lam) === null) return null
+    ngay.push({ ngay: o.ngay, muc: soKhongAm(o.muc), lam: soKhongAm(o.lam) })
+  }
+  const h = dt(du.homNayMuc)
+  const b = dt(du.chuoiBo)
+  return {
+    ok: true,
+    tu: du.tu,
+    homNay: du.homNay,
+    soNgayQua: soKhongAm(du.soNgayQua),
+    soNgayDu: soKhongAm(du.soNgayDu),
+    phanTram: so(du.phanTram),
+    ngay,
+    chuoiDuGanNhat: soKhongAm(du.chuoiDuGanNhat),
+    tongDaLam: soKhongAm(du.tongDaLam),
+    tongCauThieu: soKhongAm(du.tongCauThieu),
+    ngayDuGanNhat: laNgay(du.ngayDuGanNhat) ? du.ngayDuGanNhat : null,
+    homNayMuc: h && so(h.muc) !== null && so(h.lam) !== null ? { muc: soKhongAm(h.muc), lam: soKhongAm(h.lam) } : null,
+    chuoiBo: b && laNgay(b.tu) && laNgay(b.den) && so(b.dai) !== null ? { dai: soKhongAm(b.dai), tu: b.tu, den: b.den } : null,
+  }
+}
+
+/** Nhịp học của em — MỘT lệnh, bản em (`docNhipHocHs`: không nhóm, không bậc). Lỗi gì cũng ⇒ null. */
+export async function layNhipHocEm(token: string): Promise<NhipHocHs | null> {
   if (!token) return null
   try {
     const url = await layDiaChiMayChu()
@@ -106,7 +139,7 @@ export async function layNhipHocEm(token: string): Promise<KetQuaNhipHocEm | nul
     try {
       const r = await fetch(`${String(url).replace(/\/+$/, '')}${DUONG_NHIP_HOC_EM}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token }), signal: bo.signal })
       if (!r.ok) return null
-      return docNhipHocEm(await r.json().catch(() => null))
+      return docNhipHocHs(await r.json().catch(() => null))
     } finally {
       clearTimeout(hen)
     }
@@ -121,11 +154,11 @@ export async function layNhipHocEm(token: string): Promise<KetQuaNhipHocEm | nul
 export const ngayNgan = (ngay: string): string => `${ngay.slice(8, 10)}/${ngay.slice(5, 7)}`
 
 const L = LUAT_NHOM_NHIP
-const conHomNay = (k: KetQuaNhipHocEm): number => (k.homNayMuc ? Math.max(0, k.homNayMuc.muc - k.homNayMuc.lam) : 0)
-const homNayDu = (k: KetQuaNhipHocEm): boolean => !!k.homNayMuc && k.homNayMuc.lam >= k.homNayMuc.muc
+const conHomNay = (k: NhipHocHs): number => (k.homNayMuc ? Math.max(0, k.homNayMuc.muc - k.homNayMuc.lam) : 0)
+const homNayDu = (k: NhipHocHs): boolean => !!k.homNayMuc && k.homNayMuc.lam >= k.homNayMuc.muc
 
 /** Dòng đầu phần Nhịp học: "Đủ mức 2/11 ngày từ 01/10" (số ngày ĐÃ QUA, không gồm hôm nay — hôm nay là ô viền cuối dải). */
-export const chuDuMucEm = (k: KetQuaNhipHocEm): string =>
+export const chuDuMucEm = (k: NhipHocHs): string =>
   k.soNgayQua > 0 ? `Đủ mức ${k.soNgayDu}/${k.soNgayQua} ngày từ ${ngayNgan(k.tu)}` : `Bắt đầu đếm từ hôm nay ${ngayNgan(k.homNay)}`
 
 /**
@@ -134,21 +167,23 @@ export const chuDuMucEm = (k: KetQuaNhipHocEm): string =>
  * chủ (`tomTatNhip` + `viecTiepNhip`) — các ngày đã qua (đủ mức a/b, chuỗi bỏ) không đổi; nhóm, chuỗi ngày và việc tiếp theo kịp số hôm nay.
  * Thiếu số Sảnh (M ≤ 0) ⇒ giữ nguyên. Thuần.
  */
-export function nhipTheoSanh(k: KetQuaNhipHocEm, so: { muc: number; daLam: number } | null | undefined): KetQuaNhipHocEm {
+export function nhipTheoSanh<K extends NhipHocHs>(k: K, so: { muc: number; daLam: number } | null | undefined): K {
   if (!so || !Number.isFinite(so.muc) || !Number.isFinite(so.daLam) || so.muc <= 0) return k
   const hom: NgayNhipEm = { ngay: k.homNay, muc: Math.round(so.muc), lam: Math.max(0, Math.round(so.daLam)) }
   const ngay = k.ngay.some((x) => x.ngay === k.homNay) ? k.ngay.map((x) => (x.ngay === k.homNay ? hom : x)) : [...k.ngay, hom]
   const t = tomTatNhip(ngay, k.homNay)
-  return {
-    ...k,
-    ngay,
-    nhom: t.nhom,
-    chuoiDuGanNhat: t.chuoiDuGanNhat,
-    ngayDuGanNhat: t.ngayDuGanNhat,
-    tongDaLam: t.tongLam + hom.lam,
-    homNayMuc: t.homNay,
-    viecTiep: viecTiepNhip(t),
-  }
+  const chung = { ...k, ngay, chuoiDuGanNhat: t.chuoiDuGanNhat, ngayDuGanNhat: t.ngayDuGanNhat, tongDaLam: t.tongLam + hom.lam, homNayMuc: t.homNay }
+  // 26/10: bản em (không có `nhom`) KHÔNG được tự thêm nhóm / việc tiếp — chỉ bản phụ huynh / thầy tính lại hai trường này.
+  return ('nhom' in k ? { ...chung, nhom: t.nhom, viecTiep: viecTiepNhip(t) } : chung) as K
+}
+
+/** "Việc tiếp:" của bản EM (26/10 — không nhắc nhóm nào): chỉ số câu còn lại hôm nay + chuỗi ngày đủ mức (cùng số `nhipTheoSanh`). Thuần. */
+export function chuViecTiepHs(k: NhipHocHs): string {
+  const c = conHomNay(k)
+  const chuoi = k.chuoiDuGanNhat
+  if (homNayDu(k)) return `hôm nay em đã đủ mức — chuỗi đang là ${chuoi} ngày liền đủ mức. Mai làm đủ mức để giữ chuỗi.`
+  if (!k.homNayMuc) return 'làm đủ mức mỗi ngày. Mỗi ngày đủ mức là một ngày đủ trên dải ô.'
+  return chuoi > 0 ? `còn ${c} câu nữa là đủ mức hôm nay — em giữ được chuỗi ${chuoi + 1} ngày liền.` : `còn ${c} câu nữa là đủ mức hôm nay — bắt đầu chuỗi ngày đủ mức.`
 }
 
 /** "Việc tiếp:" cho Chăm / Chưa đều / Chưa đủ dữ liệu (Lười dùng `chuRaKhoiLuoi`). */
@@ -207,7 +242,7 @@ export function chuMotOEm(x: NgayNhipEm, homNay: string): string {
 }
 
 /** Câu đầy đủ cho trình đọc màn hình của dải ô. */
-export function chuDaiOEm(k: KetQuaNhipHocEm): string {
+export function chuDaiOEm(k: NhipHocHs): string {
   const h = k.homNayMuc ? `; hôm nay ${k.homNayMuc.lam}/${k.homNayMuc.muc} câu` : ''
   return `Từ ${ngayNgan(k.tu)} tới hôm nay: đủ mức ${k.soNgayDu}/${k.soNgayQua} ngày đã qua${h}`
 }

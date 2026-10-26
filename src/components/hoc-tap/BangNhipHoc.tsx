@@ -7,6 +7,7 @@ import {
   chuRaKhoiLuoi,
   chuTocDo,
   chuViecTiep,
+  chuViecTiepHs,
   loaiONgay,
   chuCanThem,
   chuDoTinCay,
@@ -15,6 +16,7 @@ import {
   TEN_LOAI_O_EM,
   type KetQuaNhipHocApp,
   type KetQuaNhipHocEm,
+  type NhipHocHs,
 } from '../../lib/nhip-hoc-em'
 import { ThangBacNhipLuoi } from '../bac-cham-chi/nap'
 import './bang-nhip-hoc.css'
@@ -29,6 +31,8 @@ import './bang-nhip-hoc.css'
 //   · Máy chủ gửi `doTinCay` (đợt 16, tuỳ chọn) ⇒ một dòng "Độ tin cậy N%"; dưới 90% ⇒ "kết luận tạm, đang theo dõi" + câu `canThem`. Vắng ⇒ không dòng.
 //   · 13/10 — máy chủ gửi `bacCham` ⇒ đầu bảng là THANG 12 BẬC (từ Lười đến Chăm, mỗi bậc một màu) + "Còn N điểm lên …" (khối nạp khi cần
 //     src/components/bac-cham-chi/). Vắng ⇒ không có gì, bảng y như trước. Chip bậc nằm cạnh tên nhóm ở đầu thẻ (TheHomNayEm / NhipHocCon).
+//   · 26/10 (thầy: hệ phát hiện lười CHỈ thầy + phụ huynh xem): `ngoi='em'` (app học sinh) nhận bản EM (`NhipHocHs` — không nhóm, bậc, việc tiếp,
+//     tốc độ, tin cậy) ⇒ chỉ dải ngày + «Việc tiếp» trung tính (`chuViecTiepHs`). Thang 12 bậc, «Ra khỏi nhóm Lười», tốc độ, độ tin cậy CHỈ ở `ngoi='con'`.
 // Màu: lớp `ht2-hn-*` — app học sinh tô ở hoc-tap.css; app phụ huynh tô ở ph-v3/nhip-hoc-con.css (biến --ph3-* sẵn có).
 
 export type NgoiNhip = 'em' | 'con'
@@ -41,7 +45,7 @@ export function doiNgoiCon(chu: string): string {
 /** Câu tốc độ cho phụ huynh: đổi ngôi + lời nhắc nói với phụ huynh. */
 const tocDoChoPhuHuynh = (chu: string): string => doiNgoiCon(chu).replace(/Đọc hết đề rồi mới chọn\.$/, 'Anh/chị nhắc con đọc hết đề rồi mới chọn.')
 
-function DaiNgay({ k, idMo }: { k: KetQuaNhipHocEm; idMo: string }) {
+function DaiNgay({ k, idMo }: { k: NhipHocHs; idMo: string }) {
   const n = Math.min(Math.max(k.ngay.length, 1), 14)
   const nRong = Math.min(Math.max(k.ngay.length, 1), 21)
   return (
@@ -68,9 +72,51 @@ function DaiNgay({ k, idMo }: { k: KetQuaNhipHocEm; idMo: string }) {
   )
 }
 
-export default function BangNhipHoc({ k, onMoHoSo, ngoi = 'em' }: { k: KetQuaNhipHocEm; onMoHoSo?: () => void; ngoi?: NgoiNhip }) {
+/** Bản EM (26/10): dải ngày (bấm ⇒ hồ sơ) + «Việc tiếp» trung tính + dòng thầy cũng thấy. Không nhóm, bậc, tốc độ, tin cậy. */
+function BangEm({ k, onMoHoSo, id }: { k: NhipHocHs; onMoHoSo?: () => void; id: string }) {
+  const ruot = (
+    <>
+      <span className="ht2-hn-du-dong" id={`${id}-du`}>
+        {chuDuMucEm(k)}
+      </span>
+      <DaiNgay k={k} idMo={`${id}-dai`} />
+      {onMoHoSo && (
+        <span className="ht2-hn-xem" aria-hidden="true">
+          Xem hồ sơ
+          <ChevronRight size={18} />
+        </span>
+      )}
+    </>
+  )
+  return (
+    <div className="ht2-hn-nhip" role="group" aria-label="Nhịp học của em">
+      {onMoHoSo ? (
+        <button type="button" className="ht2-hn-nhip-bam" onClick={onMoHoSo} aria-label="Xem hồ sơ làm bài của em" aria-describedby={`${id}-du ${id}-dai`}>
+          {ruot}
+        </button>
+      ) : (
+        <div className="ht2-hn-nhip-bam">{ruot}</div>
+      )}
+      <p className="ht2-hn-tiep">
+        <b>Việc tiếp:</b> {chuViecTiepHs(k)}
+      </p>
+      <p className="ht2-hn-thay">
+        <Eye size={18} aria-hidden="true" />
+        Thầy cũng thấy bảng này.
+      </p>
+    </div>
+  )
+}
+
+/** `ngoi='em'` ⇒ bản em (`NhipHocHs`); `ngoi='con'` ⇒ bản phụ huynh đủ trường (`KetQuaNhipHocEm`). */
+type PropsBang = { k: NhipHocHs; onMoHoSo?: () => void; ngoi?: 'em' } | { k: KetQuaNhipHocEm; onMoHoSo?: () => void; ngoi: 'con' }
+
+export default function BangNhipHoc(p: PropsBang) {
   const id = useId()
-  const laCon = ngoi === 'con'
+  const { onMoHoSo } = p
+  if (p.ngoi !== 'con') return <BangEm k={p.k} onMoHoSo={onMoHoSo} id={id} />
+  const k = p.k
+  const laCon = p.ngoi === 'con'
   const can = LUAT_NHOM_NHIP.ngayLienThoatLuoi
   const v = k.viecTiep
   const co = Math.min(v.loai === 'thoat-luoi' ? v.coNgay : k.chuoiDuGanNhat, can)

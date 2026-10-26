@@ -17,6 +17,7 @@ import type { KetQuaLichSuLamCau } from '../server/src/lich-su-lam-cau-kieu'
 import { gvHoSoThaiDo, ngayVnCua } from '../server/src/bai-hang-ngay'
 import { gvLichSuLamCau } from '../server/src/lich-su-lam-cau'
 import { CAN_DANG_NHAP_HO_SO, hsHoSoThaiDo, hsLichSuLamCau, LOI_HO_SO_EM } from '../server/src/ho-so-em-hs'
+import { hoSoThaiDoChoHs } from '../server/src/an-luoi-hs'
 import { banHocSinhLichSu, taoKhoaCau, tieuDeCauHs, TRUONG_BO_BAN_HOC_SINH } from '../server/src/ho-so-em-hs-loc'
 import { gameToken, parentPass } from '../server/src/game-v2-auth'
 
@@ -149,11 +150,13 @@ describe('bỏ lượt chưa được xem kết quả: còn giấu · ca chưa c
     const nhanh = (r: KetQuaHoSoThaiDo) => r.phanBoGiay.find((g) => g.nhan === 'Dưới 8 giây')!.soLuot
     expect(nhanh(thay)).toBe(3)
     expect(nhanh(hs)).toBe(0)
-    expect(hs.tinHieu.find((t) => t.ma === 'qua-nhanh')!.tu).toBe(0)
+    // 26/10 (thầy: hệ phát hiện lười CHỈ thầy + phụ huynh xem): bản em không có tín hiệu, nhãn, nhóm, số lượt «quá nhanh» (an-luoi-hs.ts)
+    expect(thay.tinHieu.find((t) => t.ma === 'qua-nhanh')).toBeTruthy()
+    for (const t of ['tinHieu', 'ketLuan', 'nhomNhip', 'coDoiPho', 'bacCham', 'tinCayNhom']) expect(t in hs).toBe(false)
+    expect(hs.phanBoGiay.every((g) => !('soNhanh' in g))).toBe(true)
     expect(hs.cauDung.length).toBe(thay.cauDung.length - 1) // câu ca đã xoá (đúng) không vào Câu đúng
     // Lịch kế hoạch (mức / đã làm từng ngày) lọc lượt ẩn ở CẢ HAI bản (SQL_LUOT_GOI7) ⇒ trùng nhau
     expect(hs.ngay.map((n) => [n.ngay, n.daLam, n.mucToiThieu])).toEqual(thay.ngay.map((n) => [n.ngay, n.daLam, n.mucToiThieu]))
-    expect(hs.nhomNhip).toBe(thay.nhomNhip)
     expect(JSON.stringify(hs)).not.toMatch(MA_AN)
   })
 })
@@ -227,12 +230,13 @@ describe('cùng phép tính với thầy: em không có lượt ẩn ⇒ mọi c
     const hsTd = (await hsHoSoThaiDo(env, { token: tokenB }, NOW)) as KetQuaHoSoThaiDo
     const boCau = (r: KetQuaHoSoThaiDo) => ({ ...r, canhBao: [], cauDung: r.cauDung.map(({ qid: _q, tieuDe: _t, ...c }) => c), cauDaOn: r.cauDaOn.map(({ qid: _q, tieuDe: _t, ...c }) => c) })
     expect(thayTd.ok).toBe(true)
-    expect(boCau(hsTd)).toEqual(boCau(thayTd))
+    expect(boCau(hsTd)).toEqual(boCau(hoSoThaiDoChoHs(thayTd) as KetQuaHoSoThaiDo)) // 26/10: trừ các trường hệ phát hiện lười (an-luoi-hs.ts)
     expect(hsTd.dem.soLuot).toBe(27) // 26 lượt kế hoạch + 1 ca đã công bố
     const thayLs = (await gvLichSuLamCau(env, { sbd: 'B' })) as KetQuaLichSuLamCau
     const hsLs = (await hsLichSuLamCau(env, { token: tokenB })) as KetQuaLichSuLamCau
     expect(hsLs.tong).toEqual(thayLs.tong)
-    expect(hsLs.lan.map(({ qid: _q, tieuDe: _t, chon: _c, ...l }) => l)).toEqual(thayLs.lan.map(({ qid: _q, tieuDe: _t, chon: _c, ...l }) => l))
+    expect(hsLs.lan.map(({ qid: _q, tieuDe: _t, chon: _c, ...l }) => l)).toEqual(thayLs.lan.map(({ qid: _q, tieuDe: _t, chon: _c, mucLam: _m, ...l }) => l)) // 26/10: em không Mức làm
+    expect(['mucLam', 'mucLam6'].filter((t) => t in hsLs)).toEqual([])
     expect(hsLs.cauSai.map(({ qid: _q, tieuDe: _t, moChua: _m, ...c }) => c)).toEqual(thayLs.cauSai.map(({ qid: _q, tieuDe: _t, ...c }) => c)) // moChua: khoá mở Tự chữa chỉ ở bản em (đợt 16)
     // qua Worker (đường thật) ra đúng như gọi hàm (Worker thêm `serverNow` vào mọi trả lời)
     const quaWorker = await goi<KetQuaLichSuLamCau & { serverNow?: number }>(env, '/hs/lich-su-lam-cau', { token: tokenB })
