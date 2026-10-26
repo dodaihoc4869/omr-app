@@ -243,7 +243,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const hoTroCham = useRef('')
   useEffect(() => { setGiaiThich(null) }, [q?.qid, xong])
   useEffect(() => { if (!q) return; if (daMo.current) veDau(); daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { if (k) { veDau(); nutTiepRef.current?.focus({ preventScroll: true }) } }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Màn Duo ở khung thấp xoay ngang: tấm kết quả nằm ở cột phải DƯỚI phương án ⇒ đưa tấm (nút «Tiếp tục») vào khung nhìn thay vì cuộn về đầu.
+  useEffect(() => {
+    if (!k) return
+    const ngangThap = duo && !!window.matchMedia?.('(orientation: landscape) and (max-height: 500px)').matches
+    if (ngangThap) nutTiepRef.current?.scrollIntoView?.({ block: 'nearest' }); else veDau()
+    nutTiepRef.current?.focus({ preventScroll: true })
+  }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   // Rung phản hồi kiểu Duolingo (thầy 26/10) — chỉ app học sinh «Trong» (phan-hoi.ts tự kiểm): tấm kết quả đúng / sai, hết chặng.
   useEffect(() => { if (k && !k.choThay && !k.hocCoHoTro && !k.omni?.luot) phanHoi(k.correct ? 'dung' : 'sai') }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (xong) phanHoi('xong') }, [xong])
@@ -301,6 +307,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const tiep = () => {
     if (gui.current) return
     setLoi('')
+    setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề
     if (viTri + 1 < cau.length) { truotCauCu(); setViTri(i => i + 1) }
     else if (goi7 && !daXinLamLai.current && !laLamLai && cauSai.length > 0) void xinLamLai()
     else ketThuc()

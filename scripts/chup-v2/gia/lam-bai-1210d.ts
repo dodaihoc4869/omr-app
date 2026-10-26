@@ -65,6 +65,11 @@ const CAU_DUO: CauGia[] = [
     loiGiai: { chot: 'n(ester) = 8,8 : 88 = 0,1 mol = n(CH3COONa) ⇒ m = 0,1 × 82 = 8,2 gam.' } },
   { ...CAU[4]!, qid: 'D5' },
 ]
+// ═══ DUO APP 26/10: `lam13&lam=duo&ll=1` = có Gói 7 ⇒ hết chặng mà có câu tự làm sai thì gọi `hoc-tap-lam-lai` (hợp đồng docs/hop-dong-duolingo-2610.md mục 3):
+// trả 1 câu anh em (chỉ đề) của câu D1; nộp qua `answer` ⇒ máy chủ ép có hỗ trợ (`attempt.assisted`).
+const LAM_LAI = thamSo.get('ll') === '1'
+const CAU_LAM_LAI: CauGia[] = [{ ...CAU_DUO[0]!, qid: 'DL1', vaiGoi7: 'lam_lai', lamLaiCua: 'D1', text: 'Số đồng phân amine bậc một có công thức phân tử C3H9N là' , choices: ['1', '2', '3', '4'], dapAn: 'B',
+  loiGiai: { chot: 'C3H9N có 2 đồng phân amine bậc một: CH3CH2CH2NH2 và (CH3)2CHNH2.' } }]
 // ═══ hết DUO 26/10
 const ds = kieu === 'duo' ? CAU_DUO : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
@@ -80,13 +85,14 @@ const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => { const n = q.pha
 const so = (v: string) => Number(String(v).replace(',', '.'))
 /** Trả lời các lệnh `/game-v2/hoc-tap-*` + `answer` của màn làm bài; lệnh khác ⇒ null (bộ giả chung lo). */
 export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<string, unknown> | null {
-  if (duong.endsWith('/game-v2/hoc-tap-start')) return { ok: true, id: `phien-${kieu || 'chung'}`, questions: ds.map(congKhai), ...(kieu === 'g7' ? { goi7: GOI7 } : {}) }
-  const q = ds.find((c) => c.qid === b.qid)
+  if (duong.endsWith('/game-v2/hoc-tap-start')) return { ok: true, id: `phien-${kieu || 'chung'}`, questions: ds.map(congKhai), ...(kieu === 'g7' || LAM_LAI ? { goi7: GOI7 } : {}) }
+  if (duong.endsWith('/game-v2/hoc-tap-lam-lai')) return { ok: true, questions: LAM_LAI ? CAU_LAM_LAI.map(congKhai) : [] }
+  const q = [...ds, ...CAU_LAM_LAI].find((c) => c.qid === b.qid)
   if (!q) return null
   if (duong.endsWith('/game-v2/answer')) {
     const tra = String(b.answer ?? '')
     daNop++
-    return { ok: true, correct: q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] }
+    return { ok: true, correct: q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn, answer: q.dapAn, solution: q.loiGiai, solutionImages: [], ...(q.vaiGoi7 === 'lam_lai' ? { attempt: { assisted: true } } : {}) }
   }
   if (duong.endsWith('/game-v2/hoc-tap-gap')) { daNop++; return { ok: true, correct: false, hocCoHoTro: true, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] } }
   return null

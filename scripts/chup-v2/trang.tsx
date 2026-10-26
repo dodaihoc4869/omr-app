@@ -528,6 +528,11 @@ function ManLam13() {
 }
 // ═══ DUO 26/10: `lam13&lam=duo` — phiên học sinh giả trên máy (nút Hỏi thầy / Lời giải từng bước chỉ hiện khi có phiên; lệnh hỏi thầy đi bộ giả chung).
 if (LA_LAM13 && thamSo.get('lam') === 'duo') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
+// ═══ DUO APP 26/10: app thật nạp TrongHs (kèm phông Nunito + hiệu ứng Lộ trình, styles/trong-hs.css) ngay lúc mở cổng ⇒ màn làm chặng luôn có phông ấy;
+// trang chụp mở thẳng màn làm chặng nên nạp tờ đó tại đây cho giống app thật.
+// Phông Nunito chỉ bật khi cổng đã vẽ (:has(.ht2) — app thật luôn gắn Hôm nay dưới màn con) ⇒ trang chụp gắn một .ht2 rỗng ẩn.
+if (LA_LAM13 && thamSo.get('lam') === 'duo' && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>') }
+// ═══ hết DUO APP 26/10
 // ═════════════════════════════════════════ hết LÀN MÀN LÀM BÀI 12/10D ═════════════════════════════════════════
 // ═════════════════════════════════════════ LÀN HỒ SƠ EM 12/10F ═════════════════════════════════════════
 // Thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé". Cảnh `?man=hs-ho-so[&nhe=luoi|cham]`: Hôm nay

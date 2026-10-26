@@ -81,11 +81,11 @@ function DuongChang({ ds, moDi }: { ds: Nut[]; moDi: boolean }) {
   useEffect(() => {
     const v = changVuaXong(soXong, soChang)
     if (v === null || yenLang()) return
-    setVua(v)
-    const nut = goc.current?.querySelectorAll('.da-nut')[v]
-    const t = window.setTimeout(() => banHat(nut, { hinh: 'sao', so: 10, xa: 80, ms: 700, mau: ['--tr-sao', '--tr-dung', '--tr-tin'] }), 120)
-    const het = window.setTimeout(() => setVua(null), 1600)
-    return () => { window.clearTimeout(t); window.clearTimeout(het) }
+    // Chờ màn vào xong (~450 ms) rồi mới chạy để em kịp thấy; không chặn bấm (lớp phủ pointer-events: none).
+    const mo = window.setTimeout(() => setVua(v), 450)
+    const t = window.setTimeout(() => banHat(goc.current?.querySelectorAll('.da-nut')[v], { hinh: 'sao', so: 10, xa: 80, ms: 700, mau: ['--tr-sao', '--tr-dung', '--tr-tin'] }), 570)
+    const het = window.setTimeout(() => setVua(null), 2100)
+    return () => { window.clearTimeout(mo); window.clearTimeout(t); window.clearTimeout(het) }
   }, [soXong, soChang])
   const daCuon = useRef(false)
   useEffect(() => {
