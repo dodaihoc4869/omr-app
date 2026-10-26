@@ -3,7 +3,7 @@
 //   640–900px ('cot'): CỘT PHẢI 320px, không phủ đề (thầy 26/10: «tối ưu cho giao diện xoay ngang»).
 //   ≥ 901px  ('noi') : thẻ nổi neo ngay dưới chữ, có mũi nhọn; rê chuột hiện, bấm ghim (nơi gọi quyết định), Esc đóng.
 // Gắn vào <body> (không bị khung cuộn của màn cắt); phông lấy đúng phông của chữ neo (không đặt phông riêng).
-import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { ChemText } from '../../lib/chem-format'
 import type { TheGiaiNghia } from '../../lib/goi-y-cham/kieu'
@@ -34,6 +34,16 @@ const ICON: Record<TheGiaiNghia['nhan'], { ten: TenBieuTuong; mau: string; chip:
   'Từ then chốt': { ten: 'flag', mau: 'gyc-chu-y', chip: '' },
   'Đề hỏi': { ten: 'alert', mau: 'gyc-chu-y', chip: 'gyc-chu-y' },
 }
+// Cột phải dùng chung cho thẻ giải nghĩa (640–900px) và gợi ý (≥ 640px): đếm số chỗ đang giữ, hết người giữ mới gỡ `data-gyc-cot-phai`.
+let soGiu = 0
+/** Báo khung màn chừa cột phải (`--gyc-cot-phai`) — trả hàm nhả. */
+export function giuCotPhai(): () => void {
+  soGiu++
+  document.documentElement.setAttribute('data-gyc-cot-phai', '')
+  let da = false
+  return () => { if (da) return; da = true; if (--soGiu <= 0) { soGiu = 0; document.documentElement.removeAttribute('data-gyc-cot-phai') } }
+}
+
 const so = (x: number) => String(Math.round(x * 100) / 100).replace('.', ',')
 
 export default function TamGiaiThich({ the, neo, kieu, id, onDong, onVao, onRoi }: {
@@ -63,6 +73,8 @@ export default function TamGiaiThich({ the, neo, kieu, id, onDong, onVao, onRoi 
     window.addEventListener('resize', dat)
     return () => { window.removeEventListener('scroll', dat, true); window.removeEventListener('resize', dat) }
   }, [kieu, neo, the])
+  // 640–900px: thẻ là CỘT PHẢI ⇒ đề co lại bên trái, không bị che (thầy 26/10: «tối ưu cho giao diện xoay ngang»)
+  useEffect(() => (kieu === 'cot' ? giuCotPhai() : undefined), [kieu])
   const ic = ICON[the.nhan] ?? ICON['Từ then chốt']
   // Thẻ của làn A (the-cham.ts `TheGiaiNghiaDu`) có thêm: loai (viên thuốc «Base mạnh», «Ester»), cachTinhM, congThucChat, tenIupac.
   // Bố cục theo bản vẽ màn 3/3b: tên to · [tên IUPAC đậm · tên cũ] · hộp «công thức · M = … g/mol» · dòng nhỏ «M tính từ nguyên tử khối …».

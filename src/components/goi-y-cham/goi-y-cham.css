@@ -38,6 +38,8 @@
 .gyc-soi .gyc-chat.gyc-sang{background:var(--tr-dung-nhat)}
 .gyc-soi .gyc-dam.gyc-sang{box-shadow:0 0 0 2px var(--tr-mat),0 0 0 4px var(--tr-hs);background:var(--tr-hs-nhat)}
 .gyc-soi .gyc-nhieu.gyc-sang{box-shadow:none}
+/* viền soi sáng dày 4px: chừa khoảng hai bên để không đè chữ bên cạnh (bản vẽ: .cau.soi .sang{margin:0 4px}) */
+.gyc-soi .gyc-sang:not(.gyc-nhieu){margin-left:4px;margin-right:4px}
 
 /* ── 2. Dòng chú giải ────────────────────────────────────────────────────────────────────────────────────── */
 .gyc-chu-giai{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 14px;font-size:12.5px;color:var(--tr-chu-3)}

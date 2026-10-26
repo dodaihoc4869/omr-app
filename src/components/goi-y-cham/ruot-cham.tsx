@@ -7,7 +7,7 @@ import type { BanSoDo, GoiYTraVe, LoaiCham, TheGiaiNghia, VungCham } from '../..
 import { docBanSoDo, taiGoiYSoDo } from '../../lib/goi-y-cham/api'
 import { bocVung, type KetQuaBoc } from './boc-chu'
 import { napTuDien, type TuDien } from './tu-dien'
-import TamGiaiThich, { useKieuTam } from './TamGiaiThich'
+import TamGiaiThich, { giuCotPhai, useKieuTam } from './TamGiaiThich'
 import GoiY3Tang, { tangTuBan, tangTuSinh, type TrangThaiGoiY } from './GoiY3Tang'
 import './goi-y-cham.css'
 
@@ -178,11 +178,7 @@ export function RuotCham(p: RuotChamProps) {
     return () => g.classList.remove('gyc-soi')
   }, [p.mo, tang, boc, goc])
   // ≥ 640px: gợi ý ở cột phải ⇒ báo khung màn chừa chỗ (biến --gyc-cot-phai trên <html>)
-  useEffect(() => {
-    if (!p.mo) return
-    document.documentElement.setAttribute('data-gyc-cot-phai', '')
-    return () => document.documentElement.removeAttribute('data-gyc-cot-phai')
-  }, [p.mo])
+  useEffect(() => (p.mo ? giuCotPhai() : undefined), [p.mo])
 
   const chuCua = (loai: LoaiCham) => [...new Set((boc?.vung ?? []).filter((v) => v.loai === loai).map((v) => v.chu.trim()).filter(Boolean))]
   const tangDs = gy?.tt === 'co' && gy.ban ? tangTuBan(gy.ban) : tangTuSinh(chuCua('cho'), chuCua('hoi'), chuCua('chat'), q.goiY)

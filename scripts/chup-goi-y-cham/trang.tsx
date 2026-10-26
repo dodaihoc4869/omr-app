@@ -19,6 +19,16 @@ import type { BanSoDo, GoiYTraVe } from '../../src/lib/goi-y-cham/kieu'
 
 // ── bài mẫu (số khớp nhau)
 const BAI: Record<string, { phan: string; de: string; pa?: string[]; ban: BanSoDo }> = {
+  lythuyet: {
+    phan: 'Phần I · Trắc nghiệm', de: 'Phát biểu nào sau đây không đúng?',
+    pa: ['Nitrogen chiếm khoảng 78% thể tích không khí.', 'Ở điều kiện thường, nitrogen là chất khí không màu, không mùi.', 'Phân tử N2 có liên kết ba bền nên nitrogen khá trơ ở nhiệt độ thường.', 'Nitrogen tan rất tốt trong nước.'],
+    ban: {
+      qid: 'lythuyet', phienBan: 1, buoc: [],
+      deNoiGi: 'Bốn câu đều nói về khí nitrogen. Ba câu đúng, một câu sai: em cần tìm câu sai đó.',
+      chiaKhoa: 'Mỗi câu thuộc một mảng kiến thức: thành phần không khí · tính chất vật lí của N2 · liên kết N≡N. Đối chiếu từng câu với đúng mảng của nó.',
+      cauTuHoi: 'Trong phòng thí nghiệm, người ta thu khí N2 bằng cách đẩy nước. Điều đó cho em biết N2 tan trong nước nhiều hay ít?',
+    },
+  },
   este: {
     phan: 'Phần I · Trắc nghiệm', pa: ['8,2.', '10,2.', '12,2.', '14,2.'],
     de: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate bằng 100 mL dung dịch NaOH 1,5 M, đun nóng. Cô cạn dung dịch sau phản ứng, thu được m gam chất rắn khan. Giá trị của m là',
