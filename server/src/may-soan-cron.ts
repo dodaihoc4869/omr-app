@@ -39,7 +39,7 @@ export const NGHI_KHI_LOI_MS = 30 * 60_000
 export const SO_LOI_DE_NGHI = 3
 export const GIOI_HAN_MOI_LUOT = 6
 export const NGAN_SACH_GIAY = 25
-export const SONG_SONG = 3
+export const SONG_SONG = 6 // 27/10 thầy «Chạy liên tục đi»: 3 ⇒ 6 câu song song ngoài giờ cao điểm (429 ⇒ tự nghỉ như cũ)
 
 /** Câu vòng sửa: CHÉP NGUYÊN `SQL_CAN_SUA` của soan-so-do.ts (không nạp máy soạn khi cờ tắt); test may-soan-cron-2710 giữ hai bản bằng nhau. */
 export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND ly_do = 'Câu tính thiếu sơ đồ hoặc bước tính.')`
