@@ -154,7 +154,7 @@ export default function HocTapHomNay(p: Props) {
     const eGoi7 = goi7 && <TheGoi7 du={goi7} />
     const eThieu = !!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>
     const eGiu = !!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>
-    const mot = !!MotTrang && muc === 'hom-nay'
+    const mot = !!MotTrang
     return <div className="ht-app ht2" data-nguon={p.nguon} data-mot={mot || undefined}>
     {trong && MenuDoc ? <MenuDoc muc={muc} ds={MENU} onMuc={(id) => setMuc(id as Muc)} coCa={p.coCa} onThi={p.onThi} thongBao={p.thongBao} dangTai={p.dangTai} onTaiLai={p.onTaiLai}
       chuDau={chuCaiDau(p.ten || 'Em')} moCuaEm={moCuaEm} onCuaEm={() => setMoCuaEm(true)} nutCuaEm={nutCuaEm} token={p.token} moDiemDanh={p.moDiemDanh !== false} />
@@ -176,11 +176,11 @@ export default function HocTapHomNay(p: Props) {
         {p.loi && <div className="ht-thong-bao ht2-loi" role="alert"><span>{p.loi}</span><button className="ht-nut-phu" onClick={p.onTaiLai}>Thử lại</button></div>}
         {p.coCa && !mot && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
-        {muc === 'hom-nay' && (MotTrang ? <MotTrang so={so} dangTai={p.dangTai && !sanh} tenBai={tenBai} viec={viec} onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} kho={kho}
+        {MotTrang ? <MotTrang muc={muc} hs={p} so={so} dangTai={p.dangTai && !sanh} tenBai={tenBai} viec={viec} onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} kho={kho}
           coCa={p.coCa} onThi={p.onThi} token={p.token} soSua={soSua} onChua={() => p.onChua()} hinhSua={hinhTuSua()} kiem={kiem} ngayKiem={ngayKiem} onKiemTra={p.onKiemTra}
           soBaiTap={p.soBaiTap} coBaiTap={p.coBaiTap} onBaiTap={p.onBaiTap}
           ghi={[ht?.conThieu ? `Hôm nay còn thiếu ${ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.` : '', sanh?.tamGiuCa ? 'Một số câu đang được giữ cho ca kiểm tra.' : ''].filter(Boolean)} />
-          : <>
+          : muc === 'hom-nay' && <>
           {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
               và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
           {/* Đợt 20 (bản vẽ docs/ban-ve-dot20): ngày kiểm tra ⇒ thẻ kiểm tra là khối CHÍNH; ngày khác (sắp đến / đang chuẩn bị) ⇒ thẻ phụ NẰM SAU khối học.
@@ -188,9 +188,9 @@ export default function HocTapHomNay(p: Props) {
               kiểm tra (nút Làm bài kiểm tra) lên ĐẦU, khối học nhẹ nằm sau. */}
           {eKiem}
           {!ngayKiem && <>{eHomNay}{eKiemSau}{eMoiSua}{eGoi7}{eThieu}{eGiu}{nhomOnSua}</>}
-        </>)}
+        </>}
 
-        {(muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" role="status" aria-busy="true" aria-label="Đang mở" />}>
+        {!mot && (muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" role="status" aria-busy="true" aria-label="Đang mở" />}>
           <HanhTrinhOnSua muc={muc} sanh={sanh} dangTai={p.dangTai} soSua={soSua}
             // Ngày có lịch kiểm tra cá nhân (PR258): thẻ kiểm tra thay nút Học tiếp — như bản trước khi trùng tu Hành trình.
             nut={ngayKiem && kiem
@@ -199,7 +199,7 @@ export default function HocTapHomNay(p: Props) {
             onChua={p.onChua} onXemLai={p.onXemLai} onTuLuyen={p.onTuLuyen} onLuyenLai={p.onLuyenLai} />
         </Suspense>}
 
-        {muc === 'ket-qua' && <section className="ht2-nhom" aria-label="Kết quả">
+        {!mot && muc === 'ket-qua' && <section className="ht2-nhom" aria-label="Kết quả">
           <h2>Điểm thầy đã công bố</h2>
           <Dong ten="Ca kiểm tra" chu="Điểm và lời giải ca đã công bố" icon={LineChart} sac="cham" onClick={p.onLichSu} />
           {p.onKetQua && <Dong ten="Kết quả bài đã nộp" chu="Điểm và báo cáo đã công bố" icon={ClipboardCheck} sac="vang" onClick={p.onKetQua} />}
