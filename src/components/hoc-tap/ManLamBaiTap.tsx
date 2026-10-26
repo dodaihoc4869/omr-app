@@ -16,6 +16,7 @@ import { chuDanhSachCau, chuDS, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nha
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
+import { TamGiaiThich, VungChamDe, type GiaiThichCham } from '../goi-y-cham/VungChamDe'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
 import './hoc-tap.css'
@@ -190,6 +191,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const daMo = useRef(false)
   // Thầy 13/10: em hỏi Thầy (AI gợi hướng) lúc đang làm câu ⇒ lần nộp câu đó là "có trợ giúp" (như Gợi ý).
   const daHoiThay = useRef('')
+  // Khe «chạm để hiện giải thích» (src/components/goi-y-cham, chờ thầy duyệt): tấm giải thích đang mở — sang câu khác thì đóng.
+  const [giaiThich, setGiaiThich] = useState<GiaiThichCham | null>(null)
+  useEffect(() => { setGiaiThich(null) }, [q?.qid, xong])
   useEffect(() => { if (!q) return; if (daMo.current) veDau(); daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (k) { veDau(); nutTiepRef.current?.focus({ preventScroll: true }) } }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   // Rung phản hồi kiểu Duolingo (thầy 26/10) — chỉ app học sinh «Trong» (phan-hoi.ts tự kiểm): tấm kết quả đúng / sai, hết chặng.
@@ -419,7 +423,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           </section>
         : q ? <>
           <p className="duo-nhan"><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}{tenBai || q.tenDang ? ` · ${tenBai || q.tenDang}` : ''}</span>{chang ? <span className="duo-chip">Chặng {chang}</span> : null}</p>
-          <DeCau q={q} stt={stt} />
+          <VungChamDe q={q} onGiaiThich={setGiaiThich}><DeCau q={q} stt={stt} /></VungChamDe>
           {q.goiY && goiY && dangTraLoi && <section id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           {choChonCach && <section className="ht2-lam-the ht2-lam-chon-cach" aria-label="Chọn cách làm">
             <h2 className="ht2-lam-chon-tieu">Câu này em chọn làm thế nào?</h2>
@@ -433,7 +437,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </> : null}
         {loi && !q && <div className="ht2-lam-loi" role="alert"><span>{loi}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => setLan(n => n + 1)}><RefreshCw size={17} aria-hidden="true" />Thử lại</button></div>}
       </main>
-      {day}
+      {giaiThich && q && !xong ? <TamGiaiThich g={giaiThich} onDong={() => setGiaiThich(null)} /> : day}
       {moLoiGiai && q && k && !k.choThay && <div className="duo-lg" role="dialog" aria-modal="true" aria-label="Lời giải từng bước">
         <div className="duo-lg-the">
           <header className="duo-lg-dau"><b>Lời giải · Câu {stt}</b><button type="button" className="duo-dong" aria-label="Đóng lời giải" onClick={() => { setMoLoiGiai(false); nutTiepRef.current?.focus({ preventScroll: true }) }}><XIcon size={24} aria-hidden="true" /></button></header>

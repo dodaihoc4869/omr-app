@@ -558,3 +558,8 @@
 [data-trong='hs'].may-yeu :is(.duo .ht2-lam-pa, .duo .ht2-lam-y, .duo .ht2-lam-o-hang, .duo-ket, .duo-loe, .duo-hoa i) { animation: none; }
 [data-trong='hs'].may-yeu .duo-ket[data-tt='dung'] .duo-kq-o svg path { animation: none; stroke-dashoffset: 0; }
 [data-trong='hs'] .ht-app.ht2-lam.duo { overflow-x: clip; } /* tia bung ở ô sát mép không sinh cuộn ngang */
+
+/* ── 12. Khe «chạm để hiện giải thích» (src/components/goi-y-cham — chờ thầy duyệt): tấm giải thích cùng kiểu tấm kết quả, nền tin ── */
+[data-trong] .duo-ket[data-tt=giai] { background: var(--tr-tin-nhat); }
+[data-trong] .duo-ket[data-tt=giai] h2 { color: var(--tr-tin-chu); }
+[data-trong] .duo-ket[data-tt=giai] .duo-kq-chu { flex: 1 1 auto; min-width: 0; }
