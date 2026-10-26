@@ -144,6 +144,16 @@ export function kiemTrang() {
   }
   ra.push(...daCat.values(), ...daTran.values())
 
+  // khung cuộn gần nhất (overflow auto/scroll, trừ html/body) và vùng nhìn thấy của nó
+  const cuonCache = new Map()
+  const khungCuon = (el) => {
+    if (cuonCache.has(el)) return cuonCache.get(el)
+    let kq = null
+    for (let e = el.parentElement; e && e !== document.body && e !== document.documentElement; e = e.parentElement) if (/auto|scroll/.test(css(e).overflowX + css(e).overflowY)) { kq = e; break }
+    cuonCache.set(el, kq)
+    return kq
+  }
+  const catTheoCuon = (r, k) => { if (!k) return r; const q = k.getBoundingClientRect(); return { l: Math.max(r.l, q.left), t: Math.max(r.t, q.top), r: Math.min(r.r, q.right), b: Math.min(r.b, q.bottom) } }
   // ── (c) chồng nhau: dòng chữ × dòng chữ, chữ × nút, nút × nút (bỏ cha–con, bỏ phần tử nổi — thuộc (d))
   const NUT = 'button, a[href], [role="button"], [role="tab"], [role="radio"], [role="checkbox"], [role="switch"], input:not([type="hidden"]), select, textarea'
   const nuts = [...goc.querySelectorAll(NUT)].filter((e) => thay(e) && !chiDoc(e) && e.getBoundingClientRect().width > 1 && e.getBoundingClientRect().height > 1)
@@ -157,8 +167,15 @@ export function kiemTrang() {
     for (let j = i + 1; j < muc.length && muc[j].r.t < x.r.b - 2; j++) {
       const y = muc[j]
       if (x.el === y.el || x.el.contains(y.el) || y.el.contains(x.el)) continue
-      const w = Math.min(x.r.r, y.r.r) - Math.max(x.r.l, y.r.l), hh = Math.min(x.r.b, y.r.b) - Math.max(x.r.t, y.r.t)
+      let w = Math.min(x.r.r, y.r.r) - Math.max(x.r.l, y.r.l), hh = Math.min(x.r.b, y.r.b) - Math.max(x.r.t, y.r.t)
       if (w <= 2 || hh <= 2) continue
+      // khác khung cuộn ⇒ chỉ phần đang hiện trong khung cuộn mới chồng được lên nhau
+      const kx = khungCuon(x.el), ky = khungCuon(y.el)
+      if (kx !== ky) {
+        const a = catTheoCuon(x.r, kx), b = catTheoCuon(y.r, ky)
+        w = Math.min(a.r, b.r) - Math.max(a.l, b.l); hh = Math.min(a.b, b.b) - Math.max(a.t, b.t)
+        if (w <= 2 || hh <= 2) continue
+      }
       // nút không chữ phủ trọn phần kia (mẫu «cả thẻ bấm được»: nút trong suốt trải cả ô) — chữ nằm trên nó là cố ý
       const trongSuot = (e) => /rgba\(0, 0, 0, 0\)|transparent/.test(css(e).backgroundColor) && css(e).backgroundImage === 'none'
       const phu = (a, b) => a.nut && !b.nut && (!a.el.textContent.trim() || trongSuot(a.el)) && a.r.l <= b.r.l + 1 && a.r.r >= b.r.r - 1 && a.r.t <= b.r.t + 1 && a.r.b >= b.r.b - 1
@@ -206,7 +223,7 @@ export function kiemTrang() {
       const tx = (r.l + r.r) / 2, ty = (r.t + r.b) / 2
       // vòng nhỏ nhất chứa tâm dòng chữ
       let v = null
-      for (const o of vong) if (Math.hypot(tx - o.x, ty - o.y) < o.r && (!v || o.r < v.r)) v = o
+      for (const o of vong) if (o.el.contains(c.el) && Math.hypot(tx - o.x, ty - o.y) < o.r && (!v || o.r < v.r)) v = o // chữ phải nằm TRONG vòng (không tính chữ lớp khác đè lên)
       if (!v) continue
       const gh = co * 0.72 // chiều cao nét chữ số/hoa (không tính khoảng dòng)
       const goc4 = [[r.l, ty - gh / 2], [r.r, ty - gh / 2], [r.l, ty + gh / 2], [r.r, ty + gh / 2]]
@@ -363,9 +380,9 @@ export function kiemChe(che) {
     return k
   }
   const xet = (el, diem, chu) => {
-    const k = vung(el)
+    const kv = vung(el)
     for (const [x, y] of diem) {
-      if (x < k.l + 1 || y < k.t + 1 || x > k.r - 1 || y > k.b - 1) continue
+      if (x < kv.l + 1 || y < kv.t + 1 || x > kv.r - 1 || y > kv.b - 1) continue
       const tren = document.elementFromPoint(x, y)
       if (!tren || tren === el || el.contains(tren)) continue
       const f = noi(tren)

@@ -44,7 +44,10 @@ import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen' // LÀN HỌC 
 import ManTuChua from '../../src/components/hoc-tap/ManTuChua' // LÀN HỌC SINH 12/10
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 // Bản màu app thầy (App.tsx nạp ba tệp này, phạm vi `.vo-thay`) — màn thầy bọc đúng khung `.m3.m3-thay.vo-thay` như app thật.
+import '../../src/styles/teacher-layout.css' // ═══ SOÁT 26/10: ba tờ vỏ thầy nay App.tsx chèn bằng chuỗi (main 26/10) — trang chụp nạp thẳng, đúng thứ tự,
 import '../../src/styles/vo-thay.css'
+import '../../src/components/chien-dich/thanh-ben-hoa2.css' // ═══ SOÁT 26/10 (thiếu ⇒ thanh trên điện thoại «tĩnh» rơi xuống cuối trang, ảnh sai)
+import '../../src/components/thanh-ben-gv2.css' // ═══ SOÁT 26/10
 import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
 import '../../src/styles/trong.css' // giao diện «Trong» 26/10 (App / AppHocSinh / AppThi nạp y như vậy)
