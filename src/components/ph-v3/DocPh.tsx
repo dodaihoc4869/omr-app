@@ -293,7 +293,7 @@ function KiemTraSua({ p }: PT) {
       <p className="pd-nhan">Kiểm tra và sửa lỗi</p>
       <ul className="pd-kt">
         {dong.map(({ ma, ten, bt: Hinh, d }) => (
-          <li key={ma} data-ma={ma} data-mau={d.mau}><span className="pd-kt-bt" aria-hidden="true"><Hinh co={18} /></span><div><b>{ten}</b><span>{d.chu}</span></div></li>
+          <li key={ma} data-ma={ma} data-mau={d.mau}><span className="pd-kt-bt" aria-hidden="true"><Hinh co={18} /></span><div><b>{ten}</b><span>{d.chu.replace(/ · /g, '\u00a0· ')/* SOÁT 26/10: «·» không mở đầu dòng */}</span></div></li>
         ))}
       </ul>
     </section>

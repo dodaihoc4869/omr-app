@@ -149,7 +149,7 @@ describe('«Chỉ đọc» bật (<html data-trong="ph">)', () => {
     expect(man.querySelector('.pd-7 .c[data-tt="nay"] small')!.textContent).toBe('Hôm nay')
     await waitFor(() => expect(man.querySelector('.pd-thang [data-on]')!.textContent).toBe('Chưa đều'))
     await waitFor(() => expect(man.querySelector('[data-vung="cach-lam-bai"]')!.textContent).toBe('Học thậtLàm nhanh vì đã thuộc 126 câu · bấm vội mà sai 8 câu'))
-    await waitFor(() => expect(man.querySelector('.pd-kt li[data-ma="sua-loi"] > div > span')!.textContent).toBe('Còn 19 câu chưa sửa · 14 ngày qua con tự sửa 6 câu'))
+    await waitFor(() => expect(man.querySelector('.pd-kt li[data-ma="sua-loi"] > div > span')!.textContent!.replace(/\u00a0/g, ' ')).toBe('Còn 19 câu chưa sửa · 14 ngày qua con tự sửa 6 câu'))
     expect(man.querySelector('.pd-kt li[data-ma="btvn"]')!.getAttribute('data-mau')).toBe('cam')
     for (const d of goi) expect(Object.keys(MAY)).toContain(d)
     expect(goi.filter((x) => x === '/ph/bao-cao-tuan')).toHaveLength(1)
