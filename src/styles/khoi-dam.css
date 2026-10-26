@@ -50,8 +50,6 @@
   --m3-cao-do-1: var(--kd-lech) var(--kd-lech) 0 var(--kd-bong);
 }
 
-/* Phông chữ thường cho CẢ ba app (phông cũ Be Vietnam Pro thôi nạp ⇒ app phụ huynh cũng dùng Source Sans 3, màu giữ nguyên). */
-:root { --sans: var(--kd-f-chu); }
 
 /* ── 2. Phông và nền ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 [data-kd] body { background: var(--kd-giay); color: var(--kd-muc); font-family: var(--kd-f-chu); font-variant-numeric: tabular-nums; }

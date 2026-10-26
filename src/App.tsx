@@ -108,6 +108,7 @@ import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 import './styles/gv-mau.css' // BẢN MÀU app thầy (28/09), phạm vi .vo-thay
 import './styles/teacher-modern.css' // Lớp hoàn thiện app thầy, sau bảng màu gốc
+import './styles/khoi-dam-phong.css' // phông «Khối đậm» tự lưu — chỉ 3 gốc dùng Khối đậm (phụ huynh / Hỏi thầy giữ Be Vietnam Pro)
 import './styles/khoi-dam.css' // Giao diện «Khối đậm» thầy duyệt 25/10 — đè sau cùng
 
 // APP GIÁO VIÊN. Màn đăng ký, hồ sơ, lịch sử, bài tập và nhắn tin PHÍA HỌC SINH

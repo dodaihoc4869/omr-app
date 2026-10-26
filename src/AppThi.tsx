@@ -7,6 +7,7 @@
 // App.tsx VẪN giữ nhánh ấy (link thi trên máy thầy đang khoá app, phép kiểm dựng thẳng <App/>) — hai nhánh cùng một cây. CSS chung đã nạp ở main.tsx.
 import { lazy, Suspense } from 'react'
 import BatLinhShell from './components/bat-linh/BatLinhShell'
+import './styles/khoi-dam-phong.css' // phông «Khối đậm» tự lưu — chỉ 3 gốc dùng Khối đậm (phụ huynh / Hỏi thầy giữ Be Vietnam Pro)
 import './styles/khoi-dam.css' // Giao diện «Khối đậm» thầy duyệt 25/10
 import ChanLoi from './components/ChanLoi'
 
