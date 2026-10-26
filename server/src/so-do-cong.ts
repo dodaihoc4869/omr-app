@@ -239,6 +239,9 @@ function hinhDangLoi(ban: BanSoDo): string | null {
   return null
 }
 
+/** Lý do cổng khi câu tính thiếu sơ đồ / bước tính — máy soạn nhận ra để bắt soạn lại (27/10). */
+export const LY_DO_THIEU_SO_DO = 'Câu tính thiếu sơ đồ hoặc bước tính.'
+
 /**
  * CỔNG KIỂM của một bản sơ đồ với câu của kho (đáp án KHO, không tin máy soạn). Thứ tự: hình dạng → CHẶN LỘ → Phần II → thiếu sơ đồ/bước →
  * tính chuỗi → so đáp án. `giaTri` = giá trị nhân hết các thừa số (khi tính được).
@@ -252,7 +255,7 @@ export function kiemCong(ban: BanSoDo, cau: CauKiemCong): KetQuaKiemCong {
   const lo = timLo(ban, cau, tinh)
   if (lo) return { ket: 'lo_dap_an', lyDo: lo, ...kem }
   if (cau.phan === 'II') return { ket: 'khong_kiem_duoc', lyDo: 'Phần II chưa kiểm số (v1).', ...kem }
-  if (!ban.soDo || !ban.buoc.length) return { ket: 'khong_kiem_duoc', lyDo: 'Câu tính thiếu sơ đồ hoặc bước tính.' }
+  if (!ban.soDo || !ban.buoc.length) return { ket: 'khong_kiem_duoc', lyDo: LY_DO_THIEU_SO_DO }
   if (!tinh.ok) return { ket: 'khong_kiem_duoc', lyDo: tinh.lyDo }
   const v = giaTri!
   // `ketQua` ghi trong bản (hiện SAU khi nộp) phải khớp phép tính theo cách viết của chính nó.

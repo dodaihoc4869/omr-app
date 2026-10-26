@@ -41,6 +41,8 @@ export const GIOI_HAN_MOI_LUOT = 6
 export const NGAN_SACH_GIAY = 25
 export const SONG_SONG = 3
 
+/** Câu vòng sửa: CHÉP NGUYÊN `SQL_CAN_SUA` của soan-so-do.ts (không nạp máy soạn khi cờ tắt); test may-soan-cron-2710 giữ hai bản bằng nhau. */
+export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND ly_do = 'Câu tính thiếu sơ đồ hoặc bước tính.')`
 /** 19:00–23:59 giờ VN — cùng mốc với `laGioCaoDiem` của soan-so-do.ts (viết lại ở đây để không nạp cả máy soạn khi cờ tắt). */
 export const laGioCaoDiemSoan = (ms: number) => (new Date(ms).getUTCHours() + 7) % 24 >= 19
 
@@ -102,7 +104,7 @@ async function demChangKtcnMo(env: Env, nowMs: number): Promise<number> {
 /** Vòng SỬA: lấy tiếp các câu đang lệch / lộ đáp án SAU qid đã xử lý (con trỏ theo khoá, không lệch khi câu vừa sửa xong rời danh sách). */
 async function cauSuaTiep(env: Env, sau: string): Promise<string[]> {
   try {
-    const r = await env.DB.prepare(`SELECT qid FROM loi_giai_so_do WHERE cong IN ('lech', 'lo_dap_an') AND qid > ? ORDER BY qid LIMIT ${GIOI_HAN_MOI_LUOT}`)
+    const r = await env.DB.prepare(`SELECT qid FROM loi_giai_so_do WHERE (${SQL_CAN_SUA}) AND qid > ? ORDER BY qid LIMIT ${GIOI_HAN_MOI_LUOT}`)
       .bind(sau).all<{ qid: string }>()
     return (r.results ?? []).map((x) => String(x.qid ?? '')).filter(Boolean)
   } catch (e) {

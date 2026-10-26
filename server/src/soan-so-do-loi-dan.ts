@@ -208,3 +208,7 @@ export function chuThuLaiKhuon(lyDo: string): string {
 export function chuThuLai(lyDo: string, giaTri?: string | number): string {
   return `Cổng kiểm báo LỆCH: ${lyDo}${giaTri !== undefined && giaTri !== '' ? ` (nhân các thừa số ra ${giaTri})` : ''}. Tính lại cẩn thận, nhân hết thừa số bước cuối phải ra đúng đáp án kho. Trả về TOÀN BỘ JSON mới đúng khuôn.`
 }
+/** Tin nhắn thử lại khi câu TÍNH mà bản trả thiếu sơ đồ / bước tính (27/10: 14/18 câu đầu của cron rơi vào đây, trước không thử lại). */
+export function chuThuLaiThieu(): string {
+  return 'Câu này là BÀI TÍNH TOÁN: bắt buộc có `soDo` (2–3 nút, số liệu đề cho xếp dọc dưới chất) và `buoc` (1–3 bước, mỗi bước đủ `thuaSo`, bước cuối nhân hết ra đáp án kho). Không dùng `chiaKhoa` / `cauTuHoi` thay cho phép tính. Trả về TOÀN BỘ JSON mới đúng khuôn.'
+}
