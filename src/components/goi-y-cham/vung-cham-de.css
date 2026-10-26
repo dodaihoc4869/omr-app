@@ -1,0 +1,5 @@
+/* Vỏ «Chạm để hiểu đề»: chỉ nút «Bắt đầu từ đâu?» (cùng kiểu nút nhẹ màu chính của bản vẽ). Phần còn lại ở goi-y-cham.css (nạp lười). */
+.gyc-hang-nut{display:flex;justify-content:flex-end;margin:0 0 10px}
+.gyc-nut-bat-dau{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:0;border-radius:12px;background:var(--tr-hs-nhat);color:var(--tr-hs-chu);font:inherit;font-weight:600;font-size:15px;cursor:pointer;touch-action:manipulation}
+.gyc-nut-bat-dau:focus-visible{outline:3px solid var(--tr-hs);outline-offset:2px}
+.gyc-nut-bat-dau[data-mo]{background:var(--tr-hs);color:var(--tr-hs-tren)}
