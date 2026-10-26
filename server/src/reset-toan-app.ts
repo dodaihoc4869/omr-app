@@ -136,6 +136,7 @@ export const BANG_GIU: readonly string[] = [
   'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_meta', 'cau_meta_to', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
   'loi_giai_so_do', // 26/10: lời giải kiểu sơ đồ của thầy, dẫn xuất từ kho câu (máy soạn + cổng kiểm) ⇒ GIỮ
   'dap_an_kho_sua', // 26/10: nhật ký TỰ SỬA ĐÁP ÁN KHO (sua-dap-an-kho.ts: đáp án cũ ⇒ mới, để lùi) — vận hành kho câu ⇒ GIỮ
+  'may_soan_trang_thai', // 27/10: trạng thái máy soạn sơ đồ chạy bằng cron (may-soan-cron.ts: vòng, con trỏ, khoá chạy) — vận hành kho câu ⇒ GIỮ
   'study_preferences', 'student_push', 'app_presence', 'ma_da_dung', 'khien_truoc_reset_2109',
   // KÍCH THƯỚC ĐỀ TỪNG CÂU TÍNH SẴN (cau-doc-giay.ts, 21/10, migration-z-2110-cau-doc-giay.sql): bảng DẪN XUẤT từ kho câu `game_v2_question` (đã GIỮ) — không phải dữ liệu học của em; xoá đi cron chỉ dựng lại.
   'cau_doc_giay',

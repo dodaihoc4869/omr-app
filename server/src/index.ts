@@ -3336,7 +3336,7 @@ async function themMocReset(env: Env, res: Response): Promise<Response> {
 }
 
 const boXuLy = {
-  async scheduled(event:{cron:string}, env:Env) {
+  async scheduled(event:{cron:string}, env:Env, ctx?:{waitUntil(p:Promise<unknown>):void}) {
     // Lệnh khôi phục 08/10: batch nguyên tử, chỉ một lần, không chạy nếu có ca thi mở.
     await khoiPhucChienDich0810(env)
     // RESET TOÀN APP (chỉ chạy đúng một lần, sau mốc 00:01 thứ Hai 21/09; trước mốc và sau khi xong thì trả về ngay). PHẢI chạy trước mọi việc khác của cron.
@@ -3359,6 +3359,10 @@ const boXuLy = {
       // Ngoài cao điểm, chuẩn bị nguồn cho từng ít em trước khi các em mở app.
       const gioVn=new Date(Date.now()+7*3600000).getUTCHours()
       if(gioVn<20)await import('./hanh-trinh-nguon-cau').then(m=>m.chuanBiNguonCau(env,Date.now())).catch(async()=>{await ghiLoiMay(env,'hanh_trinh_nguon_cau')})
+      // MÁY SOẠN LỜI GIẢI SƠ ĐỒ (27/10, may-soan-cron.ts): cờ `cau_hinh.may_soan_so_do` tắt ⇒ một câu đọc có đệm rồi về. Bật ⇒ một lô nhỏ có khoá chạy,
+      // chạy NỀN (waitUntil) để không giữ chân các việc cron phía sau (thông báo, nhắc bài). Phải đứng TRƯỚC dòng `return` dưới. Lỗi chỉ ghi log.
+      {const p=import('./may-soan-cron').then(m=>m.chayMaySoanCron(env,Date.now())).then(r=>{if(r.chay)console.log('[may-soan] cron',JSON.stringify(r))}).catch(e=>console.error('[may-soan] cron lỗi:',e))
+      if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
       // Lượt quét kho dùng ngân sách riêng; việc nền khác chạy phút kế tiếp. Cron đêm luôn chạy đầy đủ.
       if(ht?.trangThai==='vua_hop_nhat'||ht?.trangThai==='da_dong_bo')return
     }
