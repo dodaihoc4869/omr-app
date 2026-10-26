@@ -196,3 +196,7 @@
  .ktcn-nav-dt{display:none}
  .ktcn-day{left:216px}
 }
+/* SOÁT 26/10: chặng 7 câu — ô số câu không còn một ô rơi một mình xuống hàng (6+1 / 3+3+1) ⇒ chia 4 + 3 */
+.ktcn-nav-dt:has(> :nth-child(7):last-child){max-width:216px}
+@media (min-width:1024px){.ktcn-ben .ktcn-nav:has(> :nth-child(7):last-child){grid-template-columns:repeat(4,46px)}}
+@media (orientation:landscape) and (max-height:500px){.ktcn-ben .ktcn-nav:has(> :nth-child(7):last-child){grid-template-columns:repeat(4,44px)}.ktcn-ben .ktcn-nav:has(> :nth-child(7):last-child) button{width:44px;height:44px}}

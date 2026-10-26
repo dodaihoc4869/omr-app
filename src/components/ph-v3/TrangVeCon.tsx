@@ -272,7 +272,7 @@ export function DauThe({ id, bt, mau, tieuDe, phu, chip }: { id: string; bt: Rea
       <span className="ph3-o-bt" data-mau={mau} aria-hidden="true">{bt}</span>
       <div>
         <h2 id={id}>{tieuDe}</h2>
-        {phu && <span>{phu}</span>}
+        {phu && <span>{typeof phu === 'string' ? phu.replace(/ · /g, '\u00a0· ') : phu}</span>}{/* SOÁT 26/10: «·» không mở đầu dòng */}
       </div>
       {chip}
     </div>

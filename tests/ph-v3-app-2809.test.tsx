@@ -264,7 +264,7 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     const lt = container.querySelector('[data-vung="loi-thay-moi"]')!
     expect(lt.querySelector('h2')!.textContent).toBe('Nhận xét của thầy')
     // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19): dòng phụ ghi tác giả + ca + ngày; liên kết ghi số nhận xét; cảnh báo đứng đầu cột phải (điện thoại: ngay sau Hôm nay).
-    expect(lt.textContent).toContain('Thầy Đỗ Đại Học · sau Kiểm tra 45 phút · Ester – Lipid')
+    expect(lt.textContent!.replace(/\u00a0/g, ' ')).toContain('Thầy Đỗ Đại Học · sau Kiểm tra 45 phút · Ester – Lipid')
     expect([...lt.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Xem tất cả 1 nhận xét của thầy', '#loi-thay']])
     expect(container.querySelector('.tvc-nhom-trai')!.firstElementChild!.getAttribute('data-vung')).toBe('anh-hung')
     expect(container.querySelector('.tvc-nhom-phai')!.firstElementChild!.getAttribute('data-vung')).toBe('canh-bao-thay')

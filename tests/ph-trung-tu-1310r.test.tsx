@@ -168,7 +168,7 @@ describe('một trang đủ mọi phần, theo bản vẽ', () => {
     const c = await moTrang()
     await waitFor(() => expect(c.querySelector('[data-vung="loi-thay-moi"]')).toBeTruthy())
     const t = c.querySelector('[data-vung="loi-thay-moi"]')!
-    expect(t.textContent).toContain('Thầy Đỗ Đại Học · sau Kiểm tra 45 phút · Thứ Bảy 10/10')
+    expect(t.textContent!.replace(/\u00a0/g, ' ')).toContain('Thầy Đỗ Đại Học · sau Kiểm tra 45 phút · Thứ Bảy 10/10')
     expect(t.querySelector('blockquote')!.textContent).toContain('Phần III con còn sai 2 câu hiệu suất ester hoá')
     expect(t.querySelector('a[href="#loi-thay"]')!.textContent).toBe('Xem tất cả 6 nhận xét của thầy')
   })
@@ -256,7 +256,7 @@ describe('phần dưới: nạp khi cuộn tới, hai lệnh song song', () => {
     const bt = c.querySelector('[data-vung="btvn"]')!
     expect(bt.querySelector('.tvc-chang')!.querySelectorAll('i[data-xong]')).toHaveLength(3)
     expect(bt.querySelector('[data-vung="btvn-dang-lam"]')!.textContent).toContain('Xong 3/5 chặng · hạn nộp 23:59 Thứ Năm 15/10 (còn 1 ngày 2 giờ)')
-    expect([...bt.querySelectorAll('[data-vung="btvn-da-nop"] li')].map((x) => x.textContent)).toEqual([
+    expect([...bt.querySelectorAll('[data-vung="btvn-da-nop"] li')].map((x) => x.textContent!.replace(/\u00a0/g, ' '))).toEqual([
       'Ester · buổi 6Nộp 21:40 Thứ Hai 12/10 · đúng hạn8,2', 'Ester · buổi 5Nộp 02:30 Thứ Sáu 09/10 · trễ 3,5 giờ6', 'Chất béo · buổi 4Nộp 20:15 Thứ Hai 05/10 · đúng hạn7,4',
     ])
     expect(bt.textContent).toContain('Câu dồn từ các ngày trước: 12 câu, khoảng 10 phút.')

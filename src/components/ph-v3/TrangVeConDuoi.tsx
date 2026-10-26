@@ -596,7 +596,7 @@ function Btvn({ pm, moc, nowMs }: { pm: PhMoi; moc: string | null; nowMs: number
           {gan.map((b) => (
             <li key={b.maBtvn}>
               <span className="tvc-dau-cham" data-mau={b.dungHan === false ? 'ho' : b.dungHan ? 'xl' : 'xam'} aria-hidden="true">{b.dungHan === false ? <BtDongHo co={16} day={2.4} /> : <BtTich co={16} day={2.6} />}</span>
-              <div><b>{b.ten}</b><span className="tvc-phu">Nộp {ngayGioVn(b.nopLuc)}{b.dungHan === true ? ' · đúng hạn' : b.dungHan === false ? ` · trễ ${b.nopTreGio !== null ? `${soVn(b.nopTreGio)} giờ` : 'hạn'}` : ''}</span></div>
+              <div><b>{b.ten}</b><span className="tvc-phu">Nộp {ngayGioVn(b.nopLuc)}{b.dungHan === true ? '\u00a0· đúng hạn' : b.dungHan === false ? `\u00a0· trễ ${b.nopTreGio !== null ? `${soVn(b.nopTreGio)} giờ` : 'hạn'}` : ''}</span></div>
               {b.diem !== null && <strong aria-label={`${soVn(b.diem)} điểm`}>{soVn(b.diem)}</strong>}
             </li>
           ))}
