@@ -106,7 +106,7 @@ const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuL
 
 // Số câu đã làm hôm nay: chặng 2 bắt đầu ở 6/24 (chặng 3 ở 12/24); mỗi câu nộp / học cách giải +1 — như Sảnh tải lại sau mỗi câu.
 let daNop = 0
-const DAU = kieu === 'g7' ? 12 : 6
+const DAU = kieu === 'g7' ? 12 : thamSo.get('giu') === '1' ? 2 : 6 // GIỮ CHÂN 27/10: hôm nay mới 2 câu ⇒ tấm nhắc giữ chuỗi
 export const soHomNayLam13 = () => SO_LON ? { daLam: 1234 + daNop, muc: 2400, chang: 11, soChang: 12 } : ({ daLam: DAU + daNop, muc: 24, chang: Math.floor(DAU / 6) + 1, soChang: 4 })
 
 // Như `publicQuestion`: câu Phần III kèm số ô = đúng số kí tự đáp số (chỉ con số), không kèm đáp án.

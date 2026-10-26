@@ -77,7 +77,7 @@ function theTheoCongThuc(khoa: string, ntk?: BangNtk): TheGiaiNghiaDu | null {
 const NGHIA_BIEN: Record<string, string> = { m: 'khối lượng (gam)', V: 'thể tích (lít)', a: '', x: '', y: '' }
 const MUA = 'Bắt đầu từ cuối: muốn tính được thứ đề hỏi thì cần số mol của chất nào?'
 
-/** Thẻ khi chạm vùng ĐỀ HỎI. */
+/** Thẻ khi chạm vùng ĐỀ HỎI. Thầy 27/10: không câu nào chỉ nhắc lại chữ đề («X»: đó là thứ em cần tìm) — chỉ giữ câu giúp em làm. */
 function theDeHoi(v: VungCham): TheGiaiNghiaDu | null {
   const chu = v.chu.trim()
   const thuong = chu.toLowerCase()
@@ -95,23 +95,23 @@ function theDeHoi(v: VungCham): TheGiaiNghiaDu | null {
     return { ten: 'Đề hỏi điều SAI', nhan: 'Đề hỏi', doan: ['Đọc từng ý và tự hỏi «đúng hay sai?».', 'Bẫy hay gặp: đọc nhanh, bỏ sót chữ «không», «sai».'] }
   }
   if (v.khoa === 'nao-sau-day') {
-    return { ten: 'Đề hỏi chọn một phương án', nhan: 'Đề hỏi', doan: [`«${chu}»: chỉ một phương án hợp với câu hỏi.`, 'Với từng phương án, tự hỏi «có đúng ý đề không?», gạch phương án chắc chắn không hợp.'] }
+    return { ten: 'Đề hỏi chọn một phương án', nhan: 'Đề hỏi', doan: ['Với từng phương án, tự hỏi «có đúng ý đề không?», gạch phương án chắc chắn không hợp.'] }
   }
   if (v.khoa === 'gia-tri') {
     const bien = /giá trị\s+(?:gần nhất\s+)?(?:của\s+)?([a-zA-Z])(?![\p{L}\p{N}])/iu.exec(chu)?.[1]
     const nghia = bien ? NGHIA_BIEN[bien] : undefined
-    const doan = [nghia ? `${bien} là ${nghia}: đó là thứ em cần tìm.` : `«${chu}»: đó là thứ em cần tìm.`]
+    const doan = nghia ? [`${bien} là ${nghia}: đó là thứ em cần tìm.`] : []
     if (bien) doan.push(`Đọc ngược lên trong đề: ${bien} gắn với chất nào?`)
     doan.push(MUA)
     return { ten: bien ? `Đề hỏi giá trị của ${bien}` : 'Đề hỏi', nhan: 'Đề hỏi', doan }
   }
   const dem = /^số\s/u.test(thuong) && !/^số (mol|gam)/u.test(thuong)
-  if (dem) return { ten: 'Đề hỏi đếm', nhan: 'Đề hỏi', doan: [`«${chu}»: xét lần lượt từng ý, đánh dấu đúng hay sai rồi mới đếm.`] }
+  if (dem) return { ten: 'Đề hỏi đếm', nhan: 'Đề hỏi', doan: ['Xét lần lượt từng ý, đánh dấu đúng hay sai rồi mới đếm.'] }
   const tinh = v.khoa === 'tinh' || /khối lượng|thể tích|nồng độ|số mol|số gam|hiệu suất|phần trăm|bao nhiêu|giá trị|tính/u.test(thuong)
   // Thầy 27/10 («Giải thích ngu thế nhỉ» — chạm «là» ra «đó là điều đề hỏi. Đọc kỹ từng ý…»): đề hỏi không phải tính / đếm / phủ định thì KHÔNG có thẻ
   // (chữ không chạm được) — thẻ không nói thêm gì ngoài chính câu đề thì bỏ.
   if (!tinh) return null
-  return { ten: v.khoa === 'tinh' ? 'Đề yêu cầu tính' : 'Đề hỏi', nhan: 'Đề hỏi', doan: [`«${chu}»: đó là thứ em cần tìm.`, MUA] }
+  return { ten: v.khoa === 'tinh' ? 'Đề yêu cầu tính' : 'Đề hỏi', nhan: 'Đề hỏi', doan: [MUA] }
 }
 
 /**

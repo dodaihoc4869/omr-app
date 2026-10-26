@@ -539,6 +539,14 @@ if (LA_LAM13 && thamSo.get('lam') === 'duo') try { localStorage.setItem('omr_stu
 // Phông Nunito chỉ bật khi cổng đã vẽ (:has(.ht2) — app thật luôn gắn Hôm nay dưới màn con) ⇒ trang chụp gắn một .ht2 rỗng ẩn.
 if (LA_LAM13 && thamSo.get('lam') === 'duo' && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>') }
 // ═══ hết DUO APP 26/10
+// ═══ GIỮ CHÂN 27/10: `lam13&lam=duo&tp=1&giu=1` — bản tổng quan thưởng ở máy như app thật đã nạp lúc mở (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4).
+import { DUONG as DUONG_TP, docTongQuan as docTqGiu, ghiTam as ghiTamGiu, khoaTam as khoaTamGiu } from '../../src/lib/thuong-api'
+import { tongQuanGia as tqGiaGiu, lich7 as lich7Giu } from '../../tests/_thuong-mau'
+if (LA_LAM13 && thamSo.get('giu') === '1') {
+  const l = lich7Giu(['hoc', 'hoc', 'hoc', 'hoc', 'hoc', 'hoc', 'hoc']).map((x, i, a) => i === a.length - 1 ? { ...x, kieu: 'cho' } : x)
+  ghiTamGiu(khoaTamGiu(DUONG_TP.tongQuan, 'tk'), docTqGiu(tqGiaGiu({ chuoiNgay: { so: 12, giuChuoi: 1, sucChua: 2, lich7: l } })))
+}
+// ═══ hết GIỮ CHÂN 27/10
 // ═════════════════════════════════════════ hết LÀN MÀN LÀM BÀI 12/10D ═════════════════════════════════════════
 // ═════════════════════════════════════════ LÀN HỒ SƠ EM 12/10F ═════════════════════════════════════════
 // Thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé". Cảnh `?man=hs-ho-so[&nhe=luoi|cham]`: Hôm nay
