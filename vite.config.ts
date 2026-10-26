@@ -292,6 +292,8 @@ export default defineConfig({
           '**/DocPh-*.{js,css}',
           // …và lệnh Báo cáo tuần của con (dùng chung DocPh + phần dưới trang cũ TrangVeConDuoi ⇒ thành mảnh riêng), cũng chỉ nạp lười.
           '**/bao-cao-tuan-ph-api-*.js',
+          // Thưởng phạt 26/10: màn Thi đua tuần của thầy (+ lệnh, tờ kiểu) và huy hiệu kim loại dùng chung với thẻ tuần phụ huynh (DocPh) — chỉ nạp lười ⇒ kho chạy-lúc.
+          '**/{ThiDuaTuanScreen,thi-dua-tuan-api,HuyHieuGiai}-*.{js,css}',
           // Trang cũ «Hôm nay của con» (TrangVeCon + trang-con.css) nạp lười từ 26/10 (màn «Chỉ đọc» không cần; ddh.trong='tat' / màn con mới tải) ⇒ kho chạy-lúc.
           '**/TrangVeCon-*.{js,css}',
           // Giao diện «Trong» màn làm bài (26/10): tờ trình bày nạp lười trong màn thi & các màn làm câu (chỉ khi <html data-trong>) ⇒ kho chạy-lúc;

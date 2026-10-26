@@ -1,0 +1,162 @@
+/* THI ĐUA TUẦN (ThiDuaTuanScreen, thầy chốt bản vẽ 26/10 tp-15) — trình bày theo giao diện app thầy HIỆN CÓ (biến M3 của vỏ thầy).
+ * Bật «Trong» (<html data-trong="gv">) thì styles/trong-gv-thi-dua.css chỉ đổi bảng biến --td-* sang --tr-* và bo góc / bóng của «Trong».
+ * Khổ: điện thoại dọc < 600 (danh sách thay bảng, công tắc một cột) · điện thoại ngang / máy tính bảng / máy tính (bảng đủ 6 cột, công tắc hai cột).
+ * Huy hiệu kim loại (HuyHieuGiai) dùng biến --tr-* có sẵn trên :root của app thầy (trong.css nạp cùng App). */
+.tdt {
+  --td-nen: var(--m3-surface); --td-mat: var(--m3-surface-container-lowest); --td-mat-2: var(--m3-surface-container); --td-vien: var(--m3-outline);
+  --td-chu: var(--m3-on-surface); --td-chu-2: var(--m3-on-surface-variant); --td-chinh: var(--m3-primary); --td-tren-chinh: var(--m3-on-primary);
+  --td-dung: var(--m3-tertiary); --td-dung-nen: var(--m3-tertiary-container); --td-dung-chu: var(--m3-on-tertiary-container);
+  --td-sai: var(--m3-error); --td-sai-nen: var(--m3-error-container); --td-sai-chu: var(--m3-on-error-container);
+  --td-cy-nen: var(--m3-canh-bao-nen); --td-cy-chu: var(--m3-canh-bao-chu); --td-cy: var(--m3-canh-bao);
+  --td-tin-nen: var(--m3-primary-container); --td-tin-chu: var(--m3-on-primary-container); --td-sao: var(--m3-canh-bao);
+  --td-r: 16px;
+  display: flex; flex-direction: column; gap: 16px; padding: 16px 16px 112px; color: var(--td-chu); font-family: var(--sans);
+}
+.tdt * { min-width: 0; }
+.tdt-dau { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px 16px; }
+.tdt-dau-chu { flex: 1 1 240px; }
+.tdt-nhan { margin: 0 0 4px; font-size: 13px; color: var(--td-chu-2); }
+.tdt-h1 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 700; }
+.tdt-dau-nut { display: flex; flex-wrap: wrap; gap: 8px; }
+.tdt-chon-lop, .tdt-xep-chon { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 4px 0 14px; border: 1px solid var(--td-vien); border-radius: 12px; background: var(--td-mat); font-size: 14px; color: var(--td-chu-2); }
+.tdt-chon-lop select, .tdt-xep-chon select { min-height: 44px; padding: 0 8px; border: 0; background: none; font: inherit; font-weight: 600; color: var(--td-chu); }
+.tdt-nut-vien { min-height: 44px; padding: 0 16px; border: 1px solid var(--td-vien); border-radius: 12px; background: var(--td-mat); font: inherit; font-size: 14px; font-weight: 600; color: var(--td-chu); touch-action: manipulation; }
+.tdt-nut-chu { min-height: 44px; padding: 0 8px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--td-chinh); touch-action: manipulation; }
+/* đích bấm ≥ 44 × 44: vỏ thầy cũ có `.vo-thay .giua-noi-dung button / select { min-height: 40px }` (0,2,1) ⇒ các nút của màn nâng lên (0,2,2) */
+.tdt .tdt-dau-nut label > select, .tdt .tdt-the-dau label > select, .tdt .tdt-bang th button, .tdt div > button.tdt-nut-chu, .tdt p > button.tdt-nut-chu, .tdt div > button.tdt-nut-vien { min-width: 44px; min-height: 44px; }
+/* ô chọn nằm trong khung nhãn: vỏ thầy cũ vẽ viền riêng cho select ⇒ bỏ để chỉ còn một khung */
+.tdt .tdt-dau-nut label > select, .tdt .tdt-the-dau label > select { border: 0; border-radius: 10px; background: none; box-shadow: none; }
+.tdt :is(button, select):focus-visible { outline: 2px solid var(--td-chinh); outline-offset: 2px; }
+.tdt-the { border: 1px solid var(--td-vien); border-radius: var(--td-r); background: var(--td-mat); overflow: hidden; }
+.tdt-the-dau { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; padding: 14px 16px 10px; }
+.tdt-the-dau h2 { flex: 1; margin: 0; font-size: 16px; font-weight: 600; }
+.tdt-the-chan { padding: 4px 8px; border-top: 1px solid var(--td-vien); }
+.tdt-mo { font-size: 13px; color: var(--td-chu-2); }
+.tdt-loi-nho { margin: 0; padding: 8px 16px; font-size: 13.5px; color: var(--td-sai); }
+.tdt-rong { margin: 0; padding: 16px; font-size: 14px; line-height: 1.5; color: var(--td-chu-2); }
+.tdt-cho { display: flex; flex-direction: column; gap: 10px; padding: 8px 16px 16px; }
+.tdt-cho-dong { display: block; height: 40px; border-radius: 10px; background: var(--td-mat-2); }
+
+/* công tắc */
+.tdt-ct { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tdt-ct-dong {
+  display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 12px 20px; border: 0; border-top: 1px solid var(--td-vien); background: none;
+  font: inherit; text-align: left; color: var(--td-chu); cursor: pointer; touch-action: manipulation;
+}
+.tdt-ct-dong:nth-child(odd) { border-right: 1px solid var(--td-vien); }
+.tdt-ct-dong:nth-child(-n + 2) { border-top: 0; }
+.tdt-ct-dong:disabled { cursor: default; }
+.tdt-ct-dong[aria-busy] { opacity: 0.6; }
+.tdt-ct-chu { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.tdt-ct-chu b { font-size: 15px; font-weight: 600; }
+.tdt-ct-chu span { font-size: 13px; line-height: 1.4; color: var(--td-chu-2); }
+.tdt-cong { position: relative; flex: none; width: 44px; height: 26px; border-radius: 999px; background: var(--td-vien); transition: background-color 0.2s; }
+.tdt-cong::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--td-mat); transition: transform 0.2s; }
+.tdt-cong[data-on] { background: var(--td-chinh); }
+.tdt-cong[data-on]::after { transform: translateX(18px); }
+.tdt-ct .tdt-loi-nho { grid-column: 1 / -1; border-top: 1px solid var(--td-vien); }
+
+/* dải 4 số */
+.tdt-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--td-vien); border-radius: var(--td-r); background: var(--td-mat); overflow: hidden; }
+.tdt-kpi > div { display: flex; flex-direction: column; gap: 4px; padding: 12px 20px 14px; border-left: 1px solid var(--td-vien); }
+.tdt-kpi > div:first-child { border-left: 0; }
+.tdt-kpi span { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--td-chu-2); }
+.tdt-kpi b { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tdt-kpi small { margin-left: 6px; font-size: 13px; font-weight: 500; color: var(--td-chu-2); }
+.tdt-cham { width: 8px; height: 8px; border-radius: 50%; background: var(--td-tin-chu); }
+.tdt-loai { color: var(--td-sai); }
+
+/* bảng */
+.tdt-cuon { overflow-x: auto; }
+.tdt-bang { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tdt-bang th { padding: 0 8px; border-bottom: 1px solid var(--td-vien); background: var(--td-mat-2); text-align: left; vertical-align: bottom; white-space: nowrap; }
+.tdt-bang th button { display: inline-flex; flex-direction: column; align-items: flex-start; min-height: 44px; justify-content: center; padding: 6px 8px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; text-align: left; color: var(--td-chu-2); cursor: pointer; }
+.tdt-bang th[aria-sort] button { color: var(--td-chu); }
+.tdt-bang th small { font-size: 12px; font-weight: 500; color: var(--td-chu-2); }
+.tdt-bang th[data-cot="chuoi"] { text-align: right; }
+.tdt-bang th[data-cot="chuoi"] button { align-items: flex-end; }
+.tdt-mui { min-width: 1em; font-size: 12px; }
+.tdt-bang td { padding: 10px 16px; border-bottom: 1px solid var(--td-vien); white-space: nowrap; vertical-align: middle; }
+.tdt-bang tr:last-child td { border-bottom: 0; }
+.tdt-ten { font-weight: 600; }
+.tdt-so { text-align: right; font-variant-numeric: tabular-nums; }
+.tdt-nt { display: inline-flex; align-items: center; gap: 8px; }
+.tdt-xep { display: flex; flex: none; gap: 2px; width: 80px; height: 8px; border-radius: 999px; overflow: hidden; background: var(--td-mat-2); }
+.tdt-xep i { display: block; height: 100%; background: var(--td-dung); }
+.tdt-xep i + i { background: var(--td-sai); }
+.tdt-nt-so { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--td-chu-2); }
+.tdt-nt-so b { color: var(--td-chu); }
+.tdt-hang { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.tdt-chip { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.tdt-chip[data-m="dung"] { background: var(--td-dung-nen); color: var(--td-dung-chu); }
+.tdt-chip[data-m="chu-y"] { background: var(--td-cy-nen); color: var(--td-cy-chu); }
+.tdt-chip[data-m="tin"] { background: var(--td-tin-nen); color: var(--td-tin-chu); }
+.tdt-chip[data-m="sai"] { background: var(--td-sai-nen); color: var(--td-sai-chu); }
+.tdt-xep-chon, .tdt-ds { display: none; }
+
+/* cặp học cùng */
+.tdt-cap { display: grid; grid-template-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; }
+.tdt-cap li { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 20px; border-top: 1px solid var(--td-vien); }
+.tdt-cap-ten { flex: 1; font-size: 14px; color: var(--td-chu-2); overflow-wrap: anywhere; }
+.tdt-cap-ten b { font-weight: 600; color: var(--td-chu); }
+.tdt-cap-so { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; white-space: nowrap; color: var(--td-cy-chu); }
+.tdt-cap-so[data-tat] { color: var(--td-chu-2); }
+.tdt-lua { fill: var(--td-sao); }
+.tdt-lua.tat { fill: var(--td-vien); }
+
+/* huy hiệu kim loại */
+.tdt .hhg { flex: none; display: block; overflow: visible; }
+.tdt .hhg-n { fill: var(--hhg-n); stroke: var(--hhg-v); stroke-width: 6; stroke-linejoin: round; }
+.tdt .hhg-s { fill: var(--hhg-v); opacity: 0.16; }
+.tdt .hhg-k { fill: var(--hhg-c); font-size: 34px; font-weight: 800; }
+.tdt .hhg[data-kl="sat"] { --hhg-n: var(--tr-mat-3); --hhg-v: var(--tr-chu-2); --hhg-c: var(--tr-chu); }
+.tdt .hhg[data-kl="dong"] { --hhg-n: var(--tr-chu-y-nhat); --hhg-v: var(--tr-chu-y); --hhg-c: var(--tr-chu-y-chu); }
+.tdt .hhg[data-kl="bac"] { --hhg-n: var(--tr-mat-2); --hhg-v: var(--tr-vien-2); --hhg-c: var(--tr-chu-2); }
+.tdt .hhg[data-kl="vang"] { --hhg-n: var(--tr-sao-nhat); --hhg-v: var(--tr-sao); --hhg-c: var(--tr-sao-chu); }
+.tdt .hhg[data-kl="bachkim"] { --hhg-n: var(--tr-dung-nhat); --hhg-v: var(--tr-dung); --hhg-c: var(--tr-dung-chu); }
+.tdt .hhg[data-kl="kimcuong"] { --hhg-n: var(--tr-tin-nhat); --hhg-v: var(--tr-tin); --hhg-c: var(--tr-tin-chu); }
+
+@media (min-width: 901px) {
+  .tdt { gap: 20px; padding: 24px 32px 48px; }
+  .tdt-h1 { font-size: 30px; }
+  .tdt-cap { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tdt-cap li { border-left: 1px solid var(--td-vien); }
+  .tdt-cap li:nth-child(3n + 1) { border-left: 0; }
+}
+/* điện thoại ngang: bảng gọn để đủ 6 cột trong ~780 px */
+@media (max-width: 900px) and (max-height: 520px) {
+  .tdt { gap: 12px; padding: 12px max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left)); }
+  .tdt-h1 { font-size: 22px; }
+  .tdt-ct-dong { min-height: 56px; padding: 8px 16px; }
+  .tdt-kpi > div { padding: 8px 16px 10px; }
+  .tdt-kpi b { font-size: 19px; }
+  .tdt-bang td { padding: 8px 10px; }
+  .tdt-bang th { padding: 0 2px; }
+  .tdt-xep { width: 56px; }
+}
+/* điện thoại dọc: công tắc một cột, dải số 2 × 2, danh sách thay bảng */
+@media (max-width: 600px) {
+  .tdt { gap: 12px; padding: 12px 14px 112px; }
+  .tdt-h1 { font-size: 22px; }
+  .tdt-an-doc { display: none; }
+  .tdt-ct { grid-template-columns: minmax(0, 1fr); }
+  .tdt-ct-dong { padding: 12px 16px; border-right: 0 !important; }
+  .tdt-ct-dong:nth-child(2) { border-top: 1px solid var(--td-vien); }
+  .tdt-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tdt-kpi > div { padding: 10px 14px; }
+  .tdt-kpi > div:nth-child(odd) { border-left: 0; }
+  .tdt-kpi > div:nth-child(n + 3) { border-top: 1px solid var(--td-vien); }
+  .tdt-kpi b { font-size: 20px; }
+  .tdt-cuon { display: none; }
+  .tdt-xep-chon { display: inline-flex; padding-left: 10px; font-size: 13px; }
+  .tdt-ds { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--td-vien); }
+  .tdt-ds li { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--td-vien); }
+  .tdt-ds li:first-child { border-top: 0; }
+  .tdt-ds-giua { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .tdt-ds-giua .tdt-ten { overflow-wrap: anywhere; }
+  .tdt-ds-phai { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .tdt-cap li { padding: 8px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tdt-cong, .tdt-cong::after { transition: none; }
+}
