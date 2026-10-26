@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type 
 import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, Menu as MenuIcon, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Vibrate, Volume2, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './TheHomNayEm'
-import { chuViecTiep, nhipTheoSanh, TEN_NHOM_NHIP } from '../../lib/nhip-hoc-em'
+import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import { ngayGon, useDiemDanhHs } from '../diem-danh/TheDiemDanhHs'
 import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
@@ -105,14 +105,12 @@ function LoiBi({ cam, loi }: { cam: CamBi; loi: string }) {
   return <div className="bi-loi"><Bi cam={cam} size={84} /><p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
 }
 
-/** Thang 12 bậc (Lười 1–5 · Chưa đều 6–7 · Chăm 8–12), ô đang ở có viền. */
-const Thang12 = ({ bac }: { bac: number }) => <div className="da-12" role="img" aria-label={`Bậc ${bac} trên 12`}>{Array.from({ length: 12 }, (_, i) => <i key={i} data-n={i < 5 ? 'l' : i < 7 ? 'd' : 'c'} data-on={i + 1 === bac || undefined} />)}</div>
 const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 const thuNgan = (ngay: string) => THU_NGAN[new Date(`${ngay}T00:00:00Z`).getUTCDay()] ?? ''
 const lopSo = (lop?: string) => lop?.match(/^\d{1,2}/)?.[0]
 
 /** HÔM NAY kiểu Duolingo + chất Hoá (bản vẽ ve-moi/dm-*.html, thầy chốt 26/10): ba mục của menu dọc — Lộ trình (con đường chặng: học → Kiểm tra ôn tập →
- *  Tự sửa lỗi → Bài tập về nhà, ĐÚNG thứ tự việc của «Một trang») · Luyện tập (mỗi việc một ô to có số) · Thành tích (chuỗi ngày, tuần này, 12 bậc, huy hiệu
+ *  Tự sửa lỗi → Bài tập về nhà, ĐÚNG thứ tự việc của «Một trang») · Luyện tập (mỗi việc một ô to có số) · Thành tích (chuỗi ngày, tuần này, việc tiếp, huy hiệu
  *  từ số sẵn có). Cùng số, cùng lệnh, cùng nút như bản trước; ô nào app chưa có số rẻ thì giữ nhãn, bỏ số. */
 export function MotTrangHs(p: PropsMotTrang) {
   const so = p.so, kiem = p.kiem, hs = p.hs
@@ -128,7 +126,6 @@ export function MotTrangHs(p: PropsMotTrang) {
   const coBt = !!p.soBaiTap || !!p.coBaiTap
   // Thứ tự việc (thầy 26/10, như «Một trang»): ca đang mở → ngày chỉ có kiểm tra → học → đủ mức ⇒ Kiểm tra ôn tập (nếu phải làm) → Tự sửa lỗi → Bài tập về nhà.
   const chinh = p.coCa ? 'ca' : p.ngayKiem ? 'kiem' : du && kiemLam ? 'kiem' : du && coSua ? 'sua' : du && p.soBaiTap ? 'bt' : 'hoc'
-  const bac = nhip?.bacCham?.bac
   const pct = so && so.muc > 0 ? Math.min(100, Math.round((100 * so.daLam) / so.muc)) : 0
   const chang = so && !p.ngayKiem ? chiaChang(so) : []
   const xongChang = so ? soChangXong(so) : 0
@@ -142,7 +139,8 @@ export function MotTrangHs(p: PropsMotTrang) {
     <div className="dm-dong"><span className="h" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><div className="giua"><b>Chuỗi {chuoi} ngày</b><span className="mo">{du ? 'hôm nay đã đủ mức' : `làm ${con} câu nữa để đủ mức`}</span></div></div>
     <div className="dm-thanh" role="progressbar" aria-label="Câu hôm nay" aria-valuemin={0} aria-valuemax={so.muc} aria-valuenow={Math.min(so.daLam, so.muc)}><i style={{ width: `${pct}%` }} /></div>
     <span className="mo">{so.daLam}/{so.muc} câu hôm nay{du ? ' · đủ mức' : ''}</span></div>
-  const theBac = nhip && nhip.nhom !== 'chua-du' && <div className="dm-the da-bac"><h3>{bac ? `Bậc ${bac} · ` : ''}{TEN_NHOM_NHIP[nhip.nhom]}</h3>{bac && <Thang12 bac={bac} />}<span className="mo">{chuViecTiep(nhip)}</span></div>
+  // Thầy 26/10: hệ lười (nhóm, bậc chăm, Học thật / Đối phó, mức làm) CHỈ thầy và phụ huynh xem ⇒ em chỉ thấy chuỗi ngày + việc tiếp trung tính.
+  const theViec = nhip && <div className="dm-the da-viec"><h3>Chuỗi {chuoi} ngày</h3><span className="mo">Việc tiếp: {chuViecTiepHs(nhip)}</span></div>
 
   // ───── LUYỆN TẬP (mục «Ôn & sửa» cũ): mỗi việc một ô to; ô đỏ (Tự sửa lỗi còn câu) là việc nên làm trước.
   if (p.muc === 'on-lai' && hs) return <div className="dm-khung" data-muc="luyen">{tren}<main className="da-vo">
@@ -155,7 +153,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     {hs.onLuyenLai && <OTo ten="Luyện lại từ bài kiểm tra" mo="Câu sai trong các bài kiểm tra" sac="sai" Icon={RefreshCw} onClick={hs.onLuyenLai} />}
   </main></div>
 
-  // ───── THÀNH TÍCH (mục «Kết quả» cũ + Nhịp học): chuỗi ngày, 7 ngày gần nhất, 12 bậc, huy hiệu từ số sẵn có; lối vào điểm thầy đã công bố giữ nguyên.
+  // ───── THÀNH TÍCH (mục «Kết quả» cũ + Nhịp học): chuỗi ngày, 7 ngày gần nhất, việc tiếp, huy hiệu từ số sẵn có; lối vào điểm thầy đã công bố giữ nguyên.
   if (p.muc === 'ket-qua' && hs) {
     const tuan = nhip ? nhip.ngay.slice(-7) : []
     const huy: { ten: string; sac: string; Icon: LucideIcon; co: boolean }[] = [
@@ -166,11 +164,11 @@ export function MotTrangHs(p: PropsMotTrang) {
     ]
     return <div className="dm-khung" data-muc="thanh-tich">{tren}<main className="da-vo">
       <h1 className="da-tieu">Thành tích</h1>
-      <div className="da-cot">{/* ngang / máy tính: hai cột (chuỗi · tuần · bậc | huy hiệu · điểm); dọc: display: contents */}
+      <div className="da-cot">{/* ngang / máy tính: hai cột (chuỗi · tuần · việc tiếp | huy hiệu · điểm); dọc: display: contents */}
       <div className="da-lua"><Bi cam={chuoi > 0 ? 'lua' : so && so.daLam === 0 ? 'ngu' : 'chao'} size={72} /><div><b>{chuoi} ngày</b><span>Chuỗi ngày đủ mức{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</span></div></div>
       {tuan.length > 0 && <ol className="da-tuan" aria-label="7 ngày gần nhất">{tuan.map((x) => { const nay = x.ngay === nhip!.homNay, d = x.muc > 0 && x.lam >= x.muc
         return <li key={x.ngay} aria-label={`${nay ? 'Hôm nay' : thuNgan(x.ngay)}: ${d ? 'đủ mức' : `${x.lam}/${x.muc} câu`}`}><i data-d={d || undefined} data-nay={nay || undefined}>{d && <Check size={18} strokeWidth={3} aria-hidden="true" />}</i>{nay ? 'Nay' : thuNgan(x.ngay)}</li> })}</ol>}
-      {theBac}
+      {theViec}
       </div>
       <div className="da-cot">
       <div className="da-huy">{huy.map(({ ten, sac, Icon, co }) => <div key={ten}><i data-sac={co ? sac : undefined}>{co ? <Icon size={28} aria-hidden="true" /> : <Lock size={26} aria-hidden="true" />}</i>{ten}</div>)}</div>
@@ -221,7 +219,7 @@ export function MotTrangHs(p: PropsMotTrang) {
         {kiem && <button type="button" className="dm-dong" onClick={(kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined} disabled={p.coCa || !((kiemLam || kiemXong) && p.onKiemTra)}><span className="h" data-sac="tin"><Target size={20} aria-hidden="true" /></span><span className="giua"><b>Kiểm tra ôn tập</b></span><span className="so">{kiem.daTra}/{kiem.tong}</span></button>}
         {hs && <button type="button" className="dm-dong" onClick={hs.onXemLai}><span className="h" data-sac="dung"><History size={20} aria-hidden="true" /></span><span className="giua"><b>Câu đã làm</b></span></button>}
       </div>
-      {theBac}
+      {theViec}
     </aside>
   </div>
 }

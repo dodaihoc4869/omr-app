@@ -1,5 +1,6 @@
 // HÔM NAY «MỘT TRANG» + MENU DỌC (Điểm danh, A.I Đỗ Đại Học) của app học sinh — bản vẽ ve-moi/hs-mot-trang*.html, thầy chốt 26/10.
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { NHIP_EM_LUOI } from '../scripts/chup-v2/gia/nhip-hoc-em'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createRef } from 'react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
@@ -94,6 +95,20 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(screen.getByText('0 ngày')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /^Ca kiểm tra/ }))
     expect(onLichSu).toHaveBeenCalledOnce()
+  })
+})
+
+describe('Hệ lười chỉ thầy / phụ huynh xem (thầy 26/10)', () => {
+  it('Lộ trình + Thành tích: máy chủ CŨ còn gửi nhóm Lười / bậc 1 ⇒ em chỉ thấy «Chuỗi N ngày» + việc tiếp trung tính, không chữ / màu nhóm, bậc', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ...NHIP_EM_LUOI, bacCham: { bac: 1, diem: 0, diemLenBac: 3 }, doTinCay: 80 })))
+    for (const muc of ['hom-nay', 'ket-qua']) {
+      const { container, unmount } = render(<MotTrangHs {...goc({ muc, token: 'tk', hs: HS })} />)
+      const the = await screen.findByText(/^Việc tiếp:/)
+      expect(the.closest('.dm-the')!.querySelector('h3')!.textContent).toMatch(/^Chuỗi \d+ ngày$/)
+      expect(container.textContent).not.toMatch(/lười|chăm|chưa đều|bậc|đối phó|học thật|bấm vội|treo|quá nhanh/i)
+      expect(container.innerHTML).not.toMatch(/data-nhom|da-12|da-bac/)
+      unmount()
+    }
   })
 })
 
