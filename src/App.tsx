@@ -328,8 +328,12 @@ function App() {
       goCauNoi()
       return
     }
+    // Tải lúc RẢNH (chậm nhất 4 giây): không giành đường truyền với màn thầy đầu tiên ngay sau khi mở khoá.
     let con = true
-    void napCauNoi().then((m) => { if (con) m.ganCauNoi() }).catch(() => {})
+    const gan = () => void napCauNoi().then((m) => { if (con) m.ganCauNoi() }).catch(() => {})
+    const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void }
+    if (w.requestIdleCallback) w.requestIdleCallback(gan, { timeout: 4000 })
+    else setTimeout(gan, 1500)
     return () => { con = false; goCauNoi() }
   }, [canHoi, laPhieu, laXemDiem, laHocSinh, khoa])
 
