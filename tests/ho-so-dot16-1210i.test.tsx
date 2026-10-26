@@ -108,7 +108,7 @@ describe('số giây ở MỌI lượt — câu dễ lẫn câu khó, đúng l�
       'Nhận biết10 giâytrung bình mỗi lượt · 2/2 lượt có số giây · đúng 1/2',
       'Vận dụng cao—chưa đo được số giây · 0/1 lượt có số giây · đúng 0/1',
     ])
-    const dong = [...tam.querySelectorAll('.gvv2-hs-lan')].map((l) => l.textContent)
+    const dong = [...tam.querySelectorAll('.gvv2-hs-lan')].map((l) => l.textContent!.replace(/\u00a0/g, ' ')) // SOÁT 26/10: dấu cách cứng trước «·»
     expect(dong[0]).toBe('10:00Câu 5 · Gọi tên esterĐảo · Nhận biết · Chọn AĐúng12 giây')
     expect(dong[2]).toBe('09:00Câu 40 · Hiệu suất ester hoáCa Kiểm tra 15 phút · Vận dụng cao · Chọn CSai— chưa đo số giây')
   })
