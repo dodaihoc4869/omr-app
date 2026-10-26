@@ -860,3 +860,5 @@
 [data-trong] .tr-menu-anh, [data-trong] .tr-menu-tb .m3-tb-dem { font-size: 12px; }
 /* DUYỆT 26/10: Lộ trình đang tải — vạch chờ (70%) đứng CẠNH tên bài trong băng bài ⇒ «Bài học hôm nay» vỡ mỗi chữ một dòng (cột 67px) — vạch chờ xuống hàng riêng, nền mờ trên băng xanh */
 [data-trong] .da-bai > .mot-xuong { flex-basis: 100%; width: auto; height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--tr-trang) 30%, transparent); }
+/* DUYỆT 26/10: Thành tích — số chuỗi ngày 34px giãn dòng 1.05 (phông Nunito) chồng 3px dòng «Chuỗi ngày đủ mức» ngay dưới ⇒ 1.2 */
+[data-trong] .da-lua b { line-height: 1.2; }
