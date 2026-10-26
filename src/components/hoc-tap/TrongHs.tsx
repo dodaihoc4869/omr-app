@@ -2,7 +2,7 @@
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
-import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, Menu as MenuIcon, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Vibrate, Volume2, Wrench, type LucideIcon } from 'lucide-react'
+import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './TheHomNayEm'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
@@ -272,9 +272,15 @@ function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<
  *  «Một trang» (bản vẽ hs-mot-trang-menu, 26/10): khối Điểm danh đứng đầu (KhoiDiemDanh); buổi đang mở mà em chưa điểm danh ⇒ vạch thò thẻ chàm dọc
  *  «Điểm danh» (bấm ⇒ menu mở, tiêu điểm vào ô mã); mã QR gửi xong / gửi hỏng ⇒ menu tự mở cho em thấy kết quả. Mục «A.I Đỗ Đại Học» dưới 4 mục chính mở
  *  ĐÚNG tấm chat của BongBongAiDdh (sự kiện `ddh:mo-ai`; mục chỉ hiện khi kênh bật — `<html data-ai-ddh>`). */
+// Ba biểu tượng chỉ màn «Trong» dùng — vẽ nội tuyến (nét như lucide) để không kéo thêm vào mảnh biểu tượng chung của app thầy / màn thi (luật tốc độ).
+const IconNet = ({ d, size = 20 }: { d: string[]; size?: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d.map((x) => <path key={x} d={x} />)}</svg>
+const Volume2 = ({ size }: { size?: number }) => <IconNet size={size} d={['M11 5 6 9H2v6h4l5 4z', 'M15.5 8.5a5 5 0 0 1 0 7', 'M19 5a10 10 0 0 1 0 14']} />
+const Vibrate = ({ size }: { size?: number }) => <IconNet size={size} d={['m2 8 2 2-2 2 2 2-2 2', 'm22 8-2 2 2 2-2 2 2 2', 'M9 5h6a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z']} />
+const MenuIcon = ({ size }: { size?: number }) => <IconNet size={size} d={['M4 6h16', 'M4 12h16', 'M4 18h16']} />
+
 /** Công tắc phản hồi ở menu (thầy 26/10): «Âm thanh» / «Rung» Bật–Tắt — chỉ đọc/ghi localStorage ('ddh.am' / 'ddh.rung' = 'tat' khi tắt); tiếng và rung
  *  ở mảnh màn luyện tự đọc khoá này (không kéo am-thanh / rung vào nhóm mở app). Mặc định bật. */
-function CongTac({ khoa, ten, Icon }: { khoa: 'ddh.am' | 'ddh.rung'; ten: string; Icon: LucideIcon }) {
+function CongTac({ khoa, ten, Icon }: { khoa: 'ddh.am' | 'ddh.rung'; ten: string; Icon: (p: { size?: number }) => ReactNode }) {
   const [bat, setBat] = useState(() => { try { return localStorage.getItem(khoa) !== 'tat' } catch { return true } })
   return <button type="button" role="switch" aria-checked={bat} className="tr-menu-muc tr-menu-cong" onClick={() => {
     const v = !bat
