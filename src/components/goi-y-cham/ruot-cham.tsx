@@ -199,12 +199,11 @@ export function RuotCham(p: RuotChamProps) {
 
   // ── chú giải màu
   const [duChuGiai] = useState(() => hienDuChuGiai(q.qid))
-  const [moChuGiai, setMoChuGiai] = useState(false)
   const coLoai = (l: LoaiCham) => !!boc?.vung.some((v) => v.loai === l)
-  const chuGiai = boc?.vung.length ? (
+  // Code app 1 + ảnh thầy 27/10: nút «?» đứng lẻ một dòng trông lạc ⇒ sau 3 câu đầu ẨN HẲN chú giải (không còn nút «?»).
+  const chuGiai = boc?.vung.length && duChuGiai ? (
     <div className="gyc-cg-hang">
-      {!duChuGiai && <button type="button" className="gyc-nut-hoi" aria-label={moChuGiai ? 'Ẩn chú giải màu' : 'Xem chú giải màu'} aria-expanded={moChuGiai} onClick={() => setMoChuGiai((v) => !v)}><span aria-hidden="true">?</span></button>}
-      {(duChuGiai || moChuGiai) && (
+      {duChuGiai && (
         <div className="gyc-chu-giai">
           <span className="gyc-cg-dau">Chạm chữ tô màu để hiểu đề</span>
           {coLoai('cho') && <span className="gyc-mau"><i className="gyc-m-cho" />Đề cho</span>}
