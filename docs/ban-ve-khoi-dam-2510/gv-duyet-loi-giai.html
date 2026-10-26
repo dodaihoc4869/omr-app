@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Duyệt lời giải</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .tim-de { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .tim-de .o-nhap { flex: 1 1 220px; min-width: 0; }
+  .o-so .don { font: 500 13px var(--f-may); color: var(--mo); margin-left: 6px; }
+  .tien { display: flex; height: 16px; border: 2px solid var(--muc); border-radius: 999px; overflow: hidden; margin-top: 16px; }
+  .tien i { border-right: 2px solid var(--muc); } .tien i:last-child { border-right: 0; }
+  .chu-giai { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 12.5px var(--f-may); color: var(--muc-2); margin-top: 10px; }
+  .chu-giai span { display: inline-flex; align-items: center; gap: 7px; }
+  .chu-giai b { width: 12px; height: 12px; border: 2px solid var(--muc); border-radius: 4px; display: inline-block; }
+  .soc { background: repeating-linear-gradient(45deg, var(--mat-2) 0 5px, var(--ke) 5px 10px); }
+  .hang-nut { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 22px; }
+  .hang-nut .cong-tac { margin-left: auto; }
+  .luoi-duyet { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; margin-top: 24px; align-items: start; }
+  .ds-cau { display: grid; gap: 16px; }
+  .cau-dong { padding: 16px 18px; }
+  .cau-dong.dang-xem { background: var(--vang-nhat); box-shadow: 6px 6px 0 var(--bong); }
+  .cau-dong .dau-c { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .cau-dong .dau-c h3 { font-size: 20px; }
+  .cau-dong .dau-c .nhan { flex: 1; }
+  .co { list-style: none; padding: 10px 12px; margin-top: 12px; border: 2px dashed var(--muc); border-radius: 12px; background: var(--mat); font: 400 14.5px/1.5 var(--f-chu); }
+  .co li + li { margin-top: 6px; }
+  .bao { margin-top: 10px; font: 400 14.5px/1.5 var(--f-chu); color: var(--xuong); }
+  .nut-c { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .nut.chu { border-color: transparent; box-shadow: none; background: transparent; text-decoration: underline; text-underline-offset: 3px; padding: 8px 6px; }
+  .tra-lai { margin-top: 14px; }
+  .tra-lai textarea { width: 100%; min-height: 84px; padding: 12px 14px; border: var(--day) solid var(--muc); border-radius: 14px; background: var(--mat); color: var(--muc); font: 400 15px/1.5 var(--f-chu); resize: none; box-shadow: inset 3px 3px 0 var(--mat-2); }
+  /* khung câu đang xem */
+  .xem { position: sticky; top: 92px; }
+  .xem .phan-dau { padding: 18px 20px; border-bottom: var(--day) solid var(--muc); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .xem .phan-dau h2 { font-size: 22px; }
+  .xem .phan-dau .nhan { margin-left: auto; }
+  .xem .noi { padding: 18px 20px; }
+  .xem .de { font: 400 17px/1.6 var(--f-chu); }
+  .xem .lua-chon > div { min-height: 48px; font-size: 16px; }
+  .loi-giai { margin-top: 20px; border: var(--day) solid var(--muc); border-radius: 14px; overflow: hidden; }
+  .loi-giai .td { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--muc); color: var(--mat); font: 600 13px var(--f-may); letter-spacing: .03em; }
+  .loi-giai .td span:last-child { margin-left: auto; font-weight: 400; opacity: .8; }
+  .buoc { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 12px 14px; border-top: 2px dashed var(--ke); font: 400 16px/1.55 var(--f-chu); }
+  .loi-giai .td + .buoc { border-top: 0; }
+  .buoc > b:first-child { width: 30px; height: 30px; display: grid; place-items: center; border: 2px solid var(--muc); border-radius: 9px; background: var(--vang); color: #1b1b1f; font: 600 14px var(--f-may); }
+  .pt { display: block; margin-top: 6px; padding: 8px 12px; border-radius: 10px; background: var(--mat-2); border: 2px solid var(--ke); font: 500 15px/1.6 var(--f-chu); }
+  .ket { padding: 12px 14px; background: color-mix(in srgb, var(--la) 18%, var(--mat)); border-top: 2px solid var(--muc); font: 600 16px/1.5 var(--f-chu); }
+  .bay { padding: 12px 14px; background: var(--vang-nhat); border-top: 2px dashed var(--muc); font: 400 15px/1.5 var(--f-chu); }
+  .xem .chan { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px 20px; border-top: var(--day) solid var(--muc); background: var(--mat-2); border-radius: 0 0 var(--bo) var(--bo); }
+  sub { font-size: .72em; line-height: 0; }
+  @media (max-width: 1100px) { .luoi-duyet { grid-template-columns: minmax(0, 1fr); } .xem { position: static; } }
+  @media (max-width: 900px) { .hang-nut .cong-tac { margin-left: 0; } }
+  @media (max-width: 520px) { .hang-nut .cong-tac { flex-wrap: wrap; border-radius: 18px; } .chips .chip { white-space: normal; line-height: 1.3; } .xem .noi, .xem .phan-dau, .xem .chan { padding-left: 16px; padding-right: 16px; } .buoc { grid-template-columns: 30px minmax(0, 1fr); gap: 10px; font-size: 15px; } }
+</style>
+</head>
+<body data-app="gv" data-tab="kho-de" data-khung="man-con" data-tieu="Duyệt lời giải" data-phu="Chỉ lời giải đã duyệt mới hiện cho học sinh." data-ve="Kho đề">
+<main class="khung">
+  <section class="the pad mt">
+    <span class="nhan-o" style="margin-top:0">Mã đề trong kho</span>
+    <div class="tim-de"><div class="o-nhap">12-KT-C1-D4</div><span class="nut">Mở đề</span></div>
+  </section>
+
+  <div class="chips" style="margin-top:22px">
+    <span class="chip">Kiểm tra chương 1 · Ester – lipid</span>
+    <span class="chip">28 câu</span>
+    <span class="chip">Trắc nghiệm 18 · Đúng–sai 4 · Trả lời ngắn 6</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Duyệt lời giải đề</span> <span class="danh-dau" style="white-space:nowrap">12-KT-C1-D4</span></h1>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so">15<span class="don">/ 28 câu</span></span><span class="nhan">Đã duyệt</span></div>
+    <div><span class="so-vua">9</span><span class="nhan">Chờ duyệt · câu · 5 câu sạch</span></div>
+    <div><span class="so-vua">2</span><span class="nhan">Máy đang soạn · câu</span></div>
+    <div><span class="so-vua">6</span><span class="nhan">Chờ sửa kho · câu đáp án kho cần sửa hoặc máy soạn trượt</span></div>
+  </section>
+  <div class="tien" role="img" aria-label="Đã duyệt 15, chờ duyệt 9, máy đang soạn 2, máy soạn chưa qua bộ kiểm 2 trên 28 câu">
+    <i style="flex:15;background:var(--la)"></i><i style="flex:9;background:var(--vang)"></i><i class="soc" style="flex:2"></i><i style="flex:2;background:var(--xuong)"></i>
+  </div>
+  <div class="chu-giai">
+    <span><b style="background:var(--la)"></b>Đã duyệt 15</span><span><b style="background:var(--vang)"></b>Chờ duyệt 9</span>
+    <span><b class="soc"></b>Máy đang soạn 2</span><span><b style="background:var(--xuong)"></b>Máy soạn chưa qua bộ kiểm 2</span>
+  </div>
+
+  <div class="hang-nut">
+    <span class="nut san-ho to-hon">✓ Duyệt 5 câu sạch</span>
+    <span class="nut">Soạn gấp đề này</span>
+    <div class="cong-tac"><span class="on">Tất cả</span><span>Có cờ đáp án</span><span>Chờ duyệt</span><span>Chưa có hồ sơ</span></div>
+  </div>
+
+  <div class="luoi-duyet">
+    <section>
+      <div class="tieu" style="margin-bottom:12px"><h2>Danh sách câu chờ duyệt</h2><span class="nhan">lọc Tất cả · 5 câu đầu</span></div>
+      <div class="ds-cau">
+        <article class="the cau-dong dang-xem">
+          <div class="dau-c"><h3>Câu 3</h3><span class="nhan">Trắc nghiệm</span><span class="chip vang">Chờ duyệt</span></div>
+          <div class="nut-c"><span class="nut dang">Xem lời giải</span><span class="nut">Duyệt câu này</span><span class="nut chu">Trả lại cho máy soạn</span></div>
+        </article>
+
+        <article class="the cau-dong">
+          <div class="dau-c"><h3>Câu 7</h3><span class="nhan">Trắc nghiệm</span><span class="chip vang">Chờ duyệt</span></div>
+          <ul class="co">
+            <li><b>Đáp án kho cần sửa:</b> số ester ứng với công thức C<sub>4</sub>H<sub>8</sub>O<sub>2</sub> là 4, kho đang ghi B (3 chất). <b>Máy đã chốt:</b> D</li>
+            <li><b>Sửa kho:</b> “B” → “D”</li>
+          </ul>
+          <div class="nut-c"><span class="nut">Xem lời giải</span><span class="nut">Duyệt câu này</span><span class="nut chu">Trả lại cho máy soạn</span></div>
+        </article>
+
+        <article class="the cau-dong">
+          <div class="dau-c"><h3>Câu 12</h3><span class="nhan">Đúng/Sai</span><span class="chip vang">Chờ duyệt</span></div>
+          <div class="nut-c"><span class="nut">Xem lời giải</span><span class="nut">Duyệt câu này</span><span class="nut chu">Trả lại cho máy soạn</span></div>
+        </article>
+
+        <article class="the cau-dong">
+          <div class="dau-c"><h3>Câu 19</h3><span class="nhan">Trả lời ngắn</span><span class="chip do">Máy soạn chưa qua bộ kiểm</span></div>
+          <p class="bao">Bộ kiểm báo: phương trình ở bước 2 chưa cân bằng số nguyên tử O.</p>
+        </article>
+
+        <article class="the cau-dong">
+          <div class="dau-c"><h3>Câu 22</h3><span class="nhan">Trả lời ngắn</span><span class="chip vang">Chờ duyệt</span></div>
+          <div class="nut-c"><span class="nut">Xem lời giải</span><span class="nut">Duyệt câu này</span><span class="nut chu" style="text-decoration-thickness:3px">Trả lại cho máy soạn</span></div>
+          <div class="tra-lai">
+            <span class="nhan-o" style="margin-top:0">Chỗ cần sửa (máy soạn đọc ghi chú này)</span>
+            <textarea aria-label="Chỗ cần sửa">Bước 3 đổi 200 mL thành 2 L; phải là 0,2 L rồi tính lại nồng độ NaOH.</textarea>
+            <div class="nut-c"><span class="nut san-ho">Trả lại câu này</span><span class="nut chu">Thôi</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="the xem" aria-label="Đề và lời giải đang duyệt">
+      <div class="phan-dau"><span class="so-cau">3</span><h2>Câu đang xem · Câu 3</h2><span class="nhan">Trắc nghiệm · Chất béo</span></div>
+      <div class="noi">
+        <p class="de">Xà phòng hoá hoàn toàn <b>17,8 gam tristearin</b> bằng dung dịch NaOH vừa đủ, thu được m gam glycerol. Giá trị của m là</p>
+        <div class="lua-chon">
+          <div class="dung"><b>A</b>1,84</div>
+          <div><b>B</b>0,92</div>
+          <div><b>C</b>5,52</div>
+          <div><b>D</b>3,68</div>
+        </div>
+
+        <div class="loi-giai">
+          <div class="td"><span>LỜI GIẢI TỪNG BƯỚC</span><span>máy soạn · chờ thầy duyệt</span></div>
+          <div class="buoc"><b>1</b><div>Tristearin là (C<sub>17</sub>H<sub>35</sub>COO)<sub>3</sub>C<sub>3</sub>H<sub>5</sub>, M = 890 g/mol.<span class="pt">n<sub>chất béo</sub> = 17,8 : 890 = 0,02 mol</span></div></div>
+          <div class="buoc"><b>2</b><div>Phản ứng xà phòng hoá:<span class="pt">(C<sub>17</sub>H<sub>35</sub>COO)<sub>3</sub>C<sub>3</sub>H<sub>5</sub> + 3NaOH → 3C<sub>17</sub>H<sub>35</sub>COONa + C<sub>3</sub>H<sub>5</sub>(OH)<sub>3</sub></span></div></div>
+          <div class="buoc"><b>3</b><div>Một phân tử chất béo cho một phân tử glycerol:<span class="pt">n<sub>glycerol</sub> = n<sub>chất béo</sub> = 0,02 mol ⇒ m = 0,02 × 92 = 1,84 gam</span></div></div>
+          <div class="ket">Đáp án A · m = 1,84</div>
+          <div class="bay"><b>Bẫy:</b> lấy n<sub>NaOH</sub> = 0,06 mol để tính glycerol ⇒ 0,06 × 92 = 5,52 gam, rơi vào phương án C.</div>
+        </div>
+      </div>
+      <div class="chan"><span class="nut san-ho to-hon">✓ Duyệt câu này</span><span class="nut to-hon">Trả lại cho máy soạn</span></div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

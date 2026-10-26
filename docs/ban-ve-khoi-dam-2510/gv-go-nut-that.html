@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Gỡ nút thắt</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .the-nut { padding: 16px 18px; }
+  .the-nut + .the-nut { margin-top: 16px; }
+  .the-nut .dau-the { display: flex; gap: 14px; align-items: flex-start; }
+  .the-nut .ten { font: 600 17px/1.35 var(--f-chu); }
+  .the-nut .chips { margin: 8px 0 0; gap: 6px; }
+  .uu-tien { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: var(--day) solid var(--muc); border-radius: 12px; background: var(--mat-2); font: 600 20px/1 var(--f-to); }
+  .the-nut.mo { background: var(--mat); }
+  .the-nut.mo .uu-tien { background: var(--vang); color: #1b1b1f; box-shadow: 3px 3px 0 var(--bong); }
+  .the-nut .so-em { margin-left: auto; text-align: right; flex: none; }
+  .de-goc { margin-top: 14px; padding: 12px 14px; border: 2px solid var(--muc); border-radius: 12px; background: var(--mat-2); font: 400 16px/1.55 var(--f-chu); }
+  .buoc { margin-top: 12px; display: grid; gap: 8px; }
+  .buoc > div { display: flex; gap: 10px; align-items: baseline; font: 400 15.5px/1.5 var(--f-chu); }
+  .buoc > div > b { flex: none; font: 600 12px var(--f-may); border: 2px solid var(--muc); border-radius: 7px; padding: 3px 7px; background: var(--mat); }
+  .buoc > div.vuong { background: var(--vang-nhat); border: 2px solid var(--muc); border-radius: 10px; padding: 8px 10px; }
+  .buoc > div.vuong > b { background: var(--san-ho); color: #1b1b1f; }
+  .hang-av { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .hang-av .av { width: 36px; height: 36px; font-size: 13px; }
+  .o-viet { margin-top: 8px; min-height: 92px; padding: 12px 14px; border: var(--day) solid var(--muc); border-radius: 14px; background: var(--mat); font: 400 16px/1.55 var(--f-chu); box-shadow: inset 3px 3px 0 var(--mat-2); }
+  .chon-nhom { display: grid; gap: 12px; }
+  .chon-nhom > div { padding: 14px; border: var(--day) solid var(--muc); border-radius: 14px; background: var(--mat); }
+  .chon-nhom > div.on { background: var(--vang-nhat); box-shadow: 3px 3px 0 var(--bong); }
+  .chon-nhom .tieu { margin-bottom: 6px; }
+  .chon-nhom .tieu h3 { font-size: 17px; }
+  .tron { width: 24px; height: 24px; flex: none; border: 2px solid var(--muc); border-radius: 50%; background: var(--mat); }
+  .on .tron { background: radial-gradient(circle, var(--muc) 0 5px, var(--vang) 6px); }
+  .chon-nhom .dong { padding: 8px 0; }
+  .chon-nhom .dong .ten { font-size: 15px; }
+  @media (max-width: 520px) { .the-nut .so-em { display: none; } .buoc > div { flex-direction: column; gap: 4px; } }
+</style>
+</head>
+<body data-app="gv" data-tab="go-nut" data-nut-dau='<span class="nut an-hep">Tải lại</span>'>
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10</span>
+    <span class="chip">Khối 12 · 12A1, 12A2</span>
+    <span class="chip">Thẻ em gửi 7 ngày qua</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Bàn gỡ</span> <span class="danh-dau">nút thắt</span></h1>
+  <p class="mo-ta">Các em vướng cùng một bước được gom thành một thẻ.</p>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so">9</span><span class="nhan">Thẻ đang chờ</span></div>
+    <div><span class="so-vua">3</span><span class="nhan">Cần gỡ · em sai lại từ 2 lần sau lời thầy gỡ</span></div>
+    <div><span class="so-vua">25</span><span class="nhan">lượt em vướng trong 9 thẻ</span></div>
+    <div><span class="so-vua">4 em</span><span class="nhan">Kèm riêng trên lớp</span></div>
+  </section>
+
+  <div class="luoi-2">
+    <div>
+      <div class="tieu" style="margin-top:4px"><h2>Thẻ nút thắt theo thứ tự ưu tiên</h2></div>
+      <section class="the the-nut mo">
+        <div class="dau-the">
+          <span class="uu-tien">1</span>
+          <div style="min-width:0"><div class="ten">Câu 14 · Bước 2: tính số mol NaOH phản ứng với chất béo</div>
+            <div class="chips"><span class="chip san-ho nho">Cần gỡ</span><span class="chip vang nho">Nhiều em vướng — nên sửa lời giải</span><span class="chip nho">Ester – lipid</span></div></div>
+          <div class="so-em"><span class="so-nho">6</span><div class="nhan">em</div></div>
+        </div>
+        <div class="de-goc">Xà phòng hoá hoàn toàn 8,9 g tristearin bằng dung dịch NaOH vừa đủ, thu được m g glycerol. Giá trị của m là</div>
+        <div class="buoc">
+          <div><b>Bước 1</b><span>n(chất béo) = 8,9 : 890 = 0,01 mol</span></div>
+          <div class="vuong"><b>Bước 2</b><span>n(NaOH) = 3 · n(chất béo) = 0,03 mol</span></div>
+          <div><b>Bước 3</b><span>n(glycerol) = n(chất béo) = 0,01 mol ⇒ m = 0,92 g</span></div>
+        </div>
+        <span class="nhan-o">Các em vướng bước này · 6 em</span>
+        <div class="hang-av">
+          <span class="av" style="background:var(--san-ho)">QN</span><span class="av" style="background:var(--vang)">BN</span><span class="av" style="background:#8fd3a8">ĐH</span>
+          <span class="av" style="background:#b9c8ff">TL</span><span class="av" style="background:#f6b8d0">MK</span><span class="av" style="background:#ffd9a8">HP</span>
+          <span class="nhan" style="margin-left:6px">Phạm Quang Nam, Hoàng Bảo Ngọc, Vũ Đức Huy và 3 em</span>
+        </div>
+        <span class="nhan-o">Nội dung gỡ nút thắt</span>
+        <div class="o-viet">Một phân tử chất béo có <b>3 nhóm ester</b> nên cần 3 NaOH: n(NaOH) = 3 · n(chất béo). Glycerol sinh ra bằng đúng số mol chất béo, không phải bằng số mol NaOH.</div>
+        <div class="nhieu-nut" style="margin-top:14px"><span class="nut san-ho">Ghi dạy trên lớp</span><span class="nut">Xem đủ đề</span><span class="nut">Thôi</span></div>
+      </section>
+
+      <section class="the the-nut">
+        <div class="dau-the"><span class="uu-tien">2</span><div style="min-width:0"><div class="ten">Câu 9 · Bước 1: nhận ra glucose có nhóm –CHO, cho phản ứng tráng bạc</div>
+          <div class="chips"><span class="chip san-ho nho">Cần gỡ</span><span class="chip nho">Carbohydrate</span></div></div><div class="so-em"><span class="so-nho">5</span><div class="nhan">em</div></div></div>
+      </section>
+      <section class="the the-nut">
+        <div class="dau-the"><span class="uu-tien">3</span><div style="min-width:0"><div class="ten">Câu 21 · Bước 3: bảo toàn khối lượng khi thuỷ phân ester</div>
+          <div class="chips"><span class="chip san-ho nho">Cần gỡ</span><span class="chip nho">Ester – lipid</span></div></div><div class="so-em"><span class="so-nho">4</span><div class="nhan">em</div></div></div>
+      </section>
+      <section class="the the-nut">
+        <div class="dau-the"><span class="uu-tien">4</span><div style="min-width:0"><div class="ten">Câu 6 · Bước 2: viết công thức cấu tạo của saccharose</div>
+          <div class="chips"><span class="chip nho">Carbohydrate</span></div></div><div class="so-em"><span class="so-nho">3</span><div class="nhan">em</div></div></div>
+      </section>
+      <p class="nhan" style="margin-top:14px">Còn 5 thẻ đang chờ phía sau · 7 em</p>
+    </div>
+
+    <div class="cot">
+      <section class="the pad">
+        <div class="tieu"><h2>Chọn nhóm cần gỡ</h2></div>
+        <div class="chon-nhom">
+          <div class="on">
+            <div class="tieu"><span class="tron"></span><h3>Kèm riêng trên lớp · 4 em</h3></div>
+            <div class="dong"><span class="av" style="background:var(--san-ho);width:34px;height:34px;font-size:12px">QN</span><div><div class="ten">Phạm Quang Nam</div><div class="nhan">3 thẻ · sai lại 2 lần</div></div></div>
+            <div class="dong"><span class="av" style="background:var(--vang);width:34px;height:34px;font-size:12px">BN</span><div><div class="ten">Hoàng Bảo Ngọc</div><div class="nhan">2 thẻ · sai lại 3 lần</div></div></div>
+            <div class="dong"><span class="av" style="background:#8fd3a8;width:34px;height:34px;font-size:12px">ĐH</span><div><div class="ten">Vũ Đức Huy</div><div class="nhan">2 thẻ · sai lại 2 lần</div></div></div>
+            <div class="dong"><span class="av" style="background:#b9c8ff;width:34px;height:34px;font-size:12px">TL</span><div><div class="ten">Ngô Thảo Linh</div><div class="nhan">2 thẻ · sai lại 2 lần</div></div></div>
+          </div>
+          <div>
+            <div class="tieu"><span class="tron"></span><h3>Cùng kiến thức nền</h3></div>
+            <div class="nhan">Thuỷ phân ester, chất béo · thẻ 1, 3 · 10 em</div>
+            <div class="nhan">Glucose, saccharose · thẻ 2, 4 · 8 em</div>
+          </div>
+        </div>
+      </section>
+      <section class="the pad">
+        <div class="tieu"><h2>Buổi học sẽ dạy</h2></div>
+        <div style="display:flex; gap:16px; align-items:center">
+          <div class="ngay"><b>THỨ TƯ</b><span>28</span><small>Tháng 10</small></div>
+          <div><div style="font: 600 20px/1.2 var(--f-to)">12A1 · 18:00–21:00</div><div class="nhan" style="margin-top:6px">4 em kèm riêng · 2 thẻ chữa chung</div></div>
+        </div>
+        <div class="nhieu-nut" style="margin-top:16px"><span class="nut">Chọn buổi học</span></div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Chặng học của em</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  sub, sup { line-height: 0; }
+  .dai-chang { margin-top: 20px; display: grid; grid-template-columns: 1fr auto; gap: 18px 28px; align-items: end; }
+  .dai-chang h1 { font: 600 clamp(30px, 4.4vw, 46px)/1.1 var(--f-to); }
+  .dai-chang .chang { margin: 0; grid-column: 1 / -1; }
+  .dai-chang .chang i { height: 22px; border-radius: 7px; }
+  .dai-chang .ben-phai { display: flex; gap: 22px; }
+  .dai-chang .ben-phai .so-vua { display: block; }
+  .chu-chang { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: -10px; }
+  .chu-chang span { font: 500 11.5px/1.2 var(--f-may); color: var(--mo); text-align: center; }
+  .chu-chang span.dang { color: var(--muc); font-weight: 600; }
+  .dau-cau { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .dau-cau .nut { margin-left: auto; }
+  .y-ds > div > i { font: 600 15px var(--f-may); font-style: normal; flex: none; }
+  .nut-nop { margin-top: 22px; display: grid; gap: 12px; }
+  .dau-tick.dang { background: var(--vang); color: var(--bong); }
+  @media (max-width: 520px) {
+    .dai-chang { grid-template-columns: 1fr; }
+    .chu-chang span { font-size: 10.5px; }
+    .y-ds > div { align-items: flex-start; }
+    .cau { padding: 18px 16px; }
+  }
+  main.khung { padding-bottom: 110px; }
+</style>
+</head>
+<body data-app="hs" data-khung="man-con" data-ve="Hôm nay" data-tieu="Chặng học của em" data-phu="Lớp 11 · Bài 6">
+<main class="khung">
+  <section class="the pad dai-chang">
+    <div>
+      <div class="nhan" style="margin-bottom:8px">Bài 6. Một số hợp chất của nitrogen với oxygen · mỗi chặng tối đa 6 câu</div>
+      <h1>Chặng 2 · <span class="danh-dau">Câu 3/6</span></h1>
+    </div>
+    <div class="ben-phai">
+      <div><span class="so-vua">8/24</span><span class="nhan">Đã làm 8/24 câu hôm nay</span></div>
+      <div><span class="so-vua">1/4</span><span class="nhan">Xong 1/4 chặng</span></div>
+    </div>
+    <div class="chang"><i class="xong"></i><i class="sai"></i><i class="dang"></i><i></i><i></i><i></i></div>
+    <div class="chu-chang"><span>tự làm đúng</span><span>sai</span><span class="dang">đang làm</span><span>chưa làm</span><span>chưa làm</span><span>chưa làm</span></div>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the cau">
+      <div class="dau-cau">
+        <span class="so-cau">3</span>
+        <div><div style="font: 600 18px/1.2 var(--f-to)">Câu 3</div><div class="nhan">Phần II · Đúng/Sai</div></div>
+        <span class="nut">Gợi ý</span>
+      </div>
+      <p class="de">Nitric acid (HNO<sub>3</sub>) là hoá chất quan trọng để sản xuất phân bón và thuốc nổ. Mỗi phát biểu sau <b>đúng</b> hay <b>sai</b>?</p>
+      <div class="y-ds">
+        <div><i>a)</i><span>Trong dung dịch nước, HNO<sub>3</sub> phân li hoàn toàn thành ion H<sup>+</sup> và NO<sub>3</sub><sup>−</sup>.</span><div class="ds"><span class="on">Đ</span><span>S</span></div></div>
+        <div><i>b)</i><span>Aluminium và iron bị thụ động hoá trong dung dịch HNO<sub>3</sub> đặc, nguội.</span><div class="ds"><span class="on">Đ</span><span>S</span></div></div>
+        <div><i>c)</i><span>Cho copper vào dung dịch HNO<sub>3</sub> loãng, khí thoát ra là NO<sub>2</sub> màu nâu đỏ.</span><div class="ds"><span>Đ</span><span class="on">S</span></div></div>
+        <div><i>d)</i><span>Trong phân tử HNO<sub>3</sub>, nguyên tử nitrogen có số oxi hoá +5.</span><div class="ds"><span class="on">Đ</span><span>S</span></div></div>
+      </div>
+      <div class="nut-nop">
+        <span class="nut san-ho to-hon rong-het">Nộp câu →</span>
+        <span class="nut rong-het">Chưa làm được? Học cách giải</span>
+      </div>
+    </section>
+
+    <section class="the pad">
+      <div class="tieu"><h2>Chặng 2</h2><span class="nhan">6 câu</span></div>
+      <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Câu 1 · Oxide của nitrogen</div><div class="nhan">Phần I · tự làm đúng</div></div></div>
+      <div class="dong"><span class="dau-tick sai">✗</span><div><div class="ten">Câu 2 · Mưa acid</div><div class="nhan">Phần I · sai</div></div><span class="nut">Sửa câu này</span></div>
+      <div class="dong"><span class="dau-tick dang">3</span><div><div class="ten">Câu 3 · Nitric acid</div><div class="nhan">Phần II · đang làm</div></div></div>
+      <div class="dong"><span class="dau-tick trong">4</span><div><div class="ten">Câu 4</div><div class="nhan">chưa làm</div></div></div>
+      <div class="dong"><span class="dau-tick trong">5</span><div><div class="ten">Câu 5</div><div class="nhan">chưa làm</div></div></div>
+      <div class="dong"><span class="dau-tick trong">6</span><div><div class="ten">Câu 6</div><div class="nhan">chưa làm</div></div></div>
+      <div style="margin-top:14px"><span class="nut rong-het">Nghỉ và về Hôm nay</span></div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

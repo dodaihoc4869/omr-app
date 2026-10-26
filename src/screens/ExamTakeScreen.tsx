@@ -72,6 +72,7 @@ import { dungM3 } from '../components/m3'
 import NutDiuMat from '../components/NutDiuMat'
 import { useDiuMat } from '../lib/diu-mat'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
+import '../styles/khoi-dam-lam-bai.css' // «Khối đậm» 25/10: trình bày màn làm bài / làm câu của học sinh
 import { DaiBaoNheM3, DaiCanhBaoRoiM3, KhungKhoaM3 } from './ThongBaoThiM3'
 import { ngheHanMoi } from '../lib/may-chu-moi'
 import { chuBaoThemGio, hanMoiNeuKeoDai, MS_HIEN_BAO_THEM_GIO } from '../lib/them-phut'
@@ -3644,6 +3645,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                       cuonToiCau(i + 1)
                     }}
                     className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
+                    data-xong={done || undefined}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                   >
                     {i + 1}
@@ -3662,6 +3664,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               </div>
             )}
             <NutChinh
+              className="thi-nut-nop"
               disabled={camNopSom}
               onClick={() => {
                 if (camNopSom) return
@@ -3708,6 +3711,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               Xem lại
             </NutChinh>
             <NutChinh
+              className="thi-nut-nop"
               disabled={camNopSom}
               onClick={() => {
                 if (camNopSom) return
@@ -4000,6 +4004,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     key={i}
                     onClick={() => cuonToiCau(i + 1)}
                     className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
+                    data-xong={done || undefined}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-1)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                     title={`Câu ${i + 1}${done ? ' — đã làm' : ' — chưa làm'}${dungM3() && sttDanhDau.includes(i + 1) ? ' — xem lại sau' : ''}`}
                   >
@@ -4019,7 +4024,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                   Chỉ nộp bài trong 1 phút cuối
                 </div>
               )}
-              <NutChinh disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>{nhanNutNop}</NutChinh>
+              <NutChinh className="thi-nut-nop" disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>{nhanNutNop}</NutChinh>
             </div>
           </div>
         </aside>
@@ -4036,7 +4041,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 Chỉ nộp bài trong 1 phút cuối
               </div>
             )}
-            <NutChinh disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>{nhanNutNop}</NutChinh>
+            <NutChinh className="thi-nut-nop" disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>{nhanNutNop}</NutChinh>
           </div>
         </div>
       </div>

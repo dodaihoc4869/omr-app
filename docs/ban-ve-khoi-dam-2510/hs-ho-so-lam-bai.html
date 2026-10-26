@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Hồ sơ làm bài</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  /* Lưới ô ngày: 2 tuần × 7 ngày, đậm dần theo số câu (chỉ pha từ --xanh). */
+  .lich-o { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .lich-o .thu { font: 500 11.5px var(--f-may); color: var(--mo); text-align: center; }
+  .lich-o .o { aspect-ratio: 1; min-height: 44px; border: 2px solid var(--muc); border-radius: 10px; background: var(--mat-2); display: flex; flex-direction: column; justify-content: space-between; padding: 5px 6px; }
+  .lich-o .o small { font: 500 10.5px/1 var(--f-may); color: var(--mo); }
+  .lich-o .o b { font: 600 17px/1 var(--f-to); text-align: right; }
+  .lich-o .o.m1 { background: color-mix(in srgb, var(--xanh) 22%, var(--mat)); }
+  .lich-o .o.m2 { background: color-mix(in srgb, var(--xanh) 48%, var(--mat)); }
+  .lich-o .o.m3 { background: var(--xanh); }
+  .lich-o .o.m3 b, .lich-o .o.m3 small { color: var(--mat); }
+  .lich-o .o.hom-nay { box-shadow: 3px 3px 0 var(--bong); outline: 3px solid var(--vang); outline-offset: 2px; }
+  .chu-giai { display: flex; gap: 6px; align-items: center; margin-top: 14px; font: 500 11.5px var(--f-may); color: var(--mo); flex-wrap: wrap; }
+  .chu-giai i { width: 18px; height: 18px; border: 2px solid var(--muc); border-radius: 5px; background: var(--mat-2); }
+  .chu-giai i.m1 { background: color-mix(in srgb, var(--xanh) 22%, var(--mat)); } .chu-giai i.m2 { background: color-mix(in srgb, var(--xanh) 48%, var(--mat)); } .chu-giai i.m3 { background: var(--xanh); }
+  /* Thanh tỉ lệ Mức làm: Mức 1–4 một họ xanh (đúng app thật, không màu phán xét), Mức 5 san hô sọc. */
+  .ti-le { display: flex; height: 46px; border: var(--day) solid var(--muc); border-radius: 14px; overflow: hidden; box-shadow: 4px 4px 0 var(--bong); margin: 6px 0 18px; }
+  .ti-le i { display: block; height: 100%; border-right: 2px solid var(--muc); }
+  .ti-le i:last-child { border-right: 0; }
+  .m-1 { background: color-mix(in srgb, var(--xanh) 18%, var(--mat)); }
+  .m-2 { background: color-mix(in srgb, var(--xanh) 40%, var(--mat)); }
+  .m-3 { background: color-mix(in srgb, var(--xanh) 68%, var(--mat)); }
+  .m-4 { background: var(--xanh); }
+  .m-5 { background: repeating-linear-gradient(135deg, var(--san-ho) 0 6px, color-mix(in srgb, var(--san-ho) 45%, var(--mat)) 6px 12px); }
+  .muc-ds { display: grid; gap: 0; }
+  .muc-ds .dong { gap: 12px; }
+  .muc-ds .mau { width: 26px; height: 26px; flex: none; border: 2px solid var(--muc); border-radius: 7px; }
+  .muc-ds .dong > div:nth-child(2) { min-width: 0; }
+  .muc-ds .so-luot { margin-left: auto; text-align: right; flex: none; }
+  /* Số giây theo mức độ câu */
+  .giay { display: grid; gap: 12px; }
+  .giay > div { display: grid; grid-template-columns: 112px 1fr 116px; gap: 12px; align-items: center; }
+  .giay .ten-md { font: 600 14px/1.25 var(--f-chu); }
+  .giay .thanh { height: 18px; }
+  .giay .so-g { font: 600 13px var(--f-may); text-align: right; }
+  .hoc-that { display: flex; gap: 14px; align-items: center; padding: 14px; border: var(--day) solid var(--muc); border-radius: 14px; background: color-mix(in srgb, var(--la) 16%, var(--mat)); }
+  .hoc-that .huy-hieu { background: var(--la); color: var(--mat); width: 56px; height: 56px; font-size: 24px; flex: none; }
+  @media (max-width: 520px) { .giay > div { grid-template-columns: 1fr auto; gap: 6px 10px; } .giay .thanh { grid-column: 1 / -1; grid-row: 2; } .lich-o { gap: 5px; } .lich-o .o { padding: 4px; } .lich-o .o b { font-size: 15px; } }
+  main.khung { padding-bottom: 110px; }
+  /* Tối: --la, --xanh sáng lên ⇒ chữ trên nền đó dùng màu nền tối cho đủ tương phản. */
+  :root[data-theme="dark"] .chip.la, :root[data-theme="dark"] .hoc-that .huy-hieu, :root[data-theme="dark"] .lich-o .o.m3 b, :root[data-theme="dark"] .lich-o .o.m3 small { color: var(--giay); }
+</style>
+</head>
+<body data-app="hs" data-tab="ket-qua" data-khung="man-con" data-tieu="Hồ sơ làm bài của em" data-phu="Cách em học 14 ngày qua" data-ve="Kết quả">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">13/10 – 26/10</span>
+    <span class="chip la">✓ Học thật</span>
+    <span class="chip">Độ tin cậy 93%</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Cách em học</span> <span class="danh-dau">14 ngày qua</span></h1>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so" id="c7">–</span><span class="nhan">câu em làm trong 7 ngày (20/10 – 26/10)</span></div>
+    <div><span class="so-vua"><span id="dung7">–</span></span><span class="nhan">tỉ lệ đúng 7 ngày</span></div>
+    <div><span class="so-vua">1 phút 12 giây</span><span class="nhan">trung bình mỗi câu</span></div>
+    <div><span class="so-vua"><span id="ngay7">–</span>/7</span><span class="nhan">ngày có làm bài trong tuần</span></div>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Làm bài 7 ngày</h2><span class="nhan">số câu mỗi ngày</span></div>
+      <svg class="duong thap" id="cot7" aria-label="Số câu em làm mỗi ngày, 7 ngày gần nhất"></svg>
+      <div class="hoc-that mt">
+        <span class="huy-hieu">✓</span>
+        <div><div style="font: 600 20px/1.2 var(--f-to)">Học thật</div><div class="nhan" style="margin-top:4px">Em đọc đề, có thời gian nghĩ và làm đều theo ngày. Thầy cũng thấy bảng này.</div></div>
+      </div>
+    </section>
+
+    <section class="the pad">
+      <div class="tieu"><h2>Lịch làm bài theo ngày</h2><span class="nhan">14 ngày</span></div>
+      <div class="lich-o" id="lich"></div>
+      <div class="chu-giai"><span>Ít</span><i></i><i class="m1"></i><i class="m2"></i><i class="m3"></i><span>Nhiều câu</span><span style="margin-left:auto">ô viền vàng: hôm nay</span></div>
+    </section>
+  </div>
+
+  <section class="the pad mt">
+    <div class="tieu"><h2>Mức làm</h2><span class="nhan"><span id="tong-luot">–</span> lượt làm câu trong 14 ngày</span></div>
+    <p style="font: 600 clamp(20px,2.6vw,26px)/1.25 var(--f-to)"><span class="danh-dau" id="pt34">–</span> lượt em có thời gian nghĩ hoặc làm kỹ</p>
+    <div class="ti-le mt" id="ti-le" aria-label="Tỉ lệ lượt theo Mức làm"></div>
+    <div class="muc-ds" id="muc-ds"></div>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Số giây theo mức độ câu</h2><span class="nhan">dễ → khó</span></div>
+      <div class="giay">
+        <div><span class="ten-md">Nhận biết</span><div class="thanh la"><i style="width:17%"></i></div><span class="so-g">38 giây</span></div>
+        <div><span class="ten-md">Thông hiểu</span><div class="thanh la"><i style="width:30%"></i></div><span class="so-g">1 phút 5 giây</span></div>
+        <div><span class="ten-md">Vận dụng</span><div class="thanh vang"><i style="width:55%"></i></div><span class="so-g">2 phút</span></div>
+        <div><span class="ten-md">Vận dụng cao</span><div class="thanh vang"><i style="width:100%"></i></div><span class="so-g">3 phút 40 giây</span></div>
+      </div>
+      <p class="nhan" style="margin-top:14px">Giây trung bình mỗi câu, chỉ tính lượt đo được.</p>
+    </section>
+    <section class="the pad">
+      <div class="tieu"><h2>Câu từng sai</h2><span class="nhan">14 ngày</span></div>
+      <div class="o-nho"><div><span class="so">41</span><div class="nhan">câu sai</div></div><div><span class="so">29</span><div class="nhan">tự sửa được</div></div><div><span class="so">12</span><div class="nhan">chưa sửa được</div></div></div>
+      <div class="dong mt"><span class="dau-tick sai">!</span><div><div class="ten">Saccharose và maltose</div><div class="nhan">5 câu đang chờ em tự sửa</div></div></div>
+      <div class="dong"><span class="dau-tick sai">!</span><div><div class="ten">Amine</div><div class="nhan">4 câu đang chờ em tự sửa</div></div></div>
+      <div class="dong"><span class="dau-tick cho">!</span><div><div class="ten">Đại cương về polymer</div><div class="nhan">3 câu đang chờ em tự sửa</div></div></div>
+      <span class="nut san-ho to-hon rong-het" style="margin-top:12px">Sửa lỗi ngay →</span>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // 14 ngày 13/10 (Thứ Ba) → 26/10 (Thứ Hai, hôm nay). Mọi con số tính từ mảng này để khớp nhau.
+  const cau = [18, 24, 0, 30, 26, 22, 12, 28, 32, 24, 0, 36, 30, 28]
+  const thu = ['T3', 'T4', 'T5', 'T6', 'T7', 'CN', 'T2']
+  const c7 = cau.slice(7), tong = cau.reduce((a, b) => a + b, 0)
+  document.getElementById('c7').textContent = c7.reduce((a, b) => a + b, 0)
+  document.getElementById('dung7').textContent = '81%'
+  document.getElementById('ngay7').textContent = c7.filter((v) => v > 0).length
+  veCot('cot7', c7.map((v, i) => [thu[i], v, i === 6 ? _bien('--vang') : undefined]), { max: 40 })
+  const lich = document.getElementById('lich')
+  lich.innerHTML = thu.map((t) => `<span class="thu">${t}</span>`).join('') + cau.map((v, i) => {
+    const m = v === 0 ? '' : v < 20 ? 'm1' : v < 30 ? 'm2' : 'm3'
+    return `<div class="o ${m}${i === 13 ? ' hom-nay' : ''}" title="${13 + i}/10 · ${v} câu"><small>${13 + i}</small><b>${v || '–'}</b></div>`
+  }).join('')
+  // Mức làm (nhãn học sinh đúng app thật: TEN_MUC_EM + «Máy để treo»). Tổng lượt = tổng câu 14 ngày.
+  const muc = [[1, 'Nộp trước khi đọc hết đề', 6], [2, 'Đọc xong thì nộp ngay', 19], [3, 'Có thời gian nghĩ', 102], [4, 'Làm kỹ, đúng nhịp lớp', 175], [5, 'Máy để treo', 8]]
+  const tongLuot = muc.reduce((a, m) => a + m[2], 0)
+  if (tongLuot !== tong) console.error('Mức làm lệch tổng câu')
+  const pt = (n) => ((n / tongLuot) * 100).toFixed(1).replace('.', ',') + '%'
+  document.getElementById('tong-luot').textContent = tongLuot
+  document.getElementById('pt34').textContent = pt(muc[2][2] + muc[3][2])
+  document.getElementById('ti-le').innerHTML = muc.map(([m, , n]) => `<i class="m-${m}" style="width:${(n / tongLuot) * 100}%" title="Mức ${m}"></i>`).join('')
+  document.getElementById('muc-ds').innerHTML = muc.map(([m, t, n]) => `<div class="dong"><span class="mau m-${m}"></span><div><div class="ten">Mức ${m} · ${t}</div>${m === 5 ? '<div class="nhan">lượt dài nhất để treo 9 phút</div>' : ''}</div><div class="so-luot"><span class="so-nho">${n}</span><div class="nhan">lượt · ${pt(n)}</div></div></div>`).join('')
+</script>
+</body></html>

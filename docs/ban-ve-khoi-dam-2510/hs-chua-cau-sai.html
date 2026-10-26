@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Chữa câu sai</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .bo-cuc { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; margin-top: 4px; }
+  .tieu-de { font-size: clamp(28px, 4vw, 44px); margin-top: 4px; }
+  .cau { margin-top: 20px; }
+  .cau-dau { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .cau-dau .so-cau { transform: rotate(-4deg); }
+  .lua-chon > div.chon { box-shadow: 5px 5px 0 var(--bong); }
+  .lua-chon > div.chon::after { content: 'Em đang chọn'; margin-left: auto; font: 600 11.5px/1 var(--f-may); color: var(--bong); background: var(--vang); border: 2px solid var(--muc); border-radius: 7px; padding: 4px 7px; white-space: nowrap; }
+  .hanh-dong { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+  .hanh-dong .nut.san-ho { min-width: 240px; }
+  /* cột phụ: Đường tự gỡ */
+  .ben-phai { position: sticky; top: 92px; }
+  .duong { list-style: none; padding: 0; display: grid; gap: 0; margin: 4px 0 18px; }
+  .duong li { position: relative; display: flex; gap: 14px; align-items: center; padding: 10px 0; }
+  .duong li:not(:last-child)::after { content: ''; position: absolute; left: 21px; top: 52px; bottom: -12px; border-left: 3px dashed var(--muc); opacity: .5; }
+  .duong .o { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 12px; font: 600 20px/1 var(--f-to); background: var(--mat-2); position: relative; z-index: 1; }
+  .duong .xong .o { background: var(--la); color: var(--mat); }
+  .duong .dang .o { background: var(--vang); color: var(--bong); box-shadow: 3px 3px 0 var(--bong); transform: rotate(-5deg); }
+  .duong .khoa .o { border-style: dashed; color: var(--mo); background: var(--mat); }
+  .duong b { display: block; font: 600 16px/1.25 var(--f-chu); }
+  .duong .khoa b { color: var(--mo); }
+  .ben-phai h3 { font-size: 17px; margin: 22px 0 6px; }
+  .tt { display: inline-block; font: 600 11.5px/1.35 var(--f-may); padding: 3px 8px; border: 2px solid var(--muc); border-radius: 8px; background: var(--mat-2); }
+  .tt.sai { background: color-mix(in srgb, var(--xuong) 18%, var(--mat)); }
+  /* dải gọn trên điện thoại */
+  .dai-hep { display: none; margin-top: 14px; padding: 14px 16px; }
+  .dai-hep .hang-tren { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .dai-hep .chang { margin: 10px 0 6px; }
+  .dai-hep .chang i { height: 16px; }
+  .dai-hep .ba-ten { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font: 500 11px/1.3 var(--f-may); color: var(--mo); }
+  .dai-hep .ba-ten span:nth-child(2) { color: var(--muc); font-weight: 600; }
+  @media (max-width: 900px) {
+    .bo-cuc { grid-template-columns: 1fr; }
+    .dai-hep { display: block; }
+    .hanh-dong .nut { width: 100%; }
+  }
+  @media (max-width: 520px) {
+    .cau { padding: 18px 14px; }
+    .cau .de { font-size: 17px; }
+    .lua-chon > div { gap: 10px; padding: 10px; font-size: 16px; }
+    .lua-chon > div.chon::after { content: 'Đang chọn'; }
+  }
+  /* chừa chỗ cho nút A.I nổi để không đè nội dung cuối trang */
+  body main.khung { padding-bottom: 110px; }
+  @media (max-width: 1100px) { body.co-duoi main.khung { padding-bottom: 180px; } }
+</style>
+</head>
+<body data-app="hs" data-khung="man-con" data-ve="Tự sửa lỗi" data-tieu="Nitric acid – tính oxi hoá với kim loại" data-phu="Chữa câu sai">
+<main class="khung">
+  <div class="bo-cuc">
+    <div>
+      <div class="chips">
+        <span class="chip vang">Sửa trên câu gốc</span>
+        <span class="chip">Trắc nghiệm · Vận dụng</span>
+      </div>
+      <h1 class="tieu-de">Em tự làm lại <span class="danh-dau">câu này</span></h1>
+
+      <section class="the dai-hep">
+        <div class="hang-tren"><b style="font: 600 17px var(--f-to)">Đường tự gỡ</b><span class="nhan">1/3 bước</span></div>
+        <div class="chang"><i class="xong"></i><i class="dang"></i><i></i></div>
+        <div class="ba-ten"><span>Xem lại câu gốc</span><span>Tự làm lại</span><span>Đáp án và lời giải</span></div>
+      </section>
+
+      <section class="the cau">
+        <div class="cau-dau"><span class="so-cau">12</span><span class="nhan">Câu gốc · sai lần gần nhất 24/10</span></div>
+        <p class="de">Cho các kim loại: <b>Al, Cu, Fe, Ag</b>. Số kim loại tác dụng được với dung dịch <b>nitric acid đặc, nguội</b> là</p>
+        <div class="lua-chon">
+          <div><b>A</b>1</div>
+          <div class="chon"><b>B</b>2</div>
+          <div><b>C</b>3</div>
+          <div><b>D</b>4</div>
+        </div>
+      </section>
+
+      <div class="hanh-dong">
+        <span class="nut san-ho to-hon">Kiểm tra lại →</span>
+        <span class="nut to-hon">Em chưa làm được · xem lời giải</span>
+      </div>
+    </div>
+
+    <aside class="the pad ben-phai an-hep">
+      <div class="tieu"><h2>Đường tự gỡ</h2><span class="nhan">1/3 bước</span></div>
+      <ol class="duong">
+        <li class="xong"><span class="o">✓</span><div><b>Xem lại câu gốc</b><span class="nhan">Đã xem</span></div></li>
+        <li class="dang"><span class="o">2</span><div><b>Tự làm lại</b><span class="nhan">Bước đang luyện</span></div></li>
+        <li class="khoa"><span class="o">3</span><div><b>Đáp án và lời giải</b></div></li>
+      </ol>
+      <span class="nut rong-het">Xem lại đề gốc</span>
+      <h3>Những bước đã kiểm</h3>
+      <div class="dong"><span class="dau-tick sai">✗</span><div><div class="ten" style="font-size:15px">Lần làm 24/10</div><div class="nhan">Em đã chọn: D</div></div><span class="tt sai" style="margin-left:auto">sai</span></div>
+    </aside>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

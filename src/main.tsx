@@ -117,6 +117,9 @@ const laHoiThay = /^\/hoi-thay\/?$/.test(location.pathname)
 // link thi kèm `?vai=gv` (hiếm — máy thầy thử link) vẫn dựng App.tsx như cũ (App.tsx cũng ra màn thi) để khớp bảng nạp trước: `vai=gv` chỉ nạp nhóm `app`.
 const laDiem = dvMo.vai === 'diem'
 const laManThi = laDiem || (!!dvMo.maCa && dvMo.vai !== 'gv')
+// GIAO DIỆN «KHỐI ĐẬM» (thầy duyệt 25/10): bật cho app thầy, cổng học sinh và màn thi — không cho cổng phụ huynh / trang Hỏi Thầy nhúng.
+// Luật nằm ở styles/khoi-dam.css, mọi bộ chọn bắt đầu bằng `[data-kd]`. Lùi nhanh: localStorage `ddh.kd` = 'tat'.
+try { if (!laCongPhuHuynh && !laHoiThay && localStorage.getItem('ddh.kd') !== 'tat') document.documentElement.dataset.kd = '' } catch { document.documentElement.dataset.kd = '' }
 const napGoc: Promise<GocApp> = laCongHocSinh
   ? thuLai(() => import('./AppHocSinh'))
   : laCongPhuHuynh

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Hôm nay</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .loi-tat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .loi-tat > div { padding: 16px; display: flex; flex-direction: column; gap: 6px; min-height: 118px; }
+  .loi-tat .hinh-nho { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: 2px solid var(--muc); border-radius: 12px; font: 600 18px var(--f-to); color: #1b1b1f; }
+  .loi-tat .ten { font: 600 18px/1.2 var(--f-to); margin-top: 6px; }
+  .nhip { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 12px; }
+  @media (max-width: 900px) { .loi-tat { grid-template-columns: 1fr; } .loi-tat > div { min-height: 0; flex-direction: row; align-items: center; gap: 14px; } .loi-tat .ten { margin-top: 0; } }
+</style>
+</head>
+<body data-app="hs" data-tab="hom-nay">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10 · 12A1</span>
+    <span class="chip"><span class="tim-do">♥</span> 21 ngày liên tục <span class="len">+1</span></span>
+    <span class="chip">EXP 4.120</span>
+    <span class="chip vang">Nhịp học: Chăm</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Chào</span> <span class="danh-dau">Nguyễn Văn An</span></h1>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so">18/24</span><span class="nhan">câu đã làm hôm nay · còn 6 câu</span></div>
+    <div><span class="so-vua">3/4</span><span class="nhan">chặng đã xong · mỗi chặng tối đa 6 câu</span></div>
+    <div><span class="so-vua">11/12</span><span class="nhan">câu Tự sửa lỗi hôm nay</span></div>
+    <div><span class="so-vua"><span id="s7">–</span> <span id="tang">–</span></span><span class="nhan">câu 7 ngày qua, so với trung bình 3 tuần</span></div>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Hôm nay · Thứ Hai 26/10</h2><span class="chip la nho">Còn 6 câu</span></div>
+      <p style="font: 600 clamp(26px,3.4vw,34px)/1.1 var(--f-to)">Đã làm <span class="danh-dau">18/24</span> câu hôm nay</p>
+      <div class="nhan" style="margin-top:14px">Tiến độ hôm nay · Xong 3/4 chặng</div>
+      <div class="chang"><i class="xong"></i><i class="xong"></i><i class="xong"></i><i class="dang"></i></div>
+      <div class="thanh la" style="margin-top:8px"><i style="width:75%"></i></div>
+      <div style="margin-top:16px"><span class="nut san-ho to-hon rong-het">Học tiếp · 6 câu →</span></div>
+    </section>
+    <section class="the pad">
+      <div class="tieu"><h2>Lịch dành riêng cho em</h2><span class="chip vang nho">Đang chuẩn bị</span></div>
+      <div style="display:flex; gap:16px; align-items:center">
+        <div class="ngay"><b>THỨ BA</b><span>27</span><small>Tháng 10</small></div>
+        <div><div style="font: 600 24px/1.15 var(--f-to)">Kiểm tra ôn tập</div><div class="nhan" style="margin-top:6px">Mở 00:00 · hoàn thành trong 24 giờ · còn 2 ngày</div></div>
+      </div>
+      <div class="o-nho"><div><span class="so">28</span><div class="nhan">câu</div></div><div><span class="so">50</span><div class="nhan">phút</div></div><div><span class="so">6</span><div class="nhan">bài đã học</div></div></div>
+    </section>
+  </div>
+
+  <section class="the bieu">
+    <div class="hang">
+      <h2 style="font-size:22px">Câu em đã làm</h2>
+      <div class="phai"><div class="cong-tac"><span>Tuần</span><span>30 ngày</span><span class="on">Tất cả</span></div></div>
+    </div>
+    <svg class="duong" id="bieu" aria-label="Số câu em đã làm, cộng dồn"></svg>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Nhịp học của em</h2><span class="nhan">14 ngày qua</span></div>
+      <div class="nhip"><span class="chip vang">Chăm</span><span class="chip">Chưa đều</span><span class="chip">Lười</span><span class="chip">Chưa đủ dữ liệu</span></div>
+      <div class="ghi-chu"><b>Việc tiếp:</b> làm đủ 24 câu thêm 2 ngày nữa là giữ được nhóm Chăm cả tuần.</div>
+      <p class="nhan" style="margin:12px 0">Thầy cũng thấy bảng này.</p>
+      <span class="nut rong-het">Xem hồ sơ làm bài của em</span>
+    </section>
+    <section class="the pad">
+      <div class="tieu"><h2>Bài học trong 7 ngày</h2><span class="nhan">hạn 31/10</span></div>
+      <div style="font: 600 17px/1.35 var(--f-chu)">Bài 6. Một số hợp chất của nitrogen với oxygen</div>
+      <div class="nhan" style="margin:8px 0">Gặp câu gốc: <b style="color:var(--muc)">97/99 câu</b></div>
+      <div class="thanh"><i style="width:98%"></i></div>
+      <div class="nhan" style="margin-top:10px">Câu mới hôm nay: 0/2 · Còn 2 câu trong bài</div>
+    </section>
+  </div>
+
+  <section class="mt">
+    <div class="tieu"><h2>Ôn và sửa</h2></div>
+    <div class="loi-tat">
+      <div class="the"><span class="hinh-nho" style="background:var(--san-ho)">!</span><div><div class="ten">Tự sửa lỗi</div><div class="nhan">1 câu đang chờ em sửa</div></div></div>
+      <div class="the"><span class="hinh-nho" style="background:var(--vang)">✓</span><div><div class="ten">Câu đã làm</div><div class="nhan">Lời giải và lịch ôn từng câu</div></div></div>
+      <div class="the"><span class="hinh-nho" style="background:var(--xanh);color:#fff">✎</span><div><div class="ten">Bài tập về nhà</div><div class="nhan">Thầy đang giao · hạn 28/10</div></div></div>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+<script>
+  const ds = []; let s = 0
+  for (let i = 0; i < 120; i++) { s += Math.max(0, 4 + i * 0.13 + Math.sin(i / 3.2) * 3 + (i % 7 === 6 ? -3 : 0)); ds.push(Math.round(s)) }
+  // Số trên ô khớp đúng dữ liệu biểu đồ (bản vẽ không để số lệch nhau).
+  const ngay = ds.map((v, i) => v - (ds[i - 1] || 0)), cong = (a, b) => ngay.slice(a, b).reduce((x, y) => x + y, 0)
+  const s7 = cong(-7), tb3 = cong(-28, -7) / 3
+  document.getElementById('s7').textContent = s7
+  const tg = document.getElementById('tang'); tg.textContent = (s7 >= tb3 ? '+' : '') + ((s7 / tb3 - 1) * 100).toFixed(1).replace('.', ',') + '%'; tg.className = s7 >= tb3 ? 'len' : 'xuong'
+  veDuong('bieu', ds, { buoc: 250, moc: [[100, '100 câu'], [500, '500 câu'], [1000, '1.000 câu']] })
+</script>
+</body></html>

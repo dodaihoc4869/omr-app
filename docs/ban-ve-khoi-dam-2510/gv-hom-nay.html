@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Hôm nay</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .viec { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 14px; }
+  .viec > .the { padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .viec .so-vua { font-size: 34px; }
+  .viec .nut { margin-top: auto; }
+  .viec .the.nong { background: var(--vang-nhat); }
+  .song { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--xuong); border: 2px solid var(--muc); box-shadow: 0 0 0 4px color-mix(in srgb, var(--xuong) 25%, transparent); }
+  .bac { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin: 6px 0 4px; }
+  .bac div { border: 2px solid var(--muc); border-radius: 6px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 96px; position: relative; overflow: hidden; background: var(--mat-2); }
+  .bac div i { position: absolute; left: 0; right: 0; bottom: 0; border-top: 2px solid var(--muc); }
+  .bac div b { position: relative; font: 600 13px var(--f-may); margin-bottom: 4px; color: #1b1b1f; }
+  .hai-dau { display: flex; justify-content: space-between; }
+  .loc { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+  .loc .o-nhap { min-height: 44px; font-size: 14px; flex: 1; min-width: 200px; }
+  @media (max-width: 1100px) { .viec { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .viec { grid-template-columns: 1fr; } .bac div { height: 70px; } .bac div b { font-size: 10px; } }
+</style>
+</head>
+<body data-app="gv" data-tab="hom-nay" data-nut-dau='<span class="nut san-ho">Theo dõi ca đang mở</span>'>
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10</span>
+    <span class="chip">243 em</span>
+    <span class="chip">cập nhật 21:42</span>
+    <span class="chip"><span class="song"></span> 1 ca đang mở</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Hôm nay</span> <span class="danh-dau">của thầy</span></h1>
+
+  <section class="the o-so">
+    <div class="chinh-so"><span class="so">214<span style="color:var(--mo); font-size:.42em; letter-spacing:0">/243</span></span><span class="nhan">em đã học hôm nay</span></div>
+    <div><span class="so-vua">128</span><span class="nhan">em Chăm</span></div>
+    <div><span class="so-vua">61</span><span class="nhan">em Chưa đều</span></div>
+    <div><span class="so-vua">54</span><span class="nhan">em Lười hoặc Đối phó (32 + 22)</span></div>
+  </section>
+
+  <section class="mt">
+    <div class="tieu"><h2>Việc cần thầy</h2><span class="nhan">4 việc</span></div>
+    <div class="viec">
+      <div class="the nong"><span class="nhan"><span class="song"></span> Ca đang mở</span><span class="so-vua">32/40</span><span class="nhan">Kiểm tra 15 phút · 12A1 · đã nộp</span><span class="nut dang">Theo dõi →</span></div>
+      <div class="the"><span class="nhan">Cần thầy chữa</span><span class="so-vua">9 chỗ</span><span class="nhan">câu nhiều em sai trong bài hôm nay</span><span class="nut">Chữa bài →</span></div>
+      <div class="the"><span class="nhan">Học sinh hỏi</span><span class="so-vua">7 lượt</span><span class="nhan">3 ca có câu hỏi chờ thầy</span><span class="nut">Xem →</span></div>
+      <div class="the"><span class="nhan">Lớp chưa có bài mới</span><span class="so-vua">2 lớp</span><span class="nhan">10C3 · 11B2 chưa có bài ngày mai</span><span class="nut">Bổ sung bài →</span></div>
+    </div>
+  </section>
+
+  <section class="the bieu">
+    <div class="hang">
+      <h2 style="font-size:22px">Câu cả trung tâm làm mỗi ngày</h2>
+      <div class="phai"><div class="cong-tac"><span>Tuần</span><span class="on">Ngày</span><span>30 ngày</span></div><span class="nut an-hep">＋ So sánh lớp</span></div>
+    </div>
+    <svg class="duong" id="bieu" aria-label="Số câu cả trung tâm làm mỗi ngày"></svg>
+  </section>
+
+  <section class="the pad mt">
+    <div class="tieu"><h2>Nhịp học</h2><span class="nhan">12 bậc từ Lười đến Chăm</span></div>
+    <div class="loc">
+      <div class="cong-tac"><span class="on">Tất cả</span><span>10</span><span>11</span><span>12</span></div>
+      <span class="nut">Lớp: tất cả ▾</span>
+      <div class="o-nhap trong">⌕ Tìm tên hoặc số báo danh…</div>
+      <div class="cong-tac"><span class="on">Theo nhóm</span><span>Theo bậc</span></div>
+    </div>
+    <div class="bac" id="bac"></div>
+    <div class="hai-dau nhan"><span>← Lười</span><span>Chăm →</span></div>
+    <div class="luoi-2 deu" style="margin-top:18px">
+      <div>
+        <div class="tieu"><h3>Đối phó · 22 em</h3><span class="chip san-ho nho">cần nhắc</span></div>
+        <div class="dong"><span class="av" style="background:var(--san-ho)">MH</span><div><div class="ten">Trần Minh Hiếu · 12A2</div><div class="nhan">bấm vội 9/12 câu tối qua</div></div></div>
+        <div class="dong"><span class="av">LT</span><div><div class="ten">Lê Thu Trang · 11B1</div><div class="nhan">treo máy 2 lần trong bài 24/10</div></div></div>
+      </div>
+      <div>
+        <div class="tieu"><h3>Lười · 32 em</h3><span class="chip nho">chưa học</span></div>
+        <div class="dong"><span class="av" style="background:#8fd3a8">QN</span><div><div class="ten">Phạm Quang Nam · 10C3</div><div class="nhan">chưa học 3 ngày liên tiếp</div></div></div>
+        <div class="dong"><span class="av" style="background:#c9b8ff">HA</span><div><div class="ten">Vũ Hoài An · 11B2</div><div class="nhan">làm 4/24 câu hôm nay</div></div></div>
+      </div>
+    </div>
+    <div class="nhieu-nut" style="margin-top:14px"><span class="nut">Xem bảng từng ngày ›</span><span class="nut">Xem đủ 243 em ›</span></div>
+  </section>
+</main>
+<script src="khung.js"></script>
+<script>
+  // Câu cả trung tâm làm MỖI NGÀY, 90 ngày (Chủ nhật thấp); hôm nay = 3.912.
+  const ds = []
+  for (let i = 0; i < 90; i++) ds.push(Math.round(1400 + i * 24 + Math.sin(i / 4) * 240 + (i % 7 === 6 ? -650 : 0) + (i % 7 === 5 ? -280 : 0)))
+  ds[89] = 3912
+  veDuong('bieu', ds, { max: 5000, buoc: 1000, dinhDang: (v) => (v ? v / 1000 + 'K' : '0'), moc: [[2000, '2K câu/ngày'], [3000, '3K câu/ngày']], nhanCuoi: '3.912 hôm nay' })
+  // 12 bậc Lười → Chăm, tổng 243 em (khớp ô số: bậc 1–5 = Lười + Đối phó 54, bậc 6–8 = Chưa đều 61, bậc 9–12 = Chăm 128).
+  const bac = [9, 10, 12, 11, 12, 18, 21, 22, 27, 31, 36, 34], max = Math.max(...bac)
+  const mau = (i) => (i < 5 ? 'var(--san-ho)' : i < 8 ? 'var(--vang)' : 'var(--la)')
+  document.getElementById('bac').innerHTML = bac.map((n, i) => `<div><i style="height:${(n / max) * 100}%;background:${mau(i)}"></i><b>${n}</b></div>`).join('')
+</script>
+</body></html>

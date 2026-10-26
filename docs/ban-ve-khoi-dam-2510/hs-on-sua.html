@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Ôn và sửa</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .sua { margin-top: 20px; display: grid; grid-template-columns: auto 1fr auto; align-items: stretch; overflow: hidden; }
+  .sua-so { padding: 22px 30px; background: var(--vang); color: var(--bong); border-right: var(--day) solid var(--muc); display: flex; flex-direction: column; justify-content: flex-end; }
+  .sua-so .so { font-size: clamp(72px, 9vw, 116px); }
+  .sua-so span:last-child { font: 600 14px/1.2 var(--f-may); margin-top: 6px; }
+  .sua-chu { padding: 22px 26px; display: flex; flex-direction: column; justify-content: center; gap: 10px; min-width: 0; }
+  .sua-chu h2 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.05; }
+  .sua-chu .mo-ta { margin: 0; font-size: 17px; }
+  .thanh-hai { display: flex; height: 18px; border: 2px solid var(--muc); border-radius: 999px; background: var(--mat-2); overflow: hidden; margin-top: 6px; }
+  .thanh-hai i { display: block; height: 100%; border-right: 2px solid var(--muc); }
+  .thanh-hai i.xong { background: var(--la); } .thanh-hai i.cho { background: var(--vang); }
+  .chu-giai { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  .chu-giai span { display: inline-flex; align-items: center; gap: 7px; font: 400 12.5px/1.3 var(--f-may); color: var(--mo); }
+  .chu-giai span::before { content: ''; width: 12px; height: 12px; border: 2px solid var(--muc); border-radius: 4px; background: var(--la); }
+  .chu-giai span.cho::before { background: var(--vang); }
+  .chu-giai b { color: var(--muc); }
+  .sua-nut { padding: 22px 26px 22px 0; display: flex; align-items: center; }
+
+  .vao { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 28px; }
+  .o-vao { padding: 22px; display: flex; flex-direction: column; gap: 14px; min-height: 230px; }
+  .hinh { width: 68px; height: 68px; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 18px; box-shadow: 4px 4px 0 var(--bong);
+    font: 600 30px/1 var(--f-to); color: var(--bong); transform: rotate(-5deg); }
+  .o-vao:nth-child(2) .hinh { transform: rotate(4deg); }
+  .hinh.xanh { background: var(--xanh); color: var(--mat); } .hinh.la { background: var(--la); color: var(--mat); } .hinh.san-ho { background: var(--san-ho); }
+  .o-vao h3 { font-size: 24px; line-height: 1.15; }
+  .o-vao p { font: 400 16px/1.45 var(--f-chu); color: var(--muc-2); margin-top: 4px; }
+  .mui { margin-top: auto; align-self: flex-end; width: 46px; height: 46px; display: grid; place-items: center; border: var(--day) solid var(--muc); border-radius: 50%; background: var(--mat);
+    box-shadow: 3px 3px 0 var(--bong); font: 600 20px/1 var(--f-may); }
+
+  @media (max-width: 900px) {
+    .sua { grid-template-columns: auto 1fr; }
+    .sua-nut { grid-column: 1 / -1; padding: 0 22px 22px; border-top: 0; }
+    .sua-nut .nut { width: 100%; }
+    .vao { grid-template-columns: 1fr; gap: 16px; }
+    .o-vao { min-height: 0; flex-direction: row; align-items: center; padding: 16px; }
+    .o-vao .hinh { width: 56px; height: 56px; font-size: 24px; flex: none; }
+    .o-vao h3 { font-size: 20px; }
+    .o-vao p { font-size: 15px; }
+    .o-vao > div { flex: 1; min-width: 0; }
+    .mui { margin: 0; align-self: center; flex: none; }
+  }
+  @media (max-width: 520px) {
+    .sua { grid-template-columns: 1fr; }
+    .sua-so { border-right: 0; border-bottom: var(--day) solid var(--muc); flex-direction: row; align-items: flex-end; justify-content: flex-start; gap: 12px; padding: 18px 18px 16px; }
+    .sua-so span:last-child { margin: 0 0 8px; }
+    .sua-chu { padding: 18px 18px 14px; }
+    .sua-nut { padding: 0 18px 18px; }
+    .o-vao { gap: 12px; padding: 14px; }
+    .o-vao .hinh { width: 48px; height: 48px; border-radius: 14px; }
+    .o-vao h3 { font-size: 18px; }
+    .mui { width: 44px; height: 44px; }
+  }
+  /* chừa chỗ cho nút A.I nổi để không đè nội dung cuối trang */
+  body main.khung { padding-bottom: 110px; }
+  @media (max-width: 1100px) { body.co-duoi main.khung { padding-bottom: 180px; } }
+</style>
+</head>
+<body data-app="hs" data-tab="on-sua">
+<main class="khung">
+  <div class="chips">
+    <span class="chip">Thứ Hai 26/10</span>
+    <span class="chip">Lớp 12A1</span>
+  </div>
+  <h1 class="tieu-de"><span class="mo">Ôn &amp;</span> <span class="danh-dau">sửa</span></h1>
+
+  <section class="the sua">
+    <div class="sua-so"><span class="so">107</span><span>câu</span></div>
+    <div class="sua-chu">
+      <h2>Tự sửa lỗi</h2>
+      <p class="mo-ta">Câu đang chờ em sửa</p>
+      <div class="thanh-hai" role="img" aria-label="Đã tự sửa 29 trong 145 câu, 9 câu chờ lần gặp lại"><i class="xong" style="width:20%"></i><i class="cho" style="width:6.2%"></i></div>
+      <div class="chu-giai"><span>Đã tự sửa <b>29/145 câu</b></span><span class="cho">Chờ lần gặp lại: <b>9 câu</b></span></div>
+    </div>
+    <div class="sua-nut"><span class="nut san-ho to-hon">Sửa lỗi ngay →</span></div>
+  </section>
+
+  <div class="vao">
+    <section class="the o-vao">
+      <span class="hinh xanh">✓</span>
+      <div><h3>Câu đã làm</h3><p>Lời giải và lịch ôn từng câu</p></div>
+      <span class="mui">→</span>
+    </section>
+    <section class="the o-vao">
+      <span class="hinh la">◎</span>
+      <div><h3>Tu luyện</h3><p>Luyện thêm theo chương, dạng, mức</p></div>
+      <span class="mui">→</span>
+    </section>
+    <section class="the o-vao">
+      <span class="hinh san-ho">↻</span>
+      <div><h3>Luyện lại từ bài kiểm tra</h3><p>Câu sai trong các bài kiểm tra</p></div>
+      <span class="mui">→</span>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

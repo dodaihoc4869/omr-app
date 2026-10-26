@@ -50,6 +50,8 @@ const CANH = [
   { ten: 'ldct', url: '?man=ldct', cho: async (t) => { await t.getByRole('button', { name: /Bắt đầu đề mới|Làm tiếp/ }).click(); await t.locator('#ldct-cau-q1, [id^="ldct-cau"]').first().waitFor() }, nut: /^Nộp bài/ },
   { ten: 'tu-luyen', url: '?man=tuluyen-lam', cho: (t) => t.getByText(/Thuỷ phân hoàn toàn 8,8 gam/).first().waitFor(), nut: /^Nộp/ },
   { ten: 'cdl', url: '?man=cdl', cho: (t) => t.getByRole('heading', { name: 'Câu đã làm' }).waitFor(), nut: null },
+  { ten: 'kq', url: '?man=kq', cho: (t) => t.getByText('Ba phần của bài').waitFor(), nut: /Xem câu cần sửa/ },
+  { ten: 'kq-cho', url: '?man=kq-cho', cho: (t) => t.getByText('Em đã nộp bài', { exact: true }).first().waitFor(), nut: /Về bảng nhiệm vụ/ },
   { ten: 'thi', url: '?man=thi', cho: (t) => t.locator('#cau-1').waitFor({ timeout: 20000 }), lam: async (t) => { await t.waitForTimeout(600) }, nut: /^Nộp bài/ },
 ]
 
@@ -96,7 +98,7 @@ for (const c of CANH) {
           }
           return { ngang, nho: [...new Set(nho)], nut }
         }, c.nut ? c.nut.source : null)
-        await t.screenshot({ path: join(ANH, `${ten}.jpg`), type: 'jpeg', quality: 62 })
+        await t.screenshot({ path: join(ANH, `${ten}.jpg`), type: 'jpeg', quality: 62, fullPage: !!process.env.CA_TRANG })
         bao.push(`${ten}: cuộn ngang ${so.ngang.length ? so.ngang.join(' | ') : '0'} · nút chính ${so.nut} · đích nhỏ ${so.nho.length}${so.nho.length ? ' [' + so.nho.slice(0, 8).join('; ') + ']' : ''}${loi.length ? ' · LỖI TRANG ' + loi.join(' / ').slice(0, 160) : ''}`)
       } catch (e) {
         await t.screenshot({ path: join(ANH, `${ten}-HONG.jpg`), type: 'jpeg', quality: 50 }).catch(() => {})

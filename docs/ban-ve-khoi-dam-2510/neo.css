@@ -1,0 +1,48 @@
+@import url('font.css');
+/* PHONG CÁCH «KHỐI ĐẬM» — bản vẽ 25/10 theo ảnh thầy gửi (trang Model Pulse). Lấy ĐÚNG bộ biến của trang gốc (tardellirs/modelpulse, styles.css):
+   giấy #ece9e2 · mặt #fbfaf5 · mực #1b1b1f · viền 2,5px · bóng 5px lệch · bo 16px · vàng đánh dấu #ffd21e · xanh tín hiệu #3b6ff5 · san hô #ff8a6b.
+   Phông đúng ảnh: Fredoka (tiêu đề, số to — thiếu dấu Việt ⇒ Baloo 2 đỡ riêng chữ có dấu) · Source Sans 3 (chữ thường) · IBM Plex Mono (nhãn, nút). */
+:root {
+  --giay: #ece9e2; --mat: #fbfaf5; --mat-2: #f4f1e8; --muc: #1b1b1f; --muc-2: #3d3d45; --mo: #63615b; --ke: #d9d5ca;
+  --bong: #1b1b1f; --vang: #ffd21e; --vang-nhat: #fff3bf; --san-ho: #ff8a6b; --xanh: #3b6ff5; --xanh-nhat: rgba(59, 111, 245, .14);
+  --len: #17703c; --xuong: #d23b3b; --cam: #ff8a1f; --la: #2f8f5b; --tim: #a35bf0;
+  --day: 2.5px; --lech: 5px; --bo: 16px;
+  --f-to: 'Fredoka', 'Baloo 2', system-ui, sans-serif; --f-chu: 'Source Sans 3', system-ui, sans-serif; --f-may: 'IBM Plex Mono', ui-monospace, monospace;
+}
+:root[data-theme="dark"] {
+  --giay: #141519; --mat: #1e1f25; --mat-2: #272830; --muc: #f1ede3; --muc-2: #d2cec3; --mo: #a19d92; --ke: #3a3b44;
+  --bong: #000; --vang: #ffd21e; --vang-nhat: #4a3f0e; --san-ho: #ff9b80; --xanh: #7f9cff; --xanh-nhat: rgba(127, 156, 255, .18);
+  --len: #4fd18c; --xuong: #ff6b5e; --cam: #ffa24d; --la: #4fd18c; --tim: #c39bff;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { background: var(--giay); color: var(--muc); font: 400 16px/1.5 var(--f-chu); font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+.may { font-family: var(--f-may); }
+.to { font-family: var(--f-to); font-weight: 600; letter-spacing: -0.01em; }
+.the { background: var(--mat); border: var(--day) solid var(--muc); border-radius: var(--bo); box-shadow: var(--lech) var(--lech) 0 var(--bong); }
+:root[data-theme="dark"] .the, :root[data-theme="dark"] .nut, :root[data-theme="dark"] .cong-tac { box-shadow: var(--lech) var(--lech) 0 #000; }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 4px 13px; border: 2px solid var(--muc); border-radius: 999px; background: var(--mat);
+  font: 500 12.5px/1 var(--f-may); color: var(--muc); white-space: nowrap; letter-spacing: .02em; }
+.chip .tim-do { color: var(--xuong); }
+.chip .len { color: var(--len); font-weight: 600; }
+.nut { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 15px; border: var(--day) solid var(--muc); border-radius: 12px;
+  background: var(--mat); color: var(--muc); font: 600 13.5px/1 var(--f-may); box-shadow: 3px 3px 0 var(--bong); white-space: nowrap; letter-spacing: .02em; }
+.nut.dang { background: var(--vang); color: #1b1b1f; }
+.nut.san-ho { background: var(--san-ho); color: #1b1b1f; }
+.nut.to-hon { min-height: 54px; font-size: 15px; border-radius: 14px; }
+.danh-dau { background: var(--vang); color: #1b1b1f; padding: 0 .16em; border-radius: 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.so { font: 600 1em/0.95 var(--f-to); letter-spacing: -0.02em; white-space: nowrap; }
+.nhan { font: 400 12.5px/1.4 var(--f-may); color: var(--mo); }
+.len { font: 600 13px/1 var(--f-may); color: var(--len); }
+.xuong { font: 600 13px/1 var(--f-may); color: var(--xuong); }
+.cong-tac { display: inline-flex; padding: 3px; gap: 2px; background: var(--mat); border: var(--day) solid var(--muc); border-radius: 999px; box-shadow: 3px 3px 0 var(--bong); }
+.cong-tac span { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 13px; border-radius: 999px; font: 500 12.5px/1 var(--f-may); white-space: nowrap; letter-spacing: .02em; color: var(--muc); }
+.cong-tac span.on { background: var(--vang); color: #1b1b1f; box-shadow: inset 0 0 0 2px var(--muc); font-weight: 600; }
+.moc { font: 600 11.5px/1 var(--f-may); background: var(--vang); color: #1b1b1f; border: 2px solid var(--muc); border-radius: 7px; padding: 4px 7px; box-shadow: 2px 2px 0 var(--bong); }
+.thanh { height: 14px; border: 2px solid var(--muc); border-radius: 999px; background: var(--mat-2); overflow: hidden; }
+.thanh i { display: block; height: 100%; background: var(--xanh); border-right: 2px solid var(--muc); }
+.thanh.vang i { background: var(--vang); }
+.thanh.la i { background: var(--la); }
+.o-so { display: grid; }
+.o-so > div { padding: 20px 22px; border-right: var(--day) solid var(--muc); min-width: 0; }
+.o-so > div:last-child { border-right: 0; }
+h1, h2, h3 { font-family: var(--f-to); font-weight: 600; letter-spacing: -0.01em; }

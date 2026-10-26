@@ -8,6 +8,7 @@ import { TEN_NHAN_THAI_DO } from '../../../server/src/bai-hang-ngay-kieu'
 import type { DoiPhoEm, EmNhipHoc, KetQuaNhipHoc } from '../../../server/src/nhip-hoc-kieu'
 import { hoSoThaiDoGia, tenEmBhn } from './bai-hang-ngay'
 import { tomTatNhip } from '../../../server/src/nhip-hoc-luat' // LÀN NHỊP EM 12/10C
+import { phanNhomEm } from '../../../src/lib/nhip-hoc-thay'
 
 const NGAY = Array.from({ length: 12 }, (_, i) => `2026-10-${String(i + 1).padStart(2, '0')}`)
 const HOM_NAY = NGAY[NGAY.length - 1]!
@@ -89,6 +90,15 @@ const thamSo = () => (typeof location === 'undefined' ? new URLSearchParams() : 
 /** Đang ở cảnh LÀN HÔM NAY 12/10B. */
 export const laCanhNhipHoc = (): boolean => thamSo().has('nh')
 
+const KHOANG_BAC = { luoi: [1, 5], 'chua-deu': [6, 7], cham: [8, 12] } as const
+function bacGia(e: EmNhipHoc, i: number): { bac: number; diem: number; diemLenBac: number | null } | undefined {
+  const nhom = phanNhomEm(e, NGAY, HOM_NAY).nhom
+  const k = nhom === 'chua-du' ? null : KHOANG_BAC[nhom]
+  if (!k) return undefined
+  const bac = k[0] + ((i * 7 + Number(e.sbd)) % (k[1] - k[0] + 1))
+  return { bac, diem: 10 + ((i * 13) % 80), diemLenBac: bac === k[1] ? null : 5 }
+}
+
 /** `/gv/nhip-hoc` giả (hình dạng `goiLenh`). */
 export function nhipHocGia(): { ok: true; du: Record<string, unknown> } | { ok: false; loai: 'mang'; chu: string } {
   const nh = thamSo().get('nh')
@@ -97,6 +107,8 @@ export function nhipHocGia(): { ok: true; du: Record<string, unknown> } | { ok: 
     ok: true, tu: NGAY[0]!, den: HOM_NAY, homNay: HOM_NAY, ngay: NGAY, em: nh === 'trong' ? [] : EM, lop: nh === 'trong' ? [] : LOP_DS,
     doiPhoDaTinh: { quaNhanh: true, chonLap: true }, canhBao: [],
   }
+  // «Khối đậm» 25/10: `&bac=1` ⇒ thêm `bacCham` mỗi em (đúng khoảng bậc của nhóm app tính: Lười 1–5 · Chưa đều 6–7 · Chăm 8–12) để chụp dải 12 cột.
+  if (thamSo().has('bac')) kq.em = kq.em.map((e, i) => ({ ...e, bacCham: bacGia(e, i) }) as EmNhipHoc)
   return { ok: true, du: kq as unknown as Record<string, unknown> }
 }
 

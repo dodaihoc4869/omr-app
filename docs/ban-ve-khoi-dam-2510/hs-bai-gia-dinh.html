@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Bài gia đình giao</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  main.khung { padding-bottom: 110px; }
+  :root[data-theme="dark"] .chip.la { color: var(--giay); }
+  .tieu-de small { font-size: .5em; color: var(--mo); white-space: nowrap; }
+  /* Đồng hồ khối: số to Fredoka + vạch 120 phút. */
+  .dong-ho { display: grid; grid-template-columns: 1fr auto; gap: 18px 24px; align-items: end; padding: 22px; background: var(--vang); color: var(--bong); }
+  .dong-ho .nhan { color: var(--bong); opacity: .78; }
+  .dong-ho .so { font-size: clamp(60px, 9vw, 104px); }
+  .dong-ho .thanh { grid-column: 1 / -1; height: 22px; background: transparent; border-color: var(--bong); }
+  .dong-ho .thanh i { background: var(--bong); border-color: var(--bong); }
+  .dong-ho .vach { grid-column: 1 / -1; display: flex; justify-content: space-between; font: 500 12px var(--f-may); margin-top: -10px; }
+  .dong-ho .nhieu-nut { justify-content: flex-end; }
+  .dong-ho .nut { border-color: var(--bong); box-shadow: 3px 3px 0 var(--bong); }
+  .dong-ho .nut:not(.san-ho) { background: var(--mat); color: var(--muc); }
+  .luoi-cau { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-top: 6px; }
+  .luoi-cau span { min-height: 44px; display: grid; place-items: center; border: 2px solid var(--muc); border-radius: 10px; background: var(--mat-2); font: 600 14px var(--f-may); }
+  .luoi-cau span.co { background: var(--xanh); color: var(--mat); }
+  .luoi-cau span.dang { background: var(--vang); color: var(--bong); box-shadow: 2px 2px 0 var(--bong); }
+  :root[data-theme="dark"] .luoi-cau span.co { color: var(--giay); }
+  .phan-nhan { font: 600 12.5px var(--f-may); color: var(--mo); margin-top: 14px; display: block; }
+  .bai .dong { flex-wrap: wrap; }
+  .bai .dong > div:nth-child(2) { flex: 1; min-width: 180px; }
+  .bai .dong .nut { margin-left: auto; }
+  @media (max-width: 520px) {
+    .dong-ho { grid-template-columns: 1fr; padding: 18px 16px; } .dong-ho .nhieu-nut .nut { flex: 1; }
+    .luoi-cau { gap: 5px; } .bai .dong .nut { width: 100%; }
+  }
+</style>
+</head>
+<body data-app="hs" data-tab="hom-nay" data-khung="man-con" data-tieu="Bài gia đình giao" data-phu="Thời gian làm: 2 giờ" data-ve="Hôm nay">
+<main class="khung">
+  <div class="chips">
+    <span class="chip san-ho">● Đang làm 1 bài</span>
+    <span class="chip">Đã lưu nháp 19:47</span>
+    <span class="chip">3 bài gia đình giao</span>
+  </div>
+  <h1 class="tieu-de"><span class="danh-dau">Bài gia đình giao</span> <small>(120 phút từ khi bắt đầu)</small></h1>
+  <p class="mo-ta">Đang làm: <b>Đề ôn chương Hợp chất chứa nitrogen</b> · 28 câu · bắt đầu lúc 19:00.</p>
+
+  <section class="the dong-ho mt" aria-label="Đồng hồ bài gia đình giao">
+    <div><span class="so">01:12:35</span><span class="nhan" style="display:block;margin-top:8px">còn lại trong 2 giờ · đã làm 47 phút 25 giây</span></div>
+    <div class="nhieu-nut"><span class="nut to-hon">Tạm dừng</span><span class="nut san-ho to-hon">Nộp bài gia đình giao</span></div>
+    <div class="thanh" role="img" aria-label="Đã dùng 39,5% thời gian"><i style="width:39.5%"></i></div>
+    <div class="vach"><span>0 phút</span><span>60 phút</span><span>120 phút</span></div>
+  </section>
+
+  <div class="luoi-2">
+    <section class="the pad">
+      <div class="tieu"><h2>Danh sách câu</h2><span class="nhan">Đã làm 15/28</span></div>
+      <span class="phan-nhan">Phần I · Trắc nghiệm · 18 câu</span>
+      <div class="luoi-cau" id="p1"></div>
+      <span class="phan-nhan">Phần II · Đúng–sai · 4 câu</span>
+      <div class="luoi-cau" id="p2"></div>
+      <span class="phan-nhan">Phần III · Trả lời ngắn · 6 câu</span>
+      <div class="luoi-cau" id="p3"></div>
+      <div class="chu-giai nhan" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:14px"><span><b style="color:var(--xanh)">■</b> đã làm</span><span><b style="color:var(--vang)">■</b> đang làm</span><span>□ chưa làm</span></div>
+    </section>
+
+    <section class="the pad bai">
+      <div class="tieu"><h2>Danh sách bài</h2><span class="nhan">thời gian làm: 2 giờ mỗi bài</span></div>
+      <div class="dong"><span class="dau-tick cho">!</span><div><div class="ten">Đề ôn chương Hợp chất chứa nitrogen</div><div class="nhan">Số câu: 28 · Đã lưu nháp · còn 01:12:35</div></div><span class="nut dang">Tiếp tục làm bài</span></div>
+      <div class="dong"><span class="dau-tick trong">–</span><div><div class="ten">Đề luyện tổng hợp Ester – Lipid và Carbohydrate</div><div class="nhan">Số câu: 28 · Hạn nộp 01/11</div></div><span class="nut">Bắt đầu làm bài (2 tiếng)</span></div>
+      <div class="dong"><span class="dau-tick">✓</span><div><div class="ten">Đề ôn chương Carbohydrate</div><div class="nhan">Nộp 18/10 · 7,85/10 · Phần I 4,00 · Phần II 2,60 · Phần III 1,25</div></div><span class="nut">Xem kết quả &amp; Lời giải HTML</span></div>
+      <div class="ghi-chu mt">Bài của em đã được lưu nháp. Em vào làm tiếp bất cứ lúc nào trước Hạn nộp.</div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // 15 câu đã làm = Phần I 11 + Phần II 2 + Phần III 2; câu đang làm: Phần I câu 12.
+  const ve = (id, n, daLam, dang, dau = 0) => { document.getElementById(id).innerHTML = Array.from({ length: n }, (_, i) => `<span class="${daLam.includes(i + 1) ? 'co' : i + 1 === dang ? 'dang' : ''}">${dau + i + 1}</span>`).join('') }
+  ve('p1', 18, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 12)
+  ve('p2', 4, [1, 2], 0, 18)
+  ve('p3', 6, [1, 2], 0, 22)
+</script>
+</body></html>

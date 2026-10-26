@@ -90,9 +90,12 @@ function napTruocManEm(): Plugin {
         const ngoai =(ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
         const phongHs = Object.values(goi)
           .map((x) => (x as { fileName: string }).fileName)
-          .filter((f) => /^assets\/(?:be-vietnam-pro-(?:latin|vietnamese)-(?:400|600|700)|noto-serif-(?:latin|vietnamese)-700|baloo-2-(?:latin|vietnamese)-(?:700|800))-normal-[\w-]+\.woff2$/.test(f))
+          .filter((f) => /^assets\/(?:noto-serif-(?:latin|vietnamese)-700|baloo-2-(?:latin|vietnamese)-(?:700|800))-normal-[\w-]+\.woff2$/.test(f))
           .sort()
           .map((f) => goc + f)
+          // «Khối đậm» 26/10: chữ thân + tiêu đề của cổng học sinh là Source Sans 3 / Fredoka / Baloo 2 tự lưu (public/fonts/khoi-dam, tên cố định) —
+          // thay Be Vietnam Pro (giờ chỉ phụ huynh / Hỏi thầy / khi tắt Khối đậm dùng, đi kho chạy-lúc).
+          .concat(['source-sans-3-0', 'source-sans-3-2', 'fredoka-1', 'baloo-2-0'].map((t) => `${goc}fonts/khoi-dam/${t}.woff2`))
         const bang = {
           katex: dsCua('/src/lib/katex-goi.ts'),
           // Ảnh lớn nhất của màn đăng nhập học sinh (LoiChao: `anhThu(1, 50)`) — nạp trước khi máy chưa đăng nhập (tests/may-yeu-mo-app-1310 khoá đúng đường).
@@ -411,6 +414,11 @@ export default defineConfig({
           '**/inter-*-wght-normal-*.woff2',
           // Phông tiêu đề Game Hóa 2.0 'Baloo 2' (28/09): chỉ mảnh game/Sảnh 2.0 nạp (src/components/hoa2/phong-baloo.ts) — tải lúc mở game rồi cất ở kho chạy-lúc /assets/*.woff2, không vào precache vỏ.
           '**/baloo-2-*.woff2',
+          // Be Vietnam Pro (26/10): ba app chính dùng phông «Khối đậm»; Be Vietnam chỉ còn cho phụ huynh / Hỏi thầy / khi tắt Khối đậm ⇒ kho chạy-lúc.
+          '**/be-vietnam-pro-*.woff2',
+          // Phông số «Khối đậm» IBM Plex Mono (26/10, 4 tệp): chỉ nhãn phụ/con số nhỏ dùng — giữ trần 170 tệp precache; tải lần đầu rồi cất ở kho chạy-lúc
+          // (src/sw.ts bắt cả /fonts/khoi-dam/*). Fredoka + Source Sans 3 (tiêu đề, chữ thân) vẫn precache để mở app không nháy phông.
+          '**/fonts/khoi-dam/ibm-plex-mono-*.woff2',
           // Bi-a Phản Ứng (28/09): gói lười BiaGame + mảnh dùng chung với Đảo 2.0 (thẻ câu `TrongAi`, `useNgang`) — Rollup tách riêng vì cả hai game
           // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). `chu-het-luot` (1 KB) bị tách theo, chỉ DaoThanThu/DoanHoTong/Game
           // (đều ngoài precache) nhập. Chỉ máy mở game mới tải, cất ở kho chạy-lúc.

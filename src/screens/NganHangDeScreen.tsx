@@ -27,6 +27,7 @@ import { useAppStore } from '../store/appStore'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
 import { ngayDayDu } from '../lib/ngay-gio-24'
+import '../styles/khoi-dam-quan-ly.css' // «Khối đậm» 25/10: trình bày màn quản lý app thầy
 
 type CauNghi = {
   phan: 'I' | 'II' | 'III'

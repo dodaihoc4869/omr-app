@@ -1,6 +1,7 @@
 import './exam-setup.css'
 import BangMaTranDe from '../components/ma-tran-de/BangMaTranDe'
 import '../components/ca-thi/ca-thi.css'
+import '../styles/khoi-dam-quan-ly.css' // «Khối đậm» 25/10: trình bày màn quản lý app thầy
 import { laBoDe12, rutDeChuan2026, SO_CAU_CHUAN_2026 } from '../lib/ma-tran-hoa-2026'
 // MỞ CA KIỂM TRA — tối giản theo yêu cầu thầy (2026-09-02): đề đã tự về từ
 // kho, link Apps Script đã cấu hình 1 lần ở màn Ngân hàng câu hỏi, nên màn

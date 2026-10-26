@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Đăng nhập</title>
+<link rel="stylesheet" href="neo.css"><link rel="stylesheet" href="khung.css">
+<style>
+  .dau-dn { display: flex; align-items: center; gap: 12px; height: 74px; }
+  .hero { display: grid; grid-template-columns: auto 1fr auto; gap: clamp(18px, 3vw, 40px); align-items: center; margin: 18px 0 8px; }
+  .logo-to { width: clamp(96px, 12vw, 150px); aspect-ratio: 1; display: grid; place-items: center; background: var(--vang); color: var(--bong); border: var(--day) solid var(--muc);
+    border-radius: 28px; box-shadow: 8px 8px 0 var(--bong); font: 600 clamp(56px, 7vw, 92px)/1 var(--f-to); transform: rotate(-6deg); }
+  .hero h1 { font: 600 clamp(44px, 7.6vw, 100px)/1.02 var(--f-to); letter-spacing: -.02em; }
+  .hero h1 .mo { color: var(--mo); }
+  .bang-tuan { display: grid; grid-template-columns: repeat(2, 84px); gap: 12px; }
+  .ng-to { width: 84px; height: 84px; border: var(--day) solid var(--muc); border-radius: 14px; background: var(--mat); box-shadow: 4px 4px 0 var(--bong); padding: 6px 9px; display: flex; flex-direction: column; }
+  .ng-to:nth-child(2) { transform: translateY(14px) rotate(4deg); background: var(--san-ho); color: var(--bong); }
+  .ng-to:nth-child(3) { transform: rotate(-3deg); background: var(--xanh-nhat); }
+  .ng-to:nth-child(4) { transform: translateY(14px); background: var(--vang); color: var(--bong); }
+  .ng-to small { font: 600 11px/1 var(--f-may); }
+  .ng-to b { font: 600 34px/1 var(--f-to); margin: auto 0 0; }
+  .ng-to span { font: 500 9.5px/1.2 var(--f-may); }
+  .nhan-ve { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .nhan-ve .nhan { font-size: 12px; }
+  .o-nhap.mk { padding-right: 6px; gap: 10px; letter-spacing: .18em; }
+  .o-nhap.mk .mat { margin-left: auto; letter-spacing: 0; width: 44px; height: 40px; flex: none; display: grid; place-items: center; border: 2px solid var(--muc); border-radius: 10px; background: var(--mat-2); font: 600 18px/1 var(--f-may); }
+  .o-nhap.loi { border-color: var(--xuong); box-shadow: inset 3px 3px 0 color-mix(in srgb, var(--xuong) 18%, var(--mat)); }
+  .bao-loi { margin-top: 8px; font: 600 13.5px/1.4 var(--f-chu); color: var(--xuong); }
+  .goi-y { font: 400 12px/1.4 var(--f-may); color: var(--mo); margin-left: 6px; }
+  .nhan-o { margin-top: 16px; }
+  .nhan-o:first-of-type { margin-top: 4px; }
+  .quen { margin-top: 14px; text-align: center; font: 400 15px/1.5 var(--f-chu); color: var(--muc-2); }
+  .hai-nut { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+  .hai-nut .nut.san-ho { flex: 1 1 210px; }
+  .hai-nut .nut:not(.san-ho) { flex: 0 0 auto; }
+  .luoi-2.deu { margin-top: 30px; }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: auto 1fr; }
+  }
+  @media (max-width: 520px) {
+    .hero { grid-template-columns: 1fr; gap: 22px; margin-top: 8px; }
+    .logo-to { width: 84px; border-radius: 20px; box-shadow: 6px 6px 0 var(--bong); font-size: 52px; }
+    .luoi-2.deu { margin-top: 22px; }
+    .dau-dn { height: 28px; }
+    .dau-dn .logo { display: none; }
+    .hai-nut { flex-direction: column-reverse; }
+    .hai-nut .nut { width: 100%; flex: none !important; }
+  }
+</style>
+</head>
+<body data-app="hs" data-khung="khong">
+<main class="khung">
+  <div class="dau-dn"><div class="logo"><i>Đ</i>Đỗ Đại Học</div></div>
+
+  <section class="hero">
+    <div class="logo-to">Đ</div>
+    <h1><span class="mo">Hành trình</span><br><span class="danh-dau">giỏi Hóa</span></h1>
+    <div class="bang-tuan an-hep" aria-hidden="true">
+      <div class="ng-to"><small>1</small><b>H</b><span>1,008</span></div>
+      <div class="ng-to"><small>6</small><b>C</b><span>12,011</span></div>
+      <div class="ng-to"><small>7</small><b>N</b><span>14,007</span></div>
+      <div class="ng-to"><small>8</small><b>O</b><span>15,999</span></div>
+    </div>
+  </section>
+
+  <div class="luoi-2 deu">
+    <section class="the pad">
+      <div class="tieu"><h2>Đăng nhập</h2></div>
+      <label class="nhan-o">Số báo danh (SBD)</label>
+      <div class="o-nhap">110234</div>
+      <label class="nhan-o">Mật khẩu <span class="goi-y">(Lần đầu chưa có để trống để đặt)</span></label>
+      <div class="o-nhap mk">••••••••<span class="mat" title="Hiện mật khẩu">◉</span></div>
+      <div style="margin-top:22px"><span class="nut san-ho to-hon rong-het">Đăng nhập →</span></div>
+      <p class="quen">Quên mật khẩu: nhắn thầy để đặt lại.</p>
+    </section>
+
+    <div>
+      <div class="nhan-ve"><span class="moc">Trạng thái khác</span><span class="nhan">Lần đầu đặt mật khẩu</span></div>
+      <section class="the pad">
+        <div class="ghi-chu">SBD <b>12026</b> chưa có mật khẩu. Em tạo mật khẩu mới, tối thiểu 6 ký tự.</div>
+        <label class="nhan-o" style="margin-top:16px">Mật khẩu mới</label>
+        <div class="o-nhap mk">••••••••<span class="mat" title="Hiện mật khẩu">◉</span></div>
+        <label class="nhan-o">Xác nhận mật khẩu</label>
+        <div class="o-nhap mk loi">•••••••<span class="mat" title="Hiện mật khẩu">◉</span></div>
+        <p class="bao-loi">! Xác nhận mật khẩu không khớp</p>
+        <div class="hai-nut"><span class="nut">← Quay lại</span><span class="nut san-ho to-hon">Xác nhận &amp; Đăng nhập</span></div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

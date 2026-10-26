@@ -47,6 +47,9 @@ import './../../src/styles/teacher-modern.css'
 // Cổng học sinh (StudentPortalScreen) nạp hai tờ này; Hôm nay nạp hoc-tap.css trước khi mở các màn con.
 import './../../src/components/bang-nhiem-vu/sheet-m3.css'
 import './../../src/components/hoc-tap/hoc-tap.css'
+// Giao diện «Khối đậm» 25/10 (main.tsx nạp phông, AppThi / AppHocSinh nạp lớp da) — `&kd=tat` = giao diện cũ để so.
+import './../../src/styles/khoi-dam-phong.css'
+import './../../src/styles/khoi-dam.css'
 import { createElement as h, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { X } from 'lucide-react'
@@ -58,6 +61,7 @@ import LuyenDeCauTruc from '../../src/components/tu-luyen/LuyenDeCauTruc'
 import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen'
 import CauDaLam from '../../src/components/hoa2/CauDaLam'
 import ExamTakeScreen from '../../src/screens/ExamTakeScreen'
+import KetQuaSauNop, { type OCauKq } from '../../src/components/xem-diem/KetQuaSauNop'
 import { ThanhTren } from '../../src/components/m3'
 import { cacheSession, emptyAnswerRecord, emptyIntegrityLog, saveAttempt, type ExamAttempt } from '../../src/lib/exam-db'
 import type { PublicExamBank } from '../../src/data/examContent'
@@ -68,6 +72,7 @@ const man = thamSo.get('man') ?? 'lam13'
 const noop = () => {}
 const now = Date.now()
 if (thamSo.get('toi') === '1') document.documentElement.classList.add('dark')
+if (thamSo.get('kd') !== 'tat') document.documentElement.dataset.kd = ''
 
 // ───────────────────────────── bộ câu giả dùng chung (Hoá 12, soạn cho ảnh chụp) ─────────────────────────────
 const TN = [
@@ -180,6 +185,19 @@ const manThi = () =>
   h('div', { className: 'fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-white dark:bg-slate-950 man-thi-phu', style: { '--thi-le-phai': '52px' } },
     h(ExamTakeScreen, { tuCong: { maCa: MA_CA, sbd: '12121212', hoTen: 'Nguyễn Minh Anh', namSinh: '2008', lop: '12A1', scriptUrl: 'https://may-chu-gia.invalid' } }))
 
+
+// ───────────────────────────── Kết quả sau nộp (KetQuaSauNop): `?man=kq` đã công bố · `?man=kq-cho` chưa công bố (dữ liệu giả, khớp số) ─────
+const KQ_SAI: Record<number, OCauKq['kq']> = { 5: 'sai', 14: 'sai', 26: 'sai', 8: 'trong', 20: 'mot_phan', 22: 'mot_phan' }
+const KQ_CAU: OCauKq[] = Array.from({ length: 28 }, (_, i) => i + 1).map((so) => ({ phan: so <= 18 ? 'I' : so <= 22 ? 'II' : 'III', so, kq: KQ_SAI[so] ?? 'dung' }))
+const manKq = (daCongBo: boolean) => h(KetQuaSauNop, daCongBo
+  ? { kieu: 'da_cong_bo', tenCa: 'Kiểm tra 50 phút · 12A1', gioNop: '20:41 · Thứ Bảy 24/10/2026', lanThu: 1, diem: 7.75, dung: 22, tong: 28, lam: '41 phút', de: '50 phút', ss: 0.5, truoc: 7.25,
+      phan: [
+        { ma: 'I', ten: 'Phần I · Trắc nghiệm', dung: 15, tong: 18, motPhan: 0, diem: 3.75, toiDa: 4.5 },
+        { ma: 'II', ten: 'Phần II · Đúng–sai', dung: 2, tong: 4, motPhan: 2, diem: 2.75, toiDa: 4 },
+        { ma: 'III', ten: 'Phần III · Trả lời ngắn', dung: 5, tong: 6, motPhan: 0, diem: 1.25, toiDa: 1.5 },
+      ], cau: KQ_CAU, onXemBaoCao: noop, onVe: noop }
+  : { kieu: 'ca_lop', tenCa: 'Kiểm tra 50 phút · 12A1', gioNop: '20:41 · Thứ Bảy 24/10/2026', soDaLam: 27, tongCau: 28, lam2: '41 phút 12 giây', daNop: 18, daVao: 32, onVe: noop })
+
 // Khung màn con của cổng học sinh 2.0 (StudentPortalScreen `khungManCon(true)`).
 const KHUNG_CON = { className: 'fixed inset-0 z-50 overflow-y-auto tt-mo-lop', style: { overscrollBehavior: 'contain', background: 'var(--v2-nen, var(--nen))' } }
 const con =
@@ -189,6 +207,7 @@ const con =
   : man === 'tuluyen-lam' ? h('div', KHUNG_CON, h(ManTuLuyen, { token: 'tk', sbd: '12121212', onVe: noop }))
   : man === 'cdl' ? h('div', KHUNG_CON, h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop }))
   : man === 'thi' ? manThi()
+  : man === 'kq' || man === 'kq-cho' ? manKq(man === 'kq')
   : h(ManLam13)
 
 const veTrang = () => createRoot(document.getElementById('root')!).render(h(BatLinhShell, { vai: 'hs' }, con))

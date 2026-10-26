@@ -139,7 +139,8 @@ const KHONG_LUU_HTML = {
 }
 const CUNG_NGUON = (u: URL) => u.origin === self.location.origin
 registerRoute(
-  ({ url }) => CUNG_NGUON(url) && /\/assets\/[^/]+\.(?:js|css|woff2?|ttf|png|jpe?g|svg|webp|gif)$/.test(url.pathname),
+  // + /fonts/khoi-dam/*.woff2 (26/10): phông «Khối đậm» không precache (Baloo 2, IBM Plex Mono) — tải một lần rồi cất, như phông trong /assets/.
+  ({ url }) => CUNG_NGUON(url) && /\/(?:assets\/[^/]+\.(?:js|css|woff2?|ttf|png|jpe?g|svg|webp|gif)|fonts\/khoi-dam\/[\w-]+\.woff2)$/.test(url.pathname),
   new CacheFirst({
     cacheName: 'omr-manh-chay-lan',
     plugins: [KHONG_LUU_HTML, new ExpirationPlugin({ maxEntries: 150, maxAgeSeconds: 30 * 24 * 3600, purgeOnQuotaError: true })],
