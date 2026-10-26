@@ -33,9 +33,11 @@ export interface PropsManThuong {
   chuyenDe?: { ma: string; ten: string }
   /** Hiệu ứng mở màn (host bật đúng lúc, vd. Chuỗi ngày sau bài đầu tiên trong ngày). */
   hieuUng?: 'chuoi' | 'binh' | 'moc' | 'ruong'
+  /** Nơi cắm chưa có cửa hàng phụ kiện thú ⇒ ẩn thẻ «Phụ kiện cho thú» ở Cửa hàng (không vẽ nút bấm không đi đâu). */
+  anPhuKien?: boolean
 }
 
-export default function ManThuong({ man, token, onVe, onHoc, onMo, chuyenDe, hieuUng }: PropsManThuong) {
+export default function ManThuong({ man, token, onVe, onHoc, onMo, chuyenDe, hieuUng, anPhuKien }: PropsManThuong) {
   const tq = useTongQuan(token).du
   const [cuu, setCuu] = useState(false)
   if (man === 'chuoi') return <>
@@ -44,7 +46,7 @@ export default function ManThuong({ man, token, onVe, onHoc, onMo, chuyenDe, hie
   </>
   if (man === 'giai') return <ManGiaiTuan token={token} onVe={onVe} />
   if (man === 'nhiem-vu') return <ManNhiemVu token={token} onVe={onVe} hieuUng={hieuUng === 'ruong' ? 'ruong' : undefined} />
-  if (man === 'cua-hang') return <ManCuaHang token={token} onVe={onVe} onPhuKien={onMo ? () => onMo('phu-kien') : undefined} />
+  if (man === 'cua-hang') return <ManCuaHang token={token} onVe={onVe} onPhuKien={onMo && !anPhuKien ? () => onMo('phu-kien') : undefined} />
   if (man === 'huy-hieu') return <ManHuyHieu token={token} onVe={onVe} />
   if (man === 'ban') return <ManHocCungBan token={token} onVe={onVe} onHoc={onHoc} onMoi={onMo ? () => onMo('moi-ban') : undefined} />
   if (man === 'moi-ban') return <ManMoiBan token={token} onDong={onVe ?? (() => {})} />

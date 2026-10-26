@@ -1,7 +1,7 @@
 // GIAO DIỆN «TRONG» · APP HỌC SINH — phần trình bày RIÊNG của bản vẽ thầy chốt 26/10 (ve-moi/hs-mot-trang*.html, hs-menu-phai.html; từ 26/10 tối: ve-moi/dm-*.html —
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
@@ -12,6 +12,29 @@ import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
 import { Bi, type CamBi } from '../linh-vat/Bi'
 import { banHat, yenLang } from '../../lib/hieu-ung'
 import '../../styles/trong-hs.css'
+// THƯỞNG PHẠT (gộp đợt 3, 26/10 — src/components/thuong/CAM-VAO.md): thanh trên ThanhThuong vẽ NGAY từ bản lưu máy (nhỏ, cùng mảnh «Trong»); mọi màn
+// thưởng phạt + thẻ bên là MỘT mảnh nạp lười (ManThuong). Học sinh không thấy nhãn nhịp học / bậc.
+import { ThanhThuong } from '../thuong/ThanhThuong'
+import { useTongQuan } from '../thuong/dung-thuong'
+import { napSanThanhTich } from '../../lib/thuong-api'
+import type { TenManThuong } from '../thuong/ManThuong'
+const ManThuong = lazy(() => import('../thuong/ManThuong'))
+const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
+/** Sự kiện màn làm chặng phát khi xong bài ĐẦU TIÊN trong ngày ⇒ Lộ trình mở «Chuỗi ngày» với hiệu ứng lửa bùng (C1). */
+export const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
+/** Cột bên (thẻ Giải tuần + Nhiệm vụ) chỉ hiện ở máy tính / điện thoại ngang (cùng điều kiện CSS `.dm-ben`) ⇒ điện thoại dọc không nạp mảnh màn thưởng. */
+const MQ_BEN = '(min-width: 1000px), (max-height: 520px) and (min-width: 600px)'
+function useCoBen(): boolean {
+  const [co, setCo] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(MQ_BEN).matches)
+  useEffect(() => {
+    const m = window.matchMedia?.(MQ_BEN)
+    if (!m) return
+    const doi = () => setCo(m.matches)
+    m.addEventListener?.('change', doi)
+    return () => m.removeEventListener?.('change', doi)
+  }, [])
+  return co
+}
 
 export interface PropsMotTrang {
   so: SoHomNay | null; dangTai: boolean; tenBai?: string; viec?: string
@@ -151,6 +174,11 @@ const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 const thuNgan = (ngay: string) => THU_NGAN[new Date(`${ngay}T00:00:00Z`).getUTCDay()] ?? ''
 const lopSo = (lop?: string) => lop?.match(/^\d{1,2}/)?.[0]
 
+function OTo({ ten, mo, sac, Icon, so, noi, onClick, tat }: { ten: string; mo: string; sac: string; Icon: LucideIcon; so?: ReactNode; noi?: boolean; onClick?: () => void; tat?: boolean }) {
+  const than = <><span className="h" data-sac={sac}><Icon size={30} aria-hidden="true" /></span><span className="giua"><b>{ten}</b><span className="mo">{mo}</span></span>{so != null && <span className="so">{so}</span>}{onClick && <ChevronRight size={22} aria-hidden="true" className="da-mui" />}</>
+  return onClick ? <button type="button" className="da-o" data-noi={noi || undefined} onClick={onClick} disabled={tat}>{than}</button> : <div className="da-o" data-noi={noi || undefined}>{than}</div>
+}
+
 /** HÔM NAY kiểu Duolingo + chất Hoá (bản vẽ ve-moi/dm-*.html, thầy chốt 26/10): ba mục của menu dọc — Lộ trình (con đường chặng: học → Kiểm tra ôn tập →
  *  Tự sửa lỗi → Bài tập về nhà, ĐÚNG thứ tự việc của «Một trang») · Luyện tập (mỗi việc một ô to có số) · Thành tích (chuỗi ngày, tuần này, việc tiếp, huy hiệu
  *  từ số sẵn có). Cùng số, cùng lệnh, cùng nút như bản trước; ô nào app chưa có số rẻ thì giữ nhãn, bỏ số. */
@@ -158,7 +186,23 @@ export function MotTrangHs(p: PropsMotTrang) {
   const so = p.so, kiem = p.kiem, hs = p.hs
   const nhipGoc = useNhipHocEm(p.ngayKiem ? undefined : p.token, null)
   const nhip = typeof nhipGoc === 'string' ? null : nhipTheoSanh(nhipGoc, so ? { muc: so.muc, daLam: so.daLam } : null)
-  const chuoi = nhip?.chuoiDuGanNhat ?? 0
+  // Thưởng phạt: tổng quan /hs/thuong (bản lưu máy trước, máy chủ sau). Có chuỗi ngày theo bài (B3, cờ duolingo_bai) ⇒ MỌI chỗ hiện chuỗi dùng CÙNG số với
+  // thanh trên; cờ tắt (chuoiNgay vắng) ⇒ chuỗi «đủ mức» cũ. Máy chủ chưa có lệnh (404) / lỗi mà chưa có bản lưu ⇒ thanh trên cũ.
+  const tqTai = useTongQuan(p.token)
+  const tq = tqTai.du
+  const coThuong = !!p.token && (!!tq || tqTai.tai)
+  const chuoi = tq?.chuoiNgay?.so ?? nhip?.chuoiDuGanNhat ?? 0
+  const [tp, setTp] = useState<{ man: TenManThuong; hieuUng?: 'chuoi' } | null>(null)
+  const coBen = useCoBen()
+  useEffect(() => { setTp(null) }, [p.muc])
+  useEffect(() => {
+    const mo = () => setTp({ man: 'chuoi', hieuUng: 'chuoi' })
+    window.addEventListener(SU_KIEN_MO_CHUOI, mo)
+    return () => window.removeEventListener(SU_KIEN_MO_CHUOI, mo)
+  }, [])
+  // Thành tích mở ⇒ gọi sẵn giải + bạn + huy hiệu (song song) để bấm ô là có số.
+  useEffect(() => { if (p.muc === 'ket-qua' && p.token) napSanThanhTich(p.token) }, [p.muc, p.token])
+  const moTp = (man: TenManThuong) => setTp({ man })
   const con = so ? Math.max(0, so.muc - so.daLam) : null
   const du = con === 0
   const nutHoc = chuNutHoc(so, p.hetCau, p.kho)
@@ -172,11 +216,21 @@ export function MotTrangHs(p: PropsMotTrang) {
   const chang = so && !p.ngayKiem ? chiaChang(so) : []
   const xongChang = so ? soChangXong(so) : 0
 
+  // Thanh trên: ĐÚNG 3 bộ đếm thưởng phạt (chuỗi · nguyên tử hôm nay · tinh thể) + vòng Mục tiêu ngày (bản vẽ tp-4); thông báo thưởng chưa xem chỉ bật ở Lộ trình.
   const tren = <header className="da-tren" aria-label="Số của em">
+    {coThuong ? <ThanhThuong token={p.token} onMo={moTp} onHoc={p.onHoc} thongBao={!tp && (p.muc ?? 'hom-nay') === 'hom-nay'} /> : <>
     {lopSo(hs?.lop) && <span data-sac="tin" aria-label={`Khối ${lopSo(hs?.lop)}`}><GraduationCap size={22} aria-hidden="true" />{lopSo(hs?.lop)}</span>}
     <span data-sac="sao" aria-label={`Chuỗi ${chuoi} ngày đủ mức`}><Flame size={22} aria-hidden="true" />{chuoi}</span>
     {so && <span data-sac="dung" aria-label={`${so.daLam}/${so.muc} câu hôm nay`}>{du ? <CheckCircle2 size={22} aria-hidden="true" /> : <Target size={22} aria-hidden="true" />}{so.daLam}/{so.muc}</span>}
+    </>}
   </header>
+  // Một màn thưởng phạt đang mở (bấm bộ đếm / thẻ bên / ô Thành tích): thay nội dung mục, thanh trên + menu giữ nguyên; «Quay lại» về mục cũ.
+  if (tp && p.token) return <div className="dm-khung" data-muc="thuong">{tren}<main className="tp-cam">
+    <Suspense fallback={<div className="tp-cam-cho" role="status" aria-busy="true" aria-label="Đang mở" />}>
+      <ManThuong man={tp.man} token={p.token} hieuUng={tp.hieuUng} onVe={() => setTp(null)} onHoc={() => { setTp(null); p.onHoc() }} anPhuKien
+        onMo={(m) => { if (m !== 'phu-kien' && m !== 'cuu') moTp(m) }} />
+    </Suspense>
+  </main></div>
   const dongHomNay = so && <div className="dm-the"><h3>Hôm nay</h3>
     <div className="dm-dong"><span className="h" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><div className="giua"><b>Chuỗi {chuoi} ngày</b><span className="mo">{du ? 'hôm nay đã đủ mức' : `làm ${con} câu nữa để đủ mức`}</span></div></div>
     <div className="dm-thanh" role="progressbar" aria-label="Câu hôm nay" aria-valuemin={0} aria-valuemax={so.muc} aria-valuenow={Math.min(so.daLam, so.muc)}><i style={{ width: `${pct}%` }} /></div>
@@ -207,13 +261,20 @@ export function MotTrangHs(p: PropsMotTrang) {
     return <div className="dm-khung" data-muc="thanh-tich">{tren}<main className="da-vo">
       <h1 className="da-tieu">Thành tích</h1>
       <div className="da-cot">{/* ngang / máy tính: hai cột (chuỗi · tuần · việc tiếp | huy hiệu · điểm); dọc: display: contents */}
-      <div className="da-lua"><Bi cam={chuoi > 0 ? 'lua' : so && so.daLam === 0 ? 'ngu' : 'chao'} size={72} /><div><b>{chuoi} ngày</b><span>Chuỗi ngày đủ mức{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</span></div></div>
-      {tuan.length > 0 && <ol className="da-tuan" aria-label="7 ngày gần nhất">{tuan.map((x) => { const nay = x.ngay === nhip!.homNay, d = x.muc > 0 && x.lam >= x.muc
+      <div className="da-lua"><Bi cam={chuoi > 0 ? 'lua' : so && so.daLam === 0 ? 'ngu' : 'chao'} size={72} /><div><b>{chuoi} ngày</b><span>{tq?.chuoiNgay ? 'Chuỗi ngày' : 'Chuỗi ngày đủ mức'}{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</span></div></div>
+      {/* có chuỗi ngày theo bài (thưởng phạt) ⇒ lịch / việc tiếp theo chuỗi «đủ mức» cũ ẩn (hai cách đếm khác nhau không đứng cạnh nhau); lịch ở ô «Chuỗi ngày» */}
+      {!tq?.chuoiNgay && tuan.length > 0 && <ol className="da-tuan" aria-label="7 ngày gần nhất">{tuan.map((x) => { const nay = x.ngay === nhip!.homNay, d = x.muc > 0 && x.lam >= x.muc
         return <li key={x.ngay} aria-label={`${nay ? 'Hôm nay' : thuNgan(x.ngay)}: ${d ? 'đủ mức' : `${x.lam}/${x.muc} câu`}`}><i data-d={d || undefined} data-nay={nay || undefined}>{d && <Check size={18} strokeWidth={3} aria-hidden="true" />}</i>{nay ? 'Nay' : thuNgan(x.ngay)}</li> })}</ol>}
-      {theViec}
+      {!tq?.chuoiNgay && theViec}
       </div>
       <div className="da-cot">
-      <div className="da-huy">{huy.map(({ ten, sac, Icon, co }) => <div key={ten}><i data-sac={co ? sac : undefined}>{co ? <Icon size={28} aria-hidden="true" /> : <Lock size={26} aria-hidden="true" />}</i>{ten}</div>)}</div>
+      {coThuong ? <>
+        <OTo ten="Huy hiệu" mo="Huy hiệu đã có và sắp đạt" sac="sao" Icon={Trophy} onClick={() => moTp('huy-hieu')} />
+        {tq?.chuoiNgay && <OTo ten="Chuỗi ngày" mo="Lịch chuỗi, bình giữ chuỗi, mốc" sac="chu-y" Icon={Flame} onClick={() => moTp('chuoi')} />}
+        {tq?.bat.giai !== false && <OTo ten="Giải tuần" mo="Bảng nhóm tuần này" sac="tin" Icon={Route} onClick={() => moTp('giai')} />}
+        {tq?.bat.banBe !== false && <OTo ten="Học cùng bạn" mo="Chuỗi đôi với bạn học cùng" sac="dung" Icon={GraduationCap} onClick={() => moTp('ban')} />}
+        <OTo ten="Cửa hàng" mo="Tinh thể và bình giữ chuỗi" sac="sao" Icon={Sparkles} so={tq?.tinhThe} onClick={() => moTp('cua-hang')} />
+      </> : <div className="da-huy">{huy.map(({ ten, sac, Icon, co }) => <div key={ten}><i data-sac={co ? sac : undefined}>{co ? <Icon size={28} aria-hidden="true" /> : <Lock size={26} aria-hidden="true" />}</i>{ten}</div>)}</div>}
       <h2 className="da-tieu-nho">Điểm thầy đã công bố</h2>
       <OTo ten="Ca kiểm tra" mo="Điểm và lời giải ca đã công bố" sac="tin" Icon={LineChart} onClick={hs.onLichSu} />
       {hs.onKetQua && <OTo ten="Kết quả bài đã nộp" mo="Điểm và báo cáo đã công bố" sac="chu-y" Icon={ClipboardCheck} onClick={hs.onKetQua} />}
@@ -256,19 +317,16 @@ export function MotTrangHs(p: PropsMotTrang) {
     </main>
     <aside className="dm-ben" aria-label="Tóm tắt">
       {dongHomNay}
+      {/* thưởng phạt (tp-4): Giải tuần + Nhiệm vụ ngày thay thẻ «việc tiếp» cũ */}
+      {coThuong && coBen && <Suspense fallback={null}><TheBenThuong token={p.token} onMo={moTp} /></Suspense>}
       <div className="dm-the"><h3>Luyện tập</h3>
         <button type="button" className="dm-dong" onClick={p.onChua}><span className="h" data-sac="sai"><Wrench size={20} aria-hidden="true" /></span><span className="giua"><b>Tự sửa lỗi</b></span>{coSua && <span className="so">{p.soSua}</span>}</button>
         {kiem && <button type="button" className="dm-dong" onClick={(kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined} disabled={p.coCa || !((kiemLam || kiemXong) && p.onKiemTra)}><span className="h" data-sac="tin"><Target size={20} aria-hidden="true" /></span><span className="giua"><b>Kiểm tra ôn tập</b></span><span className="so">{kiem.daTra}/{kiem.tong}</span></button>}
         {hs && <button type="button" className="dm-dong" onClick={hs.onXemLai}><span className="h" data-sac="dung"><History size={20} aria-hidden="true" /></span><span className="giua"><b>Câu đã làm</b></span></button>}
       </div>
-      {theViec}
+      {!coThuong && theViec}
     </aside>
   </div>
-}
-
-function OTo({ ten, mo, sac, Icon, so, noi, onClick, tat }: { ten: string; mo: string; sac: string; Icon: LucideIcon; so?: ReactNode; noi?: boolean; onClick?: () => void; tat?: boolean }) {
-  const than = <><span className="h" data-sac={sac}><Icon size={30} aria-hidden="true" /></span><span className="giua"><b>{ten}</b><span className="mo">{mo}</span></span>{so != null && <span className="so">{so}</span>}{onClick && <ChevronRight size={22} aria-hidden="true" className="da-mui" />}</>
-  return onClick ? <button type="button" className="da-o" data-noi={noi || undefined} onClick={onClick} disabled={tat}>{than}</button> : <div className="da-o" data-noi={noi || undefined}>{than}</div>
 }
 
 const tenBuoi = (b: BuoiCuaEm) => { const n = ngayGon(b.ten); return `${n === b.ten ? b.ten : `Buổi ${n}`}${b.lop ? ` · ${b.lop}` : ''}` }

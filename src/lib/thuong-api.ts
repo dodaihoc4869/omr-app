@@ -9,12 +9,16 @@ import { layDiaChiMayChu } from './dia-chi-may-chu'
 // ───────────────────────────────────────────── KIỂU (đúng hợp đồng)
 export type HangGiai = 'sat' | 'dong' | 'bac' | 'vang' | 'bachkim' | 'kimcuong'
 export interface CongTac { giai: boolean; thangHoa: boolean; banBe: boolean; kimCuong: boolean }
-export type KieuNgay = 'hoc' | 'binh' | 'phep' | 'tat'
+/** Máy chủ B3 gửi thêm 'cuu' (ngày đã cứu bằng bài bù — chuỗi giữ) và 'cho' (hôm nay chưa xong — chưa tính). */
+export type KieuNgay = 'hoc' | 'binh' | 'phep' | 'tat' | 'cuu' | 'cho'
 export interface NgayChuoi { ngay: string; kieu: KieuNgay }
 export interface ChuoiNgay {
   so: number; giuChuoi: number; sucChua: number; lich7: NgayChuoi[]
   cuu?: { hetHan: number; daLam: number; can: number; so?: number }
   binhVuaDo?: string
+  /** (gộp đợt 3) lịch 30 ngày gần nhất + chuỗi dài nhất — máy chủ chỉ gửi ở /hs/thuong; vắng ⇒ màn chỉ hiện lịch tuần, ẩn ô «chuỗi dài nhất». */
+  lich30?: NgayChuoi[]
+  daiNhat?: number
 }
 export interface NhiemVu { ma: string; ten: string; tien: number; can: number; thuong: number; xong: boolean }
 export interface GiaiTom { hang: HangGiai; thuHang: number; soNguoi: number; hetHanGiay: number }
@@ -80,7 +84,7 @@ export function docCongTac(x: unknown): CongTac {
 }
 function docNgay(x: unknown): NgayChuoi | undefined {
   const o = dt(x); const ngay = chu(o?.ngay); const kieu = o?.kieu
-  return ngay && (kieu === 'hoc' || kieu === 'binh' || kieu === 'phep' || kieu === 'tat') ? { ngay, kieu } : undefined
+  return ngay && (kieu === 'hoc' || kieu === 'binh' || kieu === 'phep' || kieu === 'tat' || kieu === 'cuu' || kieu === 'cho') ? { ngay, kieu } : undefined
 }
 export function docChuoiNgay(x: unknown): ChuoiNgay | undefined {
   const o = dt(x)
@@ -88,8 +92,12 @@ export function docChuoiNgay(x: unknown): ChuoiNgay | undefined {
   if (!o || s === undefined || g === undefined || c === undefined || !l) return undefined
   const kq: ChuoiNgay = { so: s, giuChuoi: Math.min(g, c), sucChua: c, lich7: l.slice(-7) }
   const cu = dt(o.cuu), het = docMoc(cu?.hetHan), da = soNg(cu?.daLam), can = soNg(cu?.can)
-  if (cu && het !== undefined && da !== undefined && can) kq.cuu = { hetHan: het, daLam: da, can, ...(soNg(cu.so) ? { so: soNg(cu.so) } : {}) }
+  // máy chủ B3 gửi số chuỗi cũ ở `soCu` (hợp đồng ban đầu ghi `so`) — đọc cả hai
+  const soCu = soNg(cu?.soCu) || soNg(cu?.so)
+  if (cu && het !== undefined && da !== undefined && can) kq.cuu = { hetHan: het, daLam: da, can, ...(soCu ? { so: soCu } : {}) }
   const bv = chu(o.binhVuaDo); if (bv) kq.binhVuaDo = bv
+  const l30 = mang(o.lich30, docNgay); if (l30?.length) kq.lich30 = l30.slice(-30)
+  const dn = soNg(o.daiNhat); if (dn !== undefined) kq.daiNhat = Math.max(dn, s)
   return kq
 }
 function docNhiemVu(x: unknown): NhiemVu | undefined {

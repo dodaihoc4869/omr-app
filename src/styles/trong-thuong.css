@@ -197,6 +197,24 @@
 [data-trong='hs'] .tp-tuan7 .n .lan { position: absolute; inset: 0; border-radius: 50%; background: var(--tr-chu-y); }
 [data-trong='hs'] .tp-tuan7 .n[data-k='binh'] .lan { background: var(--tp-bang); }
 [data-trong='hs'] .tp-tuan7 .n[data-k]:has(> .lan) { background: var(--tr-mat-3); }
+/* Lịch 30 ngày (bản vẽ tp-5 «lịch tháng»): cùng màu ô với lịch tuần */
+[data-trong='hs'] .tp-lich30 { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; text-align: center; }
+[data-trong='hs'] .tp-lich30 .t { font-size: 12px; font-weight: 800; color: var(--tr-chu-3); padding-bottom: 2px; }
+[data-trong='hs'] .tp-lich30 .n { position: relative; display: grid; place-items: center; width: 100%; max-width: 44px; aspect-ratio: 1; margin: 0 auto; border-radius: 50%; background: var(--tr-mat-3); color: var(--tr-chu-3); font-size: 13px; font-weight: 800; }
+[data-trong='hs'] .tp-lich30 .n[data-k='hoc'] { background: var(--tr-chu-y); color: var(--tp-den); }
+[data-trong='hs'] .tp-lich30 .n[data-k='binh'] { background: var(--tp-bang); color: var(--tp-tren); }
+[data-trong='hs'] .tp-lich30 .n[data-k='phep'] { background: var(--tr-mat); color: var(--tp-bang-chu); box-shadow: inset 0 0 0 2.5px var(--tp-bang); }
+[data-trong='hs'] .tp-lich30 .n[data-k='tat'] { background: var(--tr-mat-2); }
+[data-trong='hs'] .tp-lich30 .n[data-k='tat']::before { content: ''; position: absolute; left: 22%; right: 22%; top: 50%; height: 2px; background: var(--tr-chu-3); transform: rotate(-40deg); }
+[data-trong='hs'] .tp-lich30 .n[data-nay] { outline: 3px solid var(--tr-chu-y); outline-offset: 2px; }
+[data-trong='hs'] .tp-lich30 .n[data-nay]:not([data-k]) { background: var(--tr-mat); }
+[data-trong='hs'] .tp-lich30 .n > span, [data-trong='hs'] .tp-lich30 .n > b { position: relative; }
+[data-trong='hs'] .tp-lich30 .n .lan { position: absolute; inset: 0; border-radius: 50%; background: var(--tr-chu-y); }
+[data-trong='hs'] .tp-lich30 .n[data-k='binh'] .lan { background: var(--tp-bang); }
+[data-trong='hs'] .tp-lich30 .n[data-k]:has(> .lan) { background: var(--tr-mat-3); }
+[data-trong='hs'] .tp-xem2 { display: inline-grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 12px; background: var(--tr-mat-2); }
+[data-trong='hs'] .tp-xem2 button { min-height: 44px; min-width: 64px; padding: 0 12px; border: 0; border-radius: 10px; background: none; font: inherit; font-size: 14px; font-weight: 800; color: var(--tr-chu-3); cursor: pointer; }
+[data-trong='hs'] .tp-xem2 button[aria-pressed='true'] { background: var(--tr-mat); color: var(--tr-chu); }
 [data-trong='hs'] .tp-chu-giai { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--tr-chu-2); }
 [data-trong='hs'] .tp-chu-giai span { display: inline-flex; align-items: center; gap: 6px; }
 [data-trong='hs'] .tp-chu-giai i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; background: var(--tr-chu-y); }

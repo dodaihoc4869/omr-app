@@ -854,3 +854,8 @@
 }
 [data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'], .da-nut[data-tt='dang'] .da-bong) { animation: none; }
 [data-trong].may-yeu :is(.da-lan, .da-vo-khoa) { display: none; }
+
+/* THƯỞNG PHẠT (gộp 26/10): một màn thưởng phạt mở trong khung Lộ trình / Thành tích — một cột (màn tự chia 2 cột ở máy tính / ngang). */
+[data-trong] .dm-khung[data-muc='thuong'] { grid-template-columns: minmax(0, 1fr); }
+[data-trong] .tp-cam { min-width: 0; padding: 0 0 24px; }
+[data-trong] .tp-cam-cho { min-height: 60vh; }

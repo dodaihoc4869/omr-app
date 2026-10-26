@@ -25,7 +25,7 @@ export function hinhHuyHieu(h: Pick<HuyHieu, 'ma' | 'ten'>): { nhom: Nhom; hinh:
   if ((m = RE_HANG.exec(ma))) { const hang = m[1] as HangGiai; return { nhom: 'giai', hinh: (khoa) => <HuyHieuKimLoai hang={hang} khoa={khoa} an /> } }
   if (/quan[_-]?quan/.test(ma)) return { nhom: 'giai', hinh: mau('sao', undefined, NET.cup) }
   if (/^hoan[_-]hao[_-](\d+)$/.test(ma)) return { nhom: 'hoan-hao', hinh: mau('sao', so(/(\d+)$/)) }
-  if (/^(?:kim[_-]?cuong|kc)[_-]/.test(ma)) return { nhom: 'kim-cuong', hinh: (khoa) => <HuyHieuKimLoai hang="kimcuong" khoa={khoa} an /> }
+  if (/^(?:kim[_-]?cuong|kc)[_|-]/.test(ma)) return { nhom: 'kim-cuong', hinh: (khoa) => <HuyHieuKimLoai hang="kimcuong" khoa={khoa} an /> }
   if (/day[_-]?chuyen/.test(ma)) return { nhom: 'dac-biet', hinh: mau('lua', undefined, NET.set) }
   if (/cu[_-]?dem/.test(ma)) return { nhom: 'dac-biet', hinh: mau('tin', undefined, NET.trang) }
   return { nhom: 'dac-biet', hinh: mau('sao', undefined, NET.cup) }
@@ -70,6 +70,7 @@ export function ManHuyHieu({ token, onVe, moi }: { token?: string; onVe?: () => 
         <h1 className="tp-tieu">Thành tích</h1>
         <div className="tp-tong4">
           {chuoi !== undefined && <div><span className="tp-o" data-sac="sao"><Flame aria-hidden="true" /></span><div><b>{chuoi} ngày</b><span className="tp-mo">chuỗi hiện tại</span></div></div>}
+          {tq?.chuoiNgay?.daiNhat !== undefined && <div><span className="tp-o" data-sac="lua"><Trophy aria-hidden="true" /></span><div><b>{tq.chuoiNgay.daiNhat} ngày</b><span className="tp-mo">chuỗi dài nhất</span></div></div>}
           {cao && <div><HuyHieuKimLoai hang={cao} an /><div><b>{TEN_HANG[cao]}</b><span className="tp-mo">hạng cao nhất</span></div></div>}
           <div><span className="tp-o" data-sac="lua"><Trophy aria-hidden="true" /></span><div><b>{co}/{tong}</b><span className="tp-mo">huy hiệu đã có</span></div></div>
         </div>

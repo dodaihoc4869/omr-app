@@ -10,7 +10,7 @@ import { bayToi, bungHat, hoatAnh, latSo, phanHoiThuong } from '../../lib/hieu-u
 import { DAT_CUOC, GIA_BINH, MOC_CHUOI, datCuoc, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, HuyHieuMau, IcLua, IcTinhThe, Tia } from './hinh'
 import { capNhatTongQuan, useTongQuan } from './dung-thuong'
-import { ChuGiaiTuan, Cho, DemTT, Loi, ManToan, NutDay, TuanBay, dongHo, gioVn, ngayNgan, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
+import { ChuGiaiTuan, Cho, DemTT, Loi, ManToan, NutDay, ThangLich, TuanBay, dongHo, gioVn, ngayNgan, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
 
 export const LUAT_CHUOI = [
   'Mỗi ngày học xong ít nhất 1 bài để ngọn lửa cháy tiếp.',
@@ -114,6 +114,31 @@ export function useMuaThuong(token: string | undefined) {
 
 export interface PropsManChuoi { token?: string; onVe?: () => void; onHoc?: () => void; onCuu?: () => void; hieuUng?: 'chuoi' | 'binh' | 'moc' }
 
+function TheCuuNho({ c, onCuu }: { c: ChuoiNgay; onCuu?: () => void }) {
+  const cu = c.cuu!
+  return <section className="tp-the" aria-label="Cứu chuỗi">
+    <div className="tp-dau"><span className="tp-o" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><h2>{cu.so ? `Cứu chuỗi ${cu.so} ngày` : 'Cứu chuỗi'}</h2></div>
+    <p className="tp-phu">Học bù {cu.can} bài trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)} · đã xong {cu.daLam}/{cu.can}.</p>
+    {onCuu && <div><button type="button" className="tp-nut" data-sac="chinh" onClick={onCuu}>Xem cách cứu chuỗi</button></div>}
+  </section>
+}
+
+/** Lịch chuỗi: có `lich30` (máy chủ /hs/thuong) ⇒ mặc định «Tháng» như bản vẽ tp-5, một chạm đổi «Tuần»; không có ⇒ chỉ lịch tuần. */
+function TheLich({ c, homNay }: { c: ChuoiNgay; homNay: string }) {
+  const [thang, datThang] = useState(true)
+  const coThang = !!c.lich30?.length
+  const xemThang = coThang && thang
+  return <section className="tp-the" aria-label="Lịch chuỗi">
+    <div className="tp-dau"><h2>{xemThang ? '30 ngày gần nhất' : '7 ngày gần nhất'}</h2>
+      {coThang && <span className="tp-xem2" role="group" aria-label="Xem lịch">
+        <button type="button" aria-pressed={!xemThang} onClick={() => datThang(false)}>Tuần</button>
+        <button type="button" aria-pressed={xemThang} onClick={() => datThang(true)}>Tháng</button>
+      </span>}</div>
+    {xemThang ? <ThangLich lich30={c.lich30!} homNay={homNay} /> : <TuanBay lich7={c.lich7} homNay={homNay} />}
+    <ChuGiaiTuan />
+  </section>
+}
+
 /** Màn Chuỗi ngày (tp-5). */
 export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng }: PropsManChuoi) {
   const { du: tq, tai, loi, thuLai } = useTongQuan(token)
@@ -129,13 +154,13 @@ export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng }: PropsManChu
       hoatAnh(the.current, [{ transform: 'scale(1)' }, { transform: 'scale(1.03)', offset: 0.3 }, { transform: 'scale(1)' }], 700, { tre: 150 })
       hoatAnh(bi.current, [{ transform: 'translateY(0)' }, { transform: 'translateY(-22px) rotate(-6deg)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-10px) rotate(4deg)' }, { transform: 'translateY(0)' }], 900, { tre: 300 })
       h.sau(350, () => bungHat(bi.current, { n: 10, r: 70, mau: ['sao', 'lua', 'trang'] }))
-      hoatAnh(document.querySelector('.tp-tuan7 [data-nay] .lan'), [{ transform: 'scale(0)' }, { transform: 'scale(1.25)', offset: 0.7 }, { transform: 'scale(1)' }], 600, { tre: 700 })
+      hoatAnh(document.querySelector('.tp-tuan7 [data-nay] .lan, .tp-lich30 [data-nay] .lan'), [{ transform: 'scale(0)' }, { transform: 'scale(1.25)', offset: 0.7 }, { transform: 'scale(1)' }], 600, { tre: 700 })
     } else if (hieuUng === 'binh') {
       phanHoiThuong('binh')
       const khe = document.getElementById('tp-khe-day'), nap = khe?.querySelector('.tp-binh-nap')
       hoatAnh(nap, [{ transform: 'translate(9px,-9px) rotate(28deg)' }, { transform: 'translate(0,2px) rotate(0)', offset: 0.75 }, { transform: 'none' }], 420)
       h.sau(380, () => bungHat(khe?.querySelector('.tp-binh'), { n: 12, r: 60, tron: true, mau: ['bang', 'trang'], d: 900 }))
-      const o = document.querySelector('.tp-tuan7 [data-k="binh"]')
+      const o = document.querySelector('.tp-tuan7 [data-k="binh"], .tp-lich30 [data-k="binh"]')
       hoatAnh(o?.querySelector('.lan'), [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.2)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], 500, { tre: 450 })
     } else {
       const moc = [...MOC_CHUOI].reverse().find((x) => c.so >= x.so)
@@ -162,11 +187,7 @@ export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng }: PropsManChu
           <div ref={bi}><Bi cam={c.so > 0 ? 'lua' : 'ngu'} size={92} /></div>
         </div>
         {c.cuu && c.cuu.daLam < c.cuu.can && <TheCuuNho c={c} onCuu={onCuu} />}
-        <section className="tp-the" aria-label="Lịch chuỗi">
-          <div className="tp-dau"><h2>7 ngày gần nhất</h2></div>
-          <TuanBay lich7={c.lich7} homNay={homNay} />
-          <ChuGiaiTuan />
-        </section>
+        <TheLich c={c} homNay={homNay} />
         {!daHoc && onHoc && <button type="button" className="tp-nut-lon" onClick={onHoc}>Học 1 bài để giữ chuỗi</button>}
       </div>
       <div className="c">
@@ -184,15 +205,6 @@ export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng }: PropsManChu
     </div>
     {m.toast}
   </div>
-}
-
-function TheCuuNho({ c, onCuu }: { c: ChuoiNgay; onCuu?: () => void }) {
-  const cu = c.cuu!
-  return <section className="tp-the" aria-label="Cứu chuỗi">
-    <div className="tp-dau"><span className="tp-o" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><h2>{cu.so ? `Cứu chuỗi ${cu.so} ngày` : 'Cứu chuỗi'}</h2></div>
-    <p className="tp-phu">Học bù {cu.can} bài trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)} · đã xong {cu.daLam}/{cu.can}.</p>
-    {onCuu && <div><button type="button" className="tp-nut" data-sac="chinh" onClick={onCuu}>Xem cách cứu chuỗi</button></div>}
-  </section>
 }
 
 /** Màn phủ Cứu chuỗi (tp-6). */

@@ -103,8 +103,11 @@ describe('Hệ lười chỉ thầy / phụ huynh xem (thầy 26/10)', () => {
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ...NHIP_EM_LUOI, bacCham: { bac: 1, diem: 0, diemLenBac: 3 }, doTinCay: 80 })))
     for (const muc of ['hom-nay', 'ket-qua']) {
       const { container, unmount } = render(<MotTrangHs {...goc({ muc, token: 'tk', hs: HS })} />)
-      const the = await screen.findByText(/^Việc tiếp:/)
-      expect(the.closest('.dm-the')!.querySelector('h3')!.textContent).toMatch(/^Chuỗi \d+ ngày$/)
+      // Gộp thưởng phạt 26/10: ở Lộ trình thẻ «việc tiếp» nhường chỗ thẻ bên Giải tuần + Nhiệm vụ (bản vẽ tp-4) — Thành tích vẫn giữ.
+      if (muc === 'ket-qua') {
+        const the = await screen.findByText(/^Việc tiếp:/)
+        expect(the.closest('.dm-the')!.querySelector('h3')!.textContent).toMatch(/^Chuỗi \d+ ngày$/)
+      } else await screen.findByLabelText('Bài học hôm nay')
       expect(container.textContent).not.toMatch(/lười|chăm|chưa đều|bậc|đối phó|học thật|bấm vội|treo|quá nhanh/i)
       expect(container.innerHTML).not.toMatch(/data-nhom|da-12|da-bac/)
       unmount()
