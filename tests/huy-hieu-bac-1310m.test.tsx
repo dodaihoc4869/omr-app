@@ -86,25 +86,26 @@ describe('HuyHieuBac — 12 huy hiệu vẽ riêng', () => {
     // hình trong khác nhau từng bậc
     const hinh = svg.map((x) => x.querySelector('.hh-net')!.innerHTML)
     expect(new Set(hinh).size).toBe(12)
-    // lên hạng: 10–12 có tia sáng, 11 có sao, 12 có nguyệt quế + lấp lánh; dưới 10 không có
+    // lên hạng (bản Khối đậm 26/10, tối giản): 10–12 khung tem lượn, 12 thêm lấp lánh; dưới 10 không có. Mọi bậc có bóng đổ cứng cùng hình khung.
     expect(svg.map((x) => !!x.querySelector('.hh-tia'))).toEqual(BAC_CHAM_CHI.map((b) => b.so >= 10))
-    expect(svg.map((x) => !!x.querySelector('.hh-nq'))).toEqual(BAC_CHAM_CHI.map((b) => b.so === 12))
     expect(svg.map((x) => !!x.querySelector('.hh-lap'))).toEqual(BAC_CHAM_CHI.map((b) => b.so === 12))
-    expect(svg[10]!.querySelector('path.hh-v.hh-vien')).toBeTruthy()
+    for (const x of svg) expect(x.querySelectorAll('.hh-bong-cung')).toHaveLength(1)
     // hiệu ứng chỉ bậc 10–12 (cỡ ≥ 24 px)
     expect(svg.map((x) => x.hasAttribute('data-dong'))).toEqual(BAC_CHAM_CHI.map((b) => b.so >= 10))
   })
-  it('mỗi huy hiệu một bộ id gradient riêng (hai huy hiệu cùng bậc không giẫm màu nhau)', () => {
+  it('mỗi huy hiệu một id vùng cắt riêng (hai huy hiệu cùng bậc không giẫm nhau); màu phẳng, không gradient', () => {
     const { container } = render(
       <>
-        <HuyHieuBac bac={8} />
-        <HuyHieuBac bac={8} />
+        <HuyHieuBac bac={10} />
+        <HuyHieuBac bac={10} />
       </>,
     )
-    const id = [...container.querySelectorAll('linearGradient')].map((g) => g.id)
+    const id = [...container.querySelectorAll('clipPath')].map((g) => g.id)
+    expect(id).toHaveLength(2)
     expect(new Set(id).size).toBe(id.length)
-    for (const svg of container.querySelectorAll('svg')) for (const el of svg.querySelectorAll('[fill^="url(#"]')) {
-      const ref = el.getAttribute('fill')!.slice(5, -1)
+    expect(container.querySelector('linearGradient')).toBeNull()
+    for (const svg of container.querySelectorAll('svg')) for (const el of svg.querySelectorAll('[clip-path^="url(#"]')) {
+      const ref = el.getAttribute('clip-path')!.slice(5, -1)
       expect(svg.querySelector(`[id="${ref}"]`)).toBeTruthy()
     }
   })

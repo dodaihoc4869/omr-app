@@ -61,45 +61,42 @@
   .bcc-dem-o b { font-size: 16px; }
 }
 
-/* ── HUY HIỆU 12 BẬC (HuyHieuBac.tsx, 13/10 đợt 19) ─────────────────────────────────────────────────────────────────────────────────────────────
- * Màu CHỈ từ biến chuẩn: --bac của bậc (trên), --giay (trắng cố định — sáng/bóng), mực tối --hh-muc (= --muc nền sáng, --muc-nguoc nền tối: luôn tối),
- * --mo (làm trầm nhóm Lười), bốn màu "vàng huy hiệu" cố định của Bảng vinh danh (--vd-*: vàng, lục, đỏ, xanh — giống nhau ở cả sáng/tối, mọi app).
- * --hh-goc = màu nền huy hiệu: Lười trầm (trộn --mo) · bậc 12 ánh kim (trộn --vd-vang). Nét mực = 38% màu nền + mực tối. */
+/* ── HUY HIỆU 12 BẬC (HuyHieuBac.tsx) — bản «Khối đậm» 26/10: tem dán màu PHẲNG, viền mực dày, bóng đổ cứng ─────────────────────────────────────
+ * Màu CHỈ từ biến chuẩn: --bac của bậc (trên; dưới [data-kd] khoi-dam.css đặt lại 12 màu theo bảng Khối đậm), --giay (trắng cố định), mực tối
+ * --hh-muc (= --muc nền sáng, --muc-nguoc nền tối: LUÔN tối — viền tem đọc được trên cả hai nền), bốn màu "vàng huy hiệu" của Bảng vinh danh
+ * (--vd-*: vàng, lục, đỏ, xanh — giống nhau ở sáng/tối, mọi app). --hh-goc = mặt huy hiệu (= --bac; bậc 12 ánh kim trộn --vd-vang). */
 .bcc.bcc-hh { --hh-muc: var(--muc); --hh-goc: var(--bac); flex: none; display: inline-block; vertical-align: middle; overflow: visible; }
 @media (prefers-color-scheme: dark) { .bcc.bcc-hh { --hh-muc: var(--muc-nguoc); } }
-.bcc.bcc-hh[data-khung='1'] { --hh-goc: color-mix(in oklab, var(--bac) 80%, var(--hh-muc)); }
+[data-kd] .bcc.bcc-hh { --hh-muc: var(--kd-bong); }
 .bcc.bcc-hh[data-bac='12'] { --hh-goc: color-mix(in oklab, var(--bac) 30%, var(--vd-vang)); }
-.bcc.bcc-hh { --hh-net: color-mix(in oklab, var(--hh-goc) 38%, var(--hh-muc)); --hh-kem: color-mix(in oklab, var(--giay) 90%, var(--hh-goc)); }
-.bcc-hh .hh-t0 { stop-color: color-mix(in oklab, var(--hh-goc) 62%, var(--giay)); }
-.bcc-hh .hh-t1 { stop-color: var(--hh-goc); }
-.bcc-hh .hh-v0 { stop-color: color-mix(in oklab, var(--hh-goc) 80%, var(--giay)); }
-.bcc-hh .hh-v1 { stop-color: color-mix(in oklab, var(--hh-goc) 66%, var(--hh-muc)); }
-.bcc-hh .hh-b0 { stop-color: var(--giay); stop-opacity: 0.6; }
-.bcc-hh .hh-b1 { stop-color: var(--giay); stop-opacity: 0.04; }
-.bcc-hh .hh-vien { stroke: var(--hh-net); stroke-width: 2.5; stroke-linejoin: round; }
-.bcc-hh .hh-ke { stroke: var(--hh-net); stroke-width: 1.6; stroke-linejoin: round; }
-.bcc-hh .hh-mong { stroke-width: 1.5; }
-.bcc-hh .hh-net { fill: none; stroke: var(--hh-net); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-.bcc-hh .hh-m { fill: none; stroke-width: 1.8; }
+.bcc.bcc-hh {
+  --hh-net: var(--hh-muc); --hh-kem: color-mix(in oklab, var(--giay) 88%, var(--hh-goc));
+  --hh-trang: var(--giay); --hh-be: color-mix(in oklab, var(--vd-vang) 28%, var(--giay)); --hh-vang: var(--vd-vang);
+  --hh-lam: var(--vd-xanh); --hh-hong: color-mix(in oklab, var(--vd-do) 70%, var(--giay)); --hh-luc: var(--vd-luc);
+}
+.bcc-hh .hh-bong-cung { fill: var(--hh-muc); stroke: var(--hh-muc); stroke-width: 3; stroke-linejoin: round; }
+.bcc-hh .hh-khung { fill: var(--hh-goc); }
+.bcc-hh .hh-dia { fill: color-mix(in oklab, var(--hh-goc) 22%, var(--giay)); }
+.bcc-hh[data-bac='12'] .hh-dia { fill: var(--hh-muc); }
+.bcc-hh .hh-vien { stroke: var(--hh-net); stroke-width: 3; stroke-linejoin: round; }
+.bcc-hh .hh-vet { fill: none; stroke: var(--giay); stroke-width: 3.4; stroke-linecap: round; opacity: 0.7; }
+.bcc-hh .hh-net { fill: none; stroke: var(--hh-net); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.bcc-hh .hh-m { fill: none; stroke-width: 2.2; }
 .bcc-hh .hh-x { stroke: none; }
-.bcc-hh .hh-mat { stroke: var(--hh-kem); stroke-width: 1.3; }
-.bcc-hh .hh-o1 { fill: none; stroke: var(--hh-net); stroke-width: 7.5; }
-.bcc-hh .hh-o2 { fill: none; stroke: var(--hh-kem); stroke-width: 2.8; }
-.bcc-hh .hh-o1.hh-than { stroke-width: 9.5; }
-.bcc-hh .hh-o2.hh-than { stroke-width: 4.8; }
-.bcc-hh .hh-k { fill: var(--hh-kem); }
-.bcc-hh .hh-n { fill: color-mix(in oklab, var(--hh-goc) 40%, var(--giay)); }
-.bcc-hh .hh-d { fill: var(--hh-net); }
-.bcc-hh .hh-v { fill: color-mix(in oklab, var(--vd-vang) 55%, var(--giay)); }
-.bcc-hh .hh-sang { fill: var(--giay); opacity: 0.7; }
-.bcc-hh .hh-lua { fill: color-mix(in oklab, var(--vd-vang-dam) 70%, var(--vd-do)); }
-.bcc-hh .hh-la { fill: color-mix(in oklab, var(--vd-luc) 78%, var(--giay)); }
-.bcc-hh .hh-nq { fill: color-mix(in oklab, var(--vd-luc) 58%, var(--giay)); }
-.bcc-hh .hh-ngoc-do { fill: var(--vd-do); stroke-width: 1.6; }
-.bcc-hh .hh-ngoc-xanh { fill: var(--vd-xanh); stroke-width: 1.6; }
-.bcc-hh .hh-tia { fill: color-mix(in oklab, var(--hh-goc) 55%, var(--giay)); }
+.bcc-hh .hh-mi { fill: none; stroke: var(--hh-trang); stroke-width: 1.6; }
+.bcc-hh .hh-xoan { fill: none; stroke: var(--hh-trang); stroke-width: 2.6; }
+.bcc-hh .hh-o1 { fill: none; stroke: var(--hh-net); stroke-width: 8; }
+.bcc-hh .hh-o2 { fill: none; stroke: var(--hh-trang); stroke-width: 3.2; }
+.bcc-hh .hh-trang { fill: var(--hh-trang); }
+.bcc-hh .hh-be { fill: var(--hh-be); }
+.bcc-hh .hh-vang { fill: var(--hh-vang); }
+.bcc-hh .hh-lam { fill: var(--hh-lam); }
+.bcc-hh .hh-hong { fill: var(--hh-hong); }
+.bcc-hh .hh-luc { fill: var(--hh-luc); }
+.bcc-hh .hh-muc { fill: var(--hh-net); }
+.bcc-hh .hh-sang { opacity: 0.85; }
 .bcc-hh .hh-luot { fill: var(--giay); opacity: 0; }
-.bcc-hh .hh-lap { fill: var(--giay); stroke: var(--hh-net); stroke-width: 1; stroke-linejoin: round; transform-box: fill-box; transform-origin: center; }
+.bcc-hh .hh-lap { fill: var(--giay); stroke: var(--hh-net); stroke-width: 1.4; stroke-linejoin: round; transform-box: fill-box; transform-origin: center; }
 /* Hiệu ứng nhẹ bậc 10–12 (cỡ ≥ 24 px): bóng sáng lướt chéo mỗi 4,2 giây; bậc 12 thêm lấp lánh. Chỉ transform/opacity. */
 .bcc-hh[data-dong] .hh-luot { animation: hh-luot 4.2s ease-in-out 0.6s infinite; }
 .bcc-hh[data-dong] .hh-lap { animation: hh-lap 2.4s ease-in-out infinite; }

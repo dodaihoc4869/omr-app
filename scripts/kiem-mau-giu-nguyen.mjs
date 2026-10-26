@@ -21,6 +21,9 @@ const MOC = process.argv[2] || 'origin/main'
 // BẢNG MÀU THẦY ĐÃ DUYỆT (ngoại lệ ĐÓNG, liệt kê đủ đường dẫn): giao diện «Khối đậm» — thầy 25/10/2026 «CHỐT BUILD TOÀN BỘ GIAO DIỆN … Duyệt tất»,
 // bản vẽ docs/ban-ve-khoi-dam-2510. Tệp này là NƠI DUY NHẤT định nghĩa bảng màu mới (--kd-*) rồi đè lên biến sẵn có; màu cũ ở mọi tệp khác giữ nguyên.
 const BANG_MAU_THAY_DUYET = new Set(['src/styles/khoi-dam.css'])
+// TỆP THẦY DUYỆT ĐỔI MÀU CŨ (chỉ miễn luật 1 "không đổi/xoá"; màu mới vẫn phải là biến chuẩn): huy hiệu 12 bậc vẽ lại theo Khối đậm 26/10 — thầy:
+// "thiết kế lại luôn logo 12 cấp từ lười tới chăm … siêu đẹp với giao diện mới", "thay đổi luôn 12 hình cho đẹp hơn sáng sủa hơn", "đẹp và đơn giản hơn nữa".
+const TEP_DUYET_DOI_MAU_CU = new Set(['src/components/bac-cham-chi/bac-cham-chi.css'])
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
 
 const THUOC_TINH_MAU = /^(?:color|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?|outline(?:-color)?|fill|stroke|stop-color|box-shadow|text-shadow|caret-color|accent-color|column-rule(?:-color)?|text-decoration(?:-color)?|--[\w-]+)$/i
@@ -234,7 +237,7 @@ for (const [trangThai, f, f2] of doi) {
   }
   for (const [k, n] of a) {
     const roi = n - (b.get(k) ?? 0)
-    if (roi > 0 && roi > (MAU_CU_THAY_RA_LENH[`${ten} · ${k}`] ?? 0)) loi.push(`ĐỔI/XOÁ màu đang có · ${ten} · ${k} · giảm ${roi}`)
+    if (roi > 0 && roi > (MAU_CU_THAY_RA_LENH[`${ten} · ${k}`] ?? 0) && !TEP_DUYET_DOI_MAU_CU.has(ten)) loi.push(`ĐỔI/XOÁ màu đang có · ${ten} · ${k} · giảm ${roi}`)
   }
   for (const [k, n] of b) {
     if ((a.get(k) ?? 0) >= n) continue
