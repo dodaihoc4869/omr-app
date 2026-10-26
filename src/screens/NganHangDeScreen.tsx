@@ -28,6 +28,7 @@ import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
 import { ngayDayDu } from '../lib/ngay-gio-24'
 import '../styles/trong-quan-ly-kho.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 type CauNghi = {
   phan: 'I' | 'II' | 'III'

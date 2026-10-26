@@ -122,3 +122,16 @@
   [data-trong='gv'] .ls-trang .gv2-bang :is(th, td) { padding-left: 10px; padding-right: 10px; }
   [data-trong='gv'] .ls-trang .gv2-bang-ca td:has(.gv2-ten-nut, .gv2-dam) { min-width: 180px; }
 }
+
+/* NGANG GV 26/10 — điện thoại dọc (2.0): nút «Mở ca kiểm tra» là nút chính đầu màn (nút nổi «Mở ca» đè thẻ ca đầu danh sách — ảnh thầy; nút nổi ẩn ở trong-gv.css).
+   Nút do App.tsx bọc cùng màn này (trong cùng Suspense) ⇒ luật nằm ở mảnh màn, không nằm ở mảnh App. */
+@media (max-width: 879px) and (min-height: 521px) {
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-mo-ca {
+    display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; width: calc(100% - 32px); min-height: 48px; margin: 16px 16px 0;
+    padding: 0 16px; border: 0; border-radius: 12px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font-family: var(--sans); font-size: 15px;
+    font-weight: 600; box-shadow: var(--tr-bong-1);
+  }
+  /* tiêu đề trang đã chỉ còn cho trình đọc màn hình ⇒ hộp đầu màn rời luồng, không để khoảng trống giữa nút và dải số */
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-khung > .ls-trang { padding-top: 12px; }
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-khung > .ls-trang > header.gv2-dau { position: absolute; }
+}

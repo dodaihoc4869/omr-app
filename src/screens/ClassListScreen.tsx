@@ -11,6 +11,7 @@ import { loadClassListMeta, saveClassList } from '../lib/classlist-db'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { napDanhSachLop } from '../lib/exam-api'
 import { GraduationCap, RefreshCw, FileSpreadsheet, Sparkles, CheckCircle2 } from 'lucide-react'
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 const FIELD_LABEL: Record<keyof ColumnMapping, string> = {
   sbd: 'Số báo danh',

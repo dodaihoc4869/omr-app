@@ -252,7 +252,7 @@ function XuongTam() {
       {[120, 32, 180, 220].map((h, i) => (
         <i key={i} style={{ height: h }} />
       ))}
-      <p className="hsv-ghi">Đang tải hồ sơ làm bài…</p>
+      <p className="hsv-ghi chu-cho-tre">Đang tải hồ sơ làm bài…</p>
     </div>
   )
 }

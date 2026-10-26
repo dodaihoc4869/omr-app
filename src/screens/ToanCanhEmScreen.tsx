@@ -15,6 +15,7 @@ import '../styles/hom-nay-v2.css'
 import '../styles/toan-canh-em.css'
 import '../components/chien-dich/gv-v2.css' // khung tấm "Hồ sơ làm bài" (.gvv2-hs) — vào thẳng Toàn cảnh thì chưa màn nào nạp
 import '../styles/trong-quan-ly-toan-canh.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 // Tấm "Hồ sơ làm bài" 6 mức (đặc tả docs/ban-ve-ho-so-em-2210 §2, đường vào từ Toàn cảnh): nạp LƯỜI — cùng mảnh với Nhịp học / Điểm danh / Bài hằng ngày.
 const HoSoLamCauEm = lazy(() => import('../components/chien-dich/HoSoLamCauEm'))
@@ -215,7 +216,7 @@ export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHo
         </section>
       )}
 
-      {ket === undefined && <p className="hn2-trong cho-tre" role="status">Đang tải toàn cảnh của em…</p>}
+      {ket === undefined && <p className="hn2-trong chu-cho-tre" role="status">Đang tải toàn cảnh của em…</p>}
       {ket && !ket.ok && (
         <p className={`hn2-ghi-chu${ket.loai === 'chua_co_lenh' ? '' : ' hn2-ghi-chu--canh'}`} role={ket.loai === 'chua_co_lenh' ? 'status' : 'alert'}>
           <Info size={16} aria-hidden="true" />
