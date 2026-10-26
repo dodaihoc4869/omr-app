@@ -48,3 +48,14 @@ goiHoa2('hoc-tap-lam-lai', token, { session: <id phiên chặng (r.id của hoc-
   - Một ngày được tính khi em xong ≥ 1 bài (≥ 6 câu có kết quả trong ngày), hoặc tự sửa xong ≥ 1 câu.
   - Bình giữ chuỗi: tặng 1 bình mỗi tuần (thứ Hai), mang tối đa 2. Ngày không đạt (trừ hôm nay) tự dùng 1 bình; hết bình thì chuỗi về 0.
   - Trả `chuoiNgay: { so, giuChuoi }` ở cả /hs (`hoc-tap-sanh`) và /ph, để cùng một số.
+- 26/10 (sau): thầy chốt luật giữ chuỗi chi tiết (Code app 1 chuyển lời), Code app 4 **nhận** (đợt B3, sau khi A1/A3 phát hành).
+  - **Bình giữ chuỗi:**
+    - mang tối đa 2; đạt mốc 100 ngày thì nâng lên 3;
+    - mỗi thứ Hai tặng 1 bình nếu chưa đầy; đạt mốc 30 ngày tặng thêm 1;
+    - mua bằng tinh thể: phần giá và ví do Code app 1 lo; máy chủ chừa hàm cộng bình;
+    - tự dùng khi em lỡ ngày; ghi lại ngày đã dùng (`binhVuaDo`).
+  - **Ngày vắng có phép** (dữ liệu P3): tự giữ chuỗi, không tốn bình.
+  - **Cứu chuỗi:** hết bình mà lỡ ngày thì chuỗi tắt; trong 24 giờ học bù 2 bài (ngoài bài của hôm đó) thì chuỗi sống lại đúng số cũ; tối đa 1 lần mỗi tuần.
+  - **Trả về:** `chuoiNgay: { so, giuChuoi, sucChua, lich7: [{ngay, kieu: 'hoc'|'binh'|'phep'|'tat'}], cuu?: {hetHan, daLam, can: 2}, binhVuaDo?: ngay }` ở cả /hs và /ph.
+  - Chừa hàm thuần `chuoiNgayCuaEm(em, ngay)` để sau tính chuỗi đôi. Chuỗi đôi chưa build.
+
