@@ -31,6 +31,13 @@ function soanGia(tl: (thamSo: Record<string, unknown>, lan: number) => Response 
 }
 
 describe('cờ', () => {
+  it('27/10: câu vòng sửa của cron trùng nguyên văn với máy soạn (có câu thiếu sơ đồ)', async () => {
+    const may = await import('../server/src/soan-so-do')
+    const cron = await import('../server/src/may-soan-cron')
+    expect(cron.SQL_CAN_SUA).toBe(may.SQL_CAN_SUA)
+    expect(cron.SQL_CAN_SUA).toContain("cong = 'khong_kiem_duoc'")
+  })
+
   it('đọc cờ: vắng / hỏng / thiếu ⇒ tắt; chỉ true thật mới bật', () => {
     expect(docCoMaySoan(null)).toEqual({ bat: false, gioCaoDiem: false, tuSuaDapAn: false })
     expect(docCoMaySoan('{hỏng')).toEqual({ bat: false, gioCaoDiem: false, tuSuaDapAn: false })
