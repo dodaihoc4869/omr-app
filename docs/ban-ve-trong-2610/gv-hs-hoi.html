@@ -1,0 +1,95 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Học sinh hỏi</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.o-tick{display:grid;place-items:center;width:44px;height:44px;flex:none;margin:-10px 0 -10px -10px}
+.o-tick i{display:grid;place-items:center;width:22px;height:22px;border-radius:7px;box-shadow:inset 0 0 0 1.5px var(--vien-2);color:var(--tren-mau)}
+.o-tick.on i{background:var(--chinh);box-shadow:none}
+.chon-thanh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 20px;background:var(--chinh-nhat);border-bottom:1px solid var(--vien)}
+.chon-thanh .nut{min-height:44px}
+.nut.xoa{color:var(--sai-chu)}
+.ca .dong{min-height:76px}
+.ca .dong.mo-ra{background:var(--mat-2)}
+.trong-ca{padding:4px 20px 20px 74px;background:var(--mat-2);border-top:0}
+.hoi-em{padding:16px 0;border-top:1px solid var(--vien)}
+.hoi-em:first-child{border-top:0}
+.loi{display:flex;gap:10px;align-items:baseline;margin-top:10px;font-size:15px;line-height:1.55}
+.loi .chip{flex:none}
+.cho{min-width:56px;text-align:right}
+.cho b{display:block;font-size:20px;line-height:1.1;color:var(--sai-chu)}
+.cho small{font-size:12px;color:var(--chu-3)}
+@media (max-width:600px){
+  .dau-man .tab{width:100%}.dau-man .tab>span{flex:1;justify-content:center}
+  .chon-thanh{padding:10px 16px}
+  .trong-ca{padding:4px 16px 16px}
+  .hoi-em .hang.giua{flex-wrap:wrap}
+  .hoi-em .nut{width:100%}
+  .chon-thanh .nut.xoa{width:100%}
+  .loi{flex-direction:column;gap:6px}
+  .cho{min-width:0}
+  .cho small{display:none}
+  .ca .phai svg{display:none}
+}
+</style></head>
+<body data-app="gv" data-tab="hs-hoi">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bỏ dải 4 ô số (lặp dòng phụ «6 ca · 14 em chờ»); «Mọi ca / Thùng rác» thành một tab cạnh tiêu đề;
+       thanh chọn chỉ hiện khi đã tick ca; mỗi ca một dòng, chỉ ca đang mở mới bung câu hỏi của từng em. -->
+  <div class="dau-man">
+    <div style="flex:1;min-width:0">
+      <p class="nhan">Cập nhật 18:42</p>
+      <h1 class="tieu-de mt-1">Học sinh hỏi</h1>
+      <p class="phu mt-1">6 ca có câu hỏi · <b class="sai-mau">14 em chờ Thầy chữa</b></p>
+    </div>
+    <div class="tab"><span class="on">Mọi ca</span><span><i data-i="trash" class="nho"></i>Thùng rác</span></div>
+  </div>
+
+  <section class="the dem ca">
+    <div class="chon-thanh">
+      <span class="dam">Đã chọn 2</span>
+      <span class="day"></span>
+      <span class="nut trong">Chọn tất cả</span>
+      <span class="nut xoa"><i data-i="trash" class="nho"></i>Bỏ 2 ca vào thùng rác</span>
+    </div>
+    <div class="ds">
+      <div class="dong mo-ra"><span class="o-tick"><i></i></span><div class="giua"><p class="ten">Kiểm tra 15 phút · Ester – lipid</p><p class="mo">12A1 · 6 em hỏi · 8 câu · nộp 24/10</p></div><span class="phai"><span class="cho"><b>5</b><small>em chờ</small></span><i data-i="chevron-down"></i></span></div>
+    </div>
+    <div class="trong-ca">
+      <div class="hoi-em">
+        <div class="hang giua" style="align-items:flex-start;gap:12px">
+          <div class="hang" style="gap:12px;align-items:flex-start"><span class="av a3">MA</span><div><p class="dam">Nguyễn Minh Anh</p><p class="mo">2 câu · gửi 21:14, 24/10</p></div></div>
+          <span class="nut chinh">Đánh dấu đã chữa cho Minh Anh</span>
+        </div>
+        <p class="loi"><span class="chip chu-y">Câu 7</span><span>«Sao thuỷ phân ethyl acetate trong NaOH lại ra sodium acetate mà không ra acetic acid ạ?»</span></p>
+        <p class="loi"><span class="chip chu-y">Câu 12</span><span>«Tristearin (C<sub>17</sub>H<sub>35</sub>COO)<sub>3</sub>C<sub>3</sub>H<sub>5</sub> có M = 890, em tính ra 884 là sai ở đâu ạ?»</span></p>
+      </div>
+      <div class="hoi-em">
+        <div class="hang giua" style="align-items:flex-start;gap:12px">
+          <div class="hang" style="gap:12px;align-items:flex-start"><span class="av a4">GB</span><div><p class="dam">Trần Gia Bảo</p><p class="mo">1 câu · gửi 20:47, 24/10</p></div></div>
+          <span class="nut">Đánh dấu đã chữa cho Gia Bảo</span>
+        </div>
+        <p class="loi"><span class="chip chu-y">Câu 15</span><span>«Vì sao phản ứng ester hoá cần H<sub>2</sub>SO<sub>4</sub> đặc ạ?»</span></p>
+      </div>
+      <div class="hoi-em">
+        <div class="hang giua" style="align-items:flex-start;gap:12px">
+          <div class="hang" style="gap:12px;align-items:flex-start"><span class="av a1">TH</span><div><p class="dam">Đỗ Thu Hà</p><p class="mo">1 câu · gửi 19:58, 24/10</p></div></div>
+          <span class="chip dung"><i data-i="check" class="nho"></i>Đã chữa</span>
+        </div>
+        <p class="loi"><span class="chip">Câu 3</span><span class="phu">«Chất béo lỏng và chất béo rắn khác nhau ở gốc acid nào ạ?»</span></p>
+      </div>
+      <div class="hang giua" style="flex-wrap:wrap;gap:0 12px;border-top:1px solid var(--vien);padding-top:4px">
+        <p class="mo">Còn 3 em chờ: Phạm Quang Nam, Vũ Đức Huy, Hoàng Bảo Ngọc</p>
+        <a class="lien-ket">Xem câu hỏi <i data-i="chevron" class="nho"></i></a>
+      </div>
+    </div>
+    <div class="ds" style="border-top:1px solid var(--vien)">
+      <div class="dong"><span class="o-tick"><i></i></span><div class="giua"><p class="ten">Kiểm tra 45 phút · Carbohydrate</p><p class="mo">12A2 · 4 em hỏi · 6 câu</p></div><span class="phai"><span class="cho"><b>4</b><small>em chờ</small></span><i data-i="chevron"></i></span></div>
+      <div class="dong"><span class="o-tick"><i></i></span><div class="giua"><p class="ten">Ôn tập · Nitrogen và sulfur</p><p class="mo">11B1 · 3 em hỏi · 5 câu</p></div><span class="phai"><span class="cho"><b>3</b><small>em chờ</small></span><i data-i="chevron"></i></span></div>
+      <div class="dong"><span class="o-tick"><i></i></span><div class="giua"><p class="ten">Kiểm tra 15 phút · Cấu tạo nguyên tử</p><p class="mo">10C3 · 2 em hỏi · 2 câu</p></div><span class="phai"><span class="cho"><b>2</b><small>em chờ</small></span><i data-i="chevron"></i></span></div>
+      <div class="dong"><span class="o-tick on"><i><svg class="i nho" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></span><div class="giua"><p class="ten">Kiểm tra ôn tập · Polymer</p><p class="mo">12A1 · 3 em hỏi · 4 câu</p></div><span class="phai"><span class="chip dung" aria-label="Đã chữa hết"><i data-i="check" class="nho"></i><span class="an-dt">Đã chữa hết</span></span><i data-i="chevron"></i></span></div>
+      <div class="dong"><span class="o-tick on"><i><svg class="i nho" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i></span><div class="giua"><p class="ten">Kiểm tra 15 phút · Cân bằng hoá học</p><p class="mo">11B1 · 2 em hỏi · 3 câu</p></div><span class="phai"><span class="chip dung" aria-label="Đã chữa hết"><i data-i="check" class="nho"></i><span class="an-dt">Đã chữa hết</span></span><i data-i="chevron"></i></span></div>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+</body></html>

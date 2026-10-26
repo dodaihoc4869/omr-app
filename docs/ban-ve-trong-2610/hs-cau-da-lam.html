@@ -1,0 +1,128 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Câu đã làm</title><link rel="stylesheet" href="trong.css">
+<style>
+sub,sup{line-height:0}
+.tong{display:grid;grid-template-columns:auto minmax(0,1fr);gap:32px;align-items:center}
+.ba-thanh{display:flex;height:12px;border-radius:999px;overflow:hidden;background:var(--mat-3);gap:2px}
+.ba-thanh i{display:block;height:100%;flex:none}
+.chu-giai{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.chu-giai>div{display:flex;flex-direction:column;gap:2px}
+.chu-giai .nhan{display:flex;align-items:center;gap:6px}
+.chu-giai .so{font-size:20px}
+.loc{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.loc .tab{flex:none}
+.loc .o-nhap{min-width:180px}
+.tab .so-tab{font-size:12px;font-weight:600;color:var(--chu-3)}
+.tab>span.on .so-tab{color:var(--chinh-chu)}
+.muc-cau{display:flex;flex-direction:column;gap:8px;padding:16px 20px;border-top:1px solid var(--vien)}
+.muc-cau:first-child{border-top:0}
+.muc-cau.dang-xem{background:var(--chinh-nhat);box-shadow:inset 3px 0 0 var(--chinh)}
+.muc-cau .dau-cau{display:flex;align-items:center;gap:8px}
+.muc-cau .de-gon{font-size:15px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.muc-cau .em{font-size:14px;color:var(--chu-2)}
+.muc-cau .em b.s{color:var(--sai-chu)} .muc-cau .em b.d{color:var(--dung-chu)}
+.muc-cau .chan{display:flex;align-items:center;gap:12px}
+.muc-cau .chan .mo{flex:1;min-width:0}
+.chi-tiet .lua-chon{min-height:48px;font-size:15px;padding:8px 14px}
+.chi-tiet .lua-chon b{width:28px;height:28px}
+.chi-tiet .pa{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.lich-su{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.lich-su span{display:flex;align-items:center;gap:8px;font-size:14px}
+@media (max-width:900px){.tong{grid-template-columns:minmax(0,1fr);gap:14px}}
+@media (max-width:600px){
+  .loc .tab{width:100%}
+  .loc .o-nhap{flex:1;min-width:0}
+  .muc-cau{padding:14px 16px}
+  .muc-cau .chan{flex-wrap:wrap}
+  .muc-cau .chan .mo{flex-basis:100%}
+  .chu-giai{grid-template-columns:minmax(0,1fr);gap:6px}.chu-giai>div{flex-direction:row;align-items:baseline;justify-content:space-between}.chu-giai .so{font-size:17px}
+}
+</style></head>
+<body data-app="hs" data-tab="on-sua" data-khung="man-con" data-ve="Hôm nay" data-tieu="Câu đã làm" data-phu="Lời giải và lịch ôn từng câu"
+  data-nut-dau='<span class="nut trong an-hep">Tải đề làm lại</span><span class="nut">Tải PDF · 64 câu</span>'>
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bỏ chip điểm ca và tiêu đề to lặp tên màn; một thẻ tổng (312 câu + thanh ba màu) thay bốn ô.
+       Bộ lọc và chọn bài gom một hàng, hai nút tải lên thanh trên; mỗi câu là một dòng gọn, chi tiết câu đứng bên phải trên máy tính. -->
+  <section class="the tong" aria-label="Tổng số câu đã làm">
+    <div>
+      <p class="so-lon">312<small>câu</small></p>
+      <p class="mo mt-1">Câu đã làm · Tất cả các bài</p>
+    </div>
+    <div style="min-width:0">
+      <div class="ba-thanh" role="img" aria-label="187 Thành thạo, 118 Cần ôn, 7 Cần thầy dạy lại"><i style="width:59.9%;background:var(--dung)"></i><i style="flex:1;background:var(--chu-y)"></i><i style="width:2.3%;background:var(--sai)"></i></div>
+      <div class="chu-giai">
+        <div><span class="nhan"><span class="cham dung"></span>Thành thạo</span><span class="so">187 <small>60%</small></span></div>
+        <div><span class="nhan"><span class="cham chu-y"></span>Cần ôn</span><span class="so">118</span></div>
+        <div><span class="nhan"><span class="cham sai"></span>Cần thầy dạy lại</span><span class="so sai-mau">7</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="loc">
+    <div class="tab" role="tablist" aria-label="Lọc câu">
+      <span>Tất cả <span class="so-tab">312</span></span>
+      <span class="on">Sai lần gần nhất <span class="so-tab">64</span></span>
+      <span>Cần ôn <span class="so-tab">118</span></span>
+      <span>Thành thạo <span class="so-tab">187</span></span>
+      <span>Cần thầy dạy lại <span class="so-tab">7</span></span>
+    </div>
+    <div class="o-nhap co-chu"><span style="flex:1">Tất cả các bài</span><i data-i="chevron-down" class="nho"></i></div>
+  </div>
+
+  <div class="chinh-phu">
+    <section class="the dem" aria-label="Danh sách câu">
+      <article class="muc-cau dang-xem">
+        <div class="dau-cau"><span class="mo">Câu 14 · Trắc nghiệm · Vận dụng</span><span class="day"></span><span class="chip chu-y">Đang ôn</span></div>
+        <p class="de-gon">Cho các dung dịch có cùng nồng độ 0,1 M: HCl, NH<sub>3</sub>, NaOH, CH<sub>3</sub>COOH. Dãy xếp theo pH tăng dần là…</p>
+        <p class="em">Em chọn: <b class="s">B</b> · Đáp án: <b class="d">A</b></p>
+        <div class="chan"><span class="mo">Đến lịch ôn lại: Thứ Tư 28/10</span><span class="nut nhe">Xem lời giải</span></div>
+      </article>
+      <article class="muc-cau">
+        <div class="dau-cau"><span class="mo">Câu 9 · Đúng–sai · Thông hiểu</span><span class="day"></span><span class="chip chu-y">Đang ôn</span></div>
+        <p class="de-gon">Điện phân dung dịch CuSO<sub>4</sub> với điện cực trơ, cường độ dòng điện không đổi. Xét các phát biểu sau…</p>
+        <p class="em">Em chọn: <b class="s">Đ S Đ Đ</b> · Đáp án: <b class="d">Đ S S Đ</b></p>
+        <div class="chan"><span class="mo">Đến lịch ôn lại: Thứ Tư 28/10</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <article class="muc-cau">
+        <div class="dau-cau"><span class="mo">Câu 21 · Trả lời ngắn · Vận dụng</span><span class="day"></span><span class="chip chu-y">Đang ôn</span></div>
+        <p class="de-gon">Hoà tan 0,02 mol NaOH vào nước được 200 mL dung dịch X. Giá trị pH của dung dịch X là bao nhiêu?</p>
+        <p class="em">Em trả lời: <b class="s">12</b> · Đáp án: <b class="d">13</b></p>
+        <div class="chan"><span class="mo">Đến lịch ôn lại: Thứ Năm 29/10</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <article class="muc-cau">
+        <div class="dau-cau"><span class="mo">Câu 3 · Trắc nghiệm · Nhận biết</span><span class="day"></span><span class="chip sai">Cần thầy dạy lại</span></div>
+        <p class="de-gon">Ester nào sau đây có mùi chuối chín?</p>
+        <p class="em">Em chọn: <b class="s">C</b> · Đáp án: <b class="d">A</b></p>
+        <div class="chan"><span class="mo">Thầy chữa câu này trên lớp. Chữa xong, câu quay lại kế hoạch ôn từ hôm sau.</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <article class="muc-cau">
+        <div class="dau-cau"><span class="mo">Câu 6 · Trắc nghiệm · Thông hiểu</span><span class="day"></span><span class="chip chu-y">Đang ôn</span></div>
+        <p class="de-gon">Trong phòng thí nghiệm, khí ammonia được điều chế bằng cách đun nóng hỗn hợp nào sau đây?</p>
+        <p class="em">Em chọn: <b class="s">B</b> · Đáp án: <b class="d">D</b></p>
+        <div class="chan"><span class="mo">Đến lịch ôn lại: Thứ Sáu 30/10</span><span class="nut">Xem lời giải</span></div>
+      </article>
+      <div style="padding:4px 20px 12px;border-top:1px solid var(--vien)"><a class="lien-ket">Xem thêm 20 câu <i data-i="chevron-down" class="nho"></i></a></div>
+    </section>
+
+    <aside class="the chi-tiet an-hep" aria-label="Chi tiết câu">
+      <div class="hang giua"><span class="mo">Câu 14 · Trắc nghiệm · Vận dụng</span><span class="chip chu-y">Đang ôn</span></div>
+      <p class="mt-3" style="font-size:15.5px;line-height:1.6">Cho các dung dịch có cùng nồng độ 0,1 M: (1) HCl, (2) NH<sub>3</sub>, (3) NaOH, (4) CH<sub>3</sub>COOH. Dãy xếp theo <b>pH tăng dần</b> là</p>
+      <div class="pa">
+        <div class="lua-chon dung"><b>A</b>(1) &lt; (4) &lt; (2) &lt; (3)</div>
+        <div class="lua-chon sai"><b>B</b>(4) &lt; (1) &lt; (2) &lt; (3)</div>
+        <div class="lua-chon"><b>C</b>(1) &lt; (4) &lt; (3) &lt; (2)</div>
+        <div class="lua-chon"><b>D</b>(3) &lt; (2) &lt; (4) &lt; (1)</div>
+      </div>
+      <span class="nut chinh rong-het mt-4">Xem lời giải <i data-i="arrow"></i></span>
+      <div class="vach"></div>
+      <p class="h3" style="font-size:15px">Lịch sử làm câu này</p>
+      <div class="lich-su">
+        <span><span class="cham dung"></span>Đúng 05/10 · Bài hằng ngày</span>
+        <span><span class="cham sai"></span>Sai 24/10 · Kiểm tra ôn tập</span>
+      </div>
+      <p class="mo mt-3">Đến lịch ôn lại: Thứ Tư 28/10</p>
+    </aside>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

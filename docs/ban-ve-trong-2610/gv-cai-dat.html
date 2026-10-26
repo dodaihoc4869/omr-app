@@ -1,0 +1,56 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Cài đặt</title><link rel="stylesheet" href="trong.css">
+<style>
+.cai{max-width:760px}
+.muc-cai{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.muc-cai .giua{flex:1;min-width:220px}
+.song{width:10px;height:10px;border-radius:50%;background:var(--dung);box-shadow:0 0 0 4px var(--dung-nhat);flex:none;display:inline-block;margin-right:8px}
+.dia-chi{overflow-wrap:anywhere}
+@media (max-width:600px){.muc-cai .nut,.muc-cai .tab{width:100%}.muc-cai .tab>span{flex:1;justify-content:center}}
+</style></head>
+<body data-app="gv" data-tab="cai-dat">
+<main class="khung"><div class="cot cai" style="gap:20px">
+  <!-- GỌN HƠN: một cột hẹp, mỗi mục một dòng (tên · trạng thái · nút); bỏ ba ô xem trước giao diện;
+       «Công cụ kỹ thuật» chỉ giữ 3 mục chưa có ở trên (bản cũ lặp lại Kết nối máy chủ và Cập nhật app). -->
+  <div>
+    <p class="nhan">Máy của Thầy Đỗ Đại Học</p>
+    <h1 class="tieu-de mt-1">Cài đặt</h1>
+  </div>
+
+  <section class="the dem">
+    <div class="ds">
+      <div class="dong" style="padding:18px 20px">
+        <div class="muc-cai" style="flex:1">
+          <span class="o-icon xam an-dt"><i data-i="sun"></i></span>
+          <div class="giua"><p class="ten">Giao diện</p><p class="mo">Tự lưu trên máy này.</p></div>
+          <div class="tab"><span><i data-i="sun" class="nho"></i>Sáng</span><span><i data-i="moon" class="nho"></i>Tối</span><span class="on"><i data-i="monitor" class="nho"></i>Theo máy</span></div>
+        </div>
+      </div>
+      <div class="dong" style="padding:18px 20px">
+        <div class="muc-cai" style="flex:1">
+          <span class="o-icon dung an-dt"><i data-i="link"></i></span>
+          <div class="giua"><p class="ten">Kết nối máy chủ</p><p class="mo dia-chi"><span class="song"></span>Đã kết nối · omr.ttadodaihoc.workers.dev</p></div>
+          <span class="nut">Kết nối máy chủ</span>
+        </div>
+      </div>
+      <div class="dong" style="padding:18px 20px">
+        <div class="muc-cai" style="flex:1">
+          <span class="o-icon an-dt"><i data-i="upload"></i></span>
+          <div class="giua"><p class="ten">Cập nhật app</p><p class="mo">Tải bản mới nhất và mở lại app.</p></div>
+          <span class="nut chinh">Cập nhật app</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="the dem">
+    <div class="the-dau" style="padding:18px 20px 4px;margin:0"><div class="h3">Công cụ kỹ thuật</div></div>
+    <div class="ds">
+      <div class="dong"><span class="o-icon xam"><i data-i="lock"></i></span><div class="giua"><p class="ten">Mật khẩu mở app</p><p class="mo">Khoá app trên máy này</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+      <div class="dong"><span class="o-icon xam"><i data-i="refresh"></i></span><div class="giua"><p class="ten">Đồng bộ lại phiếu mọi ca</p><p class="mo">Dựng lại phiếu từ bài đã nộp</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+      <div class="dong"><span class="o-icon xam"><i data-i="users"></i></span><div class="giua"><p class="ten">Đồng bộ danh sách lớp</p><p class="mo">Lấy lại danh sách em từ máy chủ</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+    </div>
+  </section>
+</div></main>
+<script src="khung.js"></script>
+</body></html>

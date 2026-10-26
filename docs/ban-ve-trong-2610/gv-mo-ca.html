@@ -1,0 +1,114 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Mở ca kiểm tra</title><link rel="stylesheet" href="trong.css">
+<style>
+.buoc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.buoc>div{display:flex;align-items:center;gap:12px;padding:14px 18px;border-left:1px solid var(--vien);min-width:0;min-height:72px}
+.buoc>div:first-child{border-left:0}
+.buoc>div.dang{background:var(--chinh-nhat);box-shadow:inset 0 -3px 0 var(--chinh)}
+.buoc .vt{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--dung-nhat);color:var(--dung-chu);font-size:14px;font-weight:600;flex:none}
+.buoc .dang .vt{background:var(--chinh);color:var(--tren-mau)}
+.buoc b{display:block;font-size:15px;font-weight:600;line-height:1.3}
+.buoc .mo{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.buoc>div>span:last-child{min-width:0}
+.chon-luat{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.chon-luat>div{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1.5px solid var(--vien);border-radius:14px;min-width:0}
+.chon-luat>div.on{border-color:var(--chinh);background:var(--chinh-nhat)}
+.chon-luat .tron{width:20px;height:20px;border-radius:50%;border:2px solid var(--vien-2);flex:none;margin-top:1px}
+.chon-luat .on .tron{border:6px solid var(--chinh);background:var(--mat)}
+.chon-luat .mo{display:block;margin-top:2px}
+.chon-luat b{display:block;font-weight:600;font-size:15px;line-height:1.35}
+.bat-tat{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--vien)}
+.bat-tat:first-of-type{border-top:0}
+.bat-tat .giua{flex:1;min-width:0}
+.tom{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.tom>div{padding:12px 14px;border-radius:12px;background:var(--mat-2)}
+dl.xem{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 16px;margin:0;font-size:14px}
+dl.xem dt{color:var(--chu-3)}
+dl.xem dd{margin:0;font-weight:500;text-align:right}
+.moc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));position:relative}
+.moc::before{content:"";position:absolute;left:16%;right:16%;top:5px;height:2px;background:var(--vien-2)}
+.moc>div{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.moc i{width:12px;height:12px;border-radius:50%;background:var(--mat);border:2px solid var(--chinh);margin-bottom:4px}
+.moc b{font-size:15px;font-weight:600}
+.xem-truoc{position:sticky;top:88px}
+@media (max-width:1100px){.xem-truoc{position:static}}
+@media (max-width:600px){
+  .buoc{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .buoc>div{padding:12px 14px;gap:10px}.buoc .mo{white-space:normal}
+  .buoc>div:nth-child(3){border-left:0}
+  .buoc>div:nth-child(n+3){border-top:1px solid var(--vien)}
+  .chuyen .nut{flex:1}
+}
+</style></head>
+<body data-app="gv" data-tab="ca-kiem-tra" data-khung="man-con" data-ve="Ca kiểm tra" data-tieu="Mở ca kiểm tra" data-phu="Ca kiểm tra › Mở ca mới">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bỏ tiêu đề lớn và chip trùng với thanh trên; 4 bước thành một dải mảnh, mỗi bước nói đúng điều đã chọn.
+       Luật chỉ còn một câu hỏi chính (Công bố điểm); «Thêm tuỳ chọn…» gom 3 công tắc + nút cài sâu. Xem trước giữ một nút chính duy nhất. -->
+  <nav class="the dem buoc" aria-label="Các bước mở ca">
+    <div><span class="vt"><i data-i="check" class="nho"></i></span><span><b>1. Đề</b><span class="mo">12-KT-C1-D4 · 28 câu</span></span></div>
+    <div><span class="vt"><i data-i="check" class="nho"></i></span><span><b>2. Ai làm</b><span class="mo">12A1 · 40 em</span></span></div>
+    <div><span class="vt"><i data-i="check" class="nho"></i></span><span><b>3. Giờ</b><span class="mo">50 phút · mở 19:30</span></span></div>
+    <div class="dang" aria-current="step"><span class="vt">4</span><span><b>4. Luật</b><span class="mo">Đang chọn</span></span></div>
+  </nav>
+
+  <div class="chinh-phu">
+    <section class="the">
+      <div class="the-dau"><div class="h3">Công bố điểm</div><span class="mo">Em thấy điểm lúc nào</span></div>
+      <div class="chon-luat" role="radiogroup" aria-label="Công bố điểm">
+        <div><span class="tron"></span><span><b>Ngay khi em nộp</b><span class="mo">Em nộp sớm có thể kể đáp án cho bạn đang làm.</span></span></div>
+        <div class="on" aria-checked="true"><span class="tron"></span><span><b>Khi cả lớp nộp xong</b><span class="mo">Em nộp xong thấy "đang chờ cả lớp".</span></span></div>
+        <div><span class="tron"></span><span><b>Thầy công bố sau</b><span class="mo">Thầy xem trước, rồi bấm Công bố điểm ở màn Kết thúc ca.</span></span></div>
+      </div>
+
+      <p class="nhan mt-6">Chống gian lận đang bật</p>
+      <div class="hang mt-2" style="flex-wrap:wrap;gap:8px">
+        <span class="chip dung"><i data-i="check" class="nho"></i>Giữ để đọc đề (nhả tay 3 giây)</span>
+        <span class="chip dung"><i data-i="check" class="nho"></i>Rời màn 3 lần thì khoá bài</span>
+        <span class="chip dung"><i data-i="check" class="nho"></i>Rời màn quá 30 giây thì khoá bài</span>
+        <span class="chip dung"><i data-i="check" class="nho"></i>Phòng chờ phát đề</span>
+      </div>
+
+      <div class="vach" style="margin:20px 0 4px"></div>
+      <div class="hang giua" style="min-height:44px"><span class="dam">Thêm tuỳ chọn…</span><i data-i="chevron-down" class="nho"></i></div>
+      <div class="the chim mt-2" style="padding:16px">
+        <label class="nhan-o">Tên ca <span class="mo" style="font-weight:400">· để trống thì tự đặt theo đề và lớp</span></label>
+        <div class="o-nhap co-chu">Kiểm tra chương 1 · 12A1</div>
+        <div class="mt-3">
+          <div class="bat-tat"><div class="giua"><p class="dam">Phòng chờ phát đề</p><p class="mo">Chờ thầy bấm Bắt đầu mới đếm ngược</p></div><span class="cong-tac on" role="switch" aria-checked="true"></span></div>
+          <div class="bat-tat"><div class="giua"><p class="dam">Giữ để đọc đề</p><p class="mo">Chống chụp ảnh đề &amp; chia sẻ · Mặc định 3s</p></div><span class="cong-tac on" role="switch" aria-checked="true"></span></div>
+          <div class="bat-tat"><div class="giua"><p class="dam">Đồng bộ giờ cả phòng</p><p class="mo">Bật sẽ dùng phòng chờ. Cả phòng tính giờ từ lúc thầy bấm Bắt đầu thi và cùng hết giờ; em vào muộn chỉ còn thời gian chung.</p></div><span class="cong-tac" role="switch" aria-checked="false"></span></div>
+        </div>
+        <span class="nut mt-2" style="white-space:normal;text-align:left;justify-content:flex-start;line-height:1.35;padding-top:8px;padding-bottom:8px"><i data-i="settings" class="nho"></i>Mức rời màn · mật khẩu ca · chỉ nộp phút cuối · ân hạn nhả tay</span>
+      </div>
+
+      <div class="hang chuyen mt-6"><span class="nut"><i data-i="back" class="nho"></i>Bước trước</span><span class="day"></span><span class="nut tat">Bước tiếp<i data-i="arrow" class="nho"></i></span></div>
+    </section>
+
+    <aside class="the xem-truoc" aria-label="Xem trước ca">
+      <p class="nhan">Xem trước · ca sẽ mở</p>
+      <h2 class="h2 mt-1">Kiểm tra chương 1 · 12A1</h2>
+      <div class="tom mt-4">
+        <div><p class="so">28<small>câu</small></p><p class="mo mt-1">10 điểm</p></div>
+        <div><p class="so">50<small>phút</small></p><p class="mo mt-1">làm bài</p></div>
+      </div>
+      <dl class="xem mt-4">
+        <dt>Đề</dt><dd>12-KT-C1-D4 · Ester – lipid</dd>
+        <dt>Cách ra đề</dt><dd>Chuẩn cấu trúc 2026</dd>
+        <dt>Số câu</dt><dd>28 câu · 10 điểm<br><span class="mo" style="font-weight:400">Phần I/II/III: 18 · 4 · 6</span></dd>
+        <dt>Ai làm</dt><dd>12A1 · 40 em</dd>
+        <dt>Thời gian</dt><dd>50 phút</dd>
+        <dt>Công bố điểm</dt><dd class="chinh-mau">Khi cả lớp nộp xong</dd>
+      </dl>
+      <div class="vach"></div>
+      <div class="moc">
+        <div><i></i><b>19:30</b><span class="mo">Mở</span></div>
+        <div><i></i><b>19:45</b><span class="mo">Hết giờ vào</span></div>
+        <div><i></i><b>20:35</b><span class="mo">Em cuối nộp</span></div>
+      </div>
+      <span class="nut chinh lon rong-het mt-6"><i data-i="play" class="nho"></i>Mở ca kiểm tra ngay</span>
+      <p class="mo mt-2" style="text-align:center">Mở xong có link mời để chép gửi lớp</p>
+    </aside>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

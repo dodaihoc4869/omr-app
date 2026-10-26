@@ -1,0 +1,85 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Giao đề theo tuần</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.tick{display:grid;place-items:center;width:22px;height:22px;border-radius:7px;box-shadow:inset 0 0 0 1.5px var(--vien-2);flex:none;color:var(--tren-mau)}
+.tick.on{background:var(--chinh);box-shadow:none}
+.ds-tick .dong{min-height:56px;padding:10px 0;gap:12px}
+.ds-tick .dong.bo .ten{color:var(--chu-3);font-weight:500}
+.luoi-em{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}
+.luoi-em .dong:nth-child(2){border-top:0}
+.lop{display:inline-flex;align-items:center;min-height:24px;padding:0 8px;border-radius:6px;background:var(--mat-2);font-size:13px;font-weight:600;color:var(--chu-2)}
+.bat{display:flex;align-items:center;gap:12px;min-height:44px}
+.tom{position:sticky;top:84px}
+@media (max-width:1100px){.tom{position:static}}
+@media (max-width:600px){.luoi-em{grid-template-columns:minmax(0,1fr)}.luoi-em .dong:nth-child(2){border-top:1px solid var(--vien)}.dau-man .tab{width:100%}.dau-man .tab>span{flex:1;justify-content:center}}
+</style></head>
+<body data-app="gv" data-tab="giao-tuan">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bỏ dải 4 ô số (lặp đúng các số đã có ở tiêu đề từng thẻ) — gom thành MỘT thẻ tóm tắt bên phải có hạn nộp và nút «Lưu lại»
+       (bản cũ có 2 nút Lưu lại); danh sách em hiện 6 em đầu + «Xem đủ». -->
+  <div class="dau-man">
+    <div style="flex:1;min-width:0">
+      <h1 class="tieu-de">Giao đề theo tuần</h1>
+      <div class="bat mt-2"><span class="cong-tac on" role="switch" aria-checked="true"></span><span class="dam">Bật việc giao đề</span></div>
+    </div>
+    <div class="tab"><span>Khối 10</span><span>Khối 11</span><span class="on">Khối 12</span></div>
+  </div>
+
+  <div class="chinh-phu">
+    <div class="cot" style="gap:20px">
+      <section class="the">
+        <div class="the-dau" style="margin-bottom:4px"><div class="h3">Lớp (khối 12)</div><a class="lien-ket">Tất cả</a></div>
+        <div class="ds ds-tick">
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><span class="lop">12A1</span><div class="giua"><p class="phu">40 em</p></div><span class="mo">38 đã tick</span></div>
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><span class="lop">12A2</span><div class="giua"><p class="phu">36 em</p></div><span class="mo">34 đã tick</span></div>
+          <div class="dong bo"><span class="tick"></span><span class="lop">12A3</span><div class="giua"><p class="phu">30 em</p></div><span class="mo">chưa chọn</span></div>
+        </div>
+      </section>
+
+      <section class="the">
+        <div class="the-dau" style="margin-bottom:12px"><div class="h3">Em khối 12 (72 đã tick)</div><a class="lien-ket">Tất cả</a></div>
+        <div class="o-nhap"><i data-i="search" class="nho"></i>Tìm tên hoặc số báo danh…</div>
+        <div class="ds ds-tick luoi-em mt-2">
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Nguyễn Minh Anh</p><p class="mo">12A1</p></div></div>
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Trần Gia Bảo</p><p class="mo">12A2</p></div></div>
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Lê Khánh Vy</p><p class="mo">12A1</p></div></div>
+          <div class="dong bo"><span class="tick"></span><div class="giua"><p class="ten">Bùi Thanh Tùng</p><p class="mo">12A1 · nghỉ học</p></div></div>
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Đỗ Thu Hà</p><p class="mo">12A2</p></div></div>
+          <div class="dong bo"><span class="tick"></span><div class="giua"><p class="ten">Mai Phương Thảo</p><p class="mo">12A2 · nghỉ học</p></div></div>
+        </div>
+        <div class="hang giua mt-1" style="flex-wrap:wrap;gap:0 12px"><p class="mo">Bỏ tick 4 em: 2 em 12A1, 2 em 12A2</p><a class="lien-ket">Xem đủ 76 em <i data-i="chevron" class="nho"></i></a></div>
+      </section>
+
+      <section class="the">
+        <div class="the-dau" style="margin-bottom:4px"><div class="h3">Nguồn đề khối 12 (5 đã tick)</div><a class="lien-ket">Tất cả</a></div>
+        <div class="ds ds-tick">
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Chương 1 · Ester – lipid</p><p class="mo">3 tờ đề · 72 câu</p></div></div>
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Chương 2 · Carbohydrate</p><p class="mo">2 tờ đề · 48 câu</p></div></div>
+          <div class="dong bo"><span class="tick"></span><div class="giua"><p class="ten">Chương 3 · Hợp chất chứa nitrogen</p><p class="mo">2 tờ đề · 48 câu · chưa dạy</p></div></div>
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Đề ôn giữa kì I · cấu trúc 2026</p><p class="mo">28 câu · Phần I, II, III</p></div></div>
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Ôn lớp 11 · Hydrocarbon</p><p class="mo">24 câu</p></div></div>
+          <div class="dong"><span class="tick on"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Ôn lớp 11 · Alcohol – phenol</p><p class="mo">24 câu</p></div></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="the tom cot" style="gap:16px">
+      <div class="h3">Hạn nộp</div>
+      <div>
+        <label class="nhan-o">Hạn nộp (tối thiểu 7 ngày kể từ lúc giao):</label>
+        <div class="o-nhap co-chu"><i data-i="calendar" class="nho"></i>23:59 · Thứ Hai 02/11/2026</div>
+      </div>
+      <div class="vach" style="margin:0"></div>
+      <div class="cot" style="gap:10px">
+        <div class="hang giua"><span class="phu">Lớp</span><span class="dam">12A1, 12A2</span></div>
+        <div class="hang giua"><span class="phu">Em nhận đề</span><span class="dam">72 em</span></div>
+        <div class="hang giua"><span class="phu">Nguồn đề</span><span class="dam">5 nguồn</span></div>
+        <div class="hang giua"><span class="phu">Nộp trước</span><span class="dam">23:59 02/11</span></div>
+      </div>
+      <span class="nut chinh lon rong-het">Lưu lại</span>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

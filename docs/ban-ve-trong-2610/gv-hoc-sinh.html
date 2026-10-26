@@ -1,0 +1,132 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Học sinh</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.dau-man>.chu{flex:1;min-width:0}
+.dau-dem{padding:18px 20px 14px;margin:0}
+.kpi3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.kpi3>.kpi{border-top:0!important;border-left:1px solid var(--vien)!important}.kpi3>.kpi:first-child{border-left:0!important}
+.xep{display:flex;height:6px;border-radius:999px;overflow:hidden;background:var(--mat-3);gap:2px}
+.xep i{display:block;height:100%}
+.cong-cu{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:0 20px 16px}
+.cong-cu .o-nhap{flex:1;min-width:220px}
+.em{display:flex;align-items:center;gap:12px;min-width:0}
+.em b{display:block;font-weight:600}
+.hn{display:flex;align-items:center;gap:10px;min-width:150px}
+.hn .thanh{flex:1;max-width:90px}
+.o-menu{position:relative;width:56px;text-align:right}
+.o-menu .nut{width:40px;min-height:40px;padding:0}
+.o-menu .nut.on{background:var(--chinh-nhat);border-color:var(--chinh);color:var(--chinh-chu)}
+.menu{position:absolute;right:12px;top:52px;z-index:5;width:220px;padding:6px;background:var(--mat);border:1px solid var(--vien);border-radius:14px;box-shadow:var(--bong-3);text-align:left}
+.menu span{display:flex;align-items:center;justify-content:space-between;min-height:40px;padding:0 12px;border-radius:10px;font-size:14px}
+.menu span.on{background:var(--mat-2);font-weight:600}
+.menu small{color:var(--chu-3);font-size:13px}
+.menu hr{border:0;border-top:1px solid var(--vien);margin:6px 0}
+.bang tr.dang-chon td{background:var(--chinh-nhat)}
+.phan-trang{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 20px;border-top:1px solid var(--vien)}
+.trang{display:flex;gap:6px;margin-left:auto}
+.trang .nut{min-width:44px;padding:0 12px}
+.chi-dt6{display:none!important}
+@media (max-width:600px){
+  .kpi3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .dau-man>.hang{width:100%}.dau-man .nut{flex:1}
+  .cong-cu{padding:0 16px 12px}.cong-cu .o-nhap{min-width:100%}.cong-cu .nut:not(.vuong){flex:1;padding:0 10px}
+  .chi-dt6{display:flex!important}
+  .phan-trang{padding:12px 16px}.trang{margin:0;width:100%;justify-content:space-between}
+}
+</style></head>
+<body data-app="gv" data-tab="hoc-sinh">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: thẻ học phí riêng gộp vào ô số «Nợ học phí» (kèm thanh 4 màu); bỏ ô «243 em» trùng dòng phụ.
+       Bộ lọc và danh sách chung một thẻ; menu ⋯ giữ đủ 5 việc. Điện thoại: bảng thành danh sách, chỉ hiện học phí khi có nợ. -->
+  <div class="dau-man">
+    <div class="chu">
+      <p class="nhan">270 em · 14 lớp · Khối 10 · 11 · 12 · cập nhật 19:20</p>
+      <h1 class="tieu-de mt-1">Học sinh</h1>
+    </div>
+    <div class="hang"><span class="nut an-dt"><i data-i="link" class="nho"></i>Dán link danh sách</span><span class="nut chinh"><i data-i="plus"></i>Thêm học sinh</span></div>
+  </div>
+
+  <div class="dai-kpi kpi3">
+    <div class="kpi"><span class="nhan">Đã học hôm nay</span><span class="so">186<small>/270 em</small></span><div class="thanh manh" style="--p:69%"><i></i></div></div>
+    <div class="kpi"><span class="nhan">Nợ học phí tháng 10</span><span class="so sai-mau">18<small>em</small></span>
+      <div class="xep" role="img" aria-label="Đã nộp đủ 248 em, còn thiếu 11 em, chưa nộp 7 em, không thu 4 em"><i style="flex:248;background:var(--dung)"></i><i style="flex:11;background:var(--chu-y)"></i><i style="flex:7;background:var(--sai)"></i><i style="flex:4;background:var(--vien-2)"></i></div>
+      <span class="mo">11 còn thiếu · 7 chưa nộp</span></div>
+    <div class="kpi an-dt"><span class="nhan">Chưa có ca kiểm tra nào</span><span class="so">9<small>em</small></span><span class="mo">mới vào trong tháng</span></div>
+  </div>
+
+  <section class="the dem">
+    <div class="the-dau dau-dem"><div class="h3">Danh sách học sinh</div><span class="mo an-dt">Em 1–25 trên 270 · xếp theo tên</span></div>
+    <div class="cong-cu">
+      <div class="o-nhap"><i data-i="search" class="nho"></i>Tìm tên, số báo danh hoặc lớp</div>
+      <span class="nut">Khối: Tất cả<i data-i="chevron-down" class="nho"></i></span>
+      <span class="nut">Lớp: Tất cả<i data-i="chevron-down" class="nho"></i></span>
+      <span class="nut">Học phí: Tất cả<i data-i="chevron-down" class="nho"></i></span>
+      <span class="nut vuong" aria-label="Tải lại danh sách"><i data-i="refresh"></i></span>
+    </div>
+    <div class="an-dt">
+      <table class="bang">
+        <thead><tr><th>Em</th><th>Lớp</th><th>Hôm nay</th><th>Ca gần nhất</th><th>Học phí</th><th style="text-align:right">Thao tác</th></tr></thead>
+        <tbody id="bang"></tbody>
+      </table>
+    </div>
+    <div class="ds chi-dt6" id="ds" style="border-top:1px solid var(--vien)"></div>
+    <div class="phan-trang">
+      <span class="mo">25 em mỗi trang · trang 1/11</span>
+      <div class="trang">
+        <span class="nut tat" aria-label="Trang trước"><i data-i="back" class="nho"></i></span>
+        <span class="nut nhe">1</span><span class="nut">2</span><span class="nut">3</span><span class="nut an-dt">…</span><span class="nut an-dt">11</span>
+        <span class="nut" aria-label="Trang sau"><i data-i="arrow" class="nho"></i></span>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+<script>
+// [họ tên, SBD, lớp, đã làm, tối thiểu (null = Chưa xếp), điểm ca gần nhất (null = Chưa có ca), học phí, menu đang mở]
+const em = [
+  ['Đặng Thuý An', '101204', '10C1', 20, 20, 7.5, 'du'],
+  ['Nguyễn Văn An', '120118', '12A1', 24, 24, 8.25, 'du'],
+  ['Vũ Hoàng Anh', '111507', '11B1', 9, 22, 6.0, 'thieu'],
+  ['Lê Ngọc Ánh', '122011', '12A2', 24, 24, 8.75, 'du'],
+  ['Phạm Gia Bảo', '100912', '10C3', 0, 20, null, 'chua'],
+  ['Hoàng Minh Châu', '121403', '12A1', 18, 24, 7.0, 'du'],
+  ['Trịnh Quốc Cường', '112206', '11B2', 22, 22, 5.5, 'du'],
+  ['Bùi Thị Diệp', '120721', '12A1', 24, 24, 9.0, 'du'],
+  ['Ngô Thành Đạt', '101833', '10C2', 14, 20, 6.75, 'thieu'],
+  ['Đỗ Hải Đăng', '122309', '12A3', 24, 24, 7.75, 'du'],
+  ['Phan Thu Hà', '111102', '11B1', 22, 22, 8.0, 'du'],
+  ['Lý Gia Hân', '100405', '10C1', null, null, null, 'khong'],
+  ['Trần Minh Hiếu', '122307', '12A2', 18, 24, 6.25, 'du', 1],
+  ['Đinh Quang Huy', '121019', '12A3', 24, 24, 8.5, 'du'],
+  ['Mai Khánh Huyền', '110814', '11B2', 6, 22, 4.75, 'chua'],
+  ['Phạm Minh Khang', '120415', '12A1', 30, 24, 9.25, 'du'],
+  ['Nguyễn Đăng Khoa', '101627', '10C3', 20, 20, 7.25, 'du'],
+  ['Võ Tuấn Kiệt', '122110', '12A2', 24, 24, 6.5, 'du'],
+  ['Hồ Phương Linh', '111720', '11B1', 22, 22, 8.0, 'du'],
+  ['Cao Bảo Long', '100318', '10C2', 11, 20, 5.0, 'thieu'],
+  ['Tạ Đức Mạnh', '121826', '12A3', 24, 24, 7.0, 'du'],
+  ['Lương Hà My', '120933', '12A1', 24, 24, 8.75, 'du'],
+  ['Phạm Quang Nam', '101405', '10C3', 0, 20, 5.25, 'du'],
+  ['Đoàn Bảo Ngọc', '110229', '11B2', 22, 22, 7.5, 'du'],
+  ['Lê Thu Trang', '111325', '11B1', 13, 22, 6.0, 'du'],
+]
+const HP = { du: ['Đã nộp đủ', 'dung'], thieu: ['Thiếu 450.000đ', 'chu-y'], chua: ['Chưa nộp', 'sai'], khong: ['Không thu', ''] }
+const AV = ['a1', 'a2', '', 'a4']
+const chuDau = (t) => t.split(' ').slice(-2).map((w) => w[0]).join('')
+const diem = (d) => d.toFixed(2).replace(/0$/, '').replace(/\.0$/, '').replace('.', ',')
+const homNay = (lam, tt) => lam === null ? '<span class="mo">Chưa xếp</span>'
+  : `<div class="hn"><div class="thanh manh ${lam >= tt ? 'dung' : 'chu-y'}" style="--p:${Math.min(100, Math.round(100 * lam / tt))}%"><i></i></div><span class="${lam === 0 ? 'sai-mau dam' : 'dam'}">${lam}/${tt}</span><span class="mo">câu</span></div>`
+const ca = (d) => d === null ? '<span class="mo">Chưa có ca</span>' : `<b class="dam">${diem(d)}</b><span class="mo"> /10 điểm</span>`
+const menu = '<div class="menu" role="menu"><span class="on">Mở hồ sơ</span><span>Báo cáo</span><span>Lịch sử ca <small>14 ca</small></span><span>Học phí <small>Đã nộp đủ</small></span><hr><span>Đặt lại mật khẩu</span></div>'
+document.getElementById('bang').innerHTML = em.map(([ten, sbd, lop, lam, tt, d, hp, mo], i) => `
+  <tr${mo ? ' class="dang-chon"' : ''}><td><div class="em"><span class="av ${AV[i % 4]}">${chuDau(ten)}</span><span><b>${ten}</b><span class="mo">SBD ${sbd}</span></span></div></td>
+  <td><span class="chip vien">${lop}</span></td><td>${homNay(lam, tt)}</td><td>${ca(d)}</td>
+  <td><span class="chip ${HP[hp][1]}">${HP[hp][0]}</span></td>
+  <td class="o-menu"><span class="nut${mo ? ' on' : ''}" aria-label="Thao tác cho em ${ten}">${icon('more')}</span>${mo ? menu : ''}</td></tr>`).join('')
+document.getElementById('ds').innerHTML = em.map(([ten, sbd, lop, lam, tt, d, hp], i) => `
+  <div class="dong"><span class="av ${AV[i % 4]}">${chuDau(ten)}</span><div class="giua"><p class="ten">${ten}</p>
+  <p class="mo">${lop} · Hôm nay ${lam === null ? 'chưa xếp' : `${lam}/${tt} câu`}</p><p class="mo">${d === null ? 'Chưa có ca' : `Ca gần nhất ${diem(d)}/10 điểm`}</p></div>
+  <span class="phai">${hp === 'thieu' || hp === 'chua' ? `<span class="chip ${HP[hp][1]}">${hp === 'thieu' ? 'Còn thiếu' : 'Chưa nộp'}</span>` : ''}${icon('chevron', 'nho')}</span></div>`).join('')
+</script>
+</body></html>

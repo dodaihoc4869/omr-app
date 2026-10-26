@@ -1,0 +1,122 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · A.I Đỗ Đại Học</title><link rel="stylesheet" href="trong.css">
+<style>
+sub,sup{line-height:0}
+p{text-wrap:pretty}
+.chat{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.av-ai{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;color:var(--tren-mau);background:linear-gradient(135deg,var(--tin),var(--hs));flex:none}
+.av-ai svg.i{width:18px;height:18px}
+.av-ai.lon{width:52px;height:52px;border-radius:16px}.av-ai.lon svg.i{width:26px;height:26px}
+.chao .h2{text-wrap:balance}
+.chao{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:8px 8px 4px}
+.tin-cay{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.tin-cay span{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--chu-2);text-align:left}
+.tin-cay svg{color:var(--dung-chu)}
+.moc{align-self:center}
+.tin{display:flex;gap:10px;align-items:flex-end;max-width:88%}
+.tin.em{align-self:flex-end;flex-direction:row-reverse}
+.bong{padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.6}
+.em .bong{background:var(--chinh-nhat);color:var(--chu);border-bottom-right-radius:6px}
+.ai .bong{background:var(--mat);border:1px solid var(--vien);box-shadow:var(--bong-1);border-bottom-left-radius:6px}
+.gio-tin{display:block;margin-top:4px;font-size:12px;color:var(--chu-3)}
+.em .gio-tin{text-align:right}
+.anh-de{padding:12px 14px;margin:-2px -6px 10px;border-radius:12px;background:var(--mat);border:1px solid var(--vien);font-size:14px;line-height:1.55}
+.anh-de .nhan{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.anh-de .lc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 16px;margin-top:6px;color:var(--chu-2)}
+.buoc-giai{margin:10px 0;padding:12px 14px;border-radius:12px;background:var(--mat-2);font-size:14.5px;line-height:1.75}
+.buoc-giai .nhan{margin-bottom:4px}
+.nham{display:flex;gap:10px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--chu-y-nhat);color:var(--chu-y-chu);font-size:14px;line-height:1.55}
+.nham svg{flex:none;margin-top:2px}
+.nham small{display:block;font-weight:600;font-size:12.5px}
+.dap{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;background:var(--dung-nhat);color:var(--dung-chu);font-weight:600}
+.soan{position:sticky;bottom:0;padding:12px 0 calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,transparent,var(--nen) 18px)}
+.soan .the{padding:12px;border-radius:22px;box-shadow:var(--bong-2)}
+.nut-anh{display:flex;gap:8px;overflow-x:auto}
+.nut-anh .nut{min-height:40px;font-size:14px;padding:0 14px;box-shadow:none;background:var(--mat-2);border-color:transparent;color:var(--chu-2)}
+.hang-gui{display:flex;gap:8px;align-items:center;margin-top:10px}
+.hang-gui .o-nhap{flex:1;border-color:transparent;background:var(--mat-2);min-height:48px;border-radius:14px}
+.luot{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:8px;font-size:12.5px;color:var(--chu-3)}
+@media (max-width:600px){
+  .tin{max-width:100%}
+  .ai .bong,.em .bong{padding:11px 14px}
+  .tin.ai .av-ai{display:none}
+  .nut-anh{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .nut-anh .nut{flex-direction:column;gap:3px;min-height:58px;padding:6px 4px;font-size:12.5px;white-space:normal;line-height:1.25;text-align:center}
+  .chao .h2{font-size:18px}
+  .tin-cay span{align-items:flex-start}.tin-cay svg{margin-top:2px}
+  .hang-gui .nut .chu{display:none}
+  .hang-gui .nut{width:48px;padding:0;min-height:48px}
+}
+</style></head>
+<body data-app="hs" data-tab="hom-nay" data-khung="man-con" data-tieu="A.I Đỗ Đại Học" data-phu="Đang trực, nhắn gì cũng được" data-ve="Hôm nay" data-ai="khong">
+<main class="khung">
+  <!-- GỌN HƠN: khung chat một cột hẹp (760px) dễ đọc; lời chào + hai dòng «kho đề của Thầy / câu mới giải hai lượt» thay cho thẻ giới thiệu dài.
+       Lời giải tách «các bước» và «Chỗ hay nhầm» thành hai khối nhỏ. Ô soạn dính đáy: ba nút ảnh/dán đề, ô nhắn, một nút chính «Gửi», số lượt còn lại. -->
+  <div class="chat">
+    <section class="chao" aria-label="Lời chào">
+      <span class="av-ai lon"><i data-i="sparkles"></i></span>
+      <h1 class="h2 mt-1">Chào Minh Anh! Có gì cứ nói với mình nha.</h1>
+      <p class="phu" style="max-width:520px">Hỏi bài, xin đề, xin vài câu luyện, hay chỉ muốn tâm sự cũng được. Mình trả lời ngay trong này.</p>
+      <div class="tin-cay">
+        <span><i data-i="check-circle" class="nho"></i>Câu có trong kho đề của Thầy: mình dùng đúng đáp án và lời giải của kho.</span>
+        <span><i data-i="zap" class="nho"></i>Câu mới: mình giải hai lượt độc lập, khớp nhau mới gửi bạn.</span>
+      </div>
+    </section>
+
+    <span class="chip moc">Hôm nay · Thứ Hai 26/10</span>
+
+    <div class="tin em">
+      <div class="bong">
+        <div class="anh-de">
+          <span class="nhan"><i data-i="image" class="nho"></i>Ảnh đề · chụp lúc 21:12</span>
+          <b>Câu 12.</b> Cho 5,6 gam Fe tác dụng hết với dung dịch HCl dư, thu được V lít khí H<sub>2</sub> (đkc). Giá trị của V là
+          <div class="lc"><span>A. 2,479.</span><span>B. 1,2395.</span><span>C. 3,7185.</span><span>D. 4,958.</span></div>
+        </div>
+        câu này làm sao v ạ, em ra 1,2395 lít mà thấy sai sai
+        <span class="gio-tin">21:12</span>
+      </div>
+    </div>
+
+    <div class="tin ai">
+      <span class="av-ai"><i data-i="sparkles"></i></span>
+      <div class="bong">
+        Bạn chia đôi số mol H<sub>2</sub> rồi đó. Mình làm lại từng bước nha:
+        <div class="buoc-giai">
+          <div>Fe + 2HCl → FeCl<sub>2</sub> + H<sub>2</sub>↑</div>
+          <div>n(Fe) = 5,6 : 56 = 0,1 mol</div>
+          <div>n(H<sub>2</sub>) = n(Fe) = 0,1 mol</div>
+          <div>V = 0,1 × 24,79 = 2,479 lít</div>
+        </div>
+        Vậy chọn <span class="dap"><i data-i="check" class="nho"></i>A. 2,479</span>
+        <div class="nham"><i data-i="alert" class="nho"></i><span><small>Chỗ hay nhầm</small>Fe tác dụng với HCl chỉ lên Fe<sup>2+</sup> (ra FeCl<sub>2</sub>), không ra FeCl<sub>3</sub>. Hệ số của H<sub>2</sub> bằng của Fe nên khỏi chia 2 nha.</span></div>
+        <span class="gio-tin">21:12</span>
+      </div>
+    </div>
+
+    <div class="tin em">
+      <div class="bong">à em hiểu rồi, tại em cân bằng sai hệ số ạ<span class="gio-tin">21:14</span></div>
+    </div>
+
+    <div class="tin ai">
+      <span class="av-ai"><i data-i="sparkles"></i></span>
+      <div class="bong">Chuẩn luôn. Muốn mình cho thêm một câu tương tự để bạn thử không? Lần này thay Fe bằng Mg (Mg + 2HCl → MgCl<sub>2</sub> + H<sub>2</sub>), bạn tự tính xem.<span class="gio-tin">21:14</span></div>
+    </div>
+
+    <div class="soan">
+      <section class="the" aria-label="Soạn tin">
+        <div class="nut-anh">
+          <span class="nut"><i data-i="camera" class="nho"></i>Chụp ảnh đề</span>
+          <span class="nut"><i data-i="image" class="nho"></i>Chọn ảnh có sẵn</span>
+          <span class="nut"><i data-i="copy" class="nho"></i>Dán đề bài</span>
+        </div>
+        <div class="hang-gui">
+          <div class="o-nhap" aria-label="Nội dung hỏi">Nhắn gì cũng được…</div>
+          <span class="nut chinh" aria-label="Gửi"><i data-i="send" class="nho"></i><span class="chu">Gửi</span></span>
+        </div>
+      </section>
+      <p class="luot"><i data-i="clock" class="nho"></i>Hôm nay bạn còn 18/20 lượt nhắn</p>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

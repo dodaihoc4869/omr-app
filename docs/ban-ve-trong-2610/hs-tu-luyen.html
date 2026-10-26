@@ -1,0 +1,73 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Tu luyện</title><link rel="stylesheet" href="trong.css">
+<style>
+.tab.top{align-self:flex-start}
+.che-do{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.cd{position:relative;display:flex;flex-direction:column;gap:4px;padding:16px;border:1.5px solid var(--vien);border-radius:16px;background:var(--mat);min-width:0;min-height:112px}
+.cd .ten{font-weight:600;font-size:15px}
+.cd .mo{line-height:1.4}
+.cd .o-chon{position:absolute;top:14px;right:14px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--vien-2);display:grid;place-items:center;color:var(--tren-mau)}
+.cd.on{border-color:var(--chinh);background:var(--chinh-nhat)}
+.cd.on .o-chon{background:var(--chinh);border-color:var(--chinh)}
+.cd .duoi-cd{margin-top:auto;padding-top:10px}
+.loc .muc-loc{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--vien)}
+.loc .muc-loc:first-of-type{border-top:0;padding-top:0}
+.loc .muc-loc>span:first-child{font-size:14px;font-weight:600;color:var(--chu-2)}
+.nhom-chon{display:flex;flex-wrap:wrap;gap:8px}
+.nhom-chon span{display:inline-flex;align-items:center;min-height:44px;padding:0 13px;border-radius:12px;border:1px solid var(--vien-2);background:var(--mat);font-size:14px;font-weight:500;color:var(--chu-2)}
+.nhom-chon span.on{border-color:var(--chinh);background:var(--chinh-nhat);color:var(--chinh-chu);font-weight:600}
+.tong-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tong-4>div{padding:12px 14px;border-radius:12px;background:var(--mat-2)}
+.tong-4 .so{font-size:22px}
+@media (max-width:900px){.che-do{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){
+  .che-do{gap:10px}.cd{padding:14px;min-height:0}.cd .ten{padding-right:22px}
+  .loc .muc-loc{grid-template-columns:minmax(0,1fr);gap:8px}
+  .tab.top{width:100%;align-self:stretch}.tab.top>span{flex:1;justify-content:center;padding:0 8px}
+}
+</style></head>
+<body data-app="hs" data-tab="on-sua" data-khung="man-con" data-ve="Ôn &amp; sửa" data-tieu="Tu luyện" data-phu="Luyện thêm theo chương, dạng, mức">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bốn chế độ thành bốn ô chọn nhỏ có nút tròn, bỏ số thứ tự và chip «Đang chọn»; bộ lọc xếp thành hàng nhãn–lựa chọn thẳng cột.
+       Thẻ «Tổng quan» chỉ là bản xem nhanh của «Tổng hợp», có lối vào riêng. -->
+  <div class="tab top" role="tablist"><span class="on">Luyện</span><span>Tổng hợp</span><span>Luyện đề cấu trúc</span></div>
+
+  <div class="che-do" role="radiogroup" aria-label="Chế độ luyện">
+    <div class="cd"><span class="o-chon"></span><p class="ten">Sửa câu sai</p><p class="mo">Làm lại câu em đã sai từ 29/09</p>
+      <div class="duoi-cd"><div class="hang giua"><span class="mo">Đã khắc phục</span><span class="dam" style="font-size:13px">12/30</span></div><div class="thanh manh dung mt-1" style="--p:40%"><i></i></div></div></div>
+    <div class="cd"><span class="o-chon"></span><p class="ten">Dạng câu sai</p><p class="mo">Câu mới cùng dạng với câu em sai</p></div>
+    <div class="cd on" aria-checked="true"><span class="o-chon"><i data-i="check" class="nho"></i></span><p class="ten">Dạng bài</p><p class="mo">Chọn Lớp → Bài → Dạng để luyện sâu</p></div>
+    <div class="cd"><span class="o-chon"></span><p class="ten">Tự do</p><p class="mo">Rút ngẫu nhiên, lọc theo sao và loại câu</p></div>
+  </div>
+
+  <div class="chinh-phu">
+    <section class="the loc">
+      <div class="the-dau"><div class="h3">Luyện Dạng bài</div><span class="mo">Lớp 11 · Bài 6</span></div>
+      <div class="muc-loc"><span>Lớp</span><div class="nhom-chon"><span>Lớp 10</span><span class="on">Lớp 11</span><span>Lớp 12</span></div></div>
+      <div class="muc-loc"><span>Bài</span><div class="o-nhap co-chu"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bài 6. Một số hợp chất của nitrogen với oxygen</span><i data-i="chevron-down" class="nho"></i></div></div>
+      <div class="muc-loc"><span>Dạng bài</span><div class="nhom-chon"><span class="on">Nitric acid – tính chất</span><span>Muối nitrate – nhiệt phân</span><span>Oxide của nitrogen</span><span>Kim loại tác dụng với HNO₃</span></div></div>
+      <div class="muc-loc"><span>Loại câu</span><div class="nhom-chon"><span class="on">Ngẫu nhiên</span><span>2 sao</span><span>1 sao</span><span>Lý thuyết</span></div></div>
+      <div class="muc-loc"><span>Số câu</span><div class="nhom-chon"><span>10</span><span class="on">20</span><span>30</span></div></div>
+      <div class="muc-loc"><span>Chấm</span><div class="nhom-chon"><span class="on">Chấm từng câu</span><span>Làm hết rồi nộp cả lượt</span></div></div>
+      <span class="nut chinh lon rong-het mt-4">Bắt đầu luyện · 20 câu <i data-i="arrow"></i></span>
+    </section>
+
+    <section class="the">
+      <div class="the-dau" style="margin:-10px 0 4px"><div class="h3">Tổng quan</div><a class="lien-ket">Tổng hợp <i data-i="chevron" class="nho"></i></a></div>
+      <div class="tong-4">
+        <div><p class="so">46</p><p class="mo">Lượt đã nộp</p></div>
+        <div><p class="so">9<small>ngày</small></p><p class="mo">Chuỗi ngày</p></div>
+        <div><p class="so">14<small>ngày</small></p><p class="mo">Chuỗi dài nhất</p></div>
+        <div><p class="so">11<small>giờ</small></p><p class="mo">Thời gian luyện</p></div>
+      </div>
+      <div class="hang giua mt-6"><p class="dam" style="font-size:14px">Tỉ lệ đúng theo tuần</p><span class="delta len">54% → 74%</span></div>
+      <svg id="bieu" style="width:100%;height:140px;display:block;margin-top:8px" aria-label="Tỉ lệ đúng theo tuần, 10 tuần gần nhất"></svg>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // 10 tuần gần nhất: 54% → 74% (khớp nhãn trên).
+  veDuong('bieu', [54, 58, 57, 61, 63, 62, 66, 70, 69, 74], { max: 100, buoc: 25, dinhDang: (v) => v + '%', mau: '--tin' })
+</script>
+</body></html>

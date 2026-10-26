@@ -1,0 +1,112 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Ai đã sai?</title><link rel="stylesheet" href="trong.css">
+<style>
+.chieu{max-width:1440px;margin:0 auto;min-height:100vh;padding:24px 40px 20px;display:flex;flex-direction:column;gap:16px}
+.chieu-dau{display:flex;align-items:flex-end;gap:24px}
+.ke{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--sai-chu)}
+.chieu-dau h1{text-wrap:balance;font-size:32px;line-height:1.15;font-weight:700;letter-spacing:-.02em;margin-top:4px}
+.thuoc{display:flex;align-items:baseline;gap:10px;color:var(--chu-2);font-size:15px;white-space:nowrap}
+.thuoc b{font-size:28px;color:var(--chu)}
+.hai{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:1}
+.ai{display:flex;flex-direction:column;gap:12px;padding:20px 22px}
+.ai.dd{border-color:var(--chinh);box-shadow:0 0 0 3px var(--chinh-nhat)}
+.ai-dau{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ky{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:700;letter-spacing:.04em}
+.ai.dd .ky{color:var(--chinh-chu)}
+.ai-so{display:flex;align-items:baseline;gap:28px;flex-wrap:wrap}
+.ai-so p{display:flex;align-items:baseline;gap:8px;color:var(--chu-2);font-size:16px}
+.ai-so b{font-size:48px;line-height:1;font-weight:700;letter-spacing:-.03em;color:var(--chu)}
+.ai-so .luot b{font-size:32px}
+.tn{display:flex;gap:3px;height:28px;border-radius:8px;overflow:hidden}
+.tn i{display:grid;place-items:center;color:var(--tren-mau);font-style:normal;font-weight:700;font-size:14px}
+.m1{--m:var(--sai);--m-nhat:var(--sai-nhat);--m-chu:var(--sai-chu)}
+.m2{--m:var(--chu-y);--m-nhat:var(--chu-y-nhat);--m-chu:var(--chu-y-chu)}
+.m3{--m:var(--tin);--m-nhat:var(--tin-nhat);--m-chu:var(--tin-chu)}
+.m4{--m:var(--dung);--m-nhat:var(--dung-nhat);--m-chu:var(--dung-chu)}
+.tn i{background:var(--m)}
+.lan{display:flex;flex-direction:column;gap:8px;padding:12px 0 2px;border-top:1px solid var(--vien)}
+.lan header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.lan header .cham{background:var(--m);width:10px;height:10px;align-self:center}
+.lan header b{font-size:16px;color:var(--m-chu)}
+.lan header span{color:var(--chu-3);font-size:14px}
+.lan header em{margin-left:auto;font-style:normal;font-weight:600;font-size:14px;color:var(--chu-2)}
+.lan.lan-rong header b{color:var(--chu-3)}
+.ten-ds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;list-style:none;margin:0;padding:0}
+.ten-ds li{display:flex;align-items:baseline;gap:8px;min-width:0;padding:6px 12px;border-radius:10px;background:var(--m-nhat)}
+.ten-ds li b{flex:1;min-width:0;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ten-ds li u{text-decoration:none;font-size:15px;font-weight:600;color:var(--m-chu);white-space:nowrap}
+.vg{width:9px;height:9px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--chu-3);flex:none;align-self:center}
+.ten-ds li.vang b{color:var(--chu-2)}
+.chan{display:flex;align-items:center;gap:16px;flex-wrap:wrap;color:var(--chu-3);font-size:14px}
+.chan .phim{margin-left:auto;display:flex;gap:14px}
+kbd{font:600 13px var(--f);padding:2px 7px;border-radius:6px;background:var(--mat-2);border:1px solid var(--vien);color:var(--chu-2)}
+@media (max-width:1100px){.ten-ds{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.hai{grid-template-columns:minmax(0,1fr)}.chieu{padding:20px}.chieu-dau{flex-wrap:wrap}.thuoc{order:3;width:100%}}
+@media (max-width:600px){
+  .chieu{padding:16px}
+  .chieu-dau{gap:12px;align-items:flex-start}
+  .chieu-dau h1{font-size:26px}
+  .ai{padding:16px}
+  .ai-so b{font-size:44px}
+  .thuoc b{font-size:22px}
+  .chan .phim{display:none}
+  .ai-so{gap:4px 20px}
+  .ai-so .luot b{font-size:26px}
+  .lan header span:not(.cham){order:3;width:100%}
+  .ten-ds{display:flex;flex-wrap:wrap}
+  .ten-ds li{flex:0 1 auto}
+  .ten-ds li b{font-size:15px}
+}
+</style></head>
+<body data-app="gv" data-khung="khong">
+<main class="chieu">
+  <!-- GỌN HƠN: bám đúng tờ chiếu thật (hai thẻ Đã điểm danh · Cả lớp, làn theo Mức làm 1–4 + Treo máy); bỏ đề và bốn làn A–D của bản cũ
+       (đề đã nằm trên tờ chiếu phía sau); mỗi thẻ chỉ còn: số em sai, thanh mức, thẻ tên + giây. -->
+  <header class="chieu-dau">
+    <div style="flex:1;min-width:0">
+      <span class="ke"><span class="cham sai"></span>Câu 7 · Ai đã sai?</span>
+      <h1>Học sinh làm sai câu này</h1>
+    </div>
+    <p class="thuoc"><span>Đọc hết đề cần</span><b>38 giây</b><span>· Nghĩ từ 60 giây</span></p>
+    <span class="nut vuong" aria-label="Đóng"><i data-i="x"></i></span>
+  </header>
+
+  <div class="hai">
+    <article class="the ai dd">
+      <header class="ai-dau"><span class="ky"><i data-i="check"></i>ĐÃ ĐIỂM DANH</span><span class="mo">Em có mặt buổi này, làm sai câu này</span></header>
+      <div class="ai-so"><p><b>11</b><span>/ 36 em có mặt làm sai</span></p><p class="luot"><b>13</b><span>lượt sai</span></p></div>
+      <div class="tn" role="img" aria-label="Mức làm 1: 4 lượt; Mức làm 2: 5 lượt; Mức làm 3: 3 lượt; Mức làm 4: 1 lượt"><i class="m1" style="flex:4">4</i><i class="m2" style="flex:5">5</i><i class="m3" style="flex:3">3</i><i class="m4" style="flex:1">1</i></div>
+      <section class="lan m1"><header><span class="cham"></span><b>Mức làm 1</b><span>Chưa đọc hết đề · dưới 38 giây</span><em>4 lượt</em></header>
+        <ul class="ten-ds"><li><b>Phạm Quang Nam</b><u>14</u></li><li><b>Hồ Gia Huy</b><u>19</u></li><li><b>Lê Thu Trang</b><u>22</u></li><li><b>Phạm Quang Nam</b><u>27</u></li></ul></section>
+      <section class="lan m2"><header><span class="cham"></span><b>Mức làm 2</b><span>Đọc xong, chưa kịp nghĩ · 38–59 giây</span><em>5 lượt</em></header>
+        <ul class="ten-ds"><li><b>Lý Minh Khoa</b><u>41</u></li><li><b>Cao Minh Tuấn</b><u>44</u></li><li><b>Đặng Hoài Phương</b><u>47</u></li><li><b>Mai Anh Thư</b><u>52</u></li><li><b>Hồ Gia Huy</b><u>55</u></li></ul></section>
+      <section class="lan m3"><header><span class="cham"></span><b>Mức làm 3</b><span>Có nghĩ · 60–119 giây</span><em>3 lượt</em></header>
+        <ul class="ten-ds"><li><b>Vũ Đức Huy</b><u>68</u></li><li><b>Ngô Thảo Linh</b><u>84</u></li><li><b>Hoàng Bảo Ngọc</b><u>97</u></li></ul></section>
+      <section class="lan m4"><header><span class="cham"></span><b>Mức làm 4</b><span>Làm kỹ · từ 120 giây</span><em>1 lượt</em></header>
+        <ul class="ten-ds"><li><b>Trịnh Khánh Linh</b><u>134</u></li></ul></section>
+      <section class="lan lan-rong"><header><b>Treo máy</b><span>Không lượt nào để máy treo</span></header></section>
+    </article>
+
+    <article class="the ai">
+      <header class="ai-dau"><span class="ky"><i data-i="users"></i>CẢ LỚP</span><span class="mo">Mọi em của lớp làm sai câu này · <span class="vg" style="display:inline-block"></span> em vắng buổi này</span></header>
+      <div class="ai-so"><p><b>14</b><span>/ 40 em của lớp làm sai</span></p><p class="luot"><b>17</b><span>lượt sai</span></p></div>
+      <div class="tn" role="img" aria-label="Mức làm 1: 6 lượt; Mức làm 2: 6 lượt; Mức làm 3: 4 lượt; Mức làm 4: 1 lượt"><i class="m1" style="flex:6">6</i><i class="m2" style="flex:6">6</i><i class="m3" style="flex:4">4</i><i class="m4" style="flex:1">1</i></div>
+      <section class="lan m1"><header><span class="cham"></span><b>Mức làm 1</b><span>Chưa đọc hết đề · dưới 38 giây</span><em>6 lượt</em></header>
+        <ul class="ten-ds"><li class="vang"><span class="vg"></span><b>Đỗ Khánh Linh</b><u>9</u></li><li><b>Phạm Quang Nam</b><u>14</u></li><li class="vang"><span class="vg"></span><b>Mạc Văn Toàn</b><u>16</u></li><li><b>Hồ Gia Huy</b><u>19</u></li><li><b>Lê Thu Trang</b><u>22</u></li><li><b>Phạm Quang Nam</b><u>27</u></li></ul></section>
+      <section class="lan m2"><header><span class="cham"></span><b>Mức làm 2</b><span>Đọc xong, chưa kịp nghĩ · 38–59 giây</span><em>6 lượt</em></header>
+        <ul class="ten-ds"><li><b>Lý Minh Khoa</b><u>41</u></li><li><b>Cao Minh Tuấn</b><u>44</u></li><li><b>Đặng Hoài Phương</b><u>47</u></li><li class="vang"><span class="vg"></span><b>Vũ Đức Anh</b><u>49</u></li><li><b>Mai Anh Thư</b><u>52</u></li><li><b>Hồ Gia Huy</b><u>55</u></li></ul></section>
+      <section class="lan m3"><header><span class="cham"></span><b>Mức làm 3</b><span>Có nghĩ · 60–119 giây</span><em>4 lượt</em></header>
+        <ul class="ten-ds"><li><b>Vũ Đức Huy</b><u>68</u></li><li class="vang"><span class="vg"></span><b>Vũ Đức Anh</b><u>72</u></li><li><b>Ngô Thảo Linh</b><u>84</u></li><li><b>Hoàng Bảo Ngọc</b><u>97</u></li></ul></section>
+      <section class="lan m4"><header><span class="cham"></span><b>Mức làm 4</b><span>Làm kỹ · từ 120 giây</span><em>1 lượt</em></header>
+        <ul class="ten-ds"><li><b>Trịnh Khánh Linh</b><u>134</u></li></ul></section>
+      <section class="lan lan-rong"><header><b>Treo máy</b><span>Không lượt nào để máy treo</span></header></section>
+    </article>
+  </div>
+
+  <footer class="chan">
+    <span>Số trên thẻ tên = giây làm. Mức làm xếp theo số giây làm của từng lượt so với thời gian đọc hết đề (38 giây) và sàn nghĩ (60 giây).</span>
+    <span class="phim"><span><kbd>←</kbd> <kbd>→</kbd> đợt</span><span><kbd>X</kbd> đóng</span></span>
+  </footer>
+</main>
+<script src="khung.js"></script>
+</body></html>

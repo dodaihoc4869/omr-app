@@ -1,0 +1,98 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Khắc phục lỗi sai</title><link rel="stylesheet" href="trong.css">
+<style>
+p{text-wrap:pretty}
+.che-do{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.che-do>div{display:flex;flex-direction:column;gap:2px;min-height:64px;padding:12px 14px;border:1.5px solid var(--vien);border-radius:14px;background:var(--mat)}
+.che-do>div.on{border-color:var(--chinh);background:var(--chinh-nhat)}
+.che-do b{font-weight:600;font-size:15px}
+.ds-ca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}
+.ds-ca .dong{min-height:56px;padding:8px 0;gap:12px}
+.ds-ca .dong:nth-child(2){border-top:0}
+.hop-chon{display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:var(--chinh);color:var(--tren-mau);flex:none}
+.hop-chon svg{width:14px;height:14px;stroke-width:3}
+.nhap-so{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.nhap-so .o-nhap{width:96px;justify-content:center;font-weight:600}
+.chuong .dong{min-height:0;padding:12px 0}
+.ba-p{display:flex;gap:4px 16px;flex-wrap:wrap;font-size:14px;color:var(--chu-2)}
+.ba-p b{color:var(--chu);font-weight:600}
+@media (max-width:600px){
+  .che-do{grid-template-columns:minmax(0,1fr)}
+  .che-do>div{min-height:0}
+  .ds-ca{grid-template-columns:minmax(0,1fr)}
+  .ds-ca .dong:nth-child(2){border-top:1px solid var(--vien)}
+  .de-luyen .dong{flex-wrap:wrap}
+  .de-luyen .dong .nut{width:100%}
+  .de-luyen .dong .nut.trong{width:auto;padding:0;margin-top:-8px}
+}
+</style></head>
+<body data-app="hs" data-tab="on-sua" data-khung="man-con" data-tieu="Khắc phục lỗi sai &amp; luyện đề" data-phu="Câu sai trong các bài kiểm tra" data-ve="Ôn &amp; sửa">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: một thẻ chính đi đúng thứ tự làm (bao nhiêu câu sai → chọn chế độ → chọn ca → số câu → «Bắt đầu sửa câu sai»).
+       Bỏ 4 ô số (gộp thành một dòng Phần I · II · III); «Câu sai theo chương» chỉ còn biểu đồ + 3 dòng, bỏ trích đề dài. -->
+  <div>
+    <p class="nhan">6 ca kiểm tra · 26/09 – 26/10</p>
+    <h1 class="tieu-de mt-1">Khắc phục lỗi sai &amp; luyện đề</h1>
+  </div>
+
+  <div class="chinh-phu">
+    <section class="the">
+      <p class="nhan">Câu chưa đúng trong 6 ca kiểm tra gần nhất</p>
+      <div class="hang mt-1" style="align-items:baseline;flex-wrap:wrap;gap:6px 16px"><span class="so-lon">55<small>câu</small></span>
+        <div class="ba-p"><span>Phần I (TN) <b>25</b></span><span>Phần II (Đ/S) <b>17</b></span><span>Phần III (Trả lời) <b>13</b></span></div></div>
+
+      <div class="vach" style="margin:20px 0"></div>
+      <p class="h3">4 chế độ khắc phục câu sai</p>
+      <p class="mo mt-1">Hệ thống tự động phân tích và tạo bài luyện khắc phục theo nhu cầu của em</p>
+      <div class="che-do mt-3" role="radiogroup">
+        <div class="on"><b>Sửa câu sai</b><span class="mo">Làm lại câu em đã sai</span></div>
+        <div><b>Dạng câu sai</b><span class="mo">Câu mới cùng dạng với câu em sai</span></div>
+        <div><b>Dạng bài</b><span class="mo">Chọn Lớp → Bài → Dạng để luyện sâu</span></div>
+        <div><b>Tự do</b><span class="mo">Rút ngẫu nhiên, lọc theo sao và loại câu</span></div>
+      </div>
+
+      <div class="hang giua mt-6"><p class="h3">Chọn các ca kiểm tra để rút câu làm sai</p><a class="lien-ket" style="white-space:nowrap">Bỏ chọn tất cả</a></div>
+      <div class="ds ds-ca" id="ds-ca"></div>
+
+      <div class="nhap-so mt-4"><label class="nhan-o" style="margin:0">Số câu muốn luyện</label><span class="o-nhap co-chu">20</span><span class="mo">tối đa 55 câu</span></div>
+      <span class="nut chinh lon rong-het mt-6">Bắt đầu sửa câu sai (6 ca đã chọn) <i data-i="arrow"></i></span>
+    </section>
+
+    <div class="cot" style="gap:20px">
+      <section class="the chuong">
+        <div class="the-dau"><div class="h3">Câu sai theo chương</div><span class="chip sai">Carbohydrate nhiều nhất</span></div>
+        <svg id="cot" style="width:100%;height:150px;display:block" role="img" aria-label="Carbohydrate 24, Nitrogen 21, Polymer 10 câu sai"></svg>
+        <div class="ds mt-2">
+          <div class="dong"><span class="cham sai"></span><p class="giua">Chương 2 · Carbohydrate</p><span class="dam sai-mau">24 câu</span></div>
+          <div class="dong"><span class="cham"></span><p class="giua">Chương 3 · Hợp chất chứa nitrogen</p><span class="dam">21 câu</span></div>
+          <div class="dong"><span class="cham"></span><p class="giua">Chương 4 · Polymer</p><span class="dam">10 câu</span></div>
+        </div>
+      </section>
+
+      <section class="the dem de-luyen">
+        <div class="the-dau" style="padding:16px 20px 0;margin:0"><div class="h3">Luyện đề chuẩn cấu trúc<p class="mo" style="font-weight:400">Chuẩn Bộ GD&amp;ĐT 2026 · 28 câu mỗi đề</p></div></div>
+        <div class="ds">
+          <div class="dong"><div class="giua"><p class="ten">Đề luyện số 4</p><p class="mo"><span class="chu-y-mau">Đang làm</span> · đã làm 9/28</p></div><span class="nut">Tiếp tục bài luyện</span></div>
+          <div class="dong"><div class="giua"><p class="ten">Đề luyện số 3</p><p class="mo">Đã nộp 20/10 · 7,25/10</p></div><span class="nut trong">Xem lại bài luyện</span></div>
+          <div class="dong"><div class="giua"><p class="ten">Đề luyện số 2</p><p class="mo">Đã nộp 11/10 · 6,50/10</p></div><span class="nut trong">Xem lại bài luyện</span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // Câu chưa đúng từng ca, khớp màn «Lịch sử ca kiểm tra»: [ngày, tên, điểm, sai P1, sai P2, sai P3]. Tổng 55 = 25 + 17 + 13.
+  // Theo chương: Carbohydrate 13 + 9 + 2 (ca 26/10) = 24 · Nitrogen 11 + 8 + 2 = 21 · Polymer 8 + 2 = 10.
+  const ca = [
+    ['26/10', 'Kiểm tra 50 phút · 12A1', '7,75', 3, 2, 1],
+    ['24/10', 'Kiểm tra tuần 12 · Polymer', '7,25', 4, 2, 2],
+    ['17/10', 'Kiểm tra tuần 11 · Amino acid và peptide', '7,00', 3, 3, 2],
+    ['10/10', 'Kiểm tra tuần 10 · Amine', '6,00', 5, 3, 3],
+    ['03/10', 'Kiểm tra tuần 9 · Tinh bột và cellulose', '6,50', 4, 3, 2],
+    ['26/09', 'Kiểm tra tuần 8 · Saccharose và maltose', '5,25', 6, 4, 3],
+  ]
+  document.getElementById('ds-ca').innerHTML = ca.map((c) => `<div class="dong" role="checkbox" aria-checked="true"><span class="hop-chon">${icon('check')}</span><div class="giua"><p class="ten" style="font-size:14px">${c[1]}</p><p class="mo">${c[0]} · Điểm: ${c[2]} · ${c[3] + c[4] + c[5]} câu sai</p></div></div>`).join('')
+  veCot('cot', [['Carbohydrate', 24, 'sai'], ['Nitrogen', 21, 'nhat'], ['Polymer', 10, 'nhat']], { khongTruc: true, soTren: true, max: 28 })
+</script>
+</body></html>

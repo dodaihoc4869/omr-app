@@ -1,0 +1,91 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Hôm nay</title><link rel="stylesheet" href="trong.css">
+<style>
+.viec .dong{min-height:72px}
+.viec .nut{min-width:112px}
+.lop-dong{display:grid;grid-template-columns:96px minmax(0,1fr) 48px;gap:12px;align-items:center;min-height:40px}
+.lop-dong b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.xep{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--mat-3)}
+.xep i{display:block;height:100%}
+.xep .c{background:var(--dung)}.xep .d{background:var(--chu-y)}.xep .l{background:var(--sai)}
+.chu-giai{display:flex;flex-wrap:wrap;gap:6px 14px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-2)}
+.ngay14{display:flex;gap:3px}
+.ngay14 i{width:10px;height:10px;border-radius:3px;background:var(--mat-3)}
+.ngay14 i.d{background:var(--dung)}.ngay14 i.t{background:var(--chu-y)}.ngay14 i.k{background:var(--sai)}
+.so-nhom{display:flex;flex-direction:column;gap:4px}
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+@media (max-width:600px){.viec .o-icon{display:none}.viec .nut{min-width:0;padding:0 14px}.dau-man .hang{width:100%}.dau-man .nut{flex:1}}
+</style></head>
+<body data-app="gv" data-tab="hom-nay">
+<main class="khung cot" style="gap:20px">
+  <div class="dau-man">
+    <div style="flex:1;min-width:0">
+      <p class="nhan">Thứ Hai 26/10 · 262 em · cập nhật 08:03</p>
+      <h1 class="tieu-de mt-1">Hôm nay của thầy</h1>
+    </div>
+    <div class="hang"><span class="nut an-dt"><i data-i="plus"></i>Bổ sung bài hôm nay</span><span class="nut chinh"><i data-i="eye"></i>Theo dõi ca đang mở</span></div>
+  </div>
+
+  <div class="dai-kpi" style="--n:5">
+    <div class="kpi"><span class="nhan">Đã học hôm nay</span><span class="so">20<small>/262 em</small></span><div class="thanh manh" style="--p:7.6%"><i></i></div></div>
+    <div class="kpi"><span class="nhan"><span class="cham dung" style="display:inline-block;margin-right:6px"></span>Chăm</span><span class="so">78<small>em</small></span><span class="mo">đủ mức ≥ 9/11 ngày</span></div>
+    <div class="kpi"><span class="nhan"><span class="cham chu-y" style="display:inline-block;margin-right:6px"></span>Chưa đều</span><span class="so">70<small>em</small></span><span class="mo">đủ mức 5–8 ngày</span></div>
+    <div class="kpi"><span class="nhan"><span class="cham sai" style="display:inline-block;margin-right:6px"></span>Lười</span><span class="so sai-mau">101<small>em</small></span><span class="mo">đủ mức ≤ 4/11 ngày</span></div>
+    <div class="kpi an-dt"><span class="nhan"><span class="cham tin" style="display:inline-block;margin-right:6px"></span>Đối phó</span><span class="so">11<small>em</small></span><span class="mo">nhanh mà sai, chọn lặp</span></div>
+  </div>
+
+  <div class="chinh-phu">
+    <div class="cot" style="gap:20px">
+      <section class="the dem viec">
+        <div class="the-dau" style="padding:18px 20px 4px;margin:0"><div class="h3">Việc cần thầy</div><span class="chip">4 việc</span></div>
+        <div class="ds">
+          <div class="dong"><span class="o-icon"><i data-i="clipboard"></i></span><div class="giua"><p class="ten">Ca đang mở · Kiểm tra Ester 12A1</p><p class="mo">Đã nộp 12/36 em · 2 em rời màn</p><div class="thanh manh mt-2" style="--p:33%;max-width:260px"><i></i></div></div><span class="nut chinh">Theo dõi</span></div>
+          <div class="dong"><span class="o-icon sai"><i data-i="alert"></i></span><div class="giua"><p class="ten">Cần thầy chữa · 5 chỗ</p><p class="mo">3 câu sai trên 4 em trở lên · 1 câu có thể nhầm đáp án · 1 tầng em kẹt</p></div><span class="nut">Chữa bài</span></div>
+          <div class="dong"><span class="o-icon tin"><i data-i="ask"></i></span><div class="giua"><p class="ten">Học sinh hỏi · 2 lượt</p><p class="mo">Chờ thầy chữa · Kiểm tra 15 phút 11B</p></div><span class="nut">Xem</span></div>
+          <div class="dong"><span class="o-icon chu-y"><i data-i="book"></i></span><div class="giua"><p class="ten">Lớp chưa có bài mới · 11A2</p><p class="mo">32 em hết câu mới từ hôm qua</p></div><span class="nut">Bổ sung bài</span></div>
+        </div>
+      </section>
+
+      <section class="the">
+        <div class="the-dau"><div class="h3">Nhịp học theo lớp</div><span class="mo an-dt">11 ngày · 01/10 → 12/10</span></div>
+        <div class="hang" style="flex-wrap:wrap;gap:10px">
+          <div class="tab"><span class="on">Tất cả 262</span><span>K10 · 46</span><span>K11 · 89</span><span>K12 · 127</span></div>
+          <div class="o-nhap" style="flex:1;min-width:200px"><i data-i="search" class="nho"></i>Tìm tên hoặc số báo danh</div>
+        </div>
+        <div class="chu-giai mt-4"><span><i class="cham dung"></i>Chăm</span><span><i class="cham chu-y"></i>Chưa đều</span><span><i class="cham sai"></i>Lười</span><span class="day mo">% Lười</span></div>
+        <div class="cot mt-3" style="gap:6px">
+          <div class="lop-dong"><b>12 Lớp Thường</b><div class="xep"><i class="c" style="width:12%"></i><i class="d" style="width:28%"></i><i class="l" style="width:60%"></i></div><span class="dam sai-mau" style="text-align:right">60%</span></div>
+          <div class="lop-dong"><b>11B</b><div class="xep"><i class="c" style="width:18%"></i><i class="d" style="width:28%"></i><i class="l" style="width:54%"></i></div><span class="dam sai-mau" style="text-align:right">54%</span></div>
+          <div class="lop-dong"><b>10A2</b><div class="xep"><i class="c" style="width:27%"></i><i class="d" style="width:28%"></i><i class="l" style="width:45%"></i></div><span class="dam" style="text-align:right">45%</span></div>
+          <div class="lop-dong"><b>12A2</b><div class="xep"><i class="c" style="width:30%"></i><i class="d" style="width:27%"></i><i class="l" style="width:43%"></i></div><span class="dam" style="text-align:right">43%</span></div>
+          <div class="lop-dong"><b>10A1</b><div class="xep"><i class="c" style="width:34%"></i><i class="d" style="width:28%"></i><i class="l" style="width:38%"></i></div><span class="dam" style="text-align:right">38%</span></div>
+          <div class="lop-dong"><b>12A1</b><div class="xep"><i class="c" style="width:48%"></i><i class="d" style="width:26%"></i><i class="l" style="width:26%"></i></div><span class="dam" style="text-align:right">26%</span></div>
+        </div>
+        <a class="lien-ket mt-2">Xem bảng từng ngày <i data-i="chevron" class="nho"></i></a>
+      </section>
+    </div>
+
+    <div class="cot" style="gap:20px">
+      <section class="the">
+        <div class="the-dau"><div class="h3">12 bậc từ Lười đến Chăm</div></div>
+        <p class="mo">249 em đã xếp bậc · 13 em chưa đủ dữ liệu</p>
+        <svg id="bac" style="width:100%;height:150px;display:block;margin-top:8px"></svg>
+        <div class="hang giua mo"><span>← Lười</span><span>Chưa đều</span><span>Chăm →</span></div>
+      </section>
+
+      <section class="the dem">
+        <div class="the-dau" style="padding:18px 20px 4px;margin:0"><div class="h3">Em cần thầy để ý</div><span class="chip sai">Lười · 101</span></div>
+        <div class="ds">
+          <div class="dong"><span class="av a3">TN</span><div class="giua"><p class="ten">Đinh Tuấn Ngọc</p><p class="mo">12 Lớp Th. · 30 ngày không làm</p><div class="ngay14 mt-1"><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i></div></div><span class="phai"><i data-i="chevron"></i></span></div>
+          <div class="dong"><span class="av a2">HM</span><div class="giua"><p class="ten">Trịnh Hương Minh</p><p class="mo">10A1 · 9 ngày không làm</p><div class="ngay14 mt-1"><i class="t"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="t"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i><i class="k"></i></div></div><span class="phai"><i data-i="chevron"></i></span></div>
+          <div class="dong"><span class="av">TL</span><div class="giua"><p class="ten">Bùi Thu Linh</p><p class="mo">11A3 · 6 ngày không làm</p><div class="ngay14 mt-1"><i class="d"></i><i class="t"></i><i class="k"></i><i class="k"></i><i class="d"></i><i class="k"></i><i class="k"></i><i class="t"></i><i class="k"></i><i class="k"></i><i class="k"></i></div></div><span class="phai"><i data-i="chevron"></i></span></div>
+        </div>
+        <div style="padding:4px 20px 12px"><a class="lien-ket">Xem đủ 101 em <i data-i="chevron" class="nho"></i></a></div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>veCot('bac', [['1',22,'sai'],['2',21,'sai'],['3',21,'sai'],['4',16,'sai'],['5',21,'sai'],['6',40,'chu-y'],['7',30,'chu-y'],['8',26,'dung'],['9',19,'dung'],['10',15,'dung'],['11',11,'dung'],['12',7,'sao']], { khongTruc: true, soTren: true, max: 44 })</script>
+</body></html>

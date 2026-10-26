@@ -1,0 +1,120 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Hồ sơ làm bài</title><link rel="stylesheet" href="trong.css">
+<style>
+p{text-wrap:pretty}
+.dau-hs{display:flex;gap:16px;align-items:center}
+.lich{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.lich .thu{font-size:12px;color:var(--chu-3);text-align:center}
+.lich .o{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:52px;border-radius:10px;background:var(--mat-2);line-height:1.15}
+.lich .o small{font-size:11px;color:var(--chu-3)}
+.lich .o b{font-size:15px;font-weight:600;color:var(--chu-3)}
+.lich .o.m1{background:color-mix(in srgb,var(--dung) 18%,var(--mat))}
+.lich .o.m2{background:color-mix(in srgb,var(--dung) 38%,var(--mat))}
+.lich .o.m3{background:color-mix(in srgb,var(--dung) 62%,var(--mat))}
+.lich .o.m1 b,.lich .o.m2 b,.lich .o.m3 b{color:var(--chu)}
+.lich .o.hom-nay{box-shadow:0 0 0 2px var(--chinh)}
+.xep{display:flex;height:12px;border-radius:999px;overflow:hidden;background:var(--mat-3);gap:2px}
+.xep i{display:block;height:100%}
+.m-1{background:var(--sai)}.m-2{background:var(--chu-y)}.m-3{background:color-mix(in srgb,var(--dung) 55%,var(--mat))}.m-4{background:var(--dung)}.m-5{background:var(--chu-3)}
+.muc .dong{min-height:48px;padding:10px 0}
+.muc .vuong-mau{width:12px;height:12px;border-radius:4px;flex:none}
+.giay .hang{gap:12px}
+.giay .ten-md{width:110px;flex:none;font-size:14px;color:var(--chu-2)}
+.giay .thanh{flex:1}
+.giay .so-g{width:112px;white-space:nowrap;text-align:right;flex:none;font-size:14px;font-weight:600}
+.giay .hang+.hang{margin-top:14px}
+.ba-so{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ba-so>div{padding:12px;border-radius:12px;background:var(--mat-2)}
+.ba-so .so{font-size:22px}
+@media (max-width:600px){
+  .giay .ten-md{width:96px;font-size:13px}.giay .so-g{width:auto;font-size:13px}
+  .lich .o{min-height:44px}
+}
+</style></head>
+<body data-app="hs" data-tab="hom-nay" data-khung="man-con" data-tieu="Hồ sơ làm bài của em" data-phu="Cách em học 14 ngày qua" data-ve="Hôm nay">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: nhãn «Học thật» + lời thầy lên đầu, liền với 4 số 7 ngày (một dải số thay cho 4 ô to). «Mức làm» là một thanh xếp + 5 dòng.
+       Một nút chính «Sửa lỗi ngay» ở thẻ «Câu từng sai»; «Lọc lượt» thu về liên kết «Xem từng lượt». Bỏ chip «Độ tin cậy». -->
+  <section class="the">
+    <div class="dau-hs">
+      <span class="o-icon dung lon"><i data-i="check-circle"></i></span>
+      <div style="flex:1;min-width:0">
+        <div class="hang" style="gap:8px;flex-wrap:wrap"><h1 class="h2">Học thật</h1><span class="chip">13/10 – 26/10</span></div>
+        <p class="phu mt-1">Em đọc đề, có thời gian nghĩ và làm đều theo ngày. Thầy cũng thấy bảng này.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="dai-kpi" style="--n:4">
+    <div class="kpi"><span class="nhan">Câu em làm trong 7 ngày</span><span class="so">178<small>câu</small></span><span class="mo">20/10 – 26/10</span></div>
+    <div class="kpi"><span class="nhan">Tỉ lệ đúng 7 ngày</span><span class="so dung-mau">81<small>%</small></span><span class="mo">144/178 câu</span></div>
+    <div class="kpi"><span class="nhan">Trung bình mỗi câu</span><span class="so">1<small>phút</small> 12<small>giây</small></span><span class="mo">chỉ tính lượt đo được</span></div>
+    <div class="kpi"><span class="nhan">Ngày có làm bài</span><span class="so">6<small>/7 ngày</small></span><span class="mo">nghỉ Thứ Sáu 23/10</span></div>
+  </div>
+
+  <div class="chinh-phu">
+    <div class="cot" style="gap:20px">
+      <section class="the">
+        <div class="the-dau"><div class="h3">Câu từng sai</div><span class="mo">14 ngày</span></div>
+        <div class="ba-so">
+          <div><p class="mo">câu sai</p><p class="so">41</p></div>
+          <div><p class="mo">tự sửa được</p><p class="so dung-mau">29</p></div>
+          <div><p class="mo">chưa sửa được</p><p class="so sai-mau">12</p></div>
+        </div>
+        <div class="ds mt-2">
+          <div class="dong" style="min-height:52px"><span class="cham sai"></span><div class="giua"><p class="ten">Saccharose và maltose</p><p class="mo">5 câu đang chờ em tự sửa</p></div></div>
+          <div class="dong" style="min-height:52px"><span class="cham sai"></span><div class="giua"><p class="ten">Amine</p><p class="mo">4 câu đang chờ em tự sửa</p></div></div>
+          <div class="dong" style="min-height:52px"><span class="cham sai"></span><div class="giua"><p class="ten">Đại cương về polymer</p><p class="mo">3 câu đang chờ em tự sửa</p></div></div>
+        </div>
+        <span class="nut chinh lon rong-het mt-3">Sửa lỗi ngay <i data-i="arrow"></i></span>
+      </section>
+
+      <section class="the muc">
+        <div class="the-dau"><div class="h3">Mức làm</div><span class="mo">310 lượt làm câu trong 14 ngày</span></div>
+        <p class="h2"><span class="dung-mau">89,4%</span> lượt em có thời gian nghĩ hoặc làm kỹ</p>
+        <div class="xep mt-4" id="xep" role="img" aria-label="Tỉ lệ lượt theo Mức làm"></div>
+        <div class="ds mt-2" id="muc-ds"></div>
+        <a class="lien-ket">Xem từng lượt <i data-i="chevron" class="nho"></i></a>
+      </section>
+
+    </div>
+
+    <div class="cot" style="gap:20px">
+      <section class="the">
+        <div class="the-dau"><div class="h3">Làm bài 7 ngày</div><span class="mo">số câu mỗi ngày</span></div>
+        <svg id="cot7" style="width:100%;height:150px;display:block" role="img" aria-label="Số câu em làm mỗi ngày, 7 ngày gần nhất"></svg>
+        <div class="vach"></div>
+        <div class="the-dau"><div class="h3">Lịch làm bài theo ngày</div><span class="mo">14 ngày</span></div>
+        <div class="lich" id="lich"></div>
+      </section>
+      <section class="the giay">
+        <div class="the-dau"><div class="h3">Số giây theo mức độ câu</div><span class="mo">dễ → khó</span></div>
+        <div class="hang"><span class="ten-md">Nhận biết</span><div class="thanh dung" style="--p:17%"><i></i></div><span class="so-g">38 giây</span></div>
+        <div class="hang"><span class="ten-md">Thông hiểu</span><div class="thanh dung" style="--p:30%"><i></i></div><span class="so-g">1 phút 5 giây</span></div>
+        <div class="hang"><span class="ten-md">Vận dụng</span><div class="thanh chu-y" style="--p:55%"><i></i></div><span class="so-g">2 phút</span></div>
+        <div class="hang"><span class="ten-md">Vận dụng cao</span><div class="thanh chu-y" style="--p:100%"><i></i></div><span class="so-g">3 phút 40 giây</span></div>
+        <p class="mo mt-4">Giây trung bình mỗi câu, chỉ tính lượt đo được.</p>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // 14 ngày 13/10 (Thứ Ba) → 26/10 (Thứ Hai, hôm nay). Mọi con số tính từ mảng này để khớp nhau: 7 ngày = 178 câu, 14 ngày = 310 lượt.
+  const cau = [18, 24, 0, 30, 26, 22, 12, 28, 32, 24, 0, 36, 30, 28]
+  const thu = ['T3', 'T4', 'T5', 'T6', 'T7', 'CN', 'T2']
+  const c7 = cau.slice(7), tong = cau.reduce((a, b) => a + b, 0)
+  veCot('cot7', c7.map((v, i) => [thu[i], v, i === 6 ? 'chinh' : 'nhat']), { khongTruc: true, soTren: true, max: 40 })
+  document.getElementById('lich').innerHTML = thu.map((t) => `<span class="thu">${t}</span>`).join('') + cau.map((v, i) => {
+    const m = v === 0 ? '' : v < 20 ? 'm1' : v < 30 ? 'm2' : 'm3'
+    return `<div class="o ${m}${i === 13 ? ' hom-nay' : ''}" title="${13 + i}/10 · ${v} câu"><small>${13 + i}</small><b>${v || '–'}</b></div>`
+  }).join('')
+  // Mức làm (nhãn học sinh đúng app thật: TEN_MUC_EM + «Máy để treo»). Tổng lượt = tổng câu 14 ngày = 310.
+  const muc = [[1, 'Nộp trước khi đọc hết đề', 6], [2, 'Đọc xong thì nộp ngay', 19], [3, 'Có thời gian nghĩ', 102], [4, 'Làm kỹ, đúng nhịp lớp', 175], [5, 'Máy để treo', 8]]
+  const tongLuot = muc.reduce((a, m) => a + m[2], 0)
+  if (tongLuot !== tong) console.error('Mức làm lệch tổng câu')
+  const pt = (n) => ((n / tongLuot) * 100).toFixed(1).replace('.', ',') + '%'
+  document.getElementById('xep').innerHTML = muc.map(([m, , n]) => `<i class="m-${m}" style="width:${(n / tongLuot) * 100}%"></i>`).join('')
+  document.getElementById('muc-ds').innerHTML = muc.map(([m, t, n]) => `<div class="dong"><span class="vuong-mau m-${m}"></span><div class="giua"><p style="font-size:14px"><span class="mo">Mức ${m} ·</span> ${t}</p>${m === 5 ? '<p class="mo">lượt dài nhất để treo 9 phút</p>' : ''}</div><span class="dam">${n}</span><span class="mo" style="width:48px;text-align:right">${pt(n)}</span></div>`).join('')
+</script>
+</body></html>

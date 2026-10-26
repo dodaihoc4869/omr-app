@@ -1,0 +1,81 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Tự sửa lỗi</title><link rel="stylesheet" href="trong.css">
+<style>
+sub,sup{line-height:0}
+.tong{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:32px;align-items:center;padding:24px}
+.tong .so-lon small{font-size:.4em}
+.ba-thanh{display:flex;height:12px;border-radius:999px;overflow:hidden;background:var(--mat-3);gap:2px}
+.ba-thanh i{display:block;height:100%;flex:none}
+.ba-thanh .x{background:var(--dung)}.ba-thanh .c{background:var(--chu-y)}.ba-thanh .s{flex:1;background:color-mix(in srgb,var(--sai) 75%,var(--mat))}
+.chu-giai{display:flex;flex-wrap:wrap;gap:6px 18px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-2)}
+.chu-giai b{color:var(--chu);font-weight:600}
+.cau-ds .dong{align-items:flex-start;min-height:80px}
+.cau-ds .dong .phai{align-self:center}
+.cau-ds .ten{font-weight:600}
+.cau-ds .chip{margin-top:8px;white-space:normal;min-height:24px;padding:3px 10px;line-height:1.35}
+.cau-ds .nut{min-width:96px}
+.tab .so-tab{font-size:12px;font-weight:600;color:var(--chu-3);background:var(--mat-3);border-radius:999px;padding:1px 7px}
+.tab>span.on .so-tab{background:var(--chinh-nhat);color:var(--chinh-chu)}
+@media (max-width:1100px){.phu-cot{order:-1}}
+@media (max-width:900px){.tong{grid-template-columns:auto minmax(0,1fr);gap:20px}.tong .nut{grid-column:1/-1}}
+@media (max-width:600px){
+  .tong{grid-template-columns:minmax(0,1fr);padding:18px;gap:16px}
+  .tong .nut{width:100%}
+  .cau-ds .o-icon{display:none}
+  .cau-ds .nut{min-width:0;padding:0 14px}
+  .the-dau .tab{width:100%}
+}
+</style></head>
+<body data-app="hs" data-tab="on-sua" data-khung="man-con" data-ve="Hôm nay" data-tieu="Tự sửa lỗi" data-phu="Sửa lại câu em làm sai">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: ba ô số + thanh hai màu + nút «Sửa tiếp» gộp một thẻ đầu trang; ba thẻ nhóm (Cần sửa · Đang chờ · Đã tự sửa) thành ba nhãn chuyển trong một danh sách.
+       «Kiểm lại sau Hỏi thầy» đưa lên cạnh vì đã đến lịch; bỏ tiêu đề to lặp tên màn. -->
+  <section class="the tong" aria-label="Tổng quan tự sửa lỗi">
+    <div>
+      <p class="nhan">Câu đang chờ em sửa</p>
+      <p class="so-lon mt-2">107<small>câu</small></p>
+    </div>
+    <div style="min-width:0">
+      <div class="ba-thanh" role="img" aria-label="145 câu: đã tự sửa 29, chờ lần gặp lại 9, cần sửa 107"><i class="x" style="width:20%"></i><i class="c" style="width:6.2%"></i><i class="s"></i></div>
+      <div class="chu-giai mt-3">
+        <span><span class="cham dung"></span>Đã tự sửa: <b>29/145 câu</b><span class="delta len">+4 hôm nay</span></span>
+        <span><span class="cham chu-y"></span>Chờ lần gặp lại: <b>9 câu</b></span>
+        <span><span class="cham sai"></span>Cần sửa: <b>107 câu</b></span>
+      </div>
+    </div>
+    <span class="nut chinh lon">Sửa tiếp <i data-i="arrow"></i></span>
+  </section>
+
+  <div class="chinh-phu">
+    <section class="the dem cau-ds">
+      <div class="the-dau" style="padding:16px 20px 8px;margin:0">
+        <div class="tab" role="tablist" aria-label="Nhóm câu">
+          <span class="on">Cần sửa <span class="so-tab">107</span></span>
+          <span>Đang chờ lần gặp lại <span class="so-tab">9</span></span>
+          <span>Đã tự sửa <span class="so-tab">29</span></span>
+        </div>
+      </div>
+      <div class="ds">
+        <div class="dong"><span class="o-icon chu-y"><i data-i="pen"></i></span><div class="giua"><p class="ten">Nitric acid – tính oxi hoá với kim loại</p><p class="mo">Trắc nghiệm · sai lần gần nhất 24/10</p><span class="chip chu-y">Đang sửa từng bước</span></div><span class="phai"><span class="nut nhe">Sửa tiếp</span></span></div>
+        <div class="dong"><span class="o-icon xam"><i data-i="pen"></i></span><div class="giua"><p class="ten">Điện phân dung dịch – thứ tự khử ở cathode</p><p class="mo">Đúng–sai · sai lần gần nhất 23/10</p><span class="chip">Chưa bắt đầu</span></div><span class="phai"><span class="nut">Sửa</span></span></div>
+        <div class="dong"><span class="o-icon xam"><i data-i="pen"></i></span><div class="giua"><p class="ten">pH của dung dịch acid, base mạnh</p><p class="mo">Trả lời ngắn · sai lần gần nhất 22/10</p><span class="chip tin">Sửa trên câu gốc</span></div><span class="phai"><span class="nut">Sửa</span></span></div>
+        <div class="dong"><span class="o-icon xam"><i data-i="pen"></i></span><div class="giua"><p class="ten">Ester – phản ứng thuỷ phân trong môi trường kiềm</p><p class="mo">Trắc nghiệm · sai lần gần nhất 21/10</p><span class="chip">Chờ chữa trên lớp · em sửa trước được</span></div><span class="phai"><span class="nut">Sửa</span></span></div>
+        <div class="dong"><span class="o-icon xam"><i data-i="lock"></i></span><div class="giua"><p class="ten">Ammonia – tính base và tính khử</p><p class="mo">Trắc nghiệm · sai lần gần nhất 20/10</p><span class="chip vien">Tạm khoá · tiến độ được giữ</span></div><span class="phai"><span class="nut">Sửa</span></span></div>
+      </div>
+      <div style="padding:0 20px 8px"><a class="lien-ket">Xem tiếp các câu <i data-i="chevron-down" class="nho"></i></a></div>
+    </section>
+
+    <div class="cot phu-cot" style="gap:20px">
+      <section class="the">
+        <div class="the-dau"><span class="o-icon tin"><i data-i="ask"></i></span><div class="h3">Kiểm lại sau Hỏi thầy<p class="mo" style="font-weight:400">1 câu</p></div></div>
+        <p class="dam">Ester – gọi tên theo danh pháp thay thế</p>
+        <div class="hang mt-2" style="flex-wrap:wrap;gap:8px"><span class="chip chu-y">Đến lịch kiểm lại</span><span class="mo">Câu kiểm lại</span></div>
+        <span class="nut rong-het mt-4">Kiểm lại</span>
+      </section>
+      <a class="lien-ket an-hep" style="padding:0 4px">Luyện thêm ở Tu luyện <i data-i="chevron" class="nho"></i></a>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>
