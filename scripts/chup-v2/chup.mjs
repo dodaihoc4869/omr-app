@@ -268,7 +268,7 @@ const DS_NG_GV = MAN_NG.flatMap(([ten, man, cho, viec]) => KHO_NG.flatMap(([w, h
   [`ng-${ten}-${kho}${nen === 'dark' ? '-toi' : ''}`, man, w, hh, nen, ten !== 'ho-so' && w >= 700 && hh >= 700, cho, viec])))
 // ═══ hết NGANG GV 26/10
 // ═══ DUO 26/10: màn làm chặng kiểu Duolingo (`?man=lam13&lam=duo`, bản vẽ docs/ban-ve-duo-2610) — 6 trạng thái + câu Đúng/Sai + câu có hình + tấm lời giải,
-// điện thoại (390×844, 390×700) / ngang 844×390 / máy tính 1440×900, sáng + tối. Thao tác `lam13:` dùng chung khối LÀN MÀN LÀM BÀI. Tiền tố "duo-".
+// điện thoại (390×844, 390×700, 360×640) / ngang 844×390 / máy tính 1440×900, sáng + tối. Thao tác `lam13:` dùng chung khối LÀN MÀN LÀM BÀI. Tiền tố "duo-".
 const D_Q1 = 'tn:^D » nut:^Kiểm tra$ » nut:^Tiếp tục'
 const D_Q3 = `${D_Q1} » tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục`
 const D_Q4 = `${D_Q3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Tiếp tục`
@@ -278,7 +278,7 @@ const DUO_CANH = [
   ['8-dung-sai', `lam13:${D_Q3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$`], ['5-tln', `lam13:${D_Q4} » phim:8,2`],
   ['6-xong', `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
 ]
-const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   DUO_CANH.map(([t, viec]) => [`duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết DUO 26/10
 

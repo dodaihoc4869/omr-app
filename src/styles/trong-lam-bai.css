@@ -481,5 +481,5 @@
 [data-trong].may-yeu :is(.duo-ket, .duo-lg-the) { animation: none; }
 [data-trong].may-yeu .duo-thanh > i { transition: none; }
 [data-trong] .duo-hai .duo-nut { padding: 0 10px; font-size: 15px; letter-spacing: .02em; }
-/* lưới 2×2: ô hẹp ⇒ nhãn «Em chọn · đáp án» chỉ cho trình đọc màn hình (màu ô + tấm kết quả «Đáp án: …» đã nói) */
-[data-trong] .duo .duo-tra[data-luoi] .ht2-lam-pa-nhan { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Ô phương án KHÔNG chèn chữ «Em chọn · đáp án» ở mọi khổ (như bản vẽ: màu xanh/đỏ + tấm kết quả «Đáp án: …» đã nói) — chữ chỉ còn cho trình đọc màn hình. */
+[data-trong] .duo .ht2-lam-pa-nhan { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

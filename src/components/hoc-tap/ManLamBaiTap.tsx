@@ -368,7 +368,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
               {lanTruoc && <p className="duo-mo">Chấm theo đáp án em nộp lần trước.</p>}
             </div>
           </div>
-          <div className="duo-them">{linkGiai}{linkHoi}{coTuChua && <button type="button" className="duo-lien" onClick={() => onChua(q.qid)}><PenLine size={18} aria-hidden="true" />Sửa câu này</button>}</div>
+          <div className="duo-them">{linkGiai}{linkHoi}{/* thầy 26/10 «Bỏ câu sai từng bước»: tấm kết quả không có «Sửa câu này» — chỉ Lời giải từng bước + Hỏi thầy */}</div>
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
           <button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' ? 'do' : undefined} onClick={tiep}>Tiếp tục</button>
         </div></section>
