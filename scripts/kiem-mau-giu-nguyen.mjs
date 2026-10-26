@@ -201,6 +201,9 @@ const GAME_DA_GO = new Map(JSON.parse(readFileSync(new URL('../docs/don-game-141
 // `cu` = khai báo màu của bản cũ được phép biến mất (khoá → số lần được giảm); `moi` = chín biến màu gốc được phép khai thô (mọi màu khác trong hai bảng phải là var()/color-mix()).
 const LENH_2110 = JSON.parse(readFileSync(new URL('../docs/mau-thay-ra-lenh-2110.json', import.meta.url), 'utf8'))
 const MAU_CU_THAY_RA_LENH = LENH_2110.cu // khoá → số lần khai báo được phép GIẢM (đúng con số đo lúc thầy ra lệnh; giảm thêm là vi phạm)
+// 26/10: gỡ CSS CHẾT (luật mà mọi bộ chọn trỏ tới lớp không còn mã nào dùng) để giao diện «Trong» không làm app nặng hơn — danh sách đóng ở
+// docs/css-chet-2610.json (khoá → số lần, đúng lúc gỡ). Cộng vào MAU_CU_THAY_RA_LENH; giảm thêm ngoài danh sách vẫn là vi phạm.
+for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2610.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 const MAU_THAY_RA_LENH = new Set([
   'src/styles/tokens.css · --v2-nga-voi: #fffef6',
   'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',

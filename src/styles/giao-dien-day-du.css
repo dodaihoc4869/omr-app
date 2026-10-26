@@ -22,21 +22,11 @@
 .ct-moca .ct-buoc[hidden] { display:none; }
 .ct-suite { display:flex; justify-content:space-between; gap:12px; padding:16px 0; }
 .ct-suite button { min-height:48px; }
-.v2t.v2 { padding:24px 16px 100px; max-width:1440px; margin-inline:auto; }
-.v2t .v2t-chinh { gap:24px; }
-.v2t .v2t-thong-tin { padding:24px; border-radius:28px; }
-.ps.ps-v2 .ps-man { max-width:1440px; margin-inline:auto; padding-bottom:calc(24px + env(safe-area-inset-bottom)); }
-.ps.ps-v2 button { touch-action:manipulation; }
 .h2-cdl .h2-cdl-dau { gap:16px; padding:20px 16px; }
 .h2-cdl .h2-cdl-tieu { font-size:clamp(24px,3vw,34px); }
 .h2-cdl .h2-cdl-ds { display:grid; gap:16px; }
 .h2-cdl .h2-the { border-radius:24px; }
 .h2-cdl .h2-the-de { line-height:1.7; }
-.dao2 .dao2-xong { max-width:1200px; margin-inline:auto; padding:24px; gap:24px; }
-.dao2 .dao2-xong-canh { max-height:360px; }
-.dh2 .dh2-thang { gap:24px; }
-.dh2 .dh2-thang .dh2-qua { gap:12px; }
-.dh2 .dh2-thang .dh2-cot-phai { gap:16px; }
 .bl-login .bl-login__card { border-radius:28px; padding:28px; }
 .ph3-vao .ph3-vao__the { border-radius:28px; padding:28px; }
 .gd-cong-gioi-thieu { display:grid; gap:16px; max-width:480px; }
@@ -52,7 +42,6 @@
  .gv-kho-bo-loc { grid-template-columns:180px minmax(0,1fr); }
  .gv-cai-dat-day-du { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
  .gv-cai-dat-day-du > .gv-page-header,.gv-cai-dat-day-du > section { grid-column:1 / -1; }
- .v2t .v2t-chinh { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
  .h2-cdl { max-width:1440px; margin-inline:auto; padding-inline:28px; }
  .h2-cdl .h2-cdl-ds { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
  .h2-cdl .h2-lsc-diem { font-size:44px; }
@@ -68,11 +57,8 @@
 @media (orientation:landscape) and (max-height:540px) {
  .gd-cong-gioi-thieu { display:none; }
  .bl-login .bl-login__card,.ph3-vao .ph3-vao__the { margin:16px auto; }
- .v2t .v2t-chinh { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
- .dao2 .dao2-xong-canh { max-height:240px; }
 }
 .hs-thao-tac summary { cursor:pointer; min-height:48px; display:flex; align-items:center; gap:8px; font-weight:600; }
-.ps.ps-v2 .ps-loc button,.ps.ps-v2 .ps-tab,.ps.ps-v2 .ps-chip { min-height:48px; }
 @media (min-width:1000px) {
  [data-teacher-screen] .gv-hoc-sinh-day-du .gv-student-list { grid-template-columns:1fr; }
  [data-teacher-screen] .gv-hoc-sinh-day-du .gv-student-list > [data-sbd] { display:grid; grid-template-columns:minmax(0,1fr) minmax(160px,auto) 220px; gap:16px; align-items:center; }
@@ -108,5 +94,4 @@
 .hs-hoc-tap .tc { padding:16px !important; min-height:0; }
 [data-teacher-screen] .ca-bang-dau { position:sticky; top:0; z-index:2; }
 [data-teacher-screen] .ls-trang .ls-the { border-radius:24px; }
-html:root body .ps.ps-v2 .ps-loc .tl-the { min-height:48px; }
 html:root body .ct .ct-etapes button,html:root body .ct .ct-suite button { min-height:48px; }

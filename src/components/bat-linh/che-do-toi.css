@@ -36,20 +36,6 @@
   }
   html:root body[data-bat-linh] :is(.bl-login__card, .ph3-vao__the) { border-color: var(--bl-line); }
   html:root body[data-bat-linh] :is(.bl-login, .ph3-vao__the) :is(input, select) { background: var(--bl-ground); color: var(--bl-ink); }
-  html:root body[data-bat-linh] .ph3-vao__chan { background: var(--bl-paper); }
-  html:root body[data-bat-linh] :is(.h2-sanh, .tlu, .ph3) { background: radial-gradient(ellipse at top, rgb(27 59 49), transparent 70%), var(--bl-ground); color-scheme: dark; }
-  html:root body[data-bat-linh] .h2-sanh {
-    --h2-kinh-nen: var(--bl-paper); --h2-ngoc: var(--bl-teal); --h2-ngoc-sang: var(--bl-teal);
-    --h2-hong: var(--bl-danger); --h2-cam-chu: var(--bl-warm-ink); --h2-xanh: var(--bl-success);
-    --h2-lua: var(--bl-warm-ink); --h2-khoa: var(--bl-warm-ink); --h2-net-nhat: rgb(205 233 213 / .18);
-  }
-  html:root body[data-bat-linh] .h2-sanh :is(.h2-nut-dao:disabled, .h2-ruong-da) { background: var(--bl-warm); border-color: var(--bl-line); }
-  html:root body[data-bat-linh] .h2-sanh .h2-xong { background: var(--bl-teal-soft); border-color: var(--bl-line); }
-  html:root body[data-bat-linh] .h2-ng-xong { background: linear-gradient(rgb(13 29 28 / .7), rgb(13 29 28 / .92)), var(--bl-scene) center / cover; }
-  html:root body[data-bat-linh] .bl-dong-hanh { border-color: var(--bl-line); background: linear-gradient(180deg, rgb(13 29 28 / .92), rgb(13 29 28 / .3) 55%, rgb(13 29 28 / .72)), var(--bl-scene) center / cover; }
-  html:root body[data-bat-linh] .bl-dong-hanh__dau h1 { color: var(--bl-ink); }
-  html:root body[data-bat-linh] .bl-dong-hanh__dau p { color: var(--bl-muted); }
-  html:root body[data-bat-linh] :is(.bl-ban-dong-hanh__ten, .bl-dong-hanh__loi) { background: var(--bl-paper); color: var(--bl-ink); border-color: var(--bl-line); }
   html:root body[data-bat-linh] .bl-bieu-cam { background: var(--bl-raised); box-shadow: 0 3px 10px rgb(0 0 0 / .3), 0 0 0 3px rgb(24 43 40 / .8); }
   html:root body[data-bat-linh] .tlu {
     --tlu-nen-3: var(--bl-raised); --tlu-nhan-chu: var(--bl-on-teal); --tlu-ngoc: var(--bl-success); --tlu-do: var(--bl-danger);
@@ -67,8 +53,6 @@
     --ph3-ho: var(--bl-danger); --ph3-ho-nen: var(--bl-danger-bg); --ph3-ho-dam: var(--bl-danger);
     --ph3-tim: var(--bl-success); --ph3-tim-nen: var(--bl-teal-soft); --ph3-tim-dam: var(--bl-success); --ph3-tim-nhat: var(--bl-muted);
   }
-  html:root body[data-bat-linh] .ph3-dieu-huong { background: var(--bl-paper); }
-  html:root body[data-bat-linh] .ph3-muc[aria-current='page'] { background: var(--bl-teal-soft); }
   html:root body[data-bat-linh] .ph3-ah { border-color: var(--bl-line); }
   html:root body[data-bat-linh] .dao {
     --dao-nen-2: var(--bl-raised); --dao-nen-anh: var(--bl-raised); --dao-vang-so: var(--bl-warm-ink);
@@ -84,42 +68,11 @@
     --d2-tat-nen: var(--bl-raised); --d2-tat-chu: var(--bl-muted); --d2-moi-chu: var(--bl-warm-ink);
     --d2-mat-troi: 0; --d2-dem: 1; --d2-may: .25; color-scheme: dark;
   }
-  html:root body[data-bat-linh] .dao2 .dao2-bd-vung li { background: var(--bl-paper); box-shadow: inset 0 0 0 1px var(--bl-line); }
-  html:root body[data-bat-linh] .dao2 .dao2-bd-vai li { background: var(--bl-warm); color: var(--bl-warm-ink); box-shadow: inset 0 0 0 1px var(--bl-line); }
-  html:root body[data-bat-linh] .dao2 .dao2-bd-vai li[data-vai=on_lai] { background: var(--bl-teal-soft); color: var(--bl-teal); }
-  html:root body[data-bat-linh] .dao2 .dao2-ruong { background: var(--bl-warm); border-color: var(--bl-line); }
-  html:root body[data-bat-linh] .bl-dao-tranh img { filter: brightness(.65) saturate(.8); }
-  html:root body[data-bat-linh] .dao :is(.dao-chip-lua, .dao-chip-exp, .dao-tien-hoa-dau span, .dao-tien-hoa li[data-hien-tai] small, .dao-chon-goi-y) { color: var(--bl-warm-ink); }
-  html:root body[data-bat-linh] .dao2 .dao2-xong-canh { background: linear-gradient(rgb(13 29 28 / .8), rgb(13 29 28 / .4)), var(--bl-scene) center / cover; }
-  html:root body[data-bat-linh] .dao2 .dao2-xong-canh p { background: var(--bl-paper); }
-  html:root body[data-bat-linh] .dao :is(.dao-chon-tranh, .dao-hon) { background: linear-gradient(rgb(13 29 28 / .45), rgb(13 29 28 / .65)), var(--bl-scene) center / cover; }
   html:root body[data-bat-linh] .ps {
     --ch-may: linear-gradient(var(--bl-raised), var(--bl-ground)); --ch-to-nen: var(--bl-raised);
     --ch-vang-so: var(--bl-warm-ink); --ch-vang-chu: var(--bl-warm-ink); color-scheme: dark;
   }
-  html:root body[data-bat-linh] .ps .ps-tt-khoa { background: var(--bl-raised); }
-  html:root body[data-bat-linh] .ps .ps-tt-thieu { background: var(--bl-warm); color: var(--bl-warm-ink); }
-  html:root body[data-bat-linh] .spirit-game { color-scheme: dark; }
-  html:root body[data-bat-linh] .spirit-game :is(.spirit-nav button[aria-current='page'], .spirit-options button[aria-pressed='true'], .spirit-nodes .current),
-  html:root body[data-bat-linh] .spirit-tabs button.active { color: var(--bl-on-teal); }
   html:root body[data-bat-linh] .bia { --b-kinh-2: var(--bl-raised); --b-do: var(--bl-danger); --b-dung: var(--bl-success); --b-p0: var(--bl-warm-ink); --b-p1: var(--bl-teal); color-scheme: dark; }
-  html:root body[data-bat-linh] .bia :is(.bia-sanh, .bia-ket, .bia-cho) { background: linear-gradient(rgb(13 29 28 / .92), rgb(24 43 40 / .97)), var(--bl-scene) center / cover; }
   html:root body[data-bat-linh] .dh2 .dh2-canh,
   html:root body[data-bat-linh] .dao2 .dao2-canh { background: linear-gradient(rgb(8 27 25 / .48), rgb(13 29 28 / .62)), var(--bl-battle-scene) center 68% / cover; }
-  html:root body[data-bat-linh] .dh2 .dh-giay-dau .dh-vien-thuoc { background: var(--bl-teal-soft); color: var(--bl-teal); }
-  html:root body[data-bat-linh] :is(.dh-giay, .dh-tam-cau, .dh2-xem-lai, .dao2-giay, .dao2-the-giai) {
-    --nen: var(--bl-ground); --the: var(--bl-paper); --the-2: var(--bl-raised); --giay: var(--bl-paper);
-    --muc: var(--bl-ink); --nhat: var(--bl-muted); --mo: var(--bl-muted); --vien: var(--bl-line); --vien-dam: var(--bl-line);
-    --dh-muc: var(--bl-ink); --dh-giay: var(--bl-paper); color-scheme: dark;
-  }
-  html:root body[data-bat-linh] .dh .dh-giay-dau span { color: var(--bl-muted); }
-  html:root body[data-bat-linh] .dh .dh-giay-dau .dh-vien-thuoc { color: var(--bl-teal); }
-  html:root body[data-bat-linh] .dh .dh-pa button { background: var(--bl-raised); color: var(--bl-ink); box-shadow: inset 0 0 0 1.5px var(--bl-line); }
-  html:root body[data-bat-linh] .dh .dh-pa button > i { background: var(--bl-paper); color: var(--bl-muted); box-shadow: inset 0 0 0 1px var(--bl-line); }
-  html:root body[data-bat-linh] .dh .dh-pa button[aria-pressed=true] { background: var(--bl-teal-soft); box-shadow: inset 0 0 0 2px var(--bl-teal); }
-  html:root body[data-bat-linh] .dh .dh-pa button[data-kq=dung] { background: var(--bl-teal-soft); box-shadow: inset 0 0 0 2px var(--bl-success); }
-  html:root body[data-bat-linh] .dh .dh-pa button[data-kq=sai] { background: var(--bl-danger-bg); box-shadow: inset 0 0 0 2px var(--bl-danger); }
-  html:root body[data-bat-linh] .dh .dh-pa button:is([aria-pressed=true], [data-kq=dung], [data-kq=sai]) > i { background: var(--bl-paper); color: var(--bl-ink); }
-  html:root body[data-bat-linh] .dh2 .dh2-tam .dh-tam-cau { background: var(--bl-raised); color: var(--bl-ink); }
-  html:root body[data-bat-linh] .dh2 .dh2-tam .dh-tam-cau small { color: var(--bl-teal); }
 }

@@ -44,7 +44,6 @@
 
 /* Nút Hỏi thầy + lời giải chữ tạm (câu chưa có hồ sơ từng bước). */
 .lg-nut-hang--gon { padding: 8px 0 0; }
-.lg-nut--hoi { background: var(--m3-tertiary-container, var(--m3-secondary-container)); color: var(--m3-on-tertiary-container, var(--m3-on-secondary-container)); border-color: transparent; }
 .lg-cuon { flex: 1; overflow: auto; overscroll-behavior: contain; padding: 16px; }
 /* `.lg-van` (không phải `.lg-chu`): `.lg-chu` là chữ lý do từng phương án của TheCau (index.css) — trùng tên làm dòng lý do trong game bị căn giữa, thò thụt (29/09). */
 .lg-van { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; font-size: 16px; line-height: 1.6; }
@@ -65,9 +64,6 @@
 
 /* NÚT "HỎI THẦY" TRONG GAME (29/09): vỏ game đặt lại mọi nút (`.dh button`, `.spirit-game button` — đặc hiệu 0,1,1) làm nút thành chữ trơn / nền trắng.
  * Bộ chọn 0,2,1 thắng các luật ấy; màu có dự phòng rgb() vì trong game có thể không có biến M3. (Đảo dùng biến --nut-* riêng: xem dao.css.) */
-button.lg-nut.lg-nut--hoi {
-  border: 0; background: var(--m3-tertiary-container, rgb(255 216 232)); color: var(--m3-on-tertiary-container, rgb(49 17 29)); box-shadow: none;
-}
 
 /* THANG TỰ GỠ (Vòng học v2 GĐ2): thanh dưới hộp lời giải + ô Gửi thầy + hộp Luyện kiến thức nền. */
 .lg-thang {
@@ -112,7 +108,6 @@ button.lg-nut.lg-nut--hoi {
 .lg-ht-tieu-de { margin: 0; font-size: 16px; font-weight: 700; color: var(--m3-on-surface); }
 .lg-ht-log { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
 .lg-ht--gon .lg-ht-log { max-height: 420px; }
-.lg-ht-goi-y { color: var(--m3-on-surface-variant); }
 .lg-ht-em {
   align-self: flex-end; max-width: 82%; margin: 0; padding: 10px 14px; border-radius: 18px 18px 4px 18px; white-space: pre-wrap;
   background: var(--m3-primary-container); color: var(--m3-on-primary-container); font-size: 15px; line-height: 1.5;
@@ -126,10 +121,6 @@ button.lg-nut.lg-nut--hoi {
 .lg-ht-cho { margin: 0; font-size: 14px; color: var(--m3-on-surface-variant); }
 .lg-ht-loi { margin: 0; padding: 8px 12px; border-radius: 12px; background: var(--m3-error-container); color: var(--m3-on-error-container); font-size: 14px; }
 /* Lớp cũ không còn nơi dùng (ô nhắn nay là .lg-nh-*): chỉ giữ dòng màu (luật giữ màu 05/10), bỏ phần bố cục cho nhẹ. */
-.lg-ht-dem { color: var(--m3-on-surface-variant); }
-.lg-ht-phu { color: var(--m3-on-surface-variant); }
-.lg-ht-o { border: 1px solid var(--m3-outline); background: var(--m3-surface); color: var(--m3-on-surface); }
-.lg-ht-gui { border: 0; background: var(--m3-primary); color: var(--m3-on-primary); }
 /* HAI NÚT DƯỚI CÂU (thầy 13/10): "Hỏi thầy" nổi bật (màu chính, bóng mềm), "Lời giải từng bước" viền nhẹ. */
 .lg-nut-hoi-thay, .lg-nut-loi-giai {
   display: inline-flex; align-items: center; gap: 8px; min-height: 48px; border-radius: 999px; font: inherit; font-size: 15px;
