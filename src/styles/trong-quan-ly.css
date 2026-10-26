@@ -1,0 +1,90 @@
+/* «TRONG» — CÁC MÀN QUẢN LÝ APP THẦY (nhóm 4, thầy chốt bản vẽ 26/10: docs/ban-ve-trong-2610 · gv-ca-kiem-tra, gv-theo-doi-ca, gv-hoc-sinh, …).
+   Bảng điều khiển gọn kiểu Linear / Google Classroom: hàng số liệu là MỘT dải thẻ trắng chia vạch, bảng gọn đầu cột nền chìm, điện thoại thành danh sách;
+   mỗi màn một nút chính (màu app thầy). CHỈ đổi trình bày: mọi bộ chọn dưới [data-trong='gv'] (tắt «Trong» ⇒ y giao diện cũ), chỉ var(--tr-*).
+   Nạp từ chính các tệp màn (mảnh nạp lười), không từ App.tsx. MỖI MÀN MỘT TỆP (tệp này = Ca kiểm tra; trong-quan-ly-<màn>.css = màn khác), mỗi tệp
+   chỉ MỘT màn nạp ⇒ CSS gộp vào mảnh sẵn có của màn, không đẻ thêm mảnh chung (precache giữ ≤ 170 tệp — scripts/kiem-sw.mjs). */
+
+/* ── 0. Mẫu chung: tiêu đề màn, dải số, thẻ, bảng ───────────────────────────────────────────────────────────────── */
+[data-trong='gv'] .ls-trang .gv2-tieu-de { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] .ls-trang .gv2-kpi--3 {
+  gap: 0; background: var(--tr-mat); border: 1px solid var(--tr-vien); border-radius: 20px; box-shadow: var(--tr-bong-1); overflow: hidden;
+}
+[data-trong='gv'] .ls-trang .gv2-the.gv2-the-so[data-mau] {
+  gap: 6px; min-height: 0; padding: 18px 20px; background: none; border: 0; border-left: 1px solid var(--tr-vien); border-radius: 0; box-shadow: none; color: var(--tr-chu);
+}
+[data-trong='gv'] .ls-trang .gv2-the-so[data-mau]::after { display: none; }
+[data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-nhan { font-size: 13px; font-weight: 500; color: var(--tr-chu-3); }
+[data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-so-kpi { font-size: 26px; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-don-vi { font-size: 13px; font-weight: 500; color: var(--tr-chu-3); margin-left: 2px; }
+[data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-phu { font-size: 13px; font-weight: 400; color: var(--tr-chu-3); opacity: 1; }
+[data-trong='gv'] .ls-trang .gv2-the-so[data-mau='hp'] .gv2-so-kpi { color: var(--tr-chu-y-chu); }
+@media (max-width: 1099px) {
+  [data-trong='gv'] .ls-trang .gv2-kpi--3 > :nth-child(odd) { border-left: 0; }
+  [data-trong='gv'] .ls-trang .gv2-kpi--3 > :nth-child(3) { grid-column: 1 / -1; border-top: 1px solid var(--tr-vien); }
+}
+/* bảng gọn: đầu cột chữ thường nền chìm, dòng cao vừa, kẻ mảnh */
+[data-trong='gv'] .ls-trang .gv2-bang th {
+  padding: 10px 16px; background: var(--tr-mat-2); border-bottom: 1px solid var(--tr-vien); color: var(--tr-chu-3);
+  font-size: 13px; font-weight: 500; letter-spacing: 0; text-transform: none;
+}
+[data-trong='gv'] .ls-trang .gv2-bang td { padding: 12px 16px; border-color: var(--tr-vien); }
+[data-trong='gv'] .ls-trang .gv2-ten-nut { font-size: 15px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .ls-trang .gv2-bang td .gv2-phu { font-size: 13px; color: var(--tr-chu-3); }
+/* chip trạng thái: một khái niệm một màu (Đang mở = xanh lá «đúng/đang chạy» có chấm; Đã đóng = xám không chấm) */
+[data-trong='gv'] .ls-trang .gv2-chip { margin: 0; padding: 0 10px; min-height: 26px; font-size: 13px; font-weight: 500; }
+[data-trong='gv'] .ls-trang .gv2-chip[data-tone='la'] { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+[data-trong='gv'] .ls-trang .gv2-chip[data-tone='do'] { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+[data-trong='gv'] .ls-trang .gv2-chip[data-tone='vang'] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+[data-trong='gv'] .ls-trang .gv2-chip[data-tone='xam'] { background: var(--tr-mat-2); color: var(--tr-chu-2); }
+[data-trong='gv'] .ls-trang .gv2-chip[data-tone='la']::before { background: var(--tr-dung); }
+[data-trong='gv'] .ls-trang .gv2-chip[data-tone='xam']::before { display: none; }
+
+/* ── 1. CA KIỂM TRA (LichSuCaScreen) ─────────────────────────────────────────────────────────────────────────────── */
+[data-trong='gv'] .ls-trang { gap: 20px; }
+[data-trong='gv'] .ls-trang .gv-directory { padding: 0 !important; border-color: var(--tr-vien) !important; border-radius: 20px !important; }
+[data-trong='gv'] .ls-trang .gv-directory > :not(.gv2-cuon, .gv-loi-tai, .gv-xuong-bang) { margin-left: 20px; margin-right: 20px; }
+[data-trong='gv'] .ls-trang .gv-filterbar { margin-top: 16px; flex-wrap: wrap; }
+[data-trong='gv'] .ls-trang .gv-filterbar > .relative { flex: 1 1 240px; }
+[data-trong='gv'] .ls-trang .ls-o-tim { min-height: 44px; border: 1px solid var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); box-shadow: none; font-size: 15px; }
+[data-trong='gv'] .ls-trang .ls-nut-tron { width: 44px; height: 44px; border: 1px solid var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu-2); box-shadow: var(--tr-bong-1); }
+/* lọc trạng thái = thanh phân đoạn (một mục chọn nổi trắng); lọc lớp = viên mảnh */
+[data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo trạng thái ca'] {
+  display: inline-flex; flex-wrap: nowrap; width: max-content; max-width: calc(100% - 40px); gap: 2px; margin-top: 4px; margin-bottom: 10px; padding: 3px;
+  border-radius: 12px; background: var(--tr-mat-2); overflow-x: auto;
+}
+[data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo trạng thái ca'] .tl-the {
+  height: 44px; padding: 0 14px; border: 0; border-radius: 10px; background: none; color: var(--tr-chu-2); font-size: 14px; font-weight: 500;
+}
+[data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo trạng thái ca'] .tl-the::before { display: none; }
+[data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo trạng thái ca'] .tl-the[aria-pressed='true'] { background: var(--tr-mat); color: var(--tr-chu); font-weight: 600; box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .ls-trang .ls-chips .tl-dem { background: none; color: inherit; padding: 0; min-width: 0; font-weight: inherit; }
+[data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo lớp'] { margin-bottom: 12px; }
+[data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo lớp'] .tl-the { border-color: var(--tr-vien-2); color: var(--tr-chu-2); }
+[data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo lớp'] .tl-the[aria-pressed='true'] { background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); border-color: transparent; }
+[data-trong='gv'] .ls-trang .gv2-cuon { margin-top: 4px; border-top: 1px solid var(--tr-vien); }
+[data-trong='gv'] .ls-trang .gv2-bang th:first-child, [data-trong='gv'] .ls-trang .gv2-bang td:first-child { padding-left: 20px; }
+[data-trong='gv'] .ls-trang .gv2-bang th:last-child, [data-trong='gv'] .ls-trang .gv2-bang td:last-child { padding-right: 20px; }
+[data-trong='gv'] .ls-trang .gv2-bang tr[data-trang-thai='Đang mở'] td { background: var(--tr-chinh-nhat); }
+[data-trong='gv'] .ls-trang .gv2-bang td:nth-child(n + 2) { font-size: 14px; color: var(--tr-chu-2); }
+[data-trong='gv'] .ls-trang .gv2-bang td b { color: var(--tr-chu); font-weight: 600; }
+[data-trong='gv'] .ls-trang .gv2-chan-bang { padding: 12px 20px; border-top: 1px solid var(--tr-vien); }
+[data-trong='gv'] .ls-trang :is(.gv-loi-tai, .gv-xuong-bang, [data-trong-ca]) { margin: 0 20px 20px; }
+/* điện thoại: bảng thành danh sách — tên ca + trạng thái trên, lớp · giờ bắt đầu dưới (số chi tiết xem ở màn ca) */
+@media (max-width: 600px) {
+  [data-trong='gv'] .ls-trang .gv-directory > :not(.gv2-cuon, .gv-loi-tai, .gv-xuong-bang) { margin-left: 16px; margin-right: 16px; }
+  [data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo trạng thái ca'] { display: flex; width: auto; max-width: none; }
+  [data-trong='gv'] .ls-trang .gv-filterbar > .gv2-nut-vien { flex: 1 1 0; padding: 0 10px; font-size: 14px; }
+  [data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo trạng thái ca'] .tl-the { flex: 1; justify-content: center; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca, [data-trong='gv'] .ls-trang .gv2-bang-ca tbody { display: block; min-width: 0; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca thead { display: none; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca tr { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; padding: 12px 16px; border-top: 1px solid var(--tr-vien); }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca tr:first-child { border-top: 0; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td { display: block; padding: 0 !important; border: 0; background: none !important; font-size: 13px; color: var(--tr-chu-3); }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td:has(.gv2-ten-nut, .gv2-dam) { order: 1; flex: 1 1 55%; min-width: 0; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td:last-child { order: 2; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td:is(.gv2-phai, :nth-last-child(2)) { display: none; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td:nth-last-child(n + 3):not(:has(.gv2-ten-nut, .gv2-dam, .gv-o-tich)) { order: 3; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td.gv2-khong-xuong::before { content: '·'; margin-right: 8px; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca tr[data-trang-thai='Đang mở'] { background: var(--tr-chinh-nhat); }
+  [data-trong='gv'] .ls-trang .gv2-chan-bang { padding: 12px 16px; }
+}

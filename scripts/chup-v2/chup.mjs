@@ -349,6 +349,10 @@ const DS = [
     ...[['gv-hom-nay',/Hôm nay của thầy/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-cai-dat',/Cài đặt/],['gv-kho',/Kho đề/]].map(([m,chu]) => [`24-${m}-${k}-toi`,m,w,h,'dark',true,chu]),
   ]),
   // trung tu 09/10: máy SÁNG nhưng thầy ép nút "Tối" trong Cài đặt (data-giao-dien) — không được nửa sáng nửa tối
+  // «Trong» nhóm 4 (26/10) — màn quản lý app thầy, 3 khổ × sáng/tối; thêm `&trong=tat` để soát giao diện cũ.
+  ...[[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => ['light','dark'].flatMap((nen) =>
+    [['gv-lich-su-ca',/Ca kiểm tra/],['gv-hs-hoi',/Học sinh hỏi/],['gv-theo-doi',/Kiểm tra 15 phút/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-kho',/Kho đề/],['gv-duyet',/Duyệt lời giải/],['gv-go-nut',/Bàn gỡ nút thắt/]].map(([m,chu]) => [`27-tr4-${m}-${k}${nen === 'dark' ? '-toi' : ''}`,m,w,h,nen,true,chu]))),
+  ...[['gv-lich-su-ca',/Ca kiểm tra/],['gv-theo-doi',/Kiểm tra 15 phút/],['gv-hoc-sinh',/Học sinh/]].map(([m,chu]) => [`27-tr4-cu-${m}`,`${m}&trong=tat`,1440,900,'light',true,chu]),
   ['24-gv-hom-nay-ep-toi', 'gv-hom-nay&giao=toi', 1440, 900, 'light', false, /Hôm nay của thầy/],
   ['24-gv-hoc-sinh-ep-toi', 'gv-hoc-sinh&giao=toi', 1440, 900, 'light', false, /Học sinh/],
   ['24-gv-mo-ca-ep-sang', 'gv-mo-ca&giao=sang', 1440, 900, 'dark', false, /Mở ca kiểm tra/],
