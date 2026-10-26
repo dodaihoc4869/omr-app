@@ -1,0 +1,26 @@
+/* «Trong» nhóm 4 — GIAO ĐỀ THEO TUẦN (GiaoDeTheoTuanScreen, gốc .gv-giao-tuan). Luật chung: đầu tệp trong-quan-ly.css.
+   Máy tính: hai cột — Lớp / Em / Nguồn đề bên trái, Hạn nộp + «Lưu lại» (nút chính) bên phải; khối = thanh phân đoạn; ô tick = dòng kẻ mảnh. */
+[data-trong='gv'] .gv-giao-tuan { gap: 20px !important; }
+[data-trong='gv'] .gv-giao-tuan h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+[data-trong='gv'] .gv-giao-tuan [data-ui-card] { border: 1px solid var(--tr-vien) !important; border-radius: 20px !important; box-shadow: var(--tr-bong-1) !important; padding: 20px !important; }
+[data-trong='gv'] .gv-giao-tuan [data-ui-card] h2 { font-size: 16px !important; font-weight: 600 !important; }
+[data-trong='gv'] .gv-giao-tuan input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--tr-chinh-nut); }
+/* khối: thanh phân đoạn; lớp: viên mảnh */
+[data-trong='gv'] .gv-giao-tuan > .gv-page-header + [data-ui-card] > div { display: inline-flex !important; gap: 2px !important; padding: 3px; border-radius: 12px; background: var(--tr-mat-2); }
+[data-trong='gv'] .gv-giao-tuan > .gv-page-header + [data-ui-card] > div > button { min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: none; color: var(--tr-chu-2); box-shadow: none; font-weight: 500; }
+[data-trong='gv'] .gv-giao-tuan > .gv-page-header + [data-ui-card] > div > button.m3-nut-tonal { background: var(--tr-mat); color: var(--tr-chu); font-weight: 600; box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .gv-giao-tuan > .gv-page-header + [data-ui-card] + [data-ui-card] button { min-height: 44px; border-radius: 999px; }
+/* ô tick (label .m3-nut-chu): dòng kẻ mảnh */
+[data-trong='gv'] .gv-giao-tuan .gv-scroll-box > label { min-height: 52px; padding: 8px 4px; border: 0; border-bottom: 1px solid var(--tr-vien); border-radius: 0; background: none; box-shadow: none; color: var(--tr-chu); }
+[data-trong='gv'] .gv-giao-tuan .gv-scroll-box > label:last-child { border-bottom: 0; }
+/* Hạn nộp + Lưu lại */
+[data-trong='gv'] .gv-giao-tuan [data-ui-card]:last-child label { flex-wrap: wrap; }
+[data-trong='gv'] .gv-giao-tuan [data-ui-card]:last-child input[type='date'] { min-height: 44px; padding: 0 12px; border: 1px solid var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu); }
+[data-trong='gv'] .gv-giao-tuan [data-ui-card]:last-child .m3-nut-tonal { width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font-weight: 600; }
+[data-trong='gv'] .gv-giao-tuan [data-ui-card]:last-child .m3-nut-tonal:disabled { background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); opacity: 0.7; }
+@media (min-width: 1100px) {
+  [data-trong='gv'] .gv-giao-tuan { display: grid !important; grid-template-columns: minmax(0, 1fr) 380px; align-items: start; align-content: start; }
+  [data-trong='gv'] .gv-giao-tuan > [data-ui-card] { grid-column: 1; }
+  [data-trong='gv'] .gv-giao-tuan > :is(.gv-page-header, .gv-page-header + [data-ui-card]) { grid-column: 1 / -1; }
+  [data-trong='gv'] .gv-giao-tuan > [data-ui-card]:last-child { grid-column: 2; grid-row: 3 / span 3; position: sticky; top: 16px; }
+}

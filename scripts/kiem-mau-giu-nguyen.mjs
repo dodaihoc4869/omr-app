@@ -18,6 +18,9 @@ import { createHash } from 'node:crypto'
 import ts from 'typescript'
 
 const MOC = process.argv[2] || 'origin/main'
+// BẢNG MÀU THẦY ĐÃ DUYỆT (ngoại lệ ĐÓNG, liệt kê đủ đường dẫn): giao diện «Trong» — thầy 26/10/2026 «Chốt BUILD LUÔN NHÉ», bản vẽ docs/ban-ve-trong-2610.
+// Tệp này là NƠI DUY NHẤT định nghĩa bảng màu mới (--tr-*) rồi đè lên biến sẵn có dưới [data-trong]; màu cũ ở mọi tệp khác giữ nguyên.
+const BANG_MAU_THAY_DUYET = new Set(['src/styles/trong.css'])
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
 
 const THUOC_TINH_MAU = /^(?:color|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?|outline(?:-color)?|fill|stroke|stop-color|box-shadow|text-shadow|caret-color|accent-color|column-rule(?:-color)?|text-decoration(?:-color)?|--[\w-]+)$/i
@@ -198,6 +201,9 @@ const GAME_DA_GO = new Map(JSON.parse(readFileSync(new URL('../docs/don-game-141
 // `cu` = khai báo màu của bản cũ được phép biến mất (khoá → số lần được giảm); `moi` = chín biến màu gốc được phép khai thô (mọi màu khác trong hai bảng phải là var()/color-mix()).
 const LENH_2110 = JSON.parse(readFileSync(new URL('../docs/mau-thay-ra-lenh-2110.json', import.meta.url), 'utf8'))
 const MAU_CU_THAY_RA_LENH = LENH_2110.cu // khoá → số lần khai báo được phép GIẢM (đúng con số đo lúc thầy ra lệnh; giảm thêm là vi phạm)
+// 26/10: gỡ CSS CHẾT (luật mà mọi bộ chọn trỏ tới lớp không còn mã nào dùng) để giao diện «Trong» không làm app nặng hơn — danh sách đóng ở
+// docs/css-chet-2610.json (khoá → số lần, đúng lúc gỡ). Cộng vào MAU_CU_THAY_RA_LENH; giảm thêm ngoài danh sách vẫn là vi phạm.
+for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2610.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 const MAU_THAY_RA_LENH = new Set([
   'src/styles/tokens.css · --v2-nga-voi: #fffef6',
   'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',
@@ -236,7 +242,7 @@ for (const [trangThai, f, f2] of doi) {
   for (const [k, n] of b) {
     if ((a.get(k) ?? 0) >= n) continue
     const gt = k.slice(k.indexOf(':') + 1)
-    if (MAU_THO.test(vanMau(gt)) && !MAU_THAY_RA_LENH.has(`${ten} · ${k}`)) loi.push(`MÀU THÔ mới (phải dùng biến chuẩn) · ${ten} · ${k}`)
+    if (MAU_THO.test(vanMau(gt)) && !MAU_THAY_RA_LENH.has(`${ten} · ${k}`) && !BANG_MAU_THAY_DUYET.has(ten)) loi.push(`MÀU THÔ mới (phải dùng biến chuẩn) · ${ten} · ${k}`)
     for (const m of gt.matchAll(/var\(\s*(--[\w-]+)/g)) if (!dinh.has(m[1])) loi.push(`BIẾN MÀU chưa định nghĩa · ${ten} · ${k}`)
   }
 }

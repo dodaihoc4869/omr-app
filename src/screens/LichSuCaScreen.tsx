@@ -24,6 +24,7 @@ import { useSoDemGv } from '../lib/so-dem-gv'
 import { ngayVn } from '../components/chien-dich/ngay'
 import { demEmTheoLop, soVi, thongKeThang } from '../lib/tong-quan-gv'
 import './gv-hoa2.css'
+import '../styles/trong-quan-ly.css' // «Trong» 26/10: trình bày màn quản lý (chỉ dưới [data-trong='gv'])
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
 import { caConEmDangLam, trangThaiCa } from '../lib/ca-dang-chay'
 export { caConEmDangLam, trangThaiCa } from '../lib/ca-dang-chay'

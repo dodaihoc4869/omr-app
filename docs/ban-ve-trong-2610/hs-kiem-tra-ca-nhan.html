@@ -1,0 +1,89 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Kiểm tra cá nhân</title><link rel="stylesheet" href="trong.css">
+<style>
+p{text-wrap:pretty}
+.tong{display:flex;gap:28px;align-items:center}
+.tong .vong .so{font-size:28px}
+.tong-chu{flex:1;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.o-gio{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;background:var(--mat-2)}
+.o-gio svg{color:var(--chu-3);margin-top:2px}
+.so-ch{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--mat-2);color:var(--chu-2);font-weight:600;font-size:14px;flex:none}
+.so-ch.xong{background:var(--dung-nhat);color:var(--dung-chu)}
+.so-ch.dang{background:var(--chinh);color:var(--tren-mau)}
+.dong.dang-lam{background:color-mix(in srgb,var(--chinh-nhat) 55%,var(--mat))}
+.cau-o{display:flex;gap:4px;margin-top:8px}
+.cau-o i{width:22px;height:6px;border-radius:999px;background:var(--mat-3)}
+.cau-o i.co{background:var(--chinh)}
+.ten-hang{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+@media (max-width:600px){
+  .tong{flex-direction:column;align-items:stretch;gap:18px}
+  .tong .vong{align-self:center}
+  .tong-chu{grid-template-columns:minmax(0,1fr)}
+  .dong.dang-lam{flex-wrap:wrap}
+  .dong.dang-lam .phai{width:100%;padding-left:50px}
+  .dong.dang-lam .phai .nut{flex:1}
+}
+</style></head>
+<body data-app="hs" data-tab="hom-nay" data-khung="man-con" data-tieu="Kiểm tra ôn tập" data-phu="Bài dành riêng cho em" data-ve="Hôm nay">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bỏ 4 ô số + thẻ lịch trùng ý; còn một thẻ tổng quan (vòng «đã trả lời» + hai mốc giờ) và danh sách chặng có đúng một nút chính «Làm tiếp chặng 3».
+       Chặng chưa tới lượt chỉ còn chip «Chờ chặng 3», không xếp nút xám. «Nộp toàn bài» sang cột phụ. -->
+  <div>
+    <p class="nhan">Thứ Hai 26/10 · bài 2/3 trong tuần</p>
+    <h1 class="tieu-de mt-1">Kiểm tra ôn tập</h1>
+  </div>
+
+  <div class="chinh-phu">
+    <div class="cot" style="gap:20px">
+      <section class="the" aria-label="Bài kiểm tra ôn tập của em">
+        <div class="tong">
+          <div class="vong" style="--p:57.1;--d:132px;--net:12px" role="img" aria-label="Đã trả lời 16 trên 28 câu"><div><div class="so">16<small>/28</small></div><div class="mo">đã trả lời</div></div></div>
+          <div class="cot" style="flex:1;min-width:0;gap:14px">
+            <div class="hang" style="flex-wrap:wrap;gap:8px"><span class="chip dung"><i data-i="check" class="nho"></i>2/5 chặng đã chốt</span><span class="chip">Từ 6 bài em đã học</span></div>
+            <div class="tong-chu">
+              <div class="o-gio"><i data-i="calendar"></i><div><p class="dam">Hạn nộp 24:00</p><p class="mo">Cả bài · còn 6 giờ 05 phút</p></div></div>
+              <div class="o-gio"><i data-i="clock"></i><div><p class="dam">Giờ riêng từng chặng</p><p class="mo">Chỉ chạy khi em bấm Làm chặng</p></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="the dem">
+        <div class="the-dau" style="padding:18px 20px 4px;margin:0"><div class="h3">Các chặng</div><span class="chip"><i data-i="check-circle" class="nho"></i>Đã lưu trên máy chủ</span></div>
+        <div class="ds">
+          <div class="dong"><span class="so-ch xong"><i data-i="check" class="nho"></i></span><div class="giua"><div class="ten-hang"><p class="ten">Chặng 1</p><span class="chip dung">Đã chốt</span></div><p class="mo">6 câu · 10 phút · đã trả lời 6/6</p></div></div>
+          <div class="dong"><span class="so-ch xong"><i data-i="check" class="nho"></i></span><div class="giua"><div class="ten-hang"><p class="ten">Chặng 2</p><span class="chip dung">Đã chốt</span></div><p class="mo">6 câu · 10 phút · đã trả lời 6/6</p></div></div>
+          <div class="dong dang-lam">
+            <span class="so-ch dang">3</span>
+            <div class="giua"><div class="ten-hang"><p class="ten">Chặng 3</p><span class="chip chu-y"><i data-i="clock" class="nho"></i>Còn 06:12</span></div><p class="mo">6 câu · 10 phút · đã trả lời 4/6</p>
+              <div class="cau-o" aria-hidden="true"><i class="co"></i><i class="co"></i><i class="co"></i><i class="co"></i><i></i><i></i></div></div>
+            <span class="phai"><span class="nut chinh">Làm tiếp chặng 3 <i data-i="arrow"></i></span></span>
+          </div>
+          <div class="dong"><span class="so-ch">4</span><div class="giua"><div class="ten-hang"><p class="ten">Chặng 4</p><span class="chip"><i data-i="lock" class="nho"></i>Chờ chặng 3</span></div><p class="mo">5 câu · 10 phút</p></div></div>
+          <div class="dong"><span class="so-ch">5</span><div class="giua"><div class="ten-hang"><p class="ten">Chặng 5</p><span class="chip"><i data-i="lock" class="nho"></i>Chờ chặng 3</span></div><p class="mo">5 câu · 10 phút</p></div></div>
+        </div>
+        <p class="mo" style="padding:4px 20px 18px">Nộp chặng 3 rồi mới mở chặng sau. Hết giờ, chặng tự chốt với các câu đã lưu.</p>
+      </section>
+    </div>
+
+    <div class="cot" style="gap:20px">
+      <section class="the">
+        <div class="the-dau"><span class="o-icon xam"><i data-i="send"></i></span><div class="h3">Nộp toàn bài</div></div>
+        <p class="phu">Xong cả 5 chặng thì nộp toàn bài. Nộp sớm vẫn được — câu bỏ trống tính là chưa trả lời.</p>
+        <span class="nut rong-het tat mt-4" aria-disabled="true">Nộp toàn bài</span>
+        <p class="mo mt-2">Nộp chặng 3 trước khi nộp toàn bài.</p>
+      </section>
+
+      <section class="the">
+        <div class="the-dau"><div class="h3">Kiến thức trong lần kiểm tra này</div></div>
+        <div class="hang" style="flex-wrap:wrap;gap:8px">
+          <span class="chip">Ester – Lipid</span><span class="chip">Xà phòng và chất giặt rửa</span><span class="chip">Glucose và fructose</span>
+          <span class="chip">Saccharose và maltose</span><span class="chip">Tinh bột và cellulose</span><span class="chip">Amine</span>
+        </div>
+        <p class="mo mt-3">Các phần cần luyện thêm sẽ vào lịch học tiếp theo của em.</p>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

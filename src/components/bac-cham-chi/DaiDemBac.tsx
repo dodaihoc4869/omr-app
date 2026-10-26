@@ -3,11 +3,14 @@
 // nào. Ô không có em nào ⇒ nền trơn, chữ mờ (vẫn đủ tương phản). Trình đọc màn hình nghe "3 em ở Bậc 1/12 · Lười Vô Cực".
 // 13/10 đợt 19: emoji ⇒ huy hiệu vẽ riêng. Có `onChon` (Nhịp học của thầy — thầy: "bấm vào từng bậc sẽ hiện ra danh sách … từng học sinh") ⇒ ô CÓ em
 // là MỘT nút cả ô (≥ 44 px) báo bậc + chính nút ấy (để trả tiêu điểm khi đóng tấm); ô 0 em không bấm được. Tờ chiếu không truyền ⇒ chỉ để nhìn.
+import type { CSSProperties } from 'react'
 import { BAC_CHAM_CHI, chuBac } from './bac'
 import HuyHieuBac from './HuyHieuBac'
 import './bac-cham-chi.css'
 
 export default function DaiDemBac({ dem, coTen = false, onChon }: { dem: readonly number[]; coTen?: boolean; onChon?: (bac: number, nut: HTMLButtonElement) => void }) {
+  // `--bcc-ti` = số em bậc ấy / bậc đông nhất — chỉ giao diện «Trong» đọc để vẽ cột cao theo số em (bố cục cũ không dùng).
+  const nhieuNhat = Math.max(1, ...dem)
   return (
     <ol className="bcc-dem" data-co-ten={coTen ? '' : undefined} aria-label="Số em mỗi bậc, từ Lười đến Chăm">
       {BAC_CHAM_CHI.map((b, i) => {
@@ -33,7 +36,7 @@ export default function DaiDemBac({ dem, coTen = false, onChon }: { dem: readonl
           </>
         )
         return (
-          <li key={b.so} className="bcc bcc-dem-o" data-bac={b.so} data-khong={n > 0 ? undefined : 'true'} data-nut={bam ? '' : undefined} title={`${chuBac(b)}: ${n} em`}>
+          <li key={b.so} className="bcc bcc-dem-o" data-bac={b.so} data-khong={n > 0 ? undefined : 'true'} data-nut={bam ? '' : undefined} title={`${chuBac(b)}: ${n} em`} style={{ '--bcc-ti': n / nhieuNhat } as CSSProperties}>
             {bam ? (
               <button type="button" className="bcc-dem-nut" aria-haspopup="dialog" onClick={(ev) => onChon!(b.so, ev.currentTarget)}>
                 {noiDung}

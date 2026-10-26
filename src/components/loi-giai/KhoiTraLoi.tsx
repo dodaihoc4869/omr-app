@@ -193,7 +193,7 @@ export function SoDo({ soDo }: { soDo: NonNullable<KhoiHinh['soDo']> }) {
           <li key={i}>
             {i > 0 && <span className="mui">{soDo.dk[i - 1] ? <span><ChemText text={chuHoa(soDo.dk[i - 1]!)} /></span> : null}<span className="sr-only">tạo ra</span></span>}
             <span className="nut" data-dau={i === 0 || undefined} data-cuoi={(i === n - 1 && i > 0) || undefined}>
-              {x.ten && <ChemText text={chuHoa(x.ten)} />}
+              {x.ten && <span><ChemText text={chuHoa(x.ten)} /></span>}
               {x.nhan && (x.ten ? <small>{x.nhan}</small> : <b>{x.nhan}</b>)}
             </span>
           </li>

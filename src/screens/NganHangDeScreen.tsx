@@ -27,6 +27,7 @@ import { useAppStore } from '../store/appStore'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
 import { ngayDayDu } from '../lib/ngay-gio-24'
+import '../styles/trong-quan-ly-kho.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
 
 type CauNghi = {
   phan: 'I' | 'II' | 'III'
@@ -482,7 +483,7 @@ export default function NganHangDeScreen() {
         const nghi = cauNghiCua(s)
         const mo = moDe.has(s.maDe)
         return (
-          <TheNoiDung key={s.maDe} noPadding>
+          <TheNoiDung key={s.maDe} noPadding className="gv-kho-de">
             {/* THẺ ĐỀ (thầy chốt 04-09 tối: "trực quan, đẹp, mịn"). Bỏ dải màu
                 đậm chiếm cả bề ngang; thay bằng một sọc màu mảnh bên trái nói
                 trạng thái (xanh: đáp án đủ · cam: còn câu chờ quyết), số thứ

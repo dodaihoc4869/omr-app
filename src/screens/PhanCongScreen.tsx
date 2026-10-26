@@ -24,6 +24,7 @@ import { giaoBtvn, theoDoiBtvn, suaGiaoBtvn, type DongTheoDoiBtvn } from '../lib
 import HopChonDe from '../components/HopChonDe'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import type { TeacherExamSource } from '../data/examContent'
+import '../styles/trong-quan-ly-giao-btvn.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
 
 interface DeKho {
   maDe: string
@@ -106,7 +107,7 @@ export function dinhDangDeCayThuMuc(maDeStr: string): string {
 
 export default function PhanCongScreen() {
   return (
-    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col w-full max-w-full min-w-0" style={{ gap: 'var(--k3)' }}>
+    <div className="gv-page gv-giao-btvn min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col w-full max-w-full min-w-0" style={{ gap: 'var(--k3)' }}>
       <header className="gv-page-header flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/70 text-[color:var(--m3-on-tertiary-container)] border border-emerald-200 dark:border-emerald-800 shadow-2xs shrink-0">
@@ -530,7 +531,7 @@ function TheGiaoBtvn() {
         </div>
       </div>}
       {/* THANH TAB CHUYỂN ĐỔI CHUẨN GOOGLE MATERIAL 3 */}
-      <div className="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-2xl w-full max-w-md border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
+      <div className="gv-btvn-tab flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-2xl w-full max-w-md border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
         <button
           type="button"
           onClick={() => setTabBtvn('giao')}

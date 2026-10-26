@@ -218,8 +218,25 @@ const DS_HSE = [
 const tuongPhanThap = []
 // ═══════════ hết LÀN HỒ SƠ EM 12/10F ═══════════
 
+// ═══════════ «TRONG» NHÓM 3 (26/10): khung app thầy + Hôm nay + việc trên lớp — 3 khổ × sáng/tối, cả trang; `-cu` = `&trong=tat` (giao diện cũ). Tiền tố "t3-". ═══════════
+const KHO_T3 = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']]
+const t3 = (ten, man, cho, viec) => [
+  ...['light', 'dark'].flatMap((nen) => KHO_T3.map(([w, hh, kho]) => [`t3-${ten}-${kho}${nen === 'dark' ? '-toi' : ''}`, man, w, hh, nen, true, cho, viec])),
+  [`t3-${ten}-may-tinh-cu`, `${man}&trong=tat`, 1440, 900, 'light', true, cho, viec],
+]
+const DS_T3 = [
+  ...t3('hom-nay', 'gv-hom-nay&nh=1', /Hôm nay của thầy/, 'hn:cho'),
+  ...t3('hanh-trinh', 'gv-nhip&ht2=1', /Hành trình giỏi Hóa/, 'cho:Kiểm tra ôn tập'),
+  ...t3('diem-danh', 'gv-nhip&ht2=1&dd12c=1', /Hành trình giỏi Hóa/, 'dd12c:buoc1'),
+  ...t3('cai-dat', 'gv-cai-dat', /Cài đặt/),
+  ...t3('len-bang', 'gv-len-bang&ht2=1', /./, 'tab:Kiểm tra đầu giờ'),
+  ...t3('chieu', 'gv-chieu&remote=PHIEN1', /Hoàng Bảo Ngọc/),
+]
+// ═══════════ hết «TRONG» NHÓM 3 ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_T3, // «TRONG» NHÓM 3
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D
@@ -332,6 +349,11 @@ const DS = [
     ...[['gv-hom-nay',/Hôm nay của thầy/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-cai-dat',/Cài đặt/],['gv-kho',/Kho đề/]].map(([m,chu]) => [`24-${m}-${k}-toi`,m,w,h,'dark',true,chu]),
   ]),
   // trung tu 09/10: máy SÁNG nhưng thầy ép nút "Tối" trong Cài đặt (data-giao-dien) — không được nửa sáng nửa tối
+  // «Trong» nhóm 4 (26/10) — màn quản lý app thầy, 3 khổ × sáng/tối; thêm `&trong=tat` để soát giao diện cũ.
+  ...[[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => ['light','dark'].flatMap((nen) =>
+    [['gv-lich-su-ca',/Ca kiểm tra/],['gv-hs-hoi',/Học sinh hỏi/],['gv-theo-doi',/Kiểm tra 15 phút/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-kho',/Kho đề/],['gv-duyet&ma=12-KT-C1-D4',/Duyệt lời giải/],['gv-go-nut',/Bàn gỡ nút thắt/],['gv-toan-canh',/Trần Đức Huy/],['gv-giao-btvn',/Giao|bài tập/i],['gv-giao-tuan',/Giao|tuần/i]].map(([m,chu]) => [`27-tr4-${m.split('&')[0]}-${k}${nen === 'dark' ? '-toi' : ''}`,m,w,h,nen,true,chu]))),
+  ...[[390,844,'doc'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => ['light','dark'].map((nen) => [`27-tr4-gv-ho-so-${k}${nen === 'dark' ? '-toi' : ''}`,'gv-toan-canh',w,h,nen,false,/Trần Đức Huy/,'nut:Hồ sơ làm bài'])),
+  ...[['gv-lich-su-ca',/Ca kiểm tra/],['gv-theo-doi',/Kiểm tra 15 phút/],['gv-hoc-sinh',/Học sinh/]].map(([m,chu]) => [`27-tr4-cu-${m}`,`${m}&trong=tat`,1440,900,'light',true,chu]),
   ['24-gv-hom-nay-ep-toi', 'gv-hom-nay&giao=toi', 1440, 900, 'light', false, /Hôm nay của thầy/],
   ['24-gv-hoc-sinh-ep-toi', 'gv-hoc-sinh&giao=toi', 1440, 900, 'light', false, /Học sinh/],
   ['24-gv-mo-ca-ep-sang', 'gv-mo-ca&giao=sang', 1440, 900, 'dark', false, /Mở ca kiểm tra/],
@@ -392,6 +414,10 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.getByRole('heading', {name:chu,exact:true}).waitFor()
     } else if (viec?.startsWith('tieu-de:')) {
       await t.getByRole('heading', { name: new RegExp(viec.slice(8)) }).first().waitFor({ timeout: 20000 })
+    } else if (viec?.startsWith('tab:')) {
+      // «TRONG» NHÓM 3: bấm một thẻ (role=tab) rồi chờ màn trong thẻ dựng xong
+      await t.getByRole('tab', { name: viec.slice(4), exact: true }).first().click({ timeout: 20000 })
+      await t.waitForTimeout(5000)
     } else if (viec?.startsWith('cho:')) {
       await t.getByText(new RegExp(viec.slice(4))).first().waitFor({ timeout: 20000 })
     } else if (viec?.startsWith('ho-so:') || viec?.startsWith('ho-so-ls:')) {
@@ -491,8 +517,11 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       const [, v, phim] = viec.split(':')
       // 21/10 Hành trình một trang 4 bước: bước 1 có thể đang gập (đã có em điểm danh ⇒ mở sẵn bước 2) — mở lại bước 1 trước.
       const moB1 = t.getByRole('button', { name: /^Mở (lại )?bước 1 · Điểm danh$/ })
-      await moB1.or(t.getByText(/em đang Lười/).first()).first().waitFor({ timeout: 20000 })
+      // «Trong» 26/10: bước gập không vẽ dòng riêng ⇒ mở bằng thước (nút bước 1 của «Các bước của buổi dạy»).
+      const thuoc1 = t.locator('nav[aria-label="Các bước của buổi dạy"] li[data-tt] button').first()
+      await moB1.or(thuoc1).or(t.getByText(/em đang Lười/).first()).first().waitFor({ timeout: 20000 })
       if (await moB1.isVisible()) await moB1.click()
+      else if (!(await t.getByText(/em đang Lười/).first().isVisible())) await thuoc1.click()
       await t.getByText(/em đang Lười/).first().waitFor({ timeout: 20000 })
       if (v === 'chieu') {
         await t.getByRole('button', { name: 'Chiếu điểm danh', exact: true }).click()

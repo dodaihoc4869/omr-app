@@ -1,0 +1,129 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Hồ sơ làm bài</title><link rel="stylesheet" href="trong.css">
+<style>
+body{--m1:var(--sai);--m2:var(--chu-y);--m3:var(--tin);--m4:var(--dung);--m5:var(--chu-3);--m6:var(--sai-chu)}
+.dau-dem{padding:18px 20px 14px;margin:0}
+.bao{display:flex;align-items:center;gap:14px;border-color:color-mix(in srgb,var(--sai) 35%,var(--vien))}
+.bao .giua{flex:1;min-width:0}
+.ket-luan{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:28px}
+.nhan-lon{font-size:34px;line-height:1.1;font-weight:700;letter-spacing:-.02em;color:var(--tin-chu)}
+.ly-do{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ly-do li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--vien);font-size:14px;line-height:1.5;color:var(--chu-2)}
+.ly-do li:first-child{border-top:0;padding-top:0}
+.ly-do b.so-ld{font-size:17px;font-weight:700;color:var(--chu);text-align:right}
+.ba-so{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:16px;align-items:end}
+.thanh6{display:flex;height:28px;border-radius:8px;overflow:hidden;gap:2px}
+.thanh6 i{display:grid;place-items:center;color:var(--tren-mau);font-size:12px;font-weight:600;font-style:normal}
+.thanh6 i.chua{background:var(--mat-3);color:var(--chu-2)}
+.luoi-muc{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.luoi-muc>div{padding:12px;border-radius:12px;background:var(--mat-2);min-width:0}
+.luoi-muc .dau-m{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--chu-2)}
+.luoi-muc .dau-m i{width:10px;height:10px;border-radius:3px;flex:none}
+.luoi-muc .ten-m{font-size:14px;font-weight:500;line-height:1.35;margin-top:4px;min-height:38px}
+.bang .kq{display:inline-flex;align-items:center;gap:4px;font-weight:600}
+.muc-chip{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.muc-chip i{width:10px;height:10px;border-radius:3px;flex:none}
+.chi-dt6{display:none!important}
+@media (max-width:1100px){.luoi-muc{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.ket-luan{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){
+  .bao{flex-wrap:wrap}.bao .nut{width:100%}.bao .o-icon{display:none}
+  .ba-so{grid-template-columns:minmax(0,1fr);gap:8px}.ba-so>div{display:flex;align-items:baseline;gap:12px}.ba-so>div .so{min-width:64px;font-size:22px}.ba-so>p.mo{text-align:left!important}
+  .thanh6 i{font-size:0}
+  .luoi-muc{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .chi-dt6{display:flex!important}
+}
+</style></head>
+<body data-app="gv" data-tab="hoc-sinh" data-khung="man-con" data-tieu="Hồ sơ làm bài" data-phu="Trần Minh Hiếu · 12A2" data-ve="Toàn cảnh em">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: dải 4 ô % (trùng thanh 6 mức) gộp thành một hàng tóm tắt ngay trên thanh; chip «Cố tình treo máy» và khối bằng chứng
+       gộp thành một dải cảnh báo ở đầu, mang nút chính «Xem các lượt treo». Nhận định và Lý do chung một thẻ. -->
+  <div>
+    <p class="nhan">SBD 122307 · 12A2 · 7 ngày gần nhất (20/10 – 26/10)</p>
+    <h1 class="tieu-de mt-1">Trần Minh Hiếu</h1>
+    <div class="hang mt-2" style="flex-wrap:wrap;gap:8px"><span class="chip tin">Có dấu hiệu đối phó</span><span class="chip chu-y">Nhịp học: Chưa đều</span></div>
+  </div>
+
+  <section class="the bao">
+    <span class="o-icon sai"><i data-i="alert"></i></span>
+    <div class="giua">
+      <p class="dam">Cố tình treo máy · 1 ngày trong 7 ngày</p>
+      <p class="mo">Thứ Ba 20/10 có 7 lượt treo máy. Lượt dài nhất 7 phút 40 giây không chạm màn khi màn đang sáng.</p>
+    </div>
+    <span class="nut chinh">Xem các lượt treo</span>
+  </section>
+
+  <section class="the ket-luan">
+    <div>
+      <p class="nhan">Nhận định tuần này · độ tin cậy 86%</p>
+      <p class="nhan-lon mt-2">Đối phó</p>
+      <div class="tab mt-3" role="group" aria-label="Xếp học sinh"><span>Học thật</span><span class="on">Đối phó</span></div>
+      <p class="phu mt-3">Tuần thứ hai liền em bị xếp Đối phó: máy đã nhắc em tuần trước, tuần này máy báo phụ huynh.</p>
+      <div class="hang mt-3" style="flex-wrap:wrap;gap:6px"><span class="chip dung">T41 · Học thật</span><span class="chip dung">T42 · Học thật</span><span class="chip tin">T43 · Đối phó</span><span class="chip tin">T44 · Đối phó</span></div>
+    </div>
+    <div>
+      <div class="the-dau"><div class="h3">Lý do</div><span class="mo">tính từ lượt có số đo</span></div>
+      <ul class="ly-do">
+        <li><b class="so-ld">40/69</b><span>lượt sai là lúc làm vội (Mức làm 1–2), tức <b class="dam" style="color:var(--chu)">58%</b> số lượt sai có số đo.</span></li>
+        <li><b class="so-ld">25</b><span>lượt Bấm vội: nộp trước khi đọc hết đề mà sai. Tối 25/10 có 9/12 câu bài tập về nhà như vậy.</span></li>
+        <li><b class="so-ld">7</b><span>lượt treo máy trong Thứ Ba 20/10 (từ 3 lượt một ngày là Mức làm 6 · Cố tình treo máy).</span></li>
+        <li><b class="so-ld">9/30</b><span>ngày đủ mức tối thiểu trong 30 ngày; 13 ngày không học.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="the">
+    <div class="the-dau"><div class="h3">Cách làm bài · 6 mức</div><span class="mo">Mức làm 1–6 từng lượt</span></div>
+    <div class="ba-so">
+      <div><p class="so sai-mau">58%</p><p class="mo">lượt sai lúc làm vội (Mức 1–2)</p></div>
+      <div><p class="so">22%</p><p class="mo">lượt sai dù đã nghĩ (Mức 3–4)</p></div>
+      <div><p class="so">20%</p><p class="mo">lượt sai sau khi treo máy (Mức 5–6)</p></div>
+      <p class="mo" style="text-align:right">Đo được <b class="dam" style="color:var(--chu)">142/158</b> lượt · 16 lượt chưa có số đo</p>
+    </div>
+    <div class="thanh6 mt-4" role="img" aria-label="Mức làm 1: 31 lượt; 2: 24; 3: 46; 4: 19; 5: 15; 6: 7; chưa có số đo: 16">
+      <i style="flex:31;background:var(--m1)">31</i><i style="flex:24;background:var(--m2)">24</i><i style="flex:46;background:var(--m3)">46</i><i style="flex:19;background:var(--m4)">19</i><i style="flex:15;background:var(--m5)">15</i><i style="flex:7;background:var(--m6)">7</i><i class="chua" style="flex:16">16</i>
+    </div>
+    <div class="hang giua mt-1 mo"><span>← làm vội</span><span>treo máy · chưa có số đo →</span></div>
+    <div class="luoi-muc mt-4" id="muc"></div>
+    <div class="hang mt-3" style="flex-wrap:wrap;gap:4px 16px"><span class="mo">Mức làm 1: <b class="dam" style="color:var(--chu)">6</b> lượt Thuộc (nhanh mà đúng) · <b class="dam" style="color:var(--chu)">25</b> lượt Bấm vội (nhanh mà sai)</span><a class="lien-ket day">Cách tính Mức làm <i data-i="chevron-down" class="nho"></i></a></div>
+  </section>
+
+  <section class="the dem">
+    <div class="the-dau dau-dem"><div class="h3">Từng lượt</div><span class="mo">mới nhất trên cùng · 8/158 lượt</span></div>
+    <div class="an-dt">
+      <table class="bang">
+        <thead><tr><th>Lúc</th><th>Câu</th><th>Kết quả</th><th style="text-align:right">Số giây</th><th>Mức làm</th></tr></thead>
+        <tbody id="bang"></tbody>
+      </table>
+    </div>
+    <div class="ds chi-dt6" id="ds" style="border-top:1px solid var(--vien)"></div>
+    <div style="padding:12px 20px;border-top:1px solid var(--vien)"><span class="nut">Xem thêm 150 lượt</span></div>
+  </section>
+</main>
+<script src="khung.js"></script>
+<script>
+const muc = [[1, 'Chưa đọc hết đề', 31, 6, 25], [2, 'Đọc xong, chưa kịp nghĩ', 24, 9, 15], [3, 'Có nghĩ', 46, 33, 13], [4, 'Làm kỹ', 19, 17, 2], [5, 'Treo máy', 15, 6, 9], [6, 'Cố tình treo máy', 7, 2, 5]]
+document.getElementById('muc').innerHTML = muc.map(([n, ten, l, d, s]) => `<div>
+  <p class="dau-m"><i style="background:var(--m${n})"></i>Mức làm ${n}</p>
+  <p class="ten-m">${ten}</p><p class="so" style="font-size:22px">${l}<small>lượt</small></p><p class="mo">đúng ${d} · sai ${s}</p>${n === 6 ? '<p class="mo sai-mau mt-1" style="font-weight:600">chỉ thầy thấy</p>' : ''}</div>`).join('')
+// [giờ, ngày, câu, nguồn · dạng, đúng?, giây, đọc hết đề, mức, tên mức]
+const luot = [
+  ['19:42', '26/10', 'Peptide và protein · Câu 3', 'Ôn lại · Trắc nghiệm', 1, '48 giây', 'đọc hết đề 22 giây', 3, 'Có nghĩ'],
+  ['19:40', '26/10', 'Amino acid – tính lưỡng tính · Câu 5', 'Ôn lại · Trắc nghiệm', 0, '61 giây', 'đọc hết đề 25 giây', 3, 'Có nghĩ'],
+  ['18:12', '26/10', 'Polymer – trùng hợp, trùng ngưng · Câu 11', 'Hành trình · Trả lời ngắn', 1, '95 giây', 'đọc hết đề 24 giây', 4, 'Làm kỹ'],
+  ['21:46', '25/10', 'Amino acid và peptide · Câu 9', 'Bài tập về nhà · Trắc nghiệm', 0, '3 giây', 'đọc hết đề 19 giây', 1, 'Bấm vội'],
+  ['21:46', '25/10', 'Amino acid và peptide · Câu 8', 'Bài tập về nhà · Trắc nghiệm', 0, '4 giây', 'đọc hết đề 21 giây', 1, 'Bấm vội'],
+  ['21:45', '25/10', 'Amino acid và peptide · Câu 7', 'Bài tập về nhà · Trắc nghiệm', 1, '5 giây', 'đọc hết đề 17 giây', 1, 'Thuộc'],
+  ['18:22', '24/10', 'Chất béo – chỉ số và glycerol · Câu 14', 'Ca kiểm tra · Trắc nghiệm', 0, '14 giây', 'đọc hết đề 12 giây', 2, 'Đọc xong, chưa kịp nghĩ'],
+  ['20:31', '20/10', 'Saccharose và maltose · Câu 6', 'Hành trình · Trắc nghiệm', 0, '7 phút 40 giây', 'treo máy', 6, 'Cố tình treo máy'],
+]
+const kq = (d) => d ? `<span class="kq dung-mau">${icon('check', 'nho')}Đúng</span>` : `<span class="kq sai-mau">${icon('x', 'nho')}Sai</span>`
+const mc = (m, t) => `<span class="muc-chip"><i style="background:var(--m${m})"></i>Mức làm ${m} <span class="mo">${t}</span></span>`
+document.getElementById('bang').innerHTML = luot.map(([g, n, c, ng, d, s, doc, m, t]) => `<tr>
+  <td><div class="dam">${g}</div><div class="mo">${n}</div></td><td><div style="font-weight:500">${c}</div><div class="mo">${ng}</div></td>
+  <td>${kq(d)}</td><td class="so-o">${s}<div class="mo" style="font-weight:400">${doc}</div></td><td>${mc(m, t)}</td></tr>`).join('')
+document.getElementById('ds').innerHTML = luot.map(([g, n, c, ng, d, s, doc, m, t]) => `<div class="dong" style="align-items:flex-start">
+  <div class="giua"><p class="ten">${c}</p><p class="mo">${g} ${n} · ${ng}</p><p class="mo mt-1">${mc(m, t)}</p></div>
+  <span class="phai" style="flex-direction:column;align-items:flex-end;gap:2px">${kq(d)}<span class="mo">${s}</span></span></div>`).join('')
+</script>
+</body></html>

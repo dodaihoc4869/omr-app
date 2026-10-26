@@ -1,0 +1,33 @@
+/* «Trong» nhóm 4 — KHO ĐỀ (NganHangDeScreen, gốc .gv-kho-day-du). Luật chung: đầu tệp trong-quan-ly.css.
+   Tiêu đề không ô biểu tượng; «Duyệt lời giải» là nút chính; Đồng bộ / Đẩy file thành ô việc trắng viền mảnh; mọi khối là thẻ trắng
+   viền mảnh; thẻ đề thành dòng gọn (sọc trái: xanh = đáp án đủ, hổ phách = còn câu chờ quyết). Kiểu chữ inline (serif) ⇒ đổi biến --serif. */
+[data-trong='gv'] .gv-kho-day-du { gap: 20px !important; --serif: var(--sans); }
+[data-trong='gv'] .gv-kho-day-du > .gv-page-header > div > div:first-child:has(> svg) { display: none; }
+[data-trong='gv'] .gv-kho-day-du > .gv-page-header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] .gv-kho-day-du > .gv-page-header > button { min-height: 44px !important; padding: 0 18px !important; border: 1px solid var(--tr-chinh-nut) !important; border-radius: 12px !important; background: var(--tr-chinh-nut) !important; color: var(--tr-tren-chinh) !important; font-weight: 600; box-shadow: var(--tr-bong-1) !important; }
+/* thẻ trắng viền mảnh cho mọi khối */
+[data-trong='gv'] .gv-kho-day-du :is(.gv-bank-overview, .gv-kho-cay, .gv-kho-bo-loc), [data-trong='gv'] .gv-kho-day-du > :is(details, section) {
+  border: 1px solid var(--tr-vien) !important; border-radius: 20px !important; background: var(--tr-mat) !important; box-shadow: var(--tr-bong-1) !important;
+}
+[data-trong='gv'] .gv-kho-day-du > details { padding: 4px 20px; }
+[data-trong='gv'] .gv-kho-day-du > details > summary { display: flex; align-items: center; min-height: 52px; font-size: 15px; font-weight: 600; cursor: pointer; }
+[data-trong='gv'] .gv-kho-day-du .gv-bank-overview .gv-page-header .font-bold { font-size: 22px !important; font-weight: 700; }
+/* ô việc: trắng viền mảnh, biểu tượng nền chìm */
+[data-trong='gv'] .gv-kho-day-du .gv-bank-overview button.tap-target {
+  border: 1px solid var(--tr-vien-2) !important; border-radius: 14px !important; background: var(--tr-mat) !important; color: var(--tr-chu) !important; box-shadow: var(--tr-bong-1) !important;
+}
+[data-trong='gv'] .gv-kho-day-du .gv-bank-overview button.tap-target > span:first-child { background: var(--tr-mat-2) !important; color: var(--tr-chu-2) !important; }
+[data-trong='gv'] .gv-kho-day-du .gv-bank-overview button.tap-target > span:last-child > span:first-child { color: var(--tr-chu) !important; }
+[data-trong='gv'] .gv-kho-day-du .gv-bank-overview button.tap-target > span:last-child > span:last-child { color: var(--tr-chu-3) !important; opacity: 1 !important; }
+/* danh sách đề */
+[data-trong='gv'] .gv-kho-day-du > section > div:first-child { padding: 16px 20px; background: none; border-bottom: 1px solid var(--tr-vien); }
+[data-trong='gv'] .gv-kho-day-du > section > div:first-child h2 { font-size: 16px; font-weight: 600; }
+[data-trong='gv'] .gv-kho-day-du .gv-bank-grid { padding: 16px; }
+[data-trong='gv'] .gv-kho-day-du .gv-kho-cay { box-shadow: none !important; background: var(--tr-mat-2) !important; border-color: transparent !important; }
+[data-trong='gv'] .gv-kho-day-du .gv-kho-cay button[aria-pressed='true'] { background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .gv-kho-day-du .gv-kho-bo-loc { box-shadow: none !important; }
+[data-trong='gv'] .gv-kho-day-du .gv-kho-bo-loc :is(input, select) { min-height: 44px; border-color: var(--tr-vien-2); }
+[data-trong='gv'] .gv-kho-day-du .gv-kho-de[data-ui-card] { border: 1px solid var(--tr-vien) !important; border-radius: 14px !important; box-shadow: none !important; }
+[data-trong='gv'] .gv-kho-day-du .gv-kho-de > div { border-top-left-radius: 14px !important; border-bottom-left-radius: 14px !important; }
+[data-trong='gv'] .gv-kho-day-du .gv-kho-de .font-bold.truncate { font-size: 15px !important; font-weight: 600; }
+[data-trong='gv'] .gv-kho-day-du .gv-kho-de details > summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--tr-chinh-chu); font-size: 13px; }

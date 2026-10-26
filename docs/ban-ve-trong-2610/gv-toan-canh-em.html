@@ -1,0 +1,117 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Toàn cảnh em</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.dau-man>.chu{flex:1;min-width:0}
+.dau-dem{padding:18px 20px 14px;margin:0}
+.chu-giai{display:flex;flex-wrap:wrap;gap:6px 16px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-2)}
+.chu-giai i{width:10px;height:10px;border-radius:3px}
+.dang-dong{display:grid;grid-template-columns:minmax(0,1fr) 120px 104px;gap:14px;align-items:center;padding:12px 20px;border-top:1px solid var(--vien);min-height:64px}
+.dang-dong .ten{font-weight:600;line-height:1.35}
+.dang-dong .pt{text-align:right;font-weight:700;font-size:17px}
+.dang-dong .pt small{display:block;font-size:12px;font-weight:500}
+.mui-len{color:var(--sai-chu)}.mui-xuong{color:var(--dung-chu)}.mui-ngang{color:var(--chu-3)}
+.loc{padding:0 20px 8px}
+.ngay{padding:14px 20px 6px;font-size:13px;font-weight:600;color:var(--chu-2);border-top:1px solid var(--vien)}
+.su{display:grid;grid-template-columns:48px 14px minmax(0,1fr);gap:10px;padding:8px 20px 10px}
+.su .gio{font-size:13px;color:var(--chu-3);font-weight:500;padding-top:1px}
+.su .cham{margin-top:7px}
+.su .loai{font-size:12px;font-weight:600;color:var(--chu-3);letter-spacing:.02em}
+.su .ten{font-weight:500;line-height:1.45}
+@media (max-width:600px){
+  .dau-man .hang{width:100%;flex-wrap:wrap}.dau-man .hang .nut{flex:1}.dau-man .hang .nut.chinh{flex:1 1 100%}
+  .dang-dong{grid-template-columns:minmax(0,1fr) 96px;padding:12px 16px}.dang-dong .thanh-o{display:none}
+  .loc{padding:0 16px 8px}.ngay{padding:14px 16px 6px}.su{padding:8px 16px 10px}
+}
+</style></head>
+<body data-app="gv" data-tab="hoc-sinh" data-khung="man-con" data-tieu="Toàn cảnh em" data-phu="Trần Minh Hiếu · 12A2" data-ve="Học sinh">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: 5 chip đầu trang gom thành một dòng phụ + 2 chip có nghĩa (chuỗi ngày, phụ huynh); một nút chính «Hồ sơ làm bài».
+       Bản đồ dạng từ lưới 12 ô thành danh sách xếp theo % sai, hiện 6 dạng đáng lo nhất, còn lại vào «Xem đủ». -->
+  <div class="dau-man">
+    <span class="av lon a2 an-dt" style="width:56px;height:56px;font-size:18px">MH</span>
+    <div class="chu">
+      <h1 class="tieu-de">Trần Minh Hiếu</h1>
+      <p class="phu mt-1">#122307 · Lớp 12A2 · Hoạt động cuối 19:42 hôm nay</p>
+      <div class="hang mt-2" style="flex-wrap:wrap;gap:8px"><span class="chip sao"><i data-i="flame" class="nho"></i>Chuỗi 4 ngày</span><span class="chip">Phụ huynh xem app · 23/10</span></div>
+    </div>
+    <div class="hang"><span class="nut">Cho thi lại</span><span class="nut">Xem hồ sơ học sinh</span><span class="nut chinh">Hồ sơ làm bài<i data-i="arrow" class="nho"></i></span></div>
+  </div>
+
+  <div class="dai-kpi" style="--n:4">
+    <div class="kpi"><span class="nhan">Điểm ca gần nhất</span><span class="so">6,25<small>/10</small></span><span class="mo">Kiểm tra 15 phút · 24/10</span></div>
+    <div class="kpi"><span class="nhan">EXP hôm nay</span><span class="so">+85</span><span class="mo">18 câu Hành trình</span></div>
+    <div class="kpi"><span class="nhan">Câu đã làm hôm nay</span><span class="so">18<small>/24 câu</small></span><div class="thanh manh chu-y" style="--p:75%"><i></i></div></div>
+    <div class="kpi"><span class="nhan">Ngày có học</span><span class="so">17<small>/30 ngày</small></span><span class="mo"><span class="delta xuong">−4</span> so với 30 ngày trước</span></div>
+  </div>
+
+  <div class="chinh-phu">
+    <div class="cot" style="gap:20px">
+      <section class="the">
+        <div class="the-dau"><div class="h3">Nhịp học 30 ngày</div><span class="mo an-dt">số câu làm mỗi ngày</span></div>
+        <svg id="nhip" style="width:100%;height:160px;display:block" aria-label="Số câu em làm mỗi ngày từ 27/09 đến 26/10"></svg>
+        <div class="chu-giai mt-2"><span><i style="background:var(--dung)"></i>Đủ mức 24 câu · 9 ngày</span><span><i style="background:var(--chu-y)"></i>Chưa đủ mức · 8 ngày</span><span><i style="background:var(--mat-3)"></i>Không học · 13 ngày</span></div>
+      </section>
+
+      <section class="the dem">
+        <div class="the-dau dau-dem"><div class="h3">Bản đồ dạng</div><span class="mo an-dt">12 dạng đã gặp · xếp theo % câu sai</span></div>
+        <div id="dang"></div>
+        <div style="padding:4px 20px 8px;border-top:1px solid var(--vien)"><a class="lien-ket">Xem đủ 12 dạng <i data-i="chevron" class="nho"></i></a></div>
+      </section>
+    </div>
+
+    <section class="the dem">
+      <div class="the-dau dau-dem"><div class="h3">Dòng thời gian</div><span class="mo an-dt">mọi việc em đã làm</span></div>
+      <div class="loc"><div class="tab"><span class="on">Tất cả</span><span>Ca kiểm tra</span><span>Bài tập về nhà</span><span>Ôn lại</span><span>Gọi lên bảng</span><span>Game</span><span>EXP</span><span>Cảnh báo của thầy</span></div></div>
+      <div id="tg"></div>
+      <div style="padding:4px 20px 8px;border-top:1px solid var(--vien)"><a class="lien-ket">Xem các ngày trước <i data-i="chevron" class="nho"></i></a></div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+// 30 ngày 27/09 → 26/10, mức tối thiểu 24 câu. Đủ mức 9 · chưa đủ 8 · không học 13 · chuỗi 4 ngày 23→26/10.
+const cau = [24, 26, 0, 24, 12, 0, 0, 24, 30, 0, 18, 0, 0, 0, 24, 9, 0, 0, 24, 0, 20, 0, 15, 0, 6, 0, 24, 30, 12, 18]
+const nhan = cau.map((_, i) => { const d = new Date(2026, 8, 27 + i); return (i % 7 === 0 || i === 27) ? `${d.getDate()}/${d.getMonth() + 1}` : '' })
+veCot('nhip', cau.map((v, i) => [nhan[i], v, v >= 24 ? 'dung' : v > 0 ? 'chu-y' : 'nhat']), { max: 32, buoc: 8 })
+
+// [dạng, gặp, sai, đã khắc phục, bậc, xu hướng sai: len|giam|ngang] — 6 dạng % sai cao nhất trong 12
+const dang = [
+  ['Peptide và protein', 15, 10, 1, 'Vận dụng', 'len'],
+  ['Amino acid – tính lưỡng tính', 22, 14, 2, 'Vận dụng', 'len'],
+  ['Điện phân dung dịch', 8, 5, 0, 'Vận dụng', 'len'],
+  ['Chất béo – chỉ số và glycerol', 18, 9, 2, 'Vận dụng', 'ngang'],
+  ['Amine – tính base', 20, 9, 3, 'Hiểu', 'len'],
+  ['Pin Galvani', 9, 4, 1, 'Vận dụng', 'ngang'],
+]
+const XH = { len: ['mui-len', 'sai đang lên'], giam: ['mui-xuong', 'sai đang giảm'], ngang: ['mui-ngang', 'giữ nguyên'] }
+document.getElementById('dang').innerHTML = dang.map(([t, g, s, k, bac, xh]) => {
+  const p = Math.round(100 * s / g)
+  return `<div class="dang-dong"><div><p class="ten">${t}</p><p class="mo">gặp ${g} · sai ${s} · đã khắc phục ${k} · bậc ${bac}</p></div>
+  <div class="thanh-o"><div class="thanh manh ${p >= 60 ? 'sai' : 'chu-y'}" style="--p:${p}%"><i></i></div></div>
+  <div class="pt ${p >= 60 ? 'sai-mau' : 'chu-y-mau'}">${p}%<small class="${XH[xh][0]}">${XH[xh][1]}</small></div></div>`
+}).join('')
+
+// [ngày, [giờ, loại, việc, chips [chữ, màu]]]
+const tg = [
+  ['Hôm nay · Thứ Hai 26/10', [
+    ['19:42', 'Ôn lại', 'Ôn lại 6 câu sai · Peptide và protein', [['đúng 4/6', 'dung']]],
+    ['19:05', 'EXP', '+85 EXP · 18 câu Hành trình hôm nay', []],
+    ['18:31', 'Game', 'Đoàn Hộ Tống · chặng 3', [['đúng 9/12', '']]],
+  ]],
+  ['Hôm qua · Chủ nhật 25/10', [
+    ['21:50', 'Cảnh báo của thầy', 'Thầy nhắc: đọc hết đề rồi mới chọn', []],
+    ['21:47', 'Bài tập về nhà', 'Amino acid và peptide · 12 câu', [['bấm vội 9/12 câu', 'sai'], ['đúng 5/12', '']]],
+  ]],
+  ['Thứ Bảy 24/10', [
+    ['18:20', 'Ca kiểm tra', 'Kiểm tra 15 phút · 12A2 · Ester – lipid', [['6,25/10 điểm', 'tin'], ['rời màn 1 lần', 'chu-y']]],
+    ['18:05', 'Gọi lên bảng', 'Câu 14 · Thế điện cực chuẩn', [['làm đúng', 'dung']]],
+  ]],
+]
+const CHAM = { 'Ôn lại': 'chinh', EXP: 'sao', Game: 'tin', 'Cảnh báo của thầy': 'sai', 'Bài tập về nhà': 'chu-y', 'Ca kiểm tra': 'tin', 'Gọi lên bảng': 'dung' }
+document.getElementById('tg').innerHTML = tg.map(([ngay, ds]) => `<div class="ngay">${ngay}</div>` + ds.map(([gio, loai, viec, chips]) => `
+  <div class="su"><span class="gio">${gio}</span><span class="cham ${CHAM[loai]}"${loai === 'EXP' ? ' style="background:var(--sao)"' : ''}></span>
+  <div><p class="loai">${loai}</p><p class="ten">${viec}</p>${chips.length ? `<div class="hang mt-1" style="flex-wrap:wrap;gap:6px">${chips.map(([c, m]) => `<span class="chip ${m}">${c}</span>`).join('')}</div>` : ''}</div></div>`).join('')).join('')
+</script>
+</body></html>

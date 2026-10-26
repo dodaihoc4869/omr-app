@@ -56,6 +56,7 @@ import { chuanHoaMucLam, ChipChuaCoSoDo, ChipMuc, ChuGiaiThuoc } from './muc-lam
 import { chuaDoTreoHet, chuKhoang7, HinhCoTinh, HinhMatMang, KhoiCachLamEm6, KhoiSauMucThay, KhoiTheoNgay, locLuot, maHien, MucLuot6, NutMoBaiTap, ThanhSau, type LoaiLoc, type LocLuot } from './ho-so-6-muc'
 import './bai-hang-ngay.css'
 import './ho-so-lam-cau-em.css'
+import '../../styles/trong-quan-ly-ho-so.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
 
 /** Em mở tấm: bắt buộc SBD · tên · khối; số Nhịp học (mức hôm nay, tầng…) có khi mở từ Nhịp học; `lop` khi mở từ Bài hằng ngày. */
 export type EmHoSo = Pick<DongNhip, 'sbd' | 'ten' | 'khoi'> & Partial<Omit<DongNhip, 'sbd' | 'ten' | 'khoi'>> & { lop?: string }

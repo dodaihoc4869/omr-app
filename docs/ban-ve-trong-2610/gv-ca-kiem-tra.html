@@ -1,0 +1,103 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Ca kiểm tra</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.dau-man>.chu{flex:1;min-width:0}
+.dau-dem{padding:18px 20px 14px;margin:0}
+.dang-mo{display:flex;align-items:center;gap:16px;padding:16px 20px;border-color:color-mix(in srgb,var(--chinh) 35%,var(--vien))}
+.dang-mo .giua{flex:1;min-width:0}
+.song{width:8px;height:8px;border-radius:50%;background:var(--dung);box-shadow:0 0 0 4px var(--dung-nhat);flex:none}
+.cong-cu{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:0 20px 16px}
+.cong-cu .o-nhap{flex:1;min-width:200px}
+.bang td .ten-ca{font-weight:600}
+.bang tr.mo-ca td{background:var(--chinh-nhat)}
+.bang .mui{color:var(--chu-3);width:36px;text-align:right}
+.chan-bang{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 20px;border-top:1px solid var(--vien)}
+.chi-dt6{display:none!important}
+.kpi3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.kpi3>.kpi{border-top:0!important;border-left:1px solid var(--vien)!important}.kpi3>.kpi:first-child{border-left:0!important}
+@media (max-width:600px){
+  .kpi3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .dau-man>.nut{width:100%}
+  .dang-mo{flex-wrap:wrap;padding:16px}.dang-mo .song{align-self:flex-start;margin-top:8px}.cong-cu .nut:not(.vuong){flex:1}.dang-mo .nut{width:100%}
+  .cong-cu{padding:0 16px 12px}.cong-cu .tab{width:100%}.cong-cu .tab>span{flex:1;justify-content:center}
+  .chi-dt6{display:flex!important}
+  .chan-bang{padding:12px 16px}.chan-bang .nut{flex:1 1 100%}.chan-bang .day{display:none}
+}
+</style></head>
+<body data-app="gv" data-tab="ca-kiem-tra">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: ca đang mở kéo lên đầu thành một dải có nút Theo dõi (bản cũ chìm trong bảng). Thanh công cụ 6 nút gom về thẻ danh sách;
+       «Chọn để xoá», «Ca đã xoá» là việc ít dùng nên xuống chân bảng. Điện thoại: bảng thành danh sách. -->
+  <div class="dau-man">
+    <div class="chu">
+      <p class="nhan">Tháng 10/2026 · 8 lớp đã có ca</p>
+      <h1 class="tieu-de mt-1">Ca kiểm tra</h1>
+    </div>
+    <span class="nut chinh"><i data-i="plus"></i>Mở ca kiểm tra</span>
+  </div>
+
+  <section class="the dang-mo">
+    <span class="song" aria-hidden="true"></span>
+    <div class="giua">
+      <p class="dam">Đang mở · Kiểm tra 15 phút · 12A1</p>
+      <p class="mo">Mở 19:30 · còn 08:42 · đã nộp 12/40 em · 1 em bị khoá</p>
+      <div class="thanh manh mt-2" style="--p:30%;max-width:320px"><i></i></div>
+    </div>
+    <span class="nut"><i data-i="eye" class="nho"></i>Theo dõi</span>
+  </section>
+
+  <div class="dai-kpi kpi3">
+    <div class="kpi"><span class="nhan">Ca trong tháng 10</span><span class="so">18<small>ca</small></span><span class="mo">8 lớp</span></div>
+    <div class="kpi"><span class="nhan">Bài đã nộp tháng 10</span><span class="so">612<small>bài</small></span><span class="mo">34 bài mỗi ca</span></div>
+    <div class="kpi an-dt"><span class="nhan">Rời màn trong tháng 10</span><span class="so chu-y-mau">47<small>lần</small></span><span class="mo">trên 612 bài đã nộp</span></div>
+  </div>
+
+  <section class="the dem">
+    <div class="the-dau dau-dem"><div class="h3">Danh sách ca kiểm tra</div><span class="mo an-dt">18 ca · mới nhất trước</span></div>
+    <div class="cong-cu">
+      <div class="tab"><span class="on">Tất cả 18</span><span>Đang mở 1</span><span>Đã đóng 17</span></div>
+      <div class="o-nhap"><i data-i="search" class="nho"></i>Tìm ca theo tên hoặc lớp</div>
+      <span class="nut">Lớp: Tất cả<i data-i="chevron-down" class="nho"></i></span>
+      <span class="nut vuong" aria-label="Tải lại"><i data-i="refresh"></i></span>
+    </div>
+    <div class="an-dt">
+      <table class="bang">
+        <thead><tr><th>Tên ca</th><th>Lớp</th><th>Bắt đầu</th><th class="an-hep">Công bố điểm</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody id="bang"></tbody>
+      </table>
+    </div>
+    <div class="ds chi-dt6" id="ds" style="border-top:1px solid var(--vien)"></div>
+    <div class="chan-bang">
+      <span class="mo">Hiện 8/18 ca<span class="an-dt"> · bấm một dòng để mở chi tiết ca</span></span>
+      <span class="nut">Xem thêm 10 ca</span>
+      <span class="day"></span>
+      <a class="lien-ket" style="color:var(--chu-2)">Chọn để xoá</a>
+      <a class="lien-ket" style="color:var(--chu-2)"><i data-i="trash" class="nho"></i>Ca đã xoá</a>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+<script>
+// [tên ca, chi tiết, lớp, giờ, ngày, công bố điểm, đang mở?]
+const ca = [
+  ['Kiểm tra 15 phút · 12A1', 'Ester – Lipid · 20 câu · 15 phút', '12A1', '19:30', 'hôm nay', 'Khi cả lớp nộp xong', 1],
+  ['Kiểm tra tuần 4 · 12A2', 'Xà phòng và chất giặt rửa · 24 câu · 45 phút', '12A2', '18:15', '25/10', 'Ngay khi nộp'],
+  ['Ôn chương 1 · Ester – Lipid', '28 câu · 50 phút', '12A1', '19:00', '24/10', 'Chưa công bố'],
+  ['Kiểm tra 15 phút · 11B1', 'Ammonia và muối ammonium · 16 câu · 15 phút', '11B1', '18:30', '23/10', 'Ngay khi nộp'],
+  ['Kiểm tra 15 phút · 10C3', 'Cấu tạo vỏ nguyên tử · 16 câu · 15 phút', '10C3', '18:20', '22/10', 'Ngay khi nộp'],
+  ['Kiểm tra tuần 3 · 11B2', 'Cân bằng hoá học · 24 câu · 45 phút', '11B2', '19:15', '21/10', 'Khi cả lớp nộp xong'],
+  ['Thi thử số 3 · Chuẩn cấu trúc 2026', 'Phần I 18 · Phần II 4 · Phần III 6 · 50 phút', '12A1 · 12A2', '14:00', '18/10', 'Chưa công bố'],
+  ['Kiểm tra 15 phút · 10C1', 'Bảng tuần hoàn các nguyên tố hoá học · 16 câu', '10C1', '18:10', '16/10', 'Ngay khi nộp'],
+]
+const tt = (mo) => mo ? '<span class="chip dung"><span class="cham dung"></span>Đang mở</span>' : '<span class="chip">Đã đóng</span>'
+document.getElementById('bang').innerHTML = ca.map(([t, ct, lop, gio, ngay, cb, mo]) => `
+  <tr${mo ? ' class="mo-ca"' : ''}><td><div class="ten-ca">${t}</div><div class="mo">${ct}</div></td>
+  <td>${lop.split(' · ').map((l) => `<span class="chip vien">${l}</span>`).join(' ')}</td>
+  <td><div class="dam">${gio}</div><div class="mo">${ngay}</div></td>
+  <td class="an-hep phu">${cb}</td><td>${tt(mo)}</td><td class="mui">${icon('chevron', 'nho')}</td></tr>`).join('')
+document.getElementById('ds').innerHTML = ca.map(([t, ct, lop, gio, ngay, cb, mo]) => `
+  <div class="dong"><div class="giua"><p class="ten">${t}</p><p class="mo">${lop} · ${gio} ${ngay}</p><p class="mo">${ct}</p></div>
+  <span class="phai">${mo ? tt(mo) : ''}${icon('chevron', 'nho')}</span></div>`).join('')
+</script>
+</body></html>

@@ -11,6 +11,7 @@ import { buoiDangMo } from '../lib/buoi-hoc-api'
 import type { BuoiHoc } from '../lib/buoi-hoc-api'
 import '../components/loi-giai/loi-giai.css'
 import './gv-hoa2.css'
+import '../styles/trong-quan-ly-go-nut.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
 
 const THU = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy']
 /** "2026-10-05" ⇒ "Thứ Hai 05/10/2026" (chuẩn ngày giờ — luật A1.6). */

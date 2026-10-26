@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useState, type ReactNode } from 'react'
 import { Activity, ArrowRight, Check, Hourglass, TriangleAlert } from 'lucide-react'
+import { modTrongHs } from './nap-trong-hs'
 import { CAU_MOI_CHANG, soChangXong, type SoHomNay } from './lam-bai'
 import { layNhipHocEm, nhipTheoSanh, TEN_NHOM_NHIP, type KetQuaNhipHocEm, type NhomNhip } from '../../lib/nhip-hoc-em'
 // Đợt 16: phần Nhịp học (dải ô ngày, Lười k/6, Việc tiếp, tốc độ) tách thành bảng DÙNG CHUNG với app phụ huynh — markup + chữ của em giữ nguyên.
@@ -93,6 +94,8 @@ export interface PropsTheHomNayEm {
   token?: string
   /** Có ⇒ khối Nhịp học bấm được, mở hồ sơ làm bài của em. */
   onMoHoSo?: () => void
+  /** Giao diện «Trong» (26/10): chỗ vẽ thẻ Nhịp học ở CỘT PHỤ (máy tính) — cùng một lượt nạp `/hs/nhip-hoc`, chỉ đổi chỗ hiện. */
+  noiNhip?: Element | null
 }
 
 /** Chữ nút học — MỘT nút cho cả màn (Hôm nay và Hành trình dùng chung).
@@ -119,7 +122,7 @@ function Chip({ nhom }: { nhom: NhomNhip }) {
 }
 
 /** Chip nhóm; máy chủ có bậc (13/10) ⇒ thêm chip "Bậc N/12 · Tên" ngay cạnh (khối nạp khi cần), hai chip xuống hàng khi chật. */
-function ChipNhom({ k }: { k: KetQuaNhipHocEm }) {
+export function ChipNhom({ k }: { k: KetQuaNhipHocEm }) {
   if (!k.bacCham) return <Chip nhom={k.nhom} />
   return (
     <span className="bcc-hang">
@@ -214,23 +217,31 @@ function PhanChinh(p: PropsTheHomNayEm & { chip: ReactNode }) {
   )
 }
 
+/** Khung xương phần Nhịp học (đang tải). */
+export const XuongNhip = () => (
+  <div className="ht2-hn-nhip ht2-hn-xuong" aria-label="Đang tải nhịp học của em">
+    <span style={{ width: '58%', height: 18 }} />
+    <span style={{ width: '100%', height: 22 }} />
+    <span style={{ width: '84%', height: 40 }} />
+  </div>
+)
+
 export default function TheHomNayEm(p: PropsTheHomNayEm) {
   // Khoá cố định (không theo số câu đã làm): số hôm nay đã tính lại từ sảnh bên dưới ⇒ không gọi /hs/nhip-hoc sau mỗi câu (khẩn 12/10 21h).
   const nhipGoc = useNhipHocEm(p.token, null)
   const nhip = typeof nhipGoc === 'string' ? nhipGoc : nhipTheoSanh(nhipGoc, p.so ? { muc: p.so.muc, daLam: p.so.daLam } : null)
   const coNhip = nhip !== 'an'
   const k = typeof nhip === 'string' ? null : nhip
+  // «Trong»: mảnh trình bày nạp lười (TrongHs.tsx) — đã nạp xong trước khi vẽ (cổng ở HocTapHomNay); chưa có ⇒ vẽ bản cũ.
+  const Trong = modTrongHs()?.HomNayTrong
+  if (Trong) return <Trong p={p} k={k} nhip={nhip} />
   return (
     <section className="ht2-hn" data-nhom={k?.nhom} data-mot={coNhip ? undefined : 'true'} aria-label="Hôm nay của em" aria-busy={(!p.so && p.dangTai) || nhip === 'tai'}>
       <PhanChinh {...p} chip={k ? <ChipNhom k={k} /> : nhip === 'tai' ? <span className="ht2-hn-chip-xuong" aria-hidden="true" /> : null} />
       {k ? (
         <BangNhipHoc k={k} onMoHoSo={p.onMoHoSo} />
       ) : nhip === 'tai' ? (
-        <div className="ht2-hn-nhip ht2-hn-xuong" aria-label="Đang tải nhịp học của em">
-          <span style={{ width: '58%', height: 18 }} />
-          <span style={{ width: '100%', height: 22 }} />
-          <span style={{ width: '84%', height: 40 }} />
-        </div>
+        <XuongNhip />
       ) : null}
     </section>
   )

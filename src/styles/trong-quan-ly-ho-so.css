@@ -1,0 +1,12 @@
+/* «Trong» nhóm 4 — HỒ SƠ LÀM BÀI (HoSoLamCauEm, tấm .hslc). Tệp dùng chung với app học sinh ⇒ CHỈ luật dưới [data-trong='gv'] (máy em không đổi).
+   Luật chung: đầu tệp trong-quan-ly.css. Nền tấm xám rất nhạt, từng khối là thẻ trắng viền mảnh bo 20; chữ một phông; nhãn màu theo nghĩa. */
+[data-trong='gv'] .gvv2-hs.hslc { background: var(--tr-nen); --serif: var(--sans); }
+[data-trong='gv'] .hslc .hslc-dau { background: var(--tr-mat); border-color: var(--tr-vien); }
+[data-trong='gv'] .hslc .gvv2-hs-mat { font-size: 13px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--tr-chu-3); }
+[data-trong='gv'] .hslc .gvv2-h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+[data-trong='gv'] .hslc .gvv2-avatar { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-weight: 600; }
+[data-trong='gv'] .hslc .hslc-khoi { padding: 20px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .hslc .gvv2-tdo-tieu { font-size: 16px; font-weight: 600; }
+[data-trong='gv'] .hslc :is(.gvv2-hs-cau, .hslc-khoi-con) { border-color: var(--tr-vien); border-radius: 14px; box-shadow: none; }
+[data-trong='gv'] .hslc .gvv2-hs-chan { background: var(--tr-mat); border-color: var(--tr-vien); }
+[data-trong='gv'] .hslc .gvv2-nut-vien { min-height: 44px; border-color: var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-1); font-weight: 600; }

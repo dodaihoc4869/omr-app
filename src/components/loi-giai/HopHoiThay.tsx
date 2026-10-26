@@ -17,6 +17,7 @@ import { ChemText } from '../../lib/chem-format'
 import { chuHoa } from './TraLoiThay'
 import './loi-giai.css'
 import './hop-hoi-thay.css'
+import '../../styles/trong-hoi-thay.css' // giao diện «Trong» (26/10): chỉ có hiệu lực dưới <html data-trong>, nạp cùng mảnh lười này
 
 /** ĐỀ CHUẨN (bản vẽ docs/ban-ve-hoi-thay-1310, thầy chốt 13/10: "giao diện đề chuẩn theo hiển thị của đề bài"): máy chủ gửi đề dạng HTML đã thoát
  *  (`deHtml`: đoạn chữ + bảng + hình) ⇒ tách ĐOẠN CHỮ để vẽ như màn làm bài ("Câu n." đậm, công thức hạ chỉ số qua ChemText), phần bảng/hình

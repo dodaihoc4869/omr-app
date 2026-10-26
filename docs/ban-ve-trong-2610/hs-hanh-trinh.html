@@ -1,0 +1,90 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Hành trình</title><link rel="stylesheet" href="trong.css">
+<style>
+.thang-the{position:relative;overflow:hidden;padding:24px}
+.thang-the::before{content:"";position:absolute;inset:-50% 0 auto auto;width:380px;height:420px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--chinh) 12%,transparent),transparent);pointer-events:none}
+.thang-dau{position:relative;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.thang-dau .giua{flex:1;min-width:0}
+.thang{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:end;margin-top:24px;padding:0;list-style:none}
+.bac{display:flex;flex-direction:column;gap:10px;min-width:0}
+.bac .khoi{border-radius:12px;background:var(--mat-2);display:flex;align-items:flex-start;justify-content:space-between;padding:10px 12px;font-weight:700;font-size:18px;color:var(--chu-3)}
+.bac:nth-child(1) .khoi{height:56px}.bac:nth-child(2) .khoi{height:84px}.bac:nth-child(3) .khoi{height:112px}.bac:nth-child(4) .khoi{height:140px}
+.bac.vung .khoi{background:var(--dung-nhat);color:var(--dung-chu)}
+.bac.dang .khoi{background:var(--chinh);color:var(--tren-mau);box-shadow:0 0 0 4px var(--chinh-nhat)}
+.bac.khoa .khoi{background:repeating-linear-gradient(-45deg,var(--mat-2) 0 8px,var(--mat) 8px 16px);box-shadow:inset 0 0 0 1px var(--vien)}
+.bac b{display:block;font-size:15px;font-weight:600;line-height:1.3}
+.bac small{display:block;font-size:13px;color:var(--chu-3)}
+.bac.vung small{color:var(--dung-chu)} .bac.dang small{color:var(--chinh-chu);font-weight:600}
+.bai .dong{display:grid;grid-template-columns:48px minmax(0,1fr) 220px 210px;grid-template-areas:"tang ten tien han";gap:20px;min-height:76px}
+.bai .tang4{grid-area:tang}.bai .giua{grid-area:ten}.bai .tien{grid-area:tien}.bai .han{grid-area:han}
+.bai .tien .hang{justify-content:space-between;font-size:13px}
+.tang4{display:flex;gap:3px;width:48px;flex:none}
+.tang4 i{flex:1;height:6px;border-radius:999px;background:var(--mat-3)}
+.tang4 i.x{background:var(--dung)}.tang4 i.d{background:var(--chinh)}
+.han{justify-content:flex-end}
+@media (max-width:900px){.bai .dong{grid-template-columns:48px minmax(0,1fr) 160px 190px;gap:16px}}
+@media (max-width:600px){
+  .thang-the{padding:18px}
+  .thang{gap:8px;margin-top:20px}
+  .bac:nth-child(1) .khoi{height:44px}.bac:nth-child(2) .khoi{height:64px}.bac:nth-child(3) .khoi{height:84px}.bac:nth-child(4) .khoi{height:104px}
+  .bac .khoi{padding:8px 10px;font-size:15px}
+  .bac b{font-size:13.5px}.bac small{font-size:12px}
+  .thang-dau .nut{width:100%}
+  .bai .dong{grid-template-columns:minmax(0,1fr);grid-template-areas:"ten" "han" "tien";gap:8px}
+  .han{justify-content:flex-start}
+}
+</style></head>
+<body data-app="hs" data-tab="hanh-trinh">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bậc thang nét mảnh thay khối viền dày; nút «Học tiếp» đứng ngay dưới tiêu đề thang.
+       Bốn thẻ bài gộp thành một danh sách: tên bài, thanh «Gặp câu gốc», hạn — đọc một lượt từ trên xuống. -->
+  <div>
+    <p class="nhan">Thứ Hai 26/10 · 12A1</p>
+    <h1 class="tieu-de mt-1"><span class="nhat">Em đang luyện tầng</span> Vận dụng</h1>
+  </div>
+
+  <section class="the thang-the" aria-label="Thang 4 tầng của mỗi bài">
+    <div class="thang-dau">
+      <div class="giua"><p class="nhan">Thang 4 tầng của mỗi bài</p><h2 class="h2 mt-1">Nền · Hiểu · Vận dụng · Tổng hợp</h2></div>
+      <span class="nut chinh lon">Học tiếp · 16 câu <i data-i="arrow"></i></span>
+    </div>
+    <ol class="thang" aria-label="Tầng đang luyện: Vận dụng">
+      <li class="bac vung"><div class="khoi">1<i data-i="check" class="nho"></i></div><div><b>Nền</b><small>Đã vững</small></div></li>
+      <li class="bac vung"><div class="khoi">2<i data-i="check" class="nho"></i></div><div><b>Hiểu</b><small>Đã vững</small></div></li>
+      <li class="bac dang"><div class="khoi">3<i data-i="flag" class="nho"></i></div><div><b>Vận dụng</b><small>Đang luyện</small></div></li>
+      <li class="bac khoa"><div class="khoi">4<i data-i="lock" class="nho"></i></div><div><b>Tổng hợp</b><small>Còn khoá</small></div></li>
+    </ol>
+  </section>
+
+  <section class="the dem bai">
+    <div class="the-dau" style="padding:18px 20px 6px;margin:0"><div class="h3">Bài đang luyện</div><span class="chip">4 bài</span></div>
+    <div class="ds">
+      <div class="dong">
+        <div class="tang4 an-dt" aria-label="Tầng Vận dụng"><i class="x"></i><i class="x"></i><i class="d"></i><i></i></div>
+        <div class="giua"><p class="ten">Bài 6. Một số hợp chất của nitrogen với oxygen</p><p class="mo">Tầng Vận dụng</p></div>
+        <div class="tien"><div class="hang"><span class="mo">Gặp câu gốc</span><span class="dam">97/99 câu</span></div><div class="thanh manh mt-1" style="--p:98%"><i></i></div></div>
+        <span class="phai han"><span class="chip sai">Đã qua hạn 25/10</span></span>
+      </div>
+      <div class="dong">
+        <div class="tang4 an-dt" aria-label="Tầng Vận dụng"><i class="x"></i><i class="x"></i><i class="d"></i><i></i></div>
+        <div class="giua"><p class="ten">Bài 5. Ammonia. Muối ammonium</p><p class="mo">Tầng Vận dụng</p></div>
+        <div class="tien"><div class="hang"><span class="mo">Gặp câu gốc</span><span class="dam">76/90 câu</span></div><div class="thanh manh mt-1" style="--p:84%"><i></i></div></div>
+        <span class="phai han"><span class="chip vien">Hạn 30/10</span></span>
+      </div>
+      <div class="dong">
+        <div class="tang4 an-dt" aria-label="Tầng Vận dụng"><i class="x"></i><i class="x"></i><i class="d"></i><i></i></div>
+        <div class="giua"><p class="ten">Bài 4. Nitrogen</p><p class="mo">Tầng Vận dụng</p></div>
+        <div class="tien"><div class="hang"><span class="mo">Gặp câu gốc</span><span class="dam dung-mau">84/84 câu</span></div><div class="thanh manh dung mt-1" style="--p:100%"><i></i></div></div>
+        <span class="phai han"><span class="chip vien">Hạn 01/11</span></span>
+      </div>
+      <div class="dong">
+        <div class="tang4 an-dt" aria-label="Tầng Vận dụng"><i class="x"></i><i class="x"></i><i class="d"></i><i></i></div>
+        <div class="giua"><p class="ten">Bài 7. Sulfur và sulfur dioxide</p><p class="mo">Tầng Vận dụng</p></div>
+        <div class="tien"><div class="hang"><span class="mo">Gặp câu gốc</span><span class="dam">18/72 câu</span></div><div class="thanh manh chu-y mt-1" style="--p:25%"><i></i></div></div>
+        <span class="phai han"><span class="chip chu-y">Bộ bài đang chờ đủ nguồn</span></span>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+</body></html>

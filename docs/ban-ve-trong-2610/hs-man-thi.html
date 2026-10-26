@@ -1,0 +1,142 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Màn làm bài thi</title><link rel="stylesheet" href="trong.css">
+<style>
+sub,sup{line-height:0}
+p{text-wrap:pretty}
+/* Thanh trên của màn thi: đồng hồ · Đã làm · Danh sách câu · Nộp bài. Không gì khác. */
+.thi-dau{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--nen) 90%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--vien)}
+.thi-hang{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;min-height:64px;padding-top:10px;padding-bottom:10px}
+.ten-ca{min-width:0}.ten-ca b{display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gio{display:flex;align-items:center;gap:8px;color:var(--chu)}
+.gio svg{color:var(--chu-3)}
+.gio-so{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.phai-thi{display:flex;align-items:center;justify-content:flex-end;gap:10px}
+.da-lam{font-size:14px;color:var(--chu-2);white-space:nowrap}.da-lam b{color:var(--chu);font-weight:600}
+.tien-do{height:3px;border-radius:0}
+.nut-ds{display:none}
+.chi-hep-dt{display:none}
+/* Thân */
+.bo-thi{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;align-items:start}
+.cau{padding:28px}
+.dau-cau{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.dau-cau .so-cau{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.dau-cau .nut{margin-left:auto}
+.xem-lai-on{background:var(--chu-y-nhat);color:var(--chu-y-chu)}
+.cac-pa{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.chuyen{display:flex;justify-content:space-between;gap:12px;margin-top:16px}
+.luoi-cau{position:sticky;top:96px}
+.o-cau{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:8px}
+.o-cau span{position:relative;min-height:44px;display:grid;place-items:center;border-radius:10px;background:var(--mat-2);color:var(--chu-3);font-size:14px;font-weight:600}
+.o-cau span.lam{background:var(--chinh-nhat);color:var(--chinh-chu)}
+.o-cau span.dang{background:var(--mat);color:var(--chu);box-shadow:inset 0 0 0 2px var(--chinh)}
+.o-cau span.co::after{content:"";position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--chu-y)}
+.nhom-cau{margin-top:16px}
+.chu-giai{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:18px;padding-top:14px;border-top:1px solid var(--vien)}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-2)}
+.chu-giai i{position:relative;width:14px;height:14px;border-radius:4px;background:var(--mat-2)}
+.chu-giai i.lam{background:var(--chinh-nhat);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--chinh) 35%,transparent)}
+.chu-giai i.dang{background:var(--mat);box-shadow:inset 0 0 0 2px var(--chinh)}
+.chu-giai i.co{background:none}.chu-giai i.co::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--chu-y)}
+.mau-ds{margin-top:40px}
+.y-ds .noi b{font-weight:600;margin-right:4px}
+@media (max-width:1100px){
+  .ten-ca{display:none}
+  .thi-hang{grid-template-columns:auto minmax(0,1fr)}
+  .nut-ds{display:inline-flex}
+  .bo-thi{grid-template-columns:minmax(0,1fr)}
+  .luoi-cau{display:none}
+  .bo-thi>section{max-width:760px;width:100%;margin:0 auto}
+}
+@media (max-width:600px){
+  .thi-hang{gap:8px;min-height:60px}
+  .gio-so{font-size:22px}
+  .da-lam.an-dt{display:none}
+  .chi-hep-dt{display:block;font-size:12px;margin-top:3px}
+  .gio-khoi .gio svg{width:18px;height:18px}
+  .nut-ds .chu{display:none}
+  .nut-ds{width:44px;padding:0}
+  .cau{padding:18px 16px}
+  .dau-cau .so-cau{font-size:18px}
+  .lua-chon{padding:10px 12px;gap:12px}
+  .dau-cau{position:relative;padding-right:52px}
+  .dau-cau .nut{position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:44px;padding:0}
+  .dau-cau .nut .chu{display:none}
+  .y-ds{flex-direction:column;align-items:stretch;gap:10px}
+  .y-ds .ds-chon{align-self:flex-start}
+  .y-ds .ds-chon span{min-width:76px}
+}
+</style></head>
+<body data-app="hs" data-khung="khong" data-ai="khong">
+<header class="thi-dau">
+  <div class="khung thi-hang">
+    <div class="ten-ca"><b>Kiểm tra 50 phút · 12A1</b><span class="mo">Mã ca: 261048 · Số báo danh: 110234</span></div>
+    <div class="gio-khoi">
+      <div class="gio" role="timer" aria-label="Còn 32 phút 18 giây"><i data-i="clock"></i><span class="gio-so">32:18</span><span class="mo an-dt">còn lại</span></div>
+      <p class="mo chi-hep-dt">Đã làm <b style="color:var(--chu)">14/28</b></p>
+    </div>
+    <div class="phai-thi">
+      <span class="da-lam an-dt">Đã làm <b>14/28</b></span>
+      <span class="nut nut-ds" aria-label="Danh sách câu"><i data-i="grid"></i><span class="chu">Danh sách câu</span></span>
+      <span class="nut chinh">Nộp bài</span>
+    </div>
+  </div>
+  <div class="thanh tien-do" style="--p:50%" aria-hidden="true"><i></i></div>
+</header>
+
+<main class="khung">
+  <!-- GỌN HƠN: thanh trên còn đúng 4 thứ (đồng hồ, Đã làm, Danh sách câu, Nộp bài) + vạch tiến độ mảnh; bỏ khung vàng đồng hồ to.
+       Một câu ở giữa, phương án to, không thẻ phụ. Lưới số câu chỉ hiện ở máy tính (cột phải); điện thoại mở bằng nút lưới. -->
+  <div class="bo-thi">
+    <section>
+      <article class="the cau" aria-label="Câu 7">
+        <div class="dau-cau">
+          <span class="so-cau">Câu 7</span><span class="chip">Phần I · Trắc nghiệm</span>
+          <span class="nut trong" aria-label="Xem lại sau"><i data-i="flag" class="nho"></i><span class="chu">Xem lại sau</span></span>
+        </div>
+        <p class="cau-de">Thuỷ phân hoàn toàn ethyl acetate (CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub>) trong dung dịch sodium hydroxide dư, đun nóng. Sản phẩm hữu cơ thu được là</p>
+        <div class="cac-pa" role="radiogroup">
+          <div class="lua-chon chon"><b>A</b><span>CH<sub>3</sub>COONa và C<sub>2</sub>H<sub>5</sub>OH.</span></div>
+          <div class="lua-chon"><b>B</b><span>CH<sub>3</sub>COOH và C<sub>2</sub>H<sub>5</sub>ONa.</span></div>
+          <div class="lua-chon"><b>C</b><span>HCOONa và C<sub>2</sub>H<sub>5</sub>OH.</span></div>
+          <div class="lua-chon"><b>D</b><span>CH<sub>3</sub>COONa và CH<sub>3</sub>OH.</span></div>
+        </div>
+      </article>
+      <div class="chuyen"><span class="nut"><i data-i="back" class="nho"></i>Câu 6</span><span class="nut">Câu 8<i data-i="arrow" class="nho"></i></span></div>
+
+      <!-- Cùng khung màn thi: câu Phần II (Đúng / Sai) hiện như dưới đây. -->
+      <div class="mau-ds">
+        <p class="nhan">Câu Phần II · Đúng / Sai hiện cùng khung này</p>
+        <article class="the cau mt-3" aria-label="Câu 20">
+          <div class="dau-cau">
+            <span class="so-cau">Câu 20</span><span class="chip">Phần II · Đúng / Sai</span><span class="chip chu-y">Mới 3/4 ý</span>
+            <span class="nut trong xem-lai-on" aria-label="Xem lại sau, đã đánh dấu"><i data-i="flag" class="nho"></i><span class="chu">Xem lại sau</span></span>
+          </div>
+          <p class="cau-de">Cho các phát biểu sau về ethyl acetate (CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub>):</p>
+          <div class="mt-3">
+            <div class="y-ds"><p class="noi cau-de" style="font-size:16px"><b>a)</b>Ethyl acetate có công thức phân tử C<sub>4</sub>H<sub>8</sub>O<sub>2</sub>.</p><span class="ds-chon"><span class="on-d">Đúng</span><span>Sai</span></span></div>
+            <div class="y-ds"><p class="noi cau-de" style="font-size:16px"><b>b)</b>Ethyl acetate tan tốt trong nước.</p><span class="ds-chon"><span>Đúng</span><span class="on-s">Sai</span></span></div>
+            <div class="y-ds"><p class="noi cau-de" style="font-size:16px"><b>c)</b>Thuỷ phân ethyl acetate trong môi trường acid là phản ứng thuận nghịch.</p><span class="ds-chon"><span class="on-d">Đúng</span><span>Sai</span></span></div>
+            <div class="y-ds"><p class="noi cau-de" style="font-size:16px"><b>d)</b>Ethyl acetate được điều chế từ acetic acid và methanol.</p><span class="ds-chon"><span>Đúng</span><span>Sai</span></span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <aside class="the luoi-cau" aria-label="Danh sách câu">
+      <div class="the-dau" style="margin-bottom:4px"><div class="h3">Danh sách câu</div><span class="mo">Đã làm 14/28</span></div>
+      <div class="nhom-cau"><p class="nhan">Phần I · Trắc nghiệm</p><div class="o-cau" id="p1"></div></div>
+      <div class="nhom-cau"><p class="nhan">Phần II · Đúng / Sai</p><div class="o-cau" id="p2"></div></div>
+      <div class="nhom-cau"><p class="nhan">Phần III · Trả lời ngắn</p><div class="o-cau" id="p3"></div></div>
+      <div class="chu-giai"><span><i class="lam"></i>đã làm</span><span><i class="dang"></i>đang xem</span><span><i></i>chưa làm</span><span><i class="co"></i>xem lại sau</span></div>
+    </aside>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // 28 câu kiểu đề mới: Phần I 1–18, Phần II 19–22, Phần III 23–28. Đã làm 14 = 1–7, 9–13, 19, 20 (khớp «Đã làm 14/28», vạch 50%).
+  // Câu 20 làm dở 3/4 ý vẫn tính là đã làm. Đánh dấu «Xem lại sau»: câu 11, 20.
+  const lam = new Set([1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 19, 20]), co = new Set([11, 20]), dang = 7
+  const o = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i).map((n) => `<span class="${n === dang ? 'dang' : lam.has(n) ? 'lam' : ''}${co.has(n) ? ' co' : ''}" title="Câu ${n}">${n}</span>`).join('')
+  p1.innerHTML = o(1, 18); p2.innerHTML = o(19, 22); p3.innerHTML = o(23, 28)
+</script>
+</body></html>

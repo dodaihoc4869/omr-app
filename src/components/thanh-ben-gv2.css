@@ -157,10 +157,6 @@
     background: var(--m3-primary-container);
     color: var(--m3-on-primary-container);
   }
-  .day-thay-them.day-thay-them--tren {
-    top: 60px;
-    bottom: auto;
-  }
   .vo-thay[data-hoa2] .khung-noi-dung {
     padding-top: 56px;
   }
@@ -225,9 +221,6 @@
 @media (min-width: 880px) {
   .m3.vo-thay[data-hoa2] .giua-noi-dung button {
     min-height: 44px;
-  }
-  .m3.vo-thay[data-hoa2] .giua-noi-dung :is(.ct-nut:not(.ct-nut-nho), .gvv2-nut-chinh, .gvv2-tab-nut, .gv2-nut-chinh) {
-    min-height: 48px;
   }
 }
 

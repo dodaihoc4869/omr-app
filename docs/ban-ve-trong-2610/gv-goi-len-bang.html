@@ -1,0 +1,99 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Gọi lên bảng</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.goi{padding:28px}
+.em-goi{display:flex;align-items:center;gap:20px}
+.av-to{width:84px;height:84px;font-size:28px}
+.ten-to{font-size:40px;line-height:1.1;font-weight:700;letter-spacing:-.02em}
+.cau{padding:20px;border-radius:16px;background:var(--mat-2)}
+.pa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pa .lua-chon{min-height:52px;font-size:16px;background:var(--mat)}
+.ba-nut{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px}
+.ba-nut .nut{min-height:60px;font-size:17px}
+.nut.chua-dat{color:var(--sai-chu)}
+.so-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.so-3>div{padding:12px;border-radius:12px;background:var(--mat-2)}
+.so-3 .so{font-size:24px}
+.ket{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;flex:none}
+.ket.dat{background:var(--dung-nhat);color:var(--dung-chu)}.ket.chua{background:var(--sai-nhat);color:var(--sai-chu)}
+@media (max-width:600px){
+  .goi{padding:20px 16px}
+  .em-goi{gap:14px}.av-to{width:60px;height:60px;font-size:20px}
+  .ten-to{font-size:30px}
+  .cau{padding:16px}
+  .pa{grid-template-columns:minmax(0,1fr);gap:8px}
+  .pa .lua-chon{min-height:48px;padding:8px 12px;gap:12px}
+  .tab-goi{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  .tab-goi>span{justify-content:center}
+  .ba-nut{grid-template-columns:1fr 1fr}
+  .ba-nut .dat{grid-column:1/-1;order:-1}
+}
+</style></head>
+<body data-app="gv" data-tab="goi-bang" data-nut-dau='<span class="nut an-dt"><i data-i="monitor"></i>Chiếu lên bảng</span><span class="nut trong">Kết thúc</span>'>
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: em được gọi + câu + ba nút chấm là MỘT thẻ chính, nút Đạt to nhất; bỏ dải 4 ô số và thẻ «Nhóm lúc gọi»
+       riêng — số đã gọi / Đạt / Chưa đạt và nhóm gộp vào một thẻ «Đã gọi trong buổi». -->
+  <div class="dau-man">
+    <div style="flex:1;min-width:0">
+      <p class="nhan">Thứ Hai 26/10 · Buổi học 12A1 · có mặt 36/40</p>
+      <h1 class="tieu-de mt-1">Gọi lên bảng</h1>
+    </div>
+    <div class="tab tab-goi" aria-label="Cách lên bảng"><span>Chiến dịch</span><span>Dạy học</span><span class="on">Kiểm tra đầu giờ</span><span>Câu cần chữa</span></div>
+  </div>
+
+  <div class="chinh-phu">
+    <section class="the goi cot" style="gap:24px">
+      <div class="hang" style="flex-wrap:wrap;gap:8px"><span class="chip chu-y">Lượt 6 · Em được gọi</span><span class="mo">không trùng em đã gọi trong buổi</span></div>
+      <div class="em-goi">
+        <span class="av a2 av-to">KV</span>
+        <div style="min-width:0">
+          <h2 class="ten-to">Lê Khánh Vy</h2>
+          <p class="phu mt-1">SBD 1207 · Lớp 12A1</p>
+        </div>
+      </div>
+      <div class="hang" style="flex-wrap:wrap;gap:10px"><span class="nhan">Nhóm lúc gọi</span><div class="tab"><span class="on">Khá</span><span>Trung bình</span><span>Cần kèm</span></div></div>
+
+      <div class="cau">
+        <div class="hang giua" style="flex-wrap:wrap;gap:4px 12px"><p class="dam">Câu 5 · Câu đã làm đúng</p><span class="mo">Phần I · Ester – lipid</span></div>
+        <p class="cau-de mt-3">Ester nào sau đây có tên gọi là <b>ethyl acetate</b>?</p>
+        <div class="pa mt-4">
+          <div class="lua-chon"><b>A</b><span>CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub></span></div>
+          <div class="lua-chon"><b>B</b><span>HCOOC<sub>2</sub>H<sub>5</sub></span></div>
+          <div class="lua-chon"><b>C</b><span>CH<sub>3</sub>COOCH<sub>3</sub></span></div>
+          <div class="lua-chon"><b>D</b><span>C<sub>2</sub>H<sub>5</sub>COOCH<sub>3</sub></span></div>
+        </div>
+        <div class="hang giua mt-3" style="flex-wrap:wrap;gap:0 12px"><span class="mo">Sai 20/09 (Ca) · Đúng 22/09 (Đoàn)</span><a class="lien-ket"><i data-i="eye" class="nho"></i>Hiện lời giải</a></div>
+      </div>
+
+      <div class="ba-nut">
+        <span class="nut"><i data-i="refresh"></i>Gọi em khác</span>
+        <span class="nut chua-dat"><i data-i="x"></i>Chưa đạt</span>
+        <span class="nut chinh dat"><i data-i="check"></i>Đạt</span>
+      </div>
+    </section>
+
+    <section class="the dem">
+      <div class="the-dau" style="padding:18px 20px 0;margin:0"><div class="h3">Đã gọi trong buổi</div><span class="mo">30 em có mặt chưa gọi</span></div>
+      <div style="padding:14px 20px 4px">
+        <div class="so-3">
+          <div><p class="nhan">Đã gọi</p><p class="so">5<small>em</small></p></div>
+          <div><p class="nhan">Đạt</p><p class="so dung-mau">4</p></div>
+          <div><p class="nhan">Chưa đạt</p><p class="so sai-mau">1</p></div>
+        </div>
+        <div class="chang mt-4" aria-label="Lượt 1 đến 5 đã chấm, lượt 6 đang gọi"><i class="xong"></i><i class="xong"></i><i class="sai"></i><i class="xong"></i><i class="xong"></i><i class="dang"></i></div>
+        <p class="mo mt-2">Lượt 1–5 đã chấm · lượt 6 đang gọi</p>
+      </div>
+      <div class="ds mt-2" style="border-top:1px solid var(--vien)">
+        <div class="dong"><span class="ket dat"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Nguyễn Minh Anh</p><p class="mo">Câu 2 · Đạt</p></div><span class="chip vien">Khá</span></div>
+        <div class="dong"><span class="ket dat"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Trần Gia Bảo</p><p class="mo">Câu 9 · Đạt</p></div><span class="chip vien">Trung bình</span></div>
+        <div class="dong"><span class="ket chua"><i data-i="x" class="nho"></i></span><div class="giua"><p class="ten">Phạm Quang Nam</p><p class="mo">Câu 4 · Chưa đạt</p></div><span class="chip vien">Cần kèm</span></div>
+        <div class="dong"><span class="ket dat"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Đỗ Thu Hà</p><p class="mo">Câu 11 · Đạt</p></div><span class="chip vien">Khá</span></div>
+        <div class="dong"><span class="ket dat"><i data-i="check" class="nho"></i></span><div class="giua"><p class="ten">Vũ Đức Huy</p><p class="mo">Câu 7 · Đạt</p></div><span class="chip vien">Trung bình</span></div>
+      </div>
+      <p class="mo" style="padding:4px 20px 16px">Nhóm lúc gọi: Khá 2 · Trung bình 2 · Cần kèm 1</p>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

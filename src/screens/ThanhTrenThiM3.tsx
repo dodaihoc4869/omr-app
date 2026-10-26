@@ -22,9 +22,11 @@ export interface ThanhTrenThiM3Props {
   onMoLuoi: () => void
   /** Nút phụ đặt ngay trước nút danh sách câu (nút "Dịu mắt"). */
   nutPhu?: ReactNode
+  /** Giao diện «Trong» (26/10): nút "Nộp bài" cuối thanh — màn thi chỉ truyền khi <html data-trong>; nút chỉ MỞ hộp xác nhận sẵn có. */
+  nutNop?: ReactNode
 }
 
-export default function ThanhTrenThiM3({ dongHo, chuThayDongHo, gap, tenCa, daLam, tong, nhanLuu, mayNgoaiMang, dangLuu, onMoLuoi, nutPhu }: ThanhTrenThiM3Props) {
+export default function ThanhTrenThiM3({ dongHo, chuThayDongHo, gap, tenCa, daLam, tong, nhanLuu, mayNgoaiMang, dangLuu, onMoLuoi, nutPhu, nutNop }: ThanhTrenThiM3Props) {
   const phanTram = tong ? Math.min(100, (daLam / tong) * 100) : 0
   const tieuDe = tenCa.trim() ? `${tenCa.trim()} · ${tong} câu` : `${tong} câu`
   return (
@@ -48,6 +50,7 @@ export default function ThanhTrenThiM3({ dongHo, chuThayDongHo, gap, tenCa, daLa
         <button type="button" onClick={onMoLuoi} className="thi-nut-luoi" title="Danh sách câu" aria-label="Danh sách câu">
           <LayoutGrid size={22} aria-hidden="true" />
         </button>
+        {nutNop}
       </div>
       <div className="thi-tien-do" role="progressbar" aria-label="Số câu đã làm" aria-valuemin={0} aria-valuemax={tong} aria-valuenow={daLam}>
         <div className="thi-tien-do-day" style={{ width: `${phanTram}%` }} />

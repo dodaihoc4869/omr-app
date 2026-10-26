@@ -8,6 +8,7 @@
 import { lazy, Suspense } from 'react'
 import BatLinhShell from './components/bat-linh/BatLinhShell'
 import ChanLoi from './components/ChanLoi'
+import './styles/trong.css' // Giao diện «Trong» thầy chốt 26/10 (chỉ khi <html data-trong>)
 
 /** Tải mảnh màn thi; hỏng (mạng chập) thì chờ 0,8 giây thử lại một lần (như App.tsx). Thiếu mảnh vì đang mở bản cũ ⇒ batLoiThieuManh() lo. */
 const napManThi = () => import('./screens/ExamTakeScreen').catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(() => import('./screens/ExamTakeScreen')))

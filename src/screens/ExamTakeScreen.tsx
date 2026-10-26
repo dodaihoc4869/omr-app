@@ -104,6 +104,8 @@ import { soOHopLe } from '../lib/so-o-tra-loi-ngan'
 import type { BoDoTreoMayTrang } from '../lib/do-treo-may-thi'
 import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
+// «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../styles/trong-lam-bai.css').catch(() => {})
 // Mảnh bố cục NGANG (01/10, thầy: "xoay ngang không hoạt động"): trước đây nạp lười NGOÀI precache, nạp hỏng một lần (mạng yếu, hay máy còn
 // bản cũ mà mảnh cũ đã bị thay sau một lượt phát hành) là React.lazy nhớ luôn lỗi ⇒ xoay bao nhiêu cũng ở bố cục dọc. Nay: mảnh có trong precache
 // (vite.config.ts), nạp thử lại một lần, và hỏng thì DỰNG LẠI lazy mới để lần xoay sau thử tiếp.
@@ -3644,6 +3646,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                       cuonToiCau(i + 1)
                     }}
                     className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
+                    data-xong={done || undefined}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                   >
                     {i + 1}
@@ -3910,6 +3913,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             dangLuu={!!saveFlash}
             onMoLuoi={() => setShowGrid(true)}
             nutPhu={<NutDiuMat bat={diuMat} onDoi={doiDiuMat} />}
+            nutNop={
+              coGiaoDienTrong() ? (
+                <button type="button" className="thi-nut-nop-tren" disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>
+                  {nhanNutNop}
+                </button>
+              ) : undefined
+            }
           />
         </div>
       ) : (
@@ -4000,6 +4010,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     key={i}
                     onClick={() => cuonToiCau(i + 1)}
                     className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
+                    data-xong={done || undefined}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-1)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                     title={`Câu ${i + 1}${done ? ' — đã làm' : ' — chưa làm'}${dungM3() && sttDanhDau.includes(i + 1) ? ' — xem lại sau' : ''}`}
                   >
@@ -4094,10 +4105,15 @@ function laLyDoMoi(v: string | undefined): boolean {
   return v === 'cua_so_noi' || v === 'thu_nho_man' || v === 'thoat_toan_man' || v === 'dau_vet_chup'
 }
 
+/** Giao diện «Trong» (26/10) đang bật — main.tsx gắn <html data-trong> TRƯỚC khi vẽ, cố định suốt phiên. CHỈ quyết định trình bày. */
+function coGiaoDienTrong(): boolean {
+  return typeof document !== 'undefined' && !!document.documentElement.dataset.trong
+}
+
 function HopThoai({ children }: { children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
-      <div className="w-full flex flex-col" style={{ maxWidth: 400, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
+      <div className="w-full flex flex-col thi-hop" style={{ maxWidth: 400, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
         {children}
       </div>
     </div>

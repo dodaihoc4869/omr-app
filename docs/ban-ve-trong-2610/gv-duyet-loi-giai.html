@@ -1,0 +1,118 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Duyệt lời giải</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.dau-man>.chu{flex:1;min-width:0}
+.tim-de{display:flex;gap:8px;align-items:center}
+.tim-de .o-nhap{width:200px}
+.dau-dem{padding:18px 20px 14px;margin:0}
+.xep{display:flex;height:10px;border-radius:999px;overflow:hidden;gap:2px}
+.xep i{display:block;height:100%}
+.bon{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.bon .nhan{display:flex;align-items:center;gap:6px}
+.hai-cot{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(0,1.4fr);gap:20px;align-items:start}
+.loc{padding:0 20px 12px}
+.cau-dong{padding:14px 20px;border-top:1px solid var(--vien)}
+.cau-dong.dang-xem{background:var(--chinh-nhat);box-shadow:inset 3px 0 0 var(--chinh)}
+.cau-dong .dau-c{display:flex;align-items:center;gap:10px;min-height:32px}
+.cau-dong .dau-c b{font-weight:600;font-size:15px}
+.o-viet{min-height:76px;padding:10px 14px;border:1px solid var(--chinh);border-radius:12px;background:var(--mat);box-shadow:0 0 0 4px var(--chinh-nhat);font-size:14px;line-height:1.5}
+.so-b{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--chinh);color:var(--tren-mau);font-weight:700;flex:none}
+.pa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pa .lua-chon{min-height:52px;font-size:15px}
+.buoc{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;padding:12px 0;border-top:1px solid var(--vien);font-size:15px;line-height:1.6}
+.buoc:first-of-type{border-top:0}
+.buoc>b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--mat-2);color:var(--chu-2);font-size:13px;font-weight:600}
+.pt{display:block;margin-top:4px;padding:8px 12px;border-radius:10px;background:var(--mat-2);font-size:14.5px}
+.chan-xem{display:flex;flex-wrap:wrap;gap:10px;padding-top:16px;margin-top:16px;border-top:1px solid var(--vien)}
+@media (max-width:1100px){.hai-cot{grid-template-columns:minmax(0,1fr)}.bon{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){
+  .dau-man>.o-ma{width:100%}.tim-de .o-nhap{flex:1;width:auto}
+  .loc{padding:0 16px 12px}.cau-dong{padding:14px 16px}
+  .pa{grid-template-columns:minmax(0,1fr)}
+  .hang-nut .nut{flex:1}
+  .chan-xem .nut{width:100%}
+}
+</style></head>
+<body data-app="gv" data-tab="kho-de" data-khung="man-con" data-tieu="Duyệt lời giải" data-phu="Chỉ lời giải đã duyệt mới hiện cho học sinh." data-ve="Kho đề">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: 4 ô số + thanh màu + chú giải gộp thành một thẻ tiến độ; 3 nút lặp ở mỗi câu bỏ đi — chạm câu là mở lời giải bên phải,
+       Duyệt/Trả lại chỉ nằm một chỗ ở chân lời giải (nút chính). Ô mã đề gọn lên đầu trang. -->
+  <div class="dau-man">
+    <div class="chu">
+      <p class="nhan">12-KT-C1-D4 · 28 câu · Trắc nghiệm 18 · Đúng–sai 4 · Trả lời ngắn 6</p>
+      <h1 class="tieu-de mt-1">Kiểm tra chương 1 · Ester – lipid</h1>
+    </div>
+    <div class="o-ma">
+      <label class="nhan-o" style="font-size:13px;font-weight:500;color:var(--chu-3)">Mã đề trong kho</label>
+      <div class="tim-de"><div class="o-nhap co-chu">12-KT-C1-D4</div><span class="nut">Mở đề</span></div>
+    </div>
+  </div>
+
+  <section class="the">
+    <div class="xep" role="img" aria-label="Đã duyệt 15, chờ duyệt 9, máy đang soạn 2, chờ sửa kho 2 trên 28 câu">
+      <i style="flex:15;background:var(--dung)"></i><i style="flex:9;background:var(--chu-y)"></i><i style="flex:2;background:var(--tin)"></i><i style="flex:2;background:var(--sai)"></i>
+    </div>
+    <div class="bon mt-4">
+      <div class="kpi"><span class="nhan"><span class="cham dung"></span>Đã duyệt</span><span class="so">15<small>/28 câu</small></span></div>
+      <div class="kpi"><span class="nhan"><span class="cham chu-y"></span>Chờ duyệt</span><span class="so">9<small>câu</small></span><span class="mo">5 câu sạch</span></div>
+      <div class="kpi"><span class="nhan"><span class="cham tin"></span>Máy đang soạn</span><span class="so">2<small>câu</small></span></div>
+      <div class="kpi"><span class="nhan"><span class="cham sai"></span>Chờ sửa kho</span><span class="so sai-mau">2<small>câu</small></span><span class="mo">đáp án kho cần sửa hoặc máy soạn trượt</span></div>
+    </div>
+    <div class="hang hang-nut mt-4" style="flex-wrap:wrap;gap:10px"><span class="nut"><i data-i="check" class="nho"></i>Duyệt 5 câu sạch</span><span class="nut trong"><i data-i="zap" class="nho"></i>Soạn gấp đề này</span></div>
+  </section>
+
+  <div class="hai-cot">
+    <section class="the dem">
+      <div class="the-dau dau-dem"><div class="h3">Danh sách câu chờ duyệt</div></div>
+      <div class="loc"><div class="tab"><span class="on">Tất cả</span><span>Có cờ đáp án</span><span>Chờ duyệt</span><span>Chưa có hồ sơ</span></div></div>
+
+      <div class="cau-dong dang-xem"><div class="dau-c"><b>Câu 3</b><span class="mo">Trắc nghiệm</span><span class="chip chu-y day">Chờ duyệt</span></div><p class="mo">Đang xem lời giải</p></div>
+
+      <div class="cau-dong">
+        <div class="dau-c"><b>Câu 7</b><span class="mo">Trắc nghiệm</span><span class="chip chu-y day">Chờ duyệt</span></div>
+        <div class="ghi-chu chu-y mt-2" style="font-size:13.5px"><i data-i="flag" class="nho"></i><span><b>Đáp án kho cần sửa:</b> số ester ứng với C<sub>4</sub>H<sub>8</sub>O<sub>2</sub> là 4, kho đang ghi B (3 chất). <b>Máy đã chốt:</b> D. <b>Sửa kho:</b> “B” → “D”</span></div>
+      </div>
+
+      <div class="cau-dong"><div class="dau-c"><b>Câu 12</b><span class="mo">Đúng/Sai</span><span class="chip chu-y day">Chờ duyệt</span></div></div>
+
+      <div class="cau-dong">
+        <div class="dau-c"><b>Câu 19</b><span class="mo">Trả lời ngắn</span><span class="chip sai day">Máy soạn chưa qua bộ kiểm</span></div>
+        <p class="mo mt-1">Bộ kiểm báo: phương trình ở bước 2 chưa cân bằng số nguyên tử O.</p>
+      </div>
+
+      <div class="cau-dong">
+        <div class="dau-c"><b>Câu 22</b><span class="mo">Trả lời ngắn</span><span class="chip chu-y day">Chờ duyệt</span></div>
+        <label class="nhan-o mt-2">Chỗ cần sửa <span class="mo" style="font-weight:400">· máy soạn đọc ghi chú này</span></label>
+        <div class="o-viet">Bước 3 đổi 200 mL thành 2 L; phải là 0,2 L rồi tính lại nồng độ NaOH.</div>
+        <div class="hang mt-3"><span class="nut">Trả lại câu này</span><span class="nut trong">Thôi</span></div>
+      </div>
+
+      <div style="padding:4px 20px 8px;border-top:1px solid var(--vien)"><a class="lien-ket">Xem đủ 9 câu chờ duyệt <i data-i="chevron" class="nho"></i></a></div>
+    </section>
+
+    <section class="the" aria-label="Đề và lời giải đang duyệt">
+      <div class="the-dau"><span class="so-b">3</span><div class="h3">Câu 3<p class="mo" style="font-weight:400">Trắc nghiệm · Chất béo</p></div><span class="chip chu-y">Chờ duyệt</span></div>
+      <p class="cau-de" style="font-size:16px">Xà phòng hoá hoàn toàn <b>17,8 gam tristearin</b> bằng dung dịch NaOH vừa đủ, thu được m gam glycerol. Giá trị của m là</p>
+      <div class="pa mt-4">
+        <div class="lua-chon dung"><b>A</b>1,84</div>
+        <div class="lua-chon"><b>B</b>0,92</div>
+        <div class="lua-chon"><b>C</b>5,52</div>
+        <div class="lua-chon"><b>D</b>3,68</div>
+      </div>
+
+      <div class="hang giua mt-6"><span class="h3">Lời giải từng bước</span><span class="mo">máy soạn · chờ thầy duyệt</span></div>
+      <div class="mt-2">
+        <div class="buoc"><b>1</b><div>Tristearin là (C<sub>17</sub>H<sub>35</sub>COO)<sub>3</sub>C<sub>3</sub>H<sub>5</sub>, M = 890 g/mol.<span class="pt">n<sub>chất béo</sub> = 17,8 : 890 = 0,02 mol</span></div></div>
+        <div class="buoc"><b>2</b><div>Phản ứng xà phòng hoá:<span class="pt">(C<sub>17</sub>H<sub>35</sub>COO)<sub>3</sub>C<sub>3</sub>H<sub>5</sub> + 3NaOH → 3C<sub>17</sub>H<sub>35</sub>COONa + C<sub>3</sub>H<sub>5</sub>(OH)<sub>3</sub></span></div></div>
+        <div class="buoc"><b>3</b><div>Một phân tử chất béo cho một phân tử glycerol:<span class="pt">n<sub>glycerol</sub> = n<sub>chất béo</sub> = 0,02 mol ⇒ m = 0,02 × 92 = 1,84 gam</span></div></div>
+      </div>
+      <div class="ghi-chu dung mt-2"><i data-i="check-circle" class="nho"></i><span><b>Đáp án A</b> · m = 1,84</span></div>
+      <div class="ghi-chu chu-y mt-2"><i data-i="alert" class="nho"></i><span><b>Bẫy:</b> lấy n<sub>NaOH</sub> = 0,06 mol để tính glycerol ⇒ 0,06 × 92 = 5,52 gam, rơi vào phương án C.</span></div>
+
+      <div class="chan-xem"><span class="nut chinh lon"><i data-i="check" class="nho"></i>Duyệt câu này</span><span class="nut lon">Trả lại cho máy soạn</span></div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

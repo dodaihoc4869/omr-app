@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
-import { ArrowRight, ChevronRight } from 'lucide-react'
+import { ArrowRight, Check, ChevronRight, Flag, History, Layers, Lock, RefreshCw, Wrench } from 'lucide-react'
 import type { SanhHoa2 } from '../hoa2/api'
 import { BieuTuongTuSua, Khung64, lapLanh } from './BieuTuongTuSua'
 import { TANG, TEN_TU_SUA } from './HocTapHomNay'
 import './hanh-trinh-on-sua.css'
+import { laTrong } from '../../lib/trong-hs'
 
 // ĐỢT 19 · LÀN N (13/10) — hai tab "Hành trình" và "Ôn & sửa" thiết kế lại (thầy: "cực đẹp, khoa học, thân thiện trực quan các nút bấm gọn gàng đẹp
 // mắt" · "rõ từng phần vô cùng đẹp mắt trực quan khoa học thân thiện"). Khối NẠP KHI MỞ TAB (`lazy` trong HocTapHomNay) ⇒ không thêm byte tải mở app.
@@ -85,11 +86,16 @@ const HinhLuyenLai = () => <Khung64 sac="do">
 </Khung64>
 const DauVung = () => <svg className="htn-dau" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="9.5" /><path d="M6.5 11.5l3 3 6-7" /></svg>
 
-function TheBai({ b }: { b: BaiEm }) {
+/** «Trong» (bản vẽ hs-hanh-trinh / hs-on-sua, thầy chốt 26/10): ô bậc đánh số + dấu (vững ✓ · đang luyện ⚑ · còn khoá 🔒), chấm tầng ở dòng bài,
+ *  biểu tượng nét thay hình vẽ minh hoạ — chỉ đổi trình bày, cùng chữ, cùng số. */
+const DAU_BAC = { vung: <Check size={16} aria-hidden="true" />, dang: <Flag size={16} aria-hidden="true" />, khoa: <Lock size={16} aria-hidden="true" /> } as const
+const ChamTang = ({ tang }: { tang: Tang }) => <span className="tr-cham-tang" aria-hidden="true">{[1, 2, 3, 4].map((i) => <i key={i} data-on={i <= tang || undefined} />)}</span>
+
+function TheBai({ b, trong }: { b: BaiEm; trong?: boolean }) {
   const ti = b.gap && b.gap.tong > 0 ? Math.round((100 * b.gap.da) / b.gap.tong) : 0
   return <article className="htn-bai" aria-label={b.ten}>
     <div className="htn-bai-dau">
-      {b.tang && <span className="htn-bai-hinh">{HINH_TANG[b.tang - 1]}</span>}
+      {b.tang && (trong ? <ChamTang tang={b.tang} /> : <span className="htn-bai-hinh">{HINH_TANG[b.tang - 1]}</span>)}
       <span className="htn-bai-ten"><h3>{b.ten}</h3>{b.tang && <small>Đang luyện tầng {TANG[b.tang - 1]}</small>}</span>
     </div>
     {b.gap && <div className="htn-gap">
@@ -121,19 +127,20 @@ export interface PropsHanhTrinhOnSua {
 }
 
 export default function HanhTrinhOnSua(p: PropsHanhTrinhOnSua) {
+  const trong = laTrong()
   if (p.muc === 'on-lai') {
     const coSo = !!p.soSua && p.soSua > 0
     return <div className="htn-os">
       <button type="button" className="htn-sua" data-co={coSo || undefined} onClick={p.onChua}>
-        <span className="htn-sua-hinh"><BieuTuongTuSua hien /></span>
+        <span className="htn-sua-hinh">{trong ? <Wrench size={20} aria-hidden="true" /> : <BieuTuongTuSua hien />}</span>
         <span className="htn-sua-chu"><strong>{TEN_TU_SUA}</strong><small>{p.soSua === 0 ? 'Không còn câu cần sửa' : coSo ? 'Câu đang chờ em sửa' : 'Câu em làm sai'}</small></span>
         {coSo && <span className="htn-sua-so"><b>{p.soSua}</b> câu</span>}
         {coSo ? <span className="htn-sua-di">Sửa lỗi ngay<ArrowRight size={20} aria-hidden="true" /></span> : <ChevronRight size={22} aria-hidden="true" className="htn-sua-mui" />}
       </button>
       <div className="htn-on-ds">
-        <TheOn ten="Câu đã làm" mo="Lời giải và lịch ôn từng câu" sac="cham" hinh={<HinhCauDaLam />} onClick={p.onXemLai} />
-        <TheOn ten="Tu luyện" mo="Luyện thêm theo chương, dạng, mức" sac="xanh" hinh={<HinhTuLuyen />} onClick={p.onTuLuyen} />
-        {p.onLuyenLai && <TheOn ten="Luyện lại từ bài kiểm tra" mo="Câu sai trong các bài kiểm tra" sac="do" hinh={<HinhLuyenLai />} onClick={p.onLuyenLai} />}
+        <TheOn ten="Câu đã làm" mo="Lời giải và lịch ôn từng câu" sac="cham" hinh={trong ? <History size={20} aria-hidden="true" /> : <HinhCauDaLam />} onClick={p.onXemLai} />
+        <TheOn ten="Tu luyện" mo="Luyện thêm theo chương, dạng, mức" sac="xanh" hinh={trong ? <Layers size={20} aria-hidden="true" /> : <HinhTuLuyen />} onClick={p.onTuLuyen} />
+        {p.onLuyenLai && <TheOn ten="Luyện lại từ bài kiểm tra" mo="Câu sai trong các bài kiểm tra" sac="do" hinh={trong ? <RefreshCw size={20} aria-hidden="true" /> : <HinhLuyenLai />} onClick={p.onLuyenLai} />}
       </div>
     </div>
   }
@@ -147,7 +154,7 @@ export default function HanhTrinhOnSua(p: PropsHanhTrinhOnSua) {
       </div>
       <ol className="htn-thang" aria-label={tang ? `Tầng đang luyện: ${TANG[tang - 1]}` : 'Thang 4 tầng'}>
         {TANG.map((t, i) => { const tt = ttTang(i, tang); return <li key={t} data-tt={tt}>
-          <span className="htn-o">{HINH_TANG[i]}{tt === 'vung' && <DauVung />}</span>
+          <span className="htn-o">{trong ? <><b>{i + 1}</b>{tt && DAU_BAC[tt]}</> : <>{HINH_TANG[i]}{tt === 'vung' && <DauVung />}</>}</span>
           <strong>{t}</strong>{tt && <small>{CHU_TT[tt]}</small>}
         </li> })}
       </ol>
@@ -155,7 +162,7 @@ export default function HanhTrinhOnSua(p: PropsHanhTrinhOnSua) {
     </section>
     <section className="htn-bai-nhom" aria-labelledby="htn-bai-tieu">
       <h2 id="htn-bai-tieu">Bài đang luyện{bai.length > 0 && <span> · {bai.length} bài</span>}</h2>
-      {bai.length > 0 ? bai.map((b) => <TheBai key={b.khoa} b={b} />) : p.dangTai && !p.sanh ? <div className="htn-cho" role="status" aria-busy="true" aria-label="Đang tải bài" /> : <p className="htn-trong">Chưa có bài đang luyện.</p>}
+      {bai.length > 0 ? bai.map((b) => <TheBai key={b.khoa} b={b} trong={trong} />) : p.dangTai && !p.sanh ? <div className="htn-cho" role="status" aria-busy="true" aria-label="Đang tải bài" /> : <p className="htn-trong">Chưa có bài đang luyện.</p>}
     </section>
   </div>
 }

@@ -1,0 +1,55 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Ôn và sửa</title><link rel="stylesheet" href="trong.css">
+<style>
+.sua{position:relative;overflow:hidden;padding:24px}
+.sua::before{content:"";position:absolute;inset:-45% auto auto -12%;width:380px;height:380px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--sai) 9%,transparent),transparent);pointer-events:none}
+.sua>*{position:relative}
+.sua-than{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.sua-than .giua{flex:1;min-width:0}
+.ba-thanh{display:flex;height:12px;border-radius:999px;overflow:hidden;background:var(--mat-3);gap:2px}
+.ba-thanh i{display:block;height:100%}
+.ba-thanh .x{background:var(--dung)}.ba-thanh .c{background:var(--chu-y)}.ba-thanh .s{background:color-mix(in srgb,var(--sai) 75%,var(--mat))}
+.chu-giai{display:flex;flex-wrap:wrap;gap:6px 18px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-2)}
+.chu-giai b{color:var(--chu);font-weight:600}
+.vao{display:flex;flex-direction:column;justify-content:center}
+.vao .dong{min-height:76px}
+@media (max-width:600px){.sua{padding:18px}.sua-than .nut{width:100%}}
+</style></head>
+<body data-app="hs" data-tab="on-sua">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: một thẻ «Tự sửa lỗi» duy nhất mang con số, thanh tiến độ và nút chính; bỏ ô số tô vàng tách rời.
+       Ba lối vào khác thành một danh sách gọn (biểu tượng + tên + một dòng mô tả), không còn ba thẻ cao 230px. -->
+  <div>
+    <p class="nhan">Thứ Hai 26/10 · 12A1</p>
+    <h1 class="tieu-de mt-1">Ôn &amp; sửa</h1>
+  </div>
+
+  <div class="chinh-phu" style="align-items:stretch">
+    <section class="the sua" aria-label="Tự sửa lỗi">
+      <div class="hang" style="gap:14px"><span class="o-icon sai lon"><i data-i="wrench"></i></span><div><p class="h3">Tự sửa lỗi</p><p class="mo">Câu đang chờ em sửa</p></div></div>
+      <div class="sua-than mt-6">
+        <div class="giua">
+          <p class="so-lon">107<small>câu</small></p>
+          <div class="ba-thanh mt-4" role="img" aria-label="145 câu: đã tự sửa 29, chờ lần gặp lại 9, cần sửa 107"><i class="x" style="width:20%"></i><i class="c" style="width:6.2%"></i><i class="s" style="width:73.8%"></i></div>
+          <div class="chu-giai mt-3">
+            <span><span class="cham dung"></span>Đã tự sửa <b>29/145 câu</b></span>
+            <span><span class="cham chu-y"></span>Chờ lần gặp lại: <b>9 câu</b></span>
+            <span><span class="cham sai"></span>Cần sửa <b>107 câu</b></span>
+          </div>
+        </div>
+        <span class="nut chinh lon">Sửa lỗi ngay <i data-i="arrow"></i></span>
+      </div>
+    </section>
+
+    <section class="the dem vao">
+      <div class="ds">
+        <div class="dong"><span class="o-icon"><i data-i="history"></i></span><div class="giua"><p class="ten">Câu đã làm</p><p class="mo">Lời giải và lịch ôn từng câu</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+        <div class="dong"><span class="o-icon tin"><i data-i="layers"></i></span><div class="giua"><p class="ten">Tu luyện</p><p class="mo">Luyện thêm theo chương, dạng, mức</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+        <div class="dong"><span class="o-icon chu-y"><i data-i="refresh"></i></span><div class="giua"><p class="ten">Luyện lại từ bài kiểm tra</p><p class="mo">Câu sai trong các bài kiểm tra</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

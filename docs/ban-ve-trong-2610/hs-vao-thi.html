@@ -1,0 +1,68 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Vào ca kiểm tra</title><link rel="stylesheet" href="trong.css">
+<style>
+.vao{width:100%;max-width:480px;margin:0 auto}
+.vao .the{padding:28px}
+.ai-vao{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--mat-2)}
+.mat-khau{letter-spacing:.3em}
+.con-tro{width:2px;height:22px;background:var(--chinh);margin-left:-6px}
+.nhac .dong{align-items:flex-start;min-height:0;padding:14px 0}
+.nhac .o-icon{width:36px;height:36px;border-radius:10px}
+@media (max-width:600px){.vao .the{padding:20px}.nhac .hang{flex-wrap:wrap}}
+</style></head>
+<body data-app="hs" data-khung="khong" data-ai="khong">
+<header class="dau">
+  <div class="khung">
+    <div class="thuong-hieu"><img src="logo/logo-hs-nho.svg" alt=""><span>Đỗ Đại Học<small>Phòng thi trực tuyến</small></span></div>
+    <span class="day"></span>
+    <span class="nut trong vuong" aria-label="Đóng phòng thi, về cổng học sinh" title="Đóng phòng thi, về cổng học sinh"><i data-i="x"></i></span>
+  </div>
+</header>
+<main class="khung">
+  <!-- GỌN HƠN: một cột duy nhất theo đúng thứ tự làm (ai vào → mã ca → mật khẩu → Vào ca kiểm tra); bỏ thẻ «vé» số báo danh to.
+       Nút «Đóng phòng thi, về cổng học sinh» thành nút X ở thanh trên (đúng như app thật). Hai lời nhắc gom về cuối, chữ nhỏ. -->
+  <div class="vao cot" style="gap:20px">
+    <div>
+      <p class="nhan">Thứ Hai 26/10 · 12A1</p>
+      <h1 class="tieu-de mt-1">Vào phòng thi trực tuyến</h1>
+      <p class="phu mt-2">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng.</p>
+    </div>
+
+    <section class="the cot" style="gap:16px">
+      <div class="ai-vao">
+        <span class="av a1">MA</span>
+        <div style="flex:1;min-width:0"><p class="dam">Nguyễn Minh Anh</p><p class="mo">Số báo danh 110234</p></div>
+        <i data-i="check-circle" class="nho" style="color:var(--dung-chu)"></i>
+      </div>
+      <div>
+        <label class="nhan-o">Mã ca kiểm tra</label>
+        <div class="o-nhap co-chu">261048</div>
+      </div>
+      <div>
+        <label class="nhan-o">Mật khẩu ca kiểm tra</label>
+        <div class="o-nhap co-chu tap-trung"><span class="mat-khau">••••</span><span class="con-tro"></span></div>
+        <p class="mo mt-1">Để trống nếu ca không có mật khẩu</p>
+      </div>
+      <span class="nut chinh lon rong-het mt-1">Vào ca kiểm tra <i data-i="arrow"></i></span>
+    </section>
+
+    <section class="nhac">
+      <p class="h3">Trước khi bắt đầu</p>
+      <div class="ds mt-1">
+        <div class="dong">
+          <span class="o-icon xam"><i data-i="expand" class="nho"></i></span>
+          <div class="giua">
+            <p class="phu">Nên để app ở <b style="color:var(--chu)">toàn màn hình</b> khi làm bài.</p>
+            <span class="nut nhe mt-3">Bật toàn màn hình</span>
+          </div>
+        </div>
+        <div class="dong">
+          <span class="o-icon xam"><i data-i="moon" class="nho"></i></span>
+          <p class="phu giua">Bật <b style="color:var(--chu)">Không làm phiền</b> trước khi bắt đầu. Cuộc gọi hay thông báo kéo em ra khỏi màn làm bài đều bị tính là rời màn.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

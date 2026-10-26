@@ -1,0 +1,114 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Điểm danh</title><link rel="stylesheet" href="trong.css">
+<style>
+.ma-the{display:grid;grid-template-columns:auto minmax(0,1fr) 360px;gap:32px;align-items:center;padding:28px}
+.qr{width:208px;height:208px;padding:12px;border-radius:16px;background:var(--mat);border:1px solid var(--vien);color:var(--chu)}
+.qr svg{display:block;width:100%;height:100%}
+.ma-so{font-size:88px;line-height:1;font-weight:700;letter-spacing:.03em;white-space:nowrap}
+.dem-nguoc{display:flex;align-items:center;gap:10px;max-width:320px}
+.dem-nguoc .thanh{flex:1}
+.co-mat{display:flex;flex-direction:column;gap:10px;padding-left:32px;border-left:1px solid var(--vien)}
+.nut-dai{flex-direction:column;gap:4px;min-height:64px;padding:10px 18px}
+.nut-dai small{font-size:13px;font-weight:500;opacity:.9}
+.hai-nut{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hai-nut .nut{padding:0 10px;font-size:14px;gap:6px}
+.vang-ds{display:flex;flex-wrap:wrap;gap:10px}
+.em-vang{border-radius:999px;font-weight:500;font-size:14px;padding:0 16px 0 12px}
+.em-vang.co-phep{background:var(--mat-2);border-style:dashed;box-shadow:none;color:var(--chu-3)}
+.xep{display:flex;height:12px;border-radius:999px;overflow:hidden;background:var(--mat-3);gap:2px}
+.xep i{display:block;height:100%}
+.xep .c{background:var(--dung)}.xep .d{background:var(--chu-y)}.xep .l{background:var(--sai)}
+.ba-nhom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ba-nhom>div{padding:12px;border-radius:12px;background:var(--mat-2)}
+.ba-nhom .so{font-size:24px}
+.chi-dt-nho{display:none!important}
+@media (max-width:600px){.chi-dt-nho{display:inline-flex!important}}
+.gio{font-size:14px;font-weight:600;color:var(--chu-2);min-width:44px}
+@media (max-width:1100px){.ma-the{grid-template-columns:auto minmax(0,1fr)}.co-mat{grid-column:1/-1;padding:24px 0 0;border-left:0;border-top:1px solid var(--vien)}}
+@media (max-width:600px){
+  .ma-the{grid-template-columns:minmax(0,1fr);gap:20px;padding:20px 16px;justify-items:center;text-align:center}
+  .ma-the .ma-chu{display:flex;flex-direction:column;align-items:center}
+  .qr{width:184px;height:184px;order:2}
+  .ma-so{font-size:60px}
+  .dem-nguoc{width:100%}
+  .co-mat{width:100%;text-align:left;order:3}
+  .ba-nhom .so{font-size:20px}
+  .ds .av{display:none}
+}
+</style></head>
+<body data-app="gv" data-tab="hanh-trinh" data-khung="man-con" data-ve="Hành trình" data-tieu="Điểm danh" data-phu="Buổi tối 26/10 · 12A1" data-nut-dau='<span class="nut trong an-dt">Kết thúc buổi</span>'>
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: mã + QR + số có mặt + nút chính gom vào MỘT thẻ đầu (bản cũ tách 2 thẻ, 4 ô số lặp ý);
+       ba cột tên 34 em đưa vào «Xem cả 36 em có mặt», chỉ để 6 em vừa điểm danh; bỏ dải chip trùng dòng phụ. -->
+  <section class="the ma-the" aria-label="Mã điểm danh">
+    <div class="qr" role="img" aria-label="Mã QR điểm danh"><svg id="qr" shape-rendering="crispEdges"></svg></div>
+    <div class="ma-chu cot" style="gap:10px">
+      <span class="nhan">Mã điểm danh</span>
+      <span class="ma-so">482 917</span>
+      <div class="hang" style="flex-wrap:wrap;gap:8px"><span class="chip dung"><span class="cham dung"></span>Tự cập nhật mỗi 5 giây</span><span class="chip">Mở lúc 18:02</span></div>
+      <p class="mo" style="text-wrap:balance">Mã đổi mỗi phút · em chỉ điểm danh được cho chính mình</p>
+      <div class="dem-nguoc"><span class="mo" style="white-space:nowrap">Mã mới sau 0:38</span><div class="thanh manh"><i style="--p:37%"></i></div></div>
+    </div>
+    <div class="co-mat">
+      <span class="nhan">Có mặt</span>
+      <span class="so-lon">36<small>/40 em</small></span>
+      <div class="thanh dung" style="--p:90%"><i></i></div>
+      <p class="mo">Vắng 4 em · 1 em có phép · cập nhật 18:16</p>
+      <span class="nut chinh lon rong-het nut-dai mt-2">Xong điểm danh<small>chiếu Nhịp học của lớp</small></span>
+      <div class="hai-nut"><span class="nut"><i data-i="monitor"></i>Chiếu điểm danh</span><span class="nut"><i data-i="plus"></i>Thêm em tay</span></div>
+    </div>
+  </section>
+
+  <div class="chinh-phu">
+    <section class="the dem">
+      <div class="the-dau" style="padding:18px 20px 4px;margin:0"><div class="h3">Vừa điểm danh</div><span class="mo">bấm em ⇒ hồ sơ làm bài</span></div>
+      <div class="ds">
+        <div class="dong"><span class="gio">18:16</span><span class="av a1">HM</span><div class="giua"><p class="ten">Lê Hà My</p><p class="mo">Đủ mức 10/11 ngày</p></div><span class="phai"><span class="chip dung">Chăm</span><i data-i="chevron" class="an-dt"></i></span></div>
+        <div class="dong"><span class="gio">18:15</span><span class="av a3">MH</span><div class="giua"><p class="ten">Trần Minh Hiếu</p><p class="mo">Đủ mức 3/11 ngày</p></div><span class="phai"><span class="chip sai">Lười</span><i data-i="chevron" class="an-dt"></i></span></div>
+        <div class="dong"><span class="gio">18:14</span><span class="av a2">TT</span><div class="giua"><p class="ten">Bùi Thanh Tâm</p><p class="mo">Đủ mức 7/11 ngày</p></div><span class="phai"><span class="chip chu-y">Chưa đều</span><i data-i="chevron" class="an-dt"></i></span></div>
+        <div class="dong"><span class="gio">18:12</span><span class="av a1">GB</span><div class="giua"><p class="ten">Phan Gia Bảo</p><p class="mo">Đủ mức 11/11 ngày</p></div><span class="phai"><span class="chip dung">Chăm</span><i data-i="chevron" class="an-dt"></i></span></div>
+        <div class="dong"><span class="gio">18:11</span><span class="av">HP</span><div class="giua"><p class="ten">Lê Hoàng Phát</p><p class="mo">Thầy thêm · đủ mức 4/11 ngày</p></div><span class="phai"><span class="chip sai">Lười</span><i data-i="chevron" class="an-dt"></i></span></div>
+        <div class="dong"><span class="gio">18:09</span><span class="av a2">YN</span><div class="giua"><p class="ten">Hoàng Yến Nhi</p><p class="mo">Đủ mức 6/11 ngày</p></div><span class="phai"><span class="chip chu-y">Chưa đều</span><i data-i="chevron" class="an-dt"></i></span></div>
+      </div>
+      <div style="padding:4px 20px 12px"><a class="lien-ket">Xem cả 36 em có mặt <i data-i="chevron" class="nho"></i></a></div>
+    </section>
+
+    <div class="cot" style="gap:20px">
+      <section class="the">
+        <div class="the-dau"><div class="h3">Vắng 4 em — 2 em đang Lười</div></div>
+        <div class="vang-ds">
+          <span class="nut em-vang"><span class="cham sai"></span>Đỗ Khánh Linh</span>
+          <span class="nut em-vang"><span class="cham sai"></span>Vũ Đức Anh</span>
+          <span class="nut em-vang"><span class="cham chu-y"></span>Mạc Văn Toàn</span>
+          <span class="nut em-vang co-phep"><span class="cham chu-y"></span>Phùng Thị Hằng (có phép)</span>
+        </div>
+        <p class="mo mt-3">Bấm tên em vắng để đánh dấu có phép.</p>
+      </section>
+
+      <section class="the">
+        <div class="the-dau"><div class="h3">Nhịp học của em có mặt</div><span class="mo">36 em</span></div>
+        <div class="xep" role="img" aria-label="Chăm 19, Chưa đều 12, Lười 5"><i class="c" style="width:52.8%"></i><i class="d" style="width:33.3%"></i><i class="l" style="width:13.9%"></i></div>
+        <div class="ba-nhom mt-4">
+          <div><p class="nhan"><span class="cham dung" style="display:inline-block;margin-right:6px"></span>Chăm</p><p class="so">19</p></div>
+          <div><p class="nhan"><span class="cham chu-y" style="display:inline-block;margin-right:6px"></span>Chưa đều</p><p class="so">12</p></div>
+          <div><p class="nhan"><span class="cham sai" style="display:inline-block;margin-right:6px"></span>Lười</p><p class="so sai-mau">5</p></div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <span class="nut trong rong-het chi-dt-nho">Kết thúc buổi</span>
+</main>
+<script src="khung.js"></script>
+<script>
+  // QR giả 25×25 (bản vẽ, không quét được): ba ô định vị + điểm có hạt cố định.
+  ;(() => {
+    const n = 25, sv = document.getElementById('qr'); let s = 482917, d = ''
+    const r = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648)
+    const dinhVi = (x, y) => [[0, 0], [n - 7, 0], [0, n - 7]].some(([a, b]) => x >= a - 1 && x <= a + 7 && y >= b - 1 && y <= b + 7)
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (!dinhVi(x, y) && r() < 0.5) d += `M${x} ${y}h1v1h-1z`
+    for (const [a, b] of [[0, 0], [n - 7, 0], [0, n - 7]]) d += `M${a} ${b}h7v7h-7zM${a + 1} ${b + 1}v5h5v-5zM${a + 2} ${b + 2}h3v3h-3z`
+    sv.setAttribute('viewBox', `0 0 ${n} ${n}`)
+    sv.innerHTML = `<path d="${d}" fill="currentColor" fill-rule="evenodd"/>`
+  })()
+</script>
+</body></html>

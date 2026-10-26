@@ -1,0 +1,103 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Đăng nhập</title><link rel="stylesheet" href="trong.css">
+<style>
+.dn{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px 48px;gap:28px;position:relative;overflow:hidden}
+.dn::before{content:"";position:absolute;inset:-30% auto auto -20%;width:720px;height:720px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--chinh) 12%,transparent),transparent);pointer-events:none}
+.dn::after{content:"";position:absolute;inset:auto -15% -35% auto;width:620px;height:620px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--tin) 9%,transparent),transparent);pointer-events:none}
+.vo{position:relative;z-index:1;width:min(980px,100%);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);background:var(--mat);border:1px solid var(--vien);border-radius:28px;box-shadow:var(--bong-3);overflow:hidden}
+.thuong{position:relative;padding:44px 44px 40px;background:linear-gradient(160deg,var(--chinh-nhat),var(--mat) 78%);display:flex;flex-direction:column;gap:18px;border-right:1px solid var(--vien)}
+.thuong .logo{width:84px;height:84px}
+.thuong h1{font-size:40px;line-height:1.12;font-weight:700;letter-spacing:-.03em}
+.thuong h1 span{color:var(--chinh-chu)}
+.thuong .phu{font-size:15px;max-width:320px}
+.nguyen-to{display:flex;gap:10px;margin-top:auto;padding-top:28px}
+.nguyen-to div{width:64px;height:64px;border-radius:14px;border:1px solid var(--vien);background:var(--mat);display:flex;flex-direction:column;padding:6px 8px;line-height:1}
+.nguyen-to small{font-size:10px;color:var(--chu-3);font-weight:500}
+.nguyen-to b{font-size:22px;font-weight:700;margin-top:auto;letter-spacing:-.02em}
+.nguyen-to span{font-size:9px;color:var(--chu-3)}
+.nguyen-to div:nth-child(3){border-color:var(--chinh);background:var(--chinh-nhat)}
+.nguyen-to div:nth-child(3) b{color:var(--chinh-chu)}
+.form{padding:44px 40px 36px;display:flex;flex-direction:column}
+.form .h2{font-size:22px}
+.truong{margin-top:18px}
+.truong .goi-y{font-weight:400;color:var(--chu-3);font-size:13px}
+.o-nhap.mk{padding-right:4px;letter-spacing:.2em}
+.o-nhap.mk .mat{margin-left:auto;width:44px;height:40px;display:grid;place-items:center;color:var(--chu-3);letter-spacing:0;border-radius:10px}
+.o-nhap.loi{border-color:var(--sai);box-shadow:0 0 0 4px var(--sai-nhat)}
+.bao-loi{display:flex;align-items:center;gap:6px;margin-top:8px;color:var(--sai-chu);font-size:13px;font-weight:500}
+.quen{margin-top:16px;text-align:center;color:var(--chu-3);font-size:14px}
+.khac{position:relative;z-index:1;width:min(420px,100%)}
+.khac .nhan{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.khac .nhan::before,.khac .nhan::after{content:"";flex:1;height:1px;background:var(--vien-2)}
+.hai-nut{display:flex;gap:10px;margin-top:22px}
+.hai-nut .nut.chinh{flex:1}
+@media (max-width:820px){
+  .vo{grid-template-columns:minmax(0,1fr);border-radius:24px}
+  .thuong{padding:28px 24px 22px;border-right:0;border-bottom:1px solid var(--vien);flex-direction:row;align-items:center;gap:16px}
+  .thuong .logo{width:60px;height:60px}
+  .thuong h1{font-size:26px}
+  .thuong .phu{font-size:14px}
+  .form{padding:24px 24px 22px}
+}
+@media (max-width:600px){
+  .dn{padding:24px 16px 32px;justify-content:flex-start;gap:24px}
+  .vo{border-radius:22px;box-shadow:var(--bong-2)}
+  .thuong{padding:24px 20px 20px}
+  .form{padding:22px 20px 20px}
+  .hai-nut{flex-direction:column-reverse}
+  .hai-nut .nut{width:100%}
+}
+</style></head>
+<body data-app="hs" data-khung="khong" data-ai="khong">
+<main class="dn">
+  <!-- GỌN HƠN: bỏ khối logo xoay và 4 ô nguyên tố to; thương hiệu + ô đăng nhập gộp một tấm, mắt rơi ngay vào hai ô nhập và nút «Đăng nhập».
+       Trạng thái «Lần đầu đặt mật khẩu» thu về một tấm nhỏ bên dưới, nút «Quay lại» thành nút nhẹ. -->
+  <section class="vo" aria-label="Đăng nhập">
+    <div class="thuong">
+      <img class="logo" src="logo/logo-hs.svg" alt="Logo Đỗ Đại Học">
+      <div class="cot" style="gap:8px">
+        <p class="nhan an-dt">Thầy Đỗ Đại Học · Luyện thi Hoá</p>
+        <h1>Hành trình<br class="an-dt"> <span>giỏi Hóa</span></h1>
+        <p class="phu an-dt">Mỗi ngày một chặng nhỏ. Sai câu nào, sửa câu đó.</p>
+      </div>
+      <div class="nguyen-to an-hep" aria-hidden="true">
+        <div><small>1</small><b>H</b><span>1,008</span></div>
+        <div><small>6</small><b>C</b><span>12,011</span></div>
+        <div><small>7</small><b>N</b><span>14,007</span></div>
+        <div><small>8</small><b>O</b><span>15,999</span></div>
+      </div>
+    </div>
+    <div class="form">
+      <h2 class="h2">Đăng nhập</h2>
+      <div class="truong">
+        <label class="nhan-o">Số báo danh (SBD)</label>
+        <div class="o-nhap co-chu tap-trung"><i data-i="user" class="nho"></i>110234</div>
+      </div>
+      <div class="truong">
+        <label class="nhan-o">Mật khẩu <span class="goi-y">(Lần đầu chưa có để trống để đặt)</span></label>
+        <div class="o-nhap co-chu mk"><i data-i="lock" class="nho"></i>••••••••<span class="mat" aria-label="Hiện mật khẩu"><i data-i="eye"></i></span></div>
+      </div>
+      <span class="nut chinh lon rong-het mt-6">Đăng nhập <i data-i="arrow"></i></span>
+      <p class="quen">Quên mật khẩu: nhắn thầy để đặt lại.</p>
+    </div>
+  </section>
+
+  <section class="khac">
+    <p class="nhan">Trạng thái khác · lần đầu đặt mật khẩu</p>
+    <div class="the" style="padding:22px">
+      <div class="ghi-chu tin"><i data-i="info" class="nho"></i><span>SBD <b>12026</b> chưa có mật khẩu. Em tạo mật khẩu mới, tối thiểu 6 ký tự.</span></div>
+      <div class="truong">
+        <label class="nhan-o">Mật khẩu mới</label>
+        <div class="o-nhap co-chu mk">••••••••<span class="mat" aria-label="Hiện mật khẩu"><i data-i="eye"></i></span></div>
+      </div>
+      <div class="truong">
+        <label class="nhan-o">Xác nhận mật khẩu</label>
+        <div class="o-nhap co-chu mk loi">•••••••<span class="mat" aria-label="Hiện mật khẩu"><i data-i="eye"></i></span></div>
+        <p class="bao-loi"><i data-i="alert" class="nho"></i>Xác nhận mật khẩu không khớp</p>
+      </div>
+      <div class="hai-nut"><span class="nut trong"><i data-i="back" class="nho"></i>Quay lại</span><span class="nut chinh">Xác nhận &amp; Đăng nhập</span></div>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+</body></html>

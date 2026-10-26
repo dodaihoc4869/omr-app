@@ -1,0 +1,92 @@
+/* «TRONG» — HÀNH TRÌNH GIỎI HÓA (bản vẽ thầy chốt 26/10: ve-moi/gv-hanh-trinh.html). Chỉ khi <html data-trong="gv">; TheBaiDaDay nạp.
+   Thước 4 bước thành MỘT thẻ ngang «Buổi dạy hôm nay» (vạch màu trên mỗi bước: xanh lá xong · màu app đang mở); dưới là bước đang mở là nhân vật chính,
+   Kiểm tra ôn tập sang cột phụ (≥ 1280 px). Bước đang gập không vẽ dòng riêng — mở bằng chính thước. Chỉ biến --tr-*. */
+[data-trong='gv'] .gvv2 { gap: 20px; color: var(--tr-chu); }
+[data-trong='gv'] .gvv2-dau .gvv2-phu { font-size: 14px; color: var(--tr-chu-3); }
+[data-trong='gv'] .gvv2-ht { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+
+/* thẻ thước */
+[data-trong='gv'] .gvv2-ht-thuoc {
+  position: static; padding: 0; overflow: hidden; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1);
+}
+[data-trong='gv'] .gvv2-ht-buoi,
+[data-trong='gv'] .gvv2-ht-buoi[data-nhieu] {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0; padding: 16px 20px 14px; border-bottom: 1px solid var(--tr-vien);
+}
+[data-trong='gv'] .gvv2-ht-nhan { flex: 1 1 auto; font-size: 16px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--tr-chu); }
+[data-trong='gv'] .gvv2-ht-buoi > b { font-size: 14px; font-weight: 500; color: var(--tr-chu-2); }
+[data-trong='gv'] .gvv2-ht-chon-buoi select { min-height: 44px; max-width: 100%; font-weight: 600; }
+[data-trong='gv'] .gvv2-ht-co-mat { font-size: 14px; color: var(--tr-chu-2); }
+[data-trong='gv'] .gvv2-ht-co-mat b { color: var(--tr-chu); font-weight: 600; }
+[data-trong='gv'] .gvv2-ht-thuoc ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+[data-trong='gv'] .gvv2-ht-thuoc li + li { margin: 0; border-left: 1px solid var(--tr-vien); }
+[data-trong='gv'] .gvv2-ht-thuoc li.gvv2-ht-tach { display: none; }
+[data-trong='gv'] .gvv2-ht-thuoc li button {
+  flex-direction: column; align-items: flex-start; gap: 8px; height: 100%; min-height: 96px; padding: 16px 20px 14px; border-radius: 0;
+  box-shadow: inset 0 3px 0 var(--tr-mat-3); background: none; color: var(--tr-chu); font-size: 15px; font-weight: 600; text-align: left;
+}
+[data-trong='gv'] .gvv2-ht-thuoc li button:hover { background: var(--tr-mat-2); }
+[data-trong='gv'] .gvv2-ht-thuoc li[data-tt='xong'] button { box-shadow: inset 0 3px 0 var(--tr-dung); }
+[data-trong='gv'] .gvv2-ht-thuoc li[data-tt='dang'] button { box-shadow: inset 0 3px 0 var(--tr-chinh); background: var(--tr-chinh-nhat); color: var(--tr-chu); }
+[data-trong='gv'] .gvv2-ht-thuoc-chu { gap: 2px; padding: 0; }
+[data-trong='gv'] .gvv2-ht-ten-dai,
+[data-trong='gv'] .gvv2-ht-thuoc-phu { display: block; }
+[data-trong='gv'] .gvv2-ht-ten-ngan,
+[data-trong='gv'] .gvv2-ht-thuoc-ghi { display: none; }
+[data-trong='gv'] .gvv2-ht-thuoc-phu,
+[data-trong='gv'] .gvv2-ht-thuoc li[data-tt] .gvv2-ht-thuoc-phu { font-size: 13px; font-weight: 400; color: var(--tr-chu-3); }
+[data-trong='gv'] .gvv2-ht-vong { width: 28px; height: 28px; border-radius: 50%; background: var(--tr-mat-2); color: var(--tr-chu-2); font-size: 13px; font-weight: 600; }
+[data-trong='gv'] [data-tt='xong'] > button > .gvv2-ht-vong { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+[data-trong='gv'] [data-tt='dang'] > button > .gvv2-ht-vong { background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); }
+[data-trong='gv'] .gvv2-ht-hp { color: var(--tr-sai-chu); font-weight: 600; }
+
+/* bước đang mở = nhân vật chính; bước gập ẩn (thước đã có tên, tóm tắt và lối mở) */
+[data-trong='gv'] .gvv2-ht-cac-buoc { gap: 20px; align-items: start; }
+[data-trong='gv'] .gvv2-ht-buoc[data-mo='false'] { display: none; }
+[data-trong='gv'] .gvv2-ht-buoc[data-dau],
+[data-trong='gv'] .gvv2-ht-buoc[data-dau][data-mo='true'] { border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .gvv2-ht-dong { padding: 18px 20px; }
+[data-trong='gv'] .gvv2-ht-dong-chu h2,
+[data-trong='gv'] .gvv2-ht-buoc[data-mo='true'] .gvv2-ht-dong-chu h2 { font-size: 16px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .gvv2-ht-dong-chu p { font-size: 13px; color: var(--tr-chu-3); }
+[data-trong='gv'] .gvv2-ht-buoc .gvv2-ht-dong > .gvv2-ht-vong { width: 40px; height: 40px; border-radius: 12px; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
+
+/* thân bước (thẻ .dh-buoc của từng bước): viền mảnh như mọi thẻ, bỏ viền dày xanh; vòng số = ô biểu tượng màu app */
+[data-trong='gv'] .gvv2-bd .dh-buoc,
+[data-trong='gv'] .gvv2-bd[data-b1] :is([data-buoc='1'] > .dh-buoc, .dh-buoc[data-buoc]) {
+  gap: 16px; padding: 20px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1);
+}
+[data-trong='gv'] .gvv2-bd .dh-buoc-ten h2 { font-size: 18px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .gvv2-bd[data-b1] .dh-buoc .dh-buoc-dau > .dh-so { width: 40px; height: 40px; border-radius: 12px; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); font-weight: 600; }
+
+/* Kiểm tra ôn tập: thẻ phụ */
+[data-trong='gv'] .gvv2-ht-on-tap { margin: 0; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .gvv2-ht-on-tap > summary { padding: 14px 20px; }
+[data-trong='gv'] .gvv2-ht-on-tap .gvv2-ht-vong { border-radius: 12px; background: var(--tr-tin-nhat); color: var(--tr-tin-chu); }
+[data-trong='gv'] .gvv2-ht-on-tap .gvv2-ht-dong-chu b { font-size: 16px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .gvv2-ht-on-tap .gvv2-ht-dong-chu span { font-size: 13px; color: var(--tr-chu-3); }
+[data-trong='gv'] .gvv2-ht-xem { color: var(--tr-chinh-chu); font-weight: 600; }
+/* cột phụ chỉ khi đang mở Dạy học (bản vẽ); Điểm danh / Gọi lên bảng / Chữa câu cần cả bề ngang */
+@media (min-width: 1280px) {
+  [data-trong='gv'] .gvv2-ht[data-mo='3'] .gvv2-ht-cac-buoc { grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr); }
+  [data-trong='gv'] .gvv2-ht[data-mo='3'] .gvv2-ht-cac-buoc > .gvv2-ht-buoc { grid-column: 1; }
+  [data-trong='gv'] .gvv2-ht[data-mo='3'] .gvv2-ht-cac-buoc > .gvv2-ht-on-tap { grid-column: 2; grid-row: 1; }
+}
+
+/* máy tính bảng: thước 2 × 2 · điện thoại: thước thành danh sách, vạch màu bên trái */
+@media (max-width: 1100px) {
+  [data-trong='gv'] .gvv2-ht-thuoc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  [data-trong='gv'] .gvv2-ht-thuoc li:nth-child(4) { border-left: 0; }
+  [data-trong='gv'] .gvv2-ht-thuoc li:nth-child(n + 4) { border-top: 1px solid var(--tr-vien); }
+}
+@media (max-width: 600px) {
+  [data-trong='gv'] .gvv2-ht-buoi { padding: 14px 16px 12px; }
+  [data-trong='gv'] .gvv2-ht-chon-buoi,
+  [data-trong='gv'] .gvv2-ht-chon-buoi select { width: 100%; }
+  [data-trong='gv'] .gvv2-ht-thuoc ol { grid-template-columns: minmax(0, 1fr); }
+  [data-trong='gv'] .gvv2-ht-thuoc li + li { border-left: 0; border-top: 1px solid var(--tr-vien); }
+  [data-trong='gv'] .gvv2-ht-thuoc li button { flex-direction: row; align-items: center; gap: 12px; min-height: 64px; padding: 12px 16px; box-shadow: inset 3px 0 0 var(--tr-mat-3); }
+  [data-trong='gv'] .gvv2-ht-thuoc li[data-tt='xong'] button { box-shadow: inset 3px 0 0 var(--tr-dung); }
+  [data-trong='gv'] .gvv2-ht-thuoc li[data-tt='dang'] button { box-shadow: inset 3px 0 0 var(--tr-chinh); }
+  [data-trong='gv'] .gvv2-ht-dong { padding: 14px 16px; }
+}

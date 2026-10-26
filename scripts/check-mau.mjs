@@ -15,6 +15,8 @@ const ROOT = fileURLToPath(new URL('../src', import.meta.url))
 // dùng. Đây là ngoại lệ ĐÓNG: thêm file vào đây phải có lý do "rời khỏi máy".
 const CHO_PHEP = new Set([
   'styles/tokens.css',
+  // Bảng màu giao diện «Trong» thầy chốt 26/10/2026 (docs/ban-ve-trong-2610): mọi mã màu của giao diện mới chỉ nằm ở đây, nơi khác dùng biến --tr-*.
+  'styles/trong.css',
   'lib/html-phieu.ts',
   'lib/html-may-chieu.ts',
   // Bảng màu của TỜ MÁY CHIẾU (M3, 19/09): tờ là HTML rời trong iframe, có thể lưu ra tệp / mở tab riêng / chiếu từ máy khác, và nền bảng luôn TỐI

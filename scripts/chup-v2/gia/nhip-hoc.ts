@@ -8,6 +8,7 @@ import { TEN_NHAN_THAI_DO } from '../../../server/src/bai-hang-ngay-kieu'
 import type { DoiPhoEm, EmNhipHoc, KetQuaNhipHoc } from '../../../server/src/nhip-hoc-kieu'
 import { hoSoThaiDoGia, tenEmBhn } from './bai-hang-ngay'
 import { tomTatNhip } from '../../../server/src/nhip-hoc-luat' // LÀN NHỊP EM 12/10C
+import { phanNhomEm } from '../../../src/lib/nhip-hoc-thay'
 
 const NGAY = Array.from({ length: 12 }, (_, i) => `2026-10-${String(i + 1).padStart(2, '0')}`)
 const HOM_NAY = NGAY[NGAY.length - 1]!
@@ -83,6 +84,15 @@ function taoEm(): EmNhipHoc[] {
 }
 
 const EM = taoEm()
+// «Trong» 26/10: máy chủ thật gửi `bacCham` mỗi em (12 bậc từ Lười đến Chăm) ⇒ thêm bậc giả TẤT ĐỊNH, đúng khoảng của nhóm em (Lười 1–5 · Chưa đều 6–7 ·
+// Chăm 8–12; bậc cuối khoảng không có «còn N điểm») để thẻ «12 bậc» hiện trong ảnh.
+for (const [i, e] of EM.entries()) {
+  const nhom = phanNhomEm(e, NGAY, HOM_NAY).nhom
+  if (nhom === 'chua-du') continue
+  const [dau, cuoi] = nhom === 'luoi' ? [1, 5] : nhom === 'chua-deu' ? [6, 7] : [8, 12]
+  const bac = dau + Math.min(cuoi - dau, Math.floor(gia(i, 31) ** (nhom === 'cham' ? 1.6 : 1) * (cuoi - dau + 1)))
+  e.bacCham = { bac, diem: Math.round(8 * bac - 4 + 6 * gia(i, 37)), diemLenBac: bac === cuoi ? null : 1 + Math.floor(7 * gia(i, 41)) }
+}
 const LOP_DS = LOP.map(([khoi, tenLop, soEm]) => ({ tenLop, khoi, soEm })).sort((a, b) => b.khoi.localeCompare(a.khoi) || a.tenLop.localeCompare(b.tenLop, 'vi'))
 
 const thamSo = () => (typeof location === 'undefined' ? new URLSearchParams() : new URLSearchParams(location.search))

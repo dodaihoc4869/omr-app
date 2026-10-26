@@ -17,3 +17,10 @@
 .lg-kc-bien-nhan[data-can-thay] { background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container); }
 .lg-kc-thay { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 .lg-kc-thay p { font-size: 13px; }
+/* «Trong» (26/10): thẻ viền mảnh, nút bo 12; nút phụ trắng viền mảnh; báo nền nhạt theo nghĩa. */
+[data-trong] .lg-kc { border-color: var(--tr-vien); background: var(--tr-mat); }
+[data-trong] .lg-kc-icon { border-radius: 10px; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
+[data-trong] :is(.lg-kc-mo, .lg-kc-phu) { border-radius: 12px; font-weight: 600; }
+[data-trong] .lg-kc-phu { border-color: var(--tr-vien-2); color: var(--tr-chu); box-shadow: var(--tr-bong-1); }
+[data-trong] :is(.lg-kc-nhac, .lg-kc-bien-nhan) { background: var(--tr-tin-nhat); color: var(--tr-tin-chu); }
+[data-trong] .lg-kc-bien-nhan[data-can-thay] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }

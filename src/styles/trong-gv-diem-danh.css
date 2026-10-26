@@ -1,0 +1,64 @@
+/* «TRONG» — ĐIỂM DANH (bước 1 Hành trình; bản vẽ thầy chốt 26/10: ve-moi/gv-diem-danh.html). Chỉ khi <html data-trong="gv">; Buoc1DiemDanh nạp.
+   Dùng TRÊN LỚP: mã 6 số + QR to đọc được từ xa; bên cạnh là số có mặt và nút chính «Xong điểm danh»; dưới: Vừa điểm danh | em vắng.
+   Hai lưới con (.dd1-o3, .dd1-o2) trải phẳng vào lưới của thẻ bước bằng display: contents — không đổi JSX, không đổi điều kiện hiện. Chỉ biến --tr-*. */
+[data-trong='gv'] .dh-buoc.dd1 {
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'dau' 'ma' 'co-mat' 'xong' 'vang' 'vua' 'ds'; gap: 16px; align-items: start;
+}
+[data-trong='gv'] .dd1 :is(.dd1-o3, .dd1-o2) { display: contents; }
+[data-trong='gv'] .dd1 > .dh-buoc-dau { grid-area: dau; }
+[data-trong='gv'] .dd1 .dd1-o--ma { grid-area: ma; }
+[data-trong='gv'] .dd1 .dd1-o--co-mat { grid-area: co-mat; }
+[data-trong='gv'] .dd1 .dd1-o--xong { grid-area: xong; }
+[data-trong='gv'] .dd1 .dd1-o--vang { grid-area: vang; }
+[data-trong='gv'] .dd1 .dd1-o--vua { grid-area: vua; }
+[data-trong='gv'] .dd1 > .dh-co-mat-gap { grid-area: ds; }
+[data-trong='gv'] .dd1 > :not(.dh-buoc-dau, .dh-co-mat-gap, .dd1-o3, .dd1-o2) { grid-column: 1 / -1; }
+
+[data-trong='gv'] .dd1 .dd1-o { gap: 10px; padding: 18px 20px; border: 1px solid var(--tr-vien); border-radius: 16px; background: var(--tr-mat); color: var(--tr-chu); }
+[data-trong='gv'] .dd1 .dd1-phu { color: var(--tr-chu-3); }
+/* mã + QR: chữ số to, đọc từ cuối lớp */
+[data-trong='gv'] .dd1 .dd1-o--ma { gap: 24px; }
+[data-trong='gv'] .dd1 .dd1-qr { flex-basis: 132px; width: 132px; height: 132px; padding: 6px; border: 1px solid var(--tr-vien); border-radius: 14px; background: var(--tr-trang); }
+[data-trong='gv'] .dd1 .dd1-nhan { font-size: 13px; font-weight: 500; color: var(--tr-chu-3); }
+[data-trong='gv'] .dd1 .dd1-ma { font-size: clamp(40px, 5.2vw, 72px); font-weight: 700; letter-spacing: 0.04em; color: var(--tr-chu); }
+/* có mặt + nút chính */
+[data-trong='gv'] .dd1 .dd1-co-mat-so { font-size: 15px; font-weight: 500; color: var(--tr-chu-3); }
+[data-trong='gv'] .dd1 .dd1-co-mat-so b { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] .dd1 .dd1-thanh { height: 8px; background: var(--tr-mat-3); }
+[data-trong='gv'] .dd1 .dd1-thanh > i[data-nhom='cham'],
+[data-trong='gv'] .dd1 .dd1-thanh > i[data-nhom='tong'] { background: var(--tr-dung); }
+[data-trong='gv'] .dd1 .dd1-thanh > i[data-nhom='chua-deu'] { background: var(--tr-chu-y); }
+[data-trong='gv'] .dd1 .dd1-thanh > i[data-nhom='luoi'] { background: var(--tr-sai); }
+[data-trong='gv'] .dd1 .dd1-thanh > i[data-nhom='moi'] { background: var(--tr-chu-3); }
+[data-trong='gv'] .dd1 .dd1-thanh > i[data-nhom='chua-co'] { background: var(--tr-chinh-nhat); }
+[data-trong='gv'] .dd1 .dd1-chip[data-nhom='cham'] { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+[data-trong='gv'] .dd1 .dd1-chip[data-nhom='chua-deu'] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+[data-trong='gv'] .dd1 .dd1-chip[data-nhom='luoi'] { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+[data-trong='gv'] .dd1 .dd1-o2--doc .dd1-o--xong,
+[data-trong='gv'] .dd1 .dd1-o--xong { flex-direction: column; align-items: stretch; gap: 10px; border: 0; background: none; padding: 0; }
+[data-trong='gv'] .dd1 .dd1-o2--doc .dd1-o--xong .dd1-phu { flex: none; }
+[data-trong='gv'] .dd1 .dd1-o2--doc .dd1-nut-chinh,
+[data-trong='gv'] .dd1 .dd1-nut-chinh { order: -1; width: 100%; min-height: 56px; border-radius: 14px; font-size: 16px; }
+/* em vắng: thẻ trắng, tên em là viên thuốc chấm màu */
+[data-trong='gv'] .dd1 .dd1-o--vang[data-co-vang] { background: var(--tr-mat); }
+[data-trong='gv'] .dd1 .dd1-vang-tieu { font-size: 16px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .dd1 .dd1-vang-ten .dd1-nut-chu { min-height: 44px; padding: 0 14px; border: 1px solid var(--tr-vien-2); border-radius: 999px; background: var(--tr-mat); color: var(--tr-chu); font-weight: 500; }
+[data-trong='gv'] .dd1 .dd1-vang-ten .dd1-nut-chu[aria-pressed='true'] { border-style: dashed; background: var(--tr-mat-2); color: var(--tr-chu-2); }
+[data-trong='gv'] .dd1 .dd1-tieu { font-size: 16px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .dd1 .dd1-vua-dong:hover { background: var(--tr-mat-2); }
+
+/* máy tính: mã + QR bên trái (rộng), có mặt + nút chính bên phải; dưới: Vừa điểm danh | em vắng */
+@media (min-width: 1000px) {
+  [data-trong='gv'] .dh-buoc.dd1 {
+    grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr);
+    grid-template-areas: 'dau dau' 'ma co-mat' 'ma xong' 'vua vang' 'vua .' 'ds ds';
+  }
+  [data-trong='gv'] .dd1 .dd1-o--ma { align-self: stretch; }
+  [data-trong='gv'] .dd1 .dd1-qr { flex-basis: 152px; width: 152px; height: 152px; }
+}
+@media (max-width: 600px) {
+  [data-trong='gv'] .dd1 .dd1-o--ma { flex-direction: column; align-items: flex-start; gap: 14px; }
+  [data-trong='gv'] .dd1 .dd1-qr { flex-basis: auto; width: 160px; height: 160px; align-self: center; }
+  [data-trong='gv'] .dd1 .dd1-ma { font-size: 48px; align-self: center; }
+}

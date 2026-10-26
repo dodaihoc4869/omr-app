@@ -15,6 +15,7 @@ import { BuocDiemDanh, emVangBuoi, useDiemDanhBuoi, type DiemDanhBuoi } from '..
 import { useSoDemGv } from '../../lib/so-dem-gv'
 import BangBaiDangGiao from './BangBaiDangGiao'
 import { buocMacDinh, chuBuoi, CHU_TRANG_THAI_BUOC, TEN_BUOC, TEN_NGAN_BUOC, trangThaiBuoc, type SoBuoc, type TrangThaiBuoc } from './buoi-day-ui'
+import '../../styles/trong-gv-hanh-trinh.css' // «Trong» 26/10 — chỉ áp khi <html data-trong="gv">
 
 const DayHocLenBang = lazy(() => import('../day-hoc/DayHocLenBang'))
 const KiemTraDauGio = lazy(() => import('../day-hoc/KiemTraDauGio'))

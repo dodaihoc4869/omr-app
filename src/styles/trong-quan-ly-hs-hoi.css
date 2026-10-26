@@ -1,0 +1,17 @@
+/* «Trong» nhóm 4 — HỌC SINH HỎI (CauHoiScreen, gốc .gv-hs-hoi). Luật chung: đầu tệp trong-quan-ly.css.
+   Tiêu đề không ô biểu tượng; hai lối nhìn = thanh phân đoạn; nhóm ca = thẻ trắng viền mảnh, mỗi ca một dòng kẻ mảnh. */
+[data-trong='gv'] .gv-hs-hoi { gap: 20px !important; --serif: var(--sans); }
+[data-trong='gv'] .gv-hs-hoi > .gv-page-header > div > div:first-child:has(> svg) { display: none; }
+[data-trong='gv'] .gv-hs-hoi > .gv-page-header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] .gv-hs-hoi > .gv-page-header p { font-size: 13px; color: var(--tr-chu-3); }
+[data-trong='gv'] .gv-hs-hoi .gv-hs-hoi-che { display: inline-flex; gap: 2px; width: max-content; max-width: 100%; padding: 3px; border-radius: 12px; background: var(--tr-mat-2); }
+[data-trong='gv'] .gv-hs-hoi .gv-hs-hoi-che > button { min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: none; color: var(--tr-chu-2); box-shadow: none; font-size: 14px; font-weight: 500; }
+[data-trong='gv'] .gv-hs-hoi .gv-hs-hoi-che > button.gv-hs-hoi-che--chon { background: var(--tr-mat); color: var(--tr-chu); font-weight: 600; box-shadow: var(--tr-bong-1); }
+/* nhóm ca theo năm: thẻ trắng viền mảnh */
+[data-trong='gv'] .gv-hs-hoi .gv-scroll-box > details { padding: 4px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .gv-hs-hoi .gv-scroll-box > details + details { margin-top: 12px; }
+[data-trong='gv'] .gv-hs-hoi .gv-scroll-box > details > summary { min-height: 52px; padding: 8px 16px; border-radius: 16px; font-size: 15px; }
+[data-trong='gv'] .gv-hs-hoi .the-bam { border: 0; border-top: 1px solid var(--tr-vien); border-radius: 0; background: none; box-shadow: none; }
+[data-trong='gv'] .gv-hs-hoi .the-bam-icon { background: var(--tr-mat-2); color: var(--tr-chu-2); }
+[data-trong='gv'] .gv-hs-hoi .the-bam-ten { font-size: 15px; font-weight: 600; }
+[data-trong='gv'] .gv-hs-hoi .the-bam-phu { font-size: 13px; color: var(--tr-chu-3); }

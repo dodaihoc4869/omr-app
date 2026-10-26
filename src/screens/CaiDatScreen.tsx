@@ -14,6 +14,7 @@ import { TheNoiDung } from '../components/DesignSystem'
 import CongTacHoa2 from '../components/chien-dich/CongTacHoa2'
 import CongTacHoiThay from '../components/chien-dich/CongTacHoiThay'
 import CongTacOmni from '../components/chien-dich/CongTacOmni'
+import '../styles/trong-gv-cai-dat.css' // «Trong» 26/10 — chỉ áp khi <html data-trong="gv">
 import CongTacAiDdh from '../components/ai-ddh/CongTacAiDdh'
 import KhoiKetNoiKhoDe from '../components/KhoiKetNoiKhoDe'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'

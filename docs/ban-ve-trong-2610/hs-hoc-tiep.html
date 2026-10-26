@@ -1,0 +1,79 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Học tiếp</title><link rel="stylesheet" href="trong.css">
+<style>
+sub,sup{line-height:0}
+.tap-trung{max-width:760px;width:100%;margin:0 auto}
+.tien-do{display:flex;align-items:center;gap:16px}
+.tien-do .chang{flex:1}
+.tien-do .chang i{height:10px}
+.tien-do .chang i.dang{background:var(--chinh-nhat);box-shadow:inset 0 0 0 2px var(--chinh)}
+.chi-dt-hep{display:none}
+.chu-giai{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--chu-3)}
+.chu-giai .vach-nho{width:14px;height:6px;border-radius:999px;background:var(--mat-3)}
+.cau{padding:28px 28px 24px}
+.cau-dau{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.cau .y-ds{padding:14px 0}
+.cau .y-ds:first-of-type{margin-top:8px}
+.cau .noi{position:relative;padding-left:28px}
+.cau .noi i.y{position:absolute;left:0;top:0;font-style:normal;font-weight:600;color:var(--chu-3)}
+.cau .noi{font-size:16px}
+.hanh-dong{display:flex;align-items:center;gap:12px;margin-top:24px}
+.hanh-dong .nut.chinh{margin-left:auto;min-width:200px}
+.duoi-man{display:flex;justify-content:space-between;align-items:center;gap:12px}
+@media (max-width:600px){
+  .chi-dt-hep{display:inline-flex}
+  .cau{padding:20px 16px 18px}
+  .cau .y-ds{flex-wrap:wrap;gap:8px 10px;padding:12px 0}
+  .cau .y-ds .noi{flex:1 1 100%}
+  .cau .ds-chon{margin-left:28px}
+  .cau .ds-chon span{min-width:64px;min-height:40px}
+  .hanh-dong{flex-direction:column-reverse;align-items:stretch}
+  .hanh-dong .nut{width:100%}
+  .hanh-dong .nut.chinh{margin-left:0}
+}
+</style></head>
+<body data-app="hs" data-khung="man-con" data-ve="Hôm nay" data-tieu="Chặng học của em" data-phu="Bài 6 · Chặng 2" data-ai="khong"
+  data-nut-dau='<span class="nut trong an-dt">Nghỉ và về Hôm nay</span>'>
+<main class="khung cot tap-trung" style="gap:18px">
+  <!-- GỌN HƠN: bỏ thẻ danh sách 6 câu bên phải và hai ô số; tiến độ chặng chỉ còn một dải 6 nấc trên đầu.
+       Câu hỏi là nhân vật duy nhất: chữ đề 17px, 4 ý Đ/S rộng, một nút «Nộp câu»; «Học cách giải» lùi thành nút phụ. -->
+  <div>
+    <div class="tien-do">
+      <span class="dam">Câu 3<span class="mo" style="font-weight:500">/6</span></span>
+      <div class="chang" role="img" aria-label="Chặng 2: câu 1 tự làm đúng, câu 2 sai, đang làm câu 3, còn 3 câu chưa làm"><i class="xong"></i><i class="sai"></i><i class="dang"></i><i></i><i></i><i></i></div>
+      <span class="mo an-dt">Hôm nay 8/24 câu</span>
+    </div>
+    <div class="chu-giai">
+      <span><span class="vach-nho" style="background:var(--dung)"></span>tự làm đúng</span>
+      <span><span class="vach-nho" style="background:var(--sai)"></span>sai</span>
+      <span><span class="vach-nho" style="background:var(--chinh-nhat);box-shadow:inset 0 0 0 1.5px var(--chinh)"></span>đang làm</span>
+      <span><span class="vach-nho"></span>chưa làm</span>
+    </div>
+  </div>
+
+  <section class="the cau" aria-label="Câu 3">
+    <div class="cau-dau">
+      <span class="chip">Phần II · Đúng – sai</span>
+      <span class="day"></span>
+      <span class="nut nhe"><i data-i="bulb" class="nho"></i>Gợi ý</span>
+    </div>
+    <p class="cau-de">Nitric acid (HNO<sub>3</sub>) là hoá chất quan trọng để sản xuất phân bón và thuốc nổ. Mỗi phát biểu sau <b>đúng</b> hay <b>sai</b>?</p>
+    <div class="y-ds"><span class="noi"><i class="y">a)</i>Trong dung dịch nước, HNO<sub>3</sub> phân li hoàn toàn thành ion H<sup>+</sup> và NO<sub>3</sub><sup>−</sup>.</span><span class="ds-chon"><span class="on-d">Đ</span><span>S</span></span></div>
+    <div class="y-ds"><span class="noi"><i class="y">b)</i>Aluminium và iron bị thụ động hoá trong dung dịch HNO<sub>3</sub> đặc, nguội.</span><span class="ds-chon"><span class="on-d">Đ</span><span>S</span></span></div>
+    <div class="y-ds"><span class="noi"><i class="y">c)</i>Cho copper vào dung dịch HNO<sub>3</sub> loãng, khí thoát ra là NO<sub>2</sub> màu nâu đỏ.</span><span class="ds-chon"><span>Đ</span><span class="on-s">S</span></span></div>
+    <div class="y-ds"><span class="noi"><i class="y">d)</i>Trong phân tử HNO<sub>3</sub>, nguyên tử nitrogen có số oxi hoá +5.</span><span class="ds-chon"><span class="on-d">Đ</span><span>S</span></span></div>
+
+    <div class="hanh-dong">
+      <span class="nut trong">Chưa làm được? Học cách giải</span>
+      <span class="nut chinh lon">Nộp câu <i data-i="arrow"></i></span>
+    </div>
+  </section>
+
+  <div class="duoi-man">
+    <span class="mo">Mỗi chặng tối đa 6 câu</span>
+    <a class="lien-ket chi-dt-hep">Nghỉ và về Hôm nay</a>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

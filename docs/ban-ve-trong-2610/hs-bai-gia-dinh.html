@@ -1,0 +1,93 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Bài gia đình giao</title><link rel="stylesheet" href="trong.css">
+<style>
+p{text-wrap:pretty}
+.dong-ho{font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.moc{display:flex;justify-content:space-between;margin-top:6px}
+.hai-so{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:20px}
+.o-cau{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:8px}
+.o-cau span{min-height:40px;display:grid;place-items:center;border-radius:10px;background:var(--mat-2);color:var(--chu-3);font-size:13.5px;font-weight:600}
+.o-cau span.lam{background:var(--chinh-nhat);color:var(--chinh-chu)}
+.o-cau span.dang{background:var(--mat);color:var(--chu);box-shadow:inset 0 0 0 2px var(--chinh)}
+.nhom-cau+.nhom-cau{margin-top:14px}
+.chu-giai{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:16px;padding-top:14px;border-top:1px solid var(--vien)}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-2)}
+.chu-giai i{width:14px;height:14px;border-radius:4px;background:var(--mat-2)}
+.chu-giai i.lam{background:var(--chinh-nhat);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--chinh) 35%,transparent)}
+.chu-giai i.dang{background:var(--mat);box-shadow:inset 0 0 0 2px var(--chinh)}
+.bai .dong{flex-wrap:wrap}
+@media (max-width:600px){
+  .dong-ho{font-size:34px}
+  .hai-so{grid-template-columns:minmax(0,1fr);gap:16px}
+  .nut-hang{flex-direction:column;align-items:stretch}
+  .bai .dong .nut{width:calc(100% - 54px);margin-left:54px}
+}
+</style></head>
+<body data-app="hs" data-tab="hom-nay" data-khung="man-con" data-tieu="Bài gia đình giao" data-phu="Thời gian làm: 2 giờ" data-ve="Hôm nay">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bài đang làm thành một thẻ: đồng hồ còn lại + thanh thời gian + số câu đã làm, một nút chính «Tiếp tục làm bài»; «Tạm dừng» và «Nộp bài gia đình giao» là nút phụ.
+       Bỏ hàng 3 chip trùng ý; lưới câu sang cột phụ; hai bài còn lại thành danh sách dòng. -->
+  <div>
+    <p class="nhan">3 bài gia đình giao · mỗi bài 120 phút từ khi bắt đầu</p>
+    <h1 class="tieu-de mt-1">Bài gia đình giao</h1>
+  </div>
+
+  <div class="chinh-phu">
+    <div class="cot" style="gap:20px">
+      <section class="the" aria-label="Bài đang làm">
+        <div class="hang" style="flex-wrap:wrap;gap:8px"><span class="chip chinh"><span class="cham chinh"></span>Đang làm</span><span class="chip"><i data-i="check" class="nho"></i>Đã lưu nháp 19:47</span></div>
+        <h2 class="h2 mt-3">Đề ôn chương Hợp chất chứa nitrogen</h2>
+        <p class="mo mt-1">Số câu: 28 · bắt đầu lúc 19:00</p>
+        <div class="hai-so">
+          <div>
+            <p class="nhan">Còn lại trong 2 giờ</p>
+            <p class="dong-ho mt-2" role="timer">01:12:35</p>
+            <div class="thanh chu-y mt-3" style="--p:39.5%" role="img" aria-label="Đã dùng 47 phút 25 giây trên 120 phút"><i></i></div>
+            <div class="moc mo"><span>0 phút</span><span>60 phút</span><span>120 phút</span></div>
+          </div>
+          <div>
+            <p class="nhan">Câu đã làm</p>
+            <p class="dong-ho mt-2">15<span style="font-size:.5em;font-weight:500;color:var(--chu-3)">/28</span></p>
+            <div class="thanh mt-3" style="--p:53.6%"><i></i></div>
+            <p class="mo mt-2">Phần I 11/18 · Phần II 2/4 · Phần III 2/6</p>
+          </div>
+        </div>
+        <div class="hang nut-hang mt-6" style="flex-wrap:wrap"><span class="nut chinh lon">Tiếp tục làm bài <i data-i="arrow"></i></span><span class="nut lon">Nộp bài gia đình giao</span><span class="nut trong" title="Tạm dừng và lưu tiến độ để làm tiếp sau"><i data-i="pause" class="nho"></i>Tạm dừng</span></div>
+        <p class="mo mt-3">Bài của em đã được lưu nháp. Em vào làm tiếp bất cứ lúc nào trước Hạn nộp.</p>
+      </section>
+
+      <section class="the dem bai">
+        <div class="the-dau" style="padding:16px 20px 0;margin:0"><div class="h3">Danh sách bài</div><span class="mo">thời gian làm: 2 giờ mỗi bài</span></div>
+        <div class="ds">
+          <div class="dong">
+            <span class="o-icon xam"><i data-i="book"></i></span>
+            <div class="giua"><p class="ten">Đề luyện tổng hợp Ester – Lipid và Carbohydrate</p><p class="mo">Số câu: 28 · Hạn nộp 01/11</p></div>
+            <span class="nut">Bắt đầu làm bài (2 tiếng)</span>
+          </div>
+          <div class="dong">
+            <span class="o-icon dung"><i data-i="check"></i></span>
+            <div class="giua"><p class="ten">Đề ôn chương Carbohydrate</p><p class="mo">Nộp 18/10 · <b style="color:var(--chu)">7,85/10</b> · Phần I 4,00 · Phần II 2,60 · Phần III 1,25</p></div>
+            <span class="nut">Xem kết quả &amp; Lời giải HTML</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="the">
+      <div class="the-dau" style="margin-bottom:4px"><div class="h3">Danh sách câu</div><span class="mo">Đã làm 15/28</span></div>
+      <div class="nhom-cau mt-3"><p class="nhan">Phần I · Trắc nghiệm · 18 câu</p><div class="o-cau" id="p1"></div></div>
+      <div class="nhom-cau"><p class="nhan">Phần II · Đúng / Sai · 4 câu</p><div class="o-cau" id="p2"></div></div>
+      <div class="nhom-cau"><p class="nhan">Phần III · Trả lời ngắn · 6 câu</p><div class="o-cau" id="p3"></div></div>
+      <div class="chu-giai"><span><i class="lam"></i>đã làm</span><span><i class="dang"></i>đang làm</span><span><i></i>chưa làm</span></div>
+    </aside>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // 15 câu đã làm = Phần I 11 (1–11) + Phần II 2 (19, 20) + Phần III 2 (23, 24); câu đang làm: 12. Thời gian đã dùng 47:25 / 120 phút = 39,5%; còn 01:12:35.
+  // Bài đã nộp: 4,00 + 2,60 + 1,25 = 7,85.
+  const lam = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 19, 20, 23, 24]), dang = 12
+  const o = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i).map((n) => `<span class="${n === dang ? 'dang' : lam.has(n) ? 'lam' : ''}">${n}</span>`).join('')
+  p1.innerHTML = o(1, 18); p2.innerHTML = o(19, 22); p3.innerHTML = o(23, 28)
+</script>
+</body></html>

@@ -28,6 +28,8 @@ import { khoaMoChua } from '../../../server/src/ho-so-em-hs-loc'
 
 import './hoc-tap.css'
 import './tu-chua.css'
+// «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
 const ManChua = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
 // Thẻ mời ở Hôm nay đi CÙNG khối mã với màn này (một khối nạp lười, không thêm tệp precache — trần 170 tệp của kiem-sw).

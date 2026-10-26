@@ -5,6 +5,13 @@ import HocSinhScreen from '../../src/screens/HocSinhScreen'
 import ExamSetupScreen from '../../src/screens/ExamSetupScreen'
 import BanGoNutThatScreen from '../../src/screens/BanGoNutThatScreen'
 import DuyetLoiGiaiScreen from '../../src/screens/DuyetLoiGiaiScreen'
+// «Trong» nhóm 4 (26/10) — màn quản lý app thầy: Ca kiểm tra · Học sinh hỏi · Theo dõi ca (TheoDoiCa thuần props, số giả khớp nhau).
+import LichSuCaScreen from '../../src/screens/LichSuCaScreen'
+import CauHoiScreen from '../../src/screens/CauHoiScreen'
+import TheoDoiCa from '../../src/components/ca-thi/TheoDoiCa'
+import ToanCanhEmScreen from '../../src/screens/ToanCanhEmScreen'
+import PhanCongScreen from '../../src/screens/PhanCongScreen'
+import GiaoDeTheoTuanScreen from '../../src/screens/GiaoDeTheoTuanScreen'
 import '../../src/styles/giao-dien-day-du.css'
 // TRANG CHỤP ẢNH BẢN DUYỆT V2 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
 // (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật (tên em trong ảnh là tên giả).
@@ -40,6 +47,19 @@ import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import '../../src/styles/vo-thay.css'
 import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
+import '../../src/styles/trong.css' // giao diện «Trong» 26/10 (App / AppHocSinh / AppThi nạp y như vậy)
+import '../../src/styles/trong-gv.css' // «Trong» — khung app thầy (App.tsx nạp ngay sau trong.css)
+import GoiLenBangScreen from '../../src/screens/GoiLenBangScreen' // «TRONG» NHÓM 3
+import DieuKhienToChieuScreen from '../../src/screens/DieuKhienToChieuScreen' // «TRONG» NHÓM 3
+import '../../src/styles/trong-gv-chieu.css' // màn thật gắn chuỗi này lúc nạp mảnh (khi data-trong đã có); trang chụp đặt data-trong SAU khi nạp ⇒ nạp thẳng
+const PHIEN_CHIEU_GIA = {
+  maPhien: 'PHIEN1', tieuDe: 'Điều khiển Máy chiếu', dotHienTai: 6, tongSoDot: 20, pha: 'cho', loiGiaiMo: false, daCham: {},
+  dsO: Array.from({ length: 20 }, (_, i) => ({
+    khoa: `o${i}`, dot: i, soCau: i + 1, phan: 'I', sao: i === 6 ? 2 : 0, sbd: String(1200 + i), hoTen: ['Hoàng Bảo Ngọc', 'Lê Khánh Vy', 'Trần Gia Bảo'][i % 3], lop: '12A1', lanLenBang: 2,
+    qid: `DH-12-C2-B6-${i + 1}`, de: 'Xà phòng hoá hoàn toàn 8,9 gam tristearin bằng NaOH vừa đủ. Khối lượng glycerol thu được là', pa: ['0,46 g', '0,92 g', '1,84 g', '2,76 g'],
+    dapAn: 'B', loiGiai: 'n(chất béo) = 8,9 : 890 = 0,01 mol\nTristearin có 3 nhóm ester: n(NaOH) = 3 · 0,01 = 0,03 mol\nn(glycerol) = n(chất béo) = 0,01 mol ⇒ m = 0,01 · 92 = 0,92 g',
+  })),
+}
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import AppPhuHuynh from '../../src/components/ph-v3/AppPhuHuynh'
@@ -90,6 +110,8 @@ import { NHIP_EM_CHAM, NHIP_EM_CHUA_DEU, NHIP_EM_LUOI } from './gia/nhip-hoc-em'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
+// Như main.tsx: giao diện «Trong» (26/10) — cảnh thầy `gv…` = 'gv', cảnh phụ huynh không bật, còn lại (học sinh, màn thi) = 'hs'. `&trong=tat` ⇒ giao diện cũ.
+if (man !== 'ph' && !man.startsWith('ph-') && thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = man.startsWith('gv') ? 'gv' : 'hs'
 const now = Date.now()
 const noop = () => {}
 
@@ -182,6 +204,8 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // Hành trình › Cần thầy chữa (trung tu 09/10 tối): bước cuối trên lớp + thẻ nút thắt GIẢ (tên em giả).
   if (u.pathname.endsWith('/gv/chua-cau-sai/hang-chieu')) return tra({ ok: true, bat: true, conNua: false, ds: BUOC_CUOI_GIA })
   if (u.pathname.endsWith('/gv/nut-that/ds')) return tra(NUT_THAT_GIA)
+  // «Trong» nhóm 4: Duyệt lời giải mở sẵn đề 12-KT-C1-D4 (28 câu: 15 đã duyệt · 9 chờ duyệt, 5 sạch · 2 máy đang soạn · 2 chờ sửa kho)
+  if (u.pathname.endsWith('/gv/loi-giai/cho-duyet')) return tra({ ok: true, maDe: '12-KT-C1-D4', cau: cauDuyetGia(), tong: { cau: 28, daDuyet: 15, choDuyet: 9, sach: 5, dangSoan: 2, traLai: 0, truot: 2, chuaCoBo: 0 } })
   // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): `/ph/con-tong-quan` GIẢ — `&tq=loi` ⇒ máy chủ lỗi (khối Gợi ý nhắc con hiện lý do + Thử lại).
   if (u.pathname.endsWith('/ph/con-tong-quan')) return thamSo.get('tq') === 'loi'
     ? new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Anh/chị thử lại sau ít phút.' }), { status: 500, headers: { 'content-type': 'application/json' } })
@@ -210,6 +234,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // ---- LÀN HÔM NAY 12/10B: Nhịp học (app thầy gọi qua `goiLenh` giả — gia/goi-lenh-thay.ts; giữ thêm đường `fetch` cùng dữ liệu)
   if (u.pathname.endsWith('/gv/nhip-hoc')) { const r = nhipHocGia(); return r.ok ? tra(r.du) : new Response(JSON.stringify({ ok: false, error: r.chu }), { status: 500, headers: { 'content-type': 'application/json' } }) }
   // ---- hết LÀN HÔM NAY 12/10B
+  // ---- «TRONG» NHÓM 3: điện thoại điều khiển máy chiếu (`?man=gv-chieu&remote=PHIEN1`) — phiên giả 20 đợt, đang ở đợt 7
+  if (u.pathname.endsWith('/gv/to-chieu/phien')) return tra({ ok: true, phien: PHIEN_CHIEU_GIA })
+  if (u.pathname.endsWith('/gv/to-chieu/trang-thai')) return tra({ ok: true, dotHienTai: 6, tongSoDot: 20, pha: 'cho', loiGiaiMo: false, daCham: {} })
   // ---- LÀN GIÁO VIÊN 12/10: Bài hằng ngày + hồ sơ thái độ (app thầy gọi qua `goiLenh` giả; giữ thêm đường `fetch` như trên)
   if (u.pathname.endsWith('/gv/bai-hang-ngay')) return tra(baiHangNgayGia())
   if (u.pathname.endsWith('/gv/ho-so-thai-do')) return tra(hoSoThaiDoGia(String(b.sbd ?? '')))
@@ -431,15 +458,125 @@ function ManHoSoEm() {
 }
 // ═════════════════════════════════════════ hết LÀN HỒ SƠ EM 12/10F ═════════════════════════════════════════
 
+// ═════════ LÀN «TRONG» HS 26/10: `?man=hs-menu` = Hôm nay (Nhịp học Chăm) + chuông THẬT ThongBaoHocSinh (2 tin chưa đọc, `/notifications/list` GIẢ) —
+// chụp menu dọc mép phải thu gọn / mở (`nut:Mở menu`). `&ca=1` = ca đang mở. ═════════
+import ThongBaoHocSinh from '../../src/components/ThongBaoHocSinh'
+if (man === 'hs-menu' || man === 'hs-sheet') {
+  const fetchChung = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const duong = new URL(url, location.href).pathname
+    if (duong.endsWith('/notifications/list')) return new Response(JSON.stringify({ ok: true, publicKey: '', items: [
+      { id: 'n1', kind: 'btvn', title: 'Bài tập về nhà mới', body: 'Thầy giao 1 bài, hạn 28/10.', created_at: new Date(now - 3600_000).toISOString(), read_at: null },
+      { id: 'n2', kind: 'mom', title: 'Lời nhắn từ gia đình', body: 'Mẹ nhắn: con nhớ làm đủ 30 câu nhé.', created_at: new Date(now - 7200_000).toISOString(), read_at: null },
+    ] }), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (duong.endsWith('/hs/nhip-hoc')) return new Response(JSON.stringify(nhipEmGia('cham')), { status: 200, headers: { 'content-type': 'application/json' } })
+    return fetchChung(input, init)
+  }
+}
+import BongBongAiDdh from '../../src/components/ai-ddh/BongBongAiDdh'
+import KhoiKhacPhuc3CheDo from '../../src/components/KhoiKhacPhuc3CheDo'
+import LuyenDeChuan from '../../src/components/LuyenDeChuan'
+import LichSuCaEm from '../../src/components/hoa2/LichSuCaEm'
+if (man === 'hs-sheet' && thamSo.get('tam') === 'ai') {
+  try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
+  const fetchAi = window.fetch
+  const TIN_AI = [
+    { id: 't1', ben: 'em', chu: 'Cho 5,6 gam Fe tác dụng hết với dung dịch HCl dư, thu được V lít khí H2 (đkc). Giá trị của V là? Em ra 1,2395 lít mà thấy sai sai.', anh: 0, trangThai: 'xong', luc: now - 600_000 },
+    { id: 't2', ben: 'vp', chu: 'Bạn chia đôi số mol H2 rồi đó. Fe + 2HCl → FeCl2 + H2; n(H2) = n(Fe) = 0,1 mol ⇒ V = 0,1 × 24,79 = 2,479 lít.', anh: 0, nguon: 'kho', traLoiCho: 't1', luc: now - 540_000 },
+  ]
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const duong = new URL(url, location.href).pathname
+    if (duong.endsWith('/hs/ai-ddh/mo')) return new Response(JSON.stringify({ ok: true, bat: true, khoa: null, vanPhongTruc: true, conLuot: 18, tranLuot: 20, tin: TIN_AI }), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (duong.endsWith('/hs/ai-ddh/tin')) return new Response(JSON.stringify({ ok: true, tin: [] }), { status: 200, headers: { 'content-type': 'application/json' } })
+    return fetchAi(input, init)
+  }
+}
+const manMenuTrong = () => h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_NHE } as never, dangTai: false, loi: '', coCa: thamSo.get('ca') === '1', token: 'tk',
+  thongBao: h(ThongBaoHocSinh, { token: 'tk', onOpen: noop }), onMoHoSo: noop, soBaiTap: 1,
+  onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })
+import DangNhapHocSinh from '../../src/screens/DangNhapHocSinh'
+import { LogoDoc } from '../../src/components/LogoVai'
+// `?man=hs-dang-nhap` = màn đăng nhập THẬT (lệnh giả: SBD 12026 chưa có mật khẩu ⇒ bước đặt mật khẩu; SBD khác ⇒ báo sai mật khẩu).
+const manDangNhapTrong = () => h(DangNhapHocSinh, { logo: h(LogoDoc, { vai: 'hs', size: 48 }), onDangNhap: noop,
+  api: { dangNhap: (async () => ({ ok: false, chuaCoMatKhau: true, error: '' })) as never, datMatKhau: (async () => ({ ok: false, error: 'Xác nhận mật khẩu không khớp' })) as never } })
+// `?man=hs-sheet&tam=btvn|lich-su|gia-dinh|vao-thi` = các tấm toàn màn của cổng học sinh (component THẬT, số giả) đè lên Hôm nay như app thật.
+import '../../src/components/bang-nhiem-vu/sheet-m3.css'
+import { ThanhTren } from '../../src/components/m3'
+import BtvnM3 from '../../src/components/bang-nhiem-vu/BtvnM3'
+import LichSuCaM3 from '../../src/components/bang-nhiem-vu/LichSuCaM3'
+import { MomDanhSachM3 } from '../../src/components/bang-nhiem-vu/MomM3'
+import PhongVaoThi from '../../src/components/PhongVaoThi'
+import VaoThiForm from '../../src/components/bang-nhiem-vu/VaoThiForm'
+const ngayGioGia = (iso: string) => { const d = new Date(iso); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` }
+const ngayIso = (ngay: number, gio = 21) => new Date(now + ngay * 86400_000).toISOString().slice(0, 11) + `${String(gio).padStart(2, '0')}:00:00+07:00`
+const manTamTrong = () => {
+  const tam = thamSo.get('tam') ?? 'btvn'
+  if (tam === 'cau-da-lam') return h(FragmentHse, null, manMenuTrong(), h('div', { className: 'fixed inset-0 z-50 overflow-y-auto overscroll-contain' }, h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop })))
+  if (tam === 'ai') return h(FragmentHse, null, manMenuTrong(), h(BongBongAiDdh, { auth: { token: 'tk', sbd: '12121212', hoTen: 'Nguyễn Minh Anh' } }))
+  const DS_CA = [
+    { maCa: '543998', tenCa: 'Kiểm tra tuần 12 · Polymer', nopLuc: ngayIso(-2, 10), tong: 7.25, diemI: 3, diemII: 2.75, diemIII: 1.5, tongCau: 28 },
+    { maCa: '541207', tenCa: 'Kiểm tra tuần 11 · Amino acid và peptide', nopLuc: ngayIso(-9, 10), tong: 7, diemI: 3.25, diemII: 2.25, diemIII: 1.5, tongCau: 28 },
+    { maCa: '538114', tenCa: 'Kiểm tra tuần 10 · Amine', nopLuc: ngayIso(-16, 10), tong: 6, diemI: 3, diemII: 2, diemIII: 1, tongCau: 28 },
+  ]
+  if (tam === 'ca') return h(FragmentHse, null, manMenuTrong(), h('div', { className: 'fixed inset-0 z-50 overflow-y-auto' }, h(LichSuCaEm, { sbd: '12121212', onVe: noop, banDau: { items: DS_CA, chuaCongBo: [] } } as never)))
+  if (tam === 'khac-phuc') return h(FragmentHse, null, manMenuTrong(), h('div', { className: 'm3 m3-sheet fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto overscroll-contain flex flex-col' },
+    h(ThanhTren, { tieuDe: 'Luyện lại từ bài kiểm tra', onQuayLai: noop, nhanQuayLai: 'Về Hôm nay' }), h('main', { className: 'max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1' },
+      h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6 items-start' }, h('div', null, h(LuyenDeChuan, { sbd: '12121212', token: 'tk' })),
+        h('div', null, h(KhoiKhacPhuc3CheDo, { sbd: '12121212', token: 'tk', hoTen: 'Nguyễn Minh Anh', dsLichSu: DS_CA, scriptUrl: '', lop: '12A1' } as never))))))
+  if (tam === 'vao-thi') return h(FragmentHse, null, manMenuTrong(), h(PhongVaoThi, { onClose: noop }, h(VaoThiForm, { maCa: '', onMaCa: noop, matKhau: '', onMatKhau: noop, loi: '', onSubmit: (e: Event) => e.preventDefault(), sbd: '12121212', hoTen: 'Nguyễn Minh Anh' } as never)))
+  const tieu = tam === 'lich-su' ? 'Kết quả bài đã nộp' : tam === 'gia-dinh' ? 'Bài gia đình giao' : 'Bài tập về nhà'
+  const con = tam === 'lich-su' ? h(LichSuCaM3, { dangTai: false, ngayGio: ngayGioGia, dongDem: (x: { tongCau?: number | null }) => `Đúng ${Math.round((x.tongCau ?? 0) * 0.8)}/${x.tongCau} câu`, dangMoDe: false, onXemBaoCao: noop, onXemDe: noop, ds: [
+      { maCa: '543998', tenCa: 'Kiểm tra tuần 12 · Polymer', nopLuc: ngayIso(-2, 10), tong: 8.5, diemI: 3.5, diemII: 3.25, diemIII: 1.75, tongCau: 28 },
+      { maCa: '541207', tenCa: 'Kiểm tra tuần 11 · Amino acid và peptide', nopLuc: ngayIso(-9, 10), tong: 8.25, diemI: 3.25, diemII: 3.5, diemIII: 1.5, tongCau: 28 },
+      { maCa: '538114', tenCa: 'Kiểm tra tuần 10 · Amine', nopLuc: ngayIso(-16, 10), tong: 6.75, diemI: 3, diemII: 2.5, diemIII: 1.25, tongCau: 28 },
+    ] } as never)
+    : tam === 'gia-dinh' ? h(MomDanhSachM3, { daTai: true, loi: '', thongBaoNop: null, onDongThongBao: noop, onLamMoi: noop, ngayGio: ngayGioGia, onBatDau: noop, onXemKetQua: noop, ds: [
+      { id: 'm1', tieuDe: 'Đề ôn chương Carbohydrate', ngayGiao: ngayIso(-1, 19), soCau: 28, trangThai: 'dang_lam' },
+      { id: 'm2', tieuDe: 'Ôn câu sai Ester – Lipid', ngayGiao: ngayIso(-8, 19), soCau: 20, trangThai: 'da_nop', diem: 7.85 },
+    ] } as never)
+    : h(BtvnM3, { dangTai: false, now, dangMoId: null, ngayGio: ngayGioGia, onMo: noop, onTaiLai: noop, ds: [
+      { maBtvn: 'b1', maCa: '612004', tenBtvn: 'Thế điện cực và nguồn điện hoá học', soCau: 24, hanNop: ngayIso(4) },
+      { maBtvn: 'b2', maCa: '611872', tenBtvn: 'Amino acid và peptide', soCau: 25, hanNop: ngayIso(3), daNop: true, nopLuc: ngayIso(-4, 21), diem: 8.4, soDung: 21, soLanLamLaiConLai: 2 },
+      { maBtvn: 'b3', maCa: '610455', tenBtvn: 'Amine', soCau: 24, hanNop: ngayIso(-11) },
+    ] } as never)
+  return h(FragmentHse, null, manMenuTrong(), h('div', { className: 'm3 m3-sheet fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto overscroll-contain flex flex-col' },
+    h(ThanhTren, { tieuDe: tieu, onQuayLai: noop, nhanQuayLai: 'Về Hôm nay' }), h('main', { className: 'max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1' }, con)))
+}
+// ═════════ hết LÀN «TRONG» HS 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
-const MAN_THAY: Record<string, string> ={ 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
+const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-toan-canh':'hocsinh', 'gv-giao-btvn':'giaobtvn', 'gv-giao-tuan':'khodegiao', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
+if (man === 'gv-duyet' && thamSo.get('ma')) location.hash = `duyet-loi-giai=${thamSo.get('ma')}`
+// Hàm (cẩu lên đầu) vì cảnh giả fetch ở trên gọi tới trước dòng này.
+function cauDuyetGia() { return [
+  { qid: 'DH-12-C1-D4-3', bam: 'b3', dang: 'tn', bo: 'C1', trangThai: 'cho_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
+  { qid: 'DH-12-C1-D4-7', bam: 'b7', dang: 'tn', bo: 'C1', trangThai: 'cho_duyet', sach: false, co: [{ loai: 'dapAn', ghi: 'số ester ứng với C4H8O2 là 4, kho đang ghi B (3 chất).', chot: 'D', sua: { truong: 'dapAn', truoc: 'B', sau: 'D' } }], ghiChu: '', loiMay: '', soLan: 1 },
+  { qid: 'DH-12-C1-D4-12', bam: 'b12', dang: 'ds', bo: 'C1', trangThai: 'cho_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
+  { qid: 'DH-12-C1-D4-19', bam: 'b19', dang: 'tln', bo: 'C1', trangThai: 'truot', sach: false, co: [], ghiChu: '', loiMay: 'phương trình ở bước 2 chưa cân bằng số nguyên tử O.', soLan: 2 },
+  { qid: 'DH-12-C1-D4-22', bam: 'b22', dang: 'tln', bo: 'C1', trangThai: 'da_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
+] }
+const EM_TD = [
+  ['Trịnh Quốc Huy', 'khoa', 9, null, 3, 41], ['Trần Minh Hiếu', 'dang_lam', 12, null, 2, 18], ['Ninh Thị Mai', 'dang_lam', 8, null, 1, 6],
+  ['Lê Hà My', 'da_nop', 20, 9.5, 0, 0], ['Phan Gia Bảo', 'da_nop', 20, 8.5, 0, 0], ['Ngô Minh Châu', 'da_nop', 20, 9, 0, 0],
+  ['Bùi Thanh Tâm', 'dang_lam', 15, null, 0, 0], ['Hoàng Yến Nhi', 'dang_lam', 13, null, 0, 0], ['Phạm Tuấn Kiệt', 'cho_thi_lai', 10, null, 0, 0], ['Đỗ Khánh Linh', 'chua_vao', null, null, 0, 0],
+].map(([hoTen, tt, daLam, diem, soLanRoiMan, tongGiayRoiMan], i) => ({ sbd: String(120100 + i), hoTen, tt, daLam, tongCau: daLam === null ? null : 20, soLanRoiMan, tongGiayRoiMan, diem })) as never[]
+const manTheoDoi = () => h('div', { className: 'gv-page', style: { padding: '16px clamp(12px, 3vw, 32px) 64px', maxWidth: 1320, margin: '0 auto' } }, h(TheoDoiCa, { tenCa: 'Kiểm tra 15 phút · 12A1', maCa: 'DH-12-C2-B6', link: 'https://omr-app-b3u.pages.dev/hs?ca=DH-12-C2-B6', daChepLink: false, onChepLink: noop, onChepLinkDiem: noop,
+  moLuc: '19:30 · Thứ Hai 26/10/2026', hetHanVao: '19:40', thoiGianPhut: 15, congBoChu: 'Khi cả lớp nộp xong', phamViChu: 'Lớp 12A1', conGiay: 522, em: EM_TD, soChuaVao: 1,
+  nguongLan: 3, dangTai: false, dangDuyet: null, onLamMoi: noop, onMoKhoa: noop, onXemEm: noop, onChieuMa: noop, onKetThuc: noop, onDongCuaVao: noop, dangLamNgay: 6 } as never))
 const con =
+  man === 'gv-toan-canh' ? h(ToanCanhEmScreen, { sbdHoSo: '11011' }) : man === 'gv-giao-btvn' ? h(PhanCongScreen) : man === 'gv-giao-tuan' ? h(GiaoDeTheoTuanScreen) :
+  man === 'gv-lich-su-ca' ? h(LichSuCaScreen) : man === 'gv-hs-hoi' ? h(CauHoiScreen) : man === 'gv-theo-doi' ? manTheoDoi() : // «Trong» nhóm 4
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
   man === 'hs-nhip' ? manNhipEm() : // LÀN NHỊP EM 12/10C
   man === 'hs-the' ? manTheHomNay() : // LÀN THẺ HÔM NAY 12/10E
   man === 'lam13' ? h(ManLam13) : // LÀN MÀN LÀM BÀI 12/10D
   man === 'hs-ho-so' ? h(ManHoSoEm) : // LÀN HỒ SƠ EM 12/10F
+  man === 'gv-len-bang' ? h(GoiLenBangScreen) : man === 'gv-chieu' ? h(DieuKhienToChieuScreen) : // «TRONG» NHÓM 3
+  man === 'hs-menu' ? manMenuTrong() : // LÀN «TRONG» HS 26/10
+  man === 'hs-dang-nhap' ? manDangNhapTrong() : // LÀN «TRONG» HS 26/10
+  man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
@@ -457,7 +594,7 @@ const con =
 const manThay = MAN_THAY[man]
 // TRUNG TU 09/10: mọi màn thầy chụp ở CHẾ ĐỘ 2.0 thật (cờ bật + `data-hoa2` trên vỏ như App.tsx) — trước đây chỉ gv-nhip bật cờ nên thanh bên
 // trong ảnh là danh sách cũ 9 mục. Thanh đáy (< 880 px) cũng dựng như app thật. `?giao=toi|sang` = thầy ép nút Sáng/Tối trong Cài đặt.
-const MAN_STORE: Record<string, string> = { 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
+const MAN_STORE: Record<string, string> = { 'gv-len-bang': 'goilenbang', 'gv-toan-canh': 'toancanh', 'gv-giao-btvn': 'giaobtvn', 'gv-giao-tuan': 'khodegiao', 'gv-lich-su-ca': 'lichsuca', 'gv-hs-hoi': 'cauhoi', 'gv-theo-doi': 'exammonitor', 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
 if (manThay) {
   // Trang chụp nạp CHUNG CSS game (doan.css có lớp `.dh-so` cùng tên — ô đáp số Đoàn Hộ Tống, rộng 100%, nền giấy) với màn thầy; app thầy thật
   // KHÔNG nạp doan.css (mảnh game chỉ máy em tải) ⇒ trả số bước Dạy học / Kiểm tra đầu giờ về đúng hình tròn 36 px của day-hoc.css cho ảnh chụp.
@@ -470,5 +607,5 @@ if (giao === 'toi' || giao === 'sang') apDungGiaoDien(giao)
 createRoot(document.getElementById('root')!).render(
   manThay
     ? (document.body.removeAttribute('data-bat-linh'), h('div', { className: 'min-h-screen m3 m3-thay vo-thay', 'data-hoa2': '' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con)), h(BottomNav)))
-    : man === 'ph' ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
+    : man === 'ph' || man === 'gv-chieu' ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
 )

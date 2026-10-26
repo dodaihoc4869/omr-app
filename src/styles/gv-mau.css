@@ -234,9 +234,6 @@
   background: var(--gvm-mat);
   box-shadow: var(--gvm-bong);
 }
-.vo-thay .gv2-the--mo {
-  box-shadow: inset 0 0 0 2px var(--gvm-xl), var(--gvm-bong);
-}
 .vo-thay .gv2-the-tieu-de,
 .vo-thay .cd-the h2 {
   font-size: 19px;
@@ -302,10 +299,6 @@
     min-height: 48px;
     padding: 0 22px;
   }
-  .vo-thay .gv2-nut-icon {
-    width: 48px;
-    min-height: 48px;
-  }
 }
 
 /* ── CHIP trạng thái: nền tông + chữ đậm cùng màu ─────────────────────────────────────────────── */
@@ -367,16 +360,6 @@
   font-weight: 700;
   color: var(--c-dam);
 }
-.gv2-the-so-bt {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: var(--c);
-  color: var(--gvm-tren-dac);
-}
 .vo-thay .gv2-the-so[data-mau] .gv2-so-kpi,
 .vo-thay .cd-kpi[data-mau] strong {
   font-size: 44px;
@@ -430,26 +413,6 @@
 }
 
 /* ── THANH TIẾN ĐỘ: dải xanh lục + vạch hổ phách = mức cần hôm nay ────────────────────────────── */
-.vo-thay .gv2-thanh {
-  height: 14px;
-  border-radius: 7px;
-  background: var(--gvm-mat);
-  box-shadow: inset 0 0 0 1px var(--gvm-vien);
-}
-.vo-thay .gv2-thanh-day {
-  border-radius: 7px;
-  background: linear-gradient(90deg, var(--gvm-xl), var(--gvm-xl-sang));
-}
-.vo-thay .gv2-thanh-vach {
-  top: -5px;
-  height: 24px;
-  border-radius: 2px;
-  background: var(--gvm-hp);
-}
-.vo-thay .gv2-tien-do-chu .gv2-phu {
-  color: var(--gvm-hp-dam);
-  font-weight: 700;
-}
 .vo-thay .cd-thanh > div {
   background: var(--gvm-xl);
 }
@@ -458,22 +421,6 @@
 }
 
 /* ── VIỆC CẦN LÀM: mỗi dòng một viên nền tông ─────────────────────────────────────────────────── */
-.vo-thay .gv2-viec {
-  gap: 10px;
-}
-.vo-thay .gv2-viec li {
-  padding: 10px 12px 10px 14px;
-  border: 0;
-  border-radius: 16px;
-  background: var(--gvm-mat-2);
-}
-.vo-thay .gv2-viec-icon {
-  border-radius: 12px;
-}
-.vo-thay .gv2-viec-icon[data-tone='do'] { background: var(--gvm-ho); color: var(--gvm-tren-dac); }
-.vo-thay .gv2-viec-icon[data-tone='vang'] { background: var(--gvm-hp); color: var(--gvm-tren-dac); }
-.vo-thay .gv2-viec-icon[data-tone='xanh'] { background: var(--gvm-xd); color: var(--gvm-tren-dac); }
-.vo-thay .gv2-viec-icon[data-tone='xam'] { background: var(--gvm-tim-nen); color: var(--gvm-tim); }
 
 /* ── BẢNG: dòng kẻ nhạt, đầu cột chữ hoa nhỏ ─────────────────────────────────────────────────── */
 .vo-thay .gv2-bang th {
@@ -489,115 +436,6 @@
 }
 
 /* ── TỔNG QUAN: "Chiến dịch luyện đang chạy" dạng THẺ NGANG (thay bảng hẹp bị cắt chữ) ─────────── */
-.gvm-cd-ds {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  /* HỘP KÉO (29/09, thầy: "cho vào box kéo cho gọn"): cao tối đa ~2 thẻ, kéo trong hộp xem các chiến dịch còn lại. */
-  max-height: min(58vh, 520px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scroll-snap-type: y proximity;
-  scrollbar-gutter: stable;
-  padding-right: 4px;
-}
-.gvm-cd-ds > .gvm-cd {
-  scroll-snap-align: start;
-  flex-shrink: 0;
-}
-.gvm-cd-ds:focus-visible {
-  outline: 2px solid var(--gvm-vien);
-  outline-offset: 4px;
-  border-radius: 20px;
-}
-.gvm-cd {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 14px 18px;
-  align-items: center;
-  padding: 16px 18px;
-  border-radius: 20px;
-  background: var(--gvm-mat-2);
-}
-@media (min-width: 1280px) {
-  .gvm-cd {
-    grid-template-columns: minmax(170px, 1.1fr) minmax(200px, 1.6fr) minmax(110px, 0.7fr) minmax(150px, 1fr) minmax(96px, 0.6fr);
-  }
-}
-@media (max-width: 640px) {
-  .gvm-cd {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-.gvm-cd-ten {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-width: 0;
-}
-.vo-thay .gvm-cd-ten .gv2-ten-nut {
-  font-size: 16px;
-  font-weight: 800;
-}
-.gvm-nho {
-  margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--gvm-chu-3);
-}
-.gvm-nhip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.gvm-nhip svg {
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-}
-.gvm-vong-nen {
-  fill: none;
-  stroke: var(--gvm-vien);
-  stroke-width: 5;
-}
-.gvm-vong {
-  fill: none;
-  stroke: var(--gvm-xl);
-  stroke-width: 5;
-  stroke-linecap: round;
-}
-.gvm-vong[data-tre] {
-  stroke: var(--gvm-hp);
-}
-.gvm-nhip b {
-  font-size: 18px;
-}
-.gvm-nhip > span {
-  white-space: nowrap;
-}
-.gvm-dang {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  min-width: 0;
-}
-.gvm-chip-dang {
-  max-width: 100%;
-  padding: 5px 12px;
-  border-radius: 12px;
-  background: var(--gvm-tim-nen);
-  color: var(--gvm-tim-dam);
-  font-size: 13px;
-  font-weight: 700;
-  overflow-wrap: anywhere;
-}
 
 /* Thẻ hiện ra: trượt lên 200 ms theo thang chung (trung tu 09/10: trước 500 ms — chậm hơn mức "≤ 250 ms" của chuẩn soát B6), dùng cho CẢ HAI
  * họ thẻ (gv2-* của màn 2.0 cũ, gvv2-* của Hôm nay / Hành trình). Lệch nhịp ngắn 30 ms để bốn thẻ số không bật cùng lúc. */

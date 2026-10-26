@@ -28,6 +28,10 @@ import {
   type PhienToChieu,
 } from '../lib/to-chieu-dong-bo-remote'
 import ModalDieuKhienTuXa from '../components/to-chieu/ModalDieuKhienTuXa'
+// «Trong» 26/10: màn không có tệp .css riêng ⇒ chuỗi CSS nằm trong mảnh này (không thêm tệp precache), chỉ gắn một lần khi <html data-trong="gv">.
+import trongChieu from '../styles/trong-gv-chieu.css?inline'
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'gv' && !document.getElementById('trong-gv-chieu'))
+  document.head.append(Object.assign(document.createElement('style'), { id: 'trong-gv-chieu', textContent: trongChieu }))
 
 export default function DieuKhienToChieuScreen() {
   const [maPhien, setMaPhien] = useState<string>(() => {
@@ -186,11 +190,11 @@ export default function DieuKhienToChieuScreen() {
   if (!maPhien || !phien) {
     return (
       <div
-        className="min-h-screen flex flex-col items-center justify-center p-4"
+        className="dkc dkc--ket-noi min-h-screen flex flex-col items-center justify-center p-4"
         style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--sans, system-ui)' }}
       >
         <div
-          className="w-full max-w-sm rounded-3xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl"
+          className="dkc-the w-full max-w-sm rounded-3xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl"
         >
           <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-800 flex items-center justify-center mb-4">
             <Smartphone size={26} />
@@ -228,7 +232,7 @@ export default function DieuKhienToChieuScreen() {
             <button
               type="submit"
               disabled={dangTai || !maNhap.trim()}
-              className="w-full py-3.5 px-4 rounded-xl font-bold bg-sky-700 hover:bg-sky-800 text-white flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+              className="dkc-chinh w-full py-3.5 px-4 rounded-xl font-bold bg-sky-700 hover:bg-sky-800 text-white flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
             >
               {dangTai ? <RefreshCw size={18} className="animate-spin" /> : 'Kết nối ngay'}
             </button>
@@ -240,7 +244,7 @@ export default function DieuKhienToChieuScreen() {
 
   return (
     <div
-      className="min-h-screen pb-24 flex flex-col"
+      className="dkc min-h-screen pb-24 flex flex-col"
       style={{
         background: 'var(--mc-nen)',
         color: 'var(--mc-muc)',
@@ -259,7 +263,7 @@ export default function DieuKhienToChieuScreen() {
 
       {/* HEADER ĐIỀU KHIỂN */}
       <header
-        className="sticky top-0 z-30 px-4 py-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-2xs"
+        className="dkc-dau sticky top-0 z-30 px-4 py-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-2xs"
       >
         <div className="flex items-center gap-2.5">
           <div
@@ -280,7 +284,7 @@ export default function DieuKhienToChieuScreen() {
           <button
             type="button"
             onClick={() => setMoModalQr(true)}
-            className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="dkc-vuong p-2 rounded-xl text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
             title="Mở mã QR chia sẻ điều khiển"
           >
             <Share2 size={18} />
@@ -288,7 +292,7 @@ export default function DieuKhienToChieuScreen() {
           <button
             type="button"
             onClick={() => void napPhien(maPhien)}
-            className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="dkc-vuong p-2 rounded-xl text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
             title="Làm mới"
           >
             <RefreshCw size={18} className={dangTai ? 'animate-spin' : ''} />
@@ -299,17 +303,17 @@ export default function DieuKhienToChieuScreen() {
       {/* KHỐI THÔNG TIN CÂU & HỌC SINH ĐANG CHIẾU */}
       <div className="p-3 sm:p-4 max-w-xl mx-auto w-full flex flex-col gap-3">
         <div
-          className="rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden"
+          className="dkc-the dkc-em rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden"
         >
           <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300">
+            <span className="dkc-cau text-xs font-black px-2.5 py-1 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300">
               CÂU {oHienTai?.soCau ?? dotHienTai + 1}
               {oHienTai?.phan ? ` · PHẦN ${oHienTai.phan}` : ''}
               {oHienTai?.tuLuan ? ' (Tự luận)' : ''}
             </span>
             <div className="flex items-center gap-1.5">
               {oHienTai?.sao ? (
-                <span className="inline-flex items-center text-xs font-bold text-amber-500">
+                <span className="dkc-sao inline-flex items-center text-xs font-bold text-amber-500">
                   <Flame size={14} fill="currentColor" /> {oHienTai.sao} sao
                 </span>
               ) : null}
@@ -328,7 +332,7 @@ export default function DieuKhienToChieuScreen() {
           {/* Tên học sinh */}
           <div className="flex items-center gap-3 py-1">
             <div
-              className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
+              className={`dkc-av w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
                 pha === 'goi'
                   ? 'bg-amber-500 text-white animate-bounce'
                   : 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
@@ -337,7 +341,7 @@ export default function DieuKhienToChieuScreen() {
               <UserCheck size={22} />
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base font-black truncate">
+              <h2 className="dkc-ten text-base font-black truncate">
                 {oHienTai?.hoTen || (oHienTai?.sbd ? `SBD ${oHienTai.sbd}` : 'Chưa phân công em')}
               </h2>
               <p className="text-xs text-slate-500 flex items-center gap-2">
@@ -349,12 +353,13 @@ export default function DieuKhienToChieuScreen() {
         </div>
 
         {/* ═══ BỘ NÚT ĐIỀU KHIỂN CHÍNH (TO, DỄ BẤM BẰNG 1 TAY) ═══ */}
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="dkc-hang-chinh grid grid-cols-2 gap-2.5">
           {/* NÚT 1: LÊN BẢNG (Gọi tên, hào quang thần thú) */}
           <button
             type="button"
             onClick={() => void guiLenh('LEN_BANG')}
-            className={`py-4 px-3 rounded-2xl font-black text-sm sm:text-base flex flex-col items-center justify-center gap-1.5 shadow-md transition-transform active:scale-95 border ${
+            data-pha={pha}
+            className={`dkc-len-bang py-4 px-3 rounded-2xl font-black text-sm sm:text-base flex flex-col items-center justify-center gap-1.5 shadow-md transition-transform active:scale-95 border ${
               pha === 'cho'
                 ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-white border-amber-400 shadow-amber-500/20'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-700'
@@ -369,7 +374,7 @@ export default function DieuKhienToChieuScreen() {
           <button
             type="button"
             onClick={() => void guiLenh('BAT_LOI_GIAI')}
-            className={`py-4 px-3 rounded-2xl font-black text-sm sm:text-base flex flex-col items-center justify-center gap-1.5 shadow-md transition-transform active:scale-95 border ${
+            className={`dkc-loi-giai py-4 px-3 rounded-2xl font-black text-sm sm:text-base flex flex-col items-center justify-center gap-1.5 shadow-md transition-transform active:scale-95 border ${
               loiGiaiMo
                 ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white border-emerald-500 shadow-emerald-500/20'
                 : 'bg-gradient-to-br from-sky-600 to-blue-700 text-white border-sky-500 shadow-sky-500/20'
@@ -382,12 +387,12 @@ export default function DieuKhienToChieuScreen() {
         </div>
 
         {/* HÀNG NÚT ĐIỀU HƯỚNG & BƯỚC TIẾP */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className="dkc-hang-dot grid grid-cols-3 gap-2">
           <button
             type="button"
             disabled={dotHienTai <= 0}
             onClick={() => void guiLenh('CHUYEN_DOT', { dot: dotHienTai - 1 })}
-            className="py-3 px-2 rounded-xl font-bold text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-1 text-slate-700 dark:text-slate-200 disabled:opacity-40 active:bg-slate-100"
+            className="dkc-nut py-3 px-2 rounded-xl font-bold text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-1 text-slate-700 dark:text-slate-200 disabled:opacity-40 active:bg-slate-100"
           >
             <ArrowLeft size={16} /> Câu trước
           </button>
@@ -395,7 +400,7 @@ export default function DieuKhienToChieuScreen() {
           <button
             type="button"
             onClick={() => void guiLenh('BUOC_TIEP')}
-            className="py-3 px-2 rounded-xl font-bold text-xs bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center gap-1 text-indigo-700 dark:text-indigo-300 active:bg-indigo-100"
+            className="dkc-nut dkc-buoc py-3 px-2 rounded-xl font-bold text-xs bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center gap-1 text-indigo-700 dark:text-indigo-300 active:bg-indigo-100"
           >
             <Sparkles size={15} /> Bước tiếp (Space)
           </button>
@@ -404,18 +409,18 @@ export default function DieuKhienToChieuScreen() {
             type="button"
             disabled={dotHienTai >= tongDot - 1}
             onClick={() => void guiLenh('CHUYEN_DOT', { dot: dotHienTai + 1 })}
-            className="py-3 px-2 rounded-xl font-bold text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-1 text-slate-700 dark:text-slate-200 disabled:opacity-40 active:bg-slate-100"
+            className="dkc-nut py-3 px-2 rounded-xl font-bold text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-1 text-slate-700 dark:text-slate-200 disabled:opacity-40 active:bg-slate-100"
           >
             Câu sau <ArrowRight size={16} />
           </button>
         </div>
 
         {/* HÀNG NÚT CHẤM ĐẠT / CHƯA ĐẠT */}
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="dkc-hang-cham grid grid-cols-2 gap-2.5">
           <button
             type="button"
             onClick={() => void guiLenh('CHAM', { khoa: khoaO, dat: true })}
-            className="py-3 px-3 rounded-xl font-bold text-sm bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center gap-2 active:scale-95"
+            className="dkc-dat py-3 px-3 rounded-xl font-bold text-sm bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center gap-2 active:scale-95"
           >
             <ThumbsUp size={18} /> ĐẠT (+1 sao)
           </button>
@@ -423,17 +428,18 @@ export default function DieuKhienToChieuScreen() {
           <button
             type="button"
             onClick={() => void guiLenh('CHAM', { khoa: khoaO, dat: false })}
-            className="py-3 px-3 rounded-xl font-bold text-sm bg-rose-50 dark:bg-rose-950/70 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 flex items-center justify-center gap-2 active:scale-95"
+            className="dkc-chua-dat py-3 px-3 rounded-xl font-bold text-sm bg-rose-50 dark:bg-rose-950/70 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 flex items-center justify-center gap-2 active:scale-95"
           >
             <ThumbsDown size={18} /> Chưa đạt
           </button>
         </div>
 
         {/* THANH TAB XEM NỘI DUNG (CHO GIÁO VIÊN ĐỌC GIẢNG) */}
-        <div className="mt-2 flex border-b border-slate-200 dark:border-slate-800">
+        <div className="dkc-tab mt-2 flex border-b border-slate-200 dark:border-slate-800">
           <button
             type="button"
             onClick={() => setTabXem('giai')}
+            data-on={tabXem === 'giai' || undefined}
             className={`flex-1 py-2.5 text-xs font-bold border-b-2 flex items-center justify-center gap-1.5 ${
               tabXem === 'giai'
                 ? 'border-sky-600 text-sky-600 dark:text-sky-400'
@@ -446,6 +452,7 @@ export default function DieuKhienToChieuScreen() {
           <button
             type="button"
             onClick={() => setTabXem('de')}
+            data-on={tabXem === 'de' || undefined}
             className={`flex-1 py-2.5 text-xs font-bold border-b-2 flex items-center justify-center gap-1.5 ${
               tabXem === 'de'
                 ? 'border-sky-600 text-sky-600 dark:text-sky-400'
@@ -458,6 +465,7 @@ export default function DieuKhienToChieuScreen() {
           <button
             type="button"
             onClick={() => setTabXem('ds')}
+            data-on={tabXem === 'ds' || undefined}
             className={`flex-1 py-2.5 text-xs font-bold border-b-2 flex items-center justify-center gap-1.5 ${
               tabXem === 'ds'
                 ? 'border-sky-600 text-sky-600 dark:text-sky-400'
@@ -470,9 +478,9 @@ export default function DieuKhienToChieuScreen() {
 
         {/* NỘI DUNG THEO TAB */}
         {tabXem === 'giai' && (
-          <div className="rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col gap-3">
+          <div className="dkc-the rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col gap-3">
             {oHienTai?.dapAn && (
-              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800">
+              <div className="dkc-dap-an p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800">
                 <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 block mb-0.5">
                   Đáp án đúng:
                 </span>
@@ -499,7 +507,7 @@ export default function DieuKhienToChieuScreen() {
         )}
 
         {tabXem === 'de' && (
-          <div className="rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col gap-3">
+          <div className="dkc-the rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col gap-3">
             <div className="text-sm font-serif leading-relaxed">
               <ChemText text={oHienTai?.de || 'Đang tải đề…'} />
             </div>
@@ -545,7 +553,7 @@ export default function DieuKhienToChieuScreen() {
         )}
 
         {tabXem === 'ds' && (
-          <div className="rounded-2xl p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col gap-1.5 max-h-96 overflow-y-auto">
+          <div className="dkc-the rounded-2xl p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col gap-1.5 max-h-96 overflow-y-auto">
             {dsO.map((o, idx) => {
               const laHienTai = idx === dotHienTai
               const khoa = o.sbd && o.qid ? `${o.sbd}|${o.qid}` : o.qid || ''

@@ -1,0 +1,71 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Chữa câu sai</title><link rel="stylesheet" href="trong.css">
+<style>
+sub,sup{line-height:0}
+.tap-trung{max-width:760px;width:100%;margin:0 auto}
+.duong{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;list-style:none;margin:10px 0 0;padding:0}
+.duong li{display:flex;flex-direction:column;gap:8px;min-width:0}
+.duong .vach-b{height:6px;border-radius:999px;background:var(--mat-3)}
+.duong li.xong .vach-b{background:var(--dung)}
+.duong li.dang .vach-b{background:var(--chinh-nhat);box-shadow:inset 0 0 0 2px var(--chinh)}
+.duong .ten-b{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-3);font-weight:500;line-height:1.3}
+.duong li.xong .ten-b{color:var(--dung-chu)}
+.duong li.dang .ten-b{color:var(--chu);font-weight:600}
+.duong .ten-b svg{flex:none}
+.cau{padding:28px 28px 24px}
+.cau-dau{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.pa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+.hanh-dong{display:flex;align-items:center;gap:12px;margin-top:24px}
+.hanh-dong .nut.chinh{margin-left:auto;min-width:200px}
+.da-kiem{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:14px;background:var(--mat-2)}
+.da-kiem .giua{flex:1;min-width:0}
+@media (max-width:600px){
+  .cau{padding:20px 16px 18px}
+  .pa{grid-template-columns:minmax(0,1fr);gap:10px}
+  .hanh-dong{flex-direction:column-reverse;align-items:stretch}
+  .hanh-dong .nut{width:100%}
+  .hanh-dong .nut.chinh{margin-left:0}
+  .duong .ten-b{font-size:12px}
+  .duong .ten-b svg{display:none}
+  .da-kiem .lien-ket{flex-basis:100%;padding-left:44px;min-height:40px}
+}
+</style></head>
+<body data-app="hs" data-tab="on-sua" data-khung="man-con" data-ve="Tự sửa lỗi" data-tieu="Nitric acid – tính oxi hoá với kim loại" data-phu="Chữa câu sai" data-ai="khong">
+<main class="khung cot tap-trung" style="gap:18px">
+  <!-- GỌN HƠN: «Đường tự gỡ» chỉ còn một dải 3 bước trên đầu (bỏ thẻ lặp bên phải và tiêu đề to); câu gốc là nhân vật chính.
+       «Những bước đã kiểm» và «Xem lại đề gốc» gộp một dòng nhỏ dưới câu. -->
+  <div>
+    <div class="hang giua"><span class="dam">Đường tự gỡ</span><span class="mo">1/3 bước</span></div>
+    <ol class="duong" aria-label="Đường tự gỡ: đang ở bước 2, Tự làm lại">
+      <li class="xong"><span class="vach-b"></span><span class="ten-b"><i data-i="check" class="nho"></i>Xem lại câu gốc</span></li>
+      <li class="dang"><span class="vach-b"></span><span class="ten-b"><i data-i="pen" class="nho"></i>Tự làm lại</span></li>
+      <li><span class="vach-b"></span><span class="ten-b"><i data-i="lock" class="nho"></i>Đáp án và lời giải</span></li>
+    </ol>
+  </div>
+
+  <section class="the cau" aria-label="Câu gốc">
+    <div class="cau-dau">
+      <span class="chip tin">Sửa trên câu gốc</span>
+      <span class="chip">Trắc nghiệm · Vận dụng</span>
+    </div>
+    <p class="cau-de">Cho các kim loại: <b>Al, Cu, Fe, Ag</b>. Số kim loại tác dụng được với dung dịch <b>nitric acid đặc, nguội</b> là</p>
+    <div class="pa">
+      <div class="lua-chon"><b>A</b>1</div>
+      <div class="lua-chon chon"><b>B</b>2</div>
+      <div class="lua-chon"><b>C</b>3</div>
+      <div class="lua-chon"><b>D</b>4</div>
+    </div>
+    <div class="hanh-dong">
+      <span class="nut trong">Em chưa làm được · xem lời giải</span>
+      <span class="nut chinh lon">Kiểm tra lại <i data-i="arrow"></i></span>
+    </div>
+  </section>
+
+  <div class="da-kiem">
+    <span class="o-icon sai" style="width:32px;height:32px;border-radius:10px"><i data-i="x" class="nho"></i></span>
+    <div class="giua"><p class="nhan">Những bước đã kiểm</p><p style="font-size:14px">Lần làm 24/10 · em đã chọn <b>D</b> · <span class="sai-mau dam">sai</span></p></div>
+    <a class="lien-ket"><i data-i="eye" class="nho"></i>Xem lại đề gốc</a>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

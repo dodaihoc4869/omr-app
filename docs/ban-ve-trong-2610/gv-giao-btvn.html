@@ -1,0 +1,97 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Giao bài tập về nhà</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.bai{display:grid;grid-template-columns:minmax(0,1fr) auto 44px;gap:10px 20px;align-items:center;padding:16px 20px;border-top:1px solid var(--vien)}
+.bai.gap{background:color-mix(in srgb,var(--chu-y-nhat) 60%,var(--mat))}
+.bai .ten{font-weight:600;line-height:1.35}
+.tien{grid-column:1/3;grid-row:2;display:flex;align-items:center;gap:12px}
+.tien .thanh{flex:1;max-width:340px}
+.tien .mo{white-space:nowrap}
+.han{text-align:right}
+.han b{display:block;font-size:17px;line-height:1.2}
+.viec-bai{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap}
+.nut.thu-hoi{color:var(--sai-chu)}
+.lop{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:6px;background:var(--mat-2);font-size:12px;font-weight:600;color:var(--chu-2);margin-right:6px}
+.nhom-em .dong{min-height:60px}
+@media (max-width:600px){
+  .dau-man .tab{width:100%}.dau-man .tab>span{flex:1;justify-content:center}
+  .bai{grid-template-columns:minmax(0,1fr) 44px;gap:8px 12px;padding:14px 16px}
+  .bai .han{grid-column:1;grid-row:2;text-align:left;display:flex;gap:8px;align-items:baseline}
+  .bai .han b{font-size:15px}
+  .bai .nut.vuong{grid-column:2;grid-row:1}
+  .bai .tien{grid-column:1/-1;grid-row:3}
+  .viec-bai{grid-row:4}
+  .viec-bai .nut{flex:1 1 calc(50% - 5px)}
+}
+</style></head>
+<body data-app="gv" data-tab="giao-bai" data-nut-dau='<span class="nut trong an-dt"><i data-i="refresh"></i>Tải lại</span>'>
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bốn ô «Cần thầy để ý» thành một dải số; bài hạn gần nhất đứng đầu và mở sẵn 4 việc của menu (không còn menu nổi đè dòng);
+       hai thẻ danh sách em gộp thành một thẻ hai nhóm, mỗi nhóm 2–3 em + «Xem đủ». -->
+  <div class="dau-man">
+    <div style="flex:1;min-width:0">
+      <p class="nhan">Thứ Hai 26/10 · 4 bài đang chạy · 141 em được giao</p>
+      <h1 class="tieu-de mt-1">Giao bài tập về nhà</h1>
+    </div>
+    <div class="tab"><span><i data-i="plus" class="nho"></i>Giao bài mới</span><span class="on">Bài tập về nhà đã giao</span></div>
+  </div>
+
+  <div>
+    <p class="h3" style="margin-bottom:10px">Cần thầy để ý</p>
+    <div class="dai-kpi" style="--n:4">
+      <div class="kpi"><span class="nhan">Em chưa mở bài</span><span class="so">7<small>em</small></span></div>
+      <div class="kpi"><span class="nhan">Em chậm nhịp</span><span class="so">5<small>em</small></span></div>
+      <div class="kpi"><span class="nhan">Em chưa nộp quá hạn</span><span class="so sai-mau">3<small>em</small></span></div>
+      <div class="kpi"><span class="nhan">Hạn gần nhất</span><span class="so chu-y-mau">23:59</span><span class="mo">hôm nay · 12A2 · 22/36 đã nộp</span></div>
+    </div>
+  </div>
+
+  <div class="chinh-phu">
+    <section class="the dem">
+      <div class="the-dau" style="padding:18px 20px 12px;margin:0"><div class="h3">Bài tập về nhà đã giao</div><span class="mo">4 bài</span></div>
+      <div class="bai gap">
+        <div><p class="ten">Carbohydrate · glucose và fructose</p><p class="mo mt-1"><span class="lop">12A2</span>24 câu · 4 em chưa mở · 3 em chậm nhịp</p></div>
+        <div class="tien"><div class="thanh chu-y"><i style="--p:61%"></i></div><span class="mo">22/36 đã nộp</span></div>
+        <div class="han"><b class="chu-y-mau">23:59</b><span class="mo">hôm nay 26/10</span></div>
+        <span class="nut vuong trong" aria-label="Thêm việc"><i data-i="more"></i></span>
+        <div class="viec-bai"><span class="nut chinh">Xem bài làm</span><span class="nut">Đổi hạn nộp</span><span class="nut">Chi tiết bài</span><span class="nut trong thu-hoi">Thu hồi</span></div>
+      </div>
+      <div class="bai">
+        <div><p class="ten">Ester – lipid · xà phòng hoá</p><p class="mo mt-1"><span class="lop">12A1</span>24 câu · 3 em chưa mở · 2 em chậm nhịp</p></div>
+        <div class="tien"><div class="thanh dung"><i style="--p:78%"></i></div><span class="mo">31/40 đã nộp</span></div>
+        <div class="han"><b>23:59</b><span class="mo">Thứ Tư 28/10</span></div>
+        <span class="nut vuong trong" aria-label="Thêm việc"><i data-i="more"></i></span>
+      </div>
+      <div class="bai">
+        <div><p class="ten">Cấu tạo nguyên tử · lớp và phân lớp electron</p><p class="mo mt-1"><span class="lop">10C3</span>20 câu · em nào cũng đã mở</p></div>
+        <div class="tien"><div class="thanh"><i style="--p:39%"></i></div><span class="mo">12/31 đã nộp</span></div>
+        <div class="han"><b>23:59</b><span class="mo">Thứ Sáu 30/10</span></div>
+        <span class="nut vuong trong" aria-label="Thêm việc"><i data-i="more"></i></span>
+      </div>
+      <div class="bai">
+        <div><p class="ten">Nitrogen · ammonia và muối ammonium</p><p class="mo mt-1"><span class="lop">11B1</span>24 câu · <span class="sai-mau">quá hạn · 3 em chưa nộp</span></p></div>
+        <div class="tien"><div class="thanh dung"><i style="--p:91%"></i></div><span class="mo">31/34 đã nộp</span></div>
+        <div class="han"><b class="sai-mau">Hết hạn</b><span class="mo">Thứ Bảy 24/10</span></div>
+        <span class="nut vuong trong" aria-label="Thêm việc"><i data-i="more"></i></span>
+      </div>
+    </section>
+
+    <section class="the dem nhom-em">
+      <div class="the-dau" style="padding:18px 20px 0;margin:0"><div class="h3">Em chưa nộp quá hạn</div><span class="chip sai">3 em</span></div>
+      <div class="ds">
+        <div class="dong"><span class="av a3">MK</span><div class="giua"><p class="ten">Lý Minh Khoa · 11B1</p><p class="mo">làm 9/24 câu, dừng 23/10</p></div></div>
+        <div class="dong"><span class="av a2">TT</span><div class="giua"><p class="ten">Lê Thu Trang · 11B1</p><p class="mo">đã mở, chưa làm câu nào</p></div></div>
+        <div class="dong"><span class="av">HP</span><div class="giua"><p class="ten">Đặng Hoài Phương · 11B1</p><p class="mo">làm 17/24 câu, dừng 24/10</p></div></div>
+      </div>
+      <div class="the-dau" style="padding:18px 20px 0;margin:0;border-top:1px solid var(--vien)"><div class="h3">Em chưa mở bài</div><span class="chip">7 em</span></div>
+      <div class="ds">
+        <div class="dong"><span class="av a1">GB</span><div class="giua"><p class="ten">Trần Gia Bảo · 12A2</p><p class="mo">hạn 23:59 hôm nay</p></div></div>
+        <div class="dong"><span class="av a4">QN</span><div class="giua"><p class="ten">Phạm Quang Nam · 12A1</p><p class="mo">hạn 23:59 Thứ Tư 28/10</p></div></div>
+      </div>
+      <div style="padding:4px 20px 12px"><a class="lien-ket">Xem đủ 7 em · 4 em 12A2, 3 em 12A1 <i data-i="chevron" class="nho"></i></a></div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>

@@ -42,6 +42,8 @@ import { taiDieuKienLuyenDe, type DieuKienLuyenDe } from '../luyen-de/dung-luyen
 import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import { taoGoiSom } from '../hoa2/nap-truoc-man'
 import { BanDoKetQua, KhungLamRong, cuonMuot, cuonToiCau, useBoCuc, type BoCuc, type LocXem, type NhomBang } from './bo-cuc'
+// «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
 
 // Thẻ "Luyện đề cấu trúc" (30/09): mảnh NẠP LƯỜI khi em mở thẻ (ngoài precache — vite.config.ts globIgnores). Cổng + lý do khoá lấy từ
 // máy chủ `/luyen-de/dieu-kien` ngay khi mở Tu luyện (thẻ hiện ổ khoá, không ẩn).

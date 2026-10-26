@@ -1,0 +1,95 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Kết quả sau nộp</title><link rel="stylesheet" href="trong.css">
+<style>
+p{text-wrap:pretty}
+.hero{position:relative;overflow:hidden;padding:28px}
+.hero::before{content:"";position:absolute;inset:-45% 0 auto auto;width:440px;height:440px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--chinh) 13%,transparent),transparent);pointer-events:none}
+.hero-than{position:relative;display:flex;gap:32px;align-items:center}
+.hero-chu{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.vong .so-lon{font-size:46px}
+.hero .ghi-chu{position:relative}
+.hero-duoi{position:relative;margin:20px 0 0 196px}
+.phan+.phan{margin-top:18px;padding-top:18px;border-top:1px solid var(--vien)}
+.phan .diem{font-size:17px;font-weight:700}.phan .diem small{font-size:13px;font-weight:500;color:var(--chu-3);margin-left:2px}
+.o-kq{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px;margin-top:8px}
+.o-kq span{min-height:44px;display:grid;place-items:center;border-radius:10px;font-size:14px;font-weight:600}
+.o-kq .d{background:var(--dung-nhat);color:var(--dung-chu)}
+.o-kq .s{background:var(--sai-nhat);color:var(--sai-chu);box-shadow:inset 0 0 0 1.5px var(--sai)}
+.o-kq .p{background:var(--chu-y-nhat);color:var(--chu-y-chu);box-shadow:inset 0 0 0 1.5px var(--chu-y)}
+.o-kq .t{background:var(--mat);color:var(--chu-3);box-shadow:inset 0 0 0 1.5px var(--vien-2)}
+.nhom-o+.nhom-o{margin-top:14px}
+.chu-giai{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:16px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-2)}
+.chu-giai i{width:14px;height:14px;border-radius:4px}
+.chu-giai i.d{background:var(--dung)}.chu-giai i.s{background:var(--sai)}.chu-giai i.p{background:var(--chu-y)}.chu-giai i.t{box-shadow:inset 0 0 0 1.5px var(--vien-2)}
+@media (max-width:600px){
+  .hero{padding:20px}
+  .hero-than{flex-direction:column;gap:16px;text-align:center}
+  .hero-chu{align-items:center;width:100%}
+  .hero .vong{--d:136px!important;--net:12px!important}
+  .hero .vong .so-lon{font-size:38px}
+  .hero .chip{white-space:normal;padding:4px 12px;line-height:1.35}
+  .hero-duoi{margin:18px 0 0}
+  .hero .hang.nut-hang{flex-direction:column;align-items:stretch;gap:4px}
+  .o-kq{grid-template-columns:repeat(6,minmax(0,1fr))}
+}
+</style></head>
+<body data-app="hs" data-tab="ket-qua" data-khung="man-con" data-tieu="Kết quả kiểm tra" data-phu="Kiểm tra 50 phút · 12A1" data-ve="Quay lại">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: điểm to trong vòng + một dòng «Em làm đúng 22/28 câu» thay cho 4 ô số; bỏ hàng 4 chip mã ca/giờ nộp.
+       Một nút chính «Xem câu cần sửa» ngay dưới điểm; «Thầy Đỗ Đại Học đã lo cho em» gộp vào thẻ điểm thành một dòng. -->
+  <section class="the hero" aria-label="Kết quả">
+    <div class="hero-than">
+      <div class="vong" style="--p:77.5;--d:164px;--net:14px" role="img" aria-label="Điểm 7,75 trên 10"><div><div class="so-lon">7,75</div><div class="mo">trên 10 điểm</div></div></div>
+      <div class="hero-chu">
+        <p class="nhan">Em đã nộp bài lúc 20:41 · Thứ Hai 26/10</p>
+        <h1 class="tieu-de">Em làm đúng 22/28 câu</h1>
+        <p class="phu">Thời gian làm 46 phút (đề cho 50 phút)</p>
+        <div><span class="chip dung mt-1"><i data-i="chart" class="nho"></i>+0,5 điểm so với lần trước của em (7,25)</span></div>
+      </div>
+    </div>
+    <div class="hero-duoi">
+      <div class="hang nut-hang" style="flex-wrap:wrap"><span class="nut chinh lon"><i data-i="wrench"></i>Xem câu cần sửa</span><span class="nut trong">Về bảng nhiệm vụ</span></div>
+    </div>
+    <div class="ghi-chu tin mt-6"><i data-i="sparkles" class="nho"></i><span><b>Thầy Đỗ Đại Học đã lo cho em:</b> 6 câu chưa đúng trọn (3 sai, 1 bỏ trống, 2 đúng một phần) sẽ vào hàng ôn lại của em, bắt đầu từ ngày mai.</span></div>
+  </section>
+
+  <div class="luoi-2" style="gap:20px;align-items:start">
+    <section class="the">
+      <div class="the-dau"><div class="h3">Ba phần của bài</div><span class="mo">tổng 7,75/10</span></div>
+      <div class="phan">
+        <div class="hang giua"><span class="dam">Phần I · Trắc nghiệm</span><span class="diem">3,75<small>/4,5 điểm</small></span></div>
+        <div class="thanh mt-2" style="--p:83.3%"><i></i></div>
+        <p class="mo mt-2">đúng 15/18 câu</p>
+      </div>
+      <div class="phan">
+        <div class="hang giua"><span class="dam">Phần II · Đúng / Sai</span><span class="diem">2,75<small>/4 điểm</small></span></div>
+        <div class="thanh mt-2" style="--p:68.8%"><i></i></div>
+        <p class="mo mt-2">đúng trọn 2/4 câu, 2 câu đúng một phần</p>
+      </div>
+      <div class="phan">
+        <div class="hang giua"><span class="dam">Phần III · Trả lời ngắn</span><span class="diem">1,25<small>/1,5 điểm</small></span></div>
+        <div class="thanh mt-2" style="--p:83.3%"><i></i></div>
+        <p class="mo mt-2">đúng 5/6 câu</p>
+      </div>
+    </section>
+
+    <section class="the">
+      <div class="the-dau"><div class="h3">Từng câu</div><span class="mo">bấm câu chưa đúng để xem lời giải</span></div>
+      <div class="nhom-o"><p class="nhan">Phần I</p><div class="o-kq" id="p1"></div></div>
+      <div class="nhom-o"><p class="nhan">Phần II</p><div class="o-kq" id="p2"></div></div>
+      <div class="nhom-o"><p class="nhan">Phần III</p><div class="o-kq" id="p3"></div></div>
+      <div class="chu-giai"><span><i class="d"></i>đúng</span><span><i class="s"></i>sai</span><span><i class="p"></i>đúng một phần</span><span><i class="t"></i>bỏ trống</span></div>
+    </section>
+  </div>
+</main>
+<script src="khung.js"></script>
+<script>
+  // Khớp số: Phần I sai câu 5, 14, bỏ trống câu 8 → 15/18 = 3,75đ; Phần II câu 20 (3 ý = 0,5đ), 22 (2 ý = 0,25đ) đúng một phần, 19 và 21 đúng trọn → 2,75đ;
+  // Phần III sai câu 26 → 5/6 = 1,25đ. Tổng 7,75 · đúng 22/28 · chưa đúng trọn 6 (3 sai, 1 bỏ trống, 2 đúng một phần). Lần trước (24/10) 7,25 → +0,50.
+  const kq = (n) => ({ 5: 's', 14: 's', 26: 's', 8: 't', 20: 'p', 22: 'p' })[n] || 'd'
+  const CHU = { d: 'đúng', s: 'sai', p: 'đúng một phần', t: 'bỏ trống' }
+  const o = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i).map((n) => `<span class="${kq(n)}" title="Câu ${n}: ${CHU[kq(n)]}">${n}</span>`).join('')
+  p1.innerHTML = o(1, 18); p2.innerHTML = o(19, 22); p3.innerHTML = o(23, 28)
+</script>
+</body></html>

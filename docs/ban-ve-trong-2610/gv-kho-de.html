@@ -1,0 +1,102 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Kho đề</title><link rel="stylesheet" href="trong.css">
+<style>
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.dau-man>.chu{flex:1;min-width:0}
+.dau-dem{padding:18px 20px 14px;margin:0}
+.kpi3{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) minmax(0,1.2fr)!important}
+.kpi3>.kpi{border-top:0!important;border-left:1px solid var(--vien)!important}.kpi3>.kpi:first-child{border-left:0!important}
+.xep{display:flex;height:8px;border-radius:999px;overflow:hidden;gap:2px}
+.xep i{display:block;height:100%}
+.chu-giai{display:flex;flex-wrap:wrap;gap:4px 14px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--chu-2)}
+.chu-giai i{width:8px;height:8px;border-radius:50%}
+.cong-cu{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:0 20px 16px}
+.cong-cu .o-nhap{flex:1;min-width:220px}
+.bang .stt{color:var(--chu-3);width:44px}
+.bang .ten-de{font-weight:600}
+.bang .viec{text-align:right;white-space:nowrap}
+.bang .viec .nut{min-height:40px;padding:0 12px}
+.bang tr.nghi td:first-child{box-shadow:inset 3px 0 0 var(--chu-y)}
+.chan-bang{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 20px;border-top:1px solid var(--vien)}
+.chi-dt6{display:none!important}
+@media (max-width:1100px){.kpi3{grid-template-columns:repeat(2,minmax(0,1fr))!important}.kpi3>.kpi:nth-child(3){grid-column:1/-1;border-left:0!important;border-top:1px solid var(--vien)!important}}
+@media (max-width:600px){
+  .dau-man>.hang{width:100%}.dau-man .nut{flex:1}
+  .kpi3{grid-template-columns:minmax(0,1fr)!important}.kpi3>.kpi{border-left:0!important}.kpi3>.kpi+.kpi{border-top:1px solid var(--vien)!important}
+  .cong-cu{padding:0 16px 12px}.cong-cu .o-nhap{min-width:100%}.cong-cu .tab{width:100%}.cong-cu .tab>span{flex:1;justify-content:center;padding:0 8px}
+  .chi-dt6{display:flex!important}
+  .chan-bang{padding:12px 16px}.chan-bang .nut{width:100%}
+}
+</style></head>
+<body data-app="gv" data-tab="kho-de">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: ba thẻ hành động to gom lại: Đồng bộ ngay lên đầu trang, «Duyệt hết» đi cùng con số 17 câu cần quyết, Đẩy file JSON + Em báo lỗi câu
+       + Công cụ kỹ thuật vào thẻ «Việc khác». Lưới thẻ đề 9 ô thành bảng một dòng mỗi đề, đề còn câu chờ quyết có vạch hổ phách. -->
+  <div class="dau-man">
+    <div class="chu">
+      <p class="nhan">Đồng bộ lần cuối 07:12 hôm nay · Khối 10 · 11 · 12 · Chuẩn cấu trúc 2026</p>
+      <h1 class="tieu-de mt-1">Kho đề</h1>
+    </div>
+    <div class="hang"><span class="nut"><i data-i="refresh" class="nho"></i>Đồng bộ ngay</span><span class="nut chinh"><i data-i="check-circle" class="nho"></i>Duyệt lời giải</span></div>
+  </div>
+
+  <div class="dai-kpi kpi3">
+    <div class="kpi"><span class="nhan">Trong kho</span><span class="so">38<small>đề</small></span><span class="mo">1.426 câu · mới nạp 25/10</span></div>
+    <div class="kpi an-dt"><span class="nhan">Câu theo dạng</span>
+      <div class="xep mt-2" role="img" aria-label="Trắc nghiệm 912 câu, Đúng–sai 228 câu, Trả lời ngắn 286 câu"><i style="flex:912;background:var(--tin)"></i><i style="flex:228;background:var(--sao)"></i><i style="flex:286;background:var(--dung)"></i></div>
+      <div class="chu-giai mt-2"><span><i style="background:var(--tin)"></i>Trắc nghiệm 912</span><span><i style="background:var(--sao)"></i>Đúng–sai 228</span><span><i style="background:var(--dung)"></i>Trả lời ngắn 286</span></div></div>
+    <div class="kpi"><span class="nhan"><span class="cham chu-y" style="display:inline-block;margin-right:6px"></span>Câu cần thầy quyết</span>
+      <div class="hang giua" style="flex-wrap:wrap;gap:8px"><span class="so chu-y-mau">17<small>câu</small></span><a class="lien-ket">Duyệt hết 17 câu</a></div>
+      <span class="mo">trong 5 đề · 33 đề đáp án đủ</span></div>
+  </div>
+
+  <section class="the dem">
+    <div class="the-dau dau-dem"><div class="h3">Danh sách đề</div><span class="mo an-dt">38 đề · mới nạp trên cùng</span></div>
+    <div class="cong-cu">
+      <div class="o-nhap"><i data-i="search" class="nho"></i>Tìm bài hoặc đề</div>
+      <div class="tab"><span class="on">Tất cả</span><span>Khối 10</span><span>Khối 11</span><span>Khối 12</span></div>
+    </div>
+    <div class="an-dt">
+      <table class="bang">
+        <thead><tr><th>#</th><th>Đề</th><th style="text-align:right">Số câu</th><th class="an-hep">Trắc nghiệm · Đúng–sai · Trả lời ngắn</th><th>Đáp án</th><th></th></tr></thead>
+        <tbody id="bang"></tbody>
+      </table>
+    </div>
+    <div class="ds chi-dt6" id="ds" style="border-top:1px solid var(--vien)"></div>
+    <div class="chan-bang"><span class="mo">Đang hiện 9/38 đề</span><span class="nut">Xem thêm 29 đề</span></div>
+  </section>
+
+  <section class="the dem">
+    <div class="the-dau dau-dem" style="padding-bottom:4px"><div class="h3">Việc khác</div></div>
+    <div class="ds">
+      <div class="dong"><span class="o-icon xam"><i data-i="upload"></i></span><div class="giua"><p class="ten">Đẩy file JSON</p><p class="mo">Từ kho-de/xong lên kho, khi máy pipeline bị chặn mạng</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+      <div class="dong"><span class="o-icon xam"><i data-i="flag"></i></span><div class="giua"><p class="ten">Em báo lỗi câu</p><p class="mo">Câu học sinh gửi báo lỗi khi làm bài</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+      <div class="dong"><span class="o-icon xam"><i data-i="settings"></i></span><div class="giua"><p class="ten">Công cụ kỹ thuật</p><p class="mo">Mã dạng, thống kê và kiểm tra</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+<script>
+// [tên, mã đề, ngày nạp, Trắc nghiệm, Đúng–sai, Trả lời ngắn, chờ quyết] — 5 đề chờ: 6+4+3+2+2 = 17
+const de = [
+  ['Đề thi thử TN THPT 2026 · số 07', '12-TT-2026-07', '25/10', 18, 4, 6, 6],
+  ['Kiểm tra chương 1 · Ester – lipid', '12-KT-C1-D4', '24/10', 18, 4, 6, 4],
+  ['Kiểm tra chương 5 · Pin điện và điện phân', '12-KT-C5-D1', '22/10', 18, 4, 6, 0],
+  ['Kiểm tra chương 3 · Hợp chất chứa nitrogen', '12-KT-C3-D2', '20/10', 24, 4, 8, 3],
+  ['Hoá 11 · Chương 2 · Nitrogen và sulfur', '11-KT-C2-D3', '18/10', 18, 4, 6, 0],
+  ['Hoá 11 · Chương 4 · Hydrocarbon', '11-KT-C4-D1', '16/10', 18, 4, 6, 2],
+  ['Hoá 10 · Chương 4 · Phản ứng oxi hoá – khử', '10-KT-C4-D2', '15/10', 18, 4, 6, 0],
+  ['Hoá 10 · Chương 2 · Bảng tuần hoàn các nguyên tố hoá học', '10-KT-C2-D1', '12/10', 24, 4, 8, 2],
+  ['Kiểm tra chương 2 · Carbohydrate', '12-KT-C2-D2', '10/10', 18, 4, 6, 0],
+]
+const tt = (n) => n ? `<span class="chip chu-y">${n} chờ quyết</span>` : `<span class="chip dung">${icon('check', 'nho')}đáp án đủ</span>`
+document.getElementById('bang').innerHTML = de.map(([t, ma, ngay, a, b, c, n], i) => `<tr${n ? ' class="nghi"' : ''}>
+  <td class="stt">${i + 1}</td><td><div class="ten-de">${t}</div><div class="mo">${ma} · nạp ${ngay}</div></td>
+  <td class="so-o">${a + b + c}</td><td class="an-hep phu">${a} · ${b} · ${c}</td><td>${tt(n)}</td>
+  <td class="viec"><span class="nut">Chi tiết đề</span> <span class="nut vuong" style="min-height:40px;width:40px" aria-label="Xoá đề">${icon('trash', 'nho')}</span></td></tr>`).join('')
+document.getElementById('ds').innerHTML = de.map(([t, ma, ngay, a, b, c, n]) => `<div class="dong">
+  <div class="giua"><p class="ten">${t}</p><p class="mo">${ma} · ${a + b + c} câu · nạp ${ngay}</p>${n ? `<div class="mt-2">${tt(n)}</div>` : ''}</div>
+  <span class="phai">${icon('chevron', 'nho')}</span></div>`).join('')
+</script>
+</body></html>
