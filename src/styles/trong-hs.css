@@ -774,3 +774,44 @@
 /* Công tắc «Âm thanh» / «Rung» trong menu (thầy 26/10) */
 [data-trong] .tr-menu-cong .tr-cong { margin-left: auto; padding: 2px 10px; border-radius: 999px; background: var(--tr-mat-3); color: var(--tr-chu-3); font-size: 12.5px; font-weight: 700; }
 [data-trong] .tr-menu-cong .tr-cong[data-bat] { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+/* ── NGANG + MÁY TÍNH (thầy 26/10: «chú ý tối ưu cho giao diện xoay ngang và máy tính»): Luyện tập lưới hai cột ô to, Thành tích hai cột (chuỗi · tuần ·
+   bậc | huy hiệu · điểm thầy công bố) — dọc: các cột bọc là display: contents (y bố cục cũ). Khung thấp: menu thu thành dải biểu tượng mép phải, Bi nhỏ lại. */
+[data-trong] .da-cot { display: contents; }
+[data-trong] .tr-menu-ray { display: contents; }
+[data-trong] :is(.tr-ray-muc, .tr-ray-them) { display: none; }
+@media (min-width: 1000px), (max-height: 520px) and (min-width: 600px) {
+  [data-trong] .dm-khung[data-muc] { grid-template-columns: minmax(0, 1fr); }
+  [data-trong] .dm-khung[data-muc] .da-vo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; max-width: 1000px; column-gap: 20px; }
+  [data-trong] .dm-khung[data-muc] .da-tieu { grid-column: 1 / -1; }
+  [data-trong] .dm-khung[data-muc='luyen'] .da-o { height: 100%; }
+  [data-trong] .dm-khung[data-muc='thanh-tich'] .da-cot { display: flex; flex-direction: column; gap: inherit; min-width: 0; }
+  [data-trong] .dm-khung[data-muc='thanh-tich'] .da-vo { row-gap: 18px; }
+  [data-trong] .dm-khung[data-muc='thanh-tich'] .da-cot { gap: 18px; }
+}
+@media (max-height: 520px) and (min-width: 600px) {
+  [data-trong] .dm-khung[data-muc='thanh-tich'] .da-cot { gap: 12px; }
+  [data-trong] .bi-loi .bi { width: 56px; height: auto; }
+  [data-trong] .bi-loi-bong { padding: 8px 12px; font-size: 15px; margin-bottom: 10px; }
+  [data-trong] .da-lua .bi { width: 56px; height: auto; }
+  [data-trong] .tr-menu-ray {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    width: 56px; padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); border-left: 1px solid var(--tr-vien); background: var(--tr-mat);
+  }
+  [data-trong] .tr-ray-muc { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px; background: transparent; color: var(--tr-chu-3); cursor: pointer; }
+  [data-trong] .tr-ray-muc[aria-current='page'] { background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
+  [data-trong]:not([data-ai-ddh]) .tr-ray-ai { display: none; }
+  [data-trong] .tr-menu-ray .tr-menu-cham, [data-trong] .tr-menu-ray .tr-menu-cham[data-dd] { position: relative; top: auto; right: auto; width: 44px; height: 44px; margin: 0; border-radius: 12px; color: var(--tr-chu-3); justify-items: center; }
+  [data-trong] .tr-menu-ray .tr-menu-cham[aria-expanded='true'] { opacity: 1; }
+  [data-trong] .tr-menu-ray .tr-menu-cham i { display: none; }
+  [data-trong] .tr-menu-ray .tr-ray-them { display: grid; place-items: center; }
+  [data-trong] .tr-menu-ray .tr-menu-cham s { top: 6px; right: 6px; }
+  /* buổi đang mở điểm danh: nút menu thành ô chàm có mã QR (chữ «Điểm danh» nằm trong nhãn đọc màn hình) */
+  [data-trong] .tr-menu-ray .tr-menu-cham[data-dd] { background: var(--tr-tin-chu); color: var(--tr-trang); }
+  [data-trong] .tr-menu-ray .tr-menu-cham[data-dd] em { width: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; color: inherit; font-size: 0; writing-mode: horizontal-tb; }
+  [data-trong] .tr-menu-ray .tr-menu-cham[data-dd] em svg { width: 22px; height: 22px; }
+  [data-trong] .tr-menu-ray .tr-menu-cham[data-dd] .tr-ray-them { display: none; }
+  [data-trong] .tr-menu-ray .tr-menu-cham:focus-visible { outline: 3px solid var(--tr-chinh); outline-offset: 2px; }
+}
+@media (max-height: 520px) and (min-width: 600px) and (hover: hover), (min-width: 1000px) and (hover: hover) {
+  [data-trong] .tr-ray-muc:hover:not([aria-current='page']) { background: var(--tr-mat-2); color: var(--tr-chu); }
+}

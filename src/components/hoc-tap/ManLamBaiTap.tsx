@@ -260,6 +260,15 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     window.addEventListener('keydown', f)
     return () => window.removeEventListener('keydown', f)
   }, [laTLN, khoa]) // eslint-disable-line react-hooks/exhaustive-deps
+  // PHÍM TẮT kiểu Duolingo (máy tính, chỉ nhánh duo — thầy 26/10): 1–4 / A–D chọn phương án Phần I; Enter = Kiểm tra / Tiếp tục. Đang gõ ô chữ, đang
+  // mở tấm lời giải / giải thích / hộp thoại ⇒ bỏ qua; nút thường đang có tiêu điểm ⇒ để Enter bấm chính nút đó (trừ ô phương án).
+  const phimDuo = useRef<(e: KeyboardEvent) => void>(() => {})
+  useEffect(() => {
+    if (!duo) return
+    const f = (e: KeyboardEvent) => phimDuo.current(e)
+    window.addEventListener('keydown', f)
+    return () => window.removeEventListener('keydown', f)
+  }, [duo])
 
   // ── chữ dải kết quả (giữ NGUYÊN câu trạng thái đặc biệt: nhờ thầy chữa, học có hỗ trợ, lượt chưa tính)
   const thoiGian = q && k && !k.choThay && !k.hocCoHoTro ? chuThoiGian(msCau[q.qid]) : ''
@@ -330,6 +339,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
 
   const homNayO = homNayHien ? <span className="ht2-lam-hom-nay"><b aria-hidden="true">{homNayHien.daLam}/{homNayHien.muc}</b><small aria-hidden="true">câu hôm nay</small><span className="ht2-an">Hôm nay đã làm {homNayHien.daLam} trên {homNayHien.muc} câu</span></span> : <span />
 
+  phimDuo.current = (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || !q || moLoiGiai || giaiThich || gui.current) return
+    const t = e.target instanceof HTMLElement ? e.target : null
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|A)$/.test(t.tagName) || t.closest('[role=dialog], .aid-tam'))) return
+    if (t?.tagName === 'BUTTON' && t.getAttribute('role') !== 'radio') return
+    const so = 'ABCD'.indexOf(e.key.toUpperCase()) >= 0 ? e.key.toUpperCase() : /^[1-4]$/.test(e.key) ? 'ABCD'[Number(e.key) - 1]! : ''
+    if (so && dangTraLoi && q.phan === 'I' && !nop) { e.preventDefault(); doiTra(so); return }
+    if (e.key !== 'Enter') return
+    if (k) { e.preventDefault(); phanHoi('chon'); tiep() }
+    else if (dangTraLoi && duocNop && !nop) { e.preventDefault(); phanHoi('chon'); void nopCau() }
+  }
   if (duo) {
     // ═══ LÀM CHẶNG KIỂU DUOLINGO (bản vẽ docs/ban-ve-duo-2610, thầy chốt 26/10, bỏ «Bỏ qua»). Một câu một lúc: thanh trên (thoát · MỘT thanh tiến độ ·
     // chuỗi đúng liền) → nhãn + đề chữ to + phương án ô lớn → ĐÁY GHIM «Kiểm tra» (+ Hỏi thầy) ⇒ bấm ⇒ tấm kết quả trượt từ đáy (đúng xanh / sai đỏ,
@@ -422,9 +442,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
             <p className="duo-ghi">{[cauSai.length ? `${chuDanhSachCau(cauSai)} sai đã vào lịch ôn 1 · 3 · 7 ngày.` : '', conDu === null ? '' : conDu > 0 ? `Còn ${conDu} câu nữa là đủ mức hôm nay.` : 'Em đã đủ mức hôm nay.'].filter(Boolean).join(' ')}</p>
           </section>
         : q ? <>
+          <div className="duo-cot-de">{/* khung thấp xoay ngang: cột trái = đề, cột phải = phương án + Kiểm tra / tấm kết quả; dọc / máy tính: display: contents (y bố cục cũ) */}
           <p className="duo-nhan"><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}{tenBai || q.tenDang ? ` · ${tenBai || q.tenDang}` : ''}</span>{chang ? <span className="duo-chip">Chặng {chang}</span> : null}</p>
           <VungChamDe q={q} onGiaiThich={setGiaiThich}><DeCau q={q} stt={stt} /></VungChamDe>
           {q.goiY && goiY && dangTraLoi && <section id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
+          </div>
+          <div className="duo-cot-tra">
           {choChonCach && <section className="ht2-lam-the ht2-lam-chon-cach" aria-label="Chọn cách làm">
             <h2 className="ht2-lam-chon-tieu">Câu này em chọn làm thế nào?</h2>
             <div className="ht2-lam-chon-dong"><span aria-hidden="true"><PenLine size={20} /></span><p><b>Tự làm:</b> tính là câu tự làm.</p></div>
@@ -434,6 +457,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {dangTraLoi && q.phan === 'III' && <BanPhimSo value={tra} khoa={nop} soO={soO} onPhim={(p: PhimSo) => doiTra(nhanPhim(tra, p, soO))} />}
           {(dangTraLoi || k) && <HinhCuoiCau q={q} stt={stt} />}
           {ghiTraLoi}
+          </div>
         </> : null}
         {loi && !q && <div className="ht2-lam-loi" role="alert"><span>{loi}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => setLan(n => n + 1)}><RefreshCw size={17} aria-hidden="true" />Thử lại</button></div>}
       </main>

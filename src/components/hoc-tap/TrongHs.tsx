@@ -2,7 +2,7 @@
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
-import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Vibrate, Volume2, Wrench, type LucideIcon } from 'lucide-react'
+import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, Menu as MenuIcon, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Vibrate, Volume2, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './TheHomNayEm'
 import { chuViecTiep, nhipTheoSanh, TEN_NHOM_NHIP } from '../../lib/nhip-hoc-em'
@@ -145,7 +145,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const theBac = nhip && nhip.nhom !== 'chua-du' && <div className="dm-the da-bac"><h3>{bac ? `Bậc ${bac} · ` : ''}{TEN_NHOM_NHIP[nhip.nhom]}</h3>{bac && <Thang12 bac={bac} />}<span className="mo">{chuViecTiep(nhip)}</span></div>
 
   // ───── LUYỆN TẬP (mục «Ôn & sửa» cũ): mỗi việc một ô to; ô đỏ (Tự sửa lỗi còn câu) là việc nên làm trước.
-  if (p.muc === 'on-lai' && hs) return <div className="dm-khung">{tren}<main className="da-vo">
+  if (p.muc === 'on-lai' && hs) return <div className="dm-khung" data-muc="luyen">{tren}<main className="da-vo">
     <h1 className="da-tieu">Luyện tập</h1>
     <OTo ten="Tự sửa lỗi" mo={p.soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} sac="sai" Icon={Wrench} so={coSua ? p.soSua! : undefined} noi={coSua} onClick={p.onChua} />
     {kiem && <OTo ten="Kiểm tra ôn tập" mo={chuKiem(kiem)} sac="tin" Icon={Target} so={`${kiem.daTra}/${kiem.tong}`} onClick={(kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined} tat={p.coCa} />}
@@ -164,16 +164,20 @@ export function MotTrangHs(p: PropsMotTrang) {
       { ten: '7 ngày liền', sac: 'sao', Icon: Flame, co: chuoi >= 7 },
       { ten: '30 ngày liền', sac: 'chu-y', Icon: Trophy, co: chuoi >= 30 },
     ]
-    return <div className="dm-khung">{tren}<main className="da-vo">
+    return <div className="dm-khung" data-muc="thanh-tich">{tren}<main className="da-vo">
       <h1 className="da-tieu">Thành tích</h1>
+      <div className="da-cot">{/* ngang / máy tính: hai cột (chuỗi · tuần · bậc | huy hiệu · điểm); dọc: display: contents */}
       <div className="da-lua"><Bi cam={chuoi > 0 ? 'lua' : so && so.daLam === 0 ? 'ngu' : 'chao'} size={72} /><div><b>{chuoi} ngày</b><span>Chuỗi ngày đủ mức{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</span></div></div>
       {tuan.length > 0 && <ol className="da-tuan" aria-label="7 ngày gần nhất">{tuan.map((x) => { const nay = x.ngay === nhip!.homNay, d = x.muc > 0 && x.lam >= x.muc
         return <li key={x.ngay} aria-label={`${nay ? 'Hôm nay' : thuNgan(x.ngay)}: ${d ? 'đủ mức' : `${x.lam}/${x.muc} câu`}`}><i data-d={d || undefined} data-nay={nay || undefined}>{d && <Check size={18} strokeWidth={3} aria-hidden="true" />}</i>{nay ? 'Nay' : thuNgan(x.ngay)}</li> })}</ol>}
       {theBac}
+      </div>
+      <div className="da-cot">
       <div className="da-huy">{huy.map(({ ten, sac, Icon, co }) => <div key={ten}><i data-sac={co ? sac : undefined}>{co ? <Icon size={28} aria-hidden="true" /> : <Lock size={26} aria-hidden="true" />}</i>{ten}</div>)}</div>
       <h2 className="da-tieu-nho">Điểm thầy đã công bố</h2>
       <OTo ten="Ca kiểm tra" mo="Điểm và lời giải ca đã công bố" sac="tin" Icon={LineChart} onClick={hs.onLichSu} />
       {hs.onKetQua && <OTo ten="Kết quả bài đã nộp" mo="Điểm và báo cáo đã công bố" sac="chu-y" Icon={ClipboardCheck} onClick={hs.onKetQua} />}
+      </div>
     </main></div>
   }
 
@@ -305,9 +309,14 @@ export function MenuDocTrong(p: {
     return () => { window.removeEventListener('keydown', phim); window.removeEventListener('scroll', cuon) }
   }, [mo, oNhap])
   return <>
-    <button ref={nut} type="button" className="tr-menu-cham" data-dd={ddMo || undefined} aria-label={ddMo ? 'Mở menu · Buổi học đang mở điểm danh' : 'Mở menu'} aria-expanded={mo} aria-controls="tr-menu" onClick={() => setMo(true)}>
-      <i /><s />{ddMo && <em aria-hidden="true"><QrCode size={16} />Điểm danh</em>}
-    </button>
+    {/* Khung thấp xoay ngang: menu thu thành DẢI BIỂU TƯỢNG mép phải (3 mục + A.I + nút mở menu đủ); dọc / máy tính: display: contents ⇒ chỉ vạch cũ. */}
+    <div className="tr-menu-ray">
+      {MENU_DUO.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-ray-muc" onClick={() => p.onMuc(id)} aria-current={p.muc === id ? 'page' : undefined} aria-label={ten} title={ten}><Icon size={22} aria-hidden="true" /></button>)}
+      <button type="button" className="tr-ray-muc tr-ray-ai" onClick={() => window.dispatchEvent(new Event('ddh:mo-ai'))} aria-label="A.I Đỗ Đại Học" title="A.I Đỗ Đại Học"><Sparkles size={20} aria-hidden="true" /></button>
+      <button ref={nut} type="button" className="tr-menu-cham" data-dd={ddMo || undefined} aria-label={ddMo ? 'Mở menu · Buổi học đang mở điểm danh' : 'Mở menu'} aria-expanded={mo} aria-controls="tr-menu" onClick={() => setMo(true)}>
+        <i /><s />{ddMo && <em aria-hidden="true"><QrCode size={16} />Điểm danh</em>}<b className="tr-ray-them" aria-hidden="true"><MenuIcon size={22} /></b>
+      </button>
+    </div>
     {mo && <div className="tr-menu-phu" onClick={() => dong(true)} aria-hidden="true" />}
     <nav ref={the} id="tr-menu" className="tr-menu" data-mo={mo || undefined} data-dd={p.token ? '' : undefined} aria-label="Điều hướng học sinh">
       <a className="tr-menu-dau" href="/hs"><img src={`${import.meta.env.BASE_URL}logo-hs-nho-v3.svg`} width={26} height={26} alt="" draggable={false} />Đỗ Đại Học</a>

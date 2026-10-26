@@ -24,6 +24,23 @@ const mo = (ds: object[], homNay: SoHomNay | null = HN) => {
 const kiemTra = () => screen.getByRole('button', { name: 'Kiểm tra' }) as HTMLButtonElement
 
 describe('làm chặng kiểu Duolingo («Trong»)', () => {
+  it('phím tắt máy tính: 1–4 / A–D chọn phương án, Enter = Kiểm tra rồi Tiếp tục; đề và phương án nằm trong hai cột bọc (ngang thấp)', async () => {
+    const { container } = mo([C1, C2])
+    await screen.findByText(C1.text)
+    expect(container.querySelector('.duo-cot-de')!.textContent).toContain(C1.text)
+    expect(container.querySelector('.duo-cot-tra .duo-tra')).not.toBeNull()
+    fireEvent.keyDown(window, { key: '2' })
+    expect(screen.getByRole('radio', { name: /^B/ }).getAttribute('aria-checked')).toBe('true')
+    fireEvent.keyDown(window, { key: 'd' })
+    expect(screen.getByRole('radio', { name: /^D/ }).getAttribute('aria-checked')).toBe('true')
+    vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'D', solution: LG1 })
+    fireEvent.keyDown(window, { key: 'Enter' })
+    await screen.findByRole('heading', { name: 'Chính xác!' })
+    expect(vi.mocked(goiHoa2).mock.calls.find((c) => c[0] === 'answer')![2]).toMatchObject({ qid: 'q1', answer: 'D' })
+    fireEvent.keyDown(document.body, { key: 'Enter' })
+    await screen.findByText(C2.text)
+  })
+
   it('đầu màn: nút thoát lưu-và-về, MỘT thanh tiến độ, chuỗi 0; «Kiểm tra» xám tới khi chọn; không có «Bỏ qua»; lưới 2×2 khi phương án ngắn', async () => {
     const { container } = mo([C1, C2])
     await screen.findByText(C1.text)

@@ -563,3 +563,41 @@
 [data-trong] .duo-ket[data-tt=giai] { background: var(--tr-tin-nhat); }
 [data-trong] .duo-ket[data-tt=giai] h2 { color: var(--tr-tin-chu); }
 [data-trong] .duo-ket[data-tt=giai] .duo-kq-chu { flex: 1 1 auto; min-width: 0; }
+
+/* ── 13. NGANG + MÁY TÍNH cho màn làm chặng (thầy 26/10: «chú ý tối ưu cho giao diện xoay ngang và máy tính»). Dọc / máy tính: hai cột bọc
+ * (duo-cot-de / duo-cot-tra) là display: contents ⇒ y bố cục một cột ≤ 720px. Khung thấp xoay ngang (≤ 500px cao): ĐỀ bên trái, PHƯƠNG ÁN + «Kiểm tra»
+ * bên phải; tấm kết quả chỉ chiếm cột phải (không phủ kín màn), nằm ngay dưới phương án (không ghim — không che phương án); Bi nhỏ lại. Máy tính: rê chuột lên phương án sáng viền. ── */
+[data-trong] .duo :is(.duo-cot-de, .duo-cot-tra) { display: contents; }
+@media (hover: hover) and (pointer: fine) {
+  [data-trong] .duo .ht2-lam-pa:not([data-ket]):not([aria-checked=true]):not(:disabled):hover { border-color: var(--tr-tin); background: var(--tr-mat-2); }
+  [data-trong] .duo-nut:not(:disabled):hover { filter: brightness(1.06); }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  [data-trong] .ht-app.ht2-lam.duo:not([data-xong]) {
+    display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, 1fr); grid-template-rows: auto auto 1fr; align-items: start;
+    max-width: 1180px; margin-inline: auto;
+  }
+  [data-trong] .duo:not([data-xong]) .duo-tren { grid-column: 1 / -1; max-width: none; min-height: 48px; padding: 4px 20px 0; }
+  [data-trong] .duo:not([data-xong]) .duo-than { display: contents; }
+  [data-trong] .duo:not([data-xong]) .duo-than > * { grid-column: 1 / -1; }
+  [data-trong] .duo:not([data-xong]) .duo-cot-de { grid-column: 1; grid-row: 2 / span 2; display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 8px 12px 20px 20px; }
+  [data-trong] .duo:not([data-xong]) .duo-cot-tra { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 8px 20px 12px 12px; }
+  [data-trong] .duo:not([data-xong]) .duo-tra[data-luoi] .ht2-lam-tn { grid-template-columns: minmax(0, 1fr); }
+  [data-trong] .duo:not([data-xong]) .duo-day { grid-column: 2; grid-row: 3; align-self: start; position: static; margin: 0 12px 12px 0; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 0; border-radius: 18px; }
+  [data-trong] .duo:not([data-xong]) .duo-day:not(.duo-ket) { background: transparent; }
+  [data-trong] .duo:not([data-xong]) .duo-giua { gap: 6px; }
+  [data-trong] .duo:not([data-xong]) .duo-nut { min-height: 48px; }
+  [data-trong] .duo-kq { gap: 10px; }
+  [data-trong] .duo-kq-chu h2 { font-size: 19px; }
+  [data-trong] .duo-kq-bi:has(.bi) { width: 44px; }
+  [data-trong] .duo-kq-bi .bi { width: 44px; height: auto; }
+  /* xong chặng: Bi (nhỏ) bên trái, chữ + số bên phải */
+  [data-trong] .duo-xong { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 24px; row-gap: 8px; align-items: center; justify-items: start; max-width: 760px; margin-inline: auto; text-align: left; }
+  [data-trong] .duo-xong > :not(.bi):not(.duo-hoa) { grid-column: 2; }
+  [data-trong] .duo-xong > .bi { grid-column: 1; grid-row: 1 / span 5; width: 104px; height: auto; }
+  [data-trong] .duo-xong .duo-3 { max-width: none; }
+  [data-trong] .duo-xong .duo-chang { justify-content: flex-start; }
+  [data-trong] .duo-xong .duo-ghi { max-width: none; }
+  [data-trong] .duo[data-xong] .duo-day { position: static; }
+  [data-trong] .duo[data-xong] .duo-giua { max-width: 760px; }
+}
