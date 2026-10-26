@@ -224,7 +224,7 @@
 [data-trong] .ht2-lam-ban-do span[data-co] { background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
 @media (min-width: 900px) {
   /* đang trả lời: một cột (sau khi nộp giữ hai cột cũ để phản hồi từng ý nằm cạnh lời giải) */
-  [data-trong] .ht2-lam-khung:not([data-ket]) { display: flex; flex-direction: column; gap: 14px; max-width: 760px; }
+  [data-trong] .ht2-lam-khung:not([data-ket]) { display: flex; flex-direction: column; align-items: stretch; gap: 14px; max-width: 760px; } /* 26/10: lưới gốc đặt align-items:start ⇒ đề + phương án co lại 217–404px lệch trái giữa màn rộng */
   [data-trong] .ht2-lam-khung:not([data-ket]) > .ht2-lam-day { position: static; margin-top: 0 !important; padding: 0; border: 0; background: none; }
   [data-trong] .ht2-lam-khung[data-tra-loi]:not([data-ket]) .ht2-lam-nhan { height: auto; }
   [data-trong] .ht2-lam-day { border-radius: 20px; }
@@ -239,7 +239,7 @@
 [data-trong]:root body .ccs .ccs-khu-lam::before { display: none; }
 [data-trong]:root body .ccs .ccs-ghi { color: var(--tr-chu-3); letter-spacing: 0.04em; }
 [data-trong]:root body .ccs .ccs-luat { padding: 12px 14px; border: 0; border-radius: 12px; background: var(--tr-tin-nhat); color: var(--tr-tin-chu); }
-[data-trong]:root body .ccs .the-cau { background: none !important; border: 0 !important; box-shadow: none !important; }
+[data-trong]:root body .ccs .the-cau { background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; } /* bo góc + overflow:hidden cắt góc phương án cuối (26/10) */
 [data-trong]:root body .ccs .the-cau > div:first-child { min-height: 0; padding: 0 !important; }
 [data-trong]:root body .ccs .the-cau > div:first-child > div:first-child { display: none !important; }
 [data-trong]:root body .ccs .the-cau > div:first-child > div:last-child { background: var(--tr-mat-2); color: var(--tr-chu-2); font-weight: 500; }
@@ -264,6 +264,20 @@
   [data-trong]:root body .ccs .ccs-hang-nut .ccs-nut-chinh { flex: 0 1 240px; }
 }
 @media (max-width: 599px) { [data-trong]:root body .ccs .ccs-khu-lam { padding: 18px 16px; } }
+/* NGANG + MÁY TÍNH 26/10 (thầy gửi ảnh Tự sửa lỗi: nút «Kiểm tra» đè hình thứ 4, vạch/khung nét đứt hiện chồng lên «Sang câu khác»). Gốc: thanh nút
+ * ghim đáy (chua-cau-sai.css, điện thoại) bị «Trong» bỏ nền ⇒ đề, hình, ô nét đứt cuộn bên dưới lộ xuyên qua hai nút. Điện thoại dọc: thanh có NỀN
+ * ĐẶC + vạch trên, ăn đúng lề của khung bước (thanh nằm trong luồng nên phần cuối đề không bị che khi cuộn hết). Khổ ngang thấp: nút về luồng thường. */
+@media (max-width: 700px) {
+  [data-trong]:root body .ccs .ccs-day {
+    margin: 4px -16px -18px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--tr-vien); border-radius: 0 0 20px 20px; background: var(--tr-mat);
+  }
+  [data-trong]:root body .ccs .ccs-bai-lam form .ccs-day { margin-bottom: 0; border-radius: 0; }
+}
+@media (min-width: 600px) and (max-width: 700px) { [data-trong]:root body .ccs .ccs-day { margin-inline: -28px; margin-bottom: -24px; padding-inline: 28px; } }
+@media (orientation: landscape) and (max-height: 620px) {
+  [data-trong]:root body .ccs .ccs-day { position: static; margin: 4px 0 0; padding: 0; border: 0; border-radius: 0; background: none; }
+}
 
 /* ── 7. TU LUYỆN (ManTuLuyen, khối .tlu) + TỰ SỬA LỖI (ManTuChua, khối .tcl-man): nhấn chàm → màu app (chữ đậm của màu app để đủ tương phản),
  * nút chính mực → nút màu app, tiêu đề gọn như thanh màn con; thanh tiến độ tự sửa ba nghĩa: đã sửa xanh lá · chờ hổ phách · cần sửa đỏ nhạt. ── */
@@ -294,3 +308,36 @@
 [data-trong] .ktcn-man .ktcn-the::before, [data-trong] .ktcn-man .ktcn-ket-dau::before { display: none; }
 [data-trong] .ktcn-man .ktcn-nut-chinh { border-radius: 12px; box-shadow: none; }
 [data-trong] .ktcn-man .ktcn-nut-phu { border-radius: 12px; border-width: 1px; }
+/* NGANG + MÁY TÍNH 26/10: trang bài Kiểm tra ôn tập — máy tính (≥ 1100) và điện thoại ngang: HAI CỘT, thẻ tổng quan bên trái (ghim khi cuộn), các chặng +
+ * Nộp toàn bài bên phải ⇒ không còn một cột 760px giữa màn rộng với hai bên trống. Chỉ bố cục; nút, chữ, thứ tự đọc giữ nguyên. */
+@media (min-width: 1100px), (orientation: landscape) and (max-height: 500px) and (min-width: 700px) {
+  [data-trong] .ktcn-man .ktcn-khung:has(> .ktcn-the[data-trang='tong-quan']) {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: 28px; align-items: start; max-width: 1180px;
+  }
+  [data-trong] .ktcn-man .ktcn-khung > .ktcn-the[data-trang='tong-quan'] { grid-column: 1; grid-row: 1 / span 2; position: sticky; top: 96px; margin: 0; }
+  [data-trong] .ktcn-man .ktcn-khung:has(> .ktcn-the[data-trang='tong-quan']) > :is(.ktcn-chang, .ktcn-nop) { grid-column: 2; margin-top: 0; }
+  [data-trong] .ktcn-man .ktcn-khung:has(> .ktcn-the[data-trang='tong-quan']) > .ktcn-nop { margin-top: 16px; }
+}
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 700px) {
+  [data-trong] .ktcn-man .ktcn-khung:has(> .ktcn-the[data-trang='tong-quan']) { column-gap: 16px; padding-top: 12px; }
+  [data-trong] .ktcn-man .ktcn-khung > .ktcn-the[data-trang='tong-quan'] { position: static; } /* thẻ cao hơn khung thấp: không ghim (ghim sẽ giấu đáy thẻ) */
+}
+/* Làm chặng ở điện thoại ngang thấp: thanh «Câu trước / Câu tiếp theo» về luồng thường ngay dưới câu (như máy tính) — không ghim đáy che 1/5 khung. */
+@media (orientation: landscape) and (max-height: 500px) {
+  [data-trong] .ktcn-man .ktcn-day { position: static; padding: 12px 0 0; background: none; border: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  [data-trong] .ktcn-man .ktcn-lam { padding-bottom: 24px; }
+}
+/* Thầy chụp 26/10 (điện thoại thật) — thẻ đầu Kiểm tra ôn tập:
+ * (1) số «10/28» trong vòng 96px to hơn lòng vòng (24px ⇒ ~66px chữ trong lòng ~71px) — đè nét, chạm mép. Số co theo vòng: ~0,21 × đường kính.
+ * (2) «Giờ riêng từng chặng» vỡ hai dòng, hai ô lệch nhau, thừa trống: thẻ hẹp (< 520px) ⇒ hai ô thành hai HÀNG gọn (biểu tượng | chữ), cao bằng nhau. */
+[data-trong] .ktcn-man .ktcn-than .ktcn-vong b { font-size: 20px; letter-spacing: -0.02em; }
+[data-trong] .ktcn-man .ktcn-than .ktcn-vong small { font-size: 11px; }
+@media (max-width: 380px) { [data-trong] .ktcn-man .ktcn-than .ktcn-vong b { font-size: 17px; } [data-trong] .ktcn-man .ktcn-than .ktcn-vong small { font-size: 10px; } }
+@media (orientation: landscape) and (max-height: 500px) { [data-trong] .ktcn-man .ktcn-the[data-chinh] .ktcn-than .ktcn-vong b { font-size: 16px; } [data-trong] .ktcn-man .ktcn-the[data-chinh] .ktcn-than .ktcn-vong small { font-size: 10px; } }
+[data-trong] .ktcn-man .ktcn-the[data-trang='tong-quan'] { container-type: inline-size; }
+@container (max-width: 520px) {
+  [data-trong] .ktcn-man .ktcn-hai-gio { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  [data-trong] .ktcn-man .ktcn-hai-gio div { grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 12px; row-gap: 2px; padding: 12px 14px; }
+  [data-trong] .ktcn-man .ktcn-hai-gio svg { grid-row: span 2; }
+  [data-trong] .ktcn-man .ktcn-hai-gio b { font-size: 16px; }
+}

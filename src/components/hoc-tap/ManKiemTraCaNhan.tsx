@@ -40,6 +40,8 @@ function GioConLai({kho,bai=false}:{kho:KhoGio|null;bai?:boolean}){
  const giay=useGiayConLai(kho)??0
  return <>{bai?conLai(giay*1000):dongHo(Math.max(0,Math.ceil(giay)))}</>
 }
+/** Dòng phụ của chặng ĐÃ CHỐT (thầy 26/10: «Đã chốt · đã trả lời 0/6» dễ hiểu nhầm): nói rõ bỏ trống bao nhiêu câu — cùng số daTra, chỉ đổi lời. */
+const chuChot=(so:number,da:number)=>da>=so?`${so} câu · trả lời đủ ${so}/${so}`:da<=0?`${so} câu · bỏ trống cả ${so} câu`:`${so} câu · trả lời ${da}/${so} · bỏ trống ${so-da}`
 const khongDangKy=()=>()=>{}
 function useHetGio(kho:KhoGio|null){
  const lay=()=>!!kho&&kho.conLai()<=0
@@ -145,7 +147,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
      <span className="ktcn-ch-dau" aria-hidden="true">{c.daChot?<Check size={20}/>:c.stt+1}</span>
      <div className="ktcn-ch-o">
       <div className="ktcn-ch-h"><b>Chặng {c.stt+1}</b>{c.daChot?<span className="ktcn-chip" data-sac="xanh">Đã chốt</span>:chay?<span className="ktcn-chip">Còn <GioConLai kho={khoChang}/></span>:khoa?<span className="ktcn-chip" data-sac="xam"><Lock size={13} aria-hidden="true"/>Chờ chặng {dangChay!.stt+1}</span>:null}</div>
-      <small>{c.soCau} câu · {Math.ceil(c.giay/60)} phút{typeof c.daTra==='number'?` · đã trả lời ${c.daTra}/${c.soCau}`:''}</small>
+      <small>{c.daChot&&typeof c.daTra==='number'?chuChot(c.soCau,c.daTra):`${c.soCau} câu · ${Math.ceil(c.giay/60)} phút${typeof c.daTra==='number'?` · đã trả lời ${c.daTra}/${c.soCau}`:''}`}</small>
       {!c.daChot&&<button type="button" className={chinh?'ktcn-nut-chinh':'ktcn-nut-phu'} onClick={()=>void mo(c.stt)} disabled={busy||khoa}>{chay?`Làm tiếp chặng ${c.stt+1}`:`Làm chặng ${c.stt+1}`}<ArrowRight size={18} aria-hidden="true"/></button>}
       {khoa&&<p className="ktcn-ch-ghi">Nộp chặng {dangChay!.stt+1} rồi mới mở chặng này.</p>}
      </div>

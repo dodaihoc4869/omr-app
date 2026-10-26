@@ -146,7 +146,7 @@ export default function HocTapHomNay(p: Props) {
     const MenuDoc = modTrongHs()?.MenuDocTrong
     const MotTrang = trong ? modTrongHs()?.MotTrangHs : undefined
     // Các khối của màn Hôm nay giao diện cũ (một cột). «Trong» vẽ MotTrangHs với CÙNG điều kiện hiện từng việc.
-    const eKiem = kiem && kiemHomNay && <Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
+    const eKiem = kiem && kiemHomNay && <Suspense fallback={<p role="status"><span className="chu-cho-tre">Đang mở lịch kiểm tra…</span></p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
     const eHomNay = <TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={tenBai} viec={viec}
       onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
     const eKiemSau = kiem && !kiemHomNay && <Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
@@ -194,7 +194,7 @@ export default function HocTapHomNay(p: Props) {
           <HanhTrinhOnSua muc={muc} sanh={sanh} dangTai={p.dangTai} soSua={soSua}
             // Ngày có lịch kiểm tra cá nhân (PR258): thẻ kiểm tra thay nút Học tiếp — như bản trước khi trùng tu Hành trình.
             nut={ngayKiem && kiem
-              ? <Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
+              ? <Suspense fallback={<p role="status"><span className="chu-cho-tre">Đang mở lịch kiểm tra…</span></p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
               : <button type="button" className="htn-nut" data-phu={p.coCa || undefined} onClick={p.onHoc} disabled={khoaHoc}>{chuNutHoc(so, con === 0, kho)}<ArrowRight size={20} aria-hidden="true" /></button>}
             onChua={p.onChua} onXemLai={p.onXemLai} onTuLuyen={p.onTuLuyen} onLuyenLai={p.onLuyenLai} />
         </Suspense>}

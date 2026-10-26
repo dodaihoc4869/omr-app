@@ -328,7 +328,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     </header>
     <div className="ht2-lam-khung" data-tra-loi={traLoiPhai ? q.phan : undefined} data-ket={traLoiPhai && k ? '' : undefined}>
       <main className="ht2-lam-than">
-        {tai ? <div className="ht2-lam-the ht2-lam-cho" role="status">Đang chuẩn bị những câu phù hợp với em…</div>
+        {tai ? <div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang chuẩn bị những câu phù hợp với em…</span></div>
         : xong ? <>
           <section className="ht2-lam-the ht2-lam-xong" aria-label="Kết quả chặng">
             <span className="ht2-lam-xong-dau" aria-hidden="true"><Check size={30} strokeWidth={2.4} /></span>

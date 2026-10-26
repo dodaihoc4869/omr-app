@@ -229,13 +229,13 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
         <header className="ht-thanh tcl-dau-trang"><button type="button" className="ht-nut-phu" onClick={veDanhSach}><ArrowLeft size={18} aria-hidden="true" />Quay lại danh sách</button><strong className="tcl-dau-trang-ten">Kiểm lại câu đã sửa</strong></header>
         <main className="ht-noi-dung ht2-noi-dung tcl-noi-dung">
           <h1>{ten || 'Câu em đang sửa'}</h1>
-          <Suspense fallback={<p className="tcl-cho-mo" role="status">Đang mở câu kiểm lại…</p>}><KiemHoiThay key={chon.qid} qid={chon.qid} token={token} tuMo /></Suspense>
+          <Suspense fallback={<p className="tcl-cho-mo" role="status"><span className="chu-cho-tre">Đang mở câu kiểm lại…</span></p>}><KiemHoiThay key={chon.qid} qid={chon.qid} token={token} tuMo /></Suspense>
         </main>
       </div>
     )
     return (
       <div ref={gocRef}>
-        <Suspense fallback={<div className="ht-app ht2 tcl-man"><p className="ht-noi-dung tcl-cho-mo" role="status">Đang mở câu…</p></div>}>
+        <Suspense fallback={<div className="ht-app ht2 tcl-man"><p className="ht-noi-dung tcl-cho-mo" role="status"><span className="chu-cho-tre">Đang mở câu…</span></p></div>}>
           <ManChua
             token={token}
             qid={chon.qid}
@@ -299,7 +299,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
         {dangMoThang || !kq ? (
           <div className="tcl-bo-cuc" aria-busy="true">
             <div className="tcl-tong tcl-xuong" role="status">
-              <p className="tcl-cho-mo">{dangMoThang ? 'Đang mở câu em chọn…' : 'Đang tải câu cần sửa…'}</p>
+              <p className="tcl-cho-mo"><span className="chu-cho-tre">{dangMoThang ? 'Đang mở câu em chọn…' : 'Đang tải câu cần sửa…'}</span></p>
             </div>
             <div className="tcl-ds" aria-hidden="true">
               <div className="tcl-nhom"><div className="tcl-the tcl-xuong" /><div className="tcl-the tcl-xuong" /><div className="tcl-the tcl-xuong" /></div>

@@ -622,6 +622,60 @@ const manMotTrang = () => h(FragmentHse, null,
     onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop }),
   h(BongBongAiDdh, { auth: { token: 'tk', sbd: '12121212', hoTen: 'Nguyễn Minh Anh' }, anBong: true }))
 // ═══ hết MỘT TRANG HS 26/10
+// ═══ NGANG HS 26/10: `?man=hs-ng&v=tu-sua|kiem|lam|ai` = màn con / tấm của cổng học sinh MỞ ĐÈ lên Hôm nay «Một trang» đúng như StudentPortalScreen
+// (Hôm nay trong `<div inert>`, moDiemDanh=false khi có màn con; màn con trong `fixed inset-0 z-50 overflow-y-auto overscroll-contain`).
+//   tu-sua  Tự sửa lỗi · «Em tự làm lại câu này» (chữa câu gọn) — câu có 4 hình công thức cấu tạo (lỗi thầy chỉ 26/10: thanh «Kiểm tra» đè hình 4)
+//   kiem    Kiểm tra ôn tập (ManKiemTraCaNhan, máy giả tối thiểu)  ·  ai = tấm chat A.I Đỗ Đại Học mở sẵn (sự kiện ddh:mo-ai như mục menu)
+//   `&dd=mo` = buổi học đang mở điểm danh (vạch menu thò thẻ «Điểm danh» khi ở Hôm nay).
+import ManKiemTraCaNhanNg from '../../src/components/hoc-tap/ManKiemTraCaNhan'
+const NG_V = thamSo.get('v') ?? 'tu-sua'
+// Màn làm bài / tự sửa / Tu luyện / kiểm tra nạp tờ «Trong» riêng lúc mảnh mã chạy MÀ data-trong đã gắn (main.tsx gắn trước); trang chụp gắn data-trong
+// SAU khi nạp ⇒ nạp thẳng tờ ấy cho các cảnh học sinh này (như app thật sau khi mở màn).
+if (document.documentElement.dataset.trong === 'hs' && (man === 'hs-ng' || man.startsWith('hs12-') || man === 'lam13')) void import('../../src/styles/trong-lam-bai.css')
+const hinhCauTao = (chu: string) => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="150" viewBox="0 0 320 150"><rect width="320" height="150" fill="white"/><g stroke="black" stroke-width="2" fill="none"><polygon points="60,40 95,20 130,40 130,80 95,100 60,80"/><line x1="130" y1="40" x2="175" y2="20"/><line x1="175" y1="20" x2="215" y2="40"/><line x1="215" y1="40" x2="215" y2="80"/></g><text x="222" y="92" font-family="sans-serif" font-size="20">OH</text><text x="20" y="135" font-family="sans-serif" font-size="18">${chu}</text></svg>`)
+if (man === 'hs-ng') {
+  try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
+  const fetchNg = window.fetch
+  const buoiNg = { id: 'b1', ten: 'Buổi học 26/10/2026', lop: '12A1' }
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const duong = new URL(url, location.href).pathname
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (duong.endsWith('/hs/buoi-hoc')) return tra(thamSo.get('dd') === 'mo' ? { ok: true, buoi: { ...buoiNg, daDiemDanh: false } } : { ok: true, buoi: null })
+    if (duong.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
+    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd-ng', trangThai: 'dang_chua_buoc', coHocLieu: false })
+    if (duong.endsWith('/hs/chua-cau-sai/gon-mo')) return tra({ ok: true, dotId: 'd-ng', lan: 1, ban: 'ban-1', tuSuaNeuDung: true, de: { qid: 'DH-12-C1-B4-9', phan: 'I', tenDang: 'Đồng phân alcohol',
+      text: 'Cho bốn chất hữu cơ có công thức cấu tạo như hình dưới. Số chất thuộc loại alcohol bậc một là',
+      choices: ['1.', '2.', '3.', '4.'], hinhAnh: ['(1)', '(2)', '(3)', '(4)'].map((c) => ({ src: hinhCauTao(`Chất ${c}`), viTri: 'sau_de', alt: `Chất ${c}` })) } })
+    if (duong.endsWith('/hs/nhip-hoc')) return tra(nhipEmGia('cham'))
+    if (duong.endsWith('/notifications/list')) return tra({ ok: true, publicKey: '', items: [] })
+    if (duong.endsWith('/hs/ai-ddh/mo')) return tra({ ok: true, bat: true, khoa: null, vanPhongTruc: true, conLuot: 18, tranLuot: 20, tin: [
+      { id: 't1', ben: 'em', chu: 'Cho 5,6 gam Fe tác dụng hết với dung dịch HCl dư, thu được V lít khí H2 (đkc). Giá trị của V là?', anh: 0, trangThai: 'xong', luc: now - 600_000 },
+      { id: 't2', ben: 'vp', chu: 'Fe + 2HCl → FeCl2 + H2; n(H2) = n(Fe) = 0,1 mol ⇒ V = 0,1 × 24,79 = 2,479 lít.', anh: 0, nguon: 'kho', traLoiCho: 't1', luc: now - 540_000 },
+    ] })
+    if (duong.endsWith('/hs/ai-ddh/tin')) return tra({ ok: true, tin: [] })
+    // Kiểm tra ôn tập (ảnh thầy 26/10): 10/28 câu đã trả lời; chặng 1 ĐÃ CHỐT mà bỏ trống cả 6 câu, chặng 2 chốt đủ 8/8, chặng 3 đang 2/7 (khớp: 0 + 8 + 2 = 10);
+    // `start` chặng ⇒ 3 câu mẫu (CAU_HOC), hạn chặng 12 phút.
+    if (duong.endsWith('/game-v2/hoc-tap-ktcn-trang-thai')) return tra({ ok: true, revision: 1, kiemTra: { ...MT_KIEM, daTra: 10, con: 18, serverNow: Date.now() },
+      chang: [{ stt: 0, soCau: 6, giay: 360, han: null, daChot: true, daTra: 0 }, { stt: 1, soCau: 8, giay: 720, han: null, daChot: true, daTra: 8 },
+        { stt: 2, soCau: 7, giay: 720, han: null, daChot: false, daTra: 2 }, { stt: 3, soCau: 7, giay: 720, han: null, daChot: false, daTra: 0 }] })
+    if (duong.endsWith('/game-v2/hoc-tap-ktcn-start')) return tra({ ok: true, revision: 1, kiemTra: { ...MT_KIEM, serverNow: Date.now() }, daChot: false,
+      questions: CAU_HOC, tra: {}, hanChang: Date.now() + 720_000 })
+    if (duong.endsWith('/game-v2/hoc-tap-ktcn-luu')) return tra({ ok: true, revision: 2, kiemTra: { ...MT_KIEM, serverNow: Date.now() }, daLuu: true })
+    return fetchNg(input, init)
+  }
+  if (NG_V === 'ai') setTimeout(() => window.dispatchEvent(new Event('ddh:mo-ai')), 900)
+}
+const manNgang = () => h(FragmentHse, null,
+  h('div', { inert: NG_V !== 'ai', 'aria-hidden': NG_V !== 'ai' || undefined } as never, h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_MT } as never, dangTai: false, loi: '', coCa: false, token: 'tk',
+    moDiemDanh: NG_V === 'ai', onMoHoSo: noop, soBaiTap: 1, coBaiTap: true, onKiemTra: noop,
+    onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })),
+  NG_V === 'ai' ? h(BongBongAiDdh, { auth: { token: 'tk', sbd: '12121212', hoTen: 'Nguyễn Minh Anh' }, anBong: true })
+  : h('div', { className: 'fixed inset-0 z-50 overflow-y-auto overscroll-contain' },
+    NG_V === 'kiem' ? h(ManKiemTraCaNhanNg, { token: 'tk', sbd: '12121212', id: 'kt1', onVe: noop, onCapNhat: noop } as never)
+    : h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B4-9', tenCau: 'Đồng phân alcohol', onVe: noop })))
+// ═══ hết NGANG HS 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
 const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-toan-canh':'hocsinh', 'gv-giao-btvn':'giaobtvn', 'gv-giao-tuan':'khodegiao', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
@@ -659,6 +713,7 @@ const con =
   man === 'hs-dang-nhap' ? manDangNhapTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-mot' ? manMotTrang() : // MỘT TRANG HS 26/10
+  man === 'hs-ng' ? manNgang() : // NGANG HS 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   PH_VAO ? h(BatLinhShell, { vai: 'ph' }, h(ParentPortalScreen)) : // NGANG PH 26/10
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })

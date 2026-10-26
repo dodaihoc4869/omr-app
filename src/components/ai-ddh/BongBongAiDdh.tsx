@@ -3,7 +3,7 @@
 // Tải lười, ngoài precache; nơi gắn (StudentPortalScreen) ẩn hẳn ở màn kiểm tra / làm bài / game. Máy chủ còn khoá thêm khi em có bài kiểm tra mở.
 // HỎI MÁY CHỦ: lúc mở app 0 lệnh (cờ lớp em có bật giữ trên máy 6 giờ; cờ cũ ⇒ hỏi một lần khi máy rảnh). Tấm mở: 1 lệnh mở; đang chờ trả lời: 1,5 giây/lần
 // (và thêm 60 giây sau mỗi tin trả lời — link trang lời giải gửi tiếp); tấm mở mà không chờ: 20 giây/lần; tấm đóng mà còn câu chờ: 60 giây/lần; xong là dừng.
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Anh, ArrowRight, BookOpen, Camera, CheckCircle2, ChevronDown, ClipboardPaste, Clock, Lightbulb, Lock, MoonStar, Send, ShieldCheck, Sparkles, WifiOff, Zap } from './bieu-tuong-ai'
 import { AnhLogo } from '../LogoVai'
 import { batNhipBenVung } from '../../lib/nhip-ben-vung'
@@ -124,6 +124,7 @@ export default function BongBongAiDdh({ auth, anBong = false }: { auth: { token?
   const [truc, setTruc] = useState(true)
   const than = useRef<HTMLDivElement>(null)
   const tepChup = useRef<HTMLInputElement>(null)
+  const oGo = useRef<HTMLTextAreaElement>(null)
   const tepChon = useRef<HTMLInputElement>(null)
   const bong = useRef<HTMLDivElement>(null)
   const keo = useRef<{ dx: number; dy: number; x0: number; y0: number; da: boolean } | null>(null)
@@ -279,6 +280,13 @@ export default function BongBongAiDdh({ auth, anBong = false }: { auth: { token?
     else r.removeAttribute('data-ai-moi')
     return () => r.removeAttribute('data-ai-moi')
   }, [bat, moiChua])
+  // «Trong» (thầy 26/10: ô nhắn hơi nhỏ): ô gõ giãn theo chữ — CSS chặn trần 5 dòng rồi cuộn trong ô. Giao diện cũ giữ nguyên (một dòng).
+  useLayoutEffect(() => {
+    const o = oGo.current
+    if (!o || !document.documentElement.dataset.trong) return
+    o.style.height = 'auto'
+    o.style.height = `${o.scrollHeight}px`
+  }, [chu, mo, du])
 
   if (!bat) return null
   return (
@@ -399,7 +407,7 @@ export default function BongBongAiDdh({ auth, anBong = false }: { auth: { token?
                   <div className="aid-go">
                     <button type="button" className="aid-nut-tron" aria-label="Chụp ảnh đề" onClick={() => tepChup.current?.click()}><Camera size={22} /></button>
                     <button type="button" className="aid-nut-tron" aria-label="Chọn ảnh có sẵn" onClick={() => tepChon.current?.click()}><Anh size={22} /></button>
-                    <textarea className="aid-go-o" rows={1} placeholder="Nhắn gì cũng được…" value={chu} maxLength={4000} aria-label="Nội dung hỏi" onChange={(e) => setChu(e.target.value)}
+                    <textarea ref={oGo} className="aid-go-o" rows={1} placeholder="Nhắn gì cũng được…" value={chu} maxLength={4000} aria-label="Nội dung hỏi" onChange={(e) => setChu(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.innerWidth >= 720) { e.preventDefault(); void gui() } }} />
                     <button type="button" className="aid-nut-tron" data-gui="" aria-label="Gửi" disabled={dangGui || (!chu.trim() && !anh.length) || du.conLuot <= 0} onClick={() => void gui()}><Send size={20} /></button>
                   </div>

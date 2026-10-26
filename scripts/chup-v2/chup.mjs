@@ -266,6 +266,12 @@ const MAN_NG = [
 const DS_NG_GV = MAN_NG.flatMap(([ten, man, cho, viec]) => KHO_NG.flatMap(([w, hh, kho]) => (['ngang', 'd700'].includes(kho) ? ['light', 'dark'] : ['light']).map((nen) =>
   [`ng-${ten}-${kho}${nen === 'dark' ? '-toi' : ''}`, man, w, hh, nen, ten !== 'ho-so' && w >= 700 && hh >= 700, cho, viec])))
 // ═══ hết NGANG GV 26/10
+// ═══ NGANG HS 26/10: màn con học sinh mở đè Hôm nay (`?man=hs-ng&v=tu-sua|kiem|ai`, khối cùng tên ở trang.tsx) ở điện thoại dọc thấp / ngang / máy tính
+// bảng / máy tính, sáng + tối (ảnh khung nhìn; đo tràn ngang + vùng chạm như mọi cảnh). Tiền tố "ng-hs-".
+const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [740, 360, 'ngang740'], [1024, 768, 'bang'], [1440, 900, 'may-tinh'], [1920, 1080, 'may-tinh-1920']].flatMap(([w, hh, k]) =>
+  ['light', 'dark'].flatMap((nen) => [['tu-sua', 'hs-ng&v=tu-sua', /Em tự làm lại câu này/], ['kiem', 'hs-ng&v=kiem', /Kiểm tra ôn tập/], ['ai', 'hs-ng&v=ai', /Chào Minh Anh/]]
+    .map(([ten, m, cho]) => [`ng-hs-${ten}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho])))
+// ═══ hết NGANG HS 26/10
 
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 // ═══ MỘT TRANG PH 26/10: app phụ huynh «Một trang» (`ph&mot=1`, khối cùng tên ở trang.tsx). Ảnh KHUNG NHÌN (không toàn trang) ở 3 khổ × sáng/tối, đo KHÔNG
@@ -283,6 +289,7 @@ const DS = [
   ...DS_MOT_PH, // MỘT TRANG PH 26/10
   ...DS_T3, // «TRONG» NHÓM 3
   ...DS_MG, // MỘT TRANG GV 26/10
+  ...DS_NG_HS, // NGANG HS 26/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D
