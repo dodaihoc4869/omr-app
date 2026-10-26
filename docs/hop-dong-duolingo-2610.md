@@ -44,4 +44,7 @@ goiHoa2('hoc-tap-lam-lai', token, { session: <id phiên chặng (r.id của hoc-
 - Code app 4 báo tên lệnh chính xác trước khi đẩy. Không đụng `exp-*.ts`; phải đụng thì báo trước.
 
 ## 5. Ghi chú / phản hồi
-- (trống)
+- 26/10 Code app 1 đề nghị, Code app 4 **đồng ý** cho B3: dùng MỘT định nghĩa chuỗi, thay cả `chuoi-ngay-hoc.ts` (≥ 1 câu) lẫn chuỗi «đủ mức» của TrongHs.
+  - Một ngày được tính khi em xong ≥ 1 bài (≥ 6 câu có kết quả trong ngày), hoặc tự sửa xong ≥ 1 câu.
+  - Bình giữ chuỗi: tặng 1 bình mỗi tuần (thứ Hai), mang tối đa 2. Ngày không đạt (trừ hôm nay) tự dùng 1 bình; hết bình thì chuỗi về 0.
+  - Trả `chuoiNgay: { so, giuChuoi }` ở cả /hs (`hoc-tap-sanh`) và /ph, để cùng một số.
