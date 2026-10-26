@@ -15,7 +15,7 @@ import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { docDuongVao, laManThayQuanLy } from './lib/vai-tro'
 import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
-// CẦU NỐI Cowork `window.__ddh` nạp LƯỜI (26/10, tốc độ): mảnh của nó kéo bộ chấm + PDF bài tập (exam-grade, bai-tap-pdf…) mà màn khoá thầy
+// Cầu nối Cowork `window.__ddh` nạp LƯỜI (26/10, tốc độ): mảnh của nó kéo bộ chấm + PDF bài tập (exam-grade, bai-tap-pdf…) mà màn khoá thầy
 // không cần — chỉ tải sau khi thầy mở khoá. Gỡ chỉ là xoá `window.__ddh` (= TEN_CAU_NOI trong cau-noi-ddh.ts) ⇒ không phải tải mảnh để gỡ.
 const napCauNoi = () => import('./lib/cau-noi-ddh')
 const goCauNoi = () => { delete (window as unknown as Record<string, unknown>).__ddh }
