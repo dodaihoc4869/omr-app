@@ -859,6 +859,6 @@
    không chạm dòng chữ dưới, bốn huy hiệu ở điện thoại dọc xếp 2 × 2 (nhãn «Chưa đủ mức hôm nay» không vỡ từng từ). Chỉ trình bày, màu giữ nguyên. */
 [data-trong] .da-bai > .mot-xuong { flex: 1 1 100%; }
 [data-trong] .da-lua b { line-height: 1.2; }
-@media (max-width: 480px) {
+@media (max-width: 480px), (orientation: landscape) and (max-height: 500px) {
   [data-trong] .da-huy { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
 }
