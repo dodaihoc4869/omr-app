@@ -74,7 +74,7 @@ import { useSoDemGv, type TheHanhTrinh } from '../../src/lib/so-dem-gv'
 import { lichSuGia } from './gia/lich-su-lam-cau'
 // LÀN PHỤ HUYNH 12/10: tổng quan về con GIẢ (`/ph/con-tong-quan`).
 import { conTongQuanGia } from './gia/ph-con-tong-quan'
-// ═══ MỘT TRANG PH 26/10: bộ số giả đợt 19 (cảnh `ph&mot=1`)
+// ═══ PH CHỈ ĐỌC 26/10: bộ số giả đợt 19 (cảnh `ph&mot=1`)
 import { NAY as NAY_PH19, hoc2Gia as hoc2Ph19, lichSuGia as lichSuPh19, loiThayGia as loiThayPh19, nhipGia as nhipPh19, thaiDoGia as thaiDoPh19, tatCaGia as tatCaPh19, tongQuanGia as tongQuanPh19 } from '../chup-ph-dot19/gia'
 // LÀN GIÁO VIÊN 12/10: `gv-nhip&the=bai-hang-ngay` = Hành trình › Bài hằng ngày (bảng nhiệt), bấm một em ⇒ tấm Hồ sơ làm bài (gia/bai-hang-ngay.ts).
 import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
@@ -114,9 +114,11 @@ const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
 // Như main.tsx: giao diện «Trong» (26/10) — cảnh thầy `gv…` = 'gv', cảnh phụ huynh không bật, còn lại (học sinh, màn thi) = 'hs'. `&trong=tat` ⇒ giao diện cũ.
 if (man !== 'ph' && !man.startsWith('ph-') && thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = man.startsWith('gv') ? 'gv' : 'hs'
-// ═══ MỘT TRANG PH 26/10: `?man=ph&mot=1` = app phụ huynh «Một trang» (bật bằng <html data-trong="ph"> như main.tsx; cảnh `ph` cũ KHÔNG có `mot` ⇒ giữ y
-// như trước, không data-trong). Số = bộ GIẢ đợt 19 (scripts/chup-ph-dot19/gia.ts: 21:05 Thứ Tư 14/10/2026, con «Nguyễn Minh Khôi») + Báo cáo tuần GIẢ
-// + một cảnh báo của thầy (`/ph/ke-hoach`, cần liên kết riêng ⇒ ghi mã giả vào máy). `&cb=0` ⇒ không cảnh báo. Đồng hồ trang = mốc của bộ giả.
+// ═══ PH CHỈ ĐỌC 26/10 (thay khối MỘT TRANG PH): `?man=ph&mot=1` = app phụ huynh «Chỉ đọc» (DocPh.tsx; bật bằng <html data-trong="ph"> như main.tsx;
+// cảnh `ph` cũ KHÔNG có `mot` ⇒ giữ y như trước, không data-trong). Số = bộ GIẢ đợt 19 (scripts/chup-ph-dot19/gia.ts: 21:05 Thứ Tư 14/10/2026, con
+// «Nguyễn Minh Khôi», hôm nay 18/30, nhóm Chưa đều) + Báo cáo tuần GIẢ (Học thật) + một cảnh báo của thầy (`/ph/ke-hoach`). Biến thể (`bienThePh`):
+//   `&hn=chua|dang|du` hôm nay 0 · 18 · 31/30 câu · `&nhom=luoi|cham` · `&dg=doi-pho|hoc-that|khong` (chưa có đánh giá) · `&cb=0` không cảnh báo
+//   · `&lt=0` thầy chưa gửi nhận xét · `&dai=1` dữ liệu dài (tên dài, lời thầy dài, số lớn). Đồng hồ trang = mốc của bộ giả.
 const MOT_PH = man === 'ph' && thamSo.get('mot') === '1'
 const traMotPh = (duong: string): unknown => {
   if (duong.endsWith('/ph/nhip-hoc')) return nhipPh19()
@@ -130,13 +132,44 @@ const traMotPh = (duong: string): unknown => {
   if (duong.endsWith('/ph/ke-hoach')) return { ok: true, canhBaoThay: thamSo.get('cb') === '0' ? [] : [{ id: 'cb-mot-ph', maBtvn: 'BT-1', tenBtvn: 'Ester – Lipid buổi 3', guiLuc: '2026-10-14T12:30:00Z', hanNop: '2026-10-15T15:00:00Z', loi: '', trangThaiEm: 'do_chang', chang: { hienTai: 3, tong: 5 } }] }
   return null
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const bienThePh = (duong: string, r: any): unknown => {
+  const hn = thamSo.get('hn'), nhom = thamSo.get('nhom'), dg = thamSo.get('dg'), dai = thamSo.get('dai') === '1'
+  const lam = hn === 'chua' ? 0 : hn === 'du' ? 31 : null
+  if (duong.endsWith('/ph/con-tong-quan')) {
+    const n = r.ngay[r.ngay.length - 1]
+    if (lam !== null) {
+      Object.assign(n, { daLam: lam, soCau: lam, dung: lam ? 24 : 0, sai: lam ? lam - 24 : 0, trangThai: lam ? 'du' : 'khong' })
+      r.dem.homNay = { ...r.dem.homNay, soLuot: lam, soCau: lam, dung: n.dung, sai: n.sai, giayTb: lam ? 41 : null }
+    }
+    if (dai) r.cauSai = { ...r.cauSai, tong: 12456, daSua: 34 }
+  }
+  if (duong.endsWith('/ph/hoc-2') && lam !== null) r.homNay = { ...r.homNay, daLam: lam }
+  if (duong.endsWith('/ph/tat-ca-ve-con') && dai) r.hoTen = 'Nguyễn Hoàng Bảo Ngọc Phương Thảo Khánh Linh'
+  if (duong.endsWith('/ph/nhip-hoc') && (nhom === 'luoi' || nhom === 'cham')) {
+    Object.assign(r, nhom === 'luoi'
+      ? { nhom: 'luoi', soNgayDu: 4, viecTiep: { loai: 'thoat-luoi', coNgay: 0, canNgay: 6, cauConHomNay: 30, homNayDu: false } }
+      : { nhom: 'cham', soNgayDu: 12, viecTiep: { loai: 'giu-chuoi', cauConHomNay: 0, homNayDu: true, chuoiNeuDu: 7 } })
+    r.bacCham = { ...(r.bacCham ?? { diem: 0 }), bac: nhom === 'luoi' ? 3 : 10 }
+  }
+  if (duong.endsWith('/ph/bao-cao-tuan') && dg) {
+    r.duLieu = dg === 'khong' ? { ...r.duLieu, nhan: null }
+      : dg === 'doi-pho' ? { ...r.duLieu, nhan: 'Đối phó', mucLam: { thuoc: 20, bamVoi: 21, treo: 3, doDuoc: 120 }, lyDo: ['x'] }
+      : { ...r.duLieu, nhan: 'Học thật', mucLam: { thuoc: 126, bamVoi: 8, treo: 0, doDuoc: 180 } }
+  }
+  if (duong.endsWith('/ph/loi-thay')) {
+    if (thamSo.get('lt') === '0') r.nhanXet = []
+    else if (dai) r.nhanXet[0].noiDung = 'Bài Ester 25/10 con sai 3/5 câu gọi tên muối. Con nhớ công thức nhưng đọc nhầm gốc acid, nhất là các ester có gốc acid mạch nhánh. Tuần này con làm thêm 10 câu gọi tên ester, thứ Bảy Thầy kiểm tra lại; anh/chị nhắc con làm đủ trước tối thứ Sáu và ghi lại những câu còn nhầm để hỏi Thầy trên lớp.'
+  }
+  return r
+}
 if (MOT_PH) {
   if (thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = 'ph'
   try { localStorage.setItem('omr_ph_pass', 'ma-gia-chup') } catch { /* bỏ qua */ }
   const dau = performance.now()
   Date.now = () => NAY_PH19 + (performance.now() - dau)
 }
-// ═══ hết MỘT TRANG PH 26/10
+// ═══ hết PH CHỈ ĐỌC 26/10
 // ═══ NGANG PH 26/10: `?man=ph-vao` = màn đăng nhập phụ huynh như app thật (<html data-trong="ph">, vỏ BatLinhShell vai ph). `&bl=1` trên cảnh
 // `ph&mot=1` ⇒ giữ body[data-bat-linh="ph"] như app thật (vỏ Bát Linh đổi bảng --ph3-*; cảnh cũ bỏ thuộc tính này).
 import ParentPortalScreen from '../../src/screens/ParentPortalScreen'
@@ -246,7 +279,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.endsWith('/gv/nut-that/ds')) return tra(NUT_THAT_GIA)
   // «Trong» nhóm 4: Duyệt lời giải mở sẵn đề 12-KT-C1-D4 (28 câu: 15 đã duyệt · 9 chờ duyệt, 5 sạch · 2 máy đang soạn · 2 chờ sửa kho)
   if (u.pathname.endsWith('/gv/loi-giai/cho-duyet')) return tra({ ok: true, maDe: '12-KT-C1-D4', cau: cauDuyetGia(), tong: { cau: 28, daDuyet: 15, choDuyet: 9, sach: 5, dangSoan: 2, traLai: 0, truot: 2, chuaCoBo: 0 } })
-  if (MOT_PH) { const r = traMotPh(u.pathname); if (r) return tra(r) } // ═══ MỘT TRANG PH 26/10
+  if (MOT_PH) { const r = traMotPh(u.pathname); if (r) return tra(bienThePh(u.pathname, r)) } // ═══ PH CHỈ ĐỌC 26/10
   // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): `/ph/con-tong-quan` GIẢ — `&tq=loi` ⇒ máy chủ lỗi (khối Gợi ý nhắc con hiện lý do + Thử lại).
   if (u.pathname.endsWith('/ph/con-tong-quan')) return thamSo.get('tq') === 'loi'
     ? new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Anh/chị thử lại sau ít phút.' }), { status: 500, headers: { 'content-type': 'application/json' } })

@@ -38,12 +38,12 @@ import ManLoiThay from './ManLoiThay'
 const ManChiTietCa = lazy(() => import('./ManChiTietCa'))
 const ManTienBo = lazy(() => import('./ManTienBo'))
 const ManDiemSo = lazy(() => import('./ManDiemSo'))
-// «MỘT TRANG» (thầy chốt 26/10, MotTrangPh.tsx): main.tsx gắn <html data-trong="ph"> (lùi một máy: localStorage ddh.trong='tat' ⇒ trang cũ y như trước,
-// không tải mảnh này). Bật ⇒ mảnh màn một trang tải NGAY lúc mô-đun này chạy (song song các lệnh lúc mở); tải hỏng ⇒ vẽ trang cũ.
-type ModMot = typeof import('./MotTrangPh')
+// «CHỈ ĐỌC» (thầy chốt bản vẽ 26/10, DocPh.tsx — thay màn «Một trang» 8 ô): main.tsx gắn <html data-trong="ph"> (lùi một máy: localStorage
+// ddh.trong='tat' ⇒ trang cũ y như trước, không tải mảnh này). Bật ⇒ mảnh màn chỉ đọc tải NGAY lúc mô-đun này chạy (song song các lệnh lúc mở); tải hỏng ⇒ vẽ trang cũ.
+type ModMot = typeof import('./DocPh')
 const laMotTrang = (): boolean => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'ph'
 let huaMot: Promise<ModMot | null> | null = null
-const napMot = (): Promise<ModMot | null> => (huaMot ??= import('./MotTrangPh').catch(() => ((huaMot = null), null)))
+const napMot = (): Promise<ModMot | null> => (huaMot ??= import('./DocPh').catch(() => ((huaMot = null), null)))
 if (laMotTrang()) void napMot()
 /** Số lượt làm câu tối đa tải cho phần "Số giây theo mức độ câu" (câu sai và tổng thì máy chủ tính trên mọi lượt). */
 const GIOI_HAN_LUOT = 600

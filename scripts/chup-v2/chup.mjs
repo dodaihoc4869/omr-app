@@ -274,19 +274,23 @@ const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], 
 // ═══ hết NGANG HS 26/10
 
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
-// ═══ MỘT TRANG PH 26/10: app phụ huynh «Một trang» (`ph&mot=1`, khối cùng tên ở trang.tsx). Ảnh KHUNG NHÌN (không toàn trang) ở 3 khổ × sáng/tối, đo KHÔNG
-// CUỘN (scrollHeight ≤ innerHeight, scrollWidth ≤ innerWidth — vượt ⇒ ghi vào «Tràn ngang», thoát mã 1) và chữ bị cắt trong ô; tấm mở từ ô; `trong=tat` ⇒ trang cũ.
-// Chạy riêng: tiền tố "6" (60-, 61-, 62-).
-const DS_MOT_PH = [
-  ...[[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => ['light', 'dark'].map((nen) => [`60-ph-mot-trang-${k}-${nen === 'dark' ? 'toi' : 'sang'}`, 'ph&mot=1', w, h, nen, false, /Hôm nay của con/, 'mtp:'])),
-  ...[[390, 844, 'doc'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => [['hom', 'Hôm nay của con'], ['nhip', 'Nhịp học'], ['thai-do', 'Thái độ làm bài'], ['kiem-tra', 'Kiểm tra và tiến bộ']].map(([id, chu]) => [`61-ph-mot-tam-${id}-${k}`, 'ph&mot=1', w, h, 'light', false, /Hôm nay của con/, `mtp:${chu}`])),
-  ['61-ph-mot-tam-btvn-ngang-toi', 'ph&mot=1', 844, 390, 'dark', false, /Hôm nay của con/, 'mtp:Bài tập về nhà'],
-  ['62-ph-mot-trang-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/],
-  ['62-ph-mot-trang-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/],
+// ═══ PH CHỈ ĐỌC 26/10 (thay khối MỘT TRANG PH): app phụ huynh «Chỉ đọc» (`ph&mot=1`, khối cùng tên ở trang.tsx). Ảnh KHUNG NHÌN ở 3 khổ × sáng/tối cho
+// ba trạng thái: chưa làm + Lười + đối phó + thầy chưa nhận xét · đang làm (bộ gốc: Chưa đều, Học thật, cảnh báo thầy) · đủ + Chăm + học thật; thêm khổ
+// 390×700 · 360×640 · 1024×768 · 1920×1080, dữ liệu dài (`dai=1`), chưa có đánh giá (`dg=khong`). Đo trang cuộn / tràn ngang (`pd:`): ba khổ chính phải
+// vừa một màn; khổ thấp hơn được cuộn (không cắt chữ). `trong=tat` ⇒ trang cũ. Chạy riêng: tiền tố "6" (60-, 61-, 62-).
+const CANH_PD = [['chua', 'hn=chua&nhom=luoi&dg=doi-pho&lt=0&cb=0'], ['dang', ''], ['du', 'hn=du&nhom=cham&dg=hoc-that&cb=0']]
+const DS_PH_DOC = [
+  ...CANH_PD.flatMap(([tt, q]) => [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => ['light', 'dark'].map((nen) =>
+    [`60-ph-doc-${tt}-${k}-${nen === 'dark' ? 'toi' : 'sang'}`, `ph&mot=1${q ? '&' + q : ''}`, w, h, nen, false, /Hôm nay/, 'pd:3'])))
+  ,...[[390, 700], [360, 640], [1024, 768], [1920, 1080], [740, 360]].map(([w, h]) => [`61-ph-doc-dang-${w}x${h}`, 'ph&mot=1', w, h, 'light', false, /Hôm nay/, 'pd:'])
+  ,['61-ph-doc-dai-doc', 'ph&mot=1&dai=1&cb=0&dg=doi-pho&nhom=luoi', 390, 844, 'light', true, /Hôm nay/, 'pd:']
+  ,['61-ph-doc-chua-danh-gia-doc', 'ph&mot=1&dg=khong&lt=0&cb=0', 390, 844, 'light', false, /Hôm nay/, 'pd:3']
+  ,['62-ph-doc-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/]
+  ,['62-ph-doc-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/]
 ]
 const DS = [
   ...DS_NG_GV, // NGANG GV 26/10
-  ...DS_MOT_PH, // MỘT TRANG PH 26/10
+  ...DS_PH_DOC, // PH CHỈ ĐỌC 26/10
   ...DS_T3, // «TRONG» NHÓM 3
   ...DS_MG, // MỘT TRANG GV 26/10
   ...DS_NG_HS, // NGANG HS 26/10
@@ -461,26 +465,13 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     } else if (viec?.startsWith('hs:')) {
       await t.getByRole('navigation', { name:'Điều hướng chính' }).getByRole('button', { name:viec.slice(3),exact:true }).click()
       await t.getByRole('heading', { name:new RegExp(viec.slice(3)) }).first().waitFor()
-    } else if (viec?.startsWith('mtp:')) {
-      // ═══ MỘT TRANG PH 26/10: chờ số lúc rảnh về (ô Thái độ hết «Đang tải…»), đo không cuộn + chữ bị cắt trong ô; `mtp:<tên ô>` ⇒ bấm ô / lối vào, chờ tấm.
-      await t.locator('.mtp-o[data-o="thai-do"] .mtp-thanh-3').waitFor({ state: 'attached', timeout: 20000 })
-      await t.waitForTimeout(600)
-      const d = await t.evaluate(() => {
-        const e = document.documentElement
-        const cat = [...document.querySelectorAll('.mtp-o')].flatMap((o) => {
-          const b = o.getBoundingClientRect()
-          return [...o.querySelectorAll('p, h2, dl, ol, .mtp-so, .mtp-thanh-3, .mtp-cot, .mtp-canh-bao')].filter((c) => c.getBoundingClientRect().height > 0 && c.getBoundingClientRect().bottom > b.bottom - 4).map((c) => `${o.getAttribute('data-o')}: «${(c.textContent || '').trim().slice(0, 24)}»`)
-        })
-        return { cao: e.scrollHeight, khung: innerHeight, rong: e.scrollWidth, khungRong: innerWidth, cat }
-      })
-      console.log(`${ten}: trang cao ${d.cao}/${d.khung} · rộng ${d.rong}/${d.khungRong} · chữ bị cắt trong ô: ${d.cat.length ? d.cat.join(' | ') : 0}`)
-      if (d.cao > d.khung || d.rong > d.khungRong) tran.push(`${ten}: CUỘN — cao ${d.cao}/${d.khung}, rộng ${d.rong}/${d.khungRong}`)
-      const o = viec.slice(4)
-      if (o) {
-        await t.getByRole('button', { name: new RegExp(`^(Mở )?${o}`) }).first().click({ timeout: 20000 })
-        await t.getByRole('dialog', { name: new RegExp(o) }).waitFor({ timeout: 20000 })
-        await t.waitForTimeout(900)
-      }
+    } else if (viec?.startsWith('pd:')) {
+      // ═══ PH CHỈ ĐỌC 26/10: chờ 7 ngày + nhóm + Báo cáo tuần về, đo cuộn / tràn ngang. `pd:3` = khổ phải vừa một màn (cuộn ⇒ ghi vào «Tràn ngang»).
+      await t.locator('[data-vung="ph-chi-doc"] .pd-7').waitFor({ state: 'attached', timeout: 20000 })
+      await t.waitForTimeout(1200)
+      const d = await t.evaluate(() => ({ cao: document.documentElement.scrollHeight, khung: innerHeight, rong: document.documentElement.scrollWidth, khungRong: innerWidth }))
+      console.log(`${ten}: trang cao ${d.cao}/${d.khung} · rộng ${d.rong}/${d.khungRong}`)
+      if (d.rong > d.khungRong || (viec === 'pd:3' && d.cao > d.khung)) tran.push(`${ten}: ${d.cao > d.khung ? 'CUỘN' : 'TRÀN'} — cao ${d.cao}/${d.khung}, rộng ${d.rong}/${d.khungRong}`)
     } else if (viec?.startsWith('ph:')) {
       const [,hash,chu] = viec.split(':')
       await t.evaluate(h => {location.hash=h}, hash)
