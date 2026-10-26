@@ -126,7 +126,7 @@ describe('một trang đủ mọi phần, theo bản vẽ', () => {
     const bac = hn.querySelector('[data-vung="bac-hom-nay"]')!
     expect(bac.tagName).toBe('BUTTON') // bấm ⇒ tấm 12 bậc của làn M
     expect(bac.textContent).toMatch(/^Bậc 7\/12 · Đại Sư Cân Bằng/)
-    expect(bac.textContent).toMatch(/Nhóm Chưa đều · Điểm chăm \d+\/100 · Chuỗi đủ mức 3 ngày/)
+    expect(bac.textContent!.replace(/\u00a0/g, ' ')).toMatch(/Nhóm Chưa đều · Điểm chăm \d+\/100 · Chuỗi đủ mức 3 ngày/)
     expect(bac.querySelector('svg.bcc-hh')).toBeTruthy() // huy hiệu vẽ riêng (HuyHieuBac)
   })
 

@@ -224,3 +224,6 @@ button.tvc-hn-bac { cursor: pointer; background: color-mix(in oklch, var(--bac) 
 @media (prefers-reduced-motion: reduce) { .tvc-muc-luc { scroll-behavior: auto; } }
 /* SOÁT 26/10 (giao diện cũ phụ huynh): tên con + lớp ở thanh đầu không cắt «…» ở 360 px — xuống dòng (thầy: không cắt chữ để vừa). */
 .ph3-dau__ten b { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+/* SOÁT 26/10 (giao diện cũ phụ huynh, cột hẹp — điện thoại ngang): ba ô số tự xuống hàng thay vì ép chữ mỗi từ một dòng; nhãn ngày «CN 04» được xuống dòng thay vì thò khỏi ô */
+@media (min-width: 600px) { .tvc-luoi-so { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } }
+.tvc-o-ngay small { white-space: normal; text-align: center; }
