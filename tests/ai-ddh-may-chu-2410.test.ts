@@ -165,6 +165,20 @@ describe('ảnh tải trước', () => {
     for (const k of khoa) { const r = await gv(env, '/gv/ai-ddh/anh', { khoa: k }); expect(r.ok).toBe(true); expect(String(r.base64).length).toBeGreaterThan(0) }
     expect((await gv(env, '/gv/ai-ddh/anh', { khoa: 'ai-ddh/A1/anh-00002-123.jpg' })).ok).toBe(false)
   })
+
+  // 26/10 (Javis DDH): ảnh MỘT chữ số (-9) vẫn tải được; số lớn nhất đường cũ kèm thân (16 + 8 − 1 = 23) qua khâu kiểm khoá (chưa có ảnh ⇒ «Không thấy ảnh», không phải «Khoá ảnh không hợp lệ»).
+  it('văn phòng tải được ảnh số 9; khoá -23.jpg qua kiểm khoá', async () => {
+    const d = taoD1That()
+    d.sql.prepare('INSERT INTO hoc_sinh (sbd, ho_ten, lop, mat_khau, cap_nhat_luc) VALUES (?,?,?,?,?)').run('A1', 'Nguyễn Văn An', '12', 'mk123456', 'x')
+    const env = d.env as unknown as Env
+    await gv(env, '/gv/ai-ddh/che-do', { cheDo: 'bat' })
+    const token = await gameToken(env, 'A1')
+    expect(await hsAnhAiDdh(env, { token, maTin: 'anh-00009', so: 9, anh: btoa('JPEGDATA') })).toEqual({ ok: true })
+    const r9 = await gv(env, '/gv/ai-ddh/anh', { khoa: 'ai-ddh/A1/anh-00009-9.jpg' })
+    expect(r9.ok).toBe(true)
+    expect(String(r9.base64).length).toBeGreaterThan(0)
+    expect(await gv(env, '/gv/ai-ddh/anh', { khoa: 'ai-ddh/A1/anh-00009-23.jpg' })).toMatchObject({ ok: false, error: 'Không thấy ảnh.' })
+  })
 })
 
 // 25/10 tối (thầy: "tối ưu chuyên sâu tốc độ tức thì cho a.i trên app hs"): chữ hiện dần + giữ đường.
