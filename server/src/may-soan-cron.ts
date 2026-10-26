@@ -112,6 +112,8 @@ async function cauSuaTiep(env: Env, sau: string): Promise<string[]> {
 }
 
 const RE_HAN_MUC = /\bHTTP (429|503)\b/
+/** Cùng mẫu `RE_QID` của soan-so-do.ts (`docThamSo`): một qid sai mẫu làm CẢ lô `qids` trả 400 ⇒ lọc trước, qid sai mẫu bị bước qua. */
+const RE_QID = /^[A-Za-z0-9][A-Za-z0-9._~:-]{0,120}$/
 const ngan = (s: string) => s.replace(/\s+/g, ' ').slice(0, 160)
 
 /**
@@ -156,11 +158,16 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
       gioiHan: GIOI_HAN_MOI_LUOT, nganSachGiay: NGAN_SACH_GIAY, songSong: caoDiem ? 1 : SONG_SONG, choChayGioCaoDiem: true, tuSuaDapAn: tuSua,
     }
     let qidsSua: string[] | null = null
+    let cuoiTrang = ''
+    let goi = true
     if (vong === 'sua') {
-      qidsSua = await cauSuaTiep(env, conTro)
-      if (!qidsSua.length) { vong = 'xong'; conTro = ''; lyDo = 'đã soạn hết kho và xong vòng sửa' }
+      const trang = await cauSuaTiep(env, conTro)
+      qidsSua = trang.filter((q) => RE_QID.test(q))
+      if (!trang.length) { vong = 'xong'; conTro = ''; lyDo = 'đã soạn hết kho và xong vòng sửa'; goi = false }
+      else if (!qidsSua.length) { conTro = trang[trang.length - 1]!; goi = false } // cả trang là qid sai mẫu ⇒ bước qua, không gọi
+      else cuoiTrang = trang[trang.length - 1]!
     }
-    if (vong !== 'xong') {
+    if (goi) {
       const soanLo = phu.soanLo ?? (await import('./soan-so-do')).soanSoDoLo
       const thamSo = vong === 'sua' ? { ...thamChung, qids: qidsSua, chiSuaLoi: true } : { ...thamChung, conTro }
       let r: Response | null = null
@@ -180,6 +187,8 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
         const tatCaLoiGoi = ketQua.length > 0 && ketQua.every((k) => k.ket === 'loi_goi')
         if (!r.ok || body?.ok !== true) {
           if (r.status === 429 || r.status === 503) soLoi++
+          // Vòng sửa: lô bị từ chối vì lý do khác hạn mức (vd 400) ⇒ bước qua lô, không kẹt mãi một chỗ.
+          else if (vong === 'sua' && cuoiTrang) conTro = cuoiTrang
           lyDo = `máy soạn trả HTTP ${r.status}${typeof body?.ma === 'string' ? ` (${ngan(body.ma)})` : ''}`
         } else {
           const d = (body.dem ?? {}) as Obj
@@ -191,9 +200,10 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
           if (vong === 'chinh') {
             if (xong) { vong = 'sua'; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, sang vòng sửa câu lệch' } else conTro = String(body.conTro ?? conTro)
           } else if (qidsSua) {
-            // conTro của soanSoDoLo là «#n» trong danh sách qids vừa truyền ⇒ đổi ra qid cuối đã xử lý.
-            const n = xong ? qidsSua.length : /^#\d+$/.test(String(body.conTro ?? '')) ? Number(String(body.conTro).slice(1)) : 0
-            if (n > 0) conTro = qidsSua[Math.min(n, qidsSua.length) - 1]!
+            // conTro của soanSoDoLo là «#n» trong danh sách qids vừa truyền ⇒ đổi ra qid cuối đã xử lý; xong cả lô ⇒ qid cuối TRANG (kể cả qid sai mẫu ở đuôi).
+            const n = /^#\d+$/.test(String(body.conTro ?? '')) ? Number(String(body.conTro).slice(1)) : 0
+            if (xong) conTro = cuoiTrang || conTro
+            else if (n > 0) conTro = qidsSua[Math.min(n, qidsSua.length) - 1]!
           }
         }
       }

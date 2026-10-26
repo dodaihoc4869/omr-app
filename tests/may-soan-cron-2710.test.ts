@@ -132,6 +132,42 @@ describe('vòng và con trỏ', () => {
   })
 })
 
+describe('vòng sửa: qid sai mẫu của máy soạn', () => {
+  it('qid sai mẫu bị lọc (không làm cả lô 400), vòng sửa vẫn tới xong; trang toàn qid sai mẫu ⇒ bước qua không gọi', async () => {
+    datCo({ bat: true })
+    d.sql.prepare("UPDATE may_soan_trang_thai SET vong = 'sua', con_tro = '' WHERE id = 1").run()
+    const ghi = (qid: string) => d.sql.prepare(`INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, cong, tao_luc, cap_nhat_luc)
+      VALUES (?, 'DE', 'v', 1, '{}', 'lech', 'x', 'x')`).run(qid)
+    for (const q of ['q01', 'Đề x-III-1', 'q03']) ghi(q) // chữ có dấu + khoảng trắng: sai mẫu RE_QID
+    const s = soanGia((t) => tra({ ok: true, xong: true, conTro: '', dem: { lech: (t.qids as string[]).length }, ketQua: [] }))
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: s.fn })
+    expect(s.goi[0]!.qids).toEqual(['q01', 'q03'])
+    expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: 'Đề x-III-1' }) // xong cả lô ⇒ con trỏ = qid cuối TRANG (chữ có dấu xếp sau 'q')
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM + 60_000, { soanLo: s.fn })
+    expect(trangThai().vong).toBe('xong')
+    // trang chỉ toàn qid sai mẫu
+    d.sql.prepare("UPDATE may_soan_trang_thai SET vong = 'sua', con_tro = 'q03' WHERE id = 1").run()
+    ghi('zz_xau 1')
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM + 120_000, { soanLo: s.fn })
+    expect(s.goi).toHaveLength(1)
+    expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: 'Đề x-III-1' }) // trang ['zz_xau 1', 'Đề x-III-1'] toàn sai mẫu
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM + 180_000, { soanLo: s.fn })
+    expect(trangThai().vong).toBe('xong')
+  })
+
+  it('vòng sửa: lô bị từ chối 400 ⇒ bước qua lô, không kẹt; không tính là lỗi hạn mức', async () => {
+    datCo({ bat: true })
+    d.sql.prepare("UPDATE may_soan_trang_thai SET vong = 'sua', con_tro = '' WHERE id = 1").run()
+    d.sql.prepare(`INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, cong, tao_luc, cap_nhat_luc) VALUES ('q01', 'DE', 'v', 1, '{}', 'lech', 'x', 'x')`).run()
+    const s = soanGia(() => tra({ ok: false, error: 'qid không hợp lệ' }, 400))
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: s.fn })
+    expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: 'q01', so_loi_lien_tiep: 0 })
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM + 60_000, { soanLo: s.fn })
+    expect(trangThai().vong).toBe('xong')
+    expect(s.goi).toHaveLength(1)
+  })
+})
+
 describe('tự hãm', () => {
   it('3 lượt lỗi 429 ⇒ nghỉ 30 phút; hết nghỉ mà lỗi tiếp ⇒ nghỉ tiếp; lượt soạn được ⇒ về 0', async () => {
     datCo({ bat: true })
