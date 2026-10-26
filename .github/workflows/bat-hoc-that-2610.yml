@@ -1,0 +1,36 @@
+# BẬT CÔNG TẮC HỌC THẬT · ĐỐI PHÓ (thầy 26/10: «Bật luôn công tắc học thật nhé»). Phiên Claude trên đám mây không gọi được API Cloudflare
+# ⇒ ghi qua đây. Chỉ ghi MỘT dòng cấu hình `cau_hinh.danh_gia_hoc_that` = "bat" (UPSERT theo khoá) — không đụng dữ liệu học sinh, không đụng
+# công tắc A.I. Đọc giá trị trước và sau khi ghi. Đổi lại bất cứ lúc nào ở app thầy: Học sinh › Xếp học sinh: Học thật · Đối phó (Tắt / Chạy ngầm / Bật).
+name: Bật công tắc Học thật · Đối phó (26/10)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-einstein-7jkysb]
+    paths: ['.github/workflows/bat-hoc-that-2610.yml']
+permissions:
+  contents: read
+concurrency:
+  group: bat-hoc-that-2610
+  cancel-in-progress: false
+jobs:
+  bat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc, ghi «bat», đọc lại
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          echo "TRƯỚC:"; npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa = 'danh_gia_hoc_that'"
+          NAY="strftime('%Y-%m-%dT%H:%M:%fZ','now')"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('danh_gia_hoc_that', '\"bat\"', $NAY) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc;" > /tmp/ghi.json
+          python3 -c "import json;d=json.load(open('/tmp/ghi.json'));print('ghi:', [x.get('success') for x in d])"
+          echo "SAU:"; npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa = 'danh_gia_hoc_that'"
