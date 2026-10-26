@@ -58,3 +58,10 @@
 [data-trong='gv'] .ct-mo-ca .ct-dong-thoi b { font-size: 14px; font-weight: 600; color: var(--tr-chu); }
 [data-trong='gv'] .ct-mo-ca .ct-ve .cuoi { padding: 0 20px 20px; }
 [data-trong='gv'] .ct-mo-ca .ct-xem-truoc > :not(.ct-ve) { border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+/* NGANG GV 26/10: 700–1040 (điện thoại ngang, máy tính bảng) — trước đây cột Xem trước rơi xuống dưới, phải cuộn dài mới thấy nút mở ca ⇒ giữ hai cột,
+   cột Xem trước hẹp lại 280 px */
+@media (min-width: 700px) and (max-width: 1040px) {
+  [data-trong='gv'] .ct-mo-ca .ct-moca { grid-template-columns: minmax(0, 1fr) minmax(250px, 280px); gap: 16px; }
+}
+/* NGANG GV 26/10 (luật «không cắt chữ»): dòng phụ của thước 4 bước («Thầy công bố s…») bị cắt «…» ở khổ hẹp ⇒ xuống dòng, đủ chữ */
+[data-trong='gv'] .ct-mo-ca .ct-buoc-chu :is(b, span) { overflow: visible; white-space: normal; text-overflow: clip; }

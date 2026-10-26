@@ -67,3 +67,9 @@
   [data-trong='gv'] .tc .tc-viec { grid-template-columns: 44px 8px minmax(0, 1fr); gap: 10px; }
   [data-trong='gv'] .tc .tc-viec-gio { grid-column: auto; padding-top: 2px; }
 }
+/* NGANG GV 26/10 (luật «không cắt chữ»): hàng lọc Dòng thời gian (9 thẻ) cuộn ngang, thẻ cuối bị cắt ở mép ⇒ xuống dòng, đủ thẻ; điện thoại: bỏ gợi ý phím
+   «Enter · mở toàn cảnh» trong ô tìm (bàn phím cảm ứng) — nó đè mất chữ gợi ý «Gõ tên hoặc số báo danh…» */
+[data-trong='gv'] .tc .tc-dong .tl-hang { flex-wrap: wrap; overflow-x: visible; }
+@media (max-width: 600px) {
+  [data-trong='gv'] .tc .tc-tim .hn2-tim-phim { display: none; }
+}

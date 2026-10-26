@@ -215,7 +215,7 @@ export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHo
         </section>
       )}
 
-      {ket === undefined && <p className="hn2-trong" role="status">Đang tải toàn cảnh của em…</p>}
+      {ket === undefined && <p className="hn2-trong cho-tre" role="status">Đang tải toàn cảnh của em…</p>}
       {ket && !ket.ok && (
         <p className={`hn2-ghi-chu${ket.loai === 'chua_co_lenh' ? '' : ' hn2-ghi-chu--canh'}`} role={ket.loai === 'chua_co_lenh' ? 'status' : 'alert'}>
           <Info size={16} aria-hidden="true" />

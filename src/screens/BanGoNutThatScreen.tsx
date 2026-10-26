@@ -90,7 +90,7 @@ export default function BanGoNutThatScreen({ nhung = false, chonDau = null }: { 
       )}
 
       {bao && <p className="gv2-nhat" role="status">{bao}</p>}
-      {dangTai && !kq && <p className="gv2-nhat" role="status">Đang tải thẻ nút thắt…</p>}
+      {dangTai && !kq && <p className="gv2-nhat cho-tre" role="status">Đang tải thẻ nút thắt…</p>}
       {kq && !kq.ok && (
         <div className="gv2-loi" role="alert">
           {kq.error ?? 'Chưa tải được thẻ nút thắt.'}

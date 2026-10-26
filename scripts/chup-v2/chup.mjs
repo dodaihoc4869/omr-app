@@ -250,6 +250,23 @@ const DS_MG = [
 ]
 // ═══ hết MỘT TRANG GV 26/10
 
+// ═══ NGANG GV 26/10: mọi màn app thầy ở điện thoại ngang (844×390, 740×360 — dải biểu tượng thay thanh trên + đáy), máy tính bảng 1024×768, máy rộng
+// 1920×1080 (khung nới 1480) và điện thoại thấp 390×700 / 360×640 (luật «không cắt chữ để ép vừa khung») — sáng; ngang + 390×700 thêm tối. Tiền tố "ng-".
+const KHO_NG = [[844, 390, 'ngang'], [740, 360, 'ngang740'], [1024, 768, '1024'], [1920, 1080, '1920'], [390, 700, 'd700'], [360, 640, 'd640']]
+const MAN_NG = [
+  ['hom-nay', 'gv-hom-nay&nh=1', /Hôm nay của thầy/, 'hn:cho'], ['hom-nay-0', 'gv-hom-nay&nh=1&ca=0', /Hôm nay của thầy/, 'hn:cho'],
+  ['ca-kt', 'gv-lich-su-ca&mo=1', /Ca kiểm tra/], ['ca-kt-nhieu', 'gv-lich-su-ca&mo=1&ca=nhieu', /Ca kiểm tra/],
+  ['hanh-trinh', 'gv-nhip&ht2=1', /Hành trình giỏi Hóa/, 'cho:Kiểm tra ôn tập'], ['diem-danh', 'gv-nhip&ht2=1&dd12c=1', /Hành trình giỏi Hóa/, 'dd12c:buoc1'],
+  ['len-bang', 'gv-len-bang&ht2=1', /./, 'tab:Kiểm tra đầu giờ'], ['chieu', 'gv-chieu&remote=PHIEN1', /Hoàng Bảo Ngọc/], ['mo-ca', 'gv-mo-ca', /Mở ca kiểm tra/],
+  ['theo-doi', 'gv-theo-doi', /Kiểm tra 15 phút/], ['hoc-sinh', 'gv-hoc-sinh', /Học sinh/], ['toan-canh', 'gv-toan-canh', /Trần Đức Huy/],
+  ['ho-so', 'gv-toan-canh', /Trần Đức Huy/, 'nut:Hồ sơ làm bài'], ['kho', 'gv-kho', /Kho đề/], ['duyet', 'gv-duyet&ma=12-KT-C1-D4', /Duyệt lời giải/],
+  ['hs-hoi', 'gv-hs-hoi', /Học sinh hỏi/], ['go-nut', 'gv-go-nut', /Bàn gỡ nút thắt/], ['giao-btvn', 'gv-giao-btvn', /Giao|bài tập/i],
+  ['giao-tuan', 'gv-giao-tuan', /Giao|tuần/i], ['cai-dat', 'gv-cai-dat', /Cài đặt/],
+]
+const DS_NG_GV = MAN_NG.flatMap(([ten, man, cho, viec]) => KHO_NG.flatMap(([w, hh, kho]) => (['ngang', 'd700'].includes(kho) ? ['light', 'dark'] : ['light']).map((nen) =>
+  [`ng-${ten}-${kho}${nen === 'dark' ? '-toi' : ''}`, man, w, hh, nen, ten !== 'ho-so' && w >= 700 && hh >= 700, cho, viec])))
+// ═══ hết NGANG GV 26/10
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 // ═══ MỘT TRANG PH 26/10: app phụ huynh «Một trang» (`ph&mot=1`, khối cùng tên ở trang.tsx). Ảnh KHUNG NHÌN (không toàn trang) ở 3 khổ × sáng/tối, đo KHÔNG
 // CUỘN (scrollHeight ≤ innerHeight, scrollWidth ≤ innerWidth — vượt ⇒ ghi vào «Tràn ngang», thoát mã 1) và chữ bị cắt trong ô; tấm mở từ ô; `trong=tat` ⇒ trang cũ.
@@ -262,6 +279,7 @@ const DS_MOT_PH = [
   ['62-ph-mot-trang-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/],
 ]
 const DS = [
+  ...DS_NG_GV, // NGANG GV 26/10
   ...DS_MOT_PH, // MỘT TRANG PH 26/10
   ...DS_T3, // «TRONG» NHÓM 3
   ...DS_MG, // MỘT TRANG GV 26/10

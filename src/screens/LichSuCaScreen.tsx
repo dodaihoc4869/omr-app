@@ -508,7 +508,7 @@ export default function LichSuCaScreen() {
               ))}
             </div>
           ) : (
-            <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
+            <div className="cho-tre" style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
           )
         ) : dsLoc.length === 0 ? (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>

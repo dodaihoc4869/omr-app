@@ -1706,7 +1706,7 @@ function GoiLenBangCu() {
         </div>
 
         {dsCa === null ? (
-          <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Đang tải danh sách ca…</div>
+          <div className="cho-tre" style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Đang tải danh sách ca…</div>
         ) : dsCaLoc.length === 0 ? (
           <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Chưa có ca nào khớp.</div>
         ) : (

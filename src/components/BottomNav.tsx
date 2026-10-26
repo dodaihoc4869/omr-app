@@ -13,6 +13,7 @@ import { AnhLogo } from './LogoVai'
 import { useHoa2Bat } from './chien-dich/co-hoa2'
 
 const CHINH = ['examhub', 'hocsinh', 'lichsuca', 'giaobtvn']
+const TEN_NGOAI_MENU: Record<string, string> = { duyetloigiai: 'Duyệt lời giải', khodegiao: 'Giao đề theo tuần', giaobtvn: 'Giao bài tập về nhà', cauhoi: 'Học sinh hỏi', bangonutthat: 'Gỡ nút thắt' }
 
 export default function BottomNav() {
   const screen = useAppStore((s) => s.screen)
@@ -22,7 +23,10 @@ export default function BottomNav() {
   const sang = mucDangSang(screen, hoa2)
   const chinh: MucDieuHuong[] = hoa2 ? MUC_HOA2_CHINH : MUC_DIEU_HUONG.filter((m) => CHINH.includes(m.id))
   const them: MucDieuHuong[] = hoa2 ? MUC_HOA2_DAY : MUC_DIEU_HUONG.filter((m) => !CHINH.includes(m.id))
-  const tenMan = [...MUC_HOA2_CHINH, ...MUC_HOA2_DAY].find((m) => m.id === sang)?.ten ?? 'Đỗ Đại Học'
+  // NGANG GV 26/10 («Trong»): màn ngoài menu (Duyệt lời giải, Giao đề theo tuần…) — thanh trên ghi đúng tên màn thay vì «Đỗ Đại Học»,
+  // vì tiêu đề trang ở điện thoại chỉ còn cho trình đọc màn hình (trước đây màn ấy không có tên nào hiện ra). Tắt «Trong» ⇒ như cũ.
+  const tenNgoaiMenu = typeof document !== 'undefined' && document.documentElement.dataset.trong === 'gv' ? TEN_NGOAI_MENU[screen] : undefined
+  const tenMan = [...MUC_HOA2_CHINH, ...MUC_HOA2_DAY].find((m) => m.id === sang)?.ten ?? tenNgoaiMenu ?? 'Đỗ Đại Học'
   const themDangSang = them.some((m) => m.id === sang)
   const di = (id: MucDieuHuong['id']) => {
     setMo(false)

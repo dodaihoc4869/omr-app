@@ -86,3 +86,10 @@
   [data-trong='gv'] .gvhs .hp-tong-so > .hp-o:first-child { grid-column: 1 / -1; border-bottom: 1px solid var(--tr-vien); }
   [data-trong='gv'] .gvhs .hp-tong-so > .hp-o:nth-child(2) { border-left: 0; }
 }
+/* NGANG GV 26/10: điện thoại ngang (601–760, dải biểu tượng) — hai nút đầu màn giữ một hàng bên phải tiêu đề thay vì xếp chồng rộng hết (ăn nửa chiều cao) */
+@media (min-width: 601px) and (max-width: 760px) {
+  [data-trong='gv'] .gvhs .gvhs-dau-nut { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; width: auto; }
+  [data-trong='gv'] .gvhs .gvhs-dau-nut > * { display: block; width: auto; }
+  [data-trong='gv'] .gvhs .gvhs-dau-nut > :last-child { order: 0; }
+  [data-trong='gv'] .gvhs .gvhs-dau-nut button { width: auto; }
+}

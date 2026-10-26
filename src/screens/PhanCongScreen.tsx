@@ -776,7 +776,7 @@ function TheGiaoBtvn() {
                     </div>
 
                     {/* DANH SÁCH CUỘN HỌC SINH */}
-                    {dangTaiLuot && <div className="text-xs text-slate-400 py-1 text-center">Đang tải danh sách lượt…</div>}
+                    {dangTaiLuot && <div className="text-xs text-slate-400 py-1 text-center cho-tre">Đang tải danh sách lượt…</div>}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 gv-scroll-box gv-scroll-box--compact" role="region" aria-label="Học sinh trong ca" tabIndex={0}>
                       {dsHsHienThi.map((e) => {
                         const trongCa = dsHsTrongCa.some((h) => h.sbd === e.sbd)

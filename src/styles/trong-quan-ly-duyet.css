@@ -14,3 +14,7 @@
   [data-trong='gv'] .gv-duyet-day-du .lg-loc { width: auto; }
   [data-trong='gv'] .gv-duyet-day-du .lg-ds > .lg-dong { padding: 14px 16px; }
 }
+/* NGANG GV 26/10: điện thoại — hàng lọc 4 thẻ cuộn ngang, «Chưa có hồ sơ» bị cắt mép ⇒ xuống dòng, đủ thẻ */
+@media (max-width: 600px) {
+  [data-trong='gv'] .gv-duyet-day-du .lg-loc { flex-wrap: wrap; width: auto; overflow-x: visible; }
+}

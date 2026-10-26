@@ -128,3 +128,9 @@
   [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb { grid-template-columns: minmax(0, 1fr); padding: 12px 16px; }
   [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb .bt { display: none; }
 }
+/* NGANG GV 26/10 (luật «không cắt chữ»): link vào ca bị cắt «omr-a…» ở khổ ngang / máy tính bảng ⇒ link xuống dòng (ngắt ở bất kỳ kí tự), đủ chữ để thầy đọc cho lớp */
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-link > span.mono:not(.ct-nhan) { flex: 1 1 220px; overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: anywhere; }
+/* NGANG GV 26/10: điện thoại — hàng lọc «Tất cả · Đang làm · Cảnh báo · Chưa vào · Đã nộp» cuộn ngang, thẻ cuối bị cắt mép ⇒ xuống dòng, đủ thẻ */
+@media (max-width: 760px) {
+  [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hang-chip { flex-wrap: wrap; overflow-x: visible; }
+}

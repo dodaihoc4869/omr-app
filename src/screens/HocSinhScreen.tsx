@@ -373,7 +373,7 @@ export default function HocSinhScreen() {
 
         {/* 2.0 (trung tu 09/10): lỗi tải nói bằng câu dễ hiểu, không in lỗi kỹ thuật thô. */}
         {loi && <OThongBao tone="do">{hoa2 ? `Chưa mở được hồ sơ. ${lyDoDeHieu(loi)}` : loi}</OThongBao>}
-        {dangTaiHoSo && !hoSo && <div style={NHAN_NHO}>Đang mở hồ sơ…</div>}
+        {dangTaiHoSo && !hoSo && <div className="cho-tre" style={NHAN_NHO}>Đang mở hồ sơ…</div>}
 
         {hoSo && (
           <>
@@ -494,7 +494,7 @@ export default function HocSinhScreen() {
             </div>
 
             {hoa2 && <details className="hs-hoc-tap" onToggle={e => setMoHocTap(e.currentTarget.open)}><summary>Nhịp học, kiến thức và dòng thời gian</summary>{moHocTap && <Suspense fallback={<p role="status">Đang mở báo cáo học tập…</p>}><ToanCanhHocTap key={hoSo.em.sbd} sbdHoSo={hoSo.em.sbd} trongHoSo /></Suspense>}</details>}
-            <details className="hs-hoc-tap" onToggle={e => setMoHocThat(e.currentTarget.open)}><summary>Học thật và can thiệp</summary>{moHocThat && <Suspense fallback={<p role="status">Đang mở…</p>}><HoSoHocThatEm key={hoSo.em.sbd} sbd={hoSo.em.sbd} /></Suspense>}</details>
+            <details className="hs-hoc-tap" onToggle={e => setMoHocThat(e.currentTarget.open)}><summary>Học thật và can thiệp</summary>{moHocThat && <Suspense fallback={<p className="cho-tre" role="status">Đang mở…</p>}><HoSoHocThatEm key={hoSo.em.sbd} sbd={hoSo.em.sbd} /></Suspense>}</details>
             {/* Các báo cáo kiểm tra trong cùng hồ sơ */}
             <div className="gv-student-actions grid grid-cols-1 sm:grid-cols-2 gap-2" role="tablist" aria-label="Mục hồ sơ">
               {(['bao-cao', 'lich-su'] as const).map((m) => {
@@ -723,7 +723,7 @@ export default function HocSinhScreen() {
         </div>
       </div>
 
-      <details className="hs-hoc-tap" onToggle={e => setMoBangHocThat(e.currentTarget.open)}><summary>Xếp học sinh: Học thật · Đối phó</summary>{moBangHocThat && <Suspense fallback={<p role="status">Đang mở…</p>}><BangHocThat onMoEm={(sbd) => moHoSo(sbd)} /></Suspense>}</details>
+      <details className="hs-hoc-tap" onToggle={e => setMoBangHocThat(e.currentTarget.open)}><summary>Xếp học sinh: Học thật · Đối phó</summary>{moBangHocThat && <Suspense fallback={<p className="cho-tre" role="status">Đang mở…</p>}><BangHocThat onMoEm={(sbd) => moHoSo(sbd)} /></Suspense>}</details>
 
       <TongHocPhi tong={tongHp} phamVi={phamViHp} loc={locHocPhi} onLoc={setLocHocPhi} loi={loiHocPhi || undefined} />
 
@@ -802,7 +802,7 @@ export default function HocSinhScreen() {
 
         {loi && <OThongBao tone="do">{loi}</OThongBao>}
         {ds === null ? (
-          <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách học sinh…</div>
+          <div className="cho-tre" style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách học sinh…</div>
         ) : dsLoc.length === 0 ? (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
             <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }}>

@@ -234,6 +234,10 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (b.action === 'danhSachCa' && thamSo.get('mg') === 'dai')
     return tra({ ok: true, items: [...CA_GIA, ...['11A2', '10A1', '12A2'].map((lop, i) => ({ ...CA_GIA[0]!, maCa: `MG-${i}`, tenCa: `Kiểm tra nhanh ${lop}`, lop, daVao: 30 + i, daNop: 5 * i }))] })
   // ═══ hết MỘT TRANG GV 26/10
+  // ═══ NGANG GV 26/10: `&ca=0` = không ca nào đang mở (Hôm nay hiện nút «Bổ sung bài hôm nay») · `&ca=nhieu` = 14 ca, tên dài, mã 6 số (như ảnh thầy chụp)
+  if (b.action === 'danhSachCa' && thamSo.get('ca') === '0') return tra({ ok: true, items: b.daXoa ? [] : CA_GIA.filter((c) => c.trangThai !== 'mo') })
+  if (b.action === 'danhSachCa' && thamSo.get('ca') === 'nhieu') return tra({ ok: true, items: b.daXoa ? [] : [...CA_GIA, ...Array.from({ length: 12 }, (_, i) => ({ ...CA_GIA[1]!, maCa: String(844396 + i), tenCa: i % 3 === 0 ? `LD${i + 3} - Doll · Kiểm tra cuối chương Este – Lipit lớp tăng cường` : `Kiểm tra 15 phút ${i % 2 ? '12A2' : '11B'}`, lop: i % 2 ? '12A2' : '11B', moLuc: phutTruoc(60 * 24 * (i + 1)), batDau: phutTruoc(60 * 24 * (i + 1)), daVao: 28 + i, daNop: 27 + i, canhBao: i % 4 }))] })
+  // ═══ hết NGANG GV 26/10
   if (b.action === 'danhSachCa') return tra({ ok: true, items: b.daXoa ? [] : CA_GIA })
   if (b.action === 'danhSachCauHoi') return tra({ ok: true, items: CAU_HOI_GIA })
   if (u.pathname.endsWith('/gv/hoc-phi/ds')) return tra({ ok: true, items: HOC_PHI_GIA })
@@ -638,7 +642,11 @@ const EM_TD = [
 const manTheoDoi = () => h('div', { className: 'gv-page', style: { padding: '16px clamp(12px, 3vw, 32px) 64px', maxWidth: 1320, margin: '0 auto' } }, h(TheoDoiCa, { tenCa: 'Kiểm tra 15 phút · 12A1', maCa: 'DH-12-C2-B6', link: 'https://omr-app-b3u.pages.dev/hs?ca=DH-12-C2-B6', daChepLink: false, onChepLink: noop, onChepLinkDiem: noop,
   moLuc: '19:30 · Thứ Hai 26/10/2026', hetHanVao: '19:40', thoiGianPhut: 15, congBoChu: 'Khi cả lớp nộp xong', phamViChu: 'Lớp 12A1', conGiay: 522, em: EM_TD, soChuaVao: 1,
   nguongLan: 3, dangTai: false, dangDuyet: null, onLamMoi: noop, onMoKhoa: noop, onXemEm: noop, onChieuMa: noop, onKetThuc: noop, onDongCuaVao: noop, dangLamNgay: 6 } as never))
+// ═══ NGANG GV 26/10: `gv-lich-su-ca&mo=1` = màn Ca kiểm tra bọc như App.tsx khi cờ 2.0 bật (nút «Mở ca kiểm tra» góc phải đầu màn)
+const manCaHoa2 = () => h('div', { className: 'ca-hoa2-khung' }, h('button', { type: 'button', className: 'ca-hoa2-mo-ca' }, 'Mở ca kiểm tra'), h(LichSuCaScreen))
+// ═══ hết NGANG GV 26/10
 const con =
+  man === 'gv-lich-su-ca' && thamSo.get('mo') === '1' ? manCaHoa2() : // NGANG GV 26/10
   man === 'gv-toan-canh' ? h(ToanCanhEmScreen, { sbdHoSo: '11011' }) : man === 'gv-giao-btvn' ? h(PhanCongScreen) : man === 'gv-giao-tuan' ? h(GiaoDeTheoTuanScreen) :
   man === 'gv-lich-su-ca' ? h(LichSuCaScreen) : man === 'gv-hs-hoi' ? h(CauHoiScreen) : man === 'gv-theo-doi' ? manTheoDoi() : // «Trong» nhóm 4
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10

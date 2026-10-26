@@ -451,7 +451,7 @@ function App() {
           GAME HÓA 2.0: màn đã bỏ thì KHÔNG dựng (kể cả một nhịp) — hiệu ứng ở trên đưa về Tổng quan ngay. */}
       {!anKhiHoa2 && (
       <ChanLoi key={screen} o={(hoa2 && TEN_MAN_HOA2[screen]) || TEN_MAN[screen]} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
-        <Suspense fallback={hoa2 ? <KhungXuongMan /> : <div style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
+        <Suspense fallback={hoa2 ? <KhungXuongMan /> : <div className="cho-tre" style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
         {screen === 'classlist' && <ClassListScreen />}
         {screen === 'examhub' && <ExamHubScreen />}
         {screen === 'examsetup' && <ExamSetupScreen />}

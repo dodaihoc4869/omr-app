@@ -31,3 +31,5 @@
 [data-trong='gv'] .gv-kho-day-du .gv-kho-de > div { border-top-left-radius: 14px !important; border-bottom-left-radius: 14px !important; }
 [data-trong='gv'] .gv-kho-day-du .gv-kho-de .font-bold.truncate { font-size: 15px !important; font-weight: 600; }
 [data-trong='gv'] .gv-kho-day-du .gv-kho-de details > summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--tr-chinh-chu); font-size: 13px; }
+/* NGANG GV 26/10 (luật «không cắt chữ»): dòng phụ hai ô việc («…khi máy pipeli…»), tên bài / mã đề trong cây và danh sách đề bị cắt «…» ⇒ xuống dòng, đủ chữ */
+[data-trong='gv'] .gv-kho-day-du .truncate { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: anywhere; }

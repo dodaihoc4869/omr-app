@@ -301,7 +301,7 @@ export default function DieuKhienToChieuScreen() {
       </header>
 
       {/* KHỐI THÔNG TIN CÂU & HỌC SINH ĐANG CHIẾU */}
-      <div className="p-3 sm:p-4 max-w-xl mx-auto w-full flex flex-col gap-3">
+      <div className="dkc-than p-3 sm:p-4 max-w-xl mx-auto w-full flex flex-col gap-3">
         <div
           className="dkc-the dkc-em rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden"
         >
