@@ -89,7 +89,7 @@ export function DongThoiGian({
                   </span>
                   <div className="tc-viec-noi-dung">
                     <span className="tc-viec-loai">{TEN_LOAI[v.loai]}</span>
-                    <h4 className="tc-viec-tieu-de">{v.tieuDe}</h4>
+                    <h4 className="tc-viec-tieu-de">{v.tieuDe.replaceAll(' · ', '\u00a0· ')}</h4>
                     {v.mota && <p className="tc-viec-mota">{v.mota}</p>}
                     {(v.chips.length > 0 || v.maCa) && (
                       <div className="tc-viec-chips">

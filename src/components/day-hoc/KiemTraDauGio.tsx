@@ -427,7 +427,7 @@ function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong, onTomTat }: { dd: Di
                           </p>
                         </div>
                         <p className="gvv2-dg-de">{c ? tomTatDe(c, 140) : 'Máy này chưa có câu này trong kho — đồng bộ Ngân hàng câu hỏi để xem đề.'}</p>
-                        {ls?.chu && <p className="gvv2-dg-ls">Lịch sử câu này: {ls.chu}</p>}
+                        {ls?.chu && <p className="gvv2-dg-ls">Lịch sử câu này: {ls.chu.replaceAll(' · ', '\u00a0· ')}</p>}
                         {t === 'dat' || t === 'chua_dat' ? (
                           <p className="gvv2-dg-kq" data-kq={t}>
                             {t === 'dat' ? <Check size={16} aria-hidden="true" /> : <X size={16} aria-hidden="true" />} {t === 'dat' ? 'Đã ghi: Đạt' : 'Đã ghi: Chưa đạt'}
@@ -627,7 +627,7 @@ function KiemTraDauGioThan({ dd, nhung, soBuoc = 2, onXong, onTomTat }: { dd: Di
                           <p className="dh-cau-de">{c ? tomTatDe(c) : 'Máy này chưa có câu này trong kho — đồng bộ Ngân hàng câu hỏi để xem đề.'}</p>
                           {ls?.chu && (
                             <p className="dg-lich-su">
-                              <span className="dg-lich-su-nhan">Lịch sử câu này:</span> {ls.chu}
+                              <span className="dg-lich-su-nhan">Lịch sử câu này:</span> {ls.chu.replaceAll(' · ', '\u00a0· ')}
                             </p>
                           )}
                           <div className="dg-cham">

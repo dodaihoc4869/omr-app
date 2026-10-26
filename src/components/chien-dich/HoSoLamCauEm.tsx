@@ -422,7 +422,7 @@ function DsCauSai({
 /** Một dòng lượt (giờ · câu · nơi làm · kết quả · Mức làm). Lượt treo: chip Mức 5/6 + số phút thay cho số giây / thước giây. */
 function DongLuot({ l, laThay, cheDo, coMuc, soCungNgay }: { l: LanLamCau; laThay: boolean; cheDo: CheDoHoSo; coMuc: boolean; soCungNgay?: number }) {
   const muc = tenMucDo(l.mucDo)
-  const phu = [l.noi, muc, l.chon ? `Chọn ${l.chon}` : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join(' · ')
+  const phu = [l.noi, muc, l.chon ? `Chọn ${l.chon}` : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join('\u00a0· ') // SOÁT 26/10: «·» không mở đầu dòng
   const k = l.dung === true ? 'dung' : l.dung === false ? 'sai' : 'trong'
   const m = l.mucLam
   return (

@@ -176,11 +176,11 @@ export default function BanGoNutThatScreen({ nhung = false, chonDau = null }: { 
                   {n.em.map((e) => (
                     <li key={e.sbd}>
                       <b>{e.hoTen}</b>
-                      {' · '}Đáp án đã chọn: {e.dapAnChon || 'chưa ghi'}
-                      {' · '}Số lần làm sai: <span className="gv2-so">{e.soLanThu}</span>
+                      {'\u00a0· '}Đáp án đã chọn: {e.dapAnChon || 'chưa ghi'}
+                      {'\u00a0· '}Số lần làm sai: <span className="gv2-so">{e.soLanThu}</span>
                       {e.kiem.length > 0 && (
                         <>
-                          {' · '}Trả lời câu kiểm: {e.kiem.map((k) => `${k.traLoi || '(trống)'} (${k.dung ? 'đúng' : 'sai'})`).join(', ')}
+                          {'\u00a0· '}Trả lời câu kiểm: {e.kiem.map((k) => `${k.traLoi || '(trống)'} (${k.dung ? 'đúng' : 'sai'})`).join(', ')}
                         </>
                       )}
                       {e.viet && <div className="gv2-phu">Em viết: “{e.viet}”</div>}

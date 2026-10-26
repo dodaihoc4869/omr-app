@@ -183,3 +183,4 @@
   .dd1 .dd1-o2--doc .dd1-nut-chinh { width: 100%; }
 }
 
+.dd1-vang-em { white-space: nowrap; } /* SOÁT 26/10: tên em vắng + dấu «·» không tách dòng */

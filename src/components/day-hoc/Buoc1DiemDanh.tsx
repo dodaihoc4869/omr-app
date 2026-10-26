@@ -459,10 +459,14 @@ export default function Buoc1DiemDanh({
                     <p className="dd1-vang-ten">
                       {vangHien.map((e, i) => (
                         <span key={e.sbd}>
-                          {i > 0 && ' · '}
-                          <button type="button" className="dd1-nut-chu" aria-pressed={coPhep.has(e.sbd)} title={coPhep.has(e.sbd) ? 'Bấm để gỡ có phép' : 'Bấm để đánh dấu vắng có phép'} onClick={() => void doiCoPhep(e.sbd, !coPhep.has(e.sbd))}>
-                            {e.hoTen || `SBD ${e.sbd}`}{coPhep.has(e.sbd) ? ' (có phép)' : ''}
-                          </button>
+                          {/* SOÁT 26/10: dấu «·» bám CUỐI tên trước (không xuống dòng giữa tên và dấu) ⇒ dòng không mở đầu bằng «·» */}
+                          <span className="dd1-vang-em">
+                            <button type="button" className="dd1-nut-chu" aria-pressed={coPhep.has(e.sbd)} title={coPhep.has(e.sbd) ? 'Bấm để gỡ có phép' : 'Bấm để đánh dấu vắng có phép'} onClick={() => void doiCoPhep(e.sbd, !coPhep.has(e.sbd))}>
+                              {e.hoTen || `SBD ${e.sbd}`}{coPhep.has(e.sbd) ? ' (có phép)' : ''}
+                            </button>
+                            {i < vangHien.length - 1 && '\u00a0·'}
+                          </span>
+                          {i < vangHien.length - 1 && ' '}
                         </span>
                       ))}
                     </p>

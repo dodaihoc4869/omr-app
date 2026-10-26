@@ -371,7 +371,7 @@
 }
 .ct-de-chon .tt {
   min-width: 0;
-  flex: 1;
+  flex: 1 1 160px; /* SOÁT 26/10: cột hẹp (ngang 844) ⇒ nút «Chọn đề kiểm tra» xuống hàng thay vì ép chữ còn 55px */
 }
 .ct-de-chon b {
   display: -webkit-box;

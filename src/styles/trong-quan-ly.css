@@ -134,4 +134,7 @@
   /* tiêu đề trang đã chỉ còn cho trình đọc màn hình ⇒ hộp đầu màn rời luồng, không để khoảng trống giữa nút và dải số */
   [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-khung > .ls-trang { padding-top: 12px; }
   [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-khung > .ls-trang > header.gv2-dau { position: absolute; }
+  /* SOÁT 26/10 (điện thoại < 880, cao > 520): tiêu đề «Ca kiểm tra» đã rời luồng nhưng vẫn hiện ⇒ đè dải số «Ca trong tháng».
+     Thanh trên đã ghi tên màn ⇒ tiêu đề chỉ còn cho trình đọc màn hình. */
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-khung > .ls-trang > header.gv2-dau { width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
