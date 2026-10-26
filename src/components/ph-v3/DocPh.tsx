@@ -1,21 +1,25 @@
 // APP PHỤ HUYNH «CHỈ ĐỌC» (thầy CHỐT bản vẽ 26/10: ve-moi/ph-doc-chua.html · ph-doc-du.html + ph-doc.css). Thay màn «Một trang» (8 ô bấm + tấm).
 // Ba câu hỏi của phụ huynh, ĐỌC là hiểu, KHÔNG phải bấm: (1) hôm nay con làm bài chưa · (2) 7 ngày qua thế nào · (3) con chăm, lười hay đối phó;
-// + lời thầy + dải 3 số (Kiểm tra gần nhất · Câu sai chưa sửa · Bài tập về nhà). Không ô bấm, không mũi tên, không tấm; chỉ ảnh đại diện góc phải
+// + lời thầy + thẻ «Kiểm tra và sửa lỗi» (Kiểm tra ôn tập · Tự sửa lỗi · Bài tập về nhà — thay dải 3 số, thầy 26/10). Không ô bấm, không mũi tên, không tấm; chỉ ảnh đại diện góc phải
 // (menu Tài khoản của AppPhuHuynh: «Đổi số báo danh»).
 // BẬT khi <html data-trong="ph"> (main.tsx); lùi một máy: localStorage `ddh.trong`='tat' ⇒ AppPhuHuynh vẽ trang cũ, KHÔNG tải tệp này.
 // SỐ — CHỈ lệnh sẵn có, KHÔNG bịa: lúc mở AppPhuHuynh đã nạp /ph/tat-ca-ve-con · /ph/con-tong-quan (7 ngày, đúng/sai hôm nay, câu sai) · /ph/nhip-hoc
 // (nhóm, bậc chăm) · /ph/loi-thay · /ph/hoc-2 · cảnh báo của thầy; tệp này gọi thêm /ph/bao-cao-tuan (Học thật / Đối phó + số câu/lần `mucLam`) SONG SONG
 // lúc mở. Số nào chưa có ⇒ nhãn + «—» hoặc bỏ dòng. Không cắt chữ (thẻ cao theo nội dung, thiếu chỗ thì trang cuộn); ngoại lệ: Lời thầy ≤ 3 dòng ở điện thoại.
 // MÀU: doc-ph.css (chỉ biến PH sẵn có).
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactElement, type ReactNode } from 'react'
 import { AnhLogo } from '../LogoVai'
-import { BtChuY, BtDongHo, BtNhan, BtTich } from './BieuTuong'
+import { BtBang, BtBut, BtChuY, BtDongHo, BtNhan, BtSach, BtTich } from './BieuTuong'
 import { LoiThe, buoiHomNay, soHomNay, tenGoi, type TrangVeConProps } from './TrangVeCon'
 import { chuThay } from './tien-ich'
 import { gioVn, ngayNganVn, soVn, thuNgayVn } from '../../lib/ph-moi/dinh-dang'
 import { tieuDeCanhBao } from '../../lib/canh-bao-thay-hien-thi'
 import { layBaoCaoTuanCon, type BaoCaoTuanCon } from '../../lib/bao-cao-tuan-ph-api'
 import type { NgayHoc } from '../../lib/ph-v3/con-tong-quan'
+import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
+import type { PhMoi } from '../../lib/ph-moi/du-lieu'
+
+type Bt = (p: { co?: number; day?: number }) => ReactElement
 import './doc-ph.css'
 
 export interface DocPhProps extends Pick<TrangVeConProps, 'v' | 'hoc2' | 'tongQuan' | 'nhip' | 'loiThay' | 'canhBao' | 'sbd' | 'tenCon' | 'lop'> {
@@ -100,7 +104,7 @@ export default function DocPh(p: DocPhProps) {
           ) : (
             <div className="pd-luoi" role="status" aria-live="polite" data-vung="dang-tai">
               <span className="ph3-an">Đang tải dữ liệu của con…</span>
-              {['hom', 'bay', 'nhom', 'loi'].map((k) => <section key={k} className={`pd-the g-${k}`} aria-hidden="true"><Cho cao={k === 'bay' ? 160 : 90} /></section>)}
+              {['hom', 'bay', 'nhom', 'loi', 'kt'].map((k) => <section key={k} className={`pd-the g-${k}`} aria-hidden="true"><Cho cao={k === 'bay' ? 160 : 90} /></section>)}
             </div>
           )
         ) : (
@@ -110,8 +114,8 @@ export default function DocPh(p: DocPhProps) {
               <BayNgay p={p} />
               <Nhom p={p} bc={bc} />
               <LoiThay p={p} />
+              <KiemTraSua p={p} />
             </div>
-            <BaSo p={p} />
           </>
         )}
       </main>
@@ -237,19 +241,60 @@ function LoiThay({ p }: PT) {
   )
 }
 
-// ---------------------------------------------------------------- dải 3 số ----------------------------------------------------------------
-function BaSo({ p }: PT) {
+// ---------------------------------------------------------------- 5 · Kiểm tra và sửa lỗi (thầy 26/10: «Hiện cả bài kiểm tra sửa lỗi trên app ph luôn nhé») ----------------------------------------------------------------
+// Ba dòng chỉ đọc, mỗi dòng một câu trạng thái có MÀU NGHĨA: do (cần nhắc ngay) · cam (đang dở / còn việc) · xanh (xong) · xam (không có việc / chưa có số).
+// Nguồn sẵn có: Kiểm tra ôn tập = `/ph/hoc-2` → kiemTraCaNhan (như TheKiemTraCon) · Tự sửa lỗi = `/ph/con-tong-quan` → cauSai (chưa sửa) + `/ph/tat-ca-ve-con`
+// → lichOn.daKhacPhuc14Ngay (máy chủ chỉ đếm 14 ngày, không có số 7 ngày) · Bài tập về nhà = baiTapVeNha. Không có số ⇒ «—», không bịa.
+export type MauDong = 'do' | 'cam' | 'xanh' | 'xam'
+export type DongKt = { mau: MauDong; chu: string }
+/** Giờ hạn: nửa đêm ghi «24:00» (hạn cuối ngày), giờ khác ghi đúng giờ. */
+const gioHan = (ms: number): string => { const g = gioVn(ms); return g === '00:00' ? '24:00' : g }
+export function dongKiemTra(kt: TomTatKiemTra | undefined, daTaiHoc2: boolean): DongKt {
+  if (!kt) return daTaiHoc2 ? { mau: 'xam', chu: 'Chưa có lịch kiểm tra ôn tập' } : { mau: 'xam', chu: '—' }
+  const diem = kt.diem !== null ? `${soVn(kt.diem)}/10` : ''
+  if (kt.trangThai === 'da_nop') return kt.homNay
+    ? { mau: 'xanh', chu: `Đã nộp${diem ? ` · ${diem}` : ''}` }
+    : { mau: 'xam', chu: `Lần gần nhất ${diem || 'đã nộp'} · ${ngayNganVn(kt.nopLuc ?? kt.moLuc)}` }
+  if (kt.trangThai === 'het_han') return { mau: 'do', chu: 'Hết hạn, con chưa nộp' }
+  if (kt.trangThai === 'can_lam') return kt.daTra > 0
+    ? { mau: 'cam', chu: `Đang làm · ${kt.daTra}/${kt.tong} câu · hạn ${gioHan(kt.hanLuc)}` }
+    : { mau: 'do', chu: `Hôm nay có bài kiểm tra · con chưa làm · hạn ${gioHan(kt.hanLuc)}` }
+  if (kt.trangThai === 'sap_den') return { mau: 'xam', chu: `Bài tiếp theo mở ${gioVn(kt.moLuc)} ${ngayNganVn(kt.moLuc)}` }
+  return { mau: 'xam', chu: 'Chưa có bài kiểm tra' }
+}
+/** «Nhiều» câu chưa sửa ⇒ từ ngưỡng này, nếu 14 ngày không tự sửa câu nào thì dòng đỏ. */
+export const NHIEU_CAU_CHUA_SUA = 5
+export function dongSuaLoi(chuaSua: number | null, tongSai: number | null, daSua14: number | null): DongKt {
+  if (chuaSua === null) return { mau: 'xam', chu: '—' }
+  if (chuaSua === 0) return tongSai ? { mau: 'xanh', chu: 'Đã sửa hết câu sai' } : { mau: 'xam', chu: 'Con chưa có câu sai nào cần sửa' }
+  const sua = daSua14 !== null ? ` · 14 ngày qua con tự sửa ${daSua14} câu` : ''
+  return { mau: chuaSua >= NHIEU_CAU_CHUA_SUA && daSua14 === 0 ? 'do' : 'cam', chu: `Còn ${chuaSua} câu chưa sửa${sua}` }
+}
+export function dongBtvn(bt: PhMoi['baiTapVeNha']): DongKt {
+  if (!bt) return { mau: 'xam', chu: '—' }
+  if (bt.dangChay.length > 0) {
+    const han = bt.dangChay.map((x) => Date.parse(x.hanNop)).filter(Number.isFinite).sort((a, b) => a - b)[0]
+    return { mau: 'cam', chu: `${bt.dangChay.length} bài chưa nộp${han !== undefined ? ` · hạn ${ngayNganVn(han)}` : ''}` }
+  }
+  return bt.gan.length > 0 ? { mau: 'xanh', chu: 'Đã nộp đủ' } : { mau: 'xam', chu: 'Không có bài' }
+}
+function KiemTraSua({ p }: PT) {
   const pm = p.v.pm!
   const tq = p.tongQuan.v
-  const diem = pm.caGanNhat?.ketQua?.tong ?? null
-  const chuaSua = tq ? Math.max(0, tq.cauSai.tong - tq.cauSai.daSua) : null
-  const bt = pm.baiTapVeNha
-  const o = (nhan: string, so: ReactNode, don: string) => <div><span>{nhan}</span><b>{so}{don && <small>{don}</small>}</b></div>
+  const chuaSua = tq ? Math.max(0, tq.cauSai.tong - tq.cauSai.daSua) : pm.lichOn?.conSaiChuaKhacPhuc ?? null
+  const dong: { ma: string; ten: string; bt: Bt; d: DongKt }[] = [
+    { ma: 'kiem-tra', ten: 'Kiểm tra ôn tập', bt: BtBang, d: dongKiemTra(p.hoc2?.kiemTraCaNhan, !!p.hoc2) },
+    { ma: 'sua-loi', ten: 'Tự sửa lỗi', bt: BtBut, d: dongSuaLoi(chuaSua, tq ? tq.cauSai.tong : null, pm.lichOn?.daKhacPhuc14Ngay ?? null) },
+    { ma: 'btvn', ten: 'Bài tập về nhà', bt: BtSach, d: dongBtvn(pm.baiTapVeNha) },
+  ]
   return (
-    <div className="pd-so" data-vung="ba-so">
-      {o('Kiểm tra gần nhất', diem !== null ? soVn(diem) : '—', diem !== null ? '/10' : '')}
-      {o('Câu sai chưa sửa', chuaSua ?? '—', chuaSua !== null ? ' câu' : '')}
-      {bt ? (bt.dangChay.length > 0 ? o('Bài tập về nhà', bt.dangChay.length, ' chưa nộp') : bt.gan.length > 0 ? o('Bài tập về nhà', 'Đã nộp', ' đủ') : o('Bài tập về nhà', 'Chưa có', ' bài')) : o('Bài tập về nhà', '—', '')}
-    </div>
+    <section className="pd-the g-kt" aria-label="Kiểm tra và sửa lỗi" data-vung="kiem-tra-sua-loi">
+      <p className="pd-nhan">Kiểm tra và sửa lỗi</p>
+      <ul className="pd-kt">
+        {dong.map(({ ma, ten, bt: Hinh, d }) => (
+          <li key={ma} data-ma={ma} data-mau={d.mau}><span className="pd-kt-bt" aria-hidden="true"><Hinh co={18} /></span><div><b>{ten}</b><span>{d.chu}</span></div></li>
+        ))}
+      </ul>
+    </section>
   )
 }

@@ -1,6 +1,6 @@
 // APP PHỤ HUYNH «CHỈ ĐỌC» (thầy chốt bản vẽ 26/10: ve-moi/ph-doc-*.html — thay màn «Một trang» 8 ô + tấm). Khoá:
 //   · main.tsx gắn <html data-trong="ph"> cho cổng phụ huynh (cùng luật lùi `ddh.trong`='tat'); /hoi-thay vẫn không có; PH không nạp trong.css;
-//   · bật ⇒ màn CHỈ ĐỌC: đầu (tên con · lớp) → Hôm nay → 7 ngày qua → Con đang ở nhóm (+ Học thật / Đối phó) → Lời thầy → dải 3 số; KHÔNG ô bấm,
+//   · bật ⇒ màn CHỈ ĐỌC: đầu (tên con · lớp) → Hôm nay → 7 ngày qua → Con đang ở nhóm (+ Học thật / Đối phó) → Lời thầy → Kiểm tra và sửa lỗi; KHÔNG ô bấm,
 //     không tấm, nút duy nhất = ảnh đại diện (menu «Đổi số báo danh»);
 //   · số: CHỈ lệnh sẵn có (thêm /ph/bao-cao-tuan, một lần); không gọi hai lệnh hồ sơ (/ph/ho-so-thai-do · /ph/lich-su-lam-cau);
 //   · lý do nhận định bằng SỐ CÂU / SỐ LẦN (mucLam), không %;
@@ -10,7 +10,8 @@ import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import AppPhuHuynh from '../src/components/ph-v3/AppPhuHuynh'
-import { lyDoCach, nhanNgay, tomTat7, trangThaiHomNay } from '../src/components/ph-v3/DocPh'
+import { dongBtvn, dongKiemTra, dongSuaLoi, lyDoCach, nhanNgay, tomTat7, trangThaiHomNay } from '../src/components/ph-v3/DocPh'
+import type { TomTatKiemTra } from '../src/lib/kiem-tra-ca-nhan'
 import type { BaoCaoTuanCon } from '../src/lib/bao-cao-tuan-ph-api'
 import type { NgayHoc } from '../src/lib/ph-v3/con-tong-quan'
 import { hoc2Gia, lichSuGia, loiThayGia, nhipGia, thaiDoGia, tatCaGia, tongQuanGia } from '../scripts/chup-ph-dot19/gia'
@@ -96,6 +97,27 @@ describe('phép thuần của màn chỉ đọc', () => {
     expect(nhanNgay('2026-10-20')).toBe('T3 20')
     expect(nhanNgay('2026-10-25')).toBe('CN 25')
   })
+  it('thẻ «Kiểm tra và sửa lỗi»: câu trạng thái + màu nghĩa của ba dòng; thiếu số ⇒ «—»', () => {
+    const mo = Date.UTC(2026, 9, 13, 17)
+    const kt = (o: Partial<TomTatKiemTra>): TomTatKiemTra => ({ id: 'k', ngay: '2026-10-14', moLuc: mo, hanLuc: mo + 86_400_000, serverNow: mo, trangThai: 'can_lam', homNay: true, tong: 28, daTra: 0, con: 28, soChang: 5, phut: 25, soBai: 6, tongKienThuc: 12, phuDe: 0, nguonDayDu: true, lyDo: '', thieuNguon: 0, diem: null, nopLuc: null, ...o })
+    expect(dongKiemTra(kt({}), true)).toEqual({ mau: 'do', chu: 'Hôm nay có bài kiểm tra · con chưa làm · hạn 24:00' })
+    expect(dongKiemTra(kt({ daTra: 10, con: 18 }), true)).toEqual({ mau: 'cam', chu: 'Đang làm · 10/28 câu · hạn 24:00' })
+    expect(dongKiemTra(kt({ trangThai: 'da_nop', diem: 8, nopLuc: mo + 3_600_000 }), true)).toEqual({ mau: 'xanh', chu: 'Đã nộp · 8/10' })
+    expect(dongKiemTra(kt({ trangThai: 'het_han' }), true)).toEqual({ mau: 'do', chu: 'Hết hạn, con chưa nộp' })
+    expect(dongKiemTra(kt({ trangThai: 'da_nop', homNay: false, diem: 7.5, nopLuc: Date.UTC(2026, 9, 10, 13) }), true)).toEqual({ mau: 'xam', chu: 'Lần gần nhất 7,5/10 · 10/10' })
+    expect(dongKiemTra(undefined, true).chu).toBe('Chưa có lịch kiểm tra ôn tập')
+    expect(dongKiemTra(undefined, false).chu).toBe('—')
+    expect(dongSuaLoi(19, 46, 6)).toEqual({ mau: 'cam', chu: 'Còn 19 câu chưa sửa · 14 ngày qua con tự sửa 6 câu' })
+    expect(dongSuaLoi(19, 46, 0).mau).toBe('do')
+    expect(dongSuaLoi(0, 46, 3)).toEqual({ mau: 'xanh', chu: 'Đã sửa hết câu sai' })
+    expect(dongSuaLoi(null, null, null).chu).toBe('—')
+    const bt = (dangChay: { hanNop: string }[], gan: unknown[]) => ({ dangChay, gan }) as never
+    expect(dongBtvn(bt([{ hanNop: '2026-10-28T16:59:00Z' }], []))).toEqual({ mau: 'cam', chu: '1 bài chưa nộp · hạn 28/10' })
+    expect(dongBtvn(bt([{ hanNop: '' }], [])).chu).toBe('1 bài chưa nộp')
+    expect(dongBtvn(bt([], [{}]))).toEqual({ mau: 'xanh', chu: 'Đã nộp đủ' })
+    expect(dongBtvn(bt([], [])).chu).toBe('Không có bài')
+    expect(dongBtvn(null).chu).toBe('—')
+  })
   it('lý do nhận định bằng SỐ CÂU / SỐ LẦN, không %', () => {
     const bc = (nhan: BaoCaoTuanCon['nhan'], thuoc: number, bamVoi: number, treo: number) => ({ nhan, mucLam: { thuoc, bamVoi, treo, doDuoc: 200 } }) as BaoCaoTuanCon
     expect(lyDoCach(bc('Đối phó', 20, 21, 3))).toBe('Bấm vội mà sai 21 câu · để máy treo 3 lần trong 7 ngày')
@@ -108,13 +130,13 @@ describe('phép thuần của màn chỉ đọc', () => {
 describe('«Chỉ đọc» bật (<html data-trong="ph">)', () => {
   beforeEach(() => { document.documentElement.dataset.trong = 'ph' })
 
-  it('thứ tự đầu → Hôm nay → 7 ngày → nhóm → Lời thầy → 3 số; không ô bấm, nút duy nhất là ảnh đại diện; chỉ lệnh sẵn có', async () => {
+  it('thứ tự đầu → Hôm nay → 7 ngày → nhóm → Lời thầy → Kiểm tra và sửa lỗi; không ô bấm, nút duy nhất là ảnh đại diện; chỉ lệnh sẵn có', async () => {
     const c = mo()
     await waitFor(() => expect(c.querySelector('[data-vung="ph-chi-doc"] [data-vung="hom-nay-doc"]')).toBeTruthy())
     const man = c.querySelector('[data-vung="ph-chi-doc"]')!
     expect(man.querySelector('h1')!.textContent).toBe('Khôi · Lớp 12A1')
-    expect([...man.querySelectorAll('.pd-luoi > section')].map((x) => x.getAttribute('data-vung'))).toEqual(['hom-nay-doc', 'bay-ngay', 'nhom-con', 'loi-thay-doc'])
-    expect(man.querySelector('.pd-luoi + [data-vung="ba-so"]')).toBeTruthy()
+    expect([...man.querySelectorAll('.pd-luoi > section')].map((x) => x.getAttribute('data-vung'))).toEqual(['hom-nay-doc', 'bay-ngay', 'nhom-con', 'loi-thay-doc', 'kiem-tra-sua-loi'])
+    expect([...man.querySelectorAll('.pd-kt li')].map((x) => x.querySelector('b')!.textContent)).toEqual(['Kiểm tra ôn tập', 'Tự sửa lỗi', 'Bài tập về nhà'])
     expect([...man.querySelectorAll('button')].map((b) => b.getAttribute('aria-label'))).toEqual(['Tài khoản: mở để đổi số báo danh'])
     expect(man.querySelectorAll('a')).toHaveLength(0)
     expect(c.querySelector('.tvc-muc-luc, .tvc-ben, [role="dialog"]')).toBeNull()
@@ -126,7 +148,8 @@ describe('«Chỉ đọc» bật (<html data-trong="ph">)', () => {
     expect(man.querySelector('.pd-7 .c[data-tt="nay"] small')!.textContent).toBe('Hôm nay')
     await waitFor(() => expect(man.querySelector('.pd-thang [data-on]')!.textContent).toBe('Chưa đều'))
     await waitFor(() => expect(man.querySelector('[data-vung="cach-lam-bai"]')!.textContent).toBe('Học thậtLàm nhanh vì đã thuộc 126 câu · bấm vội mà sai 8 câu'))
-    expect(man.querySelector('[data-vung="ba-so"]')!.textContent).toContain('Kiểm tra gần nhất')
+    await waitFor(() => expect(man.querySelector('.pd-kt li[data-ma="sua-loi"] > div > span')!.textContent).toBe('Còn 19 câu chưa sửa · 14 ngày qua con tự sửa 6 câu'))
+    expect(man.querySelector('.pd-kt li[data-ma="btvn"]')!.getAttribute('data-mau')).toBe('cam')
     for (const d of goi) expect(Object.keys(MAY)).toContain(d)
     expect(goi.filter((x) => x === '/ph/bao-cao-tuan')).toHaveLength(1)
     for (const d of ['/ph/ho-so-thai-do', '/ph/lich-su-lam-cau']) expect(goi).not.toContain(d)

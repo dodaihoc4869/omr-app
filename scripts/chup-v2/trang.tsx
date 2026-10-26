@@ -118,7 +118,9 @@ if (man !== 'ph' && !man.startsWith('ph-') && thamSo.get('trong') !== 'tat') doc
 // cảnh `ph` cũ KHÔNG có `mot` ⇒ giữ y như trước, không data-trong). Số = bộ GIẢ đợt 19 (scripts/chup-ph-dot19/gia.ts: 21:05 Thứ Tư 14/10/2026, con
 // «Nguyễn Minh Khôi», hôm nay 18/30, nhóm Chưa đều) + Báo cáo tuần GIẢ (Học thật) + một cảnh báo của thầy (`/ph/ke-hoach`). Biến thể (`bienThePh`):
 //   `&hn=chua|dang|du` hôm nay 0 · 18 · 31/30 câu · `&nhom=luoi|cham` · `&dg=doi-pho|hoc-that|khong` (chưa có đánh giá) · `&cb=0` không cảnh báo
-//   · `&lt=0` thầy chưa gửi nhận xét · `&dai=1` dữ liệu dài (tên dài, lời thầy dài, số lớn). Đồng hồ trang = mốc của bộ giả.
+//   · `&lt=0` thầy chưa gửi nhận xét · `&dai=1` dữ liệu dài (tên dài, lời thầy dài, số lớn). Thẻ «Kiểm tra và sửa lỗi»: `&kt=chua|dang|nop|het|cu|sap|khong`
+//   (Kiểm tra ôn tập hôm nay chưa làm · đang làm 10/28 · đã nộp 8 · hết hạn · lần trước 7,5 · bài sắp mở · không có lịch) · `&ss=het|do` (đã sửa hết ·
+//   còn nhiều mà 14 ngày không sửa) · `&bt=du|khong` (Bài tập về nhà đã nộp đủ · không có bài). Đồng hồ trang = mốc của bộ giả.
 const MOT_PH = man === 'ph' && thamSo.get('mot') === '1'
 const traMotPh = (duong: string): unknown => {
   if (duong.endsWith('/ph/nhip-hoc')) return nhipPh19()
@@ -145,6 +147,24 @@ const bienThePh = (duong: string, r: any): unknown => {
     if (dai) r.cauSai = { ...r.cauSai, tong: 12456, daSua: 34 }
   }
   if (duong.endsWith('/ph/hoc-2') && lam !== null) r.homNay = { ...r.homNay, daLam: lam }
+  const kt = thamSo.get('kt')
+  if (duong.endsWith('/ph/hoc-2') && kt && kt !== 'khong') {
+    const homNay = kt !== 'cu' && kt !== 'sap'
+    const mo = Date.UTC(2026, 9, homNay ? 13 : kt === 'cu' ? 9 : 15, 17) // nửa đêm giờ VN: 14/10 (hôm nay) · 10/10 (lần trước) · 16/10 (sắp mở)
+    const daTra = kt === 'dang' ? 10 : kt === 'nop' || kt === 'cu' ? 28 : 0
+    r.kiemTraCaNhan = {
+      id: `kt-${kt}`, ngay: new Date(mo + 7 * 3_600_000).toISOString().slice(0, 10), moLuc: mo, hanLuc: mo + 86_400_000, serverNow: NAY_PH19,
+      trangThai: kt === 'chua' || kt === 'dang' ? 'can_lam' : kt === 'het' ? 'het_han' : kt === 'sap' ? 'sap_den' : 'da_nop', homNay,
+      tong: 28, daTra, con: 28 - daTra, soChang: 5, phut: 25, soBai: 6, tongKienThuc: 12, phuDe: 0, nguonDayDu: true, lyDo: '', thieuNguon: 0,
+      diem: kt === 'nop' ? 8 : kt === 'cu' ? 7.5 : null, nopLuc: kt === 'nop' ? NAY_PH19 - 3_600_000 : kt === 'cu' ? mo + 20 * 3_600_000 : null,
+    }
+  }
+  if (duong.endsWith('/ph/con-tong-quan') && thamSo.get('ss') === 'het') r.cauSai = { ...r.cauSai, daSua: r.cauSai.tong }
+  if (duong.endsWith('/ph/tat-ca-ve-con') && thamSo.get('ss') === 'do' && r.lichOn) r.lichOn = { ...r.lichOn, daKhacPhuc14Ngay: 0 }
+  if (duong.endsWith('/ph/tat-ca-ve-con') && thamSo.get('bt') && r.baiTapVeNha) {
+    const gan = [{ maBtvn: 'BT-0', ten: 'Ester – Lipid buổi 2', nopLuc: '2026-10-12T13:00:00Z', dungHan: true, diem: 9, nopTreGio: null }]
+    r.baiTapVeNha = { ...r.baiTapVeNha, dangChay: [], gan: thamSo.get('bt') === 'du' ? gan : [] }
+  }
   if (duong.endsWith('/ph/tat-ca-ve-con') && dai) r.hoTen = 'Nguyễn Hoàng Bảo Ngọc Phương Thảo Khánh Linh'
   if (duong.endsWith('/ph/nhip-hoc') && (nhom === 'luoi' || nhom === 'cham')) {
     Object.assign(r, nhom === 'luoi'

@@ -276,15 +276,19 @@ const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], 
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 // ═══ PH CHỈ ĐỌC 26/10 (thay khối MỘT TRANG PH): app phụ huynh «Chỉ đọc» (`ph&mot=1`, khối cùng tên ở trang.tsx). Ảnh KHUNG NHÌN ở 3 khổ × sáng/tối cho
 // ba trạng thái: chưa làm + Lười + đối phó + thầy chưa nhận xét · đang làm (bộ gốc: Chưa đều, Học thật, cảnh báo thầy) · đủ + Chăm + học thật; thêm khổ
-// 390×700 · 360×640 · 1024×768 · 1920×1080, dữ liệu dài (`dai=1`), chưa có đánh giá (`dg=khong`). Đo trang cuộn / tràn ngang (`pd:`): ba khổ chính phải
-// vừa một màn; khổ thấp hơn được cuộn (không cắt chữ). `trong=tat` ⇒ trang cũ. Chạy riêng: tiền tố "6" (60-, 61-, 62-).
+// 390×700 · 360×640 · 1024×768 · 1920×1080, dữ liệu dài (`dai=1`), chưa có đánh giá (`dg=khong`). Đo trang cuộn / tràn ngang (`pd:`): máy tính 1440×900
+// phải vừa một màn (`pd:3`); điện thoại cuộn được từ khi thêm thẻ «Kiểm tra và sửa lỗi» (ảnh dọc chụp cả trang), không cắt chữ. `trong=tat` ⇒ trang cũ. 63- = thẻ «Kiểm tra và sửa lỗi». Chạy riêng: 60-ph-doc,61-ph-doc,62-ph-doc,63-ph-doc.
 const CANH_PD = [['chua', 'hn=chua&nhom=luoi&dg=doi-pho&lt=0&cb=0'], ['dang', ''], ['du', 'hn=du&nhom=cham&dg=hoc-that&cb=0']]
 const DS_PH_DOC = [
   ...CANH_PD.flatMap(([tt, q]) => [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => ['light', 'dark'].map((nen) =>
-    [`60-ph-doc-${tt}-${k}-${nen === 'dark' ? 'toi' : 'sang'}`, `ph&mot=1${q ? '&' + q : ''}`, w, h, nen, false, /Hôm nay/, 'pd:3'])))
+    [`60-ph-doc-${tt}-${k}-${nen === 'dark' ? 'toi' : 'sang'}`, `ph&mot=1${q ? '&' + q : ''}`, w, h, nen, k === 'doc', /Hôm nay/, k === 'may-tinh' ? 'pd:3' : 'pd:'])))
   ,...[[390, 700], [360, 640], [1024, 768], [1920, 1080], [740, 360]].map(([w, h]) => [`61-ph-doc-dang-${w}x${h}`, 'ph&mot=1', w, h, 'light', false, /Hôm nay/, 'pd:'])
   ,['61-ph-doc-dai-doc', 'ph&mot=1&dai=1&cb=0&dg=doi-pho&nhom=luoi', 390, 844, 'light', true, /Hôm nay/, 'pd:']
-  ,['61-ph-doc-chua-danh-gia-doc', 'ph&mot=1&dg=khong&lt=0&cb=0', 390, 844, 'light', false, /Hôm nay/, 'pd:3']
+  ,['61-ph-doc-chua-danh-gia-doc', 'ph&mot=1&dg=khong&lt=0&cb=0', 390, 844, 'light', true, /Hôm nay/, 'pd:']
+  // thẻ «Kiểm tra và sửa lỗi» (thầy 26/10): bảy trạng thái Kiểm tra ôn tập (điện thoại, cả trang) + sửa hết / còn nhiều không sửa + BTVN đủ / không có bài
+  ,...['chua', 'dang', 'nop', 'het', 'cu', 'sap', 'khong'].map((kt) => [`63-ph-doc-kt-${kt}-doc`, `ph&mot=1&cb=0&kt=${kt}`, 390, 844, 'light', true, /Hôm nay/, 'pd:'])
+  ,['63-ph-doc-kt-ss-het-bt-du-may-tinh', 'ph&mot=1&cb=0&kt=nop&ss=het&bt=du', 1440, 900, 'light', false, /Hôm nay/, 'pd:3']
+  ,['63-ph-doc-kt-ss-do-bt-khong-may-tinh-toi', 'ph&mot=1&cb=0&kt=chua&ss=do&bt=khong', 1440, 900, 'dark', false, /Hôm nay/, 'pd:3']
   ,['62-ph-doc-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/]
   ,['62-ph-doc-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/]
 ]
