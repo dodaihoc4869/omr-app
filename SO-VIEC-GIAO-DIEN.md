@@ -519,3 +519,5 @@ Luật: vòng nền của app HS/PH ≥ 180 giây ± 30 giây lệch ngẫu nhi�
 - 13/10 · Codex · Bảng nhịp kiểm tra cá nhân: ManKiemTraCaNhan.tsx có 1 setInterval 1000 ms chỉ cập nhật giờ cục bộ. Không gọi D1 định kỳ; hết hạn gọi chot(true) một lần, khoá tuNop và dọn đồng hồ khi rời màn. Đã xếp vào KHONG_GOI_MAY_CHU ở tests/nhip-bang-2109.test.ts.
 
 - 23/10 · Claude (Boss) · Màn chiếu Điểm danh nền sáng: `BanChieuDiemDanh.tsx` có 1 setInterval 1000 ms (ô «Mã đổi sau m:ss», chỉ vẽ lại ô mã, tắt khi buổi đã kết thúc). Không gọi máy chủ. Xếp vào `LAN_APP_THAY` (`tests/nhip-bang-2109.test.ts`).
+
+- 27/10 · Claude (Bi chuyển động, nhánh `claude/bi-dong-2710`) · `src/components/linh-vat/bi-dong.ts` có 2 setInterval: 100 ms sinh bọt khí và vòng hiệu ứng của trạng thái đang hiện (nước mắt, hơi bốc, hoa giấy, zzz, đổi màu cầu vồng). Chỉ cục bộ, không gọi máy chủ; tab ẩn hoặc Bi ra khỏi khung nhìn ⇒ không sinh hạt, mọi hoạt ảnh dừng; gỡ Bi ⇒ xoá hết. Xếp vào `KHONG_GOI_MAY_CHU` (`tests/nhip-bang-2109.test.ts`).
