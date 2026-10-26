@@ -1,6 +1,4 @@
 import BatLinhShell from './components/bat-linh/BatLinhShell'
-import './styles/teacher-layout.css'
-import './styles/vo-thay.css'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import BottomNav from './components/BottomNav'
@@ -17,7 +15,10 @@ import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { docDuongVao, laManThayQuanLy } from './lib/vai-tro'
 import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
-import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
+// CẦU NỐI Cowork `window.__ddh` nạp LƯỜI (26/10, tốc độ): mảnh của nó kéo bộ chấm + PDF bài tập (exam-grade, bai-tap-pdf…) mà màn khoá thầy
+// không cần — chỉ tải sau khi thầy mở khoá. Gỡ chỉ là xoá `window.__ddh` (= TEN_CAU_NOI trong cau-noi-ddh.ts) ⇒ không phải tải mảnh để gỡ.
+const napCauNoi = () => import('./lib/cau-noi-ddh')
+const goCauNoi = () => { delete (window as unknown as Record<string, unknown>).__ddh }
 
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
@@ -106,8 +107,25 @@ const ParentPortalScreen = lazy(() => import('./screens/ParentPortalScreen'))
 const DieuKhienToChieuScreen = lazy(() => import('./screens/DieuKhienToChieuScreen'))
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
-import './styles/gv-mau.css' // BẢN MÀU app thầy (28/09), phạm vi .vo-thay
-import './styles/teacher-modern.css' // Lớp hoàn thiện app thầy, sau bảng màu gốc
+// CSS VỎ THẦY (26/10, thầy: «tối ưu tốc độ mọi thứ cho 3 app tức thì hơn nữa»): sáu tờ CHỈ app thầy dùng (mọi luật dưới `.vo-thay` / `.m3-thay` /
+// `[data-teacher-screen]` / thanh bên–thanh đáy thầy) trước nằm trong index.css ⇒ máy em, phụ huynh, màn thi phải tải (~10 KB nén, CSS chặn lượt vẽ đầu).
+// Nay là chuỗi trong mảnh App (như trong-gv.css bên dưới — KHÔNG thêm tệp .css vào precache), chèn NGAY SAU tờ index ⇒ đúng chỗ cũ trong chuỗi luật:
+// sau tờ chung, TRƯỚC «Trong» (trong.css) và mọi tờ màn nạp sau. Thứ tự sáu tờ y như main.tsx cũ.
+import cssTeacherLayout from './styles/teacher-layout.css?inline'
+import cssVoThay from './styles/vo-thay.css?inline'
+import cssThanhBenHoa2 from './components/chien-dich/thanh-ben-hoa2.css?inline'
+import cssThanhBenGv2 from './components/thanh-ben-gv2.css?inline'
+import cssGvMau from './styles/gv-mau.css?inline' // BẢN MÀU app thầy (28/09), phạm vi .vo-thay
+import cssTeacherModern from './styles/teacher-modern.css?inline' // Lớp hoàn thiện app thầy, sau bảng màu gốc
+if (typeof document !== 'undefined' && !document.querySelector('style[data-vo-thay]')) {
+  const s = Object.assign(document.createElement('style'), { textContent: [cssTeacherLayout, cssVoThay, cssThanhBenHoa2, cssThanhBenGv2, cssGvMau, cssTeacherModern].join('\n') })
+  s.dataset.voThay = ''
+  const goc = document.querySelector('link[rel="stylesheet"][href*="/assets/index-"]')
+  const trong = document.querySelector('[data-vite-dev-id$="/styles/trong.css"]') // `npm run dev`: tờ là <style>, đứng trước «Trong»
+  if (goc) goc.after(s)
+  else if (trong) trong.before(s)
+  else document.head.append(s)
+}
 import './styles/trong.css' // Giao diện «Trong» thầy chốt 26/10 — đè sau cùng (chỉ khi <html data-trong>)
 // «Trong» — khung app thầy (thanh bên, thanh trên/đáy): chuỗi CSS nằm trong mảnh App (KHÔNG thêm tệp .css mới vào precache — trần 170 tệp),
 // chỉ gắn khi main.tsx đã bật <html data-trong="gv">; tắt «Trong» ⇒ không gắn gì.
@@ -310,8 +328,9 @@ function App() {
       goCauNoi()
       return
     }
-    ganCauNoi()
-    return () => goCauNoi()
+    let con = true
+    void napCauNoi().then((m) => { if (con) m.ganCauNoi() }).catch(() => {})
+    return () => { con = false; goCauNoi() }
   }, [canHoi, laPhieu, laXemDiem, laHocSinh, khoa])
 
   // Máy em / phụ huynh cầm link cũ thì KHÔNG đọc gì của thầy — không mở

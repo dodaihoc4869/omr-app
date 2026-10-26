@@ -132,7 +132,8 @@ describe('App.tsx: vỏ giáo viên', () => {
     expect(APP).toContain("caidat: 'Cài đặt'")
     expect(APP).toContain("{screen === 'caidat' && <CaiDatScreen />}")
     expect(APP).toContain('if (canHoi) apDungGiaoDien(docGiaoDien())')
-    expect(APP).toContain("import './styles/vo-thay.css'")
+    // 26/10: CSS vỏ thầy là chuỗi trong mảnh App (chèn ngay sau tờ index), không còn import thường.
+    expect(APP).toContain("import cssVoThay from './styles/vo-thay.css?inline'")
   })
 })
 
