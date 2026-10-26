@@ -267,7 +267,7 @@ export function MotTrangHs(p: PropsMotTrang) {
 }
 
 function OTo({ ten, mo, sac, Icon, so, noi, onClick, tat }: { ten: string; mo: string; sac: string; Icon: LucideIcon; so?: ReactNode; noi?: boolean; onClick?: () => void; tat?: boolean }) {
-  const than = <><span className="h" data-sac={sac}><Icon size={30} aria-hidden="true" /></span><span className="giua"><b>{ten}</b><span className="mo">{mo}</span></span>{so != null && <span className="so">{so}</span>}{onClick && <ChevronRight size={22} aria-hidden="true" className="da-mui" />}</>
+  const than = <><span className="h" data-sac={sac}><Icon size={30} aria-hidden="true" /></span><span className="giua"><b>{ten}</b><span className="mo">{mo.replace(/ · /g, '\u00a0· ')/* SOÁT 26/10: «·» không mở đầu dòng */}</span></span>{so != null && <span className="so">{so}</span>}{onClick && <ChevronRight size={22} aria-hidden="true" className="da-mui" />}</>
   return onClick ? <button type="button" className="da-o" data-noi={noi || undefined} onClick={onClick} disabled={tat}>{than}</button> : <div className="da-o" data-noi={noi || undefined}>{than}</div>
 }
 

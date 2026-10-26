@@ -854,3 +854,11 @@
 }
 [data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'], .da-nut[data-tt='dang'] .da-bong) { animation: none; }
 [data-trong].may-yeu :is(.da-lan, .da-vo-khoa) { display: none; }
+
+/* SOÁT 26/10 (app HS kiểu Duolingo): Lộ trình đang tải — thanh xương xuống hàng riêng, tên bài không bị ép mỗi từ một dòng; Thành tích — số «6 ngày»
+   không chạm dòng chữ dưới, bốn huy hiệu ở điện thoại dọc xếp 2 × 2 (nhãn «Chưa đủ mức hôm nay» không vỡ từng từ). Chỉ trình bày, màu giữ nguyên. */
+[data-trong] .da-bai > .mot-xuong { flex: 1 1 100%; }
+[data-trong] .da-lua b { line-height: 1.2; }
+@media (max-width: 480px) {
+  [data-trong] .da-huy { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+}
