@@ -1,0 +1,113 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Hỏi Thầy · Thầy đã trả lời</title><link rel="stylesheet" href="trong.css">
+<style>
+/* GỌN HƠN: hộp Hỏi Thầy cùng hệ «Trong» — điện thoại là tấm trượt từ đáy, máy tính là ngăn bên phải (không che bài đang làm);
+   Đề câu + Em và câu này gập thành hai dòng mảnh; câu trả lời là MỘT thẻ, phần phụ gập; một nút chính duy nhất là Gửi. */
+body{background:var(--nen)}
+.vo{display:grid;grid-template-columns:minmax(0,1fr) 520px;min-height:100vh}
+.nen-cau{position:relative;padding:32px;filter:blur(1.5px);opacity:.45}
+.nen-cau .the{max-width:720px;margin:0 auto}
+.ngan{position:relative;background:var(--mat);border-left:1px solid var(--vien);box-shadow:var(--bong-3);display:flex;flex-direction:column;min-height:100vh}
+.ngan-dau{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--vien)}
+.ngan-dau .giua{flex:1;min-width:0}
+.ngan-than{flex:1;padding:16px 20px 8px;display:flex;flex-direction:column;gap:14px}
+.gap{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;border-radius:14px;background:var(--mat-2);font-size:14px}
+.gap .nd{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--chu-2)}
+.gap b{font-weight:600;color:var(--chu)}
+.bong-em{align-self:flex-end;max-width:80%;padding:10px 14px;border-radius:18px 18px 6px 18px;background:var(--chinh-nut,var(--chinh));color:#fff;font-weight:500}
+.tl{border:1px solid var(--vien);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px;background:var(--mat)}
+.tl-dau{display:flex;align-items:center;gap:10px}
+.y-chinh{font-size:17px;line-height:1.55;font-weight:500}
+.y-chinh .gach{color:var(--sai-chu);text-decoration:line-through}
+.y-chinh .dung{color:var(--dung-chu);font-weight:600}
+.y-chinh .so-dap{display:inline-block;padding:0 8px;border-radius:8px;background:var(--dung-nhat);color:var(--dung-chu);font-weight:700}
+.so-sanh{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--vien);border-radius:14px;overflow:hidden;font-size:14px}
+.so-sanh>div{padding:10px 12px;border-top:1px solid var(--vien);line-height:1.45}
+.so-sanh>.th{border-top:0;background:var(--mat-2);font-size:12.5px;font-weight:600;color:var(--chu-3)}
+.so-sanh>div:nth-child(odd){border-right:1px solid var(--vien)}
+.so-sanh .lech-em{background:var(--sai-nhat);color:var(--sai-chu);font-weight:600}
+.so-sanh .lech-dung{background:var(--dung-nhat);color:var(--dung-chu);font-weight:600}
+.so-sanh .mo-di{color:var(--chu-3);text-decoration:line-through}
+.so-sanh .dung-in{color:var(--dung-chu);font-weight:600}
+.vi-sao{display:flex;gap:10px;padding:12px 14px;border-radius:14px;background:var(--chu-y-nhat);color:var(--chu-y-chu);font-size:14px;line-height:1.5}
+.goi{display:flex;flex-wrap:wrap;gap:8px}
+.goi span{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--vien-2);font-size:14px;font-weight:500;color:var(--chu)}
+.hoi-lai{border-radius:16px;background:var(--mat-2);padding:14px;display:flex;flex-direction:column;gap:10px}
+.hoi-lai .lua-chon{min-height:48px;font-size:15px}
+.mo-them{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 14px;border-radius:14px;border:1px dashed var(--vien-2);color:var(--chinh-chu);font-weight:600;font-size:14px}
+.nhap{position:sticky;bottom:0;padding:12px 20px 16px;border-top:1px solid var(--vien);background:var(--mat)}
+.nhap-o{display:flex;align-items:flex-end;gap:10px;padding:10px 10px 10px 14px;border:1px solid var(--vien-2);border-radius:18px}
+.nhap-o .chu{flex:1;min-height:40px;color:var(--chu-3);padding-top:8px}
+.nhap .duoi-nhap{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.kien-tri{text-align:center;color:var(--chu-3);font-size:12.5px;margin-top:8px;font-weight:500}
+sub{font-size:.72em;line-height:0}
+@media (max-width:900px){
+  .vo{grid-template-columns:minmax(0,1fr)}
+  .nen-cau{padding:16px;height:150px;overflow:hidden}
+  .ngan{border-left:0;border-radius:24px 24px 0 0;margin-top:-24px;min-height:auto}
+  .ngan::before{content:"";position:absolute;top:8px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:999px;background:var(--vien-2)}
+  .ngan-dau{padding-top:22px}
+}
+@media (max-width:600px){.ngan-than,.ngan-dau,.nhap{padding-left:16px;padding-right:16px}.so-sanh{font-size:13.5px}}
+</style></head>
+<body data-app="hs" data-khung="khong" data-ai="khong">
+<div class="vo">
+  <div class="nen-cau" aria-hidden="true">
+    <div class="the"><p class="h3">Câu 6 · Phần III · Trả lời ngắn</p><p class="cau-de mt-3">Thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong dung dịch sodium hydroxide dư, đun nóng. Khối lượng muối thu được là bao nhiêu gam?</p>
+      <div class="hang mt-4"><span class="nut chinh"><i data-i="ask"></i>Hỏi thầy</span><span class="nut"><i data-i="book"></i>Lời giải từng bước</span></div></div>
+  </div>
+
+  <aside class="ngan" aria-label="Hỏi Thầy">
+    <div class="ngan-dau">
+      <span class="o-icon"><i data-i="ask"></i></span>
+      <div class="giua"><p class="h3">Hỏi Thầy</p><p class="mo">Câu 6 · Ester – Lipid</p></div>
+      <span class="nut vuong trong" aria-label="Đóng"><i data-i="x"></i></span>
+    </div>
+
+    <div class="ngan-than">
+      <div class="gap"><b>Đề câu</b><span class="nd">Thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong…</span><span class="chip tin">Trả lời ngắn</span><i data-i="chevron-down" class="nho"></i></div>
+      <div class="gap"><i data-i="user" class="nho"></i><b>Em và câu này</b><span class="nd"></span><span class="chip chu-y">Tự làm đúng 1/3 lần</span><i data-i="chevron-down" class="nho"></i></div>
+
+      <p class="bong-em">Sao em ra 9,6 g?</p>
+
+      <section class="tl">
+        <div class="tl-dau"><span class="av a1">ĐH</span><span class="dam" style="flex:1">Thầy Đỗ Đại Học</span><span class="chip sai">Chỉ chỗ sai</span></div>
+        <p class="y-chinh">Em tính mol đúng, chỉ sai một chỗ: lấy nhầm muối <span class="gach">C<sub>2</sub>H<sub>5</sub>COONa</span>. Muối đúng là <span class="dung">CH<sub>3</sub>COONa</span> ⇒ <span class="so-dap">m = 8,2 gam</span></p>
+
+        <div class="so-sanh" aria-label="So bài em với lời giải">
+          <div class="th">Em làm</div><div class="th">Đúng là</div>
+          <div>n<sub>ester</sub> = 8,8 : 88 = 0,1 mol</div><div class="dung-in">n<sub>ester</sub> = 0,1 mol</div>
+          <div class="lech-em">Muối: C<sub>2</sub>H<sub>5</sub>COONa (M = 96)</div><div class="lech-dung">Muối: CH<sub>3</sub>COONa (M = 82)</div>
+          <div class="mo-di">m = 0,1 × 96 = 9,6 g</div><div class="dung-in">m = 0,1 × 82 = 8,2 g</div>
+        </div>
+
+        <div class="vi-sao"><i data-i="alert" class="nho"></i><span><b>Vì sao em nhầm:</b> tên ester đọc gốc alcohol trước — ethyl acetate = gốc ethyl + gốc acetate. Muối giữ gốc <b>acetate</b>.</span></div>
+        <div class="mo-them">Xem phương trình và cách tính đầy đủ <i data-i="chevron-down" class="nho"></i></div>
+
+        <div>
+          <p class="nhan">Em chưa hiểu chỗ nào? Chạm để hỏi Thầy</p>
+          <div class="goi mt-2"><span>Chỗ lệch</span><span>Vì sao M = 82?</span><span>Gọi tên ester</span></div>
+        </div>
+
+        <div class="hoi-lai">
+          <p class="nhan"><i data-i="target" class="nho" style="vertical-align:-3px"></i> Thầy hỏi lại 1 câu</p>
+          <p class="dam">Thuỷ phân methyl propionate (C<sub>2</sub>H<sub>5</sub>COOCH<sub>3</sub>) trong NaOH. Muối thu được là</p>
+          <div class="lua-chon"><b>A</b><span>CH<sub>3</sub>COONa</span></div>
+          <div class="lua-chon dung"><b>B</b><span>C<sub>2</sub>H<sub>5</sub>COONa</span></div>
+          <div class="lua-chon"><b>C</b><span>CH<sub>3</sub>ONa</span></div>
+          <div class="ghi-chu dung"><i data-i="check-circle" class="nho"></i><span>Đúng. Muối giữ gốc acid: propionate ⇒ C<sub>2</sub>H<sub>5</sub>COONa.</span></div>
+        </div>
+
+        <div class="hang" style="flex-wrap:wrap;gap:8px"><span class="nut">Giải thích dễ hơn</span><span class="nut">Cho ví dụ khác</span></div>
+      </section>
+    </div>
+
+    <div class="nhap">
+      <div class="nhap-o"><span class="chu">Nhắn chỗ em còn thắc mắc…</span><span class="nut chinh vuong" aria-label="Gửi"><i data-i="send"></i></span></div>
+      <div class="duoi-nhap"><span class="chip">Còn 11 câu hỏi hôm nay</span><span class="mo">0/500</span></div>
+      <p class="kien-tri">KIÊN TRÌ là vũ khí tối thượng để chiến thắng mọi thứ</p>
+    </div>
+  </aside>
+</div>
+<script src="khung.js"></script>
+</body></html>

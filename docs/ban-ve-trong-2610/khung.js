@@ -84,8 +84,24 @@ function icon(ten, lop = '') { return `<svg class="i ${lop}" viewBox="0 0 24 24"
       + '<span class="av lon a1">MA</span>'
     dau.innerHTML = `<div class="khung">${kieu === 'man-con' ? conHtml : brand}<span class="day"></span>`
       + (kieu === 'man-con' ? (b.dataset.nutDau || '') : `<nav class="nav-tren">${NAV.map(([k, t, ic]) => `<span class="${k === tab ? 'on' : ''}">${icon(ic, 'nho')}${t}</span>`).join('')}</nav><span class="day"></span>${phai}`) + '</div>'
-    b.prepend(dau)
-    if (kieu !== 'man-con' || b.dataset.duoi === 'co') {
+    const menuBen = b.dataset.menu // 'phai' | 'trai': menu dọc thu gọn thành chấm (bản vẽ 26/10 tối) — thay thanh đáy + tab trên
+    if (!menuBen || kieu === 'man-con') b.prepend(dau)
+    if (menuBen) {
+      b.classList.add('co-menu-cham')
+      const cham = document.createElement('button'); cham.className = 'menu-cham ' + menuBen + (b.dataset.menuMo ? ' chi-cham' : ''); cham.setAttribute('aria-label', 'Mở menu'); cham.innerHTML = '<i></i><b></b><s></s>'
+      b.append(cham)
+      if (b.dataset.menuMo) {
+        const phu = document.createElement('div'); phu.className = 'menu-phu'; b.append(phu)
+        const doc = document.createElement('nav'); doc.className = 'menu-doc ' + menuBen; doc.setAttribute('aria-label', 'Điều hướng học sinh')
+        doc.innerHTML = '<div class="menu-doc-dau"><img src="logo/logo-hs-nho.svg" alt=""><span>Đỗ Đại Học</span></div>'
+          + NAV.map(([k, t, ic]) => `<span class="muc${k === tab ? ' on' : ''}">${icon(ic)}${t}</span>`).join('')
+          + '<div class="vach"></div><span class="muc">' + icon('clipboard') + 'Vào ca kiểm tra</span>'
+          + '<span class="muc">' + icon('bell') + 'Thông báo<span class="dem-so">2</span></span>'
+          + '<span class="muc">' + icon('refresh') + 'Cập nhật bài học</span>'
+          + '<span class="muc"><span class="av a1" style="width:24px;height:24px;font-size:10px">MA</span>Của em</span><span class="tay"></span>'
+        b.append(doc)
+      }
+    } else if (kieu !== 'man-con' || b.dataset.duoi === 'co') {
       b.classList.add('co-duoi')
       const duoi = document.createElement('nav'); duoi.className = 'duoi'
       duoi.innerHTML = `<div>${NAV.map(([k, t, ic]) => `<span class="${k === tab ? 'on' : ''}"><i>${icon(ic)}</i>${t}</span>`).join('')}</div>`

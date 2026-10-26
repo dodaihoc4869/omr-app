@@ -269,3 +269,30 @@ table.bang{width:100%;border-collapse:collapse;font-size:14px}
 }
 .chi-dt{display:none}
 @media (max-width:900px){.chi-dt{display:block}}
+
+/* ── Menu dọc thu gọn thành chấm (bản vẽ 26/10 tối — thầy: «menu xếp dọc, gọn, tự ẩn vào một điểm nhỏ, chạm vào mở ra tinh tế») ───────── */
+.menu-cham{position:fixed;top:50%;transform:translateY(-50%);z-index:40;width:44px;height:64px;display:grid;place-items:center;border:0;background:transparent;padding:0}
+.menu-cham.phai{right:0}.menu-cham.trai{left:0}
+.menu-cham i{display:block;width:6px;height:40px;border-radius:999px;background:color-mix(in srgb,var(--chinh) 55%,transparent);box-shadow:0 0 0 4px color-mix(in srgb,var(--chinh) 12%,transparent)}
+.menu-cham.phai i{margin-left:14px}.menu-cham.trai i{margin-right:14px}
+.menu-cham b{position:absolute;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:var(--chinh)}
+.menu-cham.phai b{right:16px}.menu-cham.trai b{left:16px}
+.menu-cham.chi-cham i{display:none}
+.menu-phu{position:fixed;inset:0;z-index:41;background:color-mix(in srgb,var(--nen) 55%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.menu-doc{position:fixed;top:50%;transform:translateY(-50%);z-index:42;width:214px;padding:8px;border-radius:24px;background:var(--mat);border:1px solid var(--vien);box-shadow:var(--bong-3);display:flex;flex-direction:column;gap:2px}
+.menu-doc.phai{right:12px}.menu-doc.trai{left:12px}
+.menu-doc .muc{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 14px;border-radius:16px;color:var(--chu-2);font-size:15px;font-weight:500}
+.menu-doc .muc.on{background:var(--chinh-nhat);color:var(--chinh-chu);font-weight:600}
+.menu-doc .muc .dem-so{margin-left:auto}
+.menu-doc .vach{margin:6px 10px}
+.menu-doc .tay{position:absolute;top:50%;width:6px;height:40px;margin-top:-20px;border-radius:999px;background:var(--chinh)}
+.menu-doc.phai .tay{right:-14px}.menu-doc.trai .tay{left:-14px}
+body.co-menu-cham .dau .nav-tren{display:none}
+.menu-cham s{position:absolute;top:10px;width:8px;height:8px;border-radius:50%;background:var(--sai);box-shadow:0 0 0 2px var(--nen)}
+.menu-cham.phai s{right:12px}.menu-cham.trai s{left:12px}
+.menu-cham.chi-cham s{display:none}
+.menu-doc-dau{display:flex;align-items:center;gap:10px;padding:8px 14px 10px;font-weight:700;font-size:15px}
+.menu-doc-dau img{width:26px;height:26px}
+body.co-menu-cham .khung{padding-top:28px}
+body.co-menu-cham .ai-bong{bottom:24px}
+@media (max-width:600px){body.co-menu-cham .khung{padding-top:24px;padding-right:28px}}

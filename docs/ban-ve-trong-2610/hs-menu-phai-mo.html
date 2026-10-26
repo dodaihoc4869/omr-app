@@ -1,0 +1,98 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HS · Menu dọc mép phải · đang mở</title><link rel="stylesheet" href="trong.css">
+<style>
+.hero{position:relative;overflow:hidden;padding:24px}
+.hero::before{content:"";position:absolute;inset:-40% -10% auto auto;width:420px;height:420px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--chinh) 14%,transparent),transparent);pointer-events:none}
+.hero-than{position:relative;display:flex;gap:28px;align-items:center}
+.hero-chu{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.hero-duoi{position:relative;margin:16px 0 0 176px}
+.vong .so-lon{font-size:36px}
+.lich-14{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px}
+.lich-14 i{aspect-ratio:1;border-radius:5px;background:var(--mat-3)}
+.lich-14 i.d{background:var(--dung)} .lich-14 i.v{background:color-mix(in srgb,var(--dung) 45%,var(--mat-3))} .lich-14 i.h{outline:2px solid var(--chinh);outline-offset:1px;background:color-mix(in srgb,var(--dung) 45%,var(--mat-3))}
+.ca-mo{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:var(--tin-nhat);color:var(--tin-chu)}
+.ca-mo .giua{flex:1;min-width:0}
+.ca-mo .nut{background:var(--tin);border-color:var(--tin);color:#fff}
+.so-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.so-3>div{padding:12px;border-radius:12px;background:var(--mat-2)}
+@media (max-width:600px){.hero{padding:18px}.hero-than{gap:16px}.hero .vong{--d:96px!important;--net:9px!important}.hero .vong .so-lon{font-size:26px}.hero .vong .mo{font-size:11px}.hero-duoi{margin:16px 0 0}.hero .nut.lon{width:100%}.ca-mo{flex-wrap:wrap}.ca-mo .nut{width:100%}}
+</style></head>
+<body data-app="hs" data-tab="hom-nay" data-menu="phai" data-menu-mo="co">
+<main class="khung cot" style="gap:20px">
+  <div>
+    <p class="nhan">Thứ Hai 26/10 · 12A1</p>
+    <h1 class="tieu-de mt-1">Chào Minh Anh</h1>
+  </div>
+
+  <div class="ca-mo">
+    <span class="o-icon tin" style="background:var(--mat)"><i data-i="clipboard"></i></span>
+    <div class="giua"><p class="dam" style="color:var(--chu)">Ca kiểm tra đang mở · Kiểm tra 15 phút 12A1</p><p style="font-size:14px">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng.</p></div>
+    <span class="nut">Vào ca kiểm tra <i data-i="arrow"></i></span>
+  </div>
+
+  <div class="chinh-phu">
+    <div class="cot" style="gap:20px">
+      <section class="the hero" aria-label="Hôm nay">
+        <div class="hero-than">
+          <div class="vong" style="--p:40;--d:148px;--net:13px"><div><div class="so-lon">12<small>/30</small></div><div class="mo">câu hôm nay</div></div></div>
+          <div class="hero-chu">
+            <div class="hang" style="flex-wrap:wrap;gap:8px"><span class="chip chu-y">Còn 18 câu</span><span class="chip sao"><i data-i="flame" class="nho"></i>Chuỗi 6 ngày</span></div>
+            <h2 class="h2">Hành trình giỏi Hoá · Khối 12</h2>
+            <p class="phu">Bài Ester – Lipid · tầng Hiểu · xong 2/5 chặng</p>
+          </div>
+        </div>
+        <div class="hero-duoi">
+          <div class="chang" aria-label="Xong 2/5 chặng"><i class="xong"></i><i class="xong"></i><i class="dang"></i><i></i><i></i></div>
+          <div class="hang mt-4" style="flex-wrap:wrap"><span class="nut chinh lon">Học tiếp · 18 câu <i data-i="arrow"></i></span><span class="mo">Mỗi chặng tối đa 6 câu · khoảng 25 phút</span></div>
+        </div>
+      </section>
+
+      <section class="the">
+        <div class="the-dau"><span class="o-icon tin"><i data-i="target"></i></span><div class="h3">Kiểm tra ôn tập<p class="mo" style="font-weight:400">Lịch dành riêng cho em · bài 2/3 trong tuần</p></div><span class="chip tin an-dt">Hạn 24:00</span></div>
+        <div class="so-3">
+          <div><p class="mo">Số câu</p><p class="so" style="font-size:22px">28</p></div>
+          <div><p class="mo">Thời gian</p><p class="so" style="font-size:22px">50<small>phút</small></p></div>
+          <div><p class="mo">Chặng</p><p class="so" style="font-size:22px">5</p></div>
+        </div>
+        <p class="phu mt-3">Kiểm chứng những phần em đang luyện thêm. Đồng hồ mỗi chặng chỉ chạy khi em bấm vào chặng đó.</p>
+        <div class="hang mt-4"><span class="nut chinh">Làm bài kiểm tra <i data-i="arrow"></i></span><span class="mo">0/28 đã trả lời</span></div>
+      </section>
+
+      <section class="the">
+        <div class="the-dau"><span class="o-icon xam"><i data-i="book"></i></span><div class="h3">Bài học trong 7 ngày</div><span class="mo">Còn 6 câu trong bài</span></div>
+        <div class="luoi-2" style="gap:20px">
+          <div><div class="hang giua"><span class="phu">Gặp câu gốc</span><span class="dam">14/20 câu</span></div><div class="thanh mt-2" style="--p:70%"><i></i></div></div>
+          <div><div class="hang giua"><span class="phu">Câu mới hôm nay</span><span class="dam">3/5</span></div><div class="thanh dung mt-2" style="--p:60%"><i></i></div></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="cot" style="gap:20px">
+      <section class="the" style="border-color:color-mix(in srgb,var(--sai) 30%,var(--vien))">
+        <div class="hang"><span class="o-icon sai"><i data-i="wrench"></i></span><div class="giua" style="flex:1;min-width:0"><p class="h3">5 câu đang chờ em sửa</p><p class="mo">Sửa lại câu em làm sai, từng bước một</p></div></div>
+        <span class="nut rong-het mt-4">Sửa lỗi ngay</span>
+      </section>
+
+      <section class="the">
+        <div class="the-dau"><div class="h3">Nhịp học của em</div><span class="chip dung"><span class="cham dung"></span>Chăm</span></div>
+        <div class="lich-14" aria-label="14 ngày gần nhất">
+          <i class="d"></i><i class="d"></i><i class="v"></i><i class="d"></i><i></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="v"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="h"></i>
+        </div>
+        <div class="hang giua mt-2"><span class="mo">13/10</span><span class="mo">Hôm nay</span></div>
+        <div class="ghi-chu dung mt-4"><i data-i="check-circle" class="nho"></i><span><b>Việc tiếp:</b> làm đủ 30 câu hôm nay để giữ nhóm Chăm. Thầy cũng thấy bảng này.</span></div>
+        <a class="lien-ket mt-1">Xem hồ sơ làm bài của em <i data-i="chevron" class="nho"></i></a>
+      </section>
+
+      <section class="the dem">
+        <div class="the-dau" style="padding:16px 20px 0;margin:0"><div class="h3">Ôn và sửa</div></div>
+        <div class="ds">
+          <div class="dong"><span class="o-icon"><i data-i="history"></i></span><div class="giua"><p class="ten">Câu đã làm</p><p class="mo">Lời giải và lịch ôn từng câu</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+          <div class="dong"><span class="o-icon chu-y"><i data-i="pen"></i></span><div class="giua"><p class="ten">Bài tập về nhà</p><p class="mo">Thầy đang giao · 1 bài, hạn 28/10</p></div><span class="phai"><span class="dem-so">1</span><i data-i="chevron"></i></span></div>
+          <div class="dong"><span class="o-icon tin"><i data-i="layers"></i></span><div class="giua"><p class="ten">Tu luyện</p><p class="mo">Luyện thêm theo chương, dạng, mức</p></div><span class="phai"><i data-i="chevron"></i></span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="khung.js"></script>
+</body></html>
