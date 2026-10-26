@@ -1,0 +1,7 @@
+/* «TRONG» · ĐĂNG NHẬP HỌC SINH (bản vẽ hs-dang-nhap, thầy chốt 26/10): bỏ lời chào + hình bạn đồng hành, mắt rơi ngay vào hai ô nhập và nút «Đăng nhập». */
+[data-trong='hs'] .bl-login{background:var(--tr-nen)}
+[data-trong='hs'] .bl-login .bl-login__card{border:1px solid var(--tr-vien);border-radius:24px;background:var(--tr-mat);color:var(--tr-chu);box-shadow:var(--tr-bong-3)}
+[data-trong='hs'] .bl-login .bl-loi-chao{display:none}
+[data-trong='hs'] .bl-login input{min-height:48px;border-radius:12px;font-family:inherit}
+[data-trong='hs'] .bl-login .bg-amber-50{border:0;background:var(--tr-tin-nhat);color:var(--tr-tin-chu)}
+[data-trong='hs'] .bl-login .bg-rose-50{border:0;background:var(--tr-sai-nhat);color:var(--tr-sai-chu)}

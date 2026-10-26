@@ -461,7 +461,7 @@ function ManHoSoEm() {
 // ═════════ LÀN «TRONG» HS 26/10: `?man=hs-menu` = Hôm nay (Nhịp học Chăm) + chuông THẬT ThongBaoHocSinh (2 tin chưa đọc, `/notifications/list` GIẢ) —
 // chụp menu dọc mép phải thu gọn / mở (`nut:Mở menu`). `&ca=1` = ca đang mở. ═════════
 import ThongBaoHocSinh from '../../src/components/ThongBaoHocSinh'
-if (man === 'hs-menu') {
+if (man === 'hs-menu' || man === 'hs-sheet') {
   const fetchChung = window.fetch
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
@@ -474,9 +474,76 @@ if (man === 'hs-menu') {
     return fetchChung(input, init)
   }
 }
+import BongBongAiDdh from '../../src/components/ai-ddh/BongBongAiDdh'
+import KhoiKhacPhuc3CheDo from '../../src/components/KhoiKhacPhuc3CheDo'
+import LuyenDeChuan from '../../src/components/LuyenDeChuan'
+import LichSuCaEm from '../../src/components/hoa2/LichSuCaEm'
+if (man === 'hs-sheet' && thamSo.get('tam') === 'ai') {
+  try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
+  const fetchAi = window.fetch
+  const TIN_AI = [
+    { id: 't1', ben: 'em', chu: 'Cho 5,6 gam Fe tác dụng hết với dung dịch HCl dư, thu được V lít khí H2 (đkc). Giá trị của V là? Em ra 1,2395 lít mà thấy sai sai.', anh: 0, trangThai: 'xong', luc: now - 600_000 },
+    { id: 't2', ben: 'vp', chu: 'Bạn chia đôi số mol H2 rồi đó. Fe + 2HCl → FeCl2 + H2; n(H2) = n(Fe) = 0,1 mol ⇒ V = 0,1 × 24,79 = 2,479 lít.', anh: 0, nguon: 'kho', traLoiCho: 't1', luc: now - 540_000 },
+  ]
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const duong = new URL(url, location.href).pathname
+    if (duong.endsWith('/hs/ai-ddh/mo')) return new Response(JSON.stringify({ ok: true, bat: true, khoa: null, vanPhongTruc: true, conLuot: 18, tranLuot: 20, tin: TIN_AI }), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (duong.endsWith('/hs/ai-ddh/tin')) return new Response(JSON.stringify({ ok: true, tin: [] }), { status: 200, headers: { 'content-type': 'application/json' } })
+    return fetchAi(input, init)
+  }
+}
 const manMenuTrong = () => h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_NHE } as never, dangTai: false, loi: '', coCa: thamSo.get('ca') === '1', token: 'tk',
   thongBao: h(ThongBaoHocSinh, { token: 'tk', onOpen: noop }), onMoHoSo: noop, soBaiTap: 1,
   onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })
+import DangNhapHocSinh from '../../src/screens/DangNhapHocSinh'
+import { LogoDoc } from '../../src/components/LogoVai'
+// `?man=hs-dang-nhap` = màn đăng nhập THẬT (lệnh giả: SBD 12026 chưa có mật khẩu ⇒ bước đặt mật khẩu; SBD khác ⇒ báo sai mật khẩu).
+const manDangNhapTrong = () => h(DangNhapHocSinh, { logo: h(LogoDoc, { vai: 'hs', size: 48 }), onDangNhap: noop,
+  api: { dangNhap: (async () => ({ ok: false, chuaCoMatKhau: true, error: '' })) as never, datMatKhau: (async () => ({ ok: false, error: 'Xác nhận mật khẩu không khớp' })) as never } })
+// `?man=hs-sheet&tam=btvn|lich-su|gia-dinh|vao-thi` = các tấm toàn màn của cổng học sinh (component THẬT, số giả) đè lên Hôm nay như app thật.
+import '../../src/components/bang-nhiem-vu/sheet-m3.css'
+import { ThanhTren } from '../../src/components/m3'
+import BtvnM3 from '../../src/components/bang-nhiem-vu/BtvnM3'
+import LichSuCaM3 from '../../src/components/bang-nhiem-vu/LichSuCaM3'
+import { MomDanhSachM3 } from '../../src/components/bang-nhiem-vu/MomM3'
+import PhongVaoThi from '../../src/components/PhongVaoThi'
+import VaoThiForm from '../../src/components/bang-nhiem-vu/VaoThiForm'
+const ngayGioGia = (iso: string) => { const d = new Date(iso); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` }
+const ngayIso = (ngay: number, gio = 21) => new Date(now + ngay * 86400_000).toISOString().slice(0, 11) + `${String(gio).padStart(2, '0')}:00:00+07:00`
+const manTamTrong = () => {
+  const tam = thamSo.get('tam') ?? 'btvn'
+  if (tam === 'cau-da-lam') return h(FragmentHse, null, manMenuTrong(), h('div', { className: 'fixed inset-0 z-50 overflow-y-auto overscroll-contain' }, h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop })))
+  if (tam === 'ai') return h(FragmentHse, null, manMenuTrong(), h(BongBongAiDdh, { auth: { token: 'tk', sbd: '12121212', hoTen: 'Nguyễn Minh Anh' } }))
+  const DS_CA = [
+    { maCa: '543998', tenCa: 'Kiểm tra tuần 12 · Polymer', nopLuc: ngayIso(-2, 10), tong: 7.25, diemI: 3, diemII: 2.75, diemIII: 1.5, tongCau: 28 },
+    { maCa: '541207', tenCa: 'Kiểm tra tuần 11 · Amino acid và peptide', nopLuc: ngayIso(-9, 10), tong: 7, diemI: 3.25, diemII: 2.25, diemIII: 1.5, tongCau: 28 },
+    { maCa: '538114', tenCa: 'Kiểm tra tuần 10 · Amine', nopLuc: ngayIso(-16, 10), tong: 6, diemI: 3, diemII: 2, diemIII: 1, tongCau: 28 },
+  ]
+  if (tam === 'ca') return h(FragmentHse, null, manMenuTrong(), h('div', { className: 'fixed inset-0 z-50 overflow-y-auto' }, h(LichSuCaEm, { sbd: '12121212', onVe: noop, banDau: { items: DS_CA, chuaCongBo: [] } } as never)))
+  if (tam === 'khac-phuc') return h(FragmentHse, null, manMenuTrong(), h('div', { className: 'm3 m3-sheet fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto overscroll-contain flex flex-col' },
+    h(ThanhTren, { tieuDe: 'Luyện lại từ bài kiểm tra', onQuayLai: noop, nhanQuayLai: 'Về Hôm nay' }), h('main', { className: 'max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1' },
+      h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6 items-start' }, h('div', null, h(LuyenDeChuan, { sbd: '12121212', token: 'tk' })),
+        h('div', null, h(KhoiKhacPhuc3CheDo, { sbd: '12121212', token: 'tk', hoTen: 'Nguyễn Minh Anh', dsLichSu: DS_CA, scriptUrl: '', lop: '12A1' } as never))))))
+  if (tam === 'vao-thi') return h(FragmentHse, null, manMenuTrong(), h(PhongVaoThi, { onClose: noop }, h(VaoThiForm, { maCa: '', onMaCa: noop, matKhau: '', onMatKhau: noop, loi: '', onSubmit: (e: Event) => e.preventDefault(), sbd: '12121212', hoTen: 'Nguyễn Minh Anh' } as never)))
+  const tieu = tam === 'lich-su' ? 'Kết quả bài đã nộp' : tam === 'gia-dinh' ? 'Bài gia đình giao' : 'Bài tập về nhà'
+  const con = tam === 'lich-su' ? h(LichSuCaM3, { dangTai: false, ngayGio: ngayGioGia, dongDem: (x: { tongCau?: number | null }) => `Đúng ${Math.round((x.tongCau ?? 0) * 0.8)}/${x.tongCau} câu`, dangMoDe: false, onXemBaoCao: noop, onXemDe: noop, ds: [
+      { maCa: '543998', tenCa: 'Kiểm tra tuần 12 · Polymer', nopLuc: ngayIso(-2, 10), tong: 8.5, diemI: 3.5, diemII: 3.25, diemIII: 1.75, tongCau: 28 },
+      { maCa: '541207', tenCa: 'Kiểm tra tuần 11 · Amino acid và peptide', nopLuc: ngayIso(-9, 10), tong: 8.25, diemI: 3.25, diemII: 3.5, diemIII: 1.5, tongCau: 28 },
+      { maCa: '538114', tenCa: 'Kiểm tra tuần 10 · Amine', nopLuc: ngayIso(-16, 10), tong: 6.75, diemI: 3, diemII: 2.5, diemIII: 1.25, tongCau: 28 },
+    ] } as never)
+    : tam === 'gia-dinh' ? h(MomDanhSachM3, { daTai: true, loi: '', thongBaoNop: null, onDongThongBao: noop, onLamMoi: noop, ngayGio: ngayGioGia, onBatDau: noop, onXemKetQua: noop, ds: [
+      { id: 'm1', tieuDe: 'Đề ôn chương Carbohydrate', ngayGiao: ngayIso(-1, 19), soCau: 28, trangThai: 'dang_lam' },
+      { id: 'm2', tieuDe: 'Ôn câu sai Ester – Lipid', ngayGiao: ngayIso(-8, 19), soCau: 20, trangThai: 'da_nop', diem: 7.85 },
+    ] } as never)
+    : h(BtvnM3, { dangTai: false, now, dangMoId: null, ngayGio: ngayGioGia, onMo: noop, onTaiLai: noop, ds: [
+      { maBtvn: 'b1', maCa: '612004', tenBtvn: 'Thế điện cực và nguồn điện hoá học', soCau: 24, hanNop: ngayIso(4) },
+      { maBtvn: 'b2', maCa: '611872', tenBtvn: 'Amino acid và peptide', soCau: 25, hanNop: ngayIso(3), daNop: true, nopLuc: ngayIso(-4, 21), diem: 8.4, soDung: 21, soLanLamLaiConLai: 2 },
+      { maBtvn: 'b3', maCa: '610455', tenBtvn: 'Amine', soCau: 24, hanNop: ngayIso(-11) },
+    ] } as never)
+  return h(FragmentHse, null, manMenuTrong(), h('div', { className: 'm3 m3-sheet fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto overscroll-contain flex flex-col' },
+    h(ThanhTren, { tieuDe: tieu, onQuayLai: noop, nhanQuayLai: 'Về Hôm nay' }), h('main', { className: 'max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1' }, con)))
+}
 // ═════════ hết LÀN «TRONG» HS 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
@@ -507,6 +574,8 @@ const con =
   man === 'hs-ho-so' ? h(ManHoSoEm) : // LÀN HỒ SƠ EM 12/10F
   man === 'gv-len-bang' ? h(GoiLenBangScreen) : man === 'gv-chieu' ? h(DieuKhienToChieuScreen) : // «TRONG» NHÓM 3
   man === 'hs-menu' ? manMenuTrong() : // LÀN «TRONG» HS 26/10
+  man === 'hs-dang-nhap' ? manDangNhapTrong() : // LÀN «TRONG» HS 26/10
+  man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))

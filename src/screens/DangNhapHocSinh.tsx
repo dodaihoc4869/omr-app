@@ -12,6 +12,11 @@ import { voiHanCho } from '../lib/han-cho'
 import type { hsDangNhapApi, hsDatMatKhauApi } from '../lib/hs-dang-nhap-api'
 import type { KemDangNhap, ThongTinHs } from '../lib/phien-hoc-sinh'
 import { layGhiChuPhienHong } from '../lib/phien-hong'
+import cssTrong from '../styles/trong-hs-dang-nhap.css?inline'
+
+// Giao diện «Trong» (thầy chốt 26/10): kiểu riêng màn đăng nhập NHÚNG vào mảnh này (không thêm tệp tải / tệp cất sẵn); mọi luật dưới [data-trong='hs']
+// ⇒ giao diện cũ (ddh.trong = 'tat') không đổi gì.
+if (typeof document !== 'undefined' && !document.getElementById('trong-hs-dn')) document.head.append(Object.assign(document.createElement('style'), { id: 'trong-hs-dn', textContent: cssTrong }))
 
 export interface ApiDangNhapHs {
   dangNhap: typeof hsDangNhapApi

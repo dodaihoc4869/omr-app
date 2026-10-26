@@ -140,7 +140,19 @@ export default function HocTapHomNay(p: Props) {
 
   // «Trong»: mảnh trình bày nạp lười (nap-trong-hs.ts) — chờ có rồi mới vẽ (không chớp bản thiếu kiểu); không bật / tải hỏng ⇒ bản cũ y nguyên.
   const huaTrong = napTrongHs()
-  const ve = (trong: boolean) => { const MenuDoc = modTrongHs()?.MenuDocTrong; return <div className="ht-app ht2" data-nguon={p.nguon}>
+  const ve = (trong: boolean) => {
+    const MenuDoc = modTrongHs()?.MenuDocTrong
+    // Các khối của màn Hôm nay — MỘT bản cho cả hai giao diện (cũ: một cột; «Trong»: cột chính | cột phụ), điều kiện hiện y nguyên.
+    const eKiem = kiem && kiemHomNay && <Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
+    const eHomNay = <TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
+      viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
+      onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} noiNhip={trong ? oNhip : undefined} />
+    const eKiemSau = kiem && !kiemHomNay && <Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
+    const eMoiSua = <TheMoiTuSua so={soSua} token={p.token} onChua={p.onChua} />
+    const eGoi7 = goi7 && <TheGoi7 du={goi7} />
+    const eThieu = !!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>
+    const eGiu = !!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>
+    return <div className="ht-app ht2" data-nguon={p.nguon}>
     {trong && MenuDoc ? <MenuDoc muc={muc} ds={MENU} onMuc={(id) => setMuc(id as Muc)} coCa={p.coCa} onThi={p.onThi} thongBao={p.thongBao} dangTai={p.dangTai} onTaiLai={p.onTaiLai}
       chuDau={chuCaiDau(p.ten || 'Em')} moCuaEm={moCuaEm} onCuaEm={() => setMoCuaEm(true)} nutCuaEm={nutCuaEm} />
      : <header className="ht-thanh ht2-thanh">
@@ -162,38 +174,16 @@ export default function HocTapHomNay(p: Props) {
         {p.coCa && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
         {muc === 'hom-nay' && (trong ? <div className="tr-hn-luoi">
-          <div className="tr-hn-cot">
-            {kiem&&kiemHomNay&&<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
-            {!ngayKiem&&<><TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
-              viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
-              onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} noiNhip={oNhip} />
-            {kiem&&!kiemHomNay&&<Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
-            {goi7 && <TheGoi7 du={goi7} />}
-            {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>}
-            {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>}</>}
-          </div>
-          <div className="tr-hn-cot">
-            {!ngayKiem&&<><TheMoiTuSua so={soSua} token={p.token} onChua={p.onChua} />
-            <div ref={datONhip} className="tr-o-nhip" />
-            {nhomOnSua}</>}
-          </div>
+          <div className="tr-hn-cot">{eKiem}{!ngayKiem && <>{eHomNay}{eKiemSau}{eGoi7}{eThieu}{eGiu}</>}</div>
+          <div className="tr-hn-cot">{!ngayKiem && <>{eMoiSua}<div ref={datONhip} className="tr-o-nhip" />{nhomOnSua}</>}</div>
         </div> : <>
           {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
               và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
           {/* Đợt 20 (bản vẽ docs/ban-ve-dot20): ngày kiểm tra ⇒ thẻ kiểm tra là khối CHÍNH; ngày khác (sắp đến / đang chuẩn bị) ⇒ thẻ phụ NẰM SAU khối học.
               Thầy 14/10 ("khi nào tới lịch kiểm tra thì hiển bảng đó lên đầu và mở nút bắt đầu kiểm tra"): ngày kiểm tra có kèm kế hoạch học nhẹ cũng đưa thẻ
               kiểm tra (nút Làm bài kiểm tra) lên ĐẦU, khối học nhẹ nằm sau. */}
-          {kiem&&kiemHomNay&&<Suspense fallback={<p role="status">Đang mở lịch kiểm tra…</p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
-          {!ngayKiem&&<><TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={goi7?.goi[0]?.ten || sanh?.chienDich?.ten || undefined}
-            viec={goi7 ? chuViecGoi7(goi7) : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Chặng ${ht.changHienTai}/${ht.soChang}` : undefined}
-            onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
-          {kiem&&!kiemHomNay&&<Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa}/></Suspense>}
-          <TheMoiTuSua so={soSua} token={p.token} onChua={p.onChua} />
-          {goi7 && <TheGoi7 du={goi7} />}
-          {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>}
-          {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>}
-          {nhomOnSua}
-          </>}
+          {eKiem}
+          {!ngayKiem && <>{eHomNay}{eKiemSau}{eMoiSua}{eGoi7}{eThieu}{eGiu}{nhomOnSua}</>}
         </>)}
 
         {(muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" role="status" aria-busy="true" aria-label="Đang mở" />}>
