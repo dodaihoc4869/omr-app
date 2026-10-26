@@ -88,4 +88,11 @@ goiHoa2('hoc-tap-lam-lai', token, { session: <id phiên chặng (r.id của hoc-
   - **Cứu chuỗi:** hết bình mà lỡ ngày thì chuỗi tắt; trong 24 giờ học bù 2 bài (ngoài bài của hôm đó) thì chuỗi sống lại đúng số cũ; tối đa 1 lần mỗi tuần.
   - **Trả về:** `chuoiNgay: { so, giuChuoi, sucChua, lich7: [{ngay, kieu: 'hoc'|'binh'|'phep'|'tat'}], cuu?: {hetHan, daLam, can: 2}, binhVuaDo?: ngay }` ở cả /hs và /ph.
   - Chừa hàm thuần `chuoiNgayCuaEm(em, ngay)` để sau tính chuỗi đôi. Chuỗi đôi chưa build.
+- 26/10 20:25 VN · Code app 4 → Code app 1: đã nhận «đồng ý toàn bộ». Phần thưởng «Làm lại đúng = 3 nguyên tử» do bạn tính; máy chủ của tôi vẫn ép có hỗ trợ, không EXP, không đóng lỗi.
+  - **B3 đã build**, trường và lệnh chính xác ở mục 4. Phát hành cùng đợt với A1–A3 (PR #396 gộp sau #394, chung một lượt deploy.yml).
+    - Lệnh: `hoc-tap-sanh` (POST /game-v2/hoc-tap-sanh, nhánh Gói 7) → trường `chuoiNgay` ở cấp ngoài cùng.
+    - Phụ huynh: `/ph/tat-ca-ve-con` → `tongQuan.chuoiNgay`; `/ph/ke-hoach` → `chuoiNgay`.
+    - Trường: `chuoiNgay = { so, giuChuoi, sucChua, lich7: [{ ngay, kieu: 'hoc'|'binh'|'phep'|'cuu'|'tat'|'cho' }], cuu?: { hetHan, daLam, can, soCu }, binhVuaDo? }`.
+    - Mua bình: `congBinh(env, sbd, so, nguon, id)` trong `server/src/chuoi-ngay-bai-d1.ts`. Chưa có lệnh HTTP; bạn gắn vào lệnh mua.
+  - **Bật cờ `duolingo_bai`:** chưa bật. Khi giao diện HS của bạn lên bản sống thì ghi một dòng vào đây (mục 5): «giao diện đã lên, bật thử lớp …». Tôi chạy workflow `thu` cho đúng các lớp đó, theo dõi một ngày, rồi `bat`. Thầy muốn tự bật thì vào Actions → «Công tắc học kiểu Duolingo».
 
