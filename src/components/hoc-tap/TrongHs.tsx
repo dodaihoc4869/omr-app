@@ -4,12 +4,13 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
-import { chiaChang, chuNutHoc, useNhipHocEm } from './TheHomNayEm'
+import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import { ngayGon, useDiemDanhHs } from '../diem-danh/TheDiemDanhHs'
 import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
 import { Bi, type CamBi } from '../linh-vat/Bi'
+import { banHat, yenLang } from '../../lib/hieu-ung'
 import '../../styles/trong-hs.css'
 
 export interface PropsMotTrang {
@@ -55,10 +56,46 @@ type Nut = { k: string; loai: 'hoc' | 'kiem' | 'sua' | 'bt'; tt: 'xong' | 'dang'
 const LECH = [0, -52, -80, -52, 0, 52, 80, 52]
 const HINH_NUT: Record<Nut['loai'], LucideIcon> = { hoc: Play, kiem: FlaskConical, sua: Wrench, bt: PenLine }
 
-/** CON ĐƯỜNG CHẶNG (bản vẽ dm-1/2/3, thầy chốt 26/10): nút lục giác nổi khối, nối bằng đường chấm mềm (vẽ theo vị trí thật của nút). */
+/** F2/F3 — nhớ trên máy số chặng đã xong hôm nay (giờ VN): lần mở Lộ trình kế tiếp thấy THÊM đúng một chặng ⇒ chặng đó «vừa xong». Không bao giờ ghi lùi
+ *  (bản Sảnh đệm cũ vẽ trước bản mới không làm chạy lại hiệu ứng). Trả chỉ số chặng vừa xong hoặc null. */
+const KHOA_LO_TRINH = 'ddh.lo-trinh'
+function changVuaXong(xong: number, tong: number): number | null {
+  if (!tong) return null
+  const ngay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
+  let cu: { ngay?: string; tong?: number; xong?: number } | null = null
+  try { cu = JSON.parse(localStorage.getItem(KHOA_LO_TRINH) || 'null') } catch { /* bộ nhớ máy không đọc được: bỏ hiệu ứng */ }
+  const cung = !!cu && cu.ngay === ngay && cu.tong === tong
+  if (cung && typeof cu!.xong === 'number' && xong < cu!.xong) return null
+  try { localStorage.setItem(KHOA_LO_TRINH, JSON.stringify({ ngay, tong, xong })) } catch { /* không lưu được: lần sau không có hiệu ứng */ }
+  return cung && xong === (cu!.xong ?? -1) + 1 ? xong - 1 : null
+}
+
+/** CON ĐƯỜNG CHẶNG (bản vẽ dm-1/2/3, thầy chốt 26/10): nút lục giác nổi khối, nối bằng đường chấm mềm (vẽ theo vị trí thật của nút).
+ *  Hiệu ứng (HIEU-UNG.md F): F1 nút hiện tại phồng thở + bong bóng nhún (CSS) · F2 chặng vừa xong: vòng lan + sao bay · F3 chặng mới mở: khoá tinh thể vỡ
+ *  · F4 tự cuộn mượt tới nút hiện tại khi nút nằm ngoài khung nhìn. */
 function DuongChang({ ds, moDi }: { ds: Nut[]; moDi: boolean }) {
   const goc = useRef<HTMLDivElement>(null)
   const [duong, setDuong] = useState('')
+  const [vua, setVua] = useState<number | null>(null)
+  const soChang = ds.filter((n) => n.k.startsWith('c')).length, soXong = ds.filter((n) => n.k.startsWith('c') && n.tt === 'xong').length
+  useEffect(() => {
+    const v = changVuaXong(soXong, soChang)
+    if (v === null || yenLang()) return
+    setVua(v)
+    const nut = goc.current?.querySelectorAll('.da-nut')[v]
+    const t = window.setTimeout(() => banHat(nut, { hinh: 'sao', so: 10, xa: 80, ms: 700, mau: ['--tr-sao', '--tr-dung', '--tr-tin'] }), 120)
+    const het = window.setTimeout(() => setVua(null), 1600)
+    return () => { window.clearTimeout(t); window.clearTimeout(het) }
+  }, [soXong, soChang])
+  const daCuon = useRef(false)
+  useEffect(() => {
+    const nut = goc.current?.querySelector<HTMLElement>('.da-nut[data-tt="dang"]')
+    if (!nut || daCuon.current) return
+    daCuon.current = true
+    const r = nut.getBoundingClientRect()
+    if (r.top >= 0 && r.bottom <= window.innerHeight - 24) return
+    nut.scrollIntoView?.({ block: 'center', behavior: yenLang() ? 'auto' : 'smooth' })
+  }, [ds.length])
   useLayoutEffect(() => {
     const d = goc.current
     if (!d) return
@@ -84,9 +121,12 @@ function DuongChang({ ds, moDi }: { ds: Nut[]; moDi: boolean }) {
         <Icon size={30} strokeWidth={2.6} aria-hidden="true" />
         {n.nhan && <span className="da-nhan" data-ben={x > 0 ? 'trai' : undefined} aria-hidden="true">{n.nhan}</span>}
       </>
-      return <li key={n.k} className="da-o-nut" style={{ '--x': `${x}px` } as CSSProperties}>
+      const hu = vua === null ? undefined : i === vua ? 'xong' : i === vua + 1 && n.tt === 'dang' ? 'mo' : undefined
+      return <li key={n.k} className="da-o-nut" data-hu={hu} style={{ '--x': `${x}px` } as CSSProperties}>
         {n.onClick ? <button type="button" className="da-nut" data-loai={n.loai} data-tt={n.tt} onClick={n.onClick} disabled={n.tat} aria-label={n.ten}>{than}</button>
           : <span className="da-nut" data-loai={n.loai} data-tt={n.tt} role="img" aria-label={n.ten}>{than}</span>}
+        {hu === 'xong' && <span className="da-lan" aria-hidden="true" />}
+        {hu === 'mo' && <span className="da-vo-khoa" aria-hidden="true"><i /><i /><i /><i /><Lock size={22} strokeWidth={2.6} /></span>}
       </li>
     })}
   </ol></div>
@@ -99,8 +139,10 @@ function LoiBi({ cam, loi }: { cam: CamBi; loi: string }) {
     const yen = document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     if (yen) { setN(loi.length); return }
     setN(0)
-    const t = setInterval(() => setN((v) => { if (v >= loi.length) { clearInterval(t); return v } return v + 1 }), 28)
-    return () => clearInterval(t)
+    let t = 0, i = 0
+    const go = () => { i++; setN(i); if (i < loi.length) t = window.setTimeout(go, 28) }
+    t = window.setTimeout(go, 28)
+    return () => window.clearTimeout(t)
   }, [loi])
   return <div className="bi-loi"><Bi cam={cam} size={84} /><p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
 }

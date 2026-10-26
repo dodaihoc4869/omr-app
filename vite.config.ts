@@ -78,7 +78,7 @@ function napTruocManEm(): Plugin {
         }
         // 05/10: main.tsx nạp ĐỘNG gốc React ⇒ nhóm `app` (App.tsx, mọi đường trừ cổng học sinh) và `hsVo` (vỏ AppHocSinh + màn đăng nhập);
         // `hs` = phần mảnh cổng NGOÀI vỏ (máy đã đăng nhập: nạp ngay; chưa đăng nhập: nạp ưu tiên thấp sau DOMContentLoaded); `thi` / `ph` bỏ phần
-        // đã có trong `app`. Phông Sảnh (`phongHs`): mặt chữ Be Vietnam Pro / Noto Serif / Baloo 2 mà màn đăng nhập + Sảnh dùng — chỉ nạp trước
+        // đã có trong `app`. Phông Sảnh (`phongHs`): Nunito (app học sinh «Trong», 26/10 thay Be Vietnam Pro / Noto Serif) + Baloo 2 — chỉ nạp trước
         // khi trang do service worker phục vụ. Luật chọn nhóm: src/lib/nap-truoc-man-em.ts.
         const app = dsCua('/src/App.tsx')
         const hsVo = dsCua('/src/AppHocSinh.tsx')
@@ -90,7 +90,7 @@ function napTruocManEm(): Plugin {
         const ngoai =(ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
         const phongHs = Object.values(goi)
           .map((x) => (x as { fileName: string }).fileName)
-          .filter((f) => /^assets\/(?:be-vietnam-pro-(?:latin|vietnamese)-(?:400|600|700)|noto-serif-(?:latin|vietnamese)-700|baloo-2-(?:latin|vietnamese)-(?:700|800))-normal-[\w-]+\.woff2$/.test(f))
+          .filter((f) => /^assets\/(?:nunito-(?:latin|vietnamese)-wght|baloo-2-(?:latin|vietnamese)-(?:700|800))-normal-[\w-]+\.woff2$/.test(f))
           .sort()
           .map((f) => goc + f)
         const bang = {
@@ -298,7 +298,7 @@ export default defineConfig({
           // tải hỏng ⇒ màn thi vẫn chạy với trình bày cũ (logic không phụ thuộc tờ này).
           '**/trong-lam-bai-*.css',
           // Rung / tiếng phản hồi các màn luyện «Trong» (26/10): mảnh dùng chung của các màn nạp lười (làm chặng, kiểm tra, tự sửa, tu luyện) ⇒ kho chạy-lúc.
-          '**/{rung,phan-hoi,am-thanh,Bi}-*.{js,css}',
+          '**/{rung,phan-hoi,am-thanh,Bi,hieu-ung}-*.{js,css}',
           // Cầu nối Cowork `window.__ddh` (26/10): App.tsx nạp LƯỜI sau khi thầy mở khoá ⇒ kho chạy-lúc; tải hỏng (mất mạng) ⇒ chỉ thiếu cầu nối, app chạy như thường.
           '**/cau-noi-ddh-*.js',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
@@ -428,6 +428,8 @@ export default defineConfig({
           '**/inter-*-wght-normal-*.woff2',
           // Phông tiêu đề Game Hóa 2.0 'Baloo 2' (28/09): chỉ mảnh game/Sảnh 2.0 nạp (src/components/hoa2/phong-baloo.ts) — tải lúc mở game rồi cất ở kho chạy-lúc /assets/*.woff2, không vào precache vỏ.
           '**/baloo-2-*.woff2',
+          // Phông Nunito của app học sinh «Trong» (thầy 26/10, styles/trong-hs.css): máy đã đăng nhập nạp trước (phongHs) rồi cất ở kho chạy-lúc /assets/*.woff2.
+          '**/nunito-*-wght-normal-*.woff2',
           // Bi-a Phản Ứng (28/09): gói lười BiaGame + mảnh dùng chung với Đảo 2.0 (thẻ câu `TrongAi`, `useNgang`) — Rollup tách riêng vì cả hai game
           // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). `chu-het-luot` (1 KB) bị tách theo, chỉ DaoThanThu/DoanHoTong/Game
           // (đều ngoài precache) nhập. Chỉ máy mở game mới tải, cất ở kho chạy-lúc.

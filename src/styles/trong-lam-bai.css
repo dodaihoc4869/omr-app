@@ -449,9 +449,6 @@
 [data-trong] .duo-3 > div[data-sac=sao] { --sac: var(--tr-sao); --sac-chu: var(--tr-sao-chu); }
 [data-trong] .duo-3 p { margin: 0; padding: 6px 4px; background: var(--sac); color: var(--tr-trang); font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 [data-trong] .duo-3 b { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 58px; background: var(--tr-mat); color: var(--sac-chu); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
-[data-trong] .duo-chang { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
-[data-trong] .duo-chang i { width: 34px; height: 10px; border-radius: 999px; background: var(--tr-mat-3); }
-[data-trong] .duo-chang i[data-xong] { background: var(--tr-dung); }
 [data-trong] .duo-ghi { max-width: 420px; margin: 0; font-size: 14px; line-height: 1.5; color: var(--tr-chu-2); }
 @media (max-width: 600px) {
   [data-trong] .duo-tren { padding: 8px 12px 0 8px; gap: 10px; }
@@ -505,29 +502,15 @@
  *   Giảm chuyển động / máy yếu ⇒ không chuyển động, chỉ đổi màu. ── */
 @keyframes hu-nay { 0% { transform: scale(1); } 45% { transform: scale(1.04); } 100% { transform: scale(1); } }
 @keyframes hu-lac { 0%, 100% { transform: translateX(0); } 16% { transform: translateX(-6px); } 33% { transform: translateX(6px); } 50% { transform: translateX(-6px); } 66% { transform: translateX(6px); } 83% { transform: translateX(-3px); } }
-@keyframes hu-tia { 0% { opacity: 1; transform: scale(.55); } 100% { opacity: 0; transform: scale(1.35); } }
 @keyframes hu-hien { from { opacity: .35; } to { opacity: 1; } }
 @keyframes hu-ve { to { stroke-dashoffset: 0; } }
 @keyframes hu-loe { from { transform: translateX(-120%); } to { transform: translateX(260%); } }
 @keyframes hu-roi { 0% { opacity: 0; transform: translate3d(0, -20px, 0) rotate(0deg); } 12% { opacity: 1; } 100% { opacity: 0; transform: translate3d(var(--lech, 0px), 300px, 0) rotate(260deg); } }
 [data-trong='hs'] .duo .ht2-lam-pa[data-ket], [data-trong='hs'] .duo .ht2-lam-y[data-ket], [data-trong='hs'] .duo .ht2-lam-o-hang[data-ket] { position: relative; }
-/* đúng: ô đúng nảy + tia bung (8 tia vẽ bằng gradient trên phần tử giả) */
+/* đúng: ô đúng nảy; 8 hạt lục giác bung ra do lib/hieu-ung.ts (banHat) bắn — lớp hạt fixed, không tràn trang */
 [data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung'],
 [data-trong='hs'] .duo .ht2-lam-y[data-ket='dung'], [data-trong='hs'] .duo .ht2-lam-o-hang[data-ket='dung'],
 [data-trong='hs'] :is(.ccs, .tlu) .pa-hang[data-trang-thai='dung'] { animation: hu-nay 260ms ease-out; }
-[data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung']::after, [data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-o-hang[data-ket='dung']::after {
-  content: ''; position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px; pointer-events: none; opacity: 0;
-  background:
-    radial-gradient(circle, var(--tr-dung) 0 4px, transparent 5px) 50% 0 / 12px 12px no-repeat,
-    radial-gradient(circle, var(--tr-sao) 0 4px, transparent 5px) 50% 100% / 12px 12px no-repeat,
-    radial-gradient(circle, var(--tr-dung) 0 4px, transparent 5px) 0 50% / 12px 12px no-repeat,
-    radial-gradient(circle, var(--tr-tin) 0 4px, transparent 5px) 100% 50% / 12px 12px no-repeat,
-    radial-gradient(circle, var(--tr-sao) 0 3px, transparent 4px) 15% 15% / 10px 10px no-repeat,
-    radial-gradient(circle, var(--tr-dung) 0 3px, transparent 4px) 85% 15% / 10px 10px no-repeat,
-    radial-gradient(circle, var(--tr-tin) 0 3px, transparent 4px) 15% 85% / 10px 10px no-repeat,
-    radial-gradient(circle, var(--tr-dung) 0 3px, transparent 4px) 85% 85% / 10px 10px no-repeat;
-  animation: hu-tia 450ms ease-out;
-}
 /* sai: ô em chọn lắc; ô đáp án đúng hiện dần sau 150ms */
 [data-trong='hs'] .duo[data-tt='sai'] .ht2-lam-pa[data-ket='sai'], [data-trong='hs'] .duo .ht2-lam-y[data-ket='sai'], [data-trong='hs'] .duo .ht2-lam-o-hang[data-ket='sai'],
 [data-trong='hs'] :is(.ccs, .tlu) .pa-hang[data-trang-thai='sai'] { animation: hu-lac 320ms ease-in-out; }
@@ -549,7 +532,7 @@
 [data-trong='hs'] .duo-hoa i:nth-child(3n + 1) { background: var(--tr-tin); }
 [data-trong='hs'] .duo-hoa i:nth-child(4n) { background: var(--tr-sai); width: 8px; height: 8px; }
 @media (prefers-reduced-motion: reduce) {
-  [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-y, .ht2-lam-o-hang), [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-o-hang)::after,
+  [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-y, .ht2-lam-o-hang),
   [data-trong='hs'] :is(.ccs, .tlu) .pa-hang, [data-trong='hs'] :is(.duo-ket, .duo-loe, .duo-hoa i, .duo-kq-o svg path) { animation: none !important; }
   [data-trong='hs'] .duo-ket[data-tt='dung'] .duo-kq-o svg path { stroke-dashoffset: 0; }
   [data-trong='hs'] .duo-thanh > i { transition: none; }
@@ -593,11 +576,93 @@
   [data-trong] .duo-kq-bi .bi { width: 44px; height: auto; }
   /* xong chặng: Bi (nhỏ) bên trái, chữ + số bên phải */
   [data-trong] .duo-xong { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 24px; row-gap: 8px; align-items: center; justify-items: start; max-width: 760px; margin-inline: auto; text-align: left; }
-  [data-trong] .duo-xong > :not(.bi):not(.duo-hoa) { grid-column: 2; }
-  [data-trong] .duo-xong > .bi { grid-column: 1; grid-row: 1 / span 5; width: 104px; height: auto; }
+  [data-trong] .duo-xong > :not(.duo-xong-bi):not(.duo-hoa) { grid-column: 2; }
+  [data-trong] .duo-xong > .duo-xong-bi { grid-column: 1; grid-row: 1 / span 6; }
+  [data-trong] .duo-xong-bi .bi { width: 104px; height: auto; }
   [data-trong] .duo-xong .duo-3 { max-width: none; }
-  [data-trong] .duo-xong .duo-chang { justify-content: flex-start; }
   [data-trong] .duo-xong .duo-ghi { max-width: none; }
   [data-trong] .duo[data-xong] .duo-day { position: static; }
   [data-trong] .duo[data-xong] .duo-giua { max-width: 760px; }
 }
+
+/* ── 14. HIỆU ỨNG kiểu Duolingo bản Hoá (ve-moi/thuong-phat/HIEU-UNG.md A3, A4, A6, A7, B1, B2, B4 — thầy 26/10 «hấp dẫn hoặc hơn doligo»).
+ * Chỉ transform / opacity (+ nét vẽ stroke-dashoffset như tick cũ); không đổi bố cục (băng combo, tinh thể nằm đè); không chặn bấm (pointer-events: none);
+ * giảm chuyển động / máy yếu ⇒ không chuyển động, giữ màu và số cuối. Hạt bung / rơi do lib/hieu-ung.ts (≤ 40 hạt, tự gỡ). ── */
+@keyframes duo-vao { from { opacity: 0; transform: translateX(40px); } }
+@keyframes duo-xuong { from { opacity: 0; transform: translate(-50%, -14px) scale(.96); } }
+@keyframes duo-moc { from { opacity: 0; transform: scale(0); } 70% { transform: scale(1.25); } }
+@keyframes duo-bot { 0% { opacity: 0; transform: translate(0, 4px) scale(.6); } 30% { opacity: .9; } 100% { opacity: 0; transform: translate(6px, -6px) scale(1); } }
+@keyframes duo-luot { from { transform: translateX(-120%); } to { transform: translateX(320%); } }
+@keyframes duo-bat { 0% { opacity: 0; transform: translateY(14px) scale(.8); } 60% { opacity: 1; transform: translateY(-3px) scale(1.04); } 100% { opacity: 1; transform: none; } }
+@keyframes duo-ket-tinh { 0% { opacity: 0; transform: scale(0) rotate(-35deg); } 70% { opacity: 1; transform: scale(1.08) rotate(4deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes duo-xoay { to { transform: rotate(1turn); } }
+@keyframes duo-hien { from { opacity: 0; } }
+/* A3 — câu mới trượt từ phải vào (câu cũ: bản sao trượt trái mờ dần — truotRa) */
+[data-trong='hs'] .duo:not([data-xong]) :is(.duo-cot-de, .duo-cot-tra) > * { animation: duo-vao 180ms ease-out both; }
+/* A4 — dấu tick tự vẽ nét trong tiêu đề tấm đúng */
+[data-trong] .duo-kq-chu h2 { display: flex; align-items: center; gap: 6px; }
+[data-trong] .duo-tick { flex: none; fill: none; stroke: var(--tr-dung); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+[data-trong='hs'] .duo-tick path { stroke-dasharray: 22; stroke-dashoffset: 22; animation: hu-ve 300ms ease-out 140ms forwards; }
+/* A6 — băng combo «N câu đúng liền!» / «Phản ứng dây chuyền!»: trượt xuống dưới thanh trên, nằm đè, tự ẩn sau ~2 s */
+[data-trong] .duo-tren { position: relative; }
+[data-trong] .duo-combo {
+  position: absolute; top: calc(100% + 6px); left: 50%; z-index: 7; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; max-width: calc(100% - 24px);
+  padding: 6px 16px 6px 10px; border-radius: 999px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); box-shadow: var(--tr-bong-2); pointer-events: none;
+  white-space: nowrap; animation: duo-xuong 600ms cubic-bezier(.2, 1.3, .4, 1) both, duo-hien 300ms ease-in 1.8s reverse forwards;
+}
+[data-trong] .duo-combo b { font-size: 15px; font-weight: 900; letter-spacing: .02em; }
+[data-trong] .duo-phan-tu { flex: none; overflow: visible; }
+[data-trong] .duo-phan-tu line { stroke: var(--tr-chu-y-chu); stroke-width: 2.6; stroke-linecap: round; }
+[data-trong] .duo-phan-tu circle { fill: var(--tr-chu-y); stroke: var(--tr-mat); stroke-width: 1.6; }
+[data-trong] .duo-phan-tu circle[data-sac='1'] { fill: var(--tr-tin); }
+[data-trong] .duo-phan-tu circle[data-sac='2'] { fill: var(--tr-dung); }
+[data-trong='hs'] .duo-phan-tu circle[data-moi] { transform-box: fill-box; transform-origin: center; animation: duo-moc 420ms cubic-bezier(.3, 1.5, .5, 1) 260ms both; }
+/* A7 — ỐNG NGHIỆM: thân thuỷ tinh, chất lỏng có bọt nổi; combo ≥ 3 ⇒ cam phát sáng + vệt sáng lướt lặp */
+[data-trong] .duo-thanh { height: 18px; border: 2px solid var(--tr-vien-2); background: var(--tr-mat-2); }
+[data-trong] .duo-thanh > i b { position: absolute; bottom: 3px; width: 5px; height: 5px; border-radius: 50%; background: color-mix(in srgb, var(--tr-trang) 75%, transparent); opacity: 0; }
+[data-trong] .duo-thanh > i b:nth-child(1) { right: 14px; }
+[data-trong] .duo-thanh > i b:nth-child(2) { right: 30px; width: 4px; height: 4px; }
+[data-trong] .duo-thanh > i b:nth-child(3) { right: 46px; width: 3px; height: 3px; }
+[data-trong='hs'] .duo-thanh > i b { animation: duo-bot 1.6s ease-out infinite; }
+[data-trong='hs'] .duo-thanh > i b:nth-child(2) { animation-delay: .55s; }
+[data-trong='hs'] .duo-thanh > i b:nth-child(3) { animation-delay: 1.1s; }
+[data-trong] .duo-thanh[data-combo] { border-color: color-mix(in srgb, var(--tr-chu-y) 55%, var(--tr-vien-2)); box-shadow: 0 0 12px color-mix(in srgb, var(--tr-chu-y) 45%, transparent); }
+[data-trong] .duo-thanh[data-combo] > i { background: var(--tr-chu-y); transition: width 500ms ease-out, background-color 500ms ease; }
+[data-trong] .duo-thanh[data-combo] > i::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 30%; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--tr-trang) 55%, transparent), transparent); }
+[data-trong='hs'] .duo-thanh[data-combo] > i::before { animation: duo-luot 1.4s ease-in-out infinite; }
+/* vòng làm lại */
+[data-trong] .duo-nhan[data-lam-lai] { color: var(--tr-chu-y-chu); }
+[data-trong] .duo-mo-ghi { margin: -8px 0 0; font-size: 14px; font-weight: 600; color: var(--tr-chu-2); }
+/* B1 — ba thẻ số bật lên cách nhau 120 ms (số đếm tăng do useDemSo) */
+[data-trong='hs'] .duo-3 > div { animation: duo-bat 420ms cubic-bezier(.3, 1.3, .5, 1) both; animation-delay: calc(200ms + var(--i, 0) * 120ms); }
+/* B2 — chặng hoàn hảo: tinh thể kim cương kết tinh từ tâm sau lưng Bi, tia sáng xoay chậm */
+[data-trong] .duo-xong-bi { position: relative; display: grid; place-items: center; }
+[data-trong] .duo-xong-bi .bi { position: relative; z-index: 1; }
+[data-trong] .duo-tinh { position: absolute; inset: -26px; display: grid; place-items: center; pointer-events: none; }
+[data-trong] .duo-tinh i { position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(color-mix(in srgb, var(--tr-sao) 40%, transparent) 0 9deg, transparent 9deg 30deg); -webkit-mask-image: radial-gradient(circle, var(--tr-chu) 25%, transparent 70%); mask-image: radial-gradient(circle, var(--tr-chu) 25%, transparent 70%); }
+[data-trong] .duo-tinh svg { position: absolute; width: 58%; height: 58%; top: 2%; }
+[data-trong] .duo-tinh path { fill: var(--tr-sao-nhat); stroke: var(--tr-sao); stroke-width: 3; stroke-linejoin: round; }
+[data-trong] .duo-tinh path.mat { fill: none; stroke-width: 2; opacity: .8; }
+[data-trong='hs'] .duo-tinh i { animation: duo-hien 600ms ease-out both, duo-xoay 14s linear infinite; }
+[data-trong='hs'] .duo-tinh svg { animation: duo-ket-tinh 1.2s cubic-bezier(.2, 1, .3, 1) both; }
+[data-trong] .duo-hoan-hao { margin: -8px 0 0; padding: 4px 14px; border-radius: 999px; background: var(--tr-sao-nhat); color: var(--tr-sao-chu); font-size: 14px; font-weight: 800; }
+[data-trong='hs'] .duo-hoan-hao { animation: duo-bat 420ms cubic-bezier(.3, 1.3, .5, 1) 500ms both; }
+/* B4 — vòng mục tiêu ngày (chặng đã xong / chặng hôm nay) tô dần 600 ms; đầy ⇒ hạt + «Đạt mục tiêu!» */
+[data-trong] .duo-muc { display: flex; align-items: center; gap: 12px; text-align: left; }
+[data-trong] .duo-muc svg { flex: none; transform: rotate(-90deg); overflow: visible; }
+[data-trong] .duo-muc circle { fill: none; stroke-width: 7; }
+[data-trong] .duo-muc .nen { stroke: var(--tr-mat-3); }
+[data-trong] .duo-muc .chay { stroke: var(--tr-dung); stroke-linecap: round; transition: stroke-dashoffset 600ms ease-out; }
+[data-trong] .duo-muc div { display: flex; flex-direction: column; }
+[data-trong] .duo-muc b { font-size: 18px; font-weight: 900; color: var(--tr-chu); font-variant-numeric: tabular-nums; }
+[data-trong] .duo-muc span { font-size: 13.5px; font-weight: 700; color: var(--tr-chu-2); }
+[data-trong] .duo-muc em { font-style: normal; font-weight: 900; color: var(--tr-dung-chu); }
+[data-trong='hs'] .duo-muc em { display: inline-block; animation: duo-bat 420ms cubic-bezier(.3, 1.3, .5, 1) both; }
+@media (orientation: landscape) and (max-height: 500px) { [data-trong] .duo-tinh { inset: -16px; } [data-trong] .duo-muc svg { width: 48px; height: 48px; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] :is(.duo :is(.duo-cot-de, .duo-cot-tra) > *, .duo-combo, .duo-phan-tu circle, .duo-thanh > i b, .duo-thanh > i::before, .duo-3 > div, .duo-tinh i, .duo-tinh svg, .duo-hoan-hao, .duo-muc em, .duo-tick path) { animation: none !important; }
+  [data-trong='hs'] .duo-tick path { stroke-dashoffset: 0; }
+  [data-trong] .duo-muc .chay { transition: none; }
+}
+[data-trong='hs'].may-yeu :is(.duo :is(.duo-cot-de, .duo-cot-tra) > *, .duo-combo, .duo-phan-tu circle, .duo-thanh > i b, .duo-thanh > i::before, .duo-3 > div, .duo-tinh i, .duo-tinh svg, .duo-hoan-hao, .duo-muc em, .duo-tick path) { animation: none !important; }
+[data-trong='hs'].may-yeu .duo-tick path { stroke-dashoffset: 0; }

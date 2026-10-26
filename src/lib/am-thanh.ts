@@ -32,7 +32,14 @@ export const TIENG: Record<KieuPhanHoi, Giong[]> = {
     { t: 0.52, f: 3951.07, d: 0.16, a: 0.002, g: 0.05, p: [[1, 1]] },
     { t: 0.6, f: 3520, d: 0.2, a: 0.002, g: 0.05, p: [[1, 1]] },
   ],
+  // Combo (HIEU-UNG.md «Âm thanh bổ sung»): hai tiếng chuông nối nhau; mỗi bậc combo cao thêm MỘT nốt của gam trưởng (phat('combo', bac)).
+  combo: [
+    { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
+    { t: 0.08, f: BO.G6, d: 0.5, a: 0.004, g: 0.22, p: CHUONG },
+  ],
 }
+/** Gam trưởng (nửa cung) cho bậc combo: 0 → C, 1 → D, 2 → E … quá 7 bậc thì giữ nốt cao nhất. */
+const GAM = [0, 2, 4, 5, 7, 9, 11, 12]
 
 let ctx: AudioContext | null = null
 let tong: GainNode | null = null
@@ -51,20 +58,21 @@ function layCtx(): AudioContext | null {
   return ctx
 }
 
-export function phat(ten: KieuPhanHoi): void {
+export function phat(ten: KieuPhanHoi, bac = 0): void {
   if (!duocPhanHoi('ddh.am') || typeof document === 'undefined' || document.hidden) return
   try {
     const c = layCtx()
     if (!c || !tong) return
     const goc = c.currentTime + 0.01
+    const nang = ten === 'combo' ? 2 ** (GAM[Math.max(0, Math.min(GAM.length - 1, Math.round(bac)))]! / 12) : 1
     for (const v of TIENG[ten]) {
       const p = v.p ?? [[1, 1]], a = v.a ?? 0.005, t0 = goc + v.t
       const tongBien = p.reduce((s, [, b]) => s + b, 0)
       for (const [boi, bien] of p) {
         const o = c.createOscillator(), g = c.createGain()
         o.type = 'sine'
-        o.frequency.setValueAtTime(v.f * boi, t0)
-        if (v.f2) o.frequency.exponentialRampToValueAtTime(v.f2 * boi, t0 + v.d)
+        o.frequency.setValueAtTime(v.f * boi * nang, t0)
+        if (v.f2) o.frequency.exponentialRampToValueAtTime(v.f2 * boi * nang, t0 + v.d)
         const dinh = (v.g * bien) / tongBien
         g.gain.setValueAtTime(0, t0)
         g.gain.linearRampToValueAtTime(dinh, t0 + a)

@@ -12,8 +12,8 @@ afterEach(() => { vibrate.mockClear(); localStorage.clear(); delete document.doc
 
 describe('rung.ts', () => {
   it('gọi vibrate đúng mẫu cho từng kiểu', () => {
-    for (const k of ['chon', 'dung', 'sai', 'xong'] as const) { rung(k); expect(vibrate).toHaveBeenLastCalledWith(MAU_RUNG[k]) }
-    expect(MAU_RUNG).toEqual({ chon: [10], dung: [18], sai: [35, 60, 35], xong: [20, 40, 20, 40, 60] })
+    for (const k of ['chon', 'dung', 'sai', 'xong', 'combo'] as const) { rung(k); expect(vibrate).toHaveBeenLastCalledWith(MAU_RUNG[k]) }
+    expect(MAU_RUNG).toEqual({ chon: [10], dung: [18], sai: [35, 60, 35], xong: [20, 40, 20, 40, 60], combo: [14, 40, 14] })
     phanHoi('sai')
     expect(vibrate).toHaveBeenLastCalledWith([35, 60, 35])
   })

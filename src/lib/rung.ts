@@ -2,8 +2,8 @@
 // sinh «Trong» (làm chặng, Kiểm tra ôn tập, Tự sửa lỗi, Tu luyện); KHÔNG gắn ở màn thi thật. Nằm trong mảnh nạp lười của các màn ấy (không vào nhóm mở app).
 // Android: navigator.vibrate(mẫu). iPhone (không có vibrate): mẹo iOS 18+ — bấm nhãn của một `<input type="checkbox" switch>` ẩn (dựng một lần) cho một
 // nhịp rung nhẹ. Mọi lỗi im lặng. Tắt khi không có <html data-trong="hs"> hoặc em tắt trong menu (localStorage 'ddh.rung' = 'tat').
-export type KieuPhanHoi = 'chon' | 'dung' | 'sai' | 'xong'
-export const MAU_RUNG: Record<KieuPhanHoi, number[]> = { chon: [10], dung: [18], sai: [35, 60, 35], xong: [20, 40, 20, 40, 60] }
+export type KieuPhanHoi = 'chon' | 'dung' | 'sai' | 'xong' | 'combo'
+export const MAU_RUNG: Record<KieuPhanHoi, number[]> = { chon: [10], dung: [18], sai: [35, 60, 35], xong: [20, 40, 20, 40, 60], combo: [14, 40, 14] }
 
 /** Được phản hồi (rung / tiếng) không: chỉ app học sinh «Trong», và em chưa tắt công tắc `khoa` trong menu. */
 export function duocPhanHoi(khoa: 'ddh.rung' | 'ddh.am'): boolean {

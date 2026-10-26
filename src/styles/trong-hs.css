@@ -3,6 +3,20 @@
    Chỉ dưới [data-trong]; màu chỉ var(--tr-*) (styles/trong.css). Lùi ddh.trong = 'tat' ⇒ không luật nào ở đây chạy ⇒ y giao diện cũ.
    */
 
+/* ── PHÔNG NUNITO kiểu Duolingo (thầy 26/10: «Thay luôn font chữ của dolingo»). Tự chứa (không Google Fonts): bản variable (một tệp đủ mọi độ đậm),
+   chỉ hai mảnh latin + vietnamese (unicode-range ⇒ trình duyệt chỉ tải mảnh có chữ cần). Nunito — giấy phép SIL Open Font License 1.1 (Vernon Adams, Cyreal).
+   Chỉ cổng học sinh (tờ này nạp cùng TrongHs) ⇒ màn thi /t, app thầy, phụ huynh giữ phông cũ; app học sinh không còn tải Be Vietnam Pro.
+   Tệp phông không vào precache (globIgnores) — kho chạy-lúc /assets/*.woff2; máy đã đăng nhập nạp trước (phongHs, vite.config.ts). ── */
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 200 1000; font-display: swap; src: url('./phong-nunito/nunito-vietnamese-wght-normal.woff2') format('woff2-variations'), url('./phong-nunito/nunito-vietnamese-wght-normal.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 200 1000; font-display: swap; src: url('./phong-nunito/nunito-latin-wght-normal.woff2') format('woff2-variations'), url('./phong-nunito/nunito-latin-wght-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+/* Cả chữ thường lẫn chữ đề (--serif) sang Nunito; đậm theo Duolingo: chữ thường 600–700, tiêu đề / nút / số 800–900 (:where ⇒ luật riêng của màn vẫn thắng). */
+:root[data-trong='hs'] { --sans: 'Nunito', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'Nunito', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; }
+:root[data-trong='hs'] body { font-weight: 600; }
+:root[data-trong='hs'] :where(h1, h2, h3, button, b, strong, th, dd) { font-weight: 800; }
+:root[data-trong='hs'] :where(h1, .duo-xong h1, .duo-kq-chu h2) { font-weight: 900; }
+/* Số đồng hồ / điểm / bộ đếm không nhảy bề ngang khi đổi. */
+:root[data-trong='hs'] :where(.duo-chuoi, .duo-3 b, .tr-so, .ht2-lam-hom-nay, [role='timer'], time) { font-variant-numeric: tabular-nums; }
+
 /* ── Menu dọc mép phải (bản vẽ hs-menu-phai, thầy chốt 26/10): thay thanh trên + menu 4 mục. Thu gọn = một vạch nhỏ giữa mép phải. ── */
 [data-trong='hs'] .ht2 .ht-khung { display: block; }
 [data-trong='hs'] .ht2 .ht-noi-dung { max-width: 1160px; margin: 0 auto; padding: 28px 40px 104px 32px; }
@@ -810,3 +824,32 @@
 @media (max-height: 520px) and (min-width: 600px) and (hover: hover), (min-width: 1000px) and (hover: hover) {
   [data-trong] .tr-ray-muc:hover:not([aria-current='page']) { background: var(--tr-mat-2); color: var(--tr-chu); }
 }
+
+/* ── HIỆU ỨNG LỘ TRÌNH (ve-moi/thuong-phat/HIEU-UNG.md F, thầy 26/10). Chỉ transform / opacity; không đổi bố cục (lớp phủ cùng ô lưới với nút);
+   giảm chuyển động / máy yếu ⇒ đứng yên. F1 nút hiện tại phồng thở 1,6 s + bong bóng «Bắt đầu» nhún · F2 chặng vừa xong: vòng lan (sao bay: lib/hieu-ung.ts)
+   · F3 chặng mới mở: khoá tinh thể vỡ thành mảnh rồi tan · F4 tự cuộn (TrongHs.tsx). ── */
+@keyframes da-tho { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes da-nhun { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -5px); } }
+@keyframes da-lan { from { opacity: .9; transform: scale(.7); } to { opacity: 0; transform: scale(1.9); } }
+@keyframes da-manh { to { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--q)); } }
+@keyframes da-tan { 0% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(.4); } }
+[data-trong] .da-o-nut > * { grid-area: 1 / 1; }
+[data-trong='hs'] .da-nut[data-tt='dang']:not(:disabled) { animation: da-tho 1.6s ease-in-out infinite; }
+[data-trong='hs'] .da-nut[data-tt='dang'] .da-bong { animation: da-nhun 1.6s ease-in-out infinite; }
+[data-trong] .da-lan { width: 96px; height: 96px; border: 4px solid var(--tr-dung); border-radius: 50%; pointer-events: none; opacity: 0; }
+[data-trong='hs'] .da-lan { animation: da-lan 700ms ease-out both; }
+[data-trong] .da-vo-khoa { position: relative; display: grid; place-items: center; width: 74px; height: 66px; color: var(--tr-chu-3); pointer-events: none; }
+[data-trong] .da-vo-khoa > svg { position: relative; z-index: 1; opacity: 0; }
+[data-trong] .da-vo-khoa i { position: absolute; inset: 0; background: color-mix(in srgb, var(--tr-tin) 22%, var(--tr-mat-3)); opacity: 0; }
+[data-trong] .da-vo-khoa i:nth-child(1) { clip-path: polygon(25% 3%, 50% 3%, 50% 50%, 0 50%); --dx: -26px; --dy: -22px; --q: -40deg; }
+[data-trong] .da-vo-khoa i:nth-child(2) { clip-path: polygon(50% 3%, 75% 3%, 100% 50%, 50% 50%); --dx: 26px; --dy: -24px; --q: 35deg; }
+[data-trong] .da-vo-khoa i:nth-child(3) { clip-path: polygon(0 50%, 50% 50%, 50% 97%, 25% 97%); --dx: -24px; --dy: 26px; --q: 30deg; }
+[data-trong] .da-vo-khoa i:nth-child(4) { clip-path: polygon(50% 50%, 100% 50%, 75% 97%, 50% 97%); --dx: 28px; --dy: 22px; --q: -35deg; }
+[data-trong='hs'] .da-vo-khoa i { opacity: 1; animation: da-manh 600ms cubic-bezier(.3, .6, .4, 1) 120ms forwards; }
+[data-trong='hs'] .da-vo-khoa > svg { animation: da-tan 500ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] :is(.da-nut[data-tt='dang'], .da-nut[data-tt='dang'] .da-bong, .da-lan, .da-vo-khoa i, .da-vo-khoa > svg) { animation: none !important; }
+  [data-trong] :is(.da-lan, .da-vo-khoa) { display: none; }
+}
+[data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'], .da-nut[data-tt='dang'] .da-bong) { animation: none; }
+[data-trong].may-yeu :is(.da-lan, .da-vo-khoa) { display: none; }

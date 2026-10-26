@@ -3,4 +3,5 @@
 import { rung, type KieuPhanHoi } from './rung'
 import { phat } from './am-thanh'
 export type { KieuPhanHoi }
-export function phanHoi(kieu: KieuPhanHoi): void { rung(kieu); phat(kieu) }
+/** `bac`: bậc combo (chỉ tiếng 'combo' dùng — mỗi bậc cao thêm một nốt). */
+export function phanHoi(kieu: KieuPhanHoi, bac = 0): void { rung(kieu); phat(kieu, bac) }
