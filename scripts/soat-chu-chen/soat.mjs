@@ -68,7 +68,10 @@ for (const [k, c] of CANH) if (/&giao=/.test(c.man)) CANH.delete(k)
 // `--bo <regex>`: bỏ cảnh theo ?man= (vd màn đang có làn khác dựng lại)
 const BO = lay('--bo', '') ? new RegExp(lay('--bo', '')) : null
 const canh = [...CANH.values()].filter((c) => (!CHON.length || CHON.some((p) => c.ten.startsWith(p) || c.man.startsWith(p))) && !(BO && BO.test(c.man)))
-const viec = canh.flatMap((c) => KHO.flatMap(([w, h]) => NEN.map((nen) => ({ ...c, w, h, nen }))))
+// `--tiep 1`: chạy tiếp lượt soát dở (đọc <thư mục ra>/ket-qua.json, bỏ các lượt đã có)
+const DA = lay('--tiep', '') && existsSync(join(RA, 'ket-qua.json')) ? JSON.parse(readFileSync(join(RA, 'ket-qua.json'), 'utf8')) : []
+const daCo = new Set(DA.map((r) => `${r.canh}|${r.w}|${r.h}|${r.nen}`))
+const viec = canh.flatMap((c) => KHO.flatMap(([w, h]) => NEN.map((nen) => ({ ...c, w, h, nen })))).filter((v) => !daCo.has(`${v.ten}|${v.w}|${v.h}|${v.nen}`))
 console.log(`${canh.length} cảnh × ${KHO.length} khổ × ${NEN.length} nền = ${viec.length} lượt, ${SONG} song song`)
 
 // ── máy phục vụ tĩnh (như chup.mjs)
@@ -83,9 +86,13 @@ const may = createServer((req, res) => {
 }).listen(0)
 const goc = `http://127.0.0.1:${may.address().port}`
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
-const trinh = await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
+const moTrinh = () => chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
+let trinh = await moTrinh()
+// trình duyệt có thể chết giữa chừng khi máy tải nặng ⇒ mở lại (một lần cho mọi luồng đang chờ) thay vì dừng cả lượt soát
+let dangMo = null
+const conTrinh = async () => { if (trinh.isConnected()) return trinh; dangMo ??= moTrinh().then((x) => { trinh = x; dangMo = null; return x }); return dangMo }
 
-const ketQua = []
+const ketQua = [...DA]
 const daAnh = new Map() // `${tên cảnh}|${loại}` → số ảnh
 const TEN_LOAI = { a: 'cắt chữ', 'a…': 'ba chấm cố ý', b: 'tràn khung', c: 'chồng nhau', d: 'nổi/ghim che', e: 'chạm lòng vòng', f: 'dòng mở bằng ·', g: 'vỡ từng dòng', h: 'tràn ngang', j: 'ô rơi hàng' }
 const CO_ANH = ['a', 'd', 'c', 'e', 'g', 'b', 'h', 'f', 'j']
@@ -107,7 +114,7 @@ async function chupKhoanh(t, v, loai, loi) {
 }
 
 async function chay(v) {
-  const ctx = await trinh.newContext({ viewport: { width: v.w, height: v.h }, deviceScaleFactor: 1, colorScheme: v.nen, hasTouch: v.w < 900, isMobile: v.w < 500 })
+  const ctx = await (await conTrinh()).newContext({ viewport: { width: v.w, height: v.h }, deviceScaleFactor: 1, colorScheme: v.nen, hasTouch: v.w < 900, isMobile: v.w < 500 })
   await ctx.route((u) => !u.href.startsWith(goc), (r) => r.abort())
   const t = await ctx.newPage()
   t.setDefaultTimeout(8000)
@@ -158,7 +165,7 @@ async function chay(v) {
   } catch (e) {
     loiTrang.push(`lượt hỏng — ${String(e).slice(0, 200)}`)
   }
-  await ctx.close()
+  await ctx.close().catch(() => {})
   return kq
 }
 
@@ -167,7 +174,7 @@ const batDau = Date.now()
 const hang = [...viec]
 await Promise.all(Array.from({ length: SONG }, async () => {
   for (let v = hang.shift(); v; v = hang.shift()) {
-    const kq = await chay(v)
+    const kq = await chay(v).catch(() => chay(v)).catch((e) => ({ canh: v.ten, man: v.man, viec: v.viec ?? '', w: v.w, h: v.h, nen: v.nen, loi: [], anh: [], loiTrang: [`lượt hỏng — ${String(e).slice(0, 160)}`] }))
     ketQua.push(kq)
     xong++
     if (xong % 25 === 0 || xong === viec.length) {
@@ -177,7 +184,7 @@ await Promise.all(Array.from({ length: SONG }, async () => {
   }
 }))
 writeFileSync(join(RA, 'ket-qua.json'), JSON.stringify(ketQua))
-await trinh.close()
+await trinh.close().catch(() => {})
 may.close()
 const dem = {}
 for (const k of ketQua) for (const l of k.loi) dem[l.loai] = (dem[l.loai] ?? 0) + 1

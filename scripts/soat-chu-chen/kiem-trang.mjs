@@ -41,7 +41,8 @@ export function kiemTrang() {
   if (lops.length) {
     const chong = document.elementsFromPoint(W / 2, H / 2)
     let tot = null, vt = 1e9
-    for (const L of lops) { const i = chong.findIndex((x) => L.contains(x)); if (i >= 0 && i < vt) { vt = i; tot = L } }
+    // cùng chứa phần tử trên cùng (tấm lồng trong khung cố định ngoài, vd tấm Lời giải trong màn làm bài) ⇒ chọn tấm TRONG cùng
+    for (const L of lops) { const i = chong.findIndex((x) => L.contains(x)); if (i >= 0 && (i < vt || (i === vt && tot && tot.contains(L)))) { vt = i; tot = L } }
     if (tot) goc = tot.textContent.trim() ? tot : tot.parentElement || document.body
   }
   // phần tử nổi (fixed/sticky) gần nhất — không tính chính gốc
@@ -161,7 +162,15 @@ export function kiemTrang() {
   for (const c of chu) if (!noi(c.el)) for (const r of c.thay) muc.push({ el: c.el, r, chu: c.t, nut: false })
   // ô nhập: chỉ tính vùng gõ chữ (bỏ phần đệm) — nút nằm TRONG phần đệm của ô (mẫu ô số có nút «±» «,» ở mép phải) là cố ý, không chồng chữ
   const vungO = (e) => { const r = e.getBoundingClientRect(); if (!/^(INPUT|TEXTAREA)$/.test(e.tagName)) return r; const s = css(e); return { left: r.left + parseFloat(s.paddingLeft), top: r.top, right: r.right - parseFloat(s.paddingRight), bottom: r.bottom } }
-  for (const e of nuts) if (!noi(e)) { const r0 = vungO(e), k = catBoi(e.parentElement || e), r = { left: Math.max(r0.left, k.l), top: Math.max(r0.top, k.t), right: Math.min(r0.right, k.r), bottom: Math.min(r0.bottom, k.b) }; if (r.right - r.left <= 1 || r.bottom - r.top <= 1) continue; muc.push({ el: e, r: { l: r.left, t: r.top, r: r.right, b: r.bottom }, chu: (e.getAttribute('aria-label') || e.textContent || e.tagName).trim(), nut: true }) }
+  // nút NỘI DÒNG xuống dòng (vd vùng chạm trong đề): mỗi mảnh dòng một hộp — hộp bao cả hai dòng không phải chỗ chồng thật
+  // + nút nội dòng tô nền (vùng chạm): bỏ phần đệm trên/dưới — nền tô tràn khe dòng là cố ý, chữ không chạm chữ
+  const hopNut = (e) => {
+    const s = css(e)
+    if (s.display !== 'inline') return [vungO(e)]
+    const pt = parseFloat(s.paddingTop) || 0, pb = parseFloat(s.paddingBottom) || 0
+    return [...e.getClientRects()].map((r) => ({ left: r.left, right: r.right, top: r.top + pt, bottom: r.bottom - pb }))
+  }
+  for (const e of nuts) if (!noi(e)) for (const r0 of hopNut(e)) { const k = catBoi(e.parentElement || e), r = { left: Math.max(r0.left, k.l), top: Math.max(r0.top, k.t), right: Math.min(r0.right, k.r), bottom: Math.min(r0.bottom, k.b) }; if (r.right - r.left <= 1 || r.bottom - r.top <= 1) continue; muc.push({ el: e, r: { l: r.left, t: r.top, r: r.right, b: r.bottom }, chu: (e.getAttribute('aria-label') || e.textContent || e.tagName).trim(), nut: true }) }
   muc.sort((x, y) => x.r.t - y.r.t)
   const daChong = new Set()
   for (let i = 0; i < muc.length; i++) {
@@ -350,7 +359,8 @@ export function kiemChe(che) {
   if (lops.length) {
     const chong = document.elementsFromPoint(W / 2, H / 2)
     let tot = null, vt = 1e9
-    for (const L of lops) { const i = chong.findIndex((x) => L.contains(x)); if (i >= 0 && i < vt) { vt = i; tot = L } }
+    // cùng chứa phần tử trên cùng (tấm lồng trong khung cố định ngoài, vd tấm Lời giải trong màn làm bài) ⇒ chọn tấm TRONG cùng
+    for (const L of lops) { const i = chong.findIndex((x) => L.contains(x)); if (i >= 0 && (i < vt || (i === vt && tot && tot.contains(L)))) { vt = i; tot = L } }
     if (tot) goc = tot.textContent.trim() ? tot : tot.parentElement || document.body
   }
   const noiCache = new Map()
