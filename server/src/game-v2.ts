@@ -224,7 +224,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
 const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 /** Lệnh game được chạy lượt đọc "cổng đóng băng" (reset) SONG SONG khi đệm cổng vừa hết hạn (index.ts, tối ưu 05/10): chỉ các lệnh CHỈ chạm D1 qua `env.DB`
  *  (rào ghi chặn được mọi lệnh ghi). */
-export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-dem','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)
+export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-dem','hoc-tap-lam-lai','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Rào ghi (index.ts, tối ưu 05/10): đệm cổng đóng băng vừa hết hạn ⇒ lượt đọc cổng chạy song song, mọi lệnh GHI của lệnh này chờ cổng. Lệnh nội bộ
   // (Đoàn gọi `answer`) dùng lại đúng bản gộp đọc của lượt ngoài (đã có rào) ⇒ không bọc lần nữa.
@@ -352,7 +352,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const tt=kt.tomTatKt(kiem!,Date.now())
     if(action==='hoc-tap-sanh'||action==='hoa2-sanh')return {ok:true,cheDo2:true,ngay:tt.ngay,kiemTraCaNhan:tt,theLuc:{tong:tt.tong,con:tt.con},chienDich:null,doan:{con:0},dao:{con:0}}
     if(action==='hoc-tap-dem')return {ok:true,daLamHomNay:tt.daTra,toiThieu:tt.tong,kiemTraCaNhan:tt}
-    if(['hoc-tap-start','hoc-tap-gap','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete','hoa2-dao-start','hoa2-thu-suc','hoa2-thu-suc-them','hoa2-de-thu-start','hoa2-de-thu-nop'].includes(action))throw new Error('Hôm nay em chỉ làm bài kiểm tra theo lịch riêng. Bài tập tiếp tục vào ngày học kế tiếp.')
+    if(['hoc-tap-start','hoc-tap-gap','hoc-tap-lam-lai','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete','hoa2-dao-start','hoa2-thu-suc','hoa2-thu-suc-them','hoa2-de-thu-start','hoa2-de-thu-nop'].includes(action))throw new Error('Hôm nay em chỉ làm bài kiểm tra theo lịch riêng. Bài tập tiếp tục vào ngày học kế tiếp.')
   }
   // App học sinh tập trung làm bài (10/10): không bắt chọn thần thú, không mở phòng/game.
   // Cùng bộ kế hoạch, phiên, quyền và answer hiện có; chỉ bỏ ràng buộc cửa Đảo/Đoàn ở giao diện.
@@ -369,6 +369,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       if(action==='hoc-tap-gap')return g7.gapHuongDan7(env,sbd,b,Date.now())
       // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
       if(action==='hoc-tap-dem')return g7.demHomNay7(env,sbd,Date.now())
+      // Làm lại cuối chặng kiểu Duolingo (26/10, goi-bai-7-lam-lai.ts): câu anh em cho câu em vừa sai, có hỗ trợ, không EXP.
+      if(action==='hoc-tap-lam-lai')return import('./goi-bai-7-lam-lai').then(m=>m.lamLaiCuoiChang7(env,sbd,b,Date.now()))
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
       if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now());return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
@@ -376,6 +378,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
 
     // Gói 7 tắt ⇒ không có số Gói 7 (máy em giữ số của sảnh, không bịa).
     if(action==='hoc-tap-dem')return {ok:true,daLamHomNay:null,toiThieu:null}
+    if(action==='hoc-tap-lam-lai')return {ok:true,questions:[]}
     if(!await cheDo2(env,sbd)){
       if(action==='hoc-tap-start')return gameV2(env,'start',{...b,mode:'adventure'},ctx)
       return {ok:true,cheDo2:false}

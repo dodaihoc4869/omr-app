@@ -1,0 +1,59 @@
+# CÔNG TẮC «HỌC KIỂU DUOLINGO» (26/10; docs/hop-dong-duolingo-2610.md mục 2). Thầy chốt: phát hành bằng cờ, bật dần.
+# Ghi MỘT dòng cấu hình `cau_hinh.duolingo_bai` = {"cheDo":"tat"|"thu"|"bat","lop":[…]} (UPSERT theo khoá) — không đụng dữ liệu học sinh.
+#   tat ⇒ y như trước 26/10 · thu ⇒ chỉ các lớp nhập ở ô "lop" (cách nhau dấu phẩy, đúng tên lớp trong app) · bat ⇒ mọi em.
+# Gác: chặng 6 câu trộn đều (A1) + làm lại cuối chặng (A3). Máy chủ đọc qua đệm 15 giây ⇒ có tác dụng trong ~15 giây. In lại giá trị sau khi ghi.
+name: Công tắc học kiểu Duolingo (26/10)
+on:
+  workflow_dispatch:
+    inputs:
+      cheDo:
+        description: 'tat | thu | bat'
+        required: true
+        default: 'tat'
+        type: choice
+        options: [tat, thu, bat]
+      lop:
+        description: 'Chỉ dùng khi cheDo = thu: tên lớp, cách nhau dấu phẩy (vd 12A1,12A2)'
+        required: false
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: bat-duolingo-bai-2610
+  cancel-in-progress: false
+jobs:
+  bat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Dựng giá trị cờ (lọc ký tự, không chèn chuỗi thô vào SQL)
+        env:
+          CHE_DO: ${{ inputs.cheDo }}
+          LOP: ${{ inputs.lop }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          che = os.environ.get('CHE_DO', 'tat')
+          che = che if che in ('tat', 'thu', 'bat') else 'tat'
+          lop = [re.sub(r'[^0-9A-Za-zÀ-ỹ ._-]', '', x).strip() for x in os.environ.get('LOP', '').split(',')]
+          lop = [x for x in lop if x][:100] if che == 'thu' else []
+          if che == 'thu' and not lop: raise SystemExit('cheDo=thu cần ít nhất một lớp')
+          v = json.dumps({'cheDo': che, 'lop': lop}, ensure_ascii=False).replace("'", "''")
+          open('/tmp/lenh.sql', 'w').write(f"INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('duolingo_bai', '{v}', strftime('%Y-%m-%dT%H:%M:%fZ','now')) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc;")
+          print('sẽ ghi:', v)
+          PY
+      - name: Ghi cờ rồi đọc lại
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx -y wrangler@4 d1 execute omr --remote --json --file /tmp/lenh.sql > /tmp/ghi.json
+          python3 -c "import json;d=json.load(open('/tmp/ghi.json'));print('ghi:', [x.get('success') for x in d])"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa = 'duolingo_bai'"
