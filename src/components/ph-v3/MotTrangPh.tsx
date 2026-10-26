@@ -376,7 +376,7 @@ function OCauSai({ p, onMo }: PO) {
           <>
             <div className="mtp-so">{sai - sua}<small>câu chưa sửa</small></div>
             <p className="mtp-ghi">{moc ? <span className="mtp-an-doc">Từ {ngayChuoiNgan(moc)}: </span> : null}sai {sai} · đã tự sửa <b>{sua}</b></p>
-            {on > 0 && <p className="mtp-ghi mtp-an-doc mtp-an-ngang">Hôm nay {on} câu đến lịch ôn lại</p>}
+            {on > 0 && <p className="mtp-ghi mtp-an-doc mtp-an-ngang mtp-an-hep">Hôm nay {on} câu đến lịch ôn lại</p>}
           </>
         ) : <p className="mtp-ghi">Con chưa có câu nào làm sai{moc ? ` từ ${ngayChuoiNgan(moc)}` : ''}.</p>
       ) : <Cho />}
@@ -430,7 +430,7 @@ function OThoiGian({ p, onMo }: PO) {
         </>
       ) : null}
       {tv !== null ? (
-        <p className={`mtp-ghi${gio || gioChon || tb !== null ? ' mtp-an-doc' : ''}`}>Một nửa số lượt dưới <b>{Math.round(tv)} giây</b></p>
+        <p className={`mtp-ghi${gio || gioChon || tb !== null ? ' mtp-an-doc mtp-an-hep' : ''}`}>Một nửa số lượt dưới <b>{Math.round(tv)} giây</b></p>
       ) : !gio && !gioChon && !p.hoSo.td ? (p.hoSo.loiTd ? <p className="mtp-ghi">Chưa tải được thời gian làm bài.</p> : <Cho />) : null}
     </O>
   )

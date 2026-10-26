@@ -2,7 +2,8 @@
  * mọi bộ chọn bắt đầu bằng [data-trong=ph]. MÀU: CHỈ biến sẵn có của app phụ huynh — bảng --ph3-* (nền, mặt, viền, chữ, xanh lá đúng, hồng sai, hổ phách)
  * + cam logo phụ huynh --ph-cam / --ph-cam-to / --ph-cam-nen / --ph-tren-cam-nen (tokens.css, sáng + tối) + --phu (lớp phủ). KHÔNG nạp trong.css.
  * Ba khổ, KHÔNG cuộn trang: điện thoại dọc (≤ 600 px: lưới 2 cột, hàng 3 nút đáy) · điện thoại ngang (≤ 900 × ≤ 520: 4 cột, Hôm nay 2×2, lối vào là biểu
- * tượng trên thanh đầu) · máy tính (≥ 901 px: 4 cột × 3 hàng tự giãn lấp khung). Đích chạm ≥ 44 px. */
+ * tượng trên thanh đầu) · máy tính (≥ 901 px: 4 cột × 3 hàng tự giãn lấp khung). Đích chạm ≥ 44 px. Khổ ngang hẹp / máy tính nhỏ / màn lớn + tấm:
+ * khối «NGANG + MÁY TÍNH 26/10» cuối tệp. */
 [data-trong=ph] .mtp { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
 [data-trong=ph] .mtp-dau {
   position: relative; z-index: 20; flex: none; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px max(24px, calc(50% - 620px));
@@ -219,5 +220,91 @@
   [data-trong=ph] .mtp-an-ngang { display: none !important; }
   [data-trong=ph] .mtp-n14 { gap: 2px; }
   [data-trong=ph] .mtp-cot { height: 20px; }
+}
+
+/* ================================ NGANG + MÁY TÍNH 26/10 (thầy: «tối ưu toàn bộ app mọi lớp cho màn hình ngang và máy tính») ================================
+ * Kiểm ở 390×844 (giữ nguyên) · 844×390 · 740×360 · 1024×768 · 1440×900 · 1920×1080, sáng + tối: trang vẫn KHÔNG cuộn, không chữ nào bị cắt trong ô. */
+
+/* Điện thoại ngang HẸP (≤ 780 × ≤ 520, vd 740×360): ô chỉ còn ~170 px ⇒ bỏ biểu tượng cạnh tên ô (tên ô đủ chữ), chip «Có mặt…» vẫn đủ; ô Hôm nay
+ * gọn bốn số thành một dòng; cảnh báo của thầy một dòng (mở ô xem đủ); dòng phụ `.mtp-an-hep` ẩn (tấm có đủ). */
+@media (max-width: 780px) and (max-height: 520px) {
+  [data-trong=ph] .mtp-than { padding: 6px 12px; }
+  [data-trong=ph] .mtp-o { padding: 5px 10px; }
+  [data-trong=ph] .mtp-o::after { right: 10px; }
+  [data-trong=ph] .mtp-o-ten { gap: 6px; padding-right: 14px; font-size: 13px; }
+  [data-trong=ph] .mtp-o-ten svg { display: none; }
+  [data-trong=ph] .mtp-chip { padding: 2px 8px; font-size: 12px; }
+  [data-trong=ph] .mtp-o.hom { padding: 8px 10px; }
+  [data-trong=ph] .mtp-hom-than { gap: 12px; }
+  [data-trong=ph] .mtp-o.hom .mtp-so-4 { display: none; }
+  [data-trong=ph] .mtp-o.hom .mtp-chi-doc { display: block; }
+  [data-trong=ph] .mtp-canh-bao > span { -webkit-line-clamp: 1; }
+  [data-trong=ph] .mtp-so + .mtp-thanh-3 { display: none; }
+  [data-trong=ph] .mtp-an-hep { display: none !important; }
+}
+
+/* Máy tính bảng ngang / máy tính nhỏ (901–1279 px, vd 1024×768): ô hẹp hơn bản vẽ 1440 ⇒ số và vòng nhỏ lại một bậc, bốn số Hôm nay thành một dòng
+ * (bốn hộp 60 px cắt nhãn «Câu đúng»), giờ học quen một dòng. */
+@media (min-width: 901px) and (max-width: 1279px) {
+  [data-trong=ph] .mtp-o { padding: 16px 18px; gap: 8px; }
+  [data-trong=ph] .mtp-so { font-size: 27px; }
+  [data-trong=ph] .mtp-gio { font-size: 25px; white-space: nowrap; }
+  [data-trong=ph] .mtp-vong { --d: 148px; --net: 14px; }
+  [data-trong=ph] .mtp-so-lon { font-size: 36px; }
+  [data-trong=ph] .mtp-hom-tieu { font-size: 21px; }
+  [data-trong=ph] .mtp-o.hom .mtp-so-4 { display: none; }
+  [data-trong=ph] .mtp-o.hom .mtp-chi-doc { display: block; }
+}
+
+/* Màn lớn (≥ 1600 × ≥ 1000, vd 1920×1080): khung rộng hơn, chữ/số lớn hơn một bậc, khối vòng Hôm nay giãn giữa ô (Cần nhắc con xuống đáy), cột điểm
+ * Kiểm tra giãn theo chỗ trống — ô không trống một nửa; vẫn một khung hình, không cuộn. */
+@media (min-width: 1600px) and (min-height: 1000px) {
+  [data-trong=ph] .mtp-dau { padding-inline: max(32px, calc(50% - 740px)); min-height: 64px; }
+  [data-trong=ph] .mtp-than { max-width: 1480px; padding: 24px 32px 32px; gap: 20px; }
+  [data-trong=ph] .mtp-luoi { gap: 20px; }
+  [data-trong=ph] .mtp-o { padding: 24px 26px; gap: 14px; border-radius: 24px; }
+  [data-trong=ph] .mtp-o::after { top: 26px; right: 22px; }
+  [data-trong=ph] .mtp-o-ten { font-size: 16px; }
+  [data-trong=ph] .mtp-o-ten svg { width: 20px; height: 20px; }
+  [data-trong=ph] .mtp-chip { font-size: 14px; padding: 4px 12px; }
+  [data-trong=ph] .mtp-so { font-size: 40px; }
+  [data-trong=ph] .mtp-so small { font-size: 15px; }
+  [data-trong=ph] .mtp-chip-lon { font-size: 16px; }
+  [data-trong=ph] .mtp-ghi { font-size: 15.5px; }
+  [data-trong=ph] .mtp-chao p { font-size: 14px; }
+  [data-trong=ph] .mtp-chao h1 { font-size: 34px; }
+  [data-trong=ph] .mtp-o.hom { padding: 28px 30px; gap: 20px; }
+  [data-trong=ph] .mtp-o.hom .mtp-hom-than { flex: 1; gap: 24px; }
+  [data-trong=ph] .mtp-vong { --d: 204px; --net: 17px; }
+  [data-trong=ph] .mtp-so-lon { font-size: 52px; }
+  [data-trong=ph] .mtp-so-lon small { font-size: 19px; }
+  [data-trong=ph] .mtp-vong span { font-size: 14px; }
+  [data-trong=ph] .mtp-hom-chu { gap: 12px; }
+  [data-trong=ph] .mtp-hom-tieu { font-size: 30px; }
+  [data-trong=ph] .mtp-so-4 { gap: 10px; }
+  [data-trong=ph] .mtp-so-4 > div { padding: 10px 12px; }
+  [data-trong=ph] .mtp-so-4 dt { font-size: 13.5px; }
+  [data-trong=ph] .mtp-so-4 dd { font-size: 28px; }
+  [data-trong=ph] .mtp-nhac { padding: 14px 16px; font-size: 16px; }
+  [data-trong=ph] .mtp-canh-bao { font-size: 15px; }
+  [data-trong=ph] .mtp-da-xem { font-size: 14px; }
+  [data-trong=ph] .mtp-nhan-xet { font-size: 16px; -webkit-line-clamp: 4; }
+  [data-trong=ph] .mtp-n14 { gap: 5px; }
+  [data-trong=ph] .mtp-cot { flex: 1 1 64px; height: auto; min-height: 40px; max-height: 120px; gap: 7px; }
+  [data-trong=ph] .mtp-thanh-3 { height: 10px; }
+  [data-trong=ph] .mtp-loi-nut { font-size: 15px; }
+}
+
+/* TẤM ở khổ ≥ 600 px: hộp giữa 760 px (đã có). Sáu tín hiệu Thái độ để HAI cột trong tấm — ba cột (luật máy tính của trang cũ, tính theo cả màn) chỉ còn
+ * ~210 px/ô: tên ô vỡ từng chữ, nhãn thước «80%» «100%» chồng nhau. */
+@media (min-width: 600px) {
+  [data-trong=ph] .mtp-tam .tvc-tin-hieu { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* TẤM ở điện thoại ngang thấp (≤ 520 px cao): đầu tấm gọn, thẻ trong tấm bớt đệm để thấy nhiều nội dung hơn; nút Đóng 44 px luôn ở đầu (thân tấm tự cuộn). */
+@media (max-height: 520px) {
+  [data-trong=ph] .mtp-tam-dau { padding: 4px 6px 2px 16px; }
+  [data-trong=ph] .mtp-tam-dau h2 { font-size: 16px; }
+  [data-trong=ph] .mtp-tam-than { gap: 10px; padding: 2px 10px calc(10px + env(safe-area-inset-bottom)); }
+  [data-trong=ph] .mtp-tam .tvc-the { padding: 14px; gap: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { [data-trong=ph] .mtp-tam { animation: none; } }
