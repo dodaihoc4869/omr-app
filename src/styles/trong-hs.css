@@ -854,3 +854,9 @@
 }
 [data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'], .da-nut[data-tt='dang'] .da-bong) { animation: none; }
 [data-trong].may-yeu :is(.da-lan, .da-vo-khoa) { display: none; }
+/* DUYỆT 26/10: vòng «Kiểm tra ôn tập» (số «10/28» + «đã trả lời»): phông Nunito cao dòng hơn ⇒ hai dòng chồng 3px ở giãn dòng 1.1 — giãn 1.25 (vừa lòng vòng 84–112px) */
+:root[data-trong='hs']:has(.ht2) .ktcn-vong > span { line-height: 1.25; }
+/* DUYỆT 26/10: chữ ≥ 12 — chữ cái tên em trong vòng 24px ở menu («MA») 10px và số tin chưa đọc trên chuông menu 11px ⇒ 12px (vừa vòng 24 / ô 20) */
+[data-trong] .tr-menu-anh, [data-trong] .tr-menu-tb .m3-tb-dem { font-size: 12px; }
+/* DUYỆT 26/10: Lộ trình đang tải — vạch chờ (70%) đứng CẠNH tên bài trong băng bài ⇒ «Bài học hôm nay» vỡ mỗi chữ một dòng (cột 67px) — vạch chờ xuống hàng riêng, nền mờ trên băng xanh */
+[data-trong] .da-bai > .mot-xuong { flex-basis: 100%; width: auto; height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--tr-trang) 30%, transparent); }
