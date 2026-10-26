@@ -575,6 +575,42 @@ const manTamTrong = () => {
     h(ThanhTren, { tieuDe: tieu, onQuayLai: noop, nhanQuayLai: 'Về Hôm nay' }), h('main', { className: 'max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1' }, con)))
 }
 // ═════════ hết LÀN «TRONG» HS 26/10
+// ═══ MỘT TRANG HS 26/10: `?man=hs-mot&tt=thuong|ca|du&dd=mo|xong|khong` = Hôm nay «Một trang» (component THẬT HocTapHomNay + menu dọc + BongBongAiDdh
+// không nút nổi). Máy chủ GIẢ trong khối: `/hs/buoi-hoc` (buổi đang mở / đã điểm danh / không có), `/hs/diem-danh` (mã QR `&diem-danh=482913` ⇒ đã điểm danh
+// kèm giờ), `/hs/chua-cau-sai/*` (5 câu cần sửa), `/hs/nhip-hoc` (Chăm), `/notifications/list` (2 tin). Số khớp nhau: 12/30 câu, chặng 3/5, kiểm tra 28 câu.
+const MT_TT = thamSo.get('tt') ?? 'thuong', MT_DD = thamSo.get('dd') ?? 'mo'
+const mtNgay = new Date(now + 7 * 3600_000).toISOString().slice(0, 10), mtMo = Date.parse(`${mtNgay}T00:00:00+07:00`)
+const MT_KIEM = { id: 'kt1', ngay: mtNgay, moLuc: mtMo, hanLuc: mtMo + 86400_000, serverNow: now, trangThai: 'can_lam', homNay: true, baiNgayToiThieu: 12, tong: 28, daTra: 0, con: 28,
+  soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true, lyDo: '', thieuNguon: 0, diem: null, nopLuc: null }
+const mtLam = MT_TT === 'du' ? 30 : 12
+const SANH_MT = { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: mtLam, daXep: 30, soChang: 5, changHienTai: MT_TT === 'du' ? 5 : 3 },
+  theLuc: MT_TT === 'du' ? { con: 6, tong: 36 } : { con: 18, tong: 30 }, ruong: { ...SANH_MOI.ruong, daLam: mtLam, tong: 30 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
+if (man === 'hs-mot') {
+  try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
+  const fetchMt = window.fetch
+  const buoi = { id: 'b1', ten: 'Buổi học 26/10/2026', lop: '12A1' }
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const duong = new URL(url, location.href).pathname
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (duong.endsWith('/hs/buoi-hoc')) return tra(MT_DD === 'khong' ? { ok: true, buoi: null } : { ok: true, buoi: { ...buoi, daDiemDanh: MT_DD === 'xong' } })
+    if (duong.endsWith('/hs/diem-danh')) return tra({ ok: true, buoi: { ...buoi, daDiemDanh: true } })
+    if (duong.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
+    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/nhip-hoc')) return tra(nhipEmGia('cham'))
+    if (duong.endsWith('/notifications/list')) return tra({ ok: true, publicKey: '', items: [
+      { id: 'n1', kind: 'btvn', title: 'Bài tập về nhà mới', body: 'Thầy giao 1 bài, hạn 28/10.', created_at: new Date(now - 3600_000).toISOString(), read_at: null },
+      { id: 'n2', kind: 'mom', title: 'Lời nhắn từ gia đình', body: 'Mẹ nhắn: con nhớ làm đủ 30 câu nhé.', created_at: new Date(now - 7200_000).toISOString(), read_at: null },
+    ] })
+    return fetchMt(input, init)
+  }
+}
+const manMotTrang = () => h(FragmentHse, null,
+  h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_MT } as never, dangTai: false, loi: '', coCa: MT_TT === 'ca', token: 'tk', moDiemDanh: true,
+    thongBao: h(ThongBaoHocSinh, { token: 'tk', onOpen: noop }), onMoHoSo: noop, soBaiTap: 1, coBaiTap: true, onKiemTra: noop,
+    onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop }),
+  h(BongBongAiDdh, { auth: { token: 'tk', sbd: '12121212', hoTen: 'Nguyễn Minh Anh' }, anBong: true }))
+// ═══ hết MỘT TRANG HS 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
 const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-toan-canh':'hocsinh', 'gv-giao-btvn':'giaobtvn', 'gv-giao-tuan':'khodegiao', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
@@ -607,6 +643,7 @@ const con =
   man === 'hs-menu' ? manMenuTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-dang-nhap' ? manDangNhapTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
+  man === 'hs-mot' ? manMotTrang() : // MỘT TRANG HS 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
