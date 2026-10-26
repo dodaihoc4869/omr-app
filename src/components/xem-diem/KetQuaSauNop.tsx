@@ -7,6 +7,7 @@ import { demChuaDungTron, type KqMotCau, type PhanKetQua, type TrangThaiCongBo }
 import { chuDemLoai } from '../../lib/loai-cau-chua-dung'
 import { KetQuaSoLon, NutXd, PhanGon, ThanhTrenXd, TrangThaiChuaCoDiem } from './thanh-phan'
 import './ket-qua-kinh.css'
+import '../../styles/khoi-dam-lam-bai.css' // «Khối đậm» 25/10: trình bày màn làm bài / làm câu của học sinh
 
 /** Một ô "từng câu" (ca thi 28/09): kết quả chấm của CHÍNH em — chỉ truyền khi `kieu === 'da_cong_bo'`. */
 export interface OCauKq {
