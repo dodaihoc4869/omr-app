@@ -1,9 +1,9 @@
 // GIAO DIỆN «TRONG» · APP HỌC SINH — phần trình bày RIÊNG của bản vẽ thầy chốt 26/10 (ve-moi/hs-hom-nay.html, hs-menu-phai.html), NẠP LƯỜI qua
-// nap-trong-hs.ts (chỉ khi `<html data-trong>`): thẻ Hôm nay có vòng tiến độ. Cùng số, cùng chữ, cùng nút, cùng lệnh với bản cũ —
+// nap-trong-hs.ts (chỉ khi `<html data-trong>`): thẻ Hôm nay có vòng tiến độ + menu dọc mép phải. Cùng số, cùng chữ, cùng nút, cùng lệnh với bản cũ —
 // chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
-import type { CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowRight, Check, Flame } from 'lucide-react'
+import { ArrowRight, Check, ClipboardCheck, Flame, RefreshCw, type LucideIcon } from 'lucide-react'
 import { CAU_MOI_CHANG, soChangXong } from './lam-bai'
 import { chiaChang, chuNutHoc, ChipNhom, XuongNhip, type PropsTheHomNayEm } from './TheHomNayEm'
 import BangNhipHoc from './BangNhipHoc'
@@ -83,3 +83,39 @@ export function HomNayTrong({ p, k, nhip }: { p: PropsTheHomNayEm; k: KetQuaNhip
 }
 
 
+/** MENU DỌC MÉP PHẢI (bản vẽ hs-menu-phai, thầy chốt 26/10): gộp thanh trên (logo, Vào ca kiểm tra, chuông, cập nhật, ảnh «Của em») + menu 4 mục.
+ *  Thu gọn = MỘT vạch nhỏ giữa mép phải (chấm đỏ khi có tin chưa đọc — CSS :has đọc số của chuông thật). Chạm ⇒ thẻ menu ra, nền sau mờ; chạm ngoài /
+ *  chọn mục / Esc / cuộn trang ⇒ thu lại. Mở ⇒ tiêu điểm vào mục đầu; Esc, chạm ngoài, chọn mục ⇒ trả tiêu điểm về vạch. Chuông = ĐÚNG phần tử
+ *  ThongBaoHocSinh (giữ hành vi + số chưa đọc), phủ cả dòng; menu luôn gắn trong DOM (ẩn bằng CSS) để tấm thông báo mở từ đây không mất. */
+export function MenuDocTrong(p: {
+  muc: string; ds: readonly { id: string; ten: string; icon: LucideIcon }[]; onMuc: (id: string) => void
+  coCa: boolean; onThi: () => void; thongBao?: ReactNode; dangTai: boolean; onTaiLai: () => void
+  chuDau: string; moCuaEm: boolean; onCuaEm: () => void; nutCuaEm: RefObject<HTMLButtonElement | null>
+}) {
+  const [mo, setMo] = useState(false)
+  const nut = useRef<HTMLButtonElement>(null)
+  const the = useRef<HTMLElement>(null)
+  const dong = (traVe: boolean) => { setMo(false); if (traVe) nut.current?.focus() }
+  useEffect(() => {
+    if (!mo) return
+    the.current?.querySelector<HTMLElement>('.tr-menu-muc')?.focus()
+    const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') { setMo(false); nut.current?.focus() } }
+    const cuon = () => setMo(false)
+    window.addEventListener('keydown', phim)
+    window.addEventListener('scroll', cuon, { passive: true })
+    return () => { window.removeEventListener('keydown', phim); window.removeEventListener('scroll', cuon) }
+  }, [mo])
+  return <>
+    <button ref={nut} type="button" className="tr-menu-cham" aria-label="Mở menu" aria-expanded={mo} aria-controls="tr-menu" onClick={() => setMo(true)}><i /><s /></button>
+    {mo && <div className="tr-menu-phu" onClick={() => dong(true)} aria-hidden="true" />}
+    <nav ref={the} id="tr-menu" className="tr-menu" data-mo={mo || undefined} aria-label="Điều hướng học sinh">
+      <a className="tr-menu-dau" href="/hs"><img src={`${import.meta.env.BASE_URL}logo-hs-nho-v3.svg`} width={26} height={26} alt="" draggable={false} />Đỗ Đại Học</a>
+      {p.ds.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-menu-muc" onClick={() => { p.onMuc(id); dong(true) }} aria-current={p.muc === id ? 'page' : undefined}><Icon size={20} aria-hidden="true" />{ten}</button>)}
+      <hr className="tr-menu-vach" />
+      {!p.coCa && <button type="button" className="tr-menu-muc" onClick={() => { dong(true); p.onThi() }}><ClipboardCheck size={20} aria-hidden="true" />Vào ca kiểm tra</button>}
+      {p.thongBao && <div className="tr-menu-muc tr-menu-tb" onClickCapture={(e) => { if ((e.target as Element).closest?.('.m3-tb-chuong')) dong(false) }}>{p.thongBao}<span aria-hidden="true">Thông báo</span></div>}
+      <button type="button" className="tr-menu-muc" onClick={() => { dong(true); p.onTaiLai() }} disabled={p.dangTai}><RefreshCw size={20} aria-hidden="true" />Cập nhật bài học</button>
+      <button ref={p.nutCuaEm} type="button" className="tr-menu-muc" onClick={() => { dong(false); p.onCuaEm() }} aria-haspopup="dialog" aria-expanded={p.moCuaEm}><span className="tr-menu-anh" aria-hidden="true">{p.chuDau}</span>Của em</button>
+    </nav>
+  </>
+}

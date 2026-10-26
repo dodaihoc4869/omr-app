@@ -8,7 +8,7 @@ const TheKiemTraCaNhan=lazy(()=>import('./TheKiemTraCaNhan'))
 import TheHomNayEm, { chuNutHoc } from './TheHomNayEm'
 import { soHomNay } from './lam-bai'
 import { useSoCauCanSua } from '../../lib/tu-sua-loi'
-import { napTrongHs, type HuaTrongHs } from './nap-trong-hs'
+import { modTrongHs, napTrongHs, type HuaTrongHs } from './nap-trong-hs'
 void napTrongHs() // «Trong» bật ⇒ nạp mảnh trình bày ngay lúc mô-đun cổng chạy (song song lệnh Sảnh)
 
 // ĐỢT 19 (13/10 — làn N): hai tab Hành trình · Ôn & sửa thiết kế lại và biểu tượng Tự sửa lỗi vẽ riêng (BieuTuongTuSua.tsx — MỘT hình ở thẻ mời, dòng Hôm
@@ -116,7 +116,7 @@ export default function HocTapHomNay(p: Props) {
     return () => { window.removeEventListener('keydown', f); nutCuaEm.current?.focus() }
   }, [moCuaEm])
   const dongTam = (fn: () => void) => () => { setMoCuaEm(false); fn() }
-  // GIAO DIỆN «TRONG» (bản vẽ hs-hom-nay.html, thầy chốt 26/10): logo thật ở thanh trên; Hôm nay chia CỘT CHÍNH (thẻ Hôm nay · Kiểm tra ôn tập · Bài học
+  // GIAO DIỆN «TRONG» (bản vẽ hs-hom-nay.html, thầy chốt 26/10): thanh trên + menu 4 mục gộp thành MENU DỌC mép phải (TrongHs.tsx); Hôm nay chia CỘT CHÍNH (thẻ Hôm nay · Kiểm tra ôn tập · Bài học
   // 7 ngày) | CỘT PHỤ (Tự sửa lỗi · Nhịp học · Ôn và sửa) — trình bày ở src/styles/trong-hs.css; điện thoại một cột cùng thứ tự. Lùi (ddh.trong = 'tat') ⇒ y cũ.
   // Nhóm "Ôn và sửa" — MỘT khối JSX cho cả hai giao diện (cũ: cuối màn; «Trong»: cuối cột phụ).
   const nhomOnSua = <section className="ht2-nhom" aria-label="Ôn và sửa">
@@ -140,8 +140,10 @@ export default function HocTapHomNay(p: Props) {
 
   // «Trong»: mảnh trình bày nạp lười (nap-trong-hs.ts) — chờ có rồi mới vẽ (không chớp bản thiếu kiểu); không bật / tải hỏng ⇒ bản cũ y nguyên.
   const huaTrong = napTrongHs()
-  const ve = (trong: boolean) => { return <div className="ht-app ht2" data-nguon={p.nguon}>
-    <header className="ht-thanh ht2-thanh">
+  const ve = (trong: boolean) => { const MenuDoc = modTrongHs()?.MenuDocTrong; return <div className="ht-app ht2" data-nguon={p.nguon}>
+    {trong && MenuDoc ? <MenuDoc muc={muc} ds={MENU} onMuc={(id) => setMuc(id as Muc)} coCa={p.coCa} onThi={p.onThi} thongBao={p.thongBao} dangTai={p.dangTai} onTaiLai={p.onTaiLai}
+      chuDau={chuCaiDau(p.ten || 'Em')} moCuaEm={moCuaEm} onCuaEm={() => setMoCuaEm(true)} nutCuaEm={nutCuaEm} />
+     : <header className="ht-thanh ht2-thanh">
       <a className="ht-thuong-hieu" href="/hs"><span className="ht2-logo" aria-hidden="true"><Atom size={22} /></span><span>Đỗ Đại Học<small>Học Hoá mỗi ngày</small></span></a>
       <div className="ht2-thanh-phai">
         {!p.coCa && <button className="ht2-nut-thi" onClick={p.onThi}><ClipboardCheck size={18} aria-hidden="true" />Vào ca kiểm tra</button>}
@@ -149,9 +151,9 @@ export default function HocTapHomNay(p: Props) {
         <button className="ht-nut-bieu-tuong" onClick={p.onTaiLai} aria-label="Cập nhật bài học" disabled={p.dangTai}><RefreshCw size={19} aria-hidden="true" /></button>
         <button ref={nutCuaEm} className="ht2-anh" onClick={() => setMoCuaEm(true)} aria-label="Của em" aria-haspopup="dialog" aria-expanded={moCuaEm}>{chuCaiDau(p.ten || 'Em')}</button>
       </div>
-    </header>
+    </header>}
     <div className="ht-khung">
-      <nav className="ht-menu" aria-label="Điều hướng học sinh">{MENU.map(({ id, ten, icon: Icon }) => <button key={id} onClick={() => setMuc(id)} aria-current={muc === id ? 'page' : undefined}><Icon size={21} aria-hidden="true" /><span>{ten}</span></button>)}</nav>
+      {!trong && <nav className="ht-menu" aria-label="Điều hướng học sinh">{MENU.map(({ id, ten, icon: Icon }) => <button key={id} onClick={() => setMuc(id)} aria-current={muc === id ? 'page' : undefined}><Icon size={21} aria-hidden="true" /><span>{ten}</span></button>)}</nav>}
       <main className="ht-noi-dung ht2-noi-dung tt-vao-muc" key={muc}>
         <div className="ht2-mo-dau"><p>{homNayChu()}{p.lop ? ` · ${p.lop}` : ''}{muc === 'hanh-trinh' && sanh?.chienDich?.ten ? ` · ${sanh.chienDich.ten}` : ''}</p><h1>{muc === 'hom-nay' ? `Chào ${p.ten || 'em'}` : MENU.find(x => x.id === muc)?.ten}</h1></div>
         {p.canhBao}

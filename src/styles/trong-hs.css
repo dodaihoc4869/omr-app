@@ -1,6 +1,58 @@
-/* GIAO DIỆN «TRONG» · APP HỌC SINH — khung (thanh trên) + màn Hôm nay (bản vẽ ve-moi/hs-hom-nay.html, thầy chốt 26/10). Nạp từ HocTapHomNay.tsx.
+/* GIAO DIỆN «TRONG» · APP HỌC SINH — khung (menu dọc mép phải) + các màn (bản vẽ ve-moi/hs-*.html, thầy chốt 26/10). Nạp LƯỜI cùng TrongHs.tsx
+   (nap-trong-hs.ts) — chỉ khi <html data-trong>.
    Chỉ dưới [data-trong]; màu chỉ var(--tr-*) (styles/trong.css). Lùi ddh.trong = 'tat' ⇒ không luật nào ở đây chạy ⇒ y giao diện cũ.
-   Menu 4 mục KHÔNG đổi ở đây (thầy đang vẽ lại menu dọc thu gọn). */
+   */
+
+/* ── Menu dọc mép phải (bản vẽ hs-menu-phai, thầy chốt 26/10): thay thanh trên + menu 4 mục. Thu gọn = một vạch nhỏ giữa mép phải. ── */
+[data-trong='hs'] .ht2 .ht-khung { display: block; }
+[data-trong='hs'] .ht2 .ht-noi-dung { max-width: 1160px; margin: 0 auto; padding: 28px 40px 104px 32px; }
+[data-trong] .tr-menu-cham { position: fixed; top: 50%; right: 0; z-index: 40; width: 44px; height: 64px; margin-top: -32px; padding: 0; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; }
+[data-trong] .tr-menu-cham i { width: 6px; height: 40px; margin-left: 14px; border-radius: 999px; background: color-mix(in srgb, var(--tr-chinh) 55%, transparent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tr-chinh) 12%, transparent); }
+[data-trong] .tr-menu-cham s { display: none; position: absolute; top: 10px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--tr-sai); box-shadow: 0 0 0 2px var(--tr-nen); }
+[data-trong] .ht2:has(.tr-menu .m3-tb-dem) .tr-menu-cham s { display: block; }
+[data-trong] .tr-menu-cham[aria-expanded='true'] { opacity: 0; }
+[data-trong] .tr-menu-cham:focus-visible { outline: 0; }
+[data-trong] .tr-menu-cham:focus-visible i { outline: 3px solid var(--tr-chinh); outline-offset: 3px; }
+[data-trong] .tr-menu-phu { position: fixed; inset: 0; z-index: 41; background: color-mix(in srgb, var(--tr-nen) 55%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+/* KHÔNG transform trên thẻ menu (tấm Thông báo bên trong là position: fixed — transform sẽ giam nó trong thẻ); giữa màn bằng margin tự động. */
+[data-trong] .tr-menu {
+  position: fixed; inset-block: 0; right: 12px; z-index: 42; width: 214px; height: max-content; max-height: calc(100dvh - 24px); margin-block: auto; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 2px; padding: 8px; border: 1px solid var(--tr-vien); border-radius: 24px; background: var(--tr-mat); box-shadow: var(--tr-bong-3);
+  visibility: hidden; opacity: 0; transition: opacity 160ms ease, visibility 0s linear 160ms;
+}
+[data-trong] .tr-menu[data-mo] { visibility: visible; opacity: 1; transition: opacity 160ms ease; animation: tr-menu-vao 180ms ease-out; }
+@keyframes tr-menu-vao { from { transform: translateX(16px); } }
+[data-trong] .tr-menu :is(.m3-tb-tam, .m3-tb-che) { visibility: visible; }
+[data-trong] .tr-menu:has(.m3-tb-tam) { opacity: 1; transition: none; }
+[data-trong] .tr-menu-dau { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 14px 6px; color: var(--tr-chu); font-size: 15px; font-weight: 700; text-decoration: none; }
+[data-trong] .tr-menu-muc {
+  position: relative; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 14px; border: 0; border-radius: 16px; background: transparent;
+  color: var(--tr-chu-2); font-size: 15px; font-weight: 500; line-height: 1.3; font-family: inherit; text-align: left; cursor: pointer;
+}
+[data-trong] .tr-menu-muc:hover { background: var(--tr-mat-2); }
+[data-trong] .tr-menu-muc[aria-current='page'] { background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); font-weight: 600; }
+[data-trong] .tr-menu-muc:disabled { opacity: 0.5; cursor: default; }
+[data-trong] .tr-menu-vach { width: auto; margin: 6px 10px; border: 0; border-top: 1px solid var(--tr-vien); }
+[data-trong] .tr-menu-anh { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); font-size: 10px; font-weight: 600; }
+/* Thông báo: nút chuông THẬT phủ cả dòng (bấm đâu trên dòng cũng là bấm chuông), số chưa đọc ở cuối dòng. */
+[data-trong] .tr-menu-tb { padding-left: 34px; }
+[data-trong] .tr-menu-tb .m3-tb { position: static; }
+[data-trong] .tr-menu-tb .m3-tb-chuong {
+  position: absolute; inset: 0; width: auto; height: auto; min-width: 0; padding: 0 14px; border: 0; border-radius: 16px; background: transparent; box-shadow: none;
+  display: flex; align-items: center; justify-content: flex-start; color: inherit;
+}
+[data-trong] .tr-menu-tb .m3-tb-chuong svg { width: 20px; height: 20px; }
+[data-trong] .tr-menu-tb .m3-tb-dem { top: 50%; right: 14px; margin-top: -10px; background: var(--tr-sai); color: var(--tr-trang); }
+[data-trong] .tr-menu-tb > span { pointer-events: none; }
+[data-trong] .tr-menu .m3-tb-tam { position: fixed; inset: max(12px, env(safe-area-inset-top)) 12px auto; margin: 0; width: auto; }
+@media (min-width: 640px) { [data-trong] .tr-menu .m3-tb-tam { inset: 16px 16px auto auto; width: 410px; } }
+@media (prefers-reduced-motion: reduce) { [data-trong] :is(.tr-menu, .tr-menu[data-mo]) { animation: none; transition: none; } }
+[data-trong].may-yeu :is(.tr-menu, .tr-menu[data-mo]) { animation: none; transition: none; }
+[data-trong].may-yeu .tr-menu-phu { backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* Không còn thanh đáy ⇒ nút A.I nổi về sát góc dưới phải (vạch menu ở giữa mép, không đè). */
+[data-trong='hs'] body:has(.tr-menu-cham) .aid-bong { bottom: calc(24px + env(safe-area-inset-bottom)); }
+
+[data-trong] .ht2-tam .ht2-anh { background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); font-weight: 600; }
 
 /* ── Lời chào ── */
 [data-trong='hs'] .ht2-mo-dau p { font-size: 13px; font-weight: 500; color: var(--tr-chu-3); }
@@ -141,6 +193,7 @@
 /* ── Điện thoại ── */
 @media (max-width: 700px) {
   [data-trong] .ht2-mo-dau h1 { font-size: 24px; }
+  [data-trong='hs'] .ht2 .ht-noi-dung { padding: 24px 28px 96px 16px; }
   [data-trong] .ht2-ca .ht-nut-chinh { width: 100%; }
   [data-trong] .tr-hn-luoi, [data-trong] .tr-hn-cot { gap: 16px; }
   [data-trong='hs'] .tr-hn-luoi :is(.ht2-hn, .ktcn-the, .ht-the, .ht2-moi-sua) { padding: 16px; border-radius: 18px; }
