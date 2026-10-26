@@ -222,3 +222,5 @@ button.tvc-hn-bac { cursor: pointer; background: color-mix(in oklch, var(--bac) 
   .tvc-luoi .tvc-hn-than { display: flex; }
 }
 @media (prefers-reduced-motion: reduce) { .tvc-muc-luc { scroll-behavior: auto; } }
+/* SOÁT 26/10 (giao diện cũ phụ huynh): tên con + lớp ở thanh đầu không cắt «…» ở 360 px — xuống dòng (thầy: không cắt chữ để vừa). */
+.ph3-dau__ten b { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }

@@ -235,7 +235,7 @@ function DongLuot({ l }: { l: LuotGanDay }) {
       <span className="ph3-luot__dau" aria-hidden="true">{l.dung === true ? <BtTich co={16} day={3} /> : l.dung === false ? <BtNhan co={16} day={3} /> : '–'}</span>
       <div className="ph3-luot__giua">
         <b>{l.tieuDe || 'Câu chưa ghi tên dạng'}</b>
-        <span><span className="ph3-an">{kq} · </span>{l.noi} · {ngayNganVn(l.luc)} {gioVn(l.luc)}{l.coGoiY ? ' · có dùng gợi ý' : ''}</span>
+        <span><span className="ph3-an">{kq} · </span>{l.noi} · {ngayNganVn(l.luc)} {gioVn(l.luc)}{l.coGoiY ? '\u00a0· có dùng gợi ý' : ''}</span>
       </div>
       <span className="ph3-luot__giay" data-chua={l.giay === null ? '' : undefined}>{chuGiay(l.giay, l.nguonGiay)}</span>
     </li>

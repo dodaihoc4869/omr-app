@@ -1993,3 +1993,7 @@ table.ct-bang {
   align-items: center;
   gap: 8px;
 }
+
+/* SOÁT 26/10 (thầy: KHÔNG cắt chữ để vừa): tên em ở lưới theo dõi và link vào ca xuống dòng thay vì «…» — thẻ cao theo nội dung. */
+.ct-em .ten { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+.ct-link span:not(.ct-nhan) { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }

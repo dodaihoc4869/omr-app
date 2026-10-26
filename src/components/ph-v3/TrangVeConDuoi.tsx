@@ -679,7 +679,7 @@ function LichSu({ tq, hoSo, cot, moHoSo }: { tq: ConTongQuan; hoSo: TaiHoSo; cot
             {tq.ganDay.slice(0, 5).map((l, i) => (
               <li key={`${l.luc}-${i}`}>
                 <span className="tvc-dau-cham" data-mau={l.dung === true ? 'xl' : l.dung === false ? 'ho' : 'xam'} aria-hidden="true">{l.dung === false ? <BtNhan co={16} day={2.6} /> : <BtTich co={16} day={2.6} />}</span>
-                <div><b>{l.tieuDe || 'Câu chưa ghi tên'}</b><span className="tvc-phu">{[l.noi, gioVn(l.luc), l.dung === null ? 'bỏ trống' : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join(' · ')}</span></div>
+                <div><b>{l.tieuDe || 'Câu chưa ghi tên'}</b><span className="tvc-phu">{[l.noi, gioVn(l.luc), l.dung === null ? 'bỏ trống' : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join('\u00a0· ')}</span></div>
                 <strong className="tvc-giay-lon">{chuGiay(l.giay, l.nguonGiay).replace(/^≈/, '≈ ')}</strong>
               </li>
             ))}
