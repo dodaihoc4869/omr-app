@@ -26,6 +26,7 @@ import { ChipTang } from '../goi-len-bang/ChonEm'
 import type { Tang } from '../../lib/chon-em-phan-tang'
 import './day-hoc.css'
 import './dau-gio.css'
+import '../../styles/trong-gv-len-bang.css' // «Trong» 26/10 — chỉ áp khi <html data-trong="gv">
 
 const TEN_PHAN: Record<CauDayHoc['phan'], string> = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng–sai', III: 'Phần III · Trả lời ngắn' }
 const khoa = (x: { sbd: string; qid: string }) => khoaToChieu(x.sbd, x.qid)

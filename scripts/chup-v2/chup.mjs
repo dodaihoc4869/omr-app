@@ -226,6 +226,11 @@ const t3 = (ten, man, cho, viec) => [
 ]
 const DS_T3 = [
   ...t3('hom-nay', 'gv-hom-nay&nh=1', /Hôm nay của thầy/, 'hn:cho'),
+  ...t3('hanh-trinh', 'gv-nhip&ht2=1', /Hành trình giỏi Hóa/, 'cho:Kiểm tra ôn tập'),
+  ...t3('diem-danh', 'gv-nhip&ht2=1&dd12c=1', /Hành trình giỏi Hóa/, 'dd12c:buoc1'),
+  ...t3('cai-dat', 'gv-cai-dat', /Cài đặt/),
+  ...t3('len-bang', 'gv-len-bang&ht2=1', /./, 'tab:Kiểm tra đầu giờ'),
+  ...t3('chieu', 'gv-chieu&remote=PHIEN1', /Hoàng Bảo Ngọc/),
 ]
 // ═══════════ hết «TRONG» NHÓM 3 ═══════════
 
@@ -404,6 +409,10 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.getByRole('heading', {name:chu,exact:true}).waitFor()
     } else if (viec?.startsWith('tieu-de:')) {
       await t.getByRole('heading', { name: new RegExp(viec.slice(8)) }).first().waitFor({ timeout: 20000 })
+    } else if (viec?.startsWith('tab:')) {
+      // «TRONG» NHÓM 3: bấm một thẻ (role=tab) rồi chờ màn trong thẻ dựng xong
+      await t.getByRole('tab', { name: viec.slice(4), exact: true }).first().click({ timeout: 20000 })
+      await t.waitForTimeout(5000)
     } else if (viec?.startsWith('cho:')) {
       await t.getByText(new RegExp(viec.slice(4))).first().waitFor({ timeout: 20000 })
     } else if (viec?.startsWith('ho-so:') || viec?.startsWith('ho-so-ls:')) {
@@ -503,8 +512,11 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       const [, v, phim] = viec.split(':')
       // 21/10 Hành trình một trang 4 bước: bước 1 có thể đang gập (đã có em điểm danh ⇒ mở sẵn bước 2) — mở lại bước 1 trước.
       const moB1 = t.getByRole('button', { name: /^Mở (lại )?bước 1 · Điểm danh$/ })
-      await moB1.or(t.getByText(/em đang Lười/).first()).first().waitFor({ timeout: 20000 })
+      // «Trong» 26/10: bước gập không vẽ dòng riêng ⇒ mở bằng thước (nút bước 1 của «Các bước của buổi dạy»).
+      const thuoc1 = t.locator('nav[aria-label="Các bước của buổi dạy"] li[data-tt] button').first()
+      await moB1.or(thuoc1).or(t.getByText(/em đang Lười/).first()).first().waitFor({ timeout: 20000 })
       if (await moB1.isVisible()) await moB1.click()
+      else if (!(await t.getByText(/em đang Lười/).first().isVisible())) await thuoc1.click()
       await t.getByText(/em đang Lười/).first().waitFor({ timeout: 20000 })
       if (v === 'chieu') {
         await t.getByRole('button', { name: 'Chiếu điểm danh', exact: true }).click()

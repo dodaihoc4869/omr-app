@@ -42,6 +42,17 @@ import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
 import '../../src/styles/trong.css' // giao diện «Trong» 26/10 (App / AppHocSinh / AppThi nạp y như vậy)
 import '../../src/styles/trong-gv.css' // «Trong» — khung app thầy (App.tsx nạp ngay sau trong.css)
+import GoiLenBangScreen from '../../src/screens/GoiLenBangScreen' // «TRONG» NHÓM 3
+import DieuKhienToChieuScreen from '../../src/screens/DieuKhienToChieuScreen' // «TRONG» NHÓM 3
+import '../../src/styles/trong-gv-chieu.css' // màn thật gắn chuỗi này lúc nạp mảnh (khi data-trong đã có); trang chụp đặt data-trong SAU khi nạp ⇒ nạp thẳng
+const PHIEN_CHIEU_GIA = {
+  maPhien: 'PHIEN1', tieuDe: 'Điều khiển Máy chiếu', dotHienTai: 6, tongSoDot: 20, pha: 'cho', loiGiaiMo: false, daCham: {},
+  dsO: Array.from({ length: 20 }, (_, i) => ({
+    khoa: `o${i}`, dot: i, soCau: i + 1, phan: 'I', sao: i === 6 ? 2 : 0, sbd: String(1200 + i), hoTen: ['Hoàng Bảo Ngọc', 'Lê Khánh Vy', 'Trần Gia Bảo'][i % 3], lop: '12A1', lanLenBang: 2,
+    qid: `DH-12-C2-B6-${i + 1}`, de: 'Xà phòng hoá hoàn toàn 8,9 gam tristearin bằng NaOH vừa đủ. Khối lượng glycerol thu được là', pa: ['0,46 g', '0,92 g', '1,84 g', '2,76 g'],
+    dapAn: 'B', loiGiai: 'n(chất béo) = 8,9 : 890 = 0,01 mol\nTristearin có 3 nhóm ester: n(NaOH) = 3 · 0,01 = 0,03 mol\nn(glycerol) = n(chất béo) = 0,01 mol ⇒ m = 0,01 · 92 = 0,92 g',
+  })),
+}
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import AppPhuHuynh from '../../src/components/ph-v3/AppPhuHuynh'
@@ -214,6 +225,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // ---- LÀN HÔM NAY 12/10B: Nhịp học (app thầy gọi qua `goiLenh` giả — gia/goi-lenh-thay.ts; giữ thêm đường `fetch` cùng dữ liệu)
   if (u.pathname.endsWith('/gv/nhip-hoc')) { const r = nhipHocGia(); return r.ok ? tra(r.du) : new Response(JSON.stringify({ ok: false, error: r.chu }), { status: 500, headers: { 'content-type': 'application/json' } }) }
   // ---- hết LÀN HÔM NAY 12/10B
+  // ---- «TRONG» NHÓM 3: điện thoại điều khiển máy chiếu (`?man=gv-chieu&remote=PHIEN1`) — phiên giả 20 đợt, đang ở đợt 7
+  if (u.pathname.endsWith('/gv/to-chieu/phien')) return tra({ ok: true, phien: PHIEN_CHIEU_GIA })
+  if (u.pathname.endsWith('/gv/to-chieu/trang-thai')) return tra({ ok: true, dotHienTai: 6, tongSoDot: 20, pha: 'cho', loiGiaiMo: false, daCham: {} })
   // ---- LÀN GIÁO VIÊN 12/10: Bài hằng ngày + hồ sơ thái độ (app thầy gọi qua `goiLenh` giả; giữ thêm đường `fetch` như trên)
   if (u.pathname.endsWith('/gv/bai-hang-ngay')) return tra(baiHangNgayGia())
   if (u.pathname.endsWith('/gv/ho-so-thai-do')) return tra(hoSoThaiDoGia(String(b.sbd ?? '')))
@@ -437,13 +451,14 @@ function ManHoSoEm() {
 
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
-const MAN_THAY: Record<string, string> ={ 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
+const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 const con =
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
   man === 'hs-nhip' ? manNhipEm() : // LÀN NHỊP EM 12/10C
   man === 'hs-the' ? manTheHomNay() : // LÀN THẺ HÔM NAY 12/10E
   man === 'lam13' ? h(ManLam13) : // LÀN MÀN LÀM BÀI 12/10D
   man === 'hs-ho-so' ? h(ManHoSoEm) : // LÀN HỒ SƠ EM 12/10F
+  man === 'gv-len-bang' ? h(GoiLenBangScreen) : man === 'gv-chieu' ? h(DieuKhienToChieuScreen) : // «TRONG» NHÓM 3
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
@@ -461,7 +476,7 @@ const con =
 const manThay = MAN_THAY[man]
 // TRUNG TU 09/10: mọi màn thầy chụp ở CHẾ ĐỘ 2.0 thật (cờ bật + `data-hoa2` trên vỏ như App.tsx) — trước đây chỉ gv-nhip bật cờ nên thanh bên
 // trong ảnh là danh sách cũ 9 mục. Thanh đáy (< 880 px) cũng dựng như app thật. `?giao=toi|sang` = thầy ép nút Sáng/Tối trong Cài đặt.
-const MAN_STORE: Record<string, string> = { 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
+const MAN_STORE: Record<string, string> = { 'gv-len-bang': 'goilenbang', 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
 if (manThay) {
   // Trang chụp nạp CHUNG CSS game (doan.css có lớp `.dh-so` cùng tên — ô đáp số Đoàn Hộ Tống, rộng 100%, nền giấy) với màn thầy; app thầy thật
   // KHÔNG nạp doan.css (mảnh game chỉ máy em tải) ⇒ trả số bước Dạy học / Kiểm tra đầu giờ về đúng hình tròn 36 px của day-hoc.css cho ảnh chụp.
@@ -474,5 +489,5 @@ if (giao === 'toi' || giao === 'sang') apDungGiaoDien(giao)
 createRoot(document.getElementById('root')!).render(
   manThay
     ? (document.body.removeAttribute('data-bat-linh'), h('div', { className: 'min-h-screen m3 m3-thay vo-thay', 'data-hoa2': '' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con)), h(BottomNav)))
-    : man === 'ph' ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
+    : man === 'ph' || man === 'gv-chieu' ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
 )

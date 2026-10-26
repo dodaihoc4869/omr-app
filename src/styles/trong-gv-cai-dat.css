@@ -1,0 +1,20 @@
+/* «TRONG» — CÀI ĐẶT (bản vẽ thầy chốt 26/10: ve-moi/gv-cai-dat.html). Chỉ khi <html data-trong="gv">; CaiDatScreen nạp.
+   Một cột gọn (tối đa 760 px) thay lưới 2 cột; Giao diện là nút phân đoạn nền chìm; mọi khối giữ nguyên chức năng. Chỉ biến --tr-*. */
+[data-trong='gv'] .gv-cai-dat-day-du,
+[data-trong='gv'] .gv-cai-dat-day-du[class] { display: flex !important; flex-direction: column; align-items: stretch; gap: 20px !important; max-width: 824px; margin: 0; }
+[data-trong='gv'] .gv-cai-dat-day-du > :not(.gv-page-header) { width: 100%; max-width: none; box-sizing: border-box; margin: 0; padding: 20px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .gv-cai-dat-day-du h2 { font-size: 16px !important; font-weight: 600 !important; color: var(--tr-chu); }
+[data-trong='gv'] .gv-cai-dat-day-du [role='radiogroup'][aria-label='Giao diện'] {
+  display: inline-flex; gap: 2px !important; padding: 3px; border-radius: 12px; background: var(--tr-mat-2);
+}
+[data-trong='gv'] .gv-cai-dat-day-du [role='radiogroup'][aria-label='Giao diện'] > button {
+  min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: none; color: var(--tr-chu-2); font-weight: 500; box-shadow: none;
+}
+[data-trong='gv'] .gv-cai-dat-day-du [role='radiogroup'][aria-label='Giao diện'] > button[aria-checked='true'] {
+  background: var(--tr-mat); color: var(--tr-chu); font-weight: 600; box-shadow: var(--tr-bong-1);
+}
+@media (max-width: 600px) {
+  [data-trong='gv'] .gv-cai-dat-day-du > :not(.gv-page-header) { padding: 16px; }
+  [data-trong='gv'] .gv-cai-dat-day-du [role='radiogroup'][aria-label='Giao diện'] { display: flex; }
+  [data-trong='gv'] .gv-cai-dat-day-du [role='radiogroup'][aria-label='Giao diện'] > button { flex: 1; gap: 6px !important; padding: 0 6px; white-space: nowrap; }
+}

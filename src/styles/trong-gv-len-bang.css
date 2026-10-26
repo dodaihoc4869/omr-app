@@ -1,0 +1,30 @@
+/* «TRONG» — GỌI LÊN BẢNG (bản vẽ thầy chốt 26/10: ve-moi/gv-goi-len-bang.html) + các thẻ bước dùng chung của Dạy học / Kiểm tra đầu giờ / Câu cần chữa
+   (.dh-*: cùng các thẻ ấy ở Hành trình). Chỉ khi <html data-trong="gv">; KiemTraDauGio nạp (màn Gọi lên bảng và Hành trình đều kéo mảnh này).
+   Dùng TRÊN LỚP: nút ≥ 44 px, số có mặt to, thẻ trắng viền mảnh. Chỉ biến --tr-*. */
+[data-trong='gv'] .dh-the-ds { gap: 2px; padding: 3px; border: 0; border-radius: 12px; background: var(--tr-mat-2); box-shadow: none; }
+[data-trong='gv'] .dh-the { min-height: 44px; border: 0; border-radius: 10px; background: none; color: var(--tr-chu-2); font-size: 14px; font-weight: 500; box-shadow: none; }
+[data-trong='gv'] .dh-the[aria-selected='true'] { background: var(--tr-mat); color: var(--tr-chu); font-weight: 600; box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .dh-dau h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] .dh-dau p { font-size: 14px; color: var(--tr-chu-3); }
+[data-trong='gv'] .dh-buoc { gap: 14px; padding: 20px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .dh-buoc--chieu { border-color: var(--tr-vien); background: var(--tr-mat); }
+[data-trong='gv'] .dh-buoc-ten h2 { font-size: 17px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .dh-buoc-ten p { font-size: 13px; color: var(--tr-chu-3); }
+[data-trong='gv'] .dh-buoc-dau > .dh-so { width: 36px; height: 36px; border-radius: 12px; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); font-weight: 600; box-shadow: none; }
+[data-trong='gv'] .dh-so-lon { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] .dh-chip { border-radius: 999px; font-weight: 600; }
+[data-trong='gv'] .dh-chip--xanh { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+[data-trong='gv'] .dh-chip--do { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+[data-trong='gv'] .dh-chip--vang { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+[data-trong='gv'] .dh-chip--xam { background: var(--tr-mat-2); color: var(--tr-chu-2); }
+/* thẻ em được gọi (Kiểm tra đầu giờ): viền mảnh; Đạt / Chưa đạt là vạch màu trái */
+[data-trong='gv'] .gvv2-dg-luoi { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+[data-trong='gv'] .gvv2-dg-the { border-color: var(--tr-vien); border-radius: 16px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .gvv2-dg-the[data-trang-thai='dat'] { border-color: var(--tr-dung); box-shadow: inset 3px 0 0 var(--tr-dung); }
+[data-trong='gv'] .gvv2-dg-the[data-trang-thai='chua_dat'] { border-color: var(--tr-sai); box-shadow: inset 3px 0 0 var(--tr-sai); }
+[data-trong='gv'] .gvv2-dg-ten b { font-size: 17px; font-weight: 700; color: var(--tr-chu); }
+[data-trong='gv'] .gvv2-dg-nut { min-height: 48px; border-radius: 12px; font-weight: 600; }
+@media (max-width: 600px) {
+  [data-trong='gv'] .dh-the-ds { overflow-x: auto; }
+  [data-trong='gv'] .dh-buoc { padding: 16px; }
+}

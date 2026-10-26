@@ -26,6 +26,7 @@ import type { DiemDanhBuoi } from './DiemDanhBuoi'
 import ChipBac from '../bac-cham-chi/ChipBac'
 import { chuBacSo } from '../bac-cham-chi/bac'
 import './diem-danh-buoc1.css'
+import '../../styles/trong-gv-diem-danh.css' // «Trong» 26/10 — chỉ áp khi <html data-trong="gv">
 
 const HoSoLamCauEm = lazy(() => import('../chien-dich/HoSoLamCauEm'))
 const BanChieuDiemDanh = lazy(() => import('./BanChieuDiemDanh'))

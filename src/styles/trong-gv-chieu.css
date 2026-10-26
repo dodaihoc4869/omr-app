@@ -1,0 +1,40 @@
+/* «TRONG» — ĐIỆN THOẠI ĐIỀU KHIỂN MÁY CHIẾU (bản vẽ thầy chốt 26/10: ve-moi/gv-dieu-khien-chieu.html). Chỉ khi <html data-trong="gv">.
+   Dùng TRÊN LỚP, một tay: tên em to, «Mời lên bảng» là nút chính rộng hết, mọi nút ≥ 56 px. Móc lớp dkc-* đặt trong DieuKhienToChieuScreen.tsx;
+   màn chỉ có lớp Tailwind nên bộ chọn [data-trong='gv'] .dkc… (2 lớp) thắng lớp tiện ích (1 lớp). Chỉ biến --tr-*. */
+[data-trong='gv'] .dkc { background: var(--tr-nen) !important; color: var(--tr-chu) !important; }
+[data-trong='gv'] .dkc .text-slate-500 { color: var(--tr-chu-3); }
+[data-trong='gv'] .dkc-dau { padding: 8px 8px 8px 16px; background: var(--tr-mat); border-color: var(--tr-vien); box-shadow: none; }
+[data-trong='gv'] .dkc-dau h1 { font-size: 17px; font-weight: 700; }
+[data-trong='gv'] .dkc-dau p { font-size: 13px; font-weight: 500; }
+[data-trong='gv'] .dkc-vuong { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 12px; color: var(--tr-chu-2); }
+[data-trong='gv'] .dkc .dkc-the { border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .dkc-cau { padding: 4px 12px; border-radius: 999px; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); font-size: 13px; font-weight: 600; }
+[data-trong='gv'] .dkc-sao { gap: 4px; padding: 4px 12px; border-radius: 999px; background: var(--tr-sao-nhat); color: var(--tr-sao-chu); font-size: 13px; font-weight: 600; }
+[data-trong='gv'] .dkc-av,
+[data-trong='gv'] .dkc-av[class] { width: 56px; height: 56px; border-radius: 50%; background: var(--tr-sao-nhat); color: var(--tr-sao-chu); animation: none; }
+[data-trong='gv'] .dkc-ten { font-size: 26px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; white-space: normal; overflow-wrap: anywhere; }
+[data-trong='gv'] .dkc-hang-chinh { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+[data-trong='gv'] :is(.dkc-len-bang, .dkc-loi-giai) {
+  min-height: 64px; gap: 4px; border-radius: 16px; background-image: none; box-shadow: var(--tr-bong-1); font-size: 18px; font-weight: 700;
+}
+[data-trong='gv'] .dkc-len-bang[data-pha='cho'] { min-height: 80px; border-color: var(--tr-chinh-nut); background-color: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font-size: 20px; }
+[data-trong='gv'] .dkc-len-bang:not([data-pha='cho']) { border-color: var(--tr-vien-2); background-color: var(--tr-mat-2); color: var(--tr-chu-2); }
+[data-trong='gv'] .dkc-loi-giai { border-color: var(--tr-vien-2); background-color: var(--tr-mat); color: var(--tr-chu); }
+[data-trong='gv'] .dkc-loi-giai svg { color: var(--tr-chu-y); }
+[data-trong='gv'] :is(.dkc-len-bang, .dkc-loi-giai) svg { animation: none; }
+[data-trong='gv'] :is(.dkc-len-bang, .dkc-loi-giai) span + span { font-size: 13px; font-weight: 500; opacity: 0.85; }
+[data-trong='gv'] .dkc-hang-dot { gap: 10px; }
+[data-trong='gv'] .dkc-nut { min-height: 60px; border-color: var(--tr-vien-2); border-radius: 14px; background: var(--tr-mat); color: var(--tr-chu); font-size: 15px; font-weight: 600; box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .dkc-buoc { border-color: transparent; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); box-shadow: none; }
+[data-trong='gv'] .dkc-hang-cham { gap: 12px; }
+[data-trong='gv'] :is(.dkc-dat, .dkc-chua-dat) { min-height: 60px; border-radius: 14px; background: var(--tr-mat); font-size: 16px; font-weight: 600; }
+[data-trong='gv'] .dkc-dat { border-color: var(--tr-dung); color: var(--tr-dung-chu); }
+[data-trong='gv'] .dkc-chua-dat { border-color: var(--tr-sai); color: var(--tr-sai-chu); }
+[data-trong='gv'] .dkc-tab { gap: 2px; margin-top: 8px; padding: 3px; border: 0; border-radius: 12px; background: var(--tr-mat-2); }
+[data-trong='gv'] .dkc-tab button { min-height: 48px; border: 0; border-radius: 10px; color: var(--tr-chu-2); font-size: 13.5px; font-weight: 500; }
+[data-trong='gv'] .dkc-tab button[data-on] { background: var(--tr-mat); color: var(--tr-chu); font-weight: 600; box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .dkc-dap-an { border: 0; border-radius: 14px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+[data-trong='gv'] .dkc-dap-an span { color: var(--tr-dung-chu); }
+/* màn nhập mã */
+[data-trong='gv'] .dkc--ket-noi input { min-height: 52px; }
+[data-trong='gv'] .dkc-chinh { min-height: 52px; border-radius: 14px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font-size: 16px; }
