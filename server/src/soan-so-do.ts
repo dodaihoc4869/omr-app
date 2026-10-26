@@ -122,6 +122,21 @@ const ngu = (ms: number) => new Promise((ok) => setTimeout(ok, ms))
 
 /** Bộ gọi Gemini RIÊNG cho lô (không dùng chung `goiMotModel` của Hỏi thầy: bộ ấy có gọi kép 8 s, trần 25 s và nhớ «lược đồ cũ» toàn isolate
  *  — một lần Google từ chối lược đồ ở lô sẽ đổi khuôn Hỏi thầy của học sinh thật trong 10 phút). Dùng chung trạm vượt chặn vị trí `quaTram`. */
+/** Nhãn hạn mức từ thân lỗi Gemini (27/10): ` [quota=<quotaId>; retry=<giây>s]` — chỉ mã hạn mức + số giây, không có chữ của câu. Máy soạn cron đọc
+ *  để phân biệt hết hạn mức NGÀY (nghỉ tới giờ cấp lại) với hạn mức PHÚT / Gemini quá tải (co số câu song song). */
+export function nhanHanMuc(j: unknown): string {
+  const ct = ((j as Obj | null)?.error as Obj | undefined)?.details
+  if (!Array.isArray(ct)) return ''
+  let quota = ''
+  let retry = ''
+  for (const d of ct as Obj[]) {
+    for (const v of (Array.isArray(d?.violations) ? d.violations : []) as Obj[]) if (!quota) quota = str(v?.quotaId).replace(/[^\w-]/g, '').slice(0, 80)
+    const m = /^(\d+)(?:\.\d+)?s$/.exec(str(d?.retryDelay))
+    if (m && !retry) retry = m[1]!
+  }
+  return quota || retry ? ` [quota=${quota || '?'}; retry=${retry || '?'}s]` : ''
+}
+
 export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
   const key = str(env.GEMINI_API_KEY)
   const tram = env.TRAM_GEMINI ? quaTram(env.TRAM_GEMINI) : null
@@ -134,7 +149,7 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
       let r = await fetch(url, init)
       if (tram && r.status === 400 && RE_CHAN_VI_TRI.test(await r.clone().text().catch(() => ''))) r = await tram(url, init)
       const j = (await r.json().catch(() => null)) as Obj | null
-      if (!r.ok) return { ok: false, http: r.status, loi: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 160)}` }
+      if (!r.ok) return { ok: false, http: r.status, loi: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 160)}${nhanHanMuc(j)}` }
       const ung = (j?.candidates as Obj[] | undefined)?.[0]
       const chu = (((ung?.content as Obj | undefined)?.parts as Obj[] | undefined) ?? []).filter((p) => p.thought !== true).map((p) => str(p.text)).join('').trim()
       const u = (j?.usageMetadata ?? {}) as Obj

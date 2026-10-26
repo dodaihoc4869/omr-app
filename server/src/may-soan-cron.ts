@@ -124,6 +124,28 @@ async function cauSuaTiep(env: Env, sau: string): Promise<string[]> {
 }
 
 const RE_HAN_MUC = /\bHTTP (429|503)\b/
+/** Tóm loại lỗi hạn mức của một lượt từ lý do `loi_goi` (chỉ mã HTTP + mã hạn mức — an toàn để ghi, không có chữ câu). */
+export function tomLoiHanMuc(ketQua: readonly Obj[]): { chu: string; ngay: boolean } {
+  const loai = new Map<string, number>()
+  for (const k of ketQua) {
+    if (k.ket !== 'loi_goi') continue
+    const ly = String(k.lyDo ?? '')
+    const h = /\bHTTP (\d{3})\b/.exec(ly)?.[1]
+    if (!h) continue
+    const q = /\[quota=([\w?-]+);/.exec(ly)?.[1]
+    const ten = `${h}${q && q !== '?' ? ` ${q}` : ''}`
+    loai.set(ten, (loai.get(ten) ?? 0) + 1)
+  }
+  const ds = [...loai.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3)
+  return { chu: ds.map(([t, n]) => `${t} ×${n}`).join(', '), ngay: ds.some(([t]) => /PerDay/i.test(t)) }
+}
+/** Giờ Google cấp lại hạn mức NGÀY: nửa đêm giờ Thái Bình Dương sắp tới (+5 phút cho chắc). */
+export function lucCapLaiHanMucNgay(nowMs: number): number {
+  const f = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', hourCycle: 'h23', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  const p = Object.fromEntries(f.formatToParts(nowMs).map((x) => [x.type, x.value]))
+  const daQua = ((Number(p.hour) % 24) * 3600 + Number(p.minute) * 60 + Number(p.second)) * 1000 + (nowMs % 1000)
+  return nowMs - daQua + 86_400_000 + 5 * 60_000
+}
 /** Cùng mẫu `RE_QID` của soan-so-do.ts (`docThamSo`): một qid sai mẫu làm CẢ lô `qids` trả 400 ⇒ lọc trước, qid sai mẫu bị bước qua. */
 const RE_QID = /^[A-Za-z0-9][A-Za-z0-9._~:-]{0,120}$/
 const ngan = (s: string) => s.replace(/\s+/g, ' ').slice(0, 160)
@@ -165,6 +187,7 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
     let soLoi = tt.soLoiLienTiep
     let lyDo: string | null = null
     let daXuLy = 0
+    let nghiNgay = 0
     const ssTruoc = songSongHien(dem)
     let ss = ssTruoc
 
@@ -208,15 +231,20 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
           const d = (body.dem ?? {}) as Obj
           for (const [k, v] of Object.entries(d)) if (Number.isFinite(Number(v))) dem[k] = (dem[k] ?? 0) + Number(v)
           dem.luot = (dem.luot ?? 0) + 1
-          if (hanMuc && !caoDiem && ss > SONG_SONG_THAP_NHAT) {
+          const hm = tomLoiHanMuc(ketQua)
+          if (hm.ngay && soDuoc === 0) {
+            // Hết hạn mức NGÀY: co số câu không giúp gì ⇒ nghỉ tới giờ cấp lại, không đốt lượt.
+            nghiNgay = lucCapLaiHanMucNgay(nowMs)
+            lyDo = `Gemini hết hạn mức ngày (${hm.chu}) ⇒ nghỉ tới ${new Date(nghiNgay + 7 * 3_600_000).toISOString().slice(11, 16)} giờ VN`
+          } else if (hanMuc && !caoDiem && ss > SONG_SONG_THAP_NHAT) {
             // Quá tải ⇒ co lại, lượt sau chạy tiếp ngay (không nghỉ 30 phút).
             ss = Math.max(SONG_SONG_THAP_NHAT, Math.floor(ss / 2))
-            if (soDuoc > 0) soLoi = 0
-            lyDo = `Gemini báo quá tải ⇒ hạ còn ${ss} câu song song`
+            soLoi = 0 // còn hạ được ⇒ không phải lỗi; xoá cả bộ đếm cũ (vd 3 từ trước bản co giãn) để không nghỉ 30 phút oan
+            lyDo = `Gemini báo quá tải${hm.chu ? ` (${hm.chu})` : ''} ⇒ hạ còn ${ss} câu song song`
           } else if (soDuoc > 0) {
             soLoi = 0; lyDo = null
             if (!hanMuc && !caoDiem) ss = Math.min(SONG_SONG, ss + SONG_SONG_TANG)
-          } else if (tatCaLoiGoi || hanMuc) { soLoi++; lyDo = hanMuc ? 'Gemini báo hết hạn mức (429/503)' : 'mọi câu trong lượt đều lỗi gọi mô hình' }
+          } else if (tatCaLoiGoi || hanMuc) { soLoi++; lyDo = hanMuc ? `Gemini báo hết hạn mức${hm.chu ? ` (${hm.chu})` : ' (429/503)'}` : 'mọi câu trong lượt đều lỗi gọi mô hình' }
           const xong = body.xong === true
           if (vong === 'chinh') {
             if (xong) { vong = 'sua'; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, sang vòng sửa câu lệch' } else conTro = String(body.conTro ?? conTro)
@@ -232,7 +260,8 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
 
     dem.song_song_hien = ss
     let nghiDen = tt.nghiDen
-    if (soLoi >= SO_LOI_DE_NGHI) {
+    if (nghiNgay) nghiDen = nghiNgay
+    else if (soLoi >= SO_LOI_DE_NGHI) {
       nghiDen = nowMs + NGHI_KHI_LOI_MS
       lyDo = `nghỉ 30 phút sau ${soLoi} lượt lỗi liên tiếp${lyDo ? ` — ${lyDo}` : ''}`
     }

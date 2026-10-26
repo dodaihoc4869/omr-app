@@ -5,7 +5,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { taoD1That, type D1That } from './_d1-that'
 import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
-import { GIOI_HAN_MOI_LUOT, KHOA_MAY_SOAN, NGHI_KHI_LOI_MS, THOI_HAN_KHOA_MS, chayMaySoanCron, docCoMaySoan, type SoanLo } from '../server/src/may-soan-cron'
+import { GIOI_HAN_MOI_LUOT, lucCapLaiHanMucNgay, tomLoiHanMuc, KHOA_MAY_SOAN, NGHI_KHI_LOI_MS, THOI_HAN_KHOA_MS, chayMaySoanCron, docCoMaySoan, type SoanLo } from '../server/src/may-soan-cron'
 import type { Env } from '../server/src/kieu'
 
 const NGOAI_CAO_DIEM = Date.parse('2026-10-27T03:00:00Z') // 10:00 giờ VN
@@ -218,6 +218,34 @@ describe('tự hãm', () => {
     const ds: number[] = []
     for (let i = 0; i < 7; i++) { t += 60_000; await chayMaySoanCron(env, t, { soanLo: em.fn }); ds.push(JSON.parse(String(trangThai().dem_json)).song_song_hien) }
     expect(ds).toEqual([6, 10, 14, 18, 22, 24, 24])
+  })
+
+  it('27/10: hết hạn mức NGÀY ⇒ nghỉ tới nửa đêm giờ Thái Bình Dương, ghi mã hạn mức (không chữ câu)', async () => {
+    datCo({ bat: true })
+    const ly = 'HTTP 429 You exceeded your current quota [quota=GenerateRequestsPerDayPerProjectPerModel-FreeTier; retry=12s]'
+    const s = soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: { loi_goi: 2 }, ketQua: [1, 2].map((i) => ({ qid: `q${i}`, ket: 'loi_goi', lyDo: ly, lanThu: 2 })) }))
+    const t = NGOAI_CAO_DIEM + 60_000
+    expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: true })
+    expect(trangThai().nghi_den).toBe(lucCapLaiHanMucNgay(t))
+    expect(String(trangThai().ly_do)).toMatch(/hết hạn mức ngày \(429 GenerateRequestsPerDayPerProjectPerModel-FreeTier ×2\)/)
+    expect(String(trangThai().ly_do)).not.toMatch(/exceeded/)
+  })
+  it('27/10: tóm lỗi hạn mức + giờ cấp lại', () => {
+    expect(tomLoiHanMuc([{ ket: 'loi_goi', lyDo: 'HTTP 503 overloaded' }, { ket: 'dat' }, { ket: 'loi_goi', lyDo: 'HTTP 429 x [quota=GenerateRequestsPerMinutePerProjectPerModel; retry=?s]' }]))
+      .toEqual({ chu: '503 ×1, 429 GenerateRequestsPerMinutePerProjectPerModel ×1', ngay: false })
+    // 27/10/2026 06:50 VN = 26/10 16:50 PDT (UTC−7) ⇒ cấp lại 27/10 00:00 PDT = 07:00Z (+5 phút)
+    expect(new Date(lucCapLaiHanMucNgay(Date.parse('2026-10-26T23:50:00Z'))).toISOString()).toBe('2026-10-27T07:05:00.000Z')
+  })
+  it('27/10: hết giờ nghỉ cũ (bộ đếm 3, chưa có song_song_hien) mà lượt đầu lại quá tải ⇒ hạ còn 12, KHÔNG nghỉ tiếp', async () => {
+    datCo({ bat: true })
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: {}, ketQua: [] })).fn })
+    d.sql.prepare("UPDATE may_soan_trang_thai SET so_loi_lien_tiep = 3, nghi_den = ?, dem_json = '{\"dat\":37}' WHERE id = 1").run(NGOAI_CAO_DIEM + 60_000)
+    const s = soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: { loi_goi: 2 }, ketQua: [1, 2].map((i) => ({ qid: `q${i}`, ket: 'loi_goi', lyDo: 'HTTP 429', lanThu: 2 })) }))
+    const t = NGOAI_CAO_DIEM + 120_000
+    expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: false })
+    expect(s.goi[0]!.songSong).toBe(24)
+    expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 0 })
+    expect(JSON.parse(String(trangThai().dem_json))).toMatchObject({ dat: 37, song_song_hien: 12 })
   })
 
   it('máy soạn trả 503 (vd chưa có khoá) hoặc ném lỗi ⇒ đếm lỗi, nhả khoá, không ném ra ngoài', async () => {
