@@ -39,6 +39,13 @@ Bốn lớp, từ nhẹ đến nặng:
 - Em thấy ngay mình cần nhìn vào đâu.
 - Tầng sau khoá, chỉ mở khi em bấm «Gợi ý tiếp».
 
+### Tóm tắt của thầy Đỗ Đại Học — luật vẽ (thầy 26/10, chép theo ảnh vở)
+- Tổng lượng đề cho (1 tấn quặng, 1000 m³…) bên TRÁI một vạch dọc; bên phải là chất, dưới chất **xếp cột dọc đủ số liệu đề cho ở chất đó** (%, D…).
+- MỘT mũi tên, **hiệu suất ghi trên mũi tên**. Chất cuối, dưới nó đại lượng hỏi (tô hổ phách). Không ghi hệ số, không chữ thừa.
+- **Có chất trung gian quan trọng thì thêm MỘT nhịp** (chất A → chất trung gian → chất B), chỉ khi đề cho số liệu ở chất đó hoặc em dễ lạc; không thì bỏ.
+- Lời giải thích theo tư duy của thầy: `docs/tu-duy-day-hoa-thay-2610.md` (số mol là tiền, hệ số là độ giàu, hiệu suất là đánh thuế).
+- Bài khó/dài: thêm «Hiện tượng – bản chất» + thí nghiệm ảo (màn 9); phép tính khó hiểu thì tách 2, tối đa 3 bước.
+
 ## 2. Bố cục 3 khổ
 
 **Điện thoại dọc (390px)**
@@ -47,12 +54,11 @@ Bốn lớp, từ nhẹ đến nặng:
 - Chạm chữ ⇒ tấm trượt từ đáy (có thanh kéo, nút «Đã hiểu» rộng hết).
 - Gợi ý 3 tầng nằm **giữa đề và phương án**, nên đề vẫn nhìn thấy, không bị che.
 
-**Điện thoại ngang / máy tính bảng (≤ 900px)**
-- Như điện thoại dọc: tấm trượt từ đáy, rộng tối đa 640px.
-- Lý do: máy chạm, và thẻ nổi bị tràn mép (đã thấy ở bản vẽ).
+**Điện thoại ngang / máy tính bảng (640–900px)**
+- Tấm giải thích nằm **cột phải** (rộng 320px), đề co lại bên trái, không bị che (thầy 26/10: «tối ưu cho giao diện xoay ngang»).
 
 **Máy tính (1440px)**
-- Thẻ nổi neo ngay dưới chữ được chạm, có mũi nhọn.
+- Thẻ nổi neo ngay dưới chữ được chạm, có mũi nhọn. **Rê chuột** lên chữ là hiện, **bấm** thì ghim lại; phím Tab / Enter đi qua được các chữ chạm.
 - Gợi ý 3 tầng nằm giữa đề và phương án.
 
 Đích chạm:

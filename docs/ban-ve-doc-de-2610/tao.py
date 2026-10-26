@@ -106,7 +106,7 @@ def cau_ly_thuyet(cham=False):
 </section>
 '''
 
-from goi_y import cau_goi_y, ly_thuyet_goi_y, so_do_xuoi, so_do_nguoc
+from goi_y import cau_goi_y, ly_thuyet_goi_y, so_do_xuoi, so_do_nguoc, hien_tuong
 MAN = [
   ('doc-de-1-cau', 'Đề có tô màu', 'MÀN 1: câu tính toán lúc mới mở — số liệu + đơn vị tô chàm (Đề cho), câu hỏi tô hổ phách (Đề hỏi), tên chất gạch chấm. Không tô phương án A–D.', cau_tinh()),
   ('doc-de-2-don-vi', 'Chạm đơn vị', 'MÀN 2: chạm «1,5 M» ⇒ thẻ giải thích đơn vị (máy tính: thẻ nổi neo dưới chữ; điện thoại dọc: tấm trượt từ đáy). Công thức chung, không tính hộ.', cau_tinh('m')),
@@ -118,6 +118,7 @@ MAN = [
   ('doc-de-6-goi-y-ly-thuyet', 'Gợi ý câu lý thuyết', 'MÀN 7: câu lý thuyết — gợi ý riêng: đề nói gì · mảng kiến thức · câu tự hỏi (thu N2 bằng cách đẩy nước). Không tô phương án.', ly_thuyet_goi_y()),
   ('doc-de-7-so-do-xuoi', 'Sơ đồ · tính xuôi', 'MÀN 7: phương pháp của thầy — tóm tắt của thầy Đỗ Đại Học + bảo toàn S ⇒ MỘT phép tính; chạm số «2» ⇒ dãy từ đầu tới «2» sáng, bóng nói rõ: đây là số mol SO2. Tính xuôi × H/100.', so_do_xuoi()),
   ('doc-de-8-so-do-nguoc', 'Sơ đồ · tính ngược', 'MÀN 8: tính ngược (hỏi nguyên liệu) — chạm «100/80» ⇒ giải thích vì sao nhân 100/H.', so_do_nguoc()),
+  ('doc-de-9-hien-tuong', 'Bài khó · hiện tượng', 'MÀN 9: bài khó — gợi ý 1 «Hiện tượng – bản chất» có thí nghiệm ảo 3 khung (bấm phát lại), gợi ý 2 tóm tắt bằng thanh chia mol H+, gợi ý 3 tách 2 bước tính (tối đa 3).', hien_tuong()),
   ('doc-de-5-ly-thuyet', 'Câu lý thuyết', 'MÀN 5: câu lý thuyết — chỉ tô «không đúng» trong câu hỏi + nhãn «đề hỏi câu sai»; «không khí», «không màu» trong phương án KHÔNG tô.', cau_ly_thuyet(True)),
 ]
 for ten, tieu, ghi, than in MAN:

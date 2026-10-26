@@ -47,6 +47,13 @@ sub,sup{line-height:0}
   .keo{display:block}
   .bong .b-cuoi .nut{flex:1}
 }
+/* XOAY NGANG thấp (thầy 26/10 qua Code app 1: «tối ưu cho giao diện xoay ngang»): tấm giải thích nằm CỘT PHẢI, không phủ đề (khổ 640–900px: điện thoại ngang, máy tính bảng). */
+@media (min-width:640px) and (max-width:900px){
+  .phu-mo-nhat{display:none}
+  .keo{display:none}
+  .bong{left:auto;right:0;top:0;bottom:0;width:320px;max-width:none;margin:0;border-radius:22px 0 0 22px;overflow:auto;padding:16px 18px 18px}
+  body:has(.bong) main.khung{padding-right:336px}
+}
 
 /* tấm «Bắt đầu từ đâu» */
 .tam{width:min(560px,100%)}
@@ -108,17 +115,6 @@ sub,sup{line-height:0}
 .d-khoa.dang-cham{box-shadow:0 0 0 2px var(--chu-y);background:var(--chu-y-nhat)}
 
 /* SƠ ĐỒ TỐI GIẢN + MỘT PHÉP TÍNH (phương pháp của thầy 26/10: bảo toàn nguyên tố; tính xuôi × H/100, tính ngược × 100/H) */
-.sd{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px 14px;margin-top:10px;padding:14px;border-radius:14px;background:var(--mat-2)}
-.sd .dau{display:grid;grid-template-columns:auto auto;gap:2px 10px;align-items:center}
-.sd .dau .goc{grid-row:span 2;padding-right:10px;border-right:2px solid var(--vien-2);font-weight:600;color:var(--chu)}
-.sd .dau .ct,.sd .cuoi .ct{font-weight:700;color:var(--chu);font-size:16px}
-.sd .so-nho{color:var(--tin-chu);font-weight:600;font-size:14px}
-.sd .mui-dai{position:relative;height:2px;background:var(--chu-3);margin:0 6px}
-.sd .mui-dai::after{content:"";position:absolute;right:-1px;top:-5px;border:6px solid transparent;border-left:9px solid var(--chu-3);border-right:0}
-.sd .mui-nhan{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;white-space:nowrap;font-size:12.5px;color:var(--chu-2)}
-.sd .mui-duoi{position:absolute;left:50%;transform:translateX(-50%);top:8px;white-space:nowrap;font-size:12.5px;color:var(--chu-3)}
-.sd .cuoi{display:grid;justify-items:center;gap:2px}
-.sd .hoi{color:var(--chu-y-chu);font-weight:700}
 .quy-uoc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .chuoi{display:flex;flex-wrap:wrap;align-items:center;gap:8px 6px;margin-top:12px;font-size:17px;font-weight:600;color:var(--chu)}
 .chuoi .nhan{font-size:17px;color:var(--chu-3);font-weight:500}
@@ -145,11 +141,6 @@ sub,sup{line-height:0}
 .o-dap{display:flex;align-items:center;gap:10px;margin-top:18px}
 .o-dap .o-nhap{flex:1;max-width:260px}
 @media (max-width:600px){
-  .sd{grid-template-columns:1fr;justify-items:center;text-align:center}
-  .sd .mui-dai{width:2px;height:54px;margin:4px 0}
-  .sd .mui-dai::after{right:-5px;top:auto;bottom:-1px;border:6px solid transparent;border-top:9px solid var(--chu-3);border-bottom:0}
-  .sd .mui-nhan{left:14px;bottom:auto;top:50%;transform:translateY(-50%)}
-  .sd .mui-duoi{left:auto;right:14px;top:50%;transform:translateY(-50%)}
   .y-nghia .dong-yn{grid-template-columns:24px 76px 1fr;gap:8px;font-size:14px}
   .chuoi{font-size:16px}
 }
@@ -161,4 +152,57 @@ sub,sup{line-height:0}
   .tang .t-ten small{flex-basis:100%}
   .tang .t-noi,.tang .sd,.tang .chuoi,.tang .y-nghia,.tang .bong-so,.tang .phep,.tang .so-do,.tang .so-sanh{clear:both}
   .y-nghia .dong-yn{grid-template-columns:24px 62px 1fr;padding:8px 6px}
+}
+/* HIỆN TƯỢNG – BẢN CHẤT + THÍ NGHIỆM ẢO (thầy 26/10: bài khó, dài) */
+.tna{margin-top:12px;border-radius:16px;background:var(--mat-2);padding:14px}
+.tna-khung{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tna-buoc{display:grid;justify-items:center;gap:6px;padding:10px 6px;border-radius:14px;background:var(--mat);border:1.5px solid var(--vien);text-align:center;font-size:13.5px;color:var(--chu-2);line-height:1.45}
+.tna-buoc.dang{border-color:var(--chinh);box-shadow:0 0 0 3px var(--chinh-nhat)}
+.tna-buoc b{color:var(--chu);font-size:14px}
+.tna-buoc svg{width:84px;height:96px}
+.tna-buoc .pt{font-size:12.5px;color:var(--chu);font-weight:600}
+.tna-thanh{display:flex;align-items:center;gap:10px;margin-top:12px}
+.tna-thanh .nut.vuong{flex:none}
+.tna-thanh .thanh{flex:1}
+.tna-thanh .moc{display:flex;justify-content:space-between;font-size:12px;color:var(--chu-3);margin-top:4px}
+.thanh-mol{margin-top:12px}
+.thanh-mol .tm{display:flex;height:44px;border-radius:12px;overflow:hidden;font-size:13.5px;font-weight:600}
+.thanh-mol .tm>span{display:grid;place-items:center;padding:0 8px;text-align:center;line-height:1.25}
+.thanh-mol .tm i{font-style:normal}
+.thanh-mol .tm .a{flex:2;background:var(--tin-nhat);color:var(--tin-chu)}
+.thanh-mol .tm .b{flex:1;background:var(--chu-y-nhat);color:var(--chu-y-chu)}
+.thanh-mol .nhan-tm{display:flex;justify-content:space-between;font-size:12.5px;color:var(--chu-3);margin-bottom:6px}
+.buoc-tinh{display:grid;gap:10px;margin-top:12px}
+.buoc-tinh .bt{padding:12px;border-radius:14px;background:var(--mat);border:1px solid var(--vien)}
+.buoc-tinh .bt-ten{font-size:13px;font-weight:600;color:var(--chu-3);margin-bottom:6px}
+.buoc-tinh .chuoi{margin-top:0}
+@media (max-width:600px){
+  .tna-khung{grid-template-columns:1fr;gap:8px}
+  .tna-buoc{grid-template-columns:72px 1fr;justify-items:start;text-align:left;align-items:center}
+  .tna-buoc svg{width:64px;height:76px;grid-row:span 3}
+  .tna-buoc .pt,.tna-buoc b,.tna-buoc span{grid-column:2}
+}
+
+/* Tóm tắt thông minh (thầy 26/10): hiệu suất nằm TRÊN mũi tên + cách nhân; hệ số bảo toàn tô màu; chỗ đề hỏi có «?» */
+
+
+/* TÓM TẮT CỦA THẦY ĐỖ ĐẠI HỌC — chép đúng nét tay thầy (26/10, ảnh vở): tổng lượng bên TRÁI vạch dọc; bên phải là chất, dưới nó các số liệu
+   đề cho xếp CỘT DỌC (%, D…); MỘT mũi tên, hiệu suất ghi TRÊN mũi tên; chất cần tìm, dưới nó đại lượng hỏi. Không hệ số, không chữ thừa. */
+.sd{display:flex;align-items:flex-start;gap:12px;max-width:600px;margin-top:10px;padding:18px 16px;border-radius:14px;background:var(--mat-2)}
+.sd .cot-chat{display:flex;align-items:stretch;gap:0}
+.sd .goc{display:flex;align-items:flex-start;padding:4px 12px 4px 0;border-right:2px solid var(--chu-2);font-weight:600;color:var(--tin-chu);font-size:14.5px;line-height:22px;white-space:nowrap}
+.sd .goc.hoi{color:var(--chu-y-chu)}
+.sd .cot-so{display:grid;justify-items:start;gap:6px;padding-left:12px}
+.sd .cot-chat:not(.co-goc) .cot-so{padding-left:0;justify-items:center}
+.sd .ct{font-weight:700;color:var(--chu);font-size:17px;line-height:30px}
+.sd .sl{color:var(--tin-chu);font-weight:600;font-size:14.5px;line-height:1.3;white-space:nowrap}
+.sd .hoi:not(.goc){color:var(--chu-y-chu);background:var(--chu-y-nhat);border-radius:8px;padding:1px 8px;font-weight:700}
+.sd .mui{flex:1;min-width:90px;position:relative;height:3px;margin-top:15px;border-radius:3px;background:var(--chinh)}
+.sd .mui::after{content:"";position:absolute;right:-3px;top:-6px;border:7.5px solid transparent;border-left:11px solid var(--chinh);border-right:0}
+.sd .mui-tren{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);white-space:nowrap;font-size:14px;font-weight:700;color:var(--chinh-chu)}
+@media (max-width:600px){
+  .sd{flex-direction:column;align-items:center;gap:6px}
+  .sd .mui{flex:none;min-width:0;width:3px;height:56px;margin:4px 0 8px}
+  .sd .mui::after{right:auto;left:-6px;top:auto;bottom:-3px;border:7.5px solid transparent;border-top:11px solid var(--chinh);border-bottom:0}
+  .sd .mui-tren{left:14px;bottom:auto;top:50%;transform:translateY(-50%)}
 }
