@@ -400,7 +400,11 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   if (laGioCaoDiem(batDau) && !ts.choChayGioCaoDiem) return tra({ ok: false, ma: 'gio_cao_diem', error: 'Không soạn lô trong 19–24h giờ VN (giờ cao điểm). Chạy lại ngoài giờ ấy.' }, 409)
   if (!phu.goiMoHinh && !str(env.GEMINI_API_KEY)) return tra({ ok: false, error: 'Máy chủ chưa có khoá GEMINI_API_KEY.' }, 503)
   const goi = phu.goiMoHinh ?? taoGoiGeminiLo(env)
-  const cong: KiemCong = phu.kiemCong ?? (kiemCong as unknown as KiemCong)
+  // Cổng làn C đọc phương án theo khoá A–D (`luaChon['B']`); câu kho mang mảng ⇒ đổi mảng thành {A,B,C,D}. Trước 26/10 truyền thẳng mảng ⇒ cổng không thấy
+  // phương án đúng ⇒ MỌI câu Phần I ra `khong_kiem_duoc` («Phương án đúng không phải số»), không bao giờ `dat` / `lech`.
+  const cong: KiemCong = phu.kiemCong ?? ((ban, ctx) => kiemCong(ban, {
+    phan: ctx.phan, dapAn: ctx.dapAn, luaChon: Object.fromEntries(ctx.luaChon.slice(0, 4).map((s, i) => ['ABCD'[i]!, String(s ?? '')])),
+  }))
   const nganSach = (ts.nganSachGiay ?? 40) * 1000
   const het = () => bayGio() - batDau >= nganSach
 
