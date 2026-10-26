@@ -50,7 +50,8 @@ export interface MotTrangProps extends Omit<TrangVeConProps, 'phanHien' | 'onPha
   thongBao?: ReactNode
 }
 
-const Cho = () => <p className="mtp-ghi mtp-cho">Đang tải…</p>
+/** Chữ chờ trong ô: chỉ hiện sau 0,8 giây nếu số vẫn chưa về (`.ph3-cho-tre`, ph-v3.css) — tải nhanh không chớp chữ. */
+const Cho = () => <p className="mtp-ghi mtp-cho ph3-cho-tre">Đang tải…</p>
 
 function O({ id, bt: Hinh, ten, chip, lop, onMo, children }: { id: IdO; bt: Bt; ten?: string; chip?: ReactNode; lop?: string; onMo: (id: IdO) => void; children: ReactNode }) {
   const t = ten ?? TEN[id]
@@ -152,7 +153,7 @@ export default function MotTrangPh(p: MotTrangProps) {
   const tam = (id: IdO): ReactNode => {
     if (!pm) return null
     const kd = (khoi: IdKhoiDuoi) => (
-      <Suspense fallback={<p className="mtp-ghi" role="status">Đang mở…</p>}>
+      <Suspense fallback={<p className="mtp-ghi ph3-cho-tre" role="status">Đang mở…</p>}>
         <KhoiDuoi khoi={khoi} bc={bc.du ?? undefined} pm={pm} tq={tq} hoc2={hoc2} k={nhip.k} hoSo={hoSo} napHoSo={napHoSo} sbd={sbd} tenCon={pm.hoTen || p.tenCon} lop={p.lop} />
       </Suspense>
     )

@@ -137,6 +137,13 @@ if (MOT_PH) {
   Date.now = () => NAY_PH19 + (performance.now() - dau)
 }
 // ═══ hết MỘT TRANG PH 26/10
+// ═══ NGANG PH 26/10: `?man=ph-vao` = màn đăng nhập phụ huynh như app thật (<html data-trong="ph">, vỏ BatLinhShell vai ph). `&bl=1` trên cảnh
+// `ph&mot=1` ⇒ giữ body[data-bat-linh="ph"] như app thật (vỏ Bát Linh đổi bảng --ph3-*; cảnh cũ bỏ thuộc tính này).
+import ParentPortalScreen from '../../src/screens/ParentPortalScreen'
+const PH_VAO = man === 'ph-vao'
+if (PH_VAO && thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = 'ph'
+if (man === 'ph' && thamSo.get('bl') === '1') setTimeout(() => document.body.setAttribute('data-bat-linh', 'ph'), 0)
+// ═══ hết NGANG PH 26/10
 const now = Date.now()
 const noop = () => {}
 
@@ -645,6 +652,7 @@ const con =
   man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-mot' ? manMotTrang() : // MỘT TRANG HS 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
+  PH_VAO ? h(BatLinhShell, { vai: 'ph' }, h(ParentPortalScreen)) : // NGANG PH 26/10
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
@@ -674,5 +682,5 @@ if (giao === 'toi' || giao === 'sang') apDungGiaoDien(giao)
 createRoot(document.getElementById('root')!).render(
   manThay
     ? (document.body.removeAttribute('data-bat-linh'), h('div', { className: 'min-h-screen m3 m3-thay vo-thay', 'data-hoa2': '' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con)), h(BottomNav)))
-    : man === 'ph' || man === 'gv-chieu' ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
+    : man === 'ph' || man === 'gv-chieu' || PH_VAO ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
 )

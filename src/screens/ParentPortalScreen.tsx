@@ -142,7 +142,7 @@ export default function ParentPortalScreen() {
   return (
     <div className="m3">
       <div className="ph3">
-        <main className="ph3-vao"><section className="gd-cong-gioi-thieu"><h1>Cùng con nhìn thấy tiến bộ</h1></section>
+        <main className="ph3-vao" data-tu-vao={coPhienLuu && !thongBaoLoi ? '' : undefined}><section className="gd-cong-gioi-thieu"><h1>Cùng con nhìn thấy tiến bộ</h1></section>
           <div className="ph3-vao__the">
             <LogoDoc vai="ph" size={48} tieuDe />
             <LoiChao vai="ph" />
