@@ -32,14 +32,14 @@ export function docCoMaySoan(v: string | null | undefined): CoMaySoan {
   } catch { return { bat: false, gioCaoDiem: false, tuSuaDapAn: false } }
 }
 
-/** Khoá chạy: một lượt soạn (lô 6 câu, có câu thử 4 lượt + 2 lần giải mù, mỗi lần gọi tới 60 s) thường quá 90 s ⇒ 5 phút để lượt phút sau không gọi chồng
- *  (gấp đôi chi Gemini). Máy chết giữa chừng ⇒ tối đa 5 phút là lượt sau tự giành lại. */
-export const THOI_HAN_KHOA_MS = 300_000
+/** Khoá chạy: một lượt soạn (lô 24 câu song song, có câu thử 4 lượt + 2 lần giải mù, mỗi lần gọi tới 60 s) có thể tới vài phút ⇒ khoá 8 phút để lượt
+ *  phút sau không gọi chồng (gấp đôi chi Gemini). Máy chết giữa chừng ⇒ tối đa 8 phút là lượt sau tự giành lại. */
+export const THOI_HAN_KHOA_MS = 480_000
 export const NGHI_KHI_LOI_MS = 30 * 60_000
 export const SO_LOI_DE_NGHI = 3
-export const GIOI_HAN_MOI_LUOT = 6
+export const GIOI_HAN_MOI_LUOT = 24
 export const NGAN_SACH_GIAY = 25
-export const SONG_SONG = 6 // 27/10 thầy «Chạy liên tục đi»: 3 ⇒ 6 câu song song ngoài giờ cao điểm (429 ⇒ tự nghỉ như cũ)
+export const SONG_SONG = 24 // 27/10 thầy «24 câu luôn»: 24 câu song song ngoài giờ cao điểm (429 ⇒ tự nghỉ như cũ)
 
 /** Câu vòng sửa: CHÉP NGUYÊN `SQL_CAN_SUA` của soan-so-do.ts (không nạp máy soạn khi cờ tắt); test may-soan-cron-2710 giữ hai bản bằng nhau. */
 export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND ly_do = 'Câu tính thiếu sơ đồ hoặc bước tính.')`
