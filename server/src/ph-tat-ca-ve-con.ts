@@ -32,6 +32,8 @@ import { hangChamCuaEm } from './thi-dua-hom-nay'
 import { docVeDichCuaEm } from './ve-dich-d1'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 import { TEN_LOP_CHUA_XEP, TEN_LOP_THUONG_12 } from './ten-lop'
+import { docChuoiNgayBai } from './chuoi-ngay-bai-d1'
+import { docCoDuolingo } from './duolingo-bai-co'
 
 type Row = Record<string, unknown>
 
@@ -247,7 +249,7 @@ const PHAN_HO_SO: PhanHoSo[] = [
   { bang: 'hoc_sinh', batBuoc: true, sql: "SELECT 'em' AS k, ho_ten AS a, lop AS b, NULL AS c FROM hoc_sinh WHERE sbd = ?", bind: (s) => [s] },
   // (Bộ não A.I đã gỡ 28/09: hàng 'cfg' của khoá `bo_nao` vẫn đọc nhưng BỎ QUA — giữ nguyên câu SQL đã soát giới hạn term.) MỘT term cho cả cấu hình Bộ não ('cfg': a = gia_tri) lẫn ba khoá mốc hiển thị ('moc': a = khoa, b = gia_tri): D1 CHỈ cho tối đa 5 term trong một truy vấn UNION (term thứ 6 ⇒ "too many terms in compound SELECT",
   // /ph/tat-ca-ve-con trả 500 trên D1 thật lúc 16:19–16:5x 21/09). Hàng trả ra Y HỆT khi tách hai term.
-  { bang: 'cau_hinh', batBuoc: true, sql: "SELECT CASE WHEN khoa = 'bo_nao' THEN 'cfg' ELSE 'moc' END, CASE WHEN khoa = 'bo_nao' THEN gia_tri ELSE khoa END, CASE WHEN khoa = 'bo_nao' THEN NULL ELSE gia_tri END, NULL FROM cau_hinh WHERE khoa IN ('bo_nao', 'hien_thi_tu', 've_dich_tu', 'bang_tin_tu')", bind: () => [] },
+  { bang: 'cau_hinh', batBuoc: true, sql: "SELECT CASE WHEN khoa = 'bo_nao' THEN 'cfg' ELSE 'moc' END, CASE WHEN khoa = 'bo_nao' THEN gia_tri ELSE khoa END, CASE WHEN khoa = 'bo_nao' THEN NULL ELSE gia_tri END, NULL FROM cau_hinh WHERE khoa IN ('bo_nao', 'hien_thi_tu', 've_dich_tu', 'bang_tin_tu', 'duolingo_bai')", bind: () => [] },
   { bang: 'ph_giao_them', batBuoc: false, sql: "SELECT 'gt', COUNT(*), NULL, NULL FROM ph_giao_them WHERE sbd = ? AND ngay_vn = ?", bind: (s, n) => [s, n] },
   { bang: 'ke_hoach_ngay', batBuoc: false, sql: "SELECT 'kh', ngan_sach_json, viec_json, la_ngay_nghi FROM ke_hoach_ngay WHERE sbd = ? AND ngay = ?", bind: (s, n) => [s, n] },
   { bang: 'nam_kt_cau', batBuoc: false, sql: "SELECT 'cau', qid, ma_dang, chuyen_de FROM nam_kt_cau WHERE sbd = ?", bind: (s) => [s] },
@@ -357,10 +359,11 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   let daGiaoThem: number | null = null
   let kh: Row | null = null
   let coHoSo = false
+  let lopEm = ''
   const cauHinhMoc = new Map<string, unknown>()
   const tra: { dang: Map<string, string>; chuyenDe: Map<string, string> } = { dang: new Map(), chuyenDe: new Map() }
   for (const x of await pHoSo) {
-    if (x.k === 'em') hoTen = chuoi(x.a)
+    if (x.k === 'em') { hoTen = chuoi(x.a); lopEm = chuoi(x.b) }
     else if (x.k === 'moc') cauHinhMoc.set(chuoi(x.a), x.b)
     else if (x.k === 'gt') daGiaoThem = so(x.a)
     else if (x.k === 'kh') kh = x
@@ -371,6 +374,10 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
     }
   }
   ra.hoTen = hoTen
+  // B3 (26/10): chuỗi ngày theo bài — cùng định nghĩa với app học sinh khi cờ duolingo_bai bật cho con (cờ đọc KÈM truy vấn gộp ở trên ⇒ tắt thì 0 lệnh thêm);
+  // tắt ⇒ null (giữ cách đếm cũ). Bắt đầu ngay, song song các lượt đọc sau.
+  const coDuo = docCoDuolingo(chuoi(cauHinhMoc.get('duolingo_bai')) || null)
+  const pChuoiBai = coDuo.cheDo === 'bat' || (coDuo.cheDo === 'thu' && !!lopEm && coDuo.lop.includes(lopEm)) ? chan(docChuoiNgayBai(env, sbd, nowMs)) : Promise.resolve(null)
   const moc = giaiMocHienThi(cauHinhMoc.get('hien_thi_tu'), cauHinhMoc.get('ve_dich_tu'), cauHinhMoc.get('bang_tin_tu'))
   // Cần mốc: hạng chăm hôm nay + A.I đã làm (thử thách riêng / nhắc nộp) — bắt đầu ngay.
   const pDoCham = chan(hangChamCuaEm(env, sbd, nowMs, moc))
@@ -704,7 +711,11 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
     tongQuan.viecXong = viecXong
     tongQuan.viecTong = conLai.length + viecXong
   }
-  if (skHt.some((e) => e.ketQua !== null)) {
+  const chuoiBai = await pChuoiBai
+  if (chuoiBai) {
+    if (chuoiBai.so > 0) tongQuan.chuoiNgayHoc = chuoiBai.so
+    tongQuan.chuoiNgay = chuoiBai
+  } else if (skHt.some((e) => e.ketQua !== null)) {
     const ngayCoHocSet = new Set(skHt.filter((e) => e.ketQua !== null && nhanNguon(e.nguon) !== null).map((e) => e.ngayVn))
     let d = ngayCoHocSet.has(homNay) ? homNay : homQua
     let chuoiNgay = 0
