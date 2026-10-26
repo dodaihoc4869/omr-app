@@ -7,6 +7,7 @@ import { chiaCho, xepBai6, xepTrongBai, P_MUC_TIEU } from '../server/src/bai-6-c
 import { cauSaiCuaPhien, TRAN_LAM_LAI } from '../server/src/goi-bai-7-lam-lai'
 import type { ViecGoi7 } from '../server/src/goi-bai-7-loi'
 import type { RefGoi7 } from '../server/src/goi-bai-7'
+import { docCoDuolingo } from '../server/src/duolingo-bai-co'
 
 const v = (qid: string, vai: ViecGoi7['vai']): ViecGoi7 => ({ qid, vai, huongDan: vai === 'tiep_can' })
 // Kế hoạch kiểu chonGoi7: hết câu mới → sửa → ôn.
@@ -106,9 +107,11 @@ describe('khoá nguồn — nối dây máy chủ', () => {
   const g7 = readFileSync('server/src/goi-bai-7.ts', 'utf8')
   const ll = readFileSync('server/src/goi-bai-7-lam-lai.ts', 'utf8')
   const gv = readFileSync('server/src/game-v2.ts', 'utf8')
-  it('mở chặng Gói 7 dùng xepBai6 trên kế hoạch ngày; câu làm lại không thành chặng mới', () => {
+  it('mở chặng Gói 7 dùng xepBai6 trên kế hoạch ngày, GÁC bằng cờ duolingo_bai (tắt ⇒ giữ thứ tự cũ); câu làm lại không thành chặng mới', () => {
     expect(g7).toMatch(/xepBai6\(lap\.plan\.viec, lap\.pDung/)
+    expect(g7).toMatch(/const satHan = !\(await duoSom\) \|\|/)
     expect(g7).toMatch(/!r\.lamLaiCuoi/)
+    expect(ll).toMatch(/if \(!bat\) return \{ ok: true, questions: \[\] \}/)
   })
   it('câu làm lại luôn có hỗ trợ (goiY) — lệnh nộp ép assisted, không EXP, không đóng lỗi; chỉ trả đề (publicQuestion)', () => {
     expect(ll).toMatch(/goiY: GOI_Y_LAM_LAI/)
@@ -120,5 +123,15 @@ describe('khoá nguồn — nối dây máy chủ', () => {
     expect(gv).toMatch(/action==='hoc-tap-lam-lai'\)return import\('\.\/goi-bai-7-lam-lai'\)/)
     expect(gv).toMatch(/\['hoc-tap-start','hoc-tap-gap','hoc-tap-lam-lai'/)
     expect(gv).toMatch(/action==='hoc-tap-lam-lai'\)return \{ok:true,questions:\[\]\}/)
+  })
+})
+
+describe('cờ duolingo_bai — đọc giá trị', () => {
+  it('vắng / hỏng / lạ ⇒ tắt; bat / thu giữ danh sách lớp', () => {
+    expect(docCoDuolingo(null)).toEqual({ cheDo: 'tat', lop: [] })
+    expect(docCoDuolingo('{không phải json')).toEqual({ cheDo: 'tat', lop: [] })
+    expect(docCoDuolingo('{"cheDo":"bừa"}')).toEqual({ cheDo: 'tat', lop: [] })
+    expect(docCoDuolingo('{"cheDo":"bat","lop":[]}')).toEqual({ cheDo: 'bat', lop: [] })
+    expect(docCoDuolingo('{"cheDo":"thu","lop":["12A1"," 11B2 ",""]}')).toEqual({ cheDo: 'thu', lop: ['12A1', '11B2'] })
   })
 })

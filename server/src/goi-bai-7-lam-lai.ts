@@ -14,6 +14,7 @@ import { readGameScope } from './game-v2-reports'
 import { tachSongSinh } from './loi-hoc-luat'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import { docCauTheoRef } from './game-v2-bank'
+import { duolingoChoEm } from './duolingo-bai-co'
 import type { RefGoi7 } from './goi-bai-7'
 
 type Row = Record<string, unknown>
@@ -38,11 +39,13 @@ export function cauSaiCuaPhien(refs: readonly RefGoi7[], luot: readonly { qid: s
 export async function lamLaiCuoiChang7(env: Env, sbd: string, b: Row, now: number): Promise<Record<string, unknown>> {
   const id = String(b.session ?? '')
   if (!id) throw new Error('Thiếu mã chặng học.')
-  const [row, luot, control] = await Promise.all([
+  const [row, luot, control, bat] = await Promise.all([
     env.DB.prepare('SELECT json FROM game_v2_session WHERE id=? AND sbd=?').bind(id, sbd).first<{ json: string }>(),
     env.DB.prepare('SELECT qid,json FROM game_v2_attempt WHERE session=? AND sbd=?').bind(id, sbd).all<{ qid: string; json: string }>(),
     readGameScope(env, sbd),
+    duolingoChoEm(env, sbd, now),
   ])
+  if (!bat) return { ok: true, questions: [] } // cờ duolingo_bai tắt cho em ⇒ không có vòng làm lại
   if (!row) throw new Error('Không tìm thấy chặng học của em.')
   const s = JSON.parse(row.json) as PhienGoi7
   if (s.goi7 !== 1 || now - s.created > 2 * 3600000) return { ok: true, questions: [] }

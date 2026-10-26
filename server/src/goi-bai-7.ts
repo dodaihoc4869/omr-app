@@ -5,6 +5,7 @@ import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
 import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7 } from './goi-bai-7-quyen'
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7 } from './goi-bai-7-loi'
 import { xepBai6 } from './bai-6-cau'
+import { duolingoChoEm } from './duolingo-bai-co'
 import { tachMaTo } from './srs2-gv'
 import { laMaToKhongGiao, damBaoBangBaiDaDay, phamViLop, lopCuaEm } from './bai-da-day'
 import { TEN_LOP_CHUA_XEP, TEN_LOP_THUONG_12 } from './ten-lop'
@@ -563,6 +564,8 @@ export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
 export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>): Promise<Record<string,unknown> | null> {
   // Đợt 17: khối em + đợt cũ (và câu đã trả lời của nó) đọc SONG SONG với lập kế hoạch — trước đây nối tiếp sau `lapGoi7`. Bảng gói chắc có trước (`damBaoGoi7`).
   const khoiSom = som(docKhoiEm(env,sbd))
+  // Cờ «học kiểu Duolingo» (duolingo-bai-co.ts): đọc qua đệm, bắt đầu cùng đợt đầu — không thêm vòng chờ.
+  const duoSom = som(duolingoChoEm(env,sbd,now))
   const cuSom = som(damBaoGoi7(env).then(async () => {
     const old = await env.DB.prepare(`SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>=? AND json_extract(json,'$.hocTap')=1 ORDER BY created_at DESC LIMIT 1`).bind(sbd,new Date(now-2*3600000).toISOString()).first<Row>()
     const answered = old ? await env.DB.prepare('SELECT qid FROM game_v2_attempt WHERE session=? AND sbd=? UNION SELECT qid FROM goi_bai_7_gap WHERE receipt LIKE ? AND sbd=?').bind(old.id,sbd,`${str(old.id)}|%`,sbd).all<{qid:string}>() : {results:[] as {qid:string}[]}
@@ -615,7 +618,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   // Kế hoạch cũng không phát được câu nào mà em CÒN THIẾU mức ⇒ hàng chờ dự phòng (`lapGoi7` → `duPhong`, lỗi 14/10) — chặng chỉ rỗng khi thật hết câu.
   // BÀI 6 CÂU KIỂU DUOLINGO (26/10, bai-6-cau.ts): kế hoạch ngày trộn đều thành chặng 6 câu (câu mới · sửa · ôn), dễ → khó → vừa, quanh ~80% đúng — CÙNG tập câu,
   // chỉ đổi thứ tự. Ngày sát hạn của một gói còn quota (≤ 1 ngày) ⇒ giữ thứ tự cũ (câu mới trước) để em làm dở ngày vẫn phủ tối đa câu mới.
-  const satHan = lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1)
+  const satHan = !(await duoSom) || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1) // cờ tắt ⇒ giữ thứ tự cũ
   const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [])]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
   // ĐỌC SONG SONG THEO LÔ (đợt 17): trước đây TỪNG câu đọc nối tiếp (đọc câu theo ref ⇒ cổng khối) — 6 câu ≈ 12 lượt D1 chờ nhau ("Đang chuẩn bị những

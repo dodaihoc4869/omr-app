@@ -512,9 +512,3 @@ button.ht2-hn-nhip-bam:hover{border-color:color-mix(in srgb,var(--lg-nhan) 45%,v
 /* ĐỢT 19: ô hình Tự sửa lỗi (hình vẽ riêng nạp lười — BieuTuongTuSua.tsx + bieu-tuong.css; ô giữ chỗ đúng cỡ) · chỗ chờ khi mở tab Hành trình / Ôn & sửa. */
 .ht2-moi-sua .ht2-moi-sua-bt{width:60px;height:60px;flex-basis:60px;background:none}
 .ht2-cho-tab{min-height:320px;border-radius:24px;background:var(--the-2)}
-/* Kết chặng kiểu Duolingo (26/10): ba ô số — đúng liên tiếp dài nhất, câu mới đã gặp, làm lại đúng. Chỉ biến màu sẵn có (đổi theo «Trong» qua biến). */
-.ht2-lam-xong-so-lieu{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;width:100%;margin:0}
-.ht2-lam-xong-so-lieu>div{display:flex;flex-direction:column;gap:2px;padding:10px 8px;border-radius:14px;background:var(--the-2)}
-.ht2-lam .ht2-lam-xong-so-lieu dt{font-size:12px;line-height:1.35;color:var(--nhat)}
-.ht2-lam .ht2-lam-xong-so-lieu dd{margin:0;font-size:18px;font-weight:800;color:var(--muc);font-variant-numeric:tabular-nums}
-.ht2-lam .ht2-lam-xong-so-lieu>div[data-sac=vang] dd{color:var(--lam-vang)}

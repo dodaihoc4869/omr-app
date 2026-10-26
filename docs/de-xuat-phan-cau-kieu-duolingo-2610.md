@@ -1,12 +1,14 @@
 # Đề xuất: phân câu cho học sinh theo kiểu Duolingo — 26/10/2026
 
-Trạng thái: **ĐÃ BUILD 26/10** (thầy: «Bạn tự chốt theo đề xuất thông minh nhất, đơn giản nhất và hiệu quả nhất cho học sinh. Build luôn nhé»; «Đồng bộ với giao diện code app 1»).
-Claude tự chốt: **A1 + A2 + A3 + B1**; để sau B2, B3, B4 (đổi luật chuỗi / xếp hạng — đo tác dụng của A trước). Ảnh Chromium thật giao diện «Trong»: `docs/ban-ve-duolingo-2610/`.
-- A1/A2: `server/src/bai-6-cau.ts` (gắn ở `startGoi7`); thêm: câu thầy vừa chữa xong (`chua`) luôn vào chặng đầu.
-- A3: `server/src/goi-bai-7-lam-lai.ts`, lệnh `hoc-tap-lam-lai`; câu thay thế = câu anh em (`chonAnhEmChoCaDaDung`), tối đa 3 câu/chặng, một vòng. Song sinh soạn sẵn chưa dùng ở vòng này.
-- B1: màn «Xong chặng» trong `src/components/hoc-tap/ManLamBaiTap.tsx` thêm 3 ô: Đúng liên tiếp dài nhất · Câu mới đã gặp · Làm lại đúng.
-- Từ chuẩn mới «Làm lại» (khác «Ôn lại» theo lịch): `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md`.
-- Không chạy ngầm trước như mục 6 đề xuất: A1 chỉ đổi thứ tự cùng tập câu, A3 chỉ thêm lượt có hỗ trợ ⇒ lùi bằng bản lùi Worker + Pages nếu cần.
+Trạng thái: **MÁY CHỦ ĐÃ BUILD 26/10.**
+- Thầy: «Bạn tự chốt theo đề xuất thông minh nhất, đơn giản nhất và hiệu quả nhất cho học sinh. Build luôn nhé».
+- Thầy, qua Code app 1: «Chốt thuật toán của Code app 4, làm luôn nhé» — phát hành bằng cờ, bật dần; B1 và B3 trước.
+- Phân làn + hợp đồng dữ liệu: `docs/hop-dong-duolingo-2610.md`. Code app 4 làm máy chủ; Code app 1 làm giao diện HS (vòng «Làm lại», màn kết chặng B1).
+- **A1/A2:** `server/src/bai-6-cau.ts`, gắn ở `startGoi7`. Câu thầy vừa chữa xong (`chua`) luôn vào chặng đầu.
+- **A3:** `server/src/goi-bai-7-lam-lai.ts`, lệnh `hoc-tap-lam-lai`. Câu thay thế là câu anh em (`chonAnhEmChoCaDaDung`), tối đa 3 câu mỗi chặng, một vòng. Chưa dùng song sinh soạn sẵn.
+- **Cờ `cau_hinh.duolingo_bai`** (`server/src/duolingo-bai-co.ts`): `tat` / `thu` theo lớp / `bat`; vắng dòng thì tắt. Bật bằng workflow `bat-duolingo-bai-2610.yml`.
+- **B3** (chuỗi theo bài + bình giữ chuỗi): đợt sau, luật chi tiết ghi ở hợp đồng mục 5.
+
 Thầy (26/10): "Quét thuật toán của dolingo … đề xuất sửa thuật toán phân câu cho học sinh hiện tại chuẩn dolingo nhất … vẫn đảm bảo phủ câu mới, sửa câu sai như dolingo."
 Chưa tham vấn được cố vấn (phiên không có công cụ cố vấn).
 

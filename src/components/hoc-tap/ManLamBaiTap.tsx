@@ -19,9 +19,7 @@ import './hoc-tap.css'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
 
-type Cau = Question & { vaiGoi7?:string; huongDan7?:boolean; coGoi7?:boolean; goiY?: { gach?: string[]; cotLoi?: string }; lamLaiCua?: string }
-/** Câu hợp lệ để hiện (cùng luật lúc mở chặng). */
-const cauHong = (c: Cau) => !c.qid || !['I', 'II', 'III'].includes(c.phan) || typeof c.text !== 'string' || !Array.isArray(c.hinhAnh) || c.phan === 'I' && c.choices?.length !== 4 || c.phan === 'II' && c.ideas?.length !== 4
+type Cau = Question & { vaiGoi7?:string; huongDan7?:boolean; coGoi7?:boolean; goiY?: { gach?: string[]; cotLoi?: string } }
 type Ket = { choThay?:boolean; hocCoHoTro?:boolean; assisted?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh']; chamLanTruoc?: boolean }
 export function duTraLoi(phan: string, value: string): boolean { return phan === 'II' ? /^[DS]{4}$/.test(value) : phan === 'I' ? /^[ABCD]$/.test(value) : value.trim().length > 0 }
 /** Props `TheCau` cho câu học (bảng Gói 7 của thầy vẫn dùng — `src/components/chien-dich/BangGoi7.tsx`). Màn làm bài của em từ 12/10 dựng phần trả lời riêng (LamCau.tsx). */
@@ -63,8 +61,6 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const [tra, setTra] = useState(''), [ket, setKet] = useState<Record<string, Ket>>({}), [tai, setTai] = useState(true), [nop, setNop] = useState(false), [loi, setLoi] = useState(''), [lan, setLan] = useState(0), [xong, setXong] = useState(false), [goiY, setGoiY] = useState(false)
   const [tuLam, setTuLam] = useState(false), [moLoiGiai, setMoLoiGiai] = useState(false), [msCau, setMsCau] = useState<Record<string, number>>({})
   const [goi7, setGoi7] = useState<TomTatGoi7 | undefined>(), [chang, setChang] = useState<number | null>(null)
-  // LÀM LẠI CUỐI CHẶNG kiểu Duolingo (26/10, máy chủ goi-bai-7-lam-lai.ts): `soGoc` = số câu của chặng; câu làm lại nối sau, mỗi chặng xin MỘT lần.
-  const [soGoc, setSoGoc] = useState(0), daXinLamLai = useRef(false)
   // SỐ HÔM NAY TRONG CHẶNG (khẩn 12/10 22h30 — giờ cao điểm máy chủ chậm): nhánh Gói 7 lấy (đã làm, M) từ `hoc-tap-start` lúc mở chặng rồi lệnh nhẹ
   // `hoc-tap-dem` sau mỗi câu — KHÔNG gọi lại cả sảnh (`lapGoi7` ~25 truy vấn) sau mỗi câu. Sảnh nạp lại MỘT lần khi xong chặng / rời màn.
   const [dem, setDem] = useState<{ daLam: number; muc: number } | null>(null)
@@ -135,15 +131,15 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const khoa = q ? `hoc-tap:nhap:${sbd}:${q.qid}:${q.version}` : ''
   useEffect(() => {
     let huy = false
-    setTai(true); setLoi(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); daXinLamLai.current = false; soLuotDem.current++
+    setTai(true); setLoi(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); soLuotDem.current++
     // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi như cũ.
     void (layChangMoTruoc(token) ?? goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)).then(r => {
       if (huy) return
       if (!r.ok) throw new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được chặng học.')
       const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []
-      if (ds.some(cauHong)) throw new Error('Nội dung câu chưa đầy đủ. Em cập nhật lại bài học nhé.')
+      if (ds.some(c => !c.qid || !['I', 'II', 'III'].includes(c.phan) || typeof c.text !== 'string' || !Array.isArray(c.hinhAnh) || c.phan === 'I' && c.choices?.length !== 4 || c.phan === 'II' && c.ideas?.length !== 4)) throw new Error('Nội dung câu chưa đầy đủ. Em cập nhật lại bài học nhé.')
       const g7 = docTomTatGoi7(r.goi7)
-      setCau(ds); setSoGoc(ds.length); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7)
+      setCau(ds); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7)
       if (g7) setDem({ daLam: g7.daLamHomNay, muc: g7.toiThieu })
       if (!ds.length) setLoi(typeof r.message === 'string' && r.message.trim() ? r.message : 'Chưa có câu mới cho chặng này. Em về Hôm nay xem tiến độ.')
     }).catch(e => { if (!huy) setLoi(e instanceof Error ? e.message : 'Chưa tải được bài học.') }).finally(() => { if (!huy) setTai(false) })
@@ -220,36 +216,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     } catch(e){setLoi(e instanceof Error?e.message:'Chưa tải được phần chữa.')}finally{gui.current=false;setNop(false)}
   }
   // Xong chặng: câu cuối đã nộp ⇒ mở trước chặng sau (em bấm "Học tiếp chặng N" là có câu ngay).
-  const ketThuc = () => { setXong(true); canTaiSanh.current = false; onCapNhat(); moChangTruoc(token); gocRef.current?.scrollIntoView?.({ block: 'start' }) }
-  // Hết câu của chặng mà có câu SAI (Gói 7) ⇒ xin vòng làm lại MỘT lần: câu anh em cùng dạng, có hỗ trợ, không EXP. Không có câu / lỗi mạng ⇒ kết chặng như cũ.
-  const xinLamLai = async () => {
-    daXinLamLai.current = true; gui.current = true; setNop(true)
-    try {
-      const r = await goiHoa2('hoc-tap-lam-lai', token, { session: phien }, 15)
-      const ds = (Array.isArray(r.questions) ? r.questions as Cau[] : []).filter(c => !cauHong(c) && !cau.some(x => x.qid === c.qid))
-      if (!ds.length) return ketThuc()
-      setCau(v => [...v, ...ds]); setViTri(i => i + 1)
-    } catch { ketThuc() } finally { gui.current = false; setNop(false) }
-  }
-  const tiep = () => {
-    if (gui.current) return // đang xin vòng làm lại: chạm lần hai không được kết chặng giữa chừng
-    setLoi('')
-    if (viTri + 1 < cau.length) setViTri(i => i + 1)
-    else if (goi7 && !daXinLamLai.current && soSaiGoc > 0) void xinLamLai()
-    else ketThuc()
-  }
+  const tiep = () => { setLoi(''); if (viTri + 1 < cau.length) setViTri(i => i + 1); else { setXong(true); canTaiSanh.current = false; onCapNhat(); moChangTruoc(token); gocRef.current?.scrollIntoView?.({ block: 'start' }) } }
 
-  const ttCau = (c: Cau, i: number): TT => { const r = ket[c.qid]; return r ? (r.choThay || r.hocCoHoTro || r.omni?.luot ? 'ho-tro' : r.correct ? (r.assisted && c.vaiGoi7 !== 'lam_lai' ? 'ho-tro' : 'dung') : 'sai') : i === viTri && !xong ? 'dang' : 'cho' }
-  // Câu của chặng (không gồm vòng làm lại) — mọi số "x/6", vạch chặng, kết chặng tính trên phần này.
-  const goc = soGoc ? cau.slice(0, soGoc) : cau, lamLai = soGoc ? cau.slice(soGoc) : []
-  const laLamLai = !!q && q.vaiGoi7 === 'lam_lai'
-  const soDung = goc.filter((c, i) => ttCau(c, i) === 'dung').length
-  const cauSai = goc.flatMap((c, i) => ttCau(c, i) === 'sai' ? [i + 1] : [])
-  const soSaiGoc = cauSai.length
-  // Màn kết chặng (B1): chuỗi tự làm đúng dài nhất, câu mới đã gặp, kết quả vòng làm lại.
-  const chuoiDai = goc.reduce((a, c, i) => { const n = ttCau(c, i) === 'dung' ? a.n + 1 : 0; return { n, max: Math.max(a.max, n) } }, { n: 0, max: 0 }).max
-  const soCauMoi = goc.filter(c => c.vaiGoi7 === 'moi' || c.vaiGoi7 === 'tiep_can').length
-  const lamLaiDung = lamLai.filter(c => ket[c.qid]?.correct === true).length
+  const ttCau = (c: Cau, i: number): TT => { const r = ket[c.qid]; return r ? (r.choThay || r.hocCoHoTro || r.omni?.luot ? 'ho-tro' : r.correct ? (r.assisted ? 'ho-tro' : 'dung') : 'sai') : i === viTri && !xong ? 'dang' : 'cho' }
+  const soDung = cau.filter((c, i) => ttCau(c, i) === 'dung').length
+  const cauSai = cau.flatMap((c, i) => ttCau(c, i) === 'sai' ? [i + 1] : [])
   const loai = q ? (q.phan === 'I' ? 'Trắc nghiệm' : q.phan === 'II' ? 'Đúng – sai' : 'Trả lời ngắn') : ''
   // Câu Gói 7 có hướng dẫn: em CHỌN cách làm trước (Học cách giải / Tự làm câu này) — cùng điều kiện nút cũ "Chưa tự làm được · xem chữa".
   const coHuongDan = !!q && !k && (!!q.coGoi7 || q.vaiGoi7 === 'moi' || q.vaiGoi7 === 'tiep_can' || q.vaiGoi7 === 'chua')
@@ -285,21 +256,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     : k.choThay ? { tt: 'ho-tro', tieu: 'Chờ phần chữa của thầy', phu: 'Em đã gặp câu này và nhờ thầy chữa. Khi có phần chữa, em sẽ được học lại; hiện chưa tính đúng hoặc đã hiểu.' }
     : k.hocCoHoTro ? { tt: 'ho-tro', tieu: 'Đã học cách giải · có hỗ trợ', phu: 'Em đã học phần chữa. Câu này được ghi là đã gặp với hỗ trợ, chưa tính tự làm đúng.' }
     : k.omni?.luot ? { tt: 'cho', tieu: 'Lượt này chưa được tính đúng hay sai.', phu: thoiGian }
-    : laLamLai ? (k.correct ? { tt: 'dung', tieu: 'Làm lại đúng', phu: [thoiGian, 'lượt làm lại tính là có hỗ trợ'].filter(Boolean).join(' · ') }
-      : { tt: 'sai', tieu: q.phan === 'II' ? `Đúng ${yDS.filter(y => y.dung).length}/4 ý · sai ý ${yDS.filter(y => !y.dung).map(y => y.chu).join(', ')}` : `Chưa đúng · đáp án ${k.answer}`, phu: 'câu gốc vẫn vào lịch ôn 1 · 3 · 7 ngày' })
     : k.correct ? { tt: k.assisted ? 'ho-tro' : 'dung', tieu: k.assisted ? q.goiY ? 'Đúng · có gợi ý' : 'Đúng · có hỗ trợ' : 'Đúng · tự làm', phu: [lanTruoc, thoiGian, k.assisted && q.goiY ? 'câu có gợi ý tính là học có hỗ trợ' : ''].filter(Boolean).join(' · ') }
     : { tt: 'sai', tieu: q.phan === 'II' ? `Đúng ${yDS.filter(y => y.dung).length}/4 ý · sai ý ${yDS.filter(y => !y.dung).map(y => y.chu).join(', ')}` : `Chưa đúng · đáp án ${k.answer}`, phu: [lanTruoc, thoiGian, 'câu này vào lịch ôn 1 · 3 · 7 ngày'].filter(Boolean).join(' · ') }
-  const coTuChua = !!k && !k.correct && !k.omni?.luot && !k.hocCoHoTro && !k.choThay && !laLamLai
+  const coTuChua = !!k && !k.correct && !k.omni?.luot && !k.hocCoHoTro && !k.choThay
   const traHien = k?.hocCoHoTro ? '' : tra // học cách giải: nháp chưa nộp KHÔNG phải câu trả lời của em
   const lg = q && k && !k.choThay ? loiGiaiChuanTuKho(k.solution, q.phan, k.answer) : undefined
   const coLyDoY = !!lg?.tungY && Object.values(lg.tungY).some(y => !!y?.viSao?.trim())
 
   // ── thanh trên
-  const stt = viTri + 1 - (q?.vaiGoi7 === 'lam_lai' ? soGoc : 0) // vòng làm lại đánh số lại từ 1
-  // Vạch: đang làm lại ⇒ vạch các câu làm lại; còn lại ⇒ vạch 6 câu của chặng.
-  const dauVach = laLamLai ? soGoc : 0, vach = laLamLai ? lamLai : goc
-  const vachChu = vach.map((c, j) => { const t = ttCau(c, dauVach + j); return t === 'dang' ? `đang làm câu ${j + 1}` : `câu ${j + 1} ${CHU_TT[t]}` }).join(', ')
-  const tieuDe = xong ? (chang ? `Xong chặng ${chang}` : 'Xong chặng học') : laLamLai ? `Làm lại · Câu ${stt}/${lamLai.length}` : q ? `${chang ? `Chặng ${chang} · ` : ''}Câu ${stt}/${goc.length}` : 'Chặng học của em'
+  const stt = viTri + 1
+  const vachChu = cau.map((c, i) => { const t = ttCau(c, i); return t === 'dang' ? `đang làm câu ${i + 1}` : `câu ${i + 1} ${CHU_TT[t]}` }).join(', ')
+  const tieuDe = xong ? (chang ? `Xong chặng ${chang}` : 'Xong chặng học') : q ? `${chang ? `Chặng ${chang} · ` : ''}Câu ${stt}/${cau.length}` : 'Chặng học của em'
 
   // ── nút chính theo loại câu
   const soYChua = q?.phan === 'II' ? [0, 1, 2, 3].filter(i => tra[i] !== 'D' && tra[i] !== 'S').length : 0
@@ -319,7 +286,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     : !q ? null
     : k ? <div className="ht2-lam-hang-nut" data-mot={!coTuChua || undefined}>
         {coTuChua && <button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => onChua(q.qid)}>Sửa câu này</button>}
-        <button ref={nutTiepRef} type="button" className="ht2-lam-nut ht2-lam-nut-chinh" onClick={tiep}>{viTri + 1 === cau.length ? (laLamLai || !goi7 || daXinLamLai.current || !soSaiGoc ? 'Kết thúc chặng' : 'Làm lại câu sai') : 'Câu tiếp theo'}<ArrowRight size={18} aria-hidden="true" /></button>
+        <button ref={nutTiepRef} type="button" className="ht2-lam-nut ht2-lam-nut-chinh" onClick={tiep}>{viTri + 1 === cau.length ? 'Kết thúc chặng' : 'Câu tiếp theo'}<ArrowRight size={18} aria-hidden="true" /></button>
       </div>
     : choChonCach ? <div className="ht2-lam-hang-nut">
         <button type="button" className="ht2-lam-nut ht2-lam-nut-vang" onClick={() => void hocHuongDan()} disabled={nop}>Học cách giải</button>
@@ -355,7 +322,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       <button type="button" className="ht2-lam-nut-ve" onClick={onVe} disabled={nop} aria-label={xong ? 'Về Hôm nay' : 'Lưu và về Hôm nay'}><ArrowLeft size={20} aria-hidden="true" /></button>
       <div className="ht2-lam-giua">
         <h1 className="ht2-lam-tieu" aria-live="polite">{tieuDe}</h1>
-        {vach.length > 0 && !xong && <div className="ht2-lam-vach" role="img" aria-label={vachChu} style={{ gridTemplateColumns: `repeat(${vach.length}, minmax(0, 1fr))` }}>{vach.map((c, j) => <i key={c.qid} data-tt={ttCau(c, dauVach + j)} />)}</div>}
+        {cau.length > 0 && !xong && <div className="ht2-lam-vach" role="img" aria-label={vachChu} style={{ gridTemplateColumns: `repeat(${cau.length}, minmax(0, 1fr))` }}>{cau.map((c, i) => <i key={c.qid} data-tt={ttCau(c, i)} />)}</div>}
       </div>
       {homNayO}
     </header>
@@ -366,13 +333,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           <section className="ht2-lam-the ht2-lam-xong" aria-label="Kết quả chặng">
             <span className="ht2-lam-xong-dau" aria-hidden="true"><Check size={30} strokeWidth={2.4} /></span>
             <h2 className="ht2-lam-xong-tieu">{chang ? `Đã lưu chặng ${chang}` : 'Đã lưu chặng học'}</h2>
-            <p className="ht2-lam-xong-so"><b>{soDung}</b>/{goc.length} câu tự làm đúng</p>
-            <div className="ht2-lam-xong-cau" role="img" aria-label={goc.map((c, i) => `Câu ${i + 1} ${CHU_TT[ttCau(c, i)]}`).join(', ')}>{goc.map((c, i) => <span key={c.qid} data-tt={ttCau(c, i)}>{i + 1}</span>)}</div>
-            <dl className="ht2-lam-xong-so-lieu">
-              <div data-sac="vang"><dt>Đúng liên tiếp dài nhất</dt><dd>{chuoiDai} câu</dd></div>
-              <div><dt>Câu mới đã gặp</dt><dd>{soCauMoi} câu</dd></div>
-              {lamLai.length > 0 && <div><dt>Làm lại đúng</dt><dd>{lamLaiDung}/{lamLai.length} câu</dd></div>}
-            </dl>
+            <p className="ht2-lam-xong-so"><b>{soDung}</b>/{cau.length} câu tự làm đúng</p>
+            <div className="ht2-lam-xong-cau" role="img" aria-label={cau.map((c, i) => `Câu ${i + 1} ${CHU_TT[ttCau(c, i)]}`).join(', ')}>{cau.map((c, i) => <span key={c.qid} data-tt={ttCau(c, i)}>{i + 1}</span>)}</div>
             {cauSai.length > 0 && <p className="ht2-lam-phu">{chuDanhSachCau(cauSai)} đã vào lịch ôn 1 · 3 · 7 ngày.</p>}
           </section>
           {homNayHien && <section className="ht2-lam-the ht2-lam-hom-nay-the" aria-label="Hôm nay">
@@ -382,11 +344,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </>
         : q ? <>
           {!daiPhai && daiKet}
-          {laLamLai && !k && viTri === soGoc && <p className="ht2-lam-ghi"><Info size={14} aria-hidden="true" />Làm lại câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
           {!k && <div className="ht2-lam-nhan">
             <span className="ht2-lam-chip">{loai}</span>
-            {laLamLai ? <span className="ht2-lam-chip" data-sac="vang">{`Làm lại · cùng dạng câu ${goc.findIndex(c => c.qid === q.lamLaiCua) + 1 || ''}`.trim()}</span>
-            : q.vaiGoi7 === 'moi' ? <span className="ht2-lam-chip" data-sac="vang">{tenBai ? `Câu mới · ${tenBai}` : 'Câu mới'}</span>
+            {q.vaiGoi7 === 'moi' ? <span className="ht2-lam-chip" data-sac="vang">{tenBai ? `Câu mới · ${tenBai}` : 'Câu mới'}</span>
               : q.tenDang ? <span className="ht2-lam-dang" title={q.tenDang}>{q.tenDang}</span> : null}
           </div>}
           <DeCau q={q} stt={stt} />

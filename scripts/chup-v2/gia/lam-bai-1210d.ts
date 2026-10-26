@@ -3,7 +3,6 @@
 //   ?man=lam13            chặng 2 (đã làm 6/24 câu hôm nay): 3 trắc nghiệm · 1 đúng–sai · 1 trắc nghiệm · 1 trả lời ngắn (số câu đúng bản vẽ)
 //   ?man=lam13&lam=g7     câu mới của bài (Gói 7 ngày): chặng 3 · câu 1/6 · "Câu này em chọn làm thế nào?" (đã làm 12/24)
 //   ?man=lam13&lam=ds-dau đúng–sai đứng đầu (kịch bản vuốt: ý d + nút cuối phải tới được bằng vuốt)
-//   ?man=lam13&lam=lam-lai 26/10 kiểu Duolingo: chặng 6 câu trộn (mới · sửa · ôn) của Gói 7; sai câu 5 ⇒ "Làm lại câu sai" ⇒ câu cùng dạng ⇒ kết chặng
 //   ?man=lam13&lam=so-o   15/10: số ô = đúng số kí tự đáp số (thầy 15/10 ~10:25): câu amine "24" (2 ô) · "6,48" (4 ô) · "10000" (5 ô)
 import { soOPhanIII } from '../../../src/lib/so-o-tra-loi-ngan'
 
@@ -52,12 +51,7 @@ const CAU_SO_O: CauGia[] = [
     text: 'Phóng đại nguyên tử Gold lên 1 tỉ lần thì đường kính nguyên tử khoảng 30 cm, đường kính hạt nhân khoảng 0,003 cm. Đường kính nguyên tử lớn gấp bao nhiêu lần đường kính hạt nhân?',
     loiGiai: { chot: '30 : 0,003 = 10000. Nguyên tử lớn gấp khoảng 10000 lần hạt nhân.' } },
 ]
-// 26/10 LÀM LẠI CUỐI CHẶNG: vai Gói 7 trộn đều như bộ sinh bài 6 câu (ôn khởi động · mới · sửa · mới · mới · ôn) + câu anh em cho câu 5.
-const VAI_LL = ['on', 'moi', 'moi', 'sua', 'moi', 'on']
-const CAU_LL: CauGia[] = CAU.map((c, i) => ({ ...c, vaiGoi7: VAI_LL[i] }))
-const LAM_LAI: CauGia = { ...nen, qid: 'LL5', maDe: 'BAI8', phan: 'I', tenDang: 'Bậc của amine', vaiGoi7: 'lam_lai', lamLaiCua: 'L5', text: 'Chất nào sau đây là amine bậc ba?', choices: ['C2H5NH2', '(C2H5)2NH', '(CH3)3N', 'C6H5NH2'], ideas: [], dapAn: 'C',
-  loiGiai: { chot: 'Trong (CH3)3N, nguyên tử N liên kết với 3 gốc hydrocarbon nên là amine bậc ba.' } }
-const ds = kieu === 'lam-lai' ? [...CAU_LL, LAM_LAI] : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+const ds = kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
 
@@ -71,14 +65,13 @@ const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => { const n = q.pha
 const so = (v: string) => Number(String(v).replace(',', '.'))
 /** Trả lời các lệnh `/game-v2/hoc-tap-*` + `answer` của màn làm bài; lệnh khác ⇒ null (bộ giả chung lo). */
 export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<string, unknown> | null {
-  if (duong.endsWith('/game-v2/hoc-tap-start')) return { ok: true, id: `phien-${kieu || 'chung'}`, questions: (kieu === 'lam-lai' ? CAU_LL : ds).map(congKhai), ...(kieu === 'g7' || kieu === 'lam-lai' ? { goi7: GOI7 } : {}) }
-  if (duong.endsWith('/game-v2/hoc-tap-lam-lai')) return { ok: true, questions: kieu === 'lam-lai' ? [congKhai(LAM_LAI)] : [] }
+  if (duong.endsWith('/game-v2/hoc-tap-start')) return { ok: true, id: `phien-${kieu || 'chung'}`, questions: ds.map(congKhai), ...(kieu === 'g7' ? { goi7: GOI7 } : {}) }
   const q = ds.find((c) => c.qid === b.qid)
   if (!q) return null
   if (duong.endsWith('/game-v2/answer')) {
     const tra = String(b.answer ?? '')
     daNop++
-    return { ok: true, correct: q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn, answer: q.dapAn, solution: q.loiGiai, solutionImages: [], ...(q.vaiGoi7 === 'lam_lai' ? { attempt: { assisted: true } } : {}) }
+    return { ok: true, correct: q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] }
   }
   if (duong.endsWith('/game-v2/hoc-tap-gap')) { daNop++; return { ok: true, correct: false, hocCoHoTro: true, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] } }
   return null
