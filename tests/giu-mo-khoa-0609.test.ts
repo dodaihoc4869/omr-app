@@ -33,7 +33,8 @@ describe('phiên được cất KHÔNG ĐIỀU KIỆN', () => {
     // Trước đây `if (await docGiuPhien()) await catPhien(ma)` — thầy lỡ tắt ô
     // gạt là mỗi lần tải lại trang phải gõ mật khẩu, mà không hiểu vì sao.
     const app = doc('src/App.tsx')
-    expect(app).toContain('await catPhien(ma)')
+    // ĐỔI CÓ CHỦ Ý 26/10: `void catPhien(ma)` (bỏ vỏ async thừa) — vẫn cất phiên KHÔNG điều kiện.
+    expect(app).toContain('void catPhien(ma)')
     expect(app).not.toContain('if (await docGiuPhien())')
     const kh = doc('src/components/KhoiMatKhauApp.tsx')
     expect(kh).not.toContain('if (await docGiuPhien()) await catPhien')

@@ -100,6 +100,7 @@ const GvHomNayScreen = lazy(() => import('./screens/GvHomNayScreen'))
 const ChienDichScreen = lazy(() => import('./screens/ChienDichScreen'))
 const DuyetLoiGiaiScreen = lazy(() => import('./screens/DuyetLoiGiaiScreen'))
 const BanGoNutThatScreen = lazy(() => import('./screens/BanGoNutThatScreen'))
+const ThiDuaTuanScreen = lazy(() => import('./screens/ThiDuaTuanScreen')) // thưởng phạt 26/10
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
@@ -155,11 +156,9 @@ const TEN_MAN: Record<string, string> = {
   cauhoi: 'Học sinh hỏi',
   khodegiao: 'Giao đề theo tuần',
   caidat: 'Cài đặt',
-  tongquan: 'Tổng quan',
-  chiendich: 'Chiến dịch luyện',
   duyetloigiai: 'Duyệt lời giải',
   bangonutthat: 'Bàn gỡ nút thắt',
-  remotetochieu: 'Điều khiển máy chiếu',
+  thidua: 'Thi đua tuần',
 }
 
 /** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Ngân hàng" → "Kho đề".
@@ -179,14 +178,15 @@ const KhungXuongMan = () => (
   </div>
 )
 
-const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
-
 function App() {
   // LINK CŨ CỦA EM / PHỤ HUYNH (`/ph/<token>`, `?vai=ph`): từ 22/10 vai-tro.ts đưa thẳng vào cổng (phụ huynh chỉ nhập SBD), không còn biển "đã ngừng dùng".
   // LINK PHIẾU của phụ huynh (`/p#…`): trả về đúng một trang phiếu, KHÔNG dựng
   // app quản lý. Tính một lần lúc nạp, trước mọi hiệu ứng — máy phụ huynh
   // không được chạm vào IndexedDB, danh sách lớp hay hộp thư của thầy.
-  const [laPhieu] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phieu')
+  // (26/10, bù byte mục «Thi đua tuần»): đọc vai MỘT lần, năm cờ dưới suy ra từ đó.
+  const [dv] = useState(() => docDuongVao(location.search, location.pathname))
+  const vaiVao = dv.vai
+  const laPhieu = vaiVao === 'phieu'
   // LINK XEM ĐIỂM của em (`/d/<mã ca>`): cũng là máy của EM, không phải máy
   // thầy — không hỏi mật khẩu, không đọc dữ liệu của thầy, không có cầu nối.
   //
@@ -194,7 +194,7 @@ function App() {
   // màn điểm riêng: thầy chốt 07/09 là em phải thấy đúng cái màn lúc vừa thi
   // xong, đủ bốn nút Xem điểm chi tiết · Xem báo cáo học tập · Xem đề & lời
   // giải · Hỏi bài Thầy.
-  const [laXemDiem] = useState(() => docDuongVao(location.search, location.pathname).vai === 'diem')
+  const laXemDiem = vaiVao === 'diem'
   // CỔNG HỌC SINH (/hoc-sinh, /hs, ?vai=hocsinh): cổng thông tin riêng của em — đăng nhập,
   // xem điểm, nộp BTVN, khắc phục câu sai, vào thi.
   // Khi mở từ màn hình chính iOS (start_url="./" mở "/" trần), nếu máy đã dùng vai 'hs' thì vào thẳng cổng học sinh.
@@ -204,11 +204,11 @@ function App() {
   // cả ba app, nên máy nào mở hai app thì khoá ấy là của app mở sau — đó đúng
   // là cái cửa để hai cổng nhảy sang nhau. Nay `/` trần là ngõ cụt, không suy
   // ra vai nào cả.
-  const [laHocSinh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'hocsinh')
+  const laHocSinh = vaiVao === 'hocsinh'
   // CỔNG PHỤ HUYNH (/phu-huynh, /ph, ?vai=phuhuynh): cổng thông tin cho phụ huynh — tra cứu điểm của con bằng SBD, giao bài tập.
-  const [laPhuHuynh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phuhuynh')
+  const laPhuHuynh = vaiVao === 'phuhuynh'
   // ĐIỀU KHIỂN TỜ MÁY CHIẾU TỪ ĐIỆN THOẠI (?remote= hoặc /remote/)
-  const [laRemote] = useState(() => docDuongVao(location.search, location.pathname).vai === 'remote')
+  const laRemote = vaiVao === 'remote'
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
   const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))
@@ -357,8 +357,7 @@ function App() {
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
     if (laPhieu || laHocSinh || laPhuHuynh) return
-    const { maCa } = docDuongVao(location.search, location.pathname)
-    if (maCa) setScreen('examtake')
+    if (dv.maCa) setScreen('examtake')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [laPhieu, laHocSinh, laPhuHuynh])
 
@@ -423,11 +422,9 @@ function App() {
             setKhoa('da_mo')
             // CẤT PHIÊN cho tab này (mục 4A). Chạy nền, không chặn thầy vào
             // app: cất hỏng thì chỉ mất tiện lợi, không mất tính năng.
-            void (async () => {
-              // CẤT PHIÊN LUÔN, không hỏi ô gạt nữa (thầy chốt 06/09): app
-              // phải giữ mở khoá tới khi đóng tab hay thoát hẳn.
-              await catPhien(ma)
-            })()
+            // CẤT PHIÊN LUÔN, không hỏi ô gạt nữa (thầy chốt 06/09): app
+            // phải giữ mở khoá tới khi đóng tab hay thoát hẳn.
+            void catPhien(ma)
           }}
         />
       </ChanLoi>
@@ -506,12 +503,13 @@ function App() {
         {screen === 'chiendich' && <ChienDichScreen />}
         {screen === 'duyetloigiai' && <DuyetLoiGiaiScreen />}
         {screen === 'bangonutthat' && <BanGoNutThatScreen />}
+        {screen === 'thidua' && <ThiDuaTuanScreen />}
         </Suspense>
       </ChanLoi>
       )}
         </div>
       </div>
-      {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}
+      {!laManThi && <BottomNav />}
     </div>
   )
 }

@@ -107,8 +107,11 @@ describe('VAI CHỈ ĐẾN TỪ ĐƯỜNG LINK — không đoán, không nhớ',
   it('App.tsx KHÔNG còn hỏi `vaiDaDung` để quyết cổng em hay cổng phụ huynh', () => {
     expect(APP).not.toContain("vaiDaDung() === 'hs'")
     expect(APP).not.toContain("vaiDaDung() === 'ph'")
-    expect(APP).toContain("docDuongVao(location.search, location.pathname).vai === 'hocsinh'")
-    expect(APP).toContain("docDuongVao(location.search, location.pathname).vai === 'phuhuynh'")
+    // ĐỔI CÓ CHỦ Ý 26/10: App đọc đường vào MỘT lần (`dv`), các cờ vai suy ra từ `dv.vai` — vẫn chỉ từ đường link.
+    expect(APP).toContain('const [dv] = useState(() => docDuongVao(location.search, location.pathname))')
+    expect(APP).toContain('const vaiVao = dv.vai')
+    expect(APP).toContain("const laHocSinh = vaiVao === 'hocsinh'")
+    expect(APP).toContain("const laPhuHuynh = vaiVao === 'phuhuynh'")
   })
 
   it('`vai-tro.ts` KHÔNG còn nhánh đoán nào trong `laManThayQuanLy`', () => {

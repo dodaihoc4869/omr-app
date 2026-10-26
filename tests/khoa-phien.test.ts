@@ -156,7 +156,8 @@ describe('Phép 8 — khoá lại là phải DỌN, không chỉ đổi màn hì
     const { resolve } = await import('node:path')
     const app = readFileSync(resolve(__dirname, '../src/App.tsx'), 'utf8')
     expect(app).toContain('khoiPhucPhien()')
-    expect(app).toContain('await catPhien(ma)')
+    // ĐỔI CÓ CHỦ Ý 26/10: `void catPhien(ma)` (bỏ vỏ async thừa) — vẫn cất phiên KHÔNG điều kiện.
+    expect(app).toContain('void catPhien(ma)')
     expect(app).not.toContain('if (await docGiuPhien())')
   })
 })

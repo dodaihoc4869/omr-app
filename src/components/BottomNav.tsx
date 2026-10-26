@@ -6,7 +6,7 @@
 // Nút nổi "Mở ca kiểm tra" nằm trên thanh, góc phải. Ẩn ở màn làm bài (App.tsx: HIDE_BOTTOMNAV_ON), ở màn theo dõi ca và ở chính màn Mở ca.
 // Cờ BẬT: nút nổi CHỈ hiện ở màn Ca kiểm tra (mở ca nằm trong màn Ca kiểm tra — bản vẽ 09/10).
 import { useState } from 'react'
-import { MoreHorizontal, Plus, Settings } from 'lucide-react'
+import { MoreHorizontal, Plus } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { MAN_DAU_HOA2, MUC_DIEU_HUONG, MUC_HOA2_CHINH, MUC_HOA2_DAY, mucDangSang, type MucDieuHuong } from './ThanhBenTrai'
 import { AnhLogo } from './LogoVai'
@@ -47,10 +47,13 @@ export default function BottomNav() {
             <AnhLogo vai="gv" size={32} />
           </button>
           <span className="tren-thay-ten">{tenMan}</span>
-          {/* 09/10: Kho đề lên thanh đáy ⇒ bánh răng chỉ còn Cài đặt, bấm là vào thẳng (không mở tờ một mục). */}
-          <button type="button" className={`tren-thay-banh-rang${themDangSang ? ' dang' : ''}`} aria-label="Cài đặt" aria-current={themDangSang ? 'page' : undefined} onClick={() => di('caidat')}>
-            <Settings size={22} aria-hidden="true" />
-          </button>
+          {/* 09/10: Kho đề lên thanh đáy ⇒ bánh răng chỉ còn Cài đặt, bấm là vào thẳng (không mở tờ một mục).
+              26/10: mục ĐÁY thanh bên (MUC_HOA2_DAY = Thi đua tuần · Cài đặt) lên thanh trên thành nút biểu tượng — thanh đáy giữ đủ 5 mục. */}
+          {MUC_HOA2_DAY.map((m) => (
+            <button key={m.id} type="button" className={`tren-thay-banh-rang${sang === m.id ? ' dang' : ''}`} aria-label={m.ten} aria-current={sang === m.id ? 'page' : undefined} onClick={() => di(m.id)}>
+              <m.icon size={22} aria-hidden="true" />
+            </button>
+          ))}
         </div>
       )}
 

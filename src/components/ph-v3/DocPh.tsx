@@ -15,7 +15,8 @@ import { LoiThe } from './LoiThe'
 import { chuThay } from './tien-ich'
 import { gioVn, ngayNganVn, soVn, thuNgayVn } from '../../lib/ph-moi/dinh-dang'
 import { tieuDeCanhBao } from '../../lib/canh-bao-thay-hien-thi'
-import { layBaoCaoTuanCon, type BaoCaoTuanCon } from '../../lib/bao-cao-tuan-ph-api'
+import { layBaoCaoTuanCon, type BaoCaoTuanCon, type TuanCon } from '../../lib/bao-cao-tuan-ph-api'
+import { HuyHieuGiai, klDuoi, klTren, TEN_KL } from '../HuyHieuGiai'
 import type { NgayHoc } from '../../lib/ph-v3/con-tong-quan'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { PhMoi } from '../../lib/ph-moi/du-lieu'
@@ -110,8 +111,9 @@ export default function DocPh(p: DocPhProps) {
           )
         ) : (
           <>
-            <div className="pd-luoi">
+            <div className="pd-luoi" data-tuan={bc.du?.tuan ? '' : undefined}>
               <HomNay p={p} nowMs={nowMs} />
+              {bc.du?.tuan && <TuanNay t={bc.du.tuan} />}
               <BayNgay p={p} />
               <Nhom p={p} bc={bc} />
               <LoiThay p={p} />
@@ -161,6 +163,49 @@ function HomNay({ p, nowMs }: PT & { nowMs: number }) {
       </div>
       {ti !== null && <div className="pd-thanh" role="img" aria-label={`Đã làm ${Math.round(ti * 100)}% mức hôm nay`}><i style={{ width: `${ti * 100}%` }} /></div>}
       {(buoi || homQua) && <p className="pd-dong">{buoi && <span>{buoi}</span>}{homQua && <span>{homQua}</span>}</p>}
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------- 1b · Tuần này của con (thưởng phạt kiểu Duolingo — thầy chốt 26/10, bản vẽ tp-14) ----------------------------------------------------------------
+// Một thẻ CHỈ ĐỌC trả lời «con học mấy ngày liền · mấy bài · đứng thứ mấy ở giải · bao nhiêu phần nguyên tử là học thật · học cùng ai». Số lấy từ khối
+// `tuan` của /ph/bao-cao-tuan (lệnh DocPh đã gọi sẵn lúc mở — không thêm lệnh). Thiếu trường ⇒ ẩn ô / dòng ấy; thiếu cả khối ⇒ không có thẻ.
+// Luật giải: cuối tuần top 5 lên hạng, 4 hạng cuối xuống (Sắt không xuống). Nhãn Học thật / Đối phó giữ ở thẻ «Con đang ở nhóm» như cũ.
+const LEN = 5, ROI = 4
+/** Câu giải thích hạng giải cho phụ huynh (không bịa: thiếu thứ hạng ⇒ chỉ nói đang ở giải nào). */
+export function cauGiai(h: NonNullable<TuanCon['hang']>): string {
+  const ten = `Giải ${TEN_KL[h.kl]}`, tren = klTren(h.kl), duoi = klDuoi(h.kl)
+  const o = h.thuHang ? `, hạng ${h.thuHang}${h.soNguoi ? `/${h.soNguoi}` : ''}` : ''
+  const sau = !h.thuHang ? ''
+    : duoi && h.soNguoi && h.thuHang > h.soNguoi - ROI ? ` Cuối tuần còn trong ${ROI} hạng cuối thì xuống Giải ${TEN_KL[duoi]}.`
+    : tren ? ` Cuối tuần trong top ${LEN} thì lên Giải ${TEN_KL[tren]}.` : h.thuHang <= LEN ? ' Đang ở giải cao nhất.' : ''
+  return `Đang ở ${ten}${o}.${sau}`
+}
+const chuCai = (ten: string) => ten.replace(/\(.*?\)/g, '').trim().split(/\s+/).slice(-2).map((x) => x[0] ?? '').join('').toUpperCase()
+function TuanNay({ t }: { t: TuanCon }) {
+  const ti = t.tiLeHocThat
+  const o = [
+    t.chuoi !== null && <div key="c"><span>Chuỗi ngày</span><b>{t.chuoi}<small>ngày</small></b></div>,
+    t.soBai !== null && <div key="b"><span>Số bài</span><b>{t.soBai}<small>bài</small></b></div>,
+    t.hang && <div key="g"><span>Giải tuần</span><b><HuyHieuGiai kl={t.hang.kl} co={22} />{t.hang.thuHang ?? TEN_KL[t.hang.kl]}{t.hang.thuHang && t.hang.soNguoi ? <small>/{t.hang.soNguoi}</small> : null}</b></div>,
+  ].filter(Boolean)
+  return (
+    <section className="pd-the g-tuan" aria-label="Tuần này của con" data-vung="tuan-nay">
+      <p className="pd-nhan">Tuần này của con</p>
+      {o.length > 0 && <div className="pd-ba-so" data-n={o.length}>{o}</div>}
+      {t.hang && <p className="pd-ly" data-vung="cau-giai">{cauGiai(t.hang)}</p>}
+      {ti !== null && (
+        <div className="pd-ht" data-vung="ti-le-hoc-that">
+          <p className="pd-ht-so"><b>{Math.round(ti * 100)}%</b><span>nguyên tử tuần này là học thật</span></p>
+          <div className="pd-ht-thanh" role="img" aria-label={`${Math.round(ti * 100)}% học thật, ${100 - Math.round(ti * 100)}% từ câu làm vội, không tính vào giải`}>
+            <i style={{ flex: ti || 0.001 }} /><i style={{ flex: 1 - ti || 0.001 }} />
+          </div>
+          {ti < 1 && <span className="pd-ht-phu">Phần còn lại từ câu làm vội, không tính vào giải.</span>}
+        </div>
+      )}
+      {t.hocCung.length > 0 && (
+        <p className="pd-ban" data-vung="hoc-cung"><span>Đang học cùng:</span>{t.hocCung.map((b, i) => <span key={i} className="pd-ban-1"><span className="pd-av" data-k={i} aria-hidden="true">{chuCai(b.ten)}</span><b>{b.ten}</b>{b.lop && ` ${b.lop}`}</span>)}</p>
+      )}
     </section>
   )
 }

@@ -193,7 +193,8 @@ describe('khung 2.0 · 5 mục (bản vẽ tối giản thầy chốt 09/10)', (
   it('thanh bên: Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + Cài đặt ở đáy; không nút riêng "Mở ca kiểm tra"', () => {
     render(<ThanhBenTrai />)
     expect([...document.querySelectorAll('.ben-trai-danh-sach .ben-trai-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Hôm nay', 'Hành trình', 'Ca kiểm tra', 'Học sinh', 'Kho đề'])
-    expect([...document.querySelectorAll('.ben-trai-cuoi .ben-trai-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên, trên Cài đặt.
+    expect([...document.querySelectorAll('.ben-trai-cuoi .ben-trai-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Thi đua tuần', 'Cài đặt'])
     expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
   })
