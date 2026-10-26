@@ -13,8 +13,7 @@ import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { ChemText, napKatex } from '../../src/lib/chem-format'
 import { VungChamDe } from '../../src/components/goi-y-cham/VungChamDe'
-import KhoiLoiGiaiChuan from '../../src/components/loi-giai/KhoiLoiGiaiChuan'
-import { thayBangSoDo } from '../../src/components/goi-y-cham/thay-bang-so-do'
+import { KhoiLoiGiaiCoSoDo } from '../../src/components/goi-y-cham/thay-bang-so-do'
 import type { BanSoDo, GoiYTraVe } from '../../src/lib/goi-y-cham/kieu'
 
 // ── bài mẫu (số khớp nhau)
@@ -138,7 +137,7 @@ function Trang() {
       <header className="kd-tren"><button className="kd-ve" aria-label="Về">←</button><b>Câu 2/6</b><div className="kd-vach"><i /></div></header>
       <main className="kd-than">
         <div className="kd-dai" role="status">✓ Đúng · tự làm · em trả lời 76,8</div>
-        <div className="kd-kq"><KhoiLoiGiaiChuan phan="III" correct="76,8" loiGiai={{ chot: 'Bảo toàn S', buoc: ['(lời giải chữ cũ)'], ketQua: '76,8' }} thayLoiGiai={thayBangSoDo(b.ban)} /></div>
+        <div className="kd-kq"><KhoiLoiGiaiCoSoDo phan="III" correct="76,8" loiGiai={{ chot: 'Bảo toàn S', buoc: ['(lời giải chữ cũ)'], ketQua: '76,8' }} soDo={b.ban} /></div>
       </main>
       <footer className="kd-day"><button className="kd-kiem">TIẾP TỤC</button></footer>
     </div>

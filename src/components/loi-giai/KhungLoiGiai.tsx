@@ -7,8 +7,8 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { baoDocLoiGiai, guiCauKiem, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu, type SuKienKhung } from '../../lib/loi-giai-api'
 import ThanhThangGo from './ThanhThangGo'
-import KhoiLoiGiaiChuan, { chuanSangCauTruc } from './KhoiLoiGiaiChuan'
-import { thayBangSoDo } from '../goi-y-cham/thay-bang-so-do'
+import { chuanSangCauTruc } from './KhoiLoiGiaiChuan'
+import { KhoiLoiGiaiCoSoDo } from '../goi-y-cham/thay-bang-so-do'
 import './loi-giai.css'
 
 export const DUONG_KHUNG = `${import.meta.env.BASE_URL}loi-giai/khung.html`
@@ -35,14 +35,14 @@ function LoiGiaiChuView({ cau, lg, soDo }: { cau: CauChoKhung; lg: LoiGiaiChu; s
       )}
       <p className="lg-chu-dap-an"><b>Đáp án:</b> {DS_DUNG_SAI(lg.ketQua || lg.dapAn)}</p>
       {/* khối LỜI GIẢI chuẩn: LỜI GIẢI → Kiến thức cốt lõi → từng phương án/ý ✓ ✗ → bước → kết quả */}
-      <KhoiLoiGiaiChuan phan={phan} loiGiai={loiGiai} correct={lg.dapAn} thayLoiGiai={thayBangSoDo(soDo)} />
+      <KhoiLoiGiaiCoSoDo phan={phan} loiGiai={loiGiai} correct={lg.dapAn} soDo={soDo} />
     </div>
   )
 }
 
 const KIEU_SU_KIEN = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot', 'mo_buoc', 'kiem'])
 
-// `soDo` (26/10): bản sơ đồ của thầy cho câu này (lời giải sau nộp có `soDo`) ⇒ phần lời giải chữ THAY bằng lời giải kiểu sơ đồ (KhoiLoiGiaiChuan).
+// `soDo` (26/10): bản sơ đồ của thầy cho câu này (lời giải sau nộp có `soDo`) ⇒ phần lời giải chữ THAY bằng lời giải kiểu sơ đồ (KhoiLoiGiaiCoSoDo).
 export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', trongTrang = false, onDong, soDo }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; trongTrang?: boolean; onDong: () => void; soDo?: unknown }) {
   const khung = useRef<HTMLIFrameElement>(null)
   // GĐ1 v2: gom thao tác em làm trong khung (khung chỉ postMessage, không gọi mạng) — đóng hộp thì gửi một lần. Màn thầy không gửi.

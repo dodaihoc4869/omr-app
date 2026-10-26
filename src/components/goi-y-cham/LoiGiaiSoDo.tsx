@@ -1,15 +1,50 @@
 // LỜI GIẢI KIỂU SƠ ĐỒ CỦA THẦY (sau khi nộp) — thầy 26/10: «thay luôn toàn bộ lời giải tính toán trong app bằng lời giải kiểu sơ đồ này của tôi».
-// Vẽ ĐỦ bản (đề nói gì · tóm tắt · chuỗi tính có kết quả · kết quả cuối). KhoiLoiGiaiChuan gọi qua `import()` khi kết quả nộp có `soDo`;
-// bản hỏng / thiếu ⇒ hiện `duPhong` (lời giải cũ như cũ).
+// Vẽ ĐỦ bản (đề nói gì · tóm tắt · chuỗi tính có kết quả · kết quả cuối) trong đúng khung «LỜI GIẢI» của KhoiLoiGiaiChuan (cùng lớp .loi-giai),
+// rồi lý do từng phương án / ý (DongLyDo, cùng luật ✓/✗ như khối chuẩn) và phần chèn thêm (hình sau lời giải). Nạp qua KhoiLoiGiaiCoSoDo
+// (thay-bang-so-do.tsx) khi kết quả nộp có `soDo`; bản hỏng / thiếu ⇒ hiện `duPhong` (lời giải cũ như cũ).
 import type { ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
+import { DongLyDo, type KhoiLoiGiaiChuanProps } from '../loi-giai/KhoiLoiGiaiChuan'
 import { docBanSoDo } from '../../lib/goi-y-cham/api'
 import { ChuoiTinh, QuyUoc, SoDoThay, ThiNghiemAo } from './so-do-thay'
 import './goi-y-cham.css'
 
-export default function LoiGiaiSoDo({ ban: tho, duPhong = null }: { ban: unknown; duPhong?: ReactNode }) {
+/** Lý do từng phương án (Phần I) / từng ý (Phần II) — chép đúng luật của KhoiLoiGiaiChuan (hoán vị, ✓/✗ theo đáp án đang chấm). */
+function LyDo({ phan, loiGiai: lg, correct, choicePerm, yPerm, phuongAn, daChon }: KhoiLoiGiaiChuanProps) {
+  const dap = typeof correct === 'string' ? correct.toUpperCase() : ''
+  if (lg && phan === 'I' && lg.tungPa) {
+    return <div>{(choicePerm?.length === 4 ? choicePerm : [0, 1, 2, 3]).map((goc, viTri) => {
+      const k = 'ABCD'[goc] as 'A' | 'B' | 'C' | 'D'
+      return <DongLyDo key={k} dung={dap ? dap === k : !!lg.tungPa?.[k]?.dung} ma={`${'ABCD'[viTri]}.`} chu={lg.tungPa?.[k]?.viSao} phuongAn={phuongAn?.[goc]} emChon={!!daChon && daChon.toUpperCase() === k} />
+    })}</div>
+  }
+  if (lg && phan === 'II' && lg.tungY) {
+    const ds = (typeof correct === 'string' ? [...dap.replace(/Đ/g, 'D')] : [...(correct ?? [])]).map((x) => (x === 'D' || x === 'S' ? x : null))
+    const du = ds.length === 4 && ds.every(Boolean)
+    return <div>{(yPerm?.length === 4 ? yPerm : [0, 1, 2, 3]).map((i, viTri) => {
+      const k = (['a', 'b', 'c', 'd'] as const)[i]
+      return <DongLyDo key={k} dung={du ? ds[i] === 'D' : !!lg.tungY?.[k]?.dung} ma={`${'abcd'[viTri]})`} chu={lg.tungY?.[k]?.viSao} />
+    })}</div>
+  }
+  return null
+}
+
+export default function LoiGiaiSoDo({ ban: tho, duPhong = null, ...p }: Partial<KhoiLoiGiaiChuanProps> & { ban: unknown; duPhong?: ReactNode }) {
   const ban = docBanSoDo(tho, true)
   if (!ban) return <>{duPhong}</>
+  const than = <ThanSoDo ban={ban} />
+  if (!p.phan) return than
+  return (
+    <div className="loi-giai" data-giu-dong={p.giuDong ? '1' : undefined}>
+      <div className="loi-giai-nhan lg-nhan">LỜI GIẢI</div>
+      {than}
+      <LyDo {...(p as KhoiLoiGiaiChuanProps)} />
+      {p.children}
+    </div>
+  )
+}
+
+function ThanSoDo({ ban }: { ban: NonNullable<ReturnType<typeof docBanSoDo>> }) {
   const n = ban.buoc.length
   return (
     <div className="gyc-lgsd">
