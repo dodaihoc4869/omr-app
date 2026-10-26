@@ -72,6 +72,7 @@ import { dungM3 } from '../components/m3'
 import NutDiuMat from '../components/NutDiuMat'
 import { useDiuMat } from '../lib/diu-mat'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
+import { coGiaoDienTrong, napTrongLamBai } from '../styles/nap-trong-lam-bai' // «Trong» 26/10: tờ trình bày nạp riêng khi giao diện bật
 import { DaiBaoNheM3, DaiCanhBaoRoiM3, KhungKhoaM3 } from './ThongBaoThiM3'
 import { ngheHanMoi } from '../lib/may-chu-moi'
 import { chuBaoThemGio, hanMoiNeuKeoDai, MS_HIEN_BAO_THEM_GIO } from '../lib/them-phut'
@@ -3644,6 +3645,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                       cuonToiCau(i + 1)
                     }}
                     className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
+                    data-xong={done || undefined}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                   >
                     {i + 1}
@@ -3910,6 +3912,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             dangLuu={!!saveFlash}
             onMoLuoi={() => setShowGrid(true)}
             nutPhu={<NutDiuMat bat={diuMat} onDoi={doiDiuMat} />}
+            nutNop={
+              coGiaoDienTrong() ? (
+                <button type="button" className="thi-nut-nop-tren" disabled={camNopSom} onClick={() => { if (!camNopSom) setShowConfirm(true) }}>
+                  {nhanNutNop}
+                </button>
+              ) : undefined
+            }
           />
         </div>
       ) : (
@@ -4000,6 +4009,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     key={i}
                     onClick={() => cuonToiCau(i + 1)}
                     className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
+                    data-xong={done || undefined}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-1)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                     title={`Câu ${i + 1}${done ? ' — đã làm' : ' — chưa làm'}${dungM3() && sttDanhDau.includes(i + 1) ? ' — xem lại sau' : ''}`}
                   >
@@ -4082,6 +4092,7 @@ class BoLuiDoc extends Component<{ duPhong: React.ReactNode; children: React.Rea
 // thứ đọc token — chính màn này, DesignSystem, TheCau (`.m3 .the-cau`) — tự mặc bảng màu M3 sáng/tối; KHÔNG dòng logic nào đổi.
 // Đường `/` (app giáo viên) và vitest mặc định: `dungM3()` = false ⇒ y hệt trước.
 function Trang({ children, className = '', diuMat = false }: { children: React.ReactNode; className?: string; diuMat?: boolean }) {
+  napTrongLamBai()
   return (
     <div className={`min-h-screen ${dungM3() ? 'm3 ' : ''}${className}`} data-diu-mat={diuMat ? 'bat' : undefined} style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
       {children}
@@ -4097,7 +4108,7 @@ function laLyDoMoi(v: string | undefined): boolean {
 function HopThoai({ children }: { children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }}>
-      <div className="w-full flex flex-col" style={{ maxWidth: 400, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
+      <div className="w-full flex flex-col thi-hop" style={{ maxWidth: 400, background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', gap: 'var(--k3)', boxShadow: 'var(--bong-2)' }}>
         {children}
       </div>
     </div>

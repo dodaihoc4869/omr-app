@@ -7,6 +7,7 @@ import { demChuaDungTron, type KqMotCau, type PhanKetQua, type TrangThaiCongBo }
 import { chuDemLoai } from '../../lib/loai-cau-chua-dung'
 import { KetQuaSoLon, NutXd, PhanGon, ThanhTrenXd, TrangThaiChuaCoDiem } from './thanh-phan'
 import './ket-qua-kinh.css'
+import { napTrongLamBai } from '../../styles/nap-trong-lam-bai' // «Trong» 26/10: tờ trình bày nạp riêng khi giao diện bật
 
 /** Một ô "từng câu" (ca thi 28/09): kết quả chấm của CHÍNH em — chỉ truyền khi `kieu === 'da_cong_bo'`. */
 export interface OCauKq {
@@ -53,6 +54,7 @@ export interface KetQuaSauNopProps {
 }
 
 export default function KetQuaSauNop(p: KetQuaSauNopProps) {
+  napTrongLamBai()
   const ten = p.tenCa.trim() || 'Ca kiểm tra'
   const coDiem = p.kieu === 'da_cong_bo' && typeof p.diem === 'number' && Array.isArray(p.phan) && typeof p.dung === 'number' && typeof p.tong === 'number'
   return (
