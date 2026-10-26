@@ -7,15 +7,14 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { baoDocLoiGiai, guiCauKiem, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu, type SuKienKhung } from '../../lib/loi-giai-api'
 import ThanhThangGo from './ThanhThangGo'
-import { chuanSangCauTruc } from './KhoiLoiGiaiChuan'
-import { KhoiLoiGiaiCoSoDo } from '../goi-y-cham/thay-bang-so-do'
+import KhoiLoiGiaiChuan, { chuanSangCauTruc } from './KhoiLoiGiaiChuan'
 import './loi-giai.css'
 
 export const DUONG_KHUNG = `${import.meta.env.BASE_URL}loi-giai/khung.html`
 
 const DS_DUNG_SAI = (da: string) => /^[DS]{4}$/.test(da) ? da.split('').map((x, i) => `${'abcd'[i]} ${x === 'D' ? 'Đúng' : 'Sai'}`).join(' · ') : da
 
-function LoiGiaiChuView({ cau, lg, soDo }: { cau: CauChoKhung; lg: LoiGiaiChu; soDo?: unknown }) {
+function LoiGiaiChuView({ cau, lg }: { cau: CauChoKhung; lg: LoiGiaiChu }) {
   const kyTu = lg.tung.map((x) => x.id)
   const dap = (lg.dapAn || lg.ketQua || '').trim().toUpperCase().replace(/Đ/g, 'D')
   const phan: 'I' | 'II' | 'III' = kyTu.length > 0 && kyTu.every((k) => /^[a-d]$/.test(k)) ? 'II' : /^[DS]{4}$/.test(dap) && kyTu.length === 0 ? 'II' : kyTu.length > 0 || /^[A-D]$/.test(dap) ? 'I' : 'III'
@@ -35,15 +34,14 @@ function LoiGiaiChuView({ cau, lg, soDo }: { cau: CauChoKhung; lg: LoiGiaiChu; s
       )}
       <p className="lg-chu-dap-an"><b>Đáp án:</b> {DS_DUNG_SAI(lg.ketQua || lg.dapAn)}</p>
       {/* khối LỜI GIẢI chuẩn: LỜI GIẢI → Kiến thức cốt lõi → từng phương án/ý ✓ ✗ → bước → kết quả */}
-      <KhoiLoiGiaiCoSoDo phan={phan} loiGiai={loiGiai} correct={lg.dapAn} soDo={soDo} />
+      <KhoiLoiGiaiChuan phan={phan} loiGiai={loiGiai} correct={lg.dapAn} />
     </div>
   )
 }
 
 const KIEU_SU_KIEN = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot', 'mo_buoc', 'kiem'])
 
-// `soDo` (26/10): bản sơ đồ của thầy cho câu này (lời giải sau nộp có `soDo`) ⇒ phần lời giải chữ THAY bằng lời giải kiểu sơ đồ (KhoiLoiGiaiCoSoDo).
-export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', trongTrang = false, onDong, soDo }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; trongTrang?: boolean; onDong: () => void; soDo?: unknown }) {
+export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', trongTrang = false, onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; trongTrang?: boolean; onDong: () => void }) {
   const khung = useRef<HTMLIFrameElement>(null)
   // GĐ1 v2: gom thao tác em làm trong khung (khung chỉ postMessage, không gọi mạng) — đóng hộp thì gửi một lần. Màn thầy không gửi.
   const suKien = useRef<SuKienKhung[]>([])
@@ -108,7 +106,7 @@ export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false
       {hoSo ? (
         <iframe ref={khung} className="lg-khung" title={`Lời giải từng bước ${cau.so}`} src={DUONG_KHUNG} sandbox="allow-scripts" referrerPolicy="no-referrer" />
       ) : loiGiaiChu ? (
-        <div className="lg-cuon"><LoiGiaiChuView cau={cau} lg={loiGiaiChu} soDo={soDo ?? (loiGiaiChu as { soDo?: unknown }).soDo} /></div>
+        <div className="lg-cuon"><LoiGiaiChuView cau={cau} lg={loiGiaiChu} /></div>
       ) : null}
       {coThang && kiem && <ThanhThangGo qid={cau.qid} kiem={kiem} lanTai={lanTai} layDang={layDang} />}
     </div>
