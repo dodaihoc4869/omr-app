@@ -62,7 +62,9 @@ for (const [ten, man, , , , , cho, viec] of DS) { const k = `${man}|${viec ?? ''
 for (const [ten, man, cho, viec] of CANH_THEM) { const k = `${man}|${viec ?? ''}`; if (!CANH.has(k)) CANH.set(k, { ten, man, cho, viec }) }
 // cảnh trùng bố cục: ép nút Sáng/Tối trong Cài đặt (đã có sáng + tối máy)
 for (const [k, c] of CANH) if (/&giao=/.test(c.man)) CANH.delete(k)
-const canh = [...CANH.values()].filter((c) => !CHON.length || CHON.some((p) => c.ten.startsWith(p) || c.man.startsWith(p)))
+// `--bo <regex>`: bỏ cảnh theo ?man= (vd màn đang có làn khác dựng lại)
+const BO = lay('--bo', '') ? new RegExp(lay('--bo', '')) : null
+const canh = [...CANH.values()].filter((c) => (!CHON.length || CHON.some((p) => c.ten.startsWith(p) || c.man.startsWith(p))) && !(BO && BO.test(c.man)))
 const viec = canh.flatMap((c) => KHO.flatMap(([w, h]) => NEN.map((nen) => ({ ...c, w, h, nen }))))
 console.log(`${canh.length} cảnh × ${KHO.length} khổ × ${NEN.length} nền = ${viec.length} lượt, ${SONG} song song`)
 
@@ -117,6 +119,9 @@ async function chay(v) {
     } catch { loiTrang.push(`không thấy chữ ${v.cho}`) }
     await thaoTac(t, v.viec, v.ten, loiTrang, tran, tp).catch((e) => loiTrang.push(`thao tác ${v.viec} hỏng — ${String(e).slice(0, 200)}`))
     await t.waitForTimeout(900)
+    // dòng danh sách dài dùng `content-visibility: auto` (chuẩn B16) không dựng khi ở ngoài khung ⇒ ép dựng để soát được cả phần cuộn tới
+    await t.addStyleTag({ content: '*{content-visibility:visible!important}' }).catch(() => {})
+    await t.waitForTimeout(150)
     // trạng thái cảnh: a…j (trừ d), trong khung chính + từng khung con cùng gốc (tờ chiếu)
     const khung = t.frames()
     for (const f of khung) {

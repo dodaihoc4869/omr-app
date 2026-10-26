@@ -35,12 +35,14 @@ export function kiemTrang() {
   // ── gốc soát: tấm phủ cố định chiếm ≥ 50% khung đang ở trên cùng (hộp thoại, tấm toàn màn) ⇒ chỉ soát trong tấm ấy
   const lon = (el) => { const r = el.getBoundingClientRect(); return r.width * r.height >= 0.5 * W * H }
   const coDinh = (el) => { const p = css(el).position; return p === 'fixed' }
+  // tấm phủ trên cùng (theo thứ tự chồng tại tâm khung); tấm không chữ (nền mờ) ⇒ gốc = khung cha (chứa cả nền mờ lẫn tấm nổi bên cạnh)
   let goc = document.body
-  for (const [x, y] of [[W / 2, H / 2], [W / 2, H / 4], [W / 2, (3 * H) / 4]]) {
-    const tren = document.elementFromPoint(x, y)
-    let lop = null
-    for (let e = tren; e && e !== document.body; e = e.parentElement) if (coDinh(e) && lon(e)) lop = e
-    if (lop) { goc = lop; break }
+  const lops = [...document.body.querySelectorAll('*')].filter((e) => coDinh(e) && lon(e) && thay(e))
+  if (lops.length) {
+    const chong = document.elementsFromPoint(W / 2, H / 2)
+    let tot = null, vt = 1e9
+    for (const L of lops) { const i = chong.findIndex((x) => L.contains(x)); if (i >= 0 && i < vt) { vt = i; tot = L } }
+    if (tot) goc = tot.textContent.trim() ? tot : tot.parentElement || document.body
   }
   // phần tử nổi (fixed/sticky) gần nhất — không tính chính gốc
   const noiCache = new Map()
@@ -65,17 +67,20 @@ export function kiemTrang() {
     if (!rects.length) continue
     chu.push({ n, el, rects, t: t.trim() })
   }
-  // phần NHÌN THẤY của mỗi dòng chữ: cắt theo mọi tổ tiên overflow ≠ visible (chữ bị line-clamp / truncate / khung cuộn che không tính chồng)
+  // phần NHÌN THẤY của mỗi dòng chữ: cắt theo tổ tiên overflow hidden/clip (chữ bị line-clamp / truncate không tính chồng). Khung CUỘN không cắt:
+  // chữ đang cuộn khuất vẫn được soát (chồng / «·» / vỡ dòng không đổi khi cuộn tới).
   const khungCat = new Map()
   const catBoi = (el) => {
     if (khungCat.has(el)) return khungCat.get(el)
     let k = { l: -1e9, t: -1e9, r: 1e9, b: 1e9 }
     for (let e = el; e && e !== document.documentElement && e !== document.body; e = e.parentElement) {
       const s = getComputedStyle(e)
-      if (s.overflowX === 'visible' && s.overflowY === 'visible') continue
+      if (/auto|scroll/.test(s.overflowX + s.overflowY)) break // trong khung cuộn: phần khuất cuộn tới được, khung cắt bên ngoài chỉ cắt ô cuộn
+      const cx = /hidden|clip/.test(s.overflowX), cy = /hidden|clip/.test(s.overflowY)
+      if (!cx && !cy) continue
       const r = e.getBoundingClientRect()
-      if (s.overflowX !== 'visible') { k.l = Math.max(k.l, r.left); k.r = Math.min(k.r, r.right) }
-      if (s.overflowY !== 'visible') { k.t = Math.max(k.t, r.top); k.b = Math.min(k.b, r.bottom) }
+      if (cx) { k.l = Math.max(k.l, r.left); k.r = Math.min(k.r, r.right) }
+      if (cy) { k.t = Math.max(k.t, r.top); k.b = Math.min(k.b, r.bottom) }
     }
     khungCat.set(el, k)
     return k
@@ -222,6 +227,8 @@ export function kiemTrang() {
       const r = kyTu(c.n, i)
       const kc = catBoi(c.el)
       if (!r || r.left >= kc.r || r.right <= kc.l || r.top >= kc.b || r.bottom <= kc.t) continue
+      // «·» là dấu NHÂN trong phép tính (chữ số hai bên: «3 · 0,01») — không phải dấu ngăn
+      if (/\d\s*$/.test(t.slice(0, i)) && /^\s*\d/.test(t.slice(i + 1))) continue
       let truoc = null
       for (let j = i - 1; j >= 0; j--) if (t[j].trim()) { truoc = kyTu(c.n, j); break }
       let dauDong
@@ -286,6 +293,9 @@ export function kiemTrang() {
     if (!((s.display.includes('flex') && s.flexWrap === 'wrap') || s.display.includes('grid'))) continue
     const con = [...e.children].filter((x) => thay(x) && x.getBoundingClientRect().height > 0 && css(x).position !== 'absolute')
     if (con.length < 3 || con.length > 8) continue
+    // chỉ hàng Ô (có nền hoặc viền) — dòng chữ thường xuống hàng không tính
+    const laO = (x) => { const q = css(x); return (!/rgba\(0, 0, 0, 0\)|transparent/.test(q.backgroundColor) || parseFloat(q.borderTopWidth) > 0) }
+    if (!con.every(laO)) continue
     const hang = []
     for (const x of con) { const t = Math.round(x.getBoundingClientRect().top); let h = hang.find((q) => Math.abs(q.t - t) < 4); if (!h) hang.push((h = { t, ds: [] })); h.ds.push(x) }
     if (hang.length < 2) continue
@@ -317,10 +327,12 @@ export function kiemChe(che) {
   const thay = (el) => el.checkVisibility ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true, contentVisibilityAuto: true }) : true
   const lon = (el) => { const r = el.getBoundingClientRect(); return r.width * r.height >= 0.5 * W * H }
   let goc = document.body
-  for (const [x, y] of [[W / 2, H / 2], [W / 2, H / 4], [W / 2, (3 * H) / 4]]) {
-    let lop = null
-    for (let e = document.elementFromPoint(x, y); e && e !== document.body; e = e.parentElement) if (css(e).position === 'fixed' && lon(e)) lop = e
-    if (lop) { goc = lop; break }
+  const lops = [...document.body.querySelectorAll('*')].filter((e) => css(e).position === 'fixed' && lon(e) && thay(e))
+  if (lops.length) {
+    const chong = document.elementsFromPoint(W / 2, H / 2)
+    let tot = null, vt = 1e9
+    for (const L of lops) { const i = chong.findIndex((x) => L.contains(x)); if (i >= 0 && i < vt) { vt = i; tot = L } }
+    if (tot) goc = tot.textContent.trim() ? tot : tot.parentElement || document.body
   }
   const noiCache = new Map()
   const noi = (el) => {
@@ -338,13 +350,29 @@ export function kiemChe(che) {
   const ra = []
   const da = new Set()
   const rg = document.createRange()
+  // vùng nhìn thấy của phần tử (cắt theo khung cuộn/cắt tổ tiên) — điểm nằm ngoài vùng này vốn khuất, không phải bị phần tử nổi che
+  const vung = (el) => {
+    const k = { l: 0, t: 0, r: W, b: H }
+    for (let e = el.parentElement; e && e !== document.body && e !== document.documentElement; e = e.parentElement) {
+      const s = css(e)
+      if (s.overflowX === 'visible' && s.overflowY === 'visible') continue
+      const r = e.getBoundingClientRect()
+      if (s.overflowX !== 'visible') { k.l = Math.max(k.l, r.left); k.r = Math.min(k.r, r.right) }
+      if (s.overflowY !== 'visible') { k.t = Math.max(k.t, r.top); k.b = Math.min(k.b, r.bottom) }
+    }
+    return k
+  }
   const xet = (el, diem, chu) => {
+    const k = vung(el)
     for (const [x, y] of diem) {
-      if (x < 1 || y < 1 || x > W - 1 || y > H - 1) continue
+      if (x < k.l + 1 || y < k.t + 1 || x > k.r - 1 || y > k.b - 1) continue
       const tren = document.elementFromPoint(x, y)
       if (!tren || tren === el || el.contains(tren)) continue
       const f = noi(tren)
-      if (!f || f.contains(el) || !hopLe(f)) continue
+      // bỏ: tấm lớn (nền mờ hộp thoại) và ngăn kéo đang MỞ (cao ≥ 80% khung, rộng ≥ 25%) — che có chủ đích khi người dùng mở
+      if (!f || f.contains(el) || !hopLe(f) || lon(f)) continue
+      const rf = f.getBoundingClientRect()
+      if (rf.height >= 0.8 * H && rf.width >= 0.25 * W) continue
       const k = danh(f) + '|' + danh(el)
       if (da.has(k)) return
       da.add(k)

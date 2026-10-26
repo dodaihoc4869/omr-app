@@ -798,6 +798,8 @@ if (SOAT === 'dai' && MOT_PH) {
     try { return new Response(JSON.stringify(keoDai(await r.clone().json())), { status: r.status, headers: { 'content-type': 'application/json' } }) } catch { return r }
   }
 }
+// như app thật: màn Kiểm tra ôn tập nạp tờ «Trong» riêng khi <html data-trong> đã gắn (trang chụp gắn SAU khi nạp mã ⇒ nạp thẳng)
+if (man === 'soat-ktcn' && document.documentElement.dataset.trong === 'hs') void import('../../src/styles/trong-lam-bai.css')
 const manSoatKtcn = () => h(ManKiemTraCaNhan, { token: 'tk', sbd: '12121212', id: 'kt-soat', onVe: noop, onCapNhat: noop })
 // ═══ hết SOÁT 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
