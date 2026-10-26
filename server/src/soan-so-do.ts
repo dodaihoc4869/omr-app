@@ -468,6 +468,7 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
     const xong = await Promise.all(dot.map((q) => soanMotCau(q, ts, goi, cong, heThong)))
     // TỰ SỬA ĐÁP ÁN KHO — TUẦN TỰ (các câu cùng tờ ghi chung một gói R2): nghi ⇒ chọn đáp án mới ⇒ suaDapAnKho ⇒ soạn lại câu theo đáp án mới (version mới).
     if (!ts.thuKhong && ts.tuSuaDapAn !== false) {
+      const daSua: { k: number; id: string }[] = []
       for (const [k, r] of xong.entries()) {
         if (!r.dong.nghiDapAn || !r.dong.dapAnMay) continue
         const q = dot[k]!
@@ -478,14 +479,15 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
           kq = await suaDapAnKho(env, { maDe: q.maDe, qid: q.qid, dapAnMoi: moi, nguon: 'soan-so-do', lyDo: `2 lần giải mù cùng ra ${r.dong.dapAnMay} (kho ${q.correct})` }, bayGio())
         } catch (e) { r.dong.khongSua = `loi: ${(e instanceof Error ? e.message : String(e)).slice(0, 80)}`; continue }
         if (!kq.ok) { r.dong.khongSua = kq.ma; continue }
-        const qMoi: CauKho = { ...q, correct: kq.moi, version: kq.versionMoi }
-        dot[k] = qMoi
+        dot[k] = { ...q, correct: kq.moi, version: kq.versionMoi }
+        daSua.push({ k, id: kq.id })
         dem.da_sua_dap_an++
-        const lai = await soanMotCau(qMoi, ts, goi, cong, heThong)
-        xong[k] = {
-          dong: { ...lai.dong, daSuaDapAn: true, maSuaDapAn: kq.id }, ...(lai.ban ? { ban: lai.ban } : {}),
-          token: { vao: r.token.vao + lai.token.vao, ra: r.token.ra + lai.token.ra },
-        }
+      }
+      // Soạn lại SONG SONG (chỉ ghi R2 mới phải tuần tự) — giữ lượt gọi ngắn, kho đã ghi xong trước khi gọi mô hình.
+      const lai = await Promise.all(daSua.map(({ k }) => soanMotCau(dot[k]!, ts, goi, cong, heThong)))
+      for (const [i, { k, id }] of daSua.entries()) {
+        const r = xong[k]!, l = lai[i]!
+        xong[k] = { dong: { ...l.dong, daSuaDapAn: true, maSuaDapAn: id }, ...(l.ban ? { ban: l.ban } : {}), token: { vao: r.token.vao + l.token.vao, ra: r.token.ra + l.token.ra } }
       }
     }
     const ghi: D1PreparedStatement[] = []
