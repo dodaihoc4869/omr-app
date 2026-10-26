@@ -13,6 +13,7 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
 import BatLinhShell from './components/bat-linh/BatLinhShell'
 import ChanLoi from './components/ChanLoi'
+import './styles/trong.css' // Giao diện «Trong» thầy chốt 26/10 (chỉ khi <html data-trong>)
 import { LogoDoc } from './components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './screens/DangNhapHocSinh'
 import { layDiaChiMayChu } from './lib/dia-chi-may-chu'

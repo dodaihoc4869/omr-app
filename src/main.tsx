@@ -117,6 +117,12 @@ const laHoiThay = /^\/hoi-thay\/?$/.test(location.pathname)
 // link thi kèm `?vai=gv` (hiếm — máy thầy thử link) vẫn dựng App.tsx như cũ (App.tsx cũng ra màn thi) để khớp bảng nạp trước: `vai=gv` chỉ nạp nhóm `app`.
 const laDiem = dvMo.vai === 'diem'
 const laManThi = laDiem || (!!dvMo.maCa && dvMo.vai !== 'gv')
+// GIAO DIỆN «TRONG» (thầy chốt 26/10, docs/ban-ve-trong-2610): cổng học sinh + màn thi = 'hs' (xanh lá), app thầy = 'gv' (xanh dương); phụ huynh và
+// /hoi-thay giữ nguyên. Luật ở styles/trong.css, mọi bộ chọn bắt đầu bằng `[data-trong]`. Lùi nhanh một máy: localStorage `ddh.trong` = 'tat'.
+{
+  const vaiTrong = laCongPhuHuynh || laHoiThay ? '' : laCongHocSinh || laManThi ? 'hs' : 'gv'
+  try { if (vaiTrong && localStorage.getItem('ddh.trong') !== 'tat') document.documentElement.dataset.trong = vaiTrong } catch { if (vaiTrong) document.documentElement.dataset.trong = vaiTrong }
+}
 const napGoc: Promise<GocApp> = laCongHocSinh
   ? thuLai(() => import('./AppHocSinh'))
   : laCongPhuHuynh

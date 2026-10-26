@@ -40,6 +40,7 @@ import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import '../../src/styles/vo-thay.css'
 import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
+import '../../src/styles/trong.css' // giao diện «Trong» 26/10 (App / AppHocSinh / AppThi nạp y như vậy)
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import AppPhuHuynh from '../../src/components/ph-v3/AppPhuHuynh'
@@ -90,6 +91,8 @@ import { NHIP_EM_CHAM, NHIP_EM_CHUA_DEU, NHIP_EM_LUOI } from './gia/nhip-hoc-em'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
+// Như main.tsx: giao diện «Trong» (26/10) — cảnh thầy `gv…` = 'gv', cảnh phụ huynh không bật, còn lại (học sinh, màn thi) = 'hs'. `&trong=tat` ⇒ giao diện cũ.
+if (man !== 'ph' && !man.startsWith('ph-') && thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = man.startsWith('gv') ? 'gv' : 'hs'
 const now = Date.now()
 const noop = () => {}
 

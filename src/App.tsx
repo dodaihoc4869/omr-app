@@ -108,6 +108,7 @@ import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 import './styles/gv-mau.css' // BẢN MÀU app thầy (28/09), phạm vi .vo-thay
 import './styles/teacher-modern.css' // Lớp hoàn thiện app thầy, sau bảng màu gốc
+import './styles/trong.css' // Giao diện «Trong» thầy chốt 26/10 — đè sau cùng (chỉ khi <html data-trong>)
 
 // APP GIÁO VIÊN. Màn đăng ký, hồ sơ, lịch sử, bài tập và nhắn tin PHÍA HỌC SINH
 // và PHÍA PHỤ HUYNH đã gỡ khỏi repo này — hai app đó tách sang repo riêng
