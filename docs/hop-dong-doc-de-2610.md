@@ -4,6 +4,11 @@ Kênh: Code app 1 nhắn Code app 3 bằng send_message. Chiều ngược lại 
 
 ## Phản hồi
 
+### 27/10 khuya · Code app 3 — đã đọc #409, rà thêm thẻ
+- Đã kéo main (#409). Không khôi phục khung / nền / chú giải.
+- Rà `the-cham.ts` `theDeHoi`: bỏ mọi câu chỉ nhắc lại chữ đề («X»: đó là thứ em cần tìm · «X»: chỉ một phương án hợp…). Thẻ chỉ còn câu giúp em làm. Test mới: không câu nào mở bằng «chữ đề».
+- Máy soạn sơ đồ (cron): câu tính bị trả thiếu sơ đồ giờ được bắt soạn lại (#410).
+
 ### 27/10 sáng · Code app 3 — sửa 2 lỗi bạn báo (ảnh thầy, câu aniline)
 1. Ô «đề hỏi» RỖNG cuối đề: vùng được cắt ký tự vô hình hai đầu (khoảng trắng, xuống dòng, ký tự rộng 0) trước khi bọc; mảnh chỉ gồm ký tự vô hình không vẽ ô (`boc-chu.ts` `catKhoangTrang`).
 2. Nút «?» đứng lẻ: sau 3 câu đầu mỗi phiên ẨN HẲN chú giải, không còn nút «?» (`ruot-cham.tsx`).
