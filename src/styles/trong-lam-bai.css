@@ -564,6 +564,8 @@
   [data-trong] .duo:not([data-xong]) .duo-than { display: contents; }
   [data-trong] .duo:not([data-xong]) .duo-than > * { grid-column: 1 / -1; }
   [data-trong] .duo:not([data-xong]) .duo-cot-de { grid-column: 1; grid-row: 2 / span 2; display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 8px 12px 20px 20px; }
+  /* đề GHIM ở cột trái khi cột phải cuộn xuống tấm kết quả (khung thấp): em vẫn đọc được đề cạnh lời giải; đề dài hơn khung thì cuộn riêng */
+  [data-trong] .duo:not([data-xong]) .duo-cot-de { position: sticky; top: 0; align-self: start; max-height: 100dvh; overflow-y: auto; overscroll-behavior: contain; }
   [data-trong] .duo:not([data-xong]) .duo-cot-tra { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 8px 20px 12px 12px; }
   [data-trong] .duo:not([data-xong]) .duo-tra[data-luoi] .ht2-lam-tn { grid-template-columns: minmax(0, 1fr); }
   [data-trong] .duo:not([data-xong]) .duo-day { grid-column: 2; grid-row: 3; align-self: start; position: static; margin: 0 12px 12px 0; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 0; border-radius: 18px; }
@@ -658,7 +660,10 @@
 [data-trong] .duo-muc span { font-size: 13.5px; font-weight: 700; color: var(--tr-chu-2); }
 [data-trong] .duo-muc em { font-style: normal; font-weight: 900; color: var(--tr-dung-chu); }
 [data-trong='hs'] .duo-muc em { display: inline-block; animation: duo-bat 420ms cubic-bezier(.3, 1.3, .5, 1) both; }
-@media (orientation: landscape) and (max-height: 500px) { [data-trong] .duo-tinh { inset: -16px; } [data-trong] .duo-muc svg { width: 48px; height: 48px; } }
+@media (orientation: landscape) and (max-height: 500px) {
+  [data-trong] .duo-tinh { inset: -16px; } [data-trong] .duo-muc svg { width: 48px; height: 48px; }
+  [data-trong] .duo-combo { position: fixed; top: 8px; } /* khung thấp: trang đã cuộn tới tấm kết quả ⇒ băng combo bám khung nhìn, không nằm theo thanh trên đã khuất */
+}
 @media (prefers-reduced-motion: reduce) {
   [data-trong='hs'] :is(.duo :is(.duo-cot-de, .duo-cot-tra) > *, .duo-combo, .duo-phan-tu circle, .duo-thanh > i b, .duo-thanh > i::before, .duo-3 > div, .duo-tinh i, .duo-tinh svg, .duo-hoan-hao, .duo-muc em, .duo-tick path) { animation: none !important; }
   [data-trong='hs'] .duo-tick path { stroke-dashoffset: 0; }
