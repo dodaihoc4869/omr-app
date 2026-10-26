@@ -20,7 +20,7 @@ describe('mở dần 3 tầng + soi sáng', () => {
     const tai = vi.fn(async () => BAN_LO)
     const { container } = render(<VungChamDe q={{ qid: 'q-pyrite' }} tuDien={TU_DIEN_GIA} onHoTro={onHoTro} taiGoiY={tai}><De text={DE_PYRITE} /></VungChamDe>)
     await screen.findByText('8%', { selector: '.gyc-v' })
-    const nut = screen.getByRole('button', { name: /Bắt đầu từ đâu/ })
+    const nut = (await screen.findByRole('button', { name: /Bắt đầu từ đâu/ }))
     fireEvent.click(nut)
     expect(onHoTro).toHaveBeenCalledTimes(1)
     expect(tai).toHaveBeenCalledWith('q-pyrite')
@@ -55,7 +55,7 @@ describe('mở dần 3 tầng + soi sáng', () => {
 
   it('chạm thừa số «2» ⇒ ba số trước sáng (✓), «2» đặc, các số sau mờ; bóng nói nghĩa', async () => {
     render(<VungChamDe q={{ qid: 'q-pyrite' }} tuDien={TU_DIEN_GIA} taiGoiY={async () => BAN_LO}><De text={DE_PYRITE} /></VungChamDe>)
-    fireEvent.click(screen.getByRole('button', { name: /Bắt đầu từ đâu/ }))
+    fireEvent.click((await screen.findByRole('button', { name: /Bắt đầu từ đâu/ })))
     await screen.findByText(/Số mol là tiền/)
     fireEvent.click(screen.getByRole('button', { name: /Gợi ý tiếp/ }))
     fireEvent.click(screen.getByRole('button', { name: /Gợi ý tiếp/ }))
@@ -81,7 +81,7 @@ describe('không có bản soạn / mất mạng / đặt nút', () => {
   it('co:false ⇒ gợi ý tự sinh từ đề (Đề cho · Đề hỏi · Bước đầu)', async () => {
     render(<VungChamDe q={{ qid: 'e1' }} tuDien={TU_DIEN_GIA} taiGoiY={async () => ({ ok: true, co: false })}><De text={DE_ESTER} /></VungChamDe>)
     await screen.findByText('8,8 gam', { selector: '.gyc-v' })
-    fireEvent.click(screen.getByRole('button', { name: /Bắt đầu từ đâu/ }))
+    fireEvent.click((await screen.findByRole('button', { name: /Bắt đầu từ đâu/ })))
     await screen.findByText(/^Đề cho/, { selector: '.gyc-t-ten' })
     expect(document.querySelector('.gyc-goi-y .gyc-chip.gyc-tin')!.textContent).toBe('8,8 gam')
   })
@@ -89,7 +89,7 @@ describe('không có bản soạn / mất mạng / đặt nút', () => {
   it('lỗi mạng ⇒ báo «Chưa tải được gợi ý» + Thử lại, kèm gợi ý tự sinh', async () => {
     const tai = vi.fn(async () => null)
     render(<VungChamDe q={{ qid: 'e2' }} tuDien={TU_DIEN_GIA} taiGoiY={tai}><De text={DE_ESTER} /></VungChamDe>)
-    fireEvent.click(screen.getByRole('button', { name: /Bắt đầu từ đâu/ }))
+    fireEvent.click((await screen.findByRole('button', { name: /Bắt đầu từ đâu/ })))
     await screen.findByText(/Chưa tải được gợi ý soạn sẵn/)
     expect(screen.getByText(/^Đề cho/, { selector: '.gyc-t-ten' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
@@ -99,7 +99,7 @@ describe('không có bản soạn / mất mạng / đặt nút', () => {
   it('không có token/phiên ⇒ không gọi mạng, gợi ý tự sinh', async () => {
     const f = vi.spyOn(globalThis, 'fetch')
     render(<VungChamDe q={{ qid: 'e3' }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER} /></VungChamDe>)
-    fireEvent.click(screen.getByRole('button', { name: /Bắt đầu từ đâu/ }))
+    fireEvent.click((await screen.findByRole('button', { name: /Bắt đầu từ đâu/ })))
     await screen.findByText(/^Đề cho/, { selector: '.gyc-t-ten' })
     expect(f).not.toHaveBeenCalled()
     f.mockRestore()
@@ -109,7 +109,7 @@ describe('không có bản soạn / mất mạng / đặt nút', () => {
     render(<>
       <VungChamDe q={{ qid: 'e4' }} tuDien={TU_DIEN_GIA} nutBatDau={(nut) => <div data-testid="hang-day">{nut}</div>}><De text={DE_ESTER} /></VungChamDe>
     </>)
-    const nut = screen.getByRole('button', { name: /Bắt đầu từ đâu/ })
+    const nut = (await screen.findByRole('button', { name: /Bắt đầu từ đâu/ }))
     expect(screen.getByTestId('hang-day').contains(nut)).toBe(true)
     fireEvent.click(nut)
     await screen.findByText('Bắt đầu từ đâu?', { selector: 'h2' })

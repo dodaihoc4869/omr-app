@@ -92,9 +92,12 @@ const BAI: Record<string, { phan: string; de: string; pa?: string[]; ban: BanSoD
         { tieuDe: 'Nhỏ tiếp 50 mL', moTa: 'Bắt đầu sủi bọt khí' },
       ] } },
       chiaKhoa: 'H+: 0,15 mol chia làm 2 phần: 0,1 mol đổi CO3^2- → HCO3-, phần còn lại tạo CO2.',
+      // Hợp đồng chỉ có PHÉP NHÂN (tích thừa số = đáp án, cổng làn C) ⇒ phép trừ nằm trong nghĩa của thừa số đầu.
       buoc: [
-        { ten: 'n_{CO2}', thuaSo: [{ so: '0,15', nghia: 'tổng mol H+ (150 mL × 1 M)' }, { so: '0,1', nghia: 'mol H+ bị dùng trước để đổi 0,1 mol CO3^2- thành HCO3- (trừ đi)' }] },
-        { ten: 'V', thuaSo: [{ so: 'n_{CO2}', nghia: 'mol CO2 ở bước 1' }, { so: '24,79', nghia: 'thể tích 1 mol khí ở đkc (lít)' }] },
+        { ten: 'V', thuaSo: [
+          { so: 'n_{CO2}', nghia: 'mol CO2 = phần H+ còn lại sau khi đổi hết CO3^2- (0,15 − 0,1)', denDay: 'Tới đây là tiền (số mol) nhà CO2.' },
+          { so: '24,79', nghia: 'mỗi mol khí ở đkc chiếm 24,79 lít' },
+        ] },
       ],
     },
   },

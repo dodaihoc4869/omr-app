@@ -1,7 +1,7 @@
 // RUỘT «Chạm để hiểu đề» + «Bắt đầu từ đâu?» — mảnh NẠP LƯỜI của VungChamDe (không vào gói mở app, không precache: kho chạy-lúc).
 // Vỏ (VungChamDe.tsx) giữ khung: khe trên (chú giải) · thân đề (children của màn) · khe dưới (gợi ý) · nút «Bắt đầu từ đâu?».
 // Ruột: bọc chữ đề tại chỗ (boc-chu.ts) · thẻ giải nghĩa (TamGiaiThich) · soi sáng · gợi ý 3 tầng (GoiY3Tang) · chú giải màu.
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import type { BanSoDo, GoiYTraVe, LoaiCham, TheGiaiNghia, VungCham } from '../../lib/goi-y-cham/kieu'
 import { docBanSoDo, taiGoiYSoDo } from '../../lib/goi-y-cham/api'
@@ -9,6 +9,7 @@ import { bocVung, type KetQuaBoc } from './boc-chu'
 import { napTuDien, type TuDien } from './tu-dien'
 import TamGiaiThich, { giuCotPhai, useKieuTam } from './TamGiaiThich'
 import GoiY3Tang, { tangTuBan, tangTuSinh, type TrangThaiGoiY } from './GoiY3Tang'
+import { BieuTuong } from './bieu-tuong'
 import './goi-y-cham.css'
 
 export type CauCham = { qid: string; phan?: string; goiY?: { gach?: string[]; cotLoi?: string } }
@@ -17,10 +18,9 @@ export type RuotChamProps = {
   goc: RefObject<HTMLDivElement | null>
   tren: RefObject<HTMLDivElement | null>
   duoi: RefObject<HTMLDivElement | null>
-  /** em đã mở «Bắt đầu từ đâu?» */
-  mo: boolean
-  dong: () => void
   idGoiY: string
+  onHoTro?: () => void
+  nutBatDau?: (nut: ReactNode) => ReactNode
   tuDien?: TuDien
   taiGoiY?: (qid: string) => Promise<GoiYTraVe | null>
   token?: string
@@ -48,6 +48,19 @@ const sangO = (loai: LoaiCham, tang: number) => loai === 'chat' || loai === 'kho
 
 export function RuotCham(p: RuotChamProps) {
   const { q, goc } = p
+  // «Bắt đầu từ đâu?» (ruột gắn key = qid ⇒ câu mới thì đóng lại). Mở lần đầu ở câu này ⇒ onHoTro (màn ghi assisted); tra nghĩa một chữ thì KHÔNG.
+  const [mo, setMo] = useState(false)
+  const daBao = useRef(false)
+  const dong = useCallback(() => setMo(false), [])
+  const bam = () => {
+    if (!mo && !daBao.current) { daBao.current = true; p.onHoTro?.() }
+    setMo((v) => !v)
+  }
+  const nut = (
+    <button type="button" className="gyc-nut-bat-dau" aria-expanded={mo} aria-controls={p.idGoiY} onClick={bam} data-mo={mo || undefined}>
+      <BieuTuong ten="bulb" />{mo ? 'Đang xem gợi ý' : 'Bắt đầu từ đâu?'}
+    </button>
+  )
   const kieu = useKieuTam()
   const [td, setTd] = useState<TuDien | null>(p.tuDien ?? null)
   useEffect(() => {
@@ -66,7 +79,7 @@ export function RuotCham(p: RuotChamProps) {
     setBoc(kq)
     return () => kq.go()
   }, [td, goc])
-  const the = useMemo<(TheGiaiNghia | null)[]>(() => (boc && td ? boc.vung.map((v, i) => { try { return td.theCho(v, boc.chuKhoi[i]) } catch { return null } }) : []), [boc, td])
+  const the = useMemo<(TheGiaiNghia | null)[]>(() => (boc && td ? boc.vung.map((v) => { try { return td.theCho(v, boc.chuDe) } catch { return null } }) : []), [boc, td])
 
   // ── thẻ giải nghĩa đang mở: {i, ghim}; rê chuột (máy tính) = chưa ghim
   const [mo1, setMo1] = useState<{ i: number; ghim: boolean; phim?: boolean } | null>(null)
@@ -168,17 +181,17 @@ export function RuotCham(p: RuotChamProps) {
       setGy(!r ? { tt: 'loi' } : ban ? { tt: 'co', ban } : { tt: 'khong' })
     }, () => setGy({ tt: 'loi' }))
   }, [p.taiGoiY, p.token, p.phien, q.qid])
-  useEffect(() => { if (p.mo && !gy) tai() }, [p.mo, gy, tai])
+  useEffect(() => { if (mo && !gy) tai() }, [mo, gy, tai])
   // soi sáng: đề mờ, chữ tầng đang nói tới sáng
   useEffect(() => {
     const g = goc.current
     if (!g) return
-    g.classList.toggle('gyc-soi', p.mo && !!boc?.vung.length)
-    boc?.manh.forEach((ds, i) => { const s = p.mo && sangO(boc.vung[i].loai, tang); ds.forEach((x) => x.classList.toggle('gyc-sang', s)) })
+    g.classList.toggle('gyc-soi', mo && !!boc?.vung.length)
+    boc?.manh.forEach((ds, i) => { const s = mo && sangO(boc.vung[i].loai, tang); ds.forEach((x) => x.classList.toggle('gyc-sang', s)) })
     return () => g.classList.remove('gyc-soi')
-  }, [p.mo, tang, boc, goc])
+  }, [mo, tang, boc, goc])
   // ≥ 640px: gợi ý ở cột phải ⇒ báo khung màn chừa chỗ (biến --gyc-cot-phai trên <html>)
-  useEffect(() => (p.mo ? giuCotPhai() : undefined), [p.mo])
+  useEffect(() => (mo ? giuCotPhai() : undefined), [mo])
 
   const chuCua = (loai: LoaiCham) => [...new Set((boc?.vung ?? []).filter((v) => v.loai === loai).map((v) => v.chu.trim()).filter(Boolean))]
   const tangDs = gy?.tt === 'co' && gy.ban ? tangTuBan(gy.ban) : tangTuSinh(chuCua('cho'), chuCua('hoi'), chuCua('chat'), q.goiY)
@@ -206,11 +219,12 @@ export function RuotCham(p: RuotChamProps) {
   const theMo = mo1 && the[mo1.i]
   return (
     <>
-      {p.tren.current && chuGiai && createPortal(chuGiai, p.tren.current)}
-      {p.duoi.current && p.mo && createPortal(
+      {p.tren.current && createPortal(<>{!p.nutBatDau && <div className="gyc-hang-nut">{nut}</div>}{chuGiai}</>, p.tren.current)}
+      {p.nutBatDau?.(nut)}
+      {p.duoi.current && mo && createPortal(
         <GoiY3Tang
           id={p.idGoiY} tangDs={tangDs} trangThai={gy?.tt ?? 'tai'} mo={tang} coPhepTinh={coPhepTinh}
-          onTiep={() => setTang((t) => Math.min(t + 1, tangDs.length))} onXong={p.dong} onDong={p.dong} onThuLai={tai}
+          onTiep={() => setTang((t) => Math.min(t + 1, tangDs.length))} onXong={dong} onDong={dong} onThuLai={tai}
         />, p.duoi.current)}
       {theMo && boc && (
         <TamGiaiThich

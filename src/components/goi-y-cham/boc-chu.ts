@@ -46,11 +46,11 @@ export function lamSachVung(ds: unknown, dai: number): VungCham[] {
   return ra
 }
 
-export type KetQuaBoc = { vung: VungCham[]; /** chữ của khối chứa từng vùng (cho `theCho` đọc nguyên tử khối đề cho) */ chuKhoi: string[]; manh: HTMLElement[][]; go: () => void }
+export type KetQuaBoc = { vung: VungCham[]; /** chữ TOÀN đề (mọi khối nối bằng xuống dòng) — `theCho` đọc «Cho nguyên tử khối …» dù nó nằm ở đoạn khác */ chuDe: string; manh: HTMLElement[][]; go: () => void }
 
 /**
  * Tìm vùng trong từng khối chữ dưới `goc` (hàm `phatHien` của làn A) rồi bọc từng vùng.
- * `loc(ds)`: bỏ bớt vùng theo luật của màn (vd câu lý thuyết chỉ giữ «Đề hỏi»). `chamDuoc(v, chu)` = vùng có thẻ giải nghĩa (mảnh đầu nhận Tab).
+ * `loc(ds)`: bỏ bớt vùng theo luật của màn (vd câu lý thuyết chỉ giữ «Đề hỏi»). `chamDuoc(v, chuDe)` = vùng có thẻ giải nghĩa (mảnh đầu nhận Tab).
  * Lỗi bất kỳ ⇒ trả DOM nguyên trạng, không vùng nào (đề vẫn hiện trơn).
  */
 export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[], chamDuoc: (v: VungCham, chu: string) => boolean, loc: (ds: VungCham[]) => VungCham[] = (x) => x): KetQuaBoc {
@@ -79,7 +79,7 @@ export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[],
     })
     const giu = new Set(loc(tim.map((x) => x.v)))
     const chon = tim.filter((x) => giu.has(x.v))
-    const vung = chon.map((x) => x.v), chuKhoi = chon.map((x) => khoi[x.k].chu)
+    const vung = chon.map((x) => x.v), chuDe = khoi.map((x) => x.chu).join('\n')
     const manh: HTMLElement[][] = vung.map(() => [])
     // Đi TỪ CUỐI lên: tách đuôi một nút chữ không làm lệch vị trí phần đầu của chính nút ấy (nút gốc luôn giữ phần đầu).
     for (let i = vung.length - 1; i >= 0; i--) {
@@ -113,7 +113,7 @@ export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[],
       if (!ds.length) return
       if (ds.length > 1) { ds[0].classList.add('gyc-dau'); ds[ds.length - 1].classList.add('gyc-cuoi'); ds.forEach((s) => s.classList.add('gyc-nhieu')) }
       if (v.loai === 'khoa') ds.forEach((s) => s.classList.add('gyc-dam'))
-      if (!chamDuoc(v, chuKhoi[i])) return
+      if (!chamDuoc(v, chuDe)) return
       ds.forEach((s) => s.classList.add('gyc-cham'))
       const dau = ds[0]
       dau.tabIndex = 0
@@ -122,9 +122,9 @@ export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[],
       dau.setAttribute('aria-expanded', 'false')
       dau.setAttribute('aria-label', `${v.chu || ds.map((s) => s.textContent).join('')}: chạm để xem giải nghĩa`)
     })
-    return { vung, chuKhoi, manh, go }
+    return { vung, chuDe, manh, go }
   } catch {
     go()
-    return { vung: [], chuKhoi: [], manh: [], go }
+    return { vung: [], chuDe: '', manh: [], go }
   }
 }

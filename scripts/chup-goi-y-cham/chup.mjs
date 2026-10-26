@@ -47,7 +47,7 @@ const CANH = [
   { ten: '7-so-do-xuoi', bai: 'pyrite', lam: async (t) => { await moGoiY(t, 3); await t.getByRole('button', { name: 'Thừa số 4: 2' }).click() } },
   { ten: '7b-tom-tat-can-canh', bai: 'pyrite', lam: async (t) => { await moGoiY(t, 2); await t.locator('.gyc-sd').scrollIntoViewIfNeeded() }, chiPhan: '.gyc-tang:nth-of-type(2), .gyc-goi-y .gyc-tang + .gyc-tang' },
   { ten: '8-so-do-nguoc', bai: 'nguoc', lam: async (t) => { await moGoiY(t, 3); await t.getByRole('button', { name: 'Thừa số 7: 100/80' }).click() } },
-  { ten: '9-hien-tuong', bai: 'hcl', lam: async (t) => { await moGoiY(t, 3); await t.getByRole('button', { name: 'Thừa số 2: 0,1' }).click() } },
+  { ten: '9-hien-tuong', bai: 'hcl', lam: async (t) => { await moGoiY(t, 3); await t.getByRole('button', { name: 'Thừa số 1: n_{CO2}' }).click() } },
   { ten: '10-loi-giai-so-do', bai: 'loigiai', cho: (t) => t.getByText('Tóm tắt của thầy Đỗ Đại Học').waitFor(), lam: async (t) => { await t.getByRole('button', { name: 'Thừa số 6: 90/100' }).click() } },
 ]
 

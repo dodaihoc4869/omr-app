@@ -511,7 +511,7 @@ export default defineConfig({
             { name: 'app-nho', test: /src[\\/](?:store[\\/]appStore|lib[\\/](?:bo-cau-chuan|bo-cau-tu-bai-lam|cau-hinh-chua|chi-tiet-cau|classlist-db|exam-assign|exam-shuffle|nhan-xet-theo-ca)|components[\\/]NutPhieuHtml)\.tsx?$|node_modules[\\/]zustand[\\/]/, includeDependenciesRecursively: false },
             // 26/10 «Chạm để hiểu đề»: gom ruột (components/goi-y-cham, trừ vỏ VungChamDe + cầu nối thay-bang-so-do — hai tệp nhỏ ấy ở mảnh nơi gọi) + api thành MỘT mảnh, từ điển làn A (lib/goi-y-cham) một mảnh —
             // không kéo theo chem-format / hoa2-api ra khỏi mảnh cũ (includeDependenciesRecursively: false) ⇒ các đường khác không đổi byte.
-            { name: 'goi-y-cham', test: /src[\\/](?:components[\\/]goi-y-cham[\\/](?!VungChamDe\.tsx|vung-cham-de\.css|thay-bang-so-do\.tsx)[^\\/]+|lib[\\/]goi-y-cham[\\/]api\.ts)$/, includeDependenciesRecursively: false },
+            { name: 'goi-y-cham', test: /src[\\/](?:components[\\/]goi-y-cham[\\/](?!VungChamDe\.tsx|thay-bang-so-do\.tsx)[^\\/]+|lib[\\/]goi-y-cham[\\/]api\.ts)$/, includeDependenciesRecursively: false },
             { name: 'tu-dien-cham', test: /src[\\/]lib[\\/]goi-y-cham[\\/](?!api\.ts|kieu\.ts)[^\\/]+$/, includeDependenciesRecursively: false },
             // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng
             // (+2,4 KB nén cho app học sinh vì mỗi tệp nén riêng) ⇒ gom lại vào CÙNG mảnh DesignSystem (học sinh / thầy đều nạp sẵn).

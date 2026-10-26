@@ -177,6 +177,12 @@ describe('lõi THẬT của làn A (không truyền tuDien)', () => {
     expect(the.textContent).toContain('M = 40 g/mol')
   })
 
+  it('nguyên tử khối đề cho ở ĐOẠN KHÁC vẫn được dùng để tính M (Na = 24 ⇒ NaOH 41)', async () => {
+    render(<VungChamDe q={{ qid: 'ntk' }}><div><p><ChemText text="Cho 4 gam NaOH vào nước được 100 mL dung dịch. Tính nồng độ mol." /></p><p><ChemText text="Cho nguyên tử khối: Na = 24; O = 16; H = 1." /></p></div></VungChamDe>)
+    fireEvent.click(await screen.findByText('NaOH', { selector: '.gyc-v' }, { timeout: 4000 }))
+    expect((await screen.findByRole('dialog')).textContent).toContain('M = 41 g/mol')
+  })
+
   it('câu lý thuyết (không số liệu): chỉ tô «Đề hỏi», không tô chất / từ then chốt', async () => {
     const { container } = render(<VungChamDe q={{ qid: 'lt' }}><p><ChemText text="Phát biểu nào sau đây không đúng về khí nitrogen N2 khi đun nóng?" /></p></VungChamDe>)
     await waitFor(() => expect(container.querySelector('.gyc-hoi')).not.toBeNull(), { timeout: 4000 })
