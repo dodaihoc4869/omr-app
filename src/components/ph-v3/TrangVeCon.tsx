@@ -26,7 +26,7 @@ import type { Mau } from './dung-chung'
 import { chuThay } from './tien-ich'
 import './trang-con.css'
 
-const TheKiemTraCon = lazy(() => import('./TheKiemTraCon'))
+export const TheKiemTraCon = lazy(() => import('./TheKiemTraCon'))
 
 // ---------------------------------------------------------------- các phần trên trang ----------------------------------------------------------------
 export type IdPhan = 'hom-nay' | 'nhip' | 'thai-do' | 'cau-sai' | 'thoi-gian' | 'kiem-tra' | 'btvn' | 'buoi-hoc' | 'lich-su'
@@ -364,7 +364,7 @@ export function DauThe({ id, bt, mau, tieuDe, phu, chip }: { id: string; bt: Rea
 
 // ---------------------------------------------------------------- 1 · Hôm nay ----------------------------------------------------------------
 /** Số câu hôm nay từ MỘT nguồn (như trước): tổng quan (đã làm / mức tối thiểu) ⇒ kế hoạch Game Hoá 2.0 ⇒ câu đã làm + mục tiêu ngày. */
-function soHomNay(pm: PhMoi, hoc2: Hoc2 | null, tq: ConTongQuan | null): { daLam: number; tong: number | null; xap: string; dich: string; du: string } {
+export function soHomNay(pm: PhMoi, hoc2: Hoc2 | null, tq: ConTongQuan | null): { daLam: number; tong: number | null; xap: string; dich: string; du: string } {
   const n = homNayTq(tq)
   if (n) return { daLam: n.daLam, tong: n.canLam, xap: n.mucUocTinh ? '≈' : '', dich: 'mức tối thiểu của ngày', du: 'đủ mức hôm nay' }
   if (hoc2?.homNay) return { daLam: hoc2.homNay.daLam, tong: hoc2.homNay.tong, xap: '', dich: 'kế hoạch hôm nay', du: 'xong kế hoạch hôm nay' }
@@ -372,7 +372,7 @@ function soHomNay(pm: PhMoi, hoc2: Hoc2 | null, tq: ConTongQuan | null): { daLam
   return { daLam: pm.tongQuan?.soCau ?? 0, tong: muc && muc > 0 ? muc : null, xap: '', dich: 'mục tiêu của ngày', du: 'đủ mục tiêu của ngày' }
 }
 
-function HomNay({ pm, hoc2, tq, k, nowMs }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTongQuan | null; k: KetQuaNhipHocApp | null; nowMs: number }) {
+export function HomNay({ pm, hoc2, tq, k, nowMs }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTongQuan | null; k: KetQuaNhipHocApp | null; nowMs: number }) {
   const so = soHomNay(pm, hoc2, tq)
   const nTq = homNayTq(tq)
   const ti = so.tong ? Math.max(0, Math.min(1, so.daLam / so.tong)) : null
@@ -453,7 +453,7 @@ function HomNay({ pm, hoc2, tq, k, nowMs }: { pm: PhMoi; hoc2: Hoc2 | null; tq: 
 }
 
 // ---------------------------------------------------------------- 2 · Cần nhắc con ----------------------------------------------------------------
-function CanNhac({ tai, pm, nowMs }: { tai: TaiTq; pm: PhMoi; nowMs: number }) {
+export function CanNhac({ tai, pm, nowMs }: { tai: TaiTq; pm: PhMoi; nowMs: number }) {
   const ds = dongCanNhac(tai.v, pm, nowMs)
   if (!tai.v && !tai.daTai) return <div className="tvc-the tvc-cho tt-xuong" data-thu="2" data-vung="goi-y-dang-tai" aria-hidden="true" />
   // Máy chủ cũ chưa có `/ph/con-tong-quan` và không có lịch ôn / bài tập đang chạy ⇒ không có gì để nói ⇒ khối vắng (không câu "chưa có gì" giả).
@@ -483,7 +483,7 @@ const CHU_GIAI: { loai: LoaiO; ten: string }[] = [
   { loai: 'du', ten: 'Đủ mức' }, { loai: 'it', ten: 'Thiếu ít' }, { loai: 'nhieu', ten: 'Thiếu nhiều' }, { loai: 'khong', ten: 'Không làm' }, { loai: 'nay', ten: 'Hôm nay' },
 ]
 
-function NhipHoc({ pm, tq, nhip }: { pm: PhMoi; tq: ConTongQuan | null; nhip: TaiNhip }) {
+export function NhipHoc({ pm, tq, nhip }: { pm: PhMoi; tq: ConTongQuan | null; nhip: TaiNhip }) {
   const nTq = homNayTq(tq)
   const k = nhip.k ? nhipTheoSanh(nhip.k, nTq ? { muc: nTq.canLam, daLam: nTq.daLam } : null) : null
   if (!k) {
@@ -548,7 +548,7 @@ function NhipHoc({ pm, tq, nhip }: { pm: PhMoi; tq: ConTongQuan | null; nhip: Ta
 }
 
 // ---------------------------------------------------------------- 4 · Nhận xét của thầy · cảnh báo ----------------------------------------------------------------
-function LoiThay({ loiThay, thuLai }: { loiThay: { ds: NhanXetCa[] | null; chuLoi: string }; thuLai: () => void }) {
+export function LoiThay({ loiThay, thuLai }: { loiThay: { ds: NhanXetCa[] | null; chuLoi: string }; thuLai: () => void }) {
   if (loiThay.chuLoi && !loiThay.ds)
     return <section className="tvc-the tvc-loi-thay" data-thu="4" aria-label="Nhận xét của thầy"><LoiThe chu={loiThay.chuLoi} thuLai={thuLai} nut="Thử lại nhận xét" /></section>
   if (!loiThay.ds) return null
@@ -570,7 +570,7 @@ function LoiThay({ loiThay, thuLai }: { loiThay: { ds: NhanXetCa[] | null; chuLo
   )
 }
 
-function CanhBao({ cb, nay, onDaXem }: { cb: CanhBaoThay; nay: number; onDaXem: (id: string) => void }) {
+export function CanhBao({ cb, nay, onDaXem }: { cb: CanhBaoThay; nay: number; onDaXem: (id: string) => void }) {
   return (
     <section className="tvc-the tvc-canh-bao" data-thu="2" aria-label="Cảnh báo của thầy" data-vung="canh-bao-thay">
       <div className="tvc-canh-bao-dau"><BtChuong co={18} />Cảnh báo của thầy · {chuGuiLuc(cb)}</div>
