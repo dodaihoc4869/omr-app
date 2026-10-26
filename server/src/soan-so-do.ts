@@ -235,6 +235,8 @@ interface ThamSoDayDu extends ThamSoSoDo {
   choChayGioCaoDiem?: boolean
   /** VÒNG SỬA: chỉ soạn lại các câu đang `lech` / `lo_dap_an` trong bảng (tự bật `lamLai`) */
   chiSuaLoi?: boolean
+  /** chỉ quét một phần (vd 'I' để soạn lại Phần I sau khi sửa cổng đọc phương án 26/10) */
+  chiPhan?: 'I' | 'III'
 }
 type KetCuoi = KetQuaCong | 'hong' | 'loi_goi'
 export interface DongKetQua {
@@ -270,7 +272,7 @@ function docThamSo(t: unknown): ThamSoDayDu | string {
     ...(qids ? { qids } : {}), gioiHan: kep(o.gioiHan, 10, 1, 50), chiCauSaiNhieu: o.chiCauSaiNhieu === true, thuKhong: o.thuKhong === true,
     conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 8),
     nganSachGiay: kep(o.nganSachGiay, 40, 5, 110), soEmToiThieu: kep(o.soEmToiThieu, SO_EM_SAI_TOI_THIEU, 1, 1000), choChayGioCaoDiem: o.choChayGioCaoDiem === true,
-    chiSuaLoi: o.chiSuaLoi === true, ...(o.chiSuaLoi === true ? { lamLai: true } : {}), tuSuaDapAn: o.tuSuaDapAn !== false,
+    chiSuaLoi: o.chiSuaLoi === true, ...(o.chiPhan === 'I' || o.chiPhan === 'III' ? { chiPhan: o.chiPhan } : {}), ...(o.chiSuaLoi === true ? { lamLai: true } : {}), tuSuaDapAn: o.tuSuaDapAn !== false,
   }
 }
 
@@ -320,7 +322,7 @@ async function gomHang(env: Env, ts: ThamSoDayDu, het: () => boolean): Promise<{
   const [m0, q0] = (ts.conTro ?? '').includes('|') ? (ts.conTro ?? '').split('|') as [string, string] : ['', '']
   let maDe = m0, qid = q0, daQuet = 0, nguonHet = false
   while (canLam < (ts.gioiHan ?? 10) && daQuet < TRAN_QUET && !het()) {
-    const r = await env.DB.prepare(`${SQL_CAU} AND json_extract(q.json, '$.phan') IN ('I', 'III') AND (q.ma_de > ? OR (q.ma_de = ? AND q.qid > ?))
+    const r = await env.DB.prepare(`${SQL_CAU} AND json_extract(q.json, '$.phan') IN (${ts.chiPhan ? `'${ts.chiPhan}'` : `'I', 'III'`}) AND (q.ma_de > ? OR (q.ma_de = ? AND q.qid > ?))
       ORDER BY q.ma_de, q.qid LIMIT ${TRANG_QUET}`).bind(maDe, maDe, qid).all<Obj>()
     const dong = r.results ?? []
     if (!dong.length) { nguonHet = true; break }

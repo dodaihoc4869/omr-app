@@ -30,6 +30,15 @@ on:
         description: 'Tên mô hình Gemini (để trống = mặc định của máy chủ)'
         required: false
         default: ''
+      lamLai:
+        description: 'Soạn lại cả câu đã soạn (bản đạt không bị hạ)'
+        type: boolean
+        required: false
+        default: false
+      chiPhan:
+        description: 'Chỉ quét một phần: I hoặc III (để trống = cả hai)'
+        required: false
+        default: ''
       choGioCaoDiem:
         description: 'Cho chạy cả 19–24h giờ VN (thầy 26/10: «Soạn luôn bây giờ, soạn liên tục tới lúc xong»)'
         type: boolean
@@ -68,6 +77,8 @@ jobs:
           IN_SAI_NHIEU: ${{ inputs.chiCauSaiNhieu }}
           IN_MODEL: ${{ inputs.model }}
           IN_CAO_DIEM: ${{ inputs.choGioCaoDiem }}
+          IN_LAM_LAI: ${{ inputs.lamLai }}
+          IN_CHI_PHAN: ${{ inputs.chiPhan }}
         run: |
           node --input-type=module <<'JS'
           const MAY_CHU = process.env.OMR_MAY_CHU.replace(/\/$/, '')
@@ -78,6 +89,8 @@ jobs:
           const chiCauSaiNhieu = !qids.length && process.env.IN_SAI_NHIEU === 'true'
           const model = (process.env.IN_MODEL || '').trim()
           const choChayGioCaoDiem = process.env.IN_CAO_DIEM === 'true'
+          const lamLai = process.env.IN_LAM_LAI === 'true'
+          const chiPhan = ['I', 'III'].includes(process.env.IN_CHI_PHAN || '') ? process.env.IN_CHI_PHAN : ''
           const MOI_LUOT = 8
           const dem = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0, nghi_dap_an: 0, da_sua_dap_an: 0 }
           const qidDaSua = []
@@ -90,7 +103,7 @@ jobs:
           for (;;) {
           while (!xong && daSoan < tong && luot < 1500) {
             luot++
-            const body = { ...(vongSua ? { chiSuaLoi: true } : {}), gioiHan: Math.min(MOI_LUOT, tong - daSoan), thuKhong, conTro, ...(qids.length ? { qids } : {}), ...(chiCauSaiNhieu ? { chiCauSaiNhieu } : {}), ...(model ? { model } : {}), ...(choChayGioCaoDiem ? { choChayGioCaoDiem } : {}) }
+            const body = { ...(vongSua ? { chiSuaLoi: true } : {}), gioiHan: Math.min(MOI_LUOT, tong - daSoan), thuKhong, conTro, ...(qids.length ? { qids } : {}), ...(chiCauSaiNhieu ? { chiCauSaiNhieu } : {}), ...(model ? { model } : {}), ...(choChayGioCaoDiem ? { choChayGioCaoDiem } : {}), ...(lamLai && !vongSua ? { lamLai } : {}), ...(chiPhan ? { chiPhan } : {}) }
             let r, j
             for (let thu = 1; thu <= 3; thu++) {
               try {
