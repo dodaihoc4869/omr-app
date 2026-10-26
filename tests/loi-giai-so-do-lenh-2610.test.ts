@@ -28,7 +28,7 @@ function banXuoi(qid = Q): BanSoDo {
       ten: 'm', donVi: 'kg', ketQua: '76,8',
       thuaSo: [
         { so: '10^6', nghia: 'đổi tấn ra gam' }, { so: '8/100', nghia: 'phần FeS_2' }, { so: '1/120', nghia: 'đổi ra tiền nhà FeS_2' },
-        { so: '2', nghia: 'nhà SO_2 giàu gấp đôi' }, { so: '64', nghia: 'mol ra gam' }, { so: '90/100', nghia: 'đánh thuế' }, { so: '1/1000', nghia: 'gam ra kg' },
+        { so: '2', nghia: 'bảo toàn S: ra 2 SO_2' }, { so: '64', nghia: 'mol ra gam' }, { so: '90/100', nghia: 'đánh thuế' }, { so: '1/1000', nghia: 'gam ra kg' },
       ],
     }],
     ketQua: '76,8',

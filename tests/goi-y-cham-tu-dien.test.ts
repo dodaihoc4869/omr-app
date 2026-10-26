@@ -148,9 +148,10 @@ describe('thẻ đơn vị', () => {
     }
     expect(theDonVi('khong-co')).toBeNull()
   })
-  it('câu dính tới mol nói theo tư duy «số mol là tiền»', () => {
-    for (const ma of ['mol', 'g', 'M', 'dkc', 'g/mol']) expect(JSON.stringify(theDonVi(ma, '1 x'))).toMatch(/tiền/)
-    expect(JSON.stringify(theDonVi('%H', '80%'))).toMatch(/đánh thuế.*H\/100.*100\/H/)
+  // Thầy 26/10: «Tạm thời bỏ tư duy tiền nhà» ⇒ nói thẳng bằng thuật ngữ, không ẩn dụ tiền / nhà / thuế.
+  it('câu dính tới mol nói thẳng bằng thuật ngữ (tạm bỏ ẩn dụ tiền nhà)', () => {
+    for (const ma of ['mol', 'g', 'M', 'dkc', 'g/mol', '%H', 'L', 'kg', 'A']) expect(JSON.stringify(theDonVi(ma, '1 x'))).not.toMatch(/tiền|nhà |giàu|thuế|\bmua\b/)
+    expect(JSON.stringify(theDonVi('%H', '80%'))).toMatch(/xuôi.*H\/100.*ngược.*100\/H/)
   })
 })
 
@@ -168,7 +169,9 @@ describe('từ then chốt', () => {
     expect(t.doan[1]).toBe('Gặp «cô cạn» ⇒ tự hỏi: Chất rắn gồm những gì? Có chất nào dư (như NaOH) còn lại không?')
     expect(theThenChot('khong-co')).toBeNull()
   })
-  it('hiệu suất nói theo «đánh thuế»', () => {
-    expect(theThenChot('hieu-suat')!.doan.join(' ')).toMatch(/đánh thuế/)
+  it('hiệu suất nói thẳng xuôi / ngược (tạm bỏ «đánh thuế», thầy 26/10)', () => {
+    const t = theThenChot('hieu-suat')!.doan.join(' ')
+    expect(t).not.toMatch(/thuế|tiền/)
+    expect(t).toMatch(/xuôi.*H\/100.*ngược.*100\/H/)
   })
 })

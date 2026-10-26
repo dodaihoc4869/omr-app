@@ -24,7 +24,7 @@ describe('mở dần 3 tầng + soi sáng', () => {
     fireEvent.click(nut)
     expect(onHoTro).toHaveBeenCalledTimes(1)
     expect(tai).toHaveBeenCalledWith('q-pyrite')
-    await screen.findByText(/Số mol là tiền/)
+    await screen.findByText(/Theo dấu nguyên tố S/)
     expect(screen.getByLabelText('Gợi ý 2 còn khoá')).toBeTruthy()
     expect(screen.getByLabelText('Gợi ý 3 còn khoá')).toBeTruthy()
     expect(screen.getByRole('img', { name: 'Đã mở 1 trên 3 gợi ý' })).toBeTruthy()
@@ -56,7 +56,7 @@ describe('mở dần 3 tầng + soi sáng', () => {
   it('chạm thừa số «2» ⇒ ba số trước sáng (✓), «2» đặc, các số sau mờ; bóng nói nghĩa', async () => {
     render(<VungChamDe q={{ qid: 'q-pyrite' }} tuDien={TU_DIEN_GIA} taiGoiY={async () => BAN_LO}><De text={DE_PYRITE} /></VungChamDe>)
     fireEvent.click((await screen.findByRole('button', { name: /Bắt đầu từ đâu/ })))
-    await screen.findByText(/Số mol là tiền/)
+    await screen.findByText(/Theo dấu nguyên tố S/)
     fireEvent.click(screen.getByRole('button', { name: /Gợi ý tiếp/ }))
     fireEvent.click(screen.getByRole('button', { name: /Gợi ý tiếp/ }))
     expect(document.querySelector('.gyc-bong-so')!.textContent).toContain('Chạm từng số')
@@ -68,7 +68,7 @@ describe('mở dần 3 tầng + soi sáng', () => {
     expect(so2.getAttribute('aria-pressed')).toBe('true')
     expect(thua.slice(4).every((t) => t.classList.contains('gyc-sau'))).toBe(true)
     const bong = document.querySelector('.gyc-bong-so')!.textContent!
-    expect(bong).toContain('giàu gấp 2')
+    expect(bong).toContain('bảo toàn S')
     expect(bong).toContain('tới đây là: số mol SO')
     expect(document.querySelectorAll('.gyc-dong-yn.gyc-qua svg').length).toBe(3)
     // phân số vẽ chồng (tử / mẫu)

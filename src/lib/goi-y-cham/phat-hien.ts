@@ -14,7 +14,18 @@ const UU_TIEN: Record<LoaiCham, number> = { hoi: 0, cho: 1, chat: 2, khoa: 3 }
 const thoat = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 /** Mẫu regex từ chữ thô, đã chuẩn hoá như chữ đề (thường, đ→d, dấu thanh kiểu mới). */
 const mau = (s: string) => thoat(chuanChu(s))
-const BIEN_TRAI = '(?<![\\p{L}\\p{N}])'
+// KHÔNG dùng regex nhìn-lùi (iPhone iOS < 16.4 báo lỗi cú pháp ⇒ cả mảnh nạp lười chết; tests/khong-nhin-lui-safari-cu-2909.test.ts).
+// Biên trái kiểm bằng tay: khớp chỉ hợp lệ khi ký tự ngay trước KHÔNG thuộc `truocCam`.
+const BIEN_TRAI = ''
+const CHU_SO = /[\p{L}\p{N}]/u
+function* khopBien(re: RegExp, s: string, truocCam: RegExp = CHU_SO): Generator<RegExpMatchArray> {
+  const g = re.global ? re : new RegExp(re.source, re.flags + 'g')
+  for (const m of s.matchAll(g)) if (!(m.index! > 0 && truocCam.test(s[m.index! - 1]))) yield m
+}
+function khopDau(re: RegExp, s: string, truocCam: RegExp = CHU_SO): RegExpMatchArray | null {
+  for (const m of khopBien(re, s, truocCam)) return m
+  return null
+}
 const BIEN_PHAI = '(?![\\p{L}\\p{N}])'
 
 // ───────────── Số + đơn vị ─────────────
@@ -22,10 +33,11 @@ const SO = String.raw`\d+(?:[.,]\d+)*(?:\s*[×x.·*]\s*10\s*(?:\^\s*\(?[-−–+
 let _reDonVi: RegExp | null = null
 const reDonVi = () =>
   (_reDonVi ??= new RegExp(
-    `(?<![\\p{L}\\p{N}_.,^])(${SO})([ \\u00a0]?)(${[...CACH_VIET_DON_VI].sort((a, b) => b[0].length - a[0].length).map(([v]) => thoat(v)).join('|')})${BIEN_PHAI}`,
+    `(${SO})([ \\u00a0]?)(${[...CACH_VIET_DON_VI].sort((a, b) => b[0].length - a[0].length).map(([v]) => thoat(v)).join('|')})${BIEN_PHAI}`,
     'gu',
   ))
 const MA_DON_VI = new Map(CACH_VIET_DON_VI)
+const TRUOC_SO_CAM = /[\p{L}\p{N}_.,^]/u
 
 const RE_DIEN = new RegExp(['điện phân', 'dòng điện', 'cường độ', 'ampe'].map(mau).join('|'), 'u')
 const RE_PT_C = new RegExp(`c%|${mau('nồng độ')}`, 'u')
@@ -33,7 +45,7 @@ const RE_DD = new RegExp(mau('dung dịch'), 'u') // «dung dịch H2SO4 9,8%» 
 
 function doSoDonVi(t: string, lc: string, ra: UngVien[]) {
   const coDien = RE_DIEN.test(lc)
-  for (const m of t.matchAll(reDonVi())) {
+  for (const m of khopBien(reDonVi(), t, TRUOC_SO_CAM)) {
     const [, , cach, dv] = m
     let ma = MA_DON_VI.get(dv)!
     if ((dv === 's' || dv === 'h') && cach) continue // «s», «h» chỉ nhận khi viết liền số: «1930s», «2h»
@@ -46,14 +58,14 @@ function doSoDonVi(t: string, lc: string, ra: UngVien[]) {
     ra.push({ loai: 'cho', tu, den: tu + m[0].length, khoa: ma })
   }
   const reDk = new RegExp(`${BIEN_TRAI}(${mau('đkc')}|${mau('đktc')}|${mau('điều kiện tiêu chuẩn')}|${mau('điều kiện chuẩn')})${BIEN_PHAI}`, 'gu')
-  for (const m of lc.matchAll(reDk)) {
+  for (const m of khopBien(reDk, lc)) {
     const k = m[1] === 'dkc' || m[1] === mau('điều kiện chuẩn') ? 'dkc' : 'dktc'
     ra.push({ loai: 'cho', tu: m.index!, den: m.index! + m[0].length, khoa: k })
   }
 }
 
 // ───────────── Công thức + tên chất ─────────────
-const RE_CT = /(?<![\p{L}])[A-Z([](?:[A-Za-z0-9()[\]]|[=≡-](?=[A-Z([]))*(?:[·.*•]\d*H2O)?(?:\^?\d?[+-]|[⁰¹²³⁴⁵⁶⁷⁸⁹]*[⁺⁻])?(?![\p{L}\p{N}])/gu
+const RE_CT = /[A-Z([](?:[A-Za-z0-9()[\]]|[=≡-](?=[A-Z([]))*(?:[·.*•]\d*H2O)?(?:\^?\d?[+-]|[⁰¹²³⁴⁵⁶⁷⁸⁹]*[⁺⁻])?(?![\p{L}\p{N}])/gu
 const CHAN = new Set(['HCHC', 'CHC', 'HC', 'CH'])
 const LA_MA = /\((?:I{1,3}|IV|VI{0,3})\)/
 
@@ -70,7 +82,7 @@ function hopLeDeTo(goc: string): boolean {
 }
 
 function doCongThuc(t: string, f: string, lc: string, ra: UngVien[]) {
-  for (const m of f.matchAll(RE_CT)) {
+  for (const m of khopBien(RE_CT, f, /\p{L}/u)) {
     let tu = m.index!
     let c = m[0]
     // số La Mã: «Fe(III)» ⇒ chỉ lấy «Fe»
@@ -106,7 +118,7 @@ const reTen = () =>
 const KHONG_PHAI_CHAT_SAU = new Map([['oxi', / hoá/y], ['hidro', / hoá/y]])
 
 function doTenChat(lc: string, ra: UngVien[]) {
-  for (const m of lc.matchAll(reTen())) {
+  for (const m of khopBien(reTen(), lc)) {
     const den = m.index! + m[0].length
     const cam = KHONG_PHAI_CHAT_SAU.get(m[1])
     if (cam) { cam.lastIndex = den; if (cam.test(lc)) continue }
@@ -127,7 +139,7 @@ function reKhoa() {
 }
 function doThenChot(lc: string, ra: UngVien[]) {
   const { re, ma } = reKhoa()
-  for (const m of lc.matchAll(re)) ra.push({ loai: 'khoa', tu: m.index!, den: m.index! + m[0].length, khoa: ma.get(m[1]) })
+  for (const m of khopBien(re, lc)) ra.push({ loai: 'khoa', tu: m.index!, den: m.index! + m[0].length, khoa: ma.get(m[1]) })
 }
 
 // ───────────── Đề hỏi ─────────────
@@ -170,14 +182,14 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
     while (s < e && /\s/.test(t[s])) s++
     if (s >= e) continue
     const doan = lc.slice(s, e)
-    const nao = RE_NAO.exec(doan)
+    const nao = khopDau(RE_NAO, doan)
     const dau = RE_DAU.test(doan)
-    const bn = RE_BAO_NHIEU.exec(doan)
-    const laCuoi = RE_LA_CUOI.test(doan)
+    const bn = khopDau(RE_BAO_NHIEU, doan)
+    const laCuoi = !!khopDau(RE_LA_CUOI, doan)
     const hoiCham = /\?\s*$/.test(t.slice(a, b).replace(/\([^()]*\)\s*$/, '').trimEnd())
     if (!nao && !dau && !bn && !laCuoi && !hoiCham) continue
     // 1) bẫy phủ định: chỉ tô cụm bẫy (bản vẽ màn 5)
-    const bay = [...doan.matchAll(RE_BAY)]
+    const bay = [...khopBien(RE_BAY, doan)]
     if (bay.length) {
       // chọn MỘT phương án sai ('phu-dinh') · đếm số ý sai ('phu-dinh-dem') · hỏi chung ('phu-dinh-chung', vd Đ/S)
       const khoaBay = RE_SO_DEM.test(doan) ? 'phu-dinh-dem' : nao || laCuoi ? 'phu-dinh' : 'phu-dinh-chung'
@@ -196,7 +208,7 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
     if (nao) {
       den = s + nao.index! + nao[0].length
       const md = cuoiMenhDe(s + nao.index!)
-      const dc = RE_DAU_CAU.exec(lc.slice(md, s + nao.index!))
+      const dc = khopDau(RE_DAU_CAU, lc.slice(md, s + nao.index!))
       if (dc) tu = md + dc.index!
       else {
         // tối đa 2 chữ đứng trước «nào sau đây»
@@ -213,7 +225,7 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
     } else {
       den = bn ? s + bn.index! + bn[0].length : e
       const md = cuoiMenhDe(bn ? s + bn.index! : e)
-      const dc = RE_DAU_CAU.exec(lc.slice(md, den))
+      const dc = khopDau(RE_DAU_CAU, lc.slice(md, den))
       khoa = dc && lc.startsWith(mau('giá trị'), md + dc.index!) ? 'gia-tri' : bn ? 'bao-nhieu' : laCuoi ? 'la' : 'cau-hoi'
       if (dc) tu = md + dc.index!
       else {
@@ -225,7 +237,7 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
     // không nuốt số liệu / chất: tách thành phần đầu (trước vùng 'cho'/'chat' đầu tiên) và phần đuôi (sau vùng cuối)
     const day = (x: number, y: number, laDuoi = false) => {
       // phần đuôi chỉ giữ khi tự đủ nghĩa («là bao nhiêu kg»), bỏ chữ «là» trơ trọi
-      if (laDuoi && !RE_BAO_NHIEU.test(lc.slice(x, y)) && lc.slice(x, y).replace(new RegExp(`${BIEN_TRAI}${mau('là')}${BIEN_PHAI}`, 'gu'), '').trim().split(/\s+/).filter(Boolean).length < 2) return
+      if (laDuoi && !khopDau(RE_BAO_NHIEU, lc.slice(x, y)) && lc.slice(x, y).replace(new RegExp(`${mau('là')}${BIEN_PHAI}`, 'gu'), (k: string, o: number, chu: string) => (o > 0 && CHU_SO.test(chu[o - 1]) ? k : '')).trim().split(/\s+/).filter(Boolean).length < 2) return
       while (y > x && /[\s,.;:]/.test(t[y - 1])) y--
       while (x < y && /[\s,.;:]/.test(t[x])) x++
       if (y > x) ra.push({ loai: 'hoi', tu: x, den: y, khoa })

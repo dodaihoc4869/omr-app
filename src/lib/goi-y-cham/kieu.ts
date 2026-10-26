@@ -35,7 +35,7 @@ export type SoDo = { nut: NutSoDo[]; muiTen: MuiSoDo[]; chieu: 'xuoi' | 'nguoc' 
 /** Một thừa số trong phép tính; chạm vào ⇒ «từ đầu tới đây là gì». */
 export type ThuaSo = {
   so: string // hiển thị: «10^6», «8/100», «1/120», «2», «64», «90/100», «10^-6», «24,79»
-  nghia: string // theo tư duy thầy: «đổi ra tiền nhà FeS₂ (chia M = 120)», «nhà SO₂ giàu gấp 2», «bị đánh thuế: × H/100»…
+  nghia: string // nói thẳng (thầy 26/10 tạm bỏ ẩn dụ tiền nhà): «số mol FeS₂ (chia M = 120)», «1 FeS₂ cho 2 SO₂ ⇒ × 2», «tính xuôi: × H/100»…
   denDay?: string // «tới đây là: số mol SO₂» (tuỳ chọn)
 }
 /** Một bước tính (1 bước là chuẩn; khó hiểu thì tách 2, TỐI ĐA 3). Bước sau có thể dùng tên kết quả bước trước. */

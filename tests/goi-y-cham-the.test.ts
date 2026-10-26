@@ -13,7 +13,7 @@ describe('thẻ trên đề ester (bản vẽ màn 2, 3, 3b, 3c)', () => {
   it('chạm «1,5 M»', () => {
     expect(cham(DE_ESTER, '1,5 M')).toEqual({
       ten: 'M · nồng độ mol', nhan: 'Đơn vị',
-      doan: ['1,5 M đọc là 1,5 mol trên lít: cứ 1 lít dung dịch có 1,5 mol chất tan', 'Nhân C_M với thể tích (lít) là ra tiền (số mol) chất tan.'],
+      doan: ['1,5 M đọc là 1,5 mol trên lít: cứ 1 lít dung dịch có 1,5 mol chất tan', 'Nhân C_M với thể tích (lít) là ra số mol chất tan.'],
       congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L',
     })
   })
@@ -38,7 +38,8 @@ describe('thẻ trên đề ester (bản vẽ màn 2, 3, 3b, 3c)', () => {
     const t = cham(DE_ESTER, 'Giá trị của m là')!
     expect(t).toMatchObject({ ten: 'Đề hỏi giá trị của m', nhan: 'Đề hỏi' })
     expect(t.doan[0]).toBe('m là khối lượng (gam): đó là thứ em cần tìm.')
-    expect(t.doan.join(' ')).toMatch(/tiền \(số mol\)/)
+    expect(t.doan.join(' ')).toMatch(/số mol/)
+    expect(t.doan.join(' ')).not.toMatch(/tiền/) // thầy 26/10 tạm bỏ ẩn dụ tiền nhà
   })
   it('mọi vùng của đề đều có thẻ, và thẻ không lộ đáp án (10,2 / 8,2)', () => {
     for (const v of phatHien(DE_ESTER)) {

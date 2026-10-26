@@ -43,7 +43,7 @@ Bốn lớp, từ nhẹ đến nặng:
 - Tổng lượng đề cho (1 tấn quặng, 1000 m³…) bên TRÁI một vạch dọc; bên phải là chất, dưới chất **xếp cột dọc đủ số liệu đề cho ở chất đó** (%, D…).
 - MỘT mũi tên, **hiệu suất ghi trên mũi tên**. Chất cuối, dưới nó đại lượng hỏi (tô hổ phách). Không ghi hệ số, không chữ thừa.
 - **Có chất trung gian quan trọng thì thêm MỘT nhịp** (chất A → chất trung gian → chất B), chỉ khi đề cho số liệu ở chất đó hoặc em dễ lạc; không thì bỏ.
-- Lời giải thích theo tư duy của thầy: `docs/tu-duy-day-hoa-thay-2610.md` (số mol là tiền, hệ số là độ giàu, hiệu suất là đánh thuế).
+- Lời giải thích theo tư duy của thầy: `docs/tu-duy-day-hoa-thay-2610.md` (nói thẳng bằng thuật ngữ; ẩn dụ «tiền nhà» thầy tạm bỏ 26/10).
 - Bài khó/dài: thêm «Hiện tượng – bản chất» + thí nghiệm ảo (màn 9); phép tính khó hiểu thì tách 2, tối đa 3 bước.
 
 ## 2. Bố cục 3 khổ

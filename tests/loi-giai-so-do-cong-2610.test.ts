@@ -21,9 +21,9 @@ function banXuoi(): BanSoDo {
         { so: '10^6', nghia: 'đổi tấn ra gam' },
         { so: '8/100', nghia: 'lấy phần FeS_2 trong quặng' },
         { so: '1/120', nghia: 'đổi ra tiền nhà FeS_2 (chia M = 120)' },
-        { so: '2', nghia: 'nhà SO_2 giàu gấp đôi', denDay: 'tới đây là: số mol SO_2' },
+        { so: '2', nghia: 'bảo toàn S: ra 2 SO_2', denDay: 'tới đây là: số mol SO_2' },
         { so: '64', nghia: 'đổi mol ra gam' },
-        { so: '90/100', nghia: 'bị đánh thuế: nhân H/100' },
+        { so: '90/100', nghia: 'tính xuôi: nhân H/100' },
         { so: '1/1000', nghia: 'đổi gam ra kg' },
       ],
     }],
@@ -144,7 +144,7 @@ describe('chặn lộ đáp án (phần hiện trước khi nộp)', () => {
     expect(kiemCong(b, { phan: 'III', dapAn: '76,8' }).ket).toBe('lo_dap_an')
   })
   it('nghĩa thừa số chứa kết quả trung gian quyết định (số mol SO₂ = 1333,3) ⇒ lo_dap_an', () => {
-    const b = banXuoi(); b.buoc[0]!.thuaSo[3]!.nghia = 'nhà SO_2 giàu gấp đôi: được 1333,3 mol'
+    const b = banXuoi(); b.buoc[0]!.thuaSo[3]!.nghia = 'bảo toàn S: được 1333,3 mol'
     expect(kiemCong(b, { phan: 'III', dapAn: '76,8' }).ket).toBe('lo_dap_an')
     const c = banXuoi(); c.buoc[0]!.thuaSo[5]!.denDay = 'tới đây là 76800 gam'
     expect(kiemCong(c, { phan: 'III', dapAn: '76,8' }).ket).toBe('lo_dap_an')

@@ -20,7 +20,7 @@ describe('KhoiLoiGiaiCoSoDo (soDo)', () => {
     expect(screen.queryByText('Kiến thức cốt lõi')).toBeNull()
     expect(screen.getByText('LỜI GIẢI')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Thừa số 6: 90/100' }))
-    expect(document.querySelector('.gyc-bong-so')!.textContent).toContain('đánh thuế')
+    expect(document.querySelector('.gyc-bong-so')!.textContent).toContain('tính xuôi')
   })
 
   it('không có soDo ⇒ lời giải cũ y như trước (cùng DOM với KhoiLoiGiaiChuan)', () => {

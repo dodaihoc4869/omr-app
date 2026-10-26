@@ -26,17 +26,17 @@ export const TU_DIEN_GIA: TuDien = { phatHien: phatHienGia, theCho: theChoGia }
 /** Bản sơ đồ bài pyrite (tính xuôi): 1 tấn quặng 8% FeS₂, H = 90% ⇒ m SO₂ = 76,8 kg. */
 export const BAN_PYRITE: BanSoDo = {
   qid: 'q-pyrite', phienBan: 1,
-  deNoiGi: 'Số mol là tiền. Đổi quặng ra tiền nhà FeS2, chuyển sang nhà SO2 theo dấu nguyên tố S, rồi mua khối lượng SO2.',
+  deNoiGi: 'Đốt FeS2 trong quặng ra SO2. Theo dấu nguyên tố S từ FeS2 sang SO2, có hiệu suất thì tính xuôi.',
   soDo: { nut: [{ tong: '1 tấn quặng', chat: 'FeS_2', soLieu: ['8%'] }, { chat: 'SO_2', soLieu: ['m kg = ?'] }], muiTen: [{ H: 90 }], chieu: 'xuoi' },
   buoc: [{
     ten: 'm',
     thuaSo: [
       { so: '10^6', nghia: '1 tấn quặng = 10^6 gam' },
       { so: '8/100', nghia: 'gam FeS2 (quặng chứa 8%)' },
-      { so: '1/120', nghia: 'đổi ra tiền nhà FeS2 = số mol (chia M = 120)' },
-      { so: '2', nghia: 'nhà SO2 giàu gấp 2 (bảo toàn S)', denDay: 'tới đây là: số mol SO2' },
-      { so: '64', nghia: 'dùng tiền mua gam SO2 (nhân M = 64)' },
-      { so: '90/100', nghia: 'bị đánh thuế: tính xuôi × H/100' },
+      { so: '1/120', nghia: 'số mol FeS2 (chia M = 120)' },
+      { so: '2', nghia: 'bảo toàn S: 1 FeS2 có 2 S ⇒ ra 2 SO2', denDay: 'tới đây là: số mol SO2' },
+      { so: '64', nghia: 'gam SO2 theo lý thuyết (nhân M = 64)' },
+      { so: '90/100', nghia: 'gam SO2 thực tế: tính xuôi × H/100' },
       { so: '1/1000', nghia: 'kg SO2 (đề hỏi theo kg)' },
     ],
     ketQua: '76,8', donVi: 'kg',

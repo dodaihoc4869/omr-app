@@ -75,7 +75,7 @@ function theTheoCongThuc(khoa: string, ntk?: BangNtk): TheGiaiNghiaDu | null {
 }
 
 const NGHIA_BIEN: Record<string, string> = { m: 'khối lượng (gam)', V: 'thể tích (lít)', a: '', x: '', y: '' }
-const MUA = 'Bắt đầu từ cuối: muốn mua được thứ đề hỏi thì cần tiền (số mol) của chất nào?'
+const MUA = 'Bắt đầu từ cuối: muốn tính được thứ đề hỏi thì cần số mol của chất nào?'
 
 /** Thẻ khi chạm vùng ĐỀ HỎI. */
 function theDeHoi(v: VungCham): TheGiaiNghiaDu {

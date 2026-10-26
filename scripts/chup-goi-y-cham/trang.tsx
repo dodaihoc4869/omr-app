@@ -36,7 +36,7 @@ const BAI: Record<string, { phan: string; de: string; pa?: string[]; ban: BanSoD
       deNoiGi: 'Ester bị NaOH thuỷ phân khi đun nóng. Sau đó cô cạn: chất dễ bay hơi mất đi, phần rắn còn lại được cân.',
       chiaKhoa: 'Chất rắn khan = muối + NaOH còn dư (nếu có). Vì vậy phải so số mol hai chất trước phản ứng: chất nào hết, chất nào dư?',
       buoc: [
-        { ten: 'n_{ester}', thuaSo: [{ so: '8,8', nghia: 'khối lượng ethyl acetate (gam)' }, { so: '1/88', nghia: 'đổi ra tiền = số mol (chia M = 88)' }] },
+        { ten: 'n_{ester}', thuaSo: [{ so: '8,8', nghia: 'khối lượng ethyl acetate (gam)' }, { so: '1/88', nghia: 'số mol ester (chia M = 88)' }] },
         { ten: 'n_{NaOH}', thuaSo: [{ so: '1,5', nghia: 'cứ 1 lít có 1,5 mol NaOH' }, { so: '100/1000', nghia: 'đổi 100 mL ra lít' }] },
       ],
       cauTuHoi: 'Tính xong, em so hai số rồi tự làm tiếp.',
@@ -47,15 +47,15 @@ const BAI: Record<string, { phan: string; de: string; pa?: string[]; ban: BanSoD
     de: 'Đốt cháy 1 tấn quặng pyrite chứa 8% FeS2 về khối lượng (tạp chất không chứa sulfur) để sản xuất SO2, hiệu suất quá trình đạt 90%. Khối lượng SO2 thu được là m kg. Giá trị của m là',
     ban: {
       qid: 'pyrite', phienBan: 1,
-      deNoiGi: 'Số mol là tiền. Đổi quặng ra tiền nhà FeS2, chuyển sang nhà SO2 theo dấu nguyên tố S, rồi dùng tiền mua khối lượng SO2. Chuyển tiền có hiệu suất là bị đánh thuế.',
+      deNoiGi: 'Đốt FeS2 trong quặng ra SO2. Theo dấu nguyên tố S từ FeS2 sang SO2, không cần viết phương trình; có hiệu suất thì tính xuôi.',
       soDo: { nut: [{ tong: '1 tấn quặng', chat: 'FeS_2', soLieu: ['8%'] }, { chat: 'SO_2', soLieu: ['m kg = ?'] }], muiTen: [{ H: 90 }], chieu: 'xuoi' },
       buoc: [{ ten: 'm', donVi: 'kg', ketQua: '76,8', thuaSo: [
         { so: '10^6', nghia: '1 tấn quặng = 10^6 gam' },
         { so: '8/100', nghia: 'gam FeS2 (quặng chứa 8%)' },
-        { so: '1/120', nghia: 'đổi ra tiền nhà FeS2 = số mol (chia M = 120)' },
-        { so: '2', nghia: 'tiền nhà SO2: hệ số 2 so với 1 ⇒ nhà SO2 giàu gấp 2 (bảo toàn S)', denDay: 'Tới đây là tiền (số mol) nhà SO2.' },
-        { so: '64', nghia: 'dùng tiền mua gam SO2 (nhân M = 64)' },
-        { so: '90/100', nghia: 'chuyển tiền bị đánh thuế: tính xuôi chỉ còn 90% (× H/100)' },
+        { so: '1/120', nghia: 'số mol FeS2 (chia M = 120)' },
+        { so: '2', nghia: 'bảo toàn S: 1 FeS2 có 2 S ⇒ ra 2 SO2', denDay: 'Tới đây là số mol SO2.' },
+        { so: '64', nghia: 'gam SO2 theo lý thuyết (nhân M = 64)' },
+        { so: '90/100', nghia: 'gam SO2 thực tế: tính xuôi × H/100' },
         { so: '1/1000', nghia: 'kg SO2 (đề hỏi theo kg)' },
       ] }],
       ketQua: '76,8',
@@ -66,16 +66,16 @@ const BAI: Record<string, { phan: string; de: string; pa?: string[]; ban: BanSoD
     de: 'Để sản xuất 1 tấn dung dịch H2SO4 98% từ quặng pyrite chứa 60% FeS2, hiệu suất cả quá trình là 80%. Khối lượng quặng pyrite cần dùng là m tấn. Giá trị của m là',
     ban: {
       qid: 'nguoc', phienBan: 1,
-      deNoiGi: 'Đề cho sản phẩm (H2SO4), hỏi nguyên liệu (quặng) ⇒ tính ngược. Đổi H2SO4 ra tiền, chuyển về nhà FeS2 theo dấu nguyên tố S, mua khối lượng quặng, rồi bù thuế hiệu suất.',
+      deNoiGi: 'Đề cho sản phẩm (H2SO4), hỏi nguyên liệu (quặng) ⇒ tính ngược. Theo dấu nguyên tố S từ H2SO4 về FeS2, rồi nhân 100/H.',
       soDo: { nut: [{ tong: 'm tấn quặng = ?', chat: 'FeS_2', soLieu: ['60%'] }, { tong: '1 tấn dd', chat: 'H_2SO_4', soLieu: ['98%'] }], muiTen: [{ H: 80 }], chieu: 'nguoc' },
       buoc: [{ ten: 'm', thuaSo: [
         { so: '10^6', nghia: '1 tấn dung dịch = 10^6 gam' },
         { so: '98/100', nghia: 'gam H2SO4 (dung dịch 98%)' },
-        { so: '1/98', nghia: 'đổi ra tiền nhà H2SO4 = số mol (chia M = 98)' },
-        { so: '1/2', nghia: 'tiền nhà FeS2: hệ số 1 so với 2 ⇒ nhà FeS2 nghèo bằng nửa (bảo toàn S)' },
-        { so: '120', nghia: 'dùng tiền mua gam FeS2 (nhân M = 120)' },
+        { so: '1/98', nghia: 'số mol H2SO4 (chia M = 98)' },
+        { so: '1/2', nghia: 'bảo toàn S: 2 H2SO4 cần 1 FeS2' },
+        { so: '120', nghia: 'gam FeS2 (nhân M = 120)' },
         { so: '100/60', nghia: 'gam quặng theo lí thuyết (quặng chỉ chứa 60% FeS2)' },
-        { so: '100/80', nghia: 'bù thuế: tính ngược phải gửi nhiều hơn (× 100/H)', denDay: 'Đi ngược từ H2SO4 về quặng thì phải gửi nhiều hơn để sau thuế còn đủ.' },
+        { so: '100/80', nghia: 'gam quặng thực tế cần: tính ngược × 100/H', denDay: 'Tính ngược: hiệu suất 80% thì phải lấy nhiều quặng hơn lý thuyết.' },
         { so: '10^-6', nghia: 'tấn quặng (đề hỏi theo tấn)' },
       ] }],
     },
@@ -95,7 +95,7 @@ const BAI: Record<string, { phan: string; de: string; pa?: string[]; ban: BanSoD
       // Hợp đồng chỉ có PHÉP NHÂN (tích thừa số = đáp án, cổng làn C) ⇒ phép trừ nằm trong nghĩa của thừa số đầu.
       buoc: [
         { ten: 'V', thuaSo: [
-          { so: 'n_{CO2}', nghia: 'mol CO2 = phần H+ còn lại sau khi đổi hết CO3^2- (0,15 − 0,1)', denDay: 'Tới đây là tiền (số mol) nhà CO2.' },
+          { so: 'n_{CO2}', nghia: 'mol CO2 = phần H+ còn lại sau khi đổi hết CO3^2- (0,15 − 0,1)', denDay: 'Tới đây là số mol CO2.' },
           { so: '24,79', nghia: 'mỗi mol khí ở đkc chiếm 24,79 lít' },
         ] },
       ],

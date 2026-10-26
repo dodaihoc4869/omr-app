@@ -129,8 +129,8 @@ describe('soạn lô', () => {
     const mh = moHinhGia((h) => chuMau(h))
     await goiLo({ qids: [Q.III], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
     const h = mh.goi[0]!
-    expect(h.heThong).toContain('Số mol là **tiền**')
-    expect(h.heThong).toContain('đánh thuế')
+    expect(h.heThong).toContain('Tạm thời bỏ tư duy tiền nhà') // thầy 26/10: lời dặn cấm ẩn dụ tiền / nhà / thuế
+    expect(h.heThong).toContain('KHÔNG dùng ẩn dụ')
     expect(h.heThong).toContain('CẤM LỘ ĐÁP ÁN')
     expect(h.luot[0]!.chu).toContain('Đáp án kho: 76,8')
   })
