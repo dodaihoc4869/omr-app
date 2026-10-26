@@ -51,6 +51,8 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   void _a
   void _b
   const b = (body ?? {}) as Record<string, unknown>
+  // «Trong» nhóm 4 (26/10): Toàn cảnh một em GIẢ (cảnh `gv-toan-canh`) — số khớp nhau, tên giả.
+  if (duong === '/gv/em-toan-canh') return { ok: true as const, du: toanCanhGia(String(b.sbd ?? '')) as unknown as Record<string, unknown> }
   // ---- LÀN ĐIỂM DANH 12/10C (cảnh `&ht2=1&dd12c=1`): buổi điểm danh của lớp có số Nhịp học + hồ sơ đúng em (gia/diem-danh-1210c.ts) — trước ht2.
   const dd12c = traLoiDd12c(duong, b)
   if (dd12c) return dd12c
@@ -107,4 +109,29 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   if (cb) return cb
   // ---- hết LÀN CHỮA BÀI 12/10B
   return traLoiThay(duong, b)
+}
+
+// «Trong» nhóm 4 (26/10): Toàn cảnh một em GIẢ — 4 việc gần nhất, 5 dạng, nhịp 30 ngày.
+function toanCanhGia(sbd: string) {
+  const bay = Date.now()
+  const luc = (gio: number) => new Date(bay - gio * 3600_000).toISOString()
+  return {
+    em: { sbd, hoTen: 'Trần Đức Huy', lop: '11B', namSinh: '2009', chuoiNgay: 4, hoatDongCuoi: { luc: luc(0.4), viec: 'Ôn lại' }, phuHuynhXemCuoi: luc(60),
+      diemCaGanNhat: { diem: 6.25, tenCa: 'Kiểm tra 15 phút 11B', maCa: 'DH-11-C1-A2', luc: luc(50) }, expHomNay: 85, expTong: 2140 },
+    dong: [
+      { luc: luc(0.4), loai: 'on_lai', tieuDe: 'Ôn lại 6 câu sai · Cân bằng hoá học', chips: [{ chu: 'đúng 4/6', muc: 'tot' }] },
+      { luc: luc(1.1), loai: 'exp', tieuDe: '+85 EXP · 18 câu Hành trình hôm nay', chips: [] },
+      { luc: luc(26), loai: 'btvn', tieuDe: 'Ammonia và muối ammonium · 12 câu', chips: [{ chu: 'bấm vội 9/12 câu', muc: 'sai' }, { chu: 'đúng 5/12', muc: 'trung' }] },
+      { luc: luc(50), loai: 'ca', tieuDe: 'Kiểm tra 15 phút 11B', chiTiet: { maCa: 'DH-11-C1-A2' }, chips: [{ chu: '6,25/10 điểm', muc: 'trung' }, { chu: 'rời màn 1 lần', muc: 'sai' }] },
+    ],
+    conNua: luc(60),
+    dang: [
+      { ma: 'D1', ten: 'Chuyển dịch cân bằng', bac: 'van_dung', gap: 15, sai: 10, khacPhuc: 1, xuHuong: 'tang' },
+      { ma: 'D2', ten: 'Hằng số cân bằng Kc', bac: 'van_dung', gap: 22, sai: 14, khacPhuc: 2, xuHuong: 'tang' },
+      { ma: 'D3', ten: 'Ammonia — tính base', bac: 'hieu', gap: 18, sai: 9, khacPhuc: 2, xuHuong: 'giu' },
+      { ma: 'D4', ten: 'Nitric acid', bac: 'hieu', gap: 20, sai: 9, khacPhuc: 3, xuHuong: 'giam' },
+      { ma: 'D5', ten: 'Sulfur và hợp chất', bac: 'biet', gap: 9, sai: 4, khacPhuc: 1, xuHuong: 'giu' },
+    ],
+    nhip30: Array.from({ length: 30 }, (_, i) => ({ ngay: new Date(bay - (29 - i) * 86400_000).toISOString().slice(0, 10), muc: [3, 3, 0, 2, 3, 0, 1, 3, 2, 0][i % 10] })),
+  }
 }

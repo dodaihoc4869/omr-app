@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TheNoiDung } from '../components/DesignSystem'
 import { useAppStore } from '../store/appStore'
 import { goiLenh } from '../lib/goi-lenh-thay'
+import '../styles/trong-quan-ly-giao-tuan.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
 
 interface Em { sbd: string; hoTen: string; lop: string; tenLop: string }
 interface De { maDe: string; ten: string; lop: string; soCau: number }
@@ -73,7 +74,7 @@ export default function GiaoDeTheoTuanScreen() {
   }
 
   return (
-    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
+    <div className="gv-page gv-giao-tuan min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
       <div className="gv-page-header">
         <div>
           <h1>Giao đề theo tuần</h1>

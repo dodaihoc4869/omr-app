@@ -1,6 +1,7 @@
 import './exam-setup.css'
 import BangMaTranDe from '../components/ma-tran-de/BangMaTranDe'
 import '../components/ca-thi/ca-thi.css'
+import '../styles/trong-quan-ly-mo-ca.css' // «Trong» 26/10: trình bày Mở ca (chỉ dưới [data-trong='gv'])
 import { laBoDe12, rutDeChuan2026, SO_CAU_CHUAN_2026 } from '../lib/ma-tran-hoa-2026'
 // MỞ CA KIỂM TRA — tối giản theo yêu cầu thầy (2026-09-02): đề đã tự về từ
 // kho, link Apps Script đã cấu hình 1 lần ở màn Ngân hàng câu hỏi, nên màn
@@ -553,7 +554,7 @@ export default function ExamSetupScreen() {
     { id: 'khong', ten: 'Thầy công bố sau', mota: 'Thầy xem trước, rồi bấm Công bố điểm ở màn Kết thúc ca.' },
   ]
   return (
-    <div className="gv-page ct" style={{ background: 'var(--gvm-nen)', color: 'var(--gvm-chu)', fontFamily: 'var(--sans)' }}>
+    <div className="gv-page ct ct-mo-ca" style={{ background: 'var(--gvm-nen)', color: 'var(--gvm-chu)', fontFamily: 'var(--sans)' }}>
       <div className="ct-khung" style={{ maxWidth: 1320, margin: '0 auto', padding: '16px clamp(12px, 3vw, 32px) 64px' }}>
         <div className="ct-dau">
           <div>

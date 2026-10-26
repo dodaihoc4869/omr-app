@@ -9,6 +9,9 @@ import DuyetLoiGiaiScreen from '../../src/screens/DuyetLoiGiaiScreen'
 import LichSuCaScreen from '../../src/screens/LichSuCaScreen'
 import CauHoiScreen from '../../src/screens/CauHoiScreen'
 import TheoDoiCa from '../../src/components/ca-thi/TheoDoiCa'
+import ToanCanhEmScreen from '../../src/screens/ToanCanhEmScreen'
+import PhanCongScreen from '../../src/screens/PhanCongScreen'
+import GiaoDeTheoTuanScreen from '../../src/screens/GiaoDeTheoTuanScreen'
 import '../../src/styles/giao-dien-day-du.css'
 // TRANG CHỤP ẢNH BẢN DUYỆT V2 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
 // (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật (tên em trong ảnh là tên giả).
@@ -201,6 +204,8 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // Hành trình › Cần thầy chữa (trung tu 09/10 tối): bước cuối trên lớp + thẻ nút thắt GIẢ (tên em giả).
   if (u.pathname.endsWith('/gv/chua-cau-sai/hang-chieu')) return tra({ ok: true, bat: true, conNua: false, ds: BUOC_CUOI_GIA })
   if (u.pathname.endsWith('/gv/nut-that/ds')) return tra(NUT_THAT_GIA)
+  // «Trong» nhóm 4: Duyệt lời giải mở sẵn đề 12-KT-C1-D4 (28 câu: 15 đã duyệt · 9 chờ duyệt, 5 sạch · 2 máy đang soạn · 2 chờ sửa kho)
+  if (u.pathname.endsWith('/gv/loi-giai/cho-duyet')) return tra({ ok: true, maDe: '12-KT-C1-D4', cau: CAU_DUYET_GIA, tong: { cau: 28, daDuyet: 15, choDuyet: 9, sach: 5, dangSoan: 2, traLai: 0, truot: 2, chuaCoBo: 0 } })
   // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): `/ph/con-tong-quan` GIẢ — `&tq=loi` ⇒ máy chủ lỗi (khối Gợi ý nhắc con hiện lý do + Thử lại).
   if (u.pathname.endsWith('/ph/con-tong-quan')) return thamSo.get('tq') === 'loi'
     ? new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Anh/chị thử lại sau ít phút.' }), { status: 500, headers: { 'content-type': 'application/json' } })
@@ -455,7 +460,15 @@ function ManHoSoEm() {
 
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
-const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
+const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-toan-canh':'hocsinh', 'gv-giao-btvn':'giaobtvn', 'gv-giao-tuan':'khodegiao', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
+if (man === 'gv-duyet' && thamSo.get('ma')) location.hash = `duyet-loi-giai=${thamSo.get('ma')}`
+const CAU_DUYET_GIA = [
+  { qid: 'DH-12-C1-D4-3', bam: 'b3', dang: 'tn', bo: 'C1', trangThai: 'cho_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
+  { qid: 'DH-12-C1-D4-7', bam: 'b7', dang: 'tn', bo: 'C1', trangThai: 'cho_duyet', sach: false, co: [{ loai: 'dapAn', ghi: 'số ester ứng với C4H8O2 là 4, kho đang ghi B (3 chất).', chot: 'D', sua: { truong: 'dapAn', truoc: 'B', sau: 'D' } }], ghiChu: '', loiMay: '', soLan: 1 },
+  { qid: 'DH-12-C1-D4-12', bam: 'b12', dang: 'ds', bo: 'C1', trangThai: 'cho_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
+  { qid: 'DH-12-C1-D4-19', bam: 'b19', dang: 'tln', bo: 'C1', trangThai: 'truot', sach: false, co: [], ghiChu: '', loiMay: 'phương trình ở bước 2 chưa cân bằng số nguyên tử O.', soLan: 2 },
+  { qid: 'DH-12-C1-D4-22', bam: 'b22', dang: 'tln', bo: 'C1', trangThai: 'da_duyet', sach: true, co: [], ghiChu: '', loiMay: '', soLan: 1 },
+]
 const EM_TD = [
   ['Trịnh Quốc Huy', 'khoa', 9, null, 3, 41], ['Trần Minh Hiếu', 'dang_lam', 12, null, 2, 18], ['Ninh Thị Mai', 'dang_lam', 8, null, 1, 6],
   ['Lê Hà My', 'da_nop', 20, 9.5, 0, 0], ['Phan Gia Bảo', 'da_nop', 20, 8.5, 0, 0], ['Ngô Minh Châu', 'da_nop', 20, 9, 0, 0],
@@ -465,6 +478,7 @@ const manTheoDoi = () => h('div', { className: 'gv-page', style: { padding: '16p
   moLuc: '19:30 · Thứ Hai 26/10/2026', hetHanVao: '19:40', thoiGianPhut: 15, congBoChu: 'Khi cả lớp nộp xong', phamViChu: 'Lớp 12A1', conGiay: 522, em: EM_TD, soChuaVao: 1,
   nguongLan: 3, dangTai: false, dangDuyet: null, onLamMoi: noop, onMoKhoa: noop, onXemEm: noop, onChieuMa: noop, onKetThuc: noop, onDongCuaVao: noop, dangLamNgay: 6 } as never))
 const con =
+  man === 'gv-toan-canh' ? h(ToanCanhEmScreen, { sbdHoSo: '11011' }) : man === 'gv-giao-btvn' ? h(PhanCongScreen) : man === 'gv-giao-tuan' ? h(GiaoDeTheoTuanScreen) :
   man === 'gv-lich-su-ca' ? h(LichSuCaScreen) : man === 'gv-hs-hoi' ? h(CauHoiScreen) : man === 'gv-theo-doi' ? manTheoDoi() : // «Trong» nhóm 4
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
   man === 'hs-nhip' ? manNhipEm() : // LÀN NHỊP EM 12/10C
@@ -489,7 +503,7 @@ const con =
 const manThay = MAN_THAY[man]
 // TRUNG TU 09/10: mọi màn thầy chụp ở CHẾ ĐỘ 2.0 thật (cờ bật + `data-hoa2` trên vỏ như App.tsx) — trước đây chỉ gv-nhip bật cờ nên thanh bên
 // trong ảnh là danh sách cũ 9 mục. Thanh đáy (< 880 px) cũng dựng như app thật. `?giao=toi|sang` = thầy ép nút Sáng/Tối trong Cài đặt.
-const MAN_STORE: Record<string, string> = { 'gv-len-bang': 'goilenbang', 'gv-lich-su-ca': 'lichsuca', 'gv-hs-hoi': 'cauhoi', 'gv-theo-doi': 'exammonitor', 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
+const MAN_STORE: Record<string, string> = { 'gv-len-bang': 'goilenbang', 'gv-toan-canh': 'toancanh', 'gv-giao-btvn': 'giaobtvn', 'gv-giao-tuan': 'khodegiao', 'gv-lich-su-ca': 'lichsuca', 'gv-hs-hoi': 'cauhoi', 'gv-theo-doi': 'exammonitor', 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
 if (manThay) {
   // Trang chụp nạp CHUNG CSS game (doan.css có lớp `.dh-so` cùng tên — ô đáp số Đoàn Hộ Tống, rộng 100%, nền giấy) với màn thầy; app thầy thật
   // KHÔNG nạp doan.css (mảnh game chỉ máy em tải) ⇒ trả số bước Dạy học / Kiểm tra đầu giờ về đúng hình tròn 36 px của day-hoc.css cho ảnh chụp.

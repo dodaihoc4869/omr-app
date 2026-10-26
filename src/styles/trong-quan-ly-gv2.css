@@ -1,0 +1,45 @@
+/* «Trong» nhóm 4 — da chung cho màn kiểu .gv2-trang (Duyệt lời giải, Bàn gỡ nút thắt). KHÔNG nạp thẳng từ màn: tệp màn @import tệp này
+   (Vite gộp vào CSS của chính màn ⇒ không đẻ mảnh chung). Gốc: [data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du). */
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) { gap: 20px; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-tieu-de { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-phu-de { font-size: 14px; color: var(--tr-chu-3); }
+/* thẻ trắng viền mảnh (đè cả viền đậm của .m3 .gv2-the) */
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-the.gv2-the { padding: 20px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-the-tieu-de { font-size: 16px; font-weight: 600; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-phu { font-size: 13px; color: var(--tr-chu-3); }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-phu[data-tone='do'] { color: var(--tr-sai-chu); font-weight: 500; }
+/* dải số: một thẻ trắng chia vạch */
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi { gap: 0; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); overflow: hidden; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi > .gv2-the.gv2-the-so {
+  gap: 6px; min-height: 0; padding: 18px 20px; border: 0; border-left: 1px solid var(--tr-vien); border-radius: 0; background: none; box-shadow: none; animation: none;
+}
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi > .gv2-the-so:first-child { border-left: 0; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi .gv2-nhan { font-size: 13px; font-weight: 500; color: var(--tr-chu-3); }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi .gv2-so-kpi { font-size: 26px; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--tr-chu); }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi .gv2-don-vi { font-size: 13px; color: var(--tr-chu-3); }
+@media (max-width: 1099px) {
+  [data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi > .gv2-the-so:nth-child(odd) { border-left: 0; }
+  [data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi > .gv2-the-so:nth-child(n + 3) { border-top: 1px solid var(--tr-vien); }
+}
+/* chip trạng thái: một khái niệm một màu */
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-chip { margin: 0; min-height: 26px; padding: 0 10px; font-size: 13px; font-weight: 500; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-chip::before { display: none; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-chip[data-tone='la'] { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-chip[data-tone='do'] { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-chip[data-tone='vang'] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-chip[data-tone='xam'] { background: var(--tr-mat-2); color: var(--tr-chu-2); }
+/* nút: chữ = liên kết màu app không gạch chân */
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-nut-chu { min-height: 44px; padding: 0 12px; color: var(--tr-chinh-chu); text-decoration: none; font-weight: 600; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) :is(.gv2-nut-vien, .gv2-nut-chinh) { min-height: 44px; padding: 0 16px; font-size: 14px; }
+/* danh sách câu: MỘT thẻ, mỗi câu một dòng kẻ mảnh; cờ đáp án = khối hổ phách nhạt */
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .lg-ds { gap: 0; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); overflow: hidden; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .lg-ds > .gv2-the.lg-dong { padding: 16px 20px; border: 0; border-top: 1px solid var(--tr-vien); border-radius: 0; box-shadow: none; animation: none; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .lg-ds > .lg-dong:first-child { border-top: 0; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .lg-dong-dau { align-items: center; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .lg-co { padding: 10px 14px 10px 30px; border-radius: 12px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-size: 14px; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .lg-co b { color: inherit; }
+[data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .lg-o { border: 1px solid var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu); }
+@media (min-width: 600px) {
+  [data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  [data-trong='gv'] :is(.gv-duyet-day-du, .gv-go-day-du) .gv2-kpi > .gv2-the-so:not(:first-child) { border-left: 1px solid var(--tr-vien); border-top: 0; }
+}

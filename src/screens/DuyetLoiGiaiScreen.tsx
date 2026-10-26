@@ -7,6 +7,7 @@ import { gvChoDuyet, gvDuyetLoiGiai, gvSoanGap, gvXemLoiGiai, type CauChoDuyet, 
 import KhungLoiGiai from '../components/loi-giai/KhungLoiGiai'
 import '../components/loi-giai/loi-giai.css'
 import './gv-hoa2.css'
+import '../styles/trong-quan-ly-duyet.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
 
 const TEN_DANG: Record<string, string> = { tn: 'Trắc nghiệm', ds: 'Đúng/Sai', tln: 'Trả lời ngắn' }
 const TRANG_THAI: Record<TrangThaiLoiGiai, { chu: string; tone: 'la' | 'do' | 'vang' | 'xam' }> = {

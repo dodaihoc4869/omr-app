@@ -22,6 +22,7 @@ import { loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib
 import { gomTheoCa, type CaCoCauHoi } from '../lib/hoi-bai'
 import { useAppStore } from '../store/appStore'
 import { gioPhutVN } from '../lib/em-toan-canh'
+import '../styles/trong-quan-ly-hs-hoi.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
 
 const NHAN: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 
@@ -167,7 +168,7 @@ export default function CauHoiScreen() {
 
   if (mo) {
     return (
-      <div className="gv-page min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
+      <div className="gv-page gv-hs-hoi min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
         <button
           type="button"
           onClick={() => setMo(null)}
@@ -193,7 +194,7 @@ export default function CauHoiScreen() {
   const daChonHet = Boolean(ds && ds.length > 0 && chon.size === ds.length)
 
   return (
-    <div className="gv-page min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
+    <div className="gv-page gv-hs-hoi min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)' }}>
       <header className="gv-page-header flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-rose-50 dark:bg-rose-950/70 text-[color:var(--m3-on-error-container)] border border-rose-200 dark:border-rose-800 shadow-2xs shrink-0">
@@ -215,12 +216,12 @@ export default function CauHoiScreen() {
       </header>
 
       {/* HAI LỐI NHÌN: Google Blue & Red pills */}
-      <div className="flex items-center gap-2">
+      <div className="gv-hs-hoi-che flex items-center gap-2">
         <button
           type="button"
           onClick={() => void doiChe('chinh')}
           disabled={dang}
-          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-colors cursor-pointer ${
+          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-colors cursor-pointer${!laRac ? ' gv-hs-hoi-che--chon' : ''} ${
             !laRac
               ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] ring-2 ring-blue-400/30 shadow-xs'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200/80 dark:border-slate-700'
@@ -232,7 +233,7 @@ export default function CauHoiScreen() {
           type="button"
           onClick={() => void doiChe('rac')}
           disabled={dang}
-          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-colors cursor-pointer ${
+          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-colors cursor-pointer${laRac ? ' gv-hs-hoi-che--chon' : ''} ${
             laRac
               ? 'bg-[color:var(--m3-error)] text-[color:var(--m3-on-error)] ring-2 ring-rose-400/30 shadow-xs'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200/80 dark:border-slate-700'
