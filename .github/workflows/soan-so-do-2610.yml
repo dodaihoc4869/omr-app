@@ -37,7 +37,7 @@ concurrency:
 jobs:
   soan:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 355 # thầy 26/10 «Chạy hết luôn, liên tục»: một lần chạy đi được ~6 giờ; hết giờ thì chạy lại, máy chủ bỏ qua câu đã soạn
     steps:
       - uses: actions/setup-node@v4
         with:
@@ -66,7 +66,7 @@ jobs:
           const MAY_CHU = process.env.OMR_MAY_CHU.replace(/\/$/, '')
           const MB = process.env.OMR_MA_BI_MAT
           const qids = (process.env.IN_QIDS || '').split(/[\s,;]+/).map((s) => s.trim()).filter(Boolean)
-          const tong = Math.max(1, Math.min(2000, Number(process.env.IN_GIOI_HAN) || 20))
+          const tong = Math.max(1, Math.min(6000, Number(process.env.IN_GIOI_HAN) || 20))
           const thuKhong = process.env.IN_THU_KHONG !== 'false'
           const chiCauSaiNhieu = !qids.length && process.env.IN_SAI_NHIEU === 'true'
           const model = (process.env.IN_MODEL || '').trim()
@@ -76,7 +76,7 @@ jobs:
           let conTro = '', daSoan = 0, luot = 0, xong = false
           console.log(`Chế độ: ${thuKhong ? 'CHẠY THỬ (không ghi)' : 'GHI THẬT'} · nguồn: ${qids.length ? qids.length + ' qid' : chiCauSaiNhieu ? 'câu nhiều em sai' : 'quét kho'} · tối đa ${tong} câu`)
           const batDau = Date.now()
-          while (!xong && daSoan < tong && luot < 400) {
+          while (!xong && daSoan < tong && luot < 1500) {
             luot++
             const body = { gioiHan: Math.min(MOI_LUOT, tong - daSoan), thuKhong, conTro, ...(qids.length ? { qids } : {}), ...(chiCauSaiNhieu ? { chiCauSaiNhieu } : {}), ...(model ? { model } : {}) }
             let r, j
