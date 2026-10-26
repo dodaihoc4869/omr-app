@@ -1,0 +1,88 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Giải tuần · Màn cuối tuần»: lên hạng (Bi ăn mừng + tinh thể theo hạng mới: Vàng +40) / giữ hạng / rơi hạng (Bi buồn).
+     Tuần 26/10 – 1/11 (chốt CN 22:00). Biến thể: ?bt=len (mặc định, hạng 4/20 ⇒ lên Vàng, +40) · ?bt=giu (hạng 9/20) · ?bt=roi (hạng 18/20 ⇒ xuống Đồng).
+     Hiệu ứng: E2 huy hiệu mới rơi xuống, xoay lấp lánh, hoa giấy, Bi mừng, rồi D1 40 tinh thể bay vào bộ đếm (?hu=len) · E3 huy hiệu Bạc trượt xuống, Đồng hiện, Bi buồn, không hoa giấy (?hu=roi) · giữ hạng: huy hiệu nảy nhẹ (?hu=giu). -->
+<title>HS · Thưởng phạt · 8 Cuối tuần giải</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.tp-hinh{width:260px;height:200px}
+.tp-hinh .hh-to{position:absolute;left:50%;top:6px;width:150px;margin-left:-100px;z-index:1}
+.tp-hinh .hh-to.cu{opacity:0}
+.tp-hinh .tp-bi{position:absolute;right:0;bottom:0;width:86px;z-index:2}
+.tp-hinh .tp-tia{inset:-20px -10px -20px -50px}
+.tp-hinh .tp-tia path{fill:var(--kl-vang)}
+.dem-tt{display:inline-flex;align-items:center;gap:6px;margin-left:auto;min-height:40px;padding:0 12px 0 8px;border-radius:999px;background:var(--tt-nhat);color:var(--tt-chu);font-weight:900;font-size:16px}
+.dem-tt .tp-dv{width:22px;height:22px}
+.so3{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.so3>div{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:16px;background:var(--mat-2)}
+.so3 span{font-size:13px;color:var(--chu-2)}
+.so3 b{font-size:22px;font-weight:900;display:inline-flex;align-items:center;gap:5px}
+.so3 b .tp-dv{width:20px;height:20px}
+.thuong-lon{display:flex;align-items:center;gap:14px}
+.thuong-lon .tp-o{width:52px;height:52px}
+.thuong-lon .tp-o .tp-dv{width:28px;height:28px}
+.thuong-lon b{display:block;font-size:22px;font-weight:900;color:var(--tt-chu)}
+.thuong-lon span{font-size:13.5px;color:var(--chu-2)}
+</style></head>
+<body class="duo tp" data-app="hs" data-khung="khong" data-ai="khong" data-bt-mac="len" data-hu-mac="len" data-hu-giu="giu" data-hu-roi="roi">
+<div class="duo-vo">
+  <div class="duo-tren"><span class="duo-dong" aria-label="Đóng"><i data-i="x"></i></span><span class="dem-tt" aria-label="Tinh thể"><i data-tp="tt"></i><span id="dem-tt" data-bt="len">245</span><span data-bt="giu roi">245</span></span></div>
+  <main class="tp-man hai-cot">
+    <div class="cot-a">
+      <div class="tp-hinh" data-bt="len"><span class="tp-tia quay" data-tia></span><span class="hh-to" data-hh="vang" id="hh"></span><span data-bi="mung" id="bi"></span></div>
+      <div class="tp-hinh" data-bt="giu"><span class="hh-to" data-hh="bac" id="hh"></span><span data-bi="vui" id="bi"></span></div>
+      <div class="tp-hinh" data-bt="roi"><span class="hh-to cu" data-hh="bac" id="hh-cu"></span><span class="hh-to" data-hh="dong" id="hh"></span><span data-bi="sai" id="bi"></span></div>
+      <p class="tp-nhan">Tuần 26/10 – 1/11 đã chốt</p>
+      <h1 data-bt="len" style="color:var(--kl-vang-2)">Lên Giải Vàng!</h1>
+      <h1 data-bt="giu">Giữ Giải Bạc</h1>
+      <h1 data-bt="roi">Xuống Giải Đồng</h1>
+      <p class="tp-phu" data-bt="len">Em đứng hạng 4/20 nhóm Bạc. Tuần sau thi cùng các bạn Giải Vàng.</p>
+      <p class="tp-phu" data-bt="giu">Em đứng hạng 9/20 nhóm Bạc. Tuần sau vào top 5 là lên Giải Vàng.</p>
+      <p class="tp-phu" data-bt="roi">Tuần mới, làm lại từ đầu nhé. Vào top 5 Giải Đồng là về lại Bạc.</p>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the" data-bt="len" aria-label="Thưởng lên hạng"><div class="thuong-lon"><span class="tp-o tt"><i data-tp="tt"></i></span><div><b>+40 tinh thể</b><span>thưởng lên Giải Vàng</span></div></div></section>
+      <section class="tp-the" aria-label="Tuần của em">
+        <h2>Tuần của em</h2>
+        <div class="so3">
+          <div><span>Hạng trong nhóm</span><b data-bt="len">4/20</b><b data-bt="giu">9/20</b><b data-bt="roi">18/20</b></div>
+          <div><span>Nguyên tử tuần</span><b data-bt="len">412 <i data-tp="nt"></i></b><b data-bt="giu">287 <i data-tp="nt"></i></b><b data-bt="roi">52 <i data-tp="nt"></i></b></div>
+          <div><span>Ngày học trong tuần</span><b data-bt="len">7/7</b><b data-bt="giu">5/7</b><b data-bt="roi">2/7</b></div>
+          <div><span>Giải tuần sau</span><b data-bt="len" style="color:var(--kl-vang-2)">Vàng</b><b data-bt="giu">Bạc</b><b data-bt="roi" style="color:var(--kl-dong-2)">Đồng</b></div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <div class="duo-day"><div class="giua">
+    <span class="duo-nut mau-tt" data-bt="len">Nhận 40 tinh thể</span>
+    <span class="duo-nut" data-bt="giu roi">Vào tuần mới</span>
+  </div></div>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+const hh = document.getElementById('hh'), bi = document.getElementById('bi')
+TP.dk('len', async () => {
+  // E2: huy hiệu Vàng rơi xuống, xoay lấp lánh; hoa giấy; Bi mừng; fanfare — rồi D1: 40 tinh thể bay vào bộ đếm
+  TP.phanHoi('lenHang')
+  TP.a(hh, [{ transform: 'translateY(-320px) rotate(-20deg)', opacity: 0 }, { transform: 'translateY(0) rotate(4deg)', opacity: 1, offset: 0.45 }, { transform: 'translateY(-26px) rotate(-2deg)', offset: 0.6 }, { transform: 'translateY(0)', offset: 0.72 }, { transform: 'perspective(400px) rotateY(360deg)', offset: 1 }], 1600, { e: 'ease-out' })
+  TP.a(document.querySelector('.tp-tia'), [{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'none' }], 700, { delay: 700 })
+  TP.a(bi, [{ transform: 'translateY(0)' }, { transform: 'translateY(-28px)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-16px)' }, { transform: 'translateY(0)' }], 1000, { delay: 750 })
+  setTimeout(() => { TP.hoaGiay(36, 1400); TP.hat(hh, 0, { n: 12, r: 120, mau: ['var(--kl-vang)', 'var(--sao)', '#fff'] }) }, 720)
+  await TP.cho(1700)
+  const dem = document.getElementById('dem-tt')
+  TP.bay(document.querySelector('.thuong-lon .tp-o'), dem.parentElement, { n: 8, dem: (p) => { dem.textContent = Math.round(245 + 40 * p) } })
+})
+TP.dk('giu', async () => {
+  TP.phanHoi('giuHang')
+  TP.a(hh, [{ transform: 'scale(.6)', opacity: 0 }, { transform: 'scale(1.08)', opacity: 1 }, { transform: 'none', opacity: 1 }], 600)
+  TP.a(bi, [{ transform: 'translateY(0)' }, { transform: 'translateY(-12px)' }, { transform: 'translateY(0)' }], 500, { delay: 400 })
+})
+TP.dk('roi', async () => {
+  // E3: huy hiệu Bạc trượt xuống mờ đi, huy hiệu Đồng hiện; Bi buồn; không hoa giấy, âm trầm nhẹ
+  TP.phanHoi('roiHang')
+  TP.a(document.getElementById('hh-cu'), [{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(0)', opacity: 1, offset: 0.3 }, { transform: 'translateY(60px) scale(.85)', opacity: 0 }], 900, { e: 'ease-in' })
+  TP.a(hh, [{ transform: 'translateY(-30px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 500, { delay: 650 })
+  TP.a(bi, [{ transform: 'translateY(0) rotate(0)' }, { transform: 'translateY(6px) rotate(-6deg)' }, { transform: 'translateY(4px) rotate(4deg)' }, { transform: 'none' }], 900, { delay: 300 })
+})
+</script>
+</body></html>
