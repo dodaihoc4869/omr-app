@@ -286,6 +286,8 @@ export default defineConfig({
           '**/LuyenDeChuan-*.{js,css}',
           // Giao diện «Trong» app học sinh (26/10): mảnh trình bày nạp lười (nap-trong-hs.ts) ⇒ kho chạy-lúc; tải hỏng (mất mạng lần đầu) ⇒ app vẽ bản cũ.
           '**/TrongHs-*.{js,css}',
+          // «Một trang» app phụ huynh (26/10): mảnh nạp lười khi <html data-trong="ph"> (AppPhuHuynh) ⇒ kho chạy-lúc; tải hỏng ⇒ app vẽ trang cũ.
+          '**/MotTrangPh-*.{js,css}',
           // Giao diện «Trong» màn làm bài (26/10): tờ trình bày nạp lười trong màn thi & các màn làm câu (chỉ khi <html data-trong>) ⇒ kho chạy-lúc;
           // tải hỏng ⇒ màn thi vẫn chạy với trình bày cũ (logic không phụ thuộc tờ này).
           '**/trong-lam-bai-*.css',

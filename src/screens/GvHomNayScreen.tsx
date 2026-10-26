@@ -17,7 +17,7 @@
 // SỐ CHỈ TỪ API, không số giả: lệnh nào lỗi thì phần của nó KHÔNG vẽ. "Cần thầy chữa" = cùng nguồn và cùng cách gộp với danh sách Cần thầy chữa.
 // Ghi số cho thanh bên (`useSoDemGv`: ca đang mở, Cần thầy chữa). Phép tính thuần xuất ra để test (tests/gv-hom-nay-0910.test.tsx).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, Check, ChevronRight, CircleHelp, MonitorCheck, PenLine, RefreshCw, type LucideIcon } from 'lucide-react'
+import { BookOpen, Check, ChevronRight, CircleHelp, Eye, MonitorCheck, PenLine, Plus, RefreshCw, type LucideIcon } from 'lucide-react'
 import { danhSachCa, danhSachCauHoi, type CaTomTat } from '../lib/exam-api'
 import { gomTheoCa } from '../lib/hoi-bai'
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
@@ -273,6 +273,9 @@ const laDuNhip = (d: unknown): boolean => !!d && typeof d === 'object' && (d as 
 
 // ------------------------------------------------------------------ MÀN
 
+/** «Một trang» (giao diện «Trong»): số việc hiện trước khi bấm «Xem đủ N việc» (thừa đúng một việc thì hiện luôn, không cắt). */
+const SO_VIEC_MOT_TRANG = 4
+
 type Mau = 'xl' | 'ho' | 'hp' | 'xd' | 'tim' | 'xam'
 interface Viec {
   key: string
@@ -389,6 +392,8 @@ export default function GvHomNayScreen() {
     setScreen('chiendich')
   }
   const [moBoSung, setMoBoSung] = useState(false)
+  // «Một trang» (chỉ «Trong»): danh sách Việc cần thầy dài ⇒ 4 việc đầu + «Xem đủ N việc» (mở ra thì cuộn trong thẻ, trang không cuộn)
+  const [moHetViec, setMoHetViec] = useState(false)
 
   // VIỆC CẦN THẦY — xếp theo độ gấp: ca đang mở → Cần thầy chữa → em hỏi bài → lớp chờ bài mới → phần chưa đọc được (Thử lại)
   // → không có chỗ cần chữa (✓, không nút). Việc "em chưa làm câu nào" đã bỏ: khối Nhịp học nói đủ và rõ hơn.
@@ -471,15 +476,24 @@ export default function GvHomNayScreen() {
   const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => setMoBoSung(true) }
   const soEm = nhip?.ok ? nhip.kq.em.length : null
 
-  // «Trong» (bản vẽ 26/10): khối Việc cần thầy vào đầu cột trái của Nhịp học (NhipHocThay đặt); không «Trong» ⇒ đúng chỗ cũ.
+  // «Trong» · «Một trang» (bản vẽ 26/10 chiều): khối Việc cần thầy là cột đầu của lưới một khung hình (NhipHocThay đặt); không «Trong» ⇒ đúng chỗ cũ.
   const trong = typeof document !== 'undefined' && document.documentElement.dataset.trong === 'gv'
   const soViec = viec.filter((v) => v.nut && !v.loi).length
+  const catViec = trong && !moHetViec && viec.length > SO_VIEC_MOT_TRANG + 1
+  const viecHien = catViec ? viec.slice(0, SO_VIEC_MOT_TRANG) : viec
   const khoiViec = (
       <section className="gvhn-viec-khoi" aria-label="Việc cần thầy">
         {trong && du && viec.length > 0 && (
           <div className="gvhn-viec-dau">
             <h2>Việc cần thầy</h2>
             {soViec > 0 && <span className="gvv2-so">{soViec} việc</span>}
+            {/* «Một trang»: nút cắt/mở danh sách nằm ở đầu thẻ (không tốn thêm một hàng dưới danh sách) */}
+            {viec.length > SO_VIEC_MOT_TRANG + 1 && (
+              <button type="button" className="gvv2-nut-chu tt-nhan gvhn-viec-them" aria-expanded={!catViec} onClick={() => setMoHetViec((m) => !m)}>
+                {catViec ? `Xem đủ ${viec.length} việc` : 'Thu gọn'}
+                <ChevronRight size={16} aria-hidden="true" />
+              </button>
+            )}
           </div>
         )}
         {!du || (viec.length === 0 && du.conCho) ? (
@@ -488,7 +502,7 @@ export default function GvHomNayScreen() {
           <p className="gvv2-trong gvhn-viec-trong">Không có việc cần thầy lúc này. Màn tự đọc lại số mỗi lần thầy mở.</p>
         ) : (
           <ul className="gvhn-the-ds">
-            {viec.map((v) => {
+            {viecHien.map((v) => {
               const Icon = v.icon
               const ruot = (
                 <>
@@ -530,7 +544,7 @@ export default function GvHomNayScreen() {
 
   return (
     <div className="gv2-trang gvhn gvhn-1210">
-      <header className="gvhn-dau">
+      <header className="gvhn-dau" data-co-ca={caMo.length > 0 ? '' : undefined}>
         <div className="gvhn-dau-chu">
           <h1 className="gvv2-h1">Hôm nay của thầy</h1>
           {/* điện thoại (bản vẽ): "Thứ Hai 12/10 · 262 em · cập nhật 10:15" — bỏ năm và chữ "đang học" cho vừa một dòng */}
@@ -546,7 +560,15 @@ export default function GvHomNayScreen() {
             {capNhat !== null && ` · cập nhật ${gioPhut(capNhat)}`}
           </p>
         </div>
+        {/* «Một trang»: có ca đang mở thì «Bổ sung bài hôm nay» thành nút phụ cạnh nút chính (cùng hộp bổ sung bài như nút ở việc «Lớp chưa có bài mới») */}
+        {trong && caMo.length > 0 && (
+          <button type="button" className="gvv2-nut-vien gvhn-nut-phu tt-nhan" onClick={() => setMoBoSung(true)}>
+            <Plus size={18} aria-hidden="true" />
+            Bổ sung bài hôm nay
+          </button>
+        )}
         <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
+          {trong && (caMo.length > 0 ? <Eye size={18} aria-hidden="true" /> : <Plus size={18} aria-hidden="true" />)}
           {nutChinh.chu}
         </button>
       </header>

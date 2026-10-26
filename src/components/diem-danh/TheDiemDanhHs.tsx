@@ -7,7 +7,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { buoiCuaEm, emDiemDanh, maTuDuongDan, type BuoiCuaEm } from '../../lib/buoi-hoc-api'
 import './diem-danh-hs.css'
 
-type TrangThai = { loai: 'an' } | { loai: 'cho'; buoi: BuoiCuaEm | null } | { loai: 'xong'; buoi: BuoiCuaEm }
+// «Trong» (26/10, bản vẽ hs-mot-trang-menu): khối Điểm danh đứng đầu menu dọc dùng CHÍNH hook này (cùng lệnh, cùng luồng QR) — `an.daXong` / `xong.luc`
+// chỉ để menu hiện «Đã điểm danh» (+ giờ em vừa bấm trên máy này); thẻ nổi bên dưới vẫn ẩn như cũ khi đã điểm danh từ trước.
+export type TrangThaiDiemDanh = { loai: 'an'; daXong?: BuoiCuaEm } | { loai: 'cho'; buoi: BuoiCuaEm | null } | { loai: 'xong'; buoi: BuoiCuaEm; luc: number }
 
 function xoaMaKhoiDuongDan() {
   try {
@@ -26,12 +28,14 @@ export function ngayGon(ten: string): string {
   return m && /^Buổi học\s/.test(ten) ? `${m[1].padStart(2, '0')}/${m[2].padStart(2, '0')}` : ten
 }
 
-export default function TheDiemDanhHs({ token }: { token: string }) {
-  const [tt, setTt] = useState<TrangThai>({ loai: 'an' })
+/** Toàn bộ logic điểm danh của em (hỏi buổi, gửi mã, QR `?diem-danh=`). `bat` = false ⇒ như khi thẻ chưa gắn (không hỏi, không nghe); bật lại ⇒ hỏi lại. */
+export function useDiemDanhHs(token: string, bat = true) {
+  const [tt, setTt] = useState<TrangThaiDiemDanh>({ loai: 'an' })
   const [mo, setMo] = useState(false)
   const [ma, setMa] = useState('')
   const [loi, setLoi] = useState('')
   const [dangGui, setDangGui] = useState(false)
+  const [tuQr, setTuQr] = useState(false)
   const oNhap = useRef<HTMLInputElement>(null)
   const daTuGui = useRef(false)
 
@@ -48,7 +52,7 @@ export default function TheDiemDanhHs({ token }: { token: string }) {
       const r = await emDiemDanh(token, m)
       setDangGui(false)
       if (r.ok) {
-        setTt({ loai: 'xong', buoi: r.buoi })
+        setTt({ loai: 'xong', buoi: r.buoi, luc: Date.now() })
         setMa('')
         setMo(false)
       } else {
@@ -66,17 +70,19 @@ export default function TheDiemDanhHs({ token }: { token: string }) {
       if (cu.loai === 'xong') return cu
       if (!b) return cu.loai === 'cho' && !cu.buoi ? cu : { loai: 'an' }
       // Đã điểm danh từ trước (mở lại app / đóng màn khác) ⇒ không làm phiền nữa; báo "đã điểm danh" chỉ ngay sau lượt em bấm.
-      return b.daDiemDanh ? { loai: 'an' } : { loai: 'cho', buoi: b }
+      return b.daDiemDanh ? { loai: 'an', daXong: b } : { loai: 'cho', buoi: b }
     })
   }, [token])
 
   useEffect(() => {
+    if (!bat) return
     // QUÉT QR: mã có sẵn trong đường dẫn ⇒ gửi ngay một lần rồi xoá khỏi đường dẫn (tải lại trang không gửi lại).
     const maUrl = typeof window !== 'undefined' ? maTuDuongDan(window.location.search) : ''
     if (maUrl && !daTuGui.current) {
       daTuGui.current = true
       xoaMaKhoiDuongDan()
       setTt({ loai: 'cho', buoi: null })
+      setTuQr(true)
       void gui(maUrl)
     }
     void hoi()
@@ -85,7 +91,13 @@ export default function TheDiemDanhHs({ token }: { token: string }) {
     }
     document.addEventListener('visibilitychange', hien)
     return () => document.removeEventListener('visibilitychange', hien)
-  }, [gui, hoi])
+  }, [gui, hoi, bat])
+
+  return { tt, setTt, mo, setMo, ma, setMa, loi, setLoi, dangGui, gui, oNhap, tuQr }
+}
+
+export default function TheDiemDanhHs({ token }: { token: string }) {
+  const { tt, setTt, mo, setMo, ma, setMa, loi, setLoi, dangGui, gui, oNhap } = useDiemDanhHs(token)
 
   if (tt.loai === 'an') return null
 

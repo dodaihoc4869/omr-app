@@ -38,6 +38,13 @@ import ManLoiThay from './ManLoiThay'
 const ManChiTietCa = lazy(() => import('./ManChiTietCa'))
 const ManTienBo = lazy(() => import('./ManTienBo'))
 const ManDiemSo = lazy(() => import('./ManDiemSo'))
+// «MỘT TRANG» (thầy chốt 26/10, MotTrangPh.tsx): main.tsx gắn <html data-trong="ph"> (lùi một máy: localStorage ddh.trong='tat' ⇒ trang cũ y như trước,
+// không tải mảnh này). Bật ⇒ mảnh màn một trang tải NGAY lúc mô-đun này chạy (song song các lệnh lúc mở); tải hỏng ⇒ vẽ trang cũ.
+type ModMot = typeof import('./MotTrangPh')
+const laMotTrang = (): boolean => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'ph'
+let huaMot: Promise<ModMot | null> | null = null
+const napMot = (): Promise<ModMot | null> => (huaMot ??= import('./MotTrangPh').catch(() => ((huaMot = null), null)))
+if (laMotTrang()) void napMot()
 /** Số lượt làm câu tối đa tải cho phần "Số giây theo mức độ câu" (câu sai và tổng thì máy chủ tính trên mọi lượt). */
 const GIOI_HAN_LUOT = 600
 
@@ -115,6 +122,14 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   // serverNow của bản đầu xuất hiện không tạo thêm bốn yêu cầu trùng.
   const lanLamMoi = v.lanLamMoi ?? 0
   const [hoiDoiSbd, setHoiDoiSbd] = useState(false)
+  const [mot, setMot] = useState(laMotTrang)
+  const [modMot, setModMot] = useState<ModMot | null>(null)
+  useEffect(() => {
+    if (!mot) return
+    let huy = false
+    void napMot().then((m) => { if (!huy) { if (m) setModMot(() => m); else setMot(false) } })
+    return () => { huy = true }
+  }, [mot])
 
   // Tiến độ học của con: nạp cùng nhịp với "mọi thứ về con". Lỗi ⇒ giữ bản cũ; chưa từng có ⇒ khối vắng.
   const [loiHoc2, setLoiHoc2] = useState('')
@@ -216,6 +231,34 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
     }
   }
 
+  const pTrang = {
+    v, hoc2, tongQuan: taiTq, nhip: { ...nhip, thuLai: thuLaiNhip }, loiThay, thuLaiLoiThay: napLoiThay,
+    canhBao: canhBao.filter((c) => !c.daXem), onDaXem: daXemCanhBao, hoSo, napHoSo, sbd, tenCon: ten, lop, denPhan, daDenPhan,
+  }
+  const thongBao = (
+    <>
+      {v.pm && v.chuLoi && <div className="ph3-lam-moi-loi" role="status"><span>Báo cáo đang hiển thị bản đã tải. {v.chuLoi}</span><button type="button" className="tt-nhan" onClick={v.thuLai}>Thử lại báo cáo</button></div>}
+      {loiHoc2 && <div className="ph3-lam-moi-loi" role="status"><span>{hoc2 ? 'Tiến độ học đang hiển thị bản đã tải. ' : 'Chưa tải được tiến độ học. '}{loiHoc2}</span><button type="button" className="tt-nhan" onClick={() => setNhapHoc2((x) => x + 1)}>Thử lại tiến độ</button></div>}
+    </>
+  )
+  const hopDoiSbd = hoiDoiSbd && (
+    <HopXacNhan
+      tieuDe="Đổi số báo danh?"
+      noiDung={<p>Máy này sẽ quên số báo danh của con và bỏ liên kết riêng của phụ huynh đang lưu trên máy. Muốn xem lại, anh/chị mở liên kết thầy gửi hoặc nhập lại số báo danh.</p>}
+      nhanHuy="Ở lại"
+      nhanXacNhan="Đổi số báo danh"
+      onHuy={() => setHoiDoiSbd(false)}
+      onXacNhan={() => { setHoiDoiSbd(false); onDoiSbd() }}
+    />
+  )
+  if (mot && manChinh)
+    return (
+      <div className="ph3 tvc-app" data-app="ph3" data-mot-trang="">
+        {modMot ? <modMot.default {...pTrang} taiKhoan={<TaiKhoan ten={ten} onDoiSbd={() => setHoiDoiSbd(true)} />} thongBao={thongBao} /> : <DangTai chu="Đang mở…" />}
+        {hopDoiSbd}
+      </div>
+    )
+
   let man: ReactElement
   const choMan = <DangTai chu="Đang mở…" hinh="tien-bo" />
   if (tuyen.maCa) man = <Suspense fallback={<DangTai chu="Đang mở báo cáo ca kiểm tra…" hinh="chi-tiet" />}><ManChiTietCa key={tuyen.maCa} sbd={sbd} maCa={tuyen.maCa} /></Suspense>
@@ -225,11 +268,7 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   else if (tuyen.muc === 'tien-bo') man = <><NutVe /><Suspense fallback={choMan}><ManTienBo v={v} hoc2={hoc2} tq={tq.v} /></Suspense></>
   else
     man = (
-      <TrangVeCon
-        v={v} hoc2={hoc2} tongQuan={taiTq} nhip={{ ...nhip, thuLai: thuLaiNhip }} loiThay={loiThay} thuLaiLoiThay={napLoiThay}
-        canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} hoSo={hoSo} napHoSo={napHoSo} sbd={sbd} tenCon={ten} lop={lop}
-        denPhan={denPhan} daDenPhan={daDenPhan} phanHien={phanHien} onPhanHien={setPhanHien}
-      />
+      <TrangVeCon {...pTrang} phanHien={phanHien} onPhanHien={setPhanHien} />
     )
 
   const manCon = laCon(tuyen)
@@ -273,21 +312,11 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
               <TaiKhoan ten={ten} onDoiSbd={() => setHoiDoiSbd(true)} />
             </header>
           )}
-          {v.pm && v.chuLoi && <div className="ph3-lam-moi-loi" role="status"><span>Báo cáo đang hiển thị bản đã tải. {v.chuLoi}</span><button type="button" className="tt-nhan" onClick={v.thuLai}>Thử lại báo cáo</button></div>}
-          {loiHoc2 && <div className="ph3-lam-moi-loi" role="status"><span>{hoc2 ? 'Tiến độ học đang hiển thị bản đã tải. ' : 'Chưa tải được tiến độ học. '}{loiHoc2}</span><button type="button" className="tt-nhan" onClick={() => setNhapHoc2((x) => x + 1)}>Thử lại tiến độ</button></div>}
+          {thongBao}
           <div key={khoaCuon(tuyen)} className={manCon ? 'tt-mo-lop' : 'tt-vao-muc'}>{man}</div>
         </main>
       </div>
-      {hoiDoiSbd && (
-        <HopXacNhan
-          tieuDe="Đổi số báo danh?"
-          noiDung={<p>Máy này sẽ quên số báo danh của con và bỏ liên kết riêng của phụ huynh đang lưu trên máy. Muốn xem lại, anh/chị mở liên kết thầy gửi hoặc nhập lại số báo danh.</p>}
-          nhanHuy="Ở lại"
-          nhanXacNhan="Đổi số báo danh"
-          onHuy={() => setHoiDoiSbd(false)}
-          onXacNhan={() => { setHoiDoiSbd(false); onDoiSbd() }}
-        />
-      )}
+      {hopDoiSbd}
     </div>
   )
 }

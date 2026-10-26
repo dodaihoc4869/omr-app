@@ -1,0 +1,157 @@
+/* «MỘT TRANG» app phụ huynh (thầy 26/10 chiều): MỌI thông tin của con trên một màn, không cuộn.
+   Mỗi ô = một khối của app hiện nay rút về con số chính + một dòng nghĩa; chạm ô ⇒ mở đủ khối đó (tấm trượt). Màu chính = cam logo phụ huynh v3. */
+:root{--ph:#e2621b;--ph-nhat:#fff1e8;--ph-chu:#b4470f}
+:root[data-theme=dark]{--ph:#ff9a5c;--ph-nhat:#3a2010;--ph-chu:#ffbf94}
+body[data-app=ph]{--chinh:var(--ph);--chinh-nhat:var(--ph-nhat);--chinh-chu:var(--ph-chu)}
+.ph-dau{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--nen) 88%,transparent);border-bottom:1px solid var(--vien)}
+.ph-dau .khung{display:flex;align-items:center;gap:10px;min-height:56px;padding-top:6px;padding-bottom:6px}
+.ph-dau img{width:30px;height:30px}
+.ph-dau .ten-app{font-weight:700;font-size:15px;white-space:nowrap}
+.ph-dau .ten-app small{display:block;font-size:12px;font-weight:500;color:var(--chu-3)}
+.ph-loi{display:flex;gap:6px;margin-left:auto}
+.ph-loi .nut{min-height:40px;padding:0 12px;font-size:14px;font-weight:500}
+.ph main.khung{max-width:1240px;padding-top:16px;padding-bottom:16px;display:flex;flex-direction:column;gap:14px}
+.ph main.khung>*{min-width:0}
+.ph-chao{display:flex;align-items:flex-end;gap:12px}
+.ph-chao .giua{flex:1;min-width:0}
+.ph-chao h1{margin:0;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.01em}
+.ph-luoi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.ph-luoi>*{min-width:0}
+.o{position:relative;background:var(--mat);border:1px solid var(--vien);border-radius:var(--bo-3);box-shadow:var(--bong-1);padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-height:0}
+.o-ten{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--chu-2);padding-right:18px}
+.o-ten .i{width:18px;height:18px;color:var(--chinh-chu)}
+.o::after{content:"";position:absolute;top:18px;right:16px;width:7px;height:7px;border-top:2px solid var(--chu-3);border-right:2px solid var(--chu-3);transform:rotate(45deg)}
+.o-so{font-size:26px;font-weight:700;line-height:1.15;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.o-so small{font-size:13px;font-weight:500;color:var(--chu-3)}
+.o-ghi{font-size:13px;color:var(--chu-2);line-height:1.45}
+.o-ghi b{color:var(--chu);font-weight:600}
+.o.hom{grid-column:span 2;grid-row:span 2;padding:20px;gap:14px}
+.hom-than{display:flex;align-items:center;gap:20px}
+.hom .vong{--d:136px;--net:13px;--c:var(--chinh)}
+.hom .vong .so-lon{font-size:34px}
+.hom-chu{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.so-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.so-4>div{padding:8px 10px;border-radius:12px;background:var(--mat-2)}
+.so-4 .mo{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.so-4 b{display:block;font-size:18px}
+.nhac{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:var(--ph-nhat);color:var(--ph-chu);font-size:14px;line-height:1.45}
+.nhac .i{width:18px;height:18px;flex:none;margin-top:1px}
+.nhac b{color:var(--chu)}
+.o.thay{grid-column:span 2}
+.canh-bao{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--sai-nhat);color:var(--sai-chu);font-size:13.5px}
+.canh-bao span{flex:1;min-width:0}
+.canh-bao .nut{flex:none;min-height:44px;padding:0 12px;font-size:13px;background:var(--mat);border-color:transparent}
+.nhan-xet{font-size:14px;line-height:1.5;color:var(--chu);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nhan-xet .mo{font-weight:600}
+.n14{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:3px}
+.n14 i{aspect-ratio:1;border-radius:4px;background:var(--mat-3)}
+.n14 i.d{background:var(--dung)}.n14 i.t{background:color-mix(in srgb,var(--dung) 45%,var(--mat-3))}.n14 i.n{background:var(--chu-y)}.n14 i.k{background:var(--sai)}.n14 i.h{outline:2px solid var(--chinh);outline-offset:1px;background:var(--chu-y)}
+.cot-nho{display:flex;align-items:flex-end;gap:5px;height:34px}
+.cot-nho i{flex:1;border-radius:4px 4px 2px 2px;background:var(--mat-3)}
+.cot-nho i.on{background:var(--chinh)}
+.thanh-3{display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--mat-3)}
+.thanh-3 i{display:block;height:100%}
+.thanh-3 .a{background:var(--dung)}.thanh-3 .b{background:var(--chu-y)}.thanh-3 .c{background:var(--sai)}
+.ph-them{display:flex;gap:8px}
+.ph-them .nut{flex:1;min-height:44px;font-size:13.5px;font-weight:500;padding:0 10px}
+.ph-them .nut .dem-so{margin-left:2px}
+.chi-dt-ph{display:none}
+@media (min-width:901px){.ph-them{display:none}}
+@media (max-width:900px){.ph-loi .an-ph-hep{display:none}}
+/* điện thoại dọc */
+@media (max-width:600px){
+  .ph-dau .khung{min-height:52px;padding:4px 16px}
+  .ph main.khung{padding:12px 14px 12px;gap:10px}
+  .ph-chao h1{font-size:20px}
+  .ph-chao .nhan{font-size:12.5px}
+  .ph-luoi{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .o{padding:10px 12px;gap:4px;border-radius:16px}
+  .o::after{top:14px;right:12px}
+  .o-ten{font-size:12.5px;gap:6px}
+  .o-ten .i{width:16px;height:16px}
+  .o-so{font-size:21px}
+  .o-ghi{font-size:12px;line-height:1.35}
+  .o.hom{grid-row:auto;padding:14px;gap:10px}
+  .hom-than{gap:14px}
+  .hom .vong{--d:92px;--net:10px}
+  .hom .vong .so-lon{font-size:24px}
+  .hom .vong .mo{font-size:10.5px}
+  .hom-chu{gap:6px}
+  .so-4{gap:6px}.so-4>div{padding:6px 8px}.so-4 b{font-size:15px}.so-4 .mo{font-size:11px}
+  .nhac{padding:8px 10px;font-size:13px}
+  .o.thay{gap:6px}
+  .canh-bao{padding:4px 4px 4px 10px;font-size:12.5px}
+  .nhan-xet{font-size:13px;-webkit-line-clamp:2}
+  .an-dt-ph{display:none!important}
+  .cot-nho{height:24px}
+}
+/* điện thoại ngang: 4 cột, Hôm nay 2×2, bỏ dòng phụ */
+@media (max-width:900px) and (max-height:520px){
+  .ph-dau .khung{min-height:46px}
+  .ph main.khung{padding:8px 16px;gap:8px}
+  .ph-chao{display:none}
+  .ph-luoi{gap:8px}
+  .o{padding:8px 12px;gap:3px}
+  .o::after{top:13px}
+  .o-so{font-size:19px}
+  .o-ghi{font-size:12px;line-height:1.3}
+  .o.hom{padding:12px;gap:8px}
+  .hom .vong{--d:84px;--net:9px}
+  .hom .vong .so-lon{font-size:22px}
+  .hom .vong .mo{font-size:10px}
+  .hom-chu h2{font-size:15px!important}
+  .so-4 b{font-size:14px}.so-4>div{padding:4px 6px}
+  .nhac{display:none}
+  .nhan-xet{-webkit-line-clamp:1;font-size:13px}
+  .canh-bao{font-size:12.5px;padding:2px 2px 2px 8px}
+  .ph-them{display:none}
+  .an-ngang{display:none!important}
+  .n14{gap:2px}
+  .cot-nho{height:20px}
+}
+
+.hom-tieu{margin:0;font-size:19px}
+.chi-dt-ph{display:none}
+/* máy tính: ô tự giãn lấp đúng một khung hình */
+@media (min-width:901px){
+  .ph main.khung{height:calc(100dvh - 57px);box-sizing:border-box;padding-top:20px;padding-bottom:24px;gap:16px}
+  .ph-luoi{flex:1;grid-template-rows:repeat(3,minmax(0,1fr));gap:16px}
+  .o{padding:18px 20px;gap:10px}
+  .o-ten{font-size:14.5px}
+  .o-so{font-size:32px}
+  .o-ghi{font-size:14px}
+  .o.hom{padding:24px}
+  .hom .vong{--d:176px;--net:15px}
+  .hom .vong .so-lon{font-size:42px}
+  .hom-tieu{font-size:24px}
+  .so-4 b{font-size:22px}
+  .n14 i{border-radius:5px}
+  .cot-nho{height:44px}
+  .ph-chao h1{font-size:30px}
+}
+@media (max-width:600px){
+  .chi-dt-ph{display:block}
+  .hom-tieu{font-size:16px}
+  .o.hom{gap:8px}
+  .o-so.gio{font-size:19px}
+  .nhac{font-size:12.5px;padding:7px 10px}
+  .ph-chao .nhan{display:none}
+  .canh-bao{font-size:12.5px}
+  .canh-bao .nut{min-height:44px}
+}
+@media (max-width:600px){
+  .ph-dau .khung{min-height:48px;padding:2px 14px}
+  .ph main.khung{gap:8px;padding-top:10px;padding-bottom:10px}
+  .ph-luoi{gap:8px}
+}
+@media (max-width:900px) and (max-height:520px){
+  .ph-dau .khung{min-height:44px;padding-top:0;padding-bottom:0}
+  .ph main.khung{padding-top:6px;padding-bottom:6px;gap:6px}
+  .ph-luoi{gap:6px}
+  .o{padding:6px 12px}
+}
+@media (max-width:900px) and (max-height:520px){
+  .ph-loi .an-ph-hep{display:inline-flex;font-size:0;width:44px;padding:0;gap:0}
+  .ph-loi .an-ph-hep .i{width:20px;height:20px}
+  .hom .vong .mo{display:none}
+}
