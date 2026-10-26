@@ -2,8 +2,8 @@
  * chọn bắt đầu bằng [data-trong=ph]. MÀU: CHỈ biến sẵn có của app phụ huynh — bảng --ph3-* (nền, mặt, viền, chữ, xanh lá = đủ/đúng, hồng = sai/không
  * làm, hổ phách = chưa đủ) + cam logo phụ huynh --ph-cam / --ph-cam-nen (màu chính: cột Hôm nay) + --ph3-tren-xl (chữ trên nền đậm). KHÔNG nạp trong.css.
  * KHÔNG CẮT CHỮ: thẻ cao theo nội dung, thiếu chỗ thì trang cuộn (ngoại lệ: Lời thầy tối đa 3 dòng ở điện thoại dọc).
- * Khổ: điện thoại dọc (một cột) · điện thoại ngang ≤ 900 × ≤ 520 (hai cột; như bản vẽ bỏ dòng tên, Lời thầy, dòng buổi học/hôm qua và chữ lý do của
- * nhận định — số chính vẫn đủ) · máy tính ≥ 901 (hai cột). */
+ * Khổ: điện thoại dọc (một cột) · điện thoại ngang ≤ 900 × ≤ 520 (hai cột; bỏ dòng tên và dòng buổi học/hôm qua; Lời thầy + lý do nhận định LUÔN
+ * hiện — phiên chính 26/10: phụ huynh luôn phải đọc được lời thầy; trang ngang cuộn nhẹ được) · máy tính ≥ 901 (hai cột). */
 [data-trong=ph] .pd { min-height: 100dvh; background: var(--ph3-nen); color: var(--ph3-chu); }
 [data-trong=ph] .pd-khung { width: 100%; max-width: 1120px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
 [data-trong=ph] .pd-dau { background: var(--ph3-mat); border-bottom: 1px solid var(--ph3-vien); }
@@ -138,17 +138,17 @@
   [data-trong=ph] .pd-so > div { padding: 8px 10px; }
   [data-trong=ph] .pd-so b { font-size: 17px; }
 }
-/* điện thoại ngang: hai cột gọn, bỏ dòng tên, Lời thầy, dòng buổi học/hôm qua, chữ lý do của nhận định (bản vẽ) */
+/* điện thoại ngang: hai cột gọn, bỏ dòng tên và dòng buổi học/hôm qua; Lời thầy dưới 7 ngày qua, lý do nhận định vẫn hiện */
 @media (max-width: 900px) and (max-height: 520px) {
   [data-trong=ph] .pd-dau .pd-khung { min-height: 44px; padding-top: 0; padding-bottom: 0; }
   [data-trong=ph] .pd-khung { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
   [data-trong=ph] .pd-than { gap: 8px; padding-top: 8px; padding-bottom: 8px; }
   [data-trong=ph] .pd-ten { display: none; }
-  [data-trong=ph] .pd-luoi { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "hom bay" "nhom bay"; gap: 8px; }
+  [data-trong=ph] .pd-luoi { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "hom bay" "nhom bay" "nhom loi"; gap: 8px; }
   [data-trong=ph] .g-hom { grid-area: hom; }
   [data-trong=ph] .g-bay { grid-area: bay; }
   [data-trong=ph] .g-nhom { grid-area: nhom; }
-  [data-trong=ph] .g-loi { display: none; }
+  [data-trong=ph] .g-loi { grid-area: loi; }
   [data-trong=ph] .pd-the { padding: 10px 12px; gap: 6px; border-radius: 16px; }
   [data-trong=ph] .pd-dau-tron { width: 40px; height: 40px; }
   [data-trong=ph] .pd-hom-chu b { font-size: 16px; }
@@ -157,7 +157,6 @@
   [data-trong=ph] .pd-thang span { min-height: 34px; font-size: 13px; }
   [data-trong=ph] .pd-cach { padding: 6px 10px; }
   [data-trong=ph] .pd-cach b { font-size: 14px; }
-  [data-trong=ph] .pd-cach span { display: none; }
   [data-trong=ph] .pd-so > div { padding: 6px 10px; }
   [data-trong=ph] .pd-so b { font-size: 16px; }
 }
