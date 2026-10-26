@@ -9,12 +9,17 @@
 //     TỰ SỬA (thầy 26/10): `lech` / `lo_dap_an` / JSON hỏng ⇒ thử lại tới 4 lượt (từ lượt 3 model mạnh), kèm lý do; còn lệch ⇒ vòng sửa `chiSuaLoi`.
 //   · Ghi bảng CHỈ-THÊM `loi_giai_so_do` (`INSERT … ON CONFLICT(qid) DO UPDATE`), KHÔNG đụng `game_v2_question` / q.json. Bản `dat` đúng phiên
 //     bản câu không bao giờ bị lượt sau ghi đè bằng kết quả kém hơn. Chỉ `dat` mới được hiện (luật đọc của làn C).
-//   · `thuKhong` ⇒ không ghi gì (kể cả không tạo bảng), chỉ trả kết quả + bản soạn.
+//   · TỰ SỬA ĐÁP ÁN KHO (thầy 26/10: «Nếu lệch đáp án tự động lấy đáp án bạn giải ko cần hỏi tôi điều gì»): câu cuối cùng vẫn lệch mà 2 lần giải MÙ
+//     cùng ra một số khác kho ⇒ `suaDapAnKho` (sua-dap-an-kho.ts) đổi đáp án của đúng câu trong gói R2 (có nhật ký lùi `dap_an_kho_sua`, tự từ chối khi
+//     Phần II / câu bảo vệ / ca thi mở / chặng KTCN đang làm) ⇒ soạn lại câu theo đáp án mới. Làm TUẦN TỰ sau mỗi đợt song song (các câu cùng tờ ghi
+//     cùng một gói R2). Tắt bằng `tuSuaDapAn: false`.
+//   · `thuKhong` ⇒ không ghi gì (kể cả không tạo bảng, không sửa kho), chỉ trả kết quả + bản soạn.
 //   · Lô nhỏ, song song có giới hạn, ngân sách giờ mỗi lượt gọi; hết giờ ⇒ trả `conTro`, lượt sau tiếp đúng chỗ.
 //   · Không chạy 19–24h giờ VN (giờ cao điểm, DAC-TA mục 6) trừ khi `choChayGioCaoDiem`.
 import type { D1PreparedStatement, Env } from './kieu'
 import type { BanSoDo, BuocTinh, HienTuong, KetQuaCong, NutSoDo, SoDo, ThuaSo } from '../../src/lib/goi-y-cham/kieu'
-import { kiemCong } from './so-do-cong'
+import { docSo, kiemCong } from './so-do-cong'
+import { suaDapAnKho } from './sua-dap-an-kho'
 import { quaTram } from './tram-gemini'
 import { docCauEmSai } from './hoc-lieu-may-soan'
 import { laCauTuLuan, laMotSoPhanIII } from '../../src/lib/cau-tu-luan'
@@ -217,7 +222,7 @@ export function docBanSoDo(chu: string, qid: string): { ban: BanSoDo } | { loi: 
 
 // ---------------------------------------------------------------- lô
 
-export interface ThamSoSoDo { qids?: string[]; gioiHan?: number; chiCauSaiNhieu?: boolean; thuKhong?: boolean }
+export interface ThamSoSoDo { qids?: string[]; gioiHan?: number; chiCauSaiNhieu?: boolean; thuKhong?: boolean; /** mặc định true (lệnh thầy 26/10); false ⇒ chỉ đánh dấu nghi */ tuSuaDapAn?: boolean }
 interface ThamSoDayDu extends ThamSoSoDo {
   /** con trỏ lượt trước trả (`conTro`) */
   conTro?: string
@@ -232,7 +237,11 @@ interface ThamSoDayDu extends ThamSoSoDo {
   chiSuaLoi?: boolean
 }
 type KetCuoi = KetQuaCong | 'hong' | 'loi_goi'
-export interface DongKetQua { qid: string; ket: KetCuoi; lyDo?: string; giaTri?: string; lanThu: number; model?: string; dapAnMay?: string; nghiDapAn?: boolean }
+export interface DongKetQua {
+  qid: string; ket: KetCuoi; lyDo?: string; giaTri?: string; lanThu: number; model?: string; dapAnMay?: string; nghiDapAn?: boolean
+  /** đã đổi đáp án kho theo số máy giải (id dòng `dap_an_kho_sua` để lùi) */ daSuaDapAn?: boolean; maSuaDapAn?: string
+  /** nghi nhưng KHÔNG sửa: lý do (mã từ chối của suaDapAnKho / không chọn được đáp án mới) */ khongSua?: string
+}
 export type KiemCong = (ban: BanSoDo, ctx: { phan: 'I' | 'II' | 'III'; dapAn: string; luaChon: readonly string[] }) =>
   { ket: KetQuaCong; lyDo?: string; giaTri?: unknown } | Promise<{ ket: KetQuaCong; lyDo?: string; giaTri?: unknown }>
 /** Phụ thuộc thay được (test): mô hình giả, cổng giả, đồng hồ. */
@@ -261,7 +270,7 @@ function docThamSo(t: unknown): ThamSoDayDu | string {
     ...(qids ? { qids } : {}), gioiHan: kep(o.gioiHan, 10, 1, 50), chiCauSaiNhieu: o.chiCauSaiNhieu === true, thuKhong: o.thuKhong === true,
     conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 8),
     nganSachGiay: kep(o.nganSachGiay, 40, 5, 110), soEmToiThieu: kep(o.soEmToiThieu, SO_EM_SAI_TOI_THIEU, 1, 1000), choChayGioCaoDiem: o.choChayGioCaoDiem === true,
-    chiSuaLoi: o.chiSuaLoi === true, ...(o.chiSuaLoi === true ? { lamLai: true } : {}),
+    chiSuaLoi: o.chiSuaLoi === true, ...(o.chiSuaLoi === true ? { lamLai: true } : {}), tuSuaDapAn: o.tuSuaDapAn !== false,
   }
 }
 
@@ -328,6 +337,37 @@ async function gomHang(env: Env, ts: ThamSoDayDu, het: () => boolean): Promise<{
   return { hang, nguonHet }
 }
 
+/** Đơn vị viết theo một con số trong phương án (như cổng: «10,2 gam», «0,5M», «25%»). */
+const DON_VI_PA = /^[\p{L}%°³²/·.\s]{0,12}$/u
+const gan = (a: number, b: number) => Math.abs(a - b) <= 0.01 * Math.max(Math.abs(a), Math.abs(b), 1e-12)
+
+/**
+ * Đáp án kho MỚI từ số máy giải (`dapAnMay`, dấu phẩy thập phân). Không chọn được ⇒ null (không sửa).
+ *   · Phần III: làm tròn theo số chữ số thập phân của đáp án kho cũ (đáp án cũ phải là số thường «76,8» / «70»), dấu phẩy; làm tròn lệch > 1% ⇒ null.
+ *   · Phần I: đúng MỘT phương án có giá trị số lệch ≤ 1% so với số máy; 0 hoặc ≥ 2 phương án khớp ⇒ null.
+ *   · Trùng đáp án cũ ⇒ null.
+ */
+export function dapAnMoiTuMay(q: Pick<CauKho, 'phan' | 'correct' | 'choices'>, dapAnMay: string): string | null {
+  const v = Number(str(dapAnMay).replace(',', '.'))
+  if (!Number.isFinite(v)) return null
+  if (q.phan === 'III') {
+    const cu = q.correct.trim()
+    const m = /^-?\d+(?:[.,](\d+))?$/.exec(cu)
+    if (!m) return null
+    const moi = v.toFixed(m[1]?.length ?? 0).replace('.', ',').replace(/^-(0(?:,0+)?)$/, '$1')
+    if (!gan(Number(moi.replace(',', '.')), v) || moi === cu.replace('.', ',')) return null
+    return moi
+  }
+  if (q.phan !== 'I') return null
+  const khop: string[] = []
+  q.choices.slice(0, 4).forEach((c, i) => {
+    const d = docSo(boThe(str(c)).replace(/\$/g, '').trim())
+    if (d && DON_VI_PA.test(d.donVi) && gan(d.v, v)) khop.push('ABCD'[i]!)
+  })
+  if (khop.length !== 1 || khop[0] === q.correct.trim().toUpperCase()) return null
+  return khop[0]!
+}
+
 /** Soạn một câu: gọi mô hình ⇒ kiểm khuôn ⇒ cổng. TỰ SỬA (thầy 26/10): `lech` / `lo_dap_an` / JSON hỏng ⇒ thử lại tới SO_LUOT_MOT_CAU lượt,
  *  mỗi lượt kèm lý do của lượt trước; từ lượt 3 dùng MODEL_MANH. Giữ bản tốt nhất: `dat` > `khong_kiem_duoc` > `lo_dap_an` > `lech`. */
 async function soanMotCau(q: CauKho, ts: ThamSoDayDu, goi: GoiMoHinh, cong: KiemCong, heThong: string):
@@ -360,10 +400,10 @@ async function soanMotCau(q: CauKho, ts: ThamSoDayDu, goi: GoiMoHinh, cong: Kiem
     })
   }
   if (!tot) return { dong: loiCuoi ?? { qid: q.qid, ket: 'loi_goi', lyDo: 'không gọi được mô hình', lanThu: 1 }, token }
-  // GIẢI MÙ (thầy 26/10: «Nếu lệch đáp án tự động lấy đáp án bạn giải»): KHÔNG ghi đè đáp án kho (chấm thi / KTCN / BTVN dùng nó — CLAUDE.md
-  // cấm sửa điểm thật hàng loạt). Thay vào đó: còn `lech` ⇒ giải lại 2 lần MÙ (không đưa đáp án / lời giải kho), 2 model khác nhau.
+  // GIẢI MÙ (thầy 26/10: «Nếu lệch đáp án tự động lấy đáp án bạn giải»): còn `lech` ⇒ giải lại 2 lần MÙ (không đưa đáp án / lời giải kho), 2 model khác nhau.
   //   · lần mù nào ĐẠT cổng (ra đúng đáp án kho) ⇒ lấy luôn bản đó làm lời giải;
-  //   · cả hai cùng ra một số (lệch ≤ 1%) và khác kho ⇒ đánh dấu `nghi_dap_an` + `dap_an_may` để báo thầy (chỉ báo, không tự sửa kho).
+  //   · cả hai cùng ra một số (lệch ≤ 1%) và khác kho ⇒ đánh dấu `nghi_dap_an` + `dap_an_may`. Hàm này KHÔNG ghi kho: `soanSoDoLo` sửa đáp án kho
+  //     TUẦN TỰ sau đợt (suaDapAnKho — chỉ đúng câu ấy, không đụng khoá đáp án ca, không chấm lại lượt cũ) rồi soạn lại theo đáp án mới.
   let nghi: { dapAnMay: string } | null = null
   if (tot.ket === 'lech') {
     const giaTriMu: number[] = []
@@ -409,7 +449,7 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   const het = () => bayGio() - batDau >= nganSach
 
   const { hang, nguonHet } = await gomHang(env, ts, het)
-  const dem: Record<KetCuoi | 'bo_qua' | 'nghi_dap_an', number> = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0, nghi_dap_an: 0 }
+  const dem: Record<KetCuoi | 'bo_qua' | 'nghi_dap_an' | 'da_sua_dap_an', number> = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0, nghi_dap_an: 0, da_sua_dap_an: 0 }
   const ketQua: DongKetQua[] = []
   const banThu: { qid: string; ket: KetCuoi; ban: BanSoDo }[] = []
   const token = { vao: 0, ra: 0 }
@@ -426,12 +466,34 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
       if (m.q) dot.push(m.q); else dem.bo_qua++
     }
     const xong = await Promise.all(dot.map((q) => soanMotCau(q, ts, goi, cong, heThong)))
+    // TỰ SỬA ĐÁP ÁN KHO — TUẦN TỰ (các câu cùng tờ ghi chung một gói R2): nghi ⇒ chọn đáp án mới ⇒ suaDapAnKho ⇒ soạn lại câu theo đáp án mới (version mới).
+    if (!ts.thuKhong && ts.tuSuaDapAn !== false) {
+      for (const [k, r] of xong.entries()) {
+        if (!r.dong.nghiDapAn || !r.dong.dapAnMay) continue
+        const q = dot[k]!
+        const moi = dapAnMoiTuMay(q, r.dong.dapAnMay)
+        if (!moi) { r.dong.khongSua = 'khong_chon_duoc'; continue }
+        let kq: Awaited<ReturnType<typeof suaDapAnKho>>
+        try {
+          kq = await suaDapAnKho(env, { maDe: q.maDe, qid: q.qid, dapAnMoi: moi, nguon: 'soan-so-do', lyDo: `2 lần giải mù cùng ra ${r.dong.dapAnMay} (kho ${q.correct})` }, bayGio())
+        } catch (e) { r.dong.khongSua = `loi: ${(e instanceof Error ? e.message : String(e)).slice(0, 80)}`; continue }
+        if (!kq.ok) { r.dong.khongSua = kq.ma; continue }
+        const qMoi: CauKho = { ...q, correct: kq.moi, version: kq.versionMoi }
+        dot[k] = qMoi
+        dem.da_sua_dap_an++
+        const lai = await soanMotCau(qMoi, ts, goi, cong, heThong)
+        xong[k] = {
+          dong: { ...lai.dong, daSuaDapAn: true, maSuaDapAn: kq.id }, ...(lai.ban ? { ban: lai.ban } : {}),
+          token: { vao: r.token.vao + lai.token.vao, ra: r.token.ra + lai.token.ra },
+        }
+      }
+    }
     const ghi: D1PreparedStatement[] = []
     const luc = new Date(bayGio()).toISOString()
     for (const [k, r] of xong.entries()) {
       const q = dot[k]!
       dem[r.dong.ket]++
-      if (r.dong.nghiDapAn) dem.nghi_dap_an++
+      if (r.dong.nghiDapAn || r.dong.daSuaDapAn) dem.nghi_dap_an++ // câu đã sửa kho vẫn tính là một câu nghi (dòng ghi bảng thì không còn cờ nghi)
       ketQua.push(r.dong)
       token.vao += r.token.vao; token.ra += r.token.ra
       if (!r.ban || r.dong.ket === 'hong' || r.dong.ket === 'loi_goi') continue

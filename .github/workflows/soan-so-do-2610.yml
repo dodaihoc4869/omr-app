@@ -3,6 +3,7 @@
 # Máy chủ tự từ chối trong 19–24h giờ VN (giờ cao điểm).
 # REPO CÔNG KHAI: log CHỈ in số đếm + qid + kết quả cổng + lý do ĐÃ XOÁ SỐ. KHÔNG in bản soạn / đáp án / giá trị, KHÔNG tải artifact bản soạn.
 # Mặc định `thuKhong = true` (không ghi gì). Ghi thật: bỏ chọn thuKhong — chỉ bản `dat` mới hiện cho học sinh (luật đọc làn C).
+# Ghi thật còn TỰ SỬA ĐÁP ÁN KHO (thầy 26/10) khi 2 lần giải mù cùng ra một số khác kho: log chỉ in SỐ ĐẾM + qid đã sửa, KHÔNG in đáp án cũ/mới.
 name: Soạn lời giải kiểu sơ đồ (theo lô)
 on:
   workflow_dispatch:
@@ -78,7 +79,8 @@ jobs:
           const model = (process.env.IN_MODEL || '').trim()
           const choChayGioCaoDiem = process.env.IN_CAO_DIEM === 'true'
           const MOI_LUOT = 8
-          const dem = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0 }
+          const dem = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0, nghi_dap_an: 0, da_sua_dap_an: 0 }
+          const qidDaSua = []
           const token = { vao: 0, ra: 0 }
           let conTro = '', daSoan = 0, luot = 0, xong = false
           console.log(`Chế độ: ${thuKhong ? 'CHẠY THỬ (không ghi)' : 'GHI THẬT'} · nguồn: ${qids.length ? qids.length + ' qid' : chiCauSaiNhieu ? 'câu nhiều em sai' : 'quét kho'} · tối đa ${tong} câu`)
@@ -102,6 +104,7 @@ jobs:
             for (const [k, v] of Object.entries(j.dem || {})) dem[k] = (dem[k] || 0) + v
             token.vao += j.token?.vao || 0; token.ra += j.token?.ra || 0
             // Lý do cổng có thể chứa đáp án kho (vd «tích ra 70 khác 76,8») ⇒ xoá mọi con số trước khi in (repo công khai).
+            for (const x of j.ketQua || []) if (x.daSuaDapAn) qidDaSua.push(String(x.qid))
             for (const x of j.ketQua || []) console.log(`${String(x.qid).padEnd(34)} ${String(x.ket).padEnd(16)} lần ${x.lanThu}  ${String(x.lyDo || '').replace(/\d+([.,]\d+)*/g, '…').replace(/\s+/g, ' ').slice(0, 100)}`)
             daSoan += j.daXuLy || 0
             xong = !!j.xong
@@ -116,8 +119,10 @@ jobs:
           console.log('\n===== TÓM TẮT =====')
           console.log(`đạt ${dem.dat} · lệch ${dem.lech} · không kiểm được ${dem.khong_kiem_duoc} · lộ đáp án ${dem.lo_dap_an} · JSON hỏng ${dem.hong} · lỗi gọi mô hình ${dem.loi_goi} · bỏ qua ${dem.bo_qua}`)
           console.log(`đã soạn ${daSoan} câu trong ${luot} lượt gọi, ${giay} giây · token vào ${token.vao}, ra ${token.ra}${xong ? ' · đã hết nguồn' : ''}`)
+          // Repo công khai: CHỈ số đếm + qid, KHÔNG in đáp án (cũ / mới / số máy giải).
+          console.log(`nghi đáp án kho ${dem.nghi_dap_an} · đã tự sửa đáp án kho ${dem.da_sua_dap_an}${qidDaSua.length ? ': ' + qidDaSua.join(', ') : ''}`)
           if (process.env.GITHUB_STEP_SUMMARY) {
             const fs = await import('node:fs')
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Soạn lời giải kiểu sơ đồ (${thuKhong ? 'chạy thử' : 'ghi thật'})\n\n| đạt | lệch | không kiểm được | lộ đáp án | JSON hỏng | lỗi gọi | bỏ qua |\n|---|---|---|---|---|---|---|\n| ${dem.dat} | ${dem.lech} | ${dem.khong_kiem_duoc} | ${dem.lo_dap_an} | ${dem.hong} | ${dem.loi_goi} | ${dem.bo_qua} |\n\n${daSoan} câu · ${giay} giây · token vào ${token.vao}, ra ${token.ra}\n`)
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Soạn lời giải kiểu sơ đồ (${thuKhong ? 'chạy thử' : 'ghi thật'})\n\n| đạt | lệch | không kiểm được | lộ đáp án | JSON hỏng | lỗi gọi | bỏ qua |\n|---|---|---|---|---|---|---|\n| ${dem.dat} | ${dem.lech} | ${dem.khong_kiem_duoc} | ${dem.lo_dap_an} | ${dem.hong} | ${dem.loi_goi} | ${dem.bo_qua} |\n\nnghi đáp án kho ${dem.nghi_dap_an} · đã tự sửa đáp án kho ${dem.da_sua_dap_an}${qidDaSua.length ? ' (' + qidDaSua.join(', ') + ')' : ''}\n\n${daSoan} câu · ${giay} giây · token vào ${token.vao}, ra ${token.ra}\n`)
           }
           JS

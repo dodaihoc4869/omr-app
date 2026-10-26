@@ -3945,6 +3945,8 @@ const boXuLy = {
       // LỜI GIẢI KIỂU SƠ ĐỒ (26/10): máy soạn theo lô (server/src/soan-so-do.ts, làn D) — sau cổng mã bí mật ở trên, như máy soạn /kho/*.
       // Chuyển NGUYÊN thân lệnh (qids, gioiHan, thuKhong, conTro, lamLai, model…) — trừ `secret` (mã bí mật không đi tiếp vào máy soạn / nhật ký).
       if (p === '/quan-tri/soan-so-do-lo') { const { secret: _maBiMat, ...thamSo } = b; return raChua(await import('./soan-so-do').then((m) => m.soanSoDoLo(env, thamSo))) }
+      // TỰ SỬA ĐÁP ÁN KHO (26/10, sua-dap-an-kho.ts): lùi MỘT lần sửa theo id dòng `dap_an_kho_sua` — cùng cổng mã bí mật.
+      if (p === '/quan-tri/lui-dap-an-kho') return ra(await import('./sua-dap-an-kho').then((m) => m.luiDapAnKho(env, String(b.id ?? ''))))
       // LỜI GIẢI TỪNG BƯỚC: máy soạn của thầy (lấp kho, nhận lô, nộp hồ sơ) + màn Duyệt lời giải.
       if (p === '/kho/loi-giai/nap-hang') return ra(await napHangTuKho(env, b))
       // Ngân hàng câu kiến thức nền của thang tự gỡ (thang-tu-go.ts): nạp / cập nhật theo id — công cụ thầy chạy tay (đường duy nhất nạp ngân hàng nền).
