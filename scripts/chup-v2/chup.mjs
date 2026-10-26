@@ -234,9 +234,26 @@ const DS_T3 = [
 ]
 // ═══════════ hết «TRONG» NHÓM 3 ═══════════
 
+// ═══ MỘT TRANG GV 26/10: Hôm nay của thầy vừa MỘT khung hình (bản vẽ ve-moi/gv-mot-trang.html) — 3 khổ × sáng/tối + 1024×768 + giao diện cũ (`-cu`)
+// + danh sách dài (`&mg=dai`: 6 việc) + ba tấm «Xem đủ». Thao tác `mg:` (xem nhánh cùng tên dưới) ĐO trang không cuộn dọc — cuộn ⇒ lỗi trang. Tiền tố "mg-".
+const DS_MG = [
+  ...['light', 'dark'].flatMap((nen) => KHO_T3.map(([w, hh, kho]) => [`mg-hom-nay-${kho}${nen === 'dark' ? '-toi' : ''}`, 'gv-hom-nay&nh=1', w, hh, nen, true, /Hôm nay của thầy/, 'mg:cho'])),
+  ['mg-hom-nay-1024', 'gv-hom-nay&nh=1', 1024, 768, 'light', true, /Hôm nay của thầy/, 'mg:cho'],
+  ['mg-hom-nay-may-tinh-cu', 'gv-hom-nay&nh=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:cho'],
+  ['mg-dai-may-tinh', 'gv-hom-nay&nh=1&mg=dai', 1440, 900, 'light', true, /Hôm nay của thầy/, 'mg:cho'],
+  ['mg-dai-doc-toi', 'gv-hom-nay&nh=1&mg=dai', 390, 844, 'dark', true, /Hôm nay của thầy/, 'mg:cho'],
+  ['mg-dai-xem-du-may-tinh', 'gv-hom-nay&nh=1&mg=dai', 1440, 900, 'light', true, /Hôm nay của thầy/, 'mg:viec-du'],
+  ['mg-tam-lop-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'mg:tam-lop'],
+  ['mg-tam-em-doc', 'gv-hom-nay&nh=1', 390, 844, 'light', false, /Hôm nay của thầy/, 'mg:tam-em'],
+  ['mg-tam-bac-doc-toi', 'gv-hom-nay&nh=1', 390, 844, 'dark', false, /Hôm nay của thầy/, 'mg:tam-bac'],
+  ['mg-tam-lop-ngang-toi', 'gv-hom-nay&nh=1', 844, 390, 'dark', false, /Hôm nay của thầy/, 'mg:tam-lop'],
+]
+// ═══ hết MỘT TRANG GV 26/10
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
   ...DS_T3, // «TRONG» NHÓM 3
+  ...DS_MG, // MỘT TRANG GV 26/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D
@@ -552,7 +569,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       if (v === 'loi') await t.getByText(/Chưa tải được Nhịp học/).first().waitFor({ timeout: 20000 })
       else if (v === 'trong') await t.getByText(/Chưa có em nào nhận bài hằng ngày/).first().waitFor({ timeout: 20000 })
       else {
-        await t.locator('.nht-em').first().waitFor({ timeout: 20000 })
+        await t.locator('.nht-dai-so, .nht-em').first().waitFor({ timeout: 20000 }) // «Một trang» (26/10): điện thoại không còn dòng em trên màn — chờ dải số
         if (v === 'xem-du-luoi') {
           // mở rộng tại chỗ (đợt đầu 50 em) rồi cuộn tới ô tìm của cột — ảnh khung nhìn (toàn trang quá dài cho ảnh ≤ 150 KB)
           await t.getByRole('button', { name: /^Xem đủ \d+ em lười/ }).click()
@@ -573,6 +590,21 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         if (v === 'tab-doi-pho') await t.getByRole('tab', { name: /^Đối phó/ }).click()
       }
       await t.waitForTimeout(400)
+    } else if (viec?.startsWith('mg:')) {
+      // ═══ MỘT TRANG GV 26/10: chờ dải số; `mg:viec-du` bấm «Xem đủ N việc»; `mg:tam-lop|tam-em|tam-bac` mở tấm «Xem đủ» (máy tính: nút Xem đủ, điện thoại:
+      // dòng mở thêm). Ngoài tấm: trang PHẢI không cuộn dọc (scrollHeight ≤ innerHeight), cuộn ⇒ lỗi trang.
+      const v = viec.slice(3)
+      await t.locator('.nht-dai-so').waitFor({ timeout: 20000 })
+      if (v === 'viec-du') await t.getByRole('button', { name: /^Xem đủ \d+ việc/ }).click()
+      const nutTam = { 'tam-lop': /Nhịp học theo lớp|lớp và bảng từng ngày/, 'tam-em': /Em cần thầy để ý|^Xem đủ \d+ em/, 'tam-bac': /^12 bậc ·|Xem từng bậc/ }[v]
+      if (nutTam) {
+        await t.locator('button[aria-haspopup="dialog"]:visible').filter({ hasText: nutTam }).first().click()
+        await t.getByRole('dialog').waitFor({ timeout: 20000 })
+      }
+      await t.waitForTimeout(400)
+      const cuon = await t.evaluate(() => document.documentElement.scrollHeight - innerHeight)
+      if (cuon > 0 && !nutTam) loiTrang.push(`${ten}: trang cuộn dọc ${cuon}px — «Một trang» phải vừa khung`)
+      console.log(`${ten}: cuộn dọc ${cuon}px`)
     } else if (viec?.startsWith('hse:')) {
       // LÀN HỒ SƠ EM 12/10F: tấm mở sẵn — chờ đủ hai lệnh rồi làm đúng một việc; sau đó đo tương phản mọi chữ trong tấm.
       const v = viec.slice(4)

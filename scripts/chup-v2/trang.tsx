@@ -198,6 +198,10 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
   if (u.pathname.includes('vang-xem') || b.action === 'vang-xem' || b.lenh === 'vang-xem') return tra({ ok: true, bat: true, vang: 340, ongNghiem: 1200, giuLai: 200, chuoiNgay: 12, doiToiDa: 10 })
   if (b.action === 'danhSachEm' || u.pathname.endsWith('/em/danh-sach')) return tra({ ok: true, items: EM_GIA })
+  // ═══ MỘT TRANG GV 26/10: `&mg=dai` = danh sách dài hơn bản vẽ — thêm 3 ca đang mở ⇒ 6 việc cần thầy (thấy cắt 4 việc + «Xem đủ 6 việc», trang vẫn không cuộn). ═══
+  if (b.action === 'danhSachCa' && thamSo.get('mg') === 'dai')
+    return tra({ ok: true, items: [...CA_GIA, ...['11A2', '10A1', '12A2'].map((lop, i) => ({ ...CA_GIA[0]!, maCa: `MG-${i}`, tenCa: `Kiểm tra nhanh ${lop}`, lop, daVao: 30 + i, daNop: 5 * i }))] })
+  // ═══ hết MỘT TRANG GV 26/10
   if (b.action === 'danhSachCa') return tra({ ok: true, items: b.daXoa ? [] : CA_GIA })
   if (b.action === 'danhSachCauHoi') return tra({ ok: true, items: CAU_HOI_GIA })
   if (u.pathname.endsWith('/gv/hoc-phi/ds')) return tra({ ok: true, items: HOC_PHI_GIA })
