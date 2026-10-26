@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, Trophy, X as XIcon } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
@@ -15,6 +15,7 @@ import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, Loi
 import { chuDanhSachCau, chuDS, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
+import { Bi } from '../linh-vat/Bi'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
 import './hoc-tap.css'
@@ -363,8 +364,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       : !q ? null
       : k ? <section className="duo-day duo-ket" data-tt={tt} role="status" aria-live="polite"><div className="duo-giua">
           <div className="duo-kq">
-            <span className="duo-kq-bi" aria-hidden="true" />{/* khe linh vật (Bi) — cắm sau */}
-            <span className="duo-kq-o" aria-hidden="true">{tt === 'dung' ? <Check size={30} strokeWidth={3} /> : tt === 'sai' ? <XIcon size={30} strokeWidth={3} /> : <BookOpen size={26} />}</span>
+            {tt === 'trung' ? <span className="duo-kq-o" aria-hidden="true"><BookOpen size={26} /></span>
+              : <span className="duo-kq-bi" aria-hidden="true"><Bi key={q.qid} cam={tt === 'dung' ? 'vui' : 'sai'} size={64} /></span>}{/* linh vật Bi: đúng ⇒ vui nảy, sai ⇒ lo lắng lắc đầu */}
             <div className="duo-kq-chu">
               {tt === 'dung' ? <><h2>Chính xác!</h2>{cotLoi && <p><ChemText text={cotLoi} /></p>}</>
               : tt === 'sai' ? <><h2>Chưa đúng</h2>
@@ -405,7 +406,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         {tai ? <div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang chuẩn bị những câu phù hợp với em…</span></div>
         : xong ? <section className="duo-xong" aria-label="Kết quả chặng">
             <div className="duo-hoa" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i } as CSSProperties} />)}</div>
-            <div className="duo-huy" aria-hidden="true"><i /><i /><i /><i /><Trophy size={68} strokeWidth={1.8} /></div>
+            <Bi cam="mung" size={148} />
             <h1>{chang ? `Xong chặng ${chang}!` : 'Xong chặng học!'}</h1>
             {tenChuong && <p className="duo-xong-phu">{tenChuong}</p>}
             <div className="duo-3">

@@ -9,6 +9,7 @@ import { chuViecTiep, nhipTheoSanh, TEN_NHOM_NHIP } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import { ngayGon, useDiemDanhHs } from '../diem-danh/TheDiemDanhHs'
 import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
+import { Bi, type CamBi } from '../linh-vat/Bi'
 import '../../styles/trong-hs.css'
 
 export interface PropsMotTrang {
@@ -91,6 +92,19 @@ function DuongChang({ ds, moDi }: { ds: Nut[]; moDi: boolean }) {
   </ol></div>
 }
 
+/** G — Bi NÓI: bong bóng lời hiện chữ gõ dần (~28 ms/chữ); giảm chuyển động / máy yếu ⇒ hiện đủ ngay. Trình đọc màn hình đọc cả câu một lần. */
+function LoiBi({ cam, loi }: { cam: CamBi; loi: string }) {
+  const [n, setN] = useState(loi.length)
+  useEffect(() => {
+    const yen = document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (yen) { setN(loi.length); return }
+    setN(0)
+    const t = setInterval(() => setN((v) => { if (v >= loi.length) { clearInterval(t); return v } return v + 1 }), 28)
+    return () => clearInterval(t)
+  }, [loi])
+  return <div className="bi-loi"><Bi cam={cam} size={84} /><p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
+}
+
 /** Thang 12 bậc (Lười 1–5 · Chưa đều 6–7 · Chăm 8–12), ô đang ở có viền. */
 const Thang12 = ({ bac }: { bac: number }) => <div className="da-12" role="img" aria-label={`Bậc ${bac} trên 12`}>{Array.from({ length: 12 }, (_, i) => <i key={i} data-n={i < 5 ? 'l' : i < 7 ? 'd' : 'c'} data-on={i + 1 === bac || undefined} />)}</div>
 const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
@@ -152,7 +166,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     ]
     return <div className="dm-khung">{tren}<main className="da-vo">
       <h1 className="da-tieu">Thành tích</h1>
-      <div className="da-lua"><Flame size={56} aria-hidden="true" /><div><b>{chuoi} ngày</b><span>Chuỗi ngày đủ mức{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</span></div></div>
+      <div className="da-lua"><Bi cam={chuoi > 0 ? 'lua' : so && so.daLam === 0 ? 'ngu' : 'chao'} size={72} /><div><b>{chuoi} ngày</b><span>Chuỗi ngày đủ mức{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</span></div></div>
       {tuan.length > 0 && <ol className="da-tuan" aria-label="7 ngày gần nhất">{tuan.map((x) => { const nay = x.ngay === nhip!.homNay, d = x.muc > 0 && x.lam >= x.muc
         return <li key={x.ngay} aria-label={`${nay ? 'Hôm nay' : thuNgan(x.ngay)}: ${d ? 'đủ mức' : `${x.lam}/${x.muc} câu`}`}><i data-d={d || undefined} data-nay={nay || undefined}>{d && <Check size={18} strokeWidth={3} aria-hidden="true" />}</i>{nay ? 'Nay' : thuNgan(x.ngay)}</li> })}</ol>}
       {theBac}
@@ -177,6 +191,12 @@ export function MotTrangHs(p: PropsMotTrang) {
   if (coBt && !p.ngayKiem) nut.push({ k: 'bt', loai: 'bt', tt: chinh === 'bt' ? 'dang' : 'mo', nhan: p.soBaiTap ? `Bài tập về nhà · ${p.soBaiTap} bài` : 'Bài tập về nhà', bong: chinh === 'bt' ? 'Làm bài' : undefined, ten: 'Bài tập về nhà', onClick: p.onBaiTap })
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSua && 'Tự sửa lỗi', !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
   const hocThem = (chinh === 'sua' || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc
+  // Bi nói việc chính của hôm nay (cùng thứ tự `chinh`); xong hết ⇒ Bi mừng. Chưa có số (đang tải) ⇒ chưa hiện, không đoán.
+  const loiBi: [CamBi, string] | null = chinh === 'ca' ? ['chao', 'Có ca kiểm tra đang mở. Em vào ca trước nhé.']
+    : p.ngayKiem ? ['chao', 'Hôm nay là ngày Kiểm tra ôn tập. Em làm bài nhé.']
+    : !so ? null
+    : du ? (tiepTheo.length ? ['vui', `Đủ mức rồi! Giờ đến ${tiepTheo[0]} nhé.`] : ['mung', 'Xong hết việc hôm nay! Em giỏi lắm.'])
+    : so.daLam === 0 ? ['chao', 'Chào em! Hôm nay bắt đầu từ chặng Học nhé.'] : ['chao', `Học tiếp nhé! Còn ${con} câu nữa là đủ mức hôm nay.`]
 
   return <div className="dm-khung">{tren}
     <main className="da-vo" aria-busy={!so && p.dangTai}>
@@ -185,6 +205,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {!p.ngayKiem && <section className="da-bai" aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{p.viec}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
         {chang.length > 0 && <div className="da-bai-tien" role="progressbar" aria-label="Chặng hôm nay" aria-valuemin={0} aria-valuemax={chang.length} aria-valuenow={xongChang}><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</div>}
         {!so && p.dangTai && <span className="mot-xuong" aria-hidden="true" />}</section>}
+      {loiBi && <LoiBi cam={loiBi[0]} loi={loiBi[1]} />}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
       {nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}

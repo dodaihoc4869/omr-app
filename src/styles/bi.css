@@ -1,0 +1,92 @@
+/* LINH VẬT «Bi» (src/components/linh-vat/Bi.tsx) — chỉ app học sinh «Trong». Màu = biến --tr-* (không màu thô); viền tối ở CẢ HAI chế độ:
+   sáng lấy --tr-chu (gần đen), tối lấy --tr-trang (nền tối); «trắng» của Bi ngược lại. Cảm xúc đổi ⇒ --bi-c đổi ⇒ dung dịch đổi màu dần 400 ms (G).
+   Chuyển động chỉ transform/opacity; giảm chuyển động / máy yếu ⇒ Bi đứng yên. Nạp cùng mảnh lười của Bi, không vào nhóm mở app. */
+[data-trong='hs'] .bi {
+  --bi-c: var(--tr-dung); --bi-vien: var(--tr-chu); --bi-trang: var(--tr-trang);
+  --bi-sang: color-mix(in srgb, var(--bi-c) 70%, var(--bi-trang)); --bi-dam: color-mix(in srgb, var(--bi-c) 76%, var(--bi-vien));
+  display: block; flex: none; overflow: visible;
+}
+@media (prefers-color-scheme: dark) { [data-trong='hs'] .bi { --bi-vien: var(--tr-trang); --bi-trang: var(--tr-chu); } }
+[data-trong='hs'] .bi[data-cam='nghi'] { --bi-c: var(--tr-tin); }
+[data-trong='hs'] .bi[data-cam='sai'] { --bi-c: var(--tr-sai); }
+[data-trong='hs'] .bi[data-cam='mung'] { --bi-c: var(--tr-sao); }
+[data-trong='hs'] .bi[data-cam='lua'] { --bi-c: var(--tr-chu-y); }
+[data-trong='hs'] .bi[data-cam='ngu'] { --bi-c: var(--tr-chu-3); }
+
+[data-trong='hs'] .bi .bi-net { stroke: var(--bi-vien); }
+[data-trong='hs'] .bi .bi-net-c { stroke: var(--bi-c); }
+[data-trong='hs'] .bi .bi-toi, [data-trong='hs'] .bi .bi-bong { fill: var(--bi-vien); }
+[data-trong='hs'] .bi .bi-trang { fill: var(--bi-trang); }
+[data-trong='hs'] .bi .bi-s-trang { stroke: var(--bi-trang); }
+[data-trong='hs'] .bi .bi-f-sang { fill: var(--bi-sang); }
+[data-trong='hs'] .bi .bi-f-dam { fill: var(--bi-dam); }
+[data-trong='hs'] .bi .bi-g-sang { stop-color: var(--bi-sang); }
+[data-trong='hs'] .bi .bi-g-chinh { stop-color: var(--bi-c); }
+[data-trong='hs'] .bi .bi-g-dam { stop-color: var(--bi-dam); }
+[data-trong='hs'] .bi .bi-g-kinh { stop-color: var(--bi-trang); }
+[data-trong='hs'] .bi .bi-g-kinh-2 { stop-color: color-mix(in srgb, var(--tr-tin) 14%, var(--bi-trang)); }
+[data-trong='hs'] .bi .bi-ma { fill: color-mix(in srgb, var(--tr-sai) 32%, var(--bi-trang)); }
+[data-trong='hs'] .bi .bi-mieng { fill: color-mix(in srgb, var(--tr-sai) 45%, var(--bi-vien)); }
+[data-trong='hs'] .bi .bi-luoi { fill: color-mix(in srgb, var(--tr-sai) 55%, var(--bi-trang)); }
+[data-trong='hs'] .bi .bi-sao-mat { fill: color-mix(in srgb, var(--tr-sao) 22%, var(--bi-trang)); }
+[data-trong='hs'] .bi .bi-giot { fill: color-mix(in srgb, var(--tr-tin) 42%, var(--bi-trang)); }
+[data-trong='hs'] .bi .bi-f-sao { fill: var(--tr-sao); }
+[data-trong='hs'] .bi .bi-f-tin { fill: var(--tr-tin); }
+[data-trong='hs'] .bi .bi-f-dung { fill: var(--tr-dung); }
+[data-trong='hs'] .bi .bi-f-lua { fill: var(--tr-chu-y); }
+[data-trong='hs'] .bi .bi-s-tin { stroke: var(--tr-tin); }
+[data-trong='hs'] .bi .bi-s-sai { stroke: var(--tr-sai); }
+[data-trong='hs'] .bi .bi-s-dung { stroke: var(--tr-dung); }
+[data-trong='hs'] .bi .bi-s-sao { stroke: var(--tr-sao); }
+/* G — đổi cảm xúc: dung dịch đổi màu dần như chất chỉ thị */
+[data-trong='hs'] .bi :is(.bi-g-sang, .bi-g-chinh, .bi-g-dam) { transition: stop-color 400ms ease; }
+[data-trong='hs'] .bi :is(.bi-f-sang, .bi-f-dam) { transition: fill 400ms ease; }
+[data-trong='hs'] .bi .bi-net-c { transition: stroke 400ms ease; }
+
+/* G — đứng yên: nhún nhẹ, bọt khí bay lên, chớp mắt ngẫu nhiên 3–6 s */
+[data-trong='hs'] .bi .bi-than { transform-origin: 100px 214px; animation: bi-nhun 2.6s ease-in-out infinite; }
+[data-trong='hs'] .bi .bi-bot circle { animation: bi-bot 2.6s ease-out infinite; }
+[data-trong='hs'] .bi .bi-bot circle:nth-child(2) { animation-delay: .5s; }
+[data-trong='hs'] .bi .bi-bot circle:nth-child(3) { animation-delay: 1s; }
+[data-trong='hs'] .bi .bi-chop { transform-box: fill-box; transform-origin: center; animation: bi-chop var(--bi-chop, 4s) linear infinite; }
+[data-trong='hs'] .bi .bi-ngon { transform-box: fill-box; transform-origin: 50% 100%; animation: bi-ngon 1.1s ease-in-out infinite alternate; }
+[data-trong='hs'] .bi .bi-z path { animation: bi-z 2.4s ease-in-out infinite; }
+[data-trong='hs'] .bi .bi-z path:nth-child(2) { animation-delay: .3s; }
+[data-trong='hs'] .bi .bi-z path:nth-child(3) { animation-delay: .6s; }
+[data-trong='hs'] .bi[data-cam='ngu'] .bi-than { animation-duration: 4s; }
+/* Nhịp một lần khi hiện: đúng ⇒ nảy, sai ⇒ lắc đầu, mừng ⇒ nhảy + hoa giấy lục giác */
+[data-trong='hs'] .bi[data-nhip='nay'] { animation: bi-nay 520ms cubic-bezier(.3, 1.5, .5, 1) both; }
+[data-trong='hs'] .bi[data-nhip='lac'] { animation: bi-lac 420ms ease-in-out both; }
+[data-trong='hs'] .bi[data-nhip='nhay'] { animation: bi-nhay 1.2s cubic-bezier(.3, .9, .4, 1) both; }
+[data-trong='hs'] .bi .bi-hoa > * { transform-box: fill-box; transform-origin: center; animation: bi-hoa 1.2s cubic-bezier(.2, 1.2, .4, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+[data-trong='hs'] .bi[data-nhip='nay'] .bi-tren > * { transform-box: fill-box; transform-origin: center; animation: bi-hoa 600ms ease-out both; }
+
+@keyframes bi-nhun { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-3px) scale(1.01, .99); } }
+@keyframes bi-bot { 0% { transform: translateY(8px); opacity: 0; } 25% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-6px); opacity: 0; } }
+@keyframes bi-chop { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.12); } }
+@keyframes bi-ngon { from { transform: scale(.92, 1); } to { transform: scale(1.04, 1.08); } }
+@keyframes bi-z { 0%, 100% { transform: translateY(0); opacity: .55; } 50% { transform: translateY(-4px); opacity: 1; } }
+@keyframes bi-nay { 0% { transform: translateY(0) scale(1); } 35% { transform: translateY(-10%) scale(1.06, .96); } 70% { transform: translateY(0) scale(.97, 1.03); } 100% { transform: none; } }
+@keyframes bi-lac { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-7deg); } 45% { transform: rotate(6deg); } 70% { transform: rotate(-4deg); } }
+@keyframes bi-nhay { 0% { transform: translateY(0) scale(1); } 18% { transform: translateY(-14%) scale(1.04, .97); } 36% { transform: translateY(0) scale(1.03, .97); } 54% { transform: translateY(-8%); } 72%, 100% { transform: none; } }
+@keyframes bi-hoa { 0% { transform: scale(0) rotate(-60deg); opacity: 0; } 60% { transform: scale(1.2) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] .bi, [data-trong='hs'] .bi * { animation: none !important; transition: none !important; }
+}
+[data-trong='hs'].may-yeu .bi, [data-trong='hs'].may-yeu .bi * { animation: none !important; }
+
+/* ── Chỗ đặt Bi ── */
+/* Lộ trình: Bi chào + bong bóng lời (nói việc đầu tiên của hôm nay) */
+[data-trong='hs'] .bi-loi { display: flex; align-items: flex-end; gap: 10px; margin: 4px 0 8px; }
+[data-trong='hs'] .bi-loi-bong { position: relative; flex: 1 1 auto; min-width: 0; margin-bottom: 18px; padding: 12px 16px; border: 2px solid var(--tr-vien-2); border-radius: 18px; background: var(--tr-mat); color: var(--tr-chu); font-size: 16px; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+[data-trong='hs'] .bi-loi-bong::before { content: ''; position: absolute; left: -9px; bottom: 16px; width: 14px; height: 14px; border-left: 2px solid var(--tr-vien-2); border-bottom: 2px solid var(--tr-vien-2); background: var(--tr-mat); transform: rotate(45deg); }
+/* Tấm kết quả: Bi vui / lo lắng thay ô tick */
+[data-trong='hs'] .duo-kq-bi:has(.bi) { display: block; flex: none; width: 64px; }
+[data-trong='hs'] .duo-kq:has(.duo-kq-bi .bi) .duo-kq-o { display: none; }
+/* Xong chặng: Bi mừng lớn */
+[data-trong='hs'] .duo-xong .bi { margin: 0 auto; }
+/* Thành tích / trống */
+[data-trong='hs'] .bi-canh { display: flex; align-items: center; gap: 12px; }
+[data-trong='hs'] .bi-trong { display: grid; justify-items: center; gap: 8px; padding: 16px 8px; text-align: center; color: var(--tr-chu-2); font-weight: 600; }
+[data-trong='hs'] .bi-loi-con { visibility: hidden; }

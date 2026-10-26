@@ -294,7 +294,7 @@ export default defineConfig({
           // tải hỏng ⇒ màn thi vẫn chạy với trình bày cũ (logic không phụ thuộc tờ này).
           '**/trong-lam-bai-*.css',
           // Rung / tiếng phản hồi các màn luyện «Trong» (26/10): mảnh dùng chung của các màn nạp lười (làm chặng, kiểm tra, tự sửa, tu luyện) ⇒ kho chạy-lúc.
-          '**/{rung,phan-hoi,am-thanh}-*.js',
+          '**/{rung,phan-hoi,am-thanh,Bi}-*.{js,css}',
           // Cầu nối Cowork `window.__ddh` (26/10): App.tsx nạp LƯỜI sau khi thầy mở khoá ⇒ kho chạy-lúc; tải hỏng (mất mạng) ⇒ chỉ thiếu cầu nối, app chạy như thường.
           '**/cau-noi-ddh-*.js',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
