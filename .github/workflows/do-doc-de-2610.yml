@@ -1,0 +1,47 @@
+# ĐO ĐỘ PHỦ «CHẠM ĐỂ HIỂU ĐỀ» (CHỈ ĐỌC, chỉ số gộp) — thầy 26/10: chạm vào đơn vị / câu hỏi để hiểu đề (kiểu Duolingo).
+# Đếm trên chữ đề (json $.text) của game_v2_question: câu có số liệu + đơn vị, đktc / đkc, "nguyên tử khối", câu hỏi bẫy "không đúng / sai",
+# "kim loại M" (nguy cơ nhận nhầm đơn vị M). KHÔNG in chữ đề, mã câu (repo công khai, kho có đề bảo vệ). Một lượt quét, không câu con lồng.
+name: Đo độ phủ chạm để hiểu đề (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/gifted-mendel-m8etj0]
+    paths: ['.github/workflows/do-doc-de-2610.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-doc-de-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0] | {kq: .results, ms: .meta.timings.sql_duration_ms}' || echo "LOI"; }
+          T="json_extract(json,'\$.text')"
+          q "1 theo phần: số câu · có số+gam · có số+mol · có số+lít · có số+mL · có số+M (nồng độ) · có % · có °C" "SELECT json_extract(json,'\$.phan') phan, COUNT(*) n,
+            SUM($T GLOB '*[0-9] gam*' OR $T GLOB '*[0-9]gam*' OR $T GLOB '*[0-9] g[ ,.;)]*') gam,
+            SUM($T GLOB '*[0-9] mol*') mol,
+            SUM($T GLOB '*[0-9] lít*' OR $T GLOB '*[0-9] L[ ,.;)]*') lit,
+            SUM($T GLOB '*[0-9] mL*' OR $T GLOB '*[0-9] ml*') ml,
+            SUM($T GLOB '*[0-9]M[ ,.;)]*' OR $T GLOB '*[0-9] M[ ,.;)]*') nong_do_m,
+            SUM(instr($T,'%')>0) phan_tram,
+            SUM(instr($T,'°C')>0) do_c
+            FROM game_v2_question GROUP BY phan ORDER BY phan"
+          q "2 có ÍT NHẤT một số + đơn vị (gam/mol/lít/mL/M/%) theo phần" "SELECT json_extract(json,'\$.phan') phan, COUNT(*) n, SUM($T GLOB '*[0-9] gam*' OR $T GLOB '*[0-9]gam*' OR $T GLOB '*[0-9] g[ ,.;)]*' OR $T GLOB '*[0-9] mol*' OR $T GLOB '*[0-9] lít*' OR $T GLOB '*[0-9] L[ ,.;)]*' OR $T GLOB '*[0-9] mL*' OR $T GLOB '*[0-9] ml*' OR $T GLOB '*[0-9]M[ ,.;)]*' OR $T GLOB '*[0-9] M[ ,.;)]*' OR instr($T,'%')>0) co_so_lieu FROM game_v2_question GROUP BY phan ORDER BY phan"
+          q "3 điều kiện khí: đktc · đkc · 24,79 · 22,4 · 'nguyên tử khối'" "SELECT SUM(instr(lower($T),'đktc')>0) dktc, SUM(instr(lower($T),'đkc')>0) dkc, SUM(instr($T,'24,79')>0) v2479, SUM(instr($T,'22,4')>0) v224, SUM(instr(lower($T),'nguyên tử khối')>0) ntk FROM game_v2_question"
+          q "4 câu hỏi bẫy: 'không đúng' · 'phát biểu sai' · 'nào sau đây sai' · 'không phải' · 'không khí' (nhiễu) · 'không màu' (nhiễu)" "SELECT SUM(instr(lower($T),'không đúng')>0) khong_dung, SUM(instr(lower($T),'phát biểu sai')>0) pb_sai, SUM(instr(lower($T),'nào sau đây sai')>0) nao_sai, SUM(instr(lower($T),'không phải')>0) khong_phai, SUM(instr(lower($T),'không khí')>0) khong_khi, SUM(instr(lower($T),'không màu')>0) khong_mau FROM game_v2_question"
+          q "5 nguy cơ nhận nhầm M: 'kim loại M' · 'M là' · 'giá trị của m'" "SELECT SUM($T GLOB '*kim loại M[ ,.;)]*') kl_m, SUM(instr($T,'M là')>0) m_la, SUM(instr(lower($T),'giá trị của m')>0) gia_tri_m FROM game_v2_question"
+          q "6 câu kết thúc bằng câu hỏi nhận được: '... là' cuối câu · 'là bao nhiêu' · 'Giá trị của' · 'Tính'" "SELECT SUM(rtrim($T,' .:?') LIKE '% là') ket_la, SUM(instr(lower($T),'là bao nhiêu')>0) bao_nhieu, SUM(instr($T,'Giá trị của')>0) gia_tri_cua, SUM(instr($T,'Tính ')>0) tinh, COUNT(*) n FROM game_v2_question"

@@ -713,3 +713,8 @@
   [data-trong] .duo:has(.duo-than[data-de-dai]) .duo-day > .duo-giua { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
   [data-trong] .duo:has(.duo-than[data-de-dai]) .duo-day > .duo-giua > * { grid-column: 2; }
 }
+
+/* ── 16. «Chạm để hiểu đề» gắn vào màn Duo (hợp đồng docs/hop-dong-doc-de-2610.md): gợi ý mở thành cột phải cố định (≥ 640px) ⇒ khung màn chừa đúng bề
+ * rộng cột (biến --gyc-cot-phai do ruột đặt trên <html>); nút «Bắt đầu từ đâu?» nằm trong hàng nút đáy như một mục ngang hàng «Gợi ý». ── */
+[data-trong] .ht-app.ht2-lam.duo { padding-right: var(--gyc-cot-phai, 0px); }
+[data-trong] .duo-o-nut-cham { display: contents; }

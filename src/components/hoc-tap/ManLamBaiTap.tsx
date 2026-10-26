@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import type { TheCauProps } from '../TheCau'
@@ -17,7 +17,10 @@ import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
 import { banHat, truotRa, useDemSo, yenLang } from '../../lib/hieu-ung'
-import { NutBatDauCham, TamGiaiThich, VungChamDe, type GiaiThichCham } from '../goi-y-cham/VungChamDe'
+import { VungChamDe } from '../goi-y-cham/VungChamDe'
+// Lời giải kiểu sơ đồ (hợp đồng chạm để hiểu đề, chỗ 3): chỉ cần khi em mở «Lời giải từng bước» ⇒ nạp LƯỜI, lúc chờ vẽ lời giải cũ (không chớp trống).
+const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
+import { createPortal } from 'react-dom'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
 import './hoc-tap.css'
@@ -27,7 +30,7 @@ if (typeof document !== 'undefined' && document.documentElement.dataset.trong) v
 type Cau = Question & { vaiGoi7?:string; huongDan7?:boolean; coGoi7?:boolean; goiY?: { gach?: string[]; cotLoi?: string }; lamLaiCua?: string }
 /** Câu không đủ nội dung để hiện (cùng luật lúc mở chặng và lúc nhận vòng làm lại). */
 const cauHong = (c: Cau) => !c.qid || !['I', 'II', 'III'].includes(c.phan) || typeof c.text !== 'string' || !Array.isArray(c.hinhAnh) || c.phan === 'I' && c.choices?.length !== 4 || c.phan === 'II' && c.ideas?.length !== 4
-type Ket = { choThay?:boolean; hocCoHoTro?:boolean; assisted?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh']; chamLanTruoc?: boolean }
+type Ket = { soDo?: unknown; choThay?:boolean; hocCoHoTro?:boolean; assisted?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh']; chamLanTruoc?: boolean }
 export function duTraLoi(phan: string, value: string): boolean { return phan === 'II' ? /^[DS]{4}$/.test(value) : phan === 'I' ? /^[ABCD]$/.test(value) : value.trim().length > 0 }
 /** Props `TheCau` cho câu học (bảng Gói 7 của thầy vẫn dùng — `src/components/chien-dich/BangGoi7.tsx`). Màn làm bài của em từ 12/10 dựng phần trả lời riêng (LamCau.tsx). */
 export function propsCauHoc(q: Cau, stt: number, value: string, onChange: (v: string) => void, ket?: Ket, khoa = false): TheCauProps {
@@ -237,11 +240,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const daMo = useRef(false)
   // Thầy 13/10: em hỏi Thầy (AI gợi hướng) lúc đang làm câu ⇒ lần nộp câu đó là "có trợ giúp" (như Gợi ý).
   const daHoiThay = useRef('')
-  // Khe «chạm để hiện giải thích» (src/components/goi-y-cham, chờ thầy duyệt): tấm giải thích đang mở — sang câu khác thì đóng.
-  const [giaiThich, setGiaiThich] = useState<GiaiThichCham | null>(null)
-  // Em đã dùng giải thích / gợi ý chạm của câu này ⇒ lượt nộp có hỗ trợ (như Gợi ý, Hỏi thầy).
+  // «Chạm để hiểu đề» (src/components/goi-y-cham, hợp đồng docs/hop-dong-doc-de-2610.md): em mở «Bắt đầu từ đâu?» của câu này ⇒ lượt nộp có hỗ trợ
+  // (như Gợi ý, Hỏi thầy). Ruột tự vẽ thẻ giải nghĩa / gợi ý (TamGiaiThich); màn chỉ chừa chỗ đặt nút ở hàng nút đáy (`oNutCham`).
   const hoTroCham = useRef('')
-  useEffect(() => { setGiaiThich(null) }, [q?.qid, xong])
+  const [oNutCham, setONutCham] = useState<HTMLElement | null>(null)
   useEffect(() => { if (!q) return; if (daMo.current) veDau(); daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
   // Màn Duo ở khung thấp xoay ngang: tấm kết quả nằm ở cột phải DƯỚI phương án ⇒ đưa tấm (nút «Tiếp tục») vào khung nhìn thay vì cuộn về đầu.
   useEffect(() => {
@@ -436,7 +438,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (!combo) return; const t = window.setTimeout(() => setCombo(null), 2200); return () => window.clearTimeout(t) }, [combo])
   phimDuo.current = (e) => {
-    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || !q || moLoiGiai || giaiThich || gui.current) return
+    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || !q || moLoiGiai || gui.current || document.documentElement.hasAttribute('data-gyc-cot-phai')) return
     const t = e.target instanceof HTMLElement ? e.target : null
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|A)$/.test(t.tagName) || t.closest('[role=dialog], .aid-tam'))) return
     if (t?.tagName === 'BUTTON' && t.getAttribute('role') !== 'radio') return
@@ -478,8 +480,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     const conDu = homNayHien ? Math.max(0, homNayHien.muc - homNayHien.daLam) : null
     const tenChuong = tenBai || q?.tenDang || goc[goc.length - 1]?.tenDang || ''
     const danhDauHoTro = () => { if (q && !k) hoTroCham.current = q.qid }
-    // nutBatDau (khe chạm-giải-thích): hàng nút đáy cạnh «Gợi ý»; khung thấp xoay ngang thì đáy nằm ở cột phải.
-    const nutBatDau = q && !k ? <NutBatDauCham q={q} onGiaiThich={setGiaiThich} onHoTro={danhDauHoTro} /> : null
+    // nutBatDau (hợp đồng chạm để hiểu đề): nút «Bắt đầu từ đâu?» của ruột đưa vào ô ở hàng nút đáy cạnh «Gợi ý» (khung thấp xoay ngang: cột phải).
+    const nutBatDau = (nut: ReactNode) => oNutCham && !k ? createPortal(nut, oNutCham) : null
     const linkHoi = q && <NutHoiThay gon dangLam={!k} chi="hoi" qid={q.qid} nguon="bai_hang_ngay" dapAnEm={k ? traHien : undefined} onHoi={k ? undefined : () => { daHoiThay.current = q.qid }} />
     const linkGiai = q && k && !k.choThay && <button type="button" className="duo-lien" onClick={() => setMoLoiGiai(true)}><BookOpen size={18} aria-hidden="true" />Lời giải từng bước</button>
 
@@ -518,7 +520,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
           <div className="duo-bo">
             {linkHoi}
-            {nutBatDau}
+            <span ref={setONutCham} className="duo-o-nut-cham" />
             {q.goiY && <button type="button" className="duo-lien" aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={18} aria-hidden="true" />{goiY ? 'Thu gợi ý' : 'Gợi ý'}</button>}
             {coHuongDan && <button type="button" className="duo-lien" onClick={() => void hocHuongDan()} disabled={nop}><BookOpen size={18} aria-hidden="true" />Học cách giải</button>}
           </div>
@@ -554,7 +556,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {laLamLai ? <p className="duo-nhan" data-lam-lai=""><span>Làm lại · câu {stt}/{lamLai.length}</span><span className="duo-chip">Cùng dạng câu {goc.findIndex(c => c.qid === q.lamLaiCua) + 1 || '?'}</span></p>
             : <p className="duo-nhan"><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}{tenBai || q.tenDang ? <>{' · '}<span data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={tenBai || q.tenDang || ''} /></span></> : null}</span>{chang ? <span className="duo-chip">Chặng {chang}</span> : null}</p>}
           {laLamLai && !k && viTri === soGoc && <p className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
-          <VungChamDe q={q} onGiaiThich={setGiaiThich} onHoTro={danhDauHoTro}><DeCau q={q} stt={stt} /></VungChamDe>
+          <VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>
           {q.goiY && goiY && dangTraLoi && <section id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           </div>
           <div key={`t${q.qid}`} className="duo-cot-tra">
@@ -571,11 +573,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </> : null}
         {loi && !q && <div className="ht2-lam-loi" role="alert"><span>{loi}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => setLan(n => n + 1)}><RefreshCw size={17} aria-hidden="true" />Thử lại</button></div>}
       </main>
-      {giaiThich && q && !xong ? <TamGiaiThich g={giaiThich} onDong={() => setGiaiThich(null)} /> : day}
+      {day}
       {moLoiGiai && q && k && !k.choThay && <div className="duo-lg" role="dialog" aria-modal="true" aria-label="Lời giải từng bước">
         <div className="duo-lg-the">
           <header className="duo-lg-dau"><b>Lời giải · Câu {stt}</b><button type="button" className="duo-dong" aria-label="Đóng lời giải" onClick={() => { setMoLoiGiai(false); nutTiepRef.current?.focus({ preventScroll: true }) }}><XIcon size={24} aria-hidden="true" /></button></header>
-          <LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />
+          <Suspense fallback={<LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />}><LoiGiaiCauCoSoDo q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} soDo={k.soDo} /></Suspense>
           <NutHoiThay gon chi="giai" qid={q.qid} nguon="bai_hang_ngay" dapAnEm={traHien} />
         </div>
       </div>}

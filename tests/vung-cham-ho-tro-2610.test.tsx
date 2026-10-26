@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-// KHE chạm-giải-thích (chia làn với Code app 3): ruột gọi onHoTro ⇒ lượt nộp câu đó gửi assisted: true (như Gợi ý / Hỏi thầy);
-// nút bật (NutBatDauCham) nằm ở hàng nút đáy màn Duo, cạnh «Gợi ý».
+// «Chạm để hiểu đề» gắn vào màn Duo (hợp đồng docs/hop-dong-doc-de-2610.md với Code app 3): ruột gọi onHoTro ⇒ lượt nộp câu đó gửi assisted: true
+// (như Gợi ý / Hỏi thầy); nút «Bắt đầu từ đâu?» ruột trao qua nutBatDau(nut) được màn đặt vào hàng nút đáy, cạnh «Gợi ý». Màn truyền token + phiên chặng.
+// (26/10: thay bản khe chờ — NutBatDauCham / onGiaiThich — bằng chữ ký thật của VungChamDe trên main #397.)
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
@@ -10,8 +11,8 @@ vi.mock('../src/components/goi-y-cham/VungChamDe', async (goc) => {
   const that = await goc<typeof import('../src/components/goi-y-cham/VungChamDe')>()
   return {
     ...that,
-    VungChamDe: ({ children, onHoTro }: { children: React.ReactNode; onHoTro?: () => void }) => <>{children}<button type="button" onClick={onHoTro}>Xem giải thích chạm</button></>,
-    NutBatDauCham: () => <button type="button" className="nut-cham">Chạm để hiểu</button>,
+    VungChamDe: ({ children, onHoTro, nutBatDau, token, phien }: { children: React.ReactNode; onHoTro?: () => void; nutBatDau?: (n: React.ReactNode) => React.ReactNode; token?: string; phien?: string }) =>
+      <>{children}<button type="button" onClick={onHoTro} data-token={token} data-phien={phien}>Xem giải thích chạm</button>{nutBatDau?.(<button type="button" className="nut-cham">Bắt đầu từ đâu?</button>)}</>,
   }
 })
 beforeEach(() => { document.documentElement.dataset.trong = 'hs' })
@@ -37,6 +38,8 @@ describe('khe chạm-giải-thích: onHoTro + nút bật', () => {
     const { container } = mo()
     await screen.findByText(C1.text)
     expect(container.querySelector('.duo-day .duo-bo .nut-cham')).not.toBeNull() // hàng nút đáy, cạnh Gợi ý
+    const xem = screen.getByRole('button', { name: 'Xem giải thích chạm' })
+    expect([xem.dataset.token, xem.dataset.phien]).toEqual(['tk', 'p1'])
     fireEvent.click(screen.getByRole('button', { name: 'Xem giải thích chạm' }))
     expect((await nop(/^D/)).assisted).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))

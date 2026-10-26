@@ -1,47 +1,57 @@
-// KHE CẮM «CHẠM ĐỂ HIỆN GIẢI THÍCH + TÔ MÀU GỢI Ý» (kiểu Duolingo) — phiên Code app 3 đang thiết kế, CHỜ THẦY DUYỆT. Đây chỉ là khe sẵn:
-//   • <VungChamDe q onGiaiThich>{đề như hiện nay}</VungChamDe> bọc thân đề ở màn làm chặng (ManLamBaiTap, nhánh Duo). Bản này trả lại children
-//     nguyên vẹn (không thêm thẻ DOM ⇒ bố cục dọc / ngang / máy tính không đổi).
-//   • onHoTro(): ruột gọi khi em đã xem giải thích / tô gợi ý của câu đang làm ⇒ màn làm chặng ghi lượt nộp câu đó là CÓ HỖ TRỢ (assisted: true,
-//     cùng cơ chế Gợi ý / Hỏi thầy).
-//   • <NutBatDauCham> = nút bật chế độ chạm (nutBatDau): màn Duo đặt ở hàng nút đáy cạnh «Gợi ý» (khổ ngang thấp: cột phải). Bản này chưa có nút ⇒ không vẽ gì.
-//   • <TamGiaiThich> = chỗ đặt tấm giải thích: cùng kiểu tấm trượt từ đáy với tấm kết quả (duo-day duo-ket, data-tt="giai"), thế chỗ thanh đáy khi mở,
-//     đóng ⇒ thanh đáy cũ trở lại.
-// Phần ruột thật (dò từ/đơn vị được chạm, tô màu, nội dung giải thích) sẽ thay trong thư mục này và PHẢI nạp lười (import() khi em chạm lần đầu) —
-// tệp này nằm trong mảnh lười của màn làm bài, không vào nhóm mở app. Đáp án không xuống máy trước khi nộp: giải thích chỉ được dùng dữ liệu có sẵn TRƯỚC khi nộp.
-import type { ReactNode } from 'react'
-import { X as XIcon } from 'lucide-react'
-import type { Question } from '../../game/than-thu-v2/core'
+// «CHẠM ĐỂ HIỂU ĐỀ» — VỎ NHẸ bọc thân đề của màn làm chặng (thầy chốt build 26/10; bản vẽ docs/ban-ve-doc-de-2610; dữ liệu src/lib/goi-y-cham/kieu.ts).
+// Hợp đồng với màn Duo (Boss, khe trên nhánh claude/duo-app-2610): `<VungChamDe q children onHoTro nutBatDau />`.
+//   - `children` = thân đề của màn: vẽ NGUYÊN như màn đưa; ruột chỉ bọc các NÚT CHỮ bên trong (sub/sup, ảnh, công thức giữ nguyên).
+//   - `onHoTro`  = gọi khi em mở «Bắt đầu từ đâu?» lần đầu ở câu này (màn tự ghi assisted). Chạm tra nghĩa một chữ KHÔNG gọi.
+//   - `nutBatDau(nut)` = màn đặt nút «Bắt đầu từ đâu?» vào hàng nút đáy (không truyền ⇒ nút nằm ngay trên đề).
+//   - Mở gợi ý ở khổ ≥ 640px ⇒ gợi ý thành CỘT PHẢI cố định; <html> mang `data-gyc-cot-phai` và biến `--gyc-cot-phai` (320/400px):
+//     khung màn thêm `padding-right: var(--gyc-cot-phai, 0px)` để đề + phương án nằm gọn cột trái.
+//   - Tắt hẳn (ca thi, KTCN, BTVN chấm điểm): màn KHÔNG bọc, hoặc truyền `tat` ⇒ trả nguyên `children`.
+// Vỏ này CHỈ có khung (vài trăm byte, không tệp CSS riêng — không thêm tệp precache). Mọi phần khác (nút «Bắt đầu từ đâu?», bọc chữ, từ điển
+// của làn A, thẻ giải nghĩa, gợi ý 3 tầng, CSS) nạp LƯỜI
+// (ruot-cham.tsx, mảnh `goi-y-cham` ngoài precache); nạp hỏng (mất mạng lần đầu) ⇒ đề trơn như cũ, chưa có nút gợi ý.
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import type { GoiYTraVe } from '../../lib/goi-y-cham/kieu'
+import type { TuDien } from './tu-dien'
+import type { CauCham } from './ruot-cham'
 
-/** Một tấm giải thích khi em chạm vào một chỗ trong đề. */
-export interface GiaiThichCham { tieuDe: string; noiDung: ReactNode }
+type RuotMod = typeof import('./ruot-cham')
 
-export interface PropsVungChamDe {
-  q: Question
-  /** Gọi khi em chạm một chỗ có giải thích (null = đóng). Màn làm chặng giữ trạng thái và vẽ <TamGiaiThich>. */
-  onGiaiThich?: (g: GiaiThichCham | null) => void
-  /** Gọi khi em đã dùng giải thích / gợi ý của câu này ⇒ lượt nộp tính là có hỗ trợ. */
-  onHoTro?: () => void
+export type VungChamDeProps = {
+  q: CauCham & { text?: string }
   children: ReactNode
+  onHoTro?: () => void
+  nutBatDau?: (nut: ReactNode) => ReactNode
+  /** Tải bản gợi ý soạn sẵn qua `/hs/goi-y-so-do` (token của em; kèm phiên chặng thì máy chủ tự ghi «có trợ giúp»). Thiếu token ⇒ chỉ có gợi ý tự sinh từ đề. */
+  token?: string
+  phien?: string
+  /** Thay cách tải bản gợi ý (trang thử / test). */
+  taiGoiY?: (qid: string) => Promise<GoiYTraVe | null>
+  /** Thay từ điển của làn A (trang thử / test). */
+  tuDien?: TuDien
+  /** true ⇒ tắt hết (đề trơn như cũ). */
+  tat?: boolean
 }
 
-/** Bản hiện tại: chưa có hành vi chạm — trả lại đề y nguyên. */
-export function VungChamDe({ children }: PropsVungChamDe) {
-  return <>{children}</>
-}
-
-/** Nút bật chế độ chạm (nutBatDau) ở hàng nút đáy màn Duo. Bản hiện tại: chưa có nút. */
-export function NutBatDauCham(_: { q: Question; onGiaiThich?: (g: GiaiThichCham | null) => void; onHoTro?: () => void }): ReactNode {
-  return null
-}
-
-/** Tấm giải thích trượt từ đáy (cùng kiểu tấm kết quả). */
-export function TamGiaiThich({ g, onDong }: { g: GiaiThichCham; onDong: () => void }) {
-  return <section className="duo-day duo-ket" data-tt="giai" role="dialog" aria-label={g.tieuDe}><div className="duo-giua">
-    <div className="duo-kq">
-      <div className="duo-kq-chu"><h2>{g.tieuDe}</h2><div className="duo-mo">{g.noiDung}</div></div>
-      <button type="button" className="duo-dong" aria-label="Đóng giải thích" onClick={onDong}><XIcon size={24} aria-hidden="true" /></button>
+export function VungChamDe({ q, children, tat, ...p }: VungChamDeProps) {
+  const [ruot, setRuot] = useState<RuotMod | null>(null)
+  const goc = useRef<HTMLDivElement>(null), tren = useRef<HTMLDivElement>(null), duoi = useRef<HTMLDivElement>(null)
+  const id = useId()
+  useEffect(() => {
+    if (tat) return
+    let huy = false
+    import('./ruot-cham').then((m) => { if (!huy) setRuot(m) }, () => { /* mất mạng ⇒ đề trơn */ })
+    return () => { huy = true }
+  }, [tat])
+  if (tat) return <>{children}</>
+  return (
+    <div className="gyc">
+      <div ref={tren} />
+      {/* key = qid: câu mới ⇒ thân đề dựng lại từ đầu (ruột bọc lại), không bao giờ vá lên DOM đã bọc của câu cũ */}
+      <div key={`de:${q.qid}`} ref={goc} className="gyc-de">{children}</div>
+      <div ref={duoi} />
+      {ruot && <ruot.RuotCham key={`ruot:${q.qid}`} {...p} q={q} goc={goc} tren={tren} duoi={duoi} idGoiY={`${id}-gy`} />}
     </div>
-  </div></section>
+  )
 }
 
 export default VungChamDe
