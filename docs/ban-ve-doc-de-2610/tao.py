@@ -13,7 +13,7 @@ CUOI = '''</main>
 </body></html>
 '''
 CHU_GIAI = '''<div class="chu-giai"><span class="dam" style="color:var(--chu-2)">Chạm chữ tô màu để hiểu đề</span>
-<span class="mau"><i class="m-cho"></i>Đề cho</span><span class="mau"><i class="m-hoi"></i>Đề hỏi</span><span class="mau"><i class="m-chat"></i>Chất</span><span class="mau"><b style="color:var(--chu)">in đậm</b>Từ then chốt</span></div>'''
+<span class="mau"><i class="m-cho"></i>Đề cho</span><span class="mau"><i class="m-hoi"></i>Đề hỏi</span><span class="mau"><b style="color:var(--dung-chu);font-weight:600">NaOH</b>Chất</span><span class="mau"><b style="color:var(--chu)">in đậm</b>Từ then chốt</span></div>'''
 
 def span(cls, chu, them='', bong=''):
     s = f'<span class="cham-duoc {cls}{" dang-cham" if them else ""}">{chu}</span>'
