@@ -155,14 +155,19 @@ describe('soạn lô', () => {
     const mh = moHinhGia((h) => chuMau(h))
     const cong = congGia(() => 'lech')
     const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: cong })
-    expect(mh.fn).toHaveBeenCalledTimes(4)
-    expect(cong).toHaveBeenCalledTimes(4)
+    expect(mh.fn).toHaveBeenCalledTimes(6) // 4 lượt tự sửa + 2 lần giải MÙ (không đáp án kho)
+    expect(cong).toHaveBeenCalledTimes(6)
     const thuLai = mh.goi[1]!.luot
     expect(thuLai.map((l) => l.vai)).toEqual(['user', 'model', 'user'])
     expect(thuLai[2]!.chu).toContain('tích ra 70 khác 76,8')
-    expect(mh.goi.map((g) => g.model)).toEqual([M.MODEL_MAC_DINH, M.MODEL_MAC_DINH, M.MODEL_MANH, M.MODEL_MANH])
+    expect(mh.goi.map((g) => g.model)).toEqual([M.MODEL_MAC_DINH, M.MODEL_MAC_DINH, M.MODEL_MANH, M.MODEL_MANH, M.MODEL_MAC_DINH, M.MODEL_MANH])
+    // 2 lần giải MÙ: đề không kèm đáp án kho
+    expect(mh.goi[4]!.luot).toHaveLength(1)
+    expect(mh.goi[4]!.luot[0]!.chu).not.toContain('Đáp án kho')
     expect(j.dem.lech).toBe(1)
-    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lech', ly_do: 'tích ra 70 khác 76,8', gia_tri: '70' })
+    // cả 2 lần mù cùng ra 70 (khác kho 76,8) ⇒ nghi đáp án kho sai
+    expect(j.dem.nghi_dap_an).toBe(1)
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lech', ly_do: 'tích ra 70 khác 76,8', gia_tri: '70', nghi_dap_an: 1, dap_an_may: '70' })
   })
 
   it('lệch hai lượt, model mạnh ở lượt 3 đạt ⇒ lưu `dat`', async () => {
@@ -253,7 +258,7 @@ describe('soạn lô', () => {
     gieoDong(Q.III, 'dat', 0, '{"cu":1}')
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'lech') })
-    expect(mh.fn).toHaveBeenCalledTimes(4) // đã soạn lại (không bị bỏ qua); lệch ⇒ đủ 4 lượt tự sửa
+    expect(mh.fn).toHaveBeenCalledTimes(6) // đã soạn lại (không bị bỏ qua); lệch ⇒ 4 lượt tự sửa + 2 lần giải mù
     expect(j.dem.lech).toBe(1)
     expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat', ban_json: '{"cu":1}', phien_ban: 0, cap_nhat_luc: 'cu' })
   })
