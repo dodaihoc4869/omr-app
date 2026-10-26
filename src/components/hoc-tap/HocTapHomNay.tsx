@@ -124,14 +124,9 @@ export default function HocTapHomNay(p: Props) {
     const id = window.setTimeout(nap, 1500); return () => window.clearTimeout(id)
   }, [coSanh])
 
-  // «Khối đậm» (thầy duyệt bản vẽ 25/10, docs/ban-ve-khoi-dam-2510/hs-hom-nay.html): menu 4 mục nằm TRONG thanh trên — máy tính là hàng viên thuốc giữa
-  // logo và nút Vào ca kiểm tra; điện thoại / máy tính bảng vẫn là thanh đáy cố định (position: fixed, chỗ đặt trong DOM không đổi gì). Giao diện cũ
-  // (ddh.kd = 'tat') giữ cột menu trái bằng luật riêng ở hoc-tap.css.
-  const menu = <nav className="ht-menu" aria-label="Điều hướng học sinh">{MENU.map(({ id, ten, icon: Icon }) => <button key={id} onClick={() => setMuc(id)} aria-current={muc === id ? 'page' : undefined}><Icon size={21} aria-hidden="true" /><span>{ten}</span></button>)}</nav>
   return <div className="ht-app ht2" data-nguon={p.nguon}>
     <header className="ht-thanh ht2-thanh">
       <a className="ht-thuong-hieu" href="/hs"><span className="ht2-logo" aria-hidden="true"><Atom size={22} /></span><span>Đỗ Đại Học<small>Học Hoá mỗi ngày</small></span></a>
-      {menu}
       <div className="ht2-thanh-phai">
         {!p.coCa && <button className="ht2-nut-thi" onClick={p.onThi}><ClipboardCheck size={18} aria-hidden="true" />Vào ca kiểm tra</button>}
         {p.thongBao}
@@ -140,17 +135,15 @@ export default function HocTapHomNay(p: Props) {
       </div>
     </header>
     <div className="ht-khung">
+      <nav className="ht-menu" aria-label="Điều hướng học sinh">{MENU.map(({ id, ten, icon: Icon }) => <button key={id} onClick={() => setMuc(id)} aria-current={muc === id ? 'page' : undefined}><Icon size={21} aria-hidden="true" /><span>{ten}</span></button>)}</nav>
       <main className="ht-noi-dung ht2-noi-dung tt-vao-muc" key={muc}>
-        {/* Khối đậm: ngày · lớp là viên thuốc (chiến dịch ở Hành trình là viên thứ hai); tên em tô nền vàng. Chữ giữ nguyên (" · " vẫn trong DOM). */}
-        <div className="ht2-mo-dau"><p><span className="ht2-mo-dau-chip">{homNayChu()}{p.lop ? ` · ${p.lop}` : ''}</span>{muc === 'hanh-trinh' && sanh?.chienDich?.ten ? <><span className="ht2-mo-dau-cham"> · </span><span className="ht2-mo-dau-chip">{sanh.chienDich.ten}</span></> : null}</p>
-          <h1>{muc === 'hom-nay' ? <><span className="ht2-chao">Chào</span> <span className="ht2-ten-em">{p.ten || 'em'}</span></> : MENU.find(x => x.id === muc)?.ten}</h1></div>
+        <div className="ht2-mo-dau"><p>{homNayChu()}{p.lop ? ` · ${p.lop}` : ''}{muc === 'hanh-trinh' && sanh?.chienDich?.ten ? ` · ${sanh.chienDich.ten}` : ''}</p><h1>{muc === 'hom-nay' ? `Chào ${p.ten || 'em'}` : MENU.find(x => x.id === muc)?.ten}</h1></div>
         {p.canhBao}
         {p.dangLamMoi && <p className="ht-thong-bao" data-vung="dang-lam-moi" role="status">App đang làm mới, khoảng 1–5 phút. Em cứ để app mở, app tự vào lại.</p>}
         {p.loi && <div className="ht-thong-bao ht2-loi" role="alert"><span>{p.loi}</span><button className="ht-nut-phu" onClick={p.onTaiLai}>Thử lại</button></div>}
         {p.coCa && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
-        {/* Khối đậm: lưới Hôm nay — máy tính 2 cột (Hôm nay | Lịch riêng · Nhịp học | Bài học 7 ngày), điện thoại một cột cùng thứ tự (hoc-tap.css). */}
-        {muc === 'hom-nay' && <div className="ht2-luoi-hn">
+        {muc === 'hom-nay' && <>
           {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
               và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
           {/* Đợt 20 (bản vẽ docs/ban-ve-dot20): ngày kiểm tra ⇒ thẻ kiểm tra là khối CHÍNH; ngày khác (sắp đến / đang chuẩn bị) ⇒ thẻ phụ NẰM SAU khối học.
@@ -174,7 +167,7 @@ export default function HocTapHomNay(p: Props) {
             {(!!p.soBaiTap || !!p.coBaiTap) && <Dong ten="Bài tập về nhà" chu={p.soBaiTap ? 'Thầy đang giao' : 'Xem lại bài đã nộp'} icon={BookOpen} sac="muc" so={p.soBaiTap || undefined} donVi="bài" onClick={p.onBaiTap} />}
           </section>
           </>}
-        </div>}
+        </>}
 
         {(muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" role="status" aria-busy="true" aria-label="Đang mở" />}>
           <HanhTrinhOnSua muc={muc} sanh={sanh} dangTai={p.dangTai} soSua={soSua}

@@ -5,10 +5,6 @@ import HocSinhScreen from '../../src/screens/HocSinhScreen'
 import ExamSetupScreen from '../../src/screens/ExamSetupScreen'
 import BanGoNutThatScreen from '../../src/screens/BanGoNutThatScreen'
 import DuyetLoiGiaiScreen from '../../src/screens/DuyetLoiGiaiScreen'
-// «Khối đậm» 25/10 — màn quản lý: Ca kiểm tra · Học sinh hỏi · Theo dõi ca (TheoDoiCa thuần props, số giả khớp nhau).
-import LichSuCaScreen from '../../src/screens/LichSuCaScreen'
-import CauHoiScreen from '../../src/screens/CauHoiScreen'
-import TheoDoiCa from '../../src/components/ca-thi/TheoDoiCa'
 import '../../src/styles/giao-dien-day-du.css'
 // TRANG CHỤP ẢNH BẢN DUYỆT V2 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
 // (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật (tên em trong ảnh là tên giả).
@@ -44,8 +40,6 @@ import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import '../../src/styles/vo-thay.css'
 import '../../src/styles/gv-mau.css'
 import '../../src/styles/teacher-modern.css'
-import '../../src/styles/khoi-dam-phong.css' // giao diện «Khối đậm» 25/10 (main.tsx / App / AppHocSinh / AppThi nạp y như vậy)
-import '../../src/styles/khoi-dam.css'
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import AppPhuHuynh from '../../src/components/ph-v3/AppPhuHuynh'
@@ -96,8 +90,6 @@ import { NHIP_EM_CHAM, NHIP_EM_CHUA_DEU, NHIP_EM_LUOI } from './gia/nhip-hoc-em'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
-// Như main.tsx: «Khối đậm» bật cho app thầy, cổng học sinh, màn thi — không cho cổng phụ huynh.
-if (man !== 'ph') document.documentElement.dataset.kd = ''
 const now = Date.now()
 const noop = () => {}
 
@@ -441,22 +433,13 @@ function ManHoSoEm() {
 
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
-const MAN_THAY: Record<string, string> ={ 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
-const EM_TD = [
-  ['Trịnh Quốc Huy', 'khoa', 9, null, 3, 41], ['Trần Minh Hiếu', 'dang_lam', 12, null, 2, 18], ['Ninh Thị Mai', 'dang_lam', 8, null, 1, 6],
-  ['Lê Hà My', 'da_nop', 20, 9.5, 0, 0], ['Phan Gia Bảo', 'da_nop', 20, 8.5, 0, 0], ['Ngô Minh Châu', 'da_nop', 20, 9, 0, 0],
-  ['Bùi Thanh Tâm', 'dang_lam', 15, null, 0, 0], ['Hoàng Yến Nhi', 'dang_lam', 13, null, 0, 0], ['Phạm Tuấn Kiệt', 'cho_thi_lai', 10, null, 0, 0], ['Đỗ Khánh Linh', 'chua_vao', null, null, 0, 0],
-].map(([hoTen, tt, daLam, diem, soLanRoiMan, tongGiayRoiMan], i) => ({ sbd: String(120100 + i), hoTen, tt, daLam, tongCau: daLam === null ? null : 20, soLanRoiMan, tongGiayRoiMan, diem })) as never[]
-const manTheoDoi = () => h('div', { style: { padding: '16px clamp(12px, 3vw, 32px) 64px', maxWidth: 1320, margin: '0 auto' } }, h(TheoDoiCa, { tenCa: 'Kiểm tra 15 phút · 12A1', maCa: 'DH-12-C2-B6', link: 'https://omr-app-b3u.pages.dev/hs?ca=DH-12-C2-B6', daChepLink: false, onChepLink: noop,
-  moLuc: '19:30 · Thứ Hai 26/10/2026', hetHanVao: '19:40', thoiGianPhut: 15, congBoChu: 'Khi cả lớp nộp xong', phamViChu: 'Lớp 12A1', conGiay: 522, em: EM_TD, soChuaVao: 1,
-  nguongLan: 3, dangTai: false, dangDuyet: null, onLamMoi: noop, onMoKhoa: noop, onXemEm: noop, onChieuMa: noop, onKetThuc: noop, onDongCuaVao: noop, dangLamNgay: 6 } as never))
+const MAN_THAY: Record<string, string> ={ 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 const con =
   man.startsWith('hs12-') ? manHs12() : // LÀN HỌC SINH 12/10
   man === 'hs-nhip' ? manNhipEm() : // LÀN NHỊP EM 12/10C
   man === 'hs-the' ? manTheHomNay() : // LÀN THẺ HÔM NAY 12/10E
   man === 'lam13' ? h(ManLam13) : // LÀN MÀN LÀM BÀI 12/10D
   man === 'hs-ho-so' ? h(ManHoSoEm) : // LÀN HỒ SƠ EM 12/10F
-  man === 'gv-lich-su-ca' ? h(LichSuCaScreen) : man === 'gv-hs-hoi' ? h(CauHoiScreen) : man === 'gv-theo-doi' ? manTheoDoi() :
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
@@ -474,7 +457,7 @@ const con =
 const manThay = MAN_THAY[man]
 // TRUNG TU 09/10: mọi màn thầy chụp ở CHẾ ĐỘ 2.0 thật (cờ bật + `data-hoa2` trên vỏ như App.tsx) — trước đây chỉ gv-nhip bật cờ nên thanh bên
 // trong ảnh là danh sách cũ 9 mục. Thanh đáy (< 880 px) cũng dựng như app thật. `?giao=toi|sang` = thầy ép nút Sáng/Tối trong Cài đặt.
-const MAN_STORE: Record<string, string> = { 'gv-lich-su-ca': 'lichsuca', 'gv-hs-hoi': 'cauhoi', 'gv-theo-doi': 'exammonitor', 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
+const MAN_STORE: Record<string, string> = { 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
 if (manThay) {
   // Trang chụp nạp CHUNG CSS game (doan.css có lớp `.dh-so` cùng tên — ô đáp số Đoàn Hộ Tống, rộng 100%, nền giấy) với màn thầy; app thầy thật
   // KHÔNG nạp doan.css (mảnh game chỉ máy em tải) ⇒ trả số bước Dạy học / Kiểm tra đầu giờ về đúng hình tròn 36 px của day-hoc.css cho ảnh chụp.

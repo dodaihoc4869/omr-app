@@ -16,7 +16,6 @@ import './tu-luyen-rong.css'
 // TRÙNG TU 12/10 (thầy: "trùng tu lại giao diện mục tu luyện của app học sinh"): ngôn ngữ giao diện Hôm nay (.ht2) — nền giấy, chữ mực,
 // nhấn chàm, thẻ bo 24px, một nút chính màu mực; bỏ phông Baloo và nút vàng nổi kiểu game. Chỉ THÊM luật, phạm vi body[data-hoc-tap=hs].
 import './tu-luyen-hs.css'
-import '../../styles/khoi-dam-lam-bai.css' // «Khối đậm» 25/10: trình bày màn làm bài / làm câu của học sinh
 import { doiTenNguonCu } from '../../lib/nhan-nguon-lan'
 import ChonNguonSai from './ChonNguonSai'
 import { chonMacDinh, demChon, docNhoNguon, ghiNhoNguon, type MaNguonSai } from './nguon-cau-sai'

@@ -15,7 +15,6 @@ import { taiGioiHan } from '../lib/tai-gioi-han'
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
 import '../components/chien-dich/gv-v2.css'
 import './hoc-sinh-v2.css'
-import '../styles/khoi-dam-quan-ly.css' // «Khối đậm» 25/10: trình bày màn quản lý app thầy
 
 /** Số em mỗi trang (bản vẽ: "Em 1–25 trên 74"). */
 export const SO_EM_MOT_TRANG = 25

@@ -125,10 +125,6 @@ const DS_HN = [
     return [
       [`60-hn-may-tinh${t}`, 'gv-hom-nay&nh=1', 1440, 900, nen, true, /Hôm nay của thầy/, 'hn:cho'],
       [`61-hn-dien-thoai${t}`, 'gv-hom-nay&nh=1', 390, 844, nen, true, /Hôm nay của thầy/, 'hn:cho'],
-      // «Khối đậm» 25/10: có bậc (dải 12 cột) — 3 khổ
-      [`68-hn-kd-bac-may-tinh${t}`, 'gv-hom-nay&nh=1&bac=1', 1440, 900, nen, true, /Hôm nay của thầy/, 'hn:cho'],
-      [`68-hn-kd-bac-ngang${t}`, 'gv-hom-nay&nh=1&bac=1', 844, 390, nen, false, /Hôm nay của thầy/, 'hn:cho'],
-      [`68-hn-kd-bac-dien-thoai${t}`, 'gv-hom-nay&nh=1&bac=1', 390, 844, nen, true, /Hôm nay của thầy/, 'hn:cho'],
     ]
   }),
   ['62-hn-xem-du-luoi-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:xem-du-luoi'],
@@ -336,9 +332,6 @@ const DS = [
     ...[['gv-hom-nay',/Hôm nay của thầy/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-cai-dat',/Cài đặt/],['gv-kho',/Kho đề/]].map(([m,chu]) => [`24-${m}-${k}-toi`,m,w,h,'dark',true,chu]),
   ]),
   // trung tu 09/10: máy SÁNG nhưng thầy ép nút "Tối" trong Cài đặt (data-giao-dien) — không được nửa sáng nửa tối
-  // «Khối đậm» 25/10 — màn quản lý app thầy (cảnh mới: Ca kiểm tra · Học sinh hỏi · Theo dõi ca), 3 khổ × sáng/tối.
-  ...[[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => ['light','dark'].flatMap((nen) =>
-    [['gv-lich-su-ca',/Ca kiểm tra/],['gv-hs-hoi',/Học sinh hỏi/],['gv-theo-doi',/Kiểm tra 15 phút/]].map(([m,chu]) => [`25-kd-${m}-${k}${nen === 'dark' ? '-toi' : ''}`,m,w,h,nen,true,chu]))),
   ['24-gv-hom-nay-ep-toi', 'gv-hom-nay&giao=toi', 1440, 900, 'light', false, /Hôm nay của thầy/],
   ['24-gv-hoc-sinh-ep-toi', 'gv-hoc-sinh&giao=toi', 1440, 900, 'light', false, /Học sinh/],
   ['24-gv-mo-ca-ep-sang', 'gv-mo-ca&giao=sang', 1440, 900, 'dark', false, /Mở ca kiểm tra/],

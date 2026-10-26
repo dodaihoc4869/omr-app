@@ -6,7 +6,6 @@ import { AlertTriangle, BarChart3, Copy, DoorClosed, Lock, MonitorPlay, RefreshC
 import { soVn } from '../../lib/ket-qua-sau-nop'
 import { gioMayChu } from '../../lib/gio-may-chu'
 import './ca-thi.css'
-import '../../styles/khoi-dam-quan-ly.css' // «Khối đậm» 25/10: trình bày màn quản lý app thầy
 
 export type TrangThaiEmTd = 'dang_lam' | 'da_nop' | 'khoa' | 'cho_thi_lai' | 'chua_vao'
 export interface EmTheoDoi {

@@ -16,7 +16,6 @@ import NutHoiThay from '../loi-giai/NutHoiThay'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
 import './hoc-tap.css'
-import '../../styles/khoi-dam-lam-bai.css' // «Khối đậm» 25/10: trình bày màn làm bài / làm câu của học sinh
 
 type Cau = Question & { vaiGoi7?:string; huongDan7?:boolean; coGoi7?:boolean; goiY?: { gach?: string[]; cotLoi?: string } }
 type Ket = { choThay?:boolean; hocCoHoTro?:boolean; assisted?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh']; chamLanTruoc?: boolean }

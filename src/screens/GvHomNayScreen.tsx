@@ -28,7 +28,7 @@ import { useSoDemGv, type MoHanhTrinh } from '../lib/so-dem-gv'
 import { taiGioiHan } from '../lib/tai-gioi-han'
 import { layLopThay } from '../lib/ten-lop-thay'
 import { chuChoBaiMoi } from '../lib/bai-hom-nay'
-import { layNhipHoc, tinhNhipHoc } from '../lib/nhip-hoc-thay'
+import { layNhipHoc } from '../lib/nhip-hoc-thay'
 import { danhSach, docBang, type BangChienDich, type CauCanDayLai, type ChienDichTom } from '../components/chien-dich/api'
 import { baiDaDayDanhSach, docBangOmniCua, docCoOmni } from '../components/chien-dich/api-omni'
 import { nhomCanThayChua } from '../components/chien-dich/omni-bang'
@@ -282,8 +282,6 @@ interface Viec {
   /** Điện thoại: tên việc đậm + số ngắn ("Cần thầy chữa" · "8 chỗ"). */
   ten: string
   soNgan?: string
-  /** «Khối đậm» 25/10: số TO giữa thẻ ("38/40", "8 chỗ") — chỉ là cách trình bày lại số đã có ở dòng trên; vắng ⇒ thẻ không có số to. */
-  soTo?: string
   phu: string
   /** Không có nút (thẻ báo "không có chỗ cần chữa") ⇒ để trống. */
   nut?: string
@@ -403,7 +401,6 @@ export default function GvHomNayScreen() {
       tieuDe: 'Ca đang mở',
       ten: 'Ca đang mở',
       soNgan: `đã nộp ${c.daNop}/${c.daVao}`,
-      soTo: `${c.daNop}/${c.daVao}`,
       phu: `${ten}${c.lop && !ten.includes(c.lop) ? ` · ${c.lop}` : ''} · đã nộp ${c.daNop}/${c.daVao} em`,
       nut: 'Theo dõi',
       lam: () => moChiTietCa(c.maCa),
@@ -411,7 +408,7 @@ export default function GvHomNayScreen() {
   }
   if (du?.canThayChua && du.canThayChua.tong > 0) {
     const n = du.canThayChua.tong
-    viec.push({ key: 'can-chua', mau: 'hp', icon: PenLine, tieuDe: `Cần thầy chữa · ${n} chỗ`, ten: 'Cần thầy chữa', soNgan: `${n} chỗ`, soTo: `${n} chỗ`, phu: chuCanThayChua(du.canThayChua), nut: 'Chữa bài', lam: () => moHanhTrinh({ the: 'can-chua' }) })
+    viec.push({ key: 'can-chua', mau: 'hp', icon: PenLine, tieuDe: `Cần thầy chữa · ${n} chỗ`, ten: 'Cần thầy chữa', soNgan: `${n} chỗ`, phu: chuCanThayChua(du.canThayChua), nut: 'Chữa bài', lam: () => moHanhTrinh({ the: 'can-chua' }) })
   }
   if (du?.hoi && du.hoi.chuaChua > 0) {
     const h = du.hoi
@@ -422,7 +419,6 @@ export default function GvHomNayScreen() {
       tieuDe: `Học sinh hỏi · ${h.chuaChua} lượt`,
       ten: 'Học sinh hỏi',
       soNgan: `${h.chuaChua} lượt`,
-      soTo: `${h.chuaChua} lượt`,
       phu: `chờ thầy chữa · ${h.soCa === 1 ? h.caMoi : `${h.soCa} ca, mới nhất: ${h.caMoi}`}`,
       nut: 'Xem',
       lam: () => setScreen('cauhoi'),
@@ -437,7 +433,6 @@ export default function GvHomNayScreen() {
       tieuDe: ds.length === 1 ? `${ds[0]!.lop}: ${ds[0]!.soNgay} ngày chưa có bài mới` : `${ds.length} lớp chưa có bài mới`,
       ten: ds.length === 1 ? `${ds[0]!.lop}: chưa có bài mới` : 'Lớp chưa có bài mới',
       soNgan: ds.length === 1 ? `${ds[0]!.soNgay} ngày` : `${ds.length} lớp`,
-      soTo: ds.length === 1 ? `${ds[0]!.soNgay} ngày` : `${ds.length} lớp`,
       phu: ds.length === 1 ? 'Hành trình đang ôn bài cũ · tick bài vừa dạy để mở câu mới' : `${ds.map((x) => `${x.lop}: ${x.soNgay} ngày`).join(' · ')} — tick bài vừa dạy để mở câu mới`,
       nut: 'Bổ sung bài',
       lam: () => setMoBoSung(true),
@@ -474,38 +469,23 @@ export default function GvHomNayScreen() {
   // Nút chính góc phải = việc gấp nhất: có ca đang mở ⇒ theo dõi ca ấy; không thì bổ sung bài hôm nay.
   const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => setMoBoSung(true) }
   const soEm = nhip?.ok ? nhip.kq.em.length : null
-  // «KHỐI ĐẬM» 25/10 — DẢI SỐ TO đầu màn (bản vẽ docs/ban-ve-khoi-dam-2510/gv-hom-nay.html): CHỈ số của khối Nhịp học (cả trung tâm, không lọc), cùng
-  // phép thuần `tinhNhipHoc` ⇒ khớp đúng số trong khối. Nhịp học chưa về / lỗi / chưa có em ⇒ không vẽ dải; chưa có số hôm nay ⇒ bỏ ô chính.
-  const tomNhip = useMemo(() => (nhip?.ok && nhip.kq.em.length > 0 ? tinhNhipHoc(nhip.kq, { khoi: null, lop: '' }) : null), [nhip])
-  const soViec = viec.filter((v) => v.nut).length
 
   return (
     <div className="gv2-trang gvhn gvhn-1210">
       <header className="gvhn-dau">
         <div className="gvhn-dau-chu">
-          <h1 className="gvv2-h1">
-            <span className="gvhn-h1-mo">Hôm nay</span> <span className="gvhn-danh-dau">của thầy</span>
-          </h1>
-          {/* điện thoại (bản vẽ): "Thứ Hai 12/10 · 262 em · cập nhật 10:15" — bỏ năm và chữ "đang học" cho vừa một dòng.
-              «Khối đậm»: mỗi phần là một chip viên thuốc; dấu " · " vẫn trong chữ (đọc liền khi tắt giao diện mới), ẩn khi có [data-kd]. */}
-          <p className="gvv2-phu gvv2-so gvhn-chips">
-            <span className="nht-an-hep gvhn-chip">{hienNgay(ngayVn(now))}</span>
-            <span className="nht-chi-hep gvhn-chip">{hienNgay(ngayVn(now), false)}</span>
+          <h1 className="gvv2-h1">Hôm nay của thầy</h1>
+          {/* điện thoại (bản vẽ): "Thứ Hai 12/10 · 262 em · cập nhật 10:15" — bỏ năm và chữ "đang học" cho vừa một dòng */}
+          <p className="gvv2-phu gvv2-so">
+            <span className="nht-an-hep">{hienNgay(ngayVn(now))}</span>
+            <span className="nht-chi-hep">{hienNgay(ngayVn(now), false)}</span>
             {soEm !== null && soEm > 0 && (
               <>
-                <span className="gvhn-cham-ngan"> · </span>
-                <span className="gvhn-chip">
-                  {`${soEm} em`}
-                  <span className="nht-an-hep"> đang học</span>
-                </span>
+                {` · ${soEm} em`}
+                <span className="nht-an-hep"> đang học</span>
               </>
             )}
-            {capNhat !== null && (
-              <>
-                <span className="gvhn-cham-ngan"> · </span>
-                <span className="gvhn-chip">{`cập nhật ${gioPhut(capNhat)}`}</span>
-              </>
-            )}
+            {capNhat !== null && ` · cập nhật ${gioPhut(capNhat)}`}
           </p>
         </div>
         <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
@@ -513,42 +493,7 @@ export default function GvHomNayScreen() {
         </button>
       </header>
 
-      {tomNhip && (
-        <div className="gvhn-o-so" role="group" aria-label="Tóm tắt Nhịp học">
-          {tomNhip.homNay && (
-            <div className="gvhn-o-chinh">
-              <span className="gvhn-so-rat-to">
-                {tomNhip.homNay.du + tomNhip.homNay.dangLam}
-                <small>/{tomNhip.dem.tong}</small>
-              </span>
-              <span className="gvhn-o-nhan">em đã học hôm nay</span>
-              <span className="gvhn-o-nhan gvhn-o-nhan-phu">
-                {tomNhip.homNay.du} đủ mức · {tomNhip.homNay.dangLam} đang làm
-              </span>
-            </div>
-          )}
-          <div>
-            <span className="gvhn-so-vua">{tomNhip.dem.cham}</span>
-            <span className="gvhn-o-nhan">em Chăm</span>
-          </div>
-          <div>
-            <span className="gvhn-so-vua">{tomNhip.dem.chuaDeu}</span>
-            <span className="gvhn-o-nhan">em Chưa đều</span>
-          </div>
-          <div>
-            <span className="gvhn-so-vua">{tomNhip.dem.luoi}</span>
-            <span className="gvhn-o-nhan">
-              em Lười{tomNhip.dem.doiPho > 0 && ` · ${tomNhip.dem.doiPho} em có dấu hiệu đối phó`}
-            </span>
-          </div>
-        </div>
-      )}
-
       <section className="gvhn-viec-khoi" aria-label="Việc cần thầy">
-        <div className="gvhn-tieu" aria-hidden="true">
-          <h2>Việc cần thầy</h2>
-          {soViec > 0 && <span className="gvhn-o-nhan">{soViec} việc</span>}
-        </div>
         {!du || (viec.length === 0 && du.conCho) ? (
           <XuongViec />
         ) : viec.length === 0 ? (
@@ -568,23 +513,12 @@ export default function GvHomNayScreen() {
                       <b>{v.ten}</b>
                       {v.soNgan && <span className="gvv2-so"> · {v.soNgan}</span>}
                     </span>
-                    {v.soTo && (
-                      <>
-                        {/* «Khối đậm»: nhãn + số to chỉ để nhìn (aria-hidden); trình đọc màn hình vẫn đọc dòng đậm ở trên (ẩn mắt, không ẩn tai) */}
-                        <span className="gvhn-kd-nhan" aria-hidden="true">
-                          {v.ten}
-                        </span>
-                        <span className="gvhn-kd-so" aria-hidden="true">
-                          {v.soTo}
-                        </span>
-                      </>
-                    )}
                     {v.phu && <span className="gvhn-the-phu">{v.phu}</span>}
                   </span>
                 </>
               )
               return (
-                <li key={v.key} className="gvhn-the-viec" role={v.loi ? 'alert' : undefined} data-viec={v.key} data-co-so={v.soTo ? '' : undefined} data-ca={v.key.startsWith('ca-') ? '' : undefined}>
+                <li key={v.key} className="gvhn-the-viec" role={v.loi ? 'alert' : undefined} data-viec={v.key}>
                   {v.nut && v.lam ? (
                     <button type="button" className="gvhn-the-nut tt-nhan" onClick={v.lam} disabled={v.loi && dangTai}>
                       {ruot}
