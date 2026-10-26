@@ -35,15 +35,18 @@ const thaoTac = new AsyncFunction('t', 'viec', 'ten', 'loiTrang', 'tran', 'tuong
 
 // cảnh chỉ có ở trang.tsx (không nằm trong DS) + cảnh SOÁT 26/10 — [tên, ?man=, chờ chữ, thao tác]
 const CANH_THEM = [
-  ['hs-mot-thuong', 'hs-mot', /Chào Minh Anh/],
-  ['hs-mot-ca-mo', 'hs-mot&tt=ca', /Chào Minh Anh/],
-  ['hs-mot-du-da-diem-danh', 'hs-mot&tt=du&dd=xong', /Chào Minh Anh/],
-  ['hs-mot-khong-buoi', 'hs-mot&dd=khong', /Chào Minh Anh/],
-  ['hs-menu-thu-gon', 'hs-menu', /Chào Minh Anh/],
-  ['hs-menu-mo', 'hs-menu', /Chào Minh Anh/, 'nut:Mở menu'],
-  ['hs-menu-ca-mo', 'hs-menu&ca=1', /Chào Minh Anh/],
+  ['hs-mot-thuong', 'hs-mot', /Chào Minh Anh|chặng/i],
+  ['hs-mot-ca-mo', 'hs-mot&tt=ca', /Chào Minh Anh|chặng/i],
+  ['hs-mot-du-da-diem-danh', 'hs-mot&tt=du&dd=xong', /Chào Minh Anh|chặng/i],
+  ['hs-mot-khong-buoi', 'hs-mot&dd=khong', /Chào Minh Anh|chặng/i],
+  ['hs-menu-thu-gon', 'hs-menu', /Chào Minh Anh|chặng/i],
+  ['hs-menu-mo', 'hs-menu', /Chào Minh Anh|chặng/i, 'nut:Mở menu'],
+  ['hs-menu-ca-mo', 'hs-menu&ca=1', /Chào Minh Anh|chặng/i],
+  // 26/10 app HS kiểu Duolingo: hai mục mới ngoài Lộ trình (thao tác `muc:` ở chup.mjs)
+  ['hs-mot-luyen-tap', 'hs-mot', /Chào Minh Anh|chặng/i, 'muc:Luyện tập'],
+  ['hs-mot-thanh-tich', 'hs-mot', /Chào Minh Anh|chặng/i, 'muc:Thành tích'],
   ['hs-dang-nhap', 'hs-dang-nhap', /Đăng nhập/],
-  ...['btvn', 'lich-su', 'gia-dinh', 'vao-thi', 'cau-da-lam', 'ca', 'khac-phuc', 'ai'].map((tam) => [`hs-tam-${tam}`, `hs-sheet&tam=${tam}`, /Chào Minh Anh/]),
+  ...['btvn', 'lich-su', 'gia-dinh', 'vao-thi', 'cau-da-lam', 'ca', 'khac-phuc', 'ai'].map((tam) => [`hs-tam-${tam}`, `hs-sheet&tam=${tam}`, /Chào Minh Anh|chặng/i]),
   ['ph-vao', 'ph-vao', /Số báo danh của con/],
   ['ph-mot-trang-vo-that', 'ph&mot=1&bl=1', /Hôm nay của con/, 'mtp:'],
   // ═══ SOÁT 26/10 (khối cùng tên ở trang.tsx): các màn thầy chụp ảnh điện thoại
@@ -115,7 +118,7 @@ async function chay(v) {
     await t.goto(`${goc}/scripts/chup-v2/trang.html?man=${v.man}`)
     try {
       if (v.man.startsWith('gv-')) await t.getByRole('heading', { name: v.man === 'gv-kho' ? /Kho đề|Ngân hàng câu hỏi/ : v.cho }).first().waitFor({ timeout: 20000 })
-      else await t.getByText(v.cho).first().waitFor({ timeout: 20000 })
+      else await t.getByText(v.cho).locator('visible=true').first().waitFor({ timeout: 20000 }) // chữ có bản ẩn (dải ngang / bong bóng) ⇒ chờ bản đang hiện
     } catch { loiTrang.push(`không thấy chữ ${v.cho}`) }
     await thaoTac(t, v.viec, v.ten, loiTrang, tran, tp).catch((e) => loiTrang.push(`thao tác ${v.viec} hỏng — ${String(e).slice(0, 200)}`))
     await t.waitForTimeout(900)
