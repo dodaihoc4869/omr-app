@@ -127,12 +127,12 @@ export function GoiYNac({ nac, khoiCua, dangLam }: { nac: Nac[]; khoiCua: (k: Na
       <ol className="lg-nac">
         {nac.slice(0, mo).map((n, i) => (
           <li key={i} data-moi={i > 0 || undefined}>
-            <div className="lg-nac-dau"><span className="so" aria-hidden="true">{i + 1}</span>{n.ten ? <Ct t={n.ten} /> : `Gợi ý ${i + 1}`}</div>
+            <div className="lg-nac-dau"><span className="so" aria-hidden="true">{i + 1}</span><span>{n.ten ? <Ct t={n.ten} /> : `Gợi ý ${i + 1}`}</span></div>
             <p><ChuTo text={n.chu} /></p>
             {n.khoi && khoiCua(n.khoi)}
           </li>
         ))}
-        {ke && <li data-cho><button type="button" className="lg-nac-mo" onClick={() => setMo((x) => x + 1)}><Net ten="den" />Mở gợi ý {mo + 1}{ke.ten ? <> · <Ct t={ke.ten} /></> : null}</button></li>}
+        {ke && <li data-cho><button type="button" className="lg-nac-mo" onClick={() => setMo((x) => x + 1)}><Net ten="den" /><span>Mở gợi ý {mo + 1}{ke.ten ? <> · <Ct t={ke.ten} /></> : null}</span></button></li>}
         {dangLam && <li data-khoa><Net ten="khoa" />Đáp án: nộp bài rồi bấm Lời giải từng bước để xem.</li>}
       </ol>
     </>
@@ -143,7 +143,7 @@ export function GoiYNac({ nac, khoiCua, dangLam }: { nac: Nac[]; khoiCua: (k: Na
 export function XepHangKhoi({ xh }: { xh: XepHang }) {
   return (
     <section className="lg-k" aria-label={xh.tieuChi}>
-      <div className="lg-k-dau"><Net ten="xh" /><Ct t={xh.tieuChi} /></div>
+      <div className="lg-k-dau"><Net ten="xh" /><span><Ct t={xh.tieuChi} /></span></div>
       <div className="lg-xh">
         <span className="lg-xh-moc">▲ Mạnh / lớn</span>
         {xh.chat.map((c, i) => (
