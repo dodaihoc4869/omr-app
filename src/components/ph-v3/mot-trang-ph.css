@@ -308,3 +308,22 @@
   [data-trong=ph] .mtp-tam .tvc-the { padding: 14px; gap: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { [data-trong=ph] .mtp-tam { animation: none; } }
+
+/* ================================ VÁ TẠM 26/10 (thầy chụp điện thoại thật ~390×760: ô Nhịp học / Báo cáo tuần / Thời gian mất dòng) ================================
+ * LUẬT: KHÔNG BAO GIỜ cắt chữ để ép vừa khung. Ô cao theo nội dung (hàng lưới ≥ nội dung, còn chỗ thì vẫn giãn lấp khung như cũ); thiếu chỗ thì TRANG
+ * CUỘN. Tên ô / chip / dòng một-dòng được xuống dòng thay vì «…». Giữ tóm tắt có dấu «…» (Cần nhắc con, cảnh báo, nhận xét — bấm ô xem đủ trong tấm). */
+[data-trong=ph] .mtp { height: auto; min-height: 100dvh; overflow: visible; }
+[data-trong=ph] .mtp-than { flex: 1 0 auto; min-height: auto; }
+/* hàng `auto` (không `1fr`): lưới cao chưa xác định thì `1fr` kéo MỌI hàng bằng hàng cao nhất ⇒ trang cuộn vô cớ; `auto` = cao theo nội dung,
+ * chỗ trống còn lại chia đều cho các hàng (lưới giãn theo khung). */
+[data-trong=ph] .mtp-luoi { flex: 1 0 auto; min-height: auto; grid-template-rows: repeat(3, auto); }
+[data-trong=ph] .mtp-o { min-height: auto; overflow: visible; }
+[data-trong=ph] .mtp-o-ten { flex-wrap: wrap; row-gap: 4px; white-space: normal; }
+[data-trong=ph] .mtp-o-ten > span:not(.ph3-chip) { overflow: visible; text-overflow: clip; }
+[data-trong=ph] .mtp-chip, [data-trong=ph] .mtp-chip-lon, [data-trong=ph] .mtp-mot-dong { max-width: 100%; white-space: normal; overflow: visible; text-overflow: clip; }
+[data-trong=ph] .mtp-so-4 dt { white-space: normal; overflow: visible; text-overflow: clip; }
+@media (max-width: 600px) {
+  [data-trong=ph] .mtp-luoi { grid-template-rows: repeat(5, auto); }
+  /* tên ô đủ chữ trên một dòng ở 390 px (vd «Kiểm tra và tiến bộ»): chừa đúng chỗ mũi tên › (rộng ~10 px), không chừa thừa */
+  [data-trong=ph] .mtp-o-ten { padding-right: 10px; }
+}
