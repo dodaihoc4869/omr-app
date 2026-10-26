@@ -741,7 +741,7 @@ const manNgang = () => h(FragmentHse, null,
 // ═══ hết NGANG HS 26/10
 // ═══ THƯỞNG PHẠT 26/10: `?man=tp&v=…` = giao diện học sinh hệ thưởng phạt (khối riêng gia/thuong.tsx — component THẬT, máy chủ GIẢ tests/_thuong-mau.ts).
 import { canhThuong, capFetchThuong } from './gia/thuong'
-if (man === 'tp') capFetchThuong()
+if (man === 'tp' || thamSo.get('tp') === '1') capFetchThuong() // gộp 26/10: `&tp=1` ⇒ Lộ trình / làm chặng THẬT có cắm thưởng phạt
 // ═══ hết THƯỞNG PHẠT 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 

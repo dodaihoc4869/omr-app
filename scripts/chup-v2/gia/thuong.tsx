@@ -25,7 +25,10 @@ const tqGoc = (): Record<string, unknown> => {
   if (V === 'cuu' || V === 'cuu-xong') return M.tongQuanGia({ chuoiNgay: M.CUU(V === 'cuu' ? 0 : 2) })
   if (V === 'binh') return M.tongQuanGia({ chuoiNgay: { so: 12, giuChuoi: 0, sucChua: 2, lich7: M.lich7(['hoc', 'hoc', 'hoc', 'hoc', 'hoc', 'binh', 'tat']) } })
   if (V === 'phep') return M.tongQuanGia({ chuoiNgay: { so: 12, giuChuoi: 1, sucChua: 2, lich7: M.lich7(['hoc', 'hoc', 'hoc', 'hoc', 'hoc', 'phep', 'tat']) } })
-  return M.tongQuanGia()
+  // gộp 26/10: máy chủ /hs/thuong gửi thêm lịch 30 ngày + chuỗi dài nhất (B3, `thang`) ⇒ màn Chuỗi ngày hiện lịch tháng như bản vẽ tp-5
+  const K30 = Array.from({ length: 30 }, (_, i) => (i < 4 || i === 11 ? 'tat' : i === 8 || i === 27 ? 'binh' : i === 25 ? 'phep' : 'hoc')) as Parameters<typeof M.lich7>[0]
+  const goc = M.tongQuanGia() as { chuoiNgay: Record<string, unknown> }
+  return { ...goc, chuoiNgay: { ...goc.chuoiNgay, lich30: M.lich7(K30), daiNhat: 21 } }
 }
 /** Máy chủ giả cho các lệnh thưởng phạt — đặt SAU máy giả chung của trang.tsx (lớp ngoài cùng). */
 export function capFetchThuong(): void {

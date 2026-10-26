@@ -69,7 +69,14 @@ const DO = () => {
     const cx = Math.max(a.q.left, b.q.left) + x / 2, cy = Math.max(a.q.top, b.q.top) + y / 2
     const st = document.elementsFromPoint(cx, cy), ia = st.indexOf(a.el), ib = st.indexOf(b.el)
     const tren = Math.min(ia < 0 ? 1e9 : ia, ib < 0 ? 1e9 : ib), duoi = Math.max(ia, ib), thap = duoi === ia ? a.el : b.el
-    const dac = (e) => { const m = /rgba?\(([^)]+)\)/.exec(getComputedStyle(e).backgroundColor); if (!m) return false; const p = m[1].split(',').map(Number); return (p[3] ?? 1) >= 0.99 }
+    // nền đặc: rgb()/rgba() hoặc color(srgb r g b [/ a]) — màu trộn `color-mix(…)` (vd. hàng của em ở Giải tuần) trình duyệt trả dạng color(srgb …)
+    const dac = (e) => {
+      const c = getComputedStyle(e).backgroundColor
+      const m = /rgba?\(([^)]+)\)/.exec(c)
+      if (m) { const p = m[1].split(',').map(Number); return (p[3] ?? 1) >= 0.99 }
+      const k = /color\(srgb\s+[\d.e-]+\s+[\d.e-]+\s+[\d.e-]+(?:\s*\/\s*([\d.e-]+))?\)/.exec(c)
+      return !!k && Number(k[1] ?? 1) >= 0.99
+    }
     if (ia < 0 || ib < 0 || st.slice(tren + 1, duoi).some((e) => !e.contains(thap) && dac(e))) continue
     if (x > 2 && y > 3) ra.chong.push(`«${a.chu}» × «${b.chu}» (${Math.round(x)}×${Math.round(y)})`)
   }
