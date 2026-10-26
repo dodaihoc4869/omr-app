@@ -1,7 +1,7 @@
 # SOẠN «LỜI GIẢI KIỂU SƠ ĐỒ CỦA THẦY» THEO LÔ (làn D, 26/10). Chạy tay. Gọi route quản trị `POST /quan-tri/soan-so-do-lo` của Worker sống
 # (làn C đăng ký, cổng mã bí mật `x-ma-bi-mat` = secret OMR_MA_BI_MAT như nap-song-sinh-0710.yml), lặp theo con trỏ tới khi đủ `gioiHan` câu.
 # Máy chủ tự từ chối trong 19–24h giờ VN (giờ cao điểm).
-# REPO CÔNG KHAI: log CHỈ in số đếm + qid + lý do cổng. KHÔNG in bản soạn / đáp án, KHÔNG tải artifact bản soạn.
+# REPO CÔNG KHAI: log CHỈ in số đếm + qid + kết quả cổng + lý do ĐÃ XOÁ SỐ. KHÔNG in bản soạn / đáp án / giá trị, KHÔNG tải artifact bản soạn.
 # Mặc định `thuKhong = true` (không ghi gì). Ghi thật: bỏ chọn thuKhong — chỉ bản `dat` mới hiện cho học sinh (luật đọc làn C).
 name: Soạn lời giải kiểu sơ đồ (theo lô)
 on:
@@ -82,7 +82,7 @@ jobs:
             let r, j
             for (let thu = 1; thu <= 3; thu++) {
               try {
-                r = await fetch(MAY_CHU + '/quan-tri/soan-so-do-lo', { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': MB }, body: JSON.stringify(body), signal: AbortSignal.timeout(170_000) })
+                r = await fetch(MAY_CHU + '/quan-tri/soan-so-do-lo', { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': MB }, body: JSON.stringify(body), signal: AbortSignal.timeout(300_000) })
                 j = await r.json().catch(() => null)
                 if (r.status < 500 || thu === 3) break
               } catch (e) { if (thu === 3) { console.log('LỖI MẠNG', String(e).slice(0, 160)); process.exit(1) } }
@@ -91,7 +91,8 @@ jobs:
             if (!r.ok || !j?.ok) { console.log('DỪNG', r.status, String(j?.error || j?.ma || '').slice(0, 200)); process.exit(1) }
             for (const [k, v] of Object.entries(j.dem || {})) dem[k] = (dem[k] || 0) + v
             token.vao += j.token?.vao || 0; token.ra += j.token?.ra || 0
-            for (const x of j.ketQua || []) console.log(`${String(x.qid).padEnd(34)} ${String(x.ket).padEnd(16)} lần ${x.lanThu}  ${String(x.lyDo || '').replace(/\s+/g, ' ').slice(0, 100)}`)
+            // Lý do cổng có thể chứa đáp án kho (vd «tích ra 70 khác 76,8») ⇒ xoá mọi con số trước khi in (repo công khai).
+            for (const x of j.ketQua || []) console.log(`${String(x.qid).padEnd(34)} ${String(x.ket).padEnd(16)} lần ${x.lanThu}  ${String(x.lyDo || '').replace(/\d+([.,]\d+)*/g, '…').replace(/\s+/g, ' ').slice(0, 100)}`)
             daSoan += j.daXuLy || 0
             xong = !!j.xong
             conTro = j.conTro || ''

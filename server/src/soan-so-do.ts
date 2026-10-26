@@ -271,7 +271,8 @@ async function gomHang(env: Env, ts: ThamSoDayDu, het: () => boolean): Promise<{
     if (!laCauTinhToan(q)) { hang.push({ vt, q: null, boQua: 'không phải câu tính toán' }); return }
     if (!q.reviewed) { hang.push({ vt, q: null, boQua: 'câu chưa duyệt đáp án' }); return }
     const d = daSoan.get(q.qid)
-    if (d && d.version === q.version && (d.ket === 'dat' || (!ts.lamLai && d.phienBan >= PHIEN_BAN_SO_DO))) { hang.push({ vt, q: null, boQua: `đã soạn (${d.ket})` }); return }
+    // Đã soạn cùng phiên bản câu + cùng bản lời dặn ⇒ bỏ (trừ `lamLai`). Bản lời dặn mới ⇒ soạn lại; bản `dat` vẫn không bị hạ (WHERE của SQL_GHI).
+    if (d && d.version === q.version && d.phienBan >= PHIEN_BAN_SO_DO && !ts.lamLai) { hang.push({ vt, q: null, boQua: `đã soạn (${d.ket})` }); return }
     hang.push({ vt, q }); canLam++
   }
   // Nguồn DANH SÁCH: qid thầy chỉ định, hoặc câu nhiều em sai (≥ soEmToiThieu em, nhiều trước).
