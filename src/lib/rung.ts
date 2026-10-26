@@ -3,7 +3,8 @@
 // Android: navigator.vibrate(mẫu). iPhone (không có vibrate): mẹo iOS 18+ — bấm nhãn của một `<input type="checkbox" switch>` ẩn (dựng một lần) cho một
 // nhịp rung nhẹ. Mọi lỗi im lặng. Tắt khi không có <html data-trong="hs"> hoặc em tắt trong menu (localStorage 'ddh.rung' = 'tat').
 export type KieuPhanHoi = 'chon' | 'dung' | 'sai' | 'xong' | 'combo'
-export const MAU_RUNG: Record<KieuPhanHoi, number[]> = { chon: [10], dung: [18], sai: [35, 60, 35], xong: [20, 40, 20, 40, 60], combo: [14, 40, 14] }
+// 27/10 (thầy: «chưa thấy rung»): nhịp 10–18 ms quá ngắn — mô-tơ nhiều máy Android (Samsung) không kịp quay ⇒ mọi nhịp bật ≥ 35 ms.
+export const MAU_RUNG: Record<KieuPhanHoi, number[]> = { chon: [35], dung: [60], sai: [80, 70, 80], xong: [60, 50, 60, 50, 140], combo: [40, 40, 40] }
 
 /** Được phản hồi (rung / tiếng) không: chỉ app học sinh «Trong», và em chưa tắt công tắc `khoa` trong menu. */
 export function duocPhanHoi(khoa: 'ddh.rung' | 'ddh.am'): boolean {

@@ -57,7 +57,7 @@ describe('am-thanh.ts', () => {
     Object.defineProperty(navigator, 'vibrate', { value: vibrate, configurable: true, writable: true })
     const { phanHoi } = await import('../src/lib/phan-hoi')
     phanHoi('chon')
-    expect(vibrate).toHaveBeenCalledWith([10])
+    expect(vibrate).toHaveBeenCalledWith([35])
     expect(oscs).toHaveLength(1)
   })
 })
