@@ -437,3 +437,24 @@ i[data-mau="vong-tim"] { background: var(--ph3-vong-tim); }
 .ph3-vao__giup { border: none; background: transparent; color: var(--ph3-xd); }
 .ph3-vao__chan { color: var(--ph3-chu-3); }
 .ph3-dieu-huong__doi { border: 1px solid var(--ph3-vien); background: var(--ph3-mat); color: var(--ph3-chu-2); }
+
+/* NGANG + MÁY TÍNH 26/10 (thầy: màn chờ «hiện một lần rất nhanh nhìn rất xấu»): chữ chờ / khung chờ chỉ HIỆN sau 0,8 giây nếu vẫn chưa xong — tải nhanh
+ * thì không chớp gì (vẫn giữ chỗ, chỉ trong suốt). Dùng cho: chữ «Đang tải… / Đang mở…» (`.ph3-cho-tre`), khung xương lúc mở «Một trang», và thẻ đăng
+ * nhập khi máy đã nhớ con (cổng sắp tự vào — `data-tu-vao`, ParentPortalScreen; lỗi ⇒ bỏ cờ, thẻ hiện ngay). Không màu mới. */
+.ph3-cho-tre, .ph3[data-mot-trang] > [data-vung="dang-tai"], .ph3-vao[data-tu-vao] > * { animation: ph3-cho-tre 0.2s ease-out 0.8s both; }
+@keyframes ph3-cho-tre { from { opacity: 0; } }
+
+/* ĐĂNG NHẬP ở điện thoại ngang thấp (≤ 540 px cao, vd 844×390 · 740×360 — thầy 26/10 «tối ưu … màn hình ngang»): thẻ dọc cao ~490 px phải cuộn mới
+ * thấy nút ⇒ xếp HAI cột trong thẻ: logo + lời chào bên trái, ô số báo danh + nút bên phải; cả thẻ nằm gọn một khung hình. Bộ chọn mạnh hơn luật
+ * vỏ Bát Linh (bat-linh/phu-huynh.css: max-width 460 px). Không màu mới. */
+@media (orientation: landscape) and (max-height: 540px) and (min-width: 600px) {
+  html:root .ph3 .ph3-vao { padding-block: 12px; }
+  html:root .ph3 .ph3-vao .ph3-vao__the {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 28px; row-gap: 6px; align-items: center;
+    max-width: 720px; margin: 0 auto; padding: 20px 24px;
+  }
+  html:root .ph3 .ph3-vao .ph3-vao__the > :not(form) { grid-column: 1; }
+  html:root .ph3 .ph3-vao .ph3-vao__the > form { grid-column: 2; grid-row: 1 / span 2; }
+  html:root .ph3 .ph3-vao .ph3-vao__the > :not(form):not(:first-child) { padding: 4px 0 0; } /* lời chào (LoiChao) */
+  html:root .ph3 .ph3-vao .ph3-vao__the > :not(form):not(:first-child) h1 { font-size: 22px; }
+}

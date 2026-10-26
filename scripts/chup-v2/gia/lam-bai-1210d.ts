@@ -5,6 +5,7 @@
 //   ?man=lam13&lam=ds-dau đúng–sai đứng đầu (kịch bản vuốt: ý d + nút cuối phải tới được bằng vuốt)
 //   ?man=lam13&lam=so-o   15/10: số ô = đúng số kí tự đáp số (thầy 15/10 ~10:25): câu amine "24" (2 ô) · "6,48" (4 ô) · "10000" (5 ô)
 import { soOPhanIII } from '../../../src/lib/so-o-tra-loi-ngan'
+import { KET_BAI } from '../../../tests/_thuong-mau'
 
 const thamSo = new URLSearchParams(location.search)
 export const LA_LAM13 = thamSo.get('man') === 'lam13'
@@ -51,27 +52,89 @@ const CAU_SO_O: CauGia[] = [
     text: 'Phóng đại nguyên tử Gold lên 1 tỉ lần thì đường kính nguyên tử khoảng 30 cm, đường kính hạt nhân khoảng 0,003 cm. Đường kính nguyên tử lớn gấp bao nhiêu lần đường kính hạt nhân?',
     loiGiai: { chot: '30 : 0,003 = 10000. Nguyên tử lớn gấp khoảng 10000 lần hạt nhân.' } },
 ]
-const ds = kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+// ═══ DUO 26/10: `?man=lam13&lam=duo` = chặng «làm kiểu Duolingo» (bản vẽ docs/ban-ve-duo-2610): trắc nghiệm ngắn (lưới 2×2, có lý do phương án B) ·
+// trắc nghiệm có hình công thức cấu tạo · đúng–sai · trả lời ngắn · trắc nghiệm. Đáp án/lời giải chỉ trả sau `answer` như máy chủ thật.
+const hinhDuo = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="130" viewBox="0 0 320 130"><rect width="320" height="130" fill="white"/><g stroke="black" stroke-width="2" fill="none"><polygon points="50,30 85,10 120,30 120,70 85,90 50,70"/><line x1="120" y1="30" x2="165" y2="10"/><line x1="165" y1="10" x2="205" y2="30"/></g><text x="210" y="40" font-family="sans-serif" font-size="20">NH2</text></svg>')
+const CAU_DUO: CauGia[] = [
+  { ...nen, qid: 'D1', maDe: 'BAI8', phan: 'I', tenDang: 'Hợp chất chứa nitrogen', text: 'Số đồng phân amine có công thức phân tử C4H11N tác dụng với dung dịch HNO2 (ở nhiệt độ thường) tạo ra alcohol là', choices: ['2', '8', '3', '4'], ideas: [], dapAn: 'D',
+    loiGiai: { chot: 'Chỉ amine bậc một cho alcohol với HNO2; C4H11N có 4 đồng phân bậc một.', tung_pa: { A: { dung: false, vi_sao: '2 là số đồng phân bậc ba.' }, B: { dung: false, vi_sao: '8 là tổng số đồng phân amine. Chỉ amine bậc một cho alcohol với HNO2 ⇒ chỉ 4 chất.' }, C: { dung: false, vi_sao: '3 là số đồng phân bậc hai.' }, D: { dung: true, vi_sao: 'Bốn amine bậc một.' } } } },
+  { ...nen, qid: 'D2', maDe: 'BAI8', phan: 'I', tenDang: 'Hợp chất chứa nitrogen', hinhAnh: [{ src: hinhDuo, viTri: 'sau_de', alt: 'Công thức cấu tạo' }], text: 'Hợp chất có công thức cấu tạo như hình dưới đây thuộc loại nào và có bậc mấy?',
+    choices: ['Amine thơm, bậc một', 'Amine béo (no), bậc một', 'Amine béo (no), bậc hai', 'Amide, bậc một'], ideas: [], dapAn: 'B',
+    loiGiai: { chot: 'Nhóm NH2 gắn vào mạch carbon no (không gắn trực tiếp vào vòng benzene) ⇒ amine béo bậc một.' } },
+  { ...CAU[3]!, qid: 'D3' },
+  { ...nen, qid: 'D4', maDe: 'BAI1', phan: 'III', tenDang: 'Ester – Lipid', text: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong dung dịch sodium hydroxide dư, đun nóng. Khối lượng muối thu được là bao nhiêu gam?', choices: [], ideas: [], dapAn: '8,2',
+    loiGiai: { chot: 'n(ester) = 8,8 : 88 = 0,1 mol = n(CH3COONa) ⇒ m = 0,1 × 82 = 8,2 gam.' } },
+  { ...CAU[4]!, qid: 'D5' },
+]
+// ═══ DUO APP 26/10: `lam13&lam=duo&ll=1` = có Gói 7 ⇒ hết chặng mà có câu tự làm sai thì gọi `hoc-tap-lam-lai` (hợp đồng docs/hop-dong-duolingo-2610.md mục 3):
+// trả 1 câu anh em (chỉ đề) của câu D1; nộp qua `answer` ⇒ máy chủ ép có hỗ trợ (`attempt.assisted`).
+const LAM_LAI = thamSo.get('ll') === '1'
+const CAU_LAM_LAI: CauGia[] = [{ ...CAU_DUO[0]!, qid: 'DL1', vaiGoi7: 'lam_lai', lamLaiCua: 'D1', text: 'Số đồng phân amine bậc một có công thức phân tử C3H9N là' , choices: ['1', '2', '3', '4'], dapAn: 'B',
+  loiGiai: { chot: 'C3H9N có 2 đồng phân amine bậc một: CH3CH2CH2NH2 và (CH3)2CHNH2.' } }]
+// ═══ hết DUO 26/10
+// ═══ KIỂM GD MỚI 26/10: `?man=lam13&lam=duo-xau` = dữ liệu XẤU cho màn làm chặng kiểu Duolingo: đề 6 dòng, phương án 3–4 dòng, công thức dài có chỉ
+// số dưới (C6H5NH3Cl…), lưới 2×2 công thức sát ngưỡng 22 kí tự, ý Đúng/Sai dài, trả lời ngắn 6 ô (−12,75), hình rộng hơn màn + hình cuối câu, lời
+// giải / lý do phương án dài. `&so=lon` ⇒ số hôm nay lớn (1234/2400 câu, 12 chặng).
+const hinhRong = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="960" height="180" viewBox="0 0 960 180"><rect width="960" height="180" fill="white"/><g stroke="black" stroke-width="2" fill="none"><polygon points="60,50 95,30 130,50 130,90 95,110 60,90"/><line x1="130" y1="50" x2="900" y2="50"/></g><text x="300" y="120" font-family="sans-serif" font-size="22">C6H5–CH2–CH2–NH3Cl (hình rộng 960px)</text></svg>')
+const LY_DAI = 'Phương án này nhầm giữa số đồng phân cấu tạo và số đồng phân bậc một: C4H11N có 8 đồng phân amine (4 bậc một, 3 bậc hai, 1 bậc ba); chỉ amine bậc một phản ứng với HNO2 ở nhiệt độ thường tạo alcohol và giải phóng khí N2, nên phải đếm riêng 4 chất bậc một.'
+const CAU_XAU: CauGia[] = [
+  { ...nen, qid: 'X1', maDe: 'BAI8', phan: 'I', tenDang: 'Muối phenylammonium chloride và phản ứng của muối amine với dung dịch kiềm mạnh',
+    text: 'Cho 12,95 gam muối phenylammonium chloride (C6H5NH3Cl) tác dụng vừa đủ với dung dịch NaOH, đun nhẹ. Tách lấy lớp chất lỏng không tan rồi cho tác dụng với nước bromine dư thu được m gam kết tủa trắng 2,4,6-tribromoaniline (C6H2Br3NH2). Biết các phản ứng xảy ra hoàn toàn, hiệu suất tách đạt 100% và bỏ qua sự hoà tan của aniline trong nước. Giá trị của m gần nhất với giá trị nào sau đây?',
+    choices: ['33,0 gam, vì số mol C6H2Br3NH2 bằng số mol C6H5NH3Cl ban đầu và khối lượng mol của kết tủa là 330 g/mol', '16,5 gam, vì chỉ một nửa lượng aniline phản ứng với bromine do lớp chất lỏng bị hao hụt khi tách khỏi dung dịch nước', '49,5 gam, vì mỗi phân tử aniline thế ba nguyên tử bromine nên khối lượng kết tủa gấp ba lần khối lượng muối', '24,75 gam, vì NaOH dư tác dụng với HBr sinh ra làm giảm lượng kết tủa thu được sau phản ứng thế'], ideas: [], dapAn: 'A',
+    loiGiai: { chot: 'n(C6H5NH3Cl) = 12,95 : 129,5 = 0,1 mol = n(C6H5NH2) = n(C6H2Br3NH2) ⇒ m = 0,1 × 330 = 33,0 gam.', tung_pa: { A: { dung: true, vi_sao: 'Bảo toàn vòng benzene.' }, B: { dung: false, vi_sao: LY_DAI }, C: { dung: false, vi_sao: LY_DAI }, D: { dung: false, vi_sao: LY_DAI } } } },
+  { ...nen, qid: 'X2', maDe: 'BAI8', phan: 'I', tenDang: 'Đồng phân cấu tạo của amine no, đơn chức, mạch hở có công thức phân tử C5H13N',
+    text: 'Amine nào sau đây là amine bậc ba?', choices: ['CH3CH2CH2CH2CH2NH2', '(CH3)2CHCH2CH2NH2', '(CH3)2NCH2CH2CH3', 'CH3NHCH2CH2CH2CH3'], ideas: [], dapAn: 'C',
+    loiGiai: { chot: 'Amine bậc ba: nguyên tử N liên kết với ba gốc hydrocarbon. (CH3)2NCH2CH2CH3 có N gắn hai nhóm CH3 và một nhóm C3H7 nên là amine bậc ba; các chất còn lại là amine bậc một hoặc bậc hai.' } },
+  { ...nen, qid: 'X3', maDe: 'BAI4', phan: 'II', tenDang: 'Tính chất của ester và chất béo trong môi trường acid và base',
+    text: 'Cho các phát biểu sau về ethyl acetate (CH3COOC2H5), tristearin ((C17H35COO)3C3H5) và phản ứng xà phòng hoá:', choices: [],
+    ideas: ['Thuỷ phân hoàn toàn 8,9 gam tristearin ((C17H35COO)3C3H5) trong dung dịch NaOH dư, đun nóng, thu được 0,92 gam glycerol (C3H5(OH)3) và 9,18 gam muối sodium stearate (C17H35COONa).', 'Phản ứng thuỷ phân ethyl acetate (CH3COOC2H5) trong môi trường acid là phản ứng thuận nghịch, còn trong môi trường base là phản ứng một chiều.', 'Chất béo là triester của glycerol với acid béo; ở điều kiện thường các chất béo no như tristearin thường ở trạng thái rắn.', 'Xà phòng hoá hoàn toàn 1 mol tristearin cần đúng 1 mol NaOH vì phân tử chỉ có một nhóm chức ester.'],
+    dapAn: 'DDDS',
+    loiGiai: { chot: 'Tristearin có 3 nhóm ester ⇒ cần 3 mol NaOH cho 1 mol chất béo.', tung_y: { d: { dung: false, vi_sao: 'Tristearin là triester (ba nhóm –COO–) nên xà phòng hoá hoàn toàn 1 mol cần 3 mol NaOH, thu được 1 mol glycerol và 3 mol C17H35COONa.' } } } },
+  { ...nen, qid: 'X4', maDe: 'BAI1', phan: 'III', tenDang: 'Biến thiên enthalpy của phản ứng đốt cháy hợp chất hữu cơ chứa nitrogen',
+    text: 'Biết biến thiên enthalpy tạo thành chuẩn của các chất: CH3NH2(g) là −23,0 kJ/mol; CO2(g) là −393,5 kJ/mol; H2O(l) là −285,8 kJ/mol. Tính biến thiên enthalpy (kJ) khi đốt cháy 0,0125 mol methylamine theo phương trình 4CH3NH2 + 9O2 → 4CO2 + 10H2O + 2N2. (Làm tròn đến hàng phần trăm.)', choices: [], ideas: [], dapAn: '-12,75',
+    loiGiai: { chot: 'ΔrH° (4 mol) = 4(−393,5) + 10(−285,8) − 4(−23,0) = −4340 kJ ⇒ 0,0125 mol: −4340 × 0,0125 : 4 ≈ −13,56; số giả chỉ để chụp.' } },
+  { ...nen, qid: 'X5', maDe: 'BAI8', phan: 'I', tenDang: 'Hợp chất chứa nitrogen', hinhAnh: [{ src: hinhRong, viTri: 'sau_de', alt: 'Công thức cấu tạo (hình rộng)' }, { src: hinhDuo, viTri: 'cuoi_cau', alt: 'Hình cuối câu' }],
+    text: 'Hợp chất có công thức cấu tạo như hình dưới đây có tên gọi theo danh pháp thay thế là gì?',
+    choices: ['2-phenylethan-1-amine', 'N-methylbenzylamine', 'benzylamine', '1-phenylethan-1-amine'], ideas: [], dapAn: 'A',
+    loiGiai: { chot: 'Nhóm NH2 gắn ở C1 của mạch ethan, vòng benzene ở C2.' } },
+]
+const SO_LON = thamSo.get('so') === 'lon'
+// ═══ hết KIỂM GD MỚI 26/10
+const ds = kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
 
 // Số câu đã làm hôm nay: chặng 2 bắt đầu ở 6/24 (chặng 3 ở 12/24); mỗi câu nộp / học cách giải +1 — như Sảnh tải lại sau mỗi câu.
 let daNop = 0
 const DAU = kieu === 'g7' ? 12 : 6
-export const soHomNayLam13 = () => ({ daLam: DAU + daNop, muc: 24, chang: Math.floor(DAU / 6) + 1, soChang: 4 })
+export const soHomNayLam13 = () => SO_LON ? { daLam: 1234 + daNop, muc: 2400, chang: 11, soChang: 12 } : ({ daLam: DAU + daNop, muc: 24, chang: Math.floor(DAU / 6) + 1, soChang: 4 })
 
 // Như `publicQuestion`: câu Phần III kèm số ô = đúng số kí tự đáp số (chỉ con số), không kèm đáp án.
 const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => { const n = q.phan === 'III' ? soOPhanIII(_d) : null; return n === null ? q : { ...q, soO: n } }
 const so = (v: string) => Number(String(v).replace(',', '.'))
+// THƯỞNG PHẠT (gộp 26/10): `&tp=1` ⇒ lệnh answer trả `thuong` (Đúng +10, chuỗi ≥ 3: +2; sai làm kĩ +2) như máy chủ phần A, câu cuối của chặng thêm `ketBai`.
+const TP = thamSo.get('tp') === '1'
+let chuoiTp = 0
+const daTraTp = new Set<string>()
+const thuongTp = (dung: boolean) => {
+  chuoiTp = dung ? chuoiTp + 1 : 0
+  return dung ? { tinh: true, nguyenTu: 10 + (chuoiTp >= 3 ? 2 : 0), dong: [{ nhan: 'Đúng', so: 10 }, ...(chuoiTp >= 3 ? [{ nhan: `Chuỗi đúng ${chuoiTp}`, so: 2 }] : [])], chuoiDung: chuoiTp, cauKho: false }
+    : { tinh: true, nguyenTu: 2, dong: [{ nhan: 'Làm nghiêm túc', so: 2 }], chuoiDung: 0, cauKho: false }
+}
 /** Trả lời các lệnh `/game-v2/hoc-tap-*` + `answer` của màn làm bài; lệnh khác ⇒ null (bộ giả chung lo). */
 export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<string, unknown> | null {
-  if (duong.endsWith('/game-v2/hoc-tap-start')) return { ok: true, id: `phien-${kieu || 'chung'}`, questions: ds.map(congKhai), ...(kieu === 'g7' ? { goi7: GOI7 } : {}) }
-  const q = ds.find((c) => c.qid === b.qid)
+  if (duong.endsWith('/game-v2/hoc-tap-start') && thamSo.get('loi') === '1') return { ok: false, error: 'Máy chủ đang bận, chưa mở được chặng học của em lúc này. Em kiểm tra kết nối mạng rồi bấm Thử lại sau ít phút nhé.' } // KIỂM GD MỚI 26/10
+  if (duong.endsWith('/game-v2/hoc-tap-start')) return { ok: true, id: `phien-${kieu || 'chung'}`, questions: ds.map(congKhai), ...(kieu === 'g7' || LAM_LAI ? { goi7: GOI7 } : {}) }
+  if (duong.endsWith('/game-v2/hoc-tap-lam-lai')) return { ok: true, questions: LAM_LAI ? CAU_LAM_LAI.map(congKhai) : [] }
+  const q = [...ds, ...CAU_LAM_LAI].find((c) => c.qid === b.qid)
   if (!q) return null
   if (duong.endsWith('/game-v2/answer')) {
     const tra = String(b.answer ?? '')
     daNop++
-    return { ok: true, correct: q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] }
+    const dung = q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn
+    daTraTp.add(q.qid)
+    const tp = TP ? { thuong: thuongTp(dung), ...(ds.every((c) => daTraTp.has(c.qid)) ? { ketBai: KET_BAI } : {}) } : {}
+    return { ok: true, correct: dung, answer: q.dapAn, solution: q.loiGiai, solutionImages: [], ...(q.vaiGoi7 === 'lam_lai' ? { attempt: { assisted: true } } : {}), ...tp }
   }
   if (duong.endsWith('/game-v2/hoc-tap-gap')) { daNop++; return { ok: true, correct: false, hocCoHoTro: true, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] } }
   return null

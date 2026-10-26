@@ -371,7 +371,7 @@
 }
 .ct-de-chon .tt {
   min-width: 0;
-  flex: 1;
+  flex: 1 1 160px; /* SOÁT 26/10: cột hẹp (ngang 844) ⇒ nút «Chọn đề kiểm tra» xuống hàng thay vì ép chữ còn 55px */
 }
 .ct-de-chon b {
   display: -webkit-box;
@@ -1993,3 +1993,7 @@ table.ct-bang {
   align-items: center;
   gap: 8px;
 }
+
+/* SOÁT 26/10 (thầy: KHÔNG cắt chữ để vừa): tên em ở lưới theo dõi và link vào ca xuống dòng thay vì «…» — thẻ cao theo nội dung. */
+.ct-em .ten { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+.ct-link span:not(.ct-nhan) { flex: 1 1 200px; overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }

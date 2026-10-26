@@ -216,4 +216,14 @@ button.tvc-hn-bac { cursor: pointer; background: color-mix(in oklch, var(--bac) 
   .tvc-luoi > [data-cot="5"] { grid-column: span 5; }
   .tvc-the { padding: 24px; }
 }
+/* Máy tính nhỏ (1024–1279 px, vd 1024×768 — rà ngang/máy tính 26/10): cột trái chỉ ~430 px mà khối Hôm nay chia đôi ⇒ nhãn «Câu đúng / Câu sai»
+ * bị cắt trong hộp, thẻ Bậc vỡ từng chữ. Ở khổ này khối Hôm nay xếp MỘT cột (số + lượt học trên, ba ô số + thẻ Bậc dưới). Chỉ trang cũ (.tvc-luoi). */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .tvc-luoi .tvc-hn-than { display: flex; }
+}
 @media (prefers-reduced-motion: reduce) { .tvc-muc-luc { scroll-behavior: auto; } }
+/* SOÁT 26/10 (giao diện cũ phụ huynh): tên con + lớp ở thanh đầu không cắt «…» ở 360 px — xuống dòng (thầy: không cắt chữ để vừa). */
+.ph3-dau__ten b { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+/* SOÁT 26/10 (giao diện cũ phụ huynh, cột hẹp — điện thoại ngang): ba ô số tự xuống hàng thay vì ép chữ mỗi từ một dòng; nhãn ngày «CN 04» được xuống dòng thay vì thò khỏi ô */
+@media (min-width: 600px) { .tvc-luoi-so { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } }
+.tvc-o-ngay small { white-space: normal; text-align: center; }

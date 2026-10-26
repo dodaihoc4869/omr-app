@@ -1,0 +1,72 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Phạt — Thăng hoa»: 2 ngày liền không xong bài nào và không có bình giữ chuỗi ⇒ 10% số tinh thể thăng hoa (tối thiểu 5, tối đa 50);
+     lần mở app kế tiếp hiện thông báo, Bi buồn. Số giả lập: số dư 120 ⇒ 10% = 12 (trong khoảng 5–50) ⇒ còn 108. Không chặn quyền học.
+     Hiệu ứng H1: các viên tinh thể mờ dần, bốc lên thành hơi rồi tan; bộ đếm giảm 120 → 108; Bi «ngu» thức dậy rồi buồn (1,4 s). -->
+<title>HS · Thưởng phạt · 11 Thăng hoa</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.tp-hinh{width:220px;height:190px}
+.tp-hinh .tp-bi{position:absolute;left:50%;bottom:0;width:120px;margin-left:-60px}
+.tp-hinh .bi-ngu{z-index:3}
+.tp-hinh .bi-buon{z-index:2}
+.hoi{position:absolute;left:0;right:0;top:0;height:70px;z-index:1}
+.hoi i{position:absolute;width:26px;height:26px;border-radius:50%;background:var(--tin);opacity:.12;filter:blur(1px)}
+.doi{display:flex;align-items:center;justify-content:center;gap:14px}
+.doi>div{display:flex;flex-direction:column;align-items:center;gap:2px}
+.doi span{font-size:13px;color:var(--chu-2)}
+.doi b{display:inline-flex;align-items:center;gap:6px;font-size:30px;font-weight:900}
+.doi b .tp-dv{width:26px;height:26px}
+.doi .cu b{color:var(--chu-3);text-decoration:line-through;text-decoration-thickness:3px}
+.doi .moi b{color:var(--tt-chu)}
+.doi .mui{color:var(--chu-3)}
+.ly{display:flex;flex-direction:column;gap:10px}
+.ly .tp-dong .giua b{font-size:15px}
+.dem-tt{display:inline-flex;align-items:center;gap:6px;margin-left:auto;min-height:40px;padding:0 12px 0 8px;border-radius:999px;background:var(--tt-nhat);color:var(--tt-chu);font-weight:900;font-size:16px}
+.dem-tt .tp-dv{width:22px;height:22px}
+.bi-ngu{opacity:0}
+</style></head>
+<body class="duo tp" data-app="hs" data-khung="khong" data-ai="khong" data-hu-mac="thang-hoa">
+<div class="duo-vo">
+  <div class="duo-tren"><span class="duo-dong" aria-label="Đóng"><i data-i="x"></i></span><span class="dem-tt" aria-label="Tinh thể"><i data-tp="tt"></i><span id="dem">108</span></span></div>
+  <main class="tp-man hai-cot">
+    <div class="cot-a">
+      <div class="tp-hinh" id="hinh"><span class="hoi" id="hoi" aria-hidden="true"><i style="left:30%;top:30px"></i><i style="left:55%;top:10px;width:34px;height:34px"></i><i style="left:44%;top:44px;width:18px;height:18px"></i></span><span data-bi="ngu" class="bi-ngu" id="bi-ngu"></span><span data-bi="sai" class="bi-buon" id="bi-buon"></span></div>
+      <h1>12 tinh thể đã thăng hoa</h1>
+      <p class="tp-phu">2 ngày liền em chưa xong bài nào, và không có bình giữ chuỗi.</p>
+      <div class="doi" aria-label="Số dư từ 120 còn 108 tinh thể">
+        <div class="cu"><span>Trước</span><b>120</b></div><span class="mui"><i data-i="arrow"></i></span><div class="moi"><span>Còn lại</span><b><i data-tp="tt"></i>108</b></div>
+      </div>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the ly" aria-label="Vì sao">
+        <div class="tp-dong"><span class="tp-o tin"><i data-i="flask"></i></span><div class="giua"><b>Thăng hoa = 10% số tinh thể</b><span>ít nhất 5, nhiều nhất 50 · 10% của 120 là 12</span></div></div>
+        <div class="tp-dong"><span class="tp-o bang"><i data-i="lock"></i></span><div class="giua"><b>Lần sau mang sẵn bình giữ chuỗi</b><span>có bình thì tinh thể không thăng hoa · 50 tinh thể một bình</span></div></div>
+        <div class="tp-dong"><span class="tp-o sao"><i data-i="flame"></i></span><div class="giua"><b>Học 1 bài hôm nay</b><span>ngọn lửa chuỗi bắt đầu cháy lại từ hôm nay</span></div></div>
+      </section>
+    </div>
+  </main>
+  <div class="duo-day"><div class="giua"><span class="duo-nut">Học ngay</span><div class="duo-bo"><span>Để sau</span></div></div></div>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('thang-hoa', async () => {
+  // H1: Bi «ngu» thức dậy → buồn; tinh thể mờ dần, bốc hơi; bộ đếm giảm 120 → 108
+  const ngu = document.getElementById('bi-ngu'), buon = document.getElementById('bi-buon'), dem = document.getElementById('dem'), hinh = document.getElementById('hinh')
+  TP.phanHoi('thangHoa')
+  dem.textContent = '120'
+  TP.a(ngu, [{ opacity: 1, transform: 'none' }, { opacity: 1, transform: 'none', offset: 0.45 }, { opacity: 1, transform: 'translateY(-10px) rotate(-4deg)', offset: 0.6 }, { opacity: 0, transform: 'none' }], 1400)
+  TP.a(buon, [{ opacity: 0 }, { opacity: 0, offset: 0.6 }, { opacity: 1 }], 1400)
+  // tinh thể bốc hơi: viên tinh thể từ bộ đếm và quanh Bi mờ dần, bay lên, nở ra rồi tan
+  const L = TP.lop(), r = hinh.getBoundingClientRect()
+  if (TP.dong) for (let i = 0; i < 12; i++) {
+    const h = document.createElement('i'); h.className = 'tp-hat gem'; h.innerHTML = TP.tt()
+    h.style.left = r.left + r.width * (0.15 + Math.random() * 0.7) + 'px'; h.style.top = r.top + r.height * (0.45 + Math.random() * 0.4) + 'px'; L.append(h)
+    h.animate([{ transform: 'translateY(0) scale(.9)', opacity: 0 }, { transform: 'translateY(-10px) scale(1)', opacity: 1, offset: 0.2 }, { transform: `translate(${(Math.random() - 0.5) * 40}px,-110px) scale(1.9)`, opacity: 0 }], { duration: 1200, delay: i * 50, easing: 'ease-out', fill: 'backwards' }).onfinish = () => h.remove()
+  }
+  TP.a(document.getElementById('hoi'), [{ opacity: 0, transform: 'translateY(20px) scale(.6)' }, { opacity: 1, transform: 'translateY(-10px) scale(1.2)', offset: 0.6 }, { opacity: 1, transform: 'none' }], 1300)
+  await TP.cho(400)
+  TP.dem(dem, 120, 108, 900)
+  TP.a(dem.parentElement, [{ transform: 'scale(1)' }, { transform: 'scale(.9)' }, { transform: 'scale(1)' }], 900)
+})
+</script>
+</body></html>

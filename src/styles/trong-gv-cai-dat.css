@@ -18,3 +18,11 @@
   [data-trong='gv'] .gv-cai-dat-day-du [role='radiogroup'][aria-label='Giao diện'] { display: flex; }
   [data-trong='gv'] .gv-cai-dat-day-du [role='radiogroup'][aria-label='Giao diện'] > button { flex: 1; gap: 6px !important; padding: 0 6px; white-space: nowrap; }
 }
+/* NGANG GV 26/10: máy tính rộng — một cột 824 px để trống nửa phải ⇒ ≥ 1280 xếp thẻ hai cột (kiểu tường gạch, mỗi thẻ không gãy giữa hai cột);
+   thứ tự đọc: hết cột trái rồi cột phải. Điện thoại / máy tính bảng giữ một cột. */
+@media (min-width: 1280px) {
+  [data-trong='gv'] .gv-cai-dat-day-du,
+  [data-trong='gv'] .gv-cai-dat-day-du[class] { display: block !important; max-width: none; columns: 2; column-gap: 20px; }
+  [data-trong='gv'] .gv-cai-dat-day-du > .gv-page-header { column-span: all; margin: 0 0 20px; }
+  [data-trong='gv'] .gv-cai-dat-day-du > :not(.gv-page-header) { break-inside: avoid; margin: 0 0 20px; }
+}

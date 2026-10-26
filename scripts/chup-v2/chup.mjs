@@ -42,7 +42,7 @@ const DS_HS12 = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']
     // Boss 12/10: thứ tự Xem lại câu gốc → Tự làm lại → Đáp án và lời giải (bước 3 mở sau khi em làm lại / bấm xem lời giải)
     [`41-hs12-chua-truc-tiep-lam-lai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, false, /Câu em đã làm sai/, 'nut:Tự làm lại câu này'],
     [`41-hs12-chua-truc-tiep-loi-giai-${k}${t}`, 'hs12-chua-truc-tiep', w, hgt, nen, true, /Câu em đã làm sai/, 'nut:Tự làm lại câu này » Em chưa làm được — xem lời giải'],
-    [`42-hs12-tu-chua-${k}${t}`, 'hs12-tu-chua', w, hgt, nen, true, /Câu em cần chữa/],
+    [`42-hs12-tu-chua-${k}${t}`, 'hs12-tu-chua', w, hgt, nen, true, /Tự sửa lỗi/],
     [`43-hs12-tu-luyen-lam-${k}${t}`, 'hs12-tu-luyen-lam', w, hgt, nen, false, /Thuỷ phân hoàn toàn/],
   ]
 })).concat([['41-hs12-chua-gap-lai-doc', 'hs12-chua-gap-lai', 390, 844, 'light', true, /Lần gặp lại 2 mở lúc/]])
@@ -153,7 +153,7 @@ const DS_NHE = [
   ['72-nhe-chua-du-dien-thoai-toi', 'hs-nhip&nhe=chua-du', 390, 844, 'dark', true, /Thầy cũng thấy bảng này/],
   ['72-nhe-30-ngay-dien-thoai', 'hs-nhip&nhe=cham-dai', 390, 844, 'light', true, /Thầy cũng thấy bảng này/],
   ['72-nhe-30-ngay-may-tinh-toi', 'hs-nhip&nhe=cham-dai', 1440, 900, 'dark', true, /Thầy cũng thấy bảng này/],
-  ['73-nhe-loi-an-gon-dien-thoai', 'hs-nhip&nhe=loi', 390, 844, 'light', false, /Chào Minh Anh/],
+  ['73-nhe-loi-an-gon-dien-thoai', 'hs-nhip&nhe=loi', 390, 844, 'light', false, /Chào Minh Anh|chặng/i],
   // phía thầy: ô Lười ở Hôm nay nói đường thoát; tấm Hồ sơ làm bài lấy NHÓM làm nhãn chính + chip đối phó riêng (bộ giả gia/nhip-hoc.ts)
   ['74-nhe-thay-hom-nay-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:cho'],
   ['74-nhe-thay-ho-so-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:ho-so'],
@@ -184,21 +184,22 @@ const L13_TOI_CAU4 = 'tn:^A » nut:^Nộp câu » nut:^Câu tiếp theo » tn:^A
 const L13_NOP4 = `${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Nộp câu$`
 const L13_CAU5 = `${L13_NOP4} » nut:^Câu tiếp theo » tn:^B`
 const L13_CAU6 = `${L13_CAU5} » nut:^Nộp câu » nut:^Câu tiếp theo » phim:1,2`
+// DUO 26/10: màn làm chặng có «Trong» nay là kiểu Duolingo (khối DUO 26/10) ⇒ các cảnh dot13 dưới đây chụp giao diện cũ (`&trong=tat`).
 const L13_CANH = [
-  ['1-dung-sai', 'lam13', /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
-  ['2-trac-nghiem', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU5} » dau`],
-  ['3-tra-loi-ngan', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
-  ['4-hoc-huong-dan', 'lam13&lam=g7', /Câu này em chọn làm thế nào/, 'lam13:dau'],
-  ['5-phan-hoi-sai', 'lam13', /Câu 1\/6/, `lam13:${L13_NOP4}`],
-  ['6-phan-hoi-dung', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU5} » nut:^Nộp câu`],
-  ['7-xong-chang', 'lam13', /Câu 1\/6/, `lam13:${L13_CAU6} » nut:^Nộp câu » nut:^Kết thúc chặng`],
+  ['1-dung-sai', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
+  ['2-trac-nghiem', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_CAU5} » dau`],
+  ['3-tra-loi-ngan', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
+  ['4-hoc-huong-dan', 'lam13&lam=g7&trong=tat', /Câu này em chọn làm thế nào/, 'lam13:dau'],
+  ['5-phan-hoi-sai', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_NOP4}`],
+  ['6-phan-hoi-dung', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_CAU5} » nut:^Nộp câu`],
+  ['7-xong-chang', 'lam13&trong=tat', /Câu 1\/6/, `lam13:${L13_CAU6} » nut:^Nộp câu » nut:^Kết thúc chặng`],
 ]
 const DS_LAM13 = [
   ...['light', 'dark'].flatMap((nen) => L13_CANH.map(([t, m, cho, viec]) => [`lam13-${t}-doc${nen === 'dark' ? '-toi' : ''}`, m, 390, 844, nen, false, cho, viec])),
   ...L13_CANH.filter(([t]) => /dung-sai|phan-hoi-sai/.test(t)).map(([t, m, cho, viec]) => [`lam13-${t}-doc-ca-khung`, m, 390, 1180, 'light', false, cho, viec]),
   ...L13_CANH.filter(([t]) => /dung-sai|tra-loi-ngan|hoc-huong-dan|phan-hoi-sai|xong/.test(t)).map(([t, m, cho, viec]) => [`lam13-${t}-may-tinh`, m, 1440, 900, 'light', false, cho, viec]),
-  ['lam13-1-dung-sai-may-tinh-toi', 'lam13', 1440, 900, 'dark', false, /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
-  ['lam13-3-tra-loi-ngan-ngang', 'lam13', 844, 390, 'light', false, /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
+  ['lam13-1-dung-sai-may-tinh-toi', 'lam13&trong=tat', 1440, 900, 'dark', false, /Câu 1\/6/, `lam13:${L13_TOI_CAU4} » ds:a=Đúng,b=Đúng » dau`],
+  ['lam13-3-tra-loi-ngan-ngang', 'lam13&trong=tat', 844, 390, 'light', false, /Câu 1\/6/, `lam13:${L13_CAU6} » dau`],
 ]
 // ═══════════ hết LÀN MÀN LÀM BÀI 12/10D ═══════════
 
@@ -250,21 +251,113 @@ const DS_MG = [
 ]
 // ═══ hết MỘT TRANG GV 26/10
 
+// ═══ NGANG GV 26/10: mọi màn app thầy ở điện thoại ngang (844×390, 740×360 — dải biểu tượng thay thanh trên + đáy), máy tính bảng 1024×768, máy rộng
+// 1920×1080 (khung nới 1480) và điện thoại thấp 390×700 / 360×640 (luật «không cắt chữ để ép vừa khung») — sáng; ngang + 390×700 thêm tối. Tiền tố "ng-".
+const KHO_NG = [[844, 390, 'ngang'], [740, 360, 'ngang740'], [1024, 768, '1024'], [1920, 1080, '1920'], [390, 700, 'd700'], [360, 640, 'd640']]
+const MAN_NG = [
+  ['hom-nay', 'gv-hom-nay&nh=1', /Hôm nay của thầy/, 'hn:cho'], ['hom-nay-0', 'gv-hom-nay&nh=1&ca=0', /Hôm nay của thầy/, 'hn:cho'],
+  ['ca-kt', 'gv-lich-su-ca&mo=1', /Ca kiểm tra/], ['ca-kt-nhieu', 'gv-lich-su-ca&mo=1&ca=nhieu', /Ca kiểm tra/],
+  ['hanh-trinh', 'gv-nhip&ht2=1', /Hành trình giỏi Hóa/, 'cho:Kiểm tra ôn tập'], ['diem-danh', 'gv-nhip&ht2=1&dd12c=1', /Hành trình giỏi Hóa/, 'dd12c:buoc1'],
+  ['len-bang', 'gv-len-bang&ht2=1', /./, 'tab:Kiểm tra đầu giờ'], ['chieu', 'gv-chieu&remote=PHIEN1', /Hoàng Bảo Ngọc/], ['mo-ca', 'gv-mo-ca', /Mở ca kiểm tra/],
+  ['theo-doi', 'gv-theo-doi', /Kiểm tra 15 phút/], ['hoc-sinh', 'gv-hoc-sinh', /Học sinh/], ['toan-canh', 'gv-toan-canh', /Trần Đức Huy/],
+  ['ho-so', 'gv-toan-canh', /Trần Đức Huy/, 'nut:Hồ sơ làm bài'], ['kho', 'gv-kho', /Kho đề/], ['duyet', 'gv-duyet&ma=12-KT-C1-D4', /Duyệt lời giải/],
+  ['hs-hoi', 'gv-hs-hoi', /Học sinh hỏi/], ['go-nut', 'gv-go-nut', /Bàn gỡ nút thắt/], ['giao-btvn', 'gv-giao-btvn', /Giao|bài tập/i],
+  ['giao-tuan', 'gv-giao-tuan', /Giao|tuần/i], ['cai-dat', 'gv-cai-dat', /Cài đặt/],
+]
+const DS_NG_GV = MAN_NG.flatMap(([ten, man, cho, viec]) => KHO_NG.flatMap(([w, hh, kho]) => (['ngang', 'd700'].includes(kho) ? ['light', 'dark'] : ['light']).map((nen) =>
+  [`ng-${ten}-${kho}${nen === 'dark' ? '-toi' : ''}`, man, w, hh, nen, ten !== 'ho-so' && w >= 700 && hh >= 700, cho, viec])))
+// ═══ hết NGANG GV 26/10
+// ═══ DUO 26/10: màn làm chặng kiểu Duolingo (`?man=lam13&lam=duo`, bản vẽ docs/ban-ve-duo-2610) — 6 trạng thái + câu Đúng/Sai + câu có hình + tấm lời giải,
+// điện thoại (390×844, 390×700, 360×640) / ngang 844×390 / máy tính 1440×900, sáng + tối. Thao tác `lam13:` dùng chung khối LÀN MÀN LÀM BÀI. Tiền tố "duo-".
+const D_Q1 = 'tn:^D » nut:^Kiểm tra$ » nut:^Tiếp tục'
+const D_Q3 = `${D_Q1} » tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const D_Q4 = `${D_Q3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const DUO_CANH = [
+  ['1-cau', ''], ['2-chon', 'lam13:tn:^D'], ['3-dung', 'lam13:tn:^D » nut:^Kiểm tra$'], ['4-sai', 'lam13:tn:^B » nut:^Kiểm tra$'],
+  ['4b-loi-giai', 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Lời giải từng bước'], ['7-hinh', `lam13:${D_Q1}`],
+  ['8-dung-sai', `lam13:${D_Q3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$`], ['5-tln', `lam13:${D_Q4} » phim:8,2`],
+  ['6-xong', `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+]
+const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  DUO_CANH.map(([t, viec]) => [`duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
+// ═══ hết DUO 26/10
+// ═══ THƯỞNG PHẠT GỘP 26/10 (tiền tố "tpc-"): Lộ trình / Thành tích / màn mở từ thanh trên / làm chặng / kết chặng THẬT có cắm thưởng phạt (`&tp=1`:
+// máy chủ giả gia/thuong.tsx + answer trả `thuong`, câu cuối `ketBai`). 390×844 · 844×390 · 1440×900, sáng + tối. Thao tác `menu:<mục>` = chọn mục menu dọc.
+const TPC_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'nut:Chuỗi 12 ngày'],
+  ['nhiem-vu', 'hs-mot&tp=1', /Ester/, 'nut:Nguyên tử hôm nay: 147'], ['cua-hang', 'hs-mot&tp=1', /Ester/, 'nut:Tinh thể: 245'],
+  ['lam-dung', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Kiểm tra$'], ['lam-sai', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+  ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+]
+const DS_TPC = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết THƯỞNG PHẠT GỘP 26/10
+
+// ═══ NGANG HS 26/10: màn con học sinh mở đè Hôm nay (`?man=hs-ng&v=tu-sua|kiem|ai`, khối cùng tên ở trang.tsx) ở điện thoại dọc thấp / ngang / máy tính
+// bảng / máy tính, sáng + tối (ảnh khung nhìn; đo tràn ngang + vùng chạm như mọi cảnh). Tiền tố "ng-hs-".
+const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [740, 360, 'ngang740'], [1024, 768, 'bang'], [1440, 900, 'may-tinh'], [1920, 1080, 'may-tinh-1920']].flatMap(([w, hh, k]) =>
+  ['light', 'dark'].flatMap((nen) => [['tu-sua', 'hs-ng&v=tu-sua', /Em tự làm lại câu này/], ['kiem', 'hs-ng&v=kiem', /Kiểm tra ôn tập/], ['ai', 'hs-ng&v=ai', /Chào Minh Anh|chặng/i]]
+    .map(([ten, m, cho]) => [`ng-hs-${ten}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho])))
+// ═══ hết NGANG HS 26/10
+
+// ═══ KIỂM GD MỚI 26/10: dữ liệu XẤU cho màn làm chặng kiểu Duolingo (`lam13&lam=duo-xau`, gia/lam-bai-1210d.ts: đề 6 dòng, phương án 3–4 dòng, công thức
+// dài, lưới 2×2 công thức sát ngưỡng, ý Đúng/Sai dài, trả lời ngắn 6 ô, hình rộng 960px, lý do dài; `&so=lon` số hôm nay lớn; `&loi=1` máy chủ lỗi) + Gói 7
+// «Chọn cách làm» ở giao diện mới + phụ huynh «Chỉ đọc» rỗng / nhiều dữ liệu. Bộ soát scripts/soat-chu-chen + scripts/kiem-gd-moi đọc DS này. Tiền tố "kgd-".
+const K_X1 = 'tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục'
+const K_X2 = `${K_X1} » tn:^C » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const K_X3 = `${K_X2} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const K_X4 = `${K_X3} » phim:-12,75 » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const KGD_DUO = [
+  ['1-cau', ''], ['1-chon', 'lam13:tn:^B'], ['1-sai', 'lam13:tn:^B » nut:^Kiểm tra$'], ['1-dung', 'lam13:tn:^A » nut:^Kiểm tra$'],
+  ['1-loi-giai', 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Lời giải từng bước'], ['2-luoi', `lam13:${K_X1} » tn:^C`], ['2-luoi-sai', `lam13:${K_X1} » tn:^A » nut:^Kiểm tra$`],
+  ['3-ds-dang', `lam13:${K_X2} » ds:a=Đúng`], ['3-ds-sai', `lam13:${K_X2} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$`],
+  ['4-tln', `lam13:${K_X3} » phim:-12,75`], ['4-tln-sai', `lam13:${K_X3} » phim:-12,7 » nut:^Kiểm tra$`],
+  ['5-hinh', `lam13:${K_X4}`], ['5-hinh-dung', `lam13:${K_X4} » tn:^A » nut:^Kiểm tra$`], ['6-xong', `lam13:${K_X4} » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+]
+const KGD_KHO = [[390, 844, 'doc', 'light'], [390, 844, 'doc', 'dark'], [360, 640, 'doc640', 'light'], [844, 390, 'ngang', 'light'], [740, 360, 'ngang740', 'dark'],
+  [1024, 768, 'bang', 'light'], [1366, 768, 'may-tinh-1366', 'light'], [1440, 900, 'may-tinh', 'light'], [1920, 1080, 'may-tinh-1920', 'dark']]
+const DS_KGD = [
+  ...KGD_KHO.flatMap(([w, hh, k, nen]) => KGD_DUO.map(([t, viec]) => [`kgd-duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-xau', w, hh, nen, false, /Cho 12,95 gam/, viec || undefined])),
+  ...KGD_KHO.flatMap(([w, hh, k, nen]) => [
+    [`kgd-duo-so-lon-xong-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-xau&so=lon', w, hh, nen, false, /Cho 12,95 gam/, `lam13:${K_X4} » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+    [`kgd-duo-loi-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-xau&loi=1', w, hh, nen, false, /Máy chủ đang bận/],
+    [`kgd-duo-g7-chon-cach-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=g7', w, hh, nen, false, /Câu này em chọn làm thế nào/],
+    [`kgd-duo-g7-hoc-cach-giai-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=g7', w, hh, nen, false, /Câu này em chọn làm thế nào/, 'lam13:nut:^Học cách giải$'],
+    [`kgd-ph-rong-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph&mot=1&hn=chua&lt=0&cb=0&dg=khong&kt=khong&bt=khong', w, hh, nen, false, /Hôm nay/, 'pd:'],
+    [`kgd-ph-nhieu-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph&mot=1&dai=1&hn=du&nhom=cham&dg=hoc-that&kt=dang&ss=do', w, hh, nen, false, /Hôm nay/, 'pd:'],
+    [`kgd-ph-dai-canh-bao-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph&mot=1&dai=1&dg=doi-pho&nhom=luoi&kt=het', w, hh, nen, false, /Hôm nay/, 'pd:'],
+  ]),
+]
+// ═══ hết KIỂM GD MỚI 26/10
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
-// ═══ MỘT TRANG PH 26/10: app phụ huynh «Một trang» (`ph&mot=1`, khối cùng tên ở trang.tsx). Ảnh KHUNG NHÌN (không toàn trang) ở 3 khổ × sáng/tối, đo KHÔNG
-// CUỘN (scrollHeight ≤ innerHeight, scrollWidth ≤ innerWidth — vượt ⇒ ghi vào «Tràn ngang», thoát mã 1) và chữ bị cắt trong ô; tấm mở từ ô; `trong=tat` ⇒ trang cũ.
-// Chạy riêng: tiền tố "6" (60-, 61-, 62-).
-const DS_MOT_PH = [
-  ...[[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => ['light', 'dark'].map((nen) => [`60-ph-mot-trang-${k}-${nen === 'dark' ? 'toi' : 'sang'}`, 'ph&mot=1', w, h, nen, false, /Hôm nay của con/, 'mtp:'])),
-  ...[[390, 844, 'doc'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => [['hom', 'Hôm nay của con'], ['nhip', 'Nhịp học'], ['thai-do', 'Thái độ làm bài'], ['kiem-tra', 'Kiểm tra và tiến bộ']].map(([id, chu]) => [`61-ph-mot-tam-${id}-${k}`, 'ph&mot=1', w, h, 'light', false, /Hôm nay của con/, `mtp:${chu}`])),
-  ['61-ph-mot-tam-btvn-ngang-toi', 'ph&mot=1', 844, 390, 'dark', false, /Hôm nay của con/, 'mtp:Bài tập về nhà'],
-  ['62-ph-mot-trang-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/],
-  ['62-ph-mot-trang-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/],
+// ═══ PH CHỈ ĐỌC 26/10 (thay khối MỘT TRANG PH): app phụ huynh «Chỉ đọc» (`ph&mot=1`, khối cùng tên ở trang.tsx). Ảnh KHUNG NHÌN ở 3 khổ × sáng/tối cho
+// ba trạng thái: chưa làm + Lười + đối phó + thầy chưa nhận xét · đang làm (bộ gốc: Chưa đều, Học thật, cảnh báo thầy) · đủ + Chăm + học thật; thêm khổ
+// 390×700 · 360×640 · 1024×768 · 1920×1080, dữ liệu dài (`dai=1`), chưa có đánh giá (`dg=khong`). Đo trang cuộn / tràn ngang (`pd:`): máy tính 1440×900
+// phải vừa một màn (`pd:3`); điện thoại cuộn được từ khi thêm thẻ «Kiểm tra và sửa lỗi» (ảnh dọc chụp cả trang), không cắt chữ. `trong=tat` ⇒ trang cũ. 63- = thẻ «Kiểm tra và sửa lỗi». Chạy riêng: 60-ph-doc,61-ph-doc,62-ph-doc,63-ph-doc.
+const CANH_PD = [['chua', 'hn=chua&nhom=luoi&dg=doi-pho&lt=0&cb=0'], ['dang', ''], ['du', 'hn=du&nhom=cham&dg=hoc-that&cb=0']]
+const DS_PH_DOC = [
+  ...CANH_PD.flatMap(([tt, q]) => [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, h, k]) => ['light', 'dark'].map((nen) =>
+    [`60-ph-doc-${tt}-${k}-${nen === 'dark' ? 'toi' : 'sang'}`, `ph&mot=1${q ? '&' + q : ''}`, w, h, nen, k === 'doc', /Hôm nay/, k === 'may-tinh' ? 'pd:3' : 'pd:'])))
+  ,...[[390, 700], [360, 640], [1024, 768], [1920, 1080], [740, 360]].map(([w, h]) => [`61-ph-doc-dang-${w}x${h}`, 'ph&mot=1', w, h, 'light', false, /Hôm nay/, 'pd:'])
+  ,['61-ph-doc-dai-doc', 'ph&mot=1&dai=1&cb=0&dg=doi-pho&nhom=luoi', 390, 844, 'light', true, /Hôm nay/, 'pd:']
+  ,['61-ph-doc-chua-danh-gia-doc', 'ph&mot=1&dg=khong&lt=0&cb=0', 390, 844, 'light', true, /Hôm nay/, 'pd:']
+  // thẻ «Kiểm tra và sửa lỗi» (thầy 26/10): bảy trạng thái Kiểm tra ôn tập (điện thoại, cả trang) + sửa hết / còn nhiều không sửa + BTVN đủ / không có bài
+  ,...['chua', 'dang', 'nop', 'het', 'cu', 'sap', 'khong'].map((kt) => [`63-ph-doc-kt-${kt}-doc`, `ph&mot=1&cb=0&kt=${kt}`, 390, 844, 'light', true, /Hôm nay/, 'pd:'])
+  ,['63-ph-doc-kt-ss-het-bt-du-may-tinh', 'ph&mot=1&cb=0&kt=nop&ss=het&bt=du', 1440, 900, 'light', false, /Hôm nay/, 'pd:3']
+  ,['63-ph-doc-kt-ss-do-bt-khong-may-tinh-toi', 'ph&mot=1&cb=0&kt=chua&ss=do&bt=khong', 1440, 900, 'dark', false, /Hôm nay/, 'pd:3']
+  ,['62-ph-doc-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/]
+  ,['62-ph-doc-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/]
 ]
 const DS = [
-  ...DS_MOT_PH, // MỘT TRANG PH 26/10
+  ...DS_KGD, // KIỂM GD MỚI 26/10
+  ...DS_NG_GV, // NGANG GV 26/10
+  ...DS_PH_DOC, // PH CHỈ ĐỌC 26/10
   ...DS_T3, // «TRONG» NHÓM 3
   ...DS_MG, // MỘT TRANG GV 26/10
+  ...DS_NG_HS, // NGANG HS 26/10
+  ...DS_DUO, // DUO 26/10
+  ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D
@@ -364,9 +457,9 @@ const DS = [
     [`26-hs-cung-go-buoc-${k}`, 'chua-cau-sai&go=buoc', w,h,'light',false,/Số mol NaOH/],
     [`26-hs-cung-go-buoc-${k}-toi`, 'chua-cau-sai&go=buoc', w,h,'dark',false,/Số mol NaOH/],
     // App học sinh tập trung học (PR231): 4 mục + màn làm bài, sáng/tối
-    ...['light','dark'].flatMap((nen) => [['hom-nay','Hôm nay'],['hanh-trinh','Hành trình'],['on-lai','Ôn & sửa'],['ket-qua','Kết quả']].map(([m,chu]) => [`30-hs-moi-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-moi', w,h,nen,false,/Chào Minh Anh/, m === 'hom-nay' ? undefined : `ht:${chu}`])),
+    ...['light','dark'].flatMap((nen) => [['hom-nay','Lộ trình'],['on-lai','Luyện tập'],['ket-qua','Thành tích']].map(([m,chu]) => [`30-hs-moi-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-moi', w,h,nen,false,/Chào Minh Anh|chặng/i, m === 'hom-nay' ? undefined : `muc:${chu}`])),
     [`30-hs-moi-ca-mo-${k}`, 'hs-moi&ca=1', w,h,'light',false,/Ca kiểm tra đang mở/],
-    [`30-hs-moi-cua-em-${k}`, 'hs-moi', w,h,'light',false,/Chào Minh Anh/,'nut:Của em'],
+    [`30-hs-moi-cua-em-${k}`, 'hs-moi', w,h,'light',false,/Chào Minh Anh|chặng/i,'nut:Của em'],
     [`30-hs-moi-lam-${k}`, 'hs-lam', w,h,'light',false,/Thuỷ phân hoàn toàn/],
     [`30-hs-moi-lam-${k}-toi`, 'hs-lam', w,h,'dark',false,/Thuỷ phân hoàn toàn/],
     // Luyện thêm có màu nhấn (09/10): chụp thêm Hành trình nền TỐI
@@ -430,32 +523,32 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         await t.getByRole('button', { name:ten, exact:true }).first().click()
         await t.waitForTimeout(400)
       }
+    } else if (viec?.startsWith('muc:')) {
+      // 26/10 app HS kiểu Duolingo: mở mục Lộ trình / Luyện tập / Thành tích bằng nút đang HIỆN (dải mép phải khi xoay ngang; dọc ⇒ mở menu rồi bấm mục)
+      const ten = viec.slice(4)
+      const hien = () => t.getByRole('button', { name: ten, exact: true }).locator('visible=true').first()
+      // menu tự đóng khi trang cuộn ⇒ thử tối đa 3 lần (mở menu nếu mục chưa hiện, rồi bấm mục)
+      for (let lan = 0; lan < 3; lan++) {
+        if (!(await hien().count())) { await t.getByRole('button', { name: /^Mở menu/ }).locator('visible=true').first().click(); await t.waitForTimeout(500) }
+        if (await hien().click({ timeout: 3000 }).then(() => true, () => false)) break
+      }
+    } else if (viec?.startsWith('menu:')) {
+      // THƯỞNG PHẠT GỘP 26/10: chọn một mục menu dọc «Trong» (menu luôn gắn trong DOM, ẩn bằng CSS ⇒ bấm bằng DOM, rồi chờ màn mục vẽ).
+      await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), viec.slice(5))
+      await t.waitForTimeout(600)
     } else if (viec?.startsWith('ht:')) {
       await t.getByRole('navigation', { name:'Điều hướng học sinh' }).getByRole('button', { name:viec.slice(3), exact:true }).click()
       await t.waitForTimeout(250)
     } else if (viec?.startsWith('hs:')) {
       await t.getByRole('navigation', { name:'Điều hướng chính' }).getByRole('button', { name:viec.slice(3),exact:true }).click()
       await t.getByRole('heading', { name:new RegExp(viec.slice(3)) }).first().waitFor()
-    } else if (viec?.startsWith('mtp:')) {
-      // ═══ MỘT TRANG PH 26/10: chờ số lúc rảnh về (ô Thái độ hết «Đang tải…»), đo không cuộn + chữ bị cắt trong ô; `mtp:<tên ô>` ⇒ bấm ô / lối vào, chờ tấm.
-      await t.locator('.mtp-o[data-o="thai-do"] .mtp-thanh-3').waitFor({ state: 'attached', timeout: 20000 })
-      await t.waitForTimeout(600)
-      const d = await t.evaluate(() => {
-        const e = document.documentElement
-        const cat = [...document.querySelectorAll('.mtp-o')].flatMap((o) => {
-          const b = o.getBoundingClientRect()
-          return [...o.querySelectorAll('p, h2, dl, ol, .mtp-so, .mtp-thanh-3, .mtp-cot, .mtp-canh-bao')].filter((c) => c.getBoundingClientRect().height > 0 && c.getBoundingClientRect().bottom > b.bottom - 4).map((c) => `${o.getAttribute('data-o')}: «${(c.textContent || '').trim().slice(0, 24)}»`)
-        })
-        return { cao: e.scrollHeight, khung: innerHeight, rong: e.scrollWidth, khungRong: innerWidth, cat }
-      })
-      console.log(`${ten}: trang cao ${d.cao}/${d.khung} · rộng ${d.rong}/${d.khungRong} · chữ bị cắt trong ô: ${d.cat.length ? d.cat.join(' | ') : 0}`)
-      if (d.cao > d.khung || d.rong > d.khungRong) tran.push(`${ten}: CUỘN — cao ${d.cao}/${d.khung}, rộng ${d.rong}/${d.khungRong}`)
-      const o = viec.slice(4)
-      if (o) {
-        await t.getByRole('button', { name: new RegExp(`^(Mở )?${o}`) }).first().click({ timeout: 20000 })
-        await t.getByRole('dialog', { name: new RegExp(o) }).waitFor({ timeout: 20000 })
-        await t.waitForTimeout(900)
-      }
+    } else if (viec?.startsWith('pd:')) {
+      // ═══ PH CHỈ ĐỌC 26/10: chờ 7 ngày + nhóm + Báo cáo tuần về, đo cuộn / tràn ngang. `pd:3` = khổ phải vừa một màn (cuộn ⇒ ghi vào «Tràn ngang»).
+      await t.locator('[data-vung="ph-chi-doc"] .pd-7').waitFor({ state: 'attached', timeout: 20000 })
+      await t.waitForTimeout(1200)
+      const d = await t.evaluate(() => ({ cao: document.documentElement.scrollHeight, khung: innerHeight, rong: document.documentElement.scrollWidth, khungRong: innerWidth }))
+      console.log(`${ten}: trang cao ${d.cao}/${d.khung} · rộng ${d.rong}/${d.khungRong}`)
+      if (d.rong > d.khungRong || (viec === 'pd:3' && d.cao > d.khung)) tran.push(`${ten}: ${d.cao > d.khung ? 'CUỘN' : 'TRÀN'} — cao ${d.cao}/${d.khung}, rộng ${d.rong}/${d.khungRong}`)
     } else if (viec?.startsWith('ph:')) {
       const [,hash,chu] = viec.split(':')
       await t.evaluate(h => {location.hash=h}, hash)
@@ -473,8 +566,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       const ten = viec.slice(viec.indexOf(':') + 1)
       await t.getByRole('button', { name: new RegExp(`^${ten},`) }).first().click({ timeout: 20000 })
       const tam = t.getByRole('dialog')
-      await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
-      if (viec.startsWith('ho-so-ls:')) await tam.getByRole('tab', { name: /Toàn bộ lịch sử/ }).click()
+      await tam.getByText(/Từng lượt|lượt làm câu/).first().waitFor({ timeout: 20000 })
+      if (viec.startsWith('ho-so-ls:')) await tam.getByRole('tab', { name: /Toàn bộ lịch sử/ }).click({ timeout: 3000 }).catch(() => {})
       await t.waitForTimeout(400)
     } else if (viec?.startsWith('bhn:')) {
       // LÀN GIÁO VIÊN 12/10: Bài hằng ngày › bấm nút em đầu / cuối bảng ⇒ tấm Hồ sơ làm bài; `:cuon` / `:tin-hieu` cuộn thân tấm tới khối ấy.
@@ -484,8 +577,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       const nut = viTri === 'cuoi' ? t.locator('.gvv2-bhn-em').last() : t.locator('.gvv2-bhn-em').nth(Math.max(0, hang - 1))
       await nut.click({ timeout: 20000 })
       const tam = t.getByRole('dialog')
-      await tam.locator('.gvv2-tdo-dau').waitFor({ timeout: 20000 })
-      await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
+      await tam.locator('.gvv2-tdo-dau').waitFor({ timeout: 3000 }).catch(() => {})
+      await tam.getByText(/Từng lượt|lượt làm câu/).first().waitFor({ timeout: 20000 })
       if (cuon === 'cau-dung') await tam.getByRole('tab', { name: /Câu đúng/ }).click()
       // cuộn THÂN TẤM (không cuộn trang phía sau) tới khối cần chụp
       const dich = { cuon: 'gvv2-tdo-lich-tieu', 'tin-hieu': 'gvv2-tdo-th-tieu', 'cau-dung': 'gvv2-hs-the-cau-dung' }[cuon ?? '']
@@ -573,24 +666,24 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.getByText(/em đang Lười/).first().waitFor({ timeout: 20000 })
       if (v === 'chieu') {
         await t.getByRole('button', { name: 'Chiếu điểm danh', exact: true }).click()
-        await t.locator('.ddc .ddc-em').first().waitFor({ timeout: 20000 })
+        await t.locator('.ddc :is(.ddc-em, .ddv-the)').first().waitFor({ timeout: 20000 }) // bản chiếu nền sáng 23/10: thẻ em = .ddv-the
       }
       if (v === 'nhip' || v === 'ho-so') {
         await t.getByRole('button', { name: 'Xong điểm danh · chiếu Nhịp học của lớp', exact: true }).click()
-        await t.locator('.ddc .ddc-dong-em').first().waitFor({ timeout: 20000 })
+        await t.locator('.ddc :is(.ddc-dong-em, .ddv-dong-em)').first().waitFor({ timeout: 20000 })
       }
       for (const k of phim ?? '') await t.keyboard.press(k)
       if (v === 'ho-so') {
         // em đầu cột Chưa đều (nhãn thái độ của hồ sơ GIẢ chỉ có Chăm chỉ / Chưa đều / Đối phó — chọn em cùng nhóm để ảnh không tự mâu thuẫn)
-        await t.locator('.ddc-cot[data-nhom="chua-deu"] .ddc-dong-em').first().click()
-        await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
+        await t.locator(':is(.ddc-cot, .ddv-cot)[data-nhom="chua-deu"] :is(.ddc-dong-em, .ddv-dong-em)').first().click()
+        await t.getByRole('dialog').getByText(/Từng lượt|lượt làm câu/).first().waitFor({ timeout: 20000 })
       }
       if (v === 'muc' || v === 'muc-treo') await t.locator('.dd1-ot small').nth(2).waitFor({ timeout: 20000 }) // thanh Mức làm hỏi sau 1,5 giây
       if (v === 'muc-treo') await t.locator('.dd1-tong-nut[data-k="treo"]').click()
       if (v === 'muc-loi') await t.locator('.dd1-ml-loi').waitFor({ timeout: 20000 })
       if (v === 'vua') {
         await t.locator('.dd1-vua-dong').first().click()
-        await t.getByRole('dialog').getByText('Số lượt làm câu').first().waitFor({ timeout: 20000 })
+        await t.getByRole('dialog').getByText(/Từng lượt|lượt làm câu/).first().waitFor({ timeout: 20000 })
       }
       await t.waitForTimeout(500)
     } else if (viec?.startsWith('hn:')) {
@@ -610,7 +703,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         if (v === 'khoi-12') await t.getByRole('radio', { name: /^Khối 12/ }).click()
         if (v === 'ho-so') {
           await t.locator('.nht-em').first().click()
-          await t.getByRole('dialog').getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
+          await t.getByRole('dialog').getByText(/Từng lượt|lượt làm câu/).first().waitFor({ timeout: 20000 })
         }
         if (v === 'bang') {
           await t.getByRole('button', { name: /Xem bảng từng ngày/ }).click()
@@ -638,12 +731,13 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       console.log(`${ten}: cuộn dọc ${cuon}px`)
     } else if (viec?.startsWith('hse:')) {
       // LÀN HỒ SƠ EM 12/10F: tấm mở sẵn — chờ đủ hai lệnh rồi làm đúng một việc; sau đó đo tương phản mọi chữ trong tấm.
+      // 26/10: hồ sơ không còn ô «Số lượt làm câu»; hệ lười ẩn khỏi app học sinh ⇒ khối thái độ / thẻ «Toàn bộ lịch sử» có thể không có — chờ «Từng lượt».
       const v = viec.slice(4)
       const tam = t.getByRole('dialog')
-      await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
-      await tam.locator('.gvv2-tdo-dau').waitFor({ timeout: 20000 })
+      await tam.getByText(/Từng lượt|lượt làm câu/).first().waitFor({ timeout: 20000 })
+      await tam.locator('.gvv2-tdo-dau').waitFor({ timeout: 3000 }).catch(() => {})
       if (v === 'lich-su') {
-        await tam.getByRole('tab', { name: /Toàn bộ lịch sử/ }).click()
+        await tam.getByRole('tab', { name: /Toàn bộ lịch sử/ }).click({ timeout: 3000 }).catch(() => {})
         await t.evaluate(() => {
           const than = document.querySelector('.hs-ho-so-em .gvv2-hs-than')
           const o = document.getElementById('gvv2-hs-the-lich-su')

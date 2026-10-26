@@ -564,6 +564,8 @@
    (hàng lọc còn ~24px, viền viên thành "( )"). Chỉ danh sách được co và cuộn; mọi khối khác giữ đủ cao. Hàng lọc ở bố cục ngang được xuống dòng. */
 .h2-cdl-ng-trai > :not(.h2-cdl-ds) { flex-shrink: 0; }
 .h2-cdl-ngang .h2-cdl-loc { flex-wrap: wrap; overflow: visible; row-gap: 8px; }
+/* SOÁT 26/10: năm viên lọc xuống hàng ⇒ viên giãn đầy hàng (không còn một viên rơi một mình giữa khoảng trắng) */
+.h2-cdl-ngang .h2-cdl-loc.tl-hang .tl-the { flex: 1 1 auto; justify-content: center; }
 @media (pointer: coarse) {
   .h2-cdl-loc .tl-the { height: auto; min-height: 44px; }
 }

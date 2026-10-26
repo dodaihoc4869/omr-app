@@ -8,54 +8,28 @@
 // TỚI (IntersectionObserver): khối mã nạp lười + hai lệnh `/ph/ho-so-thai-do` · `/ph/lich-su-lam-cau` chạy SONG SONG (AppPhuHuynh giữ số).
 // Huy hiệu / thang 12 bậc (làn M) ở BacCon.tsx — khối nạp sẵn song song lúc mở trang. Tin xấu nói thẳng, có số, giọng bình tĩnh; số nào cũng có nhãn;
 // không mã nội bộ, không đáp án. MÀU: chỉ biến --ph3-* sẵn có + 12 màu bậc (trang-con.css).
-import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react'
-import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
-import type { ConTongQuan, GoiYNhac, NgayHoc } from '../../lib/ph-v3/con-tong-quan'
+import type { ConTongQuan, GoiYNhac } from '../../lib/ph-v3/con-tong-quan'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import { chuHanNop, chuGuiLuc, tieuDeCanhBao } from '../../lib/canh-bao-thay-hien-thi'
-import { gioVn, ngayChuoiNgan, ngayDayDuVn, tachVn, thuNgayVn, thuTuChuoiNgay } from '../../lib/ph-moi/dinh-dang'
+import { gioVn, ngayChuoiNgan, ngayDayDuVn, thuNgayVn, thuTuChuoiNgay } from '../../lib/ph-moi/dinh-dang'
 import { chuCanThem, loaiONgay, nhipTheoSanh, TEN_NHOM_NHIP, type KetQuaNhipHocApp, type NhomNhip } from '../../lib/nhip-hoc-em'
-import type { KetQuaHoSoThaiDo } from '../../lib/bai-hang-ngay-api'
-import type { KetQuaLichSuLamCau } from '../../lib/lich-su-lam-cau-api'
 import {
-  BtBang, BtBut, BtChuong, BtDiXuong, BtDongHo, BtHomNay, BtLich, BtLichSu, BtLop, BtNhipTim, BtPhai, BtSach, BtTia, BtTich, BtTinNhan, BtTrang, BtBongDen,
+  BtBut, BtChuong, BtDiXuong, BtLich, BtPhai, BtSach, BtTia, BtTich, BtTinNhan, BtTrang, BtBongDen,
 } from './BieuTuong'
 import type { Mau } from './dung-chung'
 import { chuThay } from './tien-ich'
 import './trang-con.css'
+import { HO_SO_TRONG, PHAN, PHAN_DUOI, buoiHomNay, docPhanTuHash, homNayTq, idPhan, phanCo, soHomNay, tenGoi } from './trang-ve-con-chung'
+import { LoiThe } from './LoiThe'
+import type { Bt, IdPhan, TaiHoSo, TaiNhip, TaiTq, TrangVeConProps } from './trang-ve-con-chung'
+// Phần chung đã chuyển sang trang-ve-con-chung.tsx (26/10) — xuất lại y tên cũ.
+export { HO_SO_TRONG, LoiThe, PHAN, PHAN_DUOI, buoiHomNay, docPhanTuHash, homNayTq, idPhan, phanCo, soHomNay, tenGoi }
+export type { IdPhan, TaiHoSo, TaiNhip, TaiTq, TrangVeConProps }
 
 export const TheKiemTraCon = lazy(() => import('./TheKiemTraCon'))
-
-// ---------------------------------------------------------------- các phần trên trang ----------------------------------------------------------------
-export type IdPhan = 'hom-nay' | 'nhip' | 'thai-do' | 'cau-sai' | 'thoi-gian' | 'kiem-tra' | 'btvn' | 'buoi-hoc' | 'lich-su'
-type Bt = (p: { co?: number; day?: number }) => ReactElement
-export const PHAN: readonly { id: IdPhan; ten: string; bt: Bt }[] = [
-  { id: 'hom-nay', ten: 'Hôm nay', bt: BtHomNay },
-  { id: 'nhip', ten: 'Nhịp học', bt: BtLich },
-  { id: 'thai-do', ten: 'Thái độ', bt: BtNhipTim },
-  { id: 'cau-sai', ten: 'Câu sai', bt: BtBut },
-  { id: 'thoi-gian', ten: 'Thời gian', bt: BtDongHo },
-  { id: 'kiem-tra', ten: 'Kiểm tra', bt: BtBang },
-  { id: 'btvn', ten: 'Bài tập về nhà', bt: BtSach },
-  { id: 'buoi-hoc', ten: 'Buổi học', bt: BtLop },
-  { id: 'lich-su', ten: 'Lịch sử', bt: BtLichSu },
-]
-/** Các phần nằm ở khối nạp khi cuộn tới (TrangVeConDuoi.tsx). */
-export const PHAN_DUOI: ReadonlySet<IdPhan> = new Set(['thai-do', 'cau-sai', 'thoi-gian', 'kiem-tra', 'btvn', 'buoi-hoc', 'lich-su'])
-/** id phần tử của một phần (`phan-…`) — KHÔNG trùng tuyến cũ (`#lich-su` là tuyến cũ của Ca kiểm tra). */
-export const idPhan = (id: IdPhan): string => `phan-${id}`
-/** `#phan-thai-do` ⇒ 'thai-do'; khác ⇒ null. */
-export function docPhanTuHash(hash: string): IdPhan | null {
-  const h = hash.replace(/^#/, '')
-  const p = PHAN.find((x) => `phan-${x.id}` === h)
-  return p ? p.id : null
-}
-/** Phần có trên trang với số đang có: Bài tập về nhà / Buổi học / Lịch sử chỉ khi máy chủ có số (máy chủ cũ ⇒ phần ẩn, không có mục trỏ vào chỗ trống). */
-export function phanCo(pm: PhMoi | null, tq: ConTongQuan | null): IdPhan[] {
-  return PHAN.map((p) => p.id).filter((id) => (id === 'btvn' ? !!pm?.baiTapVeNha || !!pm?.no : id === 'buoi-hoc' ? !!pm?.buoiHoc : id === 'lich-su' ? !!tq : true))
-}
 
 const giamChuyenDong = (): boolean => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 /** Cuộn tới một phần (đầu phần chừa thanh mục dính — `scroll-margin-top` trong CSS). */
@@ -75,32 +49,7 @@ const KhongGi = (_: { k: KetQuaNhipHocApp }) => null
 const BacHomNay = lazy(async () => ({ default: (await napBacCon())?.BacHomNay ?? KhongGi }))
 const BacNhip = lazy(async () => ({ default: (await napBacCon())?.BacNhip ?? KhongGi }))
 
-/** Trạng thái hai lệnh nạp khi cuộn tới (AppPhuHuynh giữ — quay lại trang không nạp lại). */
-export type TaiHoSo = { td: KetQuaHoSoThaiDo | null; ls: KetQuaLichSuLamCau | null; dangTaiTd: boolean; dangTaiLs: boolean; loiTd: string; loiLs: string; daGoi: boolean }
-export const HO_SO_TRONG: TaiHoSo = { td: null, ls: null, dangTaiTd: false, dangTaiLs: false, loiTd: '', loiLs: '', daGoi: false }
-export type TaiNhip = { k: KetQuaNhipHocApp | null; dangTai: boolean; loi: string; thuLai: () => void }
-export type TaiTq = { v: ConTongQuan | null; daTai: boolean; chuLoi: string; thuLai: () => void }
-
 // ---------------------------------------------------------------- phép thuần (test gọi thẳng) ----------------------------------------------------------------
-export const homNayTq = (tq: ConTongQuan | null): NgayHoc | null => tq?.ngay.find((n) => n.homNay) ?? null
-/** Tên gọi của con: chữ cuối của họ tên ("Nguyễn Minh Khôi" ⇒ "Khôi"). */
-export const tenGoi = (hoTen: string): string => hoTen.trim().split(/\s+/).pop() || hoTen.trim()
-const hai = (n: number) => String(n).padStart(2, '0')
-const ngayCuaMs = (ms: number): string => {
-  const t = tachVn(ms)
-  return t ? `${t.y}-${hai(t.m)}-${hai(t.d)}` : ''
-}
-
-/** Có mặt buổi học hôm nay: có mặt (giờ vào) · buổi đang mở mà con chưa điểm danh · vắng. Hôm nay không có buổi nào của con ⇒ null. */
-export function buoiHomNay(pm: PhMoi, nowMs: number): { kieu: 'co-mat'; luc: string } | { kieu: 'chua' } | { kieu: 'vang' } | null {
-  const nay = ngayCuaMs(nowMs)
-  const ds = (pm.buoiHoc ?? []).filter((b) => ngayCuaMs(Date.parse(b.moLuc)) === nay)
-  if (ds.length === 0) return null
-  const co = ds.find((b) => b.coMat)
-  if (co) return { kieu: 'co-mat', luc: gioVn(co.luc) }
-  return ds.some((b) => b.dangMo) ? { kieu: 'chua' } : { kieu: 'vang' }
-}
-
 /** Các lần học hôm nay (theo giờ, `toiDa` lần gần nhất): "19:31–19:40" · số câu · số phút; các lần sớm hơn gộp thành số lần. */
 export function lanHocHomNay(pm: PhMoi, toiDa = 3): { ds: { khoang: string; cau: string; phut: string }[]; them: number } {
   const moc = [...(pm.dongThoiGian ?? [])].sort((a, b) => Date.parse(a.batDau) - Date.parse(b.batDau))
@@ -167,29 +116,6 @@ export function oNgay(x: { ngay: string; muc: number; lam: number }, homNay: str
   return { nhan: `${thuNgan(x.ngay)} ${x.ngay.slice(8, 10)}`, loai, chu: `${ngayChuoiNgan(x.ngay)}${x.ngay === homNay ? ' (hôm nay)' : ''}: đã làm ${x.lam}/${x.muc} câu — ${tt}` }
 }
 const MAU_NHOM: Record<NhomNhip, Mau> = { cham: 'xl', 'chua-deu': 'hp', luoi: 'ho', 'chua-du': 'xd' }
-
-// ---------------------------------------------------------------- trang ----------------------------------------------------------------
-export interface TrangVeConProps {
-  v: ViewPhMoi
-  hoc2: Hoc2 | null
-  tongQuan: TaiTq
-  nhip: TaiNhip
-  loiThay: { ds: NhanXetCa[] | null; chuLoi: string }
-  thuLaiLoiThay: () => void
-  canhBao: CanhBaoThay[]
-  onDaXem: (id: string) => void
-  hoSo: TaiHoSo
-  napHoSo: () => void
-  sbd: string
-  tenCon: string
-  lop: string
-  /** Phần cần cuộn tới (bấm mục ở thanh bên, hoặc mở `#phan-…`); xong ⇒ `daDenPhan()`. */
-  denPhan: { id: IdPhan; lan: number } | null
-  daDenPhan: () => void
-  /** Phần đang đọc (thanh mục sáng đúng chỗ). */
-  phanHien: IdPhan
-  onPhanHien: (id: IdPhan) => void
-}
 
 export default function TrangVeCon(p: TrangVeConProps) {
   const { v, hoc2, tongQuan, nhip, sbd, tenCon, lop } = p
@@ -340,22 +266,13 @@ function KhungChoDuoi({ coPhan }: { coPhan: IdPhan[] }) {
   )
 }
 
-export function LoiThe({ chu, thuLai, nut }: { chu: string; thuLai: () => void; nut: string }) {
-  return (
-    <div className="tvc-loi" role="alert">
-      <p>{chu}</p>
-      <button type="button" className="ph3-nut-vien tt-nhan" onClick={thuLai}>{nut}</button>
-    </div>
-  )
-}
-
 export function DauThe({ id, bt, mau, tieuDe, phu, chip }: { id: string; bt: ReactNode; mau: Mau; tieuDe: string; phu?: ReactNode; chip?: ReactNode }) {
   return (
     <div className="tvc-dau">
       <span className="ph3-o-bt" data-mau={mau} aria-hidden="true">{bt}</span>
       <div>
         <h2 id={id}>{tieuDe}</h2>
-        {phu && <span>{phu}</span>}
+        {phu && <span>{typeof phu === 'string' ? phu.replace(/ · /g, '\u00a0· ') : phu}</span>}{/* SOÁT 26/10: «·» không mở đầu dòng */}
       </div>
       {chip}
     </div>
@@ -363,15 +280,6 @@ export function DauThe({ id, bt, mau, tieuDe, phu, chip }: { id: string; bt: Rea
 }
 
 // ---------------------------------------------------------------- 1 · Hôm nay ----------------------------------------------------------------
-/** Số câu hôm nay từ MỘT nguồn (như trước): tổng quan (đã làm / mức tối thiểu) ⇒ kế hoạch Game Hoá 2.0 ⇒ câu đã làm + mục tiêu ngày. */
-export function soHomNay(pm: PhMoi, hoc2: Hoc2 | null, tq: ConTongQuan | null): { daLam: number; tong: number | null; xap: string; dich: string; du: string } {
-  const n = homNayTq(tq)
-  if (n) return { daLam: n.daLam, tong: n.canLam, xap: n.mucUocTinh ? '≈' : '', dich: 'mức tối thiểu của ngày', du: 'đủ mức hôm nay' }
-  if (hoc2?.homNay) return { daLam: hoc2.homNay.daLam, tong: hoc2.homNay.tong, xap: '', dich: 'kế hoạch hôm nay', du: 'xong kế hoạch hôm nay' }
-  const muc = pm.tongQuan?.mucTieu?.soCau ?? null
-  return { daLam: pm.tongQuan?.soCau ?? 0, tong: muc && muc > 0 ? muc : null, xap: '', dich: 'mục tiêu của ngày', du: 'đủ mục tiêu của ngày' }
-}
-
 export function HomNay({ pm, hoc2, tq, k, nowMs }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTongQuan | null; k: KetQuaNhipHocApp | null; nowMs: number }) {
   const so = soHomNay(pm, hoc2, tq)
   const nTq = homNayTq(tq)

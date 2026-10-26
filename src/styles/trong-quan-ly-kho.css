@@ -31,3 +31,11 @@
 [data-trong='gv'] .gv-kho-day-du .gv-kho-de > div { border-top-left-radius: 14px !important; border-bottom-left-radius: 14px !important; }
 [data-trong='gv'] .gv-kho-day-du .gv-kho-de .font-bold.truncate { font-size: 15px !important; font-weight: 600; }
 [data-trong='gv'] .gv-kho-day-du .gv-kho-de details > summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--tr-chinh-chu); font-size: 13px; }
+/* NGANG GV 26/10 (luật «không cắt chữ»): dòng phụ hai ô việc («…khi máy pipeli…»), tên bài / mã đề trong cây và danh sách đề bị cắt «…» ⇒ xuống dòng, đủ chữ */
+[data-trong='gv'] .gv-kho-day-du .truncate { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: anywhere; }
+/* SOÁT 26/10 (điện thoại ≤ 480px): nhãn «đáp án đủ» + nút xoá ép tên đề còn ~50px, mỗi chữ một dòng ⇒ tên đề giữ cả hàng, nhãn xuống dưới */
+@media (max-width: 480px) {
+  [data-trong='gv'] .gv-kho-day-du .gv-kho-de .justify-between.items-start { flex-wrap: wrap; row-gap: 4px; }
+  [data-trong='gv'] .gv-kho-day-du .gv-kho-de .justify-between.items-start > .min-w-0 { flex: 1 1 200px; }
+  [data-trong='gv'] .gv-kho-day-du .gv-kho-de .justify-between.items-start > .shrink-0 { margin-left: auto; }
+}

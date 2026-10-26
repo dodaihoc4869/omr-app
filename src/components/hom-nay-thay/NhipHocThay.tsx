@@ -933,7 +933,7 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
             </span>
             <span className="mt-mo-chu">
               <b>Nhịp học theo lớp</b>
-              <small className="gvv2-so">{lopLuoi.length ? `Lười nhiều nhất: ${lopLuoi.map((l) => `${l.tenLop || 'Chưa xếp lớp'} ${l.pLuoi}%`).join(' · ')}` : `${t.lop.length} lớp · ${n} ngày đã qua`}</small>
+              <small className="gvv2-so">{lopLuoi.length ? `Lười nhiều nhất: ${lopLuoi.map((l) => `${l.tenLop || 'Chưa xếp lớp'} ${l.pLuoi}%`).join('\u00a0· ')}` : `${t.lop.length} lớp · ${n} ngày đã qua`}</small>
             </span>
             <ChevronRight size={18} aria-hidden="true" className="mt-mui" />
           </button>

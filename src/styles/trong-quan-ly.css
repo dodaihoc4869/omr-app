@@ -18,9 +18,22 @@
 [data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-don-vi { font-size: 13px; font-weight: 500; color: var(--tr-chu-3); margin-left: 2px; }
 [data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-phu { font-size: 13px; font-weight: 400; color: var(--tr-chu-3); opacity: 1; }
 [data-trong='gv'] .ls-trang .gv2-the-so[data-mau='hp'] .gv2-so-kpi { color: var(--tr-chu-y-chu); }
+/* NGANG GV 26/10 (ảnh thầy: ô thứ ba rơi xuống dòng, trắng lớn): 601–1099 ba ô một hàng; điện thoại (≤ 600) ba dòng gọn — nhãn + dòng phụ trái, số phải */
 @media (max-width: 1099px) {
-  [data-trong='gv'] .ls-trang .gv2-kpi--3 > :nth-child(odd) { border-left: 0; }
-  [data-trong='gv'] .ls-trang .gv2-kpi--3 > :nth-child(3) { grid-column: 1 / -1; border-top: 1px solid var(--tr-vien); }
+  [data-trong='gv'] .ls-trang .gv2-kpi--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  [data-trong='gv'] .ls-trang .gv2-kpi--3 > :first-child { border-left: 0; }
+}
+@media (max-width: 600px) {
+  [data-trong='gv'] .ls-trang .gv2-kpi--3 { grid-template-columns: minmax(0, 1fr); }
+  [data-trong='gv'] .ls-trang .gv2-the.gv2-the-so[data-mau] {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'nhan so' 'phu so'; align-items: center; gap: 0 12px; padding: 10px 16px;
+    border-left: 0; border-top: 1px solid var(--tr-vien);
+  }
+  [data-trong='gv'] .ls-trang .gv2-kpi--3 > :first-child { border-top: 0; }
+  [data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-nhan { grid-area: nhan; font-size: 14px; color: var(--tr-chu-2); }
+  [data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-so-dong { grid-area: so; white-space: nowrap; }
+  [data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-so-kpi { font-size: 22px; }
+  [data-trong='gv'] .ls-trang .gv2-the-so[data-mau] .gv2-phu { grid-area: phu; font-size: 12.5px; }
 }
 /* bảng gọn: đầu cột chữ thường nền chìm, dòng cao vừa, kẻ mảnh */
 [data-trong='gv'] .ls-trang .gv2-bang th {
@@ -69,8 +82,9 @@
 [data-trong='gv'] .ls-trang .gv2-bang td b { color: var(--tr-chu); font-weight: 600; }
 [data-trong='gv'] .ls-trang .gv2-chan-bang { padding: 12px 20px; border-top: 1px solid var(--tr-vien); }
 [data-trong='gv'] .ls-trang :is(.gv-loi-tai, .gv-xuong-bang, [data-trong-ca]) { margin: 0 20px 20px; }
-/* điện thoại: bảng thành danh sách — tên ca + trạng thái trên, lớp · giờ bắt đầu dưới (số chi tiết xem ở màn ca) */
-@media (max-width: 600px) {
+/* điện thoại (dọc + ngang ≤ 900 — NGANG GV 26/10: trước chỉ ≤ 600, ngang thì bảng 860 px cuộn ngang): bảng thành danh sách — tên ca + trạng thái
+   trên, lớp · giờ bắt đầu dưới (số chi tiết xem ở màn ca) */
+@media (max-width: 900px) {
   [data-trong='gv'] .ls-trang .gv-directory > :not(.gv2-cuon, .gv-loi-tai, .gv-xuong-bang) { margin-left: 16px; margin-right: 16px; }
   [data-trong='gv'] .ls-trang .ls-chips[aria-label='Lọc theo trạng thái ca'] { display: flex; width: auto; max-width: none; }
   [data-trong='gv'] .ls-trang .gv-filterbar > .gv2-nut-vien { flex: 1 1 0; padding: 0 10px; font-size: 14px; }
@@ -87,4 +101,40 @@
   [data-trong='gv'] .ls-trang .gv2-bang-ca td.gv2-khong-xuong::before { content: '·'; margin-right: 8px; }
   [data-trong='gv'] .ls-trang .gv2-bang-ca tr[data-trang-thai='Đang mở'] { background: var(--tr-chinh-nhat); }
   [data-trong='gv'] .ls-trang .gv2-chan-bang { padding: 12px 16px; }
+  /* NGANG GV 26/10 (ảnh thầy): ép xuống dòng sau trạng thái ⇒ lớp · giờ luôn cùng một dòng dưới tên; cụm không gãy, dấu «·» không đứng đầu dòng */
+  [data-trong='gv'] .ls-trang .gv2-bang-ca tr::after { content: ''; order: 2; flex: 0 0 100%; height: 0; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td { white-space: nowrap; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td:has(.gv2-ten-nut, .gv2-dam) { white-space: normal; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td:has(.gv2-ten-nut, .gv2-dam) .gv2-phu { white-space: nowrap; }
+  /* hàng công cụ: ô tìm một hàng riêng rộng hết; nút xuống hàng dưới, chữ đủ */
+  [data-trong='gv'] .ls-trang .gv-filterbar > .relative { order: 1; flex: 1 1 calc(100% - 54px); }
+  [data-trong='gv'] .ls-trang .gv-filterbar > .ls-nut-tron--nhan { order: 2; }
+  [data-trong='gv'] .ls-trang .gv-filterbar > :is(.gv2-nut-vien, .ls-nut-tron:not(.ls-nut-tron--nhan)) { order: 3; }
+  [data-trong='gv'] .ls-trang .gv-filterbar > .gv2-nut-vien { flex: 1 1 auto; white-space: nowrap; }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  [data-trong='gv'] .ls-trang .gv-filterbar > * { order: 0 !important; }
+  [data-trong='gv'] .ls-trang .gv-filterbar > .relative { flex: 1 1 240px; }
+  [data-trong='gv'] .ls-trang .gv-filterbar > .gv2-nut-vien { flex: none; }
+}
+/* 901–1199 (máy tính bảng, máy nhỏ): bảng đủ cột nhưng gọn lề để tên ca không gãy ba dòng */
+@media (min-width: 901px) and (max-width: 1199px) {
+  [data-trong='gv'] .ls-trang .gv2-bang :is(th, td) { padding-left: 10px; padding-right: 10px; }
+  [data-trong='gv'] .ls-trang .gv2-bang-ca td:has(.gv2-ten-nut, .gv2-dam) { min-width: 180px; }
+}
+
+/* NGANG GV 26/10 — điện thoại dọc (2.0): nút «Mở ca kiểm tra» là nút chính đầu màn (nút nổi «Mở ca» đè thẻ ca đầu danh sách — ảnh thầy; nút nổi ẩn ở trong-gv.css).
+   Nút do App.tsx bọc cùng màn này (trong cùng Suspense) ⇒ luật nằm ở mảnh màn, không nằm ở mảnh App. */
+@media (max-width: 879px) and (min-height: 521px) {
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-mo-ca {
+    display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; width: calc(100% - 32px); min-height: 48px; margin: 16px 16px 0;
+    padding: 0 16px; border: 0; border-radius: 12px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font-family: var(--sans); font-size: 15px;
+    font-weight: 600; box-shadow: var(--tr-bong-1);
+  }
+  /* tiêu đề trang đã chỉ còn cho trình đọc màn hình ⇒ hộp đầu màn rời luồng, không để khoảng trống giữa nút và dải số */
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-khung > .ls-trang { padding-top: 12px; }
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-khung > .ls-trang > header.gv2-dau { position: absolute; }
+  /* SOÁT 26/10 (điện thoại < 880, cao > 520): tiêu đề «Ca kiểm tra» đã rời luồng nhưng vẫn hiện ⇒ đè dải số «Ca trong tháng».
+     Thanh trên đã ghi tên màn ⇒ tiêu đề chỉ còn cho trình đọc màn hình. */
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .ca-hoa2-khung > .ls-trang > header.gv2-dau { width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }

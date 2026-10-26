@@ -1,0 +1,118 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md · Bổ sung 26/10 «Chuỗi đôi»): mời tối đa 3 bạn trong trung tâm, tìm theo tên hoặc số báo danh; bạn phải bấm đồng ý;
+     riêng tư — chỉ thấy «đã học hôm nay / chưa» + số lửa đôi; mốc đôi 7/30/100 ⇒ cả hai nhận huy hiệu đôi + 10/30/100 tinh thể.
+     Biến thể: ?bt=tim (mặc định: tìm «Hà», gửi lời mời) · ?bt=nhan (nhận lời mời: Đồng ý / Để sau) · ?bt=moc (mốc chuỗi đôi 7 ngày: hai Bi cùng cầm lửa, ăn mừng).
+     Hiệu ứng: gửi lời mời — nút đổi «Đã gửi», bay một phong bì nhỏ (?hu=gui) · nhận lời mời — hai ảnh đại diện xích lại, lửa đôi nhen lên (?hu=nhan) · mốc đôi — lửa đôi bùng, hai Bi nhảy so le, hoa giấy (?hu=moc). -->
+<title>HS · Thưởng phạt · 17 Mời bạn học cùng</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.o-tim{display:flex;align-items:center;gap:10px;min-height:52px;padding:0 16px;border-radius:16px;border:2px solid var(--tin);background:var(--mat);font-size:16px;font-weight:700}
+.o-tim .i{color:var(--chu-3)}
+.o-tim span{flex:1;min-width:0}
+.o-tim i.con-tro{width:2px;height:22px;background:var(--tin);border-radius:2px;animation:nhay 1s steps(2) infinite}
+.kq{display:flex;flex-direction:column}
+.kq .dong-b{display:flex;align-items:center;gap:12px;min-height:64px;border-top:1px solid var(--vien);padding:8px 0}
+.kq .dong-b:first-child{border-top:0}
+.kq .av{width:44px;height:44px;flex:none}
+.kq .giua{flex:1;min-width:0}
+.kq .giua b{display:block;font-size:15.5px}
+.kq .giua span{font-size:13px;color:var(--chu-3)}
+.hai-av{display:flex;align-items:center;justify-content:center;gap:6px}
+.hai-av .av{width:72px;height:72px;font-size:24px;box-shadow:0 0 0 4px var(--mat)}
+.hai-av .lua-g{width:56px;height:56px;display:grid;place-items:center}
+.hai-av .lua-g .tp-dv{width:46px;height:46px}
+.hai-bi{position:relative;width:280px;height:224px}
+.hai-bi .tp-bi{position:absolute;bottom:26px;width:116px}
+.hai-bi .b1{left:6px}
+.hai-bi .b2{right:6px}
+.hai-bi .b2 svg{transform:scaleX(-1)}
+.hai-bi .lua-g{position:absolute;left:50%;top:6px;width:76px;height:86px;margin-left:-38px;z-index:3}
+.hai-bi .lua-g .tp-dv{width:100%;height:100%}
+.hai-bi .ten-b{position:absolute;bottom:0;font-size:12px;font-weight:900;padding:2px 8px;border-radius:999px;background:var(--mat);box-shadow:var(--bong-1)}
+.dem-tt{display:inline-flex;align-items:center;gap:6px;margin-left:auto;min-height:40px;padding:0 12px 0 8px;border-radius:999px;background:var(--tt-nhat);color:var(--tt-chu);font-weight:900;font-size:16px}
+.dem-tt .tp-dv{width:22px;height:22px}
+.duo-than.tim-b{gap:14px}
+</style></head>
+<body class="duo tp" data-app="hs" data-khung="khong" data-ai="khong" data-bt-mac="tim" data-hu-mac="gui" data-hu-nhan="nhan" data-hu-moc="moc">
+<div class="duo-vo">
+  <div class="duo-tren"><span class="duo-dong" aria-label="Đóng"><i data-i="x"></i></span><span class="dem-tt" data-bt="moc" aria-label="Tinh thể"><i data-tp="tt"></i><span id="dem">245</span></span></div>
+
+  <main class="duo-than tim-b" data-bt="tim">
+    <h1 class="tp-tieu">Mời bạn học cùng</h1>
+    <p class="tp-phu" style="margin-top:-6px">Còn 1 chỗ · em học cùng tối đa 3 bạn</p>
+    <div class="o-tim" role="search"><i data-i="search"></i><span>Hà<i class="con-tro"></i></span><span class="mo" style="flex:none;font-size:13px">tên hoặc số báo danh</span></div>
+    <section class="tp-the" aria-label="Kết quả tìm">
+      <div class="kq">
+        <div class="dong-b"><span class="av k4">TH</span><div class="giua"><b>Nguyễn Thu Hà</b><span>12A1 · SBD 120207</span></div><span class="tp-nut mau-tt" id="gui">Mời</span></div>
+        <div class="dong-b"><span class="av k2">KH</span><div class="giua"><b>Chu Khánh Hà</b><span>12A1 · SBD 120231</span></div><span class="tp-nut tat">Đã gửi lời mời</span></div>
+        <div class="dong-b"><span class="av k1">HĐ</span><div class="giua"><b>Trịnh Hải Đăng</b><span>11B2 · SBD 110512</span></div><span class="tp-nut mau-tt">Mời</span></div>
+      </div>
+    </section>
+    <p class="tp-phu" style="font-size:13.5px">Bạn bè chỉ thấy em đã học hôm nay chưa và số lửa đôi, không thấy điểm hay nguyên tử.</p>
+  </main>
+
+  <main class="tp-man hai-cot" data-bt="nhan">
+    <div class="cot-a">
+      <div class="hai-av" id="hai-av"><span class="av k5" id="av1">MC</span><span class="lua-g" id="lua-g"><i data-tp="lua"></i></span><span class="av k1" id="av2">K</span></div>
+      <h1>Minh Châu mời em học cùng</h1>
+      <p class="tp-phu">12A2 · Mỗi ngày cả hai cùng xong ít nhất 1 bài thì ngọn lửa đôi cháy thêm 1 ngày.</p>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the" aria-label="Học cùng là gì">
+        <div class="tp-dong"><span class="tp-o sao"><i data-i="flame"></i></span><div class="giua"><b>Lửa đôi tăng khi cả hai cùng học</b><span>một bạn lỡ ngày thì lửa đôi tắt</span></div></div>
+        <div class="tp-dong"><span class="tp-o tt"><i data-tp="tt"></i></span><div class="giua"><b>Mốc 7 / 30 / 100 ngày</b><span>cả hai nhận huy hiệu đôi + 10 / 30 / 100 tinh thể</span></div></div>
+        <div class="tp-dong"><span class="tp-o tin"><i data-i="eye"></i></span><div class="giua"><b>Riêng tư</b><span>bạn chỉ thấy em đã học hôm nay chưa, không thấy điểm</span></div></div>
+      </section>
+    </div>
+  </main>
+
+  <main class="tp-man hai-cot" data-bt="moc">
+    <div class="cot-a">
+      <div class="hai-bi" id="hai-bi"><span class="tp-tia quay" data-tia style="position:absolute;inset:-20px"></span><span class="b1" data-bi="lua" id="b1"></span><span class="b2" data-bi="lua" id="b2"></span><span class="lua-g" id="lua-to"><i data-tp="lua"></i></span><span class="ten-b" style="left:30px">Khôi</span><span class="ten-b" style="right:22px">Minh Châu</span></div>
+      <h1 style="color:var(--sao-chu)">Chuỗi đôi 7 ngày!</h1>
+      <p class="tp-phu">Em và Minh Châu cùng học 7 ngày liền.</p>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the" aria-label="Thưởng mốc đôi">
+        <div class="tp-dong"><span class="tp-o tt"><i data-tp="tt"></i></span><div class="giua"><b>+10 tinh thể cho mỗi bạn</b><span>Minh Châu cũng nhận 10</span></div></div>
+        <div class="tp-dong"><span class="tp-o sao"><i data-i="trophy"></i></span><div class="giua"><b>Huy hiệu «Chuỗi đôi 7»</b><span>mốc kế tiếp: 30 ngày · +30 tinh thể</span></div></div>
+      </section>
+    </div>
+  </main>
+
+  <div class="duo-day" data-bt="nhan moc"><div class="giua">
+    <span class="duo-nut" data-bt="nhan">Đồng ý</span><div class="duo-bo" data-bt="nhan"><span>Để sau</span></div>
+    <span class="duo-nut mau-tt" data-bt="moc">Nhận 10 tinh thể</span>
+  </div></div>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('gui', async () => {
+  const g = document.getElementById('gui')
+  await TP.cho(500)
+  TP.phanHoi('gui')
+  TP.a(g, [{ transform: 'scale(1)' }, { transform: 'scale(.92)' }, { transform: 'none' }], 200)
+  const r = g.getBoundingClientRect(); TP.hat(r.left + r.width / 2, r.top, { n: 6, r: 40, mau: ['var(--tt)', '#fff'] })
+  g.textContent = 'Đã gửi lời mời'; g.className = 'tp-nut tat'
+})
+TP.dk('nhan', async () => {
+  TP.a(document.getElementById('av1'), [{ transform: 'translateX(-40px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 500)
+  TP.a(document.getElementById('av2'), [{ transform: 'translateX(40px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 500)
+  TP.a(document.getElementById('lua-g'), [{ transform: 'scale(0)' }, { transform: 'scale(1.4)', offset: 0.6 }, { transform: 'none' }], 700, { delay: 450 })
+  setTimeout(() => TP.hat(document.getElementById('lua-g'), 0, { n: 10, r: 50, mau: ['var(--sao)', 'var(--chu-y)'] }), 800)
+})
+TP.dk('moc', async () => {
+  // Mốc chuỗi đôi: hai Bi cùng cầm lửa, lửa giữa bùng, nhảy so le, hoa giấy; rồi 10 tinh thể bay vào bộ đếm
+  TP.phanHoi('mocDoi')
+  const l = document.getElementById('lua-to')
+  TP.a(l, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.6)', opacity: 1, offset: 0.4 }, { transform: 'scale(.9)', offset: 0.7 }, { transform: 'none', opacity: 1 }], 1300)
+  const nhay = [{ transform: 'translateY(0)' }, { transform: 'translateY(-24px) rotate(-5deg)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-12px) rotate(4deg)' }, { transform: 'translateY(0)' }]
+  TP.a(document.getElementById('b1'), nhay, 900, { delay: 300 }); TP.a(document.getElementById('b2'), nhay, 900, { delay: 520 })
+  TP.a(document.querySelector('.tp-tia'), [{ opacity: 0, transform: 'scale(.4)' }, { opacity: 1, transform: 'none' }], 800, { delay: 300 })
+  setTimeout(() => { TP.hat(l, 0, { n: 16, r: 110, mau: ['var(--sao)', 'var(--chu-y)', 'var(--sai)', '#fff'] }); TP.hoaGiay(32, 1300) }, 500)
+  await TP.cho(1600)
+  const dem = document.getElementById('dem')
+  TP.bay(document.querySelector('[data-bt=moc] .tp-o.tt') || l, dem.parentElement, { n: 6, dem: (p) => { dem.textContent = Math.round(245 + 10 * p) } })
+})
+</script>
+</body></html>

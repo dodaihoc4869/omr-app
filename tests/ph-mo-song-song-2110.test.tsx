@@ -4,6 +4,7 @@ import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
 import { xoaPass } from '../src/lib/ph-token'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 const m = vi.hoisted(() => ({ xac: vi.fn(), datPass: vi.fn(), url: vi.fn() }))
 vi.mock('../src/lib/exam-db', () => ({ loadScriptUrl: m.url }))

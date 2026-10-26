@@ -52,6 +52,7 @@ import ONgayGio24 from '../components/ONgayGio24'
 import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
 import { ganCaChot } from '../components/chien-dich/api-omni'
 import { emDiemDanhHomNay } from '../lib/chon-em-diem-danh'
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 

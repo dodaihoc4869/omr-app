@@ -91,7 +91,7 @@ describe('phần chính: MỘT con số câu hôm nay, khớp Sảnh', () => {
     ve({ g: goi({ toiThieu: 30, daLamHomNay: 31, tuLamCon: 0 }), con: 6, nhip: NHIP_EM_CHAM })
     const t = the()
     expect(t.querySelector('.ht2-hn-so')!.textContent).toBe('Đủ mức hôm nay')
-    expect(t.querySelector('.ht2-hn-da')!.textContent).toContain('Đã làm 31/30 câu hôm nay · em có thể nghỉ.')
+    expect(t.querySelector('.ht2-hn-da')!.textContent!.replace(/\u00a0/g, ' ')).toContain('Đã làm 31/30 câu hôm nay · em có thể nghỉ.') // SOÁT 26/10: cách cứng trước «·»
     expect(t.textContent).not.toMatch(/Còn \d+ câu/)
     expect(nutHoc()[0]!.textContent).toBe('Học thêm')
     expect(nutHoc()[0]!.getAttribute('data-phu')).toBe('true')
@@ -130,24 +130,24 @@ describe('phần chính: MỘT con số câu hôm nay, khớp Sảnh', () => {
 })
 
 describe('phần Nhịp học trong thẻ (số hôm nay = số Sảnh)', () => {
-  it('Lười: chip Lười · "Đủ mức 2/11 ngày từ 01/10" · dải 12 ô (ô hôm nay 7/32 của Sảnh) · "Ra khỏi nhóm Lười … 0/6 ngày, hôm nay còn 25 câu nữa là được 1/6 ngày." + 6 ô · tốc độ xấu có số · "Thầy cũng thấy bảng này."', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 26/10 (thầy: nhóm Lười / Chăm, 12 bậc, tốc độ «quá nhanh» CHỈ thầy + phụ huynh xem): máy chủ CŨ còn gửi nhóm Lười + tốc độ xấu
+  // ⇒ thẻ của em vẫn KHÔNG chip nhóm, không tô màu theo nhóm, không «Ra khỏi nhóm Lười», không dòng tốc độ; dải ngày + Việc tiếp trung tính giữ nguyên.
+  it('bản em (máy chủ cũ gửi nhóm Lười): không chip / màu nhóm · "Đủ mức 2/11 ngày từ 01/10" · dải 12 ô (ô hôm nay 7/32 của Sảnh) · Việc tiếp trung tính · "Thầy cũng thấy bảng này."', async () => {
     ve()
     const t = the()
     await within(t).findByText('Thầy cũng thấy bảng này.')
-    expect(t.getAttribute('data-nhom')).toBe('luoi')
-    expect(t.querySelector('.ht2-nhe-nhom')!.textContent).toBe('Lười')
+    expect(t.hasAttribute('data-nhom')).toBe(false)
+    expect(t.querySelector('.ht2-nhe-nhom')).toBeNull() // chuỗi 0 ngày ⇒ không chip
     expect(within(t).getByText('Đủ mức 2/11 ngày từ 01/10')).toBeTruthy()
     const o = t.querySelectorAll('.ht2-hn-dai i')
     expect(o).toHaveLength(12)
     expect(o[11]!.getAttribute('title')).toBe('12/10 (hôm nay): đã làm 7/32 câu — đang làm') // /hs/nhip-hoc ghi 0/30 — thẻ dùng số Sảnh
     expect(o[11]!.getAttribute('data-loai')).toBe('thieu-it')
     expect(within(t).getByRole('img', { name: 'Từ 01/10 tới hôm nay: đủ mức 2/11 ngày đã qua; hôm nay 7/32 câu' })).toBeTruthy()
-    expect(t.querySelector('.ht2-hn-luoi p')!.textContent).toBe('Ra khỏi nhóm Lười: đủ mức 6 ngày liền — em đang có 0/6 ngày, hôm nay còn 25 câu nữa là được 1/6 ngày.')
-    const sau = within(t).getByRole('img', { name: '0 trên 6 ngày liền đủ mức' })
-    expect([...sau.querySelectorAll('i')].map((i) => i.getAttribute('data-tt'))).toEqual(['dang', 'cho', 'cho', 'cho', 'cho', 'cho'])
-    expect(t.querySelector('.ht2-hn-toc')!.textContent).toBe('21/49 lượt em trả lời dưới 8 giây, nhóm này chỉ đúng 28%. Đọc hết đề rồi mới chọn.')
-    expect(t.textContent).not.toContain('Việc tiếp:')
-    expect(nutHoc()).toHaveLength(1) // KHÔNG có nút thứ hai trong phần Lười
+    expect(t.querySelector('.ht2-hn-luoi, .ht2-hn-toc, .ht2-hn-tin, .bcc-thang, .bcc-chip')).toBeNull()
+    expect(t.querySelector('.ht2-hn-tiep')!.textContent).toBe('Việc tiếp: còn 25 câu nữa là đủ mức hôm nay — bắt đầu chuỗi ngày đủ mức.')
+    expect(t.textContent).not.toMatch(/lười|chăm|chưa đều|bậc|đọc hết đề|quá nhanh/i)
+    expect(nutHoc()).toHaveLength(1)
   })
 
   it('Lười đang thoát 3/6: câu dùng M của Sảnh (Sảnh 12/32 ⇒ còn 20, không phải 18 của /hs/nhip-hoc); Sảnh đã đủ ⇒ k cộng hôm nay', () => {
@@ -158,11 +158,11 @@ describe('phần Nhịp học trong thẻ (số hôm nay = số Sảnh)', () => 
     expect(chuRaKhoiLuoi(du)).toBe('Ra khỏi nhóm Lười: đủ mức 6 ngày liền — em đang có 4/6 ngày, đã tính hôm nay. Mai làm đủ mức là được 5/6 ngày.')
   })
 
-  it('Chăm và Chưa đều: dòng "Việc tiếp" (số hôm nay theo Sảnh); tốc độ bình thường thì ẩn cho gọn', async () => {
+  it('Chăm và Chưa đều (bản em): chip «Chuỗi N ngày», dòng "Việc tiếp" trung tính (số hôm nay theo Sảnh); không tốc độ', async () => {
     ve({ g: goi({ toiThieu: 30, daLamHomNay: 18, tuLamCon: 12 }), nhip: NHIP_EM_CHAM })
     let t = the()
     await within(t).findByText('Thầy cũng thấy bảng này.')
-    expect(t.querySelector('.ht2-nhe-nhom')!.textContent).toBe('Chăm')
+    expect(t.querySelector('.ht2-nhe-nhom')!.textContent).toBe('Chuỗi 6 ngày') // 26/10: chip chuỗi ngày thay chip nhóm
     expect(t.querySelector('.ht2-hn-tiep')!.textContent).toBe('Việc tiếp: còn 12 câu nữa là đủ mức hôm nay — em giữ được chuỗi 7 ngày liền.')
     expect(t.querySelector('.ht2-hn-toc')).toBeNull()
     expect(t.querySelector('.ht2-hn-luoi')).toBeNull()
@@ -171,8 +171,8 @@ describe('phần Nhịp học trong thẻ (số hôm nay = số Sảnh)', () => 
     ve({ g: goi({ toiThieu: 30, daLamHomNay: 5, tuLamCon: 19, tiepCanCon: 6 }), nhip: NHIP_EM_CHUA_DEU })
     t = the()
     await within(t).findByText('Thầy cũng thấy bảng này.')
-    expect(t.querySelector('.ht2-nhe-nhom')!.textContent).toBe('Chưa đều')
-    expect(t.querySelector('.ht2-hn-tiep')!.textContent).toContain('Việc tiếp: cần thêm 14 ngày đủ mức (tính cả hôm nay) để lên nhóm Chăm — hôm nay còn 25 câu.')
+    expect(t.textContent).not.toMatch(/chưa đều|nhóm chăm|lười/i) // 26/10: không tên nhóm
+    expect(t.querySelector('.ht2-hn-tiep')!.textContent).toMatch(/^Việc tiếp: còn 25 câu nữa là đủ mức hôm nay — /)
     expect(t.querySelector('.ht2-hn-bai')!.textContent).toBe('Bài 8. Amine · 19 câu tự làm · 6 câu học có hỗ trợ')
     expect(t.querySelector('.ht2-hn-so')!.textContent).toBe('Còn 25 câu')
   })

@@ -13,6 +13,7 @@ import { taoKhoGio, useGiayConLai, type KhoGio } from '../../lib/dong-ho-thi'
 import { docKtcnDangLam, ghiKtcnDangLam, xoaKtcnDangLam } from '../../lib/ktcn-dang-lam'
 import './hoc-tap.css'
 import './kiem-tra-ca-nhan.css'
+import { phanHoi } from '../../lib/phan-hoi'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
 // ĐỢT 20 · MÀN KIỂM TRA ÔN TẬP theo bản vẽ docs/ban-ve-dot20 (thầy duyệt 13/10). Logic lưu/đồng hồ/chốt/khôi phục nháp GIỮ NGUYÊN (hợp đồng Codex
@@ -41,6 +42,8 @@ function GioConLai({kho,bai=false}:{kho:KhoGio|null;bai?:boolean}){
  const giay=useGiayConLai(kho)??0
  return <>{bai?conLai(giay*1000):dongHo(Math.max(0,Math.ceil(giay)))}</>
 }
+/** Dòng phụ của chặng ĐÃ CHỐT (thầy 26/10: «Đã chốt · đã trả lời 0/6» dễ hiểu nhầm): nói rõ bỏ trống bao nhiêu câu — cùng số daTra, chỉ đổi lời. */
+const chuChot=(so:number,da:number)=>da>=so?`${so} câu · trả lời đủ ${so}/${so}`:da<=0?`${so} câu · bỏ trống cả ${so} câu`:`${so} câu · trả lời ${da}/${so} · bỏ trống ${so-da}`
 const khongDangKy=()=>()=>{}
 function useHetGio(kho:KhoGio|null){
  const lay=()=>!!kho&&kho.conLai()<=0
@@ -114,7 +117,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  },[chang,busy,tt,ket,stt])
  // Gốc màn chỉ nghe mốc giờ; hết hạn vẫn chốt một lần, đợi đúng hàng lưu/revision hiện hành.
  useEffect(()=>{if(stt!==null&&han&&hetGio&&!busy&&!choThuLai.current)void chot(true)},[hetGio,han,offset,stt,busy,nhipThuLai])
- const doi=(qid:string,a:string)=>{const v={...traRef.current,[qid]:a};traRef.current=v;setTra(v);setLuu('Đang lưu…');setNhapCuu(undefined);try{localStorage.setItem(key,JSON.stringify({han,tra:v}))}catch{/* bản nháp máy chủ vẫn là nguồn chính */}if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{void save().catch(e=>{setLoi(e instanceof Error?e.message:'Chưa lưu được bài.');setLuu('Chưa đồng bộ; bản nháp đang ở trên máy')})},400)}
+ const doi=(qid:string,a:string)=>{phanHoi('chon');const v={...traRef.current,[qid]:a};traRef.current=v;setTra(v);setLuu('Đang lưu…');setNhapCuu(undefined);try{localStorage.setItem(key,JSON.stringify({han,tra:v}))}catch{/* bản nháp máy chủ vẫn là nguồn chính */}if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{void save().catch(e=>{setLoi(e instanceof Error?e.message:'Chưa lưu được bài.');setLuu('Chưa đồng bộ; bản nháp đang ở trên máy')})},400)}
  const phucHoi=()=>{if(!nhapCuu||!khoChang||khoChang.conLaiNgay()<=0)return;traRef.current={...traRef.current,...nhapCuu};setTra(traRef.current);setNhapCuu(undefined);void save().catch(e=>setLoi(e instanceof Error?e.message:'Chưa đồng bộ được bản nháp.'))}
  const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa lưu được bài.')}finally{setBusy(false)}}else{onVe();onCapNhat()}}
  const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa nộp được bài.')}finally{setBusy(false)}}
@@ -157,7 +160,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
      <span className="ktcn-ch-dau" aria-hidden="true">{c.daChot?<Check size={20}/>:c.stt+1}</span>
      <div className="ktcn-ch-o">
       <div className="ktcn-ch-h"><b>Chặng {c.stt+1}</b>{c.daChot?<span className="ktcn-chip" data-sac="xanh">Đã chốt</span>:chay?<span className="ktcn-chip">Còn <GioConLai kho={khoChang}/></span>:khoa?<span className="ktcn-chip" data-sac="xam"><Lock size={13} aria-hidden="true"/>Chờ chặng {dangChay!.stt+1}</span>:null}</div>
-      <small>{c.soCau} câu · {Math.ceil(c.giay/60)} phút{typeof c.daTra==='number'?` · đã trả lời ${c.daTra}/${c.soCau}`:''}</small>
+      <small>{c.daChot&&typeof c.daTra==='number'?chuChot(c.soCau,c.daTra):`${c.soCau} câu · ${Math.ceil(c.giay/60)} phút${typeof c.daTra==='number'?` · đã trả lời ${c.daTra}/${c.soCau}`:''}`}</small>
       {!c.daChot&&<button type="button" className={chinh?'ktcn-nut-chinh':'ktcn-nut-phu'} onClick={()=>void mo(c.stt)} disabled={busy||khoa}>{chay?`Làm tiếp chặng ${c.stt+1}`:`Làm chặng ${c.stt+1}`}<ArrowRight size={18} aria-hidden="true"/></button>}
       {khoa&&<p className="ktcn-ch-ghi">Nộp chặng {dangChay!.stt+1} rồi mới mở chặng này.</p>}
      </div>

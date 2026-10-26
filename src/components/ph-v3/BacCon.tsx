@@ -68,7 +68,7 @@ export function BacHomNay({ k }: { k: KetQuaNhipHocEm }) {
       <HuyHieuBac bac={b.bac} co={64} />
       <span className="tvc-hn-bac-chu">
         <b className="tvc-ten-bac">{chuBac(hien)}</b>
-        <span>Nhóm <b>{nhom}</b> · Điểm chăm <b>{b.diem}</b>/100 · Chuỗi đủ mức <b>{k.chuoiDuGanNhat}</b> ngày</span>
+        <span>Nhóm <b>{nhom}</b>&nbsp;· Điểm chăm <b>{b.diem}</b>/100&nbsp;· Chuỗi đủ mức <b>{k.chuoiDuGanNhat}</b> ngày</span>
       </span>
     </NutTam>
   )

@@ -10,3 +10,13 @@
 [data-trong='gv'] .hslc :is(.gvv2-hs-cau, .hslc-khoi-con) { border-color: var(--tr-vien); border-radius: 14px; box-shadow: none; }
 [data-trong='gv'] .hslc .gvv2-hs-chan { background: var(--tr-mat); border-color: var(--tr-vien); }
 [data-trong='gv'] .hslc .gvv2-nut-vien { min-height: 44px; border-color: var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-1); font-weight: 600; }
+/* NGANG GV 26/10: điện thoại ngang (thấp ≤ 500) — tấm toàn màn rộng ~800 px nhưng lưới chỉ chia hai cột từ 880 ⇒ một cột dài, đầu + chân tấm ăn gần nửa
+   chiều cao ⇒ chia hai cột từ 700 (Từng lượt | Hôm nay + Câu từng sai) */
+@media (max-height: 500px) and (min-width: 601px) {
+  @container hslc (min-width: 700px) {
+    [data-trong='gv'] .hslc-luoi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; }
+    [data-trong='gv'] .hslc-luoi > * { grid-column: 1 / -1; }
+    [data-trong='gv'] .hslc-luoi > .hslc-nua { grid-column: auto / span 1; }
+    [data-trong='gv'] .hsv-luoi { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
+  }
+}

@@ -29,8 +29,12 @@ async function chip(cheDo: 'hoc-sinh' | 'thay' | 'phu-huynh') {
   const tam = await screen.findByRole('dialog')
   await choTamXong(tam)
   moGap(tam, /^(Nhịp học|Lịch làm bài)/) // 6 mức: đầu tấm Thái độ dời vào ngăn gập
-  await waitFor(() => expect(tam.querySelector('#gvv2-tdo-nhan')).not.toBeNull())
-  if (cheDo === 'hoc-sinh') expect(tam.textContent).not.toMatch(/đối phó/)
+  // 26/10 (thầy: nhãn / nhóm CHỈ thầy + phụ huynh xem): đầu khối của học sinh chỉ còn khoảng ngày + dải 14 ngày, không tên nhóm (#gvv2-tdo-nhan).
+  await waitFor(() => expect(tam.querySelector(cheDo === 'hoc-sinh' ? '.gvv2-tdo-dau' : '#gvv2-tdo-nhan')).not.toBeNull())
+  if (cheDo === 'hoc-sinh') {
+    expect(tam.querySelector('#gvv2-tdo-nhan, .gvv2-tdo-ly-do, .hslc-thoat')).toBeNull()
+    expect(tam.textContent).not.toMatch(/đối phó|lười|chưa đều|nhóm chăm/i)
+  }
   return tam.querySelector('.gvv2-tdo-co-doi-pho')
 }
 

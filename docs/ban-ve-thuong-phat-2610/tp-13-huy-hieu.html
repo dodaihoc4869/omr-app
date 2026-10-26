@@ -1,0 +1,73 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md): «Huy hiệu» — mốc chuỗi (7/30/50/100/365) · hạng giải đã đạt (+ «Quán quân») · 10/50 bài hoàn hảo · Thử thách Kim cương từng chuyên đề ·
+     «Phản ứng dây chuyền» (chuỗi đúng 10) · «Cú đêm» (học sau 21:00) · mốc chuỗi đôi 7/30/100 (bổ sung 26/10). Không nhãn nhịp học / bậc chăm (HS không thấy).
+     Số liệu giả lập, khớp các màn khác: chuỗi 12 (dài nhất 21), hạng cao nhất Vàng (nay ở Bạc), 14 bài hoàn hảo, Kim cương Ester – Lipid, chuỗi đôi với Minh Châu 9 ngày.
+     Hiệu ứng D3: huy hiệu mới «Hoàn hảo 10 bài» lật 3D lộ ra, lấp lánh (?hu=lat, mặc định). -->
+<title>HS · Thưởng phạt · 13 Thành tích</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="mot-trang.css"><link rel="stylesheet" href="duo-app.css"><link rel="stylesheet" href="dm-dep.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.tong4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tong4>div{display:flex;align-items:center;gap:10px;padding:12px;border-radius:18px;background:var(--mat);border:1px solid var(--vien);min-width:0}
+.tong4 .tp-hh{width:40px}
+.tong4 .tp-o{width:40px;height:40px}
+.tong4 b{display:block;font-size:20px;font-weight:900;line-height:1.15}
+.tong4 span.mo{font-size:12.5px}
+.luoi-hh{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:12px 8px}
+.o-hh{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.o-hh .tp-hh{width:62px}
+.o-hh b{font-size:13px;line-height:1.25}
+.o-hh small{font-size:12px;color:var(--chu-3);line-height:1.3}
+.o-hh .tp-thanh{width:60px;height:6px}
+.o-hh .moi{display:inline-block;vertical-align:1px;padding:1px 7px;border-radius:999px;background:var(--sai);color:#fff;font-size:11px;font-weight:900}
+</style></head>
+<body class="da dm tp" data-app="hs" data-nav="duo" data-tab="thanh-tich" data-menu="phai" data-ai="menu" data-diem-danh="khong" data-hu-mac="lat">
+<header class="da-tren" data-lua="12" data-nt="147" data-tt="245" data-bai="3/4"></header>
+<div class="dm-khung mot">
+<main class="da-vo tp-rong">
+  <!-- GỌN HƠN: bỏ thẻ «Bậc 7 · Chưa đều» (nhãn nhịp học chỉ thầy/phụ huynh thấy); thành tích = 4 số + lưới huy hiệu theo nhóm, huy hiệu chưa có hiện tiến độ. -->
+  <div class="tp-luoi2">
+    <div class="c">
+      <h1 class="tp-tieu">Thành tích</h1>
+      <div class="tong4">
+        <div><span class="tp-o sao"><i data-i="flame"></i></span><div><b>12 ngày</b><span class="mo">chuỗi hiện tại</span></div></div>
+        <div><span class="tp-o sao" style="background:var(--chu-y)"><i data-i="trophy"></i></span><div><b>21 ngày</b><span class="mo">chuỗi dài nhất</span></div></div>
+        <div><span data-hh="vang"></span><div><b>Vàng</b><span class="mo">hạng cao nhất</span></div></div>
+        <div><span class="tp-o dung"><i data-tp="nt"></i></span><div><b>6.240</b><span class="mo">nguyên tử từ trước tới nay</span></div></div>
+      </div>
+      <section class="tp-the"><h2>Chuỗi ngày</h2><div class="luoi-hh" id="g-chuoi"></div></section>
+      <section class="tp-the"><h2>Giải tuần</h2><div class="luoi-hh" id="g-giai"></div></section>
+    </div>
+    <div class="c">
+      <section class="tp-the"><h2>Bài hoàn hảo</h2><div class="luoi-hh" id="g-hh"></div></section>
+      <section class="tp-the"><h2>Thử thách Kim cương</h2><div class="luoi-hh" id="g-kc"></div></section>
+      <section class="tp-the"><h2>Học cùng bạn</h2><div class="luoi-hh" id="g-doi"></div></section>
+      <section class="tp-the"><h2>Đặc biệt</h2><div class="luoi-hh" id="g-dac"></div></section>
+    </div>
+  </div>
+</main>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+const chu = (t, c = 34) => `<text x="50" y="${50 + c * 0.36}" text-anchor="middle" font-family="Nunito Variable,Nunito,sans-serif" font-weight="900" font-size="${c}" fill="#fff">${t}</text>`
+const ic = (n) => `<g transform="translate(29 29) scale(1.75)" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ICON[n]}</g>`
+// [mau, trong, tên, phụ, có?, tiến độ %, mới?]
+const O = (mau, trong, ten, phu, co, p, moi) => `<div class="o-hh"${moi ? ' id="moi"' : ''}><span class="tp-hh${co ? '' : ' khoa'}">${TP.huyHieuMau(mau, trong)}</span><b>${ten}${moi ? ' <span class="moi">Mới</span>' : ''}</b>${p != null ? `<div class="tp-thanh sao"><i style="--p:${p}%"></i></div>` : ''}<small>${phu}</small></div>`
+const K = (kl, ten, phu, co) => `<div class="o-hh"><span class="tp-hh${co ? '' : ' khoa'}">${TP.huyHieu(kl)}</span><b>${ten}</b><small>${phu}</small></div>`
+document.getElementById('g-chuoi').innerHTML = O('--chu-y', chu(7), '7 ngày', 'đạt 23/9', 1) + O('--chu-y', chu(30), '30 ngày', '12/30', 0, 40) + O('--chu-y', chu(50), '50 ngày', '12/50', 0, 24) + O('--chu-y', chu(100, 28), '100 ngày', '12/100', 0, 12) + O('--chu-y', chu(365, 24), 'CLB 365', '12/365', 0, 3)
+document.getElementById('g-giai').innerHTML = K('dong', 'Giải Đồng', 'đạt 28/9', 1) + K('bac', 'Giải Bạc', 'đạt 5/10', 1) + K('vang', 'Giải Vàng', 'đạt 19/10', 1) + K('bk', 'Bạch kim', 'chưa đạt', 0) + K('kc', 'Kim cương', 'chưa đạt', 0) + O('--sao', ic('trophy'), 'Quán quân', 'top 3 Giải Kim cương', 0)
+document.getElementById('g-hh').innerHTML = O('--sao', chu(10), '10 bài', 'đạt hôm nay', 1, null, 1) + O('--sao', chu(50), '50 bài', '14/50', 0, 28)
+document.getElementById('g-kc').innerHTML = K('kc', 'Ester – Lipid', 'đạt 30/10', 1) + K('kc', 'Amine', 'cần thành thạo', 0) + K('kc', 'Carbohydrate', 'cần thành thạo', 0)
+document.getElementById('g-doi').innerHTML = O('--tt', chu(7), 'Chuỗi đôi 7', 'cùng Minh Châu', 1) + O('--tt', chu(30), 'Chuỗi đôi 30', '9/30', 0, 30) + O('--tt', chu(100, 28), 'Chuỗi đôi 100', '9/100', 0, 9)
+document.getElementById('g-dac').innerHTML = O('--chu-y', ic('zap'), 'Phản ứng dây chuyền', 'chuỗi đúng 10 câu', 1) + O('--tin', ic('moon'), 'Cú đêm', 'học sau 21:00', 1)
+</script>
+<script>
+TP.dk('lat', async () => {
+  // D3: thẻ lật 3D lộ huy hiệu mới, lấp lánh
+  const m = document.getElementById('moi'), h = m.querySelector('.tp-hh')
+  TP.phanHoi('huyHieu')
+  TP.a(h, [{ transform: 'perspective(400px) rotateY(180deg) scale(.7)', opacity: 0.3 }, { transform: 'perspective(400px) rotateY(90deg) scale(.9)', opacity: 1, offset: 0.45 }, { transform: 'perspective(400px) rotateY(-12deg) scale(1.15)', offset: 0.8 }, { transform: 'none' }], 800, { delay: 300 })
+  TP.a(m.querySelector('.moi'), [{ transform: 'scale(0)' }, { transform: 'scale(1.3)' }, { transform: 'none' }], 300, { delay: 1000 })
+  setTimeout(() => TP.hat(h, 0, { n: 12, r: 60, mau: ['var(--sao)', '#fff', 'var(--chu-y)'] }), 750)
+})
+</script>
+</body></html>

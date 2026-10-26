@@ -29,6 +29,7 @@ import { gameIdentity } from './game-v2-auth'
 import { SQL_LUOT_GOI7 } from './goi-bai-7'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docCauKho } from './omni-d1'
+import { nhipHocChoHs, type TraLoiNhipHocHs } from './an-luoi-hs'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -95,7 +96,7 @@ async function docTocDo(env: Env, sbd: string, tu: string, den: string): Promise
 }
 
 /** `POST /hs/nhip-hoc {token}` — xem đầu tệp. */
-export async function hsNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<TraLoiNhipHocEm> {
+export async function hsNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<TraLoiNhipHocHs> {
   let sbd: string
   try {
     sbd = await gameIdentity(env, b)
@@ -103,14 +104,15 @@ export async function hsNhipHoc(env: Env, b: Row, nowMs = Date.now()): Promise<T
     return { ok: false, error: CAN_DANG_NHAP_NHIP }
   }
   if (!sbd || sbd.length > 40) return { ok: false, error: CAN_DANG_NHAP_NHIP }
-  return nhipHocCuaEm(env, sbd, nowMs, LOI_NHIP_EM)
+  // 26/10 (thầy: hệ phát hiện lười CHỈ thầy + phụ huynh xem): bỏ nhóm / bậc / việc tiếp / tốc độ / tin cậy khỏi bản em (an-luoi-hs.ts); không đọc tốc độ.
+  return nhipHocChoHs(await nhipHocCuaEm(env, sbd, nowMs, LOI_NHIP_EM, true))
 }
 
 /**
  * LÕI bảng "Nhịp học" của MỘT em đã xác thực (12/10 đợt 16: tách để `/ph/nhip-hoc` — ph-ho-so-con.ts — trả ĐÚNG bản em thấy, không phép tính thứ hai).
  * `sbd` đã kiểm ở nơi gọi (em ⇒ token học sinh; phụ huynh ⇒ `sbdCuaPhuHuynh`). `loi` = câu báo khi đọc hỏng (em / phụ huynh xưng hô khác nhau).
  */
-export async function nhipHocCuaEm(env: Env, sbd: string, nowMs: number, loi: string = LOI_NHIP_EM): Promise<TraLoiNhipHocEm> {
+export async function nhipHocCuaEm(env: Env, sbd: string, nowMs: number, loi: string = LOI_NHIP_EM, boTocDo = false): Promise<TraLoiNhipHocEm> {
   // Khoảng mặc định (01/10 → hôm nay); em KHÔNG chọn được khoảng khác (bỏ `tu` / `den` của thân lệnh).
   const kh = khoangNgay({}, nowMs)
   if ('error' in kh) return { ok: false, error: loi }
@@ -119,7 +121,7 @@ export async function nhipHocCuaEm(env: Env, sbd: string, nowMs: number, loi: st
     const [ngay, vaoMap, tocDo] = await Promise.all([
       ngayBaiCuaMotEm(env, sbd, tu, den, homNay),
       docNgayVao(env, [{ sbd, hoTen: sbd, lop: '', khoi: '', goi7Tu: null }], tu).catch(() => new Map<string, string>()),
-      docTocDo(env, sbd, tu, den),
+      boTocDo ? Promise.resolve(null) : docTocDo(env, sbd, tu, den),
     ])
     if (!ngay) return { ok: false, error: loi }
     const vao = vaoMap.get(sbd) ?? tu

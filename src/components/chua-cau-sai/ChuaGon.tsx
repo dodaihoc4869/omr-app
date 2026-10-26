@@ -14,6 +14,7 @@ import { apiGonMo, apiGonNop, type KetQuaGon } from '../../lib/chua-cau-sai-api'
 import { chuDapAn, daTraLoiDu, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
+import { phanHoi } from '../../lib/phan-hoi'
 
 export interface PropsChuaGon {
   token: string
@@ -78,6 +79,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep }
     }
     khoa.current = ''
     if (r.ket && KHEP.has(r.ket)) ghiXong() // ghi NGAY khi có kết quả (không chờ lượt vẽ sau)
+    if (r.ket) phanHoi(r.ket === 'tu_sua' || r.ket === 'xong_phan' ? 'dung' : 'sai') // rung phản hồi (chỉ «Trong»)
     setKq(r)
   }
   const lamLai = async () => {
@@ -176,7 +178,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep }
           <h2 className="ccs-buoc-ten" ref={tieuDe} tabIndex={-1}>Em tự làm lại câu này</h2>
         </div>
         {(mo.lan ?? 1) === 1 && <p className="ccs-luat">{mo.tuSuaNeuDung ? LUAT_BAN_MOI : 'Em vừa sai câu này hôm nay: làm đúng bây giờ tính xong phần hôm nay. Ngày khác tự làm đúng mới tính là đã tự sửa.'}</p>}
-        {khung({ ...propsCauLam(de, tra, (v) => setTra(v), ban), hoiThay: { qid, nguon: 'tu_chua' } })}
+        {khung({ ...propsCauLam(de, tra, (v) => { phanHoi('chon'); setTra(v) }, ban), hoiThay: { qid, nguon: 'tu_chua' } })}
       </>
     )
     nutChinh = <button type="button" className="ccs-nut-chinh" onClick={() => void nop()} disabled={ban || !daTraLoiDu(phan, tra)}>{ban ? 'Đang chấm…' : 'Kiểm tra'}</button>

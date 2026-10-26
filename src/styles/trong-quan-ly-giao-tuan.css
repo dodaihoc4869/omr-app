@@ -18,8 +18,9 @@
 [data-trong='gv'] .gv-giao-tuan [data-ui-card]:last-child input[type='date'] { min-height: 44px; padding: 0 12px; border: 1px solid var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu); }
 [data-trong='gv'] .gv-giao-tuan [data-ui-card]:last-child .m3-nut-tonal { width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font-weight: 600; }
 [data-trong='gv'] .gv-giao-tuan [data-ui-card]:last-child .m3-nut-tonal:disabled { background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); opacity: 0.7; }
-@media (min-width: 1100px) {
-  [data-trong='gv'] .gv-giao-tuan { display: grid !important; grid-template-columns: minmax(0, 1fr) 380px; align-items: start; align-content: start; }
+/* NGANG GV 26/10: hai cột từ 900 (trước 1100 — máy tính bảng 1024 rơi một cột, thẻ Hạn nộp tụt xuống cuối) */
+@media (min-width: 900px) {
+  [data-trong='gv'] .gv-giao-tuan { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); align-items: start; align-content: start; }
   [data-trong='gv'] .gv-giao-tuan > [data-ui-card] { grid-column: 1; }
   [data-trong='gv'] .gv-giao-tuan > :is(.gv-page-header, .gv-page-header + [data-ui-card]) { grid-column: 1 / -1; }
   [data-trong='gv'] .gv-giao-tuan > [data-ui-card]:last-child { grid-column: 2; grid-row: 3 / span 3; position: sticky; top: 16px; }

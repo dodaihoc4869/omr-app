@@ -30,7 +30,8 @@ describe('thanh bên theo cờ', () => {
   it('cờ TẮT ⇒ đúng danh sách cũ (Hôm nay, Giao bài tập về nhà, Học sinh hỏi… còn nguyên)', () => {
     render(<ThanhBenTrai />)
     // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): thêm "Gỡ nút thắt" ngay sau "Học sinh hỏi".
-    expect(tenMuc()).toEqual(['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Ngân hàng đề', 'Giao bài tập về nhà', 'Gọi lên bảng', 'Học sinh hỏi', 'Gỡ nút thắt', 'Giao đề theo tuần', 'Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên, trên Cài đặt.
+    expect(tenMuc()).toEqual(['Hôm nay', 'Học sinh', 'Thi đua tuần', 'Ca kiểm tra', 'Ngân hàng đề', 'Giao bài tập về nhà', 'Gọi lên bảng', 'Học sinh hỏi', 'Gỡ nút thắt', 'Giao đề theo tuần', 'Cài đặt'])
     expect(screen.queryByText('Thêm…')).toBeNull()
   })
 
@@ -42,7 +43,8 @@ describe('thanh bên theo cờ', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     const { container } = render(<ThanhBenTrai />)
     expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra' })).toBeNull()
-    expect(tenMuc()).toEqual(['Hôm nay', 'Hành trình', 'Ca kiểm tra', 'Học sinh', 'Kho đề', 'Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên, trên Cài đặt.
+    expect(tenMuc()).toEqual(['Hôm nay', 'Hành trình', 'Ca kiểm tra', 'Học sinh', 'Kho đề', 'Thi đua tuần', 'Cài đặt'])
     for (const bo of ['Tổng quan', 'Chiến dịch luyện', 'Chữa trên lớp', 'Gỡ nút thắt']) expect(tenMuc()).not.toContain(bo)
     expect(container.querySelector('.ben-trai-vach[role="separator"]')).toBeTruthy()
     expect(screen.queryByText('Thêm…')).toBeNull()

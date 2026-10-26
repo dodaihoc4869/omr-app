@@ -1,0 +1,82 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LUẬT (LUAT-THUONG-PHAT.md · Bổ sung 26/10 «Bình giữ chuỗi» + «Ngày vắng có phép»): lỡ một ngày thì bình tự dùng; sáng hôm sau mở app thấy
+     «Hôm qua bình giữ chuỗi đã đỡ cho em — chuỗi vẫn 12 ngày»; hình nắp bình đóng lại, ô ngày đó xanh băng. Vắng có phép: giữ chuỗi miễn phí, không tốn bình, ô có dấu «P».
+     Tình huống giả lập: sáng Thứ Bảy 31/10, hôm qua 30/10 em không học. ?bt=binh (mặc định: dùng bình, còn 0/2, thứ Hai 2/11 được tặng 1) · ?bt=phep (vắng có phép, bình vẫn 1/2).
+     Hiệu ứng C3: nắp bình đóng lại, hơi lạnh toả ra, ô 30/10 hoá xanh băng (?hu=binh) · dấu «P» đóng lên ô ngày (?hu=phep). -->
+<title>HS · Thưởng phạt · 18 Bình đã đỡ chuỗi</title>
+<link rel="stylesheet" href="trong.css"><link rel="stylesheet" href="lam-duo.css"><link rel="stylesheet" href="tp.css">
+<style>
+.tp-hinh{width:220px;height:190px}
+.tp-hinh .binh-to{position:absolute;left:24px;top:4px;width:120px;z-index:1}
+.tp-hinh .tp-bi{position:absolute;right:0;bottom:0;width:82px;z-index:2}
+.tp-hinh .p-to{position:absolute;left:30px;top:20px;width:120px;height:120px;border-radius:50%;display:grid;place-items:center;background:var(--bang-nhat);color:var(--bang-chu);font-size:64px;font-weight:900;box-shadow:inset 0 0 0 6px var(--bang);z-index:1}
+.tuan7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center}
+.tuan7>div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12.5px;font-weight:800;color:var(--chu-3)}
+.tuan7 .n{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--mat-3);color:var(--chu-3)}
+.tuan7 .n .i{width:18px;height:18px}
+.tuan7 .n.hoc{background:var(--chu-y);color:#fff}
+.tuan7 .n.binh{background:var(--bang);color:#fff}
+.tuan7 .n.phep{background:var(--mat);color:var(--bang-chu);box-shadow:inset 0 0 0 2.5px var(--bang);font-weight:900;font-size:16px}
+.tuan7 .n.nay{background:var(--mat);box-shadow:inset 0 0 0 2.5px var(--chu-y)}
+.tuan7 .n .lan{position:absolute;inset:0;border-radius:50%;background:var(--bang)}
+.tuan7 .n>.i,.tuan7 .n>b{position:relative}
+.binh-con{display:flex;align-items:center;gap:12px}
+.binh-con .tp-binh{width:40px}
+.binh-con .giua{flex:1;min-width:0}
+.binh-con b{display:block;font-size:15.5px}
+.binh-con span{font-size:13.5px;color:var(--chu-2)}
+</style></head>
+<body class="duo tp" data-app="hs" data-khung="khong" data-ai="khong" data-bt-mac="binh" data-hu-mac="binh" data-hu-phep="phep">
+<div class="duo-vo">
+  <div class="duo-tren"><span class="duo-dong" aria-label="Đóng"><i data-i="x"></i></span></div>
+  <main class="tp-man hai-cot">
+    <div class="cot-a">
+      <div class="tp-hinh" data-bt="binh"><span class="binh-to" data-binh="dong" id="binh"></span><span data-bi="vui" id="bi"></span></div>
+      <div class="tp-hinh" data-bt="phep"><span class="p-to" id="p-to">P</span><span data-bi="vui" id="bi"></span></div>
+      <h1 data-bt="binh">Hôm qua bình giữ chuỗi đã đỡ cho em</h1>
+      <h1 data-bt="phep">Ngày vắng có phép — chuỗi vẫn giữ</h1>
+      <p class="tp-phu" data-bt="binh">Chuỗi vẫn <b style="color:var(--sao-chu)">12 ngày</b>. Hôm nay học 1 bài để lửa cháy tiếp nhé.</p>
+      <p class="tp-phu" data-bt="phep">Hôm qua 30/10 em vắng có phép. Chuỗi vẫn <b style="color:var(--sao-chu)">12 ngày</b>, không tốn bình.</p>
+    </div>
+    <div class="cot-b">
+      <section class="tp-the" aria-label="Tuần này">
+        <h2>Tuần này</h2>
+        <div class="tuan7">
+          <div><span class="n hoc"><i data-i="check"></i></span>T2</div><div><span class="n hoc"><i data-i="check"></i></span>T3</div><div><span class="n hoc"><i data-i="check"></i></span>T4</div><div><span class="n hoc"><i data-i="check"></i></span>T5</div>
+          <div data-bt="binh"><span class="n binh" id="o30" aria-label="30/10: bình giữ chuỗi đỡ"><i class="lan"></i><i data-i="flask"></i></span>T6</div>
+          <div data-bt="phep"><span class="n phep" id="o30" aria-label="30/10: vắng có phép"><b>P</b></span>T6</div>
+          <div><span class="n nay" aria-label="Hôm nay, chưa học"></span>Nay</div><div><span class="n"></span>CN</div>
+        </div>
+      </section>
+      <section class="tp-the" aria-label="Bình giữ chuỗi">
+        <div class="binh-con" data-bt="binh"><span data-binh="trong"></span><div class="giua"><b>Còn 0/2 bình</b><span>Thứ Hai 2/11 được tặng 1 bình · hoặc mua 50 tinh thể</span></div></div>
+        <div class="binh-con" data-bt="phep"><span data-binh="day"></span><div class="giua"><b>Vẫn còn 1/2 bình</b><span>ngày vắng có phép không tốn bình</span></div></div>
+      </section>
+    </div>
+  </main>
+  <div class="duo-day"><div class="giua"><span class="duo-nut">Học bài hôm nay</span><div class="duo-bo" data-bt="binh"><span>Mua bình · 50 tinh thể</span></div></div></div>
+</div>
+<script src="khung.js"></script><script src="linh-vat/bi.js"></script><script src="tp.js"></script>
+<script>
+TP.dk('binh', async () => {
+  // C3: nắp bình đóng lại, hơi lạnh toả ra, ô 30/10 hoá xanh băng
+  TP.phanHoi('binh')
+  const b = document.getElementById('binh'), nap = b.querySelector('.nap')
+  nap.style.transformBox = 'fill-box'; nap.style.transformOrigin = 'center'
+  TP.a(nap, [{ transform: 'translate(10px,-16px) rotate(30deg)' }, { transform: 'translate(10px,-16px) rotate(30deg)', offset: 0.2 }, { transform: 'translate(0,3px) rotate(-3deg)', offset: 0.75 }, { transform: 'none' }], 600)
+  TP.a(b, [{ transform: 'none' }, { transform: 'none', offset: 0.6 }, { transform: 'scale(1.06,.94)', offset: 0.75 }, { transform: 'none' }], 700)
+  setTimeout(() => { TP.hat(b, 0, { n: 16, r: 90, tron: true, mau: ['var(--bang)', 'var(--bang-nhat)', '#fff'], d: 900 }) }, 420)
+  const o = document.getElementById('o30')
+  TP.a(o.querySelector('.lan'), [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.2)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], 500, { delay: 650 })
+  setTimeout(() => TP.hat(o, 0, { n: 8, r: 34, tron: true, co: 5, mau: ['var(--bang)', '#fff'] }), 900)
+  TP.a(document.getElementById('bi'), [{ transform: 'translateY(0)' }, { transform: 'translateY(-14px)' }, { transform: 'translateY(0)' }], 500, { delay: 800 })
+})
+TP.dk('phep', async () => {
+  // dấu «P» đóng lên ô ngày vắng có phép
+  const p = document.getElementById('p-to'), o = document.getElementById('o30')
+  TP.a(p, [{ transform: 'scale(2.2) rotate(-18deg)', opacity: 0 }, { transform: 'scale(.92) rotate(2deg)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], 500)
+  TP.a(o, [{ transform: 'scale(2) rotate(-15deg)', opacity: 0 }, { transform: 'scale(.9)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], 450, { delay: 500 })
+  setTimeout(() => TP.hat(o, 0, { n: 8, r: 30, co: 5, mau: ['var(--bang)', 'var(--sao)'] }), 800)
+})
+</script>
+</body></html>

@@ -1,0 +1,65 @@
+// HOOK + HÀM CHỮ CỦA MÀN HÔM NAY (tách khỏi TheHomNayEm.tsx 26/10 — luật tốc độ): Lộ trình «Trong» (TrongHs.tsx) và màn Hôm nay cũ cùng dùng. Nằm trong nhóm
+// mở app học sinh (nhỏ); thẻ giao diện cũ TheHomNayEm (kèm BangNhipHoc) nạp lười, chỉ khi tắt «Trong».
+import { useEffect, useState } from 'react'
+import { CAU_MOI_CHANG, soChangXong, type SoHomNay } from './lam-bai'
+import { layNhipHocEm, type NhipHocHs } from '../../lib/nhip-hoc-em'
+
+/** Bản nhớ trong phiên (mỗi token một bản, 60 giây, gắn với `lamMoi`): em chuyển qua lại các mục rồi về Hôm nay thì vẽ ngay, không gọi lại máy
+ *  chủ (bớt lượt D1); số câu hôm nay đổi ⇒ khoá khác ⇒ nạp lại. */
+const NHO = new Map<string, { kq: NhipHocHs; luc: number; khoa: number | null | undefined }>()
+// Khẩn 12/10 21h (giờ cao điểm): lịch sử ngày không đổi trong ngày — số HÔM NAY lấy từ sảnh ⇒ nhớ 10 phút, KHÔNG nạp lại sau mỗi câu.
+const NHO_MS = 600_000
+/** Chỉ cho test: xoá bản nhớ. */
+export const xoaNhoNhipHocEm = (): void => NHO.clear()
+
+/** Nạp `/hs/nhip-hoc`: 'tai' (đang tải) · 'an' (không token / lỗi lần đầu ⇒ ẩn gọn) · số. Lỗi khi đã có số ⇒ giữ số cũ. */
+export function useNhipHocEm(token: string | undefined, lamMoi: number | null | undefined): NhipHocHs | 'tai' | 'an' {
+  // Bản hiện gắn với phiên: đổi em trên máy dùng chung không được giữ nhóm/nhịp của em trước.
+  const [ban, setBan] = useState(() => ({ token, kq: token ? NHO.get(token)?.kq ?? null : null, hong: false }))
+  useEffect(() => {
+    if (!token) return
+    const c = NHO.get(token)
+    if (c && c.khoa === lamMoi && Date.now() - c.luc < NHO_MS) {
+      setBan({ token, kq: c.kq, hong: false })
+      return
+    }
+    let huy = false
+    void layNhipHocEm(token).then((r) => {
+      if (huy) return
+      if (r) {
+        NHO.set(token, { kq: r, luc: Date.now(), khoa: lamMoi })
+        setBan({ token, kq: r, hong: false })
+      } else setBan(v => ({ token, kq: v.token === token ? v.kq : null, hong: true }))
+    })
+    return () => {
+      huy = true
+    }
+  }, [token, lamMoi])
+  if (!token) return 'an'
+  return ban.token === token ? ban.kq ?? (ban.hong ? 'an' : 'tai') : NHO.get(token)?.kq ?? 'tai'
+}
+
+/** Các chặng của hôm nay: chặng i gồm câu (6·i, min(6·(i+1), M)] — đúng luật vạch chặng / `soChangXong`; chặng cuối lấy hết phần còn lại tới M. */
+export function chiaChang(so: SoHomNay): { co: number; tt: 'xong' | 'dang' | 'cho'; phan: number }[] {
+  const xong = soChangXong(so)
+  return Array.from({ length: so.soChang }, (_, i) => {
+    const dau = Math.min(i * CAU_MOI_CHANG, so.muc)
+    const cuoi = i === so.soChang - 1 ? so.muc : Math.min((i + 1) * CAU_MOI_CHANG, so.muc)
+    const co = Math.max(1, cuoi - dau)
+    const tt = i < xong ? 'xong' : i === xong ? 'dang' : 'cho'
+    return { co, tt, phan: tt === 'dang' ? Math.max(0, Math.min(100, Math.round((100 * (so.daLam - dau)) / co))) : 0 }
+  })
+}
+
+/** Chữ nút học — MỘT nút cho cả màn (Hôm nay và Hành trình dùng chung).
+ *  Gói 7 kho thiếu (khẩn 12/10 21h30): hết việc xếp được mà chưa đủ mức ⇒ "Hôm nay còn N câu chờ thầy bổ sung" (nút khoá); còn việc xếp được nhưng ít
+ *  hơn phần còn lại của mức ⇒ nút VẪN BẤM ĐƯỢC, nói đúng số câu sẵn sàng ("Học tiếp · 1 câu sẵn sàng") — số "Còn N câu" phía trên vẫn theo M. */
+export function chuNutHoc(so: SoHomNay | null, hetCau: boolean, kho?: { choBoSung?: number; sanSang?: number }): string {
+  if (hetCau) return kho?.choBoSung ? `Hôm nay còn ${kho.choBoSung} câu chờ thầy bổ sung` : 'Đã làm hết câu được giao'
+  if (!so) return 'Bắt đầu học'
+  const con = Math.max(0, so.muc - so.daLam)
+  if (con === 0) return 'Học thêm'
+  const dau = so.daLam > 0 ? 'Học tiếp' : 'Bắt đầu học'
+  const sanSang = kho?.sanSang
+  return sanSang !== undefined && sanSang > 0 && sanSang < con ? `${dau} · ${sanSang} câu sẵn sàng` : `${dau} · ${con} câu`
+}

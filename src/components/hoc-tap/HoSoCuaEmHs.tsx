@@ -14,7 +14,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import HoSoLamCauEm from '../chien-dich/HoSoLamCauEm'
 import { taoNguonHoSoEm } from '../../lib/ho-so-em-hs-api'
-import { layHocThatEm, type HocThatEm } from '../../lib/hoc-that-hs-api'
 import { useKhoaCuonTrang } from '../../lib/khoa-cuon-trang'
 import { mucCanSua, soCauCanSua, taiTuSuaLoi } from '../../lib/tu-sua-loi'
 import type { KetQuaDanhSachChua } from '../../lib/chua-cau-sai-api'
@@ -65,13 +64,7 @@ export default function HoSoCuaEmHs({ token, tenEm, lop, onDong, onChuaCau, onMo
     }
   }, [coDuong, token])
   const em = useMemo(() => ({ sbd: '', ten: tenEm, khoi: null, ...(lop ? { lop } : {}) }), [tenEm, lop])
-  // (24/10) Học thật · Đối phó: chỉ hiện khi thầy đã bật (máy chủ trả null ⇒ không thẻ). Mở hồ sơ ⇒ máy chủ ghi «em đã xem» lời nhắc.
-  const [ht, setHt] = useState<HocThatEm | null>(null)
-  useEffect(() => {
-    let huy = false
-    void layHocThatEm(token).then((x) => { if (!huy) setHt(x) })
-    return () => { huy = true }
-  }, [token])
+  // 26/10 (thầy: nhãn đánh giá tuần CHỈ thầy + phụ huynh xem): app em KHÔNG còn thẻ đánh giá tuần, không gọi `/hs/danh-gia` (máy chủ cũng chỉ trả `{ ok }`).
   // Trả focus: phần tử đang focus lúc mở (nút / bảng em vừa bấm) — đóng tấm thì focus về đó nếu còn trên trang.
   const moTu = useRef<HTMLElement | null>(null)
   if (moTu.current === null && typeof document !== 'undefined') moTu.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
@@ -84,29 +77,8 @@ export default function HoSoCuaEmHs({ token, tenEm, lop, onDong, onChuaCau, onMo
   )
   return createPortal(
     <div className="hs-ho-so-em" data-che-do="hoc-sinh">
-      <HoSoLamCauEm em={em} nguon={nguon} cheDo="hoc-sinh" onDong={onDong} onChuaCau={onChuaCau} coTheChua={coTheChua} soCauCanSua={soCanSua ?? undefined} onMoBaiTap={onMoBaiTap} dauThan={ht ? <TheHocThat ht={ht} /> : null} />
+      <HoSoLamCauEm em={em} nguon={nguon} cheDo="hoc-sinh" onDong={onDong} onChuaCau={onChuaCau} coTheChua={coTheChua} soCauCanSua={soCanSua ?? undefined} onMoBaiTap={onMoBaiTap} />
     </div>,
     document.body,
-  )
-}
-
-/** Thẻ Học thật / Đối phó của em: Đối phó kèm lý do bằng số để em tự sửa; Học thật không liệt kê lỗi nhỏ. */
-export function TheHocThat({ ht }: { ht: HocThatEm }) {
-  const tuanTruoc = ht.lichSu.slice(1, 4)
-  if (ht.nhan === 'Học thật') {
-    return (
-      <div className="hsv-nhan" role="status">
-        <small>Cách em học 14 ngày qua</small>
-        <b>Học thật</b>
-        {tuanTruoc.length > 0 && <span className="hsv-ghi">Các tuần trước: {tuanTruoc.map((x) => x.nhan).join(', ')}.</span>}
-      </div>
-    )
-  }
-  return (
-    <div className="hsv-canh" role="alert">
-      <div className="hsv-canh-dau">Thầy xếp em vào nhóm Đối phó</div>
-      {ht.lyDo.length > 0 && <ol>{ht.lyDo.map((x) => <li key={x}>{x}</li>)}</ol>}
-      <p>Hai tuần liền làm bài thật (không bấm vội, không bỏ bài) thì em về lại nhóm Học thật.</p>
-    </div>
   )
 }

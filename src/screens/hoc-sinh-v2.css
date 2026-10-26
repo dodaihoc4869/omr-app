@@ -104,6 +104,12 @@
 .gvhs-xuong { display: grid; gap: 4px; padding: 12px 20px 20px; }
 .gvhs-xuong-dong { display: flex; align-items: center; gap: 24px; min-height: 60px; border-top: 1px solid var(--gvm-mat-2); }
 
+/* SOÁT 26/10 — máy tính bảng ngang / cửa sổ vừa: ô tìm + ba ô chọn không vừa một hàng ⇒ nút Tải lại rơi một mình xuống hàng 2 (khoảng trắng lớn).
+   Ô tìm chiếm trọn hàng 1, hàng 2 = ba ô chọn + Tải lại. */
+@media (min-width: 761px) and (max-width: 1199px) {
+  .gvhs-tim { flex-basis: 100%; max-width: none; }
+}
+
 /* điện thoại / máy tính bảng dọc: mỗi em một thẻ (nhãn cột đứng trước giá trị) */
 @media (max-width: 760px) {
   .gvhs-loc { padding: 12px 16px; }

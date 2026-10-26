@@ -3411,6 +3411,12 @@ const boXuLy = {
       // SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy: tính lại mỗi 10 phút vào bản đệm `cau_hinh.sai_nhanh_gv` (bản còn mới ⇒ chỉ 1 truy vấn đọc); lỗi chỉ ghi log.
       // XẾP HỌC SINH (24/10): thứ Hai 01:00–06:00 giờ VN tính bản chụp tuần, ≤ 25 em/phút; công tắc «tắt» ⇒ một câu đọc rồi về; ngoài giờ ⇒ không truy vấn.
       await import('./danh-gia-hoc-that-d1').then(m=>m.cronDanhGiaTuan(env,Date.now())).then(r=>{if(r.chay)console.log('[danh-gia] tuần',JSON.stringify(r))}).catch(e=>console.error('[danh-gia] cron lỗi:',e))
+      // THƯỞNG PHẠT (26/10): 00:10–00:59 giờ VN, một lần mỗi ngày — thăng hoa, chốt cược, trả bù thưởng hôm qua, sinh 3 nhiệm vụ. Ngoài khung: không truy vấn.
+      {const g=new Date(Date.now()+7*3600000),ph=g.getUTCHours()*60+g.getUTCMinutes();if(ph>=10&&ph<60)await import('./thuong-d1').then(m=>m.cronThuongNgay(env,Date.now())).then(r=>{if(r.chay)console.log('[thuong] đêm',JSON.stringify(r))}).catch(async e=>{console.error('[thuong] đêm lỗi:',e);await ghiLoiMay(env,'thuong_dem')})}
+      // THƯỞNG PHẠT phần B (26/10): giải tuần — từ thứ Hai 00:05 VN chốt tuần trước theo lô 10 nhóm/phút (idempotent), rồi xếp nhóm em mới vào tuần
+      // (cao điểm: 5 phút/lần); chuỗi đôi — từ 00:10 VN mỗi cặp một ngày/lượt tới hết, xong thì các phút sau không truy vấn. Công tắc tắt ⇒ một câu đọc. Lỗi chỉ ghi log.
+      await import('./thuong-giai-tuan').then(m=>m.cronGiaiTuan(env,Date.now(),caoDiem)).then(r=>{if(r.chot||r.xep)console.log('[giai-tuan] cron',JSON.stringify(r))}).catch(e=>console.error('[giai-tuan] cron lỗi:',e))
+      await import('./thuong-ban-be').then(m=>m.cronChuoiDoi(env,Date.now())).then(r=>{if(r.soCap)console.log('[chuoi-doi] cron',JSON.stringify(r))}).catch(e=>console.error('[chuoi-doi] cron lỗi:',e))
       await capNhatSaiNhanhNeuCu(env,Date.now())
       // GAME HÓA 2.0 bật cả trung tâm ⇒ BTVN đã bỏ: không nhắc nộp BTVN.
       if(!await docCoHoa2(env).then(c=>c.bat&&!c.lop.length&&!c.sbd.length).catch(()=>false))await nhacTuDong(env,Date.now()).then(async r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r));if(r.lyDo==='loi')await ghiLoiMay(env,'nhac_nop_bai')}).catch(async e=>{console.error('[nhac-tu-dong] cron lỗi:',e);await ghiLoiMay(env,'nhac_nop_bai')})
@@ -3621,9 +3627,28 @@ const boXuLy = {
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       // Ô "Thi đua hôm nay" (Điều 8, phương án 8A): ĐỌC-CHỈ, token của em (thi-dua-hom-nay.ts của Code 4).
       if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(envDoc, b))
+      // THƯỞNG PHẠT phần B (26/10): giải tuần + học cùng bạn (thuong-giai-tuan.ts, thuong-ban-be.ts). Đọc = một batch (bản sao gần nhất); ghi = env.
+      if (p === '/hs/giai') return ra(await import('./thuong-giai-tuan').then((m) => m.hsGiai(env, b, Date.now(), envDoc)))
+      if (p === '/hs/ban' || p.startsWith('/hs/ban/')) {
+        const m = await import('./thuong-ban-be')
+        if (p === '/hs/ban') return ra(await m.hsBan(env, b, Date.now(), envDoc))
+        if (p === '/hs/ban/tim') return ra(await m.hsBanTim(env, { ...b, q: b.q ?? url.searchParams.get('q') ?? '' }, envDoc))
+        if (p === '/hs/ban/moi') return ra(await m.hsBanMoi(env, b))
+        if (p === '/hs/ban/tra-loi') return ra(await m.hsBanTraLoi(env, b))
+        if (p === '/hs/ban/go-cua') return ra(await m.hsBanGoCua(env, b))
+        if (p === '/hs/ban/thoi') return ra(await m.hsBanThoi(env, b))
+      }
       // BẢNG "NHỊP HỌC CỦA EM" (thầy 12/10 duyệt bản vẽ, server/src/nhip-hoc-em.ts; hợp đồng nhip-hoc-kieu.ts): CHỈ ĐỌC, token của em, chỉ số của chính em.
       if (p === '/hs/nhip-hoc') return ra(await import('./nhip-hoc-em').then((m) => m.hsNhipHoc(envDoc, b)))
       if (p === '/hs/danh-gia') return ra(await import('./danh-gia-hoc-that-d1').then((m) => m.hsDanhGia(env, b)))
+      // THƯỞNG PHẠT KIỂU DUOLINGO (thầy chốt 26/10, server/src/thuong-d1.ts): tổng quan MỘT lô đọc; ghi có khoá chống bấm lặp. Không nhãn lười trong phản hồi.
+      if (p === '/hs/thuong') return ra(await import('./thuong-d1').then((m) => m.hsThuong(env, b, ctx)))
+      if (p === '/hs/thuong/mo-ruong') return ra(await import('./thuong-d1').then((m) => m.hsMoRuong(env, b)))
+      if (p === '/hs/thuong/mua-binh') return ra(await import('./thuong-d1').then((m) => m.hsMuaBinh(env, b)))
+      if (p === '/hs/thuong/cuoc') return ra(await import('./thuong-d1').then((m) => m.hsCuocChuoi(env, b)))
+      if (p === '/hs/thuong/da-xem') return ra(await import('./thuong-d1').then((m) => m.hsDaXemThongBao(env, b)))
+      if (p === '/hs/huy-hieu') return ra(await import('./thuong-d1').then((m) => m.hsHuyHieu(env, b, ctx)))
+      if (p === '/hs/kim-cuong/bat-dau') return ra(await import('./thuong-kim-cuong').then((m) => m.hsKimCuongBatDau(env, b)))
       // BONG BÓNG A.I ĐỖ ĐẠI HỌC (thầy 24/10, server/src/ai-ddh.ts): em hỏi bài → hàng chờ văn phòng; token của em, máy chủ không tự giải.
       if (p === '/hs/ai-ddh/mo') return ra(await import('./ai-ddh').then((m) => m.hsMoAiDdh(env, b)))
       if (p === '/hs/ai-ddh/tin') return ra(await import('./ai-ddh').then((m) => m.hsTinAiDdh(env, b)))
@@ -3813,6 +3838,10 @@ const boXuLy = {
         if (vi === 'viet') return ra(await m.gvVietAiDdh(env, b))
         if (vi === 'che-do') return ra(await m.gvCheDoAiDdh(env, b))
       }
+      // CÔNG TẮC THƯỞNG PHẠT (thầy tắt được từng phần): thân rỗng ⇒ đọc; {khoa, giaTri: 'bat'|'tat'} ⇒ ghi. Khoá lạ ⇒ 400. Mặc định 'bat'.
+      if (p === '/gv/thuong/cong-tac') { const kq = await import('./thuong-d1').then((m) => m.gvCongTacThuong(env, b)); return ra(kq, 'loi400' in kq ? 400 : 200) }
+      // THƯỞNG PHẠT phần B: bảng thi đua tuần của một lớp (nguyên tử Học thật / bị loại, hạng giải, chuỗi, nhãn, học cùng). ĐỌC-CHỈ, một batch.
+      if (p === '/gv/thi-dua-tuan') return ra(await import('./thuong-gv-ph').then((m) => m.gvThiDuaTuan(envDoc, { ...b, lop: b.lop ?? url.searchParams.get('lop') ?? '' })))
       if (p.startsWith('/gv/danh-gia/')) {
         const m = await import('./danh-gia-hoc-that-d1')
         const vi = p.slice('/gv/danh-gia/'.length)

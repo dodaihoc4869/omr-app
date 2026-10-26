@@ -218,14 +218,14 @@ function mauDiem(diem: number | null): string {
 
 type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua' | 'kiemtra'
 
-/** Giữ khung bài học trong lúc mảnh mã đang về, tránh giật trang và khoảng trắng. */
+/** Giữ khung bài học trong lúc mảnh mã đang về, tránh giật trang và khoảng trắng. Chữ chờ chỉ hiện khi quá ~800ms (thầy 26/10: tải nhanh không chớp chữ). */
 function ChoNapGame() {
   return (
     <div
       className="flex items-center justify-center"
       style={{ minHeight: '60vh', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}
     >
-      Đang mở bài học…
+      <span className="chu-cho-tre">Đang mở bài học…</span>
     </div>
   )
 }
@@ -235,7 +235,7 @@ function ChoNapGame() {
 function ChoNapManCon() {
   return (
     <div role="status" className="flex items-center justify-center" style={{ minHeight: '60vh', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>
-      Đang mở…
+      <span className="chu-cho-tre">Đang mở…</span>
     </div>
   )
 }

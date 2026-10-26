@@ -17,6 +17,7 @@ import { dungBieuDo, thuNgan } from '../src/components/ph-v3/ManDiemSo'
 import { muoiBonNgay } from '../src/components/ph-v3/ManTienBo'
 import { chuBanApp } from '../src/lib/cap-nhat-app'
 import { PH_OK, CHI_TIET, NAY } from './_ph-moi/du-lieu-mau'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 const daXem = vi.fn()
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
@@ -263,7 +264,7 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     const lt = container.querySelector('[data-vung="loi-thay-moi"]')!
     expect(lt.querySelector('h2')!.textContent).toBe('Nhận xét của thầy')
     // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19): dòng phụ ghi tác giả + ca + ngày; liên kết ghi số nhận xét; cảnh báo đứng đầu cột phải (điện thoại: ngay sau Hôm nay).
-    expect(lt.textContent).toContain('Thầy Đỗ Đại Học · sau Kiểm tra 45 phút · Ester – Lipid')
+    expect(lt.textContent!.replace(/\u00a0/g, ' ')).toContain('Thầy Đỗ Đại Học · sau Kiểm tra 45 phút · Ester – Lipid')
     expect([...lt.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Xem tất cả 1 nhận xét của thầy', '#loi-thay']])
     expect(container.querySelector('.tvc-nhom-trai')!.firstElementChild!.getAttribute('data-vung')).toBe('anh-hung')
     expect(container.querySelector('.tvc-nhom-phai')!.firstElementChild!.getAttribute('data-vung')).toBe('canh-bao-thay')

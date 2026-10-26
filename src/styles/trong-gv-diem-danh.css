@@ -21,7 +21,7 @@
 [data-trong='gv'] .dd1 .dd1-o--ma { gap: 24px; }
 [data-trong='gv'] .dd1 .dd1-qr { flex-basis: 132px; width: 132px; height: 132px; padding: 6px; border: 1px solid var(--tr-vien); border-radius: 14px; background: var(--tr-trang); }
 [data-trong='gv'] .dd1 .dd1-nhan { font-size: 13px; font-weight: 500; color: var(--tr-chu-3); }
-[data-trong='gv'] .dd1 .dd1-ma { font-size: clamp(40px, 5.2vw, 72px); font-weight: 700; letter-spacing: 0.04em; color: var(--tr-chu); }
+[data-trong='gv'] .dd1 .dd1-ma { font-size: clamp(40px, 5.2vw, 72px); line-height: 1.2; font-weight: 700; letter-spacing: 0.04em; color: var(--tr-chu); }
 /* có mặt + nút chính */
 [data-trong='gv'] .dd1 .dd1-co-mat-so { font-size: 15px; font-weight: 500; color: var(--tr-chu-3); }
 [data-trong='gv'] .dd1 .dd1-co-mat-so b { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; color: var(--tr-chu); }

@@ -21,8 +21,6 @@ import type { Mau } from './dung-chung'
 import { diemCacCa, lienKetCa, TEN_PHAN } from './tien-ich'
 import { DamSo, DauThe, idPhan, LoiThe, type IdPhan, type TaiHoSo } from './TrangVeCon'
 import { layBaoCaoTuanCon, type BaoCaoTuanCon } from '../../lib/bao-cao-tuan-ph-api'
-// «Một trang» 26/10: ô Báo cáo tuần (MotTrangPh) gọi lệnh qua khối này — lệnh ở lại trong mảnh này, không đẻ thêm một mảnh precache.
-export { layBaoCaoTuanCon }
 import './trang-con-duoi.css'
 
 const HoSoCuaConPh = lazy(() => import('./HoSoCuaConPh'))
@@ -199,33 +197,6 @@ export default function PhanDuoi(p: PhanDuoiProps) {
   )
 }
 
-// ---------------------------------------------------------------- «Một trang» 26/10: MỘT khối, đúng khối cũ ----------------------------------------------------------------
-/** Khối của phần dưới mà một ô màn «Một trang» (MotTrangPh.tsx) mở trong tấm — dựng ĐÚNG component khối ở trên (không viết lại), kèm tấm Hồ sơ khi bấm «Xem đủ». */
-export type IdKhoiDuoi = 'bao-cao-tuan' | 'thai-do' | 'cau-sai' | 'thoi-gian' | 'kiem-tra' | 'btvn' | 'buoi-hoc' | 'lich-su'
-export function KhoiDuoi({ khoi, bc, ...p }: Omit<PhanDuoiProps, 'coPhan' | 'onDaVe'> & { khoi: IdKhoiDuoi; bc?: BaoCaoTuanCon }) {
-  const [moHoSo, setMoHoSo] = useState(false)
-  const moc = p.tq?.moc ?? p.k?.tu ?? null
-  const nowMs = p.tq?.serverNow ?? p.pm.serverNow ?? Date.now()
-  const mo = () => setMoHoSo(true)
-  return (
-    <>
-      {khoi === 'bao-cao-tuan' && <BaoCaoTuan sbd={p.sbd} co={bc} />}
-      {khoi === 'thai-do' && <ThaiDo hoSo={p.hoSo} napHoSo={p.napHoSo} />}
-      {khoi === 'cau-sai' && <CauSai hoSo={p.hoSo} tq={p.tq} pm={p.pm} moc={moc} napHoSo={p.napHoSo} moHoSo={mo} />}
-      {khoi === 'thoi-gian' && <ThoiGian hoSo={p.hoSo} tq={p.tq} pm={p.pm} hoc2={p.hoc2} moc={moc} />}
-      {khoi === 'kiem-tra' && <KiemTra pm={p.pm} hoc2={p.hoc2} cot="12" />}
-      {khoi === 'btvn' && <Btvn pm={p.pm} moc={moc} nowMs={nowMs} />}
-      {khoi === 'buoi-hoc' && <BuoiHoc pm={p.pm} cot="12" />}
-      {khoi === 'lich-su' && p.tq && <LichSu tq={p.tq} hoSo={p.hoSo} cot="12" moHoSo={mo} />}
-      {moHoSo && (
-        <Suspense fallback={null}>
-          <HoSoCuaConPh sbd={p.sbd} tenCon={p.tenCon} lop={p.lop} onDong={() => setMoHoSo(false)} />
-        </Suspense>
-      )}
-    </>
-  )
-}
-
 function The({ id, cot, children, vung }: { id: IdPhan; cot: string; children: ReactNode; vung: string }) {
   return (
     <section id={idPhan(id)} data-phan={id} className="tvc-the" data-cot={cot} aria-labelledby={`tvc-${id}`} data-vung={vung}>
@@ -239,12 +210,11 @@ const Cho = ({ dong = 3 }: { dong?: number }) => (
 
 // ---------------------------------------------------------------- Báo cáo tuần (thầy 24/10) ----------------------------------------------------------------
 // 7 ngày tới hôm nay, mọi số do máy chủ đếm (server/src/bao-cao-tuan.ts); số nào không có thì không hiện. Nhận định chỉ khi thầy đã bật và tuần đó đã báo phụ huynh.
-// «Một trang» 26/10: `co` = số ô Báo cáo tuần đã tải lúc rảnh (MotTrangPh) ⇒ tấm vẽ ngay, KHÔNG gọi lại lệnh; không có ⇒ tự tải như cũ.
-export function BaoCaoTuan({ sbd, co }: { sbd: string; co?: BaoCaoTuanCon }) {
-  const [bc, setBc] = useState<BaoCaoTuanCon | null>(co ?? null)
+export function BaoCaoTuan({ sbd }: { sbd: string }) {
+  const [bc, setBc] = useState<BaoCaoTuanCon | null>(null)
   const [loi, setLoi] = useState('')
   const tai = () => { setLoi(''); void layBaoCaoTuanCon(sbd).then((r) => (r.ok ? setBc(r.du) : setLoi(r.chu))) }
-  useEffect(() => { if (!co) tai() }, [sbd])
+  useEffect(tai, [sbd])
   const pt = (a: number, b: number) => `${Math.round((100 * a) / b)}%`
   const tongKt = bc ? bc.ktcn.nop + bc.ktcn.hetHan.length : 0
   const tbKt = bc?.ktcn.diem.length ? bc.ktcn.diem.reduce((s, x) => s + x, 0) / bc.ktcn.diem.length : null
@@ -626,7 +596,7 @@ function Btvn({ pm, moc, nowMs }: { pm: PhMoi; moc: string | null; nowMs: number
           {gan.map((b) => (
             <li key={b.maBtvn}>
               <span className="tvc-dau-cham" data-mau={b.dungHan === false ? 'ho' : b.dungHan ? 'xl' : 'xam'} aria-hidden="true">{b.dungHan === false ? <BtDongHo co={16} day={2.4} /> : <BtTich co={16} day={2.6} />}</span>
-              <div><b>{b.ten}</b><span className="tvc-phu">Nộp {ngayGioVn(b.nopLuc)}{b.dungHan === true ? ' · đúng hạn' : b.dungHan === false ? ` · trễ ${b.nopTreGio !== null ? `${soVn(b.nopTreGio)} giờ` : 'hạn'}` : ''}</span></div>
+              <div><b>{b.ten}</b><span className="tvc-phu">Nộp {ngayGioVn(b.nopLuc)}{b.dungHan === true ? '\u00a0· đúng hạn' : b.dungHan === false ? `\u00a0· trễ ${b.nopTreGio !== null ? `${soVn(b.nopTreGio)} giờ` : 'hạn'}` : ''}</span></div>
               {b.diem !== null && <strong aria-label={`${soVn(b.diem)} điểm`}>{soVn(b.diem)}</strong>}
             </li>
           ))}
@@ -709,7 +679,7 @@ function LichSu({ tq, hoSo, cot, moHoSo }: { tq: ConTongQuan; hoSo: TaiHoSo; cot
             {tq.ganDay.slice(0, 5).map((l, i) => (
               <li key={`${l.luc}-${i}`}>
                 <span className="tvc-dau-cham" data-mau={l.dung === true ? 'xl' : l.dung === false ? 'ho' : 'xam'} aria-hidden="true">{l.dung === false ? <BtNhan co={16} day={2.6} /> : <BtTich co={16} day={2.6} />}</span>
-                <div><b>{l.tieuDe || 'Câu chưa ghi tên'}</b><span className="tvc-phu">{[l.noi, gioVn(l.luc), l.dung === null ? 'bỏ trống' : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join(' · ')}</span></div>
+                <div><b>{l.tieuDe || 'Câu chưa ghi tên'}</b><span className="tvc-phu">{[l.noi, gioVn(l.luc), l.dung === null ? 'bỏ trống' : '', l.coGoiY ? 'có dùng gợi ý' : ''].filter(Boolean).join('\u00a0· ')}</span></div>
                 <strong className="tvc-giay-lon">{chuGiay(l.giay, l.nguonGiay).replace(/^≈/, '≈ ')}</strong>
               </li>
             ))}

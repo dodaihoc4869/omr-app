@@ -66,10 +66,10 @@ describe('CỤM 1 · Giao bài tập về nhà + Xem trước + theo dõi (hàng
 describe('CỤM 2 · Hồ sơ em / Bộ não / Ngân hàng đề (hàng 8, 10, 15)', () => {
   it('hàng 15: Ngân hàng đề viết đầy đủ "Trắc nghiệm · Đúng–sai · Trả lời ngắn" (không TN / Đ/S / TLN); lỗi soạn đề nói "Đúng/Sai"', () => {
     const nh = chuHienRa('src/screens/NganHangDeScreen.tsx')
-    expect(nh).toContain('· Trắc nghiệm {s.phanI.length}')
-    expect(nh).toContain('· Đúng–sai {s.phanII.length}')
-    expect(nh).toContain('· Trả lời ngắn {s.phanIII.length}')
-    expect(nh).not.toMatch(/· TN \{|· Đ\/S \{|· TLN \{/)
+    expect(nh).toContain('Trắc nghiệm {s.phanI.length} ·')
+    expect(nh).toContain('Đúng–sai {s.phanII.length} ·')
+    expect(nh).toContain('<span>Trả lời ngắn {s.phanIII.length}</span>')
+    expect(nh).not.toMatch(/· TN \{|· Đ\/S \{|· TLN \{|>TN \{|>Đ\/S \{|>TLN \{/) // SOÁT 26/10: dấu «·» đứng CUỐI ô (xuống dòng không mở dòng bằng «·»)
     expect(chuHienRa('src/data/examContent.ts')).toContain('chưa đánh dấu đủ Đúng/Sai cho cả 4 ý')
   })
 })

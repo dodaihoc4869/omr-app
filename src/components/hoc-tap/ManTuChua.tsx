@@ -75,8 +75,8 @@ export function dungDong(m: MucChua, i: number, cdl: ReadonlyMap<string, CauDaLa
   const saiCuoi = c ? [...c.lichSu].filter((l) => !l.dung).sort((a, b) => (a.ngay < b.ngay ? 1 : -1))[0] : undefined
   const phu = [
     c ? TEN_PHAN[c.phan] : '',
-    saiCuoi ? `sai lần gần nhất ${ngayNgan(saiCuoi.ngay)}${saiCuoi.nguon ? ` · ${NHAN_NGUON_LAN[saiCuoi.nguon]}` : ''}` : '',
-  ].filter(Boolean).join(' · ')
+    saiCuoi ? `sai lần gần nhất ${ngayNgan(saiCuoi.ngay)}${saiCuoi.nguon ? `\u00a0· ${NHAN_NGUON_LAN[saiCuoi.nguon]}` : ''}` : '',
+  ].filter(Boolean).join('\u00a0· ') // SOÁT 26/10: «·» không mở đầu dòng
   const nhom: Nhom = nhomMucChua(m, nayMs)
   // Đợt cũ còn ở nhóm chờ lần gặp lại (vòng từng bước trước 25/10) ⇒ nói đúng mốc hẹn như nhóm của nó; mọi câu khác: Cần sửa / Đã tự sửa.
   const hen = nhom === 'cho' ? henGapLai(m.denHan, nayMs) : null
@@ -229,13 +229,13 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
         <header className="ht-thanh tcl-dau-trang"><button type="button" className="ht-nut-phu" onClick={veDanhSach}><ArrowLeft size={18} aria-hidden="true" />Quay lại danh sách</button><strong className="tcl-dau-trang-ten">Kiểm lại câu đã sửa</strong></header>
         <main className="ht-noi-dung ht2-noi-dung tcl-noi-dung">
           <h1>{ten || 'Câu em đang sửa'}</h1>
-          <Suspense fallback={<p className="tcl-cho-mo" role="status">Đang mở câu kiểm lại…</p>}><KiemHoiThay key={chon.qid} qid={chon.qid} token={token} tuMo /></Suspense>
+          <Suspense fallback={<p className="tcl-cho-mo" role="status"><span className="chu-cho-tre">Đang mở câu kiểm lại…</span></p>}><KiemHoiThay key={chon.qid} qid={chon.qid} token={token} tuMo /></Suspense>
         </main>
       </div>
     )
     return (
       <div ref={gocRef}>
-        <Suspense fallback={<div className="ht-app ht2 tcl-man"><p className="ht-noi-dung tcl-cho-mo" role="status">Đang mở câu…</p></div>}>
+        <Suspense fallback={<div className="ht-app ht2 tcl-man"><p className="ht-noi-dung tcl-cho-mo" role="status"><span className="chu-cho-tre">Đang mở câu…</span></p></div>}>
           <ManChua
             token={token}
             qid={chon.qid}
@@ -299,7 +299,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
         {dangMoThang || !kq ? (
           <div className="tcl-bo-cuc" aria-busy="true">
             <div className="tcl-tong tcl-xuong" role="status">
-              <p className="tcl-cho-mo">{dangMoThang ? 'Đang mở câu em chọn…' : 'Đang tải câu cần sửa…'}</p>
+              <p className="tcl-cho-mo"><span className="chu-cho-tre">{dangMoThang ? 'Đang mở câu em chọn…' : 'Đang tải câu cần sửa…'}</span></p>
             </div>
             <div className="tcl-ds" aria-hidden="true">
               <div className="tcl-nhom"><div className="tcl-the tcl-xuong" /><div className="tcl-the tcl-xuong" /><div className="tcl-the tcl-xuong" /></div>

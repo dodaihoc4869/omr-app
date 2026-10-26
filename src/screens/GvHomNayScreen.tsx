@@ -41,6 +41,7 @@ import '../styles/trong-gv-hom-nay.css'
 import '../components/chien-dich/gv-v2.css'
 import './gv-hom-nay.css'
 import '../components/hom-nay-thay/hom-nay-thay.css'
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 // 21/10 (thầy: "nút này làm riêng bấm vào popup lên để chọn luôn chứ không gắn vào phần hành trình nữa"): "Bổ sung bài hôm nay" / "Bổ sung bài" mở
 // hộp NGAY TẠI CHỖ — mảnh nạp lười, chỉ tải khi bấm (mở màn Hôm nay không thêm byte).

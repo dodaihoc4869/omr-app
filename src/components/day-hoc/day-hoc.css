@@ -557,6 +557,10 @@
     white-space: nowrap;
   }
 }
+/* SOÁT 26/10: nay bốn thẻ (thêm «Câu cần chữa») ⇒ ở 360–412 px thẻ bị ép hẹp hơn chữ, chồng lên nhau. Thẻ giữ đủ bề rộng chữ, hàng thẻ tự cuộn ngang. */
+.dh-the-ds { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.dh-the-ds::-webkit-scrollbar { display: none; }
+.dh-the { flex: none; }
 
 /* NÚT VÀ KHỐI HIỂN THỊ LỜI GIẢI */
 .dh-nut-giai {

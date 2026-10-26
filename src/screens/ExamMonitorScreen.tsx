@@ -57,6 +57,7 @@ import { congBoDiemCa, dongCuaVaoCa, layBaoCaoCaDayDu, type ThemBaoCaoCa } from 
 import { tinhBaoCaoCaLop, tomTatCaLop, type BaoCaoCaLop, type EmChoBaoCao } from '../lib/bao-cao-ca-lop'
 import { ghepBaoCaoMotEm, layBaoCaoEmMayChu, type BaoCaoEmMayChu } from '../lib/bao-cao-may-chu'
 import { nguonCauTuNganHang, tinhBaoCaoMotEm } from '../lib/bao-cao-mot-em'
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }

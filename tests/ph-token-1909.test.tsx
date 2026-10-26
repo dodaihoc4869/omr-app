@@ -5,6 +5,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { docPass, KHOA_PH_PASS, nhanPassTuDiaChi, tachPass, xacDinhPhuHuynh, xoaPass } from '../src/lib/ph-token'
 import { datPassPhuHuynh, momApi, parentNewsApi } from '../src/lib/mom-api'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))

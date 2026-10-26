@@ -246,9 +246,7 @@
 .vo-thay .gv2-the-dau {
   margin-bottom: 14px;
 }
-.vo-thay .cd-muc-cd,
-.vo-thay .cd-buoc,
-.vo-thay .cd-tom-tat {
+.vo-thay .cd-buoc {
   border: 0;
   border-radius: 20px;
   background: var(--gvm-mat-2);
@@ -415,9 +413,6 @@
 /* ── THANH TIẾN ĐỘ: dải xanh lục + vạch hổ phách = mức cần hôm nay ────────────────────────────── */
 .vo-thay .cd-thanh > div {
   background: var(--gvm-xl);
-}
-.vo-thay .cd-vach {
-  background: var(--gvm-hp);
 }
 
 /* ── VIỆC CẦN LÀM: mỗi dòng một viên nền tông ─────────────────────────────────────────────────── */

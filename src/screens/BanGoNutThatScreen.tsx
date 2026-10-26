@@ -12,6 +12,7 @@ import type { BuoiHoc } from '../lib/buoi-hoc-api'
 import '../components/loi-giai/loi-giai.css'
 import './gv-hoa2.css'
 import '../styles/trong-quan-ly-go-nut.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 const THU = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy']
 /** "2026-10-05" ⇒ "Thứ Hai 05/10/2026" (chuẩn ngày giờ — luật A1.6). */
@@ -90,7 +91,7 @@ export default function BanGoNutThatScreen({ nhung = false, chonDau = null }: { 
       )}
 
       {bao && <p className="gv2-nhat" role="status">{bao}</p>}
-      {dangTai && !kq && <p className="gv2-nhat" role="status">Đang tải thẻ nút thắt…</p>}
+      {dangTai && !kq && <p className="gv2-nhat chu-cho-tre" role="status">Đang tải thẻ nút thắt…</p>}
       {kq && !kq.ok && (
         <div className="gv2-loi" role="alert">
           {kq.error ?? 'Chưa tải được thẻ nút thắt.'}
@@ -175,11 +176,11 @@ export default function BanGoNutThatScreen({ nhung = false, chonDau = null }: { 
                   {n.em.map((e) => (
                     <li key={e.sbd}>
                       <b>{e.hoTen}</b>
-                      {' · '}Đáp án đã chọn: {e.dapAnChon || 'chưa ghi'}
-                      {' · '}Số lần làm sai: <span className="gv2-so">{e.soLanThu}</span>
+                      {'\u00a0· '}Đáp án đã chọn: {e.dapAnChon || 'chưa ghi'}
+                      {'\u00a0· '}Số lần làm sai: <span className="gv2-so">{e.soLanThu}</span>
                       {e.kiem.length > 0 && (
                         <>
-                          {' · '}Trả lời câu kiểm: {e.kiem.map((k) => `${k.traLoi || '(trống)'} (${k.dung ? 'đúng' : 'sai'})`).join(', ')}
+                          {'\u00a0· '}Trả lời câu kiểm: {e.kiem.map((k) => `${k.traLoi || '(trống)'} (${k.dung ? 'đúng' : 'sai'})`).join(', ')}
                         </>
                       )}
                       {e.viet && <div className="gv2-phu">Em viết: “{e.viet}”</div>}

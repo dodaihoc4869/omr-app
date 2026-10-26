@@ -6,6 +6,7 @@ import { TheNoiDung } from '../components/DesignSystem'
 import { useAppStore } from '../store/appStore'
 import { goiLenh } from '../lib/goi-lenh-thay'
 import '../styles/trong-quan-ly-giao-tuan.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 interface Em { sbd: string; hoTen: string; lop: string; tenLop: string }
 interface De { maDe: string; ten: string; lop: string; soCau: number }

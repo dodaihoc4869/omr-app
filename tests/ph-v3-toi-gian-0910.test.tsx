@@ -12,6 +12,7 @@ import { chuTinhTrang, soCauHomNay, tenDangHomNay } from '../src/components/ph-v
 import { docTatCaVeCon } from '../src/lib/ph-moi/du-lieu'
 import { docHoc2 } from '../src/lib/ph-v3/du-lieu'
 import { PH_OK, PH_TRONG } from './_ph-moi/du-lieu-mau'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 let canhBao: unknown[] = []
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))

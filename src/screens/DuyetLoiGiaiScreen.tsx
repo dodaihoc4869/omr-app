@@ -8,6 +8,7 @@ import KhungLoiGiai from '../components/loi-giai/KhungLoiGiai'
 import '../components/loi-giai/loi-giai.css'
 import './gv-hoa2.css'
 import '../styles/trong-quan-ly-duyet.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 const TEN_DANG: Record<string, string> = { tn: 'Trắc nghiệm', ds: 'Đúng/Sai', tln: 'Trả lời ngắn' }
 const TRANG_THAI: Record<TrangThaiLoiGiai, { chu: string; tone: 'la' | 'do' | 'vang' | 'xam' }> = {

@@ -23,6 +23,7 @@ import { gomTheoCa, type CaCoCauHoi } from '../lib/hoi-bai'
 import { useAppStore } from '../store/appStore'
 import { gioPhutVN } from '../lib/em-toan-canh'
 import '../styles/trong-quan-ly-hs-hoi.css' // «Trong» 26/10: trình bày (chỉ dưới [data-trong='gv'])
+import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
 const NHAN: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 

@@ -14,7 +14,9 @@ import type { KetQuaNhipHoc, KetQuaNhipHocEm } from '../server/src/nhip-hoc-kieu
 import type { KetQuaBaiHangNgay, KetQuaHoSoThaiDo } from '../server/src/bai-hang-ngay-kieu'
 import { gvBaiHangNgay, ngayVnCua } from '../server/src/bai-hang-ngay'
 import { gvNhipHoc } from '../server/src/nhip-hoc'
-import { hsNhipHoc, mucTocDo } from '../server/src/nhip-hoc-em'
+// SỬA CÓ CHỦ ĐÍCH 26/10 (thầy: nhóm / bậc / tốc độ CHỈ thầy + phụ huynh xem): `/hs/nhip-hoc` không còn nhóm, việc tiếp, tốc độ ⇒ phép tính kiểm ở LÕI
+// dùng chung `nhipHocCuaEm` (= `/ph/nhip-hoc`); bản em ⇒ tests/an-luoi-hs-2610.test.ts.
+import { mucTocDo, nhipHocCuaEm } from '../server/src/nhip-hoc-em'
 import { gameToken, parentPass } from '../server/src/game-v2-auth'
 import { phanNhomEm } from '../src/lib/nhip-hoc-thay'
 
@@ -96,7 +98,7 @@ describe('máy chủ /hs/nhip-hoc — số giống thầy, luật 6 ngày', () =
     vi.setSystemTime(NOW)
     const d = boDuLieu()
     const env = d.env as unknown as Env
-    const r = (await hsNhipHoc(env, { token: await gameToken(env, 'L') }, NOW)) as KetQuaNhipHocEm
+    const r = (await nhipHocCuaEm(env, 'L', NOW)) as KetQuaNhipHocEm
     expect(r).toMatchObject({
       ok: true, tu: '2026-10-01', homNay: '2026-10-14', nhom: 'luoi', soNgayQua: 13, soNgayDu: 6, phanTram: 46, chuoiDuGanNhat: 3,
       tongDaLam: 14, tongCauThieu: 13, ngayDuGanNhat: '2026-10-13', homNayMuc: { muc: 2, lam: 1 },
@@ -113,7 +115,7 @@ describe('máy chủ /hs/nhip-hoc — số giống thầy, luật 6 ngày', () =
     vi.setSystemTime(NOW)
     const d = boDuLieu()
     const env = d.env as unknown as Env
-    const r = (await hsNhipHoc(env, { token: await gameToken(env, 'L') }, NOW)) as KetQuaNhipHocEm
+    const r = (await nhipHocCuaEm(env, 'L', NOW)) as KetQuaNhipHocEm
     // 24 lượt ngoài kế hoạch + 14 lượt kế hoạch (40 giây) = 38 lượt có số giây; 10 lượt quá nhanh, đúng 2/10
     expect(r.tocDo).toEqual({ soNhanh: 10, soCoGiay: 38, dungNhanh: 20, coTuTinh: false, muc: 'chu-y' })
     expect(mucTocDo(10, 24, 20)).toBe('xau')
@@ -127,7 +129,7 @@ describe('máy chủ /hs/nhip-hoc — số giống thầy, luật 6 ngày', () =
     vi.setSystemTime(NOW)
     const d = boDuLieu()
     const env = d.env as unknown as Env
-    const r = (await hsNhipHoc(env, { token: await gameToken(env, 'C') }, NOW)) as KetQuaNhipHocEm
+    const r = (await nhipHocCuaEm(env, 'C', NOW)) as KetQuaNhipHocEm
     expect(r).toMatchObject({ nhom: 'cham', soNgayDu: 13, soNgayQua: 13, phanTram: 100, chuoiDuGanNhat: 13, tongDaLam: 26, chuoiBo: null })
     expect(r.viecTiep).toEqual({ loai: 'giu-chuoi', cauConHomNay: 2, homNayDu: false, chuoiNeuDu: 14 })
   })
@@ -137,7 +139,7 @@ describe('máy chủ /hs/nhip-hoc — số giống thầy, luật 6 ngày', () =
     vi.setSystemTime(NOW)
     const d = boDuLieu()
     const env = d.env as unknown as Env
-    const r = (await hsNhipHoc(env, { token: await gameToken(env, 'M') }, NOW)) as KetQuaNhipHocEm
+    const r = (await nhipHocCuaEm(env, 'M', NOW)) as KetQuaNhipHocEm
     expect(r).toMatchObject({ tu: '2026-10-10', nhom: 'cham', soNgayQua: 4, soNgayDu: 4, chuoiDuGanNhat: 5, ngayDuGanNhat: '2026-10-14' })
     expect(r.ngay.map((x) => x.ngay)).toEqual(NGAY.slice(9))
     expect(r.viecTiep).toEqual({ loai: 'giu-chuoi', cauConHomNay: 0, homNayDu: true, chuoiNeuDu: 5 })
@@ -153,7 +155,7 @@ describe('/gv/ho-so-thai-do — CHỈ THÊM nhomNhip · coDoiPho · chuoiDuGanNh
     const nhip = (await gvNhipHoc(env, {}, NOW)) as KetQuaNhipHoc
     for (const sbd of ['L', 'C', 'M']) {
       const hs = (await goiWorker(worker, env, '/gv/ho-so-thai-do', { sbd }, true)) as KetQuaHoSoThaiDo
-      const em = (await hsNhipHoc(env, { token: await gameToken(env, sbd) }, NOW)) as KetQuaNhipHocEm
+      const em = (await nhipHocCuaEm(env, sbd, NOW)) as KetQuaNhipHocEm
       const dong = phanNhomEm(nhip.em.find((e) => e.sbd === sbd)!, nhip.ngay, nhip.homNay)
       expect([hs.nhomNhip, hs.chuoiDuGanNhat]).toEqual([dong.nhom, dong.chuoiDuGanNhat])
       expect([em.nhom, em.chuoiDuGanNhat, em.soNgayDu, em.soNgayQua]).toEqual([dong.nhom, dong.chuoiDuGanNhat, dong.soNgayDu, dong.soNgayQua])

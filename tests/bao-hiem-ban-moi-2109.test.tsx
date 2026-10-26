@@ -9,6 +9,7 @@ import path from 'node:path'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
 import { batBaoHiemBanMoi, CHO_BAN_MOI_TU_LEN_MS, epLenBanMoi, GIAN_CACH_KIEM_MS, kiemTraBanMoi, moiTruongThat, NHIP_BAO_HIEM_MS, TOI_DA_EP_MOI_BAN, type MoiTruongBaoHiem } from '../src/lib/bao-hiem-ban-moi'
 import { chuBanApp, datDangLamBai, datDangMoKhoa } from '../src/lib/cap-nhat-app'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))
