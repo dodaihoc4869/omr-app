@@ -240,6 +240,13 @@ describe('soạn lô', () => {
     expect(mh2.fn).toHaveBeenCalledTimes(1)
   })
 
+  it('27/10: nhãn hạn mức Gemini chỉ lấy mã hạn mức + giây chờ', () => {
+    const j = { error: { message: 'x', details: [{ '@type': 'QuotaFailure', violations: [{ quotaId: 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', quotaMetric: 'm' }] }, { '@type': 'RetryInfo', retryDelay: '12.5s' }] } }
+    expect(M.nhanHanMuc(j)).toBe(' [quota=GenerateRequestsPerDayPerProjectPerModel-FreeTier; retry=12s]')
+    expect(M.nhanHanMuc({ error: { message: 'x' } })).toBe('')
+    expect(M.nhanHanMuc(null)).toBe('')
+  })
+
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III, Q.I], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
