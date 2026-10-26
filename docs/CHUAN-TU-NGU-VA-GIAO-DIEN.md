@@ -26,6 +26,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Câu cao hơn bậc của em | **Câu thử thách (sai không sao)** · **Thử sức thêm (không bắt buộc)** | loi_cao, bonus |
 | Ba mức của một dạng | Bậc thang của em (BTVN nâng đỡ): **bậc Biết · Hiểu · Vận dụng**. Nhãn mức độ của CÂU trên phiếu/đề: **Nhận biết · Thông hiểu · Vận dụng** (chữ quen của chương trình) | NB/TH/VD, bậc 0/1/2 |
 | Làm lại câu từng sai theo lịch | **Ôn lại** | on_lai, khắc phục (trừ phiếu "Khắc phục sau ca" đã quen) |
+| Câu CÙNG DẠNG làm ngay cuối chặng sau câu em vừa sai (kiểu Duolingo, 26/10; có hỗ trợ, không EXP) | **Làm lại** ("Làm lại câu sai", "Làm lại · Câu 1/2", "Làm lại đúng") | ôn lại (để dành cho lịch), sửa ngay, chữa |
 | Con vật đồng hành | **Thần thú** ("Thần thú của em: <biệt danh>") | pet, spirit, linh thú |
 | Thanh sức của thần thú / quái | **Máu** ("Máu 83/100") | HP, số trơn |
 | Điểm tích luỹ do học | **EXP** ("+46 EXP hôm nay") | điểm, xp |

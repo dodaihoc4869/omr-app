@@ -1,0 +1,12 @@
+lam-lai-doc: cuộn ngang 0 · nút chính trong khung (778–830) · đích nhỏ 0
+lam-lai-doc-toi: cuộn ngang 0 · nút chính trong khung (778–830) · đích nhỏ 0
+lam-lai-ngang: cuộn ngang 0 · nút chính trong khung (328–376) · đích nhỏ 0
+lam-lai-ngang-toi: cuộn ngang 0 · nút chính trong khung (328–376) · đích nhỏ 0
+lam-lai-may-tinh: cuộn ngang 0 · nút chính trong khung (452–504) · đích nhỏ 0
+lam-lai-may-tinh-toi: cuộn ngang 0 · nút chính trong khung (452–504) · đích nhỏ 0
+ket-chang-doc: cuộn ngang 0 · nút chính trong khung (718–770) · đích nhỏ 0
+ket-chang-doc-toi: cuộn ngang 0 · nút chính trong khung (718–770) · đích nhỏ 0
+ket-chang-ngang: cuộn ngang 0 · nút chính trong khung (89–137) · đích nhỏ 0
+ket-chang-ngang-toi: cuộn ngang 0 · nút chính trong khung (89–137) · đích nhỏ 0
+ket-chang-may-tinh: cuộn ngang 0 · nút chính trong khung (651–703) · đích nhỏ 0
+ket-chang-may-tinh-toi: cuộn ngang 0 · nút chính trong khung (651–703) · đích nhỏ 0

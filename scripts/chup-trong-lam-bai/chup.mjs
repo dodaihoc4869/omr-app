@@ -47,6 +47,9 @@ const CANH = [
       await t.getByRole('button', { name: /^Nộp câu/ }).click(); await t.getByRole('button', { name: /Xem lời giải đầy đủ/ }).click()
     }, nut: /Câu tiếp theo/ },
   { ten: 'lam-sai', url: '?man=lam13', cho: (t) => t.getByRole('heading', { name: /Câu 1\/6/ }).waitFor(), lam: async (t) => { await t.getByRole('radio').nth(2).click(); await t.getByRole('button', { name: /^Nộp câu/ }).click(); await t.getByRole('button', { name: /Câu tiếp theo/ }).waitFor() }, nut: /Câu tiếp theo/ },
+  // 26/10 kiểu Duolingo: làm hết chặng (sai câu 5) ⇒ "Làm lại câu sai" ⇒ câu cùng dạng đã làm đúng ⇒ (ket-chang) kết chặng có ô số.
+  { ten: 'lam-lai', url: '?man=lam13&lam=lam-lai', cho: (t) => t.getByRole('heading', { name: /Câu 1\/6/ }).waitFor(), lam: (t) => lamHetChang(t, false), nut: /Kết thúc chặng/ },
+  { ten: 'ket-chang', url: '?man=lam13&lam=lam-lai', cho: (t) => t.getByRole('heading', { name: /Câu 1\/6/ }).waitFor(), lam: (t) => lamHetChang(t, true), nut: /Học tiếp/ },
   { ten: 'cau-on', url: '?man=cauon', cho: (t) => t.getByRole('heading', { name: 'Câu 1' }).waitFor(), nut: /^(Nộp|Kiểm tra)/ },
   { ten: 'luyen-de', url: '?man=luyende', cho: async (t) => { await t.getByText('Em đã học xong toàn bộ chương trình.').click(); await t.getByRole('button', { name: /Bắt đầu \/ Tiếp tục/ }).click(); await t.getByText('PHẦN I', { exact: true }).waitFor() }, nut: /^Nộp bài$/ },
   { ten: 'ldct', url: '?man=ldct', cho: async (t) => { await t.getByRole('button', { name: /Bắt đầu đề mới|Làm tiếp/ }).click(); await t.locator('#ldct-cau-q1, [id^="ldct-cau"]').first().waitFor() }, nut: /^Nộp bài/ },
@@ -64,6 +67,26 @@ const CANH = [
   { ten: 'thi-nop', url: '?man=thi', cho: (t) => t.locator('#cau-1').waitFor({ timeout: 20000 }), lam: async (t) => { await t.getByRole('button', { name: /^Nộp bài$/ }).first().click(); await t.waitForTimeout(300) }, nut: null },
   { ten: 'thi', url: '?man=thi', cho: (t) => t.locator('#cau-1').waitFor({ timeout: 20000 }), lam: async (t) => { await t.waitForTimeout(600) }, nut: /^Nộp bài/ },
 ]
+
+/** Làm 6 câu chặng lam-lai (sai câu 5 — chọn A, đáp án B), vào vòng Làm lại, làm đúng câu cùng dạng; `ket` ⇒ bấm Kết thúc chặng. */
+async function lamHetChang(t, ket) {
+  for (let i = 1; i <= 6; i++) {
+    await t.getByRole('heading', { name: new RegExp(`Câu ${i}/6`) }).waitFor()
+    const tu = t.getByRole('button', { name: 'Tự làm câu này' })
+    if (await tu.count()) await tu.click()
+    if (i === 4) { for (const [j, v] of ['Đúng', 'Đúng', 'Đúng', 'Sai'].entries()) await t.getByRole('button', { name: new RegExp(`^${v}`) }).nth(j).click() }
+    else if (i === 6) await t.keyboard.type('1,2')
+    else await t.getByRole('radio').nth(i === 5 ? 0 : i === 2 ? 1 : i === 3 ? 1 : 0).click()
+    await t.getByRole('button', { name: /^Nộp câu/ }).click()
+    await t.getByRole('button', { name: i < 6 ? /Câu tiếp theo/ : /Làm lại câu sai/ }).click()
+  }
+  await t.getByRole('heading', { name: /Làm lại · Câu 1\/1/ }).waitFor()
+  await t.getByRole('radio').nth(2).click()
+  await t.getByRole('button', { name: /^Nộp câu/ }).click()
+  await t.getByText('Làm lại đúng').first().waitFor()
+  if (ket) { await t.getByRole('button', { name: /Kết thúc chặng/ }).click(); await t.getByText('Đúng liên tiếp dài nhất').waitFor() }
+  await t.evaluate(() => document.querySelector('.ht2-lam')?.scrollIntoView({ block: 'start' }))
+}
 
 const bao = []
 for (const c of CANH) {
