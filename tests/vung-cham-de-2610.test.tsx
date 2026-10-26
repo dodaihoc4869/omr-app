@@ -22,7 +22,7 @@ describe('VungChamDe', () => {
   })
   it('màn làm chặng bọc thân đề và đặt tấm giải thích thế chỗ thanh đáy', () => {
     const s = readFileSync('src/components/hoc-tap/ManLamBaiTap.tsx', 'utf8')
-    expect(s).toMatch(/<VungChamDe q=\{q\} onGiaiThich=\{setGiaiThich\}><DeCau q=\{q\} stt=\{stt\} \/><\/VungChamDe>/)
+    expect(s).toMatch(/<VungChamDe q=\{q\} onGiaiThich=\{setGiaiThich\} onHoTro=\{danhDauHoTro\}><DeCau q=\{q\} stt=\{stt\} \/><\/VungChamDe>/)
     expect(s).toMatch(/giaiThich && q && !xong \? <TamGiaiThich g=\{giaiThich\}[^\n]*\/> : day\}/)
   })
 })

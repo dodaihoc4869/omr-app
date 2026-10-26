@@ -16,7 +16,7 @@ import { chuDanhSachCau, chuDS, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nha
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
-import { TamGiaiThich, VungChamDe, type GiaiThichCham } from '../goi-y-cham/VungChamDe'
+import { NutBatDauCham, TamGiaiThich, VungChamDe, type GiaiThichCham } from '../goi-y-cham/VungChamDe'
 import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
 import './hoc-tap.css'
@@ -193,6 +193,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const daHoiThay = useRef('')
   // Khe «chạm để hiện giải thích» (src/components/goi-y-cham, chờ thầy duyệt): tấm giải thích đang mở — sang câu khác thì đóng.
   const [giaiThich, setGiaiThich] = useState<GiaiThichCham | null>(null)
+  // Em đã dùng giải thích / gợi ý chạm của câu này ⇒ lượt nộp có hỗ trợ (như Gợi ý, Hỏi thầy).
+  const hoTroCham = useRef('')
   useEffect(() => { setGiaiThich(null) }, [q?.qid, xong])
   useEffect(() => { if (!q) return; if (daMo.current) veDau(); daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (k) { veDau(); nutTiepRef.current?.focus({ preventScroll: true }) } }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -203,7 +205,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     if (!q || !phien || !duTraLoi(q.phan, tra) || gui.current || k) return
     gui.current = true; setNop(true); setLoi('')
     const msLam = Math.max(0, Date.now() - batDau.current)
-    const assisted = !!q.goiY || daHoiThay.current === q.qid
+    const assisted = !!q.goiY || daHoiThay.current === q.qid || hoTroCham.current === q.qid
     try {
       const r = await guiLaiKhiKetMang(() => goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted, msLam, doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
@@ -377,6 +379,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     const mmss = tongMs > 0 ? `${Math.floor(tongMs / 60000)}:${String(Math.round(tongMs / 1000) % 60).padStart(2, '0')}` : '—'
     const conDu = homNayHien ? Math.max(0, homNayHien.muc - homNayHien.daLam) : null
     const tenChuong = tenBai || q?.tenDang || cau[cau.length - 1]?.tenDang || ''
+    const danhDauHoTro = () => { if (q && !k) hoTroCham.current = q.qid }
+    // nutBatDau (khe chạm-giải-thích): hàng nút đáy cạnh «Gợi ý»; khung thấp xoay ngang thì đáy nằm ở cột phải.
+    const nutBatDau = q && !k ? <NutBatDauCham q={q} onGiaiThich={setGiaiThich} onHoTro={danhDauHoTro} /> : null
     const linkHoi = q && <NutHoiThay gon dangLam={!k} chi="hoi" qid={q.qid} nguon="bai_hang_ngay" dapAnEm={k ? traHien : undefined} onHoi={k ? undefined : () => { daHoiThay.current = q.qid }} />
     const linkGiai = q && k && !k.choThay && <button type="button" className="duo-lien" onClick={() => setMoLoiGiai(true)}><BookOpen size={18} aria-hidden="true" />Lời giải từng bước</button>
 
@@ -415,6 +420,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
           <div className="duo-bo">
             {linkHoi}
+            {nutBatDau}
             {q.goiY && <button type="button" className="duo-lien" aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={18} aria-hidden="true" />{goiY ? 'Thu gợi ý' : 'Gợi ý'}</button>}
             {coHuongDan && <button type="button" className="duo-lien" onClick={() => void hocHuongDan()} disabled={nop}><BookOpen size={18} aria-hidden="true" />Học cách giải</button>}
           </div>
@@ -444,7 +450,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         : q ? <>
           <div className="duo-cot-de">{/* khung thấp xoay ngang: cột trái = đề, cột phải = phương án + Kiểm tra / tấm kết quả; dọc / máy tính: display: contents (y bố cục cũ) */}
           <p className="duo-nhan"><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}{tenBai || q.tenDang ? ` · ${tenBai || q.tenDang}` : ''}</span>{chang ? <span className="duo-chip">Chặng {chang}</span> : null}</p>
-          <VungChamDe q={q} onGiaiThich={setGiaiThich}><DeCau q={q} stt={stt} /></VungChamDe>
+          <VungChamDe q={q} onGiaiThich={setGiaiThich} onHoTro={danhDauHoTro}><DeCau q={q} stt={stt} /></VungChamDe>
           {q.goiY && goiY && dangTraLoi && <section id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           </div>
           <div className="duo-cot-tra">

@@ -1,6 +1,9 @@
 // KHE CẮM «CHẠM ĐỂ HIỆN GIẢI THÍCH + TÔ MÀU GỢI Ý» (kiểu Duolingo) — phiên Code app 3 đang thiết kế, CHỜ THẦY DUYỆT. Đây chỉ là khe sẵn:
 //   • <VungChamDe q onGiaiThich>{đề như hiện nay}</VungChamDe> bọc thân đề ở màn làm chặng (ManLamBaiTap, nhánh Duo). Bản này trả lại children
 //     nguyên vẹn (không thêm thẻ DOM ⇒ bố cục dọc / ngang / máy tính không đổi).
+//   • onHoTro(): ruột gọi khi em đã xem giải thích / tô gợi ý của câu đang làm ⇒ màn làm chặng ghi lượt nộp câu đó là CÓ HỖ TRỢ (assisted: true,
+//     cùng cơ chế Gợi ý / Hỏi thầy).
+//   • <NutBatDauCham> = nút bật chế độ chạm (nutBatDau): màn Duo đặt ở hàng nút đáy cạnh «Gợi ý» (khổ ngang thấp: cột phải). Bản này chưa có nút ⇒ không vẽ gì.
 //   • <TamGiaiThich> = chỗ đặt tấm giải thích: cùng kiểu tấm trượt từ đáy với tấm kết quả (duo-day duo-ket, data-tt="giai"), thế chỗ thanh đáy khi mở,
 //     đóng ⇒ thanh đáy cũ trở lại.
 // Phần ruột thật (dò từ/đơn vị được chạm, tô màu, nội dung giải thích) sẽ thay trong thư mục này và PHẢI nạp lười (import() khi em chạm lần đầu) —
@@ -16,12 +19,19 @@ export interface PropsVungChamDe {
   q: Question
   /** Gọi khi em chạm một chỗ có giải thích (null = đóng). Màn làm chặng giữ trạng thái và vẽ <TamGiaiThich>. */
   onGiaiThich?: (g: GiaiThichCham | null) => void
+  /** Gọi khi em đã dùng giải thích / gợi ý của câu này ⇒ lượt nộp tính là có hỗ trợ. */
+  onHoTro?: () => void
   children: ReactNode
 }
 
 /** Bản hiện tại: chưa có hành vi chạm — trả lại đề y nguyên. */
 export function VungChamDe({ children }: PropsVungChamDe) {
   return <>{children}</>
+}
+
+/** Nút bật chế độ chạm (nutBatDau) ở hàng nút đáy màn Duo. Bản hiện tại: chưa có nút. */
+export function NutBatDauCham(_: { q: Question; onGiaiThich?: (g: GiaiThichCham | null) => void; onHoTro?: () => void }): ReactNode {
+  return null
 }
 
 /** Tấm giải thích trượt từ đáy (cùng kiểu tấm kết quả). */
