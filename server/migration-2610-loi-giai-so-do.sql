@@ -6,6 +6,8 @@
 -- so_lan = số lần gọi mô hình; model/token_* = chi phí; tao_luc/cap_nhat_luc = ISO.
 CREATE TABLE IF NOT EXISTS loi_giai_so_do (qid TEXT PRIMARY KEY, ma_de TEXT NOT NULL, version TEXT NOT NULL, phien_ban INTEGER NOT NULL,
     ban_json TEXT NOT NULL, cong TEXT NOT NULL, ly_do TEXT, gia_tri TEXT, so_lan INTEGER NOT NULL DEFAULT 1, model TEXT,
-    token_vao INTEGER NOT NULL DEFAULT 0, token_ra INTEGER NOT NULL DEFAULT 0, tao_luc TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL);
+    token_vao INTEGER NOT NULL DEFAULT 0, token_ra INTEGER NOT NULL DEFAULT 0, tao_luc TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL,
+    dap_an_may TEXT, nghi_dap_an INTEGER NOT NULL DEFAULT 0);
+-- dap_an_may / nghi_dap_an (26/10): câu cuối cùng vẫn lệch ⇒ 2 lần giải MÙ cùng ra một số khác kho ⇒ nghi đáp án kho sai, CHỈ để báo thầy (không tự sửa kho).
 -- Máy soạn / màn thầy đếm và lọc theo kết quả cổng (đọc của em đi theo khoá chính qid).
 CREATE INDEX IF NOT EXISTS loi_giai_so_do_cong ON loi_giai_so_do(cong);

@@ -185,6 +185,17 @@ export function chuCauHoi(c: CauCanSoan): string {
   ].filter(Boolean).join('\n\n')
 }
 
+/** GIẢI MÙ (thầy 26/10 «Nếu lệch đáp án …»): đề KHÔNG kèm đáp án kho / lời giải kho — để biết máy tự giải ra bao nhiêu (đối chiếu đáp án kho nghi sai). */
+export function chuCauHoiMu(c: CauCanSoan): string {
+  const pa = c.phan === 'I' ? c.choices.map((x, i) => `${'ABCD'[i] ?? i + 1}. ${boThe(String(x))}`).join('\n') : ''
+  return [
+    `Phần ${c.phan}${c.phan === 'I' ? ' · Trắc nghiệm' : ' · Trả lời ngắn'}`,
+    `Đề: ${boThe(c.text)}`,
+    pa && `Phương án:\n${pa}`,
+    'LƯỢT NÀY KHÔNG CÓ ĐÁP ÁN KHO: em TỰ GIẢI từ đề. Chuỗi thừa số phải đúng hoá học; `ketQua` là kết quả em tính được (Phần I: giá trị khớp phương án em chọn). Trả về JSON đúng khuôn.',
+  ].filter(Boolean).join('\n\n')
+}
+
 /** Tin nhắn thử lại khi bản lộ đáp án ở phần học sinh thấy TRƯỚC khi nộp. */
 export function chuThuLaiLo(lyDo: string): string {
   return `Cổng kiểm báo LỘ ĐÁP ÁN ở phần học sinh thấy trước khi nộp: ${lyDo}. Viết lại deNoiGi, soDo, thuaSo.nghia, denDay, hienTuong sao cho KHÔNG còn kết quả cuối / giá trị phương án đúng / giá trị trung gian quyết định; kết quả số chỉ nằm ở buoc[].ketQua và ketQua. Trả về TOÀN BỘ JSON mới đúng khuôn.`

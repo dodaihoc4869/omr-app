@@ -18,7 +18,7 @@ import { kiemCong } from './so-do-cong'
 import { quaTram } from './tram-gemini'
 import { docCauEmSai } from './hoc-lieu-may-soan'
 import { laCauTuLuan, laMotSoPhanIII } from '../../src/lib/cau-tu-luan'
-import { PHIEN_BAN_SO_DO, chuCauHoi, chuThuLai, chuThuLaiKhuon, chuThuLaiLo, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
+import { PHIEN_BAN_SO_DO, chuCauHoi, chuCauHoiMu, chuThuLai, chuThuLaiKhuon, chuThuLaiLo, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -29,15 +29,16 @@ const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).tri
 export const SQL_BANG_SO_DO: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS loi_giai_so_do (qid TEXT PRIMARY KEY, ma_de TEXT NOT NULL, version TEXT NOT NULL, phien_ban INTEGER NOT NULL,
     ban_json TEXT NOT NULL, cong TEXT NOT NULL, ly_do TEXT, gia_tri TEXT, so_lan INTEGER NOT NULL DEFAULT 1, model TEXT,
-    token_vao INTEGER NOT NULL DEFAULT 0, token_ra INTEGER NOT NULL DEFAULT 0, tao_luc TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL)`,
+    token_vao INTEGER NOT NULL DEFAULT 0, token_ra INTEGER NOT NULL DEFAULT 0, tao_luc TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL,
+    dap_an_may TEXT, nghi_dap_an INTEGER NOT NULL DEFAULT 0)`,
   'CREATE INDEX IF NOT EXISTS loi_giai_so_do_cong ON loi_giai_so_do(cong)',
 ]
 
-const SQL_GHI = `INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, cong, ly_do, gia_tri, so_lan, model, token_vao, token_ra, tao_luc, cap_nhat_luc)
-  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+const SQL_GHI = `INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, cong, ly_do, gia_tri, so_lan, model, token_vao, token_ra, tao_luc, cap_nhat_luc, dap_an_may, nghi_dap_an)
+  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   ON CONFLICT(qid) DO UPDATE SET ma_de = excluded.ma_de, version = excluded.version, phien_ban = excluded.phien_ban, ban_json = excluded.ban_json,
     cong = excluded.cong, ly_do = excluded.ly_do, gia_tri = excluded.gia_tri, so_lan = excluded.so_lan, model = excluded.model,
-    token_vao = excluded.token_vao, token_ra = excluded.token_ra, cap_nhat_luc = excluded.cap_nhat_luc
+    token_vao = excluded.token_vao, token_ra = excluded.token_ra, cap_nhat_luc = excluded.cap_nhat_luc, dap_an_may = excluded.dap_an_may, nghi_dap_an = excluded.nghi_dap_an
   WHERE excluded.cong = 'dat' OR loi_giai_so_do.cong <> 'dat' OR loi_giai_so_do.version <> excluded.version`
 
 // ---------------------------------------------------------------- chọn câu
@@ -231,7 +232,7 @@ interface ThamSoDayDu extends ThamSoSoDo {
   chiSuaLoi?: boolean
 }
 type KetCuoi = KetQuaCong | 'hong' | 'loi_goi'
-export interface DongKetQua { qid: string; ket: KetCuoi; lyDo?: string; giaTri?: string; lanThu: number; model?: string }
+export interface DongKetQua { qid: string; ket: KetCuoi; lyDo?: string; giaTri?: string; lanThu: number; model?: string; dapAnMay?: string; nghiDapAn?: boolean }
 export type KiemCong = (ban: BanSoDo, ctx: { phan: 'I' | 'II' | 'III'; dapAn: string; luaChon: readonly string[] }) =>
   { ket: KetQuaCong; lyDo?: string; giaTri?: unknown } | Promise<{ ket: KetQuaCong; lyDo?: string; giaTri?: unknown }>
 /** Phụ thuộc thay được (test): mô hình giả, cổng giả, đồng hồ. */
@@ -359,7 +360,30 @@ async function soanMotCau(q: CauKho, ts: ThamSoDayDu, goi: GoiMoHinh, cong: Kiem
     })
   }
   if (!tot) return { dong: loiCuoi ?? { qid: q.qid, ket: 'loi_goi', lyDo: 'không gọi được mô hình', lanThu: 1 }, token }
-  return { dong: { qid: q.qid, ket: tot.ket, ...(tot.lyDo ? { lyDo: tot.lyDo } : {}), ...(tot.giaTri ? { giaTri: tot.giaTri } : {}), lanThu: tot.lan, model: tot.model }, ban: tot.ban, token }
+  // GIẢI MÙ (thầy 26/10: «Nếu lệch đáp án tự động lấy đáp án bạn giải»): KHÔNG ghi đè đáp án kho (chấm thi / KTCN / BTVN dùng nó — CLAUDE.md
+  // cấm sửa điểm thật hàng loạt). Thay vào đó: còn `lech` ⇒ giải lại 2 lần MÙ (không đưa đáp án / lời giải kho), 2 model khác nhau.
+  //   · lần mù nào ĐẠT cổng (ra đúng đáp án kho) ⇒ lấy luôn bản đó làm lời giải;
+  //   · cả hai cùng ra một số (lệch ≤ 1%) và khác kho ⇒ đánh dấu `nghi_dap_an` + `dap_an_may` để báo thầy (chỉ báo, không tự sửa kho).
+  let nghi: { dapAnMay: string } | null = null
+  if (tot.ket === 'lech') {
+    const giaTriMu: number[] = []
+    for (const model of [ts.model ?? MODEL_MAC_DINH, MODEL_MANH]) {
+      const kq = await goi({ heThong, luot: [{ vai: 'user', chu: chuCauHoiMu(q) }], model })
+      if (!kq.ok) continue
+      token.vao += kq.vao; token.ra += kq.ra
+      const doc = docBanSoDo(kq.chu, q.qid)
+      if ('loi' in doc) continue
+      const c = await cong(doc.ban, ctx)
+      if (c.ket === 'dat') { tot = { ban: doc.ban, ket: 'dat', model: kq.model, lan: tot.lan + 1 }; break }
+      const v = Number(String(c.giaTri ?? '').replace(',', '.'))
+      if (c.ket === 'lech' && Number.isFinite(v)) giaTriMu.push(v)
+    }
+    if (tot.ket === 'lech' && giaTriMu.length === 2) {
+      const [a, b] = giaTriMu as [number, number]
+      if (Math.abs(a - b) <= 0.01 * Math.max(Math.abs(a), Math.abs(b), 1e-12)) nghi = { dapAnMay: String(Number(a.toPrecision(6))).replace('.', ',') }
+    }
+  }
+  return { dong: { qid: q.qid, ...(nghi ? { nghiDapAn: true, dapAnMay: nghi.dapAnMay } : {}), ket: tot.ket, ...(tot.lyDo ? { lyDo: tot.lyDo } : {}), ...(tot.giaTri ? { giaTri: tot.giaTri } : {}), lanThu: tot.lan, model: tot.model }, ban: tot.ban, token }
 }
 
 /**
@@ -381,7 +405,7 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   const het = () => bayGio() - batDau >= nganSach
 
   const { hang, nguonHet } = await gomHang(env, ts, het)
-  const dem: Record<KetCuoi | 'bo_qua', number> = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0 }
+  const dem: Record<KetCuoi | 'bo_qua' | 'nghi_dap_an', number> = { dat: 0, lech: 0, khong_kiem_duoc: 0, lo_dap_an: 0, hong: 0, loi_goi: 0, bo_qua: 0, nghi_dap_an: 0 }
   const ketQua: DongKetQua[] = []
   const banThu: { qid: string; ket: KetCuoi; ban: BanSoDo }[] = []
   const token = { vao: 0, ra: 0 }
@@ -403,12 +427,13 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
     for (const [k, r] of xong.entries()) {
       const q = dot[k]!
       dem[r.dong.ket]++
+      if (r.dong.nghiDapAn) dem.nghi_dap_an++
       ketQua.push(r.dong)
       token.vao += r.token.vao; token.ra += r.token.ra
       if (!r.ban || r.dong.ket === 'hong' || r.dong.ket === 'loi_goi') continue
       if (ts.thuKhong) { banThu.push({ qid: q.qid, ket: r.dong.ket, ban: r.ban }); continue }
       ghi.push(env.DB.prepare(SQL_GHI).bind(q.qid, q.maDe, q.version, PHIEN_BAN_SO_DO, JSON.stringify(r.ban), r.dong.ket, r.dong.lyDo ?? null,
-        r.dong.giaTri ?? null, r.dong.lanThu, r.dong.model ?? null, r.token.vao, r.token.ra, luc, luc))
+        r.dong.giaTri ?? null, r.dong.lanThu, r.dong.model ?? null, r.token.vao, r.token.ra, luc, luc, r.dong.dapAnMay ?? null, r.dong.nghiDapAn ? 1 : 0))
     }
     if (ghi.length) {
       if (!daTaoBang) { await env.DB.batch(SQL_BANG_SO_DO.map((s) => env.DB.prepare(s))); daTaoBang = true }
