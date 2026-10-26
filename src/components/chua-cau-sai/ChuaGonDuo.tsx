@@ -19,6 +19,8 @@ import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { Bi } from '../linh-vat/Bi'
 import { banHat } from '../../lib/hieu-ung'
 import { phanHoi } from '../../lib/phan-hoi'
+import { napSanGiuChan, TamGiuChanLuoi, useGiuChan } from '../hoc-tap/GiuChan'
+import { loiGiuChan } from '../hoc-tap/giu-chan'
 import '../hoc-tap/hoc-tap.css'
 import { KhungDuoSua, type TienDoSua } from './KhungDuoSua'
 export type { TienDoSua }
@@ -101,8 +103,12 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
 
   // PHÍM TẮT (máy tính, như màn làm chặng): 1–4 / A–D chọn Phần I · số cho Phần III · Enter = Kiểm tra / Tiếp tục.
   const phim = useRef<(e: KeyboardEvent) => void>(() => {})
+  const giuMo = useRef(false), giuBat = useRef(false)
   phim.current = (e) => {
-    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || moGiai) return
+    if (moGiai && e.key === 'Escape') { e.preventDefault(); setMoGiai(false); nutChinh.current?.focus({ preventScroll: true }); return }
+    // Esc: đang giữ chân được ⇒ móc useGiuChan mở / đóng tấm; không ⇒ thoát như màn cũ (vỏ ManChuaCauSai nhường Esc cho màn Duo).
+    if (e.key === 'Escape') { if (!e.defaultPrevented && !giuMo.current && !giuBat.current && !ban && !document.querySelector('[aria-modal="true"]')) p.onVe(); return }
+    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || moGiai || giuMo.current) return
     const t = e.target instanceof HTMLElement ? e.target : null
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|A)$/.test(t.tagName) || t.closest('[role=dialog]'))) return
     if (t?.tagName === 'BUTTON' && t.getAttribute('role') !== 'radio' && e.key === 'Enter') return
@@ -124,6 +130,14 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
     window.addEventListener('keydown', f)
     return () => window.removeEventListener('keydown', f)
   }, [])
+  // GIỮ CHÂN KHI THOÁT (như màn làm chặng, PR 415): đang giữa chặng sửa hôm nay mà đã sửa ≥ 1 câu ⇒ X / Esc / back mở tấm «Đừng đi mà…» có Bi buồn.
+  // Câu ngoài việc hôm nay (không tienDo) hoặc chặng đã xong ⇒ thoát thẳng như cũ.
+  const conLai = tong - daXong
+  giuBat.current = !!tienDo && !xongChang && daXong >= 1 && conLai >= 1
+  const giu = useGiuChan({ bat: giuBat.current, onThoat: p.onVe })
+  useEffect(() => { if (tienDo) napSanGiuChan() }, [!!tienDo]) // eslint-disable-line react-hooks/exhaustive-deps
+  giuMo.current = giu.mo
+  const tamGiu = giu.mo ? (() => { const l = loiGiuChan({ conLai, lamLai: false, soCau: tong, daCham: [], coThuong: false }); return <TamGiuChanLuoi tieuDe={l.tieuDe} phu={l.phu} onTiep={giu.tiepTuc} onThoat={giu.thoat} /> })() : null
 
   // ── MÀN XONG CHẶNG: Bi mừng + hoa giấy + số có nhãn.
   if (xongChang && tienDo) {
@@ -213,7 +227,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
   const lan = mo.lan ?? 1
 
   return (
-    <KhungDuoSua goc={goc} onVe={p.onVe} khoaVe={ban} pct={pct} nhanThanh={nhanThanh} loe={p.khep && tt === 'dung'} tt={tt} deDai={deDai} day={day}>
+    <KhungDuoSua goc={goc} onVe={giu.xinThoat} khoaVe={ban} pct={pct} nhanThanh={nhanThanh} loe={p.khep && tt === 'dung'} tt={tt} deDai={deDai} day={day}>
       {q && mo.ok && !(p.daTuSua && !kq) ? <>
         <div key={`d${q.qid}${lan}`} className="duo-cot-de">
           <p className="duo-nhan" data-sua=""><span>{mo.banKhac ? 'Bản mới của câu em đã sai' : 'Câu em đã sai'}{lan > 1 ? ' · lần 2' : ''}</span>{tienDo ? <span className="duo-chip">Chặng sửa {tienDo.so}</span> : null}</p>
@@ -243,6 +257,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
           <NutHoiThay gon chi="giai" qid={qid} nguon="tu_chua" dapAnEm={tra || undefined} />
         </div>
       </div>}
+      {tamGiu}
     </KhungDuoSua>
   )
 }

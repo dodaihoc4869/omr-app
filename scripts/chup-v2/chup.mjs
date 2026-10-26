@@ -324,6 +324,7 @@ const DUO_SUA_CANH = [
   ['12-tra-loi-ngan', 'de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Dấu phẩy$ » nut:^2$'], ['13-tra-loi-ngan-dung', 'de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Dấu phẩy$ » nut:^2$ » nut:^Kiểm tra$'],
   ['14-xong-chang', 'de=2', /Câu em đã sai/, 'lam13:tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục$'],
   ['15-da-tu-sua', 'de=2&mo=da-sua', /Em đã tự sửa xong/], ['16-khong-mo', 'de=2&mo=loi', /Chưa mở được/],
+  ['17-giu-chan', 'de=2', /Câu em đã sai/, 'lam13:nut:^Quay lại$'], // giữa chặng sửa (đã sửa 3/4) ⇒ X mở tấm «Đừng đi mà…»
 ]
 const DS_DUO_SUA = [
   ...[[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>

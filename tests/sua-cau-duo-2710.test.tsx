@@ -4,6 +4,7 @@
 //   · cùng lệnh, cùng dữ liệu gửi: gon-nop nhận đúng (token, đợt, bản, câu trả lời, khoá); đáp án KHÔNG có trên màn trước khi nộp;
 //   · đúng ⇒ tấm xanh «Em đã tự sửa xong câu này» + «Tiếp tục»; câu cuối chặng ⇒ màn xong chặng có nút sang chặng sau;
 //   · sai ⇒ tấm đỏ + gợi ý, chưa ghi xong; «Làm lại câu này» mở lần 2; sai nữa ⇒ đáp án + «Lời giải» mở tấm lời giải;
+//   · giữ chân khi thoát giữa chặng sửa (useGiuChan, như màn làm chặng — PR 415);
 //   · tienDoSua: vị trí câu trong chặng của Việc hôm nay.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
@@ -97,6 +98,33 @@ describe('Sửa câu kiểu Duolingo («Trong» HS)', () => {
     expect(xong()).toEqual(['D1', 'Q'])
     fireEvent.click(screen.getByRole('button', { name: 'Lời giải' }))
     expect(screen.getByRole('dialog', { name: 'Lời giải' })).toBeTruthy()
+  })
+
+  it('giữ chân (như màn làm chặng): giữa chặng sửa đã xong ≥ 1 câu ⇒ X mở tấm «Đừng đi mà…», «Tiếp tục học» ở lại, «Thoát» về; Esc cũng mở tấm', async () => {
+    const onVe = vi.fn()
+    render(<Man token="t" qid="Q" onVe={onVe} tienDo={{ so: 1, xong: 1, tong: 4, cuoi: false, conSau: true, changTiep: 1 }} />)
+    await screen.findByRole('button', { name: 'Kiểm tra' }, CHO)
+    fireEvent.click(screen.getByRole('button', { name: 'Quay lại' }))
+    expect(await screen.findByRole('heading', { name: 'Đừng đi mà, chỉ còn 3 câu nữa là xong chặng rồi!' }, CHO)).toBeTruthy()
+    expect(onVe).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục học' }))
+    expect(screen.queryByRole('heading', { name: /Đừng đi mà/ })).toBeNull()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(await screen.findByRole('heading', { name: /Đừng đi mà/ }, CHO)).toBeTruthy()
+    expect(onVe).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Thoát' }))
+    expect(onVe).toHaveBeenCalledOnce()
+  })
+
+  it('chưa sửa câu nào trong chặng (hoặc câu ngoài việc hôm nay) ⇒ X / Esc thoát thẳng, không tấm', async () => {
+    const onVe = vi.fn()
+    render(<Man token="t" qid="Q" onVe={onVe} tienDo={{ so: 1, xong: 0, tong: 4, cuoi: false, conSau: true, changTiep: 1 }} />)
+    await screen.findByRole('button', { name: 'Kiểm tra' }, CHO)
+    fireEvent.click(screen.getByRole('button', { name: 'Quay lại' }))
+    expect(onVe).toHaveBeenCalledOnce()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(onVe).toHaveBeenCalledTimes(2)
+    expect(screen.queryByRole('heading', { name: /Đừng đi mà/ })).toBeNull()
   })
 
   it('tắt «Trong» (không data-trong) ⇒ màn cũ, không khung Duo', async () => {

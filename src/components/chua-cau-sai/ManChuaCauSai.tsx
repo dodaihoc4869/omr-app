@@ -233,11 +233,11 @@ export default function ManChuaCauSai({
   }, [])
   useEffect(() => {
     const f = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !ban) onVe()
+      if (e.key === 'Escape' && !ban && !(duo && gon)) onVe() // màn sửa câu Duo tự lo Esc (tấm giữ chân / đóng lời giải)
     }
     window.addEventListener('keydown', f)
     return () => window.removeEventListener('keydown', f)
-  }, [onVe, ban])
+  }, [onVe, ban, duo, gon])
   const ap = useCallback((r: KetQuaDot) => {
     setPh(r)
     setHoi(r.phanHoiTruoc ?? null)
