@@ -3,18 +3,25 @@
    Chỉ dưới [data-trong]; màu chỉ var(--tr-*) (styles/trong.css). Lùi ddh.trong = 'tat' ⇒ không luật nào ở đây chạy ⇒ y giao diện cũ.
    */
 
-/* ── PHÔNG NUNITO kiểu Duolingo (thầy 26/10: «Thay luôn font chữ của dolingo»). Tự chứa (không Google Fonts): bản variable (một tệp đủ mọi độ đậm),
-   chỉ hai mảnh latin + vietnamese (unicode-range ⇒ trình duyệt chỉ tải mảnh có chữ cần). Nunito — giấy phép SIL Open Font License 1.1 (Vernon Adams, Cyreal).
-   Chỉ cổng học sinh (tờ này nạp cùng TrongHs) ⇒ màn thi /t, app thầy, phụ huynh giữ phông cũ; app học sinh không còn tải Be Vietnam Pro.
+/* ── PHÔNG TRÒN KIỂU DUOLINGO: M PLUS Rounded 1c (thầy 27/10: «sửa lại font chữ siêu đẹp siêu hợp», Nunito «chưa chuẩn dolingo»).
+   Duolingo dùng DIN Round (bản quyền, không có dấu Việt); M PLUS Rounded 1c là phông OFL gần DIN Round nhất: đầu nét bo, mặt chữ rộng, nét đều, đủ dấu
+   tiếng Việt chồng (ặ ổ ữ Ở). Thi 7 phối trên màn thật (Nunito · M PLUS · Baloo 2 + Nunito · Be Vietnam Pro · Lexend · Quicksand · Baloo 2 + M PLUS).
+   Tự chứa (không Google Fonts), hai độ đậm tĩnh 700 (chữ thân) + 800 (tiêu đề / nút / số) × hai mảnh latin + vietnamese (unicode-range ⇒ chỉ tải mảnh cần).
+   Tệp đã gọt bằng pyftsubset (bỏ hinting, tên glyph, bảng chữ dọc — giữ ccmp/mark/mkmk/kern cho dấu chồng): tổng 52,1 KB < Nunito cũ 52,2 KB.
+   line-gap-override 0% ⇒ giãn dòng «normal» 1,40 (gốc 1,49 vì phông Nhật) — sát Nunito cũ 1,36, không dãn thêm khung.
+   Giấy phép SIL Open Font License 1.1 (The M+ FONTS Project Authors; bản quyền giữ trong bảng name của tệp).
+   Chỉ cổng học sinh (tờ này nạp cùng TrongHs) ⇒ màn thi /t, app thầy, phụ huynh giữ phông cũ.
    Tệp phông không vào precache (globIgnores) — kho chạy-lúc /assets/*.woff2; máy đã đăng nhập nạp trước (phongHs, vite.config.ts). ── */
-@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 200 1000; font-display: swap; src: url('./phong-nunito/nunito-vietnamese-wght-normal.woff2') format('woff2-variations'), url('./phong-nunito/nunito-vietnamese-wght-normal.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
-@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 200 1000; font-display: swap; src: url('./phong-nunito/nunito-latin-wght-normal.woff2') format('woff2-variations'), url('./phong-nunito/nunito-latin-wght-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-/* Cả chữ thường lẫn chữ đề (--serif) sang Nunito; đậm theo Duolingo: chữ thường 600–700, tiêu đề / nút / số 800–900 (:where ⇒ luật riêng của màn vẫn thắng).
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 700; font-display: swap; line-gap-override: 0%; src: url('./phong-tron/m-plus-rounded-1c-vietnamese-700-normal.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 700; font-display: swap; line-gap-override: 0%; src: url('./phong-tron/m-plus-rounded-1c-latin-700-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 800; font-display: swap; line-gap-override: 0%; src: url('./phong-tron/m-plus-rounded-1c-vietnamese-800-normal.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 800; font-display: swap; line-gap-override: 0%; src: url('./phong-tron/m-plus-rounded-1c-latin-800-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+/* Cả chữ thường lẫn chữ đề (--serif) sang M PLUS Rounded 1c; đậm theo Duolingo: chữ thân 700, tiêu đề / nút / số 800 (:where ⇒ luật riêng của màn vẫn
+   thắng; luật xin 600 dùng mặt 700, xin 900 dùng mặt 800 — không có mặt khác, trình duyệt không tô đậm giả).
    Chỉ khi cổng đã vẽ (có .ht2 — Hôm nay luôn gắn dưới các màn con) ⇒ màn đăng nhập giữ phông cũ, không tải thêm phông khi em chưa đăng nhập. */
-:root[data-trong='hs']:has(.ht2) { --sans: 'Nunito', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'Nunito', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; }
-:root[data-trong='hs']:has(.ht2) body { font-weight: 600; }
+:root[data-trong='hs']:has(.ht2) { --sans: 'M PLUS Rounded 1c', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'M PLUS Rounded 1c', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; }
+:root[data-trong='hs']:has(.ht2) body { font-weight: 700; }
 :root[data-trong='hs']:has(.ht2) :where(h1, h2, h3, button, b, strong, th, dd) { font-weight: 800; }
-:root[data-trong='hs']:has(.ht2) :where(h1, .duo-xong h1, .duo-kq-chu h2) { font-weight: 900; }
 /* Số đồng hồ / điểm / bộ đếm không nhảy bề ngang khi đổi. */
 :root[data-trong='hs'] :where(.duo-chuoi, .duo-3 b, .tr-so, .ht2-lam-hom-nay, [role='timer'], time) { font-variant-numeric: tabular-nums; }
 
@@ -862,13 +869,13 @@
 @media (max-width: 480px), (orientation: landscape) and (max-height: 500px) {
   [data-trong] .da-huy { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
 }
-/* DUYỆT 26/10: vòng «Kiểm tra ôn tập» (số «10/28» + «đã trả lời»): phông Nunito cao dòng hơn ⇒ hai dòng chồng 3px ở giãn dòng 1.1 — giãn 1.25 (vừa lòng vòng 84–112px) */
+/* DUYỆT 26/10: vòng «Kiểm tra ôn tập» (số «10/28» + «đã trả lời»): phông tròn (Nunito, nay M PLUS Rounded 1c) cao dòng hơn ⇒ hai dòng chồng 3px ở giãn dòng 1.1 — giãn 1.25 (vừa lòng vòng 84–112px) */
 :root[data-trong='hs']:has(.ht2) .ktcn-vong > span { line-height: 1.25; }
 /* DUYỆT 26/10: chữ ≥ 12 — chữ cái tên em trong vòng 24px ở menu («MA») 10px và số tin chưa đọc trên chuông menu 11px ⇒ 12px (vừa vòng 24 / ô 20) */
 [data-trong] .tr-menu-anh, [data-trong] .tr-menu-tb .m3-tb-dem { font-size: 12px; }
 /* DUYỆT 26/10: Lộ trình đang tải — vạch chờ (70%) đứng CẠNH tên bài trong băng bài ⇒ «Bài học hôm nay» vỡ mỗi chữ một dòng (cột 67px) — vạch chờ xuống hàng riêng, nền mờ trên băng xanh */
 [data-trong] .da-bai > .mot-xuong { flex-basis: 100%; width: auto; height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--tr-trang) 30%, transparent); }
-/* DUYỆT 26/10: Thành tích — số chuỗi ngày 34px giãn dòng 1.05 (phông Nunito) chồng 3px dòng «Chuỗi ngày đủ mức» ngay dưới ⇒ 1.2 */
+/* DUYỆT 26/10: Thành tích — số chuỗi ngày 34px giãn dòng 1.05 (phông tròn Nunito / M PLUS Rounded 1c) chồng 3px dòng «Chuỗi ngày đủ mức» ngay dưới ⇒ 1.2 */
 [data-trong] .da-lua b { line-height: 1.2; }
 /* THƯỞNG PHẠT (gộp 26/10): một màn thưởng phạt mở trong khung Lộ trình / Thành tích — một cột (màn tự chia 2 cột ở máy tính / ngang). */
 [data-trong] .dm-khung[data-muc='thuong'] { grid-template-columns: minmax(0, 1fr); }
