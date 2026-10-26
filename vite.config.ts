@@ -293,6 +293,8 @@ export default defineConfig({
           // Giao diện «Trong» màn làm bài (26/10): tờ trình bày nạp lười trong màn thi & các màn làm câu (chỉ khi <html data-trong>) ⇒ kho chạy-lúc;
           // tải hỏng ⇒ màn thi vẫn chạy với trình bày cũ (logic không phụ thuộc tờ này).
           '**/trong-lam-bai-*.css',
+          // Cầu nối Cowork `window.__ddh` (26/10): App.tsx nạp LƯỜI sau khi thầy mở khoá ⇒ kho chạy-lúc; tải hỏng (mất mạng) ⇒ chỉ thiếu cầu nối, app chạy như thường.
+          '**/cau-noi-ddh-*.js',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
         '**/{ChuyenBay,BanNguyenTo}-*.{js,css}',
           '**/404.html',
@@ -516,6 +518,12 @@ export default defineConfig({
             // + trợ hàm trường lớp mà trình dịch chèn cho class component (ChanLoi…): `\0@oxc-project+runtime@…/helpers/` — mọi đường đều nạp ChanLoi (bản trước nằm sẵn trong mảnh này).
             { name: 'ChanLoi', test: /src[\\/](?:components[\\/](?:ChanLoi|LogoVai|bat-linh[\\/]BatLinhShell)\.tsx|lib[\\/](?:fetch-co-han|hs-dang-nhap-api)\.ts)$|@oxc-project\+runtime@[^\\/]+[\\/]helpers[\\/]/, includeDependenciesRecursively: false },
             { name: 'DesignSystem', test: /src[\\/](?:components[\\/](?:DesignSystem|m3[\\/](?:NutTron|ThanhTren|index))\.tsx?|engine[\\/]score\.ts|lib[\\/](?:doc-so-phan-iii|cham-so-policy|cham-so|goi-lenh-thay|gio-may-chu|ten-ca|de-rieng-goi|gui-ca-trinh-duyet|anh-len-may-chu|day-ca-may-chu-moi|phieu-may-chu-moi|don-moc-reset-giao-vien|man-ca-may-chu-moi|cau-hinh-de-rieng|nhan-da-dung|cau-goc|exam-api|so-o-tra-loi-ngan|cau-tu-luan)\.ts)$/, includeDependenciesRecursively: false },
+            // 26/10 (cầu nối Cowork rời mảnh App, nạp lười): `exam-sync` + `phieu-ca-ca` mất chỗ trong App ⇒ Rolldown tách 2 tệp precache mới. Gom vào mảnh
+            // NutDongBoMoiCa (nút đồng bộ dùng cả hai — Lịch sử ca, Cài đặt vốn đã tải chúng; kèm link-phieu-ca, phieu-hang-loat, sua-dang, tu-vung-dang cũng rời App)
+            // ⇒ precache giữ 170. Màn Tạo ca / Kho đề tải kèm mảnh này khi mở (từ precache, không qua mạng).
+            { name: 'NutDongBoMoiCa', test: /src[\\/](?:components[\\/]NutDongBoMoiCa\.tsx|lib[\\/](?:exam-sync|phieu-ca-ca|link-phieu-ca|phieu-hang-loat|sua-dang|tu-vung-dang)\.ts)$/, includeDependenciesRecursively: false },
+            // 26/10: bai-tap-pdf mất điểm neo App ⇒ Rolldown xẻ mảnh này ra nhiều tệp ⇒ gom lại đúng các mô-đun của mảnh cũ (đọc từ sourcemap bản main 7654f0c3).
+            { name: 'bai-tap-pdf', test: /src[\\/](?:lib[\\/](?:bai-tap-pdf|dang-cau|goi-len-bang|loc-cau-rut|loc-sao)|data[\\/]examContent)\.ts$/, includeDependenciesRecursively: false },
             { name: 'exam-grade', test: /src[\\/]lib[\\/](?:phan-tich-lam-bai|loai-cau-chua-dung|rut-de-chua|phan-cau-len-bang|chan-doan-cau-hinh|chan-doan|chan-doan-phieu|chong-gian-lan|phieu-du-lieu|phieu-link|exam-grade)\.ts$/, includeDependenciesRecursively: false },
           ],
         },
