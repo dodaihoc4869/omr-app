@@ -150,17 +150,27 @@ describe('soạn lô', () => {
     expect(j.dem.hong).toBe(1)
   })
 
-  it('lệch ⇒ thử lại đúng 1 lần kèm lý do, vẫn lệch ⇒ lưu `lech` (không hiện)', async () => {
+  // TỰ SỬA (thầy 26/10: «Tự động sửa mọi câu lệch, tôi ko phải làm gì»): lệch ⇒ thử lại tới 4 lượt, mỗi lượt kèm lý do; từ lượt 3 model mạnh.
+  it('lệch ⇒ thử lại tới 4 lượt kèm lý do (lượt 3–4 model mạnh), vẫn lệch ⇒ lưu `lech` (không hiện)', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const cong = congGia(() => 'lech')
     const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: cong })
-    expect(mh.fn).toHaveBeenCalledTimes(2)
-    expect(cong).toHaveBeenCalledTimes(2)
+    expect(mh.fn).toHaveBeenCalledTimes(4)
+    expect(cong).toHaveBeenCalledTimes(4)
     const thuLai = mh.goi[1]!.luot
     expect(thuLai.map((l) => l.vai)).toEqual(['user', 'model', 'user'])
     expect(thuLai[2]!.chu).toContain('tích ra 70 khác 76,8')
+    expect(mh.goi.map((g) => g.model)).toEqual([M.MODEL_MAC_DINH, M.MODEL_MAC_DINH, M.MODEL_MANH, M.MODEL_MANH])
     expect(j.dem.lech).toBe(1)
-    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lech', so_lan: 2, ly_do: 'tích ra 70 khác 76,8', gia_tri: '70' })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lech', ly_do: 'tích ra 70 khác 76,8', gia_tri: '70' })
+  })
+
+  it('lệch hai lượt, model mạnh ở lượt 3 đạt ⇒ lưu `dat`', async () => {
+    const mh = moHinhGia((h) => chuMau(h))
+    const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia((_b, n) => (n < 3 ? 'lech' : 'dat')) })
+    expect(mh.fn).toHaveBeenCalledTimes(3)
+    expect(j.dem.dat).toBe(1)
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat', so_lan: 3 })
   })
 
   it('lệch rồi thử lại đạt ⇒ lưu `dat`', async () => {
@@ -170,12 +180,28 @@ describe('soạn lô', () => {
     expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat', so_lan: 2 })
   })
 
-  it('lộ đáp án ⇒ lưu `lo_dap_an`, không thử lại', async () => {
+  it('lộ đáp án ⇒ thử lại kèm lời dặn bỏ phần lộ; sửa được ⇒ `dat`, không sửa được ⇒ lưu `lo_dap_an` (không hiện)', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'lo_dap_an') })
-    expect(mh.fn).toHaveBeenCalledTimes(1)
+    expect(mh.fn).toHaveBeenCalledTimes(4)
+    expect(mh.goi[1]!.luot[2]!.chu).toContain('LỘ ĐÁP ÁN')
     expect(j.dem.lo_dap_an).toBe(1)
     expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lo_dap_an' })
+    const mh2 = moHinhGia((h) => chuMau(h))
+    const { j: j2 } = await goiLo({ qids: [Q.III], lamLai: true }, { goiMoHinh: mh2.fn, kiemCong: congGia((_b, n) => (n === 1 ? 'lo_dap_an' : 'dat')) })
+    expect(j2.dem.dat).toBe(1)
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat' })
+  })
+
+  it('vòng sửa `chiSuaLoi` chỉ lấy câu đang lệch / lộ trong bảng và soạn lại (không cần thầy chỉ qid)', async () => {
+    const mh = moHinhGia((h) => chuMau(h))
+    await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'lech') })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lech' })
+    const mh2 = moHinhGia((h) => chuMau(h))
+    const { j } = await goiLo({ chiSuaLoi: true }, { goiMoHinh: mh2.fn, kiemCong: congGia(() => 'dat') })
+    expect(mh2.fn).toHaveBeenCalledTimes(1)
+    expect(j.dem.dat).toBe(1)
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat' })
   })
 
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
@@ -227,7 +253,7 @@ describe('soạn lô', () => {
     gieoDong(Q.III, 'dat', 0, '{"cu":1}')
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'lech') })
-    expect(mh.fn).toHaveBeenCalledTimes(2) // đã soạn lại (không bị bỏ qua)
+    expect(mh.fn).toHaveBeenCalledTimes(4) // đã soạn lại (không bị bỏ qua); lệch ⇒ đủ 4 lượt tự sửa
     expect(j.dem.lech).toBe(1)
     expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat', ban_json: '{"cu":1}', phien_ban: 0, cap_nhat_luc: 'cu' })
   })

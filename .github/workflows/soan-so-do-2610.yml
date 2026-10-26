@@ -83,9 +83,12 @@ jobs:
           let conTro = '', daSoan = 0, luot = 0, xong = false
           console.log(`Chế độ: ${thuKhong ? 'CHẠY THỬ (không ghi)' : 'GHI THẬT'} · nguồn: ${qids.length ? qids.length + ' qid' : chiCauSaiNhieu ? 'câu nhiều em sai' : 'quét kho'} · tối đa ${tong} câu`)
           const batDau = Date.now()
+          // Thầy 26/10 «Tự động sửa mọi câu lệch»: soạn hết nguồn (vòng 1) ⇒ tự chạy VÒNG SỬA (chiSuaLoi) cho mọi câu còn lệch / lộ.
+          let vongSua = false
+          for (;;) {
           while (!xong && daSoan < tong && luot < 1500) {
             luot++
-            const body = { gioiHan: Math.min(MOI_LUOT, tong - daSoan), thuKhong, conTro, ...(qids.length ? { qids } : {}), ...(chiCauSaiNhieu ? { chiCauSaiNhieu } : {}), ...(model ? { model } : {}), ...(choChayGioCaoDiem ? { choChayGioCaoDiem } : {}) }
+            const body = { ...(vongSua ? { chiSuaLoi: true } : {}), gioiHan: Math.min(MOI_LUOT, tong - daSoan), thuKhong, conTro, ...(qids.length ? { qids } : {}), ...(chiCauSaiNhieu ? { chiCauSaiNhieu } : {}), ...(model ? { model } : {}), ...(choChayGioCaoDiem ? { choChayGioCaoDiem } : {}) }
             let r, j
             for (let thu = 1; thu <= 3; thu++) {
               try {
@@ -104,6 +107,10 @@ jobs:
             xong = !!j.xong
             conTro = j.conTro || ''
             if (!xong && !conTro) { console.log('DỪNG: máy chủ không trả con trỏ'); process.exit(1) }
+          }
+          if (!xong || vongSua || qids.length || thuKhong) break
+          console.log('\n===== VÒNG SỬA: soạn lại mọi câu còn lệch / lộ đáp án =====')
+          vongSua = true; xong = false; conTro = ''
           }
           const giay = Math.round((Date.now() - batDau) / 1000)
           console.log('\n===== TÓM TẮT =====')

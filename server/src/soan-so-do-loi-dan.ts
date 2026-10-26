@@ -185,6 +185,14 @@ export function chuCauHoi(c: CauCanSoan): string {
   ].filter(Boolean).join('\n\n')
 }
 
+/** Tin nhắn thử lại khi bản lộ đáp án ở phần học sinh thấy TRƯỚC khi nộp. */
+export function chuThuLaiLo(lyDo: string): string {
+  return `Cổng kiểm báo LỘ ĐÁP ÁN ở phần học sinh thấy trước khi nộp: ${lyDo}. Viết lại deNoiGi, soDo, thuaSo.nghia, denDay, hienTuong sao cho KHÔNG còn kết quả cuối / giá trị phương án đúng / giá trị trung gian quyết định; kết quả số chỉ nằm ở buoc[].ketQua và ketQua. Trả về TOÀN BỘ JSON mới đúng khuôn.`
+}
+/** Tin nhắn thử lại khi JSON hỏng / sai khuôn. */
+export function chuThuLaiKhuon(lyDo: string): string {
+  return `Bản vừa trả KHÔNG đọc được theo khuôn: ${lyDo}. Trả về MỘT đối tượng JSON đúng khuôn, không chữ nào ngoài JSON.`
+}
 /** Tin nhắn thử lại khi cổng kiểm báo lệch (kèm lý do). */
 export function chuThuLai(lyDo: string, giaTri?: string | number): string {
   return `Cổng kiểm báo LỆCH: ${lyDo}${giaTri !== undefined && giaTri !== '' ? ` (nhân các thừa số ra ${giaTri})` : ''}. Tính lại cẩn thận, nhân hết thừa số bước cuối phải ra đúng đáp án kho. Trả về TOÀN BỘ JSON mới đúng khuôn.`
