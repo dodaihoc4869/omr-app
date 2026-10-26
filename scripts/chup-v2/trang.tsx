@@ -739,6 +739,67 @@ const manNgang = () => h(FragmentHse, null,
     NG_V === 'kiem' ? h(ManKiemTraCaNhanNg, { token: 'tk', sbd: '12121212', id: 'kt1', onVe: noop, onCapNhat: noop } as never)
     : h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B4-9', tenCau: 'Đồng phân alcohol', onVe: noop })))
 // ═══ hết NGANG HS 26/10
+// ═══ SOÁT 26/10: cảnh cho bộ soát chữ chèn (scripts/soat-chu-chen) — các màn thầy chụp ảnh điện thoại 26/10 tối mà bộ chụp chưa có:
+//   `?man=soat-ktcn[&kt=ket]` = màn «Kiểm tra ôn tập của em» THẬT (ManKiemTraCaNhan): 28 câu, đã trả lời 10 (vòng «10/28»), 4 chặng, chặng 2 đang chạy;
+//     `&kt=ket` = đã nộp (kết quả lọc câu). Bấm «Làm tiếp chặng 2» (thao tác `nut:`) ⇒ màn làm chặng.
+//   `&soat=khong-ca` trên cảnh thầy (gv-lich-su-ca, gv-hom-nay) = máy chủ GIẢ không có ca nào đang mở (chỉ ca đã đóng).
+//   `&soat=dai` trên `ph&mot=1` = phụ huynh «Một trang» dữ liệu DÀI (tên con, tên bài, tên dạng dài; danh sách gấp ba).
+import ManKiemTraCaNhan from '../../src/components/hoc-tap/ManKiemTraCaNhan'
+const SOAT = thamSo.get('soat') ?? ''
+const soatNgay = new Date(now + 7 * 3600_000).toISOString().slice(0, 10), soatMo = Date.parse(`${soatNgay}T00:00:00+07:00`)
+const SOAT_KT = { id: 'kt-soat', ngay: soatNgay, moLuc: soatMo, hanLuc: soatMo + 86400_000, serverNow: now, trangThai: thamSo.get('kt') === 'ket' ? 'da_nop' : 'can_lam', homNay: true,
+  baiNgayToiThieu: 12, tong: 28, daTra: thamSo.get('kt') === 'ket' ? 28 : 10, con: thamSo.get('kt') === 'ket' ? 0 : 18, soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true,
+  lyDo: 'Kiểm chứng những phần em đang luyện thêm', thieuNguon: 0, diem: thamSo.get('kt') === 'ket' ? 7.75 : null, nopLuc: thamSo.get('kt') === 'ket' ? now - 3600_000 : null }
+const SOAT_CHANG = [{ stt: 0, soCau: 7, giay: 780, han: now - 1_200_000, daChot: true, daTra: 7 }, { stt: 1, soCau: 7, giay: 780, han: now + 462_000, daChot: false, daTra: 3 },
+  { stt: 2, soCau: 7, giay: 840, han: null, daChot: false, daTra: 0 }, { stt: 3, soCau: 7, giay: 840, han: null, daChot: false, daTra: 0 }]
+const SOAT_CAU = CAU_HOC.filter((c) => c.phan === 'I').concat(Array.from({ length: 6 }, (_, i) => ({ ...CAU_HOC[0]!, qid: `S${i}`, text: `Câu ${i + 2}: Thuỷ phân hoàn toàn ${(i + 2) * 4.4} gam ester đơn chức X bằng dung dịch NaOH vừa đủ, thu được muối và alcohol. Công thức của X là` })))
+const SOAT_KET = { chu: 'Em vững phần Ester – Lipid; phần Amine cần luyện thêm bậc amine và tính base.',
+  bai: [{ ten: 'Bài 6. Ester – Lipid', tong: 10, daKiem: 10, dungLanNay: 8 }, { ten: 'Bài 7. Carbohydrate (glucose, fructose, saccharose, tinh bột và cellulose)', tong: 10, daKiem: 10, dungLanNay: 7 }, { ten: 'Bài 8. Amine', tong: 8, daKiem: 8, dungLanNay: 6 }],
+  cau: Array.from({ length: 28 }, (_, i) => ({ de: SOAT_CAU[i % SOAT_CAU.length]!, tra: i === 9 ? '' : 'A', dung: ![3, 9, 15, 20, 22, 27].includes(i), dapAn: 'A', loiGiai: null })) }
+if (man === 'soat-ktcn') {
+  const fetchKt = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    if (url.includes('hoc-tap-ktcn-trang-thai')) return tra({ ok: true, kiemTra: SOAT_KT, chang: SOAT_CHANG })
+    if (url.includes('hoc-tap-ktcn-start')) return tra({ ok: true, kiemTra: SOAT_KT, revision: 3, hanChang: now + 462_000, daChot: false, questions: SOAT_CAU.slice(0, 7), tra: { [SOAT_CAU[0]!.qid]: 'A', [SOAT_CAU[1]!.qid]: 'B' } })
+    if (url.includes('hoc-tap-ktcn-ket-qua')) return tra({ ok: true, kiemTra: SOAT_KT, ketQua: SOAT_KET })
+    if (url.includes('hoc-tap-ktcn-')) return tra({ ok: true, kiemTra: SOAT_KT, revision: 4, daLuu: true })
+    return fetchKt(input, init)
+  }
+}
+if (SOAT === 'khong-ca' && man.startsWith('gv-')) {
+  const fetchCa = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    let b: Record<string, unknown> = {}
+    try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
+    if (b.action === 'danhSachCa') return new Response(JSON.stringify({ ok: true, items: b.daXoa ? [] : CA_GIA.filter((c) => c.trangThai !== 'mo') }), { status: 200, headers: { 'content-type': 'application/json' } })
+    return fetchCa(input, init)
+  }
+}
+if (SOAT === 'dai' && MOT_PH) {
+  const fetchPh = window.fetch
+  const DUOI = ' · Thuỷ phân ester và xà phòng hoá chất béo (ôn tập tổng hợp)'
+  const keoDai = (x: unknown, khoa = ''): unknown => {
+    if (Array.isArray(x)) return (['dangChay', 'canhBaoThay', 'bacTheoDang', 'vuaLenBac', 'nhanXet'].includes(khoa) ? [...x, ...x, ...x] : x).map((o, i) => {
+      const v = keoDai(o) as Record<string, unknown>
+      if (i < x.length || !v || typeof v !== 'object') return v
+      return Object.fromEntries(Object.entries(v).map(([k, g]) => [k, ['id', 'ma', 'maBtvn', 'maCa'].includes(k) && typeof g === 'string' ? `${g}-${i}` : g]))
+    })
+    if (!x || typeof x !== 'object') return x
+    return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, typeof v === 'string'
+      ? k === 'hoTen' ? 'Nguyễn Ngọc Minh Khôi Nguyên' : ['ten', 'tenBtvn', 'tenCa', 'tieuDe'].includes(k) ? v + DUOI : k === 'noiDung' ? `${v} ${v}` : v
+      : keoDai(v, k)]))
+  }
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const r = await fetchPh(input, init)
+    if (!new URL(url, location.href).pathname.includes('/ph/')) return r
+    try { return new Response(JSON.stringify(keoDai(await r.clone().json())), { status: r.status, headers: { 'content-type': 'application/json' } }) } catch { return r }
+  }
+}
+const manSoatKtcn = () => h(ManKiemTraCaNhan, { token: 'tk', sbd: '12121212', id: 'kt-soat', onVe: noop, onCapNhat: noop })
+// ═══ hết SOÁT 26/10
 if (['dao', 'doan', 'de-thu', 'than-thu', 'cua-hang'].includes(man)) throw Error('Cảnh Game đã ngừng: ' + man)
 
 const MAN_THAY: Record<string, string> ={ 'gv-len-bang': 'goilenbang', 'gv-toan-canh':'hocsinh', 'gv-giao-btvn':'giaobtvn', 'gv-giao-tuan':'khodegiao', 'gv-lich-su-ca':'lichsuca', 'gv-hs-hoi':'cauhoi', 'gv-theo-doi':'lichsuca', 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
@@ -777,6 +838,7 @@ const con =
   man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-mot' ? manMotTrang() : // MỘT TRANG HS 26/10
   man === 'hs-ng' ? manNgang() : // NGANG HS 26/10
+  man === 'soat-ktcn' ? manSoatKtcn() : // ═══ SOÁT 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   PH_VAO ? h(BatLinhShell, { vai: 'ph' }, h(ParentPortalScreen)) : // NGANG PH 26/10
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
