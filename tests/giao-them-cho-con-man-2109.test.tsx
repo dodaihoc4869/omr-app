@@ -10,6 +10,7 @@ import GiaoThemChoCon from '../src/components/bang-nhiem-vu/GiaoThemChoCon'
 import { chuGoiGanNhat, chuLuot, chuThanhPhan, docKetQuaGiaoThem, theTuChoi, theXacNhan } from '../src/lib/giao-them-hien-thi'
 import { phGiaoThemApi } from '../src/lib/giao-them-api'
 import { useGiaoThem, type ViewGiaoThem } from '../src/lib/use-giao-them'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 configure({ asyncUtilTimeout: 8000 })
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))

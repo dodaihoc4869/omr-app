@@ -9,6 +9,7 @@ import { chuGiay, docConTongQuan, nhanKhoangGiay, tiLeDung } from '../src/lib/ph
 import { chuTrangThaiNgay } from '../src/components/ph-v3/ConTongQuan'
 import { PH_OK } from './_ph-moi/du-lieu-mau'
 import { conTongQuanGia } from '../scripts/chup-v2/gia/ph-con-tong-quan'
+import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))

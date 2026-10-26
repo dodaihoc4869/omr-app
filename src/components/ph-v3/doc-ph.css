@@ -166,3 +166,6 @@
   [data-trong=ph] .pd-cach { padding: 6px 10px; }
   [data-trong=ph] .pd-cach b { font-size: 14px; }
 }
+/* thẻ lỗi tải (LoiThe, lớp .tvc-loi) — kiểu của trang cũ nay nạp lười cùng TrangVeCon (26/10) ⇒ màn chỉ đọc tự mang kiểu y như cũ */
+[data-trong=ph] .pd .tvc-loi { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px; border-radius: var(--r-vua); border: 1px solid var(--ph3-vien); }
+[data-trong=ph] .pd .tvc-loi p { flex: 1 1 200px; min-width: 0; font-size: var(--t-than); overflow-wrap: anywhere; }
