@@ -18,12 +18,12 @@
 //   · Không chạy 19–24h giờ VN (giờ cao điểm, DAC-TA mục 6) trừ khi `choChayGioCaoDiem`.
 import type { D1PreparedStatement, Env } from './kieu'
 import type { BanSoDo, BuocTinh, HienTuong, KetQuaCong, NutSoDo, SoDo, ThuaSo } from '../../src/lib/goi-y-cham/kieu'
-import { docSo, kiemCong } from './so-do-cong'
+import { LY_DO_THIEU_SO_DO, docSo, kiemCong } from './so-do-cong'
 import { suaDapAnKho } from './sua-dap-an-kho'
 import { quaTram } from './tram-gemini'
 import { docCauEmSai } from './hoc-lieu-may-soan'
 import { laCauTuLuan, laMotSoPhanIII } from '../../src/lib/cau-tu-luan'
-import { PHIEN_BAN_SO_DO, chuCauHoi, chuCauHoiMu, chuThuLai, chuThuLaiKhuon, chuThuLaiLo, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
+import { PHIEN_BAN_SO_DO, chuCauHoi, chuCauHoiMu, chuThuLai, chuThuLaiKhuon, chuThuLaiLo, chuThuLaiThieu, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -115,11 +115,28 @@ const MODEL_DU_PHONG: readonly string[] = ['gemini-3.5-flash-lite', 'gemini-flas
 export const MODEL_MANH = 'gemini-pro-latest'
 /** Số lượt tối đa cho MỘT câu: lượt sau đọc lý do lệch / lộ / hỏng khuôn của lượt trước. */
 export const SO_LUOT_MOT_CAU = 4
+/** Câu vòng sửa soạn lại: lệch / lộ, và câu tính bị trả THIẾU sơ đồ / bước tính (27/10). Chuỗi hằng, không chèn dữ liệu ngoài. */
+export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND ly_do = '${LY_DO_THIEU_SO_DO}')`
 const RE_CHAN_VI_TRI = /location is not supported/i
 const ngu = (ms: number) => new Promise((ok) => setTimeout(ok, ms))
 
 /** Bộ gọi Gemini RIÊNG cho lô (không dùng chung `goiMotModel` của Hỏi thầy: bộ ấy có gọi kép 8 s, trần 25 s và nhớ «lược đồ cũ» toàn isolate
  *  — một lần Google từ chối lược đồ ở lô sẽ đổi khuôn Hỏi thầy của học sinh thật trong 10 phút). Dùng chung trạm vượt chặn vị trí `quaTram`. */
+/** Nhãn hạn mức từ thân lỗi Gemini (27/10): ` [quota=<quotaId>; retry=<giây>s]` — chỉ mã hạn mức + số giây, không có chữ của câu. Máy soạn cron đọc
+ *  để phân biệt hết hạn mức NGÀY (nghỉ tới giờ cấp lại) với hạn mức PHÚT / Gemini quá tải (co số câu song song). */
+export function nhanHanMuc(j: unknown): string {
+  const ct = ((j as Obj | null)?.error as Obj | undefined)?.details
+  if (!Array.isArray(ct)) return ''
+  let quota = ''
+  let retry = ''
+  for (const d of ct as Obj[]) {
+    for (const v of (Array.isArray(d?.violations) ? d.violations : []) as Obj[]) if (!quota) quota = str(v?.quotaId).replace(/[^\w-]/g, '').slice(0, 80)
+    const m = /^(\d+)(?:\.\d+)?s$/.exec(str(d?.retryDelay))
+    if (m && !retry) retry = m[1]!
+  }
+  return quota || retry ? ` [quota=${quota || '?'}; retry=${retry || '?'}s]` : ''
+}
+
 export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
   const key = str(env.GEMINI_API_KEY)
   const tram = env.TRAM_GEMINI ? quaTram(env.TRAM_GEMINI) : null
@@ -132,7 +149,7 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
       let r = await fetch(url, init)
       if (tram && r.status === 400 && RE_CHAN_VI_TRI.test(await r.clone().text().catch(() => ''))) r = await tram(url, init)
       const j = (await r.json().catch(() => null)) as Obj | null
-      if (!r.ok) return { ok: false, http: r.status, loi: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 160)}` }
+      if (!r.ok) return { ok: false, http: r.status, loi: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 160)}${nhanHanMuc(j)}` }
       const ung = (j?.candidates as Obj[] | undefined)?.[0]
       const chu = (((ung?.content as Obj | undefined)?.parts as Obj[] | undefined) ?? []).filter((p) => p.thought !== true).map((p) => str(p.text)).join('').trim()
       const u = (j?.usageMetadata ?? {}) as Obj
@@ -270,7 +287,7 @@ function docThamSo(t: unknown): ThamSoDayDu | string {
   if (model && !/^[a-z0-9][a-z0-9.\-]{2,60}$/i.test(model)) return 'model không hợp lệ'
   return {
     ...(qids ? { qids } : {}), gioiHan: kep(o.gioiHan, 10, 1, 50), chiCauSaiNhieu: o.chiCauSaiNhieu === true, thuKhong: o.thuKhong === true,
-    conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 8),
+    conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 24), // trần 8 ⇒ 24 (thầy 27/10 «24 câu luôn»)
     nganSachGiay: kep(o.nganSachGiay, 40, 5, 110), soEmToiThieu: kep(o.soEmToiThieu, SO_EM_SAI_TOI_THIEU, 1, 1000), choChayGioCaoDiem: o.choChayGioCaoDiem === true,
     chiSuaLoi: o.chiSuaLoi === true, ...(o.chiPhan === 'I' || o.chiPhan === 'III' ? { chiPhan: o.chiPhan } : {}), ...(o.chiSuaLoi === true ? { lamLai: true } : {}), tuSuaDapAn: o.tuSuaDapAn !== false,
   }
@@ -297,7 +314,7 @@ async function gomHang(env: Env, ts: ThamSoDayDu, het: () => boolean): Promise<{
   // Nguồn DANH SÁCH: qid thầy chỉ định, hoặc câu nhiều em sai (≥ soEmToiThieu em, nhiều trước).
   let ds: string[] | null = ts.qids ?? null
   if (!ds && ts.chiSuaLoi) {
-    const r = await env.DB.prepare("SELECT qid FROM loi_giai_so_do WHERE cong IN ('lech', 'lo_dap_an') ORDER BY qid").all<Obj>().catch(() => ({ results: [] as Obj[] }))
+    const r = await env.DB.prepare(`SELECT qid FROM loi_giai_so_do WHERE ${SQL_CAN_SUA} ORDER BY qid`).all<Obj>().catch(() => ({ results: [] as Obj[] }))
     ds = (r.results ?? []).map((x) => str(x.qid)).filter(Boolean)
   }
   if (!ds && ts.chiCauSaiNhieu) {
@@ -378,6 +395,9 @@ async function soanMotCau(q: CauKho, ts: ThamSoDayDu, goi: GoiMoHinh, cong: Kiem
   const luot: LuotHoi[] = [{ vai: 'user', chu: chuCauHoi(q) }]
   const ctx = { phan: q.phan, dapAn: q.correct, luaChon: q.choices }
   const HANG: Record<string, number> = { dat: 3, khong_kiem_duoc: 2, lo_dap_an: 1, lech: 0 }
+  // Bản THIẾU sơ đồ / bước tính (27/10) xếp dưới cả `lech`: vô dụng làm lời giải; `lech` còn được giải mù + vòng sửa.
+  const thieuSoDo = (b: { ket: string; lyDo?: string }) => b.ket === 'khong_kiem_duoc' && b.lyDo === LY_DO_THIEU_SO_DO
+  const hang = (b: { ket: string; lyDo?: string }) => (thieuSoDo(b) ? -1 : HANG[b.ket] ?? -1)
   let tot: { ban: BanSoDo; ket: KetQuaCong; lyDo?: string; giaTri?: string; model: string; lan: number } | null = null
   let loiCuoi: DongKetQua | null = null
   for (let lan = 1; lan <= SO_LUOT_MOT_CAU; lan++) {
@@ -394,11 +414,12 @@ async function soanMotCau(q: CauKho, ts: ThamSoDayDu, goi: GoiMoHinh, cong: Kiem
     const c = await cong(doc.ban, ctx)
     const giaTri = c.giaTri === undefined || c.giaTri === null ? undefined : String(c.giaTri).slice(0, 40)
     const ban = { ban: doc.ban, ket: c.ket, ...(c.lyDo ? { lyDo: str(c.lyDo).slice(0, 300) } : {}), ...(giaTri ? { giaTri } : {}), model: kq.model, lan }
-    if (!tot || (HANG[ban.ket] ?? -1) > (HANG[tot.ket] ?? -1)) tot = ban
-    if (c.ket === 'dat' || c.ket === 'khong_kiem_duoc') break
+    if (!tot || hang(ban) > hang(tot)) tot = ban
+    if (c.ket === 'dat' || (c.ket === 'khong_kiem_duoc' && !thieuSoDo(ban))) break
     luot.push({ vai: 'model', chu: kq.chu }, {
       vai: 'user',
-      chu: c.ket === 'lo_dap_an' ? chuThuLaiLo(ban.lyDo ?? 'phần trước nộp chứa đáp án') : chuThuLai(ban.lyDo ?? 'tích các thừa số không ra đáp án kho', giaTri),
+      chu: thieuSoDo(ban) ? chuThuLaiThieu()
+        : c.ket === 'lo_dap_an' ? chuThuLaiLo(ban.lyDo ?? 'phần trước nộp chứa đáp án') : chuThuLai(ban.lyDo ?? 'tích các thừa số không ra đáp án kho', giaTri),
     })
   }
   if (!tot) return { dong: loiCuoi ?? { qid: q.qid, ket: 'loi_goi', lyDo: 'không gọi được mô hình', lanThu: 1 }, token }

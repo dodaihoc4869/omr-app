@@ -1,8 +1,11 @@
 // LINH VẬT «Bi» (thầy chốt 26/10, bản vẽ ve-moi/linh-vat/bi.js): bình cầu thuỷ tinh, dung dịch ĐỔI MÀU theo cảm xúc như chất chỉ thị.
 // SVG nội tuyến vẽ lại đúng hình bản duyệt (viewBox 0 0 200 230). KHÔNG có màu thô: mọi màu là lớp CSS trong bi.css, lấy từ biến --tr-* của app học sinh
 // (vui/chào → --tr-dung, nghĩ → --tr-tin, sai → --tr-sai, mừng → --tr-sao, lửa → --tr-chu-y, ngủ → --tr-chu-3). Đổi `cam` ⇒ dung dịch đổi màu dần 400 ms.
+// CHUYỂN ĐỘNG (thầy 27/10, học cú Duo): vẽ Bi tĩnh trước, rồi nạp LƯỜI mảnh ./bi-dong (không vào nhóm mở app) và thay bằng Bi chuyển động:
+// thở + chớp mắt + đảo mắt, mắt dõi ngón tay, chạm thì phản ứng; cảm xúc ánh xạ theo TT_THEO_CAM. Giảm chuyển động / máy yếu ⇒ giữ Bi tĩnh, không nạp.
 // Chỉ dùng trong app học sinh «Trong» (không ở màn thi, đăng nhập, app thầy, app phụ huynh). aria-hidden: chữ đi kèm đã nói đủ nghĩa.
-import { useId, type CSSProperties } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
+import type { BiDong, TrangThaiBi, TuyChonBi } from './bi-dong'
 import '../../styles/bi.css'
 
 export type CamBi = 'chao' | 'vui' | 'nghi' | 'sai' | 'mung' | 'ngu' | 'lua'
@@ -64,6 +67,24 @@ function Tren({ cam }: { cam: CamBi }) {
   return null
 }
 
+/** Cảm xúc ⇒ trạng thái Bi chuyển động: đúng ⇒ mừng nhảy, sai ⇒ buồn, chưa tính ⇒ nghĩ (nghiêng đầu), xong bài ⇒ nhảy múa, chuỗi ⇒ bên ngọn lửa. */
+export const TT_THEO_CAM: Record<CamBi, TrangThaiBi> = { chao: 'chao', vui: 'dung', nghi: 'nghieng', sai: 'sai', mung: 'nhay-mua', ngu: 'ngu', lua: 'chuoi' }
+/** Nhịp 'yen' (Bi nhỏ trên thanh): không màn vào, mừng chỉ vui nhẹ, chào chỉ đứng thở. */
+const TT_YEN: Partial<Record<CamBi, TrangThaiBi>> = { chao: 'yen', vui: 'vui', mung: 'vui' }
+export function ttTheoCam(cam: CamBi, nhip?: PropsBi['nhip']): [TrangThaiBi, TuyChonBi] {
+  if (nhip === 'yen') return [TT_YEN[cam] ?? TT_THEO_CAM[cam], cam === 'lua' ? { em: true, gon: true } : { em: true }]
+  if (cam === 'mung') return ['nhay-mua', { sau: 3600, ve: 'vui' }] // nhảy múa một hồi rồi vui đứng thở
+  if (cam === 'chao') return ['chao', { lan: 3 }]
+  if (cam === 'lua') return ['chuoi', { gon: true }] // lửa nhỏ sát vai như Bi tĩnh: không tràn sang chữ trong thẻ chuỗi
+  return [TT_THEO_CAM[cam], {}]
+}
+/** Bi đứng yên, không nạp mảnh chuyển động: giảm chuyển động, máy yếu, hoặc môi trường không có Web Animations. */
+export function biDungYen(): boolean {
+  if (typeof window === 'undefined' || typeof Element === 'undefined' || typeof Element.prototype.animate !== 'function') return true
+  return document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+}
+let moDong: typeof import('./bi-dong') | null = null
+
 export interface PropsBi {
   cam?: CamBi
   /** Cạnh rộng (px); cao tự theo tỉ lệ 200 : 230. */
@@ -71,10 +92,39 @@ export interface PropsBi {
   className?: string
   /** Nhịp một lần khi vừa hiện: 'nay' (đúng), 'lac' (sai), 'nhay' (mừng). Mặc định theo cảm xúc. */
   nhip?: 'nay' | 'lac' | 'nhay' | 'yen'
+  /** Câu Bi đang nói: Bi chuyển động mấp máy miệng khớp chữ (bong bóng lời do màn tự vẽ). */
+  noi?: string
 }
 
-export function Bi({ cam = 'chao', size = 96, className, nhip }: PropsBi) {
-  const id = 'bi' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
+function BiChuyenDong({ cam, size, className, nhip, noi }: PropsBi & { cam: CamBi; size: number }) {
+  const o = useRef<HTMLSpanElement>(null), bi = useRef<BiDong | null>(null), dau = useRef(true)
+  useEffect(() => {
+    if (!moDong || !o.current) return
+    const [trangThai, tuyChon] = ttTheoCam(cam, nhip)
+    const b = moDong.taoBi(o.current, { trangThai, tuyChon })
+    if (noi) b.noi(noi, { nhip: 40 })
+    bi.current = b
+    return () => { b.huy(); bi.current = null }
+  }, []) // tạo một lần; đổi cảm xúc đi qua datTrangThai để chuyển mượt
+  useEffect(() => {
+    if (dau.current) { dau.current = false; return }
+    const [t, tc] = ttTheoCam(cam, nhip)
+    bi.current?.datTrangThai(t, tc)
+    if (noi) bi.current?.noi(noi, { nhip: 40 })
+  }, [cam, nhip, noi])
+  return <span ref={o} className={`bi bi-dong${className ? ` ${className}` : ''}`} data-cam={cam} aria-hidden="true" style={{ width: size, height: Math.round((size * 230) / 200) }} />
+}
+
+export function Bi({ cam = 'chao', size = 96, className, nhip, noi }: PropsBi) {
+  const id = 'bi' + useId().replace(/[^a-zA-Z0-9_-]/g, '') // gọi TRƯỚC lối rẽ sang Bi chuyển động: thứ tự hook không đổi giữa hai lần vẽ
+  const [dong, setDong] = useState(() => !!moDong && !biDungYen())
+  useEffect(() => {
+    if (dong || biDungYen()) return
+    let con = true
+    import('./bi-dong').then((m) => { moDong = m; if (con) setDong(true) }, () => {})
+    return () => { con = false }
+  }, [dong])
+  if (dong) return <BiChuyenDong cam={cam} size={size} className={className} nhip={nhip} noi={noi} />
   const y = MUC[cam] ?? 108
   const song = `M20 ${y} Q40 ${y - 8} 60 ${y} T100 ${y} T140 ${y} T180 ${y}`
   const nhipMd = nhip ?? (cam === 'vui' ? 'nay' : cam === 'sai' ? 'lac' : cam === 'mung' ? 'nhay' : 'yen')

@@ -209,6 +209,44 @@ describe('soạn lô', () => {
     expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat' })
   })
 
+  it('27/10: câu tính trả THIẾU sơ đồ / bước ⇒ thử lại kèm lời dặn bắt soạn phép tính; vẫn thiếu ⇒ lưu, vòng sửa lấy lại', async () => {
+    const thieu = { ket: 'khong_kiem_duoc' as const, lyDo: 'Câu tính thiếu sơ đồ hoặc bước tính.' }
+    const mh = moHinhGia((h) => chuMau(h))
+    let n = 0
+    const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: vi.fn(() => (++n === 1 ? thieu : { ket: 'dat' as const })) })
+    expect(mh.fn).toHaveBeenCalledTimes(2)
+    expect(mh.goi[1]!.luot[2]!.chu).toContain('BÀI TÍNH TOÁN')
+    expect(j.dem.dat).toBe(1)
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat', so_lan: 2 })
+    // thiếu mãi ⇒ 4 lượt, lưu `khong_kiem_duoc` kèm đúng lý do ⇒ vòng sửa `chiSuaLoi` soạn lại câu ấy
+    const mh2 = moHinhGia((h) => chuMau(h))
+    await goiLo({ qids: [Q.III2] }, { goiMoHinh: mh2.fn, kiemCong: vi.fn(() => thieu) })
+    expect(mh2.fn).toHaveBeenCalledTimes(4)
+    expect(dongSoDo(Q.III2)).toMatchObject({ cong: 'khong_kiem_duoc', ly_do: thieu.lyDo })
+    const mh3 = moHinhGia((h) => chuMau(h))
+    const { j: j3 } = await goiLo({ chiSuaLoi: true }, { goiMoHinh: mh3.fn, kiemCong: vi.fn(() => ({ ket: 'dat' as const })) })
+    expect(mh3.fn).toHaveBeenCalledTimes(1)
+    expect(j3.dem.dat).toBe(1)
+    expect(dongSoDo(Q.III2)).toMatchObject({ cong: 'dat' })
+  })
+
+  it('27/10: bản thiếu sơ đồ xếp dưới `lech` (lệch còn được giải mù), «không kiểm được» lý do khác vẫn dừng ngay', async () => {
+    const mh = moHinhGia((h) => chuMau(h))
+    let n = 0
+    await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: vi.fn(() => (++n === 1 ? { ket: 'khong_kiem_duoc' as const, lyDo: 'Câu tính thiếu sơ đồ hoặc bước tính.' } : { ket: 'lech' as const, lyDo: 'tích ra 70', giaTri: 70 })) })
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'lech' })
+    const mh2 = moHinhGia((h) => chuMau(h))
+    await goiLo({ qids: [Q.III2] }, { goiMoHinh: mh2.fn, kiemCong: vi.fn(() => ({ ket: 'khong_kiem_duoc' as const, lyDo: 'Phần II chưa kiểm số (v1).' })) })
+    expect(mh2.fn).toHaveBeenCalledTimes(1)
+  })
+
+  it('27/10: nhãn hạn mức Gemini chỉ lấy mã hạn mức + giây chờ', () => {
+    const j = { error: { message: 'x', details: [{ '@type': 'QuotaFailure', violations: [{ quotaId: 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', quotaMetric: 'm' }] }, { '@type': 'RetryInfo', retryDelay: '12.5s' }] } }
+    expect(M.nhanHanMuc(j)).toBe(' [quota=GenerateRequestsPerDayPerProjectPerModel-FreeTier; retry=12s]')
+    expect(M.nhanHanMuc({ error: { message: 'x' } })).toBe('')
+    expect(M.nhanHanMuc(null)).toBe('')
+  })
+
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III, Q.I], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
