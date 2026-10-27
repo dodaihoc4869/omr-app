@@ -104,3 +104,9 @@
 [data-trong='hs'] .bi .bi-g-kinh-2 { stop-color: var(--bi-trang); }
 [data-trong='hs'] .bi .bi-bong { fill: var(--bi-net-mau); }
 [data-trong='hs'] .bi .bi-ma { fill: color-mix(in oklab, var(--tr-sai) 45%, var(--bi-trang)); }
+/* nền tối: dung dịch sáng lên một chút (pha trắng ngà 12%) + viền đậm ít hơn ⇒ Bi vẫn tươi, không chìm vào nền #131F24 */
+@media (prefers-color-scheme: dark) {
+  [data-trong='hs'] .bi { --bi-tuoi: color-mix(in oklab, var(--bi-c) 88%, var(--bi-trang)); --bi-net-mau: color-mix(in oklab, var(--bi-c) 72%, var(--bi-vien)); --bi-dam: color-mix(in oklab, var(--bi-c) 88%, var(--bi-vien)); }
+  [data-trong='hs'] .bi :is(.bi-g-sang, .bi-g-chinh, .bi-g-dam) { stop-color: var(--bi-tuoi); }
+  [data-trong='hs'] .bi .bi-net-c { stroke: var(--bi-tuoi); }
+}

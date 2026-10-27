@@ -59,3 +59,7 @@
   --bi-dam: color-mix(in oklab, var(--bi-c) 80%, var(--bi-vien));
   --bi-sang: color-mix(in oklab, var(--bi-c) 45%, var(--bi-trang));
 }
+@media (prefers-color-scheme: dark) {
+  [data-trong='hs'] .bi-dong svg { --bi-tuoi: color-mix(in oklab, var(--bi-c) 88%, var(--bi-trang)); --bi-net-mau: color-mix(in oklab, var(--bi-c) 72%, var(--bi-vien)); --bi-dam: color-mix(in oklab, var(--bi-c) 88%, var(--bi-vien)); }
+  [data-trong='hs'] .bi-dong .bd-mi-f { fill: var(--bi-tuoi); }
+}
