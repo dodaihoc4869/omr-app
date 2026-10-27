@@ -29,8 +29,8 @@ export interface CuocDang { dat: number; ngay: number }
 export interface TongQuanThuong {
   bat: CongTac
   nguyenTuHomNay?: number; tinhThe?: number
-  /** `cau` = mức câu hôm nay (vd. 96 câu = 16 chặng) — máy chủ gửi khi đã chốt mức. */
-  mucTieu?: { daXong: number; can: number; cau?: number }
+  /** `daXong/can` = chặng (máy chủ cũ) · `cau` = mức câu hôm nay · `cauDaLam` = câu đã làm (cùng số thẻ «Đủ x/y câu») · `dat` = máy chủ đã xét đạt. */
+  mucTieu?: MucTieuNgay
   chuoiNgay?: ChuoiNgay
   nhiemVu?: NhiemVu[]
   ruong?: { mo: boolean; thuong: number }
@@ -51,10 +51,20 @@ export interface DanhSachBan { ban: BanHoc[]; loiMoi: NguoiMoi[]; /** lời mờ
 export interface KetQuaTim { ma: string; ten: string; lop: string; sbd?: string; trangThai: 'ban' | 'da_moi' | 'moi_em' | null }
 /** Phần thưởng của MỘT câu (trường `thuong` trong phản hồi lệnh `answer`). tinh = false ⇒ câu không được tính (tấm trung tính). */
 export interface ThuongCau { tinh: boolean; nguyenTu: number; dong: { nhan: string; so: number }[]; chuoiDung: number; cauKho: boolean }
+export interface MucTieuNgay { daXong: number; can: number; cau?: number; cauDaLam?: number; dat?: boolean }
+/**
+ * VÒNG MỤC TIÊU NGÀY — MỘT THƯỚC ĐO VỚI THẺ «Đủ x/y câu hôm nay!» (thầy 27/10: vòng «8/16 chặng» cạnh thẻ «Đủ 93/92 câu»). Có mức câu + số câu đã làm ⇒
+ * tính bằng CÂU; không có (máy chủ cũ / chưa chốt mức) ⇒ lùi về chặng.
+ */
+export function vongMucTieu(mt: MucTieuNgay | undefined): { da: number; can: number; donVi: 'câu' | 'chặng'; dat: boolean } | null {
+  if (!mt) return null
+  const c = mt.cau && mt.cauDaLam !== undefined, da = c ? mt.cauDaLam! : mt.daXong, can = c ? mt.cau! : mt.can
+  return { da, can, donVi: c ? 'câu' : 'chặng', dat: da >= can }
+}
 /** Tổng kết bài (trường `ketBai`, có ở câu cuối của bài / chặng). */
 export interface KetBai {
   tong: number; dong: { nhan: string; so: number }[]; soDung: number; soCau: number; chinhXac: number; giay: number; hoanHao: boolean
-  mucTieu?: { daXong: number; can: number }
+  mucTieu?: MucTieuNgay
   giai?: { thuHang: number; doi: number }
 }
 export interface CauKimCuong { qid: string; phan: 'I' | 'II' | 'III'; text: string; choices: string[]; ideas: string[]; tenDang?: string }
@@ -123,7 +133,8 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
   const kq: TongQuanThuong = { bat: docCongTac(o.bat), thongBao: mang(o.thongBao, docThongBao) ?? [] }
   const nt = soNg(o.nguyenTuHomNay); if (nt !== undefined) kq.nguyenTuHomNay = nt
   const tt = soNg(o.tinhThe); if (tt !== undefined) kq.tinhThe = tt
-  const mt = dt(o.mucTieu), dx = soNg(mt?.daXong), can = soNg(mt?.can), mc = soNg(mt?.cau); if (dx !== undefined && can) kq.mucTieu = { daXong: dx, can, ...(mc ? { cau: mc } : {}) }
+  const mt = dt(o.mucTieu), dx = soNg(mt?.daXong), can = soNg(mt?.can), mc = soNg(mt?.cau), cd = soNg(mt?.cauDaLam)
+  if (dx !== undefined && can) kq.mucTieu = { daXong: dx, can, ...(mc && cd !== undefined ? { cau: mc, cauDaLam: cd } : {}) }
   const cn = docChuoiNgay(o.chuoiNgay); if (cn) kq.chuoiNgay = cn
   const nv = mang(o.nhiemVu, docNhiemVu); if (nv?.length) kq.nhiemVu = nv
   const r = dt(o.ruong), rt = soNg(r?.thuong); if (r && rt !== undefined) kq.ruong = { mo: r.mo === true, thuong: rt }

@@ -5,6 +5,7 @@ import { lazy, Suspense, useEffect, useId, useLayoutEffect, useRef, useState, ty
 import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
+import { chuViecBai } from './chu-viec-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
@@ -542,7 +543,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {/* THẺ BÀI (thầy 27/10 «thu vào bị giật… cho thanh màu xanh xuống kẻo chèn vào ống nghiệm»): thẻ đầy đủ ĐỨNG YÊN trong luồng (giữ chỗ, không nhảy cuộn);
           cuộn qua ⇒ DẢI GỌN 54px (tên bài · thanh mảnh · chặng) dính dưới hàng bộ đếm, cross-fade opacity + translateY 200 ms; sau dải là nền trang đặc + mép mờ
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
-      {!p.ngayKiem && <section className="da-bai" aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{p.viec}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
+      {!p.ngayKiem && <section className="da-bai" aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{chuViecBai(p.viec, so)}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
         {chang.length > 0 && <div className="da-bai-tien" role="progressbar" aria-label="Chặng hôm nay" aria-valuemin={0} aria-valuemax={chang.length} aria-valuenow={xongChang}><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</div>}
         {!so && p.dangTai && <span className="mot-xuong" aria-hidden="true" />}</section>}
       {!p.ngayKiem && <i ref={mocBai} className="da-bai-moc" aria-hidden="true" />}
