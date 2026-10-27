@@ -39,7 +39,7 @@ export interface TongQuanThuong {
   thongBao: ThongBao[]
   cuoc?: CuocDang | null
   /** Luật bình 27/10: giá + đã mua bình tuần này chưa (mỗi tuần mua 1 bình). Máy chủ cũ không gửi ⇒ vắng (giá mặc định GIA_BINH). */
-  binh?: { gia: number; daMuaTuan: boolean; muaTiepTu?: string }
+  binh?: { gia: number; daMuaTuan: boolean; muaTiepTu?: string; /** nguồn bình của tuần: mua · qua (quà mốc 30 ngày) */ nguon?: 'mua' | 'qua' }
   /** Thầy tạm đóng app học sinh (27/10, `cau_hinh.hs_tam_dong`). Chỉ có khi đang đóng; máy chủ cũ / đang mở ⇒ vắng. */
   tamDong?: true
 }
@@ -144,7 +144,7 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
   const cn = docChuoiNgay(o.chuoiNgay); if (cn) kq.chuoiNgay = cn
   const nv = mang(o.nhiemVu, docNhiemVu); if (nv?.length) kq.nhiemVu = nv
   const r = dt(o.ruong), rt = soNg(r?.thuong); if (r && rt !== undefined) kq.ruong = { mo: r.mo === true, thuong: rt }
-  const b = dt(o.binh), bg = soNg(b?.gia), bt = chu(b?.muaTiepTu); if (b && bg) kq.binh = { gia: bg, daMuaTuan: b.daMuaTuan === true, ...(bt ? { muaTiepTu: bt } : {}) }
+  const b = dt(o.binh), bg = soNg(b?.gia), bt = chu(b?.muaTiepTu); if (b && bg) kq.binh = { gia: bg, daMuaTuan: b.daMuaTuan === true, ...(bt ? { muaTiepTu: bt } : {}), ...(b.nguon === 'mua' || b.nguon === 'qua' ? { nguon: b.nguon } : {}) }
   const g = dt(o.giai), th = soNg(g?.thuHang), sn = soNg(g?.soNguoi), hh = soNg(g?.hetHanGiay)
   if (g && laHang(g.hang) && th && sn && hh !== undefined) kq.giai = { hang: g.hang, thuHang: th, soNguoi: sn, hetHanGiay: hh }
   if (o.cuoc === null) kq.cuoc = null
@@ -366,6 +366,10 @@ export const giaBinh = (tq?: Pick<TongQuanThuong, 'binh'> | null): number => tq?
 export const chuGiaBinh = (gia: number): string => `${gia} tinh thể · mỗi tuần mua 1 bình`
 /** Lý do nút mua xám khi tuần này đã mua. */
 export const CHU_DA_MUA_TUAN = 'Tuần này em đã mua · mua tiếp từ thứ Hai'
+/** Bình của tuần là QUÀ mốc 30 ngày (trần chung 1 bình/tuần) — nút vẫn xám. */
+export const CHU_DA_NHAN_QUA_TUAN = 'Tuần này em đã nhận 1 bình (quà mốc 30 ngày) · mua tiếp từ thứ Hai'
+/** Lý do nút mua xám đúng nguồn bình của tuần. */
+export const chuDaCoBinhTuan = (tq?: Pick<TongQuanThuong, 'binh'> | null): string => (tq?.binh?.nguon === 'qua' ? CHU_DA_NHAN_QUA_TUAN : CHU_DA_MUA_TUAN)
 export const DAT_CUOC = 50
 /** «còn 2 ngày 5 giờ» từ số giây còn lại. */
 export function chuConLai(giay: number): string {
