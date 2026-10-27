@@ -338,6 +338,8 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
     const { mucDangSang } = await import('../src/components/ThanhBenTrai')
     expect(mucDangSang('toancanh')).toBe('examhub')
     const app = (await import('../src/App.tsx?raw')).default
-    expect(app).toContain("screen === 'toancanh' && <ToanCanhEmScreen />")
+    // 26/10: màn một-thành-phần gộp vào bảng MAN_DON (mã màn ⇒ màn) dựng bằng `{ManDon && <ManDon />}` — Toàn cảnh vẫn có màn.
+    expect(app).toMatch(/const MAN_DON[\s\S]*toancanh: ToanCanhEmScreen/)
+    expect(app).toContain('{ManDon && <ManDon />}')
   })
 })

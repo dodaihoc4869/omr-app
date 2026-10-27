@@ -49,6 +49,9 @@ export const BANG_XOA_HOA2: readonly string[] = [
   'bi_a_ghe', 'bi_a_van', 'bi_a_moi', 'bi_a_co_mat', 'bi_a_diem_ban',
   // THƯỞNG PHẠT (migration-2610-thuong-phat.sql, 26/10): nhiệm vụ, rương, huy hiệu, cược, Kim cương, thông báo, bài xong — trạng thái chơi đi cùng sổ tinh thể `vang_so` (XOÁ) ⇒ về 0.
   'nhiem_vu_ngay', 'ruong_ngay', 'huy_hieu_em', 'cuoc_chuoi', 'kim_cuong_phien', 'thong_bao_thuong', 'thuong_bai_xong',
+  // THƯỞNG PHẠT PHẦN B (migration-2610-giai-ban.sql, 27/10 phân loại): giải tuần (nguyên tử tuần cộng sẵn từ exp_so — exp_so XOÁ), cặp học cùng + lửa đôi,
+  // gõ cửa, bình giữ chuỗi đã mua (trả bằng tinh thể ở vang_so — XOÁ) ⇒ trạng thái chơi, về 0 cùng lúc. Bảng xếp `danh_gia_em_tuan` (nhãn thầy / PH) ⇒ GIỮ (dưới).
+  'giai_tuan', 'ban_hoc', 'go_cua', 'chuoi_binh_mua',
   // MỌI CA THI cũ (thầy 27/09: "xoá toàn bộ các ca thi cũ"). `ca` cuối cùng.
   ...BANG_CA_THI_HOA2,
 ]
@@ -89,6 +92,9 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'cau_nen',
   // Bàn gỡ nút thắt (ban-go-nut-that.ts, 02/10): em đã đọc lời thầy gỡ nào — hồ sơ học tập ⇒ GIỮ.
   'loi_go_doc',
+  // Bảng xếp tuần (danh-gia-hoc-that-d1.ts; DDL cũng ở migration-2610-giai-ban.sql): nhãn Học thật / Đối phó từng tuần mà thầy + phụ huynh đọc — hồ sơ học tập,
+  // dựng từ sổ (GIỮ) ⇒ GIỮ (27/10).
+  'danh_gia_em_tuan',
   // TU LUYỆN (migration-2909-tu-luyen.sql, 29/09): lượt em tự luyện — hồ sơ học tập của em, độc lập với game ⇒ GIỮ (như sổ su_kien_hoc).
   'tu_luyen_luot', 'tu_luyen_cau',
   // TU LUYỆN v3 (migration-3009-tu-luyen-khac-phuc.sql, 30/09): ôn cách quãng + câu đã chấm từng câu — cùng hồ sơ Tu luyện ⇒ GIỮ.
