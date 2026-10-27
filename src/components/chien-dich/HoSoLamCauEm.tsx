@@ -970,10 +970,11 @@ function DsCauTomTat({ cau, loai, lan, ngoi }: { cau: readonly CauTomTat[]; loai
                     {chip.chu}
                   </span>
                 </span>
+                {/* «·» dính chữ đứng trước (khoảng trắng không ngắt) ⇒ dòng không bao giờ mở đầu bằng «·» (phông ĐĐH Rounded rộng hơn, 360 px, 27/10) */}
                 <span className="gvv2-hs-cau-phu gvv2-so">
-                  {muc ? `${muc} · ` : ''}
-                  {loai === 'on' ? `ôn ${c.soLanOn} lần · ` : ''}làm {c.soLan} lần · đúng {c.soDung} · sai {c.soSai}
-                  {lanCuoi ? ` · lần cuối ${lanCuoi}` : ''}
+                  {muc ? `${muc}\u00a0· ` : ''}
+                  {loai === 'on' ? `ôn ${c.soLanOn} lần\u00a0· ` : ''}làm {c.soLan} lần{'\u00a0'}· đúng {c.soDung}{'\u00a0'}· sai {c.soSai}
+                  {lanCuoi ? `\u00a0· lần cuối ${lanCuoi}` : ''}
                 </span>
                 {lan && <GiayCauTomTat c={c} lan={lan} />}
               </div>

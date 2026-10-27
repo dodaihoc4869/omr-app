@@ -16,7 +16,7 @@ import { chuThay } from './tien-ich'
 import { gioVn, ngayNganVn, soVn, thuNgayVn } from '../../lib/ph-moi/dinh-dang'
 import { tieuDeCanhBao } from '../../lib/canh-bao-thay-hien-thi'
 import { layBaoCaoTuanCon, type BaoCaoTuanCon, type TuanCon } from '../../lib/bao-cao-tuan-ph-api'
-import { HuyHieuGiai, klDuoi, klTren, TEN_KL } from '../HuyHieuGiai'
+import { HuyHieuGiai, klDuoi, klTren, TEN_KL, THU_TU_KL } from '../HuyHieuGiai'
 import type { NgayHoc } from '../../lib/ph-v3/con-tong-quan'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { PhMoi } from '../../lib/ph-moi/du-lieu'
@@ -80,11 +80,11 @@ function TuanNay({ t }: { t: TuanCon }) {
       {t.hang && <p className="pd-ly" data-vung="cau-giai">{cauGiai(t.hang)}</p>}
       {ti !== null && (
         <div className="pd-ht" data-vung="ti-le-hoc-that">
-          <p className="pd-ht-so"><b>{Math.round(ti * 100)}%</b><span>nguyên tử tuần này là học thật</span></p>
-          <div className="pd-ht-thanh" role="img" aria-label={`${Math.round(ti * 100)}% học thật, ${100 - Math.round(ti * 100)}% từ câu làm vội, không tính vào giải`}>
+          <p className="pd-ht-so"><b>{Math.round(ti * 100)}%</b><span>nguyên tử (điểm thưởng) tuần này là từ câu con tự làm đúng</span></p>
+          <div className="pd-ht-thanh" role="img" aria-label={`${Math.round(ti * 100)}% từ câu con tự làm đúng, ${100 - Math.round(ti * 100)}% từ câu đúng nhờ gợi ý hoặc hỏi thầy, không tính vào Giải tuần`}>
             <i style={{ flex: ti || 0.001 }} /><i style={{ flex: 1 - ti || 0.001 }} />
           </div>
-          {ti < 1 && <span className="pd-ht-phu">Phần còn lại từ câu làm vội, không tính vào giải.</span>}
+          <span className="pd-ht-phu">{cauHocThat(ti)}</span>
         </div>
       )}
       {t.hocCung.length > 0 && (
@@ -198,15 +198,24 @@ function HomNay({ p, nowMs }: PT & { nowMs: number }) {
 // Một thẻ CHỈ ĐỌC trả lời «con học mấy ngày liền · mấy bài · đứng thứ mấy ở giải · bao nhiêu phần nguyên tử là học thật · học cùng ai». Số lấy từ khối
 // `tuan` của /ph/bao-cao-tuan (lệnh DocPh đã gọi sẵn lúc mở — không thêm lệnh). Thiếu trường ⇒ ẩn ô / dòng ấy; thiếu cả khối ⇒ không có thẻ.
 // Luật giải: cuối tuần top 5 lên hạng, 4 hạng cuối xuống (Sắt không xuống). Nhãn Học thật / Đối phó giữ ở thẻ «Con đang ở nhóm» như cũ.
+// CHỮ (thầy 27/10: «100% nguyên tử là gì, tuần này giải Sắt rất khó hiểu»): GIỮ hai từ học sinh thấy trên app em («Giải tuần», «nguyên tử» — một khái niệm
+// một từ) nhưng nói rõ nghĩa ngay cạnh: Giải tuần = bảng thi đua mỗi tuần, 6 bậc Sắt → Kim cương; nguyên tử = điểm thưởng mỗi câu làm đúng.
 const LEN = 5, ROI = 4
-/** Câu giải thích hạng giải cho phụ huynh (không bịa: thiếu thứ hạng ⇒ chỉ nói đang ở giải nào). */
+/** Câu giải thích hạng giải cho phụ huynh (không bịa: thiếu thứ hạng ⇒ chỉ nói đang ở bậc nào). */
 export function cauGiai(h: NonNullable<TuanCon['hang']>): string {
-  const ten = `Giải ${TEN_KL[h.kl]}`, tren = klTren(h.kl), duoi = klDuoi(h.kl)
-  const o = h.thuHang ? `, hạng ${h.thuHang}${h.soNguoi ? `/${h.soNguoi}` : ''}` : ''
+  const tren = klTren(h.kl), duoi = klDuoi(h.kl)
+  const bac = tren ? `bậc ${THU_TU_KL.indexOf(h.kl) + 1}/${THU_TU_KL.length}` : 'bậc cao nhất'
+  const o = h.thuHang ? `, hạng ${h.thuHang}${h.soNguoi ? `/${h.soNguoi}` : ''} trong nhóm` : ''
   const sau = !h.thuHang ? ''
-    : duoi && h.soNguoi && h.thuHang > h.soNguoi - ROI ? ` Cuối tuần còn trong ${ROI} hạng cuối thì xuống Giải ${TEN_KL[duoi]}.`
-    : tren ? ` Cuối tuần trong top ${LEN} thì lên Giải ${TEN_KL[tren]}.` : h.thuHang <= LEN ? ' Đang ở giải cao nhất.' : ''
-  return `Đang ở ${ten}${o}.${sau}`
+    : duoi && h.soNguoi && h.thuHang > h.soNguoi - ROI ? ` Cuối tuần còn trong ${ROI} hạng cuối thì xuống bậc ${TEN_KL[duoi]}.`
+    : tren ? ` Cuối tuần vào top ${LEN} thì lên bậc ${TEN_KL[tren]}.` : ''
+  return `Giải tuần là bảng thi đua mỗi tuần, ${THU_TU_KL.length} bậc từ ${TEN_KL[THU_TU_KL[0]]} lên ${TEN_KL[THU_TU_KL[THU_TU_KL.length - 1]]}. Con đang ở bậc ${TEN_KL[h.kl]} (${bac})${o}.${sau}`
+}
+/** Dòng giải nghĩa dưới % (ti = phần nguyên tử Học thật 0..1, số máy chủ: trừ câu đúng có hỗ trợ; tuần mang nhãn Đối phó ⇒ 0 — `nguyenTuThat`). */
+export function cauHocThat(ti: number): string {
+  if (ti >= 1) return 'Mỗi câu làm đúng được nguyên tử. Chỉ câu con tự làm (không xem gợi ý, không hỏi thầy) mới tính vào Giải tuần.'
+  if (ti <= 0) return 'Tuần này chưa có nguyên tử nào tính vào Giải tuần: câu đúng nhờ gợi ý, hỏi thầy, hoặc tuần con bị xếp Đối phó đều không được tính.'
+  return 'Phần còn lại là câu con làm đúng nhờ xem gợi ý hoặc hỏi thầy, không tính vào Giải tuần.'
 }
 const chuCai = (ten: string) => ten.replace(/\(.*?\)/g, '').trim().split(/\s+/).slice(-2).map((x) => x[0] ?? '').join('').toUpperCase()
 
