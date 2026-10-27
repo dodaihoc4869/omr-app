@@ -21,11 +21,14 @@ import { ThanhThuong } from '../thuong/ThanhThuong'
 import { TheBanLoTrinh } from '../thuong/TheBanLoTrinh' // lối vào Học cùng bạn trên Lộ trình (27/10)
 import { useTongQuan } from '../thuong/dung-thuong'
 import { napSanThanhTich } from '../../lib/thuong-api'
+import { laSamsungInternet } from '../../lib/nhac-samsung'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const GiamThiTinh = lazy(() => import('../giam-thi/GiamThi').then((m) => ({ default: m.GiamThiTinh })))
 const MUC_LV = ['nb', 'th', 'vd', 'vdc'] as const
 const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
+// Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
+const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
 /** Sự kiện màn làm chặng phát khi xong bài ĐẦU TIÊN trong ngày ⇒ Lộ trình mở «Chuỗi ngày» với hiệu ứng lửa bùng (C1). */
 export const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
 /** Cột bên (thẻ Giải tuần + Nhiệm vụ) chỉ hiện ở máy tính / điện thoại ngang (cùng điều kiện CSS `.dm-ben`) ⇒ điện thoại dọc không nạp mảnh màn thưởng. */
@@ -623,6 +626,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       </div>}
       {loiBi && <LoiBi key={loiBi[2]} cam={loiBi[0]} loi={loiBi[1]} coBi={!coBiBen} khoa={loiBi[2] === 'ca' ? undefined : `${ngayVn(Date.now())}|${loiBi[2]}|${p.tenBai ?? ''}`} />}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
+      {p.token && chinh !== 'ca' && laSamsungInternet() && <Suspense fallback={null}><NhacSamsung /></Suspense>}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} cam={coBiBen ? loiBi?.[0] ?? 'chao' : undefined} moKt={moKt} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}

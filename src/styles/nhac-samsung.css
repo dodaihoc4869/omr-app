@@ -1,0 +1,7 @@
+/* THẺ NHẮC SAMSUNG INTERNET (27/10) — nạp cùng mảnh lười NhacSamsung.tsx. Chỉ biến --tr-* (sáng / tối tự đổi theo trong-hs-mau.css). */
+[data-trong='hs'] .da-nhac-ss { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 12px; padding: 12px; border: 2px solid var(--tr-vien); border-radius: 18px; background: var(--tr-mat); }
+[data-trong='hs'] .da-nhac-ss .giua { display: flex; flex-direction: column; gap: 4px; flex: 1 1 200px; min-width: 0; }
+[data-trong='hs'] .da-nhac-ss .giua b { font-size: 15.5px; font-weight: 800; line-height: 1.3; color: var(--tr-chu); }
+[data-trong='hs'] .da-nhac-ss .giua span { font-size: 15px; line-height: 1.45; color: var(--tr-chu-2); overflow-wrap: anywhere; }
+[data-trong='hs'] .da-nhac-ss-nut { flex: none; margin-left: auto; min-width: 44px; min-height: 44px; padding: 0 18px; border: 2px solid var(--tr-vien); border-radius: 14px; background: var(--tr-mat); color: var(--tr-tin-chu); font: inherit; font-size: 14px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; cursor: pointer; touch-action: manipulation; box-shadow: inset 0 -3px 0 var(--tr-vien); }
+[data-trong='hs'] .da-nhac-ss-nut:focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; }

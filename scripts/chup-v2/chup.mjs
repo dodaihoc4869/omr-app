@@ -398,6 +398,10 @@ const DS_BINH = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [
 // ═══ ĐẶT LẠI TINH THỂ 27/10 (tiền tố "dat-lai-tt-"): thông báo một lần trên Lộ trình — mọi bạn bắt đầu lại với 50 tinh thể.
 const DS_DAT_LAI_TT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].map((nen) =>
   [`dat-lai-tt-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-mot&tp=1&v=dat-lai', w, hh, nen, false, /Tinh thể đã đặt lại/]))
+// ═══ NHẮC SAMSUNG 27/10 (tiền tố "ss-"): máy Samsung Internet thấy MỘT thẻ nhắc trên Lộ trình (cách bật «Sử dụng chủ đề tối của trang web» hoặc mở bằng Chrome).
+// Lộ trình tự cuộn tới chặng đang học ⇒ cuộn thẻ vào giữa khung rồi chụp (hai lần: chờ cuộn mượt của đường chặng xong).
+const DS_SS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].map((nen) =>
+  [`ss-lo-trinh-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-mot&tp=1&ua=samsung', w, hh, nen, false, /Màu app trên Samsung Internet/, 'ton:xem:.da-nhac-ss » xem:.da-nhac-ss']))
 // ═══ TỐI HS 28/10 (tiền tố "toi-"): thầy chụp tối trên máy thật — Lộ trình đã xong hết chặng (`tt=du`) + nút Tự sửa lỗi, 390×844 · 844×390 ×
 // sáng · tối · ép tối (máy tối + trình duyệt ép tối) · ép sáng (máy sáng + trình duyệt ép tối).
 const DS_TOI2810 = [[390, 844, 'doc'], [844, 390, 'ngang']].flatMap(([w, hh, k]) => [['light', ''], ['dark', '-toi']].flatMap(([nen, hau]) => [
@@ -637,6 +641,7 @@ const DS = [
   ...DS_TON, // VIỆC TỒN 27/10
   ...DS_BINH, // LUẬT BÌNH 27/10
   ...DS_DAT_LAI_TT, // ĐẶT LẠI TINH THỂ 27/10
+  ...DS_SS, // NHẮC SAMSUNG 27/10
   ...DS_NC, // NÂNG CẤP 27/10
   ...DS_LG, // LỘ TRÌNH GHIM 27/10
   ...DS_KT, // KIỂM TRA ÔN TẬP KHOÁ CHẶNG 27/10
