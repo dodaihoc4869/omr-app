@@ -116,7 +116,7 @@ export const MODEL_MANH = 'gemini-pro-latest'
 /** Số lượt tối đa cho MỘT câu: lượt sau đọc lý do lệch / lộ / hỏng khuôn của lượt trước. */
 export const SO_LUOT_MOT_CAU = 4
 /** Câu vòng sửa soạn lại: lệch / lộ, và câu tính bị trả THIẾU sơ đồ / bước tính (27/10). Chuỗi hằng, không chèn dữ liệu ngoài. */
-export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND ly_do = '${LY_DO_THIEU_SO_DO}')`
+export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND (ly_do LIKE 'Bước % không đọc được.' OR ly_do = '${LY_DO_THIEU_SO_DO}'))`
 const RE_CHAN_VI_TRI = /location is not supported/i
 const ngu = (ms: number) => new Promise((ok) => setTimeout(ok, ms))
 
