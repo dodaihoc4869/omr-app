@@ -22,7 +22,8 @@ export interface ChuoiNgay {
 }
 export interface NhiemVu { ma: string; ten: string; tien: number; can: number; thuong: number; xong: boolean }
 export interface GiaiTom { hang: HangGiai; thuHang: number; soNguoi: number; hetHanGiay: number }
-export type LoaiThongBao = 'thang_hoa' | 'binh_do' | 'cuoi_tuan' | 'moc_chuoi' | 'cuoc' | 'huy_hieu' | 'moc_doi' | 'go_cua' | 'moi_ban'
+/** `dat_lai_tt` (27/10): tinh thể đặt lại về mức chung theo luật mới — hiện MỘT lần. */
+export type LoaiThongBao = 'thang_hoa' | 'binh_do' | 'cuoi_tuan' | 'moc_chuoi' | 'cuoc' | 'huy_hieu' | 'moc_doi' | 'go_cua' | 'moi_ban' | 'dat_lai_tt'
 export interface ThongBao { ma: string; loai: LoaiThongBao; duLieu: Record<string, unknown> }
 /** Lượt cược đang chạy — trường TUỲ CHỌN (hợp đồng chưa ghi; máy chủ gửi thì hiện tiến độ, không gửi thì chỉ hiện lời mời cược). */
 export interface CuocDang { dat: number; ngay: number }
@@ -122,7 +123,7 @@ function docNhiemVu(x: unknown): NhiemVu | undefined {
   const o = dt(x); const ma = chu(o?.ma), ten = chu(o?.ten), tien = soNg(o?.tien), can = soNg(o?.can), thuong = soNg(o?.thuong)
   return ma && ten && tien !== undefined && can && thuong !== undefined ? { ma, ten, tien: Math.min(tien, can), can, thuong, xong: o!.xong === true || tien >= can } : undefined
 }
-const LOAI_TB: readonly LoaiThongBao[] = ['thang_hoa', 'binh_do', 'cuoi_tuan', 'moc_chuoi', 'cuoc', 'huy_hieu', 'moc_doi', 'go_cua', 'moi_ban']
+const LOAI_TB: readonly LoaiThongBao[] = ['thang_hoa', 'binh_do', 'cuoi_tuan', 'moc_chuoi', 'cuoc', 'huy_hieu', 'moc_doi', 'go_cua', 'moi_ban', 'dat_lai_tt']
 function docThongBao(x: unknown): ThongBao | undefined {
   const o = dt(x); const ma = chu(o?.ma)
   return ma && LOAI_TB.includes(o!.loai as LoaiThongBao) ? { ma, loai: o!.loai as LoaiThongBao, duLieu: dt(o!.duLieu) ?? {} } : undefined
