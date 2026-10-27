@@ -309,6 +309,11 @@ export default defineConfig({
           // Giao diện «Trong» màn làm bài (26/10): tờ trình bày nạp lười trong màn thi & các màn làm câu (chỉ khi <html data-trong>) ⇒ kho chạy-lúc;
           // tải hỏng ⇒ màn thi vẫn chạy với trình bày cũ (logic không phụ thuộc tờ này).
           '**/trong-lam-bai-*.css',
+          // Sửa câu kiểu Duolingo (27/10): cây trình bày của Tự sửa lỗi nạp lười CHỈ khi <html data-trong="hs"> ⇒ kho chạy-lúc, precache giữ 170.
+          '**/{ChuaGonDuo,duo-sua}-*.{js,css}',
+          // …móc giữ chân (GiuChan.tsx + giu-chan.ts) nay dùng chung màn làm chặng Duo + màn sửa câu Duo ⇒ thành mảnh riêng; chỉ màn «Trong» dùng
+          // (như rung / Bi / hieu-ung) ⇒ kho chạy-lúc, precache giữ 170.
+          '**/giu-chan-*.js',
           // Rung / tiếng phản hồi các màn luyện «Trong» (26/10): mảnh dùng chung của các màn nạp lười (làm chặng, kiểm tra, tự sửa, tu luyện) ⇒ kho chạy-lúc.
           '**/{rung,phan-hoi,am-thanh,Bi,hieu-ung}-*.{js,css}',
           // «Chạm để hiểu đề» + «Bắt đầu từ đâu?» + lời giải kiểu sơ đồ (26/10): ruột nạp LƯỜI (vỏ VungChamDe nằm trong màn làm chặng) + từ điển
