@@ -53,7 +53,7 @@ export function songSongHien(dem: Record<string, number>): number {
 }
 
 /** Câu vòng sửa: CHÉP NGUYÊN `SQL_CAN_SUA` của soan-so-do.ts (không nạp máy soạn khi cờ tắt); test may-soan-cron-2710 giữ hai bản bằng nhau. */
-export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND (ly_do LIKE 'Bước % không đọc được.' OR ly_do = 'Câu tính thiếu sơ đồ hoặc bước tính.'))`
+export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND (ly_do LIKE 'Bước % không đọc được.' OR ly_do = 'Câu tính thiếu sơ đồ hoặc bước tính.')) OR (cong = 'dat' AND ly_do = 'trinh_bay_lai')`
 /** 19:00–23:59 giờ VN — cùng mốc với `laGioCaoDiem` của soan-so-do.ts (viết lại ở đây để không nạp cả máy soạn khi cờ tắt). */
 export const laGioCaoDiemSoan = (ms: number) => (new Date(ms).getUTCHours() + 7) % 24 >= 19
 

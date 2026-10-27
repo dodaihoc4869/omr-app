@@ -28,6 +28,11 @@ on:
         required: false
         default: false
         type: boolean
+      trinhBayLai:
+        description: 'Câu ĐẠT trình bày chưa chuẩn (thiếu «?», có H mà không nhân H/100, thừa số thiếu nghĩa) ⇒ đánh dấu để vòng sửa soạn lại (bản cũ vẫn hiện tới khi có bản đạt mới)'
+        required: false
+        default: false
+        type: boolean
       anDuSoanLai:
         description: 'Câu ĐẠT còn dính ẩn dụ tiền / nhà (thầy 26/10 đã bỏ) ⇒ ẩn khỏi học sinh và để vòng sửa soạn lại'
         required: false
@@ -80,6 +85,10 @@ jobs:
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT cong, substr(COALESCE(ly_do, ''), 1, 40) AS ly_do, COUNT(*) AS so_cau FROM loi_giai_so_do WHERE cong = 'khong_kiem_duoc' GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 15" 2>/dev/null | jq -c '.[0].results[] | .ly_do |= gsub("[0-9]"; "#")' || echo 'chưa đọc được lý do'
           # Theo model (27/10: có Workers AI khi Gemini hết hạn mức) — để thầy chê chữ của model nào thì lọc được đúng các dòng ấy.
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT model, cong, COUNT(*) AS so_cau FROM loi_giai_so_do GROUP BY 1, 2 ORDER BY 1, 2" 2>/dev/null | jq -c '.[0].results' || echo 'chưa đọc được theo model'
+          # trinhBayLai: chỉ ghi ly_do = 'trinh_bay_lai' trên dòng đạt (cong giữ 'dat' ⇒ em vẫn thấy bản cũ); cần vongSuaLai nếu máy đã «xong».
+          if [ "${{ inputs.trinhBayLai }}" = "true" ]; then
+            npx -y wrangler@4 d1 execute omr --remote --json --command "UPDATE loi_giai_so_do SET ly_do = 'trinh_bay_lai' WHERE cong = 'dat' AND ((NOT EXISTS (SELECT 1 FROM json_each(ban_json, '\$.soDo.nut') n, json_each(n.value, '\$.soLieu') s WHERE s.value LIKE '%?%') AND NOT EXISTS (SELECT 1 FROM json_each(ban_json, '\$.soDo.nut') n WHERE json_extract(n.value, '\$.tong') LIKE '%?%')) OR (EXISTS (SELECT 1 FROM json_each(ban_json, '\$.soDo.muiTen') m WHERE json_extract(m.value, '\$.H') IS NOT NULL AND json_extract(m.value, '\$.H') <> 100) AND ban_json NOT LIKE '%/100%' AND ban_json NOT LIKE '%100/%') OR EXISTS (SELECT 1 FROM json_each(ban_json, '\$.buoc') b, json_each(b.value, '\$.thuaSo') t WHERE json_extract(t.value, '\$.nghia') IS NULL OR length(trim(json_extract(t.value, '\$.nghia'))) < 3))" | jq -c '[.[] | .meta.changes]' | sed 's/^/đánh dấu trình bày lại: /'
+          fi
           # vongSuaLai: chỉ đặt lại trạng thái máy soạn (vòng 'sua', con trỏ đầu) — không đụng bảng lời giải.
           if [ "${{ inputs.vongSuaLai }}" = "true" ]; then
             npx -y wrangler@4 d1 execute omr --remote --json --command "UPDATE may_soan_trang_thai SET vong = 'sua', con_tro = '', ly_do = 'thêm một vòng sửa' WHERE id = 1 AND vong = 'xong'" | jq -c '[.[] | .meta.changes]' | sed 's/^/mở thêm vòng sửa: /'
