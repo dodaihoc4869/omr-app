@@ -548,7 +548,13 @@ export default defineConfig({
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
             // 22/10 (màn thi nạp lười Phiếu của em): các mô-đun nhỏ (+ zustand của appStore) CHỈ đi cùng App (đường /gv /p /ph /t, không đường học sinh) bị Rolldown tách
             // thành nhiều tệp ⇒ gom MỘT mảnh: cùng tập đường nên không đường nào tải thêm byte, bớt tệp precache và phần đầu nén từng tệp.
-            { name: 'app-nho', test: /src[\\/](?:store[\\/]appStore|lib[\\/](?:bo-cau-chuan|bo-cau-tu-bai-lam|cau-hinh-chua|chi-tiet-cau|classlist-db|exam-assign|exam-shuffle|nhan-xet-theo-ca)|components[\\/]NutPhieuHtml)\.tsx?$|node_modules[\\/]zustand[\\/]/, includeDependenciesRecursively: false },
+            // 27/10 (tốc độ cổng học sinh / phụ huynh): cụm API ca thi (exam-api + mô-đun chỉ nó dùng) rời DesignSystem về đây — đúng tập đường nạp tĩnh nó
+            // (App, màn thi). Cổng học sinh / phụ huynh nạp lười khi gọi máy chủ ⇒ bớt ~15 KB nén lượt mở, không thêm tệp precache.
+            // 27/10 (tốc độ app thầy): nhóm này CHỈ còn thứ App.tsx cần ngay (appStore + zustand, classlist-db, cụm exam-api qua màn khoá máy). Bộ câu / chia đề
+            // (bo-cau-*, chi-tiet-cau, exam-assign, exam-shuffle — cần examContent) về mảnh bai-tap-pdf; nhan-xet-theo-ca + cau-hinh-chua về exam-grade; NutPhieuHtml (không đường nào
+            // mở app cần — chỉ NutBaiTapPdf / phieu-ca-ca dùng) về mảnh lười NutDongBoMoiCa.
+            // Trước: App nạp app-nho ⇒ cõng luôn exam-grade, bai-tap-pdf, KhungXemPhieu, mảnh lời giải (~30 KB nén) vào lượt mở /gv. Không thêm tệp precache.
+            { name: 'app-nho', test: /src[\\/](?:store[\\/]appStore|lib[\\/](?:classlist-db|exam-api|ten-ca|de-rieng-goi|gui-ca-trinh-duyet|anh-len-may-chu|day-ca-may-chu-moi|phieu-may-chu-moi|don-moc-reset-giao-vien|man-ca-may-chu-moi|cau-hinh-de-rieng|cau-goc))\.tsx?$|node_modules[\\/]zustand[\\/]/, includeDependenciesRecursively: false },
             // 26/10 «Chạm để hiểu đề»: gom ruột (components/goi-y-cham, trừ vỏ VungChamDe + cầu nối thay-bang-so-do — hai tệp nhỏ ấy ở mảnh nơi gọi) + api thành MỘT mảnh, từ điển làn A (lib/goi-y-cham) một mảnh —
             // không kéo theo chem-format / hoa2-api ra khỏi mảnh cũ (includeDependenciesRecursively: false) ⇒ các đường khác không đổi byte.
             { name: 'goi-y-cham', test: /src[\\/](?:components[\\/]goi-y-cham[\\/](?!VungChamDe\.tsx|thay-bang-so-do\.tsx)[^\\/]+|lib[\\/]goi-y-cham[\\/]api\.ts)$/, includeDependenciesRecursively: false },
@@ -562,19 +568,22 @@ export default defineConfig({
             // đường khác, precache 171 > trần 170). Gom lại ĐÚNG ranh mảnh trước đó (danh sách mô-đun đọc từ sourcemap bản 1158a832) ⇒ các đường khác không đổi byte.
             // + trợ hàm trường lớp mà trình dịch chèn cho class component (ChanLoi…): `\0@oxc-project+runtime@…/helpers/` — mọi đường đều nạp ChanLoi (bản trước nằm sẵn trong mảnh này).
             { name: 'ChanLoi', test: /src[\\/](?:components[\\/](?:ChanLoi|LogoVai|bat-linh[\\/]BatLinhShell)\.tsx|lib[\\/](?:fetch-co-han|hs-dang-nhap-api)\.ts)$|@oxc-project\+runtime@[^\\/]+[\\/]helpers[\\/]/, includeDependenciesRecursively: false },
-            { name: 'DesignSystem', test: /src[\\/](?:components[\\/](?:DesignSystem|m3[\\/](?:NutTron|ThanhTren|index))\.tsx?|engine[\\/]score\.ts|lib[\\/](?:doc-so-phan-iii|cham-so-policy|cham-so|goi-lenh-thay|gio-may-chu|ten-ca|de-rieng-goi|gui-ca-trinh-duyet|anh-len-may-chu|day-ca-may-chu-moi|phieu-may-chu-moi|don-moc-reset-giao-vien|man-ca-may-chu-moi|cau-hinh-de-rieng|nhan-da-dung|cau-goc|exam-api|so-o-tra-loi-ngan|cau-tu-luan)\.ts)$/, includeDependenciesRecursively: false },
+            { name: 'DesignSystem', test: /src[\\/](?:components[\\/](?:DesignSystem|m3[\\/](?:NutTron|ThanhTren|index))\.tsx?|engine[\\/]score\.ts|lib[\\/](?:doc-so-phan-iii|cham-so-policy|cham-so|goi-lenh-thay|gio-may-chu|nhan-da-dung|so-o-tra-loi-ngan|cau-tu-luan)\.ts)$/, includeDependenciesRecursively: false },
             // 26/10 (cầu nối Cowork rời mảnh App, nạp lười): `exam-sync` + `phieu-ca-ca` mất chỗ trong App ⇒ Rolldown tách 2 tệp precache mới. Gom vào mảnh
             // NutDongBoMoiCa (nút đồng bộ dùng cả hai — Lịch sử ca, Cài đặt vốn đã tải chúng; kèm link-phieu-ca, phieu-hang-loat, sua-dang, tu-vung-dang cũng rời App)
             // ⇒ precache giữ 170. Màn Tạo ca / Kho đề tải kèm mảnh này khi mở (từ precache, không qua mạng).
-            { name: 'NutDongBoMoiCa', test: /src[\\/](?:components[\\/]NutDongBoMoiCa\.tsx|lib[\\/](?:exam-sync|phieu-ca-ca|link-phieu-ca|phieu-hang-loat|sua-dang|tu-vung-dang)\.ts)$/, includeDependenciesRecursively: false },
+            { name: 'NutDongBoMoiCa', test: /src[\\/](?:components[\\/](?:NutDongBoMoiCa|NutPhieuHtml)\.tsx|lib[\\/](?:exam-sync|phieu-ca-ca|link-phieu-ca|phieu-hang-loat|sua-dang|tu-vung-dang)\.ts)$/, includeDependenciesRecursively: false },
             // 26/10: bai-tap-pdf mất điểm neo App ⇒ Rolldown xẻ mảnh này ra nhiều tệp ⇒ gom lại đúng các mô-đun của mảnh cũ (đọc từ sourcemap bản main 7654f0c3).
-            { name: 'bai-tap-pdf', test: /src[\\/](?:lib[\\/](?:bai-tap-pdf|dang-cau|goi-len-bang|loc-cau-rut|loc-sao)|data[\\/]examContent)\.ts$/, includeDependenciesRecursively: false },
+            { name: 'bai-tap-pdf', test: /src[\\/](?:lib[\\/](?:bai-tap-pdf|dang-cau|goi-len-bang|loc-cau-rut|loc-sao|bo-cau-chuan|bo-cau-tu-bai-lam|chi-tiet-cau|exam-assign|exam-shuffle)|data[\\/]examContent)\.ts$/, includeDependenciesRecursively: false },
             // Thưởng phạt 26/10: phần HIỆN NGAY (thanh trên, tấm thưởng câu, băng chuỗi đúng, lớp gọi lệnh + bản lưu máy, hình, hiệu ứng, tiếng) dùng chung bởi mảnh «Trong»
             // (Lộ trình) và màn làm bài ⇒ gom MỘT mảnh (+ một tờ CSS) thay vì Rolldown xẻ 4–5 tệp nhỏ.
             { name: 'thuong-gon', test: /src[\\/](?:components[\\/]thuong[\\/](?:ThanhThuong|TamThuong|SoDem|hinh|dung-thuong|loc-thong-bao|ban-gon)\.tsx?|lib[\\/](?:thuong-api|hieu-ung-thuong|am-thanh-thuong)\.ts|styles[\\/]trong-thuong-gon\.css)$/, includeDependenciesRecursively: false },
             // …và phần dùng chung của các màn đầy đủ + màn kết bài (chung.tsx + tờ trong-thuong.css) — tên rõ để globIgnores bắt đúng (tên tự sinh `chung-*` quá chung).
             { name: 'thuong-chung', test: /src[\\/](?:components[\\/]thuong[\\/]chung\.tsx|styles[\\/]trong-thuong\.css)$/, includeDependenciesRecursively: false },
-            { name: 'exam-grade', test: /src[\\/]lib[\\/](?:phan-tich-lam-bai|loai-cau-chua-dung|rut-de-chua|phan-cau-len-bang|chan-doan-cau-hinh|chan-doan|chan-doan-phieu|chong-gian-lan|phieu-du-lieu|phieu-link|exam-grade)\.ts$/, includeDependenciesRecursively: false },
+            // 27/10 (tốc độ cổng phụ huynh): bộ đọc lời giải một câu (`ph-moi/du-lieu-loi-giai`) nạp lười ⇒ gom vào mảnh màn chi tiết ca (nơi duy nhất dùng nó trong app)
+            // thay vì một tệp precache riêng.
+            { name: 'ManChiTietCa', test: /src[\\/](?:components[\\/]ph-v3[\\/]ManChiTietCa\.tsx|lib[\\/]ph-moi[\\/]du-lieu-loi-giai\.ts)$/, includeDependenciesRecursively: false },
+            { name: 'exam-grade', test: /src[\\/]lib[\\/](?:phan-tich-lam-bai|loai-cau-chua-dung|rut-de-chua|phan-cau-len-bang|chan-doan-cau-hinh|chan-doan|chan-doan-phieu|chong-gian-lan|phieu-du-lieu|phieu-link|exam-grade|nhan-xet-theo-ca|cau-hinh-chua)\.ts$/, includeDependenciesRecursively: false },
           ],
         },
       },
