@@ -33,10 +33,46 @@ describe('giải tuần: số trên bảng = nguyên tử tính hạng của tu�
     expect((d.sql.prepare('SELECT nguyen_tu FROM giai_tuan WHERE tuan = ? AND em = ?').get(TUAN, 'E1') as { nguyen_tu: number }).nguyen_tu).toBe(623)
     d.sql.prepare("INSERT INTO danh_gia_em_tuan (sbd, tuan, diem, bac_tuan, bac, tinh_luc) VALUES ('E1', ?, 40, 3, 3, 'x')").run(TUAN)
     await cronGiaiTuan(d.env, NOW)
-    const r = (await hsGiai(d.env, { token: await gameToken(d.env, 'E1') }, NOW)) as { nhom: { laEm: boolean; nguyenTu: number; thuHang: number }[] }
+    const r = (await hsGiai(d.env, { token: await gameToken(d.env, 'E1') }, NOW)) as { nhom: { laEm: boolean; nguyenTu: number; thuHang: number; chuaTinh?: unknown }[] }
     expect(r.nhom.find((x) => x.laEm)).toMatchObject({ nguyenTu: 0, thuHang: 2 })
     expect(r.nhom.find((x) => !x.laEm)).toMatchObject({ nguyenTu: 300, thuHang: 1 })
     expect(JSON.stringify(r)).not.toMatch(/Đối phó|Học thật|bac\b/)
+  })
+  it('thầy 27/10: dòng của CHÍNH em có `chuaTinh` (623 chưa tính + lý do bản xếp, nặng trước, ≤ 3); bạn khác bị xếp đối phó vẫn KHÔNG lộ xuống máy em', async () => {
+    const d = taoD1That()
+    for (const [s, ten] of [['E1', 'Em Một'], ['E2', 'Em Hai']]) d.sql.prepare("INSERT INTO hoc_sinh(sbd, ho_ten, lop, ten_lop, mat_khau, cap_nhat_luc) VALUES (?, ?, '12', '12 - Lớp Thường', 'mk', 'x')").run(s, ten)
+    d.sql.prepare("INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('giai_tuan_chot', '2026-10-19', 'x')").run()
+    nt(d, 'E1', 26, '2026-10-26T21:00:00'); nt(d, 'E1', 597, '2026-10-27T09:00:00'); nt(d, 'E2', 300, '2026-10-27T09:00:00')
+    const phat = JSON.stringify([
+      { ma: 'khongLam', diem: 15, chu: '3 ngày liền không làm câu nào', xau: true },
+      { ma: 'nhanMaSai', diem: 28.4, chu: '12/40 lượt trả lời trước khi đọc xong đề mà sai', xau: true },
+      { ma: 'vang', diem: 0, chu: 'vắng không phép 0/4 buổi' },
+      { ma: 'bamLap', diem: 10, chu: '1 lần bấm liền ≥ 6 câu cùng một đáp án' },
+      { ma: 'goiY', diem: 5, chu: 'xem gợi ý' },
+    ])
+    const bac = d.sql.prepare("INSERT INTO danh_gia_em_tuan (sbd, tuan, diem, bac_tuan, bac, phat_json, tinh_luc) VALUES (?, ?, 40, 3, 3, ?, 'x')")
+    bac.run('E1', TUAN, phat); bac.run('E2', TUAN, phat)
+    await cronGiaiTuan(d.env, NOW)
+    const r1 = (await hsGiai(d.env, { token: await gameToken(d.env, 'E1') }, NOW)) as { nhom: { laEm: boolean; chuaTinh?: { nguyenTu: number; lyDo: { ma: string }[] } }[] }
+    const em = r1.nhom.find((x) => x.laEm)!
+    expect(em.chuaTinh).toEqual({ nguyenTu: 623, lyDo: [
+      { ma: 'nhanMaSai', chu: '12/40 lượt trả lời trước khi đọc xong đề mà sai' }, { ma: 'khongLam', chu: '3 ngày liền không làm câu nào' },
+      { ma: 'bamLap', chu: '1 lần bấm liền ≥ 6 câu cùng một đáp án' }] })
+    expect(r1.nhom.filter((x) => !x.laEm).every((x) => x.chuaTinh === undefined)).toBe(true)
+    const r2 = JSON.stringify(await hsGiai(d.env, { token: await gameToken(d.env, 'E2') }, NOW))
+    expect((JSON.parse(r2).nhom as { laEm: boolean; chuaTinh?: unknown }[]).filter((x) => x.chuaTinh).length).toBe(1)
+    expect((JSON.parse(r2).nhom as { laEm: boolean; chuaTinh?: unknown }[]).find((x) => x.chuaTinh)!.laEm).toBe(true)
+  })
+  it('em KHÔNG bị xếp đối phó ⇒ không có `chuaTinh`', async () => {
+    const d = taoD1That()
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd, ho_ten, lop, ten_lop, mat_khau, cap_nhat_luc) VALUES ('E1', 'Em Một', '12', '12 - Lớp Thường', 'mk', 'x')").run()
+    d.sql.prepare("INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('giai_tuan_chot', '2026-10-19', 'x')").run()
+    nt(d, 'E1', 50, '2026-10-27T09:00:00')
+    d.sql.prepare("INSERT INTO danh_gia_em_tuan (sbd, tuan, diem, bac_tuan, bac, phat_json, tinh_luc) VALUES ('E1', ?, 80, 1, 1, '[]', 'x')").run(TUAN)
+    await cronGiaiTuan(d.env, NOW)
+    const r = (await hsGiai(d.env, { token: await gameToken(d.env, 'E1') }, NOW)) as { nhom: { laEm: boolean; nguyenTu: number; chuaTinh?: unknown }[] }
+    expect(r.nhom[0]).toMatchObject({ laEm: true, nguyenTu: 50 })
+    expect(r.nhom[0]!.chuaTinh).toBeUndefined()
   })
   it('luật hiện cho em khớp cách tính: không còn «chưa có nguyên tử thì chưa vào bảng»; nói rõ thanh trên = hôm nay, bảng = tính hạng cả tuần; không nhãn lười', () => {
     const chu = LUAT_GIAI.join(' ')

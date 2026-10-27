@@ -139,7 +139,21 @@ export function cauGiaiEm(env: Env, em: string, tuan: string): D1PreparedStateme
   return [env.DB.prepare(SQL_EM_TUAN).bind(tuan, em), env.DB.prepare(SQL_HANG_TRUOC).bind(em, tuan), env.DB.prepare(SQL_NHOM_CUA_EM).bind(tuan, em)]
 }
 
-export interface DongGiai { thuHang: number; ten: string; lop: string; nguyenTu: number; laEm: boolean }
+export interface DongGiai { thuHang: number; ten: string; lop: string; nguyenTu: number; laEm: boolean; chuaTinh?: ChuaTinhHang }
+/**
+ * CHỈ dòng của CHÍNH em (thầy 27/10: «giữ luật Đối phó tuần ⇒ 0, nhưng nói rõ lý do cho chính em»): tuần này bản xếp ghi em bậc ≥ 3 ⇒ bảng tính 0.
+ * `nguyenTu` = nguyên tử em kiếm trong tuần (đã trừ câu có hỗ trợ) mà chưa được tính hạng · `lyDo` = các mục phạt của bản xếp tuần (mã + chữ máy ghi), nặng
+ * trước, tối đa 3. Dòng bạn khác KHÔNG BAO GIỜ có trường này (máy chủ không gửi nhãn của em khác xuống máy).
+ */
+export interface ChuaTinhHang { nguyenTu: number; lyDo: { ma: string; chu: string }[] }
+/** Mục phạt của bản xếp tuần (`danh_gia_em_tuan.phat_json`) ⇒ lý do hiện cho chính em: nặng trước, chỉ mục có điểm hoặc cờ xấu, tối đa 3. */
+export function lyDoChuaTinh(phatJson: unknown): { ma: string; chu: string }[] {
+  let ds: unknown
+  try { ds = JSON.parse(str(phatJson) || '[]') } catch { return [] }
+  if (!Array.isArray(ds)) return []
+  return ds.filter((x): x is Row => !!x && typeof x === 'object' && !!str((x as Row).ma) && !!str((x as Row).chu) && (num((x as Row).diem) > 0 || (x as Row).xau === true))
+    .sort((a, b) => num(b.diem) - num(a.diem)).slice(0, 3).map((x) => ({ ma: str(x.ma), chu: str(x.chu) }))
+}
 export interface GiaiCuaEm {
   hang: Hang
   /** '' = chưa vào bảng tuần này (chưa có nguyên tử) · 'cho' = đang xếp nhóm · 'co' = có nhóm. */
@@ -147,19 +161,22 @@ export interface GiaiCuaEm {
   nhom: DongGiai[]
   thuHang: number | null
 }
-/** Đọc kết quả `cauGiaiEm` (thuần). */
+/** Đọc kết quả `cauGiaiEm` (thuần). `kq[3]` (tuỳ chọn, chỉ /hs/giai) = phat_json bản xếp tuần của CHÍNH em ⇒ lý do chưa tính hạng. */
 export function docGiaiEm(em: string, kq: (Row[] | undefined)[]): GiaiCuaEm {
-  const [rEm, rTruoc, rNhom] = kq
+  const [rEm, rTruoc, rNhom, rPhat] = kq
   const dongEm = rEm?.[0]
   const hang = chuanHang(dongEm ? dongEm.hang : rTruoc?.[0]?.hang)
   const nhomEm = str(dongEm?.nhom)
   if (!dongEm || nhomEm === '-') return { hang, trangThai: '', nhom: [], thuHang: null }
   if (!nhomEm) return { hang, trangThai: 'cho', nhom: [], thuHang: null }
-  const xep = xepNhom((rNhom ?? []).map((x) => ({
-    em: str(x.em), nguyenTu: nguyenTuThat(num(x.nguyen_tu), num(x.ho_tro), x.bac === null || x.bac === undefined ? null : num(x.bac)),
-    vaoLuc: str(x.vao_luc), hoTen: str(x.ho_ten), lop: str(x.lop),
-  })))
-  const nhom = xep.map((x) => ({ thuHang: x.thuHang, ten: tenDayDu(x.hoTen), lop: x.lop, nguyenTu: x.nguyenTu, laEm: x.em === em }))
+  let chuaTinh: ChuaTinhHang | undefined
+  const xep = xepNhom((rNhom ?? []).map((x) => {
+    const bac = x.bac === null || x.bac === undefined ? null : num(x.bac)
+    const nt = nguyenTuThat(num(x.nguyen_tu), num(x.ho_tro), bac)
+    if (str(x.em) === em && bac !== null && bac >= 3) chuaTinh = { nguyenTu: nguyenTuThat(num(x.nguyen_tu), num(x.ho_tro), null), lyDo: lyDoChuaTinh(rPhat?.[0]?.phat_json) }
+    return { em: str(x.em), nguyenTu: nt, vaoLuc: str(x.vao_luc), hoTen: str(x.ho_ten), lop: str(x.lop) }
+  }))
+  const nhom: DongGiai[] = xep.map((x) => ({ thuHang: x.thuHang, ten: tenDayDu(x.hoTen), lop: x.lop, nguyenTu: x.nguyenTu, laEm: x.em === em, ...(x.em === em && chuaTinh ? { chuaTinh } : {}) }))
   return { hang, trangThai: 'co', nhom, thuHang: nhom.find((x) => x.laEm)?.thuHang ?? null }
 }
 
@@ -236,7 +253,9 @@ export async function hsGiai(env: Env, b: Row, nowMs: number = Date.now(), envDo
     return { ok: false, error: CAN_DANG_NHAP }
   }
   const tuan = tuanCua(nowMs)
-  const doc = () => envDoc.DB.batch([sqlCongTac(envDoc), envDoc.DB.prepare(SQL_CHOT), ...cauGiaiEm(envDoc, sbd, tuan)])
+  // Câu cuối: phat_json bản xếp tuần của CHÍNH em (cùng batch, theo PK) ⇒ lý do «chưa tính hạng» chỉ cho em ấy.
+  const doc = () => envDoc.DB.batch([sqlCongTac(envDoc), envDoc.DB.prepare(SQL_CHOT), ...cauGiaiEm(envDoc, sbd, tuan),
+    envDoc.DB.prepare('SELECT phat_json FROM danh_gia_em_tuan WHERE sbd = ? AND tuan = ?').bind(sbd, tuan)])
   const pDoc = doc()
   pDoc.catch(() => {})
   try {

@@ -1,12 +1,12 @@
 // GIẢI TUẦN (bản vẽ tp-7) · MÀN CUỐI TUẦN (tp-8) — thầy chốt 26/10. Đọc /hs/giai (hợp đồng 4.4: nhóm ~20 bạn, tên + lớp, KHÔNG số báo danh, KHÔNG nhãn)
-// và thông báo `cuoi_tuan` của /hs/thuong. Công tắc «giải tuần» tắt ⇒ màn ẩn hẳn. Màn KHÔNG nói bảng tính lượt nào (học sinh không biết, đặc tả mục 4.4).
+// và thông báo `cuoi_tuan` của /hs/thuong. Công tắc «giải tuần» tắt ⇒ màn ẩn hẳn. Bạn khác không thấy nhãn; riêng dòng CHÍNH em tuần làm đối phó có lý do + cách gỡ (thầy 27/10).
 // Hiệu ứng: E1 hàng của em trượt tới thứ hạng mới, các hàng khác dịch theo (FLIP) + số hạng lật (hạng cũ nhớ ở máy) · E2 lên hạng: huy hiệu rơi, xoay
 // lấp lánh, hoa giấy, Bi mừng, rồi tinh thể bay vào bộ đếm · E3 rơi hạng: huy hiệu trượt xuống, Bi buồn, không hoa giấy · giữ hạng: huy hiệu nảy nhẹ.
-import { useRef, useState } from 'react'
-import { ChevronDown, ChevronUp, Clock, Trophy } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, ChevronUp, Clock, Info, Trophy } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, demSo, hoaGiay, hoatAnh, latSo, phanHoiThuong } from '../../lib/hieu-ung-thuong'
-import { DUONG, HANG_GIAI, THUONG_LEN_HANG, chuConLai, hangSau, hangTruoc, layBangGiai, type HangGiai, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
+import { DUONG, HANG_GIAI, THUONG_LEN_HANG, chuConLai, hangSau, hangTruoc, layBangGiai, type ChuaTinhHang, type HangGiai, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { HuyHieuKimLoai, IcNguyenTu, IcTinhThe, TEN_HANG, Tia } from './hinh'
 import { useTai, useTongQuan } from './dung-thuong'
 import { Cho, DemTT, Loi, ManToan, NutDay, chuCai, congNgay, ngayNgan, oTinhThe, useHieuUng } from './chung'
@@ -27,6 +27,34 @@ function docHangCu(): { thuHang: number; nguyenTu: number } | null {
 }
 function ghiHangCu(v: { thuHang: number; nguyenTu: number }) { try { localStorage.setItem(KHO_HANG, JSON.stringify(v)) } catch { /* bỏ qua */ } }
 
+// THẦY 27/10: giữ luật «tuần làm đối phó ⇒ nguyên tử tuần tính 0» nhưng nói rõ lý do cho CHÍNH em (chỉ dòng của em có `chuaTinh`; bạn khác chỉ thấy số).
+export const CHU_CHUA_TINH = 'Tuần này làm đối phó nên chưa tính hạng'
+/** Cách gỡ theo đúng tiêu chí bản xếp (server/src/danh-gia-hoc-that.ts `danhGiaEm`): mỗi mã phạt một việc em làm được. */
+export const CACH_GO: Readonly<Record<string, string>> = {
+  nhanMaSai: 'Đọc hết đề rồi mới chọn, đừng bấm vội.',
+  bamLap: 'Không bấm liền một đáp án cho nhiều câu.',
+  treo: 'Đang làm thì làm tiếp, đừng để máy treo.',
+  goiY: 'Tự thử trước rồi mới xem gợi ý, lời giải.',
+  thuocKhongHieu: 'Làm lại câu từng sai bằng cách hiểu, đừng nhớ đáp án.',
+  thi: 'Khi kiểm tra, ở yên trong bài, không rời màn hình.',
+  boKtcn: 'Làm đủ các bài kiểm tra cá nhân.',
+  vang: 'Đi học đủ buổi.',
+  khongLam: 'Ngày nào cũng làm, đừng bỏ 3 ngày liền.',
+}
+const GO_CHUNG = ['nhanMaSai', 'bamLap', 'goiY', 'khongLam'] as const
+function TheChuaTinh({ ct }: { ct: ChuaTinhHang }) {
+  const the = useRef<HTMLDivElement>(null)
+  useEffect(() => { the.current?.scrollIntoView?.({ block: 'nearest' }) }, [])
+  const go = [...new Set([...ct.lyDo.map((x) => x.ma).filter((m) => CACH_GO[m]), ...(ct.lyDo.length ? [] : GO_CHUNG)])]
+  return <div ref={the} id="g-chua-tinh" className="g-chua-tinh" role="listitem" aria-label="Vì sao chưa tính hạng">
+    <b>Tuần này em kiếm được {ct.nguyenTu.toLocaleString('vi-VN')} nguyên tử nhưng chưa tính hạng.</b>
+    {ct.lyDo.length > 0 && <><p>Bản xếp tuần ghi:</p><ul>{ct.lyDo.map((x) => <li key={x.ma}>{x.chu}</li>)}</ul></>}
+    <p>Cách gỡ:</p>
+    <ul>{go.map((m) => <li key={m}>{CACH_GO[m]}</li>)}</ul>
+    <p>Làm thật 2 tuần liền thì bản xếp (chạy sáng thứ Hai) gỡ mức này, nguyên tử của em được tính hạng lại.</p>
+  </div>
+}
+
 /** Màn Giải tuần (tp-7). `tuHang` = thứ hạng trước (để chạy FLIP); vắng ⇒ lấy hạng em thấy lần trước trên máy này. */
 export function ManGiaiTuan({ token, onVe, tuHang }: { token?: string; onVe?: () => void; tuHang?: { thuHang: number; nguyenTu: number } }) {
   const tq = useTongQuan(token).du
@@ -34,6 +62,7 @@ export function ManGiaiTuan({ token, onVe, tuHang }: { token?: string; onVe?: ()
   const { du: g, tai, loi, thuLai } = useTai(token, DUONG.giai, layBangGiai, !tat)
   const bxh = useRef<HTMLDivElement>(null)
   const em = g?.nhom.find((x) => x.laEm)
+  const [moChuaTinh, setMoChuaTinh] = useState(false)
   useHieuUng((h) => {
     if (!em || !bxh.current) return
     const cu = tuHang ?? docHangCu()
@@ -77,12 +106,14 @@ export function ManGiaiTuan({ token, onVe, tuHang }: { token?: string; onVe?: ()
           {g.nhom.map((r, i) => {
             const v = vung(r.thuHang)
             const rows = [<div key={r.thuHang + r.ten} className="r" role="listitem" data-h={r.thuHang} data-vung={v} data-em={r.laEm || undefined}
-              aria-label={`Hạng ${r.thuHang}: ${r.laEm ? 'Em, ' : ''}${r.ten}${r.lop ? `, ${nhanLop(r.lop)}` : ''}, ${r.nguyenTu} nguyên tử`}>
+              aria-label={`Hạng ${r.thuHang}: ${r.laEm ? 'Em, ' : ''}${r.ten}${r.lop ? `, ${nhanLop(r.lop)}` : ''}, ${r.nguyenTu} nguyên tử${r.chuaTinh ? `. ${CHU_CHUA_TINH}` : ''}`}>
               <span className="h tp-lat">{r.thuHang}</span>
               <span className="tp-av" data-k={r.laEm ? '0' : String((i % 4) + 1)} aria-hidden="true">{chuCai(r.ten)}</span>
-              <div className="ten"><b>{r.ten}{r.laEm && <span className="tp-chu-em">Em</span>}</b>{r.lop && <small>{nhanLop(r.lop)}</small>}</div>
+              <div className="ten"><b>{r.ten}{r.laEm && <span className="tp-chu-em">Em</span>}</b>{r.lop && <small>{nhanLop(r.lop)}</small>}
+                {r.chuaTinh && <button type="button" className="g-chua-nut" aria-expanded={moChuaTinh} aria-controls="g-chua-tinh" onClick={() => setMoChuaTinh((v) => !v)}>{CHU_CHUA_TINH}<Info aria-hidden="true" /></button>}</div>
               <span className="d"><span className="so-nt">{r.nguyenTu.toLocaleString('vi-VN')}</span> <IcNguyenTu /></span>
             </div>]
+            if (r.chuaTinh && moChuaTinh) rows.push(<TheChuaTinh key="ct" ct={r.chuaTinh} />)
             if (v === 'len' && r.thuHang === g.len && n > g.len) rows.push(<div key="vl" className="vach" aria-hidden="true"><ChevronUp aria-hidden="true" />Vùng lên hạng · {g.len} bạn phía trên</div>)
             if (v === 'roi' && r.thuHang === n - g.roi + 1) rows.unshift(<div key="vr" className="vach" data-vung="roi" aria-hidden="true"><ChevronDown aria-hidden="true" />Vùng rơi hạng · {g.roi} bạn cuối</div>)
             return rows

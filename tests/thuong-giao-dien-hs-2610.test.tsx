@@ -22,6 +22,8 @@ import KetBaiThuong from '../src/components/thuong/KetBaiThuong'
 import ManThuong, { BaoGoCua, ManBinhDaDo, ManChuoiNgay, ManCuaHang, ManCuocKetQua, ManCuoiTuan, ManCuuChuoi, ManGiaiTuan, ManHocCungBan, ManHuyHieu, ManHuyHieuMoi, ManKimCuong, ManLoiMoi,
   ManMocChuoi, ManMocDoi, ManMoiBan, ManNhiemVu, ManThangHoa, TheBenThuong, ThongBaoThuong, veDuoc } from '../src/components/thuong/ManThuong'
 import { ManDatLaiTinhThe } from '../src/components/thuong/ManTinhThe'
+import { CACH_GO, CHU_CHUA_TINH } from '../src/components/thuong/ManGiai'
+const CHO_PHEP_CHUA_TINH = new Set<string>([CHU_CHUA_TINH, ...Object.values(CACH_GO)])
 import { bungHat, demSo, hoatAnh, mucChuyenDong } from '../src/lib/hieu-ung-thuong'
 
 const TK = 'tk-em'
@@ -188,6 +190,24 @@ describe('các màn (đúng số bản vẽ)', () => {
     ve(<ManCuuChuoi chuoi={docTongQuan(M.tongQuanGia({ chuoiNgay: M.CUU(2) }))!.chuoiNgay!} onDong={() => {}} />)
     expect(screen.getByRole('heading', { name: 'Chuỗi 12 ngày đã sống lại!' })).toBeTruthy()
     expect(screen.queryByRole('timer')).toBeNull()
+  })
+  it('giải tuần, thầy 27/10: dòng của CHÍNH em tuần làm đối phó ⇒ «0» + dòng phụ; chạm ⇒ thẻ: nguyên tử chưa tính, lý do bản xếp, cách gỡ đúng mã; bạn khác chỉ số', async () => {
+    const nhom = M.GIAI_GIA.nhom.map((r) => (r.laEm ? { ...r, nguyenTu: 0, thuHang: 20, chuaTinh: { nguyenTu: 623, lyDo: [{ ma: 'nhanMaSai', chu: '12/40 lượt trả lời trước khi đọc xong đề mà sai' }] } }
+      : { ...r, thuHang: r.thuHang > 4 ? r.thuHang - 1 : r.thuHang, chuaTinh: { nguyenTu: 9, lyDo: [] } }))
+    datMayChu(M.tongQuanGia(), { [DUONG.giai]: { ...M.GIAI_GIA, nhom } })
+    const c = ve(<ManGiaiTuan token={TK} />)
+    const nut = await screen.findByRole('button', { name: /Tuần này làm đối phó nên chưa tính hạng/ })
+    expect(c.querySelectorAll('.g-chua-nut').length).toBe(1) // bạn khác: máy em bỏ qua `chuaTinh` của dòng không phải em
+    expect(c.querySelector('.tp-bxh .r[data-em] .so-nt')!.textContent).toBe('0')
+    expect(c.querySelector('.g-chua-tinh')).toBeNull()
+    fireEvent.click(nut)
+    expect(nut.getAttribute('aria-expanded')).toBe('true')
+    const the = c.querySelector('.g-chua-tinh')!
+    expect(the.textContent).toMatch(/Tuần này em kiếm được 623 nguyên tử nhưng chưa tính hạng/)
+    expect(the.textContent).toMatch(/12\/40 lượt trả lời trước khi đọc xong đề mà sai/)
+    expect(the.textContent).toMatch(/Đọc hết đề rồi mới chọn, đừng bấm vội/)
+    expect(the.textContent).toMatch(/Làm thật 2 tuần liền/)
+    expect(the.textContent).not.toMatch(/lười|ĐUỔI|bậc/)
   })
   it('giải tuần (tp-7): 20 bạn, em hạng 4 nổi bật, vùng lên 5 / rơi 4, còn 2 ngày 5 giờ, không số báo danh', () => {
     const c = ve(<ManGiaiTuan token={TK} />)
@@ -406,7 +426,8 @@ describe('chuyển động + chữ + tốc độ', () => {
     // chữ cố định trong mã nguồn (bỏ chú thích) cũng sạch
     for (const f of readdirSync('src/components/thuong').filter((x) => x.endsWith('.tsx') || x.endsWith('.ts'))) {
       const ma = readFileSync(`src/components/thuong/${f}`, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replace(/\s\/\/ .*$/gm, '')
-      for (const chu of ma.match(/'[^'\n]*'|"[^"\n]*"|`[^`]*`|>[^<>{}\n]+</g) ?? []) expect(chu, `${f}: ${chu}`).not.toMatch(CAM)
+      // NGOẠI LỆ DUY NHẤT (thầy 27/10): dòng CHÍNH em trên Giải tuần khi tuần làm đối phó — chữ phụ + cách gỡ (chỉ máy em ấy thấy; máy chủ không gửi của bạn khác).
+      for (const chu of ma.match(/'[^'\n]*'|"[^"\n]*"|`[^`]*`|>[^<>{}\n]+</g) ?? []) if (!CHO_PHEP_CHUA_TINH.has(chu.slice(1, -1))) expect(chu, `${f}: ${chu}`).not.toMatch(CAM)
     }
   })
   it('nạp lười: thanh trên / tấm câu không kéo theo các màn; màn đầy đủ nằm sau import() động', () => {
