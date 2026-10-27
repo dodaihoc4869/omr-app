@@ -34,14 +34,14 @@ describe('thẻ Học cùng bạn trên Lộ trình', () => {
   it('bạn chưa học ⇒ một thẻ gọn + Gõ cửa (một lần, đúng mã bạn); bấm chữ ⇒ mở Học cùng bạn', async () => {
     const onMo = vi.fn()
     render(<TheBanLoTrinh token={TK} bat onMo={onMo} />)
-    expect(await screen.findByText('Trần Gia Bảo chưa học hôm nay')).toBeTruthy()
+    expect(await screen.findByText('Trần Gia Bảo chưa đủ mức hôm nay')).toBeTruthy()
     expect(screen.getByText('Lửa đôi 3 ngày')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Gõ cửa' }))
     await waitFor(() => expect(screen.getByRole('button', { name: 'Đã gõ cửa' }).hasAttribute('disabled')).toBe(true))
     expect(daGoi.filter((g) => g.duong === DUONG.goCua).map((g) => g.than.ma)).toEqual(['b2'])
     fireEvent.click(screen.getByRole('button', { name: 'Đã gõ cửa' }))
     expect(daGoi.filter((g) => g.duong === DUONG.goCua)).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button', { name: /Trần Gia Bảo chưa học hôm nay.*Mở Học cùng bạn/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Trần Gia Bảo chưa đủ mức hôm nay.*Mở Học cùng bạn/ }))
     expect(onMo).toHaveBeenCalledTimes(1)
     // chỉ tên + lửa đôi + đã học chưa — không điểm / nguyên tử / lớp của bạn
     expect(document.body.textContent).not.toMatch(/nguyên tử|điểm|12A2/)
@@ -50,7 +50,7 @@ describe('thẻ Học cùng bạn trên Lộ trình', () => {
   it('cả hai chưa học ⇒ «… cũng chưa học hôm nay», KHÔNG nút Gõ cửa (luật màn Học cùng bạn: em xong bài rồi mới gõ)', async () => {
     mayChu[DUONG.ban] = { ...M.BAN_GIA, ban: [{ ...M.BAN_GIA.ban[1]!, homNay: 'ca_hai_chua' }] }
     render(<TheBanLoTrinh token={TK} bat onMo={() => {}} />)
-    expect(await screen.findByText('Trần Gia Bảo cũng chưa học hôm nay')).toBeTruthy()
+    expect(await screen.findByText('Trần Gia Bảo cũng chưa đủ mức hôm nay')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Gõ cửa' })).toBeNull()
   })
 
@@ -132,7 +132,7 @@ describe('Chuỗi ngày · khối Lửa đôi', () => {
     const nut = await screen.findByRole('button', { name: 'Lửa đôi với 2 bạn — mở Học cùng bạn' })
     expect(nut.textContent).toContain('Minh Châu')
     expect(nut.textContent).toContain('Lửa đôi 9 ngày')
-    expect(nut.textContent).toContain('bạn chưa học hôm nay')
+    expect(nut.textContent).toContain('bạn chưa đủ mức hôm nay')
     expect(nut.textContent).not.toMatch(/nguyên tử|12A2/)
     fireEvent.click(nut)
     expect(onBan).toHaveBeenCalledTimes(1)

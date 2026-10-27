@@ -460,9 +460,9 @@ export function MotTrangHs(p: PropsMotTrang) {
   const tq = tqTai.du
   const coThuong = !!p.token && (!!tq || tqTai.tai)
   const chuoi = tq?.chuoiNgay?.so ?? nhip?.chuoiDuGanNhat ?? 0
-  // Boss 27/10 (Q2): có chuỗi theo luật mới (≥ 1 chặng/ngày) ⇒ mọi dòng chuỗi nói ĐÚNG luật đó; «đủ mức» là MỤC TIÊU NGÀY, ghi tách riêng.
+  // Thầy 27/10 (luật 28/10): chuỗi giữ khi LÀM ĐỦ MỨC HÔM NAY (cùng thước đo vòng «Đủ mức») ⇒ dòng chuỗi nói đúng luật đó.
   const giuHomNay = !!tq?.chuoiNgay && tq.chuoiNgay.lich7.some((x) => x.ngay.slice(0, 10) === ngayVn(Date.now()) && x.kieu === 'hoc')
-  const chuLuatChuoi = giuHomNay ? 'hôm nay đã giữ chuỗi' : 'mỗi ngày xong ít nhất 1 chặng để giữ chuỗi'
+  const chuLuatChuoi = giuHomNay ? 'hôm nay đã giữ chuỗi' : 'mỗi ngày làm đủ mức hôm nay để giữ chuỗi'
   const [tp, setTp] = useState<{ man: TenManThuong; hieuUng?: 'chuoi' } | null>(null)
   const coBen = useCoBen()
   const choSo = useChoSo(coThuong)

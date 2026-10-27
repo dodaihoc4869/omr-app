@@ -168,7 +168,7 @@ describe('các màn (đúng số bản vẽ)', () => {
     const c = ve(<ManChuoiNgay token={TK} />)
     expect(c.querySelector('#tp-so-chuoi')?.textContent).toBe('12')
     expect([...c.querySelectorAll('.tp-luat li span')].map((x) => x.textContent)).toEqual([
-      'Mỗi ngày xong ít nhất 1 chặng để giữ chuỗi.', 'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang tối đa 2 bình, mỗi tuần mua được 1 bình.', 'Hết bình? Học bù 2 chặng trong 24 giờ là cứu được chuỗi.'])
+      'Mỗi ngày làm đủ mức hôm nay để giữ chuỗi.', 'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang tối đa 2 bình, mỗi tuần mua được 1 bình.', 'Hết bình? Hôm sau làm đủ mức rồi học bù thêm 2 chặng là cứu được chuỗi.'])
     expect(c.textContent).toMatch(/150 tinh thể · mỗi tuần mua 1 bình/)
     expect(c.textContent).not.toMatch(/thứ Hai được tặng|tặng 1 bình mỗi|vắng có phép/)
     expect(c.textContent).toMatch(/đang mang 1\/2/)
@@ -324,8 +324,8 @@ describe('các màn (đúng số bản vẽ)', () => {
     const the = [...c.querySelectorAll('.tp-the-ban')]
     expect(the.length).toBe(2)
     expect(screen.getByRole('img', { name: 'Lửa đôi 9 ngày' })).toBeTruthy(); expect(screen.getByRole('img', { name: 'Lửa đôi 3 ngày' })).toBeTruthy()
-    expect(the[0]!.textContent).toMatch(/Hôm nay cả hai đã xong/); expect(the[0]!.textContent).toMatch(/Mốc kế tiếp · 30 ngày\+30/)
-    expect(the[1]!.textContent).toMatch(/Trần Gia Bảo.*Bạn chưa học hôm nay/); expect(screen.getByRole('button', { name: 'Gõ cửa' })).toBeTruthy()
+    expect(the[0]!.textContent).toMatch(/Hôm nay cả hai đã đủ mức/); expect(the[0]!.textContent).toMatch(/Mốc kế tiếp · 30 ngày\+30/)
+    expect(the[1]!.textContent).toMatch(/Trần Gia Bảo.*Bạn chưa đủ mức hôm nay/); expect(screen.getByRole('button', { name: 'Gõ cửa' })).toBeTruthy()
     expect(c.textContent).toMatch(/Còn 1 chỗ/)
     for (const t of the) expect(t.textContent).not.toMatch(/điểm|nguyên tử|⚛/i)
   })

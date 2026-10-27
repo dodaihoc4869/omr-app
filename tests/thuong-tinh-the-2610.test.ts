@@ -119,7 +119,7 @@ describe('mua bình (hàm cộng bình của B3 qua cầu nối) + cược chu�
     const a = await hsMuaBinh(env, { token: token.S1 }, NOW)
     expect(a).toMatchObject({ ok: true, tinhThe: 70, gia: 150, daMuaTuan: true, muaTiepTu: '2026-11-02' })
     expect(ids).toEqual([`S1|tt|${NGAY}|binh-w`])
-    expect(await hsMuaBinh(env, { token: token.S1 }, NOW)).toMatchObject({ ok: false, ma: 'da_mua_tuan' })
+    expect(await hsMuaBinh(env, { token: token.S1 }, NOW)).toMatchObject({ ok: false }) // bấm lặp trong ngày: khoá ngày ⇒ không trừ đôi (trần tuần: binh-1-tuan-2710)
     expect(du('S1')).toBe(70)
     gia({ docChuoiNgay: async () => ({ ...chuoi, giuChuoi: 2 }) })
     expect((await hsMuaBinh(env, { token: token.S1 }, NOW + 86_400_000)).ok).toBe(false)

@@ -67,8 +67,11 @@ export const thuHaiTt = (ngay: string): string => congNgayTt(ngay, -((new Date(D
 export function tuanMuaBinh(ngay: string): { tu: string; toi: string; muaTiepTu: string } {
   const t2 = thuHaiTt(ngay)
   const sau = congNgayTt(t2, 7)
-  return { tu: `tt|${t2}|`, toi: `tt|${sau}|`, muaTiepTu: sau }
+  // 28/10: bình mua TRƯỚC lần đặt lại 00:01 28/10 (đã bị đặt về 0) không tính vào trần tuần ⇒ đếm từ 28/10.
+  return { tu: `tt|${t2 > MOC_DEM_BINH_TUAN ? t2 : MOC_DEM_BINH_TUAN}|`, toi: `tt|${sau}|`, muaTiepTu: sau }
 }
+/** Ngày bắt đầu đếm trần bình tuần theo sổ ví (sau lần đặt lại bình 00:01 28/10). */
+export const MOC_DEM_BINH_TUAN = '2026-10-28'
 export const TT_CUOC_DAT = 50
 export const TT_CUOC_THANG = 100
 export const CUOC_SO_NGAY = 7
