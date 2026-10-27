@@ -247,7 +247,10 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
           } else if (tatCaLoiGoi || hanMuc) { soLoi++; lyDo = hanMuc ? `Gemini báo hết hạn mức${hm.chu ? ` (${hm.chu})` : ' (429/503)'}` : 'mọi câu trong lượt đều lỗi gọi mô hình' }
           const xong = body.xong === true
           if (vong === 'chinh') {
-            if (xong) { vong = 'sua'; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, sang vòng sửa câu lệch' } else conTro = String(body.conTro ?? conTro)
+            if (xong && dem.quet_lai_2710 !== 1) {
+              // 27/10: trước bản sửa, câu lỗi gọi (429) bị con trỏ bỏ qua ⇒ quét lại vòng chính MỘT lần từ đầu (câu đã soạn tự bỏ qua, rẻ).
+              dem.quet_lai_2710 = 1; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, quét lại một lần các câu từng lỗi gọi'
+            } else if (xong) { vong = 'sua'; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, sang vòng sửa câu lệch' } else conTro = String(body.conTro ?? conTro)
           } else if (qidsSua) {
             // conTro của soanSoDoLo là «#n» trong danh sách qids vừa truyền ⇒ đổi ra qid cuối đã xử lý; xong cả lô ⇒ qid cuối TRANG (kể cả qid sai mẫu ở đuôi).
             const n = /^#\d+$/.test(String(body.conTro ?? '')) ? Number(String(body.conTro).slice(1)) : 0

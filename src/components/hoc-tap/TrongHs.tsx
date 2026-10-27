@@ -331,14 +331,15 @@ export function MotTrangHs(p: PropsMotTrang) {
 
 const tenBuoi = (b: BuoiCuaEm) => { const n = ngayGon(b.ten); return `${n === b.ten ? b.ten : `Buổi ${n}`}${b.lop ? ` · ${b.lop}` : ''}` }
 
-/** KHỐI ĐIỂM DANH đầu menu (bản vẽ hs-mot-trang-menu · -menu-xong): CÙNG hook với thẻ nổi cũ (useDiemDanhHs — cùng lệnh gửi, cùng luồng QR `?diem-danh=`).
- *  Buổi đang mở, em chưa điểm danh ⇒ khối chàm, 6 ô mã (một ô nhập thật phủ trên) + nút Điểm danh · đã điểm danh ⇒ khối xanh (+ giờ em vừa bấm trên máy
- *  này) · không có buổi ⇒ khối xám. App chưa có máy quét QR riêng ⇒ không nút máy ảnh; em quét QR bằng máy ảnh điện thoại như cũ. */
+/** KHỐI ĐIỂM DANH đầu menu (bản vẽ hs-mot-trang-menu; MENU 6 MỤC thầy 27/10): CÙNG hook với thẻ nổi cũ (useDiemDanhHs — cùng lệnh gửi, cùng luồng QR `?diem-danh=`).
+ *  CHỈ hiện khi có buổi học đang mở: em chưa điểm danh ⇒ thẻ nổi chàm (màu điểm danh đang có), 6 ô mã (một ô nhập thật phủ trên) + nút Điểm danh · đã điểm danh ⇒ một dòng
+ *  xanh (+ giờ em vừa bấm trên máy này) · không có buổi ⇒ ẨN HẲN (trả null). App chưa có máy quét QR riêng ⇒ em quét QR bằng máy ảnh điện thoại như cũ. */
 type DiemDanh = ReturnType<typeof useDiemDanhHs>
+const coKhoiDiemDanh = (tt: DiemDanh['tt']) => tt.loai === 'cho' || tt.loai === 'xong' || !!tt.daXong
 function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<DiemDanh, 'tt' | 'ma' | 'setMa' | 'loi' | 'setLoi' | 'dangGui' | 'gui' | 'oNhap'>) {
   if (tt.loai === 'cho') return (
     <form className="tr-dd" aria-label="Điểm danh buổi học" onSubmit={(e) => { e.preventDefault(); void gui(ma) }}>
-      <div className="tr-dd-dau"><QrCode size={20} aria-hidden="true" /><b>Điểm danh</b>{tt.buoi && <span>{tenBuoi(tt.buoi).split(' · ')[0]}</span>}</div>
+      <div className="tr-dd-dau"><span className="tr-dd-h" aria-hidden="true"><QrCode size={20} /></span><b>Điểm danh buổi học</b></div>
       <label className="tr-dd-o">
         <span className="sr-only">Mã 6 số trên máy chiếu</span>
         <input ref={oNhap} value={ma} onChange={(e) => { setMa(e.target.value.replace(/\D/g, '').slice(0, 6)); setLoi('') }}
@@ -347,40 +348,41 @@ function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<
       </label>
       <button type="submit" className="tr-dd-nut" disabled={dangGui || ma.length !== 6}>{dangGui ? 'Đang gửi…' : 'Điểm danh'}</button>
       {loi && <p id="tr-dd-loi" className="tr-dd-loi" role="alert">{loi}</p>}
-      <p className="tr-dd-phu">Gõ mã 6 số trên máy chiếu, hoặc quét mã QR</p>
+      <p className="tr-dd-phu">{tt.buoi && <><b>{tenBuoi(tt.buoi).split(' · ')[0]}</b> · </>}Gõ mã 6 số trên máy chiếu, hoặc quét mã QR</p>
     </form>
   )
   const xong = tt.loai === 'xong' ? tt : tt.daXong ? { buoi: tt.daXong, luc: 0 } : null
-  if (xong) return (
+  if (!xong) return null
+  return (
     <section className="tr-dd" data-tt="xong" aria-label="Điểm danh buổi học">
       <div className="tr-dd-dau"><CheckCircle2 size={20} aria-hidden="true" /><b>Đã điểm danh</b>{xong.luc > 0 && <span>{hai(new Date(xong.luc).getHours())}:{hai(new Date(xong.luc).getMinutes())}</span>}</div>
       <p className="tr-dd-phu">{tenBuoi(xong.buoi)}</p>
     </section>
   )
-  return (
-    <section className="tr-dd" data-tt="tat" aria-label="Điểm danh buổi học">
-      <div className="tr-dd-dau"><QrCode size={20} aria-hidden="true" /><b>Điểm danh</b></div>
-      <p className="tr-dd-phu">Chưa có buổi học nào đang mở</p>
-    </section>
-  )
 }
 
-/** MENU DỌC MÉP PHẢI (bản vẽ hs-menu-phai, thầy chốt 26/10): gộp thanh trên (logo, Vào ca kiểm tra, chuông, cập nhật, ảnh «Của em») + menu 4 mục.
- *  Thu gọn = MỘT vạch nhỏ giữa mép phải (chấm đỏ khi có tin chưa đọc — CSS :has đọc số của chuông thật). Chạm ⇒ thẻ menu ra, nền sau mờ; chạm ngoài /
- *  chọn mục / Esc / cuộn trang ⇒ thu lại. Mở ⇒ tiêu điểm vào mục đầu; Esc, chạm ngoài, chọn mục ⇒ trả tiêu điểm về vạch. Chuông = ĐÚNG phần tử
- *  ThongBaoHocSinh (giữ hành vi + số chưa đọc), phủ cả dòng; menu luôn gắn trong DOM (ẩn bằng CSS) để tấm thông báo mở từ đây không mất.
- *  «Một trang» (bản vẽ hs-mot-trang-menu, 26/10): khối Điểm danh đứng đầu (KhoiDiemDanh); buổi đang mở mà em chưa điểm danh ⇒ vạch thò thẻ chàm dọc
- *  «Điểm danh» (bấm ⇒ menu mở, tiêu điểm vào ô mã); mã QR gửi xong / gửi hỏng ⇒ menu tự mở cho em thấy kết quả. Mục «A.I Đỗ Đại Học» dưới 4 mục chính mở
- *  ĐÚNG tấm chat của BongBongAiDdh (sự kiện `ddh:mo-ai`; mục chỉ hiện khi kênh bật — `<html data-ai-ddh>`). */
-// Ba biểu tượng chỉ màn «Trong» dùng — vẽ nội tuyến (nét như lucide) để không kéo thêm vào mảnh biểu tượng chung của app thầy / màn thi (luật tốc độ).
+/** MENU DỌC MÉP PHẢI — MENU 6 MỤC (thầy 27/10: «gọn lại còn tối đa 6 mục, đẹp tinh tế khoa học, học sinh dễ thấy dễ hiểu»; kiểu menu bên Duolingo web).
+ *  Đầu menu: logo «Đỗ Đại Học» + CHUÔNG THÔNG BÁO (ĐÚNG phần tử ThongBaoHocSinh — giữ hành vi, số chưa đọc). Dưới: khối Điểm danh (chỉ khi có buổi mở),
+ *  rồi đúng 6 mục, mỗi mục một ô biểu tượng màu riêng: Lộ trình · Luyện tập · Thành tích · Ca kiểm tra (= Vào ca kiểm tra; ẩn khi ca đang mở vì Lộ trình đã
+ *  có nút vào ca) · Hỏi A.I Đỗ Đại Học (mở ĐÚNG tấm chat của BongBongAiDdh, sự kiện `ddh:mo-ai`; chỉ hiện khi kênh bật — `<html data-ai-ddh>`) · Cài đặt
+ *  (trượt sang tấm con: Âm thanh, Rung, Cập nhật bài học, Của em — cùng nút, cùng hành vi cũ).
+ *  Thu gọn = MỘT vạch nhỏ giữa mép phải (chấm đỏ khi có tin chưa đọc — CSS :has đọc số của chuông thật); buổi đang mở mà em chưa điểm danh ⇒ vạch thò thẻ
+ *  dọc «Điểm danh» (bấm ⇒ menu mở, tiêu điểm vào ô mã); mã QR gửi xong / gửi hỏng ⇒ menu tự mở. Chạm ngoài / chọn mục / Esc / cuộn trang ⇒ thu lại
+ *  (Esc ở tấm Cài đặt ⇒ về 6 mục trước). Mở ⇒ tiêu điểm vào mục đầu; đóng ⇒ trả tiêu điểm về vạch. Menu luôn gắn trong DOM (ẩn bằng CSS) để tấm thông
+ *  báo mở từ đây không mất. */
+// Biểu tượng chỉ màn «Trong» dùng — vẽ nội tuyến (nét như lucide) để không kéo thêm vào mảnh biểu tượng chung của app thầy / màn thi (luật tốc độ).
 const IconNet = ({ d, size = 20 }: { d: string[]; size?: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d.map((x) => <path key={x} d={x} />)}</svg>
 const Volume2 = ({ size }: { size?: number }) => <IconNet size={size} d={['M11 5 6 9H2v6h4l5 4z', 'M15.5 8.5a5 5 0 0 1 0 7', 'M19 5a10 10 0 0 1 0 14']} />
 const Vibrate = ({ size }: { size?: number }) => <IconNet size={size} d={['m2 8 2 2-2 2 2 2-2 2', 'm22 8-2 2 2 2-2 2 2 2', 'M9 5h6a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z']} />
 const MenuIcon = ({ size }: { size?: number }) => <IconNet size={size} d={['M4 6h16', 'M4 12h16', 'M4 18h16']} />
+const BanhRang = ({ size }: { size?: number }) => <IconNet size={size} d={['M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z', 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0']} />
+const MuiTrai = ({ size }: { size?: number }) => <IconNet size={size} d={['m15 18-6-6 6-6']} />
+/** Chạm mục menu ⇒ phanHoi('chon') (rung + tiếng, tự theo công tắc). Nạp LƯỜI: không kéo am-thanh / rung vào nhóm mở app (luật tốc độ). */
+const cham = () => { void import('../../lib/phan-hoi').then((m) => m.phanHoi('chon'), () => {}) }
 
 /** Công tắc phản hồi ở menu (thầy 26/10): «Âm thanh» / «Rung» Bật–Tắt — chỉ đọc/ghi localStorage ('ddh.am' / 'ddh.rung' = 'tat' khi tắt); tiếng và rung
  *  ở mảnh màn luyện tự đọc khoá này (không kéo am-thanh / rung vào nhóm mở app). Mặc định bật. */
-function CongTac({ khoa, ten, Icon }: { khoa: 'ddh.am' | 'ddh.rung'; ten: string; Icon: (p: { size?: number }) => ReactNode }) {
+function CongTac({ khoa, ten, Icon, sac }: { khoa: 'ddh.am' | 'ddh.rung'; ten: string; Icon: (p: { size?: number }) => ReactNode; sac: string }) {
   const [bat, setBat] = useState(() => { try { return localStorage.getItem(khoa) !== 'tat' } catch { return true } })
   return <button type="button" role="switch" aria-checked={bat} className="tr-menu-muc tr-menu-cong" onClick={() => {
     const v = !bat
@@ -388,10 +390,13 @@ function CongTac({ khoa, ten, Icon }: { khoa: 'ddh.am' | 'ddh.rung'; ten: string
     try { if (v) localStorage.removeItem(khoa); else localStorage.setItem(khoa, 'tat') } catch { /* máy chặn lưu: chỉ đổi trong phiên này */ }
     // 27/10: bật «Rung» ⇒ rung thử ngay một nhịp để em (và thầy) biết máy rung được.
     if (v && khoa === 'ddh.rung') try { (navigator as Navigator & { vibrate?: (m: number) => boolean }).vibrate?.(80) } catch { /* máy không rung được */ }
-  }}><Icon size={20} aria-hidden="true" />{ten}<span className="tr-cong" data-bat={bat || undefined} aria-hidden="true">{bat ? 'Bật' : 'Tắt'}</span></button>
+    // bật «Âm thanh» ⇒ kêu thử tiếng chọn (rung không gọi: phanHoi nạp lười sẽ đè nhịp rung thử ở trên).
+    if (v && khoa === 'ddh.am') cham()
+  }}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}<span className="tr-cong" data-bat={bat || undefined} aria-hidden="true">{bat ? 'Bật' : 'Tắt'}</span></button>
 }
-/** Ba mục menu kiểu Duolingo (bản vẽ dm-4, thầy chốt 26/10) — cùng id mục của cổng: Lộ trình = Hôm nay (+ Hành trình) · Luyện tập = Ôn & sửa · Thành tích = Kết quả. */
-const MENU_DUO = [{ id: 'hom-nay', ten: 'Lộ trình', icon: Route }, { id: 'on-lai', ten: 'Luyện tập', icon: Wrench }, { id: 'ket-qua', ten: 'Thành tích', icon: Trophy }] as const
+/** Ba mục menu kiểu Duolingo (bản vẽ dm-4, thầy chốt 26/10) — cùng id mục của cổng: Lộ trình = Hôm nay (+ Hành trình) · Luyện tập = Ôn & sửa · Thành tích = Kết quả.
+ *  `sac` = màu ô biểu tượng (menu 6 mục 27/10): chính · chú ý · sao. */
+const MENU_DUO = [{ id: 'hom-nay', ten: 'Lộ trình', icon: Route, sac: 'chinh' }, { id: 'on-lai', ten: 'Luyện tập', icon: Wrench, sac: 'chu-y' }, { id: 'ket-qua', ten: 'Thành tích', icon: Trophy, sac: 'sao' }] as const
 export function MenuDocTrong(p: {
   muc: string; ds: readonly { id: string; ten: string; icon: LucideIcon }[]; onMuc: (id: string) => void
   coCa: boolean; onThi: () => void; thongBao?: ReactNode; dangTai: boolean; onTaiLai: () => void
@@ -399,43 +404,67 @@ export function MenuDocTrong(p: {
   token?: string; moDiemDanh: boolean
 }) {
   const [mo, setMo] = useState(false)
+  const [cai, setCai] = useState(false) // tấm con «Cài đặt» đang mở (thay chỗ 6 mục)
+  const caiRef = useRef(false)
+  caiRef.current = cai
   const nut = useRef<HTMLButtonElement>(null)
   const the = useRef<HTMLElement>(null)
+  const nutCai = useRef<HTMLButtonElement>(null)
+  const nutLui = useRef<HTMLButtonElement>(null)
   const { tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap, mo: ddMoLoi, tuQr } = useDiemDanhHs(p.token ?? '', p.moDiemDanh && !!p.token)
   const ddMo = tt.loai === 'cho'
+  const coDd = !!p.token && coKhoiDiemDanh(tt)
   const dong = (traVe: boolean) => { setMo(false); if (traVe) nut.current?.focus() }
   useEffect(() => { if (ddMoLoi || (tuQr && tt.loai === 'xong')) setMo(true) }, [ddMoLoi, tuQr, tt.loai])
+  // Menu thu lại ⇒ lần mở sau luôn về 6 mục. Đổi qua lại 6 mục ↔ Cài đặt ⇒ tiêu điểm theo (nút Quay lại / mục Cài đặt).
+  useEffect(() => { if (!mo) setCai(false) }, [mo])
+  // (chạy TRƯỚC hiệu ứng mở menu bên dưới ⇒ lúc mở, tiêu điểm cuối cùng vẫn là mục đầu / ô mã điểm danh)
+  useEffect(() => { if (mo) (cai ? nutLui : nutCai).current?.focus() }, [cai, mo])
   useEffect(() => {
     if (!mo) return
     ;(oNhap.current ?? the.current?.querySelector<HTMLElement>('.tr-menu-muc'))?.focus()
-    const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') { setMo(false); nut.current?.focus() } }
+    const phim = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      if (caiRef.current) { setCai(false); return }
+      setMo(false); nut.current?.focus()
+    }
     const cuon = () => setMo(false)
     window.addEventListener('keydown', phim)
     window.addEventListener('scroll', cuon, { passive: true })
     return () => { window.removeEventListener('keydown', phim); window.removeEventListener('scroll', cuon) }
   }, [mo, oNhap])
+  const chon = (fn: () => void) => () => { cham(); fn() }
   return <>
     {/* Khung thấp xoay ngang: menu thu thành DẢI BIỂU TƯỢNG mép phải (3 mục + A.I + nút mở menu đủ); dọc / máy tính: display: contents ⇒ chỉ vạch cũ. */}
     <div className="tr-menu-ray">
-      {MENU_DUO.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-ray-muc" onClick={() => p.onMuc(id)} aria-current={p.muc === id ? 'page' : undefined} aria-label={ten} title={ten}><Icon size={22} aria-hidden="true" /></button>)}
-      <button type="button" className="tr-ray-muc tr-ray-ai" onClick={() => window.dispatchEvent(new Event('ddh:mo-ai'))} aria-label="A.I Đỗ Đại Học" title="A.I Đỗ Đại Học"><Sparkles size={20} aria-hidden="true" /></button>
+      {MENU_DUO.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-ray-muc" onClick={chon(() => p.onMuc(id))} aria-current={p.muc === id ? 'page' : undefined} aria-label={ten} title={ten}><Icon size={22} aria-hidden="true" /></button>)}
+      <button type="button" className="tr-ray-muc tr-ray-ai" onClick={chon(() => window.dispatchEvent(new Event('ddh:mo-ai')))} aria-label="A.I Đỗ Đại Học" title="A.I Đỗ Đại Học"><Sparkles size={20} aria-hidden="true" /></button>
       <button ref={nut} type="button" className="tr-menu-cham" data-dd={ddMo || undefined} aria-label={ddMo ? 'Mở menu · Buổi học đang mở điểm danh' : 'Mở menu'} aria-expanded={mo} aria-controls="tr-menu" onClick={() => setMo(true)}>
         <i /><s />{ddMo && <em aria-hidden="true"><QrCode size={16} />Điểm danh</em>}<b className="tr-ray-them" aria-hidden="true"><MenuIcon size={22} /></b>
       </button>
     </div>
     {mo && <div className="tr-menu-phu" onClick={() => dong(true)} aria-hidden="true" />}
-    <nav ref={the} id="tr-menu" className="tr-menu" data-mo={mo || undefined} data-dd={p.token ? '' : undefined} aria-label="Điều hướng học sinh">
-      <a className="tr-menu-dau" href="/hs"><img src={`${import.meta.env.BASE_URL}logo-hs-nho-v3.svg`} width={26} height={26} alt="" draggable={false} />Đỗ Đại Học</a>
-      {p.token && <KhoiDiemDanh tt={tt} ma={ma} setMa={setMa} loi={loi} setLoi={setLoi} dangGui={dangGui} gui={gui} oNhap={oNhap} />}
-      {MENU_DUO.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-menu-muc" onClick={() => { p.onMuc(id); dong(true) }} aria-current={p.muc === id ? 'page' : undefined}><Icon size={20} aria-hidden="true" />{ten}</button>)}
-      <button type="button" className="tr-menu-muc tr-menu-ai" onClick={() => { dong(false); window.dispatchEvent(new Event('ddh:mo-ai')) }}><span className="tr-o-ai" aria-hidden="true"><Sparkles size={16} /></span>A.I Đỗ Đại Học</button>
-      <hr className="tr-menu-vach" />
-      {!p.coCa && <button type="button" className="tr-menu-muc" onClick={() => { dong(true); p.onThi() }}><ClipboardCheck size={20} aria-hidden="true" />Vào ca kiểm tra</button>}
-      {p.thongBao && <div className="tr-menu-muc tr-menu-tb" onClickCapture={(e) => { if ((e.target as Element).closest?.('.m3-tb-chuong')) dong(false) }}>{p.thongBao}<span aria-hidden="true">Thông báo</span></div>}
-      <button type="button" className="tr-menu-muc" onClick={() => { dong(true); p.onTaiLai() }} disabled={p.dangTai}><RefreshCw size={20} aria-hidden="true" />Cập nhật bài học</button>
-      <CongTac khoa="ddh.am" ten="Âm thanh" Icon={Volume2} />
-      <CongTac khoa="ddh.rung" ten="Rung" Icon={Vibrate} />
-      <button ref={p.nutCuaEm} type="button" className="tr-menu-muc" onClick={() => { dong(false); p.onCuaEm() }} aria-haspopup="dialog" aria-expanded={p.moCuaEm}><span className="tr-menu-anh" aria-hidden="true">{p.chuDau}</span>Của em</button>
+    <nav ref={the} id="tr-menu" className="tr-menu" data-mo={mo || undefined} data-dd={coDd ? '' : undefined} aria-label="Điều hướng học sinh">
+      <div className="tr-menu-dau">
+        <a className="tr-menu-ten" href="/hs"><img src={`${import.meta.env.BASE_URL}logo-hs-nho-v3.svg`} width={28} height={28} alt="" draggable={false} />Đỗ Đại Học</a>
+        {/* Chuông = ĐÚNG phần tử ThongBaoHocSinh (số chưa đọc, tấm thông báo); bấm ⇒ menu thu, tấm thông báo vẫn hiện (CSS giữ tấm hiện). */}
+        {p.thongBao && <div className="tr-menu-tb" onClickCapture={(e) => { if ((e.target as Element).closest?.('.m3-tb-chuong')) { cham(); dong(false) } }}>{p.thongBao}</div>}
+      </div>
+      {coDd && <KhoiDiemDanh tt={tt} ma={ma} setMa={setMa} loi={loi} setLoi={setLoi} dangGui={dangGui} gui={gui} oNhap={oNhap} />}
+      <div className="tr-menu-ds" hidden={cai}>
+        {MENU_DUO.map(({ id, ten, icon: Icon, sac }) => <button key={id} type="button" className="tr-menu-muc" onClick={chon(() => { p.onMuc(id); dong(true) })} aria-current={p.muc === id ? 'page' : undefined}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}</button>)}
+        {!p.coCa && <button type="button" className="tr-menu-muc" onClick={chon(() => { dong(true); p.onThi() })}><span className="tr-menu-o" data-sac="tin" aria-hidden="true"><ClipboardCheck size={20} /></span>Ca kiểm tra</button>}
+        <button type="button" className="tr-menu-muc tr-menu-ai" onClick={chon(() => { dong(false); window.dispatchEvent(new Event('ddh:mo-ai')) })}><span className="tr-menu-o tr-o-ai" aria-hidden="true"><Sparkles size={20} /></span>Hỏi A.I Đỗ Đại Học</button>
+        <button ref={nutCai} type="button" className="tr-menu-muc" onClick={chon(() => setCai(true))} aria-expanded={cai} aria-controls="tr-menu-cai"><span className="tr-menu-o" data-sac="xam" aria-hidden="true"><BanhRang size={20} /></span>Cài đặt<ChevronRight size={20} aria-hidden="true" className="tr-menu-mui" /></button>
+      </div>
+      <div id="tr-menu-cai" className="tr-menu-cai" role="group" aria-labelledby="tr-menu-cai-ten" hidden={!cai}>
+        <div className="tr-menu-cai-dau"><button ref={nutLui} type="button" className="tr-menu-lui" onClick={chon(() => setCai(false))} aria-label="Quay lại menu"><MuiTrai size={22} /></button><b id="tr-menu-cai-ten">Cài đặt</b></div>
+        <CongTac khoa="ddh.am" ten="Âm thanh" Icon={Volume2} sac="tin" />
+        <CongTac khoa="ddh.rung" ten="Rung" Icon={Vibrate} sac="chu-y" />
+        <hr className="tr-menu-vach" />
+        <button type="button" className="tr-menu-muc" onClick={chon(() => { dong(true); p.onTaiLai() })} disabled={p.dangTai}><span className="tr-menu-o" data-sac="chinh" aria-hidden="true"><RefreshCw size={20} /></span>Cập nhật bài học</button>
+        <button ref={p.nutCuaEm} type="button" className="tr-menu-muc" onClick={chon(() => { dong(false); p.onCuaEm() })} aria-haspopup="dialog" aria-expanded={p.moCuaEm}><span className="tr-menu-o tr-menu-anh" aria-hidden="true">{p.chuDau}</span>Của em</button>
+      </div>
     </nav>
   </>
 }
