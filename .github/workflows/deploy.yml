@@ -107,7 +107,9 @@ jobs:
           # GIỜ CAO ĐIỂM 19:00–23:59 VN (thầy 12/10: "tối ưu triệt để … giờ cao điểm"): `ap-migration-chua.mjs` chạy `wrangler d1 execute --file` —
           # Cloudflare báo "D1 database will be unavailable to serve queries" ⇒ em đang học thấy "Máy chủ phản hồi chậm". Schema vòng chữa ổn định từ
           # 07/10 ⇒ giờ cao điểm BỎ bước áp; bước `--schema` cuối vẫn KIỂM (thiếu là dừng phát hành). Các bước schema dưới là CREATE IF NOT EXISTS qua API.
-          if [ "$(TZ=Asia/Ho_Chi_Minh date +%H)" -ge 19 ]; then echo "Giờ cao điểm: bỏ áp schema vòng chữa bằng --file, chỉ kiểm."; else node scripts/ap-migration-chua.mjs --remote; fi
+          # 27/10: bước --file làm D1 tạm ngừng và kéo mỗi lượt phát hành 19–30+ phút ⇒ BỎ ở mọi giờ, chỉ kiểm (`--schema` cuối).
+          # Cần áp lại schema vòng chữa thì chạy tay workflow migration-vong-chua.yml.
+          echo "Bỏ áp schema vòng chữa bằng --file (ổn định từ 07/10), chỉ kiểm."
           node scripts/ap-migration-hanh-trinh-0910.mjs
           npx esbuild scripts/ap-migration-goi7.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/goi7-schema.mjs --log-level=warning
           node /tmp/goi7-schema.mjs
