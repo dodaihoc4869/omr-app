@@ -10,7 +10,6 @@ import { bayToi, bungHat, hoatAnh, latSo, phanHoiThuong } from '../../lib/hieu-u
 import { DAT_CUOC, DUONG, GIA_BINH, MOC_CHUOI, datCuoc, layDsBan, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, HuyHieuMau, IcLua, IcTinhThe, Tia } from './hinh'
 import { capNhatTongQuan, useTai, useTongQuan } from './dung-thuong'
-import { tenNgan } from './ban-gon'
 import { ChuGiaiTuan, Cho, chuCai, DemTT, Loi, ManToan, NutDay, ThangLich, TuanBay, dongHo, gioVn, ngayNgan, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
 
 export const LUAT_CHUOI = [
@@ -125,7 +124,7 @@ function KhoiLuaDoi({ token, bat, onBan }: { token?: string; bat?: boolean; onBa
   if (bat !== true || !ds || ds.tat) return null
   const nhan = ds.ban.length ? `Lửa đôi với ${ds.ban.length} bạn` : 'Chưa có bạn học cùng'
   const ruot = ds.ban.length ? ds.ban.map((b, i) => <div key={b.ma} className="tp-dong"><span className="tp-av" data-k={String((i % 4) + 1)} aria-hidden="true">{chuCai(b.ten)}</span>
-    <div className="giua"><b>{b.ten}</b><span>Lửa đôi {b.chuoiDoi} ngày · {CHU_DOI[b.homNay].replace('bạn', tenNgan(b.ten))}</span></div></div>)
+    <div className="giua"><b>{b.ten}</b><span>Lửa đôi {b.chuoiDoi} ngày · {CHU_DOI[b.homNay]}</span></div></div>)
     : <div className="tp-dong"><span className="tp-av" data-k="2" aria-hidden="true">+</span><div className="giua"><b>Học cùng bạn để giữ lửa đôi</b><span>Cả hai cùng xong 1 chặng mỗi ngày thì lửa đôi tăng</span></div></div>
   return <section className="tp-the" aria-label="Lửa đôi">
     <h2>Lửa đôi</h2>

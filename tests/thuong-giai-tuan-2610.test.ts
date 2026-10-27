@@ -114,7 +114,7 @@ describe('/hs/giai + xếp nhóm', () => {
     d.sql.prepare("INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('giai_tuan_chot', '2026-10-19', 'x')").run()
     return d
   }
-  it('cron xếp 25 em hạng Sắt ⇒ nhóm ≤ 20; em thấy nhóm tên rút gọn + lớp, KHÔNG số báo danh, KHÔNG nhãn; một batch đọc', async () => {
+  it('cron xếp 25 em hạng Sắt ⇒ nhóm ≤ 20; em thấy nhóm đủ họ tên (thầy 27/10) + lớp, KHÔNG số báo danh, KHÔNG nhãn; một batch đọc', async () => {
     const d = dung25()
     await cronGiaiTuan(d.env, NOW)
     const nhom = d.sql.prepare("SELECT nhom, COUNT(*) n FROM giai_tuan WHERE tuan = ? GROUP BY nhom").all(TUAN) as { nhom: string; n: number }[]
@@ -127,7 +127,7 @@ describe('/hs/giai + xếp nhóm', () => {
     expect(r).toMatchObject({ ok: true, bat: true, hang: 'sat', len: 5, roi: 0 })
     expect(r.hetHanGiay).toBe(Math.floor((VN('2026-11-01T22:00:00') - NOW) / 1000))
     const em = r.nhom.find((x: any) => x.laEm)
-    expect(em).toMatchObject({ ten: 'Văn Em3 N.', lop: '12A1', nguyenTu: 97 })
+    expect(em).toMatchObject({ ten: 'Nguyễn Văn Em3', lop: '12A1', nguyenTu: 97 })
     expect(r.nhom.filter((x: any) => x.laEm)).toHaveLength(1)
     const json = JSON.stringify(r)
     for (let i = 0; i < 25; i++) expect(json).not.toContain(`H${String(i).padStart(2, '0')}`)
@@ -244,7 +244,7 @@ describe('thầy + phụ huynh', () => {
       d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, ket_qua, luc, ngay_vn) VALUES (?, 'P1', ?, 'on_lai', 'm', 1, ?, ?)").run(`${ngay}|${q}`, `Q${q}`, `${ngay}T02:00:00Z`, ngay)
     d.sql.prepare("INSERT INTO ban_hoc (em_a, em_b, trang_thai, nguoi_moi, moi_luc, cap_nhat_luc) VALUES ('P1', 'P2', 'dong_y', 'P1', 'x', 'x')").run()
     const t = await tuanThuongPh(d.env, 'P1', NOW)
-    expect(t).toEqual({ chuoi: 2, soBai: 2, hang: 'sat', tiLeHocThat: 0.75, hocCung: ['Văn Bạn V.'] })
+    expect(t).toEqual({ chuoi: 2, soBai: 2, hang: 'sat', tiLeHocThat: 0.75, hocCung: ['Vũ Văn Bạn'] })
     const r = (await phBaoCaoTuan(d.env, { sbd: 'P1' }, NOW)) as Record<string, any>
     if (r.ok) expect(r.tuan).toEqual(t)
   })

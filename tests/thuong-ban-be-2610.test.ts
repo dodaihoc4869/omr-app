@@ -73,7 +73,7 @@ describe('mời / đồng ý / tối đa 3 / thôi', () => {
     expect(d.dem('thong_bao_thuong', "loai = 'moi_ban' AND em = 'B'")).toBe(1)
     const banB = (await hsBan(d.env, { token: await gameToken(d.env, 'B') }, NOW)) as Record<string, any>
     expect(banB.ban).toEqual([])
-    expect(banB.loiMoi).toEqual([{ ma: maCua(d, 'A'), ten: 'Văn An N.', lop: '12A1' }])
+    expect(banB.loiMoi).toEqual([{ ma: maCua(d, 'A'), ten: 'Nguyễn Văn An', lop: '12A1' }])
     expect(await hsBanTraLoi(d.env, { token: await gameToken(d.env, 'B'), ma: maCua(d, 'A'), dongY: false }, NOW)).toMatchObject({ ok: true, trangThai: null })
     expect(cap(d, 'A', 'B')!.trang_thai).toBe('tu_choi')
     // Mời lại sau khi bị từ chối được; lần này đồng ý.
@@ -117,7 +117,7 @@ describe('tìm bạn', () => {
     expect(json).not.toMatch(/"N\d+"|KX|TIM0|sbd/)
     expect(json).not.toContain('Khoá')
     const s = (await hsBanTim(d.env, { token: t, q: 'N7' })) as Record<string, any>
-    expect(s.ketQua).toEqual([{ ma: maCua(d, 'N7'), ten: 'Hoa 7 N.', lop: '12A1', trangThai: null }])
+    expect(s.ketQua).toEqual([{ ma: maCua(d, 'N7'), ten: 'Nguyễn Thị Hoa 7', lop: '12A1', trangThai: null }])
     expect(((await hsBanTim(d.env, { token: t, q: 'tìm' })) as Record<string, any>).ketQua).toEqual([]) // chính em
     expect(((await hsBanTim(d.env, { token: t, q: 'a' })) as Record<string, any>).ketQua).toEqual([]) // < 2 ký tự
   })
@@ -134,7 +134,7 @@ describe('/hs/ban + gõ cửa', () => {
     const b0 = d.soLenh.batch
     let r = (await hsBan(d.env, { token: tA }, NOW)) as Record<string, any>
     expect(d.soLenh.batch - b0).toBe(1)
-    expect(r.ban).toEqual([{ ma: maCua(d, 'B'), ten: 'Thị Bình T.', lop: '11B2', chuoiDoi: 2, homNay: 'ca_hai_chua', daGoCua: false }])
+    expect(r.ban).toEqual([{ ma: maCua(d, 'B'), ten: 'Trần Thị Bình', lop: '11B2', chuoiDoi: 2, homNay: 'ca_hai_chua', daGoCua: false }])
     hoc(d, 'A', '2026-10-28', 6)
     r = (await hsBan(d.env, { token: tA }, NOW)) as Record<string, any>
     expect(r.ban[0]).toMatchObject({ homNay: 'ban_chua', chuoiDoi: 2 })
@@ -152,7 +152,7 @@ describe('/hs/ban + gõ cửa', () => {
     expect(await hsBanGoCua(d.env, { token: tA, ma: maCua(d, 'B') }, NOW + 60_000)).toMatchObject({ ok: true, moi: false })
     expect(d.dem('thong_bao_thuong', "loai = 'go_cua' AND em = 'B'")).toBe(1)
     const tb = d.sql.prepare("SELECT du_lieu FROM thong_bao_thuong WHERE loai = 'go_cua'").get() as { du_lieu: string }
-    expect(JSON.parse(tb.du_lieu)).toEqual({ ma: maCua(d, 'A'), ten: 'Văn An N.', lop: '12A1' })
+    expect(JSON.parse(tb.du_lieu)).toEqual({ ma: maCua(d, 'A'), ten: 'Nguyễn Văn An', lop: '12A1' })
     expect(((await hsBan(d.env, { token: tA }, NOW)) as Record<string, any>).ban[0].daGoCua).toBe(true)
     expect(await hsBanGoCua(d.env, { token: tA, ma: maCua(d, 'B') }, VN('2026-10-29T08:00:00'))).toMatchObject({ moi: true })
     expect(await hsBanGoCua(d.env, { token: tA, ma: maCua(d, 'C') }, NOW)).toMatchObject({ ok: false })
@@ -210,7 +210,7 @@ describe('cron chuỗi đôi (00:10 VN)', () => {
     expect(d.dem('vang_so', "ma_mon = 'tt-moc-chuoi-doi' AND so_vang = 10")).toBe(2)
     expect(d.dem('huy_hieu_em', "ma = 'doi_7'")).toBe(2)
     expect(d.dem('thong_bao_thuong', "loai = 'moc_doi'")).toBe(2)
-    expect(JSON.parse((d.sql.prepare("SELECT du_lieu FROM thong_bao_thuong WHERE em = 'A' AND loai = 'moc_doi'").get() as any).du_lieu)).toEqual({ moc: 7, tinhThe: 10, ban: 'Thị Bình T.' })
+    expect(JSON.parse((d.sql.prepare("SELECT du_lieu FROM thong_bao_thuong WHERE em = 'A' AND loai = 'moc_doi'").get() as any).du_lieu)).toEqual({ moc: 7, tinhThe: 10, ban: 'Trần Thị Bình' })
     // Giả lập chạy lại ngày đó: mốc đã thưởng (moc_da) + khoá vang_so ⇒ không cộng đôi.
     d.sql.prepare("UPDATE ban_hoc SET chuoi_doi = 6, ngay_tinh = '2026-10-27', moc_da = 0 WHERE em_a = 'A' AND em_b = 'B'").run()
     await cronDen(d, VN('2026-10-29T00:30:00'))

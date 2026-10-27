@@ -68,6 +68,8 @@ const dt = (x: unknown): O | null => (x && typeof x === 'object' && !Array.isArr
 const so = (x: unknown): number | undefined => (typeof x === 'number' && Number.isFinite(x) ? x : undefined)
 const soNg = (x: unknown): number | undefined => { const n = so(x); return n === undefined || n < 0 ? undefined : Math.round(n) }
 const chu = (x: unknown): string | undefined => (typeof x === 'string' && x.trim() ? x.trim() : undefined)
+/** Họ tên người (bạn học / bảng giải): đủ họ tên, gọn khoảng trắng thừa (thầy 27/10 «chuẩn tên»). */
+const tenNguoi = (x: unknown): string | undefined => chu(x)?.replace(/\s+/g, ' ')
 const mang = <T>(x: unknown, doc: (v: unknown) => T | undefined): T[] | undefined => (Array.isArray(x) ? x.map(doc).filter((v): v is T => v !== undefined) : undefined)
 export const HANG_GIAI: readonly HangGiai[] = ['sat', 'dong', 'bac', 'vang', 'bachkim', 'kimcuong']
 const laHang = (x: unknown): x is HangGiai => HANG_GIAI.includes(x as HangGiai)
@@ -134,7 +136,7 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
   return kq
 }
 function docDongGiai(x: unknown): DongGiai | undefined {
-  const o = dt(x); const th = soNg(o?.thuHang), ten = chu(o?.ten), nt = soNg(o?.nguyenTu)
+  const o = dt(x); const th = soNg(o?.thuHang), ten = tenNguoi(o?.ten), nt = soNg(o?.nguyenTu)
   return th && ten && nt !== undefined ? { thuHang: th, ten, lop: chu(o!.lop) ?? '', nguyenTu: nt, laEm: o!.laEm === true } : undefined
 }
 export function docBangGiai(x: unknown): BangGiai | null {
@@ -158,12 +160,12 @@ export function docDsHuyHieu(x: unknown): HuyHieu[] | null {
 }
 const HOM_NAY: readonly HomNayDoi[] = ['ca_hai', 'ban_chua', 'em_chua', 'ca_hai_chua']
 function docBan(x: unknown): BanHoc | undefined {
-  const o = dt(x); const ma = chu(o?.ma), ten = chu(o?.ten), cd = soNg(o?.chuoiDoi)
+  const o = dt(x); const ma = chu(o?.ma), ten = tenNguoi(o?.ten), cd = soNg(o?.chuoiDoi)
   return ma && ten && cd !== undefined && HOM_NAY.includes(o!.homNay as HomNayDoi)
     ? { ma, ten, lop: chu(o!.lop) ?? '', chuoiDoi: cd, homNay: o!.homNay as HomNayDoi, daGoCua: o!.daGoCua === true, ...(chu(o!.tuNgay) ? { tuNgay: chu(o!.tuNgay) } : {}) } : undefined
 }
 function docNguoi(x: unknown): NguoiMoi | undefined {
-  const o = dt(x); const ma = chu(o?.ma), ten = chu(o?.ten)
+  const o = dt(x); const ma = chu(o?.ma), ten = tenNguoi(o?.ten)
   return ma && ten ? { ma, ten, lop: chu(o!.lop) ?? '' } : undefined
 }
 export function docDsBan(x: unknown): DanhSachBan | null {
