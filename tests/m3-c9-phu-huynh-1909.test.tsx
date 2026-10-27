@@ -75,7 +75,11 @@ describe('ParentPortalScreen.tsx: không mã màu cứng, phạm vi bộ sinh', 
   it('không #hex, không import hay sửa gì ngoài lớp m3; nằm trong phạm vi bộ sinh lớp tương thích', () => {
     const t = doc('src/screens/ParentPortalScreen.tsx')
     expect(t).not.toMatch(/#[0-9a-fA-F]{6}\b/)
-    expect(t).toContain("import '../components/m3'")
+    // 27/10 tốc độ: nạp thẳng ba tờ CSS của lớp m3 (cùng thứ tự components/m3/index.ts) thay cho thùng m3 (nằm trong mảnh DesignSystem ~27 KB nén).
+    const m3 = doc('src/components/m3/index.ts')
+    const toCss = [...m3.matchAll(/^import '(\.\.?\/[^']+\.css)'/gm)].map((x) => x[1]!.replace(/^\.\.\//, '../components/').replace(/^\.\//, '../components/m3/'))
+    expect(toCss).toEqual(['../components/bang-nhiem-vu/m3-theme.css', '../components/m3/m3.css', '../components/m3/m3-tuong-thich.css'])
+    expect([...t.matchAll(/^import '(\.\.\/components\/[^']+\.css)'/gm)].map((x) => x[1]).filter((x) => toCss.includes(x!))).toEqual(toCss)
     expect(doc('scripts/sinh-m3-tuong-thich.mjs')).toContain("'src/screens/ParentPortalScreen.tsx'")
   })
 })

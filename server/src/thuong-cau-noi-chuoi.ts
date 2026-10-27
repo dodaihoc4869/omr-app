@@ -4,9 +4,9 @@
 //   · `chuoiNgay`: đúng trường B3 trả (gác cờ `duolingo_bai` như B3 — cờ tắt ⇒ null, giao diện ẩn khối chuỗi; không bịa số);
 //   · mua bình: nơi gọi TRỪ tinh thể trước (khoá chống lặp), rồi `congBinhGiuChuoi` (id = khoá giao dịch ví ⇒ gọi lại không cộng đôi);
 //   · «ngày có học» / «ngày được đỡ» (thăng hoa, cược) dùng ĐÚNG định nghĩa B3: ≥ CAU_MOT_BAI câu khác nhau có kết quả trong ngày VN hoặc tự sửa xong;
-//     được đỡ = vắng có phép, bình đã dùng, ngày đã cứu.
+//     được đỡ = vắng có phép (chỉ ngày trước 27/10), bình đã dùng, ngày đã cứu.
 import type { Env } from './kieu'
-import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn, type ChuoiNgay as ChuoiNgayB3 } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn, phepConGiuChuoi, type ChuoiNgay as ChuoiNgayB3 } from './chuoi-ngay-bai'
 import { chuoiBaiNeuBat, congBinh, docNhatKyChuoi } from './chuoi-ngay-bai-d1'
 
 /** Trường dùng chung §4.3 (B3 trả; thêm 'cuu' | 'cho' theo hợp đồng docs/hop-dong-duolingo-2610.md mục 4). */
@@ -40,8 +40,11 @@ const rongNeuLoi = (p: Promise<{ results?: Dong[] }>): Promise<Dong[]> => p.then
 const dauNgayIso = (ngay: string) => new Date(Date.parse(`${ngay}T00:00:00+07:00`)).toISOString()
 const cuoiNgayIso = (ngay: string) => new Date(Date.parse(`${ngay}T00:00:00+07:00`) + 86_400_000).toISOString()
 
-/** Vắng có phép theo ngày VN của buổi (đúng câu B3, chạy cho cả lô em). */
+/** Vắng có phép theo ngày VN của buổi (đúng câu B3, chạy cho cả lô em). Luật 27/10: chỉ ngày TRƯỚC mốc còn giữ chuỗi ⇒ ngày từ mốc bỏ. */
 function docPhep(env: Env, ds: readonly string[], tu: string, den: string): Promise<Dong[]> {
+  return docPhepTho(env, ds, tu, den).then((r) => r.filter((x) => phepConGiuChuoi(String(x.ngay))))
+}
+function docPhepTho(env: Env, ds: readonly string[], tu: string, den: string): Promise<Dong[]> {
   return rongNeuLoi(env.DB.prepare(`SELECT DISTINCT d.sbd AS sbd, date(b.mo_luc, '+7 hours') AS ngay FROM buoi_hoc_diem_danh d JOIN buoi_hoc b ON b.id = d.buoi_id
       WHERE d.sbd IN (SELECT value FROM json_each(?)) AND d.trang_thai = 'co_phep' AND b.mo_luc >= ? AND b.mo_luc < ?`).bind(JSON.stringify(ds), dauNgayIso(tu), cuoiNgayIso(den)).all<Dong>())
 }

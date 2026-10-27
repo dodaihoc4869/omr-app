@@ -2,7 +2,7 @@
 // KHÔNG ném lỗi. Máy chủ chưa có lệnh (404) / lỗi / mất mạng ⇒ `loi` kèm câu cho người đọc; màn hiện "Thử lại".
 import { layDiaChiMayChu } from '../dia-chi-may-chu'
 import { docPass } from '../ph-token'
-import { docChiTietCau, docTatCaVeCon, type ChiTietCau, type PhMoi } from './du-lieu'
+import { docTatCaVeCon, type ChiTietCau, type PhMoi } from './du-lieu'
 
 const HAN_MS = 20_000
 export type PhanHoiTatCa = { kieu: 'ok'; pm: PhMoi } | { kieu: 'loi'; chu: string }
@@ -42,7 +42,8 @@ export async function taiTatCaVeCon(sbd: string): Promise<PhanHoiTatCa> {
 }
 
 export async function taiChiTietCau(sbd: string, qid: string): Promise<PhanHoiChiTiet> {
-  const r = await goi('/ph/chi-tiet-cau-ve-con', { qid }, sbd)
+  // Bộ đọc lời giải nạp lười, SONG SONG với lệnh máy chủ (không thêm thời gian chờ).
+  const [r, { docChiTietCau }] = await Promise.all([goi('/ph/chi-tiet-cau-ve-con', { qid }, sbd), import('./du-lieu-loi-giai')])
   if (!r) return { kieu: 'loi', chu: CHU_MANG }
   const ct = docChiTietCau(r.j)
   return ct ? { kieu: 'ok', ct } : { kieu: 'loi', chu: 'Chưa xem được lời giải của câu này. Anh/chị thử lại sau ít phút.' }

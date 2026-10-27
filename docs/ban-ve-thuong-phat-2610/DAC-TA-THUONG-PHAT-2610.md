@@ -68,7 +68,7 @@ Ghi vào sổ `vang_so` với loại mới.
 - Kim cương 40;
 - thắng cược 100.
 
-**Tiêu:** bình giữ chuỗi 50, cược 50.
+**Tiêu:** bình giữ chuỗi 150 (luật 27/10: mỗi tuần mua tối đa 1 bình, bỏ tặng thứ Hai, bỏ «vắng có phép giữ chuỗi»), cược 50.
 
 **Thăng hoa:**
 - 2 ngày liền không xong bài nào và không có bình đỡ ⇒ mất 10% tinh thể (tối thiểu 5, tối đa 50, không âm);

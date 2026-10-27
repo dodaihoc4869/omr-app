@@ -3,7 +3,6 @@
 //   POST /ph/chi-tiet-cau-ve-con {pass|sbd, qid} ⇒ lời giải của MỘT câu con đã làm
 // Nguyên tắc: (1) khối nào sai dạng ⇒ VẮNG (màn ẩn, không bịa 0/mảng rỗng giả); (2) CÂU BỊ CHE (`che`) chỉ giữ {luc, nguon, che, giay?} — mọi trường khác (đề, đáp án, đúng/sai, tên dạng, mã câu) BỊ BỎ
 // dù JSON lỡ có: điện thoại phụ huynh không được thành đường lộ đáp án; (3) không trường nào của game (thần thú, EXP, khiên…) được đi qua đây; (4) không ném lỗi.
-import { chuanHoaLoiGiaiCau } from '../chuan-hoa-loi-giai'
 export type NguonHien = 'on_lai' | 'btvn' | 'thu_thach_rieng' | 'luyen_dang_vap' | 'gia_dinh_giao' | 'ca_kiem_tra' | 'len_bang' | 'khac_phuc' | 'luyen_de'
 export type LyDoChe = 'chua_cong_bo' | 'chua_nop'
 export type TenBac = 'biet' | 'hieu' | 'van_dung'
@@ -480,37 +479,4 @@ export interface LoiGiaiCT {
 /** `loiGiai` là CHỮ THUẦN đọc được (chuỗi thường giữ nguyên; lời giải có cấu trúc được dựng lại thành các dòng Chốt / Bước / Kết quả) — KHÔNG BAO GIỜ chứa JSON thô. `loiGiaiCT` chỉ có khi máy chủ gửi lời giải có cấu trúc. */
 export type ChiTietCau = { kieu: 'ok'; de: string; phuongAn: string[]; dapAn: string; tenDang: string; loiGiai: string; loiGiaiCT: LoiGiaiCT | null } | { kieu: 'tu_choi'; chu: string; che: LyDoChe | null }
 
-/**
- * Máy chủ (`ph-tat-ca-ve-con.ts`) gửi `loiGiai` = CHUỖI JSON của lời giải có cấu trúc ({chot, buoc[], ketQua, tung_pa…}); nhiều câu chỉ có chữ thường.
- * Chuỗi bắt đầu bằng `{` ⇒ đọc bằng bộ chuẩn CHUNG chuanHoaLoiGiaiCau (không tự nghĩ ra nội dung); đọc hỏng ⇒ KHÔNG hiện chuỗi rác (chữ rỗng ⇒ màn nói "chưa có lời giải").
- */
-export function docLoiGiai(raw: unknown): { loiGiai: string; loiGiaiCT: LoiGiaiCT | null } {
-  const s = typeof raw === 'string' ? raw.trim().slice(0, 8000) : ''
-  if (!s) return { loiGiai: '', loiGiaiCT: null }
-  if (!s.startsWith('{') && !s.startsWith('[')) return { loiGiai: s, loiGiaiCT: null }
-  let obj: unknown
-  try {
-    obj = JSON.parse(s)
-  } catch {
-    return { loiGiai: '', loiGiaiCT: null }
-  }
-  if (!laDoiTuong(obj)) return { loiGiai: '', loiGiaiCT: null }
-  const c = chuanHoaLoiGiaiCau(obj)
-  const ketQua = chuoi(obj.ketQua ?? obj.ket_qua ?? obj.dapAn, 240)
-  if (c.thieu && !ketQua) return { loiGiai: '', loiGiaiCT: null }
-  const sach = (t: string) => !t.includes('[object Object]') // bộ chuẩn chung ép String() mọi phần tử: phần tử là object ⇒ bỏ, không in rác
-  const ct: LoiGiaiCT = { chot: sach(c.chot) ? c.chot : '', buoc: (c.buoc ?? []).filter(sach), ketQua, lyDo: (c.lyDo ?? []).filter((l) => l.ly && sach(l.ly)) }
-  const chu = [ct.chot, ...ct.buoc.map((b, i) => `Bước ${i + 1}: ${b}`), ct.ketQua ? `Kết quả: ${ct.ketQua}` : ''].filter(Boolean).join('\n')
-  return { loiGiai: chu, loiGiaiCT: chu ? ct : null }
-}
-
-/** Thân `/ph/chi-tiet-cau-ve-con`. `ok:false` ⇒ từ chối kèm LỜI THẬT của máy chủ; thân lạ ⇒ null. */
-export function docChiTietCau(raw: unknown): ChiTietCau | null {
-  if (!laDoiTuong(raw)) return null
-  if (raw.ok === false) return { kieu: 'tu_choi', chu: chuoi(raw.error, 240) || 'Chưa xem được lời giải của câu này.', che: lyDoChe(raw.che) }
-  if (raw.ok !== true) return null
-  const de = chuoi(raw.de, 4000)
-  const dapAn = chuoi(raw.dapAn, 80)
-  if (!de || !dapAn) return null
-  return { kieu: 'ok', de, phuongAn: lapDanh(raw.phuongAn, (e) => (typeof e === 'string' && e.trim() ? chuoi(e, 600) : null), 8), dapAn, tenDang: chuoi(raw.tenDang, 140), ...docLoiGiai(raw.loiGiai) }
-}
+// docLoiGiai / docChiTietCau: ở `du-lieu-loi-giai.ts` (27/10 tốc độ — bộ chuẩn lời giải chung chỉ nạp khi mở chi tiết câu, không cõng vào lượt mở /ph).

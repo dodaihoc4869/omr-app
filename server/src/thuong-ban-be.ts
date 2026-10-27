@@ -1,7 +1,7 @@
 // HỌC CÙNG BẠN — chuỗi đôi kiểu Friend Streak của Duolingo (thầy 26/10: «áp dụng thật tinh tế và dễ hiểu cho học sinh»). Phần B.
 // Luật: LUAT-THUONG-PHAT.md «Bổ sung 26/10». Hợp đồng: DAC-TA §4.4 «Học cùng bạn».
 //   · Mời tối đa 3 bạn trong trung tâm (tìm theo tên hoặc SBD đúng), bạn phải đồng ý.
-//   · Chuỗi đôi +1 khi CẢ HAI cùng xong ≥ 1 bài trong ngày; ngày vắng có phép / bình giữ chuỗi của bạn nào đỡ cho bạn ấy (giữ, không tăng); một bạn lỡ ⇒ về 0.
+//   · Chuỗi đôi +1 khi CẢ HAI cùng xong ≥ 1 bài trong ngày; bình giữ chuỗi của bạn nào đỡ cho bạn ấy (giữ, không tăng; vắng có phép chỉ đỡ ngày trước 27/10); một bạn lỡ ⇒ về 0.
 //     Tính bởi cron 00:10 VN (`cronChuoiDoi`, mỗi cặp một ngày mỗi lượt, CAS theo `ngay_tinh`). Ngày có học + bình + phép: thuong-ngay-hoc.ts (= luật B3).
 //     Giới hạn đã biết: cứu chuỗi (học bù hôm sau) cứu chuỗi CÁ NHÂN, không cứu chuỗi đôi (cron chốt ngày lỡ lúc 00:10 hôm sau, trước khi em học bù).
 //   · Mốc đôi 7/30/100 ⇒ cả hai +10/30/100 tinh thể, huy hiệu đôi, thông báo `moc_doi` (mỗi cặp mỗi mốc một lần: `moc_da`).
@@ -293,7 +293,7 @@ export async function cronChuoiDoi(env: Env, nowMs: number = Date.now()): Promis
     return { a: str(x.em_a), b: str(x.em_b), tenA: str(x.ten_a), tenB: str(x.ten_b), chuoi: num(x.chuoi_doi), mocDa: num(x.moc_da), nt, ngay: ngay > homQua ? homQua : ngay, con: num(x.con) }
   })
   const dsEm = [...new Set(viec.flatMap((v) => [v.a, v.b]))]
-  // Nhật ký đủ dài để bình giữ chuỗi (tặng mỗi thứ Hai / mua / tự dùng) tính đúng như B3; MỘT batch 4 câu cho mọi em của lượt.
+  // Nhật ký đủ dài để bình giữ chuỗi (mua / mốc 30 / tự dùng; tặng thứ Hai chỉ trước 27/10) tính đúng như B3; MỘT batch 4 câu cho mọi em của lượt.
   const [rSo, rSua, rPhep, rMua] = kq(await env.DB.batch(cauNhatKyDs(env, dsEm, themNgay(homNay, -SO_NGAY_NHIEU_EM), homNay)))
   const nhatKy = gopNhatKy(rSo, rSua, rPhep, rMua)
   const chuoiEm = new Map(dsEm.map((e) => [e, chuoiCuaEm(nhatKy.get(e), homNay)] as const))

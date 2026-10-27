@@ -56,7 +56,19 @@ export const CAU_MOI_BAI = 6
 export const TT_RUONG = 15
 export const TT_MUC_TIEU_NGAY = 5
 export const TT_KIM_CUONG = 40
-export const TT_BINH_GIU_CHUOI = 50
+/** Giá 1 bình giữ chuỗi. Luật 27/10 (thầy: «1 tuần kiếm được 1 bình thôi»): 150 (trước 50), mỗi em MUA tối đa BINH_MUA_TOI_DA_TUAN bình / tuần VN (thứ Hai → Chủ nhật). */
+export const TT_BINH_GIU_CHUOI = 150
+export const BINH_MUA_TOI_DA_TUAN = 1
+/** Hậu tố khoá ví của lượt mua bình luật mới: `tt|<ngày VN>|binh-w` (khoá cũ `tt|<ngày>|binh` giá 50 KHÔNG tính vào hạn tuần). */
+export const HAU_TO_KHOA_BINH_TUAN = 'binh-w'
+/** Thứ Hai (ngày VN) của tuần chứa `ngay`. */
+export const thuHaiTt = (ngay: string): string => congNgayTt(ngay, -((new Date(Date.parse(`${ngay}T00:00:00Z`)).getUTCDay() + 6) % 7))
+/** Khoảng khoá ví [từ, tới) của tuần chứa `ngay` (so chuỗi theo chỉ mục UNIQUE(sbd, khoa_yeu_cau)) + ngày mua tiếp (thứ Hai tuần sau). */
+export function tuanMuaBinh(ngay: string): { tu: string; toi: string; muaTiepTu: string } {
+  const t2 = thuHaiTt(ngay)
+  const sau = congNgayTt(t2, 7)
+  return { tu: `tt|${t2}|`, toi: `tt|${sau}|`, muaTiepTu: sau }
+}
 export const TT_CUOC_DAT = 50
 export const TT_CUOC_THANG = 100
 export const CUOC_SO_NGAY = 7

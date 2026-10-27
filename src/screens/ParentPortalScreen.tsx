@@ -8,11 +8,13 @@ import { datPassPhuHuynh } from '../lib/mom-api'
 import { docPass, nhanPassTuDiaChi, tachPass, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
 import { LogoDoc } from '../components/LogoVai'
 import AppPhuHuynh from '../components/ph-v3/AppPhuHuynh'
-import { tenTheoSbd } from '../lib/exam-api'
 import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
-import '../components/m3'
+// 27/10 tốc độ: chỉ cần CSS bộ mặt M3 — nhập thẳng ba tờ (cùng thứ tự `components/m3/index.ts`), KHÔNG nhập thùng m3 (nằm trong mảnh DesignSystem ~27 KB nén).
+import '../components/bang-nhiem-vu/m3-theme.css'
+import '../components/m3/m3.css'
+import '../components/m3/m3-tuong-thich.css'
 import '../components/ph-v3/ph-v3.css'
 
 const SBD_STORAGE_KEY = 'omr_ph_sbd'
@@ -96,6 +98,8 @@ export default function ParentPortalScreen() {
       let lop = conBiet?.lop ?? ''
       if (url && !conBiet) {
         try {
+          // 27/10 tốc độ: tra tên chỉ lúc đăng nhập ⇒ nạp lười cả bộ API ca thi (exam-api ~28 KB nén), không cõng vào lượt mở /ph.
+          const { tenTheoSbd } = await import('../lib/exam-api')
           const info = await tenTheoSbd(url, '', sbdSach)
           if (info && info.hoTen) {
             ten = info.hoTen

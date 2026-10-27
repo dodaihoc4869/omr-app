@@ -39,6 +39,10 @@ goiHoa2('hoc-tap-lam-lai', token, { session: <id phiên chặng (r.id của hoc-
 - **Bản giao diện mẫu** (đã gỡ khỏi bản phát hành, Code app 1 chép logic nếu muốn): commit `406dbd17` — `ManLamBaiTap.tsx` (`xinLamLai`, `tiep`, `soGoc`, chặn chạm lặp khi đang xin), test `tests/lam-lai-cuoi-chang-giao-dien-2610.test.tsx`, cảnh chụp `lam-lai` / `ket-chang`.
 
 ## 4. B3 — chuỗi ngày theo bài + bình giữ chuỗi (ĐÃ BUILD 26/10, gác cùng cờ `duolingo_bai`)
+> **Luật 27/10 (thầy):** từ ngày `NGAY_LUAT_BINH_MOI` = 2026-10-27 — bỏ tặng bình thứ Hai; bỏ «vắng có phép giữ chuỗi» (ngày có phép tính như ngày thường, cả lửa
+> đôi); bình mua 150 tinh thể, tối đa 1 bình / tuần VN (`/hs/thuong/mua-binh` từ chối mã `da_mua_tuan`, không trừ; `/hs/thuong` trả `binh: {gia, toiDaTuan,
+> daMuaTuan, muaTiepTu}`). Ngày trước mốc giữ luật cũ. Đặt lại bình về 0: dòng `chuoi_binh_mua` nguồn `tt-binh-reset-2710` (workflow `dat-lai-binh-2710.yml`).
+> `kieu: 'phep'` chỉ còn xuất hiện cho ngày trước mốc (giao diện vẽ như ngày được đỡ, không dấu «P»).
 - Hàm thuần `chuoiNgayCuaEm(nhatKy, homNay)` ở `server/src/chuoi-ngay-bai.ts`; phần D1 ở `server/src/chuoi-ngay-bai-d1.ts`.
 - **Trường trả về** (chỉ có khi cờ bật cho em; tắt hoặc lỗi thì vắng, giao diện không hiện số):
   ```
@@ -55,10 +59,10 @@ goiHoa2('hoc-tap-lam-lai', token, { session: <id phiên chặng (r.id của hoc-
   - `/ph/ke-hoach`: trường `chuoiNgay`; trường cũ `chuoiDat` lấy cùng số `so`.
 - **Luật:**
   - Một ngày được tính khi em xong ≥ 1 bài (≥ 6 câu khác nhau có kết quả trong ngày, mọi nguồn), hoặc tự sửa xong ≥ 1 câu.
-  - Ngày vắng có phép (thầy ghi ở điểm danh) giữ chuỗi, không tốn bình.
+  - ~~Ngày vắng có phép (thầy ghi ở điểm danh) giữ chuỗi, không tốn bình.~~ (bỏ từ 27/10)
   - Bình giữ chuỗi:
     - mang tối đa 2; chuỗi chạm 100 ngày thì nâng lên 3;
-    - mỗi thứ Hai tặng 1 bình; chuỗi chạm mốc 30 ngày tặng thêm 1;
+    - ~~mỗi thứ Hai tặng 1 bình~~ (bỏ từ 27/10); chuỗi chạm mốc 30 ngày tặng 1;
     - lỡ ngày thì tự dùng 1 bình: chuỗi giữ nguyên, không cộng ngày.
   - Cứu chuỗi:
     - hết bình mà lỡ ngày thì chuỗi tắt;

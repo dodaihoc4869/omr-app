@@ -1222,3 +1222,12 @@
   [data-trong] .da-pop-phu { font-size: 14px; }
   [data-trong] .da-pop-nut { min-height: 44px; margin-top: 8px; }
 }
+
+/* KHOÁ THEO KIỂM TRA ÔN TẬP (thầy 27/10 «làm xong mới mở khoá các chặng sau»): nút Tự sửa lỗi bị khoá ⇒ xám như chặng khoá (không giữ màu đỏ); Kiểm tra ôn tập
+   đã nộp ⇒ ✓ xanh như chặng đã xong. Vỡ khoá sau khi nộp: từng nút chờ tới lượt (--tre) rồi mới vỡ. */
+[data-trong] .da-nut[data-loai][data-tt='khoa'] { --n: var(--tr-mat-3); color: var(--tr-chu-3); }
+[data-trong] .da-nut[data-loai][data-tt='xong'] { --n: var(--tr-dung); }
+:root[data-trong='hs'] .da-nut[data-loai][data-tt='khoa'] { --n-d: initial; }
+:root[data-trong='hs'] .da-nut[data-loai][data-tt='xong'] { --n-d: var(--tr-dung-day); }
+[data-trong='hs'] .da-vo-khoa[style] i { animation-delay: calc(120ms + var(--tre, 0ms)); }
+[data-trong='hs'] .da-vo-khoa[style] > svg { animation-delay: var(--tre, 0ms); }
