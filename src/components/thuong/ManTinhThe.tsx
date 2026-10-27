@@ -85,7 +85,7 @@ export function ManNhiemVu({ token, onVe, hieuUng }: { token?: string; onVe?: ()
           <div className="tp-ruong-the"><span ref={ruong}><Ruong mo={mo} /></span>
             <div className="giua">
               {mo ? <><b style={{ color: 'var(--tp-tt-chu)' }}>Rương đã mở · +{r.thuong} <IcTinhThe /></b><span className="tp-mo">Hẹn em mai với {nv.length} nhiệm vụ mới.</span></>
-                : <><b>Rương ngày</b><span className="tp-mo">Xong cả {nv.length} nhiệm vụ để mở rương · +{r.thuong} <IcTinhThe /></span></>}
+                : <><b>Rương ngày</b><span className="tp-mo">Xong cả {nv.length} nhiệm vụ để mở rương{'\u00a0'}· +{r.thuong}{'\u00a0'}<IcTinhThe /></span></>}
               <div className="tp-ba-cham" role="img" aria-label={`Đã xong ${soXong}/${nv.length} nhiệm vụ`}>{nv.map((x) => <i key={x.ma} data-x={x.xong || undefined} />)}</div>
               {!mo && duMo && token && <button type="button" className="tp-nut" data-sac="tt" disabled={dangMo} onClick={() => void moRuongNgay()}>Mở rương · +{r.thuong} <IcTinhThe /></button>}
             </div></div>
