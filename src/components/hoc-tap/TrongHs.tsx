@@ -196,7 +196,21 @@ function DuongChang({ ds, moDi, cam }: { ds: Nut[]; moDi: boolean; cam?: CamBi }
 }
 
 /** G — Bi NÓI: bong bóng lời hiện chữ gõ dần (~28 ms/chữ); giảm chuyển động / máy yếu ⇒ hiện đủ ngay. Trình đọc màn hình đọc cả câu một lần. */
-function LoiBi({ cam, loi, coBi = true }: { cam: CamBi; loi: string; coBi?: boolean }) {
+/** Lời Bi NHẮC MỘT LẦN (thầy 27/10: «Chỗ học tiếp nhé nhắc 1 lần xong ẩn đi»): khoá = ngày VN + loại lời + bài. Đã hiện khoá ấy ⇒ không hiện nữa
+ *  trong ngày; nội dung đổi hẳn (vừa đủ mức, sang bài mới) ⇒ khoá mới ⇒ hiện lại một lần. Máy không có localStorage ⇒ hiện như cũ (không lỗi). */
+const KHOA_LOI_BI = 'ddh.loi-bi'
+const docDaNhac = (): string[] => { try { const v = JSON.parse(localStorage.getItem(KHOA_LOI_BI) || '[]'); return Array.isArray(v) ? v : [] } catch { return [] } }
+const ghiDaNhac = (k: string) => { try { localStorage.setItem(KHOA_LOI_BI, JSON.stringify([...docDaNhac().filter((x) => x !== k).slice(-19), k])) } catch { /* không lưu được: lần sau nhắc lại */ } }
+
+function LoiBi({ cam, loi, coBi = true, khoa }: { cam: CamBi; loi: string; coBi?: boolean; khoa?: string }) {
+  // pha: hien (gõ chữ, giữ ~4 s) → thu (mờ + co chiều cao mượt, đường đi trượt lên) → an (gỡ hẳn). Không khoá (lời quan trọng) ⇒ luôn hiện.
+  const [pha, setPha] = useState<'hien' | 'thu' | 'an'>(() => (khoa && docDaNhac().includes(khoa) ? 'an' : 'hien'))
+  useEffect(() => {
+    if (!khoa || pha !== 'hien') return
+    ghiDaNhac(khoa)
+    const t1 = window.setTimeout(() => setPha('thu'), 4700), t2 = window.setTimeout(() => setPha('an'), 5100)
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2) }
+  }, [khoa]) // eslint-disable-line react-hooks/exhaustive-deps
   const [n, setN] = useState(loi.length)
   useEffect(() => {
     const yen = document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -209,7 +223,8 @@ function LoiBi({ cam, loi, coBi = true }: { cam: CamBi; loi: string; coBi?: bool
     t = window.setTimeout(go, nhip)
     return () => window.clearTimeout(t)
   }, [loi])
-  return <div className="bi-loi" data-khong-bi={!coBi || undefined}>{coBi && <Bi cam={cam} size={84} noi={loi} />}<p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
+  if (pha === 'an') return null
+  return <div className="bi-loi-boc" data-thu={pha === 'thu' || undefined}><div className="bi-loi" data-khong-bi={!coBi || undefined}>{coBi && <Bi cam={cam} size={84} noi={loi} />}<p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div></div>
 }
 
 const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
@@ -226,6 +241,27 @@ function OTo({ ten, mo, sac, Icon, so, noi, onClick, tat }: { ten: string; mo: s
  *  từ số sẵn có). Cùng số, cùng lệnh, cùng nút như bản trước; ô nào app chưa có số rẻ thì giữ nhãn, bỏ số. */
 export function MotTrangHs(p: PropsMotTrang) {
   const so = p.so, kiem = p.kiem, hs = p.hs
+  // THẺ BÀI GHIM (thầy 27/10: «ghim phần bài 8 amine lại»): dính ngay dưới hàng bộ đếm (đo chiều cao thật của hàng — ngang thấp khác dọc); vạch mốc
+  // ngay trên thẻ khuất dưới hàng bộ đếm ⇒ thẻ đã dính ⇒ thu gọn (bỏ dòng nhãn nhỏ) + bóng đáy.
+  const khung = useRef<HTMLDivElement>(null), mocBai = useRef<HTMLElement>(null)
+  const [trenCao, datTrenCao] = useState(52)
+  const [dinh, datDinh] = useState(false)
+  useLayoutEffect(() => {
+    const tr = khung.current?.querySelector<HTMLElement>('.da-tren')
+    if (!tr) return
+    const do_ = () => datTrenCao(Math.round(tr.getBoundingClientRect().height))
+    do_()
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(do_) : null
+    ro?.observe(tr)
+    return () => ro?.disconnect()
+  })
+  useEffect(() => {
+    const m = mocBai.current
+    if (!m || typeof IntersectionObserver !== 'function') return
+    const io = new IntersectionObserver(([e]) => { if (e) datDinh(!e.isIntersecting && e.boundingClientRect.top < trenCao + 2) }, { rootMargin: `-${trenCao + 1}px 0px 0px 0px`, threshold: 0 })
+    io.observe(m)
+    return () => io.disconnect()
+  }, [trenCao, !!mocBai.current]) // eslint-disable-line react-hooks/exhaustive-deps
   const nhipGoc = useNhipHocEm(p.ngayKiem ? undefined : p.token, null)
   const nhip = typeof nhipGoc === 'string' ? null : nhipTheoSanh(nhipGoc, so ? { muc: so.muc, daLam: so.daLam } : null)
   // Thưởng phạt: tổng quan /hs/thuong (bản lưu máy trước, máy chủ sau). Có chuỗi ngày theo bài (B3, cờ duolingo_bai) ⇒ MỌI chỗ hiện chuỗi dùng CÙNG số với
@@ -340,22 +376,24 @@ export function MotTrangHs(p: PropsMotTrang) {
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSua && 'Tự sửa lỗi', !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
   const hocThem = (chinh === 'sua' || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc
   // Bi nói việc chính của hôm nay (cùng thứ tự `chinh`); xong hết ⇒ Bi mừng. Chưa có số (đang tải) ⇒ chưa hiện, không đoán.
-  const loiBi: [CamBi, string] | null = chinh === 'ca' ? ['chao', 'Có ca kiểm tra đang mở. Em vào ca trước nhé.']
-    : p.ngayKiem ? ['chao', 'Hôm nay là ngày Kiểm tra ôn tập. Em làm bài nhé.']
+  // [cảm xúc, lời, loại]: loại làm khoá «nhắc một lần» (số câu còn lại đổi theo từng câu KHÔNG tính là nội dung mới); 'ca' = lời quan trọng, luôn hiện.
+  const loiBi: [CamBi, string, string] | null = chinh === 'ca' ? ['chao', 'Có ca kiểm tra đang mở. Em vào ca trước nhé.', 'ca']
+    : p.ngayKiem ? ['chao', 'Hôm nay là ngày Kiểm tra ôn tập. Em làm bài nhé.', 'ngay-kiem']
     : !so ? null
-    : du ? (tiepTheo.length ? ['vui', `Đủ mức rồi! Giờ đến ${tiepTheo[0]} nhé.`] : ['mung', 'Xong hết việc hôm nay! Em giỏi lắm.'])
-    : so.daLam === 0 ? ['chao', 'Chào em! Hôm nay bắt đầu từ chặng Học nhé.'] : ['chao', `Học tiếp nhé! Còn ${con} câu nữa là đủ mức hôm nay.`]
+    : du ? (tiepTheo.length ? ['vui', `Đủ mức rồi! Giờ đến ${tiepTheo[0]} nhé.`, `du-${tiepTheo[0]}`] : ['mung', 'Xong hết việc hôm nay! Em giỏi lắm.', 'xong'])
+    : so.daLam === 0 ? ['chao', 'Chào em! Hôm nay bắt đầu từ chặng Học nhé.', 'bat-dau'] : ['chao', `Học tiếp nhé! Còn ${con} câu nữa là đủ mức hôm nay.`, 'hoc-tiep']
 
   // Bi đứng cạnh đường (bản vẽ nâng cấp 27/10) khi đường có ≥ 2 chặng ⇒ lời Bi phía trên chỉ còn bong bóng (không hai Bi).
   const coBiBen = chang.length >= 2
-  return <div className="dm-khung">{tren}
+  return <div ref={khung} className="dm-khung" style={{ '--tren-cao': `${trenCao}px` } as CSSProperties}>{tren}
     <main className="da-vo" aria-busy={!so && p.dangTai}>
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
       {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label="Đủ mức hôm nay"><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua"><b>Đủ {so.daLam}/{so.muc} câu hôm nay!</b><span className="mo">{tiepTheo.length ? `Tiếp theo: ${tiepTheo.join(', rồi ')}` : 'Em có thể nghỉ, hoặc học thêm câu mới.'}</span></div></section>}
-      {!p.ngayKiem && <section className="da-bai" aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{p.viec}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
+      {!p.ngayKiem && <i ref={mocBai} className="da-bai-moc" aria-hidden="true" />}
+      {!p.ngayKiem && <section className="da-bai" data-dinh={dinh || undefined} aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{p.viec}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
         {chang.length > 0 && <div className="da-bai-tien" role="progressbar" aria-label="Chặng hôm nay" aria-valuemin={0} aria-valuemax={chang.length} aria-valuenow={xongChang}><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</div>}
         {!so && p.dangTai && <span className="mot-xuong" aria-hidden="true" />}</section>}
-      {loiBi && <LoiBi cam={loiBi[0]} loi={loiBi[1]} coBi={!coBiBen} />}
+      {loiBi && <LoiBi key={loiBi[2]} cam={loiBi[0]} loi={loiBi[1]} coBi={!coBiBen} khoa={loiBi[2] === 'ca' ? undefined : `${ngayVn(Date.now())}|${loiBi[2]}|${p.tenBai ?? ''}`} />}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} cam={coBiBen ? loiBi?.[0] ?? 'chao' : undefined} />}

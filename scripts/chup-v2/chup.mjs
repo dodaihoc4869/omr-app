@@ -375,6 +375,10 @@ const NC_CANH = [
 const DS_NC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   NC_CANH.map(([t, m, cho, viec]) => [`nc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết NÂNG CẤP 27/10
+// ═══ LỘ TRÌNH GHIM 27/10 (tiền tố "lg-"): lần mở đầu (bong bóng lời Bi) · lần mở sau trong ngày (không bong bóng) · đã cuộn (thẻ bài dính, thu gọn)
+const LG_CANH = [['dau', 'hs-mot&tp=1', /Ester/], ['sau', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['cuon', 'hs-mot&tp=1', /Ester/, 'lam13:nap » cuon:320 » cho']]
+const DS_LG = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  LG_CANH.map(([t, m, cho, viec]) => [`lg-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ BẢNG + TẤM CHƯA TÍNH 27/10 (tiền tố "nb-"): bảng 2 hàng × 4 cột tự xoay dọc ở khổ hẹp · tấm «Chưa được tính» gọn · bảng lớn cuộn ngang có bóng mép
 const NB_CANH = [
   ['1-bang', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, ''], ['2-chua-tinh', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, 'lam13:tn:^B » nut:^Kiểm tra$'],
@@ -517,6 +521,7 @@ const DS = [
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_TON, // VIỆC TỒN 27/10
   ...DS_NC, // NÂNG CẤP 27/10
+  ...DS_LG, // LỘ TRÌNH GHIM 27/10
   ...DS_NB, // BẢNG + TẤM CHƯA TÍNH 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
@@ -1000,6 +1005,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         else if (loai === 'phim') for (const k of gt) await t.keyboard.press(k)
         else if (loai === 'cho') await t.waitForTimeout(Number(gt)) // GIÁM THỊ 27/10: chờ giám thị «đọc đề» xong rồi mới chụp
         else if (loai === 'dau') await t.evaluate(() => { const k = document.querySelector('.ht2-lam')?.parentElement; if (k) k.scrollTop = 0 })
+        // 27/10: `cuon:N` cuộn khung cuộn của trang N px (thẻ bài ghim) · `nap` tải lại trang (localStorage giữ ⇒ «lần mở sau»)
+        else if (loai === 'cuon') await t.evaluate((n) => { const k = [...document.querySelectorAll('body *')].find((e) => /(auto|scroll)/.test(getComputedStyle(e).overflowY) && e.scrollHeight > e.clientHeight + 4) ?? document.scrollingElement; k?.scrollBy(0, n) }, Number(gt))
+        else if (loai === 'nap') { await t.reload(); await t.getByText(cho).first().waitFor({ timeout: 20000 }); await t.waitForTimeout(600) }
         await t.waitForTimeout(250)
       }
       // GIÁM THỊ 27/10: bong bóng càu nhàu không được chồng lên nhãn, đề, phương án, thanh trên / đáy (đo hình chữ nhật thật) ⇒ ghi vào «Tràn ngang».
