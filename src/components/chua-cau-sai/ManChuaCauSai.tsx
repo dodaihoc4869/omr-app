@@ -24,6 +24,7 @@ import TheCau from '../TheCau'
 import { BangSoLieu, ZoomableImage } from '../QuestionMedia'
 import ChuaTrucTiep, { propsCauLam } from './ChuaTrucTiep'
 import ChuaGon from './ChuaGon'
+import { KhungDuoSua, type TienDoSua } from './KhungDuoSua'
 import { TrongManChua } from './trong-man-chua'
 import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
@@ -43,6 +44,8 @@ export interface PropsChuaCauSai {
   onKhongMo?: (loi: string) => void
   /** Chữa câu gọn (25/10): sang câu kế của Việc hôm nay sau khi câu này khép. Vắng ⇒ nút về như cũ. */
   onTiep?: () => void
+  /** Chỗ của câu trong chặng sửa hôm nay — màn kiểu Duolingo («Trong» HS, 27/10) vẽ thanh tiến độ + màn xong chặng. */
+  tienDo?: TienDoSua
 }
 /** Mã lỗi của lệnh gọn (máy chủ ĐÃ có đường gọn) ⇒ vẫn ở đường gọn để báo thật; mã khác / mất mạng ⇒ lối cũ. */
 const MA_GON = new Set(['KHONG_MO_DUOC_CAU', 'KHONG_CO_DOT'])
@@ -196,7 +199,14 @@ export default function ManChuaCauSai({
   nhanVe = 'Sang câu khác',
   onKhongMo,
   onTiep,
+  tienDo,
 }: PropsChuaCauSai) {
+  // «Trong» HS 27/10: đường gọn + lúc đang mở / báo lỗi vẽ khung Duo (ChuaGonDuo); lối cũ (từng bước, câu gốc) giữ như trước.
+  const [duo] = useState(() => {
+    const d = typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs'
+    if (d) void import('./ChuaGonDuo').catch(() => {}) // nạp trước, song song lệnh mở đợt
+    return d
+  })
   const [ph, setPh] = useState<KetQuaDot | null>(null),
     [tai, setTai] = useState(true),
     [daXongSo, setDaXongSo] = useState<'' | 'dong' | 'chua_thay'>(''),
@@ -223,11 +233,11 @@ export default function ManChuaCauSai({
   }, [])
   useEffect(() => {
     const f = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !ban) onVe()
+      if (e.key === 'Escape' && !ban && !(duo && gon)) onVe() // màn sửa câu Duo tự lo Esc (tấm giữ chân / đóng lời giải)
     }
     window.addEventListener('keydown', f)
     return () => window.removeEventListener('keydown', f)
-  }, [onVe, ban])
+  }, [onVe, ban, duo, gon])
   const ap = useCallback((r: KetQuaDot) => {
     setPh(r)
     setHoi(r.phanHoiTruoc ?? null)
@@ -378,6 +388,26 @@ export default function ManChuaCauSai({
     ph?.cauGoc && ['I', 'II', 'III'].includes(ph.cauGoc.phan) && ph.cauGoc.text
       ? propsCauLam({ ...ph.cauGoc, phan: ph.cauGoc.phan as 'I' | 'II' | 'III', hinhAnh: ph.cauGoc.hinhAnh as { src: string; viTri: string; alt?: string }[] | undefined }, '')
       : null
+  if (duo && (tai || gon || !ph)) {
+    const pctDau = tienDo ? Math.round((100 * Math.min(tienDo.xong, tienDo.tong)) / Math.max(1, tienDo.tong)) : 0
+    if (gon && !tai) return <ChuaGon key={gon.dotId} token={token} qid={qid} dotId={gon.dotId} dau={gon.dau} nhanVe={nhanVe} onVe={onVe} onTiep={onTiep} tienDo={tienDo} />
+    const thuLai = () => { setTai(true); setLoi(''); setLanTai((x) => x + 1) }
+    return (
+      <KhungDuoSua onVe={onVe} khoaVe={ban} pct={pctDau} nhanThanh={tienDo ? `Chặng ${tienDo.so} · đã sửa ${tienDo.xong}/${tienDo.tong} câu` : 'Sửa câu này'}
+        day={tai ? null : <div className="duo-day"><div className="duo-giua">
+          {daXongSo ? <button type="button" className="duo-nut" onClick={onVe}>{nhanVe}</button>
+            : <><button type="button" className="duo-nut" onClick={thuLai}>Thử lại</button><div className="duo-bo"><button type="button" className="duo-lien" onClick={onVe}>{nhanVe}</button></div></>}
+        </div></div>}>
+        {tai ? <div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang mở câu…</span></div>
+          : <section className="duo-sua-bao" data-tt={daXongSo ? 'dung' : 'loi'}>
+            <span className="duo-sua-dau" aria-hidden="true">{daXongSo ? <svg viewBox="0 0 24 24" width="40" height="40"><path d="M5 12.5 10 17.5 19 7" /></svg> : <svg viewBox="0 0 24 24" width="40" height="40"><path d="M12 7v6M12 17h.01" /></svg>}</span>
+            <h1 ref={buocRef} tabIndex={-1}>{daXongSo === 'dong' ? 'Câu này không cần sửa nữa' : daXongSo ? 'Câu này tạm chưa cần sửa' : 'Chưa mở được câu này'}</h1>
+            <p role={daXongSo ? 'status' : 'alert'}>{daXongSo === 'dong' ? 'Câu này không còn lỗi nào cần sửa. Thầy tính xong phần của em ở câu này.'
+              : daXongSo ? 'Câu này tạm chưa có lỗi nào cần sửa. Em sang câu khác nhé, thầy tính xong phần của em ở câu này.' : loi || 'Chưa mở được câu chữa.'}</p>
+          </section>}
+      </KhungDuoSua>
+    )
+  }
   return (
     <TrongManChua.Provider value={true}>
     <div className="tlu ccs" data-tuyen={gon ? 'gon' : trucTiep ? 'truc-tiep' : 'tung-buoc'} aria-label="Chữa câu sai">
@@ -415,7 +445,7 @@ export default function ManChuaCauSai({
             <strong>Đang mở câu…</strong>
           </div>
         ) : gon ? (
-          <ChuaGon key={gon.dotId} token={token} qid={qid} dotId={gon.dotId} dau={gon.dau} nhanVe={nhanVe} onVe={onVe} onTiep={onTiep} />
+          <ChuaGon key={gon.dotId} token={token} qid={qid} dotId={gon.dotId} dau={gon.dau} nhanVe={nhanVe} onVe={onVe} onTiep={onTiep} tienDo={tienDo} />
         ) : trucTiep && ph ? (
           <ChuaTrucTiep
             token={token}
