@@ -139,6 +139,8 @@
 [data-trong] .kq-kinh .kq-the h3 { font-size: 16px; font-weight: 600; }
 [data-trong] .kq-cau { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 [data-trong] .kq-cau > * { aspect-ratio: auto; min-height: 44px; font-size: 14px; font-weight: 600; }
+/* Khổ hẹp (360 px): 6 cột + khe 6 px ⇒ ô 43 px < vùng chạm 44 px — khe 4 px ⇒ ô ≥ 44 px (27/10). */
+@media (max-width: 379px) { [data-trong] .kq-cau { gap: 4px; } }
 [data-trong] .kq-cau .dung { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
 [data-trong] .kq-cau .sai { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); box-shadow: inset 0 0 0 1.5px var(--tr-sai); }
 [data-trong] .kq-cau .mot_phan { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); box-shadow: inset 0 0 0 1.5px var(--tr-chu-y); }
