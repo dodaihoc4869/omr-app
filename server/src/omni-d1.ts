@@ -12,6 +12,7 @@
 // Mọi đường đọc của em/PH: lỗi ⇒ trả giá trị an toàn (hồ sơ rỗng / null), KHÔNG làm hỏng Sảnh, trả lời, PH.
 import type { Env } from './kieu'
 import { KHOP } from './cau-meta'
+import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
 import {
   CAC_KHUNG_GIO, KHOA_CO_OMNI, KHOA_THAM_SO_OMNI, MUC_DICH_LUOT, PHIEN_BAN_OMNI, THAM_SO_OMNI,
   coOmniApCho, docCoOmniTu, khungGioCua,
@@ -105,7 +106,11 @@ const demHoSo = new DemTTL<HoSoOmniEm>(60_000, 400)
 const demTho = new DemTTL<Map<string, Map<string, { p: number; n: number }>>>(6 * 3_600_000, 64)
 /** Ma trận Q và siêu dữ liệu câu (đổi khi thầy duyệt Q / nạp kho) — 10 phút; isolate duyệt Q xoá ngay. */
 const demQ = new DemTTL<QCau>(10 * 60_000, 16_000)
-const demKho = new DemTTL<CauKho | null>(10 * 60_000, 16_000)
+// 28/10 (Analytics D1 27/10 19–23h: siêu dữ liệu câu ~6 % thời gian D1; kho gần như tĩnh): tuổi 10 → 30 phút, KÈM kiểm dấu kho mỗi 5 phút khi có câu đệm
+// được dùng lại (dau-kho-cau.ts) — thầy sửa kho ⇒ dấu đổi ⇒ bỏ cả đệm. Bộ test: như cũ (10 phút, không hỏi dấu).
+const BAT_DAU_KHO = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
+const demKho = new DemTTL<CauKho | null>(BAT_DAU_KHO ? 30 * 60_000 : 10 * 60_000, 16_000)
+let dauKhoDem = '', kiemDauKho = 0, lucDemDau = 0
 const demTenDang = new DemTTL<string>(10 * 60_000, 4_000)
 const demHieuChuan = new DemTTL<HieuChuan>(10 * 60_000, 4)
 const demQChienDich = new DemTTL<{ cau: QCau[]; dangCo: string[] }>(10 * 60_000, 20)
@@ -243,6 +248,13 @@ export async function docCauKho(env: Env, qids: readonly string[]): Promise<Map<
     if (c === undefined) can.push(q)
     else if (c) ra.set(q, c)
   }
+  // Có câu lấy từ đệm mà lần kiểm dấu đã quá 5 phút ⇒ hỏi dấu kho (một dòng); đổi / không đọc được ⇒ bỏ đệm, đọc lại cả lượt này.
+  if (BAT_DAU_KHO && ra.size && (now - kiemDauKho >= 5 * 60_000 || now < kiemDauKho)) {
+    const d = await dauKhoCau(env)
+    // Chưa từng biết dấu: đệm còn đúng nếu mốc lập chỉ mục mới nhất có TRƯỚC lần ghi đệm đầu tiên (`dauTruocLucDoc`).
+    if (!d || (dauKhoDem ? d !== dauKhoDem : !dauTruocLucDoc(d, lucDemDau))) { demKho.xoa(); lucDemDau = 0; ra.clear(); can.length = 0; can.push(...new Set(qids.filter(Boolean))) }
+    dauKhoDem = d; kiemDauKho = now
+  }
   for (let i = 0; i < can.length; i += 800) {
     const lo = can.slice(i, i + 800)
     const r = await env.DB.prepare(SQL_CAU_KHO).bind(JSON.stringify(lo)).all<Row>().catch(() => null)
@@ -257,6 +269,7 @@ export async function docCauKho(env: Env, qids: readonly string[]): Promise<Map<
     for (const q of lo) {
       const c = moi.get(q) ?? null
       demKho.ghi(q, now, c)
+      if (!lucDemDau) lucDemDau = now
       if (c) ra.set(q, c)
     }
   }
