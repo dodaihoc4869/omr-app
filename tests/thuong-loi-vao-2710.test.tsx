@@ -34,14 +34,14 @@ describe('thẻ Học cùng bạn trên Lộ trình', () => {
   it('bạn chưa học ⇒ một thẻ gọn + Gõ cửa (một lần, đúng mã bạn); bấm chữ ⇒ mở Học cùng bạn', async () => {
     const onMo = vi.fn()
     render(<TheBanLoTrinh token={TK} bat onMo={onMo} />)
-    expect(await screen.findByText('Bảo chưa học hôm nay')).toBeTruthy()
+    expect(await screen.findByText('Trần Gia Bảo chưa học hôm nay')).toBeTruthy()
     expect(screen.getByText('Lửa đôi 3 ngày')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Gõ cửa' }))
     await waitFor(() => expect(screen.getByRole('button', { name: 'Đã gõ cửa' }).hasAttribute('disabled')).toBe(true))
     expect(daGoi.filter((g) => g.duong === DUONG.goCua).map((g) => g.than.ma)).toEqual(['b2'])
     fireEvent.click(screen.getByRole('button', { name: 'Đã gõ cửa' }))
     expect(daGoi.filter((g) => g.duong === DUONG.goCua)).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button', { name: /Bảo chưa học hôm nay.*Mở Học cùng bạn/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Trần Gia Bảo chưa học hôm nay.*Mở Học cùng bạn/ }))
     expect(onMo).toHaveBeenCalledTimes(1)
     // chỉ tên + lửa đôi + đã học chưa — không điểm / nguyên tử / lớp của bạn
     expect(document.body.textContent).not.toMatch(/nguyên tử|điểm|12A2/)
@@ -50,7 +50,7 @@ describe('thẻ Học cùng bạn trên Lộ trình', () => {
   it('cả hai chưa học ⇒ «… cũng chưa học hôm nay», KHÔNG nút Gõ cửa (luật màn Học cùng bạn: em xong bài rồi mới gõ)', async () => {
     mayChu[DUONG.ban] = { ...M.BAN_GIA, ban: [{ ...M.BAN_GIA.ban[1]!, homNay: 'ca_hai_chua' }] }
     render(<TheBanLoTrinh token={TK} bat onMo={() => {}} />)
-    expect(await screen.findByText('Bảo cũng chưa học hôm nay')).toBeTruthy()
+    expect(await screen.findByText('Trần Gia Bảo cũng chưa học hôm nay')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Gõ cửa' })).toBeNull()
   })
 
@@ -86,8 +86,42 @@ describe('thẻ Học cùng bạn trên Lộ trình', () => {
     mayChu[DUONG.ban] = { ...M.BAN_GIA, ban: [], loiMoi: [{ ma: 'm1', ten: 'Trần Thu Lan', lop: '12A1' }] }
     const onMo = vi.fn()
     render(<TheBanLoTrinh token={TK} bat onMo={onMo} />)
-    fireEvent.click(await screen.findByRole('button', { name: /Lan mời em học cùng/ }))
+    fireEvent.click(await screen.findByRole('button', { name: /Trần Thu Lan mời em học cùng/ }))
     expect(onMo).toHaveBeenCalled()
+  })
+})
+
+describe('tên bạn ĐỦ họ tên + ô chữ đầu + nhãn lớp (thầy 27/10 «Cho hiện đủ tên nhé, chuẩn tên nhé»)', () => {
+  it('tên 4 chữ, có dấu, rất dài: hiện nguyên văn đúng thứ tự (không «Minh Đức L.»); ô chữ đầu = tên đệm + tên; lớp «11» ⇒ «Lớp 11»', async () => {
+    const DAI = 'Tôn Nữ Hoàng Thị Phương Uyên Khánh Linh'
+    mayChu[DUONG.ban] = { ...M.BAN_GIA, ban: [
+      { ma: 'x1', ten: 'Nguyễn Thị Minh Khai', lop: '11', chuoiDoi: 2, homNay: 'ca_hai', daGoCua: false },
+      { ma: 'x2', ten: '  Lê   Minh  Đức ', lop: '12A1', chuoiDoi: 5, homNay: 'ca_hai', daGoCua: false },
+      { ma: 'x3', ten: DAI, lop: '12 - Lớp Thường', chuoiDoi: 1, homNay: 'ca_hai', daGoCua: false },
+    ] }
+    const { ManHocCungBan } = await import('../src/components/thuong/ManThuong')
+    render(<ManHocCungBan token={TK} />)
+    const the = (ma: string) => document.querySelector(`[data-ban="${ma}"]`)!
+    await waitFor(() => expect(the('x1')).toBeTruthy())
+    expect(the('x1').querySelector('.giua b')!.textContent).toBe('Nguyễn Thị Minh Khai')
+    expect(the('x1').querySelector('.tp-av')!.textContent).toBe('MK')
+    expect(the('x1').querySelector('.giua span')!.textContent).toBe('Lớp 11')
+    expect(the('x2').querySelector('.giua b')!.textContent).toBe('Lê Minh Đức')
+    expect(the('x2').querySelector('.tp-av')!.textContent).toBe('MĐ')
+    expect(the('x2').querySelector('.giua span')!.textContent).toBe('Lớp 12A1')
+    expect(the('x3').querySelector('.giua b')!.textContent).toBe(DAI)
+    expect(the('x3').querySelector('.giua span')!.textContent).toBe('12 - Lớp Thường')
+    expect(document.body.textContent).not.toMatch(/[A-ZĐ]\.(?!\w)/) // không kiểu tắt «… L.»
+  })
+  it('kết quả tìm bạn: đủ họ tên, «Lớp 11» có nhãn', async () => {
+    mayChu[DUONG.timBan] = { ok: true, bat: true, ketQua: [{ ma: 't1', ten: 'Lê Minh Đức', lop: '11', trangThai: null }] }
+    const { ManMoiBan } = await import('../src/components/thuong/ManThuong')
+    render(<ManMoiBan token={TK} onDong={() => {}} />)
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: '11010' } })
+    const o = await screen.findByText('Lê Minh Đức')
+    const dong = o.closest('.dong-b')!
+    expect(dong.textContent).toContain('Lớp 11')
+    expect(dong.querySelector('.tp-av')!.textContent).toBe('MĐ')
   })
 })
 
@@ -98,7 +132,7 @@ describe('Chuỗi ngày · khối Lửa đôi', () => {
     const nut = await screen.findByRole('button', { name: 'Lửa đôi với 2 bạn — mở Học cùng bạn' })
     expect(nut.textContent).toContain('Minh Châu')
     expect(nut.textContent).toContain('Lửa đôi 9 ngày')
-    expect(nut.textContent).toContain('Bảo chưa học hôm nay')
+    expect(nut.textContent).toContain('bạn chưa học hôm nay')
     expect(nut.textContent).not.toMatch(/nguyên tử|12A2/)
     fireEvent.click(nut)
     expect(onBan).toHaveBeenCalledTimes(1)

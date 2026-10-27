@@ -107,6 +107,11 @@ export function rowidTuMa(ma: unknown): number | null {
   return Number.isSafeInteger(n) && n > 0 ? n : null
 }
 
+/** Tên bạn trong hệ thưởng (Học cùng bạn: tìm / mời / danh sách / lời mời / gõ cửa / mốc đôi · Giải tuần · khối «học cùng» của PH): ĐỦ HỌ TÊN đúng thứ tự
+ *  tiếng Việt như danh sách lớp, chỉ gọn khoảng trắng — thầy 27/10 «Cho hiện đủ tên nhé, chuẩn tên nhé» (trước: `tenRutGon` «Minh Đức L.»). Rỗng ⇒ «Bạn học».
+ *  Chỉ họ tên — không thêm SBD hay thông tin riêng nào khác. */
+export const tenDayDu = (hoTen: unknown): string => (typeof hoTen === 'string' ? hoTen.trim().split(/\s+/).filter(Boolean).join(' ') : '') || 'Bạn học'
+
 /** Tên lớp hiệu lực tính trong SQL (đúng luật `tenLopCuaEm` của ten-lop.ts). `h` = bí danh bảng hoc_sinh. */
 export const SQL_TEN_LOP = (h: string) =>
   `CASE WHEN TRIM(COALESCE(${h}.ten_lop, '')) <> '' THEN TRIM(${h}.ten_lop) WHEN TRIM(COALESCE(${h}.lop, '')) = '12' THEN '12 - Lớp Thường' WHEN TRIM(COALESCE(${h}.lop, '')) <> '' THEN TRIM(${h}.lop) ELSE 'Chưa xếp lớp' END`

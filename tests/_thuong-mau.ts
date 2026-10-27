@@ -50,10 +50,10 @@ export const HUY_HIEU_GIA = { ok: true, huyHieu: [
   { ma: 'doi_100', ten: 'Chuỗi đôi 100', co: false, tienDo: { da: 9, can: 100 } },
   { ma: 'phan_ung_day_chuyen', ten: 'Phản ứng dây chuyền', co: true, ngay: '2026-10-12' }, { ma: 'cu_dem', ten: 'Cú đêm', co: true, ngay: '2026-10-20' },
 ] }
-/** /hs/ban (tp-16) — Minh Châu cả hai xong (lửa đôi 9), Gia Bảo chưa học (3). Không điểm của bạn. */
+/** /hs/ban (tp-16) — Nguyễn Minh Châu cả hai xong (lửa đôi 9), Trần Gia Bảo chưa học (3). Đủ họ tên (thầy 27/10). Không điểm của bạn. */
 export const BAN_GIA = { ok: true, bat: true, toiDa: 3, loiMoi: [], daMoi: [], ban: [
-  { ma: 'b1', ten: 'Minh Châu', lop: '12A2', chuoiDoi: 9, homNay: 'ca_hai', daGoCua: false, tuNgay: '2026-10-17' },
-  { ma: 'b2', ten: 'Gia Bảo', lop: '12A2', chuoiDoi: 3, homNay: 'ban_chua', daGoCua: false, tuNgay: '2026-10-23' },
+  { ma: 'b1', ten: 'Nguyễn Minh Châu', lop: '12A2', chuoiDoi: 9, homNay: 'ca_hai', daGoCua: false, tuNgay: '2026-10-17' },
+  { ma: 'b2', ten: 'Trần Gia Bảo', lop: '12A2', chuoiDoi: 3, homNay: 'ban_chua', daGoCua: false, tuNgay: '2026-10-23' },
 ] }
 /** /hs/kim-cuong/ds (lối vào Thử thách Kim cương, 27/10): một chuyên đề mở, một lượt dở, một đang khoá, một đã đạt. */
 export const DS_KC_GIA = { ok: true, bat: true, ds: [
@@ -87,9 +87,9 @@ export const TB = {
   mocChuoi: { ma: 'moc_chuoi|7', loai: 'moc_chuoi', duLieu: { moc: 7, tinhThe: 10 } },
   cuocThua: { ma: 'cuoc|1', loai: 'cuoc', duLieu: { ketQua: 'thua', tinhThe: -50 } },
   huyHieu: { ma: 'huy_hieu|hoan_hao_10', loai: 'huy_hieu', duLieu: { ma: 'hoan_hao_10', ten: '10 chặng hoàn hảo' } },
-  mocDoi: { ma: 'moc_doi|7', loai: 'moc_doi', duLieu: { moc: 7, tinhThe: 10, ban: 'Minh Châu' } },
-  moiBan: { ma: 'moi_ban|1', loai: 'moi_ban', duLieu: { ma: 'b9', ten: 'Minh Châu', lop: '12A2' } },
-  goCua: { ma: 'go_cua|1', loai: 'go_cua', duLieu: { ma: 'b2', ten: 'Gia Bảo', lop: '12A2' } },
+  mocDoi: { ma: 'moc_doi|7', loai: 'moc_doi', duLieu: { moc: 7, tinhThe: 10, ban: 'Nguyễn Minh Châu' } },
+  moiBan: { ma: 'moi_ban|1', loai: 'moi_ban', duLieu: { ma: 'b9', ten: 'Nguyễn Minh Châu', lop: '12A2' } },
+  goCua: { ma: 'go_cua|1', loai: 'go_cua', duLieu: { ma: 'b2', ten: 'Trần Gia Bảo', lop: '12A2' } },
 } as const
 /** Chuỗi vừa tắt, đang cứu (tp-6). */
 export const CUU = (daLam: number) => ({ so: 0, giuChuoi: 0, sucChua: 2, lich7: lich7(['hoc', 'hoc', 'hoc', 'hoc', 'hoc', 'tat', 'tat']),

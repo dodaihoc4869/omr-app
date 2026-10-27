@@ -376,7 +376,9 @@ const TPC_CANH = [
 const TON_CANH = [
   ['lo-trinh', 'hs-mot&tp=1', false], ['lo-trinh-moi', 'hs-mot&tp=1&ban=0', false], ['chuoi', 'hs-mot&tp=1', true, 'nut:Chuỗi 12 ngày'],
   ['thanh-tich', 'hs-mot&tp=1', true, 'menu:Thành tích'], ['kc-ds', 'hs-mot&tp=1', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
-  ['kc-trong', 'hs-mot&tp=1&kc=0', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'], ['kc-moi', 'hs-mot&tp=1', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương » nut:Thử thách Cấu tạo'],
+  ['kc-trong', 'hs-mot&tp=1&kc=0', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
+  // TÊN ĐỦ 27/10 (thầy: «Cho hiện đủ tên nhé, chuẩn tên nhé»): Học cùng bạn + Mời bạn tìm «11010» (`&ten=dai`: tên 4 chữ, tên rất dài, lớp «11»)
+  ['ban', 'hs-mot&tp=1&ten=dai', true, 'ton:menu:Thành tích » nut:Học cùng bạn'], ['moi-ban', 'hs-mot&tp=1&ten=tim', false, 'ton:menu:Thành tích » nut:Học cùng bạn » nut:Mời bạn » go:11010'], ['kc-moi', 'hs-mot&tp=1', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương » nut:Thử thách Cấu tạo'],
 ]
 const DS_TON = [[390, 844, 'doc'], [360, 640, 'doc640']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TON_CANH.map(([t, m, ca, viec]) => [`ton-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
@@ -751,6 +753,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       // VIỆC TỒN 27/10: chuỗi bước ngăn " » " — `menu:<mục>` (chọn mục menu dọc như dưới) · `nut:<tên đầu>` (bấm nút có tên bắt đầu bằng chữ ấy).
       for (const buoc of viec.slice(4).split(' » ')) {
         if (buoc.startsWith('menu:')) await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), buoc.slice(5))
+        else if (buoc.startsWith('go:')) await t.getByRole('searchbox').first().fill(buoc.slice(3)) // 27/10: gõ vào ô tìm (Mời bạn)
         else await t.getByRole('button', { name: new RegExp('^' + buoc.slice(4)) }).first().click()
         await t.waitForTimeout(700)
       }
