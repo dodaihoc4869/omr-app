@@ -1,0 +1,31 @@
+# Bảng / cột mà lượt đọc Sảnh cần có trên D1 thật không (CHỈ ĐỌC: sqlite_master, pragma) — 27/10 tối, tối ưu Sảnh / Mở chặng.
+name: Đo bảng Sảnh (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-nop-2710]
+    paths: [.github/workflows/do-bang-sanh-2710.yml]
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results[]" || echo "(lỗi)"; }
+          q "bảng có mặt" "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('chien_dich_bat_dau','chien_dich_tuy_chon','chien_dich_em','hanh_trinh_v5_phan_nhom','omni_xac_nhan','hanh_trinh_v6_fit','hanh_trinh_v6_chon','v2_tham_so_em','srs2_day_lai','omni_beta_cau','cau_nghi_dap_an','goi_bai_7_muc_ngay','loi_giai_so_do','omni_p_vkn','goi_bai_7_kiem','goi_bai_7_chua','btvn_em_cau')"
+          q "cột chien_dich_em" "SELECT name FROM pragma_table_info('chien_dich_em')"
+          q "số dòng bảng lớn" "SELECT (SELECT COUNT(*) FROM su_kien_hoc) skh,(SELECT COUNT(*) FROM game_v2_question) q,(SELECT COUNT(*) FROM cau_meta) meta,(SELECT COUNT(*) FROM game_v2_attempt) att,(SELECT COUNT(*) FROM game_v2_session) ses,(SELECT COUNT(*) FROM loi_giai_hoi) lgh,(SELECT COUNT(*) FROM chua_loi_dot) cld,(SELECT COUNT(*) FROM hoc_sinh) hs"
+          q "chỉ mục game_v2_session" "SELECT name,sql FROM sqlite_master WHERE type='index' AND tbl_name IN ('game_v2_session','game_v2_attempt','loi_giai_hoi','goi_bai_7_gap')"
