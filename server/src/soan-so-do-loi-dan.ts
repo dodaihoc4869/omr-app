@@ -216,3 +216,7 @@ export function chuThuLaiThieu(): string {
 export function chuThuLaiAnDu(): string {
   return 'Thầy đã BỎ ẩn dụ tiền / nhà / giàu / nghèo / đánh thuế. Viết lại mọi chữ (deNoiGi, nghia, denDay, hienTuong) nói THẲNG bằng thuật ngữ: số mol, bảo toàn nguyên tố, khối lượng mol, hiệu suất. Giữ nguyên phép tính. Trả về TOÀN BỘ JSON mới đúng khuôn.'
 }
+/** Tin nhắn thử lại khi bản đạt số nhưng trình bày chưa đúng khuôn thầy (thiếu «?», hiệu suất không đứng riêng, thiếu nghĩa) — 27/10. */
+export function chuThuLaiTrinhBay(lyDo: string): string {
+  return `Số đã đúng nhưng TRÌNH BÀY chưa đúng khuôn thầy: ${lyDo} Giữ nguyên phép tính và kết quả; sửa đúng chỗ đó. Trả về TOÀN BỘ JSON mới đúng khuôn.`
+}
