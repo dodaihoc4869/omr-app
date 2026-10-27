@@ -73,7 +73,7 @@ export function chayThuong(d: Dat, yen: boolean): () => void {
   })
   if (!d.bi) return huy
   // Bi bay vụt vào từ mép phải (150 ms → 430 ms)
-  ve(d.bi, [{ transform: 'translateX(160px) rotate(18deg)', opacity: 0 }, { transform: 'translateX(-10px) rotate(-6deg)', opacity: 1, offset: 0.75 }, { transform: 'none', opacity: 1 }], { duration: 280, delay: 150, easing: 'ease-out', fill: 'both' })
+  ve(d.bi, [{ transform: 'translateX(24px) scale(.35) rotate(24deg)', opacity: 0 }, { transform: 'translateX(-8px) scale(1.06) rotate(-6deg)', opacity: 1, offset: 0.75 }, { transform: 'none', opacity: 1 }], { duration: 280, delay: 150, easing: 'ease-out', fill: 'both' })
   if (so && d.tu && d.dem) sau(380, () => {
     const a = tam(d.tu!), g = tam(d.bi!), b = tam(d.dem!)
     for (let i = 0; i < so; i++) {
@@ -88,9 +88,9 @@ export function chayThuong(d: Dat, yen: boolean): () => void {
   // ôm hạt ⇒ nhảy mừng (~780 ms), ném (~920 ms), rời màn (1 150 → 1 350 ms)
   sau(780, () => ve(d.bi, [{ transform: 'none' }, { transform: 'translateY(-16px) scale(1.08, .94)' }, { transform: 'translateY(0) scale(.96, 1.06)' }, { transform: 'none' }], { duration: 260, easing: 'ease-out' }))
   sau(1150, () => {
-    const ra = ve(d.bi, [{ transform: 'none', opacity: 1 }, { transform: 'translateX(140px) rotate(14deg)', opacity: 0 }], { duration: 220, easing: 'ease-in' })
+    const ra = ve(d.bi, [{ transform: 'none', opacity: 1 }, { transform: 'translateX(24px) scale(.4) rotate(14deg)', opacity: 0 }], { duration: 220, easing: 'ease-in' })
     // xong ⇒ thôi giữ khung cuối: Bi về chỗ cũ với opacity 0 của CSS (không nằm ngoài mép màn)
-    if (ra) ra.onfinish = () => { for (const a of hoat) if (a.effect && (a.effect as KeyframeEffect).target === d.bi) a.cancel() }
+    if (ra) ra.onfinish = () => { for (const a of hoat) if (a.effect && (a.effect as KeyframeEffect).target === d.bi) a.cancel(); d.bi!.style.display = 'none' }
   })
   return huy
 

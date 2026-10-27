@@ -811,8 +811,8 @@
   background: var(--tr-chu-y); color: var(--tr-trang); font-size: 16px; font-weight: 800; white-space: nowrap; box-shadow: inset 0 -3px 0 var(--tr-day-khoi);
   pointer-events: none; animation: duo-moc-vao 1400ms ease-out both; }
 [data-trong] .duo-moc[data-moc='10'] { background: var(--tr-sao); color: var(--tr-sao-chu); }
-[data-trong] .duo-bi-gom { position: fixed; right: 14px; top: 34%; z-index: 69; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0; pointer-events: none; }
-[data-trong] .duo-bi-gom .bi { width: 92px; height: auto; }
+[data-trong] .duo-bi-gom { position: fixed; right: 40px; top: 34%; z-index: 69; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0; pointer-events: none; }
+[data-trong] .duo-bi-gom :is(.bi, .bd-svg) { width: 92px; height: auto; max-width: 92px; }
 [data-trong] .duo-bi-gom b { padding: 2px 10px; border-radius: 999px; background: var(--tr-chu-y); color: var(--tr-trang); font-size: 14px; font-weight: 800; white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) {
   [data-trong='hs'] :is(.duo-ket, .duo-ket .duo-tick, .duo-ket .duo-kq-chu h2) { animation: none; }
