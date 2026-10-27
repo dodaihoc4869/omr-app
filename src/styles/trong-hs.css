@@ -1033,7 +1033,7 @@
 [data-trong='hs'] .da-vo-khoa[style] i { animation-delay: calc(120ms + var(--tre, 0ms)); }
 [data-trong='hs'] .da-vo-khoa[style] > svg { animation-delay: var(--tre, 0ms); }
 /* ── SỐ CỦA EM: CỘT DỌC DƯỚI CHUÔNG TRONG MENU (thầy 27/10 «chuyển hết 4 biểu tượng bên trái vào menu ẩn bên phải» · «để dọc xuống thẳng hàng cách đều
-   dưới cái chuông»). Bỏ viên mép trái (#501). Menu có số ⇒ lưới 2 cột: 6 mục | cột 48 px ngay dưới chuông, cùng trục; 4 mục (vòng mục tiêu · lửa · nguyên tử
+   dưới cái chuông»). Bỏ viên mép trái (PR 501). Menu có số ⇒ lưới 2 cột: 6 mục | cột 48 px ngay dưới chuông, cùng trục; 4 mục (vòng mục tiêu · lửa · nguyên tử
    · tinh thể) biểu tượng trên, số nhỏ dưới, không nền / viền, cách đều theo chiều cao 6 mục; vạch dọc rất mảnh ngăn hai cột. Không thêm hàng: menu rộng
    thêm đúng bề cột. Chỉ biến --tr-* sẵn có. */
 [data-trong='hs'] .tr-menu-dem:empty { display: none; }

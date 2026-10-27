@@ -43,7 +43,7 @@ function useCoBen(): boolean {
 }
 
 // ── SỐ CỦA EM TRONG HÀNG ĐẦU MENU (thầy 27/10 xem bản sống: «Ko làm hai ẩn, chuyển hết 4 biểu tượng bên trái vào menu ẩn bên phải… thiết kế tinh tế dễ nhìn
-// siêu đẹp» · «Chuyển hết vào menu này» · «Cho nó xếp dọc tinh tế bỏ nền thẳng hàng với cái chuông để ko phải thêm hàng vào menu»): bỏ viên mép trái (#501);
+// siêu đẹp» · «Chuyển hết vào menu này» · «Cho nó xếp dọc tinh tế bỏ nền thẳng hàng với cái chuông để ko phải thêm hàng vào menu»): bỏ viên mép trái (PR 501);
 // · «Ý tôi là để dọc xuống thẳng hàng cách đều dưới cái chuông»: 4 mục — vòng mục tiêu · lửa · nguyên tử · tinh thể — biểu tượng trên, số dưới, không nền,
 // thành CỘT DỌC bên phải 6 mục của MENU ĐANG CÓ, ngay dưới chuông, cùng trục (ô #tr-menu-dem của MenuDocTrong); không thêm hàng, menu rộng thêm đúng bề cột. Điện thoại / xoay ngang: menu ẩn mép phải; máy tính ≥ 1024 × 600: thanh menu trái.
 // Vẽ bằng portal vào ô ấy (menu là cây React khác); chạm ô ⇒ mở màn như cũ + menu thu (MenuDocTrong nghe click DOM của ô). Nội dung lấy lại TOÀN bộ bề ngang.
