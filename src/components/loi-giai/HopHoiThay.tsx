@@ -5,6 +5,8 @@
 // Vẽ qua portal vào <body>: thẻ câu trong game/màn cuộn có transform ⇒ `position: fixed` lệch khỏi màn nếu nằm trong thẻ.
 // `cau = null` (tốc độ, thầy 13/10): hộp mở NGAY lúc em bấm, đề câu đang tới ⇒ ba vạch chờ; ô nhắn dùng `qid` của nút (gõ trước được).
 // `em` (thầy 21/10, docs/ban-ve-hoi-thay-em-2110): dữ liệu THÔ của thẻ «Em và câu này» (về CÙNG lượt với đề; vắng / sai khuôn ⇒ thẻ ẩn).
+// `tong` (thầy 27/10 «trả lời đúng bấm Hỏi thầy thì màu xanh theo màu trả lời đúng; sai thì Hỏi thầy thành màu đỏ cho đồng bộ»): kết quả câu lúc mở
+// (đúng / sai / chưa tính) ⇒ `data-tong` trên nền hộp; giao diện «Trong» đổi bộ biến màu chính của hộp theo đó (trong-hoi-thay.css). Vắng ⇒ tông chính.
 // Đề và thẻ là hai ngăn loại trừ nhau; Thầy trả lời câu đầu ⇒ cả hai gập. Điện thoại ngang: hai ngăn thành cột trái (`.lg-hh-trai`), hội thoại cột phải.
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -43,7 +45,8 @@ function tachDe(html: string): { chu: string; con: string } | null {
 }
 const LOAI_CAU = { tn: 'Trắc nghiệm', ds: 'Đúng / Sai', tln: 'Trả lời ngắn' } as const
 
-export default function HopHoiThay({ cau, qid = '', luotId, nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false, dapAnEm, em = null }: { cau: CauChoKhung | null; qid?: string; luotId?: string; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean; dapAnEm?: string; em?: unknown }) {
+export type TongHoiThay = 'dung' | 'sai' | 'trung'
+export default function HopHoiThay({ cau, qid = '', luotId, nguon, onDong, onTraLoi, onMoLoiGiai, dangLam = false, dapAnEm, em = null, tong }: { tong?: TongHoiThay; cau: CauChoKhung | null; qid?: string; luotId?: string; nguon: string; onDong: () => void; onTraLoi?: () => void; onMoLoiGiai?: () => void; dangLam?: boolean; dapAnEm?: string; em?: unknown }) {
   const id = useId()
   const dongRef = useRef(onDong)
   dongRef.current = onDong
@@ -67,7 +70,7 @@ export default function HopHoiThay({ cau, qid = '', luotId, nguon, onDong, onTra
   const [hoiNhanh, setHoiNhanh] = useState<{ n: number; cau: string } | null>(null)
   const [dangGuiHoi, setDangGuiHoi] = useState(false)
   return createPortal(
-    <div className="lg-hh-nen m3">
+    <div className="lg-hh-nen m3" data-tong={tong}>
       <div className="lg-hh" role="dialog" aria-modal="true" aria-labelledby={`${id}-t`}>
         <header className="lg-hh-dau">
           <span className="lg-hh-hinh" aria-hidden="true"><MessageCircleQuestion size={22} strokeWidth={2.2} /></span>

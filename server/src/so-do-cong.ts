@@ -296,7 +296,7 @@ function khopDapAnSo(v: number, dapAn: string, d: SoDoc): boolean {
 /** Chữ hiện cho em (thầy 27/10 «Bỏ thực tế lý thuyết đi», ảnh): bỏ «thực tế» / «lý thuyết» / «theo lý thuyết»; «per» (tiếng Anh) ⇒ «/». Không đụng `so`, `ten`. */
 export function lamSachChu(chu: string): string {
   return chu
-    .replace(/\s*\b(?:theo\s+)?(?:lý thuyết|thực tế)(?![\p{L}\p{N}])/giu, '')
+    .replace(/\s*\b(?:theo\s+)?(?:l[ýí] thuyết|thực tế)(?![\p{L}\p{N}])/giu, '')
     .replace(/(?<=[\p{L}\p{N}])\s+per\s+(?=[\p{L}\p{N}])/gu, '/')
     .replace(/\(\s+/g, '(').replace(/\s+([,.;:)])/g, '$1').replace(/:\s*:/g, ':').replace(/\s{2,}/g, ' ').trim()
 }

@@ -125,7 +125,7 @@ const DAI_LUONG: [RegExp, string, (ngu: string, chuDe: string) => string | null]
   [/khối lượng/, 'khối lượng', () => 'm = n × M'],
   [/thể tích/, 'thể tích', dongTheTich],
   [/số mol/, 'số mol', () => 'n = m : M'],
-  [/hiệu suất/, 'hiệu suất', () => 'H = lượng thực tế : lượng lý thuyết × 100%'],
+  [/hiệu suất/, 'hiệu suất', () => 'H = lượng phản ứng : lượng ban đầu × 100%' /* thầy 27/10 */],
   [/tỉ khối/, 'tỉ khối', () => 'd A/B = M_A : M_B'],
 ]
 

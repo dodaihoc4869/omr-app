@@ -25,7 +25,7 @@ export function tangTuBan(ban: BanSoDo): TangGoiY[] {
   if (ban.buoc.length) {
     const n = ban.buoc.length
     ra.push({
-      icon: 'pen', mau: 'dung', ten: n > 1 ? `Tính ${n} bước` : 'Một phép tính', phu: 'chạm từng số để xem đến đó là gì',
+      icon: 'pen', mau: 'dung', ten: n > 1 ? `Tính ${n} bước` : 'Một phép tính',
       // `hienKetQua={false}`: gợi ý luôn ở TRƯỚC khi nộp — dù dữ liệu lỡ có `ketQua` cũng không vẽ.
       than: <>{n > 1 ? <div className="gyc-buoc-tinh">{ban.buoc.map((b, i) => <ChuoiTinh key={i} buoc={b} stt={i + 1} nhieu hienKetQua={false} />)}</div>
         : <ChuoiTinh buoc={ban.buoc[0]} stt={1} nhieu={false} hienKetQua={false} />}{ban.cauTuHoi && doan(ban.cauTuHoi)}</>,

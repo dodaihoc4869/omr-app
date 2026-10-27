@@ -4,11 +4,10 @@ import type { Env } from './kieu'
 import { ngayVn } from './su-kien-hoc'
 import { themNgay } from './ho-so-nam-kt'
 import { bacCongKhai, type BacDanhGia } from './danh-gia-hoc-that'
-import { SQL_TEN_LOP, chuanHang, docCongTacTuDong, num, sqlCongTac, str, tuanCua, type Hang, type Row } from './thuong-b-chung'
+import { SQL_TEN_LOP, tenDayDu, chuanHang, docCongTacTuDong, num, sqlCongTac, str, tuanCua, type Hang, type Row } from './thuong-b-chung'
 import { SO_NGAY_NHIEU_EM, cauNhatKy, cauNhatKyDs, chuoiCuaEm, gopNhatKy, soBaiNgay } from './thuong-ngay-hoc'
 import { SO_NGAY_DOC } from './chuoi-ngay-bai'
 import { nguyenTuThat, xepNhom } from './thuong-giai-tuan'
-import { tenRutGon } from './thi-dua-hom-nay'
 
 const kq = (r: { results?: unknown[] }[]): Row[][] => r.map((x) => (x.results ?? []) as Row[])
 const bacHoacNull = (v: unknown): number | null => (v === null || v === undefined || v === '' ? null : num(v))
@@ -128,7 +127,7 @@ export async function tuanThuongPh(env: Env, sbd: string, nowMs: number = Date.n
       if (h) ra.hang = chuanHang(h)
     }
     if (g && num(g.nguyen_tu) > 0) ra.tiLeHocThat = Math.round((nguyenTuThat(num(g.nguyen_tu), num(g.ho_tro), bacHoacNull(g.bac)) / num(g.nguyen_tu)) * 100) / 100
-    const ten = (rCap ?? []).map((x) => tenRutGon(x.ho_ten))
+    const ten = (rCap ?? []).map((x) => tenDayDu(x.ho_ten))
     if (bat.banBe && ten.length) ra.hocCung = ten
     return ra
   } catch (e) {

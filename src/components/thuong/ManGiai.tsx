@@ -10,6 +10,7 @@ import { DUONG, HANG_GIAI, THUONG_LEN_HANG, chuConLai, hangSau, hangTruoc, layBa
 import { HuyHieuKimLoai, IcNguyenTu, IcTinhThe, TEN_HANG, Tia } from './hinh'
 import { useTai, useTongQuan } from './dung-thuong'
 import { Cho, DemTT, Loi, ManToan, NutDay, chuCai, congNgay, ngayNgan, oTinhThe, useHieuUng } from './chung'
+import { nhanLop } from './ban-gon'
 import { DauVe } from './ManChuoi'
 
 export const LUAT_GIAI = [
@@ -74,10 +75,10 @@ export function ManGiaiTuan({ token, onVe, tuHang }: { token?: string; onVe?: ()
           {g.nhom.map((r, i) => {
             const v = vung(r.thuHang)
             const rows = [<div key={r.thuHang + r.ten} className="r" role="listitem" data-h={r.thuHang} data-vung={v} data-em={r.laEm || undefined}
-              aria-label={`Hạng ${r.thuHang}: ${r.laEm ? 'Em, ' : ''}${r.ten}${r.lop ? `, ${r.lop}` : ''}, ${r.nguyenTu} nguyên tử`}>
+              aria-label={`Hạng ${r.thuHang}: ${r.laEm ? 'Em, ' : ''}${r.ten}${r.lop ? `, ${nhanLop(r.lop)}` : ''}, ${r.nguyenTu} nguyên tử`}>
               <span className="h tp-lat">{r.thuHang}</span>
               <span className="tp-av" data-k={r.laEm ? '0' : String((i % 4) + 1)} aria-hidden="true">{chuCai(r.ten)}</span>
-              <div className="ten"><b>{r.ten}{r.laEm && <span className="tp-chu-em">Em</span>}</b>{r.lop && <small>{r.lop}</small>}</div>
+              <div className="ten"><b>{r.ten}{r.laEm && <span className="tp-chu-em">Em</span>}</b>{r.lop && <small>{nhanLop(r.lop)}</small>}</div>
               <span className="d"><span className="so-nt">{r.nguyenTu.toLocaleString('vi-VN')}</span> <IcNguyenTu /></span>
             </div>]
             if (v === 'len' && r.thuHang === g.len && n > g.len) rows.push(<div key="vl" className="vach" aria-hidden="true"><ChevronUp aria-hidden="true" />Vùng lên hạng · {g.len} bạn phía trên</div>)

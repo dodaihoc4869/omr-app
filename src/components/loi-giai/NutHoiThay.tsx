@@ -38,12 +38,14 @@ export { CHU_LAM_XONG }
 /** `dapAnEm` (v3, 15/10): bài em đã nộp ("DSSD", "B", "8,2") ⇒ Thầy so bài em với lời giải, câu Đúng/Sai ghi "Em: …" từng ý. */
 type Props = {
   qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean; dangLam?: boolean; chi?: 'hoi' | 'giai'; dapAnEm?: string; luotId?: string; soCau?: number
+  /** kết quả câu lúc mở hộp (đúng / sai / chưa tính) ⇒ tông màu hộp Hỏi Thầy (thầy 27/10); vắng ⇒ tông chính (đang làm). */
+  tong?: 'dung' | 'sai' | 'trung'
 }
 // Mỗi câu/lượt có hộp và vòng chờ riêng; phản hồi cũ không được mở sang câu mới.
 export default function NutHoiThay(props: Props) {
   return <NutHoiThayCau key={`${props.qid}\n${props.nguon}\n${props.luotId ?? ''}\n${!!props.dangLam}`} {...props} />
 }
-function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, dapAnEm, luotId, soCau }: Props) {
+function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, dapAnEm, luotId, soCau, tong }: Props) {
   const [dangTai, setDangTai] = useState<'' | 'hoi' | 'giai'>('')
   const [loi, setLoi] = useState('')
   const [mo, setMo] = useState<{ cau: CauChoKhung; hoSo: HoSoLoiGiai; kiem?: KiemKhung } | null>(null)
@@ -93,7 +95,7 @@ function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, d
       {/* Thầy 26/10: «Bỏ câu sai từng bước» — gỡ nút «Chữa câu sai từng bước» dưới lời giải (sửa câu sai vẫn ở Tự sửa lỗi). */}
       {loi && <span className="lg-loi" role="status">{loi}</span>}
       <Suspense fallback={null}>
-        {hop && <HopHoiThay cau={hop.cau} em={hop.em} qid={qid} luotId={luotId} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
+        {hop && <HopHoiThay cau={hop.cau} em={hop.em} qid={qid} luotId={luotId} nguon={nguon} dangLam={hop.dangLam} dapAnEm={dapAnEm} tong={hop.dangLam ? undefined : tong} onTraLoi={onHoi} onDong={() => { luot.current++; setDangTai(''); setHop(null) }} />}
         {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
       </Suspense>
     </div>
