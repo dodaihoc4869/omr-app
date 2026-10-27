@@ -283,3 +283,9 @@ html[data-gyc-cot-phai]{--gyc-cot-phai:320px}
 .gyc-nut-hoi,.gyc-chu-giai{display:none}
 /* 27/10 thầy «n của cái gì thì cái đó ở chỉ số dưới, gọn đẹp»: chỉ số dưới của kí hiệu đại lượng (n paracetamol, V mL, n H₂SO₄) */
 .gyc-cs{font-size:.68em;line-height:0;vertical-align:-.32em;font-weight:inherit;letter-spacing:0}
+/* 27/10 soát 1705 câu: ~600 câu có tên chất / tổng lượng / số liệu dài ⇒ cho xuống dòng gọn trong cột (sơ đồ vẫn ngang, ít phải cuộn) */
+.gyc-sd-goc>span{white-space:normal;max-width:9.5em;overflow-wrap:break-word}
+.gyc-sd-ct{white-space:normal;max-width:9em;overflow-wrap:break-word;line-height:1.35}
+.gyc-sd-sl{white-space:normal;max-width:10em;overflow-wrap:break-word}
+
+@media (max-width:639px){.gyc-sd{gap:8px;padding:14px 12px}.gyc-sd-mui{flex-basis:64px;min-width:64px}} /* 27/10: điện thoại — mũi tên ngắn hơn, ít phải cuộn */
