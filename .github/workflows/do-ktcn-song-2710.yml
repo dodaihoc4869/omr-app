@@ -1,0 +1,47 @@
+# ĐO CHẶNG KIỂM TRA CÁ NHÂN «ĐANG LÀM» CÓ CÒN SỐNG KHÔNG (CHỈ ĐỌC) — 27/10: cổng phát hành (scripts/hoi-thay-van-hanh.mjs) chờ 45 phút rồi FAIL
+# (run 40495541860). Hỏi: chặng làm cổng chờ là em đang làm thật hay chặng bỏ dở? Mỗi chặng mở in: tuổi (phút từ bat_dau), thời lượng cho phép
+# (han−bat_dau), còn bao lâu tới hạn, lặng bao lâu (bây giờ − max(lần lưu câu cuối = k.cap_nhat_luc, bat_dau)).
+# Thêm: 180 phút qua có bao nhiêu phút KHÔNG có chặng mở (khe trống để đẩy).
+# CHỈ in số — không mã em, tên em, mã bài (repo công khai).
+name: Đo chặng kiểm tra cá nhân còn sống (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/cong-ktcn-2710]
+    paths: [.github/workflows/do-ktcn-song-2710.yml]
+permissions:
+  contents: read
+concurrency:
+  group: do-ktcn-song-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          NOW="CAST((julianday('now')-2440587.5)*86400000 AS INTEGER)"
+          MO="FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE k.nop_luc IS NULL AND c.chot_luc IS NULL AND c.bat_dau<=$NOW AND c.han>$NOW"
+          echo "== giờ đo (UTC)"; date -u
+          echo "== từng chặng mở (đúng điều kiện cổng): tuổi · thời lượng · còn · lặng (phút)"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT ROUND(($NOW-c.bat_dau)/60000.0,1) tuoi, ROUND((c.han-c.bat_dau)/60000.0,1) thoi_luong, ROUND((c.han-$NOW)/60000.0,1) con, ROUND(($NOW-MAX(k.cap_nhat_luc,c.bat_dau))/60000.0,1) lang, (k.han_luc=c.han) han_theo_bai $MO ORDER BY c.bat_dau" | jq -c ".[0].results[]"
+          echo "== gộp: số chặng · số em · lặng ≥10 phút · lặng ≥30 phút"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) so_chang, COUNT(DISTINCT k.sbd) so_em, SUM(($NOW-MAX(k.cap_nhat_luc,c.bat_dau))>=600000) lang10, SUM(($NOW-MAX(k.cap_nhat_luc,c.bat_dau))>=1800000) lang30 $MO" | jq -c ".[0].results"
+          echo "== chặng chưa chốt nhưng đã quá hạn (cổng KHÔNG đếm)"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) n FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE k.nop_luc IS NULL AND c.chot_luc IS NULL AND c.han<=$NOW" | jq -c ".[0].results"
+          echo "== 180 phút qua: số phút có ≥1 chặng mở / số phút trống; chặng mở trong cửa sổ đó: thời lượng tb & lớn nhất"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "WITH RECURSIVE p(i) AS (SELECT 0 UNION ALL SELECT i+1 FROM p WHERE i<179), t AS (SELECT $NOW-i*60000 ms FROM p) SELECT SUM(EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bat_dau<=t.ms AND MIN(c.han,COALESCE(c.chot_luc,c.han))>t.ms)) phut_co_chang, SUM(NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bat_dau<=t.ms AND MIN(c.han,COALESCE(c.chot_luc,c.han))>t.ms)) phut_trong FROM t" | jq -c ".[0].results"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) so_chang, ROUND(AVG(c.han-c.bat_dau)/60000.0,1) tl_tb, ROUND(MAX(c.han-c.bat_dau)/60000.0,1) tl_max, ROUND(AVG(COALESCE(c.chot_luc,c.han)-c.bat_dau)/60000.0,1) lam_tb, SUM(c.chot_luc IS NULL) chua_chot FROM kiem_tra_ca_nhan_chang c WHERE c.bat_dau>$NOW-10800000" | jq -c ".[0].results"
+          echo "== 26 giờ qua, theo giờ VN: số phút trống (không chặng mở) / 60 — tìm khung đẩy được"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "WITH RECURSIVE p(i) AS (SELECT 0 UNION ALL SELECT i+1 FROM p WHERE i<1559), c AS (SELECT bat_dau b, MIN(han,COALESCE(chot_luc,han)) h FROM kiem_tra_ca_nhan_chang WHERE bat_dau>$NOW-97200000), t AS (SELECT $NOW-i*60000 ms FROM p) SELECT strftime('%d %H',t.ms/1000,'unixepoch','+7 hours') gio_vn, SUM(NOT EXISTS(SELECT 1 FROM c WHERE c.b<=t.ms AND c.h>t.ms)) phut_trong, MAX((SELECT COUNT(*) FROM c WHERE c.b<=t.ms AND c.h>t.ms)) dinh FROM t GROUP BY 1 ORDER BY 1" | jq -c ".[0].results[]"

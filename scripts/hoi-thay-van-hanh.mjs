@@ -17,12 +17,13 @@ const SQL_CHANG_MO = `SELECT COUNT(*) AS n FROM kiem_tra_ca_nhan_chang c JOIN ki
 /** `choMs` > 0 (25/10, thầy: "đẩy mọi thứ lên luôn"): còn chặng ĐANG LÀM thì CHỜ (hỏi lại mỗi `nhipMs`) tới khi hết rồi đi tiếp NGAY — tối các em mở
  *  chặng ngắn (~15 phút) nối nhau, dừng hẳn ở phút thứ 7 của lượt thì gần như không bao giờ gặp khe trống. Vẫn KHÔNG BAO GIỜ đổi bản khi còn chặng mở;
  *  hết `choMs` mà còn chặng ⇒ dừng như cũ. Không đọc được (rỗng / không phải số / D1 lỗi) ⇒ dừng ngay, không chờ. Mặc định 0 = hành vi cũ. */
-export async function apSchemaHoiThay(query, ds, { choMs = 0, nhipMs = 45_000, ngu = (ms) => new Promise((r) => setTimeout(r, ms)), bayGio = () => Date.now() } = {}) {
+/** `boChoKtcn` (27/10, thầy duyệt «Không chờ nếu không đụng kiểm tra»): bản mới không đụng làn kiểm tra/schema (scripts/bo-cho-ktcn.mjs) ⇒ không đếm chặng, áp DDL chỉ-thêm luôn. */
+export async function apSchemaHoiThay(query, ds, { boChoKtcn = false, choMs = 0, nhipMs = 45_000, ngu = (ms) => new Promise((r) => setTimeout(r, ms)), bayGio = () => Date.now() } = {}) {
   kiemDdlHoiThay(ds)
   // Ca thường đã qua kiem-phat-hanh-chua; cả chặng kiểm tra cá nhân đang chạy cũng chặn DDL/đổi bản.
   const het = bayGio() + choMs
   let daCho = 0
-  for (;;) {
+  for (; !boChoKtcn;) {
     let r
     try {
       r = await query(SQL_CHANG_MO)
@@ -41,5 +42,5 @@ export async function apSchemaHoiThay(query, ds, { choMs = 0, nhipMs = 45_000, n
     daCho += nhipMs
   }
   for (const sql of ds) await query(sql)
-  return { schemaHoiThay: true, soLenhChiThem: ds.length, soChangDangLam: 0, ...(daCho ? { daChoGiay: Math.round(daCho / 1000) } : {}) }
+  return { schemaHoiThay: true, soLenhChiThem: ds.length, ...(boChoKtcn ? { boChoKtcn: true } : { soChangDangLam: 0 }), ...(daCho ? { daChoGiay: Math.round(daCho / 1000) } : {}) }
 }
