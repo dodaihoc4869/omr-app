@@ -241,7 +241,7 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
     const { tuGoi, denHt } = khoangDocTheoCheDo(lo, tu, den)
     const j = (ds: readonly EmGoc[]) => JSON.stringify(ds.map((e) => e.sbd))
     const rong = Promise.resolve([] as Row[])
-    const kRows=await hoi(env,`SELECT ${kt.COT_META_KT} FROM kiem_tra_ca_nhan k WHERE sbd IN(SELECT value FROM json_each(?)) AND ngay BETWEEN ? AND ? AND trang_thai<>'cho_nguon' AND (?=1 OR nop_luc IS NOT NULL OR ngay<?)`,j(lo),tu,den,batKt?1:0,homNay)
+    const kRows=await hoi(env,`SELECT ${kt.COT_META_KT} FROM kiem_tra_ca_nhan k WHERE sbd IN(SELECT value FROM json_each(?)) AND ngay BETWEEN ? AND ? AND trang_thai<>'cho_nguon' AND (?=1 OR nop_luc IS NOT NULL OR ngay<?) AND ${kt.sqlKhongBaoTriBo('k',Date.now())}`,j(lo),tu,den,batKt?1:0,homNay)
     if(kRows===null&&batKt)throw new LoiDocSo('Không đọc được lịch kiểm tra riêng của các em.')
     const ktNgay=new Map((kRows??[]).map(r=>[`${r.sbd}|${r.ngay}`,kt.tomTatKt(r,Date.parse(homNay+'T12:00:00+07:00'))]))
     const [rTrong, rTruoc, rGoi, rGap, rKh, rLuot, rMuc7, rQuota7] = await Promise.all([
