@@ -123,6 +123,18 @@ function laThiDuo(): boolean {
 type ManhThiDuo = React.ComponentType<ThiDuoProps>
 let ThiDuoSan: ManhThiDuo | null = null
 const napThiDuo = () => import('../components/kiem-tra-duo/ThiDuo').then((m) => { ThiDuoSan = m.default })
+// 27/10 MƯỢT (scripts/do-muot-hs.mjs): khối có nội dung đề (.thi-noi-dung — màn dọc, LamBaiNgang, ThiDuo) gắn `<html data-co-de>` khi dựng; index.css
+// @media print đọc thuộc tính này thay `body:has(.thi-noi-dung) *` — luật «:has() … *» (Chrome gom cả luật trong @media print) làm tính lại kiểu CẢ TRANG
+// sau mỗi lần thêm / gỡ nút ở mọi màn. Đếm tham chiếu: nhiều khối cùng lúc vẫn đúng.
+let soKhoiDe = 0
+function DanhDauDe(): null {
+  useLayoutEffect(() => {
+    const g = document.documentElement
+    if (soKhoiDe++ === 0) g.setAttribute('data-co-de', '')
+    return () => { if (--soKhoiDe <= 0) { soKhoiDe = 0; g.removeAttribute('data-co-de') } }
+  }, [])
+  return null
+}
 if (laThiDuo()) void napThiDuo().catch(() => {})
 // KẾT QUẢ SAU NỘP (27/10, bù byte khung Duo cho đường /t): chỉ hiện SAU khi bài đã gửi được (đang có mạng — nộp lúc mất mạng là thẻ «đang gửi» riêng)
 // ⇒ mảnh nạp lười, tải sẵn từ lúc vào đề; tải hỏng ⇒ một dòng «Em đã nộp bài» thay vì trắng màn.
@@ -3863,6 +3875,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     manNgang = (
       <Trang className="man-lam-bai lb-trang" diuMat={diuMat}>
         <VanTay sbd={attempt.sbd} hoTen={hoTen.trim() || `SBD ${attempt.sbd}`} maCa={attempt.maCa} />
+        <DanhDauDe />
         <LamBaiNgang
           boCuc={boCuc}
           tenCa={attempt.tenCa || ''}
@@ -4027,7 +4040,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           khung hình. Ảnh trôi ra ngoài thì truy được ngay em nào. */}
       <VanTay sbd={attempt.sbd} hoTen={hoTen.trim() || `SBD ${attempt.sbd}`} maCa={attempt.maCa} />
 
-      <div className="thi-hai-cot thi-noi-dung">
+      <div className="thi-hai-cot thi-noi-dung"><DanhDauDe />
         <aside className="thi-luoi" aria-label="Danh sách câu">
           <div className="thi-luoi-dinh">
             <div className="font-bold" style={{ fontSize: 'var(--cx-2)', marginBottom: 'var(--k3)' }}>
@@ -4135,7 +4148,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       <BoLuiDoc duPhong={manDoc} onLoi={() => setThiDuoHong(true)}>
         <Trang className="man-lam-bai duo-kt-trang" diuMat={diuMat}>
           <VanTay sbd={attempt.sbd} hoTen={hoTen.trim() || `SBD ${attempt.sbd}`} maCa={attempt.maCa} />
-          <KhungDuo {...propsDuo}>{theDuo}</KhungDuo>
+          <DanhDauDe /><KhungDuo {...propsDuo}>{theDuo}</KhungDuo>
           {nutVaoLai}
           {lopPhu}
           <ManGiuDeDoc />

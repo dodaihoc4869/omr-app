@@ -68,13 +68,16 @@ export function banHat(el: Element | null | undefined, t: TuyChonHat = {}): numb
 }
 
 /** A3 — câu cũ trượt trái + mờ dần: chụp BẢN SAO phần tử đặt đúng chỗ (fixed), không giữ state cũ, không trễ bước sang câu mới. */
-export function truotRa(el: Element | null | undefined, ms = 180): void {
+export function truotRa(el: Element | null | undefined, ms = 180, daDo?: DOMRect, gon?: string): void {
   if (!el || yenLang()) return
-  const r = el.getBoundingClientRect()
+  // `daDo`: khung đã đo trước khi trang đổi (27/10 MƯỢT — màn làm chặng đo rồi cuộn về đầu TRƯỚC khi dựng câu mới, không ép bố cục lần nữa)
+  const r = daDo ?? el.getBoundingClientRect()
   if (!r.width || !r.height) return
   const ban = el.cloneNode(true) as HTMLElement
   ban.setAttribute('aria-hidden', 'true'); ban.setAttribute('inert', ''); ban.removeAttribute('id')
   for (const x of ban.querySelectorAll('[id]')) x.removeAttribute('id')
+  // `gon`: các hình SVG nặng trong bản sao chỉ giữ khung (rỗng ruột) — bản sao mờ dần 180 ms, hình thật vẫn đứng ở câu mới (27/10 MƯỢT: bớt ~150 nút phải tính kiểu)
+  if (gon) for (const x of ban.querySelectorAll(gon)) x.replaceChildren()
   const lop = document.createElement('div')
   lop.setAttribute('aria-hidden', 'true')
   lop.style.cssText = 'position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:5'

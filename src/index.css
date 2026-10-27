@@ -494,12 +494,13 @@ html[data-giu-de-an] [data-giu-de-phu] {
   user-select: none;
 }
 
-/* IN RA GIẤY: đề không được in. */
+/* IN RA GIẤY: đề không được in. 27/10: `html[data-co-de]` (khối có `.thi-noi-dung` tự gắn — DanhDauDe trong ExamTakeScreen.tsx) thay `body:has(.thi-noi-dung)` — Chrome gom
+   cả luật :has() trong @media print ⇒ mỗi lần thêm / gỡ nút ở bất kì đâu là tính lại kiểu cả trang. */
 @media print {
-  body:has(.thi-noi-dung) * {
+  html[data-co-de] body * {
     visibility: hidden !important;
   }
-  body:has(.thi-noi-dung)::after {
+  html[data-co-de] body::after {
     content: 'Đề thi không được in';
     visibility: visible !important;
     position: fixed;

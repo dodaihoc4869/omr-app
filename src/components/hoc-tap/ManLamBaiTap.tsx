@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { lazy, startTransition, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
@@ -22,6 +22,8 @@ import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
 import { banHat, truotRa, useDemSo, yenLang } from '../../lib/hieu-ung'
+import { hamNongTuDien } from '../goi-y-cham/tu-dien'
+import { batAnKhiBiChe } from '../../lib/an-khi-bi-che'
 import { VungChamDe } from '../goi-y-cham/VungChamDe'
 // Lời giải kiểu sơ đồ (hợp đồng chạm để hiểu đề, chỗ 3): chỉ cần khi em mở «Lời giải từng bước» ⇒ nạp LƯỜI, lúc chờ vẽ lời giải cũ (không chớp trống).
 const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
@@ -291,7 +293,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // (như Gợi ý, Hỏi thầy). Ruột tự vẽ thẻ giải nghĩa / gợi ý (TamGiaiThich); màn chỉ chừa chỗ đặt nút ở hàng nút đáy (`oNutCham`).
   const hoTroCham = useRef('')
   const [oNutCham, setONutCham] = useState<HTMLElement | null>(null)
-  useEffect(() => { if (!q) return; if (daMo.current) veDau(); daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!q) return; if (daMo.current && !daVeDau.current) veDau(); daVeDau.current = false; daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
   // Màn Duo ở khung thấp xoay ngang: tấm kết quả nằm ở cột phải DƯỚI phương án ⇒ đưa tấm (nút «Tiếp tục») vào khung nhìn thay vì cuộn về đầu.
   useEffect(() => {
     if (!k) return
@@ -366,7 +368,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // Xong chặng: câu cuối đã nộp ⇒ mở trước chặng sau (em bấm "Học tiếp chặng N" là có câu ngay).
   const ketThuc = () => { setXong(true); canTaiSanh.current = false; onCapNhat(); boChangMoTruoc(); moChangTruoc(token); /* LẶP CÂU 27/10: luôn mở trước lượt MỚI sau câu cuối, không giữ lượt cũ */ gocRef.current?.scrollIntoView?.({ block: 'start' }) }
   // A3 — câu cũ trượt trái mờ dần (bản sao, không trễ bước sang câu mới; chỉ màn Duo).
-  const truotCauCu = () => { if (duo) truotRa(gocRef.current?.querySelector('.duo-than')) }
+  // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): sang câu mới ⇒ đo khối câu cũ + cuộn khung về đầu NGAY TRONG lượt bấm, lúc bố cục còn sạch (rẻ), rồi mới dựng
+  // câu mới. Trước: `scrollIntoView` chạy SAU khi câu mới dựng ⇒ ép trình duyệt tính lại kiểu + bố cục cả màn thêm một lượt (~35–60 ms ở CPU ×6).
+  const daVeDau = useRef(false)
+  const truotCauCu = () => {
+    const goc = gocRef.current, than = goc?.querySelector('.duo-than')
+    const r = duo && than ? than.getBoundingClientRect() : undefined
+    const kh = goc ? khungCuonCua(goc) : null
+    if (goc && kh) { const lech = goc.getBoundingClientRect().top - kh.getBoundingClientRect().top; if (lech) kh.scrollTop += lech; daVeDau.current = true }
+    else if (goc && !kh && goc.getBoundingClientRect().top === 0) daVeDau.current = true // không khung nào cuộn được, màn đã ở đầu ⇒ khỏi cuộn
+    if (duo) truotRa(than, 180, r, 'svg.gtv')
+  }
   // Hết câu của chặng mà có câu TỰ LÀM SAI ⇒ xin vòng làm lại MỘT lần. Rỗng / lỗi mạng ⇒ vào màn kết chặng như cũ. Đang xin ⇒ chạm lặp không kết chặng giữa chừng.
   const xinLamLai = async () => {
     daXinLamLai.current = true; gui.current = true; setNop(true)
@@ -385,11 +397,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const soDung = goc.filter((c, i) => ttCau(c, i) === 'dung').length
   const cauSai = goc.flatMap((c, i) => ttCau(c, i) === 'sai' ? [i + 1] : [])
   const lamLaiDung = lamLai.filter(c => ket[c.qid]?.correct === true).length
+  // 27/10 MƯỢT (máy yếu, đo CPU ×6): dựng câu kế trong lượt «chuyển tiếp» của React — chia nhỏ, không giữ luồng chính một mạch 250–350 ms ⇒ nút vừa
+  // bấm lún ngay, câu mới hiện ngay sau đó. Máy thường giữ dựng ngay (cùng khung với hiệu ứng trượt câu cũ). `dangSang` chặn chạm đúp khi câu kế chưa hiện.
+  const dangSang = useRef(-1)
   const tiep = () => {
-    if (gui.current) return
+    if (gui.current || dangSang.current === viTri) return
     setLoi('')
     setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề
-    if (viTri + 1 < cau.length) { truotCauCu(); setViTri(i => i + 1) }
+    if (viTri + 1 < cau.length) {
+      // máy yếu không có hiệu ứng trượt; cuộn về đầu để sau khi câu mới dựng (không kéo câu cũ lên đầu trong lúc chờ)
+      if (yenLang()) { dangSang.current = viTri; startTransition(() => setViTri(i => i + 1)) } else { truotCauCu(); setViTri(i => i + 1) }
+    }
     else if (goi7 && !daXinLamLai.current && !laLamLai && cauSai.length > 0) void xinLamLai()
     else ketThuc()
   }
@@ -554,7 +572,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     else if (dangTraLoi && duocNop && !nop) { e.preventDefault(); phanHoi('chon'); void nopCau() }
   }
   // GIỮ CHÂN (màn Duo): đã chấm ≥ 1 câu, chặng chưa xong và còn câu phải làm ⇒ X / Esc / back mở tấm thay vì thoát thẳng.
-  useEffect(() => { if (duo) { napSanGiuChan(); void import('../giam-thi/GiamThi').catch(() => {}) } }, [duo]) // nạp sẵn mảnh giám thị trong lúc chờ câu
+  useEffect(() => { if (duo) { napSanGiuChan(); void import('../giam-thi/GiamThi').catch(() => {}); hamNongTuDien() } }, [duo]) // nạp sẵn mảnh giám thị + hâm nóng bộ dò chạm-hiểu-đề trong lúc chờ câu
+  // 27/10 MƯỢT: màn làm chặng che kín Lộ trình (khung `inert` của cổng) ⇒ trình duyệt bỏ qua kiểu / bố cục / vẽ của Lộ trình suốt lúc làm (src/lib/an-khi-bi-che.ts)
+  useEffect(() => { const tr = document.querySelector('.ht2')?.closest<HTMLElement>('[inert]'); return tr ? batAnKhiBiChe(tr) : undefined }, [])
   const conLai = cau.length - viTri - (k ? 1 : 0)
   const daChamGoc: CauDaCham[] = goc.flatMap((c) => {
     const r = ket[c.qid]
@@ -692,7 +712,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </Suspense>
       </div>
     }
-    return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-xong={xong || undefined} data-tt={k ? tt : undefined}>
+    return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-hai-cot={deDai || undefined} data-xong={xong || undefined} data-tt={k ? tt : undefined}>
       {!xong && <header className="duo-tren">
         {/* thầy 27/10 (video Duolingo): đúng liền ≥ 2 câu ⇒ nhãn nhỏ «COMBO ×N» ngay TRÊN thanh tiến độ, số theo chuỗi */}
         {chuoi >= 2 && !laLamLai && <span key={chuoi} className="duo-combo-nhan" aria-hidden="true">COMBO ×{chuoi}</span>}

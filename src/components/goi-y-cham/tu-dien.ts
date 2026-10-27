@@ -26,3 +26,28 @@ export function napTuDien(): Promise<TuDien | null> {
   )
   return hua
 }
+
+// HÂM NÓNG (27/10 MƯỢT, đo scripts/do-muot-hs.mjs): lần dò ĐẦU của phatHien dựng các biểu thức tìm đơn vị / công thức / tên chất / từ then chốt và
+// V8 dịch chúng sang mã máy ở lần chạy thứ hai — ~60 ms ở máy mạnh, 200–400 ms ở CPU ×6, rơi đúng lúc em mở câu đầu / bấm sang câu hai. Nay làm sẵn
+// lúc máy RẢNH, chia nhỏ: mỗi lượt rảnh (requestIdleCallback) hâm MỘT biểu thức (phat-hien.ts `hamNongBuoc`) rồi một câu mẫu ⇒ không lượt nào giữ luồng
+// chính lâu; lúc em mở câu chỉ còn phần dò của chính câu ấy. Không đổi kết quả.
+const MAU_HAM_NONG = 'Hoà tan hoàn toàn 5,6 gam Fe trong 200 ml dung dịch HCl 2M thu được V lít khí H2 (đkc). Chất nào sau đây là ester? Giá trị của V là bao nhiêu?'
+let daHamNong = false
+type RanhCb = (f: () => void, o?: { timeout: number }) => unknown
+/** Nạp lõi dò + hâm nóng từng phần lúc máy rảnh (một lần mỗi phiên). Lỗi bất kỳ ⇒ bỏ qua, lần mở câu tự làm như cũ. */
+export function hamNongTuDien(): void {
+  if (daHamNong || typeof window === 'undefined') return
+  daHamNong = true
+  const w = window as Window & { requestIdleCallback?: RanhCb }
+  const ranh: RanhCb = w.requestIdleCallback ? w.requestIdleCallback.bind(w) : (f) => window.setTimeout(f, 300)
+  ranh(() => {
+    void Promise.all([napTuDien(), import('../../lib/goi-y-cham/phat-hien')]).then(([td, ph]) => {
+      if (!td) { daHamNong = false; return }
+      let i = 0
+      const buoc = () => {
+        try { if (ph.hamNongBuoc(i++)) { ranh(buoc, { timeout: 1500 }); return } td.phatHien(MAU_HAM_NONG) } catch { /* đề trơn vẫn hiện */ }
+      }
+      ranh(buoc, { timeout: 1500 })
+    }, () => { daHamNong = false })
+  }, { timeout: 2000 })
+}

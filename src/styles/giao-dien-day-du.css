@@ -93,5 +93,4 @@
 .hs-hoc-tap > summary { min-height:64px; padding:20px; font-size:18px; font-weight:700; cursor:pointer; }
 .hs-hoc-tap .tc { padding:16px !important; min-height:0; }
 [data-teacher-screen] .ca-bang-dau { position:sticky; top:0; z-index:2; }
-[data-teacher-screen] .ls-trang .ls-the { border-radius:24px; }
 html:root body .ct .ct-etapes button,html:root body .ct .ct-suite button { min-height:48px; }
