@@ -76,13 +76,13 @@ export interface DsKimCuong { ds: MucKimCuong[]; tat?: true }
 
 // ───────────────────────────────────────────── ĐỌC CHẶT (thuần — test gọi thẳng)
 type O = Record<string, unknown>
-export const dt = (x: unknown): O | null => (x && typeof x === 'object' && !Array.isArray(x) ? (x as O) : null)
-export const so = (x: unknown): number | undefined => (typeof x === 'number' && Number.isFinite(x) ? x : undefined)
-export const soNg = (x: unknown): number | undefined => { const n = so(x); return n === undefined || n < 0 ? undefined : Math.round(n) }
-export const chu = (x: unknown): string | undefined => (typeof x === 'string' && x.trim() ? x.trim() : undefined)
+const dt = (x: unknown): O | null => (x && typeof x === 'object' && !Array.isArray(x) ? (x as O) : null)
+const so = (x: unknown): number | undefined => (typeof x === 'number' && Number.isFinite(x) ? x : undefined)
+const soNg = (x: unknown): number | undefined => { const n = so(x); return n === undefined || n < 0 ? undefined : Math.round(n) }
+const chu = (x: unknown): string | undefined => (typeof x === 'string' && x.trim() ? x.trim() : undefined)
 /** Họ tên người (bạn học / bảng giải): đủ họ tên, gọn khoảng trắng thừa (thầy 27/10 «chuẩn tên»). */
 const tenNguoi = (x: unknown): string | undefined => chu(x)?.replace(/\s+/g, ' ')
-export const mang = <T>(x: unknown, doc: (v: unknown) => T | undefined): T[] | undefined => (Array.isArray(x) ? x.map(doc).filter((v): v is T => v !== undefined) : undefined)
+const mang = <T>(x: unknown, doc: (v: unknown) => T | undefined): T[] | undefined => (Array.isArray(x) ? x.map(doc).filter((v): v is T => v !== undefined) : undefined)
 export const HANG_GIAI: readonly HangGiai[] = ['sat', 'dong', 'bac', 'vang', 'bachkim', 'kimcuong']
 const laHang = (x: unknown): x is HangGiai => HANG_GIAI.includes(x as HangGiai)
 /** Ngày Việt Nam (UTC+7) dạng yyyy-mm-dd. */
@@ -198,6 +198,26 @@ export function docKetQuaTim(x: unknown): KetQuaTim[] | null {
     return { ...n, ...(chu(p.sbd) ? { sbd: chu(p.sbd) } : {}), trangThai: tt(p.trangThai) ?? (p.daMoi === true ? 'da_moi' : null) }
   })
   return ds ? ds.slice(0, 10) : null
+}
+export function docThuongCau(x: unknown): ThuongCau | null {
+  const o = dt(x)
+  if (!o || typeof o.tinh !== 'boolean') return null
+  if (!o.tinh) return { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0, cauKho: false }
+  const nt = soNg(o.nguyenTu)
+  if (nt === undefined) return null
+  const dong = mang(o.dong, (v) => { const d = dt(v); const n = chu(d?.nhan), s = so(d?.so); return n && s !== undefined ? { nhan: n, so: Math.round(s) } : undefined }) ?? []
+  return { tinh: true, nguyenTu: nt, dong, chuoiDung: soNg(o.chuoiDung) ?? 0, cauKho: o.cauKho === true }
+}
+export function docKetBai(x: unknown): KetBai | null {
+  const o = dt(x)
+  const tong = soNg(o?.tong), sd = soNg(o?.soDung), sc = soNg(o?.soCau), cx = so(o?.chinhXac), gi = soNg(o?.giay)
+  if (!o || tong === undefined || sd === undefined || !sc || cx === undefined || gi === undefined) return null
+  const dong = mang(o.dong, (v) => { const d = dt(v); const n = chu(d?.nhan), s = so(d?.so); return n && s !== undefined ? { nhan: n, so: Math.round(s) } : undefined }) ?? []
+  // chinhXac: tỉ lệ 0–1 hoặc phần trăm
+  const kq: KetBai = { tong, dong, soDung: sd, soCau: sc, chinhXac: Math.max(0, Math.min(100, Math.round(cx <= 1 ? cx * 100 : cx))), giay: gi, hoanHao: o.hoanHao === true }
+  const mt = dt(o.mucTieu), dx = soNg(mt?.daXong), can = soNg(mt?.can); if (dx !== undefined && can) kq.mucTieu = { daXong: dx, can }
+  const g = dt(o.giai), th = soNg(g?.thuHang), doi = so(g?.doi); if (th && doi !== undefined) kq.giai = { thuHang: th, doi: Math.round(doi) }
+  return kq
 }
 function docCauKc(x: unknown): CauKimCuong | undefined {
   const o = dt(x); const qid = chu(o?.qid), text = typeof o?.text === 'string' ? o.text : undefined

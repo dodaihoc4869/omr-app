@@ -12,8 +12,7 @@ import KetBaiThuong from '../../../src/components/thuong/KetBaiThuong'
 import ManThuong, { BaoGoCua, ManBinhDaDo, ManCuocKetQua, ManCuoiTuan, ManCuuChuoi, ManKimCuong, ManLoiMoi, ManMocChuoi, ManMocDoi, ManMoiBan, ManThangHoa, TheBenThuong } from '../../../src/components/thuong/ManThuong'
 import { IcNguyenTu } from '../../../src/components/thuong/hinh'
 import { Bi } from '../../../src/components/linh-vat/Bi'
-import { docTongQuan, type ThongBao, type TongQuanThuong } from '../../../src/lib/thuong-api'
-import { docKetBai, docThuongCau } from '../../../src/lib/thuong-api-bai'
+import { docKetBai, docThuongCau, docTongQuan, type ThongBao, type TongQuanThuong } from '../../../src/lib/thuong-api'
 
 const ts = new URLSearchParams(location.search)
 export const V = ts.get('v') ?? 'tren'

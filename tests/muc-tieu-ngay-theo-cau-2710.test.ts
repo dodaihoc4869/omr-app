@@ -14,6 +14,7 @@ import { xoaDemChanKhoi } from '../server/src/chan-khac-khoi'
 import { gameToken } from '../server/src/game-v2-auth'
 import { hsThuong } from '../server/src/thuong-d1'
 import { chuViecGoi7 } from '../src/components/hoc-tap/HocTapHomNay'
+import { chuViecBai } from '../src/components/hoc-tap/chu-viec-bai'
 import { vongMucTieu } from '../src/lib/thuong-api'
 import type { Env } from '../server/src/kieu'
 
@@ -96,15 +97,18 @@ describe('mục tiêu ngày = mức câu (D1 thật, ba nơi một số)', () =>
     await hsThuong(k.env, { token: k.token }, undefined, t + 1000)
     expect(khoaMt()).toBe(1)
     // (3) thẻ bài: hết việc ⇒ nói số ĐÃ LÀM thật, không «0 câu tự làm · 0 câu học có hỗ trợ».
-    if (g7.tuLamCon + g7.tiepCanCon + g7.thieuNgay === 0) expect(chuViecGoi7(g7, true)).toBe(`Đã làm ${g7.daLamHomNay} câu hôm nay`)
+    expect(g7.tuLamCon + g7.tiepCanCon).toBe(0) // dòng gốc «0 câu tự làm · 0 câu học có hỗ trợ» = số CÒN LẠI
+    expect(chuViecBai(chuViecGoi7(g7), { daLam: g7.daLamHomNay, muc: g7.toiThieu } as never)).toBe(`Đã làm ${g7.daLamHomNay} câu hôm nay`)
   })
 })
 
 describe('chữ thẻ bài (hàm thuần)', () => {
-  it('còn việc ⇒ «Còn x câu tự làm · y câu học có hỗ trợ» ở thẻ Trong; hết việc ⇒ «Đã làm N câu hôm nay»', () => {
-    expect(chuViecGoi7({ tuLamCon: 12, tiepCanCon: 4, thieuNgay: 0, daLamHomNay: 30 }, true)).toBe('Còn 12 câu tự làm · 4 câu học có hỗ trợ')
-    expect(chuViecGoi7({ tuLamCon: 12, tiepCanCon: 4, thieuNgay: 0 })).toBe('12 câu tự làm · 4 câu học có hỗ trợ')
-    expect(chuViecGoi7({ tuLamCon: 0, tiepCanCon: 0, thieuNgay: 0, daLamHomNay: 93 }, true)).toBe('Đã làm 93 câu hôm nay')
+  it('thẻ bài «Trong»: chưa đủ mức ⇒ «Còn x câu tự làm · y câu học có hỗ trợ»; đủ mức ⇒ «Đã làm N câu hôm nay»; dòng Hành trình giữ nguyên', () => {
+    const so = (daLam: number, muc: number) => ({ daLam, muc }) as never
+    expect(chuViecBai('12 câu tự làm · 4 câu học có hỗ trợ', so(30, 46))).toBe('Còn 12 câu tự làm · 4 câu học có hỗ trợ')
+    expect(chuViecBai('0 câu tự làm · 0 câu học có hỗ trợ', so(93, 92))).toBe('Đã làm 93 câu hôm nay')
+    expect(chuViecBai('Nền · Chặng 2/4', so(93, 92))).toBe('Nền · Chặng 2/4')
+    expect(chuViecBai('0 câu tự làm · 0 câu học có hỗ trợ', null)).toBe('0 câu tự làm · 0 câu học có hỗ trợ')
   })
   it('vòng: có mức câu ⇒ đo bằng câu; máy chủ cũ (chỉ chặng) ⇒ lùi về chặng', () => {
     expect(vongMucTieu({ daXong: 8, can: 16, cau: 92, cauDaLam: 93, dat: true })).toEqual({ da: 93, can: 92, donVi: 'câu', dat: true })

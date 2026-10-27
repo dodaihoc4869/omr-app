@@ -13,8 +13,7 @@ import type { ReactElement } from 'react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu.test', ghiDiaChiDaDung: () => {} }))
 
 import * as M from './_thuong-mau'
-import { DUONG, _quenTam, docBangGiai, docDsBan, docTongQuan, ghiTam, khoaTam, type TongQuanThuong, type ThongBao } from '../src/lib/thuong-api'
-import { docKetBai, docThuongCau } from '../src/lib/thuong-api-bai'
+import { DUONG, _quenTam, docBangGiai, docDsBan, docKetBai, docThuongCau, docTongQuan, ghiTam, khoaTam, type TongQuanThuong, type ThongBao } from '../src/lib/thuong-api'
 import { _quenDaXem } from '../src/components/thuong/loc-thong-bao'
 import { capNhatTongQuan } from '../src/components/thuong/dung-thuong'
 import { ThanhThuong } from '../src/components/thuong/ThanhThuong'
