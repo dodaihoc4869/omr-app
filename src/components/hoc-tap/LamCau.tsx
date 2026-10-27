@@ -2,7 +2,7 @@
 // (thẻ câu dùng chung cho màn thi, màn thầy, phiếu…); chỉ dùng lại các mảnh hiển thị đề/hình/công thức mà `TheCau` cũng dùng
 // (ChemText · tachDongTheoY · ExperimentDemo · BangSoLieu · CauHinh · HinhTaiViTri · KhoiLoiGiaiChuan) để chữ và hình ra y hệt.
 // Màu: chỉ biến của app học sinh (hoc-tap.css, khối `.ht2-lam*`). Đáp án chỉ có ở các khối PHẢN HỒI — nhận từ máy chủ SAU khi nộp.
-import { useRef, useSyncExternalStore, type CSSProperties, type KeyboardEvent as KE, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent as KE, type ReactNode } from 'react'
 import { Check, Delete, X as XIcon } from 'lucide-react'
 import ExperimentDemo, { ExperimentOriginal } from '../ExperimentDemo'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
@@ -12,8 +12,11 @@ import { tachDongTheoY } from '../../lib/tach-dong-cau'
 import { laChuGiuCho } from '../../lib/anh-phuong-an'
 import type { HinhAnh } from '../../data/examContent'
 import type { Question } from '../../game/than-thu-v2/core'
-import { TOI_DA_KY_TU, chuDS, kyTuHien, phimCoTacDung, soSanhDungSai, type PhimSo } from './lam-bai'
+import { TOI_DA_KY_TU, chuDS, kyTuHien, phimCoTacDung, phimTuBanPhim, soSanhDungSai, type PhimSo } from './lam-bai'
+import { LUN_TOI_THIEU_MS, cuonThayBanPhim, doiO } from './ban-phim-hieu-ung'
+import { phanHoi } from '../../lib/phan-hoi'
 import '../m3/the-cau.css'
+import './ban-phim-duo.css'
 
 // ── BỐ CỤC THEO KHỔ MÀN (làn B đợt 16, thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và
 // thân thiện"). CÙNG điểm ngắt với hoc-tap.css: 'rong' = màn ≥ 900 px và cao > 560 px (máy tính, máy tính bảng ngang) · 'thap' = điện
@@ -181,23 +184,52 @@ export function ChonTracNghiem({ q, value, onChon, khoa }: { q: Question; value:
 /** `soO` ô = đúng số kí tự đáp số máy chủ gửi kèm (thầy 15/10; 1–4 ô giữ cỡ ô phiếu 58 px, hơn 4 ô co lại cho vừa màn); thiếu ⇒ 4 như phiếu.
  *  Đáp án cũ dài hơn vẫn hiện đủ. Ô đang nhập viền nét đứt.
  *  KHÔNG có ô nhập ⇒ không bật bàn phím điện thoại. */
-export function OPhieu({ value, ket, soO = TOI_DA_KY_TU }: { value: string; ket?: 'dung' | 'sai' | 'trung'; soO?: number }) {
+export function OPhieu({ value, ket, soO = TOI_DA_KY_TU, hu }: { value: string; ket?: 'dung' | 'sai' | 'trung'; soO?: number; hu?: HieuUngO }) {
   const so = Math.max(soO, value.length)
   return (
     <div className="ht2-lam-o-hang" aria-hidden="true" data-ket={ket} data-nhieu={so > TOI_DA_KY_TU || undefined} style={so > TOI_DA_KY_TU ? { '--so-o': so } as CSSProperties : undefined}>
-      {Array.from({ length: so }, (_, i) => (
-        <span key={i} className="ht2-lam-o" data-tt={i < value.length ? 'co' : i === value.length && !ket ? 'dang' : 'trong'}>
-          {i < value.length ? kyTuHien(value[i]!) : i === value.length && !ket ? <i className="ht2-lam-con-tro" /> : ''}
-        </span>
-      ))}
+      {Array.from({ length: so }, (_, i) => {
+        const moi = !!hu && hu.moi === i && i < value.length
+        return (
+          <span key={i} className="ht2-lam-o" data-tt={i < value.length ? 'co' : i === value.length && !ket ? 'dang' : 'trong'} data-nay={moi ? (hu!.nhip % 2 ? 'a' : 'b') : undefined}>
+            {/* chữ số vừa bấm: phần tử MỚI (key theo nhịp) ⇒ hiệu ứng bật vào ô chạy đúng một lần cho đúng ô ấy */}
+            {i < value.length ? (hu ? <b key={moi ? `m${hu.nhip}` : 'c'} className="ht2-lam-so" data-moi={moi || undefined}>{kyTuHien(value[i]!)}</b> : kyTuHien(value[i]!))
+              : i === value.length && !ket ? <i className="ht2-lam-con-tro" /> : ''}
+            {hu?.bong && hu.bong.i === i && i >= value.length && <b key={`x${hu.bong.id}`} className="ht2-lam-bong">{kyTuHien(hu.bong.ch)}</b>}
+          </span>
+        )
+      })}
     </div>
   )
 }
 
+/** Trạng thái hiệu ứng của hàng ô khi em đang gõ: ô vừa nhận kí tự (`moi`, `nhip` tăng mỗi lần) + bóng kí tự vừa xoá. */
+export interface HieuUngO { moi: number; nhip: number; bong: { i: number; ch: string; id: number } | null }
+const BONG_MS = 110
+/** So giá trị trước / sau (`doiO`) TRƯỚC khi vẽ (layout effect ⇒ không nháy): chữ số mới bật vào ô, ô nảy nhẹ; xoá ⇒ bóng kí tự thu nhỏ 100 ms. */
+function useHieuUngO(value: string): HieuUngO {
+  const truoc = useRef(value)
+  const [hu, setHu] = useState<HieuUngO>({ moi: -1, nhip: 0, bong: null })
+  useLayoutEffect(() => {
+    const cu = truoc.current
+    truoc.current = value
+    if (cu === value) return
+    const d = doiO(cu, value)
+    setHu((h) => ({ moi: d.moi, nhip: d.moi >= 0 ? h.nhip + 1 : h.nhip, bong: d.bong ? { ...d.bong, id: h.nhip + Date.now() } : null }))
+  }, [value])
+  useEffect(() => {
+    if (!hu.bong) return
+    const t = window.setTimeout(() => setHu((h) => ({ ...h, bong: null })), BONG_MS)
+    return () => window.clearTimeout(t)
+  }, [hu.bong])
+  return hu
+}
+
 export function OTraLoiNgan({ value, soO }: { value: string; soO?: number }) {
+  const hu = useHieuUngO(value)
   return (
     <section className="ht2-lam-tln" aria-label="Ô trả lời">
-      <OPhieu value={value} soO={soO} />
+      <OPhieu value={value} soO={soO} hu={hu} />
       <output className="ht2-an" aria-live="polite">{value ? `Đáp án của em: ${[...value].map(kyTuHien).join('')}` : 'Chưa nhập đáp án'}</output>
     </section>
   )
@@ -209,13 +241,100 @@ const HANG_PHIM: { p: PhimSo; chu?: string; ten?: string; chuc?: true; rong?: tr
   { p: '7' }, { p: '8' }, { p: '9' }, { p: '-', chu: '−', ten: 'Dấu trừ', chuc: true },
   { p: '0', rong: true }, { p: 'xoa-het', chu: 'Xoá hết', chuc: true, rong: true },
 ]
-/** Bàn phím số riêng trong thanh đáy: 1–9, 0, dấu phẩy, dấu trừ, xoá một kí tự, xoá hết. Phím hết tác dụng thì mờ (đủ `soO` kí tự, đã có dấu phẩy…). */
+/** Khung cuộn gần nhất của một phần tử (màn học sinh nằm trong lớp bọc `fixed … overflow-y-auto`); không có ⇒ khung trang. */
+function khungCuon(el: HTMLElement): HTMLElement {
+  for (let e = el.parentElement; e; e = e.parentElement) {
+    const oy = getComputedStyle(e).overflowY
+    if ((oy === 'auto' || oy === 'scroll') && e.scrollHeight > e.clientHeight) return e
+  }
+  return (document.scrollingElement as HTMLElement | null) ?? document.documentElement
+}
+const giamChuyenDong = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/** Bàn phím số riêng trong thanh đáy: 1–9, 0, dấu phẩy, dấu trừ, xoá một kí tự, xoá hết. Phím hết tác dụng thì mờ (đủ `soO` kí tự, đã có dấu phẩy…).
+ *  KIỂU DUOLINGO (thầy 27/10): mỗi phím là mặt phím trên gờ đáy 4 px — chạm ⇒ mặt lún xuống (≥ 80 ms, chỉ transform) rồi bật lại; mỗi lần bấm
+ *  `phanHoi('chon')` (rung + tiếng «tách»). Gõ số trên máy tính: phím tương ứng trên màn cũng lún + phản hồi (việc NHẬP vẫn do màn cha lo như cũ).
+ *  Lúc bắt đầu câu: màn thấp ⇒ tự cuộn để trọn bàn phím nằm trên thanh đáy dính (không cuộn mất ô đáp án). */
 export function BanPhimSo({ value, onPhim, khoa, soO = TOI_DA_KY_TU }: { value: string; onPhim: (p: PhimSo) => void; khoa: boolean; soO?: number }) {
+  const goc = useRef<HTMLDivElement>(null)
+  const nut = useRef<Partial<Record<PhimSo, HTMLButtonElement | null>>>({})
+  const hen = useRef(new Map<PhimSo, number>())
+  const lucAn = useRef(new Map<PhimSo, number>())
+  const hienTai = useRef({ value, khoa, soO })
+  hienTai.current = { value, khoa, soO }
+  const lun = (p: PhimSo) => {
+    const b = nut.current[p]
+    if (!b) return
+    window.clearTimeout(hen.current.get(p))
+    b.setAttribute('data-an', '')
+    lucAn.current.set(p, performance.now())
+  }
+  const nha = (p: PhimSo, toiThieu = LUN_TOI_THIEU_MS) => {
+    const b = nut.current[p]
+    if (!b || !b.hasAttribute('data-an')) return
+    const con = Math.max(0, toiThieu - (performance.now() - (lucAn.current.get(p) ?? 0)))
+    hen.current.set(p, window.setTimeout(() => b.removeAttribute('data-an'), con))
+  }
+  // Gõ phím máy tính: chỉ hiệu ứng + phản hồi (KHÔNG nhập — màn cha đã nghe phím và nhập như cũ). Cùng điều kiện bỏ qua với màn cha.
+  useEffect(() => {
+    const f = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      const t = e.target instanceof HTMLElement ? e.target : null
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.closest('[role=dialog]'))) return
+      const p = phimTuBanPhim(e.key)
+      const { value: v, khoa: k, soO: n } = hienTai.current
+      if (!p || k || !phimCoTacDung(v, p, n)) return
+      lun(p)
+      nha(p)
+      if (!e.repeat) phanHoi('chon')
+    }
+    window.addEventListener('keydown', f)
+    const ds = hen.current
+    return () => { window.removeEventListener('keydown', f); for (const t of ds.values()) window.clearTimeout(t) }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // Bắt đầu câu (bàn phím dựng lại theo câu): đo sau khi bố cục xong rồi cuộn vừa đủ.
+  useEffect(() => {
+    const el = goc.current
+    if (!el || !el.closest('.duo')) return
+    let r2 = 0
+    const r1 = requestAnimationFrame(() => { r2 = requestAnimationFrame(() => {
+      const khung = khungCuon(el)
+      const laTrang = khung === document.scrollingElement || khung === document.documentElement
+      const thanh = el.closest('.duo')?.querySelector<HTMLElement>('.duo-day')
+      const dinh = !!thanh && getComputedStyle(thanh).position === 'sticky'
+      const kTren = laTrang ? 0 : khung.getBoundingClientRect().top
+      const kDuoi = laTrang ? window.innerHeight : khung.getBoundingClientRect().bottom
+      const o = el.closest('.duo')?.querySelector<HTMLElement>('.ht2-lam-o-hang')
+      // thanh đáy không dính (điện thoại ngang: nằm ngay dưới bàn phím trong cột phải) ⇒ đưa luôn nút KIỂM TRA vào khung nếu vừa
+      const nutKt = !dinh ? thanh?.querySelector<HTMLElement>('.duo-nut') : null
+      const d = cuonThayBanPhim({
+        phimDay: Math.max(el.getBoundingClientRect().bottom, nutKt?.getBoundingClientRect().bottom ?? 0),
+        thanhTren: dinh ? Math.min(thanh!.getBoundingClientRect().top, kDuoi) : kDuoi,
+        oTren: (o ?? el).getBoundingClientRect().top,
+        khungTren: kTren,
+      })
+      if (d > 0) khung.scrollBy({ top: d, behavior: giamChuyenDong() ? 'auto' : 'smooth' })
+    }) })
+    return () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2) }
+  }, [])
   return (
-    <div className="ht2-lam-phim" role="group" aria-label="Bàn phím số">
+    <div ref={goc} className="ht2-lam-phim" role="group" aria-label="Bàn phím số">
       {HANG_PHIM.map(({ p, chu, ten, chuc, rong }) => (
-        <button key={p} type="button" aria-label={ten} data-chuc={chuc || undefined} data-rong={rong || undefined} disabled={khoa || !phimCoTacDung(value, p, soO)} onClick={() => onPhim(p)}>
-          {p === 'xoa' ? <Delete size={22} aria-hidden="true" /> : chu ?? p}
+        <button
+          key={p}
+          ref={(b) => { nut.current[p] = b }}
+          type="button"
+          aria-label={ten}
+          data-chuc={chuc || undefined}
+          data-rong={rong || undefined}
+          disabled={khoa || !phimCoTacDung(value, p, soO)}
+          onPointerDown={(e) => { if (e.button === 0 || e.pointerType !== 'mouse') lun(p) }}
+          onPointerUp={() => nha(p)}
+          onPointerLeave={() => nha(p)}
+          onPointerCancel={() => nha(p)}
+          onClick={(e) => { if (e.detail === 0) { lun(p); nha(p) } phanHoi('chon'); onPhim(p) }}
+        >
+          <span className="ht2-lam-phim-mat">{p === 'xoa' ? <Delete size={22} aria-hidden="true" /> : chu ?? p}</span>
         </button>
       ))}
     </div>

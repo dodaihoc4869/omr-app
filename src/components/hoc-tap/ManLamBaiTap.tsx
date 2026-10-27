@@ -12,6 +12,7 @@ import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
+import { TroGiupDuo } from './TroGiupDuo'
 import { chuDanhSachCau, chuDS, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
@@ -573,13 +574,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></div>
       : <div className="duo-day"><div className="duo-giua">
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
-          <div className="duo-bo">
-            {linkHoi}
+          {/* thầy 27/10 «rối quá, ẩn đi, bấm vào mới hiện»: các trợ giúp gom vào nút tròn «Trợ giúp» bên trái KIỂM TRA (TroGiupDuo) — cùng các nút cũ */}
+          <TroGiupDuo nut={<button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>}>
             <span ref={setONutCham} className="duo-o-nut-cham" />
             {q.goiY && <button type="button" className="duo-lien" aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={18} aria-hidden="true" />{goiY ? 'Thu gợi ý' : 'Gợi ý'}</button>}
             {coHuongDan && <button type="button" className="duo-lien" onClick={() => void hocHuongDan()} disabled={nop}><BookOpen size={18} aria-hidden="true" />Học cách giải</button>}
-          </div>
+            {linkHoi}
+          </TroGiupDuo>
         </div></div>
 
     // MÀN KẾT BÀI thưởng phạt (bản vẽ tp-3): một màn đủ «được bao nhiêu nguyên tử, vì sao · hôm nay còn mấy bài · hạng giải». «Tiếp tục» ⇒ về Lộ trình;

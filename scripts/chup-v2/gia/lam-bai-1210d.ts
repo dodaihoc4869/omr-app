@@ -66,6 +66,8 @@ const CAU_DUO: CauGia[] = [
     loiGiai: { chot: 'n(ester) = 8,8 : 88 = 0,1 mol = n(CH3COONa) ⇒ m = 0,1 × 82 = 8,2 gam.' } },
   { ...CAU[4]!, qid: 'D5' },
 ]
+// ═══ BÀN PHÍM DUO 27/10: `lam13&lam=duo&ba=1` ⇒ câu trả lời ngắn D4 có hướng dẫn Gói 7 ⇒ thanh đáy đủ 3 viên (Hỏi thầy · Bắt đầu từ đâu? · Học cách giải) như ảnh thầy.
+if (thamSo.get('ba') === '1') CAU_DUO[3] = { ...CAU_DUO[3]!, coGoi7: true }
 // ═══ DUO APP 26/10: `lam13&lam=duo&ll=1` = có Gói 7 ⇒ hết chặng mà có câu tự làm sai thì gọi `hoc-tap-lam-lai` (hợp đồng docs/hop-dong-duolingo-2610.md mục 3):
 // trả 1 câu anh em (chỉ đề) của câu D1; nộp qua `answer` ⇒ máy chủ ép có hỗ trợ (`attempt.assisted`).
 const LAM_LAI = thamSo.get('ll') === '1'

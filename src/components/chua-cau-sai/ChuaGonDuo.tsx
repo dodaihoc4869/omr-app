@@ -14,6 +14,7 @@ import { chiSoDuoiRo } from '../hoa2/cau-chuyen'
 import { chuDapAn, daTraLoiDu, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem } from '../hoc-tap/LamCau'
 import { nhanPhim, phimTuBanPhim, soSanhDungSai, type PhimSo } from '../hoc-tap/lam-bai'
+import { TroGiupDuo } from '../hoc-tap/TroGiupDuo'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { Bi } from '../linh-vat/Bi'
@@ -203,8 +204,8 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
     const soYChua = phan === 'II' ? [0, 1, 2, 3].filter((i) => tra[i] !== 'D' && tra[i] !== 'S').length : 0
     day = <div className="duo-day"><div className="duo-giua">
       {loi && <p className="duo-loi" role="alert">{loi}</p>}
-      <button type="button" className="duo-nut" onClick={kiem} disabled={ban || !daTraLoiDu(phan, tra)}>{ban ? 'Đang kiểm tra…' : phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
-      <div className="duo-bo">{linkHoi(true)}</div>
+      {/* thầy 27/10: trợ giúp gom vào nút tròn «Trợ giúp» bên trái KIỂM TRA (như màn làm chặng) */}
+      <TroGiupDuo nut={<button type="button" className="duo-nut" onClick={kiem} disabled={ban || !daTraLoiDu(phan, tra)}>{ban ? 'Đang kiểm tra…' : phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>}>{linkHoi(true)}</TroGiupDuo>
     </div></div>
   }
 
