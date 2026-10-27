@@ -1,38 +1,65 @@
-/* BẢNG MÀU APP HỌC SINH «TƯƠI» KIỂU DUOLINGO — thầy cho phép 27/10: «Màu sắc của app làm siêu tươi như dolingo nhé, màu sắc của linh vật cũng vậy
-   siêu tươi mịn mắt» (ngoại lệ luật màu CHỈ cho app học sinh; app thầy / phụ huynh giữ nguyên bảng trong.css). Chỉ ĐÈ dưới :root[data-trong='hs'] (thắng :root của
-   trong.css theo độ ưu tiên, không phụ thuộc thứ tự nạp). NẠP LƯỜI: @import đầu trong-hs.css + trong-lam-bai.css, (màn đăng nhập học sinh giữ bảng trong.css: thêm tệp sẽ vượt trần precache 170 tệp) ⇒
+/* BẢNG MÀU RIÊNG APP HỌC SINH «B · CHẤT CHỈ THỊ» (chàm + hồng phenolphtalein) — thầy 27/10 duyệt bản vẽ ve-moi/mau-rieng: «Chốt bảng màu chất chỉ thị,
+   làm cho sáng bằng độ sáng của doligo nhé» (trước đó, cùng ngày: «Màu sắc của app làm siêu tươi như dolingo nhé» ⇒ ngoại lệ luật màu CHỈ cho app học sinh;
+   app thầy / phụ huynh giữ nguyên bảng trong.css). Chỉ ĐÈ dưới :root[data-trong='hs'] (thắng :root của trong.css theo độ ưu tiên, không phụ thuộc thứ tự nạp).
+   NẠP LƯỜI: @import đầu trong-hs.css + trong-lam-bai.css (màn đăng nhập học sinh giữ bảng trong.css: thêm tệp sẽ vượt trần precache 170 tệp) ⇒
    không cộng byte lượt mở app nào (luật tốc độ 13/10); app thầy không tải một byte.
-   Bảng gốc Duolingo: xanh lá #58CC02 (đáy #58A700) · xanh dương #1CB0F6 (đáy #1899D6) · đỏ #FF4B4B (đáy #EA2B2B) · vàng #FFC800 · cam #FF9600;
-   chữ #4B4B4B · viền #E5E5E5; tối: nền #131F24 · mặt #202F36 · viền #37464F, chữ trắng ngà #F1F7FB.
-   Hai bậc: màu ĐẶC tươi (thanh tiến độ, viền, biểu tượng, linh vật) giữ đúng Duolingo; chỗ CÓ CHỮ TRẮNG trên nền xanh lá dùng --tr-dung-nut (= đáy
-   Duolingo #58A700, 3,0:1 cho chữ đậm) vì #58CC02 chỉ đạt 2,1:1. --tr-*-day = gờ đáy nút 3D (một tông đậm hơn, bóng phẳng, không nhoè).
-   Tương phản đo bằng scripts/do-tuong-phan-hs.mjs (bảng in ra khi chạy). */
+   CÁCH TÍNH (ve-moi/mau-rieng/tinh_b_duo.py, số đo ở de-xuat-build.md): mỗi màu tô GIỮ SẮC (hue OKLCH) của bộ B, lấy ĐỘ SÁNG L và ĐỘ TƯƠI C của đúng token
+   Duolingo cùng vai (L lệch ≤ 0,03; C cắt theo gam sRGB khi sắc chàm / lục ngọc / lam ngọc không thể tươi bằng xanh lá chanh ở cùng độ sáng);
+   nền nhạt và gờ đáy 3D theo cùng tỉ lệ L như Duolingo. Chữ trắng trên nút không kém cặp Duolingo cũ cùng vai; chữ màu (--tr-*-chu) ≥ 4,5 trên thẻ và nền nhạt.
+   Khác Duolingo: ΔE00 ≥ 15 ở màu chính, đúng, sai (riêng họ «sai» nền sáng xoay −8,7° về hồng lựu cho đủ 15).
+   Màu chính (--tr-hs, chàm) TÁCH khỏi màu đúng (--tr-dung, lục ngọc): Lộ trình, menu, rương, Bi đọc --tr-hs (khối cuối tệp); nút «Tiếp tục» ở dải đúng đọc
+   --tr-dung-nut. --tr-*-day = gờ đáy nút 3D. Tương phản đo bằng scripts/do-tuong-phan-hs.mjs (bảng in ra khi chạy). */
 :root[data-trong='hs'] {
-  --tr-nen: #ffffff; --tr-mat: #ffffff; --tr-mat-2: #f7f7f7; --tr-mat-3: #e5e5e5; --tr-vien: #e5e5e5; --tr-vien-2: #dcdcdc;
-  --tr-chu: #4b4b4b; --tr-chu-2: #666666; --tr-chu-3: #707070; --tr-trang: #ffffff;
-  --tr-dung: #58cc02; --tr-dung-nhat: #d7ffb8; --tr-dung-chu: #407a00; --tr-dung-nut: #58a700; --tr-dung-day: #478500;
-  --tr-sai: #ff4b4b; --tr-sai-nhat: #ffdfe0; --tr-sai-chu: #cb1414; --tr-sai-day: #ea2b2b;
-  --tr-chu-y: #ff9600; --tr-chu-y-nhat: #fff0d4; --tr-chu-y-chu: #b05200; --tr-chu-y-nut: #ed6f00; --tr-chu-y-day: #c47200;
-  --tr-tin: #1cb0f6; --tr-tin-nhat: #ddf4ff; --tr-tin-chu: #1273a1; --tr-tin-day: #1899d6;
-  --tr-sao: #ffc800; --tr-sao-nhat: #fff6cc; --tr-sao-chu: #b05200; --tr-sao-day: #e0a800;
-  --tr-tim: #ce82ff; --tr-tim-day: #a560d6;
-  --tr-hs: #58cc02; --tr-hs-nut: #58a700; --tr-hs-day: #478500; --tr-hs-nhat: #d7ffb8; --tr-hs-chu: #407a00; --tr-hs-tren: #ffffff;
+  --tr-nen: #f6f6fc; --tr-mat: #ffffff; --tr-mat-2: #f0f0fa; --tr-mat-3: #e1e1f1; --tr-vien: #e2e2f0; --tr-vien-2: #cbcbe3;
+  --tr-chu: #1b1938; --tr-chu-2: #454367; --tr-chu-3: #5a587d; --tr-trang: #ffffff;
+  --tr-dung: #00d396; --tr-dung-nhat: #c5ffe8; --tr-dung-chu: #007c58; --tr-dung-nut: #00a87b; --tr-dung-day: #008d66;
+  --tr-sai: #f4417c; --tr-sai-nhat: #fddfe9; --tr-sai-chu: #c70b5b; --tr-sai-day: #e5266d;
+  --tr-chu-y: #ff8c51; --tr-chu-y-nhat: #ffeee0; --tr-chu-y-chu: #b24f19; --tr-chu-y-nut: #f06b27; --tr-chu-y-day: #ce6837;
+  --tr-tin: #00bed8; --tr-tin-nhat: #dbf5fa; --tr-tin-chu: #007889; --tr-tin-day: #009eb5;
+  --tr-sao: #ffbf35; --tr-sao-nhat: #fff5d4; --tr-sao-chu: #956400; --tr-sao-day: #e3a605;
+  --tr-tim: #f373ce; --tr-tim-day: #c851a8; --tr-tim-chu: #b33d95;
+  --tr-hs: #8f9bff; --tr-hs-nut: #767eff; --tr-hs-day: #5e64cd; --tr-hs-nhat: #eeeeff; --tr-hs-chu: #565bbd; --tr-hs-tren: #ffffff;
+  --tr-nguyen-tu: #00bed8; --tr-nguyen-tu-so: #009eb5;
   --tr-phu: rgba(75, 75, 75, 0.5);
-  --tr-bong-1: 0 2px 0 #e5e5e5; --tr-bong-2: 0 4px 0 #e5e5e5; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.1);
+  --tr-bong-1: 0 2px 0 #e2e2f0; --tr-bong-2: 0 4px 0 #e2e2f0; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.1);
+  --tp-tt: var(--tr-tim); --tp-tt-chu: var(--tr-tim-chu);
 }
 @media (prefers-color-scheme: dark) {
   :root[data-trong='hs'] {
-    --tr-nen: #131f24; --tr-mat: #202f36; --tr-mat-2: #283a42; --tr-mat-3: #37464f; --tr-vien: #37464f; --tr-vien-2: #45565f;
-    --tr-chu: #f1f7fb; --tr-chu-2: #c2cdd3; --tr-chu-3: #a5b4bc; --tr-trang: #131f24;
-    --tr-dung: #56b30f; --tr-dung-nhat: #1e3b1f; --tr-dung-chu: #8ee04a; --tr-dung-nut: #56b30f; --tr-dung-day: #3f830b;
-    --tr-sai: #f45b5b; --tr-sai-nhat: #39262a; --tr-sai-chu: #ff8a8a; --tr-sai-day: #c23a3a;
-    --tr-chu-y: #f29200; --tr-chu-y-nhat: #39321e; --tr-chu-y-chu: #ffb347; --tr-chu-y-nut: #f29200; --tr-chu-y-day: #b86c00;
-    --tr-tin: #1ca8ea; --tr-tin-nhat: #143646; --tr-tin-chu: #5fc6f7; --tr-tin-day: #137fb0;
-    --tr-sao: #f2be00; --tr-sao-nhat: #393a1e; --tr-sao-chu: #ffd54a; --tr-sao-day: #b38c00;
-    --tr-tim: #b77ae6; --tr-tim-day: #8a52b3;
-    --tr-hs: #56b30f; --tr-hs-nut: #56b30f; --tr-hs-day: #3f830b; --tr-hs-nhat: #1e3b1f; --tr-hs-chu: #8ee04a; --tr-hs-tren: #131f24;
+    --tr-nen: #121129; --tr-mat: #1c1b3a; --tr-mat-2: #24234a; --tr-mat-3: #312f5e; --tr-vien: #2f2d59; --tr-vien-2: #403e72;
+    --tr-chu: #f1f0ff; --tr-chu-2: #c6c4e8; --tr-chu-3: #a4a2cd; --tr-trang: #121129;
+    --tr-dung: #00ba84; --tr-dung-nhat: #003d32; --tr-dung-chu: #00e7b0; --tr-dung-nut: #00ba84; --tr-dung-day: #008c60;
+    --tr-sai: #ed5990; --tr-sai-nhat: #38262e; --tr-sai-chu: #f889b3; --tr-sai-day: #bc386f;
+    --tr-chu-y: #fb8a33; --tr-chu-y-nhat: #412e23; --tr-chu-y-chu: #ffb075; --tr-chu-y-nut: #fb8a33; --tr-chu-y-day: #bf6528;
+    --tr-tin: #00b6cb; --tr-tin-nhat: #163547; --tr-tin-chu: #43cee0; --tr-tin-day: #008a9d;
+    --tr-sao: #f6bc02; --tr-sao-nhat: #40371c; --tr-sao-chu: #ffd462; --tr-sao-day: #b88903;
+    --tr-tim: #ca73d3; --tr-tim-day: #984ca5; --tr-tim-chu: #e17beb;
+    --tr-hs: #898bff; --tr-hs-nut: #898bff; --tr-hs-day: #5f60c9; --tr-hs-nhat: #2c2f51; --tr-hs-chu: #bdbfff; --tr-hs-tren: #121129;
+    --tr-nguyen-tu: #00b6cb; --tr-nguyen-tu-so: #00b6cb;
     --tr-phu: rgba(0, 0, 0, 0.6);
-    --tr-bong-1: 0 2px 0 #0d161a; --tr-bong-2: 0 4px 0 #0d161a; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.35);
+    --tr-bong-1: 0 2px 0 #0b0a1c; --tr-bong-2: 0 4px 0 #0b0a1c; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.35);
   }
 }
 [data-trong='hs'] { --tr-chinh-day: var(--tr-hs-day); }
+
+/* ── TÁCH MÀU CHÍNH KHỎI MÀU ĐÚNG (bộ B: chàm ≠ lục ngọc; Duolingo dùng chung một xanh lá nên các luật gốc đọc --tr-dung) ──
+   Lộ trình: thẻ bài, nút chặng đã xong / đang học, vòng tiến độ, vòng lan, vạch chặng, rương; menu; linh vật Bi ⇒ màu chính. Nguyên tử ⇒ --tr-nguyen-tu.
+   Độ ưu tiên html:root[data-trong='hs'] … cao hơn luật gốc nên thắng dù tệp này nạp TRƯỚC (@import đầu tệp). */
+html:root[data-trong='hs'] .da-bai { background: var(--tr-hs-nut); box-shadow: inset 0 -5px 0 var(--tr-hs-day); }
+html:root[data-trong='hs'] .da-dai { background: var(--tr-hs-nut); box-shadow: inset 0 -5px 0 var(--tr-hs-day), 0 10px 18px -12px var(--tr-phu); }
+html:root[data-trong='hs'] .da-nut[data-tt='xong'], html:root[data-trong='hs'] .da-nut[data-loai='hoc'][data-tt='dang'] { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }
+html:root[data-trong='hs'] :is(.da-vong .chay, .da-vong .mo) { stroke: var(--tr-hs); }
+html:root[data-trong='hs'] .da-lan { border-color: var(--tr-hs); }
+html:root[data-trong='hs'] .tr-vong[data-du] { background: conic-gradient(var(--tr-hs) calc(var(--p, 0) * 1%), var(--tr-mat-3) 0); }
+html:root[data-trong='hs'] .tr-hero .ht2-hn-vach i[data-tt='xong'] { background: var(--tr-hs); }
+html:root[data-trong='hs'] .da-ruong .rg-ngoc { fill: var(--tr-hs); }
+html:root[data-trong='hs'] .da-ruong .rg-ngoc-sang { fill: var(--tr-hs-nhat); }
+html:root[data-trong='hs'] .da-ruong .rg-ngoc-dam { fill: var(--tr-hs-chu); }
+html:root[data-trong='hs'] .tr-menu-o { --d: var(--tr-hs-day); background: var(--tr-hs-nut); }
+html:root[data-trong='hs'] .tr-menu-muc[aria-current='page'] .tr-menu-o { background: var(--tr-hs-nut); }
+html[data-trong='hs'] .bi { --bi-c: var(--tr-hs); } /* thấp hơn .bi[data-cam=…] (bi.css) ⇒ cảm xúc vẫn đổi màu */
+html:root[data-trong='hs'] .duo-ket[data-tt=dung] .duo-nut:not([data-sac]) { background: var(--tr-dung-nut); color: var(--tr-trang); box-shadow: inset 0 -4px 0 var(--tr-dung-day); }
+html:root[data-trong='hs'] .tp-dv-nt ellipse { stroke: var(--tr-nguyen-tu); }
+html:root[data-trong='hs'] .tp-dv-nt circle { fill: var(--tr-nguyen-tu); }
+html:root[data-trong='hs'] .duo-chuoi[data-co]:has(.tp-dv-nt) { color: var(--tr-nguyen-tu-so); }
+html:root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-nguyen-tu-so); }
