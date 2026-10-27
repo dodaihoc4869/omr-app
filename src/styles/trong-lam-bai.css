@@ -837,3 +837,30 @@
 }
 [data-trong] .duo .duo-hang-nut .lg-nut-hoi-thay svg { flex: none; width: 18px; height: 18px; }
 [data-trong='hs'] .duo .duo-hang-nut .lg-nut-hoi-thay:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; }
+
+/* ── PHƯƠNG TRÌNH HOÁ RÕ RÀNG (thầy 27/10: «RNH₂+H₂O⇌RNH₃⁺+OH⁻» dính liền, ⇌ nhỏ lệch dòng, «l» trong HCl giống «I» hoa). Lớp do ChemText bọc
+   (lib/chem-trinh-bay.tsx, chỉ màn làm bài HS nạp): ct-tt toán tử dính liền ⇒ khoảng hẹp hai bên · ct-mt mũi tên trần ⇒ to bằng chữ, giữa dòng · ct-kh ↑↓ · ct-l
+   «l» của Cl/Al ⇒ phông con một chữ (≈ 0,4 KB mỗi độ đậm, Vite nhúng thẳng vào tờ nạp lười này, unicode-range chỉ U+006C; vẽ tay theo nét tròn M PLUS 700/800,
+   scripts/tao-phong-chu-l.py). App thầy / phụ huynh / phiếu in không có tờ này ⇒ y nguyên. */
+@font-face { font-family: 'DDH Chu L'; font-style: normal; font-weight: 100 749; font-display: swap; src: url('./phong-tron/chu-l-duoi-700.woff2') format('woff2'); unicode-range: U+006C; }
+@font-face { font-family: 'DDH Chu L'; font-style: normal; font-weight: 750 1000; font-display: swap; src: url('./phong-tron/chu-l-duoi-800.woff2') format('woff2'); unicode-range: U+006C; }
+[data-trong='hs'] .ct-l { font-family: 'DDH Chu L', var(--sans); }
+[data-trong='hs'] .ct-tt { margin-inline: .15em; }
+[data-trong='hs'] .ct-kh { margin-inline-start: .06em; }
+[data-trong='hs'] .ct-mt { display: inline-block; font-size: 1.2em; line-height: 0; vertical-align: -.06em; }
+
+/* ── NHÃN CÂU NHẮC CHẶNG (thầy 27/10: viên «Chặng 3 · 4 câu · bắt đầu nào!» nằm ĐÈ dòng «CÂU MỚI · Amine»): không còn lớp nổi — chính dòng nhãn hiện
+   lời nhắc cạnh ô biểu tượng, 1,8 s sau mờ đi rồi chữ nhãn thường hiện lại tại chỗ (tuần tự, không lúc nào hai dòng chữ cùng hiện; không xô đề). ── */
+[data-trong] .duo-nhan[data-nc] { position: relative; }
+[data-trong] .duo-nhan-nhac {
+  position: absolute; top: 0; left: 36px; right: 0; height: 28px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  font-size: 15px; font-weight: 800; line-height: 28px; letter-spacing: 0; text-transform: none; color: var(--tr-tin-chu); pointer-events: none;
+  animation: duo-nhac-di 200ms ease-in 1.8s forwards;
+}
+[data-trong] .duo-nhan[data-nhac] > :not(.duo-nhan-o, .duo-nhan-nhac) { animation: duo-nhac-ve 260ms ease-out 2s both; }
+@keyframes duo-nhac-di { to { opacity: 0; visibility: hidden; transform: translateY(-4px); } }
+@keyframes duo-nhac-ve { from { opacity: 0; visibility: hidden; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong] .duo-nhan-nhac { animation: duo-nhac-di 1ms linear 1.8s forwards; }
+  [data-trong] .duo-nhan[data-nhac] > :not(.duo-nhan-o, .duo-nhan-nhac) { animation: duo-nhac-ve 1ms linear 1.8s both; }
+}

@@ -11,3 +11,5 @@ import 'katex/contrib/mhchem'
 import 'katex/dist/katex.min.css'
 
 export default katex
+// Chuẩn hoá chuỗi trước KaTeX (chem-latex.ts) đi cùng mảnh này — chỉ cần khi có công thức.
+export { chuanBiLatex } from './chem-latex'

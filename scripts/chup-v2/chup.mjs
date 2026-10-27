@@ -301,6 +301,14 @@ const GIU_CANH = [
 const DS_GIU = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   GIU_CANH.map(([t, viec]) => [`duo-giu-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo&tp=1&giu=1', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết GIỮ CHÂN 27/10
+// ═══ PHƯƠNG TRÌNH 27/10 (thầy gửi ảnh câu «tính base của amine»: viên «Chặng 3 · 4 câu» đè nhãn, ROH⁺N₂, phương trình dính liền, ⇌ nhỏ, «l» như «I»):
+// `lam13&lam=duo-pt` (gia/lam-bai-1210d.ts). `mo` = ngay khi mở (nhãn đang hiện lời nhắc chặng) · `nhan` = sau 3 s (nhãn thường đã về) · `chon` = chọn D.
+// 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Tiền tố "duo-pt-".
+const PT_CHO = 'lam13:' + Array(9).fill('cho').join(' » ')
+const PT_CANH = [['mo', ''], ['nhan', PT_CHO], ['chon', `${PT_CHO} » tn:^D`]]
+const DS_PT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  PT_CANH.map(([t, viec]) => [`duo-pt-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-pt', w, hh, nen, false, /tính base của amine/, viec || undefined])))
+// ═══ hết PHƯƠNG TRÌNH 27/10
 // ═══ THƯỞNG PHẠT GỘP 26/10 (tiền tố "tpc-"): Lộ trình / Thành tích / màn mở từ thanh trên / làm chặng / kết chặng THẬT có cắm thưởng phạt (`&tp=1`:
 // máy chủ giả gia/thuong.tsx + answer trả `thuong`, câu cuối `ketBai`). 390×844 · 844×390 · 1440×900, sáng + tối. Thao tác `menu:<mục>` = chọn mục menu dọc.
 const TPC_CANH = [
@@ -434,6 +442,7 @@ const DS = [
   ...DS_DUO, // DUO 26/10
   ...DS_GIU, // GIỮ CHÂN 27/10
   ...DS_CHAM, // THẺ CHẠM 27/10
+  ...DS_PT, // PHƯƠNG TRÌNH 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_NC, // NÂNG CẤP 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
