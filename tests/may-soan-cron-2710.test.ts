@@ -109,8 +109,8 @@ describe('vòng và con trỏ', () => {
     ghiLech('q00', 'dat')
     const s = soanGia((t, lan) => {
       if (lan === 1) return tra({ ok: true, xong: false, conTro: 'DE|q3', dem: { dat: 3, bo_qua: 2 }, ketQua: ketDat(3) })
-      if (lan === 2) return tra({ ok: true, xong: true, conTro: '', dem: { dat: 1 }, ketQua: ketDat(1) })
-      if (lan === 3) {
+      if (lan === 2 || lan === 3) return tra({ ok: true, xong: true, conTro: '', dem: { dat: 1 }, ketQua: ketDat(1) })
+      if (lan === 4) {
         // xử lý 3 câu đầu danh sách (hết ngân sách): q01, q02 thành đạt ⇒ rời danh sách lệch; q03 vẫn lệch
         ghiLech('q01', 'dat'); ghiLech('q02', 'dat')
         return tra({ ok: true, xong: false, conTro: '#3', dem: { dat: 2, lech: 1 }, ketQua: [...ketDat(2), { qid: 'q03', ket: 'lech', lanThu: 4 }] })
@@ -124,20 +124,24 @@ describe('vòng và con trỏ', () => {
     expect(trangThai()).toMatchObject({ vong: 'chinh', con_tro: 'DE|q3' })
     await luot()
     expect(s.goi[1]!.conTro).toBe('DE|q3')
+    // 27/10: xong vòng chính lần đầu ⇒ quét lại MỘT lần từ đầu (câu từng lỗi gọi bị bỏ qua trước bản sửa)
+    expect(trangThai()).toMatchObject({ vong: 'chinh', con_tro: '' })
+    await luot()
+    expect(s.goi[2]!.conTro).toBe('')
     expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: '' })
     await luot()
-    expect(s.goi[2]).toMatchObject({ chiSuaLoi: true, tuSuaDapAn: false, qids: ds.slice(0, G) })
+    expect(s.goi[3]).toMatchObject({ chiSuaLoi: true, tuSuaDapAn: false, qids: ds.slice(0, G) })
     expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: 'q03' })
     await luot()
-    expect(s.goi[3]!.qids).toEqual(ds.slice(3)) // q04 KHÔNG bị bỏ qua dù q01, q02 đã rời danh sách
+    expect(s.goi[4]!.qids).toEqual(ds.slice(3)) // q04 KHÔNG bị bỏ qua dù q01, q02 đã rời danh sách
     expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: ds[ds.length - 1] })
     await luot()
-    expect(s.goi).toHaveLength(4) // hết câu lệch sau câu cuối ⇒ chuyển xong, không gọi
+    expect(s.goi).toHaveLength(5) // hết câu lệch sau câu cuối ⇒ chuyển xong, không gọi
     expect(trangThai().vong).toBe('xong')
     expect(await luot()).toMatchObject({ chay: false, lyDo: 'da_xong' })
-    expect(s.goi).toHaveLength(4)
+    expect(s.goi).toHaveLength(5)
     const dem = JSON.parse(String(trangThai().dem_json)) as Record<string, number>
-    expect(dem).toMatchObject({ luot: 4, dat: 3 + 1 + 2 + ds.slice(3).length, lech: 1, bo_qua: 2 })
+    expect(dem).toMatchObject({ luot: 5, quet_lai_2710: 1, dat: 3 + 1 + 1 + 2 + ds.slice(3).length, lech: 1, bo_qua: 2 })
     expect(trangThai().dang_chay_den).toBe(0)
   })
 })
@@ -200,7 +204,7 @@ describe('tự hãm', () => {
     expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: true })
     expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 3, nghi_den: t + NGHI_KHI_LOI_MS })
     expect(String(trangThai().ly_do)).toMatch(/nghỉ 30 phút/)
-    expect(String(trangThai().ly_do)).not.toMatch(/Resource exhausted/)
+    expect(String(trangThai().ly_do)).toMatch(/\(429 Resource exhausted ×3\)/) // 27/10: chỉ chữ lỗi của Google (≤ 50 ký tự), không có chữ câu
     const truocNghi = s.goi.length
     expect(await chayMaySoanCron(env, t + 60_000, { soanLo: s.fn })).toMatchObject({ chay: false, lyDo: 'dang_nghi' })
     expect(await chayMaySoanCron(env, t + NGHI_KHI_LOI_MS - 1, { soanLo: s.fn })).toMatchObject({ chay: false, lyDo: 'dang_nghi' })
@@ -232,7 +236,11 @@ describe('tự hãm', () => {
   })
   it('27/10: tóm lỗi hạn mức + giờ cấp lại', () => {
     expect(tomLoiHanMuc([{ ket: 'loi_goi', lyDo: 'HTTP 503 overloaded' }, { ket: 'dat' }, { ket: 'loi_goi', lyDo: 'HTTP 429 x [quota=GenerateRequestsPerMinutePerProjectPerModel; retry=?s]' }]))
-      .toEqual({ chu: '503 ×1, 429 GenerateRequestsPerMinutePerProjectPerModel ×1', ngay: false })
+      .toEqual({ chu: '503 overloaded ×1, 429 GenerateRequestsPerMinutePerProjectPerModel ×1', ngay: false })
+    // không có mã hạn mức ⇒ đọc số đo / giới hạn / model trong chữ của Google; lỗi khác 429/503 không chép chữ
+    const msg = 'HTTP 429 You exceeded your current quota. * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 250, model: gemini-2.5-flash Please retry in 39s.'
+    expect(tomLoiHanMuc([{ ket: 'loi_goi', lyDo: msg }, { ket: 'loi_goi', lyDo: 'HTTP 400 Invalid argument: đề câu…' }]).chu)
+      .toBe('429 generate_content_free_tier_requests limit 250 gemini-2.5-flash ×1, 400 ×1')
     // 27/10/2026 06:50 VN = 26/10 16:50 PDT (UTC−7) ⇒ cấp lại 27/10 00:00 PDT = 07:00Z (+5 phút)
     expect(new Date(lucCapLaiHanMucNgay(Date.parse('2026-10-26T23:50:00Z'))).toISOString()).toBe('2026-10-27T07:05:00.000Z')
   })

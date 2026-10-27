@@ -154,6 +154,45 @@ const RE_DAU_CAU = new RegExp(
   'u',
 )
 
+// TỪ GHÉP không được cắt đôi (ảnh thầy 27/10: vùng tô «dịch chất nào sau đây» tách «dung | dịch»). Cặp chữ chuẩn hoá như chữ đề.
+let _tuGhep: Set<string> | null = null
+const tuGhep = () => (_tuGhep ??= new Set([
+  'dung dịch', 'phản ứng', 'nhiệt độ', 'khối lượng', 'thể tích', 'nồng độ', 'hỗn hợp', 'kết tủa', 'chất rắn', 'kim loại', 'hợp chất',
+  'phân tử', 'nguyên tử', 'hiệu suất', 'công thức', 'tên gọi', 'đồng phân', 'phát biểu', 'thí nghiệm', 'trường hợp', 'điện phân',
+  'tác dụng', 'thu được', 'hoà tan', 'đun nóng', 'xảy ra', 'phần trăm', 'giá trị', 'cần dùng', 'tính chất', 'tính khử', 'tính base',
+  'tính acid', 'oxi hoá', 'nhận định', 'mệnh đề', 'điều kiện', 'áp suất', 'chất béo', 'tinh bột', 'muối khan', 'khí thoát',
+].map(chuanChu)))
+const laTuGhep = (a: string, b: string) => tuGhep().has(`${a} ${b}`)
+/** Chữ ngay trước vị trí `i` (bỏ khoảng trắng) và chữ bắt đầu tại `i`, trên chữ đã chuẩn hoá. */
+const CHU_RE = /[\p{L}\p{N}]+/gu
+function chuTruoc(lc: string, i: number): string {
+  let j = i
+  while (j > 0 && lc[j - 1] === ' ') j--
+  let k = j
+  while (k > 0 && CHU_SO.test(lc[k - 1])) k--
+  return j < i && k < j ? lc.slice(k, j) : ''
+}
+function chuSau(lc: string, i: number): { chu: string; den: number } | null {
+  let j = i
+  while (j < lc.length && lc[j] === ' ') j++
+  if (j === i) return null
+  let k = j
+  while (k < lc.length && CHU_SO.test(lc[k])) k++
+  return k > j ? { chu: lc.slice(j, k), den: k } : null
+}
+/** Nới / co hai đầu vùng để không cắt giữa từ ghép: đầu vùng là nửa sau của từ ghép ⇒ bỏ chữ ấy; cuối vùng là nửa đầu ⇒ lấy thêm nửa sau. */
+function giuTuGhep(lc: string, x: number, y: number): [number, number] {
+  const dau = lc.slice(x, y).match(CHU_RE)
+  if (dau && dau.length > 1 && laTuGhep(chuTruoc(lc, x), dau[0])) {
+    x += dau[0].length
+    while (x < y && /[\s,.;:]/.test(lc[x])) x++
+  }
+  const cuoi = lc.slice(x, y).match(CHU_RE)
+  const sau = chuSau(lc, y)
+  if (cuoi && sau && laTuGhep(cuoi[cuoi.length - 1], sau.chu)) y = sau.den
+  return [x, y]
+}
+
 /** Tách câu: [đầu, cuối) theo «. ? !» + khoảng trắng, hoặc xuống dòng. */
 function tachCau(t: string): [number, number][] {
   const ra: [number, number][] = []
@@ -214,7 +253,10 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
         // tối đa 2 chữ đứng trước «nào sau đây»
         const truoc = lc.slice(md, s + nao.index!)
         const chu = [...truoc.matchAll(/[\p{L}\p{N}]+/gu)]
-        tu = chu.length ? md + chu[Math.max(0, chu.length - 2)].index! : s + nao.index!
+        let k = Math.max(0, chu.length - 2)
+        // không cắt giữa từ ghép: «dung dịch | chất nào sau đây» ⇒ bỏ «dịch», chỉ lấy «chất nào sau đây»
+        if (k > 0 && k < chu.length - 1 && laTuGhep(chu[k - 1][0], chu[k][0])) k++
+        tu = chu.length ? md + chu[k].index! : s + nao.index!
       }
       khoa = 'nao-sau-day'
     } else if (dau) {
@@ -240,6 +282,7 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
       if (laDuoi && !khopDau(RE_BAO_NHIEU, lc.slice(x, y)) && lc.slice(x, y).replace(new RegExp(`${mau('là')}${BIEN_PHAI}`, 'gu'), (k: string, o: number, chu: string) => (o > 0 && CHU_SO.test(chu[o - 1]) ? k : '')).trim().split(/\s+/).filter(Boolean).length < 2) return
       while (y > x && /[\s,.;:]/.test(t[y - 1])) y--
       while (x < y && /[\s,.;:]/.test(t[x])) x++
+      if (y > x) [x, y] = giuTuGhep(lc, x, y)
       if (y > x) ra.push({ loai: 'hoi', tu: x, den: y, khoa })
     }
     const trong = benTrong(tu, den)

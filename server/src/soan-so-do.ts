@@ -137,6 +137,45 @@ export function nhanHanMuc(j: unknown): string {
   return quota || retry ? ` [quota=${quota || '?'}; retry=${retry || '?'}s]` : ''
 }
 
+/** Model Workers AI dùng khi Gemini hết hạn mức (27/10). Cổng kiểm vẫn chấm như mọi bản ⇒ sai số thì không hiện. */
+export const MODEL_CF = '@cf/openai/gpt-oss-120b'
+const RE_CF_HAN_MUC = /\b(429|3036|3040|4006)\b|rate.?limit|capacity|too many|neurons|daily free/i
+
+/** Lấy CHỮ TRẢ LỜI CUỐI từ kết quả `env.AI.run` (nhiều dạng: Responses `output[]`, `output_text`, `response`, `choices`). KHÔNG lấy phần suy luận. */
+export function chuTuWorkersAi(r: unknown): string {
+  if (typeof r === 'string') return r.trim()
+  const o = (r ?? {}) as Obj
+  if (typeof o.output_text === 'string' && o.output_text.trim()) return o.output_text.trim()
+  if (Array.isArray(o.output)) {
+    const chu = (o.output as Obj[]).filter((x) => x?.type === 'message')
+      .flatMap((x) => (Array.isArray(x.content) ? x.content : []) as Obj[])
+      .filter((c) => c?.type === 'output_text' && typeof c.text === 'string').map((c) => str(c.text)).join('').trim()
+    if (chu) return chu
+  }
+  if (typeof o.response === 'string' && o.response.trim()) return o.response.trim()
+  const ch = ((o.choices as Obj[] | undefined)?.[0]?.message as Obj | undefined)?.content
+  if (typeof ch === 'string' && ch.trim()) return ch.trim()
+  return ''
+}
+
+/** Gọi Workers AI một lần theo khuôn GoiMoHinh. Lỗi hạn mức / quá tải (ném ra) ⇒ `HTTP 429` để máy soạn giữ con trỏ + co giãn như Gemini. */
+export async function goiWorkersAi(ai: NonNullable<Env['AI']>, yc: { heThong: string; luot: readonly LuotHoi[] }): Promise<KetQuaMoHinh> {
+  try {
+    const r = await ai.run(MODEL_CF, {
+      instructions: yc.heThong,
+      input: yc.luot.map((l) => ({ role: l.vai === 'model' ? 'assistant' : 'user', content: l.chu })),
+      reasoning: { effort: 'medium' },
+    })
+    const chu = chuTuWorkersAi(r)
+    if (!chu) return { ok: false, loi: 'rỗng workers-ai' }
+    const u = ((r as Obj | null)?.usage ?? {}) as Obj
+    return { ok: true, chu, model: MODEL_CF, vao: Number(u.input_tokens ?? u.prompt_tokens) || 0, ra: Number(u.output_tokens ?? u.completion_tokens) || 0 }
+  } catch (e) {
+    const m = (e instanceof Error ? e.message : String(e)).replace(/\s+/g, ' ').slice(0, 200)
+    return RE_CF_HAN_MUC.test(m) ? { ok: false, http: 429, loi: `HTTP 429 workers-ai ${m}` } : { ok: false, loi: `workers-ai ${m}` }
+  }
+}
+
 export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
   const key = str(env.GEMINI_API_KEY)
   const tram = env.TRAM_GEMINI ? quaTram(env.TRAM_GEMINI) : null
@@ -149,7 +188,7 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
       let r = await fetch(url, init)
       if (tram && r.status === 400 && RE_CHAN_VI_TRI.test(await r.clone().text().catch(() => ''))) r = await tram(url, init)
       const j = (await r.json().catch(() => null)) as Obj | null
-      if (!r.ok) return { ok: false, http: r.status, loi: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 160)}${nhanHanMuc(j)}` }
+      if (!r.ok) return { ok: false, http: r.status, loi: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).replace(/\s+/g, ' ').slice(0, 400)}${nhanHanMuc(j)}` }
       const ung = (j?.candidates as Obj[] | undefined)?.[0]
       const chu = (((ung?.content as Obj | undefined)?.parts as Obj[] | undefined) ?? []).filter((p) => p.thought !== true).map((p) => str(p.text)).join('').trim()
       const u = (j?.usageMetadata ?? {}) as Obj
@@ -159,7 +198,12 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
       return { ok: false, loi: ac.signal.aborted ? `quá ${Math.round(hanMs / 1000)} s` : e instanceof Error ? e.message.slice(0, 160) : 'lỗi mạng' }
     } finally { clearTimeout(hen) }
   }
+  // Một lượt soạn = một bộ gọi: Gemini đã 429 (cả model mạnh) một lần ⇒ các câu sau đi thẳng Workers AI, không đốt thêm lượt gọi Gemini.
+  let geminiHet = !key
+  const cf = env.AI
+  const quaCf = async (heThong: string, luot: readonly LuotHoi[], loiGemini: KetQuaMoHinh) => (cf ? await goiWorkersAi(cf, { heThong, luot }) : loiGemini)
   return async ({ heThong, luot, model }) => {
+    if (geminiHet && cf) return await goiWorkersAi(cf, { heThong, luot })
     const body = JSON.stringify({
       systemInstruction: { parts: [{ text: heThong }] },
       contents: luot.map((l) => ({ role: l.vai, parts: [{ text: l.chu }] })),
@@ -169,6 +213,14 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
     for (const m of [model, ...MODEL_DU_PHONG.filter((x) => x !== model)]) {
       kq = await motLan(m, body)
       if (!kq.ok && (kq.http === 429 || kq.http === 503)) { await ngu(3000); kq = await motLan(m, body) }
+      // 27/10: model nhanh hết hạn mức (429) ⇒ thử một lần MODEL_MANH — hạn mức tính riêng từng model, và «Hỏi thầy» không dùng model này
+      // (kể cả danh sách dự phòng `DS_MODEL_DU_PHONG` của hoi-tro-ly.ts) ⇒ không ăn vào hạn mức của học sinh.
+      if (!kq.ok && kq.http === 429 && m !== MODEL_MANH) {
+        const manh = await motLan(MODEL_MANH, body)
+        if (manh.ok) return manh
+      }
+      // 27/10 thầy «soạn luôn bằng mọi cách ko chờ gemini»: Gemini (cả model mạnh) vẫn 429 ⇒ Workers AI.
+      if (!kq.ok && kq.http === 429) { geminiHet = true; return await quaCf(heThong, luot, kq) }
       if (kq.ok || (kq.http !== 404 && kq.http !== 410)) return kq
     }
     return kq
@@ -461,7 +513,7 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   const bayGio = phu.bayGio ?? Date.now
   const batDau = bayGio()
   if (laGioCaoDiem(batDau) && !ts.choChayGioCaoDiem) return tra({ ok: false, ma: 'gio_cao_diem', error: 'Không soạn lô trong 19–24h giờ VN (giờ cao điểm). Chạy lại ngoài giờ ấy.' }, 409)
-  if (!phu.goiMoHinh && !str(env.GEMINI_API_KEY)) return tra({ ok: false, error: 'Máy chủ chưa có khoá GEMINI_API_KEY.' }, 503)
+  if (!phu.goiMoHinh && !str(env.GEMINI_API_KEY) && !env.AI) return tra({ ok: false, error: 'Máy chủ chưa có khoá GEMINI_API_KEY.' }, 503)
   const goi = phu.goiMoHinh ?? taoGoiGeminiLo(env)
   // Cổng làn C đọc phương án theo khoá A–D (`luaChon['B']`); câu kho mang mảng ⇒ đổi mảng thành {A,B,C,D}. Trước 26/10 truyền thẳng mảng ⇒ cổng không thấy
   // phương án đúng ⇒ MỌI câu Phần I ra `khong_kiem_duoc` («Phương án đúng không phải số»), không bao giờ `dat` / `lech`.
@@ -483,10 +535,11 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   while (i < hang.length) {
     if (i > 0 && het()) break
     const dot: CauKho[] = []
+    const viTri: number[] = [] // chỉ số trong `hang` của từng câu trong đợt
     let j = i
     for (; j < hang.length && dot.length < (ts.songSong ?? 4); j++) {
       const m = hang[j]!
-      if (m.q) dot.push(m.q); else dem.bo_qua++
+      if (m.q) { dot.push(m.q); viTri.push(j) } else dem.bo_qua++
     }
     const xong = await Promise.all(dot.map((q) => soanMotCau(q, ts, goi, cong, heThong)))
     // TỰ SỬA ĐÁP ÁN KHO — TUẦN TỰ (các câu cùng tờ ghi chung một gói R2): nghi ⇒ chọn đáp án mới ⇒ suaDapAnKho ⇒ soạn lại câu theo đáp án mới (version mới).
@@ -529,6 +582,17 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
     if (ghi.length) {
       if (!daTaoBang) { await env.DB.batch(SQL_BANG_SO_DO.map((s) => env.DB.prepare(s))); daTaoBang = true }
       await env.DB.batch(ghi)
+    }
+    // 27/10: câu LỖI GỌI (Gemini 429 / quá tải…) không được bỏ qua — con trỏ dừng ngay TRƯỚC câu lỗi đầu tiên, lượt sau soạn lại từ đó
+    // (câu cùng đợt đã soạn xong thì lượt sau tự bỏ qua vì đã có dòng). Trước đây con trỏ vẫn đi tiếp ⇒ câu lỗi rơi khỏi lượt quét.
+    // CHỈ lỗi hạn mức / quá tải (HTTP 429 / 503) mới giữ con trỏ; lỗi cố định của riêng câu (rỗng SAFETY, quá giờ, HTTP 400…) vẫn bước qua như cũ
+    // để một câu hỏng không ghim con trỏ mãi.
+    const kLoi = xong.findIndex((r) => r.dong.ket === 'loi_goi' && /\bHTTP (429|503)\b/.test(str(r.dong.lyDo)))
+    if (kLoi >= 0) {
+      const h = viTri[kLoi]!
+      if (h > i) conTro = hang[h - 1]!.vt
+      i = h
+      break
     }
     conTro = hang[j - 1]!.vt
     i = j

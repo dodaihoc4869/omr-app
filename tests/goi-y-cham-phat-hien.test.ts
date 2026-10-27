@@ -232,3 +232,34 @@ describe('bộ đề mẫu dài: bất biến', () => {
     ])
   })
 })
+
+// Ảnh thầy 27/10 (bản sống): đề ethylamine tô «dịch chất nào sau đây» — cắt đôi chữ «dung dịch».
+describe('không cắt giữa từ ghép tiếng Việt', () => {
+  const DE_ETHYLAMINE = 'Ethylamine thể hiện tính khử khi tác dụng với dung dịch chất nào sau đây ở nhiệt độ thường?'
+  it('câu ví dụ của thầy: vùng đề hỏi là «chất nào sau đây», không «dịch chất nào sau đây»', () => {
+    const hoi = phatHien(DE_ETHYLAMINE).filter((v) => v.loai === 'hoi').map((v) => v.chu)
+    expect(hoi).toEqual(['chất nào sau đây'])
+  })
+  it('không vùng nào bắt đầu / kết thúc giữa «dung dịch», «phản ứng», «nhiệt độ», «khối lượng»', () => {
+    const DE = [
+      DE_ETHYLAMINE,
+      'Cho Fe tác dụng với dung dịch chất nào sau đây thu được muối iron(III)?',
+      'Sau phản ứng chất nào sau đây còn dư?',
+      'Ở nhiệt độ thường kim loại nào sau đây tan trong nước?',
+      'Cho X vào nước, khối lượng chất nào sau đây không đổi?',
+    ]
+    const GHEP = [['dung', 'dịch'], ['phản', 'ứng'], ['nhiệt', 'độ'], ['khối', 'lượng']]
+    for (const de of DE) for (const v of phatHien(de)) {
+      const truoc = de.slice(0, v.tu).trimEnd().split(/\s+/).pop()?.toLowerCase() ?? ''
+      const sau = de.slice(v.den).trimStart().split(/[\s,.?]+/)[0]?.toLowerCase() ?? ''
+      const dau = v.chu.split(/\s+/)[0].toLowerCase(), cuoi = v.chu.split(/\s+/).pop()!.toLowerCase()
+      for (const [a, b] of GHEP) {
+        expect(truoc === a && dau === b, `${de} ⇒ «${v.chu}»`).toBe(false)
+        expect(cuoi === a && sau === b, `${de} ⇒ «${v.chu}»`).toBe(false)
+      }
+    }
+  })
+  it('từ ghép đứng ngay trước «nào sau đây» thì giữ trọn («kim loại nào sau đây»)', () => {
+    expect(phatHien('Kim loại nào sau đây tan trong nước?').find((v) => v.loai === 'hoi')?.chu).toBe('Kim loại nào sau đây')
+  })
+})

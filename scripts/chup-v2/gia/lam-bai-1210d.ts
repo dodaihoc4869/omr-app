@@ -102,7 +102,22 @@ const CAU_XAU: CauGia[] = [
 ]
 const SO_LON = thamSo.get('so') === 'lon'
 // ═══ hết KIỂM GD MỚI 26/10
-const ds = kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+// ═══ THẺ CHẠM 27/10: `lam13&lam=duo&cham=chat|don-vi|phu-dinh|vd` — câu đầu chặng có chữ chạm để chụp thẻ kiểu Duolingo (tiền tố ảnh «duo-cham-»):
+// chất (aniline) · đơn vị (1,5 M) · phủ định (không đúng) · vd = đúng câu trong ảnh thầy gửi (không còn tô «dịch chất nào sau đây»).
+const CHAM = thamSo.get('cham') ?? ''
+const CAU_CHAM: Record<string, CauGia> = {
+  chat: { ...nen, qid: 'C1', maDe: 'BAI8', phan: 'III', tenDang: 'Amine', text: 'Cho 4,65 gam aniline tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là bao nhiêu gam? (Làm tròn đến hàng phần trăm.)', choices: [], ideas: [], dapAn: '6,48',
+    loiGiai: { chot: 'n(aniline) = 4,65 : 93 = 0,05 mol = n(muối) ⇒ m = 0,05 × 129,5 = 6,475 ≈ 6,48 gam.' } },
+  'don-vi': { ...nen, qid: 'C2', maDe: 'BAI1', phan: 'III', tenDang: 'Ester – Lipid', text: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate bằng 100 mL dung dịch NaOH 1,5 M, đun nóng. Cô cạn dung dịch sau phản ứng, thu được m gam chất rắn khan. Giá trị của m là', choices: [], ideas: [], dapAn: '10,2',
+    loiGiai: { chot: 'n(ester) = 0,1 mol, n(NaOH) = 0,15 mol ⇒ chất rắn: 0,1 mol CH3COONa (8,2 g) + 0,05 mol NaOH dư (2 g) = 10,2 gam.' } },
+  'phu-dinh': { ...nen, qid: 'C3', maDe: 'BAI8', phan: 'I', tenDang: 'Amine', text: 'Phát biểu nào sau đây về aniline (C6H5NH2) không đúng?', choices: ['Aniline là amine bậc một.', 'Dung dịch aniline làm quỳ tím hoá xanh.', 'Aniline tác dụng với nước bromine tạo kết tủa trắng.', 'Aniline tác dụng với dung dịch HCl.'], ideas: [], dapAn: 'B',
+    loiGiai: { chot: 'Aniline có tính base rất yếu, dung dịch không làm quỳ tím đổi màu.' } },
+  vd: { ...nen, qid: 'C4', maDe: 'BAI8', phan: 'I', tenDang: 'Amine', text: 'Ethylamine thể hiện tính khử khi tác dụng với dung dịch chất nào sau đây ở nhiệt độ thường?', choices: ['HCl', 'HNO2', 'FeCl3', 'CH3COOH'], ideas: [], dapAn: 'B',
+    loiGiai: { chot: 'Amine bậc một + HNO2 ⇒ N2: nguyên tử N (−3) lên 0, ethylamine là chất khử.' } },
+}
+const CAU_DUO_CHAM = CAU_CHAM[CHAM] ? [CAU_CHAM[CHAM]!, ...CAU_DUO] : CAU_DUO
+// ═══ hết THẺ CHẠM 27/10
+const ds = kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_CHAM : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
 

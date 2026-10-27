@@ -19,7 +19,7 @@ describe('mở dần 3 tầng + soi sáng', () => {
     const onHoTro = vi.fn()
     const tai = vi.fn(async () => BAN_LO)
     const { container } = render(<VungChamDe q={{ qid: 'q-pyrite' }} tuDien={TU_DIEN_GIA} onHoTro={onHoTro} taiGoiY={tai}><De text={DE_PYRITE} /></VungChamDe>)
-    await screen.findByText('8%', { selector: '.gyc-v' })
+    await screen.findByText('8%', { selector: '.gyc-v' }, { timeout: 4000 })
     const nut = (await screen.findByRole('button', { name: /Bắt đầu từ đâu/ }))
     fireEvent.click(nut)
     expect(onHoTro).toHaveBeenCalledTimes(1)

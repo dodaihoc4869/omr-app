@@ -1,6 +1,6 @@
 // KHUNG DUO của màn sửa câu («Trong» HS, thầy 27/10): thanh trên (X · thanh tiến độ) · thân · đáy — lớp duo-* sẵn có (styles/trong-lam-bai.css).
 // Tệp NHẸ, nằm trong mảnh ManChuaCauSai (vẽ ngay lúc đang mở câu / báo lỗi); cây trình bày câu (ChuaGonDuo) nạp lười, chỉ khi <html data-trong="hs">.
-import type { ReactNode, Ref } from 'react'
+import { useState, type ReactNode, type Ref } from 'react'
 import { X as XIcon } from 'lucide-react'
 
 /** Vị trí câu đang sửa trong chặng của Việc hôm nay (ManTuChua dựng). Vắng ⇒ màn một câu (thanh đầy khi câu khép). */
@@ -25,11 +25,13 @@ export function KhungDuoSua({ onVe, khoaVe, pct, nhanThanh, loe, xong, tt, deDai
   onVe: () => void; khoaVe?: boolean; pct: number; nhanThanh: string; loe?: boolean; xong?: boolean; tt?: string; deDai?: boolean
   children: ReactNode; day?: ReactNode; goc?: Ref<HTMLDivElement>
 }) {
+  // Vệt sáng lướt xong thì gỡ (thanh đầy 100% ⇒ vệt dừng ngoài mép phải — bị cắt nhưng vẫn tính là tràn khi đo).
+  const [hetLoe, setHetLoe] = useState(false)
   return (
     <div ref={goc} className="ht-app ht2-lam duo duo-sua" data-duo="" data-xong={xong || undefined} data-tt={tt}>
       {!xong && <header className="duo-tren">
         <button type="button" className="duo-dong" onClick={onVe} disabled={khoaVe} aria-label="Quay lại"><XIcon size={26} aria-hidden="true" /></button>
-        <div className="duo-thanh" role="progressbar" aria-label={nhanThanh} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}><i style={{ width: `${pct}%` }}><b /><b /><b />{loe && <span className="duo-loe" />}</i></div>
+        <div className="duo-thanh" role="progressbar" aria-label={nhanThanh} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}><i style={{ width: `${pct}%` }}><b /><b /><b />{loe && !hetLoe && !(typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) && <span className="duo-loe" onAnimationEnd={() => setHetLoe(true)} />}</i></div>
       </header>}
       <main className="duo-than" data-de-dai={deDai || undefined} aria-live={xong ? 'polite' : undefined}>{children}</main>
       {day}
