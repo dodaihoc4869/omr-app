@@ -15,6 +15,12 @@
 //     lúc đặt lại vẫn cộng — nơi đọc lọc). Nhiều lần đặt lại ⇒ vòng lặp ngày gặp từng lần theo thứ tự, lần sau cùng (luc lớn nhất) quyết định.
 
 import { laNgayBaoTri } from './ngay-bao-tri'
+import { SQL_LA_LAN_LAM } from './omni-kieu'
+import { SQL_DA_CONG_BO } from './cong-bo-diem'
+
+/** (28/10) Điều kiện một dòng `su_kien_hoc` (KHÔNG bí danh) được tính vào MỨC HÔM NAY — đúng tập «đã làm hôm nay» của Gói 7 (`docDaLamNgay7`): bỏ KTCN,
+ *  lướt / chẩn đoán / xem lời giải, câu đang giấu, câu ca thi chưa công bố. Viết lại ở đây (không nhập goi-bai-7 ⇒ không vòng nhập). */
+export const SQL_CAU_TINH_MUC = `ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`
 
 export const CAU_MOT_BAI = 6
 export const BAI_CUU = 2
@@ -42,6 +48,15 @@ export const SQL_COT_BINH_MUA = `date(m.luc, '+7 hours') AS n,
       WHEN EXISTS (SELECT 1 FROM chuoi_binh_mua r WHERE r.sbd = m.sbd AND r.nguon LIKE '${TIEN_TO_DAT_LAI_BINH}%' AND r.luc >= m.luc AND date(r.luc, '+7 hours') = date(m.luc, '+7 hours')) THEN 0
       ELSE m.so END) AS s,
     MAX(m.nguon LIKE '${TIEN_TO_DAT_LAI_BINH}%') AS r`
+/**
+ * LUẬT CHUỖI 28/10 (thầy 27/10: «Chuỗi phải làm xong chặng mới tính chuỗi. Hiện tại đang làm xong chặng 1 là được tính chuỗi»): từ ngày này một ngày giữ
+ * chuỗi khi em LÀM ĐỦ MỨC HÔM NAY — số câu Gói 7 đã làm (`soCau7`, cùng thước đo vòng «Đủ mức» / thẻ «Đủ x/y câu») ≥ mức câu đã chốt của ngày
+ * (`goi_bai_7_muc_ngay.muc`). Ngày chưa chốt mức ⇒ đủ 1 chặng (CAU_MOT_BAI câu). Tự sửa riêng KHÔNG còn giữ chuỗi. Ngày trước mốc giữ luật cũ.
+ * Cứu chuỗi: hôm sau đủ mức + 2 chặng bù (BAI_CUU × CAU_MOT_BAI câu).
+ */
+export const NGAY_CHUOI_DU_MUC = '2026-10-28'
+/** TRẦN BÌNH 28/10 (thầy: «mỗi tuần học sinh chăm nhất cũng chỉ có 1 bình»): mọi đường (mua, quà mốc 30 ngày) chung trần 1 bình / tuần VN. */
+export const BINH_TOI_DA_TUAN = 1
 /** Ngày `ngay` còn được tặng bình thứ Hai? (chỉ thứ Hai TRƯỚC mốc luật mới) */
 export const conTangThuHai = (ngay: string): boolean => ngay < NGAY_LUAT_BINH_MOI && new Date(Date.parse(`${ngay}T00:00:00Z`)).getUTCDay() === 1
 /** Vắng có phép ngày `ngay` còn giữ chuỗi? (chỉ ngày TRƯỚC mốc luật mới) */
@@ -59,6 +74,10 @@ export interface NhatKyChuoi {
   mua?: ReadonlyMap<string, number>
   /** ngày VN bình được đặt lại về 0 (dòng nguồn NGUON_DAT_LAI_BINH) */
   datLai?: ReadonlySet<string>
+  /** (28/10) ngày VN → số câu khác nhau tính MỨC (đúng tập «đã làm hôm nay» của Gói 7: bỏ KTCN, lướt, câu chưa công bố). Vắng ⇒ dùng `soCau`. */
+  soCau7?: ReadonlyMap<string, number>
+  /** (28/10) ngày VN → mức câu đã chốt (`goi_bai_7_muc_ngay.muc`). */
+  muc?: ReadonlyMap<string, number>
 }
 export interface ChuoiNgay {
   so: number
@@ -70,6 +89,10 @@ export interface ChuoiNgay {
   /** (CHỈ-THÊM 26/10, chỉ khi nơi gọi xin `thang`) lịch 30 ngày gần nhất + chuỗi dài nhất trong cửa sổ đọc — cùng vòng lặp, không đọc thêm. */
   lich30?: { ngay: string; kieu: KieuNgay }[]
   daiNhat?: number
+  /** (28/10) số bình em ĐÃ NHẬN trong tuần VN hiện tại (mua + quà), tính từ lần đặt lại gần nhất — trần BINH_TOI_DA_TUAN. */
+  binhTuanNay: number
+  /** (28/10) mức câu hôm nay để giữ chuỗi + số câu đã làm (thước đo vòng «Đủ mức»). */
+  homNay?: { can: number; da: number }
 }
 
 const NGAY = 86_400_000
@@ -79,9 +102,20 @@ export const ngayVn = (luc: number) => new Date(luc + 7 * 3_600_000).toISOString
 /** Thứ Hai đầu tuần của ngày (VN). */
 export const thuHaiCua = (ngay: string) => { const d = new Date(ms(ngay)).getUTCDay(); return congNgay(ngay, -((d + 6) % 7)) }
 
+/** Câu tính mức / mức cần của ngày `d` (luật 28/10). */
+export const cauMucNgay = (nk: NhatKyChuoi, d: string): number => (nk.soCau7 ?? nk.soCau).get(d) ?? 0
+export const canMucNgay = (nk: NhatKyChuoi, d: string): number => Math.max(1, nk.muc?.get(d) ?? CAU_MOT_BAI)
+/** Ngày `d` giữ chuỗi? Trước 28/10: ≥ 1 chặng hoặc tự sửa xong · từ 28/10: ĐỦ MỨC HÔM NAY. Một định nghĩa cho chuỗi em, lửa đôi, cược. */
+export const ngayDatChuoi = (nk: NhatKyChuoi, d: string): boolean =>
+  d < NGAY_CHUOI_DU_MUC ? (nk.soCau.get(d) ?? 0) >= CAU_MOT_BAI || nk.tuSua.has(d) : cauMucNgay(nk, d) >= canMucNgay(nk, d)
+
 /** Chuỗi của MỘT em tại ngày `homNay` (VN) từ nhật ký. */
 export function chuoiNgayCuaEm(nk: NhatKyChuoi, homNay: string, thang = false): ChuoiNgay {
-  const dat = (d: string) => (nk.soCau.get(d) ?? 0) >= CAU_MOT_BAI || nk.tuSua.has(d)
+  const cau7 = (d: string) => cauMucNgay(nk, d)
+  const canMuc = (d: string) => canMucNgay(nk, d)
+  const dat = (d: string) => ngayDatChuoi(nk, d)
+  const tuanNhan = new Map<string, number>() // tuần VN → số bình đã nhận (mua + quà), xoá khi đặt lại
+  const nhan = (d: string, n: number) => { const t = thuHaiCua(d); tuanNhan.set(t, (tuanNhan.get(t) ?? 0) + n) }
   const coHoatDong = [...nk.soCau.keys(), ...nk.tuSua, ...nk.phep].filter(d => d <= homNay).sort()
   const batDau = coHoatDong.length ? (coHoatDong[0]! > congNgay(homNay, -SO_NGAY_DOC) ? coHoatDong[0]! : congNgay(homNay, -SO_NGAY_DOC)) : homNay
   let so = 0, binh = 0, sucChua = SUC_CHUA_GOC, binhVuaDo: string | undefined, daiNhat = 0
@@ -89,14 +123,15 @@ export function chuoiNgayCuaEm(nk: NhatKyChuoi, homNay: string, thang = false): 
   const tuanDaCuu = new Set<string>(), lich = new Map<string, KieuNgay>()
   for (let d = batDau; d <= homNay; d = congNgay(d, 1)) {
     if (conTangThuHai(d)) binh = Math.min(sucChua, binh + 1)
-    if (nk.datLai?.has(d)) binh = 0
+    if (nk.datLai?.has(d)) { binh = 0; tuanNhan.set(thuHaiCua(d), 0) }
     const mua = nk.mua?.get(d) ?? 0
-    if (mua > 0) binh = Math.min(sucChua, binh + mua)
+    if (mua > 0) { binh = Math.min(sucChua, binh + mua); nhan(d, mua) }
     if (dat(d)) {
       so++
       if (so > daiNhat) daiNhat = so
       lich.set(d, 'hoc')
-      if (so === MOC_TANG_BINH) binh = Math.min(sucChua, binh + 1)
+      // Quà mốc 30 ngày: từ 28/10 chung trần 1 bình/tuần với bình mua (tuần đã nhận bình ⇒ không tặng thêm).
+      if (so === MOC_TANG_BINH && (d < NGAY_CHUOI_DU_MUC || (tuanNhan.get(thuHaiCua(d)) ?? 0) < BINH_TOI_DA_TUAN)) { binh = Math.min(sucChua, binh + 1); nhan(d, 1) }
       if (so >= MOC_SUC_CHUA) sucChua = SUC_CHUA_100
       continue
     }
@@ -108,16 +143,19 @@ export function chuoiNgayCuaEm(nk: NhatKyChuoi, homNay: string, thang = false): 
     if (binh > 0) { binh--; binhVuaDo = d; lich.set(d, 'binh'); continue }
     // Hết bình: cứu bằng 2 bài bù ngay hôm sau (một lần mỗi tuần).
     const sau = congNgay(d, 1), tuan = thuHaiCua(d)
-    const soSau = nk.soCau.get(sau) ?? 0
-    if (!tuanDaCuu.has(tuan) && soSau >= (1 + BAI_CUU) * CAU_MOT_BAI) { tuanDaCuu.add(tuan); lich.set(d, 'cuu'); continue }
+    const soSau = sau < NGAY_CHUOI_DU_MUC ? nk.soCau.get(sau) ?? 0 : cau7(sau)
+    const nenSau = sau < NGAY_CHUOI_DU_MUC ? CAU_MOT_BAI : canMuc(sau) // phần «đủ mức của hôm đó»; bù = BAI_CUU chặng NGOÀI phần này
+    if (!tuanDaCuu.has(tuan) && soSau >= nenSau + BAI_CUU * CAU_MOT_BAI) { tuanDaCuu.add(tuan); lich.set(d, 'cuu'); continue }
     if (sau === homNay && !tuanDaCuu.has(tuan)) {
       // Còn trong hạn cứu: chuỗi tạm tắt, giao diện nhắc học bù. Bài của hôm nay tính bài đầu; phần dư mới là bài bù.
-      cuu = { hetHan: new Date(ms(homNay) + NGAY - 7 * 3_600_000).toISOString(), daLam: Math.max(0, Math.floor(soSau / CAU_MOT_BAI) - 1), can: BAI_CUU, soCu: so }
+      cuu = { hetHan: new Date(ms(homNay) + NGAY - 7 * 3_600_000).toISOString(), daLam: Math.max(0, Math.floor((soSau - nenSau) / CAU_MOT_BAI)), can: BAI_CUU, soCu: so }
     }
     so = 0
     lich.set(d, 'tat')
   }
   const lichN = (n: number) => Array.from({ length: n }, (_, i) => congNgay(homNay, i - n + 1)).map(ngay => ({ ngay, kieu: lich.get(ngay) ?? 'tat' as KieuNgay }))
   const lich7 = lichN(7)
-  return { so, giuChuoi: binh, sucChua, lich7, ...(cuu ? { cuu } : {}), ...(binhVuaDo ? { binhVuaDo } : {}), ...(thang ? { lich30: lichN(30), daiNhat } : {}) }
+  const homNayMuc = homNay >= NGAY_CHUOI_DU_MUC ? { can: canMuc(homNay), da: cau7(homNay) } : undefined
+  return { so, giuChuoi: binh, sucChua, lich7, ...(cuu ? { cuu } : {}), ...(binhVuaDo ? { binhVuaDo } : {}), ...(thang ? { lich30: lichN(30), daiNhat } : {}),
+    binhTuanNay: tuanNhan.get(thuHaiCua(homNay)) ?? 0, ...(homNayMuc ? { homNay: homNayMuc } : {}) }
 }

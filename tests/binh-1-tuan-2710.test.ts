@@ -25,7 +25,8 @@ describe('tuần mua bình (giờ VN, thứ Hai → Chủ nhật)', () => {
   it('thứ Hai đầu tuần + khoảng khoá + ngày mua tiếp', () => {
     expect(TT_BINH_GIU_CHUOI).toBe(150)
     expect(thuHaiTt('2026-11-02')).toBe('2026-11-02'); expect(thuHaiTt('2026-11-08')).toBe('2026-11-02'); expect(thuHaiTt('2026-11-09')).toBe('2026-11-09')
-    expect(tuanMuaBinh('2026-10-27')).toEqual({ tu: 'tt|2026-10-26|', toi: 'tt|2026-11-02|', muaTiepTu: '2026-11-02' })
+    expect(tuanMuaBinh('2026-10-27')).toEqual({ tu: 'tt|2026-10-28|', toi: 'tt|2026-11-02|', muaTiepTu: '2026-11-02' }) // đếm từ lần đặt lại 28/10
+    expect(tuanMuaBinh('2026-11-04')).toEqual({ tu: 'tt|2026-11-02|', toi: 'tt|2026-11-09|', muaTiepTu: '2026-11-09' })
   })
 })
 

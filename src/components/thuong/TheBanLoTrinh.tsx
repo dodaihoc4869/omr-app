@@ -50,8 +50,8 @@ export function TheBanLoTrinh({ token, bat, onMo }: PropsTheBanLoTrinh) {
       setDaGo((x) => ({ ...x, [b.ma]: true }))
       void layDsBan(token).then((x) => { if (x.ok) baoMoi(DUONG.ban, token) })
     }
-    const tieuDe = chuaCaHai ? `${ten} cũng chưa học hôm nay` : `${ten} chưa học hôm nay`
-    const phu = [chuaCaHai ? `Học 1 chặng để giữ lửa đôi ${b.chuoiDoi} ngày` : `Lửa đôi ${b.chuoiDoi} ngày`, them > 0 ? `+${them} bạn chưa học` : ''].filter(Boolean).join(' · ')
+    const tieuDe = chuaCaHai ? `${ten} cũng chưa đủ mức hôm nay` : `${ten} chưa đủ mức hôm nay`
+    const phu = [chuaCaHai ? `Học đủ mức để giữ lửa đôi ${b.chuoiDoi} ngày` : `Lửa đôi ${b.chuoiDoi} ngày`, them > 0 ? `+${them} bạn chưa học` : ''].filter(Boolean).join(' · ')
     return <section className="da-ban" aria-label="Học cùng bạn">
       <button type="button" className="da-ban-mo" onClick={onMo} aria-label={`${tieuDe}. ${phu}. Mở Học cùng bạn`}>
         <span className="da-ban-av" aria-hidden="true">{chuCai(b.ten)}</span>
