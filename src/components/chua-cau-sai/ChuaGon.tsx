@@ -4,7 +4,7 @@
 // Máy em KHÔNG có đáp án trước khi nộp (lệnh gon-mo chỉ trả đề công khai); đáp án + lời giải về cùng kết quả nộp. Không EXP (thầy 20/10).
 // "Xong phần hôm nay" (Việc hôm nay) ghi khi câu đã khép: đã tự sửa · đúng sau gợi ý / chưa qua luật tự làm · đã xem lời giải đầy đủ · không mở được câu.
 // Chỉ lớp kiểu `ccs-*` sẵn có (chua-cau-sai.css) — không màu mới.
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import TheCau, { type TheCauProps } from '../TheCau'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { docChiTiet } from '../hoa2/api'
@@ -15,6 +15,10 @@ import { chuDapAn, daTraLoiDu, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { phanHoi } from '../../lib/phan-hoi'
+// «Trong» HS (thầy 27/10 «Phần sửa câu tôi chưa thấy giao diện của doligo»): cùng logic, cây trình bày kiểu Duolingo ở ChuaGonDuo.tsx.
+// Mảnh RIÊNG nạp lười (máy tắt «Trong» không tải; ManChuaCauSai nạp trước lúc mở đợt ⇒ không thêm vòng chờ).
+const ChuaGonDuo = lazy(() => import('./ChuaGonDuo'))
+import { KhungDuoSua, type TienDoSua } from './KhungDuoSua'
 
 export interface PropsChuaGon {
   token: string
@@ -27,6 +31,8 @@ export interface PropsChuaGon {
   onVe: () => void
   /** Sang câu kế của Việc hôm nay (vắng ⇒ nút chính là `onVe`). */
   onTiep?: () => void
+  /** Chỗ của câu trong chặng sửa hôm nay (chỉ màn Duo vẽ: thanh tiến độ + màn xong chặng). */
+  tienDo?: TienDoSua
 }
 
 /** Lời cho kết quả "xong phần" — vì sao lần đúng này CHƯA tính là đã tự sửa (nói thật, một câu). */
@@ -37,7 +43,9 @@ export const CHU_XONG_PHAN: Record<NonNullable<KetQuaGon['lyDo']>, string> = {
 }
 const KHEP = new Set(['tu_sua', 'xong_phan', 'loi_giai'])
 
-export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep }: PropsChuaGon) {
+export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, tienDo }: PropsChuaGon) {
+  // Chỉ khi <html data-trong="hs"> lúc mở màn (đọc lúc vẽ — trang chụp gắn data-trong sau khi nạp mã); tắt «Trong» ⇒ màn y cũ.
+  const [duo] = useState(() => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs')
   const [mo, setMo] = useState<KetQuaGon>(dau)
   const [kq, setKq] = useState<KetQuaGon | null>(dau.daKhepHomNay ? dau : null)
   const [tra, setTra] = useState('')
@@ -91,6 +99,14 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep }
     setMo(r); setKq(r.daKhepHomNay ? r : null); setTra(''); setXemGiai(false)
     requestAnimationFrame(() => tieuDe.current?.focus())
   }
+
+  if (duo) return (
+    <Suspense fallback={<KhungDuoSua onVe={onVe} pct={tienDo ? Math.round((100 * Math.min(tienDo.xong, tienDo.tong)) / Math.max(1, tienDo.tong)) : 0} nhanThanh="Sửa câu này"><div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang mở câu…</span></div></KhungDuoSua>}>
+    <ChuaGonDuo qid={qid} mo={mo} kq={kq} tra={tra} onTra={setTra} ban={ban} loi={loi} daTuSua={daTuSua} khep={khep} ct={ct}
+      onNop={() => void nop()} onLamLai={() => void lamLai()} onVe={onVe} onTiep={ve} nhanTiep={nhanTiep} tienDo={tienDo}
+      chuXongPhan={kq?.lyDo ? CHU_XONG_PHAN[kq.lyDo] : ''} />
+    </Suspense>
+  )
 
   const khung = (p: TheCauProps, lop = '') => <div className={`m3 ccs-cau-goc-the${lop ? ` ${lop}` : ''}`}><TheCau {...p} /></div>
   const loiGiai = ct ? (
