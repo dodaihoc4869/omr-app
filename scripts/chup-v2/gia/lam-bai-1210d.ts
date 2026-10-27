@@ -126,17 +126,26 @@ const CAU_CHAM: Record<string, CauGia> = {
 }
 const CAU_DUO_CHAM = CAU_CHAM[CHAM] ? [CAU_CHAM[CHAM]!, ...CAU_DUO] : CAU_DUO
 // ═══ hết THẺ CHẠM 27/10
+// ═══ PHƯƠNG TRÌNH 27/10: `lam13&lam=duo-pt` — đúng câu trong ảnh thầy (chặng 3 · 4 câu): bốn phương án là phương trình viết LIỀN, chỉ số / điện tích
+// Unicode như kho thật ⇒ soát dấu cộng toán tử (ROH + N₂, không phải ROH⁺), khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» trong HCl. Đáp án D (phản ứng với HNO₂).
+const CAU_PT: CauGia[] = [
+  { ...nen, qid: 'P1', maDe: 'BAI8', phan: 'I', tenDang: 'Amine — tính base', text: 'Phản ứng nào dưới đây không thể hiện tính base của amine?',
+    choices: ['RNH₂+H₂O⇌RNH₃⁺+OH⁻.', 'C₆H₅NH₂+HCl→C₆H₅NH₃Cl.', 'Fe³⁺+3RNH₂+3H₂O→Fe(OH)₃↓+3RNH₃⁺.', 'RNH₂+HNO₂→ROH+N₂↑+H₂O.'], ideas: [], dapAn: 'D',
+    loiGiai: { chot: 'RNH2 + HNO2 → ROH + N2↑ + H2O: N của amine bị oxi hoá (−3 lên 0), không nhận H⁺ ⇒ không phải tính base.' } },
+  ...CAU_NC,
+]
+// ═══ hết PHƯƠNG TRÌNH 27/10
 // ═══ GIÁM THỊ 27/10: `&gt=nb|th|vd|vdc` ⇒ mọi câu mang mức ấy (giám thị tương ứng); `&gtde=ngan` ⇒ thêm câu đề NGẮN (L2, đáp án B) lên đầu chặng Duo.
 const MUC_GT = ({ nb: 'biet', th: 'hieu', vd: 'van_dung', vdc: 'van_dung_cao', khong: '' } as Record<string, string>)[thamSo.get('gt') ?? ''] // khong ⇒ câu không mức (đo nền)
 const CAU_DUO_GT = thamSo.get('gtde') === 'ngan' ? [{ ...CAU[1]!, qid: 'GT1' }, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
-const ds0 = kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+const ds0 = kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const ds = MUC_GT !== undefined ? ds0.map((c) => ({ ...c, mucDo: MUC_GT || null })) : ds0
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
 
 // Số câu đã làm hôm nay: chặng 2 bắt đầu ở 6/24 (chặng 3 ở 12/24); mỗi câu nộp / học cách giải +1 — như Sảnh tải lại sau mỗi câu.
 let daNop = 0
-const DAU = kieu === 'g7' ? 12 : thamSo.get('giu') === '1' ? 2 : 6 // GIỮ CHÂN 27/10: hôm nay mới 2 câu ⇒ tấm nhắc giữ chuỗi
+const DAU = kieu === 'g7' || kieu === 'duo-pt' ? 12 : thamSo.get('giu') === '1' ? 2 : 6 // GIỮ CHÂN 27/10: hôm nay mới 2 câu ⇒ tấm nhắc giữ chuỗi
 export const soHomNayLam13 = () => SO_LON ? { daLam: 1234 + daNop, muc: 2400, chang: 11, soChang: 12 } : ({ daLam: DAU + daNop, muc: 24, chang: Math.floor(DAU / 6) + 1, soChang: 4 })
 
 // Như `publicQuestion`: câu Phần III kèm số ô = đúng số kí tự đáp số (chỉ con số), không kèm đáp án.
