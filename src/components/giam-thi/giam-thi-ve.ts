@@ -215,7 +215,7 @@ export interface GiamThi {
   huy(): void
 }
 
-export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; xam?: boolean; mo?: boolean; trangThai?: TrangThaiGT; buoc?: number }): GiamThi {
+export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; xam?: boolean; mo?: boolean; trangThai?: TrangThaiGT; buoc?: number; /** chỗ đặt bong bóng càu nhàu (mặc định: trong khung, nổi trên đầu) */ loiVao?: HTMLElement | null }): GiamThi {
   const muc = o.muc, c = NV_GT[muc]
   // Lớp «thân thở» là phần tử HTML (transform trên lớp riêng, máy dựng bằng GPU, không vẽ lại SVG); bong bóng càu nhàu là anh em của nó.
   khung.innerHTML = `<div class="gt-tho-o">${veGiamThi(muc)}</div>`
@@ -377,13 +377,16 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     },
     noi(chu, oo = {}) {
       loiHen.forEach((t) => { clearTimeout(t); clearInterval(t) }); loiHen = []
-      khung.querySelectorAll(':scope > .gt-loi').forEach((e) => e.remove())
+      const vao = o.loiVao ?? khung
+      vao.querySelectorAll(':scope > .gt-loi').forEach((e) => e.remove())
       if (!chu) return g
-      const el = document.createElement('div'); el.className = 'gt-loi'; el.setAttribute('role', 'status')
+      const el = document.createElement('div'); el.className = 'gt-loi'; el.setAttribute('role', 'status'); el.dataset.muc = muc
       const da = document.createElement('span'), con = document.createElement('span'); con.className = 'an'
       el.append(da, con)
-      el.style.setProperty('--gt-loi-duoi', Math.max(10, khung.clientWidth * 0.45 - 6).toFixed(0) + 'px')
-      khung.appendChild(el)
+      // mũi nhọn chĩa xuống đầu giám thị (đầu ở ~45 % bề ngang khung vẽ)
+      const lech = vao === khung ? 0 : khung.getBoundingClientRect().left - vao.getBoundingClientRect().left
+      el.style.setProperty('--gt-loi-duoi', Math.max(12, lech + khung.clientWidth * 0.45 - 6).toFixed(0) + 'px')
+      vao.appendChild(el)
       if (tinh || giam || dung) { da.textContent = chu; if (tinh) return g } else con.textContent = chu
       if (typeof el.animate === 'function') el.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.05)', offset: 0.65 }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: NAY })
       if (!giam && !dung) { let i = 0; const go = window.setInterval(() => { i++; da.textContent = chu.slice(0, i); con.textContent = chu.slice(i); if (i >= chu.length) clearInterval(go) }, 34); loiHen.push(go) }
@@ -397,7 +400,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
       for (const an of svg.getAnimations ? svg.getAnimations({ subtree: true }) : []) { if (d) an.pause(); else if (an.playState === 'paused') an.play() }
       if (d) { if (raf) cancelAnimationFrame(raf); raf = 0; clearTimeout(chop) } else { nhinAp(); chopMat() }
     },
-    huy() { huyHen(); loiHen.forEach((t) => { clearTimeout(t); clearInterval(t) }); clearTimeout(chop); if (raf) cancelAnimationFrame(raf); [...vong, ...giu, ...mot].forEach((x) => x.cancel()); khung.innerHTML = ''; khung.classList.remove('gt-tinh', 'gt-xam', 'gt-mo-nhat', 'gt-dung') },
+    huy() { huyHen(); o.loiVao?.querySelectorAll(':scope > .gt-loi').forEach((e) => e.remove()); loiHen.forEach((t) => { clearTimeout(t); clearInterval(t) }); clearTimeout(chop); if (raf) cancelAnimationFrame(raf); [...vong, ...giu, ...mot].forEach((x) => x.cancel()); khung.innerHTML = ''; khung.classList.remove('gt-tinh', 'gt-xam', 'gt-mo-nhat', 'gt-dung') },
   }
   // Chớp mắt ngẫu nhiên 2,5–6 giây, thỉnh thoảng chớp đúp.
   const chopMat = () => {
