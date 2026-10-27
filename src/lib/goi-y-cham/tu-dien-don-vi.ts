@@ -16,40 +16,49 @@ export const CACH_VIET_DON_VI: readonly [string, string][] = [
   ['giây', 's'], ['phút', 'phut'], ['giờ', 'gio'], ['s', 's'], ['h', 'gio'],
 ]
 
-/** Thẻ đơn vị. `{so}` được thay bằng số đề cho (chỉ đọc lại, không tính). */
-type MauThe = { ten: string; doan: string[]; congThuc?: string; nhoDoi?: string }
+/** Thẻ đơn vị. `doan` = đúng các dòng hiện trên thẻ (tối đa 2, có công thức đổi). `{so}` = số đề cho (chỉ đọc lại, không tính).
+ *  `{khi}` = dòng thể tích mol theo điều kiện ĐỀ GHI (đkc 24,79 · đktc 22,4); đề không ghi ⇒ dòng `khiKhong`. */
+type MauThe = { ten: string; doan: string[]; khiKhong?: string; congThuc?: string; nhoDoi?: string }
+// Thầy 27/10 («Soát kĩ quá vô nghĩa»): bỏ câu chỉ nhắc lại đề («{so} g là khối lượng chất»), bỏ lời khuyên chung («Đọc kỹ…»);
+// «%» không rõ phần trăm của gì ⇒ không có thẻ.
 const MAU: Record<string, MauThe> = {
-  g: { ten: 'g · gam (khối lượng)', doan: ['{so} g là khối lượng chất.', 'Muốn ra số mol thì chia khối lượng cho M.'], congThuc: 'n = m : M', nhoDoi: '1 kg = 1000 g' },
-  kg: { ten: 'kg · kilôgam (khối lượng)', doan: ['{so} kg là khối lượng chất.', 'Đổi ra gam trước rồi mới chia M để ra số mol.'], congThuc: 'n = m : M (m tính bằng gam)', nhoDoi: '1 kg = 1000 g' },
-  tan: { ten: 'tấn (khối lượng)', doan: ['{so} tấn là khối lượng rất lớn, hay gặp trong bài sản xuất.', 'Đổi ra gam (hoặc giữ tấn và nhớ đổi lại ở cuối) rồi mới chia M.'], congThuc: 'n = m : M', nhoDoi: '1 tấn = 1000 kg = 10⁶ g' },
-  mg: { ten: 'mg · miligam (khối lượng)', doan: ['{so} mg là khối lượng rất nhỏ.'], congThuc: 'n = m : M (m tính bằng gam)', nhoDoi: '1 g = 1000 mg' },
-  mL: { ten: 'mL · mililít (thể tích)', doan: ['{so} mL là thể tích.', 'Đổi ra lít trước khi dùng trong công thức.'], congThuc: 'V (L) = V (mL) : 1000', nhoDoi: '1000 mL = 1 L · 1 mL = 1 cm³' },
-  L: { ten: 'L · lít (thể tích)', doan: ['{so} L là thể tích dung dịch hoặc thể tích khí.', 'Dung dịch: số mol chất tan = C_M × V. Chất khí: chia cho thể tích 1 mol khí theo đúng điều kiện đề ghi (đkc hay đktc).'], congThuc: 'n = C_M × V · n khí = V : V_mol', nhoDoi: '1 L = 1 dm³ = 1000 mL' },
-  m3: { ten: 'm³ · mét khối (thể tích)', doan: ['{so} m³ là thể tích lớn, hay gặp ở khí trong bài sản xuất.'], congThuc: 'V (L) = V (m³) × 1000', nhoDoi: '1 m³ = 1000 L' },
-  mol: { ten: 'mol · số mol', doan: ['Số mol là lượng chất; từ số mol tính ra khối lượng, thể tích, nồng độ.', '{so} mol đề cho sẵn, không cần đổi.'], congThuc: 'm = n × M', nhoDoi: '1 mol = 1000 mmol' },
-  mmol: { ten: 'mmol · milimol', doan: ['{so} mmol là số mol nhỏ (một phần nghìn mol).'], congThuc: 'n (mol) = n (mmol) : 1000', nhoDoi: '1 mol = 1000 mmol' },
-  M: { ten: 'M · nồng độ mol', doan: ['{so} M đọc là {so} mol trên lít: cứ 1 lít dung dịch có {so} mol chất tan', 'Nhân C_M với thể tích (lít) là ra số mol chất tan.'], congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L' },
-  '%': { ten: '% · phần trăm', doan: ['{so}% nghĩa là {so} phần trong 100 phần.', 'Đọc kỹ: phần trăm của cái gì, so với cái gì?'], congThuc: 'phần = tổng × %/100' },
-  '%m': { ten: '% · phần trăm khối lượng', doan: ['Cứ 100 g hỗn hợp có {so} g chất đó.'], congThuc: '%m = m chất : m hỗn hợp × 100%' },
-  '%V': { ten: '% · phần trăm thể tích', doan: ['Cứ 100 thể tích hỗn hợp có {so} thể tích chất đó.', 'Với chất khí cùng điều kiện, phần trăm thể tích bằng phần trăm số mol.'], congThuc: '%V = V chất : V hỗn hợp × 100%' },
-  '%C': { ten: '% · nồng độ phần trăm (C%)', doan: ['Cứ 100 g dung dịch có {so} g chất tan.'], congThuc: 'C% = m chất tan : m dung dịch × 100%', nhoDoi: 'm chất tan = m dung dịch × C% : 100' },
-  '%H': { ten: '% · hiệu suất (H)', doan: ['Hiệu suất {so}%: chỉ {so} phần trong 100 phần thực sự thành sản phẩm.', 'Tính xuôi (nguyên liệu → sản phẩm) × H/100; tính ngược (sản phẩm → nguyên liệu) × 100/H.'], congThuc: 'H = lượng thực tế : lượng lý thuyết × 100%' },
-  D: { ten: 'g/mL · khối lượng riêng (D)', doan: ['{so} g/mL nghĩa là 1 mL chất (dung dịch) nặng {so} gam.', 'Dùng để đổi thể tích dung dịch ra khối lượng dung dịch.'], congThuc: 'm = D × V', nhoDoi: '1 mL = 1 cm³' },
-  'g/mol': { ten: 'g/mol · khối lượng mol (M)', doan: ['M là khối lượng của 1 mol chất (gam).'], congThuc: 'm = n × M · n = m : M' },
-  dkc: { ten: 'đkc · điều kiện chuẩn', doan: ['Điều kiện chuẩn: 25 °C và 1 bar.', 'Ở đkc, 1 mol khí bất kì chiếm 24,79 lít.'], congThuc: 'V = n × 24,79 · n = V : 24,79', nhoDoi: '24,79 L/mol (đkc)' },
-  dktc: { ten: 'đktc · điều kiện tiêu chuẩn', doan: ['Cách ghi của chương trình cũ: 0 °C và 1 atm.', 'Ở đktc, 1 mol khí bất kì chiếm 22,4 lít.'], congThuc: 'V = n × 22,4 · n = V : 22,4', nhoDoi: '22,4 L/mol (đktc)' },
-  oC: { ten: '°C · độ C (nhiệt độ)', doan: ['{so} °C là nhiệt độ.'], nhoDoi: 'T (K) = t (°C) + 273' },
-  K: { ten: 'K · kelvin (nhiệt độ)', doan: ['{so} K là nhiệt độ tuyệt đối.'], nhoDoi: 'T (K) = t (°C) + 273' },
-  atm: { ten: 'atm · atmôtphe (áp suất)', doan: ['{so} atm là áp suất khí.'], nhoDoi: '1 atm ≈ 1,013 bar' },
-  bar: { ten: 'bar (áp suất)', doan: ['{so} bar là áp suất khí. Điều kiện chuẩn dùng 1 bar.'], nhoDoi: '1 bar = 10⁵ Pa' },
-  kJ: { ten: 'kJ · kilôjun (nhiệt lượng)', doan: ['Năng lượng, nhiệt của phản ứng (biến thiên enthalpy ΔrH).', 'ΔrH < 0: phản ứng toả nhiệt; ΔrH > 0: phản ứng thu nhiệt.'], nhoDoi: '1 kJ = 1000 J' },
-  J: { ten: 'J · jun (năng lượng)', doan: ['{so} J là năng lượng (nhiệt lượng).'], nhoDoi: '1 kJ = 1000 J' },
-  ohm: { ten: 'Ω · ohm (điện trở)', doan: ['{so} Ω là điện trở.'], congThuc: 'U = I × R' },
-  A: { ten: 'A · ampe (cường độ dòng điện)', doan: ['{so} A là cường độ dòng điện khi điện phân.', 'Điện lượng cho biết số mol electron đi qua.'], congThuc: 'n e = I × t : F (t tính bằng giây, F = 96485)' },
-  s: { ten: 's · giây (thời gian)', doan: ['{so} giây là thời gian điện phân.'], congThuc: 'n e = I × t : F (t tính bằng giây)', nhoDoi: '1 giờ = 3600 giây' },
-  phut: { ten: 'phút (thời gian)', doan: ['{so} phút là thời gian; đổi ra giây khi dùng công thức điện phân.'], nhoDoi: '1 phút = 60 giây' },
-  gio: { ten: 'giờ (thời gian)', doan: ['{so} giờ là thời gian; đổi ra giây khi dùng công thức điện phân.'], nhoDoi: '1 giờ = 3600 giây' },
+  g: { ten: 'g · gam (khối lượng)', doan: ['Ra số mol: n = m : M'], congThuc: 'n = m : M', nhoDoi: '1 kg = 1000 g' },
+  kg: { ten: 'kg · kilôgam (khối lượng)', doan: ['Đổi ra gam rồi chia M: n = m : M', '1 kg = 1000 g'], congThuc: 'n = m : M (m tính bằng gam)', nhoDoi: '1 kg = 1000 g' },
+  tan: { ten: 'tấn (khối lượng)', doan: ['Đổi ra gam rồi chia M (hoặc giữ tấn, cuối bài đổi lại)', '1 tấn = 1000 kg = 10⁶ g'], congThuc: 'n = m : M', nhoDoi: '1 tấn = 1000 kg = 10⁶ g' },
+  mg: { ten: 'mg · miligam (khối lượng)', doan: ['n = m : M (m tính bằng gam)', '1 g = 1000 mg'], congThuc: 'n = m : M (m tính bằng gam)', nhoDoi: '1 g = 1000 mg' },
+  mL: { ten: 'mL · mililít (thể tích)', doan: ['Đổi ra lít trước khi tính: chia cho 1000', '1 mL = 1 cm³'], congThuc: 'V (L) = V (mL) : 1000', nhoDoi: '1000 mL = 1 L · 1 mL = 1 cm³' },
+  L: { ten: 'L · lít (thể tích)', doan: ['{dd}', '{khi}'], khiKhong: '1 L = 1 dm³ = 1000 mL', congThuc: 'n = C_M × V', nhoDoi: '1 L = 1 dm³ = 1000 mL' },
+  m3: { ten: 'm³ · mét khối (thể tích)', doan: ['1 m³ = 1000 L'], congThuc: 'V (L) = V (m³) × 1000', nhoDoi: '1 m³ = 1000 L' },
+  mol: { ten: 'mol · số mol', doan: ['m = n × M', '{khiV}'], khiKhong: 'Dung dịch: n = C_M × V', congThuc: 'm = n × M', nhoDoi: '1 mol = 1000 mmol' },
+  mmol: { ten: 'mmol · milimol', doan: ['1 mol = 1000 mmol'], congThuc: 'n (mol) = n (mmol) : 1000', nhoDoi: '1 mol = 1000 mmol' },
+  M: { ten: 'M · nồng độ mol', doan: ['{so} M: cứ 1 lít dung dịch có {so} mol chất tan', 'n = C_M × V (V: lít; 1000 mL = 1 L)'], congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L' },
+  '%m': { ten: '% · phần trăm khối lượng', doan: ['Cứ 100 g hỗn hợp có {so} g chất đó', '%m = m chất : m hỗn hợp × 100%'], congThuc: '%m = m chất : m hỗn hợp × 100%' },
+  '%V': { ten: '% · phần trăm thể tích', doan: ['Chất khí cùng điều kiện: %V = %n (phần trăm số mol)', '%V = V chất : V hỗn hợp × 100%'], congThuc: '%V = V chất : V hỗn hợp × 100%' },
+  '%C': { ten: '% · nồng độ phần trăm (C%)', doan: ['Cứ 100 g dung dịch có {so} g chất tan', 'm chất tan = m dung dịch × C% : 100'], congThuc: 'C% = m chất tan : m dung dịch × 100%', nhoDoi: 'm chất tan = m dung dịch × C% : 100' },
+  '%H': { ten: '% · hiệu suất (H)', doan: ['Chỉ {so}% lượng lý thuyết thành sản phẩm', 'Tính xuôi (nguyên liệu → sản phẩm) × H/100; tính ngược × 100/H'], congThuc: 'H = lượng thực tế : lượng lý thuyết × 100%' },
+  D: { ten: 'g/mL · khối lượng riêng (D)', doan: ['1 mL dung dịch nặng {so} g', 'm dung dịch = D × V · 1 mL = 1 cm³'], congThuc: 'm = D × V', nhoDoi: '1 mL = 1 cm³' },
+  'g/mol': { ten: 'g/mol · khối lượng mol (M)', doan: ['Khối lượng của 1 mol chất, tính bằng gam', 'm = n × M · n = m : M'], congThuc: 'm = n × M · n = m : M' },
+  dkc: { ten: 'đkc · điều kiện chuẩn', doan: ['25 °C, 1 bar: 1 mol khí bất kì chiếm 24,79 L', 'V = n × 24,79 · n = V : 24,79'], congThuc: 'V = n × 24,79 · n = V : 24,79', nhoDoi: '24,79 L/mol (đkc)' },
+  dktc: { ten: 'đktc · điều kiện tiêu chuẩn', doan: ['Cách ghi cũ: 0 °C, 1 atm; 1 mol khí chiếm 22,4 L', 'V = n × 22,4 · n = V : 22,4'], congThuc: 'V = n × 22,4 · n = V : 22,4', nhoDoi: '22,4 L/mol (đktc)' },
+  oC: { ten: '°C · độ C (nhiệt độ)', doan: ['T (K) = t (°C) + 273'], nhoDoi: 'T (K) = t (°C) + 273' },
+  K: { ten: 'K · kelvin (nhiệt độ)', doan: ['T (K) = t (°C) + 273'], nhoDoi: 'T (K) = t (°C) + 273' },
+  atm: { ten: 'atm · atmôtphe (áp suất)', doan: ['1 atm ≈ 1,013 bar'], nhoDoi: '1 atm ≈ 1,013 bar' },
+  bar: { ten: 'bar (áp suất)', doan: ['Điều kiện chuẩn dùng áp suất 1 bar', '1 bar = 10⁵ Pa'], nhoDoi: '1 bar = 10⁵ Pa' },
+  kJ: { ten: 'kJ · kilôjun (nhiệt lượng)', doan: ['Nhiệt của phản ứng (biến thiên enthalpy ΔrH)', 'ΔrH < 0: toả nhiệt · ΔrH > 0: thu nhiệt'], nhoDoi: '1 kJ = 1000 J' },
+  J: { ten: 'J · jun (năng lượng)', doan: ['1 kJ = 1000 J'], nhoDoi: '1 kJ = 1000 J' },
+  ohm: { ten: 'Ω · ohm (điện trở)', doan: ['U = I × R'], congThuc: 'U = I × R' },
+  A: { ten: 'A · ampe (cường độ dòng điện)', doan: ['Số mol electron trao đổi khi điện phân:', 'n e = I × t : F (t tính bằng giây, F = 96485)'], congThuc: 'n e = I × t : F (t tính bằng giây, F = 96485)' },
+  s: { ten: 's · giây (thời gian)', doan: ['n e = I × t : F (t tính bằng giây)', '1 giờ = 3600 giây'], congThuc: 'n e = I × t : F (t tính bằng giây)', nhoDoi: '1 giờ = 3600 giây' },
+  phut: { ten: 'phút (thời gian)', doan: ['Đổi ra giây khi dùng n e = I × t : F', '1 phút = 60 giây'], nhoDoi: '1 phút = 60 giây' },
+  gio: { ten: 'giờ (thời gian)', doan: ['Đổi ra giây khi dùng n e = I × t : F', '1 giờ = 3600 giây'], nhoDoi: '1 giờ = 3600 giây' },
 }
+
+/** Điều kiện đo khí chính đề ghi; đề không ghi ⇒ null (không đoán 24,79 hay 22,4). */
+function dieuKien(chuDe: string): 'dkc' | 'dktc' | null {
+  const lc = chuDe.toLowerCase()
+  return /đktc|điều kiện tiêu chuẩn/.test(lc) ? 'dktc' : /đkc|điều kiện chuẩn/.test(lc) ? 'dkc' : null
+}
+const VMOL = { dkc: ['đkc', '24,79'], dktc: ['đktc', '22,4'] } as const
 
 /** Mã đơn vị có thẻ. */
 export const MA_DON_VI: readonly string[] = Object.keys(MAU)
@@ -60,12 +69,21 @@ export function soTrongChu(chu: string): string {
   return m ? m[1].trim() : ''
 }
 
-/** Thẻ giải nghĩa cho một đơn vị. `chu` là chữ chạm trong đề (để đọc lại số). Không có mã ⇒ null. */
-export function theDonVi(ma: string, chu = ''): TheGiaiNghia | null {
+/** Thẻ giải nghĩa cho một đơn vị. `chu` là chữ chạm trong đề (để đọc lại số), `chuDe` = cả đề (điều kiện đo khí, «lít dung dịch» hay «lít khí»).
+ *  Không có mã ⇒ null. */
+export function theDonVi(ma: string, chu = '', chuDe = ''): TheGiaiNghia | null {
   const mau = MAU[ma]
   if (!mau) return null
   const so = soTrongChu(chu)
+  const dk = dieuKien(chuDe)
+  const i = chu ? chuDe.indexOf(chu) : -1
+  const sau = i >= 0 ? chuDe.slice(i + chu.length, i + chu.length + 30).toLowerCase() : ''
+  const laDd = /^\s*dung dịch/.test(sau), laKhi = !laDd && (/^\s*(khí|hơi)/.test(sau) || /^\s*[a-z0-9()]+\s*\(đk/.test(sau))
+  const khi = dk ? `Khí ở ${VMOL[dk][0]}: n = V : ${VMOL[dk][1]}` : mau.khiKhong ?? ''
+  const khiV = dk ? `Khí ở ${VMOL[dk][0]}: V = n × ${VMOL[dk][1]}` : mau.khiKhong ?? ''
+  const dd = laKhi ? '' : 'Dung dịch: n = C_M × V'
   const dien = (s: string) => (so ? s.replaceAll('{so}', so) : s.replace(/\{so\}\s*/g, ''))
+    .replace('{khi}', laDd ? '1 L = 1 dm³ = 1000 mL' : khi).replace('{khiV}', khiV).replace('{dd}', dd)
   const the: TheGiaiNghia = { ten: mau.ten, nhan: 'Đơn vị', doan: mau.doan.map(dien).filter((d) => d.trim()) }
   if (mau.congThuc) the.congThuc = mau.congThuc
   if (mau.nhoDoi) the.nhoDoi = mau.nhoDoi
