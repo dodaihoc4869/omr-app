@@ -1,0 +1,55 @@
+# ĐẶT SỐ DƯ TINH THỂ CỦA MỌI EM VỀ ĐÚNG 50 (thầy DUYỆT 27/10: «Đưa tất cả tinh thể về 0» → «Để lại cho mỗi bạn 50 tinh thể»). Bấm tay, KHÔNG chạy local.
+# Chỉ THÊM dòng điều chỉnh vào `vang_so` (ma_mon 'tt-reset-50-2710', khoá 'tt|reset-50-2710'); không UPDATE / DELETE sổ. Cược chuỗi đang chạy đóng lại
+# (không hoàn tinh thể cũ, không trả 100). Thông báo một lần 'dat_lai_tt'. Cổng: ca thi mở ⇒ DỪNG; Worker sống chưa có commit `moc` ⇒ DỪNG.
+# Log chỉ in TỔNG (repo công khai). Bản sao số dư từng em (mã HS + số dư, không tên) ⇒ artifact «ban-sao-tinh-the-2710» (giữ 90 ngày).
+# `che_do: dem` ⇒ chỉ đếm + lưu bản sao, không ghi. Chạy lại an toàn (khoá duy nhất theo em).
+name: Đặt tinh thể mọi em về 50 (27/10)
+on:
+  workflow_dispatch:
+    inputs:
+      moc:
+        description: 'Commit phải có trên Worker sống (commit gộp PR có thông báo dat_lai_tt)'
+        required: true
+      che_do:
+        description: 'dem = chỉ đếm · ghi = đặt lại'
+        required: true
+        default: 'dem'
+        type: choice
+        options: [dem, ghi]
+permissions:
+  contents: read
+concurrency:
+  group: dat-lai-tinh-the-2710
+  cancel-in-progress: false
+jobs:
+  dat-lai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm / lưu bản sao / đặt lại
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          MOC_LUAT: ${{ inputs.moc }}
+          GHI: ${{ inputs.che_do }}
+          BAN_SAO: ban-sao-tinh-the/so-du-truoc-2710-${{ inputs.che_do }}.json
+        run: node scripts/dat-lai-tinh-the-2710.mjs
+      - name: Lưu bản sao số dư (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ban-sao-tinh-the-2710-${{ inputs.che_do }}-${{ github.run_id }}
+          path: ban-sao-tinh-the/
+          retention-days: 90
+          if-no-files-found: ignore
