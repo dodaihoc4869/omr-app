@@ -67,7 +67,7 @@ export type KetQuaBoc = { vung: VungCham[]; /** chữ TOÀN đề (mọi khối 
 
 /**
  * Tìm vùng trong từng khối chữ dưới `goc` (hàm `phatHien` của làn A) rồi bọc từng vùng.
- * `loc(ds)`: bỏ bớt vùng theo luật của màn (vd câu lý thuyết chỉ giữ «Đề hỏi»). `chamDuoc(v, chuDe)` = vùng có thẻ giải nghĩa (mảnh đầu nhận Tab).
+ * `loc(ds)`: bỏ bớt vùng theo luật của màn (vd câu lý thuyết chỉ giữ «Đề hỏi»). `chamDuoc(v, chuDe)` = vùng có thẻ giải nghĩa — vùng không có thẻ thì KHÔNG bọc.
  * Lỗi bất kỳ ⇒ trả DOM nguyên trạng, không vùng nào (đề vẫn hiện trơn).
  */
 export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[], chamDuoc: (v: VungCham, chu: string) => boolean, loc: (ds: VungCham[]) => VungCham[] = (x) => x): KetQuaBoc {
@@ -95,8 +95,10 @@ export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[],
       for (const v of ds) tim.push({ v, k })
     })
     const giu = new Set(loc(tim.map((x) => x.v)))
-    const chon = tim.filter((x) => giu.has(x.v))
-    const vung = chon.map((x) => x.v), chuDe = khoi.map((x) => x.chu).join('\n')
+    const chuDe = khoi.map((x) => x.chu).join('\n')
+    // Thầy 27/10 («Soát kĩ quá vô nghĩa»): vùng KHÔNG có thẻ giải nghĩa thì không bọc, không tô — chữ đề để nguyên.
+    const chon = tim.filter((x) => giu.has(x.v) && chamDuoc(x.v, chuDe))
+    const vung = chon.map((x) => x.v)
     const manh: HTMLElement[][] = vung.map(() => [])
     // Đi TỪ CUỐI lên: tách đuôi một nút chữ không làm lệch vị trí phần đầu của chính nút ấy (nút gốc luôn giữ phần đầu).
     for (let i = vung.length - 1; i >= 0; i--) {
@@ -130,7 +132,6 @@ export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[],
       if (!ds.length) return
       if (ds.length > 1) { ds[0].classList.add('gyc-dau'); ds[ds.length - 1].classList.add('gyc-cuoi'); ds.forEach((s) => s.classList.add('gyc-nhieu')) }
       if (v.loai === 'khoa') ds.forEach((s) => s.classList.add('gyc-dam'))
-      if (!chamDuoc(v, chuDe)) return
       ds.forEach((s) => s.classList.add('gyc-cham'))
       const dau = ds[0]
       dau.tabIndex = 0

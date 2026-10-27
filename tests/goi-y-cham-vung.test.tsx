@@ -13,25 +13,30 @@ afterEach(() => { cleanup(); try { sessionStorage.clear() } catch { /* */ } })
 function De({ text, stt = 1 }: { text: string; stt?: number }) {
   return <p className="de"><b>Câu {stt}.</b> <ChemText text={text} /><img alt="hình đề" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" /></p>
 }
-const cho = async (chu: string) => { const el = await screen.findByText(chu, { selector: '.gyc-v' }); return el as HTMLElement }
+const cho = async (chu: string) => { const el = await screen.findByText(chu, { selector: '.gyc-v' }, { timeout: 4000 }); return el as HTMLElement } // lần đầu nạp lười ruột (lạnh) có khi > 1 giây
 
 describe('tô màu sẵn + giữ cấu trúc đề', () => {
-  it('đề cho / đề hỏi / chất / từ then chốt có lớp riêng; chữ đề và thẻ <img> giữ nguyên', async () => {
+  it('đề cho / chất / từ then chốt có lớp riêng; chữ đề và thẻ <img> giữ nguyên', async () => {
     const { container } = render(<VungChamDe q={{ qid: 'q1' }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER} /></VungChamDe>)
     const p = container.querySelector('p.de')!
     const truoc = p.textContent
     expect((await cho('8,8 gam')).classList).toContain('gyc-cho')
-    expect((await cho('Giá trị của m là')).classList).toContain('gyc-hoi')
     expect((await cho('ethyl acetate')).classList).toContain('gyc-chat')
     expect((await cho('Cô cạn')).classList).toContain('gyc-dam')
     expect(p.textContent).toBe(truoc)
     expect(p.querySelector('img')).not.toBeNull()
     expect(p.querySelector('b')!.textContent).toBe('Câu 1.')
-    // Đề hỏi không có thẻ giải nghĩa (theCho = null) ⇒ không nhận Tab
-    expect((await cho('Giá trị của m là')).tabIndex).toBe(-1)
-    expect((await cho('8,8 gam')).tabIndex).toBe(0)
     // dải chú giải
     expect(screen.getByText('Chạm chữ tô màu để hiểu đề')).toBeTruthy()
+  })
+
+  it('thầy 27/10: vùng KHÔNG có thẻ (đề hỏi chung chung) thì không bọc, không tô; vùng nào được bọc cũng chạm được', async () => {
+    const { container } = render(<VungChamDe q={{ qid: 'q1b' }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER} /></VungChamDe>)
+    await cho('8,8 gam')
+    expect(screen.queryByText('Giá trị của m là', { selector: '.gyc-v' })).toBeNull()
+    const ds = [...container.querySelectorAll<HTMLElement>('.gyc-v')]
+    expect(ds.length).toBeGreaterThan(3)
+    for (const s of ds) expect(s.classList.contains('gyc-cham'), s.textContent!).toBe(true)
   })
 
   it('công thức có chỉ số dưới (FeS₂): <sub> giữ nguyên, vùng thành nhiều mảnh cùng data-vung', async () => {
@@ -46,20 +51,25 @@ describe('tô màu sẵn + giữ cấu trúc đề', () => {
   })
 })
 
-describe('chạm mở / đóng thẻ giải nghĩa', () => {
-  it('chạm «1,5 M» ⇒ thẻ đơn vị; «Đã hiểu» đóng; không gọi onHoTro', async () => {
+describe('thẻ kiểu Duolingo: mở / đóng', () => {
+  it('chạm «1,5 M» ⇒ thẻ nhỏ: dòng đầu đậm + 2 dòng; không lớp phủ, không nút; không gọi onHoTro', async () => {
     const onHoTro = vi.fn()
     render(<VungChamDe q={{ qid: 'q3' }} tuDien={TU_DIEN_GIA} onHoTro={onHoTro}><De text={DE_ESTER} /></VungChamDe>)
     fireEvent.click(await cho('1,5 M'))
-    const the = await screen.findByRole('dialog', { name: /M · nồng độ mol/ })
-    expect(the.textContent).toContain('Nhớ đổi: 1000 mL = 1 L')
+    const the = await screen.findByRole('dialog', { name: 'M · nồng độ mol' })
+    expect(the.querySelector('.gyc-b-ten')!.textContent).toBe('M · nồng độ mol')
+    expect(the.querySelectorAll('.gyc-b-doan').length).toBe(2)
+    expect(the.querySelector('button')).toBeNull() // không «Đã hiểu»
+    expect(the.querySelector('.gyc-bong-mui')).not.toBeNull() // mũi nhọn chỉ vào chữ
+    expect(document.querySelector('.gyc-phu')).toBeNull() // không nền xám che màn
+    expect(the.dataset.kieu).toBeUndefined() // không còn tấm đáy / cột phải
     expect((await cho('1,5 M')).getAttribute('aria-expanded')).toBe('true')
-    fireEvent.click(screen.getByRole('button', { name: 'Đã hiểu' }))
+    fireEvent.pointerDown(document.body)
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     expect(onHoTro).not.toHaveBeenCalled()
   })
 
-  it('chạm chất ⇒ tên + tên cũ + M; chạm lần nữa (đã ghim) ⇒ đóng; chạm ra ngoài ⇒ đóng', async () => {
+  it('chạm chất ⇒ tên + công thức · M + tên cũ; chạm lần nữa ⇒ đóng; chạm chữ khác ⇒ đổi thẻ; chạm ra ngoài ⇒ đóng', async () => {
     const { container } = render(<VungChamDe q={{ qid: 'q4' }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER} /></VungChamDe>)
     const naoh = await cho('NaOH')
     fireEvent.click(naoh)
@@ -71,11 +81,38 @@ describe('chạm mở / đóng thẻ giải nghĩa', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     fireEvent.click(naoh)
     await screen.findByRole('dialog')
+    fireEvent.pointerDown(await cho('1,5 M')); fireEvent.click(await cho('1,5 M'))
+    expect((await screen.findByRole('dialog')).textContent).toContain('nồng độ mol')
+    expect(screen.getAllByRole('dialog').length).toBe(1)
     fireEvent.pointerDown(container.querySelector('p b')!)
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
-  it('Tab tới chữ, Enter mở (không lọt ra phím của màn), Esc đóng và trả con trỏ về chữ', async () => {
+  it('cuộn làm chữ trôi đi ⇒ thẻ tự đóng', async () => {
+    render(<VungChamDe q={{ qid: 'q4b' }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER} /></VungChamDe>)
+    const v = await cho('1,5 M')
+    let y = 100
+    v.getClientRects = () => [new DOMRect(40, y, 30, 20)] as unknown as DOMRectList
+    fireEvent.click(v)
+    await screen.findByRole('dialog')
+    y = 60
+    fireEvent.scroll(window)
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  it('rung «chon» khi mở (app học sinh)', async () => {
+    document.documentElement.dataset.trong = 'hs'
+    const rung = vi.fn(() => true)
+    Object.defineProperty(navigator, 'vibrate', { value: rung, configurable: true })
+    try {
+      render(<VungChamDe q={{ qid: 'q4c' }} tuDien={TU_DIEN_GIA}><De text={DE_ESTER} /></VungChamDe>)
+      fireEvent.click(await cho('8,8 gam'))
+      await screen.findByRole('dialog')
+      expect(rung).toHaveBeenCalledWith([35])
+    } finally { delete document.documentElement.dataset.trong; delete (navigator as { vibrate?: unknown }).vibrate }
+  })
+
+  it('Tab tới chữ, Enter mở (không lọt ra phím của màn), con trỏ vào thẻ; Esc đóng (không lọt xuống màn) và trả con trỏ về chữ', async () => {
     const phimMan = vi.fn()
     window.addEventListener('keydown', phimMan)
     try {
@@ -83,12 +120,13 @@ describe('chạm mở / đóng thẻ giải nghĩa', () => {
       const v = await cho('8,8 gam')
       v.focus()
       fireEvent.keyDown(v, { key: 'Enter' })
-      await screen.findByRole('dialog')
+      const the = await screen.findByRole('dialog')
       expect(phimMan).not.toHaveBeenCalled()
-      await waitFor(() => expect(document.activeElement?.textContent).toBe('Đã hiểu'))
+      await waitFor(() => expect(document.activeElement).toBe(the))
       fireEvent.keyDown(document.activeElement!, { key: 'Escape' })
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
       expect(document.activeElement).toBe(v)
+      expect(phimMan).not.toHaveBeenCalled()
     } finally { window.removeEventListener('keydown', phimMan) }
   })
 })
@@ -187,6 +225,14 @@ describe('lõi THẬT của làn A (không truyền tuDien)', () => {
     render(<VungChamDe q={{ qid: 'ntk' }}><div><p><ChemText text="Cho 4 gam NaOH vào nước được 100 mL dung dịch. Tính nồng độ mol." /></p><p><ChemText text="Cho nguyên tử khối: Na = 24; O = 16; H = 1." /></p></div></VungChamDe>)
     fireEvent.click(await screen.findByText('NaOH', { selector: '.gyc-v' }, { timeout: 4000 }))
     expect((await screen.findByRole('dialog')).textContent).toContain('M = 41 g/mol')
+  })
+
+  it('ảnh thầy 27/10 (đề ethylamine): không tô «dịch chất nào sau đây», không tô gì vô nghĩa ⇒ đề trơn', async () => {
+    const { container } = render(<VungChamDe q={{ qid: 'eth' }}><p><ChemText text="Ethylamine thể hiện tính khử khi tác dụng với dung dịch chất nào sau đây ở nhiệt độ thường?" /></p></VungChamDe>)
+    // đợi lõi thật nạp xong: câu sau có số liệu được tô ⇒ lõi đã chạy trên câu này
+    render(<VungChamDe q={{ qid: 'eth2' }}><p><ChemText text="Cho 8,8 gam ethyl acetate." /></p></VungChamDe>)
+    await screen.findByText('8,8 gam', { selector: '.gyc-v' }, { timeout: 4000 })
+    expect(container.querySelector('.gyc-v')).toBeNull()
   })
 
   it('câu lý thuyết (không số liệu): chỉ tô «Đề hỏi», không tô chất / từ then chốt', async () => {

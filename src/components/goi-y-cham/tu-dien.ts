@@ -20,7 +20,7 @@ export function napTuDien(): Promise<TuDien | null> {
         const bang = ntk.get(chu)!
         return Object.keys(bang).length ? bang : undefined
       }
-      return { phatHien: a.phatHien, theCho: (v: VungCham, chuDe?: string) => b.theCho(v, chuDe ? ntkCua(chuDe) : undefined) }
+      return { phatHien: a.phatHien, theCho: (v: VungCham, chuDe?: string) => b.theCho(v, chuDe ? ntkCua(chuDe) : undefined, chuDe ?? '') }
     },
     () => { hua = null; return null },
   )

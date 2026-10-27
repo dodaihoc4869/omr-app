@@ -84,6 +84,10 @@ describe('Sửa câu kiểu Duolingo («Trong» HS)', () => {
     expect(await screen.findByRole('heading', { name: 'Chưa đúng · em thử thêm một lần' })).toBeTruthy()
     expect(container.querySelector('.duo-ket[data-tt=sai]')).toBeTruthy()
     expect(screen.getByText(/gạch chân điều đề hỏi/)).toBeTruthy()
+    // thầy 27/10: «Hỏi thầy» (nút phụ ~1/4) và «Làm lại câu này» CÙNG MỘT HÀNG ở đáy tấm.
+    const hang = container.querySelector('.duo-ket .duo-hang-nut')
+    expect(hang?.querySelector('.lg-nut-hoi-thay')?.textContent).toContain('Hỏi thầy')
+    expect(hang?.lastElementChild?.textContent).toBe('Làm lại câu này')
     expect(screen.queryByText(/Đáp án/)).toBeNull()
     expect(xong()).toEqual([])
     api.apiGonMo.mockResolvedValueOnce({ ...MO, lan: 2, tuSuaNeuDung: false })
@@ -95,9 +99,21 @@ describe('Sửa câu kiểu Duolingo («Trong» HS)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
     expect(await screen.findByRole('heading', { name: 'Chưa đúng · xem đáp án và lời giải' })).toBeTruthy()
     expect(screen.getByText(/Đáp án:/)).toBeTruthy()
+    expect(container.querySelector('.duo-ket .duo-hang-nut')?.textContent).toMatch(/Hỏi thầy.*Tiếp tục/)
     expect(xong()).toEqual(['D1', 'Q'])
     fireEvent.click(screen.getByRole('button', { name: 'Lời giải' }))
     expect(screen.getByRole('dialog', { name: 'Lời giải' })).toBeTruthy()
+  })
+
+  it('máy chủ không có gợi ý riêng ⇒ KHÔNG có dòng «Gợi ý» (không lời khuyên chung chung)', async () => {
+    const { container } = render(<Man token="t" qid="Q" onVe={() => {}} />)
+    await screen.findByRole('button', { name: 'Kiểm tra' }, CHO)
+    api.apiGonNop.mockResolvedValueOnce({ ok: true, dotId: 'D1', lan: 1, ban: 'Q', dung: false, ket: 'goi_y' })
+    fireEvent.click(screen.getByRole('radio', { name: /6,8/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+    await screen.findByRole('heading', { name: 'Chưa đúng · em thử thêm một lần' })
+    expect(container.querySelector('.duo-sua-goi-y')).toBeNull()
+    expect(screen.queryByText(/Gợi ý/)).toBeNull()
   })
 
   it('giữ chân (như màn làm chặng): giữa chặng sửa đã xong ≥ 1 câu ⇒ X mở tấm «Đừng đi mà…», «Tiếp tục học» ở lại, «Thoát» về; Esc cũng mở tấm', async () => {

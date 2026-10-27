@@ -72,7 +72,8 @@
 .gyc-cg-hang{display:flex;align-items:flex-start;gap:4px}
 .gyc-cg-hang .gyc-chu-giai{flex:1;min-width:0}
 
-/* ── 3. Thẻ giải nghĩa (TamGiaiThich): máy tính = thẻ nổi neo dưới chữ; 640–900 = cột phải 320px; ≤ 639 = tấm trượt từ đáy ─────────── */
+/* ── 3a. Thẻ giải nghĩa BẢN CŨ (26/10: tấm đáy / cột phải / thẻ nổi) — giữ nguyên khai báo màu theo luật «giữ màu» (kiem:mau-giu); từ 27/10 thẻ không
+   còn mang data-kieu nên các luật data-kieu không áp; khối 3b ngay dưới ĐÈ phần còn lại. ─────────── */
 .gyc-bong{position:fixed;z-index:60;width:340px;max-width:calc(100vw - 24px);background:var(--tr-mat);border:1px solid var(--tr-vien);border-radius:18px;box-shadow:var(--tr-bong-3);padding:18px 18px 16px;font-size:14.5px;line-height:1.55;color:var(--tr-chu-2);text-align:left;overscroll-behavior:contain}
 .gyc-bong-mui{position:absolute;top:-8px;width:14px;height:14px;background:var(--tr-mat);border-left:1px solid var(--tr-vien);border-top:1px solid var(--tr-vien);transform:rotate(45deg)}
 .gyc-bong[data-tren] .gyc-bong-mui{top:auto;bottom:-8px;transform:rotate(225deg)}
@@ -98,6 +99,23 @@
 @keyframes gyc-len{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
 @keyframes gyc-trai{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
 @keyframes gyc-hien{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* ── 3b. Thẻ giải nghĩa (TamGiaiThich) kiểu DUOLINGO (thầy 27/10): thẻ nhỏ neo ngay dưới (hết chỗ ⇒ trên) chữ được chạm, mũi nhọn chỉ vào chữ,
+   bo 16px, viền 2px nhạt, bóng phẳng (không nhoè), rộng tối đa 300px, lề màn 12px. Mọi khổ cùng một kiểu: không tấm đáy, không nền xám, không cột phải.
+   Mở: phóng .9 → 1 + hiện dần 120ms, gốc phóng ở mũi nhọn. ─────────────────────────────────────────────────────────────────────── */
+.gyc-bong{position:fixed;z-index:60;box-sizing:border-box;width:min(300px,calc(100vw - 24px));background:var(--tr-mat);border:2px solid var(--tr-vien-2);border-radius:16px;box-shadow:0 3px 0 var(--tr-vien);padding:11px 14px 12px;font-size:15px;line-height:1.45;color:var(--tr-chu-2);text-align:left;overflow-wrap:anywhere;transform-origin:var(--gyc-mui,50%) 0;outline:none}
+.gyc-bong[data-tren]{transform-origin:var(--gyc-mui,50%) 100%}
+.gyc-bong:focus-visible{box-shadow:0 3px 0 var(--tr-vien),0 0 0 3px var(--tr-hs)}
+.gyc-bong-mui{position:absolute;top:-9px;left:var(--gyc-mui,50%);width:14px;height:14px;margin-left:-9px;background:var(--tr-mat);border-left:2px solid var(--tr-vien-2);border-top:2px solid var(--tr-vien-2);border-top-left-radius:4px;transform:rotate(45deg)}
+.gyc-bong[data-tren] .gyc-bong-mui{top:auto;bottom:-9px;transform:rotate(225deg)}
+.gyc-b-ten{margin:0;font-size:16px;font-weight:800;line-height:1.3;color:var(--tr-chu)}
+.gyc-b-doan{margin:4px 0 0}
+.gyc-b-nho{margin:6px 0 0;font-size:12.5px;line-height:1.4;color:var(--tr-chu-3)}
+@media (min-width:900px){.gyc-b-ten{font-size:17px}}
+@media (prefers-reduced-motion:no-preference){
+  .gyc-bong{animation:gyc-bat .12s ease-out}
+}
+@keyframes gyc-bat{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
 
 /* biểu tượng tròn, chip, nút (cùng hình khối «Trong») */
 .gyc-o-icon{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:10px;background:var(--tr-mat-2);color:var(--tr-chu-2)}
@@ -221,10 +239,6 @@ html[data-gyc-cot-phai]{--gyc-cot-phai:320px}
   .gyc-goi-y.gyc-o-cot .gyc-tna-buoc>:not(svg){grid-column:2}
   .gyc-goi-y.gyc-o-cot .gyc-gy-cuoi .gyc-nut{flex:1 1 100%}
   .gyc-goi-y.gyc-o-cot .gyc-gy-cuoi .gyc-nut.gyc-chinh{margin-left:0}
-}
-@media (min-width:640px) and (max-width:900px){
-  /* thẻ giải nghĩa và gợi ý cùng muốn cột phải: thẻ đè lên cột gợi ý khi mở (đóng thẻ ⇒ gợi ý hiện lại) */
-  .gyc-bong[data-kieu=cot]{z-index:61}
 }
 /* Tóm tắt trong cột hẹp (cột phải 320px) và điện thoại dọc: xếp DỌC, mũi tên chỉ xuống, H bên phải mũi tên */
 @media (max-width:639px){

@@ -318,11 +318,11 @@ C12H22O11|saccharose;sucrose|saccarozơ|cbh
 C12H22O11|maltose|mantozơ|cbh
 (C6H10O5)n|starch|tinh bột|cbh
 (C6H10O5)n|cellulose|xenlulozơ|cbh
-CH3NH2|methylamine|metylamin|amin
-C2H5NH2|ethylamine|etylamin|amin
-(CH3)2NH|dimethylamine|đimetylamin|amin
-(CH3)3N|trimethylamine|trimetylamin|amin
-C3H7NH2|propylamine|propylamin|amin
+CH3NH2|methylamine;methanamine|metylamin|amin
+C2H5NH2|ethylamine;ethanamine|etylamin|amin
+(CH3)2NH|dimethylamine;N-methylmethanamine|đimetylamin|amin
+(CH3)3N|trimethylamine;N,N-dimethylmethanamine|trimetylamin|amin
+C3H7NH2|propylamine;propan-1-amine|propylamin|amin
 C6H5NH2|aniline|anilin|amin
 H2NCH2COOH|glycine;Gly|glyxin|aa
 CH3CH(NH2)COOH|alanine;Ala|alanin|aa

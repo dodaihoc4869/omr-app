@@ -68,3 +68,5 @@ jobs:
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT cong, COUNT(*) AS so_cau, SUM(nghi_dap_an) AS nghi_dap_an FROM loi_giai_so_do GROUP BY cong ORDER BY cong" 2>/dev/null | jq -c '.[0].results' || echo 'chưa có lời giải sơ đồ nào'
           # Lý do cổng (27/10): chỉ 40 ký tự đầu, MỌI chữ số thay bằng # (repo công khai: không lộ đáp án / số liệu câu).
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT cong, substr(COALESCE(ly_do, ''), 1, 40) AS ly_do, COUNT(*) AS so_cau FROM loi_giai_so_do WHERE cong = 'khong_kiem_duoc' GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 15" 2>/dev/null | jq -c '.[0].results[] | .ly_do |= gsub("[0-9]"; "#")' || echo 'chưa đọc được lý do'
+          # Theo model (27/10: có Workers AI khi Gemini hết hạn mức) — để thầy chê chữ của model nào thì lọc được đúng các dòng ấy.
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT model, cong, COUNT(*) AS so_cau FROM loi_giai_so_do GROUP BY 1, 2 ORDER BY 1, 2" 2>/dev/null | jq -c '.[0].results' || echo 'chưa đọc được theo model'
