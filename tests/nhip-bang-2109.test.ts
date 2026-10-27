@@ -24,6 +24,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/hoc-tap/ManLamBaiTap.tsx': 1, // 20/10 đo giây: 1 s cộng giây câu đang hiện, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
   'src/components/bang-tin-san/hooks.ts': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
   'src/components/giam-thi/giam-thi-ve.ts': 1, // 27/10 giám thị theo mức câu: 34 ms gõ dần chữ bong bóng càu nhàu (≤ 42 kí tự rồi tự dừng); chỉ cục bộ, không gọi máy chủ
+  'src/components/giam-thi/giam-thi-nguoi.ts': 1, // 27/10 giám thị hình người v3: cùng nhịp 34 ms gõ chữ bong bóng (≤ 42 kí tự rồi tự dừng); chỉ cục bộ, không gọi máy chủ
   'src/components/linh-vat/bi-dong.ts': 2, // 27/10 Bi chuyển động: 100 ms sinh bọt khí + vòng hiệu ứng của trạng thái đang hiện (nước mắt, hơi, hoa giấy, zzz); chỉ cục bộ, không gọi máy chủ; tab ẩn / ra khỏi khung nhìn ⇒ không sinh hạt, huỷ khi gỡ Bi
   'src/components/goi-y-cham/so-do-thay.tsx': 1, // 26/10 thí nghiệm ảo (gợi ý bài khó): 0,9 s chuyển khung, tối đa 3 khung rồi tự dừng; chỉ cục bộ, không gọi máy chủ
   'src/components/thuong/ManChuoi.tsx': 1, // 26/10 màn Cứu chuỗi (#401): 1 s vẽ lại giờ còn của hạn học bù; chỉ cục bộ, không gọi máy chủ; dừng khi cứu xong
