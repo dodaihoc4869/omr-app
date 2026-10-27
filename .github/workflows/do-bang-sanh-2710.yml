@@ -25,7 +25,6 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results[]" || echo "(lỗi)"; }
-          q "chỉ mục bảng nóng" "SELECT tbl_name,name,sql FROM sqlite_master WHERE type='index' AND tbl_name IN ('su_kien_hoc','chua_loi_dot','hanh_trinh_v4_canh','exp_so','loi_giai_hoi','kiem_tra_ca_nhan','game_v2_question','cau_meta','omni_q','chua_gon_lan') ORDER BY tbl_name"
-          q "kế hoạch truy vấn sổ theo em + luc" "EXPLAIN QUERY PLAN SELECT qid, ngay_vn, luc FROM su_kien_hoc WHERE sbd = 'x' AND luc >= '2026-10-01'"
-          q "kế hoạch truy vấn đóng đợt" "EXPLAIN QUERY PLAN SELECT id FROM chua_loi_dot WHERE sbd='x' AND dong_luc IS NULL AND trang_thai_day<>'da_tu_sua' AND COALESCE(sai_cuoi_luc,mo_luc)>=0"
-          q "số dòng bảng phụ" "SELECT (SELECT COUNT(*) FROM hanh_trinh_v4_canh) canh,(SELECT COUNT(*) FROM exp_so) exp,(SELECT COUNT(*) FROM omni_q) oq,(SELECT COUNT(*) FROM chua_gon_lan) cgl"
+          for n in 1 2 3 4; do q "tem kho lần $n" "SELECT COUNT(*) n, MAX(indexed_at) m, (SELECT COUNT(*) FROM game_v2_index gi LEFT JOIN cau_meta_to mt ON mt.ma_de=gi.ma_de WHERE mt.indexed_at IS NOT gi.indexed_at) lech, (SELECT COUNT(*) FROM cau_meta_to WHERE ma_de='*') sao FROM game_v2_index"; sleep 50; done
+          q "tờ lập chỉ mục gần nhất" "SELECT substr(indexed_at,1,16) t, COUNT(*) n FROM game_v2_index GROUP BY 1 ORDER BY 1 DESC LIMIT 8"
+          q "hàng đợi đồng bộ hôm nay (cron)" "SELECT (SELECT COUNT(*) FROM game_v2_index WHERE indexed_at >= '2026-10-27') hom_nay, (SELECT COUNT(*) FROM game_v2_index WHERE indexed_at >= '2026-10-27T12:00') toi_nay"
