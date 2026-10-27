@@ -38,6 +38,8 @@ const CHO_PHEP = new Set([
   'game/than-thu-v2/LinhTam.tsx',
   'game/than-thu-v2/ImmortalShield.tsx',
   'game/than-thu-v2/ProgressChart.tsx',
+  // BẢNG MÀU LINH VẬT 4 giám thị (thầy 27/10 «tươi mịn mắt như Duolingo»): đúng 4 màu thân + đen/trắng pha bóng, là TRANH không đổi theo nền; chỉ tệp này.
+  'components/giam-thi/giam-thi.css',
 ])
 const HEX = /#[0-9a-fA-F]{3,8}\b/g
 // bỏ qua: id URL fragment kiểu "#root", tham chiếu React key… — chỉ bắt chuỗi hex thuần
