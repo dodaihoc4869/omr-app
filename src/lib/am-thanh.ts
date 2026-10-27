@@ -37,6 +37,22 @@ export const TIENG: Record<KieuPhanHoi, Giong[]> = {
     { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
     { t: 0.08, f: BO.G6, d: 0.5, a: 0.004, g: 0.22, p: CHUONG },
   ],
+  // Mốc combo 27/10: cùng chuông combo (lên một nốt mỗi bậc), mốc cao thêm tiếng chuông thứ ba.
+  combo3: [
+    { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
+    { t: 0.08, f: BO.G6, d: 0.5, a: 0.004, g: 0.22, p: CHUONG },
+  ],
+  combo5: [
+    { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
+    { t: 0.08, f: BO.E6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
+    { t: 0.16, f: BO.G6, d: 0.55, a: 0.004, g: 0.22, p: CHUONG },
+  ],
+  combo10: [
+    { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
+    { t: 0.08, f: BO.E6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
+    { t: 0.16, f: BO.G6, d: 0.3, a: 0.004, g: 0.22, p: CHUONG },
+    { t: 0.24, f: BO.C7, d: 0.8, a: 0.004, g: 0.24, p: CHUONG },
+  ],
 }
 /** Gam trưởng (nửa cung) cho bậc combo: 0 → C, 1 → D, 2 → E … quá 7 bậc thì giữ nốt cao nhất. */
 const GAM = [0, 2, 4, 5, 7, 9, 11, 12]
@@ -64,7 +80,7 @@ export function phat(ten: KieuPhanHoi, bac = 0): void {
     const c = layCtx()
     if (!c || !tong) return
     const goc = c.currentTime + 0.01
-    const nang = ten === 'combo' ? 2 ** (GAM[Math.max(0, Math.min(GAM.length - 1, Math.round(bac)))]! / 12) : 1
+    const nang = ten.startsWith('combo') ? 2 ** (GAM[Math.max(0, Math.min(GAM.length - 1, Math.round(bac)))]! / 12) : 1
     for (const v of TIENG[ten]) {
       const p = v.p ?? [[1, 1]], a = v.a ?? 0.005, t0 = goc + v.t
       const tongBien = p.reduce((s, [, b]) => s + b, 0)

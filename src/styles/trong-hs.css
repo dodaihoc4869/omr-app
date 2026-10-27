@@ -874,3 +874,96 @@
 [data-trong] .dm-khung[data-muc='thuong'] { grid-template-columns: minmax(0, 1fr); }
 [data-trong] .tp-cam { min-width: 0; padding: 0 0 24px; }
 [data-trong] .tp-cam-cho { min-height: 60vh; }
+
+/* ── NÂNG CẤP 27/10 (bản vẽ ve-moi/nang-cap; thầy: «Bạn tự chốt sao cho tốt nhất build luôn đi» · «ngôi sao trên hình tròn nhảy lên nhảy xuống» ·
+   «hình tròn có viền tiến độ xung quanh hiệu ứng thu vào mở ra mượt mà»). Nút chặng TRÒN khối nổi kiểu Duolingo (bỏ lục giác: đáy khối của hình tròn
+   liền mạch, vòng tiến độ ôm khít). Đường chấm nối bỏ (Duolingo không có). Băng bài phẳng + đáy khối. Rương tinh thể + Bi đứng cạnh đường.
+   Nút hiện tại: vòng bốn đoạn có khe, tô dần lúc mở, thở 0,94 ↔ 1 (1,8 s); mặt nút nhún nhẹ lệch pha; sao nảy 7 px, hơi bẹp khi chạm, bóng co giãn
+   theo nhịp. Nút đã xong: dấu tick lấp lánh nhẹ, so le. Chỉ transform / opacity / stroke-dashoffset; giảm chuyển động / máy yếu ⇒ đứng yên. ── */
+[data-trong] { --tr-day-khoi: color-mix(in srgb, var(--tr-phu) 55%, transparent); }
+[data-trong='hs'] .da-nut::before, [data-trong='hs'] .da-nut::after { clip-path: none; border-radius: 50%; }
+[data-trong='hs'] .da-nut { width: 72px; height: 64px; }
+[data-trong='hs'] .da-nut[data-tt='dang'] { width: 80px; height: 70px; }
+[data-trong='hs'] .da-noi { display: none; }
+[data-trong='hs'] .da-ds { gap: 26px; }
+[data-trong='hs'] .da-bai { background: var(--tr-dung); box-shadow: inset 0 -5px 0 var(--tr-day-khoi); border-radius: 18px; }
+/* vòng: nền xám tối (mặt khoá), phần đã làm màu chính; bốn khe ở 12 · 3 · 6 · 9 giờ bằng mặt nạ (vòng xoay −90° nên khe vẫn đối xứng) */
+[data-trong='hs'] .da-vong { width: 110px; height: 110px; top: calc(50% - 4px);
+  -webkit-mask: repeating-conic-gradient(from 5deg, black 0 80deg, transparent 80deg 90deg); mask: repeating-conic-gradient(from 5deg, black 0 80deg, transparent 80deg 90deg); }
+[data-trong='hs'] .da-vong circle { stroke-width: 8; }
+[data-trong='hs'] .da-vong .nen { stroke: var(--tr-mat-3); }
+[data-trong='hs'] .da-vong .chay { stroke: var(--tr-dung); stroke-linecap: butt; }
+@keyframes da-vong-to { from { stroke-dashoffset: var(--L); } to { stroke-dashoffset: 0; } }
+@keyframes da-vong-tho { 0%, 100% { transform: translate(-50%, -50%) rotate(-90deg) scale(1); } 50% { transform: translate(-50%, -50%) rotate(-90deg) scale(.94); } }
+@keyframes da-mat-nhun { 0%, 100% { transform: translateY(-6px); } 50% { transform: translateY(-3px); } }
+@keyframes da-sao-nay {
+  0%, 100% { transform: translateY(-6px) scale(1, 1); }
+  12% { transform: translateY(-6px) scale(1.06, .92); }
+  45% { transform: translateY(-13px) scale(.97, 1.03); }
+  80% { transform: translateY(-6px) scale(1, 1); }
+}
+@keyframes da-sao-bong { 0%, 100% { transform: translate(-50%, 0) scale(1); opacity: .9; } 12% { transform: translate(-50%, 0) scale(1.12); opacity: 1; } 45% { transform: translate(-50%, 0) scale(.62); opacity: .45; } 80% { transform: translate(-50%, 0) scale(1); opacity: .9; } }
+@keyframes da-lap-lanh { 0%, 100% { opacity: 1; transform: translateY(-6px) scale(1); } 50% { opacity: .78; transform: translateY(-6px) scale(1.08); } }
+[data-trong='hs'] .da-nut[data-tt='dang']:not(:disabled) { animation: none; }
+[data-trong='hs'] .da-nut[data-tt='dang'] .da-vong { animation: da-vong-tho 1.8s ease-in-out infinite; }
+[data-trong='hs'] .da-nut[data-tt='dang'] .da-vong .chay { animation: da-vong-to 600ms ease-out both; }
+[data-trong='hs'] .da-nut[data-tt='dang']::after { animation: da-mat-nhun 1.8s ease-in-out -.45s infinite; }
+[data-trong='hs'] .da-nut[data-tt='dang'] > svg:not(.da-vong) { transform-origin: 50% 100%; animation: da-sao-nay 1.8s cubic-bezier(.45, 0, .55, 1) infinite; }
+[data-trong='hs'] .da-sao-bong { position: absolute; left: 50%; top: calc(50% + 10px); z-index: 2; width: 26px; height: 6px; border-radius: 50%; background: var(--tr-day-khoi);
+  transform: translate(-50%, 0); animation: da-sao-bong 1.8s cubic-bezier(.45, 0, .55, 1) infinite; pointer-events: none; }
+[data-trong='hs'] .da-nut[data-tt='xong'] > svg:not(.da-vong) { animation: da-lap-lanh 3.2s ease-in-out infinite; }
+[data-trong='hs'] .da-o-nut:nth-child(3n + 2) .da-nut[data-tt='xong'] > svg:not(.da-vong) { animation-delay: -1.1s; }
+[data-trong='hs'] .da-o-nut:nth-child(3n) .da-nut[data-tt='xong'] > svg:not(.da-vong) { animation-delay: -2.2s; }
+/* rương tinh thể (mờ tới khi xong hết chặng) + Bi đứng cạnh đường */
+[data-trong] .da-ruong { position: relative; display: grid; place-items: center; transform: translateX(var(--x, 0)); }
+[data-trong] .da-ruong-hinh { opacity: .55; }
+[data-trong] .da-ruong[data-mo] .da-ruong-hinh { opacity: 1; }
+[data-trong] .da-ruong .rg-bong { fill: var(--tr-day-khoi); }
+[data-trong] .da-ruong .rg-than { fill: color-mix(in srgb, var(--tr-tin) 84%, var(--tr-day-khoi)); }
+[data-trong] .da-ruong .rg-day { fill: color-mix(in srgb, var(--tr-tin) 55%, var(--tr-day-khoi)); }
+[data-trong] .da-ruong .rg-nap { fill: var(--tr-tin); }
+[data-trong] .da-ruong .rg-dai { fill: var(--tr-sao); }
+[data-trong] .da-ruong .rg-ngoc { fill: var(--tr-dung); }
+[data-trong] .da-ruong .rg-ngoc-sang { fill: var(--tr-dung-nhat); }
+[data-trong] .da-ruong .rg-ngoc-dam { fill: var(--tr-dung-chu); }
+[data-trong] .bi-loi[data-khong-bi] { justify-content: center; }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .chay, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-sao-bong) { animation: none !important; }
+}
+[data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .chay, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-sao-bong) { animation: none; }
+[data-trong='hs'] .bi-loi[data-khong-bi] .bi-loi-bong { margin-bottom: 0; }
+[data-trong='hs'] .bi-loi[data-khong-bi] .bi-loi-bong::before { display: none; }
+/* biểu tượng trên nút chặng màu (xong / hiện tại / kiểm tra / sửa lỗi): trắng ở cả hai nền như Duolingo (nền tối trước đây là chữ tối trên nút) */
+@media (prefers-color-scheme: dark) { [data-trong='hs'] .da-nut:not([data-tt='khoa']) { color: var(--tr-chu); } }
+/* THANH BỘ ĐẾM TRÊN ĐẦU (thầy 27/10: «thu nhỏ lại, giãn cách đều» — như hàng trên cùng của Duolingo): bỏ nền viên, chỉ biểu tượng 23px + số 16,5px đậm 800
+   cùng màu biểu tượng (lửa cam · nguyên tử xanh · tinh thể lam); các mục chia đều bề ngang, cao 48px; lửa chưa học hôm nay ⇒ xám. Máy tính: không giãn
+   quá cột nội dung. Bộ đếm vẫn là đích bay của hạt và vẫn nảy (SoDem). */
+[data-trong='hs'] .da-tren { padding-top: 2px; padding-bottom: 2px; }
+[data-trong='hs'] .da-tren .tp-tr { flex: 1 1 auto; justify-content: space-between; gap: 4px; max-width: 600px; min-height: 48px; margin: 0 auto; padding: 0 4px; }
+[data-trong='hs'] .da-tren .tp-tr-o { gap: 6px; min-height: 44px; padding: 4px 6px; background: transparent; font-size: 16.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
+[data-trong='hs'] .da-tren .tp-tr-o .tp-dv { width: 23px; height: 23px; }
+[data-trong='hs'] .da-tren .tp-tr-o[data-k='lua'] { color: var(--tr-chu-y); }
+[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-dung); }
+[data-trong='hs'] .da-tren .tp-tr-o[data-k='tt'] { color: var(--tp-tt); }
+[data-trong='hs'] .da-tren .tp-tr-o[data-k='lua']:has(.tp-dv-lua.tat) { color: var(--tr-chu-3); }
+[data-trong='hs'] .da-tren .tp-tr-o[data-k='lua']:has(.tp-dv-lua.tat) .tp-dv { opacity: .55; }
+[data-trong='hs'] .da-tren .tp-tr-muc { margin-left: 0; }
+@media (max-width: 380px) { [data-trong='hs'] .da-tren .tp-tr-o { font-size: 15.5px; padding: 4px 3px; } }
+/* NỀN «BẢNG TÍNH HOÁ» (thầy 27/10: bỏ nền tổ ong, thay «kiểu hoá học phép tính hiển thị ngang dọc phức tạp»): một ô SVG lặp (data URI, không thêm tệp)
+   — phương trình đã cân bằng, n = m/M, pV = nRT, phép tính mol, mũi tên ⇌, vòng benzene, chỉ số dưới; vài cụm xoay 90° cho cảm giác ngang dọc. Rất mờ
+   (chữ phụ, ~5% sáng / ~6% tối), tĩnh, không cạnh tranh nội dung. Dùng chung cho mọi màn HS đang có nền hoạ tiết (.ht2[data-mot]). */
+[data-trong='hs'] .ht2[data-mot]::before { background: var(--tr-chu-2); opacity: .05;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' font-family='Georgia,serif' font-size='15' fill='black' stroke='black' stroke-width='0'%3E %3Ctext x='22' y='38'%3E2Al + 6HCl %E2%86%92 2AlCl%E2%82%83 + 3H%E2%82%82%3C/text%3E %3Ctext x='300' y='70' font-size='17'%3EpV = nRT%3C/text%3E %3Ctext x='40' y='96'%3En =%3C/text%3E%3Ctext x='70' y='86'%3Em%3C/text%3E%3Cline x1='66' y1='92' x2='86' y2='92' stroke-width='1.2'/%3E%3Ctext x='68' y='108'%3EM%3C/text%3E %3Ctext x='120' y='100'%3EC%E2%82%86H%E2%82%85NH%E2%82%82 + HCl %E2%86%92 C%E2%82%86H%E2%82%85NH%E2%82%83Cl%3C/text%3E %3Cg transform='translate(470 120) rotate(90)'%3E%3Ctext%3EN%E2%82%82 + 3H%E2%82%82 %E2%87%8C 2NH%E2%82%83 %CE%94H %26lt; 0%3C/text%3E%3C/g%3E %3Cg fill='none' stroke-width='1.1'%3E%3Cpath d='M90 150l26 15v30l-26 15-26-15v-30z'/%3E%3Ccircle cx='90' cy='180' r='16'/%3E%3C/g%3E %3Ctext x='150' y='175'%3ECH%E2%82%83%E2%80%93CH(CH%E2%82%83)%E2%80%93NH%E2%82%82%3C/text%3E %3Ctext x='150' y='215'%3E0,1 %C3%97 129,5 = 12,95%3C/text%3E %3Cg transform='translate(36 250) rotate(90)'%3E%3Ctext%3EC%E2%82%82H%E2%82%85OH + 3O%E2%82%82 %E2%86%92 2CO%E2%82%82 + 3H%E2%82%82O%3C/text%3E%3C/g%3E %3Cpath d='M110 270l40 70h-80z' fill='none' stroke-width='1.1'/%3E %3Ctext x='176' y='290'%3En = V / 24,79%3C/text%3E %3Ctext x='176' y='330'%3EFe + CuSO%E2%82%84 %E2%86%92 FeSO%E2%82%84 + Cu%3C/text%3E %3Ctext x='70' y='400'%3ECH%E2%82%83COOH + C%E2%82%82H%E2%82%85OH %E2%87%8C CH%E2%82%83COOC%E2%82%82H%E2%82%85 + H%E2%82%82O%3C/text%3E %3Cg transform='translate(520 330) rotate(-90)'%3E%3Ctext%3ECM = n / V%3C/text%3E%3C/g%3E %3Ctext x='90' y='450'%3E4,5 : 45 = 0,1 mol%3C/text%3E %3Ctext x='300' y='470' font-size='17'%3E%CE%94H %26lt; 0%3C/text%3E %3Cg fill='none' stroke-width='1.1'%3E%3Cpath d='M300 500h70m-10-6 10 6-10 6M300 516h70m-60-6-10 6 10 6'/%3E%3C/g%3E %3Ctext x='40' y='520'%3ECaCO%E2%82%83 %E2%86%92 CaO + CO%E2%82%82%3C/text%3E %3Ctext x='400' y='540'%3EH%E2%82%82O%3C/text%3E %3C/svg%3E") repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' font-family='Georgia,serif' font-size='15' fill='black' stroke='black' stroke-width='0'%3E %3Ctext x='22' y='38'%3E2Al + 6HCl %E2%86%92 2AlCl%E2%82%83 + 3H%E2%82%82%3C/text%3E %3Ctext x='300' y='70' font-size='17'%3EpV = nRT%3C/text%3E %3Ctext x='40' y='96'%3En =%3C/text%3E%3Ctext x='70' y='86'%3Em%3C/text%3E%3Cline x1='66' y1='92' x2='86' y2='92' stroke-width='1.2'/%3E%3Ctext x='68' y='108'%3EM%3C/text%3E %3Ctext x='120' y='100'%3EC%E2%82%86H%E2%82%85NH%E2%82%82 + HCl %E2%86%92 C%E2%82%86H%E2%82%85NH%E2%82%83Cl%3C/text%3E %3Cg transform='translate(470 120) rotate(90)'%3E%3Ctext%3EN%E2%82%82 + 3H%E2%82%82 %E2%87%8C 2NH%E2%82%83 %CE%94H %26lt; 0%3C/text%3E%3C/g%3E %3Cg fill='none' stroke-width='1.1'%3E%3Cpath d='M90 150l26 15v30l-26 15-26-15v-30z'/%3E%3Ccircle cx='90' cy='180' r='16'/%3E%3C/g%3E %3Ctext x='150' y='175'%3ECH%E2%82%83%E2%80%93CH(CH%E2%82%83)%E2%80%93NH%E2%82%82%3C/text%3E %3Ctext x='150' y='215'%3E0,1 %C3%97 129,5 = 12,95%3C/text%3E %3Cg transform='translate(36 250) rotate(90)'%3E%3Ctext%3EC%E2%82%82H%E2%82%85OH + 3O%E2%82%82 %E2%86%92 2CO%E2%82%82 + 3H%E2%82%82O%3C/text%3E%3C/g%3E %3Cpath d='M110 270l40 70h-80z' fill='none' stroke-width='1.1'/%3E %3Ctext x='176' y='290'%3En = V / 24,79%3C/text%3E %3Ctext x='176' y='330'%3EFe + CuSO%E2%82%84 %E2%86%92 FeSO%E2%82%84 + Cu%3C/text%3E %3Ctext x='70' y='400'%3ECH%E2%82%83COOH + C%E2%82%82H%E2%82%85OH %E2%87%8C CH%E2%82%83COOC%E2%82%82H%E2%82%85 + H%E2%82%82O%3C/text%3E %3Cg transform='translate(520 330) rotate(-90)'%3E%3Ctext%3ECM = n / V%3C/text%3E%3C/g%3E %3Ctext x='90' y='450'%3E4,5 : 45 = 0,1 mol%3C/text%3E %3Ctext x='300' y='470' font-size='17'%3E%CE%94H %26lt; 0%3C/text%3E %3Cg fill='none' stroke-width='1.1'%3E%3Cpath d='M300 500h70m-10-6 10 6-10 6M300 516h70m-60-6-10 6 10 6'/%3E%3C/g%3E %3Ctext x='40' y='520'%3ECaCO%E2%82%83 %E2%86%92 CaO + CO%E2%82%82%3C/text%3E %3Ctext x='400' y='540'%3EH%E2%82%82O%3C/text%3E %3C/svg%3E") repeat; -webkit-mask-size: 560px 560px; mask-size: 560px 560px; }
+@media (prefers-color-scheme: dark) { [data-trong='hs'] .ht2[data-mot]::before { opacity: .065; } }
+/* linh vật mờ cạnh đường (xem DuongChang): xám đơn sắc khi chặng chưa tới, hiện màu + thở khi đã tới; bóng tròn dưới chân; không bấm, không tràn */
+[data-trong] .da-duong { overflow-x: clip; }
+[data-trong] .da-o-nut { position: relative; }
+[data-trong] .da-linh-vat { position: absolute; left: 50%; top: 50%; z-index: 0; width: 104px; transform: translate(calc(var(--lv) - 50%), -46%); pointer-events: none; }
+[data-trong] .da-linh-vat .bi { display: block; width: 104px; height: auto; }
+[data-trong] .da-linh-vat::after { content: ''; display: block; width: 70px; height: 10px; margin: -8px auto 0; border-radius: 50%; background: var(--tr-day-khoi); opacity: .5; }
+[data-trong] .da-linh-vat[data-toi] { filter: grayscale(1); opacity: .32; }
+@keyframes da-lv-tho { 0%, 100% { transform: translate(calc(var(--lv) - 50%), -46%) scale(1); } 50% { transform: translate(calc(var(--lv) - 50%), -48%) scale(1.03); } }
+[data-trong='hs'] .da-linh-vat:not([data-toi]) { animation: da-lv-tho 2.6s ease-in-out infinite; }
+@media (max-width: 380px) { [data-trong] .da-linh-vat { width: 88px; } [data-trong] .da-linh-vat .bi { width: 88px; } }
+@media (prefers-reduced-motion: reduce) { [data-trong='hs'] .da-linh-vat { animation: none; } }
+[data-trong='hs'].may-yeu .da-linh-vat { animation: none; }

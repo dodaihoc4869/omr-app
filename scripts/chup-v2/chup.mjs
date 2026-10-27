@@ -292,6 +292,22 @@ const TPC_CANH = [
 const DS_TPC = [[390, 844, 'doc'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết THƯỞNG PHẠT GỘP 26/10
+// ═══ NÂNG CẤP 27/10 (tiền tố "nc-", bản vẽ ve-moi/nang-cap): Lộ trình (nút tròn, vòng bốn đoạn, sao nảy, rương + Bi cạnh đường) và màn làm chặng
+// `lam13&lam=duo-nc` (câu chọn chất có tranh phân tử · câu tính có cảnh phản ứng + 4 phương án số · tấm Đúng · tấm Chưa đúng · tấm Chưa được tính).
+const NC_DEN_TINH = 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục'
+const NC_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['1-chon-chat', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B'],
+  ['2-dung', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+  ['3-tinh', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, `${NC_DEN_TINH} » tn:^A`],
+  ['4-sai', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, `${NC_DEN_TINH} » tn:^A » nut:^Kiểm tra$`],
+  ['5-chua-tinh', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, `${NC_DEN_TINH} » tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$`],
+  // mốc combo 3 giữa hiệu ứng (~750 ms sau Kiểm tra: Bi đã bay vào, hạt đang gom) và lúc xong (~1,6 s: số đã cộng đủ)
+  ['6-combo-giua', 'lam13&lam=duo-nc&chuoi=2', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$ » cho » cho'],
+  ['7-combo-xong', 'lam13&lam=duo-nc&chuoi=2', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$ » cho » cho » cho » cho » cho'],
+]
+const DS_NC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  NC_CANH.map(([t, m, cho, viec]) => [`nc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết NÂNG CẤP 27/10
 
 // ═══ NGANG HS 26/10: màn con học sinh mở đè Hôm nay (`?man=hs-ng&v=tu-sua|kiem|ai`, khối cùng tên ở trang.tsx) ở điện thoại dọc thấp / ngang / máy tính
 // bảng / máy tính, sáng + tối (ảnh khung nhìn; đo tràn ngang + vùng chạm như mọi cảnh). Tiền tố "ng-hs-".
@@ -358,6 +374,7 @@ const DS = [
   ...DS_NG_HS, // NGANG HS 26/10
   ...DS_DUO, // DUO 26/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
+  ...DS_NC, // NÂNG CẤP 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
   ...DS_LAM13, // LÀN MÀN LÀM BÀI 12/10D

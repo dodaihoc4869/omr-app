@@ -23,7 +23,7 @@ export function TamThuong({ thuong }: { thuong: ThuongCau | null | undefined }) 
   if (!thuong) return null
   if (!thuong.tinh) return <div className="tp-kq" data-trung="">
     <p className="tp-kq-trung">{CHU_KHONG_TINH}</p>
-    <div className="tp-cong"><span className="tp-ct" data-k="xam"><IcNguyenTu /> Nguyên tử <b>0</b></span><span className="tp-ct" data-k="xam">Chuỗi đúng <b>về 0</b></span></div>
+    {/* thầy 27/10 (bản vẽ nâng cấp): bỏ dòng «Nguyên tử 0 · Chuỗi đúng về 0» — câu chưa tính đã nói đủ, thêm hai số 0 chỉ làm rối */}
   </div>
   const n = thuong.nguyenTu
   return <div className="tp-kq">
