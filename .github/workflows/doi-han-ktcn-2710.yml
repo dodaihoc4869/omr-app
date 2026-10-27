@@ -1,0 +1,48 @@
+# DỜI BÀI KIỂM TRA ÔN TẬP 27/10 CHƯA LÀM SANG 28/10 (thầy DUYỆT 27/10: «Dời sang tối mai» — app HS tạm đóng tối 27/10 để bảo trì). Bấm tay.
+# Phạm vi + cách ghi: scripts/doi-han-ktcn-2710.mjs (chưa bắt đầu, chưa nộp; không đụng bài đã nộp, bài làm dở, ca thi). Ca thi mở ⇒ DỪNG.
+# Log chỉ in TỔNG (repo công khai). Bản sao các dòng sẽ đổi (mã + hạn cũ, không tên) ⇒ artifact «ban-sao-doi-han-ktcn-2710-…» (giữ 90 ngày).
+# `che_do: dem` ⇒ chỉ đếm + lưu bản sao. Chạy lại an toàn.
+name: Dời bài kiểm tra ôn tập 27/10 sang 28/10
+on:
+  workflow_dispatch:
+    inputs:
+      che_do:
+        description: 'dem = chỉ đếm · ghi = dời'
+        required: true
+        default: 'dem'
+        type: choice
+        options: [dem, ghi]
+permissions:
+  contents: read
+concurrency:
+  group: doi-han-ktcn-2710
+  cancel-in-progress: false
+jobs:
+  doi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm / lưu bản sao / dời
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          GHI: ${{ inputs.che_do }}
+          BAN_SAO: ban-sao-doi-han-ktcn/truoc-2710-${{ inputs.che_do }}.json
+        run: node scripts/doi-han-ktcn-2710.mjs
+      - name: Lưu bản sao (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ban-sao-doi-han-ktcn-2710-${{ inputs.che_do }}-${{ github.run_id }}
+          path: ban-sao-doi-han-ktcn/
+          retention-days: 90
+          if-no-files-found: ignore
