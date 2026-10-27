@@ -26,12 +26,13 @@ const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
 // nạp lười, ngoài lượt mở app) — không tách mảnh riêng để precache không thêm tệp; chỉ vẽ khi chữ đề / phương án có dáng chất (lọc rẻ ngay đây).
 import { IcLapLanh, IcMayTinh, MinhHoaDe, TranhPa } from './minh-hoa-hoa'
 import { chayThuong, chuMoc, mocCombo } from './hieu-ung-duo'
+import { BungDung } from './BungDung'
 /** Đề có «<số> gam|mol <tên chất>» ⇒ đáng thử vẽ cảnh. */
 const coDangCanh = (text: string) => /\d\s*(?:gam|g|mol)\s+[A-Za-z(]/.test(text)
 /** Bốn phương án đều là tên / công thức chất ngắn (không phải số, không phải câu) ⇒ đáng thử vẽ phân tử. */
 const coDangChat = (pa: readonly string[]) => pa.length === 4 && pa.every((c) => /^[A-Za-z(][A-Za-z0-9() ]{1,24}\.?$/.test((c ?? '').trim()) && /[a-z]{4}|[A-Z][a-z]?\d/.test(c ?? ''))
 /** Câu khen xoay vòng ở dải ĐÚNG (thầy 27/10, như Duolingo) — theo thứ tự câu, câu đầu luôn «Chính xác!». */
-const LOI_KHEN = ['Chính xác!', 'Làm tốt lắm!', 'Tuyệt vời!', 'Xuất sắc!']
+const LOI_KHEN = ['Chính xác!', 'Giỏi quá!', 'Làm tốt lắm!', 'Tuyệt vời!', 'Xuất sắc!']
 /** Chủ đề ngắn cho nhãn câu: đoạn đầu trước « — » (thầy 27/10 bản vẽ: «CÂU MỚI · Amine» thay «AMINE — TÍNH BASE — TÍNH KHỐI LƯỢNG»); «Ester – Lipid» giữ nguyên. */
 export const chuDeNgan = (ten: string) => ten.split(/\s—\s/)[0]!.trim()
 import { createPortal } from 'react-dom'
@@ -609,6 +610,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></div>
       : !q ? null
       : k ? <section className="duo-day duo-ket" data-tt={khongTinh ? 'trung' : tt} data-tp-trung={khongTinh || undefined} role="status" aria-live="polite"><div className="duo-giua">
+          {tt === 'dung' && !khongTinh && <BungDung key={q.qid} />}{/* thầy 27/10 (video Duolingo): mây bọt + hạt vuông xanh ở dải ĐÚNG */}
           <div className="duo-kq">
             {/* 27/10 (thầy: «dải … như dolingo»; phối hợp giám thị đứng trái đề): dải đúng / sai chỉ có dấu tròn tick / × ở tiêu đề — không đặt Bi */}
             {khongTinh ? <span className="duo-kq-o" aria-hidden="true"><Info size={26} /></span>
@@ -657,6 +659,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     }
     return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-xong={xong || undefined} data-tt={k ? tt : undefined}>
       {!xong && <header className="duo-tren">
+        {/* thầy 27/10 (video Duolingo): đúng liền ≥ 2 câu ⇒ nhãn nhỏ «COMBO ×N» ngay TRÊN thanh tiến độ, số theo chuỗi */}
+        {chuoi >= 2 && !laLamLai && <span key={chuoi} className="duo-combo-nhan" aria-hidden="true">COMBO ×{chuoi}</span>}
         <button type="button" className="duo-dong" onClick={giu.xinThoat} disabled={nop} aria-label="Lưu và về Hôm nay"><XIcon size={26} aria-hidden="true" /></button>
         {/* A7 — ỐNG NGHIỆM: chất lỏng dâng theo câu, bọt nổi; chuỗi ≥ 3 ⇒ chất lỏng cam phát sáng + vệt sáng lướt. */}
         <div className="duo-thanh" data-combo={chuoi >= 3 || undefined} role="progressbar" aria-label={laLamLai ? `Làm lại · câu ${stt}/${lamLai.length}` : q ? `Câu ${stt}/${goc.length}${chang ? ` của chặng ${chang}` : ''}` : 'Chặng học của em'} aria-valuemin={0} aria-valuemax={goc.length || 1} aria-valuenow={Math.min(daCham, goc.length)}><i style={{ width: `${pct}%` }}><b /><b /><b />{k?.correct && <span key={q?.qid} className="duo-loe" />}</i></div>

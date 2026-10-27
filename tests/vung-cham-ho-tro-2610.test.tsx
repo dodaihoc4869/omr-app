@@ -7,7 +7,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
 // thầy 27/10: dải ĐÚNG xoay vòng câu khen như Duolingo (câu đầu «Chính xác!»)
-const KHEN = /^(Chính xác|Làm tốt lắm|Tuyệt vời|Xuất sắc)!$/
+const KHEN = /^(Chính xác|Giỏi quá|Làm tốt lắm|Tuyệt vời|Xuất sắc)!$/
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 vi.mock('../src/components/goi-y-cham/VungChamDe', async (goc) => {
   const that = await goc<typeof import('../src/components/goi-y-cham/VungChamDe')>()
