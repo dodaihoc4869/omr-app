@@ -18,6 +18,7 @@ import NutHoiThay from '../loi-giai/NutHoiThay'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { Bi } from '../linh-vat/Bi'
 import { banHat } from '../../lib/hieu-ung'
+import { BungDung } from '../hoc-tap/BungDung'
 import { phanHoi } from '../../lib/phan-hoi'
 import { napSanGiuChan, TamGiuChanLuoi, useGiuChan } from '../hoc-tap/GiuChan'
 import { loiGiuChan } from '../hoc-tap/giu-chan'
@@ -168,6 +169,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
   const nutTiep = (do_?: boolean) => <button ref={nutChinh} type="button" className="duo-nut" data-sac={do_ ? 'do' : undefined} onClick={tiepTuc}>Tiếp tục</button>
   const tam = (cam: 'vui' | 'sai' | 'nghi', tieu: ReactNode, than: ReactNode, them: ReactNode, nut: ReactNode, sac = tt) => (
     <section className="duo-day duo-ket" data-tt={sac ?? 'trung'} role="status" aria-live="polite"><div className="duo-giua">
+      {sac === 'dung' && <BungDung key={`${mo.lan ?? 1}${ket ?? ''}`} />}{/* thầy 27/10 (video Duolingo): mây bọt + hạt vuông xanh ở dải ĐÚNG */}
       <div className="duo-kq">
         <span className="duo-kq-bi" aria-hidden="true"><Bi key={`${mo.lan ?? 1}${ket ?? ''}`} cam={cam} size={64} /></span>
         <div className="duo-kq-chu"><h2>{tieu}</h2>{than}</div>

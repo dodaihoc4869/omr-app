@@ -884,3 +884,26 @@
   [data-trong] .duo-nhan-nhac { animation: duo-nhac-di 1ms linear 1.8s forwards; }
   [data-trong] .duo-nhan[data-nhac] > :not(.duo-nhan-o, .duo-nhan-nhac) { animation: duo-nhac-ve 1ms linear 1.8s both; }
 }
+/* ── 20. DẢI ĐÚNG Y VIDEO DUOLINGO (thầy 27/10 «Hiệu ứng phải như thế này»): dải trượt nhanh ~140 ms; ô đúng có vệt sáng chéo quét ~250 ms; mây bọt +
+ * hạt vuông bo góc xanh (BungDung.tsx); nhãn «COMBO ×N» trên thanh tiến độ khi đúng liền ≥ 2. Giảm chuyển động / máy yếu ⇒ chỉ đổi màu. ── */
+[data-trong='hs'] .duo-ket { animation-duration: 140ms; animation-timing-function: cubic-bezier(.2, .9, .3, 1.08); }
+[data-trong] { --duo-loe-o: color-mix(in srgb, var(--tr-mat) 80%, transparent); }
+@media (prefers-color-scheme: dark) { [data-trong] { --duo-loe-o: color-mix(in srgb, var(--tr-chu) 30%, transparent); } }
+@keyframes duo-loe-o { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(260%) skewX(-18deg); } }
+[data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung'] { overflow: hidden; }
+[data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung']::after { content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 38%; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--duo-loe-o) 45%, var(--duo-loe-o) 55%, transparent); transform: translateX(-120%); animation: duo-loe-o 260ms ease-out 40ms both; }
+.duo-may { position: absolute; left: 0; bottom: 100%; z-index: 1; display: block; pointer-events: none; }
+.duo-may .nen { fill: var(--tr-dung-nhat); }
+.duo-may .vien { fill: color-mix(in srgb, var(--tr-dung) 70%, var(--tr-dung-nhat)); }
+.duo-vuong { position: fixed; left: 0; top: 0; z-index: 70; border-radius: 3px; background: var(--tr-dung); pointer-events: none; will-change: transform, opacity; }
+.duo-vuong[data-s='1'] { background: color-mix(in srgb, var(--tr-dung) 55%, var(--tr-dung-nhat)); }
+.duo-vuong[data-s='2'] { background: color-mix(in srgb, var(--tr-dung) 80%, var(--tr-dung-chu)); }
+[data-trong] .duo-tren { position: relative; }
+@keyframes duo-combo-vao { from { opacity: 0; transform: translateY(4px) scale(.85); } to { opacity: 1; transform: none; } }
+[data-trong] .duo-combo-nhan { position: absolute; top: 0; left: 72px; font-size: 11px; font-weight: 900; letter-spacing: .06em; line-height: 1; color: var(--tr-dung-chu); pointer-events: none; animation: duo-combo-vao 200ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung']::after { display: none; }
+  [data-trong] .duo-combo-nhan { animation: none; }
+}
+[data-trong='hs'].may-yeu .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung']::after { display: none; }
