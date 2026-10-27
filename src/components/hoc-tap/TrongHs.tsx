@@ -20,8 +20,9 @@ import '../../styles/trong-hs-ngang.css' // NGANG + MÁY TÍNH 27/10: chỉ bố
 // thưởng phạt + thẻ bên là MỘT mảnh nạp lười (ManThuong). Học sinh không thấy nhãn nhịp học / bậc.
 import { ThanhThuong } from '../thuong/ThanhThuong'
 import { TheBanLoTrinh } from '../thuong/TheBanLoTrinh' // lối vào Học cùng bạn trên Lộ trình (27/10)
-import { useTongQuan } from '../thuong/dung-thuong'
-import { napSanThanhTich } from '../../lib/thuong-api'
+import { baoMoi, useTongQuan } from '../thuong/dung-thuong'
+import { DUONG, layTongQuan, napSanThanhTich } from '../../lib/thuong-api'
+import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 import { laSamsungInternet } from '../../lib/nhac-samsung'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
@@ -359,20 +360,38 @@ function OTo({ ten, mo, sac, Icon, so, noi, onClick, tat }: { ten: string; mo: s
 /** HÔM NAY kiểu Duolingo + chất Hoá (bản vẽ ve-moi/dm-*.html, thầy chốt 26/10): ba mục của menu dọc — Lộ trình (con đường chặng: học → Kiểm tra ôn tập →
  *  Tự sửa lỗi → Bài tập về nhà, ĐÚNG thứ tự việc của «Một trang») · Luyện tập (mỗi việc một ô to có số) · Thành tích (chuỗi ngày, tuần này, việc tiếp, huy hiệu
  *  từ số sẵn có). Cùng số, cùng lệnh, cùng nút như bản trước; ô nào app chưa có số rẻ thì giữ nhãn, bỏ số. */
-/** Chu kỳ tự kiểm lại công tắc tạm đóng (thầy mở lại ⇒ máy em tự vào trong vòng 1 phút). */
+/** Nhịp tự kiểm lại công tắc tạm đóng (thầy mở lại ⇒ máy em tự vào trong khoảng 1 phút). Vòng chuẩn `batNhipBenVung`: lệch ±10 giây, tab ẩn không gọi, lỗi lùi dần. */
 export const TAM_DONG_KIEM_MS = 60_000
+/** Ngày bảo trì — CÙNG danh sách với server/src/ngay-bao-tri.ts (test giữ hai bên khớp): chỉ ngày này em không làm mà không bị thiệt (chuỗi, bình…). */
+export const NGAY_BAO_TRI_HS: readonly string[] = ['2026-10-27']
 /**
- * MÀN PHỦ TẠM ĐÓNG APP (thầy 27/10 tối, chữ thầy chốt NGUYÊN VĂN). Phủ cả Lộ trình khi `/hs/thuong` báo `tamDong`; tự đọc lại mỗi 60 giây và khi em quay lại
- * thẻ ⇒ thầy mở lại là tự vào. Màn làm kiểm tra / ca thi KHÔNG nằm trong Lộ trình nên không bị phủ; còn bài kiểm tra dở / ca đang mở ⇒ nút vào nộp tiếp.
+ * Chữ màn phủ theo NGÀY VN. Ngày bảo trì: nguyên văn thầy chốt 27/10. Ngày khác: không hứa «không mất chuỗi» (máy chủ chỉ miễn thiệt cho ngày trong
+ * NGAY_BAO_TRI — đóng sang ngày mới mà chưa thêm ngày vào danh sách thì lời hứa ấy SAI), không hứa giờ mở.
  */
-export function PhuTamDong(p: { onKiemLai: () => void; kiemDo?: () => void; caMo?: () => void }) {
-  const { onKiemLai } = p
+export function chuTamDong(ms: number): readonly [string, string] {
+  return NGAY_BAO_TRI_HS.includes(ngayVn(ms))
+    ? ['Tối nay các em không phải làm.', 'Ngày mai vào làm bình thường.']
+    : ['Các em chưa phải làm bài lúc này.', 'App mở lại các em vào làm tiếp bình thường.']
+}
+/** Đọc lại /hs/thuong rồi báo mọi chỗ đang hiện tổng quan (công tắc tắt ⇒ màn phủ tự gỡ). Trả `false` khi lỗi ⇒ vòng lùi dần. */
+const kiemLaiTamDong = (token: string) => layTongQuan(token).then((r) => { if (r.ok) baoMoi(DUONG.tongQuan, token); return r.ok })
+/**
+ * MÀN PHỦ TẠM ĐÓNG APP (thầy 27/10 tối). Phủ cả Lộ trình khi `/hs/thuong` báo `tamDong`; tự đọc lại theo vòng chuẩn (≈ 60 giây, dừng khi tab ẩn, lỗi lùi dần)
+ * và khi em quay lại thẻ ⇒ thầy mở lại là tự vào. Màn làm kiểm tra / ca thi KHÔNG nằm trong Lộ trình nên không bị phủ; còn bài kiểm tra dở / ca đang mở ⇒
+ * nút vào nộp tiếp.
+ */
+export function PhuTamDong(p: { token?: string; onKiemLai?: () => Promise<unknown> | unknown; kiemDo?: () => void; caMo?: () => void }) {
+  const [bay, datBay] = useState(() => Date.now())
+  const goi = useRef(p.onKiemLai)
+  goi.current = p.onKiemLai ?? (p.token ? () => kiemLaiTamDong(p.token!) : undefined)
   useEffect(() => {
-    const t = window.setInterval(onKiemLai, TAM_DONG_KIEM_MS)
-    const nhin = () => { if (document.visibilityState === 'visible') onKiemLai() }
-    document.addEventListener('visibilitychange', nhin)
-    return () => { window.clearInterval(t); document.removeEventListener('visibilitychange', nhin) }
-  }, [onKiemLai])
+    const nhip = batNhipBenVung(() => { datBay(Date.now()); return goi.current?.() }, { coSoMs: TAM_DONG_KIEM_MS, lechMs: 10_000, chayNgay: false })
+    const kich = () => nhip.kich()
+    document.addEventListener('visibilitychange', kich)
+    window.addEventListener('online', kich)
+    return () => { nhip.dung(); document.removeEventListener('visibilitychange', kich); window.removeEventListener('online', kich) }
+  }, [])
+  const [dong1, dong2] = chuTamDong(bay)
   // Phủ CẢ trang (gồm menu bên) ⇒ vẽ ra body; Lộ trình bị che bởi tấm khác (kiểm tra / ca thi / chặng: cổng đặt `inert` lên Lộ trình) ⇒ ẩn để em nộp cho xong.
   const moc = useRef<HTMLSpanElement>(null)
   const [biChe, datBiChe] = useState(false)
@@ -387,7 +406,7 @@ export function PhuTamDong(p: { onKiemLai: () => void; kiemDo?: () => void; caMo
     <div className="tdg-the">
       <Bi cam="ngu" size={120} />
       <h1 id="tdg-tieu">App đang bảo trì.</h1>
-      <p>Tối nay các em không phải làm.<br />Ngày mai vào làm bình thường.</p>
+      <p>{dong1}<br />{dong2}</p>
       {p.caMo && <button type="button" className="tdg-nut" onClick={p.caMo}>Vào ca kiểm tra</button>}
       {p.kiemDo && <button type="button" className="tdg-nut" onClick={p.kiemDo}>Làm tiếp Kiểm tra ôn tập</button>}
     </div>
@@ -403,7 +422,7 @@ export default function GacTamDong({ p, kiem }: { p: PropsHomNayCu; kiem?: TomTa
   const dong = !!t.du?.tamDong
   const { thuLai } = t
   useEffect(() => {
-    if (dong) return // đang phủ: PhuTamDong tự đọc lại
+    if (dong) return // đang phủ: PhuTamDong tự đọc lại (vòng chuẩn)
     const nhin = () => { if (document.visibilityState === 'visible') thuLai() }
     document.addEventListener('visibilitychange', nhin)
     return () => document.removeEventListener('visibilitychange', nhin)
@@ -414,7 +433,7 @@ export default function GacTamDong({ p, kiem }: { p: PropsHomNayCu; kiem?: TomTa
     h.dataset.trong = 'hs'
     return () => { delete h.dataset.trong }
   }, [dong])
-  return dong ? <PhuTamDong onKiemLai={thuLai} caMo={p.coCa ? p.onThi : undefined}
+  return dong ? <PhuTamDong token={p.token} caMo={p.coCa ? p.onThi : undefined}
     kiemDo={!p.coCa && kiem?.homNay && kiem.nopLuc === null && kiem.trangThai === 'can_lam' && kiem.daTra > 0 ? p.onKiemTra : undefined} /> : null
 }
 
@@ -536,7 +555,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     </>
   </header>
   // Thầy tạm đóng app (27/10): phủ cả Lộ trình; còn ca đang mở / bài kiểm tra dở ⇒ nút vào nộp cho xong (máy chủ không chặn các lệnh ấy).
-  if (tq?.tamDong) return <PhuTamDong onKiemLai={tqTai.thuLai} caMo={p.coCa ? p.onThi : undefined} kiemDo={!p.coCa && kiemLam && kiem!.daTra > 0 && p.onKiemTra ? p.onKiemTra : undefined} />
+  if (tq?.tamDong) return <PhuTamDong token={p.token} caMo={p.coCa ? p.onThi : undefined} kiemDo={!p.coCa && kiemLam && kiem!.daTra > 0 && p.onKiemTra ? p.onKiemTra : undefined} />
   // Một màn thưởng phạt đang mở (bấm bộ đếm / thẻ bên / ô Thành tích): thay nội dung mục, thanh trên + menu giữ nguyên; «Quay lại» về mục cũ.
   if (tp && p.token) return <div className="dm-khung" data-muc="thuong" data-so-menu={coThuong || undefined}>{tren}<main className="tp-cam">
     <Suspense fallback={<div className="tp-cam-cho" role="status" aria-busy="true" aria-label="Đang mở" />}>
