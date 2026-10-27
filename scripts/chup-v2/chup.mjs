@@ -388,6 +388,13 @@ const TON_CANH = [
 ]
 const DS_TON = [[390, 844, 'doc'], [360, 640, 'doc640']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TON_CANH.map(([t, m, ca, viec]) => [`ton-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
+// ═══ LUẬT BÌNH 27/10 (tiền tố "binh-"): Cửa hàng + Chuỗi ngày — giá 150 · mỗi tuần mua 1 bình; `&binh=da` ⇒ tuần này đã mua (nút xám + lý do). Không dấu «P».
+const BINH_CANH = [
+  ['cua-hang', 'hs-mot&tp=1', false, 'nut:245 tinh thể'], ['cua-hang-da', 'hs-mot&tp=1&binh=da', false, 'nut:245 tinh thể'],
+  ['chuoi', 'hs-mot&tp=1', true, 'nut:Chuỗi 12 ngày'], ['chuoi-da', 'hs-mot&tp=1&binh=da', true, 'nut:Chuỗi 12 ngày'],
+]
+const DS_BINH = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  BINH_CANH.map(([t, m, ca, viec]) => [`binh-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
 const DS_TPC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết THƯỞNG PHẠT GỘP 26/10
@@ -561,6 +568,7 @@ const DS = [
   ...DS_TN, // THÍ NGHIỆM GỌN 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_TON, // VIỆC TỒN 27/10
+  ...DS_BINH, // LUẬT BÌNH 27/10
   ...DS_NC, // NÂNG CẤP 27/10
   ...DS_LG, // LỘ TRÌNH GHIM 27/10
   ...DS_NB, // BẢNG + TẤM CHƯA TÍNH 27/10

@@ -533,6 +533,8 @@ function ManLam13() {
 // ═══ KIỂM GD MỚI 26/10: `lam13&lam=duo-xau` (dữ liệu xấu, gia/lam-bai-1210d.ts) cũng có phiên học sinh giả như `duo`.
 // GIÁM THỊ 27/10: `&gtloi=1` ⇒ ngẫu nhiên luôn 0: giám thị chắc chắn càu nhàu (câu đầu kho) để chụp và đo bong bóng không chồng chữ.
 if (LA_LAM13 && thamSo.get('gtloi') === '1') Math.random = () => 0
+// GIÁM THỊ NGƯỜI 27/10: `&gtdien=1` ⇒ lộ các giám thị đang sống ra window.__gt để máy quay điều khiển trạng thái (video quay từ bản build thật).
+if (LA_LAM13 && thamSo.get('gtdien') === '1') void import('../../src/components/giam-thi/giam-thi-nguoi').then((m) => { (window as unknown as { __gt: unknown }).__gt = m.GT_DANG_SONG })
 if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ hết KIỂM GD MỚI 26/10
 if (LA_LAM13 && ['duo', 'duo-nc', 'duo-bang', 'duo-pt', 'duo-tn'].includes(thamSo.get('lam') ?? '')) try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }

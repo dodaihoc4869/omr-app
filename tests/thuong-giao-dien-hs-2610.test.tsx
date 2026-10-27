@@ -166,12 +166,17 @@ describe('các màn (đúng số bản vẽ)', () => {
     const c = ve(<ManChuoiNgay token={TK} />)
     expect(c.querySelector('#tp-so-chuoi')?.textContent).toBe('12')
     expect([...c.querySelectorAll('.tp-luat li span')].map((x) => x.textContent)).toEqual([
-      'Mỗi ngày xong ít nhất 1 chặng để giữ chuỗi.', 'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang được tối đa 2 bình.', 'Hết bình? Học bù 2 chặng trong 24 giờ là cứu được chuỗi.'])
+      'Mỗi ngày xong ít nhất 1 chặng để giữ chuỗi.', 'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang tối đa 2 bình, mỗi tuần mua được 1 bình.', 'Hết bình? Học bù 2 chặng trong 24 giờ là cứu được chuỗi.'])
+    expect(c.textContent).toMatch(/150 tinh thể · mỗi tuần mua 1 bình/)
+    expect(c.textContent).not.toMatch(/thứ Hai được tặng|tặng 1 bình mỗi|vắng có phép/)
     expect(c.textContent).toMatch(/đang mang 1\/2/)
     expect(c.textContent).toMatch(/Còn 18 ngày tới mốc 30/)
     expect(c.textContent).toMatch(/Đang cược · ngày 3\/7/)
     expect(c.querySelectorAll('.tp-tuan7 .n').length).toBe(7)
-    expect(c.querySelector('.tp-tuan7 .n[data-k="phep"]')?.textContent).toBe('P')
+    // Luật 27/10 bỏ «vắng có phép giữ chuỗi»: ngày cũ máy chủ còn gửi 'phep' vẽ như ngày được đỡ, không còn dấu «P».
+    expect(c.querySelector('.tp-tuan7 .n[data-k="phep"]')).toBeNull()
+    expect([...c.querySelectorAll('.tp-tuan7 .n')].some((x) => x.textContent === 'P')).toBe(false)
+    expect(c.querySelector('.tp-chu-giai')?.textContent).not.toMatch(/phép/)
     expect(c.querySelector('.tp-tuan7 .n[data-nay]')?.getAttribute('data-k')).toBe('hoc')
   })
   it('cứu chuỗi (tp-6): vừa tắt 0/2 + đồng hồ; cứu xong 2/2 ⇒ sống lại', () => {
@@ -219,10 +224,11 @@ describe('các màn (đúng số bản vẽ)', () => {
     c = ve(<ManNhiemVu token={TK} />)
     expect(screen.getByRole('button', { name: /Mở rương · \+15/ })).toBeTruthy()
   })
-  it('cửa hàng (tp-10): 245 tinh thể, mua bình 50, cược ngày 3/7, thăng hoa + cách kiếm; công tắc tắt ⇒ ẩn khối', () => {
+  it('cửa hàng (tp-10): 245 tinh thể, mua bình 150, cược ngày 3/7, thăng hoa + cách kiếm; công tắc tắt ⇒ ẩn khối', () => {
     let c = ve(<ManCuaHang token={TK} />)
     expect(c.querySelector('.tp-so-du .tp-so')?.textContent).toBe('245')
-    expect(screen.getByRole('button', { name: 'Mua 1 bình · 50 tinh thể' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Mua 1 bình · 150 tinh thể' })).toBeTruthy()
+    expect(c.textContent).toMatch(/150 tinh thể · mỗi tuần mua 1 bình/)
     expect(c.textContent).toMatch(/Đang cược · ngày 3\/7/)
     expect(screen.getByRole('heading', { name: 'Thăng hoa là gì?' })).toBeTruthy()
     expect(c.textContent).toMatch(/Thử thách Kim cương\+40/)
@@ -230,6 +236,18 @@ describe('các màn (đúng số bản vẽ)', () => {
     c = ve(<ManCuaHang token={TK} />)
     expect(screen.queryByRole('heading', { name: 'Thăng hoa là gì?' })).toBeNull()
     expect(c.textContent).not.toMatch(/Lên hạng giải tuần|Thử thách Kim cương/)
+  })
+  it('cửa hàng + chuỗi ngày: tuần này đã mua bình ⇒ nút xám + lý do «Tuần này em đã mua · mua tiếp từ thứ Hai» (luật 27/10)', () => {
+    datMayChu(M.tongQuanGia({ binh: { gia: 150, toiDaTuan: 1, daMuaTuan: true, muaTiepTu: '2026-11-02' } }))
+    let c = ve(<ManCuaHang token={TK} />)
+    const nut = screen.getByRole('button', { name: 'Tuần này em đã mua' }) as HTMLButtonElement
+    expect(c.textContent).toMatch(/Tuần này em đã mua · mua tiếp từ thứ Hai/)
+    expect(nut.disabled).toBe(true); expect(nut.getAttribute('data-sac')).toBe('tat')
+    expect(screen.queryByRole('button', { name: /Mua 1 bình/ })).toBeNull()
+    cleanup()
+    c = ve(<ManChuoiNgay token={TK} />)
+    expect(c.querySelector('.tp-khe')?.textContent).toMatch(/Tuần này em đã mua · mua tiếp từ thứ Hai/)
+    expect(c.querySelector('.tp-khe button')).toBeNull()
   })
   it('thăng hoa (tp-11): 12 tinh thể · trước 120 · còn 108', () => {
     const c = ve(<ManThangHoa tb={tb(M.TB.thangHoa)} onDong={() => {}} />)
@@ -291,14 +309,16 @@ describe('các màn (đúng số bản vẽ)', () => {
     const c = ve(<ManMocDoi tb={tb(M.TB.mocDoi)} tq={tq()} onDong={() => {}} />)
     expect(screen.getByRole('heading', { name: 'Chuỗi đôi 7 ngày!' })).toBeTruthy(); expect(c.textContent).toMatch(/\+10 tinh thể cho mỗi bạn/)
   })
-  it('bình đã đỡ (tp-18) + vắng có phép «P»', () => {
+  it('bình đã đỡ (tp-18); không còn «vắng có phép» (luật 27/10)', () => {
     const t = tq({ chuoiNgay: { so: 12, giuChuoi: 0, sucChua: 2, lich7: M.lich7(['hoc', 'hoc', 'hoc', 'hoc', 'hoc', 'binh', 'tat']) } })
     let c = ve(<ManBinhDaDo tb={tb(M.TB.binhDo)} tq={t} onDong={() => {}} />)
     expect(screen.getByRole('heading', { name: 'Hôm qua bình giữ chuỗi đã đỡ cho em' })).toBeTruthy()
     expect(c.textContent).toMatch(/Chuỗi vẫn 12 ngày/); expect(c.textContent).toMatch(/Còn 0\/2 bình/)
     cleanup()
+    // Luật 27/10: không còn màn «vắng có phép» — thông báo cũ có cờ phép vẫn chỉ nói bình đỡ, không chữ «vắng có phép» / «P».
     c = ve(<ManBinhDaDo tb={tb(M.TB.phep)} tq={tq()} onDong={() => {}} />)
-    expect(screen.getByRole('heading', { name: 'Ngày vắng có phép — chuỗi vẫn giữ' })).toBeTruthy(); expect(c.textContent).toMatch(/không tốn bình/)
+    expect(screen.getByRole('heading', { name: 'Hôm qua bình giữ chuỗi đã đỡ cho em' })).toBeTruthy(); expect(c.textContent).not.toMatch(/có phép|không tốn bình/)
+    expect(c.textContent).toMatch(/150 tinh thể · mỗi tuần mua 1 bình/)
   })
   it('mốc chuỗi · huy hiệu mới · cược thua · gõ cửa; thẻ bên Lộ trình', () => {
     ve(<ManMocChuoi tb={tb(M.TB.mocChuoi)} tq={tq()} onDong={() => {}} />); expect(screen.getByRole('heading', { name: 'Chuỗi 7 ngày!' })).toBeTruthy(); cleanup()

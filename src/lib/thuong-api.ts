@@ -37,6 +37,8 @@ export interface TongQuanThuong {
   giai?: GiaiTom
   thongBao: ThongBao[]
   cuoc?: CuocDang | null
+  /** Luật bình 27/10: giá + đã mua bình tuần này chưa (mỗi tuần mua 1 bình). Máy chủ cũ không gửi ⇒ vắng (giá mặc định GIA_BINH). */
+  binh?: { gia: number; daMuaTuan: boolean; muaTiepTu?: string }
 }
 export interface DongGiai { thuHang: number; ten: string; lop: string; nguyenTu: number; laEm: boolean }
 export interface BangGiai { hang: HangGiai; hetHanGiay?: number; nhom: DongGiai[]; len: number; roi: number; /** thầy tắt giải tuần ⇒ màn ẩn */ tat?: true }
@@ -136,6 +138,7 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
   const cn = docChuoiNgay(o.chuoiNgay); if (cn) kq.chuoiNgay = cn
   const nv = mang(o.nhiemVu, docNhiemVu); if (nv?.length) kq.nhiemVu = nv
   const r = dt(o.ruong), rt = soNg(r?.thuong); if (r && rt !== undefined) kq.ruong = { mo: r.mo === true, thuong: rt }
+  const b = dt(o.binh), bg = soNg(b?.gia), bt = chu(b?.muaTiepTu); if (b && bg) kq.binh = { gia: bg, daMuaTuan: b.daMuaTuan === true, ...(bt ? { muaTiepTu: bt } : {}) }
   const g = dt(o.giai), th = soNg(g?.thuHang), sn = soNg(g?.soNguoi), hh = soNg(g?.hetHanGiay)
   if (g && laHang(g.hang) && th && sn && hh !== undefined) kq.giai = { hang: g.hang, thuHang: th, soNguoi: sn, hetHanGiay: hh }
   if (o.cuoc === null) kq.cuoc = null
@@ -327,7 +330,13 @@ export const MOC_CHUOI = [
 ] as const
 export const MOC_DOI = [{ so: 7, tt: 10 }, { so: 30, tt: 30 }, { so: 100, tt: 100 }] as const
 export const THUONG_LEN_HANG: Record<HangGiai, number> = { sat: 0, dong: 20, bac: 30, vang: 40, bachkim: 50, kimcuong: 60 }
-export const GIA_BINH = 50
+/** Giá bình giữ chuỗi (luật 27/10: 150, mỗi tuần mua 1 bình). Máy chủ gửi `binh.gia` thì dùng số đó. */
+export const GIA_BINH = 150
+export const giaBinh = (tq?: Pick<TongQuanThuong, 'binh'> | null): number => tq?.binh?.gia ?? GIA_BINH
+/** Chữ cửa hàng / chuỗi ngày: giá + hạn mua tuần. */
+export const chuGiaBinh = (gia: number): string => `${gia} tinh thể · mỗi tuần mua 1 bình`
+/** Lý do nút mua xám khi tuần này đã mua. */
+export const CHU_DA_MUA_TUAN = 'Tuần này em đã mua · mua tiếp từ thứ Hai'
 export const DAT_CUOC = 50
 /** «còn 2 ngày 5 giờ» từ số giây còn lại. */
 export function chuConLai(giay: number): string {

@@ -1,5 +1,12 @@
 # Luật thưởng phạt kiểu Duolingo, app học sinh. Thầy CHỐT 26/10
 
+> **Sửa 27/10 (thầy: «Bạn phải tính toán lại để 1 tuần kiếm được 1 bình thôi», «Bỏ phần thầy duyệt đi»):**
+> - Bình giữ chuỗi giá **150 tinh thể**, mỗi em **mua tối đa 1 bình / tuần** (giờ VN, thứ Hai → Chủ nhật). **Bỏ tặng bình mỗi thứ Hai.**
+> - **Bỏ «ngày vắng có phép giữ chuỗi»**: ngày vắng có phép tính như ngày thường (không học ⇒ dùng bình nếu có; hết bình ⇒ chuỗi tắt, vẫn cứu được bằng 2 chặng bù). Áp cho cả chuỗi cá nhân lẫn lửa đôi. Dữ liệu điểm danh giữ nguyên.
+> - Giữ: mang tối đa 2 (mốc 100 ngày: 3); mốc 30 ngày tặng 1 bình; cứu chuỗi.
+> - Luật mới áp từ 27/10; ngày đã qua tính như cũ. Thầy duyệt đặt lại số bình của mọi em về 0 sau khi luật mới lên bản sống (tinh thể, nguyên tử, chuỗi giữ nguyên).
+> - Mô phỏng (12 tuần, 200 em mỗi kiểu, đúng luật thưởng trong mã): em chăm 6 ngày / tuần kiếm ≈ 279 tinh thể / tuần ⇒ mua đúng 1 bình / tuần; em vừa 4 ngày ≈ 107 / tuần ⇒ 0,67 bình / tuần; em lười 2 ngày ≈ 10 / tuần ⇒ 0 bình.
+
 Thầy duyệt nguyên tắc: «Chốt thưởng phạt, vẽ đủ các màn cho tôi duyệt».
 
 Nguyên tắc chung:
@@ -41,7 +48,7 @@ Chỉ khi câu «được tính», tức Mức làm không phải Bấm vội / 
 ## Chuỗi ngày
 - Một ngày được tính khi xong ≥ 1 bài, hoặc ≥ 1 lượt tự sửa xong (trùng B3 của Code app 4).
 - Mốc 7 / 30 / 100 / 365 ngày: huy hiệu + tinh thể (10 / 30 / 100 / 365).
-- **Bình giữ chuỗi**: mang tối đa 2. Hệ thống tặng 1 bình mỗi tuần (cộng dồn tới 2); mua thêm 50 tinh thể. Bỏ một ngày thì tự dùng 1 bình.
+- **Bình giữ chuỗi**: mang tối đa 2. Mua 150 tinh thể, mỗi tuần mua tối đa 1 bình (không còn tặng mỗi tuần). Bỏ một ngày thì tự dùng 1 bình.
 - **Phạt — chuỗi tắt**: bỏ một ngày mà không có bình thì chuỗi về 0.
 - **Cứu chuỗi**: trong 24 giờ sau khi tắt, học bù 2 bài (ngoài bài của ngày hôm đó) thì chuỗi sống lại. Không mất tinh thể.
 
@@ -53,7 +60,7 @@ Chỉ khi câu «được tính», tức Mức làm không phải Bấm vội / 
   - lên hạng giải: +20 · 30 · 40 · 50 · 60 (theo hạng mới);
   - Thử thách Kim cương +40.
 - **Tiêu**:
-  - Bình giữ chuỗi 50;
+  - Bình giữ chuỗi 150, mỗi tuần mua tối đa 1 bình;
   - Cược chuỗi 50.
 - **Phạt — «Thăng hoa»**: 2 ngày liền không xong bài nào và không có bình giữ chuỗi thì 10% số tinh thể thăng hoa mất (tối thiểu 5, tối đa 50). Lần mở app kế tiếp hiện thông báo và Bi buồn.
 
@@ -134,17 +141,15 @@ Mốc chuỗi · hạng giải đã đạt · 10/50 bài hoàn hảo · Thử th
 
 ### Ba câu luật chuỗi học sinh đọc là hiểu (in đúng ở màn Chuỗi ngày)
 1. «Mỗi ngày học xong ít nhất 1 bài để ngọn lửa cháy tiếp.»
-2. «Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang được tối đa 2 bình.»
+2. «Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang tối đa 2 bình, mỗi tuần mua được 1 bình.»
 3. «Hết bình? Học bù 2 bài trong 24 giờ là cứu được chuỗi.»
 
 ### Bình giữ chuỗi (giống Streak Freeze của Duolingo)
 - Mang tối đa 2 bình. Mốc 100 ngày nâng lên mang được 3 bình.
-- Có bình bằng ba cách:
-  - tặng 1 bình mỗi thứ Hai, nếu chưa đầy;
+- Có bình bằng hai cách (27/10 bỏ tặng thứ Hai):
   - mốc 30 ngày tặng 1 bình;
-  - mua bằng tinh thể.
+  - mua bằng tinh thể: 150, tối đa 1 bình / tuần.
 - Tự dùng khi em lỡ một ngày. Sáng hôm sau mở app thấy thông báo «Hôm qua bình giữ chuỗi đã đỡ cho em — chuỗi vẫn 12 ngày». Hình: nắp bình đóng lại, ô ngày đó trên lịch màu xanh băng.
-- **Ngày vắng có phép** (thầy duyệt, dữ liệu «vắng có phép» đã có): tự giữ chuỗi miễn phí, không tốn bình. Ô ngày đó trên lịch có dấu «P».
 
 ### Cứu chuỗi (giống Earn back / Streak repair của Duolingo, nhưng không tốn tiền)
 - Đã hết bình mà lỡ ngày thì chuỗi tắt.
@@ -153,7 +158,7 @@ Mốc chuỗi · hạng giải đã đạt · 10/50 bài hoàn hảo · Thử th
 
 ### Chuỗi đôi — «Học cùng bạn» (giống Friend Streak của Duolingo)
 - Em mời tối đa 3 bạn trong trung tâm, tìm theo tên hoặc số báo danh. Bạn phải bấm đồng ý.
-- **Tăng chuỗi:** ngọn lửa đôi chỉ tăng khi CẢ HAI cùng xong ≥ 1 bài trong ngày. Một bạn lỡ thì chuỗi đôi tắt. Bình giữ chuỗi của bạn nào thì bạn ấy tự dùng để đỡ ngày lỡ của mình; ngày vắng có phép cũng được đỡ.
+- **Tăng chuỗi:** ngọn lửa đôi chỉ tăng khi CẢ HAI cùng xong ≥ 1 bài trong ngày. Một bạn lỡ thì chuỗi đôi tắt. Bình giữ chuỗi của bạn nào thì bạn ấy tự dùng để đỡ ngày lỡ của mình.
 - **«Gõ cửa»:** em xong bài mà bạn chưa thì bấm gõ cửa. Bạn nhận một lời nhắc trong app, mỗi ngày tối đa 1 lần cho mỗi bạn.
 - **Mốc chuỗi đôi 7 / 30 / 100:** cả hai cùng nhận huy hiệu đôi + tinh thể (10 / 30 / 100).
 - **Riêng tư:** em chỉ thấy bạn «đã học hôm nay / chưa» và số chuỗi đôi. KHÔNG thấy điểm, nguyên tử hay nhãn gì của bạn.

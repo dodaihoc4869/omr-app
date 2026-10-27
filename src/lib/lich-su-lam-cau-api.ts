@@ -2,8 +2,10 @@
 // làm mỗi câu, mọi thứ về học sinh đó"). Chỉ tệp này biết lệnh máy chủ `POST /gv/lich-su-lam-cau {sbd, gioiHan?}`; hình dạng trả về là hợp đồng
 // dùng chung `server/src/lich-su-lam-cau-kieu.ts` (làn máy chủ viết lệnh, app CHỈ ĐỌC). Không ném lỗi: trả `KetQuaLenh` với MỘT câu nói thật.
 // Trường thiếu / sai kiểu ⇒ bỏ dòng ấy (không bịa số); thiếu cả khung ⇒ "không đọc được".
-import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
+import type { KetQuaLenh } from './goi-lenh-thay'
 import type { CauEmSai, KetQuaLichSuLamCau, LanLamCau, MucLamLuot, NguonGiay, TongLichSuLamCau, TongMucLam } from '../../server/src/lich-su-lam-cau-kieu'
+// 27/10 tốc độ: cổng phụ huynh nhập tệp này chỉ để dùng hàm đọc thuần ⇒ `goiLenh` (mảnh DesignSystem ~27 KB nén) nạp LƯỜI lúc gọi lệnh thầy, không cõng vào /ph.
+const goiLenh: typeof import('./goi-lenh-thay').goiLenh = (...a) => import('./goi-lenh-thay').then((m) => m.goiLenh(...a))
 
 export type { CauEmSai, KetQuaLichSuLamCau, LanLamCau, MucLamLuot, NguonGiay, TongLichSuLamCau, TongMucLam }
 

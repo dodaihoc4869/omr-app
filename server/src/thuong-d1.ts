@@ -2,7 +2,7 @@
 //
 //   POST /hs/thuong                 tổng quan (MỘT lô đọc song song, 0 vòng chờ nối tiếp; trả thưởng mới đạt chạy SAU phản hồi qua ctx.waitUntil)
 //   POST /hs/thuong/mo-ruong        mở rương ngày (+15) khi đủ 3 ô — khoá (em, ngày)
-//   POST /hs/thuong/mua-binh        −50 tinh thể + gọi hàm cộng bình của B3 (CÙNG lô) — khoá (em, ngày)
+//   POST /hs/thuong/mua-binh        −150 tinh thể + gọi hàm cộng bình của B3 — tối đa 1 bình / tuần VN (luật 27/10), khoá (em, ngày)
 //   POST /hs/thuong/cuoc {dat: 50}  cược chuỗi 7 ngày — khoá (em, ngày) + chỉ mục duy nhất «một lượt đang chạy»
 //   POST /hs/thuong/da-xem {ma}     đánh dấu thông báo đã hiện
 //   POST /hs/huy-hieu               danh sách huy hiệu (trao bù huy hiệu vừa đạt sau phản hồi)
@@ -17,8 +17,9 @@ import type { D1PreparedStatement, Env, ExecutionContext } from './kieu'
 import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { viecPhu } from './viec-phu'
 import {
-  CUOC_SO_NGAY, GIO_CU_DEM, HUY_HIEU, KHOA_CONG_TAC, MA_TT, SO_LIEU_RONG, THANG_HOA_SO_NGAY, TT_CUOC_DAT, TT_CUOC_THANG, TT_BINH_GIU_CHUOI, TT_MOC_CHUOI,
-  TT_MUC_TIEU_NGAY, TT_RUONG, chonNhiemVu, congNgayTt, congTacTuDong, datHuyHieu, gioVnCua, mucTieuBai, ngayVnTt, nhiemVuCuaNgay, soThangHoa,
+  BINH_MUA_TOI_DA_TUAN, CUOC_SO_NGAY, GIO_CU_DEM, HAU_TO_KHOA_BINH_TUAN, HUY_HIEU, KHOA_CONG_TAC, MA_TT, SO_LIEU_RONG, THANG_HOA_SO_NGAY, TT_CUOC_DAT, TT_CUOC_THANG,
+  TT_BINH_GIU_CHUOI, TT_MOC_CHUOI, TT_MUC_TIEU_NGAY, TT_RUONG, chonNhiemVu, congNgayTt, congTacTuDong, datHuyHieu, gioVnCua, mucTieuBai, ngayVnTt, nhiemVuCuaNgay,
+  soThangHoa, tuanMuaBinh,
   type CongTac, type KhoaCongTac, type MauNhiemVu, type MaNhiemVu, type NhiemVuEm, type SoLieuNgay,
 } from './thuong-luat'
 import { CHUA_TINH_BINH, cauNoiChuoi, congBinhGiuChuoi } from './thuong-cau-noi-chuoi'
@@ -32,6 +33,19 @@ const so = (v: unknown): number => Number(v) || 0
 const chu = (v: unknown): string => (v === null || v === undefined ? '' : String(v))
 const json = (v: unknown): string => JSON.stringify(v)
 const docJson = <T,>(v: unknown, mac: T): T => { try { return v === null || v === undefined ? mac : (JSON.parse(String(v)) as T) } catch { return mac } }
+
+/**
+ * Số bình em ĐÃ MUA (luật 27/10) trong tuần VN chứa `ngay`, trừ lượt đã hoàn: một biểu thức con theo chỉ mục UNIQUE(sbd, khoa_yeu_cau) (khoảng khoá của tuần,
+ * hậu tố `binh-w`). Khoá giá cũ `tt|<ngày>|binh` không tính ⇒ bình mua trước luật mới không chặn tuần này.
+ */
+export function sqlBinhDaMuaTuan(sbd: string, ngay: string): DieuKienSql {
+  const t = tuanMuaBinh(ngay)
+  return {
+    sql: `(SELECT COUNT(CASE WHEN ma_mon = '${MA_TT.binh}' THEN 1 END) - COUNT(CASE WHEN ma_mon = '${MA_TT.binhHoan}' THEN 1 END) FROM vang_so
+      WHERE sbd = ? AND khoa_yeu_cau >= ? AND khoa_yeu_cau < ? AND substr(khoa_yeu_cau, 15, ${HAU_TO_KHOA_BINH_TUAN.length}) = '${HAU_TO_KHOA_BINH_TUAN}')`,
+    tham: [sbd, t.tu, t.toi],
+  }
+}
 
 // --- Lệnh ghi dùng chung (tác tử giải tuần / Code app 4 cũng gọi) ---------------------------------------
 
@@ -99,8 +113,9 @@ function lenhSoLieuNgay(env: Env, sbd: string, ngay: string): D1PreparedStatemen
         (SELECT json_group_array(khoa_yeu_cau) FROM vang_so WHERE sbd = ? AND khoa_yeu_cau LIKE ?) AS da_tra,
         (SELECT thuong FROM ruong_ngay WHERE em = ? AND ngay = ?) AS ruong,
         (SELECT COUNT(DISTINCT qid) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'chua_loi' AND ket_qua = 1) AS sua_loi,
-        (SELECT muc FROM goi_bai_7_muc_ngay WHERE sbd = ? AND ngay = ?) AS muc`)
-      .bind(sbd, ngay, sbd, sbd, `tt|${ngay}|%`, sbd, ngay, sbd, ngay, sbd, ngay),
+        (SELECT muc FROM goi_bai_7_muc_ngay WHERE sbd = ? AND ngay = ?) AS muc,
+        ${sqlBinhDaMuaTuan(sbd, ngay).sql} AS binh_tuan`)
+      .bind(sbd, ngay, sbd, sbd, `tt|${ngay}|%`, sbd, ngay, sbd, ngay, sbd, ngay, ...sqlBinhDaMuaTuan(sbd, ngay).tham),
     env.DB.prepare('SELECT phien, so_cau, so_dung, chuoi_max, kho_dung, hoan_hao, luc FROM thuong_bai_xong WHERE em = ? AND ngay = ?').bind(sbd, ngay),
     env.DB.prepare('SELECT ma, ten, can, thuong, thu_tu, xong_luc FROM nhiem_vu_ngay WHERE em = ? AND ngay = ? ORDER BY thu_tu').bind(sbd, ngay),
   ]
@@ -117,6 +132,8 @@ interface NgayEm {
   mau: MauNhiemVu[]
   daSinh: boolean
   nhiemVu: NhiemVuEm[]
+  /** Số bình đã mua tuần này (luật 27/10, tối đa BINH_MUA_TOI_DA_TUAN). */
+  binhTuan: number
   mucTieu: MucTieuNgay
 }
 
@@ -162,7 +179,7 @@ function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknow
   }
   return {
     ngay, nguyenTu: so(t.nt), tinhTheSo: so(t.tt), daTra: new Set(docJson<string[]>(t.da_tra, [])), ruongMo: t.ruong !== null && t.ruong !== undefined,
-    soLieu, mucCau, mau, daSinh: mau.length > 0, nhiemVu, mucTieu,
+    soLieu, mucCau, mau, daSinh: mau.length > 0, nhiemVu, binhTuan: Math.max(0, so(t.binh_tuan)), mucTieu,
   }
 }
 
@@ -234,6 +251,8 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
     chuoiNgay,
     nhiemVu: d.nhiemVu,
     ruong: { mo: d.ruongMo, thuong: TT_RUONG },
+    // CHỈ-THÊM 27/10 (luật bình mới): giá + hạn mua 1 bình / tuần — giao diện xám nút và nói lý do khi `daMuaTuan`.
+    binh: { gia: TT_BINH_GIU_CHUOI, toiDaTuan: BINH_MUA_TOI_DA_TUAN, daMuaTuan: d.binhTuan >= BINH_MUA_TOI_DA_TUAN, muaTiepTu: tuanMuaBinh(ngay).muaTiepTu },
     // Khối `giai` (phần B, tomTatGiaiEm): {hang, thuHang, soNguoi, hetHanGiay} | null (công tắc tắt / em chưa vào bảng tuần này) ⇒ giao diện ẩn thẻ.
     giai,
     thongBao: ((kq[4]?.results ?? []) as Dong[]).map((r) => ({ ma: chu(r.ma), loai: chu(r.loai), duLieu: docJson<unknown>(r.du_lieu, {}) })),
@@ -266,6 +285,8 @@ export async function hsMoRuong(env: Env, b: Dong, nowMs: number = Date.now()): 
 
 // --- POST /hs/thuong/mua-binh --------------------------------------------------------------------------
 
+export const LOI_DA_MUA_TUAN = 'Tuần này em đã mua · mua tiếp từ thứ Hai'
+
 export async function hsMuaBinh(env: Env, b: Dong, nowMs: number = Date.now()): Promise<Dong> {
   const { sbd: sbdKy, xong } = await gameIdentityHaiBuoc(env, b)
   const cn = cauNoiChuoi()
@@ -274,26 +295,31 @@ export async function hsMuaBinh(env: Env, b: Dong, nowMs: number = Date.now()): 
   const c = await chuoiSom
   // Chuỗi ngày chưa mở cho em (cờ B3 tắt) ⇒ chưa bán bình, KHÔNG trừ tinh thể.
   if (!c) return { ok: false, error: 'Bình giữ chuỗi sắp mở, em chờ thêm ít hôm nhé.' }
-  if (c.giuChuoi >= c.sucChua) return { ok: false, error: `Em đang mang đủ ${c.sucChua} bình rồi.` }
+  if (c.giuChuoi >= c.sucChua) return { ok: false, ma: 'day_binh', error: `Em đang mang đủ ${c.sucChua} bình rồi.` }
   const ngay = ngayVnTt(nowMs)
   const luc = new Date(nowMs).toISOString()
-  const khoa = `tt|${ngay}|binh`
-  // Bước 1 (một lô): trừ 50 (chỉ khi đủ số dư; khoá theo ngày ⇒ bấm lặp không trừ đôi) + đọc số dư sau trừ.
+  const khoa = `tt|${ngay}|${HAU_TO_KHOA_BINH_TUAN}`
+  const tuan = sqlBinhDaMuaTuan(sbd, ngay)
+  const muaTiepTu = tuanMuaBinh(ngay).muaTiepTu
+  // Bước 1 (một lô): trừ giá CHỈ khi đủ số dư VÀ tuần này chưa mua (luật 27/10: 1 bình / tuần); khoá theo ngày ⇒ bấm lặp không trừ đôi. Đọc số dư + số đã mua tuần.
   const r = await env.DB.batch([
-    lenhTruTinhThe(env, sbd, { khoa, so: TT_BINH_GIU_CHUOI, maMon: MA_TT.binh, luc }),
-    env.DB.prepare('SELECT COALESCE(SUM(so_vang), 0) AS v, EXISTS (SELECT 1 FROM vang_so WHERE sbd = ? AND khoa_yeu_cau = ?) AS da_mua FROM vang_so WHERE sbd = ?').bind(sbd, khoa, sbd),
+    lenhTruTinhThe(env, sbd, { khoa, so: TT_BINH_GIU_CHUOI, maMon: MA_TT.binh, luc }, { sql: `${tuan.sql} < ?`, tham: [...tuan.tham, BINH_MUA_TOI_DA_TUAN] }),
+    env.DB.prepare(`SELECT COALESCE(SUM(so_vang), 0) AS v, ${tuan.sql} AS da_tuan FROM vang_so WHERE sbd = ?`).bind(...tuan.tham, sbd),
   ])
   const cuoi = (r[1]?.results?.[0] ?? {}) as Dong
   if (!Number(r[0]?.meta?.changes ?? 0)) {
-    return so(cuoi.da_mua) ? { ok: false, error: 'Hôm nay em đã mua một bình rồi.', tinhThe: so(cuoi.v) } : { ok: false, error: `Em cần ${TT_BINH_GIU_CHUOI} tinh thể để mua bình.`, tinhThe: so(cuoi.v) }
+    if (so(cuoi.da_tuan) >= BINH_MUA_TOI_DA_TUAN) return { ok: false, ma: 'da_mua_tuan', error: LOI_DA_MUA_TUAN, muaTiepTu, tinhThe: so(cuoi.v) }
+    if (so(cuoi.v) < TT_BINH_GIU_CHUOI) return { ok: false, ma: 'thieu_tinh_the', error: `Em cần ${TT_BINH_GIU_CHUOI} tinh thể để mua bình.`, tinhThe: so(cuoi.v) }
+    return { ok: false, ma: 'thu_lai', error: 'Chưa mua được bình, em thử lại vào ngày mai nhé.', tinhThe: so(cuoi.v) }
   }
-  // Bước 2: hàm cộng bình của B3 (id = khoá giao dịch ví ⇒ gọi lại không cộng đôi). Ghi lỗi ⇒ hoàn đúng số đã trừ (khoá hoàn riêng, không hoàn đôi).
+  // Bước 2: hàm cộng bình của B3 (id = khoá giao dịch ví ⇒ gọi lại không cộng đôi). Ghi lỗi ⇒ hoàn đúng số đã trừ (khoá hoàn riêng, không hoàn đôi; lượt hoàn
+  // trừ khỏi số đã mua tuần ⇒ từ hôm sau em mua lại được trong tuần).
   const binh = await congBinhGiuChuoi(env, sbd, `${sbd}|${khoa}`, nowMs)
   if (!binh.ok) {
     await lenhCongTinhThe(env, sbd, { khoa: `${khoa}|hoan`, so: TT_BINH_GIU_CHUOI, maMon: MA_TT.binhHoan, luc }).run().catch(() => null)
-    return { ok: false, error: 'Chưa mua được bình, em thử lại sau ít phút nhé.', tinhThe: so(cuoi.v) + TT_BINH_GIU_CHUOI }
+    return { ok: false, ma: 'thu_lai', error: 'Chưa mua được bình, tinh thể đã hoàn lại. Em thử lại vào ngày mai nhé.', tinhThe: so(cuoi.v) + TT_BINH_GIU_CHUOI }
   }
-  return { ok: true, tinhThe: so(cuoi.v), gia: TT_BINH_GIU_CHUOI, giuChuoi: Math.min(c.sucChua, c.giuChuoi + 1), sucChua: c.sucChua }
+  return { ok: true, tinhThe: so(cuoi.v), gia: TT_BINH_GIU_CHUOI, giuChuoi: Math.min(c.sucChua, c.giuChuoi + 1), sucChua: c.sucChua, daMuaTuan: true, muaTiepTu }
 }
 
 // --- POST /hs/thuong/cuoc ------------------------------------------------------------------------------
