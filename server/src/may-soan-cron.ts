@@ -20,6 +20,7 @@
 //     `noi_dung` / `tung_pa[X].vi_sao`) là CHỮ TỰ DO vẫn tính ra đáp án cũ — chỉ đổi `dap_an` thì lời giải cũ tự mâu thuẫn. Chỉ bật khi cờ `tuSuaDapAn:true`,
 //     và lượt đó KHÔNG có chặng kiểm tra cá nhân nào đang mở (đếm theo đúng điều kiện cổng phát hành; lỗi đếm ⇒ coi như có, đóng cửa).
 //   · Lỗi bất kỳ chỉ ghi log + trạng thái (ly_do do cron tự viết, KHÔNG chép lý do / giá trị từng câu — có thể chứa đáp án; repo công khai).
+//     Ngoại lệ duy nhất (27/10): lỗi 429/503 ghi ≤ 50 ký tự CHỮ CỦA GOOGLE (số đo hạn mức / giới hạn / model) để biết hết hạn mức ngày hay phút.
 import type { Env } from './kieu'
 import { docCauHinhDem, dbGoc } from './cau-hinh-dem'
 
@@ -133,11 +134,16 @@ export function tomLoiHanMuc(ketQua: readonly Obj[]): { chu: string; ngay: boole
     const h = /\bHTTP (\d{3})\b/.exec(ly)?.[1]
     if (!h) continue
     const q = /\[quota=([\w?-]+);/.exec(ly)?.[1]
-    const ten = `${h}${q && q !== '?' ? ` ${q}` : ''}`
+    // Không có mã hạn mức ⇒ đọc từ CHỮ CỦA GOOGLE (chỉ số đo / giới hạn / model; lý do lỗi gọi không chứa chữ câu).
+    const metric = /metric: [\w./-]*?([\w-]+)(?=[,\s])/.exec(ly)?.[1]
+    const han = /limit: (\d+)/.exec(ly)?.[1]
+    const mod = /model: ([\w.-]+)/.exec(ly)?.[1]
+    const tom = h !== '429' && h !== '503' ? '' : metric ? `${metric}${han ? ` limit ${han}` : ''}${mod ? ` ${mod}` : ''}` : ly.replace(/^.*?\bHTTP \d{3}\s*/, '').replace(/\[quota=.*$/, '').replace(/[^\p{L}\p{N} .,:()-]/gu, '').trim().slice(0, 50)
+    const ten = `${h}${q && q !== '?' ? ` ${q}` : tom ? ` ${tom}` : ''}`
     loai.set(ten, (loai.get(ten) ?? 0) + 1)
   }
   const ds = [...loai.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3)
-  return { chu: ds.map(([t, n]) => `${t} ×${n}`).join(', '), ngay: ds.some(([t]) => /PerDay/i.test(t)) }
+  return { chu: ds.map(([t, n]) => `${t} ×${n}`).join(', '), ngay: ds.some(([t]) => /PerDay|per_day|requests_per_day/i.test(t)) }
 }
 /** Giờ Google cấp lại hạn mức NGÀY: nửa đêm giờ Thái Bình Dương sắp tới (+5 phút cho chắc). */
 export function lucCapLaiHanMucNgay(nowMs: number): number {
@@ -247,7 +253,10 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
           } else if (tatCaLoiGoi || hanMuc) { soLoi++; lyDo = hanMuc ? `Gemini báo hết hạn mức${hm.chu ? ` (${hm.chu})` : ' (429/503)'}` : 'mọi câu trong lượt đều lỗi gọi mô hình' }
           const xong = body.xong === true
           if (vong === 'chinh') {
-            if (xong) { vong = 'sua'; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, sang vòng sửa câu lệch' } else conTro = String(body.conTro ?? conTro)
+            if (xong && dem.quet_lai_2710 !== 1) {
+              // 27/10: trước bản sửa, câu lỗi gọi (429) bị con trỏ bỏ qua ⇒ quét lại vòng chính MỘT lần từ đầu (câu đã soạn tự bỏ qua, rẻ).
+              dem.quet_lai_2710 = 1; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, quét lại một lần các câu từng lỗi gọi'
+            } else if (xong) { vong = 'sua'; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, sang vòng sửa câu lệch' } else conTro = String(body.conTro ?? conTro)
           } else if (qidsSua) {
             // conTro của soanSoDoLo là «#n» trong danh sách qids vừa truyền ⇒ đổi ra qid cuối đã xử lý; xong cả lô ⇒ qid cuối TRANG (kể cả qid sai mẫu ở đuôi).
             const n = /^#\d+$/.test(String(body.conTro ?? '')) ? Number(String(body.conTro).slice(1)) : 0
