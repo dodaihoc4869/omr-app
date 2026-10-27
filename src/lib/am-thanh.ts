@@ -2,13 +2,26 @@
 // (scratchpad/ve-moi/am-thanh/am.js): mỗi tiếng = danh sách «giọng» { t: giây bắt đầu, f → f2: lướt tần số trong d, d: tắt dần, a: tấn công, g: âm lượng,
 // p: [[bội, biên]] hoạ âm }. Mỗi hoạ âm = một OscillatorNode sine qua GainNode; hoạ âm cao tắt nhanh hơn (như bản WAV: exp(−t·(bội−1)·2,2)).
 // Chỉ kêu khi <html data-trong="hs">, em chưa tắt («Âm thanh» trong menu ⇒ localStorage 'ddh.am' = 'tat') và tab đang hiện. AudioContext tạo lười ở lần
-// chạm đầu (luật trình duyệt) rồi dùng lại; 'suspended' ⇒ resume(). Mọi lỗi im lặng. Không dùng ở màn thi thật.
+// chạm đầu (luật trình duyệt) rồi dùng lại; 'suspended' ⇒ resume(). Mọi lỗi im lặng.
+// Màn KIỂM TRA (ca thi, Kiểm tra ôn tập — thầy 27/10 «tự động tắt âm thanh chỉ để rung») bật cờ «đang kiểm tra» (batCheDoThi dưới) ⇒ im lặng hẳn,
+// dù 'ddh.am' đang bật; rung không đổi.
 import { duocPhanHoi, type KieuPhanHoi } from './rung'
+
+// CỜ «ĐANG KIỂM TRA»: màn kiểm tra gọi `useEffect(() => batCheDoThi(), [])` — bật khi MỞ, hàm trả về gỡ khi ĐÓNG. Đếm số màn đang mở (hai màn lồng
+// nhau vẫn đúng); mỗi hàm gỡ chỉ trừ một lần. Tiếng thưởng (am-thanh-thuong.ts) cũng kiểm cờ này.
+let soManThi = 0
+export function batCheDoThi(): () => void {
+  let con = 1
+  soManThi++
+  return () => { soManThi -= con; con = 0 }
+}
+export const dangCheDoThi = (): boolean => soManThi > 0
 
 type Giong = { t: number; f: number; f2?: number; d: number; a?: number; g: number; p?: [number, number][] }
 const CHUONG: [number, number][] = [[1, 1], [2, 0.32], [3, 0.12], [4.2, 0.05]] // chuông thuỷ tinh
 const MEM: [number, number][] = [[1, 1], [3, 0.08]] // tròn, ấm
 const BO = { C5: 523.25, E5: 659.25, G5: 783.99, A4: 440, F4: 349.23, C6: 1046.5, E6: 1318.51, G6: 1567.98, A6: 1760, C7: 2093 }
+const chuong = (...f: number[]): Giong[] => f.map((x, i) => ({ t: i * 0.08, f: x, d: i === f.length - 1 ? 0.6 : 0.3, a: 0.004, g: 0.22, p: CHUONG }))
 export const TIENG: Record<KieuPhanHoi, Giong[]> = {
   chon: [{ t: 0, f: 520, f2: 1150, d: 0.07, a: 0.004, g: 0.22, p: [[1, 1]] }],
   dung: [
@@ -37,6 +50,8 @@ export const TIENG: Record<KieuPhanHoi, Giong[]> = {
     { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
     { t: 0.08, f: BO.G6, d: 0.5, a: 0.004, g: 0.22, p: CHUONG },
   ],
+  // Mốc combo 27/10: chuông nối nhau lên dần (mốc cao thêm nốt); cùng nâng một nốt mỗi bậc như 'combo'.
+  combo3: chuong(BO.C6, BO.G6), combo5: chuong(BO.C6, BO.E6, BO.G6), combo10: chuong(BO.C6, BO.E6, BO.G6, BO.C7),
 }
 /** Gam trưởng (nửa cung) cho bậc combo: 0 → C, 1 → D, 2 → E … quá 7 bậc thì giữ nốt cao nhất. */
 const GAM = [0, 2, 4, 5, 7, 9, 11, 12]
@@ -59,12 +74,12 @@ function layCtx(): AudioContext | null {
 }
 
 export function phat(ten: KieuPhanHoi, bac = 0): void {
-  if (!duocPhanHoi('ddh.am') || typeof document === 'undefined' || document.hidden) return
+  if (dangCheDoThi() || !duocPhanHoi('ddh.am') || typeof document === 'undefined' || document.hidden) return
   try {
     const c = layCtx()
     if (!c || !tong) return
     const goc = c.currentTime + 0.01
-    const nang = ten === 'combo' ? 2 ** (GAM[Math.max(0, Math.min(GAM.length - 1, Math.round(bac)))]! / 12) : 1
+    const nang = ten.startsWith('combo') ? 2 ** (GAM[Math.max(0, Math.min(GAM.length - 1, Math.round(bac)))]! / 12) : 1
     for (const v of TIENG[ten]) {
       const p = v.p ?? [[1, 1]], a = v.a ?? 0.005, t0 = goc + v.t
       const tongBien = p.reduce((s, [, b]) => s + b, 0)
