@@ -720,3 +720,20 @@
  * rộng cột (biến --gyc-cot-phai do ruột đặt trên <html>); nút «Bắt đầu từ đâu?» nằm trong hàng nút đáy như một mục ngang hàng «Gợi ý». ── */
 [data-trong] .ht-app.ht2-lam.duo { padding-right: var(--gyc-cot-phai, 0px); }
 [data-trong] .duo-o-nut-cham { display: contents; }
+
+/* ── TƯƠI 27/10 — thầy cho phép: «Màu sắc của app làm siêu tươi như dolingo». CHỈ app học sinh (:root[data-trong='hs'], thắng luật [data-trong] chung).
+ * Nút / ô 3D: gờ đáy là MỘT TÔNG ĐẬM HƠN cùng màu (--tr-*-day), bóng phẳng, không xám đục. Chữ trắng trên nền xanh lá ⇒ --tr-dung-nut (đạt 3:1 cho chữ đậm).
+ * Thanh tiến độ: xanh lá đặc + vệt sáng, bỏ bóng xám. ── */
+:root[data-trong='hs'] .duo-nut { box-shadow: inset 0 -4px 0 var(--tr-chinh-day); }
+:root[data-trong='hs'] .duo-nut[data-sac=do] { box-shadow: inset 0 -4px 0 var(--tr-sai-day); }
+:root[data-trong='hs'] .duo-nut[data-sac=vang] { box-shadow: inset 0 -4px 0 var(--tr-sao); }
+:root[data-trong='hs'] .duo-thanh > i { box-shadow: none; }
+:root[data-trong='hs'] .duo .ht2-lam-pa[aria-checked=true] { border-bottom-color: var(--tr-tin-day); }
+:root[data-trong='hs'] .duo .ht2-lam-pa[data-ket=dung] { border-bottom-color: var(--tr-dung-day); }
+:root[data-trong='hs'] .duo .ht2-lam-pa[data-ket=sai] { border-bottom-color: var(--tr-sai-day); }
+:root[data-trong='hs'] .duo .ht2-lam-pa[data-ket=dung] .ht2-lam-pa-ma { border-color: var(--tr-dung-nut); background: var(--tr-dung-nut); }
+:root[data-trong='hs'] .duo .ht2-lam-o[data-tt=dang] { border-bottom-color: var(--tr-tin-day); }
+:root[data-trong='hs'] .m3 .the-cau [data-trang-thai='dung'] .pa-ma { background: var(--tr-dung-nut); }
+:root[data-trong='hs'] .m3 .the-cau .y-nut button[data-trang-thai='chon']:first-of-type { background: var(--tr-dung-nut) !important; }
+:root[data-trong='hs'] .ht2-lam-y-nut button[aria-pressed=true] { background: var(--tr-dung-nut); }
+:root[data-trong='hs'] .m3 .thi-o-cau-co { background: var(--tr-chu-y-nut); }

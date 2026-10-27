@@ -881,3 +881,27 @@
 [data-trong] .dm-khung[data-muc='thuong'] { grid-template-columns: minmax(0, 1fr); }
 [data-trong] .tp-cam { min-width: 0; padding: 0 0 24px; }
 [data-trong] .tp-cam-cho { min-height: 60vh; }
+
+/* ── TƯƠI 27/10 — thầy cho phép: «Màu sắc của app làm siêu tươi như dolingo». CHỈ app học sinh. Khối màu nổi (ô biểu tượng, nút lục giác, băng bài,
+ * thẻ chuỗi): màu đặc + gờ đáy MỘT TÔNG ĐẬM HƠN cùng màu (--tr-*-day), bóng phẳng — bỏ gờ xám pha --tr-phu và bóng mờ nhoè. Chữ trắng trên nền
+ * màu ⇒ bản đạt 3:1 cho chữ đậm (--tr-dung-nut · --tr-tin-day · --tr-chu-y-nut). ── */
+:root[data-trong='hs'] :is(.da-bang .h, .da-o .h, .dm-dong .h, .da-huy i[data-sac]) { box-shadow: inset 0 -4px 0 var(--d, var(--tr-vien-2)); }
+:root[data-trong='hs'] :is(.da-bang[data-sac='tin'] .h, .da-o .h[data-sac='tin'], .dm-dong .h[data-sac='tin'], .da-huy i[data-sac='tin']) { --d: var(--tr-tin-day); }
+:root[data-trong='hs'] :is(.da-bang[data-sac='dung'] .h, .da-o .h[data-sac='dung'], .dm-dong .h[data-sac='dung'], .da-huy i[data-sac='dung']) { --d: var(--tr-dung-day); }
+:root[data-trong='hs'] :is(.da-o .h[data-sac='sai'], .dm-dong .h[data-sac='sai']) { --d: var(--tr-sai-day); }
+:root[data-trong='hs'] :is(.da-o .h[data-sac='sao'], .dm-dong .h[data-sac='sao'], .da-huy i[data-sac='sao']) { --d: var(--tr-sao-day); }
+:root[data-trong='hs'] :is(.da-o .h[data-sac='chu-y'], .dm-dong .h[data-sac='chu-y'], .da-huy i[data-sac='chu-y']) { --d: var(--tr-chu-y-day); }
+:root[data-trong='hs'] .da-bang .nut-to { background: var(--tr-tin-day); box-shadow: inset 0 -4px 0 var(--tr-tin-chu); }
+:root[data-trong='hs'] .da-bai { background: var(--tr-dung-nut); box-shadow: inset 0 -5px 0 var(--tr-dung-day); }
+:root[data-trong='hs'] .da-bang { box-shadow: none; border: 2px solid var(--tr-vien); }
+:root[data-trong='hs'] .da-bang[data-sac='tin'] { background: var(--tr-tin-nhat); border-color: color-mix(in srgb, var(--tr-tin) 35%, var(--tr-vien)); }
+:root[data-trong='hs'] .da-bang[data-sac='dung'] { background: var(--tr-dung-nhat); border-color: color-mix(in srgb, var(--tr-dung) 35%, var(--tr-vien)); }
+:root[data-trong='hs'] .da-lua { background: var(--tr-chu-y-nut); box-shadow: inset 0 -5px 0 var(--tr-chu-y-day); }
+:root[data-trong='hs'] .da-nut[data-tt='xong'], :root[data-trong='hs'] .da-nut[data-loai='hoc'][data-tt='dang'] { --n-d: var(--tr-dung-day); }
+:root[data-trong='hs'] .da-nut[data-tt='khoa'] { --n-d: initial; }
+:root[data-trong='hs'] .da-nut[data-loai='kiem'] { --n-d: var(--tr-tin-day); }
+:root[data-trong='hs'] .da-nut[data-loai='sua'] { --n-d: var(--tr-sai-day); }
+:root[data-trong='hs'] .da-nut[data-loai='bt'] { --n-d: var(--tr-chu-y-day); }
+:root[data-trong='hs'] .da-nut::before { background: var(--n-d, color-mix(in srgb, var(--n) 72%, var(--tr-phu))); }
+/* nút chính toàn app học sinh: nổi khối 3D như Duolingo (gờ trong, không đẩy bố cục) */
+:root[data-trong='hs'] :is(.m3-nut-chinh, .ht-nut-chinh, .h2-nut-chinh) { box-shadow: inset 0 -3px 0 var(--tr-chinh-day); }
