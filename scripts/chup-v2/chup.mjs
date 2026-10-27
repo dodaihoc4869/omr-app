@@ -600,6 +600,9 @@ const DS_NGD = NGD_KHO.filter(([, , k]) => !NGD_LOC.length || NGD_LOC.includes(k
 const VIEN_CANH = [
   ['lo-trinh', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['lo-trinh-cuon', 'hs-mot&tp=1', /Ester/, 'lam13:nap » lan:420 » cho:500'],
   ['lo-trinh-cuon-len', 'hs-mot&tp=1', /Ester/, 'lam13:nap » lan:420 » cho:400 » lan:-120 » cho:500'],
+  // 27/10 thanh ẨN: chạm «‹» ⇒ thanh trượt ra, còn gờ; chạm gờ ⇒ hiện lại; ẩn rồi mở Thành tích (lề trái 46 px)
+  ['thanh-an', 'hs-mot&tp=1', /Ester/, 'lam13:nap » bam:.tp-vien-tay » cho:400'], ['thanh-an-mo-lai', 'hs-mot&tp=1', /Ester/, 'lam13:nap » bam:.tp-vien-tay » cho:400 » bam:.tp-vien-tay » cho:400'],
+  ['thanh-an-giai', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » bam:.tp-vien-tay » nut:Giải tuần'],
   ['the-tinh-the', 'hs-mot&tp=1', /Ester/, 'lam13:nap » bam:.da-tren [data-k="tt"] » cho:300'], ['the-muc-tieu', 'hs-mot&tp=1', /Ester/, 'lam13:nap » bam:.da-tren .tp-tr-muc » cho:300'],
   ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['giai', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Giải tuần'],
   ['ban', 'hs-mot&tp=1&ten=dai', /Ester/, 'ton:menu:Thành tích » nut:Học cùng bạn'], ['kim-cuong', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
@@ -608,7 +611,8 @@ const VIEN_CANH = [
 ]
 const VIEN_KHO = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']]
 const DS_VIEN = VIEN_KHO.flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
-  VIEN_CANH.map(([t, m, cho, viec]) => [`vien-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+  VIEN_CANH.filter(([t]) => k !== 'may-tinh' || !t.startsWith('thanh-an')) // máy tính: thanh nằm trong menu trái, không có nút ẩn
+    .map(([t, m, cho, viec]) => [`vien-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 const vienDe = []
 // ═══ hết VIÊN ĐẾM NỔI 27/10
 const DS = [
@@ -846,6 +850,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       for (const buoc of viec.slice(4).split(' » ')) {
         if (buoc.startsWith('menu:')) await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), buoc.slice(5))
         else if (buoc.startsWith('go:')) await t.getByRole('searchbox').first().fill(buoc.slice(3)) // 27/10: gõ vào ô tìm (Mời bạn)
+        else if (buoc.startsWith('bam:')) await t.locator(buoc.slice(4)).first().click() // 27/10 thanh ẩn: bấm phần tử theo CSS
         else if (buoc.startsWith('xem:')) await t.evaluate((q) => document.querySelector(q)?.scrollIntoView({ block: 'center' }), buoc.slice(4)) // 27/10: cuộn phần tử vào giữa
         else await t.getByRole('button', { name: new RegExp('^' + buoc.slice(4)) }).first().click()
         await t.waitForTimeout(700)
@@ -1205,7 +1210,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   // VIÊN ĐẾM NỔI 27/10: viên không được giao chữ / nút / ảnh / hình của nội dung (đo hình chữ nhật thật; chữ đo từng dòng bằng Range).
   if (ten.startsWith('vien-')) {
     const de = await t.evaluate(() => {
-      const vien = [...document.querySelectorAll('.da-tren[data-vien] :is(.tp-tr-o, .tp-tr-muc)')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0)
+      const vien = [...document.querySelectorAll('.da-tren[data-vien] :is(.tp-tr-o, .tp-tr-muc, .tp-vien-tay)')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0)
       if (!vien.length) return []
       const ngoai = (e) => e.closest('.da-tren, .tr-menu, .tr-menu-ray, .tr-menu-phu, .da-pop, .tp-toan, [inert]')
       const giao = (a) => vien.some((b) => !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom))

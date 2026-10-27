@@ -1032,66 +1032,80 @@
 :root[data-trong='hs'] .da-nut[data-loai][data-tt='xong'] { --n-d: var(--tr-dung-day); }
 [data-trong='hs'] .da-vo-khoa[style] i { animation-delay: calc(120ms + var(--tre, 0ms)); }
 [data-trong='hs'] .da-vo-khoa[style] > svg { animation-delay: var(--tre, 0ms); }
-/* ── VIÊN ĐẾM NỔI MÉP TRÁI (thầy chốt bản vẽ P2 27/10, ve-moi/thanh-doc) — thay thanh đếm ngang trên cùng. Chỉ biến --tr-* sẵn có.
-   Thứ tự: vòng mục tiêu · lửa · nguyên tử · tinh thể. Viên 44 px (lửa / nguyên tử / tinh thể: 44 × 56, biểu tượng trên, số gọn dưới), cách mép trái 8 px,
-   giữa màn theo chiều dọc. [data-thu] (em cuộn xuống) ⇒ nền viên co thành tròn 44 + số mờ đi — CHỈ transform / opacity, ô bấm giữ nguyên 44 × 56
-   (không xô cột). Nội dung chừa lề trái 60 px (8 + 44 + 8) ⇒ không viên nào đè chữ / nút / ảnh. Máy tính ≥ 1024 × 600: viên nằm trong thanh menu trái. */
+/* ── THANH SỐ ẨN MÉP TRÁI (thầy 27/10 «Làm thanh ẩn giống bên trái, thiết kế kiểu menu cho thanh ẩn màu khác bên tay trái cho gọn»; thay 4 viên rời P2).
+   MỘT thanh dọc nền chàm nhạt (--tr-hs-nhat, khác nền trang ở cả sáng lẫn tối), bo góc phải, sát mép trái, rộng 56 px: vòng mục tiêu · lửa ·
+   nguyên tử · tinh thể (biểu tượng + số gọn, vạch ngăn mảnh, không viền từng ô) · nút «‹» ẩn thanh. [data-an] ⇒ thanh trượt ra ngoài (transform), còn GỜ
+   12 px có chấm chàm, vùng chạm 44 × 64 (đối xứng vạch menu mép phải). Lề trái nội dung theo lựa chọn tay: mở 64 px · ẩn 46 px. Chỉ biến --tr-* sẵn có. */
 [data-trong='hs'] .da-tren[data-vien] {
-  position: fixed; left: calc(8px + env(safe-area-inset-left)); top: 50%; z-index: 20; display: block; width: 44px; margin: 0; padding: 0;
-  transform: translateY(-50%); background: none; box-shadow: none; clip-path: none;
+  position: fixed; left: 0; top: 50%; z-index: 20; display: block; width: calc(56px + env(safe-area-inset-left)); margin: 0; padding: 8px 0 0 env(safe-area-inset-left);
+  border-radius: 0 18px 18px 0; background: var(--tr-hs-nhat); clip-path: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-hs) 22%, transparent), 0 8px 24px color-mix(in srgb, var(--tr-hs) 14%, transparent);
+  transform: translateY(-50%); transition: transform .22s ease;
 }
-[data-trong='hs'] .da-tren[data-vien] > .tp-tr { flex: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; width: 44px; max-width: none; min-height: 0; margin: 0; padding: 0; }
-[data-trong='hs'] .da-tren[data-vien] .tp-tr-muc { order: -1; width: 44px; height: 44px; margin: 0 0 6px; border-radius: 50%; background: var(--tr-mat); box-shadow: var(--tr-bong-2), 0 0 0 1px var(--tr-vien); }
+[data-trong='hs'] .da-tren[data-vien][data-an] { transform: translate(-100%, -50%); box-shadow: none; }
+[data-trong='hs'] .da-tren[data-vien] .tp-tr { flex: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 0; width: 56px; max-width: none; min-height: 0; margin: 0; padding: 0; }
+[data-trong='hs'] .da-tren[data-vien] .tp-tr-muc { order: -1; width: 44px; height: 44px; margin: 0 0 12px; background: none; box-shadow: none; }
 [data-trong='hs'] .da-tren[data-vien] .tp-tr-muc svg.vm { width: 44px; height: 44px; }
+[data-trong='hs'] .da-tren[data-vien] .tp-tr-muc .vm .nen { stroke: color-mix(in srgb, var(--tr-hs) 22%, transparent); }
 [data-trong='hs'] .da-tren[data-vien] .tp-tr-muc > .bi { width: 28px; margin: -3px 0 0; }
-[data-trong='hs'] .da-tren[data-vien] .tp-tr-muc em { bottom: -8px; padding: 2px 4px; font-size: 10px; transition: opacity .2s ease; }
+/* nhãn dưới vòng: viên nhỏ nhẹ (thầy 27/10: «Đủ mức» nền navy đặc nặng nề) — chưa đủ: mặt thẻ + chữ chàm; đủ mức: vàng nhạt + chữ vàng đậm */
+[data-trong='hs'] .da-tren[data-vien] .tp-tr-muc em {
+  bottom: -9px; padding: 2px 5px; border-radius: 999px; background: var(--tr-mat); color: var(--tr-hs-chu); font-size: 10px; font-weight: 900;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-hs) 26%, transparent);
+}
+[data-trong='hs'] .da-tren[data-vien] .tp-tr-muc[data-dat] em { background: var(--tr-sao-nhat); color: var(--tr-sao-chu); box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-sao) 45%, transparent); }
 [data-trong='hs'] .da-tren[data-vien] .tp-tr-o {
-  position: relative; isolation: isolate; flex-direction: column; justify-content: center; gap: 3px; width: 44px; min-width: 44px; height: 56px; min-height: 56px;
-  padding: 0; border-radius: 22px; background: none; font-size: 13px; line-height: 1; -webkit-tap-highlight-color: transparent;
+  flex-direction: column; justify-content: center; gap: 4px; width: 56px; min-width: 44px; height: 54px; min-height: 54px; padding: 0; border-radius: 0; background: none;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--tr-hs) 20%, transparent); font-size: 13.5px; line-height: 1; -webkit-tap-highlight-color: transparent;
 }
-[data-trong='hs'] .da-tren[data-vien] .tp-tr-o::before {
-  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 22px; background: var(--tr-mat); box-shadow: var(--tr-bong-2), 0 0 0 1px var(--tr-vien);
-  transition: transform .2s ease;
+[data-trong='hs'] .da-tren[data-vien] .tp-tr-o .tp-dv { width: 22px; height: 22px; }
+[data-trong='hs'] .da-tren[data-vien] .tp-tr-so { min-width: 0; }
+[data-trong='hs'] .da-tren[data-vien] .tp-tr-o[aria-expanded='true'], [data-trong='hs'] .da-tren[data-vien] .tp-tr-o:active { background: color-mix(in srgb, var(--tr-hs) 16%, transparent); }
+[data-trong='hs'] .da-tren[data-vien] :is(.tp-tr-o, .tp-tr-muc, .tp-vien-tay):focus-visible { outline: 3px solid var(--tr-hs-chu); outline-offset: -3px; }
+/* nút ẩn / gờ hiện lại */
+[data-trong='hs'] .tp-vien-tay {
+  display: grid; place-items: center; width: 56px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 0 0 18px 0; background: none; color: var(--tr-hs-chu);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--tr-hs) 20%, transparent); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
-[data-trong='hs'] .da-tren[data-vien] .tp-tr-o .tp-dv { width: 22px; height: 22px; transition: transform .2s ease; }
-[data-trong='hs'] .da-tren[data-vien] .tp-tr-so { min-width: 0; transition: opacity .2s ease; }
-[data-trong='hs'] .da-tren[data-vien] .tp-tr-o[aria-expanded='true']::before { background: var(--tr-mat-3); }
-[data-trong='hs'] .da-tren[data-vien] .tp-tr-o:active::before { transform: scale(.94); }
-[data-trong='hs'] .da-tren[data-vien][data-thu] .tp-tr-o::before { transform: scaleY(.786); }
-[data-trong='hs'] .da-tren[data-vien][data-thu] .tp-tr-o .tp-dv { transform: translateY(8px); }
-[data-trong='hs'] .da-tren[data-vien][data-thu] :is(.tp-tr-so, .tp-tr-muc em) { opacity: 0; }
-/* tấm toàn khung / A.I / menu điện thoại đang mở ⇒ viên không thò lên trên */
+[data-trong='hs'] .tp-vien-tay > i { display: none; }
+[data-trong='hs'] .da-tren[data-an] .tp-vien-tay {
+  position: absolute; left: 100%; top: 50%; width: 44px; height: 64px; margin-top: -32px; place-items: center start; border-radius: 0; box-shadow: none; background: none;
+}
+[data-trong='hs'] .da-tren[data-an] .tp-vien-tay > svg { display: none; }
+[data-trong='hs'] .da-tren[data-an] .tp-vien-tay > i {
+  display: grid; place-items: center; width: 12px; height: 56px; border-radius: 0 10px 10px 0; background: var(--tr-hs-nhat);
+  box-shadow: inset -1.5px 0 0 color-mix(in srgb, var(--tr-hs) 60%, transparent), 0 0 0 1px color-mix(in srgb, var(--tr-hs) 40%, transparent), 0 4px 12px color-mix(in srgb, var(--tr-hs) 20%, transparent);
+}
+[data-trong='hs'] .da-tren[data-an] .tp-vien-tay > i > b { width: 6px; height: 6px; border-radius: 50%; background: var(--tr-hs-nut); }
+/* tấm toàn khung / A.I / menu điện thoại đang mở ⇒ thanh không thò lên trên */
 [data-trong] body:has(.tp-toan, .aid-tam, .tr-menu[data-mo]) > .da-tren[data-vien] { visibility: hidden; }
-/* màn làm câu / kiểm tra / màn cũ mở dạng tấm toàn màn (cổng giữ Lộ trình dưới lớp [inert]) ⇒ ẨN viên, chừa chỗ cho đề + giám thị (như Duolingo) */
+/* màn làm câu / kiểm tra / màn cũ mở dạng tấm toàn màn (cổng giữ Lộ trình dưới lớp [inert]) ⇒ ẨN thanh, chừa chỗ cho đề + giám thị (như Duolingo) */
 [data-trong] body:has([inert] .dm-khung[data-vien]) > .da-tren[data-vien] { display: none; }
-@media (prefers-reduced-motion: reduce) {
-  [data-trong='hs'] .da-tren[data-vien] :is(.tp-dv, .tp-tr-so, em) { transition: none; }
-  [data-trong='hs'] .da-tren[data-vien] .tp-tr-o::before { transition: none; }
-}
-/* lề trái nội dung (điện thoại dọc, xoay ngang, khổ < 1024 × 600) */
+@media (prefers-reduced-motion: reduce) { [data-trong='hs'] .da-tren[data-vien] { transition: none; } }
+/* lề trái nội dung theo lựa chọn tay (điện thoại dọc, xoay ngang, khổ < 1024 × 600) */
 @media (max-width: 1023px), (max-height: 599px) {
-  [data-trong='hs'] .dm-khung[data-vien] { padding-left: calc(60px + env(safe-area-inset-left)); }
+  [data-trong='hs'] .dm-khung[data-vien='mo'] { padding-left: calc(64px + env(safe-area-inset-left)); }
+  [data-trong='hs'] .dm-khung[data-vien='thu'] { padding-left: calc(46px + env(safe-area-inset-left)); }
 }
 [data-trong='hs'] .dm-khung[data-vien] > .da-vo { padding-top: max(16px, env(safe-area-inset-top)); }
 @media (min-width: 1000px) { [data-trong='hs'] .dm-khung[data-vien] > .da-vo { padding-top: 26px; } [data-trong='hs'] .dm-khung[data-vien] .dm-ben { top: 16px; } }
-/* máy tính: viên GỘP vào thanh menu trái — hàng vòng mục tiêu (chữ đầy đủ) + ba ô số */
+/* máy tính: thanh số GỘP vào thanh menu trái — hàng vòng mục tiêu (chữ đầy đủ) + ba ô số */
 [data-trong='hs'] .tr-menu-dem:empty { display: none; }
 @media (max-width: 1023px), (max-height: 599px) { [data-trong='hs'] .tr-menu-dem { display: none; } }
 [data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] {
-  position: static; width: auto; padding: 8px; border-radius: 16px; transform: none; background: var(--tr-mat-2); box-shadow: inset 0 0 0 1px var(--tr-vien);
+  position: static; width: auto; padding: 8px; border-radius: 16px; transform: none; transition: none; background: var(--tr-mat-2); box-shadow: inset 0 0 0 1px var(--tr-vien);
 }
-[data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] > .tp-tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; width: auto; }
+[data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] .tp-tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; width: auto; }
 [data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] .tp-tr-muc {
-  grid-column: 1 / -1; display: flex; justify-content: flex-start; width: auto; height: 56px; margin: 0 0 4px; padding: 0 8px 0 60px; border-radius: 14px; box-shadow: none;
+  grid-column: 1 / -1; display: flex; justify-content: flex-start; width: auto; height: 56px; margin: 0 0 4px; padding: 0 8px 0 60px; border-radius: 14px; background: var(--tr-mat);
 }
 [data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] .tp-tr-muc svg.vm { inset: 4px auto auto 8px; width: 48px; height: 48px; }
 [data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] .tp-tr-muc > .bi { position: absolute; left: 17px; top: 11px; width: 30px; margin: 0; }
 [data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] .tp-tr-muc em {
-  position: static; transform: none; padding: 0; background: none; color: var(--tr-chu); font-size: 14px; font-weight: 800; line-height: 1.25; text-align: left; white-space: normal;
+  position: static; transform: none; padding: 0; background: none; box-shadow: none; color: var(--tr-chu); font-size: 14px; font-weight: 800; line-height: 1.25; text-align: left; white-space: normal;
 }
-[data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] .tp-tr-o { width: auto; min-width: 0; font-size: 15px; }
-[data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] .tp-tr-o::before { box-shadow: none; }
-/* thẻ bật của viên: mũi nhọn bên TRÁI (viên nổi) · màu tím cho tinh thể */
+[data-trong='hs'] .tr-menu-dem > .da-tren[data-vien] .tp-tr-o { width: auto; height: 56px; min-width: 0; border-radius: 12px; box-shadow: none; background: var(--tr-mat); font-size: 15px; }
+/* thẻ bật của mục: mũi nhọn bên TRÁI (thanh mép trái) · màu tím cho tinh thể */
 [data-trong] .da-pop.tp-vien-the { z-index: 42; }
 [data-trong] .da-pop.tp-vien-the[data-ben] { transform-origin: left var(--oy, 28px); }
 [data-trong] .da-pop.tp-vien-the[data-ben]::before { top: calc(var(--oy, 28px) - 11px); left: -9px; width: 10px; height: 22px; clip-path: polygon(0 50%, 100% 0, 100% 100%); }

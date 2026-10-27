@@ -80,19 +80,26 @@ describe('ThanhThuong vien', () => {
   })
 })
 
-describe('mã nguồn: viên nổi thay thanh trên', () => {
+describe('mã nguồn: thanh số ẩn mép trái thay thanh trên (thầy 27/10)', () => {
   const ts = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')
   const css = readFileSync('src/styles/trong-hs.css', 'utf8')
-  it('portal header data-vien; máy tính ⇒ ô #tr-menu-dem trong menu; thu khi em cuộn', () => {
-    expect(ts).toMatch(/createPortal\(<header className="da-tren" data-vien="" data-thu=\{thuVien \|\| undefined\}/)
+  it('portal header data-vien + data-an; nút ẩn / gờ hiện lại; lựa chọn tay nhớ trên máy (try/catch); máy tính ⇒ ô #tr-menu-dem; tự ẩn khi em cuộn', () => {
+    expect(ts).toMatch(/createPortal\(<header id="tp-vien" className="da-tren" data-vien="" data-an=\{anVien \|\| undefined\}/)
+    expect(ts).toMatch(/className="tp-vien-tay" aria-expanded=\{!anVien\} aria-label=\{anVien \? 'Hiện số của em' : 'Ẩn số của em'\}/)
+    expect(ts).toMatch(/inert=\{anVien \|\| undefined\}/)
+    expect(ts).toMatch(/try \{ return localStorage\.getItem\(KHOA_VIEN\) === 'thu' \} catch \{ return false \}/)
     expect(ts).toMatch(/<div id="tr-menu-dem" className="tr-menu-dem" \/>/)
     expect(ts).toMatch(/MQ_MAY_TINH = '\(min-width: 1024px\) and \(min-height: 600px\)'/)
     expect(ts).toMatch(/performance\.now\(\) - tay < 800/)
+    expect(ts).toMatch(/data-vien=\{coThuong \? \(tayThu \? 'thu' : 'mo'\) : undefined\}/)
   })
-  it('CSS: viên cách mép 8 px, chỉ biến màu --tr-*, lề trái 60 px, ẩn dưới [inert], giảm chuyển động, thu chỉ transform / opacity', () => {
-    const khoi = css.slice(css.indexOf('/* ── VIÊN ĐẾM NỔI MÉP TRÁI'))
-    expect(khoi).toMatch(/left: calc\(8px \+ env\(safe-area-inset-left\)\)/)
-    expect(khoi).toMatch(/padding-left: calc\(60px \+ env\(safe-area-inset-left\)\)/)
+  it('CSS: thanh nền chàm nhạt sát mép trái, ẩn bằng transform, lề 64 / 46 px, ẩn dưới [inert], giảm chuyển động, chỉ biến --tr-*', () => {
+    const khoi = css.slice(css.indexOf('/* ── THANH SỐ ẨN MÉP TRÁI'))
+    expect(khoi).toMatch(/background: var\(--tr-hs-nhat\)/)
+    expect(khoi).toMatch(/\[data-an\] \{ transform: translate\(-100%, -50%\)/)
+    expect(khoi).toMatch(/\.dm-khung\[data-vien='mo'\] \{ padding-left: calc\(64px/)
+    expect(khoi).toMatch(/\.dm-khung\[data-vien='thu'\] \{ padding-left: calc\(46px/)
+    expect(khoi).toMatch(/width: 44px; height: 64px/) // gờ: vùng chạm 44 × 64
     expect(khoi).toMatch(/body:has\(\[inert\] \.dm-khung\[data-vien\]\) > \.da-tren\[data-vien\] \{ display: none; \}/)
     expect(khoi).toMatch(/prefers-reduced-motion: reduce/)
     expect(khoi).not.toMatch(/#[0-9a-f]{3,8}\b/i)
