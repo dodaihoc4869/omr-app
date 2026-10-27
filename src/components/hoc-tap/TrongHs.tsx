@@ -379,10 +379,9 @@ export function MotTrangHs(p: PropsMotTrang) {
       : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: c.phan, onClick: p.onHoc, tat: p.khoaHoc }
       : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở` })
   })
-  // Thầy 27/10 (ảnh Lộ trình): bỏ nhãn chữ «Kiểm tra ôn tập» / «Tự sửa lỗi · n câu» cạnh nút — tên vẫn ở `ten` (trình đọc màn hình).
-  if (kiem) nut.push({ k: 'kiem', loai: 'kiem', tt: chinh === 'kiem' ? 'dang' : 'mo', bong: chinh === 'kiem' && kiemLam ? (kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu') : undefined,
+  if (kiem) nut.push({ k: 'kiem', loai: 'kiem', tt: chinh === 'kiem' ? 'dang' : 'mo', nhan: 'Kiểm tra ôn tập', bong: chinh === 'kiem' && kiemLam ? (kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu') : undefined,
     ten: `Kiểm tra ôn tập: ${chuKiem(kiem)}`, onClick: (kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined, tat: p.coCa })
-  if (coSua && !p.ngayKiem) nut.push({ k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: ${p.soSua} câu`, onClick: p.onChua })
+  if (coSua && !p.ngayKiem) nut.push({ k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', nhan: `Tự sửa lỗi · ${p.soSua} câu`, bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: ${p.soSua} câu`, onClick: p.onChua })
   if (coBt && !p.ngayKiem) nut.push({ k: 'bt', loai: 'bt', tt: chinh === 'bt' ? 'dang' : 'mo', nhan: p.soBaiTap ? `Bài tập về nhà · ${p.soBaiTap} bài` : 'Bài tập về nhà', bong: chinh === 'bt' ? 'Làm bài' : undefined, ten: 'Bài tập về nhà', onClick: p.onBaiTap })
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSua && 'Tự sửa lỗi', !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
   const hocThem = (chinh === 'sua' || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc
