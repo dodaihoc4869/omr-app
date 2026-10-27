@@ -72,7 +72,7 @@ export function DeCau({ q, stt }: { q: Question; stt: number }) {
         <p className="ht2-lam-de-chu"><b>Câu {stt}.</b> <ChemText text={de} /></p>
       )}
       <ExperimentDemo text={de} />
-      <BangSoLieu table={q.table} />
+      <BangDe table={q.table} />
       <ExperimentOriginal text={q.text} hasImages={Boolean(q.imageDataUrl || q.hinhAnh.some((h) => h.viTri === 'sau_de'))}>
         {q.imageDataUrl && <CauHinh src={q.imageDataUrl} alt={`Hình câu ${stt}`} />}
         <HinhTaiViTri hinhAnh={hinh(q)} viTri="sau_de" nhan={`câu ${stt}`} />
@@ -424,4 +424,30 @@ export function LoiGiaiCau({ q, solution, dapAn, hinhLoiGiai, children }: { q: Q
       </KhoiLoiGiaiChuan>
     </section>
   )
+}
+
+/** Bảng số liệu trong đề ở các màn luyện của em (làm chặng · Kiểm tra ôn tập · Tự sửa lỗi). 27/10 (thầy: bảng «Chất | Ammonia | Methylamine |
+ *  Ethylamine…» tràn phải, cột cuối bị cắt): bảng HAI hàng rộng hơn khung ⇒ tự xoay DỌC (mỗi chất một hàng; đủ chỗ lại thì về ngang); bảng lớn ⇒ cuộn
+ *  ngang trong khung, bóng mờ ở mép còn nội dung. Đo bằng ResizeObserver + cuộn; vẽ lại bằng BangSoLieu sẵn có (bảng đã xoay khi cần). */
+function BangDe({ table }: { table?: string[][] }) {
+  const k = useRef<HTMLDivElement>(null)
+  const [[doc, mep], dat] = useState<[number, string]>([0, ''])
+  const hai = table?.length === 2 && table[0]!.length > 2
+  useLayoutEffect(() => {
+    const e = k.current?.firstElementChild as HTMLElement | null
+    if (!e) return
+    const f = () => {
+      if (doc) { if (e.clientWidth >= doc) dat([0, '']); return }
+      const w = e.scrollWidth, c = e.clientWidth, l = e.scrollLeft
+      if (w > c + 1 && hai) return dat([w, ''])
+      dat([0, `${l > 1 ? 'inset 14px 0 12px -12px var(--phu)' : ''}${l > 1 && l + c < w - 1 ? ',' : ''}${l + c < w - 1 ? 'inset -14px 0 12px -12px var(--phu)' : ''}`])
+    }
+    f(); e.onscroll = f
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(f) : null
+    ro?.observe(e)
+    return () => { e.onscroll = null; ro?.disconnect() }
+  }, [doc, hai, table])
+  if (!table?.length) return null
+  const bang = doc ? table[0]!.map((c, j) => [c, table[1]![j] ?? '']) : table
+  return <div ref={k} className="bang-de" data-doc={doc ? '' : undefined} style={{ ['--bang-mep' as string]: mep || 'none' }}><BangSoLieu table={bang} /></div>
 }

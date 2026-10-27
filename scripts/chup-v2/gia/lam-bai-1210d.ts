@@ -111,6 +111,17 @@ const CAU_NC: CauGia[] = [
   { ...nen, qid: 'N3', maDe: 'BAI8', phan: 'I', tenDang: 'Amine — tính base — tính khối lượng', text: 'Cho 0,1 mol aniline tác dụng vừa đủ với HCl. Khối lượng muối phenylammonium chloride thu được là', choices: ['25,900 gam.', '6,475 gam.', '19,425 gam.', '12,950 gam.'], ideas: [], dapAn: 'D',
     loiGiai: { chot: 'C6H5NH2 + HCl → C6H5NH3Cl; m = 0,1 × 129,5 = 12,95 gam.' } },
 ]
+// ═══ BẢNG + TẤM CHƯA TÍNH 27/10: `lam13&lam=duo-bang` — câu có bảng 2 hàng × 4 cột (ảnh thầy: nhiệt độ sôi NH3 −33,3 · CH3NH2 −6,4 · C2H5NH2 16,6 °C)
+// tự xoay dọc ở khổ hẹp; nộp ⇒ `thuong.tinh = false` (tấm «Chưa được tính»); câu 2 có bảng lớn 3 hàng × 5 cột (cuộn ngang, bóng mép).
+const CAU_BANG: CauGia[] = [
+  { ...nen, qid: 'B1', maDe: 'BAI8', phan: 'I', tenDang: 'Amine — tính chất vật lí', text: 'Cho nhiệt độ sôi của dãy các chất gồm ammonia và các amine như bảng sau.\nNgoài liên kết hydrogen, tương tác van der Waals, yếu tố nào sau đây ảnh hưởng chính đến chiều biến đổi nhiệt độ sôi trong dãy trên?',
+    table: [['Chất', 'Ammonia', 'Methylamine', 'Ethylamine'], ['Nhiệt độ sôi (°C)', '−33,3', '−6,4', '16,6']],
+    choices: ['Độ dài liên kết N–H.', 'Số oxi hoá của nguyên tử N.', 'Khối lượng phân tử.', 'Năng lượng liên kết N–H.'], ideas: [], dapAn: 'C',
+    loiGiai: { chot: 'Cùng có liên kết hydrogen; phân tử khối tăng (17 < 31 < 45) ⇒ tương tác van der Waals mạnh hơn ⇒ nhiệt độ sôi tăng.' } },
+  { ...nen, qid: 'B2', maDe: 'BAI8', phan: 'I', tenDang: 'Amine — tính chất vật lí', text: 'Cho bảng nhiệt độ sôi và độ tan trong nước của một số chất. Chất nào sau đây tan tốt nhất trong nước?',
+    table: [['Chất', 'Methylamine', 'Ethylamine', 'Propylamine', 'Aniline'], ['Nhiệt độ sôi (°C)', '−6,4', '16,6', '47,8', '184,1'], ['Độ tan (g/100 g nước)', 'rất lớn', 'rất lớn', 'lớn', '3,6']],
+    choices: ['Methylamine.', 'Aniline.', 'Propylamine.', 'Benzene.'], ideas: [], dapAn: 'A', loiGiai: { chot: 'Amine mạch ngắn tan rất tốt nhờ liên kết hydrogen với nước.' } },
+]
 const SO_LON = thamSo.get('so') === 'lon'
 // ═══ hết KIỂM GD MỚI 26/10
 // ═══ THẺ CHẠM 27/10: `lam13&lam=duo&cham=chat|don-vi|phu-dinh|vd` — câu đầu chặng có chữ chạm để chụp thẻ kiểu Duolingo (tiền tố ảnh «duo-cham-»):
@@ -140,7 +151,7 @@ const CAU_PT: CauGia[] = [
 // ═══ GIÁM THỊ 27/10: `&gt=nb|th|vd|vdc` ⇒ mọi câu mang mức ấy (giám thị tương ứng); `&gtde=ngan` ⇒ thêm câu đề NGẮN (L2, đáp án B) lên đầu chặng Duo.
 const MUC_GT = ({ nb: 'biet', th: 'hieu', vd: 'van_dung', vdc: 'van_dung_cao', khong: '' } as Record<string, string>)[thamSo.get('gt') ?? ''] // khong ⇒ câu không mức (đo nền)
 const CAU_DUO_GT = thamSo.get('gtde') === 'ngan' ? [{ ...CAU[1]!, qid: 'GT1' }, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
-const ds0 = kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+const ds0 = kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const ds = MUC_GT !== undefined ? ds0.map((c) => ({ ...c, mucDo: MUC_GT || null })) : ds0
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
@@ -154,7 +165,7 @@ export const soHomNayLam13 = () => SO_LON ? { daLam: 1234 + daNop, muc: 2400, ch
 const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => { const n = q.phan === 'III' ? soOPhanIII(_d) : null; return n === null ? q : { ...q, soO: n } }
 const so = (v: string) => Number(String(v).replace(',', '.'))
 // THƯỞNG PHẠT (gộp 26/10): `&tp=1` ⇒ lệnh answer trả `thuong` (Đúng +10, chuỗi ≥ 3: +2; sai làm kĩ +2) như máy chủ phần A, câu cuối của chặng thêm `ketBai`.
-const TP = thamSo.get('tp') === '1' || kieu === 'duo-nc'
+const TP = thamSo.get('tp') === '1' || kieu === 'duo-nc' || kieu === 'duo-bang'
 let chuoiTp = Number(thamSo.get('chuoi') ?? 0) // `&chuoi=2` (27/10): bắt đầu giữa chuỗi đúng ⇒ câu đúng đầu chạm mốc 3 (cảnh hiệu ứng mốc combo)
 const daTraTp = new Set<string>()
 const thuongTp = (dung: boolean) => {
@@ -174,7 +185,7 @@ export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<s
     daNop++
     const dung = q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn
     daTraTp.add(q.qid)
-    const tp = TP ? { thuong: q.qid === 'N3' ? { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0, cauKho: false } : thuongTp(dung), ...(ds.every((c) => daTraTp.has(c.qid)) ? { ketBai: KET_BAI } : {}) } : {}
+    const tp = TP ? { thuong: q.qid === 'N3' || q.qid === 'B1' ? { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0, cauKho: false } : thuongTp(dung), ...(ds.every((c) => daTraTp.has(c.qid)) ? { ketBai: KET_BAI } : {}) } : {}
     return { ok: true, correct: dung, answer: q.dapAn, solution: q.loiGiai, solutionImages: [], ...(q.vaiGoi7 === 'lam_lai' ? { attempt: { assisted: true } } : {}), ...tp }
   }
   if (duong.endsWith('/game-v2/hoc-tap-gap')) { daNop++; return { ok: true, correct: false, hocCoHoTro: true, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] } }

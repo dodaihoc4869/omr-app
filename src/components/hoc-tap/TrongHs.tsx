@@ -20,6 +20,8 @@ import { useTongQuan } from '../thuong/dung-thuong'
 import { napSanThanhTich } from '../../lib/thuong-api'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
+const GiamThiTinh = lazy(() => import('../giam-thi/GiamThi').then((m) => ({ default: m.GiamThiTinh })))
+const MUC_LV = ['nb', 'th', 'vd', 'vdc'] as const
 const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
 /** Sự kiện màn làm chặng phát khi xong bài ĐẦU TIÊN trong ngày ⇒ Lộ trình mở «Chuỗi ngày» với hiệu ứng lửa bùng (C1). */
 export const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
@@ -176,9 +178,15 @@ function DuongChang({ ds, moDi, cam }: { ds: Nut[]; moDi: boolean; cam?: CamBi }
         {hu === 'xong' && <span className="da-lan" aria-hidden="true" />}
         {hu === 'mo' && <span className="da-vo-khoa" aria-hidden="true"><i /><i /><i /><i /><Lock size={22} strokeWidth={2.6} /></span>}
         {/* LINH VẬT MỜ CẠNH ĐƯỜNG (thầy 27/10, như cú Duo xám): cứ 3 nút một con, xen kẽ trái / phải, đứng phía đối diện chỗ đường lượn; chặng chưa tới ⇒
-            xám mờ, đã tới ⇒ hiện màu + thở. Hiện dùng Bi; chỗ cắm sẵn `data-lv` cho 4 giám thị (Tí · Cô Cốc · Chú Tam · Giáo sư Kíp) khi vào main. */}
-        {i % 3 === 1 && cam && <span className="da-linh-vat" aria-hidden="true" data-lv="bi" data-toi={n.tt === 'khoa' || undefined}
-          style={{ '--lv': `${(x > 0 || (x === 0 && (i / 3 | 0) % 2 === 0) ? -1 : 1) * 104 - x}px` } as CSSProperties}><Bi cam={n.tt === 'khoa' ? 'ngu' : cam} size={104} /></span>}
+            xám mờ, đã tới ⇒ hiện màu + thở. Xen kẽ Bi rồi 4 giám thị (Tí · Cô Cốc · Chú Tam · Giáo sư Kíp — GiamThiTinh, mảnh giám thị nạp lười);
+            Lộ trình chưa biết mức câu của cụm chặng ⇒ xoay vòng nb → th → vd → vdc. */}
+        {i % 3 === 1 && cam && (() => {
+          const thu = (i / 3) | 0, gt = thu === 0 ? null : MUC_LV[(thu - 1) % MUC_LV.length]!, toi = n.tt === 'khoa'
+          return <span className="da-linh-vat" aria-hidden="true" data-lv={gt ?? 'bi'} data-toi={toi || undefined}
+            style={{ '--lv': `${(x > 0 || (x === 0 && thu % 2 === 0) ? -1 : 1) * 104 - x}px` } as CSSProperties}>
+            {gt ? <Suspense fallback={null}><GiamThiTinh muc={gt} xam={toi} mo={toi} className="da-lv-gt" /></Suspense> : <Bi cam={toi ? 'ngu' : cam} size={104} />}
+          </span>
+        })()}
       </li>
       // Rương tinh thể + Bi đứng cạnh đường (bản vẽ nâng cấp): sau chặng giữa (đủ ≥ 2 chặng); rương lệch phía đối diện Bi.
       return i === giua ? [o, <li key="ruong" className="da-ruong" aria-hidden="true" data-mo={soXong === soChang || undefined} style={{ '--x': `${LECH[(i + 1) % LECH.length]! <= 0 ? -56 : 56}px` } as CSSProperties}>
