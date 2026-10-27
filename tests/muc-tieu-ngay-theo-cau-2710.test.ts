@@ -109,6 +109,6 @@ describe('chữ thẻ bài (hàm thuần)', () => {
   it('vòng: có mức câu ⇒ đo bằng câu; máy chủ cũ (chỉ chặng) ⇒ lùi về chặng', () => {
     expect(vongMucTieu({ daXong: 8, can: 16, cau: 92, cauDaLam: 93, dat: true })).toEqual({ da: 93, can: 92, donVi: 'câu', dat: true })
     expect(vongMucTieu({ daXong: 8, can: 16 })).toEqual({ da: 8, can: 16, donVi: 'chặng', dat: false })
-    expect(vongMucTieu({ daXong: 1, can: 16 }, { daLam: 40, muc: 92 })).toEqual({ da: 40, can: 92, donVi: 'câu', dat: false })
+    expect(vongMucTieu({ daXong: 1, can: 16, cau: 92, cauDaLam: 40 })).toEqual({ da: 40, can: 92, donVi: 'câu', dat: false })
   })
 })

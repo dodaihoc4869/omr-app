@@ -30,7 +30,8 @@ export interface PropsKetBai {
 
 export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut = 'Tiếp tục', cauHomNay }: PropsKetBai) {
   const hh = k.hoanHao
-  const mt = vongMucTieu(k.mucTieu, cauHomNay), dat = !!mt && mt.dat
+  // Màn làm bài có số `hoc-tap-dem` mới nhất ⇒ đè số của máy chủ (mục tiêu đo bằng câu, cùng thẻ «Đủ x/y câu»).
+  const mt = vongMucTieu(cauHomNay && cauHomNay.muc > 0 ? { daXong: 0, can: 1, cau: cauHomNay.muc, cauDaLam: cauHomNay.daLam } : k.mucTieu), dat = !!mt && mt.dat
   const g = bat?.giai === false ? undefined : k.giai
   const ba = useRef<HTMLDivElement>(null), bi = useRef<HTMLDivElement>(null), kt = useRef<HTMLDivElement>(null), vong = useRef<HTMLDivElement>(null), chip = useRef<HTMLSpanElement>(null)
   useHieuUng((h) => {

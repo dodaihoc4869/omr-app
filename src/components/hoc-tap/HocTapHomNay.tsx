@@ -60,8 +60,8 @@ const chuCaiDau = (ten: string) => { const p = ten.trim().split(/\s+/).filter(Bo
  * Hết việc (thầy 27/10: thẻ ghi «0 câu tự làm · 0 câu học có hỗ trợ» cạnh «Đủ 93/92 câu») ⇒ nói số ĐÃ LÀM thật: «Đã làm 93 câu hôm nay».
  */
 export function chuViecGoi7(g: Pick<TomTatGoi7, 'tuLamCon' | 'tiepCanCon' | 'thieuNgay'> & { daLamHomNay?: number }, con = false): string {
-  if (g.tuLamCon + g.tiepCanCon + g.thieuNgay === 0 && g.daLamHomNay !== undefined && g.daLamHomNay > 0) return `Đã làm ${g.daLamHomNay} câu hôm nay`
-  return `${con ? 'Còn ' : ''}${g.tuLamCon} câu tự làm · ${g.tiepCanCon} câu học có hỗ trợ${g.thieuNgay > 0 ? ` · ${g.thieuNgay} câu chờ thầy bổ sung` : ''}`
+  return g.tuLamCon + g.tiepCanCon + g.thieuNgay || !g.daLamHomNay ? `${con ? 'Còn ' : ''}${g.tuLamCon} câu tự làm · ${g.tiepCanCon} câu học có hỗ trợ${g.thieuNgay > 0 ? ` · ${g.thieuNgay} câu chờ thầy bổ sung` : ''}`
+    : `Đã làm ${g.daLamHomNay} câu hôm nay`
 }
 
 /** Dòng việc: biểu tượng · tên · chữ phụ ngắn (nếu có) · số (nếu có) · mũi tên. */

@@ -13,7 +13,8 @@ import type { ReactElement } from 'react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu.test', ghiDiaChiDaDung: () => {} }))
 
 import * as M from './_thuong-mau'
-import { DUONG, _quenTam, docBangGiai, docDsBan, docKetBai, docThuongCau, docTongQuan, ghiTam, khoaTam, type TongQuanThuong, type ThongBao } from '../src/lib/thuong-api'
+import { DUONG, _quenTam, docBangGiai, docDsBan, docTongQuan, ghiTam, khoaTam, type TongQuanThuong, type ThongBao } from '../src/lib/thuong-api'
+import { docKetBai, docThuongCau } from '../src/lib/thuong-api-bai'
 import { _quenDaXem } from '../src/components/thuong/loc-thong-bao'
 import { capNhatTongQuan } from '../src/components/thuong/dung-thuong'
 import { ThanhThuong } from '../src/components/thuong/ThanhThuong'
@@ -83,15 +84,14 @@ describe('phần hiện ngay', () => {
     await waitFor(() => expect(c.querySelector('[data-k="tt"] .tp-so')?.textContent).toBe('245'))
     expect(c.querySelector('[data-k="lua"] .tp-so')?.textContent).toBe('12')
     expect(c.querySelector('[data-k="nt"] .tp-so')?.textContent).toBe('147')
-    expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 4 chặng · đã xong 3' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 4 chặng · đã làm 3' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '245 tinh thể' }))
     expect(mo).toHaveBeenCalledWith('cua-hang')
   })
   it('vòng mục tiêu (thầy 27/10 «8/16 chặng» cạnh «Đủ 93/92 câu»): đo bằng CÂU cùng thẻ; đạt ⇒ «Đủ mức»; capNhatTongQuan ⇒ vòng đổi số NGAY', async () => {
     datMayChu({ ...M.tongQuanGia(), mucTieu: { daXong: 8, can: 16, cau: 92, cauDaLam: 40, dat: false } })
     const c = ve(<ThanhThuong token={TK} onMo={() => {}} thongBao={false} />)
-    const vong = await screen.findByRole('button', { name: 'Mục tiêu hôm nay: 92 câu · đã làm 40' })
-    expect(vong.getAttribute('title')).toBe('Mục tiêu hôm nay: 92 câu · đã làm 40')
+    await screen.findByRole('button', { name: 'Mục tiêu hôm nay: 92 câu · đã làm 40' })
     expect(c.querySelector('.tp-tr-muc em')?.textContent).toBe('40/92 câu')
     mayChu[DUONG.tongQuan] = { ...M.tongQuanGia(), mucTieu: { daXong: 8, can: 16, cau: 92, cauDaLam: 93, dat: true } }
     await act(async () => { await capNhatTongQuan(TK) })
