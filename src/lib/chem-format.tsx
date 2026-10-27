@@ -22,8 +22,9 @@
 //    $E^\circ_{Ni^{2+}/Ni}$). Render bằng KaTeX (nhẹ, nhanh trên điện thoại
 //    hơn MathJax). Công thức lỗi cú pháp -> hiện nguyên văn kèm dấu cảnh báo,
 //    KHÔNG BAO GIỜ để trắng hay làm sập trang (bọc try/catch).
-import { memo, useEffect, useSyncExternalStore, type JSX } from 'react'
+import { memo, useEffect, useSyncExternalStore, type JSX, type ReactNode } from 'react'
 import type KatexT from 'katex'
+import type { chuanBiLatex } from './chem-latex'
 import { goKyTuLa } from './chu-la-pdf'
 import { gomTuCongThuc, laNhanMuiTen, nhanTruocMuiTenVeSau, tachDongSoDo } from './chem-format-so-do'
 
@@ -86,65 +87,6 @@ export function chuanHoaCongThucTongQuat(raw: string): string {
   return s
 }
 
-// ---------------------------------------------------------------------------
-// NHÃN MŨI TÊN CÓ NGOẶC VUÔNG LỒNG — sơ đồ chuyển hoá (thầy báo 06/09)
-//
-// LỖI ĐÃ DÍNH: kho ghi `\ce{->[+[Ag(NH3)2]OH][t^\circ]}`. mhchem đóng nhãn ở
-// dấu `]` ĐẦU TIÊN nên nhãn thành `+[Ag(NH3)2`, còn `OH]` và `[t^\circ]` rơi ra
-// ngoài thành chữ rời — đúng cái ảnh thầy chụp ở câu cellulose.
-//
-// Kiểm bằng KaTeX thật (mathml, đếm `<msub>`):
-//   `->[+[Ag(NH3)2]OH][t^\circ]`     → nhãn trên "+[Ag(NH3)2OH][t°]", MẤT nhãn dưới
-//   `->[+{[}Ag(NH3)2{]}OH][t^\circ]` → nhãn trên "+[Ag(NH₃)₂]OH", nhãn dưới "t°" ✓
-//
-// `{[}` là cách mhchem viết dấu ngoặc vuông NGUYÊN VĂN. Bọc cả nhãn trong `{}`
-// cũng hết lỗi nhưng MẤT chỉ số dưới (in ra "NH3)2" thay vì "NH₃)₂").
-const MUI_TEN_MHCHEM = /(<=>>|<<=>|<=>|<->|->|<-)(\s*)\[/g
-
-/** Đổi `[` `]` bên trong NHÃN mũi tên thành `{[}` `{]}`.
- *
- * Chỉ động vào chữ nằm giữa nhãn, và chỉ khi ngoặc trong nhãn CÂN — lệch ngoặc
- * là dữ liệu đã hỏng sẵn, đoán tiếp chỉ hỏng thêm nên giữ nguyên cho hiện rõ. */
-export function chuanHoaNhanMuiTen(raw: string): string {
-  const s = String(raw ?? '')
-  if (!s.includes('[')) return s
-  let ra = ''
-  let i = 0
-  MUI_TEN_MHCHEM.lastIndex = 0
-  let m: RegExpExecArray | null
-  while ((m = MUI_TEN_MHCHEM.exec(s)) !== null) {
-    const moNhan = m.index + m[0].length - 1 // vị trí dấu `[` mở nhãn
-    if (moNhan < i) continue // nhãn này đã nằm trong phần vừa xử lý
-    ra += s.slice(i, moNhan)
-    i = moNhan
-    // Tối đa hai nhãn: `->[trên][dưới]`.
-    for (let lan = 0; lan < 2 && s[i] === '['; lan++) {
-      const dong = timNgoacDong(s, i)
-      if (dong < 0) break
-      ra += `[${thoatNgoacVuong(s.slice(i + 1, dong))}]`
-      i = dong + 1
-    }
-    MUI_TEN_MHCHEM.lastIndex = i
-  }
-  return ra + s.slice(i)
-}
-
-/** Vị trí `]` khớp với `[` ở `mo`, tính cả ngoặc lồng. Không khớp thì -1. */
-function timNgoacDong(s: string, mo: number): number {
-  let sau = 0
-  for (let j = mo; j < s.length; j++) {
-    if (s[j] === '[') sau++
-    else if (s[j] === ']') {
-      sau--
-      if (sau === 0) return j
-    }
-  }
-  return -1
-}
-
-function thoatNgoacVuong(nhan: string): string {
-  return nhan.replace(/\[/g, '{[}').replace(/\]/g, '{]}')
-}
 
 export function chuanHoaNhanTrenMuiTen(raw: string): string {
   let s = String(raw ?? '').trim()
@@ -217,58 +159,6 @@ export function tachMuiTen(raw: string): KhucMuiTen[] {
   }
   if (i < s.length) ra.push({ t: 'chu', v: s.slice(i) })
   return ra.filter((k) => k.t === 'mui' || k.v !== '')
-}
-
-// ---------------------------------------------------------------------------
-// ĐỘ RỘNG ƯỚC TÍNH — quyết định công thức nằm trong dòng hay tách khối riêng.
-//
-// LỖI ĐÃ DÍNH: đo bằng `latex.length` thì `$\ce{->[+H2O][acid, t^\circ]}$` dài
-// 28 ký tự nên bị đẩy thành KHỐI RIÊNG. Hậu quả: mỗi mũi tên của sơ đồ chuyển
-// hoá rơi xuống một dòng, "Cellulose" một dòng, "X" một dòng — sơ đồ vỡ vụn.
-//
-// Đo cho đúng thứ mắt nhìn thấy: bỏ vỏ `\ce{}`, bỏ lệnh LaTeX và dấu gom, và
-// HAI NHÃN của mũi tên XẾP CHỒNG nên chỉ tính nhãn dài hơn, không cộng dồn.
-
-/** Bề rộng ước tính theo số ký tự MẮT NHÌN THẤY. */
-export function beRongUocTinh(latex: string): number {
-  let s = String(latex ?? '').trim()
-  const voCe = /^\\ce\s*\{([\s\S]*)\}$/.exec(s)
-  if (voCe) s = voCe[1]
-  let rong = 0
-  let i = 0
-  while (i < s.length) {
-    const con = s.slice(i)
-    const mui = /^(<=>>|<<=>|<=>|<->|->|<-)(\s*)\[/.exec(con)
-    if (mui) {
-      i += mui[1].length + mui[2].length
-      let daiNhat = 0
-      for (let lan = 0; lan < 2 && s[i] === '['; lan++) {
-        const dong = timNgoacDong(s, i)
-        if (dong < 0) break
-        daiNhat = Math.max(daiNhat, donDeDem(s.slice(i + 1, dong)).length)
-        i = dong + 1
-      }
-      rong += 2 + daiNhat // thân mũi tên + nhãn rộng nhất
-      continue
-    }
-    const lenh = /^\\[a-zA-Z]+/.exec(con)
-    if (lenh) {
-      rong += 1
-      i += lenh[0].length
-      continue
-    }
-    if ('{}_^'.includes(s[i])) {
-      i += 1
-      continue
-    }
-    rong += 1
-    i += 1
-  }
-  return rong
-}
-
-function donDeDem(t: string): string {
-  return t.replace(/\\[a-zA-Z]+/g, 'x').replace(/[{}_^]/g, '')
 }
 
 /** Chuỗi liền (không khoảng trắng) chứa `-` nối vào chữ hay `[` `(` là CÔNG
@@ -464,6 +354,37 @@ export function taRaChuNoiBiDinh(raw: string): string {
   return String(raw ?? '').replace(RE_CHU_NOI_DINH, '$1 $2 ')
 }
 
+// ---------------------------------------------------------------------------
+// DẤU CỘNG: TOÁN TỬ HAY ĐIỆN TÍCH (thầy chụp 27/10: `RNH₂+HNO₂→ROH+N₂↑+H₂O`
+// hiện ROH⁺N₂↑ — dấu cộng nối hai chất bị đọc thành điện tích của ROH).
+//
+// `+`/`-` là TOÁN TỬ khi theo sau là chất mới: chữ hoa, hệ số, `(` / `[`
+// (trừ trạng thái `(aq)` `(dd)`…). Là ĐIỆN TÍCH khi dính sau chất và sau nó là
+// hết chuỗi, dấu câu, hoặc dấu cách rồi tới toán tử / chữ thường.
+
+/** Sau `(` là kí hiệu trạng thái ⇒ dấu đứng trước vẫn là điện tích (`Na+(aq)`). */
+export const RE_TRANG_THAI = /^\((aq|s|l|g|dd|k|r)\)/
+
+/** Dấu đứng TRƯỚC vị trí `j` (đã dính sau chất) có phải hết một điện tích không. */
+function laHetDienTich(text: string, j: number): boolean {
+  const c = text[j]
+  if (c === undefined || /[.,;:)\]}/]/.test(c)) return true
+  if (c === '(') return RE_TRANG_THAI.test(text.slice(j))
+  if (!/\s/.test(c)) return false
+  const sau = text.slice(j).trimStart()
+  return !sau || !/^[A-Z0-9([]/.test(sau)
+}
+
+/** Từ chứa chữ số ở `i` là chất NHIỀU nguyên tử (≥ 2 chữ hoa, bỏ hệ số đầu):
+ * `RNH3` `C6H5NH3` `3NH4` có; `Fe3` `Cl3` (một nguyên tố) không. */
+function laNhieuNguyenTu(text: string, i: number): boolean {
+  let dau = i
+  while (dau > 0 && /[A-Za-z0-9()[\]₀-₉]/.test(text[dau - 1])) dau--
+  const tu = text.slice(dau, i).replace(/^[0-9]+/, '')
+  return (tu.match(/[A-Z]/g) ?? []).length >= 2
+}
+
+
 function parseChemTextDon(text: string): ChemPart[] {
   const parts: ChemPart[] = []
   const pushText = (ch: string) => {
@@ -526,6 +447,22 @@ function parseChemTextDon(text: string): ChemPart[] {
       }
     }
 
+    // ĐIỆN TÍCH TÁCH BẰNG DẤU CÁCH (thầy 27/10): `SO4 2-`, `CO3 2-` ⇒ SO₄²⁻.
+    // Chỉ khi chữ đứng trước là CÔNG THỨC kết thúc bằng chỉ số (có chữ hoa,
+    // tận cùng chữ số hoặc `)`) và sau dấu là chỗ hết điện tích — câu văn
+    // («câu 2-3», «Bài 2-») không lọt.
+    if (/[0-9]/.test(ch) && text[i - 1] === ' ') {
+      const m = /^([0-9]+)([+-])/.exec(text.slice(i))
+      if (m && laHetDienTich(text, i + m[0].length) && /(^|[^A-Za-z0-9()])[A-Z][A-Za-z0-9()]*[0-9)]$/.test(text.slice(0, i - 1))) {
+        const last = parts[parts.length - 1]
+        if (last && last.t === 'text') last.v = last.v.slice(0, -1)
+        if (last && last.t === 'text' && !last.v) parts.pop()
+        parts.push({ t: 'sup', v: m[1] + m[2] })
+        i += m[0].length
+        continue
+      }
+    }
+
     // Tự động: dãy số ngay sau chữ/dấu đóng ngoặc
     if (/[0-9]/.test(ch)) {
       const lastPart = parts[parts.length - 1]
@@ -534,7 +471,25 @@ function parseChemTextDon(text: string): ChemPart[] {
         const m = /^[0-9]+/.exec(text.slice(i))!
         const after = text[i + m[0].length]
         const dauLaLienKet = after === '-' && laCongThucCauTao(text, i + m[0].length)
-        if ((after === '+' || after === '-') && !dauLaLienKet) {
+        // ION NHIỀU NGUYÊN TỬ MỘT ĐIỆN TÍCH (thầy 27/10): `RNH3+ + OH-`,
+        // `3NH4+`, `C6H5NH3+` ⇒ chỉ số dưới + dấu mũ. Một nguyên tố trơn
+        // (`Fe3+`, `Cl3-`) vẫn để bảng ion quen thuộc lo — xem ghi chú bảng.
+        // Ion phức `[Ni(NH3)6]2+` ⇒ cả «2+» là điện tích của ngoặc vuông.
+        if ((after === '+' || after === '-') && prevChar === ']' && laHetDienTich(text, i + m[0].length + 1)) {
+          parts.push({ t: 'sup', v: m[0] + after })
+          i += m[0].length + 1
+          continue
+        }
+        if ((after === '+' || after === '-') && !dauLaLienKet && m[0].length === 1 && (laHetDienTich(text, i + 2) || /^\+[A-Z0-9(]/.test(text.slice(i + 2))) && laNhieuNguyenTu(text, i)) {
+          parts.push({ t: 'sub', v: m[0] })
+          parts.push({ t: 'sup', v: after })
+          i += m[0].length + 1
+          continue
+        }
+        // `NH2+HCl`, `H2+3O2`: dấu cộng dính liền chất / hệ số sau ⇒ toán tử, số trước là chỉ số.
+        const sauDau = text.slice(i + m[0].length + 1)
+        const congLaToanTu = after === '+' && /^[A-Z0-9([]/.test(sauDau) && !RE_TRANG_THAI.test(sauDau)
+        if ((after === '+' || after === '-') && !dauLaLienKet && !congLaToanTu) {
           pushText(m[0])
           i += m[0].length
           continue
@@ -550,9 +505,13 @@ function parseChemTextDon(text: string): ChemPart[] {
       const prevChar = text[i - 1]
       const nextChar = text[i + 1]
       const boundaryBefore = isAtomBoundaryChar(prevChar)
-      const boundaryAfter = !nextChar || !/[0-9+-]/.test(nextChar)
+      // `+` dính sau chất mà theo sau là CHỮ HOA / `(` / `[` thì là TOÁN TỬ
+      // nối chất mới (thầy 27/10: `ROH+N₂↑` từng in ROH⁺N₂↑), không phải điện tích.
+      const boundaryAfter = !nextChar || !/[0-9+\-A-Z([]/.test(nextChar) || (nextChar === '(' && RE_TRANG_THAI.test(text.slice(i + 1)))
       const laLienKet = ch === '-' && laCongThucCauTao(text, i)
-      if (boundaryBefore && boundaryAfter && !laLienKet) {
+      // Sau chỉ số đã viết sẵn (`RNH₃+ + OH⁻`) ⇒ điện tích chỉ khi hết điện tích chắc chắn.
+      const sauChiSo = /[₀-₉]/.test(prevChar ?? '') && laHetDienTich(text, i + 1)
+      if (((boundaryBefore && boundaryAfter) || sauChiSo) && !laLienKet) {
         parts.push({ t: 'sup', v: ch })
         i += 1
         continue
@@ -674,12 +633,6 @@ function quetKhucLatex(s: string, i: number): number {
   return cuoi
 }
 
-/** Đổi ký hiệu toán Unicode về lệnh LaTeX tương ứng TRƯỚC khi đưa cho KaTeX.
- * Kho đề cũ đã bị một lượt "gỡ LaTeX" đổi `\times` thành `×` nhưng bỏ sót
- * `\bar` và `\dfrac`, nên chuỗi còn lại lẫn cả hai kiểu. */
-function kyHieuToanVeLatex(s: string): string {
-  return s.replace(/\u00d7/g, '\\times ').replace(/\u00b7/g, '\\cdot ').replace(/\u2212/g, '-')
-}
 
 export function splitCeSegments(raw: string): Segment[] {
   const text = raw ?? ''
@@ -737,35 +690,6 @@ const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as 
 /** 1 công thức "\ce{...}" hoặc "$...$" render bằng KaTeX. Lỗi cú pháp -> hiện
  * nguyên văn chuỗi gốc kèm gạch chân đỏ cảnh báo, KHÔNG BAO GIỜ để trắng hay
  * làm sập trang. */
-/** Công thức dài hơn ngần này thì tách thành khối riêng cuộn ngang được.
- *
- * Ngưỡng đặt theo phương trình NGẮN NHẤT đã thấy bị cắt trên máy thầy:
- * `HCOOCH3 + NaOH -> HCOONa + CH3OH` (32 ký tự) tràn khỏi ô lời giải ở màn
- * Gọi lên bảng. Bản đầu để 42 nên đúng câu đó vẫn lọt lưới. Để 26 thì mọi
- * phương trình phản ứng đều thành khối riêng, còn công thức một chất
- * (`CH3COOC2H5` — 10 ký tự) vẫn nằm trong dòng chữ như cũ.
- *
- * Thà xuống dòng thừa còn hơn cắt cụt: chữ tràn ra ngoài thì em MẤT HẲN vế
- * phải mà không biết là mình đang thiếu.
- *
- * Đo bằng `beRongUocTinh`, KHÔNG bằng `latex.length` — xem ghi chú ở hàm đó. */
-const DAI_PHAI_CUON = 26
-
-function chuanHoaMuiTenMhchem(raw: string): string {
-  let s = String(raw ?? '')
-  s = s.replace(/(<=>>|<<=>|<=>|<->|->|<-|→|←|⇌|\\to|\\rightarrow)(\s*)\(([^)]+)\)/g, (m, mui: string, cach: string, nhan: string, viTri: number, goc: string) => {
-    // "-> (CH3)2O" là chất sản phẩm, không phải điều kiện — xem `laNhanMuiTen`.
-    const mo = viTri + mui.length + cach.length
-    if (!laNhanMuiTen(goc, mo, mo + nhan.length + 1, cach.length > 0, false)) return m
-    const chuanMui = mui === '→' || mui === '\\to' || mui === '\\rightarrow' ? '->' : mui === '←' ? '<-' : mui === '⇌' ? '<=>' : mui
-    return `${chuanMui}[${nhan}]`
-  })
-  s = s.replace(/\[([^\]]*)\]/g, (_m, nhan: string) => {
-    const dk = nhan.replace(/\bt\^o\b/gi, 't^\\circ').replace(/t°/g, 't^\\circ')
-    return `[${dk}]`
-  })
-  return s
-}
 
 function ChemTextNoMui({ text }: { text: string }): JSX.Element {
   const parts = parseChemTextDon(text)
@@ -788,6 +712,7 @@ function ChemTextNoMui({ text }: { text: string }): JSX.Element {
 // nguyên văn chữ trong một nhịp rồi tự vẽ lại khi KaTeX tới.
 type Katex = typeof KatexT
 let katexSan: Katex | null = null
+let chuanBi: typeof chuanBiLatex = (_t, latex) => ({ latex, dai: false })
 let huaKatex: Promise<Katex> | null = null
 const nguoiChoKatex = new Set<() => void>()
 
@@ -796,6 +721,7 @@ export function napKatex(): Promise<Katex> {
   if (!huaKatex) {
     huaKatex = import('./katex-goi').then(
       (m) => {
+        chuanBi = m.chuanBiLatex
         katexSan = m.default
         for (const f of nguoiChoKatex) f()
         return m.default
@@ -842,12 +768,12 @@ function dungCongThuc(katex: Katex, t: 'ce' | 'math', latexGoc: string): KetQuaC
     nhoCongThuc.set(khoa, co)
     return co
   }
-  // Chuẩn hoá TRƯỚC khi đưa cho mhchem
-  const latex = chuanHoaCongThucTongQuat(chuanHoaNhanMuiTen(kyHieuToanVeLatex(t === 'ce' ? chuanHoaMuiTenMhchem(latexGoc) : latexGoc)))
+  // Chuẩn hoá TRƯỚC khi đưa cho mhchem (phần chỉ cần khi có KaTeX ở mảnh nạp lười chem-latex.ts)
+  const { latex, dai } = chuanBi(t, latexGoc)
   let kq: KetQuaCongThuc
   try {
     const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
-    kq = { latex, html, dai: beRongUocTinh(latex) > DAI_PHAI_CUON }
+    kq = { latex, html, dai }
   } catch {
     kq = { latex, loi: true }
   }
@@ -950,6 +876,19 @@ function MotPhan({ p }: { p: ChemPart }): JSX.Element | null {
   return <span>{p.v}</span>
 }
 
+// ---------------------------------------------------------------------------
+// TRÌNH BÀY PHƯƠNG TRÌNH (thầy 27/10) — phần bọc kí tự (khoảng hẹp quanh toán tử,
+// ⇌ cỡ chữ, «l» có đuôi) nằm ở mảnh RIÊNG `chem-trinh-bay.tsx`, chỉ màn làm bài
+// của app học sinh nạp và tự cắm vào đây ⇒ không cộng byte lượt mở ba app, app
+// thầy / phụ huynh / phiếu in giữ DOM y nguyên.
+type TrinhBay = (v: string, truoc: string, sau: string) => ReactNode
+let trinhBay: TrinhBay | null = null
+export const datTrinhBayChu = (f: TrinhBay): void => { trinhBay = f }
+
+/** Kí tự cuối / đầu đại diện của một đoạn (chỉ số ⇒ «₀», số mũ ⇒ «⁺», mũi tên ⇒ chính nó). */
+const kyTuBien = (p: ChemPart, cuoi: boolean): string => p.t === 'mui' ? p.mui : p.t === 'sub' ? '₀' : p.t === 'sup' ? '⁺' : p.v[cuoi ? p.v.length - 1 : 0] ?? ''
+const bay = (v: string, truoc: string, sau: string): ReactNode => trinhBay ? trinhBay(v, truoc, sau) : v
+
 /** Một khúc chữ (không tách sơ đồ nữa). Công thức và "mũi tên + chất sau" được
  * bọc liền (`ct-lien`) để không bị ngắt dòng giữa chừng. */
 function ChemDong({ text }: { text: string }): JSX.Element {
@@ -967,8 +906,10 @@ function ChemDong({ text }: { text: string }): JSX.Element {
         // Chữ thường liền kề gộp lại một span như bản cũ — DOM gọn, test cũ không đổi.
         const nut: JSX.Element[] = []
         let dem = ''
-        const xa = () => {
-          if (dem) nut.push(<span key={nut.length}>{dem}</span>)
+        let truoc = ''
+        const xa = (sau: string) => {
+          if (dem) nut.push(<span key={nut.length}>{bay(dem, truoc, sau)}</span>)
+          if (dem) truoc = dem[dem.length - 1]
           dem = ''
         }
         for (const g of gom) {
@@ -977,18 +918,27 @@ function ChemDong({ text }: { text: string }): JSX.Element {
               dem += g.x.v
               continue
             }
-            xa()
+            xa(kyTuBien(g.x, false))
             nut.push(<MotPhan key={nut.length} p={g.x} />)
+            truoc = kyTuBien(g.x, true)
             continue
           }
-          xa()
+          xa(kyTuBien(g.ds[0], false))
+          const ds = g.ds
           nut.push(
             <span key={nut.length} className="ct-lien" style={{ whiteSpace: 'nowrap' }}>
-              {g.ds.map((p, j) => (p.t === 'text' ? <span key={j}>{p.v}</span> : <MotPhan key={j} p={p} />))}
+              {ds.map((p, j) =>
+                p.t === 'text' ? (
+                  <span key={j}>{bay(p.v, j > 0 ? kyTuBien(ds[j - 1], true) : truoc, j + 1 < ds.length ? kyTuBien(ds[j + 1], false) : '')}</span>
+                ) : (
+                  <MotPhan key={j} p={p} />
+                ),
+              )}
             </span>,
           )
+          truoc = kyTuBien(ds[ds.length - 1], true)
         }
-        xa()
+        xa('')
         return <span key={si}>{nut}</span>
       })}
     </>

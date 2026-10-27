@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
+import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2, guiLaiKhiKetMang } from '../hoa2/api'
@@ -43,7 +44,7 @@ import { IcNguyenTu } from '../thuong/hinh'
 import { capNhatTongQuan } from '../thuong/dung-thuong'
 import { DUONG, docKetBai, docThuongCau, khoaTam, layTam, ngayVn, type TongQuanThuong } from '../../lib/thuong-api'
 // GIỮ CHÂN KHI THOÁT + băng nhắc + lời động viên (thầy 27/10, ảnh Duolingo): móc nhỏ ở đây, tấm + CSS là mảnh nạp lười (GiuChan.tsx).
-import { BangNhac, napSanGiuChan, TamGiuChanLuoi, useGiuChan } from './GiuChan'
+import { napSanGiuChan, TamGiuChanLuoi, useGiuChan } from './GiuChan'
 import { canGiuChan, chuoiHomNay, loiBangNhac, loiDongVien, loiGiuChan, type CauDaCham } from './giu-chan'
 const KetBaiThuong = lazy(() => import('../thuong/KetBaiThuong'))
 // Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng; ở đây chỉ phần chọn mức (nhỏ).
@@ -661,7 +662,6 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         {coNt ? <span ref={demRef} className="duo-chuoi" data-co={ntBai > 0 || undefined} aria-label={`Nguyên tử của bài này: ${ntBai}`}><IcNguyenTu />{ntTre ?? ntBai}</span>
           : <span className="duo-chuoi" data-co={chuoi > 0 || undefined} aria-label={`Chuỗi ${chuoi} câu đúng liền`}><Flame size={22} aria-hidden="true" />{chuoi}</span>}
         {combo && <BangCombo key={combo.id} n={combo.n} />}
-        {!combo && !giu.mo && bangNhac && q && <BangNhac chu={bangNhac} khoa={q.qid} />}
       </header>}
       <main className="duo-than" data-de-dai={deDai || undefined} aria-live={xong ? 'polite' : undefined}>
         {tai ? <div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang chuẩn bị những câu phù hợp với em…</span></div>
@@ -684,7 +684,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {th && k && !laLamLai && !luot?.moc && <BangComboTp chuoi={khongTinh ? 0 : th.chuoiDung} tat={khongTinh && chuoiTruocTp >= 3} truoc={chuoiTruocTp} />}
           <div key={`d${q.qid}`} className="duo-cot-de">{/* khung thấp xoay ngang: cột trái = đề, cột phải = phương án + Kiểm tra / tấm kết quả; dọc / máy tính: display: contents (y bố cục cũ) */}
           {laLamLai ? <p className="duo-nhan" data-lam-lai=""><span>Làm lại · câu {stt}/{lamLai.length}</span><span className="duo-chip">Cùng dạng câu {goc.findIndex(c => c.qid === q.lamLaiCua) + 1 || '?'}</span></p>
-            : <p className="duo-nhan" data-nc=""><span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
+            // thầy 27/10: lời nhắc chặng nằm TRONG dòng nhãn (không lớp nổi đè), mờ về nhãn thường sau 1,8 s — CSS «NHÃN CÂU NHẮC CHẶNG»
+            : <p className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
           {!laLamLai && <div className="duo-lenh"><h2>{lenh}</h2>{nutDen}</div>}
           {laLamLai && !k && viTri === soGoc && <p className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
           {mucGt ? <div className="duo-gt-san" data-nho={deDaiGiamThi(q) || undefined}>

@@ -1,4 +1,4 @@
-// GIỮ CHÂN KHI THOÁT (thầy 27/10, ảnh Duolingo): phần NHỎ nằm trong mảnh màn làm bài — móc `useGiuChan` (nút X, phím Esc, nút back Android) + băng nhắc.
+// GIỮ CHÂN KHI THOÁT (thầy 27/10, ảnh Duolingo): phần NHỎ nằm trong mảnh màn làm bài — móc `useGiuChan` (nút X, phím Esc, nút back Android) (băng nhắc nằm trong dòng nhãn câu).
 // Tấm đáy (Bi buồn + lời nhắn + «Tiếp tục học» / «Thoát») và CSS của nó là mảnh RIÊNG nạp lười (`TamGiuChan.tsx` + styles/trong-giu-chan.css), nạp sẵn
 // ngay khi vào màn Duo ⇒ bấm X là tấm trượt lên liền, không chờ mạng. Chữ dựng ở giu-chan.ts (hàm thuần). KHÔNG dùng ở màn bài kiểm tra / ca thi.
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
@@ -62,10 +62,4 @@ export function TamGiuChanLuoi(p: PropsTam) {
   return <Suspense fallback={null}><TamGiuChan {...p} /></Suspense>
 }
 
-/** Băng nhắc nhỏ trượt xuống dưới thanh trên rồi tự ẩn (mở chặng, trước câu cuối). Không chặn bấm. `khoa` đổi ⇒ chạy lại. */
-export function BangNhac({ chu, khoa }: { chu: string; khoa: string }) {
-  const [hien, setHien] = useState(true)
-  useEffect(() => { setHien(true); const t = window.setTimeout(() => setHien(false), 2600); return () => window.clearTimeout(t) }, [khoa])
-  if (!chu || !hien) return null
-  return <div key={khoa} className="giu-bang" role="status">{chu}</div>
-}
+// Băng nhắc mở chặng / trước câu cuối: nay nằm TRONG dòng nhãn câu của ManLamBaiTap (thầy 27/10: viên nổi đè lên nhãn).
