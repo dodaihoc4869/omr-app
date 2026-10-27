@@ -1,0 +1,38 @@
+/* BÓNG ĐÈN «TRỢ GIÚP» + TẤM BẬT XUỐNG của màn Duo (TroGiupDuo.tsx, thầy 27/10 «ẩn đi, bấm vào mới hiện» ⇒ «cho vào cái bóng đèn»). Nút là `.duo-den`
+ * sẵn có cạnh dòng lệnh (trong-lam-bai.css); thêm chấm nhỏ màu chú ý khi còn trợ giúp chưa xem. Tấm: ngay dưới bóng đèn, scale .9 → 1 + mờ dần 140 ms
+ * (chỉ transform / opacity). Nạp qua @import trong styles/trong-lam-bai.css. Chỉ biến màu «Trong» có sẵn. */
+[data-trong] .duo-tg { position: relative; flex: none; margin-left: auto; }
+[data-trong] .duo-tg[hidden] { display: none; }
+[data-trong] .duo-tg .duo-den { position: relative; -webkit-tap-highlight-color: transparent; transition: transform .08s ease; }
+[data-trong='hs'] .duo-tg .duo-den:active { transform: translateY(2px); }
+[data-trong] .duo-tg .duo-den[data-moi]::after {
+  content: ''; position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border: 2px solid var(--tr-mat); border-radius: 50%; background: var(--tr-chu-y);
+}
+[data-trong] .duo-lenh[data-chi-den] { justify-content: flex-end; margin-top: -8px; }
+/* hàng bóng đèn nổi trên phần đề phía sau (các khối đề có transform khi trượt vào ⇒ tự tạo lớp xếp chồng) và trên thanh đáy dính khi tấm mở dài */
+[data-trong] .duo-lenh:has(> .duo-tg) { position: relative; z-index: 7; }
+
+[data-trong] .duo-tg-tam {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; display: flex; flex-direction: column; gap: 2px;
+  width: max-content; min-width: 230px; max-width: calc(100vw - 32px); padding: 6px; border: 2px solid var(--tr-vien-2); border-radius: 18px;
+  background: var(--tr-mat); box-shadow: var(--tr-bong-1); transform-origin: calc(100% - 23px) 0; animation: duo-tg-bat 140ms ease-out;
+}
+[data-trong] .duo-tg-tam[hidden] { display: none; }
+@keyframes duo-tg-bat { from { opacity: 0; transform: scale(.9); } }
+/* các mục: chính các nút cũ, trình bày thành dòng biểu tượng + chữ */
+[data-trong] .duo-tg-tam :is(.lg-nut-hang, .duo-o-nut-cham) { display: contents; }
+[data-trong] .ht-app.duo .duo-tg-tam :is(.duo-lien, .lg-nut-hoi-thay, .gyc-nut-bat-dau) {
+  display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; min-height: 48px; margin: 0; padding: 0 16px 0 12px;
+  border: 0; border-radius: 12px; background: transparent !important; box-shadow: none !important; color: var(--tr-chu);
+  font-size: 16px; font-weight: 700; letter-spacing: 0; text-transform: none; text-align: left; white-space: nowrap;
+}
+[data-trong] .ht-app.duo .duo-tg-tam :is(.duo-lien, .lg-nut-hoi-thay, .gyc-nut-bat-dau) svg { width: 22px; height: 22px; flex: none; color: var(--tr-tin-chu); }
+[data-trong] .ht-app.duo .duo-tg-tam .gyc-nut-bat-dau svg { color: var(--tr-hs-chu); }
+[data-trong] .ht-app.duo .duo-tg-tam :is(.duo-lien, .lg-nut-hoi-thay, .gyc-nut-bat-dau):not(:disabled):hover,
+[data-trong] .ht-app.duo .duo-tg-tam :is(.duo-lien, .lg-nut-hoi-thay, .gyc-nut-bat-dau):focus-visible { background: var(--tr-mat-2) !important; }
+[data-trong] .ht-app.duo .duo-tg-tam .lg-loi { max-width: 280px; padding: 4px 12px 8px; font-size: 13.5px; color: var(--tr-chu-2); white-space: normal; }
+
+/* điện thoại ngang: cột đề ghim tự cuộn (overflow) sẽ cắt tấm ⇒ trong lúc tấm mở cho cột tràn ra */
+@media (orientation: landscape) and (max-height: 500px) { [data-trong] .duo:not([data-xong]) .duo-cot-de:has(.duo-tg-tam:not([hidden])) { overflow: visible; } }
+@media (prefers-reduced-motion: reduce) { [data-trong] .duo-tg-tam { animation: none; } [data-trong] .duo-tg .duo-den { transition: none; } [data-trong='hs'] .duo-tg .duo-den:active { transform: none; } }
+[data-trong].may-yeu .duo-tg-tam { animation: none; }

@@ -281,6 +281,21 @@ const DUO_CANH = [
 const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   DUO_CANH.map(([t, viec]) => [`duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết DUO 26/10
+// ═══ BÀN PHÍM DUO 27/10 (tiền tố "duo-5-tln-"): câu trả lời ngắn có đủ trợ giúp (`&ba=1`: Bắt đầu từ đâu? · Học cách giải · Hỏi thầy) — mở câu (tự cuộn
+// để trọn bàn phím trên thanh đáy) · gõ 8,2 · vừa bấm xoá · tấm bóng đèn «Trợ giúp» mở; thêm tấm ấy ở câu trắc nghiệm, đúng–sai và màn sửa câu Duo.
+// 390×844, 360×640, 844×390, 1440×900, sáng + tối.
+const BP_TLN = `lam13:${D_Q4} » nut:^Tự làm câu này`
+const BP_CANH = [
+  ['duo-5-tln-ba-dau', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, BP_TLN], ['duo-5-tln-ba-go', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, `${BP_TLN} » phim:8,2`],
+  ['duo-5-tln-ba-xoa', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, `${BP_TLN} » phim:8,2 » nut:^Xoá một kí tự$`],
+  ['duo-5-tln-ba-tg-mo', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, `${BP_TLN} » phim:8,2 » nut:^Trợ giúp`],
+  ['duo-5-tln-tg-tn-mo', 'lam13&lam=duo', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Trợ giúp'],
+  ['duo-5-tln-tg-ds-mo', 'lam13&lam=duo', /Số đồng phân amine/, `lam13:${D_Q3} » ds:a=Đúng » nut:^Trợ giúp`],
+  ['duo-5-tln-tg-sua-mo', 'duo-sua&de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Trợ giúp'],
+]
+const DS_BP = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  BP_CANH.map(([t, m, cho, viec]) => [`${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết BÀN PHÍM DUO 27/10
 // ═══ THẺ CHẠM 27/10 (thầy: «làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo»): thẻ nhỏ neo dưới chữ tô tím trên màn làm chặng THẬT
 // (`lam13&lam=duo&cham=…`, gia/lam-bai-1210d.ts) — mở trên chất / đơn vị / phủ định; 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
 // `vd` = câu ethylamine trong ảnh thầy (không còn tô «dịch chất nào sau đây»; chạm «Ethylamine» ⇒ tên · công thức · M). Thao tác `cham:<chữ>` = chạm chữ đó rồi chờ thẻ. Tiền tố "duo-cham-".
@@ -485,6 +500,7 @@ const DS = [
   ...DS_NG_HS, // NGANG HS 26/10
   ...DS_DUO_SUA, // DUO SỬA 27/10
   ...DS_DUO, // DUO 26/10
+  ...DS_BP, // BÀN PHÍM DUO 27/10
   ...DS_GIU, // GIỮ CHÂN 27/10
   ...DS_GT, // GIÁM THỊ 27/10
   ...DS_CHAM, // THẺ CHẠM 27/10
