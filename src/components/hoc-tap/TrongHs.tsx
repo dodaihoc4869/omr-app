@@ -246,6 +246,9 @@ export function MotTrangHs(p: PropsMotTrang) {
   const khung = useRef<HTMLDivElement>(null), mocBai = useRef<HTMLElement>(null)
   const [trenCao, datTrenCao] = useState(52)
   const [dinh, datDinh] = useState(false)
+  // dải gọn chỉ dựng từ lần dính đầu (chưa cuộn ⇒ không có bản sao tên bài trong cây); đã dựng thì giữ để thu / hiện mượt
+  const daDinh = useRef(false)
+  if (dinh) daDinh.current = true
   useLayoutEffect(() => {
     const tr = khung.current?.querySelector<HTMLElement>('.da-tren')
     if (!tr) return
@@ -258,6 +261,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   useEffect(() => {
     const m = mocBai.current
     if (!m || typeof IntersectionObserver !== 'function') return
+    // vạch mốc nằm ở ĐÁY thẻ đầy đủ: khuất dưới hàng bộ đếm ⇒ hiện dải gọn (chỉ đổi một thuộc tính; không tính gì trong onscroll)
     const io = new IntersectionObserver(([e]) => { if (e) datDinh(!e.isIntersecting && e.boundingClientRect.top < trenCao + 2) }, { rootMargin: `-${trenCao + 1}px 0px 0px 0px`, threshold: 0 })
     io.observe(m)
     return () => io.disconnect()
@@ -389,10 +393,17 @@ export function MotTrangHs(p: PropsMotTrang) {
     <main className="da-vo" aria-busy={!so && p.dangTai}>
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
       {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label="Đủ mức hôm nay"><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua"><b>Đủ {so.daLam}/{so.muc} câu hôm nay!</b><span className="mo">{tiepTheo.length ? `Tiếp theo: ${tiepTheo.join(', rồi ')}` : 'Em có thể nghỉ, hoặc học thêm câu mới.'}</span></div></section>}
-      {!p.ngayKiem && <i ref={mocBai} className="da-bai-moc" aria-hidden="true" />}
-      {!p.ngayKiem && <section className="da-bai" data-dinh={dinh || undefined} aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{p.viec}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
+      {/* THẺ BÀI (thầy 27/10 «thu vào bị giật… cho thanh màu xanh xuống kẻo chèn vào ống nghiệm»): thẻ đầy đủ ĐỨNG YÊN trong luồng (giữ chỗ, không nhảy cuộn);
+          cuộn qua ⇒ DẢI GỌN 54px (tên bài · thanh mảnh · chặng) dính dưới hàng bộ đếm, cross-fade opacity + translateY 200 ms; sau dải là nền trang đặc + mép mờ
+          ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
+      {!p.ngayKiem && <section className="da-bai" aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{p.viec}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
         {chang.length > 0 && <div className="da-bai-tien" role="progressbar" aria-label="Chặng hôm nay" aria-valuemin={0} aria-valuemax={chang.length} aria-valuenow={xongChang}><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</div>}
         {!so && p.dangTai && <span className="mot-xuong" aria-hidden="true" />}</section>}
+      {!p.ngayKiem && <i ref={mocBai} className="da-bai-moc" aria-hidden="true" />}
+      {!p.ngayKiem && (dinh || daDinh.current) && <div className="da-dai-dinh" data-hien={dinh || undefined} aria-hidden="true">
+        <div className="da-dai"><b>{p.tenBai || 'Bài học hôm nay'}</b>
+          {chang.length > 0 && <span className="da-dai-tien"><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</span>}</div>
+      </div>}
       {loiBi && <LoiBi key={loiBi[2]} cam={loiBi[0]} loi={loiBi[1]} coBi={!coBiBen} khoa={loiBi[2] === 'ca' ? undefined : `${ngayVn(Date.now())}|${loiBi[2]}|${p.tenBai ?? ''}`} />}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
