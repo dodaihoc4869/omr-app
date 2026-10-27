@@ -20,8 +20,10 @@ describe('GIAO BÀI VÀ GỌI LÊN BẢNG TÁCH RIÊNG', () => {
   })
 
   it('menu phân biệt giao bài với gọi lên bảng', () => {
-    expect(APP).toContain("goilenbang: 'Gọi lên bảng'")
-    expect(APP).toContain("giaobtvn: 'Giao bài tập về nhà'")
+    // 26/10: tên màn (báo lỗi) của màn có mục thanh bên lấy ĐÚNG tên mục MUC_DIEU_HUONG — hai mục mang hai tên khác nhau.
+    expect(APP).toContain('tenMucCua(MUC_DIEU_HUONG, s)')
+    expect(THANH).toContain("{ id: 'goilenbang', ten: 'Gọi lên bảng'")
+    expect(THANH).toContain("{ id: 'giaobtvn', ten: 'Giao bài tập về nhà'")
     expect(THANH).toContain('Gọi lên bảng')
     expect(THANH).toContain('Giao bài tập về nhà')
   })

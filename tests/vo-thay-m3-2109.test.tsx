@@ -24,7 +24,11 @@ afterEach(() => {
 
 describe('danh sách mục dùng chung (ngăn kéo · rail · thanh đáy)', () => {
   it('8 mục đúng thứ tự bản vẽ; Cài đặt là mục đáy; nhãn cũ mà test khác khoá còn nguyên', () => {
-    expect(MUC_DIEU_HUONG.map((m) => m.id)).toEqual(['examhub', 'hocsinh', 'lichsuca', 'nganhangde', 'giaobtvn', 'goilenbang', 'cauhoi', 'caidat'])
+    // SỬA CÓ CHỦ ĐÍCH 27/10: bộ menu cũ (cờ Hóa 2 tắt) đã THÊM ba mục sau bản 21/09 — Gỡ nút thắt (02/10, MUC_GO_NUT_THAT), Giao đề theo tuần (`khodegiao`)
+    // và Thi đua tuần (26/10, MUC_THI_DUA: ngay dưới Học sinh). Tám mục gốc vẫn đủ, đúng thứ tự cũ; Cài đặt vẫn là mục đáy duy nhất.
+    expect(MUC_DIEU_HUONG.map((m) => m.id)).toEqual(['examhub', 'hocsinh', 'thidua', 'lichsuca', 'nganhangde', 'giaobtvn', 'goilenbang', 'cauhoi', 'bangonutthat', 'khodegiao', 'caidat'])
+    const GOC_2109 = ['examhub', 'hocsinh', 'lichsuca', 'nganhangde', 'giaobtvn', 'goilenbang', 'cauhoi', 'caidat']
+    expect(MUC_DIEU_HUONG.map((m) => m.id).filter((id) => GOC_2109.includes(id))).toEqual(GOC_2109)
     expect(MUC_DIEU_HUONG.filter((m) => m.cuoi).map((m) => m.id)).toEqual(['caidat'])
     const ten = Object.fromEntries(MUC_DIEU_HUONG.map((m) => [m.id, m.ten]))
     expect(ten).toMatchObject({ examhub: 'Hôm nay', giaobtvn: 'Giao bài tập về nhà', goilenbang: 'Gọi lên bảng', cauhoi: 'Học sinh hỏi', caidat: 'Cài đặt' })
@@ -61,13 +65,15 @@ describe('ThanhBenTrai (ngăn kéo / rail)', () => {
 })
 
 describe('BottomNav (< 880 px) — ĐỦ mục', () => {
-  it('bốn mục chính + Thêm; tờ Thêm chứa đúng bốn mục còn lại → hợp lại đủ cả 8', () => {
+  it('bốn mục chính + Thêm; tờ Thêm chứa đúng các mục còn lại → hợp lại đủ mọi mục', () => {
     render(<BottomNav />)
     for (const t of ['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Bài tập', 'Thêm']) expect(screen.getByText(t)).toBeTruthy()
     expect(screen.queryByRole('menu')).toBeNull()
     fireEvent.click(screen.getByText('Thêm'))
     const items = screen.getAllByRole('menuitem').map((e) => e.textContent)
-    expect(items).toEqual(['Ngân hàng đề', 'Gọi lên bảng', 'Học sinh hỏi', 'Cài đặt'])
+    expect(items).toEqual(['Thi đua tuần', 'Ngân hàng đề', 'Gọi lên bảng', 'Học sinh hỏi', 'Gỡ nút thắt', 'Giao đề theo tuần', 'Cài đặt'])
+    // bốn mục chính + tờ Thêm = ĐỦ danh sách dùng chung (không mục nào chỉ có ở ngăn kéo)
+    expect([...['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Giao bài tập về nhà'], ...items].sort()).toEqual(MUC_DIEU_HUONG.map((m) => m.ten).sort())
     expect(screen.getByText('Thêm').closest('button')!.getAttribute('aria-expanded')).toBe('true')
     fireEvent.click(screen.getByRole('menuitem', { name: 'Ngân hàng đề' }))
     expect(useAppStore.getState().screen).toBe('nganhangde')
@@ -129,8 +135,12 @@ describe('App.tsx: vỏ giáo viên', () => {
   it('gốc mang m3 m3-thay vo-thay; ThanhBenTrai đứng TRƯỚC khung nội dung; có màn caidat; áp giao diện khi mở', () => {
     expect(APP).toContain("`min-h-screen m3 m3-thay${laManThi ? '' : ' vo-thay'}`")
     expect(APP.indexOf('<ThanhBenTrai />')).toBeLessThan(APP.indexOf('<div className="khung-noi-dung">'))
-    expect(APP).toContain("caidat: 'Cài đặt'")
-    expect(APP).toContain("{screen === 'caidat' && <CaiDatScreen />}")
+    // 26/10: tên màn báo lỗi của màn có mục thanh bên lấy ĐÚNG tên mục (bảng TEN_MAN chỉ giữ màn không có mục) ⇒ Cài đặt đọc từ MUC_DIEU_HUONG.
+    expect(APP).toContain('tenMucCua(MUC_DIEU_HUONG, s)')
+    expect(MUC_DIEU_HUONG.find((m) => m.id === 'caidat')?.ten).toBe('Cài đặt')
+    // 26/10: màn một-thành-phần gộp vào bảng MAN_DON (mã màn ⇒ màn), dựng bằng `{ManDon && <ManDon />}` — Cài đặt vẫn có màn.
+    expect(APP).toMatch(/const MAN_DON[\s\S]*caidat: CaiDatScreen/)
+    expect(APP).toContain('{ManDon && <ManDon />}')
     expect(APP).toContain('if (canHoi) apDungGiaoDien(docGiaoDien())')
     // 26/10: CSS vỏ thầy là chuỗi trong mảnh App (chèn ngay sau tờ index), không còn import thường.
     expect(APP).toContain("import cssVoThay from './styles/vo-thay.css?inline'")
