@@ -53,6 +53,12 @@ export const laCauKho = (q: { sao?: unknown; mucDo?: unknown }): boolean => Numb
 
 /** Số câu tối đa của một bài (chặng) — mục tiêu ngày = ceil(mức câu hôm nay / số này). */
 export const CAU_MOI_BAI = 6
+/**
+ * CHẶNG ĐỦ (thầy 27/10 «tối ưu chặt chẽ… công bằng», lỗ hổng đo 27/10: 34/382 chặng xong < 6 câu, 22 «hoàn hảo» < 6 câu, 8 em-ngày ăn «Xong 2 chặng» chỉ nhờ
+ * chặng ngắn): từ 28/10 chặng < CAU_MOI_BAI câu KHÔNG tính vào «Xong N chặng», «Chặng hoàn hảo», mục tiêu ngày theo chặng, huy hiệu hoàn hảo. Ngày cũ giữ.
+ */
+export const NGAY_CHANG_DU = '2026-10-28'
+export const changDu = (ngay: string, soCau: number): boolean => ngay < NGAY_CHANG_DU || soCau >= CAU_MOI_BAI
 export const TT_RUONG = 15
 export const TT_MUC_TIEU_NGAY = 5
 export const TT_KIM_CUONG = 40

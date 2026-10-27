@@ -36,7 +36,7 @@ const DO = {
     FROM (SELECT g.sbd, g.ngay, g.muc AS m, (SELECT COUNT(DISTINCT s.qid) FROM su_kien_hoc s WHERE s.sbd = g.sbd AND s.ngay_vn = g.ngay AND s.ket_qua IS NOT NULL AND s.ma_nguon NOT LIKE 'ktcn:%') AS c
       FROM goi_bai_7_muc_ngay g WHERE g.ngay >= ? AND g.ngay < '2026-10-28' AND g.muc > 0)`,
   // L4 công bằng theo lớp: tỉ lệ (em, ngày) ĐỦ MỨC theo lớp — lớp nào mức quá cao / thiếu câu.
-  du_muc_theo_lop: `SELECT COALESCE(h.ten_lop, h.lop, '?') AS lop, COUNT(*) AS emNgay, SUM(x.c >= x.m) AS duMuc, ROUND(AVG(x.m), 1) AS mucTB, ROUND(AVG(x.c), 1) AS daLamTB
+  du_muc_theo_lop: `SELECT COALESCE(h.ten_lop, h.lop, 'chua_xep') AS lop, COUNT(*) AS emNgay, SUM(x.c >= x.m) AS duMuc, ROUND(AVG(x.m), 1) AS mucTB, ROUND(AVG(x.c), 1) AS daLamTB
     FROM (SELECT g.sbd, g.ngay, g.muc AS m, (SELECT COUNT(DISTINCT s.qid) FROM su_kien_hoc s WHERE s.sbd = g.sbd AND s.ngay_vn = g.ngay AND s.ket_qua IS NOT NULL AND s.ma_nguon NOT LIKE 'ktcn:%') AS c
       FROM goi_bai_7_muc_ngay g WHERE g.ngay >= ? AND g.ngay < '2026-10-28' AND g.muc > 0) x JOIN hoc_sinh h ON h.sbd = x.sbd GROUP BY 1 ORDER BY 2 DESC LIMIT 20`,
   // L4b em có làm (≥ 1 câu) mà mức > số câu còn có thể làm — đo mức cao bất thường.
