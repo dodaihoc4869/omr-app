@@ -8,11 +8,12 @@
 //   · Tuần T2 00:00 → CN 22:00 VN. Cron từ thứ Hai 00:05 VN chốt tuần trước: top 5 lên, 4 cuối rơi, Sắt không rơi, Kim cương top 3 «Quán quân»,
 //     tinh thể lên hạng 20/30/40/50/60, thông báo `cuoi_tuan`.
 //   · ĐỌC (`/hs/giai`, `tomTatGiaiEm`): MỘT batch, mọi câu theo chỉ mục (PK/idx_giai_tuan_nhom), không quét sổ.
-//   · KHÔNG trả số báo danh, KHÔNG nhãn, tên bạn = tên rút gọn + lớp.
+//   · KHÔNG trả số báo danh, KHÔNG nhãn, tên bạn = họ tên đủ (thầy 27/10) + lớp.
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { CAN_DANG_NHAP } from './on-lai-nop'
-import { tenRutGon, SBD_THU_NGHIEM } from './thi-dua-hom-nay'
+import { SBD_THU_NGHIEM } from './thi-dua-hom-nay'
+import { tenDayDu } from './thuong-b-chung'
 import { themNgay } from './ho-so-nam-kt'
 import {
   CO_NHOM, HANG, SO_LEN, SO_QUAN_QUAN, SO_ROI, TINH_THE_LEN_HANG, SQL_TEN_LOP,
@@ -158,7 +159,7 @@ export function docGiaiEm(em: string, kq: (Row[] | undefined)[]): GiaiCuaEm {
     em: str(x.em), nguyenTu: nguyenTuThat(num(x.nguyen_tu), num(x.ho_tro), x.bac === null || x.bac === undefined ? null : num(x.bac)),
     vaoLuc: str(x.vao_luc), hoTen: str(x.ho_ten), lop: str(x.lop),
   })))
-  const nhom = xep.map((x) => ({ thuHang: x.thuHang, ten: tenRutGon(x.hoTen), lop: x.lop, nguyenTu: x.nguyenTu, laEm: x.em === em }))
+  const nhom = xep.map((x) => ({ thuHang: x.thuHang, ten: tenDayDu(x.hoTen), lop: x.lop, nguyenTu: x.nguyenTu, laEm: x.em === em }))
   return { hang, trangThai: 'co', nhom, thuHang: nhom.find((x) => x.laEm)?.thuHang ?? null }
 }
 

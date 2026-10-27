@@ -108,15 +108,38 @@ export function tinhThuongTraLoi(v: VaoThuongTraLoi): RaThuongTraLoi {
     xongBai = v.session.questions.length > 0 && v.session.questions.every((x) => da.has(x.qid))
   }
   if (xongBai) {
-    const cauBai: CauCuaBai[] = nt.map((x) => ({
-      dung: x.d === 1, hoTro: x.h === 1 || x.l === 1,
-      thuong: { tinh: x.t === 1, nguyenTu: x.n, dong: dongTuMuc(x), chuoiDung: x.c, cauKho: x.k === 1 },
-    }))
-    const giayDo = nt.reduce((s, x) => s + x.g, 0)
-    const giay = giayDo > 0 ? giayDo : Math.max(0, Math.round((v.nowMs - (Number(v.session.created) || v.nowMs)) / 1000))
-    ra.ketBai = ketBaiNguyenTu(cauBai, giay)
+    ra.ketBai = ketBaiTuNt(nt, v.session.created, v.nowMs)
     if (ra.ketBai.hoanHao) ra.thuongBai = NT_HOAN_HAO
   }
+  return ra
+}
+
+/** Kết bài từ các câu đã lưu gọn của phiên (dùng chung cho câu nộp và câu «Học cách giải»). */
+function ketBaiTuNt(nt: readonly MucNt[], created: unknown, nowMs: number): KetBaiNguyenTu {
+  const cauBai: CauCuaBai[] = nt.map((x) => ({
+    dung: x.d === 1, hoTro: x.h === 1 || x.l === 1,
+    thuong: { tinh: x.t === 1, nguyenTu: x.n, dong: dongTuMuc(x), chuoiDung: x.c, cauKho: x.k === 1 },
+  }))
+  const giayDo = nt.reduce((s, x) => s + x.g, 0)
+  const giay = giayDo > 0 ? giayDo : Math.max(0, Math.round((nowMs - (Number(created) || nowMs)) / 1000))
+  return ketBaiNguyenTu(cauBai, giay)
+}
+
+/**
+ * CÂU «HỌC CÁCH GIẢI» (lệnh `hoc-tap-gap`, lỗi 27/10 — vòng «Mục tiêu ngày» đứng 1/16 dù em làm thêm nhiều chặng): câu em chọn học cách giải KHÔNG đi qua
+ * lệnh `answer` ⇒ trước đây không vào `$.nt` của phiên ⇒ chặng có một câu như vậy KHÔNG BAO GIỜ «xong bài» (thiếu `ketBai`, thiếu dòng `thuong_bai_xong`).
+ * Nay câu ấy vào `$.nt` như một câu có hỗ trợ KHÔNG được tính: 0 nguyên tử, không chuỗi, mất Hoàn hảo — đúng luật thưởng cũ, chỉ để chặng đếm là xong.
+ * Câu đã có trong `$.nt` (đã nộp / gọi lặp) ⇒ giữ nguyên bản cũ. Trả null khi phiên không phải bài học (Kim cương không có lệnh này).
+ */
+export function tinhThuongHocCachGiai(session: PhienNt, qid: string, cau: { sao?: unknown; mucDo?: unknown }, nowMs: number): RaThuongTraLoi | null {
+  if (session.hocTap !== 1 || session.kimCuong === 1) return null
+  const cu = docNt(session.nt)
+  const cauKho = laCauKho(cau)
+  const thuong: ThuongCau = { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0, cauKho }
+  const nt = cu.some((x) => x.q === qid) ? cu : [...cu, { q: qid, n: 0, d: 0, h: 1, t: 0, k: cauKho ? 1 : 0, c: 0, g: 0 } satisfies MucNt]
+  const ra: RaThuongTraLoi = { thuong, thuongBai: 0, nt }
+  const da = new Set(nt.map((x) => x.q))
+  if (session.questions.length > 0 && session.questions.every((x) => da.has(x.qid))) ra.ketBai = ketBaiTuNt(nt, session.created, nowMs)
   return ra
 }
 
@@ -124,11 +147,13 @@ export function tinhThuongTraLoi(v: VaoThuongTraLoi): RaThuongTraLoi {
  * Các câu GHI/ĐỌC thêm vào CUỐI lô chấm (mọi câu ghi gác `EXISTS` bản chấm vừa chèn — bản chấm thua CAS thì không ghi gì). Câu CUỐI luôn là câu đọc mục tiêu
  * ngày khi bài vừa xong. Trả cả hàm đọc kết quả.
  */
-export function lenhThuongTraLoi(env: Env, x: { sbd: string; phien: string; receipt: string; ngay: string; luc: string; nowMs: number; ra: RaThuongTraLoi; chuyenDe?: string }): {
+export function lenhThuongTraLoi(env: Env, x: { sbd: string; phien: string; receipt: string; ngay: string; luc: string; nowMs: number; ra: RaThuongTraLoi; chuyenDe?: string
+  /** Gác thay cho «bản chấm vừa chèn» (lệnh «Học cách giải» không có bản chấm): MỘT biểu thức SQL với MỘT tham số `?` (= `receipt`). */
+  gac?: string }): {
   lenh: D1PreparedStatement[]; mucTieuTu(kq: readonly { results?: unknown[] }[]): { daXong: number; can: number } | null
 } {
   const { sbd, phien, receipt, ngay, luc, ra } = x
-  const dk = 'EXISTS (SELECT 1 FROM game_v2_attempt WHERE id = ?)'
+  const dk = x.gac ?? 'EXISTS (SELECT 1 FROM game_v2_attempt WHERE id = ?)'
   const lenh: D1PreparedStatement[] = [
     env.DB.prepare(`UPDATE game_v2_session SET json = json_set(json, '$.nt', json(?)) WHERE id = ? AND sbd = ? AND ${dk}`).bind(JSON.stringify(ra.nt), phien, sbd, receipt),
   ]

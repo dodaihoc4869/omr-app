@@ -203,6 +203,7 @@ describe('27/10 thầy «Bỏ thực tế lý thuyết đi» (ảnh nitrobenzene
     expect(lamSachChu('khối lượng benzene (kg per kmol)')).toBe('khối lượng benzene (kg/kmol)')
     expect(lamSachChu('Lượng thực tế: tính xuôi × H/100')).toBe('Lượng: tính xuôi × H/100')
     expect(lamSachChu('số mol aniline (chia M = 93)')).toBe('số mol aniline (chia M = 93)')
+    expect(lamSachChu('gam quặng theo lí thuyết (quặng chỉ chứa 60% FeS₂)')).toBe('gam quặng (quặng chỉ chứa 60% FeS₂)')
   })
   it('làm sạch mọi chữ hiện, không đụng số / tên bước', () => {
     const ban = { qid: 'q', phienBan: 1, deNoiGi: 'Tính lượng thực tế', soDo: { nut: [{ chat: 'C_6H_6', soLieu: ['m thực tế = ?'] }], muiTen: [], chieu: 'nguoc' as const },

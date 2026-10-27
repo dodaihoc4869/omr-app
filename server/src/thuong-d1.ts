@@ -117,7 +117,8 @@ interface NgayEm {
   mau: MauNhiemVu[]
   daSinh: boolean
   nhiemVu: NhiemVuEm[]
-  mucTieu: { daXong: number; can: number }
+  /** `cau` (CHỈ-THÊM 27/10) = mức câu hôm nay thầy đặt (vd. 96) — để vòng nói rõ «16 chặng (96 câu)»; chưa chốt mức ⇒ vắng. */
+  mucTieu: { daXong: number; can: number; cau?: number }
 }
 
 /** «Xong 2 bài» ⇒ «Xong 2 chặng», «Bài hoàn hảo» ⇒ «Chặng hoàn hảo»; giữ «Bài tập…», «Bài 8…». */
@@ -143,7 +144,7 @@ function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknow
   const mucCau = t.muc === null || t.muc === undefined ? null : so(t.muc)
   return {
     ngay, nguyenTu: so(t.nt), tinhTheSo: so(t.tt), daTra: new Set(docJson<string[]>(t.da_tra, [])), ruongMo: t.ruong !== null && t.ruong !== undefined,
-    soLieu, mucCau, mau, daSinh: mau.length > 0, nhiemVu, mucTieu: { daXong: soLieu.baiXong, can: mucTieuBai(mucCau) },
+    soLieu, mucCau, mau, daSinh: mau.length > 0, nhiemVu, mucTieu: { daXong: soLieu.baiXong, can: mucTieuBai(mucCau), ...(mucCau && mucCau > 0 ? { cau: mucCau } : {}) },
   }
 }
 

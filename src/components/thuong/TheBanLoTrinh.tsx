@@ -10,7 +10,7 @@ import { useRef, useState } from 'react'
 import { Users, X } from 'lucide-react'
 import { DUONG, goCua, layDsBan, ngayVn } from '../../lib/thuong-api'
 import { baoMoi, useTai } from './dung-thuong'
-import { banCanNhac, banChuaHoc, hieuUngGoCua, tenNgan } from './ban-gon'
+import { banCanNhac, banChuaHoc, chuCai, hieuUngGoCua, tenGoi } from './ban-gon'
 
 const KHO_DONG = 'ddh.thuong.moi-ban-an'
 const daDongHomNay = (): boolean => { try { return localStorage.getItem(KHO_DONG) === ngayVn() } catch { return false } }
@@ -38,7 +38,7 @@ export function TheBanLoTrinh({ token, bat, onMo }: PropsTheBanLoTrinh) {
   if (b) {
     const go = !!b.daGoCua || !!daGo[b.ma]
     const them = ds.ban.filter(banChuaHoc).length - 1
-    const ten = tenNgan(b.ten)
+    const ten = tenGoi(b.ten)
     const chuaCaHai = b.homNay === 'ca_hai_chua'
     const goCuaBan = async () => {
       if (dangGo || go) return
@@ -54,7 +54,7 @@ export function TheBanLoTrinh({ token, bat, onMo }: PropsTheBanLoTrinh) {
     const phu = [chuaCaHai ? `Học 1 chặng để giữ lửa đôi ${b.chuoiDoi} ngày` : `Lửa đôi ${b.chuoiDoi} ngày`, them > 0 ? `+${them} bạn chưa học` : ''].filter(Boolean).join(' · ')
     return <section className="da-ban" aria-label="Học cùng bạn">
       <button type="button" className="da-ban-mo" onClick={onMo} aria-label={`${tieuDe}. ${phu}. Mở Học cùng bạn`}>
-        <span className="da-ban-av" aria-hidden="true">{(ten[0] ?? '').toUpperCase()}</span>
+        <span className="da-ban-av" aria-hidden="true">{chuCai(b.ten)}</span>
         <span className="giua"><b>{tieuDe}</b><span>{phu}</span></span>
       </button>
       {b.homNay === 'ban_chua' && <button ref={nut} type="button" className="da-ban-go" disabled={go || dangGo} onClick={() => void goCuaBan()}>{go ? 'Đã gõ cửa' : 'Gõ cửa'}</button>}
@@ -64,8 +64,8 @@ export function TheBanLoTrinh({ token, bat, onMo }: PropsTheBanLoTrinh) {
   const moi = ds.loiMoi[0]
   if (moi) return <section className="da-ban" aria-label="Lời mời học cùng">
     <button type="button" className="da-ban-mo" onClick={onMo}>
-      <span className="da-ban-av" aria-hidden="true">{(tenNgan(moi.ten)[0] ?? '').toUpperCase()}</span>
-      <span className="giua"><b>{tenNgan(moi.ten)} mời em học cùng</b><span>Đồng ý để cùng giữ lửa đôi</span></span>
+      <span className="da-ban-av" aria-hidden="true">{chuCai(moi.ten)}</span>
+      <span className="giua"><b>{tenGoi(moi.ten)} mời em học cùng</b><span>Đồng ý để cùng giữ lửa đôi</span></span>
     </button>
   </section>
   if (ds.ban.length > 0 || ds.daMoi.length > 0 || an) return null

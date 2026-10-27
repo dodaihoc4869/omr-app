@@ -987,3 +987,34 @@
 [data-trong='hs'] .duo-ket[data-tp-trung] .duo-may[data-loai='trung'] .nen { fill: color-mix(in srgb, var(--tr-tin) 7%, var(--tr-mat)); }
 [data-trong='hs'] .duo-ket[data-tp-trung] .duo-may[data-loai='trung'] .vien { fill: color-mix(in srgb, var(--tr-tin) 22%, var(--tr-vien)); }
 .duo-tron { position: fixed; left: 0; top: 0; z-index: 70; border-radius: 50%; background: color-mix(in srgb, var(--tr-sai) 45%, var(--tr-sai-nhat)); pointer-events: none; will-change: transform, opacity; }
+/* 24. LÀM LẠI HIỆU ỨNG NGUYÊN TỬ + COMBO (thầy 27/10 «chưa đẹp mắt và tinh tế, làm lại cho ngon như Duolingo» · «sét đánh dọc màn hình rung lắc siêu xịn»;
+   video lỗi: thanh trên trôi khi câu dài, hạt Bi gom nhỏ, nhãn «+2 dây chuyền» đè hình đáp án, băng mốc che chữ «TRẮC NGHIỆM») — hieu-ung-duo.ts, SoLan.tsx.
+   Thanh trên DÍNH (nền đặc) ở mọi câu; viên «+N» chỉ bật cạnh bộ đếm; băng mốc nằm trong thanh trên (đè ống tiến độ, không che chữ); sét + loé trên cùng. */
+[data-trong='hs'] .duo:not([data-xong]) > .duo-tren { position: sticky; top: 0; z-index: 30; padding-bottom: 6px; background: var(--tr-mat); }
+[data-trong] .duo-chuoi { position: relative; }
+.duo-vien { position: absolute; right: calc(100% + 2px); top: -6px; padding: 1px 7px; border-radius: 999px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu);
+  box-shadow: var(--tr-bong-1); font-size: 13px; font-weight: 900; line-height: 18px; white-space: nowrap; pointer-events: none; will-change: transform, opacity; }
+.duo-vien[data-cam] { top: 10px; right: calc(100% + 12px); background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+.so-lan { display: inline-flex; height: 1.2em; line-height: 1.2em; overflow: hidden; }
+.so-lan-cot { display: block; height: 1.2em; overflow: hidden; }
+.so-lan-dai { display: flex; flex-direction: column; transition: transform .42s cubic-bezier(.25, .8, .3, 1); }
+.so-lan-dai[data-tat] { transition: none; }
+.so-lan-dai i { display: block; height: 1.2em; font-style: normal; text-align: center; }
+[data-trong] .duo-tren > .duo-moc { position: absolute; top: 50%; left: 50%; z-index: 3; max-width: calc(100% - 150px); overflow: hidden; text-overflow: ellipsis;
+  padding: 5px 12px; font-size: 14px; animation: duo-moc-tren 1400ms ease-out both; }
+@keyframes duo-moc-tren { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.6); } 14% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+  22%, 82% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(.96); } }
+.duo-hat { width: 20px; height: 20px; }
+.duo-set { position: fixed; left: 0; top: 0; z-index: 68; overflow: hidden; pointer-events: none; }
+.duo-set path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+.duo-set .vien { stroke: var(--tr-chu-y); stroke-width: 18; opacity: .6; }
+.duo-set .giua { stroke: var(--tr-sao); stroke-width: 7; }
+.duo-set .loi { stroke: var(--tr-trang); stroke-width: 3; }
+.duo-set .nhanh.vien { stroke-width: 10; } .duo-set .nhanh.giua { stroke-width: 4; } .duo-set .nhanh.loi { stroke-width: 1.6; }
+.duo-set .lua { fill: var(--tr-sao); }
+.duo-set-loe { position: fixed; inset: 0; z-index: 67; background: var(--tr-sao); opacity: 0; pointer-events: none; }
+@media (prefers-color-scheme: dark) { [data-trong='hs'] .duo-set .loi { stroke: var(--tr-chu); } }
+@media (prefers-reduced-motion: reduce) {
+  .so-lan-dai { transition: none; }
+  [data-trong] .duo-tren > .duo-moc { animation: none; transform: translate(-50%, -50%); }
+}

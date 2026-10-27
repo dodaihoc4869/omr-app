@@ -29,7 +29,8 @@ export interface CuocDang { dat: number; ngay: number }
 export interface TongQuanThuong {
   bat: CongTac
   nguyenTuHomNay?: number; tinhThe?: number
-  mucTieu?: { daXong: number; can: number }
+  /** `cau` = mức câu hôm nay (vd. 96 câu = 16 chặng) — máy chủ gửi khi đã chốt mức. */
+  mucTieu?: { daXong: number; can: number; cau?: number }
   chuoiNgay?: ChuoiNgay
   nhiemVu?: NhiemVu[]
   ruong?: { mo: boolean; thuong: number }
@@ -67,6 +68,8 @@ const dt = (x: unknown): O | null => (x && typeof x === 'object' && !Array.isArr
 const so = (x: unknown): number | undefined => (typeof x === 'number' && Number.isFinite(x) ? x : undefined)
 const soNg = (x: unknown): number | undefined => { const n = so(x); return n === undefined || n < 0 ? undefined : Math.round(n) }
 const chu = (x: unknown): string | undefined => (typeof x === 'string' && x.trim() ? x.trim() : undefined)
+/** Họ tên người (bạn học / bảng giải): đủ họ tên, gọn khoảng trắng thừa (thầy 27/10 «chuẩn tên»). */
+const tenNguoi = (x: unknown): string | undefined => chu(x)?.replace(/\s+/g, ' ')
 const mang = <T>(x: unknown, doc: (v: unknown) => T | undefined): T[] | undefined => (Array.isArray(x) ? x.map(doc).filter((v): v is T => v !== undefined) : undefined)
 export const HANG_GIAI: readonly HangGiai[] = ['sat', 'dong', 'bac', 'vang', 'bachkim', 'kimcuong']
 const laHang = (x: unknown): x is HangGiai => HANG_GIAI.includes(x as HangGiai)
@@ -118,7 +121,7 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
   const kq: TongQuanThuong = { bat: docCongTac(o.bat), thongBao: mang(o.thongBao, docThongBao) ?? [] }
   const nt = soNg(o.nguyenTuHomNay); if (nt !== undefined) kq.nguyenTuHomNay = nt
   const tt = soNg(o.tinhThe); if (tt !== undefined) kq.tinhThe = tt
-  const mt = dt(o.mucTieu), dx = soNg(mt?.daXong), can = soNg(mt?.can); if (dx !== undefined && can) kq.mucTieu = { daXong: dx, can }
+  const mt = dt(o.mucTieu), dx = soNg(mt?.daXong), can = soNg(mt?.can), mc = soNg(mt?.cau); if (dx !== undefined && can) kq.mucTieu = { daXong: dx, can, ...(mc ? { cau: mc } : {}) }
   const cn = docChuoiNgay(o.chuoiNgay); if (cn) kq.chuoiNgay = cn
   const nv = mang(o.nhiemVu, docNhiemVu); if (nv?.length) kq.nhiemVu = nv
   const r = dt(o.ruong), rt = soNg(r?.thuong); if (r && rt !== undefined) kq.ruong = { mo: r.mo === true, thuong: rt }
@@ -133,7 +136,7 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
   return kq
 }
 function docDongGiai(x: unknown): DongGiai | undefined {
-  const o = dt(x); const th = soNg(o?.thuHang), ten = chu(o?.ten), nt = soNg(o?.nguyenTu)
+  const o = dt(x); const th = soNg(o?.thuHang), ten = tenNguoi(o?.ten), nt = soNg(o?.nguyenTu)
   return th && ten && nt !== undefined ? { thuHang: th, ten, lop: chu(o!.lop) ?? '', nguyenTu: nt, laEm: o!.laEm === true } : undefined
 }
 export function docBangGiai(x: unknown): BangGiai | null {
@@ -157,12 +160,12 @@ export function docDsHuyHieu(x: unknown): HuyHieu[] | null {
 }
 const HOM_NAY: readonly HomNayDoi[] = ['ca_hai', 'ban_chua', 'em_chua', 'ca_hai_chua']
 function docBan(x: unknown): BanHoc | undefined {
-  const o = dt(x); const ma = chu(o?.ma), ten = chu(o?.ten), cd = soNg(o?.chuoiDoi)
+  const o = dt(x); const ma = chu(o?.ma), ten = tenNguoi(o?.ten), cd = soNg(o?.chuoiDoi)
   return ma && ten && cd !== undefined && HOM_NAY.includes(o!.homNay as HomNayDoi)
     ? { ma, ten, lop: chu(o!.lop) ?? '', chuoiDoi: cd, homNay: o!.homNay as HomNayDoi, daGoCua: o!.daGoCua === true, ...(chu(o!.tuNgay) ? { tuNgay: chu(o!.tuNgay) } : {}) } : undefined
 }
 function docNguoi(x: unknown): NguoiMoi | undefined {
-  const o = dt(x); const ma = chu(o?.ma), ten = chu(o?.ten)
+  const o = dt(x); const ma = chu(o?.ma), ten = tenNguoi(o?.ten)
   return ma && ten ? { ma, ten, lop: chu(o!.lop) ?? '' } : undefined
 }
 export function docDsBan(x: unknown): DanhSachBan | null {
