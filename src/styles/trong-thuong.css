@@ -233,6 +233,7 @@
 [data-trong='hs'] .tp-moc > div[data-k='xong'] .hx { background: var(--tr-chu-y); color: var(--tp-den); }
 [data-trong='hs'] .tp-moc > div[data-k='ke'] .hx { background: var(--tr-sao-nhat); color: var(--tr-sao-chu); box-shadow: inset 0 0 0 3px var(--tr-sao); }
 [data-trong='hs'] .tp-moc small { font-size: 11.5px; line-height: 1.3; color: var(--tr-chu-3); }
+[data-trong='hs'] .tp-moc .tp-moc-nw { display: block; white-space: nowrap; } /* «+100 ◆» / «khe 3» mỗi cụm một dòng, không vỡ giữa cụm ở 360 px */
 [data-trong='hs'] .tp-moc b { font-size: 12.5px; }
 [data-trong='hs'] .tp-moc-ke { display: flex; align-items: center; gap: 12px; }
 [data-trong='hs'] .tp-moc-ke .giua { flex: 1; min-width: 0; }

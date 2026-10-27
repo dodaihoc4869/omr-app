@@ -46,7 +46,7 @@ function TheMoc({ so }: { so: number }) {
     <div className="tp-moc" role="list">
       {MOC_CHUOI.map((m) => <div key={m.so} role="listitem" data-k={so >= m.so ? 'xong' : m === ke ? 'ke' : undefined} aria-label={`Mốc ${m.so} ngày: ${m.thuong}${so >= m.so ? ', đã đạt' : ''}`}>
         <span className="hx" data-moc={m.so}>{m.so}</span><b>{m.so} ngày</b>
-        <small>{m.tt ? <>+{m.tt} <IcTinhThe />{m.so === 30 ? ' · 1 bình' : m.so === 100 ? ' · khe 3' : ''}</> : m.thuong}</small>
+        <small>{m.tt ? <><span className="tp-moc-nw">+{m.tt} <IcTinhThe /></span>{m.so === 30 ? <span className="tp-moc-nw">1 bình</span> : m.so === 100 ? <span className="tp-moc-nw">khe 3</span> : null}</> : m.thuong}</small>
       </div>)}
     </div>
     {ke && <>

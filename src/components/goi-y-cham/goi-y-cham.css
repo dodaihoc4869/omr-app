@@ -45,7 +45,7 @@
    chữ chạm được CHỈ đổi màu tím (--tr-tin-chu, cùng màu «tím» của app) + đậm. Đề hỏi / số liệu không chạm được giữ chữ thường.
    Hết phân màu theo loại ⇒ nút «?» (chú giải màu) thừa — ẩn. Soi sáng khi xem gợi ý: chữ khác mờ đi, chữ đang nói tới giữ rõ (không khung). */
 .gyc-v.gyc-v,.gyc-v.gyc-v:hover,.gyc-v.gyc-v.gyc-dang,.gyc-soi .gyc-v.gyc-v.gyc-sang{background:none;box-shadow:none}
-.gyc-v,.gyc-soi .gyc-sang:not(.gyc-nhieu),.gyc-chat.gyc-cham:not(.gyc-nhieu),.gyc-dam.gyc-cham:not(.gyc-nhieu){padding:0;margin:0}
+.gyc-v,.gyc-soi .gyc-sang:not(.gyc-nhieu),.gyc-chat.gyc-cham:not(.gyc-nhieu),.gyc-dam.gyc-cham:not(.gyc-nhieu),.gyc-nhieu.gyc-dau,.gyc-nhieu.gyc-cuoi{padding:0;margin:0}
 .gyc-cho,.gyc-hoi{color:inherit;font-weight:inherit}
 .gyc-v.gyc-cham{color:var(--tr-tin-chu);font-weight:800}
 .gyc-v.gyc-cham:hover,.gyc-v.gyc-cham.gyc-dang{opacity:.7}

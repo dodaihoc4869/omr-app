@@ -100,7 +100,7 @@ export function MinhHoaDe({ text }: { text: string }): ReactNode {
   if (!c) return null
   const rong = c.luong.length * 8 + 20
   return <figure className="mh-canh" aria-label={`Minh hoạ: ${c.luong} ${c.ct} tác dụng với ${c.thuoc}`}>
-    <svg viewBox="0 0 330 126" aria-hidden="true">
+    <svg viewBox="0 0 330 129" aria-hidden="true">
       <ellipse className="mh-bong" cx="62" cy="104" rx="40" ry="5" />
       <path className="mh-thuy-tinh" d="M50 14h24v8h-3v22l26 48a8 8 0 0 1-7 12H34a8 8 0 0 1-7-12l26-48V22h-3z" />
       <path className={`mh-dd-${c.dd}`} d="M40 66h44l13 26a8 8 0 0 1-7 12H34a8 8 0 0 1-7-12z" />
