@@ -1,7 +1,7 @@
 // NÚT BÓNG ĐÈN «TRỢ GIÚP» CỦA MÀN DUO (thầy 27/10, hai ảnh: ba viên «Hỏi thầy · Bắt đầu từ đâu? · Học cách giải» dưới KIỂM TRA «rối quá, thiết kế ẩn
 // đi, bấm vào mới hiện cho tinh tế» ⇒ «Cho chỗ khoanh vào cái bóng đèn luôn nhé»). Thanh đáy chỉ còn KIỂM TRA; MỌI trợ giúp gom vào nút bóng đèn ở góc
 // phải dòng lệnh («Chọn đáp án đúng»). Bấm ⇒ tấm nhỏ bật xuống ngay dưới bóng đèn, mỗi dòng biểu tượng + chữ; chạm ra ngoài / Esc / chọn một mục ⇒
-// đóng. Câu không có trợ giúp nào ⇒ ẩn bóng đèn. Có trợ giúp mà em chưa mở tấm lần nào ở câu này ⇒ chấm nhỏ màu chú ý trên bóng đèn.
+// đóng. Câu không có trợ giúp nào ⇒ ẩn bóng đèn. Có gợi ý thật (không tính «Hỏi thầy») mà em chưa mở tấm lần nào ở câu này ⇒ chấm nhỏ màu chú ý.
 // Các mục là CHÍNH các nút cũ (màn cha đưa vào `children`, kể cả ô portal của «Bắt đầu từ đâu?») ⇒ hành vi, đánh dấu «có hỗ trợ», aria giữ nguyên.
 // Màn cha gắn `key` theo câu ⇒ câu mới thì chấm «chưa xem» hiện lại. Tờ trình bày: tro-giup-duo.css, nạp qua @import trong styles/trong-lam-bai.css
 // (chỉ giao diện «Trong»). Tấm luôn nằm trong DOM (ẩn bằng `hidden`) để ô portal và nút «Hỏi thầy» không bị dựng lại khi đóng / mở.
@@ -13,6 +13,8 @@ export function TroGiupDuo({ children }: { children: ReactNode }) {
   const [mo, setMo] = useState(false)
   const [co, setCo] = useState(false)
   const [daXem, setDaXem] = useState(false)
+  // chấm «chưa xem» chỉ đếm trợ giúp THẬT của câu (Bắt đầu từ đâu? · Gợi ý · Học cách giải); «Hỏi thầy» câu nào cũng có ⇒ không tính
+  const [coGoi, setCoGoi] = useState(false)
   const goc = useRef<HTMLDivElement>(null)
   const tam = useRef<HTMLDivElement>(null)
   const nutTg = useRef<HTMLButtonElement>(null)
@@ -25,6 +27,7 @@ export function TroGiupDuo({ children }: { children: ReactNode }) {
     let coLoi = false
     const xet = () => {
       setCo(!!t.querySelector('button'))
+      setCoGoi(!!t.querySelector('button:not(.lg-nut-hoi-thay)'))
       const l = !!t.querySelector('.lg-loi')
       if (l && !coLoi) setMo(true)
       coLoi = l
@@ -53,8 +56,8 @@ export function TroGiupDuo({ children }: { children: ReactNode }) {
   }, [mo])
   return (
     <div ref={goc} className="duo-tg" hidden={!co}>
-      <button ref={nutTg} type="button" className="duo-den" aria-label={daXem ? 'Trợ giúp' : 'Trợ giúp, có gợi ý chưa xem'} aria-expanded={mo} aria-controls={id}
-        data-moi={!daXem || undefined} onClick={() => { phanHoi('chon'); setMo((v) => !v) }}>
+      <button ref={nutTg} type="button" className="duo-den" aria-label={coGoi && !daXem ? 'Trợ giúp, có gợi ý chưa xem' : 'Trợ giúp'} aria-expanded={mo} aria-controls={id}
+        data-moi={(coGoi && !daXem) || undefined} onClick={() => { phanHoi('chon'); setMo((v) => !v) }}>
         <Lightbulb size={22} aria-hidden="true" />
       </button>
       {/* chọn một mục ⇒ mục chạy việc của nó (cùng lượt sự kiện) rồi tấm đóng */}
