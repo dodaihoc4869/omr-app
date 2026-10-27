@@ -10,6 +10,7 @@ import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import { laCauTuLuan } from './cam-tu-luan'
 import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
+import { DemTheoKho } from './dau-kho-cau'
 import { khoaCau } from '../../src/lib/khu-trung-cau'
 import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, HANG_MUC_DO, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docBatDauMap, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
@@ -99,7 +100,15 @@ export const maGocCuaTo = (maDe: readonly string[]): string[] => [...new Set(maD
  * Câu hợp lệ của các tờ đề (đã duyệt, bỏ tự luận), theo thứ tự tờ rồi thứ tự câu trong tờ; câu trùng giữa các tờ chỉ tính MỘT lần (tờ đứng trước giữ).
  * `theoTo`: số câu dùng được mà MỖI tờ góp vào (sau khi bỏ trùng) — cộng lại đúng bằng `qids.length`, để màn giao hiện số từng tờ khớp tổng.
  */
-export async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<{ qids: string[]; theoTo: Record<string, number>; theoMucDo: Record<string, number> }> {
+type CauCuaTo = { qids: string[]; theoTo: Record<string, number>; theoMucDo: Record<string, number> }
+/** 28/10 (Analytics D1 27/10 19–23h: câu này 8 % thời gian D1): đệm theo kho trong isolate (dau-kho-cau.ts `DemTheoKho`) — khoá = danh sách tờ đúng thứ tự;
+ *  trọng lượng = số câu. Trả BẢN SAO (nơi gọi có thể sửa mảng/đối tượng). */
+const demCauCuaTo = new DemTheoKho<CauCuaTo>(30 * 60_000, 5 * 60_000, 64, 400_000)
+export async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<CauCuaTo> {
+  const v = await demCauCuaTo.lay(env, JSON.stringify(maDe), Date.now(), () => cauCuaToChiTietD1(env, maDe), (x) => x.qids.length + 1)
+  return { qids: [...v.qids], theoTo: { ...v.theoTo }, theoMucDo: { ...v.theoMucDo } }
+}
+async function cauCuaToChiTietD1(env: Env, maDe: readonly string[]): Promise<CauCuaTo> {
   // 14/10: đọc câu RÚT GỌN (cau-gon.ts — không ảnh/lời giải, ~650 so với ~3.950 ký tự/câu): chỉ cần duyệt / tự luận / phần / mức độ. Dòng JSON hỏng bị bỏ như cũ.
   const r = await env.DB.prepare(`SELECT ma_de, qid, ${SQL_CAU_GON} FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY rowid`).bind(JSON.stringify(maGocCuaTo(maDe))).all<Row>()
   const theoGoc = new Map<string, { qid: string; phan: string; mucDo: string }[]>()
