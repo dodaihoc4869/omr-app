@@ -80,19 +80,18 @@
 [data-trong] .duo-gt-nv .gt-o { --gt-loi-y: 2px; }
 [data-trong] .duo-gt-bong { grid-column: 2; grid-row: 2; position: relative; min-width: 0; margin-left: 12px; padding: 12px 14px; border: 2px solid var(--tr-vien-2); border-radius: 18px; background: var(--tr-mat); }
 [data-trong] .duo-gt-bong::before { content: ''; position: absolute; left: -9px; top: var(--duoi, 50%); width: 14px; height: 14px; margin-top: -7px; background: var(--tr-mat); border-left: 2px solid var(--tr-vien-2); border-bottom: 2px solid var(--tr-vien-2); border-bottom-left-radius: 4px; transform: rotate(45deg); }
-[data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
+[data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 19px; }
 [data-trong] .duo-gt-san[data-nho] { align-items: start; }
 [data-trong] .duo-gt-san[data-nho] .duo-gt-nv { width: 92px; margin-left: -10px; }
 [data-trong] .duo-gt-san[data-nho] .duo-gt-bong { --duoi: 32px; margin-top: 2px; }
-[data-trong] .duo .duo-gt-san[data-nho] .duo-gt-bong .ht2-lam-de-chu { font-size: 17px; }
-@media (max-width: 380px) { [data-trong] .duo-gt-san:not([data-nho]) .duo-gt-nv { width: 108px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 17px; } }
+[data-trong] .duo .duo-gt-san[data-nho] .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
+@media (max-width: 380px) { [data-trong] .duo-gt-san:not([data-nho]) .duo-gt-nv { width: 108px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; } }
 @media (min-width: 900px) { [data-trong] .duo-gt-san:not([data-nho]) .duo-gt-nv { width: 150px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 21px; } [data-trong] .duo .duo-gt-san[data-nho] .duo-gt-bong .ht2-lam-de-chu { font-size: 19px; } }
 /* Khung thấp xoay ngang: cột đề hẹp ⇒ luôn giám thị nhỏ. */
 @media (orientation: landscape) and (max-height: 500px) {
   [data-trong] .duo-gt-san { align-items: start; grid-template-rows: 34px auto; }
   [data-trong] .duo-gt-san .duo-gt-nv { width: 84px; margin-left: -10px; }
   [data-trong] .duo-gt-san .duo-gt-bong { --duoi: 30px; margin-top: 2px; padding: 10px 12px; }
-  [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 16px; }
+  [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
 }
-/* Chữ chạm được (VungChamDe) trong bong bóng: nới vùng chạm lên ≥ 44 px theo chiều dọc mà không đổi dòng chữ (padding trên phần tử nội dòng không đẩy dòng). */
-[data-trong] .duo-gt-bong [role='button'] { padding-block: 11px; }
+/* Chữ trong bong bóng ≥ 18 px: chữ chạm được (VungChamDe, vùng chạm = cao chữ + 20 px) luôn ≥ 44 px. */
