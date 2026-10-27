@@ -72,7 +72,35 @@
 .gyc-cg-hang{display:flex;align-items:flex-start;gap:4px}
 .gyc-cg-hang .gyc-chu-giai{flex:1;min-width:0}
 
-/* ── 3. Thẻ giải nghĩa (TamGiaiThich) kiểu DUOLINGO (thầy 27/10): thẻ nhỏ neo ngay dưới (hết chỗ ⇒ trên) chữ được chạm, mũi nhọn chỉ vào chữ,
+/* ── 3a. Thẻ giải nghĩa BẢN CŨ (26/10: tấm đáy / cột phải / thẻ nổi) — giữ nguyên khai báo màu theo luật «giữ màu» (kiem:mau-giu); từ 27/10 thẻ không
+   còn mang data-kieu nên các luật data-kieu không áp; khối 3b ngay dưới ĐÈ phần còn lại. ─────────── */
+.gyc-bong{position:fixed;z-index:60;width:340px;max-width:calc(100vw - 24px);background:var(--tr-mat);border:1px solid var(--tr-vien);border-radius:18px;box-shadow:var(--tr-bong-3);padding:18px 18px 16px;font-size:14.5px;line-height:1.55;color:var(--tr-chu-2);text-align:left;overscroll-behavior:contain}
+.gyc-bong-mui{position:absolute;top:-8px;width:14px;height:14px;background:var(--tr-mat);border-left:1px solid var(--tr-vien);border-top:1px solid var(--tr-vien);transform:rotate(45deg)}
+.gyc-bong[data-tren] .gyc-bong-mui{top:auto;bottom:-8px;transform:rotate(225deg)}
+.gyc-b-dau{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.gyc-b-ten{font-size:17px;font-weight:600;color:var(--tr-chu);min-width:0}
+.gyc-b-loai{margin-left:auto;flex:none}
+.gyc-b-doan{margin:6px 0 0}
+.gyc-b-ct{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--tr-mat-2);color:var(--tr-chu);font-weight:600;font-size:15px;text-align:center}
+.gyc-b-nho{font-size:12.5px;color:var(--tr-chu-3);margin-top:10px}
+.gyc-b-cuoi{display:flex;gap:8px;margin-top:12px}
+.gyc-keo{display:none;width:40px;height:5px;border-radius:999px;background:var(--tr-vien-2);margin:0 auto 14px}
+.gyc-phu{position:fixed;inset:0;z-index:59;background:var(--tr-phu)}
+.gyc-bong[data-kieu=day]{left:0;right:0;bottom:0;top:auto;width:auto;max-width:640px;max-height:85vh;overflow:auto;margin:0 auto;border-radius:22px 22px 0 0;padding:12px 18px calc(24px + env(safe-area-inset-bottom));font-size:15px}
+.gyc-bong[data-kieu=day] .gyc-keo{display:block}
+.gyc-bong[data-kieu=day] .gyc-b-cuoi .gyc-nut{flex:1}
+.gyc-bong[data-kieu=cot]{left:auto;right:0;top:0;bottom:0;width:320px;max-width:none;border-radius:22px 0 0 22px;overflow:auto;padding:16px 18px 18px}
+.gyc-bong[data-kieu=cot] .gyc-b-cuoi .gyc-nut{flex:1}
+@media (prefers-reduced-motion:no-preference){
+  .gyc-bong[data-kieu=day]{animation:gyc-len .22s ease-out}
+  .gyc-bong[data-kieu=cot]{animation:gyc-trai .2s ease-out}
+  .gyc-bong[data-kieu=noi]{animation:gyc-hien .16s ease-out}
+}
+@keyframes gyc-len{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes gyc-trai{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes gyc-hien{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* ── 3b. Thẻ giải nghĩa (TamGiaiThich) kiểu DUOLINGO (thầy 27/10): thẻ nhỏ neo ngay dưới (hết chỗ ⇒ trên) chữ được chạm, mũi nhọn chỉ vào chữ,
    bo 16px, viền 2px nhạt, bóng phẳng (không nhoè), rộng tối đa 300px, lề màn 12px. Mọi khổ cùng một kiểu: không tấm đáy, không nền xám, không cột phải.
    Mở: phóng .9 → 1 + hiện dần 120ms, gốc phóng ở mũi nhọn. ─────────────────────────────────────────────────────────────────────── */
 .gyc-bong{position:fixed;z-index:60;box-sizing:border-box;width:min(300px,calc(100vw - 24px));background:var(--tr-mat);border:2px solid var(--tr-vien-2);border-radius:16px;box-shadow:0 3px 0 var(--tr-vien);padding:11px 14px 12px;font-size:15px;line-height:1.45;color:var(--tr-chu-2);text-align:left;overflow-wrap:anywhere;transform-origin:var(--gyc-mui,50%) 0;outline:none}
