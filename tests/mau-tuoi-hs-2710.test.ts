@@ -15,16 +15,10 @@ const mau = doc('trong-hs-mau.css')
 describe('màu tươi app học sinh 27/10', () => {
   const bang = docBang(mau) as { sang: Record<string, string>; toi: Record<string, string> }
 
-  it('màu nhấn đúng bảng Duolingo ở nền sáng, nền trắng tinh', () => {
-    expect(bang.sang).toMatchObject({
-      '--tr-dung': '#58cc02', '--tr-dung-nut': '#58a700', '--tr-tin': '#1cb0f6', '--tr-tin-day': '#1899d6', '--tr-sai': '#ff4b4b', '--tr-sai-day': '#ea2b2b',
-      '--tr-sao': '#ffc800', '--tr-chu-y': '#ff9600', '--tr-chu': '#4b4b4b', '--tr-vien': '#e5e5e5', '--tr-nen': '#ffffff', '--tr-mat': '#ffffff',
-      '--tr-dung-nhat': '#d7ffb8', '--tr-sai-nhat': '#ffdfe0', '--tr-tin-nhat': '#ddf4ff',
-    })
-  })
-
-  it('nền tối kiểu Duolingo, chữ trắng ngà (không trắng tinh)', () => {
-    expect(bang.toi).toMatchObject({ '--tr-nen': '#131f24', '--tr-mat': '#202f36', '--tr-vien': '#37464f', '--tr-chu': '#f1f7fb' })
+  // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị» (sáng bằng Duolingo) — khoá đầy đủ ở tests/mau-chat-chi-thi-hs-2710.test.ts
+  it('bảng học sinh là bộ B «Chất chỉ thị» (chàm + lục ngọc), nền tối đêm chàm', () => {
+    expect(bang.sang).toMatchObject({ '--tr-hs-nut': '#767eff', '--tr-dung': '#00d396', '--tr-nen': '#f6f6fc', '--tr-mat': '#ffffff' })
+    expect(bang.toi).toMatchObject({ '--tr-nen': '#121129', '--tr-mat': '#1c1b3a', '--tr-chu': '#f1f0ff' })
   })
 
   it.each(['sang', 'toi'] as const)('mọi cặp chữ/nền đạt ngưỡng tương phản (%s)', (che) => {
