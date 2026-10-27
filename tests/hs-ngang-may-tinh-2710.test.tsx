@@ -1,5 +1,5 @@
 // APP HỌC SINH NGANG + MÁY TÍNH (thầy 27/10 «Tối ưu tất cả các màn app hs xoay ngang và máy tính chưa»): thanh bên trái máy tính, dải kết quả ngang
-// trải bề ngang ≤ 45% chiều cao, phương án / bàn phím vừa khung 844×390, hai cột cho câu bàn phím ở 1024, đổi mục về đầu trang. Ảnh: khối «NGANG DUO 27/10».
+// gọn một hàng trải bề ngang ≤ 30% chiều cao, phương án / bàn phím vừa khung 844×390, hai cột cho câu bàn phím ở 1024, đổi mục về đầu trang. Ảnh: khối «NGANG DUO 27/10».
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
@@ -24,10 +24,12 @@ describe('app HS ngang + máy tính 27/10', () => {
     expect(k).toContain(':is(.tr-menu-cham, .tr-menu-phu) { display: none; }')
     expect(k).toContain('.ht2[data-mot] { padding-left: var(--hs-ben); }')
   })
-  it('điện thoại ngang: dải kết quả ghim đáy trải hết bề ngang, tối đa 45% chiều cao, hai cột chừa đáy cuộn bằng dải', () => {
+  it('điện thoại ngang: dải kết quả GỌN MỘT HÀNG ghim đáy trải hết bề ngang, tối đa 30% chiều cao, hai cột chừa đáy cuộn bằng dải', () => {
     const k = khoi(doc('src/styles/trong-lam-ngang.css'), '(orientation: landscape) and (max-height: 500px)')
-    expect(k).toMatch(/\.duo-day\.duo-ket \{[^}]*position: fixed; left: 0; right: 0; bottom: 0;[^}]*max-height: 45dvh;/)
-    expect(k).toContain(':has(.duo-ket) :is(.duo-cot-de, .duo-cot-tra) { padding-bottom: calc(45dvh + 8px); }')
+    expect(k).toMatch(/\.duo-day\.duo-ket \{[^}]*position: fixed; left: 0; right: 0; bottom: 0;[^}]*max-height: 30dvh;/)
+    expect(k).toContain(':has(.duo-ket) :is(.duo-cot-de, .duo-cot-tra) { padding-bottom: calc(30dvh + 8px); }')
+    // một hàng: chỉ tiêu đề + «Lời giải» (và «Gợi ý» của màn sửa câu) hiện; phần chữ khác ẩn khỏi mắt, vẫn còn cho trình đọc màn hình (không display: none)
+    expect(k).toMatch(/\.duo-kq-chu > :not\(\.duo-ct-dau, \.duo-sua-goi-y\) \{[^}]*position: absolute;[^}]*clip-path: inset\(50%\);/)
     // bàn phím số: ô 48 + phím 44 (≥ 44px vùng chạm) — ô nhập không còn bị đẩy khuất dưới thanh trên
     expect(k).toContain('.ht2-lam-phim button { height: 44px; }')
   })
