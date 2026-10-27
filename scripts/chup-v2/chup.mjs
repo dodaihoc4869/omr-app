@@ -606,13 +606,13 @@ const DS_NGD = NGD_KHO.filter(([, , k]) => !NGD_LOC.length || NGD_LOC.includes(k
 // Đo thêm (in «Viên đè»): hình chữ nhật mỗi viên giao với chữ / nút / ảnh / hình của nội dung ⇒ phải rỗng ở mọi màn, mọi khổ. `lan:N` = lăn chuột N px (em cuộn
 // thật ⇒ viên thu), `bam:CSS` = bấm phần tử (viên ⇒ thẻ bật).
 const VIEN_CANH = [
-  ['lo-trinh', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['lo-trinh-cuon', 'hs-mot&tp=1', /Ester/, 'lam13:nap » lan:420 » cho:500'],
-  ['lo-trinh-cuon-len', 'hs-mot&tp=1', /Ester/, 'lam13:nap » lan:420 » cho:400 » lan:-120 » cho:500'],
-  ['the-tinh-the', 'hs-mot&tp=1', /Ester/, 'lam13:nap » bam:.da-tren [data-k="tt"] » cho:300'], ['the-muc-tieu', 'hs-mot&tp=1', /Ester/, 'lam13:nap » bam:.da-tren .tp-tr-muc » cho:300'],
+  // 27/10 thầy: số của em vào CỘT DỌC dưới chuông trong menu (bỏ viên mép trái) — menu đóng / mở / mở có Điểm danh / mở Cài đặt
+  ['lo-trinh', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['menu', 'hs-mot&tp=1&dd=khong', /Ester/, 'menu6:'], ['menu-dd', 'hs-mot&tp=1&dd=mo', /Ester/, 'menu6:'],
+  ['menu-cai', 'hs-mot&tp=1', /Ester/, 'menu6:Cài đặt'],
   ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['giai', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Giải tuần'],
   ['ban', 'hs-mot&tp=1&ten=dai', /Ester/, 'ton:menu:Thành tích » nut:Học cùng bạn'], ['kim-cuong', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
-  ['luyen', 'hs-mot&tp=1', /Ester/, 'menu:Luyện tập'], ['menu', 'hs-mot&dd=khong', /Ester/, 'menu6:'],
-  ['lam-cau', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B'], // màn làm câu: không viên (cổng: Lộ trình nằm dưới [inert] ⇒ CSS ẩn viên)
+  ['luyen', 'hs-mot&tp=1', /Ester/, 'menu:Luyện tập'],
+  ['lam-cau', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B'], // màn làm câu: không số nào nổi
 ]
 const VIEN_KHO = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']]
 const DS_VIEN = VIEN_KHO.flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
