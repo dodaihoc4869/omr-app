@@ -1,0 +1,33 @@
+# NGHIỆM THU 27/10 — CHỈ ĐỌC, chỉ in SỐ ĐẾM (không sbd / tên). Chạy khi đẩy nhánh nghiệm thu (không gộp vào main).
+name: Nghiệm thu 27/10 (chỉ đọc)
+on:
+  push:
+    branches: [claude/nghiem-thu-2710]
+    paths: ['.github/workflows/nghiem-thu-2710.yml', 'scripts/nghiem-thu-2710.ts']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tệp đo chỉ có SELECT
+        run: |
+          if grep -v '^\s*//' scripts/nghiem-thu-2710.ts | grep -v 'test(sql)' | grep -iqE '\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE TABLE|REPLACE INTO)\b'; then echo "Có lệnh ghi — dừng."; exit 1; fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đóng gói (dùng đúng hàm thuần chuỗi ngày của máy chủ)
+        run: npx -y esbuild@0.24.0 scripts/nghiem-thu-2710.ts --bundle --platform=node --format=esm --outfile=/tmp/nt.mjs --log-level=warning
+      - name: Đo
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node /tmp/nt.mjs
