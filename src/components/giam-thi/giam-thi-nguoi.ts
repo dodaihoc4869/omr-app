@@ -636,7 +636,9 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     const dtms = lan ? Math.min(100, now - lan) : 16
     lan = now
     tichLuy += dtms
-    if (!mayYeu() || tichLuy >= 30) { let con = tichLuy; tichLuy = 0; while (con > 0) { const dt = Math.min(con, 8); tichPhan(dt / 1000); con -= dt } ve() }
+    // 28/10 MƯỢT: vẽ ~30 khung/s (mọi máy) — mỗi khung giám thị = JS + tính kiểu + sơn ~80 hình; 60 khung/s giữ luồng chính bận gần trọn mỗi khung ở
+    // CPU ×4 ⇒ chạm phải chờ (đo: chờ vào 30–70 ms). 30 khung/s: nửa số khung rảnh hẳn; chuyển động vẫn tích phân bước 8 ms như cũ.
+    if (tichLuy >= 30) { let con = tichLuy; tichLuy = 0; while (con > 0) { const dt = Math.min(con, 8); tichPhan(dt / 1000); con -= dt } ve() }
     raf = requestAnimationFrame(lap)
   }
   const chay = () => { if (!raf && !tinh && !giam && !dung && !khuat) { lan = 0; raf = requestAnimationFrame(lap) } }

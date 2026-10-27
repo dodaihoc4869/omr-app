@@ -102,11 +102,11 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       if (!(day > khuyet().kh + 12)) san.removeAttribute('data-l')
       ve()
     }
-    // 27/10 MƯỢT: lượt đầu chỉ quyết (một lần ép bố cục); cỡ đối chiếu ghi ở lượt báo ĐẦU của ResizeObserver (bố cục đã sạch) thay vì đọc ngay —
-    // đọc ngay sau khi gỡ `data-l` là ép tính lại cả màn thêm một lượt mỗi câu.
-    quyet()
+    // 28/10 MƯỢT (vết Chrome, chuyển câu CPU ×6): quyết ở lượt báo ĐẦU của ResizeObserver — chạy SAU lượt tính kiểu + bố cục mà khung vẽ vốn phải làm,
+    // TRƯỚC lần sơn (không nháy dáng sai). Trước: quyết ngay trong layout effect ⇒ ép tính kiểu cả câu mới giữa lượt dựng của React (~110 ms ở ×6),
+    // rồi khung vẽ còn tính lại phần đổi sau đó.
     const ro = new ResizeObserver(() => {
-      if (dau) { dau = false; ghiCo(); return }
+      if (dau) { dau = false; quyet(); ghiCo(); return }
       if (san.clientWidth !== rong || de.offsetHeight !== cao) { quyet(); ghiCo() }
       else if (bong.offsetHeight !== bongCao) { bongCao = bong.offsetHeight; ve() }
     })
