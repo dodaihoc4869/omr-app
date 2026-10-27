@@ -365,7 +365,14 @@ const DS_PH_DOC = [
   ,['62-ph-doc-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/]
   ,['62-ph-doc-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/]
 ]
+// ═══ MENU 6 MỤC 27/10 (tiền tố "menu6-"): menu dọc app học sinh gọn 6 mục — mở (không buổi điểm danh) · mở khi có buổi đang mở (thẻ Điểm danh đầu menu)
+// · tấm Cài đặt. Hôm nay «Một trang» THẬT (`?man=hs-mot&dd=khong|mo`), chuông thật 2 tin chưa đọc. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
+const MENU6_CANH = [['mo', 'hs-mot&dd=khong', 'menu6:'], ['dd', 'hs-mot&dd=mo', 'menu6:'], ['cai', 'hs-mot&dd=khong', 'menu6:Cài đặt']]
+const DS_MENU6 = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  MENU6_CANH.map(([t, m, viec]) => [`menu6-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, /Ester/, viec])))
+// ═══ hết MENU 6 MỤC 27/10
 const DS = [
+  ...DS_MENU6, // MENU 6 MỤC 27/10
   ...DS_KGD, // KIỂM GD MỚI 26/10
   ...DS_NG_GV, // NGANG GV 26/10
   ...DS_PH_DOC, // PH CHỈ ĐỌC 26/10
@@ -540,6 +547,19 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       for (const ten of viec.slice(4).split(' » ')) {
         await t.getByRole('button', { name:ten, exact:true }).first().click()
         await t.waitForTimeout(400)
+      }
+    } else if (viec?.startsWith('menu6:')) {
+      // MENU 6 MỤC 27/10: Lộ trình tự cuộn tới chặng hiện tại lúc mở (menu thu khi trang cuộn) ⇒ chờ cuộn xong, mở menu (thử lại tới khi menu mở thật),
+      // rồi bấm các nút sau «menu6:» (ngăn bằng " » ") trong menu.
+      await t.waitForTimeout(1200)
+      for (let lan = 0; lan < 4; lan++) {
+        if (await t.locator('#tr-menu[data-mo]').count()) break
+        await t.getByRole('button', { name: /^Mở menu/ }).locator('visible=true').first().click()
+        await t.waitForTimeout(500)
+      }
+      for (const ten of viec.slice(6).split(' » ').filter(Boolean)) {
+        await t.locator('#tr-menu').getByRole('button', { name: ten, exact: true }).click()
+        await t.waitForTimeout(450)
       }
     } else if (viec?.startsWith('muc:')) {
       // 26/10 app HS kiểu Duolingo: mở mục Lộ trình / Luyện tập / Thành tích bằng nút đang HIỆN (dải mép phải khi xoay ngang; dọc ⇒ mở menu rồi bấm mục)
