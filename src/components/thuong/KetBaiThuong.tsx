@@ -7,6 +7,7 @@ import { useRef } from 'react'
 import { Clock, Target } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bungHat, demSo, hoaGiay, hoatAnh, phanHoiThuong, xongHieuUng } from '../../lib/hieu-ung-thuong'
+import { phatThuong } from '../../lib/am-thanh-thuong'
 import { hangSau, type CongTac, type HangGiai, type KetBai } from '../../lib/thuong-api'
 import { HuyHieuKimLoai, IcNguyenTu, IcTinhThe, TEN_HANG, Tia } from './hinh'
 import { useHieuUng } from './chung'
@@ -32,8 +33,17 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
   const ba = useRef<HTMLDivElement>(null), bi = useRef<HTMLDivElement>(null), kt = useRef<HTMLDivElement>(null), vong = useRef<HTMLDivElement>(null), chip = useRef<HTMLSpanElement>(null)
   useHieuUng((h) => {
     ba.current?.querySelectorAll(':scope > div').forEach((d, i) => hoatAnh(d, [{ transform: 'translateY(16px) scale(.85)', opacity: 0 }, { transform: 'scale(1.05)', opacity: 1, offset: 0.6 }, { transform: 'none', opacity: 1 }], 420, { tre: 200 + i * 120 }))
+    // 27/10 (thầy «làm lại cho ngon như Duolingo»): ba thẻ số đếm lên ease-out 900 ms, «tích» nhẹ khi số tăng (màn kiểm tra tự im — cờ dangCheDoThi),
+    // thẻ TỔNG nảy khi đếm xong. Số lấy nguyên từ máy chủ (ketBai). Giảm chuyển động ⇒ demSo hiện ngay số cuối.
     const dem = ba.current?.querySelectorAll<HTMLElement>('[data-dem]') ?? []
-    dem.forEach((s) => { const toi = Number(s.dataset.dem), duoi = s.dataset.duoi ?? '', dau = s.dataset.dau ?? ''; s.textContent = `${dau}0${duoi}`; h.sau(260, () => void demSo(s, 0, toi, 800, (v) => `${dau}${v}${duoi}`)) })
+    let tich = 0
+    dem.forEach((s, i) => {
+      const toi = Number(s.dataset.dem), duoi = s.dataset.duoi ?? '', dau = s.dataset.dau ?? '', gio = s.dataset.gio !== undefined
+      const dinh = (v: number) => (gio ? phutGiay(v) : `${dau}${v}${duoi}`)
+      s.textContent = dinh(0)
+      h.sau(260 + i * 120, () => void demSo(s, 0, toi, 900, (v) => { const n = performance.now(); if (v > 0 && n - tich > 55) { tich = n; phatThuong('tick') } return dinh(v) })
+        .then(() => { if (s.dataset.tong !== undefined) hoatAnh(s.closest('[role=group]'), [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(.98)' }, { transform: 'scale(1)' }], 320) }))
+    })
     document.querySelectorAll('.tp-tach .hang-t').forEach((r, i) => hoatAnh(r, [{ transform: 'translateX(-12px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 260, { tre: 500 + i * 90 }))
     if (hh) {
       phanHoiThuong('hoanHao')
@@ -63,9 +73,10 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
         <h1 style={hh ? { color: 'var(--tr-sao-chu)' } : undefined}>{hh ? 'Hoàn hảo!' : 'Xong chặng!'}</h1>
         {(phu || hh) && <p className="tp-phu">{hh ? `${k.soCau}/${k.soCau} câu đúng, tự làm${phu ? ` · ${phu}` : ''}` : phu}</p>}
         <div ref={ba} className="tp-3o">
-          <div role="group" aria-label={`Nguyên tử: +${k.tong}`}><p>Nguyên tử</p><b aria-hidden="true"><IcNguyenTu /><span data-dem={k.tong} data-dau="+">+{k.tong}</span></b></div>
-          <div data-sac="tin" role="group" aria-label={`Chính xác: ${k.chinhXac}%`}><p>Chính xác</p><b aria-hidden="true"><Target /><span data-dem={k.chinhXac} data-duoi="%">{k.chinhXac}%</span></b></div>
-          <div data-sac="sao" role="group" aria-label={`Thời gian: ${phutGiay(k.giay)}`}><p>Thời gian</p><b aria-hidden="true"><Clock /><span>{phutGiay(k.giay)}</span></b></div>
+          {/* thẻ kiểu Duolingo «Lesson complete»: viền màu + tiêu đề nhỏ in hoa — TỔNG NGUYÊN TỬ vàng · CHÍNH XÁC xanh lá · THỜI GIAN xanh dương */}
+          <div data-sac="sao" role="group" aria-label={`Tổng nguyên tử: +${k.tong}`}><p>Tổng nguyên tử</p><b aria-hidden="true"><IcNguyenTu /><span data-dem={k.tong} data-dau="+" data-tong="">+{k.tong}</span></b></div>
+          <div role="group" aria-label={`Chính xác: ${k.chinhXac}%`}><p>Chính xác</p><b aria-hidden="true"><Target /><span data-dem={k.chinhXac} data-duoi="%">{k.chinhXac}%</span></b></div>
+          <div data-sac="tin" role="group" aria-label={`Thời gian: ${phutGiay(k.giay)}`}><p>Thời gian</p><b aria-hidden="true"><Clock /><span data-dem={k.giay} data-gio="">{phutGiay(k.giay)}</span></b></div>
         </div>
       </div>
       <div className="cot-b">

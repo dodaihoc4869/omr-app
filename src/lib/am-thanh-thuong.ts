@@ -5,7 +5,7 @@
 import { duocPhanHoi } from './rung'
 import { dangCheDoThi } from './am-thanh'
 
-export type KieuTiengThuong = 'combo' | 'tinhThe' | 'ruong' | 'lenHang' | 'roiHang' | 'chuoi' | 'vo' | 'thangHoa'
+export type KieuTiengThuong = 'combo' | 'tinhThe' | 'ruong' | 'lenHang' | 'roiHang' | 'chuoi' | 'vo' | 'thangHoa' | 'set' | 'tick'
 type Giong = { t: number; f: number; f2?: number; d: number; a?: number; g: number; p?: [number, number][] }
 type On = { t: number; d: number; f: number; f2: number; q: number; g: number }
 const CHUONG: [number, number][] = [[1, 1], [2, 0.32], [3, 0.12], [4.2, 0.05]]
@@ -26,6 +26,10 @@ export function tiengThuong(kieu: KieuTiengThuong, bac = 0): { giong: Giong[]; o
     case 'chuoi': return { giong: [{ t: 0.16, f: 1318.51, d: 0.5, a: 0.004, g: 0.16, p: CHUONG }, { t: 0.24, f: 1975.53, d: 0.6, a: 0.004, g: 0.14, p: CHUONG }], on: [{ t: 0, d: 0.32, f: 300, f2: 2400, q: 0.8, g: 0.28 }] }
     case 'vo': return { giong: [{ t: 0.02, f: 3951.07, d: 0.12, a: 0.001, g: 0.08, p: [[1, 1]] }, { t: 0.07, f: 3135.96, d: 0.14, a: 0.001, g: 0.07, p: [[1, 1]] }, { t: 0.13, f: 4698.63, d: 0.1, a: 0.001, g: 0.05, p: [[1, 1]] }], on: [{ t: 0, d: 0.09, f: 4000, f2: 2500, q: 0.9, g: 0.3 }] }
     case 'thangHoa': return { giong: [], on: [{ t: 0, d: 0.7, f: 5000, f2: 600, q: 0.7, g: 0.22 }] }
+    // 27/10 mốc combo: SÉT NỔ ngắn — ồn lọc quét từ cao xuống (tiếng «rắc») + ồn trầm + âm trầm nổ lướt xuống
+    case 'set': return { giong: [{ t: 0.02, f: 92, f2: 38, d: 0.42, a: 0.004, g: 0.42, p: [[1, 1], [2, 0.25]] }], on: [{ t: 0, d: 0.16, f: 6500, f2: 900, q: 0.6, g: 0.34 }, { t: 0.04, d: 0.5, f: 900, f2: 110, q: 0.7, g: 0.3 }] }
+    // 27/10 kết chặng: «tích» rất nhẹ khi số đếm tăng
+    case 'tick': return { giong: [{ t: 0, f: 2300, d: 0.025, a: 0.001, g: 0.05, p: [[1, 1]] }], on: [] }
   }
 }
 

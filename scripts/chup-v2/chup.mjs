@@ -1031,8 +1031,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         await t.waitForTimeout(250)
       }
       // GIÁM THỊ 27/10: bong bóng càu nhàu không được chồng lên nhãn, đề, phương án, thanh trên / đáy (đo hình chữ nhật thật) ⇒ ghi vào «Tràn ngang».
+      // 27/10 thanh trên DÍNH: trang đã cuộn ⇒ bong bóng (thuộc phần đề) trượt khuất DƯỚI thanh trên như mọi nội dung khác — không tính là chồng lên thanh trên
       const chong = await t.evaluate(() => { const l = document.querySelector('.gt-loi'); if (!l) return ''; const a = l.getBoundingClientRect()
-        return [...document.querySelectorAll('.duo-nhan, .duo-gt-bong, .duo-tra, .duo-day, .duo-tren')].filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom) }).map((e) => e.className.split(' ')[0]).join(', ') })
+        return [...document.querySelectorAll('.duo-nhan, .duo-gt-bong, .duo-tra, .duo-day, .duo-tren')].filter((e) => !(e.matches('.duo-tren') && getComputedStyle(e).position === 'sticky' && a.top < e.getBoundingClientRect().bottom)).filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom) }).map((e) => e.className.split(' ')[0]).join(', ') })
       if (chong) tran.push(`${ten}: bong bóng càu nhàu chồng lên ${chong}`)
       // GIÁM THỊ 27/10 tối: khung đề không được có vùng rỗng ở đáy > 24 px (khung chữ L chỉ khi chữ thật sự tràn xuống dưới chân giám thị).
       const rong = await t.evaluate(() => { const b = document.querySelector('.duo-gt-bong'), d = b?.querySelector('.ht2-lam-de'); if (!b || !d) return 0

@@ -521,3 +521,5 @@ Luật: vòng nền của app HS/PH ≥ 180 giây ± 30 giây lệch ngẫu nhi�
 - 23/10 · Claude (Boss) · Màn chiếu Điểm danh nền sáng: `BanChieuDiemDanh.tsx` có 1 setInterval 1000 ms (ô «Mã đổi sau m:ss», chỉ vẽ lại ô mã, tắt khi buổi đã kết thúc). Không gọi máy chủ. Xếp vào `LAN_APP_THAY` (`tests/nhip-bang-2109.test.ts`).
 
 - 27/10 · Claude (Bi chuyển động, nhánh `claude/bi-dong-2710`) · `src/components/linh-vat/bi-dong.ts` có 2 setInterval: 100 ms sinh bọt khí và vòng hiệu ứng của trạng thái đang hiện (nước mắt, hơi bốc, hoa giấy, zzz, đổi màu cầu vồng). Chỉ cục bộ, không gọi máy chủ; tab ẩn hoặc Bi ra khỏi khung nhìn ⇒ không sinh hạt, mọi hoạt ảnh dừng; gỡ Bi ⇒ xoá hết. Xếp vào `KHONG_GOI_MAY_CHU` (`tests/nhip-bang-2109.test.ts`).
+
+- 27/10 · Claude (nhánh hiệu ứng nguyên tử): xếp loại vòng 1 s ở `src/components/thuong/ManChuoi.tsx` (màn Cứu chuỗi, có từ #401, không phải do #464 đổi chữ «bài» → «chặng»): chỉ vẽ lại giờ còn của hạn học bù, không gọi máy chủ, dừng khi cứu xong ⇒ thêm vào bảng KHONG_GOI_MAY_CHU của tests/nhip-bang-2109.test.ts.

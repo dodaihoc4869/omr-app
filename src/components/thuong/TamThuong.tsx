@@ -7,17 +7,20 @@
 //  - OngNghiem: thanh tiến độ là ống nghiệm, chất lỏng dâng; combo ≥ 3 ⇒ cam phát sáng + vệt sáng lướt.
 import { useEffect, useRef, type CSSProperties } from 'react'
 import type { ThuongCau } from '../../lib/thuong-api'
-import { hoatAnh, bungHat, phanHoiThuong } from '../../lib/hieu-ung-thuong'
+import { coChuyenDong, hoatAnh, bungHat, demSo, phanHoiThuong } from '../../lib/hieu-ung-thuong'
 import { IcNguyenTu, PhanTu } from './hinh'
 import '../../styles/trong-thuong-gon.css'
 
 export const CHU_KHONG_TINH = 'Câu này chưa được tính — đọc kĩ rồi làm nhé'
 const loaiDong = (nhan: string) => (/khó/i.test(nhan) ? 'kho' : /chuỗi|dây chuyền/i.test(nhan) ? 'chuoi' : undefined)
 
-export function TamThuong({ thuong }: { thuong: ThuongCau | null | undefined }) {
-  const bay = useRef<HTMLSpanElement>(null)
+/** `demLen` (màn làm chặng Duo, làm lại 27/10): KHÔNG có «+N» bay nổi giữa nội dung (viên thưởng chỉ bật cạnh bộ đếm góc phải trên); số «+N nguyên tử»
+ *  đếm từ 0 lên trong 400 ms (giảm chuyển động ⇒ số cuối). */
+export function TamThuong({ thuong, demLen }: { thuong: ThuongCau | null | undefined; demLen?: boolean }) {
+  const bay = useRef<HTMLSpanElement>(null), so = useRef<HTMLSpanElement>(null)
   useEffect(() => {
-    if (thuong?.tinh && thuong.nguyenTu > 0) hoatAnh(bay.current, [{ transform: 'translateY(10px)', opacity: 0 }, { transform: 'translateY(-14px)', opacity: 1, offset: 0.3 }, { transform: 'translateY(-60px)', opacity: 0 }], 700, { tre: 260, e: 'ease-out' })
+    if (demLen && thuong?.tinh && thuong.nguyenTu > 0) void demSo(so.current, 0, thuong.nguyenTu, 400, (v) => `+${v}`)
+    else if (thuong?.tinh && thuong.nguyenTu > 0) hoatAnh(bay.current, [{ transform: 'translateY(10px)', opacity: 0 }, { transform: 'translateY(-14px)', opacity: 1, offset: 0.3 }, { transform: 'translateY(-60px)', opacity: 0 }], 700, { tre: 260, e: 'ease-out' })
     else if (thuong && !thuong.tinh) phanHoiThuong('khongTinh')
   }, [thuong])
   if (!thuong) return null
@@ -27,9 +30,9 @@ export function TamThuong({ thuong }: { thuong: ThuongCau | null | undefined }) 
   </div>
   const n = thuong.nguyenTu
   return <div className="tp-kq">
-    <span ref={bay} className="tp-bay-so" aria-hidden="true">+{n} <IcNguyenTu /></span>
+    {!demLen && <span ref={bay} className="tp-bay-so" aria-hidden="true">+{n} <IcNguyenTu /></span>}
     <div className="tp-cong">
-      <span className="tong">+{n} <IcNguyenTu /> nguyên tử</span>
+      <span className="tong" aria-label={`+${n} nguyên tử`}><span ref={so} aria-hidden="true">+{demLen && coChuyenDong() ? 0 : n}</span> <IcNguyenTu /> <span aria-hidden="true">nguyên tử</span></span>
       {thuong.dong.map((d, i) => <span key={i} className="tp-ct" data-k={loaiDong(d.nhan)}>{d.nhan} <b>{d.so > 0 ? '+' : ''}{d.so}</b></span>)}
     </div>
   </div>

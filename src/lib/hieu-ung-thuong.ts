@@ -21,7 +21,7 @@ export type KieuThuong = KieuTiengThuong | 'xong' | 'binh' | 'mua' | 'goCua' | '
 const RUNG: Record<KieuThuong, number[]> = {
   combo: [12, 30, 12], tinhThe: [8], ruong: [20, 40, 30, 40, 60], lenHang: [30, 50, 30, 50, 80], roiHang: [60], chuoi: [25, 40, 50], vo: [40, 30, 20],
   thangHoa: [80], xong: [20, 40, 20, 40, 60], binh: [15, 40, 25], mua: [10, 30, 10], goCua: [18, 120, 18], huyHieu: [20, 40, 40], mucTieu: [20, 40, 20, 40, 60],
-  hoanHao: [30, 50, 30, 50, 80], chuoiTat: [50], truot: [35, 60, 35], giuHang: [18], cuocThua: [40, 30, 20], gui: [10], khongTinh: [12],
+  hoanHao: [30, 50, 30, 50, 80], chuoiTat: [50], truot: [35, 60, 35], giuHang: [18], cuocThua: [40, 30, 20], gui: [10], khongTinh: [12], set: [120], tick: [8],
 }
 const TIENG: Partial<Record<KieuThuong, [KieuTiengThuong, number?] | 'xong'>> = {
   combo: ['combo'], tinhThe: ['tinhThe'], ruong: ['ruong'], lenHang: ['lenHang'], roiHang: ['roiHang'], chuoi: ['chuoi'], vo: ['vo'], thangHoa: ['thangHoa'],
