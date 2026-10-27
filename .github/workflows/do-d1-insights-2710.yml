@@ -1,0 +1,35 @@
+# TRUY VẤN D1 NẶNG NHẤT (CHỈ ĐỌC, số gộp của Cloudflare `wrangler d1 insights`) — thầy 27/10: «App phải tức thì ở mọi khung giờ». Câu SQL in dạng có tham số `?`
+# (không chứa dữ liệu em), cắt 220 kí tự. Sắp theo tổng thời gian chạy và theo tổng dòng đọc, 24 giờ qua.
+name: Đo truy vấn D1 nặng (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-nop-2710]
+    paths: [.github/workflows/do-d1-insights-2710.yml]
+permissions:
+  contents: read
+concurrency:
+  group: do-d1-insights-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Insights
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          for SX in time reads; do
+            echo "== top 30 theo tổng $SX (24h): lần · tổng ms · tb ms · tb dòng đọc · tb dòng ghi · SQL"
+            npx -y wrangler@4 d1 insights omr --timePeriod 1d --sort-type sum --sort-by $SX --limit 30 --json > /tmp/i.json 2>/tmp/i.err || { tail -5 /tmp/i.err; continue; }
+            jq -r '.[] | [(.numberOfTimesRun|tostring), ((.queryEfficiency // 0)|tostring), ((.totalDurationMs // 0)|floor|tostring), ((.avgDurationMs // 0)*10|floor/10|tostring), ((.avgRowsRead // 0)|floor|tostring), ((.avgRowsWritten // 0)|floor|tostring), (.query|gsub("\\s+";" ")|.[0:220])] | join(" | ")' /tmp/i.json || head -c 600 /tmp/i.json
+          done
