@@ -601,7 +601,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     // Giám thị: câu có mức độ ⇒ con của mức ấy đứng cạnh đề; tấm kết quả dùng dấu tròn ✓ / ✗ thay Bi (giám thị đã phản ứng). Không mức ⇒ y cũ.
     const mucGt = q ? mucGiamThi(q) : null
     const ketGt = !k ? null : khongTinh ? 'chua-tinh' as const : tt === 'trung' ? 'trung' as const : tt === 'sai' ? 'sai' as const : chuoi >= 3 && !laLamLai ? 'combo' as const : 'dung' as const
-    const linkGiai = q && k && !k.choThay && <button type="button" className="duo-lien" onClick={() => setMoLoiGiai(true)}><BookOpen size={18} aria-hidden="true" />Lời giải từng bước</button>
+    // thầy 27/10 «Lời giải từng bước cho lên hàng chưa đúng, làm nhỏ lại»: nút nhỏ ở BÊN PHẢI hàng tiêu đề dải (kiểu icon cờ Duolingo), mọi dải đúng / sai /
+    // chưa tính; khổ hẹp + tiêu đề dài ⇒ chỉ còn icon sách (tên đọc màn hình giữ «Lời giải từng bước»).
+    const nutLg = q && k && !k.choThay ? <button type="button" className="duo-ct-lg" aria-label="Lời giải từng bước" onClick={() => setMoLoiGiai(true)}><BookOpen size={18} aria-hidden="true" /><span>Lời giải</span></button> : null
+    const dauDai = (tieu: ReactNode, chu: string) => <div className="duo-ct-dau" data-dai={chu.length > 12 || undefined}>{tieu}{nutLg}</div>
 
     const day = tai ? null
       : xong ? <div className="duo-day" data-xong=""><div className="duo-giua">
@@ -619,22 +622,18 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
                   phụ (không nhãn lười: máy chủ chỉ báo `tinh: false`, không nói vì sao), «Lời giải từng bước» là liên kết nhỏ ở góc phải hàng tiêu đề.
                   TamThuong vẫn gắn (ẩn) để giữ tiếng / rung «không tính» như cũ. */}
               {khongTinh ? <>
-                <div className="duo-ct-dau">
-                  <h2><span className="duo-ct-i" aria-hidden="true"><Info size={20} strokeWidth={2.6} /></span>Chưa được tính</h2>
-                  {q && k && !k.choThay && <button type="button" className="duo-ct-lg" onClick={() => setMoLoiGiai(true)}><BookOpen size={16} aria-hidden="true" />Lời giải</button>}
-                </div>
+                {dauDai(<h2><span className="duo-ct-i" aria-hidden="true"><Info size={20} strokeWidth={2.6} /></span>Chưa được tính</h2>, 'Chưa được tính')}
                 <p className="duo-mo">Đọc kĩ đề rồi làm nhé.</p>
                 <span hidden><TamThuong thuong={th} /></span>
               </>
-              : tt === 'dung' ? <><h2><svg className="duo-tick" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7" /></svg>{laLamLai ? 'Làm lại đúng' : LOI_KHEN[viTri % LOI_KHEN.length]}</h2><TamThuong thuong={th} />{cotLoi && <p><ChemText text={cotLoi} /></p>}</>
-              : tt === 'sai' ? <><h2><svg className="duo-tick" data-sai="" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 7 17 17M17 7 7 17" /></svg>Chưa đúng</h2><TamThuong thuong={th} />{dongVien && <p className="giu-dong-vien">{dongVien}</p>}
+              : tt === 'dung' ? <>{dauDai(<h2><svg className="duo-tick" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7" /></svg>{laLamLai ? 'Làm lại đúng' : LOI_KHEN[viTri % LOI_KHEN.length]}</h2>, laLamLai ? 'Làm lại đúng' : LOI_KHEN[viTri % LOI_KHEN.length]!)}<TamThuong thuong={th} />{cotLoi && <p><ChemText text={cotLoi} /></p>}</>
+              : tt === 'sai' ? <>{dauDai(<h2><svg className="duo-tick" data-sai="" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 7 17 17M17 7 7 17" /></svg>Chưa đúng</h2>, 'Chưa đúng')}<TamThuong thuong={th} />{dongVien && <p className="giu-dong-vien">{dongVien}</p>}
                   <p><b>{q.phan === 'II' && ketDai ? ketDai.tieu : <>Đáp án đúng: <ChemText text={chuDapAnDuo} /></>}</b></p>
                   <p className="duo-mo">{(lyDoEm || cotLoi) && <><ChemText text={lyDoEm || cotLoi} />{' '}</>}{laLamLai ? 'Câu gốc vẫn' : 'Câu này đã'} vào lịch ôn <span className="duo-lien-chu">1 · 3 · 7 ngày</span>.</p></>
-              : <><h2>{ketDai?.tieu}</h2><TamThuong thuong={th} />{ketDai?.phu && <p className="duo-mo">{ketDai.phu}</p>}</>}
+              : <>{dauDai(<h2>{ketDai?.tieu}</h2>, ketDai?.tieu ?? '')}<TamThuong thuong={th} />{ketDai?.phu && <p className="duo-mo">{ketDai.phu}</p>}</>}
               {lanTruoc && !khongTinh && <p className="duo-mo">Chấm theo đáp án em nộp lần trước.</p>}
             </div>
           </div>
-          {linkGiai && !khongTinh && <div className="duo-them">{linkGiai}{/* thầy 26/10 «Bỏ câu sai từng bước»: tấm kết quả không có «Sửa câu này» — chỉ Lời giải từng bước + Hỏi thầy */}</div>}
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
           {/* thầy 27/10: Hỏi thầy (nút 3D phụ ~1/4, trái) + «Tiếp tục» CÙNG MỘT HÀNG */}
           <div className="duo-hang-nut">{linkHoi}<button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' && !khongTinh ? 'do' : khongTinh ? 'lam' : undefined} onClick={() => { phanHoi('chon'); tiep() }}>Tiếp tục</button></div>
