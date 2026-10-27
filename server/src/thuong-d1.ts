@@ -17,10 +17,10 @@ import type { D1PreparedStatement, Env, ExecutionContext } from './kieu'
 import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { viecPhu } from './viec-phu'
 import {
-  BINH_MUA_TOI_DA_TUAN, CUOC_SO_NGAY, GIO_CU_DEM, HAU_TO_KHOA_BINH_TUAN, HUY_HIEU, KHOA_CONG_TAC, MA_TT, SO_LIEU_RONG, THANG_HOA_SO_NGAY, TT_CUOC_DAT, TT_CUOC_THANG,
+  BINH_MUA_TOI_DA_TUAN, CUOC_SO_NGAY, GIO_CU_DEM, HAU_TO_KHOA_BINH_TUAN, HUY_HIEU, KHOA_CONG_TAC, KHOA_TAM_DONG_HS, MA_TT, SO_LIEU_RONG, THANG_HOA_SO_NGAY, TT_CUOC_DAT, TT_CUOC_THANG,
   TT_BINH_GIU_CHUOI, TT_MOC_CHUOI, TT_MUC_TIEU_NGAY, TT_RUONG, chonNhiemVu, congNgayTt, congTacTuDong, datHuyHieu, gioVnCua, mucTieuBai, ngayVnTt, nhiemVuCuaNgay,
-  soThangHoa, tuanMuaBinh,
-  type CongTac, type KhoaCongTac, type MauNhiemVu, type MaNhiemVu, type NhiemVuEm, type SoLieuNgay,
+  soThangHoa, tamDongTuDong, tuanMuaBinh,
+  type CongTac, type MauNhiemVu, type MaNhiemVu, type NhiemVuEm, type SoLieuNgay,
 } from './thuong-luat'
 import { CHUA_TINH_BINH, cauNoiChuoi, congBinhGiuChuoi } from './thuong-cau-noi-chuoi'
 import { tomTatGiaiEm } from './thuong-giai-tuan'
@@ -83,22 +83,34 @@ export function lenhThuongMocChuoi(env: Env, sbd: string, moc: number, ngay: str
 
 // --- Công tắc ----------------------------------------------------------------------------------------
 
-const SQL_CONG_TAC = `SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (${KHOA_CONG_TAC.map(() => '?').join(',')})`
-export const lenhDocCongTac = (env: Env): D1PreparedStatement => env.DB.prepare(SQL_CONG_TAC).bind(...KHOA_CONG_TAC)
+// Cùng MỘT câu đọc cả khoá tạm đóng app học sinh (`hs_tam_dong`) ⇒ /hs/thuong báo `tamDong` mà không thêm câu / vòng chờ nào.
+const KHOA_DOC = [...KHOA_CONG_TAC, KHOA_TAM_DONG_HS] as const
+const SQL_CONG_TAC = `SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (${KHOA_DOC.map(() => '?').join(',')})`
+export const lenhDocCongTac = (env: Env): D1PreparedStatement => env.DB.prepare(SQL_CONG_TAC).bind(...KHOA_DOC)
+type DongCongTac = { khoa: string; gia_tri: string }
+async function docDongCongTac(env: Env): Promise<DongCongTac[]> {
+  try { return (await lenhDocCongTac(env).all<DongCongTac>()).results ?? [] } catch { return [] }
+}
 export async function docCongTac(env: Env): Promise<CongTac> {
-  try { return congTacTuDong((await lenhDocCongTac(env).all<{ khoa: string; gia_tri: string }>()).results ?? []) } catch { return congTacTuDong([]) }
+  return congTacTuDong(await docDongCongTac(env))
+}
+/** Dạng thầy đọc / ghi: 4 công tắc thưởng + `hs_tam_dong` ('bat' = đang đóng app học sinh; mặc định 'tat'). */
+export type CongTacGv = CongTac & { [KHOA_TAM_DONG_HS]: 'bat' | 'tat' }
+async function docCongTacGv(env: Env): Promise<CongTacGv> {
+  const rows = await docDongCongTac(env)
+  return { ...congTacTuDong(rows), [KHOA_TAM_DONG_HS]: tamDongTuDong(rows) ? 'bat' : 'tat' }
 }
 /** Lệnh thầy: thân rỗng ⇒ đọc; `{khoa, giaTri}` ⇒ ghi rồi trả lại đúng dạng như đọc. Khoá lạ / giá trị lạ ⇒ `loi400`. */
-export async function gvCongTacThuong(env: Env, b: Dong): Promise<{ ok: true; congTac: CongTac } | { ok: false; error: string; loi400: true }> {
+export async function gvCongTacThuong(env: Env, b: Dong): Promise<{ ok: true; congTac: CongTacGv } | { ok: false; error: string; loi400: true }> {
   if (b.khoa !== undefined && b.khoa !== null && b.khoa !== '') {
     const khoa = chu(b.khoa)
-    if (!(KHOA_CONG_TAC as readonly string[]).includes(khoa)) return { ok: false, error: `Khoá công tắc không có: ${khoa}`, loi400: true }
+    if (!(KHOA_DOC as readonly string[]).includes(khoa)) return { ok: false, error: `Khoá công tắc không có: ${khoa}`, loi400: true }
     const g = b.giaTri === true ? 'bat' : b.giaTri === false ? 'tat' : chu(b.giaTri)
     if (g !== 'bat' && g !== 'tat') return { ok: false, error: "Giá trị công tắc chỉ nhận 'bat' hoặc 'tat'.", loi400: true }
     await env.DB.prepare('INSERT INTO cau_hinh(khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
-      .bind(khoa as KhoaCongTac, g, new Date().toISOString()).run()
+      .bind(khoa, g, new Date().toISOString()).run()
   }
-  return { ok: true, congTac: await docCongTac(env) }
+  return { ok: true, congTac: await docCongTacGv(env) }
 }
 const batTuCongTac = (c: CongTac) => ({ giai: c.thuong_giai_tuan === 'bat', thangHoa: c.thuong_thang_hoa === 'bat', banBe: c.thuong_ban_be === 'bat', kimCuong: c.thuong_kim_cuong === 'bat' })
 
@@ -233,7 +245,8 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
   lo.catch(() => {})
   const sbd = await xong
   const [kq, chuoiNgay, giai, cauDaLam] = await Promise.all([lo, chuoiSom, giaiSom, cauSom])
-  const congTac = congTacTuDong((kq[0]?.results ?? []) as Dong[] as { khoa: unknown; gia_tri: unknown }[])
+  const dongCt = (kq[0]?.results ?? []) as Dong[] as { khoa: unknown; gia_tri: unknown }[]
+  const congTac = congTacTuDong(dongCt)
   const d = phanTichNgay(sbd, ngay, kq.slice(1, 4), cauDaLam)
   const choTra = thuongChoTra(d)
   const cuoc = (kq[5]?.results?.[0] ?? null) as Dong | null
@@ -245,6 +258,8 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
   return {
     ok: true,
     bat: batTuCongTac(congTac),
+    // CHỈ-THÊM 27/10: thầy tạm đóng app học sinh (`cau_hinh.hs_tam_dong` = 'bat') ⇒ màn phủ «App đang bảo trì» (trừ khi em đang làm kiểm tra / ca thi).
+    tamDong: tamDongTuDong(dongCt),
     nguyenTuHomNay: d.nguyenTu,
     tinhThe: d.tinhTheSo + choTra.reduce((t, k) => t + k.so, 0),
     mucTieu: d.mucTieu,

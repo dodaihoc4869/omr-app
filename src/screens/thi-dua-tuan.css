@@ -55,6 +55,8 @@
 .tdt-cong[data-on] { background: var(--td-chinh); }
 .tdt-cong[data-on]::after { transform: translateX(18px); }
 .tdt-ct .tdt-loi-nho { grid-column: 1 / -1; border-top: 1px solid var(--td-vien); }
+/* Tạm đóng app học sinh (27/10): dòng thứ 5, nằm riêng cả hàng */
+.tdt-ct-dong[data-khoa='hs_tam_dong'] { grid-column: 1 / -1; border-right: 0; }
 
 /* dải 4 số */
 .tdt-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--td-vien); border-radius: var(--td-r); background: var(--td-mat); overflow: hidden; }

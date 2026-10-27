@@ -251,3 +251,14 @@ export function congTacTuDong(rows: readonly { khoa: unknown; gia_tri: unknown }
   const m = new Map(rows.map((r) => [String(r.khoa), String(r.gia_tri ?? '').trim().replace(/^"|"$/g, '')]))
   return Object.fromEntries(KHOA_CONG_TAC.map((k) => [k, m.get(k) === 'tat' ? 'tat' : 'bat'])) as CongTac
 }
+
+/**
+ * TẠM ĐÓNG APP HỌC SINH (thầy 27/10 tối: «Tắt app, để tối ưu xong rồi mở lại cho tôi»). Khoá riêng trong `cau_hinh`, NGƯỢC chiều với 4 công tắc thưởng:
+ * 'bat' = ĐANG ĐÓNG; vắng dòng / giá trị lạ = MỞ. Không đổi schema. Máy chủ chỉ báo cờ (`tamDong` trong /hs/thuong); màn phủ ở app học sinh,
+ * KHÔNG chặn lệnh kiểm tra cá nhân / ca thi (em đang làm dở vẫn nộp được).
+ */
+export const KHOA_TAM_DONG_HS = 'hs_tam_dong'
+export function tamDongTuDong(rows: readonly { khoa: unknown; gia_tri: unknown }[]): boolean {
+  const r = rows.find((x) => String(x.khoa) === KHOA_TAM_DONG_HS)
+  return !!r && String(r.gia_tri ?? '').trim().replace(/^"|"$/g, '') === 'bat'
+}

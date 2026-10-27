@@ -1085,3 +1085,18 @@
 :root[data-trong='hs'] .tr-menu-cham i { width: 6px; height: 44px; background: color-mix(in srgb, var(--tr-hs) 78%, transparent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tr-hs) 16%, transparent), 0 4px 14px color-mix(in srgb, var(--tr-hs) 30%, transparent); }
 /* thanh tiến độ thẻ bài / dải ghim ở nền tối: phần đầy là MÀU ĐÚNG (trước là --tr-trang = gần đen ở nền tối ⇒ «vạch đen đặc» lúc 16/16) */
 @media (prefers-color-scheme: dark) { :root[data-trong='hs'] :is(.da-bai-tien, .da-dai-tien) > i > s { background: var(--tr-dung); } }
+
+/* TẠM ĐÓNG APP (27/10) — màn phủ «App đang bảo trì» (TrongHs.PhuTamDong). Chỉ biến --tr-* ⇒ tự hợp sáng / tối. */
+[data-trong] .tdg-phu {
+  position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; overflow-y: auto;
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); background: var(--tr-nen); color: var(--tr-chu);
+}
+[data-trong] .tdg-the { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+[data-trong] .tdg-the h1 { margin: 6px 0 0; font-size: 26px; line-height: 1.25; font-weight: 800; color: var(--tr-chu); }
+[data-trong] .tdg-the p { margin: 0; font-size: 18px; line-height: 1.5; font-weight: 600; color: var(--tr-chu-2); }
+[data-trong] .tdg-nut {
+  width: 100%; min-height: 52px; margin-top: 8px; padding: 0 20px; border: 0; border-radius: 16px; font: inherit; font-size: 16px; font-weight: 800;
+  background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-chu) 18%, transparent); cursor: pointer; touch-action: manipulation;
+}
+[data-trong] .tdg-nut:active { transform: translateY(2px); box-shadow: none; }
+

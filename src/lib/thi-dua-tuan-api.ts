@@ -70,7 +70,8 @@ export function docThiDua(j: O, lop: string): ThiDuaTuan | null {
 }
 
 // ---- công tắc (cau_hinh) ----
-export const KHOA_CONG_TAC = ['thuong_giai_tuan', 'thuong_thang_hoa', 'thuong_ban_be', 'thuong_kim_cuong'] as const
+// `hs_tam_dong` (27/10): NGƯỢC chiều — bật = ĐANG ĐÓNG app học sinh; máy chủ mặc định 'tat'.
+export const KHOA_CONG_TAC = ['thuong_giai_tuan', 'thuong_thang_hoa', 'thuong_ban_be', 'thuong_kim_cuong', 'hs_tam_dong'] as const
 export type KhoaCongTac = (typeof KHOA_CONG_TAC)[number]
 export type CongTac = Partial<Record<KhoaCongTac, boolean>>
 export function docCongTac(j: O): CongTac {
