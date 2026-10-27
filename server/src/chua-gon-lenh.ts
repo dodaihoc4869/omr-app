@@ -20,6 +20,7 @@ import { phuQidAoMoi, SO_THU_BIEN_THE } from './ban-khac-ao'
 import { qidBienThe, qidYDsMoi } from './loi-hoc-luat'
 import { GIO_LOI_GIAI_GAN, sqlHoCau } from './chua-gon'
 import { emCoGhi } from './dem-ke-hoach'
+import { goiYTuLoiGiai } from './goi-y-rieng'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
@@ -173,13 +174,12 @@ export async function gonNop(env: Env, b: Obj): Promise<Response> {
   return Response.json(await kemChiTiet(env, sbd, Q, kq, ban))
 }
 
-/** Gợi ý sau lần sai đầu: bước 1 của bài luyện từng bước (nếu thầy đã duyệt) — KHÔNG lấy câu đầu lời giải (hay có "Chọn B" / đáp số). */
-async function goiYMot(env: Env, Q: string, ban: PrivateQuestion): Promise<string> {
+/** Gợi ý sau lần sai đầu (thầy 27/10: lời khuyên chung chung «đọc lại đề, gạch chân…» là vô nghĩa ⇒ bỏ): bước 1 bài luyện từng bước thầy đã duyệt ·
+ *  không có ⇒ vế đầu bước 1 / kiến thức cốt lõi của lời giải kho nếu KHÔNG lộ đáp án (goi-y-rieng.ts) · không có ⇒ undefined (máy em không hiện dòng Gợi ý). */
+async function goiYMot(env: Env, Q: string, ban: PrivateQuestion): Promise<string | undefined> {
   const h = await docHocLieu(env, Q).catch(() => null)
   const buoc = h?.duDung ? h.hocLieu?.buoc?.[0] : undefined
   const m1 = buoc?.hoTro?.find((x) => x.muc === 1)?.noiDung?.trim()
   if (m1) return m1
-  const ten = (ban.tenDang ?? '').trim()
-  const dau = ban.phan === 'II' ? 'Em xét lại từng ý một, mỗi ý so với kiến thức của bài' : ban.phan === 'III' ? 'Em viết lại dữ kiện, đổi đúng đơn vị rồi tính lại từng bước' : 'Em đọc lại đề, gạch chân điều đề hỏi rồi loại từng phương án'
-  return ten ? `Dạng: ${ten}. ${dau}.` : `${dau}.`
+  return goiYTuLoiGiai(ban) ?? undefined
 }
