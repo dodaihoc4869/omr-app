@@ -2,7 +2,7 @@
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
-import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
+import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
@@ -15,6 +15,7 @@ import '../../styles/trong-hs.css'
 // THƯỞNG PHẠT (gộp đợt 3, 26/10 — src/components/thuong/CAM-VAO.md): thanh trên ThanhThuong vẽ NGAY từ bản lưu máy (nhỏ, cùng mảnh «Trong»); mọi màn
 // thưởng phạt + thẻ bên là MỘT mảnh nạp lười (ManThuong). Học sinh không thấy nhãn nhịp học / bậc.
 import { ThanhThuong } from '../thuong/ThanhThuong'
+import { TheBanLoTrinh } from '../thuong/TheBanLoTrinh' // lối vào Học cùng bạn trên Lộ trình (27/10)
 import { useTongQuan } from '../thuong/dung-thuong'
 import { napSanThanhTich } from '../../lib/thuong-api'
 import type { TenManThuong } from '../thuong/ManThuong'
@@ -306,6 +307,7 @@ export function MotTrangHs(p: PropsMotTrang) {
         {tq?.chuoiNgay && <OTo ten="Chuỗi ngày" mo="Lịch chuỗi, bình giữ chuỗi, mốc" sac="chu-y" Icon={Flame} onClick={() => moTp('chuoi')} />}
         {tq?.bat.giai !== false && <OTo ten="Giải tuần" mo="Bảng nhóm tuần này" sac="tin" Icon={Route} onClick={() => moTp('giai')} />}
         {tq?.bat.banBe !== false && <OTo ten="Học cùng bạn" mo="Chuỗi đôi với bạn học cùng" sac="dung" Icon={GraduationCap} onClick={() => moTp('ban')} />}
+        {tq?.bat.kimCuong && <OTo ten="Thử thách Kim cương" mo="10 câu khó của chuyên đề em đã vững" sac="tin" Icon={Award} onClick={() => moTp('kim-cuong')} />}
         <OTo ten="Cửa hàng" mo="Tinh thể và bình giữ chuỗi" sac="sao" Icon={Sparkles} so={tq?.tinhThe} onClick={() => moTp('cua-hang')} />
       </> : <div className="da-huy">{huy.map(({ ten, sac, Icon, co }) => <div key={ten}><i data-sac={co ? sac : undefined}>{co ? <Icon size={28} aria-hidden="true" /> : <Lock size={26} aria-hidden="true" />}</i>{ten}</div>)}</div>}
       <h2 className="da-tieu-nho">Điểm thầy đã công bố</h2>
@@ -347,6 +349,7 @@ export function MotTrangHs(p: PropsMotTrang) {
         {!so && p.dangTai && <span className="mot-xuong" aria-hidden="true" />}</section>}
       {loiBi && <LoiBi cam={loiBi[0]} loi={loiBi[1]} coBi={!coBiBen} />}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
+      {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} cam={coBiBen ? loiBi?.[0] ?? 'chao' : undefined} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
     </main>

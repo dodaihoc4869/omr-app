@@ -9,7 +9,11 @@
 // lược đồ THẬT (nạp đúng tệp `server/schema.sql` + mọi `server/migration-*.sql`),
 // nên `json_each`, `ON CONFLICT`, `date(...,'+7 hours')` được kiểm chứng chứ không
 // đoán. `batch` chạy trong một giao dịch, giống D1.
-import { DatabaseSync } from 'node:sqlite'
+import { createRequire } from 'node:module'
+// `node:sqlite` CHỈ có tên kèm tiền tố «node:» (không nằm trong `builtinModules`) ⇒ Vite ở môi trường client (test `@vitest-environment jsdom`, vd
+// tra-loi-ngan-qua-4-o-1510) không nhận ra là mô-đun lõi, cố đóng gói ⇒ «Cannot bundle Node.js built-in "node:sqlite"» (27/10). Nạp bằng `require`
+// của Node ⇒ test node lẫn jsdom đều dùng được; kiểu giữ nguyên.
+const { DatabaseSync } = createRequire(import.meta.url)('node:sqlite') as typeof import('node:sqlite')
 import { readFileSync, readdirSync } from 'node:fs'
 import type { D1PreparedStatement, Env } from '../server/src/kieu'
 import { xoaDemThiDua } from '../server/src/dem-thi-dua'

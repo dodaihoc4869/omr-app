@@ -573,6 +573,13 @@
   [data-trong='hs'] .tp-goc *, [data-trong='hs'] .tp-goc *::before, [data-trong='hs'] .tp-goc *::after { animation: none !important; transition: none !important; }
 }
 [data-trong='hs'].may-yeu .tp-goc *, [data-trong='hs'].may-yeu .tp-goc *::before, [data-trong='hs'].may-yeu .tp-goc *::after { animation: none !important; }
+/* Thử thách Kim cương · danh sách chuyên đề (27/10, lối vào từ Thành tích) */
+[data-trong='hs'] .tp-kc-muc + .tp-kc-muc { padding-top: 12px; border-top: 1px solid var(--tr-vien); }
+[data-trong='hs'] .tp-kc-muc { flex-wrap: wrap; row-gap: 8px; }
+[data-trong='hs'] .tp-kc-muc .giua { flex: 1 1 170px; min-width: 0; }
+[data-trong='hs'] .tp-kc-muc :is(.tp-nut, .tp-mo-lai, .tp-chip) { flex: none; margin-left: auto; white-space: nowrap; }
+[data-trong='hs'] .tp-kc-hh { display: block; flex: none; width: 40px; }
+[data-trong='hs'] .tp-nut[data-sac='kc'] { background: var(--tp-kl-kimcuong-2); color: var(--tp-tren); border-color: transparent; box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tp-den) 18%, transparent); }
 
 /* TƯƠI 27/10 (thầy cho phép: «Màu sắc của app làm siêu tươi như dolingo»): chữ trắng trên dải xanh lá ⇒ --tr-dung-nut (đạt 3:1 cho chữ đậm). */
 :root[data-trong='hs'] .tp-bxh .vach { background: var(--tr-dung-nut); }

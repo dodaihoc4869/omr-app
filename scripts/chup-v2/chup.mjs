@@ -332,6 +332,15 @@ const TPC_CANH = [
   ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
 ]
 // PHÔNG 27/10: thêm khổ 360×640 (`doc640`) — soát nhãn ngắn bẻ dòng khi phông rộng hơn; cảnh `menu` = menu dọc đang mở.
+// ═══ VIỆC TỒN 27/10 (tiền tố "ton-"): lối vào Học cùng bạn (thẻ trên Lộ trình · khối «Lửa đôi» ở Chuỗi ngày) + lối vào Thử thách Kim cương (ô ở Thành tích
+// ⇒ danh sách chuyên đề đã vững). App THẬT `hs-mot&tp=1` + máy chủ giả gia/thuong.tsx. 390×844 · 360×640, sáng + tối; Chuỗi ngày chụp cả trang.
+const TON_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1', false], ['lo-trinh-moi', 'hs-mot&tp=1&ban=0', false], ['chuoi', 'hs-mot&tp=1', true, 'nut:Chuỗi 12 ngày'],
+  ['thanh-tich', 'hs-mot&tp=1', true, 'menu:Thành tích'], ['kc-ds', 'hs-mot&tp=1', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
+  ['kc-trong', 'hs-mot&tp=1&kc=0', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'], ['kc-moi', 'hs-mot&tp=1', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương » nut:Thử thách Cấu tạo'],
+]
+const DS_TON = [[390, 844, 'doc'], [360, 640, 'doc640']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  TON_CANH.map(([t, m, ca, viec]) => [`ton-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
 const DS_TPC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết THƯỞNG PHẠT GỘP 26/10
@@ -481,6 +490,7 @@ const DS = [
   ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_PT, // PHƯƠNG TRÌNH 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
+  ...DS_TON, // VIỆC TỒN 27/10
   ...DS_NC, // NÂNG CẤP 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
@@ -677,6 +687,13 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.waitForTimeout(1500)
       await t.evaluate(() => document.querySelector('.tr-menu-cham')?.click())
       await t.waitForTimeout(400)
+    } else if (viec?.startsWith('ton:')) {
+      // VIỆC TỒN 27/10: chuỗi bước ngăn " » " — `menu:<mục>` (chọn mục menu dọc như dưới) · `nut:<tên đầu>` (bấm nút có tên bắt đầu bằng chữ ấy).
+      for (const buoc of viec.slice(4).split(' » ')) {
+        if (buoc.startsWith('menu:')) await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), buoc.slice(5))
+        else await t.getByRole('button', { name: new RegExp('^' + buoc.slice(4)) }).first().click()
+        await t.waitForTimeout(700)
+      }
     } else if (viec?.startsWith('menu:')) {
       // THƯỞNG PHẠT GỘP 26/10: chọn một mục menu dọc «Trong» (menu luôn gắn trong DOM, ẩn bằng CSS ⇒ bấm bằng DOM, rồi chờ màn mục vẽ).
       await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), viec.slice(5))
