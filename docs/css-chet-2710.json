@@ -1,0 +1,18 @@
+{
+ "ghiChu": "27/10/2026 — gỡ CSS CHẾT ở tờ nạp CHUNG khi mở MỌI đường (index-*.css): main đỏ luật tốc độ sau #430/#431 (cổng HS +0,1 KB; /gv /p sát mốc). Luật bị gỡ = mọi bộ chọn chứa lớp không còn ở đâu trong src/, server/src, public (kể cả chuỗi ghép động): menu phụ huynh cũ `ph3-dieu-huong` / `ph3-muc` / `ph3-vao__chan` (bat-linh/phu-huynh.css — màn PH «Một trang» không còn dùng). Không màu nào đang HIỆN trên màn bị đổi. `cu` = khai báo màu được phép biến mất (khoá → số lần, đúng con số đo lúc gỡ).",
+ "cu": {
+  "src/components/bat-linh/phu-huynh.css · background: var(--bl-paper)": 1,
+  "src/components/bat-linh/phu-huynh.css · box-shadow: 0 -4px 20px rgb(22 62 62 / .06)": 1,
+  "src/components/bat-linh/phu-huynh.css · background: rgb(253 229 161)": 1,
+  "src/components/bat-linh/phu-huynh.css · color: rgb(88 64 20)": 1,
+  "src/components/bat-linh/phu-huynh.css · color: var(--bl-teal)": 1,
+  "src/components/bat-linh/phu-huynh.css · color: var(--bl-ink)": 1,
+  "src/components/bat-linh/phu-huynh.css · background: rgb(255 252 243 / .85)": 1,
+  "src/components/bat-linh/phu-huynh.css · border-right: 1px solid var(--bl-line)": 1,
+  "src/components/bat-linh/phu-huynh.css · background: linear-gradient(180deg, var(--bl-paper) 65%, rgb(231 240 220))": 1,
+  "src/components/bat-linh/phu-huynh.css · border-bottom: 1px solid var(--bl-line)": 1,
+  "src/components/bat-linh/phu-huynh.css · background: rgb(235 241 220)": 1,
+  "src/components/bat-linh/phu-huynh.css · background: transparent": 2,
+  "src/components/bat-linh/phu-huynh.css · color: inherit": 1
+ }
+}

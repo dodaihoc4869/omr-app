@@ -139,13 +139,15 @@ const HOI_SOM_MO_CHANG =
   `try{var q=String(p.sbd||''),h=JSON.parse(localStorage.getItem('omr_hoa2_sanh_dem:'+q)||localStorage.getItem('omr_hoa2_sanh_dem:'+q.trim())||'null'),s=h&&h.cheDo2&&h.sanh&&h.sanh.ngay===new Date(Date.now()+25200000).toISOString().slice(0,10)?h.sanh:null,k=s&&s.kiemTraCaNhan,c=window.__ddhHoiSom&&window.__ddhHoiSom['/hs/ca-dang-mo'];` +
   `if(c&&c.hua&&s&&s.theLuc&&s.theLuc.con>0&&!(k&&k.homNay===true&&!k.baiNgayToiThieu))c.hua.then(function(x){try{if(x&&x.ok&&JSON.parse(x.text).coCaMo===false){H(window,g,p,[['/game-v2/hoc-tap-start','token']],true);var m=window.__ddhHoiSom['/game-v2/hoc-tap-start'];if(m)m.het=Date.now()+6e5}}catch(e){}})}catch(e){}`
 
-/** Mã JS (ES5, tự gọi) chèn vào <head>: chọn mảng theo đường dẫn rồi thêm thẻ link tải sớm (+ hỏi Sảnh sớm khi máy em đã đăng nhập). */
-export function taoMaNapTruoc(bang: BangNapTruoc): string {
-  return `(function(){try{var c=(${chonMangNapTruoc.toString()})(location.pathname,location.search);var b=${JSON.stringify(bang)};` +
+/** Mã JS (ES5, tự gọi) chèn vào <head>: chọn mảng theo đường dẫn rồi thêm thẻ link tải sớm (+ hỏi Sảnh sớm khi máy em đã đăng nhập).
+ *  `gon` (lúc build, vite.config.ts — 27/10 luật tốc độ): nén mã nguồn HAI HÀM chèn bằng `toString()` (bỏ khoảng trắng, đổi tên biến cục bộ) — chúng đứng
+ *  trong index.html của MỌI đường vào; khung ngoài (`var b=…;var nap=`) giữ nguyên văn cho kiem-toc-do-tai / test đọc. Test gọi không `gon` ⇒ y bản cũ. */
+export function taoMaNapTruoc(bang: BangNapTruoc, gon: (hamNguon: string) => string = (x) => x): string {
+  return `(function(){try{var c=(${gon(chonMangNapTruoc.toString())})(location.pathname,location.search);var b=${JSON.stringify(bang)};` +
     `var nap=function(ds,thap){if(!ds)return;for(var i=0;i<ds.length;i++){var l=document.createElement('link');if(/\\.css$/.test(ds[i])){l.rel='preload';l.as='style'}else if(/\\.woff2$/.test(ds[i])){l.rel='preload';l.as='font';l.type='font/woff2'}else{l.rel='modulepreload'}if(thap)l.fetchPriority='low';l.crossOrigin='';l.href=ds[i];document.head.appendChild(l)}};` +
     `if(c==='hs'&&b.hsVo){var p=null;try{p=JSON.parse(localStorage.getItem(${JSON.stringify(KHOA_PHIEN_HS)})||'null')}catch(e){}nap(b.hsVo);` +
     `if(p){nap(b.hs);var g='';try{g=localStorage.getItem(${JSON.stringify(KHOA_DIA_CHI_HS)})||''}catch(e){}` +
-    `if(/^https:\\/\\/[^\\/]+$/.test(g)&&typeof fetch==='function'){try{var H=(${hoiSomSanh.toString()});H(window,g,p,${JSON.stringify(LENH_HOI_SOM)},true);${HOI_SOM_MO_CHANG}}catch(e){}}` +
+    `if(/^https:\\/\\/[^\\/]+$/.test(g)&&typeof fetch==='function'){try{var H=(${gon(hoiSomSanh.toString())});H(window,g,p,${JSON.stringify(LENH_HOI_SOM)},true);${HOI_SOM_MO_CHANG}}catch(e){}}` +
     `if(navigator.serviceWorker&&navigator.serviceWorker.controller)nap(b.phongHs)}else{if(b.anhDangNhapHs){var a=document.createElement('link');a.rel='preload';a.as='image';a.href=b.anhDangNhapHs;document.head.appendChild(a)}` +
     `document.addEventListener('DOMContentLoaded',function(){nap(b.hs,1)})}return}` +
     `if(c==='ph'&&b.phVo){nap(b.phVo);nap(b.ph);return}if(c==='thi'&&b.thiRieng){nap(b.thi);return}if(b.app&&c!=='hs')nap(b.app);nap(c&&b[c])}catch(e){}})()`
