@@ -3805,7 +3805,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       </button>
     ) : null
 
-  // Dải cảnh báo rời màn + dòng báo thêm giờ — dùng chung cho ba bố cục (ngang, dọc, Duo).
+  // Dải cảnh báo rời màn + dòng báo thêm giờ — dùng chung cho bố cục ngang và Duo (bố cục dọc giữ khối riêng y cũ).
   const daiBao = (
     <>
       {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
@@ -3989,7 +3989,34 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       )}
 
 
-      {daiBao}
+      {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
+      {canhBaoRoi &&
+        (dungM3() ? (
+          <div className="sticky z-30" style={{ top: 56 }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+            <DaiCanhBaoRoiM3 muc={canhBaoRoi.muc} loi={canhBaoRoi.loi} />
+          </div>
+        ) : (
+          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+            <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
+              <b>{canhBaoRoi.loi}</b>
+            </OThongBao>
+          </div>
+        ))}
+
+      {/* DÒNG BÁO "Thầy cho thêm N phút" — nhẹ, tự tắt; nhường chỗ cho cảnh báo rời màn (cùng vị trí dính) */}
+      {baoThemGio &&
+        !canhBaoRoi &&
+        (dungM3() ? (
+          <div className="sticky z-30" style={{ top: 56 }} role="status" data-bao-them-gio>
+            <DaiBaoNheM3 chu={baoThemGio} />
+          </div>
+        ) : (
+          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="status" data-bao-them-gio>
+            <OThongBao tone="xanh">
+              <b>{baoThemGio}</b>
+            </OThongBao>
+          </div>
+        ))}
 
       {/* HAI CỘT TRÊN MÀN RỘNG. Cột trái KHÔNG phải menu của thầy: em đang thi
           mà bên cạnh có "Ngân hàng câu hỏi" thì một chạm là ra hết đáp án. Cột
