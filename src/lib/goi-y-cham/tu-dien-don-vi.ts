@@ -35,7 +35,7 @@ const MAU: Record<string, MauThe> = {
   '%m': { ten: '% · phần trăm khối lượng', doan: ['Cứ 100 g hỗn hợp có {so} g chất đó', '%m = m chất : m hỗn hợp × 100%'], congThuc: '%m = m chất : m hỗn hợp × 100%' },
   '%V': { ten: '% · phần trăm thể tích', doan: ['Chất khí cùng điều kiện: %V = %n (phần trăm số mol)', '%V = V chất : V hỗn hợp × 100%'], congThuc: '%V = V chất : V hỗn hợp × 100%' },
   '%C': { ten: '% · nồng độ phần trăm (C%)', doan: ['Cứ 100 g dung dịch có {so} g chất tan', 'm chất tan = m dung dịch × C% : 100'], congThuc: 'C% = m chất tan : m dung dịch × 100%', nhoDoi: 'm chất tan = m dung dịch × C% : 100' },
-  '%H': { ten: '% · hiệu suất (H)', doan: ['Chỉ {so}% lượng lý thuyết thành sản phẩm', 'Tính xuôi (nguyên liệu → sản phẩm) × H/100; tính ngược × 100/H'], congThuc: 'H = lượng thực tế : lượng lý thuyết × 100%' },
+  '%H': { ten: '% · hiệu suất (H)', doan: ['Chỉ {so}% lượng ban đầu tham gia phản ứng', 'Tính xuôi (nguyên liệu → sản phẩm) × H/100; tính ngược × 100/H'], congThuc: 'H = lượng phản ứng : lượng ban đầu × 100%' },
   D: { ten: 'g/mL · khối lượng riêng (D)', doan: ['1 mL dung dịch nặng {so} g', 'm dung dịch = D × V · 1 mL = 1 cm³'], congThuc: 'm = D × V', nhoDoi: '1 mL = 1 cm³' },
   'g/mol': { ten: 'g/mol · khối lượng mol (M)', doan: ['Khối lượng của 1 mol chất, tính bằng gam', 'm = n × M · n = m : M'], congThuc: 'm = n × M · n = m : M' },
   dkc: { ten: 'đkc · điều kiện chuẩn', doan: ['25 °C, 1 bar: 1 mol khí bất kì chiếm 24,79 L', 'V = n × 24,79 · n = V : 24,79'], congThuc: 'V = n × 24,79 · n = V : 24,79', nhoDoi: '24,79 L/mol (đkc)' },
