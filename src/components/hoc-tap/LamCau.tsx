@@ -283,6 +283,14 @@ export function BanPhimSo({ value, onPhim, khoa, soO = TOI_DA_KY_TU }: { value: 
   const lucAn = useRef(new Map<PhimSo, number>())
   const hienTai = useRef({ value, khoa, soO })
   hienTai.current = { value, khoa, soO }
+  // 27/10 MƯỢT: màn Duo đọc `.duo[data-co-phim]` (bố cục hai cột khi có bàn phím số) thay cho `.duo:has(.ht2-lam-phim)` — :has() ở khối cha
+  // làm tính lại kiểu cả trang mỗi lần đổi nút. Gắn trước lần sơn (layout effect), gỡ khi bàn phím rời đi.
+  useLayoutEffect(() => {
+    const duo = goc.current?.closest('.duo')
+    if (!duo) return
+    duo.setAttribute('data-co-phim', '')
+    return () => duo.removeAttribute('data-co-phim')
+  }, [])
   const lun = (p: PhimSo) => {
     const b = nut.current[p]
     if (!b) return

@@ -28,7 +28,7 @@ export function KhungDuoSua({ onVe, khoaVe, pct, nhanThanh, loe, xong, tt, deDai
   // Vệt sáng lướt xong thì gỡ (thanh đầy 100% ⇒ vệt dừng ngoài mép phải — bị cắt nhưng vẫn tính là tràn khi đo).
   const [hetLoe, setHetLoe] = useState(false)
   return (
-    <div ref={goc} className="ht-app ht2-lam duo duo-sua" data-duo="" data-xong={xong || undefined} data-tt={tt}>
+    <div ref={goc} className="ht-app ht2-lam duo duo-sua" data-duo="" data-hai-cot={deDai || undefined} data-xong={xong || undefined} data-tt={tt}>
       {!xong && <header className="duo-tren">
         <button type="button" className="duo-dong" onClick={onVe} disabled={khoaVe} aria-label="Quay lại"><XIcon size={26} aria-hidden="true" /></button>
         <div className="duo-thanh" role="progressbar" aria-label={nhanThanh} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}><i style={{ width: `${pct}%` }}><b /><b /><b />{loe && !hetLoe && !(typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) && <span className="duo-loe" onAnimationEnd={() => setHetLoe(true)} />}</i></div>

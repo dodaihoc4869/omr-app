@@ -318,6 +318,16 @@ export function tuThe(muc: MucGT): Record<string, TrangThaiVe> {
 }
 const PHU = ['phu-kinh', 'phu-lac', 'phu-ngap', 'phu-gai']
 /** Các giám thị đang sống (bộ chụp / máy quay video bản build điều khiển trạng thái qua đây). */
+// NHƯỜNG KHUNG CHO LƯỢT CHẠM (27/10 MƯỢT, đo scripts/do-muot-hs.mjs): một khung linh vật vẽ lại vài chục hình SVG (~6–10 ms ở CPU ×4) — chen đúng giữa
+// lượt chạm và lần vẽ phản hồi (nút lún, ô được chọn) là phản hồi chậm thêm một khung. Có pointerdown / keydown ⇒ linh vật nghỉ 140 ms (đồng hồ lò xo
+// vẫn tính, chạy tiếp mượt). Viết tại chỗ (không tệp chung) để không sinh thêm mảnh precache.
+let nhuongDen = 0
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  const chamNhuong = () => { nhuongDen = performance.now() + 140 }
+  window.addEventListener('pointerdown', chamNhuong, { capture: true, passive: true })
+  window.addEventListener('keydown', chamNhuong, { capture: true, passive: true })
+}
+const dangNhuongKhung = (now: number): boolean => now < nhuongDen
 export const GT_DANG_SONG = new Set<GiamThi>()
 
 // ─────────────── BỘ MÁY LÒ XO ───────────────
@@ -615,17 +625,21 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
   }
 
   // ── vòng lặp (dừng khi tab ẩn / tamDung) ──
-  let raf = 0, lan = 0, dung = false, tichLuy = 0
+  // 27/10 MƯỢT: giám thị ra khỏi khung nhìn (em cuộn đề dài) ⇒ vòng rAF ngủ; vào lại ⇒ chạy tiếp (IntersectionObserver, không đo bố cục mỗi khung).
+  let raf = 0, lan = 0, dung = false, tichLuy = 0, khuat = false
   const lap = (now: number) => {
     raf = 0
-    if (dung || document.hidden) { lan = 0; return }
+    if (dung || khuat || document.hidden) { lan = 0; return }
+    if (dangNhuongKhung(now)) { raf = requestAnimationFrame(lap); return } // em vừa chạm: nhường khung cho phản hồi nút 
     const dtms = lan ? Math.min(100, now - lan) : 16
     lan = now
     tichLuy += dtms
     if (!mayYeu() || tichLuy >= 30) { let con = tichLuy; tichLuy = 0; while (con > 0) { const dt = Math.min(con, 8); tichPhan(dt / 1000); con -= dt } ve() }
     raf = requestAnimationFrame(lap)
   }
-  const chay = () => { if (!raf && !tinh && !giam && !dung) { lan = 0; raf = requestAnimationFrame(lap) } }
+  const chay = () => { if (!raf && !tinh && !giam && !dung && !khuat) { lan = 0; raf = requestAnimationFrame(lap) } }
+  const quan = !tinh && !giam && typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver((ds) => { khuat = !ds.some((x) => x.isIntersecting); if (!khuat) chay() }) : null
+  quan?.observe(svg)
   const hienLai = () => { if (!document.hidden) chay() }
   document.addEventListener('visibilitychange', hienLai)
   // bấm vào giám thị ⇒ bị chọc
@@ -688,6 +702,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     },
     huy() {
       if (raf) cancelAnimationFrame(raf); raf = 0; dung = true
+      quan?.disconnect()
       document.removeEventListener('visibilitychange', hienLai)
       svg.removeEventListener('click', choc)
       o.loiVao?.querySelectorAll(':scope > .gt-loi').forEach((e) => e.remove())

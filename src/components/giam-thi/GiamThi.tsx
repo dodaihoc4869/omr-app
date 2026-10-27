@@ -42,15 +42,18 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     cauMoi(nhip, qid)
     batDau.current = bay(); daNop.current = false
     // Bong bóng càu nhàu không rộng hơn khối giám thị + đề (không tràn sang cột phương án ở khung ngang).
-    const doRong = () => { const san = el.closest('.duo-gt-san') ?? el.parentElement; if (san) el.style.setProperty('--gt-loi-max', `${Math.max(140, san.clientWidth - 4)}px`) }
-    doRong()
-    window.addEventListener('resize', doRong)
+    // 27/10 MƯỢT: đo bằng ResizeObserver (báo SAU khi trình duyệt tự tính bố cục, trước lần sơn) thay vì đọc `clientWidth` ngay khi dựng — đọc ngay
+    // ép tính lại kiểu + bố cục cả màn thêm một lượt mỗi câu (~35–60 ms ở CPU ×6). Bong bóng càu nhàu hiện sau ≥ 1,2 s nên luôn có số đúng.
+    const san = el.closest('.duo-gt-san') ?? el.parentElement
+    const doRong = (w: number) => el.style.setProperty('--gt-loi-max', `${Math.max(140, w - 4)}px`)
+    const quanRong = san && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => doRong(san.clientWidth)) : null // đọc trong lượt báo: bố cục đã sạch, không ép tính lại
+    if (san && quanRong) quanRong.observe(san); else if (san) doRong(san.clientWidth)
     if (!ket) {
       g.datTrangThai('doc', { xong: () => { if (coKet.current) return; const chon = vung()?.querySelector(`.duo-tra ${CHON}`); chon ? g.nhinVao(chon) : g.nhin(0.5, 0.45); datHen('loi', 1200, () => { if (!coKet.current) noi('ngauNhien') }) } })
       henCho()
       datHen('dh', DONG_HO_GT[muc], () => { if (!coKet.current && !document.hidden) { datTT('dong-ho'); noi('dongHo') } })
     }
-    return () => { window.removeEventListener('resize', doRong); huyHen(); g.huy(); gt.current = null }
+    return () => { quanRong?.disconnect(); huyHen(); g.huy(); gt.current = null }
   }, [muc, qid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // KHUNG CHỮ L — CHỈ khi chữ thật sự tràn xuống dưới chân giám thị (thầy 27/10: câu 4 dòng bị đáy rỗng). Đo trước khi vẽ (layout effect /
@@ -69,17 +72,20 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       svg.setAttribute('width', String(w)); svg.setAttribute('height', String(h))
       path.setAttribute('d', duongL(w, h, kw, kh, kd))
     }
-    let rong = -1, cao = -1, bongCao = -1
+    let rong = -1, cao = -1, bongCao = -1, dau = true
+    const ghiCo = () => { rong = san.clientWidth; cao = de.offsetHeight; bongCao = bong.offsetHeight }
     const quyet = () => {
       san.setAttribute('data-l', '')
       const day = de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top
       if (!(day > khuyet().kh + 12)) san.removeAttribute('data-l')
       ve()
-      rong = san.clientWidth; cao = de.offsetHeight; bongCao = bong.offsetHeight
     }
+    // 27/10 MƯỢT: lượt đầu chỉ quyết (một lần ép bố cục); cỡ đối chiếu ghi ở lượt báo ĐẦU của ResizeObserver (bố cục đã sạch) thay vì đọc ngay —
+    // đọc ngay sau khi gỡ `data-l` là ép tính lại cả màn thêm một lượt mỗi câu.
     quyet()
     const ro = new ResizeObserver(() => {
-      if (san.clientWidth !== rong || de.offsetHeight !== cao) quyet()
+      if (dau) { dau = false; ghiCo(); return }
+      if (san.clientWidth !== rong || de.offsetHeight !== cao) { quyet(); ghiCo() }
       else if (bong.offsetHeight !== bongCao) { bongCao = bong.offsetHeight; ve() }
     })
     ro.observe(san); ro.observe(de); ro.observe(bong)

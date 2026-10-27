@@ -68,9 +68,10 @@ export function banHat(el: Element | null | undefined, t: TuyChonHat = {}): numb
 }
 
 /** A3 — câu cũ trượt trái + mờ dần: chụp BẢN SAO phần tử đặt đúng chỗ (fixed), không giữ state cũ, không trễ bước sang câu mới. */
-export function truotRa(el: Element | null | undefined, ms = 180): void {
+export function truotRa(el: Element | null | undefined, ms = 180, daDo?: DOMRect): void {
   if (!el || yenLang()) return
-  const r = el.getBoundingClientRect()
+  // `daDo`: khung đã đo trước khi trang đổi (27/10 MƯỢT — màn làm chặng đo rồi cuộn về đầu TRƯỚC khi dựng câu mới, không ép bố cục lần nữa)
+  const r = daDo ?? el.getBoundingClientRect()
   if (!r.width || !r.height) return
   const ban = el.cloneNode(true) as HTMLElement
   ban.setAttribute('aria-hidden', 'true'); ban.setAttribute('inert', ''); ban.removeAttribute('id')

@@ -49,19 +49,19 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
   })
 
   it('chỉ app học sinh dùng; --sans/--serif/--tp-f trỏ DDH Rounded; thân 500 (Đề), chữ chạm / tiêu đề / nút (Đậm), khoảng chữ nhãn đo theo Duolingo', () => {
-    expect(HS).toMatch(/:root\[data-trong='hs'\]:has\(\.ht2\) \{ --sans: 'DDH Rounded'[^;]*; --serif: 'DDH Rounded'/)
-    expect(HS).toContain(":root[data-trong='hs']:has(.ht2) body { font-weight: 500; }")
-    expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .duo :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; }")
-    expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .duo .ht2-lam-de-chu { color: var(--tr-chu); }")
-    expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .gyc-v.gyc-cham { font-weight: 700; }")
-    expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .duo .duo-tra[data-so] .ht2-lam-pa { font-weight: 800; }")
-    expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .duo-nhan { letter-spacing: .02em; }")
+    expect(HS).toMatch(/:root\[data-trong='hs'\]\[data-ht2\] \{ --sans: 'DDH Rounded'[^;]*; --serif: 'DDH Rounded'/)
+    expect(HS).toContain(":root[data-trong='hs'][data-ht2] body { font-weight: 500; }")
+    expect(HS).toContain(":root[data-trong='hs'][data-ht2] .duo :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; }")
+    expect(HS).toContain(":root[data-trong='hs'][data-ht2] .duo .ht2-lam-de-chu { color: var(--tr-chu); }")
+    expect(HS).toContain(":root[data-trong='hs'][data-ht2] .gyc-v.gyc-cham { font-weight: 700; }")
+    expect(HS).toContain(":root[data-trong='hs'][data-ht2] .duo .duo-tra[data-so] .ht2-lam-pa { font-weight: 800; }")
+    expect(HS).toContain(":root[data-trong='hs'][data-ht2] .duo-nhan { letter-spacing: .02em; }")
     expect(HS).toMatch(/:where\(h1, h2, h3, button, b, strong, th, dd\) \{ font-weight: 800; \}/)
     expect(doc('src/styles/trong-thuong-gon.css')).toMatch(/--tp-f: 'DDH Rounded'/)
   })
 
   it('dấu chồng: tiêu đề xuống hàng được giãn dòng ≥ 1,3', () => {
-    const m = /:root\[data-trong='hs'\]:has\(\.ht2\) :is\(([^)]*)\) \{ line-height: ([\d.]+); \}/.exec(HS)
+    const m = /:root\[data-trong='hs'\]\[data-ht2\] :is\(([^)]*)\) \{ line-height: ([\d.]+); \}/.exec(HS)
     expect(m).not.toBeNull()
     expect(Number(m![2])).toBeGreaterThanOrEqual(1.3)
     for (const chon of ['.duo-xong h1', '.tp-man h1', '.tp-tieu', '.da-bai b', '.ht2-mo-dau h1', '.tp-combo']) expect(m![1]).toContain(chon)
@@ -69,7 +69,7 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
 
   it('360 px: nhãn ngắn không bẻ dòng xấu — cân dòng + bớt khoảng ở điện thoại hẹp', () => {
     expect(HS).toMatch(/:is\(\.tp-nv \.giua > b, \.da-o b, \.da-o \.mo, \.ktcn-dong-so li > span, \.tp-lua-lon \.giua p, \.tp-nut, \.tp-nut-lon\) \{ text-wrap: balance; \}/)
-    const hep = HS.slice(HS.indexOf('@media (max-width: 380px) {\n  :root[data-trong=\'hs\']:has(.ht2) .ktcn-dong-so li'))
+    const hep = HS.slice(HS.indexOf('@media (max-width: 380px) {\n  :root[data-trong=\'hs\'][data-ht2] .ktcn-dong-so li'))
     expect(hep).toContain('.ktcn-dong-so li { gap: 6px; font-size: 14px; }')
     expect(hep).toContain('.tp-nv { gap: 10px; padding: 12px; }')
   })

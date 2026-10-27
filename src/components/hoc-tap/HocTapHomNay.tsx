@@ -1,4 +1,4 @@
-import { lazy, Suspense, use, useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, use, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowRight, Atom, BookOpen, ChevronRight, ClipboardCheck, History, Home, LineChart, LogOut, Mail, RefreshCw, Route, Users, X } from 'lucide-react'
 import type { KetQuaSanh } from '../hoa2/api'
 import type { TomTatGoi7 } from '../../lib/goi-bai-7'
@@ -81,7 +81,20 @@ export function TheMoiTuSua(p: { so: number | null; token?: string; onChua: (qid
   return <Suspense fallback={null}><TheMoi {...p} /></Suspense>
 }
 
+// 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): màn có lớp `.ht2` (Lộ trình, Tự sửa lỗi) gắn `<html data-ht2>` khi dựng (layout effect ⇒ trước lần sơn đầu,
+// không nháy phông) và gỡ khi màn cuối rời đi. styles/trong-hs.css đọc `:root[data-trong='hs'][data-ht2]` thay `:root:has(.ht2)` — :has() ở GỐC bắt
+// trình duyệt soát lại <html> sau mọi lần thêm / gỡ nút rồi tính lại kiểu cả trang. Cùng điều kiện, cùng giao diện.
+let soManHt2 = 0
+export function useDanhDauHt2(): void {
+  useLayoutEffect(() => {
+    const g = document.documentElement
+    if (soManHt2++ === 0) g.setAttribute('data-ht2', '')
+    return () => { if (--soManHt2 <= 0) { soManHt2 = 0; g.removeAttribute('data-ht2') } }
+  }, [])
+}
+
 export default function HocTapHomNay(p: Props) {
+  useDanhDauHt2()
   const [muc, setMuc] = useState<Muc>('hom-nay')
   const [moCuaEm, setMoCuaEm] = useState(false)
   const nutCuaEm = useRef<HTMLButtonElement>(null)

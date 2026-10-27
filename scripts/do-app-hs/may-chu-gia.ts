@@ -63,7 +63,14 @@ const nguonTuLuyen = (): Obj => ({
 })
 const cauTuLuyen = (n: number) => Array.from({ length: n }, (_, i) => ({ qid: `T${i}`, phan: 'I', text: `Câu ${i + 1}: ${chu(i + 2)} $\\Delta H = -${i + 10}\\,kJ$`, choices: [chu(i, 1), chu(i + 1, 1), chu(i + 2, 1), chu(i + 3, 1)], ideas: [], hinhAnh: [], tenDang: DANG[i % 6], mucDo: 'hieu' }))
 
+// LÀM CHẶNG (27/10, scripts/do-muot-hs.mjs): 8 câu trắc nghiệm, đáp án luôn A (kịch bản bấm phương án đầu ⇒ chuỗi đúng, có combo / thưởng — ca nặng nhất
+// của hiệu ứng). Đáp án / lời giải chỉ trả SAU `answer` như máy chủ thật.
+const CAU_CHANG = Array.from({ length: 8 }, (_, i) => ({ qid: `K${i}`, version: '1', group: 'g', phan: 'I', maDe: 'BAI1', tenDang: DANG[i % 6], mucDo: 'hieu', sao: 0, kienThuc: [], hinhAnh: [], ideas: [],
+  text: `Câu ${i + 1}: ${chu(i, 2)}. Chất nào sau đây thoả mãn?`, choices: [chu(i, 1), chu(i + 1, 1), chu(i + 2, 1), chu(i + 3, 1)] }))
+const lamChang = { daNop: 0, chuoi: 0, daTra: new Set<string>() }
+
 export function datLai() {
+  lamChang.daNop = 0; lamChang.chuoi = 0; lamChang.daTra.clear()
   kichBan.lanSanh = 0
   kichBan.omni = false
   kichBan.gio = null
@@ -123,6 +130,22 @@ export async function traLoi(duong: string, body: Obj): Promise<Obj> {
       return { ok: true, suggestions: DANG.map((t) => ({ title: t, source: 'Ester', part: 'I' })), remaining: 28, dailyUsed: 12, shopBat: true }
     case 'so-tay':
       return { ok: true, dang: DANG.map((t, i) => ({ key: 'D' + i, ten: t })) }
+    case 'hoc-tap-start':
+      return { ok: true, id: 'phien-gia', questions: CAU_CHANG, goi7: { bat: true, ngay: '2026-09-30', toiThieu: 40, daLamHomNay: 12 + lamChang.daNop, tuLamCon: 20, tiepCanCon: 8, thieuPhu: 0, thieuNgay: 0, canHoTro: false,
+        kienThucCu: { tong: 0, dat: 0, tyLe: null }, goi: [{ id: 'g1', ten: 'Ester – Lipid', batDau: '2026-09-28', han: '2026-10-04', tong: 40, daGap: 12, con: 28, quota: 8, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI1'] }], diemDaDo: [] } }
+    case 'hoc-tap-dem':
+      return { ok: true, daLamHomNay: 12 + lamChang.daNop, toiThieu: 40 }
+    case 'hoc-tap-lam-lai':
+      return { ok: true, questions: [] }
+    case 'answer': {
+      const dung = String(body.answer ?? '') === 'A'
+      lamChang.daNop++; lamChang.daTra.add(String(body.qid))
+      lamChang.chuoi = dung ? lamChang.chuoi + 1 : 0
+      const c = lamChang.chuoi
+      return { ok: true, correct: dung, answer: 'A', solution: { chot: 'Chốt lời giải: phương án A đúng vì thoả mãn điều kiện đề bài.' }, solutionImages: [],
+        thuong: dung ? { tinh: true, nguyenTu: 10 + (c >= 3 ? 2 : 0), dong: [{ nhan: 'Đúng', so: 10 }, ...(c >= 3 ? [{ nhan: `Chuỗi đúng ${c}`, so: 2 }] : [])], chuoiDung: c, cauKho: false }
+          : { tinh: true, nguyenTu: 2, dong: [{ nhan: 'Làm nghiêm túc', so: 2 }], chuoiDung: 0, cauKho: false } }
+    }
     case 'hoa2-cau-da-lam':
       return cauDaLam()
     case 'hoa2-cau-chi-tiet': {

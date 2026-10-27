@@ -106,26 +106,48 @@ export const CAM_XUC_LUA: Record<TrangThaiLua, TrangThaiVe> = {
   },
 }
 
+// NHƯỜNG KHUNG CHO LƯỢT CHẠM (27/10 MƯỢT, đo scripts/do-muot-hs.mjs): một khung linh vật vẽ lại vài chục hình SVG (~6–10 ms ở CPU ×4) — chen đúng giữa
+// lượt chạm và lần vẽ phản hồi (nút lún, ô được chọn) là phản hồi chậm thêm một khung. Có pointerdown / keydown ⇒ linh vật nghỉ 140 ms (đồng hồ lò xo
+// vẫn tính, chạy tiếp mượt). Viết tại chỗ (không tệp chung) để không sinh thêm mảnh precache.
+let nhuongDen = 0
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  const chamNhuong = () => { nhuongDen = performance.now() + 140 }
+  window.addEventListener('pointerdown', chamNhuong, { capture: true, passive: true })
+  window.addEventListener('keydown', chamNhuong, { capture: true, passive: true })
+}
+const dangNhuongKhung = (now: number): boolean => now < nhuongDen
 // ─────────── MỘT VÒNG rAF CHUNG ───────────
-type Song = { tich(dt: number): void; ve(): void; hien: boolean }
+// 27/10 MƯỢT (scripts/do-muot-hs.mjs): vòng chỉ chạy khi CÓ Lửa đang được nhìn thấy — Lửa ngoài khung nhìn (IntersectionObserver) hoặc nằm dưới
+// màn con che kín (Lộ trình `inert` khi đang làm chặng, <html class="sanh-bi-che">) ⇒ không tính, không vẽ, và KHÔNG xin khung nữa (trước: vòng
+// rAF 60 lượt/giây chạy suốt, kể cả khi mọi Lửa đều khuất). Lửa hiện lại (IO / lớp che gỡ) ⇒ chạy tiếp đúng tư thế cũ.
+type Song = { tich(dt: number): void; ve(): void; hien: boolean; svg: SVGSVGElement }
 const dangSong = new Set<Song>()
 let raf = 0, lan = 0, tichLuy = 0
 const mayYeu = () => document.documentElement.classList.contains('may-yeu')
+/** Lửa này đang nằm dưới một màn con che kín (Lộ trình bị `inert` khi màn làm chặng / màn con mở đè). */
+const biChe = (s: Song) => document.documentElement.classList.contains('sanh-bi-che') && !!s.svg.closest('[inert]')
+const dangThay = () => [...dangSong].filter((s) => s.hien && !biChe(s))
 function lap(now: number) {
   raf = 0
   if (document.hidden || !dangSong.size) { lan = 0; return }
+  const ds = dangThay()
+  if (!ds.length) { lan = 0; return } // không Lửa nào đang thấy ⇒ ngủ; IO / lớp che đổi sẽ gọi `chay`
+  if (dangNhuongKhung(now)) { raf = requestAnimationFrame(lap); return } // em vừa chạm: nhường khung cho phản hồi nút
   const dtms = lan ? Math.min(100, now - lan) : 16
   lan = now; tichLuy += dtms
   if (!mayYeu() || tichLuy >= 30) {
     let con = tichLuy; tichLuy = 0
-    const ds = [...dangSong].filter((s) => s.hien)
     while (con > 0) { const dt = Math.min(con, 8); for (const s of ds) s.tich(dt / 1000); con -= dt }
     for (const s of ds) s.ve()
   }
   raf = requestAnimationFrame(lap)
 }
 const chay = () => { if (!raf && !document.hidden && dangSong.size) { lan = 0; raf = requestAnimationFrame(lap) } }
-if (typeof document !== 'undefined') document.addEventListener('visibilitychange', chay)
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', chay)
+  // Màn con đóng (gỡ lớp `sanh-bi-che` trên <html>) ⇒ Lửa của Lộ trình chạy lại. Chỉ theo dõi thuộc tính class của <html> (rẻ).
+  if (typeof MutationObserver !== 'undefined') new MutationObserver(chay).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+}
 
 /** Các Lửa đang sống (bộ chụp / máy quay video bản build điều khiển trạng thái qua đây). */
 export const LUA_DANG_SONG = new Set<Lua>()
@@ -357,7 +379,7 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     return `M${Q(A1.a)}L${Q(A1.p1)}Q${Q(A1.c)} ${Q(A1.p2)}L${Q(A1.b)}Q${Q([A1.b[0]! + u2[0] * w3 / 2, A1.b[1]! + u2[1] * w3 / 2])} ${Q(tip)}Q${Q([B1.b[0]! + u2[0] * w3 / 2, B1.b[1]! + u2[1] * w3 / 2])} ${Q(B1.b)}L${Q(B1.p2)}Q${Q(B1.c)} ${Q(B1.p1)}L${Q(B1.a)}Q${Q([B1.a[0]! - u1[0] * w1 / 2, B1.a[1]! - u1[1] * w1 / 2])} ${Q(goc)}Q${Q([A1.a[0]! - u1[0] * w1 / 2, A1.a[1]! - u1[1] * w1 / 2])} ${Q(A1.a)}Z`
   }
 
-  const song: Song = { tich, ve, hien: true }
+  const song: Song = { tich, ve, hien: true, svg }
   let quan: IntersectionObserver | null = null
   if (!tinh && !tc.tay) {
     dangSong.add(song)

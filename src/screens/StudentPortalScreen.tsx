@@ -774,6 +774,15 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   }, [cheDo2, tab])
   // SỬA LỖI 12/10 "không vuốt lên được": có màn con ⇒ khoá trang Hôm nay phía sau, cú vuốt luôn thuộc màn đang nhìn (src/lib/khoa-cuon-trang.ts).
   useKhoaCuonTrang(dangMoManCon)
+  // 27/10 MƯỢT: màn con che kín ⇒ trình duyệt bỏ qua kiểu / bố cục / vẽ của Lộ trình phía sau (src/lib/an-khi-bi-che.ts, qua mảnh lười khối phụ).
+  const khungTrangChinh = useRef<HTMLDivElement>(null), coManCon = tab !== null
+  useEffect(() => {
+    const el = khungTrangChinh.current
+    if (!coManCon || !el) return
+    let go: (() => void) | undefined, huy = false
+    napKhoiPhu().then((m) => { if (!huy) go = m.batAnKhiBiChe(el) }, () => {})
+    return () => { huy = true; go?.() }
+  }, [coManCon])
   // Chỉ nạp trước màn thi sau xác thực, ở Hôm nay và lúc máy rảnh; bấm Vào thi vẫn tải ngay.
   // Gói C 15/10: màn thi về xong thì nạp tiếp mảnh khối phụ (Khắc phục / Bài tập về nhà / Bài gia đình giao) — NỐI SAU, không tranh lượt.
   useEffect(() => {
@@ -920,7 +929,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       {/* + bong bóng A.I Đỗ Đại Học (24/10): chỉ ở Hôm nay, không khi đang thi / mở hồ sơ. */}
       {auth.token && !manThi && tab === null && <>{!trongHs && <TheDiemDanhHs token={auth.token} />}{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} anBong={trongHs} /></Suspense>}</>}
       {auth.token && !manThi && (
-        <div inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
+        <div ref={khungTrangChinh} inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
           coCa={!!caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} coBaiTap={dsBtvn.length > 0} token={auth.token} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}

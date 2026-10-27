@@ -40,7 +40,9 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: start;
   }
-  .ldc-lam .the-cau > div:last-child:has(> div > div > .pa-hang, > div > div > .y-hang, > .osl) > * { grid-column: 1; min-width: 0; }
+  /* 27/10 MƯỢT: bỏ `:has(…) > *` (Chrome tính lại kiểu cả trang mỗi lần đổi nút). Thân thẻ không có khối trả lời thì không phải lưới:
+     `grid-column` không tác dụng, `min-width: 0` trùng giá trị tự động ⇒ cùng giao diện. */
+  .ldc-lam .the-cau > div:last-child > * { grid-column: 1; min-width: 0; }
   .ldc-lam .the-cau > div:last-child > :is(div:has(> div > .pa-hang), div:has(> div > .y-hang), .osl) { grid-column: 2; grid-row: 1 / span 3; }
   .ldc-lam .the-cau > div:last-child > :is(div:has(> div > .pa-hang), div:has(> div > .y-hang), .osl) ~ * { grid-column: 1 / -1; }
 }

@@ -36,7 +36,6 @@
   }
   html:root body[data-bat-linh] :is(.bl-login__card, .ph3-vao__the) { border-color: var(--bl-line); }
   html:root body[data-bat-linh] :is(.bl-login, .ph3-vao__the) :is(input, select) { background: var(--bl-ground); color: var(--bl-ink); }
-  html:root body[data-bat-linh] .bl-bieu-cam { background: var(--bl-raised); box-shadow: 0 3px 10px rgb(0 0 0 / .3), 0 0 0 3px rgb(24 43 40 / .8); }
   html:root body[data-bat-linh] .tlu {
     --tlu-nen-3: var(--bl-raised); --tlu-nhan-chu: var(--bl-on-teal); --tlu-ngoc: var(--bl-success); --tlu-do: var(--bl-danger);
     --tlu-cd-1: var(--bl-warm-ink); --tlu-cd-2: var(--bl-teal); --tlu-cd-3: var(--bl-success); --tlu-cd-4: rgb(210 182 242);
@@ -73,6 +72,4 @@
     --ch-vang-so: var(--bl-warm-ink); --ch-vang-chu: var(--bl-warm-ink); color-scheme: dark;
   }
   html:root body[data-bat-linh] .bia { --b-kinh-2: var(--bl-raised); --b-do: var(--bl-danger); --b-dung: var(--bl-success); --b-p0: var(--bl-warm-ink); --b-p1: var(--bl-teal); color-scheme: dark; }
-  html:root body[data-bat-linh] .dh2 .dh2-canh,
-  html:root body[data-bat-linh] .dao2 .dao2-canh { background: linear-gradient(rgb(8 27 25 / .48), rgb(13 29 28 / .62)), var(--bl-battle-scene) center 68% / cover; }
 }

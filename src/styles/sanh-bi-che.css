@@ -8,3 +8,12 @@ html.sanh-bi-che .h2-sanh *::before,
 html.sanh-bi-che .h2-sanh *::after {
   animation-play-state: paused !important;
 }
+
+/* 27/10 MƯỢT (scripts/do-muot-hs.mjs): giao diện «Trong» — Lộ trình nằm dưới màn con trong khung `inert` (StudentPortalScreen). Các hoạt ảnh lặp
+ * của đường chặng (nút đang học nhún, sao nảy, vòng thở, lấp lánh, linh vật cạnh đường thở) vẫn chạy phía sau màn làm chặng ⇒ TẠM DỪNG như cảnh
+ * Sảnh cũ; đóng màn con là chạy tiếp đúng chỗ. */
+html.sanh-bi-che [inert] *,
+html.sanh-bi-che [inert] *::before,
+html.sanh-bi-che [inert] *::after {
+  animation-play-state: paused !important;
+}

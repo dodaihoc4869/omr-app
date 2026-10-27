@@ -155,7 +155,9 @@
 [data-trong] .kq-kinh .xd-khung:has(> .xd-kq)::before {
   content: ''; grid-area: 2 / 1 / 5 / -1; align-self: stretch; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1);
 }
-[data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > * { grid-column: 1 / -1; position: relative; }
+/* 27/10 MƯỢT: không viết `.xd-khung:has(> .xd-kq) > *` — luật «:has() … > *» làm Chrome tính lại kiểu CẢ TRANG mỗi lần thêm / gỡ nút (đo scripts/do-muot-hs.mjs).
+   Cùng tập phần tử: chính .xd-kq + các con đứng trước / sau nó; cùng độ ưu tiên (0,4,0). */
+[data-trong] .kq-kinh .xd-khung > :is(.xd-kq, .xd-kq ~ *, :has(~ .xd-kq)) { grid-column: 1 / -1; position: relative; }
 [data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > .xd-muc__mo-ta { grid-row: 1; margin-bottom: 12px; }
 [data-trong] .kq-kinh .xd-khung > .xd-kq { grid-row: 2; padding: 28px 28px 8px; border: 0; background: none; box-shadow: none; }
 [data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > .xd-nut-hang { grid-row: 3; display: flex; flex-wrap: wrap; gap: 4px 8px; padding: 12px 28px 24px; }
@@ -708,11 +710,11 @@
 }
 /* Điện thoại ngang thấp: hai cột đề | trả lời + tấm kết quả cột phải đã có ở mục 13 (lưới trên .ht2-lam.duo, đề ghim cột trái) — không chồng thêm lưới thứ hai. */
 @media (min-width: 1100px) and (min-height: 501px) {
-  [data-trong] .duo:has(.duo-than[data-de-dai]) :is(.duo-tren, .duo-than, .duo-giua) { max-width: 1160px; }
+  [data-trong] .duo[data-hai-cot][data-duo] :is(.duo-tren, .duo-than, .duo-giua) { max-width: 1160px; }
   [data-trong] .duo-than[data-de-dai]:has(> .duo-cot-de) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: start; align-content: start; }
   [data-trong] .duo-than[data-de-dai] > :is(.duo-cot-de, .duo-cot-tra) { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-  [data-trong] .duo:has(.duo-than[data-de-dai]) .duo-day > .duo-giua { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
-  [data-trong] .duo:has(.duo-than[data-de-dai]) .duo-day > .duo-giua > * { grid-column: 2; }
+  [data-trong] .duo[data-hai-cot][data-duo] .duo-day > .duo-giua { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
+  [data-trong] .duo[data-hai-cot][data-duo] .duo-day > .duo-giua > * { grid-column: 2; }
 }
 
 /* ── 16. «Chạm để hiểu đề» gắn vào màn Duo (hợp đồng docs/hop-dong-doc-de-2610.md): gợi ý mở thành cột phải cố định (≥ 640px) ⇒ khung màn chừa đúng bề
