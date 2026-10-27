@@ -29,7 +29,8 @@ export interface CuocDang { dat: number; ngay: number }
 export interface TongQuanThuong {
   bat: CongTac
   nguyenTuHomNay?: number; tinhThe?: number
-  mucTieu?: { daXong: number; can: number }
+  /** `cau` = mức câu hôm nay (vd. 96 câu = 16 chặng) — máy chủ gửi khi đã chốt mức. */
+  mucTieu?: { daXong: number; can: number; cau?: number }
   chuoiNgay?: ChuoiNgay
   nhiemVu?: NhiemVu[]
   ruong?: { mo: boolean; thuong: number }
@@ -118,7 +119,7 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
   const kq: TongQuanThuong = { bat: docCongTac(o.bat), thongBao: mang(o.thongBao, docThongBao) ?? [] }
   const nt = soNg(o.nguyenTuHomNay); if (nt !== undefined) kq.nguyenTuHomNay = nt
   const tt = soNg(o.tinhThe); if (tt !== undefined) kq.tinhThe = tt
-  const mt = dt(o.mucTieu), dx = soNg(mt?.daXong), can = soNg(mt?.can); if (dx !== undefined && can) kq.mucTieu = { daXong: dx, can }
+  const mt = dt(o.mucTieu), dx = soNg(mt?.daXong), can = soNg(mt?.can), mc = soNg(mt?.cau); if (dx !== undefined && can) kq.mucTieu = { daXong: dx, can, ...(mc ? { cau: mc } : {}) }
   const cn = docChuoiNgay(o.chuoiNgay); if (cn) kq.chuoiNgay = cn
   const nv = mang(o.nhiemVu, docNhiemVu); if (nv?.length) kq.nhiemVu = nv
   const r = dt(o.ruong), rt = soNg(r?.thuong); if (r && rt !== undefined) kq.ruong = { mo: r.mo === true, thuong: rt }

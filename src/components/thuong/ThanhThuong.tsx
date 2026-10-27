@@ -40,14 +40,15 @@ export function ThanhThuong({ token, onMo, onHoc, thongBao = true }: PropsThanhT
     {du.nguyenTuHomNay !== undefined && o('nt', `${du.nguyenTuHomNay} nguyên tử hôm nay`, 'nhiem-vu', <><IcNguyenTu /><SoDem gt={du.nguyenTuHomNay} className="tp-tr-so" /></>)}
     {du.tinhThe !== undefined && o('tt', `${du.tinhThe} tinh thể`, 'cua-hang', <><IcTinhThe /><SoDem gt={du.tinhThe} className="tp-tr-so" /></>)}
     {mt && (() => {
-      const nhan = `Mục tiêu ngày ${mt.daXong}/${mt.can} chặng${dat ? ', đã đạt' : ''}`
+      // Thầy 27/10: nói rõ mức thầy đặt (chặng = 6 câu) — «Mục tiêu hôm nay: 16 chặng (96 câu) · đã xong 1».
+      const nhan = `Mục tiêu hôm nay: ${mt.can} chặng${mt.cau ? ` (${mt.cau} câu)` : ''} · đã xong ${mt.daXong}${dat ? ', đã đạt' : ''}`
       const ruot = <>
         <svg className="vm" viewBox="0 0 52 52" aria-hidden="true"><circle className="nen" cx="26" cy="26" r="22" /><circle className="chay" cx="26" cy="26" r="22" strokeDasharray={`${p * CHU_VI} 200`} /></svg>
         <Bi cam={dat ? 'mung' : 'chao'} size={34} nhip="yen" />
         <em aria-hidden="true">{mt.daXong}/{mt.can} chặng</em>
       </>
-      return onMo ? <button type="button" className="tp-tr-muc" data-dat={dat || undefined} aria-label={nhan} onClick={() => onMo('nhiem-vu')}>{ruot}</button>
-        : <span className="tp-tr-muc" data-dat={dat || undefined} role="img" aria-label={nhan}>{ruot}</span>
+      return onMo ? <button type="button" className="tp-tr-muc" data-dat={dat || undefined} aria-label={nhan} title={nhan} onClick={() => onMo('nhiem-vu')}>{ruot}</button>
+        : <span className="tp-tr-muc" data-dat={dat || undefined} role="img" aria-label={nhan} title={nhan}>{ruot}</span>
     })()}
     {tb.length > 0 && <Suspense fallback={null}><ThongBaoThuong token={token!} tongQuan={du} onHoc={onHoc} /></Suspense>}
   </div>
