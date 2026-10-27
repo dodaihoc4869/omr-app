@@ -1,0 +1,46 @@
+# ĐO «LẶP CÂU» (CHỈ ĐỌC) — thầy 27/10 tối: «Học sinh báo app bấm vào toàn lặp câu». Chỉ in SỐ ĐẾM (không mã em, tên em, mã câu — repo công khai).
+# Từ 17:00 VN 27/10: lượt trả lời cùng em – cùng câu lặp lại (khoảng cách), theo vai câu / làm lại / đúng-sai lần trước; câu đã làm bị PHÁT LẠI trong
+# chặng mới; phiên mở dồn; sổ ghi trùng.
+name: Đo lặp câu (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-nop-2710]
+    paths: [.github/workflows/do-lap-cau-2710.yml]
+permissions:
+  contents: read
+concurrency:
+  group: do-lap-cau-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          T="'2026-10-27T10:00:00Z'"
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results[]" || echo "(lỗi truy vấn)"; }
+          GOC="CASE WHEN instr(qid,'~')>0 THEN substr(qid,1,instr(qid,'~')-1) ELSE qid END"
+          A="SELECT sbd,qid,session,created_at,json_extract(json,'\$.attempt.correct') dung,json_extract(json,'\$.attempt.assisted') ht,LAG(created_at) OVER (PARTITION BY sbd,$GOC ORDER BY created_at) truoc,LAG(session) OVER (PARTITION BY sbd,$GOC ORDER BY created_at) phien_truoc,LAG(json_extract(json,'\$.attempt.correct')) OVER (PARTITION BY sbd,$GOC ORDER BY created_at) dung_truoc FROM game_v2_attempt WHERE created_at>=$T"
+          date -u
+          q "tổng lượt từ 17h VN: lượt · em · cặp em-câu" "SELECT COUNT(*) luot, COUNT(DISTINCT sbd) em, COUNT(DISTINCT sbd||'|'||$GOC) cap FROM game_v2_attempt WHERE created_at>=$T"
+          q "lượt LẶP (cùng em, cùng câu gốc, lượt thứ 2+): tổng · số em · cùng phiên · <2 phút · 2–15 · 15–60 · ≥60 phút" "WITH a AS ($A) SELECT COUNT(*) lap, COUNT(DISTINCT sbd) em, SUM(session=phien_truoc) cung_phien, SUM((julianday(created_at)-julianday(truoc))*1440<2) d2, SUM((julianday(created_at)-julianday(truoc))*1440 BETWEEN 2 AND 15) d15, SUM((julianday(created_at)-julianday(truoc))*1440 BETWEEN 15 AND 60) d60, SUM((julianday(created_at)-julianday(truoc))*1440>=60) tren60 FROM a WHERE truoc IS NOT NULL"
+          q "lặp theo đúng/sai lần trước · có hỗ trợ lần này" "WITH a AS ($A) SELECT dung_truoc, ht, COUNT(*) n, SUM((julianday(created_at)-julianday(truoc))*1440<15) duoi15p FROM a WHERE truoc IS NOT NULL GROUP BY dung_truoc, ht"
+          q "lặp theo vai câu trong phiên mới (vai · làm lại cuối chặng · goi7 · mode)" "WITH a AS ($A) SELECT json_extract(j.value,'\$.vai') vai, json_extract(j.value,'\$.lamLaiCuoi') llc, json_extract(s.json,'\$.goi7') g7, json_extract(s.json,'\$.mode') mode, COUNT(*) n, SUM((julianday(a.created_at)-julianday(a.truoc))*1440<15) duoi15p FROM a JOIN game_v2_session s ON s.id=a.session, json_each(s.json,'\$.questions') j WHERE a.truoc IS NOT NULL AND json_extract(j.value,'\$.qid')=a.qid GROUP BY 1,2,3,4 ORDER BY n DESC LIMIT 30"
+          q "lặp theo giờ VN" "WITH a AS ($A) SELECT strftime('%H',a.created_at,'+7 hours') gio, COUNT(*) lap, SUM((julianday(created_at)-julianday(truoc))*1440<15) duoi15p FROM a WHERE truoc IS NOT NULL GROUP BY 1 ORDER BY 1"
+          q "câu PHÁT trong chặng mới (từ 17h, hocTap) mà em đã trả lời ở phiên khác trước đó tối nay: theo vai · tổng phát · đã làm trước · trong 15 phút" "SELECT json_extract(j.value,'\$.vai') vai, json_extract(j.value,'\$.lamLaiCuoi') llc, COUNT(*) phat, SUM(EXISTS(SELECT 1 FROM game_v2_attempt a WHERE a.sbd=s.sbd AND a.qid=json_extract(j.value,'\$.qid') AND a.created_at>=$T AND a.created_at<s.created_at AND a.session<>s.id)) da_lam, SUM(EXISTS(SELECT 1 FROM game_v2_attempt a WHERE a.sbd=s.sbd AND a.qid=json_extract(j.value,'\$.qid') AND a.created_at>=$T AND a.created_at<s.created_at AND a.session<>s.id AND (julianday(s.created_at)-julianday(a.created_at))*1440<15)) da_lam_15p FROM game_v2_session s, json_each(s.json,'\$.questions') j WHERE s.created_at>=$T AND json_extract(s.json,'\$.hocTap')=1 GROUP BY 1,2 ORDER BY phat DESC LIMIT 30"
+          q "phiên học: tổng · số em · phiên mở cách phiên trước của cùng em <60 giây · cùng bộ câu với phiên trước" "WITH s AS (SELECT sbd,created_at,json,LAG(created_at) OVER (PARTITION BY sbd ORDER BY created_at) t,LAG(json) OVER (PARTITION BY sbd ORDER BY created_at) jt FROM game_v2_session WHERE created_at>=$T AND json_extract(json,'\$.hocTap')=1) SELECT COUNT(*) phien, COUNT(DISTINCT sbd) em, SUM((julianday(created_at)-julianday(t))*86400<60) duoi60s, SUM(json_extract(json,'\$.questions[0].qid')=json_extract(jt,'\$.questions[0].qid')) cung_cau_dau FROM s"
+          q "phiên có câu trùng trong chính nó" "SELECT COUNT(*) n FROM game_v2_session s WHERE s.created_at>=$T AND json_extract(s.json,'\$.hocTap')=1 AND (SELECT COUNT(*) FROM json_each(s.json,'\$.questions'))>(SELECT COUNT(DISTINCT json_extract(value,'\$.qid')) FROM json_each(s.json,'\$.questions'))"
+          q "sổ học ghi trùng (cùng attempt_id >1 dòng) hôm nay" "SELECT COUNT(*) n, COALESCE(SUM(c),0) dong FROM (SELECT attempt_id, COUNT(*) c FROM su_kien_hoc WHERE ngay_vn='2026-10-27' AND attempt_id IS NOT NULL AND attempt_id<>'' GROUP BY attempt_id HAVING c>1)"
+          q "sổ học hôm nay theo nguồn: dòng · cặp em-câu lặp ≥2 lượt có kết quả" "SELECT nguon, COUNT(*) dong, COUNT(DISTINCT sbd||'|'||qid) cap FROM su_kien_hoc WHERE ngay_vn='2026-10-27' AND ket_qua IS NOT NULL GROUP BY nguon ORDER BY dong DESC LIMIT 12"
