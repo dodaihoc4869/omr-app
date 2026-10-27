@@ -895,10 +895,10 @@
 [data-trong] { --duo-loe-o: color-mix(in srgb, var(--tr-mat) 80%, transparent); }
 @media (prefers-color-scheme: dark) { [data-trong] { --duo-loe-o: color-mix(in srgb, var(--tr-chu) 30%, transparent); } }
 @keyframes duo-loe-o { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(260%) skewX(-18deg); } }
-[data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung'] { overflow: hidden; }
+[data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung'] { overflow: hidden; overflow: clip; }
 [data-trong='hs'] .duo[data-tt='dung'] .ht2-lam-pa[data-ket='dung']::after { content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 38%; pointer-events: none;
   background: linear-gradient(90deg, transparent, var(--duo-loe-o) 45%, var(--duo-loe-o) 55%, transparent); transform: translateX(-120%); animation: duo-loe-o 260ms ease-out 40ms both; }
-.duo-may { position: absolute; left: 0; bottom: 100%; z-index: 1; display: block; pointer-events: none; }
+.duo-may { position: absolute; left: 0; bottom: 100%; z-index: 1; display: block; pointer-events: none; overflow: clip; contain: paint; } /* bướu mây cắt ở mép khung svg (= bề rộng dải): không lòi, không tạo vùng cuộn */
 .duo-may .nen { fill: var(--tr-dung-nhat); }
 .duo-may .vien { fill: color-mix(in srgb, var(--tr-dung) 70%, var(--tr-dung-nhat)); }
 .duo-vuong { position: fixed; left: 0; top: 0; z-index: 70; border-radius: 3px; background: var(--tr-dung); pointer-events: none; will-change: transform, opacity; }
