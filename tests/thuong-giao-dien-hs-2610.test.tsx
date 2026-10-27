@@ -20,7 +20,8 @@ import { ThanhThuong } from '../src/components/thuong/ThanhThuong'
 import { BangCombo, CHU_KHONG_TINH, OngNghiem, TamThuong } from '../src/components/thuong/TamThuong'
 import KetBaiThuong from '../src/components/thuong/KetBaiThuong'
 import ManThuong, { BaoGoCua, ManBinhDaDo, ManChuoiNgay, ManCuaHang, ManCuocKetQua, ManCuoiTuan, ManCuuChuoi, ManGiaiTuan, ManHocCungBan, ManHuyHieu, ManHuyHieuMoi, ManKimCuong, ManLoiMoi,
-  ManMocChuoi, ManMocDoi, ManMoiBan, ManNhiemVu, ManThangHoa, TheBenThuong, ThongBaoThuong } from '../src/components/thuong/ManThuong'
+  ManMocChuoi, ManMocDoi, ManMoiBan, ManNhiemVu, ManThangHoa, TheBenThuong, ThongBaoThuong, veDuoc } from '../src/components/thuong/ManThuong'
+import { ManDatLaiTinhThe } from '../src/components/thuong/ManTinhThe'
 import { bungHat, demSo, hoatAnh, mucChuyenDong } from '../src/lib/hieu-ung-thuong'
 
 const TK = 'tk-em'
@@ -247,6 +248,19 @@ describe('các màn (đúng số bản vẽ)', () => {
     c = ve(<ManChuoiNgay token={TK} />)
     expect(c.querySelector('.tp-khe')?.textContent).toMatch(/Tuần này em đã mua · mua tiếp từ thứ Hai/)
     expect(c.querySelector('.tp-khe button')).toBeNull()
+  })
+  it('đặt lại tinh thể 27/10 (dat_lai_tt): thông báo một lần, nói mức 50 + luật bình, cược đã dừng; thiếu số ⇒ không vẽ', () => {
+    const t = tb({ ma: 'dat_lai_tt|2710', loai: 'dat_lai_tt', duLieu: { conLai: 50, cuocHuy: true } })
+    expect(docTongQuan({ ok: true, bat: {}, thongBao: [t] })!.thongBao).toHaveLength(1)
+    expect(veDuoc(t, tq())).toBe(true)
+    expect(veDuoc(tb({ ma: 'x', loai: 'dat_lai_tt', duLieu: {} }), tq())).toBe(false)
+    const c = ve(<ManDatLaiTinhThe tb={t} onDong={() => {}} />)
+    expect(screen.getByRole('heading', { name: 'Tinh thể đã đặt lại theo luật mới' })).toBeTruthy()
+    expect(c.textContent).toMatch(/bắt đầu lại với 50 tinh thể/); expect(c.textContent).toMatch(/150 tinh thể · mỗi tuần mua 1 bình/)
+    expect(c.textContent).toMatch(/Lượt cược chuỗi đã dừng/)
+    cleanup()
+    const c2 = ve(<ManDatLaiTinhThe tb={tb({ ma: 'y', loai: 'dat_lai_tt', duLieu: { conLai: 50, cuocHuy: false } })} onDong={() => {}} />)
+    expect(c2.textContent).not.toMatch(/cược/)
   })
   it('thăng hoa (tp-11): 12 tinh thể · trước 120 · còn 108', () => {
     const c = ve(<ManThangHoa tb={tb(M.TB.thangHoa)} onDong={() => {}} />)

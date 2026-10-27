@@ -33,7 +33,9 @@ const tqGoc = (): Record<string, unknown> => {
   const goc = M.tongQuanGia() as { chuoiNgay: Record<string, unknown> }
   // Luật bình 27/10 (cảnh binh-*): `&binh=da` ⇒ tuần này em đã mua bình (nút xám + lý do).
   const binh = { gia: 150, toiDaTuan: 1, daMuaTuan: ts.get('binh') === 'da', muaTiepTu: '2026-11-02' }
-  return { ...goc, binh, chuoiNgay: { ...goc.chuoiNgay, lich30: M.lich7(K30), daiNhat: 21 } }
+  // Đặt lại tinh thể 27/10 (cảnh dat-lai-tt-*): `&v=dat-lai` ⇒ thông báo một lần «Tinh thể đã đặt lại theo luật mới».
+  const datLai = V === 'dat-lai' ? { tinhThe: 50, cuoc: null, thongBao: [{ ma: 'dat_lai_tt|2710', loai: 'dat_lai_tt', duLieu: { conLai: 50, cuocHuy: true } }] } : {}
+  return { ...goc, binh, ...datLai, chuoiNgay: { ...goc.chuoiNgay, lich30: M.lich7(K30), daiNhat: 21 } }
 }
 /** Máy chủ giả cho các lệnh thưởng phạt — đặt SAU máy giả chung của trang.tsx (lớp ngoài cùng). */
 export function capFetchThuong(): void {

@@ -395,6 +395,9 @@ const BINH_CANH = [
 ]
 const DS_BINH = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   BINH_CANH.map(([t, m, ca, viec]) => [`binh-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
+// ═══ ĐẶT LẠI TINH THỂ 27/10 (tiền tố "dat-lai-tt-"): thông báo một lần trên Lộ trình — mọi bạn bắt đầu lại với 50 tinh thể.
+const DS_DAT_LAI_TT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].map((nen) =>
+  [`dat-lai-tt-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-mot&tp=1&v=dat-lai', w, hh, nen, false, /Tinh thể đã đặt lại/]))
 const DS_TPC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết THƯỞNG PHẠT GỘP 26/10
@@ -604,6 +607,7 @@ const DS = [
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_TON, // VIỆC TỒN 27/10
   ...DS_BINH, // LUẬT BÌNH 27/10
+  ...DS_DAT_LAI_TT, // ĐẶT LẠI TINH THỂ 27/10
   ...DS_NC, // NÂNG CẤP 27/10
   ...DS_LG, // LỘ TRÌNH GHIM 27/10
   ...DS_KT, // KIỂM TRA ÔN TẬP KHOÁ CHẶNG 27/10

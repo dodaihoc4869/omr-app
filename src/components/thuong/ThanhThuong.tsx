@@ -3,6 +3,7 @@
 // Trường nào thiếu ⇒ ô đó ẩn (không bịa số). Có thông báo thưởng chưa xem (thăng hoa, bình đã đỡ, cuối tuần…) ⇒ nạp LƯỜI tấm thông báo.
 // Cắm: thay các viên số trong header.da-tren của Lộ trình (xem CAM-VAO.md).
 import { lazy, Suspense, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { Bi } from '../linh-vat/Bi'
 import { IcLua, IcNguyenTu, IcTinhThe } from './hinh'
 import { SoDem } from './SoDem'
@@ -51,7 +52,9 @@ export function ThanhThuong({ token, onMo, onHoc, thongBao = true }: PropsThanhT
       </>
       return o(undefined, nhan, 'nhiem-vu', ruot, 'tp-tr-muc', dat || undefined)
     })()}
-    {tb.length > 0 && <Suspense fallback={null}><ThongBaoThuong token={token!} tongQuan={du} onHoc={onHoc} /></Suspense>}
+    {/* 27/10: tấm thông báo toàn khung (position: fixed) đưa ra <body> — thanh trên `.da-tren` có clip-path + sticky z-index ⇒ để bên trong thì tấm bị
+        cắt còn đúng dải thanh trên (thấy nút Đóng + bộ đếm, mất thân). */}
+    {tb.length > 0 && typeof document !== 'undefined' && createPortal(<Suspense fallback={null}><ThongBaoThuong token={token!} tongQuan={du} onHoc={onHoc} /></Suspense>, document.body)}
   </div>
 }
 
