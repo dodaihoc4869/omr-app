@@ -15,7 +15,7 @@ describe('thẻ trên đề ester', () => {
   it('chạm «1,5 M»', () => {
     expect(cham(DE_ESTER, '1,5 M')).toEqual({
       ten: 'M · nồng độ mol', nhan: 'Đơn vị',
-      doan: ['1,5 M: cứ 1 lít dung dịch có 1,5 mol chất tan', 'n = C_M × V (V tính bằng lít) · 1000 mL = 1 L'],
+      doan: ['1,5 M: cứ 1 lít dung dịch có 1,5 mol chất tan', 'n = C_M × V (V: lít; 1000 mL = 1 L)'],
       congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L',
     })
   })

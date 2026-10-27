@@ -31,7 +31,7 @@ const MAU: Record<string, MauThe> = {
   m3: { ten: 'm³ · mét khối (thể tích)', doan: ['1 m³ = 1000 L'], congThuc: 'V (L) = V (m³) × 1000', nhoDoi: '1 m³ = 1000 L' },
   mol: { ten: 'mol · số mol', doan: ['m = n × M', '{khiV}'], khiKhong: 'Dung dịch: n = C_M × V', congThuc: 'm = n × M', nhoDoi: '1 mol = 1000 mmol' },
   mmol: { ten: 'mmol · milimol', doan: ['1 mol = 1000 mmol'], congThuc: 'n (mol) = n (mmol) : 1000', nhoDoi: '1 mol = 1000 mmol' },
-  M: { ten: 'M · nồng độ mol', doan: ['{so} M: cứ 1 lít dung dịch có {so} mol chất tan', 'n = C_M × V (V tính bằng lít) · 1000 mL = 1 L'], congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L' },
+  M: { ten: 'M · nồng độ mol', doan: ['{so} M: cứ 1 lít dung dịch có {so} mol chất tan', 'n = C_M × V (V: lít; 1000 mL = 1 L)'], congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L' },
   '%m': { ten: '% · phần trăm khối lượng', doan: ['Cứ 100 g hỗn hợp có {so} g chất đó', '%m = m chất : m hỗn hợp × 100%'], congThuc: '%m = m chất : m hỗn hợp × 100%' },
   '%V': { ten: '% · phần trăm thể tích', doan: ['Chất khí cùng điều kiện: %V = %n (phần trăm số mol)', '%V = V chất : V hỗn hợp × 100%'], congThuc: '%V = V chất : V hỗn hợp × 100%' },
   '%C': { ten: '% · nồng độ phần trăm (C%)', doan: ['Cứ 100 g dung dịch có {so} g chất tan', 'm chất tan = m dung dịch × C% : 100'], congThuc: 'C% = m chất tan : m dung dịch × 100%', nhoDoi: 'm chất tan = m dung dịch × C% : 100' },
