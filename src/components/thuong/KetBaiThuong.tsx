@@ -8,7 +8,7 @@ import { Clock, Target } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bungHat, demSo, hoaGiay, hoatAnh, phanHoiThuong, xongHieuUng } from '../../lib/hieu-ung-thuong'
 import { phatThuong } from '../../lib/am-thanh-thuong'
-import { hangSau, type CongTac, type HangGiai, type KetBai } from '../../lib/thuong-api'
+import { hangSau, vongMucTieu, type CongTac, type HangGiai, type KetBai } from '../../lib/thuong-api'
 import { HuyHieuKimLoai, IcNguyenTu, IcTinhThe, TEN_HANG, Tia } from './hinh'
 import { useHieuUng } from './chung'
 
@@ -24,11 +24,14 @@ export interface PropsKetBai {
   bat?: CongTac
   onTiep: () => void
   chuNut?: string
+  /** Số câu hôm nay mới nhất của màn làm bài (`hoc-tap-dem`) ⇒ vòng mục tiêu tính bằng CÂU, cùng thước đo thẻ «Đủ x/y câu hôm nay!». */
+  cauHomNay?: { daLam: number; muc: number } | null
 }
 
-export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut = 'Tiếp tục' }: PropsKetBai) {
+export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut = 'Tiếp tục', cauHomNay }: PropsKetBai) {
   const hh = k.hoanHao
-  const mt = k.mucTieu, dat = !!mt && mt.daXong >= mt.can
+  // Màn làm bài có số `hoc-tap-dem` mới nhất ⇒ đè số của máy chủ (mục tiêu đo bằng câu, cùng thẻ «Đủ x/y câu»).
+  const mt = vongMucTieu(cauHomNay && cauHomNay.muc > 0 ? { daXong: 0, can: 1, cau: cauHomNay.muc, cauDaLam: cauHomNay.daLam } : k.mucTieu), dat = !!mt && mt.dat
   const g = bat?.giai === false ? undefined : k.giai
   const ba = useRef<HTMLDivElement>(null), bi = useRef<HTMLDivElement>(null), kt = useRef<HTMLDivElement>(null), vong = useRef<HTMLDivElement>(null), chip = useRef<HTMLSpanElement>(null)
   useHieuUng((h) => {
@@ -56,7 +59,7 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
       hoatAnh(bi.current, [{ transform: 'translateY(0)' }, { transform: 'translateY(-18px)' }, { transform: 'translateY(0)' }], 500, { tre: 200 })
     }
     if (mt) {
-      const c = vong.current?.querySelector('.chay'), tu = Math.max(0, (mt.daXong - 1) / mt.can), toi = Math.min(1, mt.daXong / mt.can)
+      const c = vong.current?.querySelector('.chay'), tu = Math.max(0, (mt.da - (mt.donVi === 'câu' ? 6 : 1)) / mt.can), toi = Math.min(1, mt.da / mt.can)
       if (c && typeof requestAnimationFrame === 'function') h.sau(900, () => {
         const t0 = performance.now()
         const f = (t: number) => { const p = Math.min(1, (t - t0) / 600), x = tu + (toi - tu) * (1 - Math.pow(1 - p, 3)); c.setAttribute('stroke-dasharray', `${x * CHU_VI} 200`); if (p < 1) requestAnimationFrame(f); else if (dat) { phanHoiThuong('mucTieu'); bungHat(vong.current, { n: 14, r: 70 }); hoatAnh(chip.current, [{ transform: 'scale(.4)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1 }, { transform: 'none', opacity: 1 }], 360) } }
@@ -88,10 +91,10 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
         {(mt || g) && <div className="tp-hai">
           {mt && <section className="tp-the" aria-label="Mục tiêu ngày">
             <div className="tp-dong">
-              <div ref={vong} className="tp-vong" data-dat={dat || undefined} role="img" aria-label={`Mục tiêu ngày ${mt.daXong}/${mt.can} chặng`}>
-                <svg viewBox="0 0 64 64" aria-hidden="true"><circle className="nen" cx="32" cy="32" r="28" /><circle className="chay" cx="32" cy="32" r="28" strokeDasharray={`${Math.min(1, mt.daXong / mt.can) * CHU_VI} 200`} /></svg><b aria-hidden="true">{mt.daXong}/{mt.can}</b></div>
-              <div className="giua">{dat ? <><b>Đạt mục tiêu! · {mt.daXong}/{mt.can} chặng</b><span ref={chip} className="tp-dat">+5 <IcTinhThe /> tinh thể</span></>
-                : <><b>Mục tiêu ngày · {mt.daXong}/{mt.can} chặng</b><span>Thêm {mt.can - mt.daXong} chặng nữa là đạt, nhận +5 <IcTinhThe /></span></>}</div>
+              <div ref={vong} className="tp-vong" data-dat={dat || undefined} role="img" aria-label={`Mục tiêu ngày ${mt.da}/${mt.can} ${mt.donVi}`}>
+                <svg viewBox="0 0 64 64" aria-hidden="true"><circle className="nen" cx="32" cy="32" r="28" /><circle className="chay" cx="32" cy="32" r="28" strokeDasharray={`${Math.min(1, mt.da / mt.can) * CHU_VI} 200`} /></svg><b aria-hidden="true">{mt.da}/{mt.can}</b></div>
+              <div className="giua">{dat ? <><b>{mt.donVi === 'câu' ? `Đủ mức! · ${mt.da}/${mt.can} câu` : `Đạt mục tiêu! · ${mt.da}/${mt.can} chặng`}</b><span ref={chip} className="tp-dat">+5 <IcTinhThe /> tinh thể</span></>
+                : <><b>Mục tiêu ngày · {mt.da}/{mt.can} {mt.donVi}</b><span>Thêm {mt.can - mt.da} {mt.donVi} nữa là đạt, nhận +5 <IcTinhThe /></span></>}</div>
             </div>
           </section>}
           {g && <section className="tp-the" aria-label="Giải tuần">

@@ -19,6 +19,9 @@ export const V = ts.get('v') ?? 'tren'
 const TK = 'tk-chup'
 const noop = () => {}
 const tqGoc = (): Record<string, unknown> => {
+  // 27/10 (cảnh mtc-*): mục tiêu ngày đo bằng CÂU, CÙNG số với sảnh giả của `hs-mot` (30 câu; `tt=du` ⇒ đã làm 30, mặc định 12) — chặng ghi được cố ý lệch (2/5)
+  if (ts.get('mt') === 'du') return M.tongQuanGia({ mucTieu: { daXong: 2, can: 5, cau: 30, cauDaLam: 30, dat: true } })
+  if (ts.get('mt') === 'chua') return M.tongQuanGia({ mucTieu: { daXong: 2, can: 5, cau: 30, cauDaLam: 12, dat: false } })
   if (V === 'tat') return M.tongQuanGia({ bat: { giai: false, thangHoa: false, banBe: false, kimCuong: false } })
   if (V === 'nv-mo') return M.tongQuanGia({ nhiemVu: M.NHIEM_VU_XONG, mucTieu: { daXong: 4, can: 4 }, tinhThe: 285, ruong: { mo: true, thuong: 15 } })
   if (V === 'chuoi') return M.tongQuanGia({ cuoc: null, mucTieu: { daXong: 1, can: 4 } })
