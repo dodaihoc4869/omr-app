@@ -948,6 +948,13 @@ async function datLuotDk() {
   }
   await saveAttemptDk(a)
 }
+// 27/10 (thầy: bảng trong đề ở màn thi không được tràn): `&bang=1` ⇒ câu 1 có bảng 2 hàng × 4 cột (tự xoay dọc ở khổ hẹp), câu 2 có bảng lớn 3 × 5 (cuộn, bóng mép).
+if (thamSo.get('bang') === '1') {
+  DK_BANK.phanI[0] = { ...DK_BANK.phanI[0]!, text: 'Cho nhiệt độ sôi của ammonia và các amine như bảng sau. Yếu tố nào sau đây ảnh hưởng chính đến chiều biến đổi nhiệt độ sôi trong dãy trên?',
+    choices: ['Độ dài liên kết N–H.', 'Số oxi hoá của nguyên tử N.', 'Khối lượng phân tử.', 'Năng lượng liên kết N–H.'], table: [['Chất', 'Ammonia', 'Methylamine', 'Ethylamine'], ['Nhiệt độ sôi (°C)', '−33,3', '−6,4', '16,6']] }
+  DK_BANK.phanI[1] = { ...DK_BANK.phanI[1]!, text: 'Cho bảng nhiệt độ sôi và độ tan trong nước của một số amine. Chất nào sau đây tan tốt nhất trong nước?',
+    choices: ['Methylamine.', 'Aniline.', 'Propylamine.', 'Ethylamine.'], table: [['Chất', 'Methylamine', 'Ethylamine', 'Propylamine', 'Aniline'], ['Nhiệt độ sôi (°C)', '−6,4', '16,6', '47,8', '184,1'], ['Độ tan (g/100 g nước)', 'rất lớn', 'rất lớn', 'lớn', '3,6']] }
+}
 function ManThiDk() {
   const [san, datSan] = useStateDk(false)
   useEffectDk(() => { void datLuotDk().then(() => datSan(true)) }, [])

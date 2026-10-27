@@ -480,6 +480,8 @@ const DUO_KT_CANH = [
   ['ktcn-nop', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 6 » nut:^Nộp chặng 2`],
   ['ktcn-ket', 'duo-kt&v=ket', /Làm tốt lắm/],
   ['thi-cau', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/],
+  // 27/10: bảng trong đề ở màn thi — 2 hàng × 4 cột tự xoay dọc (câu 1) · bảng lớn cuộn ngang có bóng mép (câu 2)
+  ['thi-bang', 'duo-kt&v=thi&vai=hocsinh&bang=1', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 1`], ['thi-bang-lon', 'duo-kt&v=thi&vai=hocsinh&bang=1', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 2`],
   ['thi-chon', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, 'lam13:nut:^B\\.'],
   ['thi-ds', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 5 » nut:^Đúng$`],
   ['thi-tln', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 7 » nut:^1$ » nut:^7$`],

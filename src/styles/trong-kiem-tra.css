@@ -231,3 +231,12 @@
   [data-trong='hs'] :is(.duo-kt, .duo-kt-thi) :is(.duo-kt-truoc, .duo-kt-nut-luoi, .duo-kt-o, .duo-kt-nut-phu, .duo-kt-nop-ds button, .pa-hang, .bns-phim button, .duo-nut):active:not(:disabled) { transform: none; }
 }
 [data-trong='hs'].may-yeu .duo-kt-tam { animation: none; }
+
+/* ── BẢNG TRONG ĐỀ Ở MÀN THI / KIỂM TRA kiểu Duo (thầy 27/10; KhungKiemTra.useBangKt gắn thuộc tính): bảng hai hàng quá rộng ⇒ lưới dọc (mỗi cột cũ
+ * thành một hàng: cột trái là hàng tiêu đề cũ), chữ được xuống dòng; bảng lớn cuộn ngang ⇒ bóng mờ ở mép còn nội dung. Chỉ trình bày. ── */
+[data-trong] .cau-bang table[data-doc] { display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--n, 2), auto); grid-template-columns: auto minmax(0, 1fr); }
+[data-trong] .cau-bang table[data-doc] :is(thead, tbody, tr) { display: contents; }
+[data-trong] .cau-bang table[data-doc] :is(th, td) { white-space: normal; }
+[data-trong] .cau-bang[data-mep=phai] { box-shadow: inset -14px 0 12px -12px var(--phu); }
+[data-trong] .cau-bang[data-mep=trai] { box-shadow: inset 14px 0 12px -12px var(--phu); }
+[data-trong] .cau-bang[data-mep=hai] { box-shadow: inset -14px 0 12px -12px var(--phu), inset 14px 0 12px -12px var(--phu); }
