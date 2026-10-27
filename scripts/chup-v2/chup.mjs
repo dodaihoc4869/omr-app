@@ -281,6 +281,14 @@ const DUO_CANH = [
 const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   DUO_CANH.map(([t, viec]) => [`duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết DUO 26/10
+// ═══ THẺ CHẠM 27/10 (thầy: «làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo»): thẻ nhỏ neo dưới chữ tô tím trên màn làm chặng THẬT
+// (`lam13&lam=duo&cham=…`, gia/lam-bai-1210d.ts) — mở trên chất / đơn vị / phủ định; 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
+// `vd` = câu ethylamine trong ảnh thầy (không còn ô tô «dịch chất nào sau đây»). Thao tác `cham:<chữ>` = chạm chữ đó rồi chờ thẻ. Tiền tố "duo-cham-".
+const CHAM_CANH = [['chat', /aniline/, 'cham:aniline'], ['don-vi', /ethyl acetate/, 'cham:1,5 M'], ['phu-dinh', /không đúng/, 'cham:không đúng']]
+const DS_CHAM = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  CHAM_CANH.map(([t, cho, viec]) => [`duo-cham-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, `lam13&lam=duo&cham=${t}`, w, hh, nen, false, cho, viec])))
+DS_CHAM.push(['duo-cham-vd-doc', 'lam13&lam=duo&cham=vd', 390, 844, 'light', false, /Ethylamine thể hiện/, 'cham-khong:'])
+// ═══ hết THẺ CHẠM 27/10
 // ═══ GIỮ CHÂN 27/10 (ảnh Duolingo «Đừng đi mà…»): tấm giữ chân khi bấm X giữa chặng + băng nhắc + lời động viên. `&giu=1` ⇒ bản tổng quan thưởng ở máy
 // (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4) và hôm nay mới làm 2 câu (trang.tsx / gia/lam-bai-1210d.ts). Tiền tố "duo-giu-".
 const X_GIU = 'nut:^Lưu và về Hôm nay'
@@ -406,6 +414,7 @@ const DS = [
   ...DS_DUO_SUA, // DUO SỬA 27/10
   ...DS_DUO, // DUO 26/10
   ...DS_GIU, // GIỮ CHÂN 27/10
+  ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
@@ -879,6 +888,19 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
       const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
       if (tranTrong > 0) tran.push(`${ten}: trong khung ${tranTrong}px`)
+    } else if (viec?.startsWith('cham:')) {
+      // THẺ CHẠM 27/10: chạm chữ tô tím (ruột nạp lười) ⇒ chờ thẻ kiểu Duolingo hiện hẳn (hết 120 ms phóng to)
+      await t.locator('.gyc-cham', { hasText: viec.slice(5) }).first().click({ timeout: 20000 })
+      await t.locator('.gyc-bong').waitFor({ timeout: 20000 })
+      await t.waitForTimeout(300)
+      const ngoai = await t.evaluate(() => { const r = document.querySelector('.gyc-bong')?.getBoundingClientRect(); return r ? [r.left < 12, r.right > innerWidth - 12, r.top < 0, r.bottom > innerHeight].some(Boolean) : true })
+      if (ngoai) tran.push(`${ten}: thẻ chạm vượt mép màn`)
+    } else if (viec?.startsWith('cham-khong:')) {
+      // câu không có chữ đáng giải nghĩa: chờ ruột chạy xong (nút «Bắt đầu từ đâu?» hiện) rồi kiểm KHÔNG có chữ tô
+      await t.getByRole('button', { name: /Bắt đầu từ đâu/ }).first().waitFor({ timeout: 20000 })
+      await t.waitForTimeout(400)
+      const so = await t.locator('.gyc-v').count()
+      if (so) loiTrang.push(`${ten}: còn ${so} chữ tô trên câu không đáng tô`)
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {
@@ -900,6 +922,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       .filter((e) => {
         const r = e.getBoundingClientRect()
         const s = getComputedStyle(e)
+        // THẺ CHẠM 27/10: chữ chạm trong đề là đích NỘI DÒNG (WCAG 2.5.8 miễn) và có ::after nới 10px trên + dưới ⇒ tính cả phần nới
+        if (e.classList.contains('gyc-cham')) return r.height + 20 < 44
         return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && (r.width < 44 || r.height < 44)
       })
       .map((e) => `${(e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 40)} ${Math.round(e.getBoundingClientRect().width)}×${Math.round(e.getBoundingClientRect().height)}`),

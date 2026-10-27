@@ -125,7 +125,7 @@ describe('thẻ đơn vị', () => {
     const t = theDonVi('M', '1,5 M')!
     expect(t.ten).toBe('M · nồng độ mol')
     expect(t.nhan).toBe('Đơn vị')
-    expect(t.doan[0]).toBe('1,5 M đọc là 1,5 mol trên lít: cứ 1 lít dung dịch có 1,5 mol chất tan')
+    expect(t.doan[0]).toBe('1,5 M: cứ 1 lít dung dịch có 1,5 mol chất tan')
     expect(t.congThuc).toBe('n = C_M × V (V tính bằng lít)')
     expect(t.nhoDoi).toBe('1000 mL = 1 L')
   })
@@ -134,9 +134,17 @@ describe('thẻ đơn vị', () => {
     expect(dkc).toContain('24,79'); expect(dkc).not.toContain('22,4')
     expect(dktc).toContain('22,4'); expect(dktc).not.toContain('24,79')
   })
-  it('thẻ L không gắn cứng thể tích mol', () => {
+  it('thẻ L không gắn cứng thể tích mol: theo đúng điều kiện đề ghi, lít khí thì bỏ dòng dung dịch', () => {
     const l = JSON.stringify(theDonVi('L', '2,479 lít'))
     expect(l).not.toContain('24,79'); expect(l).not.toContain('22,4')
+    expect(theDonVi('L', '2,479 lít', 'Hấp thụ 2,479 lít CO2 (đkc) vào nước')!.doan).toEqual(['Khí ở đkc: n = V : 24,79'])
+    expect(theDonVi('L', '2,24 lít', 'Dẫn 2,24 lít khí CO2 (đktc) vào nước')!.doan).toEqual(['Khí ở đktc: n = V : 22,4'])
+    expect(theDonVi('L', '0,5 lít', 'Cho 0,5 lít dung dịch NaOH 1M (đkc)')!.doan).toEqual(['Dung dịch: n = C_M × V', '1 L = 1 dm³ = 1000 mL'])
+  })
+  it('thầy 27/10: thẻ đơn vị không nhắc lại đề («8,8 g là khối lượng chất»), «%» chung chung thì không thẻ', () => {
+    expect(theDonVi('g', '8,8 gam')!.doan).toEqual(['Ra số mol: n = m : M'])
+    expect(theDonVi('%', '10%')).toBeNull()
+    for (const ma of MA_DON_VI) expect(JSON.stringify(theDonVi(ma, '7,3 x'))).not.toMatch(/7,3 (g|kg|mL|L|mol) là|Đọc kỹ|Đọc kĩ|tự hỏi/)
   })
   it('mọi mã có thẻ ngắn (1–3 câu), không tính hộ', () => {
     expect(MA_DON_VI.length).toBeGreaterThanOrEqual(25)
@@ -156,17 +164,24 @@ describe('thẻ đơn vị', () => {
 })
 
 describe('từ then chốt', () => {
-  it('khoảng 40 từ, mã không trùng, mỗi từ có nghĩa và câu tự hỏi', () => {
+  it('khoảng 40 từ, mã không trùng; từ có thẻ thì nghĩa + một dòng kiến thức, KHÔNG câu «tự hỏi» (thầy 27/10)', () => {
     const ds = danhSachThenChot()
     expect(ds.length).toBeGreaterThanOrEqual(38)
     expect(new Set(ds.map((t) => t.ma)).size).toBe(ds.length)
-    for (const t of ds) { expect(t.nghia).toBeTruthy(); expect(t.tuHoi).toMatch(/\?|:/) }
+    for (const t of ds) {
+      if (!t.nghia) { expect(theThenChot(t.ma)).toBeNull(); continue }
+      expect(t.them, t.ma).toBeTruthy()
+      expect(`${t.nghia} ${t.them}`, t.ma).not.toMatch(/\?|tự hỏi/)
+    }
+  })
+  it('từ thường ai cũng hiểu ⇒ không có thẻ', () => {
+    for (const ma of ['dun-nong', 'thu-duoc', 'toi-da', 'toi-thieu', 'loc', 'nhiet-do-thuong']) expect(theThenChot(ma), ma).toBeNull()
   })
   it('thẻ «Cô cạn»', () => {
     const t = theThenChot('co-can', 'Cô cạn')!
     expect(t).toMatchObject({ ten: 'Cô cạn', nhan: 'Từ then chốt' })
     expect(t.doan[0]).toMatch(/bay hơi hết nước.*chất rắn khan/)
-    expect(t.doan[1]).toBe('Gặp «cô cạn» ⇒ tự hỏi: Chất rắn gồm những gì? Có chất nào dư (như NaOH) còn lại không?')
+    expect(t.doan[1]).toBe('Chất rắn gồm muối tạo thành và chất không bay hơi còn dư (như NaOH dư).')
     expect(theThenChot('khong-co')).toBeNull()
   })
   it('hiệu suất nói thẳng xuôi / ngược (tạm bỏ «đánh thuế», thầy 26/10)', () => {
