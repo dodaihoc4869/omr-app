@@ -1,7 +1,8 @@
 // GIAO DIỆN «TRONG» · APP HỌC SINH — phần trình bày RIÊNG của bản vẽ thầy chốt 26/10 (ve-moi/hs-mot-trang*.html, hs-menu-phai.html; từ 26/10 tối: ve-moi/dm-*.html —
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { lazy, Suspense, useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
@@ -78,7 +79,9 @@ function chuKiem(k: TomTatKiemTra): string {
 /** Phần của cổng HocTapHomNay mà Luyện tập / Thành tích cần (truyền nguyên props cổng — không thêm lệnh, không thêm số). */
 export interface HsTrong { lop?: string; onXemLai: () => void; onTuLuyen: () => void; onLichSu: () => void; onKetQua?: () => void; onLuyenLai?: () => void }
 /** Một nút trên con đường chặng (Lộ trình). `x` = độ lệch ngang (px) để đường uốn như bản vẽ. */
-type Nut = { k: string; loai: 'hoc' | 'kiem' | 'sua' | 'bt'; tt: 'xong' | 'dang' | 'khoa' | 'mo'; nhan?: string; bong?: string; vong?: number; ten: string; onClick?: () => void; tat?: boolean }
+type Nut = { k: string; loai: 'hoc' | 'kiem' | 'sua' | 'bt'; tt: 'xong' | 'dang' | 'khoa' | 'mo'; dem?: number; bong?: string; vong?: number; ten: string; pop: Pop }
+/** Thẻ bật ra khi bấm một nút Lộ trình (thầy 27/10, ảnh Duolingo «bấm vào hiện như thế này»): tiêu đề · dòng phụ · nút việc chính (không có ⇒ chỉ thông tin). */
+type Pop = { tieu: string; phu: string; nut?: { chu: string; onClick?: () => void; tat?: boolean } }
 const LECH = [0, -52, -80, -52, 0, 52, 80, 52]
 const HINH_NUT: Record<Nut['loai'], LucideIcon> = { hoc: Play, kiem: FlaskConical, sua: Wrench, bt: PenLine }
 
@@ -109,17 +112,76 @@ function Ruong() {
     <path className="rg-ngoc" d="M48 30l12 10-12 18-12-18z" /><path className="rg-ngoc-sang" d="M48 30l12 10H36z" /><path className="rg-ngoc-dam" d="M48 58l-12-18h12z" />
   </svg>
 }
-/** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo): bốn đoạn có khe, nền xám tối, phần đã làm tô màu chính từ đỉnh theo chiều kim đồng hồ,
- *  tô dần 0 → tỉ lệ thật lúc mở (stroke-dashoffset, 600 ms); vòng thở co 0,94 ↔ 1. Không có số ⇒ vòng xám nguyên. */
-const CV = 2 * Math.PI * 54
+/** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo; «làm sát lại, tinh tế hơn»): bốn đoạn đầu tròn, khe nhỏ, ôm sát nút (khe ~5–7 px), nền xám
+ *  rất nhạt; phần đã làm cùng màu nút, tô dần 0 → tỉ lệ thật lúc mở (mặt nạ stroke-dashoffset, 500 ms ease-out). Không có số ⇒ vòng xám nguyên. */
+const CV = 2 * Math.PI * 54, DOAN = CV / 4, KHE = 14 // khe theo đơn vị khung 116 (nét 8 đầu tròn ⇒ khe nhìn thấy ~5 px)
 function VongChang({ pt }: { pt?: number }) {
   const L = Math.max(0, Math.min(100, pt ?? 0)) / 100 * CV
-  return <svg className="da-vong" viewBox="0 0 116 116" aria-hidden="true"><circle className="nen" cx="58" cy="58" r="54" />
-    {L > 0 && <circle className="chay" cx="58" cy="58" r="54" strokeDasharray={`${L} ${CV}`} style={{ '--L': `${L}` } as CSSProperties} />}</svg>
+  const id = `da-vm${useId().replace(/[^a-zA-Z0-9]/g, '')}`
+  const doan = { cx: 58, cy: 58, r: 54, strokeDasharray: `${DOAN - KHE} ${KHE}`, strokeDashoffset: DOAN - KHE / 2 }
+  return <svg className="da-vong" viewBox="0 0 116 116" aria-hidden="true">
+    {L > 0 && <mask id={id}><circle className="mo" cx="58" cy="58" r="54" strokeDasharray={`${L} ${CV}`} style={{ '--L': `${L}` } as CSSProperties} /></mask>}
+    <circle className="nen" {...doan} />
+    {L > 0 && <circle className="chay" {...doan} mask={`url(#${id})`} />}</svg>
 }
+
+/** THẺ BẬT RA dưới nút (thầy 27/10): rộng gần hết màn (lề 16 px, tối đa 440), mũi nhọn chỉ đúng tâm nút; gần đáy màn ⇒ bật LÊN TRÊN nút. Vẽ vào <body>
+ *  (position: fixed, trên dải thẻ ghim) ⇒ không bị khung nào cắt. Chạm ra ngoài / cuộn / đổi khổ / Esc ⇒ đóng; Esc trả focus về nút. */
+function TheNut({ id, sac, pop, mo, onDong }: { id: string; sac: string; pop: Pop; mo: HTMLElement; onDong: (traFocus: boolean) => void }) {
+  const the = useRef<HTMLDivElement>(null)
+  const dat = useRef<() => void>(() => {})
+  useLayoutEffect(() => {
+    const t = the.current
+    if (!t) return
+    let goc0 = mo.getBoundingClientRect().top
+    // cuộn nhỏ (trình duyệt đưa nút vào khung, cuộn mượt đang dừng) ⇒ thẻ đi theo nút; cuộn hẳn (> 40 px) ⇒ đóng
+    dat.current = () => { if (Math.abs(mo.getBoundingClientRect().top - goc0) > 40) onDong(false); else datCho() }
+    const datCho = () => {
+      const r = mo.getBoundingClientRect(), vw = document.documentElement.clientWidth || window.innerWidth, vh = window.innerHeight
+      const w = Math.min(vw - 32, 440), cx = r.left + r.width / 2, left = Math.max(16, Math.min(vw - 16 - w, cx - w / 2))
+      t.style.width = `${w}px`; t.style.left = `${left}px`
+      t.style.setProperty('--ox', `${Math.max(24, Math.min(w - 24, cx - left))}px`)
+      const h = t.offsetHeight, duoi = r.bottom + 14, tren = r.top - 14 - h
+      const lenTren = duoi + h > vh - 12 && tren >= 8
+      t.toggleAttribute('data-tren', lenTren)
+      t.style.top = `${lenTren ? tren : duoi}px`
+    }
+    datCho()
+    // khổ thấp (điện thoại ngang): trên / dưới nút đều không đủ chỗ ⇒ cuộn khung NGAY (không mượt) cho thẻ nằm trọn dưới nút, rồi đặt lại
+    const r = mo.getBoundingClientRect(), du = r.bottom + 14 + t.offsetHeight - (window.innerHeight - 12)
+    if (du > 0 && !t.hasAttribute('data-tren')) {
+      let k: Element | null = mo.parentElement
+      while (k && !(/(auto|scroll)/.test(getComputedStyle(k).overflowY) && k.scrollHeight > k.clientHeight)) k = k.parentElement
+      ;(k ?? document.scrollingElement)?.scrollBy?.({ top: Math.min(du, r.top - 8), behavior: 'instant' as ScrollBehavior })
+      goc0 = mo.getBoundingClientRect().top
+      datCho()
+    }
+    ;(t.querySelector<HTMLElement>('.da-pop-nut:not(:disabled)') ?? t).focus({ preventScroll: true })
+  }, [mo]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const ngoai = (e: Event) => { const x = e.target as Node; if (!the.current?.contains(x) && !mo.contains(x)) onDong(false) }
+    const dong = () => onDong(false), cuon = () => dat.current()
+    const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.preventDefault(); onDong(true) } }
+    document.addEventListener('pointerdown', ngoai, true)
+    window.addEventListener('scroll', cuon, true)
+    window.addEventListener('resize', dong)
+    document.addEventListener('keydown', phim)
+    return () => { document.removeEventListener('pointerdown', ngoai, true); window.removeEventListener('scroll', cuon, true); window.removeEventListener('resize', dong); document.removeEventListener('keydown', phim) }
+  }, [mo, onDong])
+  const n = pop.nut
+  return createPortal(<div ref={the} id={id} className="da-pop" data-sac={sac} role="dialog" aria-label={pop.tieu} tabIndex={-1}>
+    <b className="da-pop-tieu">{pop.tieu}</b><span className="da-pop-phu">{pop.phu}</span>
+    {n && <button type="button" className="da-pop-nut" disabled={n.tat || !n.onClick} onClick={() => { onDong(false); n.onClick?.() }}>{n.chu}</button>}
+  </div>, document.body)
+}
+const SAC_POP: Record<Nut['loai'], string> = { hoc: 'dung', kiem: 'tin', sua: 'sai', bt: 'chu-y' }
 
 function DuongChang({ ds, moDi, cam }: { ds: Nut[]; moDi: boolean; cam?: CamBi }) {
   const goc = useRef<HTMLDivElement>(null)
+  // Chỉ MỘT thẻ mở một lúc: k của nút đang mở (rương = 'ruong') + phần tử nút (để đặt thẻ và trả focus).
+  const [moThe, setMoThe] = useState<{ k: string; el: HTMLElement } | null>(null)
+  const dongThe = useRef((traFocus: boolean) => setMoThe((m) => { if (traFocus) m?.el.focus(); return null })).current
+  const bam = (k: string, el: HTMLElement) => { cham(); setMoThe((m) => (m?.k === k ? null : { k, el })) }
   const [duong, setDuong] = useState('')
   const [vua, setVua] = useState<number | null>(null)
   const soChang = ds.filter((n) => n.k.startsWith('c')).length, soXong = ds.filter((n) => n.k.startsWith('c') && n.tt === 'xong').length
@@ -169,12 +231,16 @@ function DuongChang({ ds, moDi, cam }: { ds: Nut[]; moDi: boolean; cam?: CamBi }
         {/* ngôi sao đặc tự vẽ (không thêm biểu tượng thư viện vào mảnh dùng chung lúc mở app) */}
         {sao ? <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth={1.6} strokeLinejoin="round" aria-hidden="true"><path d="M12 2.8l2.8 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17l-5.7 3.1 1.2-6.3-4.6-4.4 6.3-.8z" /></svg>
           : <Icon size={30} strokeWidth={2.6} aria-hidden="true" />}
-        {n.nhan && <span className="da-nhan" data-ben={x > 0 ? 'trai' : undefined} aria-hidden="true">{n.nhan}</span>}
+        {/* huy hiệu số như chấm thông báo (thầy 27/10: bỏ viên chữ cạnh nút vì đè giám thị; tên đầy đủ ở aria-label + thẻ bật ra) */}
+        {n.dem ? <b className="da-dem" aria-hidden="true">{n.dem > 99 ? '99+' : n.dem}</b> : null}
       </>
       const hu = vua === null ? undefined : i === vua ? 'xong' : i === vua + 1 && n.tt === 'dang' ? 'mo' : undefined
+      const mo = moThe?.k === n.k
       const o = <li key={n.k} className="da-o-nut" data-hu={hu} style={{ '--x': `${x}px` } as CSSProperties}>
-        {n.onClick ? <button type="button" className="da-nut" data-loai={n.loai} data-tt={n.tt} onClick={n.onClick} disabled={n.tat} aria-label={n.ten}>{than}</button>
-          : <span className="da-nut" data-loai={n.loai} data-tt={n.tt} role="img" aria-label={n.ten}>{than}</span>}
+        {/* bấm nút KHÔNG vào thẳng: mở thẻ bên dưới (việc chính nằm trong thẻ) */}
+        <button type="button" className="da-nut" data-loai={n.loai} data-tt={n.tt} aria-label={n.ten} aria-haspopup="dialog" aria-expanded={mo}
+          aria-controls={mo ? `da-pop-${n.k}` : undefined} onClick={(e) => bam(n.k, e.currentTarget)}>{than}</button>
+        {mo && <TheNut id={`da-pop-${n.k}`} sac={n.tt === 'khoa' ? 'khoa' : SAC_POP[n.loai]} pop={n.pop} mo={moThe!.el} onDong={dongThe} />}
         {hu === 'xong' && <span className="da-lan" aria-hidden="true" />}
         {hu === 'mo' && <span className="da-vo-khoa" aria-hidden="true"><i /><i /><i /><i /><Lock size={22} strokeWidth={2.6} /></span>}
         {/* LINH VẬT MỜ CẠNH ĐƯỜNG (thầy 27/10, như cú Duo xám): cứ 3 nút một con, xen kẽ trái / phải, đứng phía đối diện chỗ đường lượn; chặng chưa tới ⇒
@@ -189,8 +255,14 @@ function DuongChang({ ds, moDi, cam }: { ds: Nut[]; moDi: boolean; cam?: CamBi }
         })()}
       </li>
       // Rương tinh thể + Bi đứng cạnh đường (bản vẽ nâng cấp): sau chặng giữa (đủ ≥ 2 chặng); rương lệch phía đối diện Bi.
-      return i === giua ? [o, <li key="ruong" className="da-ruong" aria-hidden="true" data-mo={soXong === soChang || undefined} style={{ '--x': `${LECH[(i + 1) % LECH.length]! <= 0 ? -56 : 56}px` } as CSSProperties}>
-        <Ruong /></li>] : o
+      // Rương bấm được (thầy 27/10): thẻ nói điều kiện sáng rương theo luật đang có (xong hết chặng hôm nay) — không hứa phần thưởng chưa có.
+      const moR = moThe?.k === 'ruong', duR = soXong === soChang
+      return i === giua ? [o, <li key="ruong" className="da-ruong" data-mo={duR || undefined} style={{ '--x': `${LECH[(i + 1) % LECH.length]! <= 0 ? -56 : 56}px` } as CSSProperties}>
+        <button type="button" className="da-ruong-nut" aria-label="Rương hôm nay" aria-haspopup="dialog" aria-expanded={moR} aria-controls={moR ? 'da-pop-ruong' : undefined}
+          onClick={(e) => bam('ruong', e.currentTarget)}><Ruong /></button>
+        {moR && <TheNut id="da-pop-ruong" sac="sao" mo={moThe!.el} onDong={dongThe} pop={{ tieu: 'Rương hôm nay',
+          phu: duR ? `Em đã xong cả ${soChang} chặng hôm nay, rương đã sáng!` : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXong} chặng` }} />}
+      </li>] : o
     })}
   </ol></div>
 }
@@ -373,16 +445,26 @@ export function MotTrangHs(p: PropsMotTrang) {
 
   // ───── LỘ TRÌNH: con đường chặng của hôm nay + nút việc sau (đúng thứ tự «Một trang»).
   const nut: Nut[] = []
+  // Mỗi nút kèm THẺ BẬT RA (thầy 27/10): tên · dòng phụ · nút việc chính GỌI ĐÚNG lệnh cũ. Số nguyên tử của chặng phụ thuộc đúng / sai từng câu ⇒ không ghi «+N».
+  const tenBaiThe = p.tenBai || 'Bài học hôm nay'
+  let dauChang = 0
   if (!p.ngayKiem) chang.forEach((c, i) => {
     const dang = c.tt === 'dang' && chinh === 'hoc' || c.tt === 'dang' && chinh === 'ca'
-    nut.push(c.tt === 'xong' ? { k: `c${i}`, loai: 'hoc', tt: 'xong', ten: `Chặng ${i + 1}: đã xong` }
-      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: c.phan, onClick: p.onHoc, tat: p.khoaHoc }
-      : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở` })
+    const thu = `Chặng ${i + 1} / ${chang.length}`, conChang = so ? Math.max(0, Math.min(c.co, dauChang + c.co - so.daLam)) : c.co
+    dauChang += c.co
+    nut.push(c.tt === 'xong' ? { k: `c${i}`, loai: 'hoc', tt: 'xong', ten: `Chặng ${i + 1}: đã xong`,
+      pop: { tieu: tenBaiThe, phu: `${thu} · đã xong`, nut: hs ? { chu: 'Xem lại', onClick: hs.onXemLai } : undefined } }
+      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: c.phan,
+        pop: { tieu: tenBaiThe, phu: p.khoaHoc || p.hetCau ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc } } }
+      : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở`, pop: { tieu: tenBaiThe, phu: `${thu} · Hoàn thành các chặng trước để mở khoá` } })
   })
-  if (kiem) nut.push({ k: 'kiem', loai: 'kiem', tt: chinh === 'kiem' ? 'dang' : 'mo', nhan: 'Kiểm tra ôn tập', bong: chinh === 'kiem' && kiemLam ? (kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu') : undefined,
-    ten: `Kiểm tra ôn tập: ${chuKiem(kiem)}`, onClick: (kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined, tat: p.coCa })
-  if (coSua && !p.ngayKiem) nut.push({ k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', nhan: `Tự sửa lỗi · ${p.soSua} câu`, bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: ${p.soSua} câu`, onClick: p.onChua })
-  if (coBt && !p.ngayKiem) nut.push({ k: 'bt', loai: 'bt', tt: chinh === 'bt' ? 'dang' : 'mo', nhan: p.soBaiTap ? `Bài tập về nhà · ${p.soBaiTap} bài` : 'Bài tập về nhà', bong: chinh === 'bt' ? 'Làm bài' : undefined, ten: 'Bài tập về nhà', onClick: p.onBaiTap })
+  if (kiem) nut.push({ k: 'kiem', loai: 'kiem', tt: chinh === 'kiem' ? 'dang' : 'mo', bong: chinh === 'kiem' && kiemLam ? (kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu') : undefined,
+    ten: `Kiểm tra ôn tập: ${chuKiem(kiem)}`, pop: { tieu: 'Kiểm tra ôn tập', phu: chuKiem(kiem),
+      nut: (kiemLam || kiemXong) && p.onKiemTra ? { chu: kiemXong ? 'Xem kết quả' : kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu', onClick: p.onKiemTra, tat: p.coCa } : undefined } })
+  if (coSua && !p.ngayKiem) nut.push({ k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', dem: p.soSua ?? undefined, bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: ${p.soSua} câu`,
+    pop: { tieu: 'Tự sửa lỗi', phu: `${p.soSua} câu cần sửa`, nut: { chu: 'Sửa ngay', onClick: p.onChua } } })
+  if (coBt && !p.ngayKiem) nut.push({ k: 'bt', loai: 'bt', tt: chinh === 'bt' ? 'dang' : 'mo', dem: p.soBaiTap || undefined, bong: chinh === 'bt' ? 'Làm bài' : undefined, ten: 'Bài tập về nhà',
+    pop: { tieu: 'Bài tập về nhà', phu: p.soBaiTap ? `${p.soBaiTap} bài thầy đang giao` : 'Xem lại bài đã nộp', nut: { chu: p.soBaiTap ? 'Làm bài' : 'Xem bài', onClick: p.onBaiTap } } })
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSua && 'Tự sửa lỗi', !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
   const hocThem = (chinh === 'sua' || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc
   // Bi nói việc chính của hôm nay (cùng thứ tự `chinh`); xong hết ⇒ Bi mừng. Chưa có số (đang tải) ⇒ chưa hiện, không đoán.

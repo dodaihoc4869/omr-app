@@ -613,7 +613,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></div>
       : !q ? null
       : k ? <section className="duo-day duo-ket" data-tt={khongTinh ? 'trung' : tt} data-tp-trung={khongTinh || undefined} role="status" aria-live="polite"><div className="duo-giua">
-          {tt === 'dung' && !khongTinh && <BungDung key={q.qid} />}{/* thầy 27/10 (video Duolingo): mây bọt + hạt vuông xanh ở dải ĐÚNG */}
+          <BungDung key={q.qid} loai={khongTinh ? 'trung' : tt === 'dung' || tt === 'sai' ? tt : 'trung'} />{/* thầy 27/10 (video Duolingo): mây bọt — đúng: xanh + hạt vuông · sai: đỏ nhạt + hạt tròn · chưa tính: xám, không hạt */}
           <div className="duo-kq">
             {/* 27/10 (thầy: «dải … như dolingo»; phối hợp giám thị đứng trái đề): dải đúng / sai chỉ có dấu tròn tick / × ở tiêu đề — không đặt Bi */}
             {tt === 'trung' && !khongTinh ? <span className="duo-kq-o" aria-hidden="true"><BookOpen size={26} /></span> : null}

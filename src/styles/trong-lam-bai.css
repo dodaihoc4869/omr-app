@@ -979,3 +979,12 @@
 [data-trong] .duo-ket .duo-ct-lg svg { width: 18px; height: 18px; flex: none; }
 [data-trong] .duo-ket .duo-ct-lg:focus-visible { outline: 3px solid currentColor; outline-offset: -2px; }
 @media (max-width: 380px) { [data-trong] .duo-ct-dau[data-dai] .duo-ct-lg > span { display: none; } }
+/* 23. MÂY BỌT DẢI SAI / CHƯA TÍNH (thầy 27/10 «Phần sai chưa có hiệu ứng bong bóng như trong video»): cùng mây bướu như dải đúng, nền bướu = đúng nền dải,
+   viền bướu đậm hơn nền. Sai: đỏ nhạt + 7 hạt tròn đỏ nhạt bay lên rồi tan (BungDung.tsx) · chưa tính: xám nhạt (tấm chưa tính ánh xanh), không hạt. */
+.duo-may[data-loai='sai'] .nen { fill: var(--tr-sai-nhat); }
+.duo-may[data-loai='sai'] .vien { fill: color-mix(in srgb, var(--tr-sai) 55%, var(--tr-sai-nhat)); }
+.duo-may[data-loai='trung'] .nen { fill: var(--tr-mat-2); }
+.duo-may[data-loai='trung'] .vien { fill: var(--tr-vien-2); }
+[data-trong='hs'] .duo-ket[data-tp-trung] .duo-may[data-loai='trung'] .nen { fill: color-mix(in srgb, var(--tr-tin) 7%, var(--tr-mat)); }
+[data-trong='hs'] .duo-ket[data-tp-trung] .duo-may[data-loai='trung'] .vien { fill: color-mix(in srgb, var(--tr-tin) 22%, var(--tr-vien)); }
+.duo-tron { position: fixed; left: 0; top: 0; z-index: 70; border-radius: 50%; background: color-mix(in srgb, var(--tr-sai) 45%, var(--tr-sai-nhat)); pointer-events: none; will-change: transform, opacity; }
