@@ -53,6 +53,12 @@ export const laCauKho = (q: { sao?: unknown; mucDo?: unknown }): boolean => Numb
 
 /** Số câu tối đa của một bài (chặng) — mục tiêu ngày = ceil(mức câu hôm nay / số này). */
 export const CAU_MOI_BAI = 6
+/**
+ * CHẶNG ĐỦ (thầy 27/10 «tối ưu chặt chẽ… công bằng», lỗ hổng đo 27/10: 34/382 chặng xong < 6 câu, 22 «hoàn hảo» < 6 câu, 8 em-ngày ăn «Xong 2 chặng» chỉ nhờ
+ * chặng ngắn): từ 28/10 chặng < CAU_MOI_BAI câu KHÔNG tính vào «Xong N chặng», «Chặng hoàn hảo», mục tiêu ngày theo chặng, huy hiệu hoàn hảo. Ngày cũ giữ.
+ */
+export const NGAY_CHANG_DU = '2026-10-28'
+export const changDu = (ngay: string, soCau: number): boolean => ngay < NGAY_CHANG_DU || soCau >= CAU_MOI_BAI
 export const TT_RUONG = 15
 export const TT_MUC_TIEU_NGAY = 5
 export const TT_KIM_CUONG = 40
@@ -67,8 +73,11 @@ export const thuHaiTt = (ngay: string): string => congNgayTt(ngay, -((new Date(D
 export function tuanMuaBinh(ngay: string): { tu: string; toi: string; muaTiepTu: string } {
   const t2 = thuHaiTt(ngay)
   const sau = congNgayTt(t2, 7)
-  return { tu: `tt|${t2}|`, toi: `tt|${sau}|`, muaTiepTu: sau }
+  // 28/10: bình mua TRƯỚC lần đặt lại 00:01 28/10 (đã bị đặt về 0) không tính vào trần tuần ⇒ đếm từ 28/10.
+  return { tu: `tt|${t2 > MOC_DEM_BINH_TUAN ? t2 : MOC_DEM_BINH_TUAN}|`, toi: `tt|${sau}|`, muaTiepTu: sau }
 }
+/** Ngày bắt đầu đếm trần bình tuần theo sổ ví (sau lần đặt lại bình 00:01 28/10). */
+export const MOC_DEM_BINH_TUAN = '2026-10-28'
 export const TT_CUOC_DAT = 50
 export const TT_CUOC_THANG = 100
 export const CUOC_SO_NGAY = 7
@@ -251,3 +260,28 @@ export function congTacTuDong(rows: readonly { khoa: unknown; gia_tri: unknown }
   const m = new Map(rows.map((r) => [String(r.khoa), String(r.gia_tri ?? '').trim().replace(/^"|"$/g, '')]))
   return Object.fromEntries(KHOA_CONG_TAC.map((k) => [k, m.get(k) === 'tat' ? 'tat' : 'bat'])) as CongTac
 }
+
+/**
+ * TẠM ĐÓNG APP HỌC SINH (thầy 27/10 tối: «Tắt app, để tối ưu xong rồi mở lại cho tôi»). Khoá riêng trong `cau_hinh`, NGƯỢC chiều với 4 công tắc thưởng:
+ * 'bat' = ĐANG ĐÓNG; vắng dòng / giá trị lạ = MỞ. Không đổi schema. Máy chủ chỉ báo cờ (`tamDong` trong /hs/thuong); màn phủ ở app học sinh,
+ * KHÔNG chặn lệnh kiểm tra cá nhân / ca thi (em đang làm dở vẫn nộp được).
+ */
+export const KHOA_TAM_DONG_HS = 'hs_tam_dong'
+export function tamDongTuDong(rows: readonly { khoa: unknown; gia_tri: unknown }[]): boolean {
+  const r = rows.find((x) => String(x.khoa) === KHOA_TAM_DONG_HS)
+  return !!r && String(r.gia_tri ?? '').trim().replace(/^"|"$/g, '') === 'bat'
+}
+/**
+ * DANH SÁCH ĐƯỢC VÀO khi đang tạm đóng (thầy 27/10: «mở cho số báo danh 12121212 để tôi test trước»): `cau_hinh.hs_tam_dong_cho_phep` = các SBD cách
+ * nhau dấu phẩy. So khớp CHÍNH XÁC từng SBD (bỏ khoảng trắng hai đầu).
+ */
+export const KHOA_TAM_DONG_CHO_PHEP = 'hs_tam_dong_cho_phep'
+export function dsChoPhepTamDong(rows: readonly { khoa: unknown; gia_tri: unknown }[]): string[] {
+  const r = rows.find((x) => String(x.khoa) === KHOA_TAM_DONG_CHO_PHEP)
+  return r ? String(r.gia_tri ?? '').replace(/^"|"$/g, '').split(',').map((x) => x.trim()).filter(Boolean) : []
+}
+/** Em có bị tạm đóng không: công tắc bật VÀ SBD của em không trong danh sách được vào. */
+export function tamDongChoEm(rows: readonly { khoa: unknown; gia_tri: unknown }[], sbd: string): boolean {
+  return tamDongTuDong(rows) && !dsChoPhepTamDong(rows).includes(String(sbd ?? '').trim())
+}
+

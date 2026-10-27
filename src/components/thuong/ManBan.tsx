@@ -15,9 +15,9 @@ import { DauVe } from './ManChuoi'
 import { hieuUngGoCua, nhanLop, tenGoi } from './ban-gon'
 
 export const LUAT_BAN = [
-  'Cả hai cùng xong ít nhất 1 chặng trong ngày thì lửa đôi tăng 1. Một bạn lỡ thì lửa đôi tắt.',
+  'Cả hai cùng làm đủ mức trong ngày thì lửa đôi tăng 1. Một bạn lỡ thì lửa đôi tắt.',
   'Bình giữ chuỗi của bạn nào thì đỡ cho bạn ấy.',
-  'Em xong chặng mà bạn chưa? Bấm «Gõ cửa», mỗi ngày 1 lần cho mỗi bạn.',
+  'Em đủ mức mà bạn chưa? Bấm «Gõ cửa», mỗi ngày 1 lần cho mỗi bạn.',
   'Bạn bè chỉ thấy em đã học hôm nay chưa và số lửa đôi, không thấy điểm.',
 ] as const
 const KHO_DOI = 'ddh.thuong.lua-doi'
@@ -29,11 +29,11 @@ function LuaDoi({ so, id }: { so: number; id?: string }) {
   return <span className="tp-lua-doi" role="img" aria-label={`Lửa đôi ${so} ngày`}><span className="doi" aria-hidden="true"><IcLua /><IcLua /></span><span className="tp-lat" id={id} aria-hidden="true">{so}</span></span>
 }
 const HOM_NAY_CHU = (b: BanHoc) => ({
-  ca_hai: { Ic: CheckCircle2, chu: 'Hôm nay cả hai đã xong' },
+  ca_hai: { Ic: CheckCircle2, chu: 'Hôm nay cả hai đã đủ mức' },
   // tên đủ đã đứng ngay trên (đầu thẻ) ⇒ dòng trạng thái gọi «Bạn», không lặp họ tên dài (27/10)
-  ban_chua: { Ic: Clock, chu: 'Bạn chưa học hôm nay' },
-  em_chua: { Ic: Flame, chu: 'Bạn đã học · còn chờ em 1 chặng' },
-  ca_hai_chua: { Ic: Clock, chu: 'Hôm nay cả hai chưa học' },
+  ban_chua: { Ic: Clock, chu: 'Bạn chưa đủ mức hôm nay' },
+  em_chua: { Ic: Flame, chu: 'Bạn đã đủ mức · còn chờ em' },
+  ca_hai_chua: { Ic: Clock, chu: 'Hôm nay cả hai chưa đủ mức' },
 }[b.homNay])
 
 function TheBan({ b, i, token, bao }: { b: BanHoc; i: number; token?: string; bao: (c: string) => void }) {
@@ -117,7 +117,7 @@ export function ManHocCungBan({ token, onVe, onMoi, onHoc }: { token?: string; o
   return <div className="tp-goc tp-vo" data-man="ban">
     <DauVe onVe={onVe} />
     {loi && <Loi chu={loi} onThuLai={thuLai} />}
-    <div><h1 className="tp-tieu">Học cùng bạn</h1><p className="tp-phu" style={{ marginTop: 4 }}>Lửa đôi chỉ tăng khi cả hai cùng xong ít nhất 1 chặng trong ngày.</p></div>
+    <div><h1 className="tp-tieu">Học cùng bạn</h1><p className="tp-phu" style={{ marginTop: 4 }}>Lửa đôi chỉ tăng khi cả hai cùng làm đủ mức trong ngày.</p></div>
     {ds.loiMoi.map((n, i) => <section key={n.ma} className="tp-the" aria-label={`Lời mời của ${n.ten}`}>
       <div className="tp-ban-dau"><span className="tp-av" data-k={String((i % 4) + 1)} aria-hidden="true">{chuCai(n.ten)}</span>
         <div className="giua"><b>{n.ten} mời em học cùng</b><span>{nhanLop(n.lop)}</span></div></div>
@@ -136,7 +136,7 @@ export function ManHocCungBan({ token, onVe, onMoi, onHoc }: { token?: string; o
         {onMoi && <button type="button" className="tp-nut" onClick={onMoi}>Mời bạn</button>}
       </div>}
     </div>
-    {canHoc && onHoc && <button type="button" className="tp-nut-lon" onClick={onHoc}>Học 1 chặng để giữ lửa đôi</button>}
+    {canHoc && onHoc && <button type="button" className="tp-nut-lon" onClick={onHoc}>Học tiếp để giữ lửa đôi</button>}
     <section className="tp-the" aria-label="Luật học cùng">
       <h2>Luật học cùng</h2>
       <ol className="tp-luat">{LUAT_BAN.map((l, i) => <li key={i}><b>{i + 1}</b><span>{l}</span></li>)}</ol>
@@ -229,7 +229,7 @@ export function ManLoiMoi({ tb, token, onDong }: { tb: ThongBao; token?: string;
       <div className="cot-a">
         <div className="tp-hai-av"><span ref={a1} className="tp-av" data-k="1" aria-hidden="true">{chuCai(ten)}</span><span ref={lua} className="lua-g" aria-hidden="true"><IcLua /></span><span ref={a2} className="tp-av" data-k="0" aria-hidden="true">Em</span></div>
         <h1>{ten} mời em học cùng</h1>
-        <p className="tp-phu">{lop ? `${nhanLop(lop)} · ` : ''}Mỗi ngày cả hai cùng xong ít nhất 1 chặng thì ngọn lửa đôi cháy thêm 1 ngày.</p>
+        <p className="tp-phu">{lop ? `${nhanLop(lop)} · ` : ''}Mỗi ngày cả hai cùng làm đủ mức thì ngọn lửa đôi cháy thêm 1 ngày.</p>
       </div>
       <div className="cot-b">
         <section className="tp-the" aria-label="Học cùng là gì">
@@ -288,7 +288,7 @@ export function BaoGoCua({ tb, onHoc, onDong }: { tb: ThongBao; onHoc?: () => vo
   useHieuUng(() => { phanHoiThuong('goCua'); hoatAnh(ref.current, [{ transform: 'translate(-50%, 40px)', opacity: 0 }, { transform: 'translate(-50%, 0)', opacity: 1 }], 300) }, [])
   if (!ten) return null
   return <div ref={ref} className="tp-goc tp-toast" role="status">
-    <span>{tenGoi(ten)} gõ cửa: bạn đã học xong, chờ em 1 chặng để giữ lửa đôi.</span>
+    <span>{tenGoi(ten)} gõ cửa: bạn đã đủ mức, chờ em đủ mức để giữ lửa đôi.</span>
     {onHoc && <button type="button" className="tp-nut-chu" onClick={() => { onDong(); onHoc() }}>Học ngay</button>}
     <button type="button" className="tp-nut-chu" onClick={onDong}>Đóng</button>
   </div>

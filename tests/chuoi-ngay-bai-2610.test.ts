@@ -10,10 +10,10 @@ const hocCacNgay = (ds: string[], cau = CAU_MOT_BAI) => Object.fromEntries(ds.ma
 // 26/10/2026 là thứ Hai.
 describe('chuoiNgayCuaEm', () => {
   it('thứ Hai đầu tuần đúng', () => { expect(thuHaiCua('2026-10-26')).toBe('2026-10-26'); expect(thuHaiCua('2026-11-01')).toBe('2026-10-26') })
-  it('ngày đạt = xong ≥ 1 bài (≥ 6 câu); 5 câu không tính; tự sửa xong 1 câu thì tính', () => {
-    expect(chuoiNgayCuaEm(nk({ hoc: { '2026-10-27': 6, '2026-10-28': 6 } }), '2026-10-28').so).toBe(2)
-    expect(chuoiNgayCuaEm(nk({ hoc: { '2026-10-27': 6, '2026-10-28': 5 } }), '2026-10-28').so).toBe(1) // hôm nay chưa đủ ⇒ giữ tới hôm qua
-    expect(chuoiNgayCuaEm(nk({ hoc: { '2026-10-27': 6 }, tuSua: ['2026-10-28'] }), '2026-10-28').so).toBe(2)
+  it('(trước 28/10) ngày đạt = xong ≥ 1 bài (≥ 6 câu); 5 câu không tính; tự sửa xong 1 câu thì tính', () => {
+    expect(chuoiNgayCuaEm(nk({ hoc: { '2026-10-20': 6, '2026-10-21': 6 } }), '2026-10-21').so).toBe(2)
+    expect(chuoiNgayCuaEm(nk({ hoc: { '2026-10-20': 6, '2026-10-21': 5 } }), '2026-10-21').so).toBe(1) // hôm nay chưa đủ ⇒ giữ tới hôm qua
+    expect(chuoiNgayCuaEm(nk({ hoc: { '2026-10-20': 6 }, tuSua: ['2026-10-21'] }), '2026-10-21').so).toBe(2)
   })
   it('hôm nay chưa học ⇒ chuỗi giữ tới hôm qua, lịch hôm nay "cho"', () => {
     const r = chuoiNgayCuaEm(nk({ hoc: hocCacNgay(ngay('2026-10-26', 3)) }), '2026-10-29')

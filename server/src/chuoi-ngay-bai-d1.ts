@@ -6,7 +6,7 @@
 // Lượt 2–4 lỗi / bảng chưa có ⇒ coi như rỗng; lượt 1 lỗi ⇒ trả null (nơi gọi giữ số cũ, không bịa).
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
-import { chuoiNgayCuaEm, ngayVn, SO_NGAY_DOC, SQL_COT_BINH_MUA, type ChuoiNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
+import { chuoiNgayCuaEm, ngayVn, NGAY_CHUOI_DU_MUC, SO_NGAY_DOC, SQL_CAU_TINH_MUC, SQL_COT_BINH_MUA, type ChuoiNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 
 export const SQL_CHUOI_BINH = [
   'CREATE TABLE IF NOT EXISTS chuoi_binh_mua (id TEXT PRIMARY KEY, sbd TEXT NOT NULL, so INTEGER NOT NULL, nguon TEXT NOT NULL, luc TEXT NOT NULL)',
@@ -18,12 +18,15 @@ const rongNeuLoi = (p: Promise<{ results?: Row[] }>) => p.then((r) => r.results 
 
 export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Promise<NhatKyChuoi> {
   const homNay = ngayVn(nowMs), tu = lui(homNay, SO_NGAY_DOC), tuIso = `${lui(tu, 1)}T00:00:00Z`
-  const [sk, sua, phep, mua] = await Promise.all([
-    env.DB.prepare('SELECT ngay_vn AS n, COUNT(DISTINCT qid) AS c FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL GROUP BY ngay_vn')
-      .bind(sbd, tu, homNay).all<Row>(),
+  const [sk, sua, phep, mua, muc] = await Promise.all([
+    env.DB.prepare(`SELECT ngay_vn AS n, COUNT(DISTINCT qid) AS c, COUNT(DISTINCT CASE WHEN ngay_vn >= ? AND ${SQL_CAU_TINH_MUC} THEN qid END) AS c7
+        FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL GROUP BY ngay_vn`)
+      .bind(NGAY_CHUOI_DU_MUC, sbd, tu, homNay).all<Row>(),
     rongNeuLoi(env.DB.prepare("SELECT DISTINCT date(dong_luc, '+7 hours') AS n FROM chua_loi_dot WHERE sbd = ? AND trang_thai_day = 'da_tu_sua' AND dong_luc >= ?").bind(sbd, tuIso).all<Row>()),
     rongNeuLoi(env.DB.prepare("SELECT DISTINCT date(b.mo_luc, '+7 hours') AS n FROM buoi_hoc_diem_danh d JOIN buoi_hoc b ON b.id = d.buoi_id WHERE d.sbd = ? AND d.trang_thai = 'co_phep' AND b.mo_luc >= ?").bind(sbd, tuIso).all<Row>()),
     rongNeuLoi(env.DB.prepare(`SELECT ${SQL_COT_BINH_MUA} FROM chuoi_binh_mua m WHERE m.sbd = ? AND m.luc >= ? GROUP BY n`).bind(sbd, tuIso).all<Row>()),
+    // (28/10) mức câu đã chốt từng ngày — luật chuỗi «đủ mức hôm nay». Cùng đợt (song song), không thêm vòng chờ.
+    rongNeuLoi(env.DB.prepare('SELECT ngay AS n, muc AS m FROM goi_bai_7_muc_ngay WHERE sbd = ? AND ngay >= ? AND ngay <= ?').bind(sbd, NGAY_CHUOI_DU_MUC, homNay).all<Row>()),
   ])
   const ngay = (x: Row) => String(x.n ?? '')
   return {
@@ -31,6 +34,8 @@ export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Prom
     tuSua: new Set(sua.map(ngay).filter(Boolean)),
     phep: new Set(phep.map(ngay).filter(Boolean)),
     mua: new Map(mua.map((x) => [ngay(x), Number(x.s) || 0] as const)),
+    soCau7: new Map((sk.results ?? []).filter((x) => ngay(x) >= NGAY_CHUOI_DU_MUC).map((x) => [ngay(x), Number(x.c7) || 0] as const)),
+    muc: new Map(muc.filter((x) => Number(x.m) > 0).map((x) => [ngay(x), Number(x.m)] as const)),
     datLai: new Set(mua.filter((x) => Number(x.r) === 1).map(ngay).filter(Boolean)),
   }
 }

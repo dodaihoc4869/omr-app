@@ -3352,13 +3352,15 @@ const boXuLy = {
       // B2 (15/10): dựng lại bảng siêu dữ liệu câu tính sẵn cho tờ vừa lập chỉ mục (cau-meta.ts). Thường ngày không tờ nào lệch ⇒ một câu đọc nhẹ.
       await import('./cau-meta').then(m=>m.dongBoCauMeta(env,laGioCaoDiemVn(Date.now())?5:40)).catch(e=>console.error('[cau-meta] đồng bộ',e))
       // ĐO LẠI LƯỢT CŨ (21/10): lấp dần bảng kích thước đề từng câu (`cau_doc_giay`) — cao điểm chỉ 20 câu/phút, ngoài cao điểm 120; xong hết thì một câu đọc nhẹ.
-      await import('./cau-doc-giay').then(m=>m.dongBoCauDocGiay(env,laGioCaoDiemVn(Date.now())?10:120)).catch(e=>console.error('[cau-doc-giay] đồng bộ',e))
+      // KHUNG HỌC 18:00–23:59 VN (thầy 27/10 «tức thì mọi khung giờ»; đo Analytics 19–23h: D1 bận 20 % thời gian, lệnh em chờ ~1,3 s/đợt): việc LẤP DẦN này
+      // không ai chờ ⇒ nghỉ cả khung, chạy bù ngoài giờ (120 câu/phút).
+      if(!laKhungHocVn(Date.now()))await import('./cau-doc-giay').then(m=>m.dongBoCauDocGiay(env,120)).catch(e=>console.error('[cau-doc-giay] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
       if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)
       // Ngoài cao điểm, chuẩn bị nguồn cho từng ít em trước khi các em mở app.
       const gioVn=new Date(Date.now()+7*3600000).getUTCHours()
-      if(gioVn<20)await import('./hanh-trinh-nguon-cau').then(m=>m.chuanBiNguonCau(env,Date.now())).catch(async()=>{await ghiLoiMay(env,'hanh_trinh_nguon_cau')})
+      if(gioVn<18)await import('./hanh-trinh-nguon-cau').then(m=>m.chuanBiNguonCau(env,Date.now())).catch(async()=>{await ghiLoiMay(env,'hanh_trinh_nguon_cau')})
       // MÁY SOẠN LỜI GIẢI SƠ ĐỒ (27/10, may-soan-cron.ts): cờ `cau_hinh.may_soan_so_do` tắt ⇒ một câu đọc có đệm rồi về. Bật ⇒ một lô nhỏ có khoá chạy,
       // chạy NỀN (waitUntil) để không giữ chân các việc cron phía sau (thông báo, nhắc bài). Phải đứng TRƯỚC dòng `return` dưới. Lỗi chỉ ghi log.
       {const p=import('./may-soan-cron').then(m=>m.chayMaySoanCron(env,Date.now())).then(r=>{if(r.chay)console.log('[may-soan] cron',JSON.stringify(r))}).catch(e=>console.error('[may-soan] cron lỗi:',e))
@@ -3666,9 +3668,14 @@ const boXuLy = {
       if (p === '/hs/ke-hoach-ngay') {
         // DỒN LƯỢT + ĐỆM 20 GIÂY theo em (dem-ke-hoach.ts; Boss 21/09): lượt đệm KHÔNG ghi gì; em có ghi thì đệm bị xoá ngay. `thanThu` luôn đọc tươi.
         let sbdKhoa = ''
-        try { sbdKhoa = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
+        // NHANH 27/10 (thầy «nhanh hơn app cũ mọi chỗ»): lịch Kiểm tra ôn tập (CHỈ ĐỌC) bắt đầu CÙNG đợt lượt đọc mật khẩu khi token đã qua kiểm chữ ký — trước: một đợt D1
+        // nối tiếp riêng sau xác thực. Kết quả/lỗi chỉ dùng ở đúng chỗ `await` cũ.
+        const ktMod = import('./kiem-tra-ca-nhan')
+        let ktSom: { sbd: string; p: Promise<Awaited<ReturnType<Awaited<typeof ktMod>['docKtCn']>>> } | null = null
+        try { sbdKhoa = b.token ? await gameIdentity(env, b, (s) => { const p = ktMod.then((m) => m.docKtCn(env, s, Date.now(), true)); p.catch(() => {}); ktSom = { sbd: s, p } }) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
         if (!sbdKhoa || sbdKhoa.length > 40) return themMocReset(env, ra(await dungKeHoachEm(env, b)))
-        const kt=await import('./kiem-tra-ca-nhan'), baiKt=await kt.docKtCn(env,sbdKhoa,Date.now(),true)
+        const som = ktSom as { sbd: string; p: Promise<Awaited<ReturnType<Awaited<typeof ktMod>['docKtCn']>>> } | null
+        const kt=await ktMod, baiKt=await (som && som.sbd === sbdKhoa ? som.p : kt.docKtCn(env,sbdKhoa,Date.now(),true))
         if(kt.laNgayKt(baiKt,Date.now())){
           const tt=kt.tomTatKt(baiKt!,Date.now())
           if(kt.coHocNgayKt(baiKt)){const g=await import('./goi-bai-7'),dem=await g.demHomNay7(env,sbdKhoa,Date.now()),lam=Number(dem.daLamHomNay);return themMocReset(env,ra({ok:true,cheDoNgay:'goi7',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:12,toiThieuCau:12},tienBo:{daLamCau:lam,toiThieuCau:12,conThieu:Math.max(0,12-lam),dat:lam>=12}}))}
@@ -3723,7 +3730,12 @@ const boXuLy = {
       if (p === '/hs/chua-cau-sai/danh-sach') return raChua(await chuaDanhSach(env,b))
       // 27/10 khoá theo Kiểm tra ôn tập: đang có bài kiểm tra hôm nay chưa nộp ⇒ chưa mở đợt Tự sửa lỗi (giao diện cũng khoá nút).
       if (p === '/hs/chua-cau-sai/mo-dot') {
-        const kt = await import('./kiem-tra-ca-nhan'), sbd = await gameIdentity(env, b), khoa = kt.ktDangKhoaChang(await kt.docKtCn(env, sbd, Date.now(), true), Date.now())
+        // NHANH 27/10: lịch Kiểm tra ôn tập đọc CÙNG đợt lượt đọc mật khẩu (như /hs/ke-hoach-ngay ở trên).
+        const kt = await import('./kiem-tra-ca-nhan')
+        let ktSom: { sbd: string; p: ReturnType<typeof kt.docKtCn> } | null = null
+        const sbd = await gameIdentity(env, b, (s) => { const p = kt.docKtCn(env, s, Date.now(), true); p.catch(() => {}); ktSom = { sbd: s, p } })
+        const somKt = ktSom as { sbd: string; p: ReturnType<typeof kt.docKtCn> } | null
+        const khoa = kt.ktDangKhoaChang(await (somKt && somKt.sbd === sbd ? somKt.p : kt.docKtCn(env, sbd, Date.now(), true)), Date.now())
         if (khoa) return ra({ ok: false, ma: kt.MA_KHOA_KT, error: kt.CHU_KHOA_KT, kiemTraCaNhan: khoa }, 409)
         // 27/10 tốc độ (thầy: «sửa lỗi chỗ mở câu phải tức thì»): `gon:true` (CHỈ-THÊM) ⇒ mở đợt XONG thì mở luôn bản làm lại (gon-mo) trong CÙNG lượt,
         // trả ở trường `gon` (đúng thân lệnh gon-mo, kèm `status`) — máy em khỏi gọi gon-mo nối tiếp. Không có cờ ⇒ y như cũ.
@@ -4052,6 +4064,10 @@ const boXuLy = {
 }
 
 /** Khung CAO ĐIỂM học sinh làm bài: 20:00–23:59 giờ VN (= 13:00–16:59 UTC). */
+/** KHUNG HỌC 18:00–23:59 giờ VN (thầy 27/10 «App phải tức thì ở mọi khung giờ»): việc nền không ai chờ (lấp dần, soạn trước, chuẩn bị nguồn) nghỉ cả khung. */
+export function laKhungHocVn(nowMs: number): boolean {
+  return new Date(nowMs + 7 * 3_600_000).getUTCHours() >= 18
+}
 export function laGioCaoDiemVn(nowMs: number): boolean {
   const gio = new Date(nowMs + 7 * 3_600_000).getUTCHours()
   return gio >= 20 && gio <= 23

@@ -9,6 +9,7 @@ import { chuViecBai } from './chu-viec-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
+import type { Props as PropsHomNayCu } from './HocTapHomNay'
 import { ngayGon, useDiemDanhHs } from '../diem-danh/TheDiemDanhHs'
 import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
 import { Bi, type CamBi } from '../linh-vat/Bi'
@@ -358,6 +359,65 @@ function OTo({ ten, mo, sac, Icon, so, noi, onClick, tat }: { ten: string; mo: s
 /** HÔM NAY kiểu Duolingo + chất Hoá (bản vẽ ve-moi/dm-*.html, thầy chốt 26/10): ba mục của menu dọc — Lộ trình (con đường chặng: học → Kiểm tra ôn tập →
  *  Tự sửa lỗi → Bài tập về nhà, ĐÚNG thứ tự việc của «Một trang») · Luyện tập (mỗi việc một ô to có số) · Thành tích (chuỗi ngày, tuần này, việc tiếp, huy hiệu
  *  từ số sẵn có). Cùng số, cùng lệnh, cùng nút như bản trước; ô nào app chưa có số rẻ thì giữ nhãn, bỏ số. */
+/** Chu kỳ tự kiểm lại công tắc tạm đóng (thầy mở lại ⇒ máy em tự vào trong vòng 1 phút). */
+export const TAM_DONG_KIEM_MS = 60_000
+/**
+ * MÀN PHỦ TẠM ĐÓNG APP (thầy 27/10 tối, chữ thầy chốt NGUYÊN VĂN). Phủ cả Lộ trình khi `/hs/thuong` báo `tamDong`; tự đọc lại mỗi 60 giây và khi em quay lại
+ * thẻ ⇒ thầy mở lại là tự vào. Màn làm kiểm tra / ca thi KHÔNG nằm trong Lộ trình nên không bị phủ; còn bài kiểm tra dở / ca đang mở ⇒ nút vào nộp tiếp.
+ */
+export function PhuTamDong(p: { onKiemLai: () => void; kiemDo?: () => void; caMo?: () => void }) {
+  const { onKiemLai } = p
+  useEffect(() => {
+    const t = window.setInterval(onKiemLai, TAM_DONG_KIEM_MS)
+    const nhin = () => { if (document.visibilityState === 'visible') onKiemLai() }
+    document.addEventListener('visibilitychange', nhin)
+    return () => { window.clearInterval(t); document.removeEventListener('visibilitychange', nhin) }
+  }, [onKiemLai])
+  // Phủ CẢ trang (gồm menu bên) ⇒ vẽ ra body; Lộ trình bị che bởi tấm khác (kiểm tra / ca thi / chặng: cổng đặt `inert` lên Lộ trình) ⇒ ẩn để em nộp cho xong.
+  const moc = useRef<HTMLSpanElement>(null)
+  const [biChe, datBiChe] = useState(false)
+  useLayoutEffect(() => {
+    const xet = () => datBiChe(!!moc.current?.closest('[inert]'))
+    xet()
+    const mo = typeof MutationObserver === 'function' ? new MutationObserver(xet) : null
+    mo?.observe(document.body, { attributes: true, attributeFilter: ['inert'], subtree: true })
+    return () => mo?.disconnect()
+  }, [])
+  return <><span ref={moc} hidden />{!biChe && createPortal(<div className="tdg-phu" role="dialog" aria-modal="true" aria-labelledby="tdg-tieu" data-vung="tam-dong">
+    <div className="tdg-the">
+      <Bi cam="ngu" size={120} />
+      <h1 id="tdg-tieu">App đang bảo trì.</h1>
+      <p>Tối nay các em không phải làm.<br />Ngày mai vào làm bình thường.</p>
+      {p.caMo && <button type="button" className="tdg-nut" onClick={p.caMo}>Vào ca kiểm tra</button>}
+      {p.kiemDo && <button type="button" className="tdg-nut" onClick={p.kiemDo}>Làm tiếp Kiểm tra ôn tập</button>}
+    </div>
+  </div>, document.body)}</>
+}
+
+/**
+ * GIAO DIỆN CŨ (ddh.trong = 'tat') cũng phải đóng: Hôm nay cũ nạp lười mảnh này, tự đọc /hs/thuong (lúc mở + khi em quay lại thẻ); `tamDong` ⇒ ÉP «Trong»
+ * (gắn `<html data-trong>` để màn phủ đúng màu --tr-*) rồi phủ y như Lộ trình; thầy mở lại ⇒ gỡ thuộc tính, trả giao diện cũ nguyên vẹn.
+ */
+export default function GacTamDong({ p, kiem }: { p: PropsHomNayCu; kiem?: TomTatKiemTra }) {
+  const t = useTongQuan(p.token)
+  const dong = !!t.du?.tamDong
+  const { thuLai } = t
+  useEffect(() => {
+    if (dong) return // đang phủ: PhuTamDong tự đọc lại
+    const nhin = () => { if (document.visibilityState === 'visible') thuLai() }
+    document.addEventListener('visibilitychange', nhin)
+    return () => document.removeEventListener('visibilitychange', nhin)
+  }, [dong, thuLai])
+  useLayoutEffect(() => {
+    const h = document.documentElement
+    if (!dong || h.dataset.trong) return
+    h.dataset.trong = 'hs'
+    return () => { delete h.dataset.trong }
+  }, [dong])
+  return dong ? <PhuTamDong onKiemLai={thuLai} caMo={p.coCa ? p.onThi : undefined}
+    kiemDo={!p.coCa && kiem?.homNay && kiem.nopLuc === null && kiem.trangThai === 'can_lam' && kiem.daTra > 0 ? p.onKiemTra : undefined} /> : null
+}
+
 export function MotTrangHs(p: PropsMotTrang) {
   const so = p.so, kiem = p.kiem, hs = p.hs
   // THẺ BÀI GHIM (thầy 27/10: «ghim phần bài 8 amine lại»): dính ngay dưới hàng bộ đếm (đo chiều cao thật của hàng — ngang thấp khác dọc); vạch mốc
@@ -400,9 +460,9 @@ export function MotTrangHs(p: PropsMotTrang) {
   const tq = tqTai.du
   const coThuong = !!p.token && (!!tq || tqTai.tai)
   const chuoi = tq?.chuoiNgay?.so ?? nhip?.chuoiDuGanNhat ?? 0
-  // Boss 27/10 (Q2): có chuỗi theo luật mới (≥ 1 chặng/ngày) ⇒ mọi dòng chuỗi nói ĐÚNG luật đó; «đủ mức» là MỤC TIÊU NGÀY, ghi tách riêng.
+  // Thầy 27/10 (luật 28/10): chuỗi giữ khi LÀM ĐỦ MỨC HÔM NAY (cùng thước đo vòng «Đủ mức») ⇒ dòng chuỗi nói đúng luật đó.
   const giuHomNay = !!tq?.chuoiNgay && tq.chuoiNgay.lich7.some((x) => x.ngay.slice(0, 10) === ngayVn(Date.now()) && x.kieu === 'hoc')
-  const chuLuatChuoi = giuHomNay ? 'hôm nay đã giữ chuỗi' : 'mỗi ngày xong ít nhất 1 chặng để giữ chuỗi'
+  const chuLuatChuoi = giuHomNay ? 'hôm nay đã giữ chuỗi' : 'mỗi ngày làm đủ mức hôm nay để giữ chuỗi'
   const [tp, setTp] = useState<{ man: TenManThuong; hieuUng?: 'chuoi' } | null>(null)
   const coBen = useCoBen()
   const choSo = useChoSo(coThuong)
@@ -463,6 +523,8 @@ export function MotTrangHs(p: PropsMotTrang) {
     {so && <span data-sac="dung" aria-label={`${so.daLam}/${so.muc} câu hôm nay`}>{du ? <CheckCircle2 size={22} aria-hidden="true" /> : <Target size={22} aria-hidden="true" />}{so.daLam}/{so.muc}</span>}
     </>
   </header>
+  // Thầy tạm đóng app (27/10): phủ cả Lộ trình; còn ca đang mở / bài kiểm tra dở ⇒ nút vào nộp cho xong (máy chủ không chặn các lệnh ấy).
+  if (tq?.tamDong) return <PhuTamDong onKiemLai={tqTai.thuLai} caMo={p.coCa ? p.onThi : undefined} kiemDo={!p.coCa && kiemLam && kiem!.daTra > 0 && p.onKiemTra ? p.onKiemTra : undefined} />
   // Một màn thưởng phạt đang mở (bấm bộ đếm / thẻ bên / ô Thành tích): thay nội dung mục, thanh trên + menu giữ nguyên; «Quay lại» về mục cũ.
   if (tp && p.token) return <div className="dm-khung" data-muc="thuong" data-so-menu={coThuong || undefined}>{tren}<main className="tp-cam">
     <Suspense fallback={<div className="tp-cam-cho" role="status" aria-busy="true" aria-label="Đang mở" />}>

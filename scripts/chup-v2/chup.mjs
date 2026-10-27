@@ -377,6 +377,7 @@ const DS_GT = ['nb', 'th', 'vd', 'vdc'].flatMap((m) => ['light', 'dark'].flatMap
 const TPC_CANH = [
   ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['menu', 'hs-mot&tp=1', /Ester/, 'mo-menu'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'nut:Chuỗi 12 ngày'],
   ['nhiem-vu', 'hs-mot&tp=1', /Ester/, 'nut:147 nguyên tử hôm nay'], ['cua-hang', 'hs-mot&tp=1', /Ester/, 'nut:245 tinh thể'],
+  ['tam-dong', 'hs-mot&tp=1&v=tam-dong', /App đang bảo trì/], // 27/10: thầy tạm đóng app học sinh (màn phủ)
   ['lam-dung', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Kiểm tra$'], ['lam-sai', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
   ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
 ]
@@ -612,6 +613,8 @@ const VIEN_CANH = [
   ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['giai', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Giải tuần'],
   ['ban', 'hs-mot&tp=1&ten=dai', /Ester/, 'ton:menu:Thành tích » nut:Học cùng bạn'], ['kim-cuong', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
   ['luyen', 'hs-mot&tp=1', /Ester/, 'menu:Luyện tập'],
+  // 27/10 thầy gửi ảnh «Nhiệm vụ hôm nay» bị bóp (lề viên cũ): mở từ cột số trong menu — rương đã mở / chưa mở
+  ['nhiem-vu', 'hs-mot&tp=1&v=nv-mo', /Ester/, 'menu6:147 nguyên tử hôm nay'], ['nhiem-vu-chua', 'hs-mot&tp=1', /Ester/, 'menu6:147 nguyên tử hôm nay'],
   ['lam-cau', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B'], // màn làm câu: không số nào nổi
 ]
 const VIEN_KHO = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']]

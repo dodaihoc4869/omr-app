@@ -283,13 +283,16 @@ describe('tự sửa đáp án và giờ cao điểm', () => {
     expect(s.goi[1]!.tuSuaDapAn).toBe(true)
   })
 
-  it('giờ cao điểm 19–24h VN: không có cờ gioCaoDiem ⇒ không chạy; có ⇒ chạy 1 câu song song', async () => {
+  // 27/10 (Boss, thầy «app tức thì mọi khung giờ»): khung học 18:00–23:59 VN máy soạn NGHỈ hẳn — cờ `gioCaoDiem` không còn mở được (máy soạn ghi D1
+  // liên tục, tranh hàng với lệnh của em). 17:59 vẫn chạy.
+  it('khung học 18–24h VN: không chạy, kể cả khi có cờ gioCaoDiem; 17:59 vẫn chạy', async () => {
     datCo({ bat: true })
     const s = soanGia(() => tra({ ok: true, xong: false, conTro: 'DE|q1', dem: { dat: 1 }, ketQua: ketDat(1) }))
     expect(await chayMaySoanCron(env, CAO_DIEM, { soanLo: s.fn })).toMatchObject({ chay: false, lyDo: 'gio_cao_diem' })
-    expect(s.goi).toHaveLength(0)
     datCo({ bat: true, gioCaoDiem: true })
-    expect(await chayMaySoanCron(env, CAO_DIEM, { soanLo: s.fn })).toMatchObject({ chay: true })
-    expect(s.goi[0]).toMatchObject({ songSong: 1, choChayGioCaoDiem: true })
+    expect(await chayMaySoanCron(env, CAO_DIEM, { soanLo: s.fn })).toMatchObject({ chay: false, lyDo: 'gio_cao_diem' })
+    expect(await chayMaySoanCron(env, Date.parse('2026-10-27T11:00:00Z'), { soanLo: s.fn })).toMatchObject({ chay: false, lyDo: 'gio_cao_diem' }) // 18:00 VN
+    expect(s.goi).toHaveLength(0)
+    expect(await chayMaySoanCron(env, Date.parse('2026-10-27T10:59:00Z'), { soanLo: s.fn })).toMatchObject({ chay: true }) // 17:59 VN
   })
 })

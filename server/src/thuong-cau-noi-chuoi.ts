@@ -6,8 +6,9 @@
 //   · «ngày có học» / «ngày được đỡ» (thăng hoa, cược) dùng ĐÚNG định nghĩa B3: ≥ CAU_MOT_BAI câu khác nhau có kết quả trong ngày VN hoặc tự sửa xong;
 //     được đỡ = vắng có phép (chỉ ngày trước 27/10), bình đã dùng, ngày đã cứu.
 import type { Env } from './kieu'
-import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn, phepConGiuChuoi, type ChuoiNgay as ChuoiNgayB3 } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SQL_CAU_TINH_MUC, type ChuoiNgay as ChuoiNgayB3 } from './chuoi-ngay-bai'
 import { chuoiBaiNeuBat, congBinh, docNhatKyChuoi } from './chuoi-ngay-bai-d1'
+import { ngayBaoTriTrong } from './ngay-bao-tri'
 
 /** Trường dùng chung §4.3 (B3 trả; thêm 'cuu' | 'cho' theo hợp đồng docs/hop-dong-duolingo-2610.md mục 4). */
 export type ChuoiNgay = ChuoiNgayB3
@@ -22,8 +23,8 @@ export interface CauNoiChuoi {
   docChuoiNgay(env: Env, sbd: string, nowMs: number, thang?: boolean): Promise<ChuoiNgay | null>
   /** Cộng 1 bình giữ chuỗi (đã trừ tinh thể ở nơi gọi). `id` chống trùng. */
   congBinh(env: Env, sbd: string, id: string, nowMs: number): Promise<boolean>
-  /** Ngày VN CÓ HỌC (định nghĩa B3) của các em trong [tu, den]. */
-  docNgayCoHoc(env: Env, ds: readonly string[], tu: string, den: string): Promise<Map<string, Set<string>>>
+  /** Ngày VN CÓ HỌC (≥ 1 chặng) của các em trong [tu, den]. `duMuc` (28/10, cược chuỗi) ⇒ ngày GIỮ CHUỖI theo luật mới: từ NGAY_CHUOI_DU_MUC phải đủ mức. */
+  docNgayCoHoc(env: Env, ds: readonly string[], tu: string, den: string, duMuc?: boolean): Promise<Map<string, Set<string>>>
   /** Ngày được ĐỠ (vắng có phép, bình đã dùng, ngày đã cứu) — thăng hoa không phạt ngày ấy. */
   docNgayDuocDo(env: Env, ds: readonly string[], tu: string, den: string, nowMs: number): Promise<Map<string, Set<string>>>
   /** Ngày vắng CÓ PHÉP — cược chuỗi không thua vì ngày ấy (bình thì vẫn thua, LUAT «Cược chuỗi»). */
@@ -37,12 +38,15 @@ const gom = (...ds: readonly Dong[][]): Map<string, Set<string>> => {
   return m
 }
 const rongNeuLoi = (p: Promise<{ results?: Dong[] }>): Promise<Dong[]> => p.then((r) => r.results ?? [], () => [])
+const congNgayCN = (ngay: string, n: number) => new Date(Date.parse(`${ngay}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10)
 const dauNgayIso = (ngay: string) => new Date(Date.parse(`${ngay}T00:00:00+07:00`)).toISOString()
 const cuoiNgayIso = (ngay: string) => new Date(Date.parse(`${ngay}T00:00:00+07:00`) + 86_400_000).toISOString()
 
 /** Vắng có phép theo ngày VN của buổi (đúng câu B3, chạy cho cả lô em). Luật 27/10: chỉ ngày TRƯỚC mốc còn giữ chuỗi ⇒ ngày từ mốc bỏ. */
 function docPhep(env: Env, ds: readonly string[], tu: string, den: string): Promise<Dong[]> {
-  return docPhepTho(env, ds, tu, den).then((r) => r.filter((x) => phepConGiuChuoi(String(x.ngay))))
+  // + ngày bảo trì (ngay-bao-tri.ts): mọi em được đỡ ngày đó (thăng hoa không phạt, cược không thua).
+  const baoTri = ngayBaoTriTrong(tu, den).flatMap((ngay) => ds.map((sbd) => ({ sbd, ngay })))
+  return docPhepTho(env, ds, tu, den).then((r) => [...r.filter((x) => phepConGiuChuoi(String(x.ngay))), ...baoTri])
 }
 function docPhepTho(env: Env, ds: readonly string[], tu: string, den: string): Promise<Dong[]> {
   return rongNeuLoi(env.DB.prepare(`SELECT DISTINCT d.sbd AS sbd, date(b.mo_luc, '+7 hours') AS ngay FROM buoi_hoc_diem_danh d JOIN buoi_hoc b ON b.id = d.buoi_id
@@ -52,13 +56,19 @@ function docPhepTho(env: Env, ds: readonly string[], tu: string, den: string): P
 const B3: CauNoiChuoi = {
   docChuoiNgay: (env, sbd, nowMs, thang) => chuoiBaiNeuBat(env, sbd, nowMs, env, !!thang),
   congBinh: (env, sbd, id, nowMs) => congBinh(env, sbd, 1, 'tinh_the', id, nowMs),
-  async docNgayCoHoc(env, ds, tu, den) {
+  async docNgayCoHoc(env, ds, tu, den, duMuc) {
     if (!ds.length) return new Map()
     const [a, b] = await Promise.all([
-      rongNeuLoi(env.DB.prepare(`SELECT sbd, ngay_vn AS ngay FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL
-          GROUP BY sbd, ngay_vn HAVING COUNT(DISTINCT qid) >= ?`).bind(JSON.stringify(ds), tu, den, CAU_MOT_BAI).all<Dong>()),
-      rongNeuLoi(env.DB.prepare(`SELECT DISTINCT sbd, date(dong_luc, '+7 hours') AS ngay FROM chua_loi_dot WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai_day = 'da_tu_sua'
-          AND dong_luc >= ? AND dong_luc < ?`).bind(JSON.stringify(ds), dauNgayIso(tu), cuoiNgayIso(den)).all<Dong>()),
+      rongNeuLoi(env.DB.prepare(duMuc
+        ? `SELECT sbd, ngay_vn AS ngay FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn >= ?2 AND ngay_vn <= ?3 AND ket_qua IS NOT NULL
+            GROUP BY sbd, ngay_vn HAVING (ngay_vn < '${NGAY_CHUOI_DU_MUC}' AND COUNT(DISTINCT qid) >= ?4)
+              OR (ngay_vn >= '${NGAY_CHUOI_DU_MUC}' AND COUNT(DISTINCT CASE WHEN ${SQL_CAU_TINH_MUC} THEN qid END)
+                  >= COALESCE((SELECT g.muc FROM goi_bai_7_muc_ngay g WHERE g.sbd = su_kien_hoc.sbd AND g.ngay = su_kien_hoc.ngay_vn AND g.muc > 0), ?4))`
+        : `SELECT sbd, ngay_vn AS ngay FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn >= ?2 AND ngay_vn <= ?3 AND ket_qua IS NOT NULL
+            GROUP BY sbd, ngay_vn HAVING COUNT(DISTINCT qid) >= ?4`).bind(JSON.stringify(ds), tu, den, CAU_MOT_BAI).all<Dong>()),
+      // Tự sửa xong: chỉ còn giữ chuỗi ở ngày TRƯỚC 28/10 khi `duMuc`.
+      duMuc && tu >= NGAY_CHUOI_DU_MUC ? Promise.resolve([] as Dong[]) : rongNeuLoi(env.DB.prepare(`SELECT DISTINCT sbd, date(dong_luc, '+7 hours') AS ngay FROM chua_loi_dot WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai_day = 'da_tu_sua'
+          AND dong_luc >= ? AND dong_luc < ?`).bind(JSON.stringify(ds), dauNgayIso(tu), cuoiNgayIso(duMuc && den >= NGAY_CHUOI_DU_MUC ? congNgayCN(NGAY_CHUOI_DU_MUC, -1) : den)).all<Dong>()),
     ])
     return gom(a, b)
   },

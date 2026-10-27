@@ -1,0 +1,59 @@
+# CÔNG TẮC TẠM ĐÓNG APP HỌC SINH (thầy 27/10 tối: «Tắt app, để tối ưu xong rồi mở lại cho tôi»). Ghi MỘT dòng cấu hình `cau_hinh.hs_tam_dong`
+# (UPSERT theo khoá) — không đụng dữ liệu học sinh, không đổi schema:
+#   · bat = ĐÓNG: Lộ trình app học sinh phủ «App đang bảo trì» (máy đang mở tự đọc lại mỗi 60 giây). Bài kiểm tra / ca thi đang làm vẫn nộp được.
+#   · tat = MỞ lại: máy các em tự vào lại trong vòng 1 phút.
+#   · cho_phep (tuỳ chọn) ⇒ `cau_hinh.hs_tam_dong_cho_phep`: các SBD vẫn vào học được khi đang đóng (thầy thử trước). «xoa» ⇒ xoá danh sách.
+# Cũng bật / tắt được ở app thầy: Thi đua tuần → dòng «Tạm đóng app học sinh». In lại giá trị sau khi ghi (không in bí mật).
+name: Công tắc tạm đóng app học sinh
+on:
+  workflow_dispatch:
+    inputs:
+      trang_thai:
+        description: 'bat = ĐÓNG app học sinh · tat = MỞ lại'
+        required: true
+        type: choice
+        options: [bat, tat]
+      cho_phep:
+        description: 'Tuỳ chọn: SBD vẫn được vào khi đang đóng, cách nhau dấu phẩy (vd 12121212,12345678). Ghi «xoa» để xoá danh sách. Để trống = giữ nguyên.'
+        required: false
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: cong-tac-tam-dong-hs
+  cancel-in-progress: false
+jobs:
+  ghi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Ghi công tắc rồi đọc lại
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          G: ${{ inputs.trang_thai }}
+          CP: ${{ inputs.cho_phep }}
+        run: |
+          case "$G" in bat|tat) ;; *) echo "Giá trị lạ: chỉ nhận bat / tat"; exit 1 ;; esac
+          # Danh sách SBD: chỉ chữ / số / _ / - / dấu phẩy / khoảng trắng (chặn chèn SQL); bỏ khoảng trắng, bỏ mục rỗng.
+          if [ -n "$CP" ]; then
+            printf '%s' "$CP" | grep -Eq '^[A-Za-z0-9_, -]+$' || { echo "cho_phep lạ: chỉ nhận SBD cách nhau dấu phẩy"; exit 1; }
+            DS=$(printf '%s' "$CP" | tr -d ' ' | tr ',' '\n' | grep -v '^$' | paste -sd, -)
+            [ "$DS" = "xoa" ] && DS=''  # «xoa» ⇒ danh sách rỗng (ghi đè dòng cấu hình, không xoá dòng)
+            npx -y wrangler@4 d1 execute omr --remote --json --command "INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('hs_tam_dong_cho_phep', '$DS', strftime('%Y-%m-%dT%H:%M:%fZ','now')) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc;" > /dev/null
+            echo "đã ghi danh sách được vào: ${DS:-(rỗng)}"
+          fi
+          NAY="strftime('%Y-%m-%dT%H:%M:%fZ','now')"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('hs_tam_dong', '$G', $NAY) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc;" > /tmp/ghi.json
+          python3 -c "import json;d=json.load(open('/tmp/ghi.json'));print('ghi:', [x.get('success') for x in d])"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN ('hs_tam_dong', 'hs_tam_dong_cho_phep') ORDER BY khoa" > /tmp/doc.json
+          python3 -c "import json,sys;d=json.load(open('/tmp/doc.json'));rs=d[0].get('results') or [];[print('đọc lại:', r) for r in rs];r={x['khoa']:x for x in rs}.get('hs_tam_dong',{});sys.exit(0 if r.get('gia_tri')=='$G' else 1)"
+          echo "### Tạm đóng app học sinh: $G ($( [ "$G" = bat ] && echo 'ĐANG ĐÓNG' || echo 'ĐANG MỞ' ))" >> "$GITHUB_STEP_SUMMARY"

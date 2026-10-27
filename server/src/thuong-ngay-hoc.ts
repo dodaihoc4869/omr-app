@@ -7,8 +7,9 @@
 // dựng `NhatKyChuoi` từng em và gọi đúng hàm thuần của B3 ⇒ số giống hệt màn học sinh (cửa sổ đọc ≤ SO_NGAY_DOC của B3).
 import type { D1PreparedStatement, Env } from './kieu'
 import { themNgay } from './ho-so-nam-kt'
-import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn as ngayVnMs, phepConGiuChuoi, SO_NGAY_DOC, SQL_COT_BINH_MUA, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayDatChuoi, ngayVn as ngayVnMs, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SO_NGAY_DOC, SQL_CAU_TINH_MUC, SQL_COT_BINH_MUA, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 import { str, num, type Row } from './thuong-b-chung'
+import { laNgayBaoTri } from './ngay-bao-tri'
 
 export { CAU_MOT_BAI, type KieuNgay }
 /** Cửa sổ đọc khi đọc CẢ LỚP / cron (ngày). Một em (phụ huynh) đọc đủ SO_NGAY_DOC như B3. */
@@ -21,7 +22,11 @@ export const laNgayDo = (k: KieuNgay): boolean => k === 'phep' || k === 'binh' |
 export const TAP_EM_JSON = '(SELECT value FROM json_each(?1))'
 /** Câu khác nhau có kết quả theo (em, ngày VN) — đúng câu đếm của B3. `?2..?3` = khoảng ngày. Chỉ mục idx_skh_em_ngay_qid(sbd, ngay_vn, qid, ket_qua). */
 export const sqlSoCau = (tapEm: string = TAP_EM_JSON): string =>
-  `SELECT sbd, ngay_vn AS n, COUNT(DISTINCT qid) AS c FROM su_kien_hoc WHERE sbd IN ${tapEm} AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL GROUP BY sbd, ngay_vn`
+  // (28/10) + c7 = câu tính MỨC (đúng tập Gói 7) · m = mức câu đã chốt của ngày — luật chuỗi «đủ mức hôm nay» (chỉ ngày từ NGAY_CHUOI_DU_MUC).
+  `SELECT sbd, ngay_vn AS n, COUNT(DISTINCT qid) AS c,
+      COUNT(DISTINCT CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' AND ${SQL_CAU_TINH_MUC} THEN qid END) AS c7,
+      CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' THEN (SELECT g.muc FROM goi_bai_7_muc_ngay g WHERE g.sbd = su_kien_hoc.sbd AND g.ngay = su_kien_hoc.ngay_vn) END AS m
+    FROM su_kien_hoc WHERE sbd IN ${tapEm} AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL GROUP BY sbd, ngay_vn`
 /** Ngày tự sửa xong (B3). `?2` = ngày đầu cửa sổ. Chỉ mục idx_cld_sbd_trang_thai(sbd, trang_thai_day, …). */
 export const sqlTuSua = (tapEm: string = TAP_EM_JSON): string =>
   `SELECT DISTINCT sbd, date(dong_luc, '+7 hours') AS n FROM chua_loi_dot WHERE sbd IN ${tapEm} AND trang_thai_day = 'da_tu_sua' AND dong_luc >= ?2`
@@ -46,16 +51,20 @@ export function cauNhatKy(env: Env, tapEm: string, thamSo1: string, tu: string, 
 export const cauNhatKyDs = (env: Env, dsSbd: readonly string[], tu: string, den: string): D1PreparedStatement[] =>
   cauNhatKy(env, TAP_EM_JSON, JSON.stringify([...new Set(dsSbd)]), tu, den)
 
-type NhatKyGhi = { soCau: Map<string, number>; tuSua: Set<string>; phep: Set<string>; mua: Map<string, number>; datLai: Set<string> }
+type NhatKyGhi = { soCau: Map<string, number>; tuSua: Set<string>; phep: Set<string>; mua: Map<string, number>; datLai: Set<string>; soCau7: Map<string, number>; muc: Map<string, number> }
 /** Gộp kết quả bốn câu ⇒ sbd → NhatKyChuoi (đúng kiểu của B3). */
 export function gopNhatKy(rSo: Row[] | undefined, rSua: Row[] | undefined, rPhep: Row[] | undefined, rMua: Row[] | undefined): Map<string, NhatKyChuoi> {
   const ra = new Map<string, NhatKyGhi>()
   const lay = (sbd: string): NhatKyGhi => {
     let m = ra.get(sbd)
-    if (!m) ra.set(sbd, (m = { soCau: new Map(), tuSua: new Set(), phep: new Set(), mua: new Map(), datLai: new Set() }))
+    if (!m) ra.set(sbd, (m = { soCau: new Map(), tuSua: new Set(), phep: new Set(), mua: new Map(), datLai: new Set(), soCau7: new Map(), muc: new Map() }))
     return m
   }
-  for (const x of rSo ?? []) lay(str(x.sbd)).soCau.set(str(x.n), num(x.c))
+  for (const x of rSo ?? []) {
+    const m = lay(str(x.sbd)), n = str(x.n)
+    m.soCau.set(n, num(x.c))
+    if (n >= NGAY_CHUOI_DU_MUC) { m.soCau7.set(n, num(x.c7)); if (num(x.m) > 0) m.muc.set(n, num(x.m)) }
+  }
   for (const x of rSua ?? []) if (str(x.n)) lay(str(x.sbd)).tuSua.add(str(x.n))
   for (const x of rPhep ?? []) if (str(x.n)) lay(str(x.sbd)).phep.add(str(x.n))
   for (const x of rMua ?? []) if (str(x.n)) { const m = lay(str(x.sbd)); m.mua.set(str(x.n), num(x.s)); if (num(x.r) === 1) m.datLai.add(str(x.n)) }
@@ -64,7 +73,7 @@ export function gopNhatKy(rSo: Row[] | undefined, rSua: Row[] | undefined, rPhep
 export const NHAT_KY_RONG: NhatKyChuoi = { soCau: new Map(), tuSua: new Set(), phep: new Set(), mua: new Map() }
 
 /** Ngày đạt (xong ≥ 1 bài hoặc tự sửa xong ≥ 1 câu) — đúng luật B3. */
-export const datNgay = (nk: NhatKyChuoi | undefined, ngay: string): boolean => !!nk && ((nk.soCau.get(ngay) ?? 0) >= CAU_MOT_BAI || nk.tuSua.has(ngay))
+export const datNgay = (nk: NhatKyChuoi | undefined, ngay: string): boolean => !!nk && ngayDatChuoi(nk, ngay)
 /** Số bài của một ngày: mỗi CAU_MOT_BAI câu khác nhau một bài; ngày chỉ có tự sửa ⇒ 1. */
 export const soBaiNgay = (nk: NhatKyChuoi | undefined, ngay: string): number =>
   !nk ? 0 : Math.max(Math.floor((nk.soCau.get(ngay) ?? 0) / CAU_MOT_BAI), nk.tuSua.has(ngay) ? 1 : 0)
@@ -80,7 +89,7 @@ export function kieuNgayCua(nk: NhatKyChuoi | undefined, ngay: string, homNay: s
   const l = (chuoi ?? chuoiCuaEm(nk, homNay)).lich7.find((x) => x.ngay === ngay)
   if (l) return l.kieu
   if (datNgay(nk, ngay)) return 'hoc'
-  return nk?.phep.has(ngay) && phepConGiuChuoi(ngay) ? 'phep' : 'tat'
+  return (nk?.phep.has(ngay) && phepConGiuChuoi(ngay)) || laNgayBaoTri(ngay) ? 'phep' : 'tat'
 }
 
 /** Bulk: sbd → NhatKyChuoi trong [tu, den]. Một batch. */

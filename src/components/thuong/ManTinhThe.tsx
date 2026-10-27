@@ -225,7 +225,7 @@ export function ManThangHoa({ tb, onHoc, onDong }: { tb: ThongBao; onHoc?: () =>
         <section className="tp-the" aria-label="Vì sao">
           <div className="tp-dong"><span className="tp-o" data-sac="tin"><FlaskConical aria-hidden="true" /></span><div className="giua"><b>Thăng hoa = 10% số tinh thể</b><span>ít nhất 5, nhiều nhất 50{truoc !== undefined ? ` · 10% của ${truoc} là ${mat}` : ''}</span></div></div>
           <div className="tp-dong"><span className="tp-o" data-sac="bang"><Lock aria-hidden="true" /></span><div className="giua"><b>Lần sau mang sẵn bình giữ chuỗi</b><span>có bình thì tinh thể không thăng hoa · {chuGiaBinh(giaBinh())}</span></div></div>
-          <div className="tp-dong"><span className="tp-o" data-sac="sao"><Zap aria-hidden="true" /></span><div className="giua"><b>Học 1 chặng hôm nay</b><span>ngọn lửa chuỗi bắt đầu cháy lại từ hôm nay</span></div></div>
+          <div className="tp-dong"><span className="tp-o" data-sac="sao"><Zap aria-hidden="true" /></span><div className="giua"><b>Làm đủ mức hôm nay</b><span>ngọn lửa chuỗi cháy lại từ hôm nay</span></div></div>
         </section>
       </div>
     </main>

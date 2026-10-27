@@ -55,7 +55,8 @@ export function songSongHien(dem: Record<string, number>): number {
 /** Câu vòng sửa: CHÉP NGUYÊN `SQL_CAN_SUA` của soan-so-do.ts (không nạp máy soạn khi cờ tắt); test may-soan-cron-2710 giữ hai bản bằng nhau. */
 export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND (ly_do LIKE 'Bước % không đọc được.' OR ly_do = 'Câu tính thiếu sơ đồ hoặc bước tính.')) OR (cong = 'dat' AND ly_do = 'trinh_bay_lai')`
 /** 19:00–23:59 giờ VN — cùng mốc với `laGioCaoDiem` của soan-so-do.ts (viết lại ở đây để không nạp cả máy soạn khi cờ tắt). */
-export const laGioCaoDiemSoan = (ms: number) => (new Date(ms).getUTCHours() + 7) % 24 >= 19
+// 27/10 (Boss, thầy «app tức thì mọi khung giờ»): khung nghỉ 18:00–23:59 VN, KHÔNG còn mở bằng cờ `gioCaoDiem` (máy soạn ghi D1 liên tục, tranh hàng với em).
+export const laGioCaoDiemSoan = (ms: number) => (new Date(ms).getUTCHours() + 7) % 24 >= 18
 
 export const SQL_BANG_MAY_SOAN: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS may_soan_trang_thai (id INTEGER PRIMARY KEY, vong TEXT NOT NULL, con_tro TEXT NOT NULL DEFAULT '',
@@ -165,7 +166,7 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
   try { co = docCoMaySoan(await docCauHinhDem(env, KHOA_MAY_SOAN, nowMs)) } catch { return { chay: false, lyDo: 'khong_doc_duoc_co' } }
   if (!co.bat) return { chay: false, lyDo: 'co_tat' }
   const caoDiem = laGioCaoDiemSoan(nowMs)
-  if (caoDiem && !co.gioCaoDiem) return { chay: false, lyDo: 'gio_cao_diem' }
+  if (caoDiem) return { chay: false, lyDo: 'gio_cao_diem' }
 
   let the = 0
   try {
