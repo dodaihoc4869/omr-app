@@ -297,6 +297,42 @@ describe('soạn lô', () => {
     } finally { globalThis.fetch = goc; vi.useRealTimers() }
   })
 
+  it('27/10 Workers AI: chỉ lấy chữ trả lời cuối (không lấy suy luận), nhiều dạng kết quả', () => {
+    expect(M.chuTuWorkersAi({ output: [{ type: 'reasoning', content: [{ type: 'reasoning_text', text: 'NGHĨ' }] }, { type: 'message', content: [{ type: 'output_text', text: '{"a":1}' }] }] })).toBe('{"a":1}')
+    expect(M.chuTuWorkersAi({ output_text: ' x ' })).toBe('x')
+    expect(M.chuTuWorkersAi({ response: 'y' })).toBe('y')
+    expect(M.chuTuWorkersAi({ choices: [{ message: { content: 'z', reasoning_content: 'NGHĨ' } }] })).toBe('z')
+    expect(M.chuTuWorkersAi({ output: [{ type: 'reasoning', content: [{ type: 'reasoning_text', text: 'NGHĨ' }] }] })).toBe('')
+  })
+  it('27/10 Workers AI: lỗi hạn mức / quá tải ném ra ⇒ HTTP 429 (giữ con trỏ); lỗi khác ⇒ lỗi thường', async () => {
+    const nem = (m: string) => ({ run: vi.fn(async () => { throw new Error(m) }) })
+    for (const m of ['3036: Account limited', 'Capacity temporarily exceeded', '4006: you have used up your daily free allocation of 10,000 neurons', 'Too many requests'])
+      expect(await M.goiWorkersAi(nem(m), { heThong: 'h', luot: [] })).toMatchObject({ ok: false, http: 429 })
+    const k = await M.goiWorkersAi(nem('5007: No such model'), { heThong: 'h', luot: [] })
+    expect(k.ok).toBe(false)
+    expect((k as { http?: number }).http).toBeUndefined()
+    const ok = await M.goiWorkersAi({ run: vi.fn(async () => ({ output_text: '{"a":1}', usage: { input_tokens: 5, output_tokens: 7 } })) }, { heThong: 'h', luot: [{ vai: 'model', chu: 'a' }] })
+    expect(ok).toMatchObject({ ok: true, chu: '{"a":1}', model: M.MODEL_CF, vao: 5, ra: 7 })
+  })
+  it('27/10: Gemini 429 cả model mạnh ⇒ Workers AI; các câu sau cùng lượt đi thẳng Workers AI', async () => {
+    const goc = globalThis.fetch
+    let soGemini = 0
+    globalThis.fetch = vi.fn(async () => { soGemini++; return new Response(JSON.stringify({ error: { message: 'quota' } }), { status: 429 }) }) as typeof fetch
+    const ai = { run: vi.fn(async (_m: string, _i: unknown) => ({ output_text: '{"a":1}' })) }
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    try {
+      const goi = M.taoGoiGeminiLo({ GEMINI_API_KEY: 'k', AI: ai } as never)
+      const p1 = goi({ heThong: 'h', luot: [{ vai: 'user', chu: 'x' }], model: M.MODEL_MAC_DINH })
+      await vi.runAllTimersAsync()
+      expect(await p1).toMatchObject({ ok: true, model: M.MODEL_CF })
+      const truoc = soGemini
+      expect(await goi({ heThong: 'h', luot: [{ vai: 'user', chu: 'y' }], model: M.MODEL_MAC_DINH })).toMatchObject({ ok: true, model: M.MODEL_CF })
+      expect(soGemini).toBe(truoc)
+      expect(ai.run).toHaveBeenCalledTimes(2)
+      expect(ai.run.mock.calls[0]![1]).toMatchObject({ instructions: 'h', input: [{ role: 'user', content: 'x' }] })
+    } finally { globalThis.fetch = goc; vi.useRealTimers() }
+  })
+
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III, Q.I], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })

@@ -80,6 +80,8 @@ export interface Env {
   MA_BI_MAT: string
   /** Khoá Gemini (Google AI Studio) cho phần hỏi thêm Thầy (server/src/hoi-tro-ly.ts) — Worker secret, KHÔNG vào git. Vắng ⇒ phần này tắt. */
   GEMINI_API_KEY?: string
+  /** Workers AI (binding `[ai]` trong wrangler.toml, 27/10): máy soạn sơ đồ dùng khi Gemini hết hạn mức. Vắng ⇒ không dùng. */
+  AI?: { run(model: string, input: unknown): Promise<unknown> }
 }
 
 /**

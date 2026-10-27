@@ -137,6 +137,45 @@ export function nhanHanMuc(j: unknown): string {
   return quota || retry ? ` [quota=${quota || '?'}; retry=${retry || '?'}s]` : ''
 }
 
+/** Model Workers AI dùng khi Gemini hết hạn mức (27/10). Cổng kiểm vẫn chấm như mọi bản ⇒ sai số thì không hiện. */
+export const MODEL_CF = '@cf/openai/gpt-oss-120b'
+const RE_CF_HAN_MUC = /\b(429|3036|3040|4006)\b|rate.?limit|capacity|too many|neurons|daily free/i
+
+/** Lấy CHỮ TRẢ LỜI CUỐI từ kết quả `env.AI.run` (nhiều dạng: Responses `output[]`, `output_text`, `response`, `choices`). KHÔNG lấy phần suy luận. */
+export function chuTuWorkersAi(r: unknown): string {
+  if (typeof r === 'string') return r.trim()
+  const o = (r ?? {}) as Obj
+  if (typeof o.output_text === 'string' && o.output_text.trim()) return o.output_text.trim()
+  if (Array.isArray(o.output)) {
+    const chu = (o.output as Obj[]).filter((x) => x?.type === 'message')
+      .flatMap((x) => (Array.isArray(x.content) ? x.content : []) as Obj[])
+      .filter((c) => c?.type === 'output_text' && typeof c.text === 'string').map((c) => str(c.text)).join('').trim()
+    if (chu) return chu
+  }
+  if (typeof o.response === 'string' && o.response.trim()) return o.response.trim()
+  const ch = ((o.choices as Obj[] | undefined)?.[0]?.message as Obj | undefined)?.content
+  if (typeof ch === 'string' && ch.trim()) return ch.trim()
+  return ''
+}
+
+/** Gọi Workers AI một lần theo khuôn GoiMoHinh. Lỗi hạn mức / quá tải (ném ra) ⇒ `HTTP 429` để máy soạn giữ con trỏ + co giãn như Gemini. */
+export async function goiWorkersAi(ai: NonNullable<Env['AI']>, yc: { heThong: string; luot: readonly LuotHoi[] }): Promise<KetQuaMoHinh> {
+  try {
+    const r = await ai.run(MODEL_CF, {
+      instructions: yc.heThong,
+      input: yc.luot.map((l) => ({ role: l.vai === 'model' ? 'assistant' : 'user', content: l.chu })),
+      reasoning: { effort: 'medium' },
+    })
+    const chu = chuTuWorkersAi(r)
+    if (!chu) return { ok: false, loi: 'rỗng workers-ai' }
+    const u = ((r as Obj | null)?.usage ?? {}) as Obj
+    return { ok: true, chu, model: MODEL_CF, vao: Number(u.input_tokens ?? u.prompt_tokens) || 0, ra: Number(u.output_tokens ?? u.completion_tokens) || 0 }
+  } catch (e) {
+    const m = (e instanceof Error ? e.message : String(e)).replace(/\s+/g, ' ').slice(0, 200)
+    return RE_CF_HAN_MUC.test(m) ? { ok: false, http: 429, loi: `HTTP 429 workers-ai ${m}` } : { ok: false, loi: `workers-ai ${m}` }
+  }
+}
+
 export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
   const key = str(env.GEMINI_API_KEY)
   const tram = env.TRAM_GEMINI ? quaTram(env.TRAM_GEMINI) : null
@@ -159,7 +198,12 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
       return { ok: false, loi: ac.signal.aborted ? `quá ${Math.round(hanMs / 1000)} s` : e instanceof Error ? e.message.slice(0, 160) : 'lỗi mạng' }
     } finally { clearTimeout(hen) }
   }
+  // Một lượt soạn = một bộ gọi: Gemini đã 429 (cả model mạnh) một lần ⇒ các câu sau đi thẳng Workers AI, không đốt thêm lượt gọi Gemini.
+  let geminiHet = !key
+  const cf = env.AI
+  const quaCf = async (heThong: string, luot: readonly LuotHoi[], loiGemini: KetQuaMoHinh) => (cf ? await goiWorkersAi(cf, { heThong, luot }) : loiGemini)
   return async ({ heThong, luot, model }) => {
+    if (geminiHet && cf) return await goiWorkersAi(cf, { heThong, luot })
     const body = JSON.stringify({
       systemInstruction: { parts: [{ text: heThong }] },
       contents: luot.map((l) => ({ role: l.vai, parts: [{ text: l.chu }] })),
@@ -175,6 +219,8 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
         const manh = await motLan(MODEL_MANH, body)
         if (manh.ok) return manh
       }
+      // 27/10 thầy «soạn luôn bằng mọi cách ko chờ gemini»: Gemini (cả model mạnh) vẫn 429 ⇒ Workers AI.
+      if (!kq.ok && kq.http === 429) { geminiHet = true; return await quaCf(heThong, luot, kq) }
       if (kq.ok || (kq.http !== 404 && kq.http !== 410)) return kq
     }
     return kq
@@ -467,7 +513,7 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   const bayGio = phu.bayGio ?? Date.now
   const batDau = bayGio()
   if (laGioCaoDiem(batDau) && !ts.choChayGioCaoDiem) return tra({ ok: false, ma: 'gio_cao_diem', error: 'Không soạn lô trong 19–24h giờ VN (giờ cao điểm). Chạy lại ngoài giờ ấy.' }, 409)
-  if (!phu.goiMoHinh && !str(env.GEMINI_API_KEY)) return tra({ ok: false, error: 'Máy chủ chưa có khoá GEMINI_API_KEY.' }, 503)
+  if (!phu.goiMoHinh && !str(env.GEMINI_API_KEY) && !env.AI) return tra({ ok: false, error: 'Máy chủ chưa có khoá GEMINI_API_KEY.' }, 503)
   const goi = phu.goiMoHinh ?? taoGoiGeminiLo(env)
   // Cổng làn C đọc phương án theo khoá A–D (`luaChon['B']`); câu kho mang mảng ⇒ đổi mảng thành {A,B,C,D}. Trước 26/10 truyền thẳng mảng ⇒ cổng không thấy
   // phương án đúng ⇒ MỌI câu Phần I ra `khong_kiem_duoc` («Phương án đúng không phải số»), không bao giờ `dat` / `lech`.
