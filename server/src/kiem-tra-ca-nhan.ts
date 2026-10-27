@@ -22,6 +22,7 @@ import { dongGoiDe2026 } from './kiem-tra-ca-nhan-chu-ky'
 import { nguonTuongDuongKt } from './kiem-tra-ca-nhan-nguon'
 import { chonChuKyKt2026,nhomKienThucKt } from './kiem-tra-ca-nhan-ma-tran'
 import { chuanMucDo } from './lich-su-lam-cau'
+import { laNgayBaoTri, sqlKhongBaoTriBo, SQL_DS_BAO_TRI } from './ngay-bao-tri'
 
 type Row = Record<string, unknown>
 const s = (v: unknown) => String(v ?? '')
@@ -77,6 +78,12 @@ export function ktDangKhoaChang(r: Row | null, now: number): ReturnType<typeof t
   const tt = tomTatKt(r!, now)
   return tt.trangThai === 'can_lam' ? tt : null
 }
+/** NGÀY BẢO TRÌ (Boss 27/10 theo thầy «Tối nay các em không phải làm»; danh sách chung `ngay-bao-tri.ts`, #513): bài có `ngay` là ngày bảo trì, quá hạn mà
+ *  em CHƯA NỘP ⇒ KHÔNG chốt «hết hạn» (giữ nguyên dữ liệu bài dở, không ghi sổ), KHÔNG hiện «Đã lỡ» ở lịch thầy / bài hằng ngày, KHÔNG tính lỡ / phạt / xếp loại
+ *  (các bảng tính đếm `trang_thai='het_han'` — bài này giữ trạng thái cũ). Trước hạn em vẫn nộp tiếp bình thường. Chỉ là luật đọc/tính, không xoá dữ liệu. */
+export const laKtBaoTriBo = (r: Row | null, now: number): boolean => !!r && laNgayBaoTri(s(r.ngay)) && !r.nop_luc && now >= Number(r.han_luc) && s(r.trang_thai) !== 'cho_nguon'
+export { sqlKhongBaoTriBo }
+export const CHU_BAO_TRI_KT = 'Ngày 27/10 app bảo trì: bài kiểm tra này không tính, em không phải làm. Em làm bài mới theo lịch nhé.'
 export const MA_KHOA_KT = 'KIEM_TRA_ON_TAP_TRUOC'
 export const CHU_KHOA_KT = 'Em làm xong Kiểm tra ôn tập hôm nay trước rồi mới mở chặng học mới nhé.'
 export function coHocNgayKt(r:Row|null):boolean {if(!r)return false;const m=r.meta_json?JSON.parse(s(r.meta_json)):de(r);return Number(m.baiNgayToiThieu)>0}
@@ -250,6 +257,7 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   let r=await docBai(env,sbd,s(b.id)), d=de(r)
   if (s(r.trang_thai)==='cho_nguon') throw new Error('Bài đang chờ đủ nguồn. Em tiếp tục lịch học thường.')
   if(action==='hoc-tap-ktcn-trang-thai'){
+    if(laKtBaoTriBo(r,now))throw new Error(CHU_BAO_TRI_KT)
     if(!r.nop_luc&&now>=Number(r.han_luc))r=await chotKtCn(env,r,now,true)
     // 27/10 tốc độ (thầy: «chỗ bấm kiểm tra phải tức thì»): `kemKetQua` (CHỈ-THÊM) ⇒ bài đã nộp trả luôn phần chữa trong CÙNG lượt — máy em khỏi gọi
     // hoc-tap-ktcn-ket-qua nối tiếp. Đọc chặng và dựng kết quả chạy song song; kết quả giống hệt lệnh ket-qua (chốt lại rồi ketQuaKt).
@@ -261,6 +269,7 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     return {ok:true,kiemTra:tomTatKt(r,now),...(kq?{ketQua:kq.k}:{}),chang:d.chang.map((c,i)=>{const cr=rows.results.find(v=>Number(v.stt)===i);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr?Number(cr.han):null,daChot:!!cr&&(!!cr.chot_luc||now>=Number(cr.han)),daTra:c.qids.filter(q=>duTraKt(phanQ.get(q)??'',typeof t[q]==='string'?t[q]:'')).length}})}
   }
   if (now<Number(r.mo_luc)) throw new Error('Chưa đến lịch kiểm tra của em.')
+  if (laKtBaoTriBo(r,now)) throw new Error(CHU_BAO_TRI_KT)
   if (!r.nop_luc && now>=Number(r.han_luc)) r=await chotKtCn(env,r,now,true)
   if (action==='hoc-tap-ktcn-nop') {
     // Không nhận đáp án ở lệnh nộp; chỉ chốt bản nháp đã lưu đúng giờ ở máy chủ.
@@ -341,7 +350,7 @@ export async function dongBoKtCn(env: Env, now: number, tran=2,dungKhung2026=tru
   if (await env.DB.prepare("SELECT 1 FROM ca WHERE trang_thai='mo' LIMIT 1").first()) return {soEm:0,soMoi:0,hoan:true}
   await buMetaKt(env,10)
   const cfg=JSON.parse((await docCauHinhDem(env,'kiem_tra_ca_nhan_v1'))??'{}'),batLuc=Date.parse(s(cfg.batLuc))||0
-  const het=bat?await env.DB.prepare(`SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=? AND han_luc>?) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?`).bind(now,batLuc,tran).all<Row>():{results:[] as Row[]}
+  const het=bat?await env.DB.prepare(`SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=? AND han_luc>? AND ngay NOT IN(${SQL_DS_BAO_TRI})) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?`).bind(now,batLuc,tran).all<Row>():{results:[] as Row[]}
   for (const r of het.results) await chotKtCn(env,r,now,true)
   // Làm mới phạm vi/đề trước ngày kiểm tra; ngày đã mở tuyệt đối không đổi N/nguồn.
   const moi=await env.DB.prepare(`SELECT k.sbd FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE COALESCE(h.trang_thai,'')<>'khoa' AND k.mo_luc>? AND k.nop_luc IS NULL AND (COALESCE(json_extract(km.meta_json,'$.phienBan'),1)<>? OR (k.ngay=? AND k.cap_nhat_luc<? AND COALESCE(json_extract(k.json,'$.chuKyNgay'),k.ngay)>?)) GROUP BY k.sbd ORDER BY MIN(k.ngay) LIMIT ?`).bind(now,dungKhung2026?3:2,congNgayKt(ngayKt(now),1),dauNgayKt(ngayKt(now)),ngayKt(now),tran).all<Row>()

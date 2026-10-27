@@ -9,6 +9,7 @@ import { gameIdentity } from './game-v2-auth'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { coCaDangMo } from './ca-dang-mo'
 import { protectedQuestions } from './game-v2-bank'
+import { sqlKhongBaoTriBo } from './ngay-bao-tri'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x))
@@ -283,7 +284,7 @@ export async function gvAnhAiDdh(env: Env, b: Row): Promise<Row> {
 async function cauBaoVeEm(env: Env, sbd: string): Promise<Set<string>> {
   const [tap, kt] = await Promise.all([
     protectedQuestions(env).catch(() => null),
-    env.DB.prepare('SELECT json FROM kiem_tra_ca_nhan WHERE sbd = ? AND nop_luc IS NULL').bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
+    env.DB.prepare(`SELECT json FROM kiem_tra_ca_nhan k WHERE sbd = ? AND nop_luc IS NULL AND ${sqlKhongBaoTriBo('k', Date.now())}`).bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
   ])
   const ra = new Set<string>(tap ?? [])
   for (const r of kt.results ?? []) {
