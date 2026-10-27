@@ -1,0 +1,36 @@
+/* LINH VẬT CHÍNH «Lửa» (src/components/linh-vat/Bi.tsx + lua-dong.ts; thầy chốt 27/10 «Chọn Lửa build luôn nhé») — chỉ app học sinh «Trong».
+   BẢNG MÀU TRANH: không mã thô; mọi sắc pha color-mix từ token bảng «Chất chỉ thị» (--tr-chu-y / --tr-sai / --tr-sao / --tr-tin / --tr-tim / --tr-hs-*)
+   và đen / trắng CỐ ĐỊNH (--btg-chu-doan / --btg-chu-doan-dam); LÔNG / DA pha từ token CỐ ĐỊNH (--gap, --vd-cam, --btg-cam) ⇒ không đổi theo nền. Lông CAM ĐẤT (ΔE00 ≈ 15 so cam «chú ý /
+   lửa chuỗi» --tr-chu-y) để không lẫn với ngọn lửa chuỗi ngày trên cùng màn. Chuyển động do lua-dong.ts (rAF, chỉ transform / thuộc tính SVG);
+   giảm chuyển động / máy yếu ⇒ Lửa tĩnh. Khung giữ chỗ tỉ lệ 200 : 230 như Bi cũ ⇒ mọi khung chứa (.bi) giữ nguyên. */
+[data-trong='hs'] .lua {
+  --lv-long: color-mix(in srgb, var(--gap) 44%, color-mix(in srgb, var(--vd-cam) 82%, var(--btg-duong)));
+  --lv-longT: color-mix(in srgb, var(--gap) 42%, color-mix(in srgb, var(--vd-cam) 65%, var(--btg-chu-doan)));
+  --lv-longS: color-mix(in srgb, var(--gap) 38%, color-mix(in srgb, var(--vd-cam) 25%, var(--btg-cam)));
+  --lv-kem: color-mix(in srgb, var(--btg-chu-doan-dam) 82%, var(--btg-cam));
+  --lv-tai: color-mix(in srgb, var(--gap) 4%, color-mix(in srgb, var(--btg-cam) 35%, var(--btg-chu-doan-dam)));
+  --lv-mui: color-mix(in srgb, var(--gap) 11%, color-mix(in srgb, var(--btg-duong) 8%, var(--btg-chu-doan)));
+  --lv-tayV: color-mix(in srgb, var(--gap) 36%, color-mix(in srgb, var(--vd-cam) 58%, var(--btg-chu-doan)));
+  --lv-trang: var(--btg-chu-doan-dam);
+  --lv-aoT: color-mix(in srgb, var(--tr-hs-nut) 9%, color-mix(in srgb, var(--tr-hs-day) 10%, var(--btg-chu-doan-dam)));
+  --lv-tayAoV: color-mix(in srgb, var(--tr-tin) 4%, color-mix(in srgb, var(--tr-hs-day) 39%, var(--btg-chu-doan-dam)));
+  --lv-thuyTinh: color-mix(in srgb, var(--btg-chu-doan-dam) 89%, color-mix(in srgb, var(--tr-tin) 70%, var(--tr-hs-nut)));
+  --lv-thuyTinhV: color-mix(in srgb, var(--tr-tin) 3%, color-mix(in srgb, var(--tr-hs-day) 67%, var(--btg-chu-doan-dam)));
+  --lv-cham: var(--tr-hs-day);
+  --lv-chamS: var(--tr-hs-nut);
+  --lv-hong: var(--tr-tim);
+  --lv-kinh: color-mix(in srgb, var(--tr-tin) 14%, var(--btg-chu-doan-dam));
+  --lv-kinhV: color-mix(in srgb, var(--btg-chu-doan) 16%, var(--tr-tin));
+  --lv-den: color-mix(in srgb, var(--btg-chu-doan) 82%, var(--tr-hs-day));
+  --lv-mieng: color-mix(in srgb, var(--tr-sai) 53%, var(--btg-chu-doan));
+  --lv-luoi: color-mix(in srgb, var(--tr-chu-y) 23%, color-mix(in srgb, var(--tr-tim) 80%, var(--btg-chu-doan-dam)));
+  --lv-ma: color-mix(in srgb, var(--tr-chu-y) 16%, color-mix(in srgb, var(--tr-tim) 66%, var(--btg-chu-doan-dam)));
+  --lv-sao: var(--tr-sao);
+  --lv-giot: color-mix(in srgb, var(--tr-tin) 44%, var(--btg-chu-doan-dam));
+  --lv-bong: color-mix(in srgb, var(--btg-chu-doan) 14%, transparent);
+  display: block; flex: none; position: relative; aspect-ratio: 200 / 230; overflow: visible;
+}
+/* bề ngang theo prop size — độ ưu tiên 0 ⇒ luật khung chứa (vd. .da-linh-vat .bi) vẫn thắng như với Bi cũ */
+:where([data-trong='hs'] .bi.lua) { width: var(--lv-w, 96px); }
+[data-trong='hs'] .lua > .lua-svg { display: block; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+@media (prefers-color-scheme: dark) { [data-trong='hs'] .lua { --lv-bong: color-mix(in srgb, var(--btg-chu-doan) 45%, transparent); } }

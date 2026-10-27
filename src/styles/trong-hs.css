@@ -1040,14 +1040,14 @@
 [data-trong] .da-duong { overflow-x: clip; }
 [data-trong] .da-o-nut { position: relative; }
 [data-trong] .da-linh-vat { position: absolute; left: 50%; top: 50%; z-index: 0; width: 104px; transform: translate(calc(var(--lv) - 50%), -46%); pointer-events: none; }
-[data-trong] .da-linh-vat .bi { display: block; width: 104px; height: auto; }
+[data-trong] .da-linh-vat .bi { display: block; width: 74px; height: auto; margin: 0 auto; } /* Lửa cao ≈ 72 px như cú Duo cạnh đường */
 [data-trong] .da-linh-vat .da-lv-gt { width: 104px; height: 120px; }
 [data-trong] .da-linh-vat .da-lv-gt svg { display: block; width: 100%; height: 100%; }
 [data-trong] .da-linh-vat::after { content: ''; display: block; width: 70px; height: 10px; margin: -8px auto 0; border-radius: 50%; background: var(--tr-day-khoi); opacity: .5; }
 [data-trong] .da-linh-vat[data-toi] { filter: grayscale(1); opacity: .32; }
 @keyframes da-lv-tho { 0%, 100% { transform: translate(calc(var(--lv) - 50%), -46%) scale(1); } 50% { transform: translate(calc(var(--lv) - 50%), -48%) scale(1.03); } }
 [data-trong='hs'] .da-linh-vat:not([data-toi]) { animation: da-lv-tho 2.6s ease-in-out infinite; }
-@media (max-width: 380px) { [data-trong] .da-linh-vat { width: 88px; } [data-trong] .da-linh-vat .bi { width: 88px; } }
+@media (max-width: 380px) { [data-trong] .da-linh-vat { width: 88px; } [data-trong] .da-linh-vat .bi { width: 64px; } }
 @media (prefers-reduced-motion: reduce) { [data-trong='hs'] .da-linh-vat { animation: none; } }
 [data-trong='hs'].may-yeu .da-linh-vat { animation: none; }
 /* THẺ «HỌC CÙNG BẠN» TRÊN LỘ TRÌNH (27/10, TheBanLoTrinh): một hàng gọn kiểu lời nhắc bạn bè Duolingo — chữ bấm được mở màn, nút «Gõ cửa» / nút đóng bên phải. */

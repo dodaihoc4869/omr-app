@@ -215,6 +215,9 @@ for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css
 // bỏ nền mặt / chữ / bóng / viền xám cũ (đúng 5 khai báo), thay bằng màu thân giám thị pha từ --gt-mau-* (giam-thi.css).
 for (const k of ['background: var(--tr-mat)', 'color: var(--tr-chu)', 'box-shadow: 0 3px 0 var(--tr-vien-2)', 'background: inherit', 'border-right: 2px solid var(--tr-vien-2)']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
 for (const k of ['border: 2px solid var(--tr-vien-2)', 'border-bottom: 2px solid var(--tr-vien-2)', 'border-left: 2px solid var(--tr-vien-2)']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
+// 27/10 thầy: «Chọn Lửa build luôn nhé» ⇒ linh vật Lửa (lua-dong.ts + lua.css, màu --lv-*) thay hình Bi vẽ trong Bi.tsx: 12 thuộc tính SVG fill="none"
+// của hình Bi cũ (không phải màu) biến mất cùng hình; đúng 12 lần, đúng tệp.
+MAU_CU_THAY_RA_LENH['src/components/linh-vat/Bi.tsx · fill: none'] = (MAU_CU_THAY_RA_LENH['src/components/linh-vat/Bi.tsx · fill: none'] ?? 0) + 12
 // 27/10: đợt gỡ CSS chết thứ hai (tờ nạp chung index-*.css; luật tốc độ đỏ sau #430/#431) — danh sách đóng ở docs/css-chet-2710.json, cùng cách.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 for (const [k, n] of Object.entries(GON_MA_2710.cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n

@@ -673,7 +673,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         onVe()
       }
       return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-xong="">
-        <Suspense fallback={<main className="duo-than"><section className="duo-xong" aria-label="Kết quả chặng"><div className="duo-xong-bi"><Bi cam="mung" size={148} /></div><h1>{chang ? `Xong chặng ${chang}!` : 'Xong chặng học!'}</h1></section></main>}>
+        <Suspense fallback={<main className="duo-than"><section className="duo-xong" aria-label="Kết quả chặng"><div className="duo-xong-bi"><Bi cam="mung" size={126} /></div><h1>{chang ? `Xong chặng ${chang}!` : 'Xong chặng học!'}</h1></section></main>}>
           <KetBaiThuong ketBai={ketBaiTp} hang={tqLuu?.giai?.hang} bat={tqLuu?.bat} phu={phu} onTiep={veLoTrinh} cauHomNay={homNayHien} />
         </Suspense>
       </div>
@@ -696,7 +696,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         : xong ? <section className="duo-xong" data-hoan-hao={hoanHao || undefined} aria-label="Kết quả chặng">
             <div className="duo-hoa" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i } as CSSProperties} />)}</div>
             {/* B2 — chặng hoàn hảo (tự làm đúng cả chặng): tinh thể kim cương kết tinh từ tâm sau lưng Bi, tia sáng xoay chậm; B3 — Bi mừng nhảy, hoa giấy lục giác. */}
-            <div className="duo-xong-bi">{hoanHao && <span className="duo-tinh" aria-hidden="true"><i /><svg viewBox="0 0 100 100"><path d="M50 4 86 36 50 96 14 36Z" /><path className="mat" d="M14 36H86M50 4 34 36 50 96 66 36Z" /></svg></span>}<Bi cam="mung" size={148} /></div>
+            <div className="duo-xong-bi">{hoanHao && <span className="duo-tinh" aria-hidden="true"><i /><svg viewBox="0 0 100 100"><path d="M50 4 86 36 50 96 14 36Z" /><path className="mat" d="M14 36H86M50 4 34 36 50 96 66 36Z" /></svg></span>}<Bi cam="mung" size={126} /></div>
             <h1>{chang ? `Xong chặng ${chang}!` : 'Xong chặng học!'}</h1>
             {hoanHao && <p className="duo-hoan-hao">Hoàn hảo · tự làm đúng cả {goc.length} câu</p>}
             {tenChuong && <p className="duo-xong-phu">{tenChuong}</p>}
