@@ -56,7 +56,7 @@ describe('khoá nguồn — nối dây /hs và /ph, không thêm lệnh D1 khi c
   const gv = readFileSync('server/src/game-v2.ts', 'utf8'), ph = readFileSync('server/src/ph-tat-ca-ve-con.ts', 'utf8')
   const kh = readFileSync('server/src/ph-truy-cap.ts', 'utf8'), dem = readFileSync('server/src/cau-hinh-dem.ts', 'utf8')
   it('Sảnh Gói 7 trả chuoiNgay khi cờ bật (đọc song song lập kế hoạch)', () => {
-    expect(gv).toMatch(/const chuoiSom=import\('\.\/chuoi-ngay-bai-d1'\)\.then\(m=>m\.chuoiBaiNeuBat/)
+    expect(gv).toMatch(/const chuoiSom=(?:hocTapSom\?\.chuoi\?\?)?import\('\.\/chuoi-ngay-bai-d1'\)\.then\(m=>m\.chuoiBaiNeuBat/) // 27/10 sẵn sàng: đọc sớm cùng đợt mật khẩu (batDauHocTapSom)
     expect(gv).toMatch(/\.\.\.\(chuoi7\?\{chuoiNgay:chuoi7\}:\{\}\)/)
   })
   it('Phụ huynh: cờ đọc KÈM truy vấn gộp; bật ⇒ tongQuan.chuoiNgay + chuoiNgayHoc cùng số; /ph/ke-hoach trả chuoiNgay', () => {

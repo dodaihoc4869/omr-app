@@ -178,7 +178,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
   const toi=(i:number)=>{phanHoi('chon');setMoLuoi(false);setViTri(Math.max(0,Math.min(cs.length-1,i)))}
   const chuaLam=cs.flatMap((c,i)=>daTraDu(c,tra[c.qid])?[]:[i+1])
   const nhanLuu=luu==='Đã lưu trên máy chủ'?<><CloudCheck size={16} aria-hidden="true"/>Đã lưu</>:luu
-  return <div className="ht-app ht2-lam duo duo-kt" ref={khung} data-duo="">
+  return <div className="ht-app ht2-lam duo duo-kt" ref={khung} data-duo="" data-hai-cot={deDai||undefined}>
    <ThanhTrenKt onDong={()=>void ve()} nhanDong={`Lưu và về ${tenTrangChinh()}`} khoaDong={busy} daLam={daTraChang} tong={cs.length}
     gio={<GioChangDuo kho={khoChang} nhan={`Thời gian chặng ${stt+1} còn lại`}/>} nhanGio="" onMoLuoi={()=>{phanHoi('chon');setMoLuoi(true)}}/>
    <main className="duo-than" data-de-dai={deDai||undefined}>

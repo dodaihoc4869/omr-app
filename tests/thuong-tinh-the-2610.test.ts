@@ -74,7 +74,7 @@ describe('/hs/thuong + rương', () => {
     vang('S1', 40)
     d.sql.prepare("INSERT INTO thong_bao_thuong(em,ma,loai,du_lieu,luc) VALUES('S1','thang_hoa|x','thang_hoa','{\"mat\":5}','2026-10-26T00:00:00Z')").run()
     const r = await hsThuong(env, { token: token.S1 }, undefined, NOW)
-    expect(Object.keys(r).sort()).toEqual(['bat', 'binh', 'chuoiNgay', 'cuoc', 'giai', 'mucTieu', 'nguyenTuHomNay', 'nhiemVu', 'ok', 'ruong', 'thongBao', 'tinhThe'].sort()) // giai: gộp đợt 3 (phần B); binh: luật 27/10
+    expect(Object.keys(r).sort()).toEqual(['bat', 'binh', 'chuoiNgay', 'cuoc', 'giai', 'mucTieu', 'nguyenTuHomNay', 'nhiemVu', 'ok', 'ruong', 'tamDong', 'thongBao', 'tinhThe'].sort()) // giai: gộp đợt 3 (phần B); binh: luật 27/10
     expect(r.binh).toEqual({ gia: 150, toiDaTuan: 1, daMuaTuan: false, muaTiepTu: '2026-11-02' })
     expect(r.bat).toEqual({ giai: true, thangHoa: true, banBe: true, kimCuong: true })
     expect(r.tinhThe).toBe(40)
@@ -119,7 +119,7 @@ describe('mua bình (hàm cộng bình của B3 qua cầu nối) + cược chu�
     const a = await hsMuaBinh(env, { token: token.S1 }, NOW)
     expect(a).toMatchObject({ ok: true, tinhThe: 70, gia: 150, daMuaTuan: true, muaTiepTu: '2026-11-02' })
     expect(ids).toEqual([`S1|tt|${NGAY}|binh-w`])
-    expect(await hsMuaBinh(env, { token: token.S1 }, NOW)).toMatchObject({ ok: false, ma: 'da_mua_tuan' })
+    expect(await hsMuaBinh(env, { token: token.S1 }, NOW)).toMatchObject({ ok: false }) // bấm lặp trong ngày: khoá ngày ⇒ không trừ đôi (trần tuần: binh-1-tuan-2710)
     expect(du('S1')).toBe(70)
     gia({ docChuoiNgay: async () => ({ ...chuoi, giuChuoi: 2 }) })
     expect((await hsMuaBinh(env, { token: token.S1 }, NOW + 86_400_000)).ok).toBe(false)
@@ -212,7 +212,7 @@ describe('cron thăng hoa (00:10 VN)', () => {
 describe('công tắc thầy + huy hiệu', () => {
   it('đọc mặc định «bat»; ghi một khoá; khoá lạ / giá trị lạ ⇒ lỗi 400', async () => {
     const { env } = await dung()
-    expect(await gvCongTacThuong(env, {})).toEqual({ ok: true, congTac: { thuong_giai_tuan: 'bat', thuong_thang_hoa: 'bat', thuong_ban_be: 'bat', thuong_kim_cuong: 'bat' } })
+    expect(await gvCongTacThuong(env, {})).toEqual({ ok: true, congTac: { thuong_giai_tuan: 'bat', thuong_thang_hoa: 'bat', thuong_ban_be: 'bat', thuong_kim_cuong: 'bat', hs_tam_dong: 'tat' } })
     expect((await gvCongTacThuong(env, { khoa: 'thuong_kim_cuong', giaTri: 'tat' }))).toMatchObject({ ok: true, congTac: { thuong_kim_cuong: 'tat', thuong_giai_tuan: 'bat' } })
     expect(await gvCongTacThuong(env, { khoa: 'thuong_la', giaTri: 'tat' })).toMatchObject({ ok: false, loi400: true })
     expect(await gvCongTacThuong(env, { khoa: 'thuong_ban_be', giaTri: 'mo' })).toMatchObject({ ok: false, loi400: true })

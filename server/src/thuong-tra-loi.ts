@@ -11,6 +11,7 @@ import { NT_HOAN_HAO } from './exp-cau-hinh'
 import { cauKhongDuocTinh, laCauKho, MA_TT, TT_KIM_CUONG, mucTieuBai, trangThaiKimCuong } from './thuong-luat'
 import type { DoLuot } from './do-giay-luot'
 import { lenhCongTinhThe } from './thuong-d1'
+import { tachSongSinh } from './loi-hoc-luat'
 
 /** Một câu đã chấm của phiên, lưu gọn trong `game_v2_session.json.$.nt`. */
 export interface MucNt {
@@ -29,6 +30,8 @@ export interface MucNt {
   g: number
   /** câu làm lại cuối chặng */
   l?: 1
+  /** (28/10) câu LẶP trong ngày — đã đúng / đã làm sai trước đó (mã gốc, kể cả song sinh) ⇒ 0 nguyên tử */
+  r?: 1
 }
 
 export interface PhienNt {
@@ -44,6 +47,27 @@ export const laPhienNguyenTu = (s: PhienNt): boolean => s.hocTap === 1 || s.kimC
 export const docNt = (nt: unknown): MucNt[] => (Array.isArray(nt) ? (nt.filter((x) => !!x && typeof x === 'object' && typeof (x as MucNt).q === 'string') as MucNt[]) : [])
 /** Kim cương: phiên đã kết thúc (vỡ đủ ống hoặc đủ câu) ⇒ lệnh `answer` từ chối câu mới. */
 export const kimCuongDaXong = (s: PhienNt): boolean => s.kimCuong === 1 && trangThaiKimCuong(docNt(s.nt).map((x) => x.d === 1)).xong
+
+/**
+ * LẶP CÂU TRONG NGÀY (thầy 27/10 «đảm bảo công bằng mọi chỗ»; đo 27/10: 3 186 lượt lặp (em, câu, ngày) cộng thêm 12 256 nguyên tử). Từ NGAY_LAP_CAU, so theo
+ * MÃ GỐC (bỏ hậu tố song sinh / biến thể / lần): câu ĐÃ ĐÚNG hôm nay làm lại ⇒ 0 nguyên tử, chuỗi đúng giữ nguyên (không cộng, không đứt); câu đã làm SAI hôm
+ * nay làm sai lại ⇒ 0 (không cộng «Làm nghiêm túc» lần hai). Làm lại để SỬA SAI (sai trước, nay đúng) vẫn được cộng phần sửa như thường.
+ * Tập câu trong ngày nằm trong hồ sơ game (`p.ntNgay`, đọc sẵn + ghi CAS cùng lô chấm như `ntChuoi`) ⇒ 0 lệnh D1 thêm.
+ */
+export const NGAY_LAP_CAU = '2026-10-28'
+export interface NtNgay { n: string; d: string[]; s: string[] }
+export const TOI_DA_CAU_NGAY = 600
+export const gocCau = (qid: string): string => tachSongSinh(qid).goc
+export const ntNgayTuHoSo = (v: unknown, ngay: string): { dung: Set<string>; sai: Set<string> } => {
+  const x = v as NtNgay | undefined
+  return x && x.n === ngay ? { dung: new Set(Array.isArray(x.d) ? x.d : []), sai: new Set(Array.isArray(x.s) ? x.s : []) } : { dung: new Set(), sai: new Set() }
+}
+/** Tập câu trong ngày sau lượt này (chỉ lượt được tính). */
+export function ntNgaySau(cu: { dung: Set<string>; sai: Set<string> }, ngay: string, qid: string, dung: boolean, tinh: boolean): NtNgay {
+  const d = new Set(cu.dung), s = new Set(cu.sai), g = gocCau(qid)
+  if (tinh) { if (dung) { d.add(g); s.delete(g) } else if (!d.has(g)) s.add(g) }
+  return { n: ngay, d: [...d].slice(-TOI_DA_CAU_NGAY), s: [...s].slice(-TOI_DA_CAU_NGAY) }
+}
 
 /** Chuỗi đúng mang qua các bài TRONG NGÀY (hồ sơ game). */
 export interface NtChuoi { n: string; c: number }
@@ -67,6 +91,8 @@ export interface VaoThuongTraLoi {
   chuoiTruoc: number
   giay: number | null
   nowMs: number
+  /** (28/10) câu gốc đã đúng / đã sai hôm nay — từ `p.ntNgay` (vắng ⇒ không xét lặp). */
+  daLamNgay?: { dung: ReadonlySet<string>; sai: ReadonlySet<string> }
 }
 
 export interface RaThuongTraLoi {
@@ -81,6 +107,7 @@ export interface RaThuongTraLoi {
 /** Dựng lại các dòng thưởng của một câu đã lưu gọn (đủ để gom nhóm kết bài). */
 function dongTuMuc(x: MucNt): { nhan: string; so: number }[] {
   if (x.t !== 1) return []
+  if (x.r === 1) return [{ nhan: x.d === 1 ? 'Câu đã đúng hôm nay' : 'Câu đã làm hôm nay', so: 0 }]
   if (x.d !== 1) return [{ nhan: 'Làm nghiêm túc', so: x.n }]
   if (x.l === 1) return [{ nhan: 'Làm lại đúng', so: x.n }]
   if (x.h === 1) return [{ nhan: 'Đúng có hỗ trợ', so: x.n }]
@@ -93,9 +120,14 @@ export function tinhThuongTraLoi(v: VaoThuongTraLoi): RaThuongTraLoi {
   const lamLai = !!ref?.lamLaiCuoi
   const cauKho = laCauKho(v.cau)
   // Câu làm lại luôn «có hỗ trợ» ở máy chủ của Code app 4 — luật thưởng riêng (3), không xét hỗ trợ.
-  const thuong = nguyenTuCau({ dung: v.dung, hoTro: v.hoTro && !lamLai, khongTinh: v.khongTinh, cauKho, chuoiTruoc: v.chuoiTruoc, lamLai })
+  const ngayVnLuot = new Date(v.nowMs + 7 * 3_600_000).toISOString().slice(0, 10)
+  const goc = gocCau(v.qid)
+  const lap = !v.khongTinh && !!v.daLamNgay && ngayVnLuot >= NGAY_LAP_CAU && (v.daLamNgay.dung.has(goc) || (!v.dung && v.daLamNgay.sai.has(goc)))
+  const thuong: ThuongCau = lap
+    ? { tinh: true, nguyenTu: 0, dong: [{ nhan: v.dung ? 'Câu đã đúng hôm nay' : 'Câu đã làm hôm nay', so: 0 }], chuoiDung: v.dung ? Math.max(0, Math.floor(v.chuoiTruoc)) : 0, cauKho }
+    : nguyenTuCau({ dung: v.dung, hoTro: v.hoTro && !lamLai, khongTinh: v.khongTinh, cauKho, chuoiTruoc: v.chuoiTruoc, lamLai })
   const cu = docNt(v.session.nt).filter((x) => x.q !== v.qid)
-  const moi: MucNt = { q: v.qid, n: thuong.nguyenTu, d: v.dung ? 1 : 0, h: v.hoTro ? 1 : 0, t: thuong.tinh ? 1 : 0, k: cauKho ? 1 : 0, c: thuong.chuoiDung, g: Math.max(0, Math.round(Number(v.giay) || 0)), ...(lamLai ? { l: 1 as const } : {}) }
+  const moi: MucNt = { q: v.qid, n: thuong.nguyenTu, d: v.dung ? 1 : 0, h: v.hoTro ? 1 : 0, t: thuong.tinh ? 1 : 0, k: cauKho ? 1 : 0, c: thuong.chuoiDung, g: Math.max(0, Math.round(Number(v.giay) || 0)), ...(lap ? { r: 1 as const } : {}), ...(lamLai ? { l: 1 as const } : {}) }
   const nt = [...cu, moi]
   const ra: RaThuongTraLoi = { thuong, thuongBai: 0, nt }
   let xongBai = false

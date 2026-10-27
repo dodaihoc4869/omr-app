@@ -19,6 +19,10 @@ Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo vi
 
   Mẫu đặc tả và luật: `docs/quy-trinh-4-buoc-1310.md`. Sửa lỗi hoặc tối ưu không đổi giao diện thì làm thẳng.
 - **LUẬT TỐC ĐỘ (thầy 13/10):** "Khi bạn sửa bất kì cái gì thì luôn phải đảm bảo sau khi sửa xong tốc độ load app và tốc độ máy chủ phải nhanh hơn". Trước khi đẩy: `npm run build && npm run kiem:toc-do` phải 0 đỏ — đo byte tải mở từng app (`scripts/kiem-toc-do-tai.mjs`) và số đợt chờ D1 nối tiếp của 4 lệnh nóng (`tests/toc-do-may-chu-lenh-nong-1310.test.ts`), so mốc `docs/moc-toc-do.json`. Mốc CHỈ HẠ, không nâng; đỏ ⇒ làm nhẹ/bớt vòng chờ rồi mới đẩy. Thêm lệnh máy chủ mới: đọc song song (`som`/`Promise.all`/`batch`), không thêm vòng chờ nối tiếp.
+- **TÁC TỬ TỨC THÌ SAU MỖI VIỆC (thầy 27/10, BẮT BUỘC):** "Từ giờ làm bất cứ gì, xong là phải luôn có agent tức thì cho app nhanh hơn lần trước đó". Mỗi việc (tính năng, sửa lỗi, đổi giao diện, máy chủ) sau khi gộp ⇒ PHẢI chạy tác tử `toc-do` (`.claude/agents/toc-do.md`). Tác tử đo trước/sau trên bản vừa gộp, làm cho app NHANH HƠN bản trước, phát hành.
+  - **Đo:** byte tải mở; thời gian tới chạm được; phản hồi bấm; chuyển câu; khung hình khi cuộn và làm câu ở CPU ×1/×4/×6 + Slow 3G; độ trễ và đợt chờ D1 nối tiếp của lệnh nóng, kể cả giờ cao điểm 19–23h.
+  - **Chưa nhanh hơn ⇒ chưa được báo xong.** Không phiên nào báo thầy «xong» nếu chưa có dòng số đo của tác tử này.
+  - **Mốc thấp nhất:** «app cũ» trước #389 (26/10). Mọi chỗ phải bằng hoặc nhanh hơn, kể cả máy yếu (`ddh.mayYeu`).
 
 ## TIẾT KIỆM NGỮ CẢNH (thầy yêu cầu 21/09)
 - KHÔNG đọc/ls sâu: `node_modules/`, `dist/`, `.dist-old-*/`, `src/graphify-out/`, `public/than-thu-v2/*.png` (ảnh 3 MB), `docs/anh-*/`, `docs/ban-ve-*/*.jpg` (chỉ mở ảnh khi việc cần nhìn).

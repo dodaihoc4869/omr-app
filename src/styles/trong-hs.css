@@ -23,35 +23,36 @@
 @font-face { font-family: 'DDH Rounded'; font-style: normal; font-weight: 550 1000; font-display: swap; line-gap-override: 0%; src: url('./phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0394, U+03B1-03B2, U+2000-206F, U+2070-208F, U+20AC, U+2103, U+2190-2193, U+21C4, U+21CC, U+2212, U+2264-2265, U+FEFF, U+FFFD; }
 /* Cả chữ thường lẫn chữ đề (--serif) sang ĐĐH Rounded; thân 500 (Đề); luật xin 600 trở lên (nhãn, tiêu đề, nút, số) dùng Đậm (:where ⇒ luật riêng
    của màn vẫn thắng).
-   Chỉ khi cổng đã vẽ (có .ht2 — Hôm nay luôn gắn dưới các màn con) ⇒ màn đăng nhập giữ phông cũ, không tải thêm phông khi em chưa đăng nhập. */
-:root[data-trong='hs']:has(.ht2) { --sans: 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; }
-:root[data-trong='hs']:has(.ht2) body { font-weight: 500; }
-:root[data-trong='hs']:has(.ht2) :where(h1, h2, h3, button, b, strong, th, dd) { font-weight: 800; }
+   Chỉ khi cổng đã vẽ (có .ht2 — Hôm nay luôn gắn dưới các màn con) ⇒ màn đăng nhập giữ phông cũ, không tải thêm phông khi em chưa đăng nhập.
+   27/10 MƯỢT: đọc `<html data-ht2>` (màn `.ht2` tự gắn — useDanhDauHt2 trong HocTapHomNay.tsx) thay `:root:has(.ht2)` — :has() ở gốc làm tính lại kiểu cả trang. */
+:root[data-trong='hs'][data-ht2] { --sans: 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; }
+:root[data-trong='hs'][data-ht2] body { font-weight: 500; }
+:root[data-trong='hs'][data-ht2] :where(h1, h2, h3, button, b, strong, th, dd) { font-weight: 800; }
 /* «Đề cho nét thanh hơn» (thầy 27/10, ảnh màn làm câu): chữ đề + phương án dùng mặt Đề (500), màu chữ đậm vừa --tr-chu để nét thanh mà vẫn rõ;
    chữ chạm được (tô màu, goi-y-cham) giữ đậm hơn một bậc — mặt Đậm (xin 700). */
-:root[data-trong='hs']:has(.ht2) .duo :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; }
-:root[data-trong='hs']:has(.ht2) .duo .ht2-lam-de-chu { color: var(--tr-chu); }
-:root[data-trong='hs']:has(.ht2) .gyc-v.gyc-cham { font-weight: 700; }
-:root[data-trong='hs']:has(.ht2) .duo .duo-tra[data-so] .ht2-lam-pa { font-weight: 800; } /* phương án SỐ (câu tính) vẫn là số ⇒ Đậm */
+:root[data-trong='hs'][data-ht2] .duo :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; }
+:root[data-trong='hs'][data-ht2] .duo .ht2-lam-de-chu { color: var(--tr-chu); }
+:root[data-trong='hs'][data-ht2] .gyc-v.gyc-cham { font-weight: 700; }
+:root[data-trong='hs'][data-ht2] .duo .duo-tra[data-so] .ht2-lam-pa { font-weight: 800; } /* phương án SỐ (câu tính) vẫn là số ⇒ Đậm */
 /* Khoảng chữ đo trên ảnh Duolingo (khe giữa hai chữ / chiều cao chữ hoa): nút IN HOA «TIẾP TỤC» 0,18–0,22 ⇒ giữ .04em (0,18–0,21);
    nhãn nhỏ IN HOA «TỪ VỰNG MỚI» / «PHẦN 1, CỬA 1» 0,12 / 0,15 ⇒ .04em cũ rộng hơn (0,17) — .02em (0,14). */
-:root[data-trong='hs']:has(.ht2) .duo-nhan { letter-spacing: .02em; }
+:root[data-trong='hs'][data-ht2] .duo-nhan { letter-spacing: .02em; }
 /* PHÔNG 27/10 · DẤU CHỒNG: ĐĐH Rounded (như M PLUS gốc) có dấu chồng chữ hoa cao (Ổ đỉnh 1,06 em) và chân chữ sâu (g, ặ −0,23 em) ⇒ tiêu đề CÓ THỂ xuống hàng mà giãn
    dòng < 1,3 thì dấu dòng dưới chạm chân chữ dòng trên (đo mực hai dòng, phông 700 và 800: 1,25 còn chạm «gậy ặ ợ / Ỗ Ổ Ở Ữ», 1,3 hết chạm).
    Nâng các tiêu đề xuống hàng được lên 1,3; số / chữ một dòng (nowrap, chỉ chữ số, nút chữ in hoa) giữ nguyên. */
-:root[data-trong='hs']:has(.ht2) :is(.ht2-mo-dau h1, .da-bai b, .duo-xong h1, .tp-man h1, .tp-tieu, .tp-combo, .tp-khe b, .tp-o-hh b) { line-height: 1.3; }
+:root[data-trong='hs'][data-ht2] :is(.ht2-mo-dau h1, .da-bai b, .duo-xong h1, .tp-man h1, .tp-tieu, .tp-combo, .tp-khe b, .tp-o-hh b) { line-height: 1.3; }
 /* PHÔNG 27/10 · 360 px: phông rộng hơn Nunito ⇒ nhãn ngắn bẻ dòng xấu («2/4 chặng đã | chốt», «Đúng 2 câu | khó», «Tinh thể và | bình giữ | chuỗi»).
    Bớt khoảng / cỡ biểu tượng ở điện thoại hẹp và cân dòng (text-wrap: balance) — không cắt chữ. */
-:root[data-trong='hs']:has(.ht2) :is(.tp-nv .giua > b, .da-o b, .da-o .mo, .ktcn-dong-so li > span, .tp-lua-lon .giua p, .tp-nut, .tp-nut-lon) { text-wrap: balance; }
+:root[data-trong='hs'][data-ht2] :is(.tp-nv .giua > b, .da-o b, .da-o .mo, .ktcn-dong-so li > span, .tp-lua-lon .giua p, .tp-nut, .tp-nut-lon) { text-wrap: balance; }
 @media (max-width: 380px) {
-  :root[data-trong='hs']:has(.ht2) .ktcn-dong-so li { gap: 6px; font-size: 14px; }
-  :root[data-trong='hs']:has(.ht2) .ktcn-dong-so li > svg { width: 18px; height: 18px; flex: none; }
-  :root[data-trong='hs']:has(.ht2) .tp-nv { gap: 10px; padding: 12px; }
-  :root[data-trong='hs']:has(.ht2) .tp-nv .giua > b { font-size: 15px; }
-  :root[data-trong='hs']:has(.ht2) .tp-nv .thuong { min-width: 0; }
-  :root[data-trong='hs']:has(.ht2) .da-o { gap: 12px; padding: 14px 12px; }
-  :root[data-trong='hs']:has(.ht2) .da-o .h { width: 48px; height: 48px; }
-  :root[data-trong='hs']:has(.ht2) .da-o .so { font-size: 20px; }
+  :root[data-trong='hs'][data-ht2] .ktcn-dong-so li { gap: 6px; font-size: 14px; }
+  :root[data-trong='hs'][data-ht2] .ktcn-dong-so li > svg { width: 18px; height: 18px; flex: none; }
+  :root[data-trong='hs'][data-ht2] .tp-nv { gap: 10px; padding: 12px; }
+  :root[data-trong='hs'][data-ht2] .tp-nv .giua > b { font-size: 15px; }
+  :root[data-trong='hs'][data-ht2] .tp-nv .thuong { min-width: 0; }
+  :root[data-trong='hs'][data-ht2] .da-o { gap: 12px; padding: 14px 12px; }
+  :root[data-trong='hs'][data-ht2] .da-o .h { width: 48px; height: 48px; }
+  :root[data-trong='hs'][data-ht2] .da-o .so { font-size: 20px; }
 }
 /* Số đồng hồ / điểm / bộ đếm không nhảy bề ngang khi đổi. */
 :root[data-trong='hs'] :where(.duo-chuoi, .duo-3 b, .tr-so, .ht2-lam-hom-nay, [role='timer'], time) { font-variant-numeric: tabular-nums; }
@@ -203,9 +204,6 @@
 [data-trong='hs'] .ht2-ca .ht-nut-chinh { min-height: 44px; padding: 0 18px; border-radius: 12px; border-color: var(--tr-tin-chu); background: var(--tr-tin-chu); color: var(--tr-trang); font-size: 15px; }
 
 /* Thẻ chung của màn: trắng, viền mảnh, bo 20px, bóng rất nhẹ. */
-[data-trong='hs'] .tr-hn-luoi :is(.ht2-hn, .ht2-nhom, .ht2-moi-sua, .ktcn-the, .ht-the) {
-  margin: 0; padding: 20px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); color: var(--tr-chu);
-}
 /* Bảng màu riêng của thẻ Hôm nay (biến khai ở hoc-tap.css) ⇒ màu app + màu nghĩa «Trong». */
 [data-trong='hs'] :is(.ht2-hn, .ht2-dong) {
   --lg-nhan: var(--tr-chinh-chu); --hn-du: var(--tr-dung); --hn-thieu-it: var(--tr-chu-y); --hn-khong: var(--tr-sai); --hn-o-cho: var(--tr-vien-2);
@@ -213,8 +211,6 @@
 }
 [data-trong] :is(.tr-the-dau, .ht2-nhom > h2) { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
 [data-trong] .ht2 :is(.tr-the-dau h2, .ht2-nhom > h2) { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.4; letter-spacing: 0; }
-[data-trong] .tr-nhip :is(.ht2-hn-tiep, .ht2-hn-luoi) { padding: 12px 14px; border-radius: 12px; font-size: 14px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
-[data-trong] .tr-hn-luoi :is(.ht2-moi-sua-nut, .ht2-moi-sua-chu-nut, .ht2-moi-sua > .vh-hang) { grid-column: 1 / -1; }
 
 /* ── Ôn và sửa / Kết quả: MỘT thẻ, dòng ngăn bằng đường mảnh ── */
 [data-trong='hs'] .ht2-noi-dung > .ht2-nhom, [data-trong='hs'] .tr-hn-luoi .ht2-nhom {
@@ -241,8 +237,6 @@
 [data-trong] .ht2[data-mot] .ht2-mo-dau h1 { margin: 0; font-size: 24px; }
 [data-trong] .ht2[data-mot] .ht-thong-bao { margin: 0; }
 [data-trong] .mot-xuong { display: block; width: 70%; height: 22px; border-radius: 8px; background: var(--tr-mat-2); }
-[data-trong] .mot-o > :is(svg, span, img) { max-width: 100%; max-height: 100%; }
-[data-trong] .mot-giua :is(strong, small) { overflow-wrap: anywhere; }
 [data-trong] .mot-lien-ket {
   display: inline-flex; align-items: center; align-self: flex-start; gap: 4px; min-height: 44px; padding: 0 4px; border: 0; background: transparent;
   color: var(--tr-chinh-chu); font-size: 15px; font-weight: 600;
@@ -473,7 +467,6 @@
   [data-trong] .ht2-mo-dau h1 { font-size: 24px; }
   [data-trong='hs'] .ht2 .ht-noi-dung { padding: 24px 28px 96px 16px; }
   [data-trong] .ht2-ca .ht-nut-chinh { width: 100%; }
-  [data-trong='hs'] .tr-hn-luoi :is(.ht2-hn, .ktcn-the, .ht-the, .ht2-moi-sua) { padding: 16px; border-radius: 18px; }
   [data-trong] .ht2 .ht2-nhom > h2 { padding: 14px 16px 4px; }
   [data-trong] .ht2-nhom > .ht2-dong { padding: 12px 16px; }
   [data-trong] .htn-lo { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'dau' 'nut' 'thang'; padding: 16px; }
@@ -743,7 +736,7 @@
   [data-trong] .da-huy { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
 }
 /* DUYỆT 26/10: vòng «Kiểm tra ôn tập» (số «10/28» + «đã trả lời»): phông tròn (Nunito, nay ĐĐH Rounded) cao dòng hơn ⇒ hai dòng chồng 3px ở giãn dòng 1.1 — giãn 1.25 (vừa lòng vòng 84–112px) */
-:root[data-trong='hs']:has(.ht2) .ktcn-vong > span { line-height: 1.25; }
+:root[data-trong='hs'][data-ht2] .ktcn-vong > span { line-height: 1.25; }
 /* DUYỆT 26/10: chữ ≥ 12 — chữ cái tên em trong vòng 24px ở menu («MA») 10px và số tin chưa đọc trên chuông menu 11px ⇒ 12px (vừa vòng 24 / ô 20) */
 [data-trong] .tr-menu-anh, [data-trong] .tr-menu-tb .m3-tb-dem { font-size: 12px; }
 /* DUYỆT 26/10: Lộ trình đang tải — vạch chờ (70%) đứng CẠNH tên bài trong băng bài ⇒ «Bài học hôm nay» vỡ mỗi chữ một dòng (cột 67px) — vạch chờ xuống hàng riêng, nền mờ trên băng xanh */

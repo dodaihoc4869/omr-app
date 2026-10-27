@@ -53,6 +53,12 @@ export const laCauKho = (q: { sao?: unknown; mucDo?: unknown }): boolean => Numb
 
 /** Số câu tối đa của một bài (chặng) — mục tiêu ngày = ceil(mức câu hôm nay / số này). */
 export const CAU_MOI_BAI = 6
+/**
+ * CHẶNG ĐỦ (thầy 27/10 «tối ưu chặt chẽ… công bằng», lỗ hổng đo 27/10: 34/382 chặng xong < 6 câu, 22 «hoàn hảo» < 6 câu, 8 em-ngày ăn «Xong 2 chặng» chỉ nhờ
+ * chặng ngắn): từ 28/10 chặng < CAU_MOI_BAI câu KHÔNG tính vào «Xong N chặng», «Chặng hoàn hảo», mục tiêu ngày theo chặng, huy hiệu hoàn hảo. Ngày cũ giữ.
+ */
+export const NGAY_CHANG_DU = '2026-10-28'
+export const changDu = (ngay: string, soCau: number): boolean => ngay < NGAY_CHANG_DU || soCau >= CAU_MOI_BAI
 export const TT_RUONG = 15
 export const TT_MUC_TIEU_NGAY = 5
 export const TT_KIM_CUONG = 40
@@ -67,8 +73,11 @@ export const thuHaiTt = (ngay: string): string => congNgayTt(ngay, -((new Date(D
 export function tuanMuaBinh(ngay: string): { tu: string; toi: string; muaTiepTu: string } {
   const t2 = thuHaiTt(ngay)
   const sau = congNgayTt(t2, 7)
-  return { tu: `tt|${t2}|`, toi: `tt|${sau}|`, muaTiepTu: sau }
+  // 28/10: bình mua TRƯỚC lần đặt lại 00:01 28/10 (đã bị đặt về 0) không tính vào trần tuần ⇒ đếm từ 28/10.
+  return { tu: `tt|${t2 > MOC_DEM_BINH_TUAN ? t2 : MOC_DEM_BINH_TUAN}|`, toi: `tt|${sau}|`, muaTiepTu: sau }
 }
+/** Ngày bắt đầu đếm trần bình tuần theo sổ ví (sau lần đặt lại bình 00:01 28/10). */
+export const MOC_DEM_BINH_TUAN = '2026-10-28'
 export const TT_CUOC_DAT = 50
 export const TT_CUOC_THANG = 100
 export const CUOC_SO_NGAY = 7

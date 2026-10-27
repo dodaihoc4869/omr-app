@@ -11,6 +11,7 @@ import worker from '../server/src/index'
 import { taoKhoOmni, themChienDich } from './omni-3-ke-hoach-chung'
 import { dongBoGoi7 } from '../server/src/goi-bai-7'
 import { SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
+import { SQL_SAN_SANG } from '../server/src/san-sang'
 import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
 import { xoaDemChienDich, xoaDemMetaCau } from '../server/src/srs2-d1'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
@@ -74,6 +75,8 @@ function boDemDot(goc: Env['DB']) {
 async function kho() {
   const k = taoKhoOmni({ 'DH-B8': 24 }, 3)
   for (const q of SQL_BANG_HANH_TRINH) k.d.sql.exec(q)
+  for (const q of SQL_SAN_SANG) k.d.sql.exec(q) // bảng bản sẵn (san-sang.ts) có sẵn như bản sống
+  k.d.sql.exec('CREATE TABLE IF NOT EXISTS chien_dich_em (chien_dich_id TEXT NOT NULL, sbd TEXT NOT NULL, them_luc TEXT, bot_luc TEXT, PRIMARY KEY (chien_dich_id, sbd))') // có ở bản sống
   await damBaoBangBaiDaDay(k.env)
   const b8 = k.qids('DH-B8')
   k.d.sql.exec(`UPDATE hoc_sinh SET lop='12', ten_lop=NULL, mat_khau='mk';
@@ -131,6 +134,13 @@ it('nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D
   vi.setSystemTime(NOW + 190_000); await amCo(); const lau = await nop(3, true)
   expect(lau.kq.correct).toBe(true); ghi('nop-cau-dung-xac-thuc', lau)
   vi.setSystemTime(NOW + 191_000); ghi('dem-sau-cau-xac-thuc', await goi(k, 'hoc-tap-dem', {}))
+  // NHANH 27/10 (thầy «nhanh hơn app cũ mọi chỗ»): đồng bộ EXP học tập nền (~3 phút/lần + mỗi lần quay lại tab) — lượt không có gì mới KHÔNG ghi lại hồ sơ;
+  // kế hoạch ngày (/hs/ke-hoach-ngay, Sảnh hỏi sớm + làm mới) — lịch Kiểm tra ôn tập đọc cùng đợt mật khẩu.
+  vi.setSystemTime(NOW + 300_000); await amCo(); await goi(k, 'academic-sync', {})
+  vi.setSystemTime(NOW + 301_000); ghi('dong-bo-exp-lai', await goi(k, 'academic-sync', {}))
+  const keHoach = async () => { const viecPhu: Promise<unknown>[] = []; const ctx = { waitUntil: (x: Promise<unknown>) => { viecPhu.push(x) }, passThroughOnException() {} }
+    return k.bo.chay(async () => (await (await worker.fetch(new Request('https://test/hs/ke-hoach-ngay', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: k.token }) }), k.env, ctx as never)).json()) as Record<string, unknown>, viecPhu) }
+  vi.setSystemTime(NOW + 470_000); await amCo(); ghi('ke-hoach-ngay', await keHoach())
   const moc = JSON.parse(fs.readFileSync(MOC, 'utf8')) as { mayChuNop?: Record<string, { dot: number; lenh: number }> }
   if (process.env.GHI_MOC_TOC_DO) fs.writeFileSync(process.env.GHI_MOC_TOC_DO, JSON.stringify(do_, null, 1))
   const vuot: string[] = [], ha: string[] = [], thieuMoc: string[] = []

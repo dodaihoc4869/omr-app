@@ -36,6 +36,11 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS bi_a_moi_tu ON bi_a_moi(tu_sbd, tao_luc)',
   //  · Vào bàn bằng mã / cấp mã bàn mới: bàn đang chờ trong hạn vé.
   'CREATE INDEX IF NOT EXISTS bi_a_van_cho ON bi_a_van(trang_thai, tao_luc)',
+  // 27/10 (thầy «tức thì mọi khung giờ»; Analytics D1 27/10 19–23h, EXPLAIN bản thật): sổ học theo em + mốc giờ (`sbd = ? AND luc >= ?`, 4,9 % thời gian D1 khung
+  // học, ~2.250 dòng đọc mỗi lần) đang đi chỉ mục (sbd, received_at) ⇒ quét hết sổ của em. Bảng ~300 nghìn dòng: dựng ở cron 00:01 VN, ngoài giờ học.
+  'CREATE INDEX IF NOT EXISTS idx_skh_em_luc ON su_kien_hoc(sbd, luc)',
+  //  · Lượt xem lời giải theo em + mốc giờ (`loi_giai_hoi WHERE sbd=? AND … AND luc>=?`, 24 nghìn lần khung học): chỉ mục cũ (sbd, qid, luc) ⇒ quét mọi câu.
+  'CREATE INDEX IF NOT EXISTS idx_lg_hoi_em_luc ON loi_giai_hoi(sbd, luc)',
 ]
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {

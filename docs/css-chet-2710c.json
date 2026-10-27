@@ -1,0 +1,12 @@
+{
+ "ghiChu": "27/10/2026 khuya — thầy: «TỐI ƯU CHUYÊN SÂU TỐC ĐỘ, ĐỘ MƯỢT TỨC THÌ NHƯ APP CŨ». Gỡ CSS CHẾT để bù byte cho phần tối ưu độ mượt (luật tốc độ: mốc chỉ hạ): luật mà MỌI vế bộ chọn có lớp không còn ở đâu trong src/, server/src, public, index.html, scripts/chup-v2 (trừ tiền tố ghép động, lucide/katex). Tờ nạp chung: src/components/bat-linh/che-do-toi.css (.bl-bieu-cam, .dh2-canh/.dao2-canh — game đã gỡ), src/styles/may-yeu.css (.v2-the, .v2s-tien-do, .dao2-giay), src/styles/giao-dien-day-du.css (.ls-trang .ls-the). Cổng học sinh: src/components/hoc-tap/hoc-tap.css (.ht2-nhe, .ht2-the, .ht2-tu-chua, .ht-dieu-khien, .ht-hoan-thanh, .ht-ca), src/styles/trong-hs.css (.tr-hn-luoi, .tr-nhip, .mot-o, .mot-giua). m3-tuong-thich.css là tệp SINH (test m3-b/m3-c) ⇒ không sửa tay. cu = khai báo màu biến mất theo các luật ấy (khoá → số lần); không đổi màu nào đang hiện.",
+ "cu": {
+  "src/components/bat-linh/che-do-toi.css · box-shadow: 0 3px 10px rgb(0 0 0 / .3), 0 0 0 3px rgb(24 43 40 / .8)": 1,
+  "src/components/bat-linh/che-do-toi.css · background: linear-gradient(rgb(8 27 25 / .48), rgb(13 29 28 / .62)), var(--bl-battle-scene) center 68% / cover": 1,
+  "src/styles/may-yeu.css · box-shadow: 0 1px 3px rgb(0 0 0 / 0.1) !important": 1,
+  "src/components/hoc-tap/hoc-tap.css · --nhe-xanh: color-mix(in srgb,var(--xanh) 50%,var(--muc))": 1,
+  "src/components/hoc-tap/hoc-tap.css · --nhe-do: color-mix(in srgb,var(--do) 68%,var(--muc))": 1,
+  "src/components/hoc-tap/hoc-tap.css · --nhe-cam: color-mix(in srgb,var(--cam) 38%,var(--muc))": 1,
+  "src/components/hoc-tap/hoc-tap.css · --nhe-m: var(--muc)": 1
+ }
+}

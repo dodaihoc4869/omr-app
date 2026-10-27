@@ -29,3 +29,45 @@ export function dauTruocLucDoc(d: string, docLuc: number): boolean {
   return moc < new Date(docLuc).toISOString()
 }
 
+
+/**
+ * ĐỆM THEO KHO trong isolate (28/10 — Analytics D1 27/10 19–23h: đọc câu rút gọn của tờ 8 %, siêu dữ liệu câu ~6 % thời gian D1; kho câu gần như tĩnh — mốc lập
+ * chỉ mục mới nhất 07/10). Mỗi khoá đọc D1 nhiều nhất MỘT lần mỗi `hanMs` (30 phút) trong isolate; quá `kiemMs` (5 phút) thì hỏi dấu kho (một dòng nhẹ,
+ * `dauKhoCau`): dấu đổi (thầy sửa đề / duyệt / thêm tờ ⇒ mốc lập chỉ mục đổi) ⇒ bỏ ngay, đọc lại. Không đọc được dấu ⇒ đọc lại (như cũ).
+ * Lượt cùng khoá đến cùng lúc (isolate mới giờ cao điểm) chờ chung MỘT lượt đọc. Giới hạn số khoá + tổng trọng lượng (vd số câu) ⇒ bộ nhớ có trần.
+ * Bộ test mặc định TẮT (kết quả test không phụ thuộc giờ thật / đệm giữa các ca); test của đệm bật bằng `batDemTheoKho(true)`.
+ */
+let demTheoKhoBat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
+export function batDemTheoKho(b: boolean): void { demTheoKhoBat = b }
+const cacDem: { xoa(): void }[] = []
+/** Bỏ mọi đệm theo kho (test / sau khi lập lại chỉ mục trong cùng isolate). */
+export function xoaDemTheoKho(): void { for (const d of cacDem) d.xoa() }
+export class DemTheoKho<T> {
+  private kho = new Map<string, { v: T; dau: string; kiem: number; luc: number; co: number }>()
+  private dang = new Map<string, Promise<T>>()
+  private tong = 0
+  constructor(private readonly hanMs = 30 * 60_000, private readonly kiemMs = 5 * 60_000, private readonly toiDaKhoa = 64, private readonly toiDaCo = 400_000) { cacDem.push(this) }
+  xoa(): void { this.kho.clear(); this.dang.clear(); this.tong = 0 }
+  private bo(k: string): void { const x = this.kho.get(k); if (x) { this.tong -= x.co; this.kho.delete(k) } }
+  async lay(env: Env, khoa: string, now: number, doc: () => Promise<T>, co: (v: T) => number = () => 1): Promise<T> {
+    if (!demTheoKhoBat) return doc()
+    const x = this.kho.get(khoa)
+    if (x && now - x.luc >= 0 && now - x.luc < this.hanMs) {
+      if (now - x.kiem >= 0 && now - x.kiem < this.kiemMs) return x.v
+      const d = await dauKhoCau(env)
+      if (d && (x.dau ? d === x.dau : dauTruocLucDoc(d, x.luc)) && this.kho.get(khoa) === x) { x.dau = d; x.kiem = now; return x.v }
+    }
+    this.bo(khoa)
+    const dangDoc = this.dang.get(khoa)
+    if (dangDoc) return dangDoc
+    const p = doc()
+    this.dang.set(khoa, p)
+    try {
+      const v = await p
+      const c = Math.max(1, co(v))
+      this.bo(khoa); this.kho.set(khoa, { v, dau: '', kiem: now, luc: now, co: c }); this.tong += c
+      for (const k of this.kho.keys()) { if (this.kho.size <= this.toiDaKhoa && this.tong <= this.toiDaCo) break; if (k !== khoa) this.bo(k) }
+      return v
+    } finally { if (this.dang.get(khoa) === p) this.dang.delete(khoa) }
+  }
+}

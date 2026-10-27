@@ -22,6 +22,7 @@ import type { KetQuaDanhSachChua, LichKiemLaiHoiThay, MucChua } from '../../lib/
 import { nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
 import { dungViecHomNay, docSbdHs, luuViecHomNay, themMotChang } from '../../lib/tu-sua-viec-hom-nay'
 import ViecHomNay from './ViecHomNay'
+import { useDanhDauHt2 } from './HocTapHomNay'
 import type { ViecHomNay as KieuViecHomNay, ViecMuc } from '../../lib/tu-sua-viec-hom-nay'
 import type { TienDoSua } from '../chua-cau-sai/KhungDuoSua'
 import { taiCauDaLam, NHAN_NGUON_LAN, type CauDaLamMuc } from '../hoa2/api'
@@ -139,6 +140,7 @@ export function tienDoSua(viec: KieuViecHomNay | null | undefined, qid: string):
 type Chon = { qid: string; ten?: string; kiemHoiThay?: boolean; /** câu mở thẳng KHÔNG có trong danh sách: mở không được thì về danh sách kèm lời báo */ thu?: boolean }
 
 export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: string; qid?: string; onVe: () => void; onTuLuyen?: () => void }) {
+  useDanhDauHt2() // <html data-ht2> (xem HocTapHomNay.tsx)
   const [chon, setChon] = useState<Chon | null>(null)
   /** Câu mở thẳng đang chờ danh sách để tìm đúng đợt. */
   const [doi, setDoi] = useState(qid ?? '')
