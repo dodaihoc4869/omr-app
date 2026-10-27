@@ -389,7 +389,10 @@ const DS_NC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [14
   NC_CANH.map(([t, m, cho, viec]) => [`nc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết NÂNG CẤP 27/10
 // ═══ LỘ TRÌNH GHIM 27/10 (tiền tố "lg-"): lần mở đầu (bong bóng lời Bi) · lần mở sau trong ngày (không bong bóng) · đã cuộn (thẻ bài dính, thu gọn)
-const LG_CANH = [['dau', 'hs-mot&tp=1', /Ester/], ['sau', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['cuon', 'hs-mot&tp=1', /Ester/, 'lam13:nap » cuon:320 » cho']]
+const LG_CANH = [['dau', 'hs-mot&tp=1', /Ester/], ['sau', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['cuon', 'hs-mot&tp=1', /Ester/, 'lam13:nap » cuon:320 » cho'],
+  // 27/10 thầy «bấm vào hiện như thế này» (ảnh Duolingo): thẻ bật ra dưới / trên nút cho từng loại nút
+  ...[['hoc', '^(Học tiếp|Bắt đầu học)'], ['xong', 'đã xong$'], ['khoa', 'chưa mở$'], ['ruong', '^Rương hôm nay'], ['kiem', '^Kiểm tra ôn tập'], ['sua', '^Tự sửa lỗi']]
+    .map(([k, ten]) => [`pop-${k}`, 'hs-mot&tp=1', /Ester/, `lam13:nap » nut:${ten} » cho:300`])]
 const DS_LG = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   LG_CANH.map(([t, m, cho, viec]) => [`lg-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ BẢNG + TẤM CHƯA TÍNH 27/10 (tiền tố "nb-"): bảng 2 hàng × 4 cột tự xoay dọc ở khổ hẹp · tấm «Chưa được tính» gọn · bảng lớn cuộn ngang có bóng mép
