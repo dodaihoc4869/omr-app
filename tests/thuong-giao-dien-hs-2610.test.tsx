@@ -15,6 +15,7 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 import * as M from './_thuong-mau'
 import { DUONG, _quenTam, docBangGiai, docDsBan, docKetBai, docThuongCau, docTongQuan, ghiTam, khoaTam, type TongQuanThuong, type ThongBao } from '../src/lib/thuong-api'
 import { _quenDaXem } from '../src/components/thuong/loc-thong-bao'
+import { capNhatTongQuan } from '../src/components/thuong/dung-thuong'
 import { ThanhThuong } from '../src/components/thuong/ThanhThuong'
 import { BangCombo, CHU_KHONG_TINH, OngNghiem, TamThuong } from '../src/components/thuong/TamThuong'
 import KetBaiThuong from '../src/components/thuong/KetBaiThuong'
@@ -82,9 +83,18 @@ describe('phần hiện ngay', () => {
     await waitFor(() => expect(c.querySelector('[data-k="tt"] .tp-so')?.textContent).toBe('245'))
     expect(c.querySelector('[data-k="lua"] .tp-so')?.textContent).toBe('12')
     expect(c.querySelector('[data-k="nt"] .tp-so')?.textContent).toBe('147')
-    expect(screen.getByRole('button', { name: 'Mục tiêu ngày 3/4 bài' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 4 chặng · đã xong 3' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Tinh thể: 245' }))
     expect(mo).toHaveBeenCalledWith('cua-hang')
+  })
+  it('vòng mục tiêu (lỗi 27/10 «1/16»): nói rõ «16 chặng (96 câu) · đã xong 1»; xong chặng ⇒ capNhatTongQuan ⇒ vòng đổi số NGAY, không cần mở lại app', async () => {
+    datMayChu({ ...M.tongQuanGia(), mucTieu: { daXong: 1, can: 16, cau: 96 } })
+    ve(<ThanhThuong token={TK} onMo={() => {}} thongBao={false} />)
+    const vong = await screen.findByRole('button', { name: 'Mục tiêu hôm nay: 16 chặng (96 câu) · đã xong 1' })
+    expect(vong.getAttribute('title')).toBe('Mục tiêu hôm nay: 16 chặng (96 câu) · đã xong 1')
+    mayChu[DUONG.tongQuan] = { ...M.tongQuanGia(), mucTieu: { daXong: 3, can: 16, cau: 96 } }
+    await act(async () => { await capNhatTongQuan(TK) })
+    expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 16 chặng (96 câu) · đã xong 3' })).toBeTruthy()
   })
   it('thanh trên: thiếu trường ⇒ ô đó ẩn; chưa có bản nào ⇒ khung xương không số', async () => {
     datMayChu({ ok: true, bat: M.BAT, thongBao: [], tinhThe: 80 })

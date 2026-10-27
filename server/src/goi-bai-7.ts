@@ -29,6 +29,8 @@ import { envGhiRieng, lenhTrong } from './doc-d1-theo-luot'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
 import { soSanhOnHoiThay } from './hoi-thay-lich-on'
 import { cungTap, layKeHoach7, nhoKeHoach7 } from './goi-bai-7-nho'
+import { lenhThuongTraLoi, tinhThuongHocCachGiai, type PhienNt } from './thuong-tra-loi'
+import { ngayVnTt } from './thuong-luat'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -681,17 +683,27 @@ export async function gapHuongDan7(env: Env,sbd: string,b: Row,now: number) {
   if (!gs.length || !q.reviewed || laCauTuLuan(q) || !(await chanKhacKhoiEm(env,'goi7-chua',sbd,[q])).length) throw new Error('Câu không thuộc bài được giao cho em.')
   const chua = await env.DB.prepare('SELECT loi_go FROM goi_bai_7_chua WHERE qid=? AND version=? AND goi_id IN (SELECT value FROM json_each(?)) LIMIT 1').bind(q.qid,q.version,JSON.stringify(gs.map(g=>g.id))).first<{loi_go:string}>()
   const solution = chua?.loi_go && chua.loi_go!=='@loi-giai-goc' ? chua.loi_go : q.solution
+  // LỖI 27/10 (vòng «Mục tiêu ngày» đứng 1/16): câu học cách giải không đi qua `answer` ⇒ chặng có nó không bao giờ «xong bài». Nay câu này vào `$.nt` của
+  // phiên (có hỗ trợ, KHÔNG được tính — 0 nguyên tử, luật thưởng giữ nguyên) và nếu là câu cuối thì ghi `thuong_bai_xong` + đọc mục tiêu ngày CÙNG lô (0 vòng chờ thêm).
+  const tt = tinhThuongHocCachGiai(s as unknown as PhienNt, q.qid, q, now)
+  const ltt = tt ? lenhThuongTraLoi(env,{sbd,phien:str(b.session),receipt:str(b.session),ngay:ngayVnTt(now),luc:new Date(now).toISOString(),nowMs:now,ra:tt,gac:'EXISTS (SELECT 1 FROM game_v2_session WHERE id = ?)'}) : null
+  // Phần thưởng lỗi (vd. bảng chưa có) ⇒ chạy lại lô KHÔNG có nó — thưởng không bao giờ làm hỏng lệnh học cách giải.
+  const chayLo = async (ds: D1PreparedStatement[]): Promise<Record<string,unknown>> => {
+    if (!ltt) { await env.DB.batch(ds); return {} }
+    try { const kq = await env.DB.batch([...ds, ...ltt.lenh]); const mt = tt?.ketBai ? ltt.mucTieuTu(kq) : null; return tt?.ketBai ? { ketBai: { ...tt.ketBai, ...(mt ? { mucTieu: mt } : {}) } } : {} }
+    catch { await env.DB.batch(ds); return {} }
+  }
   if (!solution || typeof solution==='string' && !solution.trim()) {
     // Chỉ chứng nhận em đã gặp câu và cần thầy, không phát đáp án hay ghi đã hiểu.
-    await env.DB.batch(gs.map(g=>env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_gap(receipt,goi_id,sbd,qid,version,kieu,luc) VALUES(?,?,?,?,?,?,?)').bind(`${str(b.session)}|${q.qid}|${g.id}`,g.id,sbd,q.qid,q.version,'cho_thay',new Date(now).toISOString())))
-    return {ok:true,choThay:true,correct:false}
+    const them = await chayLo(gs.map(g=>env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_gap(receipt,goi_id,sbd,qid,version,kieu,luc) VALUES(?,?,?,?,?,?,?)').bind(`${str(b.session)}|${q.qid}|${g.id}`,g.id,sbd,q.qid,q.version,'cho_thay',new Date(now).toISOString())))
+    return {ok:true,choThay:true,correct:false,...them}
   }
   // Sau khi phần chữa đã mở, máy chủ buộc mọi lần nộp trong phiên này là có hỗ trợ.
   ref.goiY={cotLoi:'Đã học phần chữa'}
-  await env.DB.batch([
+  const them = await chayLo([
     env.DB.prepare("UPDATE game_v2_session SET json=json_set(json,? ,json(?)) WHERE id=? AND sbd=? AND json_extract(json,?)=?").bind(`$.questions[${s.questions.indexOf(ref)}].goiY`,JSON.stringify(ref.goiY),str(b.session),sbd,`$.questions[${s.questions.indexOf(ref)}].qid`,q.qid),
     ...gs.map(g=>env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_gap(receipt,goi_id,sbd,qid,version,kieu,luc) VALUES(?,?,?,?,?,?,?)').bind(`${str(b.session)}|${q.qid}|${g.id}`,g.id,sbd,q.qid,q.version,'co_ho_tro',new Date(now).toISOString())),
     env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi(sbd,qid,luc) VALUES(?,?,?)').bind(sbd,q.qid,new Date(now).toISOString()),
   ])
-  return {ok:true,correct:false,answer:q.correct,solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),hocCoHoTro:true}
+  return {ok:true,correct:false,answer:q.correct,solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),hocCoHoTro:true,...them}
 }
