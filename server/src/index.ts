@@ -3666,9 +3666,14 @@ const boXuLy = {
       if (p === '/hs/ke-hoach-ngay') {
         // DỒN LƯỢT + ĐỆM 20 GIÂY theo em (dem-ke-hoach.ts; Boss 21/09): lượt đệm KHÔNG ghi gì; em có ghi thì đệm bị xoá ngay. `thanThu` luôn đọc tươi.
         let sbdKhoa = ''
-        try { sbdKhoa = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
+        // NHANH 27/10 (thầy «nhanh hơn app cũ mọi chỗ»): lịch Kiểm tra ôn tập (CHỈ ĐỌC) bắt đầu CÙNG đợt lượt đọc mật khẩu khi token đã qua kiểm chữ ký — trước: một đợt D1
+        // nối tiếp riêng sau xác thực. Kết quả/lỗi chỉ dùng ở đúng chỗ `await` cũ.
+        const ktMod = import('./kiem-tra-ca-nhan')
+        let ktSom: { sbd: string; p: Promise<Awaited<ReturnType<Awaited<typeof ktMod>['docKtCn']>>> } | null = null
+        try { sbdKhoa = b.token ? await gameIdentity(env, b, (s) => { const p = ktMod.then((m) => m.docKtCn(env, s, Date.now(), true)); p.catch(() => {}); ktSom = { sbd: s, p } }) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
         if (!sbdKhoa || sbdKhoa.length > 40) return themMocReset(env, ra(await dungKeHoachEm(env, b)))
-        const kt=await import('./kiem-tra-ca-nhan'), baiKt=await kt.docKtCn(env,sbdKhoa,Date.now(),true)
+        const som = ktSom as { sbd: string; p: Promise<Awaited<ReturnType<Awaited<typeof ktMod>['docKtCn']>>> } | null
+        const kt=await ktMod, baiKt=await (som && som.sbd === sbdKhoa ? som.p : kt.docKtCn(env,sbdKhoa,Date.now(),true))
         if(kt.laNgayKt(baiKt,Date.now())){
           const tt=kt.tomTatKt(baiKt!,Date.now())
           if(kt.coHocNgayKt(baiKt)){const g=await import('./goi-bai-7'),dem=await g.demHomNay7(env,sbdKhoa,Date.now()),lam=Number(dem.daLamHomNay);return themMocReset(env,ra({ok:true,cheDoNgay:'goi7',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:12,toiThieuCau:12},tienBo:{daLamCau:lam,toiThieuCau:12,conThieu:Math.max(0,12-lam),dat:lam>=12}}))}
@@ -3723,7 +3728,12 @@ const boXuLy = {
       if (p === '/hs/chua-cau-sai/danh-sach') return raChua(await chuaDanhSach(env,b))
       // 27/10 khoá theo Kiểm tra ôn tập: đang có bài kiểm tra hôm nay chưa nộp ⇒ chưa mở đợt Tự sửa lỗi (giao diện cũng khoá nút).
       if (p === '/hs/chua-cau-sai/mo-dot') {
-        const kt = await import('./kiem-tra-ca-nhan'), sbd = await gameIdentity(env, b), khoa = kt.ktDangKhoaChang(await kt.docKtCn(env, sbd, Date.now(), true), Date.now())
+        // NHANH 27/10: lịch Kiểm tra ôn tập đọc CÙNG đợt lượt đọc mật khẩu (như /hs/ke-hoach-ngay ở trên).
+        const kt = await import('./kiem-tra-ca-nhan')
+        let ktSom: { sbd: string; p: ReturnType<typeof kt.docKtCn> } | null = null
+        const sbd = await gameIdentity(env, b, (s) => { const p = kt.docKtCn(env, s, Date.now(), true); p.catch(() => {}); ktSom = { sbd: s, p } })
+        const somKt = ktSom as { sbd: string; p: ReturnType<typeof kt.docKtCn> } | null
+        const khoa = kt.ktDangKhoaChang(await (somKt && somKt.sbd === sbd ? somKt.p : kt.docKtCn(env, sbd, Date.now(), true)), Date.now())
         if (khoa) return ra({ ok: false, ma: kt.MA_KHOA_KT, error: kt.CHU_KHOA_KT, kiemTraCaNhan: khoa }, 409)
         // 27/10 tốc độ (thầy: «sửa lỗi chỗ mở câu phải tức thì»): `gon:true` (CHỈ-THÊM) ⇒ mở đợt XONG thì mở luôn bản làm lại (gon-mo) trong CÙNG lượt,
         // trả ở trường `gon` (đúng thân lệnh gon-mo, kèm `status`) — máy em khỏi gọi gon-mo nối tiếp. Không có cờ ⇒ y như cũ.
