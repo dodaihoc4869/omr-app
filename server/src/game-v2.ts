@@ -416,7 +416,9 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(p.choice&&action!=='hoa2-cau-da-lam'&&action!=='hoa2-cau-chi-tiet')return {ok:true,cheDo2:true,canChonThu:true};
     return cauDaLamSom??hoa2Action(env,sbd,action,b);
   }
-  if(action==='academic-sync'){const result=await syncAcademic(env,sbd,p,b.mom);return {ok:true,...result,profile:visible(p),revision:await save(env,sbd,p,revision)}}
+  // NHANH 27/10: nhịp nền ~3 phút + mỗi lần quay lại tab ⇒ phần lớn lượt KHÔNG có gì mới ⇒ hồ sơ y nguyên (bỏ qua mốc giờ đồng bộ `academic.at`) thì KHÔNG ghi
+  // lại — trước: lần nào cũng UPDATE cả JSON hồ sơ (một đợt ghi D1 nối tiếp).
+  if(action==='academic-sync'){const truocSync=JSON.stringify(p),atTruoc=p.academic?.at;const result=await syncAcademic(env,sbd,p,b.mom);const ac=p.academic,atMoi=ac?.at;if(ac&&atTruoc!==undefined)ac.at=atTruoc;const yNguyen=JSON.stringify(p)===truocSync;if(ac)ac.at=atMoi!;return {ok:true,...result,profile:visible(p),revision:yNguyen?revision:await save(env,sbd,p,revision)}}
   if(action==='progress-history'){
     const rows=await env.DB.prepare(`SELECT date(created_at,'+7 hours') AS day, COUNT(*) AS total,
       SUM(CASE WHEN json_extract(json,'$.attempt.correct')=1 AND COALESCE(json_extract(json,'$.attempt.assisted'),0)=0 THEN 1 ELSE 0 END) AS correct

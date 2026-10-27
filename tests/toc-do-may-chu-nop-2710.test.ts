@@ -131,6 +131,13 @@ it('nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D
   vi.setSystemTime(NOW + 190_000); await amCo(); const lau = await nop(3, true)
   expect(lau.kq.correct).toBe(true); ghi('nop-cau-dung-xac-thuc', lau)
   vi.setSystemTime(NOW + 191_000); ghi('dem-sau-cau-xac-thuc', await goi(k, 'hoc-tap-dem', {}))
+  // NHANH 27/10 (thầy «nhanh hơn app cũ mọi chỗ»): đồng bộ EXP học tập nền (~3 phút/lần + mỗi lần quay lại tab) — lượt không có gì mới KHÔNG ghi lại hồ sơ;
+  // kế hoạch ngày (/hs/ke-hoach-ngay, Sảnh hỏi sớm + làm mới) — lịch Kiểm tra ôn tập đọc cùng đợt mật khẩu.
+  vi.setSystemTime(NOW + 300_000); await amCo(); await goi(k, 'academic-sync', {})
+  vi.setSystemTime(NOW + 301_000); ghi('dong-bo-exp-lai', await goi(k, 'academic-sync', {}))
+  const keHoach = async () => { const viecPhu: Promise<unknown>[] = []; const ctx = { waitUntil: (x: Promise<unknown>) => { viecPhu.push(x) }, passThroughOnException() {} }
+    return k.bo.chay(async () => (await (await worker.fetch(new Request('https://test/hs/ke-hoach-ngay', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: k.token }) }), k.env, ctx as never)).json()) as Record<string, unknown>, viecPhu) }
+  vi.setSystemTime(NOW + 470_000); await amCo(); ghi('ke-hoach-ngay', await keHoach())
   const moc = JSON.parse(fs.readFileSync(MOC, 'utf8')) as { mayChuNop?: Record<string, { dot: number; lenh: number }> }
   if (process.env.GHI_MOC_TOC_DO) fs.writeFileSync(process.env.GHI_MOC_TOC_DO, JSON.stringify(do_, null, 1))
   const vuot: string[] = [], ha: string[] = [], thieuMoc: string[] = []
