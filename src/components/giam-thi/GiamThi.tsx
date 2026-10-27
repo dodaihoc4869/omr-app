@@ -5,7 +5,8 @@
 //   đúng ⇒ mừng theo tính cách (đúng liền ≥ 3 ⇒ combo) · sai ⇒ xị mặt · câu chưa tính ⇒ lắc ngón tay · học có hỗ trợ / chờ thầy ⇒ đứng coi.
 // Lời càu nhàu (loi-giam-thi.ts) theo nhịp chung cả phiên, tối đa 1 lần mỗi 2–3 câu. Tab ẩn ⇒ dừng hết (hoạt ảnh + hẹn giờ).
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react'
-import { duongL, khuyetL, taoGiamThi, type GiamThi, type MucGT, type TrangThaiGT } from './giam-thi-ve'
+import { duongL, khuyetL, type MucGT, type TrangThaiGT } from './giam-thi-ve'
+import { taoGiamThi, type GiamThi } from './giam-thi-nguoi' // 4 giám thị HÌNH NGƯỜI v3 (thầy chốt 27/10), cùng API bản cũ
 import { cauMoi, suLoi, taoNhip, type NguCanhLoi, type NhipLoi } from './loi-giam-thi'
 import './giam-thi.css'
 

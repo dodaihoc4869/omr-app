@@ -100,11 +100,16 @@
 [data-trong] .duo-gt-bong::before { content: ''; position: absolute; left: -9px; top: var(--duoi, 50%); width: 14px; height: 14px; margin-top: -7px; background: var(--tr-mat); border-left: 2px solid var(--tr-vien); border-bottom: 2px solid var(--tr-vien); border-bottom-left-radius: 4px; transform: rotate(45deg); }
 [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 19px; }
 .duo-gt-vien, .duo-gt-cho { display: none; }
+/* Giám thị NGƯỜI (v3): mặt ở ~38 % bề ngang khung tính từ đỉnh ⇒ đề ngắn: bong bóng canh từ trên, mũi nhọn (30 px từ đỉnh bong bóng) chĩa vào mặt. */
+[data-trong] .duo-gt-san:not([data-l]) { align-items: start; }
+[data-trong] .duo-gt-san:not([data-l]) .duo-gt-bong { --duoi: 30px; margin-top: max(0px, calc(var(--gt-nvw) * .38 - 30px)); }
 /* Đề dài: chữ L. Khuyết = giám thị (lệch trái 14 px, nhô trên 4 px; thân rộng ~83 %, chân ở ~96 % cao hình) + khe 10 px; --gt-kw / --gt-kh / --gt-kd (mũi nhọn) mảnh GiamThi đọc để vẽ viền. */
 [data-trong] .duo-gt-san[data-l] {
   grid-template-columns: minmax(0, 1fr); align-items: start;
   --gt-kw: calc(var(--gt-nvw) * .83 - 4px); --gt-kh: calc(var(--gt-nvw) * 1.15 + 6px); --gt-kd: calc(var(--gt-nvw) * .71 - 4px);
 }
+/* Giám thị NGƯỜI (v3, 27/10): người cao ≈ bề ngang khung, thân hẹp hơn dụng cụ cũ ⇒ khuyết chữ L đo lại (cùng công thức khuyetL trong giam-thi-ve.ts). */
+[data-trong] .duo-gt-san[data-l] { --gt-kw: calc(var(--gt-nvw) * .66 - 2px); --gt-kh: calc(var(--gt-nvw) * 1.1 + 4px); --gt-kd: calc(var(--gt-nvw) * .38 + 0px); }
 [data-trong] .duo-gt-san[data-l] .duo-gt-nv { position: relative; z-index: 1; grid-column: 1; grid-row: 2; align-self: start; justify-self: start; margin: -4px 0 0 -14px; }
 [data-trong] .duo-gt-san[data-l] .duo-gt-bong { grid-column: 1; grid-row: 2; display: flow-root; margin: 0; border: 0; background: none; isolation: isolate; }
 [data-trong] .duo-gt-san[data-l] .duo-gt-bong::before { content: none; }
@@ -124,3 +129,103 @@
   [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
 }
 /* Chữ trong bong bóng ≥ 18 px: chữ chạm được (VungChamDe, vùng chạm = cao chữ + 20 px) luôn ≥ 44 px. */
+
+/* GIÁM THỊ HÌNH NGƯỜI v3 (giam-thi-nguoi.ts, thầy chốt 27/10 «Chốt thay đi»): BẢNG MÀU TRANH của 4 người — KHÔNG mã thô, mọi sắc pha color-mix từ
+   bốn màu thân --gt-mau-*, --tr-tin / --tr-sao, trắng --gt-trang và đen cố định --btg-chu-doan (đen không đổi theo nền ⇒ tóc / con ngươi luôn đậm).
+   Tên biến --gn-<phần>; mỗi mức đè phần riêng (da, tóc, áo, quần, giày, điểm nhấn) dưới [data-muc]. */
+.gtn {
+  --gn-trang: var(--gt-trang);
+  --gn-den: color-mix(in srgb, var(--gt-toi) 43%, color-mix(in srgb, var(--gt-mau-vdc) 8%, var(--btg-chu-doan)));
+  --gn-mieng: color-mix(in srgb, var(--gt-mau-vdc) 49%, var(--btg-chu-doan));
+  --gn-luoi: color-mix(in srgb, var(--gt-mau-th) 9%, color-mix(in srgb, var(--gt-mau-vdc) 70%, var(--gt-trang)));
+  --gn-hong: color-mix(in srgb, var(--gt-mau-th) 10%, color-mix(in srgb, var(--gt-mau-vdc) 60%, var(--gt-trang)));
+  --gn-hong2: color-mix(in srgb, var(--gt-mau-th) 45%, color-mix(in srgb, var(--gt-mau-vdc) 56%, var(--gt-trang)));
+  --gn-xam2: color-mix(in srgb, var(--gt-trang) 64%, var(--btg-chu-doan));
+  --gn-xam3: color-mix(in srgb, var(--gt-trang) 78%, var(--gt-toi));
+  --gn-tin: var(--tr-tin);
+  --gn-tinT: color-mix(in srgb, var(--btg-chu-doan) 15%, var(--tr-tin));
+  --gn-tinN: color-mix(in srgb, var(--tr-tin) 15%, var(--gt-trang));
+  --gn-tinS: color-mix(in srgb, var(--tr-tin) 49%, var(--gt-trang));
+  --gn-kinh: color-mix(in srgb, var(--tr-tin) 12%, var(--gt-trang));
+  --gn-nap: color-mix(in srgb, var(--tr-tin) 28%, color-mix(in srgb, var(--gt-mau-vdc) 2%, var(--gt-trang)));
+  --gn-sao: var(--tr-sao);
+  --gn-cam: var(--gt-mau-vd);
+  --gn-camT: color-mix(in srgb, var(--gt-mau-vd) 89%, var(--btg-chu-doan));
+  --gn-tim: var(--gt-mau-th);
+  --gn-timT: color-mix(in srgb, var(--gt-mau-th) 85%, var(--btg-chu-doan));
+  --gn-xanh: var(--gt-mau-nb);
+  --gn-do: var(--gt-mau-vdc);
+  --gn-nau: color-mix(in srgb, var(--gt-mau-nb) 35%, color-mix(in srgb, var(--gt-mau-th) 7%, var(--gt-mau-vdc)));
+  --gn-gang: var(--tr-tin);
+  --gn-gangT: color-mix(in srgb, var(--btg-chu-doan) 15%, var(--tr-tin));
+  --gn-giot: color-mix(in srgb, var(--tr-tin) 40%, var(--gt-trang));
+  --gn-bong: color-mix(in srgb, var(--tr-chu) 12%, transparent);
+}
+@media (prefers-color-scheme: dark) { .gtn { --gn-bong: var(--tr-mat-3); } }
+.gtn[data-muc='nb'] {
+  --gn-da: color-mix(in srgb, var(--gt-mau-th) 17%, color-mix(in srgb, var(--gt-mau-vd) 51%, var(--gt-trang)));
+  --gn-daT: color-mix(in srgb, var(--gt-mau-th) 46%, color-mix(in srgb, var(--gt-mau-vd) 25%, var(--tr-sao)));
+  --gn-daV: color-mix(in srgb, var(--gt-mau-vdc) 35%, color-mix(in srgb, var(--gt-mau-vd) 63%, var(--tr-tin)));
+  --gn-toc: color-mix(in srgb, var(--gt-mau-vd) 13%, color-mix(in srgb, var(--gt-mau-vdc) 17%, var(--btg-chu-doan)));
+  --gn-tocT: color-mix(in srgb, var(--gt-mau-vd) 9%, color-mix(in srgb, var(--gt-mau-vdc) 8%, var(--btg-chu-doan)));
+  --gn-may: color-mix(in srgb, var(--gt-mau-vd) 11%, color-mix(in srgb, var(--gt-mau-vdc) 8%, var(--btg-chu-doan)));
+  --gn-aoT: color-mix(in srgb, var(--gt-mau-nb) 82%, var(--btg-chu-doan));
+  --gn-aoV: color-mix(in srgb, var(--gt-mau-nb) 67%, var(--btg-chu-doan));
+  --gn-quan: color-mix(in srgb, var(--gt-mau-th) 17%, color-mix(in srgb, var(--tr-tin) 25%, var(--btg-chu-doan)));
+  --gn-giay: color-mix(in srgb, var(--gt-trang) 46%, var(--tr-tin));
+  --gn-ve: color-mix(in srgb, var(--gt-mau-nb) 77%, var(--gt-trang));
+  --gn-ao: var(--gt-mau-nb);
+  --gn-coTay: var(--gn-aoT);
+  --gn-giayT: var(--gt-trang);
+}
+.gtn[data-muc='th'] {
+  --gn-da: color-mix(in srgb, var(--gt-mau-th) 24%, color-mix(in srgb, var(--gt-mau-vd) 56%, var(--btg-chu-doan)));
+  --gn-daT: color-mix(in srgb, var(--gt-mau-th) 15%, color-mix(in srgb, var(--gt-mau-vd) 43%, var(--btg-chu-doan)));
+  --gn-daV: color-mix(in srgb, var(--gt-mau-vdc) 23%, color-mix(in srgb, var(--tr-sao) 16%, var(--btg-chu-doan)));
+  --gn-toc: color-mix(in srgb, var(--gt-mau-vd) 4%, var(--btg-chu-doan));
+  --gn-tocT: var(--btg-chu-doan);
+  --gn-aoT: color-mix(in srgb, var(--gt-mau-th) 87%, var(--btg-chu-doan));
+  --gn-aoV: color-mix(in srgb, var(--gt-mau-th) 76%, var(--btg-chu-doan));
+  --gn-quan: color-mix(in srgb, var(--gt-mau-th) 22%, color-mix(in srgb, var(--tr-tin) 9%, var(--btg-chu-doan)));
+  --gn-giay: color-mix(in srgb, var(--gt-mau-th) 75%, var(--btg-chu-doan));
+  --gn-giayT: color-mix(in srgb, var(--gt-mau-th) 58%, var(--btg-chu-doan));
+  --gn-ve: color-mix(in srgb, var(--gt-trang) 42%, var(--gt-mau-th));
+  --gn-khuy: color-mix(in srgb, var(--btg-chu-doan) 33%, var(--gt-mau-th));
+  --gn-gong: color-mix(in srgb, var(--gt-mau-th) 50%, var(--btg-chu-doan));
+  --gn-ao: var(--gt-mau-th);
+  --gn-coTay: var(--gn-aoT);
+  --gn-may: var(--gn-toc);
+}
+.gtn[data-muc='vd'] {
+  --gn-da: color-mix(in srgb, var(--gt-mau-th) 30%, color-mix(in srgb, var(--tr-sao) 55%, var(--gt-trang)));
+  --gn-daT: color-mix(in srgb, var(--gt-mau-nb) 8%, color-mix(in srgb, var(--gt-mau-th) 51%, var(--tr-sao)));
+  --gn-daV: color-mix(in srgb, var(--gt-mau-th) 33%, color-mix(in srgb, var(--tr-sao) 67%, var(--btg-chu-doan)));
+  --gn-toc: color-mix(in srgb, var(--btg-chu-doan) 96%, var(--gt-mau-th));
+  --gn-tocT: var(--btg-chu-doan);
+  --gn-ao: color-mix(in srgb, var(--gt-trang) 46%, var(--tr-tin));
+  --gn-aoT: color-mix(in srgb, var(--gt-mau-nb) 1%, color-mix(in srgb, var(--tr-tin) 70%, var(--gt-trang)));
+  --gn-aoV: color-mix(in srgb, var(--gt-trang) 18%, color-mix(in srgb, var(--tr-tin) 92%, var(--btg-chu-doan)));
+  --gn-quan: color-mix(in srgb, var(--btg-chu-doan) 80%, var(--gt-trang));
+  --gn-giay: color-mix(in srgb, var(--gt-mau-nb) 18%, color-mix(in srgb, var(--gt-mau-vdc) 52%, var(--gt-toi)));
+  --gn-giayT: color-mix(in srgb, var(--gt-mau-nb) 13%, color-mix(in srgb, var(--gt-mau-vdc) 37%, var(--btg-chu-doan)));
+  --gn-bac: color-mix(in srgb, var(--gt-mau-th) 37%, color-mix(in srgb, var(--tr-tin) 51%, var(--tr-sao)));
+  --gn-kinhV: color-mix(in srgb, var(--tr-tin) 56%, var(--gt-trang));
+  --gn-coTay: var(--gn-tinT);
+  --gn-may: var(--gn-toc);
+  --gn-kinh3: color-mix(in srgb, var(--tr-tin) 29%, var(--gt-trang));
+}
+.gtn[data-muc='vdc'] {
+  --gn-da: color-mix(in srgb, var(--gt-mau-vd) 14%, color-mix(in srgb, var(--gt-mau-vdc) 19%, var(--gt-trang)));
+  --gn-daT: color-mix(in srgb, var(--gt-mau-th) 27%, color-mix(in srgb, var(--gt-mau-vd) 54%, var(--gt-trang)));
+  --gn-daV: color-mix(in srgb, var(--gt-mau-nb) 10%, color-mix(in srgb, var(--gt-mau-th) 53%, var(--gt-mau-vd)));
+  --gn-toc: color-mix(in srgb, var(--tr-tin) 6%, color-mix(in srgb, var(--gt-trang) 78%, var(--gt-toi)));
+  --gn-tocT: color-mix(in srgb, var(--gt-mau-th) 39%, color-mix(in srgb, var(--tr-tin) 54%, var(--tr-sao)));
+  --gn-may: color-mix(in srgb, var(--tr-tin) 7%, color-mix(in srgb, var(--gt-trang) 30%, var(--gt-toi)));
+  --gn-aoT: color-mix(in srgb, var(--gt-mau-vdc) 88%, var(--btg-chu-doan));
+  --gn-aoV: color-mix(in srgb, var(--gt-mau-vdc) 74%, var(--btg-chu-doan));
+  --gn-quan: color-mix(in srgb, var(--gt-mau-vdc) 28%, color-mix(in srgb, var(--tr-tin) 32%, var(--btg-chu-doan)));
+  --gn-giay: color-mix(in srgb, var(--gt-mau-vd) 9%, color-mix(in srgb, var(--gt-mau-vdc) 43%, var(--btg-chu-doan)));
+  --gn-giayT: color-mix(in srgb, var(--gt-mau-vd) 7%, color-mix(in srgb, var(--gt-mau-vdc) 28%, var(--btg-chu-doan)));
+  --gn-ao: var(--gt-mau-vdc);
+  --gn-coTay: var(--gn-aoT);
+}
