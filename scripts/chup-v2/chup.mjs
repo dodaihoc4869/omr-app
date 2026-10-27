@@ -552,7 +552,37 @@ const MENU6_CANH = [['mo', 'hs-mot&dd=khong', 'menu6:'], ['dd', 'hs-mot&dd=mo', 
 const DS_MENU6 = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   MENU6_CANH.map(([t, m, viec]) => [`menu6-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, /Ester/, viec])))
 // ═══ hết MENU 6 MỤC 27/10
+// ═══ NGANG DUO 27/10 (tiền tố "ngd-", thầy 27/10 «Tối ưu tất cả các màn app hs xoay ngang và máy tính chưa»): MỌI màn app học sinh giao diện Duolingo ở
+// điện thoại ngang 844×390 · 932×430, máy tính bảng 1024×768, máy tính 1440×900 (sáng + tối) + điện thoại dọc 390×844 · 360×640 (chứng minh không vỡ).
+// Ngoài tràn ngang / vùng chạm, cảnh "ngd-" đo thêm (ghi `<ra>/do-ngd.jsonl`, in «Bố cục»): dòng chữ > 75 kí tự, nút / ô phương án / ô nhập bị phần tử khác
+// che (thanh đáy dính, giám thị, bàn phím), dải kết quả > 45% chiều cao (khổ thấp), tấm nổi (bóng đèn, thẻ chạm, thẻ Lộ trình) vượt mép màn.
+const NGD_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['lo-trinh-pop', 'hs-mot&tp=1', /Ester/, 'lam13:nap » nut:^(Học tiếp|Bắt đầu học) » cho:300'],
+  ['cau-chon', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B'], ['cau-dung', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+  ['cau-sai', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, `${NC_DEN_TINH} » tn:^A » nut:^Kiểm tra$`],
+  ['cau-combo', 'lam13&lam=duo-nc&chuoi=2', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$ » cho » cho » cho » cho » cho'],
+  ['cau-ds', 'lam13&lam=duo', /Số đồng phân amine/, `lam13:${D_Q3} » ds:a=Đúng,b=Đúng`],
+  ['de-dai', 'lam13&lam=duo&gtde=aniline&gt=th', /Aniline/, 'lam13:cho:3600 » dau'], ['de-gt', 'lam13&lam=duo&gtde=dai&gtloi=1&gt=vd', /Toluidine là/, 'lam13:cho:3600 » dau'],
+  ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
+  ['sua', 'duo-sua&de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI}`], ['sua-tln', 'duo-sua&de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Dấu phẩy$ » nut:^2$'],
+  ['kt-cau', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, 'lam13:nut:^Làm tiếp chặng 2'], ['kt-luoi', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI}`],
+  ['thi-cau', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, 'lam13:nut:^B\\.'], ['thi-kq', 'duo-kt&v=kq&vai=hocsinh', /Làm tốt lắm/],
+  ['ban-phim', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, `${BP_TLN} » phim:8,2`], ['bong-den', 'lam13&lam=duo', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Trợ giúp'],
+  ['hoi-thay', 'lam13&lam=duo&ht=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Hỏi thầy'],
+  ['giu', 'lam13&lam=duo&tp=1&giu=1', /Số đồng phân amine/, `lam13:${D_Q1} » ${X_GIU}`], ['cham', 'lam13&lam=duo&cham=chat', /aniline/, 'cham:aniline'],
+  ['menu', 'hs-mot&dd=khong', /Ester/, 'menu6:'], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'nut:Chuỗi 12 ngày'],
+  ['ban', 'hs-mot&tp=1&ten=dai', /Ester/, 'ton:menu:Thành tích » nut:Học cùng bạn'], ['kim-cuong', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
+  ['giai', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Giải tuần'], ['luyen', 'hs-mot&tp=1', /Ester/, 'menu:Luyện tập'],
+  ['ho-so', 'hs-ho-so&nhe=luoi', /Hồ sơ làm bài của em/, 'hse:dau'],
+]
+const NGD_KHO = [[844, 390, 'ngang', 2], [932, 430, 'ngang932', 2], [1024, 768, 'bang', 2], [1440, 900, 'may-tinh', 2], [390, 844, 'doc', 1], [360, 640, 'doc640', 1]]
+// chạy nhanh: NGD_KHO=ngang,may-tinh (chỉ các khổ ấy) · NGD_TOI=0 (bỏ nền tối)
+const NGD_LOC = (process.env.NGD_KHO ?? '').split(',').filter(Boolean)
+const DS_NGD = NGD_KHO.filter(([, , k]) => !NGD_LOC.length || NGD_LOC.includes(k)).flatMap(([w, hh, k, soNen]) => ['light', 'dark'].slice(0, process.env.NGD_TOI === '0' ? 1 : soNen).flatMap((nen) =>
+  NGD_CANH.map(([t, m, cho, viec]) => [`ngd-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết NGANG DUO 27/10
 const DS = [
+  ...DS_NGD, // NGANG DUO 27/10
   ...DS_DUO_KT, // DUO KIỂM TRA 27/10
   ...DS_MENU6, // MENU 6 MỤC 27/10
   ...DS_KGD, // KIỂM GD MỚI 26/10
@@ -753,6 +783,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.waitForTimeout(1200)
       for (let lan = 0; lan < 4; lan++) {
         if (await t.locator('#tr-menu[data-mo]').count()) break
+        // NGANG DUO 27/10: máy tính ≥ 1024 × 600 — menu là THANH BÊN TRÁI luôn hiện (không có nút «Mở menu») ⇒ bấm mục ngay
+        if (await t.evaluate(() => getComputedStyle(document.querySelector('.tr-menu-cham') ?? document.body).display === 'none' && getComputedStyle(document.querySelector('#tr-menu') ?? document.body).visibility === 'visible')) break
         await t.getByRole('button', { name: /^Mở menu/ }).locator('visible=true').first().click()
         await t.waitForTimeout(500)
       }
@@ -1133,6 +1165,42 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       .map((e) => `${(e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 40)} ${Math.round(e.getBoundingClientRect().width)}×${Math.round(e.getBoundingClientRect().height)}`),
   )
   if (nho.length) chamNho.push(`${ten}: ${nho.join(' | ')}`)
+  // NGANG DUO 27/10: đo bố cục (xem khối NGD_CANH) — chỉ ghi, không làm hỏng lượt chụp; tổng hợp ở cuối («Bố cục»).
+  if (ten.startsWith('ngd-')) {
+    const d = await t.evaluate(() => {
+      const W = innerWidth, H = innerHeight, ra = { dai: [], che: [], day: [], ngoai: [] }
+      const hien = (e) => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.opacity !== '0' && r.bottom > 1 && r.top < H - 1 && r.right > 1 && r.left < W - 1 }
+      const ten = (e) => (e.getAttribute('aria-label') || e.textContent || e.className || e.tagName).toString().trim().replace(/\s+/g, ' ').slice(0, 32)
+      // dòng chữ: nút chữ ≥ 2 dòng ⇒ kí tự / dòng trung bình
+      const di = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+      for (let n = di.nextNode(); n; n = di.nextNode()) {
+        const chu = n.textContent.replace(/\s+/g, ' ').trim(); if (chu.length < 60 || !n.parentElement || !hien(n.parentElement)) continue
+        const r = document.createRange(); r.selectNodeContents(n); const dong = new Set([...r.getClientRects()].filter((x) => x.width > 4).map((x) => Math.round(x.top / 4))).size
+        if (dong >= 2 && chu.length / dong > 75) ra.dai.push(`${Math.round(chu.length / dong)} kí tự/dòng «${chu.slice(0, 24)}»`)
+      }
+      // phần tử bấm / nhập bị che: điểm giữa không thuộc chính nó
+      for (const e of document.querySelectorAll('button, [role="button"], [role="radio"], a[href], input:not([type=hidden]), textarea')) {
+        if (!hien(e) || e.closest('[inert], [aria-hidden="true"]')) continue
+        const r = e.getBoundingClientRect(), x = Math.min(W - 2, Math.max(1, r.left + r.width / 2)), y = Math.min(H - 2, Math.max(1, r.top + r.height / 2))
+        if (r.top < 0 || r.bottom > H) continue // khuất một phần ở mép cuộn: không tính
+        const o = document.elementFromPoint(x, y); if (!o || e.contains(o) || o.contains(e) || e.closest('label')?.contains(o)) continue
+        ra.che.push(`${ten(e)} ⟵ ${(o.className?.baseVal ?? o.className ?? o.tagName).toString().split(' ')[0] || o.tagName}`)
+      }
+      // thanh / dải dính đáy: chiều cao so khung
+      for (const e of document.querySelectorAll('.duo-day, .duo-ket, .duo-ket-dai, [class*="-day"]')) {
+        if (!hien(e)) continue; const s = getComputedStyle(e); if (!/fixed|sticky/.test(s.position) && !e.classList.contains('duo-ket')) continue
+        const r = e.getBoundingClientRect(); ra.day.push(`${e.className.split(' ')[0]} ${Math.round(r.height)}px=${Math.round(r.height / H * 100)}%`)
+      }
+      // tấm nổi vượt mép
+      for (const e of document.querySelectorAll('.duo-tg-tam, .gyc-bong, .da-pop, [role="dialog"], .m3-tb-tam')) {
+        if (!hien(e)) continue; const r = e.getBoundingClientRect()
+        if (r.left < -1 || r.right > W + 1 || r.top < -1 || r.bottom > H + 1) ra.ngoai.push(`${e.className.split(' ')[0]} ${Math.round(r.left)},${Math.round(r.top)}→${Math.round(r.right)},${Math.round(r.bottom)}`)
+      }
+      ra.cao = document.scrollingElement.scrollHeight
+      return ra
+    })
+    writeFileSync(join(RA, 'do-ngd.jsonl'), JSON.stringify({ ten, ...d }) + '\n', { flag: 'a' })
+  }
   for (const q of [72, 60, 50, 40, 32, 25, 20, 15]) {
     const buf = await t.screenshot({ type: 'jpeg', quality: q, fullPage: ca })
     if (buf.length <= 150 * 1024 || q === 15) {

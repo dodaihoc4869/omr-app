@@ -1,0 +1,35 @@
+/* ── NGANG + MÁY TÍNH app học sinh giao diện Duolingo (thầy 27/10 «Tối ưu tất cả các màn app hs xoay ngang và máy tính chưa»). Chỉ BỐ CỤC: không màu mới,
+ * chỉ biến --tr-* sẵn có. Nạp cùng mảnh lười TrongHs (sau trong-hs.css). Tiền tố `:root[data-trong='hs']` ⇒ thắng luật cùng chỗ của tờ gốc (nạp trước / sau).
+ * Điện thoại dọc (390×844, 360×640) KHÔNG đổi. ──
+ *
+ * MÁY TÍNH (≥ 1024 rộng, ≥ 600 cao): menu 6 mục thành THANH BÊN TRÁI cố định (kiểu Duolingo web) — cùng phần tử <nav id="tr-menu">, cùng thứ tự đọc;
+ * vạch mép phải / thẻ dọc «Điểm danh» / lớp mờ không cần nữa. Nội dung (Lộ trình | cột phải) dời sang phải đúng bề thanh. */
+@media (min-width: 1024px) and (min-height: 600px) {
+  :root[data-trong='hs'] { --hs-ben: 220px; }
+  :root[data-trong='hs'] .ht2[data-mot] { padding-left: var(--hs-ben); }
+  :root[data-trong='hs'] .ht2[data-mot] .tr-menu {
+    inset: 0 auto 0 0; right: auto; width: var(--hs-ben); height: auto; max-height: none; margin: 0; padding: 20px 12px calc(16px + env(safe-area-inset-bottom));
+    gap: 10px; border: 0; border-right: 2px solid var(--tr-vien); border-radius: 0; box-shadow: none; z-index: 30;
+    visibility: visible; opacity: 1; transition: none; animation: none;
+  }
+  :root[data-trong='hs'] .ht2[data-mot] .tr-menu-dau { padding: 0 4px 6px 8px; }
+  :root[data-trong='hs'] .ht2[data-mot] .tr-menu-muc { gap: 12px; min-height: 50px; padding: 6px 10px; font-size: 16px; }
+  :root[data-trong='hs'] .ht2[data-mot] :is(.tr-menu-cham, .tr-menu-phu) { display: none; }
+  /* không còn vạch mép phải ⇒ trả lại lề phải 64px đã chừa cho vạch */
+  :root[data-trong='hs'] .ht2[data-mot] .dm-khung { grid-template-columns: minmax(0, 1fr) 300px; column-gap: 24px; padding-right: 24px; }
+  :root[data-trong='hs'] .ht2[data-mot] .da-tren { margin-right: -24px; padding-right: 24px; }
+  :root[data-trong='hs'] .ht2[data-mot] .dm-khung[data-muc] { grid-template-columns: minmax(0, 1fr); }
+  /* nút A.I nổi / tấm thông báo không bị thanh bên đè */
+  :root[data-trong='hs'] .ht2[data-mot] .tr-menu .m3-tb-tam { inset: 16px 16px auto auto; }
+}
+@media (min-width: 1280px) and (min-height: 600px) {
+  :root[data-trong='hs'] { --hs-ben: 256px; }
+  :root[data-trong='hs'] .ht2[data-mot] .tr-menu { padding-inline: 16px; }
+  :root[data-trong='hs'] .ht2[data-mot] .tr-menu-muc { font-size: 17px; }
+  :root[data-trong='hs'] .ht2[data-mot] .dm-khung { grid-template-columns: minmax(0, 1fr) 340px; column-gap: 32px; padding-inline: 24px; }
+  :root[data-trong='hs'] .ht2[data-mot] .da-tren { margin-left: -24px; padding-left: 24px; }
+}
+/* Màn danh sách một cột (Thử thách Kim cương): trước kéo hết 1000px, dòng chuyên đề rộng 900px+ (mắt chạy xa từ tên tới nút) ⇒ cột giữa 720px. */
+@media (min-width: 1000px) {
+  :root[data-trong='hs'] .tp-vo[data-man='kim-cuong-ds'] { max-width: 720px; }
+}

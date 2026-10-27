@@ -14,6 +14,7 @@ import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
 import { Bi, type CamBi } from '../linh-vat/Bi'
 import { banHat, yenLang } from '../../lib/hieu-ung'
 import '../../styles/trong-hs.css'
+import '../../styles/trong-hs-ngang.css' // NGANG + MÁY TÍNH 27/10: chỉ bố cục, nạp SAU trong-hs.css
 // THƯỞNG PHẠT (gộp đợt 3, 26/10 — src/components/thuong/CAM-VAO.md): thanh trên ThanhThuong vẽ NGAY từ bản lưu máy (nhỏ, cùng mảnh «Trong»); mọi màn
 // thưởng phạt + thẻ bên là MỘT mảnh nạp lười (ManThuong). Học sinh không thấy nhãn nhịp học / bậc.
 import { ThanhThuong } from '../thuong/ThanhThuong'
@@ -650,6 +651,10 @@ export function MenuDocTrong(p: {
   const onMuc = useRef(p.onMuc)
   onMuc.current = p.onMuc
   useEffect(() => { const ve = () => onMuc.current('hom-nay'); window.addEventListener('ddh:ve-lt', ve); return () => window.removeEventListener('ddh:ve-lt', ve) }, [])
+  // NGANG + MÁY TÍNH 27/10: đổi sang Luyện tập / Thành tích ⇒ về đầu trang (trước đây giữ chỗ cuộn của Lộ trình ⇒ mở mục mới ở giữa trang, cột trái trống).
+  // Lộ trình tự cuộn tới chặng hiện tại (F4) nên không đụng.
+  const mucTruoc = useRef(p.muc)
+  useEffect(() => { if (mucTruoc.current === p.muc) return; mucTruoc.current = p.muc; if (p.muc !== 'hom-nay') document.scrollingElement?.scrollTo?.(0, 0) }, [p.muc])
   const caiRef = useRef(false)
   caiRef.current = cai
   const nut = useRef<HTMLButtonElement>(null)

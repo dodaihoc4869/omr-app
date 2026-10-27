@@ -1,0 +1,65 @@
+/* ── NGANG + MÁY TÍNH màn làm câu kiểu Duolingo (thầy 27/10 «Tối ưu tất cả các màn app hs xoay ngang và máy tính chưa»). Chỉ BỐ CỤC: không màu mới.
+ * Nạp qua @import đầu trong-lam-bai.css ⇒ đứng TRƯỚC luật tờ ấy; tiền tố `:root[data-trong='hs']` cho đủ nặng để thắng. Điện thoại dọc không đổi. ──
+ *
+ * ĐIỆN THOẠI NGANG (cao ≤ 500): khung 844×390 phải thấy trọn phương án + «Kiểm tra» (trước: phương án ô 62–125px xếp một cột ⇒ «Kiểm tra» khuất
+ * dưới mép, ô nhập số bị bàn phím đẩy lên dưới thanh trên). Dải kết quả: DẢI ĐÁY TRẢI HẾT BỀ NGANG kiểu Duolingo (chữ trái · nút phải), ≤ 45% chiều cao —
+ * trước đây tấm nằm trong cột phải cao 190–235px (48–60% khung). Hai cột chừa đáy cuộn bằng dải ⇒ không gì bị dải che vĩnh viễn. */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* thanh trên + cột: bớt khoảng đầu */
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-tren { min-height: 44px; padding-top: 2px; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-cot-tra { gap: 8px; padding-top: 6px; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-cot-de { padding-top: 6px; }
+  /* phương án gọn: ô 46px, khe 8px; phương án ngắn (≤ 8 kí tự) lưới 2 × 2 */
+  :root[data-trong='hs'] .duo .ht2-lam-tn { gap: 8px; }
+  :root[data-trong='hs'] .duo .ht2-lam-pa, :root[data-trong='hs'] .duo .ht2-lam-pa[data-ket] { min-height: 46px; padding: 6px 12px; gap: 10px; }
+  :root[data-trong='hs'] .duo .ht2-lam-pa-ma, :root[data-trong='hs'] .duo .ht2-lam-pa[data-ket=mo] .ht2-lam-pa-ma { flex-basis: 30px; width: 30px; height: 30px; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-tra[data-luoi]:not([data-pa]) .ht2-lam-tn { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :root[data-trong='hs'] .duo .duo-tra[data-so] .ht2-lam-pa { min-height: 52px; font-size: 21px; }
+  /* phương án có tranh phân tử: lưới 2 × 2, tranh nhỏ ⇒ bốn ô + «Kiểm tra» vừa khung */
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-tra:has(.mh-pa) .ht2-lam-tn { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :root[data-trong='hs'] .duo .ht2-lam-pa:has(.mh-pa) { min-height: 104px; padding: 18px 6px 6px; }
+  :root[data-trong='hs'] .duo .mh-pa svg { width: 80px; height: 54px; }
+  :root[data-trong='hs'] .duo .ht2-lam-pa:has(.mh-pa) .ht2-lam-pa-chu { font-size: 15px; }
+  /* «Kiểm tra» (chưa chấm): khe đáy nhỏ */
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-day:not(.duo-ket) { margin-bottom: 4px; padding-block: 4px calc(6px + env(safe-area-inset-bottom)); }
+  /* trả lời ngắn: ô số + bàn phím vừa khung (ô 48, phím 44) */
+  :root[data-trong='hs'] .ht-app.duo .ht2-lam-o { height: 48px; font-size: 26px; }
+  :root[data-trong='hs'] .ht-app.duo .ht2-lam-phim { gap: 6px; }
+  :root[data-trong='hs'] .ht-app.duo .ht2-lam-phim button { height: 44px; }
+
+  /* DẢI KẾT QUẢ: ghim đáy, trải hết bề ngang; trong dải: chữ (cuộn riêng nếu dài) | hàng nút theo bề rộng chữ nút (không bẻ dòng) */
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-day.duo-ket {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; max-height: 45dvh; margin: 0; border-radius: 0;
+    padding: 8px max(20px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 20px; row-gap: 4px; width: 100%; max-width: 1080px; height: 100%; margin-inline: auto;
+  }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > * { grid-column: 1 / -1; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-kq { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; max-height: calc(45dvh - 16px); }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-hang-nut { grid-column: 2; grid-row: 1; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-loi { grid-column: 2; grid-row: 2; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket .duo-kq-chu h2 { font-size: 20px; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-hang-nut { min-width: 280px; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket .duo-nut { min-height: 46px; padding-inline: 18px; white-space: nowrap; }
+  /* dải đang hiện: hai cột chừa đáy cuộn bằng dải tối đa ⇒ phương án / cuối đề cuộn lên trên dải được */
+  :root[data-trong='hs'] .duo:not([data-xong]):has(.duo-ket) :is(.duo-cot-de, .duo-cot-tra) { padding-bottom: calc(45dvh + 8px); }
+}
+
+/* MÁY TÍNH BẢNG / MÁY TÍNH (≥ 1000 rộng, > 500 cao): đề dài / có hình / có bảng (data-de-dai) — trước chỉ từ 1100px — và câu TRẢ LỜI NGẮN (bàn phím số) chia
+ * hai cột đề | trả lời, cột đề ghim khi cuộn. Trước: 1024×768 một cột 720px ⇒ ô nhập + bàn phím đẩy đề lên khuất dưới thanh trên (phải cuộn lên đọc đề).
+ * Đề ngắn trắc nghiệm giữ một cột giữa như Duolingo. Thanh đáy vẫn trải hết bề ngang, nội dung dải nằm thẳng dưới cột trả lời (như luật ≥ 1100 sẵn có).
+ * (:has() không lồng được trong :has() ⇒ viết hai nhánh trong :is.) */
+@media (min-width: 1000px) and (min-height: 501px) {
+  :root[data-trong='hs'] :is(.duo:has(.duo-than[data-de-dai]), .duo:has(.ht2-lam-phim)) :is(.duo-tren, .duo-than, .duo-giua) { max-width: 1160px; }
+  :root[data-trong='hs'] .duo-than:is([data-de-dai], :has(.ht2-lam-phim)):has(> .duo-cot-de) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: start; align-content: start; }
+  :root[data-trong='hs'] .duo-than:is([data-de-dai], :has(.ht2-lam-phim)) > :is(.duo-cot-de, .duo-cot-tra) { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  :root[data-trong='hs'] .duo-than:is([data-de-dai], :has(.ht2-lam-phim)) > .duo-cot-de { position: sticky; top: 64px; }
+  :root[data-trong='hs'] :is(.duo:has(.duo-than[data-de-dai]), .duo:has(.ht2-lam-phim)) .duo-day > .duo-giua { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
+  :root[data-trong='hs'] :is(.duo:has(.duo-than[data-de-dai]), .duo:has(.ht2-lam-phim)) .duo-day > .duo-giua > * { grid-column: 2; }
+}
+
+/* Kết quả bài thi «Từng câu» (≥ 900 rộng, nửa khung): 9 cột cố định ⇒ ô 41px ở 932×430 (dưới 44px). Ô tối thiểu 44px, số cột tự theo bề rộng. */
+@media (min-width: 900px) {
+  :root[data-trong] .kq-cau { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); }
+}
