@@ -1,6 +1,6 @@
 // GIÁM THỊ THEO MỨC CÂU (thầy chốt 27/10): chọn mức, kho lời càu nhàu, nhịp nói, kịch bản trạng thái, hình vẽ không màu thô.
 import { describe, expect, it } from 'vitest'
-import { deDaiGiamThi, mucGiamThi } from '../src/components/giam-thi/muc-giam-thi'
+import { mucGiamThi } from '../src/components/giam-thi/muc-giam-thi'
 import { khoaMucDo } from '../src/lib/muc-do-nhan-thuc'
 import { LOI_GIAM_THI, cauMoi, suLoi, taoNhip, type NguCanhLoi } from '../src/components/giam-thi/loi-giam-thi'
 import { THU_TU_GT, duongL, gocTay, khuyetL, kichBan, veGiamThi, type TrangThaiGT } from '../src/components/giam-thi/giam-thi-ve'
@@ -21,11 +21,6 @@ describe('chọn giám thị theo mức câu', () => {
     expect(mucGiamThi(undefined)).toBeNull()
     expect(mucGiamThi({ mucDo: 'van_dung', sao: 2 })).toBe('vdc')
     expect(mucGiamThi({ mucDo: 'hieu', sao: 0 })).toBe('th')
-  })
-  it('đề dài / có hình ⇒ giám thị nhỏ', () => {
-    expect(deDaiGiamThi({ text: 'Chất nào sau đây làm quỳ tím hoá xanh?' })).toBe(false)
-    expect(deDaiGiamThi({ text: 'x'.repeat(120) })).toBe(true)
-    expect(deDaiGiamThi({ text: 'ngắn', hinhAnh: [{ viTri: 'sau_de' }] })).toBe(true)
   })
 })
 
