@@ -1,0 +1,50 @@
+# ĐO GIẢI TUẦN (CHỈ ĐỌC) — thầy 27/10: bảng giải tuần hiện 0 nguyên tử cho em đã đủ mức hôm nay («Xem con số nguyên tử đã tính đúng chưa»).
+# Chỉ SELECT; chỉ in số đếm gộp và dòng ẩn danh (không mã em, không tên). So bảng giai_tuan (cộng bởi trigger) với sổ exp_so của cùng tuần.
+name: Đo giải tuần (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/giai-tuan-nt-2710]
+    paths: ['.github/workflows/do-giai-tuan-2710.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-giai-tuan-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Giải tuần so với sổ (chỉ SELECT gộp / ẩn danh)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          T="2026-10-26"
+          q "trigger trên exp_so" "SELECT name, substr(sql, 1, 400) s FROM sqlite_master WHERE type='trigger' AND tbl_name IN ('exp_so','giai_tuan')"
+          q "giai_tuan theo tuần: dòng · có nt · nt=0 · đã chốt · chờ xếp · loại · vào sớm/muộn" \
+            "SELECT tuan, COUNT(*) n, SUM(nguyen_tu>0) co_nt, SUM(nguyen_tu=0) nt0, SUM(chot_luc IS NOT NULL) chot, SUM(nhom='') cho, SUM(nhom='-') loai, MIN(vao_luc) vao_dau, MAX(vao_luc) vao_cuoi, MIN(chot_luc) chot_dau, MAX(chot_luc) chot_cuoi FROM giai_tuan GROUP BY tuan ORDER BY tuan"
+          q "cau_hinh giải" "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN ('giai_tuan_chot','thuong_giai_tuan','thuong_moc')"
+          q "exp_so tuần này theo ngày: dòng · tổng · số em · exp>0" \
+            "SELECT ngay_vn, COUNT(*) n, SUM(exp) tong, COUNT(DISTINCT sbd) em, SUM(exp>0) duong FROM exp_so WHERE ngay_vn >= '$T' GROUP BY ngay_vn"
+          q "exp_so tuần này theo loại: dòng · tổng · được trigger tính là hỗ trợ" \
+            "SELECT loai, COUNT(*) n, SUM(exp) tong, SUM(CASE WHEN loai='cau_ho_tro' OR (loai='cau' AND ghi_chu LIKE 'Câu đúng có hỗ trợ%') THEN exp ELSE 0 END) ho_tro FROM exp_so WHERE ngay_vn >= '$T' GROUP BY loai ORDER BY tong DESC LIMIT 30"
+          q "so em: sổ tuần (exp>0, trước CN 22h) vs giai_tuan.nguyen_tu — nhóm khớp/lệch" \
+            "WITH s AS (SELECT sbd, SUM(exp) e FROM exp_so WHERE ngay_vn >= '$T' AND ngay_vn <= date('$T','+6 days') AND exp > 0 GROUP BY sbd) SELECT CASE WHEN g.em IS NULL THEN 'khong_co_dong' WHEN g.nguyen_tu = s.e THEN 'khop' WHEN g.nguyen_tu = 0 THEN 'giai_0' WHEN g.nguyen_tu < s.e THEN 'giai_thieu' ELSE 'giai_thua' END k, COUNT(*) n, SUM(s.e) so, SUM(COALESCE(g.nguyen_tu,0)) giai FROM s LEFT JOIN giai_tuan g ON g.tuan = '$T' AND g.em = s.sbd GROUP BY k"
+          q "dòng giai_tuan tuần này mà sổ tuần không có nguyên tử" \
+            "SELECT COUNT(*) n, SUM(g.nguyen_tu) nt FROM giai_tuan g WHERE g.tuan = '$T' AND NOT EXISTS (SELECT 1 FROM exp_so s WHERE s.sbd = g.em AND s.ngay_vn >= '$T' AND s.exp > 0)"
+          q "lý do hiện 0 trên bảng (dòng đã xếp nhóm tuần này)" \
+            "SELECT SUM(g.nguyen_tu=0) nt0, SUM(g.nguyen_tu>0 AND d.bac>=3) bac_doi_pho, SUM(g.nguyen_tu>0 AND (d.bac IS NULL OR d.bac<3) AND g.nguyen_tu_ho_tro>=g.nguyen_tu) het_ho_tro, SUM(g.nguyen_tu>0 AND (d.bac IS NULL OR d.bac<3) AND g.nguyen_tu_ho_tro<g.nguyen_tu) hien_duong, COUNT(*) n FROM giai_tuan g LEFT JOIN danh_gia_em_tuan d ON d.sbd=g.em AND d.tuan=g.tuan WHERE g.tuan='$T' AND g.nhom NOT IN ('','-')"
+          q "danh_gia_em_tuan tuần này theo bậc" "SELECT tuan, bac, COUNT(*) n FROM danh_gia_em_tuan WHERE tuan >= '2026-10-19' GROUP BY tuan, bac"
+          q "ẨN DANH — em có ≥ 500 nguyên tử HÔM NAY (27/10): dòng giải tuần vs sổ" \
+            "WITH h AS (SELECT sbd, SUM(exp) e FROM exp_so WHERE ngay_vn = '2026-10-27' GROUP BY sbd HAVING SUM(exp) >= 500) SELECT h.e hom_nay, (SELECT SUM(exp) FROM exp_so s WHERE s.sbd=h.sbd AND s.ngay_vn>='$T' AND s.exp>0) so_tuan, g.nguyen_tu giai_nt, g.nguyen_tu_ho_tro giai_ht, g.nhom <> '' AND g.nhom <> '-' co_nhom, g.chot_luc IS NOT NULL da_chot, g.vao_luc, d.bac, (SELECT MIN(luc) FROM exp_so s WHERE s.sbd=h.sbd AND s.ngay_vn>='$T') so_dau, (SELECT COUNT(*) FROM exp_so s WHERE s.sbd=h.sbd AND s.ngay_vn>='$T' AND s.luc > g.vao_luc) dong_sau_vao FROM h LEFT JOIN giai_tuan g ON g.tuan='$T' AND g.em=h.sbd LEFT JOIN danh_gia_em_tuan d ON d.sbd=h.sbd AND d.tuan='$T' ORDER BY h.e DESC LIMIT 20"
+          q "exp_so: cột (để biết ghi sổ kiểu gì)" "SELECT name, type FROM pragma_table_info('exp_so')"

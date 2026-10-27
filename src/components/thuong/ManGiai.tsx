@@ -13,11 +13,13 @@ import { Cho, DemTT, Loi, ManToan, NutDay, chuCai, congNgay, ngayNgan, oTinhThe,
 import { nhanLop } from './ban-gon'
 import { DauVe } from './ManChuoi'
 
+// Thầy 27/10 (ảnh: thanh trên 597, bảng tuần 0, luật cũ «chưa có nguyên tử thì chưa vào bảng»): luật nói ĐÚNG cách tính — bảng đếm nguyên tử TÍNH HẠNG
+// cả tuần (luật thầy chốt 26/10: không tính câu có hỗ trợ, không tính lượt chưa học thật — em không thấy lý do riêng), thanh trên đếm nguyên tử HÔM NAY.
 export const LUAT_GIAI = [
   'Tuần tính từ thứ Hai 00:00 đến Chủ nhật 22:00.',
-  'Xếp hạng theo nguyên tử em kiếm trong tuần.',
+  'Xếp hạng theo nguyên tử tính hạng của cả tuần (không tính câu có hỗ trợ).',
   'Top 5 lên hạng. 4 bạn cuối rơi hạng. Giải Sắt không rơi nữa.',
-  'Tuần nào chưa có nguyên tử thì em chưa vào bảng tuần đó.',
+  'Em vào bảng từ nguyên tử đầu tiên của tuần. Thanh trên đếm nguyên tử hôm nay, bảng đếm nguyên tử tính hạng, nên hai số có thể khác nhau.',
 ] as const
 const KHO_HANG = 'ddh.thuong.hang-giai'
 function docHangCu(): { thuHang: number; nguyenTu: number } | null {
