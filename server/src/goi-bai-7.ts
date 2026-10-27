@@ -613,7 +613,13 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   const saved = old ? json<{questions:RefGoi7[]}>(old.json) : null
   const done = new Set(answered.results.map(r => r.qid))
   // Câu LÀM LẠI CUỐI CHẶNG (goi-bai-7-lam-lai.ts) chỉ sống trong chặng của nó: em rời giữa vòng làm lại ⇒ không thành chặng mới.
-  const viec = saved ? saved.questions.filter(r => !done.has(r.qid) && !r.lamLaiCuoi).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
+  // LẶP CÂU (thầy 27/10 tối «học sinh báo app bấm vào toàn lặp câu»; đo D1 thật: 100 lượt lặp / 20 em, 91 lượt < 15 phút, 82 lượt lần trước đã ĐÚNG, 0 lượt
+  // cùng phiên). Nguyên nhân gốc: đợt cũ được DÙNG LẠI chỉ trừ câu đã trả lời TRONG CHÍNH đợt ấy. Giờ cao điểm mở chặng chậm (p90 37 s, quá 40 s máy em bỏ
+  // chờ, bấm Thử lại / mở trước từ Hôm nay) ⇒ hai đợt cùng bộ câu; em làm hết ở đợt này, đợt kia (mới hơn) còn nguyên ⇒ lần mở sau phát lại CẢ chặng vừa làm
+  // (và đợt cũ vốn được miễn bộ lọc «vừa làm»). Nay câu của đợt cũ cũng bỏ nếu em đã làm hôm nay / vừa trả lời (15 phút) ở BẤT KỲ đợt nào — so cả mã gốc của
+  // câu song sinh (`~ss|bt|ydN`): em vừa làm câu gốc thì bản song sinh của nó cũng không phát ngay.
+  const vuaLamGoc = (qid: string) => vuaLam.has(qid) || vuaLam.has(tachSongSinh(qid).goc)
+  const viec = saved ? saved.questions.filter(r => !done.has(r.qid) && !r.lamLaiCuoi && !vuaLamGoc(r.qid) && !lap.daLamTap.has(r.qid)).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = []
   const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
   // Đợt cũ còn câu mà không câu nào phát được nữa ⇒ lấy theo kế hoạch hôm nay; kế hoạch đi tiếp qua câu không phát được cho đủ 6 câu (khẩn 12/10 23h).
@@ -629,7 +635,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   for (const lay of lanThu) { if (refs.length) break
     const ds = lay()
     const ung = ds.map(v => { const oldRef = saved?.questions.find(r=>r.qid===v.qid); return { v, oldRef, meta: oldRef ?? lap.hs.meta.get(v.qid) ?? cauGoi.get(v.qid) } })
-      .filter(x => x.meta && !lap.chan.has(x.v.qid) && !lap.chan.has(x.meta.group) && (ds === viec || !vuaLam.has(x.v.qid)))
+      .filter(x => x.meta && !lap.chan.has(x.v.qid) && !lap.chan.has(x.meta.group) && (ds === viec || !vuaLamGoc(x.v.qid)))
     for (let i = 0; i < ung.length && refs.length < 6;) {
     const lo = ung.slice(i, i + 6 - refs.length + 2); i += lo.length
     const daDoc = (await Promise.all(lo.map(x => currentQuestion(env, x.meta!).then(q => ({ ...x, q }), () => null)))).filter((x): x is NonNullable<typeof x> => !!x)
@@ -645,6 +651,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
       const m=lap.hs.meta.get(q.qid)
       if(m){const x=(await apLamLaiKhac(env,lap.hs,[{q,m}],{sbd,nowMs:now,keHoach:lap.plan.viec.map(v=>v.qid)},new Set([...lap.chan,...refs.map(r=>r.qid)])))[0];if(x){q=x.q;lamLai=x.lamLai;const ss=tachSongSinh(q.qid);if(ss.songSinh!==null)lamLai={...lamLai,tc:ss.goc}}}
     }
+    if (!oldRef && q.qid !== v.qid && vuaLamGoc(q.qid)) continue // bản làm lại (song sinh / anh em) của câu em vừa trả lời ⇒ không phát ngay
     const ref: RefGoi7 = {...oldRef,...lamLai,qid:q.qid,maDe:q.maDe,version:q.version,group:q.group,novel:lap.hs.tt.get(q.qid)?.laMoi ?? true,
       role:v.vai==='moi'?'cau_moi':v.vai==='sua'?'on_lai':'on_lai',vai:v.vai,huongDan:v.huongDan,
       ...(kiemHoiThay.has(q.qid)||kiemHoiThay.has(tachSongSinh(lamLai?.tc??oldRef?.tc??q.qid).goc)?{hoiThayKiem:true as const}:{})}
