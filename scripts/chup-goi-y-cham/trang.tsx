@@ -16,6 +16,18 @@ import { VungChamDe } from '../../src/components/goi-y-cham/VungChamDe'
 import { KhoiLoiGiaiCoSoDo } from '../../src/components/goi-y-cham/thay-bang-so-do'
 import type { BanSoDo, GoiYTraVe } from '../../src/lib/goi-y-cham/kieu'
 
+// Bài kí hiệu (thầy 27/10, ảnh paracetamol): tên bước / thừa số «n_paracetamol», «V_mL», «n_H2SO4», số mũ trong sơ đồ.
+const KI_HIEU: { ban: BanSoDo } = { ban: {
+  qid: 'kihieu', phienBan: 1, ketQua: '862,9',
+  deNoiGi: 'Sản xuất 1,5·10^6 viên paracetamol (500 mg/viên) từ p-nitrophenol, hiệu suất 80%: tính khối lượng p-nitrophenol cần dùng.',
+  soDo: { chieu: 'nguoc', nut: [{ tong: '1,5·10^6 viên thuốc', chat: 'C_8H_9NO_2', soLieu: ['500 mg'] }, { chat: 'C_6H_5NO_3', soLieu: ['m kg = ?'] }], muiTen: [{ H: 80 }] },
+  buoc: [
+    { ten: 'n_paracetamol', thuaSo: [{ so: '1,5·10^6', nghia: 'số viên thuốc' }, { so: '500', nghia: 'mg mỗi viên' }, { so: '10^-6', nghia: 'đổi mg ra kg' }, { so: '1/151', nghia: 'số kmol paracetamol (chia M = 151)' }] },
+    { ten: 'n_p-nitrophenol', thuaSo: [{ so: 'n_paracetamol', nghia: 'số kmol paracetamol ở bước 1' }, { so: '100/80', nghia: 'tính ngược × 100/H' }] },
+    { ten: 'm_p-nitrophenol', donVi: 'kg', ketQua: '862,9', thuaSo: [{ so: 'n_p-nitrophenol', nghia: 'số kmol p-nitrophenol' }, { so: '139', nghia: 'khối lượng p-nitrophenol (nhân M = 139)', denDay: 'tới đây là: m_p-nitrophenol (kg)' }] },
+  ],
+} }
+
 // ── bài mẫu (số khớp nhau)
 const BAI: Record<string, { phan: string; de: string; pa?: string[]; ban: BanSoDo }> = {
   lythuyet: {
@@ -134,8 +146,8 @@ body{background:var(--tr-nen);color:var(--tr-chu);font-family:'Be Vietnam Pro',s
 function Trang() {
   const p = new URLSearchParams(location.search)
   const ten = p.get('bai') ?? 'este'
-  if (ten === 'loigiai') {
-    const b = BAI.pyrite
+  if (ten === 'loigiai' || ten === 'kihieu') {
+    const b = ten === 'kihieu' ? KI_HIEU : BAI.pyrite
     return <div className="kd"><style>{CSS}</style>
       <header className="kd-tren"><button className="kd-ve" aria-label="Về">←</button><b>Câu 2/6</b><div className="kd-vach"><i /></div></header>
       <main className="kd-than">

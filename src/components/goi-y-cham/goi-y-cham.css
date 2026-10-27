@@ -281,3 +281,5 @@ html[data-gyc-cot-phai]{--gyc-cot-phai:320px}
 
 /* thầy 27/10: chữ chạm chỉ một màu tím ⇒ chú giải màu và nút «?» thừa — ẩn (đặt cuối tệp để thắng luật hiển thị phía trên) */
 .gyc-nut-hoi,.gyc-chu-giai{display:none}
+/* 27/10 thầy «n của cái gì thì cái đó ở chỉ số dưới, gọn đẹp»: chỉ số dưới của kí hiệu đại lượng (n paracetamol, V mL, n H₂SO₄) */
+.gyc-cs{font-size:.68em;line-height:0;vertical-align:-.32em;font-weight:inherit;letter-spacing:0}

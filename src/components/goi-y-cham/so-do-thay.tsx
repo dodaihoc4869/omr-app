@@ -11,6 +11,9 @@ import { BieuTuong } from './bieu-tuong'
 
 // `_` sau là TÊN chất («n_paracetamol», «n_p-nitrophenol») ⇒ cả tên là chỉ số dưới (thầy 27/10, ảnh: trước hiện «n_paracetamol» thô, «n_p» hạ mỗi chữ p).
 const CHI_SO = /_(\{[^}]*\}|[0-9]+|[\p{Ll}][\p{L}\p{N}()\-]+(?![_\p{L}\p{N}])|[A-Z][A-Za-z0-9()]*|[A-Za-z](?![a-z]))|\^(\{[^}]*\}|[-−+]?[0-9]*[+\-−]?)/gu
+const CS_DUOI: Record<string, string> = { '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉' }
+/** Công thức trong chỉ số dưới («H2SO4») ⇒ số sau chữ thành chỉ số Unicode («H₂SO₄») — n<sub>H₂SO₄</sub> gọn, không lồng <sub> (thầy 27/10). */
+const hoaChiSo = (v: string) => (/^[A-Z(]/.test(v) ? v.replace(/(?<=[A-Za-z)\]])\d+/g, (d) => [...d].map((c) => CS_DUOI[c] ?? c).join('')) : v)
 const MU: Record<string, string> = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻', '−': '⁻', '+': '⁺' }
 /** Chữ có `_x` (chỉ số dưới) / `^x` (số mũ) → React; không có ⇒ trả nguyên chuỗi. */
 export function ChuCo({ chu }: { chu: string }): ReactNode {
@@ -23,11 +26,23 @@ export function ChuCo({ chu }: { chu: string }): ReactNode {
     const v = m[1] !== undefined ? goc : goc.replace(/-/g, '−')
     // Số mũ chỉ gồm chữ số / dấu ⇒ ký tự mũ Unicode («10⁶»), không dùng <sup>: trong khung flex của sơ đồ <sup> bị đẩy lên cao (thầy 27/10, ảnh «mũ 6»).
     if (m[2] !== undefined && /^[0-9+\-−]+$/.test(v)) ra.push([...v].map((c) => MU[c] ?? c).join(''))
-    else ra.push(m[1] !== undefined ? <sub key={m.index}>{v}</sub> : <sup key={m.index}>{v}</sup>)
+    else ra.push(m[1] !== undefined ? <sub key={m.index} className="gyc-cs">{hoaChiSo(v)}</sub> : <sup key={m.index}>{v}</sup>)
     cuoi = m.index! + m[0].length
   }
   ra.push(chu.slice(cuoi))
   return <>{ra}</>
+}
+/** Bề rộng hiện (đơn vị ~ch) của một thừa số: phần chỉ số dưới / mũ vẽ nhỏ (~0,7) ⇒ cột số không rộng thừa. */
+const doDaiHien = (so: string) => {
+  let nho = 0
+  const goc = so.replace(CHI_SO, (m) => { nho += m.length - 1; return '' })
+  return Math.ceil(goc.length + nho * 0.7)
+}
+/** Chữ giải nghĩa: kí hiệu đại lượng kiểu «n_paracetamol», «m_{CO2}» lẫn trong câu ⇒ chỉ số dưới (ChuCo); phần còn lại ChemText như cũ. */
+const RE_KI_HIEU = /([A-Za-zΔ]+_(?:\{[^}]*\}|[^\s,;:)]+))/u
+export function ChuTron({ chu }: { chu: string }) {
+  if (!chu.includes('_')) return <ChemText text={chu} />
+  return <>{chu.split(RE_KI_HIEU).map((p, i) => (i % 2 ? <ChuCo key={i} chu={p} /> : p ? <ChemText key={i} text={p} /> : null))}</>
 }
 /** Công thức chất: có `_`/`^` ⇒ ChuCo; viết liền kiểu «FeS2» ⇒ ChemText tự hạ chỉ số như đề. */
 export function CongThuc({ chu }: { chu: string }) {
@@ -99,12 +114,12 @@ export function ChuoiTinh({ buoc, stt, nhieu, hienKetQua }: { buoc: BuocTinh; st
         ))}
         {ketQua ? <span className="gyc-nhan gyc-ket">= {ketQua}</span> : <span className="gyc-nhan gyc-bang">= ?</span>}
       </div>
-      <div className="gyc-y-nghia" style={{ '--gyc-cot-so': `${Math.min(16, Math.max(5, ...buoc.thuaSo.map((x, i) => x.so.length + (i ? 2 : 0)))) + 1}ch` } as CSSProperties}>
+      <div className="gyc-y-nghia" style={{ '--gyc-cot-so': `${Math.min(14, Math.max(5, ...buoc.thuaSo.map((x, i) => doDaiHien(x.so) + (i ? 2 : 0)))) + 1}ch` } as CSSProperties}>
         {buoc.thuaSo.map((x, i) => (
           <div key={i} className={`gyc-dong-yn${tt(i) ? ` gyc-${tt(i)}` : ''}`}>
             <span className="gyc-tt">{tt(i) === 'qua' ? <BieuTuong ten="check" /> : i + 1}</span>
             <span className="gyc-ps-chu">{i ? '· ' : ''}<ChuCo chu={x.so} /></span>
-            <span><ChemText text={x.nghia} />{x.denDay ? <small className="gyc-den-day"> · <ChemText text={x.denDay} /></small> : null}</span>
+            <span><ChuTron chu={x.nghia} />{x.denDay ? <small className="gyc-den-day"> · <ChuTron chu={x.denDay} /></small> : null}</span>
           </div>
         ))}
       </div>
