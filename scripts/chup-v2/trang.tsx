@@ -535,11 +535,11 @@ function ManLam13() {
 if (LA_LAM13 && thamSo.get('gtloi') === '1') Math.random = () => 0
 if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ hết KIỂM GD MỚI 26/10
-if (LA_LAM13 && (thamSo.get('lam') === 'duo' || thamSo.get('lam') === 'duo-nc')) try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
+if (LA_LAM13 && ['duo', 'duo-nc', 'duo-bang'].includes(thamSo.get('lam') ?? '')) try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ DUO APP 26/10: app thật nạp TrongHs (kèm phông tròn M PLUS Rounded 1c + hiệu ứng Lộ trình, styles/trong-hs.css) ngay lúc mở cổng ⇒ màn làm chặng luôn có phông ấy;
 // trang chụp mở thẳng màn làm chặng nên nạp tờ đó tại đây cho giống app thật.
 // Phông tròn chỉ bật khi cổng đã vẽ (:has(.ht2) — app thật luôn gắn Hôm nay dưới màn con) ⇒ trang chụp gắn một .ht2 rỗng ẩn.
-if (LA_LAM13 && (thamSo.get('lam') === 'duo' || thamSo.get('lam') === 'duo-nc') && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>') }
+if (LA_LAM13 && ['duo', 'duo-nc', 'duo-bang'].includes(thamSo.get('lam') ?? '') && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>') }
 // ═══ hết DUO APP 26/10
 // ═══ GIỮ CHÂN 27/10: `lam13&lam=duo&tp=1&giu=1` — bản tổng quan thưởng ở máy như app thật đã nạp lúc mở (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4).
 import { DUONG as DUONG_TP, docTongQuan as docTqGiu, ghiTam as ghiTamGiu, khoaTam as khoaTamGiu } from '../../src/lib/thuong-api'

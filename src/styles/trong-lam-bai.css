@@ -839,3 +839,16 @@
 }
 [data-trong] .duo .duo-hang-nut .lg-nut-hoi-thay svg { flex: none; width: 18px; height: 18px; }
 [data-trong='hs'] .duo .duo-hang-nut .lg-nut-hoi-thay:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; }
+/* ── 19. TẤM «CHƯA ĐƯỢC TÍNH» gọn kiểu Duolingo (thầy 27/10: «phần màu xám … làm cho tinh tế lại»): nền rất nhạt pha chàm (không xám đặc), trượt lên như
+ * dải đúng / sai; dấu (i) tròn đặc 30px cùng dòng tiêu đề; «Lời giải» liên kết nhỏ góc phải; «Tiếp tục» màu nhấn trung tính (chàm) khối 3D; thấp hơn ~30%. ── */
+[data-trong='hs'] .duo-day.duo-ket[data-tp-trung] { padding-top: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); border-top: 0; background: color-mix(in srgb, var(--tr-tin) 7%, var(--tr-mat)); }
+[data-trong] .duo-ket[data-tp-trung] .duo-giua { gap: 8px; }
+[data-trong] .duo-ket[data-tp-trung] .duo-kq { gap: 0; }
+[data-trong] .duo-ct-dau { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+[data-trong] .duo-ket[data-tp-trung] .duo-kq-chu h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 21px; color: var(--tr-tin-chu); }
+[data-trong] .duo-ct-i { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--tr-tin); color: var(--tr-trang); }
+[data-trong] .duo-ct-lg { display: inline-flex; align-items: center; gap: 5px; flex: none; min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--tr-tin-chu); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+[data-trong] .duo-ket[data-tp-trung] .duo-kq-chu p.duo-mo { margin: 0 0 0 40px; font-size: 14px; color: var(--tr-chu-2); }
+[data-trong] .duo-ket[data-tp-trung] .duo-hang-nut { --hang-vien: color-mix(in srgb, var(--tr-tin) 40%, var(--tr-mat)); --hang-chu: var(--tr-tin-chu); }
+[data-trong] .duo-nut[data-sac=lam], [data-trong='hs'] .duo-day.duo-ket[data-tp-trung] .duo-nut[data-sac=lam] { background: var(--tr-tin); color: var(--tr-trang); }
+[data-trong='hs'] .duo-day.duo-ket .duo-nut[data-sac=lam]:not(:disabled) { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-tin) 55%, var(--tr-phu)); }

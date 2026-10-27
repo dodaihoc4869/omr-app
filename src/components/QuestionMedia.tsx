@@ -6,7 +6,7 @@
 // ô gộp) dựng bảng HTML thật — đọc tốt hơn ảnh trên màn hẹp. Bốn loại sau
 // KHÔNG render bằng KaTeX/HTML mà nhúng ẢNH: sơ đồ phản ứng nhiều mũi tên,
 // công thức cấu tạo, bảng phức tạp, đồ thị/mô hình thí nghiệm (HinhAnh).
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { HinhAnh, QuestionMedia as QuestionMediaData } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
 
@@ -35,17 +35,41 @@ export function ManHinhAnh({ src, alt, onClose }: { src: string; alt: string; on
 
 /** Bảng số liệu đơn giản — bảng HTML thật, cuộn ngang trong khung riêng,
  * chữ sans 13px không co nhỏ hơn. */
+/** Bảng số liệu của đề. 27/10 (thầy: bảng «Chất | Ammonia | Methylamine | Ethylamine…» tràn phải, cột cuối bị cắt):
+ *  - bảng HAI hàng (tiêu đề + một hàng số) mà rộng hơn khung ⇒ tự xoay DỌC (mỗi chất một hàng), khung đủ rộng lại thì về ngang;
+ *  - bảng lớn ⇒ cuộn ngang trong khung, bóng mờ ở mép còn nội dung (`data-cuon` = trai | phai | hai). */
 export function BangSoLieu({ table }: { table?: string[][] }) {
+  const khung = useRef<HTMLDivElement>(null)
+  const [doc, setDoc] = useState(0) // > 0 ⇒ đang xoay dọc; giá trị = bề rộng bảng ngang cần
+  const [cuon, setCuon] = useState('')
+  const haiHang = !!table && table.length === 2 && table[0].length >= 3
+  useLayoutEffect(() => {
+    const k = khung.current
+    if (!k) return
+    const do_ = () => {
+      if (doc) { if (k.clientWidth >= doc) setDoc(0); return }
+      const tran = k.scrollWidth > k.clientWidth + 1
+      if (tran && haiHang) { setDoc(k.scrollWidth); return }
+      const t = k.scrollLeft > 1, p = k.scrollLeft + k.clientWidth < k.scrollWidth - 1
+      setCuon(t && p ? 'hai' : t ? 'trai' : p ? 'phai' : '')
+    }
+    do_()
+    k.addEventListener('scroll', do_, { passive: true })
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(do_) : null
+    ro?.observe(k)
+    return () => { k.removeEventListener('scroll', do_); ro?.disconnect() }
+  }, [doc, haiHang, table])
   if (!table || table.length === 0) return null
   // Cỡ chữ, đường kẻ, nền tiêu đề nằm ở .cau-bang (index.css) — ô bảng KHÔNG
   // được nhỏ hơn 13px, vì bảng dưới 5 cột cấm đổi thành ảnh.
   const o: React.CSSProperties = { fontFamily: 'var(--sans)', color: 'var(--muc)' }
+  const bang = doc ? [[table[0][0], table[1][0]], ...table[0].slice(1).map((c, j) => [c, table[1][j + 1] ?? ''])] : table
   return (
-    <div className="cau-bang" style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }}>
+    <div ref={khung} className="cau-bang" data-doc={doc ? '' : undefined} data-cuon={!doc && cuon ? cuon : undefined} style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }}>
       <table>
         <thead>
           <tr>
-            {table[0].map((cell, i) => (
+            {bang[0].map((cell, i) => (
               <th key={i} className="text-left" style={o}>
                 <ChemText text={cell} />
               </th>
@@ -53,7 +77,7 @@ export function BangSoLieu({ table }: { table?: string[][] }) {
           </tr>
         </thead>
         <tbody>
-          {table.slice(1).map((row, r) => (
+          {bang.slice(1).map((row, r) => (
             <tr key={r}>
               {row.map((cell, c) => (
                 <td key={c} style={o}>

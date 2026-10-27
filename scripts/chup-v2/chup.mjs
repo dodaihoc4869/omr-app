@@ -343,6 +343,13 @@ const NC_CANH = [
 const DS_NC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   NC_CANH.map(([t, m, cho, viec]) => [`nc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết NÂNG CẤP 27/10
+// ═══ BẢNG + TẤM CHƯA TÍNH 27/10 (tiền tố "nb-"): bảng 2 hàng × 4 cột tự xoay dọc ở khổ hẹp · tấm «Chưa được tính» gọn · bảng lớn cuộn ngang có bóng mép
+const NB_CANH = [
+  ['1-bang', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, ''], ['2-chua-tinh', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+  ['3-bang-lon', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục'],
+]
+const DS_NB = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  NB_CANH.map(([t, m, cho, viec]) => [`nb-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec || undefined])))
 // ═══ BI CHUYỂN ĐỘNG 27/10 (tiền tố "bd-"): mọi chỗ có Bi trong app học sinh — Lộ trình (Bi nói), câu đúng (mừng nhảy), câu sai (buồn), kết chặng
 // (nhảy múa), Thành tích, chuỗi ngày (lửa). 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Bi chuyển động nạp lười ⇒ chờ thêm cho mảnh bi-dong.
 const DS_BD = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
@@ -473,6 +480,7 @@ const DS = [
   ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_NC, // NÂNG CẤP 27/10
+  ...DS_NB, // BẢNG + TẤM CHƯA TÍNH 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E

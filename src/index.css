@@ -185,6 +185,11 @@ body {
   background: var(--the-2);
   font-weight: 700;
 }
+/* 27/10: còn nội dung bị che ở mép ⇒ bóng mờ ở mép đó (bảng lớn cuộn ngang); bảng hai hàng quá rộng tự xoay dọc (QuestionMedia.BangSoLieu). */
+.cau-bang[data-cuon=phai] { box-shadow: inset -14px 0 12px -12px var(--phu); }
+.cau-bang[data-cuon=trai] { box-shadow: inset 14px 0 12px -12px var(--phu); }
+.cau-bang[data-cuon=hai] { box-shadow: inset -14px 0 12px -12px var(--phu), inset 14px 0 12px -12px var(--phu); }
+.cau-bang[data-doc] td { white-space: normal; }
 
 .cau-hinh img {
   max-width: 100%;
