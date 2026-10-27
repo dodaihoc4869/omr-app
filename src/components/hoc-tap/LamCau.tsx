@@ -9,6 +9,7 @@ import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
 import KhoiLoiGiaiChuan, { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { ChemText } from '../../lib/chem-format'
 import { tachDongTheoY } from '../../lib/tach-dong-cau'
+import { giuLienPhuongTrinh, tachDoanDe } from '../../lib/gian-y-de'
 import { laChuGiuCho } from '../../lib/anh-phuong-an'
 import type { HinhAnh } from '../../data/examContent'
 import type { Question } from '../../game/than-thu-v2/core'
@@ -69,7 +70,7 @@ export function DeCau({ q, stt }: { q: Question; stt: number }) {
           <CauHinh src={q.thanCauImg} alt={`Đề câu ${stt}`} />
         </>
       ) : (
-        <p className="ht2-lam-de-chu"><b>Câu {stt}.</b> <ChemText text={de} /></p>
+        <ChuDe de={de} stt={stt} />
       )}
       <ExperimentDemo text={de} />
       <BangDe table={q.table} />
@@ -78,6 +79,23 @@ export function DeCau({ q, stt }: { q: Question; stt: number }) {
         <HinhTaiViTri hinhAnh={hinh(q)} viTri="sau_de" nhan={`câu ${stt}`} />
       </ExperimentOriginal>
     </section>
+  )
+}
+
+/** Chữ đề GIÃN Ý (thầy 27/10): mỗi dòng gốc / nhãn «Bước 1:» / phương trình / câu hỏi cuối là một đoạn riêng (`tachDoanDe`).
+ *  Đoạn = <span> khối (cùng nằm trong <p> cũ ⇒ khung chữ L của giám thị, «Câu N.» ẩn ở Duo giữ nguyên); `data-gyc-khoi` ⇒ chạm-hiểu-đề dò từng đoạn.
+ *  Khoảng cách / khối phương trình: styles/trong-lam-bai.css (chỉ giao diện «Trong», nạp lười). Đề một đoạn ⇒ DOM y như cũ. */
+function ChuDe({ de, stt }: { de: string; stt: number }) {
+  const ds = tachDoanDe(de)
+  if (ds.length < 2 && ds[0]?.loai !== 'pt' && !ds[0]?.nhan) return <p className="ht2-lam-de-chu"><b>Câu {stt}.</b> <ChemText text={de} /></p>
+  return (
+    <p className="ht2-lam-de-chu de-gian"><b>Câu {stt}.</b>{' '}
+      {ds.map((d, i) => (
+        <span key={i} className="de-doan" data-loai={d.loai} data-gyc-khoi="" style={{ display: 'block' }}>
+          {d.nhan && <b className="de-nhan">{d.nhan}</b>}{d.nhan && d.chu ? ' ' : null}{d.chu && <ChemText text={d.loai === 'pt' ? giuLienPhuongTrinh(d.chu) : d.chu} />}
+        </span>
+      ))}
+    </p>
   )
 }
 

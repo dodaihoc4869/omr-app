@@ -179,7 +179,15 @@ const CAU_4DONG: CauGia = { ...nen, qid: 'GT3', maDe: 'BAI8', phan: 'I', tenDang
   choices: ['77,4', '75,0', '15,1', '7,5'], ideas: [], dapAn: 'A', loiGiai: { chot: 'Aniline là C6H5NH2, M = 93 ⇒ %C = 72 : 93 = 77,4 %.' } }
 const CAU_6DONG: CauGia = { ...nen, qid: 'GT4', maDe: 'BAI8', phan: 'I', tenDang: 'Muối của amine', text: 'Cho 4,5 gam ethylamine (C2H5NH2) tác dụng vừa đủ với dung dịch HCl, thu được dung dịch X. Cô cạn cẩn thận dung dịch X ở nhiệt độ thấp, thu được m gam muối khan. Giá trị của m là',
   choices: ['7,65', '8,10', '8,15', '0,85'], ideas: [], dapAn: 'C', loiGiai: { chot: 'n = 4,5 : 45 = 0,1 mol ⇒ m = 0,1 × 81,5 = 8,15 gam.' } }
-const DAU_GT: Record<string, CauGia> = { ngan: { ...CAU[1]!, qid: 'GT1' }, '4dong': CAU_4DONG, '6dong': CAU_6DONG, dai: CAU_TOLUIDINE }
+// `&gtde=aniline` ⇒ đề DÀI nhiều ý như ảnh thầy 27/10 («Đề hiển thị phải có giãn cách ý»): giới thiệu · phương pháp · Bước 1 (kèm phương trình) · Bước 2 · Giả sử… · câu hỏi.
+const CAU_ANILINE: CauGia = { ...nen, qid: 'GT5', maDe: 'BAI8', phan: 'I', tenDang: 'Xử lí aniline trong nước thải', text: [
+  'Aniline (C6H5NH2) là một amine thơm được sử dụng rộng rãi trong công nghiệp để sản xuất phẩm nhuộm, dược phẩm và hóa chất khác. Tuy nhiên, aniline là chất độc và có thể gây hại cho môi trường nếu không được xử lý đúng cách.',
+  'Một phương pháp xử lý aniline trong nước thải công nghiệp là oxi hoá aniline thành picric acid (2,4,6-trinitrophenol), một chất ít độc hơn và có thể được sử dụng làm thuốc nổ hoặc chất nhuộm.',
+  'Bước 1: Nitro hoá aniline để tạo 2,4,6-trinitroaniline C6H5NH2 + 3HNO3 đặc, (H2SO4 đặc, t°) → C6H2(NO2)3NH2 + 3H2O',
+  'Bước 2: Oxi hoá 2,4,6-trinitroaniline bằng Na2Cr2O7/H+ tạo thành 2,4,6-trinitrophenol.',
+  'Giả sử một nhà máy thải ra 1000 lít nước (khối lượng riêng 1 g/mL) chứa 0,05% khối lượng aniline. Để xử lý toàn bộ lượng aniline này, người ta sử dụng dung dịch HNO3 68% (khối lượng riêng 1,42 g/mL). Thể tích dung dịch HNO3 tối thiểu cần dùng là bao nhiêu lít?',
+].join('\n'), choices: ['1,05', '0,35', '1,52', '3,15'], ideas: [], dapAn: 'A', loiGiai: { chot: 'm aniline = 500 g ⇒ 5,376 mol ⇒ HNO3 16,13 mol = 1016 g ⇒ dung dịch 1494 g ⇒ 1,05 lít.' } }
+const DAU_GT: Record<string, CauGia> = { ngan: { ...CAU[1]!, qid: 'GT1' }, '4dong': CAU_4DONG, '6dong': CAU_6DONG, dai: CAU_TOLUIDINE, aniline: CAU_ANILINE }
 const CAU_DUO_GT = DAU_GT[thamSo.get('gtde') ?? ''] ? [DAU_GT[thamSo.get('gtde')!]!, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
 const ds0 = kieu === 'duo-tn' ? CAU_TN : kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-combo' ? CAU_COMBO : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const ds = MUC_GT !== undefined ? ds0.map((c) => ({ ...c, mucDo: MUC_GT || null })) : ds0
