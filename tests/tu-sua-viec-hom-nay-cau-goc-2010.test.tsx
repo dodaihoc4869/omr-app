@@ -4,7 +4,11 @@
 //   · chỉ bấm "Em chưa làm được · xem lời giải" mà chưa tự làm ⇒ KHÔNG ghi;
 //   · hẹn lần gặp lại 2 đã tới ⇒ đúng MỘT dòng điều kiện cạnh nút "Làm lần gặp lại 2"; chưa tới ⇒ không dòng.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, configure, fireEvent, render, screen } from '@testing-library/react'
+
+// Màn chữa nạp LƯỜI: máy tải nặng có lúc chậm hơn mốc chờ mặc định 1 s của findBy* ⇒ đỏ chập chờn (27/10). Nới lên 5 s; điều kiện kiểm giữ nguyên.
+configure({ asyncUtilTimeout: 5000 })
+vi.setConfig({ testTimeout: 20_000 })
 
 const api = vi.hoisted(() => ({ apiMoDot: vi.fn(), apiPhatItem: vi.fn(), apiNopItem: vi.fn(), apiXinGoiY: vi.fn(), apiCoChua: vi.fn(),
   // Chữa câu gọn (25/10): máy chủ CHƯA có lệnh gọn (mất nối / bản cũ) ⇒ màn đi lối cũ — tệp này kiểm lối lùi ấy.
@@ -45,7 +49,7 @@ describe('Câu chỉ có lối câu gốc: khi nào tính là xong phần hôm n
     render(<Man token="t" qid="Q" onVe={() => {}} />)
     fireEvent.click(await screen.findByRole('button', { name: 'Tự làm lại câu này' }))
     expect(ghiLocal()).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: /6,8/ }))
+    fireEvent.click(await screen.findByRole('button', { name: /6,8/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra lại' }))
     expect(await screen.findByRole('heading', { name: 'Chưa đúng' })).toBeTruthy()
     expect(ghiLocal()?.x).toEqual(['D1'])
@@ -55,7 +59,7 @@ describe('Câu chỉ có lối câu gốc: khi nào tính là xong phần hôm n
     mayChu(CT)
     render(<Man token="t" qid="Q" onVe={() => {}} />)
     fireEvent.click(await screen.findByRole('button', { name: 'Tự làm lại câu này' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Em chưa làm được · xem lời giải' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Em chưa làm được · xem lời giải' }))
     expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
     expect(ghiLocal()).toBeNull()
   })

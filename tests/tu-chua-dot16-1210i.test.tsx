@@ -6,7 +6,12 @@
 //   · danh sách lỗi khi đang mở thẳng ⇒ báo rõ câu em chọn chưa mở được + Thử lại ⇒ tải lại rồi mở đúng câu;
 //   · thẻ tổng: mọi con số lấy từ dữ liệu máy chủ và có nhãn; nút chính mở câu đứng đầu nhóm Cần chữa THEO THỨ TỰ MÁY CHỦ; không mã nội bộ.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, configure, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+
+// Màn chữa nạp LƯỜI (import động): máy tải nặng có lúc chậm hơn mốc chờ mặc định 1 s của findBy*/waitFor ⇒ đỏ chập chờn (27/10).
+// Nới mốc chờ lên 5 s (mỗi test tối đa 20 s); điều kiện kiểm giữ nguyên.
+configure({ asyncUtilTimeout: 5000 })
+vi.setConfig({ testTimeout: 20_000 })
 
 const api = vi.hoisted(() => ({
   apiDanhSachTuChua: vi.fn(),

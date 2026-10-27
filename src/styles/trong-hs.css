@@ -1028,6 +1028,18 @@
 @media (max-width: 380px) { [data-trong] .da-linh-vat { width: 88px; } [data-trong] .da-linh-vat .bi { width: 88px; } }
 @media (prefers-reduced-motion: reduce) { [data-trong='hs'] .da-linh-vat { animation: none; } }
 [data-trong='hs'].may-yeu .da-linh-vat { animation: none; }
+/* THẺ «HỌC CÙNG BẠN» TRÊN LỘ TRÌNH (27/10, TheBanLoTrinh): một hàng gọn kiểu lời nhắc bạn bè Duolingo — chữ bấm được mở màn, nút «Gõ cửa» / nút đóng bên phải. */
+[data-trong] .da-ban { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 8px 10px 8px 8px; border: 2px solid var(--tr-vien); border-radius: 18px; background: var(--tr-mat); }
+[data-trong] .da-ban-mo { display: flex; align-items: center; gap: 12px; flex: 1 1 180px; min-width: 0; min-height: 48px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; touch-action: manipulation; }
+[data-trong] .da-ban-av { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--tr-sao-nhat); color: var(--tr-sao-chu); font-size: 17px; font-weight: 800; }
+[data-trong] .da-ban .giua { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+[data-trong] .da-ban .giua b { font-size: 15.5px; font-weight: 800; line-height: 1.3; color: var(--tr-chu); }
+[data-trong] .da-ban .giua span { font-size: 13.5px; line-height: 1.4; color: var(--tr-chu-2); }
+[data-trong] .da-ban-go { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--tr-tin-day); color: var(--tr-trang); font-size: 14px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; cursor: pointer; touch-action: manipulation; box-shadow: inset 0 -4px 0 var(--tr-tin-chu); }
+[data-trong] .da-ban-go:disabled { background: var(--tr-mat-2); color: var(--tr-chu-3); box-shadow: none; cursor: default; }
+[data-trong] .da-ban-dong { display: grid; place-items: center; flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px; background: none; color: var(--tr-chu-3); cursor: pointer; }
+[data-trong] :is(.da-ban-mo, .da-ban-go, .da-ban-dong):focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; border-radius: 12px; }
+[data-trong] .da-ban-loi { flex: 1 1 100%; margin: 0; font-size: 13px; color: var(--tr-sai-chu); }
 
 /* ── TƯƠI 27/10 — thầy cho phép: «Màu sắc của app làm siêu tươi như dolingo». CHỈ app học sinh. Khối màu nổi (ô biểu tượng, nút lục giác, băng bài,
  * thẻ chuỗi): màu đặc + gờ đáy MỘT TÔNG ĐẬM HƠN cùng màu (--tr-*-day), bóng phẳng — bỏ gờ xám pha --tr-phu và bóng mờ nhoè. Chữ trắng trên nền
