@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { phatHien } from '../src/lib/goi-y-cham/phat-hien'
 import { theCho } from '../src/lib/goi-y-cham/the-cham'
-import { docNguyenTuKhoiTrongDe } from '../src/lib/goi-y-cham/tu-dien-chat'
+import { docNguyenTuKhoiTrongDe, tinhM } from '../src/lib/goi-y-cham/tu-dien-chat'
 import type { TheGiaiNghia, VungCham } from '../src/lib/goi-y-cham/kieu'
 
 const DE_ESTER =
@@ -19,16 +19,15 @@ describe('thẻ trên đề ester', () => {
       congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L',
     })
   })
-  it('chạm «ethyl acetate»: tên IUPAC · công thức · M · loại · tên cũ', () => {
-    expect(cham(DE_ESTER, 'ethyl acetate')).toMatchObject({
-      ten: 'ethyl acetate', nhan: 'Chất', loai: 'Ester', tenCu: 'etyl axetat', tenPhu: 'tên cũ: etyl axetat', M: 88, congThucChat: 'CH₃COOC₂H₅',
-      doan: ['CH₃COOC₂H₅ · M = 88 g/mol', 'Ester'],
-    })
+  it('chạm «ethyl acetate»: đúng 3 dòng tên · công thức · M (thầy 27/10: bỏ tính chất, bỏ dòng tên cũ)', () => {
+    const t = cham(DE_ESTER, 'ethyl acetate')!
+    expect(t).toMatchObject({ ten: 'ethyl acetate', nhan: 'Chất', M: 88, congThucChat: 'CH₃COOC₂H₅', doan: ['CH₃COOC₂H₅', 'M = 88 g/mol'] })
+    expect(t).not.toHaveProperty('tenPhu')
   })
   it('chạm «NaOH»: dòng đầu là TÊN chất, công thức + M ở dòng dưới', () => {
     expect(cham(DE_ESTER, 'NaOH')).toMatchObject({
       ten: 'sodium hydroxide', nhan: 'Công thức', loai: 'Base mạnh', tenIupac: 'sodium hydroxide', tenCu: 'natri hiđroxit (xút ăn da)', M: 40,
-      cachTinhM: 'Na = 23, O = 16, H = 1 (23 + 16 + 1 = 40)', doan: ['NaOH · M = 40 g/mol', 'Base mạnh'],
+      cachTinhM: 'Na = 23, O = 16, H = 1 (23 + 16 + 1 = 40)', doan: ['NaOH', 'M = 40 g/mol'],
     })
   })
   it('chạm «Cô cạn»: nghĩa + kiến thức cụ thể, không «tự hỏi»', () => {
@@ -128,7 +127,7 @@ describe('thẻ chất và công thức', () => {
   it('công thức nhiều chất cùng công thức phân tử ⇒ liệt kê, không chọn bừa', () => {
     const t = cham('Lên men 18 gam C6H12O6.', 'C6H12O6')!
     expect(t).toMatchObject({ ten: 'C₆H₁₂O₆', ungVien: ['glucose', 'fructose'], loai: 'Carbohydrate', M: 180 })
-    expect(t.doan).toEqual(['M = 180 g/mol', 'Có thể là glucose hoặc fructose (Carbohydrate)'])
+    expect(t.doan).toEqual(['Có thể là glucose hoặc fructose', 'M = 180 g/mol'])
   })
   it('tên cũ ⇒ thẻ tên IUPAC to, tên cũ nhỏ', () => {
     expect(cham('Cho natri hiđroxit vào nước.', 'natri hiđroxit')).toMatchObject({ ten: 'sodium hydroxide', tenCu: 'natri hiđroxit (xút ăn da)', M: 40, loai: 'Base mạnh' })
@@ -139,19 +138,30 @@ describe('thẻ chất và công thức', () => {
   })
   it('polymer không công thức, tinh bột có M mắt xích', () => {
     expect(cham('Trùng hợp vinyl chloride thu được poly(vinyl chloride).', 'poly(vinyl chloride)')).toMatchObject({ ten: 'poly(vinyl chloride)', loai: 'Polymer' })
-    expect(cham('Thuỷ phân tinh bột.', 'tinh bột')).toMatchObject({ ten: 'starch', M: 162, doan: ['(C₆H₁₀O₅)ₙ · M một mắt xích = 162 g/mol', 'Carbohydrate'] })
+    expect(cham('Thuỷ phân tinh bột.', 'tinh bột')).toMatchObject({ ten: 'starch', M: 162, doan: ['(C₆H₁₀O₅)ₙ', 'M một mắt xích = 162 g/mol'] })
   })
   it('công thức hợp lệ nhưng chưa có trong từ điển ⇒ vẫn có M', () => {
     const v: VungCham = { loai: 'chat', tu: 0, den: 6, chu: 'C5H10O', khoa: 'C5H10O' }
-    expect(theCho(v)).toMatchObject({ ten: 'C₅H₁₀O', nhan: 'Công thức', M: 86, doan: ['M = 86 g/mol', 'C = 12, H = 1, O = 16 (5·12 + 10·1 + 16 = 86)'] })
+    expect(theCho(v)).toMatchObject({ ten: 'C₅H₁₀O', nhan: 'Công thức', M: 86, cachTinhM: 'C = 12, H = 1, O = 16 (5·12 + 10·1 + 16 = 86)', doan: ['M = 86 g/mol'] })
   })
-  it('amine: bậc + tính chất; đề hỏi chính điều đó thì ẩn (không lộ đáp án)', () => {
+  it('thầy 27/10: thẻ chất KHÔNG có loại, bậc, tính chất, tên cũ — kể cả amine', () => {
     const de = 'Cho 4,65 gam aniline tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là bao nhiêu gam?'
-    expect(cham(de, 'aniline')).toMatchObject({ ten: 'aniline', M: 93, doan: ['C₆H₅NH₂ · M = 93 g/mol', 'Amine bậc I · tính base rất yếu, không làm quỳ tím đổi màu'] })
-    const de2 = 'Đốt cháy 0,1 mol ethylamine thu được V lít khí N2 (đkc). Giá trị của V là'
-    expect(cham(de2, 'ethylamine')).toMatchObject({ doan: ['C₂H₅NH₂ · M = 45 g/mol', 'Amine bậc I · dung dịch làm quỳ tím hoá xanh'], tenPhu: 'tên khác: ethanamine · tên cũ: etylamin' })
-    const hoiBac = 'Cho 0,1 mol ethylamine. Ethylamine là amine bậc mấy và làm quỳ tím đổi màu gì?'
-    expect(theCho(phatHien(hoiBac).find((v) => v.chu === 'ethylamine')!, undefined, hoiBac)?.doan).toEqual(['C₂H₅NH₂ · M = 45 g/mol', 'Amine'])
+    expect(cham(de, 'aniline')).toMatchObject({ ten: 'aniline', M: 93, doan: ['C₆H₅NH₂', 'M = 93 g/mol'] })
+    const t = cham('Đốt cháy 0,1 mol ethylamine thu được V lít khí N2 (đkc). Giá trị của V là', 'ethylamine')!
+    expect(t).not.toHaveProperty('tenPhu')
+    const chu = [t.ten, ...t.doan].join(' | ') // đúng những gì thẻ hiện
+    expect(chu).not.toMatch(/bậc|quỳ|base|Amine|tên cũ|etylamin|ethanamine/)
+  })
+  it('đề ghi tên cũ («anilin») vẫn chạm được, thẻ hiện tên theo GDPT 2018', () => {
+    const de = 'Cho 9,3 gam anilin tác dụng với nước brom dư.'
+    expect(cham(de, 'anilin')).toMatchObject({ ten: 'aniline', doan: ['C₆H₅NH₂', 'M = 93 g/mol'] })
+  })
+  it('kiểm M bằng bảng nguyên tử khối trong mã (không gõ tay)', () => {
+    for (const [ten, ct, M] of [['ethylamine', 'C2H5NH2', 45], ['methylamine', 'CH3NH2', 31], ['aniline', 'C6H5NH2', 93], ['ethyl acetate', 'CH3COOC2H5', 88], ['glucose', 'C6H12O6', 180], ['sodium hydroxide', 'NaOH', 40]] as const) {
+      const t = theCho({ loai: 'chat', tu: 0, den: ten.length, chu: ten, khoa: ten })!
+      expect(t.M, ten).toBe(M)
+      expect(t.M).toBe(tinhM(ct))
+    }
   })
   it('M theo nguyên tử khối đề cho', () => {
     const de = 'Cho 5,85 gam NaCl vào nước. Cho nguyên tử khối: Na = 23; Cl = 35.'

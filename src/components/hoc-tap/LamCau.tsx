@@ -137,7 +137,8 @@ export function BanDoY({ value }: { value: string }) {
 // ───────────────────────────── TRẮC NGHIỆM · đang làm ─────────────────────────────
 
 /** Bốn ô lựa chọn lớn (≥ 56 px), chạm CẢ Ô, `role=radio`; phím mũi tên chuyển ô như nhóm radio. */
-export function ChonTracNghiem({ q, value, onChon, khoa }: { q: Question; value: string; onChon: (v: 'A' | 'B' | 'C' | 'D') => void; khoa: boolean }) {
+/** `tranh` (nâng cấp 27/10): tranh minh hoạ từng phương án (phân tử) — màn Duo truyền vào; thiếu ⇒ như cũ. */
+export function ChonTracNghiem({ q, value, onChon, khoa, tranh }: { q: Question; value: string; onChon: (v: 'A' | 'B' | 'C' | 'D') => void; khoa: boolean; tranh?: ReactNode[] }) {
   const nut = useRef<(HTMLButtonElement | null)[]>([])
   const dangChon = CHU_PA.indexOf(value as 'A')
   const phim = (e: KE<HTMLDivElement>) => {
@@ -167,6 +168,7 @@ export function ChonTracNghiem({ q, value, onChon, khoa }: { q: Question; value:
               onClick={() => onChon(chu)}
             >
               <b className="ht2-lam-pa-ma">{chu}</b>
+              {tranh?.[i]}
               <span className="ht2-lam-pa-chu">
                 {gopAnh ? anhSau.map((h, k) => <img key={k} src={h.src} alt={h.alt ?? `Phương án ${chu}`} loading="lazy" decoding="async" className="ht2-lam-anh-nho" />) : <NoiDung chu={q.choices[i] ?? ''} anh={q.choiceImgs?.[i]} alt={`Phương án ${chu}`} />}
               </span>
@@ -372,7 +374,7 @@ export function PhanHoiDungSai({ q, tra, dapAn, lyDo }: { q: Question; tra: stri
 }
 
 /** Trắc nghiệm sau khi nộp: ô em chọn / ô đáp án đánh dấu (chữ + biểu tượng), các ô khác mờ. */
-export function PhanHoiTracNghiem({ q, tra, dapAn }: { q: Question; tra: string; dapAn: string }) {
+export function PhanHoiTracNghiem({ q, tra, dapAn, tranh }: { q: Question; tra: string; dapAn: string; tranh?: ReactNode[] }) {
   return (
     <div className="ht2-lam-tn" aria-label="Các lựa chọn">
       {CHU_PA.map((chu, i) => {
@@ -385,6 +387,7 @@ export function PhanHoiTracNghiem({ q, tra, dapAn }: { q: Question; tra: string;
           <div key={chu} className="ht2-lam-pa-khoi">
             <div className="ht2-lam-pa" data-ket={ket}>
               <b className="ht2-lam-pa-ma">{chu}</b>
+              {tranh?.[i]}
               <span className="ht2-lam-pa-chu">{ket !== 'mo' && <span className="ht2-an">Phương án {chu}: </span>}{gopAnh ? anhSau.map((h, k) => <img key={k} src={h.src} alt={h.alt ?? `Phương án ${chu}`} loading="lazy" decoding="async" className="ht2-lam-anh-nho" />) : <NoiDung chu={q.choices[i] ?? ''} anh={q.choiceImgs?.[i]} alt={`Phương án ${chu}`} />}</span>
               {nhan && <small className="ht2-lam-pa-nhan">{nhan}</small>}
             </div>

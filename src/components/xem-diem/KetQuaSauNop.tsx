@@ -2,6 +2,7 @@
 //   da_cong_bo → điểm to + ba phần + MỘT nút chính "Xem báo cáo chi tiết";  ca_lop → "Điểm hiện khi cả lớp nộp xong" (đã nộp a/b em);  khong → "Thầy chưa công bố điểm".
 // Hai trạng thái sau KHÔNG nhận, KHÔNG vẽ điểm/đáp án/lời giải — kể cả khi màn cha lỡ truyền: nhánh không đọc `diem`/`phan`.
 // Chỉ VẼ khối kết quả; luật chấm, luật công bố, đường nộp, cảnh báo rời màn nằm nguyên ở màn cha. Khối "A.I Đỗ Đại Học đã lo" chưa vẽ (thiếu dữ liệu máy chủ ⇒ ẩn, không bịa).
+import { lazy, Suspense } from 'react'
 import { FileText } from 'lucide-react'
 import { demChuaDungTron, type KqMotCau, type PhanKetQua, type TrangThaiCongBo } from '../../lib/ket-qua-sau-nop'
 import { chuDemLoai } from '../../lib/loai-cau-chua-dung'
@@ -9,6 +10,9 @@ import { KetQuaSoLon, NutXd, PhanGon, ThanhTrenXd, TrangThaiChuaCoDiem } from '.
 import './ket-qua-kinh.css'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
+// Kiểu Duolingo (thầy 27/10): Bi đầu màn kết quả — mảnh nạp lười, chỉ app học sinh «Trong» (không cộng byte đường /t); nạp hỏng ⇒ không có Bi, màn y cũ.
+const BiNop = lazy((): Promise<{ default: (p: { diem?: number | null; phu: string }) => React.ReactElement | null }> => import('../kiem-tra-duo/BiNop').catch(() => ({ default: () => null })))
+const coBi = () => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs'
 
 /** Một ô "từng câu" (ca thi 28/09): kết quả chấm của CHÍNH em — chỉ truyền khi `kieu === 'da_cong_bo'`. */
 export interface OCauKq {
@@ -57,14 +61,18 @@ export interface KetQuaSauNopProps {
 export default function KetQuaSauNop(p: KetQuaSauNopProps) {
   const ten = p.tenCa.trim() || 'Ca kiểm tra'
   const coDiem = p.kieu === 'da_cong_bo' && typeof p.diem === 'number' && Array.isArray(p.phan) && typeof p.dung === 'number' && typeof p.tong === 'number'
+  const chuNop = `Em đã nộp bài${p.gioNop ? ` lúc ${p.gioNop}` : ''}${p.lanThu && p.lanThu > 1 ? ` · lần ${p.lanThu}` : ''}`
   return (
     <div className="m3 xd kq-kinh" data-vung="ket-qua-sau-nop" data-trang-thai={p.kieu}>
       <ThanhTrenXd ten="Kết quả kiểm tra" phu={ten} onQuayLai={p.onVe} quayLai="Quay lại" />
       <main className="xd-khung">
-        <p className="xd-muc__mo-ta">
-          Em đã nộp bài{p.gioNop ? ` lúc ${p.gioNop}` : ''}
-          {p.lanThu && p.lanThu > 1 ? ` · lần ${p.lanThu}` : ''}
-        </p>
+        {coBi() ? (
+          <Suspense fallback={<p className="xd-muc__mo-ta">{chuNop}</p>}>
+            <BiNop diem={coDiem ? p.diem : null} phu={chuNop} />
+          </Suspense>
+        ) : (
+          <p className="xd-muc__mo-ta">{chuNop}</p>
+        )}
         {coDiem ? (
           <>
             <KetQuaSoLon diem={p.diem!} dung={p.dung!} tong={p.tong!} lam={p.lam} de={p.de} ss={p.ss} truoc={p.truoc} exp={p.expCa} />
