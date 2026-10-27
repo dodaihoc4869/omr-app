@@ -41,7 +41,9 @@ export interface TongQuanThuong {
   /** Luật bình 27/10: giá + đã mua bình tuần này chưa (mỗi tuần mua 1 bình). Máy chủ cũ không gửi ⇒ vắng (giá mặc định GIA_BINH). */
   binh?: { gia: number; daMuaTuan: boolean; muaTiepTu?: string }
 }
-export interface DongGiai { thuHang: number; ten: string; lop: string; nguyenTu: number; laEm: boolean }
+/** Chỉ có ở dòng của CHÍNH em khi tuần này bản xếp ghi làm đối phó (bảng tính 0): nguyên tử đã kiếm mà chưa tính hạng + lý do (mã, chữ). */
+export interface ChuaTinhHang { nguyenTu: number; lyDo: { ma: string; chu: string }[] }
+export interface DongGiai { thuHang: number; ten: string; lop: string; nguyenTu: number; laEm: boolean; chuaTinh?: ChuaTinhHang }
 export interface BangGiai { hang: HangGiai; hetHanGiay?: number; nhom: DongGiai[]; len: number; roi: number; /** thầy tắt giải tuần ⇒ màn ẩn */ tat?: true }
 export interface HuyHieu { ma: string; ten: string; co: boolean; tienDo?: { da: number; can: number }; ngay?: string }
 export type HomNayDoi = 'ca_hai' | 'ban_chua' | 'em_chua' | 'ca_hai_chua'
@@ -152,7 +154,10 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
 }
 function docDongGiai(x: unknown): DongGiai | undefined {
   const o = dt(x); const th = soNg(o?.thuHang), ten = tenNguoi(o?.ten), nt = soNg(o?.nguyenTu)
-  return th && ten && nt !== undefined ? { thuHang: th, ten, lop: chu(o!.lop) ?? '', nguyenTu: nt, laEm: o!.laEm === true } : undefined
+  if (!th || !ten || nt === undefined) return undefined
+  const laEm = o!.laEm === true, ct = laEm ? dt(o!.chuaTinh) : null, ctNt = soNg(ct?.nguyenTu)
+  const lyDo = mang(ct?.lyDo, (v) => { const d = dt(v); const ma = chu(d?.ma), c = chu(d?.chu); return ma && c ? { ma, chu: c } : undefined }) ?? []
+  return { thuHang: th, ten, lop: chu(o!.lop) ?? '', nguyenTu: nt, laEm, ...(ct && ctNt !== undefined ? { chuaTinh: { nguyenTu: ctNt, lyDo } } : {}) }
 }
 export function docBangGiai(x: unknown): BangGiai | null {
   const o = dt(x)
