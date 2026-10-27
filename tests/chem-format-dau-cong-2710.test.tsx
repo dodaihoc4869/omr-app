@@ -66,7 +66,7 @@ describe('trình bày phương trình (app học sinh «Trong»)', () => {
     expect(container.textContent).toBe('RNH₂+H₂O⇌RNH₃⁺+OH⁻.|C₆H₅NH₂+HCl→C₆H₅NH₃Cl.|RNH2+HNO2→ROH+N2↑+H2O.')
     expect([...container.querySelectorAll('.ct-tt')].map((e) => e.textContent).join('')).toBe('+⇌++→+→++')
     expect(container.querySelectorAll('.ct-mt')).toHaveLength(3)
-    expect([...container.querySelectorAll('.ct-l')].map((e) => e.parentElement?.textContent)).toEqual(['C₆H₅NH₂+HCl→C₆H₅NH₃Cl.', 'C₆H₅NH₂+HCl→C₆H₅NH₃Cl.'])
+    expect([...container.querySelectorAll('.ct-l')].map((e) => e.textContent)).toEqual(['HCl', 'C₆H₅NH₃Cl']) // cả chất trong một nút chữ
     expect(container.querySelectorAll('.ct-kh')).toHaveLength(1)
     expect(container.querySelector('sup')?.textContent).not.toBe('+') // ROH+N2: không còn điện tích giả
     expect(container.querySelectorAll('wbr').length).toBe(container.querySelectorAll('.ct-tt').length) // xuống dòng được sau toán tử
@@ -75,6 +75,6 @@ describe('trình bày phương trình (app học sinh «Trong»)', () => {
   it('phương trình đã cách đều (`A + B → C`) không thêm khoảng; «Clo», «lời» không bọc «l»', () => {
     const { container } = render(<ChemText text="Clo + lời giải: Al + HCl → AlCl3" />)
     expect(container.querySelectorAll('.ct-tt')).toHaveLength(0)
-    expect([...container.querySelectorAll('.ct-l')].map((e) => e.previousSibling?.textContent?.slice(-1))).toEqual(['A', 'C', 'A', 'C']) // Al, HCl, AlCl3
+    expect([...container.querySelectorAll('.ct-l')].map((e) => e.textContent)).toEqual(['Al', 'HCl', 'AlCl']) // «AlCl» + chỉ số ₃ (thẻ sub riêng)
   })
 })
