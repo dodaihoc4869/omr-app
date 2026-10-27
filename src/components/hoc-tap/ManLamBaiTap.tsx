@@ -560,9 +560,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
               {lanTruoc && !khongTinh && <p className="duo-mo">Chấm theo đáp án em nộp lần trước.</p>}
             </div>
           </div>
-          <div className="duo-them">{linkGiai}{linkHoi}{/* thầy 26/10 «Bỏ câu sai từng bước»: tấm kết quả không có «Sửa câu này» — chỉ Lời giải từng bước + Hỏi thầy */}</div>
+          {linkGiai && <div className="duo-them">{linkGiai}{/* thầy 26/10 «Bỏ câu sai từng bước»: tấm kết quả không có «Sửa câu này» — chỉ Lời giải từng bước + Hỏi thầy */}</div>}
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          <button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' && !khongTinh ? 'do' : undefined} onClick={() => { phanHoi('chon'); tiep() }}>Tiếp tục</button>
+          {/* thầy 27/10: Hỏi thầy (nút 3D phụ ~1/4, trái) + «Tiếp tục» CÙNG MỘT HÀNG */}
+          <div className="duo-hang-nut">{linkHoi}<button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' && !khongTinh ? 'do' : undefined} onClick={() => { phanHoi('chon'); tiep() }}>Tiếp tục</button></div>
         </div></section>
       : choChonCach ? <div className="duo-day"><div className="duo-giua">
           <div className="duo-hai">
