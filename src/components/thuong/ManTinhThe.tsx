@@ -6,7 +6,7 @@ import { useRef, useState, type CSSProperties } from 'react'
 import { BookOpen, Check, ChevronRight, Clock, FlaskConical, Lock, Sparkles, Target, Wrench, Zap } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, demSo, hoatAnh, phanHoiThuong } from '../../lib/hieu-ung-thuong'
-import { GIA_BINH, moRuong, type NhiemVu, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
+import { GIA_BINH, moRuong, vongMucTieu, type NhiemVu, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, IcTinhThe, Ruong } from './hinh'
 import { SoDem } from './SoDem'
 import { capNhatTongQuan, useTongQuan } from './dung-thuong'
@@ -57,10 +57,10 @@ export function ManNhiemVu({ token, onVe, hieuUng }: { token?: string; onVe?: ()
   if (!tq) return <div className="tp-goc tp-vo"><DauVe onVe={onVe} />{tai ? <Cho /> : <Loi chu={loi || 'Chưa xem được nhiệm vụ.'} onThuLai={thuLai} />}</div>
   const nv = tq.nhiemVu ?? []
   const soXong = nv.filter((x) => x.xong).length
-  const r = tq.ruong, mt = tq.mucTieu
+  const r = tq.ruong, mt = vongMucTieu(tq.mucTieu)
   const mo = !!r?.mo || moXong
   const duMo = nv.length > 0 && soXong === nv.length
-  const datMt = !!mt && mt.daXong >= mt.can
+  const datMt = !!mt?.dat
   const daNhan = nv.filter((x) => x.xong).reduce((s, x) => s + x.thuong, 0) + (datMt ? MUC_TIEU_TT : 0) + (mo && r ? r.thuong : 0)
   const conLai = nv.filter((x) => !x.xong).reduce((s, x) => s + x.thuong, 0) + (mt && !datMt ? MUC_TIEU_TT : 0) + (!mo && r ? r.thuong : 0)
   const moRuongNgay = async () => {
@@ -96,11 +96,11 @@ export function ManNhiemVu({ token, onVe, hieuUng }: { token?: string; onVe?: ()
           <h2>Tinh thể hôm nay</h2>
           <div className="tp-tong-nv"><span>Đã nhận</span><b>+{daNhan} <IcTinhThe /></b>{conLai > 0 && <><span>· còn có thể nhận</span><b>+{conLai} <IcTinhThe /></b></>}</div>
           {conLai > 0 && <p className="tp-phu" style={{ fontSize: 13.5 }}>Còn lại: {[nv.length - soXong > 0 && `${nv.length - soXong} nhiệm vụ (+${nv.filter((x) => !x.xong).reduce((s, x) => s + x.thuong, 0)})`,
-            mt && !datMt && `mục tiêu ngày ${mt.can} chặng (+${MUC_TIEU_TT})`, !mo && r && `rương (+${r.thuong})`].filter(Boolean).join(', ')}.</p>}
+            mt && !datMt && `mục tiêu ngày ${mt.can} ${mt.donVi} (+${MUC_TIEU_TT})`, !mo && r && `rương (+${r.thuong})`].filter(Boolean).join(', ')}.</p>}
         </section>
         {mt && <section className="tp-the" aria-label="Mục tiêu ngày">
           <div className="tp-dong"><span className="tp-o" data-sac={datMt ? 'sao' : undefined}><Target aria-hidden="true" /></span>
-            <div className="giua"><b>Mục tiêu ngày · {mt.daXong}/{mt.can} chặng</b><span>{datMt ? `Đã đạt · +${MUC_TIEU_TT} tinh thể` : `Thêm ${mt.can - mt.daXong} chặng nữa là đạt, nhận +${MUC_TIEU_TT} tinh thể`}</span></div></div>
+            <div className="giua"><b>Mục tiêu ngày · {mt.da}/{mt.can} {mt.donVi}</b><span>{datMt ? `${mt.donVi === 'câu' ? 'Đủ mức' : 'Đã đạt'} · +${MUC_TIEU_TT} tinh thể` : `Thêm ${mt.can - mt.da} ${mt.donVi} nữa là đạt, nhận +${MUC_TIEU_TT} tinh thể`}</span></div></div>
         </section>}
         <section className="tp-the" aria-label="Các nhiệm vụ có thể ra">
           <h2>Mỗi ngày rút 3 trong 6 kiểu</h2>

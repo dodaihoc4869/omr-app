@@ -54,9 +54,14 @@ const THU = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm',
 const homNayChu = () => { const d = new Date(); return `${THU[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}` }
 const chuCaiDau = (ten: string) => { const p = ten.trim().split(/\s+/).filter(Boolean); return ((p.length > 1 ? p[p.length - 2]![0] : '') + (p[p.length - 1]?.[0] ?? 'E')).toUpperCase() }
 
-/** Tiêu đề việc còn lại của ngày Gói 7: tự làm + có hỗ trợ (+ câu chờ bổ sung khi kho thiếu) = mức − đã làm, không số nào mâu thuẫn vòng tròn. */
-export function chuViecGoi7(g: Pick<TomTatGoi7, 'tuLamCon' | 'tiepCanCon' | 'thieuNgay'>): string {
-  return `${g.tuLamCon} câu tự làm · ${g.tiepCanCon} câu học có hỗ trợ${g.thieuNgay > 0 ? ` · ${g.thieuNgay} câu chờ thầy bổ sung` : ''}`
+/**
+ * Tiêu đề việc CÒN LẠI của ngày Gói 7: tự làm + có hỗ trợ (+ câu chờ bổ sung khi kho thiếu) = mức − đã làm, không số nào mâu thuẫn vòng tròn.
+ * `con` (thẻ bài «Trong», đứng một mình không có chữ «Còn N câu» bên cạnh) ⇒ thêm chữ «Còn» để em không đọc thành số đã làm.
+ * Hết việc (thầy 27/10: thẻ ghi «0 câu tự làm · 0 câu học có hỗ trợ» cạnh «Đủ 93/92 câu») ⇒ nói số ĐÃ LÀM thật: «Đã làm 93 câu hôm nay».
+ */
+export function chuViecGoi7(g: Pick<TomTatGoi7, 'tuLamCon' | 'tiepCanCon' | 'thieuNgay'> & { daLamHomNay?: number }, con = false): string {
+  if (g.tuLamCon + g.tiepCanCon + g.thieuNgay === 0 && g.daLamHomNay !== undefined && g.daLamHomNay > 0) return `Đã làm ${g.daLamHomNay} câu hôm nay`
+  return `${con ? 'Còn ' : ''}${g.tuLamCon} câu tự làm · ${g.tiepCanCon} câu học có hỗ trợ${g.thieuNgay > 0 ? ` · ${g.thieuNgay} câu chờ thầy bổ sung` : ''}`
 }
 
 /** Dòng việc: biểu tượng · tên · chữ phụ ngắn (nếu có) · số (nếu có) · mũi tên. */
@@ -177,7 +182,7 @@ export default function HocTapHomNay(p: Props) {
         {p.loi && <div className="ht-thong-bao ht2-loi" role="alert"><span>{p.loi}</span><button className="ht-nut-phu" onClick={p.onTaiLai}>Thử lại</button></div>}
         {p.coCa && !mot && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
-        {MotTrang ? <MotTrang muc={muc} hs={p} so={so} dangTai={p.dangTai && !sanh} tenBai={tenBai} viec={viec} onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} kho={kho}
+        {MotTrang ? <MotTrang muc={muc} hs={p} so={so} dangTai={p.dangTai && !sanh} tenBai={tenBai} viec={goi7 ? chuViecGoi7(goi7, true) : viec} onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} kho={kho}
           coCa={p.coCa} onThi={p.onThi} token={p.token} soSua={soSua} onChua={() => p.onChua()} hinhSua={hinhTuSua()} kiem={kiem} ngayKiem={ngayKiem} onKiemTra={p.onKiemTra}
           soBaiTap={p.soBaiTap} coBaiTap={p.coBaiTap} onBaiTap={p.onBaiTap}
           ghi={[ht?.conThieu ? `Hôm nay còn thiếu ${ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.` : '', sanh?.tamGiuCa ? 'Một số câu đang được giữ cho ca kiểm tra.' : ''].filter(Boolean)} />

@@ -117,8 +117,20 @@ interface NgayEm {
   mau: MauNhiemVu[]
   daSinh: boolean
   nhiemVu: NhiemVuEm[]
-  /** `cau` (CHỈ-THÊM 27/10) = mức câu hôm nay thầy đặt (vd. 96) — để vòng nói rõ «16 chặng (96 câu)»; chưa chốt mức ⇒ vắng. */
-  mucTieu: { daXong: number; can: number; cau?: number }
+  mucTieu: MucTieuNgay
+}
+
+/**
+ * MỤC TIÊU NGÀY — MỘT THƯỚC ĐO VỚI «ĐỦ MỨC» (thầy 27/10: vòng «8/16 chặng» mà thẻ báo «Đủ 93/92 câu hôm nay!»). Đã chốt mức câu ngày ⇒ tính bằng CÂU:
+ * `cauDaLam` = đúng số «đã làm hôm nay» của Gói 7 (`docDaLamNgay7` — cùng hàm của sảnh / `hoc-tap-dem` ⇒ thẻ «Đủ x/y câu» và vòng luôn ra MỘT số), `cau` = mức
+ * (`goi_bai_7_muc_ngay`), `dat` = cauDaLam ≥ cau. Chưa chốt mức / đọc lỗi ⇒ lùi về số chặng xong (`thuong_bai_xong`) như cũ.
+ * `daXong` / `can` (chặng) GIỮ cho máy em bản cũ; `cau`, `cauDaLam`, `dat` CHỈ-THÊM.
+ */
+export interface MucTieuNgay { daXong: number; can: number; cau?: number; cauDaLam?: number; dat: boolean }
+
+/** Số câu «đã làm hôm nay» của Gói 7 (một nguồn với thẻ «Đủ x/y câu»). Nạp lười module Gói 7; lỗi / chưa có bảng ⇒ null (lùi về chặng). */
+export function docCauDaLamNgay(env: Env, sbd: string, ngay: string, nowMs?: number): Promise<number | null> {
+  return import('./goi-bai-7').then((m) => m.docDaLamNgay7(env, sbd, ngay, nowMs)).then((x) => x.size, () => null)
 }
 
 /** «Xong 2 bài» ⇒ «Xong 2 chặng», «Bài hoàn hảo» ⇒ «Chặng hoàn hảo»; giữ «Bài tập…», «Bài 8…». */
@@ -126,7 +138,7 @@ export function chuChangTen(s: string): string {
   return s.replace(/(^|[^\p{L}])(b|B)ài(?![\p{L}])(?! tập| học| \d)/gu, (_m, d: string, b: string) => `${d}${b === 'B' ? 'C' : 'c'}hặng`)
 }
 
-function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknown[] }[]): NgayEm {
+function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknown[] }[], cauDaLam: number | null = null): NgayEm {
   const t = (kq[0]?.results?.[0] ?? {}) as Dong
   const bai = (kq[1]?.results ?? []) as Dong[]
   const nv = (kq[2]?.results ?? []) as Dong[]
@@ -142,9 +154,15 @@ function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknow
   const mau: MauNhiemVu[] = nv.map((r) => ({ ma: chu(r.ma) as MaNhiemVu, ten: chuChangTen(chu(r.ten)), can: so(r.can), thuong: so(r.thuong) }))
   const nhiemVu = nhiemVuCuaNgay(sbd, ngay, soLieu, mau.length ? mau : undefined)
   const mucCau = t.muc === null || t.muc === undefined ? null : so(t.muc)
+  const theoCau = !!mucCau && mucCau > 0 && cauDaLam !== null
+  const mucTieu: MucTieuNgay = {
+    daXong: soLieu.baiXong, can: mucTieuBai(mucCau),
+    ...(mucCau && mucCau > 0 ? { cau: mucCau } : {}), ...(theoCau ? { cauDaLam: cauDaLam! } : {}),
+    dat: theoCau ? cauDaLam! >= mucCau! : soLieu.baiXong > 0 && soLieu.baiXong >= mucTieuBai(mucCau),
+  }
   return {
     ngay, nguyenTu: so(t.nt), tinhTheSo: so(t.tt), daTra: new Set(docJson<string[]>(t.da_tra, [])), ruongMo: t.ruong !== null && t.ruong !== undefined,
-    soLieu, mucCau, mau, daSinh: mau.length > 0, nhiemVu, mucTieu: { daXong: soLieu.baiXong, can: mucTieuBai(mucCau), ...(mucCau && mucCau > 0 ? { cau: mucCau } : {}) },
+    soLieu, mucCau, mau, daSinh: mau.length > 0, nhiemVu, mucTieu,
   }
 }
 
@@ -152,7 +170,8 @@ function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknow
 function thuongChoTra(d: NgayEm): { khoa: string; so: number; maMon: string }[] {
   const ra: { khoa: string; so: number; maMon: string }[] = []
   for (const n of d.nhiemVu) if (n.xong && !d.daTra.has(`tt|${d.ngay}|nv|${n.ma}`)) ra.push({ khoa: `tt|${d.ngay}|nv|${n.ma}`, so: n.thuong, maMon: MA_TT.nhiemVu })
-  if (d.mucTieu.daXong >= d.mucTieu.can && d.mucTieu.daXong > 0 && !d.daTra.has(`tt|${d.ngay}|muc_tieu`)) ra.push({ khoa: `tt|${d.ngay}|muc_tieu`, so: TT_MUC_TIEU_NGAY, maMon: MA_TT.mucTieu })
+  // +5 khi ĐẠT mục tiêu ngày (đủ mức câu; khoá theo ngày ⇒ không trả trùng dù vòng / chặng đổi cách đếm).
+  if (d.mucTieu.dat && !d.daTra.has(`tt|${d.ngay}|muc_tieu`)) ra.push({ khoa: `tt|${d.ngay}|muc_tieu`, so: TT_MUC_TIEU_NGAY, maMon: MA_TT.mucTieu })
   return ra
 }
 function lenhSinhNhiemVu(env: Env, sbd: string, ngay: string): D1PreparedStatement[] {
@@ -169,9 +188,11 @@ function lenhTraThuongNgay(env: Env, sbd: string, d: NgayEm, luc: string): D1Pre
   return lenh
 }
 
-/** Đọc số liệu ngày của em (một lô). */
-export async function docNgayEm(env: Env, sbd: string, ngay: string): Promise<NgayEm> {
-  return phanTichNgay(sbd, ngay, await env.DB.batch(lenhSoLieuNgay(env, sbd, ngay)))
+/** Đọc số liệu ngày của em (một lô + số câu đã làm, SONG SONG — không thêm vòng chờ). `nowMs` (hôm nay) ⇒ tính cả câu vừa nộp chưa kịp vào sổ. */
+export async function docNgayEm(env: Env, sbd: string, ngay: string, nowMs?: number): Promise<NgayEm> {
+  const cauSom = docCauDaLamNgay(env, sbd, ngay, nowMs)
+  const [kq, cau] = await Promise.all([env.DB.batch(lenhSoLieuNgay(env, sbd, ngay)), cauSom])
+  return phanTichNgay(sbd, ngay, kq, cau)
 }
 
 // --- POST /hs/thuong ----------------------------------------------------------------------------------
@@ -183,6 +204,8 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
   const chuoiSom = cauNoiChuoi().docChuoiNgay(env, sbdKy, nowMs, true).catch(() => null)
   // Tóm tắt giải tuần (phần B): MỘT batch riêng chạy CÙNG đợt (không thêm vòng chờ); tách lô để bảng giải chưa có / lỗi không làm hỏng tổng quan (⇒ null).
   const giaiSom = tomTatGiaiEm(env, sbdKy, nowMs).catch(() => null)
+  // Số câu đã làm hôm nay (mục tiêu ngày theo câu): 3 câu đọc song song CÙNG đợt — không thêm vòng chờ nối tiếp.
+  const cauSom = docCauDaLamNgay(env, sbdKy, ngay, nowMs)
   // MỘT lô đọc: công tắc · số liệu ngày (3 câu) · thông báo chưa xem · cược đang chạy.
   const lo = env.DB.batch([
     lenhDocCongTac(env),
@@ -192,9 +215,9 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
   ])
   lo.catch(() => {})
   const sbd = await xong
-  const [kq, chuoiNgay, giai] = await Promise.all([lo, chuoiSom, giaiSom])
+  const [kq, chuoiNgay, giai, cauDaLam] = await Promise.all([lo, chuoiSom, giaiSom, cauSom])
   const congTac = congTacTuDong((kq[0]?.results ?? []) as Dong[] as { khoa: unknown; gia_tri: unknown }[])
-  const d = phanTichNgay(sbd, ngay, kq.slice(1, 4))
+  const d = phanTichNgay(sbd, ngay, kq.slice(1, 4), cauDaLam)
   const choTra = thuongChoTra(d)
   const cuoc = (kq[5]?.results?.[0] ?? null) as Dong | null
   // Trả thưởng mới đạt (nhiệm vụ / mục tiêu) + sinh nhiệm vụ lần đầu trong ngày: SAU phản hồi, idempotent theo khoá. Số trên màn đã gồm phần này.
@@ -224,7 +247,7 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
 export async function hsMoRuong(env: Env, b: Dong, nowMs: number = Date.now()): Promise<Dong> {
   const { sbd: sbdKy, xong } = await gameIdentityHaiBuoc(env, b)
   const ngay = ngayVnTt(nowMs)
-  const doc = docNgayEm(env, sbdKy, ngay)
+  const doc = docNgayEm(env, sbdKy, ngay, nowMs)
   doc.catch(() => {})
   const sbd = await xong
   const d = await doc

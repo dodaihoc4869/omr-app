@@ -87,14 +87,17 @@ describe('phần hiện ngay', () => {
     fireEvent.click(screen.getByRole('button', { name: '245 tinh thể' }))
     expect(mo).toHaveBeenCalledWith('cua-hang')
   })
-  it('vòng mục tiêu (lỗi 27/10 «1/16»): nói rõ «16 chặng (96 câu) · đã xong 1»; xong chặng ⇒ capNhatTongQuan ⇒ vòng đổi số NGAY, không cần mở lại app', async () => {
-    datMayChu({ ...M.tongQuanGia(), mucTieu: { daXong: 1, can: 16, cau: 96 } })
-    ve(<ThanhThuong token={TK} onMo={() => {}} thongBao={false} />)
-    const vong = await screen.findByRole('button', { name: 'Mục tiêu hôm nay: 16 chặng (96 câu) · đã xong 1' })
-    expect(vong.getAttribute('title')).toBe('Mục tiêu hôm nay: 16 chặng (96 câu) · đã xong 1')
-    mayChu[DUONG.tongQuan] = { ...M.tongQuanGia(), mucTieu: { daXong: 3, can: 16, cau: 96 } }
+  it('vòng mục tiêu (thầy 27/10 «8/16 chặng» cạnh «Đủ 93/92 câu»): đo bằng CÂU cùng thẻ; đạt ⇒ «Đủ mức»; capNhatTongQuan ⇒ vòng đổi số NGAY', async () => {
+    datMayChu({ ...M.tongQuanGia(), mucTieu: { daXong: 8, can: 16, cau: 92, cauDaLam: 40, dat: false } })
+    const c = ve(<ThanhThuong token={TK} onMo={() => {}} thongBao={false} />)
+    const vong = await screen.findByRole('button', { name: 'Mục tiêu hôm nay: 92 câu · đã làm 40' })
+    expect(vong.getAttribute('title')).toBe('Mục tiêu hôm nay: 92 câu · đã làm 40')
+    expect(c.querySelector('.tp-tr-muc em')?.textContent).toBe('40/92 câu')
+    mayChu[DUONG.tongQuan] = { ...M.tongQuanGia(), mucTieu: { daXong: 8, can: 16, cau: 92, cauDaLam: 93, dat: true } }
     await act(async () => { await capNhatTongQuan(TK) })
-    expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 16 chặng (96 câu) · đã xong 3' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 92 câu · đã làm 93, đủ mức' })).toBeTruthy()
+    expect(c.querySelector('.tp-tr-muc em')?.textContent).toBe('Đủ mức')
+    expect(c.querySelector('.tp-tr-muc')?.hasAttribute('data-dat')).toBe(true)
   })
   it('thanh trên: thiếu trường ⇒ ô đó ẩn; chưa có bản nào ⇒ khung xương không số', async () => {
     datMayChu({ ok: true, bat: M.BAT, thongBao: [], tinhThe: 80 })

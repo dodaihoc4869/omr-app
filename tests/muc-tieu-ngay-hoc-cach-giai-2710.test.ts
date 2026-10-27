@@ -102,6 +102,6 @@ describe('mục tiêu ngày đếm đủ chặng (D1 thật)', () => {
     expect((k.d.sql.prepare('SELECT COUNT(*) AS n FROM thuong_bai_xong WHERE em = ?').get('S1') as { n: number }).n).toBe(3)
     const tq = await hsThuong(k.env, { token: k.token }, undefined, t)
     const muc = (k.d.sql.prepare('SELECT muc FROM goi_bai_7_muc_ngay WHERE sbd = ?').get('S1') as { muc: number } | undefined)?.muc
-    expect(tq.mucTieu).toEqual({ daXong: 3, can: kb[2]!.mucTieu!.can, ...(muc ? { cau: muc } : {}) })
+    expect(tq.mucTieu).toMatchObject({ daXong: 3, can: kb[2]!.mucTieu!.can, ...(muc ? { cau: muc } : {}) })
   })
 })

@@ -77,7 +77,7 @@ describe('/hs/thuong + rương', () => {
     expect(Object.keys(r).sort()).toEqual(['bat', 'chuoiNgay', 'cuoc', 'giai', 'mucTieu', 'nguyenTuHomNay', 'nhiemVu', 'ok', 'ruong', 'thongBao', 'tinhThe'].sort()) // giai: gộp đợt 3 (phần B)
     expect(r.bat).toEqual({ giai: true, thangHoa: true, banBe: true, kimCuong: true })
     expect(r.tinhThe).toBe(40)
-    expect(r.mucTieu).toEqual({ daXong: 0, can: 1 })
+    expect(r.mucTieu).toEqual({ daXong: 0, can: 1, dat: false })
     expect(r.ruong).toEqual({ mo: false, thuong: 15 })
     expect((r.nhiemVu as unknown[]).length).toBe(3)
     for (const n of r.nhiemVu as Record<string, unknown>[]) expect(Object.keys(n).sort()).toEqual(['can', 'ma', 'ten', 'thuong', 'tien', 'xong'])
@@ -101,7 +101,7 @@ describe('/hs/thuong + rương', () => {
     // Tổng quan sau đó: nhiệm vụ / mục tiêu đã trả không trả lại.
     const r = await hsThuong(env, { token: token.S1 }, undefined, NOW)
     expect(r.tinhThe).toBe(45)
-    expect(r.mucTieu).toEqual({ daXong: 1, can: 1 })
+    expect(r.mucTieu).toEqual({ daXong: 1, can: 1, dat: true })
   })
 })
 
