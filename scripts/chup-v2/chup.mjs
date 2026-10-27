@@ -330,6 +330,30 @@ const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], 
     .map(([ten, m, cho]) => [`ng-hs-${ten}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho])))
 // ═══ hết NGANG HS 26/10
 
+// ═══ DUO SỬA 27/10: màn sửa câu (Tự sửa lỗi · «Em tự làm lại câu này») kiểu Duolingo (`?man=duo-sua&de=…`, khối cùng tên ở trang.tsx; máy chủ giả
+// chấm theo đáp án). Thao tác `lam13:` (tn / nut / ds). 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối; thêm `&trong=tat` (màn cũ giữ nguyên). Tiền tố "duo-sua-".
+const DS_SUA_SAI = 'tn:^C » nut:^Kiểm tra$'
+const DUO_SUA_CANH = [
+  ['01-cau-hinh', 'de=1', /Câu em đã sai/], ['02-cau', 'de=2', /Câu em đã sai/], ['03-chon', 'de=2', /Câu em đã sai/, 'lam13:tn:^B'],
+  ['04-dung', 'de=2', /Câu em đã sai/, 'lam13:tn:^A » nut:^Kiểm tra$'], ['05-sai-goi-y', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI}`],
+  ['06-lan-2', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI} » nut:^Làm lại câu này$`],
+  ['07-sai-lan-2', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI} » nut:^Làm lại câu này$ » tn:^D » nut:^Kiểm tra$`],
+  ['08-loi-giai', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI} » nut:^Làm lại câu này$ » tn:^D » nut:^Kiểm tra$ » nut:^Lời giải$`],
+  ['09-dung-lan-2', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI} » nut:^Làm lại câu này$ » tn:^A » nut:^Kiểm tra$`],
+  ['10-dung-sai', 'de=3', /Câu em đã sai/, 'lam13:ds:a=Đúng,b=Sai,c=Đúng'], ['11-dung-sai-ket', 'de=3', /Câu em đã sai/, 'lam13:ds:a=Đúng,b=Sai,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Làm lại câu này$ » ds:a=Đúng,b=Sai,c=Sai,d=Sai » nut:^Kiểm tra$'],
+  ['12-tra-loi-ngan', 'de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Dấu phẩy$ » nut:^2$'], ['13-tra-loi-ngan-dung', 'de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Dấu phẩy$ » nut:^2$ » nut:^Kiểm tra$'],
+  ['14-xong-chang', 'de=2', /Câu em đã sai/, 'lam13:tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục$'],
+  ['15-da-tu-sua', 'de=2&mo=da-sua', /Em đã tự sửa xong/], ['16-khong-mo', 'de=2&mo=loi', /Chưa mở được/],
+  ['17-giu-chan', 'de=2', /Câu em đã sai/, 'lam13:nut:^Quay lại$'], // giữa chặng sửa (đã sửa 3/4) ⇒ X mở tấm «Đừng đi mà…»
+]
+const DS_DUO_SUA = [
+  ...[[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+    DUO_SUA_CANH.map(([t, q, cho, viec]) => [`duo-sua-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, `duo-sua&${q}`, w, hh, nen, false, cho, viec]))),
+  ['duo-sua-00-tat-doc', 'duo-sua&de=2&trong=tat', 390, 844, 'light', false, /Em tự làm lại câu này/],
+  ['duo-sua-00-tat-may-tinh', 'duo-sua&de=2&trong=tat', 1440, 900, 'light', false, /Em tự làm lại câu này/],
+]
+// ═══ hết DUO SỬA 27/10
+
 // ═══ KIỂM GD MỚI 26/10: dữ liệu XẤU cho màn làm chặng kiểu Duolingo (`lam13&lam=duo-xau`, gia/lam-bai-1210d.ts: đề 6 dòng, phương án 3–4 dòng, công thức
 // dài, lưới 2×2 công thức sát ngưỡng, ý Đúng/Sai dài, trả lời ngắn 6 ô, hình rộng 960px, lý do dài; `&so=lon` số hôm nay lớn; `&loi=1` máy chủ lỗi) + Gói 7
 // «Chọn cách làm» ở giao diện mới + phụ huynh «Chỉ đọc» rỗng / nhiều dữ liệu. Bộ soát scripts/soat-chu-chen + scripts/kiem-gd-moi đọc DS này. Tiền tố "kgd-".
@@ -379,13 +403,21 @@ const DS_PH_DOC = [
   ,['62-ph-doc-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/]
   ,['62-ph-doc-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/]
 ]
+// ═══ MENU 6 MỤC 27/10 (tiền tố "menu6-"): menu dọc app học sinh gọn 6 mục — mở (không buổi điểm danh) · mở khi có buổi đang mở (thẻ Điểm danh đầu menu)
+// · tấm Cài đặt. Hôm nay «Một trang» THẬT (`?man=hs-mot&dd=khong|mo`), chuông thật 2 tin chưa đọc. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
+const MENU6_CANH = [['mo', 'hs-mot&dd=khong', 'menu6:'], ['dd', 'hs-mot&dd=mo', 'menu6:'], ['cai', 'hs-mot&dd=khong', 'menu6:Cài đặt']]
+const DS_MENU6 = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  MENU6_CANH.map(([t, m, viec]) => [`menu6-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, /Ester/, viec])))
+// ═══ hết MENU 6 MỤC 27/10
 const DS = [
+  ...DS_MENU6, // MENU 6 MỤC 27/10
   ...DS_KGD, // KIỂM GD MỚI 26/10
   ...DS_NG_GV, // NGANG GV 26/10
   ...DS_PH_DOC, // PH CHỈ ĐỌC 26/10
   ...DS_T3, // «TRONG» NHÓM 3
   ...DS_MG, // MỘT TRANG GV 26/10
   ...DS_NG_HS, // NGANG HS 26/10
+  ...DS_DUO_SUA, // DUO SỬA 27/10
   ...DS_DUO, // DUO 26/10
   ...DS_GIU, // GIỮ CHÂN 27/10
   ...DS_GT, // GIÁM THỊ 27/10
@@ -555,6 +587,19 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       for (const ten of viec.slice(4).split(' » ')) {
         await t.getByRole('button', { name:ten, exact:true }).first().click()
         await t.waitForTimeout(400)
+      }
+    } else if (viec?.startsWith('menu6:')) {
+      // MENU 6 MỤC 27/10: Lộ trình tự cuộn tới chặng hiện tại lúc mở (menu thu khi trang cuộn) ⇒ chờ cuộn xong, mở menu (thử lại tới khi menu mở thật),
+      // rồi bấm các nút sau «menu6:» (ngăn bằng " » ") trong menu.
+      await t.waitForTimeout(1200)
+      for (let lan = 0; lan < 4; lan++) {
+        if (await t.locator('#tr-menu[data-mo]').count()) break
+        await t.getByRole('button', { name: /^Mở menu/ }).locator('visible=true').first().click()
+        await t.waitForTimeout(500)
+      }
+      for (const ten of viec.slice(6).split(' » ').filter(Boolean)) {
+        await t.locator('#tr-menu').getByRole('button', { name: ten, exact: true }).click()
+        await t.waitForTimeout(450)
       }
     } else if (viec?.startsWith('muc:')) {
       // 26/10 app HS kiểu Duolingo: mở mục Lộ trình / Luyện tập / Thành tích bằng nút đang HIỆN (dải mép phải khi xoay ngang; dọc ⇒ mở menu rồi bấm mục)
