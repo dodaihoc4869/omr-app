@@ -252,7 +252,13 @@ export function MotTrangHs(p: PropsMotTrang) {
   useLayoutEffect(() => {
     const tr = khung.current?.querySelector<HTMLElement>('.da-tren')
     if (!tr) return
-    const do_ = () => datTrenCao(Math.round(tr.getBoundingClientRect().height))
+    // mép dưới THỰC của hàng bộ đếm: tính cả vòng Bi + nhãn «x/y bài» (nhãn đặt tuyệt đối, có thể thò khỏi hàng) + khe 8px (thầy 27/10 «chữ 1/16 vẫn bị cắt»)
+    const do_ = () => {
+      const r = tr.getBoundingClientRect()
+      let day = r.bottom
+      tr.querySelectorAll('.tp-tr, .tp-tr-o, .tp-tr-muc, .tp-tr-muc > :not(svg)').forEach((e) => { day = Math.max(day, e.getBoundingClientRect().bottom) })
+      datTrenCao(Math.round(day - r.top) + 8)
+    }
     do_()
     const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(do_) : null
     ro?.observe(tr)
