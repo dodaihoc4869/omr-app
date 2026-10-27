@@ -70,3 +70,5 @@ jobs:
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT cong, substr(COALESCE(ly_do, ''), 1, 40) AS ly_do, COUNT(*) AS so_cau FROM loi_giai_so_do WHERE cong = 'khong_kiem_duoc' GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 15" 2>/dev/null | jq -c '.[0].results[] | .ly_do |= gsub("[0-9]"; "#")' || echo 'chưa đọc được lý do'
           # Theo model (27/10: có Workers AI khi Gemini hết hạn mức) — để thầy chê chữ của model nào thì lọc được đúng các dòng ấy.
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT model, cong, COUNT(*) AS so_cau FROM loi_giai_so_do GROUP BY 1, 2 ORDER BY 1, 2" 2>/dev/null | jq -c '.[0].results' || echo 'chưa đọc được theo model'
+          # Thầy 26/10 bỏ ẩn dụ tiền nhà: đếm câu ĐẠT còn dính chữ tiền / giàu / nghèo / thuế (chỉ số đếm, không in nội dung).
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS dat_con_an_du FROM loi_giai_so_do WHERE cong = 'dat' AND (ban_json LIKE '%tiền%' OR ban_json LIKE '%giàu%' OR ban_json LIKE '%nghèo%' OR ban_json LIKE '%thuế%')" 2>/dev/null | jq -c '.[0].results' || echo 'chưa đếm được ẩn dụ'
