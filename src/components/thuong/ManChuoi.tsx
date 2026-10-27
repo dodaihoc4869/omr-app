@@ -7,14 +7,14 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { ArrowLeft, Check, Flame } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, hoatAnh, latSo, phanHoiThuong } from '../../lib/hieu-ung-thuong'
-import { DAT_CUOC, DUONG, GIA_BINH, MOC_CHUOI, datCuoc, layDsBan, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
+import { CHU_DA_MUA_TUAN, DAT_CUOC, DUONG, MOC_CHUOI, chuGiaBinh, datCuoc, giaBinh, layDsBan, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, HuyHieuMau, IcLua, IcTinhThe, Tia } from './hinh'
 import { capNhatTongQuan, useTai, useTongQuan } from './dung-thuong'
-import { ChuGiaiTuan, Cho, chuCai, DemTT, Loi, ManToan, NutDay, ThangLich, TuanBay, dongHo, gioVn, ngayNgan, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
+import { ChuGiaiTuan, Cho, chuCai, DemTT, Loi, ManToan, NutDay, ThangLich, TuanBay, dongHo, gioVn, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
 
 export const LUAT_CHUOI = [
   'Mỗi ngày xong ít nhất 1 chặng để giữ chuỗi.',
-  'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang được tối đa 2 bình.',
+  'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang tối đa 2 bình, mỗi tuần mua được 1 bình.',
   'Hết bình? Học bù 2 chặng trong 24 giờ là cứu được chuỗi.',
 ] as const
 
@@ -22,17 +22,18 @@ export function DauVe({ onVe, chu = 'Quay lại' }: { onVe?: () => void; chu?: s
   return onVe ? <div><button type="button" className="tp-nut-chu" onClick={onVe}><ArrowLeft size={18} aria-hidden="true" />{chu}</button></div> : null
 }
 
-/** Ba khe bình (khe 3 mở ở mốc 100 ngày). */
-function KheBinh({ c, tinhThe, dangMua, onMua, idDay }: { c: ChuoiNgay; tinhThe?: number; dangMua: boolean; onMua?: () => void; idDay?: string }) {
+/** Ba khe bình (khe 3 mở ở mốc 100 ngày). Luật 27/10: mỗi tuần mua 1 bình ⇒ tuần này đã mua thì khe trống nói lý do thay cho nút. */
+function KheBinh({ c, tinhThe, gia, daMuaTuan, dangMua, onMua, idDay }: { c: ChuoiNgay; tinhThe?: number; gia: number; daMuaTuan: boolean; dangMua: boolean; onMua?: () => void; idDay?: string }) {
   const so = Math.max(3, c.sucChua)
   return <div className="tp-khe">
     {Array.from({ length: so }, (_, i) => {
       if (i >= c.sucChua) return <div key={i} data-k="khoa"><Binh kieu="khoa" /><b>Khe thứ {i + 1}</b><small>mở ở mốc 100 ngày</small></div>
       if (i < c.giuChuoi) return <div key={i} data-k="day" id={i === c.giuChuoi - 1 ? idDay : undefined}><Binh kieu="day" /><b>Sẵn sàng</b><small>tự đỡ khi em lỡ ngày</small></div>
-      const du = tinhThe === undefined || tinhThe >= GIA_BINH
+      const du = tinhThe === undefined || tinhThe >= gia
       return <div key={i} data-k="trong"><Binh kieu="trong" /><b>Khe trống</b>
-        {onMua && i === c.giuChuoi ? <button type="button" className="tp-nut" data-sac={du ? undefined : 'tat'} disabled={!du || dangMua} onClick={onMua} aria-label={`Mua 1 bình giữ chuỗi, ${GIA_BINH} tinh thể`}>
-          <IcTinhThe />Mua {GIA_BINH}</button> : <small>{du ? `mua ${GIA_BINH} tinh thể` : `cần ${GIA_BINH} tinh thể`}</small>}
+        {daMuaTuan ? <small>{i === c.giuChuoi ? CHU_DA_MUA_TUAN : 'mỗi tuần mua 1 bình'}</small>
+          : onMua && i === c.giuChuoi ? <button type="button" className="tp-nut" data-sac={du ? undefined : 'tat'} disabled={!du || dangMua} onClick={onMua} aria-label={`Mua 1 bình giữ chuỗi, ${gia} tinh thể`}>
+          <IcTinhThe />Mua {gia}</button> : <small>{du ? `mua ${gia} tinh thể` : `cần ${gia} tinh thể`}</small>}
       </div>
     })}
   </div>
@@ -87,7 +88,7 @@ export function useMuaThuong(token: string | undefined) {
     setDang('binh')
     const r = await muaBinh(token)
     setDang('')
-    if (!r.ok) return bao(r.chu)
+    if (!r.ok) { void capNhatTongQuan(token); return bao(r.chu) } // máy chủ từ chối (vd tuần này đã mua) ⇒ tải lại để nút xám đúng lý do
     phanHoiThuong('mua')
     const toi = dich ? document.getElementById(dich) : null
     await bayToi(oTinhThe(), toi, { n: 6, d: 650 })
@@ -211,7 +212,8 @@ export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng, onBan }: Prop
       <div className="c">
         <section className="tp-the" aria-label="Bình giữ chuỗi">
           <div className="tp-dau"><h2>Bình giữ chuỗi</h2><span className="day tp-mo">đang mang {c.giuChuoi}/{c.sucChua}</span></div>
-          <KheBinh c={c} tinhThe={tq.tinhThe} dangMua={m.dang === 'binh'} onMua={token ? () => void m.mua('tp-khe-day') : undefined} idDay="tp-khe-day" />
+          <p className="tp-phu">{chuGiaBinh(giaBinh(tq))}</p>
+          <KheBinh c={c} tinhThe={tq.tinhThe} gia={giaBinh(tq)} daMuaTuan={tq.binh?.daMuaTuan === true} dangMua={m.dang === 'binh'} onMua={token ? () => void m.mua('tp-khe-day') : undefined} idDay="tp-khe-day" />
         </section>
         <section className="tp-the" aria-label="Luật chuỗi">
           <h2>Luật chuỗi</h2>
@@ -273,23 +275,17 @@ export function ManCuuChuoi({ chuoi, onHoc, onDong }: { chuoi: ChuoiNgay; onHoc?
   </ManToan>
 }
 
-/** Màn phủ «Bình đã đỡ» (tp-18) — thông báo `binh_do` lần mở app sau ngày lỡ. Ngày vắng có phép ⇒ dấu «P», không tốn bình. */
+/** Màn phủ «Bình đã đỡ» (tp-18) — thông báo `binh_do` lần mở app sau ngày lỡ. (Luật 27/10: bỏ «vắng có phép giữ chuỗi» ⇒ màn chỉ còn trường hợp bình đỡ.) */
 export function ManBinhDaDo({ tb, tq, token, onHoc, onDong }: { tb: ThongBao; tq: TongQuanThuong; token?: string; onHoc?: () => void; onDong: () => void }) {
   const c = tq.chuoiNgay
   const d = tb.duLieu
   const ngay = typeof d.ngay === 'string' ? d.ngay.slice(0, 10) : c?.binhVuaDo?.slice(0, 10)
-  const phep = d.phep === true || (!!ngay && c?.lich7.some((x) => x.ngay.slice(0, 10) === ngay && x.kieu === 'phep'))
   const so = typeof d.so === 'number' ? d.so : c?.so
+  const gia = giaBinh(tq), daMuaTuan = tq.binh?.daMuaTuan === true
   const m = useMuaThuong(token)
-  const binh = useRef<HTMLSpanElement>(null), p = useRef<HTMLSpanElement>(null), bi = useRef<HTMLDivElement>(null)
+  const binh = useRef<HTMLSpanElement>(null), bi = useRef<HTMLDivElement>(null)
   useHieuUng((h) => {
     const o = ngay ? document.getElementById(`tp-o-${ngay}`) : null
-    if (phep) {
-      hoatAnh(p.current, [{ transform: 'scale(2.2) rotate(-18deg)', opacity: 0 }, { transform: 'scale(.92) rotate(2deg)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], 500)
-      hoatAnh(o, [{ transform: 'scale(2) rotate(-15deg)', opacity: 0 }, { transform: 'scale(.9)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], 450, { tre: 500 })
-      h.sau(800, () => bungHat(o, { n: 8, r: 30, co: 5, mau: ['bang', 'sao'] }))
-      return
-    }
     phanHoiThuong('binh')
     const nap = binh.current?.querySelector('.tp-binh-nap')
     hoatAnh(nap, [{ transform: 'translate(10px,-16px) rotate(30deg)' }, { transform: 'translate(10px,-16px) rotate(30deg)', offset: 0.2 }, { transform: 'translate(0,3px) rotate(-3deg)', offset: 0.75 }, { transform: 'none' }], 600)
@@ -302,26 +298,24 @@ export function ManBinhDaDo({ tb, tq, token, onHoc, onDong }: { tb: ThongBao; tq
   const chuSo = so !== undefined ? <b style={{ color: 'var(--tr-sao-chu)' }}>{so} ngày</b> : null
   const day = <>
     <NutDay chu="Học chặng hôm nay" onClick={onHoc ?? onDong} />
-    {!phep && c && c.giuChuoi < c.sucChua && token && <NutDay chu={`Mua bình · ${GIA_BINH} tinh thể`} phu tat={m.dang !== '' || (tq.tinhThe !== undefined && tq.tinhThe < GIA_BINH)} onClick={() => void m.mua('tp-binh-con')} />}
+    {c && c.giuChuoi < c.sucChua && token && !daMuaTuan && <NutDay chu={`Mua bình · ${gia} tinh thể`} phu tat={m.dang !== '' || (tq.tinhThe !== undefined && tq.tinhThe < gia)} onClick={() => void m.mua('tp-binh-con')} />}
   </>
-  return <ManToan nhan={phep ? 'Ngày vắng có phép' : 'Bình giữ chuỗi đã đỡ'} onDong={onDong} day={day}>
+  return <ManToan nhan="Bình giữ chuỗi đã đỡ" onDong={onDong} day={day}>
     <main className="tp-man" data-hai="">
       <div className="cot-a">
         <div className="tp-hinh">
-          {phep ? <span ref={p} className="tp-p-to" aria-hidden="true">P</span> : <span ref={binh} className="tp-binh-to"><Binh kieu="dong" /></span>}
+          <span ref={binh} className="tp-binh-to"><Binh kieu="dong" /></span>
           <div ref={bi} className="bi-o"><Bi cam="vui" size={96} /></div>
         </div>
-        <h1>{phep ? 'Ngày vắng có phép — chuỗi vẫn giữ' : 'Hôm qua bình giữ chuỗi đã đỡ cho em'}</h1>
-        <p className="tp-phu">{phep
-          ? <>{ngay ? `Hôm ${ngayNgan(ngay)} em vắng có phép.` : 'Em vắng có phép.'}{chuSo && <> Chuỗi vẫn {chuSo}</>}, không tốn bình.</>
-          : <>{chuSo ? <>Chuỗi vẫn {chuSo}. </> : null}Hôm nay học 1 chặng để lửa cháy tiếp nhé.</>}</p>
+        <h1>Hôm qua bình giữ chuỗi đã đỡ cho em</h1>
+        <p className="tp-phu">{chuSo ? <>Chuỗi vẫn {chuSo}. </> : null}Hôm nay học 1 chặng để lửa cháy tiếp nhé.</p>
       </div>
       <div className="cot-b">
         {c && <section className="tp-the" aria-label="Tuần này"><h2>Tuần này</h2><TuanBay lich7={c.lich7} idO={(x) => `tp-o-${x}`} /></section>}
         {c && <section className="tp-the" aria-label="Bình giữ chuỗi">
           <div className="tp-binh-con" id="tp-binh-con"><Binh kieu={c.giuChuoi > 0 ? 'day' : 'trong'} />
-            <div className="giua"><b>{phep ? `Vẫn còn ${c.giuChuoi}/${c.sucChua} bình` : `Còn ${c.giuChuoi}/${c.sucChua} bình`}</b>
-              <span>{phep ? 'ngày vắng có phép không tốn bình' : c.giuChuoi < c.sucChua ? `thứ Hai được tặng 1 bình · hoặc mua ${GIA_BINH} tinh thể` : 'đã đầy bình'}</span></div></div>
+            <div className="giua"><b>{`Còn ${c.giuChuoi}/${c.sucChua} bình`}</b>
+              <span>{c.giuChuoi >= c.sucChua ? 'đã đầy bình' : daMuaTuan ? CHU_DA_MUA_TUAN : chuGiaBinh(gia)}</span></div></div>
         </section>}
       </div>
     </main>

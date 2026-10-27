@@ -2,11 +2,11 @@
 //   1. sổ học `su_kien_hoc`: số câu khác nhau có kết quả theo ngày VN (chỉ mục idx_skh_em_ngay_qid)
 //   2. `chua_loi_dot`: ngày em tự sửa xong (trang_thai_day = 'da_tu_sua', theo `dong_luc`)
 //   3. điểm danh `buoi_hoc_diem_danh` 'co_phep' ⇒ ngày của buổi (theo `buoi_hoc.mo_luc`)
-//   4. bình mua `chuoi_binh_mua` (bảng CHỈ-THÊM, tạo khi cộng bình lần đầu)
+//   4. bình mua `chuoi_binh_mua` (bảng CHỈ-THÊM, tạo khi cộng bình lần đầu) + dòng đặt lại bình 27/10 (NGUON_DAT_LAI_BINH)
 // Lượt 2–4 lỗi / bảng chưa có ⇒ coi như rỗng; lượt 1 lỗi ⇒ trả null (nơi gọi giữ số cũ, không bịa).
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
-import { chuoiNgayCuaEm, ngayVn, SO_NGAY_DOC, type ChuoiNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
+import { chuoiNgayCuaEm, ngayVn, SO_NGAY_DOC, SQL_COT_BINH_MUA, type ChuoiNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 
 export const SQL_CHUOI_BINH = [
   'CREATE TABLE IF NOT EXISTS chuoi_binh_mua (id TEXT PRIMARY KEY, sbd TEXT NOT NULL, so INTEGER NOT NULL, nguon TEXT NOT NULL, luc TEXT NOT NULL)',
@@ -23,7 +23,7 @@ export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Prom
       .bind(sbd, tu, homNay).all<Row>(),
     rongNeuLoi(env.DB.prepare("SELECT DISTINCT date(dong_luc, '+7 hours') AS n FROM chua_loi_dot WHERE sbd = ? AND trang_thai_day = 'da_tu_sua' AND dong_luc >= ?").bind(sbd, tuIso).all<Row>()),
     rongNeuLoi(env.DB.prepare("SELECT DISTINCT date(b.mo_luc, '+7 hours') AS n FROM buoi_hoc_diem_danh d JOIN buoi_hoc b ON b.id = d.buoi_id WHERE d.sbd = ? AND d.trang_thai = 'co_phep' AND b.mo_luc >= ?").bind(sbd, tuIso).all<Row>()),
-    rongNeuLoi(env.DB.prepare("SELECT date(luc, '+7 hours') AS n, SUM(so) AS s FROM chuoi_binh_mua WHERE sbd = ? AND luc >= ? GROUP BY n").bind(sbd, tuIso).all<Row>()),
+    rongNeuLoi(env.DB.prepare(`SELECT ${SQL_COT_BINH_MUA} FROM chuoi_binh_mua m WHERE m.sbd = ? AND m.luc >= ? GROUP BY n`).bind(sbd, tuIso).all<Row>()),
   ])
   const ngay = (x: Row) => String(x.n ?? '')
   return {
@@ -31,6 +31,7 @@ export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Prom
     tuSua: new Set(sua.map(ngay).filter(Boolean)),
     phep: new Set(phep.map(ngay).filter(Boolean)),
     mua: new Map(mua.map((x) => [ngay(x), Number(x.s) || 0] as const)),
+    datLai: new Set(mua.filter((x) => Number(x.r) === 1).map(ngay).filter(Boolean)),
   }
 }
 
