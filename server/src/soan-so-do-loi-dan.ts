@@ -212,3 +212,7 @@ export function chuThuLai(lyDo: string, giaTri?: string | number): string {
 export function chuThuLaiThieu(): string {
   return 'Câu này là BÀI TÍNH TOÁN: bắt buộc có `soDo` (2–3 nút, số liệu đề cho xếp dọc dưới chất) và `buoc` (1–3 bước, mỗi bước đủ `thuaSo`, bước cuối nhân hết ra đáp án kho). Không dùng `chiaKhoa` / `cauTuHoi` thay cho phép tính. Trả về TOÀN BỘ JSON mới đúng khuôn.'
 }
+/** Tin nhắn thử lại khi bản dùng ẩn dụ tiền / nhà thầy đã bỏ (26/10). */
+export function chuThuLaiAnDu(): string {
+  return 'Thầy đã BỎ ẩn dụ tiền / nhà / giàu / nghèo / đánh thuế. Viết lại mọi chữ (deNoiGi, nghia, denDay, hienTuong) nói THẲNG bằng thuật ngữ: số mol, bảo toàn nguyên tố, khối lượng mol, hiệu suất. Giữ nguyên phép tính. Trả về TOÀN BỘ JSON mới đúng khuôn.'
+}
