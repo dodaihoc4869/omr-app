@@ -78,7 +78,7 @@ function napTruocManEm(): Plugin {
         }
         // 05/10: main.tsx nạp ĐỘNG gốc React ⇒ nhóm `app` (App.tsx, mọi đường trừ cổng học sinh) và `hsVo` (vỏ AppHocSinh + màn đăng nhập);
         // `hs` = phần mảnh cổng NGOÀI vỏ (máy đã đăng nhập: nạp ngay; chưa đăng nhập: nạp ưu tiên thấp sau DOMContentLoaded); `thi` / `ph` bỏ phần
-        // đã có trong `app`. Phông Sảnh (`phongHs`): ĐĐH Rounded Đề + Nhấn + Đậm (app học sinh «Trong»; 27/10 phông riêng thay M PLUS Rounded 1c, trước đó thay Nunito, 26/10 Nunito thay Be Vietnam Pro / Noto Serif) + Baloo 2 — chỉ nạp trước
+        // đã có trong `app`. Phông Sảnh (`phongHs`): ĐĐH Rounded Đề + Đậm (app học sinh «Trong»; 27/10 phông riêng thay M PLUS Rounded 1c, trước đó thay Nunito, 26/10 Nunito thay Be Vietnam Pro / Noto Serif) + Baloo 2 — chỉ nạp trước
         // khi trang do service worker phục vụ. Luật chọn nhóm: src/lib/nap-truoc-man-em.ts.
         const app = dsCua('/src/App.tsx')
         const hsVo = dsCua('/src/AppHocSinh.tsx')
@@ -90,7 +90,7 @@ function napTruocManEm(): Plugin {
         const ngoai =(ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
         const phongHs = Object.values(goi)
           .map((x) => (x as { fileName: string }).fileName)
-          .filter((f) => /^assets\/(?:ddh-rounded-(?:de|nhan|dam)-(?:latin|vietnamese)|baloo-2-(?:latin|vietnamese)-(?:700|800)-normal)-[\w-]+\.woff2$/.test(f))
+          .filter((f) => /^assets\/(?:ddh-rounded-(?:de|dam)-(?:latin|vietnamese)|baloo-2-(?:latin|vietnamese)-(?:700|800)-normal)-[\w-]+\.woff2$/.test(f))
           .sort()
           .map((f) => goc + f)
         const bang = {

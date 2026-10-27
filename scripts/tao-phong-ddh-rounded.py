@@ -2,15 +2,17 @@
 # Dẫn xuất từ M PLUS Rounded 1c (SIL OFL 1.1, © 2016 The Rounded M+ Project Authors — KHÔNG có Reserved Font Name; vẫn đổi tên
 # cho đúng tinh thần OFL). KHÔNG dùng / chép đường nét của phông Duolingo (Feather, DIN Next Rounded): chỉ học cảm giác tròn, dày, rộng.
 #
-# Ba kiểu:
-#   Đề  (chữ đề / phương án / thân, gốc Medium 500 — thầy 27/10 «Đề cho nét thanh hơn»): mặt chữ rộng ×1,03, khoảng chữ +1,2 %,
-#        chiều cao chữ thường +3 %, «l» có đuôi sẵn, «1» có chân.
-#   Nhấn (chữ chạm được / nhãn đậm vừa, gốc Bold 700): cùng các sửa của Đề, đậm hơn một bậc.
-#   Đậm (tiêu đề / nút / số, gốc Black 900): hẹp ×0,96, khoảng chữ −1,5 %, chiều cao chữ thường +3 %, «l» có đuôi qua ss01 (lớp .ct-l).
+# Hai kiểu — độ đậm HIỆU CHỈNH THEO SỐ ĐO ảnh Duolingo (thầy 27/10 «nét chữ thanh đậm đúng tỉ lệ với Duolingo»; tỉ lệ «bề dày nét đứng /
+# chiều cao chữ x» đo bằng máy, số đo ở src/styles/phong-ddh/README.md). Gốc M+ không nội suy được (các độ đậm
+# vẽ rời, số điểm khác nhau) ⇒ chỉnh độ đậm bằng dời đường viền (làm đậm / làm mảnh `net` đơn vị mỗi bên, kiểu FT_Outline_Embolden).
+#   Đề  (chữ đề / phương án / thân — «Đề cho nét thanh hơn»): gốc Regular 400 + NET_DE, rộng ×1,03, khoảng chữ +1,2 %,
+#        chữ thường cao +3 %, «l» có đuôi sẵn, «1» có chân.
+#   Đậm (tiêu đề / nút / nhãn / số / chữ chạm được): gốc Bold 700 + NET_DAM, hẹp ×0,96, khoảng chữ −1,5 %, chữ thường cao +3 %,
+#        «l» có đuôi qua ss01 (lớp .ct-l). Đo: Duolingo dùng MỘT độ đậm cho mọi chữ đậm (tiêu đề, nút, nhãn, số, dải kết quả).
 # Cả hai: chỉ số dưới hạ dưới chân dòng (M+ đặt ₂ ₆ trên chân dòng), mũi tên → ← ↑ ↓ ⇄ ⇌ vẽ lại đầu tròn, hẹp (M+ rộng cả em),
 # bỏ hinting / tên glyph / chữ dọc / liga; chia hai mảnh latin + vietnamese (unicode-range như trong-hs.css), woff2.
 #
-# Chạy: python3 scripts/tao-phong-ddh-rounded.py <thư mục có MPLUSRounded1c-Medium.ttf, -Bold.ttf, -Black.ttf> <thư mục ra>
+# Chạy: python3 scripts/tao-phong-ddh-rounded.py <thư mục có MPLUSRounded1c-Regular.ttf, -Bold.ttf> <thư mục ra>
 #   (TTF lấy ở github.com/google/fonts, ofl/mplusrounded1c). Cần: fonttools, brotli, skia-pathops.
 import math, os, sys, unicodedata
 from fontTools.ttLib import TTFont
@@ -37,12 +39,12 @@ LATIN = (khoang(0x20, 0x7E) + LATIN1 + [0x394, 0x3B1, 0x3B2]
          + [0x2070] + khoang(0x2074, 0x207B) + khoang(0x2080, 0x208B) + [0x20AC, 0x2103]
          + khoang(0x2190, 0x2193) + [0x21C4, 0x21CC, 0x2212, 0x2264, 0x2265])
 
+NET_DE = float(os.environ.get('DDH_NET_DE', 3))     # đơn vị (1/1000 em) dời mỗi bên — số đo chốt ở bảng tỉ lệ
+NET_DAM = float(os.environ.get('DDH_NET_DAM', 8))
 KIEU = {
-  'de': dict(tep='MPLUSRounded1c-Medium.ttf', sx=1.03, theo=12, kxh=1.03, dam=500, ten='De', hien='Đề',
+  'de': dict(tep='MPLUSRounded1c-Regular.ttf', net=NET_DE, sx=1.03, theo=12, kxh=1.03, dam=400, ten='De', hien='Đề',
              l_mac_dinh=True, mot_chan=True),
-  'nhan': dict(tep='MPLUSRounded1c-Bold.ttf', sx=1.03, theo=12, kxh=1.03, dam=700, ten='Nhan', hien='Nhấn',
-               l_mac_dinh=True, mot_chan=True),
-  'dam': dict(tep='MPLUSRounded1c-Black.ttf', sx=0.96, theo=-15, kxh=1.03, dam=900, ten='Dam', hien='Đậm',
+  'dam': dict(tep='MPLUSRounded1c-Bold.ttf', net=NET_DAM, sx=0.96, theo=-15, kxh=1.03, dam=700, ten='Dam', hien='Đậm',
               l_mac_dinh=False, mot_chan=False),
 }
 XH = 520  # chiều cao chữ thường của gốc (x, u, n… 0–520)
@@ -177,6 +179,34 @@ def them_ss01(f):
     for ls in [sr.Script.DefaultLangSys] + [x.LangSys for x in sr.Script.LangSysRecord]:
       if ls is not None: ls.FeatureIndex.append(fi); ls.FeatureCount = len(ls.FeatureIndex)
 
+def lam_dam(f, s):
+  """Dời mọi đường viền ra ngoài s đơn vị (s < 0: vào trong) — mép mực đi đều hai phía, nét dày thêm 2s. Điểm ở góc dời theo phân giác
+  (miter, chặn ở góc gắt). TrueType: mực nằm bên PHẢI hướng đi của đường viền ⇒ pháp tuyến ngoài = (−dy, dx)."""
+  if not s: return
+  g = f['glyf']
+  for ten in f.getGlyphOrder():
+    gl = g[ten]
+    if gl.isComposite() or gl.numberOfContours <= 0: continue
+    c = gl.coordinates; dau = 0; moi = list(c)
+    for cuoi in gl.endPtsOfContours:
+      idx = list(range(dau, cuoi + 1)); n = len(idx)
+      for k, i in enumerate(idx):
+        x, y = c[i]
+        def ke(buoc):
+          for t in range(1, n):
+            px, py = c[idx[(k + buoc * t) % n]]
+            if (px, py) != (x, y): return px, py
+          return x, y
+        (ax, ay), (bx, by) = ke(-1), ke(1)
+        ix, iy = x - ax, y - ay; L = math.hypot(ix, iy) or 1; ix, iy = ix / L, iy / L
+        ox, oy = bx - x, by - y; L = math.hypot(ox, oy) or 1; ox, oy = ox / L, oy / L
+        nx, ny = (-iy - oy), (ix + ox)  # tổng hai pháp tuyến ngoài
+        cos = ix * ox + iy * oy; he = max(1 + cos, 0.25)
+        moi[i] = (x + nx * s / he, y + ny * s / he)
+      dau = cuoi + 1
+    for i, (x, y) in enumerate(moi): c[i] = (round(x), round(y))
+    gl.recalcBounds(g)
+
 def bien_doi(f, k):
   """Rộng/hẹp theo sx, khoảng chữ `theo`, chữ thường cao thêm (k.kxh) — áp cho glyf, hmtx, neo dấu và kern của GPOS."""
   sx, theo, kxh = k['sx'], k['theo'], k['kxh']; d = XH * (kxh - 1)
@@ -261,6 +291,8 @@ def tao(ma, k):
     them_glyph(f, 'l.ss01', gl, Xe + 40); them_ss01(f)
     if 'GDEF' in f and f['GDEF'].table.GlyphClassDef: f['GDEF'].table.GlyphClassDef.classDefs['l.ss01'] = 1
   if k['mot_chan']: mot_co_chan(f)
+  lam_dam(f, k['net'])
+  k = dict(k, theo=k['theo'] + 2 * k['net'] * k['sx'])  # giữ khoảng trắng hai bên chữ như trước khi làm đậm
   bien_doi(f, k)
   dat_ten(f, k)
   f.save(tam); f.close()

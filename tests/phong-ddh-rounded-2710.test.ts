@@ -1,6 +1,6 @@
 // PHÔNG RIÊNG APP HỌC SINH «ĐĐH Rounded» (thầy 27/10: «tự tạo font riêng», đẹp như chữ Duolingo) — dẫn xuất OFL từ M PLUS Rounded 1c
-// (scripts/tao-phong-ddh-rounded.py): Đề (chữ đề / thân, gốc 500 — «Đề cho nét thanh hơn», 100–599) + Nhấn (chữ chạm được, 600–749) + Đậm
-// (tiêu đề / nút / số, 750–1000), tự chứa trong src/styles/phong-ddh,
+// (scripts/tao-phong-ddh-rounded.py): Đề (chữ đề / phương án / thân, 100–549) + Đậm (tiêu đề / nút / nhãn / số / chữ chạm, 550–1000) — độ đậm
+// hiệu chỉnh theo SỐ ĐO ảnh Duolingo (tỉ lệ nét / chiều cao chữ x, thầy 27/10), tự chứa trong src/styles/phong-ddh,
 // hai mảnh latin + vietnamese, font-display swap, tổng byte không vượt bộ M PLUS cũ (52 080 B) + phông con «l» (872 B) đã gộp vào.
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -13,19 +13,18 @@ const THU_MUC = resolve(GOC, 'src/styles/phong-ddh')
 const mat = [...HS.matchAll(/@font-face \{([^}]*)\}/g)].map((m) => m[1])
 
 describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
-  it('sáu mặt DDH Rounded: Đề 100–599 / Nhấn 600–749 / Đậm 750–1000 × latin/vietnamese, swap, có unicode-range', () => {
-    expect(mat).toHaveLength(6)
+  it('bốn mặt DDH Rounded: Đề 100–549 / Đậm 550–1000 × latin/vietnamese, swap, có unicode-range', () => {
+    expect(mat).toHaveLength(4)
     for (const m of mat) {
       expect(m).toContain("font-family: 'DDH Rounded'")
       expect(m).toContain('font-display: swap')
       expect(m).toMatch(/unicode-range: U\+/)
-      expect(m).toMatch(/url\('\.\/phong-ddh\/ddh-rounded-(de|nhan|dam)-(latin|vietnamese)\.woff2'\)/)
+      expect(m).toMatch(/url\('\.\/phong-ddh\/ddh-rounded-(de|dam)-(latin|vietnamese)\.woff2'\)/)
     }
-    expect(mat.filter((m) => m.includes('font-weight: 100 599') && m.includes('ddh-rounded-de-'))).toHaveLength(2)
-    expect(mat.filter((m) => m.includes('font-weight: 600 749') && m.includes('ddh-rounded-nhan-'))).toHaveLength(2)
-    expect(mat.filter((m) => m.includes('font-weight: 750 1000') && m.includes('ddh-rounded-dam-'))).toHaveLength(2)
+    expect(mat.filter((m) => m.includes('font-weight: 100 549') && m.includes('ddh-rounded-de-'))).toHaveLength(2)
+    expect(mat.filter((m) => m.includes('font-weight: 550 1000') && m.includes('ddh-rounded-dam-'))).toHaveLength(2)
     // mảnh vietnamese phủ dấu chồng (ặ U+1EB7, ổ U+1ED5, ữ U+1EEF, Ở U+1EDE nằm trong U+1EA0-1EF9)
-    expect(mat.filter((m) => m.includes('U+1EA0-1EF9') && m.includes('-vietnamese.woff2'))).toHaveLength(3)
+    expect(mat.filter((m) => m.includes('U+1EA0-1EF9') && m.includes('-vietnamese.woff2'))).toHaveLength(2)
     // mảnh latin phủ kí hiệu Hoá: chỉ số trên / dưới, → ← ↑ ↓, ⇄ ⇌, °C (Latin-1), −
     for (const m of mat.filter((x) => x.includes('-latin.woff2'))) {
       for (const r of ['U+0000-00FF', 'U+2070-208F', 'U+2190-2193', 'U+21C4', 'U+21CC', 'U+2212']) expect(m).toContain(r)
@@ -34,9 +33,10 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
 
   it('tệp phông tự host, tổng byte ≤ bộ cũ, không còn M PLUS / phông con «l», có giấy phép OFL + ghi công', () => {
     const tep = readdirSync(THU_MUC).filter((t) => t.endsWith('.woff2')).sort()
-    expect(tep).toEqual(['dam-latin', 'dam-vietnamese', 'de-latin', 'de-vietnamese', 'nhan-latin', 'nhan-vietnamese'].map((x) => `ddh-rounded-${x}.woff2`))
+    expect(tep).toEqual(['dam-latin', 'dam-vietnamese', 'de-latin', 'de-vietnamese'].map((x) => `ddh-rounded-${x}.woff2`))
     const tong = tep.reduce((s, t) => s + statSync(resolve(THU_MUC, t)).size, 0)
     expect(tong).toBeLessThanOrEqual(52080 + 872)
+    expect(tong).toBeLessThanOrEqual(36 * 1024) // hai kiểu: ~34,7 KB
     expect(HS).not.toContain("'M PLUS Rounded 1c'")
     expect(HS).not.toContain('phong-tron')
     const lam = doc('src/styles/trong-lam-bai.css')
@@ -48,13 +48,14 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
     expect(doc('src/styles/phong-ddh/README.md')).toContain('ĐĐH Rounded dẫn xuất từ M PLUS Rounded 1c (SIL Open Font License 1.1), © 2016 The Rounded M+ Project Authors')
   })
 
-  it('chỉ app học sinh dùng; --sans/--serif/--tp-f trỏ DDH Rounded; thân 500 (Đề), chữ chạm 700 (Nhấn), tiêu đề 800 (Đậm)', () => {
+  it('chỉ app học sinh dùng; --sans/--serif/--tp-f trỏ DDH Rounded; thân 500 (Đề), chữ chạm / tiêu đề / nút (Đậm), khoảng chữ nhãn đo theo Duolingo', () => {
     expect(HS).toMatch(/:root\[data-trong='hs'\]:has\(\.ht2\) \{ --sans: 'DDH Rounded'[^;]*; --serif: 'DDH Rounded'/)
     expect(HS).toContain(":root[data-trong='hs']:has(.ht2) body { font-weight: 500; }")
     expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .duo :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; }")
     expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .duo .ht2-lam-de-chu { color: var(--tr-chu); }")
     expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .gyc-v.gyc-cham { font-weight: 700; }")
     expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .duo .duo-tra[data-so] .ht2-lam-pa { font-weight: 800; }")
+    expect(HS).toContain(":root[data-trong='hs']:has(.ht2) .duo-nhan { letter-spacing: .02em; }")
     expect(HS).toMatch(/:where\(h1, h2, h3, button, b, strong, th, dd\) \{ font-weight: 800; \}/)
     expect(doc('src/styles/trong-thuong-gon.css')).toMatch(/--tp-f: 'DDH Rounded'/)
   })
@@ -80,7 +81,6 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
     const nguon = m![0].slice(m![0].indexOf('/^assets') + 1, m![0].lastIndexOf('$/.test') + 1)
     const re = new RegExp(nguon)
     expect(re.test('assets/ddh-rounded-dam-latin-AbCd1234.woff2')).toBe(true)
-    expect(re.test('assets/ddh-rounded-nhan-latin-AbCd1234.woff2')).toBe(true)
     expect(re.test('assets/ddh-rounded-de-vietnamese-AbCd_234.woff2')).toBe(true)
     expect(re.test('assets/baloo-2-latin-800-normal-AbCd1234.woff2')).toBe(true)
     expect(re.test('assets/m-plus-rounded-1c-latin-800-normal-AbCd1234.woff2')).toBe(false)
