@@ -54,9 +54,6 @@
   outline: 3px solid var(--tlu-vang);
   outline-offset: 2px;
 }
-.tlu .baloo {
-  font-family: 'Baloo 2', var(--sans, system-ui), sans-serif;
-}
 .tlu-tab {
   font-variant-numeric: tabular-nums;
 }
@@ -278,11 +275,6 @@
   line-height: 1.4;
   color: var(--tlu-chu-phu);
 }
-.tlu-the-che-do-y {
-  display: none;
-  font-size: 12px;
-  color: var(--tlu-chu-phu);
-}
 .tlu-xuong {
   min-height: 150px;
   border-radius: 22px;
@@ -337,11 +329,6 @@
   min-width: 0;
   font-size: 15px;
   line-height: 1.35;
-}
-.tlu-o-chon-so {
-  flex-shrink: 0;
-  font-size: 13px;
-  color: var(--tlu-chu-phu);
 }
 .tlu-ds-dang-sai {
   list-style: none;
@@ -749,179 +736,6 @@
   min-width: 0;
 }
 
-/* Hàng câu đang tự gỡ: thẻ riêng, gọn trên màn dọc và không biến thành
- * danh sách nút toàn chiều ngang ở tablet/máy tính. */
-.tlu-cho-chua {
-  gap: 16px;
-  padding: 20px 22px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgb(30 41 59 / 0.65) 0%, rgb(18 25 42 / 0.8) 100%);
-  border: 1px solid rgb(255 255 255 / 0.08);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.25);
-  overflow: hidden;
-}
-.tlu-cho-chua-dau {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-.tlu-cho-chua-bieu-tuong {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: rgb(99 102 241 / 0.2);
-  color: rgb(165 180 252);
-  flex-shrink: 0;
-}
-.tlu-cho-chua-gioi-thieu {
-  min-width: 0;
-  flex: 1 1 auto;
-}
-.tlu-cho-chua-gioi-thieu .tlu-muc {
-  margin: 0 0 3px;
-  font-size: 18px;
-  font-weight: 700;
-  color: rgb(248 250 252);
-}
-.tlu-cho-chua-gioi-thieu .tlu-ghi {
-  margin: 0;
-  font-size: 13px;
-  color: rgb(148 163 184);
-  line-height: 1.4;
-}
-.tlu-cho-chua-tom-tat {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 12px;
-  background: rgb(15 23 42 / 0.6);
-  border: 1px solid rgb(255 255 255 / 0.06);
-  color: rgb(148 163 184);
-  flex-shrink: 0;
-}
-.tlu-cho-chua-tom-tat strong {
-  color: rgb(248 250 252);
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1;
-}
-.tlu-cho-chua-tom-tat-chu {
-  display: flex;
-  flex-direction: column;
-  font-size: 11px;
-  line-height: 1.15;
-  color: rgb(148 163 184);
-}
-.tlu-cho-chua-luoi {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px 12px;
-}
-.tlu-cho-chua-the {
-  position: relative;
-  min-width: 0;
-  min-height: 46px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 14px 6px 8px;
-  border: 1px solid rgb(255 255 255 / 0.06);
-  border-radius: 14px;
-  background: rgb(30 41 59 / 0.55);
-  color: rgb(248 250 252);
-  text-align: left;
-  transition: transform 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
-}
-.tlu-cho-chua-so {
-  width: 32px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: rgb(99 102 241 / 0.15);
-  color: rgb(165 180 252);
-  font-size: 12px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.tlu-cho-chua-noi-dung {
-  min-width: 0;
-  flex: 1 1 auto;
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  overflow: hidden;
-}
-.tlu-cho-chua-noi-dung strong {
-  flex: 0 0 auto;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: rgb(248 250 252);
-  white-space: nowrap;
-}
-.tlu-cho-chua-noi-dung > span {
-  min-width: 0;
-  overflow: hidden;
-  color: rgb(148 163 184);
-  font-size: 12.5px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.tlu-cho-chua-hen {
-  flex-shrink: 0;
-  color: rgb(251 191 36);
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.tlu-cho-chua-mo {
-  display: grid;
-  place-items: center;
-  color: rgb(148 163 184 / 0.5);
-  flex-shrink: 0;
-}
-.tlu-cho-chua-the[aria-current='true'] {
-  border-color: rgb(251 191 36);
-  box-shadow: inset 0 0 0 1px rgb(251 191 36);
-}
-@media (hover: hover) and (pointer: fine) {
-  .tlu-cho-chua-the:hover {
-    transform: translateY(-1px);
-    border-color: rgb(255 255 255 / 0.14);
-    background-color: rgb(45 58 82 / 0.65);
-  }
-  .tlu-cho-chua-the:hover .tlu-cho-chua-mo {
-    color: rgb(248 250 252);
-  }
-}
-@media (min-width: 900px) {
-  .tlu-cho-chua-luoi {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-@media (min-width: 600px) {
-  .tlu-cho-chua-luoi {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (max-width: 420px) {
-  .tlu-cho-chua-dau {
-    grid-template-columns: 44px minmax(0, 1fr);
-  }
-  .tlu-cho-chua-tom-tat {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
-  }
-  .tlu-cho-chua-tom-tat span {
-    max-width: none;
-  }
-}
 .tlu-bd {
   margin: 0;
 }
@@ -1133,10 +947,6 @@
   }
   .tlu-the-che-do {
     min-height: 190px;
-  }
-  .tlu-the-che-do-y {
-    display: block;
-    margin-top: auto;
   }
   .tlu-luoi-noi-bat {
     grid-template-columns: repeat(3, 1fr);

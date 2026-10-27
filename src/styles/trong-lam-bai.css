@@ -443,15 +443,6 @@
 [data-trong] .duo-lg-dau b { font-size: 17px; }
 /* màn xong chặng */
 [data-trong] .duo-xong { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 28px 0 8px; text-align: center; }
-[data-trong] .duo-huy { position: relative; display: grid; place-items: center; width: 148px; height: 148px; color: var(--tr-trang); }
-[data-trong] .duo-huy::before { content: ''; position: absolute; inset: 0; border-radius: 42px; background: linear-gradient(150deg, var(--tr-sao), var(--tr-chu-y)); transform: rotate(8deg); box-shadow: 0 14px 30px color-mix(in srgb, var(--tr-sao) 35%, transparent); }
-[data-trong] .duo-huy::after { content: ''; position: absolute; inset: 14px; border: 3px dashed color-mix(in srgb, var(--tr-trang) 55%, transparent); border-radius: 32px; transform: rotate(8deg); }
-[data-trong] .duo-huy svg { position: relative; z-index: 1; }
-[data-trong] .duo-huy i { position: absolute; width: 10px; height: 10px; border-radius: 3px; }
-[data-trong] .duo-huy i:nth-child(1) { top: -6px; left: 10px; background: var(--tr-dung); }
-[data-trong] .duo-huy i:nth-child(2) { top: 20px; right: -10px; background: var(--tr-tin); }
-[data-trong] .duo-huy i:nth-child(3) { bottom: -4px; left: -8px; background: var(--tr-sai); }
-[data-trong] .duo-huy i:nth-child(4) { bottom: 12px; right: -14px; background: var(--tr-sao); }
 [data-trong] .duo-xong h1 { margin: 4px 0 0; font-size: 30px; font-weight: 800; line-height: 1.2; color: var(--tr-sao-chu); }
 [data-trong] .duo-xong-phu { margin: 0; font-size: 16px; color: var(--tr-chu-2); }
 [data-trong] .duo-3 { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; width: 100%; max-width: 520px; }
@@ -483,8 +474,6 @@
   [data-trong] .duo .ht2-lam-de-chu { font-size: 18px; }
   [data-trong] .duo .ht2-lam-pa, [data-trong] .duo .ht2-lam-pa[data-ket] { min-height: 52px; font-size: 17px; }
   [data-trong] .duo-xong { padding-top: 12px; gap: 10px; }
-  [data-trong] .duo-huy { width: 96px; height: 96px; }
-  [data-trong] .duo-huy svg { width: 44px; height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) { [data-trong] :is(.duo-ket, .duo-lg-the) { animation: none; } [data-trong] .duo-thanh > i { transition: none; } }
 [data-trong].may-yeu :is(.duo-ket, .duo-lg-the) { animation: none; }
@@ -815,8 +804,6 @@
 [data-trong] .duo-chuoi .tp-dv { width: 23px; height: 23px; }
 .duo-hat { position: fixed; left: 0; top: 0; z-index: 70; width: 22px; height: 22px; color: var(--tr-dung); pointer-events: none; will-change: transform; }
 .duo-hat svg { display: block; width: 100%; height: 100%; }
-.duo-loe-mep { position: fixed; inset: 0; z-index: 68; pointer-events: none; opacity: 0;
-  box-shadow: inset 0 0 0 5px color-mix(in srgb, var(--tr-chu-y) 75%, transparent), inset 0 0 48px color-mix(in srgb, var(--tr-chu-y) 45%, transparent); }
 [data-trong] .duo-moc { position: fixed; top: calc(70px + env(safe-area-inset-top)); left: 50%; z-index: 69; margin: 0; padding: 8px 18px; border-radius: 999px;
   background: var(--tr-chu-y); color: var(--tr-trang); font-size: 16px; font-weight: 800; white-space: nowrap; box-shadow: inset 0 -3px 0 var(--tr-day-khoi);
   pointer-events: none; animation: duo-moc-vao 1400ms ease-out both; }

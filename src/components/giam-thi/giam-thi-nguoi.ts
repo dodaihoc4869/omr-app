@@ -5,7 +5,7 @@
 // Khung xương LÒ XO: mọi tham số (dáng, mặt, miệng) nội suy bằng lò xo từ giá trị ĐANG CÓ ⇒ đổi tư thế không nhảy cóc, có quá đà (follow-through);
 // mỗi động tác lớn mở bằng nhịp lấy đà (anticipation); tóc, vạt áo, đạo cụ trễ một nhịp theo lò xo phụ. Chỉ đổi transform / hình SVG, không bố cục.
 // MÀU: không mã màu thô — mọi màu là biến --gn-* (giam-thi.css) pha color-mix từ bốn màu thân --gt-mau-* và biến --tr-* sẵn có.
-// Tab ẩn / tamDung ⇒ dừng vòng rAF và hẹn giờ. Giảm chuyển động ⇒ tư thế tĩnh đổi theo cảm xúc. Máy yếu (html.may-yeu) ⇒ 30 khung/s, bỏ lấp lánh và động tác vặt.
+// Tab ẩn / tamDung ⇒ dừng vòng rAF và hẹn giờ. Giảm chuyển động ⇒ tư thế tĩnh đổi theo cảm xúc. Máy yếu (html.may-yeu) ⇒ tư thế tĩnh như giảm chuyển động (27/10; trước: 30 khung/s).
 import type { MucGT, TrangThaiGT } from './giam-thi-ve'
 import { rung } from '../../lib/rung'
 
@@ -324,7 +324,8 @@ export const GT_DANG_SONG = new Set<GiamThi>()
 export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; xam?: boolean; mo?: boolean; trangThai?: TrangThaiGT; buoc?: number; loiVao?: HTMLElement | null }): GiamThi {
   const muc = o.muc, C = NV_NGUOI[muc], id = 'gtn' + ++soId, TTV = tuThe(muc)
   const tinh = !!o.tinh
-  const giam = !tinh && typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
+  // 27/10 (thầy: «Máy yếu bị lag»): máy yếu cũng dùng tư thế tĩnh đổi theo cảm xúc — KHÔNG chạy vòng rAF lò xo (đo CPU×6: ~120 lượt rAF/giây suốt lúc làm bài).
+  const giam = !tinh && ((typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.classList.contains('may-yeu'))
   const mayYeu = () => document.documentElement.classList.contains('may-yeu')
   khung.innerHTML = ''
   if (tinh) khung.classList.add('gt-tinh')

@@ -278,15 +278,6 @@
 
 /* Bảng vận hành giáo viên dùng cùng tệp nhưng nhận token màu của app giáo viên. */
 .ccs-kpi { padding: 1rem; color: var(--muc); }
-.ccs-kpi-tieu { margin: 0 0 0.25rem; font-size: 1.05rem; font-weight: 700; }
-.ccs-kpi-cua-so { margin: 0 0 1rem; color: var(--tlu-chu-phu); font-size: 0.78rem; }
-.ccs-kpi-hang { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.ccs-kpi-o { display: flex; flex: 1; flex-direction: column; gap: 0.3rem; min-width: 7rem; padding: 0.875rem; border: 1.5px solid var(--tlu-vien); border-radius: 0.75rem; background: var(--tlu-nen-2); }
-.ccs-kpi-o[data-dat='true'] { border-color: var(--tlu-ngoc); background: color-mix(in srgb, var(--tlu-ngoc) 8%, transparent); }
-.ccs-kpi-so { font-size: 1.75rem; font-weight: 800; line-height: 1.1; }
-.ccs-kpi-o[data-dat='true'] .ccs-kpi-so { color: var(--tlu-ngoc); }
-.ccs-kpi-nhan { color: var(--tlu-chu-phu); font-size: 0.75rem; line-height: 1.4; }
-.ccs-kpi-cohort { margin-top: 0.75rem; color: var(--tlu-chu-phu); font-size: 0.72rem; }
 .ccs-kpi textarea { display: block; width: 100%; min-height: 180px; }
 .ccs-kpi form { display: grid; gap: 0.75rem; padding: 1rem 0; }
 .ccs-kpi label { display: block; }
@@ -295,7 +286,6 @@
 .ccs-kpi input,
 .ccs-kpi summary { min-height: 48px; }
 .ccs-kpi pre { overflow-wrap: anywhere; white-space: pre-wrap; }
-.ccs-phu { position: fixed; z-index: 10000; inset: 0; overflow-y: auto; background: var(--nen); }
 .ccs-hop { position: fixed; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; border: 0; background: var(--nen); overscroll-behavior: contain; }
 .ccs-hop::backdrop { background: var(--nen); }
 .ccs-kpi { --tlu-nen: var(--nen); --tlu-nen-2: var(--the); --tlu-chu: var(--muc); --tlu-chu-phu: var(--nhat); --tlu-vien: var(--vien); --tlu-ngoc: var(--xanh); --tlu-do: var(--do); }
@@ -479,15 +469,12 @@ body[data-hoc-tap=hs] .ccs-cau-goc-the { min-width: 0; }
 /* Câu tự luận / trả lời ngắn ở bước Tự làm lại: em giải ra giấy ⇒ chỉ hiện đề, ẩn ô nhập số (12/10, Boss). */
 body[data-hoc-tap=hs] .ccs-chi-de .osl { display: none; }
 body[data-hoc-tap=hs] .ccs-dang-tai-nho { padding: 24px 16px; border-radius: 18px; background: var(--the-2); color: var(--nhat); text-align: center; }
-body[data-hoc-tap=hs] .ccs-ghi-nho { margin: 0; color: var(--nhat); font-size: 14px; }
 body[data-hoc-tap=hs] .ccs-doi-chieu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 0; }
 body[data-hoc-tap=hs] .ccs-doi-chieu > div { display: grid; gap: 2px; min-width: 0; padding: 12px 14px; border: 1px solid var(--vien); border-radius: 16px; background: var(--the); }
 body[data-hoc-tap=hs] .ccs-doi-chieu > div[data-kieu='dung'] { border-color: var(--xanh); background: color-mix(in srgb, var(--xanh) 9%, var(--the)); }
 body[data-hoc-tap=hs] .ccs-doi-chieu > div[data-kieu='em'] { border-color: color-mix(in srgb, var(--do) 55%, var(--vien)); background: color-mix(in srgb, var(--do) 5%, var(--the)); }
 body[data-hoc-tap=hs] .ccs-doi-chieu dt { color: var(--nhat); font-size: 13px; font-weight: 700; }
 body[data-hoc-tap=hs] .ccs-doi-chieu dd { margin: 0; color: var(--muc); font-size: 17px; font-weight: 800; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
-body[data-hoc-tap=hs] .ccs-doi-chieu-gon { margin-top: 10px; }
-body[data-hoc-tap=hs] .ccs-doi-chieu-gon > div { background: var(--the); }
 body[data-hoc-tap=hs] .ccs-khu-loi { max-width: 640px; margin: 24px auto 0; }
 body[data-hoc-tap=hs] .ccs-nghi { color: var(--nhat); }
 /* Nút chính sát đáy trên điện thoại (ngón cái với tới) — thanh dính trong khung bước, có vùng tai thỏ. */
@@ -544,9 +531,6 @@ body[data-hoc-tap=hs] .ccs-khu-lam { align-content: start; }
 }
 @media (min-width: 900px) and (min-height: 621px) {
   body[data-hoc-tap=hs] .ccs-lo-trinh[data-nut='true'] li > button { row-gap: 2px; padding-top: 10px; padding-bottom: 10px; }
-  body[data-hoc-tap=hs] .ccs-lo-trinh[data-nut='true'] li > button .ccs-buoc-goi {
-    display: block; grid-column: 2; overflow: hidden; color: var(--nhat); font-size: 12.5px; font-weight: 500; line-height: 1.35; text-overflow: ellipsis;
-  }
 }
 
 /* Một dòng điều kiện lúc em sắp làm bản mới (thầy 20/10) — chỉ biến màu sẵn có của màn chữa. */

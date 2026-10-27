@@ -71,3 +71,19 @@ describe('màn làm bài dùng lượt mở trước', () => {
     expect(soLanMo()).toBe(2) // dùng lại lượt mở trước
   })
 })
+
+describe('27/10 (ảnh thầy) — chặng rỗng vì đã xong phần hôm nay KHÔNG là lỗi', () => {
+  it('máy chủ trả questions:[] + message ⇒ thẻ trạng thái + nút về trang chính (làm mới số), không «Thử lại», không role=alert', async () => {
+    const CHU = 'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'
+    vi.mocked(goiHoa2).mockResolvedValue({ ok: true, questions: [], message: CHU })
+    const onVe = vi.fn(), onCapNhat = vi.fn()
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={onVe} onCapNhat={onCapNhat} onChua={vi.fn()} />)
+    const the = (await screen.findByText(CHU, undefined, { timeout: 3000 })).closest('[role=status]')
+    expect(the?.getAttribute('data-tt')).toBe('xong')
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(screen.queryByText('Thử lại')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /^Về / }))
+    expect(onCapNhat).toHaveBeenCalledTimes(1)
+    expect(onVe).toHaveBeenCalledTimes(1)
+  })
+})

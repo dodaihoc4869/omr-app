@@ -9,24 +9,11 @@
 .btm-tieu-chu { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 240px; }
 .btm-hang { display: flex; flex-wrap: wrap; align-items: center; gap: var(--k2, 8px); }
 .btm-h { margin: 0; font-size: var(--bnv-cx-4); font-weight: 700; line-height: 1.25; }
-.btm-phu { margin: 0; font-size: var(--bnv-cx-1); line-height: 1.5; color: var(--m3-on-surface-variant); }
 .btm-lam-moi { flex-shrink: 0; }
 
 .btm-chip-tertiary { --m3-v-nen: var(--m3-tertiary-container); --m3-v-chu: var(--m3-on-tertiary-container); }
 .btm-chip-secondary { --m3-v-nen: var(--m3-secondary-container); --m3-v-chu: var(--m3-on-secondary-container); }
 .btm-chip-canh-bao { --m3-v-nen: var(--m3-canh-bao, var(--m3-secondary-container)); --m3-v-chu: var(--m3-tren-canh-bao, var(--m3-on-secondary-container)); }
-
-/* cách làm theo lô */
-.btm-cach { display: flex; flex-direction: column; gap: var(--k3, 12px); padding: var(--k4, 16px); border-radius: var(--m3-bo-16); background: var(--m3-surface-container); }
-.btm-cach-dau { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--k2, 8px); }
-.btm-cach-ten { margin: 0; font-size: var(--bnv-cx-2); font-weight: 700; line-height: 1.35; text-transform: none; }
-.btm-cach-luoi { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--k2, 8px); }
-@media (min-width: 640px) { .btm-cach-luoi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.btm-cach-o { display: flex; flex-direction: column; gap: 4px; padding: var(--k3, 12px); border-radius: var(--m3-bo-12); font-size: var(--bnv-cx-1); line-height: 1.5; }
-.btm-cach-o b { font-size: var(--bnv-cx-1); letter-spacing: 0.04em; }
-.btm-cach-o[data-vai='tertiary'] { background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container); }
-.btm-cach-o[data-vai='secondary'] { background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
-.btm-cach-o[data-vai='error'] { background: var(--m3-error-container); color: var(--m3-on-error-container); }
 
 /* danh sách + thẻ */
 .btm-ds { display: flex; flex-direction: column; gap: var(--k3, 12px); }

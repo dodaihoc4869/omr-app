@@ -50,13 +50,6 @@
 .ph3-tieu-de--ca h1 { font-size: var(--t-khoi); line-height: 1.25; }
 .ph3-tieu-de--ca span { font-size: var(--t-phu); }
 
-.ph3-dieu-huong { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--ph3-mat); border-top: 1px solid var(--ph3-vien); padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
-.ph3-dieu-huong__logo, .ph3-dieu-huong__con { display: none; }
-.ph3-muc { display: flex; flex-direction: column; align-items: center; gap: var(--k1); min-height: 56px; padding-top: var(--k1); color: var(--ph3-chu-2); font-size: 12px; font-weight: 600; border-radius: var(--r-vua); }
-.ph3-muc__bt { width: 60px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: background-color 200ms ease; }
-.ph3-muc[aria-current="page"] { color: var(--ph3-chu); font-weight: 700; }
-.ph3-muc[aria-current="page"] .ph3-muc__bt { background: var(--ph3-xd-nen); color: var(--ph3-xd-dam); }
-
 /* ---------------------------------------------------------------- lưới thẻ ---------------------------------------------------------------- */
 .ph3-luoi { display: flex; flex-direction: column; gap: var(--k4); padding: 0 var(--k4); }
 /* thẻ: BÓNG mảnh, không viền (thẻ nhận xét của thầy: viền, không bóng) */
@@ -117,10 +110,6 @@
 .ph3-ah__cau { display: flex; align-items: baseline; gap: 2px; }
 .ph3-ah__cau b { font-size: var(--t-so); line-height: 1; font-weight: 800; letter-spacing: -1px; }
 .ph3-ah__cau small { font-size: var(--t-khoi); font-weight: 700; color: var(--ph3-ah-chu-2); }
-.ph3-ah__thanh { display: block; height: 8px; border-radius: var(--r-vien); background: var(--ph3-ah-o); overflow: hidden; }
-.ph3-ah__thanh > span { display: block; height: 100%; border-radius: 5px; background: var(--ph3-vong-hp); }
-.ph3-ah__ghi { display: flex; flex-direction: column; gap: 2px; font-size: var(--t-phu); line-height: 1.45; color: var(--ph3-ah-chu-2); }
-.ph3-ah__o-ghi { padding: var(--k2) var(--k3); border-radius: var(--r-nho); background: var(--ph3-ah-o); font-size: var(--t-phu); line-height: 1.5; color: var(--ph3-ah-chu-2); }
 .ph3-ah__dong { display: flex; flex-direction: column; gap: var(--k1); padding-top: var(--k4); border-top: 1px solid var(--ph3-ah-vach); font-size: var(--t-phu); line-height: 1.5; color: var(--ph3-ah-chu-2); }
 .ph3-ah__dong b { font-size: 15px; font-weight: 700; color: var(--ph3-ah-chu); }
 
@@ -139,29 +128,12 @@
 /* bản vẽ tối giản 09/10: số bên phải tiêu đề thẻ · tuần này (7 chấm) · danh sách cần chú ý · dòng liên kết · thẻ nhận xét của thầy (trung tu 09/10) */
 .ph3-the__so { flex-shrink: 0; font-size: var(--t-the); font-weight: 800; white-space: nowrap; }
 .ph3-the__so small { font-size: var(--t-phu); font-weight: 600; color: var(--ph3-chu-3); }
-.ph3-tuan { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--k1); }
-.ph3-tuan li { display: flex; flex-direction: column; align-items: center; gap: var(--k2); min-width: 0; font-size: var(--t-phu); font-weight: 600; color: var(--ph3-chu-2); }
-.ph3-tuan i { width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: var(--ph3-mat-2); border: 1.5px solid var(--ph3-vien); }
-.ph3-tuan li[data-hoc] i { background: var(--ph3-xl); border-color: var(--ph3-xl); color: var(--ph3-tren-xl); }
-.ph3-tuan li[data-sau] i { background: transparent; border-style: dashed; }
-.ph3-tuan li[data-nay] > span { color: var(--ph3-chu); font-weight: 800; }
-.ph3-ten-dang { font-size: var(--t-than); font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
 .ph3-dong-lk { display: flex; align-items: center; justify-content: space-between; gap: var(--k2); min-height: 48px; font-size: var(--t-than); font-weight: 600; line-height: 1.45; color: var(--ph3-chu-2); }
 .ph3-dong-lk > span { min-width: 0; overflow-wrap: anywhere; }
 .ph3-dong-lk b { font-weight: 800; color: var(--ph3-chu); }
 .ph3-dong-lk svg { flex-shrink: 0; color: var(--ph3-xd); }
-.ph3-the--ds { padding: var(--k2) var(--k5); gap: 0; }
-.ph3-ds-dong > li + li { border-top: 1px solid var(--ph3-mat-2); }
-.ph3-dong { display: flex; align-items: center; gap: var(--k3); min-height: 72px; padding: var(--k3) 0; }
-.ph3-dong--lk { color: var(--ph3-chu); }
-.ph3-dong--lk > svg { flex-shrink: 0; color: var(--ph3-chu-3); }
-.ph3-dong__chu { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.ph3 .ph3-dong__nhan { font-size: var(--t-phu); font-weight: 500; line-height: 1.4; color: var(--ph3-chu-3); }
-.ph3-dong__chu > b { font-size: var(--t-than); font-weight: 700; overflow-wrap: anywhere; }
 .ph3-the--thay { background: var(--ph3-hp-nhat); border: 1px solid var(--ph3-hp-nen); box-shadow: none; }
 .ph3-the__loi { font-size: var(--t-than); line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; }
-.ph3-gia-dinh { padding: 0 var(--k1); font-size: var(--t-phu); line-height: 1.55; max-width: 75ch; }
-.ph3-gia-dinh b { font-weight: 700; }
 .ph3-thanh { height: 8px; border-radius: 4px; background: var(--ph3-mat-2); overflow: hidden; display: block; }
 .ph3-thanh > span { display: block; height: 100%; border-radius: 4px; background: var(--ph3-tim); }
 .ph3-thanh > span[data-mau="xl"] { background: var(--ph3-xl); }
@@ -177,11 +149,6 @@
 .ph3-so-lon small { font-size: var(--t-khoi); font-weight: 700; color: var(--ph3-chu-3); letter-spacing: 0; }
 .ph3-cho-cong-bo { display: flex; gap: var(--k3); align-items: flex-start; padding: var(--k4); border-radius: 16px; background: var(--ph3-mat-2); font-size: 15px; line-height: 1.5; }
 .ph3-cho-cong-bo svg { flex-shrink: 0; color: var(--ph3-chu-3); margin-top: 2px; }
-
-.ph3-canh-bao { display: flex; flex-direction: column; gap: var(--k3); padding: var(--k5); border-radius: 24px; background: var(--ph3-ho-nen); color: var(--ph3-ho-dam); }
-.ph3-canh-bao__dau { display: flex; align-items: center; gap: var(--k2); font-size: var(--t-phu); font-weight: 700; }
-.ph3-canh-bao p { font-size: 15px; line-height: 1.5; }
-.ph3-canh-bao__nut { align-self: flex-start; }
 
 /* danh sách ca (Ca kiểm tra · Các ca trước) */
 .ph3-ds-ca-khoi { display: flex; flex-direction: column; gap: var(--k2); min-width: 0; }
@@ -305,10 +272,7 @@
 /* ---------------------------------------------------------------- xoay ngang · máy tính bảng (600–1023 px) ---------------------------------------------------------------- */
 @media (min-width: 600px) {
   .ph3-chinh { max-width: none; margin: 0 0 0 calc(88px + env(safe-area-inset-left)); padding: 0 var(--k2) var(--k6); }
-  .ph3-dieu-huong { top: 0; right: auto; width: calc(88px + env(safe-area-inset-left)); border-top: none; border-right: 1px solid var(--ph3-vien); padding: max(12px, env(safe-area-inset-top)) 4px 12px env(safe-area-inset-left); display: flex; flex-direction: column; align-items: center; gap: 4px; overflow-y: auto; }
-  .ph3-dieu-huong__logo { display: block; width: 36px; height: 36px; margin: 0 0 12px; flex-shrink: 0; }
   .ph3-dau__logo { display: none; }
-  .ph3-muc { width: 80px; min-height: 60px; flex-shrink: 0; }
   .ph3-luoi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: row dense; align-items: start; }
   .ph3-o-du { grid-column: 1 / -1; }
 }
@@ -325,17 +289,6 @@
 /* ---------------------------------------------------------------- máy tính (≥ 1024 px) ---------------------------------------------------------------- */
 @media (min-width: 1024px) {
   .ph3-chinh { margin-left: 272px; padding: var(--k4) 40px 40px; max-width: 1400px; }
-  .ph3-dieu-huong { width: 272px; align-items: stretch; padding: 24px 16px; gap: 4px; }
-  .ph3-dieu-huong__logo { display: none; }
-  .ph3-dieu-huong__con { display: flex; align-items: center; gap: var(--k3); padding: 0 var(--k2) var(--k5); }
-  .ph3-dieu-huong__con img { width: 44px; height: 44px; flex-shrink: 0; }
-  .ph3-dieu-huong__con div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .ph3-dieu-huong__con span { font-size: 13px; color: var(--ph3-chu-3); }
-  .ph3-dieu-huong__con b { font-size: var(--t-the); font-weight: 700; overflow-wrap: anywhere; }
-  .ph3-muc { width: auto; flex-direction: row; justify-content: flex-start; gap: 14px; min-height: 52px; padding: 0 18px; border-radius: 26px; font-size: 15px; }
-  .ph3-muc__bt { width: 24px; height: 24px; background: transparent; }
-  .ph3-muc[aria-current="page"] { background: var(--ph3-xd-nen); color: var(--ph3-xd-dam); }
-  .ph3-muc[aria-current="page"] .ph3-muc__bt { background: transparent; }
   /* đầu màn: tên con đã ở thanh bên ⇒ chỉ còn nút tròn Tài khoản ở góc phải, ngang tiêu đề màn */
   .ph3-dau { position: absolute; top: var(--k6); right: 40px; z-index: 20; padding: 0; }
   .ph3-dau__ten { display: none; }
@@ -353,7 +306,6 @@
   .ph3-ah { padding: 28px; }
   .ph3-bieu-do { max-height: 260px; } /* đồ thị không phóng chữ quá to trên màn rộng */
   .ph3-the { padding: var(--k6); }
-  .ph3-the--ds { padding: var(--k2) var(--k6); }
 }
 
 /* Giảm chuyển động: tắt mọi chuyển tiếp của app (app không còn hoạt ảnh riêng); đổi mục / khung xương do thang chung lo (thang.css: chỉ còn mờ 120 ms, không thở). */
@@ -367,76 +319,15 @@
 .ph3-lam-moi-loi button { min-height: 48px; padding: 8px 16px; border-radius: 12px; border: 1px solid var(--ph3-vien); background: var(--ph3-mat); color: var(--ph3-chu); font: inherit; touch-action: manipulation; }
 .ph3-the .ph3-lam-moi-loi { margin: 0; }
 .ph3-dau__ten, .ph3-dieu-huong__con > div { min-width: 0; overflow-wrap: anywhere; }
-@media (min-width: 1024px) { .ph3-lam-moi-loi { margin-inline: 0 64px; } } /* chừa góc phải cho nút tròn Tài khoản */
-
-/* ================================================================ KHỐI CHƯA GỠ (trung tu 09/10) ================================================================
- * Các luật dưới đây KHÔNG còn phần tử nào dùng (đã soát mọi tệp .ts/.tsx trong src/: vòng điểm cũ, chiến dịch, điều đáng mừng, giờ học, lời thầy dạng danh sách,
- * bộ lọc, ô đếm cũ, nút "Đổi số báo danh" ở thanh bên…). Luật CHẾT không mang màu đã gỡ hẳn; luật chết mang màu đã gỡ hết thuộc tính KHÔNG phải màu, còn lại đúng khai báo màu vì cổng `npm run kiem:mau-giu`
- * (đếm khai báo màu theo TỪNG TỆP) tính gỡ là "xoá màu đang có" ⇒ gom về đây, giữ nguyên văn, chờ Boss/thầy cho ngoại lệ thì gỡ một lượt. Không thêm luật mới vào khối này. */
-.ph3-nut-chu { color: var(--ph3-xd); }
-.ph3-ghi--ai svg { color: var(--ph3-xd); }
-.ph3-o-xam { background: var(--ph3-mat-2); }
-.ph3-dong-bt { color: var(--ph3-chu-2); }
-.ph3-chu-giai span { color: var(--ph3-ah-chu-2); }
-.ph3-chu-giai small { color: var(--ph3-ah-chu-2); }
+@media (min-width: 1024px) { .ph3-lam-moi-loi { margin-inline: 0 64px; } }
 [data-mau="vong-hp"] { color: var(--ph3-vong-hp); }
 [data-mau="vong-xl"] { color: var(--ph3-vong-xl); }
 [data-mau="vong-tim"] { color: var(--ph3-vong-tim); }
 i[data-mau="vong-hp"] { background: var(--ph3-vong-hp); }
 i[data-mau="vong-xl"] { background: var(--ph3-vong-xl); }
 i[data-mau="vong-tim"] { background: var(--ph3-vong-tim); }
-.ph3-ah__so { border-top: 1px solid var(--ph3-ah-vach); }
-.ph3-ah__so span { color: var(--ph3-ah-chu-2); }
-.ph3-ah__cap span { color: var(--ph3-ah-chu-2); }
-.ph3-ah__cap small { color: var(--ph3-ah-chu-2); }
-.ph3-ah__o3 > div { background: var(--ph3-ah-o); }
-.ph3-ah__o3 span { color: var(--ph3-ah-chu-2); }
-.ph3-ah__thu { color: var(--ph3-ah-chu); }
-.ph3-cd-ray { background: var(--ph3-mat-2); }
-.ph3-cd-ray > span[data-mau="xl"] { background: var(--ph3-xl); }
-.ph3-cd-ray > span[data-mau="xd"] { background: var(--ph3-xd); }
-.ph3-cd-ray > span[data-mau="ho"] { background: var(--ph3-ho); }
-.ph3-cd-chu i { background: var(--ph3-mat-2); border: 1px solid var(--ph3-vien); }
-.ph3-cd-chu i[data-mau="xl"] { background: var(--ph3-xl); border: none; }
-.ph3-cd-chu i[data-mau="xd"] { background: var(--ph3-xd); border: none; }
-.ph3-cd-chu i[data-mau="ho"] { background: var(--ph3-ho); border: none; }
-.ph3-cd-chu span { color: var(--ph3-chu-2); }
-.ph3-cd-chu b { color: var(--ph3-chu); }
-.ph3-dong-bai { background: var(--ph3-mat-2); }
-.ph3-mung li { background: var(--ph3-mat-2); }
-.ph3-mung__so { color: var(--ph3-xl); }
-.ph3-mung__bt { background: var(--ph3-xl); color: var(--ph3-tren-xl); }
-.ph3-vap li { background: var(--ph3-hp-nhat); border: 1px solid var(--ph3-hp-nen); }
-.ph3-vap__dong b { color: var(--ph3-hp-dam); }
-.ph3-vap__dong span { color: var(--ph3-hp-dam); }
-.ph3-vach > span { background: var(--ph3-hp-vach); }
-.ph3-vach > span[data-dung] { background: var(--ph3-xl); }
-.ph3-gio__ray { background: var(--ph3-mat-2); }
-.ph3-gio__ray > span { background: var(--ph3-tim); }
-.ph3-gio__moc { color: var(--ph3-chu-3); }
-.ph3 .ph3-lan { background: var(--ph3-mat-2); }
-.ph3-lan li { border-bottom: 1px solid var(--ph3-vien); }
-.ph3-lan li:last-child { border-bottom: none; }
-.ph3-lan span { color: var(--ph3-chu-2); }
-.ph3-ai svg { color: var(--ph3-xd); }
-.ph3-canh-bao--da-xem { background: var(--ph3-mat-2); color: var(--ph3-chu); }
-.ph3-canh-bao--da-xem .ph3-canh-bao__dau { color: var(--ph3-chu-3); }
 .ph3-ngay[data-moi] { background: var(--ph3-tim-nen); color: var(--ph3-tim-dam); }
-.ph3-doi[data-huong="len"] { color: var(--ph3-xl); }
-.ph3-doi[data-huong="xuong"] { color: var(--ph3-ho); }
-.ph3-doi[data-huong="giu"] { color: var(--ph3-chu-3); }
-.ph3-cach-tinh > div { background: var(--ph3-mat-2); }
-.ph3-cach-tinh b { color: var(--ph3-tim-dam); }
-.ph3-cach-tinh span { color: var(--ph3-chu-2); }
 .ph3-dem-bac > div[data-nhan] { background: var(--ph3-xd-nen); color: var(--ph3-xd-dam); }
-.ph3-ds-nx a { border-bottom: 1px solid var(--ph3-mat-2); }
-.ph3-ds-nx li:last-child a { border-bottom: none; }
-.ph3-ds-nx__ngay { color: var(--ph3-chu-3); }
-.ph3-ds-nx__noi { color: var(--ph3-chu-2); }
-.ph3-vao__goi { color: var(--ph3-chu-3); }
-.ph3-vao__giup { border: none; background: transparent; color: var(--ph3-xd); }
-.ph3-vao__chan { color: var(--ph3-chu-3); }
-.ph3-dieu-huong__doi { border: 1px solid var(--ph3-vien); background: var(--ph3-mat); color: var(--ph3-chu-2); }
 
 /* NGANG + MÁY TÍNH 26/10 (thầy: màn chờ «hiện một lần rất nhanh nhìn rất xấu»): chữ chờ / khung chờ chỉ HIỆN sau 0,8 giây nếu vẫn chưa xong — tải nhanh
  * thì không chớp gì (vẫn giữ chỗ, chỉ trong suốt). Dùng cho: chữ «Đang tải… / Đang mở…» (`.ph3-cho-tre`), khung xương lúc mở «Một trang», và thẻ đăng
