@@ -590,7 +590,25 @@ const NGD_LOC = (process.env.NGD_KHO ?? '').split(',').filter(Boolean)
 const DS_NGD = NGD_KHO.filter(([, , k]) => !NGD_LOC.length || NGD_LOC.includes(k)).flatMap(([w, hh, k, soNen]) => ['light', 'dark'].slice(0, process.env.NGD_TOI === '0' ? 1 : soNen).flatMap((nen) =>
   NGD_CANH.map(([t, m, cho, viec]) => [`ngd-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết NGANG DUO 27/10
+// ═══ VIÊN ĐẾM NỔI 27/10 (tiền tố "vien-", thầy chốt bản vẽ P2 ve-moi/thanh-doc): bỏ thanh đếm ngang, 4 viên nổi mép trái (máy tính: trong thanh menu trái).
+// Đo thêm (in «Viên đè»): hình chữ nhật mỗi viên giao với chữ / nút / ảnh / hình của nội dung ⇒ phải rỗng ở mọi màn, mọi khổ. `lan:N` = lăn chuột N px (em cuộn
+// thật ⇒ viên thu), `bam:CSS` = bấm phần tử (viên ⇒ thẻ bật).
+const VIEN_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['lo-trinh-cuon', 'hs-mot&tp=1', /Ester/, 'lam13:nap » lan:420 » cho:500'],
+  ['lo-trinh-cuon-len', 'hs-mot&tp=1', /Ester/, 'lam13:nap » lan:420 » cho:400 » lan:-120 » cho:500'],
+  ['the-tinh-the', 'hs-mot&tp=1', /Ester/, 'lam13:nap » bam:.da-tren [data-k="tt"] » cho:300'], ['the-muc-tieu', 'hs-mot&tp=1', /Ester/, 'lam13:nap » bam:.da-tren .tp-tr-muc » cho:300'],
+  ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['giai', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Giải tuần'],
+  ['ban', 'hs-mot&tp=1&ten=dai', /Ester/, 'ton:menu:Thành tích » nut:Học cùng bạn'], ['kim-cuong', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
+  ['luyen', 'hs-mot&tp=1', /Ester/, 'menu:Luyện tập'], ['menu', 'hs-mot&dd=khong', /Ester/, 'menu6:'],
+  ['lam-cau', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B'], // màn làm câu: không viên (cổng: Lộ trình nằm dưới [inert] ⇒ CSS ẩn viên)
+]
+const VIEN_KHO = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']]
+const DS_VIEN = VIEN_KHO.flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  VIEN_CANH.map(([t, m, cho, viec]) => [`vien-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+const vienDe = []
+// ═══ hết VIÊN ĐẾM NỔI 27/10
 const DS = [
+  ...DS_VIEN, // VIÊN ĐẾM NỔI 27/10
   ...DS_NGD, // NGANG DUO 27/10
   ...DS_DUO_KT, // DUO KIỂM TRA 27/10
   ...DS_MENU6, // MENU 6 MỤC 27/10
@@ -1111,6 +1129,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         // THÍ NGHIỆM GỌN 27/10: `xem:CSS` cuộn phần tử vào giữa màn · `bam:CSS` bấm phần tử (thanh <summary> không mang vai nút)
         else if (loai === 'xem') await t.evaluate((q) => document.querySelector(q)?.scrollIntoView({ block: 'center' }), gt)
         else if (loai === 'bam') await t.locator(gt).first().click({ timeout: 20000 })
+        else if (loai === 'lan') { await t.mouse.move(w / 2, hgt / 2); await t.mouse.wheel(0, Number(gt)) } // VIÊN ĐẾM NỔI 27/10: em lăn chuột thật
         else if (loai === 'nap') { await t.reload(); await t.getByText(cho).first().waitFor({ timeout: 20000 }); await t.waitForTimeout(600) }
         await t.waitForTimeout(250)
       }
@@ -1177,6 +1196,29 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       .map((e) => `${(e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 40)} ${Math.round(e.getBoundingClientRect().width)}×${Math.round(e.getBoundingClientRect().height)}`),
   )
   if (nho.length) chamNho.push(`${ten}: ${nho.join(' | ')}`)
+  // VIÊN ĐẾM NỔI 27/10: viên không được giao chữ / nút / ảnh / hình của nội dung (đo hình chữ nhật thật; chữ đo từng dòng bằng Range).
+  if (ten.startsWith('vien-')) {
+    const de = await t.evaluate(() => {
+      const vien = [...document.querySelectorAll('.da-tren[data-vien] :is(.tp-tr-o, .tp-tr-muc)')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0)
+      if (!vien.length) return []
+      const ngoai = (e) => e.closest('.da-tren, .tr-menu, .tr-menu-ray, .tr-menu-phu, .da-pop, .tp-toan, [inert]')
+      const giao = (a) => vien.some((b) => !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom))
+      const hien = (e) => { for (let k = e; k && k !== document.body; k = k.parentElement) { const s = getComputedStyle(k); if (s.visibility === 'hidden' || s.display === 'none' || Number(s.opacity) < 0.2) return false } return true }
+      const ra = []
+      const di = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+      for (let n = di.nextNode(); n; n = di.nextNode()) {
+        if (!n.textContent.trim() || !n.parentElement || ngoai(n.parentElement) || !hien(n.parentElement)) continue
+        const r = document.createRange(); r.selectNodeContents(n)
+        if ([...r.getClientRects()].some((x) => x.width > 0 && giao(x))) ra.push(`chữ «${n.textContent.trim().slice(0, 20)}»`)
+      }
+      for (const e of document.querySelectorAll('button, a[href], input, img, svg, canvas, .bi, [class*="anh"], [class*="avt"]')) {
+        if (ngoai(e) || e.closest('svg') !== e && e.tagName.toLowerCase() === 'svg' || !hien(e)) continue
+        const r = e.getBoundingClientRect(); if (r.width > 0 && giao(r)) ra.push(`${e.tagName.toLowerCase()}.${(e.className?.baseVal ?? e.className ?? '').toString().split(' ')[0]}`)
+      }
+      return [...new Set(ra)].slice(0, 6)
+    })
+    if (de.length) vienDe.push(`${ten}: ${de.join(' | ')}`)
+  }
   // NGANG DUO 27/10: đo bố cục (xem khối NGD_CANH) — chỉ ghi, không làm hỏng lượt chụp; tổng hợp ở cuối («Bố cục»).
   if (ten.startsWith('ngd-')) {
     const d = await t.evaluate(() => {
@@ -1231,6 +1273,7 @@ for (const l of loiTrang) console.log('  ' + l)
 console.log(`Tràn ngang: ${tran.length}`)
 for (const l of tran) console.log('  ' + l)
 console.log(`Vùng chạm < 44px: ${chamNho.length}`)
+if (vienDe.length || CHON.some((c) => c.startsWith('vien'))) { console.log(`Viên đè nội dung: ${vienDe.length}`); vienDe.forEach((x) => console.log('  ' + x)) }
 for (const l of chamNho) console.log('  ' + l)
 // LÀN HỒ SƠ EM 12/10F: chữ trong tấm dưới ngưỡng tương phản (4,5:1; chữ lớn 3:1) — chỉ cảnh `hse:`.
 if (DS.some(([ten, , , , , , , viec]) => viec?.startsWith('hse:') && (!CHON.length || CHON.some((c) => ten.startsWith(c))))) {
