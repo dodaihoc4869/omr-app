@@ -101,7 +101,8 @@ describe('hình và kịch bản', () => {
 describe('khung chữ L ôm giám thị (đề dài, thầy 27/10 tối)', () => {
   it('khuyết cùng công thức với giam-thi.css', () => {
     const css = readFileSync('src/components/giam-thi/giam-thi.css', 'utf8')
-    const heSo = (k: string) => { const m = css.match(new RegExp(`--gt-${k}: calc\\(var\\(--gt-nvw\\) \\* ([\\d.]+) ([-+]) (\\d+)px\\)`)); expect(m, k).not.toBeNull(); return (nvw: number) => nvw * Number(m![1]) + (m![2] === '-' ? -1 : 1) * Number(m![3]) }
+    const heSo = (k: string) => { const m = [...css.matchAll(new RegExp(`--gt-${k}: calc\\(var\\(--gt-nvw\\) \\* ([\\d.]+) ([-+]) (\\d+)px\\)`, 'g'))].at(-1); expect(m, k).toBeTruthy(); // khai báo SAU CÙNG thắng (giám thị người v3 đè hệ số cũ)
+      return (nvw: number) => nvw * Number(m![1]) + (m![2] === '-' ? -1 : 1) * Number(m![3]) }
     for (const nvw of [96, 100, 120, 136]) {
       const k = khuyetL(nvw)
       expect(k.kw).toBeCloseTo(heSo('kw')(nvw)); expect(k.kh).toBeCloseTo(heSo('kh')(nvw)); expect(k.kd).toBeCloseTo(heSo('kd')(nvw))

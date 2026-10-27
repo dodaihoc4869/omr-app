@@ -278,7 +278,7 @@ it('lịch mới: 127 câu vẫn gặp đủ trong 7 ngày với ba ngày kiểm
  for(let i=0;i<7;i++){const d=`2026-10-${10+i}`,n=quotaHocKt(con,d,'2026-10-16',lich);if(lich.has(d))expect(n).toBeLessThanOrEqual(12);con-=n}
  expect(con).toBe(0);expect(quotaHocKt(33,'2026-10-17','2026-10-16',lich)).toBe(33)
 })
-it('ngày một kiểm tra: API vẫn mở chặng Gói7, đúng 12 câu riêng; câu kiểm tra không ăn mục tiêu ngày',async()=>{
+it('ngày một kiểm tra: nộp bài kiểm tra xong API mở chặng Gói7, đúng 12 câu riêng; câu kiểm tra không ăn mục tiêu ngày',async()=>{
  const k=await kho(127),{damBaoKtCn}=await import('../server/src/kiem-tra-ca-nhan-schema'),{metaKt}=await import('../server/src/kiem-tra-ca-nhan'),{lam}=await import('./omni-3-ke-hoach-chung'),{xoaMoiDem}=await import('../server/src/dem-chung'),{docNgayCacEm}=await import('../server/src/bai-hang-ngay')
  await damBaoKtCn(k.env)
  const d={phienBan:3,baiNgayToiThieu:12,lyDo:'Kiểm tra',bai:[{khoa:'B1',ten:'Bài mới'}],muc:[],cau:[],soPhu:0,phut:50,thieu:[],chang:[]}
@@ -296,6 +296,9 @@ it('ngày một kiểm tra: API vẫn mở chặng Gói7, đúng 12 câu riêng;
  expect(lap!.goi.find(g=>g.id==='g7:old')!.cau).toHaveLength(8)
  expect(lap!.goi.reduce((n,g)=>n+g.quota,0)).toBeLessThanOrEqual(12)
  const r=await gameV2(k.env,'hoc-tap-sanh',{token:k.token});expect(r.kiemTraCaNhan).toMatchObject({homNay:true,baiNgayToiThieu:12});expect(r.goi7).toMatchObject({toiThieu:12,daLamHomNay:0})
+ // thầy 27/10: bài kiểm tra đang mở chưa nộp ⇒ chưa mở chặng (mã KIEM_TRA_ON_TAP_TRUOC); nộp xong ⇒ mở chặng Gói7 như cũ
+ expect(await gameV2(k.env,'hoc-tap-start',{token:k.token})).toMatchObject({ok:false,ma:'KIEM_TRA_ON_TAP_TRUOC'})
+ k.d.sql.prepare("UPDATE kiem_tra_ca_nhan SET nop_luc=?,trang_thai='da_nop' WHERE id='ktcn:S1:2026-10-10'").run(NOW);xoaMoiDem()
  const ch=await gameV2(k.env,'hoc-tap-start',{token:k.token});expect((ch.questions as unknown[]).length).toBeGreaterThan(0)
  const qid=k.qids('DH-B1')[100]!;await lam(k.env,'S1',qid,NOW,true,{maNguon:'ktcn:S1:2026-10-10',purpose:'de_thu',cauVersion:'v1'})
  const gs=await docGoiCuaEm7(k.env,'S1',NOW);expect(gs.find(g=>g.id==='g7:latest')!.daGap.has(qid)).toBe(true)

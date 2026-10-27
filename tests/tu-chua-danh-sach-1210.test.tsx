@@ -60,7 +60,7 @@ describe('Danh sách câu cần chữa', () => {
     expect(dong1.textContent!.replace(/\u00a0/g, ' ')).toContain('Cần sửa')
     const dong2 = screen.getByRole('button', { name: /Chất béo/ })
     expect(dong2.textContent!.replace(/\u00a0/g, ' ')).toContain('Trả lời ngắn · sai lần gần nhất 09/10 · Luyện tập trước đây')
-    expect(dong2.textContent).toMatch(/Lần gặp lại 2 mở lúc \d{2}:\d{2} · (Thứ (Hai|Ba|Tư|Năm|Sáu|Bảy)|Chủ nhật) \d{2}\/\d{2}\/\d{4}/)
+    expect(dong2.textContent).toMatch(/Lần gặp lại 2 mở lúc \d{2}:\d{2}\s· (Thứ (Hai|Ba|Tư|Năm|Sáu|Bảy)|Chủ nhật) \d{2}\/\d{2}\/\d{4}/)
     expect(screen.getByRole('button', { name: /Câu sai số 3/ }).textContent).toContain('Cần sửa')
     expect(screen.getByRole('button', { name: /Câu sai số 4/ }).textContent).toContain('Đã tự sửa')
     expect(screen.getByRole('region', { name: 'Cần sửa: 2 câu' })).toBeTruthy()

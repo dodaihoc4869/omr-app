@@ -105,8 +105,9 @@ export function useToast(): [ReactNode, (chu: string) => void] {
 }
 
 /** Kiểu ngày máy chủ ⇒ kiểu vẽ: 'cuu' (đã cứu bằng bài bù — chuỗi giữ) vẽ như ngày được đỡ; 'cho' (hôm nay chưa xong) = chưa có gì. */
-const kieuHien = (k: NgayChuoi['kieu']): 'hoc' | 'binh' | 'phep' | 'tat' | undefined => (k === 'cuu' ? 'binh' : k === 'cho' ? undefined : k)
-const NHAN_NGAY = { hoc: 'đã học', binh: 'được đỡ, chuỗi vẫn giữ', phep: 'vắng có phép, chuỗi vẫn giữ', tat: 'chuỗi tắt' } as const
+// Luật 27/10 bỏ «vắng có phép giữ chuỗi» ⇒ không còn dấu «P»: ngày cũ máy chủ còn gửi 'phep' (trước 27/10) hiện như ngày được đỡ.
+const kieuHien = (k: NgayChuoi['kieu']): 'hoc' | 'binh' | 'tat' | undefined => (k === 'cuu' || k === 'phep' ? 'binh' : k === 'cho' ? undefined : k)
+const NHAN_NGAY = { hoc: 'đã học', binh: 'được đỡ, chuỗi vẫn giữ', tat: 'chuỗi tắt' } as const
 
 /** Lịch 30 ngày gần nhất (lich30, chỉ /hs/thuong gửi) — lưới 7 cột từ Thứ Hai, ô trống trước ngày đầu; hôm nay viền cam. Bản vẽ tp-5 «lịch tháng». */
 export function ThangLich({ lich30, homNay = ngayVn() }: { lich30: NgayChuoi[]; homNay?: string }) {
@@ -124,19 +125,19 @@ export function ThangLich({ lich30, homNay = ngayVn() }: { lich30: NgayChuoi[]; 
       return <span key={d} role="listitem" className="n" data-k={k} data-nay={nay || undefined}
         aria-label={`${nay ? 'Hôm nay' : `${thuNgan(d)} ${ngayNgan(d)}`}: ${k ? NHAN_NGAY[k] : nay ? 'chưa học' : 'chưa có'}`}>
         {(k === 'binh' || (nay && k === 'hoc')) && <i className="lan" aria-hidden="true" />}
-        {k === 'phep' ? <b>P</b> : <span>{Number(d.slice(8, 10))}</span>}
+        <span>{Number(d.slice(8, 10))}</span>
       </span>
     })}
   </div>
 }
 
-/** Lịch 7 ngày chuỗi (lich7 của hợp đồng 4.3): học · bình đỡ · P vắng có phép · chuỗi tắt; hôm nay viền cam. */
+/** Lịch 7 ngày chuỗi (lich7 của hợp đồng 4.3): học · bình đỡ · chuỗi tắt; hôm nay viền cam. */
 export function TuanBay({ lich7, homNay = ngayVn(), idO }: { lich7: NgayChuoi[]; homNay?: string; idO?: (ngay: string) => string | undefined }) {
   // đủ 7 ô kết thúc ở hôm nay (ngày máy chủ chưa gửi ⇒ ô trống, không đoán)
   const theo = new Map(lich7.map((x) => [x.ngay.slice(0, 10), kieuHien(x.kieu)]))
   const cuoi = lich7.length && lich7[lich7.length - 1]!.ngay.slice(0, 10) > homNay ? lich7[lich7.length - 1]!.ngay.slice(0, 10) : homNay
   const ngay = Array.from({ length: 7 }, (_, i) => congNgay(cuoi, i - 6))
-  const NHAN = { hoc: 'đã học', binh: 'bình giữ chuỗi đỡ', phep: 'vắng có phép, chuỗi vẫn giữ', tat: 'chuỗi tắt' } as const
+  const NHAN = { hoc: 'đã học', binh: 'bình giữ chuỗi đỡ', tat: 'chuỗi tắt' } as const
   return <div className="tp-tuan7" role="list" aria-label="7 ngày gần nhất">
     {ngay.map((d) => {
       const nay = d === homNay
@@ -146,7 +147,7 @@ export function TuanBay({ lich7, homNay = ngayVn(), idO }: { lich7: NgayChuoi[];
       return <div key={d} role="listitem" aria-label={`${nay ? 'Hôm nay' : `${thuNgan(d)} ${ngayNgan(d)}`}: ${k ? NHAN[k] : tl ? 'chưa tới' : nay ? 'chưa học' : 'chưa có'}`}>
         <span className="n" data-k={k} data-nay={nay || undefined} id={idO?.(d)}>
           {(k === 'binh' || (nay && k === 'hoc')) && <i className="lan" aria-hidden="true" />}
-          {k === 'hoc' ? <Check size={18} strokeWidth={3} aria-hidden="true" /> : k === 'binh' ? <FlaskConical size={18} aria-hidden="true" /> : k === 'phep' ? <b>P</b> : null}
+          {k === 'hoc' ? <Check size={18} strokeWidth={3} aria-hidden="true" /> : k === 'binh' ? <FlaskConical size={18} aria-hidden="true" /> : null}
         </span>
         <span aria-hidden="true">{nay ? 'Nay' : thuNgan(d)}</span>
       </div>
@@ -154,5 +155,5 @@ export function TuanBay({ lich7, homNay = ngayVn(), idO }: { lich7: NgayChuoi[];
   </div>
 }
 export function ChuGiaiTuan() {
-  return <div className="tp-chu-giai" aria-hidden="true"><span><i />Ngày học</span><span><i data-k="binh" />Bình đỡ</span><span><i data-k="phep" />P · Vắng có phép</span><span><i data-k="tat" />Chuỗi tắt</span></div>
+  return <div className="tp-chu-giai" aria-hidden="true"><span><i />Ngày học</span><span><i data-k="binh" />Bình đỡ</span><span><i data-k="tat" />Chuỗi tắt</span></div>
 }

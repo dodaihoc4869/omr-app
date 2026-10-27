@@ -52,13 +52,17 @@ import {
   Pause,
   X,
 } from 'lucide-react'
-import {
-  hsDangNhapApi,
-  hsDatMatKhauApi,
-  hsLichSuCaApi,
-  hsBtvnApi,
-  hsCauSaiApi,
-} from '../lib/exam-api'
+// 27/10 tốc độ: bộ API ca thi (exam-api ~40 KB thô) KHÔNG chặn lượt mở cổng học sinh — bắt đầu tải ngay khi mảnh này chạy (song song, máy đã cài app
+// lấy từ precache), về rồi thì gọi thẳng như nhập tĩnh; chưa về thì lệnh chờ đúng lượt tải đó.
+type ExamApi = typeof import('../lib/exam-api')
+let examApi: ExamApi | null = null
+const examApiCho = import('../lib/exam-api').then((m) => (examApi = m))
+examApiCho.catch(() => {}) // mất mạng lúc tải sẵn: không thành lỗi nền; lệnh gọi sau tự nhận lỗi qua chính lời hứa này
+const hsDangNhapApi: ExamApi['hsDangNhapApi'] = (...a) => examApi ? examApi.hsDangNhapApi(...a) : examApiCho.then((m) => m.hsDangNhapApi(...a))
+const hsDatMatKhauApi: ExamApi['hsDatMatKhauApi'] = (...a) => examApi ? examApi.hsDatMatKhauApi(...a) : examApiCho.then((m) => m.hsDatMatKhauApi(...a))
+const hsLichSuCaApi: ExamApi['hsLichSuCaApi'] = (...a) => examApi ? examApi.hsLichSuCaApi(...a) : examApiCho.then((m) => m.hsLichSuCaApi(...a))
+const hsBtvnApi: ExamApi['hsBtvnApi'] = (...a) => examApi ? examApi.hsBtvnApi(...a) : examApiCho.then((m) => m.hsBtvnApi(...a))
+const hsCauSaiApi: ExamApi['hsCauSaiApi'] = (...a) => examApi ? examApi.hsCauSaiApi(...a) : examApiCho.then((m) => m.hsCauSaiApi(...a))
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { tenBaiTapTrenThe, type TheChangView } from '../lib/btvn-ca-nhan-kieu'

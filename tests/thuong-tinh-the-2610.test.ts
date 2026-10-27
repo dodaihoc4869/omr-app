@@ -1,5 +1,5 @@
 // @vitest-environment node
-// THƯỞNG PHẠT 26/10 — TINH THỂ (= sổ `vang_so`; DAC-TA-THUONG-PHAT-2610.md §4.2, §4.4, §4.6): kiếm (nhiệm vụ, rương, mục tiêu, cược thắng), tiêu (bình 50,
+// THƯỞNG PHẠT 26/10 — TINH THỂ (= sổ `vang_so`; DAC-TA-THUONG-PHAT-2610.md §4.2, §4.4, §4.6): kiếm (nhiệm vụ, rương, mục tiêu, cược thắng), tiêu (bình 150 — luật 27/10,
 // cược 50), thăng hoa 10 % / tối thiểu 5 / tối đa 50 / không âm, chống lặp (bấm lặp, cron chạy lại), công tắc mặc định «bat». D1 thật (node:sqlite).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
@@ -74,7 +74,8 @@ describe('/hs/thuong + rương', () => {
     vang('S1', 40)
     d.sql.prepare("INSERT INTO thong_bao_thuong(em,ma,loai,du_lieu,luc) VALUES('S1','thang_hoa|x','thang_hoa','{\"mat\":5}','2026-10-26T00:00:00Z')").run()
     const r = await hsThuong(env, { token: token.S1 }, undefined, NOW)
-    expect(Object.keys(r).sort()).toEqual(['bat', 'chuoiNgay', 'cuoc', 'giai', 'mucTieu', 'nguyenTuHomNay', 'nhiemVu', 'ok', 'ruong', 'thongBao', 'tinhThe'].sort()) // giai: gộp đợt 3 (phần B)
+    expect(Object.keys(r).sort()).toEqual(['bat', 'binh', 'chuoiNgay', 'cuoc', 'giai', 'mucTieu', 'nguyenTuHomNay', 'nhiemVu', 'ok', 'ruong', 'thongBao', 'tinhThe'].sort()) // giai: gộp đợt 3 (phần B); binh: luật 27/10
+    expect(r.binh).toEqual({ gia: 150, toiDaTuan: 1, daMuaTuan: false, muaTiepTu: '2026-11-02' })
     expect(r.bat).toEqual({ giai: true, thangHoa: true, banBe: true, kimCuong: true })
     expect(r.tinhThe).toBe(40)
     expect(r.mucTieu).toEqual({ daXong: 0, can: 1 })
@@ -107,16 +108,18 @@ describe('/hs/thuong + rương', () => {
 
 describe('mua bình (hàm cộng bình của B3 qua cầu nối) + cược chuỗi', () => {
   const chuoi = { so: 5, giuChuoi: 0, sucChua: 2, lich7: [] }
-  it('trừ 50 rồi cộng bình (id = khoá giao dịch); bấm lặp trong ngày không trừ đôi; thiếu tinh thể / đủ bình / chuỗi chưa mở ⇒ không trừ', async () => {
+  it('trừ 150 rồi cộng bình (id = khoá giao dịch); bấm lặp trong ngày không trừ đôi; thiếu tinh thể / đủ bình / chuỗi chưa mở ⇒ không trừ', async () => {
     const { env, token, vang, du } = await dung()
     const ids: string[] = []
     gia({ docChuoiNgay: async () => chuoi, congBinh: async (_e, _s, id) => { ids.push(id); return true } })
-    expect((await hsMuaBinh(env, { token: token.S1 }, NOW)).ok).toBe(false) // 0 tinh thể
+    expect(await hsMuaBinh(env, { token: token.S1 }, NOW)).toMatchObject({ ok: false, ma: 'thieu_tinh_the' }) // 0 tinh thể
     vang('S1', 120)
+    expect(await hsMuaBinh(env, { token: token.S1 }, NOW)).toMatchObject({ ok: false, ma: 'thieu_tinh_the', error: 'Em cần 150 tinh thể để mua bình.' })
+    vang('S1', 100)
     const a = await hsMuaBinh(env, { token: token.S1 }, NOW)
-    expect(a).toMatchObject({ ok: true, tinhThe: 70, gia: 50 })
-    expect(ids).toEqual([`S1|tt|${NGAY}|binh`])
-    expect((await hsMuaBinh(env, { token: token.S1 }, NOW)).ok).toBe(false)
+    expect(a).toMatchObject({ ok: true, tinhThe: 70, gia: 150, daMuaTuan: true, muaTiepTu: '2026-11-02' })
+    expect(ids).toEqual([`S1|tt|${NGAY}|binh-w`])
+    expect(await hsMuaBinh(env, { token: token.S1 }, NOW)).toMatchObject({ ok: false, ma: 'da_mua_tuan' })
     expect(du('S1')).toBe(70)
     gia({ docChuoiNgay: async () => ({ ...chuoi, giuChuoi: 2 }) })
     expect((await hsMuaBinh(env, { token: token.S1 }, NOW + 86_400_000)).ok).toBe(false)
@@ -124,13 +127,15 @@ describe('mua bình (hàm cộng bình của B3 qua cầu nối) + cược chu�
     expect((await hsMuaBinh(env, { token: token.S1 }, NOW + 86_400_000)).ok).toBe(false)
     expect(du('S1')).toBe(70)
   })
-  it('hàm cộng bình lỗi ⇒ hoàn đúng 50 (khoá hoàn riêng)', async () => {
+  it('hàm cộng bình lỗi ⇒ hoàn đúng 150 (khoá hoàn riêng); lượt hoàn không tính vào hạn tuần ⇒ hôm sau mua lại được', async () => {
     const { env, token, vang, du } = await dung()
-    vang('S1', 60)
+    vang('S1', 160)
     gia({ docChuoiNgay: async () => chuoi, congBinh: async () => { throw new Error('D1 lỗi') } })
     const r = await hsMuaBinh(env, { token: token.S1 }, NOW)
     expect(r.ok).toBe(false)
-    expect(du('S1')).toBe(60)
+    expect(du('S1')).toBe(160)
+    gia({ docChuoiNgay: async () => chuoi, congBinh: async () => true })
+    expect(await hsMuaBinh(env, { token: token.S1 }, NOW + 86_400_000)).toMatchObject({ ok: true, tinhThe: 10 })
   })
   it('cược: đặt đúng 50, một lượt mỗi lúc; cron: giữ chuỗi đủ 7 ngày ⇒ +100; đứt ⇒ mất 50', async () => {
     const { d, env, token, vang, du } = await dung(['S1', 'S2'])
