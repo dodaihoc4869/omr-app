@@ -423,7 +423,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
 
 // ─────────────────────────────── VIỀN BONG BÓNG CHỮ L (đề dài) ───────────────────────────────
 /** Khuyết góc trái trên theo cỡ giám thị — CÙNG công thức với giam-thi.css (`--gt-kw / --gt-kh / --gt-kd`). */
-export const khuyetL = (nvw: number) => ({ kw: nvw * 0.83 - 4, kh: nvw * 1.15 + 6, kd: nvw * 0.71 - 4 })
+export const khuyetL = (nvw: number) => ({ kw: nvw * 0.66 - 2, kh: nvw * 1.1 + 4, kd: nvw * 0.38 })
 /** Đường viền bong bóng chữ L: hộp w×h, khuyết kw×kh ở góc trái trên; bo R ở góc ngoài, r ở góc trong; mũi nhọn ở cạnh khuyết, cao kd, chĩa trái. */
 export function duongL(w: number, h: number, kw: number, kh: number, kd: number, R = 18, r = 16): string {
   const b = 1, n = (x: number) => Math.round(x * 10) / 10

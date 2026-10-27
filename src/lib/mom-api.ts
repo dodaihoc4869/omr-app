@@ -1,5 +1,4 @@
 import {layDiaChiMayChu} from './dia-chi-may-chu'
-import {chuanHoaLoiGiaiCau} from './chuan-hoa-loi-giai'
 // Phiếu HTML nạp lười (≈ 52 KB gzip): chỉ tải khi em mở kết quả bài, không kéo vào lượt tải đầu.
 import type {ThongTinPhieu} from './html-phieu'
 import type {CauLuyen} from './bai-tap-pdf'
@@ -97,6 +96,8 @@ export function chuanHoaBaiMom(b: any): any {
 
 /** Báo cáo dựng từ nội dung và điểm đã lưu trên máy chủ, đồng điệu với tất cả các phiếu HTML trong app. */
 export async function momReviewHtml(b: any): Promise<string> {
+  // 27/10 tốc độ: bộ chuẩn lời giải nạp lười — cổng phụ huynh nhập tệp này (datPassPhuHuynh) mà không cần nó lúc mở.
+  const { chuanHoaLoiGiaiCau } = await import('./chuan-hoa-loi-giai')
   const dsCauRaw = Array.isArray(b.dsCau) ? b.dsCau : (Array.isArray(b.cau) ? b.cau : [])
   const dapAnDaNop = b.dapAnDaNop || b.answers || {}
 
