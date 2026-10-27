@@ -217,6 +217,8 @@ for (const k of ['background: var(--tr-mat)', 'color: var(--tr-chu)', 'box-shado
 for (const k of ['border: 2px solid var(--tr-vien-2)', 'border-bottom: 2px solid var(--tr-vien-2)', 'border-left: 2px solid var(--tr-vien-2)']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
 // 27/10: đợt gỡ CSS chết thứ hai (tờ nạp chung index-*.css; luật tốc độ đỏ sau #430/#431) — danh sách đóng ở docs/css-chet-2710.json, cùng cách.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
+// 27/10 chiều (máy yếu): CSS chết ở các tờ app học sinh / phụ huynh — danh sách đóng docs/css-chet-2710b.json, cùng cách.
+for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710b.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 for (const [k, n] of Object.entries(GON_MA_2710.cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị»: «Chốt bảng màu chất chỉ thị, làm cho sáng bằng độ sáng của doligo nhé» ⇒ BỐN màu thân giám thị
 // đổi sang sắc bộ B (độ sáng / độ tươi ngang Duolingo, ve-moi/mau-rieng/de-xuat-build.md): bốn mã Duolingo cũ được phép biến mất đúng một lần.
