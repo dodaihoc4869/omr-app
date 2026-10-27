@@ -17,9 +17,9 @@ import type { D1PreparedStatement, Env, ExecutionContext } from './kieu'
 import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { viecPhu } from './viec-phu'
 import {
-  BINH_MUA_TOI_DA_TUAN, CUOC_SO_NGAY, GIO_CU_DEM, HAU_TO_KHOA_BINH_TUAN, HUY_HIEU, KHOA_CONG_TAC, KHOA_TAM_DONG_HS, MA_TT, SO_LIEU_RONG, THANG_HOA_SO_NGAY, TT_CUOC_DAT, TT_CUOC_THANG,
+  BINH_MUA_TOI_DA_TUAN, CUOC_SO_NGAY, GIO_CU_DEM, HAU_TO_KHOA_BINH_TUAN, HUY_HIEU, KHOA_CONG_TAC, KHOA_TAM_DONG_CHO_PHEP, KHOA_TAM_DONG_HS, MA_TT, SO_LIEU_RONG, THANG_HOA_SO_NGAY, TT_CUOC_DAT, TT_CUOC_THANG,
   TT_BINH_GIU_CHUOI, TT_MOC_CHUOI, TT_MUC_TIEU_NGAY, TT_RUONG, chonNhiemVu, congNgayTt, congTacTuDong, datHuyHieu, gioVnCua, mucTieuBai, ngayVnTt, nhiemVuCuaNgay,
-  soThangHoa, tamDongTuDong, tuanMuaBinh,
+  soThangHoa, tamDongChoEm, tamDongTuDong, tuanMuaBinh,
   type CongTac, type MauNhiemVu, type MaNhiemVu, type NhiemVuEm, type SoLieuNgay,
 } from './thuong-luat'
 import { CHUA_TINH_BINH, cauNoiChuoi, congBinhGiuChuoi } from './thuong-cau-noi-chuoi'
@@ -84,7 +84,9 @@ export function lenhThuongMocChuoi(env: Env, sbd: string, moc: number, ngay: str
 // --- Công tắc ----------------------------------------------------------------------------------------
 
 // Cùng MỘT câu đọc cả khoá tạm đóng app học sinh (`hs_tam_dong`) ⇒ /hs/thuong báo `tamDong` mà không thêm câu / vòng chờ nào.
-const KHOA_DOC = [...KHOA_CONG_TAC, KHOA_TAM_DONG_HS] as const
+// + danh sách SBD được vào khi đang đóng (`hs_tam_dong_cho_phep`, thầy thử trước) — cũng trong câu ấy.
+const KHOA_GHI = [...KHOA_CONG_TAC, KHOA_TAM_DONG_HS] as const
+const KHOA_DOC = [...KHOA_GHI, KHOA_TAM_DONG_CHO_PHEP] as const
 const SQL_CONG_TAC = `SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (${KHOA_DOC.map(() => '?').join(',')})`
 export const lenhDocCongTac = (env: Env): D1PreparedStatement => env.DB.prepare(SQL_CONG_TAC).bind(...KHOA_DOC)
 type DongCongTac = { khoa: string; gia_tri: string }
@@ -104,7 +106,7 @@ async function docCongTacGv(env: Env): Promise<CongTacGv> {
 export async function gvCongTacThuong(env: Env, b: Dong): Promise<{ ok: true; congTac: CongTacGv } | { ok: false; error: string; loi400: true }> {
   if (b.khoa !== undefined && b.khoa !== null && b.khoa !== '') {
     const khoa = chu(b.khoa)
-    if (!(KHOA_DOC as readonly string[]).includes(khoa)) return { ok: false, error: `Khoá công tắc không có: ${khoa}`, loi400: true }
+    if (!(KHOA_GHI as readonly string[]).includes(khoa)) return { ok: false, error: `Khoá công tắc không có: ${khoa}`, loi400: true }
     const g = b.giaTri === true ? 'bat' : b.giaTri === false ? 'tat' : chu(b.giaTri)
     if (g !== 'bat' && g !== 'tat') return { ok: false, error: "Giá trị công tắc chỉ nhận 'bat' hoặc 'tat'.", loi400: true }
     await env.DB.prepare('INSERT INTO cau_hinh(khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
@@ -258,8 +260,8 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
   return {
     ok: true,
     bat: batTuCongTac(congTac),
-    // CHỈ-THÊM 27/10: thầy tạm đóng app học sinh (`cau_hinh.hs_tam_dong` = 'bat') ⇒ màn phủ «App đang bảo trì» (trừ khi em đang làm kiểm tra / ca thi).
-    tamDong: tamDongTuDong(dongCt),
+    // CHỈ-THÊM 27/10: thầy tạm đóng app học sinh (`cau_hinh.hs_tam_dong` = 'bat', trừ SBD trong `hs_tam_dong_cho_phep`) ⇒ màn phủ «App đang bảo trì» (trừ khi em đang làm kiểm tra / ca thi).
+    tamDong: tamDongChoEm(dongCt, sbd),
     nguyenTuHomNay: d.nguyenTu,
     tinhThe: d.tinhTheSo + choTra.reduce((t, k) => t + k.so, 0),
     mucTieu: d.mucTieu,

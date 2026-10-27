@@ -265,3 +265,17 @@ export function tamDongTuDong(rows: readonly { khoa: unknown; gia_tri: unknown }
   const r = rows.find((x) => String(x.khoa) === KHOA_TAM_DONG_HS)
   return !!r && String(r.gia_tri ?? '').trim().replace(/^"|"$/g, '') === 'bat'
 }
+/**
+ * DANH SÁCH ĐƯỢC VÀO khi đang tạm đóng (thầy 27/10: «mở cho số báo danh 12121212 để tôi test trước»): `cau_hinh.hs_tam_dong_cho_phep` = các SBD cách
+ * nhau dấu phẩy. So khớp CHÍNH XÁC từng SBD (bỏ khoảng trắng hai đầu).
+ */
+export const KHOA_TAM_DONG_CHO_PHEP = 'hs_tam_dong_cho_phep'
+export function dsChoPhepTamDong(rows: readonly { khoa: unknown; gia_tri: unknown }[]): string[] {
+  const r = rows.find((x) => String(x.khoa) === KHOA_TAM_DONG_CHO_PHEP)
+  return r ? String(r.gia_tri ?? '').replace(/^"|"$/g, '').split(',').map((x) => x.trim()).filter(Boolean) : []
+}
+/** Em có bị tạm đóng không: công tắc bật VÀ SBD của em không trong danh sách được vào. */
+export function tamDongChoEm(rows: readonly { khoa: unknown; gia_tri: unknown }[], sbd: string): boolean {
+  return tamDongTuDong(rows) && !dsChoPhepTamDong(rows).includes(String(sbd ?? '').trim())
+}
+

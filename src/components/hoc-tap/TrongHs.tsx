@@ -9,6 +9,7 @@ import { chuViecBai } from './chu-viec-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
+import type { Props as PropsHomNayCu } from './HocTapHomNay'
 import { ngayGon, useDiemDanhHs } from '../diem-danh/TheDiemDanhHs'
 import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
 import { Bi, type CamBi } from '../linh-vat/Bi'
@@ -391,6 +392,30 @@ export function PhuTamDong(p: { onKiemLai: () => void; kiemDo?: () => void; caMo
       {p.kiemDo && <button type="button" className="tdg-nut" onClick={p.kiemDo}>Làm tiếp Kiểm tra ôn tập</button>}
     </div>
   </div>, document.body)}</>
+}
+
+/**
+ * GIAO DIỆN CŨ (ddh.trong = 'tat') cũng phải đóng: Hôm nay cũ nạp lười mảnh này, tự đọc /hs/thuong (lúc mở + khi em quay lại thẻ); `tamDong` ⇒ ÉP «Trong»
+ * (gắn `<html data-trong>` để màn phủ đúng màu --tr-*) rồi phủ y như Lộ trình; thầy mở lại ⇒ gỡ thuộc tính, trả giao diện cũ nguyên vẹn.
+ */
+export default function GacTamDong({ p, kiem }: { p: PropsHomNayCu; kiem?: TomTatKiemTra }) {
+  const t = useTongQuan(p.token)
+  const dong = !!t.du?.tamDong
+  const { thuLai } = t
+  useEffect(() => {
+    if (dong) return // đang phủ: PhuTamDong tự đọc lại
+    const nhin = () => { if (document.visibilityState === 'visible') thuLai() }
+    document.addEventListener('visibilitychange', nhin)
+    return () => document.removeEventListener('visibilitychange', nhin)
+  }, [dong, thuLai])
+  useLayoutEffect(() => {
+    const h = document.documentElement
+    if (!dong || h.dataset.trong) return
+    h.dataset.trong = 'hs'
+    return () => { delete h.dataset.trong }
+  }, [dong])
+  return dong ? <PhuTamDong onKiemLai={thuLai} caMo={p.coCa ? p.onThi : undefined}
+    kiemDo={!p.coCa && kiem?.homNay && kiem.nopLuc === null && kiem.trangThai === 'can_lam' && kiem.daTra > 0 ? p.onKiemTra : undefined} /> : null
 }
 
 export function MotTrangHs(p: PropsMotTrang) {

@@ -28,7 +28,7 @@ const hinhTuSua = (hien?: boolean) => <Suspense fallback={null}><HinhTuSua hien=
 // Hôm nay có số, nhớ trong phiên, lỗi ⇒ ẩn, không bao giờ chặn thẻ Hôm nay). Dòng việc: chữ phụ ngắn (không lời dặn); bỏ câu giải thích ở Hành trình
 // và tấm "Của em".
 type Muc = 'hom-nay' | 'hanh-trinh' | 'on-lai' | 'ket-qua'
-interface Props {
+export interface Props {
   dangLamMoi?: boolean; nguon?: string; onKetQua?: () => void; onLuyenLai?: () => void; onBangTin?: () => void;
   thongBao?: ReactNode; canhBao?: ReactNode; tienDoCu?: { daLam: number; mucTieu: number };
   ten: string; lop: string; ketQua: KetQuaSanh | null; dangTai: boolean; loi: string
@@ -76,6 +76,8 @@ export const TEN_TU_SUA = 'Tự sửa lỗi'
  *  `TheMoiTuSua.tsx` (đi cùng khối mã màn Tự sửa lỗi), nạp trước lúc trình duyệt rảnh (cùng lượt nạp Hành trình / Ôn & sửa) ⇒ không thêm byte tải mở app; chưa nạp xong thì chưa vẽ thẻ (như khi chưa có số). Chỉ hiện khi biết chắc còn câu cần sửa. */
 const napTheMoi = () => import('./ManTuChua')
 const TheMoi = lazy(() => napTheMoi().then((m) => ({ default: m.TheMoiTuSua })))
+// Tạm đóng app (27/10) ở giao diện cũ: nạp lười mảnh «Trong» (đã có sẵn, không thêm tệp) chỉ để đọc công tắc + phủ.
+const GacTamDong = lazy(() => import('./TrongHs'))
 export function TheMoiTuSua(p: { so: number | null; token?: string; onChua: (qid?: string) => void }) {
   if (!p.so || p.so <= 0) return null
   return <Suspense fallback={null}><TheMoi {...p} /></Suspense>
@@ -223,7 +225,7 @@ export default function HocTapHomNay(p: Props) {
       </div>
     </div>}
   </div> }
-  if (!huaTrong) return ve(false)
+  if (!huaTrong) return <>{ve(false)}<Suspense><GacTamDong p={p} kiem={kiem} /></Suspense></>
   return <Suspense fallback={<div className="ht-app ht2" aria-busy="true" />}><CongTrong hua={huaTrong} ve={ve} /></Suspense>
 }
 
