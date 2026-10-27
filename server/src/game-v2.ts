@@ -359,6 +359,13 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(action==='hoc-tap-dem')return {ok:true,daLamHomNay:tt.daTra,toiThieu:tt.tong,kiemTraCaNhan:tt}
     if(['hoc-tap-start','hoc-tap-gap','hoc-tap-lam-lai','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete','hoa2-dao-start','hoa2-thu-suc','hoa2-thu-suc-them','hoa2-de-thu-start','hoa2-de-thu-nop'].includes(action))throw new Error('Hôm nay em chỉ làm bài kiểm tra theo lịch riêng. Bài tập tiếp tục vào ngày học kế tiếp.')
   }
+  // KHOÁ CHẶNG SAU KIỂM TRA ÔN TẬP (thầy 27/10): ngày có Kiểm tra ôn tập + vẫn có bài học ⇒ bài kiểm tra đang mở mà chưa nộp thì KHÔNG mở chặng / làm lại /
+  // học cách giải / phiên cũ (start · resume · answer · complete) — kể cả lối cũ. Sảnh, đếm, xem câu đã làm vẫn chạy. Dùng lại lượt đọc `kiem` ở trên (không thêm
+  // vòng D1). Quá hạn / đã nộp / công tắc thầy tắt ⇒ không khoá.
+  if(['hoc-tap-start','hoc-tap-gap','hoc-tap-lam-lai','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete'].includes(action)){
+    const khoa=kt.ktDangKhoaChang(kiem,Date.now())
+    if(khoa)return {ok:false,ma:kt.MA_KHOA_KT,error:kt.CHU_KHOA_KT,kiemTraCaNhan:khoa}
+  }
   // App học sinh tập trung làm bài (10/10): không bắt chọn thần thú, không mở phòng/game.
   // Cùng bộ kế hoạch, phiên, quyền và answer hiện có; chỉ bỏ ràng buộc cửa Đảo/Đoàn ở giao diện.
   if(action.startsWith('hoc-tap-')){

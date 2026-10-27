@@ -69,6 +69,16 @@ export async function docKtCn(env: Env, sbd: string, now: number, chiMeta=false)
   return r
 }
 export function laNgayKt(r: Row | null, now: number): boolean { return !!r && s(r.ngay) === ngayKt(now) && s(r.trang_thai) !== 'cho_nguon' }
+/** KHOÁ CHẶNG SAU KIỂM TRA ÔN TẬP (thầy 27/10: «Nếu có kiểm tra tuần thì đẩy lên đầu hành trình, làm xong mới mở khoá các chặng sau»).
+ *  Bài được tính: Kiểm tra ôn tập theo lịch riêng (KTCN, bài kiểm tra trong tuần) của HÔM NAY, đang mở (đã tới giờ mở, chưa tới hạn), CHƯA nộp, khi công tắc
+ *  thầy `kiem_tra_ca_nhan_v1` bật (tắt ⇒ docKtCn trả null ⇒ không khoá). Quá hạn chưa làm ⇒ không khoá (em thấy «Đã lỡ»). Trả bản tóm tắt khi đang khoá. */
+export function ktDangKhoaChang(r: Row | null, now: number): ReturnType<typeof tomTatKt> | null {
+  if (!laNgayKt(r, now) || r!.nop_luc) return null
+  const tt = tomTatKt(r!, now)
+  return tt.trangThai === 'can_lam' ? tt : null
+}
+export const MA_KHOA_KT = 'KIEM_TRA_ON_TAP_TRUOC'
+export const CHU_KHOA_KT = 'Em làm xong Kiểm tra ôn tập hôm nay trước rồi mới mở chặng học mới nhé.'
 export function coHocNgayKt(r:Row|null):boolean {if(!r)return false;const m=r.meta_json?JSON.parse(s(r.meta_json)):de(r);return Number(m.baiNgayToiThieu)>0}
 export function tomTatKt(r: Row, now: number) {
   const d=r.meta_json?null:de(r),t=d?tra(r):null

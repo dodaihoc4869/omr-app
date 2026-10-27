@@ -667,8 +667,13 @@ const manTamTrong = () => {
 // kèm giờ), `/hs/chua-cau-sai/*` (5 câu cần sửa), `/hs/nhip-hoc` (Chăm), `/notifications/list` (2 tin). Số khớp nhau: 12/30 câu, chặng 3/5, kiểm tra 28 câu.
 const MT_TT = thamSo.get('tt') ?? 'thuong', MT_DD = thamSo.get('dd') ?? 'mo'
 const mtNgay = new Date(now + 7 * 3600_000).toISOString().slice(0, 10), mtMo = Date.parse(`${mtNgay}T00:00:00+07:00`)
+// 27/10 «kiểm tra tuần lên đầu, làm xong mới mở khoá»: `&kt=khoa` = Kiểm tra ôn tập HÔM NAY đang mở chưa nộp (nút kiểm tra đầu đường, chặng khoá) · `&kt=xong` =
+// đã nộp (điểm 8,5; mở trang ngay sau `kt=khoa` ⇒ hiệu ứng vỡ khoá) · mặc định = bài kiểm tra NGÀY MAI (đường như cũ, không khoá).
+const MT_KT = thamSo.get('kt')
 const MT_KIEM = { id: 'kt1', ngay: mtNgay, moLuc: mtMo, hanLuc: mtMo + 86400_000, serverNow: now, trangThai: 'can_lam', homNay: true, baiNgayToiThieu: 12, tong: 28, daTra: 0, con: 28,
-  soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true, lyDo: '', thieuNguon: 0, diem: null, nopLuc: null }
+  soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true, lyDo: '', thieuNguon: 0, diem: null as number | null, nopLuc: null as number | null,
+  ...(MT_KT === 'xong' ? { trangThai: 'da_nop', daTra: 28, con: 0, diem: 8.5, nopLuc: now - 60_000 } : MT_KT === 'khoa' ? {}
+    : { ngay: new Date(mtMo + 86400_000 + 7 * 3600_000).toISOString().slice(0, 10), moLuc: mtMo + 86400_000, hanLuc: mtMo + 2 * 86400_000, trangThai: 'sap_den', homNay: false }) }
 const mtLam = MT_TT === 'du' ? 30 : 12
 const SANH_MT = { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: mtLam, daXep: 30, soChang: 5, changHienTai: MT_TT === 'du' ? 5 : 3 },
   theLuc: MT_TT === 'du' ? { con: 6, tong: 36 } : { con: 18, tong: 30 }, ruong: { ...SANH_MOI.ruong, daLam: mtLam, tong: 30 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }

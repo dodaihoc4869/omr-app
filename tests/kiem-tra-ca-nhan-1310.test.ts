@@ -2,7 +2,7 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
-import { lapKtCn as lapKtCnThat, docKtCn, tomTatKt, ktCnAction, dongBoKtCn as dongBoKtCnThat, chotKtCn, buMetaKt } from '../server/src/kiem-tra-ca-nhan'
+import { lapKtCn as lapKtCnThat, docKtCn, tomTatKt, ktCnAction, dongBoKtCn as dongBoKtCnThat, chotKtCn, buMetaKt, ktDangKhoaChang } from '../server/src/kiem-tra-ca-nhan'
 import { chonDeKt, henKt, quotaHocKt, phutCauKt, dauNgayKt, type MucKt } from '../server/src/kiem-tra-ca-nhan-loi'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
@@ -158,6 +158,31 @@ it('bản nháp cũ không ghi đè đáp án mới; retry cùng patch không t�
  expect(await ktCnAction(k.env,'S1','hoc-tap-ktcn-luu',payload,now+2000)).toMatchObject({daLuu:true,revision:1})
  await expect(ktCnAction(k.env,'S1','hoc-tap-ktcn-luu',{...payload,tra:{[qid]:'B'}},now+3000)).rejects.toThrow('lượt khác')
  expect(JSON.parse(String((await docKtCn(k.env,'S1',now))!.tra_json))[qid]).toBe('A')
+})
+it('thầy 27/10 «làm xong kiểm tra tuần mới mở khoá chặng sau»: ngày kiểm tra CÓ bài học ⇒ chưa nộp thì từ chối mở chặng (mã rõ, mọi lối), nộp xong ⇒ mở; quá hạn / công tắc tắt ⇒ không khoá',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,id=String(r.id),now=Number(r.mo_luc)+1000
+ // ngày kiểm tra có bài học (bản 2026: baiNgayToiThieu 12) — chỉ sửa dữ liệu thử của kho giả
+ k.d.sql.exec(`UPDATE kiem_tra_ca_nhan SET json=json_set(json,'$.baiNgayToiThieu',12)`)
+ k.d.sql.exec(`UPDATE kiem_tra_ca_nhan_meta SET meta_json=json_set(meta_json,'$.baiNgayToiThieu',12)`)
+ vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(now)
+ const token=await gameToken(k.env,'S1')
+ for(const lenh of ['hoc-tap-start','hoc-tap-lam-lai','hoc-tap-gap','start','answer']){
+  const res=await gameV2(k.env,lenh,{token})
+  expect(res,lenh).toMatchObject({ok:false,ma:'KIEM_TRA_ON_TAP_TRUOC',kiemTraCaNhan:{id,homNay:true,trangThai:'can_lam'}})
+ }
+ expect(k.d.sql.prepare("SELECT COUNT(*) n FROM srs2_ke_hoach WHERE sbd='S1'").get()).toMatchObject({n:0}) // lệnh bị từ chối không lập kế hoạch
+ // Sảnh vẫn mở (để thấy nút kiểm tra + chặng khoá)
+ expect((await gameV2(k.env,'hoc-tap-sanh',{token})).ma).toBeUndefined()
+ const meta=await docKtCn(k.env,'S1',now,true)
+ expect(ktDangKhoaChang(meta,now)).toMatchObject({id})
+ expect(ktDangKhoaChang(meta,Number(r.han_luc)+1000)).toBeNull() // quá hạn ⇒ không khoá
+ await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id},now)
+ expect(ktDangKhoaChang(await docKtCn(k.env,'S1',now,true),now)).toBeNull()
+ const sau=await gameV2(k.env,'hoc-tap-start',{token}).catch((e:Error)=>({loi:e.message}))
+ expect((sau as Record<string,unknown>).ma).toBeUndefined()
+ // công tắc thầy tắt ⇒ docKtCn null ⇒ không khoá
+ k.d.sql.exec(`UPDATE cau_hinh SET gia_tri='{"bat":false}' WHERE khoa='kiem_tra_ca_nhan_v1'`);xoaMoiDem();xoaDemCauHinh(k.env)
+ expect(await docKtCn(k.env,'S1',now,true)).toBeNull()
 })
 it('kết quả kiểm tra đã nộp vẫn là mức ngày thật nếu tạm tắt tính năng',async()=>{
  const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,id=String(r.id),now=Number(r.mo_luc)+1000
