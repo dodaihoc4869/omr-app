@@ -2,11 +2,12 @@
    thân 4 con theo bảng màu linh vật ngay dưới; đạo cụ / mắt / miệng lấy biến --tr-* (con ngươi, lông mày luôn tối, lòng mắt luôn sáng ở cả hai nền).
    Chuyển động chỉ transform / opacity. Thân thở trên lớp HTML riêng (GPU, không vẽ lại SVG). Giảm chuyển động / máy yếu ⇒ đứng yên. */
 /* BẢNG MÀU LINH VẬT (thầy 27/10: «tươi mịn mắt như Duolingo») — CHỈNH MỘT CHỖ Ở ĐÂY. Là màu TRANH (như bảng màu game): không đổi theo nền sáng/tối;
-   bóng đổ phẳng = một tông đậm hơn, highlight nhẹ, không gradient, viền cùng sắc (không viền đen). check-mau.mjs cho phép mã màu riêng tệp này. */
+   bóng đổ phẳng = một tông đậm hơn, highlight nhẹ, không gradient, viền cùng sắc (không viền đen). Chỉ 4 mã gốc này là màu thô (check-mau.mjs +
+   kiem-mau-giu-nguyen.mjs ghi lệnh thầy); mọi sắc khác pha từ chúng với --gt-trang / --gt-toi (trắng / tối cố định ở cả hai nền). */
 .gtv {
   --gt-mau-nb: #58cc02; --gt-mau-th: #ce82ff; --gt-mau-vd: #ff9600; --gt-mau-vdc: #ff4b4b;
   --gt-c: var(--gt-mau-nb); --gt-toi: var(--tr-chu); --gt-trang: var(--tr-trang);
-  --gt-sang: color-mix(in srgb, var(--gt-c) 55%, #fff); --gt-dam: color-mix(in srgb, var(--gt-c) 80%, #000); --gt-kinh: color-mix(in srgb, var(--gt-c) 15%, #fff);
+  --gt-sang: color-mix(in srgb, var(--gt-c) 55%, var(--gt-trang)); --gt-dam: color-mix(in srgb, var(--gt-c) 80%, var(--gt-toi)); --gt-kinh: color-mix(in srgb, var(--gt-c) 15%, var(--gt-trang));
   display: block; width: 100%; height: auto; overflow: visible;
 }
 @media (prefers-color-scheme: dark) { .gtv { --gt-toi: var(--tr-trang); --gt-trang: var(--tr-chu); } }
