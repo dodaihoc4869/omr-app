@@ -14,7 +14,7 @@
 //     đạt 3 ⇒ nghỉ 30 phút. Lượt có câu soạn được ⇒ về 0. Hết giờ nghỉ mà lượt đầu lại lỗi ⇒ nghỉ tiếp 30 phút (bộ đếm không xoá khi bắt đầu nghỉ).
 //   · GIỜ CAO ĐIỂM 19–24h VN: chỉ chạy khi cờ `gioCaoDiem`, và `songSong` 1.
 //   · TỰ CO GIÃN (thầy 27/10 «Ko đc quá tải làm 24 câu liên tục tới lúc xong»): số câu song song hiện tại lưu ở `dem_json.song_song_hien`.
-//     Lượt gặp 429/503 ⇒ chia đôi (24 → 12 → 6 → 3 → 2), KHÔNG tính lỗi để nghỉ khi còn hạ được; lượt êm có câu soạn được ⇒ +4 (tới SONG_SONG).
+//     Lượt gặp 429/503 ⇒ chia đôi (48 → 24 → 12 → 6 → 3 → 2), KHÔNG tính lỗi để nghỉ khi còn hạ được; lượt êm có câu soạn được ⇒ +4 (tới SONG_SONG).
 //     Chỉ khi đã ở mức thấp nhất mà vẫn 429 mới đếm lỗi ⇒ 3 lượt liền mới nghỉ 30 phút như cũ.
 //   · TỰ SỬA ĐÁP ÁN KHO: MẶC ĐỊNH TẮT (soanSoDoLo mặc định BẬT ⇒ luôn truyền boolean rõ ràng). Lý do: lời giải chữ trong gói R2 (`loi_giai.buoc` / `chot` /
 //     `noi_dung` / `tung_pa[X].vi_sao`) là CHỮ TỰ DO vẫn tính ra đáp án cũ — chỉ đổi `dap_an` thì lời giải cũ tự mâu thuẫn. Chỉ bật khi cờ `tuSuaDapAn:true`,
@@ -36,14 +36,14 @@ export function docCoMaySoan(v: string | null | undefined): CoMaySoan {
   } catch { return { bat: false, gioCaoDiem: false, tuSuaDapAn: false } }
 }
 
-/** Khoá chạy: một lượt soạn (lô 24 câu song song, có câu thử 4 lượt + 2 lần giải mù, mỗi lần gọi tới 60 s) có thể tới vài phút ⇒ khoá 8 phút để lượt
- *  phút sau không gọi chồng (gấp đôi chi Gemini). Máy chết giữa chừng ⇒ tối đa 8 phút là lượt sau tự giành lại. */
-export const THOI_HAN_KHOA_MS = 480_000
+/** Khoá chạy: một lượt soạn (lô 48 câu song song, có câu thử 4 lượt + 2 lần giải mù, mỗi lần gọi tới 60 s) có thể tới vài phút ⇒ khoá 12 phút (cron tối đa 15 phút) để lượt
+ *  phút sau không gọi chồng (gấp đôi chi Gemini). Máy chết giữa chừng ⇒ tối đa 12 phút là lượt sau tự giành lại. */
+export const THOI_HAN_KHOA_MS = 720_000
 export const NGHI_KHI_LOI_MS = 30 * 60_000
 export const SO_LOI_DE_NGHI = 3
-export const GIOI_HAN_MOI_LUOT = 24
+export const GIOI_HAN_MOI_LUOT = 48
 export const NGAN_SACH_GIAY = 25
-export const SONG_SONG = 24 // 27/10 thầy «24 câu luôn»: trần 24 câu song song ngoài giờ cao điểm (429 ⇒ tự co về SONG_SONG_THAP_NHAT)
+export const SONG_SONG = 48 // 27/10: trần 48 câu song song ngoài giờ cao điểm (thầy «24 câu luôn» ⇒ Workers AI chưa 429 lần nào, lượt ~7 phút chờ câu chậm nhất ⇒ gấp đôi); 429 ⇒ tự co về SONG_SONG_THAP_NHAT
 export const SONG_SONG_THAP_NHAT = 2
 export const SONG_SONG_TANG = 4
 /** Số câu song song lượt này theo `dem_json.song_song_hien` (vắng / hỏng ⇒ trần). */

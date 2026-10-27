@@ -19,7 +19,7 @@ const mo = Date.parse('2026-10-26T00:00:00+07:00')
 const KIEM: TomTatKiemTra = { id: 'k', ngay: '2026-10-26', moLuc: mo, hanLuc: mo + 86400_000, serverNow: mo + 3600_000, trangThai: 'can_lam', homNay: true, baiNgayToiThieu: 12,
   tong: 28, daTra: 0, con: 28, soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true, lyDo: '', thieuNguon: 0, diem: null, nopLuc: null }
 
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); window.history.replaceState(null, '', '/') })
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); window.history.replaceState(null, '', '/'); try { localStorage.clear() } catch { /* bỏ qua */ } })
 
 // 26/10 tối (thầy chốt bản vẽ ve-moi/dm-*.html — hướng Duolingo + chất Hoá): Hôm nay «Một trang» nay là LỘ TRÌNH — con đường chặng giữ ĐÚNG thứ tự việc
 // (học → Kiểm tra ôn tập → Tự sửa lỗi → Bài tập về nhà; ca đang mở / ngày chỉ kiểm tra như cũ), cùng nút, cùng lệnh. Luyện tập / Thành tích là hai mục còn lại.
@@ -28,6 +28,23 @@ const nut = () => within(duong()).getAllByRole('listitem').map((li) => (li.first
 const HS = { lop: '12A1', onXemLai: noop, onTuLuyen: noop, onLichSu: noop, onKetQua: noop }
 
 describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
+  it('lời Bi NHẮC MỘT LẦN mỗi ngày (thầy 27/10): giữ ~4 s rồi thu gọn và gỡ; mở lại trong ngày ⇒ không hiện; nội dung đổi hẳn (đủ mức) ⇒ hiện lại một lần', () => {
+    vi.useFakeTimers()
+    try {
+      const a = render(<MotTrangHs {...goc()} />)
+      expect(a.container.querySelector('.bi-loi')).not.toBeNull()
+      act(() => { vi.advanceTimersByTime(4800) })
+      expect(a.container.querySelector('.bi-loi-boc[data-thu]')).not.toBeNull()
+      act(() => { vi.advanceTimersByTime(500) })
+      expect(a.container.querySelector('.bi-loi')).toBeNull()
+      a.unmount()
+      const b = render(<MotTrangHs {...goc({ so: { daLam: 14, muc: 30, chang: 3, soChang: 5 } as PropsMotTrang['so'] })} />)
+      expect(b.container.querySelector('.bi-loi')).toBeNull() // số câu còn lại đổi KHÔNG phải nội dung mới
+      b.unmount()
+      const c = render(<MotTrangHs {...goc({ so: { daLam: 30, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'] })} />)
+      expect(c.container.querySelector('.bi-loi-bong .ht2-an')!.textContent).toMatch(/^Đủ mức rồi!/)
+    } finally { vi.useRealTimers() }
+  })
   it('lời Bi trọn câu (soát 27/10: ảnh chụp lúc đang gõ trông «cụt» ở chữ «là»): câu đủ ý và gõ xong trong ≤ 0,7 s', () => {
     vi.useFakeTimers()
     try {
